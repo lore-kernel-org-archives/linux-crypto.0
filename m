@@ -1,73 +1,110 @@
-From: Garg Vakul-B16394 <B16394@freescale.com>
-Subject: RE: [PATCH] crypto: caam - fix inconsistent assoc dma mapping
- direction
-Date: Fri, 10 May 2013 13:04:54 +0000
-Message-ID: <065BBB7616BCE543832A2EF096986B941E84FC@039-SN2MPN1-012.039d.mgd.msft.net>
-References: <1368187719-6865-1-git-send-email-horia.geanta@freescale.com>
+From: Joel A Fernandes <joelagnel@ti.com>
+Subject: [PATCH] OMAP: AES: Don't idle/start AES device between Encrypt operations
+Date: Sat, 11 May 2013 12:23:44 -0500
+Message-ID: <1368293024-6654-1-git-send-email-joelagnel@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	Phillips Kim-R1AAHA <R1AAHA@freescale.com>
-To: Geanta Neag Horia Ioan-B05471 <B05471@freescale.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain
+Cc: "Mark A. Greer" <mgreer@animalcreek.com>,
+	Joel A Fernandes <joelagnel@ti.com>
+To: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from am1ehsobe005.messaging.microsoft.com ([213.199.154.208]:7942
-	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752417Ab3EJNEt convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 10 May 2013 09:04:49 -0400
-In-Reply-To: <1368187719-6865-1-git-send-email-horia.geanta@freescale.com>
-Content-Language: en-US
+Received: from arroyo.ext.ti.com ([192.94.94.40]:33525 "EHLO arroyo.ext.ti.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753104Ab3EKRXt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 11 May 2013 13:23:49 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Looks good.
+Calling runtime PM API for every block causes serious perf hit to
+crypto operations that are done on a long buffer.
+As crypto is performed on a page boundary, encrypting large buffers can
+cause a series of crypto operations divided by page. The runtime PM API
+is also called those many times.
 
+We call runtime_pm_get_sync only at beginning of the session (cra_init)
+and runtime_pm_put at the end. This result in upto a 50% speedup as below:
 
-> -----Original Message-----
-> From: Geanta Neag Horia Ioan-B05471
-> Sent: Friday, May 10, 2013 5:39 PM
-> To: linux-crypto@vger.kernel.org
-> Cc: Herbert Xu; stable@vger.kernel.org; Phillips Kim-R1AAHA; Garg Vakul-
-> B16394
-> Subject: [PATCH] crypto: caam - fix inconsistent assoc dma mapping
-> direction
-> 
-> req->assoc is dma mapped BIDIRECTIONAL and unmapped TO_DEVICE.
-> Since it is read-only for the device, use TO_DEVICE both for mapping and
-> unmapping.
-> 
-> Cc: <stable@vger.kernel.org> # 3.9, 3.8
-> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
-> ---
->  drivers/crypto/caam/caamalg.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/caam/caamalg.c
-> b/drivers/crypto/caam/caamalg.c index 42420fb..bf7da50 100644
-> --- a/drivers/crypto/caam/caamalg.c
-> +++ b/drivers/crypto/caam/caamalg.c
-> @@ -1154,7 +1154,7 @@ static struct aead_edesc *aead_edesc_alloc(struct
-> aead_request *req,
->  		dst_nents = sg_count(req->dst, req->cryptlen, &dst_chained);
-> 
->  	sgc = dma_map_sg_chained(jrdev, req->assoc, assoc_nents ? : 1,
-> -				 DMA_BIDIRECTIONAL, assoc_chained);
-> +				 DMA_TO_DEVICE, assoc_chained);
->  	if (likely(req->src == req->dst)) {
->  		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
->  					 DMA_BIDIRECTIONAL, src_chained);
-> @@ -1336,7 +1336,7 @@ static struct aead_edesc
-> *aead_giv_edesc_alloc(struct aead_givcrypt_request
->  		dst_nents = sg_count(req->dst, req->cryptlen, &dst_chained);
-> 
->  	sgc = dma_map_sg_chained(jrdev, req->assoc, assoc_nents ? : 1,
-> -				 DMA_BIDIRECTIONAL, assoc_chained);
-> +				 DMA_TO_DEVICE, assoc_chained);
->  	if (likely(req->src == req->dst)) {
->  		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
->  					 DMA_BIDIRECTIONAL, src_chained);
-> --
-> 1.7.7.6
+Before:
+root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
+Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
+Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
+Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
+Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
+
+After:
+root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
+Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
+Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
+Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
+Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
+
+While at it, also drop enter and exit pr_debugs, in related code. tracers
+are exactly used for that.
+
+Tested on a Beaglebone (AM335x SoC) board.
+
+Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
+---
+ drivers/crypto/omap-aes.c |   23 +++++++++++++++++++----
+ 1 files changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 6aa425f..e6474eb 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -208,7 +208,6 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
+ 	 * It may be long delays between requests.
+ 	 * Device might go to off mode to save power.
+ 	 */
+-	pm_runtime_get_sync(dd->dev);
+ 
+ 	if (!(dd->flags & FLAGS_INIT)) {
+ 		dd->flags |= FLAGS_INIT;
+@@ -636,7 +635,6 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
+ 
+ 	pr_debug("err: %d\n", err);
+ 
+-	pm_runtime_put(dd->dev);
+ 	dd->flags &= ~FLAGS_BUSY;
+ 
+ 	req->base.complete(&req->base, err);
+@@ -837,8 +835,16 @@ static int omap_aes_ctr_decrypt(struct ablkcipher_request *req)
+ 
+ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ {
+-	pr_debug("enter\n");
++	struct omap_aes_dev *dd = NULL;
++
++	/* Find AES device, currently picks the first device */
++	spin_lock_bh(&list_lock);
++	list_for_each_entry(dd, &dev_list, list) {
++		break;
++	}
++	spin_unlock_bh(&list_lock);
+ 
++	pm_runtime_get_sync(dd->dev);
+ 	tfm->crt_ablkcipher.reqsize = sizeof(struct omap_aes_reqctx);
+ 
+ 	return 0;
+@@ -846,7 +852,16 @@ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ 
+ static void omap_aes_cra_exit(struct crypto_tfm *tfm)
+ {
+-	pr_debug("enter\n");
++	struct omap_aes_dev *dd = NULL;
++
++	/* Find AES device, currently picks the first device */
++	spin_lock_bh(&list_lock);
++	list_for_each_entry(dd, &dev_list, list) {
++		break;
++	}
++	spin_unlock_bh(&list_lock);
++
++	pm_runtime_put_sync(dd->dev);
+ }
+ 
+ /* ********************** ALGS ************************************ */
+-- 
+1.7.4.1
