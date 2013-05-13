@@ -1,66 +1,74 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH][RFC] CPU Jitter random number generator
-Date: Mon, 13 May 2013 17:32:18 +0200
-Message-ID: <20130513173218.76823730@tauon>
+From: Kevin Hilman <khilman@linaro.org>
+Subject: Re: [PATCH] OMAP: AES: Don't idle/start AES device between Encrypt operations
+Date: Mon, 13 May 2013 09:35:49 -0700
+Message-ID: <878v3i6dne.fsf@linaro.org>
+References: <1368293024-6654-1-git-send-email-joelagnel@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mo-p00-ob.rzone.de ([81.169.146.161]:41717 "EHLO
-	mo-p00-ob.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753078Ab3EMPc2 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 May 2013 11:32:28 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+	"Mark A. Greer" <mgreer@animalcreek.com>
+To: Joel A Fernandes <joelagnel@ti.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <1368293024-6654-1-git-send-email-joelagnel@ti.com> (Joel
+	A. Fernandes's message of "Sat, 11 May 2013 12:23:44 -0500")
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+Joel A Fernandes <joelagnel@ti.com> writes:
 
-[1] patch at http://www.chronox.de/jent/jitterentropy-20130508.tar.bz2
+> Calling runtime PM API for every block causes serious perf hit to
+> crypto operations that are done on a long buffer.
+> As crypto is performed on a page boundary, encrypting large buffers can
+> cause a series of crypto operations divided by page. The runtime PM API
+> is also called those many times.
+>
+> We call runtime_pm_get_sync only at beginning of the session (cra_init)
+> and runtime_pm_put at the end. This result in upto a 50% speedup as below:
+>
+> Before:
+> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+> Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
+> Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
+> Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
+> Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
+> Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
+>
+> After:
+> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+> Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
+> Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
+> Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
+> Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
+> Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
+>
+> While at it, also drop enter and exit pr_debugs, in related code. tracers
+> are exactly used for that.
+>
+> Tested on a Beaglebone (AM335x SoC) board.
+>
+> Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
 
-A new version of the CPU Jitter random number generator is released at
-http://www.chronox.de/ . The heart of the RNG is about 30 lines of easy
-to read code. The readme in the main directory explains the different
-code files.
+Did you explore using runtime PM autosuspend timeouts for this instead?
+They are intended for exactly this kind of thing, and the timeouts can
+have sane defaults, but can be configured from userspace to allow a
+power/performance trade-off.
 
-In a previous attempt (http://lkml.org/lkml/2013/2/8/476), the first
-iteration received comments for the lack of tests, documentation and
-entropy assessment. All these concerns have been addressed. The
-documentation of the CPU Jitter random number generator
-(http://www.chronox.de/jent/doc/index.html and PDF at
-http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.pdf -- the graphs and
-pictures are better in PDF) offers a full analysis of:
+[...]
 
-- the root cause of entropy
+>  static void omap_aes_cra_exit(struct crypto_tfm *tfm)
+>  {
+> -	pr_debug("enter\n");
+> +	struct omap_aes_dev *dd = NULL;
+> +
+> +	/* Find AES device, currently picks the first device */
+> +	spin_lock_bh(&list_lock);
+> +	list_for_each_entry(dd, &dev_list, list) {
+> +		break;
+> +	}
+> +	spin_unlock_bh(&list_lock);
+> +
+> +	pm_runtime_put_sync(dd->dev);
 
-- a design of the RNG
+nit: Why use the synchronous call here?  The original was async.
 
-- statistical tests and analyses
-
-- entropy assessment and explanation of the flow of entropy
-
-The document also explains the core concept to have a fully
-decentralized entropy collector for every caller in need of entropy.
-
-The appendix of the documentation contains example use cases by
-providing link code to the Linux kernel crypto API, libgcrypt and
-OpenSSL. Links to other cryptographic libraries should be straight
-forward to implement. These implementations follow the concept of
-decentralized entropy collection.
-
-The man page provided with the source code explains the use of the API
-of the CPU Jitter random number generator.
-
-The test cases used to compile the documentation are available at the
-web site as well.
-
-Note: for the kernel crypto API, please read the provided Kconfig file
-for the provided switches and which of them are recommended in regular
-operation. These switches must currently be set manually in the
-Makefile.
-
-Ciao
-Stephan
-
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Kevin
