@@ -1,111 +1,62 @@
-From: Joel A Fernandes <joelagnel@ti.com>
-Subject: [PATCH v2] OMAP: AES: Don't idle/start AES device between Encrypt operations
-Date: Mon, 13 May 2013 22:07:47 -0500
-Message-ID: <1368500867-7737-1-git-send-email-joelagnel@ti.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [cryptodev:master 2/13] undefined reference to
+ `crypto_shash_update'
+Date: Tue, 14 May 2013 12:22:59 +0800
+Message-ID: <20130514042259.GA20298@gondor.apana.org.au>
+References: <5191b967.2QgbDFN8LBbn0tI6%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <khilman@linaro.org>, "Mark A. Greer" <mgreer@animalcreek.com>,
-	Joel A Fernandes <joelagnel@ti.com>
-To: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>
-Return-path: <linux-omap-owner@vger.kernel.org>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Tim Chen <tim.c.chen@linux.intel.com>, kbuild-all@01.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: kbuild test robot <fengguang.wu@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:59495 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751034Ab3ENEXG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 14 May 2013 00:23:06 -0400
+Content-Disposition: inline
+In-Reply-To: <5191b967.2QgbDFN8LBbn0tI6%fengguang.wu@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Calling runtime PM API for every block causes serious perf hit to
-crypto operations that are done on a long buffer.
-As crypto is performed on a page boundary, encrypting large buffers can
-cause a series of crypto operations divided by page. The runtime PM API
-is also called those many times.
+On Tue, May 14, 2013 at 12:11:19PM +0800, kbuild test robot wrote:
+> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> head:   b9d0b63e0349515938e42f85f9e7a1742ae919d1
+> commit: f8ef7e01fe6ec9ffc0cef1044d385acb590ac106 [2/13] crypto: crct10dif - Wrap crc_t10dif function all to use crypto transform framework
+> config: i386-randconfig-x10-0513 (attached as .config)
+> 
+> All error/warnings:
+> 
+>    lib/built-in.o: In function `crc_t10dif':
+> >> (.text+0x1047a): undefined reference to `crypto_shash_update'
+>    lib/built-in.o: In function `crc_t10dif_update_lib':
+> >> (.text+0x104b6): undefined reference to `crypto_alloc_shash'
+>    lib/built-in.o: In function `crc_t10dif_update_lib':
+> >> (.text+0x1052e): undefined reference to `crypto_destroy_tfm'
+>    lib/built-in.o: In function `crc_t10dif_update_lib':
+> >> (.text+0x10540): undefined reference to `crypto_destroy_tfm'
+>    lib/built-in.o: In function `crc_t10dif_mod_fini':
+> >> crc-t10dif.c:(.exit.text+0x10): undefined reference to `crypto_destroy_tfm'
 
-We call runtime_pm_get_sync only at beginning on the session (cra_init)
-and runtime_pm_put at the end. This result in upto a 50% speedup as below.
-This doesn't make the driver to keep the system awake as runtime get/put
-is only called during a crypto session which completes usually quickly.
+Thanks.  Should be fixed by the following patch which I've foloded
+into the original changes.
 
-Before:
-root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
-Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
-Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
-Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
-Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
-Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
+diff --git a/lib/Kconfig b/lib/Kconfig
+index fe01d41..0cee056 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -63,6 +63,7 @@ config CRC16
+ 
+ config CRC_T10DIF
+ 	tristate "CRC calculation for the T10 Data Integrity Field"
++	select CRYPTO_CRCT10DIF
+ 	help
+ 	  This option is only needed if a module that's not in the
+ 	  kernel tree needs to calculate CRC checks for use with the
 
-After:
-root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
-Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
-Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
-Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
-Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
-Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
-
-While at it, also drop enter and exit pr_debugs, in related code. tracers
-can be used for that.
-
-Tested on a Beaglebone (AM335x SoC) board.
-
-Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
----
-v2 changes: Clarify usage of runtime PM a bit more in the commit logs.
-
- drivers/crypto/omap-aes.c |   23 +++++++++++++++++++----
- 1 files changed, 19 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 6aa425f..e6474eb 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -208,7 +208,6 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
- 	 * It may be long delays between requests.
- 	 * Device might go to off mode to save power.
- 	 */
--	pm_runtime_get_sync(dd->dev);
- 
- 	if (!(dd->flags & FLAGS_INIT)) {
- 		dd->flags |= FLAGS_INIT;
-@@ -636,7 +635,6 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
- 
- 	pr_debug("err: %d\n", err);
- 
--	pm_runtime_put_sync(dd->dev);
- 	dd->flags &= ~FLAGS_BUSY;
- 
- 	req->base.complete(&req->base, err);
-@@ -837,8 +835,16 @@ static int omap_aes_ctr_decrypt(struct ablkcipher_request *req)
- 
- static int omap_aes_cra_init(struct crypto_tfm *tfm)
- {
--	pr_debug("enter\n");
-+	struct omap_aes_dev *dd = NULL;
-+
-+	/* Find AES device, currently picks the first device */
-+	spin_lock_bh(&list_lock);
-+	list_for_each_entry(dd, &dev_list, list) {
-+		break;
-+	}
-+	spin_unlock_bh(&list_lock);
- 
-+	pm_runtime_get_sync(dd->dev);
- 	tfm->crt_ablkcipher.reqsize = sizeof(struct omap_aes_reqctx);
- 
- 	return 0;
-@@ -846,7 +852,16 @@ static int omap_aes_cra_init(struct crypto_tfm *tfm)
- 
- static void omap_aes_cra_exit(struct crypto_tfm *tfm)
- {
--	pr_debug("enter\n");
-+	struct omap_aes_dev *dd = NULL;
-+
-+	/* Find AES device, currently picks the first device */
-+	spin_lock_bh(&list_lock);
-+	list_for_each_entry(dd, &dev_list, list) {
-+		break;
-+	}
-+	spin_unlock_bh(&list_lock);
-+
-+	pm_runtime_put_sync(dd->dev);
- }
- 
- /* ********************** ALGS ************************************ */
+Thanks,
 -- 
-1.7.4.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
