@@ -1,35 +1,58 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - FIX RNG init for RNG greater than equal
- to 4
-Date: Tue, 14 May 2013 10:35:09 +0800
-Message-ID: <20130514023509.GA19306@gondor.apana.org.au>
-References: <1366971294-10673-1-git-send-email-ruchika.gupta@freescale.com>
- <065BBB7616BCE543832A2EF096986B941D616B@039-SN2MPN1-012.039d.mgd.msft.net>
+Subject: Re: [PATCH v3 0/4] Patchset to use PCLMULQDQ to accelerate
+ CRC-T10DIF checksum computation
+Date: Tue, 14 May 2013 10:35:26 +0800
+Message-ID: <20130514023526.GB19306@gondor.apana.org.au>
+References: <cover.1367436101.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Gupta Ruchika-R66431 <R66431@freescale.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Phillips Kim-R1AAHA <R1AAHA@freescale.com>,
-	Porosanu Alexandru-B06830 <B06830@freescale.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Garg Vakul-B16394 <B16394@freescale.com>
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	Matthew Wilcox <willy@linux.intel.com>,
+	Jim Kukunas <james.t.kukunas@linux.intel.com>,
+	Keith Busch <keith.busch@intel.com>,
+	Erdinc Ozturk <erdinc.ozturk@intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:35393 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:58595 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755783Ab3ENCfT (ORCPT
+	with ESMTP id S1755783Ab3ENCfz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 May 2013 22:35:19 -0400
+	Mon, 13 May 2013 22:35:55 -0400
 Content-Disposition: inline
-In-Reply-To: <065BBB7616BCE543832A2EF096986B941D616B@039-SN2MPN1-012.039d.mgd.msft.net>
+In-Reply-To: <cover.1367436101.git.tim.c.chen@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 26, 2013 at 11:34:19AM +0000, Garg Vakul-B16394 wrote:
-> Reviewed-by: Vakul Garg <vakul@freescale.com>
+On Wed, May 01, 2013 at 12:52:47PM -0700, Tim Chen wrote:
+> Currently the CRC-T10DIF checksum is computed using a generic table lookup
+> algorithm.  By switching the checksum to PCLMULQDQ based computation,
+> we can speedup the computation by 8x for checksumming 512 bytes and
+> even more for larger buffer size.  This will improve performance of SCSI
+> drivers turning on the CRC-T10IDF checksum.  In our SSD based experiments,
+> we have seen increase disk throughput by 3.5x with T10DIF for 512 byte
+> block size.
+> 
+> This patch set provides the x86_64 routine using PCLMULQDQ instruction
+> and switches the crc_t10dif library function to use the faster PCLMULQDQ
+> based routine when available.
+> 
+> Tim
+> 
+> v3
+> 1. Update the crct10dif crypto transform used in the crct10dif library in a safe way.
+> 2. Load the accelerated t10dif transform for the x86_64 cpus that support it.
+> 3. Added generic crct10dif crypto transform.
 
-Patch applied.  Thanks!
+All applied.  Thanks Tim.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
