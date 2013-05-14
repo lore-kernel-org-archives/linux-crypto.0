@@ -1,33 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: remove dependency on EXPERIMENTAL
-Date: Tue, 14 May 2013 10:38:27 +0800
-Message-ID: <20130514023827.GG19306@gondor.apana.org.au>
-References: <1368359839.1350.10.camel@x61.thuisdomein>
+From: "Fernandes, Joel A" <joelagnel@ti.com>
+Subject: RE: [PATCH] OMAP: AES: Don't idle/start AES device between Encrypt
+ operations
+Date: Tue, 14 May 2013 02:49:50 +0000
+Message-ID: <083BC63EECB6FD41B8E81CF7FD87CC0F2E4D6FF3@DLEE08.ent.ti.com>
+References: <1368293024-6654-1-git-send-email-joelagnel@ti.com>
+	<878v3i6dne.fsf@linaro.org>
+	<083BC63EECB6FD41B8E81CF7FD87CC0F2E4D6E5F@DLEE08.ent.ti.com>
+ <87y5bi38yc.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Paul Bolle <pebolle@tiscali.nl>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:33753 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756527Ab3ENCic (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 13 May 2013 22:38:32 -0400
-Content-Disposition: inline
-In-Reply-To: <1368359839.1350.10.camel@x61.thuisdomein>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
+	"Mark A. Greer" <mgreer@animalcreek.com>
+To: Kevin Hilman <khilman@linaro.org>
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <87y5bi38yc.fsf@linaro.org>
+Content-Language: en-US
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, May 12, 2013 at 01:57:19PM +0200, Paul Bolle wrote:
-> The Kconfig symbol EXPERIMENTAL was removed in v3.9. So this dependency
-> makes it impossible to set CRYPTO_DEV_SAHARA. It's unlikely that this is
-> what is intended, so let's remove this dependency.
+Hi Kevin,
+
+> have to be created anyway.
+> > Imagine encrypting a 20M block- this means runtime PM API is called
+> > 20 * 1024 / 4 =~ 5000 times. The slow down in my opinion doesn't make it
+> worth it.
+> > What is your opinion about this?
 > 
-> Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+> OK, I'm not terribly familiar with the crypto API, so I was assuming that the
+> init/exit calls you're instrumenting were happening at driver probe/remove
+> time.  Based on your clarifications, that doesn't seem to be the case.
+> 
+> My main concern is that drivers don't simply use 'get' on driver probe and 'put'
+> on driver remove and force the system awake as long as the driver is present.
+> I've seen that plenty of times, and I was assuming that's what was going on
+> here.  Sorry for the confusion.
 
-Patch applied.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+[Joel] No problem, thanks. Yes, the driver doesn't put/get in the probe functions.
+Just when it has to do its work.
+
+> How about just add a few more details to the changelog summarizing
+> how/when the init/exit calls happen to make it a bit more clear.
+
+[Joel] Sure, I will make this more clear. Sorry for not doing so earlier.
+
+Thanks,
+Joel
