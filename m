@@ -1,49 +1,111 @@
-From: "Fernandes, Joel A" <joelagnel@ti.com>
-Subject: RE: [PATCH] OMAP: AES: Don't idle/start AES device between Encrypt
- operations
-Date: Tue, 14 May 2013 02:49:50 +0000
-Message-ID: <083BC63EECB6FD41B8E81CF7FD87CC0F2E4D6FF3@DLEE08.ent.ti.com>
-References: <1368293024-6654-1-git-send-email-joelagnel@ti.com>
-	<878v3i6dne.fsf@linaro.org>
-	<083BC63EECB6FD41B8E81CF7FD87CC0F2E4D6E5F@DLEE08.ent.ti.com>
- <87y5bi38yc.fsf@linaro.org>
+From: Joel A Fernandes <joelagnel@ti.com>
+Subject: [PATCH v2] OMAP: AES: Don't idle/start AES device between Encrypt operations
+Date: Mon, 13 May 2013 22:07:47 -0500
+Message-ID: <1368500867-7737-1-git-send-email-joelagnel@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
-	"Mark A. Greer" <mgreer@animalcreek.com>
-To: Kevin Hilman <khilman@linaro.org>
+Content-Type: text/plain
+Cc: <khilman@linaro.org>, "Mark A. Greer" <mgreer@animalcreek.com>,
+	Joel A Fernandes <joelagnel@ti.com>
+To: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>
 Return-path: <linux-omap-owner@vger.kernel.org>
-In-Reply-To: <87y5bi38yc.fsf@linaro.org>
-Content-Language: en-US
 Sender: linux-omap-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Kevin,
+Calling runtime PM API for every block causes serious perf hit to
+crypto operations that are done on a long buffer.
+As crypto is performed on a page boundary, encrypting large buffers can
+cause a series of crypto operations divided by page. The runtime PM API
+is also called those many times.
 
-> have to be created anyway.
-> > Imagine encrypting a 20M block- this means runtime PM API is called
-> > 20 * 1024 / 4 =~ 5000 times. The slow down in my opinion doesn't make it
-> worth it.
-> > What is your opinion about this?
-> 
-> OK, I'm not terribly familiar with the crypto API, so I was assuming that the
-> init/exit calls you're instrumenting were happening at driver probe/remove
-> time.  Based on your clarifications, that doesn't seem to be the case.
-> 
-> My main concern is that drivers don't simply use 'get' on driver probe and 'put'
-> on driver remove and force the system awake as long as the driver is present.
-> I've seen that plenty of times, and I was assuming that's what was going on
-> here.  Sorry for the confusion.
+We call runtime_pm_get_sync only at beginning on the session (cra_init)
+and runtime_pm_put at the end. This result in upto a 50% speedup as below.
+This doesn't make the driver to keep the system awake as runtime get/put
+is only called during a crypto session which completes usually quickly.
 
-[Joel] No problem, thanks. Yes, the driver doesn't put/get in the probe functions.
-Just when it has to do its work.
+Before:
+root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
+Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
+Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
+Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
+Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
 
-> How about just add a few more details to the changelog summarizing
-> how/when the init/exit calls happen to make it a bit more clear.
+After:
+root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
+Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
+Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
+Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
+Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
 
-[Joel] Sure, I will make this more clear. Sorry for not doing so earlier.
+While at it, also drop enter and exit pr_debugs, in related code. tracers
+can be used for that.
 
-Thanks,
-Joel
+Tested on a Beaglebone (AM335x SoC) board.
+
+Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
+---
+v2 changes: Clarify usage of runtime PM a bit more in the commit logs.
+
+ drivers/crypto/omap-aes.c |   23 +++++++++++++++++++----
+ 1 files changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 6aa425f..e6474eb 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -208,7 +208,6 @@ static int omap_aes_hw_init(struct omap_aes_dev *dd)
+ 	 * It may be long delays between requests.
+ 	 * Device might go to off mode to save power.
+ 	 */
+-	pm_runtime_get_sync(dd->dev);
+ 
+ 	if (!(dd->flags & FLAGS_INIT)) {
+ 		dd->flags |= FLAGS_INIT;
+@@ -636,7 +635,6 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
+ 
+ 	pr_debug("err: %d\n", err);
+ 
+-	pm_runtime_put_sync(dd->dev);
+ 	dd->flags &= ~FLAGS_BUSY;
+ 
+ 	req->base.complete(&req->base, err);
+@@ -837,8 +835,16 @@ static int omap_aes_ctr_decrypt(struct ablkcipher_request *req)
+ 
+ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ {
+-	pr_debug("enter\n");
++	struct omap_aes_dev *dd = NULL;
++
++	/* Find AES device, currently picks the first device */
++	spin_lock_bh(&list_lock);
++	list_for_each_entry(dd, &dev_list, list) {
++		break;
++	}
++	spin_unlock_bh(&list_lock);
+ 
++	pm_runtime_get_sync(dd->dev);
+ 	tfm->crt_ablkcipher.reqsize = sizeof(struct omap_aes_reqctx);
+ 
+ 	return 0;
+@@ -846,7 +852,16 @@ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ 
+ static void omap_aes_cra_exit(struct crypto_tfm *tfm)
+ {
+-	pr_debug("enter\n");
++	struct omap_aes_dev *dd = NULL;
++
++	/* Find AES device, currently picks the first device */
++	spin_lock_bh(&list_lock);
++	list_for_each_entry(dd, &dev_list, list) {
++		break;
++	}
++	spin_unlock_bh(&list_lock);
++
++	pm_runtime_put_sync(dd->dev);
+ }
+ 
+ /* ********************** ALGS ************************************ */
+-- 
+1.7.4.1
+
