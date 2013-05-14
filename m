@@ -1,65 +1,57 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [cryptodev:master 2/13] crct10dif.c:undefined reference to
- `crypto_register_shash'
-Date: Tue, 14 May 2013 14:56:07 +0800
-Message-ID: <20130514065607.GA20953@gondor.apana.org.au>
-References: <5191d74e.8BmjhOylQ1jkg8HR%fengguang.wu@intel.com>
+From: Kevin Hilman <khilman@linaro.org>
+Subject: Re: [PATCH v2] OMAP: AES: Don't idle/start AES device between Encrypt operations
+Date: Tue, 14 May 2013 07:11:09 -0700
+Message-ID: <87bo8dy7lu.fsf@linaro.org>
+References: <1368500867-7737-1-git-send-email-joelagnel@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tim Chen <tim.c.chen@linux.intel.com>, kbuild-all@01.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: kbuild test robot <fengguang.wu@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:47018 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751177Ab3ENG4N (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 May 2013 02:56:13 -0400
-Content-Disposition: inline
-In-Reply-To: <5191d74e.8BmjhOylQ1jkg8HR%fengguang.wu@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+	"Mark A. Greer" <mgreer@animalcreek.com>
+To: Joel A Fernandes <joelagnel@ti.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <1368500867-7737-1-git-send-email-joelagnel@ti.com> (Joel
+	A. Fernandes's message of "Mon, 13 May 2013 22:07:47 -0500")
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, May 14, 2013 at 02:18:54PM +0800, kbuild test robot wrote:
-> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   78cdfaf27bf1a3d5c8c9907c72f1a32dafe0ec04
-> commit: e3a0f01adfccf883a14df83f81a2b37d03d6926d [2/13] crypto: crct10dif - Wrap crc_t10dif function all to use crypto transform framework
-> config: i386-randconfig-x10-0513 (attached as .config)
-> 
-> All error/warnings:
-> 
->    crypto/built-in.o: In function `crct10dif_mod_init':
-> >> crct10dif.c:(.init.text+0x9): undefined reference to `crypto_register_shash'
->    crypto/built-in.o: In function `crct10dif_mod_fini':
-> >> crct10dif.c:(.exit.text+0x9): undefined reference to `crypto_unregister_shash'
->    lib/built-in.o: In function `crc_t10dif':
->    (.text+0x1047a): undefined reference to `crypto_shash_update'
->    lib/built-in.o: In function `crc_t10dif_update_lib':
->    (.text+0x104b6): undefined reference to `crypto_alloc_shash'
->    lib/built-in.o: In function `crc_t10dif_update_lib':
->    (.text+0x1052e): undefined reference to `crypto_destroy_tfm'
->    lib/built-in.o: In function `crc_t10dif_update_lib':
->    (.text+0x10540): undefined reference to `crypto_destroy_tfm'
->    lib/built-in.o: In function `crc_t10dif_mod_fini':
->    crc-t10dif.c:(.exit.text+0x10): undefined reference to `crypto_destroy_tfm'
+Joel A Fernandes <joelagnel@ti.com> writes:
 
-Oops, I forgot to take out the dependency.
+> Calling runtime PM API for every block causes serious perf hit to
+> crypto operations that are done on a long buffer.
+> As crypto is performed on a page boundary, encrypting large buffers can
+> cause a series of crypto operations divided by page. The runtime PM API
+> is also called those many times.
+>
+> We call runtime_pm_get_sync only at beginning on the session (cra_init)
+> and runtime_pm_put at the end. This result in upto a 50% speedup as below.
+> This doesn't make the driver to keep the system awake as runtime get/put
+> is only called during a crypto session which completes usually quickly.
+>
+> Before:
+> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+> Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
+> Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
+> Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
+> Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
+> Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
+>
+> After:
+> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+> Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
+> Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
+> Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
+> Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
+> Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
+>
+> While at it, also drop enter and exit pr_debugs, in related code. tracers
+> can be used for that.
+>
+> Tested on a Beaglebone (AM335x SoC) board.
+>
+> Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 68de618..d1ca631 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -378,7 +378,6 @@ config CRYPTO_CRC32_PCLMUL
- 
- config CRYPTO_CRCT10DIF
- 	tristate "CRCT10DIF algorithm"
--	depends on CRC_T10DIF
- 	select CRYPTO_HASH
- 	help
- 	  CRC T10 Data Integrity Field computation is being cast as
+Acked-by: Kevin Hilman <khilman@linaro.org> 
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks for the updated changelog.
+
+Kevin
