@@ -1,60 +1,66 @@
-From: Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: [PATCH 03/39] dmaengine: ste_dma40: Don't configure runtime
- configurable setup during allocate
-Date: Wed, 15 May 2013 18:44:26 +0200
-Message-ID: <CACRpkdbvhB=7QScU1bCN8wXr7ZOuPX9XYoCjX_a8gFSMCkbm-w@mail.gmail.com>
+From: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH 04/39] ARM: ux500: Stop passing UART's platform data for
+ Device Tree boots
+Date: Wed, 15 May 2013 18:48:12 +0200
+Message-ID: <CACRpkdbMVQWQpgiG+PcMUY789i+OgRObtH-toDYKdkbn9VtQ5g@mail.gmail.com>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-	<1368611522-9984-4-git-send-email-lee.jones@linaro.org>
+	<1368611522-9984-5-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Felipe Balbi <balbi@ti.com>,
-	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Vinod Koul <vinod.koul@intel.com>,
-	Rabin Vincent <rabin@rab.in>,
-	Linus WALLEIJ <linus.walleij@stericsson.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Srinidhi KASAGAR <srinidhi.kasagar@stericsson.com>,
-	Per Forlin <per.forlin@stericsson.com>,
-	Dan Williams <djbw@fb.com>
-To: Lee Jones <lee.jones@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f170.google.com ([209.85.223.170]:49504 "EHLO
-	mail-ie0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932899Ab3EOQo1 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 May 2013 12:44:27 -0400
-Received: by mail-ie0-f170.google.com with SMTP id aq17so4236680iec.1
-        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2013 09:44:27 -0700 (PDT)
-In-Reply-To: <1368611522-9984-4-git-send-email-lee.jones@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
+	<linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Felipe Balbi <balbi-l0cyMroinI0@public.gmane.org>,
+	"linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>,
+	Linus WALLEIJ <linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>,
+	Srinidhi KASAGAR <srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>
+To: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1368611522-9984-5-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones@linaro.org> wrote:
+On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
 
-> Using the dmaengine API, allocating and configuring a channel are two
-> separate actions. Here we're removing logical channel configuration from
-> the channel allocating routines.
+> It was required to pass DMA channel configuration information to the
+> UART driver before the new DMA API was in place. Now that it is, and
+> is fully compatible with Device Tree we can stop doing that.
+>
+> Reviewed-by: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> ---
+>  arch/arm/mach-ux500/cpu-db8500.c |    6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/arm/mach-ux500/cpu-db8500.c b/arch/arm/mach-ux500/cpu-db8500.c
+> index 38ebf2b..9b26fe2 100644
+> --- a/arch/arm/mach-ux500/cpu-db8500.c
+> +++ b/arch/arm/mach-ux500/cpu-db8500.c
+> @@ -230,9 +230,9 @@ static struct of_dev_auxdata u8500_auxdata_lookup[] __initdata = {
+>         /* Requires call-back bindings. */
+>         OF_DEV_AUXDATA("arm,cortex-a9-pmu", 0, "arm-pmu", &db8500_pmu_platdata),
+>         /* Requires DMA bindings. */
+> -       OF_DEV_AUXDATA("arm,pl011", 0x80120000, "uart0", &uart0_plat),
+> -       OF_DEV_AUXDATA("arm,pl011", 0x80121000, "uart1", &uart1_plat),
+> -       OF_DEV_AUXDATA("arm,pl011", 0x80007000, "uart2", &uart2_plat),
+> +       OF_DEV_AUXDATA("arm,pl011", 0x80120000, "uart0", NULL),
+> +       OF_DEV_AUXDATA("arm,pl011", 0x80121000, "uart1", NULL),
+> +       OF_DEV_AUXDATA("arm,pl011", 0x80007000, "uart2", NULL),
+>         OF_DEV_AUXDATA("arm,pl022", 0x80002000, "ssp0",  &ssp0_plat),
+>         OF_DEV_AUXDATA("arm,pl18x", 0x80126000, "sdi0",  &mop500_sdi0_data),
+>         OF_DEV_AUXDATA("arm,pl18x", 0x80118000, "sdi1",  &mop500_sdi1_data),
 
-This commit message is also incorrect, but I amended it.
-
-Besides, when I amend commit messages I make sure I really
-understand what is going on so no big deal...
-
-> Cc: Vinod Koul <vinod.koul@intel.com>
-> Cc: Dan Williams <djbw@fb.com>
-> Cc: Per Forlin <per.forlin@stericsson.com>
-> Cc: Rabin Vincent <rabin@rab.in>
-> Signed-off-by: Lee Jones <lee.jones@linaro.org>
-
-I still need Vinod's ACK on this before I send it anywhere.
-
-Patch applied!
+OK dma_request_slave_channel() is upstream in the PL011 driver,
+so applied!
 
 Yours,
 Linus Walleij
+--
+To unsubscribe from this list: send the line "unsubscribe linux-usb" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
