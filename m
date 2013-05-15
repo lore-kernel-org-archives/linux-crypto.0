@@ -1,263 +1,60 @@
-From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH 30/39] ARM: ux500: Replace ST-E's home-brew DMA direction definition with the generic one
-Date: Wed, 15 May 2013 10:51:53 +0100
-Message-ID: <1368611522-9984-31-git-send-email-lee.jones@linaro.org>
+From: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: [PATCH 28/39] ARM: ux500: Remove empty function u8500_of_init_devices()
+Date: Wed, 15 May 2013 10:51:51 +0100
+Message-ID: <1368611522-9984-29-git-send-email-lee.jones@linaro.org>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-Cc: arnd@arndb.de, linus.walleij@stericsson.com,
-	srinidhi.kasagar@stericsson.com, Lee Jones <lee.jones@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	balbi@ti.com, linux-usb@vger.kernel.org,
-	linux-crypto@vger.kernel.org, davem@davemloft.net,
-	herbert@gondor.apana.org.au, vinod.koul@intel.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:59710 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932707Ab3EOJxG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 May 2013 05:53:06 -0400
-Received: by mail-wi0-f176.google.com with SMTP id hr14so4951615wib.15
-        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2013 02:53:05 -0700 (PDT)
-In-Reply-To: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: arnd-r2nGTMty4D4@public.gmane.org, linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org,
+	srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	balbi-l0cyMroinI0@public.gmane.org, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org
+Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1368611522-9984-1-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-STEDMA40_*_TO_* direction definitions are identical in all but name to
-the pre-defined generic DMA_*_TO_* ones. Let's make things easy by not
-duplicating such things.
+As promised, now all devices which resided in u8500_of_init_devices()
+have been enabled for Device Tree, we can completely remove it.
 
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
+Acked-by: Fabio Baltieri <fabio.baltieri-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 ---
- arch/arm/mach-ux500/board-mop500-audio.c |   12 ++++++------
- arch/arm/mach-ux500/board-mop500-sdi.c   |   16 ++++++++--------
- arch/arm/mach-ux500/board-mop500.c       |   22 +++++++++++-----------
- arch/arm/mach-ux500/usb.c                |    4 ++--
- 4 files changed, 27 insertions(+), 27 deletions(-)
+ arch/arm/mach-ux500/cpu-db8500.c |   14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
-diff --git a/arch/arm/mach-ux500/board-mop500-audio.c b/arch/arm/mach-ux500/board-mop500-audio.c
-index ec87262..bfe443d 100644
---- a/arch/arm/mach-ux500/board-mop500-audio.c
-+++ b/arch/arm/mach-ux500/board-mop500-audio.c
-@@ -21,13 +21,13 @@
+diff --git a/arch/arm/mach-ux500/cpu-db8500.c b/arch/arm/mach-ux500/cpu-db8500.c
+index f1e7a75..b407601 100644
+--- a/arch/arm/mach-ux500/cpu-db8500.c
++++ b/arch/arm/mach-ux500/cpu-db8500.c
+@@ -215,15 +215,6 @@ struct device * __init u8500_init_devices(void)
+ }
  
- static struct stedma40_chan_cfg msp0_dma_rx = {
- 	.high_priority = true,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type = DB8500_DMA_DEV31_MSP0_SLIM0_CH0,
- };
+ #ifdef CONFIG_MACH_UX500_DT
+-
+-/* TODO: Once all pieces are DT:ed, remove completely. */
+-static struct device * __init u8500_of_init_devices(void)
+-{
+-	struct device *parent = db8500_soc_device_init();
+-
+-	return parent;
+-}
+-
+ static struct of_dev_auxdata u8500_auxdata_lookup[] __initdata = {
+ 	/* Requires call-back bindings. */
+ 	OF_DEV_AUXDATA("arm,cortex-a9-pmu", 0, "arm-pmu", &db8500_pmu_platdata),
+@@ -283,7 +274,7 @@ static const struct of_device_id u8500_local_bus_nodes[] = {
  
- static struct stedma40_chan_cfg msp0_dma_tx = {
- 	.high_priority = true,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV31_MSP0_SLIM0_CH0,
- };
+ static void __init u8500_init_machine(void)
+ {
+-	struct device *parent = NULL;
++	struct device *parent = db8500_soc_device_init();
  
-@@ -39,13 +39,13 @@ struct msp_i2s_platform_data msp0_platform_data = {
+ 	/* Pinmaps must be in place before devices register */
+ 	if (of_machine_is_compatible("st-ericsson,mop500"))
+@@ -296,9 +287,6 @@ static void __init u8500_init_machine(void)
+ 	else if (of_machine_is_compatible("st-ericsson,ccu9540")) {}
+ 		/* TODO: Add pinmaps for ccu9540 board. */
  
- static struct stedma40_chan_cfg msp1_dma_rx = {
- 	.high_priority = true,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type = DB8500_DMA_DEV30_MSP3,
- };
- 
- static struct stedma40_chan_cfg msp1_dma_tx = {
- 	.high_priority = true,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV30_MSP1,
- };
- 
-@@ -57,13 +57,13 @@ struct msp_i2s_platform_data msp1_platform_data = {
- 
- static struct stedma40_chan_cfg msp2_dma_rx = {
- 	.high_priority = true,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type = DB8500_DMA_DEV14_MSP2,
- };
- 
- static struct stedma40_chan_cfg msp2_dma_tx = {
- 	.high_priority = true,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV14_MSP2,
- 	.use_fixed_channel = true,
- 	.phy_channel = 1,
-diff --git a/arch/arm/mach-ux500/board-mop500-sdi.c b/arch/arm/mach-ux500/board-mop500-sdi.c
-index 29be714..e6891d1 100644
---- a/arch/arm/mach-ux500/board-mop500-sdi.c
-+++ b/arch/arm/mach-ux500/board-mop500-sdi.c
-@@ -34,13 +34,13 @@
- #ifdef CONFIG_STE_DMA40
- struct stedma40_chan_cfg mop500_sdi0_dma_cfg_rx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type = DB8500_DMA_DEV29_SD_MM0,
- };
- 
- static struct stedma40_chan_cfg mop500_sdi0_dma_cfg_tx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV29_SD_MM0,
- };
- #endif
-@@ -81,13 +81,13 @@ void mop500_sdi_tc35892_init(struct device *parent)
- #ifdef CONFIG_STE_DMA40
- static struct stedma40_chan_cfg sdi1_dma_cfg_rx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type = DB8500_DMA_DEV32_SD_MM1,
- };
- 
- static struct stedma40_chan_cfg sdi1_dma_cfg_tx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV32_SD_MM1,
- };
- #endif
-@@ -112,13 +112,13 @@ struct mmci_platform_data mop500_sdi1_data = {
- #ifdef CONFIG_STE_DMA40
- struct stedma40_chan_cfg mop500_sdi2_dma_cfg_rx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type =  DB8500_DMA_DEV28_SD_MM2,
- };
- 
- static struct stedma40_chan_cfg mop500_sdi2_dma_cfg_tx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV28_SD_MM2,
- };
- #endif
-@@ -144,13 +144,13 @@ struct mmci_platform_data mop500_sdi2_data = {
- #ifdef CONFIG_STE_DMA40
- struct stedma40_chan_cfg mop500_sdi4_dma_cfg_rx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type =  DB8500_DMA_DEV42_SD_MM4,
- };
- 
- static struct stedma40_chan_cfg mop500_sdi4_dma_cfg_tx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV42_SD_MM4,
- };
- #endif
-diff --git a/arch/arm/mach-ux500/board-mop500.c b/arch/arm/mach-ux500/board-mop500.c
-index ba26ae3..0b018c4 100644
---- a/arch/arm/mach-ux500/board-mop500.c
-+++ b/arch/arm/mach-ux500/board-mop500.c
-@@ -424,19 +424,19 @@ void mop500_snowball_ethernet_clock_enable(void)
- 
- static struct cryp_platform_data u8500_cryp1_platform_data = {
- 		.mem_to_engine = {
--				.dir = STEDMA40_MEM_TO_PERIPH,
-+				.dir = DMA_MEM_TO_DEV,
- 				.dev_type = DB8500_DMA_DEV48_CAC1,
- 				.mode = STEDMA40_MODE_LOGICAL,
- 		},
- 		.engine_to_mem = {
--				.dir = STEDMA40_PERIPH_TO_MEM,
-+				.dir = DMA_DEV_TO_MEM,
- 				.dev_type = DB8500_DMA_DEV48_CAC1,
- 				.mode = STEDMA40_MODE_LOGICAL,
- 		}
- };
- 
- static struct stedma40_chan_cfg u8500_hash_dma_cfg_tx = {
--		.dir = STEDMA40_MEM_TO_PERIPH,
-+		.dir = DMA_MEM_TO_DEV,
- 		.dev_type = DB8500_DMA_DEV50_HAC1_TX,
- 		.mode = STEDMA40_MODE_LOGICAL,
- };
-@@ -455,13 +455,13 @@ static struct platform_device *mop500_platform_devs[] __initdata = {
- #ifdef CONFIG_STE_DMA40
- static struct stedma40_chan_cfg ssp0_dma_cfg_rx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type = DB8500_DMA_DEV8_SSP0,
- };
- 
- static struct stedma40_chan_cfg ssp0_dma_cfg_tx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV8_SSP0,
- };
- #endif
-@@ -490,37 +490,37 @@ static void __init mop500_spi_init(struct device *parent)
- #ifdef CONFIG_STE_DMA40
- static struct stedma40_chan_cfg uart0_dma_cfg_rx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type = DB8500_DMA_DEV13_UART0,
- };
- 
- static struct stedma40_chan_cfg uart0_dma_cfg_tx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV13_UART0,
- };
- 
- static struct stedma40_chan_cfg uart1_dma_cfg_rx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type = DB8500_DMA_DEV12_UART1,
- };
- 
- static struct stedma40_chan_cfg uart1_dma_cfg_tx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV12_UART1,
- };
- 
- static struct stedma40_chan_cfg uart2_dma_cfg_rx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_PERIPH_TO_MEM,
-+	.dir = DMA_DEV_TO_MEM,
- 	.dev_type = DB8500_DMA_DEV11_UART2,
- };
- 
- static struct stedma40_chan_cfg uart2_dma_cfg_tx = {
- 	.mode = STEDMA40_MODE_LOGICAL,
--	.dir = STEDMA40_MEM_TO_PERIPH,
-+	.dir = DMA_MEM_TO_DEV,
- 	.dev_type = DB8500_DMA_DEV11_UART2,
- };
- #endif
-diff --git a/arch/arm/mach-ux500/usb.c b/arch/arm/mach-ux500/usb.c
-index 2f9abe9..b7bd8d3 100644
---- a/arch/arm/mach-ux500/usb.c
-+++ b/arch/arm/mach-ux500/usb.c
-@@ -14,12 +14,12 @@
- 
- #define MUSB_DMA40_RX_CH { \
- 		.mode = STEDMA40_MODE_LOGICAL, \
--		.dir = STEDMA40_PERIPH_TO_MEM, \
-+		.dir = DMA_DEV_TO_MEM, \
- 	}
- 
- #define MUSB_DMA40_TX_CH { \
- 		.mode = STEDMA40_MODE_LOGICAL, \
--		.dir = STEDMA40_MEM_TO_PERIPH, \
-+		.dir = DMA_MEM_TO_DEV, \
- 	}
- 
- static struct stedma40_chan_cfg musb_dma_rx_ch[UX500_MUSB_DMA_NUM_RX_TX_CHANNELS]
--- 
-1.7.10.4
+-	/* TODO: Export SoC, USB, cpu-freq and DMA40 */
+-	parent = u8500_of_init_devices();
