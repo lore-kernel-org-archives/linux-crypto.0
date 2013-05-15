@@ -1,51 +1,50 @@
-From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH 00/39] Continuation of DMA changes in ux500 based drivers
-Date: Wed, 15 May 2013 10:51:23 +0100
-Message-ID: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-Cc: arnd@arndb.de, linus.walleij@stericsson.com,
-	srinidhi.kasagar@stericsson.com
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	balbi@ti.com, linux-usb@vger.kernel.org,
-	linux-crypto@vger.kernel.org, davem@davemloft.net,
-	herbert@gondor.apana.org.au, vinod.koul@intel.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f43.google.com ([74.125.82.43]:50352 "EHLO
-	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754773Ab3EOJwN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 May 2013 05:52:13 -0400
-Received: by mail-wg0-f43.google.com with SMTP id c11so1422794wgh.10
-        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2013 02:52:12 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: [PATCH 04/39] ARM: ux500: Stop passing UART's platform data for Device Tree boots
+Date: Wed, 15 May 2013 10:51:27 +0100
+Message-ID: <1368611522-9984-5-git-send-email-lee.jones@linaro.org>
+References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
+Cc: arnd-r2nGTMty4D4@public.gmane.org, linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org,
+	srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	balbi-l0cyMroinI0@public.gmane.org, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org
+Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1368611522-9984-1-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-A great deal of these patches have now been applied through various trees.
-We now need to grab the attention of the outstanding DMA clients (MUSB and
-Crypto) to progress.
+It was required to pass DMA channel configuration information to the
+UART driver before the new DMA API was in place. Now that it is, and
+is fully compatible with Device Tree we can stop doing that.
 
-Also, Linus could probably do with a hand from Vinod for the remaining
-dmaengine patches.
+Reviewed-by: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+---
+ arch/arm/mach-ux500/cpu-db8500.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Thanks in advance.
+diff --git a/arch/arm/mach-ux500/cpu-db8500.c b/arch/arm/mach-ux500/cpu-db8500.c
+index 38ebf2b..9b26fe2 100644
+--- a/arch/arm/mach-ux500/cpu-db8500.c
++++ b/arch/arm/mach-ux500/cpu-db8500.c
+@@ -230,9 +230,9 @@ static struct of_dev_auxdata u8500_auxdata_lookup[] __initdata = {
+ 	/* Requires call-back bindings. */
+ 	OF_DEV_AUXDATA("arm,cortex-a9-pmu", 0, "arm-pmu", &db8500_pmu_platdata),
+ 	/* Requires DMA bindings. */
+-	OF_DEV_AUXDATA("arm,pl011", 0x80120000, "uart0", &uart0_plat),
+-	OF_DEV_AUXDATA("arm,pl011", 0x80121000, "uart1", &uart1_plat),
+-	OF_DEV_AUXDATA("arm,pl011", 0x80007000, "uart2", &uart2_plat),
++	OF_DEV_AUXDATA("arm,pl011", 0x80120000, "uart0", NULL),
++	OF_DEV_AUXDATA("arm,pl011", 0x80121000, "uart1", NULL),
++	OF_DEV_AUXDATA("arm,pl011", 0x80007000, "uart2", NULL),
+ 	OF_DEV_AUXDATA("arm,pl022", 0x80002000, "ssp0",  &ssp0_plat),
+ 	OF_DEV_AUXDATA("arm,pl18x", 0x80126000, "sdi0",  &mop500_sdi0_data),
+ 	OF_DEV_AUXDATA("arm,pl18x", 0x80118000, "sdi1",  &mop500_sdi1_data),
+-- 
+1.7.10.4
 
- Documentation/devicetree/bindings/dma/ste-dma40.txt |    4 ++
- Documentation/devicetree/bindings/usb/ux500-usb.txt |   50 ++++++++++++++++++
- arch/arm/mach-ux500/board-mop500-audio.c            |   12 ++---
- arch/arm/mach-ux500/board-mop500-sdi.c              |   16 +++---
- arch/arm/mach-ux500/board-mop500.c                  |   36 +++++--------
- arch/arm/mach-ux500/cpu-db8500.c                    |   34 ++++--------
- arch/arm/mach-ux500/devices-db8500.c                |   80 ----------------------------
- arch/arm/mach-ux500/usb.c                           |   37 +++----------
- drivers/crypto/ux500/cryp/cryp.h                    |    7 ++-
- drivers/crypto/ux500/cryp/cryp_core.c               |   31 ++++++++++-
- drivers/crypto/ux500/hash/hash_alg.h                |    5 +-
- drivers/crypto/ux500/hash/hash_core.c               |   24 ++++++++-
- drivers/dma/ste_dma40.c                             |  292 +++++++++++++++++++++++++++++++++++++++++++++++++----------------------------------------------------
- drivers/dma/ste_dma40_ll.c                          |  189 +++++++++++++++++++++++++++++++++--------------------------------
- drivers/dma/ste_dma40_ll.h                          |    3 +-
- drivers/usb/musb/ux500.c                            |   61 ++++++++++++++++++++-
- drivers/usb/musb/ux500_dma.c                        |   59 ++++++++++++---------
- include/linux/platform_data/dma-ste-dma40.h         |   25 ++-------
- include/linux/platform_data/usb-musb-ux500.h        |    5 +-
- sound/soc/ux500/ux500_pcm.c                         |   10 ++--
- 20 files changed, 506 insertions(+), 474 deletions(-)
+--
+To unsubscribe from this list: send the line "unsubscribe linux-usb" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
