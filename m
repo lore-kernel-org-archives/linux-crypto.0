@@ -1,57 +1,51 @@
-From: Kevin Hilman <khilman@linaro.org>
-Subject: Re: [PATCH v2] OMAP: AES: Don't idle/start AES device between Encrypt operations
-Date: Tue, 14 May 2013 07:11:09 -0700
-Message-ID: <87bo8dy7lu.fsf@linaro.org>
-References: <1368500867-7737-1-git-send-email-joelagnel@ti.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-	"Mark A. Greer" <mgreer@animalcreek.com>
-To: Joel A Fernandes <joelagnel@ti.com>
-Return-path: <linux-omap-owner@vger.kernel.org>
-In-Reply-To: <1368500867-7737-1-git-send-email-joelagnel@ti.com> (Joel
-	A. Fernandes's message of "Mon, 13 May 2013 22:07:47 -0500")
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Lee Jones <lee.jones@linaro.org>
+Subject: [PATCH 00/39] Continuation of DMA changes in ux500 based drivers
+Date: Wed, 15 May 2013 10:51:23 +0100
+Message-ID: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
+Cc: arnd@arndb.de, linus.walleij@stericsson.com,
+	srinidhi.kasagar@stericsson.com
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	balbi@ti.com, linux-usb@vger.kernel.org,
+	linux-crypto@vger.kernel.org, davem@davemloft.net,
+	herbert@gondor.apana.org.au, vinod.koul@intel.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wg0-f43.google.com ([74.125.82.43]:50352 "EHLO
+	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754773Ab3EOJwN (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 15 May 2013 05:52:13 -0400
+Received: by mail-wg0-f43.google.com with SMTP id c11so1422794wgh.10
+        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2013 02:52:12 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Joel A Fernandes <joelagnel@ti.com> writes:
+A great deal of these patches have now been applied through various trees.
+We now need to grab the attention of the outstanding DMA clients (MUSB and
+Crypto) to progress.
 
-> Calling runtime PM API for every block causes serious perf hit to
-> crypto operations that are done on a long buffer.
-> As crypto is performed on a page boundary, encrypting large buffers can
-> cause a series of crypto operations divided by page. The runtime PM API
-> is also called those many times.
->
-> We call runtime_pm_get_sync only at beginning on the session (cra_init)
-> and runtime_pm_put at the end. This result in upto a 50% speedup as below.
-> This doesn't make the driver to keep the system awake as runtime get/put
-> is only called during a crypto session which completes usually quickly.
->
-> Before:
-> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
-> Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
-> Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
-> Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
-> Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
-> Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
->
-> After:
-> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
-> Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
-> Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
-> Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
-> Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
-> Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
->
-> While at it, also drop enter and exit pr_debugs, in related code. tracers
-> can be used for that.
->
-> Tested on a Beaglebone (AM335x SoC) board.
->
-> Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
+Also, Linus could probably do with a hand from Vinod for the remaining
+dmaengine patches.
 
-Acked-by: Kevin Hilman <khilman@linaro.org> 
+Thanks in advance.
 
-Thanks for the updated changelog.
-
-Kevin
+ Documentation/devicetree/bindings/dma/ste-dma40.txt |    4 ++
+ Documentation/devicetree/bindings/usb/ux500-usb.txt |   50 ++++++++++++++++++
+ arch/arm/mach-ux500/board-mop500-audio.c            |   12 ++---
+ arch/arm/mach-ux500/board-mop500-sdi.c              |   16 +++---
+ arch/arm/mach-ux500/board-mop500.c                  |   36 +++++--------
+ arch/arm/mach-ux500/cpu-db8500.c                    |   34 ++++--------
+ arch/arm/mach-ux500/devices-db8500.c                |   80 ----------------------------
+ arch/arm/mach-ux500/usb.c                           |   37 +++----------
+ drivers/crypto/ux500/cryp/cryp.h                    |    7 ++-
+ drivers/crypto/ux500/cryp/cryp_core.c               |   31 ++++++++++-
+ drivers/crypto/ux500/hash/hash_alg.h                |    5 +-
+ drivers/crypto/ux500/hash/hash_core.c               |   24 ++++++++-
+ drivers/dma/ste_dma40.c                             |  292 +++++++++++++++++++++++++++++++++++++++++++++++++----------------------------------------------------
+ drivers/dma/ste_dma40_ll.c                          |  189 +++++++++++++++++++++++++++++++++--------------------------------
+ drivers/dma/ste_dma40_ll.h                          |    3 +-
+ drivers/usb/musb/ux500.c                            |   61 ++++++++++++++++++++-
+ drivers/usb/musb/ux500_dma.c                        |   59 ++++++++++++---------
+ include/linux/platform_data/dma-ste-dma40.h         |   25 ++-------
+ include/linux/platform_data/usb-musb-ux500.h        |    5 +-
+ sound/soc/ux500/ux500_pcm.c                         |   10 ++--
+ 20 files changed, 506 insertions(+), 474 deletions(-)
