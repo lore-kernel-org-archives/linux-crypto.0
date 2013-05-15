@@ -1,134 +1,34 @@
-From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH 09/39] ARM: ux500: Remove DMA address look-up table
-Date: Wed, 15 May 2013 10:51:32 +0100
-Message-ID: <1368611522-9984-10-git-send-email-lee.jones@linaro.org>
+From: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: [PATCH 27/39] ARM: ux500: Remove ux500-musb platform registation when booting with DT
+Date: Wed, 15 May 2013 10:51:50 +0100
+Message-ID: <1368611522-9984-28-git-send-email-lee.jones@linaro.org>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-Cc: arnd@arndb.de, linus.walleij@stericsson.com,
-	srinidhi.kasagar@stericsson.com, Lee Jones <lee.jones@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	balbi@ti.com, linux-usb@vger.kernel.org,
-	linux-crypto@vger.kernel.org, davem@davemloft.net,
-	herbert@gondor.apana.org.au, vinod.koul@intel.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: arnd-r2nGTMty4D4@public.gmane.org, linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org,
+	srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	balbi-l0cyMroinI0@public.gmane.org, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org
+Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1368611522-9984-1-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-DMA addresses are now passed as part of the dmaengine API by invoking
-dmaengine_slave_config(). So there's no requirement for the DMA40
-driver to look them up in a table provided by platform data. This
-method does not fit in well using Device Tree either.
+Now the ux500-musb driver has been enabled for Device Tree, there is no
+requirement to register it from platform code.
 
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
+Acked-by: Fabio Baltieri <fabio.baltieri-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 ---
- arch/arm/mach-ux500/devices-db8500.c        |   80 ---------------------------
- include/linux/platform_data/dma-ste-dma40.h |    2 -
- 2 files changed, 82 deletions(-)
+ arch/arm/mach-ux500/cpu-db8500.c |    2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arch/arm/mach-ux500/devices-db8500.c b/arch/arm/mach-ux500/devices-db8500.c
-index bed25a3..e21ffd8 100644
---- a/arch/arm/mach-ux500/devices-db8500.c
-+++ b/arch/arm/mach-ux500/devices-db8500.c
-@@ -42,87 +42,7 @@ static struct resource dma40_resources[] = {
- 	}
- };
+diff --git a/arch/arm/mach-ux500/cpu-db8500.c b/arch/arm/mach-ux500/cpu-db8500.c
+index e20bc10..f1e7a75 100644
+--- a/arch/arm/mach-ux500/cpu-db8500.c
++++ b/arch/arm/mach-ux500/cpu-db8500.c
+@@ -221,8 +221,6 @@ static struct device * __init u8500_of_init_devices(void)
+ {
+ 	struct device *parent = db8500_soc_device_init();
  
--/*
-- * Mapping between destination event lines and physical device address.
-- * The event line is tied to a device and therefore the address is constant.
-- * When the address comes from a primecell it will be configured in runtime
-- * and we set the address to -1 as a placeholder.
-- */
--static const dma_addr_t dma40_tx_map[DB8500_DMA_NR_DEV] = {
--	/* MUSB - these will be runtime-reconfigured */
--	[DB8500_DMA_DEV39_USB_OTG_IEP_AND_OEP_8] = -1,
--	[DB8500_DMA_DEV16_USB_OTG_IEP_AND_OEP_7_15] = -1,
--	[DB8500_DMA_DEV17_USB_OTG_IEP_AND_OEP_6_14] = -1,
--	[DB8500_DMA_DEV18_USB_OTG_IEP_AND_OEP_5_13] = -1,
--	[DB8500_DMA_DEV19_USB_OTG_IEP_AND_OEP_4_12] = -1,
--	[DB8500_DMA_DEV36_USB_OTG_IEP_AND_OEP_3_11] = -1,
--	[DB8500_DMA_DEV37_USB_OTG_IEP_AND_OEP_2_10] = -1,
--	[DB8500_DMA_DEV38_USB_OTG_IEP_AND_OEP_1_9] = -1,
--	/* PrimeCells - run-time configured */
--	[DB8500_DMA_DEV0_SPI0] = -1,
--	[DB8500_DMA_DEV1_SD_MMC0] = -1,
--	[DB8500_DMA_DEV2_SD_MMC1] = -1,
--	[DB8500_DMA_DEV3_SD_MMC2] = -1,
--	[DB8500_DMA_DEV8_SSP0] = -1,
--	[DB8500_DMA_DEV9_SSP1] = -1,
--	[DB8500_DMA_DEV11_UART2] = -1,
--	[DB8500_DMA_DEV12_UART1] = -1,
--	[DB8500_DMA_DEV13_UART0] = -1,
--	[DB8500_DMA_DEV28_SD_MM2] = -1,
--	[DB8500_DMA_DEV29_SD_MM0] = -1,
--	[DB8500_DMA_DEV32_SD_MM1] = -1,
--	[DB8500_DMA_DEV33_SPI2] = -1,
--	[DB8500_DMA_DEV35_SPI1] = -1,
--	[DB8500_DMA_DEV40_SPI3] = -1,
--	[DB8500_DMA_DEV41_SD_MM3] = -1,
--	[DB8500_DMA_DEV42_SD_MM4] = -1,
--	[DB8500_DMA_DEV43_SD_MM5] = -1,
--	[DB8500_DMA_DEV14_MSP2] = U8500_MSP2_BASE + MSP_TX_RX_REG_OFFSET,
--	[DB8500_DMA_DEV30_MSP1] = U8500_MSP1_BASE + MSP_TX_RX_REG_OFFSET,
--	[DB8500_DMA_DEV31_MSP0_SLIM0_CH0] = U8500_MSP0_BASE + MSP_TX_RX_REG_OFFSET,
--	[DB8500_DMA_DEV48_CAC1] = U8500_CRYP1_BASE + CRYP1_TX_REG_OFFSET,
--	[DB8500_DMA_DEV50_HAC1_TX] = U8500_HASH1_BASE + HASH1_TX_REG_OFFSET,
--};
--
--/* Mapping between source event lines and physical device address */
--static const dma_addr_t dma40_rx_map[DB8500_DMA_NR_DEV] = {
--	/* MUSB - these will be runtime-reconfigured */
--	[DB8500_DMA_DEV39_USB_OTG_IEP_AND_OEP_8] = -1,
--	[DB8500_DMA_DEV16_USB_OTG_IEP_AND_OEP_7_15] = -1,
--	[DB8500_DMA_DEV17_USB_OTG_IEP_AND_OEP_6_14] = -1,
--	[DB8500_DMA_DEV18_USB_OTG_IEP_AND_OEP_5_13] = -1,
--	[DB8500_DMA_DEV19_USB_OTG_IEP_AND_OEP_4_12] = -1,
--	[DB8500_DMA_DEV36_USB_OTG_IEP_AND_OEP_3_11] = -1,
--	[DB8500_DMA_DEV37_USB_OTG_IEP_AND_OEP_2_10] = -1,
--	[DB8500_DMA_DEV38_USB_OTG_IEP_AND_OEP_1_9] = -1,
--	/* PrimeCells */
--	[DB8500_DMA_DEV0_SPI0] = -1,
--	[DB8500_DMA_DEV1_SD_MMC0] = -1,
--	[DB8500_DMA_DEV2_SD_MMC1] = -1,
--	[DB8500_DMA_DEV3_SD_MMC2] = -1,
--	[DB8500_DMA_DEV8_SSP0] = -1,
--	[DB8500_DMA_DEV9_SSP1] = -1,
--	[DB8500_DMA_DEV11_UART2] = -1,
--	[DB8500_DMA_DEV12_UART1] = -1,
--	[DB8500_DMA_DEV13_UART0] = -1,
--	[DB8500_DMA_DEV28_SD_MM2] = -1,
--	[DB8500_DMA_DEV29_SD_MM0] = -1,
--	[DB8500_DMA_DEV32_SD_MM1] = -1,
--	[DB8500_DMA_DEV33_SPI2] = -1,
--	[DB8500_DMA_DEV35_SPI1] = -1,
--	[DB8500_DMA_DEV40_SPI3] = -1,
--	[DB8500_DMA_DEV41_SD_MM3] = -1,
--	[DB8500_DMA_DEV42_SD_MM4] = -1,
--	[DB8500_DMA_DEV43_SD_MM5] = -1,
--	[DB8500_DMA_DEV14_MSP2] = U8500_MSP2_BASE + MSP_TX_RX_REG_OFFSET,
--	[DB8500_DMA_DEV30_MSP3] = U8500_MSP3_BASE + MSP_TX_RX_REG_OFFSET,
--	[DB8500_DMA_DEV31_MSP0_SLIM0_CH0] = U8500_MSP0_BASE + MSP_TX_RX_REG_OFFSET,
--	[DB8500_DMA_DEV48_CAC1] = U8500_CRYP1_BASE + CRYP1_RX_REG_OFFSET,
--};
--
- struct stedma40_platform_data dma40_plat_data = {
--	.dev_rx = dma40_rx_map,
--	.dev_tx = dma40_tx_map,
- 	.disabled_channels = {-1},
- };
- 
-diff --git a/include/linux/platform_data/dma-ste-dma40.h b/include/linux/platform_data/dma-ste-dma40.h
-index c54af61..af0064e 100644
---- a/include/linux/platform_data/dma-ste-dma40.h
-+++ b/include/linux/platform_data/dma-ste-dma40.h
-@@ -152,8 +152,6 @@ struct stedma40_chan_cfg {
-  * for 'multiple of 4' channels, like 8.
-  */
- struct stedma40_platform_data {
--	const dma_addr_t		*dev_tx;
--	const dma_addr_t		*dev_rx;
- 	int				 disabled_channels[STEDMA40_MAX_PHYS];
- 	int				*soft_lli_chans;
- 	int				 num_of_soft_lli_chans;
--- 
-1.7.10.4
+-	db8500_add_usb(parent, usb_db8500_dma_cfg, usb_db8500_dma_cfg);
