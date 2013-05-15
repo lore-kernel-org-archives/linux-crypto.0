@@ -1,7 +1,7 @@
 From: Lee Jones <lee.jones@linaro.org>
-Subject: [PATCH 22/39] usb: musb: ux500: take the dma_mask from coherent_dma_mask
-Date: Wed, 15 May 2013 10:51:45 +0100
-Message-ID: <1368611522-9984-23-git-send-email-lee.jones@linaro.org>
+Subject: [PATCH 32/39] ARM: ux500: Remove recently unused stedma40_xfer_dir enums
+Date: Wed, 15 May 2013 10:51:55 +0100
+Message-ID: <1368611522-9984-33-git-send-email-lee.jones@linaro.org>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
 Cc: arnd@arndb.de, linus.walleij@stericsson.com,
 	srinidhi.kasagar@stericsson.com, Lee Jones <lee.jones@linaro.org>
@@ -14,54 +14,41 @@ In-Reply-To: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The dma_mask will always be the same as the coherent_dma_mask, so let's
-cut down on the platform_data burden and set it as such in the driver.
-This also saves us from supporting it separately when we come to enable
-this driver for Device Tree.
+We're now using the transfer direction definitions provided by the DMA
+sub-system, so the home-brew ones have become obsolete.
 
-Cc: Felipe Balbi <balbi@ti.com>
-Cc: linux-usb@vger.kernel.org
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
-Acked-by: Fabio Baltieri <fabio.baltieri@linaro.org>
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- arch/arm/mach-ux500/usb.c |    3 ---
- drivers/usb/musb/ux500.c  |    2 +-
- 2 files changed, 1 insertion(+), 4 deletions(-)
+ include/linux/platform_data/dma-ste-dma40.h |   10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
 
-diff --git a/arch/arm/mach-ux500/usb.c b/arch/arm/mach-ux500/usb.c
-index 49d6e57..2f9abe9 100644
---- a/arch/arm/mach-ux500/usb.c
-+++ b/arch/arm/mach-ux500/usb.c
-@@ -74,8 +74,6 @@ static struct ux500_musb_board_data musb_board_data = {
- 	.dma_filter = stedma40_filter,
+diff --git a/include/linux/platform_data/dma-ste-dma40.h b/include/linux/platform_data/dma-ste-dma40.h
+index 288dc24..54ddca6 100644
+--- a/include/linux/platform_data/dma-ste-dma40.h
++++ b/include/linux/platform_data/dma-ste-dma40.h
+@@ -77,14 +77,6 @@ enum stedma40_periph_data_width {
+ 	STEDMA40_DOUBLEWORD_WIDTH = STEDMA40_ESIZE_64_BIT
  };
  
--static u64 ux500_musb_dmamask = DMA_BIT_MASK(32);
+-enum stedma40_xfer_dir {
+-	STEDMA40_MEM_TO_MEM = 1,
+-	STEDMA40_MEM_TO_PERIPH,
+-	STEDMA40_PERIPH_TO_MEM,
+-	STEDMA40_PERIPH_TO_PERIPH
+-};
 -
- static struct musb_hdrc_platform_data musb_platform_data = {
- 	.mode = MUSB_OTG,
- 	.board_data = &musb_board_data,
-@@ -98,7 +96,6 @@ struct platform_device ux500_musb_device = {
- 	.id = 0,
- 	.dev = {
- 		.platform_data = &musb_platform_data,
--		.dma_mask = &ux500_musb_dmamask,
- 		.coherent_dma_mask = DMA_BIT_MASK(32),
- 	},
- 	.num_resources = ARRAY_SIZE(usb_resources),
-diff --git a/drivers/usb/musb/ux500.c b/drivers/usb/musb/ux500.c
-index 371776f..3cf10bc 100644
---- a/drivers/usb/musb/ux500.c
-+++ b/drivers/usb/musb/ux500.c
-@@ -228,7 +228,7 @@ static int ux500_probe(struct platform_device *pdev)
- 	}
- 
- 	musb->dev.parent		= &pdev->dev;
--	musb->dev.dma_mask		= pdev->dev.dma_mask;
-+	musb->dev.dma_mask		= &pdev->dev.coherent_dma_mask;
- 	musb->dev.coherent_dma_mask	= pdev->dev.coherent_dma_mask;
- 
- 	glue->dev			= &pdev->dev;
+-
+ /**
+  * struct stedma40_half_channel_info - dst/src channel configuration
+  *
+@@ -120,7 +112,7 @@ struct stedma40_half_channel_info {
+  *
+  */
+ struct stedma40_chan_cfg {
+-	enum stedma40_xfer_dir			 dir;
++	enum dma_transfer_direction		 dir;
+ 	bool					 high_priority;
+ 	bool					 realtime;
+ 	enum stedma40_mode			 mode;
 -- 
 1.7.10.4
