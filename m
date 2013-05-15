@@ -1,60 +1,48 @@
-From: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [PATCH 28/39] ARM: ux500: Remove empty function u8500_of_init_devices()
-Date: Wed, 15 May 2013 10:51:51 +0100
-Message-ID: <1368611522-9984-29-git-send-email-lee.jones@linaro.org>
+From: Lee Jones <lee.jones@linaro.org>
+Subject: [PATCH 26/39] ARM: ux500: Add an auxdata entry for MUSB for clock-name look-up
+Date: Wed, 15 May 2013 10:51:49 +0100
+Message-ID: <1368611522-9984-27-git-send-email-lee.jones@linaro.org>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-Cc: arnd-r2nGTMty4D4@public.gmane.org, linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org,
-	srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	balbi-l0cyMroinI0@public.gmane.org, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org
-Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1368611522-9984-1-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: arnd@arndb.de, linus.walleij@stericsson.com,
+	srinidhi.kasagar@stericsson.com, Lee Jones <lee.jones@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	balbi@ti.com, linux-usb@vger.kernel.org,
+	linux-crypto@vger.kernel.org, davem@davemloft.net,
+	herbert@gondor.apana.org.au, vinod.koul@intel.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:59361 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932683Ab3EOJxA (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 15 May 2013 05:53:00 -0400
+Received: by mail-wi0-f174.google.com with SMTP id c10so2965068wiw.7
+        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2013 02:52:58 -0700 (PDT)
+In-Reply-To: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-As promised, now all devices which resided in u8500_of_init_devices()
-have been enabled for Device Tree, we can completely remove it.
+The recently DT:ed MUSB driver will require clock-name by device-name
+look-up capability, until common clk has is properly supported by the
+ux500 platform.
 
-Acked-by: Fabio Baltieri <fabio.baltieri-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
+Acked-by: Fabio Baltieri <fabio.baltieri@linaro.org>
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- arch/arm/mach-ux500/cpu-db8500.c |   14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
+ arch/arm/mach-ux500/cpu-db8500.c |    1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/arch/arm/mach-ux500/cpu-db8500.c b/arch/arm/mach-ux500/cpu-db8500.c
-index f1e7a75..b407601 100644
+index b1c9241..e20bc10 100644
 --- a/arch/arm/mach-ux500/cpu-db8500.c
 +++ b/arch/arm/mach-ux500/cpu-db8500.c
-@@ -215,15 +215,6 @@ struct device * __init u8500_init_devices(void)
- }
- 
- #ifdef CONFIG_MACH_UX500_DT
--
--/* TODO: Once all pieces are DT:ed, remove completely. */
--static struct device * __init u8500_of_init_devices(void)
--{
--	struct device *parent = db8500_soc_device_init();
--
--	return parent;
--}
--
- static struct of_dev_auxdata u8500_auxdata_lookup[] __initdata = {
- 	/* Requires call-back bindings. */
- 	OF_DEV_AUXDATA("arm,cortex-a9-pmu", 0, "arm-pmu", &db8500_pmu_platdata),
-@@ -283,7 +274,7 @@ static const struct of_device_id u8500_local_bus_nodes[] = {
- 
- static void __init u8500_init_machine(void)
- {
--	struct device *parent = NULL;
-+	struct device *parent = db8500_soc_device_init();
- 
- 	/* Pinmaps must be in place before devices register */
- 	if (of_machine_is_compatible("st-ericsson,mop500"))
-@@ -296,9 +287,6 @@ static void __init u8500_init_machine(void)
- 	else if (of_machine_is_compatible("st-ericsson,ccu9540")) {}
- 		/* TODO: Add pinmaps for ccu9540 board. */
- 
--	/* TODO: Export SoC, USB, cpu-freq and DMA40 */
--	parent = u8500_of_init_devices();
+@@ -253,6 +253,7 @@ static struct of_dev_auxdata u8500_auxdata_lookup[] __initdata = {
+ 	OF_DEV_AUXDATA("st,nomadik-i2c", 0x80128000, "nmk-i2c.2", NULL),
+ 	OF_DEV_AUXDATA("st,nomadik-i2c", 0x80110000, "nmk-i2c.3", NULL),
+ 	OF_DEV_AUXDATA("st,nomadik-i2c", 0x8012a000, "nmk-i2c.4", NULL),
++	OF_DEV_AUXDATA("stericsson,db8500-musb", 0xa03e0000, "musb-ux500.0", NULL),
+ 	OF_DEV_AUXDATA("stericsson,db8500-prcmu", 0x80157000, "db8500-prcmu",
+ 			&db8500_prcmu_pdata),
+ 	OF_DEV_AUXDATA("smsc,lan9115", 0x50000000, "smsc911x.0", NULL),
+-- 
+1.7.10.4
