@@ -1,53 +1,51 @@
-From: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH 05/39] ARM: ux500: Stop passing MMC's platform data for
- Device Tree boots
-Date: Wed, 15 May 2013 18:50:47 +0200
-Message-ID: <CACRpkdbOxzhgR=ugXLrSBJ_Y1rw=0mcrvtuRi=-c5v039xsPWA@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH 07/39] dmaengine: ste_dma40: Only use addresses passed as
+ configuration information
+Date: Wed, 15 May 2013 18:54:18 +0200
+Message-ID: <CACRpkdY97uS_ckSqy=Ta0SDrXrGmtDB4eL28_ZZPN5j--emr5A@mail.gmail.com>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-	<1368611522-9984-6-git-send-email-lee.jones@linaro.org>
+	<1368611522-9984-8-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
-	<linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Felipe Balbi <balbi-l0cyMroinI0@public.gmane.org>,
-	"linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Linus WALLEIJ <linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>,
-	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>,
-	Srinidhi KASAGAR <srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>
-To: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1368611522-9984-6-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Felipe Balbi <balbi@ti.com>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Vinod Koul <vinod.koul@intel.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Linus WALLEIJ <linus.walleij@stericsson.com>,
+	Srinidhi KASAGAR <srinidhi.kasagar@stericsson.com>
+To: Lee Jones <lee.jones@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ie0-f172.google.com ([209.85.223.172]:36738 "EHLO
+	mail-ie0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759665Ab3EOQyT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 15 May 2013 12:54:19 -0400
+Received: by mail-ie0-f172.google.com with SMTP id 16so4164906iea.17
+        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2013 09:54:19 -0700 (PDT)
+In-Reply-To: <1368611522-9984-8-git-send-email-lee.jones@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones@linaro.org> wrote:
 
-> It was required to pass DMA channel configuration information to the
-> MMC driver before the new DMA API was in place. Now that it is, and
-> is fully compatible with Device Tree we can stop doing that.
+> Addresses are passed in from the client's driver via the invocation of
+> dmaengine_slave_config(), so there's no need to fetch them from platform
+> data too, hardwired or otherwise. This is a great step forward, as it
+> elevates a large burden from platform data in the way of a look-up
+> table.
 >
-> Reviewed-by: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-> Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> Signed-off-by: Lee Jones <lee.jones@linaro.org>
 
-So since the use of dma_request_slave_channel() is not upstream,
-I guess this will break DMA use (i.e slow down transfers!) on all
-device tree boots?
+This should be the case even without patch 5 & 6 so patch tentatively
+applied.
 
-I'd be happy to apply it once the MMCI patch is in linux-next
-indicating there may just be a window in the merge period
-where it falls back to IRQ mode, but I don't want to disable
-DMA on DT boots for an entire kernel cycle just like that.
-
-Not applied as of yet.
+Waiting for Vinod's ACK on this though.
 
 Yours,
 Linus Walleij
---
-To unsubscribe from this list: send the line "unsubscribe linux-usb" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
