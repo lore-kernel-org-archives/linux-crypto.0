@@ -1,9 +1,10 @@
 From: Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: [PATCH 13/39] crypto: ux500/hash - Set DMA configuration though dma_slave_config()
-Date: Wed, 15 May 2013 19:09:57 +0200
-Message-ID: <CACRpkdZ+XExToF8DaC+iiMrpf-s01Hc6W5q40n=WnfJ4qtKStw@mail.gmail.com>
+Subject: Re: [PATCH 11/39] ARM: ux500: Remove unnecessary attributes from DMA
+ channel request pdata
+Date: Wed, 15 May 2013 19:05:44 +0200
+Message-ID: <CACRpkdYLwywT0R7zyd2d=1bH+FajV=yopHrvTMpYRYF+4zkQDQ@mail.gmail.com>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-	<1368611522-9984-14-git-send-email-lee.jones@linaro.org>
+	<1368611522-9984-12-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: "linux-arm-kernel@lists.infradead.org"
@@ -17,33 +18,31 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	Vinod Koul <vinod.koul@intel.com>,
 	Arnd Bergmann <arnd@arndb.de>,
 	Linus WALLEIJ <linus.walleij@stericsson.com>,
-	Srinidhi KASAGAR <srinidhi.kasagar@stericsson.com>,
-	Andreas Westin <andreas.westin@stericsson.com>
+	Srinidhi KASAGAR <srinidhi.kasagar@stericsson.com>
 To: Lee Jones <lee.jones@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1368611522-9984-14-git-send-email-lee.jones@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ie0-f180.google.com ([209.85.223.180]:54778 "EHLO
+	mail-ie0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932942Ab3EORLe (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 15 May 2013 13:11:34 -0400
+Received: by mail-ie0-f180.google.com with SMTP id ar20so4179724iec.39
+        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2013 10:11:33 -0700 (PDT)
+In-Reply-To: <1368611522-9984-12-git-send-email-lee.jones@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones@linaro.org> wrote:
 
-> The DMA controller currently takes configuration information from
-> information passed though dma_channel_request(), but it shouldn't.
-> Using the API, the DMA channel should only be configured during
-> a dma_slave_config() call.
+> DMA data width and packet size information is only required at channel
+> configuration time. Any information passed from platform data is passed
+> directly to the DMA40 driver to use during channel allocation, but these
+> pieces of information are subsequently ignored by the driver, so we may
+> as well remove them.
 >
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Andreas Westin <andreas.westin@stericsson.com>
-> Cc: linux-crypto@vger.kernel.org
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
 > Signed-off-by: Lee Jones <lee.jones@linaro.org>
 
-I think I need to stop applying here and wait for an ACK from
-Herbert on everything hitting drivers/crypto.
-
-If I get Vinod's ACK for the previous patches I can send an
-initial pull request on that and then follow up with the rest.
+Patch applied.
 
 Yours,
 Linus Walleij
