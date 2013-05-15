@@ -1,205 +1,60 @@
-From: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [PATCH 02/39] dmaengine: ste_dma40: Remove unnecessary call to d40_phy_cfg()
-Date: Wed, 15 May 2013 10:51:25 +0100
-Message-ID: <1368611522-9984-3-git-send-email-lee.jones@linaro.org>
+From: Lee Jones <lee.jones@linaro.org>
+Subject: [PATCH 06/39] ARM: ux500: Move SDI (MMC) and UART devices under more descriptive heading
+Date: Wed, 15 May 2013 10:51:29 +0100
+Message-ID: <1368611522-9984-7-git-send-email-lee.jones@linaro.org>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-Cc: arnd-r2nGTMty4D4@public.gmane.org, linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org,
-	srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-To: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	balbi-l0cyMroinI0@public.gmane.org, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org
-Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1368611522-9984-1-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: arnd@arndb.de, linus.walleij@stericsson.com,
+	srinidhi.kasagar@stericsson.com, Lee Jones <lee.jones@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	balbi@ti.com, linux-usb@vger.kernel.org,
+	linux-crypto@vger.kernel.org, davem@davemloft.net,
+	herbert@gondor.apana.org.au, vinod.koul@intel.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:60980 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932439Ab3EOJwY (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 15 May 2013 05:52:24 -0400
+Received: by mail-wg0-f51.google.com with SMTP id b13so1425644wgh.30
+        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2013 02:52:23 -0700 (PDT)
+In-Reply-To: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-All configuration left in d40_phy_cfg() is runtime configurable and
-there is already a call into it from d40_runtime_config(), so let's
-rely on that.
+Now DMA DT bindings exist and are in use by he MMC and UART drivers, it
+should be possible to remove them from the auxdata structure. However,
+after doing so the drivers fail. Common clk is still reliant on the
+dev_name() call to do device name matching, which will fail due to the
+fact that Device Tree naming differs somewhat do the more traditional
+conventions.
 
-Acked-by: Vinod Koul <vnod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Acked-by: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/dma/ste_dma40.c    |   14 +++---
- drivers/dma/ste_dma40_ll.c |  101 +++++++++++++++++++++-----------------------
- drivers/dma/ste_dma40_ll.h |    3 +-
- 3 files changed, 58 insertions(+), 60 deletions(-)
+ arch/arm/mach-ux500/cpu-db8500.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/dma/ste_dma40.c b/drivers/dma/ste_dma40.c
-index 759293e..b7fe46b 100644
---- a/drivers/dma/ste_dma40.c
-+++ b/drivers/dma/ste_dma40.c
-@@ -2043,6 +2043,14 @@ static int d40_config_memcpy(struct d40_chan *d40c)
- 	} else if (dma_has_cap(DMA_MEMCPY, cap) &&
- 		   dma_has_cap(DMA_SLAVE, cap)) {
- 		d40c->dma_cfg = dma40_memcpy_conf_phy;
-+
-+		/* Generate interrrupt at end of transfer or relink. */
-+		d40c->dst_def_cfg |= BIT(D40_SREG_CFG_TIM_POS);
-+
-+		/* Generate interrupt on error. */
-+		d40c->src_def_cfg |= BIT(D40_SREG_CFG_EIM_POS);
-+		d40c->dst_def_cfg |= BIT(D40_SREG_CFG_EIM_POS);
-+
- 	} else {
- 		chan_err(d40c, "No memcpy\n");
- 		return -EINVAL;
-@@ -2496,9 +2504,6 @@ static int d40_alloc_chan_resources(struct dma_chan *chan)
- 	}
- 
- 	pm_runtime_get_sync(d40c->base->dev);
--	/* Fill in basic CFG register values */
--	d40_phy_cfg(&d40c->dma_cfg, &d40c->src_def_cfg,
--		    &d40c->dst_def_cfg, chan_is_logical(d40c));
- 
- 	d40_set_prio_realtime(d40c);
- 
-@@ -2862,8 +2867,7 @@ static int d40_set_runtime_config(struct dma_chan *chan,
- 	if (chan_is_logical(d40c))
- 		d40_log_cfg(cfg, &d40c->log_def.lcsp1, &d40c->log_def.lcsp3);
- 	else
--		d40_phy_cfg(cfg, &d40c->src_def_cfg,
--			    &d40c->dst_def_cfg, false);
-+		d40_phy_cfg(cfg, &d40c->src_def_cfg, &d40c->dst_def_cfg);
- 
- 	/* These settings will take precedence later */
- 	d40c->runtime_addr = config_addr;
-diff --git a/drivers/dma/ste_dma40_ll.c b/drivers/dma/ste_dma40_ll.c
-index 435a223..ab5a2a7 100644
---- a/drivers/dma/ste_dma40_ll.c
-+++ b/drivers/dma/ste_dma40_ll.c
-@@ -50,63 +50,58 @@ void d40_log_cfg(struct stedma40_chan_cfg *cfg,
- 
- }
- 
--/* Sets up SRC and DST CFG register for both logical and physical channels */
--void d40_phy_cfg(struct stedma40_chan_cfg *cfg,
--		 u32 *src_cfg, u32 *dst_cfg, bool is_log)
-+void d40_phy_cfg(struct stedma40_chan_cfg *cfg, u32 *src_cfg, u32 *dst_cfg)
- {
- 	u32 src = 0;
- 	u32 dst = 0;
- 
--	if (!is_log) {
--		/* Physical channel */
--		if ((cfg->dir ==  STEDMA40_PERIPH_TO_MEM) ||
--		    (cfg->dir == STEDMA40_PERIPH_TO_PERIPH)) {
--			/* Set master port to 1 */
--			src |= 1 << D40_SREG_CFG_MST_POS;
--			src |= D40_TYPE_TO_EVENT(cfg->dev_type);
--
--			if (cfg->src_info.flow_ctrl == STEDMA40_NO_FLOW_CTRL)
--				src |= 1 << D40_SREG_CFG_PHY_TM_POS;
--			else
--				src |= 3 << D40_SREG_CFG_PHY_TM_POS;
--		}
--		if ((cfg->dir ==  STEDMA40_MEM_TO_PERIPH) ||
--		    (cfg->dir == STEDMA40_PERIPH_TO_PERIPH)) {
--			/* Set master port to 1 */
--			dst |= 1 << D40_SREG_CFG_MST_POS;
--			dst |= D40_TYPE_TO_EVENT(cfg->dev_type);
--
--			if (cfg->dst_info.flow_ctrl == STEDMA40_NO_FLOW_CTRL)
--				dst |= 1 << D40_SREG_CFG_PHY_TM_POS;
--			else
--				dst |= 3 << D40_SREG_CFG_PHY_TM_POS;
--		}
--		/* Interrupt on end of transfer for destination */
--		dst |= 1 << D40_SREG_CFG_TIM_POS;
--
--		/* Generate interrupt on error */
--		src |= 1 << D40_SREG_CFG_EIM_POS;
--		dst |= 1 << D40_SREG_CFG_EIM_POS;
--
--		/* PSIZE */
--		if (cfg->src_info.psize != STEDMA40_PSIZE_PHY_1) {
--			src |= 1 << D40_SREG_CFG_PHY_PEN_POS;
--			src |= cfg->src_info.psize << D40_SREG_CFG_PSIZE_POS;
--		}
--		if (cfg->dst_info.psize != STEDMA40_PSIZE_PHY_1) {
--			dst |= 1 << D40_SREG_CFG_PHY_PEN_POS;
--			dst |= cfg->dst_info.psize << D40_SREG_CFG_PSIZE_POS;
--		}
--
--		/* Element size */
--		src |= cfg->src_info.data_width << D40_SREG_CFG_ESIZE_POS;
--		dst |= cfg->dst_info.data_width << D40_SREG_CFG_ESIZE_POS;
--
--		/* Set the priority bit to high for the physical channel */
--		if (cfg->high_priority) {
--			src |= 1 << D40_SREG_CFG_PRI_POS;
--			dst |= 1 << D40_SREG_CFG_PRI_POS;
--		}
-+	if ((cfg->dir ==  STEDMA40_PERIPH_TO_MEM) ||
-+	    (cfg->dir == STEDMA40_PERIPH_TO_PERIPH)) {
-+		/* Set master port to 1 */
-+		src |= 1 << D40_SREG_CFG_MST_POS;
-+		src |= D40_TYPE_TO_EVENT(cfg->dev_type);
-+
-+		if (cfg->src_info.flow_ctrl == STEDMA40_NO_FLOW_CTRL)
-+			src |= 1 << D40_SREG_CFG_PHY_TM_POS;
-+		else
-+			src |= 3 << D40_SREG_CFG_PHY_TM_POS;
-+	}
-+	if ((cfg->dir ==  STEDMA40_MEM_TO_PERIPH) ||
-+	    (cfg->dir == STEDMA40_PERIPH_TO_PERIPH)) {
-+		/* Set master port to 1 */
-+		dst |= 1 << D40_SREG_CFG_MST_POS;
-+		dst |= D40_TYPE_TO_EVENT(cfg->dev_type);
-+
-+		if (cfg->dst_info.flow_ctrl == STEDMA40_NO_FLOW_CTRL)
-+			dst |= 1 << D40_SREG_CFG_PHY_TM_POS;
-+		else
-+			dst |= 3 << D40_SREG_CFG_PHY_TM_POS;
-+	}
-+	/* Interrupt on end of transfer for destination */
-+	dst |= 1 << D40_SREG_CFG_TIM_POS;
-+
-+	/* Generate interrupt on error */
-+	src |= 1 << D40_SREG_CFG_EIM_POS;
-+	dst |= 1 << D40_SREG_CFG_EIM_POS;
-+
-+	/* PSIZE */
-+	if (cfg->src_info.psize != STEDMA40_PSIZE_PHY_1) {
-+		src |= 1 << D40_SREG_CFG_PHY_PEN_POS;
-+		src |= cfg->src_info.psize << D40_SREG_CFG_PSIZE_POS;
-+	}
-+	if (cfg->dst_info.psize != STEDMA40_PSIZE_PHY_1) {
-+		dst |= 1 << D40_SREG_CFG_PHY_PEN_POS;
-+		dst |= cfg->dst_info.psize << D40_SREG_CFG_PSIZE_POS;
-+	}
-+
-+	/* Element size */
-+	src |= cfg->src_info.data_width << D40_SREG_CFG_ESIZE_POS;
-+	dst |= cfg->dst_info.data_width << D40_SREG_CFG_ESIZE_POS;
-+
-+	/* Set the priority bit to high for the physical channel */
-+	if (cfg->high_priority) {
-+		src |= 1 << D40_SREG_CFG_PRI_POS;
-+		dst |= 1 << D40_SREG_CFG_PRI_POS;
- 	}
- 
- 	if (cfg->src_info.big_endian)
-diff --git a/drivers/dma/ste_dma40_ll.h b/drivers/dma/ste_dma40_ll.h
-index fdde8ef..1b47312 100644
---- a/drivers/dma/ste_dma40_ll.h
-+++ b/drivers/dma/ste_dma40_ll.h
-@@ -432,8 +432,7 @@ enum d40_lli_flags {
- 
- void d40_phy_cfg(struct stedma40_chan_cfg *cfg,
- 		 u32 *src_cfg,
--		 u32 *dst_cfg,
--		 bool is_log);
-+		 u32 *dst_cfg);
- 
- void d40_log_cfg(struct stedma40_chan_cfg *cfg,
- 		 u32 *lcsp1,
+diff --git a/arch/arm/mach-ux500/cpu-db8500.c b/arch/arm/mach-ux500/cpu-db8500.c
+index 96ddbae..b1c9241 100644
+--- a/arch/arm/mach-ux500/cpu-db8500.c
++++ b/arch/arm/mach-ux500/cpu-db8500.c
+@@ -230,15 +230,15 @@ static struct of_dev_auxdata u8500_auxdata_lookup[] __initdata = {
+ 	/* Requires call-back bindings. */
+ 	OF_DEV_AUXDATA("arm,cortex-a9-pmu", 0, "arm-pmu", &db8500_pmu_platdata),
+ 	/* Requires DMA bindings. */
++	OF_DEV_AUXDATA("arm,pl022", 0x80002000, "ssp0",  &ssp0_plat),
++	/* Requires clock name bindings. */
+ 	OF_DEV_AUXDATA("arm,pl011", 0x80120000, "uart0", NULL),
+ 	OF_DEV_AUXDATA("arm,pl011", 0x80121000, "uart1", NULL),
+ 	OF_DEV_AUXDATA("arm,pl011", 0x80007000, "uart2", NULL),
+-	OF_DEV_AUXDATA("arm,pl022", 0x80002000, "ssp0",  &ssp0_plat),
+ 	OF_DEV_AUXDATA("arm,pl18x", 0x80126000, "sdi0",  NULL),
+ 	OF_DEV_AUXDATA("arm,pl18x", 0x80118000, "sdi1",  NULL),
+ 	OF_DEV_AUXDATA("arm,pl18x", 0x80005000, "sdi2",  NULL),
+ 	OF_DEV_AUXDATA("arm,pl18x", 0x80114000, "sdi4",  NULL),
+-	/* Requires clock name bindings. */
+ 	OF_DEV_AUXDATA("st,nomadik-gpio", 0x8012e000, "gpio.0", NULL),
+ 	OF_DEV_AUXDATA("st,nomadik-gpio", 0x8012e080, "gpio.1", NULL),
+ 	OF_DEV_AUXDATA("st,nomadik-gpio", 0x8000e000, "gpio.2", NULL),
 -- 
 1.7.10.4
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-usb" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
