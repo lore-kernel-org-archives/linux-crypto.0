@@ -1,7 +1,7 @@
 From: Tim Chen <tim.c.chen@linux.intel.com>
 Subject: Re: linux-next: Tree for May 15 (crypto /crct10dif)
-Date: Thu, 16 May 2013 09:09:54 -0700
-Message-ID: <1368720594.27102.273.camel@schen9-DESK>
+Date: Thu, 16 May 2013 09:59:12 -0700
+Message-ID: <1368723552.27102.286.camel@schen9-DESK>
 References: <20130515132627.817585a3d9fb3a3e502eb586@canb.auug.org.au>
 	 <5193CCEC.7070909@infradead.org>
 	 <alpine.DEB.2.02.1305161152530.31865@M2420>
@@ -17,10 +17,10 @@ Cc: Xiong Zhou <jencce.kernel@gmail.com>,
 	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
 To: Geert Uytterhoeven <geert@linux-m68k.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:44169 "EHLO mga09.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:8510 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752256Ab3EPQJy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 May 2013 12:09:54 -0400
+	id S1752330Ab3EPQ7M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 16 May 2013 12:59:12 -0400
 In-Reply-To: <CAMuHMdUmD2DMNeezetHNbe9DgQXpTN4BEfEmJSztyzCivQpyXQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -37,11 +37,6 @@ On Thu, 2013-05-16 at 09:22 +0200, Geert Uytterhoeven wrote:
 > 
 > This is a library symbol, so "select CRC_T10DIF"?
 > 
-
-I think "depends on" CRC_T10DIF is okay.  This generic transform is not
-needed if we are not using the T10-DIF library.  It is meant for
-wrapping the library call to t10-dif as a crypto transform.
-
 > >         select CRYPTO_HASH
 > >         help
 > >           CRC T10 Data Integrity Field computation is being cast as
@@ -50,14 +45,46 @@ wrapping the library call to t10-dif as a crypto transform.
 > 
 >                         Geert
 > 
-> --
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-> 
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
->                                 -- Linus Torvalds
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+
+This is the fix I think that will resolve the build issues.  The generic
+crc-t10dif transform depends on the library function crc_t10dif_generic
+in lib/crc-t10dif.c, so "depends on CRC_T10DIF" for CRYPTO_CRCT10DIF is
+needed.
+
+Now for CRC_T10DIF, we should use select CRYPTO_HASH, so it can try to
+allocate a T10DIF transform if it is available.  If not, it will simply
+use the crc_t10dif_generic function. Loading the
+generic t10dif crypto transform is not mandatory for the library
+function crc_t10dif. 
+
+Thanks for catching the issues.
+
+Tim
+
+Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+---
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index d1ca631..015df24 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -379,6 +379,7 @@ config CRYPTO_CRC32_PCLMUL
+ config CRYPTO_CRCT10DIF
+ 	tristate "CRCT10DIF algorithm"
+ 	select CRYPTO_HASH
++	depends on CRC_T10DIF
+ 	help
+ 	  CRC T10 Data Integrity Field computation is being cast as
+ 	  a crypto transform.  This allows for faster crc t10 diff
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 0cee056..e6ad2e4 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -63,7 +63,7 @@ config CRC16
+ 
+ config CRC_T10DIF
+ 	tristate "CRC calculation for the T10 Data Integrity Field"
+-	select CRYPTO_CRCT10DIF
++	select CRYPTO_HASH
+ 	help
+ 	  This option is only needed if a module that's not in the
+ 	  kernel tree needs to calculate CRC checks for use with the
