@@ -1,70 +1,130 @@
 From: Lee Jones <lee.jones@linaro.org>
-Subject: Re: [PATCH 01/39] dmaengine: ste_dma40: Separate Logical Global
- Interrupt Mask (GIM) unmasking
-Date: Thu, 16 May 2013 08:26:34 +0100
-Message-ID: <20130516072634.GE3269@gmail.com>
+Subject: Re: [PATCH 34/39] dmaengine: ste_dma40: Convert data_width from
+ register bit format to value
+Date: Thu, 16 May 2013 08:35:53 +0100
+Message-ID: <20130516073553.GF3269@gmail.com>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
- <1368611522-9984-2-git-send-email-lee.jones@linaro.org>
- <CACRpkdZJp-WRGNgzwqERVBtb_WxQGybmMjnnLTAoX66qECNh7g@mail.gmail.com>
- <20130516063513.GC14863@intel.com>
+ <1368611522-9984-35-git-send-email-lee.jones@linaro.org>
+ <20130516063244.GA14863@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Felipe Balbi <balbi@ti.com>,
-	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	Rabin Vincent <rabin@rab.in>,
-	Linus WALLEIJ <linus.walleij@stericsson.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Srinidhi KASAGAR <srinidhi.kasagar@stericsson.com>,
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	balbi@ti.com, linux-usb@vger.kernel.org,
+	linux-crypto@vger.kernel.org, davem@davemloft.net,
+	herbert@gondor.hengli.com.au, arnd@arndb.de,
+	linus.walleij@stericsson.com, srinidhi.kasagar@stericsson.com,
+	Dan Williams <djbw@fb.com>,
 	Per Forlin <per.forlin@stericsson.com>,
-	Dan Williams <djbw@fb.com>
+	Rabin Vincent <rabin@rab.in>
 To: Vinod Koul <vinod.koul@intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20130516063513.GC14863@intel.com>
+In-Reply-To: <20130516063244.GA14863@intel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 On Thu, 16 May 2013, Vinod Koul wrote:
 
-> On Wed, May 15, 2013 at 06:29:51PM +0200, Linus Walleij wrote:
-> > On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones@linaro.org> =
-wrote:
+> On Wed, May 15, 2013 at 10:51:57AM +0100, Lee Jones wrote:
+> > When a DMA client requests and configures a DMA channel, it request=
+s
+> > data_width in Bytes. The DMA40 driver then swiftly converts it over=
+ to
+> > the necessary register bit value. Unfortunately, for any subsequent
+> > calculations we have to shift '1' by the bit pattern (1 << data_wid=
+th)
+> > times to make any sense of it.
 > >=20
-> > > During the initial setup of a logical channel, it is necessary to=
- unmask
-> > > the GIM in order to receive generated terminal count and error in=
-terrupts.
-> > > We're separating out this required code so it will be possible to=
- move
-> > > the remaining code in d40_phy_cfg(), which is mostly runtime conf=
-iguration
-> > > into the runtime_config() routine.
-> > >
-> > > Cc: Vinod Koul <vinod.koul@intel.com>
-> > > Cc: Dan Williams <djbw@fb.com>
-> > > Cc: Per Forlin <per.forlin@stericsson.com>
-> > > Cc: Rabin Vincent <rabin@rab.in>
-> > > Acked-by: Arnd Bergmann <arnd@arndb.de>
-> > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> > This patch flips the semantics on its head and only converts the va=
+lue
+> > to its respective register bit pattern when writing to registers. T=
+his
+> > way we can use the true data_width (in Bytes) value.
 > >=20
-> > Tentatively applied to my ux500-dma40 branch.
-> >=20
-> > This lacks an ACK from Vinod...
-> Acked-by: Vinod Koul <vinod.koul@intel.com>
-> >=20
-> > I cannot get any of this stack of patches up to ARM SoC
-> > before I have Vinod's ACK on all hitting drivers/dma/*
-> Wip ... :)
+> > Cc: Vinod Koul <vinod.koul@intel.com>
+> > Cc: Dan Williams <djbw@fb.com>
+> > Cc: Per Forlin <per.forlin@stericsson.com>
+> > Cc: Rabin Vincent <rabin@rab.in>
+> > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> > ---
+>  =20
+> > @@ -2804,14 +2781,24 @@ static int d40_set_runtime_config(struct dm=
+a_chan *chan,
+> >  		src_maxburst =3D dst_maxburst * dst_addr_width / src_addr_width;
+> >  	}
+> > =20
+> > +	/* Only valid widths are; 1, 2, 4 and 8. */
+> > +	if (src_addr_width <=3D DMA_SLAVE_BUSWIDTH_UNDEFINED ||
+> > +	    src_addr_width >  DMA_SLAVE_BUSWIDTH_8_BYTES   ||
+> > +	    dst_addr_width <=3D DMA_SLAVE_BUSWIDTH_UNDEFINED ||
+> > +	    dst_addr_width >  DMA_SLAVE_BUSWIDTH_8_BYTES   ||
+> > +	    ((src_addr_width > 1) && (src_addr_width & 1)) ||
+> > +	    ((dst_addr_width > 1) && (dst_addr_width & 1)))
+> > +		return -EINVAL;
+> how about a simple macro to check above..
 
-Nice! :)
+I thought about it, but as this code appears only once, I considered
+it to be unnecessary abstraction.
+
+> > +
+> > +	cfg->src_info.data_width =3D src_addr_width;
+> > +	cfg->dst_info.data_width =3D dst_addr_width;
+> > +
+> >  	ret =3D dma40_config_to_halfchannel(d40c, &cfg->src_info,
+> > -					  src_addr_width,
+> >  					  src_maxburst);
+> >  	if (ret)
+> >  		return ret;
+> > =20
+> >  	ret =3D dma40_config_to_halfchannel(d40c, &cfg->dst_info,
+> > -					  dst_addr_width,
+> >  					  dst_maxburst);
+> >  	if (ret)
+> >  		return ret;
+> > diff --git a/drivers/dma/ste_dma40_ll.c b/drivers/dma/ste_dma40_ll.=
+c
+> > index 5ddd724..a035dfe 100644
+> > --- a/drivers/dma/ste_dma40_ll.c
+> > +++ b/drivers/dma/ste_dma40_ll.c
+> > @@ -10,6 +10,18 @@
+> > =20
+> >  #include "ste_dma40_ll.h"
+> > =20
+> > +u8 d40_width_to_bits(enum dma_slave_buswidth width)
+> > +{
+> > +	if (width =3D=3D DMA_SLAVE_BUSWIDTH_1_BYTE)
+> > +		return STEDMA40_ESIZE_8_BIT;
+> > +	else if (width =3D=3D DMA_SLAVE_BUSWIDTH_2_BYTES)
+> > +		return STEDMA40_ESIZE_16_BIT;
+> > +	else if (width =3D=3D DMA_SLAVE_BUSWIDTH_8_BYTES)
+> > +		return STEDMA40_ESIZE_64_BIT;
+> > +	else
+> > +		return STEDMA40_ESIZE_32_BIT;
+> > +}
+> > +
+> Switch looks better for this and how about
+> 	return fls(width);
+>=20
+> as your defines are 0...3 and dmaengine define 1,2,..8 for same thing
+> then you can also get rid of STEDMA40_XXX_WIDTH macros!
+
+I like it.
+
+Will you let me do it as a follow-up patch?
+
+> > @@ -70,13 +70,6 @@ enum stedma40_flow_ctrl {
+> >  	STEDMA40_FLOW_CTRL,
+> >  };
+> > =20
+> > -enum stedma40_periph_data_width {
+> > -	STEDMA40_BYTE_WIDTH =3D STEDMA40_ESIZE_8_BIT,
+> > -	STEDMA40_HALFWORD_WIDTH =3D STEDMA40_ESIZE_16_BIT,
+> > -	STEDMA40_WORD_WIDTH =3D STEDMA40_ESIZE_32_BIT,
+> > -	STEDMA40_DOUBLEWORD_WIDTH =3D STEDMA40_ESIZE_64_BIT
+> > -};
+> nice
+>=20
 
 --=20
 Lee Jones
