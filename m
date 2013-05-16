@@ -1,78 +1,84 @@
-From: Fabio Baltieri <fabio.baltieri-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH 20/39] usb: musb: ux500: move channel number knowledge
- into the driver
-Date: Wed, 15 May 2013 22:14:39 +0200
-Message-ID: <20130515201439.GA10141@balto.lan>
-References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
- <1368611522-9984-21-git-send-email-lee.jones@linaro.org>
- <CACRpkdYjjDp+7hzGtAchyy3+5Vxc8jK5THGCETkAO_V9Hj9Ssw@mail.gmail.com>
+From: Xiong Zhou <jencce.kernel@gmail.com>
+Subject: Re: linux-next: Tree for May 15 (crypto /crct10dif)
+Date: Thu, 16 May 2013 11:57:48 +0800 (CST)
+Message-ID: <alpine.DEB.2.02.1305161152530.31865@M2420>
+References: <20130515132627.817585a3d9fb3a3e502eb586@canb.auug.org.au> <5193CCEC.7070909@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-	"linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
-	<linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Felipe Balbi <balbi-l0cyMroinI0@public.gmane.org>,
-	"linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>,
-	Linus WALLEIJ <linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>,
-	Srinidhi KASAGAR <srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>
-To: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CACRpkdYjjDp+7hzGtAchyy3+5Vxc8jK5THGCETkAO_V9Hj9Ssw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
+	jencce.kernel@gmail.com
+To: tim.c.chen@linux.intel.com, herbert@gondor.apana.org.au
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <5193CCEC.7070909@infradead.org>
+Sender: linux-next-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello Linus,
 
-On Wed, May 15, 2013 at 07:18:01PM +0200, Linus Walleij wrote:
-> On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+
+On Wed, 15 May 2013, Randy Dunlap wrote:
+
+> On 05/14/13 20:26, Stephen Rothwell wrote:
+> > Hi all,
+> > 
+> > Changes since 20130514:
+> > 
 > 
-> > For all ux500 based platforms the maximum number of end-points are used.
-> > Move this knowledge into the driver so we can relinquish the burden from
-> > platform data. This also removes quite a bit of complexity from the driver
-> > and will aid us when we come to enable the driver for Device Tree.
-> >
-> > Cc: Felipe Balbi <balbi-l0cyMroinI0@public.gmane.org>
-> > Cc: linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > Acked-by: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-> > Acked-by: Fabio Baltieri <fabio.baltieri-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-> > Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> on x86_64:
 > 
-> I guess this stuff is dependent on the stuff Fabio has recently sent to
-> Felipe for the ux500 musb DMA so these musb patches should
-> primarily go through his tree.
-
-Not really, I only sent some coding style fix for the dma driver, as
-almost all of my work was in the usb phy files.  I also checked my
-latest series against Lee's tree and the two seems to merge without any
-conflict, so as far as I'm concerned it's really up to you and Felipe.
-
-Fabio
-
-> It seems like the later changes to the platform code
-> (arch/arm/mach-ux500) may be sufficiently orthogonal
-> so it can be done out-of-order?
+> crypto/built-in.o: In function `chksum_digest':
+> crct10dif.c:(.text+0x2789f): undefined reference to `crc_t10dif_generic'
+> crypto/built-in.o: In function `chksum_finup':
+> crct10dif.c:(.text+0x278c7): undefined reference to `crc_t10dif_generic'
+> crypto/built-in.o: In function `chksum_update':
+> crct10dif.c:(.text+0x278ef): undefined reference to `crc_t10dif_generic'
 > 
-> I can't merge any of this without Felipes ACKs in any
-> case.
 > 
-> Yours,
-> Linus Walleij
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+> CONFIG_CRYPTO_CRCT10DIF=y
+> CONFIG_CRC_T10DIF=m
+> 
+> 
+> 
+> Full randconfig file is attached.
+> 
+> 
+> -- 
+> ~Randy
+> 
+just try.
 
--- 
-Fabio Baltieri
---
-To unsubscribe from this list: send the line "unsubscribe linux-usb" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+From: Xiong Zhou <jencce.kernel@gmail.com>
+
+Try to fix randconfig build error reported by Randy Dunlap:
+
+on x86_64:
+
+crypto/built-in.o: In function `chksum_digest':
+crct10dif.c:(.text+0x2789f): undefined reference to `crc_t10dif_generic'
+crypto/built-in.o: In function `chksum_finup':
+crct10dif.c:(.text+0x278c7): undefined reference to `crc_t10dif_generic'
+crypto/built-in.o: In function `chksum_update':
+crct10dif.c:(.text+0x278ef): undefined reference to `crc_t10dif_generic'
+
+CONFIG_CRYPTO_CRCT10DIF=y
+CONFIG_CRC_T10DIF=m
+
+Cc: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Xiong Zhou <jencce.kernel@gmail.com>
+---
+ crypto/Kconfig |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 25b5209..28655bc 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -378,6 +378,7 @@ config CRYPTO_CRC32_PCLMUL
+ 
+ config CRYPTO_CRCT10DIF
+ 	tristate "CRCT10DIF algorithm"
++	depends on CRC_T10DIF
+ 	select CRYPTO_HASH
+ 	help
+ 	  CRC T10 Data Integrity Field computation is being cast as
