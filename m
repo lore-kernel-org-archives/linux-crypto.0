@@ -1,46 +1,72 @@
-From: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH 35/39] dmaengine: ste_dma40_ll: Replace meaningless
- register set with comment
-Date: Thu, 16 May 2013 07:58:03 +0100
-Message-ID: <20130516065803.GB3269@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 12/39] crypto: ux500/hash - Prepare clock before
+ enabling it
+Date: Thu, 16 May 2013 15:00:03 +0800
+Message-ID: <20130516070003.GA6634@gondor.apana.org.au>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
- <1368611522-9984-36-git-send-email-lee.jones@linaro.org>
- <20130516051820.GH27639@intel.com>
+ <1368611522-9984-13-git-send-email-lee.jones@linaro.org>
+ <CACRpkdYdf1j+V516CigFeGKv1B+Mf4mZk8g3ZwYAwa=rDP=7vg@mail.gmail.com>
+ <20130516065355.GA3269@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	balbi-l0cyMroinI0@public.gmane.org, linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org,
-	linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org, srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org,
-	Dan Williams <djbw-b10kYP2dOMg@public.gmane.org>,
-	Per Forlin <per.forlin-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>,
-	Rabin Vincent <rabin-66gdRtMMWGc@public.gmane.org>
-To: Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Felipe Balbi <balbi@ti.com>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Vinod Koul <vinod.koul@intel.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Linus WALLEIJ <linus.walleij@stericsson.com>,
+	Srinidhi KASAGAR <srinidhi.kasagar@stericsson.com>,
+	Andreas Westin <andreas.westin@stericsson.com>
+To: Lee Jones <lee.jones@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:36190 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754949Ab3EPHAX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 16 May 2013 03:00:23 -0400
 Content-Disposition: inline
-In-Reply-To: <20130516051820.GH27639-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20130516065355.GA3269@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-> > Unsure of the author's intentions, rather than just removing the no=
-p,
-> > we're replacing it with a comment containing the possible intention
-> > of the statement OR:ing with 0.
-> Would be worthwhile to check w/ Linus W on this (or check whom to bla=
-me)
+On Thu, May 16, 2013 at 07:53:55AM +0100, Lee Jones wrote:
+> On Wed, 15 May 2013, Linus Walleij wrote:
+> 
+> > On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones@linaro.org> wrote:
+> > 
+> > > If we fail to prepare the ux500-hash clock before enabling it the
+> > > platform will fail to boot. Here we insure this happens.
+> > >
+> > > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > > Cc: David S. Miller <davem@davemloft.net>
+> > > Cc: Andreas Westin <andreas.westin@stericsson.com>
+> > > Cc: linux-crypto@vger.kernel.org
+> > > Acked-by: Arnd Bergmann <arnd@arndb.de>
+> > > Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
+> > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> > 
+> > This patch seems to be totally independent of the other stuff
+> > in the patch series, and it even seems like an -rc fix to me
+> > (I don't think the crypto device works without this).
+> > 
+> > This should go into the crypto tree?
+> 
+> I agree. 
+> 
+> > Else please convince Herbert to give his ACK on this
+> > before I apply it.
+> 
+> Pleeeeaasseee Herbert, take this patch! :)
 
-I did already. It was his idea to place the comment in.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-The original author will on parental leave for the foreseeable future.
-
---=20
-Lee Jones
-Linaro ST-Ericsson Landing Team Lead
-Linaro.org =E2=94=82 Open source software for ARM SoCs
-=46ollow Linaro: Facebook | Twitter | Blog
---
-To unsubscribe from this list: send the line "unsubscribe linux-usb" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
