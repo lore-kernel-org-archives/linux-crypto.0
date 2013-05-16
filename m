@@ -1,45 +1,63 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 18/39] crypto: ux500/[cryp|hash] - Show successful
- start-up in the bootlog
-Date: Thu, 16 May 2013 15:02:17 +0800
-Message-ID: <20130516070217.GD6721@gondor.apana.org.au>
+From: Lee Jones <lee.jones@linaro.org>
+Subject: Re: [PATCH 31/39] dmaengine: ste_dma40: Replace ST-E's home-brew DMA
+ direction defs with generic ones
+Date: Thu, 16 May 2013 08:06:38 +0100
+Message-ID: <20130516070638.GC3269@gmail.com>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
- <1368611522-9984-19-git-send-email-lee.jones@linaro.org>
+ <1368611522-9984-32-git-send-email-lee.jones@linaro.org>
+ <20130516051701.GG27639@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	balbi@ti.com, linux-usb@vger.kernel.org,
 	linux-crypto@vger.kernel.org, davem@davemloft.net,
-	vinod.koul@intel.com, arnd@arndb.de, linus.walleij@stericsson.com,
-	srinidhi.kasagar@stericsson.com,
-	Andreas Westin <andreas.westin@stericsson.com>
-To: Lee Jones <lee.jones@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:56253 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754957Ab3EPHCZ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 May 2013 03:02:25 -0400
+	herbert@gondor.hengli.com.au, arnd@arndb.de,
+	linus.walleij@stericsson.com, srinidhi.kasagar@stericsson.com,
+	Dan Williams <djbw@fb.com>,
+	Per Forlin <per.forlin@stericsson.com>,
+	Rabin Vincent <rabin@rab.in>
+To: Vinod Koul <vinod.koul@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1368611522-9984-19-git-send-email-lee.jones@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20130516051701.GG27639@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 15, 2013 at 10:51:41AM +0100, Lee Jones wrote:
-> The Cryp driver is currently silent and the Hash driver prints the
-> name of its probe function unnecessarily. Let's just put a nice
-> descriptive one-liner there instead.
-> 
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Andreas Westin <andreas.westin@stericsson.com>
-> Cc: linux-crypto@vger.kernel.org
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: Lee Jones <lee.jones@linaro.org>
+On Thu, 16 May 2013, Vinod Koul wrote:
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> On Wed, May 15, 2013 at 10:51:54AM +0100, Lee Jones wrote:
+> > STEDMA40_*_TO_* direction definitions are identical in all but name=
+ to
+> > the pre-defined generic DMA_*_TO_* ones. Let's make things easy by =
+not
+> > duplicating such things.
+> >=20
+> > Cc: Vinod Koul <vinod.koul@intel.com>
+> > Cc: Dan Williams <djbw@fb.com>
+> > Cc: Per Forlin <per.forlin@stericsson.com>
+> > Cc: Rabin Vincent <rabin@rab.in>
+> > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> Nice :)
+
+:)
+
+> 1) I dont see the STE macro getting removed, why do we need it
+
+They are removed later in the set, once their use has been removed
+from platform code and all the other drivers.
+
+> 2) last i checked the direction values had a bit idfference b/w what =
+you are
+> using and what dmaengine defines, so hopefully that is taken care of.=
+=2E
+
+Yes, no problem.
+
+<place Ack here> ;)
+
+--=20
+Lee Jones
+Linaro ST-Ericsson Landing Team Lead
+Linaro.org =E2=94=82 Open source software for ARM SoCs
+=46ollow Linaro: Facebook | Twitter | Blog
