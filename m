@@ -1,71 +1,56 @@
-From: Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: [PATCH 20/39] usb: musb: ux500: move channel number knowledge
- into the driver
-Date: Fri, 17 May 2013 08:35:04 +0200
-Message-ID: <CACRpkdaJ7_p=ggax2gE86ea75Da7p9xB6A6Kte36j2LZq6_TVQ@mail.gmail.com>
-References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-	<1368611522-9984-21-git-send-email-lee.jones@linaro.org>
-	<CACRpkdYjjDp+7hzGtAchyy3+5Vxc8jK5THGCETkAO_V9Hj9Ssw@mail.gmail.com>
-	<20130515201439.GA10141@balto.lan>
+From: "Mark A. Greer" <mgreer@animalcreek.com>
+Subject: Re: [PATCH v2] OMAP: AES: Don't idle/start AES device between
+ Encrypt operations
+Date: Fri, 17 May 2013 14:14:56 -0700
+Message-ID: <20130517211456.GI28484@animalcreek.com>
+References: <1368500867-7737-1-git-send-email-joelagnel@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Lee Jones <lee.jones@linaro.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Felipe Balbi <balbi@ti.com>,
-	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Vinod Koul <vinod.koul@intel.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Linus WALLEIJ <linus.walleij@stericsson.com>,
-	Srinidhi KASAGAR <srinidhi.kasagar@stericsson.com>
-To: Fabio Baltieri <fabio.baltieri@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f180.google.com ([209.85.223.180]:42261 "EHLO
-	mail-ie0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754000Ab3EQGfF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 May 2013 02:35:05 -0400
-Received: by mail-ie0-f180.google.com with SMTP id ar20so8187807iec.25
-        for <linux-crypto@vger.kernel.org>; Thu, 16 May 2013 23:35:04 -0700 (PDT)
-In-Reply-To: <20130515201439.GA10141@balto.lan>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
+	khilman@linaro.org
+To: Joel A Fernandes <joelagnel@ti.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1368500867-7737-1-git-send-email-joelagnel@ti.com>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 15, 2013 at 10:14 PM, Fabio Baltieri
-<fabio.baltieri@linaro.org> wrote:
-> On Wed, May 15, 2013 at 07:18:01PM +0200, Linus Walleij wrote:
->> On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones@linaro.org> wrote:
->>
->> > For all ux500 based platforms the maximum number of end-points are used.
->> > Move this knowledge into the driver so we can relinquish the burden from
->> > platform data. This also removes quite a bit of complexity from the driver
->> > and will aid us when we come to enable the driver for Device Tree.
->> >
->> > Cc: Felipe Balbi <balbi@ti.com>
->> > Cc: linux-usb@vger.kernel.org
->> > Acked-by: Linus Walleij <linus.walleij@linaro.org>
->> > Acked-by: Fabio Baltieri <fabio.baltieri@linaro.org>
->> > Signed-off-by: Lee Jones <lee.jones@linaro.org>
->>
->> I guess this stuff is dependent on the stuff Fabio has recently sent to
->> Felipe for the ux500 musb DMA so these musb patches should
->> primarily go through his tree.
->
-> Not really, I only sent some coding style fix for the dma driver, as
-> almost all of my work was in the usb phy files.  I also checked my
-> latest series against Lee's tree and the two seems to merge without any
-> conflict, so as far as I'm concerned it's really up to you and Felipe.
+On Mon, May 13, 2013 at 10:07:47PM -0500, Joel A Fernandes wrote:
+> Calling runtime PM API for every block causes serious perf hit to
+> crypto operations that are done on a long buffer.
+> As crypto is performed on a page boundary, encrypting large buffers can
+> cause a series of crypto operations divided by page. The runtime PM API
+> is also called those many times.
+> 
+> We call runtime_pm_get_sync only at beginning on the session (cra_init)
+> and runtime_pm_put at the end. This result in upto a 50% speedup as below.
+> This doesn't make the driver to keep the system awake as runtime get/put
+> is only called during a crypto session which completes usually quickly.
+> 
+> Before:
+> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+> Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
+> Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
+> Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
+> Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
+> Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
+> 
+> After:
+> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+> Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
+> Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
+> Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
+> Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
+> Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
+> 
+> While at it, also drop enter and exit pr_debugs, in related code. tracers
+> can be used for that.
+> 
+> Tested on a Beaglebone (AM335x SoC) board.
+> 
+> Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
+> ---
 
-OK so Felipe can merge these smallish patches to musb, fine...
+FWIW,
 
-The other (DMA) stuff needs to be merged together with the rest
-of the DMA40 series, so here basically Felipe needs an indication
-if he can ACK it so I merge it through ARM SoC without colissions
-and it sounds like we can make the assumption that this will work.
-
-Yours,
-Linus Walleij
+Acked-by: Mark A. Greer <mgreer@animalcreek.com>
