@@ -1,104 +1,71 @@
-From: Xiong Zhou <jencce.kernel@gmail.com>
-Subject: Re: linux-next: Tree for May 15 (crypto /crct10dif)
-Date: Fri, 17 May 2013 11:09:54 +0800
-Message-ID: <CADJHv_tk3B=jSKBkpFYc+xjVs=1yC3RcXtdZUbz7sEYdWqbv=Q@mail.gmail.com>
-References: <20130515132627.817585a3d9fb3a3e502eb586@canb.auug.org.au>
-	<5193CCEC.7070909@infradead.org>
-	<alpine.DEB.2.02.1305161152530.31865@M2420>
-	<CAMuHMdUmD2DMNeezetHNbe9DgQXpTN4BEfEmJSztyzCivQpyXQ@mail.gmail.com>
-	<1368723552.27102.286.camel@schen9-DESK>
-	<1368727412.27102.289.camel@schen9-DESK>
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH 20/39] usb: musb: ux500: move channel number knowledge
+ into the driver
+Date: Fri, 17 May 2013 08:35:04 +0200
+Message-ID: <CACRpkdaJ7_p=ggax2gE86ea75Da7p9xB6A6Kte36j2LZq6_TVQ@mail.gmail.com>
+References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
+	<1368611522-9984-21-git-send-email-lee.jones@linaro.org>
+	<CACRpkdYjjDp+7hzGtAchyy3+5Vxc8jK5THGCETkAO_V9Hj9Ssw@mail.gmail.com>
+	<20130515201439.GA10141@balto.lan>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Linux-Next <linux-next@vger.kernel.org>,
+Cc: Lee Jones <lee.jones@linaro.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-To: Tim Chen <tim.c.chen@linux.intel.com>
+	Felipe Balbi <balbi@ti.com>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Vinod Koul <vinod.koul@intel.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Linus WALLEIJ <linus.walleij@stericsson.com>,
+	Srinidhi KASAGAR <srinidhi.kasagar@stericsson.com>
+To: Fabio Baltieri <fabio.baltieri@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-la0-f48.google.com ([209.85.215.48]:64948 "EHLO
-	mail-la0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752063Ab3EQDJ5 (ORCPT
+Received: from mail-ie0-f180.google.com ([209.85.223.180]:42261 "EHLO
+	mail-ie0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754000Ab3EQGfF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 May 2013 23:09:57 -0400
-In-Reply-To: <1368727412.27102.289.camel@schen9-DESK>
+	Fri, 17 May 2013 02:35:05 -0400
+Received: by mail-ie0-f180.google.com with SMTP id ar20so8187807iec.25
+        for <linux-crypto@vger.kernel.org>; Thu, 16 May 2013 23:35:04 -0700 (PDT)
+In-Reply-To: <20130515201439.GA10141@balto.lan>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-2013/5/17 Tim Chen <tim.c.chen@linux.intel.com>:
-> On Thu, 2013-05-16 at 09:59 -0700, Tim Chen wrote:
->> On Thu, 2013-05-16 at 09:22 +0200, Geert Uytterhoeven wrote:
->> > On Thu, May 16, 2013 at 5:57 AM, Xiong Zhou <jencce.kernel@gmail.com> wrote:
->> > > --- a/crypto/Kconfig
->> > > +++ b/crypto/Kconfig
->> > > @@ -378,6 +378,7 @@ config CRYPTO_CRC32_PCLMUL
->> > >
->> > >  config CRYPTO_CRCT10DIF
->> > >         tristate "CRCT10DIF algorithm"
->> > > +       depends on CRC_T10DIF
->> >
->> > This is a library symbol, so "select CRC_T10DIF"?
->> >
->> > >         select CRYPTO_HASH
->> > >         help
->> > >           CRC T10 Data Integrity Field computation is being cast as
->> >
->> > Gr{oetje,eeting}s,
->> >
->> >                         Geert
->> >
+On Wed, May 15, 2013 at 10:14 PM, Fabio Baltieri
+<fabio.baltieri@linaro.org> wrote:
+> On Wed, May 15, 2013 at 07:18:01PM +0200, Linus Walleij wrote:
+>> On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones@linaro.org> wrote:
 >>
->> This is the fix I think that will resolve the build issues.  The generic
->> crc-t10dif transform depends on the library function crc_t10dif_generic
->> in lib/crc-t10dif.c, so "depends on CRC_T10DIF" for CRYPTO_CRCT10DIF is
->> needed.
+>> > For all ux500 based platforms the maximum number of end-points are used.
+>> > Move this knowledge into the driver so we can relinquish the burden from
+>> > platform data. This also removes quite a bit of complexity from the driver
+>> > and will aid us when we come to enable the driver for Device Tree.
+>> >
+>> > Cc: Felipe Balbi <balbi@ti.com>
+>> > Cc: linux-usb@vger.kernel.org
+>> > Acked-by: Linus Walleij <linus.walleij@linaro.org>
+>> > Acked-by: Fabio Baltieri <fabio.baltieri@linaro.org>
+>> > Signed-off-by: Lee Jones <lee.jones@linaro.org>
 >>
->> Now for CRC_T10DIF, we should use select CRYPTO_HASH, so it can try to
->> allocate a T10DIF transform if it is available.  If not, it will simply
->> use the crc_t10dif_generic function. Loading the
->> generic t10dif crypto transform is not mandatory for the library
->> function crc_t10dif.
->>
->> Thanks for catching the issues.
->>
->> Tim
->>
+>> I guess this stuff is dependent on the stuff Fabio has recently sent to
+>> Felipe for the ux500 musb DMA so these musb patches should
+>> primarily go through his tree.
+>
+> Not really, I only sent some coding style fix for the dma driver, as
+> almost all of my work was in the usb phy files.  I also checked my
+> latest series against Lee's tree and the two seems to merge without any
+> conflict, so as far as I'm concerned it's really up to you and Felipe.
 
-cool.
+OK so Felipe can merge these smallish patches to musb, fine...
 
->
-> Need to also add select CRYPTO for CRC_T10DIF.  Updated fix below:
->
->
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
-> ---
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index d1ca631..015df24 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -379,6 +379,7 @@ config CRYPTO_CRC32_PCLMUL
->  config CRYPTO_CRCT10DIF
->         tristate "CRCT10DIF algorithm"
->         select CRYPTO_HASH
-> +       depends on CRC_T10DIF
->         help
->           CRC T10 Data Integrity Field computation is being cast as
->           a crypto transform.  This allows for faster crc t10 diff
-> diff --git a/lib/Kconfig b/lib/Kconfig
-> index 0cee056..6407793 100644
-> --- a/lib/Kconfig
-> +++ b/lib/Kconfig
-> @@ -63,7 +63,8 @@ config CRC16
->
->  config CRC_T10DIF
->         tristate "CRC calculation for the T10 Data Integrity Field"
-> -       select CRYPTO_CRCT10DIF
-> +       select CRYPTO
-> +       select CRYPTO_HASH
->         help
->           This option is only needed if a module that's not in the
->           kernel tree needs to calculate CRC checks for use with the
->
->
+The other (DMA) stuff needs to be merged together with the rest
+of the DMA40 series, so here basically Felipe needs an indication
+if he can ACK it so I merge it through ARM SoC without colissions
+and it sounds like we can make the assumption that this will work.
+
+Yours,
+Linus Walleij
