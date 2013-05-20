@@ -1,51 +1,81 @@
-From: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH 20/39] usb: musb: ux500: move channel number knowledge
- into the driver
-Date: Mon, 20 May 2013 14:19:40 +0200
-Message-ID: <CACRpkdbhzdPGRPFvcSupCJ_vYCdFOnbM-vhp60f9A5Q+jxrP=w@mail.gmail.com>
-References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-	<1368611522-9984-21-git-send-email-lee.jones@linaro.org>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: linux-next: Tree for May 15 (crypto /crct10dif)
+Date: Mon, 20 May 2013 12:09:45 -0700
+Message-ID: <1369076985.27102.319.camel@schen9-DESK>
+References: <20130515132627.817585a3d9fb3a3e502eb586@canb.auug.org.au>
+	 <5193CCEC.7070909@infradead.org>
+	 <alpine.DEB.2.02.1305161152530.31865@M2420>
+	 <CAMuHMdUmD2DMNeezetHNbe9DgQXpTN4BEfEmJSztyzCivQpyXQ@mail.gmail.com>
+	 <1368723552.27102.286.camel@schen9-DESK>
+	 <1368727412.27102.289.camel@schen9-DESK>
+	 <20130520114707.GA1187@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
-	<linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Felipe Balbi <balbi-l0cyMroinI0@public.gmane.org>,
-	"linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>,
-	Linus WALLEIJ <linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>,
-	Srinidhi KASAGAR <srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>
-To: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1368611522-9984-21-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Xiong Zhou <jencce.kernel@gmail.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Linux-Next <linux-next@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20130520114707.GA1187@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+On Mon, 2013-05-20 at 19:47 +0800, Herbert Xu wrote:
 
-> For all ux500 based platforms the maximum number of end-points are used.
-> Move this knowledge into the driver so we can relinquish the burden from
-> platform data. This also removes quite a bit of complexity from the driver
-> and will aid us when we come to enable the driver for Device Tree.
->
-> Cc: Felipe Balbi <balbi-l0cyMroinI0@public.gmane.org>
-> Cc: linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Acked-by: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-> Acked-by: Fabio Baltieri <fabio.baltieri-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-> Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> 
+> Nope this is still broken.  We need to move the actual crct10dif
+> code into crypto/.  I'll fix up the patch in the tree.
+> 
+> Also I'm going to get rid of crc_t10dif_update_lib function.  If you
+> still want to maintain the ordering you should do so using the
+> *_init constructs.
+> 
 
-I have now gone over and collected ACKs etc for the patches up until here.
+Herbert, 
 
-Now you need Felipe's consent to proceed with the MUSB changes
-through my tree.
+I used the following constructs in the pclmulqdq version of t10dif
+to get the module loaded. 
 
-Yours,
-Linus Walleij
---
-To unsubscribe from this list: send the line "unsubscribe linux-usb" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+static const struct x86_cpu_id crct10dif_cpu_id[] = {
+        X86_FEATURE_MATCH(X86_FEATURE_PCLMULQDQ),
+        {}
+};
+MODULE_DEVICE_TABLE(x86cpu, crct10dif_cpu_id);
+
+However, the default generic algorithm is used
+in the library function. The options CRC_T10DIF, CRYPTO_CRCT10DIF
+and CRYPTO_CRCT10DIF_PCLMUL are selected as modules (which
+is most likely usage scenario in distribution) on my
+test machine.  The library module and generic crypto module was loaded
+before the pclmulqdq t10dif module during boot.  How should
+things be changed to get this crypto module loaded earlier before the
+library?  Should we add another init call level between fs and device
+init calls for loading the available crypto algorithms?  
+The crc_t10dif_update_lib was originally used to side step this issue.
+
+BTW, latest crypto-dev need the following modification if we get
+rid of crc_t10dif_update_lib.
+
+Thanks.
+
+Tim
+
+
+
+diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c
+b/arch/x86/crypto/crct10dif-pclmul_glue.c
+index 3c0abd3..d838b7f 100644
+--- a/arch/x86/crypto/crct10dif-pclmul_glue.c
++++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
+@@ -136,8 +136,6 @@ static int __init crct10dif_intel_mod_init(void)
+                return -ENODEV;
+ 
+        ret = crypto_register_shash(&alg);
+-       if (!ret)
+-               crc_t10dif_update_lib();
+        return ret;
+ }
