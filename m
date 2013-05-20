@@ -1,43 +1,71 @@
-From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
-Subject: NIST SP800-138 availibility using kernel crypto APIs for SMB3.0 MAC generation
-Date: Sun, 19 May 2013 21:49:58 -0500
-Message-ID: <CADT32eKKeouXxVv57bEfug-Kr89VJ-wfcaxRw_E79g5MLw4_3Q@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: linux-next: Tree for May 15 (crypto /crct10dif)
+Date: Mon, 20 May 2013 19:47:07 +0800
+Message-ID: <20130520114707.GA1187@gondor.apana.org.au>
+References: <20130515132627.817585a3d9fb3a3e502eb586@canb.auug.org.au>
+ <5193CCEC.7070909@infradead.org>
+ <alpine.DEB.2.02.1305161152530.31865@M2420>
+ <CAMuHMdUmD2DMNeezetHNbe9DgQXpTN4BEfEmJSztyzCivQpyXQ@mail.gmail.com>
+ <1368723552.27102.286.camel@schen9-DESK>
+ <1368727412.27102.289.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
-	linux-cifs <linux-cifs@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f171.google.com ([209.85.217.171]:56916 "EHLO
-	mail-lb0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755223Ab3ETCuA (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 19 May 2013 22:50:00 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Xiong Zhou <jencce.kernel@gmail.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Linux-Next <linux-next@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
+To: Tim Chen <tim.c.chen@linux.intel.com>
+Return-path: <linux-next-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1368727412.27102.289.camel@schen9-DESK>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-With the recent patches added to kernel crypto for improving AES
-support, adding aesni etc, it seems like it is time to add AES CMAC
-to the cifs kernel module (for the popular SMB3 signing and per-share
-encryption) but needed for an implementation for SP800-138 in kernel
-crypto codebase.
-Was specifically interested using the way defined in 3.1.4.2 of
-MS-SMB2 document, in particular
+On Thu, May 16, 2013 at 11:03:32AM -0700, Tim Chen wrote:
+>
+> Need to also add select CRYPTO for CRC_T10DIF.  Updated fix below:
+> 
+> 
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+> ---
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index d1ca631..015df24 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -379,6 +379,7 @@ config CRYPTO_CRC32_PCLMUL
+>  config CRYPTO_CRCT10DIF
+>  	tristate "CRCT10DIF algorithm"
+>  	select CRYPTO_HASH
+> +	depends on CRC_T10DIF
+>  	help
+>  	  CRC T10 Data Integrity Field computation is being cast as
+>  	  a crypto transform.  This allows for faster crc t10 diff
+> diff --git a/lib/Kconfig b/lib/Kconfig
+> index 0cee056..6407793 100644
+> --- a/lib/Kconfig
+> +++ b/lib/Kconfig
+> @@ -63,7 +63,8 @@ config CRC16
+>  
+>  config CRC_T10DIF
+>  	tristate "CRC calculation for the T10 Data Integrity Field"
+> -	select CRYPTO_CRCT10DIF
+> +	select CRYPTO
+> +	select CRYPTO_HASH
+>  	help
+>  	  This option is only needed if a module that's not in the
+>  	  kernel tree needs to calculate CRC checks for use with the
 
-KDF in Counter mode (section 5.1 of NIST SP 800-108) or a way to specify a mode
-PRF as HMAC-SHA256 (or a way to specify a PRF)
+Nope this is still broken.  We need to move the actual crct10dif
+code into crypto/.  I'll fix up the patch in the tree.
 
+Also I'm going to get rid of crc_t10dif_update_lib function.  If you
+still want to maintain the ordering you should do so using the
+*_init constructs.
 
-cifs client would use this algorithm for SMB3.0 MAC generation
-(network packet signing on network file system mounts to newer
-generation NAS, and Windows 2012) and also for per-share encryption
-(which is also available on the most recent generation of NAS via
-SMB3). Apparently with current Intel processors having hardware for
-this kind of encryption offload - full packet encryption is faster
-than packet signing used to be (with the older standard algorithms)
-and just doing packet signing is really fast.
-
-Are their APIs in crypto kernel code to use for this purpose?
-
-Regards,
-
-Shirish
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
