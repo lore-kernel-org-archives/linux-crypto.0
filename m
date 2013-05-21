@@ -1,135 +1,99 @@
-From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: [PATCH 2/2] crypto: sha256_ssse3 - add sha224 support
-Date: Tue, 21 May 2013 17:10:49 +0300
-Message-ID: <20130521141049.16352.97486.stgit@localhost6.localdomain6>
-References: <20130521141044.16352.75962.stgit@localhost6.localdomain6>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: [PATCH][RFC] CPU Jitter random number generator (resent)
+Date: Tue, 21 May 2013 12:43:50 -0400
+Message-ID: <CACXcFmnqfpsAnS3ca-bfqE=Ru5vsdFv4atZoE=5AoH9CgWAAfQ@mail.gmail.com>
+References: <20130521084455.5c651991@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sd-mail-sa-01.sanoma.fi ([158.127.18.161]:51192 "EHLO
-	sd-mail-sa-01.sanoma.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751827Ab3EUOKv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 May 2013 10:10:51 -0400
-In-Reply-To: <20130521141044.16352.75962.stgit@localhost6.localdomain6>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-crypto@vger.kernel.org
+To: LKML <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20130521084455.5c651991@tauon>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add sha224 implementation to sha256_ssse3 module.
+I very much like the basic notion here. The existing random(4) driver
+may not get enough entropy in a VM or on a device like a Linux router
+and I think work such as yours or HAVEGE
+(http://www.irisa.fr/caps/projects/hipsor/) are important research.
+The paper by McGuire et al of "Analysis of inherent randomness of the
+Linux kernel" (http://lwn.net/images/conf/rtlws11/random-hardware.pdf)
+seems to show that this is a fine source of more entropy.
 
-This also fixes sha256_ssse3 module autoloading issue when 'sha224' is used
-before 'sha256'. Previously in such case, just sha256_generic was loaded and
-not sha256_ssse3 (since it did not provide sha224). Now if 'sha256' was used
-after 'sha224' usage, sha256_ssse3 would remain unloaded.
+On the other hand, I am not certain you are doing it in the right
+place. My own attempt (ftp://ftp.cs.sjtu.edu.cn:990/sandy/maxwell/)
+put it in a demon that just feeds /dev/random, probably also not the
+right place. haveged(8) (http://www.issihosts.com/haveged/) also puts
+it in a demon process. It may, as you suggest, belong in the kernel
+instead, but I think there are arguments both ways.
 
-Cc: Tim Chen <tim.c.chen@linux.intel.com>
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
----
- arch/x86/crypto/sha256_ssse3_glue.c |   57 ++++++++++++++++++++++++++++++++---
- 1 file changed, 52 insertions(+), 5 deletions(-)
+Could we keep random(4) mostly as is and rearrange your code to just
+give it more entropy? I think the large entropy pool in the existing
+driver is essential since we sometimes want to generate things like a
+2 Kbit PGP key and it is not clear to me that your driver is entirely
+trustworthy under such stress.
 
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index 597d4da..50226c4 100644
---- a/arch/x86/crypto/sha256_ssse3_glue.c
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -187,7 +187,36 @@ static int sha256_ssse3_import(struct shash_desc *desc, const void *in)
- 	return 0;
- }
- 
--static struct shash_alg alg = {
-+static int sha224_ssse3_init(struct shash_desc *desc)
-+{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+
-+	sctx->state[0] = SHA224_H0;
-+	sctx->state[1] = SHA224_H1;
-+	sctx->state[2] = SHA224_H2;
-+	sctx->state[3] = SHA224_H3;
-+	sctx->state[4] = SHA224_H4;
-+	sctx->state[5] = SHA224_H5;
-+	sctx->state[6] = SHA224_H6;
-+	sctx->state[7] = SHA224_H7;
-+	sctx->count = 0;
-+
-+	return 0;
-+}
-+
-+static int sha224_ssse3_final(struct shash_desc *desc, u8 *hash)
-+{
-+	u8 D[SHA256_DIGEST_SIZE];
-+
-+	sha256_ssse3_final(desc, D);
-+
-+	memcpy(hash, D, SHA224_DIGEST_SIZE);
-+	memset(D, 0, SHA256_DIGEST_SIZE);
-+
-+	return 0;
-+}
-+
-+static struct shash_alg algs[] = { {
- 	.digestsize	=	SHA256_DIGEST_SIZE,
- 	.init		=	sha256_ssse3_init,
- 	.update		=	sha256_ssse3_update,
-@@ -204,7 +233,24 @@ static struct shash_alg alg = {
- 		.cra_blocksize	=	SHA256_BLOCK_SIZE,
- 		.cra_module	=	THIS_MODULE,
- 	}
--};
-+}, {
-+	.digestsize	=	SHA224_DIGEST_SIZE,
-+	.init		=	sha224_ssse3_init,
-+	.update		=	sha256_ssse3_update,
-+	.final		=	sha224_ssse3_final,
-+	.export		=	sha256_ssse3_export,
-+	.import		=	sha256_ssse3_import,
-+	.descsize	=	sizeof(struct sha256_state),
-+	.statesize	=	sizeof(struct sha256_state),
-+	.base		=	{
-+		.cra_name	=	"sha224",
-+		.cra_driver_name =	"sha224-ssse3",
-+		.cra_priority	=	150,
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA224_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
-+} };
- 
- #ifdef CONFIG_AS_AVX
- static bool __init avx_usable(void)
-@@ -227,7 +273,7 @@ static bool __init avx_usable(void)
- 
- static int __init sha256_ssse3_mod_init(void)
- {
--	/* test for SSE3 first */
-+	/* test for SSSE3 first */
- 	if (cpu_has_ssse3)
- 		sha256_transform_asm = sha256_transform_ssse3;
- 
-@@ -254,7 +300,7 @@ static int __init sha256_ssse3_mod_init(void)
- 		else
- #endif
- 			pr_info("Using SSSE3 optimized SHA-256 implementation\n");
--		return crypto_register_shash(&alg);
-+		return crypto_register_shashes(algs, ARRAY_SIZE(algs));
- 	}
- 	pr_info("Neither AVX nor SSSE3 is available/usable.\n");
- 
-@@ -263,7 +309,7 @@ static int __init sha256_ssse3_mod_init(void)
- 
- static void __exit sha256_ssse3_mod_fini(void)
- {
--	crypto_unregister_shash(&alg);
-+	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
- }
- 
- module_init(sha256_ssse3_mod_init);
-@@ -273,3 +319,4 @@ MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA256 Secure Hash Algorithm, Supplemental SSE3 accelerated");
- 
- MODULE_ALIAS("sha256");
-+MODULE_ALIAS("sha384");
+On Tue, May 21, 2013 at 2:44 AM, Stephan Mueller <smueller@chronox.de> wrote:
+> Hi,
+>
+> [1] patch at http://www.chronox.de/jent/jitterentropy-20130516.tar.bz2
+>
+> A new version of the CPU Jitter random number generator is released at
+> http://www.chronox.de/ . The heart of the RNG is about 30 lines of easy
+> to read code. The readme in the main directory explains the different
+> code files. A changelog can be found on the web site.
+>
+> In a previous attempt (http://lkml.org/lkml/2013/2/8/476), the first
+> iteration received comments for the lack of tests, documentation and
+> entropy assessment. All these concerns have been addressed. The
+> documentation of the CPU Jitter random number generator
+> (http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html and PDF at
+> http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.pdf -- the graphs and
+> pictures are better in PDF) offers a full analysis of:
+>
+> - the root cause of entropy
+>
+> - a design of the RNG
+>
+> - statistical tests and analyses
+>
+> - entropy assessment and explanation of the flow of entropy
+>
+> The document also explains the core concept to have a fully
+> decentralized entropy collector for every caller in need of entropy.
+>
+> Also, this RNG is well suitable for virtualized environments.
+> Measurements on OpenVZ and KVM environments have been conducted as
+> documented. As the Linux kernel is starved of entropy in virtualized as
+> well as server environments, new sources of entropy are vital.
+>
+> The appendix of the documentation contains example use cases by
+> providing link code to the Linux kernel crypto API, libgcrypt and
+> OpenSSL. Links to other cryptographic libraries should be straight
+> forward to implement. These implementations follow the concept of
+> decentralized entropy collection.
+>
+> The man page provided with the source code explains the use of the API
+> of the CPU Jitter random number generator.
+>
+> The test cases used to compile the documentation are available at the
+> web site as well.
+>
+> Note: for the kernel crypto API, please read the provided Kconfig file
+> for the switches and which of them are recommended in regular
+> operation. These switches must currently be set manually in the
+> Makefile.
+>
+> Ciao
+> Stephan
+>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Who put a stop payment on my reality check?
