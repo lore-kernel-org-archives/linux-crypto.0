@@ -1,74 +1,46 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: Theodore Ts'o <tytso@mit.edu>
 Subject: Re: [PATCH][RFC] CPU Jitter random number generator (resent)
-Date: Tue, 21 May 2013 18:56:04 +0200
-Message-ID: <20130521185604.06c00b0e@tauon>
+Date: Tue, 21 May 2013 15:01:57 -0400
+Message-ID: <20130521190157.GD22559@thunk.org>
 References: <20130521084455.5c651991@tauon>
-	<CACXcFmmPjGBYhfbwfMdE2iTv2a9Q6HB1aT8JSnXA-8n2yO0zcA@mail.gmail.com>
+ <CACXcFm=PCPs23Kd8B0+B7418fSaz=59Z4DRcj3-Wcd-i=Meang@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
 To: Sandy Harris <sandyinchina@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mo-p00-ob.rzone.de ([81.169.146.162]:53702 "EHLO
-	mo-p00-ob.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754272Ab3EUQ4Q (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 May 2013 12:56:16 -0400
-In-Reply-To: <CACXcFmmPjGBYhfbwfMdE2iTv2a9Q6HB1aT8JSnXA-8n2yO0zcA@mail.gmail.com>
+Received: from li9-11.members.linode.com ([67.18.176.11]:50400 "EHLO
+	imap.thunk.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755775Ab3EUTB7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 21 May 2013 15:01:59 -0400
+Content-Disposition: inline
+In-Reply-To: <CACXcFm=PCPs23Kd8B0+B7418fSaz=59Z4DRcj3-Wcd-i=Meang@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 21 May 2013 12:09:02 -0400
-Sandy Harris <sandyinchina@gmail.com> wrote:
+I continue to be suspicious about claims that userspace timing
+measurements are measuring anything other than OS behaviour.  But that
+doesn't mean that they shouldn't exist.  Personally, I believe you
+should try to collect as much entropy as you can, from as many places
+as you can.  For VM's, it means we should definitely use
+paravirtualization to get randomness from the host OS.  If you don't
+trust the host OS, then what on earth are you doing trying to generate
+a long-term public key pair on the VM in the first place?  For that
+matter, why are you willing to expose a high value private keypair on
+the VM?
 
-Hi Sandy,
+For devices like Linux routers, what we desperately need is hardware
+assist; either a on-CPU hardware random number generator, or a
+hardware RNG from a TPM module, or having an individualized secret key
+generated at manufacturing time and burned onto the device.  If you
+don't trust that the Intel hardware RNG honest, then by all means mix
+in additional timing information either at kernel device driver level,
+or from systems such as HAVEGE.
 
-> I very much like the basic notion here. The existing random(4) driver
-> may not get enough entropy in a VM or on a device like a Linux router
-> and I think work such as yours or HAVEGE (
-> http://www.irisa.fr/caps/projects/hipsor/) are important research. The
-> paper by McGuire et al of "Analysis of inherent randomness of the
-> Linux
-> kernel" (http://lwn.net/images/conf/rtlws11/random-hardware.pdf)
-> seems to show that this is a fine source of more entropy.
-> 
-> On the other hand, I am not certain you are doing it in the right
-> place. My own attempt (ftp://ftp.cs.sjtu.edu.cn:990/sandy/maxwell/)
-> put it in a demon that just feeds /dev/random, probably also not the
-> right place. haveged(8) ( http://www.issihosts.com/haveged/) also
-> puts it in a demon process. It may, as you suggest, belong in the
-> kernel instead, but I think there are arguments both ways.
+What I'm against is relying only on solutions such as HAVEGE or
+replacing /dev/random with something scheme that only relies on CPU
+timing and ignores interrupt timing.
 
-Thanks for your insights. What I propose is that it shall NOT have any
-fixed place at all.
+Regards,
 
-The entropy collection shall be as close to the "consumer" as
-possible. There shall be NO single one entropy collector, but one for
-every consumer.
-
-That is the reason, why the code I am offering has that many links to
-different crypto libs or even a stand-alone shared lib compilation.
-Also, the implementation for the kernel crypto API should be used in a
-way where one "consumer" instantiates the raw RNG or even the DRNGs
-independently from others. That means, in-kernel users of entropy like
-IPSEC shall instantiate the the kernel crypto API code independently
-of others.
-> 
-> Could we keep random(4) mostly as is and rearrange your code to just
-> give it more entropy? I think the large entropy pool in the existing
-> driver is essential since we sometimes want to generate things like a
-> 2 Kbit PGP key and it is not clear to me that your driver is entirely
-> trustworthy under such stress.
-
-We can easily do that -- the different links I provide to different
-crypto libs can be extended by a patch to random(4) too. My goal is to
-go away from a central source of entropy to a fully decentralized
-source.
-
-Ciao
-Stephan
-
-
--- 
-| Cui bono? |
+					- Ted
