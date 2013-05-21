@@ -1,71 +1,76 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH][RFC] CPU Jitter random number generator (resent)
-Date: Tue, 21 May 2013 08:44:55 +0200
-Message-ID: <20130521084455.5c651991@tauon>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: linux-next: Tree for May 15 (crypto /crct10dif)
+Date: Tue, 21 May 2013 21:46:57 +0800
+Message-ID: <20130521134656.GA9594@gondor.apana.org.au>
+References: <20130515132627.817585a3d9fb3a3e502eb586@canb.auug.org.au>
+ <5193CCEC.7070909@infradead.org>
+ <alpine.DEB.2.02.1305161152530.31865@M2420>
+ <CAMuHMdUmD2DMNeezetHNbe9DgQXpTN4BEfEmJSztyzCivQpyXQ@mail.gmail.com>
+ <1368723552.27102.286.camel@schen9-DESK>
+ <1368727412.27102.289.camel@schen9-DESK>
+ <20130520114707.GA1187@gondor.apana.org.au>
+ <1369076985.27102.319.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mo-p00-ob.rzone.de ([81.169.146.162]:17242 "EHLO
-	mo-p00-ob.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753979Ab3EUGpG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 May 2013 02:45:06 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Xiong Zhou <jencce.kernel@gmail.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Linux-Next <linux-next@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
+To: Tim Chen <tim.c.chen@linux.intel.com>
+Return-path: <linux-next-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1369076985.27102.319.camel@schen9-DESK>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On Mon, May 20, 2013 at 12:09:45PM -0700, Tim Chen wrote:
+> On Mon, 2013-05-20 at 19:47 +0800, Herbert Xu wrote:
+> 
+> > 
+> > Nope this is still broken.  We need to move the actual crct10dif
+> > code into crypto/.  I'll fix up the patch in the tree.
+> > 
+> > Also I'm going to get rid of crc_t10dif_update_lib function.  If you
+> > still want to maintain the ordering you should do so using the
+> > *_init constructs.
+> > 
+> 
+> Herbert, 
+> 
+> I used the following constructs in the pclmulqdq version of t10dif
+> to get the module loaded. 
+> 
+> static const struct x86_cpu_id crct10dif_cpu_id[] = {
+>         X86_FEATURE_MATCH(X86_FEATURE_PCLMULQDQ),
+>         {}
+> };
+> MODULE_DEVICE_TABLE(x86cpu, crct10dif_cpu_id);
+> 
+> However, the default generic algorithm is used
+> in the library function. The options CRC_T10DIF, CRYPTO_CRCT10DIF
+> and CRYPTO_CRCT10DIF_PCLMUL are selected as modules (which
+> is most likely usage scenario in distribution) on my
+> test machine.  The library module and generic crypto module was loaded
+> before the pclmulqdq t10dif module during boot.  How should
+> things be changed to get this crypto module loaded earlier before the
+> library?  Should we add another init call level between fs and device
+> init calls for loading the available crypto algorithms?  
+> The crc_t10dif_update_lib was originally used to side step this issue.
 
-[1] patch at http://www.chronox.de/jent/jitterentropy-20130516.tar.bz2
+OK, the way it's meant to work is that the all versions generic
+or otherwise do not call themselves by the name of the algorithm.
 
-A new version of the CPU Jitter random number generator is released at
-http://www.chronox.de/ . The heart of the RNG is about 30 lines of easy
-to read code. The readme in the main directory explains the different
-code files. A changelog can be found on the web site.
+Instead every implementation links itself to the algorithm via
+a module alias.  That way the first user will cause modprobe
+to load all available versions and then rank them by priority.
 
-In a previous attempt (http://lkml.org/lkml/2013/2/8/476), the first
-iteration received comments for the lack of tests, documentation and
-entropy assessment. All these concerns have been addressed. The
-documentation of the CPU Jitter random number generator
-(http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html and PDF at
-http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.pdf -- the graphs and
-pictures are better in PDF) offers a full analysis of:
+However, now that I've looked at it it appears that crc32c and
+crct10dif have not done this properly.  I'll fix that up.
 
-- the root cause of entropy
-
-- a design of the RNG
-
-- statistical tests and analyses
-
-- entropy assessment and explanation of the flow of entropy
-
-The document also explains the core concept to have a fully
-decentralized entropy collector for every caller in need of entropy.
-
-Also, this RNG is well suitable for virtualized environments.
-Measurements on OpenVZ and KVM environments have been conducted as
-documented. As the Linux kernel is starved of entropy in virtualized as
-well as server environments, new sources of entropy are vital.
-
-The appendix of the documentation contains example use cases by
-providing link code to the Linux kernel crypto API, libgcrypt and
-OpenSSL. Links to other cryptographic libraries should be straight
-forward to implement. These implementations follow the concept of
-decentralized entropy collection.
-
-The man page provided with the source code explains the use of the API
-of the CPU Jitter random number generator.
-
-The test cases used to compile the documentation are available at the
-web site as well.
-
-Note: for the kernel crypto API, please read the provided Kconfig file
-for the switches and which of them are recommended in regular
-operation. These switches must currently be set manually in the
-Makefile.
-
-Ciao
-Stephan
-
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
