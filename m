@@ -1,34 +1,36 @@
-From: Thomas Meyer <thomas@m3y3r.de>
-Subject: [PATCH] crypto: ux50: Cocci spatch "resource_size.spatch"
-Date: Wed, 22 May 2013 21:38:40 +0200
-Message-ID: <1369251520.3865.321.camel@localhost.localdomain>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH] crypto: sha256_ssse3 - fix stack corruption with SSSE3
+ and AVX implementations
+Date: Wed, 22 May 2013 17:32:04 -0700
+Message-ID: <1369269124.27102.356.camel@schen9-DESK>
+References: <20130521140941.15997.83258.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, Julian Wollrath <jwollrath@web.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www17.your-server.de ([213.133.104.17]:46600 "EHLO
-	www17.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753849Ab3EVUBj (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 May 2013 16:01:39 -0400
+Received: from mga09.intel.com ([134.134.136.24]:51971 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755044Ab3EWAcQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 May 2013 20:32:16 -0400
+In-Reply-To: <20130521140941.15997.83258.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Tue, 2013-05-21 at 17:09 +0300, Jussi Kivilinna wrote:
+> The _XFER stack element size was set too small, 8 bytes, when it needs to be
+> 16 bytes. As _XFER is the last stack element used by these implementations,
+> the 16 byte stores with 'movdqa' corrupt the stack where the value of register
+> %r12 is temporarily stored. As these implementations align the stack pointer
+> to 16 bytes, this corruption did not happen every time.
+> 
+> Patch corrects this issue.
 
-Signed-off-by: Thomas Meyer <thomas@m3y3r.de>
----
+Thanks for catching and fixing the issue.
 
-diff -u -p a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -1600,7 +1600,7 @@ static int ux500_cryp_remove(struct plat
- 
- 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	if (res)
--		release_mem_region(res->start, res->end - res->start + 1);
-+		release_mem_region(res->start, resource_size(res));
- 
- 	kfree(device_data);
- 
+Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
+
+Tim
