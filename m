@@ -1,34 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/8] crypto: caam - fix SEQ IN PTR command when RTO or
- PRE bit is set
-Date: Tue, 28 May 2013 17:50:57 +0800
-Message-ID: <20130528095057.GC24414@gondor.apana.org.au>
-References: <1368455877-1759-1-git-send-email-andrei.varvara@freescale.com>
+Subject: Re: [PATCH v2 1/1] crypto: Added support for Freescale's DCP
+ co-processor
+Date: Tue, 28 May 2013 17:51:24 +0800
+Message-ID: <20130528095123.GD24414@gondor.apana.org.au>
+References: <1368993578-23661-1-git-send-email-tobias.rauter@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Kim.Phillips@freescale.com,
-	AFLEMING@freescale.com, vakul@freescale.com
-To: Andrei Varvara <andrei.varvara@freescale.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Tobias Rauter <tobias.rauter@gmail.com>
+To: Tobias Rauter <tobiasrauter@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:52108 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:39178 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S933873Ab3E1JvB (ORCPT
+	with ESMTP id S933813Ab3E1Jv1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 May 2013 05:51:01 -0400
+	Tue, 28 May 2013 05:51:27 -0400
 Content-Disposition: inline
-In-Reply-To: <1368455877-1759-1-git-send-email-andrei.varvara@freescale.com>
+In-Reply-To: <1368993578-23661-1-git-send-email-tobias.rauter@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 13, 2013 at 02:37:57PM +0000, Andrei Varvara wrote:
-> SEQ IN PTR command does not require pointer if RTO or PRE bit is set
-> Updated desc_constr.h accordingly.
+On Sun, May 19, 2013 at 09:59:38PM +0200, Tobias Rauter wrote:
+> This patch enables the DCP crypto functionality on imx28.
+> Currently, only aes-128-cbc is supported.
+> Moreover, the dcpboot misc-device, which is used by Freescale's
+> SDK tools and uses a non-software-readable OTP-key, is added.
 > 
-> Signed-off-by: Andrei Varvara <andrei.varvara@freescale.com>
-> Reviewed-by: Phillips Kim-R1AAHA <Kim.Phillips@freescale.com>
-> Reviewed-by: Fleming Andrew-AFLEMING <AFLEMING@freescale.com>
+> Changes of v2:
+> - ring buffer for hardware-descriptors
+> - use of ablkcipher walk
+> - OTP key encryption/decryption via misc-device
+>   (compatible to Freescale-SDK)
+> - overall cleanup
+> 
+> The DCP is also capable of sha1/sha256 but I won't be able to add 
+> that anytime soon.
+> Tested with built-in runtime-self-test, tcrypt and openssl via 
+> cryptodev 1.6 on imx28-evk and a custom built imx28-board.
+> 
+> 
+> Signed-off-by: Tobias Rauter <tobias.rauter@gmail.com>
 
-All applied to cryptodev.  Thanks!
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
