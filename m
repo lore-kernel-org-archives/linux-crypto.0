@@ -1,38 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: sha512_ssse3 - add sha384 support
-Date: Tue, 28 May 2013 17:53:01 +0800
-Message-ID: <20130528095301.GG24414@gondor.apana.org.au>
-References: <20130521141044.16352.75962.stgit@localhost6.localdomain6>
+Subject: Re: [PATCH] crypto: ux50: Cocci spatch "resource_size.spatch"
+Date: Tue, 28 May 2013 17:53:16 +0800
+Message-ID: <20130528095316.GH24414@gondor.apana.org.au>
+References: <1369251520.3865.321.camel@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Thomas Meyer <thomas@m3y3r.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:58881 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:42205 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750932Ab3E1JxE (ORCPT
+	with ESMTP id S1751192Ab3E1JxV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 May 2013 05:53:04 -0400
+	Tue, 28 May 2013 05:53:21 -0400
 Content-Disposition: inline
-In-Reply-To: <20130521141044.16352.75962.stgit@localhost6.localdomain6>
+In-Reply-To: <1369251520.3865.321.camel@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 21, 2013 at 05:10:44PM +0300, Jussi Kivilinna wrote:
-> Add sha384 implementation to sha512_ssse3 module.
+On Wed, May 22, 2013 at 09:38:40PM +0200, Thomas Meyer wrote:
 > 
-> This also fixes sha512_ssse3 module autoloading issue when 'sha384' is used
-> before 'sha512'. Previously in such case, just sha512_generic was loaded and
-> not sha512_ssse3 (since it did not provide sha384). Now if 'sha512' was used
-> after 'sha384' usage, sha512_ssse3 would remain unloaded. For example, this
-> happens with tcrypt testing module since it tests 'sha384' before 'sha512'.
-> 
-> Cc: Tim Chen <tim.c.chen@linux.intel.com>
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+> Signed-off-by: Thomas Meyer <thomas@m3y3r.de>
 
-Both patches applied.  Thanks!
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
