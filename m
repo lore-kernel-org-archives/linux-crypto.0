@@ -1,67 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] OMAP: AES: Don't idle/start AES device between
- Encrypt operations
-Date: Tue, 28 May 2013 15:42:27 +0800
-Message-ID: <20130528074227.GA24414@gondor.apana.org.au>
-References: <1368500867-7737-1-git-send-email-joelagnel@ti.com>
+From: Wei Yongjun <weiyj.lk@gmail.com>
+Subject: [PATCH] crypto: hifn_795x - fix to pass correct device identity to free_irq()
+Date: Tue, 28 May 2013 17:10:23 +0800
+Message-ID: <CAPgLHd-owwK7Yzr15zFx=aak_1vn+uZ_jxJTCM4GqR+u4COQsQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
-	khilman@linaro.org, "Mark A. Greer" <mgreer@animalcreek.com>
-To: Joel A Fernandes <joelagnel@ti.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: yongjun_wei@trendmicro.com.cn, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:34034 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S933188Ab3E1Hmc (ORCPT
+Received: from mail-bk0-f44.google.com ([209.85.214.44]:64287 "EHLO
+	mail-bk0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933609Ab3E1JKZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 May 2013 03:42:32 -0400
-Content-Disposition: inline
-In-Reply-To: <1368500867-7737-1-git-send-email-joelagnel@ti.com>
+	Tue, 28 May 2013 05:10:25 -0400
+Received: by mail-bk0-f44.google.com with SMTP id jc3so4074329bkc.17
+        for <linux-crypto@vger.kernel.org>; Tue, 28 May 2013 02:10:24 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 14, 2013 at 03:07:47AM +0000, Joel A Fernandes wrote:
-> Calling runtime PM API for every block causes serious perf hit to
-> crypto operations that are done on a long buffer.
-> As crypto is performed on a page boundary, encrypting large buffers can
-> cause a series of crypto operations divided by page. The runtime PM API
-> is also called those many times.
-> 
-> We call runtime_pm_get_sync only at beginning on the session (cra_init)
-> and runtime_pm_put at the end. This result in upto a 50% speedup as below.
-> This doesn't make the driver to keep the system awake as runtime get/put
-> is only called during a crypto session which completes usually quickly.
-> 
-> Before:
-> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
-> Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
-> Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
-> Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
-> Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
-> Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
-> 
-> After:
-> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
-> Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
-> Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
-> Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
-> Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
-> Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
-> 
-> While at it, also drop enter and exit pr_debugs, in related code. tracers
-> can be used for that.
-> 
-> Tested on a Beaglebone (AM335x SoC) board.
-> 
-> Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
+From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 
-I like your patch but it doesn't apply against the current cryptodev
-tree.
+free_irq() expects the same device identity that was passed
+to request_irq(), otherwise the IRQ is not freed.
 
-Please rebase and repost.
+Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+---
+ drivers/crypto/hifn_795x.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index ebf130e..12fea3e 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -2676,7 +2676,7 @@ err_out_stop_device:
+ 	hifn_reset_dma(dev, 1);
+ 	hifn_stop_device(dev);
+ err_out_free_irq:
+-	free_irq(dev->irq, dev->name);
++	free_irq(dev->irq, dev);
+ 	tasklet_kill(&dev->tasklet);
+ err_out_free_desc:
+ 	pci_free_consistent(pdev, sizeof(struct hifn_dma),
+@@ -2711,7 +2711,7 @@ static void hifn_remove(struct pci_dev *pdev)
+ 		hifn_reset_dma(dev, 1);
+ 		hifn_stop_device(dev);
+ 
+-		free_irq(dev->irq, dev->name);
++		free_irq(dev->irq, dev);
+ 		tasklet_kill(&dev->tasklet);
+ 
+ 		hifn_flush(dev);
