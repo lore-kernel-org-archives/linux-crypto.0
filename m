@@ -1,48 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 1/1] crypto: Added support for Freescale's DCP
- co-processor
-Date: Tue, 28 May 2013 17:51:24 +0800
-Message-ID: <20130528095123.GD24414@gondor.apana.org.au>
-References: <1368993578-23661-1-git-send-email-tobias.rauter@gmail.com>
+Subject: Re: [PATCH] crypto: sha512_generic - set cra_driver_name
+Date: Tue, 28 May 2013 17:52:24 +0800
+Message-ID: <20130528095224.GF24414@gondor.apana.org.au>
+References: <20130521141010.16154.53640.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Tobias Rauter <tobias.rauter@gmail.com>
-To: Tobias Rauter <tobiasrauter@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:39178 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:58342 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S933813Ab3E1Jv1 (ORCPT
+	with ESMTP id S932290Ab3E1Jw1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 May 2013 05:51:27 -0400
+	Tue, 28 May 2013 05:52:27 -0400
 Content-Disposition: inline
-In-Reply-To: <1368993578-23661-1-git-send-email-tobias.rauter@gmail.com>
+In-Reply-To: <20130521141010.16154.53640.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, May 19, 2013 at 09:59:38PM +0200, Tobias Rauter wrote:
-> This patch enables the DCP crypto functionality on imx28.
-> Currently, only aes-128-cbc is supported.
-> Moreover, the dcpboot misc-device, which is used by Freescale's
-> SDK tools and uses a non-software-readable OTP-key, is added.
+On Tue, May 21, 2013 at 05:10:10PM +0300, Jussi Kivilinna wrote:
+> 'sha512_generic' should set driver name now that there is alternative sha512
+> provider (sha512_ssse3).
 > 
-> Changes of v2:
-> - ring buffer for hardware-descriptors
-> - use of ablkcipher walk
-> - OTP key encryption/decryption via misc-device
->   (compatible to Freescale-SDK)
-> - overall cleanup
-> 
-> The DCP is also capable of sha1/sha256 but I won't be able to add 
-> that anytime soon.
-> Tested with built-in runtime-self-test, tcrypt and openssl via 
-> cryptodev 1.6 on imx28-evk and a custom built imx28-board.
-> 
-> 
-> Signed-off-by: Tobias Rauter <tobias.rauter@gmail.com>
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 
-Patch applied.  Thanks!
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
