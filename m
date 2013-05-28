@@ -1,40 +1,61 @@
-From: Matt <jackdachef@gmail.com>
-Subject: Re: Oops on 3.10-rc1 related to ssh256_ssse3
-Date: Sun, 26 May 2013 17:11:04 +0200
-Message-ID: <CAG-aW04xGTjLf85paG5dMNLT2mOaxqtuR-Fh61Sw-QM-0hgLYg@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 3.10
+Date: Tue, 28 May 2013 13:52:29 +0800
+Message-ID: <20130528055229.GA23937@gondor.apana.org.au>
+References: <20100903060055.GA28915@gondor.apana.org.au>
+ <20100903110722.GA31826@gondor.apana.org.au>
+ <20101215115035.GA25248@gondor.apana.org.au>
+ <20110216053911.GA10999@gondor.apana.org.au>
+ <20110328071322.GA6569@gondor.apana.org.au>
+ <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-crypto@vger.kernel.org, Julian Wollrath <jwollrath@web.de>
-To: "Jussi Kivilinna >" <jussi.kivilinna@mbnet.fi>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qa0-f42.google.com ([209.85.216.42]:62721 "EHLO
-	mail-qa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753418Ab3EZPLF (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:44160 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S932844Ab3E1Fwg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 26 May 2013 11:11:05 -0400
-Received: by mail-qa0-f42.google.com with SMTP id bs12so640834qab.1
-        for <linux-crypto@vger.kernel.org>; Sun, 26 May 2013 08:11:04 -0700 (PDT)
+	Tue, 28 May 2013 01:52:36 -0400
+Content-Disposition: inline
+In-Reply-To: <20130328082841.GA7425@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
->Appears to be stack corruption caused by sha256_transform_ssse3. >Does attached
->patch help?
->
->-Jussi
+Hi Linus:
 
-Hi Jussi, Julian,
+This push fixes a crash in the new sha256_ssse3 driver as well as
+a DMA setup/teardown bug in caam.
 
-Hi Crypto-List,
+Please pull from
 
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-yes, the attached patch let me boot the kernel and there don't seem to
-be any more additional issues or messages so far
+or
 
-Please mark it for inclusion in 3.10-rc3 or at least final 3.10
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
 
-Thanks & Kind Regards
+Horia Geanta (1):
+      crypto: caam - fix inconsistent assoc dma mapping direction
 
-Matt
+Jussi Kivilinna (1):
+      crypto: sha256_ssse3 - fix stack corruption with SSSE3 and AVX implementations
 
-(Re-sending in plain text mode due to mailing list rejecting html-mails)
+ arch/x86/crypto/sha256-avx-asm.S   |    2 +-
+ arch/x86/crypto/sha256-ssse3-asm.S |    2 +-
+ drivers/crypto/caam/caamalg.c      |    4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
