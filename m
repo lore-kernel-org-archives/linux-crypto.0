@@ -1,42 +1,66 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: sha256_ssse3 - fix stack corruption with SSSE3
- and AVX implementations
-Date: Tue, 28 May 2013 13:53:05 +0800
-Message-ID: <20130528055305.GA23966@gondor.apana.org.au>
-References: <20130521140941.15997.83258.stgit@localhost6.localdomain6>
- <1369269124.27102.356.camel@schen9-DESK>
+Subject: Re: [PATCH v2] OMAP: AES: Don't idle/start AES device between
+ Encrypt operations
+Date: Tue, 28 May 2013 15:42:27 +0800
+Message-ID: <20130528074227.GA24414@gondor.apana.org.au>
+References: <1368500867-7737-1-git-send-email-joelagnel@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, Julian Wollrath <jwollrath@web.de>,
-	"David S. Miller" <davem@davemloft.net>
-To: Tim Chen <tim.c.chen@linux.intel.com>
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
+	khilman@linaro.org, "Mark A. Greer" <mgreer@animalcreek.com>
+To: Joel A Fernandes <joelagnel@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:55845 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:34034 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932844Ab3E1FxN (ORCPT
+	with ESMTP id S933188Ab3E1Hmc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 May 2013 01:53:13 -0400
+	Tue, 28 May 2013 03:42:32 -0400
 Content-Disposition: inline
-In-Reply-To: <1369269124.27102.356.camel@schen9-DESK>
+In-Reply-To: <1368500867-7737-1-git-send-email-joelagnel@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 22, 2013 at 05:32:04PM -0700, Tim Chen wrote:
-> On Tue, 2013-05-21 at 17:09 +0300, Jussi Kivilinna wrote:
-> > The _XFER stack element size was set too small, 8 bytes, when it needs to be
-> > 16 bytes. As _XFER is the last stack element used by these implementations,
-> > the 16 byte stores with 'movdqa' corrupt the stack where the value of register
-> > %r12 is temporarily stored. As these implementations align the stack pointer
-> > to 16 bytes, this corruption did not happen every time.
-> > 
-> > Patch corrects this issue.
+On Tue, May 14, 2013 at 03:07:47AM +0000, Joel A Fernandes wrote:
+> Calling runtime PM API for every block causes serious perf hit to
+> crypto operations that are done on a long buffer.
+> As crypto is performed on a page boundary, encrypting large buffers can
+> cause a series of crypto operations divided by page. The runtime PM API
+> is also called those many times.
 > 
-> Thanks for catching and fixing the issue.
+> We call runtime_pm_get_sync only at beginning on the session (cra_init)
+> and runtime_pm_put at the end. This result in upto a 50% speedup as below.
+> This doesn't make the driver to keep the system awake as runtime get/put
+> is only called during a crypto session which completes usually quickly.
 > 
-> Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
+> Before:
+> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+> Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
+> Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
+> Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
+> Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
+> Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
+> 
+> After:
+> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+> Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
+> Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
+> Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
+> Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
+> Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
+> 
+> While at it, also drop enter and exit pr_debugs, in related code. tracers
+> can be used for that.
+> 
+> Tested on a Beaglebone (AM335x SoC) board.
+> 
+> Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
 
-Patch applied.  Thanks!
+I like your patch but it doesn't apply against the current cryptodev
+tree.
+
+Please rebase and repost.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
