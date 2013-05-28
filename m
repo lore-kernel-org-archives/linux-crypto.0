@@ -1,60 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.10
-Date: Tue, 28 May 2013 13:52:29 +0800
-Message-ID: <20130528055229.GA23937@gondor.apana.org.au>
-References: <20100903060055.GA28915@gondor.apana.org.au>
- <20100903110722.GA31826@gondor.apana.org.au>
- <20101215115035.GA25248@gondor.apana.org.au>
- <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: sha256_ssse3 - fix stack corruption with SSSE3
+ and AVX implementations
+Date: Tue, 28 May 2013 13:53:05 +0800
+Message-ID: <20130528055305.GA23966@gondor.apana.org.au>
+References: <20130521140941.15997.83258.stgit@localhost6.localdomain6>
+ <1369269124.27102.356.camel@schen9-DESK>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org, Julian Wollrath <jwollrath@web.de>,
+	"David S. Miller" <davem@davemloft.net>
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:44160 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:55845 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932844Ab3E1Fwg (ORCPT
+	with ESMTP id S932844Ab3E1FxN (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 May 2013 01:52:36 -0400
+	Tue, 28 May 2013 01:53:13 -0400
 Content-Disposition: inline
-In-Reply-To: <20130328082841.GA7425@gondor.apana.org.au>
+In-Reply-To: <1369269124.27102.356.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Wed, May 22, 2013 at 05:32:04PM -0700, Tim Chen wrote:
+> On Tue, 2013-05-21 at 17:09 +0300, Jussi Kivilinna wrote:
+> > The _XFER stack element size was set too small, 8 bytes, when it needs to be
+> > 16 bytes. As _XFER is the last stack element used by these implementations,
+> > the 16 byte stores with 'movdqa' corrupt the stack where the value of register
+> > %r12 is temporarily stored. As these implementations align the stack pointer
+> > to 16 bytes, this corruption did not happen every time.
+> > 
+> > Patch corrects this issue.
+> 
+> Thanks for catching and fixing the issue.
+> 
+> Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
 
-This push fixes a crash in the new sha256_ssse3 driver as well as
-a DMA setup/teardown bug in caam.
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Horia Geanta (1):
-      crypto: caam - fix inconsistent assoc dma mapping direction
-
-Jussi Kivilinna (1):
-      crypto: sha256_ssse3 - fix stack corruption with SSSE3 and AVX implementations
-
- arch/x86/crypto/sha256-avx-asm.S   |    2 +-
- arch/x86/crypto/sha256-ssse3-asm.S |    2 +-
- drivers/crypto/caam/caamalg.c      |    4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
-
-Thanks,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
