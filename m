@@ -1,75 +1,126 @@
-From: Felipe Balbi <balbi@ti.com>
-Subject: Re: [PATCH 20/39] usb: musb: ux500: move channel number knowledge
- into the driver
-Date: Wed, 29 May 2013 20:57:41 +0300
-Message-ID: <20130529175741.GG21290@arwen.pp.htv.fi>
-References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
- <1368611522-9984-21-git-send-email-lee.jones@linaro.org>
-Reply-To: <balbi@ti.com>
+From: Joel A Fernandes <joelagnel@ti.com>
+Subject: [PATCH v3] OMAP: AES: Don't idle/start AES device between Encrypt operations
+Date: Wed, 29 May 2013 13:59:46 -0500
+Message-ID: <1369853986-3970-1-git-send-email-joelagnel@ti.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="/i8j2F0k9BYX4qLc"
-Cc: <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <balbi@ti.com>,
-	<linux-usb@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<davem@davemloft.net>, <herbert@gondor.hengli.com.au>,
-	<vinod.koul@intel.com>, <arnd@arndb.de>,
-	<linus.walleij@stericsson.com>, <srinidhi.kasagar@stericsson.com>
-To: Lee Jones <lee.jones@linaro.org>
+Content-Type: text/plain
+Cc: "Mark A. Greer" <mgreer@animalcreek.com>,
+	Kevin Hilman <khilman@linaro.org>,
+	Joel A Fernandes <joelagnel@ti.com>
+To: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bear.ext.ti.com ([192.94.94.41]:35249 "EHLO bear.ext.ti.com"
+Received: from arroyo.ext.ti.com ([192.94.94.40]:60701 "EHLO arroyo.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934764Ab3E2R7H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 May 2013 13:59:07 -0400
-Content-Disposition: inline
-In-Reply-To: <1368611522-9984-21-git-send-email-lee.jones@linaro.org>
+	id S966027Ab3E2TAM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 29 May 2013 15:00:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
---/i8j2F0k9BYX4qLc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Calling runtime PM API for every block causes serious perf hit to
+crypto operations that are done on a long buffer.
+As crypto is performed on a page boundary, encrypting large buffers can
+cause a series of crypto operations divided by page. The runtime PM API
+is also called those many times.
 
-On Wed, May 15, 2013 at 10:51:43AM +0100, Lee Jones wrote:
-> For all ux500 based platforms the maximum number of end-points are used.
-> Move this knowledge into the driver so we can relinquish the burden from
-> platform data. This also removes quite a bit of complexity from the driver
-> and will aid us when we come to enable the driver for Device Tree.
->=20
-> Cc: Felipe Balbi <balbi@ti.com>
-> Cc: linux-usb@vger.kernel.org
-> Acked-by: Linus Walleij <linus.walleij@linaro.org>
-> Acked-by: Fabio Baltieri <fabio.baltieri@linaro.org>
-> Signed-off-by: Lee Jones <lee.jones@linaro.org>
+We call runtime_pm_get_sync only at beginning on the session (cra_init)
+and runtime_pm_put at the end. This result in upto a 50% speedup as below.
+This doesn't make the driver to keep the system awake as runtime get/put
+is only called during a crypto session which completes usually quickly.
 
-for drivers/usb/musb
+Before:
+root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
+Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
+Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
+Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
+Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
 
-Acked-by: Felipe Balbi <balbi@ti.com>
+After:
+root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
+Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
+Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
+Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
+Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
+Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
 
---=20
-balbi
+While at it, also drop enter and exit pr_debugs, in related code. tracers
+can be used for that.
 
---/i8j2F0k9BYX4qLc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+Tested on a Beaglebone (AM335x SoC) board.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+v2 changes:
+Refreshed patch on kernel v3.10-rc3
+v3 changes:
+Included Acks in commit message
 
-iQIcBAEBAgAGBQJRpkGVAAoJEIaOsuA1yqRE6v8QALBoV3kkhWM5sDVzuZCCWlMB
-XLCfsgjK4qc0F3FBBEACkl4sU86APPSADaI1asBamWQ56zRl95FB5Ggzt7kdRxCo
-klkyuNbNtidFaRss27WJOnzn3rU9FphjCbmDv5mbW6dR4v5FqJeD3VpPMAXgKSjo
-N5DngSrLRYuj1mftAM4GeCxeJURl+4Vx/gvFpsqKPuFq/Z+jmxZbM9HFeJptkaba
-1SZhkCxsEhF/sLxyLcmnQDxuyB3u4ExVzKZbc0TAUI49azxd0m7f/kwZ7hpA91QM
-kkK8aq/FGrqhY0cVuLhxT7WvIw+4UxSSSNgEl5eycQtK+zhm7h/JDW9M79GZulJ3
-SBJKWPJjPC1x5iGPz7itkCoMrWMn+mpnCy+B/bSQBZTTTav2cNvntvvhRp3QvPJo
-zie+0phWGXFKRoBBUOiw/o3qZxJ6ioOFoC8WHbqiuuA+l1Nkm3WFEgj6EQhLXGVV
-BRoJpcsUsDlkLmrN0ffupTRxCKJNlMiD1pwbxyBa7dv1Hapb12DOkNIEo5kejequ
-6pulkBDd5VhgIRqotwfZoLOfSvI4yYyuAGm9fW06PVEsfpUZjQYkyu/IMFMk+JRE
-0AT02dKO39rj+914Vi2xkR3cvMS8GzM7PTKeMga3FM1dd1l0g6L+XinVL6VCfghE
-ZVutlZ2vNHBFJqFTeZnD
-=9Ex2
------END PGP SIGNATURE-----
+Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
+Acked-by: Kevin Hilman <khilman@linaro.org>
+Acked-by: Mark A. Greer <mgreer@animalcreek.com>
+---
+ drivers/crypto/omap-aes.c |   29 +++++++++++++++++++----------
+ 1 files changed, 19 insertions(+), 10 deletions(-)
 
---/i8j2F0k9BYX4qLc--
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index ee15b0f..06524a0 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -203,13 +203,6 @@ static void omap_aes_write_n(struct omap_aes_dev *dd, u32 offset,
+ 
+ static int omap_aes_hw_init(struct omap_aes_dev *dd)
+ {
+-	/*
+-	 * clocks are enabled when request starts and disabled when finished.
+-	 * It may be long delays between requests.
+-	 * Device might go to off mode to save power.
+-	 */
+-	pm_runtime_get_sync(dd->dev);
+-
+ 	if (!(dd->flags & FLAGS_INIT)) {
+ 		dd->flags |= FLAGS_INIT;
+ 		dd->err = 0;
+@@ -636,7 +629,6 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
+ 
+ 	pr_debug("err: %d\n", err);
+ 
+-	pm_runtime_put(dd->dev);
+ 	dd->flags &= ~FLAGS_BUSY;
+ 
+ 	req->base.complete(&req->base, err);
+@@ -837,8 +829,16 @@ static int omap_aes_ctr_decrypt(struct ablkcipher_request *req)
+ 
+ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ {
+-	pr_debug("enter\n");
++	struct omap_aes_dev *dd = NULL;
+ 
++	/* Find AES device, currently picks the first device */
++	spin_lock_bh(&list_lock);
++	list_for_each_entry(dd, &dev_list, list) {
++		break;
++	}
++	spin_unlock_bh(&list_lock);
++ 
++	pm_runtime_get_sync(dd->dev);
+ 	tfm->crt_ablkcipher.reqsize = sizeof(struct omap_aes_reqctx);
+ 
+ 	return 0;
+@@ -846,7 +846,16 @@ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ 
+ static void omap_aes_cra_exit(struct crypto_tfm *tfm)
+ {
+-	pr_debug("enter\n");
++	struct omap_aes_dev *dd = NULL;
++
++	/* Find AES device, currently picks the first device */
++	spin_lock_bh(&list_lock);
++	list_for_each_entry(dd, &dev_list, list) {
++		break;
++	}
++	spin_unlock_bh(&list_lock);
++
++	pm_runtime_put_sync(dd->dev);
+ }
+ 
+ /* ********************** ALGS ************************************ */
+-- 
+1.7.4.1
