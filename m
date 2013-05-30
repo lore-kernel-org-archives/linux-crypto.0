@@ -1,68 +1,51 @@
-From: Santosh Shilimkar <santosh.shilimkar@ti.com>
-Subject: Re: [PATCH v3] OMAP: AES: Don't idle/start AES device between Encrypt
- operations
-Date: Wed, 29 May 2013 15:05:11 -0400
-Message-ID: <51A65167.70303@ti.com>
-References: <1369853986-3970-1-git-send-email-joelagnel@ti.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH 20/39] usb: musb: ux500: move channel number knowledge
+ into the driver
+Date: Thu, 30 May 2013 09:44:49 +0200
+Message-ID: <CACRpkda+C7qzKSssXStkcM4eOQaHUcWEUd6txfV-pAWdTT=YEw@mail.gmail.com>
+References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
+	<1368611522-9984-21-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-	"Mark A. Greer" <mgreer@animalcreek.com>,
-	Kevin Hilman <khilman@linaro.org>
-To: Joel A Fernandes <joelagnel@ti.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Felipe Balbi <balbi@ti.com>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Vinod Koul <vinod.koul@intel.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Linus WALLEIJ <linus.walleij@stericsson.com>,
+	Srinidhi KASAGAR <srinidhi.kasagar@stericsson.com>
+To: Lee Jones <lee.jones@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from devils.ext.ti.com ([198.47.26.153]:52746 "EHLO
-	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759396Ab3E2TFY (ORCPT
+Received: from mail-ie0-f180.google.com ([209.85.223.180]:59436 "EHLO
+	mail-ie0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S967558Ab3E3Hou (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 May 2013 15:05:24 -0400
-In-Reply-To: <1369853986-3970-1-git-send-email-joelagnel@ti.com>
+	Thu, 30 May 2013 03:44:50 -0400
+Received: by mail-ie0-f180.google.com with SMTP id b11so13165291iee.39
+        for <linux-crypto@vger.kernel.org>; Thu, 30 May 2013 00:44:49 -0700 (PDT)
+In-Reply-To: <1368611522-9984-21-git-send-email-lee.jones@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday 29 May 2013 02:59 PM, Joel A Fernandes wrote:
-> Calling runtime PM API for every block causes serious perf hit to
-> crypto operations that are done on a long buffer.
-> As crypto is performed on a page boundary, encrypting large buffers can
-> cause a series of crypto operations divided by page. The runtime PM API
-> is also called those many times.
-> 
-> We call runtime_pm_get_sync only at beginning on the session (cra_init)
-> and runtime_pm_put at the end. This result in upto a 50% speedup as below.
-> This doesn't make the driver to keep the system awake as runtime get/put
-> is only called during a crypto session which completes usually quickly.
-> 
-Nice !!
+On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones@linaro.org> wrote:
 
-> Before:
-> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
-> Doing aes-128-cbc for 3s on 16 size blocks: 13310 aes-128-cbc's in 0.01s
-> Doing aes-128-cbc for 3s on 64 size blocks: 13040 aes-128-cbc's in 0.04s
-> Doing aes-128-cbc for 3s on 256 size blocks: 9134 aes-128-cbc's in 0.03s
-> Doing aes-128-cbc for 3s on 1024 size blocks: 8939 aes-128-cbc's in 0.01s
-> Doing aes-128-cbc for 3s on 8192 size blocks: 4299 aes-128-cbc's in 0.00s
-> 
-> After:
-> root@beagleboard:~# time -v openssl speed -evp aes-128-cbc
-> Doing aes-128-cbc for 3s on 16 size blocks: 18911 aes-128-cbc's in 0.02s
-> Doing aes-128-cbc for 3s on 64 size blocks: 18878 aes-128-cbc's in 0.02s
-> Doing aes-128-cbc for 3s on 256 size blocks: 11878 aes-128-cbc's in 0.10s
-> Doing aes-128-cbc for 3s on 1024 size blocks: 11538 aes-128-cbc's in 0.05s
-> Doing aes-128-cbc for 3s on 8192 size blocks: 4857 aes-128-cbc's in 0.03s
-> 
-> While at it, also drop enter and exit pr_debugs, in related code. tracers
-> can be used for that.
-> 
-> Tested on a Beaglebone (AM335x SoC) board.
-> 
-> v2 changes:
-> Refreshed patch on kernel v3.10-rc3
-> v3 changes:
-> Included Acks in commit message
-> 
-> Signed-off-by: Joel A Fernandes <joelagnel@ti.com>
-> Acked-by: Kevin Hilman <khilman@linaro.org>
-> Acked-by: Mark A. Greer <mgreer@animalcreek.com>
-> ---
-Acked-by: Santosh Shilimkar <santosh.shilimkar@ti.com>
+> For all ux500 based platforms the maximum number of end-points are used.
+> Move this knowledge into the driver so we can relinquish the burden from
+> platform data. This also removes quite a bit of complexity from the driver
+> and will aid us when we come to enable the driver for Device Tree.
+>
+> Cc: Felipe Balbi <balbi@ti.com>
+> Cc: linux-usb@vger.kernel.org
+> Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> Acked-by: Fabio Baltieri <fabio.baltieri@linaro.org>
+> Signed-off-by: Lee Jones <lee.jones@linaro.org>
+
+Patch applied to my dma40 branch with Felipe's ACK.
+
+Thanks!
+Linus Walleij
