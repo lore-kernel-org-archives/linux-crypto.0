@@ -1,47 +1,43 @@
-From: Linus Walleij <linus.walleij@linaro.org>
-Subject: Re: [PATCH 29/39] dmaengine: ste_dma40: Use the BIT macro to replace
- ugly '(1 << x)'s
-Date: Thu, 30 May 2013 10:47:38 +0200
-Message-ID: <CACRpkdYgu3q8s=jMfQ1L-WEoDxRz4gQW6+jqZ8RTVvCAnLQKVA@mail.gmail.com>
+From: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH 30/39] ARM: ux500: Replace ST-E's home-brew DMA direction
+ definition with the generic one
+Date: Thu, 30 May 2013 10:52:13 +0200
+Message-ID: <CACRpkdZfw9ACS9=Nx9NuQqca_cvrdYwNOSWfpigMU1x94goZcA@mail.gmail.com>
 References: <1368611522-9984-1-git-send-email-lee.jones@linaro.org>
-	<1368611522-9984-30-git-send-email-lee.jones@linaro.org>
+	<1368611522-9984-31-git-send-email-lee.jones@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Felipe Balbi <balbi@ti.com>,
-	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Vinod Koul <vinod.koul@intel.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Linus WALLEIJ <linus.walleij@stericsson.com>,
-	Srinidhi KASAGAR <srinidhi.kasagar@stericsson.com>
-To: Lee Jones <lee.jones@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f179.google.com ([209.85.223.179]:54110 "EHLO
-	mail-ie0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S967973Ab3E3Iri (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 May 2013 04:47:38 -0400
-Received: by mail-ie0-f179.google.com with SMTP id c13so26878866ieb.24
-        for <linux-crypto@vger.kernel.org>; Thu, 30 May 2013 01:47:38 -0700 (PDT)
-In-Reply-To: <1368611522-9984-30-git-send-email-lee.jones@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org"
+	<linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Felipe Balbi <balbi-l0cyMroinI0@public.gmane.org>,
+	"linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>,
+	Linus WALLEIJ <linus.walleij-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>,
+	Srinidhi KASAGAR <srinidhi.kasagar-0IS4wlFg1OjSUeElwK9/Pw@public.gmane.org>
+To: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1368611522-9984-31-git-send-email-lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Sender: linux-usb-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones@linaro.org> wrote:
+On Wed, May 15, 2013 at 11:51 AM, Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
 
-> The aim is to make the code that little more readable.
+> STEDMA40_*_TO_* direction definitions are identical in all but name to
+> the pre-defined generic DMA_*_TO_* ones. Let's make things easy by not
+> duplicating such things.
 >
-> Acked-by: Vinod Koul <vnod.koul@intel.com>
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> Signed-off-by: Lee Jones <lee.jones-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 
-Patch applied to my ux500-dma40 branch.
+Vinod, I'm lacking your ACK on this patch, but have tentatively
+queued it anyway. Maybe you missed it?
 
 Yours,
 Linus Walleij
+--
+To unsubscribe from this list: send the line "unsubscribe linux-usb" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
