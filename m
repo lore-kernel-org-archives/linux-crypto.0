@@ -1,41 +1,42 @@
-From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: [PATCH 1/2] crypto: twofish - disable AVX2 implementation
-Date: Sun, 02 Jun 2013 19:51:47 +0300
-Message-ID: <20130602165147.25743.88831.stgit@localhost6.localdomain6>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: sahara: fix building as module
+Date: Mon, 03 Jun 2013 23:57:37 +0200
+Message-ID: <3573891.yE7nyLPekp@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Javier Martin <javier.martin@vista-silicon.com>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from saarni.dnainternet.net ([83.102.40.136]:38242 "EHLO
-	saarni.dnainternet.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754196Ab3FBQ7h (ORCPT
+Received: from moutng.kundenserver.de ([212.227.126.187]:60289 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757697Ab3FCV5V (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 2 Jun 2013 12:59:37 -0400
+	Mon, 3 Jun 2013 17:57:21 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It appears that the performance of 'vpgatherdd' is suboptimal for this kind of
-workload (tested on Core i5-4570) and causes twofish_avx2 to be significantly
-slower than twofish_avx. So disable the AVX2 implementation to avoid
-performance regressions.
+The sahara crypto driver has an incorrect MODULE_DEVICE_TABLE, which
+prevents us from actually building this driver as a loadable module.
 
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
----
- crypto/Kconfig |    1 +
- 1 file changed, 1 insertion(+)
+sahara_dt_ids is a of_device_id array, so we have to use
+MODULE_DEVICE_TABLE(of, ...).
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index d1ca631..678a6ed 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1318,6 +1318,7 @@ config CRYPTO_TWOFISH_AVX_X86_64
- config CRYPTO_TWOFISH_AVX2_X86_64
- 	tristate "Twofish cipher algorithm (x86_64/AVX2)"
- 	depends on X86 && 64BIT
-+	depends on BROKEN
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_CRYPTD
- 	select CRYPTO_ABLK_HELPER_X86
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Cc: Javier Martin <javier.martin@vista-silicon.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index a97bb6c..c3dc1c0 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -863,7 +863,7 @@ static struct of_device_id sahara_dt_ids[] = {
+ 	{ .compatible = "fsl,imx27-sahara" },
+ 	{ /* sentinel */ }
+ };
+-MODULE_DEVICE_TABLE(platform, sahara_dt_ids);
++MODULE_DEVICE_TABLE(of, sahara_dt_ids);
+ 
+ static int sahara_probe(struct platform_device *pdev)
+ {
