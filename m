@@ -1,61 +1,56 @@
-From: Alexander Holler <holler@ahsoftware.de>
-Subject: Re: [PATCH  RESEND/V2] crypto: Ignore validity dates of X.509 certificates
- at loading/parsing time
-Date: Thu, 06 Jun 2013 13:17:23 +0200
-Message-ID: <51B06FC3.8090405@ahsoftware.de>
-References: <1364409710-6458-1-git-send-email-holler@ahsoftware.de> <1367503746-6431-1-git-send-email-holler@ahsoftware.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+From: Akinobu Mita <akinobu.mita@gmail.com>
+Subject: [PATCH 0/3] introduce sg_pcopy_from_buffer() and sg_pcopy_to_buffer()
+Date: Thu,  6 Jun 2013 21:52:55 +0900
+Message-ID: <1370523178-5437-1-git-send-email-akinobu.mita@gmail.com>
+Cc: Akinobu Mita <akinobu.mita@gmail.com>, Tejun Heo <tj@kernel.org>,
+	Imre Deak <imre.deak@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	David Howells <dhowells@redhat.com>,
-	Josh Boyer <jwboyer@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>
-To: Alexander Holler <holler@ahsoftware.de>
+	linux-crypto@vger.kernel.org,
+	"James E.J. Bottomley" <JBottomley@parallels.com>,
+	Douglas Gilbert <dgilbert@interlog.com>,
+	linux-scsi@vger.kernel.org
+To: linux-kernel@vger.kernel.org, akpm@linux-foundation.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from h1446028.stratoserver.net ([85.214.92.142]:40992 "EHLO
-	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932627Ab3FFLSR (ORCPT
+Received: from mail-pd0-f178.google.com ([209.85.192.178]:40340 "EHLO
+	mail-pd0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932403Ab3FFMxY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Jun 2013 07:18:17 -0400
-In-Reply-To: <1367503746-6431-1-git-send-email-holler@ahsoftware.de>
+	Thu, 6 Jun 2013 08:53:24 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am 02.05.2013 16:09, schrieb Alexander Holler:
-> I don't see any real use case where checking the validity dates of X.509
-> certificates at parsing time adds any security gain. In contrast, doing so
-> makes MODSIGN unusable on systems without a RTC (or systems with a possible
-> wrong date in a existing RTC, or systems where the RTC is read after the keys
-> got loaded).
-> 
-> If something really cares about the dates, it should check them at the time
-> when the certificates are used, not when they are loaded and parsed.
-> 
-> So just remove the validity check of the dates in the parser.
-> 
-> Signed-off-by: Alexander Holler <holler@ahsoftware.de>
-> Cc: stable@vger.kernel.org
+This patch set introduces sg_pcopy_from_buffer() and sg_pcopy_to_buffer(),
+which copy data between a linear buffer and an SG list.
 
-As it just happened to me again and I've recently posted some patches
-which do make it possible to experience the problem on x86 systems too,
-here is a reminder.
+The only difference between sg_pcopy_{from,to}_buffer() and
+sg_copy_{from,to}_buffer() is an additional argument that specifies
+the number of bytes to skip the SG list before copying.
 
-To replay the problem (on x86 or any other arch), apply the 3 patches in
-this series:
+The main reason for introducing these functions is to fix a problem
+in scsi_debug module.  And there is a local function in crypto/talitos
+module, which can be replaced by sg_pcopy_to_buffer().
 
-https://lkml.org/lkml/2013/6/5/430
+Akinobu Mita (3):
+  lib/scatterlist: introduce sg_pcopy_from_buffer() and
+    sg_pcopy_to_buffer()
+  crypto: talitos: use sg_pcopy_to_buffer()
+  scsi_debug: fix do_device_access() with wrap around range
 
-build a kernel with CONFIG_MODULE_SIG_FORCE=y and start that kernel with
-hctosys=none as kernel command line parameter.
+ drivers/crypto/talitos.c    |  60 +-----------------------
+ drivers/scsi/scsi_debug.c   |  43 ++++++++++++++---
+ include/linux/scatterlist.h |   5 ++
+ lib/scatterlist.c           | 109 ++++++++++++++++++++++++++++++++++++--------
+ 4 files changed, 131 insertions(+), 86 deletions(-)
 
-This will disable the "persistent" clock (and any RTC), thus the kernel
-will refuse to load modules because it doesn't has a valid time when
-loading the certificate.
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Imre Deak <imre.deak@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: "James E.J. Bottomley" <JBottomley@parallels.com>
+Cc: Douglas Gilbert <dgilbert@interlog.com>
+Cc: linux-scsi@vger.kernel.org
 
-Regards,
-
-Alexander Holler
+-- 
+1.8.1.4
