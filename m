@@ -1,215 +1,108 @@
 From: Akinobu Mita <akinobu.mita@gmail.com>
-Subject: [PATCH 1/3] lib/scatterlist: introduce sg_pcopy_from_buffer() and sg_pcopy_to_buffer()
-Date: Thu,  6 Jun 2013 21:52:56 +0900
-Message-ID: <1370523178-5437-2-git-send-email-akinobu.mita@gmail.com>
+Subject: [PATCH 2/3] crypto: talitos: use sg_pcopy_to_buffer()
+Date: Thu,  6 Jun 2013 21:52:57 +0900
+Message-ID: <1370523178-5437-3-git-send-email-akinobu.mita@gmail.com>
 References: <1370523178-5437-1-git-send-email-akinobu.mita@gmail.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>, Tejun Heo <tj@kernel.org>,
-	Imre Deak <imre.deak@intel.com>,
+Cc: Akinobu Mita <akinobu.mita@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
+	Horia Geanta <horia.geanta@freescale.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	"James E.J. Bottomley" <JBottomley@parallels.com>,
-	Douglas Gilbert <dgilbert@interlog.com>,
-	linux-scsi@vger.kernel.org
+	linux-crypto@vger.kernel.org
 To: linux-kernel@vger.kernel.org, akpm@linux-foundation.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1370523178-5437-1-git-send-email-akinobu.mita@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The only difference between sg_pcopy_{from,to}_buffer() and
-sg_copy_{from,to}_buffer() is an additional argument that specifies
-the number of bytes to skip the SG list before copying.
+Use sg_pcopy_to_buffer() which is better than the function previously used.
+Because it doesn't do kmap/kunmap for skipped pages.
 
 Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Imre Deak <imre.deak@intel.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Horia Geanta <horia.geanta@freescale.com>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: linux-crypto@vger.kernel.org
-Cc: "James E.J. Bottomley" <JBottomley@parallels.com>
-Cc: Douglas Gilbert <dgilbert@interlog.com>
-Cc: linux-scsi@vger.kernel.org
 ---
- include/linux/scatterlist.h |   5 ++
- lib/scatterlist.c           | 109 ++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 94 insertions(+), 20 deletions(-)
+ drivers/crypto/talitos.c | 60 +-----------------------------------------------
+ 1 file changed, 1 insertion(+), 59 deletions(-)
 
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index 5951e3f..f5dee42 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -241,6 +241,11 @@ size_t sg_copy_from_buffer(struct scatterlist *sgl, unsigned int nents,
- size_t sg_copy_to_buffer(struct scatterlist *sgl, unsigned int nents,
- 			 void *buf, size_t buflen);
- 
-+size_t sg_pcopy_from_buffer(struct scatterlist *sgl, unsigned int nents,
-+			    void *buf, size_t buflen, off_t skip);
-+size_t sg_pcopy_to_buffer(struct scatterlist *sgl, unsigned int nents,
-+			  void *buf, size_t buflen, off_t skip);
-+
- /*
-  * Maximum number of entries that will be allocated in one piece, if
-  * a list larger than this is required then chaining will be utilized.
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index a1cf8ca..3b40b72 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -453,6 +453,47 @@ void sg_miter_start(struct sg_mapping_iter *miter, struct scatterlist *sgl,
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 5b2b5e6..661dc3e 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1112,64 +1112,6 @@ static int sg_count(struct scatterlist *sg_list, int nbytes, bool *chained)
+ 	return sg_nents;
  }
- EXPORT_SYMBOL(sg_miter_start);
  
-+static bool sg_miter_get_next_page(struct sg_mapping_iter *miter)
-+{
-+	if (!miter->__remaining) {
-+		struct scatterlist *sg;
-+		unsigned long pgoffset;
-+
-+		if (!__sg_page_iter_next(&miter->piter))
-+			return false;
-+
-+		sg = miter->piter.sg;
-+		pgoffset = miter->piter.sg_pgoffset;
-+
-+		miter->__offset = pgoffset ? 0 : sg->offset;
-+		miter->__remaining = sg->offset + sg->length -
-+				(pgoffset << PAGE_SHIFT) - miter->__offset;
-+		miter->__remaining = min_t(unsigned long, miter->__remaining,
-+					   PAGE_SIZE - miter->__offset);
-+	}
-+
-+	return true;
-+}
-+
-+static bool sg_miter_seek(struct sg_mapping_iter *miter, off_t offset)
-+{
-+	WARN_ON(miter->addr);
-+
-+	while (offset) {
-+		off_t consumed;
-+
-+		if (!sg_miter_get_next_page(miter))
-+			return false;
-+
-+		consumed = min_t(off_t, offset, miter->__remaining);
-+		miter->__offset += consumed;
-+		miter->__remaining -= consumed;
-+		offset -= consumed;
-+	}
-+
-+	return true;
-+}
-+
- /**
-  * sg_miter_next - proceed mapping iterator to the next mapping
-  * @miter: sg mapping iter to proceed
-@@ -478,22 +519,9 @@ bool sg_miter_next(struct sg_mapping_iter *miter)
- 	 * Get to the next page if necessary.
- 	 * __remaining, __offset is adjusted by sg_miter_stop
- 	 */
--	if (!miter->__remaining) {
--		struct scatterlist *sg;
--		unsigned long pgoffset;
+-/**
+- * sg_copy_end_to_buffer - Copy end data from SG list to a linear buffer
+- * @sgl:		 The SG list
+- * @nents:		 Number of SG entries
+- * @buf:		 Where to copy to
+- * @buflen:		 The number of bytes to copy
+- * @skip:		 The number of bytes to skip before copying.
+- *                       Note: skip + buflen should equal SG total size.
+- *
+- * Returns the number of copied bytes.
+- *
+- **/
+-static size_t sg_copy_end_to_buffer(struct scatterlist *sgl, unsigned int nents,
+-				    void *buf, size_t buflen, unsigned int skip)
+-{
+-	unsigned int offset = 0;
+-	unsigned int boffset = 0;
+-	struct sg_mapping_iter miter;
+-	unsigned long flags;
+-	unsigned int sg_flags = SG_MITER_ATOMIC;
+-	size_t total_buffer = buflen + skip;
 -
--		if (!__sg_page_iter_next(&miter->piter))
--			return false;
+-	sg_flags |= SG_MITER_FROM_SG;
 -
--		sg = miter->piter.sg;
--		pgoffset = miter->piter.sg_pgoffset;
-+	if (!sg_miter_get_next_page(miter))
-+		return false;
- 
--		miter->__offset = pgoffset ? 0 : sg->offset;
--		miter->__remaining = sg->offset + sg->length -
--				(pgoffset << PAGE_SHIFT) - miter->__offset;
--		miter->__remaining = min_t(unsigned long, miter->__remaining,
--					   PAGE_SIZE - miter->__offset);
+-	sg_miter_start(&miter, sgl, nents, sg_flags);
+-
+-	local_irq_save(flags);
+-
+-	while (sg_miter_next(&miter) && offset < total_buffer) {
+-		unsigned int len;
+-		unsigned int ignore;
+-
+-		if ((offset + miter.length) > skip) {
+-			if (offset < skip) {
+-				/* Copy part of this segment */
+-				ignore = skip - offset;
+-				len = miter.length - ignore;
+-				if (boffset + len > buflen)
+-					len = buflen - boffset;
+-				memcpy(buf + boffset, miter.addr + ignore, len);
+-			} else {
+-				/* Copy all of this segment (up to buflen) */
+-				len = miter.length;
+-				if (boffset + len > buflen)
+-					len = buflen - boffset;
+-				memcpy(buf + boffset, miter.addr, len);
+-			}
+-			boffset += len;
+-		}
+-		offset += miter.length;
 -	}
- 	miter->page = sg_page_iter_page(&miter->piter);
- 	miter->consumed = miter->length = miter->__remaining;
+-
+-	sg_miter_stop(&miter);
+-
+-	local_irq_restore(flags);
+-	return boffset;
+-}
+-
+ /*
+  * allocate and map the extended descriptor
+  */
+@@ -1800,7 +1742,7 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
  
-@@ -552,14 +580,16 @@ EXPORT_SYMBOL(sg_miter_stop);
-  * @nents:		 Number of SG entries
-  * @buf:		 Where to copy from
-  * @buflen:		 The number of bytes to copy
-- * @to_buffer: 		 transfer direction (non zero == from an sg list to a
-- * 			 buffer, 0 == from a buffer to an sg list
-+ * @skip:		 Number of bytes to skip before copying
-+ * @to_buffer:		 transfer direction (true == from an sg list to a
-+ *			 buffer, false == from a buffer to an sg list
-  *
-  * Returns the number of copied bytes.
-  *
-  **/
- static size_t sg_copy_buffer(struct scatterlist *sgl, unsigned int nents,
--			     void *buf, size_t buflen, int to_buffer)
-+			     void *buf, size_t buflen, off_t skip,
-+			     bool to_buffer)
- {
- 	unsigned int offset = 0;
- 	struct sg_mapping_iter miter;
-@@ -573,6 +603,9 @@ static size_t sg_copy_buffer(struct scatterlist *sgl, unsigned int nents,
- 
- 	sg_miter_start(&miter, sgl, nents, sg_flags);
- 
-+	if (!sg_miter_seek(&miter, skip))
-+		return false;
-+
- 	local_irq_save(flags);
- 
- 	while (sg_miter_next(&miter) && offset < buflen) {
-@@ -607,7 +640,7 @@ static size_t sg_copy_buffer(struct scatterlist *sgl, unsigned int nents,
- size_t sg_copy_from_buffer(struct scatterlist *sgl, unsigned int nents,
- 			   void *buf, size_t buflen)
- {
--	return sg_copy_buffer(sgl, nents, buf, buflen, 0);
-+	return sg_copy_buffer(sgl, nents, buf, buflen, 0, false);
- }
- EXPORT_SYMBOL(sg_copy_from_buffer);
- 
-@@ -624,6 +657,42 @@ EXPORT_SYMBOL(sg_copy_from_buffer);
- size_t sg_copy_to_buffer(struct scatterlist *sgl, unsigned int nents,
- 			 void *buf, size_t buflen)
- {
--	return sg_copy_buffer(sgl, nents, buf, buflen, 1);
-+	return sg_copy_buffer(sgl, nents, buf, buflen, 0, true);
- }
- EXPORT_SYMBOL(sg_copy_to_buffer);
-+
-+/**
-+ * sg_pcopy_from_buffer - Copy from a linear buffer to an SG list
-+ * @sgl:		 The SG list
-+ * @nents:		 Number of SG entries
-+ * @buf:		 Where to copy from
-+ * @skip:		 Number of bytes to skip before copying
-+ * @buflen:		 The number of bytes to copy
-+ *
-+ * Returns the number of copied bytes.
-+ *
-+ **/
-+size_t sg_pcopy_from_buffer(struct scatterlist *sgl, unsigned int nents,
-+			    void *buf, size_t buflen, off_t skip)
-+{
-+	return sg_copy_buffer(sgl, nents, buf, buflen, skip, false);
-+}
-+EXPORT_SYMBOL(sg_pcopy_from_buffer);
-+
-+/**
-+ * sg_pcopy_to_buffer - Copy from an SG list to a linear buffer
-+ * @sgl:		 The SG list
-+ * @nents:		 Number of SG entries
-+ * @buf:		 Where to copy to
-+ * @skip:		 Number of bytes to skip before copying
-+ * @buflen:		 The number of bytes to copy
-+ *
-+ * Returns the number of copied bytes.
-+ *
-+ **/
-+size_t sg_pcopy_to_buffer(struct scatterlist *sgl, unsigned int nents,
-+			  void *buf, size_t buflen, off_t skip)
-+{
-+	return sg_copy_buffer(sgl, nents, buf, buflen, skip, true);
-+}
-+EXPORT_SYMBOL(sg_pcopy_to_buffer);
+ 	if (to_hash_later) {
+ 		int nents = sg_count(areq->src, nbytes, &chained);
+-		sg_copy_end_to_buffer(areq->src, nents,
++		sg_pcopy_to_buffer(areq->src, nents,
+ 				      req_ctx->bufnext,
+ 				      to_hash_later,
+ 				      nbytes - to_hash_later);
 -- 
 1.8.1.4
