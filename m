@@ -1,60 +1,52 @@
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH  RESEND/V2] crypto: Ignore validity dates of X.509 certificates at loading/parsing time
-Date: Fri, 07 Jun 2013 11:43:41 +0930
-Message-ID: <87d2ryr7l6.fsf@rustcorp.com.au>
-References: <1364409710-6458-1-git-send-email-holler@ahsoftware.de> <1367503746-6431-1-git-send-email-holler@ahsoftware.de> <51B06FC3.8090405@ahsoftware.de>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH] Fix prototype definitions of sha256_transform_asm,
+ sha512_transform_asm
+Date: Fri, 07 Jun 2013 09:47:54 -0700
+Message-ID: <1370623674.27102.376.camel@schen9-DESK>
+References: <cover.1364303479.git.tim.c.chen@linux.intel.com>
+	 <1364331519.27102.10.camel@schen9-DESK>
+	 <1366403112.27102.112.camel@schen9-DESK>
+	 <20130425130404.GA29292@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Howells <dhowells@redhat.com>,
-	Josh Boyer <jwboyer@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>
-To: Alexander Holler <holler@ahsoftware.de>,
-	Alexander Holler <holler@ahsoftware.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	Jim Kukunas <james.t.kukunas@linux.intel.com>,
+	Kirk Yap <kirk.s.yap@intel.com>,
+	David Cote <david.m.cote@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <51B06FC3.8090405@ahsoftware.de>
+In-Reply-To: <20130425130404.GA29292@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Alexander Holler <holler@ahsoftware.de> writes:
-> Am 02.05.2013 16:09, schrieb Alexander Holler:
->> I don't see any real use case where checking the validity dates of X.509
->> certificates at parsing time adds any security gain. In contrast, doing so
->> makes MODSIGN unusable on systems without a RTC (or systems with a possible
->> wrong date in a existing RTC, or systems where the RTC is read after the keys
->> got loaded).
->> 
->> If something really cares about the dates, it should check them at the time
->> when the certificates are used, not when they are loaded and parsed.
->> 
->> So just remove the validity check of the dates in the parser.
->> 
->> Signed-off-by: Alexander Holler <holler@ahsoftware.de>
->> Cc: stable@vger.kernel.org
->
-> As it just happened to me again and I've recently posted some patches
-> which do make it possible to experience the problem on x86 systems too,
-> here is a reminder.
->
-> To replay the problem (on x86 or any other arch), apply the 3 patches in
-> this series:
->
-> https://lkml.org/lkml/2013/6/5/430
->
-> build a kernel with CONFIG_MODULE_SIG_FORCE=y and start that kernel with
-> hctosys=none as kernel command line parameter.
->
-> This will disable the "persistent" clock (and any RTC), thus the kernel
-> will refuse to load modules because it doesn't has a valid time when
-> loading the certificate.
->
-> Regards,
->
-> Alexander Holler
+On Thu, 2013-04-25 at 21:04 +0800, Herbert Xu wrote:
+> On Fri, Apr 19, 2013 at 01:25:12PM -0700, Tim Chen wrote:
+> > Herbert,
+> > 
+> > This is a follow on patch to the optimized sha256 and sha512 patch series that's just
+> > merged into the crypto-dev.  Let me know if you prefer me to respin the
+> > patch series.
+> > 
+> > This patch corrects the prototype of sha256_transform_asm and
+> > sha512_transform_asm function pointer declaration to static.  It also
+> > fixes a typo in sha512_ssse3_final function that affects the computation
+> > of upper 64 bits of the buffer size.
+> 
+> Thanks, I've folded this into the original patches in order to
+> maintain bisectability.
 
-David?
+Hi Herbert,
 
-Thanks,
-Rusty.
+Wonder if you had a chance to merge this patch?  I think it is not in
+the latest crypto-dev.
+
+Thanks.
+
+Tim
