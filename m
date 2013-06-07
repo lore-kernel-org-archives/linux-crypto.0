@@ -1,86 +1,60 @@
-From: Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCH 1/3] lib/scatterlist: introduce sg_pcopy_from_buffer()
- and sg_pcopy_to_buffer()
-Date: Thu, 6 Jun 2013 14:00:41 -0700
-Message-ID: <20130606210041.GD5045@htj.dyndns.org>
-References: <1370523178-5437-1-git-send-email-akinobu.mita@gmail.com>
- <1370523178-5437-2-git-send-email-akinobu.mita@gmail.com>
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH  RESEND/V2] crypto: Ignore validity dates of X.509 certificates at loading/parsing time
+Date: Fri, 07 Jun 2013 11:43:41 +0930
+Message-ID: <87d2ryr7l6.fsf@rustcorp.com.au>
+References: <1364409710-6458-1-git-send-email-holler@ahsoftware.de> <1367503746-6431-1-git-send-email-holler@ahsoftware.de> <51B06FC3.8090405@ahsoftware.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
-	Imre Deak <imre.deak@intel.com>,
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	"James E.J. Bottomley" <JBottomley@parallels.com>,
-	Douglas Gilbert <dgilbert@interlog.com>,
-	linux-scsi@vger.kernel.org
-To: Akinobu Mita <akinobu.mita@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pb0-f50.google.com ([209.85.160.50]:42777 "EHLO
-	mail-pb0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754327Ab3FFVAp (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Jun 2013 17:00:45 -0400
-Content-Disposition: inline
-In-Reply-To: <1370523178-5437-2-git-send-email-akinobu.mita@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	David Howells <dhowells@redhat.com>,
+	Josh Boyer <jwboyer@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>
+To: Alexander Holler <holler@ahsoftware.de>,
+	Alexander Holler <holler@ahsoftware.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <51B06FC3.8090405@ahsoftware.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+Alexander Holler <holler@ahsoftware.de> writes:
+> Am 02.05.2013 16:09, schrieb Alexander Holler:
+>> I don't see any real use case where checking the validity dates of X.509
+>> certificates at parsing time adds any security gain. In contrast, doing so
+>> makes MODSIGN unusable on systems without a RTC (or systems with a possible
+>> wrong date in a existing RTC, or systems where the RTC is read after the keys
+>> got loaded).
+>> 
+>> If something really cares about the dates, it should check them at the time
+>> when the certificates are used, not when they are loaded and parsed.
+>> 
+>> So just remove the validity check of the dates in the parser.
+>> 
+>> Signed-off-by: Alexander Holler <holler@ahsoftware.de>
+>> Cc: stable@vger.kernel.org
+>
+> As it just happened to me again and I've recently posted some patches
+> which do make it possible to experience the problem on x86 systems too,
+> here is a reminder.
+>
+> To replay the problem (on x86 or any other arch), apply the 3 patches in
+> this series:
+>
+> https://lkml.org/lkml/2013/6/5/430
+>
+> build a kernel with CONFIG_MODULE_SIG_FORCE=y and start that kernel with
+> hctosys=none as kernel command line parameter.
+>
+> This will disable the "persistent" clock (and any RTC), thus the kernel
+> will refuse to load modules because it doesn't has a valid time when
+> loading the certificate.
+>
+> Regards,
+>
+> Alexander Holler
 
-On Thu, Jun 06, 2013 at 09:52:56PM +0900, Akinobu Mita wrote:
-> +static bool sg_miter_get_next_page(struct sg_mapping_iter *miter)
-> +{
-> +	if (!miter->__remaining) {
-> +		struct scatterlist *sg;
-> +		unsigned long pgoffset;
-> +
-> +		if (!__sg_page_iter_next(&miter->piter))
-> +			return false;
-> +
-> +		sg = miter->piter.sg;
-> +		pgoffset = miter->piter.sg_pgoffset;
-> +
-> +		miter->__offset = pgoffset ? 0 : sg->offset;
-> +		miter->__remaining = sg->offset + sg->length -
-> +				(pgoffset << PAGE_SHIFT) - miter->__offset;
-> +		miter->__remaining = min_t(unsigned long, miter->__remaining,
-> +					   PAGE_SIZE - miter->__offset);
-> +	}
-> +
-> +	return true;
-> +}
+David?
 
-It'd be better if separating out this function is a separate patch.
-Mixing factoring out something and adding new stuff makes the patch a
-bit harder to read.
-
-> +static bool sg_miter_seek(struct sg_mapping_iter *miter, off_t offset)
-> +{
-> +	WARN_ON(miter->addr);
-> +
-> +	while (offset) {
-> +		off_t consumed;
-> +
-> +		if (!sg_miter_get_next_page(miter))
-> +			return false;
-> +
-> +		consumed = min_t(off_t, offset, miter->__remaining);
-> +		miter->__offset += consumed;
-> +		miter->__remaining -= consumed;
-> +		offset -= consumed;
-> +	}
-> +
-> +	return true;
-> +}
-
-While I think the above should work at the beginning, what if @miter
-is in the middle of iteration and __remaining isn't zero?
-
-Looks good to me otherwise.
-
-Thanks.
-
--- 
-tejun
+Thanks,
+Rusty.
