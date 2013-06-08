@@ -1,8 +1,9 @@
 From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: [PATCH 1/2] Revert "crypto: blowfish - add AVX2/x86_64
- implementation of blowfish cipher"
-Date: Sat, 08 Jun 2013 12:17:42 +0300
-Message-ID: <20130608091742.31485.50446.stgit@localhost6.localdomain6>
+Subject: [PATCH 2/2] Revert "crypto: twofish - add AVX2/x86_64 assembler
+ implementation of twofish cipher"
+Date: Sat, 08 Jun 2013 12:17:47 +0300
+Message-ID: <20130608091747.31485.93164.stgit@localhost6.localdomain6>
+References: <20130608091742.31485.50446.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
@@ -10,80 +11,76 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sypressi.dnainternet.net ([83.102.40.135]:51629 "EHLO
-	sypressi.dnainternet.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751568Ab3FHJRu (ORCPT
+Received: from sinikuusama.dnainternet.net ([83.102.40.134]:55510 "EHLO
+	sinikuusama.dnainternet.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751861Ab3FHJR5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 8 Jun 2013 05:17:50 -0400
+	Sat, 8 Jun 2013 05:17:57 -0400
+In-Reply-To: <20130608091742.31485.50446.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This reverts commit 604880107010a1e5794552d184cd5471ea31b973.
+This reverts commit cf1521a1a5e21fd1e79a458605c4282fbfbbeee2.
 
 Instruction (vpgatherdd) that this implementation relied on turned out =
 to be
-slow performer on real hardware (i5-4570). The previous 4-way blowfish
+slow performer on real hardware (i5-4570). The previous 8-way twofish/A=
+VX
 implementation is therefore faster and this implementation should be re=
 moved.
 
+Converting this implementation to use the same method as in twofish/AVX=
+ for
+table look-ups would give additional ~3% speed up vs twofish/AVX, but w=
+ould
+hardly be worth of the added code and binary size.
+
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 ---
- arch/x86/crypto/Makefile               |    4=20
- arch/x86/crypto/blowfish-avx2-asm_64.S |  449 ------------------------=
--
- arch/x86/crypto/blowfish_avx2_glue.c   |  585 ------------------------=
+ arch/x86/crypto/Makefile              |    2=20
+ arch/x86/crypto/twofish-avx2-asm_64.S |  600 -------------------------=
 --------
- arch/x86/crypto/blowfish_glue.c        |   32 +-
- arch/x86/include/asm/crypto/blowfish.h |   43 --
- crypto/Kconfig                         |   18 -
- crypto/testmgr.c                       |   12 -
- 7 files changed, 24 insertions(+), 1119 deletions(-)
- delete mode 100644 arch/x86/crypto/blowfish-avx2-asm_64.S
- delete mode 100644 arch/x86/crypto/blowfish_avx2_glue.c
- delete mode 100644 arch/x86/include/asm/crypto/blowfish.h
+ arch/x86/crypto/twofish_avx2_glue.c   |  584 -------------------------=
+-------
+ arch/x86/crypto/twofish_avx_glue.c    |   14 -
+ arch/x86/include/asm/crypto/twofish.h |   18 -
+ crypto/Kconfig                        |   24 -
+ crypto/testmgr.c                      |   12 -
+ 7 files changed, 2 insertions(+), 1252 deletions(-)
+ delete mode 100644 arch/x86/crypto/twofish-avx2-asm_64.S
+ delete mode 100644 arch/x86/crypto/twofish_avx2_glue.c
 
 diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 94cb151..9ce3418 100644
+index 9ce3418..7d6ba9d 100644
 --- a/arch/x86/crypto/Makefile
 +++ b/arch/x86/crypto/Makefile
-@@ -3,8 +3,6 @@
- #
-=20
- avx_supported :=3D $(call as-instr,vpxor %xmm0$(comma)%xmm0$(comma)%xm=
-m0,yes,no)
--avx2_supported :=3D $(call as-instr,vpgatherdd %ymm0$(comma)(%eax$(com=
-ma)%ymm1\
--					$(comma)4)$(comma)%ymm2,yes,no)
-=20
- obj-$(CONFIG_CRYPTO_ABLK_HELPER_X86) +=3D ablk_helper.o
- obj-$(CONFIG_CRYPTO_GLUE_HELPER_X86) +=3D glue_helper.o
-@@ -43,7 +41,6 @@ endif
-=20
- # These modules require assembler to support AVX2.
+@@ -43,7 +43,6 @@ endif
  ifeq ($(avx2_supported),yes)
--	obj-$(CONFIG_CRYPTO_BLOWFISH_AVX2_X86_64) +=3D blowfish-avx2.o
  	obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64) +=3D camellia-aesni-a=
 vx2.o
  	obj-$(CONFIG_CRYPTO_SERPENT_AVX2_X86_64) +=3D serpent-avx2.o
- 	obj-$(CONFIG_CRYPTO_TWOFISH_AVX2_X86_64) +=3D twofish-avx2.o
-@@ -74,7 +71,6 @@ ifeq ($(avx_supported),yes)
+-	obj-$(CONFIG_CRYPTO_TWOFISH_AVX2_X86_64) +=3D twofish-avx2.o
  endif
 =20
+ aes-i586-y :=3D aes-i586-asm_32.o aes_glue.o
+@@ -73,7 +72,6 @@ endif
  ifeq ($(avx2_supported),yes)
--	blowfish-avx2-y :=3D blowfish-avx2-asm_64.o blowfish_avx2_glue.o
  	camellia-aesni-avx2-y :=3D camellia-aesni-avx2-asm_64.o camellia_aesn=
 i_avx2_glue.o
  	serpent-avx2-y :=3D serpent-avx2-asm_64.o serpent_avx2_glue.o
- 	twofish-avx2-y :=3D twofish-avx2-asm_64.o twofish_avx2_glue.o
-diff --git a/arch/x86/crypto/blowfish-avx2-asm_64.S b/arch/x86/crypto/b=
-lowfish-avx2-asm_64.S
+-	twofish-avx2-y :=3D twofish-avx2-asm_64.o twofish_avx2_glue.o
+ endif
+=20
+ aesni-intel-y :=3D aesni-intel_asm.o aesni-intel_glue.o fpu.o
+diff --git a/arch/x86/crypto/twofish-avx2-asm_64.S b/arch/x86/crypto/tw=
+ofish-avx2-asm_64.S
 deleted file mode 100644
-index 784452e..0000000
---- a/arch/x86/crypto/blowfish-avx2-asm_64.S
+index e1a83b9..0000000
+--- a/arch/x86/crypto/twofish-avx2-asm_64.S
 +++ /dev/null
-@@ -1,449 +0,0 @@
+@@ -1,600 +0,0 @@
 -/*
-- * x86_64/AVX2 assembler optimized version of Blowfish
+- * x86_64/AVX2 assembler optimized version of Twofish
 - *
 - * Copyright =C2=A9 2012-2013 Jussi Kivilinna <jussi.kivilinna@iki.fi>
 - *
@@ -97,72 +94,70 @@ y
 - */
 -
 -#include <linux/linkage.h>
+-#include "glue_helper-asm-avx2.S"
 -
--.file "blowfish-avx2-asm_64.S"
+-.file "twofish-avx2-asm_64.S"
 -
 -.data
--.align 32
+-.align 16
 -
--.Lprefetch_mask:
--.long 0*64
--.long 1*64
--.long 2*64
--.long 3*64
--.long 4*64
--.long 5*64
--.long 6*64
--.long 7*64
--
--.Lbswap32_mask:
--.long 0x00010203
--.long 0x04050607
--.long 0x08090a0b
--.long 0x0c0d0e0f
+-.Lvpshufb_mask0:
+-.long 0x80808000
+-.long 0x80808004
+-.long 0x80808008
+-.long 0x8080800c
 -
 -.Lbswap128_mask:
 -	.byte 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
--.Lbswap_iv_mask:
--	.byte 7, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0
+-.Lxts_gf128mul_and_shl1_mask_0:
+-	.byte 0x87, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0
+-.Lxts_gf128mul_and_shl1_mask_1:
+-	.byte 0x0e, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0
 -
 -.text
+-
 -/* structure of crypto context */
--#define p	0
--#define s0	((16 + 2) * 4)
--#define s1	((16 + 2 + (1 * 256)) * 4)
--#define s2	((16 + 2 + (2 * 256)) * 4)
--#define s3	((16 + 2 + (3 * 256)) * 4)
+-#define s0	0
+-#define s1	1024
+-#define s2	2048
+-#define s3	3072
+-#define w	4096
+-#define	k	4128
 -
 -/* register macros */
 -#define CTX	%rdi
--#define RIO	 %rdx
 -
--#define RS0	%rax
+-#define RS0	CTX
 -#define RS1	%r8
 -#define RS2	%r9
 -#define RS3	%r10
+-#define RK	%r11
+-#define RW	%rax
+-#define RROUND  %r12
+-#define RROUNDd %r12d
 -
--#define RLOOP	%r11
--#define RLOOPd	%r11d
--
--#define RXr0	%ymm8
--#define RXr1	%ymm9
--#define RXr2	%ymm10
--#define RXr3	%ymm11
--#define RXl0	%ymm12
--#define RXl1	%ymm13
--#define RXl2	%ymm14
--#define RXl3	%ymm15
+-#define RA0	%ymm8
+-#define RB0	%ymm9
+-#define RC0	%ymm10
+-#define RD0	%ymm11
+-#define RA1	%ymm12
+-#define RB1	%ymm13
+-#define RC1	%ymm14
+-#define RD1	%ymm15
 -
 -/* temp regs */
--#define RT0	%ymm0
--#define RT0x	%xmm0
--#define RT1	%ymm1
--#define RT1x	%xmm1
--#define RIDX0	%ymm2
--#define RIDX1	%ymm3
--#define RIDX1x	%xmm3
--#define RIDX2	%ymm4
--#define RIDX3	%ymm5
+-#define RX0	%ymm0
+-#define RY0	%ymm1
+-#define RX1	%ymm2
+-#define RY1	%ymm3
+-#define RT0	%ymm4
+-#define RIDX	%ymm5
+-
+-#define RX0x	%xmm0
+-#define RY0x	%xmm1
+-#define RX1x	%xmm2
+-#define RY1x	%xmm3
+-#define RT0x	%xmm4
 -
 -/* vpgatherdd mask and '-1' */
 -#define RNOT	%ymm6
@@ -171,177 +166,383 @@ y
 -#define RBYTE	%ymm7
 -
 -/*********************************************************************=
-**
-- * 32-way AVX2 blowfish
+*
+-  16-way AVX2 twofish
 - *********************************************************************=
-**/
--#define F(xl, xr) \
--	vpsrld $24, xl, RIDX0; \
--	vpsrld $16, xl, RIDX1; \
--	vpsrld $8, xl, RIDX2; \
--	vpand RBYTE, RIDX1, RIDX1; \
--	vpand RBYTE, RIDX2, RIDX2; \
--	vpand RBYTE, xl, RIDX3; \
--	\
--	vpgatherdd RNOT, (RS0, RIDX0, 4), RT0; \
--	vpcmpeqd RNOT, RNOT, RNOT; \
--	vpcmpeqd RIDX0, RIDX0, RIDX0; \
--	\
--	vpgatherdd RNOT, (RS1, RIDX1, 4), RT1; \
--	vpcmpeqd RIDX1, RIDX1, RIDX1; \
--	vpaddd RT0, RT1, RT0; \
--	\
--	vpgatherdd RIDX0, (RS2, RIDX2, 4), RT1; \
--	vpxor RT0, RT1, RT0; \
--	\
--	vpgatherdd RIDX1, (RS3, RIDX3, 4), RT1; \
--	vpcmpeqd RNOT, RNOT, RNOT; \
--	vpaddd RT0, RT1, RT0; \
--	\
--	vpxor RT0, xr, xr;
--
--#define add_roundkey(xl, nmem) \
--	vpbroadcastd nmem, RT0; \
--	vpxor RT0, xl ## 0, xl ## 0; \
--	vpxor RT0, xl ## 1, xl ## 1; \
--	vpxor RT0, xl ## 2, xl ## 2; \
--	vpxor RT0, xl ## 3, xl ## 3;
--
--#define round_enc() \
--	add_roundkey(RXr, p(CTX,RLOOP,4)); \
--	F(RXl0, RXr0); \
--	F(RXl1, RXr1); \
--	F(RXl2, RXr2); \
--	F(RXl3, RXr3); \
--	\
--	add_roundkey(RXl, p+4(CTX,RLOOP,4)); \
--	F(RXr0, RXl0); \
--	F(RXr1, RXl1); \
--	F(RXr2, RXl2); \
--	F(RXr3, RXl3);
--
--#define round_dec() \
--	add_roundkey(RXr, p+4*2(CTX,RLOOP,4)); \
--	F(RXl0, RXr0); \
--	F(RXl1, RXr1); \
--	F(RXl2, RXr2); \
--	F(RXl3, RXr3); \
--	\
--	add_roundkey(RXl, p+4(CTX,RLOOP,4)); \
--	F(RXr0, RXl0); \
--	F(RXr1, RXl1); \
--	F(RXr2, RXl2); \
--	F(RXr3, RXl3);
--
+*/
 -#define init_round_constants() \
 -	vpcmpeqd RNOT, RNOT, RNOT; \
--	leaq s0(CTX), RS0; \
+-	vpsrld $24, RNOT, RBYTE; \
+-	leaq k(CTX), RK; \
+-	leaq w(CTX), RW; \
 -	leaq s1(CTX), RS1; \
 -	leaq s2(CTX), RS2; \
 -	leaq s3(CTX), RS3; \
--	vpsrld $24, RNOT, RBYTE;
 -
--#define transpose_2x2(x0, x1, t0) \
--	vpunpckldq x0, x1, t0; \
--	vpunpckhdq x0, x1, x1; \
+-#define g16(ab, rs0, rs1, rs2, rs3, xy) \
+-	vpand RBYTE, ab ## 0, RIDX; \
+-	vpgatherdd RNOT, (rs0, RIDX, 4), xy ## 0; \
+-	vpcmpeqd RNOT, RNOT, RNOT; \
+-		\
+-		vpand RBYTE, ab ## 1, RIDX; \
+-		vpgatherdd RNOT, (rs0, RIDX, 4), xy ## 1; \
+-		vpcmpeqd RNOT, RNOT, RNOT; \
 -	\
--	vpunpcklqdq t0, x1, x0; \
--	vpunpckhqdq t0, x1, x1;
+-	vpsrld $8, ab ## 0, RIDX; \
+-	vpand RBYTE, RIDX, RIDX; \
+-	vpgatherdd RNOT, (rs1, RIDX, 4), RT0; \
+-	vpcmpeqd RNOT, RNOT, RNOT; \
+-	vpxor RT0, xy ## 0, xy ## 0; \
+-		\
+-		vpsrld $8, ab ## 1, RIDX; \
+-		vpand RBYTE, RIDX, RIDX; \
+-		vpgatherdd RNOT, (rs1, RIDX, 4), RT0; \
+-		vpcmpeqd RNOT, RNOT, RNOT; \
+-		vpxor RT0, xy ## 1, xy ## 1; \
+-	\
+-	vpsrld $16, ab ## 0, RIDX; \
+-	vpand RBYTE, RIDX, RIDX; \
+-	vpgatherdd RNOT, (rs2, RIDX, 4), RT0; \
+-	vpcmpeqd RNOT, RNOT, RNOT; \
+-	vpxor RT0, xy ## 0, xy ## 0; \
+-		\
+-		vpsrld $16, ab ## 1, RIDX; \
+-		vpand RBYTE, RIDX, RIDX; \
+-		vpgatherdd RNOT, (rs2, RIDX, 4), RT0; \
+-		vpcmpeqd RNOT, RNOT, RNOT; \
+-		vpxor RT0, xy ## 1, xy ## 1; \
+-	\
+-	vpsrld $24, ab ## 0, RIDX; \
+-	vpgatherdd RNOT, (rs3, RIDX, 4), RT0; \
+-	vpcmpeqd RNOT, RNOT, RNOT; \
+-	vpxor RT0, xy ## 0, xy ## 0; \
+-		\
+-		vpsrld $24, ab ## 1, RIDX; \
+-		vpgatherdd RNOT, (rs3, RIDX, 4), RT0; \
+-		vpcmpeqd RNOT, RNOT, RNOT; \
+-		vpxor RT0, xy ## 1, xy ## 1;
 -
--#define read_block(xl, xr) \
--	vbroadcasti128 .Lbswap32_mask, RT1; \
--	\
--	vpshufb RT1, xl ## 0, xl ## 0; \
--	vpshufb RT1, xr ## 0, xr ## 0; \
--	vpshufb RT1, xl ## 1, xl ## 1; \
--	vpshufb RT1, xr ## 1, xr ## 1; \
--	vpshufb RT1, xl ## 2, xl ## 2; \
--	vpshufb RT1, xr ## 2, xr ## 2; \
--	vpshufb RT1, xl ## 3, xl ## 3; \
--	vpshufb RT1, xr ## 3, xr ## 3; \
--	\
--	transpose_2x2(xl ## 0, xr ## 0, RT0); \
--	transpose_2x2(xl ## 1, xr ## 1, RT0); \
--	transpose_2x2(xl ## 2, xr ## 2, RT0); \
--	transpose_2x2(xl ## 3, xr ## 3, RT0);
+-#define g1_16(a, x) \
+-	g16(a, RS0, RS1, RS2, RS3, x);
 -
--#define write_block(xl, xr) \
--	vbroadcasti128 .Lbswap32_mask, RT1; \
+-#define g2_16(b, y) \
+-	g16(b, RS1, RS2, RS3, RS0, y);
+-
+-#define encrypt_round_end16(a, b, c, d, nk) \
+-	vpaddd RY0, RX0, RX0; \
+-	vpaddd RX0, RY0, RY0; \
+-	vpbroadcastd nk(RK,RROUND,8), RT0; \
+-	vpaddd RT0, RX0, RX0; \
+-	vpbroadcastd 4+nk(RK,RROUND,8), RT0; \
+-	vpaddd RT0, RY0, RY0; \
 -	\
--	transpose_2x2(xl ## 0, xr ## 0, RT0); \
--	transpose_2x2(xl ## 1, xr ## 1, RT0); \
--	transpose_2x2(xl ## 2, xr ## 2, RT0); \
--	transpose_2x2(xl ## 3, xr ## 3, RT0); \
+-	vpxor RY0, d ## 0, d ## 0; \
 -	\
--	vpshufb RT1, xl ## 0, xl ## 0; \
--	vpshufb RT1, xr ## 0, xr ## 0; \
--	vpshufb RT1, xl ## 1, xl ## 1; \
--	vpshufb RT1, xr ## 1, xr ## 1; \
--	vpshufb RT1, xl ## 2, xl ## 2; \
--	vpshufb RT1, xr ## 2, xr ## 2; \
--	vpshufb RT1, xl ## 3, xl ## 3; \
--	vpshufb RT1, xr ## 3, xr ## 3;
+-	vpxor RX0, c ## 0, c ## 0; \
+-	vpsrld $1, c ## 0, RT0; \
+-	vpslld $31, c ## 0, c ## 0; \
+-	vpor RT0, c ## 0, c ## 0; \
+-	\
+-		vpaddd RY1, RX1, RX1; \
+-		vpaddd RX1, RY1, RY1; \
+-		vpbroadcastd nk(RK,RROUND,8), RT0; \
+-		vpaddd RT0, RX1, RX1; \
+-		vpbroadcastd 4+nk(RK,RROUND,8), RT0; \
+-		vpaddd RT0, RY1, RY1; \
+-		\
+-		vpxor RY1, d ## 1, d ## 1; \
+-		\
+-		vpxor RX1, c ## 1, c ## 1; \
+-		vpsrld $1, c ## 1, RT0; \
+-		vpslld $31, c ## 1, c ## 1; \
+-		vpor RT0, c ## 1, c ## 1; \
+-
+-#define encrypt_round16(a, b, c, d, nk) \
+-	g2_16(b, RY); \
+-	\
+-	vpslld $1, b ## 0, RT0; \
+-	vpsrld $31, b ## 0, b ## 0; \
+-	vpor RT0, b ## 0, b ## 0; \
+-	\
+-		vpslld $1, b ## 1, RT0; \
+-		vpsrld $31, b ## 1, b ## 1; \
+-		vpor RT0, b ## 1, b ## 1; \
+-	\
+-	g1_16(a, RX); \
+-	\
+-	encrypt_round_end16(a, b, c, d, nk);
+-
+-#define encrypt_round_first16(a, b, c, d, nk) \
+-	vpslld $1, d ## 0, RT0; \
+-	vpsrld $31, d ## 0, d ## 0; \
+-	vpor RT0, d ## 0, d ## 0; \
+-	\
+-		vpslld $1, d ## 1, RT0; \
+-		vpsrld $31, d ## 1, d ## 1; \
+-		vpor RT0, d ## 1, d ## 1; \
+-	\
+-	encrypt_round16(a, b, c, d, nk);
+-
+-#define encrypt_round_last16(a, b, c, d, nk) \
+-	g2_16(b, RY); \
+-	\
+-	g1_16(a, RX); \
+-	\
+-	encrypt_round_end16(a, b, c, d, nk);
+-
+-#define decrypt_round_end16(a, b, c, d, nk) \
+-	vpaddd RY0, RX0, RX0; \
+-	vpaddd RX0, RY0, RY0; \
+-	vpbroadcastd nk(RK,RROUND,8), RT0; \
+-	vpaddd RT0, RX0, RX0; \
+-	vpbroadcastd 4+nk(RK,RROUND,8), RT0; \
+-	vpaddd RT0, RY0, RY0; \
+-	\
+-	vpxor RX0, c ## 0, c ## 0; \
+-	\
+-	vpxor RY0, d ## 0, d ## 0; \
+-	vpsrld $1, d ## 0, RT0; \
+-	vpslld $31, d ## 0, d ## 0; \
+-	vpor RT0, d ## 0, d ## 0; \
+-	\
+-		vpaddd RY1, RX1, RX1; \
+-		vpaddd RX1, RY1, RY1; \
+-		vpbroadcastd nk(RK,RROUND,8), RT0; \
+-		vpaddd RT0, RX1, RX1; \
+-		vpbroadcastd 4+nk(RK,RROUND,8), RT0; \
+-		vpaddd RT0, RY1, RY1; \
+-		\
+-		vpxor RX1, c ## 1, c ## 1; \
+-		\
+-		vpxor RY1, d ## 1, d ## 1; \
+-		vpsrld $1, d ## 1, RT0; \
+-		vpslld $31, d ## 1, d ## 1; \
+-		vpor RT0, d ## 1, d ## 1;
+-
+-#define decrypt_round16(a, b, c, d, nk) \
+-	g1_16(a, RX); \
+-	\
+-	vpslld $1, a ## 0, RT0; \
+-	vpsrld $31, a ## 0, a ## 0; \
+-	vpor RT0, a ## 0, a ## 0; \
+-	\
+-		vpslld $1, a ## 1, RT0; \
+-		vpsrld $31, a ## 1, a ## 1; \
+-		vpor RT0, a ## 1, a ## 1; \
+-	\
+-	g2_16(b, RY); \
+-	\
+-	decrypt_round_end16(a, b, c, d, nk);
+-
+-#define decrypt_round_first16(a, b, c, d, nk) \
+-	vpslld $1, c ## 0, RT0; \
+-	vpsrld $31, c ## 0, c ## 0; \
+-	vpor RT0, c ## 0, c ## 0; \
+-	\
+-		vpslld $1, c ## 1, RT0; \
+-		vpsrld $31, c ## 1, c ## 1; \
+-		vpor RT0, c ## 1, c ## 1; \
+-	\
+-	decrypt_round16(a, b, c, d, nk)
+-
+-#define decrypt_round_last16(a, b, c, d, nk) \
+-	g1_16(a, RX); \
+-	\
+-	g2_16(b, RY); \
+-	\
+-	decrypt_round_end16(a, b, c, d, nk);
+-
+-#define encrypt_cycle16() \
+-	encrypt_round16(RA, RB, RC, RD, 0); \
+-	encrypt_round16(RC, RD, RA, RB, 8);
+-
+-#define encrypt_cycle_first16() \
+-	encrypt_round_first16(RA, RB, RC, RD, 0); \
+-	encrypt_round16(RC, RD, RA, RB, 8);
+-
+-#define encrypt_cycle_last16() \
+-	encrypt_round16(RA, RB, RC, RD, 0); \
+-	encrypt_round_last16(RC, RD, RA, RB, 8);
+-
+-#define decrypt_cycle16(n) \
+-	decrypt_round16(RC, RD, RA, RB, 8); \
+-	decrypt_round16(RA, RB, RC, RD, 0);
+-
+-#define decrypt_cycle_first16(n) \
+-	decrypt_round_first16(RC, RD, RA, RB, 8); \
+-	decrypt_round16(RA, RB, RC, RD, 0);
+-
+-#define decrypt_cycle_last16(n) \
+-	decrypt_round16(RC, RD, RA, RB, 8); \
+-	decrypt_round_last16(RA, RB, RC, RD, 0);
+-
+-#define transpose_4x4(x0,x1,x2,x3,t1,t2) \
+-	vpunpckhdq x1, x0, t2; \
+-	vpunpckldq x1, x0, x0; \
+-	\
+-	vpunpckldq x3, x2, t1; \
+-	vpunpckhdq x3, x2, x2; \
+-	\
+-	vpunpckhqdq t1,	x0, x1; \
+-	vpunpcklqdq t1,	x0, x0; \
+-	\
+-	vpunpckhqdq x2, t2, x3; \
+-	vpunpcklqdq x2,	t2, x2;
+-
+-#define read_blocks8(offs,a,b,c,d) \
+-	transpose_4x4(a, b, c, d, RX0, RY0);
+-
+-#define write_blocks8(offs,a,b,c,d) \
+-	transpose_4x4(a, b, c, d, RX0, RY0);
+-
+-#define inpack_enc8(a,b,c,d) \
+-	vpbroadcastd 4*0(RW), RT0; \
+-	vpxor RT0, a, a; \
+-	\
+-	vpbroadcastd 4*1(RW), RT0; \
+-	vpxor RT0, b, b; \
+-	\
+-	vpbroadcastd 4*2(RW), RT0; \
+-	vpxor RT0, c, c; \
+-	\
+-	vpbroadcastd 4*3(RW), RT0; \
+-	vpxor RT0, d, d;
+-
+-#define outunpack_enc8(a,b,c,d) \
+-	vpbroadcastd 4*4(RW), RX0; \
+-	vpbroadcastd 4*5(RW), RY0; \
+-	vpxor RX0, c, RX0; \
+-	vpxor RY0, d, RY0; \
+-	\
+-	vpbroadcastd 4*6(RW), RT0; \
+-	vpxor RT0, a, c; \
+-	vpbroadcastd 4*7(RW), RT0; \
+-	vpxor RT0, b, d; \
+-	\
+-	vmovdqa RX0, a; \
+-	vmovdqa RY0, b;
+-
+-#define inpack_dec8(a,b,c,d) \
+-	vpbroadcastd 4*4(RW), RX0; \
+-	vpbroadcastd 4*5(RW), RY0; \
+-	vpxor RX0, a, RX0; \
+-	vpxor RY0, b, RY0; \
+-	\
+-	vpbroadcastd 4*6(RW), RT0; \
+-	vpxor RT0, c, a; \
+-	vpbroadcastd 4*7(RW), RT0; \
+-	vpxor RT0, d, b; \
+-	\
+-	vmovdqa RX0, c; \
+-	vmovdqa RY0, d;
+-
+-#define outunpack_dec8(a,b,c,d) \
+-	vpbroadcastd 4*0(RW), RT0; \
+-	vpxor RT0, a, a; \
+-	\
+-	vpbroadcastd 4*1(RW), RT0; \
+-	vpxor RT0, b, b; \
+-	\
+-	vpbroadcastd 4*2(RW), RT0; \
+-	vpxor RT0, c, c; \
+-	\
+-	vpbroadcastd 4*3(RW), RT0; \
+-	vpxor RT0, d, d;
+-
+-#define read_blocks16(a,b,c,d) \
+-	read_blocks8(0, a ## 0, b ## 0, c ## 0, d ## 0); \
+-	read_blocks8(8, a ## 1, b ## 1, c ## 1, d ## 1);
+-
+-#define write_blocks16(a,b,c,d) \
+-	write_blocks8(0, a ## 0, b ## 0, c ## 0, d ## 0); \
+-	write_blocks8(8, a ## 1, b ## 1, c ## 1, d ## 1);
+-
+-#define xor_blocks16(a,b,c,d) \
+-	xor_blocks8(0, a ## 0, b ## 0, c ## 0, d ## 0); \
+-	xor_blocks8(8, a ## 1, b ## 1, c ## 1, d ## 1);
+-
+-#define inpack_enc16(a,b,c,d) \
+-	inpack_enc8(a ## 0, b ## 0, c ## 0, d ## 0); \
+-	inpack_enc8(a ## 1, b ## 1, c ## 1, d ## 1);
+-
+-#define outunpack_enc16(a,b,c,d) \
+-	outunpack_enc8(a ## 0, b ## 0, c ## 0, d ## 0); \
+-	outunpack_enc8(a ## 1, b ## 1, c ## 1, d ## 1);
+-
+-#define inpack_dec16(a,b,c,d) \
+-	inpack_dec8(a ## 0, b ## 0, c ## 0, d ## 0); \
+-	inpack_dec8(a ## 1, b ## 1, c ## 1, d ## 1);
+-
+-#define outunpack_dec16(a,b,c,d) \
+-	outunpack_dec8(a ## 0, b ## 0, c ## 0, d ## 0); \
+-	outunpack_dec8(a ## 1, b ## 1, c ## 1, d ## 1);
 -
 -.align 8
--__blowfish_enc_blk32:
+-__twofish_enc_blk16:
 -	/* input:
 -	 *	%rdi: ctx, CTX
--	 *	RXl0..4, RXr0..4: plaintext
+-	 *	RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1: plaintext
 -	 * output:
--	 *	RXl0..4, RXr0..4: ciphertext (RXl <=3D> RXr swapped)
+-	 *	RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1: ciphertext
 -	 */
 -	init_round_constants();
 -
--	read_block(RXl, RXr);
+-	read_blocks16(RA, RB, RC, RD);
+-	inpack_enc16(RA, RB, RC, RD);
 -
--	movl $1, RLOOPd;
--	add_roundkey(RXl, p+4*(0)(CTX));
+-	xorl RROUNDd, RROUNDd;
+-	encrypt_cycle_first16();
+-	movl $2, RROUNDd;
 -
 -.align 4
 -.L__enc_loop:
--	round_enc();
+-	encrypt_cycle16();
 -
--	leal 2(RLOOPd), RLOOPd;
--	cmpl $17, RLOOPd;
+-	addl $2, RROUNDd;
+-	cmpl $14, RROUNDd;
 -	jne .L__enc_loop;
 -
--	add_roundkey(RXr, p+4*(17)(CTX));
+-	encrypt_cycle_last16();
 -
--	write_block(RXl, RXr);
+-	outunpack_enc16(RA, RB, RC, RD);
+-	write_blocks16(RA, RB, RC, RD);
 -
 -	ret;
--ENDPROC(__blowfish_enc_blk32)
+-ENDPROC(__twofish_enc_blk16)
 -
 -.align 8
--__blowfish_dec_blk32:
+-__twofish_dec_blk16:
 -	/* input:
 -	 *	%rdi: ctx, CTX
--	 *	RXl0..4, RXr0..4: ciphertext
+-	 *	RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1: ciphertext
 -	 * output:
--	 *	RXl0..4, RXr0..4: plaintext (RXl <=3D> RXr swapped)
+-	 *	RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1: plaintext
 -	 */
 -	init_round_constants();
 -
--	read_block(RXl, RXr);
+-	read_blocks16(RA, RB, RC, RD);
+-	inpack_dec16(RA, RB, RC, RD);
 -
--	movl $14, RLOOPd;
--	add_roundkey(RXl, p+4*(17)(CTX));
+-	movl $14, RROUNDd;
+-	decrypt_cycle_first16();
+-	movl $12, RROUNDd;
 -
 -.align 4
 -.L__dec_loop:
--	round_dec();
+-	decrypt_cycle16();
 -
--	addl $-2, RLOOPd;
--	jns .L__dec_loop;
+-	addl $-2, RROUNDd;
+-	jnz .L__dec_loop;
 -
--	add_roundkey(RXr, p+4*(0)(CTX));
+-	decrypt_cycle_last16();
 -
--	write_block(RXl, RXr);
+-	outunpack_dec16(RA, RB, RC, RD);
+-	write_blocks16(RA, RB, RC, RD);
 -
 -	ret;
--ENDPROC(__blowfish_dec_blk32)
+-ENDPROC(__twofish_dec_blk16)
 -
--ENTRY(blowfish_ecb_enc_32way)
+-ENTRY(twofish_ecb_enc_16way)
 -	/* input:
 -	 *	%rdi: ctx, CTX
 -	 *	%rsi: dst
@@ -349,33 +550,21 @@ y
 -	 */
 -
 -	vzeroupper;
+-	pushq %r12;
 -
--	vmovdqu 0*32(%rdx), RXl0;
--	vmovdqu 1*32(%rdx), RXr0;
--	vmovdqu 2*32(%rdx), RXl1;
--	vmovdqu 3*32(%rdx), RXr1;
--	vmovdqu 4*32(%rdx), RXl2;
--	vmovdqu 5*32(%rdx), RXr2;
--	vmovdqu 6*32(%rdx), RXl3;
--	vmovdqu 7*32(%rdx), RXr3;
+-	load_16way(%rdx, RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1);
 -
--	call __blowfish_enc_blk32;
+-	call __twofish_enc_blk16;
 -
--	vmovdqu RXr0, 0*32(%rsi);
--	vmovdqu RXl0, 1*32(%rsi);
--	vmovdqu RXr1, 2*32(%rsi);
--	vmovdqu RXl1, 3*32(%rsi);
--	vmovdqu RXr2, 4*32(%rsi);
--	vmovdqu RXl2, 5*32(%rsi);
--	vmovdqu RXr3, 6*32(%rsi);
--	vmovdqu RXl3, 7*32(%rsi);
+-	store_16way(%rsi, RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1);
 -
+-	popq %r12;
 -	vzeroupper;
 -
 -	ret;
--ENDPROC(blowfish_ecb_enc_32way)
+-ENDPROC(twofish_ecb_enc_16way)
 -
--ENTRY(blowfish_ecb_dec_32way)
+-ENTRY(twofish_ecb_dec_16way)
 -	/* input:
 -	 *	%rdi: ctx, CTX
 -	 *	%rsi: dst
@@ -383,33 +572,21 @@ y
 -	 */
 -
 -	vzeroupper;
+-	pushq %r12;
 -
--	vmovdqu 0*32(%rdx), RXl0;
--	vmovdqu 1*32(%rdx), RXr0;
--	vmovdqu 2*32(%rdx), RXl1;
--	vmovdqu 3*32(%rdx), RXr1;
--	vmovdqu 4*32(%rdx), RXl2;
--	vmovdqu 5*32(%rdx), RXr2;
--	vmovdqu 6*32(%rdx), RXl3;
--	vmovdqu 7*32(%rdx), RXr3;
+-	load_16way(%rdx, RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1);
 -
--	call __blowfish_dec_blk32;
+-	call __twofish_dec_blk16;
 -
--	vmovdqu RXr0, 0*32(%rsi);
--	vmovdqu RXl0, 1*32(%rsi);
--	vmovdqu RXr1, 2*32(%rsi);
--	vmovdqu RXl1, 3*32(%rsi);
--	vmovdqu RXr2, 4*32(%rsi);
--	vmovdqu RXl2, 5*32(%rsi);
--	vmovdqu RXr3, 6*32(%rsi);
--	vmovdqu RXl3, 7*32(%rsi);
+-	store_16way(%rsi, RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1);
 -
+-	popq %r12;
 -	vzeroupper;
 -
 -	ret;
--ENDPROC(blowfish_ecb_dec_32way)
+-ENDPROC(twofish_ecb_dec_16way)
 -
--ENTRY(blowfish_cbc_dec_32way)
+-ENTRY(twofish_cbc_dec_16way)
 -	/* input:
 -	 *	%rdi: ctx, CTX
 -	 *	%rsi: dst
@@ -417,141 +594,111 @@ y
 -	 */
 -
 -	vzeroupper;
+-	pushq %r12;
 -
--	vmovdqu 0*32(%rdx), RXl0;
--	vmovdqu 1*32(%rdx), RXr0;
--	vmovdqu 2*32(%rdx), RXl1;
--	vmovdqu 3*32(%rdx), RXr1;
--	vmovdqu 4*32(%rdx), RXl2;
--	vmovdqu 5*32(%rdx), RXr2;
--	vmovdqu 6*32(%rdx), RXl3;
--	vmovdqu 7*32(%rdx), RXr3;
+-	load_16way(%rdx, RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1);
 -
--	call __blowfish_dec_blk32;
+-	call __twofish_dec_blk16;
 -
--	/* xor with src */
--	vmovq (%rdx), RT0x;
--	vpshufd $0x4f, RT0x, RT0x;
--	vinserti128 $1, 8(%rdx), RT0, RT0;
--	vpxor RT0, RXr0, RXr0;
--	vpxor 0*32+24(%rdx), RXl0, RXl0;
--	vpxor 1*32+24(%rdx), RXr1, RXr1;
--	vpxor 2*32+24(%rdx), RXl1, RXl1;
--	vpxor 3*32+24(%rdx), RXr2, RXr2;
--	vpxor 4*32+24(%rdx), RXl2, RXl2;
--	vpxor 5*32+24(%rdx), RXr3, RXr3;
--	vpxor 6*32+24(%rdx), RXl3, RXl3;
+-	store_cbc_16way(%rdx, %rsi, RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1,
+-			RX0);
 -
--	vmovdqu RXr0, (0*32)(%rsi);
--	vmovdqu RXl0, (1*32)(%rsi);
--	vmovdqu RXr1, (2*32)(%rsi);
--	vmovdqu RXl1, (3*32)(%rsi);
--	vmovdqu RXr2, (4*32)(%rsi);
--	vmovdqu RXl2, (5*32)(%rsi);
--	vmovdqu RXr3, (6*32)(%rsi);
--	vmovdqu RXl3, (7*32)(%rsi);
--
+-	popq %r12;
 -	vzeroupper;
 -
 -	ret;
--ENDPROC(blowfish_cbc_dec_32way)
+-ENDPROC(twofish_cbc_dec_16way)
 -
--ENTRY(blowfish_ctr_32way)
+-ENTRY(twofish_ctr_16way)
 -	/* input:
 -	 *	%rdi: ctx, CTX
--	 *	%rsi: dst
--	 *	%rdx: src
--	 *	%rcx: iv (big endian, 64bit)
+-	 *	%rsi: dst (16 blocks)
+-	 *	%rdx: src (16 blocks)
+-	 *	%rcx: iv (little endian, 128bit)
 -	 */
 -
 -	vzeroupper;
+-	pushq %r12;
 -
--	vpcmpeqd RT0, RT0, RT0;
--	vpsrldq $8, RT0, RT0; /* a: -1, b: 0, c: -1, d: 0 */
+-	load_ctr_16way(%rcx, .Lbswap128_mask, RA0, RB0, RC0, RD0, RA1, RB1, R=
+C1,
+-		       RD1, RX0, RX0x, RX1, RX1x, RY0, RY0x, RY1, RY1x, RNOT,
+-		       RBYTE);
 -
--	vpcmpeqd RT1x, RT1x, RT1x;
--	vpaddq RT1x, RT1x, RT1x; /* a: -2, b: -2 */
--	vpxor RIDX0, RIDX0, RIDX0;
--	vinserti128 $1, RT1x, RIDX0, RIDX0; /* a: 0, b: 0, c: -2, d: -2 */
+-	call __twofish_enc_blk16;
 -
--	vpaddq RIDX0, RT0, RT0; /* a: -1, b: 0, c: -3, d: -2 */
+-	store_ctr_16way(%rdx, %rsi, RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1);
 -
--	vpcmpeqd RT1, RT1, RT1;
--	vpaddq RT1, RT1, RT1; /* a: -2, b: -2, c: -2, d: -2 */
--	vpaddq RT1, RT1, RIDX2; /* a: -4, b: -4, c: -4, d: -4 */
--
--	vbroadcasti128 .Lbswap_iv_mask, RIDX0;
--	vbroadcasti128 .Lbswap128_mask, RIDX1;
--
--	/* load IV and byteswap */
--	vmovq (%rcx), RT1x;
--	vinserti128 $1, RT1x, RT1, RT1; /* a: BE, b: 0, c: BE, d: 0 */
--	vpshufb RIDX0, RT1, RT1; /* a: LE, b: LE, c: LE, d: LE */
--
--	/* construct IVs */
--	vpsubq RT0, RT1, RT1;		/* a: le1, b: le0, c: le3, d: le2 */
--	vpshufb RIDX1, RT1, RXl0;	/* a: be0, b: be1, c: be2, d: be3 */
--	vpsubq RIDX2, RT1, RT1;		/* le5, le4, le7, le6 */
--	vpshufb RIDX1, RT1, RXr0;	/* be4, be5, be6, be7 */
--	vpsubq RIDX2, RT1, RT1;
--	vpshufb RIDX1, RT1, RXl1;
--	vpsubq RIDX2, RT1, RT1;
--	vpshufb RIDX1, RT1, RXr1;
--	vpsubq RIDX2, RT1, RT1;
--	vpshufb RIDX1, RT1, RXl2;
--	vpsubq RIDX2, RT1, RT1;
--	vpshufb RIDX1, RT1, RXr2;
--	vpsubq RIDX2, RT1, RT1;
--	vpshufb RIDX1, RT1, RXl3;
--	vpsubq RIDX2, RT1, RT1;
--	vpshufb RIDX1, RT1, RXr3;
--
--	/* store last IV */
--	vpsubq RIDX2, RT1, RT1; /* a: le33, b: le32, ... */
--	vpshufb RIDX1x, RT1x, RT1x; /* a: be32, ... */
--	vmovq RT1x, (%rcx);
--
--	call __blowfish_enc_blk32;
--
--	/* dst =3D src ^ iv */
--	vpxor 0*32(%rdx), RXr0, RXr0;
--	vpxor 1*32(%rdx), RXl0, RXl0;
--	vpxor 2*32(%rdx), RXr1, RXr1;
--	vpxor 3*32(%rdx), RXl1, RXl1;
--	vpxor 4*32(%rdx), RXr2, RXr2;
--	vpxor 5*32(%rdx), RXl2, RXl2;
--	vpxor 6*32(%rdx), RXr3, RXr3;
--	vpxor 7*32(%rdx), RXl3, RXl3;
--	vmovdqu RXr0, (0*32)(%rsi);
--	vmovdqu RXl0, (1*32)(%rsi);
--	vmovdqu RXr1, (2*32)(%rsi);
--	vmovdqu RXl1, (3*32)(%rsi);
--	vmovdqu RXr2, (4*32)(%rsi);
--	vmovdqu RXl2, (5*32)(%rsi);
--	vmovdqu RXr3, (6*32)(%rsi);
--	vmovdqu RXl3, (7*32)(%rsi);
--
+-	popq %r12;
 -	vzeroupper;
 -
 -	ret;
--ENDPROC(blowfish_ctr_32way)
-diff --git a/arch/x86/crypto/blowfish_avx2_glue.c b/arch/x86/crypto/blo=
-wfish_avx2_glue.c
+-ENDPROC(twofish_ctr_16way)
+-
+-.align 8
+-twofish_xts_crypt_16way:
+-	/* input:
+-	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst (16 blocks)
+-	 *	%rdx: src (16 blocks)
+-	 *	%rcx: iv (t =E2=8A=95 =CE=B1=E2=81=BF =E2=88=88 GF(2=C2=B9=C2=B2=E2=
+=81=B8))
+-	 *	%r8: pointer to __twofish_enc_blk16 or __twofish_dec_blk16
+-	 */
+-
+-	vzeroupper;
+-	pushq %r12;
+-
+-	load_xts_16way(%rcx, %rdx, %rsi, RA0, RB0, RC0, RD0, RA1, RB1, RC1,
+-		       RD1, RX0, RX0x, RX1, RX1x, RY0, RY0x, RY1, RY1x, RNOT,
+-		       .Lxts_gf128mul_and_shl1_mask_0,
+-		       .Lxts_gf128mul_and_shl1_mask_1);
+-
+-	call *%r8;
+-
+-	store_xts_16way(%rsi, RA0, RB0, RC0, RD0, RA1, RB1, RC1, RD1);
+-
+-	popq %r12;
+-	vzeroupper;
+-
+-	ret;
+-ENDPROC(twofish_xts_crypt_16way)
+-
+-ENTRY(twofish_xts_enc_16way)
+-	/* input:
+-	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst (16 blocks)
+-	 *	%rdx: src (16 blocks)
+-	 *	%rcx: iv (t =E2=8A=95 =CE=B1=E2=81=BF =E2=88=88 GF(2=C2=B9=C2=B2=E2=
+=81=B8))
+-	 */
+-	leaq __twofish_enc_blk16, %r8;
+-	jmp twofish_xts_crypt_16way;
+-ENDPROC(twofish_xts_enc_16way)
+-
+-ENTRY(twofish_xts_dec_16way)
+-	/* input:
+-	 *	%rdi: ctx, CTX
+-	 *	%rsi: dst (16 blocks)
+-	 *	%rdx: src (16 blocks)
+-	 *	%rcx: iv (t =E2=8A=95 =CE=B1=E2=81=BF =E2=88=88 GF(2=C2=B9=C2=B2=E2=
+=81=B8))
+-	 */
+-	leaq __twofish_dec_blk16, %r8;
+-	jmp twofish_xts_crypt_16way;
+-ENDPROC(twofish_xts_dec_16way)
+diff --git a/arch/x86/crypto/twofish_avx2_glue.c b/arch/x86/crypto/twof=
+ish_avx2_glue.c
 deleted file mode 100644
-index 4417e9a..0000000
---- a/arch/x86/crypto/blowfish_avx2_glue.c
+index ce33b5b..0000000
+--- a/arch/x86/crypto/twofish_avx2_glue.c
 +++ /dev/null
-@@ -1,585 +0,0 @@
+@@ -1,584 +0,0 @@
 -/*
-- * Glue Code for x86_64/AVX2 assembler optimized version of Blowfish
+- * Glue Code for x86_64/AVX2 assembler optimized version of Twofish
 - *
 - * Copyright =C2=A9 2012-2013 Jussi Kivilinna <jussi.kivilinna@mbnet.f=
 i>
-- *
-- * CBC & ECB parts based on code (crypto/cbc.c,ecb.c) by:
-- *   Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
-- * CTR part based on code (crypto/ctr.c) by:
-- *   (C) Copyright IBM Corp. 2007 - Joy Latten <latten@us.ibm.com>
 - *
 - * This program is free software; you can redistribute it and/or modif=
 y
@@ -560,11 +707,6 @@ y
 - * the Free Software Foundation; either version 2 of the License, or
 - * (at your option) any later version.
 - *
-- * This program is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
 - */
 -
 -#include <linux/module.h>
@@ -572,478 +714,457 @@ y
 -#include <linux/crypto.h>
 -#include <linux/err.h>
 -#include <crypto/algapi.h>
--#include <crypto/blowfish.h>
--#include <crypto/cryptd.h>
 -#include <crypto/ctr.h>
--#include <asm/i387.h>
+-#include <crypto/twofish.h>
+-#include <crypto/lrw.h>
+-#include <crypto/xts.h>
 -#include <asm/xcr.h>
 -#include <asm/xsave.h>
--#include <asm/crypto/blowfish.h>
+-#include <asm/crypto/twofish.h>
 -#include <asm/crypto/ablk_helper.h>
+-#include <asm/crypto/glue_helper.h>
 -#include <crypto/scatterwalk.h>
 -
--#define BF_AVX2_PARALLEL_BLOCKS 32
+-#define TF_AVX2_PARALLEL_BLOCKS 16
 -
--/* 32-way AVX2 parallel cipher functions */
--asmlinkage void blowfish_ecb_enc_32way(struct bf_ctx *ctx, u8 *dst,
--				       const u8 *src);
--asmlinkage void blowfish_ecb_dec_32way(struct bf_ctx *ctx, u8 *dst,
--				       const u8 *src);
--asmlinkage void blowfish_cbc_dec_32way(struct bf_ctx *ctx, u8 *dst,
--				       const u8 *src);
--asmlinkage void blowfish_ctr_32way(struct bf_ctx *ctx, u8 *dst, const =
-u8 *src,
--				   __be64 *iv);
+-/* 16-way AVX2 parallel cipher functions */
+-asmlinkage void twofish_ecb_enc_16way(struct twofish_ctx *ctx, u8 *dst=
+,
+-				      const u8 *src);
+-asmlinkage void twofish_ecb_dec_16way(struct twofish_ctx *ctx, u8 *dst=
+,
+-				      const u8 *src);
+-asmlinkage void twofish_cbc_dec_16way(void *ctx, u128 *dst, const u128=
+ *src);
 -
--static inline bool bf_fpu_begin(bool fpu_enabled, unsigned int nbytes)
+-asmlinkage void twofish_ctr_16way(void *ctx, u128 *dst, const u128 *sr=
+c,
+-				  le128 *iv);
+-
+-asmlinkage void twofish_xts_enc_16way(struct twofish_ctx *ctx, u8 *dst=
+,
+-				      const u8 *src, le128 *iv);
+-asmlinkage void twofish_xts_dec_16way(struct twofish_ctx *ctx, u8 *dst=
+,
+-				      const u8 *src, le128 *iv);
+-
+-static inline void twofish_enc_blk_3way(struct twofish_ctx *ctx, u8 *d=
+st,
+-					const u8 *src)
 -{
--	if (fpu_enabled)
--		return true;
--
--	/* FPU is only used when chunk to be processed is large enough, so
--	 * do not enable FPU until it is necessary.
--	 */
--	if (nbytes < BF_BLOCK_SIZE * BF_AVX2_PARALLEL_BLOCKS)
--		return false;
--
--	kernel_fpu_begin();
--	return true;
+-	__twofish_enc_blk_3way(ctx, dst, src, false);
 -}
 -
--static inline void bf_fpu_end(bool fpu_enabled)
--{
--	if (fpu_enabled)
--		kernel_fpu_end();
--}
+-static const struct common_glue_ctx twofish_enc =3D {
+-	.num_funcs =3D 4,
+-	.fpu_blocks_limit =3D 8,
 -
--static int ecb_crypt(struct blkcipher_desc *desc, struct blkcipher_wal=
-k *walk,
--		     bool enc)
--{
--	bool fpu_enabled =3D false;
--	struct bf_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
--	const unsigned int bsize =3D BF_BLOCK_SIZE;
--	unsigned int nbytes;
--	int err;
+-	.funcs =3D { {
+-		.num_blocks =3D 16,
+-		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(twofish_ecb_enc_16way) }
+-	}, {
+-		.num_blocks =3D 8,
+-		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(twofish_ecb_enc_8way) }
+-	}, {
+-		.num_blocks =3D 3,
+-		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(twofish_enc_blk_3way) }
+-	}, {
+-		.num_blocks =3D 1,
+-		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(twofish_enc_blk) }
+-	} }
+-};
 -
--	err =3D blkcipher_walk_virt(desc, walk);
--	desc->flags &=3D ~CRYPTO_TFM_REQ_MAY_SLEEP;
+-static const struct common_glue_ctx twofish_ctr =3D {
+-	.num_funcs =3D 4,
+-	.fpu_blocks_limit =3D 8,
 -
--	while ((nbytes =3D walk->nbytes)) {
--		u8 *wsrc =3D walk->src.virt.addr;
--		u8 *wdst =3D walk->dst.virt.addr;
+-	.funcs =3D { {
+-		.num_blocks =3D 16,
+-		.fn_u =3D { .ctr =3D GLUE_CTR_FUNC_CAST(twofish_ctr_16way) }
+-	},  {
+-		.num_blocks =3D 8,
+-		.fn_u =3D { .ctr =3D GLUE_CTR_FUNC_CAST(twofish_ctr_8way) }
+-	}, {
+-		.num_blocks =3D 3,
+-		.fn_u =3D { .ctr =3D GLUE_CTR_FUNC_CAST(twofish_enc_blk_ctr_3way) }
+-	}, {
+-		.num_blocks =3D 1,
+-		.fn_u =3D { .ctr =3D GLUE_CTR_FUNC_CAST(twofish_enc_blk_ctr) }
+-	} }
+-};
 -
--		fpu_enabled =3D bf_fpu_begin(fpu_enabled, nbytes);
+-static const struct common_glue_ctx twofish_enc_xts =3D {
+-	.num_funcs =3D 3,
+-	.fpu_blocks_limit =3D 8,
 -
--		/* Process multi-block AVX2 batch */
--		if (nbytes >=3D bsize * BF_AVX2_PARALLEL_BLOCKS) {
--			do {
--				if (enc)
--					blowfish_ecb_enc_32way(ctx, wdst, wsrc);
--				else
--					blowfish_ecb_dec_32way(ctx, wdst, wsrc);
+-	.funcs =3D { {
+-		.num_blocks =3D 16,
+-		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(twofish_xts_enc_16way) }
+-	}, {
+-		.num_blocks =3D 8,
+-		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(twofish_xts_enc_8way) }
+-	}, {
+-		.num_blocks =3D 1,
+-		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(twofish_xts_enc) }
+-	} }
+-};
 -
--				wsrc +=3D bsize * BF_AVX2_PARALLEL_BLOCKS;
--				wdst +=3D bsize * BF_AVX2_PARALLEL_BLOCKS;
--				nbytes -=3D bsize * BF_AVX2_PARALLEL_BLOCKS;
--			} while (nbytes >=3D bsize * BF_AVX2_PARALLEL_BLOCKS);
+-static const struct common_glue_ctx twofish_dec =3D {
+-	.num_funcs =3D 4,
+-	.fpu_blocks_limit =3D 8,
 -
--			if (nbytes < bsize)
--				goto done;
--		}
+-	.funcs =3D { {
+-		.num_blocks =3D 16,
+-		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(twofish_ecb_dec_16way) }
+-	}, {
+-		.num_blocks =3D 8,
+-		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(twofish_ecb_dec_8way) }
+-	}, {
+-		.num_blocks =3D 3,
+-		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(twofish_dec_blk_3way) }
+-	}, {
+-		.num_blocks =3D 1,
+-		.fn_u =3D { .ecb =3D GLUE_FUNC_CAST(twofish_dec_blk) }
+-	} }
+-};
 -
--		/* Process multi-block batch */
--		if (nbytes >=3D bsize * BF_PARALLEL_BLOCKS) {
--			do {
--				if (enc)
--					blowfish_enc_blk_4way(ctx, wdst, wsrc);
--				else
--					blowfish_dec_blk_4way(ctx, wdst, wsrc);
+-static const struct common_glue_ctx twofish_dec_cbc =3D {
+-	.num_funcs =3D 4,
+-	.fpu_blocks_limit =3D 8,
 -
--				wsrc +=3D bsize * BF_PARALLEL_BLOCKS;
--				wdst +=3D bsize * BF_PARALLEL_BLOCKS;
--				nbytes -=3D bsize * BF_PARALLEL_BLOCKS;
--			} while (nbytes >=3D bsize * BF_PARALLEL_BLOCKS);
+-	.funcs =3D { {
+-		.num_blocks =3D 16,
+-		.fn_u =3D { .cbc =3D GLUE_CBC_FUNC_CAST(twofish_cbc_dec_16way) }
+-	}, {
+-		.num_blocks =3D 8,
+-		.fn_u =3D { .cbc =3D GLUE_CBC_FUNC_CAST(twofish_cbc_dec_8way) }
+-	}, {
+-		.num_blocks =3D 3,
+-		.fn_u =3D { .cbc =3D GLUE_CBC_FUNC_CAST(twofish_dec_blk_cbc_3way) }
+-	}, {
+-		.num_blocks =3D 1,
+-		.fn_u =3D { .cbc =3D GLUE_CBC_FUNC_CAST(twofish_dec_blk) }
+-	} }
+-};
 -
--			if (nbytes < bsize)
--				goto done;
--		}
+-static const struct common_glue_ctx twofish_dec_xts =3D {
+-	.num_funcs =3D 3,
+-	.fpu_blocks_limit =3D 8,
 -
--		/* Handle leftovers */
--		do {
--			if (enc)
--				blowfish_enc_blk(ctx, wdst, wsrc);
--			else
--				blowfish_dec_blk(ctx, wdst, wsrc);
--
--			wsrc +=3D bsize;
--			wdst +=3D bsize;
--			nbytes -=3D bsize;
--		} while (nbytes >=3D bsize);
--
--done:
--		err =3D blkcipher_walk_done(desc, walk, nbytes);
--	}
--
--	bf_fpu_end(fpu_enabled);
--	return err;
--}
+-	.funcs =3D { {
+-		.num_blocks =3D 16,
+-		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(twofish_xts_dec_16way) }
+-	}, {
+-		.num_blocks =3D 8,
+-		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(twofish_xts_dec_8way) }
+-	}, {
+-		.num_blocks =3D 1,
+-		.fn_u =3D { .xts =3D GLUE_XTS_FUNC_CAST(twofish_xts_dec) }
+-	} }
+-};
 -
 -static int ecb_encrypt(struct blkcipher_desc *desc, struct scatterlist=
  *dst,
 -		       struct scatterlist *src, unsigned int nbytes)
 -{
--	struct blkcipher_walk walk;
--
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	return ecb_crypt(desc, &walk, true);
+-	return glue_ecb_crypt_128bit(&twofish_enc, desc, dst, src, nbytes);
 -}
 -
 -static int ecb_decrypt(struct blkcipher_desc *desc, struct scatterlist=
  *dst,
 -		       struct scatterlist *src, unsigned int nbytes)
 -{
--	struct blkcipher_walk walk;
--
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	return ecb_crypt(desc, &walk, false);
--}
--
--static unsigned int __cbc_encrypt(struct blkcipher_desc *desc,
--				  struct blkcipher_walk *walk)
--{
--	struct bf_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
--	unsigned int bsize =3D BF_BLOCK_SIZE;
--	unsigned int nbytes =3D walk->nbytes;
--	u64 *src =3D (u64 *)walk->src.virt.addr;
--	u64 *dst =3D (u64 *)walk->dst.virt.addr;
--	u64 *iv =3D (u64 *)walk->iv;
--
--	do {
--		*dst =3D *src ^ *iv;
--		blowfish_enc_blk(ctx, (u8 *)dst, (u8 *)dst);
--		iv =3D dst;
--
--		src +=3D 1;
--		dst +=3D 1;
--		nbytes -=3D bsize;
--	} while (nbytes >=3D bsize);
--
--	*(u64 *)walk->iv =3D *iv;
--	return nbytes;
+-	return glue_ecb_crypt_128bit(&twofish_dec, desc, dst, src, nbytes);
 -}
 -
 -static int cbc_encrypt(struct blkcipher_desc *desc, struct scatterlist=
  *dst,
 -		       struct scatterlist *src, unsigned int nbytes)
 -{
--	struct blkcipher_walk walk;
--	int err;
--
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err =3D blkcipher_walk_virt(desc, &walk);
--
--	while ((nbytes =3D walk.nbytes)) {
--		nbytes =3D __cbc_encrypt(desc, &walk);
--		err =3D blkcipher_walk_done(desc, &walk, nbytes);
--	}
--
--	return err;
--}
--
--static unsigned int __cbc_decrypt(struct blkcipher_desc *desc,
--				  struct blkcipher_walk *walk)
--{
--	struct bf_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
--	const unsigned int bsize =3D BF_BLOCK_SIZE;
--	unsigned int nbytes =3D walk->nbytes;
--	u64 *src =3D (u64 *)walk->src.virt.addr;
--	u64 *dst =3D (u64 *)walk->dst.virt.addr;
--	u64 last_iv;
--	int i;
--
--	/* Start of the last block. */
--	src +=3D nbytes / bsize - 1;
--	dst +=3D nbytes / bsize - 1;
--
--	last_iv =3D *src;
--
--	/* Process multi-block AVX2 batch */
--	if (nbytes >=3D bsize * BF_AVX2_PARALLEL_BLOCKS) {
--		do {
--			nbytes -=3D bsize * (BF_AVX2_PARALLEL_BLOCKS - 1);
--			src -=3D BF_AVX2_PARALLEL_BLOCKS - 1;
--			dst -=3D BF_AVX2_PARALLEL_BLOCKS - 1;
--
--			blowfish_cbc_dec_32way(ctx, (u8 *)dst, (u8 *)src);
--
--			nbytes -=3D bsize;
--			if (nbytes < bsize)
--				goto done;
--
--			*dst ^=3D *(src - 1);
--			src -=3D 1;
--			dst -=3D 1;
--		} while (nbytes >=3D bsize * BF_AVX2_PARALLEL_BLOCKS);
--
--		if (nbytes < bsize)
--			goto done;
--	}
--
--	/* Process multi-block batch */
--	if (nbytes >=3D bsize * BF_PARALLEL_BLOCKS) {
--		u64 ivs[BF_PARALLEL_BLOCKS - 1];
--
--		do {
--			nbytes -=3D bsize * (BF_PARALLEL_BLOCKS - 1);
--			src -=3D BF_PARALLEL_BLOCKS - 1;
--			dst -=3D BF_PARALLEL_BLOCKS - 1;
--
--			for (i =3D 0; i < BF_PARALLEL_BLOCKS - 1; i++)
--				ivs[i] =3D src[i];
--
--			blowfish_dec_blk_4way(ctx, (u8 *)dst, (u8 *)src);
--
--			for (i =3D 0; i < BF_PARALLEL_BLOCKS - 1; i++)
--				dst[i + 1] ^=3D ivs[i];
--
--			nbytes -=3D bsize;
--			if (nbytes < bsize)
--				goto done;
--
--			*dst ^=3D *(src - 1);
--			src -=3D 1;
--			dst -=3D 1;
--		} while (nbytes >=3D bsize * BF_PARALLEL_BLOCKS);
--
--		if (nbytes < bsize)
--			goto done;
--	}
--
--	/* Handle leftovers */
--	for (;;) {
--		blowfish_dec_blk(ctx, (u8 *)dst, (u8 *)src);
--
--		nbytes -=3D bsize;
--		if (nbytes < bsize)
--			break;
--
--		*dst ^=3D *(src - 1);
--		src -=3D 1;
--		dst -=3D 1;
--	}
--
--done:
--	*dst ^=3D *(u64 *)walk->iv;
--	*(u64 *)walk->iv =3D last_iv;
--
--	return nbytes;
+-	return glue_cbc_encrypt_128bit(GLUE_FUNC_CAST(twofish_enc_blk), desc,
+-				       dst, src, nbytes);
 -}
 -
 -static int cbc_decrypt(struct blkcipher_desc *desc, struct scatterlist=
  *dst,
 -		       struct scatterlist *src, unsigned int nbytes)
 -{
--	bool fpu_enabled =3D false;
--	struct blkcipher_walk walk;
--	int err;
--
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err =3D blkcipher_walk_virt(desc, &walk);
--	desc->flags &=3D ~CRYPTO_TFM_REQ_MAY_SLEEP;
--
--	while ((nbytes =3D walk.nbytes)) {
--		fpu_enabled =3D bf_fpu_begin(fpu_enabled, nbytes);
--		nbytes =3D __cbc_decrypt(desc, &walk);
--		err =3D blkcipher_walk_done(desc, &walk, nbytes);
--	}
--
--	bf_fpu_end(fpu_enabled);
--	return err;
--}
--
--static void ctr_crypt_final(struct blkcipher_desc *desc,
--			    struct blkcipher_walk *walk)
--{
--	struct bf_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
--	u8 *ctrblk =3D walk->iv;
--	u8 keystream[BF_BLOCK_SIZE];
--	u8 *src =3D walk->src.virt.addr;
--	u8 *dst =3D walk->dst.virt.addr;
--	unsigned int nbytes =3D walk->nbytes;
--
--	blowfish_enc_blk(ctx, keystream, ctrblk);
--	crypto_xor(keystream, src, nbytes);
--	memcpy(dst, keystream, nbytes);
--
--	crypto_inc(ctrblk, BF_BLOCK_SIZE);
--}
--
--static unsigned int __ctr_crypt(struct blkcipher_desc *desc,
--				struct blkcipher_walk *walk)
--{
--	struct bf_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
--	unsigned int bsize =3D BF_BLOCK_SIZE;
--	unsigned int nbytes =3D walk->nbytes;
--	u64 *src =3D (u64 *)walk->src.virt.addr;
--	u64 *dst =3D (u64 *)walk->dst.virt.addr;
--	int i;
--
--	/* Process multi-block AVX2 batch */
--	if (nbytes >=3D bsize * BF_AVX2_PARALLEL_BLOCKS) {
--		do {
--			blowfish_ctr_32way(ctx, (u8 *)dst, (u8 *)src,
--					   (__be64 *)walk->iv);
--
--			src +=3D BF_AVX2_PARALLEL_BLOCKS;
--			dst +=3D BF_AVX2_PARALLEL_BLOCKS;
--			nbytes -=3D bsize * BF_AVX2_PARALLEL_BLOCKS;
--		} while (nbytes >=3D bsize * BF_AVX2_PARALLEL_BLOCKS);
--
--		if (nbytes < bsize)
--			goto done;
--	}
--
--	/* Process four block batch */
--	if (nbytes >=3D bsize * BF_PARALLEL_BLOCKS) {
--		__be64 ctrblocks[BF_PARALLEL_BLOCKS];
--		u64 ctrblk =3D be64_to_cpu(*(__be64 *)walk->iv);
--
--		do {
--			/* create ctrblks for parallel encrypt */
--			for (i =3D 0; i < BF_PARALLEL_BLOCKS; i++) {
--				if (dst !=3D src)
--					dst[i] =3D src[i];
--
--				ctrblocks[i] =3D cpu_to_be64(ctrblk++);
--			}
--
--			blowfish_enc_blk_xor_4way(ctx, (u8 *)dst,
--						  (u8 *)ctrblocks);
--
--			src +=3D BF_PARALLEL_BLOCKS;
--			dst +=3D BF_PARALLEL_BLOCKS;
--			nbytes -=3D bsize * BF_PARALLEL_BLOCKS;
--		} while (nbytes >=3D bsize * BF_PARALLEL_BLOCKS);
--
--		*(__be64 *)walk->iv =3D cpu_to_be64(ctrblk);
--
--		if (nbytes < bsize)
--			goto done;
--	}
--
--	/* Handle leftovers */
--	do {
--		u64 ctrblk;
--
--		if (dst !=3D src)
--			*dst =3D *src;
--
--		ctrblk =3D *(u64 *)walk->iv;
--		be64_add_cpu((__be64 *)walk->iv, 1);
--
--		blowfish_enc_blk_xor(ctx, (u8 *)dst, (u8 *)&ctrblk);
--
--		src +=3D 1;
--		dst +=3D 1;
--	} while ((nbytes -=3D bsize) >=3D bsize);
--
--done:
--	return nbytes;
+-	return glue_cbc_decrypt_128bit(&twofish_dec_cbc, desc, dst, src,
+-				       nbytes);
 -}
 -
 -static int ctr_crypt(struct blkcipher_desc *desc, struct scatterlist *=
 dst,
 -		     struct scatterlist *src, unsigned int nbytes)
 -{
--	bool fpu_enabled =3D false;
--	struct blkcipher_walk walk;
--	int err;
--
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err =3D blkcipher_walk_virt_block(desc, &walk, BF_BLOCK_SIZE);
--	desc->flags &=3D ~CRYPTO_TFM_REQ_MAY_SLEEP;
--
--	while ((nbytes =3D walk.nbytes) >=3D BF_BLOCK_SIZE) {
--		fpu_enabled =3D bf_fpu_begin(fpu_enabled, nbytes);
--		nbytes =3D __ctr_crypt(desc, &walk);
--		err =3D blkcipher_walk_done(desc, &walk, nbytes);
--	}
--
--	bf_fpu_end(fpu_enabled);
--
--	if (walk.nbytes) {
--		ctr_crypt_final(desc, &walk);
--		err =3D blkcipher_walk_done(desc, &walk, 0);
--	}
--
--	return err;
+-	return glue_ctr_crypt_128bit(&twofish_ctr, desc, dst, src, nbytes);
 -}
 -
--static struct crypto_alg bf_algs[6] =3D { {
--	.cra_name		=3D "__ecb-blowfish-avx2",
--	.cra_driver_name	=3D "__driver-ecb-blowfish-avx2",
+-static inline bool twofish_fpu_begin(bool fpu_enabled, unsigned int nb=
+ytes)
+-{
+-	/* since reusing AVX functions, starts using FPU at 8 parallel blocks=
+ */
+-	return glue_fpu_begin(TF_BLOCK_SIZE, 8, NULL, fpu_enabled, nbytes);
+-}
+-
+-static inline void twofish_fpu_end(bool fpu_enabled)
+-{
+-	glue_fpu_end(fpu_enabled);
+-}
+-
+-struct crypt_priv {
+-	struct twofish_ctx *ctx;
+-	bool fpu_enabled;
+-};
+-
+-static void encrypt_callback(void *priv, u8 *srcdst, unsigned int nbyt=
+es)
+-{
+-	const unsigned int bsize =3D TF_BLOCK_SIZE;
+-	struct crypt_priv *ctx =3D priv;
+-	int i;
+-
+-	ctx->fpu_enabled =3D twofish_fpu_begin(ctx->fpu_enabled, nbytes);
+-
+-	while (nbytes >=3D TF_AVX2_PARALLEL_BLOCKS * bsize) {
+-		twofish_ecb_enc_16way(ctx->ctx, srcdst, srcdst);
+-		srcdst +=3D bsize * TF_AVX2_PARALLEL_BLOCKS;
+-		nbytes -=3D bsize * TF_AVX2_PARALLEL_BLOCKS;
+-	}
+-
+-	while (nbytes >=3D 8 * bsize) {
+-		twofish_ecb_enc_8way(ctx->ctx, srcdst, srcdst);
+-		srcdst +=3D bsize * 8;
+-		nbytes -=3D bsize * 8;
+-	}
+-
+-	while (nbytes >=3D 3 * bsize) {
+-		twofish_enc_blk_3way(ctx->ctx, srcdst, srcdst);
+-		srcdst +=3D bsize * 3;
+-		nbytes -=3D bsize * 3;
+-	}
+-
+-	for (i =3D 0; i < nbytes / bsize; i++, srcdst +=3D bsize)
+-		twofish_enc_blk(ctx->ctx, srcdst, srcdst);
+-}
+-
+-static void decrypt_callback(void *priv, u8 *srcdst, unsigned int nbyt=
+es)
+-{
+-	const unsigned int bsize =3D TF_BLOCK_SIZE;
+-	struct crypt_priv *ctx =3D priv;
+-	int i;
+-
+-	ctx->fpu_enabled =3D twofish_fpu_begin(ctx->fpu_enabled, nbytes);
+-
+-	while (nbytes >=3D TF_AVX2_PARALLEL_BLOCKS * bsize) {
+-		twofish_ecb_dec_16way(ctx->ctx, srcdst, srcdst);
+-		srcdst +=3D bsize * TF_AVX2_PARALLEL_BLOCKS;
+-		nbytes -=3D bsize * TF_AVX2_PARALLEL_BLOCKS;
+-	}
+-
+-	while (nbytes >=3D 8 * bsize) {
+-		twofish_ecb_dec_8way(ctx->ctx, srcdst, srcdst);
+-		srcdst +=3D bsize * 8;
+-		nbytes -=3D bsize * 8;
+-	}
+-
+-	while (nbytes >=3D 3 * bsize) {
+-		twofish_dec_blk_3way(ctx->ctx, srcdst, srcdst);
+-		srcdst +=3D bsize * 3;
+-		nbytes -=3D bsize * 3;
+-	}
+-
+-	for (i =3D 0; i < nbytes / bsize; i++, srcdst +=3D bsize)
+-		twofish_dec_blk(ctx->ctx, srcdst, srcdst);
+-}
+-
+-static int lrw_encrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
+-		       struct scatterlist *src, unsigned int nbytes)
+-{
+-	struct twofish_lrw_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
+-	be128 buf[TF_AVX2_PARALLEL_BLOCKS];
+-	struct crypt_priv crypt_ctx =3D {
+-		.ctx =3D &ctx->twofish_ctx,
+-		.fpu_enabled =3D false,
+-	};
+-	struct lrw_crypt_req req =3D {
+-		.tbuf =3D buf,
+-		.tbuflen =3D sizeof(buf),
+-
+-		.table_ctx =3D &ctx->lrw_table,
+-		.crypt_ctx =3D &crypt_ctx,
+-		.crypt_fn =3D encrypt_callback,
+-	};
+-	int ret;
+-
+-	desc->flags &=3D ~CRYPTO_TFM_REQ_MAY_SLEEP;
+-	ret =3D lrw_crypt(desc, dst, src, nbytes, &req);
+-	twofish_fpu_end(crypt_ctx.fpu_enabled);
+-
+-	return ret;
+-}
+-
+-static int lrw_decrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
+-		       struct scatterlist *src, unsigned int nbytes)
+-{
+-	struct twofish_lrw_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
+-	be128 buf[TF_AVX2_PARALLEL_BLOCKS];
+-	struct crypt_priv crypt_ctx =3D {
+-		.ctx =3D &ctx->twofish_ctx,
+-		.fpu_enabled =3D false,
+-	};
+-	struct lrw_crypt_req req =3D {
+-		.tbuf =3D buf,
+-		.tbuflen =3D sizeof(buf),
+-
+-		.table_ctx =3D &ctx->lrw_table,
+-		.crypt_ctx =3D &crypt_ctx,
+-		.crypt_fn =3D decrypt_callback,
+-	};
+-	int ret;
+-
+-	desc->flags &=3D ~CRYPTO_TFM_REQ_MAY_SLEEP;
+-	ret =3D lrw_crypt(desc, dst, src, nbytes, &req);
+-	twofish_fpu_end(crypt_ctx.fpu_enabled);
+-
+-	return ret;
+-}
+-
+-static int xts_encrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
+-		       struct scatterlist *src, unsigned int nbytes)
+-{
+-	struct twofish_xts_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
+-
+-	return glue_xts_crypt_128bit(&twofish_enc_xts, desc, dst, src, nbytes=
+,
+-				     XTS_TWEAK_CAST(twofish_enc_blk),
+-				     &ctx->tweak_ctx, &ctx->crypt_ctx);
+-}
+-
+-static int xts_decrypt(struct blkcipher_desc *desc, struct scatterlist=
+ *dst,
+-		       struct scatterlist *src, unsigned int nbytes)
+-{
+-	struct twofish_xts_ctx *ctx =3D crypto_blkcipher_ctx(desc->tfm);
+-
+-	return glue_xts_crypt_128bit(&twofish_dec_xts, desc, dst, src, nbytes=
+,
+-				     XTS_TWEAK_CAST(twofish_enc_blk),
+-				     &ctx->tweak_ctx, &ctx->crypt_ctx);
+-}
+-
+-static struct crypto_alg tf_algs[10] =3D { {
+-	.cra_name		=3D "__ecb-twofish-avx2",
+-	.cra_driver_name	=3D "__driver-ecb-twofish-avx2",
 -	.cra_priority		=3D 0,
 -	.cra_flags		=3D CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		=3D BF_BLOCK_SIZE,
--	.cra_ctxsize		=3D sizeof(struct bf_ctx),
+-	.cra_blocksize		=3D TF_BLOCK_SIZE,
+-	.cra_ctxsize		=3D sizeof(struct twofish_ctx),
 -	.cra_alignmask		=3D 0,
 -	.cra_type		=3D &crypto_blkcipher_type,
 -	.cra_module		=3D THIS_MODULE,
 -	.cra_u =3D {
 -		.blkcipher =3D {
--			.min_keysize	=3D BF_MIN_KEY_SIZE,
--			.max_keysize	=3D BF_MAX_KEY_SIZE,
--			.setkey		=3D blowfish_setkey,
+-			.min_keysize	=3D TF_MIN_KEY_SIZE,
+-			.max_keysize	=3D TF_MAX_KEY_SIZE,
+-			.setkey		=3D twofish_setkey,
 -			.encrypt	=3D ecb_encrypt,
 -			.decrypt	=3D ecb_decrypt,
 -		},
 -	},
 -}, {
--	.cra_name		=3D "__cbc-blowfish-avx2",
--	.cra_driver_name	=3D "__driver-cbc-blowfish-avx2",
+-	.cra_name		=3D "__cbc-twofish-avx2",
+-	.cra_driver_name	=3D "__driver-cbc-twofish-avx2",
 -	.cra_priority		=3D 0,
 -	.cra_flags		=3D CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		=3D BF_BLOCK_SIZE,
--	.cra_ctxsize		=3D sizeof(struct bf_ctx),
+-	.cra_blocksize		=3D TF_BLOCK_SIZE,
+-	.cra_ctxsize		=3D sizeof(struct twofish_ctx),
 -	.cra_alignmask		=3D 0,
 -	.cra_type		=3D &crypto_blkcipher_type,
 -	.cra_module		=3D THIS_MODULE,
 -	.cra_u =3D {
 -		.blkcipher =3D {
--			.min_keysize	=3D BF_MIN_KEY_SIZE,
--			.max_keysize	=3D BF_MAX_KEY_SIZE,
--			.setkey		=3D blowfish_setkey,
+-			.min_keysize	=3D TF_MIN_KEY_SIZE,
+-			.max_keysize	=3D TF_MAX_KEY_SIZE,
+-			.setkey		=3D twofish_setkey,
 -			.encrypt	=3D cbc_encrypt,
 -			.decrypt	=3D cbc_decrypt,
 -		},
 -	},
 -}, {
--	.cra_name		=3D "__ctr-blowfish-avx2",
--	.cra_driver_name	=3D "__driver-ctr-blowfish-avx2",
+-	.cra_name		=3D "__ctr-twofish-avx2",
+-	.cra_driver_name	=3D "__driver-ctr-twofish-avx2",
 -	.cra_priority		=3D 0,
 -	.cra_flags		=3D CRYPTO_ALG_TYPE_BLKCIPHER,
 -	.cra_blocksize		=3D 1,
--	.cra_ctxsize		=3D sizeof(struct bf_ctx),
+-	.cra_ctxsize		=3D sizeof(struct twofish_ctx),
 -	.cra_alignmask		=3D 0,
 -	.cra_type		=3D &crypto_blkcipher_type,
 -	.cra_module		=3D THIS_MODULE,
 -	.cra_u =3D {
 -		.blkcipher =3D {
--			.min_keysize	=3D BF_MIN_KEY_SIZE,
--			.max_keysize	=3D BF_MAX_KEY_SIZE,
--			.ivsize		=3D BF_BLOCK_SIZE,
--			.setkey		=3D blowfish_setkey,
+-			.min_keysize	=3D TF_MIN_KEY_SIZE,
+-			.max_keysize	=3D TF_MAX_KEY_SIZE,
+-			.ivsize		=3D TF_BLOCK_SIZE,
+-			.setkey		=3D twofish_setkey,
 -			.encrypt	=3D ctr_crypt,
 -			.decrypt	=3D ctr_crypt,
 -		},
 -	},
 -}, {
--	.cra_name		=3D "ecb(blowfish)",
--	.cra_driver_name	=3D "ecb-blowfish-avx2",
--	.cra_priority		=3D 400,
+-	.cra_name		=3D "__lrw-twofish-avx2",
+-	.cra_driver_name	=3D "__driver-lrw-twofish-avx2",
+-	.cra_priority		=3D 0,
+-	.cra_flags		=3D CRYPTO_ALG_TYPE_BLKCIPHER,
+-	.cra_blocksize		=3D TF_BLOCK_SIZE,
+-	.cra_ctxsize		=3D sizeof(struct twofish_lrw_ctx),
+-	.cra_alignmask		=3D 0,
+-	.cra_type		=3D &crypto_blkcipher_type,
+-	.cra_module		=3D THIS_MODULE,
+-	.cra_exit		=3D lrw_twofish_exit_tfm,
+-	.cra_u =3D {
+-		.blkcipher =3D {
+-			.min_keysize	=3D TF_MIN_KEY_SIZE +
+-					  TF_BLOCK_SIZE,
+-			.max_keysize	=3D TF_MAX_KEY_SIZE +
+-					  TF_BLOCK_SIZE,
+-			.ivsize		=3D TF_BLOCK_SIZE,
+-			.setkey		=3D lrw_twofish_setkey,
+-			.encrypt	=3D lrw_encrypt,
+-			.decrypt	=3D lrw_decrypt,
+-		},
+-	},
+-}, {
+-	.cra_name		=3D "__xts-twofish-avx2",
+-	.cra_driver_name	=3D "__driver-xts-twofish-avx2",
+-	.cra_priority		=3D 0,
+-	.cra_flags		=3D CRYPTO_ALG_TYPE_BLKCIPHER,
+-	.cra_blocksize		=3D TF_BLOCK_SIZE,
+-	.cra_ctxsize		=3D sizeof(struct twofish_xts_ctx),
+-	.cra_alignmask		=3D 0,
+-	.cra_type		=3D &crypto_blkcipher_type,
+-	.cra_module		=3D THIS_MODULE,
+-	.cra_u =3D {
+-		.blkcipher =3D {
+-			.min_keysize	=3D TF_MIN_KEY_SIZE * 2,
+-			.max_keysize	=3D TF_MAX_KEY_SIZE * 2,
+-			.ivsize		=3D TF_BLOCK_SIZE,
+-			.setkey		=3D xts_twofish_setkey,
+-			.encrypt	=3D xts_encrypt,
+-			.decrypt	=3D xts_decrypt,
+-		},
+-	},
+-}, {
+-	.cra_name		=3D "ecb(twofish)",
+-	.cra_driver_name	=3D "ecb-twofish-avx2",
+-	.cra_priority		=3D 500,
 -	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		=3D BF_BLOCK_SIZE,
+-	.cra_blocksize		=3D TF_BLOCK_SIZE,
 -	.cra_ctxsize		=3D sizeof(struct async_helper_ctx),
 -	.cra_alignmask		=3D 0,
 -	.cra_type		=3D &crypto_ablkcipher_type,
@@ -1052,19 +1173,19 @@ dst,
 -	.cra_exit		=3D ablk_exit,
 -	.cra_u =3D {
 -		.ablkcipher =3D {
--			.min_keysize	=3D BF_MIN_KEY_SIZE,
--			.max_keysize	=3D BF_MAX_KEY_SIZE,
+-			.min_keysize	=3D TF_MIN_KEY_SIZE,
+-			.max_keysize	=3D TF_MAX_KEY_SIZE,
 -			.setkey		=3D ablk_set_key,
 -			.encrypt	=3D ablk_encrypt,
 -			.decrypt	=3D ablk_decrypt,
 -		},
 -	},
 -}, {
--	.cra_name		=3D "cbc(blowfish)",
--	.cra_driver_name	=3D "cbc-blowfish-avx2",
--	.cra_priority		=3D 400,
+-	.cra_name		=3D "cbc(twofish)",
+-	.cra_driver_name	=3D "cbc-twofish-avx2",
+-	.cra_priority		=3D 500,
 -	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		=3D BF_BLOCK_SIZE,
+-	.cra_blocksize		=3D TF_BLOCK_SIZE,
 -	.cra_ctxsize		=3D sizeof(struct async_helper_ctx),
 -	.cra_alignmask		=3D 0,
 -	.cra_type		=3D &crypto_ablkcipher_type,
@@ -1073,18 +1194,18 @@ dst,
 -	.cra_exit		=3D ablk_exit,
 -	.cra_u =3D {
 -		.ablkcipher =3D {
--			.min_keysize	=3D BF_MIN_KEY_SIZE,
--			.max_keysize	=3D BF_MAX_KEY_SIZE,
--			.ivsize		=3D BF_BLOCK_SIZE,
+-			.min_keysize	=3D TF_MIN_KEY_SIZE,
+-			.max_keysize	=3D TF_MAX_KEY_SIZE,
+-			.ivsize		=3D TF_BLOCK_SIZE,
 -			.setkey		=3D ablk_set_key,
 -			.encrypt	=3D __ablk_encrypt,
 -			.decrypt	=3D ablk_decrypt,
 -		},
 -	},
 -}, {
--	.cra_name		=3D "ctr(blowfish)",
--	.cra_driver_name	=3D "ctr-blowfish-avx2",
--	.cra_priority		=3D 400,
+-	.cra_name		=3D "ctr(twofish)",
+-	.cra_driver_name	=3D "ctr-twofish-avx2",
+-	.cra_priority		=3D 500,
 -	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
 -	.cra_blocksize		=3D 1,
 -	.cra_ctxsize		=3D sizeof(struct async_helper_ctx),
@@ -1095,17 +1216,62 @@ dst,
 -	.cra_exit		=3D ablk_exit,
 -	.cra_u =3D {
 -		.ablkcipher =3D {
--			.min_keysize	=3D BF_MIN_KEY_SIZE,
--			.max_keysize	=3D BF_MAX_KEY_SIZE,
--			.ivsize		=3D BF_BLOCK_SIZE,
+-			.min_keysize	=3D TF_MIN_KEY_SIZE,
+-			.max_keysize	=3D TF_MAX_KEY_SIZE,
+-			.ivsize		=3D TF_BLOCK_SIZE,
 -			.setkey		=3D ablk_set_key,
 -			.encrypt	=3D ablk_encrypt,
 -			.decrypt	=3D ablk_encrypt,
 -			.geniv		=3D "chainiv",
 -		},
 -	},
+-}, {
+-	.cra_name		=3D "lrw(twofish)",
+-	.cra_driver_name	=3D "lrw-twofish-avx2",
+-	.cra_priority		=3D 500,
+-	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		=3D TF_BLOCK_SIZE,
+-	.cra_ctxsize		=3D sizeof(struct async_helper_ctx),
+-	.cra_alignmask		=3D 0,
+-	.cra_type		=3D &crypto_ablkcipher_type,
+-	.cra_module		=3D THIS_MODULE,
+-	.cra_init		=3D ablk_init,
+-	.cra_exit		=3D ablk_exit,
+-	.cra_u =3D {
+-		.ablkcipher =3D {
+-			.min_keysize	=3D TF_MIN_KEY_SIZE +
+-					  TF_BLOCK_SIZE,
+-			.max_keysize	=3D TF_MAX_KEY_SIZE +
+-					  TF_BLOCK_SIZE,
+-			.ivsize		=3D TF_BLOCK_SIZE,
+-			.setkey		=3D ablk_set_key,
+-			.encrypt	=3D ablk_encrypt,
+-			.decrypt	=3D ablk_decrypt,
+-		},
+-	},
+-}, {
+-	.cra_name		=3D "xts(twofish)",
+-	.cra_driver_name	=3D "xts-twofish-avx2",
+-	.cra_priority		=3D 500,
+-	.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		=3D TF_BLOCK_SIZE,
+-	.cra_ctxsize		=3D sizeof(struct async_helper_ctx),
+-	.cra_alignmask		=3D 0,
+-	.cra_type		=3D &crypto_ablkcipher_type,
+-	.cra_module		=3D THIS_MODULE,
+-	.cra_init		=3D ablk_init,
+-	.cra_exit		=3D ablk_exit,
+-	.cra_u =3D {
+-		.ablkcipher =3D {
+-			.min_keysize	=3D TF_MIN_KEY_SIZE * 2,
+-			.max_keysize	=3D TF_MAX_KEY_SIZE * 2,
+-			.ivsize		=3D TF_BLOCK_SIZE,
+-			.setkey		=3D ablk_set_key,
+-			.encrypt	=3D ablk_encrypt,
+-			.decrypt	=3D ablk_decrypt,
+-		},
+-	},
 -} };
--
 -
 -static int __init init(void)
 -{
@@ -1119,220 +1285,203 @@ dst,
 -	xcr0 =3D xgetbv(XCR_XFEATURE_ENABLED_MASK);
 -	if ((xcr0 & (XSTATE_SSE | XSTATE_YMM)) !=3D (XSTATE_SSE | XSTATE_YMM)=
 ) {
--		pr_info("AVX detected but unusable.\n");
+-		pr_info("AVX2 detected but unusable.\n");
 -		return -ENODEV;
 -	}
 -
--	return crypto_register_algs(bf_algs, ARRAY_SIZE(bf_algs));
+-	return crypto_register_algs(tf_algs, ARRAY_SIZE(tf_algs));
 -}
 -
 -static void __exit fini(void)
 -{
--	crypto_unregister_algs(bf_algs, ARRAY_SIZE(bf_algs));
+-	crypto_unregister_algs(tf_algs, ARRAY_SIZE(tf_algs));
 -}
 -
 -module_init(init);
 -module_exit(fini);
 -
 -MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Blowfish Cipher Algorithm, AVX2 optimized");
--MODULE_ALIAS("blowfish");
--MODULE_ALIAS("blowfish-asm");
-diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish=
-_glue.c
-index 3548d76..50ec333 100644
---- a/arch/x86/crypto/blowfish_glue.c
-+++ b/arch/x86/crypto/blowfish_glue.c
-@@ -1,7 +1,7 @@
- /*
-  * Glue Code for assembler optimized version of Blowfish
-  *
-- * Copyright =C2=A9 2011-2013 Jussi Kivilinna <jussi.kivilinna@iki.fi>
-+ * Copyright (c) 2011 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-  *
-  * CBC & ECB parts based on code (crypto/cbc.c,ecb.c) by:
-  *   Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
-@@ -32,24 +32,40 @@
- #include <linux/module.h>
- #include <linux/types.h>
- #include <crypto/algapi.h>
--#include <asm/crypto/blowfish.h>
-=20
- /* regular block cipher functions */
- asmlinkage void __blowfish_enc_blk(struct bf_ctx *ctx, u8 *dst, const =
-u8 *src,
- 				   bool xor);
--EXPORT_SYMBOL_GPL(__blowfish_enc_blk);
+-MODULE_DESCRIPTION("Twofish Cipher Algorithm, AVX2 optimized");
+-MODULE_ALIAS("twofish");
+-MODULE_ALIAS("twofish-asm");
+diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofi=
+sh_avx_glue.c
+index 2047a56..a62ba54 100644
+--- a/arch/x86/crypto/twofish_avx_glue.c
++++ b/arch/x86/crypto/twofish_avx_glue.c
+@@ -50,26 +50,18 @@
+ /* 8-way parallel cipher functions */
+ asmlinkage void twofish_ecb_enc_8way(struct twofish_ctx *ctx, u8 *dst,
+ 				     const u8 *src);
+-EXPORT_SYMBOL_GPL(twofish_ecb_enc_8way);
 -
- asmlinkage void blowfish_dec_blk(struct bf_ctx *ctx, u8 *dst, const u8=
- *src);
--EXPORT_SYMBOL_GPL(blowfish_dec_blk);
+ asmlinkage void twofish_ecb_dec_8way(struct twofish_ctx *ctx, u8 *dst,
+ 				     const u8 *src);
+-EXPORT_SYMBOL_GPL(twofish_ecb_dec_8way);
 =20
- /* 4-way parallel cipher functions */
- asmlinkage void __blowfish_enc_blk_4way(struct bf_ctx *ctx, u8 *dst,
- 					const u8 *src, bool xor);
--EXPORT_SYMBOL_GPL(__blowfish_enc_blk_4way);
+ asmlinkage void twofish_cbc_dec_8way(struct twofish_ctx *ctx, u8 *dst,
+ 				     const u8 *src);
+-EXPORT_SYMBOL_GPL(twofish_cbc_dec_8way);
 -
- asmlinkage void blowfish_dec_blk_4way(struct bf_ctx *ctx, u8 *dst,
- 				      const u8 *src);
--EXPORT_SYMBOL_GPL(blowfish_dec_blk_4way);
-+
-+static inline void blowfish_enc_blk(struct bf_ctx *ctx, u8 *dst, const=
- u8 *src)
-+{
-+	__blowfish_enc_blk(ctx, dst, src, false);
-+}
-+
-+static inline void blowfish_enc_blk_xor(struct bf_ctx *ctx, u8 *dst,
-+					const u8 *src)
-+{
-+	__blowfish_enc_blk(ctx, dst, src, true);
-+}
-+
-+static inline void blowfish_enc_blk_4way(struct bf_ctx *ctx, u8 *dst,
-+					 const u8 *src)
-+{
-+	__blowfish_enc_blk_4way(ctx, dst, src, false);
-+}
-+
-+static inline void blowfish_enc_blk_xor_4way(struct bf_ctx *ctx, u8 *d=
+ asmlinkage void twofish_ctr_8way(struct twofish_ctx *ctx, u8 *dst,
+ 				 const u8 *src, le128 *iv);
+-EXPORT_SYMBOL_GPL(twofish_ctr_8way);
+=20
+ asmlinkage void twofish_xts_enc_8way(struct twofish_ctx *ctx, u8 *dst,
+ 				     const u8 *src, le128 *iv);
+-EXPORT_SYMBOL_GPL(twofish_xts_enc_8way);
+ asmlinkage void twofish_xts_dec_8way(struct twofish_ctx *ctx, u8 *dst,
+ 				     const u8 *src, le128 *iv);
+-EXPORT_SYMBOL_GPL(twofish_xts_dec_8way);
+=20
+ static inline void twofish_enc_blk_3way(struct twofish_ctx *ctx, u8 *d=
 st,
-+				      const u8 *src)
-+{
-+	__blowfish_enc_blk_4way(ctx, dst, src, true);
-+}
+ 					const u8 *src)
+@@ -77,19 +69,17 @@ static inline void twofish_enc_blk_3way(struct twof=
+ish_ctx *ctx, u8 *dst,
+ 	__twofish_enc_blk_3way(ctx, dst, src, false);
+ }
 =20
- static void blowfish_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8=
- *src)
+-void twofish_xts_enc(void *ctx, u128 *dst, const u128 *src, le128 *iv)
++static void twofish_xts_enc(void *ctx, u128 *dst, const u128 *src, le1=
+28 *iv)
  {
-diff --git a/arch/x86/include/asm/crypto/blowfish.h b/arch/x86/include/=
-asm/crypto/blowfish.h
-deleted file mode 100644
-index f097b2f..0000000
---- a/arch/x86/include/asm/crypto/blowfish.h
-+++ /dev/null
-@@ -1,43 +0,0 @@
--#ifndef ASM_X86_BLOWFISH_H
--#define ASM_X86_BLOWFISH_H
+ 	glue_xts_crypt_128bit_one(ctx, dst, src, iv,
+ 				  GLUE_FUNC_CAST(twofish_enc_blk));
+ }
+-EXPORT_SYMBOL_GPL(twofish_xts_enc);
+=20
+-void twofish_xts_dec(void *ctx, u128 *dst, const u128 *src, le128 *iv)
++static void twofish_xts_dec(void *ctx, u128 *dst, const u128 *src, le1=
+28 *iv)
+ {
+ 	glue_xts_crypt_128bit_one(ctx, dst, src, iv,
+ 				  GLUE_FUNC_CAST(twofish_dec_blk));
+ }
+-EXPORT_SYMBOL_GPL(twofish_xts_dec);
+=20
+=20
+ static const struct common_glue_ctx twofish_enc =3D {
+diff --git a/arch/x86/include/asm/crypto/twofish.h b/arch/x86/include/a=
+sm/crypto/twofish.h
+index e655c60..878c51c 100644
+--- a/arch/x86/include/asm/crypto/twofish.h
++++ b/arch/x86/include/asm/crypto/twofish.h
+@@ -28,20 +28,6 @@ asmlinkage void __twofish_enc_blk_3way(struct twofis=
+h_ctx *ctx, u8 *dst,
+ asmlinkage void twofish_dec_blk_3way(struct twofish_ctx *ctx, u8 *dst,
+ 				     const u8 *src);
+=20
+-/* 8-way parallel cipher functions */
+-asmlinkage void twofish_ecb_enc_8way(struct twofish_ctx *ctx, u8 *dst,
+-				     const u8 *src);
+-asmlinkage void twofish_ecb_dec_8way(struct twofish_ctx *ctx, u8 *dst,
+-				     const u8 *src);
+-asmlinkage void twofish_cbc_dec_8way(struct twofish_ctx *ctx, u8 *dst,
+-				     const u8 *src);
+-asmlinkage void twofish_ctr_8way(struct twofish_ctx *ctx, u8 *dst,
+-				 const u8 *src, le128 *iv);
+-asmlinkage void twofish_xts_enc_8way(struct twofish_ctx *ctx, u8 *dst,
+-				     const u8 *src, le128 *iv);
+-asmlinkage void twofish_xts_dec_8way(struct twofish_ctx *ctx, u8 *dst,
+-				     const u8 *src, le128 *iv);
 -
--#include <linux/crypto.h>
--#include <crypto/blowfish.h>
+ /* helpers from twofish_x86_64-3way module */
+ extern void twofish_dec_blk_cbc_3way(void *ctx, u128 *dst, const u128 =
+*src);
+ extern void twofish_enc_blk_ctr(void *ctx, u128 *dst, const u128 *src,
+@@ -57,8 +43,4 @@ extern void lrw_twofish_exit_tfm(struct crypto_tfm *t=
+fm);
+ extern int xts_twofish_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 			      unsigned int keylen);
+=20
+-/* helpers from twofish-avx module */
+-extern void twofish_xts_enc(void *ctx, u128 *dst, const u128 *src, le1=
+28 *iv);
+-extern void twofish_xts_dec(void *ctx, u128 *dst, const u128 *src, le1=
+28 *iv);
 -
--#define BF_PARALLEL_BLOCKS 4
--
--/* regular block cipher functions */
--asmlinkage void __blowfish_enc_blk(struct bf_ctx *ctx, u8 *dst, const =
-u8 *src,
--				   bool xor);
--asmlinkage void blowfish_dec_blk(struct bf_ctx *ctx, u8 *dst, const u8=
- *src);
--
--/* 4-way parallel cipher functions */
--asmlinkage void __blowfish_enc_blk_4way(struct bf_ctx *ctx, u8 *dst,
--					const u8 *src, bool xor);
--asmlinkage void blowfish_dec_blk_4way(struct bf_ctx *ctx, u8 *dst,
--				      const u8 *src);
--
--static inline void blowfish_enc_blk(struct bf_ctx *ctx, u8 *dst, const=
- u8 *src)
--{
--	__blowfish_enc_blk(ctx, dst, src, false);
--}
--
--static inline void blowfish_enc_blk_xor(struct bf_ctx *ctx, u8 *dst,
--					const u8 *src)
--{
--	__blowfish_enc_blk(ctx, dst, src, true);
--}
--
--static inline void blowfish_enc_blk_4way(struct bf_ctx *ctx, u8 *dst,
--					 const u8 *src)
--{
--	__blowfish_enc_blk_4way(ctx, dst, src, false);
--}
--
--static inline void blowfish_enc_blk_xor_4way(struct bf_ctx *ctx, u8 *d=
-st,
--				      const u8 *src)
--{
--	__blowfish_enc_blk_4way(ctx, dst, src, true);
--}
--
--#endif
+ #endif /* ASM_X86_TWOFISH_H */
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index d1ca631..4ef0ee7 100644
+index 4ef0ee7..904ffe8 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -839,24 +839,6 @@ config CRYPTO_BLOWFISH_X86_64
+@@ -1297,30 +1297,6 @@ config CRYPTO_TWOFISH_AVX_X86_64
  	  See also:
- 	  <http://www.schneier.com/blowfish.html>
+ 	  <http://www.schneier.com/twofish.html>
 =20
--config CRYPTO_BLOWFISH_AVX2_X86_64
--	tristate "Blowfish cipher algorithm (x86_64/AVX2)"
+-config CRYPTO_TWOFISH_AVX2_X86_64
+-	tristate "Twofish cipher algorithm (x86_64/AVX2)"
 -	depends on X86 && 64BIT
 -	select CRYPTO_ALGAPI
 -	select CRYPTO_CRYPTD
 -	select CRYPTO_ABLK_HELPER_X86
--	select CRYPTO_BLOWFISH_COMMON
--	select CRYPTO_BLOWFISH_X86_64
+-	select CRYPTO_GLUE_HELPER_X86
+-	select CRYPTO_TWOFISH_COMMON
+-	select CRYPTO_TWOFISH_X86_64
+-	select CRYPTO_TWOFISH_X86_64_3WAY
+-	select CRYPTO_TWOFISH_AVX_X86_64
+-	select CRYPTO_LRW
+-	select CRYPTO_XTS
 -	help
--	  Blowfish cipher algorithm (x86_64/AVX2), by Bruce Schneier.
+-	  Twofish cipher algorithm (x86_64/AVX2).
 -
--	  This is a variable key length cipher which can use keys from 32
--	  bits to 448 bits in length.  It's fast, simple and specifically
--	  designed for use on "large microprocessors".
+-	  Twofish was submitted as an AES (Advanced Encryption Standard)
+-	  candidate cipher by researchers at CounterPane Systems.  It is a
+-	  16 round block cipher supporting key sizes of 128, 192, and 256
+-	  bits.
 -
 -	  See also:
--	  <http://www.schneier.com/blowfish.html>
+-	  <http://www.schneier.com/twofish.html>
 -
- config CRYPTO_CAMELLIA
- 	tristate "Camellia cipher algorithms"
- 	depends on CRYPTO
+ comment "Compression"
+=20
+ config CRYPTO_DEFLATE
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index f19a392..27f1118 100644
+index 27f1118..b2bc533 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
-@@ -1661,9 +1661,6 @@ static const struct alg_test_desc alg_test_descs[=
+@@ -1654,9 +1654,6 @@ static const struct alg_test_desc alg_test_descs[=
 ] =3D {
+ 		.alg =3D "__cbc-twofish-avx",
  		.test =3D alg_test_null,
- 		.fips_allowed =3D 1,
  	}, {
--		.alg =3D "__driver-cbc-blowfish-avx2",
+-		.alg =3D "__cbc-twofish-avx2",
 -		.test =3D alg_test_null,
 -	}, {
- 		.alg =3D "__driver-cbc-camellia-aesni",
- 		.test =3D alg_test_null,
- 	}, {
-@@ -1695,9 +1692,6 @@ static const struct alg_test_desc alg_test_descs[=
-] =3D {
+ 		.alg =3D "__driver-cbc-aes-aesni",
  		.test =3D alg_test_null,
  		.fips_allowed =3D 1,
- 	}, {
--		.alg =3D "__driver-ecb-blowfish-avx2",
--		.test =3D alg_test_null,
--	}, {
- 		.alg =3D "__driver-ecb-camellia-aesni",
+@@ -1685,9 +1682,6 @@ static const struct alg_test_desc alg_test_descs[=
+] =3D {
+ 		.alg =3D "__driver-cbc-twofish-avx",
  		.test =3D alg_test_null,
  	}, {
-@@ -1988,9 +1982,6 @@ static const struct alg_test_desc alg_test_descs[=
-] =3D {
+-		.alg =3D "__driver-cbc-twofish-avx2",
+-		.test =3D alg_test_null,
+-	}, {
+ 		.alg =3D "__driver-ecb-aes-aesni",
  		.test =3D alg_test_null,
  		.fips_allowed =3D 1,
- 	}, {
--		.alg =3D "cryptd(__driver-cbc-blowfish-avx2)",
--		.test =3D alg_test_null,
--	}, {
- 		.alg =3D "cryptd(__driver-cbc-camellia-aesni)",
+@@ -1716,9 +1710,6 @@ static const struct alg_test_desc alg_test_descs[=
+] =3D {
+ 		.alg =3D "__driver-ecb-twofish-avx",
  		.test =3D alg_test_null,
  	}, {
-@@ -2004,9 +1995,6 @@ static const struct alg_test_desc alg_test_descs[=
-] =3D {
+-		.alg =3D "__driver-ecb-twofish-avx2",
+-		.test =3D alg_test_null,
+-	}, {
+ 		.alg =3D "__ghash-pclmulqdqni",
  		.test =3D alg_test_null,
  		.fips_allowed =3D 1,
- 	}, {
--		.alg =3D "cryptd(__driver-ecb-blowfish-avx2)",
--		.test =3D alg_test_null,
--	}, {
- 		.alg =3D "cryptd(__driver-ecb-camellia-aesni)",
+@@ -2019,9 +2010,6 @@ static const struct alg_test_desc alg_test_descs[=
+] =3D {
+ 		.alg =3D "cryptd(__driver-ecb-twofish-avx)",
  		.test =3D alg_test_null,
  	}, {
+-		.alg =3D "cryptd(__driver-ecb-twofish-avx2)",
+-		.test =3D alg_test_null,
+-	}, {
+ 		.alg =3D "cryptd(__driver-gcm-aes-aesni)",
+ 		.test =3D alg_test_null,
+ 		.fips_allowed =3D 1,
