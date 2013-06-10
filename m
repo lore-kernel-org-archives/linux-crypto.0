@@ -1,86 +1,62 @@
-From: Akinobu Mita <akinobu.mita@gmail.com>
-Subject: Re: [PATCH 1/3] lib/scatterlist: introduce sg_pcopy_from_buffer() and sg_pcopy_to_buffer()
-Date: Sat, 8 Jun 2013 23:28:04 +0900
-Message-ID: <CAC5umyi0By0hd5RSvhODjdx=1ExAdigDaiGDu-tYD7t4s2FYGw@mail.gmail.com>
-References: <1370523178-5437-1-git-send-email-akinobu.mita@gmail.com>
-	<1370523178-5437-2-git-send-email-akinobu.mita@gmail.com>
-	<20130606210041.GD5045@htj.dyndns.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Fixes for 3.10
+Date: Mon, 10 Jun 2013 17:05:44 +0800
+Message-ID: <20130610090544.GA13465@gondor.apana.org.au>
+References: <20100903110722.GA31826@gondor.apana.org.au>
+ <20101215115035.GA25248@gondor.apana.org.au>
+ <20110216053911.GA10999@gondor.apana.org.au>
+ <20110328071322.GA6569@gondor.apana.org.au>
+ <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20130528055229.GA23937@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Imre Deak <imre.deak@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	"James E.J. Bottomley" <JBottomley@parallels.com>,
-	Douglas Gilbert <dgilbert@interlog.com>,
-	linux-scsi@vger.kernel.org
-To: Tejun Heo <tj@kernel.org>
-Return-path: <linux-scsi-owner@vger.kernel.org>
-In-Reply-To: <20130606210041.GD5045@htj.dyndns.org>
-Sender: linux-scsi-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:41828 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751910Ab3FJJFu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 10 Jun 2013 05:05:50 -0400
+Content-Disposition: inline
+In-Reply-To: <20130528055229.GA23937@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-2013/6/7 Tejun Heo <tj@kernel.org>:
-> Hello,
->
-> On Thu, Jun 06, 2013 at 09:52:56PM +0900, Akinobu Mita wrote:
->> +static bool sg_miter_get_next_page(struct sg_mapping_iter *miter)
->> +{
->> +     if (!miter->__remaining) {
->> +             struct scatterlist *sg;
->> +             unsigned long pgoffset;
->> +
->> +             if (!__sg_page_iter_next(&miter->piter))
->> +                     return false;
->> +
->> +             sg = miter->piter.sg;
->> +             pgoffset = miter->piter.sg_pgoffset;
->> +
->> +             miter->__offset = pgoffset ? 0 : sg->offset;
->> +             miter->__remaining = sg->offset + sg->length -
->> +                             (pgoffset << PAGE_SHIFT) - miter->__offset;
->> +             miter->__remaining = min_t(unsigned long, miter->__remaining,
->> +                                        PAGE_SIZE - miter->__offset);
->> +     }
->> +
->> +     return true;
->> +}
->
-> It'd be better if separating out this function is a separate patch.
-> Mixing factoring out something and adding new stuff makes the patch a
-> bit harder to read.
+Hi Linus:
 
-OK, sounds good. I'll do so in next version.
+This push fixes a build problem in sahara and temporarily disables
+two new optimisations because of performance regressions until a
+permanent fix is ready.
 
-But I feel sg_miter_get_next_page() is not very appropriate name, because
-it gets the next page only if necessary.  If I can find more appropriate name,
-I'll rename it.
+Please pull from
 
->> +static bool sg_miter_seek(struct sg_mapping_iter *miter, off_t offset)
->> +{
->> +     WARN_ON(miter->addr);
->> +
->> +     while (offset) {
->> +             off_t consumed;
->> +
->> +             if (!sg_miter_get_next_page(miter))
->> +                     return false;
->> +
->> +             consumed = min_t(off_t, offset, miter->__remaining);
->> +             miter->__offset += consumed;
->> +             miter->__remaining -= consumed;
->> +             offset -= consumed;
->> +     }
->> +
->> +     return true;
->> +}
->
-> While I think the above should work at the beginning, what if @miter
-> is in the middle of iteration and __remaining isn't zero?
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-sg_miter_seek() should work as far as it is called just after sg_miter_start(),
-or just after sg_miter_stop() in the middle of iteration (Although I only
-tested the former case).  I omitted a function comment in excuse of the static
-function, but I should write something I said above.
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Arnd Bergmann (1):
+      crypto: sahara - fix building as module
+
+Jussi Kivilinna (2):
+      crypto: twofish - disable AVX2 implementation
+      crypto: blowfish - disable AVX2 implementation
+
+ crypto/Kconfig          |    2 ++
+ drivers/crypto/sahara.c |    2 +-
+ 2 files changed, 3 insertions(+), 1 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
