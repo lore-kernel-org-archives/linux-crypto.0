@@ -1,8 +1,7 @@
 From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: [PATCH 4/4] crypto: testmgr - test hash implementations with
- unaligned buffers
-Date: Thu, 13 Jun 2013 17:37:55 +0300
-Message-ID: <20130613143755.31765.58282.stgit@localhost6.localdomain6>
+Subject: [PATCH 3/4] crypto: testmgr - test AEADs with unaligned buffers
+Date: Thu, 13 Jun 2013 17:37:50 +0300
+Message-ID: <20130613143750.31765.4558.stgit@localhost6.localdomain6>
 References: <20130613143740.31765.66518.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -11,16 +10,16 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from saarni.dnainternet.net ([83.102.40.136]:58861 "EHLO
-	saarni.dnainternet.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752642Ab3FMOiA (ORCPT
+Received: from sypressi.dnainternet.net ([83.102.40.135]:33887 "EHLO
+	sypressi.dnainternet.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752642Ab3FMOiv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Jun 2013 10:38:00 -0400
+	Thu, 13 Jun 2013 10:38:51 -0400
 In-Reply-To: <20130613143740.31765.66518.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds unaligned buffer tests for hashes.
+This patch adds unaligned buffer tests for AEADs.
 
 The first new test is with one byte offset and the second test checks if
 cra_alignmask for driver is big enough; for example, for testing a case
@@ -29,83 +28,95 @@ aligned to 16 bytes.
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 ---
- crypto/testmgr.c |   41 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 39 insertions(+), 2 deletions(-)
+ crypto/testmgr.c |   37 +++++++++++++++++++++++++++++++------
+ 1 file changed, 31 insertions(+), 6 deletions(-)
 
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index f205386..2f00607 100644
+index 8bd185f..f205386 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
-@@ -184,8 +184,9 @@ static int do_one_async_hash_op(struct ahash_request *req,
- 	return ret;
- }
+@@ -360,7 +360,7 @@ out_nobuf:
  
--static int test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
--		     unsigned int tcount, bool use_digest)
-+static int __test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
-+		       unsigned int tcount, bool use_digest,
-+		       const int align_offset)
+ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 		       struct aead_testvec *template, unsigned int tcount,
+-		       const bool diff_dst)
++		       const bool diff_dst, const int align_offset)
  {
- 	const char *algo = crypto_tfm_alg_driver_name(crypto_ahash_tfm(tfm));
- 	unsigned int i, j, k, temp;
-@@ -216,10 +217,15 @@ static int test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
- 		if (template[i].np)
- 			continue;
+ 	const char *algo = crypto_tfm_alg_driver_name(crypto_aead_tfm(tfm));
+ 	unsigned int i, j, k, n, temp;
+@@ -423,15 +423,16 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 		if (!template[i].np) {
+ 			j++;
  
-+		ret = -EINVAL;
-+		if (WARN_ON(align_offset + template[i].psize > PAGE_SIZE))
-+			goto out;
-+
- 		j++;
- 		memset(result, 0, 64);
+-			/* some tepmplates have no input data but they will
++			/* some templates have no input data but they will
+ 			 * touch input
+ 			 */
+ 			input = xbuf[0];
++			input += align_offset;
+ 			assoc = axbuf[0];
  
- 		hash_buff = xbuf[0];
-+		hash_buff += align_offset;
+ 			ret = -EINVAL;
+-			if (WARN_ON(template[i].ilen > PAGE_SIZE ||
+-				    template[i].alen > PAGE_SIZE))
++			if (WARN_ON(align_offset + template[i].ilen >
++				    PAGE_SIZE || template[i].alen > PAGE_SIZE))
+ 				goto out;
  
- 		memcpy(hash_buff, template[i].plaintext, template[i].psize);
- 		sg_init_one(&sg[0], hash_buff, template[i].psize);
-@@ -281,6 +287,10 @@ static int test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
+ 			memcpy(input, template[i].input, template[i].ilen);
+@@ -470,6 +471,7 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
  
- 	j = 0;
- 	for (i = 0; i < tcount; i++) {
+ 			if (diff_dst) {
+ 				output = xoutbuf[0];
++				output += align_offset;
+ 				sg_init_one(&sgout[0], output,
+ 					    template[i].ilen +
+ 						(enc ? authsize : 0));
+@@ -530,6 +532,10 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 	}
+ 
+ 	for (i = 0, j = 0; i < tcount; i++) {
 +		/* alignment tests are only done with continuous buffers */
 +		if (align_offset != 0)
 +			break;
 +
  		if (template[i].np) {
  			j++;
- 			memset(result, 0, 64);
-@@ -358,6 +368,33 @@ out_nobuf:
- 	return ret;
- }
  
-+static int test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
-+		     unsigned int tcount, bool use_digest)
-+{
+@@ -732,15 +738,34 @@ out_noxbuf:
+ static int test_aead(struct crypto_aead *tfm, int enc,
+ 		     struct aead_testvec *template, unsigned int tcount)
+ {
 +	unsigned int alignmask;
-+	int ret;
-+
-+	ret = __test_hash(tfm, template, tcount, use_digest, 0);
+ 	int ret;
+ 
+ 	/* test 'dst == src' case */
+-	ret = __test_aead(tfm, enc, template, tcount, false);
++	ret = __test_aead(tfm, enc, template, tcount, false, 0);
+ 	if (ret)
+ 		return ret;
+ 
+ 	/* test 'dst != src' case */
+-	return __test_aead(tfm, enc, template, tcount, true);
++	ret = __test_aead(tfm, enc, template, tcount, true, 0);
 +	if (ret)
 +		return ret;
 +
 +	/* test unaligned buffers, check with one byte offset */
-+	ret = __test_hash(tfm, template, tcount, use_digest, 1);
++	ret = __test_aead(tfm, enc, template, tcount, true, 1);
 +	if (ret)
 +		return ret;
 +
 +	alignmask = crypto_tfm_alg_alignmask(&tfm->base);
 +	if (alignmask) {
 +		/* Check if alignment mask for tfm is correctly set. */
-+		ret = __test_hash(tfm, template, tcount, use_digest,
++		ret = __test_aead(tfm, enc, template, tcount, true,
 +				  alignmask + 1);
 +		if (ret)
 +			return ret;
 +	}
 +
 +	return 0;
-+}
-+
- static int __test_aead(struct crypto_aead *tfm, int enc,
- 		       struct aead_testvec *template, unsigned int tcount,
- 		       const bool diff_dst, const int align_offset)
+ }
+ 
+ static int test_cipher(struct crypto_cipher *tfm, int enc,
