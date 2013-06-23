@@ -1,33 +1,65 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/4] crypto: testmgr - check that entries in
- alg_test_descs are in correct order
-Date: Fri, 21 Jun 2013 15:17:28 +0800
-Message-ID: <20130621071727.GD24151@gondor.apana.org.au>
-References: <20130613143740.31765.66518.stgit@localhost6.localdomain6>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:45542 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753883Ab3FUHRa (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Jun 2013 03:17:30 -0400
-Content-Disposition: inline
-In-Reply-To: <20130613143740.31765.66518.stgit@localhost6.localdomain6>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Akinobu Mita <akinobu.mita@gmail.com>
+Subject: [PATCH v3 0/4] introduce sg_pcopy_from_buffer() and sg_pcopy_to_buffer()
+Date: Sun, 23 Jun 2013 21:37:37 +0900
+Message-ID: <1371991061-19437-1-git-send-email-akinobu.mita@gmail.com>
+Cc: Akinobu Mita <akinobu.mita@gmail.com>, Tejun Heo <tj@kernel.org>,
+	Imre Deak <imre.deak@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	"James E.J. Bottomley" <JBottomley@parallels.com>,
+	Douglas Gilbert <dgilbert@interlog.com>,
+	linux-scsi@vger.kernel.org
+To: linux-kernel@vger.kernel.org, akpm@linux-foundation.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 13, 2013 at 05:37:40PM +0300, Jussi Kivilinna wrote:
-> Patch adds check for alg_test_descs list order, so that accidentically
-> misplaced entries are found quicker. Duplicate entries are also checked for.
-> 
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+This patch set introduces sg_pcopy_from_buffer() and sg_pcopy_to_buffer(),
+which copy data between a linear buffer and an SG list.
 
-All applied.  Thanks!
+The only difference between sg_pcopy_{from,to}_buffer() and
+sg_copy_{from,to}_buffer() is an additional argument that specifies
+the number of bytes to skip the SG list before copying.
+
+The main reason for introducing these functions is to fix a problem
+in scsi_debug module.  And there is a local function in crypto/talitos
+module, which can be replaced by sg_pcopy_to_buffer().
+
+* Changes from v2
+- Add Acked-by line
+- Rename sg_miter_seek() to sg_miter_skip()
+- Remove the restriction on when sg_miter_skip() can be called
+
+* Changes from v1
+- Separate the change that factors out sg_miter_get_next_page() from
+  the patch "introduce sg_pcopy_from_buffer() and sg_pcopy_to_buffer()"
+- Add function comment for internal function sg_miter_seek()
+- Simplify the assignment of sdb->resid in fill_from_dev_buffer() in
+  scsi_debug
+
+Akinobu Mita (4):
+  lib/scatterlist: factor out sg_miter_get_next_page() from
+    sg_miter_next()
+  lib/scatterlist: introduce sg_pcopy_from_buffer() and
+    sg_pcopy_to_buffer()
+  crypto: talitos: use sg_pcopy_to_buffer()
+  scsi_debug: fix do_device_access() with wrap around range
+
+ drivers/crypto/talitos.c    |  60 +--------------------
+ drivers/scsi/scsi_debug.c   |  48 +++++++++++++----
+ include/linux/scatterlist.h |   5 ++
+ lib/scatterlist.c           | 127 +++++++++++++++++++++++++++++++++++++-------
+ 4 files changed, 150 insertions(+), 90 deletions(-)
+
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Imre Deak <imre.deak@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: "James E.J. Bottomley" <JBottomley@parallels.com>
+Cc: Douglas Gilbert <dgilbert@interlog.com>
+Cc: linux-scsi@vger.kernel.org
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.1.4
