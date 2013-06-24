@@ -1,49 +1,50 @@
-From: Daniel Borkmann <dborkman@redhat.com>
-Subject: Re: [PATCH crypto] crypto: algboss: fix NULL pointer dereference
- in cryptomgr_probe
-Date: Mon, 24 Jun 2013 16:33:06 +0200
-Message-ID: <51C858A2.40801@redhat.com>
-References: <1371715221-27192-1-git-send-email-dborkman@redhat.com> <20130624135943.GA11776@gondor.apana.org.au>
+From: Tejun Heo <tj@kernel.org>
+Subject: Re: [PATCH v3 2/4] lib/scatterlist: introduce sg_pcopy_from_buffer()
+ and sg_pcopy_to_buffer()
+Date: Mon, 24 Jun 2013 16:27:53 -0700
+Message-ID: <20130624232753.GQ1918@mtj.dyndns.org>
+References: <1371991061-19437-1-git-send-email-akinobu.mita@gmail.com>
+ <1371991061-19437-3-git-send-email-akinobu.mita@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
+	Imre Deak <imre.deak@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	"James E.J. Bottomley" <JBottomley@parallels.com>,
+	Douglas Gilbert <dgilbert@interlog.com>,
+	linux-scsi@vger.kernel.org
+To: Akinobu Mita <akinobu.mita@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58982 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751072Ab3FXOdN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Jun 2013 10:33:13 -0400
-In-Reply-To: <20130624135943.GA11776@gondor.apana.org.au>
+Received: from mail-qc0-f181.google.com ([209.85.216.181]:57434 "EHLO
+	mail-qc0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751856Ab3FXX2A (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 24 Jun 2013 19:28:00 -0400
+Content-Disposition: inline
+In-Reply-To: <1371991061-19437-3-git-send-email-akinobu.mita@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 06/24/2013 03:59 PM, Herbert Xu wrote:
-...
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Mon Jun 24 21:57:42 2013 +0800
->
->      crypto: algboss - Hold ref count on larval
->
-...
->
->      The use of wait_for_completion_interruptible is intentional so that
->      we don't lock up the thread if a bug causes us to never wake up.
->
->      This bug is caused by the helper thread using the larval without
->      holding a reference count on it.  If the helper thread completes
->      after the original thread requesting for help has gone away and
->      destroyed the larval, then we get the crash above.
->
->      So the fix is to hold a reference count on the larval.
->
->      Cc: <stable@vger.kernel.org> # 3.6+
->      Reported-by: Daniel Borkmann <dborkman@redhat.com>
->      Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Sun, Jun 23, 2013 at 09:37:39PM +0900, Akinobu Mita wrote:
+> The only difference between sg_pcopy_{from,to}_buffer() and
+> sg_copy_{from,to}_buffer() is an additional argument that specifies
+> the number of bytes to skip the SG list before copying.
+> 
+> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Imre Deak <imre.deak@intel.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: "James E.J. Bottomley" <JBottomley@parallels.com>
+> Cc: Douglas Gilbert <dgilbert@interlog.com>
+> Cc: linux-scsi@vger.kernel.org
 
-Tested-by: Daniel Borkmann <dborkman@redhat.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 
-This fixes the panic for me with the reproducer I sent off-list.
+Thanks.
 
-Thanks Herbert !
+-- 
+tejun
