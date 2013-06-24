@@ -1,191 +1,197 @@
-From: Akinobu Mita <akinobu.mita@gmail.com>
-Subject: [PATCH v3 2/4] lib/scatterlist: introduce sg_pcopy_from_buffer() and sg_pcopy_to_buffer()
-Date: Sun, 23 Jun 2013 21:37:39 +0900
-Message-ID: <1371991061-19437-3-git-send-email-akinobu.mita@gmail.com>
-References: <1371991061-19437-1-git-send-email-akinobu.mita@gmail.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>, Tejun Heo <tj@kernel.org>,
-	Imre Deak <imre.deak@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	"James E.J. Bottomley" <JBottomley@parallels.com>,
-	Douglas Gilbert <dgilbert@interlog.com>,
-	linux-scsi@vger.kernel.org
-To: linux-kernel@vger.kernel.org, akpm@linux-foundation.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1371991061-19437-1-git-send-email-akinobu.mita@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH crypto] crypto: algboss: fix NULL pointer dereference
+ in cryptomgr_probe
+Date: Mon, 24 Jun 2013 21:59:43 +0800
+Message-ID: <20130624135943.GA11776@gondor.apana.org.au>
+References: <1371715221-27192-1-git-send-email-dborkman@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org
+To: Daniel Borkmann <dborkman@redhat.com>
+Return-path: <netdev-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1371715221-27192-1-git-send-email-dborkman@redhat.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The only difference between sg_pcopy_{from,to}_buffer() and
-sg_copy_{from,to}_buffer() is an additional argument that specifies
-the number of bytes to skip the SG list before copying.
+Hi Daniel:
 
-Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Imre Deak <imre.deak@intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: "James E.J. Bottomley" <JBottomley@parallels.com>
-Cc: Douglas Gilbert <dgilbert@interlog.com>
-Cc: linux-scsi@vger.kernel.org
----
+Can you see if this patch helps?
 
-* Changes from v2
-- Rename sg_miter_seek() to sg_miter_skip()
-- Remove the restriction on when sg_miter_skip() can be called
+commit f2baa471deead85e3285f23032609cd7bd52f197
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Mon Jun 24 21:57:42 2013 +0800
 
- include/linux/scatterlist.h |  5 +++
- lib/scatterlist.c           | 88 ++++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 88 insertions(+), 5 deletions(-)
+    crypto: algboss - Hold ref count on larval
+    
+    On Thu, Jun 20, 2013 at 10:00:21AM +0200, Daniel Borkmann wrote:
+    > After having fixed a NULL pointer dereference in SCTP 1abd165e ("net:
+    > sctp: fix NULL pointer dereference in socket destruction"), I ran into
+    > the following NULL pointer dereference in the crypto subsystem with
+    > the same reproducer, easily hit each time:
+    >
+    > BUG: unable to handle kernel NULL pointer dereference at (null)
+    > IP: [<ffffffff81070321>] __wake_up_common+0x31/0x90
+    > PGD 0
+    > Oops: 0000 [#1] SMP
+    > Modules linked in: padlock_sha(F-) sha256_generic(F) sctp(F) libcrc32c(F) [..]
+    > CPU: 6 PID: 3326 Comm: cryptomgr_probe Tainted: GF            3.10.0-rc5+ #1
+    > Hardware name: Dell Inc. PowerEdge T410/0H19HD, BIOS 1.6.3 02/01/2011
+    > task: ffff88007b6cf4e0 ti: ffff88007b7cc000 task.ti: ffff88007b7cc000
+    > RIP: 0010:[<ffffffff81070321>]  [<ffffffff81070321>] __wake_up_common+0x31/0x90
+    > RSP: 0018:ffff88007b7cde08  EFLAGS: 00010082
+    > RAX: ffffffffffffffe8 RBX: ffff88003756c130 RCX: 0000000000000000
+    > RDX: 0000000000000000 RSI: 0000000000000003 RDI: ffff88003756c130
+    > RBP: ffff88007b7cde48 R08: 0000000000000000 R09: ffff88012b173200
+    > R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000282
+    > R13: ffff88003756c138 R14: 0000000000000000 R15: 0000000000000000
+    > FS:  0000000000000000(0000) GS:ffff88012fc60000(0000) knlGS:0000000000000000
+    > CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+    > CR2: 0000000000000000 CR3: 0000000001a0b000 CR4: 00000000000007e0
+    > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    > DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+    > Stack:
+    >  ffff88007b7cde28 0000000300000000 ffff88007b7cde28 ffff88003756c130
+    >  0000000000000282 ffff88003756c128 ffffffff81227670 0000000000000000
+    >  ffff88007b7cde78 ffffffff810722b7 ffff88007cdcf000 ffffffff81a90540
+    > Call Trace:
+    >  [<ffffffff81227670>] ? crypto_alloc_pcomp+0x20/0x20
+    >  [<ffffffff810722b7>] complete_all+0x47/0x60
+    >  [<ffffffff81227708>] cryptomgr_probe+0x98/0xc0
+    >  [<ffffffff81227670>] ? crypto_alloc_pcomp+0x20/0x20
+    >  [<ffffffff8106760e>] kthread+0xce/0xe0
+    >  [<ffffffff81067540>] ? kthread_freezable_should_stop+0x70/0x70
+    >  [<ffffffff815450dc>] ret_from_fork+0x7c/0xb0
+    >  [<ffffffff81067540>] ? kthread_freezable_should_stop+0x70/0x70
+    > Code: 41 56 41 55 41 54 53 48 83 ec 18 66 66 66 66 90 89 75 cc 89 55 c8
+    >       4c 8d 6f 08 48 8b 57 08 41 89 cf 4d 89 c6 48 8d 42 e
+    > RIP  [<ffffffff81070321>] __wake_up_common+0x31/0x90
+    >  RSP <ffff88007b7cde08>
+    > CR2: 0000000000000000
+    > ---[ end trace b495b19270a4d37e ]---
+    >
+    > My assumption is that the following is happening: the minimal SCTP
+    > tool runs under ``echo 1 > /proc/sys/net/sctp/auth_enable'', hence
+    > it's making use of crypto_alloc_hash() via sctp_auth_init_hmacs().
+    > It forks itself, heavily allocates, binds, listens and waits in
+    > accept on sctp sockets, and then randomly kills some of them (no
+    > need for an actual client in this case to hit this). Then, again,
+    > allocating, binding, etc, and then killing child processes.
+    >
+    > The problem that might be happening here is that cryptomgr requests
+    > the module to probe/load through cryptomgr_schedule_probe(), but
+    > before the thread handler cryptomgr_probe() returns, we return from
+    > the wait_for_completion_interruptible() function and probably already
+    > have cleared up larval, thus we run into a NULL pointer dereference
+    > when in cryptomgr_probe() complete_all() is being called.
+    >
+    > If we wait with wait_for_completion() instead, this panic will not
+    > occur anymore. This is valid, because in case a signal is pending,
+    > cryptomgr_probe() returns from probing anyway with properly calling
+    > complete_all().
+    
+    The use of wait_for_completion_interruptible is intentional so that
+    we don't lock up the thread if a bug causes us to never wake up.
+    
+    This bug is caused by the helper thread using the larval without
+    holding a reference count on it.  If the helper thread completes
+    after the original thread requesting for help has gone away and
+    destroyed the larval, then we get the crash above.
+    
+    So the fix is to hold a reference count on the larval.
+    
+    Cc: <stable@vger.kernel.org> # 3.6+
+    Reported-by: Daniel Borkmann <dborkman@redhat.com>
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index 2680677..adae88f 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -244,6 +244,11 @@ size_t sg_copy_from_buffer(struct scatterlist *sgl, unsigned int nents,
- size_t sg_copy_to_buffer(struct scatterlist *sgl, unsigned int nents,
- 			 void *buf, size_t buflen);
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index 769219b..76fc0b2 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -45,10 +45,9 @@ struct cryptomgr_param {
+ 		} nu32;
+ 	} attrs[CRYPTO_MAX_ATTRS];
  
-+size_t sg_pcopy_from_buffer(struct scatterlist *sgl, unsigned int nents,
-+			    void *buf, size_t buflen, off_t skip);
-+size_t sg_pcopy_to_buffer(struct scatterlist *sgl, unsigned int nents,
-+			  void *buf, size_t buflen, off_t skip);
-+
- /*
-  * Maximum number of entries that will be allocated in one piece, if
-  * a list larger than this is required then chaining will be utilized.
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index c35b929..129a82f 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -476,6 +476,43 @@ static bool sg_miter_get_next_page(struct sg_mapping_iter *miter)
+-	char larval[CRYPTO_MAX_ALG_NAME];
+ 	char template[CRYPTO_MAX_ALG_NAME];
+ 
+-	struct completion *completion;
++	struct crypto_larval *larval;
+ 
+ 	u32 otype;
+ 	u32 omask;
+@@ -87,7 +86,8 @@ static int cryptomgr_probe(void *data)
+ 	crypto_tmpl_put(tmpl);
+ 
+ out:
+-	complete_all(param->completion);
++	complete_all(&param->larval->completion);
++	crypto_alg_put(&param->larval->alg);
+ 	kfree(param);
+ 	module_put_and_exit(0);
  }
+@@ -187,18 +187,19 @@ static int cryptomgr_schedule_probe(struct crypto_larval *larval)
+ 	param->otype = larval->alg.cra_flags;
+ 	param->omask = larval->mask;
  
- /**
-+ * sg_miter_skip - reposition mapping iterator
-+ * @miter: sg mapping iter to be skipped
-+ * @offset: number of bytes to plus the current location
-+ *
-+ * Description:
-+ *   Sets the offset of @miter to its current location plus @offset bytes.
-+ *   If mapping iterator @miter has been proceeded by sg_miter_next(), this
-+ *   stops @miter.
-+ *
-+ * Context:
-+ *   Don't care if @miter is stopped, or not proceeded yet.
-+ *   Otherwise, preemption disabled if the SG_MITER_ATOMIC is set.
-+ *
-+ * Returns:
-+ *   true if @miter contains the valid mapping.  false if end of sg
-+ *   list is reached.
-+ */
-+static bool sg_miter_skip(struct sg_mapping_iter *miter, off_t offset)
+-	memcpy(param->larval, larval->alg.cra_name, CRYPTO_MAX_ALG_NAME);
+-
+-	param->completion = &larval->completion;
++	crypto_alg_get(&larval->alg);
++	param->larval = larval;
+ 
+ 	thread = kthread_run(cryptomgr_probe, param, "cryptomgr_probe");
+ 	if (IS_ERR(thread))
+-		goto err_free_param;
++		goto err_put_larval;
+ 
+ 	wait_for_completion_interruptible(&larval->completion);
+ 
+ 	return NOTIFY_STOP;
+ 
++err_put_larval:
++	crypto_alg_put(&larval->alg);
+ err_free_param:
+ 	kfree(param);
+ err_put_module:
+diff --git a/crypto/api.c b/crypto/api.c
+index 033a714..3b61803 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -34,12 +34,6 @@ EXPORT_SYMBOL_GPL(crypto_alg_sem);
+ BLOCKING_NOTIFIER_HEAD(crypto_chain);
+ EXPORT_SYMBOL_GPL(crypto_chain);
+ 
+-static inline struct crypto_alg *crypto_alg_get(struct crypto_alg *alg)
+-{
+-	atomic_inc(&alg->cra_refcnt);
+-	return alg;
+-}
+-
+ struct crypto_alg *crypto_mod_get(struct crypto_alg *alg)
+ {
+ 	return try_module_get(alg->cra_module) ? crypto_alg_get(alg) : NULL;
+diff --git a/crypto/internal.h b/crypto/internal.h
+index 9ebedae..bd39bfc 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -103,6 +103,12 @@ int crypto_register_notifier(struct notifier_block *nb);
+ int crypto_unregister_notifier(struct notifier_block *nb);
+ int crypto_probing_notify(unsigned long val, void *v);
+ 
++static inline struct crypto_alg *crypto_alg_get(struct crypto_alg *alg)
 +{
-+	sg_miter_stop(miter);
-+
-+	while (offset) {
-+		off_t consumed;
-+
-+		if (!sg_miter_get_next_page(miter))
-+			return false;
-+
-+		consumed = min_t(off_t, offset, miter->__remaining);
-+		miter->__offset += consumed;
-+		miter->__remaining -= consumed;
-+		offset -= consumed;
-+	}
-+
-+	return true;
++	atomic_inc(&alg->cra_refcnt);
++	return alg;
 +}
 +
-+/**
-  * sg_miter_next - proceed mapping iterator to the next mapping
-  * @miter: sg mapping iter to proceed
-  *
-@@ -561,14 +598,16 @@ EXPORT_SYMBOL(sg_miter_stop);
-  * @nents:		 Number of SG entries
-  * @buf:		 Where to copy from
-  * @buflen:		 The number of bytes to copy
-- * @to_buffer: 		 transfer direction (non zero == from an sg list to a
-- * 			 buffer, 0 == from a buffer to an sg list
-+ * @skip:		 Number of bytes to skip before copying
-+ * @to_buffer:		 transfer direction (true == from an sg list to a
-+ *			 buffer, false == from a buffer to an sg list
-  *
-  * Returns the number of copied bytes.
-  *
-  **/
- static size_t sg_copy_buffer(struct scatterlist *sgl, unsigned int nents,
--			     void *buf, size_t buflen, int to_buffer)
-+			     void *buf, size_t buflen, off_t skip,
-+			     bool to_buffer)
+ static inline void crypto_alg_put(struct crypto_alg *alg)
  {
- 	unsigned int offset = 0;
- 	struct sg_mapping_iter miter;
-@@ -582,6 +621,9 @@ static size_t sg_copy_buffer(struct scatterlist *sgl, unsigned int nents,
- 
- 	sg_miter_start(&miter, sgl, nents, sg_flags);
- 
-+	if (!sg_miter_skip(&miter, skip))
-+		return false;
-+
- 	local_irq_save(flags);
- 
- 	while (sg_miter_next(&miter) && offset < buflen) {
-@@ -616,7 +658,7 @@ static size_t sg_copy_buffer(struct scatterlist *sgl, unsigned int nents,
- size_t sg_copy_from_buffer(struct scatterlist *sgl, unsigned int nents,
- 			   void *buf, size_t buflen)
- {
--	return sg_copy_buffer(sgl, nents, buf, buflen, 0);
-+	return sg_copy_buffer(sgl, nents, buf, buflen, 0, false);
- }
- EXPORT_SYMBOL(sg_copy_from_buffer);
- 
-@@ -633,6 +675,42 @@ EXPORT_SYMBOL(sg_copy_from_buffer);
- size_t sg_copy_to_buffer(struct scatterlist *sgl, unsigned int nents,
- 			 void *buf, size_t buflen)
- {
--	return sg_copy_buffer(sgl, nents, buf, buflen, 1);
-+	return sg_copy_buffer(sgl, nents, buf, buflen, 0, true);
- }
- EXPORT_SYMBOL(sg_copy_to_buffer);
-+
-+/**
-+ * sg_pcopy_from_buffer - Copy from a linear buffer to an SG list
-+ * @sgl:		 The SG list
-+ * @nents:		 Number of SG entries
-+ * @buf:		 Where to copy from
-+ * @skip:		 Number of bytes to skip before copying
-+ * @buflen:		 The number of bytes to copy
-+ *
-+ * Returns the number of copied bytes.
-+ *
-+ **/
-+size_t sg_pcopy_from_buffer(struct scatterlist *sgl, unsigned int nents,
-+			    void *buf, size_t buflen, off_t skip)
-+{
-+	return sg_copy_buffer(sgl, nents, buf, buflen, skip, false);
-+}
-+EXPORT_SYMBOL(sg_pcopy_from_buffer);
-+
-+/**
-+ * sg_pcopy_to_buffer - Copy from an SG list to a linear buffer
-+ * @sgl:		 The SG list
-+ * @nents:		 Number of SG entries
-+ * @buf:		 Where to copy to
-+ * @skip:		 Number of bytes to skip before copying
-+ * @buflen:		 The number of bytes to copy
-+ *
-+ * Returns the number of copied bytes.
-+ *
-+ **/
-+size_t sg_pcopy_to_buffer(struct scatterlist *sgl, unsigned int nents,
-+			  void *buf, size_t buflen, off_t skip)
-+{
-+	return sg_copy_buffer(sgl, nents, buf, buflen, skip, true);
-+}
-+EXPORT_SYMBOL(sg_pcopy_to_buffer);
+ 	if (atomic_dec_and_test(&alg->cra_refcnt) && alg->cra_destroy)
+
+Thanks,
 -- 
-1.8.1.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
