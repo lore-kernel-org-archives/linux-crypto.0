@@ -1,7 +1,7 @@
 From: Fabio Baltieri <fabio.baltieri@linaro.org>
-Subject: [PATCH 1/6] crypto: ux500/hash: use readl on iomem addresses
-Date: Tue, 25 Jun 2013 10:54:44 +0200
-Message-ID: <1372150489-25594-2-git-send-email-fabio.baltieri@linaro.org>
+Subject: [PATCH 2/6] crypto: ux500/hash: add missing static qualifiers
+Date: Tue, 25 Jun 2013 10:54:45 +0200
+Message-ID: <1372150489-25594-3-git-send-email-fabio.baltieri@linaro.org>
 References: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
 Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -9,108 +9,47 @@ Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Lee Jones <lee.jones@linaro.org>,
 	Fabio Baltieri <fabio.baltieri@linaro.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ea0-f169.google.com ([209.85.215.169]:57544 "EHLO
+	mail-ea0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752227Ab3FYIzo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Jun 2013 04:55:44 -0400
+Received: by mail-ea0-f169.google.com with SMTP id h15so6616235eak.14
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2013 01:55:43 -0700 (PDT)
 In-Reply-To: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Always use readl when reading memory mapped registers.
+Add missing static qualifiers to hash_process_data and hash_hw_final.
 
 Signed-off-by: Fabio Baltieri <fabio.baltieri@linaro.org>
 ---
- drivers/crypto/ux500/hash/hash_core.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ drivers/crypto/ux500/hash/hash_core.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index f89fe8a..154f437 100644
+index 154f437..dbf7b63 100644
 --- a/drivers/crypto/ux500/hash/hash_core.c
 +++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -473,12 +473,12 @@ static void hash_hw_write_key(struct hash_device_data *device_data,
- 		HASH_SET_DIN(&word, nwords);
- 	}
- 
--	while (device_data->base->str & HASH_STR_DCAL_MASK)
-+	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
- 		cpu_relax();
- 
- 	HASH_SET_DCAL;
- 
--	while (device_data->base->str & HASH_STR_DCAL_MASK)
-+	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
- 		cpu_relax();
+@@ -792,8 +792,7 @@ void hash_begin(struct hash_device_data *device_data, struct hash_ctx *ctx)
+ 	HASH_CLEAR_BITS(&device_data->base->str, HASH_STR_NBLW_MASK);
  }
  
-@@ -661,7 +661,7 @@ static void hash_messagepad(struct hash_device_data *device_data,
- 	if (index_bytes)
- 		HASH_SET_DIN(message, nwords);
- 
--	while (device_data->base->str & HASH_STR_DCAL_MASK)
-+	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
- 		cpu_relax();
- 
- 	/* num_of_bytes == 0 => NBLW <- 0 (32 bits valid in DATAIN) */
-@@ -676,7 +676,7 @@ static void hash_messagepad(struct hash_device_data *device_data,
- 			(int)(readl_relaxed(&device_data->base->str) &
- 				HASH_STR_NBLW_MASK));
- 
--	while (device_data->base->str & HASH_STR_DCAL_MASK)
-+	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
- 		cpu_relax();
- }
- 
-@@ -776,7 +776,7 @@ void hash_begin(struct hash_device_data *device_data, struct hash_ctx *ctx)
- 	/* HW and SW initializations */
- 	/* Note: there is no need to initialize buffer and digest members */
- 
--	while (device_data->base->str & HASH_STR_DCAL_MASK)
-+	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
- 		cpu_relax();
- 
- 	/*
-@@ -962,7 +962,7 @@ static int hash_dma_final(struct ahash_request *req)
- 	wait_for_completion(&ctx->device->dma.complete);
- 	hash_dma_done(ctx);
- 
--	while (device_data->base->str & HASH_STR_DCAL_MASK)
-+	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
- 		cpu_relax();
- 
- 	if (ctx->config.oper_mode == HASH_OPER_MODE_HMAC && ctx->key) {
-@@ -1060,7 +1060,7 @@ int hash_hw_final(struct ahash_request *req)
- 				req_ctx->state.index);
- 	} else {
- 		HASH_SET_DCAL;
--		while (device_data->base->str & HASH_STR_DCAL_MASK)
-+		while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
- 			cpu_relax();
- 	}
- 
-@@ -1189,7 +1189,7 @@ int hash_resume_state(struct hash_device_data *device_data,
- 	temp_cr = device_state->temp_cr;
- 	writel_relaxed(temp_cr & HASH_CR_RESUME_MASK, &device_data->base->cr);
- 
--	if (device_data->base->cr & HASH_CR_MODE_MASK)
-+	if (readl(&device_data->base->cr) & HASH_CR_MODE_MASK)
- 		hash_mode = HASH_OPER_MODE_HMAC;
- 	else
- 		hash_mode = HASH_OPER_MODE_HASH;
-@@ -1233,7 +1233,7 @@ int hash_save_state(struct hash_device_data *device_data,
- 	 * actually makes sure that there isn't any ongoing calculation in the
- 	 * hardware.
- 	 */
--	while (device_data->base->str & HASH_STR_DCAL_MASK)
-+	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
- 		cpu_relax();
- 
- 	temp_cr = readl_relaxed(&device_data->base->cr);
-@@ -1242,7 +1242,7 @@ int hash_save_state(struct hash_device_data *device_data,
- 
- 	device_state->din_reg = readl_relaxed(&device_data->base->din);
- 
--	if (device_data->base->cr & HASH_CR_MODE_MASK)
-+	if (readl(&device_data->base->cr) & HASH_CR_MODE_MASK)
- 		hash_mode = HASH_OPER_MODE_HMAC;
- 	else
- 		hash_mode = HASH_OPER_MODE_HASH;
+-int hash_process_data(
+-		struct hash_device_data *device_data,
++static int hash_process_data(struct hash_device_data *device_data,
+ 		struct hash_ctx *ctx, struct hash_req_ctx *req_ctx,
+ 		int msg_length, u8 *data_buffer, u8 *buffer, u8 *index)
+ {
+@@ -992,7 +991,7 @@ out:
+  * hash_hw_final - The final hash calculation function
+  * @req:	The hash request for the job.
+  */
+-int hash_hw_final(struct ahash_request *req)
++static int hash_hw_final(struct ahash_request *req)
+ {
+ 	int ret = 0;
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
 -- 
 1.8.2
