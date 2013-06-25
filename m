@@ -1,56 +1,40 @@
-From: Fabio Baltieri <fabio.baltieri@linaro.org>
-Subject: [PATCH 3/6] crypto: ux500/crypt: add missing __iomem qualifiers
-Date: Tue, 25 Jun 2013 10:54:46 +0200
-Message-ID: <1372150489-25594-4-git-send-email-fabio.baltieri@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH 0/6] Various ux500 crypto updates
+Date: Tue, 25 Jun 2013 11:20:50 +0200
+Message-ID: <CACRpkdYgZ5ZSwDBfV8FRRqGcv09JiFyNq18vqO_dbxbhJ6_x4w@mail.gmail.com>
 References: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Lee Jones <lee.jones@linaro.org>,
-	Fabio Baltieri <fabio.baltieri@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ea0-f176.google.com ([209.85.215.176]:42652 "EHLO
-	mail-ea0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752844Ab3FYIzs (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Jun 2013 04:55:48 -0400
-Received: by mail-ea0-f176.google.com with SMTP id z15so6627717ead.35
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2013 01:55:47 -0700 (PDT)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Lee Jones <lee.jones@linaro.org>
+To: Fabio Baltieri <fabio.baltieri@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add missing __iomem to struct cryp_register pointers, this solve some
-"incorrect type in initializer (different address spaces)" sparse
-warnings.
+On Tue, Jun 25, 2013 at 10:54 AM, Fabio Baltieri
+<fabio.baltieri@linaro.org> wrote:
 
-Signed-off-by: Fabio Baltieri <fabio.baltieri@linaro.org>
----
- drivers/crypto/ux500/cryp/cryp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> these are some fixes to issue pointed out by sparse and dmaengine API
+> udpates on the recently enabled ux500 hw crypto drivers.
 
-diff --git a/drivers/crypto/ux500/cryp/cryp.c b/drivers/crypto/ux500/cryp/cryp.c
-index 3eafa90..43a0c8a 100644
---- a/drivers/crypto/ux500/cryp/cryp.c
-+++ b/drivers/crypto/ux500/cryp/cryp.c
-@@ -291,7 +291,7 @@ void cryp_save_device_context(struct cryp_device_data *device_data,
- 			      int cryp_mode)
- {
- 	enum cryp_algo_mode algomode;
--	struct cryp_register *src_reg = device_data->base;
-+	struct cryp_register __iomem *src_reg = device_data->base;
- 	struct cryp_config *config =
- 		(struct cryp_config *)device_data->current_ctx;
- 
-@@ -349,7 +349,7 @@ void cryp_save_device_context(struct cryp_device_data *device_data,
- void cryp_restore_device_context(struct cryp_device_data *device_data,
- 				 struct cryp_device_context *ctx)
- {
--	struct cryp_register *reg = device_data->base;
-+	struct cryp_register __iomem *reg = device_data->base;
- 	struct cryp_config *config =
- 		(struct cryp_config *)device_data->current_ctx;
- 
--- 
-1.8.2
+The series:
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
+
+> These are based on recent linux-next, and can probably be applied on an
+> architecture specific branch with your ack, or just skip to the next
+> merge window.
+
+I think these depend on the DMA40 fixes that reside in the ARM SoC
+tree. If I get Herbert's ACK I can queue them.
+
+They will have to go through that tree or wait for the next merge
+window, I think they are not regressions so no hurry.
+
+Yours,
+Linus Walleij
