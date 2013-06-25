@@ -1,7 +1,7 @@
 From: Fabio Baltieri <fabio.baltieri@linaro.org>
-Subject: [PATCH 2/6] crypto: ux500/hash: add missing static qualifiers
-Date: Tue, 25 Jun 2013 10:54:45 +0200
-Message-ID: <1372150489-25594-3-git-send-email-fabio.baltieri@linaro.org>
+Subject: [PATCH 4/6] crypto: ux500: use dmaengine_device_control API
+Date: Tue, 25 Jun 2013 10:54:47 +0200
+Message-ID: <1372150489-25594-5-git-send-email-fabio.baltieri@linaro.org>
 References: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
 Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -9,47 +9,51 @@ Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Lee Jones <lee.jones@linaro.org>,
 	Fabio Baltieri <fabio.baltieri@linaro.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ea0-f169.google.com ([209.85.215.169]:57544 "EHLO
-	mail-ea0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752227Ab3FYIzo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Jun 2013 04:55:44 -0400
-Received: by mail-ea0-f169.google.com with SMTP id h15so6616235eak.14
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2013 01:55:43 -0700 (PDT)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add missing static qualifiers to hash_process_data and hash_hw_final.
+Use dmaengine_device_control inline function instead of going through the
+structures manually.
 
 Signed-off-by: Fabio Baltieri <fabio.baltieri@linaro.org>
 ---
- drivers/crypto/ux500/hash/hash_core.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
+ drivers/crypto/ux500/hash/hash_core.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index b675bbd..1957c18 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -607,12 +607,12 @@ static void cryp_dma_done(struct cryp_ctx *ctx)
+ 	dev_dbg(ctx->device->dev, "[%s]: ", __func__);
+ 
+ 	chan = ctx->device->dma.chan_mem2cryp;
+-	chan->device->device_control(chan, DMA_TERMINATE_ALL, 0);
++	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
+ 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_src,
+ 		     ctx->device->dma.sg_src_len, DMA_TO_DEVICE);
+ 
+ 	chan = ctx->device->dma.chan_cryp2mem;
+-	chan->device->device_control(chan, DMA_TERMINATE_ALL, 0);
++	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
+ 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_dst,
+ 		     ctx->device->dma.sg_dst_len, DMA_FROM_DEVICE);
+ }
 diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 154f437..dbf7b63 100644
+index dbf7b63..8c2817804 100644
 --- a/drivers/crypto/ux500/hash/hash_core.c
 +++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -792,8 +792,7 @@ void hash_begin(struct hash_device_data *device_data, struct hash_ctx *ctx)
- 	HASH_CLEAR_BITS(&device_data->base->str, HASH_STR_NBLW_MASK);
- }
+@@ -203,7 +203,7 @@ static void hash_dma_done(struct hash_ctx *ctx)
+ 	struct dma_chan *chan;
  
--int hash_process_data(
--		struct hash_device_data *device_data,
-+static int hash_process_data(struct hash_device_data *device_data,
- 		struct hash_ctx *ctx, struct hash_req_ctx *req_ctx,
- 		int msg_length, u8 *data_buffer, u8 *buffer, u8 *index)
- {
-@@ -992,7 +991,7 @@ out:
-  * hash_hw_final - The final hash calculation function
-  * @req:	The hash request for the job.
-  */
--int hash_hw_final(struct ahash_request *req)
-+static int hash_hw_final(struct ahash_request *req)
- {
- 	int ret = 0;
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	chan = ctx->device->dma.chan_mem2hash;
+-	chan->device->device_control(chan, DMA_TERMINATE_ALL, 0);
++	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
+ 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg,
+ 			ctx->device->dma.sg_len, DMA_TO_DEVICE);
+ 
 -- 
 1.8.2
