@@ -1,49 +1,116 @@
 From: Fabio Baltieri <fabio.baltieri@linaro.org>
-Subject: [PATCH 0/6] Various ux500 crypto updates
-Date: Tue, 25 Jun 2013 10:54:43 +0200
-Message-ID: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
+Subject: [PATCH 1/6] crypto: ux500/hash: use readl on iomem addresses
+Date: Tue, 25 Jun 2013 10:54:44 +0200
+Message-ID: <1372150489-25594-2-git-send-email-fabio.baltieri@linaro.org>
+References: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
 Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Linus Walleij <linus.walleij@linaro.org>,
 	Lee Jones <lee.jones@linaro.org>,
 	Fabio Baltieri <fabio.baltieri@linaro.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ea0-f176.google.com ([209.85.215.176]:51915 "EHLO
-	mail-ea0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751389Ab3FYIzH (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Jun 2013 04:55:07 -0400
-Received: by mail-ea0-f176.google.com with SMTP id z15so6547813ead.21
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2013 01:55:05 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello Herbert,
+Always use readl when reading memory mapped registers.
 
-these are some fixes to issue pointed out by sparse and dmaengine API
-udpates on the recently enabled ux500 hw crypto drivers.
+Signed-off-by: Fabio Baltieri <fabio.baltieri@linaro.org>
+---
+ drivers/crypto/ux500/hash/hash_core.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-These are based on recent linux-next, and can probably be applied on an
-architecture specific branch with your ack, or just skip to the next
-merge window.
-
-Thanks,
-Fabio
-
-
-Fabio Baltieri (6):
-  crypto: ux500/hash: use readl on iomem addresses
-  crypto: ux500/hash: add missing static qualifiers
-  crypto: ux500/crypt: add missing __iomem qualifiers
-  crypto: ux500: use dmaengine_device_control API
-  crypto: ux500: use dmaengine_prep_slave_sg API
-  crypto: ux500: use dmaengine_submit API
-
- drivers/crypto/ux500/cryp/cryp.c      |  4 ++--
- drivers/crypto/ux500/cryp/cryp_core.c | 26 +++++++++++++-------------
- drivers/crypto/ux500/hash/hash_core.c | 33 ++++++++++++++++-----------------
- 3 files changed, 31 insertions(+), 32 deletions(-)
-
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index f89fe8a..154f437 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -473,12 +473,12 @@ static void hash_hw_write_key(struct hash_device_data *device_data,
+ 		HASH_SET_DIN(&word, nwords);
+ 	}
+ 
+-	while (device_data->base->str & HASH_STR_DCAL_MASK)
++	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
+ 		cpu_relax();
+ 
+ 	HASH_SET_DCAL;
+ 
+-	while (device_data->base->str & HASH_STR_DCAL_MASK)
++	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
+ 		cpu_relax();
+ }
+ 
+@@ -661,7 +661,7 @@ static void hash_messagepad(struct hash_device_data *device_data,
+ 	if (index_bytes)
+ 		HASH_SET_DIN(message, nwords);
+ 
+-	while (device_data->base->str & HASH_STR_DCAL_MASK)
++	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
+ 		cpu_relax();
+ 
+ 	/* num_of_bytes == 0 => NBLW <- 0 (32 bits valid in DATAIN) */
+@@ -676,7 +676,7 @@ static void hash_messagepad(struct hash_device_data *device_data,
+ 			(int)(readl_relaxed(&device_data->base->str) &
+ 				HASH_STR_NBLW_MASK));
+ 
+-	while (device_data->base->str & HASH_STR_DCAL_MASK)
++	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
+ 		cpu_relax();
+ }
+ 
+@@ -776,7 +776,7 @@ void hash_begin(struct hash_device_data *device_data, struct hash_ctx *ctx)
+ 	/* HW and SW initializations */
+ 	/* Note: there is no need to initialize buffer and digest members */
+ 
+-	while (device_data->base->str & HASH_STR_DCAL_MASK)
++	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
+ 		cpu_relax();
+ 
+ 	/*
+@@ -962,7 +962,7 @@ static int hash_dma_final(struct ahash_request *req)
+ 	wait_for_completion(&ctx->device->dma.complete);
+ 	hash_dma_done(ctx);
+ 
+-	while (device_data->base->str & HASH_STR_DCAL_MASK)
++	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
+ 		cpu_relax();
+ 
+ 	if (ctx->config.oper_mode == HASH_OPER_MODE_HMAC && ctx->key) {
+@@ -1060,7 +1060,7 @@ int hash_hw_final(struct ahash_request *req)
+ 				req_ctx->state.index);
+ 	} else {
+ 		HASH_SET_DCAL;
+-		while (device_data->base->str & HASH_STR_DCAL_MASK)
++		while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
+ 			cpu_relax();
+ 	}
+ 
+@@ -1189,7 +1189,7 @@ int hash_resume_state(struct hash_device_data *device_data,
+ 	temp_cr = device_state->temp_cr;
+ 	writel_relaxed(temp_cr & HASH_CR_RESUME_MASK, &device_data->base->cr);
+ 
+-	if (device_data->base->cr & HASH_CR_MODE_MASK)
++	if (readl(&device_data->base->cr) & HASH_CR_MODE_MASK)
+ 		hash_mode = HASH_OPER_MODE_HMAC;
+ 	else
+ 		hash_mode = HASH_OPER_MODE_HASH;
+@@ -1233,7 +1233,7 @@ int hash_save_state(struct hash_device_data *device_data,
+ 	 * actually makes sure that there isn't any ongoing calculation in the
+ 	 * hardware.
+ 	 */
+-	while (device_data->base->str & HASH_STR_DCAL_MASK)
++	while (readl(&device_data->base->str) & HASH_STR_DCAL_MASK)
+ 		cpu_relax();
+ 
+ 	temp_cr = readl_relaxed(&device_data->base->cr);
+@@ -1242,7 +1242,7 @@ int hash_save_state(struct hash_device_data *device_data,
+ 
+ 	device_state->din_reg = readl_relaxed(&device_data->base->din);
+ 
+-	if (device_data->base->cr & HASH_CR_MODE_MASK)
++	if (readl(&device_data->base->cr) & HASH_CR_MODE_MASK)
+ 		hash_mode = HASH_OPER_MODE_HMAC;
+ 	else
+ 		hash_mode = HASH_OPER_MODE_HASH;
 -- 
 1.8.2
