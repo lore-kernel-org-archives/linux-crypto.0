@@ -1,7 +1,7 @@
 From: Fabio Baltieri <fabio.baltieri@linaro.org>
-Subject: [PATCH 5/6] crypto: ux500: use dmaengine_prep_slave_sg API
-Date: Tue, 25 Jun 2013 10:54:48 +0200
-Message-ID: <1372150489-25594-6-git-send-email-fabio.baltieri@linaro.org>
+Subject: [PATCH 3/6] crypto: ux500/crypt: add missing __iomem qualifiers
+Date: Tue, 25 Jun 2013 10:54:46 +0200
+Message-ID: <1372150489-25594-4-git-send-email-fabio.baltieri@linaro.org>
 References: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
 Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -9,73 +9,48 @@ Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Lee Jones <lee.jones@linaro.org>,
 	Fabio Baltieri <fabio.baltieri@linaro.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ea0-f176.google.com ([209.85.215.176]:42652 "EHLO
+	mail-ea0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752844Ab3FYIzs (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Jun 2013 04:55:48 -0400
+Received: by mail-ea0-f176.google.com with SMTP id z15so6627717ead.35
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2013 01:55:47 -0700 (PDT)
 In-Reply-To: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Use dmaengine_prep_slave_sg inline function instead of going through the
-structures manually.
+Add missing __iomem to struct cryp_register pointers, this solve some
+"incorrect type in initializer (different address spaces)" sparse
+warnings.
 
 Signed-off-by: Fabio Baltieri <fabio.baltieri@linaro.org>
 ---
- drivers/crypto/ux500/cryp/cryp_core.c | 20 ++++++++++----------
- drivers/crypto/ux500/hash/hash_core.c |  4 ++--
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ drivers/crypto/ux500/cryp/cryp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index 1957c18..0cd89df 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -553,10 +553,10 @@ static int cryp_set_dma_transfer(struct cryp_ctx *ctx,
- 		dev_dbg(ctx->device->dev, "[%s]: Setting up DMA for buffer "
- 			"(TO_DEVICE)", __func__);
+diff --git a/drivers/crypto/ux500/cryp/cryp.c b/drivers/crypto/ux500/cryp/cryp.c
+index 3eafa90..43a0c8a 100644
+--- a/drivers/crypto/ux500/cryp/cryp.c
++++ b/drivers/crypto/ux500/cryp/cryp.c
+@@ -291,7 +291,7 @@ void cryp_save_device_context(struct cryp_device_data *device_data,
+ 			      int cryp_mode)
+ {
+ 	enum cryp_algo_mode algomode;
+-	struct cryp_register *src_reg = device_data->base;
++	struct cryp_register __iomem *src_reg = device_data->base;
+ 	struct cryp_config *config =
+ 		(struct cryp_config *)device_data->current_ctx;
  
--		desc = channel->device->device_prep_slave_sg(channel,
--					     ctx->device->dma.sg_src,
--					     ctx->device->dma.sg_src_len,
--					     direction, DMA_CTRL_ACK, NULL);
-+		desc = dmaengine_prep_slave_sg(channel,
-+				ctx->device->dma.sg_src,
-+				ctx->device->dma.sg_src_len,
-+				direction, DMA_CTRL_ACK);
- 		break;
+@@ -349,7 +349,7 @@ void cryp_save_device_context(struct cryp_device_data *device_data,
+ void cryp_restore_device_context(struct cryp_device_data *device_data,
+ 				 struct cryp_device_context *ctx)
+ {
+-	struct cryp_register *reg = device_data->base;
++	struct cryp_register __iomem *reg = device_data->base;
+ 	struct cryp_config *config =
+ 		(struct cryp_config *)device_data->current_ctx;
  
- 	case DMA_FROM_DEVICE:
-@@ -577,12 +577,12 @@ static int cryp_set_dma_transfer(struct cryp_ctx *ctx,
- 		dev_dbg(ctx->device->dev, "[%s]: Setting up DMA for buffer "
- 			"(FROM_DEVICE)", __func__);
- 
--		desc = channel->device->device_prep_slave_sg(channel,
--					     ctx->device->dma.sg_dst,
--					     ctx->device->dma.sg_dst_len,
--					     direction,
--					     DMA_CTRL_ACK |
--					     DMA_PREP_INTERRUPT, NULL);
-+		desc = dmaengine_prep_slave_sg(channel,
-+				ctx->device->dma.sg_dst,
-+				ctx->device->dma.sg_dst_len,
-+				direction,
-+				DMA_CTRL_ACK |
-+				DMA_PREP_INTERRUPT);
- 
- 		desc->callback = cryp_dma_out_callback;
- 		desc->callback_param = ctx;
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 8c2817804..3527777 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -180,9 +180,9 @@ static int hash_set_dma_transfer(struct hash_ctx *ctx, struct scatterlist *sg,
- 
- 	dev_dbg(ctx->device->dev, "[%s]: Setting up DMA for buffer "
- 			"(TO_DEVICE)", __func__);
--	desc = channel->device->device_prep_slave_sg(channel,
-+	desc = dmaengine_prep_slave_sg(channel,
- 			ctx->device->dma.sg, ctx->device->dma.sg_len,
--			direction, DMA_CTRL_ACK | DMA_PREP_INTERRUPT, NULL);
-+			direction, DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
- 	if (!desc) {
- 		dev_err(ctx->device->dev,
- 			"[%s]: device_prep_slave_sg() failed!", __func__);
 -- 
 1.8.2
