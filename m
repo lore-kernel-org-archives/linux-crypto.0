@@ -1,7 +1,7 @@
 From: Fabio Baltieri <fabio.baltieri@linaro.org>
-Subject: [PATCH 4/6] crypto: ux500: use dmaengine_device_control API
-Date: Tue, 25 Jun 2013 10:54:47 +0200
-Message-ID: <1372150489-25594-5-git-send-email-fabio.baltieri@linaro.org>
+Subject: [PATCH 6/6] crypto: ux500: use dmaengine_submit API
+Date: Tue, 25 Jun 2013 10:54:49 +0200
+Message-ID: <1372150489-25594-7-git-send-email-fabio.baltieri@linaro.org>
 References: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
 Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -14,46 +14,39 @@ In-Reply-To: <1372150489-25594-1-git-send-email-fabio.baltieri@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Use dmaengine_device_control inline function instead of going through the
-structures manually.
+Use dmaengine_submit instead of calling desc->tx_submit manually.
 
 Signed-off-by: Fabio Baltieri <fabio.baltieri@linaro.org>
 ---
- drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
+ drivers/crypto/ux500/cryp/cryp_core.c | 2 +-
  drivers/crypto/ux500/hash/hash_core.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index b675bbd..1957c18 100644
+index 0cd89df..a999f53 100644
 --- a/drivers/crypto/ux500/cryp/cryp_core.c
 +++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -607,12 +607,12 @@ static void cryp_dma_done(struct cryp_ctx *ctx)
- 	dev_dbg(ctx->device->dev, "[%s]: ", __func__);
+@@ -594,7 +594,7 @@ static int cryp_set_dma_transfer(struct cryp_ctx *ctx,
+ 		return -EFAULT;
+ 	}
  
- 	chan = ctx->device->dma.chan_mem2cryp;
--	chan->device->device_control(chan, DMA_TERMINATE_ALL, 0);
-+	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
- 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_src,
- 		     ctx->device->dma.sg_src_len, DMA_TO_DEVICE);
+-	cookie = desc->tx_submit(desc);
++	cookie = dmaengine_submit(desc);
+ 	dma_async_issue_pending(channel);
  
- 	chan = ctx->device->dma.chan_cryp2mem;
--	chan->device->device_control(chan, DMA_TERMINATE_ALL, 0);
-+	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
- 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_dst,
- 		     ctx->device->dma.sg_dst_len, DMA_FROM_DEVICE);
- }
+ 	return 0;
 diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index dbf7b63..8c2817804 100644
+index 3527777..496ae6a 100644
 --- a/drivers/crypto/ux500/hash/hash_core.c
 +++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -203,7 +203,7 @@ static void hash_dma_done(struct hash_ctx *ctx)
- 	struct dma_chan *chan;
+@@ -192,7 +192,7 @@ static int hash_set_dma_transfer(struct hash_ctx *ctx, struct scatterlist *sg,
+ 	desc->callback = hash_dma_callback;
+ 	desc->callback_param = ctx;
  
- 	chan = ctx->device->dma.chan_mem2hash;
--	chan->device->device_control(chan, DMA_TERMINATE_ALL, 0);
-+	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
- 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg,
- 			ctx->device->dma.sg_len, DMA_TO_DEVICE);
+-	cookie = desc->tx_submit(desc);
++	cookie = dmaengine_submit(desc);
+ 	dma_async_issue_pending(channel);
  
+ 	return 0;
 -- 
 1.8.2
