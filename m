@@ -1,53 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 3.10
-Date: Thu, 27 Jun 2013 21:02:26 +0800
-Message-ID: <20130627130225.GA1612@gondor.apana.org.au>
-References: <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20130528055229.GA23937@gondor.apana.org.au>
- <20130610090544.GA13465@gondor.apana.org.au>
- <20130620132922.GA19014@gondor.apana.org.au>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: [PATCH] fix typo in comment
+Date: Fri, 28 Jun 2013 15:56:20 +0300
+Message-ID: <1372424180-23969-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20130620132922.GA19014@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<trivial@kernel.org>,
+	Cristian Stoica <cristian.stoica@freescale.com>
+To: <herbert@gondor.hengli.com.au>, <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from tx2ehsobe004.messaging.microsoft.com ([65.55.88.14]:52723 "EHLO
+	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754506Ab3F1M7F (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 28 Jun 2013 08:59:05 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+---
+ crypto/api.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This push fixes a crash in the crypto layer exposed by an SCTP
-test tool.
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Herbert Xu (1):
-      crypto: algboss - Hold ref count on larval
-
- crypto/algboss.c  |   15 ++++++++-------
- crypto/api.c      |    6 ------
- crypto/internal.h |    6 ++++++
- 3 files changed, 14 insertions(+), 13 deletions(-)
-
-Thanks,
+diff --git a/crypto/api.c b/crypto/api.c
+index 033a714..733e4ef 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -397,7 +397,7 @@ EXPORT_SYMBOL_GPL(__crypto_alloc_tfm);
+  *	@mask: Mask for type comparison
+  *
+  *	This function should not be used by new algorithm types.
+- *	Plesae use crypto_alloc_tfm instead.
++ *	Please use crypto_alloc_tfm instead.
+  *
+  *	crypto_alloc_base() will first attempt to locate an already loaded
+  *	algorithm.  If that fails and the kernel supports dynamically loadable
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.1.5
