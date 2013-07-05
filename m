@@ -1,173 +1,181 @@
-From: Ruchika Gupta <ruchika.gupta@freescale.com>
-Subject: [PATCH] crypto: caam - RNG instantiation by directly programming DECO
-Date: Thu, 4 Jul 2013 11:26:03 +0530
-Message-ID: <1372917363-25422-1-git-send-email-ruchika.gupta@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Update for 3.11
+Date: Fri, 5 Jul 2013 19:52:40 +1000
+Message-ID: <20130705095240.GA22111@gondor.apana.org.au>
+References: <20110106000157.GA16089@gondor.apana.org.au>
+ <20110315145940.GA15373@gondor.apana.org.au>
+ <20110520235409.GA1722@gondor.apana.org.au>
+ <20110724011752.GA14373@gondor.apana.org.au>
+ <20111031040952.GA19659@gondor.apana.org.au>
+ <20120106041250.GA7759@gondor.apana.org.au>
+ <20121004095357.GA11777@gondor.apana.org.au>
+ <20121214103156.GA5840@gondor.apana.org.au>
+ <20130223023331.GA11002@gondor.apana.org.au>
+ <20130502014703.GA2033@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Alex Porosanu <alexandru.porosanu@freescale.com>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	Vakul Garg <vakul@freescale.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: <linuxppc-dev@linux.freescale.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:46763 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756596Ab3GEJws (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Jul 2013 05:52:48 -0400
+Content-Disposition: inline
+In-Reply-To: <20130502014703.GA2033@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Remove the dependency of RNG instantiation on Job Ring. Now
-RNG instantiation for devices with RNG version > 4 is done
-by directly programming DECO 0.
+Hi Linus:
 
-Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
----
- drivers/crypto/caam/ctrl.c | 74 ++++++++++++++++++++++------------------------
- drivers/crypto/caam/regs.h | 12 +++++++-
- 2 files changed, 47 insertions(+), 39 deletions(-)
+Here is the crypto update for 3.11:
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index f5d6dec..86c9600 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -75,55 +75,53 @@ static void build_instantiation_desc(u32 *desc)
- 			 OP_ALG_RNG4_SK);
- }
- 
--struct instantiate_result {
--	struct completion completion;
--	int err;
--};
--
--static void rng4_init_done(struct device *dev, u32 *desc, u32 err,
--			   void *context)
-+static int instantiate_rng(struct device *ctrldev)
- {
--	struct instantiate_result *instantiation = context;
--
--	if (err) {
--		char tmp[CAAM_ERROR_STR_MAX];
--
--		dev_err(dev, "%08x: %s\n", err, caam_jr_strstatus(tmp, err));
--	}
--
--	instantiation->err = err;
--	complete(&instantiation->completion);
--}
--
--static int instantiate_rng(struct device *jrdev)
--{
--	struct instantiate_result instantiation;
--
--	dma_addr_t desc_dma;
-+	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctrldev);
-+	struct caam_full __iomem *topregs;
-+	unsigned int timeout = 100000;
- 	u32 *desc;
--	int ret;
-+	int i, ret = 0;
- 
- 	desc = kmalloc(CAAM_CMD_SZ * 6, GFP_KERNEL | GFP_DMA);
- 	if (!desc) {
--		dev_err(jrdev, "cannot allocate RNG init descriptor memory\n");
-+		dev_err(ctrldev, "can't allocate RNG init descriptor memory\n");
- 		return -ENOMEM;
- 	}
--
- 	build_instantiation_desc(desc);
--	desc_dma = dma_map_single(jrdev, desc, desc_bytes(desc), DMA_TO_DEVICE);
--	init_completion(&instantiation.completion);
--	ret = caam_jr_enqueue(jrdev, desc, rng4_init_done, &instantiation);
--	if (!ret) {
--		wait_for_completion_interruptible(&instantiation.completion);
--		ret = instantiation.err;
--		if (ret)
--			dev_err(jrdev, "unable to instantiate RNG\n");
-+
-+	/* Set the bit to request direct access to DECO0 */
-+	topregs = (struct caam_full __iomem *)ctrlpriv->ctrl;
-+	setbits32(&topregs->ctrl.deco_rq, DECORR_RQD0ENABLE);
-+
-+	while (!(rd_reg32(&topregs->ctrl.deco_rq) & DECORR_DEN0) &&
-+								 --timeout)
-+		cpu_relax();
-+
-+	if (!timeout) {
-+		dev_err(ctrldev, "failed to acquire DECO 0\n");
-+		ret = -EIO;
-+		goto out;
- 	}
- 
--	dma_unmap_single(jrdev, desc_dma, desc_bytes(desc), DMA_TO_DEVICE);
-+	for (i = 0; i < desc_len(desc); i++)
-+		topregs->deco.descbuf[i] = *(desc + i);
- 
--	kfree(desc);
-+	wr_reg32(&topregs->deco.jr_ctl_hi, DECO_JQCR_WHL | DECO_JQCR_FOUR);
-+
-+	timeout = 10000000;
-+	while ((rd_reg32(&topregs->deco.desc_dbg) & DECO_DBG_VALID) &&
-+								 --timeout)
-+		cpu_relax();
- 
-+	if (!timeout) {
-+		dev_err(ctrldev, "failed to instantiate RNG\n");
-+		ret = -EIO;
-+	}
-+
-+	clrbits32(&topregs->ctrl.deco_rq, DECORR_RQD0ENABLE);
-+out:
-+	kfree(desc);
- 	return ret;
- }
- 
-@@ -303,7 +301,7 @@ static int caam_probe(struct platform_device *pdev)
- 	if ((cha_vid & CHA_ID_RNG_MASK) >> CHA_ID_RNG_SHIFT >= 4 &&
- 	    !(rd_reg32(&topregs->ctrl.r4tst[0].rdsta) & RDSTA_IF0)) {
- 		kick_trng(pdev);
--		ret = instantiate_rng(ctrlpriv->jrdev[0]);
-+		ret = instantiate_rng(dev);
- 		if (ret) {
- 			caam_remove(pdev);
- 			return ret;
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index c09142f..4455396 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -341,6 +341,8 @@ struct caam_ctrl {
- #define MCFGR_DMA_RESET		0x10000000
- #define MCFGR_LONG_PTR		0x00010000 /* Use >32-bit desc addressing */
- #define SCFGR_RDBENABLE		0x00000400
-+#define DECORR_RQD0ENABLE	0x00000001 /* Enable DECO0 for direct access */
-+#define DECORR_DEN0		0x00010000 /* DECO0 available for access*/
- 
- /* AXI read cache control */
- #define MCFGR_ARCACHE_SHIFT	12
-@@ -703,9 +705,16 @@ struct caam_deco {
- 	struct deco_sg_table sctr_tbl[4];	/* DxSTR - Scatter Tables */
- 	u32 rsvd29[48];
- 	u32 descbuf[64];	/* DxDESB - Descriptor buffer */
--	u32 rsvd30[320];
-+	u32 rscvd30[193];
-+	u32 desc_dbg;		/* DxDDR - DECO Debug Register */
-+	u32 rsvd31[126];
- };
- 
-+/* DECO DBG Register Valid Bit*/
-+#define DECO_DBG_VALID		0x80000000
-+#define DECO_JQCR_WHL		0x20000000
-+#define DECO_JQCR_FOUR		0x10000000
-+
- /*
-  * Current top-level view of memory map is:
-  *
-@@ -733,6 +742,7 @@ struct caam_full {
- 	u64 rsvd[512];
- 	struct caam_assurance assure;
- 	struct caam_queue_if qi;
-+	struct caam_deco deco;
- };
- 
- #endif /* REGS_H */
+* Do not idle omap device between crypto operations in one session.
+* Added sha224/sha384 shims for SSSE3.
+* More optimisations for camellia-aesni-avx2.
+* Removed defunct blowfish/twofish AVX2 implementations.
+* Added unaligned buffer self-tests.
+* Added PCLMULQDQ optimisation for CRCT10DIF.
+* Added support for Freescale's DCP co-processor
+* Misc fixes.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Andrei Varvara (8):
+      crypto: caam - fix SEQ IN PTR command when RTO or PRE bit is set
+      crypto: caam - Fix STORE command to support overwriting Shared Descriptor's memory
+      crypto: caam - Add MATH command to support shld function
+      crypto: caam - Add new macros for building extended SEC descriptors (> 64 words)
+      crypto: caam - Add defines for overwriting Descriptor's memory
+      crypto: caam - Add defines for CAAM commands
+      crypto: caam - Add define for Adjust Output Frame Length in PDB
+      crypto: caam - add missing flag for the LOAD/STORE commands
+
+Arnd Bergmann (1):
+      hwrng: bcm2835 - fix MODULE_LICENSE tag
+
+Herbert Xu (2):
+      crypto: crct10dif - Use PTR_RET
+      Merge git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto
+
+Jingoo Han (6):
+      hwrng: atmel - remove unnecessary platform_set_drvdata()
+      hwrng: bcm63xx - remove unnecessary platform_set_drvdata()
+      hwrng: timeriomem - remove unnecessary platform_set_drvdata()
+      hwrng: tx4939 - remove unnecessary platform_set_drvdata()
+      hwrng: use platform_{get,set}_drvdata()
+      crypto: picoxcell - replace strict_strtoul() with kstrtoul()
+
+Joel A Fernandes (1):
+      crypto: omap-aes - Don't idle/start AES device between Encrypt operations
+
+Jussi Kivilinna (10):
+      crypto: sha512_generic - set cra_driver_name
+      crypto: sha512_ssse3 - add sha384 support
+      crypto: sha256_ssse3 - add sha224 support
+      crypto: camellia-aesni-avx2 - tune assembly code for more performance
+      Revert "crypto: blowfish - add AVX2/x86_64 implementation of blowfish cipher"
+      Revert "crypto: twofish - add AVX2/x86_64 assembler implementation of twofish cipher"
+      crypto: testmgr - check that entries in alg_test_descs are in correct order
+      crypto: testmgr - test skciphers with unaligned buffers
+      crypto: testmgr - test AEADs with unaligned buffers
+      crypto: testmgr - test hash implementations with unaligned buffers
+
+Lars-Peter Clausen (1):
+      crypto: hifn_795x - Pass correct pointer to free_irq()
+
+Laurent Navet (1):
+      drivers: crypto: use devm_ioremap_resource()
+
+Linus Walleij (1):
+      hwrng: nomadik - use clk_prepare_enable()
+
+Paul Bolle (1):
+      crypto: sahara - remove dependency on EXPERIMENTAL
+
+Ruchika Gupta (1):
+      crypto: caam - FIX RNG init for RNG greater than equal to 4
+
+Sachin Kamat (6):
+      crypto: mv_cesa: Remove redundant platform_set_drvdata()
+      crypto: s5p-sss: Remove redundant platform_set_drvdata()
+      crypto: dcp - Remove redundant platform_set_drvdata()
+      crypto: dcp - Use devm_* APIs
+      crypto: dcp - Use NULL instead of 0
+      crypto: dcp - Staticize local symbols
+
+Thomas Meyer (1):
+      crypto: ux500 - Cocci spatch "resource_size.spatch"
+
+Tim Chen (4):
+      crypto: crct10dif - Wrap crc_t10dif function all to use crypto transform framework
+      crypto: crct10dif - Accelerated CRC T10 DIF computation with PCLMULQDQ instruction
+      crypto: crct10dif - Glue code to cast accelerated CRCT10DIF assembly as a crypto transform
+      crypto: crct10dif - Simple correctness and speed test for CRCT10DIF hash
+
+Tobias Rauter (1):
+      crypto: dcp - Added support for Freescale's DCP co-processor
+
+ arch/arm/boot/dts/imx28.dtsi                 |    2 +-
+ arch/x86/crypto/Makefile                     |    8 +-
+ arch/x86/crypto/blowfish-avx2-asm_64.S       |  449 -------------
+ arch/x86/crypto/blowfish_avx2_glue.c         |  585 -----------------
+ arch/x86/crypto/blowfish_glue.c              |   32 +-
+ arch/x86/crypto/camellia-aesni-avx2-asm_64.S |  160 +++--
+ arch/x86/crypto/crct10dif-pcl-asm_64.S       |  643 ++++++++++++++++++
+ arch/x86/crypto/crct10dif-pclmul_glue.c      |  151 +++++
+ arch/x86/crypto/sha256_ssse3_glue.c          |   57 ++-
+ arch/x86/crypto/sha512_ssse3_glue.c          |   58 ++-
+ arch/x86/crypto/twofish-avx2-asm_64.S        |  600 -----------------
+ arch/x86/crypto/twofish_avx2_glue.c          |  584 ----------------
+ arch/x86/crypto/twofish_avx_glue.c           |   14 +-
+ arch/x86/include/asm/crypto/blowfish.h       |   43 --
+ arch/x86/include/asm/crypto/twofish.h        |   18 -
+ crypto/Kconfig                               |   63 +--
+ crypto/Makefile                              |    1 +
+ crypto/crct10dif.c                           |  178 +++++
+ crypto/sha512_generic.c                      |    2 +
+ crypto/tcrypt.c                              |    8 +
+ crypto/testmgr.c                             |  176 ++++-
+ crypto/testmgr.h                             |   33 +
+ drivers/char/hw_random/atmel-rng.c           |    2 -
+ drivers/char/hw_random/bcm2835-rng.c         |    2 +-
+ drivers/char/hw_random/bcm63xx-rng.c         |    2 -
+ drivers/char/hw_random/n2-drv.c              |    6 +-
+ drivers/char/hw_random/nomadik-rng.c         |    2 +-
+ drivers/char/hw_random/octeon-rng.c          |    4 +-
+ drivers/char/hw_random/omap-rng.c            |    6 +-
+ drivers/char/hw_random/timeriomem-rng.c      |    2 -
+ drivers/char/hw_random/tx4939-rng.c          |    1 -
+ drivers/crypto/Kconfig                       |   12 +-
+ drivers/crypto/Makefile                      |    1 +
+ drivers/crypto/caam/ctrl.c                   |   10 +-
+ drivers/crypto/caam/desc.h                   |   22 +-
+ drivers/crypto/caam/desc_constr.h            |   81 +++-
+ drivers/crypto/caam/pdb.h                    |    1 +
+ drivers/crypto/caam/regs.h                   |   42 ++-
+ drivers/crypto/dcp.c                         |  912 ++++++++++++++++++++++++++
+ drivers/crypto/hifn_795x.c                   |    4 +-
+ drivers/crypto/mv_cesa.c                     |    1 -
+ drivers/crypto/omap-aes.c                    |   36 +-
+ drivers/crypto/omap-sham.c                   |    7 +-
+ drivers/crypto/picoxcell_crypto.c            |    2 +-
+ drivers/crypto/s5p-sss.c                     |    2 -
+ drivers/crypto/ux500/cryp/cryp_core.c        |    2 +-
+ include/linux/crc-t10dif.h                   |    4 +
+ lib/Kconfig                                  |    2 +
+ lib/crc-t10dif.c                             |   73 +--
+ 49 files changed, 2542 insertions(+), 2564 deletions(-)
+
+Thanks,
 -- 
-1.8.1.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
