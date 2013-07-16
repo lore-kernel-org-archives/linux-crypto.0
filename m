@@ -1,55 +1,81 @@
-From: Arthur Marsh <arthur.marsh@internode.on.net>
-Subject: Re: unable to finish booting when "crypto: crct10dif - Wrap crc_t10dif
- function all to use crypto transform framework" applied
-Date: Thu, 11 Jul 2013 20:57:52 +0930
-Message-ID: <51DE96B8.6000109@internode.on.net>
-References: <51D8420C.7010602@internode.on.net> <1373385611.22432.230.camel@schen9-DESK> <51DC52C7.3010101@internode.on.net> <1373405654.22432.258.camel@schen9-DESK> <20130710061621.GA20488@gondor.apana.org.au>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH 3.11-rc1] crypto: Fix boot failure due to
+ moduledependency.
+Date: Tue, 16 Jul 2013 09:23:48 -0700
+Message-ID: <1373991828.22432.274.camel@schen9-DESK>
+References: <201307162053.GBC56724.MFVOJtSLQHFOOF@I-love.SAKURA.ne.jp>
+	 <20130716115527.GA1034@gondor.apana.org.au>
+	 <201307162249.JEA41532.FFOLHVQJFtOOMS@I-love.SAKURA.ne.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
+Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
 	linux-crypto <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ipmail05.adl6.internode.on.net ([150.101.137.143]:11595 "EHLO
-	ipmail05.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751868Ab3GKL16 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Jul 2013 07:27:58 -0400
-In-Reply-To: <20130710061621.GA20488@gondor.apana.org.au>
+Received: from mga02.intel.com ([134.134.136.20]:16054 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932821Ab3GPQXv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 16 Jul 2013 12:23:51 -0400
+In-Reply-To: <201307162249.JEA41532.FFOLHVQJFtOOMS@I-love.SAKURA.ne.jp>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert Xu wrote, on 10/07/13 15:46:
-> On Tue, Jul 09, 2013 at 02:34:14PM -0700, Tim Chen wrote:
->>
->>> I'm not sure what the root disk is doing, just using Debian's mk-kpkg
->>> kernel_package to build a kernel with an initial ramdisk.
->>>
->>> On one of the failed boot-up attempts I saw an error like:
->>>
->>> sd_mod - unknown symbol crc*
->>
->> If you have any detailed dumps on the messages from sd_mod that will
->> be helpful.
->
-> I think that's the key.  Whatever is creating the initrd of that
-> distro isn't including the new crct10dif module.  I can't believe
-> they still haven't fixed the initrd tools to do dependency checking.
->
-> Cheers,
+On Tue, 2013-07-16 at 22:49 +0900, Tetsuo Handa wrote:
+> Herbert Xu wrote:
+> > Looks like a bug in whatever is creating the initrd as it isn't
+> > including modules necessary for the boot.
+> 
+> It turned out that it is already wrong as of creating modules.dep.
+> 
+>   # grep crc /lib/modules/3.11.0-rc1/modules.dep
+>   kernel/crypto/crct10dif.ko:
+>   kernel/drivers/scsi/sd_mod.ko: kernel/lib/crc-t10dif.ko
+>   kernel/lib/crc-t10dif.ko:
+> 
+> modules.dep says
+> 
+>   (1) sd_mod.ko depends on crc-t10dif.ko
+>   (2) crc-t10dif.ko does not depend on crct10dif.ko
 
-Hi, sorry for the late reply. Thanks both to Tim Chen and Herbert Xu for 
-your help!
+Yes, the generator of modules.dep does not seem to pick up the right
+dependency.  
 
-In more recent git pulls from Linus' tree the kernel builds and runs 
-fine using Debian's mk-kpg.
+> 
+> but commit 2d31e518 made crc-t10dif.ko depend on crct10dif.ko , didn't it?
+> 
+> crct10dif.ko need to be loaded before crc-t10dif.ko is loaded, but doing
+> 
+> diff --git a/lib/Kconfig b/lib/Kconfig
+> index 35da513..53ee0fd 100644
+> --- a/lib/Kconfig
+> +++ b/lib/Kconfig
+> @@ -68,6 +68,7 @@ config CRC_T10DIF
+>  	tristate "CRC calculation for the T10 Data Integrity Field"
+>  	select CRYPTO
+>  	select CRYPTO_CRCT10DIF
+> +	depends on CRYPTO_CRCT10DIF
 
-If it is possible to use git-bisect to find which commit fixed the 
-problem I am happy to do so, or run any tools on the created initrd to 
-see if there was a problem with its creation that caused the problem I 
-reported against the kernel.
+Herbert, seems like modules.dep generator wants explicit
 
-Regards,
+- 	select CRYPTO_CRCT10DIF
++	depends on CRYPTO_CRCT10DIF
 
-Arthur.
+But it seems to me like it should have known CRC_T10DIF needs
+CRYPTO_CRCT10DIF when we do 
+	select CRYPTO_CRCT10DIF
+
+Your thoughts?
+
+Thanks.
+
+Tim
+
+>  	help
+>  	  This option is only needed if a module that's not in the
+>  	  kernel tree needs to calculate CRC checks for use with the
+> 
+> causes below warning.
+> 
+>   crypto/Kconfig:379:     symbol CRYPTO_CRCT10DIF is selected by CRC_T10DIF
+>   warning: (BLK_DEV_SD && SCSI_LPFC && SCSI_DEBUG) selects CRC_T10DIF which has unmet direct dependencies (CRYPTO_CRCT10DIF)
