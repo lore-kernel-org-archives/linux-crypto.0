@@ -1,316 +1,164 @@
 From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: [RFC][PATCH 04/20] ima: read and use signature hash algorithm
-Date: Wed, 17 Jul 2013 19:51:24 -0400
-Message-ID: <1374105100-25880-5-git-send-email-zohar@linux.vnet.ibm.com>
+Subject: [RFC][PATCH 06/20] ima: differentiate between template hash and file data hash sizes
+Date: Wed, 17 Jul 2013 19:51:26 -0400
+Message-ID: <1374105100-25880-7-git-send-email-zohar@linux.vnet.ibm.com>
 References: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
-Cc: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
 	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>
+	Mimi Zohar <zohar@us.ibm.com>
 To: linux-security-module@vger.kernel.org
 Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
 Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+The TPM v1.2 limits the template hash size to 20 bytes.  This
+patch differentiates between the template hash size, as defined
+in the ima_template_entry, and the file data hash size, as
+defined in the ima_template_data.  Subsequent patches add support
+for different file data hash algorithms.
 
-All files on the filesystem, currently, are hashed using the same hash
-algorithm.  In preparation for files from different packages being
-signed using different hash algorithms, this patch adds support for
-reading the signature hash algorithm from the 'security.ima' extended
-attribute and calculates the appropriate file data hash based on it.
+Change log:
+- hash digest definition in ima_store_template() should be TPM_DIGEST_SIZE
 
-Changelog:
-- fix scripts Lindent and checkpatch msgs - Mimi
-
-Signed-off-by: Dmitry Kasatkin <d.kasatkin@samsung.com>
-Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Signed-off-by: Mimi Zohar <zohar@us.ibm.com>
 ---
- security/integrity/digsig_asymmetric.c | 11 ---------
- security/integrity/ima/ima.h           | 29 ++++++++++++++++++++---
- security/integrity/ima/ima_api.c       | 12 +++++++++-
- security/integrity/ima/ima_appraise.c  | 42 +++++++++++++++++++++++++++-------
- security/integrity/ima/ima_main.c      | 11 +++++++--
- security/integrity/integrity.h         | 11 +++++++++
- 6 files changed, 91 insertions(+), 25 deletions(-)
+ security/integrity/ima/ima.h        |  2 +-
+ security/integrity/ima/ima_api.c    |  2 +-
+ security/integrity/ima/ima_crypto.c |  4 ++--
+ security/integrity/ima/ima_fs.c     | 10 +++++-----
+ security/integrity/ima/ima_init.c   |  2 +-
+ security/integrity/ima/ima_queue.c  |  4 ++--
+ 6 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
-index b475466..9eae480 100644
---- a/security/integrity/digsig_asymmetric.c
-+++ b/security/integrity/digsig_asymmetric.c
-@@ -20,17 +20,6 @@
- #include "integrity.h"
- 
- /*
-- * signature format v2 - for using with asymmetric keys
-- */
--struct signature_v2_hdr {
--	uint8_t version;	/* signature format version */
--	uint8_t	hash_algo;	/* Digest algorithm [enum pkey_hash_algo] */
--	uint32_t keyid;		/* IMA key identifier - not X509/PGP specific*/
--	uint16_t sig_size;	/* signature size */
--	uint8_t sig[0];		/* signature payload */
--} __packed;
--
--/*
-  * Request an asymmetric key.
-  */
- static struct key *request_asymmetric_key(struct key *keyring, uint32_t keyid)
 diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index eb86032..efcdef2 100644
+index efcdef2..52393ed 100644
 --- a/security/integrity/ima/ima.h
 +++ b/security/integrity/ima/ima.h
-@@ -99,7 +99,9 @@ static inline unsigned long ima_hash_key(u8 *digest)
- int ima_get_action(struct inode *inode, int mask, int function);
- int ima_must_measure(struct inode *inode, int mask, int function);
- int ima_collect_measurement(struct integrity_iint_cache *iint,
--			    struct file *file);
-+			    struct file *file,
-+			    struct evm_ima_xattr_data **xattr_value,
-+			    int *xattr_len);
- void ima_store_measurement(struct integrity_iint_cache *iint, struct file *file,
- 			   const unsigned char *filename);
- void ima_audit_measurement(struct integrity_iint_cache *iint,
-@@ -132,17 +134,25 @@ void ima_delete_rules(void);
+@@ -49,7 +49,7 @@ struct ima_template_data {
+ };
  
- #ifdef CONFIG_IMA_APPRAISE
- int ima_appraise_measurement(int func, struct integrity_iint_cache *iint,
--			     struct file *file, const unsigned char *filename);
-+			     struct file *file, const unsigned char *filename,
-+			     struct evm_ima_xattr_data *xattr_value,
-+			     int xattr_len);
- int ima_must_appraise(struct inode *inode, int mask, enum ima_hooks func);
- void ima_update_xattr(struct integrity_iint_cache *iint, struct file *file);
- enum integrity_status ima_get_cache_status(struct integrity_iint_cache *iint,
- 					   int func);
-+void ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value, int xattr_len,
-+		       struct ima_digest_data *hash);
-+int ima_read_xattr(struct dentry *dentry,
-+		   struct evm_ima_xattr_data **xattr_value);
- 
- #else
- static inline int ima_appraise_measurement(int func,
- 					   struct integrity_iint_cache *iint,
- 					   struct file *file,
--					   const unsigned char *filename)
-+					   const unsigned char *filename,
-+					   struct evm_ima_xattr_data *xattr_value,
-+					   int xattr_len)
- {
- 	return INTEGRITY_UNKNOWN;
- }
-@@ -163,6 +173,19 @@ static inline enum integrity_status ima_get_cache_status(struct integrity_iint_c
- {
- 	return INTEGRITY_UNKNOWN;
- }
-+
-+static inline void ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
-+				     int xattr_len,
-+				     struct ima_digest_data *hash)
-+{
-+}
-+
-+static inline int ima_read_xattr(struct dentry *dentry,
-+				 struct evm_ima_xattr_data **xattr_value)
-+{
-+	return 0;
-+}
-+
- #endif
- 
- /* LSM based policy rules require audit */
+ struct ima_template_entry {
+-	u8 digest[IMA_DIGEST_SIZE];	/* sha1 or md5 measurement hash */
++	u8 digest[TPM_DIGEST_SIZE];	/* sha1 or md5 measurement hash */
+ 	const char *template_name;
+ 	int template_len;
+ 	struct ima_template_data template;
 diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
-index e531fe2..1dba98e 100644
+index 5a7942e..2cc5dcc 100644
 --- a/security/integrity/ima/ima_api.c
 +++ b/security/integrity/ima/ima_api.c
-@@ -139,17 +139,27 @@ int ima_must_measure(struct inode *inode, int mask, int function)
-  * Return 0 on success, error code otherwise
+@@ -46,7 +46,7 @@ int ima_store_template(struct ima_template_entry *entry,
+ 	int result;
+ 	struct {
+ 		struct ima_digest_data hdr;
+-		char digest[IMA_MAX_DIGEST_SIZE];
++		char digest[TPM_DIGEST_SIZE];
+ 	} hash;
+ 
+ 	memset(entry->digest, 0, sizeof(entry->digest));
+diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
+index 2fd1786..872c669 100644
+--- a/security/integrity/ima/ima_crypto.c
++++ b/security/integrity/ima/ima_crypto.c
+@@ -155,7 +155,7 @@ static void __init ima_pcrread(int idx, u8 *pcr)
   */
- int ima_collect_measurement(struct integrity_iint_cache *iint,
--			    struct file *file)
-+			    struct file *file,
-+			    struct evm_ima_xattr_data **xattr_value,
-+			    int *xattr_len)
+ int __init ima_calc_boot_aggregate(char *digest)
  {
- 	struct inode *inode = file_inode(file);
- 	const char *filename = file->f_dentry->d_name.name;
- 	int result = 0;
- 
-+	if (xattr_value)
-+		*xattr_len = ima_read_xattr(file->f_dentry, xattr_value);
-+
- 	if (!(iint->flags & IMA_COLLECTED)) {
- 		u64 i_version = file_inode(file)->i_version;
- 
- 		/* use default hash algorithm */
- 		iint->ima_hash.algo = ima_hash_algo;
-+
-+		if (xattr_value)
-+			ima_get_hash_algo(*xattr_value, *xattr_len,
-+					  &iint->ima_hash);
-+
- 		result = ima_calc_file_hash(file, &iint->ima_hash);
- 		if (!result) {
- 			iint->version = i_version;
-diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index f2a3bda..5b59b43 100644
---- a/security/integrity/ima/ima_appraise.c
-+++ b/security/integrity/ima/ima_appraise.c
-@@ -107,6 +107,34 @@ static void ima_cache_flags(struct integrity_iint_cache *iint, int func)
+-	u8 pcr_i[IMA_DIGEST_SIZE];
++	u8 pcr_i[TPM_DIGEST_SIZE];
+ 	int rc, i;
+ 	struct {
+ 		struct shash_desc shash;
+@@ -173,7 +173,7 @@ int __init ima_calc_boot_aggregate(char *digest)
+ 	for (i = TPM_PCR0; i < TPM_PCR8; i++) {
+ 		ima_pcrread(i, pcr_i);
+ 		/* now accumulate with current aggregate */
+-		rc = crypto_shash_update(&desc.shash, pcr_i, IMA_DIGEST_SIZE);
++		rc = crypto_shash_update(&desc.shash, pcr_i, TPM_DIGEST_SIZE);
  	}
+ 	if (!rc)
+ 		crypto_shash_final(&desc.shash, digest);
+diff --git a/security/integrity/ima/ima_fs.c b/security/integrity/ima/ima_fs.c
+index 38477c9..89adf1d 100644
+--- a/security/integrity/ima/ima_fs.c
++++ b/security/integrity/ima/ima_fs.c
+@@ -134,7 +134,7 @@ static int ima_measurements_show(struct seq_file *m, void *v)
+ 	ima_putc(m, &pcr, sizeof pcr);
+ 
+ 	/* 2nd: template digest */
+-	ima_putc(m, e->digest, IMA_DIGEST_SIZE);
++	ima_putc(m, e->digest, TPM_DIGEST_SIZE);
+ 
+ 	/* 3rd: template name size */
+ 	namelen = strlen(e->template_name);
+@@ -168,11 +168,11 @@ static const struct file_operations ima_measurements_ops = {
+ 	.release = seq_release,
+ };
+ 
+-static void ima_print_digest(struct seq_file *m, u8 *digest)
++static void ima_print_digest(struct seq_file *m, u8 *digest, int size)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < IMA_DIGEST_SIZE; i++)
++	for (i = 0; i < size; i++)
+ 		seq_printf(m, "%02x", *(digest + i));
  }
  
-+void ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value, int xattr_len,
-+		       struct ima_digest_data *hash)
-+{
-+	struct signature_v2_hdr *sig;
-+
-+	if (!xattr_value || xattr_len < 0 || xattr_len <= 1 + sizeof(*sig))
-+		return;
-+
-+	sig = (typeof(sig)) xattr_value->digest;
-+
-+	if (xattr_value->type != EVM_IMA_XATTR_DIGSIG || sig->version != 2)
-+		return;
-+
-+	hash->algo = sig->hash_algo;
-+}
-+
-+int ima_read_xattr(struct dentry *dentry,
-+		   struct evm_ima_xattr_data **xattr_value)
-+{
-+	struct inode *inode = dentry->d_inode;
-+
-+	if (!inode->i_op->getxattr)
-+		return 0;
-+
-+	return vfs_getxattr_alloc(dentry, XATTR_NAME_IMA, (char **)xattr_value,
-+				  0, GFP_NOFS);
-+}
-+
- /*
-  * ima_appraise_measurement - appraise file measurement
-  *
-@@ -116,23 +144,22 @@ static void ima_cache_flags(struct integrity_iint_cache *iint, int func)
-  * Return 0 on success, error code otherwise
-  */
- int ima_appraise_measurement(int func, struct integrity_iint_cache *iint,
--			     struct file *file, const unsigned char *filename)
-+			     struct file *file, const unsigned char *filename,
-+			     struct evm_ima_xattr_data *xattr_value,
-+			     int xattr_len)
+@@ -183,7 +183,7 @@ void ima_template_show(struct seq_file *m, void *e, enum ima_show_type show)
+ 
+ 	switch (show) {
+ 	case IMA_SHOW_ASCII:
+-		ima_print_digest(m, entry->digest);
++		ima_print_digest(m, entry->digest, IMA_DIGEST_SIZE);
+ 		seq_printf(m, " %s\n", entry->file_name);
+ 		break;
+ 	case IMA_SHOW_BINARY:
+@@ -213,7 +213,7 @@ static int ima_ascii_measurements_show(struct seq_file *m, void *v)
+ 	seq_printf(m, "%2d ", CONFIG_IMA_MEASURE_PCR_IDX);
+ 
+ 	/* 2nd: SHA1 template hash */
+-	ima_print_digest(m, e->digest);
++	ima_print_digest(m, e->digest, TPM_DIGEST_SIZE);
+ 
+ 	/* 3th:  template name */
+ 	seq_printf(m, " %s ", e->template_name);
+diff --git a/security/integrity/ima/ima_init.c b/security/integrity/ima/ima_init.c
+index 162ea72..9d0243c 100644
+--- a/security/integrity/ima/ima_init.c
++++ b/security/integrity/ima/ima_init.c
+@@ -74,7 +74,7 @@ err_out:
+ 
+ int __init ima_init(void)
  {
- 	struct dentry *dentry = file->f_dentry;
- 	struct inode *inode = dentry->d_inode;
--	struct evm_ima_xattr_data *xattr_value = NULL;
- 	enum integrity_status status = INTEGRITY_UNKNOWN;
- 	const char *op = "appraise_data";
- 	char *cause = "unknown";
--	int rc;
-+	int rc = xattr_len;
+-	u8 pcr_i[IMA_DIGEST_SIZE];
++	u8 pcr_i[TPM_DIGEST_SIZE];
+ 	int rc;
  
- 	if (!ima_appraise)
- 		return 0;
- 	if (!inode->i_op->getxattr)
- 		return INTEGRITY_UNKNOWN;
- 
--	rc = vfs_getxattr_alloc(dentry, XATTR_NAME_IMA, (char **)&xattr_value,
--				0, GFP_NOFS);
- 	if (rc <= 0) {
- 		if (rc && rc != -ENODATA)
- 			goto out;
-@@ -159,7 +186,7 @@ int ima_appraise_measurement(int func, struct integrity_iint_cache *iint,
- 			status = INTEGRITY_FAIL;
+ 	ima_used_chip = 0;
+diff --git a/security/integrity/ima/ima_queue.c b/security/integrity/ima/ima_queue.c
+index ff63fe0..e63ff33 100644
+--- a/security/integrity/ima/ima_queue.c
++++ b/security/integrity/ima/ima_queue.c
+@@ -50,7 +50,7 @@ static struct ima_queue_entry *ima_lookup_digest_entry(u8 *digest_value)
+ 	key = ima_hash_key(digest_value);
+ 	rcu_read_lock();
+ 	hlist_for_each_entry_rcu(qe, &ima_htable.queue[key], hnext) {
+-		rc = memcmp(qe->entry->digest, digest_value, IMA_DIGEST_SIZE);
++		rc = memcmp(qe->entry->digest, digest_value, TPM_DIGEST_SIZE);
+ 		if (rc == 0) {
+ 			ret = qe;
  			break;
- 		}
--		if (rc - 1 == iint->ima_hash.length)
-+		if (xattr_len - 1 == iint->ima_hash.length)
- 			rc = memcmp(xattr_value->digest,
- 				    iint->ima_hash.digest,
- 				    iint->ima_hash.length);
-@@ -207,7 +234,6 @@ out:
- 		ima_cache_flags(iint, func);
- 	}
- 	ima_set_cache_status(iint, func, status);
--	kfree(xattr_value);
- 	return status;
- }
- 
-@@ -223,7 +249,7 @@ void ima_update_xattr(struct integrity_iint_cache *iint, struct file *file)
- 	if (iint->flags & IMA_DIGSIG)
- 		return;
- 
--	rc = ima_collect_measurement(iint, file);
-+	rc = ima_collect_measurement(iint, file, NULL, NULL);
- 	if (rc < 0)
- 		return;
- 
-diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
-index a8ae99b..c22027e 100644
---- a/security/integrity/ima/ima_main.c
-+++ b/security/integrity/ima/ima_main.c
-@@ -149,6 +149,8 @@ static int process_measurement(struct file *file, const char *filename,
- 	char *pathbuf = NULL;
- 	const char *pathname = NULL;
- 	int rc = -ENOMEM, action, must_appraise, _func;
-+	struct evm_ima_xattr_data *xattr_value = NULL, **xattr_ptr = NULL;
-+	int xattr_len = 0;
- 
- 	if (!ima_initialized || !S_ISREG(inode->i_mode))
- 		return 0;
-@@ -187,7 +189,10 @@ static int process_measurement(struct file *file, const char *filename,
- 		goto out_digsig;
- 	}
- 
--	rc = ima_collect_measurement(iint, file);
-+	if (action & IMA_APPRAISE_SUBMASK)
-+		xattr_ptr = &xattr_value;
-+
-+	rc = ima_collect_measurement(iint, file, xattr_ptr, &xattr_len);
- 	if (rc != 0)
- 		goto out_digsig;
- 
-@@ -198,7 +203,8 @@ static int process_measurement(struct file *file, const char *filename,
- 	if (action & IMA_MEASURE)
- 		ima_store_measurement(iint, file, pathname);
- 	if (action & IMA_APPRAISE_SUBMASK)
--		rc = ima_appraise_measurement(_func, iint, file, pathname);
-+		rc = ima_appraise_measurement(_func, iint, file, pathname,
-+					      xattr_value, xattr_len);
- 	if (action & IMA_AUDIT)
- 		ima_audit_measurement(iint, pathname);
- 	kfree(pathbuf);
-@@ -207,6 +213,7 @@ out_digsig:
- 		rc = -EACCES;
- out:
- 	mutex_unlock(&inode->i_mutex);
-+	kfree(xattr_value);
- 	if ((rc && must_appraise) && (ima_appraise & IMA_APPRAISE_ENFORCE))
- 		return -EACCES;
- 	return 0;
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index a97f1091..d519a9c 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -70,6 +70,17 @@ struct ima_digest_data {
- 	u8 digest[IMA_MAX_DIGEST_SIZE];
- } __packed;
- 
-+/*
-+ * signature format v2 - for using with asymmetric keys
-+ */
-+struct signature_v2_hdr {
-+	uint8_t version;	/* signature format version */
-+	uint8_t	hash_algo;	/* Digest algorithm [enum pkey_hash_algo] */
-+	uint32_t keyid;		/* IMA key identifier - not X509/PGP specific */
-+	uint16_t sig_size;	/* signature size */
-+	uint8_t sig[0];		/* signature payload */
-+} __packed;
-+
- /* integrity data associated with an inode */
- struct integrity_iint_cache {
- 	struct rb_node rb_node;	/* rooted in integrity_iint_tree */
+@@ -106,7 +106,7 @@ static int ima_pcr_extend(const u8 *hash)
+ int ima_add_template_entry(struct ima_template_entry *entry, int violation,
+ 			   const char *op, struct inode *inode)
+ {
+-	u8 digest[IMA_DIGEST_SIZE];
++	u8 digest[TPM_DIGEST_SIZE];
+ 	const char *audit_cause = "hash_added";
+ 	char tpm_audit_cause[AUDIT_CAUSE_LEN_MAX];
+ 	int audit_info = 1;
 -- 
 1.8.1.4
 
