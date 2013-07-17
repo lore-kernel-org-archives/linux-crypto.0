@@ -1,164 +1,109 @@
 From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: [RFC][PATCH 06/20] ima: differentiate between template hash and file data hash sizes
-Date: Wed, 17 Jul 2013 19:51:26 -0400
-Message-ID: <1374105100-25880-7-git-send-email-zohar@linux.vnet.ibm.com>
+Subject: [RFC][PATCH 08/20] ima: support arbitrary hash algorithms in ima_calc_buffer_hash
+Date: Wed, 17 Jul 2013 19:51:28 -0400
+Message-ID: <1374105100-25880-9-git-send-email-zohar@linux.vnet.ibm.com>
 References: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
+Cc: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
 	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Mimi Zohar <zohar@us.ibm.com>
+	Mimi Zohar <zohar@linux.vnet.ibm.com>
 To: linux-security-module@vger.kernel.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e36.co.us.ibm.com ([32.97.110.154]:46489 "EHLO
+	e36.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757545Ab3GQXwA (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Jul 2013 19:52:00 -0400
+Received: from /spool/local
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+	Wed, 17 Jul 2013 17:52:00 -0600
 In-Reply-To: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The TPM v1.2 limits the template hash size to 20 bytes.  This
-patch differentiates between the template hash size, as defined
-in the ima_template_entry, and the file data hash size, as
-defined in the ima_template_data.  Subsequent patches add support
-for different file data hash algorithms.
+From: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
 
-Change log:
-- hash digest definition in ima_store_template() should be TPM_DIGEST_SIZE
+ima_calc_buffer_hash will be used with different hash algorithms.
+This patch provides support for arbitrary hash algorithms in
+ima_calc_buffer_hash.
 
-Signed-off-by: Mimi Zohar <zohar@us.ibm.com>
+Signed-off-by: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 ---
- security/integrity/ima/ima.h        |  2 +-
- security/integrity/ima/ima_api.c    |  2 +-
- security/integrity/ima/ima_crypto.c |  4 ++--
- security/integrity/ima/ima_fs.c     | 10 +++++-----
- security/integrity/ima/ima_init.c   |  2 +-
- security/integrity/ima/ima_queue.c  |  4 ++--
- 6 files changed, 12 insertions(+), 12 deletions(-)
+ security/integrity/ima/ima_api.c    |  3 +++
+ security/integrity/ima/ima_crypto.c | 28 ++++++++++++++++++++++------
+ 2 files changed, 25 insertions(+), 6 deletions(-)
 
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index efcdef2..52393ed 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -49,7 +49,7 @@ struct ima_template_data {
- };
- 
- struct ima_template_entry {
--	u8 digest[IMA_DIGEST_SIZE];	/* sha1 or md5 measurement hash */
-+	u8 digest[TPM_DIGEST_SIZE];	/* sha1 or md5 measurement hash */
- 	const char *template_name;
- 	int template_len;
- 	struct ima_template_data template;
 diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
-index 5a7942e..2cc5dcc 100644
+index 2cc5dcc..bc1d128 100644
 --- a/security/integrity/ima/ima_api.c
 +++ b/security/integrity/ima/ima_api.c
-@@ -46,7 +46,7 @@ int ima_store_template(struct ima_template_entry *entry,
- 	int result;
- 	struct {
- 		struct ima_digest_data hdr;
--		char digest[IMA_MAX_DIGEST_SIZE];
-+		char digest[TPM_DIGEST_SIZE];
- 	} hash;
+@@ -18,6 +18,7 @@
+ #include <linux/fs.h>
+ #include <linux/xattr.h>
+ #include <linux/evm.h>
++#include <crypto/hash_info.h>
+ #include "ima.h"
  
- 	memset(entry->digest, 0, sizeof(entry->digest));
+ static const char *IMA_TEMPLATE_NAME = "ima";
+@@ -54,6 +55,8 @@ int ima_store_template(struct ima_template_entry *entry,
+ 	entry->template_len = sizeof(entry->template);
+ 
+ 	if (!violation) {
++		/* this function uses default algo */
++		hash.hdr.algo = HASH_ALGO_SHA1;
+ 		result = ima_calc_buffer_hash(&entry->template,
+ 					      entry->template_len, &hash.hdr);
+ 		if (result < 0) {
 diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
-index 2fd1786..872c669 100644
+index e5d3ebf..e2be252 100644
 --- a/security/integrity/ima/ima_crypto.c
 +++ b/security/integrity/ima/ima_crypto.c
-@@ -155,7 +155,7 @@ static void __init ima_pcrread(int idx, u8 *pcr)
+@@ -139,23 +139,39 @@ int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
+ /*
+  * Calculate the hash of a given buffer
   */
- int __init ima_calc_boot_aggregate(char *digest)
+-int ima_calc_buffer_hash(const void *buf, int len, struct ima_digest_data *hash)
++static int ima_calc_buffer_hash_tfm(const void *buf, int len,
++				    struct ima_digest_data *hash,
++				    struct crypto_shash *tfm)
  {
--	u8 pcr_i[IMA_DIGEST_SIZE];
-+	u8 pcr_i[TPM_DIGEST_SIZE];
- 	int rc, i;
  	struct {
  		struct shash_desc shash;
-@@ -173,7 +173,7 @@ int __init ima_calc_boot_aggregate(char *digest)
- 	for (i = TPM_PCR0; i < TPM_PCR8; i++) {
- 		ima_pcrread(i, pcr_i);
- 		/* now accumulate with current aggregate */
--		rc = crypto_shash_update(&desc.shash, pcr_i, IMA_DIGEST_SIZE);
-+		rc = crypto_shash_update(&desc.shash, pcr_i, TPM_DIGEST_SIZE);
- 	}
- 	if (!rc)
- 		crypto_shash_final(&desc.shash, digest);
-diff --git a/security/integrity/ima/ima_fs.c b/security/integrity/ima/ima_fs.c
-index 38477c9..89adf1d 100644
---- a/security/integrity/ima/ima_fs.c
-+++ b/security/integrity/ima/ima_fs.c
-@@ -134,7 +134,7 @@ static int ima_measurements_show(struct seq_file *m, void *v)
- 	ima_putc(m, &pcr, sizeof pcr);
+-		char ctx[crypto_shash_descsize(ima_shash_tfm)];
++		char ctx[crypto_shash_descsize(tfm)];
+ 	} desc;
  
- 	/* 2nd: template digest */
--	ima_putc(m, e->digest, IMA_DIGEST_SIZE);
-+	ima_putc(m, e->digest, TPM_DIGEST_SIZE);
+-	desc.shash.tfm = ima_shash_tfm;
++	desc.shash.tfm = tfm;
+ 	desc.shash.flags = 0;
  
- 	/* 3rd: template name size */
- 	namelen = strlen(e->template_name);
-@@ -168,11 +168,11 @@ static const struct file_operations ima_measurements_ops = {
- 	.release = seq_release,
- };
+-	/* this function uses default algo */
+-	hash->algo = ima_hash_algo;
+-	hash->length = crypto_shash_digestsize(ima_shash_tfm);
++	hash->length = crypto_shash_digestsize(tfm);
  
--static void ima_print_digest(struct seq_file *m, u8 *digest)
-+static void ima_print_digest(struct seq_file *m, u8 *digest, int size)
- {
- 	int i;
- 
--	for (i = 0; i < IMA_DIGEST_SIZE; i++)
-+	for (i = 0; i < size; i++)
- 		seq_printf(m, "%02x", *(digest + i));
+ 	return crypto_shash_digest(&desc.shash, buf, len, hash->digest);
  }
  
-@@ -183,7 +183,7 @@ void ima_template_show(struct seq_file *m, void *e, enum ima_show_type show)
- 
- 	switch (show) {
- 	case IMA_SHOW_ASCII:
--		ima_print_digest(m, entry->digest);
-+		ima_print_digest(m, entry->digest, IMA_DIGEST_SIZE);
- 		seq_printf(m, " %s\n", entry->file_name);
- 		break;
- 	case IMA_SHOW_BINARY:
-@@ -213,7 +213,7 @@ static int ima_ascii_measurements_show(struct seq_file *m, void *v)
- 	seq_printf(m, "%2d ", CONFIG_IMA_MEASURE_PCR_IDX);
- 
- 	/* 2nd: SHA1 template hash */
--	ima_print_digest(m, e->digest);
-+	ima_print_digest(m, e->digest, TPM_DIGEST_SIZE);
- 
- 	/* 3th:  template name */
- 	seq_printf(m, " %s ", e->template_name);
-diff --git a/security/integrity/ima/ima_init.c b/security/integrity/ima/ima_init.c
-index 162ea72..9d0243c 100644
---- a/security/integrity/ima/ima_init.c
-+++ b/security/integrity/ima/ima_init.c
-@@ -74,7 +74,7 @@ err_out:
- 
- int __init ima_init(void)
++int ima_calc_buffer_hash(const void *buf, int len, struct ima_digest_data *hash)
++{
++	struct crypto_shash *tfm;
++	int rc;
++
++	tfm = ima_alloc_tfm(hash->algo);
++	if (IS_ERR(tfm))
++		return PTR_ERR(tfm);
++
++	rc = ima_calc_buffer_hash_tfm(buf, len, hash, tfm);
++
++	ima_free_tfm(tfm);
++
++	return rc;
++}
++
+ static void __init ima_pcrread(int idx, u8 *pcr)
  {
--	u8 pcr_i[IMA_DIGEST_SIZE];
-+	u8 pcr_i[TPM_DIGEST_SIZE];
- 	int rc;
- 
- 	ima_used_chip = 0;
-diff --git a/security/integrity/ima/ima_queue.c b/security/integrity/ima/ima_queue.c
-index ff63fe0..e63ff33 100644
---- a/security/integrity/ima/ima_queue.c
-+++ b/security/integrity/ima/ima_queue.c
-@@ -50,7 +50,7 @@ static struct ima_queue_entry *ima_lookup_digest_entry(u8 *digest_value)
- 	key = ima_hash_key(digest_value);
- 	rcu_read_lock();
- 	hlist_for_each_entry_rcu(qe, &ima_htable.queue[key], hnext) {
--		rc = memcmp(qe->entry->digest, digest_value, IMA_DIGEST_SIZE);
-+		rc = memcmp(qe->entry->digest, digest_value, TPM_DIGEST_SIZE);
- 		if (rc == 0) {
- 			ret = qe;
- 			break;
-@@ -106,7 +106,7 @@ static int ima_pcr_extend(const u8 *hash)
- int ima_add_template_entry(struct ima_template_entry *entry, int violation,
- 			   const char *op, struct inode *inode)
- {
--	u8 digest[IMA_DIGEST_SIZE];
-+	u8 digest[TPM_DIGEST_SIZE];
- 	const char *audit_cause = "hash_added";
- 	char tpm_audit_cause[AUDIT_CAUSE_LEN_MAX];
- 	int audit_info = 1;
+ 	if (!ima_used_chip)
 -- 
 1.8.1.4
-
