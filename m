@@ -1,7 +1,7 @@
 From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: [RFC][PATCH 01/20] crypto: provide single place for hash algo information
-Date: Wed, 17 Jul 2013 19:51:21 -0400
-Message-ID: <1374105100-25880-2-git-send-email-zohar@linux.vnet.ibm.com>
+Subject: [RFC][PATCH 03/20] ima: provide support for arbitrary hash algorithms
+Date: Wed, 17 Jul 2013 19:51:23 -0400
+Message-ID: <1374105100-25880-4-git-send-email-zohar@linux.vnet.ibm.com>
 References: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
 Cc: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
 	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
@@ -15,201 +15,367 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
 
-This patch provides single place for information about hash algorithms,
-such as hash sizes, and kernel driver names. Will be used by IMA and
-public key code.
+In preparation of supporting more hash algorithms with larger hash sizes
+needed for signature verification, this patch replaces the 20 byte sized
+digest, with a more flexible structure.  The new structure includes the
+hash algorithm, digest size, and digest.
 
 Changelog:
-- Fix sparse and checkpatch warnings
-- Move hash algo enums to uapi for userspace signing functions.
+- recalculate filedata hash for the measurement list, if the signature
+  hash digest size is greater than 20 bytes.
+- use generic HASH_ALGO_
+- make ima_calc_file_hash static
+- scripts lindent and checkpatch fixes
 
 Signed-off-by: Dmitry Kasatkin <d.kasatkin@samsung.com>
 Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 ---
- crypto/Kconfig                 |  3 +++
- crypto/Makefile                |  1 +
- crypto/hash_info.c             | 56 ++++++++++++++++++++++++++++++++++++++++++
- include/crypto/hash_info.h     | 40 ++++++++++++++++++++++++++++++
- include/uapi/linux/hash_info.h | 37 ++++++++++++++++++++++++++++
- 5 files changed, 137 insertions(+)
- create mode 100644 crypto/hash_info.c
- create mode 100644 include/crypto/hash_info.h
- create mode 100644 include/uapi/linux/hash_info.h
+ security/integrity/ima/Kconfig        |  1 +
+ security/integrity/ima/ima.h          |  7 ++---
+ security/integrity/ima/ima_api.c      | 32 +++++++++++++++++------
+ security/integrity/ima/ima_appraise.c | 20 ++++++++------
+ security/integrity/ima/ima_crypto.c   | 49 +++++++++++++++++++++++++++++------
+ security/integrity/ima/ima_main.c     |  6 +++--
+ security/integrity/integrity.h        | 15 ++++++++---
+ 7 files changed, 98 insertions(+), 32 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 622d8a4..6f2b632 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1393,6 +1393,9 @@ config CRYPTO_USER_API_SKCIPHER
- 	  This option enables the user-spaces interface for symmetric
- 	  key cipher algorithms.
+diff --git a/security/integrity/ima/Kconfig b/security/integrity/ima/Kconfig
+index 39196ab..e6628e7 100644
+--- a/security/integrity/ima/Kconfig
++++ b/security/integrity/ima/Kconfig
+@@ -9,6 +9,7 @@ config IMA
+ 	select CRYPTO_HMAC
+ 	select CRYPTO_MD5
+ 	select CRYPTO_SHA1
++	select CRYPTO_HASH_INFO
+ 	select TCG_TPM if HAS_IOMEM && !UML
+ 	select TCG_TIS if TCG_TPM && X86
+ 	select TCG_IBMVTPM if TCG_TPM && PPC64
+diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
+index b3dd616..eb86032 100644
+--- a/security/integrity/ima/ima.h
++++ b/security/integrity/ima/ima.h
+@@ -39,7 +39,7 @@ enum tpm_pcrs { TPM_PCR0 = 0, TPM_PCR8 = 8 };
+ /* set during initialization */
+ extern int ima_initialized;
+ extern int ima_used_chip;
+-extern char *ima_hash;
++extern int ima_hash_algo;
+ extern int ima_appraise;
  
-+config CRYPTO_HASH_INFO
-+	bool
-+
- source "drivers/crypto/Kconfig"
- source crypto/asymmetric_keys/Kconfig
+ /* IMA inode template definition */
+@@ -70,8 +70,9 @@ void ima_fs_cleanup(void);
+ int ima_inode_alloc(struct inode *inode);
+ int ima_add_template_entry(struct ima_template_entry *entry, int violation,
+ 			   const char *op, struct inode *inode);
+-int ima_calc_file_hash(struct file *file, char *digest);
+-int ima_calc_buffer_hash(const void *data, int len, char *digest);
++int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash);
++int ima_calc_buffer_hash(const void *data, int len,
++			 struct ima_digest_data *hash);
+ int ima_calc_boot_aggregate(char *digest);
+ void ima_add_violation(struct inode *inode, const unsigned char *filename,
+ 		       const char *op, const char *cause);
+diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
+index 1c03e8f1..e531fe2 100644
+--- a/security/integrity/ima/ima_api.c
++++ b/security/integrity/ima/ima_api.c
+@@ -44,6 +44,7 @@ int ima_store_template(struct ima_template_entry *entry,
+ 	const char *op = "add_template_measure";
+ 	const char *audit_cause = "hashing_error";
+ 	int result;
++	struct ima_digest_data hash;
  
-diff --git a/crypto/Makefile b/crypto/Makefile
-index a8e9b0f..c179df9 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -101,3 +101,4 @@ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
- obj-$(CONFIG_XOR_BLOCKS) += xor.o
- obj-$(CONFIG_ASYNC_CORE) += async_tx/
- obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys/
-+obj-$(CONFIG_CRYPTO_HASH_INFO) += hash_info.o
-diff --git a/crypto/hash_info.c b/crypto/hash_info.c
-new file mode 100644
-index 0000000..3e7ff46
---- /dev/null
-+++ b/crypto/hash_info.c
-@@ -0,0 +1,56 @@
-+/*
-+ * Hash Info: Hash algorithms information
-+ *
-+ * Copyright (c) 2013 Dmitry Kasatkin <d.kasatkin@samsung.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
+ 	memset(entry->digest, 0, sizeof(entry->digest));
+ 	entry->template_name = IMA_TEMPLATE_NAME;
+@@ -51,14 +52,14 @@ int ima_store_template(struct ima_template_entry *entry,
+ 
+ 	if (!violation) {
+ 		result = ima_calc_buffer_hash(&entry->template,
+-						entry->template_len,
+-						entry->digest);
++					      entry->template_len, &hash);
+ 		if (result < 0) {
+ 			integrity_audit_msg(AUDIT_INTEGRITY_PCR, inode,
+ 					    entry->template_name, op,
+ 					    audit_cause, result, 0);
+ 			return result;
+ 		}
++		memcpy(entry->digest, hash.digest, hash.length);
+ 	}
+ 	result = ima_add_template_entry(entry, violation, op, inode);
+ 	return result;
+@@ -147,8 +148,9 @@ int ima_collect_measurement(struct integrity_iint_cache *iint,
+ 	if (!(iint->flags & IMA_COLLECTED)) {
+ 		u64 i_version = file_inode(file)->i_version;
+ 
+-		iint->ima_xattr.type = IMA_XATTR_DIGEST;
+-		result = ima_calc_file_hash(file, iint->ima_xattr.digest);
++		/* use default hash algorithm */
++		iint->ima_hash.algo = ima_hash_algo;
++		result = ima_calc_file_hash(file, &iint->ima_hash);
+ 		if (!result) {
+ 			iint->version = i_version;
+ 			iint->flags |= IMA_COLLECTED;
+@@ -196,7 +198,21 @@ void ima_store_measurement(struct integrity_iint_cache *iint,
+ 		return;
+ 	}
+ 	memset(&entry->template, 0, sizeof(entry->template));
+-	memcpy(entry->template.digest, iint->ima_xattr.digest, IMA_DIGEST_SIZE);
++	if (iint->ima_hash.algo != ima_hash_algo) {
++		struct ima_digest_data hash;
 +
-+#include <linux/export.h>
++		hash.algo = ima_hash_algo;
++		result = ima_calc_file_hash(file, &hash);
++		if (result)
++			integrity_audit_msg(AUDIT_INTEGRITY_DATA, inode,
++					    filename, "collect_data", "failed",
++					    result, 0);
++		else
++			memcpy(entry->template.digest, hash.digest,
++			       hash.length);
++	} else
++		memcpy(entry->template.digest, iint->ima_hash.digest,
++		       iint->ima_hash.length);
+ 	strcpy(entry->template.file_name,
+ 	       (strlen(filename) > IMA_EVENT_NAME_LEN_MAX) ?
+ 	       file->f_dentry->d_name.name : filename);
+@@ -212,14 +228,14 @@ void ima_audit_measurement(struct integrity_iint_cache *iint,
+ 			   const unsigned char *filename)
+ {
+ 	struct audit_buffer *ab;
+-	char hash[(IMA_DIGEST_SIZE * 2) + 1];
++	char hash[(iint->ima_hash.length * 2) + 1];
+ 	int i;
+ 
+ 	if (iint->flags & IMA_AUDITED)
+ 		return;
+ 
+-	for (i = 0; i < IMA_DIGEST_SIZE; i++)
+-		hex_byte_pack(hash + (i * 2), iint->ima_xattr.digest[i]);
++	for (i = 0; i < iint->ima_hash.length; i++)
++		hex_byte_pack(hash + (i * 2), iint->ima_hash.digest[i]);
+ 	hash[i * 2] = '\0';
+ 
+ 	ab = audit_log_start(current->audit_context, GFP_KERNEL,
+diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
+index 2d4beca..f2a3bda 100644
+--- a/security/integrity/ima/ima_appraise.c
++++ b/security/integrity/ima/ima_appraise.c
+@@ -43,12 +43,12 @@ int ima_must_appraise(struct inode *inode, int mask, enum ima_hooks func)
+ }
+ 
+ static int ima_fix_xattr(struct dentry *dentry,
+-			  struct integrity_iint_cache *iint)
++			 struct integrity_iint_cache *iint)
+ {
+-	iint->ima_xattr.type = IMA_XATTR_DIGEST;
++	iint->ima_hash.type = IMA_XATTR_DIGEST;
+ 	return __vfs_setxattr_noperm(dentry, XATTR_NAME_IMA,
+-				     (u8 *)&iint->ima_xattr,
+-				      sizeof(iint->ima_xattr), 0);
++				     &iint->ima_hash.type,
++				     1 + iint->ima_hash.length, 0);
+ }
+ 
+ /* Return specific func appraised cached result */
+@@ -159,8 +159,12 @@ int ima_appraise_measurement(int func, struct integrity_iint_cache *iint,
+ 			status = INTEGRITY_FAIL;
+ 			break;
+ 		}
+-		rc = memcmp(xattr_value->digest, iint->ima_xattr.digest,
+-			    IMA_DIGEST_SIZE);
++		if (rc - 1 == iint->ima_hash.length)
++			rc = memcmp(xattr_value->digest,
++				    iint->ima_hash.digest,
++				    iint->ima_hash.length);
++		else
++			rc = -EINVAL;
+ 		if (rc) {
+ 			cause = "invalid-hash";
+ 			status = INTEGRITY_FAIL;
+@@ -172,8 +176,8 @@ int ima_appraise_measurement(int func, struct integrity_iint_cache *iint,
+ 		iint->flags |= IMA_DIGSIG;
+ 		rc = integrity_digsig_verify(INTEGRITY_KEYRING_IMA,
+ 					     xattr_value->digest, rc - 1,
+-					     iint->ima_xattr.digest,
+-					     IMA_DIGEST_SIZE);
++					     iint->ima_hash.digest,
++					     iint->ima_hash.length);
+ 		if (rc == -EOPNOTSUPP) {
+ 			status = INTEGRITY_UNKNOWN;
+ 		} else if (rc) {
+diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
+index a02e079..2fd1786 100644
+--- a/security/integrity/ima/ima_crypto.c
++++ b/security/integrity/ima/ima_crypto.c
+@@ -20,6 +20,7 @@
+ #include <linux/err.h>
+ #include <linux/slab.h>
+ #include <crypto/hash.h>
 +#include <crypto/hash_info.h>
+ #include "ima.h"
+ 
+ static struct crypto_shash *ima_shash_tfm;
+@@ -28,10 +29,11 @@ int ima_init_crypto(void)
+ {
+ 	long rc;
+ 
+-	ima_shash_tfm = crypto_alloc_shash(ima_hash, 0, 0);
++	ima_shash_tfm = crypto_alloc_shash(hash_algo_name[ima_hash_algo], 0, 0);
+ 	if (IS_ERR(ima_shash_tfm)) {
+ 		rc = PTR_ERR(ima_shash_tfm);
+-		pr_err("Can not allocate %s (reason: %ld)\n", ima_hash, rc);
++		pr_err("Can not allocate %s (reason: %ld)\n",
++		       hash_algo_name[ima_hash_algo], rc);
+ 		return rc;
+ 	}
+ 	return 0;
+@@ -40,17 +42,19 @@ int ima_init_crypto(void)
+ /*
+  * Calculate the MD5/SHA1 file digest
+  */
+-int ima_calc_file_hash(struct file *file, char *digest)
++static int ima_calc_file_hash_tfm(struct file *file,
++				  struct ima_digest_data *hash,
++				  struct crypto_shash *tfm)
+ {
+ 	loff_t i_size, offset = 0;
+ 	char *rbuf;
+ 	int rc, read = 0;
+ 	struct {
+ 		struct shash_desc shash;
+-		char ctx[crypto_shash_descsize(ima_shash_tfm)];
++		char ctx[crypto_shash_descsize(tfm)];
+ 	} desc;
+ 
+-	desc.shash.tfm = ima_shash_tfm;
++	desc.shash.tfm = tfm;
+ 	desc.shash.flags = 0;
+ 
+ 	rc = crypto_shash_init(&desc.shash);
+@@ -85,17 +89,42 @@ int ima_calc_file_hash(struct file *file, char *digest)
+ 	}
+ 	kfree(rbuf);
+ 	if (!rc)
+-		rc = crypto_shash_final(&desc.shash, digest);
++		rc = crypto_shash_final(&desc.shash, hash->digest);
+ 	if (read)
+ 		file->f_mode &= ~FMODE_READ;
+ out:
+ 	return rc;
+ }
+ 
++int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
++{
++	struct crypto_shash *tfm = ima_shash_tfm;
++	int rc;
 +
-+const char *const hash_algo_name[HASH_ALGO__LAST] = {
-+	[HASH_ALGO_MD4]		= "md4",
-+	[HASH_ALGO_MD5]		= "md5",
-+	[HASH_ALGO_SHA1]	= "sha1",
-+	[HASH_ALGO_RIPE_MD_160]	= "rmd160",
-+	[HASH_ALGO_SHA256]	= "sha256",
-+	[HASH_ALGO_SHA384]	= "sha384",
-+	[HASH_ALGO_SHA512]	= "sha512",
-+	[HASH_ALGO_SHA224]	= "sha224",
-+	[HASH_ALGO_RIPE_MD_128]	= "rmd128",
-+	[HASH_ALGO_RIPE_MD_256]	= "rmd256",
-+	[HASH_ALGO_RIPE_MD_320]	= "rmd320",
-+	[HASH_ALGO_WP_256]	= "wp256",
-+	[HASH_ALGO_WP_384]	= "wp384",
-+	[HASH_ALGO_WP_512]	= "wp512",
-+	[HASH_ALGO_TGR_128]	= "tgr128",
-+	[HASH_ALGO_TGR_160]	= "tgr160",
-+	[HASH_ALGO_TGR_192]	= "tgr192",
-+};
-+EXPORT_SYMBOL_GPL(hash_algo_name);
++	if (hash->algo != ima_hash_algo && hash->algo < HASH_ALGO__LAST) {
++		tfm = crypto_alloc_shash(hash_algo_name[hash->algo], 0, 0);
++		if (IS_ERR(tfm)) {
++			rc = PTR_ERR(tfm);
++			pr_err("Can not allocate %s (reason: %d)\n",
++			       hash_algo_name[hash->algo], rc);
++			return rc;
++		}
++	}
 +
-+const int hash_digest_size[HASH_ALGO__LAST] = {
-+	[HASH_ALGO_MD4]		= MD5_DIGEST_SIZE,
-+	[HASH_ALGO_MD5]		= MD5_DIGEST_SIZE,
-+	[HASH_ALGO_SHA1]	= SHA1_DIGEST_SIZE,
-+	[HASH_ALGO_RIPE_MD_160]	= RMD160_DIGEST_SIZE,
-+	[HASH_ALGO_SHA256]	= SHA256_DIGEST_SIZE,
-+	[HASH_ALGO_SHA384]	= SHA384_DIGEST_SIZE,
-+	[HASH_ALGO_SHA512]	= SHA512_DIGEST_SIZE,
-+	[HASH_ALGO_SHA224]	= SHA224_DIGEST_SIZE,
-+	[HASH_ALGO_RIPE_MD_128]	= RMD128_DIGEST_SIZE,
-+	[HASH_ALGO_RIPE_MD_256]	= RMD256_DIGEST_SIZE,
-+	[HASH_ALGO_RIPE_MD_320]	= RMD320_DIGEST_SIZE,
-+	[HASH_ALGO_WP_256]	= WP256_DIGEST_SIZE,
-+	[HASH_ALGO_WP_384]	= WP384_DIGEST_SIZE,
-+	[HASH_ALGO_WP_512]	= WP512_DIGEST_SIZE,
-+	[HASH_ALGO_TGR_128]	= TGR128_DIGEST_SIZE,
-+	[HASH_ALGO_TGR_160]	= TGR160_DIGEST_SIZE,
-+	[HASH_ALGO_TGR_192]	= TGR192_DIGEST_SIZE,
-+};
-+EXPORT_SYMBOL_GPL(hash_digest_size);
-diff --git a/include/crypto/hash_info.h b/include/crypto/hash_info.h
-new file mode 100644
-index 0000000..e1e5a3e
---- /dev/null
-+++ b/include/crypto/hash_info.h
-@@ -0,0 +1,40 @@
-+/*
-+ * Hash Info: Hash algorithms information
-+ *
-+ * Copyright (c) 2013 Dmitry Kasatkin <d.kasatkin@samsung.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
++	hash->length = crypto_shash_digestsize(tfm);
 +
-+#ifndef _CRYPTO_HASH_INFO_H
-+#define _CRYPTO_HASH_INFO_H
++	rc = ima_calc_file_hash_tfm(file, hash, tfm);
 +
-+#include <crypto/sha.h>
-+#include <crypto/md5.h>
++	if (tfm != ima_shash_tfm)
++		crypto_free_shash(tfm);
 +
-+#include <uapi/linux/hash_info.h>
++	return rc;
++}
 +
-+/* not defined in include/crypto/ */
-+#define RMD128_DIGEST_SIZE      16
-+#define RMD160_DIGEST_SIZE	20
-+#define RMD256_DIGEST_SIZE      32
-+#define RMD320_DIGEST_SIZE      40
+ /*
+  * Calculate the hash of a given buffer
+  */
+-int ima_calc_buffer_hash(const void *data, int len, char *digest)
++int ima_calc_buffer_hash(const void *buf, int len, struct ima_digest_data *hash)
+ {
+ 	struct {
+ 		struct shash_desc shash;
+@@ -105,7 +134,11 @@ int ima_calc_buffer_hash(const void *data, int len, char *digest)
+ 	desc.shash.tfm = ima_shash_tfm;
+ 	desc.shash.flags = 0;
+ 
+-	return crypto_shash_digest(&desc.shash, data, len, digest);
++	/* this function uses default algo */
++	hash->algo = ima_hash_algo;
++	hash->length = crypto_shash_digestsize(ima_shash_tfm);
 +
-+/* not defined in include/crypto/ */
-+#define WP512_DIGEST_SIZE	64
-+#define WP384_DIGEST_SIZE	48
-+#define WP256_DIGEST_SIZE	32
++	return crypto_shash_digest(&desc.shash, buf, len, hash->digest);
+ }
+ 
+ static void __init ima_pcrread(int idx, u8 *pcr)
+diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+index 6c491a6..a8ae99b 100644
+--- a/security/integrity/ima/ima_main.c
++++ b/security/integrity/ima/ima_main.c
+@@ -24,6 +24,7 @@
+ #include <linux/slab.h>
+ #include <linux/xattr.h>
+ #include <linux/ima.h>
++#include <crypto/hash_info.h>
+ 
+ #include "ima.h"
+ 
+@@ -35,11 +36,12 @@ int ima_appraise = IMA_APPRAISE_ENFORCE;
+ int ima_appraise;
+ #endif
+ 
+-char *ima_hash = "sha1";
++int ima_hash_algo = HASH_ALGO_SHA1;
 +
-+/* not defined in include/crypto/ */
-+#define TGR128_DIGEST_SIZE 16
-+#define TGR160_DIGEST_SIZE 20
-+#define TGR192_DIGEST_SIZE 24
+ static int __init hash_setup(char *str)
+ {
+ 	if (strncmp(str, "md5", 3) == 0)
+-		ima_hash = "md5";
++		ima_hash_algo = HASH_ALGO_MD5;
+ 	return 1;
+ }
+ __setup("ima_hash=", hash_setup);
+diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
+index c42fb7a..a97f1091 100644
+--- a/security/integrity/integrity.h
++++ b/security/integrity/integrity.h
+@@ -59,20 +59,29 @@ enum evm_ima_xattr_type {
+ struct evm_ima_xattr_data {
+ 	u8 type;
+ 	u8 digest[SHA1_DIGEST_SIZE];
+-}  __attribute__((packed));
++} __packed;
 +
-+extern const char *const hash_algo_name[HASH_ALGO__LAST];
-+extern const int hash_digest_size[HASH_ALGO__LAST];
++#define IMA_MAX_DIGEST_SIZE	64
 +
-+#endif /* _CRYPTO_HASH_INFO_H */
-diff --git a/include/uapi/linux/hash_info.h b/include/uapi/linux/hash_info.h
-new file mode 100644
-index 0000000..ca18c45
---- /dev/null
-+++ b/include/uapi/linux/hash_info.h
-@@ -0,0 +1,37 @@
-+/*
-+ * Hash Info: Hash algorithms information
-+ *
-+ * Copyright (c) 2013 Dmitry Kasatkin <d.kasatkin@samsung.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+
-+#ifndef _UAPI_LINUX_HASH_INFO_H
-+#define _UAPI_LINUX_HASH_INFO_H
-+
-+enum hash_algo {
-+	HASH_ALGO_MD4,
-+	HASH_ALGO_MD5,
-+	HASH_ALGO_SHA1,
-+	HASH_ALGO_RIPE_MD_160,
-+	HASH_ALGO_SHA256,
-+	HASH_ALGO_SHA384,
-+	HASH_ALGO_SHA512,
-+	HASH_ALGO_SHA224,
-+	HASH_ALGO_RIPE_MD_128,
-+	HASH_ALGO_RIPE_MD_256,
-+	HASH_ALGO_RIPE_MD_320,
-+	HASH_ALGO_WP_256,
-+	HASH_ALGO_WP_384,
-+	HASH_ALGO_WP_512,
-+	HASH_ALGO_TGR_128,
-+	HASH_ALGO_TGR_160,
-+	HASH_ALGO_TGR_192,
-+	HASH_ALGO__LAST
-+};
-+
-+#endif /* _UAPI_LINUX_HASH_INFO_H */
++struct ima_digest_data {
++	u8 algo;
++	u8 length;
++	u8 type;
++	u8 digest[IMA_MAX_DIGEST_SIZE];
++} __packed;
+ 
+ /* integrity data associated with an inode */
+ struct integrity_iint_cache {
+-	struct rb_node rb_node; /* rooted in integrity_iint_tree */
++	struct rb_node rb_node;	/* rooted in integrity_iint_tree */
+ 	struct inode *inode;	/* back pointer to inode in question */
+ 	u64 version;		/* track inode changes */
+ 	unsigned long flags;
+-	struct evm_ima_xattr_data ima_xattr;
+ 	enum integrity_status ima_file_status:4;
+ 	enum integrity_status ima_mmap_status:4;
+ 	enum integrity_status ima_bprm_status:4;
+ 	enum integrity_status ima_module_status:4;
+ 	enum integrity_status evm_status:4;
++	struct ima_digest_data ima_hash;
+ };
+ 
+ /* rbtree tree calls to lookup, insert, delete
 -- 
 1.8.1.4
 
