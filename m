@@ -1,440 +1,161 @@
 From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: [RFC][PATCH 13/20] ima: new templates management mechanism
-Date: Wed, 17 Jul 2013 19:51:33 -0400
-Message-ID: <1374105100-25880-14-git-send-email-zohar@linux.vnet.ibm.com>
+Subject: [RFC][PATCH 20/20] ima: enable support for larger default filedata hash algorithms
+Date: Wed, 17 Jul 2013 19:51:40 -0400
+Message-ID: <1374105100-25880-21-git-send-email-zohar@linux.vnet.ibm.com>
 References: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Roberto Sassu <roberto.sassu@polito.it>,
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
 	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>
+	Mimi Zohar <zohar@us.ibm.com>,
+	Roberto Sassu <roberto.sassu@polito.it>
 To: linux-security-module@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e32.co.us.ibm.com ([32.97.110.150]:40623 "EHLO
-	e32.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757580Ab3GQXwH (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jul 2013 19:52:07 -0400
-Received: from /spool/local
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
-	Wed, 17 Jul 2013 17:52:06 -0600
+Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-=46rom: Roberto Sassu <roberto.sassu@polito.it>
+The IMA measurement list contains two hashes - a template data hash
+and a filedata hash.  The template data hash is committed to the TPM,
+which is limited, by the TPM v1.2 specification, to 20 bytes.  The
+filedata hash is defined as 20 bytes as well.
 
-The original 'ima' template is fixed length, containing the filedata ha=
-sh
-and pathname.  The filedata hash is limited to 20 bytes (md5/sha1).  Th=
-e
-pathname is a null terminated string, limited to 255 characters.  To
-overcome these limitations and to add additional file metadata, it is
-necessary to extend the current version of IMA by defining additional
-templates.
+Now that support for variable length measurement list templates was
+added, the filedata hash is not limited to 20 bytes.  This patch adds
+Kconfig support for defining larger default filedata hash algorithms
+and replacing the builtin default with one specified on the kernel
+command line.
 
-The main reason to introduce this feature is that, each time a new
-template is defined, the functions that generate and display the
-measurement list would include the code for handling a new format and,
-thus, would significantly grow over time.
-
-This patch set solves this problem by separating the template managemen=
-t
-from the remaining IMA code. The core of this solution is the definitio=
-n
-of two new data structures: a template descriptor, to determine which
-information should be included in the measurement list, and a template
-field, to generate and display data of a given type.
-
-To define a new template field, developers define the field identifier
-and implement two functions, init() and show(), respectively to generat=
-e
-and display measurement entries.  Initially, this patch set defines the
-following template fields (support for additional data types will be
-added later):
-=C2=A0- 'd': the digest of the event (i.e. the digest of a measured fil=
-e),
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0calculated with the SHA=
-1 or MD5 hash algorithm;
-=C2=A0- 'n': the name of the event (i.e. the file name), with size up t=
-o
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0255 bytes;
-=C2=A0- 'd-ng': the digest of the event, calculated with an arbitrary h=
-ash
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0algor=
-ithm (field format: [<hash algo>:]digest, where the digest
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0prefi=
-x is shown only if the hash algorithm is not SHA1 or MD5);
-=C2=A0- 'n-ng': the name of the event, without size limitations.
-
-Defining a new template descriptor requires specifying the template for=
-mat,
-a string of field identifiers separated by the '|' character.  This pat=
-ch
-set defines the following template descriptors:
-=C2=A0- "ima": its format is 'd|n';
-=C2=A0- "ima-ng" (default): its format is 'd-ng|n-ng'
-
-=46urther details about the new template architecture can be found in
-Documentation/security/IMA-templates.txt.
+<uapi/linux/hash_info.h> contains a list of hash algorithms.  The
+Kconfig default hash algorithm is a subset of this list, but any hash
+algorithm included in the list can be specified at boot, using the
+'ima_hash=' kernel command line option.
 
 Changelog:
-- don't defer calling ima_init_template() - Mimi
-- don't define ima_lookup_template_desc() until used - Mimi
-- squashed with documentation patch - Mimi
+- support hashes that are configured
+- use generic HASH_ALGO_ definitions
+- add Kconfig support
+- hash_setup must be called only once (Dmitry)
+- removed trailing whitespaces (Roberto Sassu)
 
+Signed-off-by: Mimi Zohar <zohar@us.ibm.com>
 Signed-off-by: Roberto Sassu <roberto.sassu@polito.it>
-Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 ---
- Documentation/security/00-INDEX          |   2 +
- Documentation/security/IMA-templates.txt |  87 +++++++++++++++++++++++=
-+
- security/integrity/ima/Makefile          |   2 +-
- security/integrity/ima/ima.h             |  29 ++++++++
- security/integrity/ima/ima_init.c        |   4 ++
- security/integrity/ima/ima_template.c    | 112 +++++++++++++++++++++++=
-++++++++
- 6 files changed, 235 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/security/IMA-templates.txt
- create mode 100644 security/integrity/ima/ima_template.c
+ Documentation/kernel-parameters.txt |  6 +++++-
+ security/integrity/ima/Kconfig      | 35 +++++++++++++++++++++++++++++++++++
+ security/integrity/ima/ima_main.c   | 26 ++++++++++++++++++++++++--
+ 3 files changed, 64 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/security/00-INDEX b/Documentation/security/0=
-0-INDEX
-index 414235c..45c82fd 100644
---- a/Documentation/security/00-INDEX
-+++ b/Documentation/security/00-INDEX
-@@ -22,3 +22,5 @@ keys.txt
- 	- description of the kernel key retention service.
- tomoyo.txt
- 	- documentation on the TOMOYO Linux Security Module.
-+IMA-templates.txt
-+	- documentation on the template management mechanism for IMA.
-diff --git a/Documentation/security/IMA-templates.txt b/Documentation/s=
-ecurity/IMA-templates.txt
-new file mode 100644
-index 0000000..a777e5f
---- /dev/null
-+++ b/Documentation/security/IMA-templates.txt
-@@ -0,0 +1,87 @@
-+                       IMA Template Management Mechanism
+diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
+index 7c60db3..f328a60 100644
+--- a/Documentation/kernel-parameters.txt
++++ b/Documentation/kernel-parameters.txt
+@@ -1130,9 +1130,13 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
+ 			owned by uid=0.
+ 
+ 	ima_hash=	[IMA]
+-			Format: { "sha1" | "md5" }
++			Format: { md5 | sha1 | rmd160 | sha256 | sha384
++				   | sha512 | ... }
+ 			default: "sha1"
+ 
++			The list of supported hash algorithms is defined
++			in crypto/hash_info.h.
 +
+ 	ima_tcb		[IMA]
+ 			Load a policy which meets the needs of the Trusted
+ 			Computing Base.  This means IMA will measure all
+diff --git a/security/integrity/ima/Kconfig b/security/integrity/ima/Kconfig
+index de26cc8..dab1898 100644
+--- a/security/integrity/ima/Kconfig
++++ b/security/integrity/ima/Kconfig
+@@ -71,6 +71,41 @@ config IMA_DEFAULT_TEMPLATE
+ 	default "ima" if IMA_TEMPLATE
+ 	default "ima-ng" if IMA_NG_TEMPLATE
+ 
++choice
++	prompt "Default integrity hash algorithm"
++	default IMA_DEFAULT_HASH_SHA1
++	depends on IMA
++	help
++	   Select the default hash algorithm used for the measurement
++	   list, integrity appraisal and audit log.  The compiled default
++	   hash algorithm can be overwritten using the kernel command
++	   line 'ima_hash=' option.
 +
-+=3D=3D=3D=3D INTRODUCTION =3D=3D=3D=3D
++	config IMA_DEFAULT_HASH_SHA1
++		bool "SHA1 (default)"
++		depends on CRYPTO_SHA1
 +
-+The original 'ima' template is fixed length, containing the filedata h=
-ash
-+and pathname. The filedata hash is limited to 20 bytes (md5/sha1).
-+The pathname is a null terminated string, limited to 255 characters.
-+To overcome these limitations and to add additional file metadata, it =
-is
-+necessary to extend the current version of IMA by defining additional
-+templates. For example, information that could be possibly reported ar=
-e
-+the inode UID/GID or the LSM labels either of the inode and of the pro=
-cess
-+that is accessing it.
++	config IMA_DEFAULT_HASH_SHA256
++		bool "SHA256"
++		depends on CRYPTO_SHA256 && IMA_NG_TEMPLATE
 +
-+However, the main problem to introduce this feature is that, each time
-+a new template is defined, the functions that generate and display
-+the measurements list would include the code for handling a new format
-+and, thus, would significantly grow over the time.
++	config IMA_DEFAULT_HASH_SHA512
++		bool "SHA512"
++		depends on CRYPTO_SHA512 && IMA_NG_TEMPLATE
 +
-+The proposed solution solves this problem by separating the template
-+management from the remaining IMA code. The core of this solution is t=
-he
-+definition of two new data structures: a template descriptor, to deter=
-mine
-+which information should be included in the measurement list; a templa=
-te
-+field, to generate and display data of a given type.
++	config IMA_DEFAULT_HASH_WP512
++		bool "WP512"
++		depends on CRYPTO_WP512 && IMA_NG_TEMPLATE
++endchoice
 +
-+Managing templates with these structures is very simple. To support
-+a new data type, developers define the field identifier and implement
-+two functions, init() and show(), respectively to generate and display
-+measurement entries. Defining a new template descriptor requires
-+specifying the template format, a string of field identifiers separate=
-d
-+by the '|' character. While in the current implementation it is possib=
-le
-+to define new template descriptors only by adding their definition in =
-the
-+template specific code (ima_template.c), in a future version it will b=
-e
-+possible to register a new template on a running kernel by supplying t=
-o IMA
-+the desired format string. In this version, IMA initializes at boot ti=
-me
-+all defined template descriptors by translating the format into an arr=
-ay
-+of template fields structures taken from the set of the supported ones=
-=2E
++config IMA_DEFAULT_HASH
++	string
++	depends on IMA
++	default "sha1" if IMA_DEFAULT_HASH_SHA1
++	default "sha256" if IMA_DEFAULT_HASH_SHA256
++	default "sha512" if IMA_DEFAULT_HASH_SHA512
++	default "wp512" if IMA_DEFAULT_HASH_WP512
 +
-+After the initialization step, IMA will call ima_alloc_init_template()
-+(new function defined within the patches for the new template manageme=
-nt
-+mechanism) to generate a new measurement entry by using the template
-+descriptor chosen through the kernel configuration or through the newl=
-y
-+introduced 'ima_template=3D' kernel command line parameter. It is duri=
-ng this
-+phase that the advantages of the new architecture are clearly shown:
-+the latter function will not contain specific code to handle a given t=
-emplate
-+but, instead, it simply calls the init() method of the template fields
-+associated to the chosen template descriptor and store the result (poi=
-nter
-+to allocated data and data length) in the measurement entry structure.
-+
-+The same mechanism is employed to display measurements entries.
-+The functions ima[_ascii]_measurements_show() retrieve, for each entry=
-,
-+the template descriptor used to produce that entry and call the show()
-+method for each item of the array of template fields structures.
-+
-+
-+
-+=3D=3D=3D=3D SUPPORTED TEMPLATE FIELDS AND DESCRIPTORS =3D=3D=3D=3D
-+
-+In the following, there is the list of supported template fields
-+('<identifier>': description), that can be used to define new template
-+descriptors by adding their identifier to the format string
-+(support for more data types will be added later):
-+
-+ - 'd': the digest of the event (i.e. the digest of a measured file),
-+        calculated with the SHA1 or MD5 hash algorithm;
-+ - 'n': the name of the event (i.e. the file name), with size up to 25=
-5 bytes;
-+ - 'd-ng': the digest of the event, calculated with an arbitrary hash
-+           algorithm (field format: [<hash algo>:]digest, where the di=
-gest
-+           prefix is shown only if the hash algorithm is not SHA1 or M=
-D5);
-+ - 'n-ng': the name of the event, without size limitations.
-+
-+
-+Below, there is the list of defined template descriptors:
-+ - "ima": its format is 'd|n';
-+ - "ima-ng" (default): its format is 'd-ng|n-ng'.
-+
-+
-+
-+=3D=3D=3D=3D USE =3D=3D=3D=3D
-+
-+To specify the template descriptor to be used to generate measurement =
-entries,
-+currently the following methods are supported:
-+
-+ - select a template descriptor among those supported in the kernel
-+   configuration ('ima-ng' is the default choice);
-+ - specify a template descriptor name from the kernel command line thr=
-ough
-+   the 'ima_template=3D' parameter.
-diff --git a/security/integrity/ima/Makefile b/security/integrity/ima/M=
-akefile
-index 56dfee7..7fe4ae3 100644
---- a/security/integrity/ima/Makefile
-+++ b/security/integrity/ima/Makefile
-@@ -6,5 +6,5 @@
- obj-$(CONFIG_IMA) +=3D ima.o
-=20
- ima-y :=3D ima_fs.o ima_queue.o ima_init.o ima_main.o ima_crypto.o ima=
-_api.o \
--	 ima_policy.o
-+	 ima_policy.o ima_template.o
- ima-$(CONFIG_IMA_APPRAISE) +=3D ima_appraise.o
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.=
-h
-index da03d33..c85718f 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -36,12 +36,39 @@ enum tpm_pcrs { TPM_PCR0 =3D 0, TPM_PCR8 =3D 8 };
- #define IMA_HASH_BITS 9
- #define IMA_MEASURE_HTABLE_SIZE (1 << IMA_HASH_BITS)
-=20
-+#define IMA_TEMPLATE_FIELD_ID_MAX_LEN	16
-+#define IMA_TEMPLATE_NUM_FIELDS_MAX	15
-+
- /* set during initialization */
- extern int ima_initialized;
- extern int ima_used_chip;
- extern int ima_hash_algo;
- extern int ima_appraise;
-=20
-+/* IMA template field data definition */
-+struct ima_field_data {
-+	u8 *data;
-+	u32 len;
-+};
-+
-+/* IMA template field definition */
-+struct ima_template_field {
-+	const char field_id[IMA_TEMPLATE_FIELD_ID_MAX_LEN];
-+	int (*field_init) (struct integrity_iint_cache *iint, struct file *fi=
-le,
-+			   const unsigned char *filename,
-+			   struct ima_field_data *field_data);
-+	void (*field_show) (struct seq_file *m, enum ima_show_type show,
-+			    struct ima_field_data *field_data);
-+};
-+
-+/* IMA template descriptor definition */
-+struct ima_template_desc {
-+	char *name;
-+	char *fmt;
-+	int num_fields;
-+	struct ima_template_field **fields;
-+};
-+
- /* IMA inode template definition */
- struct ima_template_data {
- 	u8 digest[IMA_DIGEST_SIZE];	/* sha1/md5 measurement hash */
-@@ -79,6 +106,8 @@ void ima_add_violation(struct file *file, const unsi=
-gned char *filename,
- 		       const char *op, const char *cause);
- int ima_init_crypto(void);
-=20
-+int ima_init_template(void);
-+
- /*
-  * used to protect h_table and sha_table
-  */
-diff --git a/security/integrity/ima/ima_init.c b/security/integrity/ima=
-/ima_init.c
-index 50e15e6..f84aec5 100644
---- a/security/integrity/ima/ima_init.c
-+++ b/security/integrity/ima/ima_init.c
-@@ -99,6 +99,10 @@ int __init ima_init(void)
- 	rc =3D ima_init_crypto();
- 	if (rc)
- 		return rc;
-+	rc =3D ima_init_template();
-+	if (rc !=3D 0)
-+		return rc;
-+
- 	ima_add_boot_aggregate();	/* boot aggregate must be first entry */
- 	ima_init_policy();
-=20
-diff --git a/security/integrity/ima/ima_template.c b/security/integrity=
-/ima/ima_template.c
-new file mode 100644
-index 0000000..7e86783
---- /dev/null
-+++ b/security/integrity/ima/ima_template.c
-@@ -0,0 +1,112 @@
-+/*
-+ * Copyright (C) 2013 Politecnico di Torino, Italy
-+ *                    TORSEC group -- http://security.polito.it
-+ *
-+ * Author: Roberto Sassu <roberto.sassu@polito.it>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation, version 2 of the
-+ * License.
-+ *
-+ * File: ima_template.c
-+ *      Helpers to manage template descriptors.
-+ */
-+#include "ima.h"
-+
-+static struct ima_template_desc defined_templates[] =3D {
-+};
-+
-+static struct ima_template_field supported_fields[] =3D {
-+};
-+
-+static struct ima_template_field *ima_lookup_template_field(
-+							const char *field_id)
-+{
+ config IMA_APPRAISE
+ 	bool "Appraise integrity measurements"
+ 	depends on IMA
+diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+index c2f6d96..fc1ff82 100644
+--- a/security/integrity/ima/ima_main.c
++++ b/security/integrity/ima/ima_main.c
+@@ -37,11 +37,32 @@ int ima_appraise;
+ #endif
+ 
+ int ima_hash_algo = HASH_ALGO_SHA1;
++static int hash_setup_done;
+ 
+ static int __init hash_setup(char *str)
+ {
+-	if (strncmp(str, "md5", 3) == 0)
+-		ima_hash_algo = HASH_ALGO_MD5;
++	struct ima_template_desc *template_desc = ima_template_desc_current();
 +	int i;
 +
-+	for (i =3D 0; i < ARRAY_SIZE(supported_fields); i++)
-+		if (strncmp(supported_fields[i].field_id, field_id,
-+			    IMA_TEMPLATE_FIELD_ID_MAX_LEN) =3D=3D 0)
-+			return &supported_fields[i];
-+	return NULL;
-+}
++	if (hash_setup_done)
++		return 1;
 +
-+static int ima_template_fmt_size(char *template_fmt)
-+{
-+	char c;
-+	int template_fmt_len =3D strlen(template_fmt);
-+	int i =3D 0, j =3D 0;
-+
-+	while (i < template_fmt_len) {
-+		c =3D template_fmt[i];
-+		if (c =3D=3D '|')
-+			j++;
-+		i++;
-+	}
-+
-+	return j + 1;
-+}
-+
-+static int template_desc_init_fields(char *template_fmt,
-+				     struct ima_template_field ***fields,
-+				     int *num_fields)
-+{
-+	char *c, *template_fmt_ptr =3D template_fmt;
-+	int template_num_fields =3D ima_template_fmt_size(template_fmt);
-+	int i, result =3D 0;
-+
-+	if (template_num_fields > IMA_TEMPLATE_NUM_FIELDS_MAX)
-+		return -EINVAL;
-+
-+	*fields =3D kzalloc(template_num_fields * sizeof(*fields), GFP_KERNEL=
-);
-+	if (*fields =3D=3D NULL) {
-+		result =3D -ENOMEM;
++	if (strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) == 0) {
++		if (strncmp(str, "sha1", 4) == 0)
++			ima_hash_algo = HASH_ALGO_SHA1;
++		else if (strncmp(str, "md5", 3) == 0)
++			ima_hash_algo = HASH_ALGO_MD5;
 +		goto out;
 +	}
-+	for (i =3D 0; (c =3D strsep(&template_fmt_ptr, "|")) !=3D NULL &&
-+	     i < template_num_fields; i++) {
-+		struct ima_template_field *f =3D ima_lookup_template_field(c);
 +
-+		if (!f) {
-+			result =3D -ENOENT;
-+			goto out;
++	for (i = 0; i < HASH_ALGO__LAST; i++) {
++		if (strcmp(str, hash_algo_name[i]) == 0) {
++			ima_hash_algo = i;
++			break;
 +		}
-+		(*fields)[i] =3D f;
 +	}
-+	*num_fields =3D i;
-+	return 0;
 +out:
-+	kfree(*fields);
-+	*fields =3D NULL;
-+	return result;
-+}
-+
-+static int init_defined_templates(void)
-+{
-+	int i =3D 0;
-+	int result =3D 0;
-+
-+	/* Init defined templates. */
-+	for (i =3D 0; i < ARRAY_SIZE(defined_templates); i++) {
-+		struct ima_template_desc *template =3D &defined_templates[i];
-+
-+		result =3D template_desc_init_fields(template->fmt,
-+						   &(template->fields),
-+						   &(template->num_fields));
-+		if (result < 0)
-+			return result;
-+	}
-+	return result;
-+}
-+
-+int ima_init_template(void)
-+{
-+	int result;
-+
-+	result =3D init_defined_templates();
-+	if (result < 0)
-+		return result;
-+
-+	return 0;
-+}
---=20
++	hash_setup_done = 1;
+ 	return 1;
+ }
+ __setup("ima_hash=", hash_setup);
+@@ -306,6 +327,7 @@ static int __init init_ima(void)
+ {
+ 	int error;
+ 
++	hash_setup(CONFIG_IMA_DEFAULT_HASH);
+ 	error = ima_init();
+ 	if (!error)
+ 		ima_initialized = 1;
+-- 
 1.8.1.4
+
