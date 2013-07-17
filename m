@@ -1,161 +1,127 @@
 From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: [RFC][PATCH 20/20] ima: enable support for larger default filedata hash algorithms
-Date: Wed, 17 Jul 2013 19:51:40 -0400
-Message-ID: <1374105100-25880-21-git-send-email-zohar@linux.vnet.ibm.com>
-References: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
+Subject: [RFC][PATCH 00/20] ima: larger digests and template support
+Date: Wed, 17 Jul 2013 19:51:20 -0400
+Message-ID: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Mimi Zohar <zohar@us.ibm.com>,
-	Roberto Sassu <roberto.sassu@polito.it>
+	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>
 To: linux-security-module@vger.kernel.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e35.co.us.ibm.com ([32.97.110.153]:48995 "EHLO
+	e35.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757632Ab3GRALc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Jul 2013 20:11:32 -0400
+Received: from /spool/local
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+	Wed, 17 Jul 2013 18:11:31 -0600
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The IMA measurement list contains two hashes - a template data hash
-and a filedata hash.  The template data hash is committed to the TPM,
-which is limited, by the TPM v1.2 specification, to 20 bytes.  The
-filedata hash is defined as 20 bytes as well.
+Support for additional hash algorithms with larger digests, as well as
+support for additional file metadata, in the IMA measurement list, have
+been proposed for a long time.  Unfortunately, the IMA measurement list
+entries, which are exposed to userspace via the securityfs
+ascii/binary_runtime_measurement lists, are fixed length.  Any changes
+to the measurement list would impact existing userspace tools.
 
-Now that support for variable length measurement list templates was
-added, the filedata hash is not limited to 20 bytes.  This patch adds
-Kconfig support for defining larger default filedata hash algorithms
-and replacing the builtin default with one specified on the kernel
-command line.
+This patch set defines an extensible template architecture and support
+for larger hash algorithms.  A description of the new template
+architecture is described in the "ima: new templates management
+mechanism" patch description and, with more detail, in
+Documentation/security/IMA-templates.txt.  The two initial templates
+defined are: the original 'ima', for backwards compatibility, and
+'ima-ng', which eliminates the digest and pathname size limitations.
+Future templates will include file metadata, such as uid/gid and LSM
+object/subject labels.
 
-<uapi/linux/hash_info.h> contains a list of hash algorithms.  The
-Kconfig default hash algorithm is a subset of this list, but any hash
-algorithm included in the list can be specified at boot, using the
-'ima_hash=' kernel command line option.
+Larger hash algorithms, used for file data signature verification, is
+also required to conform to various standards.
 
-Changelog:
-- support hashes that are configured
-- use generic HASH_ALGO_ definitions
-- add Kconfig support
-- hash_setup must be called only once (Dmitry)
-- removed trailing whitespaces (Roberto Sassu)
+The first 9 patches add support for additional, larger hash
+algorithms used in both the IMA measurement list and for file signature
+verification, but isn't enabled until support for the new template
+architecture is enabled.
 
-Signed-off-by: Mimi Zohar <zohar@us.ibm.com>
-Signed-off-by: Roberto Sassu <roberto.sassu@polito.it>
----
- Documentation/kernel-parameters.txt |  6 +++++-
- security/integrity/ima/Kconfig      | 35 +++++++++++++++++++++++++++++++++++
- security/integrity/ima/ima_main.c   | 26 ++++++++++++++++++++++++--
- 3 files changed, 64 insertions(+), 3 deletions(-)
+Patches from 10 to 12 are preparatory for the subsequent changes.
 
-diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
-index 7c60db3..f328a60 100644
---- a/Documentation/kernel-parameters.txt
-+++ b/Documentation/kernel-parameters.txt
-@@ -1130,9 +1130,13 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
- 			owned by uid=0.
- 
- 	ima_hash=	[IMA]
--			Format: { "sha1" | "md5" }
-+			Format: { md5 | sha1 | rmd160 | sha256 | sha384
-+				   | sha512 | ... }
- 			default: "sha1"
- 
-+			The list of supported hash algorithms is defined
-+			in crypto/hash_info.h.
-+
- 	ima_tcb		[IMA]
- 			Load a policy which meets the needs of the Trusted
- 			Computing Base.  This means IMA will measure all
-diff --git a/security/integrity/ima/Kconfig b/security/integrity/ima/Kconfig
-index de26cc8..dab1898 100644
---- a/security/integrity/ima/Kconfig
-+++ b/security/integrity/ima/Kconfig
-@@ -71,6 +71,41 @@ config IMA_DEFAULT_TEMPLATE
- 	default "ima" if IMA_TEMPLATE
- 	default "ima-ng" if IMA_NG_TEMPLATE
- 
-+choice
-+	prompt "Default integrity hash algorithm"
-+	default IMA_DEFAULT_HASH_SHA1
-+	depends on IMA
-+	help
-+	   Select the default hash algorithm used for the measurement
-+	   list, integrity appraisal and audit log.  The compiled default
-+	   hash algorithm can be overwritten using the kernel command
-+	   line 'ima_hash=' option.
-+
-+	config IMA_DEFAULT_HASH_SHA1
-+		bool "SHA1 (default)"
-+		depends on CRYPTO_SHA1
-+
-+	config IMA_DEFAULT_HASH_SHA256
-+		bool "SHA256"
-+		depends on CRYPTO_SHA256 && IMA_NG_TEMPLATE
-+
-+	config IMA_DEFAULT_HASH_SHA512
-+		bool "SHA512"
-+		depends on CRYPTO_SHA512 && IMA_NG_TEMPLATE
-+
-+	config IMA_DEFAULT_HASH_WP512
-+		bool "WP512"
-+		depends on CRYPTO_WP512 && IMA_NG_TEMPLATE
-+endchoice
-+
-+config IMA_DEFAULT_HASH
-+	string
-+	depends on IMA
-+	default "sha1" if IMA_DEFAULT_HASH_SHA1
-+	default "sha256" if IMA_DEFAULT_HASH_SHA256
-+	default "sha512" if IMA_DEFAULT_HASH_SHA512
-+	default "wp512" if IMA_DEFAULT_HASH_WP512
-+
- config IMA_APPRAISE
- 	bool "Appraise integrity measurements"
- 	depends on IMA
-diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
-index c2f6d96..fc1ff82 100644
---- a/security/integrity/ima/ima_main.c
-+++ b/security/integrity/ima/ima_main.c
-@@ -37,11 +37,32 @@ int ima_appraise;
- #endif
- 
- int ima_hash_algo = HASH_ALGO_SHA1;
-+static int hash_setup_done;
- 
- static int __init hash_setup(char *str)
- {
--	if (strncmp(str, "md5", 3) == 0)
--		ima_hash_algo = HASH_ALGO_MD5;
-+	struct ima_template_desc *template_desc = ima_template_desc_current();
-+	int i;
-+
-+	if (hash_setup_done)
-+		return 1;
-+
-+	if (strcmp(template_desc->name, IMA_TEMPLATE_IMA_NAME) == 0) {
-+		if (strncmp(str, "sha1", 4) == 0)
-+			ima_hash_algo = HASH_ALGO_SHA1;
-+		else if (strncmp(str, "md5", 3) == 0)
-+			ima_hash_algo = HASH_ALGO_MD5;
-+		goto out;
-+	}
-+
-+	for (i = 0; i < HASH_ALGO__LAST; i++) {
-+		if (strcmp(str, hash_algo_name[i]) == 0) {
-+			ima_hash_algo = i;
-+			break;
-+		}
-+	}
-+out:
-+	hash_setup_done = 1;
- 	return 1;
- }
- __setup("ima_hash=", hash_setup);
-@@ -306,6 +327,7 @@ static int __init init_ima(void)
- {
- 	int error;
- 
-+	hash_setup(CONFIG_IMA_DEFAULT_HASH);
- 	error = ima_init();
- 	if (!error)
- 		ima_initialized = 1;
+Patches from 13 to 16 introduce the new template architecture
+and the last group effectively enables it by allowing users to
+choose their desired template either from the kernel configuration
+and from the kernel command line.
+
+Mimi Zohar
+
+Dmitry Kasatkin (8):
+  crypto: provide single place for hash algo information
+  keys: change asymmetric keys to use common hash definitions
+  ima: provide support for arbitrary hash algorithms
+  ima: read and use signature hash algorithm
+  ima: use dynamically allocated hash storage
+  ima: provide dedicated hash algo allocation function
+  ima: support arbitrary hash algorithms in ima_calc_buffer_hash
+  ima: ima_calc_boot_agregate must use SHA1
+
+Mimi Zohar (3):
+  ima: differentiate between template hash and file data hash sizes
+  ima: add Kconfig default measurement list template
+  ima: enable support for larger default filedata hash algorithms
+
+Roberto Sassu (9):
+  ima: pass the file descriptor to ima_add_violation()
+  ima: pass the filename argument up to ima_add_template_entry()
+  ima: define new function ima_alloc_init_template() to API
+  ima: new templates management mechanism
+  ima: define template fields library and new helpers
+  ima: define new template ima-ng and template fields d-ng and n-ng
+  ima: switch to new template management mechanism
+  ima: defer determining the appraisal hash algorithm for 'ima' template
+  ima: define kernel parameter 'ima_template=' to change configured
+    default
+
+ Documentation/kernel-parameters.txt       |  11 +-
+ Documentation/security/00-INDEX           |   2 +
+ Documentation/security/IMA-templates.txt  |  87 +++++++++
+ crypto/Kconfig                            |   3 +
+ crypto/Makefile                           |   1 +
+ crypto/asymmetric_keys/Kconfig            |   1 +
+ crypto/asymmetric_keys/public_key.c       |  12 --
+ crypto/asymmetric_keys/rsa.c              |  14 +-
+ crypto/asymmetric_keys/x509_cert_parser.c |  12 +-
+ crypto/asymmetric_keys/x509_parser.h      |   2 +-
+ crypto/asymmetric_keys/x509_public_key.c  |   4 +-
+ crypto/hash_info.c                        |  56 ++++++
+ include/crypto/hash_info.h                |  40 ++++
+ include/crypto/public_key.h               |  18 +-
+ include/uapi/linux/hash_info.h            |  37 ++++
+ kernel/module_signing.c                   |   8 +-
+ security/integrity/digsig_asymmetric.c    |  11 --
+ security/integrity/iint.c                 |   2 +
+ security/integrity/ima/Kconfig            |  61 ++++++
+ security/integrity/ima/Makefile           |   2 +-
+ security/integrity/ima/ima.h              |  95 +++++++--
+ security/integrity/ima/ima_api.c          | 119 ++++++++----
+ security/integrity/ima/ima_appraise.c     |  60 ++++--
+ security/integrity/ima/ima_crypto.c       | 131 +++++++++++--
+ security/integrity/ima/ima_fs.c           |  64 +++---
+ security/integrity/ima/ima_init.c         |  37 ++--
+ security/integrity/ima/ima_main.c         |  50 ++++-
+ security/integrity/ima/ima_queue.c        |  10 +-
+ security/integrity/ima/ima_template.c     | 175 +++++++++++++++++
+ security/integrity/ima/ima_template_lib.c | 313 ++++++++++++++++++++++++++++++
+ security/integrity/ima/ima_template_lib.h |  39 ++++
+ security/integrity/integrity.h            |  26 ++-
+ 32 files changed, 1300 insertions(+), 203 deletions(-)
+ create mode 100644 Documentation/security/IMA-templates.txt
+ create mode 100644 crypto/hash_info.c
+ create mode 100644 include/crypto/hash_info.h
+ create mode 100644 include/uapi/linux/hash_info.h
+ create mode 100644 security/integrity/ima/ima_template.c
+ create mode 100644 security/integrity/ima/ima_template_lib.c
+ create mode 100644 security/integrity/ima/ima_template_lib.h
+
 -- 
 1.8.1.4
-
