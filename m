@@ -1,236 +1,96 @@
 From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: [RFC][PATCH 12/20] ima: define new function ima_alloc_init_template() to API
-Date: Wed, 17 Jul 2013 19:51:32 -0400
-Message-ID: <1374105100-25880-13-git-send-email-zohar@linux.vnet.ibm.com>
+Subject: [RFC][PATCH 19/20] ima: define kernel parameter 'ima_template=' to change configured default
+Date: Wed, 17 Jul 2013 19:51:39 -0400
+Message-ID: <1374105100-25880-20-git-send-email-zohar@linux.vnet.ibm.com>
 References: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
 Cc: Roberto Sassu <roberto.sassu@polito.it>,
 	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
 	Mimi Zohar <zohar@linux.vnet.ibm.com>
 To: linux-security-module@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e33.co.us.ibm.com ([32.97.110.151]:49833 "EHLO
-	e33.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757545Ab3GQXwF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jul 2013 19:52:05 -0400
-Received: from /spool/local
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
-	Wed, 17 Jul 2013 23:52:04 -0000
+Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: Roberto Sassu <roberto.sassu@polito.it>
 
-Instead of allocating and initializing the template entry from multiple
-places (eg. boot aggregate, violation, and regular measurements), this
-patch defines a new function called ima_alloc_init_template().  The new
-function allocates and initializes the measurement entry with the inode
-digest and the filename.
-
-In respect to the current behavior, it truncates the file name passed
-in the 'filename' argument if the latter's size is greater than 255 bytes
-and the passed file descriptor is NULL.
-
-Changelog:
-- initialize 'hash' variable for non TPM case - Mimi
-- conform to expectation for 'iint' to be defined as a pointer. - Mimi
-- add missing 'file' dependency for recalculating file hash. - Mimi
+This patch allows users to specify from the kernel command line the
+template descriptor, among those defined, that will be used to generate
+and display measurement entries. If an user specifies a wrong template,
+IMA reverts to the template descriptor set in the kernel configuration.
 
 Signed-off-by: Roberto Sassu <roberto.sassu@polito.it>
 Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 ---
- security/integrity/ima/ima.h      |  3 ++
- security/integrity/ima/ima_api.c  | 88 ++++++++++++++++++++++++++-------------
- security/integrity/ima/ima_init.c | 24 ++++++-----
- 3 files changed, 76 insertions(+), 39 deletions(-)
+ Documentation/kernel-parameters.txt   |  5 +++++
+ security/integrity/ima/ima_template.c | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
 
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index 27d2ffb..da03d33 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -107,6 +107,9 @@ void ima_store_measurement(struct integrity_iint_cache *iint, struct file *file,
- 			   const unsigned char *filename);
- void ima_audit_measurement(struct integrity_iint_cache *iint,
- 			   const unsigned char *filename);
-+int ima_alloc_init_template(struct integrity_iint_cache *iint,
-+			    struct file *file, const unsigned char *filename,
-+			    struct ima_template_entry **entry);
- int ima_store_template(struct ima_template_entry *entry, int violation,
- 		       struct inode *inode, const unsigned char *filename);
- void ima_template_show(struct seq_file *m, void *e, enum ima_show_type show);
-diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
-index a0fe504..29dd43d 100644
---- a/security/integrity/ima/ima_api.c
-+++ b/security/integrity/ima/ima_api.c
-@@ -24,6 +24,62 @@
- static const char *IMA_TEMPLATE_NAME = "ima";
+diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
+index cb5daa1..7c60db3 100644
+--- a/Documentation/kernel-parameters.txt
++++ b/Documentation/kernel-parameters.txt
+@@ -1139,6 +1139,11 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
+ 			programs exec'd, files mmap'd for exec, and all files
+ 			opened for read by uid=0.
  
- /*
-+ * ima_alloc_init_template - create and initialize a new template entry
-+ */
-+int ima_alloc_init_template(struct integrity_iint_cache *iint,
-+			    struct file *file, const unsigned char *filename,
-+			    struct ima_template_entry **entry)
++	ima_template=   [IMA]
++			Select one of defined IMA measurements template formats.
++			Formats: { "ima" | "ima-ng" }
++			Default: "ima-ng"
++
+ 	init=		[KNL]
+ 			Format: <full_path>
+ 			Run specified binary instead of /sbin/init as init
+diff --git a/security/integrity/ima/ima_template.c b/security/integrity/ima/ima_template.c
+index c28ff9b..0002214 100644
+--- a/security/integrity/ima/ima_template.c
++++ b/security/integrity/ima/ima_template.c
+@@ -12,6 +12,8 @@
+  * File: ima_template.c
+  *      Helpers to manage template descriptors.
+  */
++#include <crypto/hash_info.h>
++
+ #include "ima.h"
+ #include "ima_template_lib.h"
+ 
+@@ -32,6 +34,35 @@ static struct ima_template_field supported_fields[] = {
+ };
+ 
+ static struct ima_template_desc *ima_template;
++static struct ima_template_desc *lookup_template_desc(const char *name);
++
++static int __init ima_template_setup(char *str)
 +{
-+	struct ima_template_entry *e;
-+	int result = 0;
++	struct ima_template_desc *template_desc;
++	int template_len = strlen(str);
 +
-+	e = kzalloc(sizeof(**entry), GFP_NOFS);
-+	if (!e)
-+		return -ENOMEM;
++	/*
++	 * Verify that a template with the supplied name exists.
++	 * If not, use CONFIG_IMA_DEFAULT_TEMPLATE.
++	 */
++	template_desc = lookup_template_desc(str);
++	if (!template_desc)
++		return 1;
 +
-+	memset(&(e)->template, 0, sizeof(e->template));
-+	if (!iint)		/* IMA measurement violation entry */
-+		goto out;
++	/*
++	 * Verify whether the current hash algorithm is supported
++	 * by the 'ima' template.
++	 */
++	if (template_len == 3 && strcmp(str, IMA_TEMPLATE_IMA_NAME) == 0 &&
++	    ima_hash_algo != HASH_ALGO_SHA1 && ima_hash_algo != HASH_ALGO_MD5) {
++		pr_err("IMA: template does not support hash alg\n");
++		return 1;
++	}
 +
-+	if (iint->ima_hash->algo != ima_hash_algo) {
-+		struct inode *inode;
-+		struct {
-+			struct ima_digest_data hdr;
-+			char digest[IMA_MAX_DIGEST_SIZE];
-+		} hash;
-+
-+		if (!file) {
-+			result = -EINVAL;
-+			goto out_free;
-+		}
-+
-+		inode = file_inode(file);
-+		hash.hdr.algo = ima_hash_algo;
-+		hash.hdr.length = SHA1_DIGEST_SIZE;
-+		result = ima_calc_file_hash(file, &hash.hdr);
-+		if (result) {
-+			integrity_audit_msg(AUDIT_INTEGRITY_DATA, inode,
-+					    filename, "collect_data",
-+					    "failed", result, 0);
-+			goto out_free;
-+		} else
-+			memcpy(e->template.digest, hash.hdr.digest,
-+			       hash.hdr.length);
-+	} else
-+		memcpy(e->template.digest, iint->ima_hash->digest,
-+		       iint->ima_hash->length);
-+out:
-+	strcpy(e->template.file_name,
-+	       (strlen(filename) > IMA_EVENT_NAME_LEN_MAX && file != NULL) ?
-+	       file->f_dentry->d_name.name : filename);
-+	*entry = e;
-+	return 0;
-+out_free:
-+	kfree(e);
-+	return result;
++	ima_template = template_desc;
++	return 1;
 +}
-+
-+/*
-  * ima_store_template - store ima template measurements
-  *
-  * Calculate the hash of a template entry, add the template entry
-@@ -90,13 +146,11 @@ void ima_add_violation(struct file *file, const unsigned char *filename,
- 	/* can overflow, only indicator */
- 	atomic_long_inc(&ima_htable.violations);
++__setup("ima_template=", ima_template_setup);
  
--	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
--	if (!entry) {
-+	result = ima_alloc_init_template(NULL, file, filename, &entry);
-+	if (result < 0) {
- 		result = -ENOMEM;
- 		goto err_out;
- 	}
--	memset(&entry->template, 0, sizeof(entry->template));
--	strncpy(entry->template.file_name, filename, IMA_EVENT_NAME_LEN_MAX);
- 	result = ima_store_template(entry, violation, inode, filename);
- 	if (result < 0)
- 		kfree(entry);
-@@ -220,34 +274,12 @@ void ima_store_measurement(struct integrity_iint_cache *iint,
- 	if (iint->flags & IMA_MEASURED)
- 		return;
- 
--	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
--	if (!entry) {
-+	result = ima_alloc_init_template(iint, file, filename, &entry);
-+	if (result < 0) {
- 		integrity_audit_msg(AUDIT_INTEGRITY_PCR, inode, filename,
- 				    op, audit_cause, result, 0);
- 		return;
- 	}
--	memset(&entry->template, 0, sizeof(entry->template));
--	if (iint->ima_hash->algo != ima_hash_algo) {
--		struct {
--			struct ima_digest_data hdr;
--			char digest[IMA_MAX_DIGEST_SIZE];
--		} hash;
--
--		hash.hdr.algo = ima_hash_algo;
--		result = ima_calc_file_hash(file, &hash.hdr);
--		if (result)
--			integrity_audit_msg(AUDIT_INTEGRITY_DATA, inode,
--					    filename, "collect_data", "failed",
--					    result, 0);
--		else
--			memcpy(entry->template.digest, hash.hdr.digest,
--			       hash.hdr.length);
--	} else
--		memcpy(entry->template.digest, iint->ima_hash->digest,
--		       iint->ima_hash->length);
--	strcpy(entry->template.file_name,
--	       (strlen(filename) > IMA_EVENT_NAME_LEN_MAX) ?
--	       file->f_dentry->d_name.name : filename);
- 
- 	result = ima_store_template(entry, violation, inode, filename);
- 	if (!result || result == -EEXIST)
-diff --git a/security/integrity/ima/ima_init.c b/security/integrity/ima/ima_init.c
-index d42fac3..50e15e6 100644
---- a/security/integrity/ima/ima_init.c
-+++ b/security/integrity/ima/ima_init.c
-@@ -43,34 +43,36 @@ int ima_used_chip;
- static void __init ima_add_boot_aggregate(void)
+ static struct ima_template_desc *lookup_template_desc(const char *name)
  {
- 	struct ima_template_entry *entry;
-+	struct integrity_iint_cache tmp_iint, *iint = &tmp_iint;
- 	const char *op = "add_boot_aggregate";
- 	const char *audit_cause = "ENOMEM";
- 	int result = -ENOMEM;
--	int violation = 1;
-+	int violation = 0;
- 	struct {
- 		struct ima_digest_data hdr;
- 		char digest[TPM_DIGEST_SIZE];
- 	} hash;
- 
--	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
--	if (!entry)
--		goto err_out;
-+	memset(iint, 0, sizeof(*iint));
-+	memset(&hash, 0, sizeof(hash));
-+	iint->ima_hash = &hash.hdr;
-+	iint->ima_hash->algo = HASH_ALGO_SHA1;
-+	iint->ima_hash->length = SHA1_DIGEST_SIZE;
- 
--	memset(&entry->template, 0, sizeof(entry->template));
--	strncpy(entry->template.file_name, boot_aggregate_name,
--		IMA_EVENT_NAME_LEN_MAX);
- 	if (ima_used_chip) {
--		violation = 0;
--		hash.hdr.algo = HASH_ALGO_SHA1;
- 		result = ima_calc_boot_aggregate(&hash.hdr);
- 		if (result < 0) {
- 			audit_cause = "hashing_error";
- 			kfree(entry);
- 			goto err_out;
- 		}
--		memcpy(entry->template.digest, hash.hdr.digest,
--		       hash.hdr.length);
- 	}
-+
-+	result = ima_alloc_init_template(iint, NULL, boot_aggregate_name,
-+					 &entry);
-+	if (result < 0)
-+		return;
-+
- 	result = ima_store_template(entry, violation, NULL,
- 				    boot_aggregate_name);
- 	if (result < 0)
 -- 
 1.8.1.4
+
