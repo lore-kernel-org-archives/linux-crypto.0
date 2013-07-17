@@ -1,421 +1,96 @@
 From: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Subject: [RFC][PATCH 16/20] ima: switch to new template management mechanism
-Date: Wed, 17 Jul 2013 19:51:36 -0400
-Message-ID: <1374105100-25880-17-git-send-email-zohar@linux.vnet.ibm.com>
+Subject: [RFC][PATCH 18/20] ima: add Kconfig default measurement list template
+Date: Wed, 17 Jul 2013 19:51:38 -0400
+Message-ID: <1374105100-25880-19-git-send-email-zohar@linux.vnet.ibm.com>
 References: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
-Cc: Roberto Sassu <roberto.sassu@polito.it>,
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>,
 	linux-crypto@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>
+	Mimi Zohar <zohar@us.ibm.com>,
+	Roberto Sassu <roberto.sassu@polito.it>
 To: linux-security-module@vger.kernel.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e36.co.us.ibm.com ([32.97.110.154]:46546 "EHLO
+	e36.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757604Ab3GQXwM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Jul 2013 19:52:12 -0400
+Received: from /spool/local
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+	Wed, 17 Jul 2013 17:52:12 -0600
 In-Reply-To: <1374105100-25880-1-git-send-email-zohar@linux.vnet.ibm.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Roberto Sassu <roberto.sassu@polito.it>
-
-This patch performs the switch to the new template mechanism by modifying
-the functions ima_alloc_init_template(), ima_measurements_show() and
-ima_ascii_measurements_show(). The old function ima_template_show() was
-removed as it is no longer needed. Also, if the template descriptor used
-to generate a measurement entry is not 'ima', the whole length of field
-data stored for an entry is provided before the data itself through the
-binary_runtime_measurement interface.
+This patch adds a Kconfig option to select the default IMA
+measurement list template.  The 'ima' template limited the
+filedata hash to 20 bytes and the pathname to 255 charaters.
+The 'ima-ng' measurement list template permits larger hash
+digests and longer pathnames.
 
 Changelog:
-- unnecessary to use strncmp() (Mimi Zohar)
-- create new variable 'field' in ima_alloc_init_template() (Roberto Sassu)
-- use GFP_NOFS flag in ima_alloc_init_template() (Roberto Sassu)
-- new variable 'num_fields' in ima_store_template() (Roberto Sassu,
-  proposed by Mimi Zohar)
-- rename ima_calc_buffer_hash/template_hash() to ima_calc_field_array_hash(),
-  something more generic (Mimi, requested by Dmitry)
-- sparse error fix - Fengguang Wu
+- keep 'select CRYPTO_HASH_INFO' in 'config IMA' section (Kconfig)
+  (Roberto Sassu);
+- removed trailing whitespaces (Roberto Sassu).
+- Lindent fixes
 
+Signed-off-by: Mimi Zohar <zohar@us.ibm.com>
 Signed-off-by: Roberto Sassu <roberto.sassu@polito.it>
-Signed-off-by: Mimi Zohar <zohar@linux.vnet.ibm.com>
 ---
- security/integrity/ima/ima.h          | 19 ++++-----
- security/integrity/ima/ima_api.c      | 73 +++++++++++------------------------
- security/integrity/ima/ima_crypto.c   | 31 +++++++++++----
- security/integrity/ima/ima_fs.c       | 54 ++++++++++++--------------
- security/integrity/ima/ima_template.c | 22 +++++++++++
- 5 files changed, 101 insertions(+), 98 deletions(-)
+ security/integrity/ima/Kconfig        | 25 +++++++++++++++++++++++++
+ security/integrity/ima/ima_template.c |  4 ++--
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index e1f081d..72d013e 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -72,17 +72,11 @@ struct ima_template_desc {
- 	struct ima_template_field **fields;
- };
+diff --git a/security/integrity/ima/Kconfig b/security/integrity/ima/Kconfig
+index e6628e7..de26cc8 100644
+--- a/security/integrity/ima/Kconfig
++++ b/security/integrity/ima/Kconfig
+@@ -46,6 +46,31 @@ config IMA_LSM_RULES
+ 	help
+ 	  Disabling this option will disregard LSM based policy rules.
  
--/* IMA inode template definition */
--struct ima_template_data {
--	u8 digest[IMA_DIGEST_SIZE];	/* sha1/md5 measurement hash */
--	char file_name[IMA_EVENT_NAME_LEN_MAX + 1];	/* name + \0 */
--};
--
- struct ima_template_entry {
- 	u8 digest[TPM_DIGEST_SIZE];	/* sha1 or md5 measurement hash */
--	const char *template_name;
--	int template_len;
--	struct ima_template_data template;
-+	struct ima_template_desc *template_desc; /* template descriptor */
-+	u32 template_data_len;
-+	struct ima_field_data template_data[0];	/* template related data */
- };
- 
- struct ima_queue_entry {
-@@ -102,14 +96,16 @@ int ima_add_template_entry(struct ima_template_entry *entry, int violation,
- 			   const char *op, struct inode *inode,
- 			   const unsigned char *filename);
- int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash);
--int ima_calc_buffer_hash(const void *data, int len,
--			 struct ima_digest_data *hash);
-+int ima_calc_field_array_hash(struct ima_field_data *field_data, int num_fields,
-+			      struct ima_digest_data *hash);
- int __init ima_calc_boot_aggregate(struct ima_digest_data *hash);
- void ima_add_violation(struct file *file, const unsigned char *filename,
- 		       const char *op, const char *cause);
- int ima_init_crypto(void);
- void ima_putc(struct seq_file *m, void *data, int datalen);
- void ima_print_digest(struct seq_file *m, u8 *digest, int size);
-+struct ima_template_desc *ima_template_desc_current(void);
-+int ima_init_template(void);
- 
- int ima_init_template(void);
- 
-@@ -146,7 +142,6 @@ int ima_alloc_init_template(struct integrity_iint_cache *iint,
- 			    struct ima_template_entry **entry);
- int ima_store_template(struct ima_template_entry *entry, int violation,
- 		       struct inode *inode, const unsigned char *filename);
--void ima_template_show(struct seq_file *m, void *e, enum ima_show_type show);
- const char *ima_d_path(struct path *path, char **pathbuf);
- 
- /* rbtree tree calls to lookup, insert, delete
-diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
-index 29dd43d..974fbab 100644
---- a/security/integrity/ima/ima_api.c
-+++ b/security/integrity/ima/ima_api.c
-@@ -21,8 +21,6 @@
- #include <crypto/hash_info.h>
- #include "ima.h"
- 
--static const char *IMA_TEMPLATE_NAME = "ima";
--
- /*
-  * ima_alloc_init_template - create and initialize a new template entry
-  */
-@@ -30,52 +28,28 @@ int ima_alloc_init_template(struct integrity_iint_cache *iint,
- 			    struct file *file, const unsigned char *filename,
- 			    struct ima_template_entry **entry)
- {
--	struct ima_template_entry *e;
--	int result = 0;
-+	struct ima_template_desc *template_desc = ima_template_desc_current();
-+	int i, result = 0;
- 
--	e = kzalloc(sizeof(**entry), GFP_NOFS);
--	if (!e)
-+	*entry = kzalloc(sizeof(**entry) + template_desc->num_fields *
-+				sizeof(struct ima_field_data), GFP_NOFS);
-+	if (!*entry)
- 		return -ENOMEM;
- 
--	memset(&(e)->template, 0, sizeof(e->template));
--	if (!iint)		/* IMA measurement violation entry */
--		goto out;
--
--	if (iint->ima_hash->algo != ima_hash_algo) {
--		struct inode *inode;
--		struct {
--			struct ima_digest_data hdr;
--			char digest[IMA_MAX_DIGEST_SIZE];
--		} hash;
-+	for (i = 0; i < template_desc->num_fields; i++) {
-+		struct ima_template_field *field = template_desc->fields[i];
-+		result = field->field_init(iint, file, filename,
-+					   &((*entry)->template_data[i]));
-+		if (result != 0)
-+			goto out;
- 
--		if (!file) {
--			result = -EINVAL;
--			goto out_free;
--		}
--
--		inode = file_inode(file);
--		hash.hdr.algo = ima_hash_algo;
--		hash.hdr.length = SHA1_DIGEST_SIZE;
--		result = ima_calc_file_hash(file, &hash.hdr);
--		if (result) {
--			integrity_audit_msg(AUDIT_INTEGRITY_DATA, inode,
--					    filename, "collect_data",
--					    "failed", result, 0);
--			goto out_free;
--		} else
--			memcpy(e->template.digest, hash.hdr.digest,
--			       hash.hdr.length);
--	} else
--		memcpy(e->template.digest, iint->ima_hash->digest,
--		       iint->ima_hash->length);
--out:
--	strcpy(e->template.file_name,
--	       (strlen(filename) > IMA_EVENT_NAME_LEN_MAX && file != NULL) ?
--	       file->f_dentry->d_name.name : filename);
--	*entry = e;
-+		(*entry)->template_data_len += (*entry)->template_data[i].len;
-+	}
-+	(*entry)->template_desc = template_desc;
- 	return 0;
--out_free:
--	kfree(e);
-+out:
-+	kfree(*entry);
-+	*entry = NULL;
- 	return result;
- }
- 
-@@ -101,24 +75,23 @@ int ima_store_template(struct ima_template_entry *entry,
- {
- 	const char *op = "add_template_measure";
- 	const char *audit_cause = "hashing_error";
-+	char *template_name = entry->template_desc->name;
- 	int result;
- 	struct {
- 		struct ima_digest_data hdr;
- 		char digest[TPM_DIGEST_SIZE];
- 	} hash;
- 
--	memset(entry->digest, 0, sizeof(entry->digest));
--	entry->template_name = IMA_TEMPLATE_NAME;
--	entry->template_len = sizeof(entry->template);
--
- 	if (!violation) {
-+		int num_fields = entry->template_desc->num_fields;
++choice
++	prompt "Default template"
++	default IMA_NG_TEMPLATE
++	depends on IMA
++	help
++	  Select the default IMA measurement template.
 +
- 		/* this function uses default algo */
- 		hash.hdr.algo = HASH_ALGO_SHA1;
--		result = ima_calc_buffer_hash(&entry->template,
--					      entry->template_len, &hash.hdr);
-+		result = ima_calc_field_array_hash(&entry->template_data[0],
-+						   num_fields, &hash.hdr);
- 		if (result < 0) {
- 			integrity_audit_msg(AUDIT_INTEGRITY_PCR, inode,
--					    entry->template_name, op,
-+					    template_name, op,
- 					    audit_cause, result, 0);
- 			return result;
- 		}
-diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
-index 22be23f..84a6a4c 100644
---- a/security/integrity/ima/ima_crypto.c
-+++ b/security/integrity/ima/ima_crypto.c
-@@ -137,26 +137,43 @@ int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
- }
- 
- /*
-- * Calculate the hash of a given buffer
-+ * Calculate the hash of template data
-  */
--static int ima_calc_buffer_hash_tfm(const void *buf, int len,
--				    struct ima_digest_data *hash,
--				    struct crypto_shash *tfm)
-+static int ima_calc_field_array_hash_tfm(struct ima_field_data *field_data,
-+					 int num_fields,
-+					 struct ima_digest_data *hash,
-+					 struct crypto_shash *tfm)
- {
- 	struct {
- 		struct shash_desc shash;
- 		char ctx[crypto_shash_descsize(tfm)];
- 	} desc;
-+	int rc, i;
- 
- 	desc.shash.tfm = tfm;
- 	desc.shash.flags = 0;
- 
- 	hash->length = crypto_shash_digestsize(tfm);
- 
--	return crypto_shash_digest(&desc.shash, buf, len, hash->digest);
-+	rc = crypto_shash_init(&desc.shash);
-+	if (rc != 0)
-+		return rc;
++	  The original 'ima' measurement list template contains a
++	  hash, defined as 20 bytes, and a null terminated pathname,
++	  limited to 255 characters.  The 'ima-ng' measurement list
++	  template permits both larger hash digests and longer
++	  pathnames.
 +
-+	for (i = 0; i < num_fields; i++) {
-+		rc = crypto_shash_update(&desc.shash, field_data[i].data,
-+					 field_data[i].len);
-+		if (rc)
-+			break;
-+	}
++	config IMA_TEMPLATE
++		bool "ima"
++	config IMA_NG_TEMPLATE
++		bool "ima-ng (default)"
++endchoice
 +
-+	if (!rc)
-+		rc = crypto_shash_final(&desc.shash, hash->digest);
++config IMA_DEFAULT_TEMPLATE
++	string
++	depends on IMA
++	default "ima" if IMA_TEMPLATE
++	default "ima-ng" if IMA_NG_TEMPLATE
 +
-+	return rc;
- }
- 
--int ima_calc_buffer_hash(const void *buf, int len, struct ima_digest_data *hash)
-+int ima_calc_field_array_hash(struct ima_field_data *field_data, int num_fields,
-+			      struct ima_digest_data *hash)
- {
- 	struct crypto_shash *tfm;
- 	int rc;
-@@ -165,7 +182,7 @@ int ima_calc_buffer_hash(const void *buf, int len, struct ima_digest_data *hash)
- 	if (IS_ERR(tfm))
- 		return PTR_ERR(tfm);
- 
--	rc = ima_calc_buffer_hash_tfm(buf, len, hash, tfm);
-+	rc = ima_calc_field_array_hash_tfm(field_data, num_fields, hash, tfm);
- 
- 	ima_free_tfm(tfm);
- 
-diff --git a/security/integrity/ima/ima_fs.c b/security/integrity/ima/ima_fs.c
-index f9d8d05..0575d65 100644
---- a/security/integrity/ima/ima_fs.c
-+++ b/security/integrity/ima/ima_fs.c
-@@ -111,6 +111,7 @@ void ima_putc(struct seq_file *m, void *data, int datalen)
-  *       char[20]=template digest
-  *       32bit-le=template name size
-  *       char[n]=template name
-+ *       [eventdata length]
-  *       eventdata[n]=template specific data
-  */
- static int ima_measurements_show(struct seq_file *m, void *v)
-@@ -120,6 +121,7 @@ static int ima_measurements_show(struct seq_file *m, void *v)
- 	struct ima_template_entry *e;
- 	int namelen;
- 	u32 pcr = CONFIG_IMA_MEASURE_PCR_IDX;
-+	int i;
- 
- 	/* get entry */
- 	e = qe->entry;
-@@ -137,15 +139,22 @@ static int ima_measurements_show(struct seq_file *m, void *v)
- 	ima_putc(m, e->digest, TPM_DIGEST_SIZE);
- 
- 	/* 3rd: template name size */
--	namelen = strlen(e->template_name);
-+	namelen = strlen(e->template_desc->name);
- 	ima_putc(m, &namelen, sizeof namelen);
- 
- 	/* 4th:  template name */
--	ima_putc(m, (void *)e->template_name, namelen);
-+	ima_putc(m, e->template_desc->name, namelen);
-+
-+	/* 5th:  template length (except for 'ima' template) */
-+	if (strcmp(e->template_desc->name, IMA_TEMPLATE_IMA_NAME) != 0)
-+		ima_putc(m, &e->template_data_len,
-+			 sizeof(e->template_data_len));
- 
--	/* 5th:  template specific data */
--	ima_template_show(m, (struct ima_template_data *)&e->template,
--			  IMA_SHOW_BINARY);
-+	/* 6th:  template specific data */
-+	for (i = 0; i < e->template_desc->num_fields; i++) {
-+		e->template_desc->fields[i]->field_show(m, IMA_SHOW_BINARY,
-+							&e->template_data[i]);
-+	}
- 	return 0;
- }
- 
-@@ -176,33 +185,13 @@ void ima_print_digest(struct seq_file *m, u8 *digest, int size)
- 		seq_printf(m, "%02x", *(digest + i));
- }
- 
--void ima_template_show(struct seq_file *m, void *e, enum ima_show_type show)
--{
--	struct ima_template_data *entry = e;
--	int namelen;
--
--	switch (show) {
--	case IMA_SHOW_ASCII:
--		ima_print_digest(m, entry->digest, IMA_DIGEST_SIZE);
--		seq_printf(m, " %s\n", entry->file_name);
--		break;
--	case IMA_SHOW_BINARY:
--		ima_putc(m, entry->digest, IMA_DIGEST_SIZE);
--
--		namelen = strlen(entry->file_name);
--		ima_putc(m, &namelen, sizeof namelen);
--		ima_putc(m, entry->file_name, namelen);
--	default:
--		break;
--	}
--}
--
- /* print in ascii */
- static int ima_ascii_measurements_show(struct seq_file *m, void *v)
- {
- 	/* the list never shrinks, so we don't need a lock here */
- 	struct ima_queue_entry *qe = v;
- 	struct ima_template_entry *e;
-+	int i;
- 
- 	/* get entry */
- 	e = qe->entry;
-@@ -216,11 +205,18 @@ static int ima_ascii_measurements_show(struct seq_file *m, void *v)
- 	ima_print_digest(m, e->digest, TPM_DIGEST_SIZE);
- 
- 	/* 3th:  template name */
--	seq_printf(m, " %s ", e->template_name);
-+	seq_printf(m, " %s", e->template_desc->name);
- 
- 	/* 4th:  template specific data */
--	ima_template_show(m, (struct ima_template_data *)&e->template,
--			  IMA_SHOW_ASCII);
-+	for (i = 0; i < e->template_desc->num_fields; i++) {
-+		seq_puts(m, " ");
-+		if (e->template_data[i].len == 0)
-+			continue;
-+
-+		e->template_desc->fields[i]->field_show(m, IMA_SHOW_ASCII,
-+							&e->template_data[i]);
-+	}
-+	seq_puts(m, "\n");
- 	return 0;
- }
- 
+ config IMA_APPRAISE
+ 	bool "Appraise integrity measurements"
+ 	depends on IMA
 diff --git a/security/integrity/ima/ima_template.c b/security/integrity/ima/ima_template.c
-index bf38d1a..1c4cf19 100644
+index 1c4cf19..c28ff9b 100644
 --- a/security/integrity/ima/ima_template.c
 +++ b/security/integrity/ima/ima_template.c
-@@ -31,6 +31,20 @@ static struct ima_template_field supported_fields[] = {
- 	 .field_show = ima_show_template_string},
- };
- 
-+static struct ima_template_desc *ima_template;
-+
-+static struct ima_template_desc *lookup_template_desc(const char *name)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(defined_templates); i++) {
-+		if (strcmp(defined_templates[i].name, name) == 0)
-+			return defined_templates + i;
-+	}
-+
-+	return NULL;
-+}
-+
- static struct ima_template_field *lookup_template_field(const char *field_id)
+@@ -127,8 +127,8 @@ static int init_defined_templates(void)
+ struct ima_template_desc *ima_template_desc_current(void)
  {
- 	int i;
-@@ -110,6 +124,14 @@ static int init_defined_templates(void)
- 	return result;
+ 	if (!ima_template)
+-		ima_template = lookup_template_desc(IMA_TEMPLATE_IMA_NAME);
+-
++		ima_template =
++		    lookup_template_desc(CONFIG_IMA_DEFAULT_TEMPLATE);
+ 	return ima_template;
  }
  
-+struct ima_template_desc *ima_template_desc_current(void)
-+{
-+	if (!ima_template)
-+		ima_template = lookup_template_desc(IMA_TEMPLATE_IMA_NAME);
-+
-+	return ima_template;
-+}
-+
- int ima_init_template(void)
- {
- 	int result;
 -- 
 1.8.1.4
-
