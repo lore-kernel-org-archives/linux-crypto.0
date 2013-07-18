@@ -1,152 +1,133 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH 3.11-rc1] crypto: Fix boot failure due to module
- dependency.
-Date: Thu, 18 Jul 2013 14:00:00 -0700
-Message-ID: <1374181200.22432.350.camel@schen9-DESK>
-References: <201307180550.BDB51536.LHMQOOOVFJFSFt@I-love.SAKURA.ne.jp>
-	 <1374098936.22432.322.camel@schen9-DESK>
-	 <201307180347.r6I3l5e9077577@www262.sakura.ne.jp>
+From: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Subject: Re: [PATCH 3.11-rc1] crypto: Fix boot failure due to module dependency.
+Date: Fri, 19 Jul 2013 00:17:14 +0200
+Message-ID: <51E8696A.7090406@intel.com>
+References: <201307180550.BDB51536.LHMQOOOVFJFSFt@I-love.SAKURA.ne.jp>  <1374098936.22432.322.camel@schen9-DESK>  <201307180347.r6I3l5e9077577@www262.sakura.ne.jp> <1374181200.22432.350.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, ak <ak@linux.intel.com>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
+Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, ak <ak@linux.intel.com>,
+	rjw@rjwysocki.net
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:4907 "EHLO mga02.intel.com"
+Received: from mga14.intel.com ([143.182.124.37]:38782 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759381Ab3GRU76 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Jul 2013 16:59:58 -0400
-In-Reply-To: <201307180347.r6I3l5e9077577@www262.sakura.ne.jp>
+	id S932956Ab3GRWRT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 18 Jul 2013 18:17:19 -0400
+In-Reply-To: <1374181200.22432.350.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2013-07-18 at 12:47 +0900, Tetsuo Handa wrote:
-> Tim Chen wrote:
-> > > > Your approach is quite complicated.  I think something simpler like the
-> > > > following will work:
-> > >
-> > > We cannot benefit from PCLMULQDQ. Is it acceptable for you?
-> > 
-> > 
-> > The following code in crct10dif-pclmul_glue.c
-> > 
-> > static const struct x86_cpu_id crct10dif_cpu_id[] = {
-> >         X86_FEATURE_MATCH(X86_FEATURE_PCLMULQDQ),
-> >         {}
-> > };
-> > MODULE_DEVICE_TABLE(x86cpu, crct10dif_cpu_id);
-> > 
-> > will put the module in the device table and get the module
-> > loaded, as long as the cpu support PCLMULQDQ. So we should be able
-> > to benefit.
-> 
-> Excuse me, how can crct10dif-pclmul.ko get loaded automatically?
-> Did you test CONFIG_CRYPTO_CRCT10DIF_PCLMUL=m with below debug message?
-
-The code:
-
-static const struct x86_cpu_id crct10dif_cpu_id[] = {
-         X86_FEATURE_MATCH(X86_FEATURE_PCLMULQDQ),
-         {}
-};
-MODULE_DEVICE_TABLE(x86cpu, crct10dif_cpu_id);
-
-causes the following line to be added to modules.alias file:
-
-alias x86cpu:vendor:*:family:*:model:*:feature:*0081* crct10dif_pclmul
-
-This should cause udev to load the crct10dif_pclml module when cpu
-support the PCLMULQDQ (feature code 0081).  I did my testing during
-development on 3.10 and the module was indeed loaded.
-
-However, I found that the following commit under 3.11-rc1 broke 
-the mechanism after some bisection.
-
-commit ac212b6980d8d5eda705864fc5a8ecddc6d6eacc
-Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-Date:   Fri May 3 00:26:22 2013 +0200
-
-    ACPI / processor: Use common hotplug infrastructure
-    
-    Split the ACPI processor driver into two parts, one that is
-    non-modular, resides in the ACPI core and handles the enumeration
-    and hotplug of processors and one that implements the rest of the
-    existing processor driver functionality.
-    
-Rafael, can you check and see if this can be fixed so those optimized 
-crypto modules for Intel cpu that support them can be loaded?
-
-Herbert, we had a discussion earlier on a separate issue regarding the 
-module load order.  We wanted to load all supported crypto t10dif modules
-before the crc-t10dif module.  You mentioned that the MODULE_ALIAS also
-need some fixing and wonder if those changes have been merged into
-3.11-rc1?  See https://lkml.org/lkml/2013/5/21/216 .  Theoretically, that
-fix should also get all the crypto modules support t10dif be loaded.
-
-Thanks.
-
-Tim
-
-> 
-> diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c b/arch/x86/crypto/crct10dif-pclmul_glue.c
-> index 7845d7f..a8a95aa 100644
-> --- a/arch/x86/crypto/crct10dif-pclmul_glue.c
-> +++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
-> @@ -129,9 +129,10 @@ MODULE_DEVICE_TABLE(x86cpu, crct10dif_cpu_id);
->  
->  static int __init crct10dif_intel_mod_init(void)
->  {
-> +	printk(KERN_WARNING "********** Checking for X86_FEATURE_PCLMULQDQ\n");
->  	if (!x86_match_cpu(crct10dif_cpu_id))
->  		return -ENODEV;
-> -
-> +	printk(KERN_WARNING "********** Registering crct10dif-pclmul\n");
->  	return crypto_register_shash(&alg);
->  }
-> 
-> As far as I tested, crct10dif-pclmul.ko will not be loaded unless manually
-> adding "modprobe crct10dif-pclmul" to initramfs's /init or choosing
-> CONFIG_CRYPTO_CRCT10DIF_PCLMUL=y.
-> 
-> > So as long as the crct10dif.ko and crct10dif-pclmul.ko are loaded,
-> > the pclmulqdq t10dif will have a higher priority and get allocated
-> > and used.
-> 
-> What I'm talking are
-> 
->   (1) Since mkinitramfs is unable to know that crct10dif-pclmul.ko has higher
->       priority than crct10dif.ko , mkinitramfs will not include
->       "modprobe crct10dif-pclmul" line in the generated initramfs.
-> 
->   (2) In order to get benefit from PCLMULQDQ, users have to manually make sure
->       that "modprobe crct10dif-pclmul" is called before crc-t10dif.ko (which is
->       loaded before sd_mod.ko is loaded) is loaded by their initramfs's /init
->       script.
-> 
->   (3) The cause of (1) is that crct10dif-pclmul.ko will not be loaded
->       automatically unless choosing CONFIG_CRYPTO_CRCT10DIF_PCLMUL=y.
-> 
->   (4) The cause of (3) is that modules.dep does not describe that users will
->       benefit by loading crct10dif-pclmul.ko before loading crc-t10dif.ko .
-> 
->   (5) Currently crct10dif-pclmul.ko cannot be loaded if PCLMULQDQ is not
->       supported. This leads to boot failure (since sd_mod.ko cannot be loaded)
->       if modules.dep says that "crct10dif-pclmul.ko is required by
->       crc-t10dif.ko".
-> 
->   (6) To solve (4) and (5), modules.dep should say "crct10dif-pclmul.ko is
->       preferred for crc-t10dif.ko but is not required by crc-t10dif.ko".
->       But there is no such mechanism. Thus, currently available choice is
->       "allow loading crct10dif-pclmul.ko even if PCLMULQDQ is not supported"
->       or "ignore errors by built-in the crct10dif-pclmul.ko module".
-> 
-> My patch (b) seems to be complicated but is required in order to solve (4)
-> without asking users to manually add "modprobe crct10dif-pclmul" into their
-> initramfs. If we choose patch (b) rather than patch (a), we need to solve (5).
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+T24gNy8xOC8yMDEzIDExOjAwIFBNLCBUaW0gQ2hlbiB3cm90ZToKPiBPbiBUaHUsIDIwMTMtMDct
+MTggYXQgMTI6NDcgKzA5MDAsIFRldHN1byBIYW5kYSB3cm90ZToKPj4gVGltIENoZW4gd3JvdGU6
+Cj4+Pj4+IFlvdXIgYXBwcm9hY2ggaXMgcXVpdGUgY29tcGxpY2F0ZWQuICBJIHRoaW5rIHNvbWV0
+aGluZyBzaW1wbGVyIGxpa2UgdGhlCj4+Pj4+IGZvbGxvd2luZyB3aWxsIHdvcms6Cj4+Pj4gV2Ug
+Y2Fubm90IGJlbmVmaXQgZnJvbSBQQ0xNVUxRRFEuIElzIGl0IGFjY2VwdGFibGUgZm9yIHlvdT8K
+Pj4+Cj4+PiBUaGUgZm9sbG93aW5nIGNvZGUgaW4gY3JjdDEwZGlmLXBjbG11bF9nbHVlLmMKPj4+
+Cj4+PiBzdGF0aWMgY29uc3Qgc3RydWN0IHg4Nl9jcHVfaWQgY3JjdDEwZGlmX2NwdV9pZFtdID0g
+ewo+Pj4gICAgICAgICAgWDg2X0ZFQVRVUkVfTUFUQ0goWDg2X0ZFQVRVUkVfUENMTVVMUURRKSwK
+Pj4+ICAgICAgICAgIHt9Cj4+PiB9Owo+Pj4gTU9EVUxFX0RFVklDRV9UQUJMRSh4ODZjcHUsIGNy
+Y3QxMGRpZl9jcHVfaWQpOwo+Pj4KPj4+IHdpbGwgcHV0IHRoZSBtb2R1bGUgaW4gdGhlIGRldmlj
+ZSB0YWJsZSBhbmQgZ2V0IHRoZSBtb2R1bGUKPj4+IGxvYWRlZCwgYXMgbG9uZyBhcyB0aGUgY3B1
+IHN1cHBvcnQgUENMTVVMUURRLiBTbyB3ZSBzaG91bGQgYmUgYWJsZQo+Pj4gdG8gYmVuZWZpdC4K
+Pj4gRXhjdXNlIG1lLCBob3cgY2FuIGNyY3QxMGRpZi1wY2xtdWwua28gZ2V0IGxvYWRlZCBhdXRv
+bWF0aWNhbGx5Pwo+PiBEaWQgeW91IHRlc3QgQ09ORklHX0NSWVBUT19DUkNUMTBESUZfUENMTVVM
+PW0gd2l0aCBiZWxvdyBkZWJ1ZyBtZXNzYWdlPwo+IFRoZSBjb2RlOgo+Cj4gc3RhdGljIGNvbnN0
+IHN0cnVjdCB4ODZfY3B1X2lkIGNyY3QxMGRpZl9jcHVfaWRbXSA9IHsKPiAgICAgICAgICAgWDg2
+X0ZFQVRVUkVfTUFUQ0goWDg2X0ZFQVRVUkVfUENMTVVMUURRKSwKPiAgICAgICAgICAge30KPiB9
+Owo+IE1PRFVMRV9ERVZJQ0VfVEFCTEUoeDg2Y3B1LCBjcmN0MTBkaWZfY3B1X2lkKTsKPgo+IGNh
+dXNlcyB0aGUgZm9sbG93aW5nIGxpbmUgdG8gYmUgYWRkZWQgdG8gbW9kdWxlcy5hbGlhcyBmaWxl
+Ogo+Cj4gYWxpYXMgeDg2Y3B1OnZlbmRvcjoqOmZhbWlseToqOm1vZGVsOio6ZmVhdHVyZToqMDA4
+MSogY3JjdDEwZGlmX3BjbG11bAo+Cj4gVGhpcyBzaG91bGQgY2F1c2UgdWRldiB0byBsb2FkIHRo
+ZSBjcmN0MTBkaWZfcGNsbWwgbW9kdWxlIHdoZW4gY3B1Cj4gc3VwcG9ydCB0aGUgUENMTVVMUURR
+IChmZWF0dXJlIGNvZGUgMDA4MSkuICBJIGRpZCBteSB0ZXN0aW5nIGR1cmluZwo+IGRldmVsb3Bt
+ZW50IG9uIDMuMTAgYW5kIHRoZSBtb2R1bGUgd2FzIGluZGVlZCBsb2FkZWQuCj4KPiBIb3dldmVy
+LCBJIGZvdW5kIHRoYXQgdGhlIGZvbGxvd2luZyBjb21taXQgdW5kZXIgMy4xMS1yYzEgYnJva2UK
+PiB0aGUgbWVjaGFuaXNtIGFmdGVyIHNvbWUgYmlzZWN0aW9uLgo+Cj4gY29tbWl0IGFjMjEyYjY5
+ODBkOGQ1ZWRhNzA1ODY0ZmM1YThlY2RkYzZkNmVhY2MKPiBBdXRob3I6IFJhZmFlbCBKLiBXeXNv
+Y2tpIDxyYWZhZWwuai53eXNvY2tpQGludGVsLmNvbT4KPiBEYXRlOiAgIEZyaSBNYXkgMyAwMDoy
+NjoyMiAyMDEzICswMjAwCj4KPiAgICAgIEFDUEkgLyBwcm9jZXNzb3I6IFVzZSBjb21tb24gaG90
+cGx1ZyBpbmZyYXN0cnVjdHVyZQo+ICAgICAgCj4gICAgICBTcGxpdCB0aGUgQUNQSSBwcm9jZXNz
+b3IgZHJpdmVyIGludG8gdHdvIHBhcnRzLCBvbmUgdGhhdCBpcwo+ICAgICAgbm9uLW1vZHVsYXIs
+IHJlc2lkZXMgaW4gdGhlIEFDUEkgY29yZSBhbmQgaGFuZGxlcyB0aGUgZW51bWVyYXRpb24KPiAg
+ICAgIGFuZCBob3RwbHVnIG9mIHByb2Nlc3NvcnMgYW5kIG9uZSB0aGF0IGltcGxlbWVudHMgdGhl
+IHJlc3Qgb2YgdGhlCj4gICAgICBleGlzdGluZyBwcm9jZXNzb3IgZHJpdmVyIGZ1bmN0aW9uYWxp
+dHkuCj4gICAgICAKPiBSYWZhZWwsIGNhbiB5b3UgY2hlY2sgYW5kIHNlZSBpZiB0aGlzIGNhbiBi
+ZSBmaXhlZCBzbyB0aG9zZSBvcHRpbWl6ZWQKPiBjcnlwdG8gbW9kdWxlcyBmb3IgSW50ZWwgY3B1
+IHRoYXQgc3VwcG9ydCB0aGVtIGNhbiBiZSBsb2FkZWQ/CgpJIHRoaW5rIHRoaXMgaXMgYW4gb3Jk
+ZXJpbmcgaXNzdWUgYmV0d2VlbiB1ZGV2IHN0YXJ0dXAgYW5kIHRoZSB0aW1lIHdoZW4gCmRldmlj
+ZXMgYXJlIHJlZ2lzdGVyZWQuCgpJIHdvbmRlciB3aGF0IGhhcHBlbnMgaWYgeW91IHB1dCB0aG9z
+ZSBtb2R1bGVzIGludG8gdGhlIGluaXRyYW1mcyBpbWFnZT8KClJhZmFlbAoKCj4gSGVyYmVydCwg
+d2UgaGFkIGEgZGlzY3Vzc2lvbiBlYXJsaWVyIG9uIGEgc2VwYXJhdGUgaXNzdWUgcmVnYXJkaW5n
+IHRoZQo+IG1vZHVsZSBsb2FkIG9yZGVyLiAgV2Ugd2FudGVkIHRvIGxvYWQgYWxsIHN1cHBvcnRl
+ZCBjcnlwdG8gdDEwZGlmIG1vZHVsZXMKPiBiZWZvcmUgdGhlIGNyYy10MTBkaWYgbW9kdWxlLiAg
+WW91IG1lbnRpb25lZCB0aGF0IHRoZSBNT0RVTEVfQUxJQVMgYWxzbwo+IG5lZWQgc29tZSBmaXhp
+bmcgYW5kIHdvbmRlciBpZiB0aG9zZSBjaGFuZ2VzIGhhdmUgYmVlbiBtZXJnZWQgaW50bwo+IDMu
+MTEtcmMxPyAgU2VlIGh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDEzLzUvMjEvMjE2IC4gIFRoZW9y
+ZXRpY2FsbHksIHRoYXQKPiBmaXggc2hvdWxkIGFsc28gZ2V0IGFsbCB0aGUgY3J5cHRvIG1vZHVs
+ZXMgc3VwcG9ydCB0MTBkaWYgYmUgbG9hZGVkLgo+Cj4gVGhhbmtzLgo+Cj4gVGltCj4KPj4gZGlm
+ZiAtLWdpdCBhL2FyY2gveDg2L2NyeXB0by9jcmN0MTBkaWYtcGNsbXVsX2dsdWUuYyBiL2FyY2gv
+eDg2L2NyeXB0by9jcmN0MTBkaWYtcGNsbXVsX2dsdWUuYwo+PiBpbmRleCA3ODQ1ZDdmLi5hOGE5
+NWFhIDEwMDY0NAo+PiAtLS0gYS9hcmNoL3g4Ni9jcnlwdG8vY3JjdDEwZGlmLXBjbG11bF9nbHVl
+LmMKPj4gKysrIGIvYXJjaC94ODYvY3J5cHRvL2NyY3QxMGRpZi1wY2xtdWxfZ2x1ZS5jCj4+IEBA
+IC0xMjksOSArMTI5LDEwIEBAIE1PRFVMRV9ERVZJQ0VfVEFCTEUoeDg2Y3B1LCBjcmN0MTBkaWZf
+Y3B1X2lkKTsKPj4gICAKPj4gICBzdGF0aWMgaW50IF9faW5pdCBjcmN0MTBkaWZfaW50ZWxfbW9k
+X2luaXQodm9pZCkKPj4gICB7Cj4+ICsJcHJpbnRrKEtFUk5fV0FSTklORyAiKioqKioqKioqKiBD
+aGVja2luZyBmb3IgWDg2X0ZFQVRVUkVfUENMTVVMUURRXG4iKTsKPj4gICAJaWYgKCF4ODZfbWF0
+Y2hfY3B1KGNyY3QxMGRpZl9jcHVfaWQpKQo+PiAgIAkJcmV0dXJuIC1FTk9ERVY7Cj4+IC0KPj4g
+KwlwcmludGsoS0VSTl9XQVJOSU5HICIqKioqKioqKioqIFJlZ2lzdGVyaW5nIGNyY3QxMGRpZi1w
+Y2xtdWxcbiIpOwo+PiAgIAlyZXR1cm4gY3J5cHRvX3JlZ2lzdGVyX3NoYXNoKCZhbGcpOwo+PiAg
+IH0KPj4KPj4gQXMgZmFyIGFzIEkgdGVzdGVkLCBjcmN0MTBkaWYtcGNsbXVsLmtvIHdpbGwgbm90
+IGJlIGxvYWRlZCB1bmxlc3MgbWFudWFsbHkKPj4gYWRkaW5nICJtb2Rwcm9iZSBjcmN0MTBkaWYt
+cGNsbXVsIiB0byBpbml0cmFtZnMncyAvaW5pdCBvciBjaG9vc2luZwo+PiBDT05GSUdfQ1JZUFRP
+X0NSQ1QxMERJRl9QQ0xNVUw9eS4KPj4KPj4+IFNvIGFzIGxvbmcgYXMgdGhlIGNyY3QxMGRpZi5r
+byBhbmQgY3JjdDEwZGlmLXBjbG11bC5rbyBhcmUgbG9hZGVkLAo+Pj4gdGhlIHBjbG11bHFkcSB0
+MTBkaWYgd2lsbCBoYXZlIGEgaGlnaGVyIHByaW9yaXR5IGFuZCBnZXQgYWxsb2NhdGVkCj4+PiBh
+bmQgdXNlZC4KPj4gV2hhdCBJJ20gdGFsa2luZyBhcmUKPj4KPj4gICAgKDEpIFNpbmNlIG1raW5p
+dHJhbWZzIGlzIHVuYWJsZSB0byBrbm93IHRoYXQgY3JjdDEwZGlmLXBjbG11bC5rbyBoYXMgaGln
+aGVyCj4+ICAgICAgICBwcmlvcml0eSB0aGFuIGNyY3QxMGRpZi5rbyAsIG1raW5pdHJhbWZzIHdp
+bGwgbm90IGluY2x1ZGUKPj4gICAgICAgICJtb2Rwcm9iZSBjcmN0MTBkaWYtcGNsbXVsIiBsaW5l
+IGluIHRoZSBnZW5lcmF0ZWQgaW5pdHJhbWZzLgo+Pgo+PiAgICAoMikgSW4gb3JkZXIgdG8gZ2V0
+IGJlbmVmaXQgZnJvbSBQQ0xNVUxRRFEsIHVzZXJzIGhhdmUgdG8gbWFudWFsbHkgbWFrZSBzdXJl
+Cj4+ICAgICAgICB0aGF0ICJtb2Rwcm9iZSBjcmN0MTBkaWYtcGNsbXVsIiBpcyBjYWxsZWQgYmVm
+b3JlIGNyYy10MTBkaWYua28gKHdoaWNoIGlzCj4+ICAgICAgICBsb2FkZWQgYmVmb3JlIHNkX21v
+ZC5rbyBpcyBsb2FkZWQpIGlzIGxvYWRlZCBieSB0aGVpciBpbml0cmFtZnMncyAvaW5pdAo+PiAg
+ICAgICAgc2NyaXB0Lgo+Pgo+PiAgICAoMykgVGhlIGNhdXNlIG9mICgxKSBpcyB0aGF0IGNyY3Qx
+MGRpZi1wY2xtdWwua28gd2lsbCBub3QgYmUgbG9hZGVkCj4+ICAgICAgICBhdXRvbWF0aWNhbGx5
+IHVubGVzcyBjaG9vc2luZyBDT05GSUdfQ1JZUFRPX0NSQ1QxMERJRl9QQ0xNVUw9eS4KPj4KPj4g
+ICAgKDQpIFRoZSBjYXVzZSBvZiAoMykgaXMgdGhhdCBtb2R1bGVzLmRlcCBkb2VzIG5vdCBkZXNj
+cmliZSB0aGF0IHVzZXJzIHdpbGwKPj4gICAgICAgIGJlbmVmaXQgYnkgbG9hZGluZyBjcmN0MTBk
+aWYtcGNsbXVsLmtvIGJlZm9yZSBsb2FkaW5nIGNyYy10MTBkaWYua28gLgo+Pgo+PiAgICAoNSkg
+Q3VycmVudGx5IGNyY3QxMGRpZi1wY2xtdWwua28gY2Fubm90IGJlIGxvYWRlZCBpZiBQQ0xNVUxR
+RFEgaXMgbm90Cj4+ICAgICAgICBzdXBwb3J0ZWQuIFRoaXMgbGVhZHMgdG8gYm9vdCBmYWlsdXJl
+IChzaW5jZSBzZF9tb2Qua28gY2Fubm90IGJlIGxvYWRlZCkKPj4gICAgICAgIGlmIG1vZHVsZXMu
+ZGVwIHNheXMgdGhhdCAiY3JjdDEwZGlmLXBjbG11bC5rbyBpcyByZXF1aXJlZCBieQo+PiAgICAg
+ICAgY3JjLXQxMGRpZi5rbyIuCj4+Cj4+ICAgICg2KSBUbyBzb2x2ZSAoNCkgYW5kICg1KSwgbW9k
+dWxlcy5kZXAgc2hvdWxkIHNheSAiY3JjdDEwZGlmLXBjbG11bC5rbyBpcwo+PiAgICAgICAgcHJl
+ZmVycmVkIGZvciBjcmMtdDEwZGlmLmtvIGJ1dCBpcyBub3QgcmVxdWlyZWQgYnkgY3JjLXQxMGRp
+Zi5rbyIuCj4+ICAgICAgICBCdXQgdGhlcmUgaXMgbm8gc3VjaCBtZWNoYW5pc20uIFRodXMsIGN1
+cnJlbnRseSBhdmFpbGFibGUgY2hvaWNlIGlzCj4+ICAgICAgICAiYWxsb3cgbG9hZGluZyBjcmN0
+MTBkaWYtcGNsbXVsLmtvIGV2ZW4gaWYgUENMTVVMUURRIGlzIG5vdCBzdXBwb3J0ZWQiCj4+ICAg
+ICAgICBvciAiaWdub3JlIGVycm9ycyBieSBidWlsdC1pbiB0aGUgY3JjdDEwZGlmLXBjbG11bC5r
+byBtb2R1bGUiLgo+Pgo+PiBNeSBwYXRjaCAoYikgc2VlbXMgdG8gYmUgY29tcGxpY2F0ZWQgYnV0
+IGlzIHJlcXVpcmVkIGluIG9yZGVyIHRvIHNvbHZlICg0KQo+PiB3aXRob3V0IGFza2luZyB1c2Vy
+cyB0byBtYW51YWxseSBhZGQgIm1vZHByb2JlIGNyY3QxMGRpZi1wY2xtdWwiIGludG8gdGhlaXIK
+Pj4gaW5pdHJhbWZzLiBJZiB3ZSBjaG9vc2UgcGF0Y2ggKGIpIHJhdGhlciB0aGFuIHBhdGNoIChh
+KSwgd2UgbmVlZCB0byBzb2x2ZSAoNSkuCj4+IC0tCj4+IFRvIHVuc3Vic2NyaWJlIGZyb20gdGhp
+cyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1bnN1YnNjcmliZSBsaW51eC1rZXJuZWwiIGluCj4+IHRo
+ZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnCj4+IE1vcmUg
+bWFqb3Jkb21vIGluZm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8u
+aHRtbAo+PiBQbGVhc2UgcmVhZCB0aGUgRkFRIGF0ICBodHRwOi8vd3d3LnR1eC5vcmcvbGttbC8K
+PgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tCkludGVsIFRlY2hub2xvZ3kgUG9sYW5kIHNwLiB6IG8uby4KeiBzaWVk
+emliYSB3IEdkYW5za3UKdWwuIFNsb3dhY2tpZWdvIDE3Mwo4MC0yOTggR2RhbnNrCgpTYWQgUmVq
+b25vd3kgR2RhbnNrIFBvbG5vYyB3IEdkYW5za3UsIApWSUkgV3lkemlhbCBHb3Nwb2RhcmN6eSBL
+cmFqb3dlZ28gUmVqZXN0cnUgU2Fkb3dlZ28sIApudW1lciBLUlMgMTAxODgyCgpOSVAgOTU3LTA3
+LTUyLTMxNgpLYXBpdGFsIHpha2xhZG93eSAyMDAuMDAwIHpsCgpUaGlzIGUtbWFpbCBhbmQgYW55
+IGF0dGFjaG1lbnRzIG1heSBjb250YWluIGNvbmZpZGVudGlhbCBtYXRlcmlhbCBmb3IKdGhlIHNv
+bGUgdXNlIG9mIHRoZSBpbnRlbmRlZCByZWNpcGllbnQocykuIEFueSByZXZpZXcgb3IgZGlzdHJp
+YnV0aW9uCmJ5IG90aGVycyBpcyBzdHJpY3RseSBwcm9oaWJpdGVkLiBJZiB5b3UgYXJlIG5vdCB0
+aGUgaW50ZW5kZWQKcmVjaXBpZW50LCBwbGVhc2UgY29udGFjdCB0aGUgc2VuZGVyIGFuZCBkZWxl
+dGUgYWxsIGNvcGllcy4K
