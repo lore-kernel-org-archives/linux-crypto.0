@@ -1,98 +1,43 @@
-From: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: Re: [PATCH 3.11-rc1] crypto: Fix boot failure due to module dependency.
-Date: Thu, 18 Jul 2013 12:47:05 +0900
-Message-ID: <201307180347.r6I3l5e9077577@www262.sakura.ne.jp>
-References: <201307180550.BDB51536.LHMQOOOVFJFSFt@I-love.SAKURA.ne.jp> <1374098936.22432.322.camel@schen9-DESK>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: [PATCH] crypto: remove double execution of the same test suite
+Date: Thu, 18 Jul 2013 18:57:07 +0300
+Message-ID: <1374163027-17201-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-2022-JP"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
+Content-Type: text/plain
+Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <horia.geanta@freescale.com>,
+	Cristian Stoica <cristian.stoica@freescale.com>
+To: <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www262.sakura.ne.jp ([202.181.97.72]:60688 "EHLO
-	www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756717Ab3GRDrQ (ORCPT
+Received: from co1ehsobe001.messaging.microsoft.com ([216.32.180.184]:54710
+	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754643Ab3GRQKx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jul 2013 23:47:16 -0400
-In-Reply-To: <1374098936.22432.322.camel@schen9-DESK>
+	Thu, 18 Jul 2013 12:10:53 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Tim Chen wrote:
-> > > Your approach is quite complicated.  I think something simpler like the
-> > > following will work:
-> >
-> > We cannot benefit from PCLMULQDQ. Is it acceptable for you?
-> 
-> 
-> The following code in crct10dif-pclmul_glue.c
-> 
-> static const struct x86_cpu_id crct10dif_cpu_id[] = {
->         X86_FEATURE_MATCH(X86_FEATURE_PCLMULQDQ),
->         {}
-> };
-> MODULE_DEVICE_TABLE(x86cpu, crct10dif_cpu_id);
-> 
-> will put the module in the device table and get the module
-> loaded, as long as the cpu support PCLMULQDQ. So we should be able
-> to benefit.
+This patch removes redundant execution of the same test suite in cases
+where alg and driver variables are the same (e.g. when alg_test is
+called from tcrypt_test)
 
-Excuse me, how can crct10dif-pclmul.ko get loaded automatically?
-Did you test CONFIG_CRYPTO_CRCT10DIF_PCLMUL=m with below debug message?
+Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+---
+ crypto/testmgr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c b/arch/x86/crypto/crct10dif-pclmul_glue.c
-index 7845d7f..a8a95aa 100644
---- a/arch/x86/crypto/crct10dif-pclmul_glue.c
-+++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
-@@ -129,9 +129,10 @@ MODULE_DEVICE_TABLE(x86cpu, crct10dif_cpu_id);
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 2f00607..e091ef6 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3234,7 +3234,7 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+ 	if (i >= 0)
+ 		rc |= alg_test_descs[i].test(alg_test_descs + i, driver,
+ 					     type, mask);
+-	if (j >= 0)
++	if (j >= 0 && j != i)
+ 		rc |= alg_test_descs[j].test(alg_test_descs + j, driver,
+ 					     type, mask);
  
- static int __init crct10dif_intel_mod_init(void)
- {
-+	printk(KERN_WARNING "********** Checking for X86_FEATURE_PCLMULQDQ\n");
- 	if (!x86_match_cpu(crct10dif_cpu_id))
- 		return -ENODEV;
--
-+	printk(KERN_WARNING "********** Registering crct10dif-pclmul\n");
- 	return crypto_register_shash(&alg);
- }
-
-As far as I tested, crct10dif-pclmul.ko will not be loaded unless manually
-adding "modprobe crct10dif-pclmul" to initramfs's /init or choosing
-CONFIG_CRYPTO_CRCT10DIF_PCLMUL=y.
-
-> So as long as the crct10dif.ko and crct10dif-pclmul.ko are loaded,
-> the pclmulqdq t10dif will have a higher priority and get allocated
-> and used.
-
-What I'm talking are
-
-  (1) Since mkinitramfs is unable to know that crct10dif-pclmul.ko has higher
-      priority than crct10dif.ko , mkinitramfs will not include
-      "modprobe crct10dif-pclmul" line in the generated initramfs.
-
-  (2) In order to get benefit from PCLMULQDQ, users have to manually make sure
-      that "modprobe crct10dif-pclmul" is called before crc-t10dif.ko (which is
-      loaded before sd_mod.ko is loaded) is loaded by their initramfs's /init
-      script.
-
-  (3) The cause of (1) is that crct10dif-pclmul.ko will not be loaded
-      automatically unless choosing CONFIG_CRYPTO_CRCT10DIF_PCLMUL=y.
-
-  (4) The cause of (3) is that modules.dep does not describe that users will
-      benefit by loading crct10dif-pclmul.ko before loading crc-t10dif.ko .
-
-  (5) Currently crct10dif-pclmul.ko cannot be loaded if PCLMULQDQ is not
-      supported. This leads to boot failure (since sd_mod.ko cannot be loaded)
-      if modules.dep says that "crct10dif-pclmul.ko is required by
-      crc-t10dif.ko".
-
-  (6) To solve (4) and (5), modules.dep should say "crct10dif-pclmul.ko is
-      preferred for crc-t10dif.ko but is not required by crc-t10dif.ko".
-      But there is no such mechanism. Thus, currently available choice is
-      "allow loading crct10dif-pclmul.ko even if PCLMULQDQ is not supported"
-      or "ignore errors by built-in the crct10dif-pclmul.ko module".
-
-My patch (b) seems to be complicated but is required in order to solve (4)
-without asking users to manually add "modprobe crct10dif-pclmul" into their
-initramfs. If we choose patch (b) rather than patch (a), we need to solve (5).
+-- 
+1.8.1.5
