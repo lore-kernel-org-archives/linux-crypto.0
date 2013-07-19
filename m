@@ -1,62 +1,50 @@
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 3.11-rc1] crypto: Fix boot failure due to module
- dependency.
-Date: Fri, 19 Jul 2013 16:16:30 -0700
-Message-ID: <20130719231630.GC1701@kroah.com>
-References: <201307180550.BDB51536.LHMQOOOVFJFSFt@I-love.SAKURA.ne.jp>
- <2493652.fjZLqTL8IF@vostro.rjw.lan>
- <1374257329.22432.382.camel@schen9-DESK>
- <4295105.1txhDL4OOg@vostro.rjw.lan>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH 3.11-rc1] crypto: Fix boot failure due to module dependency.
+Date: Fri, 19 Jul 2013 16:21:09 -0700
+Message-ID: <51E9C9E5.2060602@zytor.com>
+References: <201307180550.BDB51536.LHMQOOOVFJFSFt@I-love.SAKURA.ne.jp> <2493652.fjZLqTL8IF@vostro.rjw.lan> <1374257329.22432.382.camel@schen9-DESK> <4295105.1txhDL4OOg@vostro.rjw.lan> <20130719231630.GC1701@kroah.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
 	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
 	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	ak <ak@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	ak <ak@linux.intel.com>,
 	ACPI Devel Maling List <linux-acpi@vger.kernel.org>
-To: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <4295105.1txhDL4OOg@vostro.rjw.lan>
-Sender: linux-kernel-owner@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <20130719231630.GC1701@kroah.com>
+Sender: linux-acpi-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 19, 2013 at 11:38:04PM +0200, Rafael J. Wysocki wrote:
-> Alas, this is not the one I'd like to apply.
+On 07/19/2013 04:16 PM, Greg Kroah-Hartman wrote:
 > 
-> With that patch applied, new device objects are created to avoid binding the
-> processor driver directly to the cpu system device objects, because that
-> apparently confuses udev and it starts to ignore the cpu modalias once the
-> driver has been bound to any of those objects.
+> udev isn't doing any module loading, 'modprobe' is just being called for
+> any new module alias that shows up in the system, and all of the drivers
+> that match it then get loaded.
 > 
-> I've verified in the meantime that this indeed is the case.
+> How is it a problem if a module is attempted to be loaded that is
+> already loaded?  How is it a problem if a different module is loaded for
+> a device already bound to a driver?  Both of those should be total
+> "no-ops" for the kernel.
 > 
-> A link to the patch in question: https://patchwork.kernel.org/patch/2830561/
+> But, I don't know anything about the cpu code, how is loading a module
+> causing problems?  That sounds like it needs to be fixes, as any root
+> user can load modules whenever they want, you can't protect the kernel
+> from doing that.
 > 
-> Greg, I asked you some time ago whether or not it was possible for udev to stop
-> autoloading modules that matched the cpu modalias after a driver had been bound
-> to the cpu system device objects and you said "no".  However, this time I can
-> say with certainty that that really is the case.  So, the question now is
-> whether or not we can do anything in the kernel to avoid that confusion in udev
-> instead of applying the patch linked above (which is beyond ugly in my not so
-> humble opinion)?
 
-udev isn't doing any module loading, 'modprobe' is just being called for
-any new module alias that shows up in the system, and all of the drivers
-that match it then get loaded.
+The issue here seems to be the dynamic binding nature of the crypto
+subsystem.  When something needs crypto, it will request the appropriate
+crypto module (e.g. crct10dif), which may race with detecting a specific
+hardware accelerator based on CPUID or device information (e.g.
+crct10dif_pclmul).
 
-How is it a problem if a module is attempted to be loaded that is
-already loaded?  How is it a problem if a different module is loaded for
-a device already bound to a driver?  Both of those should be total
-"no-ops" for the kernel.
+RAID has effectively the same issue, and we just "solved" it by
+compiling in all the accelerators into the top-level module.
 
-But, I don't know anything about the cpu code, how is loading a module
-causing problems?  That sounds like it needs to be fixes, as any root
-user can load modules whenever they want, you can't protect the kernel
-from doing that.
+	-hpa
 
-thanks,
-
-greg k-h
