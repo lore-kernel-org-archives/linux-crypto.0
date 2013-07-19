@@ -1,61 +1,48 @@
-From: "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH 3.11-rc1] crypto: Fix boot failure due to module dependency.
-Date: Thu, 18 Jul 2013 16:44:20 -0700
-Message-ID: <51E87DD4.3000907@zytor.com>
-References: <201307180550.BDB51536.LHMQOOOVFJFSFt@I-love.SAKURA.ne.jp>  <1374098936.22432.322.camel@schen9-DESK>  <201307180347.r6I3l5e9077577@www262.sakura.ne.jp> <1374181200.22432.350.camel@schen9-DESK> <51E8696A.7090406@intel.com>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH] crypto: remove double execution of the same test suite
+Date: Fri, 19 Jul 2013 09:48:47 +0300
+Message-ID: <51E8E14F.8080603@freescale.com>
+References: <1374163027-17201-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	herbert@gondor.hengli.com.au, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, ak <ak@linux.intel.com>,
-	rjw@rjwysocki.net
-To: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Cc: <herbert@gondor.hengli.com.au>, <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+To: Cristian Stoica <cristian.stoica@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:60203 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934601Ab3GRXok (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Jul 2013 19:44:40 -0400
-In-Reply-To: <51E8696A.7090406@intel.com>
+Received: from ch1ehsobe005.messaging.microsoft.com ([216.32.181.185]:59678
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1759633Ab3GSGtG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 19 Jul 2013 02:49:06 -0400
+In-Reply-To: <1374163027-17201-1-git-send-email-cristian.stoica@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07/18/2013 03:17 PM, Rafael J. Wysocki wrote:
->>
->> alias x86cpu:vendor:*:family:*:model:*:feature:*0081* crct10dif_pclmul
->>
->> This should cause udev to load the crct10dif_pclml module when cpu
->> support the PCLMULQDQ (feature code 0081).  I did my testing during
->> development on 3.10 and the module was indeed loaded.
->>
->> However, I found that the following commit under 3.11-rc1 broke
->> the mechanism after some bisection.
->>
->> commit ac212b6980d8d5eda705864fc5a8ecddc6d6eacc
->> Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
->> Date:   Fri May 3 00:26:22 2013 +0200
->>
->>      ACPI / processor: Use common hotplug infrastructure
->>           Split the ACPI processor driver into two parts, one that is
->>      non-modular, resides in the ACPI core and handles the enumeration
->>      and hotplug of processors and one that implements the rest of the
->>      existing processor driver functionality.
->>      Rafael, can you check and see if this can be fixed so those
->> optimized
->> crypto modules for Intel cpu that support them can be loaded?
-> 
-> I think this is an ordering issue between udev startup and the time when
-> devices are registered.
-> 
-> I wonder what happens if you put those modules into the initramfs image?
-> 
+On 7/18/2013 6:57 PM, Cristian Stoica wrote:
+> This patch removes redundant execution of the same test suite in cases
+> where alg and driver variables are the same (e.g. when alg_test is
+> called from tcrypt_test)
+>
+> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
 
-OK, this bothers me on some pretty deep level... a set of changes
-exclusively in drivers/acpi breaking functionality which had nothing to
-do with ACPI, specifically CPU-feature-based module loading.
+Reviewed-by: Horia Geanta <horia.geanta@freescale.com>
 
-Please let me know what the investigation comes up with, or if I need to
-get more directly involved.
-
-	-hpa
+> ---
+>   crypto/testmgr.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 2f00607..e091ef6 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -3234,7 +3234,7 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+>   	if (i >= 0)
+>   		rc |= alg_test_descs[i].test(alg_test_descs + i, driver,
+>   					     type, mask);
+> -	if (j >= 0)
+> +	if (j >= 0 && j != i)
+>   		rc |= alg_test_descs[j].test(alg_test_descs + j, driver,
+>   					     type, mask);
+>
+>
