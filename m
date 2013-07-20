@@ -1,50 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3.11-rc1] crypto: Fix boot failure due to module
- dependency.
-Date: Sat, 20 Jul 2013 15:30:21 +1000
-Message-ID: <20130720053021.GA19689@gondor.apana.org.au>
-References: <201307180550.BDB51536.LHMQOOOVFJFSFt@I-love.SAKURA.ne.jp>
- <2493652.fjZLqTL8IF@vostro.rjw.lan>
- <1374257329.22432.382.camel@schen9-DESK>
- <4295105.1txhDL4OOg@vostro.rjw.lan>
- <20130719231630.GC1701@kroah.com>
- <51E9C9E5.2060602@zytor.com>
- <20130719232459.GA18039@gondor.apana.org.au>
- <1374277033.22432.384.camel@schen9-DESK>
- <1374283864.22432.393.camel@schen9-DESK>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: Re: [PATCH 3.11-rc1] crypto: Fix boot failure due to moduledependency.
+Date: Sat, 20 Jul 2013 14:56:06 +0900
+Message-ID: <201307201456.JIC35412.VFOMFJOQLOtHFS@I-love.SAKURA.ne.jp>
+References: <51E9C9E5.2060602@zytor.com>
+	<20130719232459.GA18039@gondor.apana.org.au>
+	<1374277033.22432.384.camel@schen9-DESK>
+	<1374283864.22432.393.camel@schen9-DESK>
+	<20130720053021.GA19689@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	ak <ak@linux.intel.com>,
-	ACPI Devel Maling List <linux-acpi@vger.kernel.org>
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-acpi-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1374283864.22432.393.camel@schen9-DESK>
-Sender: linux-acpi-owner@vger.kernel.org
+Cc: hpa@zytor.com, gregkh@linuxfoundation.org, rjw@rjwysocki.net,
+	rafael.j.wysocki@intel.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, ak@linux.intel.com,
+	linux-acpi@vger.kernel.org
+To: herbert@gondor.apana.org.au, tim.c.chen@linux.intel.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20130720053021.GA19689@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 19, 2013 at 06:31:04PM -0700, Tim Chen wrote:
->
-> However, when I have the library and generic algorithm compiled in,
-> I do not see the PCLMULQDQ version loaded.
+Herbert Xu wrote:
+> On Fri, Jul 19, 2013 at 06:31:04PM -0700, Tim Chen wrote:
+> >
+> > However, when I have the library and generic algorithm compiled in,
+> > I do not see the PCLMULQDQ version loaded.
+> > 
+> > CONFIG_CRYPTO_CRCT10DIF=y
+> > CONFIG_CRYPTO_CRCT10DIF_PCLMUL=m
+> > CONFIG_CRC_T10DIF=y
 > 
-> CONFIG_CRYPTO_CRCT10DIF=y
-> CONFIG_CRYPTO_CRCT10DIF_PCLMUL=m
-> CONFIG_CRC_T10DIF=y
+> That is completely expected.  I don't really think we need to
+> do anything about this case.  After all, if the admin wants to
+> use the optimised version for CRC_T10DIF then they could simply
+> compile that in as well.
+> 
 
-That is completely expected.  I don't really think we need to
-do anything about this case.  After all, if the admin wants to
-use the optimised version for CRC_T10DIF then they could simply
-compile that in as well.
+Wow! ;-)
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+But I'd expect something like
+
+ static int __init crc_t10dif_mod_init(void)
+ {
++#if !defined(CONFIG_CRC_T10DIF_MODULE) && defined(CONFIG_CRYPTO_CRCT10DIF_PCLMUL_MODULE)
++	printk(KERN_WARNING "Consider CONFIG_CRYPTO_CRCT10DIF_PCLMUL=y for better performance\n");
++#endif
+ 	crct10dif_tfm = crypto_alloc_shash("crct10dif", 0, 0);
+ 	return PTR_RET(crct10dif_tfm);
+ }
+
+because the admin might not be aware of this implication.
