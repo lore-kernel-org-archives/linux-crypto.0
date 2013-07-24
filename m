@@ -1,34 +1,30 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: crypto: ux500: Fix logging, make arrays const, neatening
-Date: Mon, 22 Jul 2013 16:19:35 -0700
-Message-ID: <1374535175.2061.84.camel@joe-AO722>
-References: <1373896210-21316-1-git-send-email-standby24x7@gmail.com>
-	 <1374003464-32302-1-git-send-email-standby24x7@gmail.com>
-	 <1374008808.1949.37.camel@joe-AO722>
-	 <CACRpkdaUQaDbtr5rOyob_G5ggSZLUVOWU+TmhL51Jw_c0S+T0A@mail.gmail.com>
+From: Zhao Hongjiang <zhaohongjiang@huawei.com>
+Subject: [BUG] 3.11 boot failure caused by commit crypto
+Date: Wed, 24 Jul 2013 10:28:28 +0800
+Message-ID: <51EF3BCC.30102@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
-Cc: Masanari Iida <standby24x7@gmail.com>,
-	Andreas Westin <andreas.westin@stericsson.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto <linux-crypto@vger.kernel.org>
-To: Linus Walleij <linus.walleij@linaro.org>
+Cc: <davem@davemloft.net>, <tim.c.chen@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	<linux-crypto@vger.kernel.org>
+To: <herbert@gondor.hengli.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from perches-mx.perches.com ([206.117.179.246]:54335 "EHLO
-	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751717Ab3GVXTg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 22 Jul 2013 19:19:36 -0400
-In-Reply-To: <CACRpkdaUQaDbtr5rOyob_G5ggSZLUVOWU+TmhL51Jw_c0S+T0A@mail.gmail.com>
+Received: from szxga01-in.huawei.com ([119.145.14.64]:18758 "EHLO
+	szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750901Ab3GXCcT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Jul 2013 22:32:19 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2013-07-23 at 00:35 +0200, Linus Walleij wrote:
-> Have you tested this on hardware or is it compile-tested only?
+When i boot my system with the latest 3.11-rc2 kernel, something occur as follow:
 
-Hi Linus.
+Waiting for device /dev/disk/by-id/... to appear: ............ Could not find //dev/disk/by-id/...
+Want me to fall back to /dev/disk/by-id/..... ?
 
-Compile tested only.  Not tested on real devices.  -ENOHARDWARE.
+I found out the patch commit id: 2d31e518a42828df7877bca23a958627d60408bc (crypto: crct10dif - 
+Wrap crc_t10dif function all to use crypto transform framework) cause this problem by bisect.
 
-cheers, Joe
+I revert this patch and this problem go away, the boot become successful.
