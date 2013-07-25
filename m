@@ -1,74 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.11
-Date: Wed, 24 Jul 2013 17:23:07 +1000
-Message-ID: <20130724072307.GA31136@gondor.apana.org.au>
-References: <20100903060055.GA28915@gondor.apana.org.au>
- <20100903110722.GA31826@gondor.apana.org.au>
- <20101215115035.GA25248@gondor.apana.org.au>
- <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
+Subject: Re: [PATCH] modules: add support for soft module dependencies
+Date: Thu, 25 Jul 2013 12:03:29 +1000
+Message-ID: <20130725020329.GA14625@gondor.apana.org.au>
+References: <20130724071757.GA30970@gondor.apana.org.au>
+ <87siz38q2t.fsf@rustcorp.com.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
+Cc: Andreas Robinson <andr345@gmail.com>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	Zhao Hongjiang <zhaohongjiang@huawei.com>, davem@davemloft.net,
+	tim.c.chen@linux.intel.com,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	linux-crypto@vger.kernel.org
+To: Rusty Russell <rusty@rustcorp.com.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:42439 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:58252 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751828Ab3GXHXM (ORCPT
+	with ESMTP id S1754388Ab3GYCDl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Jul 2013 03:23:12 -0400
+	Wed, 24 Jul 2013 22:03:41 -0400
 Content-Disposition: inline
-In-Reply-To: <20130328082841.GA7425@gondor.apana.org.au>
+In-Reply-To: <87siz38q2t.fsf@rustcorp.com.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Thu, Jul 25, 2013 at 09:32:02AM +0930, Rusty Russell wrote:
+> Herbert Xu <herbert@gondor.apana.org.au> writes:
+> > Hi Rusty:
+> >
+> > I don't know why this patch never went into the kernel, even
+> > though the corresponding features have been added to modprobe
+> > in most if not all distros.
+> 
+> Because Andreas never sent me the patch?  This is the first I've *heard*
+> of this feature.  Looks like it didn't hit lkml either.  And what was
+> 2/2?
 
-This push fixes a memory corruption issue in caam, as well as
-reverting the new optimised crct10dif implementation as it breaks
-boot on initrd systems.
+2/2 was the patch to actually use this in crc32c.
 
-Hopefully crct10dif will be reinstated once the supporting code
-is added so that it doesn't break boot.
+> It's not how I would have done this: post-deps are more flexibly done at
+> runtime, because the module may have to do work to figure out what to
+> pull in.  But since it already exists, I'll apply this patch: it doesn't
+> cost the kernel anything.
+> 
+> And I've fixed the example, so we know how to list multiple modules!
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Herbert Xu (1):
-      Revert "crypto: crct10dif - Wrap crc_t10dif function all to use crypto transform framework"
-
-Vakul Garg (1):
-      crypto: caam - Fixed the memory out of bound overwrite issue
-
- arch/x86/crypto/Makefile                |    2 -
- arch/x86/crypto/crct10dif-pcl-asm_64.S  |  643 -------------------------------
- arch/x86/crypto/crct10dif-pclmul_glue.c |  151 --------
- crypto/Kconfig                          |   19 -
- crypto/Makefile                         |    1 -
- crypto/crct10dif.c                      |  178 ---------
- crypto/tcrypt.c                         |    8 -
- crypto/testmgr.c                        |   10 -
- crypto/testmgr.h                        |   33 --
- drivers/crypto/caam/caamhash.c          |    2 +-
- include/linux/crc-t10dif.h              |    4 -
- lib/Kconfig                             |    2 -
- lib/crc-t10dif.c                        |   73 ++--
- 13 files changed, 44 insertions(+), 1082 deletions(-)
-
-Thanks,
+Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
