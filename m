@@ -1,7 +1,7 @@
 From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: [PATCH 3/4] crypto: omap-sham: Convert to devm_request_irq()
-Date: Fri, 26 Jul 2013 12:29:16 +0530
-Message-ID: <1374821957-30141-4-git-send-email-lokeshvutla@ti.com>
+Subject: [PATCH 4/4] crypto: omap-sham: Convert to devm_kzalloc()
+Date: Fri, 26 Jul 2013 12:29:17 +0530
+Message-ID: <1374821957-30141-5-git-send-email-lokeshvutla@ti.com>
 References: <1374821957-30141-1-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -10,67 +10,85 @@ Cc: <linux-arm-kernel@lists.infradead.org>, <davem@davemloft.net>,
 	<joelf@ti.com>, <lokeshvutla@ti.com>
 To: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:40392 "EHLO comal.ext.ti.com"
+Received: from arroyo.ext.ti.com ([192.94.94.40]:36602 "EHLO arroyo.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753418Ab3GZG77 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 26 Jul 2013 02:59:59 -0400
+	id S1753645Ab3GZHAD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 26 Jul 2013 03:00:03 -0400
 In-Reply-To: <1374821957-30141-1-git-send-email-lokeshvutla@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Using devm_request_irq() rather than request_irq().
-So removing free_irq() calls from the probe error
-path and the remove handler.
+Use devm_kzalloc() to make cleanup paths simpler.
 
 Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 ---
- drivers/crypto/omap-sham.c |   12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ drivers/crypto/omap-sham.c |   15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index a6eb6a8..b82b140 100644
+index b82b140..ae1ca8b2 100644
 --- a/drivers/crypto/omap-sham.c
 +++ b/drivers/crypto/omap-sham.c
-@@ -1896,10 +1896,11 @@ static int omap_sham_probe(struct platform_device *pdev)
+@@ -1870,7 +1870,7 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	int err, i, j;
+ 	u32 rev;
+ 
+-	dd = kzalloc(sizeof(struct omap_sham_dev), GFP_KERNEL);
++	dd = devm_kzalloc(dev, sizeof(struct omap_sham_dev), GFP_KERNEL);
+ 	if (dd == NULL) {
+ 		dev_err(dev, "unable to alloc data struct.\n");
+ 		err = -ENOMEM;
+@@ -1887,12 +1887,12 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	err = (dev->of_node) ? omap_sham_get_res_of(dd, dev, &res) :
+ 			       omap_sham_get_res_pdev(dd, pdev, &res);
+ 	if (err)
+-		goto res_err;
++		goto data_err;
+ 
+ 	dd->io_base = devm_ioremap_resource(dev, &res);
+ 	if (IS_ERR(dd->io_base)) {
+ 		err = PTR_ERR(dd->io_base);
+-		goto res_err;
++		goto data_err;
  	}
  	dd->phys_base = res.start;
  
--	err = request_irq(dd->irq, dd->pdata->intr_hdlr, IRQF_TRIGGER_LOW,
--			  dev_name(dev), dd);
-+	err = devm_request_irq(dev, dd->irq, dd->pdata->intr_hdlr,
-+			       IRQF_TRIGGER_NONE, dev_name(dev), dd);
+@@ -1901,7 +1901,7 @@ static int omap_sham_probe(struct platform_device *pdev)
  	if (err) {
--		dev_err(dev, "unable to request irq.\n");
-+		dev_err(dev, "unable to request irq %d, err = %d\n",
-+			dd->irq, err);
- 		goto res_err;
+ 		dev_err(dev, "unable to request irq %d, err = %d\n",
+ 			dd->irq, err);
+-		goto res_err;
++		goto data_err;
  	}
  
-@@ -1912,7 +1913,7 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	dma_cap_zero(mask);
+@@ -1913,7 +1913,7 @@ static int omap_sham_probe(struct platform_device *pdev)
  		dev_err(dev, "unable to obtain RX DMA engine channel %u\n",
  			dd->dma);
  		err = -ENXIO;
--		goto dma_err;
-+		goto res_err;
+-		goto res_err;
++		goto data_err;
  	}
  
  	dd->flags |= dd->pdata->flags;
-@@ -1950,8 +1951,6 @@ err_algs:
+@@ -1951,9 +1951,6 @@ err_algs:
  					&dd->pdata->algs_info[i].algs_list[j]);
  	pm_runtime_disable(dev);
  	dma_release_channel(dd->dma_lch);
--dma_err:
--	free_irq(dd->irq, dd);
- res_err:
- 	kfree(dd);
- 	dd = NULL;
-@@ -1979,7 +1978,6 @@ static int omap_sham_remove(struct platform_device *pdev)
+-res_err:
+-	kfree(dd);
+-	dd = NULL;
+ data_err:
+ 	dev_err(dev, "initialization failed.\n");
+ 
+@@ -1978,8 +1975,6 @@ static int omap_sham_remove(struct platform_device *pdev)
  	tasklet_kill(&dd->done_task);
  	pm_runtime_disable(&pdev->dev);
  	dma_release_channel(dd->dma_lch);
--	free_irq(dd->irq, dd);
- 	kfree(dd);
- 	dd = NULL;
+-	kfree(dd);
+-	dd = NULL;
  
+ 	return 0;
+ }
 -- 
 1.7.9.5
