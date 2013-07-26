@@ -1,53 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] modules: add support for soft module dependencies
-Date: Thu, 25 Jul 2013 12:03:29 +1000
-Message-ID: <20130725020329.GA14625@gondor.apana.org.au>
-References: <20130724071757.GA30970@gondor.apana.org.au>
- <87siz38q2t.fsf@rustcorp.com.au>
+From: Lokesh Vutla <lokeshvutla@ti.com>
+Subject: [PATCH 0/4] crypto: omap-sham: Add support for SHA384/SHA512 for OMAP5/AM43xx Soc's
+Date: Fri, 26 Jul 2013 12:29:13 +0530
+Message-ID: <1374821957-30141-1-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andreas Robinson <andr345@gmail.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Zhao Hongjiang <zhaohongjiang@huawei.com>, davem@davemloft.net,
-	tim.c.chen@linux.intel.com,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	linux-crypto@vger.kernel.org
-To: Rusty Russell <rusty@rustcorp.com.au>
+Content-Type: text/plain
+Cc: <linux-arm-kernel@lists.infradead.org>, <davem@davemloft.net>,
+	<herbert@gondor.hengli.com.au>, <rnayak@ti.com>, <nsekhar@ti.com>,
+	<joelf@ti.com>, <lokeshvutla@ti.com>
+To: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:58252 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754388Ab3GYCDl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Jul 2013 22:03:41 -0400
-Content-Disposition: inline
-In-Reply-To: <87siz38q2t.fsf@rustcorp.com.au>
+Received: from bear.ext.ti.com ([192.94.94.41]:38503 "EHLO bear.ext.ti.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752595Ab3GZG7x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 26 Jul 2013 02:59:53 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 25, 2013 at 09:32:02AM +0930, Rusty Russell wrote:
-> Herbert Xu <herbert@gondor.apana.org.au> writes:
-> > Hi Rusty:
-> >
-> > I don't know why this patch never went into the kernel, even
-> > though the corresponding features have been added to modprobe
-> > in most if not all distros.
-> 
-> Because Andreas never sent me the patch?  This is the first I've *heard*
-> of this feature.  Looks like it didn't hit lkml either.  And what was
-> 2/2?
+This patch series adds support for SHA348 and SHA512 in addition to MD5,
+SHA1, SHA224 SHA256 that the omap sha module supports. Also adding the pdata
+for OMAP5 and AM43xx Soc's.
+And using devm_* calls to make cleanup paths simpler.
 
-2/2 was the patch to actually use this in crc32c.
+Lokesh Vutla (4):
+  crypto: omap-sham: Add SHA384 and SHA512 Support
+  crypto: omap-sham: Add OMAP5/AM43XX SHAM Support
+  crypto: omap-sham: Convert to devm_request_irq()
+  crypto: omap-sham: Convert to devm_kzalloc()
 
-> It's not how I would have done this: post-deps are more flexibly done at
-> runtime, because the module may have to do work to figure out what to
-> pull in.  But since it already exists, I'll apply this patch: it doesn't
-> cost the kernel anything.
-> 
-> And I've fixed the example, so we know how to list multiple modules!
+ drivers/crypto/Kconfig     |   11 +-
+ drivers/crypto/omap-sham.c |  314 +++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 262 insertions(+), 63 deletions(-)
 
-Thanks!
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.9.5
