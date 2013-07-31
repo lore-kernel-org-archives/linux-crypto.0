@@ -1,72 +1,173 @@
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [BUG] 3.11 boot failure caused by commit crypto
-Date: Wed, 31 Jul 2013 09:39:37 +0930
-Message-ID: <87vc3r4mke.fsf@rustcorp.com.au>
-References: <51EF3BCC.30102@huawei.com> <20130724070621.GA30415@gondor.apana.org.au> <1375130346.22432.399.camel@schen9-DESK> <20130729230806.GA1506@gondor.apana.org.au> <1375140048.22432.400.camel@schen9-DESK> <87li4o615p.fsf@rustcorp.com.au> <20130730112817.GA5516@gondor.apana.org.au>
+From: Ruchika Gupta <ruchika.gupta@freescale.com>
+Subject: [PATCH] crypto: caam - Remove unused functions from Job Ring
+Date: Wed, 31 Jul 2013 15:48:56 +0530
+Message-ID: <1375265936-30844-1-git-send-email-ruchika.gupta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
-	Zhao Hongjiang <zhaohongjiang@huawei.com>, davem@davemloft.net,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"gregkh\@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:43070 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751683Ab3GaDJi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Jul 2013 23:09:38 -0400
-In-Reply-To: <20130730112817.GA5516@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>,
+	Vakul Garg <vakul@freescale.com>,
+	Alex Porosanu <alexandru.porosanu@freescale.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Horia Geanta <horia.geanta@freescale.com>,
+	Bharat Bhushan <bharat.bhushan@freescale.com>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	<linux-kernel@vger.kernel.org>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
-> On Tue, Jul 30, 2013 at 03:26:50PM +0930, Rusty Russell wrote:
->>
->> Does this imply that you want me to push that to Linus now, and/or CC
->> stable?  Was planning for *next* merge window...
->
-> Next merge window is fine.  However, it would be good to restore
-> the new driver for that as well.  So I see two ways to do this,
-> either we push the crct10dif driver patches through your tree,
-> on top of the MODULES_SOFTDEP patch, or I pull the MODULES_SOFTDEP
-> patch into the crypto tree.
->
-> What would you like to do?
-
-You're welcome to it: it's v. unlikely to conflict with anything else.
-
-Here it is, fresh from my pending-rebases branch, with my Signed-off-by.
-
-Cheers,
-Rusty.
-
-From: Andreas Robinson <andr345@gmail.com>
-Subject: modules: add support for soft module dependencies
-
-Additional and optional dependencies not found while building the kernel and
-modules, can now be declared explicitly.
-
-Signed-off-by: Andreas Robinson <andr345@gmail.com>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
+Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
 ---
- include/linux/module.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/crypto/caam/ctrl.c   |  3 --
+ drivers/crypto/caam/intern.h |  5 ----
+ drivers/crypto/caam/jr.c     | 67 --------------------------------------------
+ drivers/crypto/caam/jr.h     |  2 --
+ 4 files changed, 77 deletions(-)
 
-diff --git a/include/linux/module.h b/include/linux/module.h
-index 46f1ea0..504035f 100644
---- a/include/linux/module.h
-+++ b/include/linux/module.h
-@@ -97,6 +97,11 @@ extern const struct gtype##_id __mod_##gtype##_table		\
- /* For userspace: you can also call me... */
- #define MODULE_ALIAS(_alias) MODULE_INFO(alias, _alias)
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 86c9600..b010d42 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -313,9 +313,6 @@ static int caam_probe(struct platform_device *pdev)
  
-+/* Soft module dependencies. See man modprobe.d for details.
-+ * Example: MODULE_SOFTDEP("pre: module-foo module-bar post: module-baz")
-+ */
-+#define MODULE_SOFTDEP(_softdep) MODULE_INFO(softdep, _softdep)
-+
- /*
-  * The following license idents are currently accepted as indicating free
-  * software modules
+ 	/* NOTE: RTIC detection ought to go here, around Si time */
+ 
+-	/* Initialize queue allocator lock */
+-	spin_lock_init(&ctrlpriv->jr_alloc_lock);
+-
+ 	caam_id = rd_reg64(&topregs->ctrl.perfmon.caam_id);
+ 
+ 	/* Report "alive" for developer to see */
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index e4a16b7..34c4b9f 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -9,9 +9,6 @@
+ #ifndef INTERN_H
+ #define INTERN_H
+ 
+-#define JOBR_UNASSIGNED 0
+-#define JOBR_ASSIGNED 1
+-
+ /* Currently comes from Kconfig param as a ^2 (driver-required) */
+ #define JOBR_DEPTH (1 << CONFIG_CRYPTO_DEV_FSL_CAAM_RINGSIZE)
+ 
+@@ -46,7 +43,6 @@ struct caam_drv_private_jr {
+ 	struct caam_job_ring __iomem *rregs;	/* JobR's register space */
+ 	struct tasklet_struct irqtask;
+ 	int irq;			/* One per queue */
+-	int assign;			/* busy/free */
+ 
+ 	/* Job ring info */
+ 	int ringsize;	/* Size of rings (assume input = output) */
+@@ -68,7 +64,6 @@ struct caam_drv_private {
+ 
+ 	struct device *dev;
+ 	struct device **jrdev; /* Alloc'ed array per sub-device */
+-	spinlock_t jr_alloc_lock;
+ 	struct platform_device *pdev;
+ 
+ 	/* Physical-presence section */
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index b4aa773e..105ba4d 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -126,72 +126,6 @@ static void caam_jr_dequeue(unsigned long devarg)
+ }
+ 
+ /**
+- * caam_jr_register() - Alloc a ring for someone to use as needed. Returns
+- * an ordinal of the rings allocated, else returns -ENODEV if no rings
+- * are available.
+- * @ctrldev: points to the controller level dev (parent) that
+- *           owns rings available for use.
+- * @dev:     points to where a pointer to the newly allocated queue's
+- *           dev can be written to if successful.
+- **/
+-int caam_jr_register(struct device *ctrldev, struct device **rdev)
+-{
+-	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctrldev);
+-	struct caam_drv_private_jr *jrpriv = NULL;
+-	int ring;
+-
+-	/* Lock, if free ring - assign, unlock */
+-	spin_lock(&ctrlpriv->jr_alloc_lock);
+-	for (ring = 0; ring < ctrlpriv->total_jobrs; ring++) {
+-		jrpriv = dev_get_drvdata(ctrlpriv->jrdev[ring]);
+-		if (jrpriv->assign == JOBR_UNASSIGNED) {
+-			jrpriv->assign = JOBR_ASSIGNED;
+-			*rdev = ctrlpriv->jrdev[ring];
+-			spin_unlock(&ctrlpriv->jr_alloc_lock);
+-			return ring;
+-		}
+-	}
+-
+-	/* If assigned, write dev where caller needs it */
+-	spin_unlock(&ctrlpriv->jr_alloc_lock);
+-	*rdev = NULL;
+-
+-	return -ENODEV;
+-}
+-EXPORT_SYMBOL(caam_jr_register);
+-
+-/**
+- * caam_jr_deregister() - Deregister an API and release the queue.
+- * Returns 0 if OK, -EBUSY if queue still contains pending entries
+- * or unprocessed results at the time of the call
+- * @dev     - points to the dev that identifies the queue to
+- *            be released.
+- **/
+-int caam_jr_deregister(struct device *rdev)
+-{
+-	struct caam_drv_private_jr *jrpriv = dev_get_drvdata(rdev);
+-	struct caam_drv_private *ctrlpriv;
+-
+-	/* Get the owning controller's private space */
+-	ctrlpriv = dev_get_drvdata(jrpriv->parentdev);
+-
+-	/*
+-	 * Make sure ring empty before release
+-	 */
+-	if (rd_reg32(&jrpriv->rregs->outring_used) ||
+-	    (rd_reg32(&jrpriv->rregs->inpring_avail) != JOBR_DEPTH))
+-		return -EBUSY;
+-
+-	/* Release ring */
+-	spin_lock(&ctrlpriv->jr_alloc_lock);
+-	jrpriv->assign = JOBR_UNASSIGNED;
+-	spin_unlock(&ctrlpriv->jr_alloc_lock);
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL(caam_jr_deregister);
+-
+-/**
+  * caam_jr_enqueue() - Enqueue a job descriptor head. Returns 0 if OK,
+  * -EBUSY if the queue is full, -EIO if it cannot map the caller's
+  * descriptor.
+@@ -379,7 +313,6 @@ static int caam_jr_init(struct device *dev)
+ 		  (JOBR_INTC_COUNT_THLD << JRCFG_ICDCT_SHIFT) |
+ 		  (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
+ 
+-	jrp->assign = JOBR_UNASSIGNED;
+ 	return 0;
+ }
+ 
+diff --git a/drivers/crypto/caam/jr.h b/drivers/crypto/caam/jr.h
+index c23df39..9d8741a 100644
+--- a/drivers/crypto/caam/jr.h
++++ b/drivers/crypto/caam/jr.h
+@@ -8,8 +8,6 @@
+ #define JR_H
+ 
+ /* Prototypes for backend-level services exposed to APIs */
+-int caam_jr_register(struct device *ctrldev, struct device **rdev);
+-int caam_jr_deregister(struct device *rdev);
+ int caam_jr_enqueue(struct device *dev, u32 *desc,
+ 		    void (*cbk)(struct device *dev, u32 *desc, u32 status,
+ 				void *areq),
+-- 
+1.8.1.4
