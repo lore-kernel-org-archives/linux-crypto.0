@@ -1,36 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: remove double execution of the same test suite
-Date: Thu, 1 Aug 2013 10:47:59 +1000
-Message-ID: <20130801004757.GA24286@gondor.apana.org.au>
-References: <1374163027-17201-1-git-send-email-cristian.stoica@freescale.com>
+Subject: Re: [PATCH] crypto: caam - RNG instantiation by directly programming
+ DECO
+Date: Thu, 1 Aug 2013 11:47:09 +1000
+Message-ID: <20130801014709.GB24286@gondor.apana.org.au>
+References: <1372917363-25422-1-git-send-email-ruchika.gupta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, horia.geanta@freescale.com
-To: Cristian Stoica <cristian.stoica@freescale.com>
+Cc: linuxppc-dev@linux.freescale.net,
+	"David S. Miller" <davem@davemloft.net>,
+	Alex Porosanu <alexandru.porosanu@freescale.com>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	Vakul Garg <vakul@freescale.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Ruchika Gupta <ruchika.gupta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:46316 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:41058 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750773Ab3HAAsD (ORCPT
+	with ESMTP id S1751690Ab3HABrO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 31 Jul 2013 20:48:03 -0400
+	Wed, 31 Jul 2013 21:47:14 -0400
 Content-Disposition: inline
-In-Reply-To: <1374163027-17201-1-git-send-email-cristian.stoica@freescale.com>
+In-Reply-To: <1372917363-25422-1-git-send-email-ruchika.gupta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 18, 2013 at 06:57:07PM +0300, Cristian Stoica wrote:
-> This patch removes redundant execution of the same test suite in cases
-> where alg and driver variables are the same (e.g. when alg_test is
-> called from tcrypt_test)
+On Thu, Jul 04, 2013 at 11:26:03AM +0530, Ruchika Gupta wrote:
+> Remove the dependency of RNG instantiation on Job Ring. Now
+> RNG instantiation for devices with RNG version > 4 is done
+> by directly programming DECO 0.
 > 
-> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+> Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
 
-Which algorithm (apart from crc* which I know and will fix) uses the
-same driver name as its algorithm name? Doing this will cause issues
-when an alternative implementation for that algorithm gets added.
-
-Thanks,
+Patch applied.  Thanks a lot!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
