@@ -1,36 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - Remove unused functions from Job Ring
-Date: Thu, 1 Aug 2013 11:48:10 +1000
-Message-ID: <20130801014809.GG24286@gondor.apana.org.au>
-References: <1375265936-30844-1-git-send-email-ruchika.gupta@freescale.com>
+From: Stoica Cristian-B18196 <B18196@freescale.com>
+Subject: RE: [PATCH] crypto: remove double execution of the same test suite
+Date: Thu, 1 Aug 2013 08:11:25 +0000
+Message-ID: <1628287275CAA9409F1E349DEF3C6CCE4D31E1@039-SN2MPN1-013.039d.mgd.msft.net>
+References: <1374163027-17201-1-git-send-email-cristian.stoica@freescale.com>
+ <20130801004757.GA24286@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Vakul Garg <vakul@freescale.com>,
-	Alex Porosanu <alexandru.porosanu@freescale.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Horia Geanta <horia.geanta@freescale.com>,
-	Bharat Bhushan <bharat.bhushan@freescale.com>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	linux-kernel@vger.kernel.org
-To: Ruchika Gupta <ruchika.gupta@freescale.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Geanta Neag Horia Ioan-B05471 <B05471@freescale.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:48754 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752250Ab3HABsP (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 31 Jul 2013 21:48:15 -0400
-Content-Disposition: inline
-In-Reply-To: <1375265936-30844-1-git-send-email-ruchika.gupta@freescale.com>
+Received: from ch1ehsobe002.messaging.microsoft.com ([216.32.181.182]:30184
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750742Ab3HAILb convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 1 Aug 2013 04:11:31 -0400
+In-Reply-To: <20130801004757.GA24286@gondor.apana.org.au>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 31, 2013 at 03:48:56PM +0530, Ruchika Gupta wrote:
-> Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
+> Which algorithm (apart from crc* which I know and will fix) uses the
+> same driver name as its algorithm name? Doing this will cause issues
+> when an alternative implementation for that algorithm gets added.
 
-Patch applied.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Fixing names resolves double calls only for the thread cryptomgr_test->alg_test where the call is:
+    err = alg_test(param->driver, param->alg, type, CRYPTO_ALG_TESTED);
+
+It doesn't fix the thread tcrypt_test->alg_test where the call is:
+    ret = alg_test(alg, alg, 0, 0);
+
+Cristian S.
