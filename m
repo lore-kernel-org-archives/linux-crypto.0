@@ -1,43 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: remove double execution of the same test suite
-Date: Thu, 1 Aug 2013 21:37:47 +1000
-Message-ID: <20130801113747.GA30622@gondor.apana.org.au>
-References: <1374163027-17201-1-git-send-email-cristian.stoica@freescale.com>
- <20130801004757.GA24286@gondor.apana.org.au>
- <1628287275CAA9409F1E349DEF3C6CCE4D31E1@039-SN2MPN1-013.039d.mgd.msft.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Geanta Neag Horia Ioan-B05471 <B05471@freescale.com>
-To: Stoica Cristian-B18196 <B18196@freescale.com>
+From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Subject: [PATCH v2 0/2] drivers/crypto/nx: fixes when input data is too large
+Date: Fri,  2 Aug 2013 09:09:50 -0300
+Message-ID: <1375445392-16237-1-git-send-email-mhcerri@linux.vnet.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+To: benh@kernel.crashing.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:60330 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753801Ab3HALhv (ORCPT
+Received: from e24smtp04.br.ibm.com ([32.104.18.25]:57648 "EHLO
+	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751395Ab3HBMKA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 1 Aug 2013 07:37:51 -0400
-Content-Disposition: inline
-In-Reply-To: <1628287275CAA9409F1E349DEF3C6CCE4D31E1@039-SN2MPN1-013.039d.mgd.msft.net>
+	Fri, 2 Aug 2013 08:10:00 -0400
+Received: from /spool/local
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <mhcerri@linux.vnet.ibm.com>;
+	Fri, 2 Aug 2013 09:09:58 -0300
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 01, 2013 at 08:11:25AM +0000, Stoica Cristian-B18196 wrote:
-> > Which algorithm (apart from crc* which I know and will fix) uses the
-> > same driver name as its algorithm name? Doing this will cause issues
-> > when an alternative implementation for that algorithm gets added.
-> 
-> Fixing names resolves double calls only for the thread cryptomgr_test->alg_test where the call is:
->     err = alg_test(param->driver, param->alg, type, CRYPTO_ALG_TESTED);
-> 
-> It doesn't fix the thread tcrypt_test->alg_test where the call is:
->     ret = alg_test(alg, alg, 0, 0);
+This series of patches fixes two bugs that are triggered when the input data is
+too large. The first one is caused by the miscalculation of physical addresses
+and the second one by some limits that the co-processor has to the input data.
 
-Good point.  I'll apply your patch.
+Changes in v2:
+        * Replace Signed-Off-By tags with Reviewed-By tags where it is
+	  appropriate.
 
-Thanks!
+Marcelo Cerri (2):
+  drivers/crypto/nx: fix physical addresses added to sg lists
+  drivers/crypto/nx: fix limits to sg lists for SHA-2
+
+ drivers/crypto/nx/nx-sha256.c | 108 +++++++++++++++++++++++-----------------
+ drivers/crypto/nx/nx-sha512.c | 113 ++++++++++++++++++++++++------------------
+ drivers/crypto/nx/nx.c        |  22 ++++++--
+ 3 files changed, 148 insertions(+), 95 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.12
