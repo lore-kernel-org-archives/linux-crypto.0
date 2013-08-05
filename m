@@ -1,46 +1,118 @@
-From: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-Subject: [PATCH] drivers/crypto/nx: saves chaining value from co-processor
-Date: Fri, 02 Aug 2013 18:13:58 -0500
-Message-ID: <1375485238.32477.41.camel@what-is-leg>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH][RFC] CPU Jitter random number generator (resent)
+Date: Mon, 05 Aug 2013 05:05:40 +0200
+Message-ID: <9385773.xkqW3Pd2B5@tauon>
+References: <20130521084455.5c651991@tauon> <20130521190157.GD22559@thunk.org> <CACXcFmnyDh7kBN3SCLGH3DcHH2gZO2_7weL_pch00g+3Jsjegg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
-	herbert@gondor.apana.org.au, mhcerri@linux.vnet.ibm.com
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e39.co.us.ibm.com ([32.97.110.160]:33348 "EHLO
-	e39.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753083Ab3HBXOD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 2 Aug 2013 19:14:03 -0400
-Received: from /spool/local
-	by e39.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <fin@linux.vnet.ibm.com>;
-	Fri, 2 Aug 2013 17:14:02 -0600
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Sandy Harris <sandyinchina@gmail.com>,
+	Theodore Ts'o <tytso@mit.edu>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CACXcFmnyDh7kBN3SCLGH3DcHH2gZO2_7weL_pch00g+3Jsjegg@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The chaining value from co-processor was not being saved. This value is
-needed because it is used as the IV, for example by cts(cbc(aes)).
+Am Dienstag, 21. Mai 2013, 17:39:49 schrieb Sandy Harris:
 
-Signed-off-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-Signed-off-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
----
- drivers/crypto/nx/nx-aes-cbc.c |    1 +
- 1 file changed, 1 insertion(+)
+Hi Sandy, Ted,
 
-diff --git a/drivers/crypto/nx/nx-aes-cbc.c b/drivers/crypto/nx/nx-aes-cbc.c
-index 35d483f..a2f99a9 100644
---- a/drivers/crypto/nx/nx-aes-cbc.c
-+++ b/drivers/crypto/nx/nx-aes-cbc.c
-@@ -95,6 +95,7 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
-        if (rc)
-                goto out;
+I prepared a new release of the CPU Jitter RNG available at [1]. The 
+core of the RNG remains unchanged. However, there are the following 
+changes:
 
-+       memcpy(desc->info, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
-        atomic_inc(&(nx_ctx->stats->aes_ops));
-        atomic64_add(csbcpb->csb.processed_byte_count,
-                     &(nx_ctx->stats->aes_bytes));
+- addition of a patch to integrate the RNG into /dev/random as explained 
+in appendix B.3 of [2], although the long-term goal of the RNG is rather 
+the integration into the kernel crypto API when considering the Linux 
+kernel as outlined in appendix B.1 of [2]
+
+- ensure that the code is compiled without optimizations based on the 
+reasons outlined in section 5.1 of [2]
+
+- addition of chapter 5.1 to [2] explaining how the entropy is collected
+
+- additional code to execute the CPU Jitter RNG on different OSes 
+(specifically AIX, MacOS and z/OS -- other Unixes are good without 
+additional changes)
+
+>On Tue, May 21, 2013 at 3:01 PM, Theodore Ts'o <tytso@mit.edu> wrote:
+>> I continue to be suspicious about claims that userspace timing
+>> measurements are measuring anything other than OS behaviour.
+>
+>Yes, but they do seem to contain some entropy. See links in the
+>original post of this thread, the havege stuff and especially the
+>McGuire et al paper.
+
+With the initially shown implementation and documentation I did not 
+really show that sufficient entropy is gathered from the CPU execution 
+jitter. With a new test I now closed that hole. The newly added test 
+measures the entropy gathered during execution jitter collection, i.e. 
+heart of the RNG in terms of how much statistical entropy it provides. 
+The description of the test is given in section 5.1 of [2]. To ensure 
+that the statistical entropy measurements are indeed showing the 
+information theoretical entropy, section 4.4 of [2] outlines that 
+patterns are not identified in the output of the RNG which would 
+diminish the information theoretical entropy compared to the statistical 
+entropy.
+
+That test was then executed on about 200 different systems with the 
+results given in appendix F of [2]. The table stated there supported by 
+the many graphs demonstrates that the CPU Jitter random number generator 
+delivers high-quality entropy on:
+
+- a large range of CPUs ranging from embedded systems of MIPS and ARM 
+CPUs, covering desktop systems with AMD and Intel x86 32 bit and 64 bit 
+CPUs up to server CPUs of Intel Itanium, Sparc, POWER and IBM System Z;
+
+- a large range of operating systems: Linux (including Android), 
+OpenBSD, FreeBSD, NetBSD, AIX, OpenIndiana (OpenSolaris), AIX, z/OS;
+
+- a range of different compilers: GCC, Clang and the z/OS C compiler.
+
+The test results show an interesting yet common trend -- i.e. common for 
+the different CPU types: the newer the CPU is, the more CPU execution 
+time jitter is present.
+
+[2] appendix F.37 contains entropy measurements on different operating 
+systems on the very same hardware, indicating that the jitter 
+measurements are present regardless of the OS.
+
+With the test results, Ted's concerns should be removed.
+
+[...]
+
+>> For devices like Linux routers, what we desperately need is hardware
+>> assist;  [or] mix
+>> in additional timing information either at kernel device driver
+>> level,
+>> or from systems such as HAVEGE.
+
+The concern with HAVEGE is that it is very complex. The implementation 
+is far from being straight forward.
+>> 
+>> What I'm against is relying only on solutions such as HAVEGE or
+>> replacing /dev/random with something scheme that only relies on CPU
+>> timing and ignores interrupt timing.
+>
+>My question is how to incorporate some of that into /dev/random.
+>At one point, timing info was used along with other stuff. Some
+>of that got deleted later, What is the current state? Should we
+>add more?
+
+Please see the suggestion for an integration with /dev/random given in 
+appendix B.3 of [2]. The source code for the integration is given in 
+patches/linux-3.9-random.patch which is described in patches/README. The 
+patch only utilizes the CPU Jitter RNG when the entropy in the entropy 
+pool falls below the low threshold, i.e. when no entropy from other 
+sources is present.
+
+[1] http://www.chronox.de/jent/jitterentropy-20130724.tar.bz2
+
+[2] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.pdf
+
+
+Ciao
+Stephan
 -- 
-1.7.10.4
+| Cui bono? |
