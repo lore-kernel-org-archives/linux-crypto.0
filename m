@@ -1,70 +1,66 @@
 From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: [PATCH 1/6] hwrng: OMAP: Use module_platform_driver macro
-Date: Mon, 5 Aug 2013 20:17:18 +0530
-Message-ID: <1375714043-23407-2-git-send-email-lokeshvutla@ti.com>
+Subject: [PATCH 4/6] hwrng: OMAP: Add device tree support
+Date: Mon, 5 Aug 2013 20:17:21 +0530
+Message-ID: <1375714043-23407-5-git-send-email-lokeshvutla@ti.com>
 References: <1375714043-23407-1-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: dsaxena@plexity.net, Lokesh Vutla <lokeshvutla@ti.com>,
- herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org, mpm@selenic.com,
- linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain
+Cc: <linux-arm-kernel@lists.infradead.org>, <mpm@selenic.com>,
+	<herbert@gondor.hengli.com.au>, <dsaxena@plexity.net>,
+	<linux-crypto@vger.kernel.org>, Lokesh Vutla <lokeshvutla@ti.com>
 To: <linux-omap@vger.kernel.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linux-omap-owner@vger.kernel.org>
 In-Reply-To: <1375714043-23407-1-git-send-email-lokeshvutla@ti.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-omap-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-module_platform_driver() makes the code simpler.
-Using the macro in the driver.
+Add Device Tree suport to the omap-rng driver.
+Currently, only support for OMAP2 and OMAP3 is
+being added but support for OMAP4 and OMAP5 will
+be added in a subsequent patch.
 
 Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 ---
- drivers/char/hw_random/omap-rng.c |   18 ++----------------
- 1 file changed, 2 insertions(+), 16 deletions(-)
+ drivers/char/hw_random/omap-rng.c |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index 6843ec8..3e9a7ec 100644
+index 5a2ab3b..3076c9d 100644
 --- a/drivers/char/hw_random/omap-rng.c
 +++ b/drivers/char/hw_random/omap-rng.c
-@@ -198,9 +198,6 @@ static SIMPLE_DEV_PM_OPS(omap_rng_pm, omap_rng_suspend, omap_rng_resume);
+@@ -24,6 +24,9 @@
+ #include <linux/delay.h>
+ #include <linux/slab.h>
+ #include <linux/pm_runtime.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++#include <linux/of_address.h>
  
- #endif
+ #include <asm/io.h>
  
--/* work with hotplug and coldplug */
--MODULE_ALIAS("platform:omap_rng");
--
- static struct platform_driver omap_rng_driver = {
- 	.driver = {
- 		.name		= "omap_rng",
-@@ -211,18 +208,7 @@ static struct platform_driver omap_rng_driver = {
- 	.remove		= __exit_p(omap_rng_remove),
+@@ -104,6 +107,14 @@ static struct hwrng omap_rng_ops = {
+ 	.data_read	= omap_rng_data_read,
  };
  
--static int __init omap_rng_init(void)
--{
--	return platform_driver_register(&omap_rng_driver);
--}
--
--static void __exit omap_rng_exit(void)
--{
--	platform_driver_unregister(&omap_rng_driver);
--}
--
--module_init(omap_rng_init);
--module_exit(omap_rng_exit);
--
-+module_platform_driver(omap_rng_driver);
-+MODULE_ALIAS("platform:omap_rng");
- MODULE_AUTHOR("Deepak Saxena (and others)");
- MODULE_LICENSE("GPL");
++#if defined(CONFIG_OF)
++static const struct of_device_id omap_rng_of_match[] = {
++		{ .compatible = "ti,omap2-rng" },
++		{},
++};
++MODULE_DEVICE_TABLE(of, omap_rng_of_match);
++#endif
++
+ static int omap_rng_probe(struct platform_device *pdev)
+ {
+ 	struct omap_rng_private_data *priv;
+@@ -197,6 +208,7 @@ static struct platform_driver omap_rng_driver = {
+ 		.name		= "omap_rng",
+ 		.owner		= THIS_MODULE,
+ 		.pm		= OMAP_RNG_PM,
++		.of_match_table = of_match_ptr(omap_rng_of_match),
+ 	},
+ 	.probe		= omap_rng_probe,
+ 	.remove		= __exit_p(omap_rng_remove),
 -- 
 1.7.9.5
+
