@@ -1,63 +1,71 @@
-From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-Subject: Questions about the Crypto API
-Date: Mon, 5 Aug 2013 17:25:57 -0300
-Message-ID: <20130805202557.GE5752@oc8526070481.ibm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Questions about the Crypto API
+Date: Tue, 6 Aug 2013 17:00:10 +1000
+Message-ID: <20130806070010.GB19754@gondor.apana.org.au>
+References: <20130805202557.GE5752@oc8526070481.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org
+To: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp05.br.ibm.com ([32.104.18.26]:54066 "EHLO
-	e24smtp05.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754694Ab3HEU0I (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:53325 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753555Ab3HFHAT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 5 Aug 2013 16:26:08 -0400
-Received: from /spool/local
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <mhcerri@linux.vnet.ibm.com>;
-	Mon, 5 Aug 2013 17:26:06 -0300
-Received: from d24relay02.br.ibm.com (d24relay02.br.ibm.com [9.13.184.26])
-	by d24dlp01.br.ibm.com (Postfix) with ESMTP id 848F8352005F
-	for <linux-crypto@vger.kernel.org>; Mon,  5 Aug 2013 16:26:03 -0400 (EDT)
-Received: from d24av04.br.ibm.com (d24av04.br.ibm.com [9.8.31.97])
-	by d24relay02.br.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id r75KOSan26542172
-	for <linux-crypto@vger.kernel.org>; Mon, 5 Aug 2013 17:24:28 -0300
-Received: from d24av04.br.ibm.com (localhost [127.0.0.1])
-	by d24av04.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id r75KQ2vw006886
-	for <linux-crypto@vger.kernel.org>; Mon, 5 Aug 2013 17:26:03 -0300
+	Tue, 6 Aug 2013 03:00:19 -0400
 Content-Disposition: inline
+In-Reply-To: <20130805202557.GE5752@oc8526070481.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Mon, Aug 05, 2013 at 05:25:57PM -0300, Marcelo Cerri wrote:
+>
+> My first doubt is regarding which kind of concurrency the Crypto API
+> allows. For example, can a single `struct crypto_tfm` be used by two
+> concurrent calls? I'm asking about that because I noticed that for
 
-I'm starting to work on some platform-specific implementations using the
-Crypto API. I spent some time reading the available documentation and
-mainly the code, but I still have some doubts on how the Crypto API
-works and how it should be used.
+Yes.
 
-My first doubt is regarding which kind of concurrency the Crypto API
-allows. For example, can a single `struct crypto_tfm` be used by two
-concurrent calls? I'm asking about that because I noticed that for
-blkcipher the only implementation-specific context that can be used is
-allocated inside the tfm struct.
+> blkcipher the only implementation-specific context that can be used is
+> allocated inside the tfm struct.
 
-I'm working to fix some bugs in the NX driver (located in
-drivers/crypto/nx), and one issue that we are facing is that NFS when
-using Kerberos uses the same tfm with different kthreads. That causes
-concurrent accesses to the internal data stored into the context and
-incorrect results.
+Both blkcipher and ablkcipher are meant to be fully reentrant.
+So you must take necessary precautions if your implementation
+is not reentrant, e.g., by locking.
 
-So my question here is: should this type of concurrency be handled by
-the driver or a caller is not allowed to use the same tfm for concurrent
-calls?
+> I'm working to fix some bugs in the NX driver (located in
+> drivers/crypto/nx), and one issue that we are facing is that NFS when
+> using Kerberos uses the same tfm with different kthreads. That causes
+> concurrent accesses to the internal data stored into the context and
+> incorrect results.
+> 
+> So my question here is: should this type of concurrency be handled by
+> the driver or a caller is not allowed to use the same tfm for concurrent
+> calls?
 
-My second doubt is regarding the difference between ablkcipher and
-blkcipher. I do understand their difference from caller's point of view.
-But I'm not sure what are the consequences of implementing a driver
-using one or another option.
+>From what you've said NFS seems to be doing the right thing, so the
+bug would be in the driver.
 
-For example, can a blkcipher implementation be used asynchronously and
-vice versa?
+> My second doubt is regarding the difference between ablkcipher and
+> blkcipher. I do understand their difference from caller's point of view.
+> But I'm not sure what are the consequences of implementing a driver
+> using one or another option.
+> 
+> For example, can a blkcipher implementation be used asynchronously and
+> vice versa?
 
-Thanks for your help.
-Marcelo
+In general which model you pick for drivers depend on what your
+hardware looks like.  For example, padlock-aes uses the blkcipher
+model because the hardware presents itself through a synchronous
+CPU instruction, while most other drivers use the ablkcipher
+interface because the underlying hardware completes asynchronously.
+
+A blkcipher implementation is always available through both the
+blkcipher and the ablkcipher interface.  While an ablkcipher
+implementaiton can only be used through the ablkcipher interface.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
