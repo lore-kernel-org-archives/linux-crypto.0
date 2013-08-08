@@ -1,38 +1,58 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Questions about the Crypto API
-Date: Thu, 8 Aug 2013 15:02:30 +1000
-Message-ID: <20130808050230.GB9636@gondor.apana.org.au>
-References: <20130805202557.GE5752@oc8526070481.ibm.com>
- <20130806070010.GB19754@gondor.apana.org.au>
- <20130806120540.GA364@oc8526070481.ibm.com>
+From: Michael Ellerman <michael@ellerman.id.au>
+Subject: Re: [PATCH v2] drivers/crypto/nx: saves chaining value from
+ co-processor
+Date: Thu, 8 Aug 2013 17:49:22 +1000
+Message-ID: <20130808074922.GA22688@concordia>
+References: <1375917350.16050.14.camel@what-is-leg>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Cc: linux-kernel@vger.kernel.org, mhcerri@linux.vnet.ibm.com,
+	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au
+To: Fionnuala Gunter <fin@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:48172 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755260Ab3HHFCc (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Aug 2013 01:02:32 -0400
+Received: from ozlabs.org ([203.10.76.45]:38163 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753368Ab3HHHtZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 8 Aug 2013 03:49:25 -0400
 Content-Disposition: inline
-In-Reply-To: <20130806120540.GA364@oc8526070481.ibm.com>
+In-Reply-To: <1375917350.16050.14.camel@what-is-leg>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 06, 2013 at 09:05:41AM -0300, Marcelo Cerri wrote:
->
-> I saw it's possible to keep a context in an ablkcipher_request
-> structure. I'm assuming that multiple callers using the same tfm still
-> would have to use different requests. So do you think that implementing
-> it as an asynchronous block cipher would be an alternative to locks in
-> the NX driver?
+Hi Fin,
 
-It really depends on your hardware.  For example, does it provide
-a convenient way of notifying the completion of an operation?
+I don't know anything about crypto so I can only critique you on your
+patch submission technique :)  ...
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Wed, Aug 07, 2013 at 06:15:50PM -0500, Fionnuala Gunter wrote:
+> This patch fixes a bug that is triggered when cts(cbc(aes)) is used with
+> nx-crypto driver on input larger than 32 bytes.
+> 
+> The chaining value from co-processor was not being saved. This value is
+> needed because it is used as the IV by cts(cbc(aes)).
+> 
+> Signed-off-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
+> Reviewed-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+> ---
+> v2. changed signed-off-by to reviewed-by and added more details to
+> description
+> 
+> This bug appeared in the original submission (v3.5)
+
+Ideally this should identify the commit, so:
+
+  This bug was introduced in the original submission (v3.5), commit
+  856d673 "powerpc/crypto: AES-CBC mode routines for nx encryption".
+
+Including the subject of the commit is handy in case the patch has been
+backported somewhere, in which case the commit sha will be different.
+
+It should definitely be part of the commit message, not below the "---".
+
+And Ben might disagree but I think with a clear cut bug fix like this it
+should include the CC to stable, so:
+
+    Cc: stable@vger.kernel.org # 3.5+
+
+cheers
