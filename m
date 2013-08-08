@@ -1,98 +1,64 @@
-From: Garg Vakul-B16394 <B16394@freescale.com>
-Subject: RE: Questions about the Crypto API
-Date: Thu, 8 Aug 2013 14:50:41 +0000
-Message-ID: <065BBB7616BCE543832A2EF096986B940A05ADCD@039-SN2MPN1-011.039d.mgd.msft.net>
-References: <20130805202557.GE5752@oc8526070481.ibm.com>
- <20130806070010.GB19754@gondor.apana.org.au>
+From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Subject: Re: [PATCH 3/3] crypto: dcp: rename 'compatible' property to 'fsl,dcp'
+Date: Thu, 08 Aug 2013 23:39:47 +0400
+Message-ID: <5203F403.1040800@cogentembedded.com>
+References: <1375968629-10091-1-git-send-email-LW@KARO-electronics.de> <1375968629-10091-4-git-send-email-LW@KARO-electronics.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: devicetree@vger.kernel.org, Stephen Warren <swarren@wwwdotorg.org>,
+	Rob Herring <rob.herring@calxeda.com>,
+	linux-crypto@vger.kernel.org,
+	Tobias Rauter <tobiasrauter@gmail.com>,
+	linux-arm-kernel@lists.infradead.org
+To: =?UTF-8?B?TG90aGFyIFdhw59tYW5u?= <LW@KARO-electronics.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db9lp0253.outbound.messaging.microsoft.com ([213.199.154.253]:44729
-	"EHLO db9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757850Ab3HHOwF convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Aug 2013 10:52:05 -0400
-In-Reply-To: <20130806070010.GB19754@gondor.apana.org.au>
-Content-Language: en-US
+Received: from mail-lb0-f172.google.com ([209.85.217.172]:34401 "EHLO
+	mail-lb0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965777Ab3HHTjm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 8 Aug 2013 15:39:42 -0400
+Received: by mail-lb0-f172.google.com with SMTP id o7so2785176lbv.31
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Aug 2013 12:39:41 -0700 (PDT)
+In-Reply-To: <1375968629-10091-4-git-send-email-LW@KARO-electronics.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert
+Hello.
 
+On 08/08/2013 05:30 PM, Lothar Wa=C3=9Fmann wrote:
 
-> -----Original Message-----
-> From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
-> owner@vger.kernel.org] On Behalf Of Herbert Xu
-> Sent: Tuesday, August 06, 2013 12:30 PM
-> To: Marcelo Cerri
-> Cc: linux-crypto@vger.kernel.org
-> Subject: Re: Questions about the Crypto API
-> 
-> On Mon, Aug 05, 2013 at 05:25:57PM -0300, Marcelo Cerri wrote:
-> >
-> > My first doubt is regarding which kind of concurrency the Crypto API
-> > allows. For example, can a single `struct crypto_tfm` be used by two
-> > concurrent calls? I'm asking about that because I noticed that for
-> 
-> Yes.
-> 
+> Leave the old 'fsl-dcp' value in place with an appropriate comment
+> until external users have updated their DTBs.
 
-In this post, you mentioned that tfm is single threaded.
-Am I misinterpreting your statement?
+> Signed-off-by: Lothar Wa=C3=9Fmann <LW@KARO-electronics.de>
+> ---
+>   arch/arm/boot/dts/imx28.dtsi |    2 +-
+>   drivers/crypto/dcp.c         |    2 ++
+>   2 files changed, 3 insertions(+), 1 deletions(-)
 
-http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg08689.html
+> diff --git a/arch/arm/boot/dts/imx28.dtsi b/arch/arm/boot/dts/imx28.d=
+tsi
+> index ea99d09..0584935 100644
+> --- a/arch/arm/boot/dts/imx28.dtsi
+> +++ b/arch/arm/boot/dts/imx28.dtsi
+> @@ -794,7 +794,7 @@
+>   			};
+>
+>   			dcp: dcp@80028000 {
 
+     By the way, I see that this is a crypto device, so it should be na=
+med=20
+"crypto" according to ePAPR spec. [1]
 
+> -				compatible =3D "fsl-dcp";
+> +				compatible =3D "fsl,dcp";
+>   				reg =3D <0x80028000 0x2000>;
+>   				interrupts =3D <52 53 54>;
+>   				status =3D "disabled";
 
-> > blkcipher the only implementation-specific context that can be used is
-> > allocated inside the tfm struct.
-> 
-> Both blkcipher and ablkcipher are meant to be fully reentrant.
-> So you must take necessary precautions if your implementation is not
-> reentrant, e.g., by locking.
-> 
-> > I'm working to fix some bugs in the NX driver (located in
-> > drivers/crypto/nx), and one issue that we are facing is that NFS when
-> > using Kerberos uses the same tfm with different kthreads. That causes
-> > concurrent accesses to the internal data stored into the context and
-> > incorrect results.
-> >
-> > So my question here is: should this type of concurrency be handled by
-> > the driver or a caller is not allowed to use the same tfm for
-> > concurrent calls?
-> 
-> From what you've said NFS seems to be doing the right thing, so the bug
-> would be in the driver.
-> 
-> > My second doubt is regarding the difference between ablkcipher and
-> > blkcipher. I do understand their difference from caller's point of
-> view.
-> > But I'm not sure what are the consequences of implementing a driver
-> > using one or another option.
-> >
-> > For example, can a blkcipher implementation be used asynchronously and
-> > vice versa?
-> 
-> In general which model you pick for drivers depend on what your hardware
-> looks like.  For example, padlock-aes uses the blkcipher model because
-> the hardware presents itself through a synchronous CPU instruction, while
-> most other drivers use the ablkcipher interface because the underlying
-> hardware completes asynchronously.
-> 
-> A blkcipher implementation is always available through both the blkcipher
-> and the ablkcipher interface.  While an ablkcipher implementaiton can
-> only be used through the ablkcipher interface.
-> 
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto"
-> in the body of a message to majordomo@vger.kernel.org More majordomo info
-> at  http://vger.kernel.org/majordomo-info.html
+[1] http://www.power.org/resources/downloads/Power_ePAPR_APPROVED_v1.0.=
+pdf
+
+WBR, Sergei
