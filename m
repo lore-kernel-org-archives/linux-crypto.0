@@ -1,49 +1,68 @@
-From: =?UTF-8?q?Lothar=20Wa=C3=9Fmann?= <LW@KARO-electronics.de>
-Subject: [PATCH 1/3] ARM: dts: mxs: set dcp to "disabled" by default
-Date: Thu,  8 Aug 2013 15:30:27 +0200
-Message-ID: <1375968629-10091-2-git-send-email-LW@KARO-electronics.de>
-References: <1375968629-10091-1-git-send-email-LW@KARO-electronics.de>
+From: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
+Subject: RE: Questions about the Crypto API
+Date: Thu, 8 Aug 2013 14:04:05 +0000
+Message-ID: <A83C99F8370D4D42BEB2D2B3153A6BBC23D55514@NASANEXD02C.na.qualcomm.com>
+References: <20130805202557.GE5752@oc8526070481.ibm.com>
+ <20130806070010.GB19754@gondor.apana.org.au>
+ <20130806120540.GA364@oc8526070481.ibm.com>
+ <20130806141612.GB364@oc8526070481.ibm.com>
+ <20130808050139.GA9636@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Stephen Warren <swarren@wwwdotorg.org>,
- Rob Herring <rob.herring@calxeda.com>, linux-crypto@vger.kernel.org,
- Tobias Rauter <tobiasrauter@gmail.com>, linux-arm-kernel@lists.infradead.org,
- =?UTF-8?q?Lothar=20Wa=C3=9Fmann?= <LW@KARO-electronics.de>
-To: devicetree@vger.kernel.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1375968629-10091-1-git-send-email-LW@KARO-electronics.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sabertooth01.qualcomm.com ([65.197.215.72]:44283 "EHLO
+	sabertooth01.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965501Ab3HHOEH convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 8 Aug 2013 10:04:07 -0400
+In-Reply-To: <20130808050139.GA9636@gondor.apana.org.au>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-UmVpbnRyb2R1Y2UgJ3N0YXR1cyA9ICJkaXNhYmxlZCInIGZvciB0aGUgZGNwIG5vZGUgdGhhdCB3
-YXMgZHJvcHBlZCBieQpjb21taXQgNTE5ZDhiMWEgIkFkZGVkIHN1cHBvcnQgZm9yIEZyZWVzY2Fs
-ZSdzIERDUCBjby1wcm9jZXNzb3IiLgoKRXhwbGljaXRseSBlbmFibGUgaXQgaW4gaW14MjgtZXZr
-IHdoaWNoIGlzIHJlZmVyZW5jZWQgaW4gdGhlIGNvbW1pdAptZXNzYWdlIG9mIHRoYXQgY29tbWl0
-LgoKU2lnbmVkLW9mZi1ieTogTG90aGFyIFdhw59tYW5uIDxMV0BLQVJPLWVsZWN0cm9uaWNzLmRl
-PgotLS0KIGFyY2gvYXJtL2Jvb3QvZHRzL2lteDI4LWV2ay5kdHMgfCAgICA0ICsrKysKIGFyY2gv
-YXJtL2Jvb3QvZHRzL2lteDI4LmR0c2kgICAgfCAgICAzICsrLQogMiBmaWxlcyBjaGFuZ2VkLCA2
-IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm0vYm9v
-dC9kdHMvaW14MjgtZXZrLmR0cyBiL2FyY2gvYXJtL2Jvb3QvZHRzL2lteDI4LWV2ay5kdHMKaW5k
-ZXggZGZmMjI3OS4uYWM3OTBiYiAxMDA2NDQKLS0tIGEvYXJjaC9hcm0vYm9vdC9kdHMvaW14Mjgt
-ZXZrLmR0cworKysgYi9hcmNoL2FybS9ib290L2R0cy9pbXgyOC1ldmsuZHRzCkBAIC0zNjEsMyAr
-MzYxLDcgQEAKIAkJZGVmYXVsdC1icmlnaHRuZXNzLWxldmVsID0gPDY+OwogCX07CiB9OworCism
-ZGNwIHsKKwlzdGF0dXMgPSAib2theSI7Cit9OwpkaWZmIC0tZ2l0IGEvYXJjaC9hcm0vYm9vdC9k
-dHMvaW14MjguZHRzaSBiL2FyY2gvYXJtL2Jvb3QvZHRzL2lteDI4LmR0c2kKaW5kZXggZTQ1OWQ2
-My4uZWE5OWQwOSAxMDA2NDQKLS0tIGEvYXJjaC9hcm0vYm9vdC9kdHMvaW14MjguZHRzaQorKysg
-Yi9hcmNoL2FybS9ib290L2R0cy9pbXgyOC5kdHNpCkBAIC03OTQsOSArNzk0LDEwIEBACiAJCQl9
-OwogCiAJCQlkY3A6IGRjcEA4MDAyODAwMCB7CisJCQkJY29tcGF0aWJsZSA9ICJmc2wtZGNwIjsK
-IAkJCQlyZWcgPSA8MHg4MDAyODAwMCAweDIwMDA+OwogCQkJCWludGVycnVwdHMgPSA8NTIgNTMg
-NTQ+OwotCQkJCWNvbXBhdGlibGUgPSAiZnNsLWRjcCI7CisJCQkJc3RhdHVzID0gImRpc2FibGVk
-IjsKIAkJCX07CiAKIAkJCXB4cDogcHhwQDgwMDJhMDAwIHsKLS0gCjEuNy4yLjUKCgpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpsaW51eC1hcm0ta2VybmVs
-IG1haWxpbmcgbGlzdApsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmcKaHR0cDov
-L2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9saW51eC1hcm0ta2VybmVsCg==
+Thanks for Marcelo and Herbert for the questions and answers.
+I have a few more questions related to the same subject of API.
+
+1. In the crypto_async_request, is the list  element  available to the driver to use? I see most of drivers do "crypto_enqueue_request()"  to keep track of the outstanding async requests.  The only exception I have seen so far is talitos driver where they implement their FIFO to keep track the outstanding async requests.
+
+2. The async driver simply returns instead of sleep.  The requestor of the async request, does wait_for_completion()  for the completion callback from driver.  Can it be wait_for_completion_interruptible() such as testmgr.c does?
+If the sleep can be interruptible, how does driver know the request has been aborted?  The request can be still in the driver queue waiting for the hw to finish execution. How is driver aware to dequeue this aborted request? If not, the link list can be corrupted and cause kernel to crash potentially.
+
+Chemin
+
+
+-----Original Message-----
+From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Herbert Xu
+Sent: Thursday, August 08, 2013 1:02 AM
+To: Marcelo Cerri
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: Questions about the Crypto API
+
+On Tue, Aug 06, 2013 at 11:16:12AM -0300, Marcelo Cerri wrote:
+> Herbert,
+> 
+> Let me include a few more questions.
+> 
+> There are flags in several structures such as crypto_async_request, 
+> blkcipher_desc and crypto_tfm. How they are intended to be used?
+> 
+> For example if I want to explicitly make a call that shouldn't sleep, 
+> should I clear the CRYPTO_TFM_REQ_MAY_SLEEP in one of these structures?
+> And in which one?
+> 
+> Since cryptographic methods can be called in softirq contexts, is the 
+> caller responsible for setting this flag correctly based on the 
+> context it is running?
+
+Yes, although MAY_SLEEP is mostly used by synchronous implementations since async drivers can simply return instead of sleeping.
+
+Cheers,
+--
+Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe linux-crypto" in the body of a message to majordomo@vger.kernel.org More majordomo info at  http://vger.kernel.org/majordomo-info.html
