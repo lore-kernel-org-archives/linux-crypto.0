@@ -1,48 +1,47 @@
-From: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-Subject: [PATCH v2] drivers/crypto/nx: saves chaining value from co-processor
-Date: Wed, 07 Aug 2013 18:15:50 -0500
-Message-ID: <1375917350.16050.14.camel@what-is-leg>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Questions about the Crypto API
+Date: Thu, 8 Aug 2013 15:01:40 +1000
+Message-ID: <20130808050139.GA9636@gondor.apana.org.au>
+References: <20130805202557.GE5752@oc8526070481.ibm.com>
+ <20130806070010.GB19754@gondor.apana.org.au>
+ <20130806120540.GA364@oc8526070481.ibm.com>
+ <20130806141612.GB364@oc8526070481.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	herbert@gondor.apana.org.au, fin@linux.vnet.ibm.com,
-	mhcerri@linux.vnet.ibm.com
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:47919 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750953Ab3HHFBr (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 8 Aug 2013 01:01:47 -0400
+Content-Disposition: inline
+In-Reply-To: <20130806141612.GB364@oc8526070481.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch fixes a bug that is triggered when cts(cbc(aes)) is used with
-nx-crypto driver on input larger than 32 bytes.
+On Tue, Aug 06, 2013 at 11:16:12AM -0300, Marcelo Cerri wrote:
+> Herbert,
+> 
+> Let me include a few more questions.
+> 
+> There are flags in several structures such as crypto_async_request,
+> blkcipher_desc and crypto_tfm. How they are intended to be used?
+> 
+> For example if I want to explicitly make a call that shouldn't sleep,
+> should I clear the CRYPTO_TFM_REQ_MAY_SLEEP in one of these structures?
+> And in which one?
+> 
+> Since cryptographic methods can be called in softirq contexts, is the
+> caller responsible for setting this flag correctly based on the context
+> it is running?
 
-The chaining value from co-processor was not being saved. This value is
-needed because it is used as the IV by cts(cbc(aes)).
+Yes, although MAY_SLEEP is mostly used by synchronous implementations
+since async drivers can simply return instead of sleeping.
 
-Signed-off-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-Reviewed-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
----
-v2. changed signed-off-by to reviewed-by and added more details to
-description
-
-This bug appeared in the original submission (v3.5)
----
- drivers/crypto/nx/nx-aes-cbc.c |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/nx/nx-aes-cbc.c
-b/drivers/crypto/nx/nx-aes-cbc.c
-index 35d483f..a2f99a9 100644
---- a/drivers/crypto/nx/nx-aes-cbc.c
-+++ b/drivers/crypto/nx/nx-aes-cbc.c
-@@ -95,6 +95,7 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc
-*desc,
-        if (rc)
-                goto out;
-
-+       memcpy(desc->info, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
-        atomic_inc(&(nx_ctx->stats->aes_ops));
-        atomic64_add(csbcpb->csb.processed_byte_count,
-                     &(nx_ctx->stats->aes_bytes));
+Cheers,
 -- 
-1.7.10.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
