@@ -1,58 +1,47 @@
-From: Michael Ellerman <michael@ellerman.id.au>
-Subject: Re: [PATCH v2] drivers/crypto/nx: saves chaining value from
- co-processor
-Date: Thu, 8 Aug 2013 17:49:22 +1000
-Message-ID: <20130808074922.GA22688@concordia>
-References: <1375917350.16050.14.camel@what-is-leg>
+From: =?UTF-8?q?Lothar=20Wa=C3=9Fmann?= <LW@KARO-electronics.de>
+Subject: [PATCH 0/3] ARM: dts: mxs: dcp cleanup patches
+Date: Thu,  8 Aug 2013 15:30:26 +0200
+Message-ID: <1375968629-10091-1-git-send-email-LW@KARO-electronics.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, mhcerri@linux.vnet.ibm.com,
-	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au
-To: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:38163 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753368Ab3HHHtZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 Aug 2013 03:49:25 -0400
-Content-Disposition: inline
-In-Reply-To: <1375917350.16050.14.camel@what-is-leg>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.infradead.org,
+ Tobias Rauter <tobiasrauter@gmail.com>, linux-crypto@vger.kernel.org,
+ Rob Herring <rob.herring@calxeda.com>, Stephen Warren <swarren@wwwdotorg.org>
+To: devicetree@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Fin,
+This patch series does the following:
 
-I don't know anything about crypto so I can only critique you on your
-patch submission technique :)  ...
+- let the driver be "disabled" by default in imx28.dtsi
+- coding style cleanups in drivers/crypto/dcp.c
+- use the "official" 'fsl,' prefix in the 'compatible' property
 
-On Wed, Aug 07, 2013 at 06:15:50PM -0500, Fionnuala Gunter wrote:
-> This patch fixes a bug that is triggered when cts(cbc(aes)) is used with
-> nx-crypto driver on input larger than 32 bytes.
-> 
-> The chaining value from co-processor was not being saved. This value is
-> needed because it is used as the IV by cts(cbc(aes)).
-> 
-> Signed-off-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-> Reviewed-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-> ---
-> v2. changed signed-off-by to reviewed-by and added more details to
-> description
-> 
-> This bug appeared in the original submission (v3.5)
+The last patch adds a new entry to the of_match_table of the driver,
+so that current DT blobs will still work. When out of tree users
+(mentioned in the commit log of 519d8b1a "Added support for
+Freescale's DCP co-processor") have updated their DTBs the old entry
+'fsl-dsp' can be removed from the driver.
 
-Ideally this should identify the commit, so:
+This patch series requires at least
+"[PATCH 2/8] ARM: dts: mxs: add labels to most nodes for easier reference"
+from the patch series:
+<1375966287-6784-1-git-send-email-LW@KARO-electronics.de> to be
+applied.
 
-  This bug was introduced in the original submission (v3.5), commit
-  856d673 "powerpc/crypto: AES-CBC mode routines for nx encryption".
-
-Including the subject of the commit is handy in case the patch has been
-backported somewhere, in which case the commit sha will be different.
-
-It should definitely be part of the commit message, not below the "---".
-
-And Ben might disagree but I think with a clear cut bug fix like this it
-should include the CC to stable, so:
-
-    Cc: stable@vger.kernel.org # 3.5+
-
-cheers
+ arch/arm/boot/dts/imx28.dtsi      |    2 +-
+ b/arch/arm/boot/dts/imx28-evk.dts |    4 ++++
+ b/arch/arm/boot/dts/imx28.dtsi    |    3 ++-
+ b/drivers/crypto/dcp.c            |   11 +++++------
+ drivers/crypto/dcp.c              |    2 ++
+ 5 files changed, 14 insertions(+), 8 deletions(-)
