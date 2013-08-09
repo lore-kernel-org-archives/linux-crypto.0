@@ -1,73 +1,70 @@
-From: Jingoo Han <jg1.han@samsung.com>
-Subject: [PATCH 2/2] crypto: crypto4xx - Staticize local symbols
-Date: Fri, 09 Aug 2013 16:59:57 +0900
-Message-ID: <000901ce94d6$70a09f50$51e1ddf0$@samsung.com>
+From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Subject: Re: Questions about the Crypto API
+Date: Fri, 9 Aug 2013 09:55:14 -0300
+Message-ID: <20130809125513.GA7674@oc8526070481.ibm.com>
+References: <20130805202557.GE5752@oc8526070481.ibm.com>
+ <20130806070010.GB19754@gondor.apana.org.au>
+ <065BBB7616BCE543832A2EF096986B940A05ADCD@039-SN2MPN1-011.039d.mgd.msft.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: "'David S. Miller'" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, 'James Hsiao' <jhsiao@amcc.com>,
-	Jingoo Han <jg1.han@samsung.com>
-To: 'Herbert Xu' <herbert@gondor.apana.org.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout4.samsung.com ([203.254.224.34]:38471 "EHLO
-	mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S967662Ab3HIH77 (ORCPT
+Received: from e24smtp04.br.ibm.com ([32.104.18.25]:53748 "EHLO
+	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755381Ab3HIMzV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Aug 2013 03:59:59 -0400
-Received: from epcpsbgr3.samsung.com
- (u143.gpu120.samsung.co.kr [203.254.230.143])
- by mailout4.samsung.com (Oracle Communications Messaging Server 7u4-24.01
- (7.0.4.24.0) 64bit (built Nov 17 2011))
- with ESMTP id <0MR900G497JJ2KF0@mailout4.samsung.com> for
- linux-crypto@vger.kernel.org; Fri, 09 Aug 2013 16:59:57 +0900 (KST)
-Content-language: ko
+	Fri, 9 Aug 2013 08:55:21 -0400
+Received: from /spool/local
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <mhcerri@linux.vnet.ibm.com>;
+	Fri, 9 Aug 2013 09:55:18 -0300
+Received: from d24relay01.br.ibm.com (d24relay01.br.ibm.com [9.8.31.16])
+	by d24dlp01.br.ibm.com (Postfix) with ESMTP id 5557E352005F
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Aug 2013 08:55:17 -0400 (EDT)
+Received: from d24av03.br.ibm.com (d24av03.br.ibm.com [9.8.31.95])
+	by d24relay01.br.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id r79Corjf1065196
+	for <linux-crypto@vger.kernel.org>; Fri, 9 Aug 2013 09:50:53 -0300
+Received: from d24av03.br.ibm.com (localhost [127.0.0.1])
+	by d24av03.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id r79CtGmg004181
+	for <linux-crypto@vger.kernel.org>; Fri, 9 Aug 2013 09:55:16 -0300
+Content-Disposition: inline
+In-Reply-To: <065BBB7616BCE543832A2EF096986B940A05ADCD@039-SN2MPN1-011.039d.mgd.msft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-These local symbols are used only in this file.
-Fix the following sparse warnings:
+On Thu, Aug 08, 2013 at 02:50:41PM +0000, Garg Vakul-B16394 wrote:
+> Hi Herbert
+> 
+> 
+> > -----Original Message-----
+> > From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
+> > owner@vger.kernel.org] On Behalf Of Herbert Xu
+> > Sent: Tuesday, August 06, 2013 12:30 PM
+> > To: Marcelo Cerri
+> > Cc: linux-crypto@vger.kernel.org
+> > Subject: Re: Questions about the Crypto API
+> > 
+> > On Mon, Aug 05, 2013 at 05:25:57PM -0300, Marcelo Cerri wrote:
+> > >
+> > > My first doubt is regarding which kind of concurrency the Crypto API
+> > > allows. For example, can a single `struct crypto_tfm` be used by two
+> > > concurrent calls? I'm asking about that because I noticed that for
+> > 
+> > Yes.
+> > 
+> 
+> In this post, you mentioned that tfm is single threaded.
+> Am I misinterpreting your statement?
+> 
+> http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg08689.html
+> 
 
-drivers/crypto/amcc/crypto4xx_alg.c:35:6: warning: symbol 'set_dynamic_sa_command_0' was not declared. Should it be static?
-drivers/crypto/amcc/crypto4xx_alg.c:55:6: warning: symbol 'set_dynamic_sa_command_1' was not declared. Should it be static?
+Hi Herbert,
 
-Signed-off-by: Jingoo Han <jg1.han@samsung.com>
----
- drivers/crypto/amcc/crypto4xx_alg.c |   15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+I also would like to better understand that. It doesn't seem natural for
+me that a single tfm can be used by multiple kernel threads.
 
-diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
-index a33243c..4afca39 100644
---- a/drivers/crypto/amcc/crypto4xx_alg.c
-+++ b/drivers/crypto/amcc/crypto4xx_alg.c
-@@ -32,10 +32,10 @@
- #include "crypto4xx_sa.h"
- #include "crypto4xx_core.h"
- 
--void set_dynamic_sa_command_0(struct dynamic_sa_ctl *sa, u32 save_h,
--			      u32 save_iv, u32 ld_h, u32 ld_iv, u32 hdr_proc,
--			      u32 h, u32 c, u32 pad_type, u32 op_grp, u32 op,
--			      u32 dir)
-+static void set_dynamic_sa_command_0(struct dynamic_sa_ctl *sa, u32 save_h,
-+				     u32 save_iv, u32 ld_h, u32 ld_iv,
-+				     u32 hdr_proc, u32 h, u32 c, u32 pad_type,
-+				     u32 op_grp, u32 op, u32 dir)
- {
- 	sa->sa_command_0.w = 0;
- 	sa->sa_command_0.bf.save_hash_state = save_h;
-@@ -52,9 +52,10 @@ void set_dynamic_sa_command_0(struct dynamic_sa_ctl *sa, u32 save_h,
- 	sa->sa_command_0.bf.dir = dir;
- }
- 
--void set_dynamic_sa_command_1(struct dynamic_sa_ctl *sa, u32 cm, u32 hmac_mc,
--			      u32 cfb, u32 esn, u32 sn_mask, u32 mute,
--			      u32 cp_pad, u32 cp_pay, u32 cp_hdr)
-+static void set_dynamic_sa_command_1(struct dynamic_sa_ctl *sa, u32 cm,
-+				     u32 hmac_mc, u32 cfb, u32 esn,
-+				     u32 sn_mask, u32 mute, u32 cp_pad,
-+				     u32 cp_pay, u32 cp_hdr)
- {
- 	sa->sa_command_1.w = 0;
- 	sa->sa_command_1.bf.crypto_mode31 = (cm & 4) >> 2;
--- 
-1.7.10.4
+Best regards,
+Marcelo
