@@ -1,39 +1,53 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] drivers/crypto/nx: saves chaining value from
- co-processor
-Date: Fri, 9 Aug 2013 16:43:37 +1000
-Message-ID: <20130809064337.GC23834@gondor.apana.org.au>
-References: <1375917350.16050.14.camel@what-is-leg>
+From: Jingoo Han <jg1.han@samsung.com>
+Subject: [PATCH 1/2] crypto: sahara - Staticize local symbol
+Date: Fri, 09 Aug 2013 16:57:48 +0900
+Message-ID: <000801ce94d6$24377710$6ca66530$@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, mhcerri@linux.vnet.ibm.com
-To: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1375917350.16050.14.camel@what-is-leg>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	'Javier Martin' <javier.martin@vista-silicon.com>,
+	Jingoo Han <jg1.han@samsung.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout2.samsung.com ([203.254.224.25]:19181 "EHLO
+	mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S967449Ab3HIH5u (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Aug 2013 03:57:50 -0400
+Received: from epcpsbgr1.samsung.com
+ (u141.gpu120.samsung.co.kr [203.254.230.141])
+ by mailout2.samsung.com (Oracle Communications Messaging Server 7u4-24.01
+ (7.0.4.24.0) 64bit (built Nov 17 2011))
+ with ESMTP id <0MR900B1L7GDQQA0@mailout2.samsung.com> for
+ linux-crypto@vger.kernel.org; Fri, 09 Aug 2013 16:57:49 +0900 (KST)
+Content-language: ko
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 07, 2013 at 06:15:50PM -0500, Fionnuala Gunter wrote:
-> This patch fixes a bug that is triggered when cts(cbc(aes)) is used with
-> nx-crypto driver on input larger than 32 bytes.
-> 
-> The chaining value from co-processor was not being saved. This value is
-> needed because it is used as the IV by cts(cbc(aes)).
-> 
-> Signed-off-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-> Reviewed-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-> ---
-> v2. changed signed-off-by to reviewed-by and added more details to
-> description
-> 
-> This bug appeared in the original submission (v3.5)
+This local symbol is used only in this file.
+Fix the following sparse warnings:
 
-Patch applied.  However your patch was totally white-space damaged.
-I've fixed it this time, but please fix this in your future
-submissions.
+drivers/crypto/sahara.c:420:6: warning: symbol 'sahara_watchdog' was not declared. Should it be static?
+
+Signed-off-by: Jingoo Han <jg1.han@samsung.com>
+---
+ drivers/crypto/sahara.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index c3dc1c0..b076d81 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -417,7 +417,7 @@ static void sahara_aes_done_task(unsigned long data)
+ 	dev->req->base.complete(&dev->req->base, dev->error);
+ }
+ 
+-void sahara_watchdog(unsigned long data)
++static void sahara_watchdog(unsigned long data)
+ {
+ 	struct sahara_dev *dev = (struct sahara_dev *)data;
+ 	unsigned int err = sahara_read(dev, SAHARA_REG_ERRSTATUS);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.10.4
