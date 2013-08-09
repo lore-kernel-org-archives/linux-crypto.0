@@ -1,61 +1,45 @@
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH v2] drivers/crypto/nx: saves chaining value from
  co-processor
-Date: Fri, 09 Aug 2013 16:25:04 +1000
-Message-ID: <1376029504.32100.16.camel@pasglop>
+Date: Fri, 9 Aug 2013 16:30:03 +1000
+Message-ID: <20130809063003.GB23506@gondor.apana.org.au>
 References: <1375917350.16050.14.camel@what-is-leg>
+ <1376029504.32100.16.camel@pasglop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, herbert@gondor.hengli.com.au,
-	mhcerri@linux.vnet.ibm.com
-To: Fionnuala Gunter <fin@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Fionnuala Gunter <fin@linux.vnet.ibm.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, mhcerri@linux.vnet.ibm.com
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:36850 "EHLO gate.crashing.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1030199Ab3HIGZX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Aug 2013 02:25:23 -0400
-In-Reply-To: <1375917350.16050.14.camel@what-is-leg>
+Received: from ringil.hengli.com.au ([178.18.16.133]:39039 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1030220Ab3HIGaM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Aug 2013 02:30:12 -0400
+Content-Disposition: inline
+In-Reply-To: <1376029504.32100.16.camel@pasglop>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2013-08-07 at 18:15 -0500, Fionnuala Gunter wrote:
-> This patch fixes a bug that is triggered when cts(cbc(aes)) is used with
-> nx-crypto driver on input larger than 32 bytes.
+On Fri, Aug 09, 2013 at 04:25:04PM +1000, Benjamin Herrenschmidt wrote:
+> On Wed, 2013-08-07 at 18:15 -0500, Fionnuala Gunter wrote:
+> > This patch fixes a bug that is triggered when cts(cbc(aes)) is used with
+> > nx-crypto driver on input larger than 32 bytes.
+> > 
+> > The chaining value from co-processor was not being saved. This value is
+> > needed because it is used as the IV by cts(cbc(aes)).
+> > 
+> > Signed-off-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
+> > Reviewed-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
 > 
-> The chaining value from co-processor was not being saved. This value is
-> needed because it is used as the IV by cts(cbc(aes)).
-> 
-> Signed-off-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-> Reviewed-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+> Herbert, I assume you will handle this along with all the other NX fixes
+> and I can safely take them out of linuxppc patchwork ?
 
-Herbert, I assume you will handle this along with all the other NX fixes
-and I can safely take them out of linuxppc patchwork ?
+Yes of course.
 
-Cheers,
-Ben.
-
-> ---
-> v2. changed signed-off-by to reviewed-by and added more details to
-> description
-> 
-> This bug appeared in the original submission (v3.5)
-> ---
->  drivers/crypto/nx/nx-aes-cbc.c |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/crypto/nx/nx-aes-cbc.c
-> b/drivers/crypto/nx/nx-aes-cbc.c
-> index 35d483f..a2f99a9 100644
-> --- a/drivers/crypto/nx/nx-aes-cbc.c
-> +++ b/drivers/crypto/nx/nx-aes-cbc.c
-> @@ -95,6 +95,7 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc
-> *desc,
->         if (rc)
->                 goto out;
-> 
-> +       memcpy(desc->info, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
->         atomic_inc(&(nx_ctx->stats->aes_ops));
->         atomic64_add(csbcpb->csb.processed_byte_count,
->                      &(nx_ctx->stats->aes_bytes));
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
