@@ -1,70 +1,53 @@
-From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-Subject: Re: Questions about the Crypto API
-Date: Fri, 9 Aug 2013 09:55:14 -0300
-Message-ID: <20130809125513.GA7674@oc8526070481.ibm.com>
-References: <20130805202557.GE5752@oc8526070481.ibm.com>
- <20130806070010.GB19754@gondor.apana.org.au>
- <065BBB7616BCE543832A2EF096986B940A05ADCD@039-SN2MPN1-011.039d.mgd.msft.net>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 2/4] crypto: omap-sham: Add OMAP5/AM43XX SHAM Support
+Date: Fri, 9 Aug 2013 16:31:34 +0100
+Message-ID: <20130809153134.GT27325@e106331-lin.cambridge.arm.com>
+References: <1374821957-30141-1-git-send-email-lokeshvutla@ti.com>
+ <1374821957-30141-3-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
+	"joelf@ti.com" <joelf@ti.com>, "rnayak@ti.com" <rnayak@ti.com>,
+	"nsekhar@ti.com" <nsekhar@ti.com>,
+	"herbert@gondor.hengli.com.au" <herbert@gondor.hengli.com.au>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+To: Lokesh Vutla <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp04.br.ibm.com ([32.104.18.25]:53748 "EHLO
-	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755381Ab3HIMzV (ORCPT
+Received: from cam-admin0.cambridge.arm.com ([217.140.96.50]:56323 "EHLO
+	cam-admin0.cambridge.arm.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S964963Ab3HIPcL (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Aug 2013 08:55:21 -0400
-Received: from /spool/local
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <mhcerri@linux.vnet.ibm.com>;
-	Fri, 9 Aug 2013 09:55:18 -0300
-Received: from d24relay01.br.ibm.com (d24relay01.br.ibm.com [9.8.31.16])
-	by d24dlp01.br.ibm.com (Postfix) with ESMTP id 5557E352005F
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Aug 2013 08:55:17 -0400 (EDT)
-Received: from d24av03.br.ibm.com (d24av03.br.ibm.com [9.8.31.95])
-	by d24relay01.br.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id r79Corjf1065196
-	for <linux-crypto@vger.kernel.org>; Fri, 9 Aug 2013 09:50:53 -0300
-Received: from d24av03.br.ibm.com (localhost [127.0.0.1])
-	by d24av03.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id r79CtGmg004181
-	for <linux-crypto@vger.kernel.org>; Fri, 9 Aug 2013 09:55:16 -0300
+	Fri, 9 Aug 2013 11:32:11 -0400
 Content-Disposition: inline
-In-Reply-To: <065BBB7616BCE543832A2EF096986B940A05ADCD@039-SN2MPN1-011.039d.mgd.msft.net>
+In-Reply-To: <1374821957-30141-3-git-send-email-lokeshvutla@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 08, 2013 at 02:50:41PM +0000, Garg Vakul-B16394 wrote:
-> Hi Herbert
+On Fri, Jul 26, 2013 at 07:59:15AM +0100, Lokesh Vutla wrote:
+> Add support for the OMAP5 version of the SHAM module
+> that is present on OMAP5 and AM43xx SoCs.
 > 
+> This module is very simialar to OMAP4 version of SHAM module,
+> and adds SHA384 SHA512 hardware-accelerated hash functions to it.
+> To handle the higher digest size of SHA512, few SHA512_DIGEST_i
+> (i=1-16, and first 8 registers are duplicated from SHA_DIGEST_i
+> registers) registers are added at the end of register set.
+> So adding the above register offsets and module info in pdata.
 > 
-> > -----Original Message-----
-> > From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-
-> > owner@vger.kernel.org] On Behalf Of Herbert Xu
-> > Sent: Tuesday, August 06, 2013 12:30 PM
-> > To: Marcelo Cerri
-> > Cc: linux-crypto@vger.kernel.org
-> > Subject: Re: Questions about the Crypto API
-> > 
-> > On Mon, Aug 05, 2013 at 05:25:57PM -0300, Marcelo Cerri wrote:
-> > >
-> > > My first doubt is regarding which kind of concurrency the Crypto API
-> > > allows. For example, can a single `struct crypto_tfm` be used by two
-> > > concurrent calls? I'm asking about that because I noticed that for
-> > 
-> > Yes.
-> > 
-> 
-> In this post, you mentioned that tfm is single threaded.
-> Am I misinterpreting your statement?
-> 
-> http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg08689.html
+> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+> ---
+>  drivers/crypto/omap-sham.c |   44 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
 > 
 
-Hi Herbert,
+> +	{
+> +		.compatible	= "ti,omap5-sham",
+> +		.data		= &omap_sham_pdata_omap5,
+> +	},
 
-I also would like to better understand that. It doesn't seem natural for
-me that a single tfm can be used by multiple kernel threads.
+No binding update?
 
-Best regards,
-Marcelo
+Mark.
