@@ -1,44 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] drivers/crypto/nx: saves chaining value from
- co-processor
-Date: Fri, 9 Aug 2013 16:30:03 +1000
-Message-ID: <20130809063003.GB23506@gondor.apana.org.au>
-References: <1375917350.16050.14.camel@what-is-leg>
- <1376029504.32100.16.camel@pasglop>
+Subject: Re: [PATCH v2 0/2] drivers/crypto/nx: fixes when input data is too
+ large
+Date: Fri, 9 Aug 2013 16:42:22 +1000
+Message-ID: <20130809064222.GA23834@gondor.apana.org.au>
+References: <1375445392-16237-1-git-send-email-mhcerri@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Fionnuala Gunter <fin@linux.vnet.ibm.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, mhcerri@linux.vnet.ibm.com
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: benh@kernel.crashing.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:39039 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:41455 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1030220Ab3HIGaM (ORCPT
+	with ESMTP id S1030352Ab3HIGm1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Aug 2013 02:30:12 -0400
+	Fri, 9 Aug 2013 02:42:27 -0400
 Content-Disposition: inline
-In-Reply-To: <1376029504.32100.16.camel@pasglop>
+In-Reply-To: <1375445392-16237-1-git-send-email-mhcerri@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 09, 2013 at 04:25:04PM +1000, Benjamin Herrenschmidt wrote:
-> On Wed, 2013-08-07 at 18:15 -0500, Fionnuala Gunter wrote:
-> > This patch fixes a bug that is triggered when cts(cbc(aes)) is used with
-> > nx-crypto driver on input larger than 32 bytes.
-> > 
-> > The chaining value from co-processor was not being saved. This value is
-> > needed because it is used as the IV by cts(cbc(aes)).
-> > 
-> > Signed-off-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-> > Reviewed-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+On Fri, Aug 02, 2013 at 12:09:50PM +0000, Marcelo Cerri wrote:
+> This series of patches fixes two bugs that are triggered when the input data is
+> too large. The first one is caused by the miscalculation of physical addresses
+> and the second one by some limits that the co-processor has to the input data.
 > 
-> Herbert, I assume you will handle this along with all the other NX fixes
-> and I can safely take them out of linuxppc patchwork ?
+> Changes in v2:
+>         * Replace Signed-Off-By tags with Reviewed-By tags where it is
+> 	  appropriate.
+> 
+> Marcelo Cerri (2):
+>   drivers/crypto/nx: fix physical addresses added to sg lists
+>   drivers/crypto/nx: fix limits to sg lists for SHA-2
 
-Yes of course.
-
-Thanks,
+Both patches applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
