@@ -1,39 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/2] drivers/crypto/nx: fixes when input data is too
- large
-Date: Fri, 9 Aug 2013 16:42:22 +1000
-Message-ID: <20130809064222.GA23834@gondor.apana.org.au>
-References: <1375445392-16237-1-git-send-email-mhcerri@linux.vnet.ibm.com>
+Subject: Re: [PATCH 0/6] hwrng: OMAP: Updates for OMAP RNG module
+Date: Fri, 9 Aug 2013 16:42:34 +1000
+Message-ID: <20130809064234.GB23834@gondor.apana.org.au>
+References: <1375714043-23407-1-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: benh@kernel.crashing.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-To: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Cc: linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	mpm@selenic.com, dsaxena@plexity.net, linux-crypto@vger.kernel.org
+To: Lokesh Vutla <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:41455 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:43332 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1030352Ab3HIGm1 (ORCPT
+	with ESMTP id S1030432Ab3HIGmx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Aug 2013 02:42:27 -0400
+	Fri, 9 Aug 2013 02:42:53 -0400
 Content-Disposition: inline
-In-Reply-To: <1375445392-16237-1-git-send-email-mhcerri@linux.vnet.ibm.com>
+In-Reply-To: <1375714043-23407-1-git-send-email-lokeshvutla@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 02, 2013 at 12:09:50PM +0000, Marcelo Cerri wrote:
-> This series of patches fixes two bugs that are triggered when the input data is
-> too large. The first one is caused by the miscalculation of physical addresses
-> and the second one by some limits that the co-processor has to the input data.
+On Mon, Aug 05, 2013 at 08:17:17PM +0530, Lokesh Vutla wrote:
+> This patch series adds support for OMAP4 version of RNG module.
+> This module produce a 64 bit random number and also allows to
+> de tune FROs when repeated pattern is coming out of FROs.
+> This series also has few fixes for the driver.
 > 
-> Changes in v2:
->         * Replace Signed-Off-By tags with Reviewed-By tags where it is
-> 	  appropriate.
-> 
-> Marcelo Cerri (2):
->   drivers/crypto/nx: fix physical addresses added to sg lists
->   drivers/crypto/nx: fix limits to sg lists for SHA-2
+> Lokesh Vutla (6):
+>   hwrng: OMAP: Use module_platform_driver macro
+>   hwrng: OMAP: Convert to devm_kzalloc()
+>   hwrng: OMAP: Remove duplicated function call
+>   hwrng: OMAP: Add device tree support
+>   ARM: OMAP2+: Only manually add hwmod data when DT not used.
+>   hwrng: OMAP: Add OMAP4 TRNG support
 
-Both patches applied.  Thanks!
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
