@@ -1,61 +1,55 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Questions about the Crypto API
-Date: Sat, 10 Aug 2013 11:15:41 +1000
-Message-ID: <20130810011541.GA6549@gondor.apana.org.au>
+Date: Sat, 10 Aug 2013 11:21:28 +1000
+Message-ID: <20130810012128.GB6549@gondor.apana.org.au>
 References: <20130805202557.GE5752@oc8526070481.ibm.com>
  <20130806070010.GB19754@gondor.apana.org.au>
- <065BBB7616BCE543832A2EF096986B940A05ADCD@039-SN2MPN1-011.039d.mgd.msft.net>
- <20130809125513.GA7674@oc8526070481.ibm.com>
- <A83C99F8370D4D42BEB2D2B3153A6BBC23D55A6E@NASANEXD02C.na.qualcomm.com>
+ <20130806120540.GA364@oc8526070481.ibm.com>
+ <20130806141612.GB364@oc8526070481.ibm.com>
+ <20130808050139.GA9636@gondor.apana.org.au>
+ <A83C99F8370D4D42BEB2D2B3153A6BBC23D55514@NASANEXD02C.na.qualcomm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>,
-	Garg Vakul-B16394 <B16394@freescale.com>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 To: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:48273 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:35058 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S968314Ab3HJBQ5 (ORCPT
+	with ESMTP id S968331Ab3HJBVe (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Aug 2013 21:16:57 -0400
+	Fri, 9 Aug 2013 21:21:34 -0400
 Content-Disposition: inline
-In-Reply-To: <A83C99F8370D4D42BEB2D2B3153A6BBC23D55A6E@NASANEXD02C.na.qualcomm.com>
+In-Reply-To: <A83C99F8370D4D42BEB2D2B3153A6BBC23D55514@NASANEXD02C.na.qualcomm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 09, 2013 at 01:09:12PM +0000, Hsieh, Che-Min wrote:
-> Marcelo/Herbert:
+On Thu, Aug 08, 2013 at 02:04:05PM +0000, Hsieh, Che-Min wrote:
+> Thanks for Marcelo and Herbert for the questions and answers.
+> I have a few more questions related to the same subject of API.
 > 
-> I believe It is. Herbert, please correct me if I am wrong.
-> A single tfm is used as a user context to crypto, so to speak. But a user is not a thread.
-> Let us use ipsec as example.
-> For each security association (SA), it will take up a tfm.
-> Assume I have IP sec setup between my local host and remote host.  I might have two SA's, one for each direction.
-> Now, I might run ping. Simultaneously, I might run iperf. I might run a lot of different things  between these two ip hosts.
-> But only two tfm's are involved.
-> I have seen this happening   in our system with ipsec setup as described above.
-> While an  async request is outstanding in the driver,  another request is  issued to the same driver for the same tfm.
+> 1. In the crypto_async_request, is the list  element  available to the driver to use? I see most of drivers do "crypto_enqueue_request()"  to keep track of the outstanding async requests.  The only exception I have seen so far is talitos driver where they implement their FIFO to keep track the outstanding async requests.
 
-Yes you're absolutely right.
+You should use your own list element since this may interfere
+with the crypto API's own queueing mechanism, if any (meaning
+that even if in your particular case this field is unused by
+the time you see it this may change in future).
 
-Unless I've misunderstood Marcelo's question is different from
-what Garg was asking.
+> 2. The async driver simply returns instead of sleep.  The requestor of the async request, does wait_for_completion()  for the completion callback from driver.  Can it be wait_for_completion_interruptible() such as testmgr.c does?
+> If the sleep can be interruptible, how does driver know the request has been aborted?  The request can be still in the driver queue waiting for the hw to finish execution. How is driver aware to dequeue this aborted request? If not, the link list can be corrupted and cause kernel to crash potentially.
 
-Marcelo: The tfm, be it blkcipher or ablkcipher can always be used
-in parallel by the user on different CPUs.  For example, IPsec may
-receive two packets on two CPUs through the same SA, in which case
-decryption will be carried out in parallel.
+If the requester is using the async interface then in general
+the requester should not be sitting around waiting for it to
+complete.  See for example how we handle this in IPsec.
 
-Garg: For any tfm, blkcipher or ablkcipher, they must return results
-in the order they were given.  For a blkcipher which is synchronous,
-this is always true by definition since we return only after the
-result has been completed.  For an async ablkcipher, this means that
-if you receive two requests on the same CPU, then the first request
-must be served and completed before the second request's completion
-can be initiated.
+As for an aborted wait, the user must guarantee that any memory
+associated with the request is not freed until the driver has
+called the completion function.  IOW we don't currently provide
+a kill mechanism to the user.
 
-Sorry for any confusion this might have caused.
+Do you have a particular case where a kill mechanism would be
+useful (memory corruption caused by the user freeing the request
+early is just a bug)?
 
 Cheers,
 -- 
