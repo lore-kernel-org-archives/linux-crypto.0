@@ -1,91 +1,60 @@
-From: Shawn Guo <shawn.guo@linaro.org>
+From: =?utf-8?Q?Lothar_Wa=C3=9Fmann?= <LW@KARO-electronics.de>
 Subject: Re: [PATCH 1/3] ARM: dts: mxs: set dcp to "disabled" by default
-Date: Mon, 12 Aug 2013 19:05:26 +0800
-Message-ID: <20130812110523.GD25292@S2101-09.ap.freescale.net>
+Date: Mon, 12 Aug 2013 14:05:51 +0200
+Message-ID: <21000.53151.841177.378797@ipc1.ka-ro>
 References: <1375968629-10091-1-git-send-email-LW@KARO-electronics.de>
- <1375968629-10091-2-git-send-email-LW@KARO-electronics.de>
+	<1375968629-10091-2-git-send-email-LW@KARO-electronics.de>
+	<20130812110523.GD25292@S2101-09.ap.freescale.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Cc: devicetree@vger.kernel.org, Stephen Warren <swarren@wwwdotorg.org>,
- Rob Herring <rob.herring@calxeda.com>, linux-crypto@vger.kernel.org,
- Tobias Rauter <tobiasrauter@gmail.com>, linux-arm-kernel@lists.infradead.org
-To: Lothar =?iso-8859-1?Q?Wa=DFmann?= <LW@KARO-electronics.de>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <1375968629-10091-2-git-send-email-LW@KARO-electronics.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <devicetree@vger.kernel.org>,
+	Stephen Warren <swarren@wwwdotorg.org>,
+	Rob Herring <rob.herring@calxeda.com>,
+	<linux-crypto@vger.kernel.org>,
+	Tobias Rauter <tobiasrauter@gmail.com>,
+	<linux-arm-kernel@lists.infradead.org>
+To: Shawn Guo <shawn.guo@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.karo-electronics.de ([81.173.242.67]:58140 "EHLO
+	mail.karo-electronics.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754530Ab3HLMF7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 12 Aug 2013 08:05:59 -0400
+In-Reply-To: <20130812110523.GD25292@S2101-09.ap.freescale.net>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Aug 08, 2013 at 03:30:27PM +0200, Lothar Wa=DFmann wrote:
-> Reintroduce 'status =3D "disabled"' for the dcp node that was dropped by
-> commit 519d8b1a "Added support for Freescale's DCP co-processor".
+Hi,
 
-For IP blocks that do not have pins to be routed on boards, it should be
-fine to have it enabled in <soc>.dtsi.
+Shawn Guo writes:
+> On Thu, Aug 08, 2013 at 03:30:27PM +0200, Lothar Wa=C3=9Fmann wrote:
+> > Reintroduce 'status =3D "disabled"' for the dcp node that was dropp=
+ed by
+> > commit 519d8b1a "Added support for Freescale's DCP co-processor".
+>=20
+> For IP blocks that do not have pins to be routed on boards, it should=
+ be
+> fine to have it enabled in <soc>.dtsi.
+>=20
+That means that when a new driver is added, it will start wasting
+resources on all board using that SoC unless the board maintainers
+explicitly disable that driver in DTB.
 
-Shawn
+I would prefer things to be the other way:
+New drivers (no matter whether for chip-internal or external hardware)
+should require to be explicitly enabled for those platforms on which
+they are being used.
 
-> =
 
-> Explicitly enable it in imx28-evk which is referenced in the commit
-> message of that commit.
-> =
+Lothar Wa=C3=9Fmann
+--=20
+___________________________________________________________
 
-> Signed-off-by: Lothar Wa=DFmann <LW@KARO-electronics.de>
-> ---
->  arch/arm/boot/dts/imx28-evk.dts |    4 ++++
->  arch/arm/boot/dts/imx28.dtsi    |    3 ++-
->  2 files changed, 6 insertions(+), 1 deletions(-)
-> =
+Ka-Ro electronics GmbH | Pascalstra=C3=9Fe 22 | D - 52076 Aachen
+Phone: +49 2408 1402-0 | Fax: +49 2408 1402-10
+Gesch=C3=A4ftsf=C3=BChrer: Matthias Kaussen
+Handelsregistereintrag: Amtsgericht Aachen, HRB 4996
 
-> diff --git a/arch/arm/boot/dts/imx28-evk.dts b/arch/arm/boot/dts/imx28-ev=
-k.dts
-> index dff2279..ac790bb 100644
-> --- a/arch/arm/boot/dts/imx28-evk.dts
-> +++ b/arch/arm/boot/dts/imx28-evk.dts
-> @@ -361,3 +361,7 @@
->  		default-brightness-level =3D <6>;
->  	};
->  };
-> +
-> +&dcp {
-> +	status =3D "okay";
-> +};
-> diff --git a/arch/arm/boot/dts/imx28.dtsi b/arch/arm/boot/dts/imx28.dtsi
-> index e459d63..ea99d09 100644
-> --- a/arch/arm/boot/dts/imx28.dtsi
-> +++ b/arch/arm/boot/dts/imx28.dtsi
-> @@ -794,9 +794,10 @@
->  			};
->  =
-
->  			dcp: dcp@80028000 {
-> +				compatible =3D "fsl-dcp";
->  				reg =3D <0x80028000 0x2000>;
->  				interrupts =3D <52 53 54>;
-> -				compatible =3D "fsl-dcp";
-> +				status =3D "disabled";
->  			};
->  =
-
->  			pxp: pxp@8002a000 {
-> -- =
-
-> 1.7.2.5
-> =
-
-> =
-
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+www.karo-electronics.de | info@karo-electronics.de
+___________________________________________________________
