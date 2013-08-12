@@ -1,98 +1,60 @@
-From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-Subject: Re: Questions about the Crypto API
-Date: Mon, 12 Aug 2013 10:49:13 -0300
-Message-ID: <20130812134913.GA5173@oc8526070481.ibm.com>
-References: <20130805202557.GE5752@oc8526070481.ibm.com>
- <20130806070010.GB19754@gondor.apana.org.au>
- <065BBB7616BCE543832A2EF096986B940A05ADCD@039-SN2MPN1-011.039d.mgd.msft.net>
- <20130809125513.GA7674@oc8526070481.ibm.com>
- <A83C99F8370D4D42BEB2D2B3153A6BBC23D55A6E@NASANEXD02C.na.qualcomm.com>
- <20130810011541.GA6549@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>,
-	Garg Vakul-B16394 <B16394@freescale.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Kumar Gala <galak@codeaurora.org>
+Subject: Re: [PATCH 1/3] ARM: dts: mxs: set dcp to "disabled" by default
+Date: Mon, 12 Aug 2013 09:17:05 -0500
+Message-ID: <73E20626-6771-4F37-BE65-8AA0D49FA94D@codeaurora.org>
+References: <1375968629-10091-1-git-send-email-LW@KARO-electronics.de> <1375968629-10091-2-git-send-email-LW@KARO-electronics.de> <20130812110523.GD25292@S2101-09.ap.freescale.net> <21000.53151.841177.378797@ipc1.ka-ro>
+Mime-Version: 1.0 (Apple Message framework v1283)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Shawn Guo <shawn.guo@linaro.org>, <devicetree@vger.kernel.org>,
+	Stephen Warren <swarren@wwwdotorg.org>,
+	Rob Herring <rob.herring@calxeda.com>,
+	<linux-crypto@vger.kernel.org>,
+	Tobias Rauter <tobiasrauter@gmail.com>,
+	<linux-arm-kernel@lists.infradead.org>
+To: =?iso-8859-1?Q?Lothar_Wa=DFmann?= <LW@KARO-electronics.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp03.br.ibm.com ([32.104.18.24]:39064 "EHLO
-	e24smtp03.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755340Ab3HLNtW (ORCPT
+Received: from smtp.codeaurora.org ([198.145.11.231]:50222 "EHLO
+	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756020Ab3HLORA convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 12 Aug 2013 09:49:22 -0400
-Received: from /spool/local
-	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <mhcerri@linux.vnet.ibm.com>;
-	Mon, 12 Aug 2013 10:49:20 -0300
-Received: from d24relay01.br.ibm.com (d24relay01.br.ibm.com [9.8.31.16])
-	by d24dlp02.br.ibm.com (Postfix) with ESMTP id 62FB61DC0066
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Aug 2013 09:49:17 -0400 (EDT)
-Received: from d24av01.br.ibm.com (d24av01.br.ibm.com [9.8.31.91])
-	by d24relay01.br.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id r7CDipiH1310912
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Aug 2013 10:44:51 -0300
-Received: from d24av01.br.ibm.com (localhost [127.0.0.1])
-	by d24av01.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id r7CDnGT9019563
-	for <linux-crypto@vger.kernel.org>; Mon, 12 Aug 2013 10:49:16 -0300
-Content-Disposition: inline
-In-Reply-To: <20130810011541.GA6549@gondor.apana.org.au>
+	Mon, 12 Aug 2013 10:17:00 -0400
+In-Reply-To: <21000.53151.841177.378797@ipc1.ka-ro>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Aug 10, 2013 at 11:15:41AM +1000, Herbert Xu wrote:
-> On Fri, Aug 09, 2013 at 01:09:12PM +0000, Hsieh, Che-Min wrote:
-> > Marcelo/Herbert:
-> > 
-> > I believe It is. Herbert, please correct me if I am wrong.
-> > A single tfm is used as a user context to crypto, so to speak. But a user is not a thread.
-> > Let us use ipsec as example.
-> > For each security association (SA), it will take up a tfm.
-> > Assume I have IP sec setup between my local host and remote host.  I might have two SA's, one for each direction.
-> > Now, I might run ping. Simultaneously, I might run iperf. I might run a lot of different things  between these two ip hosts.
-> > But only two tfm's are involved.
-> > I have seen this happening   in our system with ipsec setup as described above.
-> > While an  async request is outstanding in the driver,  another request is  issued to the same driver for the same tfm.
-> 
-> Yes you're absolutely right.
-> 
-> Unless I've misunderstood Marcelo's question is different from
-> what Garg was asking.
-> 
-> Marcelo: The tfm, be it blkcipher or ablkcipher can always be used
-> in parallel by the user on different CPUs.  For example, IPsec may
-> receive two packets on two CPUs through the same SA, in which case
-> decryption will be carried out in parallel.
 
-So does that means that it's possible to keep data in the tfm's context
-that is the same for a single SA, such as the AES expanded key, but it's
-not possible to keep data that is specific for the current operation,
-such as an operation state that the driver might require?
+On Aug 12, 2013, at 7:05 AM, Lothar Wa=DFmann wrote:
 
-Actually I think that probably I have misunderstood the blkcipher
-interface, so here it is another question: is each encrypt/decrypt call
-a complete operation? I mean, I'm considering that I could always chain
-a series of calls to encrypt data in separated chunks, in a similar way
-that is done for the hash interface and because that I'm assuming that I
-would have to keep state between those calls if the device requires
-that.
+> Hi,
+>=20
+> Shawn Guo writes:
+>> On Thu, Aug 08, 2013 at 03:30:27PM +0200, Lothar Wa=DFmann wrote:
+>>> Reintroduce 'status =3D "disabled"' for the dcp node that was dropp=
+ed by
+>>> commit 519d8b1a "Added support for Freescale's DCP co-processor".
+>>=20
+>> For IP blocks that do not have pins to be routed on boards, it shoul=
+d be
+>> fine to have it enabled in <soc>.dtsi.
+>>=20
+> That means that when a new driver is added, it will start wasting
+> resources on all board using that SoC unless the board maintainers
+> explicitly disable that driver in DTB.
+>=20
+> I would prefer things to be the other way:
+> New drivers (no matter whether for chip-internal or external hardware=
+)
+> should require to be explicitly enabled for those platforms on which
+> they are being used.
 
-> 
-> Garg: For any tfm, blkcipher or ablkcipher, they must return results
-> in the order they were given.  For a blkcipher which is synchronous,
-> this is always true by definition since we return only after the
-> result has been completed.  For an async ablkcipher, this means that
-> if you receive two requests on the same CPU, then the first request
-> must be served and completed before the second request's completion
-> can be initiated.
-> 
-> Sorry for any confusion this might have caused.
-> 
-> Cheers,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+But that enablement should be in the kernel and not the device tree.  T=
+he device tree is describing the HW, if the DCP exists and is usable w/=
+o an external IO than by default it should be enabled in the SoC .dts
+
+- k
+
+--
+Employee of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, host=
+ed by The Linux Foundation
