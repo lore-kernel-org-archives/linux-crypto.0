@@ -1,72 +1,89 @@
 From: Joel Fernandes <joelf@ti.com>
-Subject: [PATCH 07/10] crypto: omap-aes: Add IRQ info and helper macros
-Date: Wed, 14 Aug 2013 18:12:46 -0500
-Message-ID: <1376521969-16807-8-git-send-email-joelf@ti.com>
+Subject: [PATCH 10/10] crypto: omap-aes: Switch to PIO mode in probe function
+Date: Wed, 14 Aug 2013 18:12:49 -0500
+Message-ID: <1376521969-16807-11-git-send-email-joelf@ti.com>
 References: <1376521969-16807-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Joel Fernandes <joelf@ti.com>, Linux OMAP List <linux-omap@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.hengli.com.au>, "David S. Miller"
- <davem@davemloft.net>, Mark Greer <mgreer@animalcreek.com>, Tony Lindgren
- <tony@atomide.com>, Santosh Shilimkar <santosh.shilimkar@ti.com>, Rajendra
- Nayak <rnayak@ti.com>, Lokesh Vutla <lokeshvutla@ti.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain
+Cc: Linux OMAP List <linux-omap@vger.kernel.org>,
+	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Joel Fernandes <joelf@ti.com>
+To: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Mark Greer <mgreer@animalcreek.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Santosh Shilimkar <santosh.shilimkar@ti.com>,
+	Rajendra Nayak <rnayak@ti.com>,
+	Lokesh Vutla <lokeshvutla@ti.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1376521969-16807-1-git-send-email-joelf@ti.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add IRQ information to pdata and helper macros. These are
-required for PIO-mode support.
+In cases where requesting for DMA channels fails for some reason, or channel
+numbers are not provided in DT or platform data, we switch to PIO-only mode
+also checking if platform provides IRQ numbers and interrupt register offsets
+in DT and platform data. All dma-only paths are avoided in this mode.
 
 Signed-off-by: Joel Fernandes <joelf@ti.com>
 ---
- drivers/crypto/omap-aes.c |    8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/crypto/omap-aes.c |   28 +++++++++++++++++++++++-----
+ 1 file changed, 23 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 71da52b..c057eac 100644
+index 54f2729..34e3b77 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -82,6 +82,10 @@
+@@ -1074,7 +1074,7 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 	struct omap_aes_dev *dd;
+ 	struct crypto_alg *algp;
+ 	struct resource res;
+-	int err = -ENOMEM, i, j;
++	int err = -ENOMEM, i, j, irq = -1;
+ 	u32 reg;
  
- #define AES_REG_LENGTH_N(x)		(0x54 + ((x) * 0x04))
+ 	dd = kzalloc(sizeof(struct omap_aes_dev), GFP_KERNEL);
+@@ -1118,8 +1118,23 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 	tasklet_init(&dd->queue_task, omap_aes_queue_task, (unsigned long)dd);
  
-+#define AES_REG_IRQ_STATUS(dd)         ((dd)->pdata->irq_status_ofs)
-+#define AES_REG_IRQ_ENABLE(dd)         ((dd)->pdata->irq_enable_ofs)
-+#define AES_REG_IRQ_DATA_IN            BIT(1)
-+#define AES_REG_IRQ_DATA_OUT           BIT(2)
- #define DEFAULT_TIMEOUT		(5*HZ)
+ 	err = omap_aes_dma_init(dd);
+-	if (err)
+-		goto err_dma;
++	if (err && AES_REG_IRQ_STATUS(dd) && AES_REG_IRQ_ENABLE(dd)) {
++		dd->pio_only = 1;
++
++		irq = platform_get_irq(pdev, 0);
++		if (irq < 0) {
++			dev_err(dev, "can't get IRQ resource\n");
++			goto err_irq;
++		}
++
++		err = request_irq(irq, omap_aes_irq, 0,
++				dev_name(dev), dd);
++		if (err) {
++			dev_err(dev, "Unable to grab omap-aes IRQ\n");
++			goto err_irq;
++		}
++	}
++
  
- #define FLAGS_MODE_MASK		0x000f
-@@ -127,6 +131,8 @@ struct omap_aes_pdata {
- 	u32		data_ofs;
- 	u32		rev_ofs;
- 	u32		mask_ofs;
-+	u32             irq_enable_ofs;
-+	u32             irq_status_ofs;
- 
- 	u32		dma_enable_in;
- 	u32		dma_enable_out;
-@@ -846,6 +852,8 @@ static const struct omap_aes_pdata omap_aes_pdata_omap4 = {
- 	.data_ofs	= 0x60,
- 	.rev_ofs	= 0x80,
- 	.mask_ofs	= 0x84,
-+	.irq_status_ofs = 0x8c,
-+	.irq_enable_ofs = 0x90,
- 	.dma_enable_in	= BIT(5),
- 	.dma_enable_out	= BIT(6),
- 	.major_mask	= 0x0700,
+ 	INIT_LIST_HEAD(&dd->list);
+ 	spin_lock(&list_lock);
+@@ -1147,8 +1162,11 @@ err_algs:
+ 		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
+ 			crypto_unregister_alg(
+ 					&dd->pdata->algs_info[i].algs_list[j]);
+-	omap_aes_dma_cleanup(dd);
+-err_dma:
++	if (dd->pio_only)
++		free_irq(irq, dd);
++	else
++		omap_aes_dma_cleanup(dd);
++err_irq:
+ 	tasklet_kill(&dd->done_task);
+ 	tasklet_kill(&dd->queue_task);
+ 	pm_runtime_disable(dev);
 -- 
 1.7.9.5
