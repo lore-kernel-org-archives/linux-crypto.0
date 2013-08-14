@@ -1,45 +1,66 @@
-From: jmlatten@linux.vnet.ibm.com
-Subject: [PATCH] crypto:nx - fix nx-aes-gcm verification
-Date: Wed, 14 Aug 2013 17:17:57 -0500
-Message-ID: <520c0215.kHFgBNcJQfAPXpv3%jmlatten@linux.vnet.ibm.com>
+From: Joel Fernandes <joelf@ti.com>
+Subject: [PATCH 03/10] crypto: omap-aes: Populate number of SG elements
+Date: Wed, 14 Aug 2013 18:12:42 -0500
+Message-ID: <1376521969-16807-4-git-send-email-joelf@ti.com>
+References: <1376521969-16807-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain
+Cc: Linux OMAP List <linux-omap@vger.kernel.org>,
+	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Joel Fernandes <joelf@ti.com>
+To: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Mark Greer <mgreer@animalcreek.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Santosh Shilimkar <santosh.shilimkar@ti.com>,
+	Rajendra Nayak <rnayak@ti.com>,
+	Lokesh Vutla <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [32.97.110.51] ([32.97.110.51]:45862 "HELO oc8377654763.ibm.com"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-	id S1758395Ab3HNWZa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Aug 2013 18:25:30 -0400
+Received: from arroyo.ext.ti.com ([192.94.94.40]:39228 "EHLO arroyo.ext.ti.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933268Ab3HNXNi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 Aug 2013 19:13:38 -0400
+In-Reply-To: <1376521969-16807-1-git-send-email-joelf@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch fixes a bug in the nx-aes-gcm implementation.
-Corrected the code so that the authtag is always verified after
-decrypting and not just when there is associated data included.
-Also, corrected the code to retrieve the input authtag from src
-instead of dst. 
+Crypto layer only passes nbytes but number of SG elements is needed
+for mapping/unmapping SGs at one time using dma_map* API and also
+needed to pass in for dmaengine prep function.
 
-Reviewed-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-Reviewed-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-Signed-off-by: Joy Latten <jmlatten@linux.vnet.ibm.com>
+We call function added to scatterwalk for this purpose in omap_aes_handle_queue
+to populate the values which are used later.
 
-diff --git a/drivers/crypto/nx/nx-aes-gcm.c b/drivers/crypto/nx/nx-aes-gcm.c
-index 6cca6c3..eb851bb 100644
---- a/drivers/crypto/nx/nx-aes-gcm.c
-+++ b/drivers/crypto/nx/nx-aes-gcm.c
-@@ -243,11 +243,11 @@ static int gcm_aes_nx_crypt(struct aead_request *req, int enc)
- 				 req->dst, nbytes,
- 				 crypto_aead_authsize(crypto_aead_reqtfm(req)),
- 				 SCATTERWALK_TO_SG);
--	} else if (req->assoclen) {
-+	} else {
- 		u8 *itag = nx_ctx->priv.gcm.iauth_tag;
- 		u8 *otag = csbcpb->cpb.aes_gcm.out_pat_or_mac;
+Signed-off-by: Joel Fernandes <joelf@ti.com>
+---
+ drivers/crypto/omap-aes.c |    6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 3838e0a..b7189a8 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -171,6 +171,8 @@ struct omap_aes_dev {
+ 	void			*buf_out;
+ 	int			dma_out;
+ 	struct dma_chan		*dma_lch_out;
++	int			in_sg_len;
++	int			out_sg_len;
+ 	dma_addr_t		dma_addr_out;
  
--		scatterwalk_map_and_copy(itag, req->dst, nbytes,
-+		scatterwalk_map_and_copy(itag, req->src, nbytes,
- 				 crypto_aead_authsize(crypto_aead_reqtfm(req)),
- 				 SCATTERWALK_FROM_SG);
- 		rc = memcmp(itag, otag,
+ 	const struct omap_aes_pdata	*pdata;
+@@ -741,6 +743,10 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ 	dd->out_offset = 0;
+ 	dd->out_sg = req->dst;
+ 
++	dd->in_sg_len = scatterwalk_bytes_sglen(dd->in_sg, dd->total);
++	dd->out_sg_len = scatterwalk_bytes_sglen(dd->out_sg, dd->total);
++	BUG_ON(dd->in_sg_len < 0 || dd->out_sg_len < 0);
++
+ 	rctx = ablkcipher_request_ctx(req);
+ 	ctx = crypto_ablkcipher_ctx(crypto_ablkcipher_reqtfm(req));
+ 	rctx->mode &= FLAGS_MODE_MASK;
+-- 
+1.7.9.5
