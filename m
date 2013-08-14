@@ -1,32 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: make tables used from assembler __visible
-Date: Wed, 14 Aug 2013 20:49:25 +1000
-Message-ID: <20130814104925.GB13403@gondor.apana.org.au>
-References: <1376182871-17690-1-git-send-email-andi@firstfloor.org>
+Subject: Re: [PATCH] crypto: nx - fix concurrency issue
+Date: Wed, 14 Aug 2013 20:49:40 +1000
+Message-ID: <20130814104937.GC13403@gondor.apana.org.au>
+References: <1376344177-7205-1-git-send-email-mhcerri@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
-To: Andi Kleen <andi@firstfloor.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:39423 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932467Ab3HNKta (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Aug 2013 06:49:30 -0400
+Cc: benh@kernel.crashing.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1376182871-17690-1-git-send-email-andi@firstfloor.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1376344177-7205-1-git-send-email-mhcerri@linux.vnet.ibm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Aug 10, 2013 at 06:01:11PM -0700, Andi Kleen wrote:
-> From: Andi Kleen <ak@linux.intel.com>
+On Mon, Aug 12, 2013 at 06:49:37PM -0300, Marcelo Cerri wrote:
+> The NX driver uses the transformation context to store several fields
+> containing data related to the state of the operations in progress.
+> Since a single tfm can be used by different kernel threads at the same
+> time, we need to protect the data stored into the context.
 > 
-> Tables used from assembler should be marked __visible to let
-> the compiler know.
+> This patch makes use of spin locks to protect the data where a race
+> condition can happen.
 > 
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
+> Reviewed-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
+> Reviewed-by: Joy Latten <jmlatten@linux.vnet.ibm.com>
+> Signed-off-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
 
-Patch applied.  Thanks Andi.
+Patch applied.  Thanks a lot!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
