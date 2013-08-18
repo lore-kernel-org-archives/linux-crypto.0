@@ -1,74 +1,82 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Questions about the Crypto API
-Date: Fri, 16 Aug 2013 16:37:42 +1000
-Message-ID: <20130816063742.GB6859@gondor.apana.org.au>
-References: <20130805202557.GE5752@oc8526070481.ibm.com>
- <20130806070010.GB19754@gondor.apana.org.au>
- <065BBB7616BCE543832A2EF096986B940A05ADCD@039-SN2MPN1-011.039d.mgd.msft.net>
- <20130809125513.GA7674@oc8526070481.ibm.com>
- <A83C99F8370D4D42BEB2D2B3153A6BBC23D55A6E@NASANEXD02C.na.qualcomm.com>
- <20130810011541.GA6549@gondor.apana.org.au>
- <20130812134913.GA5173@oc8526070481.ibm.com>
- <A83C99F8370D4D42BEB2D2B3153A6BBC23D569CE@NASANEXD02C.na.qualcomm.com>
+From: Joel Fernandes <joelf@ti.com>
+Subject: [PATCH v2 01/14] crypto: scatterwalk:  Add support for calculating number of SG elements
+Date: Sat, 17 Aug 2013 21:42:22 -0500
+Message-ID: <1376793755-30478-2-git-send-email-joelf@ti.com>
+References: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
+Content-Type: text/plain
+Cc: Linux OMAP List <linux-omap@vger.kernel.org>,
+	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Joel Fernandes <joelf@ti.com>
+To: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Mark Greer <mgreer@animalcreek.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Santosh Shilimkar <santosh.shilimkar@ti.com>,
+	Rajendra Nayak <rnayak@ti.com>,
+	Lokesh Vutla <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:33847 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750764Ab3HPGhq (ORCPT
+Received: from devils.ext.ti.com ([198.47.26.153]:53612 "EHLO
+	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752947Ab3HRCnd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Aug 2013 02:37:46 -0400
-Content-Disposition: inline
-In-Reply-To: <A83C99F8370D4D42BEB2D2B3153A6BBC23D569CE@NASANEXD02C.na.qualcomm.com>
+	Sat, 17 Aug 2013 22:43:33 -0400
+In-Reply-To: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 13, 2013 at 07:25:50PM +0000, Hsieh, Che-Min wrote:
-> > Garg: For any tfm, blkcipher or ablkcipher, they must return results 
-> > in the order they were given.  For a blkcipher which is synchronous, 
-> > this is always true by definition since we return only after the 
-> > result has been completed.  For an async ablkcipher, this means that 
-> > if you receive two requests on the same CPU, then the first request 
-> > must be served and completed before the second request's completion 
-> > can be initiated.
-> 
-> Herbert, can you give further clarification:
-> (*) This ordering of  result  is also true for others, such as  aead and hashing, right?
+Crypto layer only passes nbytes to encrypt but in omap-aes driver we need to
+know number of SG elements to pass to dmaengine slave API.  We add function for
+the same to scatterwalk library.
 
-Correct.
+Signed-off-by: Joel Fernandes <joelf@ti.com>
+---
+ crypto/scatterwalk.c         |   22 ++++++++++++++++++++++
+ include/crypto/scatterwalk.h |    2 ++
+ 2 files changed, 24 insertions(+)
 
-> Can  you  confirm, or correct the following statements:
-> (*)To perform hashing on a long data stream, it may come in multiple requests to the driver;  in a sequence of one .init request,   one or more than one .update requests, and lastly one .final  request.  In this sequence, a request has to be complete, before next one to be issued to the driver. Those requests  should always come in the same struct crypto_async_request.
-> Is this correct?
-
-No.  Operations can always be interleaved, i.e., two different
-requests can both start with init and then update in lock-step.
-
-For hashes all state must be confined to the context area of
-ahash_request.  That is, the hardware must not maintain internal
-state, or if it does, it must be prepared to refresh its state if
-an ahash_request comes in that does not agree with the hardware's
-current state.
-
-Now, I understand that not all hardware makes it easy to do this,
-that is why we don't require all hardware to provide the
-init/update/final interface.  The hardware can provide only the
-digest interface (and most likely the finup interface) and then
-rely on a software fall-back for the "stateless" init/update/final
-operations.
-
-Accordingly, on the user side we encourage everyone to use digest
-and/or finup wherever possible so that the chances of hardware
-acceleration is maximised.
-
-> If driver needs to maintain state variables for such (init, update, final), the state variables can be maintained in the request implementation context, instead of tfm context. Right?
-
-Right.
-
-Cheers,
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index 7281b8a..79ca227 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -124,3 +124,25 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+ 	scatterwalk_done(&walk, out, 0);
+ }
+ EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
++
++int scatterwalk_bytes_sglen(struct scatterlist *sg, int num_bytes)
++{
++	int offset = 0, n = 0;
++
++	/* num_bytes is too small */
++	if (num_bytes < sg->length)
++		return -1;
++
++	do {
++		offset += sg->length;
++		n++;
++		sg = scatterwalk_sg_next(sg);
++
++		/* num_bytes is too large */
++		if (unlikely(!sg && (num_bytes < offset)))
++			return -1;
++	} while (sg && (num_bytes > offset));
++
++	return n;
++}
++EXPORT_SYMBOL_GPL(scatterwalk_bytes_sglen);
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 3744d2a..13621cc 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -113,4 +113,6 @@ void scatterwalk_done(struct scatter_walk *walk, int out, int more);
+ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+ 			      unsigned int start, unsigned int nbytes, int out);
+ 
++int scatterwalk_bytes_sglen(struct scatterlist *sg, int num_bytes);
++
+ #endif  /* _CRYPTO_SCATTERWALK_H */
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.9.5
