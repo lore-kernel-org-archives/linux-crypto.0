@@ -1,127 +1,124 @@
-From: Joel Fernandes <joelf@ti.com>
-Subject: Re: [PATCH v2 02/14] crypto: omap-aes: Add useful debug macros
-Date: Sun, 18 Aug 2013 00:56:11 -0500
-Message-ID: <521061FB.2030504@ti.com>
-References: <1376793755-30478-1-git-send-email-joelf@ti.com>  <1376793755-30478-3-git-send-email-joelf@ti.com> <1376799747.2027.11.camel@joe-AO722>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH][RFC] Tests on 200 different CPUs/Arches and OSes with CPU Jitter RNG
+Date: Sun, 18 Aug 2013 20:05:52 +0200
+Message-ID: <2846522.WmUuVkVV56@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Mark Greer <mgreer@animalcreek.com>,
-	Tony Lindgren <tony@atomide.com>,
-	Santosh Shilimkar <santosh.shilimkar@ti.com>,
-	Rajendra Nayak <rnayak@ti.com>,
-	Lokesh Vutla <lokeshvutla@ti.com>,
-	Linux OMAP List <linux-omap@vger.kernel.org>,
-	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bear.ext.ti.com ([192.94.94.41]:39481 "EHLO bear.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751155Ab3HRF4y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 18 Aug 2013 01:56:54 -0400
-In-Reply-To: <1376799747.2027.11.camel@joe-AO722>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: sandyinchina@gmail.com, Theodore Tso <tytso@mit.edu>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 08/17/2013 11:22 PM, Joe Perches wrote:
-> On Sat, 2013-08-17 at 21:42 -0500, Joel Fernandes wrote:
->> When DEBUG is enabled, these macros can be used to print variables in integer
->> and hex format, and clearly display which registers, offsets and values are
->> being read/written , including printing the names of the offsets and their values.
->>
->> Note:
->> This patch results in a checkpatch error that cannot be fixed.
->> ERROR: Macros with multiple statements should be enclosed in a do - while loop
->> +#define omap_aes_read(dd, offset)                                      \
->> +       __raw_readl(dd->io_base + offset);                              \
->> +       pr_debug("omap_aes_read(" #offset ")\n");
->>
->> Using do-while loop will break a lot of code such as:
->> ret = omap_aes_read(..);
-> 
-> That's where you use a statement expression macro
-> 
-> #define omap_aes_read(dd, offset)					\
-> ({									\
-> 	pr_debug("omap_aes_read("omap_aes_read(" #offset ")\n");	\
-> 	__raw_readl((dd)->iobase + offset);				\
-> })
-> 
+Hi Sandy, Ted,
 
-That made things a lot simpler, thanks. Re-spinning just this patch as below:
+(this is a reply to [3])
 
---->8---
+I prepared a new release of the CPU Jitter RNG available at [1]. The 
+core of the RNG remains unchanged. However, there are the following 
+changes:
 
-From: Joel Fernandes <joelf@ti.com>
-Subject: [PATCH] crypto: omap-aes: Add useful debug macros
+- addition of a patch to integrate the RNG into /dev/random as explained 
+in appendix B.3 of [2], although the long-term goal of the RNG is rather 
+the integration into the kernel crypto API when considering the Linux 
+kernel as outlined in appendix B.1 of [2]
 
-When DEBUG is enabled, these macros can be used to print variables in integer
-and hex format, and clearly display which registers, offsets and values are
-being read/written , including printing the names of the offsets and their values.
+- ensure that the code is compiled without optimization based on the 
+reasons outlined in section 5.1 of [2]
 
-Using statement expression macros in read path as,
-Suggested-by: Joe Perches <joe@perches.com>
+- addition of chapter 5.1 to [2] explaining how the entropy is collected
 
-Signed-off-by: Joel Fernandes <joelf@ti.com>
----
- drivers/crypto/omap-aes.c |   24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+- additional code to execute the CPU Jitter RNG on different OSes 
+(specifically AIX, MacOS and z/OS -- other Unixes are good without 
+additional changes)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index ee15b0f..e26d4d4 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -13,7 +13,9 @@
-  *
-  */
 
--#define pr_fmt(fmt) "%s: " fmt, __func__
-+#define pr_fmt(fmt) "%20s: " fmt, __func__
-+#define prn(num) pr_debug(#num "=%d\n", num)
-+#define prx(num) pr_debug(#num "=%x\n", num)
+>On Tue, May 21, 2013 at 3:01 PM, Theodore Ts'o <tytso@mit.edu> wrote:
 
- #include <linux/err.h>
- #include <linux/module.h>
-@@ -172,16 +174,36 @@ struct omap_aes_dev {
- static LIST_HEAD(dev_list);
- static DEFINE_SPINLOCK(list_lock);
+>> I continue to be suspicious about claims that userspace timing
+>> measurements are measuring anything other than OS behaviour.
 
-+#ifdef DEBUG
-+#define omap_aes_read(dd, offset)				\
-+({								\
-+	int _read_ret;						\
-+	_read_ret = __raw_readl(dd->io_base + offset);		\
-+	pr_debug("omap_aes_read(" #offset "=%#x)= %#x\n",	\
-+		 offset, _read_ret);				\
-+	_read_ret;						\
-+})
-+#else
- static inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
- {
- 	return __raw_readl(dd->io_base + offset);
- }
-+#endif
+>
+>Yes, but they do seem to contain some entropy. See links in the
+>original post of this thread, the havege stuff and especially the
+>McGuire et al paper.
 
-+#ifdef DEBUG
-+#define omap_aes_write(dd, offset, value)				\
-+	do {								\
-+		pr_debug("omap_aes_write(" #offset "=%#x) value=%#x\n",	\
-+			 offset, value);				\
-+		__raw_writel(value, dd->io_base + offset);		\
-+	} while (0)
-+#else
- static inline void omap_aes_write(struct omap_aes_dev *dd, u32 offset,
- 				  u32 value)
- {
- 	__raw_writel(value, dd->io_base + offset);
- }
-+#endif
+With the initially shown implementation and documentation I did not 
+really show that sufficient entropy is gathered from the CPU execution 
+jitter -- i.e. that there is unpredictable jitter in the execution time. 
+With a new test I now closed that hole. The newly added test 
+measures the entropy gathered during execution jitter collection, i.e. 
+heart of the RNG in terms of how much statistical entropy it provides. 
+The description of the test is given in section 5.1 of [2]. To ensure 
+that the statistical entropy measurements are indeed showing the 
+information theoretical entropy, section 4.4 of [2] outlines that 
+patterns are not identified in the output of the RNG which would 
+diminish the information theoretical entropy compared to the statistical 
+entropy.
 
- static inline void omap_aes_write_mask(struct omap_aes_dev *dd, u32 offset,
- 					u32 value, u32 mask)
+That test was then executed on about 200 different systems with the 
+results given in appendix F of [2]. The table stated there supported by 
+the many graphs demonstrates that the CPU Jitter random number generator 
+delivers high-quality entropy on:
+
+- a large range of CPUs ranging from embedded systems of MIPS and ARM 
+CPUs, covering desktop systems with AMD and Intel x86 32 bit and 64 bit 
+CPUs up to server CPUs of Intel Itanium, Sparc, POWER and IBM System Z;
+
+- a large range of operating systems: Linux (including Android), 
+OpenBSD, FreeBSD, NetBSD, AIX, OpenIndiana (OpenSolaris), AIX, z/OS;
+
+- a range of different compilers: GCC, Clang and the z/OS C compiler.
+
+The test results show an interesting yet common trend -- i.e. common for 
+the different CPU types: the newer the CPU is, the more CPU execution 
+time jitter is present.
+
+[2] appendix F.37 contains entropy measurements on different operating 
+systems on the very same hardware, indicating that the jitter 
+measurements are present regardless of the OS.
+
+With the test results, Ted's concerns should be removed.
+
+[...]
+
+
+>> For devices like Linux routers, what we desperately need is hardware
+>> assist;  [or] mix
+>> in additional timing information either at kernel device driver
+>> level,
+>> or from systems such as HAVEGE.
+
+The concern with HAVEGE is that it is very complex. The implementation 
+is far from being straight forward.
+
+>> 
+>> What I'm against is relying only on solutions such as HAVEGE or
+>> replacing /dev/random with something scheme that only relies on CPU
+>> timing and ignores interrupt timing.
+
+>
+>My question is how to incorporate some of that into /dev/random.
+>At one point, timing info was used along with other stuff. Some
+>of that got deleted later, What is the current state? Should we
+>add more?
+
+Please see the suggestion for an integration with /dev/random given in 
+appendix B.3 of [2]. The source code for the integration is given in 
+patches/linux-3.9-random.patch which is described in patches/README. The 
+patch only utilizes the CPU Jitter RNG when the entropy in the entropy 
+pool falls below the low threshold, i.e. when no entropy from other 
+sources is present.
+
+[1] http://www.chronox.de/jent/jitterentropy-20130818.tar.bz2
+
+[2] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.pdf
+
+[3] http://www.gossamer-threads.com/lists/linux/kernel/1716565#1716565
+
+
+Ciao
+Stephan
 -- 
-1.7.9.5
+| Cui bono? |
