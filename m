@@ -1,56 +1,52 @@
-From: Joel Fernandes <joelf@ti.com>
-Subject: [PATCH v2 05/14] crypto: omap-aes: Sync SG before DMA operation
-Date: Sat, 17 Aug 2013 21:42:26 -0500
-Message-ID: <1376793755-30478-6-git-send-email-joelf@ti.com>
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH v2 02/14] crypto: omap-aes: Add useful debug macros
+Date: Sat, 17 Aug 2013 21:22:27 -0700
+Message-ID: <1376799747.2027.11.camel@joe-AO722>
 References: <1376793755-30478-1-git-send-email-joelf@ti.com>
+	 <1376793755-30478-3-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Linux OMAP List <linux-omap@vger.kernel.org>,
-	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Joel Fernandes <joelf@ti.com>
-To: Herbert Xu <herbert@gondor.hengli.com.au>,
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Mark Greer <mgreer@animalcreek.com>,
 	Tony Lindgren <tony@atomide.com>,
 	Santosh Shilimkar <santosh.shilimkar@ti.com>,
 	Rajendra Nayak <rnayak@ti.com>,
-	Lokesh Vutla <lokeshvutla@ti.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1376793755-30478-1-git-send-email-joelf@ti.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Lokesh Vutla <lokeshvutla@ti.com>,
+	Linux OMAP List <linux-omap@vger.kernel.org>,
+	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Joel Fernandes <joelf@ti.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from perches-mx.perches.com ([206.117.179.246]:40510 "EHLO
+	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750771Ab3HREW3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 18 Aug 2013 00:22:29 -0400
+In-Reply-To: <1376793755-30478-3-git-send-email-joelf@ti.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Earlier functions that did a similar sync are replaced by the dma_sync_sg_*
-which can operate on entire SG list.
+On Sat, 2013-08-17 at 21:42 -0500, Joel Fernandes wrote:
+> When DEBUG is enabled, these macros can be used to print variables in integer
+> and hex format, and clearly display which registers, offsets and values are
+> being read/written , including printing the names of the offsets and their values.
+> 
+> Note:
+> This patch results in a checkpatch error that cannot be fixed.
+> ERROR: Macros with multiple statements should be enclosed in a do - while loop
+> +#define omap_aes_read(dd, offset)                                      \
+> +       __raw_readl(dd->io_base + offset);                              \
+> +       pr_debug("omap_aes_read(" #offset ")\n");
+> 
+> Using do-while loop will break a lot of code such as:
+> ret = omap_aes_read(..);
 
-Signed-off-by: Joel Fernandes <joelf@ti.com>
----
- drivers/crypto/omap-aes.c |    4 ++++
- 1 file changed, 4 insertions(+)
+That's where you use a statement expression macro
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 64dd5c1..5e034a1 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -489,6 +489,8 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
- 	struct dma_slave_config cfg;
- 	int ret;
- 
-+	dma_sync_sg_for_device(dd->dev, dd->in_sg, in_sg_len, DMA_TO_DEVICE);
-+
- 	memset(&cfg, 0, sizeof(cfg));
- 
- 	cfg.src_addr = dd->phys_base + AES_REG_DATA_N(dd, 0);
-@@ -676,6 +678,8 @@ static void omap_aes_done_task(unsigned long data)
- 
- 	pr_debug("enter done_task\n");
- 
-+	dma_sync_sg_for_cpu(dd->dev, dd->in_sg, dd->in_sg_len, DMA_FROM_DEVICE);
-+
- 	omap_aes_crypt_dma_stop(dd);
- 	omap_aes_finish_req(dd, 0);
- 	omap_aes_handle_queue(dd, NULL);
--- 
-1.7.9.5
+#define omap_aes_read(dd, offset)					\
+({									\
+	pr_debug("omap_aes_read("omap_aes_read(" #offset ")\n");	\
+	__raw_readl((dd)->iobase + offset);				\
+})
