@@ -1,67 +1,101 @@
 From: Joel Fernandes <joelf@ti.com>
-Subject: [PATCH v2 03/14] crypto: omap-aes: Populate number of SG elements
-Date: Sat, 17 Aug 2013 21:42:24 -0500
-Message-ID: <1376793755-30478-4-git-send-email-joelf@ti.com>
+Subject: [PATCH v2 02/14] crypto: omap-aes: Add useful debug macros
+Date: Sat, 17 Aug 2013 21:42:23 -0500
+Message-ID: <1376793755-30478-3-git-send-email-joelf@ti.com>
 References: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Joel Fernandes <joelf@ti.com>, Linux OMAP List <linux-omap@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.hengli.com.au>, "David S. Miller"
- <davem@davemloft.net>, Mark Greer <mgreer@animalcreek.com>, Tony Lindgren
- <tony@atomide.com>, Santosh Shilimkar <santosh.shilimkar@ti.com>, Rajendra
- Nayak <rnayak@ti.com>, Lokesh Vutla <lokeshvutla@ti.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain
+Cc: Linux OMAP List <linux-omap@vger.kernel.org>,
+	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Joel Fernandes <joelf@ti.com>
+To: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Mark Greer <mgreer@animalcreek.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Santosh Shilimkar <santosh.shilimkar@ti.com>,
+	Rajendra Nayak <rnayak@ti.com>,
+	Lokesh Vutla <lokeshvutla@ti.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1376793755-30478-1-git-send-email-joelf@ti.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Crypto layer only passes nbytes but number of SG elements is needed for mapping
-or unmapping SGs at one time using dma_map* API and also needed to pass in for
-dmaengine prep function.
+When DEBUG is enabled, these macros can be used to print variables in integer
+and hex format, and clearly display which registers, offsets and values are
+being read/written , including printing the names of the offsets and their values.
 
-We call function added to scatterwalk for this purpose in omap_aes_handle_queue
-to populate the values which are used later.
+Note:
+This patch results in a checkpatch error that cannot be fixed.
+ERROR: Macros with multiple statements should be enclosed in a do - while loop
++#define omap_aes_read(dd, offset)                                      \
++       __raw_readl(dd->io_base + offset);                              \
++       pr_debug("omap_aes_read(" #offset ")\n");
+
+Using do-while loop will break a lot of code such as:
+ret = omap_aes_read(..);
+
+On the other hand, not using a do-while loop will only result in a spurious
+debug print message when DEBUG is enabled, all other issues would be caught at
+compile time if any. As such, there is no code in the driver as of now that
+requires a do-while loop, but there is code that will break if a do-while loop
+is used in the macro so we ignore the checkpatch error in this case.
 
 Signed-off-by: Joel Fernandes <joelf@ti.com>
 ---
- drivers/crypto/omap-aes.c |    6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/crypto/omap-aes.c |   22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 26b802b..e369e6e 100644
+index ee15b0f..26b802b 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -164,6 +164,8 @@ struct omap_aes_dev {
- 	void			*buf_out;
- 	int			dma_out;
- 	struct dma_chan		*dma_lch_out;
-+	int			in_sg_len;
-+	int			out_sg_len;
- 	dma_addr_t		dma_addr_out;
+@@ -13,7 +13,8 @@
+  *
+  */
  
- 	const struct omap_aes_pdata	*pdata;
-@@ -731,6 +733,10 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
- 	dd->out_offset = 0;
- 	dd->out_sg = req->dst;
+-#define pr_fmt(fmt) "%s: " fmt, __func__
++#define prn(num) pr_debug(#num "=%d\n", num)
++#define prx(num) pr_debug(#num "=%x\n", num)
  
-+	dd->in_sg_len = scatterwalk_bytes_sglen(dd->in_sg, dd->total);
-+	dd->out_sg_len = scatterwalk_bytes_sglen(dd->out_sg, dd->total);
-+	BUG_ON(dd->in_sg_len < 0 || dd->out_sg_len < 0);
-+
- 	rctx = ablkcipher_request_ctx(req);
- 	ctx = crypto_ablkcipher_ctx(crypto_ablkcipher_reqtfm(req));
- 	rctx->mode &= FLAGS_MODE_MASK;
+ #include <linux/err.h>
+ #include <linux/module.h>
+@@ -172,16 +173,35 @@ struct omap_aes_dev {
+ static LIST_HEAD(dev_list);
+ static DEFINE_SPINLOCK(list_lock);
+ 
++#ifdef DEBUG
++/*
++ * Note: In DEBUG mode, when using conditionals, omap_aes_read _must_
++ * be surrounded by braces otherwise you may see spurious prints.
++ */
++#define omap_aes_read(dd, offset)					\
++	__raw_readl(dd->io_base + offset);				\
++	pr_debug("omap_aes_read(" #offset ")\n");
++#else
+ static inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
+ {
+ 	return __raw_readl(dd->io_base + offset);
+ }
++#endif
+ 
++#ifdef DEBUG
++#define omap_aes_write(dd, offset, value)				\
++	do {								\
++		pr_debug("omap_aes_write(" #offset "=%x) value=%d\n",	\
++			 offset, value);				\
++		__raw_writel(value, dd->io_base + offset);		\
++	} while (0)
++#else
+ static inline void omap_aes_write(struct omap_aes_dev *dd, u32 offset,
+ 				  u32 value)
+ {
+ 	__raw_writel(value, dd->io_base + offset);
+ }
++#endif
+ 
+ static inline void omap_aes_write_mask(struct omap_aes_dev *dd, u32 offset,
+ 					u32 value, u32 mask)
 -- 
 1.7.9.5
