@@ -1,7 +1,7 @@
 From: Joel Fernandes <joelf@ti.com>
-Subject: [PATCH v2 08/14] crypto: omap-aes: PIO mode: Add IRQ handler and walk SGs
-Date: Sat, 17 Aug 2013 21:42:29 -0500
-Message-ID: <1376793755-30478-9-git-send-email-joelf@ti.com>
+Subject: [PATCH v2 04/14] crypto: omap-aes: Simplify DMA usage by using direct SGs
+Date: Sat, 17 Aug 2013 21:42:25 -0500
+Message-ID: <1376793755-30478-5-git-send-email-joelf@ti.com>
 References: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -22,143 +22,248 @@ In-Reply-To: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-We add an IRQ handler that implements a state-machine for PIO-mode and data
-structures for walking the scatter-gather list. The IRQ handler is called in
-succession both when data is available to read or next data can be sent for
-processing. This process continues till the entire in/out SG lists have been
-walked. Once the SG-list has been completely walked, the IRQ handler schedules
-the done_task tasklet.
+In early version of this driver, assumptions were made such as DMA layer
+requires contiguous buffers etc. Due to this, new buffers were allocated,
+mapped and used for DMA. These assumptions are no longer true and DMAEngine
+scatter-gather DMA doesn't have such requirements. We simply the DMA operations
+by directly using the scatter-gather buffers provided by the crypto layer
+instead of creating our own.
 
-Also add a useful macro that is used through out the IRQ code for a common
-pattern of calculating how much an SG list has been walked.  This improves code
-readability and avoids checkpatch errors.
+Lot of logic that handled DMA'ing only X number of bytes of the total, or as
+much as fitted into a 3rd party buffer is removed and is no longer required.
+
+Also, good performance improvement of atleast ~20% seen with encrypting a
+buffer size of 8K (1800 ops/sec vs 1400 ops/sec).  Improvement will be higher
+for much larger blocks though such benchmarking is left as an exercise for the
+reader.  Also DMA usage is much more simplified and coherent with rest of the
+code.
 
 Signed-off-by: Joel Fernandes <joelf@ti.com>
 ---
- drivers/crypto/omap-aes.c |   90 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 90 insertions(+)
+ drivers/crypto/omap-aes.c |  147 ++++++++-------------------------------------
+ 1 file changed, 25 insertions(+), 122 deletions(-)
 
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 9a964e8..889dc99 100644
+index e369e6e..64dd5c1 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -39,6 +39,8 @@
- #define DST_MAXBURST			4
- #define DMA_MIN				(DST_MAXBURST * sizeof(u32))
+@@ -480,22 +480,14 @@ static int sg_copy(struct scatterlist **sg, size_t *offset, void *buf,
+ }
  
-+#define _calc_walked(inout) (dd->inout##_walk.offset - dd->inout##_sg->offset)
-+
- /* OMAP TRM gives bitfields as start:end, where start is the higher bit
-    number. For example 7:0 */
- #define FLD_MASK(start, end)	(((1 << ((start) - (end) + 1)) - 1) << (end))
-@@ -91,6 +93,8 @@
- #define FLAGS_FAST		BIT(5)
- #define FLAGS_BUSY		BIT(6)
+ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
+-		struct scatterlist *in_sg, struct scatterlist *out_sg)
++		struct scatterlist *in_sg, struct scatterlist *out_sg,
++		int in_sg_len, int out_sg_len)
+ {
+ 	struct omap_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct omap_aes_dev *dd = ctx->dd;
+ 	struct dma_async_tx_descriptor *tx_in, *tx_out;
+ 	struct dma_slave_config cfg;
+-	dma_addr_t dma_addr_in = sg_dma_address(in_sg);
+-	int ret, length = sg_dma_len(in_sg);
+-
+-	pr_debug("len: %d\n", length);
+-
+-	dd->dma_size = length;
+-
+-	if (!(dd->flags & FLAGS_FAST))
+-		dma_sync_single_for_device(dd->dev, dma_addr_in, length,
+-					   DMA_TO_DEVICE);
++	int ret;
  
-+#define AES_BLOCK_WORDS		(AES_BLOCK_SIZE >> 2)
-+
- struct omap_aes_ctx {
- 	struct omap_aes_dev *dd;
+ 	memset(&cfg, 0, sizeof(cfg));
  
-@@ -156,6 +160,8 @@ struct omap_aes_dev {
- 	size_t				total;
- 	struct scatterlist		*in_sg;
- 	struct scatterlist		*out_sg;
-+	struct scatter_walk		in_walk;
-+	struct scatter_walk		out_walk;
- 	int			dma_in;
- 	struct dma_chan		*dma_lch_in;
- 	int			dma_out;
-@@ -852,6 +858,90 @@ static const struct omap_aes_pdata omap_aes_pdata_omap4 = {
- 	.minor_shift	= 0,
- };
+@@ -514,7 +506,7 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
+ 		return ret;
+ 	}
  
-+static irqreturn_t omap_aes_irq(int irq, void *dev_id)
-+{
-+	struct omap_aes_dev *dd = dev_id;
-+	u32 status, i;
-+	u32 *src, *dst;
-+
-+	status = omap_aes_read(dd, AES_REG_IRQ_STATUS(dd));
-+	if (status & AES_REG_IRQ_DATA_IN) {
-+		omap_aes_write(dd, AES_REG_IRQ_ENABLE(dd), 0x0);
-+
-+		BUG_ON(!dd->in_sg);
-+
-+		BUG_ON(_calc_walked(in) > dd->in_sg->length);
-+
-+		src = sg_virt(dd->in_sg) + _calc_walked(in);
-+
-+		for (i = 0; i < AES_BLOCK_WORDS; i++) {
-+			omap_aes_write(dd, AES_REG_DATA_N(dd, i), *src);
-+
-+			scatterwalk_advance(&dd->in_walk, 4);
-+			if (dd->in_sg->length == _calc_walked(in)) {
-+				dd->in_sg = scatterwalk_sg_next(dd->in_sg);
-+				if (dd->in_sg) {
-+					scatterwalk_start(&dd->in_walk,
-+							  dd->in_sg);
-+					src = sg_virt(dd->in_sg) +
-+					      _calc_walked(in);
-+				}
-+			} else {
-+				src++;
-+			}
-+		}
-+
-+		/* Clear IRQ status */
-+		status &= ~AES_REG_IRQ_DATA_IN;
-+		omap_aes_write(dd, AES_REG_IRQ_STATUS(dd), status);
-+
-+		/* Enable DATA_OUT interrupt */
-+		omap_aes_write(dd, AES_REG_IRQ_ENABLE(dd), 0x4);
-+
-+	} else if (status & AES_REG_IRQ_DATA_OUT) {
-+		omap_aes_write(dd, AES_REG_IRQ_ENABLE(dd), 0x0);
-+
-+		BUG_ON(!dd->out_sg);
-+
-+		BUG_ON(_calc_walked(out) > dd->out_sg->length);
-+
-+		dst = sg_virt(dd->out_sg) + _calc_walked(out);
-+
-+		for (i = 0; i < AES_BLOCK_WORDS; i++) {
-+			*dst = omap_aes_read(dd, AES_REG_DATA_N(dd, i));
-+			scatterwalk_advance(&dd->out_walk, 4);
-+			if (dd->out_sg->length == _calc_walked(out)) {
-+				dd->out_sg = scatterwalk_sg_next(dd->out_sg);
-+				if (dd->out_sg) {
-+					scatterwalk_start(&dd->out_walk,
-+							  dd->out_sg);
-+					dst = sg_virt(dd->out_sg) +
-+					      _calc_walked(out);
-+				}
-+			} else {
-+				dst++;
-+			}
-+		}
-+
-+		dd->total -= AES_BLOCK_SIZE;
-+
-+		BUG_ON(dd->total < 0);
-+
-+		/* Clear IRQ status */
-+		status &= ~AES_REG_IRQ_DATA_OUT;
-+		omap_aes_write(dd, AES_REG_IRQ_STATUS(dd), status);
-+
-+		if (!dd->total)
-+			/* All bytes read! */
-+			tasklet_schedule(&dd->done_task);
-+		else
-+			/* Enable DATA_IN interrupt for next block */
-+			omap_aes_write(dd, AES_REG_IRQ_ENABLE(dd), 0x2);
-+	}
-+
-+	return IRQ_HANDLED;
-+}
-+
- static const struct of_device_id omap_aes_of_match[] = {
- 	{
- 		.compatible	= "ti,omap2-aes",
+-	tx_in = dmaengine_prep_slave_sg(dd->dma_lch_in, in_sg, 1,
++	tx_in = dmaengine_prep_slave_sg(dd->dma_lch_in, in_sg, in_sg_len,
+ 					DMA_MEM_TO_DEV,
+ 					DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+ 	if (!tx_in) {
+@@ -533,7 +525,7 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
+ 		return ret;
+ 	}
+ 
+-	tx_out = dmaengine_prep_slave_sg(dd->dma_lch_out, out_sg, 1,
++	tx_out = dmaengine_prep_slave_sg(dd->dma_lch_out, out_sg, out_sg_len,
+ 					DMA_DEV_TO_MEM,
+ 					DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+ 	if (!tx_out) {
+@@ -551,7 +543,7 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
+ 	dma_async_issue_pending(dd->dma_lch_out);
+ 
+ 	/* start DMA */
+-	dd->pdata->trigger(dd, length);
++	dd->pdata->trigger(dd, dd->total);
+ 
+ 	return 0;
+ }
+@@ -560,93 +552,28 @@ static int omap_aes_crypt_dma_start(struct omap_aes_dev *dd)
+ {
+ 	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(
+ 					crypto_ablkcipher_reqtfm(dd->req));
+-	int err, fast = 0, in, out;
+-	size_t count;
+-	dma_addr_t addr_in, addr_out;
+-	struct scatterlist *in_sg, *out_sg;
+-	int len32;
++	int err;
+ 
+ 	pr_debug("total: %d\n", dd->total);
+ 
+-	if (sg_is_last(dd->in_sg) && sg_is_last(dd->out_sg)) {
+-		/* check for alignment */
+-		in = IS_ALIGNED((u32)dd->in_sg->offset, sizeof(u32));
+-		out = IS_ALIGNED((u32)dd->out_sg->offset, sizeof(u32));
+-
+-		fast = in && out;
++	err = dma_map_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
++	if (!err) {
++		dev_err(dd->dev, "dma_map_sg() error\n");
++		return -EINVAL;
+ 	}
+ 
+-	if (fast)  {
+-		count = min(dd->total, sg_dma_len(dd->in_sg));
+-		count = min(count, sg_dma_len(dd->out_sg));
+-
+-		if (count != dd->total) {
+-			pr_err("request length != buffer length\n");
+-			return -EINVAL;
+-		}
+-
+-		pr_debug("fast\n");
+-
+-		err = dma_map_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
+-		if (!err) {
+-			dev_err(dd->dev, "dma_map_sg() error\n");
+-			return -EINVAL;
+-		}
+-
+-		err = dma_map_sg(dd->dev, dd->out_sg, 1, DMA_FROM_DEVICE);
+-		if (!err) {
+-			dev_err(dd->dev, "dma_map_sg() error\n");
+-			dma_unmap_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
+-			return -EINVAL;
+-		}
+-
+-		addr_in = sg_dma_address(dd->in_sg);
+-		addr_out = sg_dma_address(dd->out_sg);
+-
+-		in_sg = dd->in_sg;
+-		out_sg = dd->out_sg;
+-
+-		dd->flags |= FLAGS_FAST;
+-
+-	} else {
+-		/* use cache buffers */
+-		count = sg_copy(&dd->in_sg, &dd->in_offset, dd->buf_in,
+-				 dd->buflen, dd->total, 0);
+-
+-		len32 = DIV_ROUND_UP(count, DMA_MIN) * DMA_MIN;
+-
+-		/*
+-		 * The data going into the AES module has been copied
+-		 * to a local buffer and the data coming out will go
+-		 * into a local buffer so set up local SG entries for
+-		 * both.
+-		 */
+-		sg_init_table(&dd->in_sgl, 1);
+-		dd->in_sgl.offset = dd->in_offset;
+-		sg_dma_len(&dd->in_sgl) = len32;
+-		sg_dma_address(&dd->in_sgl) = dd->dma_addr_in;
+-
+-		sg_init_table(&dd->out_sgl, 1);
+-		dd->out_sgl.offset = dd->out_offset;
+-		sg_dma_len(&dd->out_sgl) = len32;
+-		sg_dma_address(&dd->out_sgl) = dd->dma_addr_out;
+-
+-		in_sg = &dd->in_sgl;
+-		out_sg = &dd->out_sgl;
+-
+-		addr_in = dd->dma_addr_in;
+-		addr_out = dd->dma_addr_out;
+-
+-		dd->flags &= ~FLAGS_FAST;
+-
++	err = dma_map_sg(dd->dev, dd->out_sg, dd->out_sg_len, DMA_FROM_DEVICE);
++	if (!err) {
++		dev_err(dd->dev, "dma_map_sg() error\n");
++		return -EINVAL;
+ 	}
+ 
+-	dd->total -= count;
+-
+-	err = omap_aes_crypt_dma(tfm, in_sg, out_sg);
++	err = omap_aes_crypt_dma(tfm, dd->in_sg, dd->out_sg, dd->in_sg_len,
++				 dd->out_sg_len);
+ 	if (err) {
+-		dma_unmap_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
+-		dma_unmap_sg(dd->dev, dd->out_sg, 1, DMA_TO_DEVICE);
++		dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
++		dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len,
++			     DMA_FROM_DEVICE);
+ 	}
+ 
+ 	return err;
+@@ -667,7 +594,6 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
+ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+ {
+ 	int err = 0;
+-	size_t count;
+ 
+ 	pr_debug("total: %d\n", dd->total);
+ 
+@@ -676,21 +602,8 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+ 	dmaengine_terminate_all(dd->dma_lch_in);
+ 	dmaengine_terminate_all(dd->dma_lch_out);
+ 
+-	if (dd->flags & FLAGS_FAST) {
+-		dma_unmap_sg(dd->dev, dd->out_sg, 1, DMA_FROM_DEVICE);
+-		dma_unmap_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
+-	} else {
+-		dma_sync_single_for_device(dd->dev, dd->dma_addr_out,
+-					   dd->dma_size, DMA_FROM_DEVICE);
+-
+-		/* copy data */
+-		count = sg_copy(&dd->out_sg, &dd->out_offset, dd->buf_out,
+-				 dd->buflen, dd->dma_size, 1);
+-		if (count != dd->dma_size) {
+-			err = -EINVAL;
+-			pr_err("not all data converted: %u\n", count);
+-		}
+-	}
++	dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
++	dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len, DMA_FROM_DEVICE);
+ 
+ 	return err;
+ }
+@@ -760,21 +673,11 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ static void omap_aes_done_task(unsigned long data)
+ {
+ 	struct omap_aes_dev *dd = (struct omap_aes_dev *)data;
+-	int err;
+-
+-	pr_debug("enter\n");
+ 
+-	err = omap_aes_crypt_dma_stop(dd);
+-
+-	err = dd->err ? : err;
+-
+-	if (dd->total && !err) {
+-		err = omap_aes_crypt_dma_start(dd);
+-		if (!err)
+-			return; /* DMA started. Not fininishing. */
+-	}
++	pr_debug("enter done_task\n");
+ 
+-	omap_aes_finish_req(dd, err);
++	omap_aes_crypt_dma_stop(dd);
++	omap_aes_finish_req(dd, 0);
+ 	omap_aes_handle_queue(dd, NULL);
+ 
+ 	pr_debug("exit\n");
 -- 
 1.7.9.5
