@@ -1,100 +1,54 @@
 From: Joel Fernandes <joelf@ti.com>
-Subject: [PATCH v2 00/14] crypto: omap-aes: Improve DMA, add PIO mode and support for AM437x
-Date: Sat, 17 Aug 2013 21:42:21 -0500
-Message-ID: <1376793755-30478-1-git-send-email-joelf@ti.com>
+Subject: [PATCH v2 14/14] crypto: omap-aes: Kconfig: Add build support for
+ AM437x
+Date: Sat, 17 Aug 2013 21:42:35 -0500
+Message-ID: <1376793755-30478-15-git-send-email-joelf@ti.com>
+References: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Linux OMAP List <linux-omap@vger.kernel.org>,
-	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Mark Greer <mgreer@animalcreek.com>,
-	Tony Lindgren <tony@atomide.com>,
-	Santosh Shilimkar <santosh.shilimkar@ti.com>,
-	Rajendra Nayak <rnayak@ti.com>,
-	Lokesh Vutla <lokeshvutla@ti.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Joel Fernandes <joelf@ti.com>, Linux OMAP List <linux-omap@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.hengli.com.au>, "David S. Miller"
+ <davem@davemloft.net>, Mark Greer <mgreer@animalcreek.com>, Tony Lindgren
+ <tony@atomide.com>, Santosh Shilimkar <santosh.shilimkar@ti.com>, Rajendra
+ Nayak <rnayak@ti.com>, Lokesh Vutla <lokeshvutla@ti.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <1376793755-30478-1-git-send-email-joelf@ti.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-Following patch series rewrites the DMA code to be cleaner and faster. Earlier,
-only a single SG was used for DMA purpose, and the SG-list passed from the
-crypto layer was being copied and DMA'd one entry at a time. This turns out to
-be quite inefficient and lot of code, we replace it with much simpler approach
-that directly passes the SG-list from crypto to the DMA layers for cases where
-possible. For all cases where such a direct passing of SG list is not possible,
-we create a new SG-list and do the copying. This is still better than before, as
-we create an SG list as big as needed and not just 1-element list.
+For AM437x SoC, ARCH_OMAP2 and ARCH_OMAP3 is not enabled in the defconfig. We
+follow same thing as SHA driver, and add depends on ARCH_OMAP2PLUS so that the
+config is selectable for AES driver on AM437x SoC builds.
 
-We also add PIO mode support to the driver, and switch to it whenever the DMA
-channel allocation is not available. This also has shown to give good performance
-for small blocks as shown below.
+Signed-off-by: Joel Fernandes <joelf@ti.com>
+---
+ drivers/crypto/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Tests have been performed on AM335x, OMAP4 and AM437x SoCs.
-
-Below is a sample run on AM335x SoC (beaglebone board), showing
-performance improvement (20% for 8K blocks):
-
-With DMA rewrite (key size = 128-bit)
-16 byte blocks: 4318 operations in 1 seconds (69088 bytes)
-64 byte blocks: 4360 operations in 1 seconds (279040 bytes)
-256 byte blocks: 3609 operations in 1 seconds (923904 bytes)
-1024 byte blocks: 3418 operations in 1 seconds (3500032 bytes)
-8192 byte blocks: 1766 operations in 1 seconds (14467072 bytes)
-
-Without DMA rewrite:
-16 byte blocks: 4417 operations in 1 seconds (70672 bytes)
-64 byte blocks: 4221 operations in 1 seconds (270144 bytes)
-256 byte blocks: 3528 operations in 1 seconds (903168 bytes)
-1024 byte blocks: 3281 operations in 1 seconds (3359744 bytes)
-8192 byte blocks: 1460 operations in 1 seconds (11960320 bytes)
-
-With PIO mode, good performance is observed for small blocks:
-16 byte blocks: 20585 operations in 1 seconds (329360 bytes)
-64 byte blocks: 8106 operations in 1 seconds (518784 bytes)
-256 byte blocks: 2359 operations in 1 seconds (603904 bytes)
-1024 byte blocks: 605 operations in 1 seconds (619520 bytes)
-8192 byte blocks: 79 operations in 1 seconds (647168 bytes)
-
-Future work in this direction would be to dynamically change between PIO/DMA mode
-based on the block size.
-
-Changes since last series:
-* Unaligned cases for omap-aes are handled with patch: 
-   "Add support for cases of unaligned lengths"
-* Support for am437x SoC is added and tested.
-* Changes following review comments on debug patch 
-
-Note:
-  The debug patch:  "crypto: omap-aes: Add useful debug macros" will generate
-  a checkpatch error, which cannot be fixed. Refer to patch for error message
-  and reasons for why cannot be fixed, thanks.
-
-Joel Fernandes (14):
-  crypto: scatterwalk:  Add support for calculating number of SG
-    elements
-  crypto: omap-aes: Add useful debug macros
-  crypto: omap-aes: Populate number of SG elements
-  crypto: omap-aes: Simplify DMA usage by using direct SGs
-  crypto: omap-aes: Sync SG before DMA operation
-  crypto: omap-aes: Remove previously used intermediate buffers
-  crypto: omap-aes: Add IRQ info and helper macros
-  crypto: omap-aes: PIO mode: Add IRQ handler and walk SGs
-  crypto: omap-aes: PIO mode: platform data for OMAP4/AM437x and
-    trigger
-  crypto: omap-aes: Switch to PIO mode during probe
-  crypto: omap-aes: Add support for cases of unaligned lengths
-  crypto: omap-aes: Convert kzalloc to devm_kzalloc
-  crypto: omap-aes: Convert request_irq to devm_request_irq
-  crypto: omap-aes: Kconfig: Add build support for AM437x
-
- crypto/scatterwalk.c         |   22 ++
- drivers/crypto/Kconfig       |    2 +-
- drivers/crypto/omap-aes.c    |  466 +++++++++++++++++++++++-------------------
- include/crypto/scatterwalk.h |    2 +
- 4 files changed, 284 insertions(+), 208 deletions(-)
-
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index dffb855..e289afa 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -252,7 +252,7 @@ config CRYPTO_DEV_OMAP_SHAM
+ 
+ config CRYPTO_DEV_OMAP_AES
+ 	tristate "Support for OMAP AES hw engine"
+-	depends on ARCH_OMAP2 || ARCH_OMAP3
++	depends on ARCH_OMAP2 || ARCH_OMAP3 || ARCH_OMAP2PLUS
+ 	select CRYPTO_AES
+ 	select CRYPTO_BLKCIPHER2
+ 	help
 -- 
 1.7.9.5
