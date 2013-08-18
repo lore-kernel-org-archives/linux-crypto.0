@@ -1,269 +1,185 @@
 From: Joel Fernandes <joelf@ti.com>
-Subject: [PATCH v2 04/14] crypto: omap-aes: Simplify DMA usage by using direct SGs
-Date: Sat, 17 Aug 2013 21:42:25 -0500
-Message-ID: <1376793755-30478-5-git-send-email-joelf@ti.com>
+Subject: [PATCH v2 11/14] crypto: omap-aes: Add support for cases of unaligned
+ lengths
+Date: Sat, 17 Aug 2013 21:42:32 -0500
+Message-ID: <1376793755-30478-12-git-send-email-joelf@ti.com>
 References: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Linux OMAP List <linux-omap@vger.kernel.org>,
-	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Joel Fernandes <joelf@ti.com>
-To: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Mark Greer <mgreer@animalcreek.com>,
-	Tony Lindgren <tony@atomide.com>,
-	Santosh Shilimkar <santosh.shilimkar@ti.com>,
-	Rajendra Nayak <rnayak@ti.com>,
-	Lokesh Vutla <lokeshvutla@ti.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Joel Fernandes <joelf@ti.com>, Linux OMAP List <linux-omap@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.hengli.com.au>, "David S. Miller"
+ <davem@davemloft.net>, Mark Greer <mgreer@animalcreek.com>, Tony Lindgren
+ <tony@atomide.com>, Santosh Shilimkar <santosh.shilimkar@ti.com>, Rajendra
+ Nayak <rnayak@ti.com>, Lokesh Vutla <lokeshvutla@ti.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1376793755-30478-1-git-send-email-joelf@ti.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-In early version of this driver, assumptions were made such as DMA layer
-requires contiguous buffers etc. Due to this, new buffers were allocated,
-mapped and used for DMA. These assumptions are no longer true and DMAEngine
-scatter-gather DMA doesn't have such requirements. We simply the DMA operations
-by directly using the scatter-gather buffers provided by the crypto layer
-instead of creating our own.
+For cases where offset/length of on any page of the input SG is not aligned by
+AES_BLOCK_SIZE, we copy all the pages from the input SG list into a contiguous
+buffer and prepare a single element SG list for this buffer with length as the
+total bytes to crypt.
 
-Lot of logic that handled DMA'ing only X number of bytes of the total, or as
-much as fitted into a 3rd party buffer is removed and is no longer required.
+This is requried for cases such as when an SG list of 16 bytes total size
+contains 16 pages each containing 1 byte. DMA using the direct buffers of such
+instances is not possible.
 
-Also, good performance improvement of atleast ~20% seen with encrypting a
-buffer size of 8K (1800 ops/sec vs 1400 ops/sec).  Improvement will be higher
-for much larger blocks though such benchmarking is left as an exercise for the
-reader.  Also DMA usage is much more simplified and coherent with rest of the
-code.
+For this purpose, we first detect if the unaligned case and accordingly
+allocate enough number of pages to satisfy the request and prepare SG lists.
+We then copy data into the buffer, and copy data out of it on completion.
 
 Signed-off-by: Joel Fernandes <joelf@ti.com>
 ---
- drivers/crypto/omap-aes.c |  147 ++++++++-------------------------------------
- 1 file changed, 25 insertions(+), 122 deletions(-)
+ drivers/crypto/omap-aes.c |   86 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 83 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index e369e6e..64dd5c1 100644
+index d214dbf..cbeaaf4 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -480,22 +480,14 @@ static int sg_copy(struct scatterlist **sg, size_t *offset, void *buf,
- }
+@@ -157,9 +157,23 @@ struct omap_aes_dev {
+ 	struct tasklet_struct	queue_task;
  
- static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
--		struct scatterlist *in_sg, struct scatterlist *out_sg)
-+		struct scatterlist *in_sg, struct scatterlist *out_sg,
-+		int in_sg_len, int out_sg_len)
- {
- 	struct omap_aes_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct omap_aes_dev *dd = ctx->dd;
- 	struct dma_async_tx_descriptor *tx_in, *tx_out;
- 	struct dma_slave_config cfg;
--	dma_addr_t dma_addr_in = sg_dma_address(in_sg);
--	int ret, length = sg_dma_len(in_sg);
--
--	pr_debug("len: %d\n", length);
--
--	dd->dma_size = length;
--
--	if (!(dd->flags & FLAGS_FAST))
--		dma_sync_single_for_device(dd->dev, dma_addr_in, length,
--					   DMA_TO_DEVICE);
-+	int ret;
- 
- 	memset(&cfg, 0, sizeof(cfg));
- 
-@@ -514,7 +506,7 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
- 		return ret;
- 	}
- 
--	tx_in = dmaengine_prep_slave_sg(dd->dma_lch_in, in_sg, 1,
-+	tx_in = dmaengine_prep_slave_sg(dd->dma_lch_in, in_sg, in_sg_len,
- 					DMA_MEM_TO_DEV,
- 					DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
- 	if (!tx_in) {
-@@ -533,7 +525,7 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
- 		return ret;
- 	}
- 
--	tx_out = dmaengine_prep_slave_sg(dd->dma_lch_out, out_sg, 1,
-+	tx_out = dmaengine_prep_slave_sg(dd->dma_lch_out, out_sg, out_sg_len,
- 					DMA_DEV_TO_MEM,
- 					DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
- 	if (!tx_out) {
-@@ -551,7 +543,7 @@ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
- 	dma_async_issue_pending(dd->dma_lch_out);
- 
- 	/* start DMA */
--	dd->pdata->trigger(dd, length);
-+	dd->pdata->trigger(dd, dd->total);
- 
- 	return 0;
- }
-@@ -560,93 +552,28 @@ static int omap_aes_crypt_dma_start(struct omap_aes_dev *dd)
- {
- 	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(
- 					crypto_ablkcipher_reqtfm(dd->req));
--	int err, fast = 0, in, out;
--	size_t count;
--	dma_addr_t addr_in, addr_out;
--	struct scatterlist *in_sg, *out_sg;
--	int len32;
-+	int err;
- 
- 	pr_debug("total: %d\n", dd->total);
- 
--	if (sg_is_last(dd->in_sg) && sg_is_last(dd->out_sg)) {
--		/* check for alignment */
--		in = IS_ALIGNED((u32)dd->in_sg->offset, sizeof(u32));
--		out = IS_ALIGNED((u32)dd->out_sg->offset, sizeof(u32));
--
--		fast = in && out;
-+	err = dma_map_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
-+	if (!err) {
-+		dev_err(dd->dev, "dma_map_sg() error\n");
-+		return -EINVAL;
- 	}
- 
--	if (fast)  {
--		count = min(dd->total, sg_dma_len(dd->in_sg));
--		count = min(count, sg_dma_len(dd->out_sg));
--
--		if (count != dd->total) {
--			pr_err("request length != buffer length\n");
--			return -EINVAL;
--		}
--
--		pr_debug("fast\n");
--
--		err = dma_map_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
--		if (!err) {
--			dev_err(dd->dev, "dma_map_sg() error\n");
--			return -EINVAL;
--		}
--
--		err = dma_map_sg(dd->dev, dd->out_sg, 1, DMA_FROM_DEVICE);
--		if (!err) {
--			dev_err(dd->dev, "dma_map_sg() error\n");
--			dma_unmap_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
--			return -EINVAL;
--		}
--
--		addr_in = sg_dma_address(dd->in_sg);
--		addr_out = sg_dma_address(dd->out_sg);
--
--		in_sg = dd->in_sg;
--		out_sg = dd->out_sg;
--
--		dd->flags |= FLAGS_FAST;
--
--	} else {
--		/* use cache buffers */
--		count = sg_copy(&dd->in_sg, &dd->in_offset, dd->buf_in,
--				 dd->buflen, dd->total, 0);
--
--		len32 = DIV_ROUND_UP(count, DMA_MIN) * DMA_MIN;
--
--		/*
--		 * The data going into the AES module has been copied
--		 * to a local buffer and the data coming out will go
--		 * into a local buffer so set up local SG entries for
--		 * both.
--		 */
--		sg_init_table(&dd->in_sgl, 1);
--		dd->in_sgl.offset = dd->in_offset;
--		sg_dma_len(&dd->in_sgl) = len32;
--		sg_dma_address(&dd->in_sgl) = dd->dma_addr_in;
--
--		sg_init_table(&dd->out_sgl, 1);
--		dd->out_sgl.offset = dd->out_offset;
--		sg_dma_len(&dd->out_sgl) = len32;
--		sg_dma_address(&dd->out_sgl) = dd->dma_addr_out;
--
--		in_sg = &dd->in_sgl;
--		out_sg = &dd->out_sgl;
--
--		addr_in = dd->dma_addr_in;
--		addr_out = dd->dma_addr_out;
--
--		dd->flags &= ~FLAGS_FAST;
--
-+	err = dma_map_sg(dd->dev, dd->out_sg, dd->out_sg_len, DMA_FROM_DEVICE);
-+	if (!err) {
-+		dev_err(dd->dev, "dma_map_sg() error\n");
-+		return -EINVAL;
- 	}
- 
--	dd->total -= count;
--
--	err = omap_aes_crypt_dma(tfm, in_sg, out_sg);
-+	err = omap_aes_crypt_dma(tfm, dd->in_sg, dd->out_sg, dd->in_sg_len,
-+				 dd->out_sg_len);
- 	if (err) {
--		dma_unmap_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
--		dma_unmap_sg(dd->dev, dd->out_sg, 1, DMA_TO_DEVICE);
-+		dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
-+		dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len,
-+			     DMA_FROM_DEVICE);
- 	}
- 
- 	return err;
-@@ -667,7 +594,6 @@ static void omap_aes_finish_req(struct omap_aes_dev *dd, int err)
- static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
- {
- 	int err = 0;
--	size_t count;
- 
- 	pr_debug("total: %d\n", dd->total);
- 
-@@ -676,21 +602,8 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+ 	struct ablkcipher_request	*req;
++
++	/*
++	 * total is used by PIO mode for book keeping so introduce
++	 * variable total_save as need it to calc page_order
++	 */
+ 	size_t				total;
++	size_t				total_save;
++
+ 	struct scatterlist		*in_sg;
+ 	struct scatterlist		*out_sg;
++
++	/* Buffers for copying for unaligned cases */
++	struct scatterlist		in_sgl;
++	struct scatterlist		out_sgl;
++	struct scatterlist		*orig_out;
++	int				sgs_copied;
++
+ 	struct scatter_walk		in_walk;
+ 	struct scatter_walk		out_walk;
+ 	int			dma_in;
+@@ -543,12 +557,51 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
  	dmaengine_terminate_all(dd->dma_lch_in);
  	dmaengine_terminate_all(dd->dma_lch_out);
  
--	if (dd->flags & FLAGS_FAST) {
--		dma_unmap_sg(dd->dev, dd->out_sg, 1, DMA_FROM_DEVICE);
--		dma_unmap_sg(dd->dev, dd->in_sg, 1, DMA_TO_DEVICE);
--	} else {
--		dma_sync_single_for_device(dd->dev, dd->dma_addr_out,
--					   dd->dma_size, DMA_FROM_DEVICE);
+-	dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
+-	dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len, DMA_FROM_DEVICE);
 -
--		/* copy data */
--		count = sg_copy(&dd->out_sg, &dd->out_offset, dd->buf_out,
--				 dd->buflen, dd->dma_size, 1);
--		if (count != dd->dma_size) {
--			err = -EINVAL;
--			pr_err("not all data converted: %u\n", count);
--		}
--	}
-+	dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
-+	dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len, DMA_FROM_DEVICE);
- 
  	return err;
  }
-@@ -760,21 +673,11 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ 
++int omap_aes_check_aligned(struct scatterlist *sg)
++{
++	while (sg) {
++		if (!IS_ALIGNED(sg->offset, 4))
++			return -1;
++		if (!IS_ALIGNED(sg->length, AES_BLOCK_SIZE))
++			return -1;
++		sg = sg_next(sg);
++	}
++	return 0;
++}
++
++int omap_aes_copy_sgs(struct omap_aes_dev *dd)
++{
++	void *buf_in, *buf_out;
++	int pages;
++
++	pages = get_order(dd->total);
++
++	buf_in = (void *)__get_free_pages(GFP_ATOMIC, pages);
++	buf_out = (void *)__get_free_pages(GFP_ATOMIC, pages);
++
++	if (!buf_in || !buf_out) {
++		pr_err("Couldn't allocated pages for unaligned cases.\n");
++		return -1;
++	}
++
++	dd->orig_out = dd->out_sg;
++
++	sg_copy_buf(buf_in, dd->in_sg, 0, dd->total, 0);
++
++	sg_init_table(&dd->in_sgl, 1);
++	sg_set_buf(&dd->in_sgl, buf_in, dd->total);
++	dd->in_sg = &dd->in_sgl;
++
++	sg_init_table(&dd->out_sgl, 1);
++	sg_set_buf(&dd->out_sgl, buf_out, dd->total);
++	dd->out_sg = &dd->out_sgl;
++
++	return 0;
++}
++
+ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ 			       struct ablkcipher_request *req)
+ {
+@@ -582,9 +635,19 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ 	/* assign new request to device */
+ 	dd->req = req;
+ 	dd->total = req->nbytes;
++	dd->total_save = req->nbytes;
+ 	dd->in_sg = req->src;
+ 	dd->out_sg = req->dst;
+ 
++	if (omap_aes_check_aligned(dd->in_sg) ||
++	    omap_aes_check_aligned(dd->out_sg)) {
++		if (omap_aes_copy_sgs(dd))
++			pr_err("Failed to copy SGs for unaligned cases\n");
++		dd->sgs_copied = 1;
++	} else {
++		dd->sgs_copied = 0;
++	}
++
+ 	dd->in_sg_len = scatterwalk_bytes_sglen(dd->in_sg, dd->total);
+ 	dd->out_sg_len = scatterwalk_bytes_sglen(dd->out_sg, dd->total);
+ 	BUG_ON(dd->in_sg_len < 0 || dd->out_sg_len < 0);
+@@ -612,14 +675,31 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
  static void omap_aes_done_task(unsigned long data)
  {
  	struct omap_aes_dev *dd = (struct omap_aes_dev *)data;
--	int err;
--
--	pr_debug("enter\n");
++	void *buf_in, *buf_out;
++	int pages;
  
--	err = omap_aes_crypt_dma_stop(dd);
--
--	err = dd->err ? : err;
--
--	if (dd->total && !err) {
--		err = omap_aes_crypt_dma_start(dd);
--		if (!err)
--			return; /* DMA started. Not fininishing. */
--	}
-+	pr_debug("enter done_task\n");
+ 	pr_debug("enter done_task\n");
  
--	omap_aes_finish_req(dd, err);
-+	omap_aes_crypt_dma_stop(dd);
-+	omap_aes_finish_req(dd, 0);
+ 	if (!dd->pio_only) {
+ 		dma_sync_sg_for_device(dd->dev, dd->out_sg, dd->out_sg_len,
+ 				       DMA_FROM_DEVICE);
++		dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
++		dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len,
++			     DMA_FROM_DEVICE);
+ 		omap_aes_crypt_dma_stop(dd);
+ 	}
++
++	if (dd->sgs_copied) {
++		buf_in = sg_virt(&dd->in_sgl);
++		buf_out = sg_virt(&dd->out_sgl);
++
++		sg_copy_buf(buf_out, dd->orig_out, 0, dd->total_save, 1);
++
++		pages = get_order(dd->total_save);
++		free_pages((unsigned long)buf_in, pages);
++		free_pages((unsigned long)buf_out, pages);
++	}
++
+ 	omap_aes_finish_req(dd, 0);
  	omap_aes_handle_queue(dd, NULL);
  
- 	pr_debug("exit\n");
 -- 
 1.7.9.5
