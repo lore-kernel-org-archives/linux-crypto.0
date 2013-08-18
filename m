@@ -1,7 +1,7 @@
 From: Joel Fernandes <joelf@ti.com>
-Subject: [PATCH v2 13/14] crypto: omap-aes: Convert request_irq to devm_request_irq
-Date: Sat, 17 Aug 2013 21:42:34 -0500
-Message-ID: <1376793755-30478-14-git-send-email-joelf@ti.com>
+Subject: [PATCH v2 07/14] crypto: omap-aes: Add IRQ info and helper macros
+Date: Sat, 17 Aug 2013 21:42:28 -0500
+Message-ID: <1376793755-30478-8-git-send-email-joelf@ti.com>
 References: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -18,45 +18,54 @@ To: Herbert Xu <herbert@gondor.hengli.com.au>,
 	Rajendra Nayak <rnayak@ti.com>,
 	Lokesh Vutla <lokeshvutla@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:52862 "EHLO comal.ext.ti.com"
+Received: from comal.ext.ti.com ([198.47.26.152]:52861 "EHLO comal.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753812Ab3HRCnk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 17 Aug 2013 22:43:40 -0400
+	id S1754447Ab3HRCnj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 17 Aug 2013 22:43:39 -0400
 In-Reply-To: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Keeps request_irq exit/error code paths simpler.
+Add IRQ information to pdata and helper macros. These are required
+for PIO-mode support.
 
-Suggested-by: Lokesh Vutla <lokeshvutla@ti.com>
 Signed-off-by: Joel Fernandes <joelf@ti.com>
 ---
- drivers/crypto/omap-aes.c |    6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/crypto/omap-aes.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 6a4ac4a..ab449b5 100644
+index bbdd1c3..9a964e8 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -1197,7 +1197,7 @@ static int omap_aes_probe(struct platform_device *pdev)
- 			goto err_irq;
- 		}
+@@ -75,6 +75,10 @@
  
--		err = request_irq(irq, omap_aes_irq, 0,
-+		err = devm_request_irq(dev, irq, omap_aes_irq, 0,
- 				dev_name(dev), dd);
- 		if (err) {
- 			dev_err(dev, "Unable to grab omap-aes IRQ\n");
-@@ -1232,9 +1232,7 @@ err_algs:
- 		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
- 			crypto_unregister_alg(
- 					&dd->pdata->algs_info[i].algs_list[j]);
--	if (dd->pio_only)
--		free_irq(irq, dd);
--	else
-+	if (!dd->pio_only)
- 		omap_aes_dma_cleanup(dd);
- err_irq:
- 	tasklet_kill(&dd->done_task);
+ #define AES_REG_LENGTH_N(x)		(0x54 + ((x) * 0x04))
+ 
++#define AES_REG_IRQ_STATUS(dd)         ((dd)->pdata->irq_status_ofs)
++#define AES_REG_IRQ_ENABLE(dd)         ((dd)->pdata->irq_enable_ofs)
++#define AES_REG_IRQ_DATA_IN            BIT(1)
++#define AES_REG_IRQ_DATA_OUT           BIT(2)
+ #define DEFAULT_TIMEOUT		(5*HZ)
+ 
+ #define FLAGS_MODE_MASK		0x000f
+@@ -120,6 +124,8 @@ struct omap_aes_pdata {
+ 	u32		data_ofs;
+ 	u32		rev_ofs;
+ 	u32		mask_ofs;
++	u32             irq_enable_ofs;
++	u32             irq_status_ofs;
+ 
+ 	u32		dma_enable_in;
+ 	u32		dma_enable_out;
+@@ -836,6 +842,8 @@ static const struct omap_aes_pdata omap_aes_pdata_omap4 = {
+ 	.data_ofs	= 0x60,
+ 	.rev_ofs	= 0x80,
+ 	.mask_ofs	= 0x84,
++	.irq_status_ofs = 0x8c,
++	.irq_enable_ofs = 0x90,
+ 	.dma_enable_in	= BIT(5),
+ 	.dma_enable_out	= BIT(6),
+ 	.major_mask	= 0x0700,
 -- 
 1.7.9.5
