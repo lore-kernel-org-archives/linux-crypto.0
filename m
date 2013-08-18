@@ -1,185 +1,180 @@
 From: Joel Fernandes <joelf@ti.com>
-Subject: [PATCH v2 11/14] crypto: omap-aes: Add support for cases of unaligned
- lengths
-Date: Sat, 17 Aug 2013 21:42:32 -0500
-Message-ID: <1376793755-30478-12-git-send-email-joelf@ti.com>
+Subject: [PATCH v2 06/14] crypto: omap-aes: Remove previously used intermediate buffers
+Date: Sat, 17 Aug 2013 21:42:27 -0500
+Message-ID: <1376793755-30478-7-git-send-email-joelf@ti.com>
 References: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Joel Fernandes <joelf@ti.com>, Linux OMAP List <linux-omap@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.hengli.com.au>, "David S. Miller"
- <davem@davemloft.net>, Mark Greer <mgreer@animalcreek.com>, Tony Lindgren
- <tony@atomide.com>, Santosh Shilimkar <santosh.shilimkar@ti.com>, Rajendra
- Nayak <rnayak@ti.com>, Lokesh Vutla <lokeshvutla@ti.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain
+Cc: Linux OMAP List <linux-omap@vger.kernel.org>,
+	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Joel Fernandes <joelf@ti.com>
+To: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Mark Greer <mgreer@animalcreek.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Santosh Shilimkar <santosh.shilimkar@ti.com>,
+	Rajendra Nayak <rnayak@ti.com>,
+	Lokesh Vutla <lokeshvutla@ti.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1376793755-30478-1-git-send-email-joelf@ti.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-For cases where offset/length of on any page of the input SG is not aligned by
-AES_BLOCK_SIZE, we copy all the pages from the input SG list into a contiguous
-buffer and prepare a single element SG list for this buffer with length as the
-total bytes to crypt.
-
-This is requried for cases such as when an SG list of 16 bytes total size
-contains 16 pages each containing 1 byte. DMA using the direct buffers of such
-instances is not possible.
-
-For this purpose, we first detect if the unaligned case and accordingly
-allocate enough number of pages to satisfy the request and prepare SG lists.
-We then copy data into the buffer, and copy data out of it on completion.
+Intermdiate buffers were allocated, mapped and used for DMA.  These are no
+longer required as we use the SGs from crypto layer directly in previous
+commits in the series. Also along with it, remove the logic for copying SGs
+etc as they are no longer used, and all the associated variables in omap_aes_device.
 
 Signed-off-by: Joel Fernandes <joelf@ti.com>
 ---
- drivers/crypto/omap-aes.c |   86 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 83 insertions(+), 3 deletions(-)
+ drivers/crypto/omap-aes.c |   90 ---------------------------------------------
+ 1 file changed, 90 deletions(-)
 
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index d214dbf..cbeaaf4 100644
+index 5e034a1..bbdd1c3 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -157,9 +157,23 @@ struct omap_aes_dev {
- 	struct tasklet_struct	queue_task;
- 
+@@ -149,25 +149,13 @@ struct omap_aes_dev {
  	struct ablkcipher_request	*req;
-+
-+	/*
-+	 * total is used by PIO mode for book keeping so introduce
-+	 * variable total_save as need it to calc page_order
-+	 */
  	size_t				total;
-+	size_t				total_save;
-+
  	struct scatterlist		*in_sg;
+-	struct scatterlist		in_sgl;
+-	size_t				in_offset;
  	struct scatterlist		*out_sg;
-+
-+	/* Buffers for copying for unaligned cases */
-+	struct scatterlist		in_sgl;
-+	struct scatterlist		out_sgl;
-+	struct scatterlist		*orig_out;
-+	int				sgs_copied;
-+
- 	struct scatter_walk		in_walk;
- 	struct scatter_walk		out_walk;
- 	int			dma_in;
-@@ -543,12 +557,51 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
- 	dmaengine_terminate_all(dd->dma_lch_in);
- 	dmaengine_terminate_all(dd->dma_lch_out);
- 
--	dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
--	dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len, DMA_FROM_DEVICE);
+-	struct scatterlist		out_sgl;
+-	size_t				out_offset;
 -
+-	size_t			buflen;
+-	void			*buf_in;
+-	size_t			dma_size;
+ 	int			dma_in;
+ 	struct dma_chan		*dma_lch_in;
+-	dma_addr_t		dma_addr_in;
+-	void			*buf_out;
+ 	int			dma_out;
+ 	struct dma_chan		*dma_lch_out;
+ 	int			in_sg_len;
+ 	int			out_sg_len;
+-	dma_addr_t		dma_addr_out;
+-
+ 	const struct omap_aes_pdata	*pdata;
+ };
+ 
+@@ -352,33 +340,6 @@ static int omap_aes_dma_init(struct omap_aes_dev *dd)
+ 	dd->dma_lch_out = NULL;
+ 	dd->dma_lch_in = NULL;
+ 
+-	dd->buf_in = (void *)__get_free_pages(GFP_KERNEL, OMAP_AES_CACHE_SIZE);
+-	dd->buf_out = (void *)__get_free_pages(GFP_KERNEL, OMAP_AES_CACHE_SIZE);
+-	dd->buflen = PAGE_SIZE << OMAP_AES_CACHE_SIZE;
+-	dd->buflen &= ~(AES_BLOCK_SIZE - 1);
+-
+-	if (!dd->buf_in || !dd->buf_out) {
+-		dev_err(dd->dev, "unable to alloc pages.\n");
+-		goto err_alloc;
+-	}
+-
+-	/* MAP here */
+-	dd->dma_addr_in = dma_map_single(dd->dev, dd->buf_in, dd->buflen,
+-					 DMA_TO_DEVICE);
+-	if (dma_mapping_error(dd->dev, dd->dma_addr_in)) {
+-		dev_err(dd->dev, "dma %d bytes error\n", dd->buflen);
+-		err = -EINVAL;
+-		goto err_map_in;
+-	}
+-
+-	dd->dma_addr_out = dma_map_single(dd->dev, dd->buf_out, dd->buflen,
+-					  DMA_FROM_DEVICE);
+-	if (dma_mapping_error(dd->dev, dd->dma_addr_out)) {
+-		dev_err(dd->dev, "dma %d bytes error\n", dd->buflen);
+-		err = -EINVAL;
+-		goto err_map_out;
+-	}
+-
+ 	dma_cap_zero(mask);
+ 	dma_cap_set(DMA_SLAVE, mask);
+ 
+@@ -405,14 +366,6 @@ static int omap_aes_dma_init(struct omap_aes_dev *dd)
+ err_dma_out:
+ 	dma_release_channel(dd->dma_lch_in);
+ err_dma_in:
+-	dma_unmap_single(dd->dev, dd->dma_addr_out, dd->buflen,
+-			 DMA_FROM_DEVICE);
+-err_map_out:
+-	dma_unmap_single(dd->dev, dd->dma_addr_in, dd->buflen, DMA_TO_DEVICE);
+-err_map_in:
+-	free_pages((unsigned long)dd->buf_out, OMAP_AES_CACHE_SIZE);
+-	free_pages((unsigned long)dd->buf_in, OMAP_AES_CACHE_SIZE);
+-err_alloc:
+ 	if (err)
+ 		pr_err("error: %d\n", err);
  	return err;
+@@ -422,11 +375,6 @@ static void omap_aes_dma_cleanup(struct omap_aes_dev *dd)
+ {
+ 	dma_release_channel(dd->dma_lch_out);
+ 	dma_release_channel(dd->dma_lch_in);
+-	dma_unmap_single(dd->dev, dd->dma_addr_out, dd->buflen,
+-			 DMA_FROM_DEVICE);
+-	dma_unmap_single(dd->dev, dd->dma_addr_in, dd->buflen, DMA_TO_DEVICE);
+-	free_pages((unsigned long)dd->buf_out, OMAP_AES_CACHE_SIZE);
+-	free_pages((unsigned long)dd->buf_in, OMAP_AES_CACHE_SIZE);
  }
  
-+int omap_aes_check_aligned(struct scatterlist *sg)
-+{
-+	while (sg) {
-+		if (!IS_ALIGNED(sg->offset, 4))
-+			return -1;
-+		if (!IS_ALIGNED(sg->length, AES_BLOCK_SIZE))
-+			return -1;
-+		sg = sg_next(sg);
-+	}
-+	return 0;
-+}
-+
-+int omap_aes_copy_sgs(struct omap_aes_dev *dd)
-+{
-+	void *buf_in, *buf_out;
-+	int pages;
-+
-+	pages = get_order(dd->total);
-+
-+	buf_in = (void *)__get_free_pages(GFP_ATOMIC, pages);
-+	buf_out = (void *)__get_free_pages(GFP_ATOMIC, pages);
-+
-+	if (!buf_in || !buf_out) {
-+		pr_err("Couldn't allocated pages for unaligned cases.\n");
-+		return -1;
-+	}
-+
-+	dd->orig_out = dd->out_sg;
-+
-+	sg_copy_buf(buf_in, dd->in_sg, 0, dd->total, 0);
-+
-+	sg_init_table(&dd->in_sgl, 1);
-+	sg_set_buf(&dd->in_sgl, buf_in, dd->total);
-+	dd->in_sg = &dd->in_sgl;
-+
-+	sg_init_table(&dd->out_sgl, 1);
-+	sg_set_buf(&dd->out_sgl, buf_out, dd->total);
-+	dd->out_sg = &dd->out_sgl;
-+
-+	return 0;
-+}
-+
- static int omap_aes_handle_queue(struct omap_aes_dev *dd,
- 			       struct ablkcipher_request *req)
- {
-@@ -582,9 +635,19 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ static void sg_copy_buf(void *buf, struct scatterlist *sg,
+@@ -443,42 +391,6 @@ static void sg_copy_buf(void *buf, struct scatterlist *sg,
+ 	scatterwalk_done(&walk, out, 0);
+ }
+ 
+-static int sg_copy(struct scatterlist **sg, size_t *offset, void *buf,
+-		   size_t buflen, size_t total, int out)
+-{
+-	unsigned int count, off = 0;
+-
+-	while (buflen && total) {
+-		count = min((*sg)->length - *offset, total);
+-		count = min(count, buflen);
+-
+-		if (!count)
+-			return off;
+-
+-		/*
+-		 * buflen and total are AES_BLOCK_SIZE size aligned,
+-		 * so count should be also aligned
+-		 */
+-
+-		sg_copy_buf(buf + off, *sg, *offset, count, out);
+-
+-		off += count;
+-		buflen -= count;
+-		*offset += count;
+-		total -= count;
+-
+-		if (*offset == (*sg)->length) {
+-			*sg = sg_next(*sg);
+-			if (*sg)
+-				*offset = 0;
+-			else
+-				total = 0;
+-		}
+-	}
+-
+-	return off;
+-}
+-
+ static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
+ 		struct scatterlist *in_sg, struct scatterlist *out_sg,
+ 		int in_sg_len, int out_sg_len)
+@@ -643,9 +555,7 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
  	/* assign new request to device */
  	dd->req = req;
  	dd->total = req->nbytes;
-+	dd->total_save = req->nbytes;
+-	dd->in_offset = 0;
  	dd->in_sg = req->src;
+-	dd->out_offset = 0;
  	dd->out_sg = req->dst;
  
-+	if (omap_aes_check_aligned(dd->in_sg) ||
-+	    omap_aes_check_aligned(dd->out_sg)) {
-+		if (omap_aes_copy_sgs(dd))
-+			pr_err("Failed to copy SGs for unaligned cases\n");
-+		dd->sgs_copied = 1;
-+	} else {
-+		dd->sgs_copied = 0;
-+	}
-+
  	dd->in_sg_len = scatterwalk_bytes_sglen(dd->in_sg, dd->total);
- 	dd->out_sg_len = scatterwalk_bytes_sglen(dd->out_sg, dd->total);
- 	BUG_ON(dd->in_sg_len < 0 || dd->out_sg_len < 0);
-@@ -612,14 +675,31 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
- static void omap_aes_done_task(unsigned long data)
- {
- 	struct omap_aes_dev *dd = (struct omap_aes_dev *)data;
-+	void *buf_in, *buf_out;
-+	int pages;
- 
- 	pr_debug("enter done_task\n");
- 
- 	if (!dd->pio_only) {
- 		dma_sync_sg_for_device(dd->dev, dd->out_sg, dd->out_sg_len,
- 				       DMA_FROM_DEVICE);
-+		dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
-+		dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len,
-+			     DMA_FROM_DEVICE);
- 		omap_aes_crypt_dma_stop(dd);
- 	}
-+
-+	if (dd->sgs_copied) {
-+		buf_in = sg_virt(&dd->in_sgl);
-+		buf_out = sg_virt(&dd->out_sgl);
-+
-+		sg_copy_buf(buf_out, dd->orig_out, 0, dd->total_save, 1);
-+
-+		pages = get_order(dd->total_save);
-+		free_pages((unsigned long)buf_in, pages);
-+		free_pages((unsigned long)buf_out, pages);
-+	}
-+
- 	omap_aes_finish_req(dd, 0);
- 	omap_aes_handle_queue(dd, NULL);
- 
 -- 
 1.7.9.5
