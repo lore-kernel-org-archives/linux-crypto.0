@@ -1,80 +1,41 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH][RFC] Tests on 200 different CPUs/Arches and OSes with CPU Jitter RNG
-Date: Tue, 20 Aug 2013 08:20:40 +0200
-Message-ID: <114750096.FHpdnNQbA1@tauon>
-References: <2846522.WmUuVkVV56@tauon>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch] crypto: sahara - checking the wrong variable
+Date: Tue, 20 Aug 2013 11:51:41 +0300
+Message-ID: <20130820085141.GA7469@elgon.mountain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: sandyinchina@gmail.com, Theodore Tso <tytso@mit.edu>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2846522.WmUuVkVV56@tauon>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <rob.herring@calxeda.com>,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.hengli.com.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:45773 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751425Ab3HTIwE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Aug 2013 04:52:04 -0400
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Sonntag, 18. August 2013, 20:05:52 schrieb Stephan Mueller:
+There is a typo here.  "dev->hw_link[]" is an array, not a pointer, so
+the check is nonsense.  We should be checking recently allocated
+"dev->hw_link[0]" instead.
 
-Hi Ted, Sandy,
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-For FIPS 140-2, there is currently a draft of an Implementation Guidance 
-discussed covering the requirements of seed sources for deterministic 
-random number generators. The standard seed source when having no 
-hardware RNGs is either /dev/urandom or /dev/random. Please note that 
-the current discussion explicitly prohibits the use of /dev/urandom for 
-FIPS 140-2 compliant systems.
-
-In addition, the recommendation of SP800-90B is available in draft form 
-at [1] placing quite severe requirements on seed sources. After 
-assessing the above mentioned IG discussion and in discussions with the 
-German BSI, these governmental folks seem to interpret the concept of 
-entropy as solely information theoretical entropy. They seem to 
-disregard cryptographic strength added by a whitening function. 
-Therefore, my gut feeling is that /dev/urandom is also questioned by 
-SP800-90B -- but I have no proof at this point.
-
-That focus on information theoretical entropy ultimately implies that 
-only /dev/random can be used and /dev/urandom must not be used. 
-Naturally, many people are not happy with that due to the blocking 
-behavior. Especially in a headless environment like server systems, 
-Linux is currently starved of entropy. This is even more a problem with 
-virtualized environments. For example, some time ago we tried to obtain 
-48 bytes out of /dev/random on a PPC system after the entropy pools 
-where completely drained. Well, we got it after some 20 hours as the 
-system was quiet (it may now be a bit better with the interrupt usage in 
-current kernels, but still there will be a noticeable block).
-
-Now, people will scream: those governmental guys sell snake oil and we 
-should still use /dev/urandom. And I have to concur. Yet, I am just 
-delivering the message. With the German BSI, the last discussion showed 
-that they are open to allowing /dev/urandom based on extensive 
-discussions. Yet, you have to make quite a stance to prove that.
-
->- addition of a patch to integrate the RNG into /dev/random as
->explained in appendix B.3 of [2], although the long-term goal of the
->RNG is rather the integration into the kernel crypto API when
->considering the Linux kernel as outlined in appendix B.1 of [2]
-
-All in all, with the suggested CPU Jitter RNG, all of this would be an 
-issue of the past on systems the init function considers appropriate -- 
-in my tests more than 95% of all systems are accepted. When using my 
-patch on /dev/random, dd shows a throughput of about 6kb/s on my system 
-when pulling out megabytes of data. It will be slower on slower systems, 
-but yet it will not block. Moreover when pulling data for seed which is 
-only a few bytes at a time, the invocation of /dev/random will not show 
-any noticeable delay.
-
-PS: As I mentioned earlier, however, my long term goal would be that 
-callers would disregard /dev/random entirely as it is a central entropy 
-source and therefore the prime spot for attacks to reduce entropy. With 
-the jitter RNG, even unprivileged user space can have its own instance 
-of a seed source.
-
-
-[1] http://csrc.nist.gov/publications/PubsDrafts.html#SP-800-90-B
-
-
-Ciao
-Stephan
--- 
-| Cui bono? |
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index b076d81..d7bb8ba 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -955,7 +955,7 @@ static int sahara_probe(struct platform_device *pdev)
+ 	dev->hw_link[0] = dma_alloc_coherent(&pdev->dev,
+ 			SAHARA_MAX_HW_LINK * sizeof(struct sahara_hw_link),
+ 			&dev->hw_phys_link[0], GFP_KERNEL);
+-	if (!dev->hw_link) {
++	if (!dev->hw_link[0]) {
+ 		dev_err(&pdev->dev, "Could not allocate hw links\n");
+ 		err = -ENOMEM;
+ 		goto err_link;
