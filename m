@@ -1,77 +1,80 @@
-From: Chen Gang <gang.chen@asianux.com>
-Subject: Re: [PATCH] kernel/padata.c: always check the return value of __padata_remove_cpu()
- and __padata_add_cpu()
-Date: Tue, 20 Aug 2013 11:44:31 +0800
-Message-ID: <5212E61F.7010602@asianux.com>
-References: <5212E5E4.8010408@asianux.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH][RFC] Tests on 200 different CPUs/Arches and OSes with CPU Jitter RNG
+Date: Tue, 20 Aug 2013 08:20:40 +0200
+Message-ID: <114750096.FHpdnNQbA1@tauon>
+References: <2846522.WmUuVkVV56@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: steffen.klassert@secunet.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from intranet.asianux.com ([58.214.24.6]:47496 "EHLO
-	intranet.asianux.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751553Ab3HTDpd (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Aug 2013 23:45:33 -0400
-In-Reply-To: <5212E5E4.8010408@asianux.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: sandyinchina@gmail.com, Theodore Tso <tytso@mit.edu>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <2846522.WmUuVkVV56@tauon>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
+
+Am Sonntag, 18. August 2013, 20:05:52 schrieb Stephan Mueller:
+
+Hi Ted, Sandy,
+
+For FIPS 140-2, there is currently a draft of an Implementation Guidance 
+discussed covering the requirements of seed sources for deterministic 
+random number generators. The standard seed source when having no 
+hardware RNGs is either /dev/urandom or /dev/random. Please note that 
+the current discussion explicitly prohibits the use of /dev/urandom for 
+FIPS 140-2 compliant systems.
+
+In addition, the recommendation of SP800-90B is available in draft form 
+at [1] placing quite severe requirements on seed sources. After 
+assessing the above mentioned IG discussion and in discussions with the 
+German BSI, these governmental folks seem to interpret the concept of 
+entropy as solely information theoretical entropy. They seem to 
+disregard cryptographic strength added by a whitening function. 
+Therefore, my gut feeling is that /dev/urandom is also questioned by 
+SP800-90B -- but I have no proof at this point.
+
+That focus on information theoretical entropy ultimately implies that 
+only /dev/random can be used and /dev/urandom must not be used. 
+Naturally, many people are not happy with that due to the blocking 
+behavior. Especially in a headless environment like server systems, 
+Linux is currently starved of entropy. This is even more a problem with 
+virtualized environments. For example, some time ago we tried to obtain 
+48 bytes out of /dev/random on a PPC system after the entropy pools 
+where completely drained. Well, we got it after some 20 hours as the 
+system was quiet (it may now be a bit better with the interrupt usage in 
+current kernels, but still there will be a noticeable block).
+
+Now, people will scream: those governmental guys sell snake oil and we 
+should still use /dev/urandom. And I have to concur. Yet, I am just 
+delivering the message. With the German BSI, the last discussion showed 
+that they are open to allowing /dev/urandom based on extensive 
+discussions. Yet, you have to make quite a stance to prove that.
+
+>- addition of a patch to integrate the RNG into /dev/random as
+>explained in appendix B.3 of [2], although the long-term goal of the
+>RNG is rather the integration into the kernel crypto API when
+>considering the Linux kernel as outlined in appendix B.1 of [2]
+
+All in all, with the suggested CPU Jitter RNG, all of this would be an 
+issue of the past on systems the init function considers appropriate -- 
+in my tests more than 95% of all systems are accepted. When using my 
+patch on /dev/random, dd shows a throughput of about 6kb/s on my system 
+when pulling out megabytes of data. It will be slower on slower systems, 
+but yet it will not block. Moreover when pulling data for seed which is 
+only a few bytes at a time, the invocation of /dev/random will not show 
+any noticeable delay.
+
+PS: As I mentioned earlier, however, my long term goal would be that 
+callers would disregard /dev/random entirely as it is a central entropy 
+source and therefore the prime spot for attacks to reduce entropy. With 
+the jitter RNG, even unprivileged user space can have its own instance 
+of a seed source.
 
 
-If this patch is correct, better to let CPU_ONLINE and CPU_DOWN_FAILED
-share the same code.
-
-And do we need a comment "/* fall through */" between CPU_UP_CANCELED
-and CPU_DOWN_FAILED (or it is another bug, need a 'break' statement) ?
-
-At last, also better to let CPU_DOWN_PREPARE and CPU_UP_CANCELED share
-the same code (if need a 'break'), or share the most of code (if "fall
-through").
-
-Thanks.
-
-On 08/20/2013 11:43 AM, Chen Gang wrote:
-> When failure occures, __padata_add_cpu() and __padata_remove_cpu() will
-> return -ENOMEM, which need be noticed in any cases (even in cleaning up
-> cases).
-> 
-> Signed-off-by: Chen Gang <gang.chen@asianux.com>
-> ---
->  kernel/padata.c |    8 ++++++--
->  1 files changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/kernel/padata.c b/kernel/padata.c
-> index 072f4ee..6a124cd 100644
-> --- a/kernel/padata.c
-> +++ b/kernel/padata.c
-> @@ -871,16 +871,20 @@ static int padata_cpu_callback(struct notifier_block *nfb,
->  		if (!pinst_has_cpu(pinst, cpu))
->  			break;
->  		mutex_lock(&pinst->lock);
-> -		__padata_remove_cpu(pinst, cpu);
-> +		err = __padata_remove_cpu(pinst, cpu);
->  		mutex_unlock(&pinst->lock);
-> +		if (err)
-> +			return notifier_from_errno(err);
->  
->  	case CPU_DOWN_FAILED:
->  	case CPU_DOWN_FAILED_FROZEN:
->  		if (!pinst_has_cpu(pinst, cpu))
->  			break;
->  		mutex_lock(&pinst->lock);
-> -		__padata_add_cpu(pinst, cpu);
-> +		err = __padata_add_cpu(pinst, cpu);
->  		mutex_unlock(&pinst->lock);
-> +		if (err)
-> +			return notifier_from_errno(err);
->  	}
->  
->  	return NOTIFY_OK;
-> 
+[1] http://csrc.nist.gov/publications/PubsDrafts.html#SP-800-90-B
 
 
+Ciao
+Stephan
 -- 
-Chen Gang
+| Cui bono? |
