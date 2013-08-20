@@ -1,41 +1,173 @@
-From: Stephen Warren <swarren-3lzwWm7+Weoh9ZMKESR00Q@public.gmane.org>
-Subject: Re: [patch] crypto: tegra-aes - bitwise vs logical and
-Date: Tue, 20 Aug 2013 10:31:41 -0600
-Message-ID: <521399ED.9030701@wwwdotorg.org>
-References: <20130820085447.GA20170@elgon.mountain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	Grant Likely <grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-	Rob Herring <rob.herring-bsGFqQB8/DxBDgjK7y7TUQ@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-	Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130820085447.GA20170-mgFCXtclrQlZLf2FXnZxJA@public.gmane.org>
-Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Olof Johansson <olof@lixom.net>
+Subject: [PATCH] hwrng: reorder OMAP TRNG driver code
+Date: Tue, 20 Aug 2013 11:07:53 -0700
+Message-ID: <1377022073-28198-1-git-send-email-olof@lixom.net>
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-omap@vger.kernel.org, Olof Johansson <olof@lixom.net>,
+	Lokesh Vutla <lokeshvutla@ti.com>
+To: herbert@gondor.hengli.com.au
+Return-path: <linux-omap-owner@vger.kernel.org>
+Sender: linux-omap-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 08/20/2013 02:54 AM, Dan Carpenter wrote:
-> The bug here is that:
-> 
-> 	while (eng_busy & (!icq_empty) & dma_busy)
-> 
-> is never true because it's using bitwise instead of logical ANDs.  The
-> other bitwise AND conditions work as intended but I changed them as well
-> for consistency.
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-> ---
-> Static checker stuff.  I don't have the hardware.
+The newly added omap4 support in the driver was added without
+consideration for building older configs. When building omap1_defconfig,
+it resulted in:
 
-Varun, can you please test the driver with this change applied and make
-sure it works correctly.
+drivers/char/hw_random/omap-rng.c:190:12: warning: 'omap4_rng_init' defined but not used [-Wunused-function]
+drivers/char/hw_random/omap-rng.c:215:13: warning: 'omap4_rng_cleanup' defined but not used [-Wunused-function]
+drivers/char/hw_random/omap-rng.c:251:20: warning: 'omap4_rng_irq' defined but not used [-Wunused-function]
 
-If you could also update our internal testing wiki with the steps you
-use for this testing, that'd be great too.
+Move the code around so it is grouped with its operations struct, which
+for the omap4 case means also under the #ifdef CONFIG_OF, where it needs
+to be.
 
-Thanks.
+Signed-off-by: Olof Johansson <olof@lixom.net>
+Cc: Lokesh Vutla <lokeshvutla@ti.com>
+---
+ drivers/char/hw_random/omap-rng.c |  108 ++++++++++++++++++-------------------
+ 1 file changed, 54 insertions(+), 54 deletions(-)
+
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index f3f7142..9b89ff4 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -140,16 +140,6 @@ static inline void omap_rng_write(struct omap_rng_dev *priv, u16 reg,
+ 	__raw_writel(val, priv->base + priv->pdata->regs[reg]);
+ }
+ 
+-static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
+-{
+-	return omap_rng_read(priv, RNG_STATUS_REG) ? 0 : 1;
+-}
+-
+-static inline u32 omap4_rng_data_present(struct omap_rng_dev *priv)
+-{
+-	return omap_rng_read(priv, RNG_STATUS_REG) & RNG_REG_STATUS_RDY;
+-}
+-
+ static int omap_rng_data_present(struct hwrng *rng, int wait)
+ {
+ 	struct omap_rng_dev *priv;
+@@ -187,6 +177,60 @@ static int omap_rng_data_read(struct hwrng *rng, u32 *data)
+ 	return data_size;
+ }
+ 
++static int omap_rng_init(struct hwrng *rng)
++{
++	struct omap_rng_dev *priv;
++
++	priv = (struct omap_rng_dev *)rng->priv;
++	return priv->pdata->init(priv);
++}
++
++static void omap_rng_cleanup(struct hwrng *rng)
++{
++	struct omap_rng_dev *priv;
++
++	priv = (struct omap_rng_dev *)rng->priv;
++	priv->pdata->cleanup(priv);
++}
++
++static struct hwrng omap_rng_ops = {
++	.name		= "omap",
++	.data_present	= omap_rng_data_present,
++	.data_read	= omap_rng_data_read,
++	.init		= omap_rng_init,
++	.cleanup	= omap_rng_cleanup,
++};
++
++static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
++{
++	return omap_rng_read(priv, RNG_STATUS_REG) ? 0 : 1;
++}
++
++static int omap2_rng_init(struct omap_rng_dev *priv)
++{
++	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x1);
++	return 0;
++}
++
++static void omap2_rng_cleanup(struct omap_rng_dev *priv)
++{
++	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x0);
++}
++
++static struct omap_rng_pdata omap2_rng_pdata = {
++	.regs		= (u16 *)reg_map_omap2,
++	.data_size	= OMAP2_RNG_OUTPUT_SIZE,
++	.data_present	= omap2_rng_data_present,
++	.init		= omap2_rng_init,
++	.cleanup	= omap2_rng_cleanup,
++};
++
++#if defined(CONFIG_OF)
++static inline u32 omap4_rng_data_present(struct omap_rng_dev *priv)
++{
++	return omap_rng_read(priv, RNG_STATUS_REG) & RNG_REG_STATUS_RDY;
++}
++
+ static int omap4_rng_init(struct omap_rng_dev *priv)
+ {
+ 	u32 val;
+@@ -221,33 +265,6 @@ static void omap4_rng_cleanup(struct omap_rng_dev *priv)
+ 	omap_rng_write(priv, RNG_CONFIG_REG, val);
+ }
+ 
+-static int omap2_rng_init(struct omap_rng_dev *priv)
+-{
+-	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x1);
+-	return 0;
+-}
+-
+-static void omap2_rng_cleanup(struct omap_rng_dev *priv)
+-{
+-	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x0);
+-}
+-
+-static int omap_rng_init(struct hwrng *rng)
+-{
+-	struct omap_rng_dev *priv;
+-
+-	priv = (struct omap_rng_dev *)rng->priv;
+-	return priv->pdata->init(priv);
+-}
+-
+-static void omap_rng_cleanup(struct hwrng *rng)
+-{
+-	struct omap_rng_dev *priv;
+-
+-	priv = (struct omap_rng_dev *)rng->priv;
+-	priv->pdata->cleanup(priv);
+-}
+-
+ static irqreturn_t omap4_rng_irq(int irq, void *dev_id)
+ {
+ 	struct omap_rng_dev *priv = dev_id;
+@@ -275,23 +292,6 @@ static irqreturn_t omap4_rng_irq(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static struct hwrng omap_rng_ops = {
+-	.name		= "omap",
+-	.data_present	= omap_rng_data_present,
+-	.data_read	= omap_rng_data_read,
+-	.init		= omap_rng_init,
+-	.cleanup	= omap_rng_cleanup,
+-};
+-
+-static struct omap_rng_pdata omap2_rng_pdata = {
+-	.regs		= (u16 *)reg_map_omap2,
+-	.data_size	= OMAP2_RNG_OUTPUT_SIZE,
+-	.data_present	= omap2_rng_data_present,
+-	.init		= omap2_rng_init,
+-	.cleanup	= omap2_rng_cleanup,
+-};
+-
+-#if defined(CONFIG_OF)
+ static struct omap_rng_pdata omap4_rng_pdata = {
+ 	.regs		= (u16 *)reg_map_omap4,
+ 	.data_size	= OMAP4_RNG_OUTPUT_SIZE,
+-- 
+1.7.10.4
+
