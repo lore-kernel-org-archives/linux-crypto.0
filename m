@@ -1,41 +1,61 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] crypto: sahara - checking the wrong variable
-Date: Tue, 20 Aug 2013 11:51:41 +0300
-Message-ID: <20130820085141.GA7469@elgon.mountain>
+From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: [patch] crypto: tegra-aes - bitwise vs logical and
+Date: Tue, 20 Aug 2013 11:54:48 +0300
+Message-ID: <20130820085447.GA20170@elgon.mountain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Grant Likely <grant.likely@linaro.org>,
-	Rob Herring <rob.herring@calxeda.com>,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-To: Herbert Xu <herbert@gondor.hengli.com.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:45773 "EHLO
-	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751425Ab3HTIwE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Aug 2013 04:52:04 -0400
+Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	Stephen Warren <swarren-3lzwWm7+Weoh9ZMKESR00Q@public.gmane.org>,
+	Grant Likely <grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Rob Herring <rob.herring-bsGFqQB8/DxBDgjK7y7TUQ@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org>
+Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-There is a typo here.  "dev->hw_link[]" is an array, not a pointer, so
-the check is nonsense.  We should be checking recently allocated
-"dev->hw_link[0]" instead.
+The bug here is that:
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+	while (eng_busy & (!icq_empty) & dma_busy)
 
-diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-index b076d81..d7bb8ba 100644
---- a/drivers/crypto/sahara.c
-+++ b/drivers/crypto/sahara.c
-@@ -955,7 +955,7 @@ static int sahara_probe(struct platform_device *pdev)
- 	dev->hw_link[0] = dma_alloc_coherent(&pdev->dev,
- 			SAHARA_MAX_HW_LINK * sizeof(struct sahara_hw_link),
- 			&dev->hw_phys_link[0], GFP_KERNEL);
--	if (!dev->hw_link) {
-+	if (!dev->hw_link[0]) {
- 		dev_err(&pdev->dev, "Could not allocate hw links\n");
- 		err = -ENOMEM;
- 		goto err_link;
+is never true because it's using bitwise instead of logical ANDs.  The
+other bitwise AND conditions work as intended but I changed them as well
+for consistency.
+
+Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+---
+Static checker stuff.  I don't have the hardware.
+
+diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
+index 85ea752..2d58da9 100644
+--- a/drivers/crypto/tegra-aes.c
++++ b/drivers/crypto/tegra-aes.c
+@@ -275,7 +275,7 @@ static int aes_start_crypt(struct tegra_aes_dev *dd, u32 in_addr, u32 out_addr,
+ 			value = aes_readl(dd, TEGRA_AES_INTR_STATUS);
+ 			eng_busy = value & TEGRA_AES_ENGINE_BUSY_FIELD;
+ 			icq_empty = value & TEGRA_AES_ICQ_EMPTY_FIELD;
+-		} while (eng_busy & (!icq_empty));
++		} while (eng_busy && !icq_empty);
+ 		aes_writel(dd, cmdq[i], TEGRA_AES_ICMDQUE_WR);
+ 	}
+ 
+@@ -365,7 +365,7 @@ static int aes_set_key(struct tegra_aes_dev *dd)
+ 		eng_busy = value & TEGRA_AES_ENGINE_BUSY_FIELD;
+ 		icq_empty = value & TEGRA_AES_ICQ_EMPTY_FIELD;
+ 		dma_busy = value & TEGRA_AES_DMA_BUSY_FIELD;
+-	} while (eng_busy & (!icq_empty) & dma_busy);
++	} while (eng_busy && !icq_empty && dma_busy);
+ 
+ 	/* settable command to get key into internal registers */
+ 	value = CMD_SETTABLE << CMDQ_OPCODE_SHIFT |
+@@ -379,7 +379,7 @@ static int aes_set_key(struct tegra_aes_dev *dd)
+ 		value = aes_readl(dd, TEGRA_AES_INTR_STATUS);
+ 		eng_busy = value & TEGRA_AES_ENGINE_BUSY_FIELD;
+ 		icq_empty = value & TEGRA_AES_ICQ_EMPTY_FIELD;
+-	} while (eng_busy & (!icq_empty));
++	} while (eng_busy && !icq_empty);
+ 
+ 	return 0;
+ }
