@@ -1,185 +1,72 @@
-From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: Re: [PATCH] hwrng: reorder OMAP TRNG driver code
-Date: Wed, 21 Aug 2013 10:51:16 +0530
-Message-ID: <52144E4C.4050405@ti.com>
-References: <1377022073-28198-1-git-send-email-olof@lixom.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] [PATCH]  Fix for a warning - crypto/fcrypt,c
+Date: Wed, 21 Aug 2013 20:47:15 +1000
+Message-ID: <20130821104715.GA22975@gondor.apana.org.au>
+References: <4092573.JCpLRYcAKP@aragorn.auenland.lan>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.hengli.com.au>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>
-Return-path: <linux-omap-owner@vger.kernel.org>
-In-Reply-To: <1377022073-28198-1-git-send-email-olof@lixom.net>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, behanw@converseincode.com,
+	pageexec@freemail.hu
+To: Jan-Simon =?iso-8859-1?Q?M=F6ller?= <dl9pf@gmx.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:54360 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751495Ab3HUKr0 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Aug 2013 06:47:26 -0400
+Content-Disposition: inline
+In-Reply-To: <4092573.JCpLRYcAKP@aragorn.auenland.lan>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Olof,
-On Tuesday 20 August 2013 11:37 PM, Olof Johansson wrote:
-> The newly added omap4 support in the driver was added without
-> consideration for building older configs. When building omap1_defconfig,
-> it resulted in:
-> 
-> drivers/char/hw_random/omap-rng.c:190:12: warning: 'omap4_rng_init' defined but not used [-Wunused-function]
-> drivers/char/hw_random/omap-rng.c:215:13: warning: 'omap4_rng_cleanup' defined but not used [-Wunused-function]
-> drivers/char/hw_random/omap-rng.c:251:20: warning: 'omap4_rng_irq' defined but not used [-Wunused-function]
-> 
-> Move the code around so it is grouped with its operations struct, which
-> for the omap4 case means also under the #ifdef CONFIG_OF, where it needs
-> to be.
-> 
-Missed testing this. Thanks for the patch.
-Reviewed-by: Lokesh Vutla <lokeshvutla@ti.com>
+On Thu, Aug 15, 2013 at 02:01:50PM +0200, Jan-Simon M=F6ller wrote:
+> Hi all,
+>=20
+> please merge the attached patch.=20
+>=20
+> Fix for warning:
+> linux/crypto/fcrypt.c:143:47: warning: signed shift result (0x5980000=
+00)=20
+> requires 36 bits to
+>       represent, but 'int' only has 32 bits [-Wshift-overflow]
+>         Z(0xef), Z(0x70), Z(0xcf), Z(0xc2), Z(0x2a), Z(0xb3), Z(0x61)=
+,=20
+> Z(0xad),
+>                                                      ^~~~~~~
+> linux/crypto/fcrypt.c:113:29: note: expanded from macro 'Z'
+> #define Z(x) cpu_to_be32((x << 27 ) | (x >> 5))
+>                             ^  ~~
+> linux/include/uapi/linux/byteorder/little_endian.h:38:53: note: expan=
+ded from=20
+> macro
+>       '__cpu_to_be32'
+> #define __cpu_to_be32(x) ((__force __be32)__swab32((x)))
+>                                                     ^
+> linux/include/uapi/linux/swab.h:116:21: note: expanded from macro '__=
+swab32'
+>         ___constant_swab32(x) :                 \
+>                            ^
+> linux/include/uapi/linux/swab.h:18:12: note: expanded from macro=20
+> '___constant_swab32'
+>         (((__u32)(x) & (__u32)0x0000ff00UL) <<  8) |            \
+>                   ^
+>=20
+> Solution - make sure we don't exceed the 32 bit range by adding (x & =
+~(1U <<=20
+> 27)) =20
+> =3D  & (0xF7FFFFFF)_16 or & (1111 0111 1111 1111 1111 1111 1111 1111)=
+_2
 
-Regards,
-Lokesh
+Your fix makes no sense.  To achieve what you want you'd need to lop
+off the first 5 bits, not the fifth bit.
 
-> Signed-off-by: Olof Johansson <olof@lixom.net>
-> Cc: Lokesh Vutla <lokeshvutla@ti.com>
-> ---
->  drivers/char/hw_random/omap-rng.c |  108 ++++++++++++++++++-------------------
->  1 file changed, 54 insertions(+), 54 deletions(-)
-> 
-> diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-> index f3f7142..9b89ff4 100644
-> --- a/drivers/char/hw_random/omap-rng.c
-> +++ b/drivers/char/hw_random/omap-rng.c
-> @@ -140,16 +140,6 @@ static inline void omap_rng_write(struct omap_rng_dev *priv, u16 reg,
->  	__raw_writel(val, priv->base + priv->pdata->regs[reg]);
->  }
->  
-> -static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
-> -{
-> -	return omap_rng_read(priv, RNG_STATUS_REG) ? 0 : 1;
-> -}
-> -
-> -static inline u32 omap4_rng_data_present(struct omap_rng_dev *priv)
-> -{
-> -	return omap_rng_read(priv, RNG_STATUS_REG) & RNG_REG_STATUS_RDY;
-> -}
-> -
->  static int omap_rng_data_present(struct hwrng *rng, int wait)
->  {
->  	struct omap_rng_dev *priv;
-> @@ -187,6 +177,60 @@ static int omap_rng_data_read(struct hwrng *rng, u32 *data)
->  	return data_size;
->  }
->  
-> +static int omap_rng_init(struct hwrng *rng)
-> +{
-> +	struct omap_rng_dev *priv;
-> +
-> +	priv = (struct omap_rng_dev *)rng->priv;
-> +	return priv->pdata->init(priv);
-> +}
-> +
-> +static void omap_rng_cleanup(struct hwrng *rng)
-> +{
-> +	struct omap_rng_dev *priv;
-> +
-> +	priv = (struct omap_rng_dev *)rng->priv;
-> +	priv->pdata->cleanup(priv);
-> +}
-> +
-> +static struct hwrng omap_rng_ops = {
-> +	.name		= "omap",
-> +	.data_present	= omap_rng_data_present,
-> +	.data_read	= omap_rng_data_read,
-> +	.init		= omap_rng_init,
-> +	.cleanup	= omap_rng_cleanup,
-> +};
-> +
-> +static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
-> +{
-> +	return omap_rng_read(priv, RNG_STATUS_REG) ? 0 : 1;
-> +}
-> +
-> +static int omap2_rng_init(struct omap_rng_dev *priv)
-> +{
-> +	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x1);
-> +	return 0;
-> +}
-> +
-> +static void omap2_rng_cleanup(struct omap_rng_dev *priv)
-> +{
-> +	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x0);
-> +}
-> +
-> +static struct omap_rng_pdata omap2_rng_pdata = {
-> +	.regs		= (u16 *)reg_map_omap2,
-> +	.data_size	= OMAP2_RNG_OUTPUT_SIZE,
-> +	.data_present	= omap2_rng_data_present,
-> +	.init		= omap2_rng_init,
-> +	.cleanup	= omap2_rng_cleanup,
-> +};
-> +
-> +#if defined(CONFIG_OF)
-> +static inline u32 omap4_rng_data_present(struct omap_rng_dev *priv)
-> +{
-> +	return omap_rng_read(priv, RNG_STATUS_REG) & RNG_REG_STATUS_RDY;
-> +}
-> +
->  static int omap4_rng_init(struct omap_rng_dev *priv)
->  {
->  	u32 val;
-> @@ -221,33 +265,6 @@ static void omap4_rng_cleanup(struct omap_rng_dev *priv)
->  	omap_rng_write(priv, RNG_CONFIG_REG, val);
->  }
->  
-> -static int omap2_rng_init(struct omap_rng_dev *priv)
-> -{
-> -	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x1);
-> -	return 0;
-> -}
-> -
-> -static void omap2_rng_cleanup(struct omap_rng_dev *priv)
-> -{
-> -	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x0);
-> -}
-> -
-> -static int omap_rng_init(struct hwrng *rng)
-> -{
-> -	struct omap_rng_dev *priv;
-> -
-> -	priv = (struct omap_rng_dev *)rng->priv;
-> -	return priv->pdata->init(priv);
-> -}
-> -
-> -static void omap_rng_cleanup(struct hwrng *rng)
-> -{
-> -	struct omap_rng_dev *priv;
-> -
-> -	priv = (struct omap_rng_dev *)rng->priv;
-> -	priv->pdata->cleanup(priv);
-> -}
-> -
->  static irqreturn_t omap4_rng_irq(int irq, void *dev_id)
->  {
->  	struct omap_rng_dev *priv = dev_id;
-> @@ -275,23 +292,6 @@ static irqreturn_t omap4_rng_irq(int irq, void *dev_id)
->  	return IRQ_HANDLED;
->  }
->  
-> -static struct hwrng omap_rng_ops = {
-> -	.name		= "omap",
-> -	.data_present	= omap_rng_data_present,
-> -	.data_read	= omap_rng_data_read,
-> -	.init		= omap_rng_init,
-> -	.cleanup	= omap_rng_cleanup,
-> -};
-> -
-> -static struct omap_rng_pdata omap2_rng_pdata = {
-> -	.regs		= (u16 *)reg_map_omap2,
-> -	.data_size	= OMAP2_RNG_OUTPUT_SIZE,
-> -	.data_present	= omap2_rng_data_present,
-> -	.init		= omap2_rng_init,
-> -	.cleanup	= omap2_rng_cleanup,
-> -};
-> -
-> -#if defined(CONFIG_OF)
->  static struct omap_rng_pdata omap4_rng_pdata = {
->  	.regs		= (u16 *)reg_map_omap4,
->  	.data_size	= OMAP4_RNG_OUTPUT_SIZE,
-> 
+However, which compiler is this? This warning seems to be rather
+pointless.
 
+Thanks,
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
