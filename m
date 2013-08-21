@@ -1,53 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 00/14] crypto: omap-aes: Improve DMA, add PIO mode and
- support for AM437x
-Date: Wed, 21 Aug 2013 21:50:52 +1000
-Message-ID: <20130821115051.GE23287@gondor.apana.org.au>
-References: <1376793755-30478-1-git-send-email-joelf@ti.com>
+Subject: Re: [patch] crypto: sahara - checking the wrong variable
+Date: Wed, 21 Aug 2013 21:51:10 +1000
+Message-ID: <20130821115110.GF23287@gondor.apana.org.au>
+References: <20130820085141.GA7469@elgon.mountain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
-	Mark Greer <mgreer@animalcreek.com>,
-	Tony Lindgren <tony@atomide.com>,
-	Santosh Shilimkar <santosh.shilimkar@ti.com>,
-	Rajendra Nayak <rnayak@ti.com>,
-	Lokesh Vutla <lokeshvutla@ti.com>,
-	Linux OMAP List <linux-omap@vger.kernel.org>,
-	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Joel Fernandes <joelf@ti.com>
+	Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <rob.herring@calxeda.com>,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:36025 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:48717 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751463Ab3HULvH (ORCPT
+	with ESMTP id S1751895Ab3HULvV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Aug 2013 07:51:07 -0400
+	Wed, 21 Aug 2013 07:51:21 -0400
 Content-Disposition: inline
-In-Reply-To: <1376793755-30478-1-git-send-email-joelf@ti.com>
+In-Reply-To: <20130820085141.GA7469@elgon.mountain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Aug 17, 2013 at 09:42:21PM -0500, Joel Fernandes wrote:
-> Following patch series rewrites the DMA code to be cleaner and faster. Earlier,
-> only a single SG was used for DMA purpose, and the SG-list passed from the
-> crypto layer was being copied and DMA'd one entry at a time. This turns out to
-> be quite inefficient and lot of code, we replace it with much simpler approach
-> that directly passes the SG-list from crypto to the DMA layers for cases where
-> possible. For all cases where such a direct passing of SG list is not possible,
-> we create a new SG-list and do the copying. This is still better than before, as
-> we create an SG list as big as needed and not just 1-element list.
+On Tue, Aug 20, 2013 at 11:51:41AM +0300, Dan Carpenter wrote:
+> There is a typo here.  "dev->hw_link[]" is an array, not a pointer, so
+> the check is nonsense.  We should be checking recently allocated
+> "dev->hw_link[0]" instead.
 > 
-> We also add PIO mode support to the driver, and switch to it whenever the DMA
-> channel allocation is not available. This also has shown to give good performance
-> for small blocks as shown below.
-> 
-> Tests have been performed on AM335x, OMAP4 and AM437x SoCs.
-> 
-> Below is a sample run on AM335x SoC (beaglebone board), showing
-> performance improvement (20% for 8K blocks):
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-All applied.  Thanks!
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
