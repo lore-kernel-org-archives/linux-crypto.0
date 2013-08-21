@@ -1,35 +1,53 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto:nx - fix nx-aes-gcm verification
-Date: Wed, 21 Aug 2013 21:50:35 +1000
-Message-ID: <20130821115035.GD23287@gondor.apana.org.au>
-References: <520c0215.kHFgBNcJQfAPXpv3%jmlatten@linux.vnet.ibm.com>
+Subject: Re: [PATCH v2 00/14] crypto: omap-aes: Improve DMA, add PIO mode and
+ support for AM437x
+Date: Wed, 21 Aug 2013 21:50:52 +1000
+Message-ID: <20130821115051.GE23287@gondor.apana.org.au>
+References: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: jmlatten@linux.vnet.ibm.com
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Mark Greer <mgreer@animalcreek.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Santosh Shilimkar <santosh.shilimkar@ti.com>,
+	Rajendra Nayak <rnayak@ti.com>,
+	Lokesh Vutla <lokeshvutla@ti.com>,
+	Linux OMAP List <linux-omap@vger.kernel.org>,
+	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Joel Fernandes <joelf@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:34069 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:36025 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751486Ab3HULup (ORCPT
+	with ESMTP id S1751463Ab3HULvH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Aug 2013 07:50:45 -0400
+	Wed, 21 Aug 2013 07:51:07 -0400
 Content-Disposition: inline
-In-Reply-To: <520c0215.kHFgBNcJQfAPXpv3%jmlatten@linux.vnet.ibm.com>
+In-Reply-To: <1376793755-30478-1-git-send-email-joelf@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Aug 14, 2013 at 05:17:57PM -0500, jmlatten@linux.vnet.ibm.com wrote:
-> This patch fixes a bug in the nx-aes-gcm implementation.
-> Corrected the code so that the authtag is always verified after
-> decrypting and not just when there is associated data included.
-> Also, corrected the code to retrieve the input authtag from src
-> instead of dst. 
+On Sat, Aug 17, 2013 at 09:42:21PM -0500, Joel Fernandes wrote:
+> Following patch series rewrites the DMA code to be cleaner and faster. Earlier,
+> only a single SG was used for DMA purpose, and the SG-list passed from the
+> crypto layer was being copied and DMA'd one entry at a time. This turns out to
+> be quite inefficient and lot of code, we replace it with much simpler approach
+> that directly passes the SG-list from crypto to the DMA layers for cases where
+> possible. For all cases where such a direct passing of SG list is not possible,
+> we create a new SG-list and do the copying. This is still better than before, as
+> we create an SG list as big as needed and not just 1-element list.
 > 
-> Reviewed-by: Fionnuala Gunter <fin@linux.vnet.ibm.com>
-> Reviewed-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-> Signed-off-by: Joy Latten <jmlatten@linux.vnet.ibm.com>
+> We also add PIO mode support to the driver, and switch to it whenever the DMA
+> channel allocation is not available. This also has shown to give good performance
+> for small blocks as shown below.
+> 
+> Tests have been performed on AM335x, OMAP4 and AM437x SoCs.
+> 
+> Below is a sample run on AM335x SoC (beaglebone board), showing
+> performance improvement (20% for 8K blocks):
 
-Patch applied.  Thanks!
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
