@@ -1,47 +1,81 @@
-From: "PaX Team" <pageexec@freemail.hu>
+From: Jan-Simon =?ISO-8859-1?Q?M=F6ller?= <dl9pf@gmx.de>
 Subject: Re: [RFC] [PATCH]  Fix for a warning - crypto/fcrypt,c
-Date: Wed, 21 Aug 2013 17:39:36 +0200
-Message-ID: <5214DF38.17262.204C9B7D@pageexec.freemail.hu>
-References: <4092573.JCpLRYcAKP@aragorn.auenland.lan>, <20130821104715.GA22975@gondor.apana.org.au>
-Reply-To: pageexec@freemail.hu
+Date: Wed, 21 Aug 2013 22:42:01 +0200
+Message-ID: <3514602.viscUS1bgS@aragorn.auenland.lan>
+References: <4092573.JCpLRYcAKP@aragorn.auenland.lan>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, behanw@converseincode.com
-To: "=?UTF-8?Q?Jan-Simon_M=C3=B6ller?=" <dl9pf@gmx.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: behanw@converseincode.com, pageexec@freemail.hu
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from r00tworld.com ([212.85.137.150]:47354 "EHLO r00tworld.com"
+Received: from mout.gmx.net ([212.227.17.22]:52957 "EHLO mout.gmx.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751610Ab3HUQhu convert rfc822-to-8bit (ORCPT
+	id S1752515Ab3HUUnU convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Aug 2013 12:37:50 -0400
-In-reply-to: <20130821104715.GA22975@gondor.apana.org.au>
-Content-description: Mail message body
+	Wed, 21 Aug 2013 16:43:20 -0400
+Received: from aragorn.auenland.lan ([95.90.185.134]) by mail.gmx.com
+ (mrgmx101) with ESMTPSA (Nemesis) id 0Ldcv0-1VutSJ0tRy-00imVc for
+ <linux-crypto@vger.kernel.org>; Wed, 21 Aug 2013 22:43:17 +0200
+In-Reply-To: <4092573.JCpLRYcAKP@aragorn.auenland.lan>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 21 Aug 2013 at 20:47, Herbert Xu wrote:
 
-> On Thu, Aug 15, 2013 at 02:01:50PM +0200, Jan-Simon M=C3=B6ller wrote=
-:
-> > Solution - make sure we don't exceed the 32 bit range by adding (x =
-& ~(1U <<=20
-> > 27)) =20
-> > =3D  & (0xF7FFFFFF)_16 or & (1111 0111 1111 1111 1111 1111 1111 111=
-1)_2
+Should I resend a fixed version with=20
+(1U << 27) - 1) instead ?
+
+Best,
+JS
+
+On Thursday 15 August 2013 14:01:50 Jan-Simon M=F6ller wrote:
+> Hi all,
 >=20
-> Your fix makes no sense.  To achieve what you want you'd need to lop
-> off the first 5 bits, not the fifth bit.
-
-oops, the bitmask expression wanted to be (1U << 27) - 1) instead.
-another approach would be to simply cast the macro argument to __be32.
-
-> However, which compiler is this? This warning seems to be rather
-> pointless.
-
-it's clang and this warning is about an undefined behaviour because
-the hexadecimal constants passed to this macro are treated as signed
-ints and for some of the constants the result of the shift cannot be
-represented as a signed int.
+> please merge the attached patch.
+>=20
+> Fix for warning:
+> linux/crypto/fcrypt.c:143:47: warning: signed shift result (0x5980000=
+00)
+> requires 36 bits to
+>       represent, but 'int' only has 32 bits [-Wshift-overflow]
+>         Z(0xef), Z(0x70), Z(0xcf), Z(0xc2), Z(0x2a), Z(0xb3), Z(0x61)=
+,
+> Z(0xad),
+>                                                      ^~~~~~~
+> linux/crypto/fcrypt.c:113:29: note: expanded from macro 'Z'
+> #define Z(x) cpu_to_be32((x << 27 ) | (x >> 5))
+>                             ^  ~~
+> linux/include/uapi/linux/byteorder/little_endian.h:38:53: note: expan=
+ded
+> from macro
+>       '__cpu_to_be32'
+> #define __cpu_to_be32(x) ((__force __be32)__swab32((x)))
+>                                                     ^
+> linux/include/uapi/linux/swab.h:116:21: note: expanded from macro '__=
+swab32'
+> ___constant_swab32(x) :                 \
+>                            ^
+> linux/include/uapi/linux/swab.h:18:12: note: expanded from macro
+> '___constant_swab32'
+>         (((__u32)(x) & (__u32)0x0000ff00UL) <<  8) |            \
+>                   ^
+>=20
+> Solution - make sure we don't exceed the 32 bit range by adding (x & =
+~(1U <<
+> 27))
+> =3D  & (0xF7FFFFFF)_16 or & (1111 0111 1111 1111 1111 1111 1111 1111)=
+_2
+>=20
+>=20
+> Author:  PaX Team <pageexec at freemail.hu>
+> ML-Post:
+> http://lists.cs.uiuc.edu/pipermail/llvm-commits/Week-of-Mon-20120507/=
+142707
+> .html URL:     http://llvm.linuxfoundation.org
+>=20
+> Merge:   Jan-Simon M=F6ller <dl9pf at gmx.de>
+>=20
+>=20
+>=20
+> Best,
