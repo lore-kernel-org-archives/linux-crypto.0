@@ -1,173 +1,90 @@
-From: Olof Johansson <olof@lixom.net>
-Subject: [PATCH] hwrng: reorder OMAP TRNG driver code
-Date: Tue, 20 Aug 2013 11:07:53 -0700
-Message-ID: <1377022073-28198-1-git-send-email-olof@lixom.net>
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-omap@vger.kernel.org, Olof Johansson <olof@lixom.net>,
-	Lokesh Vutla <lokeshvutla@ti.com>
-To: herbert@gondor.hengli.com.au
-Return-path: <linux-omap-owner@vger.kernel.org>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Joel Fernandes <joelf@ti.com>
+Subject: Re: [PATCH v2 04/14] crypto: omap-aes: Simplify DMA usage by using
+ direct SGs
+Date: Tue, 20 Aug 2013 19:54:42 -0500
+Message-ID: <52140FD2.7020403@ti.com>
+References: <1376793755-30478-1-git-send-email-joelf@ti.com> <1376793755-30478-5-git-send-email-joelf@ti.com> <521367B4.2020203@ti.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Mark Greer <mgreer@animalcreek.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Santosh Shilimkar <santosh.shilimkar@ti.com>,
+	Rajendra Nayak <rnayak@ti.com>,
+	Linux OMAP List <linux-omap@vger.kernel.org>,
+	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Lokesh Vutla <lokeshvutla@ti.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from bear.ext.ti.com ([192.94.94.41]:54476 "EHLO bear.ext.ti.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751311Ab3HUAzQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Aug 2013 20:55:16 -0400
+In-Reply-To: <521367B4.2020203@ti.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The newly added omap4 support in the driver was added without
-consideration for building older configs. When building omap1_defconfig,
-it resulted in:
+On 08/20/2013 07:57 AM, Lokesh Vutla wrote:
+> Hi Joel,
+> 
+> On Sunday 18 August 2013 08:12 AM, Joel Fernandes wrote:
+>> In early version of this driver, assumptions were made such as DMA layer
+>> requires contiguous buffers etc. Due to this, new buffers were allocated,
+>> mapped and used for DMA. These assumptions are no longer true and DMAEngine
+>> scatter-gather DMA doesn't have such requirements. We simply the DMA operations
+>> by directly using the scatter-gather buffers provided by the crypto layer
+>> instead of creating our own.
+>>
+>> Lot of logic that handled DMA'ing only X number of bytes of the total, or as
+>> much as fitted into a 3rd party buffer is removed and is no longer required.
+>>
+>> Also, good performance improvement of atleast ~20% seen with encrypting a
+>> buffer size of 8K (1800 ops/sec vs 1400 ops/sec).  Improvement will be higher
+>> for much larger blocks though such benchmarking is left as an exercise for the
+>> reader.  Also DMA usage is much more simplified and coherent with rest of the
+>> code.
+>>
+>> Signed-off-by: Joel Fernandes <joelf@ti.com>
+>> ---
+>>  drivers/crypto/omap-aes.c |  147 ++++++++-------------------------------------
+>>  1 file changed, 25 insertions(+), 122 deletions(-)
+>>
+>> diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+>> index e369e6e..64dd5c1 100644
+>> --- a/drivers/crypto/omap-aes.c
+>> +++ b/drivers/crypto/omap-aes.c
+>> @@ -480,22 +480,14 @@ static int sg_copy(struct scatterlist **sg, size_t *offset, void *buf,
+>>  }
+>>  
+>>  static int omap_aes_crypt_dma(struct crypto_tfm *tfm,
+>> -		struct scatterlist *in_sg, struct scatterlist *out_sg)
+>> +		struct scatterlist *in_sg, struct scatterlist *out_sg,
+>> +		int in_sg_len, int out_sg_len)
+>>  {
+>>  	struct omap_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+>>  	struct omap_aes_dev *dd = ctx->dd;
+>>  	struct dma_async_tx_descriptor *tx_in, *tx_out;
+>>  	struct dma_slave_config cfg;
+>> -	dma_addr_t dma_addr_in = sg_dma_address(in_sg);
+>> -	int ret, length = sg_dma_len(in_sg);
+>> -
+>> -	pr_debug("len: %d\n", length);
+>> -
+>> -	dd->dma_size = length;
+>> -
+>> -	if (!(dd->flags & FLAGS_FAST))
+>> -		dma_sync_single_for_device(dd->dev, dma_addr_in, length,
+>> -					   DMA_TO_DEVICE);
+>> +	int ret;
+> By this change FLAGS_FAST is unsed, it can be cleaned right?
+> or Am I missing something?
 
-drivers/char/hw_random/omap-rng.c:190:12: warning: 'omap4_rng_init' defined but not used [-Wunused-function]
-drivers/char/hw_random/omap-rng.c:215:13: warning: 'omap4_rng_cleanup' defined but not used [-Wunused-function]
-drivers/char/hw_random/omap-rng.c:251:20: warning: 'omap4_rng_irq' defined but not used [-Wunused-function]
+Yes, FLAGS_FAST would be unused now and can go away. Since it is very trivial
+change, I will make this change in the not-immediate future and submit.
 
-Move the code around so it is grouped with its operations struct, which
-for the omap4 case means also under the #ifdef CONFIG_OF, where it needs
-to be.
+Thanks,
 
-Signed-off-by: Olof Johansson <olof@lixom.net>
-Cc: Lokesh Vutla <lokeshvutla@ti.com>
----
- drivers/char/hw_random/omap-rng.c |  108 ++++++++++++++++++-------------------
- 1 file changed, 54 insertions(+), 54 deletions(-)
-
-diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index f3f7142..9b89ff4 100644
---- a/drivers/char/hw_random/omap-rng.c
-+++ b/drivers/char/hw_random/omap-rng.c
-@@ -140,16 +140,6 @@ static inline void omap_rng_write(struct omap_rng_dev *priv, u16 reg,
- 	__raw_writel(val, priv->base + priv->pdata->regs[reg]);
- }
- 
--static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
--{
--	return omap_rng_read(priv, RNG_STATUS_REG) ? 0 : 1;
--}
--
--static inline u32 omap4_rng_data_present(struct omap_rng_dev *priv)
--{
--	return omap_rng_read(priv, RNG_STATUS_REG) & RNG_REG_STATUS_RDY;
--}
--
- static int omap_rng_data_present(struct hwrng *rng, int wait)
- {
- 	struct omap_rng_dev *priv;
-@@ -187,6 +177,60 @@ static int omap_rng_data_read(struct hwrng *rng, u32 *data)
- 	return data_size;
- }
- 
-+static int omap_rng_init(struct hwrng *rng)
-+{
-+	struct omap_rng_dev *priv;
-+
-+	priv = (struct omap_rng_dev *)rng->priv;
-+	return priv->pdata->init(priv);
-+}
-+
-+static void omap_rng_cleanup(struct hwrng *rng)
-+{
-+	struct omap_rng_dev *priv;
-+
-+	priv = (struct omap_rng_dev *)rng->priv;
-+	priv->pdata->cleanup(priv);
-+}
-+
-+static struct hwrng omap_rng_ops = {
-+	.name		= "omap",
-+	.data_present	= omap_rng_data_present,
-+	.data_read	= omap_rng_data_read,
-+	.init		= omap_rng_init,
-+	.cleanup	= omap_rng_cleanup,
-+};
-+
-+static inline u32 omap2_rng_data_present(struct omap_rng_dev *priv)
-+{
-+	return omap_rng_read(priv, RNG_STATUS_REG) ? 0 : 1;
-+}
-+
-+static int omap2_rng_init(struct omap_rng_dev *priv)
-+{
-+	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x1);
-+	return 0;
-+}
-+
-+static void omap2_rng_cleanup(struct omap_rng_dev *priv)
-+{
-+	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x0);
-+}
-+
-+static struct omap_rng_pdata omap2_rng_pdata = {
-+	.regs		= (u16 *)reg_map_omap2,
-+	.data_size	= OMAP2_RNG_OUTPUT_SIZE,
-+	.data_present	= omap2_rng_data_present,
-+	.init		= omap2_rng_init,
-+	.cleanup	= omap2_rng_cleanup,
-+};
-+
-+#if defined(CONFIG_OF)
-+static inline u32 omap4_rng_data_present(struct omap_rng_dev *priv)
-+{
-+	return omap_rng_read(priv, RNG_STATUS_REG) & RNG_REG_STATUS_RDY;
-+}
-+
- static int omap4_rng_init(struct omap_rng_dev *priv)
- {
- 	u32 val;
-@@ -221,33 +265,6 @@ static void omap4_rng_cleanup(struct omap_rng_dev *priv)
- 	omap_rng_write(priv, RNG_CONFIG_REG, val);
- }
- 
--static int omap2_rng_init(struct omap_rng_dev *priv)
--{
--	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x1);
--	return 0;
--}
--
--static void omap2_rng_cleanup(struct omap_rng_dev *priv)
--{
--	omap_rng_write(priv, RNG_SYSCONFIG_REG, 0x0);
--}
--
--static int omap_rng_init(struct hwrng *rng)
--{
--	struct omap_rng_dev *priv;
--
--	priv = (struct omap_rng_dev *)rng->priv;
--	return priv->pdata->init(priv);
--}
--
--static void omap_rng_cleanup(struct hwrng *rng)
--{
--	struct omap_rng_dev *priv;
--
--	priv = (struct omap_rng_dev *)rng->priv;
--	priv->pdata->cleanup(priv);
--}
--
- static irqreturn_t omap4_rng_irq(int irq, void *dev_id)
- {
- 	struct omap_rng_dev *priv = dev_id;
-@@ -275,23 +292,6 @@ static irqreturn_t omap4_rng_irq(int irq, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
--static struct hwrng omap_rng_ops = {
--	.name		= "omap",
--	.data_present	= omap_rng_data_present,
--	.data_read	= omap_rng_data_read,
--	.init		= omap_rng_init,
--	.cleanup	= omap_rng_cleanup,
--};
--
--static struct omap_rng_pdata omap2_rng_pdata = {
--	.regs		= (u16 *)reg_map_omap2,
--	.data_size	= OMAP2_RNG_OUTPUT_SIZE,
--	.data_present	= omap2_rng_data_present,
--	.init		= omap2_rng_init,
--	.cleanup	= omap2_rng_cleanup,
--};
--
--#if defined(CONFIG_OF)
- static struct omap_rng_pdata omap4_rng_pdata = {
- 	.regs		= (u16 *)reg_map_omap4,
- 	.data_size	= OMAP4_RNG_OUTPUT_SIZE,
--- 
-1.7.10.4
-
+-Joel
