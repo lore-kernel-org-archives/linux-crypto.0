@@ -1,102 +1,114 @@
-From: "Lee, Chun-Yi" <joeyli.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 04/18] asymmetric keys: implement OS2IP in rsa
-Date: Thu, 22 Aug 2013 19:01:43 +0800
-Message-ID: <1377169317-5959-5-git-send-email-jlee@suse.com>
+From: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+Subject: [PATCH 05/18] asymmetric keys: implement RSASP1
+Date: Thu, 22 Aug 2013 19:01:44 +0800
+Message-ID: <1377169317-5959-6-git-send-email-jlee@suse.com>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
-Cc: linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
-	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
-	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>,
-	Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
-	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
-	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
-	Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
-	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"Lee, Chun-Yi" <jlee-IBi9RG/b67k@public.gmane.org>
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <opensuse-kernel+bounces-4973-glsk-opensuse-kernel=m.gmane.org-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-In-Reply-To: <1377169317-5959-1-git-send-email-jlee-IBi9RG/b67k@public.gmane.org>
-List-Post: <mailto:opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-List-Help: <mailto:opensuse-kernel+help-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-List-Subscribe: <mailto:opensuse-kernel+subscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-List-Unsubscribe: <mailto:opensuse-kernel+unsubscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-List-Owner: <mailto:opensuse-kernel+owner-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-List-Archive: <http://lists.opensuse.org/opensuse-kernel/>
+Cc: linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	opensuse-kernel@opensuse.org, David Howells <dhowells@redhat.com>,
+	"Rafael J. Wysocki" <rjw@sisk.pl>,
+	Matthew Garrett <mjg59@srcf.ucam.org>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	Josh Boyer <jwboyer@redhat.com>,
+	Vojtech Pavlik <vojtech@suse.cz>,
+	Matt Fleming <matt.fleming@intel.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
+	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
+	"Lee, Chun-Yi" <jlee@suse.com>
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1377169317-5959-1-git-send-email-jlee@suse.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Implement Octet String to Integer conversion [RFC3447 sec 4.2] in rsa.c. It's
-the second step of signature generation operation.
+Implement RSASP1 and fill-in the following data to public key signature
+structure: signature length (pkcs->k), signature octet
+strings (pks->S) and MPI of signature (pks->rsa.s).
 
-This patch is temporary set non-RSASP1 message to pks->S for debugging.
-
-Reviewed-by: Jiri Kosina <jkosina-AlSwsSmVLrQ@public.gmane.org>
-Signed-off-by: Lee, Chun-Yi <jlee-IBi9RG/b67k@public.gmane.org>
+Reviewed-by: Jiri Kosina <jkosina@suse.cz>
+Signed-off-by: Lee, Chun-Yi <jlee@suse.com>
 ---
- crypto/asymmetric_keys/rsa.c |   29 ++++++++++++++++++++++++-----
- 1 files changed, 24 insertions(+), 5 deletions(-)
+ crypto/asymmetric_keys/rsa.c |   47 +++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 44 insertions(+), 3 deletions(-)
 
 diff --git a/crypto/asymmetric_keys/rsa.c b/crypto/asymmetric_keys/rsa.c
-index c26ae77..0862018 100644
+index 0862018..e60defe 100644
 --- a/crypto/asymmetric_keys/rsa.c
 +++ b/crypto/asymmetric_keys/rsa.c
-@@ -168,6 +168,20 @@ static int RSA_I2OSP(MPI x, size_t xLen, u8 **_X)
- }
+@@ -86,6 +86,39 @@ static const struct {
+ };
  
  /*
-+ * Octet String to Integer conversion [RFC3447 sec 4.2]
++ * RSASP1() function [RFC3447 sec 5.2.1]
 + */
-+static int RSA_OS2IP(u8 *X, size_t XLen, MPI *_x)
++static int RSASP1(const struct private_key *key, MPI m, MPI *_s)
 +{
-+	MPI x;
++	MPI s;
++	int ret;
 +
-+	x = mpi_alloc((XLen + BYTES_PER_MPI_LIMB - 1) / BYTES_PER_MPI_LIMB);
-+	mpi_set_buffer(x, X, XLen, 0);
++	/* (1) Validate 0 <= m < n */
++	if (mpi_cmp_ui(m, 0) < 0) {
++		kleave(" = -EBADMSG [m < 0]");
++		return -EBADMSG;
++	}
++	if (mpi_cmp(m, key->rsa.n) >= 0) {
++		kleave(" = -EBADMSG [m >= n]");
++		return -EBADMSG;
++	}
 +
-+	*_x = x;
++	s = mpi_alloc(0);
++	if (!s)
++		return -ENOMEM;
++
++	/* (2) s = m^d mod n */
++	ret = mpi_powm(s, m, key->rsa.d, key->rsa.n);
++	if (ret < 0) {
++		mpi_free(s);
++		return ret;
++	}
++
++	*_s = s;
 +	return 0;
 +}
 +
 +/*
-  * EMSA_PKCS1-v1_5-ENCODE [RFC3447 sec 9.2]
-  * @M: message to be signed, and octet string
-  * @emLen: intended length in octets of the encoded message
-@@ -412,6 +426,9 @@ static struct public_key_signature *RSA_generate_signature(
+  * RSAVP1() function [RFC3447 sec 5.2.2]
+  */
+ static int RSAVP1(const struct public_key *key, MPI s, MPI *_m)
+@@ -173,9 +206,12 @@ static int RSA_I2OSP(MPI x, size_t xLen, u8 **_X)
+ static int RSA_OS2IP(u8 *X, size_t XLen, MPI *_x)
  {
- 	struct public_key_signature *pks;
- 	u8 *EM = NULL;
-+	MPI m = NULL;
-+	MPI s = NULL;
-+	unsigned X_size;
- 	size_t emLen;
- 	int ret;
+ 	MPI x;
++	int ret;
  
-@@ -431,14 +448,16 @@ static struct public_key_signature *RSA_generate_signature(
+ 	x = mpi_alloc((XLen + BYTES_PER_MPI_LIMB - 1) / BYTES_PER_MPI_LIMB);
+-	mpi_set_buffer(x, X, XLen, 0);
++	ret = mpi_set_buffer(x, X, XLen, 0);
++	if (ret < 0)
++		return ret;
+ 
+ 	*_x = x;
+ 	return 0;
+@@ -453,8 +489,13 @@ static struct public_key_signature *RSA_generate_signature(
  	if (ret < 0)
  		goto error_v1_5_encode;
  
--	/* TODO 2): m = OS2IP (EM) */
-+	/* 2): m = OS2IP (EM) */
-+	ret = RSA_OS2IP(EM, emLen, &m);
-+	if (ret < 0)
-+		goto error_v1_5_encode;
+-	/* TODO 3): s = RSASP1 (K, m) */
+-	s = m;
++	/* 3): s = RSASP1 (K, m) */
++	RSASP1(key, m, &s);
++
++	pks->rsa.s = s;
++	pks->nr_mpi = 1;
++	pks->k = mpi_get_nbits(s);
++	pks->k = (pks->k + 7) / 8;
  
- 	/* TODO 3): s = RSASP1 (K, m) */
-+	s = m;
- 
--	/* TODO 4): S = I2OSP (s, k) */
--
--	/* TODO: signature S to a u8* S or set to sig->rsa.s? */
--	pks->S = EM;		/* TODO: temporary set S to EM */
-+	/* 4): S = I2OSP (s, k) */
-+	_RSA_I2OSP(s, &X_size, &pks->S);
- 
- 	return pks;
- 
+ 	/* 4): S = I2OSP (s, k) */
+ 	_RSA_I2OSP(s, &X_size, &pks->S);
 -- 
 1.6.4.2
