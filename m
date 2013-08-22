@@ -1,35 +1,54 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
 Subject: Re: [PATCH] kernel/padata.c: always check the return value of
  __padata_remove_cpu() and __padata_add_cpu()
-Date: Thu, 22 Aug 2013 07:11:22 +0200
-Message-ID: <20130822051122.GB26773@secunet.com>
+Date: Thu, 22 Aug 2013 08:05:03 +0200
+Message-ID: <20130822060503.GC26773@secunet.com>
 References: <5212E5E4.8010408@asianux.com>
  <5212E61F.7010602@asianux.com>
+ <20130822051122.GB26773@secunet.com>
+ <5215A134.90607@asianux.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 To: Chen Gang <gang.chen@asianux.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([195.81.216.161]:42152 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753059Ab3HVGFG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 22 Aug 2013 02:05:06 -0400
 Content-Disposition: inline
-In-Reply-To: <5212E61F.7010602@asianux.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <5215A134.90607@asianux.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 20, 2013 at 11:44:31AM +0800, Chen Gang wrote:
+On Thu, Aug 22, 2013 at 01:27:16PM +0800, Chen Gang wrote:
+> On 08/22/2013 01:11 PM, Steffen Klassert wrote:
+> > On Tue, Aug 20, 2013 at 11:44:31AM +0800, Chen Gang wrote:
+> >>
+> >> If this patch is correct, better to let CPU_ONLINE and CPU_DOWN_FAILED
+> >> share the same code.
+> >>
+> >> And do we need a comment "/* fall through */" between CPU_UP_CANCELED
+> >> and CPU_DOWN_FAILED (or it is another bug, need a 'break' statement) ?
+> >>
+> >> At last, also better to let CPU_DOWN_PREPARE and CPU_UP_CANCELED share
+> >> the same code (if need a 'break'), or share the most of code (if "fall
+> >> through").
+> >>
+> > 
+> > CPU_ONLINE and CPU_DOWN_FAILED can share the code. Same is true for
+> > CPU_DOWN_PREPARE and CPU_UP_CANCELED.
+> > 
+> > Thanks!
+> > 
+> > 
 > 
-> If this patch is correct, better to let CPU_ONLINE and CPU_DOWN_FAILED
-> share the same code.
+> Thank you too.
 > 
-> And do we need a comment "/* fall through */" between CPU_UP_CANCELED
-> and CPU_DOWN_FAILED (or it is another bug, need a 'break' statement) ?
+> And need I send another patch for it ?
 > 
-> At last, also better to let CPU_DOWN_PREPARE and CPU_UP_CANCELED share
-> the same code (if need a 'break'), or share the most of code (if "fall
-> through").
+> Or just make by yourself (and better to mark me as Reported-by). :-)
 > 
 
-CPU_ONLINE and CPU_DOWN_FAILED can share the code. Same is true for
-CPU_DOWN_PREPARE and CPU_UP_CANCELED.
-
-Thanks!
+You found the problem, feel free to send a patch.
