@@ -1,44 +1,107 @@
-From: "Ruiz, Irma" <iruiz@paterson.k12.nj.us>
-Subject: RE:
-Date: Fri, 23 Aug 2013 10:47:27 +0000
-Message-ID: <B719EF0A9FB7A247B5147CD67A83E60E011FEB7A8E__23486.3562662669$1377257788$gmane$org@EXCH10-MB3.paterson.k12.nj.us>
-References: <B719EF0A9FB7A247B5147CD67A83E60E011FEB76D1@EXCH10-MB3.paterson.k12.nj.us>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: "Ruiz, Irma" <iruiz@paterson.k12.nj.us>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from studentmail.paterson.k12.nj.us ([204.8.198.37]:9832 "EHLO
-	mail.paterson.k12.nj.us" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755348Ab3HWLfb convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Aug 2013 07:35:31 -0400
-In-Reply-To: <B719EF0A9FB7A247B5147CD67A83E60E011FEB76D1@EXCH10-MB3.paterson.k12.nj.us>
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Subject: [PATCH 02/10] crypto: nx - fix limits to sg lists for AES-ECB
+Date: Fri, 23 Aug 2013 17:01:06 -0300
+Message-ID: <1377288074-18998-3-git-send-email-mhcerri@linux.vnet.ibm.com>
+References: <1377288074-18998-1-git-send-email-mhcerri@linux.vnet.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1377288074-18998-1-git-send-email-mhcerri@linux.vnet.ibm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
+This patch updates the nx-aes-ecb implementation to perform several
+hyper calls if needed in order to always respect the length limits for
+scatter/gather lists.
 
-________________________________
-From: Ruiz, Irma
-Sent: Friday, August 23, 2013 6:40 AM
-To: Ruiz, Irma
-Subject:
+Two different limits are considered:
 
-Your Mailbox Has Exceeded It Storage Limit As Set By Your Administrator,Click Below to complete update on your storage limit quota
+ - "ibm,max-sg-len": maximum number of bytes of each scatter/gather
+   list.
 
-CLICK HERE<http://isaacjones.coffeecup.com/forms/WEBMAIL%20ADMINISTRATOR/>
+ - "ibm,max-sync-cop":
+    - The total number of bytes that a scatter/gather list can hold.
+    - The maximum number of elements that a scatter/gather list can have.
 
-Please note that you have within 24 hours to complete this update. because you might lose access to your Email Box.
+Reviewed-by: Joy Latten <jmlatten@linux.vnet.ibm.com>
+Signed-off-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+---
+ drivers/crypto/nx/nx-aes-ecb.c | 48 ++++++++++++++++++++++++++----------------
+ 1 file changed, 30 insertions(+), 18 deletions(-)
 
-System Administrator
-This email or attachment(s) may contain confidential or legally privileged information intended for the sole use of the addressee(s). Any use, redistribution, disclosure, or reproduction of this message, except as intended, is prohibited. If you received this email in error, please notify the sender and remove all copies of the message, including any attachments. Any views or opinions expressed in this email (unless otherwise stated) may not represent those of Capital & Coast District Health Board.
-[X]
-[X]
-[X]
-[X]
-[X]
-[X]
-[X]
-[X]
-[X]
+diff --git a/drivers/crypto/nx/nx-aes-ecb.c b/drivers/crypto/nx/nx-aes-ecb.c
+index fe0d803..85a8d23 100644
+--- a/drivers/crypto/nx/nx-aes-ecb.c
++++ b/drivers/crypto/nx/nx-aes-ecb.c
+@@ -71,37 +71,49 @@ static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
+ 	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
+ 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
+ 	unsigned long irq_flags;
++	unsigned int processed = 0, to_process;
++	u32 max_sg_len;
+ 	int rc;
+ 
+ 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
+ 
+-	if (nbytes > nx_ctx->ap->databytelen) {
+-		rc = -EINVAL;
+-		goto out;
+-	}
++	max_sg_len = min_t(u32, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
++			   nx_ctx->ap->sglen);
+ 
+ 	if (enc)
+ 		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
+ 	else
+ 		NX_CPB_FDM(csbcpb) &= ~NX_FDM_ENDE_ENCRYPT;
+ 
+-	rc = nx_build_sg_lists(nx_ctx, desc, dst, src, nbytes, 0, NULL);
+-	if (rc)
+-		goto out;
++	do {
++		to_process = min_t(u64, nbytes - processed,
++				   nx_ctx->ap->databytelen);
++		to_process = min_t(u64, to_process,
++				   NX_PAGE_SIZE * (max_sg_len - 1));
++		to_process = to_process & ~(AES_BLOCK_SIZE - 1);
+ 
+-	if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
+-		rc = -EINVAL;
+-		goto out;
+-	}
++		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, to_process,
++				processed, NULL);
++		if (rc)
++			goto out;
+ 
+-	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op,
+-			   desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
+-	if (rc)
+-		goto out;
++		if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
++			rc = -EINVAL;
++			goto out;
++		}
++
++		rc = nx_hcall_sync(nx_ctx, &nx_ctx->op,
++				   desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
++		if (rc)
++			goto out;
++
++		atomic_inc(&(nx_ctx->stats->aes_ops));
++		atomic64_add(csbcpb->csb.processed_byte_count,
++			     &(nx_ctx->stats->aes_bytes));
++
++		processed += to_process;
++	} while (processed < nbytes);
+ 
+-	atomic_inc(&(nx_ctx->stats->aes_ops));
+-	atomic64_add(csbcpb->csb.processed_byte_count,
+-		     &(nx_ctx->stats->aes_bytes));
+ out:
+ 	spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
+ 	return rc;
+-- 
+1.7.12
