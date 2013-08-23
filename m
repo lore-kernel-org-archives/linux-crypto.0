@@ -1,65 +1,62 @@
 From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-Subject: [PATCH 10/10] crypto: nx - fix SHA-2 for chunks bigger than block size
-Date: Fri, 23 Aug 2013 17:01:14 -0300
-Message-ID: <1377288074-18998-11-git-send-email-mhcerri@linux.vnet.ibm.com>
-References: <1377288074-18998-1-git-send-email-mhcerri@linux.vnet.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Subject: [PATCH 00/10] Series of fixes for NX driver
+Date: Fri, 23 Aug 2013 17:01:04 -0300
+Message-ID: <1377288074-18998-1-git-send-email-mhcerri@linux.vnet.ibm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp04.br.ibm.com ([32.104.18.25]:43954 "EHLO
-	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932132Ab3HWUBy (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Aug 2013 16:01:54 -0400
-Received: from /spool/local
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <mhcerri@linux.vnet.ibm.com>;
-	Fri, 23 Aug 2013 17:01:51 -0300
-In-Reply-To: <1377288074-18998-1-git-send-email-mhcerri@linux.vnet.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Each call to the co-processor, with exception of the last call, needs to
-send data that is multiple of block size. As consequence, any remaining
-data is kept in the internal NX context.
+This series of patches contains fixes in several algorithms implemented
+by the NX driver. The patches can be separated in three different
+categories:
 
-This patch fixes a bug in the driver that causes it to save incorrect
-data into the context when data is bigger than the block size.
+ - Changes to split the data in several hyper calls to respect the
+   limits of data that the co-processador can handle. This affects
+   all AES modes.
+ - Fixes in how the driver handle zero length messages. This affects
+   XCBC and GCM.
+ - Fixes for SHA-2 when chunks bigger than the block size are provided.
 
-Reviewed-by: Joy Latten <jmlatten@linux.vnet.ibm.com>
-Signed-off-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
----
- drivers/crypto/nx/nx-sha256.c | 2 +-
- drivers/crypto/nx/nx-sha512.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Fionnuala Gunter (2):
+  crypto: nx - fix limits to sg lists for AES-XCBC
+  crypto: nx - fix limits to sg lists for AES-CCM
 
-diff --git a/drivers/crypto/nx/nx-sha256.c b/drivers/crypto/nx/nx-sha256.c
-index 6547a71..da0b24a 100644
---- a/drivers/crypto/nx/nx-sha256.c
-+++ b/drivers/crypto/nx/nx-sha256.c
-@@ -129,7 +129,7 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
- 		NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
- 
- 		total -= to_process;
--		data += to_process;
-+		data += to_process - sctx->count;
- 		sctx->count = 0;
- 		in_sg = nx_ctx->in_sg;
- 	} while (leftover >= SHA256_BLOCK_SIZE);
-diff --git a/drivers/crypto/nx/nx-sha512.c b/drivers/crypto/nx/nx-sha512.c
-index 236e6af..4ae5b0f 100644
---- a/drivers/crypto/nx/nx-sha512.c
-+++ b/drivers/crypto/nx/nx-sha512.c
-@@ -131,7 +131,7 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 		NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
- 
- 		total -= to_process;
--		data += to_process;
-+		data += to_process - sctx->count[0];
- 		sctx->count[0] = 0;
- 		in_sg = nx_ctx->in_sg;
- 	} while (leftover >= SHA512_BLOCK_SIZE);
+Marcelo Cerri (8):
+  crypto: nx - add offset to nx_build_sg_lists()
+  crypto: nx - fix limits to sg lists for AES-ECB
+  crypto: nx - fix limits to sg lists for AES-CBC
+  crypto: nx - fix limits to sg lists for AES-CTR
+  crypto: nx - fix limits to sg lists for AES-GCM
+  crypto: nx - fix XCBC for zero length messages
+  crypto: nx - fix GCM for zero length messages
+  crypto: nx - fix SHA-2 for chunks bigger than block size
+
+ drivers/crypto/nx/nx-aes-cbc.c  |  50 ++++---
+ drivers/crypto/nx/nx-aes-ccm.c  | 297 +++++++++++++++++++++++++++++-----------
+ drivers/crypto/nx/nx-aes-ctr.c  |  50 ++++---
+ drivers/crypto/nx/nx-aes-ecb.c  |  48 ++++---
+ drivers/crypto/nx/nx-aes-gcm.c  | 292 ++++++++++++++++++++++++++++++---------
+ drivers/crypto/nx/nx-aes-xcbc.c | 191 +++++++++++++++++++-------
+ drivers/crypto/nx/nx-sha256.c   |   2 +-
+ drivers/crypto/nx/nx-sha512.c   |   2 +-
+ drivers/crypto/nx/nx.c          |   9 +-
+ drivers/crypto/nx/nx.h          |   2 +-
+ 10 files changed, 683 insertions(+), 260 deletions(-)
+
 -- 
 1.7.12
