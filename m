@@ -1,50 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] kernel/padata.c: share code between CPU_ONLINE and
- CPU_DOWN_FAILED, same to CPU_DOWN_PREPARE and CPU_UP_CANCELED
-Date: Fri, 23 Aug 2013 20:47:32 +1000
-Message-ID: <20130823104731.GA30865@gondor.apana.org.au>
-References: <5212E5E4.8010408@asianux.com>
- <5212E61F.7010602@asianux.com>
- <20130822051122.GB26773@secunet.com>
- <5215A134.90607@asianux.com>
- <20130822060503.GC26773@secunet.com>
- <5215B319.3020908@asianux.com>
- <20130823104448.GI26773@secunet.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Chen Gang <gang.chen@asianux.com>, linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:57395 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754564Ab3HWKrk (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Aug 2013 06:47:40 -0400
-Content-Disposition: inline
-In-Reply-To: <20130823104448.GI26773@secunet.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Richard Weinberger <richard@nod.at>
+Subject: [PATCH] kernel/padata.c: Register hotcpu notifier after initialization
+Date: Fri, 23 Aug 2013 13:12:33 +0200
+Message-ID: <1377256353-7979-1-git-send-email-richard@nod.at>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	herbert@gondor.apana.org.au, gang.chen@asianux.com,
+	Richard Weinberger <richard@nod.at>
+To: steffen.klassert@secunet.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Aug 23, 2013 at 12:44:48PM +0200, Steffen Klassert wrote:
-> On Thu, Aug 22, 2013 at 02:43:37PM +0800, Chen Gang wrote:
-> > Share code between CPU_ONLINE and CPU_DOWN_FAILED, same to
-> > CPU_DOWN_PREPARE and CPU_UP_CANCELED.
-> > 
-> > It will fix 2 bugs:
-> > 
-> >   "not check the return value of __padata_remove_cpu() and __padata_add_cpu()".
-> >   "need add 'break' between CPU_UP_CANCELED and CPU_DOWN_FAILED".
-> > 
-> > 
-> > Signed-off-by: Chen Gang <gang.chen@asianux.com>
-> 
-> This looks ok to me, Herbert can you take this one?
+padata_cpu_callback() takes pinst->lock, to avoid taking
+an uninitialized lock, register the notifier after it's
+initialization.
 
-Sure.
+Signed-off-by: Richard Weinberger <richard@nod.at>
+---
+ kernel/padata.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Thanks,
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 072f4ee..8e1bf9d 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -1086,18 +1086,18 @@ struct padata_instance *padata_alloc(struct workqueue_struct *wq,
+ 
+ 	pinst->flags = 0;
+ 
+-#ifdef CONFIG_HOTPLUG_CPU
+-	pinst->cpu_notifier.notifier_call = padata_cpu_callback;
+-	pinst->cpu_notifier.priority = 0;
+-	register_hotcpu_notifier(&pinst->cpu_notifier);
+-#endif
+-
+ 	put_online_cpus();
+ 
+ 	BLOCKING_INIT_NOTIFIER_HEAD(&pinst->cpumask_change_notifier);
+ 	kobject_init(&pinst->kobj, &padata_attr_type);
+ 	mutex_init(&pinst->lock);
+ 
++#ifdef CONFIG_HOTPLUG_CPU
++	pinst->cpu_notifier.notifier_call = padata_cpu_callback;
++	pinst->cpu_notifier.priority = 0;
++	register_hotcpu_notifier(&pinst->cpu_notifier);
++#endif
++
+ 	return pinst;
+ 
+ err_free_masks:
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.3.1
