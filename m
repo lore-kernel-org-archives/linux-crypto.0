@@ -1,10 +1,10 @@
 From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH 03/18] asymmetric keys: separate the length checking of
- octet string from RSA_I2OSP
-Date: Sun, 25 Aug 2013 18:01:47 +0200
-Message-ID: <20130825160147.GB5171@amd.pavel.ucw.cz>
+Subject: Re: [PATCH 06/18] asymmetric keys: support parsing PKCS #8 private
+ key information
+Date: Sun, 25 Aug 2013 18:10:12 +0200
+Message-ID: <20130825161012.GC5171@amd.pavel.ucw.cz>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
- <1377169317-5959-4-git-send-email-jlee@suse.com>
+ <1377169317-5959-7-git-send-email-jlee@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org,
@@ -26,30 +26,51 @@ Cc: linux-kernel@vger.kernel.org,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
 	"Lee, Chun-Yi" <jlee@suse.com>
 To: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:37511 "EHLO
+	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754450Ab3HYQKP (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 25 Aug 2013 12:10:15 -0400
 Content-Disposition: inline
-In-Reply-To: <1377169317-5959-4-git-send-email-jlee@suse.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1377169317-5959-7-git-send-email-jlee@suse.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu 2013-08-22 19:01:42, Lee, Chun-Yi wrote:
-> Due to RSA_I2OSP is not only used by signature verification path but also used
-> in signature generation path. So, separate the length checking of octet string
-> because it's not for generate 0x00 0x01 leading string when used in signature
-> generation.
+On Thu 2013-08-22 19:01:45, Lee, Chun-Yi wrote:
+> Add ASN.1 files and parser to support parsing PKCS #8 noncompressed private
+> key information. It's better than direct parsing pure private key because
+> PKCS #8 has a privateKeyAlgorithm to indicate the algorithm of private
+> key, e.g. RSA from PKCS #1
 > 
 > Reviewed-by: Jiri Kosina <jkosina@suse.cz>
 > Signed-off-by: Lee, Chun-Yi <jlee@suse.com>
 
-> +static int RSA_I2OSP(MPI x, size_t xLen, u8 **_X)
-> +{
-> +	unsigned x_size;
-> +	unsigned X_size;
-> +	u8 *X = NULL;
 
-Is this kernel code or entry into obfuscated C code contest? This is not funny.
+> +#include <crypto/public_key.h>
+> +
+> +struct pkcs8_info {
+> +	enum pkey_algo privkey_algo:8;		/* Private key algorithm */
 
-									Pavel
+Are you sure this is well-defined?
+
+> +struct private_key_algorithm *pkcs8_private_key_algorithms[PKEY_ALGO__LAST] = {
+> +	[PKEY_ALGO_DSA]         = NULL,
+> +#if defined(CONFIG_PUBLIC_KEY_ALGO_RSA) || \
+> +	defined(CONFIG_PUBLIC_KEY_ALGO_RSA_MODULE)
+> +	[PKEY_ALGO_RSA]         = &RSA_private_key_algorithm,
+> +#endif
+> +};
+
+  pkey_algo
+  privkey_algo
+  private_key_algorithm
+
+...you use all variants.
+
+Having symbols with "__" inside them is "interesting". I'd not do it.
+										Pavel
+
 -- 
 (english) http://www.livejournal.com/~pavelmachek
 (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
