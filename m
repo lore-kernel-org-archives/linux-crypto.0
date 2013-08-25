@@ -1,10 +1,10 @@
 From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH 06/18] asymmetric keys: support parsing PKCS #8 private
- key information
-Date: Sun, 25 Aug 2013 18:10:12 +0200
-Message-ID: <20130825161012.GC5171@amd.pavel.ucw.cz>
+Subject: Re: [PATCH 07/18] asymmetric keys: explicitly add the leading zero
+ byte to encoded message
+Date: Sun, 25 Aug 2013 18:13:13 +0200
+Message-ID: <20130825161313.GD5171@amd.pavel.ucw.cz>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
- <1377169317-5959-7-git-send-email-jlee@suse.com>
+ <1377169317-5959-8-git-send-email-jlee@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org,
@@ -26,51 +26,35 @@ Cc: linux-kernel@vger.kernel.org,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
 	"Lee, Chun-Yi" <jlee@suse.com>
 To: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:37511 "EHLO
-	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754450Ab3HYQKP (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 25 Aug 2013 12:10:15 -0400
+Return-path: <linux-security-module-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1377169317-5959-7-git-send-email-jlee@suse.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1377169317-5959-8-git-send-email-jlee@suse.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu 2013-08-22 19:01:45, Lee, Chun-Yi wrote:
-> Add ASN.1 files and parser to support parsing PKCS #8 noncompressed private
-> key information. It's better than direct parsing pure private key because
-> PKCS #8 has a privateKeyAlgorithm to indicate the algorithm of private
-> key, e.g. RSA from PKCS #1
+On Thu 2013-08-22 19:01:46, Lee, Chun-Yi wrote:
+> Per PKCS1 spec, the EMSA-PKCS1-v1_5 encoded message is leading by 0x00 0x01 in
+> its first 2 bytes. The leading zero byte is suppressed by MPI so we pass a
+> pointer to the _preceding_ byte to RSA_verify() in original code, but it has
+> risk for the byte is not zero because it's not in EM buffer's scope, neither
+> RSA_verify() nor mpi_get_buffer() didn't take care the leading byte.
+> 
+> To avoid the risk, that's better we explicitly add the leading zero byte to EM
+> for pass to RSA_verify(). This patch allocate a _EM buffer to capture the
+> result from RSA_I2OSP(), then set the first byte to zero in EM and copy the
+> remaining bytes from _EM.
 > 
 > Reviewed-by: Jiri Kosina <jkosina@suse.cz>
 > Signed-off-by: Lee, Chun-Yi <jlee@suse.com>
 
+> -	ret = RSA_verify(H, EM - 1, k, sig->digest_size,
+> +	EM = kmalloc(k, GFP_KERNEL);
+> +	memset(EM, 0, 1);
+> +	memcpy(EM + 1, _EM, k-1);
+> +	kfree(_EM);
 
-> +#include <crypto/public_key.h>
-> +
-> +struct pkcs8_info {
-> +	enum pkey_algo privkey_algo:8;		/* Private key algorithm */
-
-Are you sure this is well-defined?
-
-> +struct private_key_algorithm *pkcs8_private_key_algorithms[PKEY_ALGO__LAST] = {
-> +	[PKEY_ALGO_DSA]         = NULL,
-> +#if defined(CONFIG_PUBLIC_KEY_ALGO_RSA) || \
-> +	defined(CONFIG_PUBLIC_KEY_ALGO_RSA_MODULE)
-> +	[PKEY_ALGO_RSA]         = &RSA_private_key_algorithm,
-> +#endif
-> +};
-
-  pkey_algo
-  privkey_algo
-  private_key_algorithm
-
-...you use all variants.
-
-Having symbols with "__" inside them is "interesting". I'd not do it.
-										Pavel
-
+Spot a crash waiting to happen.
+									Pavel
 -- 
 (english) http://www.livejournal.com/~pavelmachek
 (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
