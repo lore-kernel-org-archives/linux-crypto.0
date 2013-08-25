@@ -1,104 +1,83 @@
-From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-Subject: [PATCH 04/10] crypto: nx - fix limits to sg lists for AES-CTR
-Date: Fri, 23 Aug 2013 17:01:08 -0300
-Message-ID: <1377288074-18998-5-git-send-email-mhcerri@linux.vnet.ibm.com>
-References: <1377288074-18998-1-git-send-email-mhcerri@linux.vnet.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1377288074-18998-1-git-send-email-mhcerri@linux.vnet.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
+Subject: Re: [PATCH 02/18] asymmetric keys: implement
+ EMSA_PKCS1-v1_5-ENCODE in rsa
+Date: Sun, 25 Aug 2013 17:53:09 +0200
+Message-ID: <20130825155309.GA5171@amd.pavel.ucw.cz>
+References: <1377169317-5959-1-git-send-email-jlee@suse.com>
+ <1377169317-5959-3-git-send-email-jlee@suse.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
+	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
+	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
+	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
+	Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
+	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"Lee, Chun-Yi" <jlee-IBi9RG/b67k@public.gmane.org>
+To: "Lee, Chun-Yi" <joeyli.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1377169317-5959-3-git-send-email-jlee-IBi9RG/b67k@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch updates the nx-aes-ctr implementation to perform several
-hyper calls if needed in order to always respect the length limits for
-scatter/gather lists.
+On Thu 2013-08-22 19:01:41, Lee, Chun-Yi wrote:
+> Implement EMSA_PKCS1-v1_5-ENCODE [RFC3447 sec 9.2] in rsa.c. It's the
+> first step of signature generation operation
+> (RSASSA-PKCS1-v1_5-SIGN).
 
-Two different limits are considered:
+Is this your own code, or did you copy it from somewhere?
 
- - "ibm,max-sg-len": maximum number of bytes of each scatter/gather
-   list.
+> +	if (!T)
+> +		goto error_T;
+> +
+> +	memcpy(T, RSA_ASN1_templates[hash_algo].data, RSA_ASN1_templates[hash_algo].size);
+> +	memcpy(T + RSA_ASN1_templates[hash_algo].size, pks->digest, pks->digest_size);
+> +
+> +	/* 3) check If emLen < tLen + 11, output "intended encoded message length too short" */
+> +	if (emLen < tLen + 11) {
+> +		ret = EINVAL;
+> +		goto error_emLen;
+> +	}
 
- - "ibm,max-sync-cop":
-    - The total number of bytes that a scatter/gather list can hold.
-    - The maximum number of elements that a scatter/gather list can have.
+Normal kernel calling convention is 0 / -EINVAL.
 
-Reviewed-by: Joy Latten <jmlatten@linux.vnet.ibm.com>
-Signed-off-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
----
- drivers/crypto/nx/nx-aes-ctr.c | 50 ++++++++++++++++++++++++++----------------
- 1 file changed, 31 insertions(+), 19 deletions(-)
+> +	memcpy(EM + 2, PS, emLen - tLen - 3);
+> +	EM[2 + emLen - tLen - 3] = 0x00;
+> +	memcpy(EM + 2 + emLen - tLen - 3 + 1, T, tLen);
 
-diff --git a/drivers/crypto/nx/nx-aes-ctr.c b/drivers/crypto/nx/nx-aes-ctr.c
-index 80dee8d..a37d009 100644
---- a/drivers/crypto/nx/nx-aes-ctr.c
-+++ b/drivers/crypto/nx/nx-aes-ctr.c
-@@ -89,33 +89,45 @@ static int ctr_aes_nx_crypt(struct blkcipher_desc *desc,
- 	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
- 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
- 	unsigned long irq_flags;
-+	unsigned int processed = 0, to_process;
-+	u32 max_sg_len;
- 	int rc;
- 
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
- 
--	if (nbytes > nx_ctx->ap->databytelen) {
--		rc = -EINVAL;
--		goto out;
--	}
-+	max_sg_len = min_t(u32, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
-+			   nx_ctx->ap->sglen);
- 
--	rc = nx_build_sg_lists(nx_ctx, desc, dst, src, nbytes, 0,
--			       csbcpb->cpb.aes_ctr.iv);
--	if (rc)
--		goto out;
-+	do {
-+		to_process = min_t(u64, nbytes - processed,
-+				   nx_ctx->ap->databytelen);
-+		to_process = min_t(u64, to_process,
-+				   NX_PAGE_SIZE * (max_sg_len - 1));
-+		to_process = to_process & ~(AES_BLOCK_SIZE - 1);
- 
--	if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
--		rc = -EINVAL;
--		goto out;
--	}
-+		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, to_process,
-+				       processed, csbcpb->cpb.aes_ctr.iv);
-+		if (rc)
-+			goto out;
- 
--	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op,
--			   desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
--	if (rc)
--		goto out;
-+		if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
-+			rc = -EINVAL;
-+			goto out;
-+		}
- 
--	atomic_inc(&(nx_ctx->stats->aes_ops));
--	atomic64_add(csbcpb->csb.processed_byte_count,
--		     &(nx_ctx->stats->aes_bytes));
-+		rc = nx_hcall_sync(nx_ctx, &nx_ctx->op,
-+				   desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
-+		if (rc)
-+			goto out;
-+
-+		memcpy(desc->info, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
-+
-+		atomic_inc(&(nx_ctx->stats->aes_ops));
-+		atomic64_add(csbcpb->csb.processed_byte_count,
-+			     &(nx_ctx->stats->aes_bytes));
-+
-+		processed += to_process;
-+	} while (processed < nbytes);
- out:
- 	spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
- 	return rc;
+ThisDoesNotLookLikeKernelCode, NoCamelCase, please.
+
+> +	*_EM = EM;
+
+And we don't usually use _ prefix like this.
+
+
+> --- a/include/crypto/public_key.h
+> +++ b/include/crypto/public_key.h
+> @@ -110,6 +110,8 @@ extern void public_key_destroy(void *payload);
+>  struct public_key_signature {
+>  	u8 *digest;
+>  	u8 digest_size;			/* Number of bytes in digest */
+> +	u8 *S;				/* signature S of length k octets */
+
+u8 *signature?
+
+> +	size_t k;			/* length k of signature S */
+
+u8 *signature_length.
+
 -- 
-1.7.12
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
