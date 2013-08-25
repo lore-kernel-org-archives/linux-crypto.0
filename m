@@ -1,10 +1,10 @@
 From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH 09/18] Secure boot: Add a dummy kernel parameter that
- will switch on Secure Boot mode
-Date: Sun, 25 Aug 2013 18:16:49 +0200
-Message-ID: <20130825161649.GF5171@amd.pavel.ucw.cz>
+Subject: Re: [PATCH 10/18] efi: Enable secure boot lockdown automatically
+ when enabled in firmware
+Date: Sun, 25 Aug 2013 18:22:43 +0200
+Message-ID: <20130825162243.GG5171@amd.pavel.ucw.cz>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
- <1377169317-5959-10-git-send-email-jlee@suse.com>
+ <1377169317-5959-11-git-send-email-jlee@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org,
@@ -24,49 +24,27 @@ Cc: linux-kernel@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
+	Matthew Garrett <mjg@redhat.com>,
 	"Lee, Chun-Yi" <jlee@suse.com>
 To: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
 Return-path: <linux-security-module-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1377169317-5959-10-git-send-email-jlee@suse.com>
+In-Reply-To: <1377169317-5959-11-git-send-email-jlee@suse.com>
 Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-You may want to check subject. If it does something, it is not dummy.
+On Thu 2013-08-22 19:01:49, Lee, Chun-Yi wrote:
+> From: Matthew Garrett <mjg@redhat.com>
+> 
+> The firmware has a set of flags that indicate whether secure boot is enabled
+> and enforcing. Use them to indicate whether the kernel should lock itself
+> down.  We also indicate the machine is in secure boot mode by adding the
+> EFI_SECURE_BOOT bit for use with efi_enabled.
 
-> --- a/Documentation/kernel-parameters.txt
-> +++ b/Documentation/kernel-parameters.txt
-> @@ -2784,6 +2784,13 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
->  			Note: increases power consumption, thus should only be
->  			enabled if running jitter sensitive (HPC/RT) workloads.
->  
-> +	secureboot_enable=
-> +			[KNL] Enables an emulated UEFI Secure Boot mode.  This
-> +			locks down various aspects of the kernel guarded by the
-> +			CAP_COMPROMISE_KERNEL capability.  This includes things
-> +			like /dev/mem, IO port access, and other areas.  It can
-> +			be used on non-UEFI machines for testing purposes.
-> +
->  	security=	[SECURITY] Choose a security module to enable at boot.
->  			If this boot parameter is not specified, only the first
->  			security module asking for security registration will be
-> diff --git a/kernel/cred.c b/kernel/cred.c
-> index e0573a4..c3f4e3e 100644
-> --- a/kernel/cred.c
-> +++ b/kernel/cred.c
-> @@ -565,6 +565,23 @@ void __init cred_init(void)
->  				     0, SLAB_HWCACHE_ALIGN|SLAB_PANIC, NULL);
->  }
->  
-> +void __init secureboot_enable()
-> +{
-> +	pr_info("Secure boot enabled\n");
-> +	cap_lower((&init_cred)->cap_bset, CAP_COMPROMISE_KERNEL);
-> +	cap_lower((&init_cred)->cap_permitted, CAP_COMPROMISE_KERNEL);
-> +}
+> +	status = efi_call_phys5(sys_table->runtime->get_variable,
+> +				L"SecureBoot", &var_guid, NULL, &datasize, &sb);
 
-OTOH you don't implement CAP_COMPROMISE_KERNEL, so it is dummy after
-all. But CAP_COMPROMISE_KERNEL is infeasible to implement, right?
+What is this L"..." thing?
 									Pavel
 
 -- 
