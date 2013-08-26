@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [PATCH 03/18] asymmetric keys: separate the length checking of
  octet string from RSA_I2OSP
 Date: Mon, 26 Aug 2013 18:25:31 +0800
-Message-ID: <1377512731.27967.34.camel__11690.4388917193$1377512830$gmane$org@linux-s257.site>
+Message-ID: <1377512731.27967.34.camel__38879.4046397836$1377512833$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <1377169317-5959-4-git-send-email-jlee@suse.com>
 	 <20130825160147.GB5171@amd.pavel.ucw.cz>
@@ -27,9 +27,9 @@ Cc: linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-pm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20130825160147.GB5171@amd.pavel.ucw.cz>
-Sender: linux-pm-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E6=97=A5=EF=BC=8C2013-08-25 =E6=96=BC 18:01 +0200=EF=BC=8CPa=
@@ -69,5 +69,3 @@ Do you have good suggest for the naming?
 
 Thanks a lot!
 Joey Lee
-
-
