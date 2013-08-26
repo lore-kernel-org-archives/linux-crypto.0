@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [PATCH 03/18] asymmetric keys: separate the length checking of
  octet string from RSA_I2OSP
 Date: Mon, 26 Aug 2013 18:25:31 +0800
-Message-ID: <1377512731.27967.34.camel__38879.4046397836$1377512833$gmane$org@linux-s257.site>
+Message-ID: <1377512731.27967.34.camel__39330.6279126138$1377512844$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <1377169317-5959-4-git-send-email-jlee@suse.com>
 	 <20130825160147.GB5171@amd.pavel.ucw.cz>
@@ -27,10 +27,15 @@ Cc: linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.nue.novell.com ([195.135.221.5]:60054 "EHLO
+	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755892Ab3HZK04 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 26 Aug 2013 06:26:56 -0400
 In-Reply-To: <20130825160147.GB5171@amd.pavel.ucw.cz>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 =E6=96=BC =E6=97=A5=EF=BC=8C2013-08-25 =E6=96=BC 18:01 +0200=EF=BC=8CPa=
 vel Machek =E6=8F=90=E5=88=B0=EF=BC=9A
