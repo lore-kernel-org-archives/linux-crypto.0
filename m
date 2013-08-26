@@ -1,50 +1,35 @@
-From: Chen Gang <gang.chen@asianux.com>
-Subject: Re: [PATCH v2] kernel/padata.c: share code between CPU_ONLINE and
- CPU_DOWN_FAILED, same to CPU_DOWN_PREPARE and CPU_UP_CANCELED
-Date: Mon, 26 Aug 2013 09:11:31 +0800
-Message-ID: <521AAB43.3080604@asianux.com>
-References: <5212E5E4.8010408@asianux.com> <5212E61F.7010602@asianux.com> <20130822051122.GB26773@secunet.com> <5215A134.90607@asianux.com> <20130822060503.GC26773@secunet.com> <5215B319.3020908@asianux.com> <20130823104448.GI26773@secunet.com> <20130823104731.GA30865@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] [PATCH]  Fix for a warning - crypto/fcrypt,c
+Date: Mon, 26 Aug 2013 16:04:29 +1000
+Message-ID: <20130826060429.GA25922@gondor.apana.org.au>
+References: <4092573.JCpLRYcAKP@aragorn.auenland.lan>
+ <3514602.viscUS1bgS@aragorn.auenland.lan>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, behanw@converseincode.com,
+	pageexec@freemail.hu
+To: Jan-Simon =?iso-8859-1?Q?M=F6ller?= <dl9pf@gmx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from intranet.asianux.com ([58.214.24.6]:8693 "EHLO
-	intranet.asianux.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754728Ab3HZBMh (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:55870 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756136Ab3HZGEe (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 25 Aug 2013 21:12:37 -0400
-In-Reply-To: <20130823104731.GA30865@gondor.apana.org.au>
+	Mon, 26 Aug 2013 02:04:34 -0400
+Content-Disposition: inline
+In-Reply-To: <3514602.viscUS1bgS@aragorn.auenland.lan>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/23/2013 06:47 PM, Herbert Xu wrote:
-> On Fri, Aug 23, 2013 at 12:44:48PM +0200, Steffen Klassert wrote:
->> On Thu, Aug 22, 2013 at 02:43:37PM +0800, Chen Gang wrote:
->>> Share code between CPU_ONLINE and CPU_DOWN_FAILED, same to
->>> CPU_DOWN_PREPARE and CPU_UP_CANCELED.
->>>
->>> It will fix 2 bugs:
->>>
->>>   "not check the return value of __padata_remove_cpu() and __padata_add_cpu()".
->>>   "need add 'break' between CPU_UP_CANCELED and CPU_DOWN_FAILED".
->>>
->>>
->>> Signed-off-by: Chen Gang <gang.chen@asianux.com>
->>
->> This looks ok to me, Herbert can you take this one?
-> 
-> Sure.
-> 
+On Wed, Aug 21, 2013 at 10:42:01PM +0200, Jan-Simon M=F6ller wrote:
+>=20
+> Should I resend a fixed version with=20
+> (1U << 27) - 1) instead ?
 
-Thank you all.
+Sure.
 
-> Thanks,
-> 
-
-Thanks.
--- 
-Chen Gang
+Thanks,
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
