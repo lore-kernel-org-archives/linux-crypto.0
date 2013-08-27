@@ -1,63 +1,67 @@
-From: joeyli <jlee@suse.com>
+From: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
 Subject: Re: [PATCH 11/18] Hibernate: introduced RSA key-pair to verify
  signature of snapshot
-Date: Tue, 27 Aug 2013 21:12:39 +0800
-Message-ID: <1377609159.20140.32.camel__32480.6518191055$1377609283$gmane$org@linux-s257.site>
+Date: Tue, 27 Aug 2013 16:17:22 +0200
+Message-ID: <20130827141722.GA23163@amd.pavel.ucw.cz>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
-	 <1377169317-5959-12-git-send-email-jlee@suse.com>
-	 <20130825162554.GH5171@amd.pavel.ucw.cz>
-	 <1377594283.20140.3.camel@linux-s257.site>
-	 <20130827112943.GA20527@amd.pavel.ucw.cz>
+ <1377169317-5959-12-git-send-email-jlee@suse.com>
+ <20130825162554.GH5171@amd.pavel.ucw.cz>
+ <1377594283.20140.3.camel@linux-s257.site>
+ <20130827112943.GA20527@amd.pavel.ucw.cz>
+ <20130827120142.GA4314@saturn.hollstein.homelinux.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	opensuse-kernel@opensuse.org, David Howells <dhowells@redhat.com>,
-	"Rafael J. Wysocki" <rjw@sisk.pl>,
-	Matthew Garrett <mjg59@srcf.ucam.org>,
-	Len Brown <len.brown@intel.com>,
-	Josh Boyer <jwboyer@redhat.com>,
-	Vojtech Pavlik <vojtech@suse.cz>,
-	Matt Fleming <matt.fleming@intel.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
-	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
-	Takashi Iwai <tiwai@suse.de>
-To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-pm-owner@vger.kernel.org>
-In-Reply-To: <20130827112943.GA20527@amd.pavel.ucw.cz>
-Sender: linux-pm-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Manfred Hollstein <mhollstein-zqRNUXuvxA0b1SvskN2V4Q@public.gmane.org>, joeyli <jlee-IBi9RG/b67k@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
+	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
+	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
+	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
+	Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
+	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Takashi Iwai <tiwai
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20130827120142.GA4314-FGSgn5mWDzkZXJsbVdw/lG363IjY150HP6IUcbMO39o@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-=E6=96=BC =E4=BA=8C=EF=BC=8C2013-08-27 =E6=96=BC 13:29 +0200=EF=BC=8CPa=
-vel Machek =E6=8F=90=E5=88=B0=EF=BC=9A
-> > > > @@ -1205,6 +1290,10 @@ struct boot_params *efi_main(void *handl=
-e, efi_system_table_t *_table,
-> > > > =20
-> > > >  	setup_efi_pci(boot_params);
-> > > > =20
-> > > > +#ifdef CONFIG_SNAPSHOT_VERIFICATION
-> > > > +	setup_s4_keys(boot_params);
-> > > > +#endif
-> > > > +
-> > >=20
-> > > Move ifdef inside the function?
-> >=20
-> > OK, I will define a dummy function for non-verification situation.
->=20
-> IIRC you can just put the #ifdef inside the function body.=20
-> 									Pavel
+On Tue 2013-08-27 14:01:42, Manfred Hollstein wrote:
+> On Tue, 27 Aug 2013, 13:29:43 +0200, Pavel Machek wrote:
+> > > > > @@ -1205,6 +1290,10 @@ struct boot_params *efi_main(void *handle, efi_system_table_t *_table,
+> > > > >  
+> > > > >  	setup_efi_pci(boot_params);
+> > > > >  
+> > > > > +#ifdef CONFIG_SNAPSHOT_VERIFICATION
+> > > > > +	setup_s4_keys(boot_params);
+> > > > > +#endif
+> > > > > +
+> > > > 
+> > > > Move ifdef inside the function?
+> > > 
+> > > OK, I will define a dummy function for non-verification situation.
+> > 
+> > IIRC you can just put the #ifdef inside the function body. 
+> 
+> This is certainly not to be invoked on a frequent basis (and therefore
+> not on a hot path), but from a more general angle, wouldn't this leave
+> a(nother) plain "jsr... rts" sequence without any effect other than
+> burning a few cycles? If the whole function call can be disabled
+> (ignored) in a certain configuration, it shouldn't call at all, should
+> it?
 
-I want use inline dummy function like saveable_highmem_page() in
-snapshot.c, maybe it's	 better then additional function call?
-
-
-Thanks a lot!
-Joey Lee
-
+gcc should be able to deal with optimizing that out.
+									Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
