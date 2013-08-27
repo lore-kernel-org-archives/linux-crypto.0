@@ -1,106 +1,68 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH 17/18] Hibernate: introduced SNAPSHOT_SIG_HASH config
- for select hash algorithm
-Date: Tue, 27 Aug 2013 13:30:44 +0200
-Message-ID: <20130827113044.GB20527@amd.pavel.ucw.cz>
+From: Manfred Hollstein <mhollstein-zqRNUXuvxA0b1SvskN2V4Q@public.gmane.org>
+Subject: Re: [PATCH 11/18] Hibernate: introduced RSA key-pair to verify
+ signature of snapshot
+Date: Tue, 27 Aug 2013 14:01:42 +0200
+Message-ID: <20130827120142.GA4314@saturn.hollstein.homelinux.org>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
- <1377169317-5959-18-git-send-email-jlee@suse.com>
- <20130825164329.GL5171@amd.pavel.ucw.cz>
- <1377598937.20140.12.camel@linux-s257.site>
+ <1377169317-5959-12-git-send-email-jlee@suse.com>
+ <20130825162554.GH5171@amd.pavel.ucw.cz>
+ <1377594283.20140.3.camel@linux-s257.site>
+ <20130827112943.GA20527@amd.pavel.ucw.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	opensuse-kernel@opensuse.org, David Howells <dhowells@redhat.com>,
-	"Rafael J. Wysocki" <rjw@sisk.pl>,
-	Matthew Garrett <mjg59@srcf.ucam.org>,
-	Len Brown <len.brown@intel.com>,
-	Josh Boyer <jwboyer@redhat.com>,
-	Vojtech Pavlik <vojtech@suse.cz>,
-	Matt Fleming <matt.fleming@intel.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
-	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
-To: joeyli <jlee@suse.com>
-Return-path: <linux-pm-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: joeyli <jlee-IBi9RG/b67k@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
+	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
+	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
+	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
+	Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
+	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Takashi Iwai <tiwai-l3A5Bk7waGM@public.gmane.org>
+To: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
+Return-path: <opensuse-kernel+bounces-5014-glsk-opensuse-kernel=m.gmane.org-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Post: <mailto:opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Help: <mailto:opensuse-kernel+help-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Subscribe: <mailto:opensuse-kernel+subscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Unsubscribe: <mailto:opensuse-kernel+unsubscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Owner: <mailto:opensuse-kernel+owner-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Archive: <http://lists.opensuse.org/opensuse-kernel/>
 Content-Disposition: inline
-In-Reply-To: <1377598937.20140.12.camel@linux-s257.site>
-Sender: linux-pm-owner@vger.kernel.org
+In-Reply-To: <20130827112943.GA20527-tWAi6jLit6GreWDznjuHag@public.gmane.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue 2013-08-27 18:22:17, joeyli wrote:
-> =E6=96=BC =E6=97=A5=EF=BC=8C2013-08-25 =E6=96=BC 18:43 +0200=EF=BC=8C=
-Pavel Machek =E6=8F=90=E5=88=B0=EF=BC=9A
-> > On Thu 2013-08-22 19:01:56, Lee, Chun-Yi wrote:
-> > > This patch introduced SNAPSHOT_SIG_HASH config for user to select=
- which
-> > > hash algorithm will be used during signature generation of snapsh=
-ot.
-> > >=20
-> > > v2:
-> > > Add define check of oCONFIG_SNAPSHOT_VERIFICATION in snapshot.c b=
-efore
-> > > declare pkey_hash().
-> > >=20
-> > > Reviewed-by: Jiri Kosina <jkosina@suse.cz>
-> > > Signed-off-by: Lee, Chun-Yi <jlee@suse.com>
-> > > ---
-> > >  kernel/power/Kconfig    |   46 +++++++++++++++++++++++++++++++++=
-+++++++++++++
-> > >  kernel/power/snapshot.c |   27 ++++++++++++++++++++++-----
-> > >  2 files changed, 68 insertions(+), 5 deletions(-)
-> > >=20
-> > > diff --git a/kernel/power/Kconfig b/kernel/power/Kconfig
-> > > index b592d88..79b34fa 100644
-> > > --- a/kernel/power/Kconfig
-> > > +++ b/kernel/power/Kconfig
-> > > @@ -78,6 +78,52 @@ config SNAPSHOT_VERIFICATION
-> > >  	  dependent on UEFI environment. EFI bootloader should generate=
- the
-> > >  	  key-pair.
-> > > =20
-> > > +choice
-> > > +	prompt "Which hash algorithm should snapshot be signed with?"
-> > > +        depends on SNAPSHOT_VERIFICATION
-> > > +        help
-> > > +          This determines which sort of hashing algorithm will b=
-e used during
-> > > +          signature generation of snapshot. This algorithm _must=
-_ be built into
-> > > +	  the kernel directly so that signature verification can take p=
-lace.
-> > > +	  It is not possible to load a signed snapshot containing the a=
-lgorithm
-> > > +	  to check the signature on that module.
-> >=20
-> > Like if 1000 ifdefs you already added to the code are not enough, y=
-ou
-> > make some new ones?
-> > 									Pavel
-> >=20
->=20
-> This SNAPSHOT_SIG_HASH kernel config is to select which SHA algorithm=
-s
-> used for generate digest of snapshot. The configuration will captured=
- by
-> a const char* in code:
->=20
-> +static const char *snapshot_hash =3D CONFIG_SNAPSHOT_SIG_HASH;
-> +
-> +static int pkey_hash(void)
->=20
-> So, there doesn't have any ifdef block derived from this new config.
+On Tue, 27 Aug 2013, 13:29:43 +0200, Pavel Machek wrote:
+> > > > @@ -1205,6 +1290,10 @@ struct boot_params *efi_main(void *handle, efi_system_table_t *_table,
+> > > >  
+> > > >  	setup_efi_pci(boot_params);
+> > > >  
+> > > > +#ifdef CONFIG_SNAPSHOT_VERIFICATION
+> > > > +	setup_s4_keys(boot_params);
+> > > > +#endif
+> > > > +
+> > > 
+> > > Move ifdef inside the function?
+> > 
+> > OK, I will define a dummy function for non-verification situation.
+> 
+> IIRC you can just put the #ifdef inside the function body. 
 
-I'd say select one hash function, and use it. There's no need to make
-it configurable.
-									Pavel
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses=
-/blog.html
+This is certainly not to be invoked on a frequent basis (and therefore
+not on a hot path), but from a more general angle, wouldn't this leave
+a(nother) plain "jsr... rts" sequence without any effect other than
+burning a few cycles? If the whole function call can be disabled
+(ignored) in a certain configuration, it shouldn't call at all, should
+it?
+
+Cheers.
+
+l8er
+manfred
