@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [PATCH 12/18] Hibernate: generate and verify signature of
  snapshot
 Date: Tue, 27 Aug 2013 11:22:28 +0800
-Message-ID: <1377573748.27967.60.camel__42178.3093399883$1377573864$gmane$org@linux-s257.site>
+Message-ID: <1377573748.27967.60.camel__47159.4966169961$1377573866$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <1377169317-5959-13-git-send-email-jlee@suse.com>
 	 <20130825163648.GI5171@amd.pavel.ucw.cz>
@@ -27,9 +27,9 @@ Cc: linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-pm-owner@vger.kernel.org>
 In-Reply-To: <20130825163648.GI5171@amd.pavel.ucw.cz>
-Sender: linux-security-module-owner@vger.kernel.org
+Sender: linux-pm-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 Hi Pavel,=20
@@ -205,8 +205,3 @@ Yes, here also duplicate, I will remove.
 Thanks a lot!
 Joey Lee
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-securit=
-y-module" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
