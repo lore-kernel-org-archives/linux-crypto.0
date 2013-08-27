@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [PATCH 11/18] Hibernate: introduced RSA key-pair to verify
  signature of snapshot
 Date: Tue, 27 Aug 2013 21:12:39 +0800
-Message-ID: <1377609159.20140.32.camel__16417.9959371269$1377609270$gmane$org@linux-s257.site>
+Message-ID: <1377609159.20140.32.camel__17722.24287638$1377609273$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <1377169317-5959-12-git-send-email-jlee@suse.com>
 	 <20130825162554.GH5171@amd.pavel.ucw.cz>
@@ -30,9 +30,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
 	Takashi Iwai <tiwai@suse.de>
 To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20130827112943.GA20527@amd.pavel.ucw.cz>
-Sender: linux-security-module-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E4=BA=8C=EF=BC=8C2013-08-27 =E6=96=BC 13:29 +0200=EF=BC=8CPa=
@@ -60,9 +60,3 @@ snapshot.c, maybe it's	 better then additional function call?
 
 Thanks a lot!
 Joey Lee
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-securit=
-y-module" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
