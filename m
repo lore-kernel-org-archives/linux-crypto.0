@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [PATCH 15/18] Hibernate: adapt to UEFI secure boot with
  signature check
 Date: Tue, 27 Aug 2013 18:14:37 +0800
-Message-ID: <1377598477.20140.5.camel__5869.64090257442$1377598584$gmane$org@linux-s257.site>
+Message-ID: <1377598477.20140.5.camel__1559.16475127942$1377598595$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <1377169317-5959-16-git-send-email-jlee@suse.com>
 	 <20130825164219.GK5171@amd.pavel.ucw.cz>
@@ -27,9 +27,9 @@ Cc: linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <20130825164219.GK5171@amd.pavel.ucw.cz>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E6=97=A5=EF=BC=8C2013-08-25 =E6=96=BC 18:42 +0200=EF=BC=8CPa=
@@ -158,3 +158,9 @@ I will use a help function to replace those ifdef block.
 
 Thanks for your suggestion!
 Joey Lee
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-securit=
+y-module" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
