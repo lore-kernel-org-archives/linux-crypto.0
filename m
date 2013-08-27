@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [PATCH 12/18] Hibernate: generate and verify signature of
  snapshot
 Date: Tue, 27 Aug 2013 11:22:28 +0800
-Message-ID: <1377573748.27967.60.camel__41441.2039485343$1377573852$gmane$org@linux-s257.site>
+Message-ID: <1377573748.27967.60.camel__2000.53475932709$1377573861$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <1377169317-5959-13-git-send-email-jlee@suse.com>
 	 <20130825163648.GI5171@amd.pavel.ucw.cz>
@@ -27,10 +27,15 @@ Cc: linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.nue.novell.com ([195.135.221.5]:36705 "EHLO
+	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752048Ab3H0DX4 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 26 Aug 2013 23:23:56 -0400
 In-Reply-To: <20130825163648.GI5171@amd.pavel.ucw.cz>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 Hi Pavel,=20
 
