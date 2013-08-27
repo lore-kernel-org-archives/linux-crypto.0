@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [PATCH 17/18] Hibernate: introduced SNAPSHOT_SIG_HASH config
  for select hash algorithm
 Date: Tue, 27 Aug 2013 20:54:57 +0800
-Message-ID: <1377608097.20140.30.camel__21136.1151807525$1377608218$gmane$org@linux-s257.site>
+Message-ID: <1377608097.20140.30.camel__6220.93303031779$1377608221$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <1377169317-5959-18-git-send-email-jlee@suse.com>
 	 <20130825164329.GL5171@amd.pavel.ucw.cz>
@@ -29,15 +29,10 @@ Cc: linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nue.novell.com ([195.135.221.5]:47885 "EHLO
-	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752877Ab3H0M4d (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 Aug 2013 08:56:33 -0400
+Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <20130827113044.GB20527@amd.pavel.ucw.cz>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E4=BA=8C=EF=BC=8C2013-08-27 =E6=96=BC 13:30 +0200=EF=BC=8CPa=
 vel Machek =E6=8F=90=E5=88=B0=EF=BC=9A
@@ -121,3 +116,9 @@ them this option to make decision?
 
 Thanks a lot!
 Joey LEe
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-securit=
+y-module" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
