@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [RFC PATCH 00/18 v3] Signature verification of hibernate
  snapshot
 Date: Thu, 29 Aug 2013 08:01:45 +0800
-Message-ID: <1377734505.19568.39.camel__47837.6409308568$1377734621$gmane$org@linux-s257.site>
+Message-ID: <1377734505.19568.39.camel__46875.2895402305$1377734632$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <87eh9dzg00.fsf@mid.deneb.enyo.de>
 Mime-Version: 1.0
@@ -26,10 +26,15 @@ Cc: linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Florian Weimer <fw@deneb.enyo.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.nue.novell.com ([195.135.221.5]:58774 "EHLO
+	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751917Ab3H2ADZ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 28 Aug 2013 20:03:25 -0400
 In-Reply-To: <87eh9dzg00.fsf@mid.deneb.enyo.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 Hi Florian,=20
 
