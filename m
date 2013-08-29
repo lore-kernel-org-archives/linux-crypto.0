@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [RFC PATCH 00/18 v3] Signature verification of hibernate
  snapshot
 Date: Fri, 30 Aug 2013 06:30:17 +0800
-Message-ID: <1377815417.7080.28.camel__30988.0141205669$1377815609$gmane$org@linux-s257.site>
+Message-ID: <1377815417.7080.28.camel__32935.8000810773$1377815619$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <87eh9dzg00.fsf@mid.deneb.enyo.de>
 	 <1377734505.19568.39.camel@linux-s257.site>
@@ -28,9 +28,9 @@ Cc: Florian Weimer <fw@deneb.enyo.de>, linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Pavel Machek <pavel@denx.de>
-Return-path: <linux-pm-owner@vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <20130829213249.GA25940@amd.pavel.ucw.cz>
-Sender: linux-pm-owner@vger.kernel.org
+Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E5=9B=9B=EF=BC=8C2013-08-29 =E6=96=BC 23:32 +0200=EF=BC=8CPa=
@@ -93,3 +93,8 @@ regeneration procedure.
 Thanks a lot!
 Joey LEe
 
+--
+To unsubscribe from this list: send the line "unsubscribe linux-securit=
+y-module" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
