@@ -1,40 +1,35 @@
-From: joeyli <jlee@suse.com>
+From: joeyli <jlee-IBi9RG/b67k@public.gmane.org>
 Subject: Re: [RFC PATCH 00/18 v3] Signature verification of hibernate
  snapshot
 Date: Thu, 29 Aug 2013 08:01:45 +0800
-Message-ID: <1377734505.19568.39.camel__46875.2895402305$1377734632$gmane$org@linux-s257.site>
+Message-ID: <1377734505.19568.39.camel__23732.3015150197$1377734634$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <87eh9dzg00.fsf@mid.deneb.enyo.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	opensuse-kernel@opensuse.org, David Howells <dhowells@redhat.com>,
-	"Rafael J. Wysocki" <rjw@sisk.pl>,
-	Matthew Garrett <mjg59@srcf.ucam.org>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	Josh Boyer <jwboyer@redhat.com>,
-	Vojtech Pavlik <vojtech@suse.cz>,
-	Matt Fleming <matt.fleming@intel.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
-	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
-To: Florian Weimer <fw@deneb.enyo.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nue.novell.com ([195.135.221.5]:58774 "EHLO
-	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751917Ab3H2ADZ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 Aug 2013 20:03:25 -0400
-In-Reply-To: <87eh9dzg00.fsf@mid.deneb.enyo.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
+	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>,
+	Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
+	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
+	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
+	Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
+	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Florian Weimer <fw-d32yF4oPJVt0XxTmqZlbVQ@public.gmane.org>
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <87eh9dzg00.fsf-ZqZwdwZz9NfTBotR3TxKnbNAH6kLmebB@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
 Hi Florian,=20
 
