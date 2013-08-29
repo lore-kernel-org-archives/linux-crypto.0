@@ -1,62 +1,54 @@
 From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-Subject: Re: [PATCH 03/10] crypto: nx - fix limits to sg lists for AES-CBC
-Date: Thu, 29 Aug 2013 11:32:36 -0300
-Message-ID: <20130829143235.GA31059@oc8526070481.ibm.com>
-References: <1377288074-18998-1-git-send-email-mhcerri@linux.vnet.ibm.com>
- <1377288074-18998-4-git-send-email-mhcerri@linux.vnet.ibm.com>
- <20130829044221.GA25208@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [PATCH v2 00/10] Series of fixes for NX driver
+Date: Thu, 29 Aug 2013 11:36:30 -0300
+Message-ID: <1377787000-4966-1-git-send-email-mhcerri@linux.vnet.ibm.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp04.br.ibm.com ([32.104.18.25]:40703 "EHLO
-	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753001Ab3H2Ocq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 29 Aug 2013 10:32:46 -0400
-Received: from /spool/local
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <mhcerri@linux.vnet.ibm.com>;
-	Thu, 29 Aug 2013 11:32:44 -0300
-Content-Disposition: inline
-In-Reply-To: <20130829044221.GA25208@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	linuxppc-dev@lists.ozlabs.org, benh@kernel.crashing.org,
+	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Aug 29, 2013 at 02:42:22PM +1000, Herbert Xu wrote:
-> On Fri, Aug 23, 2013 at 05:01:07PM -0300, Marcelo Cerri wrote:
-> > This patch updates the nx-aes-cbc implementation to perform several
-> > hyper calls if needed in order to always respect the length limits for
-> > scatter/gather lists.
-> > 
-> > Two different limits are considered:
-> > 
-> >  - "ibm,max-sg-len": maximum number of bytes of each scatter/gather
-> >    list.
-> > 
-> >  - "ibm,max-sync-cop":
-> >     - The total number of bytes that a scatter/gather list can hold.
-> >     - The maximum number of elements that a scatter/gather list can have.
-> > 
-> > Reviewed-by: Joy Latten <jmlatten@linux.vnet.ibm.com>
-> > Signed-off-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-> 
-> This patch does not apply against the current cryptodev tree.
-> 
-> Please regenerate your pathces.
+This series of patches contains fixes in several algorithms implemented
+by the NX driver. The patches can be separated in three different
+categories:
+  
+ - Changes to split the data in several hyper calls to respect the
+   limits of data that the co-processador can handle. This affects
+   all AES modes.
+ - Fixes in how the driver handle zero length messages. This affects
+   XCBC and GCM.
+ - Fixes for SHA-2 when chunks bigger than the block size are provided.
 
-Sorry for this. I'm sending a v2 series without conflicts.
+v2:
+ - Fixed conflict.
 
-> 
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+Fionnuala Gunter (2):
+  crypto: nx - fix limits to sg lists for AES-XCBC
+  crypto: nx - fix limits to sg lists for AES-CCM
+
+Marcelo Cerri (8):
+  crypto: nx - add offset to nx_build_sg_lists()
+  crypto: nx - fix limits to sg lists for AES-ECB
+  crypto: nx - fix limits to sg lists for AES-CBC
+  crypto: nx - fix limits to sg lists for AES-CTR
+  crypto: nx - fix limits to sg lists for AES-GCM
+  crypto: nx - fix XCBC for zero length messages
+  crypto: nx - fix GCM for zero length messages
+  crypto: nx - fix SHA-2 for chunks bigger than block size
+
+ drivers/crypto/nx/nx-aes-cbc.c  |  50 ++++---
+ drivers/crypto/nx/nx-aes-ccm.c  | 297 +++++++++++++++++++++++++++++-----------
+ drivers/crypto/nx/nx-aes-ctr.c  |  50 ++++---
+ drivers/crypto/nx/nx-aes-ecb.c  |  48 ++++---
+ drivers/crypto/nx/nx-aes-gcm.c  | 292 ++++++++++++++++++++++++++++++---------
+ drivers/crypto/nx/nx-aes-xcbc.c | 191 +++++++++++++++++++-------
+ drivers/crypto/nx/nx-sha256.c   |   2 +-
+ drivers/crypto/nx/nx-sha512.c   |   2 +-
+ drivers/crypto/nx/nx.c          |   9 +-
+ drivers/crypto/nx/nx.h          |   2 +-
+ 10 files changed, 683 insertions(+), 260 deletions(-)
+
+-- 
+1.7.12
