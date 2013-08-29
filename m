@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [RFC PATCH 00/18 v3] Signature verification of hibernate
  snapshot
 Date: Thu, 29 Aug 2013 08:01:45 +0800
-Message-ID: <1377734505.19568.39.camel__12233.3224201158$1377734617$gmane$org@linux-s257.site>
+Message-ID: <1377734505.19568.39.camel__47837.6409308568$1377734621$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <87eh9dzg00.fsf@mid.deneb.enyo.de>
 Mime-Version: 1.0
@@ -26,9 +26,9 @@ Cc: linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Florian Weimer <fw@deneb.enyo.de>
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <87eh9dzg00.fsf@mid.deneb.enyo.de>
-Sender: linux-security-module-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 Hi Florian,=20
@@ -70,9 +70,3 @@ resume, not every system boot.
 
 Thanks a lot!
 Joey Lee
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-securit=
-y-module" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
