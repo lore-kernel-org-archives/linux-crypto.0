@@ -1,27 +1,18 @@
 From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-Subject: [PATCH v2 02/10] crypto: nx - fix limits to sg lists for AES-ECB
-Date: Thu, 29 Aug 2013 11:36:32 -0300
-Message-ID: <1377787000-4966-3-git-send-email-mhcerri@linux.vnet.ibm.com>
+Subject: [PATCH v2 03/10] crypto: nx - fix limits to sg lists for AES-CBC
+Date: Thu, 29 Aug 2013 11:36:33 -0300
+Message-ID: <1377787000-4966-4-git-send-email-mhcerri@linux.vnet.ibm.com>
 References: <1377787000-4966-1-git-send-email-mhcerri@linux.vnet.ibm.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org, benh@kernel.crashing.org,
 	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp04.br.ibm.com ([32.104.18.25]:41992 "EHLO
-	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755375Ab3H2OhT (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 29 Aug 2013 10:37:19 -0400
-Received: from /spool/local
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <mhcerri@linux.vnet.ibm.com>;
-	Thu, 29 Aug 2013 11:37:14 -0300
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1377787000-4966-1-git-send-email-mhcerri@linux.vnet.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch updates the nx-aes-ecb implementation to perform several
+This patch updates the nx-aes-cbc implementation to perform several
 hyper calls if needed in order to always respect the length limits for
 scatter/gather lists.
 
@@ -37,14 +28,14 @@ Two different limits are considered:
 Reviewed-by: Joy Latten <jmlatten@linux.vnet.ibm.com>
 Signed-off-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
 ---
- drivers/crypto/nx/nx-aes-ecb.c | 48 ++++++++++++++++++++++++++----------------
- 1 file changed, 30 insertions(+), 18 deletions(-)
+ drivers/crypto/nx/nx-aes-cbc.c | 50 +++++++++++++++++++++++++-----------------
+ 1 file changed, 30 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-ecb.c b/drivers/crypto/nx/nx-aes-ecb.c
-index fe0d803..85a8d23 100644
---- a/drivers/crypto/nx/nx-aes-ecb.c
-+++ b/drivers/crypto/nx/nx-aes-ecb.c
-@@ -71,37 +71,49 @@ static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
+diff --git a/drivers/crypto/nx/nx-aes-cbc.c b/drivers/crypto/nx/nx-aes-cbc.c
+index a9e76c6..cc00b52 100644
+--- a/drivers/crypto/nx/nx-aes-cbc.c
++++ b/drivers/crypto/nx/nx-aes-cbc.c
+@@ -71,39 +71,49 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
  	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
  	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
  	unsigned long irq_flags;
@@ -66,7 +57,8 @@ index fe0d803..85a8d23 100644
  	else
  		NX_CPB_FDM(csbcpb) &= ~NX_FDM_ENDE_ENCRYPT;
  
--	rc = nx_build_sg_lists(nx_ctx, desc, dst, src, nbytes, 0, NULL);
+-	rc = nx_build_sg_lists(nx_ctx, desc, dst, src, nbytes, 0,
+-			       csbcpb->cpb.aes_cbc.iv);
 -	if (rc)
 -		goto out;
 +	do {
@@ -81,7 +73,7 @@ index fe0d803..85a8d23 100644
 -		goto out;
 -	}
 +		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, to_process,
-+				processed, NULL);
++				       processed, csbcpb->cpb.aes_cbc.iv);
 +		if (rc)
 +			goto out;
  
@@ -93,22 +85,23 @@ index fe0d803..85a8d23 100644
 +			rc = -EINVAL;
 +			goto out;
 +		}
-+
+ 
+-	memcpy(desc->info, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
+-	atomic_inc(&(nx_ctx->stats->aes_ops));
+-	atomic64_add(csbcpb->csb.processed_byte_count,
+-		     &(nx_ctx->stats->aes_bytes));
 +		rc = nx_hcall_sync(nx_ctx, &nx_ctx->op,
 +				   desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
 +		if (rc)
 +			goto out;
 +
++		memcpy(desc->info, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
 +		atomic_inc(&(nx_ctx->stats->aes_ops));
 +		atomic64_add(csbcpb->csb.processed_byte_count,
 +			     &(nx_ctx->stats->aes_bytes));
 +
 +		processed += to_process;
 +	} while (processed < nbytes);
- 
--	atomic_inc(&(nx_ctx->stats->aes_ops));
--	atomic64_add(csbcpb->csb.processed_byte_count,
--		     &(nx_ctx->stats->aes_bytes));
  out:
  	spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
  	return rc;
