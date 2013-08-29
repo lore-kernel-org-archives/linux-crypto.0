@@ -1,115 +1,83 @@
-From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-Subject: [PATCH v2 04/10] crypto: nx - fix limits to sg lists for AES-CTR
-Date: Thu, 29 Aug 2013 11:36:34 -0300
-Message-ID: <1377787000-4966-5-git-send-email-mhcerri@linux.vnet.ibm.com>
-References: <1377787000-4966-1-git-send-email-mhcerri@linux.vnet.ibm.com>
+From: dl9pf@gmx.de
+Subject: [PATCH] Fix bitoperation for compilation with clang
+Date: Thu, 29 Aug 2013 20:09:24 +0200
+Message-ID: <1377799764-14373-1-git-send-email-dl9pf@gmx.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <1377787000-4966-1-git-send-email-mhcerri@linux.vnet.ibm.com>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: dl9pf@gmx.de, pageexec@freemail.hu,
+	llvmlinux@lists.linuxfoundation.org, behanw@converseincode.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch updates the nx-aes-ctr implementation to perform several
-hyper calls if needed in order to always respect the length limits for
-scatter/gather lists.
+=46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 
-Two different limits are considered:
+v2: Fix bug in statement as pointed out by Herbert Xu. Kudos to pipacs.
 
- - "ibm,max-sg-len": maximum number of bytes of each scatter/gather
-   list.
+Author:  PaX Team <pageexec at freemail.hu>
+ML-Post: http://lists.cs.uiuc.edu/pipermail/llvm-commits/Week-of-Mon-20=
+120507/142707.html
+URL:     http://llvm.linuxfoundation.org
 
- - "ibm,max-sync-cop":
-    - The total number of bytes that a scatter/gather list can hold.
-    - The maximum number of elements that a scatter/gather list can have.
+Merge:   Jan-Simon M=C3=B6ller <dl9pf at gmx.de>
 
-Reviewed-by: Joy Latten <jmlatten@linux.vnet.ibm.com>
-Signed-off-by: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
+Description:
+
+=46ix for warning:
+linux/crypto/fcrypt.c:143:47: warning: signed shift result (0x598000000=
+) requires 36 bits to
+      represent, but 'int' only has 32 bits [-Wshift-overflow]
+        Z(0xef), Z(0x70), Z(0xcf), Z(0xc2), Z(0x2a), Z(0xb3), Z(0x61), =
+Z(0xad),
+                                                     ^~~~~~~
+linux/crypto/fcrypt.c:113:29: note: expanded from macro 'Z'
+                            ^  ~~
+linux/include/uapi/linux/byteorder/little_endian.h:38:53: note: expande=
+d from macro
+      '__cpu_to_be32'
+                                                    ^
+linux/include/uapi/linux/swab.h:116:21: note: expanded from macro '__sw=
+ab32'
+        ___constant_swab32(x) :                 \
+                           ^
+linux/include/uapi/linux/swab.h:18:12: note: expanded from macro '___co=
+nstant_swab32'
+        (((__u32)(x) & (__u32)0x0000ff00UL) <<  8) |            \
+                  ^
+
+Solution - make sure we don't exceed the 32 bit range.
+ #define Z(x) cpu_to_be32(((x & 0x1f) << 27) | (x >> 5))
+
+Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
+CC: pageexec@freemail.hu
+CC: llvmlinux@lists.linuxfoundation.org
+CC: behanw@converseincode.com
+CC: herbert@gondor.apana.org.au
+CC: davem@davemloft.net
+CC: linux-crypto@vger.kernel.org
+CC: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/nx/nx-aes-ctr.c | 50 ++++++++++++++++++++++++++----------------
- 1 file changed, 31 insertions(+), 19 deletions(-)
+ crypto/fcrypt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-ctr.c b/drivers/crypto/nx/nx-aes-ctr.c
-index 80dee8d..a37d009 100644
---- a/drivers/crypto/nx/nx-aes-ctr.c
-+++ b/drivers/crypto/nx/nx-aes-ctr.c
-@@ -89,33 +89,45 @@ static int ctr_aes_nx_crypt(struct blkcipher_desc *desc,
- 	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
- 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
- 	unsigned long irq_flags;
-+	unsigned int processed = 0, to_process;
-+	u32 max_sg_len;
- 	int rc;
- 
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
- 
--	if (nbytes > nx_ctx->ap->databytelen) {
--		rc = -EINVAL;
--		goto out;
--	}
-+	max_sg_len = min_t(u32, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
-+			   nx_ctx->ap->sglen);
- 
--	rc = nx_build_sg_lists(nx_ctx, desc, dst, src, nbytes, 0,
--			       csbcpb->cpb.aes_ctr.iv);
--	if (rc)
--		goto out;
-+	do {
-+		to_process = min_t(u64, nbytes - processed,
-+				   nx_ctx->ap->databytelen);
-+		to_process = min_t(u64, to_process,
-+				   NX_PAGE_SIZE * (max_sg_len - 1));
-+		to_process = to_process & ~(AES_BLOCK_SIZE - 1);
- 
--	if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
--		rc = -EINVAL;
--		goto out;
--	}
-+		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, to_process,
-+				       processed, csbcpb->cpb.aes_ctr.iv);
-+		if (rc)
-+			goto out;
- 
--	rc = nx_hcall_sync(nx_ctx, &nx_ctx->op,
--			   desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
--	if (rc)
--		goto out;
-+		if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
-+			rc = -EINVAL;
-+			goto out;
-+		}
- 
--	atomic_inc(&(nx_ctx->stats->aes_ops));
--	atomic64_add(csbcpb->csb.processed_byte_count,
--		     &(nx_ctx->stats->aes_bytes));
-+		rc = nx_hcall_sync(nx_ctx, &nx_ctx->op,
-+				   desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
-+		if (rc)
-+			goto out;
-+
-+		memcpy(desc->info, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
-+
-+		atomic_inc(&(nx_ctx->stats->aes_ops));
-+		atomic64_add(csbcpb->csb.processed_byte_count,
-+			     &(nx_ctx->stats->aes_bytes));
-+
-+		processed += to_process;
-+	} while (processed < nbytes);
- out:
- 	spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
- 	return rc;
--- 
-1.7.12
+diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
+index 3b2cf56..021d7fe 100644
+--- a/crypto/fcrypt.c
++++ b/crypto/fcrypt.c
+@@ -110,7 +110,7 @@ static const __be32 sbox0[256] =3D {
+ };
+=20
+ #undef Z
+-#define Z(x) cpu_to_be32((x << 27) | (x >> 5))
++#define Z(x) cpu_to_be32(((x & 0x1f) << 27) | (x >> 5))
+ static const __be32 sbox1[256] =3D {
+ 	Z(0x77), Z(0x14), Z(0xa6), Z(0xfe), Z(0xb2), Z(0x5e), Z(0x8c), Z(0x3e=
+),
+ 	Z(0x67), Z(0x6c), Z(0xa1), Z(0x0d), Z(0xc2), Z(0xa2), Z(0xc1), Z(0x85=
+),
+--=20
+1.8.1.4
