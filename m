@@ -1,20 +1,21 @@
-From: Florian Weimer <fw-d32yF4oPJVt0XxTmqZlbVQ@public.gmane.org>
-Subject: Re: [RFC PATCH 00/18 v3] Signature verification of hibernate snapshot
-Date: Sun, 01 Sep 2013 12:41:22 +0200
-Message-ID: <87r4d8vn71.fsf@mid.deneb.enyo.de>
+From: Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>
+Subject: Re: [RFC PATCH 00/18 v3] Signature verification of hibernate
+ snapshot
+Date: Sun, 1 Sep 2013 17:04:29 +0100
+Message-ID: <20130901160429.GA1375@srcf.ucam.org>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
-	<87eh9dzg00.fsf@mid.deneb.enyo.de>
-	<1377734505.19568.39.camel@linux-s257.site>
+ <87eh9dzg00.fsf@mid.deneb.enyo.de>
+ <1377734505.19568.39.camel@linux-s257.site>
+ <87r4d8vn71.fsf@mid.deneb.enyo.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+Cc: joeyli <jlee-IBi9RG/b67k@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
-	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
-	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>,
-	Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
+	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>, Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>, Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
 	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
 	James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
 	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
@@ -23,28 +24,24 @@ Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
 	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
 	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: joeyli <jlee-IBi9RG/b67k@public.gmane.org>
-Return-path: <opensuse-kernel+bounces-5026-glsk-opensuse-kernel=m.gmane.org-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-In-Reply-To: <1377734505.19568.39.camel-ONCj+Eqt86TasUa73XJKwA@public.gmane.org> (joeyli's message of
-	"Thu, 29 Aug 2013 08:01:45 +0800")
-List-Post: <mailto:opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-List-Help: <mailto:opensuse-kernel+help-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-List-Subscribe: <mailto:opensuse-kernel+subscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-List-Unsubscribe: <mailto:opensuse-kernel+unsubscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-List-Owner: <mailto:opensuse-kernel+owner-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
-List-Archive: <http://lists.opensuse.org/opensuse-kernel/>
+To: Florian Weimer <fw-d32yF4oPJVt0XxTmqZlbVQ@public.gmane.org>
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <87r4d8vn71.fsf-ZqZwdwZz9NfTBotR3TxKnbNAH6kLmebB@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-* joeyli:
+On Sun, Sep 01, 2013 at 12:41:22PM +0200, Florian Weimer wrote:
 
-> Yes, Matthew raised this concern at before. I modified patch to load
-> private key in efi stub kernel, before ExitBootServices(), that means we
-> don't need generate key-pair at every system boot. So, the above
-> procedure of efi bootloader will only run one time. 
+> But if you don't generate fresh keys on every boot, the persistent
+> keys are mor exposed to other UEFI applications.  Correct me if I'm
+> wrong, but I don't think UEFI variables are segregated between
+> different UEFI applications, so if anyone gets a generic UEFI variable
+> dumper (or setter) signed by the trusted key, this cryptographic
+> validation of hibernate snapshots is bypassable.
 
-But if you don't generate fresh keys on every boot, the persistent
-keys are mor exposed to other UEFI applications.  Correct me if I'm
-wrong, but I don't think UEFI variables are segregated between
-different UEFI applications, so if anyone gets a generic UEFI variable
-dumper (or setter) signed by the trusted key, this cryptographic
-validation of hibernate snapshots is bypassable.
+If anyone can execute arbitrary code in your UEFI environment then 
+you've already lost.
+
+-- 
+Matthew Garrett | mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org
