@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [RFC PATCH 00/18 v3] Signature verification of hibernate
  snapshot
 Date: Mon, 02 Sep 2013 10:12:22 +0800
-Message-ID: <1378087942.7080.75.camel__26567.499448038$1378088149$gmane$org@linux-s257.site>
+Message-ID: <1378087942.7080.75.camel__35944.139751564$1378088155$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <87eh9dzg00.fsf@mid.deneb.enyo.de>
 	 <1377734505.19568.39.camel@linux-s257.site>
@@ -28,15 +28,10 @@ Cc: Matthew Garrett <mjg59@srcf.ucam.org>,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Florian Weimer <fw@deneb.enyo.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nue.novell.com ([195.135.221.5]:54387 "EHLO
-	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753572Ab3IBCPP (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 1 Sep 2013 22:15:15 -0400
+Return-path: <linux-pm-owner@vger.kernel.org>
 In-Reply-To: <87vc2ksdfa.fsf@mid.deneb.enyo.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-pm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E6=97=A5=EF=BC=8C2013-09-01 =E6=96=BC 18:40 +0200=EF=BC=8CFl=
 orian Weimer =E6=8F=90=E5=88=B0=EF=BC=9A
@@ -87,3 +82,4 @@ way to keep the password is in brain.
 
 Thanks a lot!
 Joey Lee
+
