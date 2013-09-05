@@ -1,41 +1,96 @@
-From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: [PATCH] crypto: x86: restore avx2_supported check
-Date: Tue, 03 Sep 2013 16:49:47 +0300
-Message-ID: <20130903134947.5366.51429.stgit@localhost6.localdomain6>
+From: Matt Fleming <matt@console-pimps.org>
+Subject: Re: [PATCH 11/18] Hibernate: introduced RSA key-pair to verify
+ signature of snapshot
+Date: Thu, 5 Sep 2013 09:53:48 +0100
+Message-ID: <20130905085348.GJ28598@console-pimps.org>
+References: <1377169317-5959-1-git-send-email-jlee@suse.com>
+ <1377169317-5959-12-git-send-email-jlee@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sypressi.dnainternet.net ([83.102.40.135]:55358 "EHLO
-	sypressi.dnainternet.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932886Ab3ICNtv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 Sep 2013 09:49:51 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	opensuse-kernel@opensuse.org, David Howells <dhowells@redhat.com>,
+	"Rafael J. Wysocki" <rjw@sisk.pl>,
+	Matthew Garrett <mjg59@srcf.ucam.org>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	Josh Boyer <jwboyer@redhat.com>,
+	Vojtech Pavlik <vojtech@suse.cz>,
+	Matt Fleming <matt.fleming@intel.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
+	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
+	"Lee, Chun-Yi" <jlee@suse.com>, Takashi Iwai <tiwai@suse.de
+To: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1377169317-5959-12-git-send-email-jlee@suse.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Commit 3d387ef08c4 (Revert "crypto: blowfish - add AVX2/x86_64 implementation
-of blowfish cipher") reverted too much as it removed the 'assembler supports
-AVX2' check and therefore disabled remaining AVX2 implementations of Camellia
-and Serpent. Patch restores the check and enables these implementations.
+On Thu, 22 Aug, at 07:01:50PM, Lee, Chun-Yi wrote:
+> +static int efi_status_to_err(efi_status_t status)
+> +{
+> +	int err;
+> +
+> +	switch (status) {
+> +	case EFI_INVALID_PARAMETER:
+> +		err = -EINVAL;
+> +		break;
+> +	case EFI_OUT_OF_RESOURCES:
+> +		err = -ENOSPC;
+> +		break;
+> +	case EFI_DEVICE_ERROR:
+> +		err = -EIO;
+> +		break;
+> +	case EFI_WRITE_PROTECTED:
+> +		err = -EROFS;
+> +		break;
+> +	case EFI_SECURITY_VIOLATION:
+> +		err = -EACCES;
+> +		break;
+> +	case EFI_NOT_FOUND:
+> +		err = -ENODATA;
+> +		break;
+> +	default:
+> +		err = -EINVAL;
+> +	}
+> +
+> +	return err;
+> +}
 
-Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
----
- arch/x86/crypto/Makefile |    2 ++
- 1 file changed, 2 insertions(+)
+Please don't reimplement this. Instead make the existing function
+global.
 
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 7d6ba9d..75b08e1e 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -3,6 +3,8 @@
- #
- 
- avx_supported := $(call as-instr,vpxor %xmm0$(comma)%xmm0$(comma)%xmm0,yes,no)
-+avx2_supported := $(call as-instr,vpgatherdd %ymm0$(comma)(%eax$(comma)%ymm1\
-+				$(comma)4)$(comma)%ymm2,yes,no)
- 
- obj-$(CONFIG_CRYPTO_ABLK_HELPER_X86) += ablk_helper.o
- obj-$(CONFIG_CRYPTO_GLUE_HELPER_X86) += glue_helper.o
+[...]
+
+> +static void *load_wake_key_data(unsigned long *datasize)
+> +{
+> +	u32 attr;
+> +	void *wkey_data;
+> +	efi_status_t status;
+> +
+> +	if (!efi_enabled(EFI_RUNTIME_SERVICES))
+> +		return ERR_PTR(-EPERM);
+> +
+> +	/* obtain the size */
+> +	*datasize = 0;
+> +	status = efi.get_variable(EFI_S4_WAKE_KEY_NAME, &EFI_HIBERNATE_GUID,
+> +				  NULL, datasize, NULL);
+> +	if (status != EFI_BUFFER_TOO_SMALL) {
+> +		wkey_data = ERR_PTR(efi_status_to_err(status));
+> +		pr_err("PM: Couldn't get wake key data size: 0x%lx\n", status);
+> +		goto error;
+> +	}
+
+Is it safe to completely bypass the efivars interface and access
+efi.get_variable() directly? I wouldn't have thought so, unless you can
+guarantee that the kernel isn't going to access any of the EFI runtime
+services while you execute this function.
+
+-- 
+Matt Fleming, Intel Open Source Technology Center
