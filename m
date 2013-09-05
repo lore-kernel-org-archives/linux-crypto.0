@@ -1,8 +1,8 @@
-From: joeyli <jlee-IBi9RG/b67k@public.gmane.org>
+From: joeyli <jlee@suse.com>
 Subject: Re: [PATCH 11/18] Hibernate: introduced RSA key-pair to verify
  signature of snapshot
 Date: Thu, 05 Sep 2013 21:28:57 +0800
-Message-ID: <1378387737.6193.75.camel__24643.4026551016$1378387739$gmane$org@linux-s257.site>
+Message-ID: <1378387737.6193.75.camel__42107.0321383469$1378387740$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <1377169317-5959-12-git-send-email-jlee@suse.com>
 	 <20130905085348.GJ28598@console-pimps.org>
@@ -11,28 +11,28 @@ References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
-	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
-	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>,
-	Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
-	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
-	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
-	Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
-	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Takashi Iwai <tiwai-l3A5Bk7waGM@public.gmane.org>
-To: Matt Fleming <matt-HNK1S37rvNbeXh+fF434Mdi2O/JbrIOy@public.gmane.org>
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130905103158.GM28598-HNK1S37rvNbeXh+fF434Mdi2O/JbrIOy@public.gmane.org>
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	opensuse-kernel@opensuse.org, David Howells <dhowells@redhat.com>,
+	"Rafael J. Wysocki" <rjw@sisk.pl>,
+	Matthew Garrett <mjg59@srcf.ucam.org>,
+	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	Josh Boyer <jwboyer@redhat.com>,
+	Vojtech Pavlik <vojtech@suse.cz>,
+	Matt Fleming <matt.fleming@intel.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
+	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
+	Takashi Iwai <tiwai@suse.de>
+To: Matt Fleming <matt@console-pimps.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <20130905103158.GM28598@console-pimps.org>
+Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E5=9B=9B=EF=BC=8C2013-09-05 =E6=96=BC 11:31 +0100=EF=BC=8CMa=
@@ -60,3 +60,9 @@ I see! I will use efivar api to access EFI variable.
 
 Thanks a lot!
 Joey Lee
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-securit=
+y-module" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
