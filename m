@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [PATCH 11/18] Hibernate: introduced RSA key-pair to verify
  signature of snapshot
 Date: Thu, 05 Sep 2013 18:13:36 +0800
-Message-ID: <1378376016.6193.71.camel__9593.76681498743$1378376015$gmane$org@linux-s257.site>
+Message-ID: <1378376016.6193.71.camel__2124.53896315328$1378376016$gmane$org@linux-s257.site>
 References: <1377169317-5959-1-git-send-email-jlee@suse.com>
 	 <1377169317-5959-12-git-send-email-jlee@suse.com>
 	 <20130905085348.GJ28598@console-pimps.org>
@@ -28,15 +28,10 @@ Cc: linux-kernel@vger.kernel.org,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
 	Takashi Iwai <tiwai@suse.de>
 To: Matt Fleming <matt@console-pimps.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nue.novell.com ([195.135.221.5]:47911 "EHLO
-	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S935552Ab3IEKNA (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Sep 2013 06:13:00 -0400
+Return-path: <linux-pm-owner@vger.kernel.org>
 In-Reply-To: <20130905085348.GJ28598@console-pimps.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-pm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Hi Matt,=20
 
@@ -119,3 +114,4 @@ Does it what your concern?
 
 Thanks a lot!
 Joey Lee
+
