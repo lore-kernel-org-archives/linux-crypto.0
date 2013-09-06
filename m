@@ -1,68 +1,147 @@
-From: joeyli <jlee@suse.com>
-Subject: Re: [PATCH 11/18] Hibernate: introduced RSA key-pair to verify
- signature of snapshot
-Date: Thu, 05 Sep 2013 21:28:57 +0800
-Message-ID: <1378387737.6193.75.camel__42107.0321383469$1378387740$gmane$org@linux-s257.site>
-References: <1377169317-5959-1-git-send-email-jlee@suse.com>
-	 <1377169317-5959-12-git-send-email-jlee@suse.com>
-	 <20130905085348.GJ28598@console-pimps.org>
-	 <1378376016.6193.71.camel@linux-s257.site>
-	 <20130905103158.GM28598@console-pimps.org>
+From: Kees Cook <keescook@chromium.org>
+Subject: race condition in crypto larval handling
+Date: Fri, 6 Sep 2013 16:20:50 -0700
+Message-ID: <CAGXu5jJvuAC3paV5k_bmoHHrHVgc0Hi6ShSDk3iQUt1Lf0cioQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	opensuse-kernel@opensuse.org, David Howells <dhowells@redhat.com>,
-	"Rafael J. Wysocki" <rjw@sisk.pl>,
-	Matthew Garrett <mjg59@srcf.ucam.org>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	Josh Boyer <jwboyer@redhat.com>,
-	Vojtech Pavlik <vojtech@suse.cz>,
-	Matt Fleming <matt.fleming@intel.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
-	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
-	Takashi Iwai <tiwai@suse.de>
-To: Matt Fleming <matt@console-pimps.org>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <20130905103158.GM28598@console-pimps.org>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: "David S. Miller" <davem@davemloft.net>,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, Tyler Hicks <tyhicks@canonical.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ie0-f171.google.com ([209.85.223.171]:51183 "EHLO
+	mail-ie0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750711Ab3IFXUv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 6 Sep 2013 19:20:51 -0400
+Received: by mail-ie0-f171.google.com with SMTP id 9so8484015iec.30
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Sep 2013 16:20:51 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-=E6=96=BC =E5=9B=9B=EF=BC=8C2013-09-05 =E6=96=BC 11:31 +0100=EF=BC=8CMa=
-tt Fleming =E6=8F=90=E5=88=B0=EF=BC=9A
-> On Thu, 05 Sep, at 06:13:36PM, joeyli wrote:
-> > This S4WakeKey is a VOLATILE variable that could not modify by
-> > SetVariable() at runtime. So, it's read only even through efivars.=20
-> >=20
-> > Does it what your concern?
-> =20
-> No, the UEFI spec probibits certain runtime functions from being
-> executed concurrently on separate cpus and the spinlock used in the
-> efivars code ensures that we adhere to that restriction. See table 31=
- in
-> section 7.1 of the UEFI 2.4 spec for the list of services that are
-> non-reentrant.
->=20
-> The problem isn't that we want to avoid simultaneous access to
-> S4WakeKey, it's that we can't invoke any of the variable runtime serv=
-ice
-> functions concurrently.
->=20
+Hi,
 
-I see! I will use efivar api to access EFI variable.
+I've tracked down a race condition and ref counting problem in the
+crypto API internals. We've been seeing it under Chrome OS, but it
+seems it's not isolated to just us:
 
-Thanks a lot!
-Joey Lee
+https://code.google.com/p/chromium/issues/detail?id=244581
+http://marc.info/?l=linux-crypto-vger&m=135429403609373&w=2
+https://bugzilla.redhat.com/show_bug.cgi?id=983682
+http://www.mail-archive.com/linux-cifs@vger.kernel.org/msg07933.html
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-securit=
-y-module" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I think I've found the basic origin of the problem.
+crypto_larval_add() has synchronization to make sure only a single
+larval can ever be created. That logic seems totally fine. However,
+this means that crypto_larval_lookup() from two threads can return the
+same larval, which means that crypto_alg_mod_lookup() runs the risk of
+calling crypto_larval_kill() on the same larval twice, which does not
+appear to be handled sanely.
+
+I can easily crash the kernel by forcing a synchronization point just
+before the "return crypt_larval_add(...)" call in
+crypto_larval_lookup(). Basically, I added this sloppy sync code (I
+feel like there must be a better way to do this):
+
++static atomic_t global_sync = ATOMIC_INIT(0);
+...
+struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask)
+...
++       if (strncmp(name, "asdf", 4) == 0) {
++               int value;
++
++               value = atomic_add_return(1, &global_sync);
++               if (value == 1) {
++                       /* I was first to stall here, wait for inc. */
++                       while (atomic_read(&global_sync) != 2)
++                               cpu_relax();
++               } else if (value == 2) {
++                       /* I was second to stall here, wait for dec. */
++                       while (atomic_read(&global_sync) != 1)
++                               cpu_relax();
++               } else {
++                       BUG();
++               }
++               atomic_dec(&global_sync);
++       }
+
+        return crypto_larval_add(name, type, mask);
+ }
+
+And then ran code from userspace that did, effectively:
+
+    struct sockaddr_alg sa = {
+        .salg_family = AF_ALG,
+        .salg_type   = "hash",
+    };
+    strcpy(sa.salg_name, argv[1]);
+
+    fork();
+    ...
+    sds[0] = socket(AF_ALG, SOCK_SEQPACKET, 0);
+    bind(sds[0], (struct sockaddr *) &sa, sizeof(sa));
+
+And ran this as "./tickle asdf1" to generate the two threads trying to
+find an invalid alg. The race looks possible even with valid algs, but
+this was the fastest path I could see to tickle the issue.
+
+With added printks to the kernel, it was clear that crypto_larval_kill
+was being called twice on the same larval, and the list_del() call was
+doing bad things. When I fixed that, the refcnt bug became very
+obvious. Here's the change I made for crypto_larval_kill:
+
+@@ -161,7 +166,8 @@ void crypto_larval_kill(struct crypto_alg *alg)
+        struct crypto_larval *larval = (void *)alg;
+
+        down_write(&crypto_alg_sem);
+-       list_del(&alg->cra_list);
++       if (!list_empty(&alg->cra_list))
++               list_del_init(&alg->cra_list);
+        up_write(&crypto_alg_sem);
+        complete_all(&larval->completion);
+        crypto_alg_put(alg);
+
+It seems that there are too many "put" calls (mixed between
+crypto_alg_put() and crypto_mod_put(), which also calls
+crypto_alg_put()). See this annotated portion of
+crypto_alg_mod_lookup:
+
+        /* This can (correctly) return the same larval for two threads. */
+        larval = crypto_larval_lookup(name, type, mask);
+        if (IS_ERR(larval) || !crypto_is_larval(larval))
+                return larval;
+
+        ok = crypto_probing_notify(CRYPTO_MSG_ALG_REQUEST, larval);
+
+        if (ok == NOTIFY_STOP)
+                /* This calls crypto_mod_put(), but sometimes also get?? */
+                alg = crypto_larval_wait(larval);
+        else {
+                /* This directly calls crypto_mod_put */
+                crypto_mod_put(larval);
+                alg = ERR_PTR(-ENOENT);
+        }
+        /* This calls crypto_alg_put */
+        crypto_larval_kill(larval);
+        return alg;
+
+In the two-thread situation, the first thread gets a larval with
+refcnt 2 via crypto_larval_add. (Why 2?) The next thread finds the
+larval via crypto_larval_add's call to __crypto_alg_lookup() and sees
+the ref bump to 3. While exiting crypto_alg_mod_lookup, each thread
+decrements the ref count twice.
+
+It seems to me like either each call to crypto_larval_lookup() should
+result in a refcount bumped by two, or crypto_alg_mod_lookup() should
+decrement only once, and the initial refcount should be 1 not 2 from
+crypto_larval_add. But it's not clear to me which is sensible here.
+
+What's the right solution here?
+
+Thanks,
+
+-Kees
+
+-- 
+Kees Cook
+Chrome OS Security
