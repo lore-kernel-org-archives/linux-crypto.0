@@ -1,244 +1,164 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 3.12
-Date: Sat, 7 Sep 2013 13:55:44 +1000
-Message-ID: <20130907035544.GA22658@gondor.apana.org.au>
-References: <20101024061625.GA23715@gondor.apana.org.au>
- <20110106000157.GA16089@gondor.apana.org.au>
- <20110315145940.GA15373@gondor.apana.org.au>
- <20110520235409.GA1722@gondor.apana.org.au>
- <20110724011752.GA14373@gondor.apana.org.au>
- <20111031040952.GA19659@gondor.apana.org.au>
- <20120106041250.GA7759@gondor.apana.org.au>
- <20121004095357.GA11777@gondor.apana.org.au>
- <20121214103156.GA5840@gondor.apana.org.au>
- <20130223023331.GA11002@gondor.apana.org.au>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: race condition in crypto larval handling
+Date: Sat, 7 Sep 2013 10:39:22 -0400
+Message-ID: <20130907143922.GA13851@neilslaptop.think-freely.org>
+References: <CAGXu5jJvuAC3paV5k_bmoHHrHVgc0Hi6ShSDk3iQUt1Lf0cioQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Linus Torvalds <torvalds@linux-foundation.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:34846 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750847Ab3IGDzw (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Sep 2013 23:55:52 -0400
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, Tyler Hicks <tyhicks@canonical.com>
+To: Kees Cook <keescook@chromium.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20130223023331.GA11002@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <CAGXu5jJvuAC3paV5k_bmoHHrHVgc0Hi6ShSDk3iQUt1Lf0cioQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+On Fri, Sep 06, 2013 at 04:20:50PM -0700, Kees Cook wrote:
+> Hi,
+> 
+> I've tracked down a race condition and ref counting problem in the
+> crypto API internals. We've been seeing it under Chrome OS, but it
+> seems it's not isolated to just us:
+> 
+> https://code.google.com/p/chromium/issues/detail?id=244581
+> http://marc.info/?l=linux-crypto-vger&m=135429403609373&w=2
+> https://bugzilla.redhat.com/show_bug.cgi?id=983682
+> http://www.mail-archive.com/linux-cifs@vger.kernel.org/msg07933.html
+> 
+> I think I've found the basic origin of the problem.
+> crypto_larval_add() has synchronization to make sure only a single
+> larval can ever be created. That logic seems totally fine. However,
+> this means that crypto_larval_lookup() from two threads can return the
+> same larval, which means that crypto_alg_mod_lookup() runs the risk of
+> calling crypto_larval_kill() on the same larval twice, which does not
+> appear to be handled sanely.
+> 
+> I can easily crash the kernel by forcing a synchronization point just
+> before the "return crypt_larval_add(...)" call in
+> crypto_larval_lookup(). Basically, I added this sloppy sync code (I
+> feel like there must be a better way to do this):
+> 
+> +static atomic_t global_sync = ATOMIC_INIT(0);
+> ...
+> struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask)
+> ...
+> +       if (strncmp(name, "asdf", 4) == 0) {
+> +               int value;
+> +
+> +               value = atomic_add_return(1, &global_sync);
+> +               if (value == 1) {
+> +                       /* I was first to stall here, wait for inc. */
+> +                       while (atomic_read(&global_sync) != 2)
+> +                               cpu_relax();
+> +               } else if (value == 2) {
+> +                       /* I was second to stall here, wait for dec. */
+> +                       while (atomic_read(&global_sync) != 1)
+> +                               cpu_relax();
+> +               } else {
+> +                       BUG();
+> +               }
+> +               atomic_dec(&global_sync);
+> +       }
+> 
+>         return crypto_larval_add(name, type, mask);
+>  }
+> 
+> And then ran code from userspace that did, effectively:
+> 
+>     struct sockaddr_alg sa = {
+>         .salg_family = AF_ALG,
+>         .salg_type   = "hash",
+>     };
+>     strcpy(sa.salg_name, argv[1]);
+> 
+>     fork();
+>     ...
+>     sds[0] = socket(AF_ALG, SOCK_SEQPACKET, 0);
+>     bind(sds[0], (struct sockaddr *) &sa, sizeof(sa));
+> 
+> And ran this as "./tickle asdf1" to generate the two threads trying to
+> find an invalid alg. The race looks possible even with valid algs, but
+> this was the fastest path I could see to tickle the issue.
+> 
+> With added printks to the kernel, it was clear that crypto_larval_kill
+> was being called twice on the same larval, and the list_del() call was
+> doing bad things. When I fixed that, the refcnt bug became very
+> obvious. Here's the change I made for crypto_larval_kill:
+> 
+> @@ -161,7 +166,8 @@ void crypto_larval_kill(struct crypto_alg *alg)
+>         struct crypto_larval *larval = (void *)alg;
+> 
+>         down_write(&crypto_alg_sem);
+> -       list_del(&alg->cra_list);
+> +       if (!list_empty(&alg->cra_list))
+> +               list_del_init(&alg->cra_list);
+>         up_write(&crypto_alg_sem);
+>         complete_all(&larval->completion);
+>         crypto_alg_put(alg);
+> 
+> It seems that there are too many "put" calls (mixed between
+> crypto_alg_put() and crypto_mod_put(), which also calls
+> crypto_alg_put()). See this annotated portion of
+> crypto_alg_mod_lookup:
+> 
+>         /* This can (correctly) return the same larval for two threads. */
+>         larval = crypto_larval_lookup(name, type, mask);
+>         if (IS_ERR(larval) || !crypto_is_larval(larval))
+>                 return larval;
+> 
+>         ok = crypto_probing_notify(CRYPTO_MSG_ALG_REQUEST, larval);
+> 
+>         if (ok == NOTIFY_STOP)
+>                 /* This calls crypto_mod_put(), but sometimes also get?? */
+>                 alg = crypto_larval_wait(larval);
+>         else {
+>                 /* This directly calls crypto_mod_put */
+>                 crypto_mod_put(larval);
+>                 alg = ERR_PTR(-ENOENT);
+>         }
+>         /* This calls crypto_alg_put */
+>         crypto_larval_kill(larval);
+>         return alg;
+> 
+> In the two-thread situation, the first thread gets a larval with
+> refcnt 2 via crypto_larval_add. (Why 2?) The next thread finds the
+> larval via crypto_larval_add's call to __crypto_alg_lookup() and sees
+> the ref bump to 3. While exiting crypto_alg_mod_lookup, each thread
+> decrements the ref count twice.
+> 
+> It seems to me like either each call to crypto_larval_lookup() should
+> result in a refcount bumped by two, or crypto_alg_mod_lookup() should
+> decrement only once, and the initial refcount should be 1 not 2 from
+> crypto_larval_add. But it's not clear to me which is sensible here.
+> 
+> What's the right solution here?
+> 
+> Thanks,
+> 
+> -Kees
+> 
+> -- 
+> Kees Cook
+> Chrome OS Security
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+I've been tracking this problem too:
+https://bugzilla.redhat.com/show_bug.cgi?id=1002351
 
-Here is the crypto update for 3.12:
+Though I'd just started so I've not gotten anywhere near this far.  It seems,
+given your analysis above that we really need to rework the refcounting here.
+At the very least we probably need to:
 
-* Added MODULE_SOFTDEP to allow pre-loading of modules.
-* Reinstated crct10dif driver using the module softdep feature.
-* Allow via rng driver to be auto-loaded.
+1) only modify the module reference count when a larval for a given alg is
+created, or when its last refcount is decremented.
 
-* Split large input data when necessary in nx.
-* Handle zero length messages correctly for GCM/XCBC in nx.
-* Handle SHA-2 chunks bigger than block size properly in nx.
+2) fix up the cra_refcount to start at one and increment for each lookup, and
+decrement for each kill.
 
-* Handle unaligned lengths in omap-aes.
-* Added SHA384/SHA512 to omap-sham.
-* Added OMAP5/AM43XX SHAM support.
-* Added OMAP4 TRNG support.
-
-* Misc fixes.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Alex Porosanu (2):
-      crypto: caam - replace xstr macro with __stringify
-      crypto: caam - add option for enabling DEBUG mode
-
-Andi Kleen (1):
-      crypto: make tables used from assembler __visible
-
-Andreas Robinson (1):
-      modules: add support for soft module dependencies
-
-Ben Hutchings (1):
-      hwrng: via - Add MODULE_DEVICE_TABLE
-
-Chen Gang (1):
-      padata - share code between CPU_ONLINE and CPU_DOWN_FAILED, same =
-to CPU_DOWN_PREPARE and CPU_UP_CANCELED
-
-Cristian Stoica (1):
-      crypto: testmgr - remove double execution of the same test suite
-
-Dan Carpenter (2):
-      crypto: sahara - checking the wrong variable
-      crypto: tegra-aes - bitwise vs logical and
-
-=46abio Estevam (1):
-      hwrng: mxc-rnga - Check the return value from clk_prepare_enable(=
-)
-
-=46ionnuala Gunter (3):
-      crypto: nx - saves chaining value from co-processor
-      crypto: nx - fix limits to sg lists for AES-XCBC
-      crypto: nx - fix limits to sg lists for AES-CCM
-
-Herbert Xu (2):
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linu=
-x
-      Reinstate "crypto: crct10dif - Wrap crc_t10dif function all to us=
-e crypto transform framework"
-
-Jan-Simon M=F6ller (1):
-      crypto: fcrypt - Fix bitoperation for compilation with clang
-
-Jingoo Han (3):
-      hwrng: pixocel - Staticize 'rng_dev'
-      crypto: sahara - Staticize local symbol
-      crypto: crypto4xx - Staticize local symbols
-
-Joe Perches (1):
-      crypto: ux500 - Fix logging, make arrays const, neatening
-
-Joel Fernandes (14):
-      crypto: scatterwalk - Add support for calculating number of SG el=
-ements
-      crypto: omap-aes - Add useful debug macros
-      crypto: omap-aes - Populate number of SG elements
-      crypto: omap-aes - Simplify DMA usage by using direct SGs
-      crypto: omap-aes - Sync SG before DMA operation
-      crypto: omap-aes - Remove previously used intermediate buffers
-      crypto: omap-aes - Add IRQ info and helper macros
-      crypto: omap-aes - PIO mode: Add IRQ handler and walk SGs
-      crypto: omap-aes - PIO mode: platform data for OMAP4/AM437x and t=
-rigger
-      crypto: omap-aes - Switch to PIO mode during probe
-      crypto: omap-aes - Add support for cases of unaligned lengths
-      crypto: omap-aes - Convert kzalloc to devm_kzalloc
-      crypto: omap-aes - Convert request_irq to devm_request_irq
-      crypto: omap-aes - Kconfig: Add build support for AM437x
-
-John Haxby (1):
-      crypto: xor - Check for osxsave as well as avx in crypto/xor
-
-Julia Lawall (3):
-      hwrng: tx4939 - simplify use of devm_ioremap_resource
-      crypto: camellia-x86-64 - replace commas by semicolons and adjust=
- code alignment
-      crypto: camellia_generic - replace commas by semicolons and adjus=
-t code alignment
-
-Lokesh Vutla (12):
-      crypto: omap-sham - Add SHA384 and SHA512 Support
-      crypto: omap-sham - Add OMAP5/AM43XX SHAM Support
-      crypto: omap-sham - Convert to devm_request_irq()
-      crypto: omap-sham - Convert to devm_kzalloc()
-      hwrng: omap - Use module_platform_driver macro
-      hwrng: omap - Convert to devm_kzalloc()
-      hwrng: omap - Remove duplicated function call
-      hwrng: omap - Add device tree support
-      ARM: OMAP2+: Only manually add hwmod data when DT not used.
-      hwrng: omap - Add OMAP4 TRNG support
-      crypto: omap-sham - Enable Polling mode if DMA fails
-      crypto: omap-sham - correct dma burst size
-
-Marcelo Cerri (11):
-      crypto: nx - fix physical addresses added to sg lists
-      crypto: nx - fix limits to sg lists for SHA-2
-      crypto: nx - fix concurrency issue
-      crypto: nx - add offset to nx_build_sg_lists()
-      crypto: nx - fix limits to sg lists for AES-ECB
-      crypto: nx - fix limits to sg lists for AES-CBC
-      crypto: nx - fix limits to sg lists for AES-CTR
-      crypto: nx - fix limits to sg lists for AES-GCM
-      crypto: nx - fix XCBC for zero length messages
-      crypto: nx - fix GCM for zero length messages
-      crypto: nx - fix SHA-2 for chunks bigger than block size
-
-Olof Johansson (1):
-      hwrng: omap - reorder OMAP TRNG driver code
-
-Richard Weinberger (1):
-      padata - Register hotcpu notifier after initialization
-
-Ruchika Gupta (2):
-      crypto: caam - RNG instantiation by directly programming DECO
-      crypto: caam - Remove unused functions from Job Ring
-
-Vakul Garg (1):
-      crypto: caam - Moved macro DESC_JOB_IO_LEN to desc_constr.h
-
-jmlatten@linux.vnet.ibm.com (1):
-      crypto: nx - fix nx-aes-gcm verification
-
- arch/arm/mach-omap2/devices.c           |    2 +-
- arch/x86/crypto/Makefile                |    2 +
- arch/x86/crypto/camellia_glue.c         |   64 +--
- arch/x86/crypto/crct10dif-pcl-asm_64.S  |  643 +++++++++++++++++++++++=
-++++++++
- arch/x86/crypto/crct10dif-pclmul_glue.c |  151 ++++++++
- arch/x86/include/asm/xor_avx.h          |    4 +-
- crypto/Kconfig                          |   19 +
- crypto/Makefile                         |    1 +
- crypto/aes_generic.c                    |    8 +-
- crypto/camellia_generic.c               |   48 +--
- crypto/cast_common.c                    |    8 +-
- crypto/crct10dif.c                      |  178 +++++++++
- crypto/fcrypt.c                         |    2 +-
- crypto/scatterwalk.c                    |   22 ++
- crypto/tcrypt.c                         |    8 +
- crypto/testmgr.c                        |   12 +-
- crypto/testmgr.h                        |   33 ++
- drivers/char/hw_random/Kconfig          |    6 +-
- drivers/char/hw_random/mxc-rnga.c       |    4 +-
- drivers/char/hw_random/omap-rng.c       |  386 +++++++++++++++----
- drivers/char/hw_random/picoxcell-rng.c  |    2 +-
- drivers/char/hw_random/tx4939-rng.c     |    4 +-
- drivers/char/hw_random/via-rng.c        |    7 +
- drivers/crypto/Kconfig                  |   13 +-
- drivers/crypto/amcc/crypto4xx_alg.c     |   15 +-
- drivers/crypto/caam/Kconfig             |    8 +
- drivers/crypto/caam/Makefile            |    3 +
- drivers/crypto/caam/caamalg.c           |   80 ++--
- drivers/crypto/caam/caamhash.c          |   70 ++--
- drivers/crypto/caam/ctrl.c              |   77 ++--
- drivers/crypto/caam/desc_constr.h       |    1 +
- drivers/crypto/caam/intern.h            |    5 -
- drivers/crypto/caam/jr.c                |   67 ----
- drivers/crypto/caam/jr.h                |    2 -
- drivers/crypto/caam/key_gen.c           |    6 +-
- drivers/crypto/caam/regs.h              |   12 +-
- drivers/crypto/nx/nx-aes-cbc.c          |   57 ++-
- drivers/crypto/nx/nx-aes-ccm.c          |  283 ++++++++++----
- drivers/crypto/nx/nx-aes-ctr.c          |   52 ++-
- drivers/crypto/nx/nx-aes-ecb.c          |   50 ++-
- drivers/crypto/nx/nx-aes-gcm.c          |  296 ++++++++++----
- drivers/crypto/nx/nx-aes-xcbc.c         |  205 +++++++---
- drivers/crypto/nx/nx-sha256.c           |  124 +++---
- drivers/crypto/nx/nx-sha512.c           |  131 ++++---
- drivers/crypto/nx/nx.c                  |   35 +-
- drivers/crypto/nx/nx.h                  |    3 +-
- drivers/crypto/omap-aes.c               |  468 ++++++++++++----------
- drivers/crypto/omap-sham.c              |  382 ++++++++++++++----
- drivers/crypto/sahara.c                 |    4 +-
- drivers/crypto/tegra-aes.c              |    6 +-
- drivers/crypto/ux500/hash/hash_core.c   |  586 ++++++++++++++---------=
------
- include/crypto/scatterwalk.h            |    2 +
- include/linux/crc-t10dif.h              |    4 +
- include/linux/module.h                  |    5 +
- kernel/padata.c                         |   32 +-
- lib/Kconfig                             |    2 +
- lib/crc-t10dif.c                        |   74 ++--
- 57 files changed, 3410 insertions(+), 1364 deletions(-)
-
-Thanks,
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Neil
