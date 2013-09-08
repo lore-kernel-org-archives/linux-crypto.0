@@ -1,180 +1,80 @@
-From: Kees Cook <keescook@chromium.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: race condition in crypto larval handling
-Date: Sat, 7 Sep 2013 10:10:17 -0700
-Message-ID: <CAGXu5j+m5dtV78K1h4bgquhEM0PM2vkw4BE7XLqcT8QdWY8bpQ@mail.gmail.com>
+Date: Sun, 8 Sep 2013 11:32:11 +1000
+Message-ID: <20130908013210.GA30627@gondor.apana.org.au>
 References: <CAGXu5jJvuAC3paV5k_bmoHHrHVgc0Hi6ShSDk3iQUt1Lf0cioQ@mail.gmail.com>
-	<20130907143922.GA13851@neilslaptop.think-freely.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
 	LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	Tyler Hicks <tyhicks@canonical.com>
-To: Neil Horman <nhorman@tuxdriver.com>
+	linux-crypto@vger.kernel.org, Tyler Hicks <tyhicks@canonical.com>
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ob0-f173.google.com ([209.85.214.173]:54474 "EHLO
-	mail-ob0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751006Ab3IGRKT (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:34139 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751120Ab3IHBcU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 7 Sep 2013 13:10:19 -0400
-Received: by mail-ob0-f173.google.com with SMTP id ta17so4643992obb.32
-        for <linux-crypto@vger.kernel.org>; Sat, 07 Sep 2013 10:10:17 -0700 (PDT)
-In-Reply-To: <20130907143922.GA13851@neilslaptop.think-freely.org>
+	Sat, 7 Sep 2013 21:32:20 -0400
+Content-Disposition: inline
+In-Reply-To: <CAGXu5jJvuAC3paV5k_bmoHHrHVgc0Hi6ShSDk3iQUt1Lf0cioQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Sep 7, 2013 at 7:39 AM, Neil Horman <nhorman@tuxdriver.com> wrote:
-> On Fri, Sep 06, 2013 at 04:20:50PM -0700, Kees Cook wrote:
->> Hi,
->>
->> I've tracked down a race condition and ref counting problem in the
->> crypto API internals. We've been seeing it under Chrome OS, but it
->> seems it's not isolated to just us:
->>
->> https://code.google.com/p/chromium/issues/detail?id=244581
->> http://marc.info/?l=linux-crypto-vger&m=135429403609373&w=2
->> https://bugzilla.redhat.com/show_bug.cgi?id=983682
->> http://www.mail-archive.com/linux-cifs@vger.kernel.org/msg07933.html
->>
->> I think I've found the basic origin of the problem.
->> crypto_larval_add() has synchronization to make sure only a single
->> larval can ever be created. That logic seems totally fine. However,
->> this means that crypto_larval_lookup() from two threads can return the
->> same larval, which means that crypto_alg_mod_lookup() runs the risk of
->> calling crypto_larval_kill() on the same larval twice, which does not
->> appear to be handled sanely.
->>
->> I can easily crash the kernel by forcing a synchronization point just
->> before the "return crypt_larval_add(...)" call in
->> crypto_larval_lookup(). Basically, I added this sloppy sync code (I
->> feel like there must be a better way to do this):
->>
->> +static atomic_t global_sync = ATOMIC_INIT(0);
->> ...
->> struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask)
->> ...
->> +       if (strncmp(name, "asdf", 4) == 0) {
->> +               int value;
->> +
->> +               value = atomic_add_return(1, &global_sync);
->> +               if (value == 1) {
->> +                       /* I was first to stall here, wait for inc. */
->> +                       while (atomic_read(&global_sync) != 2)
->> +                               cpu_relax();
->> +               } else if (value == 2) {
->> +                       /* I was second to stall here, wait for dec. */
->> +                       while (atomic_read(&global_sync) != 1)
->> +                               cpu_relax();
->> +               } else {
->> +                       BUG();
->> +               }
->> +               atomic_dec(&global_sync);
->> +       }
->>
->>         return crypto_larval_add(name, type, mask);
->>  }
->>
->> And then ran code from userspace that did, effectively:
->>
->>     struct sockaddr_alg sa = {
->>         .salg_family = AF_ALG,
->>         .salg_type   = "hash",
->>     };
->>     strcpy(sa.salg_name, argv[1]);
->>
->>     fork();
->>     ...
->>     sds[0] = socket(AF_ALG, SOCK_SEQPACKET, 0);
->>     bind(sds[0], (struct sockaddr *) &sa, sizeof(sa));
->>
->> And ran this as "./tickle asdf1" to generate the two threads trying to
->> find an invalid alg. The race looks possible even with valid algs, but
->> this was the fastest path I could see to tickle the issue.
->>
->> With added printks to the kernel, it was clear that crypto_larval_kill
->> was being called twice on the same larval, and the list_del() call was
->> doing bad things. When I fixed that, the refcnt bug became very
->> obvious. Here's the change I made for crypto_larval_kill:
->>
->> @@ -161,7 +166,8 @@ void crypto_larval_kill(struct crypto_alg *alg)
->>         struct crypto_larval *larval = (void *)alg;
->>
->>         down_write(&crypto_alg_sem);
->> -       list_del(&alg->cra_list);
->> +       if (!list_empty(&alg->cra_list))
->> +               list_del_init(&alg->cra_list);
->>         up_write(&crypto_alg_sem);
->>         complete_all(&larval->completion);
->>         crypto_alg_put(alg);
->>
->> It seems that there are too many "put" calls (mixed between
->> crypto_alg_put() and crypto_mod_put(), which also calls
->> crypto_alg_put()). See this annotated portion of
->> crypto_alg_mod_lookup:
->>
->>         /* This can (correctly) return the same larval for two threads. */
->>         larval = crypto_larval_lookup(name, type, mask);
->>         if (IS_ERR(larval) || !crypto_is_larval(larval))
->>                 return larval;
->>
->>         ok = crypto_probing_notify(CRYPTO_MSG_ALG_REQUEST, larval);
->>
->>         if (ok == NOTIFY_STOP)
->>                 /* This calls crypto_mod_put(), but sometimes also get?? */
->>                 alg = crypto_larval_wait(larval);
->>         else {
->>                 /* This directly calls crypto_mod_put */
->>                 crypto_mod_put(larval);
->>                 alg = ERR_PTR(-ENOENT);
->>         }
->>         /* This calls crypto_alg_put */
->>         crypto_larval_kill(larval);
->>         return alg;
->>
->> In the two-thread situation, the first thread gets a larval with
->> refcnt 2 via crypto_larval_add. (Why 2?) The next thread finds the
->> larval via crypto_larval_add's call to __crypto_alg_lookup() and sees
->> the ref bump to 3. While exiting crypto_alg_mod_lookup, each thread
->> decrements the ref count twice.
->>
->> It seems to me like either each call to crypto_larval_lookup() should
->> result in a refcount bumped by two, or crypto_alg_mod_lookup() should
->> decrement only once, and the initial refcount should be 1 not 2 from
->> crypto_larval_add. But it's not clear to me which is sensible here.
->>
->> What's the right solution here?
->>
->> Thanks,
->>
->> -Kees
->>
->> --
->> Kees Cook
->> Chrome OS Security
->>
-> I've been tracking this problem too:
-> https://bugzilla.redhat.com/show_bug.cgi?id=1002351
+On Fri, Sep 06, 2013 at 04:20:50PM -0700, Kees Cook wrote:
 >
-> Though I'd just started so I've not gotten anywhere near this far.  It seems,
-> given your analysis above that we really need to rework the refcounting here.
-> At the very least we probably need to:
->
-> 1) only modify the module reference count when a larval for a given alg is
-> created, or when its last refcount is decremented.
->
-> 2) fix up the cra_refcount to start at one and increment for each lookup, and
-> decrement for each kill.
+> In the two-thread situation, the first thread gets a larval with
+> refcnt 2 via crypto_larval_add. (Why 2?) The next thread finds the
+> larval via crypto_larval_add's call to __crypto_alg_lookup() and sees
+> the ref bump to 3. While exiting crypto_alg_mod_lookup, each thread
+> decrements the ref count twice.
+> 
+> It seems to me like either each call to crypto_larval_lookup() should
+> result in a refcount bumped by two, or crypto_alg_mod_lookup() should
+> decrement only once, and the initial refcount should be 1 not 2 from
+> crypto_larval_add. But it's not clear to me which is sensible here.
+> 
+> What's the right solution here?
 
-What I haven't been able to figure out is the "expected" behavior of a
-larval. crypto_larval_kill() seems to be the only thing that removes
-it from the alg list, so that seems like the only place a "put" should
-be happening. Though that put should likely be the mod_put not the
-alg_put. I don't think larval_wait should be doing a put, but it also
-can perform a "get", so I'm baffled by that too. :)
+First of all thanks a lot for tracking this problem down! It's
+been bothering me for months but I was unable to find a good
+reproducer.
 
--Kees
+So now that you've identified the problem, the solution is easy.
+crypto_larval_lookup should only ever return a larval if it created
+one.  Any larval created earlier must be waited on first before we
+return.
 
+So does this patch fix the crash for you?
+
+diff --git a/crypto/api.c b/crypto/api.c
+index 320ea4d..a2b39c5 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -34,6 +34,8 @@ EXPORT_SYMBOL_GPL(crypto_alg_sem);
+ BLOCKING_NOTIFIER_HEAD(crypto_chain);
+ EXPORT_SYMBOL_GPL(crypto_chain);
+ 
++static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg);
++
+ struct crypto_alg *crypto_mod_get(struct crypto_alg *alg)
+ {
+ 	return try_module_get(alg->cra_module) ? crypto_alg_get(alg) : NULL;
+@@ -144,8 +146,11 @@ static struct crypto_alg *crypto_larval_add(const char *name, u32 type,
+ 	}
+ 	up_write(&crypto_alg_sem);
+ 
+-	if (alg != &larval->alg)
++	if (alg != &larval->alg) {
+ 		kfree(larval);
++		if (crypto_is_larval(alg))
++			alg = crypto_larval_wait(alg);
++	}
+ 
+ 	return alg;
+ }
+
+Cheers,
 -- 
-Kees Cook
-Chrome OS Security
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
