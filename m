@@ -1,7 +1,7 @@
 From: Alex Porosanu <alexandru.porosanu@freescale.com>
-Subject: [PATCH 5/7] crypto: caam - uninstantiate RNG state handle 0 if instantiated by caam driver
-Date: Mon, 9 Sep 2013 18:56:32 +0300
-Message-ID: <1378742194-32194-6-git-send-email-alexandru.porosanu@freescale.com>
+Subject: [PATCH 7/7] crypto: caam - enable instantiation of all RNG4 state handles
+Date: Mon, 9 Sep 2013 18:56:34 +0300
+Message-ID: <1378742194-32194-8-git-send-email-alexandru.porosanu@freescale.com>
 References: <1378742194-32194-1-git-send-email-alexandru.porosanu@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,145 +9,402 @@ Cc: <herbert@gondor.hengli.com.au>, <horia.geanta@freescale.com>,
 	<vakul@freescale.com>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co9ehsobe001.messaging.microsoft.com ([207.46.163.24]:38883
-	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754067Ab3IIP72 (ORCPT
+Received: from mail-db9lp0248.outbound.messaging.microsoft.com ([213.199.154.248]:39012
+	"EHLO db9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754438Ab3IIP7g (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Sep 2013 11:59:28 -0400
+	Mon, 9 Sep 2013 11:59:36 -0400
 In-Reply-To: <1378742194-32194-1-git-send-email-alexandru.porosanu@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If the caam driver module instantiates the RNG state handle 0, then
-upon the removal of the module, the RNG state handle is left
-initialized. This patch takes care of reverting the state of the
-handle back to its previous uninstantatied state.
+RNG4 block contains multiple (i.e. 2) state handles that can be
+initialized. This patch adds the necessary code for detecting
+which of the two state handles has been instantiated by another
+piece of software e.g. u-boot and instantiate the other one (or
+both if none was instantiated). Only the state handle(s)
+instantiated by this driver will be deinstantiated when removing
+the module.
 
 Signed-off-by: Alex Porosanu <alexandru.porosanu@freescale.com>
 ---
- drivers/crypto/caam/ctrl.c   |   57 +++++++++++++++++++++++++++++++++++++----
- drivers/crypto/caam/intern.h |    6 ++++
- 2 files changed, 57 insertions(+), 6 deletions(-)
+ drivers/crypto/caam/ctrl.c   |  206 ++++++++++++++++++++++++++++++++----------
+ drivers/crypto/caam/intern.h |    8 +-
+ drivers/crypto/caam/regs.h   |    7 ++-
+ 3 files changed, 169 insertions(+), 52 deletions(-)
 
 diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 3ad032f..9e9215a 100644
+index 29cbec1..26438cd 100644
 --- a/drivers/crypto/caam/ctrl.c
 +++ b/drivers/crypto/caam/ctrl.c
-@@ -44,6 +44,17 @@ static void build_instantiation_desc(u32 *desc)
+@@ -17,41 +17,49 @@
+  * Descriptor to instantiate RNG State Handle 0 in normal mode and
+  * load the JDKEK, TDKEK and TDSK registers
+  */
+-static void build_instantiation_desc(u32 *desc)
++static void build_instantiation_desc(u32 *desc, int handle, int do_sk)
+ {
+-	u32 *jump_cmd;
++	u32 *jump_cmd, op_flags;
+ 
+ 	init_job_desc(desc, 0);
+ 
++	op_flags = OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
++			(handle << OP_ALG_AAI_SHIFT) | OP_ALG_AS_INIT;
++
+ 	/* INIT RNG in non-test mode */
+-	append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
+-			 OP_ALG_AS_INIT);
++	append_operation(desc, op_flags);
+ 
+-	/* wait for done */
+-	jump_cmd = append_jump(desc, JUMP_CLASS_CLASS1);
+-	set_jump_tgt_here(desc, jump_cmd);
++	if (!handle && do_sk) {
++		/*
++		 * For SH0, Secure Keys must be generated as well
++		 */
+ 
+-	/*
+-	 * load 1 to clear written reg:
+-	 * resets the done interrupt and returns the RNG to idle.
+-	 */
+-	append_load_imm_u32(desc, 1, LDST_SRCDST_WORD_CLRW);
++		/* wait for done */
++		jump_cmd = append_jump(desc, JUMP_CLASS_CLASS1);
++		set_jump_tgt_here(desc, jump_cmd);
+ 
+-	/* generate secure keys (non-test) */
+-	append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
+-			 OP_ALG_AAI_RNG4_SK);
++		/*
++		 * load 1 to clear written reg:
++		 * resets the done interrrupt and returns the RNG to idle.
++		 */
++		append_load_imm_u32(desc, 1, LDST_SRCDST_WORD_CLRW);
++
++		/* Initialize State Handle  */
++		append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
++				 OP_ALG_AAI_RNG4_SK);
++	}
+ 
  	append_jump(desc, JUMP_CLASS_CLASS1 | JUMP_TYPE_HALT);
  }
  
-+/* Descriptor for deinstantiation of State Handle 0 of the RNG block. */
-+static void build_deinstantiation_desc(u32 *desc)
-+{
-+	init_job_desc(desc, 0);
-+
-+	/* Uninstantiate State Handle 0 */
-+	append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
-+			 OP_ALG_AS_INITFINAL);
-+
-+	append_jump(desc, JUMP_CLASS_CLASS1 | JUMP_TYPE_HALT);
-+}
+ /* Descriptor for deinstantiation of State Handle 0 of the RNG block. */
+-static void build_deinstantiation_desc(u32 *desc)
++static void build_deinstantiation_desc(u32 *desc, int handle)
+ {
+ 	init_job_desc(desc, 0);
  
- /*
+ 	/* Uninstantiate State Handle 0 */
+ 	append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
+-			 OP_ALG_AS_INITFINAL);
++			 (handle << OP_ALG_AAI_SHIFT) | OP_ALG_AS_INITFINAL);
+ 
+ 	append_jump(desc, JUMP_CLASS_CLASS1 | JUMP_TYPE_HALT);
+ }
+@@ -60,11 +68,14 @@ static void build_deinstantiation_desc(u32 *desc)
   * run_descriptor_deco0 - runs a descriptor on DECO0, under direct control of
-@@ -59,7 +70,7 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc)
+  *			  the software (no JR/QI used).
+  * @ctrldev - pointer to device
++ * @status - descriptor status, after being run
++ *
+  * Return: - 0 if no error occurred
+  *	   - -ENODEV if the DECO couldn't be acquired
+  *	   - -EAGAIN if an error occurred while executing the descriptor
+  */
+-static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc)
++static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc,
++					u32 *status)
+ {
+ 	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctrldev);
  	struct caam_full __iomem *topregs;
- 	unsigned int timeout = 100000;
- 	u32 deco_dbg_reg, flags;
--	int i, ret = 0;
-+	int i;
- 
- 	/* Set the bit to request direct access to DECO0 */
- 	topregs = (struct caam_full __iomem *)ctrlpriv->ctrl;
-@@ -102,11 +113,6 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc)
+@@ -113,6 +124,9 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc)
  		cpu_relax();
  	} while ((deco_dbg_reg & DESC_DBG_DECO_STAT_VALID) && --timeout);
  
--	if (!timeout) {
--		dev_err(ctrldev, "failed to instantiate RNG\n");
--		ret = -EIO;
--	}
--
++	*status = rd_reg32(&topregs->deco.op_status_hi) &
++		  DECO_OP_STATUS_HI_ERR_MASK;
++
  	/* Mark the DECO as free */
  	clrbits32(&topregs->ctrl.deco_rq, DECORR_RQD0ENABLE);
  
-@@ -146,6 +152,39 @@ static int instantiate_rng(struct device *ctrldev)
- 	return ret;
- }
- 
-+/*
-+ * deinstantiate_rng - builds and executes a descriptor on DECO0,
-+ *		       which deinitializes the RNG block.
-+ * @ctrldev - pointer to device
+@@ -126,6 +140,14 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc)
+  * instantiate_rng - builds and executes a descriptor on DECO0,
+  *		     which initializes the RNG block.
+  * @ctrldev - pointer to device
++ * @state_handle_mask - bitmask containing the instantiation status
++ *			for the RNG4 state handles which exist in
++ *			the RNG4 block: 1 if it's been instantiated
++ *			by an external entry, 0 otherwise.
++ * @gen_sk  - generate data to be loaded into the JDKEK, TDKEK and TDSK;
++ *	      Caution: this can be done only once; if the keys need to be
++ *	      regenerated, a POR is required
 + *
-+ * Return: - 0 if no error occurred
-+ *	   - -ENOMEM if there isn't enough memory to allocate the descriptor
-+ *	   - -ENODEV if DECO0 couldn't be acquired
-+ *	   - -EAGAIN if an error occurred when executing the descriptor
-+ */
-+static int deinstantiate_rng(struct device *ctrldev)
-+{
-+	u32 *desc;
-+	int i, ret = 0;
-+
-+	desc = kmalloc(CAAM_CMD_SZ * 3, GFP_KERNEL);
-+	if (!desc)
-+		return -ENOMEM;
-+
-+	/* Create the descriptor for deinstantating RNG State Handle 0 */
-+	build_deinstantiation_desc(desc);
-+
-+	/* Try to run it through DECO0 */
-+	ret = run_descriptor_deco0(ctrldev, desc);
-+
-+	if (ret)
-+		dev_err(ctrldev, "failed to deinstantiate RNG\n");
-+
-+	kfree(desc);
-+
-+	return ret;
-+}
-+
- static int caam_remove(struct platform_device *pdev)
+  * Return: - 0 if no error occurred
+  *	   - -ENOMEM if there isn't enough memory to allocate the descriptor
+  *	   - -ENODEV if DECO0 couldn't be acquired
+@@ -133,19 +155,56 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc)
+  *	      f.i. there was a RNG hardware error due to not "good enough"
+  *	      entropy being aquired.
+  */
+-static int instantiate_rng(struct device *ctrldev)
++static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
++			   int gen_sk)
  {
- 	struct device *ctrldev;
-@@ -165,6 +204,10 @@ static int caam_remove(struct platform_device *pdev)
+-	u32 *desc;
+-	int ret = 0;
++	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctrldev);
++	struct caam_full __iomem *topregs;
++	struct rng4tst __iomem *r4tst;
++	u32 *desc, status, rdsta_val;
++	int ret = 0, sh_idx;
++
++	topregs = (struct caam_full __iomem *)ctrlpriv->ctrl;
++	r4tst = &topregs->ctrl.r4tst[0];
+ 
+ 	desc = kmalloc(CAAM_CMD_SZ * 7, GFP_KERNEL);
+ 	if (!desc)
+ 		return -ENOMEM;
+-	/* Create the descriptor for instantiating RNG State Handle 0 */
+-	build_instantiation_desc(desc);
+ 
+-	/* Try to run it through DECO0 */
+-	ret = run_descriptor_deco0(ctrldev, desc);
++	for (sh_idx = 0; sh_idx < RNG4_MAX_HANDLES; sh_idx++) {
++		/*
++		 * If the corresponding bit is set, this state handle
++		 * was initialized by somebody else, so it's left alone.
++		 */
++		if ((1 << sh_idx) & state_handle_mask)
++			continue;
++
++		/* Create the descriptor for instantiating RNG State Handle */
++		build_instantiation_desc(desc, sh_idx, gen_sk);
++
++		/* Try to run it through DECO0 */
++		ret = run_descriptor_deco0(ctrldev, desc, &status);
++
++		/*
++		 * If ret is not 0, or descriptor status is not 0, then
++		 * something went wrong. No need to try the next state
++		 * handle (if available), bail out here.
++		 * Also, if for some reason, the State Handle didn't get
++		 * instantiated although the descriptor has finished
++		 * without any error (HW optimizations for later
++		 * CAAM eras), then try again.
++		 */
++		rdsta_val =
++			rd_reg32(&topregs->ctrl.r4tst[0].rdsta) & RDSTA_IFMASK;
++		if (status || !(rdsta_val & (1 << sh_idx)))
++			ret = -EAGAIN;
++		if (ret)
++			break;
++
++		dev_info(ctrldev, "Instantiated RNG4 SH%d\n", sh_idx);
++		/* Clear the contents before recreating the descriptor */
++		memset(desc, 0x00, CAAM_CMD_SZ * 7);
++	}
+ 
+ 	kfree(desc);
+ 
+@@ -156,29 +215,49 @@ static int instantiate_rng(struct device *ctrldev)
+  * deinstantiate_rng - builds and executes a descriptor on DECO0,
+  *		       which deinitializes the RNG block.
+  * @ctrldev - pointer to device
++ * @state_handle_mask - bitmask containing the instantiation status
++ *			for the RNG4 state handles which exist in
++ *			the RNG4 block: 1 if it's been instantiated
+  *
+  * Return: - 0 if no error occurred
+  *	   - -ENOMEM if there isn't enough memory to allocate the descriptor
+  *	   - -ENODEV if DECO0 couldn't be acquired
+  *	   - -EAGAIN if an error occurred when executing the descriptor
+  */
+-static int deinstantiate_rng(struct device *ctrldev)
++static int deinstantiate_rng(struct device *ctrldev, int state_handle_mask)
+ {
+-	u32 *desc;
+-	int i, ret = 0;
++	u32 *desc, status;
++	int sh_idx, ret = 0;
+ 
+ 	desc = kmalloc(CAAM_CMD_SZ * 3, GFP_KERNEL);
+ 	if (!desc)
+ 		return -ENOMEM;
+ 
+-	/* Create the descriptor for deinstantating RNG State Handle 0 */
+-	build_deinstantiation_desc(desc);
+-
+-	/* Try to run it through DECO0 */
+-	ret = run_descriptor_deco0(ctrldev, desc);
+-
+-	if (ret)
+-		dev_err(ctrldev, "failed to deinstantiate RNG\n");
++	for (sh_idx = 0; sh_idx < RNG4_MAX_HANDLES; sh_idx++) {
++		/*
++		 * If the corresponding bit is set, then it means the state
++		 * handle was initialized by us, and thus it needs to be
++		 * deintialized as well
++		 */
++		if ((1 << sh_idx) & state_handle_mask) {
++			/*
++			 * Create the descriptor for deinstantating this state
++			 * handle
++			 */
++			build_deinstantiation_desc(desc, sh_idx);
++
++			/* Try to run it through DECO0 */
++			ret = run_descriptor_deco0(ctrldev, desc, &status);
++
++			if (ret || status) {
++				dev_err(ctrldev,
++					"Failed to deinstantiate RNG4 SH%d\n",
++					sh_idx);
++				break;
++			}
++			dev_info(ctrldev, "Deinstantiated RNG4 SH%d\n", sh_idx);
++		}
++	}
+ 
+ 	kfree(desc);
+ 
+@@ -204,9 +283,9 @@ static int caam_remove(struct platform_device *pdev)
  		irq_dispose_mapping(jrpriv->irq);
  	}
  
-+	/* De-initialize RNG if it was initialized by this driver. */
-+	if (ctrlpriv->rng4_init)
-+		deinstantiate_rng(ctrldev);
-+
+-	/* De-initialize RNG if it was initialized by this driver. */
+-	if (ctrlpriv->rng4_init)
+-		deinstantiate_rng(ctrldev);
++	/* De-initialize RNG state handles initialized by this driver. */
++	if (ctrlpriv->rng4_sh_init)
++		deinstantiate_rng(ctrldev, ctrlpriv->rng4_sh_init);
+ 
  	/* Shut down debug views */
  #ifdef CONFIG_DEBUG_FS
- 	debugfs_remove_recursive(ctrlpriv->dfs_root);
-@@ -384,6 +427,8 @@ static int caam_probe(struct platform_device *pdev)
+@@ -306,7 +385,7 @@ EXPORT_SYMBOL(caam_get_era);
+ /* Probe routine for CAAM top (controller) level */
+ static int caam_probe(struct platform_device *pdev)
+ {
+-	int ret, ring, rspec, ent_delay = RTSDCTL_ENT_DLY_MIN;
++	int ret, ring, rspec, gen_sk, ent_delay = RTSDCTL_ENT_DLY_MIN;
+ 	u64 caam_id;
+ 	struct device *dev;
+ 	struct device_node *nprop, *np;
+@@ -414,20 +493,53 @@ static int caam_probe(struct platform_device *pdev)
+ 	 * If SEC has RNG version >= 4 and RNG state handle has not been
+ 	 * already instantiated, do RNG instantiation
+ 	 */
+-	if ((cha_vid & CHA_ID_RNG_MASK) >> CHA_ID_RNG_SHIFT >= 4 &&
+-	    !(rd_reg32(&topregs->ctrl.r4tst[0].rdsta) & RDSTA_IF0)) {
++	if ((cha_vid & CHA_ID_RNG_MASK) >> CHA_ID_RNG_SHIFT >= 4) {
++		ctrlpriv->rng4_sh_init =
++			rd_reg32(&topregs->ctrl.r4tst[0].rdsta);
++		/*
++		 * If the secure keys (TDKEK, JDKEK, TDSK), were already
++		 * generated, signal this to the function that is instantiating
++		 * the state handles. An error would occur if RNG4 attempts
++		 * to regenerate these keys before the next POR.
++		 */
++		gen_sk = ctrlpriv->rng4_sh_init & RDSTA_SKVN ? 0 : 1;
++		ctrlpriv->rng4_sh_init &= RDSTA_IFMASK;
+ 		do {
+-			kick_trng(pdev, ent_delay);
+-			ret = instantiate_rng(dev);
+-			ent_delay += 400;
++			int inst_handles =
++				rd_reg32(&topregs->ctrl.r4tst[0].rdsta) &
++								RDSTA_IFMASK;
++			/*
++			 * If either SH were instantiated by somebody else
++			 * (e.g. u-boot) then it is assumed that the entropy
++			 * parameters are properly set and thus the function
++			 * setting these (kick_trng(...)) is skipped.
++			 * Also, if a handle was instantiated, do not change
++			 * the TRNG parameters.
++			 */
++			if (!(ctrlpriv->rng4_sh_init || inst_handles)) {
++				kick_trng(pdev, ent_delay);
++				ent_delay += 400;
++			}
++			/*
++			 * if instantiate_rng(...) fails, the loop will rerun
++			 * and the kick_trng(...) function will modfiy the
++			 * upper and lower limits of the entropy sampling
++			 * interval, leading to a sucessful initialization of
++			 * the RNG.
++			 */
++			ret = instantiate_rng(dev, inst_handles,
++					      gen_sk);
+ 		} while ((ret == -EAGAIN) && (ent_delay < RTSDCTL_ENT_DLY_MAX));
+ 		if (ret) {
+ 			dev_err(dev, "failed to instantiate RNG");
+ 			caam_remove(pdev);
  			return ret;
  		}
+-
+-		ctrlpriv->rng4_init = 1;
++		/*
++		 * Set handles init'ed by this module as the complement of the
++		 * already initialized ones
++		 */
++		ctrlpriv->rng4_sh_init = ~ctrlpriv->rng4_sh_init & RDSTA_IFMASK;
  
-+		ctrlpriv->rng4_init = 1;
-+
  		/* Enable RDB bit so that RNG works faster */
  		setbits32(&topregs->ctrl.scfgr, SCFGR_RDBENABLE);
- 	}
 diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 34c4b9f..ada2429 100644
+index ada2429..bbc1ac9 100644
 --- a/drivers/crypto/caam/intern.h
 +++ b/drivers/crypto/caam/intern.h
-@@ -87,6 +87,12 @@ struct caam_drv_private {
+@@ -87,11 +87,11 @@ struct caam_drv_private {
  	/* list of registered hash algorithms (mk generic context handle?) */
  	struct list_head hash_list;
  
-+	/* RNG4 block */
-+	bool rng4_init;		/* If RNG4 block is initialized by this driver,
-+				   then this will be set; if it was initialized
-+				   by another entity (e.g. u-boot), it will be
-+				   cleared. */
-+
++#define	RNG4_MAX_HANDLES 2
+ 	/* RNG4 block */
+-	bool rng4_init;		/* If RNG4 block is initialized by this driver,
+-				   then this will be set; if it was initialized
+-				   by another entity (e.g. u-boot), it will be
+-				   cleared. */
++	u32 rng4_sh_init;	/* This bitmap shows which of the State
++				   Handles of the RNG4 block are initialized
++				   by this driver */
+ 
  	/*
  	 * debugfs entries for developer view into driver/device
- 	 * variables at runtime.
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 9aa9f71..d50174f 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -245,7 +245,7 @@ struct rngtst {
+ 
+ /* RNG4 TRNG test registers */
+ struct rng4tst {
+-#define RTMCTL_PRGM 0x00010000	/* 1 -> program mode, 0 -> run mode */
++#define RTMCTL_PRGM	0x00010000	/* 1 -> program mode, 0 -> run mode */
+ 	u32 rtmctl;		/* misc. control register */
+ 	u32 rtscmisc;		/* statistical check misc. register */
+ 	u32 rtpkrrng;		/* poker range register */
+@@ -268,7 +268,11 @@ struct rng4tst {
+ 		u32 rtfrqcnt;	/* PRGM=0: freq. count register */
+ 	};
+ 	u32 rsvd1[40];
++#define RDSTA_SKVT 0x80000000
++#define RDSTA_SKVN 0x40000000
+ #define RDSTA_IF0 0x00000001
++#define RDSTA_IF1 0x00000002
++#define RDSTA_IFMASK (RDSTA_IF1 | RDSTA_IF0)
+ 	u32 rdsta;
+ 	u32 rsvd2[15];
+ };
+@@ -694,6 +698,7 @@ struct caam_deco {
+ 	u32 jr_ctl_hi;	/* CxJRR - JobR Control Register      @800 */
+ 	u32 jr_ctl_lo;
+ 	u64 jr_descaddr;	/* CxDADR - JobR Descriptor Address */
++#define DECO_OP_STATUS_HI_ERR_MASK 0xF00000FF
+ 	u32 op_status_hi;	/* DxOPSTA - DECO Operation Status */
+ 	u32 op_status_lo;
+ 	u32 rsvd24[2];
 -- 
 1.7.7.6
