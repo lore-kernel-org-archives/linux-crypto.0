@@ -1,60 +1,89 @@
-From: Kees Cook <keescook@chromium.org>
+From: James Yonan <james@openvpn.net>
 Subject: Re: race condition in crypto larval handling
-Date: Sun, 8 Sep 2013 08:52:11 -0700
-Message-ID: <CAGXu5jLQ8oex=PMftRsFcoB78SXSRM3LTVoib61agA392vSvTA@mail.gmail.com>
-References: <CAGXu5jJvuAC3paV5k_bmoHHrHVgc0Hi6ShSDk3iQUt1Lf0cioQ@mail.gmail.com>
-	<20130908013210.GA30627@gondor.apana.org.au>
-	<CAGXu5j+DoXK_9v430xhCzOO1bsuuhe84fjkf7+DZ0r35hUNBBg@mail.gmail.com>
-	<20130908043703.GA31554@gondor.apana.org.au>
-	<20130908045422.GA31896@gondor.apana.org.au>
-	<CAGXu5jL4ojFEWAkW0NDSERUFTQhPgwb6ToOcAsg_4QySex1GfA@mail.gmail.com>
+Date: Sun, 08 Sep 2013 19:41:23 -0600
+Message-ID: <522D2743.9060802@openvpn.net>
+References: <CAGXu5jJvuAC3paV5k_bmoHHrHVgc0Hi6ShSDk3iQUt1Lf0cioQ@mail.gmail.com> <20130908013210.GA30627@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "David S. Miller" <davem@davemloft.net>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	Tyler Hicks <tyhicks@canonical.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oa0-f53.google.com ([209.85.219.53]:41547 "EHLO
-	mail-oa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752322Ab3IHPwM (ORCPT
+Received: from magnetar.openvpn.net ([74.52.27.18]:43119 "EHLO
+	magnetar.openvpn.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751147Ab3IIBlZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 8 Sep 2013 11:52:12 -0400
-Received: by mail-oa0-f53.google.com with SMTP id k18so5658231oag.40
-        for <linux-crypto@vger.kernel.org>; Sun, 08 Sep 2013 08:52:12 -0700 (PDT)
-In-Reply-To: <CAGXu5jL4ojFEWAkW0NDSERUFTQhPgwb6ToOcAsg_4QySex1GfA@mail.gmail.com>
+	Sun, 8 Sep 2013 21:41:25 -0400
+Received: from moab.lan (c-24-9-78-222.hsd1.co.comcast.net [24.9.78.222])
+	(authenticated bits=0)
+	by magnetar.openvpn.net (8.13.1/8.13.1) with ESMTP id r891fIXg000698
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO)
+	for <linux-crypto@vger.kernel.org>; Sun, 8 Sep 2013 19:41:19 -0600
+In-Reply-To: <20130908013210.GA30627@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Sep 7, 2013 at 11:01 PM, Kees Cook <keescook@chromium.org> wrote:
-> On Sat, Sep 7, 2013 at 9:54 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->> On Sun, Sep 08, 2013 at 02:37:03PM +1000, Herbert Xu wrote:
->>> On Sat, Sep 07, 2013 at 08:34:15PM -0700, Kees Cook wrote:
->>> >
->>> > However, I noticed on the "good" path (even without the above patch),
->>> > I sometimes see a double-kfree triggered by the modprobe process. I
->>> > can't, however, see how that's happening, since larval_destroy should
->>> > only be called when refcnt == 0.
->>>
->>> Do you still see this double free with this patch? Without the
->>> patch it is completely expected as killing the same lavral twice
->>> will cause memory corruption leading to all sorts of weirdness,
->>> even if you stop it from deleting the list entry twice.
+On 07/09/2013 19:32, Herbert Xu wrote:
+> On Fri, Sep 06, 2013 at 04:20:50PM -0700, Kees Cook wrote:
 >>
->> Actually I know what it is.  sha512 registers two algorithms.
->> Therefore, it will create two larvals in sequence and then destroy
->> them in turn.  So it's not a double free at all.  If you put a
->> printk in crypto_larval_alloc that should confirm this.
+>> In the two-thread situation, the first thread gets a larval with
+>> refcnt 2 via crypto_larval_add. (Why 2?) The next thread finds the
+>> larval via crypto_larval_add's call to __crypto_alg_lookup() and sees
+>> the ref bump to 3. While exiting crypto_alg_mod_lookup, each thread
+>> decrements the ref count twice.
+>>
+>> It seems to me like either each call to crypto_larval_lookup() should
+>> result in a refcount bumped by two, or crypto_alg_mod_lookup() should
+>> decrement only once, and the initial refcount should be 1 not 2 from
+>> crypto_larval_add. But it's not clear to me which is sensible here.
+>>
+>> What's the right solution here?
 >
-> Ah! That would make sense; it just happens to re-allocate to the exact
-> same location, yes. Whew, that's certainly what's happening. I can
-> retest to confirm in my morning.
+> First of all thanks a lot for tracking this problem down! It's
+> been bothering me for months but I was unable to find a good
+> reproducer.
+>
+> So now that you've identified the problem, the solution is easy.
+> crypto_larval_lookup should only ever return a larval if it created
+> one.  Any larval created earlier must be waited on first before we
+> return.
+>
+> So does this patch fix the crash for you?
+>
+> diff --git a/crypto/api.c b/crypto/api.c
+> index 320ea4d..a2b39c5 100644
+> --- a/crypto/api.c
+> +++ b/crypto/api.c
+> @@ -34,6 +34,8 @@ EXPORT_SYMBOL_GPL(crypto_alg_sem);
+>   BLOCKING_NOTIFIER_HEAD(crypto_chain);
+>   EXPORT_SYMBOL_GPL(crypto_chain);
+>
+> +static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg);
+> +
+>   struct crypto_alg *crypto_mod_get(struct crypto_alg *alg)
+>   {
+>   	return try_module_get(alg->cra_module) ? crypto_alg_get(alg) : NULL;
+> @@ -144,8 +146,11 @@ static struct crypto_alg *crypto_larval_add(const char *name, u32 type,
+>   	}
+>   	up_write(&crypto_alg_sem);
+>
+> -	if (alg != &larval->alg)
+> +	if (alg != &larval->alg) {
+>   		kfree(larval);
+> +		if (crypto_is_larval(alg))
+> +			alg = crypto_larval_wait(alg);
+> +	}
+>
+>   	return alg;
+>   }
 
-Confirmed: 2 allocs happen, and then 2 kfrees. :)
+I tried this patch, but I still see an apparent module lookup/load race 
+if code on several CPUs calls crypto_alloc_aead at the same time, and an 
+external module such as aes needs to be loaded.
 
--Kees
+Seeing this in the log: "request_module: runaway loop modprobe gcm(aes)"
 
--- 
-Kees Cook
-Chrome OS Security
+Shouldn't module lookup/load be bracketed by some sort of lock to 
+prevent this?
+
+James
