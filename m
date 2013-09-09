@@ -1,7 +1,7 @@
 From: Alex Porosanu <alexandru.porosanu@freescale.com>
-Subject: [PATCH 3/7] crypto: caam - fix RNG4 instantiation
-Date: Mon, 9 Sep 2013 18:56:30 +0300
-Message-ID: <1378742194-32194-4-git-send-email-alexandru.porosanu@freescale.com>
+Subject: [PATCH 5/7] crypto: caam - uninstantiate RNG state handle 0 if instantiated by caam driver
+Date: Mon, 9 Sep 2013 18:56:32 +0300
+Message-ID: <1378742194-32194-6-git-send-email-alexandru.porosanu@freescale.com>
 References: <1378742194-32194-1-git-send-email-alexandru.porosanu@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,182 +9,145 @@ Cc: <herbert@gondor.hengli.com.au>, <horia.geanta@freescale.com>,
 	<vakul@freescale.com>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co9ehsobe002.messaging.microsoft.com ([207.46.163.25]:30526
+Received: from co9ehsobe001.messaging.microsoft.com ([207.46.163.24]:38883
 	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751113Ab3IIP71 (ORCPT
+	by vger.kernel.org with ESMTP id S1754067Ab3IIP72 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Sep 2013 11:59:27 -0400
+	Mon, 9 Sep 2013 11:59:28 -0400
 In-Reply-To: <1378742194-32194-1-git-send-email-alexandru.porosanu@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The RNG4 block in CAAM needs to be 'seeded' first before being used
-for generating pseudo-random data. The 'seeding' is done by getting
-entropy from the TRNG ring oscillator. The RTFRQMAX register controls
-the maximum allowable number of samples that can be aquired during
-an entropy sample. Depending on the clock at which the RNG4 block
-(and for that matter the SEC block) runs, it's possible that a
-hard-coded value for the maximum frequency is inadequate, i.e. more
-samples than needed are taken. This is an error, and thus the RNG4
-block doesn't get initialized.  The patch attempts to alleviate
-this issue by trying with progressivly larger frequencies, until
-the number of samples is adequate.
-This patch also fixes how a descriptor is deemed as being finished:
-instead of checking the VALID field in the DECO debug register,
-it makes sure that the DECO is idle, by checking the DECO state field
-of the said register.
+If the caam driver module instantiates the RNG state handle 0, then
+upon the removal of the module, the RNG state handle is left
+initialized. This patch takes care of reverting the state of the
+handle back to its previous uninstantatied state.
 
 Signed-off-by: Alex Porosanu <alexandru.porosanu@freescale.com>
 ---
- drivers/crypto/caam/ctrl.c |   63 ++++++++++++++++++++++++++++++++-----------
- drivers/crypto/caam/regs.h |    7 +++-
- 2 files changed, 52 insertions(+), 18 deletions(-)
+ drivers/crypto/caam/ctrl.c   |   57 +++++++++++++++++++++++++++++++++++++----
+ drivers/crypto/caam/intern.h |    6 ++++
+ 2 files changed, 57 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 11c7f29..d5fe5f5 100644
+index 3ad032f..9e9215a 100644
 --- a/drivers/crypto/caam/ctrl.c
 +++ b/drivers/crypto/caam/ctrl.c
-@@ -82,7 +82,7 @@ static int instantiate_rng(struct device *ctrldev)
- 	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctrldev);
- 	struct caam_full __iomem *topregs;
- 	unsigned int timeout = 100000;
--	u32 *desc;
-+	u32 *desc, deco_dbg_reg;
- 	int i, ret = 0;
- 
- 	desc = kmalloc(CAAM_CMD_SZ * 7, GFP_KERNEL | GFP_DMA);
-@@ -112,9 +112,17 @@ static int instantiate_rng(struct device *ctrldev)
- 	wr_reg32(&topregs->deco.jr_ctl_hi, DECO_JQCR_WHL | DECO_JQCR_FOUR);
- 
- 	timeout = 10000000;
--	while ((rd_reg32(&topregs->deco.desc_dbg) & DECO_DBG_VALID) &&
--								 --timeout)
-+	do {
-+		deco_dbg_reg = rd_reg32(&topregs->deco.desc_dbg);
-+		/*
-+		 * If an error occured in the descriptor, then
-+		 * the DECO status field will be set to 0x0D
-+		 */
-+		if ((deco_dbg_reg & DESC_DBG_DECO_STAT_MASK) ==
-+		    DESC_DBG_DECO_STAT_HOST_ERR)
-+			break;
- 		cpu_relax();
-+	} while ((deco_dbg_reg & DESC_DBG_DECO_STAT_VALID) && --timeout);
- 
- 	if (!timeout) {
- 		dev_err(ctrldev, "failed to instantiate RNG\n");
-@@ -128,10 +136,12 @@ out:
+@@ -44,6 +44,17 @@ static void build_instantiation_desc(u32 *desc)
+ 	append_jump(desc, JUMP_CLASS_CLASS1 | JUMP_TYPE_HALT);
  }
+ 
++/* Descriptor for deinstantiation of State Handle 0 of the RNG block. */
++static void build_deinstantiation_desc(u32 *desc)
++{
++	init_job_desc(desc, 0);
++
++	/* Uninstantiate State Handle 0 */
++	append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
++			 OP_ALG_AS_INITFINAL);
++
++	append_jump(desc, JUMP_CLASS_CLASS1 | JUMP_TYPE_HALT);
++}
  
  /*
-- * By default, the TRNG runs for 200 clocks per sample;
-- * 1600 clocks per sample generates better entropy.
-+ * kick_trng - sets the various parameters for enabling the initialization
-+ *	       of the RNG4 block in CAAM
-+ * @pdev - pointer to the platform device
-+ * @ent_delay - Defines the length (in system clocks) of each entropy sample.
-  */
--static void kick_trng(struct platform_device *pdev)
-+static void kick_trng(struct platform_device *pdev, int ent_delay)
- {
- 	struct device *ctrldev = &pdev->dev;
- 	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctrldev);
-@@ -144,14 +154,31 @@ static void kick_trng(struct platform_device *pdev)
+  * run_descriptor_deco0 - runs a descriptor on DECO0, under direct control of
+@@ -59,7 +70,7 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc)
+ 	struct caam_full __iomem *topregs;
+ 	unsigned int timeout = 100000;
+ 	u32 deco_dbg_reg, flags;
+-	int i, ret = 0;
++	int i;
  
- 	/* put RNG4 into program mode */
- 	setbits32(&r4tst->rtmctl, RTMCTL_PRGM);
--	/* 1600 clocks per sample */
-+
-+	/*
-+	 * Performance-wise, it does not make sense to
-+	 * set the delay to a value that is lower
-+	 * than the last one that worked (i.e. the state handles
-+	 * were instantiated properly. Thus, instead of wasting
-+	 * time trying to set the values controlling the sample
-+	 * frequency, the function simply returns.
-+	 */
-+	val = (rd_reg32(&r4tst->rtsdctl) & RTSDCTL_ENT_DLY_MASK)
-+	      >> RTSDCTL_ENT_DLY_SHIFT;
-+	if (ent_delay <= val) {
-+		/* put RNG4 into run mode */
-+		clrbits32(&r4tst->rtmctl, RTMCTL_PRGM);
-+		return;
-+	}
-+
- 	val = rd_reg32(&r4tst->rtsdctl);
--	val = (val & ~RTSDCTL_ENT_DLY_MASK) | (1600 << RTSDCTL_ENT_DLY_SHIFT);
-+	val = (val & ~RTSDCTL_ENT_DLY_MASK) |
-+	      (ent_delay << RTSDCTL_ENT_DLY_SHIFT);
- 	wr_reg32(&r4tst->rtsdctl, val);
--	/* min. freq. count */
--	wr_reg32(&r4tst->rtfrqmin, 400);
--	/* max. freq. count */
--	wr_reg32(&r4tst->rtfrqmax, 6400);
-+	/* min. freq. count, equal to 1/4 of the entropy sample length */
-+	wr_reg32(&r4tst->rtfrqmin, ent_delay >> 2);
-+	/* max. freq. count, equal to 8 times the entropy sample length */
-+	wr_reg32(&r4tst->rtfrqmax, ent_delay << 3);
- 	/* put RNG4 into run mode */
- 	clrbits32(&r4tst->rtmctl, RTMCTL_PRGM);
+ 	/* Set the bit to request direct access to DECO0 */
+ 	topregs = (struct caam_full __iomem *)ctrlpriv->ctrl;
+@@ -102,11 +113,6 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc)
+ 		cpu_relax();
+ 	} while ((deco_dbg_reg & DESC_DBG_DECO_STAT_VALID) && --timeout);
+ 
+-	if (!timeout) {
+-		dev_err(ctrldev, "failed to instantiate RNG\n");
+-		ret = -EIO;
+-	}
+-
+ 	/* Mark the DECO as free */
+ 	clrbits32(&topregs->ctrl.deco_rq, DECORR_RQD0ENABLE);
+ 
+@@ -146,6 +152,39 @@ static int instantiate_rng(struct device *ctrldev)
+ 	return ret;
  }
-@@ -192,7 +219,7 @@ EXPORT_SYMBOL(caam_get_era);
- /* Probe routine for CAAM top (controller) level */
- static int caam_probe(struct platform_device *pdev)
- {
--	int ret, ring, rspec;
-+	int ret, ring, rspec, ent_delay = RTSDCTL_ENT_DLY_MIN;
- 	u64 caam_id;
- 	struct device *dev;
- 	struct device_node *nprop, *np;
-@@ -298,13 +325,17 @@ static int caam_probe(struct platform_device *pdev)
  
- 	/*
- 	 * If SEC has RNG version >= 4 and RNG state handle has not been
--	 * already instantiated ,do RNG instantiation
-+	 * already instantiated, do RNG instantiation
- 	 */
- 	if ((cha_vid & CHA_ID_RNG_MASK) >> CHA_ID_RNG_SHIFT >= 4 &&
- 	    !(rd_reg32(&topregs->ctrl.r4tst[0].rdsta) & RDSTA_IF0)) {
--		kick_trng(pdev);
--		ret = instantiate_rng(dev);
-+		do {
-+			kick_trng(pdev, ent_delay);
-+			ret = instantiate_rng(dev);
-+			ent_delay += 400;
-+		} while ((ret == -EIO) && (ent_delay < RTSDCTL_ENT_DLY_MAX));
- 		if (ret) {
-+			dev_err(dev, "failed to instantiate RNG");
- 			caam_remove(pdev);
++/*
++ * deinstantiate_rng - builds and executes a descriptor on DECO0,
++ *		       which deinitializes the RNG block.
++ * @ctrldev - pointer to device
++ *
++ * Return: - 0 if no error occurred
++ *	   - -ENOMEM if there isn't enough memory to allocate the descriptor
++ *	   - -ENODEV if DECO0 couldn't be acquired
++ *	   - -EAGAIN if an error occurred when executing the descriptor
++ */
++static int deinstantiate_rng(struct device *ctrldev)
++{
++	u32 *desc;
++	int i, ret = 0;
++
++	desc = kmalloc(CAAM_CMD_SZ * 3, GFP_KERNEL);
++	if (!desc)
++		return -ENOMEM;
++
++	/* Create the descriptor for deinstantating RNG State Handle 0 */
++	build_deinstantiation_desc(desc);
++
++	/* Try to run it through DECO0 */
++	ret = run_descriptor_deco0(ctrldev, desc);
++
++	if (ret)
++		dev_err(ctrldev, "failed to deinstantiate RNG\n");
++
++	kfree(desc);
++
++	return ret;
++}
++
+ static int caam_remove(struct platform_device *pdev)
+ {
+ 	struct device *ctrldev;
+@@ -165,6 +204,10 @@ static int caam_remove(struct platform_device *pdev)
+ 		irq_dispose_mapping(jrpriv->irq);
+ 	}
+ 
++	/* De-initialize RNG if it was initialized by this driver. */
++	if (ctrlpriv->rng4_init)
++		deinstantiate_rng(ctrldev);
++
+ 	/* Shut down debug views */
+ #ifdef CONFIG_DEBUG_FS
+ 	debugfs_remove_recursive(ctrlpriv->dfs_root);
+@@ -384,6 +427,8 @@ static int caam_probe(struct platform_device *pdev)
  			return ret;
  		}
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 4455396..9aa9f71 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -255,6 +255,8 @@ struct rng4tst {
- 	};
- #define RTSDCTL_ENT_DLY_SHIFT 16
- #define RTSDCTL_ENT_DLY_MASK (0xffff << RTSDCTL_ENT_DLY_SHIFT)
-+#define RTSDCTL_ENT_DLY_MIN 1200
-+#define RTSDCTL_ENT_DLY_MAX 12800
- 	u32 rtsdctl;		/* seed control register */
- 	union {
- 		u32 rtsblim;	/* PRGM=1: sparse bit limit register */
-@@ -706,12 +708,13 @@ struct caam_deco {
- 	u32 rsvd29[48];
- 	u32 descbuf[64];	/* DxDESB - Descriptor buffer */
- 	u32 rscvd30[193];
-+#define DESC_DBG_DECO_STAT_HOST_ERR	0x00D00000
-+#define DESC_DBG_DECO_STAT_VALID	0x80000000
-+#define DESC_DBG_DECO_STAT_MASK		0x00F00000
- 	u32 desc_dbg;		/* DxDDR - DECO Debug Register */
- 	u32 rsvd31[126];
- };
  
--/* DECO DBG Register Valid Bit*/
--#define DECO_DBG_VALID		0x80000000
- #define DECO_JQCR_WHL		0x20000000
- #define DECO_JQCR_FOUR		0x10000000
++		ctrlpriv->rng4_init = 1;
++
+ 		/* Enable RDB bit so that RNG works faster */
+ 		setbits32(&topregs->ctrl.scfgr, SCFGR_RDBENABLE);
+ 	}
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index 34c4b9f..ada2429 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -87,6 +87,12 @@ struct caam_drv_private {
+ 	/* list of registered hash algorithms (mk generic context handle?) */
+ 	struct list_head hash_list;
  
++	/* RNG4 block */
++	bool rng4_init;		/* If RNG4 block is initialized by this driver,
++				   then this will be set; if it was initialized
++				   by another entity (e.g. u-boot), it will be
++				   cleared. */
++
+ 	/*
+ 	 * debugfs entries for developer view into driver/device
+ 	 * variables at runtime.
 -- 
 1.7.7.6
