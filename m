@@ -1,510 +1,300 @@
-From: Joel Fernandes <joelf@ti.com>
-Subject: Re: [PATCH 1/3] crypto: omap-des: Add omap-des driver for OMAP4/AM43xx
-Date: Tue, 10 Sep 2013 11:16:16 -0500
-Message-ID: <522F45D0.5050605@ti.com>
-References: <1377818873-21174-1-git-send-email-joelf@ti.com>
- <1377818873-21174-2-git-send-email-joelf@ti.com> <522063AB.2030907@ti.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Tony Lindgren <tony@atomide.com>, Mark Greer <mgreer@animalcreek.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Herbert Xu <herbert@gondor.hengli.com.au>,
- Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
- Linux OMAP List <linux-omap@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Lokesh Vutla <lokeshvutla@ti.com>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Rajendra Nayak <rnayak@ti.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <522063AB.2030907@ti.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: James Yonan <james@openvpn.net>
+Subject: [PATCH] crypto_memcmp: add constant-time memcmp
+Date: Tue, 10 Sep 2013 11:38:11 -0700
+Message-ID: <1378838291-7036-1-git-send-email-james@openvpn.net>
+Cc: herbert@gondor.hengli.com.au, James Yonan <james@openvpn.net>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from magnetar.openvpn.net ([74.52.27.18]:44135 "EHLO
+	magnetar.openvpn.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751214Ab3IJSi2 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 10 Sep 2013 14:38:28 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 08/30/2013 04:19 AM, Rajendra Nayak wrote:
-> []..
-> 
->> +
->> +#define pr_fmt(fmt) "%s: " fmt, __func__
->> +
->> +#ifdef DEBUG
->> +#define prn(num) printk(#num "=%d\n", num)
->> +#define prx(num) printk(#num "=%x\n", num)
->> +#else
->> +#define prn(num) do { } while (0)
->> +#define prx(num)  do { } while (0)
->> +#endif
->> +
->> +#include <linux/err.h>
->> +#include <linux/module.h>
->> +#include <linux/init.h>
->> +#include <linux/errno.h>
->> +#include <linux/kernel.h>
->> +#include <linux/platform_device.h>
->> +#include <linux/scatterlist.h>
->> +#include <linux/dma-mapping.h>
->> +#include <linux/dmaengine.h>
->> +#include <linux/omap-dma.h>
->> +#include <linux/pm_runtime.h>
->> +#include <linux/of.h>
->> +#include <linux/of_device.h>
->> +#include <linux/of_address.h>
->> +#include <linux/io.h>
->> +#include <linux/crypto.h>
->> +#include <linux/interrupt.h>
->> +#include <crypto/scatterwalk.h>
->> +#include <crypto/des.h>
->> +
->> +#define DST_MAXBURST			2
->> +
->> +#define DES_BLOCK_WORDS		(DES_BLOCK_SIZE >> 2)
->> +
->> +#define _calc_walked(inout) (dd->inout##_walk.offset - dd->inout##_sg->offset)
->> +
->> +#define DES_REG_KEY(dd, x)		((dd)->pdata->key_ofs - \
->> +						((x ^ 0x01) * 0x04))
->> +
->> +#define DES_REG_IV(dd, x)		((dd)->pdata->iv_ofs + ((x) * 0x04))
->> +
->> +#define DES_REG_CTRL(dd)		((dd)->pdata->ctrl_ofs)
->> +#define DES_REG_CTRL_CBC		(1 << 4)
->> +#define DES_REG_CTRL_TDES		(1 << 3)
->> +#define DES_REG_CTRL_DIRECTION		(1 << 2)
->> +#define DES_REG_CTRL_INPUT_READY	(1 << 1)
->> +#define DES_REG_CTRL_OUTPUT_READY	(1 << 0)
-> 
-> Why not use bitops like you have done below.
+When comparing MAC hashes, AEAD authentication tags, or other hash
+values in the context of authentication or integrity checking, it
+is important not to leak timing information to a potential attacker.
 
-Ok, will do that.
+Bytewise memory comparisons (such as memcmp) are usually optimized so
+that they return a nonzero value as soon as a mismatch is found.
+This early-return behavior can leak timing information, allowing an
+attacker to iteratively guess the correct result.
 
-> 
->> +
->> +#define DES_REG_DATA_N(dd, x)		((dd)->pdata->data_ofs + ((x) * 0x04))
->> +
->> +#define DES_REG_REV(dd)			((dd)->pdata->rev_ofs)
->> +
->> +#define DES_REG_MASK(dd)		((dd)->pdata->mask_ofs)
->> +
->> +#define DES_REG_LENGTH_N(x)		(0x24 + ((x) * 0x04))
->> +
->> +#define DES_REG_IRQ_STATUS(dd)         ((dd)->pdata->irq_status_ofs)
->> +#define DES_REG_IRQ_ENABLE(dd)         ((dd)->pdata->irq_enable_ofs)
->> +#define DES_REG_IRQ_DATA_IN            BIT(1)
->> +#define DES_REG_IRQ_DATA_OUT           BIT(2)
->> +
->> +#define FLAGS_MODE_MASK		0x000f
->> +#define FLAGS_ENCRYPT		BIT(0)
->> +#define FLAGS_CBC		BIT(1)
->> +#define FLAGS_INIT		BIT(4)
->> +#define FLAGS_BUSY		BIT(6)
->> +
-> 
-> []..
-> 
->> +struct omap_des_pdata {
->> +	struct omap_des_algs_info	*algs_info;
->> +	unsigned int	algs_info_size;
->> +
->> +	void		(*trigger)(struct omap_des_dev *dd, int length);
-> 
-> Is this really used? How does a DT platform pass function pointers?
+This patch adds a new method crypto_memcmp that has the same prototype
+as standard memcmp, but that compares strings of the same length in
+roughly constant time (cache misses could change the timing, but
+since they don't reveal information about the content of the strings
+being compared, they are effectively benign).  Note that crypto_memcmp
+(unlike memcmp) can only be used to test for equality or inequality,
+NOT greater-than or less-than.  This is not an issue for its use-cases
+within the Crypto API.
 
-This is hard coded in the pdata structures for each platform and provided once
-the DT matches. Different platforms may have different pdata.
+I tried to locate all of the places in the Crypto API where memcmp was
+being used for authentication or integrity checking, and convert them
+over to crypto_memcmp.
 
->> +
->> +	u32		key_ofs;
->> +	u32		iv_ofs;
->> +	u32		ctrl_ofs;
->> +	u32		data_ofs;
->> +	u32		rev_ofs;
->> +	u32		mask_ofs;
->> +	u32             irq_enable_ofs;
->> +	u32             irq_status_ofs;
->> +
->> +	u32		dma_enable_in;
->> +	u32		dma_enable_out;
->> +	u32		dma_start;
->> +
->> +	u32		major_mask;
->> +	u32		major_shift;
->> +	u32		minor_mask;
->> +	u32		minor_shift;
->> +};
->> +
->> +struct omap_des_dev {
->> +	struct list_head	list;
->> +	unsigned long		phys_base;
->> +	void __iomem		*io_base;
->> +	struct omap_des_ctx	*ctx;
->> +	struct device		*dev;
->> +	unsigned long		flags;
->> +	int			err;
->> +
->> +	/* spinlock used for queues */
->> +	spinlock_t		lock;
->> +	struct crypto_queue	queue;
->> +
->> +	struct tasklet_struct	done_task;
->> +	struct tasklet_struct	queue_task;
->> +
->> +	struct ablkcipher_request	*req;
->> +	/*
->> +	 * total is used by PIO mode for book keeping so introduce
->> +	 * variable total_save as need it to calc page_order
->> +	 */
->> +	size_t                          total;
->> +	size_t                          total_save;
->> +
->> +	struct scatterlist		*in_sg;
->> +	struct scatterlist		*out_sg;
->> +
->> +	/* Buffers for copying for unaligned cases */
->> +	struct scatterlist		in_sgl;
->> +	struct scatterlist		out_sgl;
->> +	struct scatterlist		*orig_out;
->> +	int				sgs_copied;
->> +
->> +	struct scatter_walk		in_walk;
->> +	struct scatter_walk		out_walk;
->> +	int			dma_in;
->> +	struct dma_chan		*dma_lch_in;
->> +	int			dma_out;
->> +	struct dma_chan		*dma_lch_out;
->> +	int			in_sg_len;
->> +	int			out_sg_len;
->> +	int			pio_only;
->> +	const struct omap_des_pdata	*pdata;
->> +};
->> +
->> +/* keep registered devices data here */
->> +static LIST_HEAD(dev_list);
->> +static DEFINE_SPINLOCK(list_lock);
->> +
-> 
-> []..
-> 
->> +
->> +static int omap_des_crypt_dma_start(struct omap_des_dev *dd)
->> +{
->> +	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(
->> +					crypto_ablkcipher_reqtfm(dd->req));
->> +	int err;
->> +
->> +	pr_debug("total: %d\n", dd->total);
->> +
->> +	if (!dd->pio_only) {
->> +		err = dma_map_sg(dd->dev, dd->in_sg, dd->in_sg_len,
->> +				 DMA_TO_DEVICE);
->> +		if (!err) {
->> +			dev_err(dd->dev, "dma_map_sg() error\n");
->> +			return -EINVAL;
->> +		}
->> +
->> +		err = dma_map_sg(dd->dev, dd->out_sg, dd->out_sg_len,
->> +				 DMA_FROM_DEVICE);
->> +		if (!err) {
->> +			dev_err(dd->dev, "dma_map_sg() error\n");
->> +			return -EINVAL;
->> +		}
->> +	}
->> +
->> +	err = omap_des_crypt_dma(tfm, dd->in_sg, dd->out_sg, dd->in_sg_len,
->> +				 dd->out_sg_len);
->> +	if (err && !dd->pio_only) {
->> +		dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
->> +		dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len,
->> +			     DMA_FROM_DEVICE);
->> +	}
->> +
->> +	return err;
->> +}
->> +
->> +static void omap_des_finish_req(struct omap_des_dev *dd, int err)
->> +{
->> +	struct ablkcipher_request *req = dd->req;
->> +
->> +	pr_debug("err: %d\n", err);
->> +
->> +	pm_runtime_put(dd->dev);
-> 
-> You seem to do a pm_runtime_get_sync() in omap_des_write_ctrl() and a
-> pm_runtime_put() here and not a pm_runtime_put_sync()?
+crypto_memcmp is declared noinline and placed in its own source file
+because a very smart compiler (or LTO) might notice that the return
+value is always compared against zero/nonzero, and might then
+reintroduce the same early-return optimization that we are trying to
+avoid.
 
-Yes, that's on purpose :) I had submitted a fix earlier to do that.
-http://www.spinics.net/lists/linux-crypto/msg08482.html
+Signed-off-by: James Yonan <james@openvpn.net>
+---
+ crypto/Makefile                         |  2 +-
+ crypto/asymmetric_keys/rsa.c            |  5 +++--
+ crypto/authenc.c                        |  7 ++++---
+ crypto/authencesn.c                     |  9 +++++----
+ crypto/ccm.c                            |  5 +++--
+ crypto/crypto_memcmp.c                  | 31 +++++++++++++++++++++++++++++++
+ crypto/gcm.c                            |  3 ++-
+ include/crypto/internal/crypto_memcmp.h | 20 ++++++++++++++++++++
+ 8 files changed, 69 insertions(+), 13 deletions(-)
+ create mode 100644 crypto/crypto_memcmp.c
+ create mode 100644 include/crypto/internal/crypto_memcmp.h
 
-> 
->> +
->> +#ifdef CONFIG_OF
->> +static const struct omap_des_pdata omap_des_pdata_omap4 = {
->> +	.algs_info	= omap_des_algs_info_ecb_cbc,
->> +	.algs_info_size	= ARRAY_SIZE(omap_des_algs_info_ecb_cbc),
->> +	.trigger	= omap_des_dma_trigger_omap4,
->> +	.key_ofs	= 0x14,
->> +	.iv_ofs		= 0x18,
->> +	.ctrl_ofs	= 0x20,
->> +	.data_ofs	= 0x28,
->> +	.rev_ofs	= 0x30,
->> +	.mask_ofs	= 0x34,
->> +	.irq_status_ofs = 0x3c,
->> +	.irq_enable_ofs = 0x40,
->> +	.dma_enable_in	= BIT(5),
->> +	.dma_enable_out	= BIT(6),
->> +	.major_mask	= 0x0700,
->> +	.major_shift	= 8,
->> +	.minor_mask	= 0x003f,
->> +	.minor_shift	= 0,
->> +};
->> +
->> +static irqreturn_t omap_des_irq(int irq, void *dev_id)
->> +{
->> +	struct omap_des_dev *dd = dev_id;
->> +	u32 status, i;
->> +	u32 *src, *dst;
->> +
->> +	status = omap_des_read(dd, DES_REG_IRQ_STATUS(dd));
->> +	if (status & DES_REG_IRQ_DATA_IN) {
->> +		omap_des_write(dd, DES_REG_IRQ_ENABLE(dd), 0x0);
->> +
->> +		BUG_ON(!dd->in_sg);
->> +
->> +		BUG_ON(_calc_walked(in) > dd->in_sg->length);
->> +
->> +		src = sg_virt(dd->in_sg) + _calc_walked(in);
->> +
->> +		for (i = 0; i < DES_BLOCK_WORDS; i++) {
->> +			omap_des_write(dd, DES_REG_DATA_N(dd, i), *src);
->> +
->> +			scatterwalk_advance(&dd->in_walk, 4);
->> +			if (dd->in_sg->length == _calc_walked(in)) {
->> +				dd->in_sg = scatterwalk_sg_next(dd->in_sg);
->> +				if (dd->in_sg) {
->> +					scatterwalk_start(&dd->in_walk,
->> +							  dd->in_sg);
->> +					src = sg_virt(dd->in_sg) +
->> +					      _calc_walked(in);
->> +				}
->> +			} else {
->> +				src++;
->> +			}
->> +		}
->> +
->> +		/* Clear IRQ status */
->> +		status &= ~DES_REG_IRQ_DATA_IN;
->> +		omap_des_write(dd, DES_REG_IRQ_STATUS(dd), status);
->> +
->> +		/* Enable DATA_OUT interrupt */
->> +		omap_des_write(dd, DES_REG_IRQ_ENABLE(dd), 0x4);
->> +
->> +	} else if (status & DES_REG_IRQ_DATA_OUT) {
->> +		omap_des_write(dd, DES_REG_IRQ_ENABLE(dd), 0x0);
->> +
->> +		BUG_ON(!dd->out_sg);
->> +
->> +		BUG_ON(_calc_walked(out) > dd->out_sg->length);
->> +
->> +		dst = sg_virt(dd->out_sg) + _calc_walked(out);
->> +
->> +		for (i = 0; i < DES_BLOCK_WORDS; i++) {
->> +			*dst = omap_des_read(dd, DES_REG_DATA_N(dd, i));
->> +			scatterwalk_advance(&dd->out_walk, 4);
->> +			if (dd->out_sg->length == _calc_walked(out)) {
->> +				dd->out_sg = scatterwalk_sg_next(dd->out_sg);
->> +				if (dd->out_sg) {
->> +					scatterwalk_start(&dd->out_walk,
->> +							  dd->out_sg);
->> +					dst = sg_virt(dd->out_sg) +
->> +					      _calc_walked(out);
->> +				}
->> +			} else {
->> +				dst++;
->> +			}
->> +		}
->> +
->> +		dd->total -= DES_BLOCK_SIZE;
->> +
->> +		BUG_ON(dd->total < 0);
->> +
->> +		/* Clear IRQ status */
->> +		status &= ~DES_REG_IRQ_DATA_OUT;
->> +		omap_des_write(dd, DES_REG_IRQ_STATUS(dd), status);
->> +
->> +		if (!dd->total)
->> +			/* All bytes read! */
->> +			tasklet_schedule(&dd->done_task);
->> +		else
->> +			/* Enable DATA_IN interrupt for next block */
->> +			omap_des_write(dd, DES_REG_IRQ_ENABLE(dd), 0x2);
->> +	}
->> +
->> +	return IRQ_HANDLED;
->> +}
->> +
->> +static const struct of_device_id omap_des_of_match[] = {
->> +	{
->> +		.compatible	= "ti,omap4-des",
->> +		.data		= &omap_des_pdata_omap4,
->> +	},
->> +	{},
->> +};
->> +MODULE_DEVICE_TABLE(of, omap_des_of_match);
->> +
->> +static int omap_des_get_res_of(struct omap_des_dev *dd,
->> +		struct device *dev, struct resource *res)
->> +{
->> +	struct device_node *node = dev->of_node;
->> +	const struct of_device_id *match;
->> +	int err = 0;
->> +
->> +	match = of_match_device(of_match_ptr(omap_des_of_match), dev);
->> +	if (!match) {
->> +		dev_err(dev, "no compatible OF match\n");
->> +		err = -EINVAL;
->> +		goto err;
->> +	}
->> +
->> +	err = of_address_to_resource(node, 0, res);
-> 
-> Do you really need to do this? DT should have already populated
-> a resource for you based on the 'reg' property.
-
-Ok, thanks. Now will do:
-        *res = platform_get_resource(pdev, IORESOURCE_MEM);
-
->> +	if (err < 0) {
->> +		dev_err(dev, "can't translate OF node address\n");
->> +		err = -EINVAL;
->> +		goto err;
->> +	}
->> +
->> +	dd->dma_out = -1; /* Dummy value that's unused */
->> +	dd->dma_in = -1; /* Dummy value that's unused */
->> +
->> +	dd->pdata = match->data;
->> +
->> +err:
->> +	return err;
->> +}
->> +#else
->> +static const struct of_device_id omap_des_of_match[] = {
->> +	{},
->> +};
-> 
-> you don't need this if you use of_match_ptr()
-
-Ok I changed it to:
-+               .of_match_table = of_match_ptr(omap_des_of_match),
-
-and removed empty definition for !CONFIG_OF.
-
->> +
->> +static int omap_des_get_res_of(struct omap_des_dev *dd,
->> +		struct device *dev, struct resource *res)
->> +{
->> +	return -EINVAL;
->> +}
->> +#endif
->> +
->> +static int omap_des_get_res_pdev(struct omap_des_dev *dd,
->> +		struct platform_device *pdev, struct resource *res)
->> +{
->> +	struct device *dev = &pdev->dev;
->> +	struct resource *r;
->> +	int err = 0;
->> +
->> +	/* Get the base address */
->> +	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
->> +	if (!r) {
->> +		dev_err(dev, "no MEM resource info\n");
->> +		err = -ENODEV;
->> +		goto err;
->> +	}
->> +	memcpy(res, r, sizeof(*res));
-> 
-> I don't think you need any of this. Regardless of a DT or a
-> non-DT platform, you should be able to do a platform_get_resource()
-> for mem resources.
-
-Yes ok, I removed all this and am directly using the res pointer now instead of
-pre-filling a structure. Also both DT/non-DT paths now use platform_get_resource.
-
-[..]
->> +	tasklet_kill(&dd->done_task);
->> +	tasklet_kill(&dd->queue_task);
->> +	omap_des_dma_cleanup(dd);
->> +	pm_runtime_disable(dd->dev);
->> +	dd = NULL;
->> +
->> +	return 0;
->> +}
->> +
->> +#ifdef CONFIG_PM_SLEEP
->> +static int omap_des_suspend(struct device *dev)
->> +{
->> +	pm_runtime_put_sync(dev);
-> 
-> I know you seemed to have taken this from the omap-aes driver, but this
-> does not seem correct. Your system suspend callbacks shouldn't
-> really be using pm_runtime apis.
-> On OMAPs this is handled by the pm_domain level callbacks, in case
-> your device is not runtime suspended during system suspend.
-
-Can you suggest how else to handle this?
-
->> +	return 0;
->> +}
->> +
->> +static int omap_des_resume(struct device *dev)
->> +{
->> +	pm_runtime_get_sync(dev);
-> 
-> Same here.
-> Btw, has the omap-aes or this driver been tested with system
-> suspend on any platfoms?
-
-Yes, omap-aes has been successfully tested with Suspend/Resume on AM335x platforms.
-
->> +	return 0;
->> +}
->> +#endif
->> +
->> +static const struct dev_pm_ops omap_des_pm_ops = {
->> +	SET_SYSTEM_SLEEP_PM_OPS(omap_des_suspend, omap_des_resume)
->> +};
->> +
->> +static struct platform_driver omap_des_driver = {
->> +	.probe	= omap_des_probe,
->> +	.remove	= omap_des_remove,
->> +	.driver	= {
->> +		.name	= "omap-des",
->> +		.owner	= THIS_MODULE,
->> +		.pm	= &omap_des_pm_ops,
->> +		.of_match_table	= omap_des_of_match,
-> 
-> You could use of_match_ptr() here and avoid having the empty
-> omap_des_of_match defined.
-
-Done, thanks.
-
-Regards,
-
--Joel
-
->> +	},
->> +};
->> +
->> +module_platform_driver(omap_des_driver);
->> +
->> +MODULE_DESCRIPTION("OMAP DES hw acceleration support.");
->> +MODULE_LICENSE("GPL v2");
->> +MODULE_AUTHOR("Joel Fernandes <joelf@ti.com>");
->>
-> 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 2ba0df2..39a574d 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -3,7 +3,7 @@
+ #
+ 
+ obj-$(CONFIG_CRYPTO) += crypto.o
+-crypto-y := api.o cipher.o compress.o
++crypto-y := api.o cipher.o compress.o crypto_memcmp.o
+ 
+ obj-$(CONFIG_CRYPTO_WORKQUEUE) += crypto_wq.o
+ 
+diff --git a/crypto/asymmetric_keys/rsa.c b/crypto/asymmetric_keys/rsa.c
+index 4a6a069..4f9a250 100644
+--- a/crypto/asymmetric_keys/rsa.c
++++ b/crypto/asymmetric_keys/rsa.c
+@@ -13,6 +13,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/slab.h>
++#include <crypto/internal/crypto_memcmp.h>
+ #include "public_key.h"
+ 
+ MODULE_LICENSE("GPL");
+@@ -189,12 +190,12 @@ static int RSA_verify(const u8 *H, const u8 *EM, size_t k, size_t hash_size,
+ 		}
+ 	}
+ 
+-	if (memcmp(asn1_template, EM + T_offset, asn1_size) != 0) {
++	if (crypto_memcmp(asn1_template, EM + T_offset, asn1_size) != 0) {
+ 		kleave(" = -EBADMSG [EM[T] ASN.1 mismatch]");
+ 		return -EBADMSG;
+ 	}
+ 
+-	if (memcmp(H, EM + T_offset + asn1_size, hash_size) != 0) {
++	if (crypto_memcmp(H, EM + T_offset + asn1_size, hash_size) != 0) {
+ 		kleave(" = -EKEYREJECTED [EM[T] hash mismatch]");
+ 		return -EKEYREJECTED;
+ 	}
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index ffce19d..82ca98f 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -13,6 +13,7 @@
+ #include <crypto/aead.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/skcipher.h>
++#include <crypto/internal/crypto_memcmp.h>
+ #include <crypto/authenc.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/err.h>
+@@ -188,7 +189,7 @@ static void authenc_verify_ahash_update_done(struct crypto_async_request *areq,
+ 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+ 				 authsize, 0);
+ 
+-	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
++	err = crypto_memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+ 	if (err)
+ 		goto out;
+ 
+@@ -227,7 +228,7 @@ static void authenc_verify_ahash_done(struct crypto_async_request *areq,
+ 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+ 				 authsize, 0);
+ 
+-	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
++	err = crypto_memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+ 	if (err)
+ 		goto out;
+ 
+@@ -462,7 +463,7 @@ static int crypto_authenc_verify(struct aead_request *req,
+ 	ihash = ohash + authsize;
+ 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+ 				 authsize, 0);
+-	return memcmp(ihash, ohash, authsize) ? -EBADMSG : 0;
++	return crypto_memcmp(ihash, ohash, authsize) ? -EBADMSG : 0;
+ }
+ 
+ static int crypto_authenc_iverify(struct aead_request *req, u8 *iv,
+diff --git a/crypto/authencesn.c b/crypto/authencesn.c
+index ab53762..ec3bef9 100644
+--- a/crypto/authencesn.c
++++ b/crypto/authencesn.c
+@@ -15,6 +15,7 @@
+ #include <crypto/aead.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/skcipher.h>
++#include <crypto/internal/crypto_memcmp.h>
+ #include <crypto/authenc.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/err.h>
+@@ -247,7 +248,7 @@ static void authenc_esn_verify_ahash_update_done(struct crypto_async_request *ar
+ 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+ 				 authsize, 0);
+ 
+-	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
++	err = crypto_memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+ 	if (err)
+ 		goto out;
+ 
+@@ -296,7 +297,7 @@ static void authenc_esn_verify_ahash_update_done2(struct crypto_async_request *a
+ 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+ 				 authsize, 0);
+ 
+-	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
++	err = crypto_memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+ 	if (err)
+ 		goto out;
+ 
+@@ -336,7 +337,7 @@ static void authenc_esn_verify_ahash_done(struct crypto_async_request *areq,
+ 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+ 				 authsize, 0);
+ 
+-	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
++	err = crypto_memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+ 	if (err)
+ 		goto out;
+ 
+@@ -568,7 +569,7 @@ static int crypto_authenc_esn_verify(struct aead_request *req)
+ 	ihash = ohash + authsize;
+ 	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+ 				 authsize, 0);
+-	return memcmp(ihash, ohash, authsize) ? -EBADMSG : 0;
++	return crypto_memcmp(ihash, ohash, authsize) ? -EBADMSG : 0;
+ }
+ 
+ static int crypto_authenc_esn_iverify(struct aead_request *req, u8 *iv,
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index 499c917..57349d3 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -12,6 +12,7 @@
+ 
+ #include <crypto/internal/aead.h>
+ #include <crypto/internal/skcipher.h>
++#include <crypto/internal/crypto_memcmp.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+@@ -363,7 +364,7 @@ static void crypto_ccm_decrypt_done(struct crypto_async_request *areq,
+ 
+ 	if (!err) {
+ 		err = crypto_ccm_auth(req, req->dst, cryptlen);
+-		if (!err && memcmp(pctx->auth_tag, pctx->odata, authsize))
++		if (!err && crypto_memcmp(pctx->auth_tag, pctx->odata, authsize))
+ 			err = -EBADMSG;
+ 	}
+ 	aead_request_complete(req, err);
+@@ -422,7 +423,7 @@ static int crypto_ccm_decrypt(struct aead_request *req)
+ 		return err;
+ 
+ 	/* verify */
+-	if (memcmp(authtag, odata, authsize))
++	if (crypto_memcmp(authtag, odata, authsize))
+ 		return -EBADMSG;
+ 
+ 	return err;
+diff --git a/crypto/crypto_memcmp.c b/crypto/crypto_memcmp.c
+new file mode 100644
+index 0000000..ef4101c
+--- /dev/null
++++ b/crypto/crypto_memcmp.c
+@@ -0,0 +1,31 @@
++/*
++ * Constant-time memcmp.
++ *
++ * Copyright (C) 2013 OpenVPN Technologies Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ */
++
++#include <linux/export.h>
++#include <crypto/internal/crypto_memcmp.h>
++
++/**
++ * Like memcmp(), but constant-time to prevent leakage of timing info.
++ * Returns 0 when data is equal, non-zero otherwise.
++ */
++noinline int crypto_memcmp(const void *a, const void *b, size_t size)
++{
++	const u8 *a1 = a;
++	const u8 *b1 = b;
++	int ret = 0;
++	size_t i;
++
++	for (i = 0; i < size; i++) {
++		ret |= *a1++ ^ *b1++;
++	}
++	return ret;
++}
++EXPORT_SYMBOL_GPL(crypto_memcmp);
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index 43e1fb0..6be5bca 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -12,6 +12,7 @@
+ #include <crypto/internal/aead.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/crypto_memcmp.h>
+ #include <crypto/scatterwalk.h>
+ #include <crypto/hash.h>
+ #include "internal.h"
+@@ -582,7 +583,7 @@ static int crypto_gcm_verify(struct aead_request *req,
+ 
+ 	crypto_xor(auth_tag, iauth_tag, 16);
+ 	scatterwalk_map_and_copy(iauth_tag, req->src, cryptlen, authsize, 0);
+-	return memcmp(iauth_tag, auth_tag, authsize) ? -EBADMSG : 0;
++	return crypto_memcmp(iauth_tag, auth_tag, authsize) ? -EBADMSG : 0;
+ }
+ 
+ static void gcm_decrypt_done(struct crypto_async_request *areq, int err)
+diff --git a/include/crypto/internal/crypto_memcmp.h b/include/crypto/internal/crypto_memcmp.h
+new file mode 100644
+index 0000000..db23cc0
+--- /dev/null
++++ b/include/crypto/internal/crypto_memcmp.h
+@@ -0,0 +1,20 @@
++/*
++ * Constant-time memcmp.
++ *
++ * Copyright (C) 2013 OpenVPN Technologies Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ */
++
++#ifndef _CRYPTO_INTERNAL_CRYPTO_MEMCMP_H
++#define _CRYPTO_INTERNAL_CRYPTO_MEMCMP_H
++
++#include <linux/types.h>
++#include <linux/compiler.h>
++
++noinline int crypto_memcmp(const void *a, const void *b, size_t size);
++
++#endif
+-- 
+1.8.1.2
