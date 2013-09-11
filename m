@@ -1,44 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: race condition in crypto larval handling
-Date: Wed, 11 Sep 2013 09:13:01 +1000
-Message-ID: <20130910231301.GA28135@gondor.apana.org.au>
-References: <522D2743.9060802@openvpn.net>
+Subject: Re: [PATCH] modules: add support for soft module dependencies
+Date: Wed, 11 Sep 2013 14:40:03 +1000
+Message-ID: <20130911044003.GA30913@gondor.apana.org.au>
+References: <20130724071757.GA30970@gondor.apana.org.au>
+ <87siz38q2t.fsf@rustcorp.com.au>
+ <20130725020329.GA14625@gondor.apana.org.au>
+ <CAKi4VA+=1vOOt0BqdQHQaeF1hP3DrRtCL_ObXY0cPeO7S_MtYw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: James Yonan <james@openvpn.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:49403 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751227Ab3IJXNF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Sep 2013 19:13:05 -0400
+Cc: Rusty Russell <rusty@rustcorp.com.au>,
+	Andreas Robinson <andr345@gmail.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Zhao Hongjiang <zhaohongjiang@huawei.com>,
+	David Miller <davem@davemloft.net>, tim.c.chen@linux.intel.com,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	linux-crypto@vger.kernel.org,
+	linux-modules <linux-modules@vger.kernel.org>,
+	Tom Gundersen <teg@jklm.no>
+To: Lucas De Marchi <lucas.de.marchi@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <522D2743.9060802@openvpn.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <CAKi4VA+=1vOOt0BqdQHQaeF1hP3DrRtCL_ObXY0cPeO7S_MtYw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Please don't trim cc lists!
+On Tue, Sep 10, 2013 at 11:01:38AM -0300, Lucas De Marchi wrote:
+>
+> However looking at the only user right now, crct10dif: couldn't we
+> detect at runtime if this module can be used instead of just trying to
+> load it as a pre softdep and possibly failing?
 
-James Yonan <james@openvpn.net> wrote:
-> 
-> I tried this patch, but I still see an apparent module lookup/load race 
-> if code on several CPUs calls crypto_alloc_aead at the same time, and an 
-> external module such as aes needs to be loaded.
-> 
-> Seeing this in the log: "request_module: runaway loop modprobe gcm(aes)"
-> 
-> Shouldn't module lookup/load be bracketed by some sort of lock to 
-> prevent this?
-
-This sounds like a different problem.  Larvals are only used to
-control the instantiation of templates.  The loading of modules
-occur prior to that so you can certainly have multiple loads occur
-if multiple threads are trying to allocate the same algorithm.
-
-This should be harmless since gcm(aes) doesn't exist anyway so
-regardless of whether we load the module the lookup will fail and
-we will go through the larval code path.
+No as sd_mod requires crct10dif to be present.  The use of softdep
+as opposed to just a symbolic dependency is due to there being two
+modules for crct10dif, a generic version and an arch-specific one.
 
 Cheers,
 -- 
