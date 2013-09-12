@@ -1,59 +1,51 @@
-From: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
-Subject: question about rfc404 support.
-Date: Wed, 11 Sep 2013 19:16:13 +0000
-Message-ID: <A83C99F8370D4D42BEB2D2B3153A6BBC23D6C796@NASANEXD02C.na.qualcomm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [3.12-rc1] Dependency on module-init-tools >= 3.11 ?
+Date: Thu, 12 Sep 2013 15:28:06 +1000
+Message-ID: <20130912052806.GA15737@gondor.apana.org.au>
+References: <1374283864.22432.393.camel@schen9-DESK>
+ <20130720053021.GA19689@gondor.apana.org.au>
+ <201307201456.JIC35412.VFOMFJOQLOtHFS@I-love.SAKURA.ne.jp>
+ <201309112043.HBD04609.FOtLSOFVQHFOJM@I-love.SAKURA.ne.jp>
+ <20130912042622.GA15181@gondor.apana.org.au>
+ <201309121403.FIH09821.JtLOVOSFOFHFQM@I-love.SAKURA.ne.jp>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "Bronstein, Dan" <dbronste@qti.qualcomm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: andr345@gmail.com, rusty@rustcorp.com.au,
+	linux-kernel@vger.kernel.org, arthur.marsh@internode.on.net,
+	tim.c.chen@linux.intel.com,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from wolverine01.qualcomm.com ([199.106.114.254]:14613 "EHLO
-	wolverine01.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754852Ab3IKTQO convert rfc822-to-8bit (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:42567 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751346Ab3ILF2P (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Sep 2013 15:16:14 -0400
-Content-Language: en-US
+	Thu, 12 Sep 2013 01:28:15 -0400
+Content-Disposition: inline
+In-Reply-To: <201309121403.FIH09821.JtLOVOSFOFHFQM@I-love.SAKURA.ne.jp>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert:
+On Thu, Sep 12, 2013 at 02:03:41PM +0900, Tetsuo Handa wrote:
+> Herbert Xu wrote:
+> > This way at least you'll have a working system until your initramfs
+> > tool is fixed to do the right thing.
+> 
+> Thank you. But it is module-init-tools-3.9-21.el6_4 in RHEL 6.4.
+> We can't wait until Red Hat backports module-init-tools >= 3.11 to RHEL 6.x.
+> 
+> Since most people are already using module-init-tools >= 3.11 and
+> there is workaround for my case (i.e. choose built-in), just updating
+> 
+>   module-init-tools      0.9.10                  # depmod -V
+> 
+> line at "Current Minimal Requirements" in Documentation/Changes will be OK.
 
-  Can you confirm the following. Thanks.
+The trouble is not all distros will include the softdep modules in
+the initramfs.  So for now I think we will have to live with a fallback.
 
-  Rfc2404 - The Use of HMAC-SHA-1-96 within ESP and AH
- 
- For the support, I can't find any algorithm to be specified in the .craname of ahash_alg for Rfc2404.
- 
-  From 
-http://www.freebsd.org/cgi/man.cgi?query=setkey&sektion=8
- it says the following :
-
-  ALGORITHMS
-     The following list shows the supported algorithms.  The protocol and algorithm are almost completely orthogonal.  The following list of authentication algorithms can be used as aalgo in the -A aalgo of the protocol parameter:
-
-	   algorithm	   keylen (bits)       comment
-	   
-	   hmac-sha1	   160		   ah: rfc2404
- 
-
-That leads me to believe, from crypto driver stand point, there is no need to have a new algorithm for hmac-sha-1-96 support.  Instead, the agent SW(such as ipsec) should use  "hmac(sha1)", and do the truncation of digested data from 160 bits to 96 bits.
-
-I run a quick test. The input file to setkey command is defined as such ----
-
-flush;
-spdflush;
-add 10.2.243.75 10.2.243.29 ah 0x604 -A hmac-sha1 0x8D967D88F6CAA9D714800AB3D48051D63F73A312;
-add 10.2.243.29 10.2.243.75 ah 0x605 -A hmac-sha1 0x8D967D88F6CAA9D714800AB3D48051D63F73A314;
-spdadd 10.2.243.75 10.2.243.29 any -P in ipsec ah/transport//use;
-spdadd 10.2.243.29 10.2.243.75 any -P out ipsec ah/transport//use;
-
-
-I use tcpdump. Clearly I can see 24 bytes of AH header of the ipsec packets.  The header has 12 bytes of fixed information  - Next (1), Ah len (1) ,Reserved (2), Spi (4)  ,Sequence                      (4),  and Auth result.  (12 bytes)
-
-
-Can you confirm the above? Thanks.
-
-Regards,
-Chemin
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
