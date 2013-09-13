@@ -1,44 +1,84 @@
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: Re: [3.12-rc1] Dependency on module-init-tools >= 3.11 ?
-Date: Fri, 13 Sep 2013 22:27:15 +0900
-Message-ID: <201309132227.JEB13098.SOLFHFOOVFJMQt@I-love.SAKURA.ne.jp>
-References: <201309121403.FIH09821.JtLOVOSFOFHFQM@I-love.SAKURA.ne.jp>
-	<20130912052806.GA15737@gondor.apana.org.au>
-	<201309121920.AHJ58678.OMVJFFSHOtOFQL@I-love.SAKURA.ne.jp>
-	<20130912102953.GA18916@gondor.apana.org.au>
-	<5231CF30.8050500@hp.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: Crypto Fixes for 3.12
+Date: Fri, 13 Sep 2013 07:22:55 -0700
+Message-ID: <CA+55aFyp8mfqWb2CNyCKgMtAn88a5i+MLshq0DjYEmW7FNoZXA@mail.gmail.com>
+References: <20100903060055.GA28915@gondor.apana.org.au>
+	<20100903110722.GA31826@gondor.apana.org.au>
+	<20101215115035.GA25248@gondor.apana.org.au>
+	<20110216053911.GA10999@gondor.apana.org.au>
+	<20110328071322.GA6569@gondor.apana.org.au>
+	<20110629235153.GA16559@gondor.apana.org.au>
+	<20120126024342.GA12492@gondor.apana.org.au>
+	<20120823083242.GA23102@gondor.apana.org.au>
+	<20121109093005.GA25632@gondor.apana.org.au>
+	<20130328082841.GA7425@gondor.apana.org.au>
+	<20130913113051.GA8189@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, andr345@gmail.com,
-	rusty@rustcorp.com.au, linux-kernel@vger.kernel.org,
-	arthur.marsh@internode.on.net, tim.c.chen@linux.intel.com,
-	linux-crypto@vger.kernel.org
-To: waiman.long@hp.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5231CF30.8050500@hp.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-vc0-f171.google.com ([209.85.220.171]:44437 "EHLO
+	mail-vc0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751847Ab3IMOW4 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 13 Sep 2013 10:22:56 -0400
+In-Reply-To: <20130913113051.GA8189@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Waiman Long wrote:
-> I would like to report that I also have the same boot problem on a 
-> RHEL6.4 box with the crypto patch. My workaround is to force kernel 
-> build to have the crc_t10dif code built-in by changing the config file:
-> 
-> 4889c4889
-> < CONFIG_CRYPTO_CRCT10DIF=m
-> ---
->  > CONFIG_CRYPTO_CRCT10DIF=y
-> 5002c5002
-> < CONFIG_CRC_T10DIF=m
-> ---
->  > CONFIG_CRC_T10DIF=y
-> 
-> This solved the boot problem without any additional patch.  Do you think 
-> you should consider changing the configuration default to "y" instead of 
-> "m" or doesn't allow the "m" option at all?
+On Fri, Sep 13, 2013 at 4:30 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> Herbert Xu (2):
+>       crypto: api - Fix race condition in larval lookup
+>       crypto: crct10dif - Add fallback for broken initrds
+>
+>  crypto/Makefile                             |    2 +-
+>  crypto/api.c                                |    7 +-
+>  crypto/{crct10dif.c => crct10dif_common.c}  |  100 +--------------------------
+>  crypto/{crct10dif.c => crct10dif_generic.c} |   53 +-------------
+>  lib/crc-t10dif.c                            |   11 ++-
+>  5 files changed, 20 insertions(+), 153 deletions(-)
 
-That was proposed but not accepted.
-https://lkml.org/lkml/2013/7/17/543
+Please fix your script. You apparently have it using "-C" to find
+copies, which can be very useful to see what is going on especially
+with "--summary" (which you don't have), but is misleading when
+sending diffstats when people don't expect it.
 
-You should choose CONFIG_CRYPTO_CRCT10DIF_PCLMUL=y in your kernel config
-if your CPU supports PCLMULQDQ.
+The pull request does not have "20 insertions", it has "146
+insertions", and it's just that a fair chunk of them come from a file
+being essentially duplicated. See the difference:
+
+With copy detection ("git diff -C --stat --summary")
+ crypto/Makefile                             |   2 +-
+ crypto/api.c                                |   7 +-
+ crypto/{crct10dif.c => crct10dif_common.c}  | 100 +-------------------
+ crypto/{crct10dif.c => crct10dif_generic.c} |  53 +----------
+ lib/crc-t10dif.c                            |  11 ++-
+ 5 files changed, 20 insertions(+), 153 deletions(-)
+ copy crypto/{crct10dif.c => crct10dif_common.c} (63%)
+ rename crypto/{crct10dif.c => crct10dif_generic.c} (55%)
+
+With just rename detection (git diff -M --stat --summary)
+ crypto/Makefile                            |   2 +-
+ crypto/api.c                               |   7 +-
+ crypto/{crct10dif.c => crct10dif_common.c} | 100 +---------------
+ crypto/crct10dif_generic.c                 | 127 +++++++++++++++++++++
+ lib/crc-t10dif.c                           |  11 +-
+ 5 files changed, 146 insertions(+), 101 deletions(-)
+ rename crypto/{crct10dif.c => crct10dif_common.c} (63%)
+ create mode 100644 crypto/crct10dif_generic.c
+
+and your pull request looked really misleading because it did "-C" but
+didn't have that summary pointing out that one of them was a copy.
+
+So please use "-M --stat --summary". That's what git shows me when I
+do a "git pull", so that's what I'm going to compare with..
+
+As mentioned "-C" _is_ useful, but it's useful when you're
+specifically looking for "that's a lot of new lines, is it copying old
+files" kind of things.
+
+                  Linus
