@@ -1,47 +1,44 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: tegra: use kernel entropy instead of ad-hoc
-Date: Fri, 13 Sep 2013 22:23:18 +1000
-Message-ID: <20130913122318.GD8579@gondor.apana.org.au>
-References: <1378712154-30602-1-git-send-email-linus.walleij@linaro.org>
- <522DF0FC.5080200@wwwdotorg.org>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: Re: [3.12-rc1] Dependency on module-init-tools >= 3.11 ?
+Date: Fri, 13 Sep 2013 22:27:15 +0900
+Message-ID: <201309132227.JEB13098.SOLFHFOOVFJMQt@I-love.SAKURA.ne.jp>
+References: <201309121403.FIH09821.JtLOVOSFOFHFQM@I-love.SAKURA.ne.jp>
+	<20130912052806.GA15737@gondor.apana.org.au>
+	<201309121920.AHJ58678.OMVJFFSHOtOFQL@I-love.SAKURA.ne.jp>
+	<20130912102953.GA18916@gondor.apana.org.au>
+	<5231CF30.8050500@hp.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-	Varun Wadekar <vwadekar@nvidia.com>,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Neil Horman <nhorman@tuxdriver.com>,
-	linux-tegra@vger.kernel.org
-To: Stephen Warren <swarren@wwwdotorg.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:44004 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755311Ab3IMMXi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Sep 2013 08:23:38 -0400
-Content-Disposition: inline
-In-Reply-To: <522DF0FC.5080200@wwwdotorg.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: herbert@gondor.apana.org.au, andr345@gmail.com,
+	rusty@rustcorp.com.au, linux-kernel@vger.kernel.org,
+	arthur.marsh@internode.on.net, tim.c.chen@linux.intel.com,
+	linux-crypto@vger.kernel.org
+To: waiman.long@hp.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <5231CF30.8050500@hp.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 09, 2013 at 10:02:04AM -0600, Stephen Warren wrote:
-> On 09/09/2013 01:35 AM, Linus Walleij wrote:
-> > The way I read the Tegra AES RNG is that it has a homebrew
-> > algorithm for initializing the 128bit RNG using timespec and
-> > the unique chip ID. This looks like reinventing the (square)
-> > wheel, instead just grab 128bits from the kernel entropy pool
-> > where the time and (after another patch) chip unique ID is
-> > already mixed in.
-> > 
-> > Incidentally this also gets rid of a rather ugly
-> > cross-dependence on the machine using an extern declaration.
+Waiman Long wrote:
+> I would like to report that I also have the same boot problem on a 
+> RHEL6.4 box with the crypto patch. My workaround is to force kernel 
+> build to have the crc_t10dif code built-in by changing the config file:
 > 
-> This sounds reasonable to me, although I know little about the driver.
-> Varun, can you please comment?
+> 4889c4889
+> < CONFIG_CRYPTO_CRCT10DIF=m
+> ---
+>  > CONFIG_CRYPTO_CRCT10DIF=y
+> 5002c5002
+> < CONFIG_CRC_T10DIF=m
+> ---
+>  > CONFIG_CRC_T10DIF=y
 > 
-> Acked-by: Stephen Warren <swarren@nvidia.com>
+> This solved the boot problem without any additional patch.  Do you think 
+> you should consider changing the configuration default to "y" instead of 
+> "m" or doesn't allow the "m" option at all?
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+That was proposed but not accepted.
+https://lkml.org/lkml/2013/7/17/543
+
+You should choose CONFIG_CRYPTO_CRCT10DIF_PCLMUL=y in your kernel config
+if your CPU supports PCLMULQDQ.
