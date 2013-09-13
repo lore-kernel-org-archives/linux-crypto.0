@@ -1,74 +1,81 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Fixes for 3.12
-Date: Sat, 14 Sep 2013 00:39:08 +1000
-Message-ID: <20130913143908.GA11208@gondor.apana.org.au>
-References: <20101215115035.GA25248@gondor.apana.org.au>
- <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20130913113051.GA8189@gondor.apana.org.au>
- <CA+55aFyp8mfqWb2CNyCKgMtAn88a5i+MLshq0DjYEmW7FNoZXA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 0/2] AES in CBC/CTR/XTS modes using ARMv8 Crypto Extensions
+Date: Fri, 13 Sep 2013 17:08:04 +0200
+Message-ID: <1379084886-1178-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: linux-crypto@vger.kernel.org, nico@linaro.org,
+	catalin.marinas@arm.com, steve.capper@arm.com,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-arm@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:51881 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932109Ab3IMOjP (ORCPT
+Received: from mail-ea0-f171.google.com ([209.85.215.171]:35385 "EHLO
+	mail-ea0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756358Ab3IMPI3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Sep 2013 10:39:15 -0400
-Content-Disposition: inline
-In-Reply-To: <CA+55aFyp8mfqWb2CNyCKgMtAn88a5i+MLshq0DjYEmW7FNoZXA@mail.gmail.com>
+	Fri, 13 Sep 2013 11:08:29 -0400
+Received: by mail-ea0-f171.google.com with SMTP id n15so649848ead.16
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2013 08:08:27 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Sep 13, 2013 at 07:22:55AM -0700, Linus Torvalds wrote:
-> On Fri, Sep 13, 2013 at 4:30 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > Herbert Xu (2):
-> >       crypto: api - Fix race condition in larval lookup
-> >       crypto: crct10dif - Add fallback for broken initrds
-> >
-> >  crypto/Makefile                             |    2 +-
-> >  crypto/api.c                                |    7 +-
-> >  crypto/{crct10dif.c => crct10dif_common.c}  |  100 +--------------------------
-> >  crypto/{crct10dif.c => crct10dif_generic.c} |   53 +-------------
-> >  lib/crc-t10dif.c                            |   11 ++-
-> >  5 files changed, 20 insertions(+), 153 deletions(-)
-> 
-> Please fix your script. You apparently have it using "-C" to find
-> copies, which can be very useful to see what is going on especially
-> with "--summary" (which you don't have), but is misleading when
-> sending diffstats when people don't expect it.
+Hello all,
 
-Sorry, will do for future pushes.  FWIW the -M stats are
+This is a first attempt at getting something implemented that uses the ARMv8
+crypto extensions for performing AES encryption in CBC, CTR and XTS modes.
 
- crypto/Makefile                            |    2 +-
- crypto/api.c                               |    7 +-
- crypto/{crct10dif.c => crct10dif_common.c} |  100 +---------------------
- crypto/crct10dif_generic.c                 |  127 ++++++++++++++++++++++++++++
- lib/crc-t10dif.c                           |   11 ++-
- 5 files changed, 146 insertions(+), 101 deletions(-)
- 
-> With just rename detection (git diff -M --stat --summary)
->  crypto/Makefile                            |   2 +-
->  crypto/api.c                               |   7 +-
->  crypto/{crct10dif.c => crct10dif_common.c} | 100 +---------------
->  crypto/crct10dif_generic.c                 | 127 +++++++++++++++++++++
->  lib/crc-t10dif.c                           |  11 +-
->  5 files changed, 146 insertions(+), 101 deletions(-)
->  rename crypto/{crct10dif.c => crct10dif_common.c} (63%)
->  create mode 100644 crypto/crct10dif_generic.c
+The first patch moves the ablk helper code out of arch/x86. This code is used
+to automagically instantiate async blkciphers based on the synchronous ones in
+my implementation.
 
-Thanks,
+The second patch contains the actual AES code. Note that this is only compile
+tested, there are most likely numerous bugs that need to be shaken out before
+this will even run, so consider yourselves warned.
+
+Comments highly appreciated,
+
+Regards,
+Ard.
+
+
+Ard Biesheuvel (2):
+  crypto: move ablk_helper out of arch/x86
+  arm64: add support for AES using ARMv8 Crypto Extensions
+
+ arch/arm64/Makefile                        |   8 +-
+ arch/arm64/crypto/Makefile                 |  12 +
+ arch/arm64/crypto/aesce-cbc.S              |  58 +++++
+ arch/arm64/crypto/aesce-ctr.S              |  83 +++++++
+ arch/arm64/crypto/aesce-glue.c             | 352 +++++++++++++++++++++++++++++
+ arch/arm64/crypto/aesce-macros.S           |  95 ++++++++
+ arch/arm64/crypto/aesce-xts.S              | 129 +++++++++++
+ arch/x86/crypto/Makefile                   |   1 -
+ arch/x86/crypto/ablk_helper.c              | 149 ------------
+ arch/x86/crypto/aesni-intel_glue.c         |   2 +-
+ arch/x86/crypto/camellia_aesni_avx2_glue.c |   2 +-
+ arch/x86/crypto/camellia_aesni_avx_glue.c  |   2 +-
+ arch/x86/crypto/cast5_avx_glue.c           |   2 +-
+ arch/x86/crypto/cast6_avx_glue.c           |   2 +-
+ arch/x86/crypto/serpent_avx2_glue.c        |   2 +-
+ arch/x86/crypto/serpent_avx_glue.c         |   2 +-
+ arch/x86/crypto/serpent_sse2_glue.c        |   2 +-
+ arch/x86/crypto/twofish_avx_glue.c         |   2 +-
+ arch/x86/include/asm/crypto/ablk_helper.h  |  31 ---
+ crypto/Kconfig                             |  28 ++-
+ crypto/Makefile                            |   4 +
+ crypto/ablk_helper_generic.c               | 155 +++++++++++++
+ crypto/ablk_helper_x86.c                   |   8 +
+ include/crypto/ablk_helper.h               |  34 +++
+ 24 files changed, 961 insertions(+), 204 deletions(-)
+ create mode 100644 arch/arm64/crypto/Makefile
+ create mode 100644 arch/arm64/crypto/aesce-cbc.S
+ create mode 100644 arch/arm64/crypto/aesce-ctr.S
+ create mode 100644 arch/arm64/crypto/aesce-glue.c
+ create mode 100644 arch/arm64/crypto/aesce-macros.S
+ create mode 100644 arch/arm64/crypto/aesce-xts.S
+ delete mode 100644 arch/x86/crypto/ablk_helper.c
+ delete mode 100644 arch/x86/include/asm/crypto/ablk_helper.h
+ create mode 100644 crypto/ablk_helper_generic.c
+ create mode 100644 crypto/ablk_helper_x86.c
+ create mode 100644 include/crypto/ablk_helper.h
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.1.2
