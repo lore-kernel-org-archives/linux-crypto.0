@@ -1,77 +1,52 @@
 From: Sachin Kamat <sachin.kamat@linaro.org>
-Subject: [PATCH 1/3] crypto: mv_cesa - Staticize local symbols
-Date: Fri, 13 Sep 2013 17:06:45 +0530
-Message-ID: <1379072207-11179-1-git-send-email-sachin.kamat@linaro.org>
+Subject: [PATCH 2/3] crypto: omap-aes - Staticize local symbols
+Date: Fri, 13 Sep 2013 17:06:46 +0530
+Message-ID: <1379072207-11179-2-git-send-email-sachin.kamat@linaro.org>
+References: <1379072207-11179-1-git-send-email-sachin.kamat@linaro.org>
 Cc: herbert@gondor.apana.org.au, sachin.kamat@linaro.org,
-	Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+	Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f178.google.com ([209.85.192.178]:53681 "EHLO
-	mail-pd0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754065Ab3IMLy4 (ORCPT
+Received: from mail-pa0-f47.google.com ([209.85.220.47]:43390 "EHLO
+	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754065Ab3IMLy6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Sep 2013 07:54:56 -0400
-Received: by mail-pd0-f178.google.com with SMTP id w10so1137381pde.23
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2013 04:54:55 -0700 (PDT)
+	Fri, 13 Sep 2013 07:54:58 -0400
+Received: by mail-pa0-f47.google.com with SMTP id kl13so2436694pab.34
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2013 04:54:58 -0700 (PDT)
+In-Reply-To: <1379072207-11179-1-git-send-email-sachin.kamat@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Local symbols used only in this file are made static.
 
 Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
-Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Cc: Dmitry Kasatkin <dmitry.kasatkin@nokia.com>
 ---
- drivers/crypto/mv_cesa.c |   10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/crypto/omap-aes.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 3374a3e..f9b9560 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -907,7 +907,7 @@ static int mv_cra_hash_hmac_sha1_init(struct crypto_tfm *tfm)
- 	return mv_cra_hash_init(tfm, "sha1", COP_HMAC_SHA1, SHA1_BLOCK_SIZE);
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index ce791c2..e1e58d0 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -554,7 +554,7 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+ 	return err;
  }
  
--irqreturn_t crypto_int(int irq, void *priv)
-+static irqreturn_t crypto_int(int irq, void *priv)
+-int omap_aes_check_aligned(struct scatterlist *sg)
++static int omap_aes_check_aligned(struct scatterlist *sg)
  {
- 	u32 val;
- 
-@@ -928,7 +928,7 @@ irqreturn_t crypto_int(int irq, void *priv)
- 	return IRQ_HANDLED;
+ 	while (sg) {
+ 		if (!IS_ALIGNED(sg->offset, 4))
+@@ -566,7 +566,7 @@ int omap_aes_check_aligned(struct scatterlist *sg)
+ 	return 0;
  }
  
--struct crypto_alg mv_aes_alg_ecb = {
-+static struct crypto_alg mv_aes_alg_ecb = {
- 	.cra_name		= "ecb(aes)",
- 	.cra_driver_name	= "mv-ecb-aes",
- 	.cra_priority	= 300,
-@@ -951,7 +951,7 @@ struct crypto_alg mv_aes_alg_ecb = {
- 	},
- };
- 
--struct crypto_alg mv_aes_alg_cbc = {
-+static struct crypto_alg mv_aes_alg_cbc = {
- 	.cra_name		= "cbc(aes)",
- 	.cra_driver_name	= "mv-cbc-aes",
- 	.cra_priority	= 300,
-@@ -975,7 +975,7 @@ struct crypto_alg mv_aes_alg_cbc = {
- 	},
- };
- 
--struct ahash_alg mv_sha1_alg = {
-+static struct ahash_alg mv_sha1_alg = {
- 	.init = mv_hash_init,
- 	.update = mv_hash_update,
- 	.final = mv_hash_final,
-@@ -999,7 +999,7 @@ struct ahash_alg mv_sha1_alg = {
- 		 }
- };
- 
--struct ahash_alg mv_hmac_sha1_alg = {
-+static struct ahash_alg mv_hmac_sha1_alg = {
- 	.init = mv_hash_init,
- 	.update = mv_hash_update,
- 	.final = mv_hash_final,
+-int omap_aes_copy_sgs(struct omap_aes_dev *dd)
++static int omap_aes_copy_sgs(struct omap_aes_dev *dd)
+ {
+ 	void *buf_in, *buf_out;
+ 	int pages;
 -- 
 1.7.9.5
