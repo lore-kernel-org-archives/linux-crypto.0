@@ -1,64 +1,137 @@
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH] modules: add support for soft module dependencies
-Date: Fri, 13 Sep 2013 09:37:33 +0930
-Message-ID: <87ob7x37p6.fsf@rustcorp.com.au>
-References: <20130724071757.GA30970@gondor.apana.org.au> <87siz38q2t.fsf@rustcorp.com.au> <20130725020329.GA14625@gondor.apana.org.au> <CAKi4VA+=1vOOt0BqdQHQaeF1hP3DrRtCL_ObXY0cPeO7S_MtYw@mail.gmail.com>
+From: Daniel Borkmann <dborkman@redhat.com>
+Subject: Re: [PATCH] crypto_memcmp: add constant-time memcmp
+Date: Fri, 13 Sep 2013 10:33:19 +0200
+Message-ID: <5232CDCF.50208@redhat.com>
+References: <1378838291-7036-1-git-send-email-james@openvpn.net> <522F6BB3.2050308@redhat.com> <20130911121956.GA16462@oc8526070481.ibm.com> <5230A649.5010703@openvpn.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andreas Robinson <andr345@gmail.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Zhao Hongjiang <zhaohongjiang@huawei.com>,
-	David Miller <davem@davemloft.net>, tim.c.chen@linux.intel.com,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"gregkh\@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	linux-crypto@vger.kernel.org,
-	linux-modules <linux-modules@vger.kernel.org>,
-	Tom Gundersen <teg@jklm.no>
-To: Lucas De Marchi <lucas.de.marchi@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>,
+	linux-crypto@vger.kernel.org, herbert@gondor.hengli.com.au,
+	Florian Weimer <fw@deneb.enyo.de>
+To: James Yonan <james@openvpn.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:47216 "EHLO ozlabs.org"
+Received: from mx1.redhat.com ([209.132.183.28]:62571 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756020Ab3IMAkz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Sep 2013 20:40:55 -0400
-In-Reply-To: <CAKi4VA+=1vOOt0BqdQHQaeF1hP3DrRtCL_ObXY0cPeO7S_MtYw@mail.gmail.com>
+	id S1755896Ab3IMIej (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 13 Sep 2013 04:34:39 -0400
+In-Reply-To: <5230A649.5010703@openvpn.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Lucas De Marchi <lucas.de.marchi@gmail.com> writes:
-> On Wed, Jul 24, 2013 at 11:03 PM, Herbert Xu
-> <herbert@gondor.apana.org.au> wrote:
->> On Thu, Jul 25, 2013 at 09:32:02AM +0930, Rusty Russell wrote:
->>> Herbert Xu <herbert@gondor.apana.org.au> writes:
->>> > Hi Rusty:
->>> >
->>> > I don't know why this patch never went into the kernel, even
->>> > though the corresponding features have been added to modprobe
->>> > in most if not all distros.
->>>
->>> Because Andreas never sent me the patch?  This is the first I've *heard*
->>> of this feature.  Looks like it didn't hit lkml either.  And what was
->>> 2/2?
+On 09/11/2013 07:20 PM, James Yonan wrote:
+> On 10/09/2013 12:57, Daniel Borkmann wrote:
+>> There was a similar patch posted some time ago [1] on lkml, where
+>> Florian (CC) made a good point in [2] that future compiler optimizations
+>> could short circuit on this. This issue should probably be addressed in
+>> such a patch here as well.
 >>
->> 2/2 was the patch to actually use this in crc32c.
->>
->>> It's not how I would have done this: post-deps are more flexibly done at
->>> runtime, because the module may have to do work to figure out what to
->>> pull in.  But since it already exists, I'll apply this patch: it doesn't
->>> cost the kernel anything.
+>>  [1] https://lkml.org/lkml/2013/2/10/131
+>>  [2] https://lkml.org/lkml/2013/2/11/381
 >
-> But it did cause boot failures. The file modules.softdep file was
-> supposed to be informational until now. That's why depmod put a
-> comment saying to "copy on user's discretion to /etc/modules.d"
-> instead of parsing it directly.
+> On 11/09/2013 06:19, Marcelo Cerri wrote:
+>> The discussion that Daniel pointed out has another interesting point
+>> regarding the function name. I don't think it's a good idea to name it
+>> crypto_memcpy since it doesn't have behavior the same way as strcmp.
+>>
+>> Florian suggested in the thread names such crypto_mem_equal, which I
+>> think fits better here.
+>
+> Ok, here's another stab at this:
+>
+> * Changed the name to crypto_mem_not_equal.  The "not_equal" seems to
+> make more sense because the function returns a nonzero "true" value if
+> the memory regions are not equal.
 
-I'm happy to change this macro to create a modinfo line like
-"softdep:<modname>"
+Ok, sounds good.
 
-ie. tools like mkinitrd could pick it up and try to find a matching
-module, but depmod would ignore it.
+> * Good point that a smart optimizer might add instructions to
+> short-circuit the loop if all bits in ret have been set.  One way to
+> deal with this is to disable optimizations that might increase code
+> size, since a short-circuit optimization in this case would require
+> adding instructions.
+>
+>     #pragma GCC optimize ("Os")
+>
+> The nice thing about using #pragma is that older versions of gcc that
+> don't recognize it will simply ignore it, and we can probably presume
+> that older versions of gcc do not support a short-circuit optimization
+> if the latest one does not.  I did a quick test using gcc 3.4.6 at -O2,
+> and did not see any evidence of a short-circuit optimization.
+>
+> * Improved performance when CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS is
+> enabled.  This makes the performance roughly on-par with memcmp.
 
-It's really up to Lucas, since this affects him.
+Hm, why don't we take fixed-size versions of Daniel J Bernstein from NaCl
+library [1], e.g. for comparing hashes?
 
-Cheers,
-Rusty.
+E.g. for 16 bytes:
+
+int crypto_verify(const unsigned char *x,const unsigned char *y)
+{
+   unsigned int differentbits = 0;
+#define F(i) differentbits |= x[i] ^ y[i];
+   F(0)
+   F(1)
+   F(2)
+   F(3)
+   F(4)
+   F(5)
+   F(6)
+   F(7)
+   F(8)
+   F(9)
+   F(10)
+   F(11)
+   F(12)
+   F(13)
+   F(14)
+   F(15)
+   return (1 & ((differentbits - 1) >> 8)) - 1;
+}
+
+It will return 0 if x[0], x[1], ..., x[15] are the same as y[0], y[1], ..., y[15],
+otherwise it returns -1. That's w/o for loops, so probably more "compiler-proof" ...
+
+   [1] http://nacl.cr.yp.to/
+
+> ----------------
+>
+> #pragma GCC optimize ("Os")
+>
+> noinline unsigned long crypto_mem_not_equal(const void *a, const void *b, size_t size)
+> {
+>      unsigned long ret = 0;
+>
+> #ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+> #if BITS_PER_LONG == 64
+>      while (size >= 8) {
+>          ret |= *(unsigned long *)a ^ *(unsigned long *)b;
+>          a += 8;
+>          b += 8;
+>          size -= 8;
+>      }
+>      if (!size)
+>          return ret;
+> #endif /* BITS_PER_LONG == 64 */
+>      if (sizeof(unsigned int) == 4) {
+>          while (size >= 4) {
+>              ret |= *(unsigned int *)a ^ *(unsigned int *)b;
+>              a += 4;
+>              b += 4;
+>              size -= 4;
+>          }
+>          if (!size)
+>              return ret;
+>      }
+> #endif /* CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS */
+>      while (size > 0) {
+>          ret |= *(unsigned char *)a ^ *(unsigned char *)b;
+>          a += 1;
+>          b += 1;
+>          size -= 1;
+>      }
+>      return ret;
+> }
+>
+> James
