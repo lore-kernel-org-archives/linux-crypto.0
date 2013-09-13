@@ -1,66 +1,77 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.12
-Date: Fri, 13 Sep 2013 21:30:52 +1000
-Message-ID: <20130913113051.GA8189@gondor.apana.org.au>
-References: <20100903060055.GA28915@gondor.apana.org.au>
- <20100903110722.GA31826@gondor.apana.org.au>
- <20101215115035.GA25248@gondor.apana.org.au>
- <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: Sachin Kamat <sachin.kamat@linaro.org>
+Subject: [PATCH 1/3] crypto: mv_cesa - Staticize local symbols
+Date: Fri, 13 Sep 2013 17:06:45 +0530
+Message-ID: <1379072207-11179-1-git-send-email-sachin.kamat@linaro.org>
+Cc: herbert@gondor.apana.org.au, sachin.kamat@linaro.org,
+	Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:58816 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751418Ab3IMLa6 (ORCPT
+Received: from mail-pd0-f178.google.com ([209.85.192.178]:53681 "EHLO
+	mail-pd0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754065Ab3IMLy4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Sep 2013 07:30:58 -0400
-Content-Disposition: inline
-In-Reply-To: <20130328082841.GA7425@gondor.apana.org.au>
+	Fri, 13 Sep 2013 07:54:56 -0400
+Received: by mail-pd0-f178.google.com with SMTP id w10so1137381pde.23
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2013 04:54:55 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Local symbols used only in this file are made static.
 
-This push fixes a 7+ year race condition in the crypto API that
-causes sporadic crashes when multiple threads load the same
-algorithm.
+Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
+Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+---
+ drivers/crypto/mv_cesa.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-It also fixes the crct10dif algorithm again to prevent boot
-failures on systems where the initramfs tool ignores module
-softdeps.
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Herbert Xu (2):
-      crypto: api - Fix race condition in larval lookup
-      crypto: crct10dif - Add fallback for broken initrds
-
- crypto/Makefile                             |    2 +-
- crypto/api.c                                |    7 +-
- crypto/{crct10dif.c => crct10dif_common.c}  |  100 +--------------------------
- crypto/{crct10dif.c => crct10dif_generic.c} |   53 +-------------
- lib/crc-t10dif.c                            |   11 ++-
- 5 files changed, 20 insertions(+), 153 deletions(-)
-
-Thanks,
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index 3374a3e..f9b9560 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -907,7 +907,7 @@ static int mv_cra_hash_hmac_sha1_init(struct crypto_tfm *tfm)
+ 	return mv_cra_hash_init(tfm, "sha1", COP_HMAC_SHA1, SHA1_BLOCK_SIZE);
+ }
+ 
+-irqreturn_t crypto_int(int irq, void *priv)
++static irqreturn_t crypto_int(int irq, void *priv)
+ {
+ 	u32 val;
+ 
+@@ -928,7 +928,7 @@ irqreturn_t crypto_int(int irq, void *priv)
+ 	return IRQ_HANDLED;
+ }
+ 
+-struct crypto_alg mv_aes_alg_ecb = {
++static struct crypto_alg mv_aes_alg_ecb = {
+ 	.cra_name		= "ecb(aes)",
+ 	.cra_driver_name	= "mv-ecb-aes",
+ 	.cra_priority	= 300,
+@@ -951,7 +951,7 @@ struct crypto_alg mv_aes_alg_ecb = {
+ 	},
+ };
+ 
+-struct crypto_alg mv_aes_alg_cbc = {
++static struct crypto_alg mv_aes_alg_cbc = {
+ 	.cra_name		= "cbc(aes)",
+ 	.cra_driver_name	= "mv-cbc-aes",
+ 	.cra_priority	= 300,
+@@ -975,7 +975,7 @@ struct crypto_alg mv_aes_alg_cbc = {
+ 	},
+ };
+ 
+-struct ahash_alg mv_sha1_alg = {
++static struct ahash_alg mv_sha1_alg = {
+ 	.init = mv_hash_init,
+ 	.update = mv_hash_update,
+ 	.final = mv_hash_final,
+@@ -999,7 +999,7 @@ struct ahash_alg mv_sha1_alg = {
+ 		 }
+ };
+ 
+-struct ahash_alg mv_hmac_sha1_alg = {
++static struct ahash_alg mv_hmac_sha1_alg = {
+ 	.init = mv_hash_init,
+ 	.update = mv_hash_update,
+ 	.final = mv_hash_final,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.9.5
