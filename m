@@ -1,54 +1,33 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 0/2] AES in CBC/CTR/XTS modes using ARMv8 Crypto Extensions
-Date: Fri, 13 Sep 2013 17:08:04 +0200
-Message-ID: <1379084886-1178-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 1/2] crypto: move ablk_helper out of arch/x86
+Date: Fri, 13 Sep 2013 17:08:05 +0200
+Message-ID: <1379084886-1178-2-git-send-email-ard.biesheuvel@linaro.org>
+References: <1379084886-1178-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-crypto@vger.kernel.org, nico@linaro.org,
 	catalin.marinas@arm.com, steve.capper@arm.com,
 	Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-arm@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ea0-f171.google.com ([209.85.215.171]:35385 "EHLO
-	mail-ea0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756358Ab3IMPI3 (ORCPT
+Received: from mail-ea0-f176.google.com ([209.85.215.176]:36338 "EHLO
+	mail-ea0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756358Ab3IMPIb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Sep 2013 11:08:29 -0400
-Received: by mail-ea0-f171.google.com with SMTP id n15so649848ead.16
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2013 08:08:27 -0700 (PDT)
+	Fri, 13 Sep 2013 11:08:31 -0400
+Received: by mail-ea0-f176.google.com with SMTP id q16so645532ead.35
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2013 08:08:30 -0700 (PDT)
+In-Reply-To: <1379084886-1178-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello all,
+Move the ablk_helper code out of arch/x86 so it can be reused
+by other architectures. The only x86 specific dependency was
+a call to irq_fpu_usable(), this has been factored out and moved
+to crypto/ablk_helper_x86.c
 
-This is a first attempt at getting something implemented that uses the ARMv8
-crypto extensions for performing AES encryption in CBC, CTR and XTS modes.
-
-The first patch moves the ablk helper code out of arch/x86. This code is used
-to automagically instantiate async blkciphers based on the synchronous ones in
-my implementation.
-
-The second patch contains the actual AES code. Note that this is only compile
-tested, there are most likely numerous bugs that need to be shaken out before
-this will even run, so consider yourselves warned.
-
-Comments highly appreciated,
-
-Regards,
-Ard.
-
-
-Ard Biesheuvel (2):
-  crypto: move ablk_helper out of arch/x86
-  arm64: add support for AES using ARMv8 Crypto Extensions
-
- arch/arm64/Makefile                        |   8 +-
- arch/arm64/crypto/Makefile                 |  12 +
- arch/arm64/crypto/aesce-cbc.S              |  58 +++++
- arch/arm64/crypto/aesce-ctr.S              |  83 +++++++
- arch/arm64/crypto/aesce-glue.c             | 352 +++++++++++++++++++++++++++++
- arch/arm64/crypto/aesce-macros.S           |  95 ++++++++
- arch/arm64/crypto/aesce-xts.S              | 129 +++++++++++
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
  arch/x86/crypto/Makefile                   |   1 -
- arch/x86/crypto/ablk_helper.c              | 149 ------------
+ arch/x86/crypto/ablk_helper.c              | 149 ---------------------------
  arch/x86/crypto/aesni-intel_glue.c         |   2 +-
  arch/x86/crypto/camellia_aesni_avx2_glue.c |   2 +-
  arch/x86/crypto/camellia_aesni_avx_glue.c  |   2 +-
@@ -58,24 +37,717 @@ Ard Biesheuvel (2):
  arch/x86/crypto/serpent_avx_glue.c         |   2 +-
  arch/x86/crypto/serpent_sse2_glue.c        |   2 +-
  arch/x86/crypto/twofish_avx_glue.c         |   2 +-
- arch/x86/include/asm/crypto/ablk_helper.h  |  31 ---
- crypto/Kconfig                             |  28 ++-
+ arch/x86/include/asm/crypto/ablk_helper.h  |  31 ------
+ crypto/Kconfig                             |  21 ++--
  crypto/Makefile                            |   4 +
- crypto/ablk_helper_generic.c               | 155 +++++++++++++
- crypto/ablk_helper_x86.c                   |   8 +
- include/crypto/ablk_helper.h               |  34 +++
- 24 files changed, 961 insertions(+), 204 deletions(-)
- create mode 100644 arch/arm64/crypto/Makefile
- create mode 100644 arch/arm64/crypto/aesce-cbc.S
- create mode 100644 arch/arm64/crypto/aesce-ctr.S
- create mode 100644 arch/arm64/crypto/aesce-glue.c
- create mode 100644 arch/arm64/crypto/aesce-macros.S
- create mode 100644 arch/arm64/crypto/aesce-xts.S
+ crypto/ablk_helper_generic.c               | 155 +++++++++++++++++++++++++++++
+ crypto/ablk_helper_x86.c                   |   8 ++
+ include/crypto/ablk_helper.h               |  34 +++++++
+ 17 files changed, 220 insertions(+), 201 deletions(-)
  delete mode 100644 arch/x86/crypto/ablk_helper.c
  delete mode 100644 arch/x86/include/asm/crypto/ablk_helper.h
  create mode 100644 crypto/ablk_helper_generic.c
  create mode 100644 crypto/ablk_helper_x86.c
  create mode 100644 include/crypto/ablk_helper.h
 
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 7d6ba9d..18fda50 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -4,7 +4,6 @@
+ 
+ avx_supported := $(call as-instr,vpxor %xmm0$(comma)%xmm0$(comma)%xmm0,yes,no)
+ 
+-obj-$(CONFIG_CRYPTO_ABLK_HELPER_X86) += ablk_helper.o
+ obj-$(CONFIG_CRYPTO_GLUE_HELPER_X86) += glue_helper.o
+ 
+ obj-$(CONFIG_CRYPTO_AES_586) += aes-i586.o
+diff --git a/arch/x86/crypto/ablk_helper.c b/arch/x86/crypto/ablk_helper.c
+deleted file mode 100644
+index 43282fe..0000000
+--- a/arch/x86/crypto/ablk_helper.c
++++ /dev/null
+@@ -1,149 +0,0 @@
+-/*
+- * Shared async block cipher helpers
+- *
+- * Copyright (c) 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+- *
+- * Based on aesni-intel_glue.c by:
+- *  Copyright (C) 2008, Intel Corp.
+- *    Author: Huang Ying <ying.huang@intel.com>
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+- * USA
+- *
+- */
+-
+-#include <linux/kernel.h>
+-#include <linux/crypto.h>
+-#include <linux/init.h>
+-#include <linux/module.h>
+-#include <crypto/algapi.h>
+-#include <crypto/cryptd.h>
+-#include <asm/i387.h>
+-#include <asm/crypto/ablk_helper.h>
+-
+-int ablk_set_key(struct crypto_ablkcipher *tfm, const u8 *key,
+-		 unsigned int key_len)
+-{
+-	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+-	struct crypto_ablkcipher *child = &ctx->cryptd_tfm->base;
+-	int err;
+-
+-	crypto_ablkcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
+-	crypto_ablkcipher_set_flags(child, crypto_ablkcipher_get_flags(tfm)
+-				    & CRYPTO_TFM_REQ_MASK);
+-	err = crypto_ablkcipher_setkey(child, key, key_len);
+-	crypto_ablkcipher_set_flags(tfm, crypto_ablkcipher_get_flags(child)
+-				    & CRYPTO_TFM_RES_MASK);
+-	return err;
+-}
+-EXPORT_SYMBOL_GPL(ablk_set_key);
+-
+-int __ablk_encrypt(struct ablkcipher_request *req)
+-{
+-	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+-	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+-	struct blkcipher_desc desc;
+-
+-	desc.tfm = cryptd_ablkcipher_child(ctx->cryptd_tfm);
+-	desc.info = req->info;
+-	desc.flags = 0;
+-
+-	return crypto_blkcipher_crt(desc.tfm)->encrypt(
+-		&desc, req->dst, req->src, req->nbytes);
+-}
+-EXPORT_SYMBOL_GPL(__ablk_encrypt);
+-
+-int ablk_encrypt(struct ablkcipher_request *req)
+-{
+-	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+-	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+-
+-	if (!irq_fpu_usable()) {
+-		struct ablkcipher_request *cryptd_req =
+-			ablkcipher_request_ctx(req);
+-
+-		memcpy(cryptd_req, req, sizeof(*req));
+-		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
+-
+-		return crypto_ablkcipher_encrypt(cryptd_req);
+-	} else {
+-		return __ablk_encrypt(req);
+-	}
+-}
+-EXPORT_SYMBOL_GPL(ablk_encrypt);
+-
+-int ablk_decrypt(struct ablkcipher_request *req)
+-{
+-	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+-	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+-
+-	if (!irq_fpu_usable()) {
+-		struct ablkcipher_request *cryptd_req =
+-			ablkcipher_request_ctx(req);
+-
+-		memcpy(cryptd_req, req, sizeof(*req));
+-		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
+-
+-		return crypto_ablkcipher_decrypt(cryptd_req);
+-	} else {
+-		struct blkcipher_desc desc;
+-
+-		desc.tfm = cryptd_ablkcipher_child(ctx->cryptd_tfm);
+-		desc.info = req->info;
+-		desc.flags = 0;
+-
+-		return crypto_blkcipher_crt(desc.tfm)->decrypt(
+-			&desc, req->dst, req->src, req->nbytes);
+-	}
+-}
+-EXPORT_SYMBOL_GPL(ablk_decrypt);
+-
+-void ablk_exit(struct crypto_tfm *tfm)
+-{
+-	struct async_helper_ctx *ctx = crypto_tfm_ctx(tfm);
+-
+-	cryptd_free_ablkcipher(ctx->cryptd_tfm);
+-}
+-EXPORT_SYMBOL_GPL(ablk_exit);
+-
+-int ablk_init_common(struct crypto_tfm *tfm, const char *drv_name)
+-{
+-	struct async_helper_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct cryptd_ablkcipher *cryptd_tfm;
+-
+-	cryptd_tfm = cryptd_alloc_ablkcipher(drv_name, 0, 0);
+-	if (IS_ERR(cryptd_tfm))
+-		return PTR_ERR(cryptd_tfm);
+-
+-	ctx->cryptd_tfm = cryptd_tfm;
+-	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request) +
+-		crypto_ablkcipher_reqsize(&cryptd_tfm->base);
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL_GPL(ablk_init_common);
+-
+-int ablk_init(struct crypto_tfm *tfm)
+-{
+-	char drv_name[CRYPTO_MAX_ALG_NAME];
+-
+-	snprintf(drv_name, sizeof(drv_name), "__driver-%s",
+-					crypto_tfm_alg_driver_name(tfm));
+-
+-	return ablk_init_common(tfm, drv_name);
+-}
+-EXPORT_SYMBOL_GPL(ablk_init);
+-
+-MODULE_LICENSE("GPL");
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index f80e668..835488b 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -34,7 +34,7 @@
+ #include <asm/cpu_device_id.h>
+ #include <asm/i387.h>
+ #include <asm/crypto/aes.h>
+-#include <asm/crypto/ablk_helper.h>
++#include <crypto/ablk_helper.h>
+ #include <crypto/scatterwalk.h>
+ #include <crypto/internal/aead.h>
+ #include <linux/workqueue.h>
+diff --git a/arch/x86/crypto/camellia_aesni_avx2_glue.c b/arch/x86/crypto/camellia_aesni_avx2_glue.c
+index 414fe5d..4209a76 100644
+--- a/arch/x86/crypto/camellia_aesni_avx2_glue.c
++++ b/arch/x86/crypto/camellia_aesni_avx2_glue.c
+@@ -14,6 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/crypto.h>
+ #include <linux/err.h>
++#include <crypto/ablk_helper.h>
+ #include <crypto/algapi.h>
+ #include <crypto/ctr.h>
+ #include <crypto/lrw.h>
+@@ -21,7 +22,6 @@
+ #include <asm/xcr.h>
+ #include <asm/xsave.h>
+ #include <asm/crypto/camellia.h>
+-#include <asm/crypto/ablk_helper.h>
+ #include <asm/crypto/glue_helper.h>
+ 
+ #define CAMELLIA_AESNI_PARALLEL_BLOCKS 16
+diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/crypto/camellia_aesni_avx_glue.c
+index 37fd0c0..87a041a 100644
+--- a/arch/x86/crypto/camellia_aesni_avx_glue.c
++++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
+@@ -14,6 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/crypto.h>
+ #include <linux/err.h>
++#include <crypto/ablk_helper.h>
+ #include <crypto/algapi.h>
+ #include <crypto/ctr.h>
+ #include <crypto/lrw.h>
+@@ -21,7 +22,6 @@
+ #include <asm/xcr.h>
+ #include <asm/xsave.h>
+ #include <asm/crypto/camellia.h>
+-#include <asm/crypto/ablk_helper.h>
+ #include <asm/crypto/glue_helper.h>
+ 
+ #define CAMELLIA_AESNI_PARALLEL_BLOCKS 16
+diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
+index c663181..e6a3700 100644
+--- a/arch/x86/crypto/cast5_avx_glue.c
++++ b/arch/x86/crypto/cast5_avx_glue.c
+@@ -26,13 +26,13 @@
+ #include <linux/types.h>
+ #include <linux/crypto.h>
+ #include <linux/err.h>
++#include <crypto/ablk_helper.h>
+ #include <crypto/algapi.h>
+ #include <crypto/cast5.h>
+ #include <crypto/cryptd.h>
+ #include <crypto/ctr.h>
+ #include <asm/xcr.h>
+ #include <asm/xsave.h>
+-#include <asm/crypto/ablk_helper.h>
+ #include <asm/crypto/glue_helper.h>
+ 
+ #define CAST5_PARALLEL_BLOCKS 16
+diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
+index 8d0dfb8..09f3677 100644
+--- a/arch/x86/crypto/cast6_avx_glue.c
++++ b/arch/x86/crypto/cast6_avx_glue.c
+@@ -28,6 +28,7 @@
+ #include <linux/types.h>
+ #include <linux/crypto.h>
+ #include <linux/err.h>
++#include <crypto/ablk_helper.h>
+ #include <crypto/algapi.h>
+ #include <crypto/cast6.h>
+ #include <crypto/cryptd.h>
+@@ -37,7 +38,6 @@
+ #include <crypto/xts.h>
+ #include <asm/xcr.h>
+ #include <asm/xsave.h>
+-#include <asm/crypto/ablk_helper.h>
+ #include <asm/crypto/glue_helper.h>
+ 
+ #define CAST6_PARALLEL_BLOCKS 8
+diff --git a/arch/x86/crypto/serpent_avx2_glue.c b/arch/x86/crypto/serpent_avx2_glue.c
+index 23aabc6..2fae489 100644
+--- a/arch/x86/crypto/serpent_avx2_glue.c
++++ b/arch/x86/crypto/serpent_avx2_glue.c
+@@ -14,6 +14,7 @@
+ #include <linux/types.h>
+ #include <linux/crypto.h>
+ #include <linux/err.h>
++#include <crypto/ablk_helper.h>
+ #include <crypto/algapi.h>
+ #include <crypto/ctr.h>
+ #include <crypto/lrw.h>
+@@ -22,7 +23,6 @@
+ #include <asm/xcr.h>
+ #include <asm/xsave.h>
+ #include <asm/crypto/serpent-avx.h>
+-#include <asm/crypto/ablk_helper.h>
+ #include <asm/crypto/glue_helper.h>
+ 
+ #define SERPENT_AVX2_PARALLEL_BLOCKS 16
+diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
+index 9ae83cf..ff48708 100644
+--- a/arch/x86/crypto/serpent_avx_glue.c
++++ b/arch/x86/crypto/serpent_avx_glue.c
+@@ -28,6 +28,7 @@
+ #include <linux/types.h>
+ #include <linux/crypto.h>
+ #include <linux/err.h>
++#include <crypto/ablk_helper.h>
+ #include <crypto/algapi.h>
+ #include <crypto/serpent.h>
+ #include <crypto/cryptd.h>
+@@ -38,7 +39,6 @@
+ #include <asm/xcr.h>
+ #include <asm/xsave.h>
+ #include <asm/crypto/serpent-avx.h>
+-#include <asm/crypto/ablk_helper.h>
+ #include <asm/crypto/glue_helper.h>
+ 
+ /* 8-way parallel cipher functions */
+diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
+index 97a356e..8c95f86 100644
+--- a/arch/x86/crypto/serpent_sse2_glue.c
++++ b/arch/x86/crypto/serpent_sse2_glue.c
+@@ -34,6 +34,7 @@
+ #include <linux/types.h>
+ #include <linux/crypto.h>
+ #include <linux/err.h>
++#include <crypto/ablk_helper.h>
+ #include <crypto/algapi.h>
+ #include <crypto/serpent.h>
+ #include <crypto/cryptd.h>
+@@ -42,7 +43,6 @@
+ #include <crypto/lrw.h>
+ #include <crypto/xts.h>
+ #include <asm/crypto/serpent-sse2.h>
+-#include <asm/crypto/ablk_helper.h>
+ #include <asm/crypto/glue_helper.h>
+ 
+ static void serpent_decrypt_cbc_xway(void *ctx, u128 *dst, const u128 *src)
+diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
+index a62ba54..4e3c665 100644
+--- a/arch/x86/crypto/twofish_avx_glue.c
++++ b/arch/x86/crypto/twofish_avx_glue.c
+@@ -28,6 +28,7 @@
+ #include <linux/types.h>
+ #include <linux/crypto.h>
+ #include <linux/err.h>
++#include <crypto/ablk_helper.h>
+ #include <crypto/algapi.h>
+ #include <crypto/twofish.h>
+ #include <crypto/cryptd.h>
+@@ -39,7 +40,6 @@
+ #include <asm/xcr.h>
+ #include <asm/xsave.h>
+ #include <asm/crypto/twofish.h>
+-#include <asm/crypto/ablk_helper.h>
+ #include <asm/crypto/glue_helper.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/workqueue.h>
+diff --git a/arch/x86/include/asm/crypto/ablk_helper.h b/arch/x86/include/asm/crypto/ablk_helper.h
+deleted file mode 100644
+index 4f93df5..0000000
+--- a/arch/x86/include/asm/crypto/ablk_helper.h
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/*
+- * Shared async block cipher helpers
+- */
+-
+-#ifndef _CRYPTO_ABLK_HELPER_H
+-#define _CRYPTO_ABLK_HELPER_H
+-
+-#include <linux/crypto.h>
+-#include <linux/kernel.h>
+-#include <crypto/cryptd.h>
+-
+-struct async_helper_ctx {
+-	struct cryptd_ablkcipher *cryptd_tfm;
+-};
+-
+-extern int ablk_set_key(struct crypto_ablkcipher *tfm, const u8 *key,
+-			unsigned int key_len);
+-
+-extern int __ablk_encrypt(struct ablkcipher_request *req);
+-
+-extern int ablk_encrypt(struct ablkcipher_request *req);
+-
+-extern int ablk_decrypt(struct ablkcipher_request *req);
+-
+-extern void ablk_exit(struct crypto_tfm *tfm);
+-
+-extern int ablk_init_common(struct crypto_tfm *tfm, const char *drv_name);
+-
+-extern int ablk_init(struct crypto_tfm *tfm);
+-
+-#endif /* _CRYPTO_ABLK_HELPER_H */
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 69ce573..15750a5 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -174,9 +174,8 @@ config CRYPTO_TEST
+ 	help
+ 	  Quick & dirty crypto test module.
+ 
+-config CRYPTO_ABLK_HELPER_X86
++config CRYPTO_ABLK_HELPER
+ 	tristate
+-	depends on X86
+ 	select CRYPTO_CRYPTD
+ 
+ config CRYPTO_GLUE_HELPER_X86
+@@ -879,7 +878,7 @@ config CRYPTO_CAMELLIA_AESNI_AVX_X86_64
+ 	depends on CRYPTO
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_CRYPTD
+-	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_ABLK_HELPER
+ 	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_CAMELLIA_X86_64
+ 	select CRYPTO_LRW
+@@ -901,7 +900,7 @@ config CRYPTO_CAMELLIA_AESNI_AVX2_X86_64
+ 	depends on CRYPTO
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_CRYPTD
+-	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_ABLK_HELPER
+ 	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_CAMELLIA_X86_64
+ 	select CRYPTO_CAMELLIA_AESNI_AVX_X86_64
+@@ -953,7 +952,7 @@ config CRYPTO_CAST5_AVX_X86_64
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_CRYPTD
+-	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_ABLK_HELPER
+ 	select CRYPTO_CAST_COMMON
+ 	select CRYPTO_CAST5
+ 	help
+@@ -976,7 +975,7 @@ config CRYPTO_CAST6_AVX_X86_64
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_CRYPTD
+-	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_ABLK_HELPER
+ 	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_CAST_COMMON
+ 	select CRYPTO_CAST6
+@@ -1094,7 +1093,7 @@ config CRYPTO_SERPENT_SSE2_X86_64
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_CRYPTD
+-	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_ABLK_HELPER
+ 	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_SERPENT
+ 	select CRYPTO_LRW
+@@ -1116,7 +1115,7 @@ config CRYPTO_SERPENT_SSE2_586
+ 	depends on X86 && !64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_CRYPTD
+-	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_ABLK_HELPER
+ 	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_SERPENT
+ 	select CRYPTO_LRW
+@@ -1138,7 +1137,7 @@ config CRYPTO_SERPENT_AVX_X86_64
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_CRYPTD
+-	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_ABLK_HELPER
+ 	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_SERPENT
+ 	select CRYPTO_LRW
+@@ -1160,7 +1159,7 @@ config CRYPTO_SERPENT_AVX2_X86_64
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_CRYPTD
+-	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_ABLK_HELPER
+ 	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_SERPENT
+ 	select CRYPTO_SERPENT_AVX_X86_64
+@@ -1276,7 +1275,7 @@ config CRYPTO_TWOFISH_AVX_X86_64
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_CRYPTD
+-	select CRYPTO_ABLK_HELPER_X86
++	select CRYPTO_ABLK_HELPER
+ 	select CRYPTO_GLUE_HELPER_X86
+ 	select CRYPTO_TWOFISH_COMMON
+ 	select CRYPTO_TWOFISH_X86_64
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 2d5ed08..1013b4b 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -104,3 +104,7 @@ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_XOR_BLOCKS) += xor.o
+ obj-$(CONFIG_ASYNC_CORE) += async_tx/
+ obj-$(CONFIG_ASYMMETRIC_KEY_TYPE) += asymmetric_keys/
++
++obj-$(CONFIG_CRYPTO_ABLK_HELPER)	+= ablk_helper.o
++ablk_helper-y				:= ablk_helper_generic.o
++ablk_helper-$(CONFIG_X86)		+= ablk_helper_x86.o
+diff --git a/crypto/ablk_helper_generic.c b/crypto/ablk_helper_generic.c
+new file mode 100644
+index 0000000..b63b800
+--- /dev/null
++++ b/crypto/ablk_helper_generic.c
+@@ -0,0 +1,155 @@
++/*
++ * Shared async block cipher helpers
++ *
++ * Copyright (c) 2012 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
++ *
++ * Based on aesni-intel_glue.c by:
++ *  Copyright (C) 2008, Intel Corp.
++ *    Author: Huang Ying <ying.huang@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
++ * USA
++ *
++ */
++
++#include <linux/kernel.h>
++#include <linux/crypto.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/hardirq.h>
++#include <crypto/algapi.h>
++#include <crypto/cryptd.h>
++#include <crypto/ablk_helper.h>
++
++/* can be overridden by the architecture if desired */
++bool __weak ablk_can_run_sync(void)
++{
++	return !in_interrupt();
++}
++
++int ablk_set_key(struct crypto_ablkcipher *tfm, const u8 *key,
++		 unsigned int key_len)
++{
++	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct crypto_ablkcipher *child = &ctx->cryptd_tfm->base;
++	int err;
++
++	crypto_ablkcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
++	crypto_ablkcipher_set_flags(child, crypto_ablkcipher_get_flags(tfm)
++				    & CRYPTO_TFM_REQ_MASK);
++	err = crypto_ablkcipher_setkey(child, key, key_len);
++	crypto_ablkcipher_set_flags(tfm, crypto_ablkcipher_get_flags(child)
++				    & CRYPTO_TFM_RES_MASK);
++	return err;
++}
++EXPORT_SYMBOL_GPL(ablk_set_key);
++
++int __ablk_encrypt(struct ablkcipher_request *req)
++{
++	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
++	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct blkcipher_desc desc;
++
++	desc.tfm = cryptd_ablkcipher_child(ctx->cryptd_tfm);
++	desc.info = req->info;
++	desc.flags = 0;
++
++	return crypto_blkcipher_crt(desc.tfm)->encrypt(
++		&desc, req->dst, req->src, req->nbytes);
++}
++EXPORT_SYMBOL_GPL(__ablk_encrypt);
++
++int ablk_encrypt(struct ablkcipher_request *req)
++{
++	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
++	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++
++	if (!ablk_can_run_sync()) {
++		struct ablkcipher_request *cryptd_req =
++			ablkcipher_request_ctx(req);
++
++		memcpy(cryptd_req, req, sizeof(*req));
++		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
++
++		return crypto_ablkcipher_encrypt(cryptd_req);
++	} else {
++		return __ablk_encrypt(req);
++	}
++}
++EXPORT_SYMBOL_GPL(ablk_encrypt);
++
++int ablk_decrypt(struct ablkcipher_request *req)
++{
++	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
++	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++
++	if (!ablk_can_run_sync()) {
++		struct ablkcipher_request *cryptd_req =
++			ablkcipher_request_ctx(req);
++
++		memcpy(cryptd_req, req, sizeof(*req));
++		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
++
++		return crypto_ablkcipher_decrypt(cryptd_req);
++	} else {
++		struct blkcipher_desc desc;
++
++		desc.tfm = cryptd_ablkcipher_child(ctx->cryptd_tfm);
++		desc.info = req->info;
++		desc.flags = 0;
++
++		return crypto_blkcipher_crt(desc.tfm)->decrypt(
++			&desc, req->dst, req->src, req->nbytes);
++	}
++}
++EXPORT_SYMBOL_GPL(ablk_decrypt);
++
++void ablk_exit(struct crypto_tfm *tfm)
++{
++	struct async_helper_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	cryptd_free_ablkcipher(ctx->cryptd_tfm);
++}
++EXPORT_SYMBOL_GPL(ablk_exit);
++
++int ablk_init_common(struct crypto_tfm *tfm, const char *drv_name)
++{
++	struct async_helper_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct cryptd_ablkcipher *cryptd_tfm;
++
++	cryptd_tfm = cryptd_alloc_ablkcipher(drv_name, 0, 0);
++	if (IS_ERR(cryptd_tfm))
++		return PTR_ERR(cryptd_tfm);
++
++	ctx->cryptd_tfm = cryptd_tfm;
++	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request) +
++		crypto_ablkcipher_reqsize(&cryptd_tfm->base);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(ablk_init_common);
++
++int ablk_init(struct crypto_tfm *tfm)
++{
++	char drv_name[CRYPTO_MAX_ALG_NAME];
++
++	snprintf(drv_name, sizeof(drv_name), "__driver-%s",
++					crypto_tfm_alg_driver_name(tfm));
++
++	return ablk_init_common(tfm, drv_name);
++}
++EXPORT_SYMBOL_GPL(ablk_init);
++
++MODULE_LICENSE("GPL");
+diff --git a/crypto/ablk_helper_x86.c b/crypto/ablk_helper_x86.c
+new file mode 100644
+index 0000000..5671fcb
+--- /dev/null
++++ b/crypto/ablk_helper_x86.c
+@@ -0,0 +1,8 @@
++
++#include <linux/types.h>
++#include <asm/i387.h>
++
++bool ablk_can_run_sync(void)
++{
++	return irq_fpu_usable();
++}
+diff --git a/include/crypto/ablk_helper.h b/include/crypto/ablk_helper.h
+new file mode 100644
+index 0000000..f8d855c
+--- /dev/null
++++ b/include/crypto/ablk_helper.h
+@@ -0,0 +1,34 @@
++/*
++ * Shared async block cipher helpers
++ */
++
++#ifndef _CRYPTO_ABLK_HELPER_H
++#define _CRYPTO_ABLK_HELPER_H
++
++#include <linux/crypto.h>
++#include <linux/kernel.h>
++#include <crypto/cryptd.h>
++
++struct async_helper_ctx {
++	struct cryptd_ablkcipher *cryptd_tfm;
++};
++
++/* to be implemented by the architecture */
++extern bool ablk_arch_sync_allowed(void);
++
++extern int ablk_set_key(struct crypto_ablkcipher *tfm, const u8 *key,
++			unsigned int key_len);
++
++extern int __ablk_encrypt(struct ablkcipher_request *req);
++
++extern int ablk_encrypt(struct ablkcipher_request *req);
++
++extern int ablk_decrypt(struct ablkcipher_request *req);
++
++extern void ablk_exit(struct crypto_tfm *tfm);
++
++extern int ablk_init_common(struct crypto_tfm *tfm, const char *drv_name);
++
++extern int ablk_init(struct crypto_tfm *tfm);
++
++#endif /* _CRYPTO_ABLK_HELPER_H */
 -- 
 1.8.1.2
