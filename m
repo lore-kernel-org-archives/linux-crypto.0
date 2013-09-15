@@ -1,75 +1,255 @@
-From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: Re: [RFC PATCH 2/2] arm64: add support for AES using ARMv8 Crypto
- Extensions
-Date: Sat, 14 Sep 2013 17:11:53 +0300
-Message-ID: <52346EA9.3020802@iki.fi>
-References: <1379084886-1178-1-git-send-email-ard.biesheuvel@linaro.org> <1379084886-1178-3-git-send-email-ard.biesheuvel@linaro.org> <5234196D.9050101@iki.fi> <CAKv+Gu9fCaaTVyCt-r-ijpqYDo4LTfvzrorzjWWCYMM17QUOQA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-arm@lists.infradead.org, linux-crypto@vger.kernel.org,
-	Nicolas Pitre <nico@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Steve Capper <steve.capper@arm.com>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:59486 "EHLO mail.kapsi.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756512Ab3INOL5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 14 Sep 2013 10:11:57 -0400
-In-Reply-To: <CAKv+Gu9fCaaTVyCt-r-ijpqYDo4LTfvzrorzjWWCYMM17QUOQA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: "Lee, Chun-Yi" <joeyli.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [RFC V4 PATCH 00/15] Signature verification of hibernate snapshot
+Date: Sun, 15 Sep 2013 08:56:46 +0800
+Message-ID: <1379206621-18639-1-git-send-email-jlee@suse.com>
+Cc: linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
+	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>,
+	Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
+	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
+	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
+	Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
+	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"Lee, Chun-Yi" <jlee-IBi9RG/b67k@public.gmane.org>
+To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <opensuse-kernel+bounces-5094-glsk-opensuse-kernel=m.gmane.org-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Post: <mailto:opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Help: <mailto:opensuse-kernel+help-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Subscribe: <mailto:opensuse-kernel+subscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Unsubscribe: <mailto:opensuse-kernel+unsubscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Owner: <mailto:opensuse-kernel+owner-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Archive: <http://lists.opensuse.org/opensuse-kernel/>
+List-Id: linux-crypto.vger.kernel.org
 
-On 14.09.2013 16:30, Ard Biesheuvel wrote:
-> On 14 September 2013 10:08, Jussi Kivilinna <jussi.kivilinna@iki.fi> wrote:
->> On 13.09.2013 18:08, Ard Biesheuvel wrote:
->>> This adds ARMv8 Crypto Extensions based implemenations of
->>> AES in CBC, CTR and XTS mode.
->>>
->>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->>> ---
->> ..snip..
->>> +static int xts_set_key(struct crypto_tfm *tfm, const u8 *in_key,
->>> +                    unsigned int key_len)
->>> +{
->>> +     struct crypto_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
->>> +     u32 *flags = &tfm->crt_flags;
->>> +     int ret;
->>> +
->>> +     ret = crypto_aes_expand_key(&ctx->key1, in_key, key_len/2);
->>> +     if (!ret)
->>> +             ret = crypto_aes_expand_key(&ctx->key2, &in_key[key_len/2],
->>> +                                         key_len/2);
->>
->> Use checkpatch.
->>
-> 
-> Um, I did get a bunch of errors and warnings from checkpatch.pl tbh,
-> put not in this particular location. Care to elaborate?
-> 
+Hi experts,
 
-Well, the checkpatch.pl I had stored to brain had become corrupted and kept
-saying that you need spaces around all operators. But apparently spaces are
-just required for assignment operators.
+This patchset is the implementation for signature verification of hibernate
+snapshot image. The origin idea is from Jiri Kosina: Let EFI bootloader
+generate key-pair in UEFI secure boot environment, then pass it to kernel
+for sign/verify S4 image.
 
->>> +}, {
->>> +     .cra_name               = "__ctr-aes-aesce",
->>> +     .cra_driver_name        = "__driver-ctr-aes-aesce",
->>> +     .cra_priority           = 0,
->>> +     .cra_flags              = CRYPTO_ALG_TYPE_BLKCIPHER,
->>> +     .cra_blocksize          = AES_BLOCK_SIZE,
->>
->> CTR mode is stream cipher, cra_blocksize must be set to 1.
->>
->> This should have been picked up by in-kernel run-time tests, check
->> CONFIG_CRYPTO_MANAGER_DISABLE_TESTS (and CONFIG_CRYPTO_TEST/tcrypt
->> module).
->>
-> 
-> Well, run-time implies access to hardware :-) As I indicated in the
-> cover letter, these bits are only compile tested.
+Due to there have potential threat from the S4 image hacked, it may causes
+kernel lost the trust in UEFI secure boot. Hacker attack the S4 snapshot
+image in swap partition through whatever exploit from another trusted OS,
+and the exploit may don't need physical access machine.
 
-Ok, I read the cover letter too hastily :)
+So, this patchset give the ability to kernel for parsing RSA private key
+from EFI bootloader, then using the private key to generate the signature
+of S4 snapshot image. Kernel put the signature to snapshot header, and
+verify the signature when kernel try to recover snapshot image to memory.
 
--Jussi
+How To Enable
+==============
+
+Set CONFIG_SNAPSHOT_VERIFICATION kernel config to enable. And you can also
+choice which hash algorithm should snapshot be signed with. Then rebuild
+kernel. This function depends on EFI_STUB.
+
+Please note this function need UEFI bootloader's support to generate key-pair
+in UEFI secure boot environment, e.g. shim. Current shim implementation by
+Gary Lin:
+
+Git:
+     https://github.com/lcp/shim/tree/s4-key-upstream
+RPM:
+     https://build.opensuse.org/package/show/home:gary_lin:UEFI/shim
+
+Please use the shim from above URL if you want to try. Please remember add
+the hash of shim to db in UEFI BIOS because it didn't sign by Microsoft or
+any OSV key.
+
+The default behavior is taint kernel when signature check fail. If you want
+direct fail whole hibernate snapshot restore procedure when signature check
+does not pass, please use snapshot_sig_enforce kernel parameter or
+CONFIG_EFI_SECURE_BOOT_SNAPSHOT_SIG_ENFORCE config.
+
+If you want binding UEF secure boot with sig_enforce flag, then you can use
+CONFIG_EFI_SECURE_BOOT_SNAPSHOT_SIG_ENFORCE config. The sig_enforce flag will
+auto enabled when UEFI secure boot enabled.
+
+Behavior
+=========
+
+The RSA key-pair are generated by EFI bootloader(e.g. shim) in UEFI secure
+boot environment, then put private key to S4SignKey, public key to S4WakeKey
+EFI variable. Kernel's behavior as following:
+
+ + First, EFI stub kernel will check the following 2 EFI variable:
+   S4SignKey-fe141863-c070-478e-b8a3-878a5dc9ef21    [BootService]
+   S4WakeKey-fe141863-c070-478e-b8a3-878a5dc9ef21    [Runtime][Volatile]
+
+   S4SignKey and S4WakeKey is a RSA key-pair:
+    - S4SignKey is a private key that's used to generate signature of S4
+      snapshot.
+      The blob format of S4SignKey is PKCS#8 _uncompressed_ format, it should
+      packaged a RSA private key that's followed PKCS#1.
+
+    - S4WakeKey is a public key that's used to verify signature of S4
+      snapshot.
+      The blob format of S4WakeKey is X.509 format, it should packaged a RSA
+      public key that's followed PKCS#1.
+
+ + EFI stub kernel will load the S4SignKey blob to RAM before ExitBootServices,
+   then copy to a memory page that's maintained by hibernate_key.c. This
+   private key will be used to sign snapshot when hibernate launched.
+
+ + When sig_enforce flag set to TRUE, means force check verification pass:
+    - If kernel didn't find S4 key-pair, then kernel will block hibernate
+      functions including kernel space and userspace hibernate.
+    - If snapshot signature check fail when hibernate resume, the snapshot
+      restore procedure will fail and running normal boot process.
+
+ + When sig_enforce flag set to FALSE, means not force the verification pass:
+    - If kernel didn't find S4 key-pair, then the hibernate function still
+      available. But kernel will be tainted after hibernate resume.
+    - If snapshot signature check fail when hibernate resume, the snapshot
+      restore procedure will allow continue. But kernel will be tainted.
+
+On EFI bootloader side, the behavior as following:
+
+ + EFI bootloader must generate RSA key-pair when:
+    - First time boot, bootloader generate key-pair when didn't find it.
+
+    - Bootloader need re-generate after found GenS4Key efi variable from OS:
+        GenS4Key-fe141863-c070-478e-b8a3-878a5dc9ef21   [Runtime][Non-Volatile]
+      The size of GenS4Key is 1 byte, OS(kernel or userland tool) will set it to
+      "1" for notify efi bootloader regenerate key-pair.
+
+    - If re-generate key-pair, bootloader need store the new public key to
+      EFI bootservices variable by itself, e.g. store to NextWakeKey variable
+      When system resumed from hibernate, bootloader need copy public key from
+      NextWakeKey to S4WakeKey, then kernel will use it to verify snapshot
+      image.
+
+Implementation
+==============
+
+Whole implementation including 3 parts: shim, asymmetric keys and hibernate:
+
+ + shim:
+   Current solution implemented by Gary Lin:
+     https://github.com/lcp/shim/tree/s4-key-upstream
+
+   Please use shim from the above URL if you want to try. Please remember add
+   this shim to db because it didn't sign by Microsoft or any OSV key.
+
+ + Asymmetric keys:
+   This patchset implemented uncompressed PKCS#8 and RSA private key parser,
+   it also implement the signature generation operation of RSASSA-PKCS1-v_5
+   in PKCS#1 spec. [RFC3447 sec 8.2.2]
+   Set CONFIG_PKCS8_PRIVATE_KEY_INFO_PARSER=y will give kernel the abilities
+   to parsing private key in uncompressed PKCS#8 blob and generate signature.
+
+ + Hibernate:
+   Set CONFIG_SNAPSHOT_VERIFICATION=y will enable the function of snapshot
+   signature generation and verification. I reserved 512 byes size in snapshot
+   header for store the signature that's generated from the digest with SHA
+   algorithms.
+
+For adapt S4 signature check to secure boot, It Base on Matthew Garrett's 2
+patches in "[PATCH] Add additional security checks when module loading is
+restricted" series: https://lkml.org/lkml/2013/8/19/331
+  [PATCH 01/10] Add secure_modules() call
+  [PATCH V3 11/11] Add option to automatically enforce module signatures when in Secure Boot mode
+
+Please help review this RFC patchset! Appreciate for any comments!
+
+
+V4:
+ - Cleaned source code, use helper functions to reduce #ifdef chunk.
+ - Introduced sig_enforce flag, taint kernel when signature check fail.
+ - Use forward_info structure to maintain the empty of forward information and
+   new sign key from boot kernel to resume target kernel.
+ - Use efivar API to access S4WakeKey variable.
+ - Call set_key_regen_flag() to set key-pair regeneration flag in hibernate.c
+   and user.c
+
+V3:
+ - Load S4 sign key before ExitBootServices in efi stub.
+ - In Makefile, moved hibernate_keys.o before hibernate.o for load S4 sign
+   key before check hibernate image. It makes sure the new sign key will be
+   transfer to resume target kernel.
+ - Set "depends on EFI_STUB" in Kconfig.
+
+V2:
+ - Moved SNAPSHOT_VERIFICATION kernel config to earlier patch.
+ - Add dummy functions to simplify the ifdef check.
+ - Sent to opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org for review:
+   http://lists.opensuse.org/opensuse-kernel/2013-08/msg00025.html
+
+V1:
+ - Internal review
+ - github:
+   https://github.com/joeyli/linux-s4sign/commits/devel-s4sign
+
+
+Lee, Chun-Yi (15):
+  asymmetric keys: add interface and skeleton for implement signature
+    generation
+  asymmetric keys: implement EMSA_PKCS1-v1_5-ENCODE in rsa
+  asymmetric keys: separate the length checking of octet string from
+    RSA_I2OSP
+  asymmetric keys: implement OS2IP in rsa
+  asymmetric keys: implement RSASP1
+  asymmetric keys: support parsing PKCS #8 private key information
+  asymmetric keys: explicitly add the leading zero byte to encoded
+    message
+  Hibernate: introduced RSA key-pair to verify signature of snapshot
+  Hibernate: generate and verify signature of snapshot
+  Hibernate: Avoid S4 sign key data included in snapshot image
+  Hibernate: taint kernel when signature check fail
+  Hibernate: show the verification time for monitor performance
+  Hibernate: introduced SNAPSHOT_SIG_HASH config for select hash
+    algorithm
+  Hibernate: notify bootloader regenerate key-pair for snapshot
+    verification
+  Hibernate: adapt to UEFI secure boot with signature check
+
+ Documentation/kernel-parameters.txt        |    7 +
+ arch/x86/Kconfig                           |   11 +
+ arch/x86/boot/compressed/eboot.c           |   92 +++++++
+ arch/x86/include/asm/efi.h                 |    9 +
+ arch/x86/include/uapi/asm/bootparam.h      |    1 +
+ arch/x86/kernel/setup.c                    |    7 +
+ arch/x86/platform/efi/efi.c                |   68 +++++
+ crypto/asymmetric_keys/Kconfig             |   11 +
+ crypto/asymmetric_keys/Makefile            |   16 +
+ crypto/asymmetric_keys/pkcs8.asn1          |   19 ++
+ crypto/asymmetric_keys/pkcs8_info_parser.c |  152 ++++++++++
+ crypto/asymmetric_keys/pkcs8_parser.h      |   23 ++
+ crypto/asymmetric_keys/pkcs8_private_key.c |  148 ++++++++++
+ crypto/asymmetric_keys/pkcs8_rsakey.asn1   |   29 ++
+ crypto/asymmetric_keys/private_key.h       |   29 ++
+ crypto/asymmetric_keys/public_key.c        |   32 +++
+ crypto/asymmetric_keys/rsa.c               |  296 +++++++++++++++++++-
+ crypto/asymmetric_keys/signature.c         |   28 ++
+ include/crypto/public_key.h                |   28 ++
+ include/keys/asymmetric-subtype.h          |    6 +
+ include/linux/efi.h                        |   25 ++
+ include/linux/kernel.h                     |    1 +
+ include/linux/suspend.h                    |    7 +
+ kernel/panic.c                             |    2 +
+ kernel/power/Kconfig                       |   77 +++++-
+ kernel/power/Makefile                      |    1 +
+ kernel/power/hibernate.c                   |   23 ++-
+ kernel/power/hibernate_keys.c              |  410 ++++++++++++++++++++++++++++
+ kernel/power/main.c                        |    7 +-
+ kernel/power/power.h                       |   62 +++++
+ kernel/power/snapshot.c                    |  323 ++++++++++++++++++++++-
+ kernel/power/swap.c                        |    4 +
+ kernel/power/user.c                        |   14 +-
+ 33 files changed, 1946 insertions(+), 22 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/pkcs8.asn1
+ create mode 100644 crypto/asymmetric_keys/pkcs8_info_parser.c
+ create mode 100644 crypto/asymmetric_keys/pkcs8_parser.h
+ create mode 100644 crypto/asymmetric_keys/pkcs8_private_key.c
+ create mode 100644 crypto/asymmetric_keys/pkcs8_rsakey.asn1
+ create mode 100644 crypto/asymmetric_keys/private_key.h
+ create mode 100644 kernel/power/hibernate_keys.c
