@@ -1,43 +1,59 @@
-From: Sachin Kamat <sachin.kamat-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [PATCH 1/2] crypto: tegra-aes: Fix NULL pointer dereference
-Date: Mon, 16 Sep 2013 09:01:10 +0530
-Message-ID: <1379302271-22438-1-git-send-email-sachin.kamat@linaro.org>
-Cc: linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	swarren-3lzwWm7+Weoh9ZMKESR00Q@public.gmane.org, sachin.kamat-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
-To: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Sachin Kamat <sachin.kamat@linaro.org>
+Subject: [PATCH 2/2] crypto: tegra-aes: Use devm_clk_get
+Date: Mon, 16 Sep 2013 09:01:11 +0530
+Message-ID: <1379302271-22438-2-git-send-email-sachin.kamat@linaro.org>
+References: <1379302271-22438-1-git-send-email-sachin.kamat@linaro.org>
+Cc: linux-tegra@vger.kernel.org, herbert@gondor.apana.org.au,
+	swarren@wwwdotorg.org, sachin.kamat@linaro.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f50.google.com ([209.85.220.50]:65467 "EHLO
+	mail-pa0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756226Ab3IPDta (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 15 Sep 2013 23:49:30 -0400
+Received: by mail-pa0-f50.google.com with SMTP id fb10so4806374pad.23
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Sep 2013 20:49:29 -0700 (PDT)
+In-Reply-To: <1379302271-22438-1-git-send-email-sachin.kamat@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-'dd' is tested for NULL. However, it is derefenced in the error
-message print. Change the print to pr_err to avoid this.
+devm_clk_get is device managed and makes code simpler.
 
-Signed-off-by: Sachin Kamat <sachin.kamat-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
 ---
- drivers/crypto/tegra-aes.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/crypto/tegra-aes.c |    5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
-index 403282f..33f9530 100644
+index 33f9530..d8c7a13 100644
 --- a/drivers/crypto/tegra-aes.c
 +++ b/drivers/crypto/tegra-aes.c
-@@ -27,6 +27,8 @@
-  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-  */
- 
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/errno.h>
-@@ -716,7 +718,7 @@ static int tegra_aes_rng_reset(struct crypto_rng *tfm, u8 *seed,
- 	u8 *dt;
- 
- 	if (!ctx || !dd) {
--		dev_err(dd->dev, "ctx=0x%x, dd=0x%x\n",
-+		pr_err("ctx=0x%x, dd=0x%x\n",
- 			(unsigned int)ctx, (unsigned int)dd);
- 		return -EINVAL;
+@@ -917,7 +917,7 @@ static int tegra_aes_probe(struct platform_device *pdev)
  	}
+ 
+ 	/* Initialize the vde clock */
+-	dd->aes_clk = clk_get(dev, "vde");
++	dd->aes_clk = devm_clk_get(dev, "vde");
+ 	if (IS_ERR(dd->aes_clk)) {
+ 		dev_err(dev, "iclock intialization failed.\n");
+ 		err = -ENODEV;
+@@ -1026,8 +1026,6 @@ out:
+ 	if (dd->buf_out)
+ 		dma_free_coherent(dev, AES_HW_DMA_BUFFER_SIZE_BYTES,
+ 			dd->buf_out, dd->dma_buf_out);
+-	if (!IS_ERR(dd->aes_clk))
+-		clk_put(dd->aes_clk);
+ 	if (aes_wq)
+ 		destroy_workqueue(aes_wq);
+ 	spin_lock(&list_lock);
+@@ -1061,7 +1059,6 @@ static int tegra_aes_remove(struct platform_device *pdev)
+ 			  dd->buf_in, dd->dma_buf_in);
+ 	dma_free_coherent(dev, AES_HW_DMA_BUFFER_SIZE_BYTES,
+ 			  dd->buf_out, dd->dma_buf_out);
+-	clk_put(dd->aes_clk);
+ 	aes_dev = NULL;
+ 
+ 	return 0;
 -- 
 1.7.9.5
