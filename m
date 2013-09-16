@@ -1,60 +1,43 @@
-From: James Yonan <james@openvpn.net>
-Subject: Re: [PATCH] crypto_mem_not_equal: add constant-time equality testing
- of memory regions
-Date: Sun, 15 Sep 2013 10:59:43 -0600
-Message-ID: <5235E77F.1050807@openvpn.net>
-References: <5232CDCF.50208@redhat.com> <1379259179-2677-1-git-send-email-james@openvpn.net> <878uyyks0e.fsf@mid.deneb.enyo.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Daniel Borkmann <dborkman@redhat.com>,
-	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>,
-	linux-crypto@vger.kernel.org, herbert@gondor.hengli.com.au
-To: Florian Weimer <fw@deneb.enyo.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from magnetar.openvpn.net ([74.52.27.18]:46738 "EHLO
-	magnetar.openvpn.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757137Ab3IOQ7y (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 15 Sep 2013 12:59:54 -0400
-In-Reply-To: <878uyyks0e.fsf@mid.deneb.enyo.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Sachin Kamat <sachin.kamat-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: [PATCH 1/2] crypto: tegra-aes: Fix NULL pointer dereference
+Date: Mon, 16 Sep 2013 09:01:10 +0530
+Message-ID: <1379302271-22438-1-git-send-email-sachin.kamat@linaro.org>
+Cc: linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	swarren-3lzwWm7+Weoh9ZMKESR00Q@public.gmane.org, sachin.kamat-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+To: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 15/09/2013 09:45, Florian Weimer wrote:
-> * James Yonan:
->
->> + * Constant-time equality testing of memory regions.
->> + * Returns 0 when data is equal, non-zero otherwise.
->> + * Fast path if size == 16.
->> + */
->> +noinline unsigned long crypto_mem_not_equal(const void *a, const void *b, size_t size)
->
-> I think this should really return unsigned or int, to reduce the risk
-> that the upper bytes are truncated because the caller uses an
-> inappropriate type, resulting in a bogus zero result.  Reducing the
-> value to 0/1 probably doesn't hurt performance too much.  It also
-> doesn't encode any information about the location of the difference in
-> the result value, which helps if that ever leaks.
+'dd' is tested for NULL. However, it is derefenced in the error
+message print. Change the print to pr_err to avoid this.
 
-The problem with returning 0/1 within the function body of 
-crypto_mem_not_equal is that it makes it easier for the compiler to 
-introduce a short-circuit optimization.
+Signed-off-by: Sachin Kamat <sachin.kamat-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+---
+ drivers/crypto/tegra-aes.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-It might be better to move the test where the result is compared against 
-0 into an inline function:
-
-noinline unsigned long __crypto_mem_not_equal(const void *a, const void 
-*b, size_t size);
-
-static inline int crypto_mem_not_equal(const void *a, const void *b, 
-size_t size) {
-	return __crypto_mem_not_equal(a, b, size) != 0UL ? 1 : 0;
-}
-
-This hides the fact that we are only interested in a boolean result from 
-the compiler when it's compiling crypto_mem_not_equal.c, but also 
-ensures type safety when users test the return value.  It's also likely 
-to have little or no performance impact.
-
-James
+diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
+index 403282f..33f9530 100644
+--- a/drivers/crypto/tegra-aes.c
++++ b/drivers/crypto/tegra-aes.c
+@@ -27,6 +27,8 @@
+  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+  */
+ 
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/errno.h>
+@@ -716,7 +718,7 @@ static int tegra_aes_rng_reset(struct crypto_rng *tfm, u8 *seed,
+ 	u8 *dt;
+ 
+ 	if (!ctx || !dd) {
+-		dev_err(dd->dev, "ctx=0x%x, dd=0x%x\n",
++		pr_err("ctx=0x%x, dd=0x%x\n",
+ 			(unsigned int)ctx, (unsigned int)dd);
+ 		return -EINVAL;
+ 	}
+-- 
+1.7.9.5
