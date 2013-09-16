@@ -1,33 +1,31 @@
-From: dominik.d.paulus@studium.uni-erlangen.de
-Subject: crypto: GCM API usage
-Date: Mon, 16 Sep 2013 12:58:40 +0200
-Message-ID: <65abe254e199230984fd6a15dec39a76.squirrel@faumail.uni-erlangen.de>
+From: Stephen Warren <swarren-3lzwWm7+Weoh9ZMKESR00Q@public.gmane.org>
+Subject: Re: [PATCH] crypto: tegra: use kernel entropy instead of ad-hoc
+Date: Mon, 16 Sep 2013 09:28:22 -0600
+Message-ID: <52372396.8030707@wwwdotorg.org>
+References: <1378712154-30602-1-git-send-email-linus.walleij@linaro.org> <522DF0FC.5080200@wwwdotorg.org> <20130913122318.GD8579@gondor.apana.org.au> <52333974.4040404@wwwdotorg.org> <20130913233912.GA16389@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: linux-kernel@i4.cs.fau.de, tobias.polzer@fau.de
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx-rz-2.rrze.uni-erlangen.de ([131.188.11.21]:46406 "EHLO
-	mx-rz-2.rrze.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757497Ab3IPLFH (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Sep 2013 07:05:07 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+	Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	Neil Horman <nhorman-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org>,
+	linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20130913233912.GA16389-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On 09/13/2013 05:39 PM, Herbert Xu wrote:
+> On Fri, Sep 13, 2013 at 10:12:36AM -0600, Stephen Warren wrote:
+>>
+>> I'm curious which kernel version it was merged for; it'd be nice to
+>> remove tegra_chip_uid() from the Tegra tree now since it's unused, but
+>> that obviously requires this patch in the history.
+> 
+> This is in cryptodev which will be pushed upstream for 3.13.
 
-We are currently trying to add encryption support to the usbip kernel
-driver. Unfortunately, there is almost no documentation for the kernel
-crypto API. So far, we couldn't figure out how to use the GCM encryption
-mode in the kernel. There seems to be infrastructure for IV generation
-in place (e.g. seqiv.c, the geniv stuff and the RFC 4106 implementation),
-but no code directly using it.
-
-What's the recommended way to use the IV generators with a "high-level"
-API?
-
-Regards,
-        Tobias Polzer and Dominik Paulus
+OK, I guess I'll send you the follow-on cleanup patch then. While it
+does touch arch/arm/mach-tegra code, I hope it won't conflict with
+anything else going through the Tegra tree, so should be safe.
