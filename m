@@ -1,48 +1,112 @@
-From: Stephen Warren <swarren-3lzwWm7+Weoh9ZMKESR00Q@public.gmane.org>
-Subject: [PATCH] ARM: tegra: remove tegra_chip_uid()
-Date: Mon, 16 Sep 2013 09:34:19 -0600
-Message-ID: <1379345659-9528-1-git-send-email-swarren@wwwdotorg.org>
-Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	Linus Walleij <linus.walleij-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
-	Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
-Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: James Yonan <james@openvpn.net>
+Subject: Re: [PATCH] crypto_mem_not_equal: add constant-time equality testing
+ of memory regions
+Date: Mon, 16 Sep 2013 11:10:59 -0600
+Message-ID: <52373BA3.9090709@openvpn.net>
+References: <5232CDCF.50208@redhat.com> <1379259179-2677-1-git-send-email-james@openvpn.net> <878uyyks0e.fsf@mid.deneb.enyo.de> <5235E77F.1050807@openvpn.net> <5236B9A7.3090001@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Florian Weimer <fw@deneb.enyo.de>,
+	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>,
+	linux-crypto@vger.kernel.org, herbert@gondor.hengli.com.au
+To: Daniel Borkmann <dborkman@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from magnetar.openvpn.net ([74.52.27.18]:47223 "EHLO
+	magnetar.openvpn.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751181Ab3IPRLM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 Sep 2013 13:11:12 -0400
+In-Reply-To: <5236B9A7.3090001@redhat.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+On 16/09/2013 01:56, Daniel Borkmann wrote:
+> On 09/15/2013 06:59 PM, James Yonan wrote:
+>> On 15/09/2013 09:45, Florian Weimer wrote:
+>>> * James Yonan:
+>>>
+>>>> + * Constant-time equality testing of memory regions.
+>>>> + * Returns 0 when data is equal, non-zero otherwise.
+>>>> + * Fast path if size == 16.
+>>>> + */
+>>>> +noinline unsigned long crypto_mem_not_equal(const void *a, const
+>>>> void *b, size_t size)
+>>>
+>>> I think this should really return unsigned or int, to reduce the risk
+>>> that the upper bytes are truncated because the caller uses an
+>>> inappropriate type, resulting in a bogus zero result.  Reducing the
+>>> value to 0/1 probably doesn't hurt performance too much.  It also
+>>> doesn't encode any information about the location of the difference in
+>>> the result value, which helps if that ever leaks.
+>>
+>> The problem with returning 0/1 within the function body of
+>> crypto_mem_not_equal is that it makes it easier for the compiler to
+>> introduce a short-circuit optimization.
+>>
+>> It might be better to move the test where the result is compared
+>> against 0 into an inline function:
+>>
+>> noinline unsigned long __crypto_mem_not_equal(const void *a, const
+>> void *b, size_t size);
+>>
+>> static inline int crypto_mem_not_equal(const void *a, const void *b,
+>> size_t size) {
+>>      return __crypto_mem_not_equal(a, b, size) != 0UL ? 1 : 0;
+>> }
+>>
+>> This hides the fact that we are only interested in a boolean result
+>> from the compiler when it's compiling crypto_mem_not_equal.c, but also
+>> ensures type safety when users test the return value.  It's also
+>> likely to have little or no performance impact.
+>
+> Well, the code snippet I've provided from NaCl [1] is not really
+> "fast-path"
+> as you say, but rather to prevent the compiler from doing such
+> optimizations
+> by having a transformation of the "accumulated" bits into 0 and 1 as an end
+> result (likely to prevent a short circuit), plus it has static size, so no
+> loops applied here that could screw up.
+>
+> Variable size could be done under arch/ in asm, and if not available, that
+> just falls back to normal memcmp that is being transformed into a same
+> return
+> value. By that, all other archs could easily migrate afterwards. What do
+> you
+> think?
+>
+>   [1] http://www.spinics.net/lists/linux-crypto/msg09558.html
 
-Following commit f5b38c5 "crypto: tegra - use kernel entropy instead
-of ad-hoc", this function is no longer used. It's also only accurate
-for Tegra20 and not later SoCs. So, remove it.
+I'm not sure that the differentbits -> 0/-1 transform in NaCl really 
+buys us anything because we don't care very much about making the final 
+test of differentbits != 0 constant-time.  An attacker already knows 
+whether the test succeeded or failed -- we care more about making the 
+failure cases constant-time.
 
-Signed-off-by: Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
----
-Herbert, this is a patch for the crypto tree, since it depends on a
-patch to the tegra-aes crypto driver that's in your tree.
+To do this, we need to make sure that the compiler doesn't insert one or 
+more early instructions to compare differentbits with 0xFF and then 
+bypass the rest of the F(n) lines because it knows then that the value 
+of differentbits cannot be changed by subsequent F(n) lines.  It seems 
+that all of the approaches that use |= to build up the differentbits 
+value suffer from this problem.
 
- arch/arm/mach-tegra/fuse.c | 10 ----------
- 1 file changed, 10 deletions(-)
+My proposed solution is rather than trying to outsmart the compiler with 
+code that resists optimization, why not just turn optimization off 
+directly with #pragma GCC optimize.  Or better yet, use an optimization 
+setting that provides reasonable speed without introducing potential 
+short-circuit optimizations.
 
-diff --git a/arch/arm/mach-tegra/fuse.c b/arch/arm/mach-tegra/fuse.c
-index e035cd2..64652b3 100644
---- a/arch/arm/mach-tegra/fuse.c
-+++ b/arch/arm/mach-tegra/fuse.c
-@@ -155,13 +155,3 @@ void tegra_init_fuse(void)
- 		tegra_sku_id, tegra_cpu_process_id,
- 		tegra_core_process_id);
- }
--
--unsigned long long tegra_chip_uid(void)
--{
--	unsigned long long lo, hi;
--
--	lo = tegra_fuse_readl(FUSE_UID_LOW);
--	hi = tegra_fuse_readl(FUSE_UID_HIGH);
--	return (hi << 32ull) | lo;
--}
--EXPORT_SYMBOL(tegra_chip_uid);
--- 
-1.8.1.5
+By optimizing for size ("Os"), the compiler will need to turn off 
+optimizations that add code for a possible speed benefit, and the kind 
+of short-circuit optimizations that we are trying to avoid fall 
+precisely into this class -- they add an instruction to check if the OR 
+accumulator has all of its bits set, then if so, do an early exit.  So 
+by using Os, we still benefit from optimizations that increase speed but 
+don't increase code size.
+
+Once we eliminate the possibility of short-circuit optimizations, then 
+it's much more straightforward to make the function fast (e.g. by 
+comparing 64-bits at a time) and flexible (by handling arbitrary size). 
+  My current implementation of crypto_mem_not_equal does both.
+
+James
