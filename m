@@ -1,42 +1,55 @@
-From: Florian Weimer <fw@deneb.enyo.de>
-Subject: Re: [PATCH] crypto_mem_not_equal: add constant-time equality testing of memory regions
-Date: Mon, 16 Sep 2013 19:25:10 +0200
-Message-ID: <87bo3ssmq1.fsf@mid.deneb.enyo.de>
-References: <5232CDCF.50208@redhat.com>
-	<1379259179-2677-1-git-send-email-james@openvpn.net>
-	<878uyyks0e.fsf@mid.deneb.enyo.de> <5235E77F.1050807@openvpn.net>
+From: Dominik Paulus <dominik@d-paulus.de>
+Subject: Re: crypto: GCM API usage
+Date: Mon, 16 Sep 2013 20:34:11 +0200
+Message-ID: <20130916183411.GC3380@d-paulus.de>
+References: <65abe254e199230984fd6a15dec39a76.squirrel@faumail.uni-erlangen.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Daniel Borkmann <dborkman@redhat.com>,
-	Marcelo Cerri <mhcerri@linux.vnet.ibm.com>,
-	linux-crypto@vger.kernel.org, herbert@gondor.hengli.com.au
-To: James Yonan <james@openvpn.net>
+Cc: tobias.polzer@fau.de, linux-kernel@i4.cs.fau.de
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ka.mail.enyo.de ([87.106.162.201]:60161 "EHLO ka.mail.enyo.de"
+Received: from d-paulus.de ([37.221.197.252]:60690 "EHLO d-paulus.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751337Ab3IPRZY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Sep 2013 13:25:24 -0400
-In-Reply-To: <5235E77F.1050807@openvpn.net> (James Yonan's message of "Sun, 15
-	Sep 2013 10:59:43 -0600")
+	id S1750753Ab3IPSoC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 Sep 2013 14:44:02 -0400
+Content-Disposition: inline
+In-Reply-To: <65abe254e199230984fd6a15dec39a76.squirrel@faumail.uni-erlangen.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* James Yonan:
+Hi,
 
-> noinline unsigned long __crypto_mem_not_equal(const void *a, const
-> void *b, size_t size);
->
-> static inline int crypto_mem_not_equal(const void *a, const void *b,
-> size_t size) {
-> 	return __crypto_mem_not_equal(a, b, size) != 0UL ? 1 : 0;
-> }
->
-> This hides the fact that we are only interested in a boolean result
-> from the compiler when it's compiling crypto_mem_not_equal.c, but also
-> ensures type safety when users test the return value.  It's also
-> likely to have little or no performance impact.
+On Mon, Sep 16, 2013 at 12:58:40PM +0200, dominik.d.paulus@studium.uni-erlangen.de wrote:
+> We are currently trying to add encryption support to the usbip kernel
+> driver. Unfortunately, there is almost no documentation for the kernel
+> crypto API. So far, we couldn't figure out how to use the GCM encryption
+> mode in the kernel. There seems to be infrastructure for IV generation
+> in place (e.g. seqiv.c, the geniv stuff and the RFC 4106 implementation),
+> but no code directly using it.
+> 
+> What's the recommended way to use the IV generators with a "high-level"
+> API?
 
-Yes, that looks good to me.
+Sorry, that mail probably got a bit too short. To explain our problem a bit
+more: We are currently using a 64-bit counter to generate IVs. As the
+keys are randomly generated for each session and thus never reused,
+that's probably a not too bad idea (if it is, please tell us why ;)),
+assuming this counter is never going to overflow. We pass the IVs
+directly to aead_request_set_crypt for each message. This currently
+works quite fine.
 
-(I haven't checked the other parts of your patch, though, especially
-those where you adjust all callers.)
+However, we would expect that IV generation is at least partially handled
+by the crypto API. As I said, there seems to be infrastructure for that,
+that abstracts the sequence number quite nicely. The seqiv generator
+seems to provide a high-level interface to the AEAD crypto, including an 
+abstraction for the sequence number generation. However, due to the lack
+of documentation and/or reference code using the API, we couldn't find
+out how to use it yet.
+
+Any help on this would be appreciated. If we feel competent enough to do 
+so after finishing this project, we would also volunteer to extend the
+introduction in Documentation/crypto/api-intro.txt a bit.
+
+Regards,
+        Tobias Polzer and Dominik Paulus
