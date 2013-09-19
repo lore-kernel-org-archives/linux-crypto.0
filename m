@@ -1,114 +1,182 @@
-From: Marcelo Cerri <mhcerri@linux.vnet.ibm.com>
-Subject: Re: crypto: GCM API usage
-Date: Thu, 19 Sep 2013 17:33:16 -0300
-Message-ID: <20130919203316.GA31494@oc8526070481.ibm.com>
-References: <65abe254e199230984fd6a15dec39a76.squirrel@faumail.uni-erlangen.de>
- <20130916183411.GC3380@d-paulus.de>
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: [PATCH 00/51] DMA mask changes
+Date: Thu, 19 Sep 2013 22:22:35 +0100
+Message-ID: <20130919212235.GD12758@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, tobias.polzer@fau.de,
-	linux-kernel@i4.cs.fau.de
-To: Dominik Paulus <dominik@d-paulus.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp01.br.ibm.com ([32.104.18.85]:51315 "EHLO
-	e24smtp01.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752103Ab3ISUd2 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 19 Sep 2013 16:33:28 -0400
-Received: from /spool/local
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <mhcerri@linux.vnet.ibm.com>;
-	Thu, 19 Sep 2013 17:33:25 -0300
-Received: from d24relay03.br.ibm.com (d24relay03.br.ibm.com [9.13.184.25])
-	by d24dlp02.br.ibm.com (Postfix) with ESMTP id 0BF411DC0063
-	for <linux-crypto@vger.kernel.org>; Thu, 19 Sep 2013 16:33:22 -0400 (EDT)
-Received: from d24av04.br.ibm.com (d24av04.br.ibm.com [9.8.31.97])
-	by d24relay03.br.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id r8JKVm8f50266344
-	for <linux-crypto@vger.kernel.org>; Thu, 19 Sep 2013 17:31:48 -0300
-Received: from d24av04.br.ibm.com (localhost [127.0.0.1])
-	by d24av04.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id r8JKXKm8005797
-	for <linux-crypto@vger.kernel.org>; Thu, 19 Sep 2013 17:33:21 -0300
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+To: alsa-devel@alsa-project.org, b43-dev@lists.infradead.org,
+ devel@driverdev.osuosl.org, devicetree@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, e1000-devel@lists.sourceforge.net,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mmc@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-omap@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ Solarflare linux maintainers <linux-net-drivers@solarflare.com>,
+ uclinux-dist-devel@blackfin.uclinux.org
+Return-path: <alsa-devel-bounces@alsa-project.org>
 Content-Disposition: inline
-In-Reply-To: <20130916183411.GC3380@d-paulus.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
+ <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
+List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
+List-Post: <mailto:alsa-devel@alsa-project.org>
+List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
+List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
+ <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
+Errors-To: alsa-devel-bounces@alsa-project.org
+Sender: alsa-devel-bounces@alsa-project.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 16, 2013 at 08:34:11PM +0200, Dominik Paulus wrote:
-> Hi,
-> 
-> On Mon, Sep 16, 2013 at 12:58:40PM +0200, dominik.d.paulus@studium.uni-erlangen.de wrote:
-> > We are currently trying to add encryption support to the usbip kernel
-> > driver. Unfortunately, there is almost no documentation for the kernel
-> > crypto API. So far, we couldn't figure out how to use the GCM encryption
-> > mode in the kernel. There seems to be infrastructure for IV generation
-> > in place (e.g. seqiv.c, the geniv stuff and the RFC 4106 implementation),
-> > but no code directly using it.
-> > 
-> > What's the recommended way to use the IV generators with a "high-level"
-> > API?
-> 
-> Sorry, that mail probably got a bit too short. To explain our problem a bit
-> more: We are currently using a 64-bit counter to generate IVs. As the
-> keys are randomly generated for each session and thus never reused,
-> that's probably a not too bad idea (if it is, please tell us why ;)),
-> assuming this counter is never going to overflow. We pass the IVs
-> directly to aead_request_set_crypt for each message. This currently
-> works quite fine.
+This started out as a request to look at the DMA mask situation, and how
+to solve the issues which we have on ARM - notably how the DMA mask
+should be setup.
 
-It's usual the use of random IVs but I don't think that any known
-pattern (as a counter) in the IV generation should cause any reduction
-in the algorithm strength (and if it does, it's probably a weakness in
-the algorithm itself). The only thing that should be avoided for sure is
-the reuse of the same IV.
+However, I started off reviewing how the dma_mask and coherent_dma_mask
+was being used, and what I found was rather messy, and in some cases
+rather buggy.  I tried to get some of the bug fixes in before the last
+merge window, but it seems that the maintainers preferred to have the
+full solution rather than a simple -rc suitable bug fix.
 
-> 
-> However, we would expect that IV generation is at least partially handled
-> by the crypto API. As I said, there seems to be infrastructure for that,
-> that abstracts the sequence number quite nicely. The seqiv generator
-> seems to provide a high-level interface to the AEAD crypto, including an 
-> abstraction for the sequence number generation. However, due to the lack
-> of documentation and/or reference code using the API, we couldn't find
-> out how to use it yet.
+So, this is an attempt to clean things up.
 
-I haven't used the IV generation facility of the Crypto API, but it
-seems to be very straightforward although there's no documentation
-about that.
+The first point here is that drivers performing DMA should be calling
+dma_set_mask()/dma_set_coherent_mask() in their probe function to verify
+that DMA can be performed.  Lots of ARM drivers omit this step; please
+refer to the DMA API documentation on this subject.
 
-You should use aead_givcrypt_set_callback(), aead_givcrypt_set_assoc()
-and aead_givcrypt_set_crypt() as you would use the regular aead
-functions, that includes that you have to provide a buffer with length
-equals to the algorithm block size for the IV. And then you should call
-aead_givcrypt_set_giv() passing a counter and another IV buffer.
+What this means is that the DMA mask provided by bus code is a default
+value - nothing more.  It doesn't have to accurately reflect what the
+device is actually capable of.  Apart from the storage for dev->dma_mask
+being initialised for any device which is DMA capable, there is no other
+initialisation which is strictly necessary at device creation time.
 
-The difference between the two IV buffers that you have to provide to
-aead_givcrypt_set_crypt() and aead_givcrypt_set_giv() is that the first
-one will be updated by the algorithm during the encryption of each block
-and the second one will contain the generated IV that you will have to
-use to decrypt data.
+Now, these cleanups address two major areas:
+1. The setting of DMA masks, particularly when both the coherent and
+   streaming DMA masks are set together.
 
-The last step is to call crypto_aead_givencrypt() as you would call
-crypto_aead_encrypt().
+2. The initialisation of DMA masks by drivers - this seems to be becoming
+   a popular habbit, one which may not be entirely the right solution.
+   Rather than having this scattered throughout the tree, I've pulled
+   that into a central location (and called it coercing the DMA mask -
+   because it really is about forcing the DMA mask to be that value.)
 
-Under the cover the Crypto API will generate a random salt in the first
-use of each request. This salt will be xor'd with the given counter to
-create the new IV. That has an advantage over a simple count, that
-usually will start with the same value every time the system is
-rebooted.
+3. Finally, addressing the long held misbelief that DMA masks somehow
+   correspond with physical addresses.  We already have established
+   long ago that dma_addr_t values returned from the DMA API are the
+   values which you program into the DMA controller, and so are the
+   bus addresses.  It is _only_ sane that DMA masks are also bus
+   related too, and not related to physical address spaces.
 
-> 
-> Any help on this would be appreciated. If we feel competent enough to do 
-> so after finishing this project, we would also volunteer to extend the
-> introduction in Documentation/crypto/api-intro.txt a bit.
-> 
+(3) is a very important point for LPAE systems, which may still have
+less than 4GB of memory, but this memory is all located above the 4GB
+physical boundary.  This means with the current model, any device
+using a 32-bit DMA mask fails - even though the DMA controller is
+still only a 32-bit DMA controller but the 32-bit bus addresses map
+to system memory.  To put it another way, the bus addresses have a
+4GB physical offset on them.
 
-That is probably a very good idea! I also want to improve the
-documentation as soon I have some time to do it :)
+This email is only being sent to the mailing lists in question, not to
+anyone personally.  The list of individuals is far to great to do that.
+I'm hoping no mailing lists reject the patches based on the number of
+recipients.
 
-> Regards,
->         Tobias Polzer and Dominik Paulus
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+Patches based on v3.12-rc1.
+
+ Documentation/DMA-API-HOWTO.txt                   |   37 +++++++++------
+ Documentation/DMA-API.txt                         |    8 +++
+ arch/arm/include/asm/dma-mapping.h                |    8 +++
+ arch/arm/mm/dma-mapping.c                         |   49 ++++++++++++++++++--
+ arch/arm/mm/init.c                                |   12 +++---
+ arch/arm/mm/mm.h                                  |    2 +
+ arch/powerpc/kernel/vio.c                         |    3 +-
+ block/blk-settings.c                              |    8 ++--
+ drivers/amba/bus.c                                |    6 +--
+ drivers/ata/pata_ixp4xx_cf.c                      |    5 ++-
+ drivers/ata/pata_octeon_cf.c                      |    5 +-
+ drivers/block/nvme-core.c                         |   10 ++---
+ drivers/crypto/ixp4xx_crypto.c                    |   48 ++++++++++----------
+ drivers/dma/amba-pl08x.c                          |    5 ++
+ drivers/dma/dw/platform.c                         |    8 +--
+ drivers/dma/edma.c                                |    6 +--
+ drivers/dma/pl330.c                               |    4 ++
+ drivers/firmware/dcdbas.c                         |   23 +++++-----
+ drivers/firmware/google/gsmi.c                    |   13 +++--
+ drivers/gpu/drm/exynos/exynos_drm_drv.c           |    6 ++-
+ drivers/gpu/drm/omapdrm/omap_dmm_tiler.c          |    5 +-
+ drivers/media/platform/omap3isp/isp.c             |    6 +-
+ drivers/media/platform/omap3isp/isp.h             |    3 -
+ drivers/mmc/card/queue.c                          |    3 +-
+ drivers/mmc/host/sdhci-acpi.c                     |    5 +-
+ drivers/net/ethernet/broadcom/b44.c               |    3 +-
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c  |    8 +---
+ drivers/net/ethernet/brocade/bna/bnad.c           |   13 ++----
+ drivers/net/ethernet/emulex/benet/be_main.c       |   12 +----
+ drivers/net/ethernet/intel/e1000/e1000_main.c     |    9 +---
+ drivers/net/ethernet/intel/e1000e/netdev.c        |   18 +++-----
+ drivers/net/ethernet/intel/igb/igb_main.c         |   18 +++-----
+ drivers/net/ethernet/intel/igbvf/netdev.c         |   18 +++-----
+ drivers/net/ethernet/intel/ixgb/ixgb_main.c       |   16 ++-----
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c     |   15 ++----
+ drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c |   15 ++----
+ drivers/net/ethernet/nxp/lpc_eth.c                |    6 ++-
+ drivers/net/ethernet/octeon/octeon_mgmt.c         |    5 +-
+ drivers/net/ethernet/sfc/efx.c                    |   12 +-----
+ drivers/net/wireless/b43/dma.c                    |    9 +---
+ drivers/net/wireless/b43legacy/dma.c              |    9 +---
+ drivers/of/platform.c                             |    3 -
+ drivers/parport/parport_pc.c                      |    8 +++-
+ drivers/scsi/scsi_lib.c                           |    2 +-
+ drivers/staging/dwc2/platform.c                   |    5 +-
+ drivers/staging/et131x/et131x.c                   |   17 +------
+ drivers/staging/imx-drm/imx-drm-core.c            |    8 +++-
+ drivers/staging/imx-drm/ipuv3-crtc.c              |    4 +-
+ drivers/staging/media/dt3155v4l/dt3155v4l.c       |    5 +--
+ drivers/usb/chipidea/ci_hdrc_imx.c                |    7 +--
+ drivers/usb/dwc3/dwc3-exynos.c                    |    7 +--
+ drivers/usb/gadget/lpc32xx_udc.c                  |    4 +-
+ drivers/usb/host/bcma-hcd.c                       |    3 +-
+ drivers/usb/host/ehci-atmel.c                     |    7 +--
+ drivers/usb/host/ehci-octeon.c                    |    4 +-
+ drivers/usb/host/ehci-omap.c                      |   10 ++--
+ drivers/usb/host/ehci-orion.c                     |    7 +--
+ drivers/usb/host/ehci-platform.c                  |   10 ++--
+ drivers/usb/host/ehci-s5p.c                       |    7 +--
+ drivers/usb/host/ehci-spear.c                     |    7 +--
+ drivers/usb/host/ehci-tegra.c                     |    7 +--
+ drivers/usb/host/ohci-at91.c                      |    9 ++--
+ drivers/usb/host/ohci-exynos.c                    |    7 +--
+ drivers/usb/host/ohci-nxp.c                       |    5 +-
+ drivers/usb/host/ohci-octeon.c                    |    5 +-
+ drivers/usb/host/ohci-omap3.c                     |   10 ++--
+ drivers/usb/host/ohci-pxa27x.c                    |    8 ++--
+ drivers/usb/host/ohci-sa1111.c                    |    6 +++
+ drivers/usb/host/ohci-spear.c                     |    7 +--
+ drivers/usb/host/ssb-hcd.c                        |    3 +-
+ drivers/usb/host/uhci-platform.c                  |    7 +--
+ drivers/usb/musb/am35x.c                          |   50 +++++++--------------
+ drivers/usb/musb/da8xx.c                          |   49 +++++++-------------
+ drivers/usb/musb/davinci.c                        |   48 +++++++-------------
+ drivers/usb/musb/tusb6010.c                       |   49 +++++++-------------
+ drivers/video/amba-clcd.c                         |    5 ++
+ include/linux/amba/bus.h                          |    2 -
+ include/linux/dma-mapping.h                       |   31 +++++++++++++
+ sound/arm/pxa2xx-pcm.c                            |    9 +---
+ sound/soc/atmel/atmel-pcm.c                       |   11 ++---
+ sound/soc/blackfin/bf5xx-ac97-pcm.c               |   11 ++---
+ sound/soc/blackfin/bf5xx-i2s-pcm.c                |   10 ++---
+ sound/soc/davinci/davinci-pcm.c                   |    9 +---
+ sound/soc/fsl/fsl_dma.c                           |    9 +---
+ sound/soc/fsl/mpc5200_dma.c                       |   10 ++---
+ sound/soc/jz4740/jz4740-pcm.c                     |   12 ++---
+ sound/soc/kirkwood/kirkwood-dma.c                 |    9 +---
+ sound/soc/nuc900/nuc900-pcm.c                     |    9 ++--
+ sound/soc/omap/omap-pcm.c                         |   11 ++---
+ sound/soc/pxa/pxa2xx-pcm.c                        |   11 ++---
+ sound/soc/s6000/s6000-pcm.c                       |    9 +---
+ sound/soc/samsung/dma.c                           |   11 ++---
+ sound/soc/samsung/idma.c                          |   11 ++---
+ 93 files changed, 493 insertions(+), 566 deletions(-)
