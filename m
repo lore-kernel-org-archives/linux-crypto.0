@@ -1,45 +1,101 @@
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH 0/4] ARM: NEON based fast(er) AES in CBC/CTR/XTS modes
-Date: Fri, 20 Sep 2013 15:12:10 -0400 (EDT)
-Message-ID: <alpine.LFD.2.03.1309201501010.312@syhkavp.arg>
-References: <1379702811-8025-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+Subject: Re: [PATCH 12/51] DMA-API: net: intel/e1000: replace
+ dma_set_mask()+dma_set_coherent_mask() with new helper
+Date: Fri, 20 Sep 2013 12:45:55 -0700
+Message-ID: <1379706355.1972.8.camel@jtkirshe-mobl>
+References: <20130919212235.GD12758@n2100.arm.linux.org.uk>
+ <E1VMluG-0007gV-6y@rmk-PC.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qc0-f176.google.com ([209.85.216.176]:38789 "EHLO
-	mail-qc0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753239Ab3ITTMN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Sep 2013 15:12:13 -0400
-Received: by mail-qc0-f176.google.com with SMTP id t7so527041qcv.7
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Sep 2013 12:12:12 -0700 (PDT)
-In-Reply-To: <1379702811-8025-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
-
-On Fri, 20 Sep 2013, Ard Biesheuvel wrote:
-
-> Note to reviewers:
-> Reviewing the file aesbs-core.S may be a bit overwhelming, so if there are any
-> questions or concerns, please refer to the link below. This is the original Perl
-> script that gets called by OpenSSL's build system during their build to generate
-> the .S file on the fly. [In the case of OpenSSL, this is used in some cases to
-> target different assemblers or ABIs]. This arrangement is not suitable (or 
-> required) for the kernel, so I have taken the generated .S file instead.
-> 
-> http://git.openssl.org/gitweb/?p=openssl.git;f=crypto/aes/asm/bsaes-armv7.pl;a=blob
-
-You should probably capture this reference in the code, or at least in 
-the commit log for the corresponding patch.
-
-> Note to integrators:
-> While this implementation is significantly faster, especially in CTR mode, it is
-> unclear whether the net impact on power efficiency is favorable or not, so
-> please refrain from making any assumptions to that effect.
-
-That definitively should be mentioned in the commit log for patch #4.
+Content-Type: multipart/mixed; boundary="===============7923185765950412603=="
+Cc: alsa-devel@alsa-project.org, linux-doc@vger.kernel.org,
+ linux-mmc@vger.kernel.org,
+ Peter P Waskiewicz Jr <peter.p.waskiewicz.jr@intel.com>,
+ linux-fbdev@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-ide@vger.kernel.org, Carolyn Wyborny <carolyn.wyborny@intel.com>,
+ devel@driverdev.osuosl.org, linux-samsung-soc@vger.kernel.org,
+ linux-scsi@vger.kernel.org, e1000-devel@lists.sourceforge.net,
+ Don Skidmore <donald.c.skidmore@intel.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>, b43-dev@lists.infradead.org,
+ linux-media@vger.kernel.org, Alex Duyck <alexander.h.duyck@intel.com>,
+ devicetree@vger.kernel.org, Greg Rose <gregory.v.rose@intel.com>,
+ dri-devel@lists.freedesktop.org, linux-tegra@vger.kernel.org,
+ linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Solarflare linux maintainers <linux-net-drivers@solarflare.com>,
+ netdev@vger.kernel.org, linux-usb
+To: Russell King <rmk+kernel@arm.linux.org.uk>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <E1VMluG-0007gV-6y@rmk-PC.arm.linux.org.uk>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
 
-Nicolas
+--===============7923185765950412603==
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-IwGSEViKnlGxN4Ur4LPe"
+
+
+--=-IwGSEViKnlGxN4Ur4LPe
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 2013-09-19 at 22:37 +0100, Russell King wrote:
+> Replace the following sequence:
+>=20
+>         dma_set_mask(dev, mask);
+>         dma_set_coherent_mask(dev, mask);
+>=20
+> with a call to the new helper dma_set_mask_and_coherent().
+>=20
+> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+> ---
+>  drivers/net/ethernet/intel/e1000/e1000_main.c |    9 ++-------
+>  1 files changed, 2 insertions(+), 7 deletions(-)
+
+Acked-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+
+--=-IwGSEViKnlGxN4Ur4LPe
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iQIcBAABCgAGBQJSPKXzAAoJEOVv75VaS+3OXRMP/0inX8RE/LpymWBicNP8WD6j
+xJGDMRHzZ+Frac/Q0qSWiCNSvfBn/WZ9glR0uxnIz51/TjfFzITWZBzcsgeVJlAv
+BAQt/pIzXrw1Qwwcnm3ZGBJ6XhGFQ8rI+6Fv/1nQ7peb1PoVjpM+pkGszhgOD7AZ
+KU0EqTKIIGnRKxdVZwraXXEIrrwCwEnEJnHylot3scVYOEww+8UkQzp1ItDHeXuD
+FQurkbrCawaVB7bctDl45kmo66I+Pn6SLo22LFDI7m8Q92KePKR0pNHv4dLuRrh2
+5j6S2j1jeZca3DT0dFzyV1jgBjOzWmHfA38yHpk0FesH+3DAlTgkTxLc2PpARAww
+cKqu5d/i1rk0INt61H6tp3qYWH7HQ563PW9aIxX82PsRdXtedvTUjtxAZ/kIWAUQ
+uFX5Q0Y0u9XlfC8spRAcUvi9AxKATY/mDXcd1oBFO2yLYWcfo/2R4THAqz/yjhea
+KQQVh9gE2Uc06/fWbh2W+uGdluMNJJSEKTbkNxea2w9+MEGLV9+Cjdfb9x/w4oMf
+vT5rD9lIZh1k9xZGjB++HrOd6Gy6l9j+wYQqIiC0Ut9P5gOjrd2gyhg3xzvz894/
+eYO6FFFLJeQijLVHEU5nUVg+0IQQQaUc0Cq6WGr/USpjapQUq0xuQLLRCaph1uPM
+crlJOl4YrRaaUMl8RxDR
+=UEsD
+-----END PGP SIGNATURE-----
+
+--=-IwGSEViKnlGxN4Ur4LPe--
+
+
+--===============7923185765950412603==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Linuxppc-dev mailing list
+Linuxppc-dev@lists.ozlabs.org
+https://lists.ozlabs.org/listinfo/linuxppc-dev
+--===============7923185765950412603==--
