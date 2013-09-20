@@ -1,66 +1,103 @@
-From: Russell King <rmk+kernel@arm.linux.org.uk>
-Subject: [PATCH 33/51] DMA-API: net: nxp/lpc_eth: use
- dma_coerce_mask_and_coherent()
-Date: Thu, 19 Sep 2013 22:58:03 +0100
-Message-ID: <E1VMmEd-0007jF-19@rmk-PC.arm.linux.org.uk>
-References: <20130919212235.GD12758@n2100.arm.linux.org.uk>
+From: Yashpal Dutta <yashpal.dutta@freescale.com>
+Subject: [PATCH v3] crypto: caam - map src buffer before access
+Date: Fri, 20 Sep 2013 23:24:07 +0530
+Message-ID: <1379699647-10680-1-git-send-email-yashpal.dutta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-To: alsa-devel@alsa-project.org, b43-dev@lists.infradead.org,
- devel@driverdev.osuosl.org, devicetree@vger.kernel.org,
- dri-devel@lists.freedesktop.org, e1000-devel@lists.sourceforge.net,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mmc@vger.kernel.org, linux-nvme@lists.infradead.org,
- linux-omap@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- Solarflare linux maintainers <linux-net-drivers@solarflare.com>,
- uclinux-dist-devel@blackfin.uclinux.org
-Return-path: <alsa-devel-bounces@alsa-project.org>
-In-Reply-To: <20130919212235.GD12758@n2100.arm.linux.org.uk>
-List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
-List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
-List-Post: <mailto:alsa-devel@alsa-project.org>
-List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
-List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
-Errors-To: alsa-devel-bounces@alsa-project.org
-Sender: alsa-devel-bounces@alsa-project.org
+Content-Type: text/plain
+Cc: Yashpal Dutta <yashpal.dutta@freescale.com>
+To: <linux-crypto@vger.kernel.org>, <stable@vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The code sequence:
-	pldat->pdev->dev.coherent_dma_mask = 0xFFFFFFFF;
-	pldat->pdev->dev.dma_mask = &pldat->pdev->dev.coherent_dma_mask;
-bypasses the architectures check on the DMA mask.  It can be replaced
-with dma_coerce_mask_and_coherent(), avoiding the direct initialization
-of this mask.
+KMap the buffers before copying trailing bytes during hmac into a session
+temporary buffer. This is required if pinned buffer from user-space is send
+during hmac and is safe even if hmac request is generated from within kernel.
 
-Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
+Reviewed-by: Vakul Garg <vakul@freescale.com>
+Reviewed-by: Horia Geanta <horia.geanta@freescale.com> 
 ---
- drivers/net/ethernet/nxp/lpc_eth.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+Patch covers review comments on first version of patch.
+./scripts/checkpatch.pl --strict 0001-crypto-caam-map-src-buffer-before-access.patch 
 
-diff --git a/drivers/net/ethernet/nxp/lpc_eth.c b/drivers/net/ethernet/nxp/lpc_eth.c
-index a061b93..ba3ca18 100644
---- a/drivers/net/ethernet/nxp/lpc_eth.c
-+++ b/drivers/net/ethernet/nxp/lpc_eth.c
-@@ -1399,8 +1399,10 @@ static int lpc_eth_drv_probe(struct platform_device *pdev)
- 	}
+total: 0 errors, 0 warnings, 0 checks, 62 lines checked
+
+The patch fixes driver crashes when a pinned buffer from user-space is sent to CAAM driver
+for HMAC processing.
+
+ drivers/crypto/caam/sg_sw_sec4.h |   34 +++++++++++++++++++++++++---------
+ 1 file changed, 25 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
+index e0037c8..6d21a12 100644
+--- a/drivers/crypto/caam/sg_sw_sec4.h
++++ b/drivers/crypto/caam/sg_sw_sec4.h
+@@ -117,6 +117,21 @@ static int dma_unmap_sg_chained(struct device *dev, struct scatterlist *sg,
+ 	return nents;
+ }
  
- 	if (pldat->dma_buff_base_v == 0) {
--		pldat->pdev->dev.coherent_dma_mask = 0xFFFFFFFF;
--		pldat->pdev->dev.dma_mask = &pldat->pdev->dev.coherent_dma_mask;
-+		ret = dma_coerce_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-+		if (ret)
-+			goto err_out_free_irq;
++/* Map SG page in kernel virtual address space and copy */
++static inline void sg_map_copy(u8 *dest, struct scatterlist *sg,
++			       int len, int offset)
++{
++	u8 *mapped_addr;
 +
- 		pldat->dma_buff_size = PAGE_ALIGN(pldat->dma_buff_size);
++	/*
++	 * Page here can be user-space pinned using get_user_pages
++	 * Same must be kmapped before use and kunmapped subsequently
++	 */
++	mapped_addr = kmap_atomic(sg_page(sg));
++	memcpy(dest, mapped_addr + offset, len);
++	kunmap_atomic(mapped_addr);
++}
++
+ /* Copy from len bytes of sg to dest, starting from beginning */
+ static inline void sg_copy(u8 *dest, struct scatterlist *sg, unsigned int len)
+ {
+@@ -124,15 +139,15 @@ static inline void sg_copy(u8 *dest, struct scatterlist *sg, unsigned int len)
+ 	int cpy_index = 0, next_cpy_index = current_sg->length;
  
- 		/* Allocate a chunk of memory for the DMA ethernet buffers
+ 	while (next_cpy_index < len) {
+-		memcpy(dest + cpy_index, (u8 *) sg_virt(current_sg),
+-		       current_sg->length);
++		sg_map_copy(dest + cpy_index, current_sg, current_sg->length,
++			    current_sg->offset);
+ 		current_sg = scatterwalk_sg_next(current_sg);
+ 		cpy_index = next_cpy_index;
+ 		next_cpy_index += current_sg->length;
+ 	}
+ 	if (cpy_index < len)
+-		memcpy(dest + cpy_index, (u8 *) sg_virt(current_sg),
+-		       len - cpy_index);
++		sg_map_copy(dest + cpy_index, current_sg, len-cpy_index,
++			    current_sg->offset);
+ }
+ 
+ /* Copy sg data, from to_skip to end, to dest */
+@@ -140,7 +155,7 @@ static inline void sg_copy_part(u8 *dest, struct scatterlist *sg,
+ 				      int to_skip, unsigned int end)
+ {
+ 	struct scatterlist *current_sg = sg;
+-	int sg_index, cpy_index;
++	int sg_index, cpy_index, offset;
+ 
+ 	sg_index = current_sg->length;
+ 	while (sg_index <= to_skip) {
+@@ -148,9 +163,10 @@ static inline void sg_copy_part(u8 *dest, struct scatterlist *sg,
+ 		sg_index += current_sg->length;
+ 	}
+ 	cpy_index = sg_index - to_skip;
+-	memcpy(dest, (u8 *) sg_virt(current_sg) +
+-	       current_sg->length - cpy_index, cpy_index);
+-	current_sg = scatterwalk_sg_next(current_sg);
+-	if (end - sg_index)
++	offset = current_sg->offset + current_sg->length - cpy_index;
++	sg_map_copy(dest, current_sg, cpy_index, offset);
++	if (end - sg_index) {
++		current_sg = scatterwalk_sg_next(current_sg);
+ 		sg_copy(dest + cpy_index, current_sg, end - sg_index);
++	}
+ }
 -- 
-1.7.4.4
+1.7.10.4
