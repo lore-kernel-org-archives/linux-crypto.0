@@ -1,106 +1,48 @@
-From: Yashpal Dutta <yashpal.dutta@freescale.com>
-Subject: [PATCH v4] crypto: caam - map src buffer before access
-Date: Sat, 21 Sep 2013 14:26:35 +0530
-Message-ID: <1379753795-14949-1-git-send-email-yashpal.dutta@freescale.com>
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: Re: [PATCH 24/51] DMA-API: dma: pl330:
+	add	dma_set_mask_and_coherent() call
+Date: Sat, 21 Sep 2013 21:00:00 +0100
+Message-ID: <20130921200000.GS25647@n2100.arm.linux.org.uk>
+References: <20130919212235.GD12758@n2100.arm.linux.org.uk>
+ <E1VMm5t-0007i5-V7@rmk-PC.arm.linux.org.uk>
+ <201309201926.29084.heiko@sntech.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Yashpal Dutta <yashpal.dutta@freescale.com>
-To: <linux-crypto@vger.kernel.org>, <stable@vger.kernel.org>
-Return-path: <stable-owner@vger.kernel.org>
-Sender: stable-owner@vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: alsa-devel@alsa-project.org, linux-doc@vger.kernel.org,
+ linux-mmc@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-ide@vger.kernel.org,
+ devel@driverdev.osuosl.org, linux-samsung-soc@vger.kernel.org,
+ linux-scsi@vger.kernel.org, e1000-devel@lists.sourceforge.net,
+ b43-dev@lists.infradead.org, linux-media@vger.kernel.org,
+ devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-tegra@vger.kernel.org, Dan Williams <dan.j.williams@intel.com>,
+ linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Solarflare linux maintainers <linux-net-drivers@solarflare.com>,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, Vinod Koul <vinod.koul@intel.com>,
+ linux-crypto@vger.kernel.org, uclinux-dist-devel@blackfin.uclinux.org,
+ linuxppc-dev@lists.ozlabs.org
+To: Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+Return-path: <alsa-devel-bounces@alsa-project.org>
+Content-Disposition: inline
+In-Reply-To: <201309201926.29084.heiko@sntech.de>
+List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
+ <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
+List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
+List-Post: <mailto:alsa-devel@alsa-project.org>
+List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
+List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
+ <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
+Errors-To: alsa-devel-bounces@alsa-project.org
+Sender: alsa-devel-bounces@alsa-project.org
 List-Id: linux-crypto.vger.kernel.org
 
-KMap the buffers before copying trailing bytes during hmac into a session
-temporary buffer. This is required if pinned buffer from user-space is send
-during hmac and is safe even if hmac request is generated from within kernel.
+On Fri, Sep 20, 2013 at 07:26:27PM +0200, Heiko St=FCbner wrote:
+> Am Donnerstag, 19. September 2013, 23:49:01 schrieb Russell King:
+> > The DMA API requires drivers to call the appropriate dma_set_mask()
+> > functions before doing any DMA mapping.  Add this required call to
+> > the AMBA PL08x driver.
+> 			^--- copy and paste error - should of course be PL330
 
-Cc:stable@vger.kernel.org
-Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
-Reviewed-by: Vakul Garg <vakul@freescale.com>
-Reviewed-by: Horia Geanta <horia.geanta@freescale.com> 
----
-Patch covers review comments on first version of patch.
-./scripts/checkpatch.pl --strict 0001-crypto-caam-map-src-buffer-before-access.patch 
-
-total: 0 errors, 0 warnings, 0 checks, 62 lines checked
-
-The patch fixes driver crashes when a pinned buffer from user-space is sent to CAAM driver
-for HMAC processing.
-
-Added Cc:stable@vger.kernel.org
-
- drivers/crypto/caam/sg_sw_sec4.h |   34 +++++++++++++++++++++++++---------
- 1 file changed, 25 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index e0037c8..6d21a12 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -117,6 +117,21 @@ static int dma_unmap_sg_chained(struct device *dev, struct scatterlist *sg,
- 	return nents;
- }
- 
-+/* Map SG page in kernel virtual address space and copy */
-+static inline void sg_map_copy(u8 *dest, struct scatterlist *sg,
-+			       int len, int offset)
-+{
-+	u8 *mapped_addr;
-+
-+	/*
-+	 * Page here can be user-space pinned using get_user_pages
-+	 * Same must be kmapped before use and kunmapped subsequently
-+	 */
-+	mapped_addr = kmap_atomic(sg_page(sg));
-+	memcpy(dest, mapped_addr + offset, len);
-+	kunmap_atomic(mapped_addr);
-+}
-+
- /* Copy from len bytes of sg to dest, starting from beginning */
- static inline void sg_copy(u8 *dest, struct scatterlist *sg, unsigned int len)
- {
-@@ -124,15 +139,15 @@ static inline void sg_copy(u8 *dest, struct scatterlist *sg, unsigned int len)
- 	int cpy_index = 0, next_cpy_index = current_sg->length;
- 
- 	while (next_cpy_index < len) {
--		memcpy(dest + cpy_index, (u8 *) sg_virt(current_sg),
--		       current_sg->length);
-+		sg_map_copy(dest + cpy_index, current_sg, current_sg->length,
-+			    current_sg->offset);
- 		current_sg = scatterwalk_sg_next(current_sg);
- 		cpy_index = next_cpy_index;
- 		next_cpy_index += current_sg->length;
- 	}
- 	if (cpy_index < len)
--		memcpy(dest + cpy_index, (u8 *) sg_virt(current_sg),
--		       len - cpy_index);
-+		sg_map_copy(dest + cpy_index, current_sg, len-cpy_index,
-+			    current_sg->offset);
- }
- 
- /* Copy sg data, from to_skip to end, to dest */
-@@ -140,7 +155,7 @@ static inline void sg_copy_part(u8 *dest, struct scatterlist *sg,
- 				      int to_skip, unsigned int end)
- {
- 	struct scatterlist *current_sg = sg;
--	int sg_index, cpy_index;
-+	int sg_index, cpy_index, offset;
- 
- 	sg_index = current_sg->length;
- 	while (sg_index <= to_skip) {
-@@ -148,9 +163,10 @@ static inline void sg_copy_part(u8 *dest, struct scatterlist *sg,
- 		sg_index += current_sg->length;
- 	}
- 	cpy_index = sg_index - to_skip;
--	memcpy(dest, (u8 *) sg_virt(current_sg) +
--	       current_sg->length - cpy_index, cpy_index);
--	current_sg = scatterwalk_sg_next(current_sg);
--	if (end - sg_index)
-+	offset = current_sg->offset + current_sg->length - cpy_index;
-+	sg_map_copy(dest, current_sg, cpy_index, offset);
-+	if (end - sg_index) {
-+		current_sg = scatterwalk_sg_next(current_sg);
- 		sg_copy(dest + cpy_index, current_sg, end - sg_index);
-+	}
- }
--- 
-1.7.10.4
+Fixed, thanks.
