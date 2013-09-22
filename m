@@ -1,48 +1,50 @@
-From: Grant Likely <grant.likely@linaro.org>
-Subject: Re: [PATCH 22/51] DMA-API: amba: get rid of separate dma_mask
-Date: Sun, 22 Sep 2013 07:18:28 -0500
-Message-ID: <20130922121828.58F02C42373@trevor.secretlab.ca>
-References: <20130919212235.GD12758@n2100.arm.linux.org.uk>
- <E1VMm3x-0007hp-Lv@rmk-PC.arm.linux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Rob Herring <rob.herring@calxeda.com>
-To: Russell King <rmk+kernel@arm.linux.org.uk>, alsa-devel@alsa-project.org,
- b43-dev@lists.infradead.org, devel@driverdev.osuosl.org,
- devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org,
- e1000-devel@lists.sourceforge.net, linux-arm-kernel@lists.infradead.org,
- linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-fbdev@vger.kernel.org, linux-ide@vger.kernel.org,
- linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-omap@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-samsung-soc@vger.kernel.org,
- linux-scsi@vger.kernel.org, linux-tegra@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org,
- Solarflare linux maintainers <linux-net-drivers@solarflare.com>,
- uclinux-dist-devel@blackfin.uclinux.org
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <E1VMm3x-0007hp-Lv@rmk-PC.arm.linux.org.uk>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+From: Fabio Estevam <festevam@gmail.com>
+Subject: [PATCH 1/3] crypto: dcp: Use devm_ioremap_resource()
+Date: Sun, 22 Sep 2013 14:42:25 -0300
+Message-ID: <1379871747-17570-1-git-send-email-festevam@gmail.com>
+Cc: tobias.rauter@gmail.com, linux-crypto@vger.kernel.org,
+	Fabio Estevam <fabio.estevam@freescale.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ye0-f179.google.com ([209.85.213.179]:55485 "EHLO
+	mail-ye0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752255Ab3IVRmg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 22 Sep 2013 13:42:36 -0400
+Received: by mail-ye0-f179.google.com with SMTP id r6so906102yen.38
+        for <linux-crypto@vger.kernel.org>; Sun, 22 Sep 2013 10:42:35 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 19 Sep 2013 22:47:01 +0100, Russell King <rmk+kernel@arm.linux.org.uk> wrote:
-> AMBA Primecell devices always treat streaming and coherent DMA exactly
-> the same, so there's no point in having the masks separated.
-> 
-> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+From: Fabio Estevam <fabio.estevam@freescale.com>
 
-for the drivers/of/platform.c portion:
-Acked-by: Grant Likely <grant.likely@linaro.org>
+Using devm_ioremap_resource() can make the code simpler and smaller.
 
-g.
+When devm_ioremap_resource() is used there is no need to explicitely check the 
+error returned by platform_get_resource().
+
+Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
+---
+ drivers/crypto/dcp.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/drivers/crypto/dcp.c b/drivers/crypto/dcp.c
+index a8a7dd4..90a7cb7 100644
+--- a/drivers/crypto/dcp.c
++++ b/drivers/crypto/dcp.c
+@@ -733,12 +733,7 @@ static int dcp_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, dev);
+ 
+ 	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!r) {
+-		dev_err(&pdev->dev, "failed to get IORESOURCE_MEM\n");
+-		return -ENXIO;
+-	}
+-	dev->dcp_regs_base = devm_ioremap(&pdev->dev, r->start,
+-					  resource_size(r));
++	dev->dcp_regs_base = devm_ioremap_resource(&pdev->dev, r);
+ 
+ 	dcp_set(dev, DCP_CTRL_SFRST, DCP_REG_CTRL);
+ 	udelay(10);
+-- 
+1.8.1.2
