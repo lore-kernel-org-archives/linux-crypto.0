@@ -1,83 +1,51 @@
-From: Nicolas Ferre <nicolas.ferre@atmel.com>
-Subject: Re: [PATCH 36/51] DMA-API: usb: use dma_set_coherent_mask()
-Date: Mon, 23 Sep 2013 14:30:48 +0200
-Message-ID: <52403478.6010305@atmel.com>
-References: <20130919212235.GD12758@n2100.arm.linux.org.uk> <E1VMmHX-0007jq-Cj@rmk-PC.arm.linux.org.uk>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Asymmetric cryptography HW offloading
+Date: Mon, 23 Sep 2013 15:31:29 +0300
+Message-ID: <524034A1.70204@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Kukjin Kim <kgene.kim@samsung.com>,
-	Stephen Warren <swarren@wwwdotorg.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Felipe Balbi <balbi@ti.com>,
-	Alan Stern <stern@rowland.harvard.edu>
-To: Russell King <rmk+kernel@arm.linux.org.uk>,
-	<alsa-devel@alsa-project.org>, <b43-dev@lists.infradead.org>,
-	<devel@driverdev.osuosl.org>, <devicetree@vger.kernel.org>,
-	<dri-devel@lists.freedesktop.org>,
-	<e1000-devel@lists.sourceforge.net>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-crypto@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-fbdev@vger.kernel.org>, <linux-ide@vger.kernel.org>,
-	<linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-	<linux-nvme@lists.infradead.org>, <linux-omap@vger.kernel.org>,
-	<linuxppc-dev@lists.ozlabs.org>,
-	<linux-samsung-soc@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-	<linux-tegra@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-	Solarflare linux maintainers <linux-net-drivers@solarflare.com>,
-	<uclinux-dist-devel@blackfin.uclinux.org>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: Herbert Xu <herbert@gondor.hengli.com.au>,
+	David Howells <dhowells@redhat.com>,
+	James Morris - <james.l.morris@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eusmtp01.atmel.com ([212.144.249.242]:11678 "EHLO
-	eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753550Ab3IWMau (ORCPT
+Received: from mail-db8lp0185.outbound.messaging.microsoft.com ([213.199.154.185]:53013
+	"EHLO db8outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752988Ab3IWMcz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Sep 2013 08:30:50 -0400
-In-Reply-To: <E1VMmHX-0007jq-Cj@rmk-PC.arm.linux.org.uk>
+	Mon, 23 Sep 2013 08:32:55 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 20/09/2013 00:01, Russell King :
-> The correct way for a driver to specify the coherent DMA mask is
-> not to directly access the field in the struct device, but to use
-> dma_set_coherent_mask().  Only arch and bus code should access this
-> member directly.
->
-> Convert all direct write accesses to using the correct API.
->
-> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
-> ---
->   drivers/usb/chipidea/ci_hdrc_imx.c |    5 +++--
->   drivers/usb/dwc3/dwc3-exynos.c     |    5 +++--
->   drivers/usb/gadget/lpc32xx_udc.c   |    4 +++-
->   drivers/usb/host/ehci-atmel.c      |    5 +++--
+Hi,
 
-For Atmel driver:
+CAAM crypto engine (drivers/crypto/caam/*) is capable of asymmetric 
+operations, like: modular exponentiation, RSA 
+sign/verify/encrypt/decrypt, (EC)DSA sign etc.
+I would appreciate some design guidelines on how to harness these 
+capabilities, for crypto engines in general.
 
-Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
+1. In-kernel interface for asymmetric crypto
+Should crypto/asymmetric_keys/* be used, i.e. appended with modular 
+exponentiation, other asymmetric operations? I am asking since this 
+seems to be closer to key management than to asymmetric crypto...
+If so, should an algorithm priority be defined, similar to Crypto API 
+interface for symmetric algos (so that for e.g. a HW implementation of 
+RSA verify would be preferred over a SW implementation)? Currently 
+interface does not allow for two or more implementers of the same 
+algo/operation.
 
-[..]
+Currently, SW implementation of modular exponentiation - mpi_powm() - is 
+used by crypto/asymmetric_keys/rsa.c and lib/digsig.c. AFAICT, its users 
+could benefit from a HW-accelerated version.
 
-> diff --git a/drivers/usb/host/ehci-atmel.c b/drivers/usb/host/ehci-atmel.c
-> index 3b645ff..5831a88 100644
-> --- a/drivers/usb/host/ehci-atmel.c
-> +++ b/drivers/usb/host/ehci-atmel.c
-> @@ -92,8 +92,9 @@ static int ehci_atmel_drv_probe(struct platform_device *pdev)
->   	 */
->   	if (!pdev->dev.dma_mask)
->   		pdev->dev.dma_mask = &pdev->dev.coherent_dma_mask;
-> -	if (!pdev->dev.coherent_dma_mask)
-> -		pdev->dev.coherent_dma_mask = DMA_BIT_MASK(32);
-> +	retval = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32));
-> +	if (retval)
-> +		goto fail_create_hcd;
->
->   	hcd = usb_create_hcd(driver, &pdev->dev, dev_name(&pdev->dev));
->   	if (!hcd) {
-
-[..]
+2. User space interface
+Should AF_ALG be expanded to provide access to this new asymmetric cypto 
+API?
+The API would allow user space applications to offload PKC operations in HW.
+Possible use: offloading compute-intensive parts of TLS handshake, IKE.
 
 Thanks,
--- 
-Nicolas Ferre
+Horia
