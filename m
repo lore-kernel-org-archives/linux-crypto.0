@@ -1,43 +1,32 @@
-From: Kim Phillips <kim.phillips@linaro.org>
-Subject: Re: [PATCH v4] crypto: caam - map src buffer before access
-Date: Mon, 23 Sep 2013 13:51:34 -0500
-Message-ID: <20130923135134.23a7462d143b8e2a1f0cc165@linaro.org>
-References: <1379753795-14949-1-git-send-email-yashpal.dutta@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: caam - map src buffer before access
+Date: Tue, 24 Sep 2013 06:08:18 +1000
+Message-ID: <20130923200818.GA21243@gondor.apana.org.au>
+References: <1378927446-21209-1-git-send-email-yashpal.dutta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, stable@vger.kernel.org
-To: yashpal.dutta@freescale.com
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Yashpal Dutta <yashpal.dutta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oa0-f48.google.com ([209.85.219.48]:63033 "EHLO
-	mail-oa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752863Ab3IWSvg (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:35680 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753448Ab3IWUI5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Sep 2013 14:51:36 -0400
-Received: by mail-oa0-f48.google.com with SMTP id m6so959038oag.7
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Sep 2013 11:51:36 -0700 (PDT)
-In-Reply-To: <1379753795-14949-1-git-send-email-yashpal.dutta@freescale.com>
+	Mon, 23 Sep 2013 16:08:57 -0400
+Content-Disposition: inline
+In-Reply-To: <1378927446-21209-1-git-send-email-yashpal.dutta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, 21 Sep 2013 14:26:35 +0530
-Yashpal Dutta <yashpal.dutta@freescale.com> wrote:
-
+On Wed, Sep 11, 2013 at 07:24:06PM +0000, Yashpal Dutta wrote:
 > KMap the buffers before copying trailing bytes during hmac into a session
 > temporary buffer. This is required if pinned buffer from user-space is send
 > during hmac and is safe even if hmac request is generated from within kernel.
+> 
+> Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
 
-it may be "safe" but it adversely affects performance for AF_ALG users,
-no?
-
-why does ocf-linux need this, and not AF_ALG?  Is a patch to ocf-linux
-more appropriate here?
-
-> Cc:stable@vger.kernel.org
-
-fyi, this violates the following rule in
-Documentation/stable_kernel_rules.txt:
-
- - It or an equivalent fix must already exist in Linus' tree (upstream).
-
-Kim
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
