@@ -1,31 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: caam - map src buffer before access
-Date: Tue, 24 Sep 2013 06:08:18 +1000
-Message-ID: <20130923200818.GA21243@gondor.apana.org.au>
-References: <1378927446-21209-1-git-send-email-yashpal.dutta@freescale.com>
+Subject: Re: [PATCH 1/3] crypto: mv_cesa - Staticize local symbols
+Date: Tue, 24 Sep 2013 06:08:51 +1000
+Message-ID: <20130923200851.GB21243@gondor.apana.org.au>
+References: <1379072207-11179-1-git-send-email-sachin.kamat@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Yashpal Dutta <yashpal.dutta@freescale.com>
+Cc: linux-crypto@vger.kernel.org,
+	Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+To: Sachin Kamat <sachin.kamat@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:35680 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:50348 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753448Ab3IWUI5 (ORCPT
+	with ESMTP id S1753449Ab3IWUI5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Mon, 23 Sep 2013 16:08:57 -0400
 Content-Disposition: inline
-In-Reply-To: <1378927446-21209-1-git-send-email-yashpal.dutta@freescale.com>
+In-Reply-To: <1379072207-11179-1-git-send-email-sachin.kamat@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Sep 11, 2013 at 07:24:06PM +0000, Yashpal Dutta wrote:
-> KMap the buffers before copying trailing bytes during hmac into a session
-> temporary buffer. This is required if pinned buffer from user-space is send
-> during hmac and is safe even if hmac request is generated from within kernel.
+On Fri, Sep 13, 2013 at 05:06:45PM +0530, Sachin Kamat wrote:
+> Local symbols used only in this file are made static.
 > 
-> Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
+> Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
+> Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
