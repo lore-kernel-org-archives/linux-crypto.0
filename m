@@ -1,36 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/3] crypto: dcp - Use devm_ioremap_resource()
-Date: Tue, 24 Sep 2013 06:09:57 +1000
-Message-ID: <20130923200957.GG21243@gondor.apana.org.au>
-References: <1379871747-17570-1-git-send-email-festevam@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: tobias.rauter@gmail.com, linux-crypto@vger.kernel.org,
+From: Fabio Estevam <festevam@gmail.com>
+Subject: [PATCH] crypto: dcp: Check the return value from devm_ioremap_resource()
+Date: Mon, 23 Sep 2013 18:12:04 -0300
+Message-ID: <1379970724-11983-1-git-send-email-festevam@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
 	Fabio Estevam <fabio.estevam@freescale.com>
-To: Fabio Estevam <festevam@gmail.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:34665 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753584Ab3IWUJ7 (ORCPT
+Received: from mail-yh0-f54.google.com ([209.85.213.54]:49534 "EHLO
+	mail-yh0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752829Ab3IWVMU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Sep 2013 16:09:59 -0400
-Content-Disposition: inline
-In-Reply-To: <1379871747-17570-1-git-send-email-festevam@gmail.com>
+	Mon, 23 Sep 2013 17:12:20 -0400
+Received: by mail-yh0-f54.google.com with SMTP id z20so1617431yhz.41
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Sep 2013 14:12:19 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Sep 22, 2013 at 02:42:25PM -0300, Fabio Estevam wrote:
-> From: Fabio Estevam <fabio.estevam@freescale.com>
-> 
-> Using devm_ioremap_resource() can make the code simpler and smaller.
-> 
-> When devm_ioremap_resource() is used there is no need to explicitely check the 
-> error returned by platform_get_resource().
-> 
-> Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
+From: Fabio Estevam <fabio.estevam@freescale.com>
 
-All applied.  Thanks.
+devm_ioremap_resource() may fail, so better check its return value and propagate
+it in the case of error.
+
+Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
+---
+ drivers/crypto/dcp.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/crypto/dcp.c b/drivers/crypto/dcp.c
+index 7b77c84..247ab80 100644
+--- a/drivers/crypto/dcp.c
++++ b/drivers/crypto/dcp.c
+@@ -734,6 +734,8 @@ static int dcp_probe(struct platform_device *pdev)
+ 
+ 	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	dev->dcp_regs_base = devm_ioremap_resource(&pdev->dev, r);
++	if (IS_ERR(dev->dcp_regs_base))
++		return PTR_ERR(dev->dcp_regs_base);
+ 
+ 	dcp_set(dev, DCP_CTRL_SFRST, DCP_REG_CTRL);
+ 	udelay(10);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.1.2
