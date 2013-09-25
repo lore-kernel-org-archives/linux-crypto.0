@@ -1,59 +1,43 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH v4] crypto: caam - map src buffer before access
-Date: Tue, 24 Sep 2013 12:07:20 +0300
-Message-ID: <52415648.90103@freescale.com>
-References: <1379753795-14949-1-git-send-email-yashpal.dutta@freescale.com> <20130923135134.23a7462d143b8e2a1f0cc165@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <yashpal.dutta@freescale.com>, <linux-crypto@vger.kernel.org>,
-	<stable@vger.kernel.org>
-To: Kim Phillips <kim.phillips@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [216.32.181.183] ([216.32.181.183]:58179 "EHLO
-	ch1outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S1750823Ab3IXJIj (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 24 Sep 2013 05:08:39 -0400
-In-Reply-To: <20130923135134.23a7462d143b8e2a1f0cc165@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate snapshot
+Date: Wed, 25 Sep 2013 22:04:33 +0100
+Message-ID: <29408.1380143073@warthog.procyon.org.uk>
+References: <1379206621-18639-1-git-send-email-jlee@suse.com>
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
+	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>,
+	Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
+	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
+	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
+	Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
+	Herbert Xu <herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
+	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"Lee,                          Chun-Yi" <jlee-IBi9RG/b67k@public.gmane.org>
+To: "Lee, Chun-Yi" <joeyli.kernel-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <opensuse-kernel+bounces-5131-glsk-opensuse-kernel=m.gmane.org-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+In-Reply-To: <1379206621-18639-1-git-send-email-jlee-IBi9RG/b67k@public.gmane.org>
+List-Post: <mailto:opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Help: <mailto:opensuse-kernel+help-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Subscribe: <mailto:opensuse-kernel+subscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Unsubscribe: <mailto:opensuse-kernel+unsubscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Owner: <mailto:opensuse-kernel+owner-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Archive: <http://lists.opensuse.org/opensuse-kernel/>
+List-Id: linux-crypto.vger.kernel.org
 
-On 9/23/2013 9:51 PM, Kim Phillips wrote:
-> On Sat, 21 Sep 2013 14:26:35 +0530
-> Yashpal Dutta <yashpal.dutta@freescale.com> wrote:
->
->> KMap the buffers before copying trailing bytes during hmac into a session
->> temporary buffer. This is required if pinned buffer from user-space is send
->> during hmac and is safe even if hmac request is generated from within kernel.
-> it may be "safe" but it adversely affects performance for AF_ALG users,
-> no?
->
-> why does ocf-linux need this, and not AF_ALG?  Is a patch to ocf-linux
-> more appropriate here?
 
-SW hashing (crypto/ahash.c, crypto/shash.c) do the kmap/kunmap.
-Crypto engine drivers should do this too. Either by themselves or 
-(probably better) try to use existing support in crypto/scatterwalk.c
+I have pushed some keyrings patches that will likely affect this to:
 
-At the interface level, AF_ALG issues get_user_pages via 
-af_alg_make_sg(), similar to what ocf-linux does.
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-devel
 
->
->> Cc:stable@vger.kernel.org
-> fyi, this violates the following rule in
-> Documentation/stable_kernel_rules.txt:
->
->   - It or an equivalent fix must already exist in Linus' tree (upstream).
+I intend to ask James to pull these into his next branch.  If he's happy to do
+so, I can look at pulling at least your asymmetric keys patch on top of them.
 
-AFAICT, rules are more flexible, at least that's my understanding. 
-Adding a Cc:stable in the signed-off area is more convenient, since it 
-provides for automatic inclusion in -stable tree (once patch reaches 
-Linus' tree):
-  - To have the patch automatically included in the stable tree, add the tag
-      Cc: stable@vger.kernel.org
-    in the sign-off area. Once the patch is merged it will be applied to
-    the stable tree without anything else needing to be done by the author
-    or subsystem maintainer.
+It'd be helpful if you could see if you need to make any updates.
 
-Horia
+David
