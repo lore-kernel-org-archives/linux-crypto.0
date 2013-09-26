@@ -1,75 +1,68 @@
 From: joeyli <jlee@suse.com>
-Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
- snapshot
-Date: Thu, 26 Sep 2013 09:36:35 +0800
-Message-ID: <1380159395.32302.19.camel__37434.8954567269$1380159444$gmane$org@linux-s257.site>
+Subject: Re: [PATCH V4 13/15] Hibernate: introduced SNAPSHOT_SIG_HASH
+ config for select hash algorithm
+Date: Thu, 26 Sep 2013 09:43:39 +0800
+Message-ID: <1380159819.32302.24.camel__11912.4571713202$1380159833$gmane$org@linux-s257.site>
 References: <1379206621-18639-1-git-send-email-jlee@suse.com>
-	 <29408.1380143073@warthog.procyon.org.uk>
+	 <1379206621-18639-14-git-send-email-jlee@suse.com>
+	 <20130918134535.GA3748@amd.pavel.ucw.cz>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-kernel@vger.kernel.org,
 	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
 	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	opensuse-kernel@opensuse.org, "Rafael J. Wysocki" <rjw@sisk.pl>,
+	opensuse-kernel@opensuse.org, David Howells <dhowells@redhat.com>,
+	"Rafael J. Wysocki" <rjw@sisk.pl>,
 	Matthew Garrett <mjg59@srcf.ucam.org>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+	Len Brown <len.brown@intel.com>,
 	Josh Boyer <jwboyer@redhat.com>,
 	Vojtech Pavlik <vojtech@suse.cz>,
 	Matt Fleming <matt.fleming@intel.com>,
 	James Bottomley <james.bottomley@hansenpartnership.com>,
 	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
 	Rusty Russell <rusty@rustcorp.com.au>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <29408.1380143073@warthog.procyon.org.uk>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Pavel Machek <pavel@ucw.cz>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.nue.novell.com ([195.135.221.5]:47475 "EHLO
+	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751384Ab3IZBnk (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 Sep 2013 21:43:40 -0400
+In-Reply-To: <20130918134535.GA3748@amd.pavel.ucw.cz>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-=E6=96=BC =E4=B8=89=EF=BC=8C2013-09-25 =E6=96=BC 22:04 +0100=EF=BC=8CDa=
-vid Howells =E6=8F=90=E5=88=B0=EF=BC=9A
-> I have pushed some keyrings patches that will likely affect this to:
+=E6=96=BC =E4=B8=89=EF=BC=8C2013-09-18 =E6=96=BC 15:45 +0200=EF=BC=8CPa=
+vel Machek =E6=8F=90=E5=88=B0=EF=BC=9A
+> On Sun 2013-09-15 08:56:59, Lee, Chun-Yi wrote:
+> > This patch introduced SNAPSHOT_SIG_HASH config for user to select w=
+hich
+> > hash algorithm will be used during signature generation of snapshot=
+=2E
 >=20
-> 	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/lo=
-g/?h=3Dkeys-devel
+> This series is big enough already... and who is going to test it?
+
+The hash config not just for testing, it's relate to the performance an=
+d
+secure between different hash algorithms.
+
+There have person raised in LPC say he don't like SHA algorithm.
+
+> There's no need to make hash configurable. Just select one that works=
+=2E
+> =09
+> 									Pavel
 >=20
 
-Thanks for your point out, I will respin my asymmetric keys patch base
-on this tree.
-
-> I intend to ask James to pull these into his next branch.  If he's ha=
-ppy to do
-> so, I can look at pulling at least your asymmetric keys patch on top =
-of them.
->=20
-> It'd be helpful if you could see if you need to make any updates.
->=20
-> David
->=20
-
-In LPC, Alan and Vojtech raised another thinking is using symmetric key
-to protect the hash of snapshot. It's simpler then using RSA private ke=
-y
-to sign it.
-
-Even finally we use the symmetric key solution, I will still respin and
-resent the patch for add the leading zero byte:
-
-[PATCH V4 07/15] asymmetric keys: explicitly add the leading zero byte
-to encoded message
-
-I think keys-devel tree need it.
+SHA1 has good performance, and SHA512 has better security, which one yo=
+u
+like it?
 
 
 Thanks a lot!
 Joey Lee
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-securit=
-y-module" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
