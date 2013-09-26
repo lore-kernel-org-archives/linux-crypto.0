@@ -1,47 +1,439 @@
-From: Hamid Nassiby <h.nassiby@gmail.com>
-Subject: Re: IV generation in geode-aes
-Date: Thu, 26 Sep 2013 20:12:46 +0330
-Message-ID: <CAFuf8QP1MmFmE-nubFVm7rnte-AbYfGpHFRRzhriSa+BcrsBmQ@mail.gmail.com>
-References: <loom.20130919T140312-617@post.gmane.org>
+From: James Yonan <james@openvpn.net>
+Subject: Re: crypto: crypto_memneq - add equality testing of memory regions
+ w/o timing leaks
+Date: Thu, 26 Sep 2013 11:45:59 -0600
+Message-ID: <524472D7.2000609@openvpn.net>
+References: <1380183639-6288-1-git-send-email-james@openvpn.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
-To: Sohail <sohailtariq25@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.hengli.com.au, linux-crypto@vger.kernel.org,
+	Daniel Borkmann <dborkman@redhat.com>,
+	Florian Weimer <fw@deneb.enyo.de>
+To: James Yonan <james@openvpn.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f46.google.com ([74.125.82.46]:61957 "EHLO
-	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753404Ab3IZQnS (ORCPT
+Received: from magnetar.openvpn.net ([74.52.27.18]:55698 "EHLO
+	magnetar.openvpn.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751571Ab3IZRqJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Sep 2013 12:43:18 -0400
-Received: by mail-wg0-f46.google.com with SMTP id k14so1436520wgh.1
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Sep 2013 09:43:16 -0700 (PDT)
-In-Reply-To: <loom.20130919T140312-617@post.gmane.org>
+	Thu, 26 Sep 2013 13:46:09 -0400
+In-Reply-To: <1380183639-6288-1-git-send-email-james@openvpn.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Here is the latest iteration of the constant-time memory 
+equality-testing patch:
 
-In geode-aes, there is not any IV generation mechanism. In fact IV is
-delivered to geode-aes's
-registered algorithms, from upper layers.For example in case of
-"cbc-aes-geode" algorithm,
-from cbc wrapper ("cbc.c") via walk->iv:
+* This patch includes contributions and a signoff from Daniel Borkmann.
 
-blkcipher_walk_init(&walk, dst, src, nbytes);
-err = blkcipher_walk_virt(desc, &walk);
-op->iv = walk.iv;
-...
+* Moved the optimization flag -Os (used to prevent early return 
+optimization) into the Makefile after seeing a report that #pragma gcc 
+is considered broken and unmaintained.
 
-Regards.
+* Added #ifndef __HAVE_ARCH_CRYPTO_MEMNEQ to accommodate possible future 
+arch-specific asm implementations.
 
-On Thu, Sep 19, 2013 at 4:34 PM, Sohail <sohailtariq25@gmail.com> wrote:
-> Hi all,
-> I could'nt understand the mechanism of IV generation in geode-aes. Can
-> someone explain it in easy to understand manner?
+* For clarity, separated the size-independent function 
+(__crypto_memneq_generic) from the fast-path optimization for 16 bytes 
+(__crypto_memneq_16) using a switch so that future fast-path data widths 
+can be easily added.
+
+* Reduce the number of #ifdefs by using sizeof(unsigned long) instead of 
+BITS_PER_LONG.
+
+* Shortened the public function name to crypto_memneq.
+
+James
+
+On 26/09/2013 02:20, James Yonan wrote:
+> When comparing MAC hashes, AEAD authentication tags, or other hash
+> values in the context of authentication or integrity checking, it
+> is important not to leak timing information to a potential attacker,
+> i.e. when communication happens over a network.
 >
-> Thanks a lot.
+> Bytewise memory comparisons (such as memcmp) are usually optimized so
+> that they return a nonzero value as soon as a mismatch is found. E.g,
+> on x86_64/i5 for 512 bytes this can be ~50 cyc for a full mismatch
+> and up to ~850 cyc for a full match (cold). This early-return behavior
+> can leak timing information as a side channel, allowing an attacker to
+> iteratively guess the correct result.
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> This patch adds a new method crypto_memneq ("memory not equal to each
+> other") to the crypto API that compares memory areas of the same length
+> in roughly "constant time" (cache misses could change the timing, but
+> since they don't reveal information about the content of the strings
+> being compared, they are effectively benign). Iow, best and worst case
+> behaviour take the same amount of time to complete (in contrast to
+> memcmp).
+>
+> Note that crypto_memneq (unlike memcmp) can only be used to test for
+> equality or inequality, NOT for lexicographical order. This, however,
+> is not an issue for its use-cases within the crypto API.
+>
+> We tried to locate all of the places in the crypto API where memcmp was
+> being used for authentication or integrity checking, and convert them
+> over to crypto_memneq.
+>
+> crypto_memneq is declared noinline, placed in its own source file,
+> and compiled with optimizations that might increase code size disabled
+> ("Os") because a smart compiler (or LTO) might notice that the return
+> value is always compared against zero/nonzero, and might then
+> reintroduce the same early-return optimization that we are trying to
+> avoid.
+>
+> Using #pragma or __attribute__ optimization annotations of the code
+> for disabling optimization was avoided as it seems to be considered
+> broken or unmaintained for long time in GCC [1]. Therefore, we work
+> around that by specifying the compile flag for memneq.o directly in
+> the Makefile. We found that this seems to be most appropriate.
+>
+> As we use ("Os"), this patch also provides a loop-free "fast-path" for
+> frequently used 16 byte digests. Similarly to kernel library string
+> functions, leave an option for future even further optimized architecture
+> specific assembler implementations.
+>
+> This was a joint work of James Yonan and Daniel Borkmann. Also thanks
+> for feedback from Florian Weimer on this and earlier proposals [2].
+>
+>    [1] http://gcc.gnu.org/ml/gcc/2012-07/msg00211.html
+>    [2] https://lkml.org/lkml/2013/2/10/131
+>
+> Signed-off-by: James Yonan <james@openvpn.net>
+> Signed-off-by: Daniel Borkmann <dborkman@redhat.com>
+> Cc: Florian Weimer <fw@deneb.enyo.de>
+> ---
+>   crypto/Makefile              |   7 ++-
+>   crypto/asymmetric_keys/rsa.c |   5 +-
+>   crypto/authenc.c             |   6 +-
+>   crypto/authencesn.c          |   8 +--
+>   crypto/ccm.c                 |   4 +-
+>   crypto/gcm.c                 |   2 +-
+>   crypto/memneq.c              | 138 +++++++++++++++++++++++++++++++++++++++++++
+>   include/crypto/algapi.h      |  18 +++++-
+>   8 files changed, 174 insertions(+), 14 deletions(-)
+>   create mode 100644 crypto/memneq.c
+>
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index 2d5ed08..b88cdf0 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -2,8 +2,13 @@
+>   # Cryptographic API
+>   #
+>
+> +# memneq MUST be built with -Os or -O0 to prevent early-return optimizations
+> +# that will defeat memneq's actual purpose to prevent timing attacks.
+> +CFLAGS_REMOVE_memneq.o := -O1 -O2 -O3
+> +CFLAGS_memneq.o := -Os
+> +
+>   obj-$(CONFIG_CRYPTO) += crypto.o
+> -crypto-y := api.o cipher.o compress.o
+> +crypto-y := api.o cipher.o compress.o memneq.o
+>
+>   obj-$(CONFIG_CRYPTO_WORKQUEUE) += crypto_wq.o
+>
+> diff --git a/crypto/asymmetric_keys/rsa.c b/crypto/asymmetric_keys/rsa.c
+> index 4a6a069..1912b9b 100644
+> --- a/crypto/asymmetric_keys/rsa.c
+> +++ b/crypto/asymmetric_keys/rsa.c
+> @@ -13,6 +13,7 @@
+>   #include <linux/module.h>
+>   #include <linux/kernel.h>
+>   #include <linux/slab.h>
+> +#include <crypto/algapi.h>
+>   #include "public_key.h"
+>
+>   MODULE_LICENSE("GPL");
+> @@ -189,12 +190,12 @@ static int RSA_verify(const u8 *H, const u8 *EM, size_t k, size_t hash_size,
+>   		}
+>   	}
+>
+> -	if (memcmp(asn1_template, EM + T_offset, asn1_size) != 0) {
+> +	if (crypto_memneq(asn1_template, EM + T_offset, asn1_size) != 0) {
+>   		kleave(" = -EBADMSG [EM[T] ASN.1 mismatch]");
+>   		return -EBADMSG;
+>   	}
+>
+> -	if (memcmp(H, EM + T_offset + asn1_size, hash_size) != 0) {
+> +	if (crypto_memneq(H, EM + T_offset + asn1_size, hash_size) != 0) {
+>   		kleave(" = -EKEYREJECTED [EM[T] hash mismatch]");
+>   		return -EKEYREJECTED;
+>   	}
+> diff --git a/crypto/authenc.c b/crypto/authenc.c
+> index ffce19d..2b3f4ab 100644
+> --- a/crypto/authenc.c
+> +++ b/crypto/authenc.c
+> @@ -188,7 +188,7 @@ static void authenc_verify_ahash_update_done(struct crypto_async_request *areq,
+>   	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+>   				 authsize, 0);
+>
+> -	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+> +	err = crypto_memneq(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+>   	if (err)
+>   		goto out;
+>
+> @@ -227,7 +227,7 @@ static void authenc_verify_ahash_done(struct crypto_async_request *areq,
+>   	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+>   				 authsize, 0);
+>
+> -	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+> +	err = crypto_memneq(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+>   	if (err)
+>   		goto out;
+>
+> @@ -462,7 +462,7 @@ static int crypto_authenc_verify(struct aead_request *req,
+>   	ihash = ohash + authsize;
+>   	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+>   				 authsize, 0);
+> -	return memcmp(ihash, ohash, authsize) ? -EBADMSG : 0;
+> +	return crypto_memneq(ihash, ohash, authsize) ? -EBADMSG : 0;
+>   }
+>
+>   static int crypto_authenc_iverify(struct aead_request *req, u8 *iv,
+> diff --git a/crypto/authencesn.c b/crypto/authencesn.c
+> index ab53762..c569d58 100644
+> --- a/crypto/authencesn.c
+> +++ b/crypto/authencesn.c
+> @@ -247,7 +247,7 @@ static void authenc_esn_verify_ahash_update_done(struct crypto_async_request *ar
+>   	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+>   				 authsize, 0);
+>
+> -	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+> +	err = crypto_memneq(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+>   	if (err)
+>   		goto out;
+>
+> @@ -296,7 +296,7 @@ static void authenc_esn_verify_ahash_update_done2(struct crypto_async_request *a
+>   	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+>   				 authsize, 0);
+>
+> -	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+> +	err = crypto_memneq(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+>   	if (err)
+>   		goto out;
+>
+> @@ -336,7 +336,7 @@ static void authenc_esn_verify_ahash_done(struct crypto_async_request *areq,
+>   	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+>   				 authsize, 0);
+>
+> -	err = memcmp(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+> +	err = crypto_memneq(ihash, ahreq->result, authsize) ? -EBADMSG : 0;
+>   	if (err)
+>   		goto out;
+>
+> @@ -568,7 +568,7 @@ static int crypto_authenc_esn_verify(struct aead_request *req)
+>   	ihash = ohash + authsize;
+>   	scatterwalk_map_and_copy(ihash, areq_ctx->sg, areq_ctx->cryptlen,
+>   				 authsize, 0);
+> -	return memcmp(ihash, ohash, authsize) ? -EBADMSG : 0;
+> +	return crypto_memneq(ihash, ohash, authsize) ? -EBADMSG : 0;
+>   }
+>
+>   static int crypto_authenc_esn_iverify(struct aead_request *req, u8 *iv,
+> diff --git a/crypto/ccm.c b/crypto/ccm.c
+> index 499c917..3e05499 100644
+> --- a/crypto/ccm.c
+> +++ b/crypto/ccm.c
+> @@ -363,7 +363,7 @@ static void crypto_ccm_decrypt_done(struct crypto_async_request *areq,
+>
+>   	if (!err) {
+>   		err = crypto_ccm_auth(req, req->dst, cryptlen);
+> -		if (!err && memcmp(pctx->auth_tag, pctx->odata, authsize))
+> +		if (!err && crypto_memneq(pctx->auth_tag, pctx->odata, authsize))
+>   			err = -EBADMSG;
+>   	}
+>   	aead_request_complete(req, err);
+> @@ -422,7 +422,7 @@ static int crypto_ccm_decrypt(struct aead_request *req)
+>   		return err;
+>
+>   	/* verify */
+> -	if (memcmp(authtag, odata, authsize))
+> +	if (crypto_memneq(authtag, odata, authsize))
+>   		return -EBADMSG;
+>
+>   	return err;
+> diff --git a/crypto/gcm.c b/crypto/gcm.c
+> index 43e1fb0..b4f0179 100644
+> --- a/crypto/gcm.c
+> +++ b/crypto/gcm.c
+> @@ -582,7 +582,7 @@ static int crypto_gcm_verify(struct aead_request *req,
+>
+>   	crypto_xor(auth_tag, iauth_tag, 16);
+>   	scatterwalk_map_and_copy(iauth_tag, req->src, cryptlen, authsize, 0);
+> -	return memcmp(iauth_tag, auth_tag, authsize) ? -EBADMSG : 0;
+> +	return crypto_memneq(iauth_tag, auth_tag, authsize) ? -EBADMSG : 0;
+>   }
+>
+>   static void gcm_decrypt_done(struct crypto_async_request *areq, int err)
+> diff --git a/crypto/memneq.c b/crypto/memneq.c
+> new file mode 100644
+> index 0000000..cd01622
+> --- /dev/null
+> +++ b/crypto/memneq.c
+> @@ -0,0 +1,138 @@
+> +/*
+> + * Constant-time equality testing of memory regions.
+> + *
+> + * Authors:
+> + *
+> + *   James Yonan <james@openvpn.net>
+> + *   Daniel Borkmann <dborkman@redhat.com>
+> + *
+> + * This file is provided under a dual BSD/GPLv2 license.  When using or
+> + * redistributing this file, you may do so under either license.
+> + *
+> + * GPL LICENSE SUMMARY
+> + *
+> + * Copyright(c) 2013 OpenVPN Technologies, Inc. All rights reserved.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of version 2 of the GNU General Public License as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful, but
+> + * WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program; if not, write to the Free Software
+> + * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
+> + * The full GNU General Public License is included in this distribution
+> + * in the file called LICENSE.GPL.
+> + *
+> + * BSD LICENSE
+> + *
+> + * Copyright(c) 2013 OpenVPN Technologies, Inc. All rights reserved.
+> + *
+> + * Redistribution and use in source and binary forms, with or without
+> + * modification, are permitted provided that the following conditions
+> + * are met:
+> + *
+> + *   * Redistributions of source code must retain the above copyright
+> + *     notice, this list of conditions and the following disclaimer.
+> + *   * Redistributions in binary form must reproduce the above copyright
+> + *     notice, this list of conditions and the following disclaimer in
+> + *     the documentation and/or other materials provided with the
+> + *     distribution.
+> + *   * Neither the name of OpenVPN Technologies nor the names of its
+> + *     contributors may be used to endorse or promote products derived
+> + *     from this software without specific prior written permission.
+> + *
+> + * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+> + * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+> + * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+> + * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+> + * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+> + * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+> + * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+> + * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+> + * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+> + * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+> + * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+> + */
+> +
+> +#include <crypto/algapi.h>
+> +
+> +#ifndef __HAVE_ARCH_CRYPTO_MEMNEQ
+> +
+> +/* Generic path for arbitrary size */
+> +static inline unsigned long
+> +__crypto_memneq_generic(const void *a, const void *b, size_t size)
+> +{
+> +	unsigned long neq = 0;
+> +
+> +#if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
+> +	while (size >= sizeof(unsigned long)) {
+> +		neq |= *(unsigned long *)a ^ *(unsigned long *)b;
+> +		a += sizeof(unsigned long);
+> +		b += sizeof(unsigned long);
+> +		size -= sizeof(unsigned long);
+> +	}
+> +#endif /* CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS */
+> +	while (size > 0) {
+> +		neq |= *(unsigned char *)a ^ *(unsigned char *)b;
+> +		a += 1;
+> +		b += 1;
+> +		size -= 1;
+> +	}
+> +	return neq;
+> +}
+> +
+> +/* Loop-free fast-path for frequently used 16-byte size */
+> +static inline unsigned long __crypto_memneq_16(const void *a, const void *b)
+> +{
+> +#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+> +	if (sizeof(unsigned long) == 8)
+> +		return ((*(unsigned long *)(a)   ^ *(unsigned long *)(b))
+> +		      | (*(unsigned long *)(a+8) ^ *(unsigned long *)(b+8)));
+> +	else if (sizeof(unsigned int) == 4)
+> +		return ((*(unsigned int *)(a)    ^ *(unsigned int *)(b))
+> +                      | (*(unsigned int *)(a+4)  ^ *(unsigned int *)(b+4))
+> +		      | (*(unsigned int *)(a+8)  ^ *(unsigned int *)(b+8))
+> +	              | (*(unsigned int *)(a+12) ^ *(unsigned int *)(b+12)));
+> +	else
+> +#endif /* CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS */
+> +		return ((*(unsigned char *)(a)    ^ *(unsigned char *)(b))
+> +		      | (*(unsigned char *)(a+1)  ^ *(unsigned char *)(b+1))
+> +		      | (*(unsigned char *)(a+2)  ^ *(unsigned char *)(b+2))
+> +		      | (*(unsigned char *)(a+3)  ^ *(unsigned char *)(b+3))
+> +		      | (*(unsigned char *)(a+4)  ^ *(unsigned char *)(b+4))
+> +		      | (*(unsigned char *)(a+5)  ^ *(unsigned char *)(b+5))
+> +		      | (*(unsigned char *)(a+6)  ^ *(unsigned char *)(b+6))
+> +		      | (*(unsigned char *)(a+7)  ^ *(unsigned char *)(b+7))
+> +		      | (*(unsigned char *)(a+8)  ^ *(unsigned char *)(b+8))
+> +		      | (*(unsigned char *)(a+9)  ^ *(unsigned char *)(b+9))
+> +		      | (*(unsigned char *)(a+10) ^ *(unsigned char *)(b+10))
+> +		      | (*(unsigned char *)(a+11) ^ *(unsigned char *)(b+11))
+> +		      | (*(unsigned char *)(a+12) ^ *(unsigned char *)(b+12))
+> +		      | (*(unsigned char *)(a+13) ^ *(unsigned char *)(b+13))
+> +		      | (*(unsigned char *)(a+14) ^ *(unsigned char *)(b+14))
+> +		      | (*(unsigned char *)(a+15) ^ *(unsigned char *)(b+15)));
+> +}
+> +
+> +/* Compare two areas of memory without leaking timing information,
+> + * and with special optimizations for common sizes.  Users should
+> + * not call this function directly, but should instead use
+> + * crypto_memneq defined in crypto/algapi.h.
+> + */
+> +noinline unsigned long __crypto_memneq(const void *a, const void *b,
+> +				       size_t size)
+> +{
+> +	switch (size) {
+> +	case 16:
+> +		return __crypto_memneq_16(a, b);
+> +	default:
+> +		return __crypto_memneq_generic(a, b, size);
+> +	}
+> +}
+> +EXPORT_SYMBOL(__crypto_memneq);
+> +
+> +#endif /* __HAVE_ARCH_CRYPTO_MEMNEQ */
+> diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+> index 418d270..e73c19e 100644
+> --- a/include/crypto/algapi.h
+> +++ b/include/crypto/algapi.h
+> @@ -386,5 +386,21 @@ static inline int crypto_requires_sync(u32 type, u32 mask)
+>   	return (type ^ CRYPTO_ALG_ASYNC) & mask & CRYPTO_ALG_ASYNC;
+>   }
+>
+> -#endif	/* _CRYPTO_ALGAPI_H */
+> +noinline unsigned long __crypto_memneq(const void *a, const void *b, size_t size);
+> +
+> +/**
+> + * crypto_memneq - Compare two areas of memory without leaking
+> + *		   timing information.
+> + *
+> + * @a: One area of memory
+> + * @b: Another area of memory
+> + * @size: The size of the area.
+> + *
+> + * Returns 0 when data is equal, 1 otherwise.
+> + */
+> +static inline int crypto_memneq(const void *a, const void *b, size_t size)
+> +{
+> +	return __crypto_memneq(a, b, size) != 0UL ? 1 : 0;
+> +}
+>
+> +#endif	/* _CRYPTO_ALGAPI_H */
+>
