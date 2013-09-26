@@ -1,162 +1,46 @@
-From: =?utf-8?Q?Lothar_Wa=C3=9Fmann?= <LW@KARO-electronics.de>
-Subject: Re: [PATCH 2/3] ARM: mxs: crypto: Add Freescale MXS DCP driver
-Date: Thu, 26 Sep 2013 14:13:33 +0200
-Message-ID: <21060.9453.908125.71858@ipc1.ka-ro>
-References: <1380194306-5243-1-git-send-email-marex@denx.de>
-	<1380194306-5243-2-git-send-email-marex@denx.de>
+From: Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>
+Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate snapshot
+Date: Thu, 26 Sep 2013 14:21:23 +0200
+Message-ID: <524426C3.1050501@suse.cz>
+References: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org> <1380161957.32302.42.camel@linux-s257.site> <1380192218.32302.69.camel@linux-s257.site> <20130926120621.GA7537@amd.pavel.ucw.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Marek Vasut <marex@denx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.karo-electronics.de ([81.173.242.67]:50516 "EHLO
-	mail.karo-electronics.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756642Ab3IZMNi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Sep 2013 08:13:38 -0400
-In-Reply-To: <1380194306-5243-2-git-send-email-marex@denx.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: joeyli <jlee-IBi9RG/b67k@public.gmane.org>, Alan Stern <stern-nwvwT67g6+6dFdvTe/nMLpVzexx5G7lz@public.gmane.org>,
+ David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+ linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org,
+ "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+ Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>, Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+ Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+ Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>, Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+ James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
+ Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
+ Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
+ Herbert Xu <herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org>,
+ "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+ "H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>,
+ Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
+Return-path: <opensuse-kernel+bounces-5146-glsk-opensuse-kernel=m.gmane.org-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Post: <mailto:opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Help: <mailto:opensuse-kernel+help-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Subscribe: <mailto:opensuse-kernel+subscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Unsubscribe: <mailto:opensuse-kernel+unsubscribe-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Owner: <mailto:opensuse-kernel+owner-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org>
+List-Archive: <http://lists.opensuse.org/opensuse-kernel/>
+In-Reply-To: <20130926120621.GA7537-tWAi6jLit6GreWDznjuHag@public.gmane.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Marek,
+On 26.9.2013 14:06, Pavel Machek wrote:
+> Actually...
+> 
+> Is not it as simple as storing hash of hibernation image into NVRAM
+> and then verifying the hash matches the value in NVRAM on next
+> startup? No encryption needed. 
 
-some small comments below.
+I think that part of the exercise is to minimize the number of writes to
+the NVRAM. The hash changes with every hibernation, obviously.
 
-Marek Vasut writes:
-> diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-> new file mode 100644
-> index 0000000..c2b35c7
-> --- /dev/null
-> +++ b/drivers/crypto/mxs-dcp.c
-[...]
-> +/* AES 128 ECB and AES 128 CBC */
-> +static struct crypto_alg dcp_aes_algs[] =3D {
-> +	[0] =3D {
-> +		.cra_name		=3D "ecb(aes)",
-> +		.cra_driver_name	=3D "ecb-aes-dcp",
-> +		.cra_priority		=3D 400,
-> +		.cra_alignmask		=3D 15,
-> +		.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
-> +					  CRYPTO_ALG_ASYNC |
-> +					  CRYPTO_ALG_NEED_FALLBACK,
-> +		.cra_init		=3D mxs_dcp_aes_fallback_init,
-> +		.cra_exit		=3D mxs_dcp_aes_fallback_exit,
-> +		.cra_blocksize		=3D AES_BLOCK_SIZE,
-> +		.cra_ctxsize		=3D sizeof(struct dcp_async_ctx),
-> +		.cra_type		=3D &crypto_ablkcipher_type,
-> +		.cra_module		=3D THIS_MODULE,
-> +		.cra_u	=3D {
-> +			.ablkcipher =3D {
-> +				.min_keysize	=3D AES_MIN_KEY_SIZE,
-> +				.max_keysize	=3D AES_MAX_KEY_SIZE,
-> +				.setkey		=3D mxs_dcp_aes_setkey,
-> +				.encrypt	=3D mxs_dcp_aes_ecb_encrypt,
-> +				.decrypt	=3D mxs_dcp_aes_ecb_decrypt
-> +			}
-missing ',' after '}'
-> +		}
-dto.
-
-> +	},
-> +	[1] =3D {
-> +		.cra_name		=3D "cbc(aes)",
-> +		.cra_driver_name	=3D "cbc-aes-dcp",
-> +		.cra_priority		=3D 400,
-> +		.cra_alignmask		=3D 15,
-> +		.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
-> +					  CRYPTO_ALG_ASYNC |
-> +					  CRYPTO_ALG_NEED_FALLBACK,
-> +		.cra_init		=3D mxs_dcp_aes_fallback_init,
-> +		.cra_exit		=3D mxs_dcp_aes_fallback_exit,
-> +		.cra_blocksize		=3D AES_BLOCK_SIZE,
-> +		.cra_ctxsize		=3D sizeof(struct dcp_async_ctx),
-> +		.cra_type		=3D &crypto_ablkcipher_type,
-> +		.cra_module		=3D THIS_MODULE,
-> +		.cra_u =3D {
-> +			.ablkcipher =3D {
-> +				.min_keysize	=3D AES_MIN_KEY_SIZE,
-> +				.max_keysize	=3D AES_MAX_KEY_SIZE,
-> +				.setkey		=3D mxs_dcp_aes_setkey,
-> +				.encrypt	=3D mxs_dcp_aes_cbc_encrypt,
-> +				.decrypt	=3D mxs_dcp_aes_cbc_decrypt,
-> +				.ivsize		=3D AES_BLOCK_SIZE,
-> +			}
-dto.
-> +		}
-dto.
-> +	},
-> +};
-> +
-> +/* SHA1 */
-> +static struct ahash_alg dcp_sha1_alg =3D {
-> +	.init	=3D dcp_sha_init,
-> +	.update	=3D dcp_sha_update,
-> +	.final	=3D dcp_sha_final,
-> +	.finup	=3D dcp_sha_finup,
-> +	.digest	=3D dcp_sha_digest,
-> +	.halg	=3D {
-> +		.digestsize	=3D SHA1_DIGEST_SIZE,
-> +		.base		=3D {
-> +			.cra_name		=3D "sha1",
-> +			.cra_driver_name	=3D "sha1-dcp",
-> +			.cra_priority		=3D 400,
-> +			.cra_alignmask		=3D 63,
-> +			.cra_flags		=3D CRYPTO_ALG_ASYNC,
-> +			.cra_blocksize		=3D SHA1_BLOCK_SIZE,
-> +			.cra_ctxsize		=3D sizeof(struct dcp_async_ctx),
-> +			.cra_module		=3D THIS_MODULE,
-> +			.cra_init		=3D dcp_sha_cra_init,
-> +			.cra_exit		=3D dcp_sha_cra_exit,
-> +		}
-dto.
-> +	}
-dto.
-
-> +};
-> +
-> +/* SHA256 */
-> +static struct ahash_alg dcp_sha256_alg =3D {
-> +	.init	=3D dcp_sha_init,
-> +	.update	=3D dcp_sha_update,
-> +	.final	=3D dcp_sha_final,
-> +	.finup	=3D dcp_sha_finup,
-> +	.digest	=3D dcp_sha_digest,
-> +	.halg	=3D {
-> +		.digestsize	=3D SHA256_DIGEST_SIZE,
-> +		.base		=3D {
-> +			.cra_name		=3D "sha256",
-> +			.cra_driver_name	=3D "sha256-dcp",
-> +			.cra_priority		=3D 400,
-> +			.cra_alignmask		=3D 63,
-> +			.cra_flags		=3D CRYPTO_ALG_ASYNC,
-> +			.cra_blocksize		=3D SHA256_BLOCK_SIZE,
-> +			.cra_ctxsize		=3D sizeof(struct dcp_async_ctx),
-> +			.cra_module		=3D THIS_MODULE,
-> +			.cra_init		=3D dcp_sha_cra_init,
-> +			.cra_exit		=3D dcp_sha_cra_exit,
-> +		}
-dto.
-> +	}
-dto.
-
-> +static const struct of_device_id mxs_dcp_dt_ids[] =3D {
-> +	{.compatible =3D "fsl,mxs-dcp", .data =3D NULL,},
->
-missing spaces after '{' and before '}'
-
-
-Lothar Wa=C3=9Fmann
---=20
-___________________________________________________________
-
-Ka-Ro electronics GmbH | Pascalstra=C3=9Fe 22 | D - 52076 Aachen
-Phone: +49 2408 1402-0 | Fax: +49 2408 1402-10
-Gesch=C3=A4ftsf=C3=BChrer: Matthias Kaussen
-Handelsregistereintrag: Amtsgericht Aachen, HRB 4996
-
-www.karo-electronics.de | info@karo-electronics.de
-___________________________________________________________
+Michal
