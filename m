@@ -1,69 +1,50 @@
-From: Marek Vasut <marex@denx.de>
-Subject: [PATCH 3/3] ARM: mxs: dts: Enable DCP for MXS
-Date: Thu, 26 Sep 2013 13:18:26 +0200
-Message-ID: <1380194306-5243-3-git-send-email-marex@denx.de>
+From: Fabio Estevam <festevam@gmail.com>
+Subject: Re: [PATCH 2/3] ARM: mxs: crypto: Add Freescale MXS DCP driver
+Date: Thu, 26 Sep 2013 08:27:15 -0300
+Message-ID: <CAOMZO5AU_R5aeHKbkGRGuyXsVOVdUwdF5oZXdEZZYs442nFnEA@mail.gmail.com>
 References: <1380194306-5243-1-git-send-email-marex@denx.de>
-Cc: linux-arm-kernel@lists.infradead.org, Marek Vasut <marex@denx.de>,
+	<1380194306-5243-2-git-send-email-marex@denx.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Fabio Estevam <fabio.estevam@freescale.com>,
 	Shawn Guo <shawn.guo@linaro.org>
-To: linux-crypto@vger.kernel.org
+To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:42433 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756301Ab3IZLSl (ORCPT
+Received: from mail-vb0-f50.google.com ([209.85.212.50]:47114 "EHLO
+	mail-vb0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756628Ab3IZL1Q (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Sep 2013 07:18:41 -0400
-In-Reply-To: <1380194306-5243-1-git-send-email-marex@denx.de>
+	Thu, 26 Sep 2013 07:27:16 -0400
+Received: by mail-vb0-f50.google.com with SMTP id x14so710707vbb.23
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Sep 2013 04:27:15 -0700 (PDT)
+In-Reply-To: <1380194306-5243-2-git-send-email-marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Enable the DCP by default on both i.MX23 and i.MX28.
+Hi Marek,
 
-Signed-off-by: Marek Vasut <marex@denx.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Fabio Estevam <fabio.estevam@freescale.com>
-Cc: Shawn Guo <shawn.guo@linaro.org>
-To: linux-crypto@vger.kernel.org
----
- arch/arm/boot/dts/imx23.dtsi | 4 +++-
- arch/arm/boot/dts/imx28.dtsi | 5 +++--
- 2 files changed, 6 insertions(+), 3 deletions(-)
+On Thu, Sep 26, 2013 at 8:18 AM, Marek Vasut <marex@denx.de> wrote:
+> Add support for the MXS DCP block. The driver currently supports
+> SHA-1/SHA-256 hashing and AES-128 CBC/ECB modes. The non-standard
+> CRC32 is not yet supported.
+>
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David S. Miller <davem@davemloft.net>
+> ---
+>  drivers/crypto/Kconfig   |   17 +
+>  drivers/crypto/Makefile  |    1 +
+>  drivers/crypto/mxs-dcp.c | 1082 ++++++++++++++++++++++++++++++++++++++++++++++
 
-diff --git a/arch/arm/boot/dts/imx23.dtsi b/arch/arm/boot/dts/imx23.dtsi
-index 87faa6e..0630a9a 100644
---- a/arch/arm/boot/dts/imx23.dtsi
-+++ b/arch/arm/boot/dts/imx23.dtsi
-@@ -337,8 +337,10 @@
- 			};
- 
- 			dcp@80028000 {
-+				compatible = "fsl,mxs-dcp";
- 				reg = <0x80028000 0x2000>;
--				status = "disabled";
-+				interrupts = <53 54>;
-+				status = "okay";
- 			};
- 
- 			pxp@8002a000 {
-diff --git a/arch/arm/boot/dts/imx28.dtsi b/arch/arm/boot/dts/imx28.dtsi
-index 918d419..8b5ad60 100644
---- a/arch/arm/boot/dts/imx28.dtsi
-+++ b/arch/arm/boot/dts/imx28.dtsi
-@@ -782,9 +782,10 @@
- 			};
- 
- 			dcp: dcp@80028000 {
-+				compatible = "fsl,mxs-dcp";
- 				reg = <0x80028000 0x2000>;
--				interrupts = <52 53 54>;
--				compatible = "fsl-dcp";
-+				interrupts = <53 54>;
-+				status = "okay";
- 			};
- 
- 			pxp: pxp@8002a000 {
--- 
-1.8.4.rc3
+What about the existing DCP driver at drivers/crypto/dcp.c ?
+
+Why do we need to have two drivers for the same IP block? It looks
+confusing to have both.
+
+Regards,
+
+Fabio Estevam
