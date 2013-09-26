@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
  snapshot
 Date: Thu, 26 Sep 2013 18:43:38 +0800
-Message-ID: <1380192218.32302.69.camel__23368.8378743411$1380192270$gmane$org@linux-s257.site>
+Message-ID: <1380192218.32302.69.camel__16864.3804303885$1380192284$gmane$org@linux-s257.site>
 References: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org>
 	 <1380161957.32302.42.camel@linux-s257.site>
 Mime-Version: 1.0
@@ -25,9 +25,9 @@ Cc: David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Alan Stern <stern@rowland.harvard.edu>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-pm-owner@vger.kernel.org>
 In-Reply-To: <1380161957.32302.42.camel@linux-s257.site>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-pm-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E5=9B=9B=EF=BC=8C2013-09-26 =E6=96=BC 10:19 +0800=EF=BC=8Cjo=
@@ -104,3 +104,4 @@ performance is not too bad to a big image.
 
 Thanks
 Joey Lee
+
