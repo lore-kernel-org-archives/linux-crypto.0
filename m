@@ -1,194 +1,91 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: Re: [PATCH 2/3] ARM: mxs: crypto: Add Freescale MXS DCP driver
-Date: Thu, 26 Sep 2013 09:48:01 -0300
-Message-ID: <CAOMZO5A4rH_id25ROU_CdiOd79MhtU9J3jtFVyqeeD0R+=EuTw@mail.gmail.com>
-References: <1380194306-5243-1-git-send-email-marex@denx.de>
-	<1380194306-5243-2-git-send-email-marex@denx.de>
+From: joeyli <jlee@suse.com>
+Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
+ snapshot
+Date: Thu, 26 Sep 2013 20:56:10 +0800
+Message-ID: <1380200170.32302.85.camel__38757.3685417466$1380200196$gmane$org@linux-s257.site>
+References: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org>
+	 <1380161957.32302.42.camel@linux-s257.site>
+	 <1380192218.32302.69.camel@linux-s257.site>
+	 <20130926120621.GA7537@amd.pavel.ucw.cz>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Marek Vasut <marex@denx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vb0-f54.google.com ([209.85.212.54]:54689 "EHLO
-	mail-vb0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756657Ab3IZMsC (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Sep 2013 08:48:02 -0400
-Received: by mail-vb0-f54.google.com with SMTP id q14so810422vbe.27
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Sep 2013 05:48:02 -0700 (PDT)
-In-Reply-To: <1380194306-5243-2-git-send-email-marex@denx.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Alan Stern <stern@rowland.harvard.edu>,
+	David Howells <dhowells@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	opensuse-kernel@opensuse.org, "Rafael J. Wysocki" <rjw@sisk.pl>,
+	Matthew Garrett <mjg59@srcf.ucam.org>,
+	Len Brown <len.brown@intel.com>,
+	Josh Boyer <jwboyer@redhat.com>,
+	Vojtech Pavlik <vojtech@suse.cz>,
+	Matt Fleming <matt.fleming@intel.com>,
+	James Bottomley <james.bottomley@hansenpartnership.com>,
+	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
+	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
+To: Pavel Machek <pavel@ucw.cz>
+Return-path: <linux-pm-owner@vger.kernel.org>
+In-Reply-To: <20130926120621.GA7537@amd.pavel.ucw.cz>
+Sender: linux-pm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Sep 26, 2013 at 8:18 AM, Marek Vasut <marex@denx.de> wrote:
+=E6=96=BC =E5=9B=9B=EF=BC=8C2013-09-26 =E6=96=BC 14:06 +0200=EF=BC=8CPa=
+vel Machek =E6=8F=90=E5=88=B0=EF=BC=9A
+> Hi!
+>=20
+> > For the symmetric key solution, I will try HMAC (Hash Message
+> > Authentication Code). It's already used in networking, hope the
+> > performance is not too bad to a big image.
+>=20
+> Kernel already supports crc32 of the hibernation image, you may want
+> to take a look how that is done.
 
-> +config CRYPTO_DEV_MXS_DCP
-> +       tristate "Support for Freescale MXS DCP"
-> +       depends on ARCH_MXS
-> +       select CRYPTO_SHA1
-> +       select CRYPTO_SHA256
-> +       select CRYPTO_CBC
-> +       select CRYPTO_ECB
-> +       select CRYPTO_AES
-> +       select CRYPTO_BLKCIPHER
-> +       select CRYPTO_ALGAPI
-> +       help
-> +         The Freescale i.MX23/i.MX28 has SHA1/SHA256 and AES128 CBC/ECB
-> +         co-processor on the die.
-> +
-> +         To compile this driver as a module, choose M here: the module
-> +         will be called atmel-sha.
+In current kernel design, The crc32 is only for the LZO in-kernel
+hibernate, doesn't apply to non-compress hibernate and userspace
+hibernate.
 
-Actually it will be called 'mxs-dcp'.
+Put signature to snapshot header can support any kind of caller that's
+trigger hibernate. Any userspace hibernate tool will take the snapshot
+image from kernel, so, we need put the signature(or hash result) to
+snapshot header before userspace write it to anywhere.=20
 
-> + * There can even be only one instance of the MXS DCP due to the
-> + * design of Linux Crypto API.
+>=20
+> Maybe you want to replace crc32 with cryptographics hash (sha1?) and
+> then use only hash for more crypto? That way speed of whatever crypto
+> you do should not be an issue.
 
-Is this true? Usually we don't want to create a global struct.
+That speed of hash is calculated from non-compress snapshot image, does
+not overlap with crc32.
 
-> +
-> +/* AES 128 ECB and AES 128 CBC */
-> +static struct crypto_alg dcp_aes_algs[] = {
-> +       [0] = {
+>=20
+> Actually...
+>=20
+> Is not it as simple as storing hash of hibernation image into NVRAM
+> and then verifying the hash matches the value in NVRAM on next
+> startup? No encryption needed.=20
+>=20
+> And that may even be useful for non-secure-boot people, as it ensures
+> you boot right image after resume, boot it just once, etc...
+>=20
+> 									Pavel
 
-No need for explicitely add this [0]
+The HMAC approach will not encrypt, just put the key of HMAC to boottim=
+e
+variable.=20
 
-> +               .cra_name               = "ecb(aes)",
-> +               .cra_driver_name        = "ecb-aes-dcp",
-> +               .cra_priority           = 400,
-> +               .cra_alignmask          = 15,
-> +               .cra_flags              = CRYPTO_ALG_TYPE_ABLKCIPHER |
-> +                                         CRYPTO_ALG_ASYNC |
-> +                                         CRYPTO_ALG_NEED_FALLBACK,
-> +               .cra_init               = mxs_dcp_aes_fallback_init,
-> +               .cra_exit               = mxs_dcp_aes_fallback_exit,
-> +               .cra_blocksize          = AES_BLOCK_SIZE,
-> +               .cra_ctxsize            = sizeof(struct dcp_async_ctx),
-> +               .cra_type               = &crypto_ablkcipher_type,
-> +               .cra_module             = THIS_MODULE,
-> +               .cra_u  = {
-> +                       .ablkcipher = {
-> +                               .min_keysize    = AES_MIN_KEY_SIZE,
-> +                               .max_keysize    = AES_MAX_KEY_SIZE,
-> +                               .setkey         = mxs_dcp_aes_setkey,
-> +                               .encrypt        = mxs_dcp_aes_ecb_encrypt,
-> +                               .decrypt        = mxs_dcp_aes_ecb_decrypt
-> +                       }
-> +               }
-> +       },
-> +       [1] = {
-
-Same here.
-
-> +static int mxs_dcp_probe(struct platform_device *pdev)
-> +{
-> +       struct device *dev = &pdev->dev;
-> +       struct dcp *sdcp = NULL;
-> +       int i, ret;
-> +
-> +       struct resource *iores;
-> +       int dcp_vmi_irq, dcp_irq;
-> +
-> +       mutex_lock(&global_mutex);
-> +       if (global_sdcp) {
-> +               dev_err(dev, "Only one DCP instance allowed!\n");
-> +               ret = -ENODEV;
-> +               goto err_mutex;
-> +       }
-> +
-> +       iores = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-> +       dcp_vmi_irq = platform_get_irq(pdev, 0);
-> +       dcp_irq = platform_get_irq(pdev, 1);
-> +       if (!iores || dcp_vmi_irq < 0 || dcp_irq < 0) {
-
-No need to check for !iores here.
-
-You use it inside devm_ioremap_resource, which already does this checking.
+If user doesn't enable UEFI secure boot, that's fine, the key of HMAC
+still cannot access in OS runtime.=20
+If user enable UEFI secure boot, then that's better! Because all EFI
+file will signed by the manufacturers or OSVs to make sure the code is
+secure, will not pass the key to runtime.
 
 
-> +       /*
-> +        * We do not enable context switching. Give the context buffer a
-> +        * pointer to an illegal address so if context switching is
-> +        * inadvertantly enabled, the DCP will return an error instead of
-> +        * trashing good memory. The DCP DMA cannot access ROM, so any ROM
-> +        * address will do.
-> +        */
-> +       writel(0xffff0000, sdcp->base + MXS_DCP_CONTEXT);
-
-Can you use a define instead of this hardcoded number?
-
-> +static int mxs_dcp_remove(struct platform_device *pdev)
-> +{
-> +       struct dcp *sdcp;
-> +       int i;
-> +
-> +       sdcp = platform_get_drvdata(pdev);
-> +
-> +       kthread_stop(sdcp->thread[DCP_CHAN_HASH_SHA]);
-> +       kthread_stop(sdcp->thread[DCP_CHAN_CRYPTO]);
-> +
-> +       platform_set_drvdata(pdev, NULL);
-> +
-> +       dma_free_coherent(sdcp->dev, sizeof(struct dcp_coherent_block),
-> +                         sdcp->coh, sdcp->coh_phys);
-> +
-> +       if (sdcp->caps & MXS_DCP_CAPABILITY1_SHA256)
-> +               crypto_unregister_ahash(&dcp_sha256_alg);
-> +
-> +       if (sdcp->caps & MXS_DCP_CAPABILITY1_SHA1)
-> +               crypto_unregister_ahash(&dcp_sha1_alg);
-> +
-> +       if (sdcp->caps & MXS_DCP_CAPABILITY1_AES128) {
-> +               for (i = ARRAY_SIZE(dcp_aes_algs); i >= 0; i--)
-> +                       crypto_unregister_alg(&dcp_aes_algs[i]);
-> +       }
-> +
-> +       mutex_lock(&global_mutex);
-> +       global_sdcp = NULL;
-> +       mutex_unlock(&global_mutex);
+Thanks a lot!
+Joey Lee
 
 
-The order of the resources removal does not look correct here.
-
-It should match the order of the error path in probe.
-
-> +
-> +       return 0;
-> +}
-> +
-> +static const struct of_device_id mxs_dcp_dt_ids[] = {
-> +       {.compatible = "fsl,mxs-dcp", .data = NULL,},
-
-In the other mxs/imx drivers we use:
-
-.compatible = "fsl,<soc>-dcp"
-
-You also need to provide a devicetree documentation for this binding.
-
-> +       { /* sentinel */ }
-> +};
-> +
-> +MODULE_DEVICE_TABLE(of, mxs_dcp_dt_ids);
-> +
-> +static struct platform_driver mxs_dcp_driver = {
-> +       .probe  = mxs_dcp_probe,
-> +       .remove = mxs_dcp_remove,
-> +       .driver = {
-> +               .name           = "mxs-dcp",
-> +               .owner          = THIS_MODULE,
-> +               .of_match_table = mxs_dcp_dt_ids,
-> +       },
-> +};
-> +
-> +module_platform_driver(mxs_dcp_driver);
-> +
-> +MODULE_AUTHOR("Marek Vasut <marex@denx.de>");
-> +MODULE_DESCRIPTION("Freescale MXS DCP Driver");
-> +MODULE_LICENSE("GPL");
-
-
-Could also add MODULE_ALIAS.
