@@ -1,33 +1,33 @@
-From: joeyli <jlee@suse.com>
+From: joeyli <jlee-IBi9RG/b67k@public.gmane.org>
 Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
  snapshot
 Date: Thu, 26 Sep 2013 18:43:38 +0800
-Message-ID: <1380192218.32302.69.camel__6579.07058853215$1380192264$gmane$org@linux-s257.site>
+Message-ID: <1380192218.32302.69.camel__5896.44166543639$1380192264$gmane$org@linux-s257.site>
 References: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org>
 	 <1380161957.32302.42.camel@linux-s257.site>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	opensuse-kernel@opensuse.org, "Rafael J. Wysocki" <rjw@sisk.pl>,
-	Matthew Garrett <mjg59@srcf.ucam.org>,
-	Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-	Josh Boyer <jwboyer@redhat.com>,
-	Vojtech Pavlik <vojtech@suse.cz>,
-	Matt Fleming <matt.fleming@intel.com>,
-	James Bottomley <james.bottomley@hansenpartnership.com>,
-	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
-	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
-To: Alan Stern <stern@rowland.harvard.edu>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1380161957.32302.42.camel@linux-s257.site>
-Sender: linux-security-module-owner@vger.kernel.org
+Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
+	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>, Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>,
+	Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
+	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
+	James Bottomley <james.bottomley-JuX6DAaQMKPCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
+	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
+	Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
+	Herbert Xu <herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
+	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Alan Stern <stern-nwvwT67g6+6dFdvTe/nMLpVzexx5G7lz@public.gmane.org>
+Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1380161957.32302.42.camel-ONCj+Eqt86TasUa73XJKwA@public.gmane.org>
+Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E5=9B=9B=EF=BC=8C2013-09-26 =E6=96=BC 10:19 +0800=EF=BC=8Cjo=
@@ -104,9 +104,3 @@ performance is not too bad to a big image.
 
 Thanks
 Joey Lee
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-securit=
-y-module" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
