@@ -1,36 +1,36 @@
-From: joeyli <jlee-IBi9RG/b67k@public.gmane.org>
+From: joeyli <jlee@suse.com>
 Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
  snapshot
 Date: Thu, 26 Sep 2013 12:40:03 +0800
-Message-ID: <1380170403.32302.52.camel__42561.7252862596$1380170422$gmane$org@linux-s257.site>
+Message-ID: <1380170403.32302.52.camel__33216.8737579652$1380170434$gmane$org@linux-s257.site>
 References: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org>
 	 <1380147414.18835.36.camel@dabdike.int.hansenpartnership.com>
 	 <20130926002730.GA26857@amd.pavel.ucw.cz>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: James Bottomley <James.Bottomley-d9PhHud1JfjCXq6kfMZ53/egYHeGw8Jk@public.gmane.org>,
-	Alan Stern <stern-nwvwT67g6+6dFdvTe/nMLpVzexx5G7lz@public.gmane.org>,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-efi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	opensuse-kernel-stAJ6ESoqRxg9hUCZPvPmw@public.gmane.org, "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
-	Matthew Garrett <mjg59-1xO5oi07KQx4cg9Nei1l7Q@public.gmane.org>,
-	Len Brown <len.brown-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Josh Boyer <jwboyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Vojtech Pavlik <vojtech-AlSwsSmVLrQ@public.gmane.org>,
-	Matt Fleming <matt.fleming-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, JKosina-IBi9RG/b67k@public.gmane.org,
-	Rusty Russell <rusty-8n+1lVoiYb80n/F98K4Iww@public.gmane.org>,
-	Herbert Xu <herbert-F6s6mLieUQo7FNHlEwC/lvQIK84fMopw@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>, Michal Marek <mmarek-AlSwsSmVLrQ@public.gmane.org>,
-	Gary Lin <GLin-IBi9RG/b67k@public.gmane.org>, Vivek Goyal <vgoyal-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
-Return-path: <linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130926002730.GA26857-tWAi6jLit6GreWDznjuHag@public.gmane.org>
-Sender: linux-efi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	David Howells <dhowells@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	opensuse-kernel@opensuse.org, "Rafael J. Wysocki" <rjw@sisk.pl>,
+	Matthew Garrett <mjg59@srcf.ucam.org>,
+	Len Brown <len.brown@intel.com>,
+	Josh Boyer <jwboyer@redhat.com>,
+	Vojtech Pavlik <vojtech@suse.cz>,
+	Matt Fleming <matt.fleming@intel.com>,
+	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
+	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
+To: Pavel Machek <pavel@ucw.cz>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20130926002730.GA26857@amd.pavel.ucw.cz>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E5=9B=9B=EF=BC=8C2013-09-26 =E6=96=BC 02:27 +0200=EF=BC=8CPa=
