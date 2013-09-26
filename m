@@ -1,16 +1,17 @@
 From: joeyli <jlee@suse.com>
 Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
  snapshot
-Date: Thu, 26 Sep 2013 20:56:10 +0800
-Message-ID: <1380200170.32302.85.camel__3099.73504995487$1380200262$gmane$org@linux-s257.site>
+Date: Thu, 26 Sep 2013 21:20:38 +0800
+Message-ID: <1380201638.32302.90.camel__11281.5675246113$1380201694$gmane$org@linux-s257.site>
 References: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org>
 	 <1380161957.32302.42.camel@linux-s257.site>
 	 <1380192218.32302.69.camel@linux-s257.site>
-	 <20130926120621.GA7537@amd.pavel.ucw.cz>
+	 <20130926120621.GA7537@amd.pavel.ucw.cz>  <20130926122210.GA30225@suse.cz>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Alan Stern <stern@rowland.harvard.edu>,
+Cc: Pavel Machek <pavel@ucw.cz>,
+	Alan Stern <stern@rowland.harvard.edu>,
 	David Howells <dhowells@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
@@ -19,7 +20,6 @@ Cc: Alan Stern <stern@rowland.harvard.edu>,
 	Matthew Garrett <mjg59@srcf.ucam.org>,
 	Len Brown <len.brown@intel.com>,
 	Josh Boyer <jwboyer@redhat.com>,
-	Vojtech Pavlik <vojtech@suse.cz>,
 	Matt Fleming <matt.fleming@intel.com>,
 	James Bottomley <james.bottomley@hansenpartnership.com>,
 	Greg KH <gregkh@linuxfoundation.org>, JKosina@suse.com,
@@ -28,64 +28,48 @@ Cc: Alan Stern <stern@rowland.harvard.edu>,
 	"David S. Miller" <davem@davemloft.net>,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
-To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-pm-owner@vger.kernel.org>
-In-Reply-To: <20130926120621.GA7537@amd.pavel.ucw.cz>
-Sender: linux-pm-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Vojtech Pavlik <vojtech@suse.cz>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.nue.novell.com ([195.135.221.5]:48361 "EHLO
+	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757113Ab3IZNUu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 Sep 2013 09:20:50 -0400
+In-Reply-To: <20130926122210.GA30225@suse.cz>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-=E6=96=BC =E5=9B=9B=EF=BC=8C2013-09-26 =E6=96=BC 14:06 +0200=EF=BC=8CPa=
-vel Machek =E6=8F=90=E5=88=B0=EF=BC=9A
-> Hi!
+=E6=96=BC =E5=9B=9B=EF=BC=8C2013-09-26 =E6=96=BC 14:22 +0200=EF=BC=8CVo=
+jtech Pavlik =E6=8F=90=E5=88=B0=EF=BC=9A
+> On Thu, Sep 26, 2013 at 02:06:21PM +0200, Pavel Machek wrote:
 >=20
-> > For the symmetric key solution, I will try HMAC (Hash Message
-> > Authentication Code). It's already used in networking, hope the
-> > performance is not too bad to a big image.
+> > > For the symmetric key solution, I will try HMAC (Hash Message
+> > > Authentication Code). It's already used in networking, hope the
+> > > performance is not too bad to a big image.
+> >=20
+> > Kernel already supports crc32 of the hibernation image, you may wan=
+t
+> > to take a look how that is done.
+> >=20
+> > Maybe you want to replace crc32 with cryptographics hash (sha1?) an=
+d
+> > then use only hash for more crypto? That way speed of whatever
+> crypto
+> > you do should not be an issue.
 >=20
-> Kernel already supports crc32 of the hibernation image, you may want
-> to take a look how that is done.
+> Well, yes, one could skip the CRC when the signing is enabled to gain
+> a
+> little speedup.=20
 
-In current kernel design, The crc32 is only for the LZO in-kernel
-hibernate, doesn't apply to non-compress hibernate and userspace
-hibernate.
+In current kernel, CRC is for check the integrity of LZO compressed
+image, the purpose is different to check the integrity of snapshot
+image.
+So, CRC will not in non-compress hibernate or userspace hibernate code
+path
 
-Put signature to snapshot header can support any kind of caller that's
-trigger hibernate. Any userspace hibernate tool will take the snapshot
-image from kernel, so, we need put the signature(or hash result) to
-snapshot header before userspace write it to anywhere.=20
-
->=20
-> Maybe you want to replace crc32 with cryptographics hash (sha1?) and
-> then use only hash for more crypto? That way speed of whatever crypto
-> you do should not be an issue.
-
-That speed of hash is calculated from non-compress snapshot image, does
-not overlap with crc32.
-
->=20
-> Actually...
->=20
-> Is not it as simple as storing hash of hibernation image into NVRAM
-> and then verifying the hash matches the value in NVRAM on next
-> startup? No encryption needed.=20
->=20
-> And that may even be useful for non-secure-boot people, as it ensures
-> you boot right image after resume, boot it just once, etc...
->=20
-> 									Pavel
-
-The HMAC approach will not encrypt, just put the key of HMAC to boottim=
-e
-variable.=20
-
-If user doesn't enable UEFI secure boot, that's fine, the key of HMAC
-still cannot access in OS runtime.=20
-If user enable UEFI secure boot, then that's better! Because all EFI
-file will signed by the manufacturers or OSVs to make sure the code is
-secure, will not pass the key to runtime.
-
+On the other hand, attacker can easily change the CRC code in the heade=
+r
+of LZO hibernate image.
 
 Thanks a lot!
 Joey Lee
-
-
