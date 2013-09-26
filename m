@@ -1,93 +1,89 @@
-From: =?utf-8?Q?Lothar_Wa=C3=9Fmann?= <LW@KARO-electronics.de>
-Subject: Re: [PATCH 2/3] ARM: mxs: crypto: Add Freescale MXS DCP driver
-Date: Thu, 26 Sep 2013 16:09:29 +0200
-Message-ID: <21060.16409.341402.552996@ipc1.ka-ro>
-References: <1380194306-5243-1-git-send-email-marex@denx.de>
-	<1380194306-5243-2-git-send-email-marex@denx.de>
-	<21060.9453.908125.71858@ipc1.ka-ro>
-	<201309261604.37168.marex@denx.de>
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
+ snapshot
+Date: Thu, 26 Sep 2013 07:44:14 -0700
+Message-ID: <1380206654.18835.56.camel@dabdike.int.hansenpartnership.com>
+References: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org>
+	  <1380147414.18835.36.camel@dabdike.int.hansenpartnership.com>
+	  <20130926002730.GA26857@amd.pavel.ucw.cz>
+	 <1380162771.18835.47.camel@dabdike.int.hansenpartnership.com>
+	 <alpine.LNX.2.00.1309260819490.18703@pobox.suse.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Marek Vasut <marex@denx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.karo-electronics.de ([81.173.242.67]:49734 "EHLO
-	mail.karo-electronics.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750896Ab3IZOJc (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Sep 2013 10:09:32 -0400
-In-Reply-To: <201309261604.37168.marex@denx.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: 7bit
+Cc: Pavel Machek <pavel@ucw.cz>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	David Howells <dhowells@redhat.com>,
+	"Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	opensuse-kernel@opensuse.org, "Rafael J. Wysocki" <rjw@sisk.pl>,
+	Matthew Garrett <mjg59@srcf.ucam.org>,
+	Len Brown <len.brown@intel.com>,
+	Josh Boyer <jwboyer@redhat.com>,
+	Vojtech Pavlik <vojtech@suse.cz>,
+	Matt Fleming <matt.fleming@intel.com>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
+	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>,
+	"Lee, Chun-Yi" <jlee@suse.com>
+To: Jiri Kosina <jiri.kosina@suse.com>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <alpine.LNX.2.00.1309260819490.18703@pobox.suse.cz>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On Thu, 2013-09-26 at 08:24 +0200, Jiri Kosina wrote:
+> On Wed, 25 Sep 2013, James Bottomley wrote:
+> 
+> > > I don't get this. Why is it important that current kernel can't
+> > > recreate the signature?
+> > 
+> > The thread model is an attack on the saved information (i.e. the suspend
+> > image) between it being saved by the old kernel and used by the new one.
+> > The important point isn't that the new kernel doesn't have access to
+> > K_{N-1} it's that no-one does: the key is destroyed as soon as the old
+> > kernel terminates however the verification public part P_{N-1} survives.
+> 
+> James,
+> 
+> could you please describe the exact scenario you think that the symmetric 
+> keys aproach doesn't protect against, while the assymetric key aproach 
+> does?
+> 
+> The crucial points, which I believe make the symmetric key aproach work 
+> (and I feel quite embarassed by the fact that I haven't realized this 
+> initially when coming up with the assymetric keys aproach) are:
+> 
+> - the kernel that is performing the actual resumption is trusted in the 
+>   secure boot model, i.e. you trust it to perform proper verification
+> 
+> - potentially malicious userspace (which is what we are protecting against 
+>   -- malicious root creating fake hibernation image and issuing reboot) 
+>   doesn't have access to the symmetric key
 
-Marek Vasut writes:
-> Dear Lothar Wa=C3=9Fmann,
->=20
-> > Hi Marek,
-> >=20
-> > some small comments below.
-> >=20
-> > Marek Vasut writes:
-> > > diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-> > > new file mode 100644
-> > > index 0000000..c2b35c7
-> > > --- /dev/null
-> > > +++ b/drivers/crypto/mxs-dcp.c
-> >=20
-> > [...]
-> >=20
-> > > +/* AES 128 ECB and AES 128 CBC */
-> > > +static struct crypto_alg dcp_aes_algs[] =3D {
-> > > +	[0] =3D {
-> > > +		.cra_name		=3D "ecb(aes)",
-> > > +		.cra_driver_name	=3D "ecb-aes-dcp",
-> > > +		.cra_priority		=3D 400,
-> > > +		.cra_alignmask		=3D 15,
-> > > +		.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
-> > > +					  CRYPTO_ALG_ASYNC |
-> > > +					  CRYPTO_ALG_NEED_FALLBACK,
-> > > +		.cra_init		=3D mxs_dcp_aes_fallback_init,
-> > > +		.cra_exit		=3D mxs_dcp_aes_fallback_exit,
-> > > +		.cra_blocksize		=3D AES_BLOCK_SIZE,
-> > > +		.cra_ctxsize		=3D sizeof(struct dcp_async_ctx),
-> > > +		.cra_type		=3D &crypto_ablkcipher_type,
-> > > +		.cra_module		=3D THIS_MODULE,
-> > > +		.cra_u	=3D {
-> > > +			.ablkcipher =3D {
-> > > +				.min_keysize	=3D AES_MIN_KEY_SIZE,
-> > > +				.max_keysize	=3D AES_MAX_KEY_SIZE,
-> > > +				.setkey		=3D mxs_dcp_aes_setkey,
-> > > +				.encrypt	=3D mxs_dcp_aes_ecb_encrypt,
-> > > +				.decrypt	=3D mxs_dcp_aes_ecb_decrypt
-> > > +			}
-> >=20
-> > missing ',' after '}'
->=20
-> Is this a problem? The last ',' is not needed by the C standard.
->=20
-The problem arises when someone wants to append another item to the
-list. Without the comma he has to change two lines which may cause
-merge conflicts if two people add different items to the same struct.
+OK, so the scheme is to keep a symmetric key in BS that is passed into
+the kernel each time (effectively a secret key) for signing and
+validation?
 
-That's why we usually have (unnecessary) commas on the last element of
-a struct initializer (except when they are meant to be the last
-element of course).
+The only two problems I see are
+
+     1. The key isn't generational (any compromise obtains it).  This
+        can be fixed by using a set of keys generated on each boot and
+        passing in both K_{N-1} and K_N
+     2. No external agency other than the next kernel can do the
+        validation since the validating key has to be secret
+
+The importance of 2 is just tripwire like detection ... perhaps it
+doesn't really matter in a personal computer situation.  It would matter
+in an enterprise where images are stored and re-used but until servers
+have UEFI secure boot, that's not going to be an issue.
+
+James
 
 
-Lothar Wa=C3=9Fmann
---=20
-___________________________________________________________
 
-Ka-Ro electronics GmbH | Pascalstra=C3=9Fe 22 | D - 52076 Aachen
-Phone: +49 2408 1402-0 | Fax: +49 2408 1402-10
-Gesch=C3=A4ftsf=C3=BChrer: Matthias Kaussen
-Handelsregistereintrag: Amtsgericht Aachen, HRB 4996
-
-www.karo-electronics.de | info@karo-electronics.de
-___________________________________________________________
