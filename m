@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
  snapshot
 Date: Thu, 26 Sep 2013 09:36:35 +0800
-Message-ID: <1380159395.32302.19.camel__45476.3055815876$1380159423$gmane$org@linux-s257.site>
+Message-ID: <1380159395.32302.19.camel__24620.5234820538$1380159430$gmane$org@linux-s257.site>
 References: <1379206621-18639-1-git-send-email-jlee@suse.com>
 	 <29408.1380143073@warthog.procyon.org.uk>
 Mime-Version: 1.0
@@ -25,9 +25,9 @@ Cc: linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: David Howells <dhowells@redhat.com>
-Return-path: <linux-pm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <29408.1380143073@warthog.procyon.org.uk>
-Sender: linux-pm-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E4=B8=89=EF=BC=8C2013-09-25 =E6=96=BC 22:04 +0100=EF=BC=8CDa=
@@ -67,4 +67,3 @@ I think keys-devel tree need it.
 
 Thanks a lot!
 Joey Lee
-
