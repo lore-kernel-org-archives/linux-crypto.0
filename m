@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
  snapshot
 Date: Thu, 26 Sep 2013 10:19:17 +0800
-Message-ID: <1380161957.32302.42.camel__30903.6513012417$1380161979$gmane$org@linux-s257.site>
+Message-ID: <1380161957.32302.42.camel__42801.7512466342$1380161984$gmane$org@linux-s257.site>
 References: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -24,10 +24,15 @@ Cc: David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Alan Stern <stern@rowland.harvard.edu>
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.nue.novell.com ([195.135.221.5]:56672 "EHLO
+	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753625Ab3IZCTU (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 Sep 2013 22:19:20 -0400
 In-Reply-To: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 =E6=96=BC =E4=B8=89=EF=BC=8C2013-09-25 =E6=96=BC 17:25 -0400=EF=BC=8CAl=
 an Stern =E6=8F=90=E5=88=B0=EF=BC=9A
@@ -88,9 +93,3 @@ Please current me if I missed anything.
 
 Thanks a lot!
 Joey Lee
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-securit=
-y-module" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
