@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
  snapshot
 Date: Thu, 26 Sep 2013 20:56:10 +0800
-Message-ID: <1380200170.32302.85.camel__21993.8818169341$1380200251$gmane$org@linux-s257.site>
+Message-ID: <1380200170.32302.85.camel__49336.1338078559$1380200259$gmane$org@linux-s257.site>
 References: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org>
 	 <1380161957.32302.42.camel@linux-s257.site>
 	 <1380192218.32302.69.camel@linux-s257.site>
@@ -29,9 +29,9 @@ Cc: Alan Stern <stern@rowland.harvard.edu>,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <20130926120621.GA7537@amd.pavel.ucw.cz>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E5=9B=9B=EF=BC=8C2013-09-26 =E6=96=BC 14:06 +0200=EF=BC=8CPa=
@@ -87,3 +87,10 @@ secure, will not pass the key to runtime.
 
 Thanks a lot!
 Joey Lee
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-securit=
+y-module" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
