@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [PATCH V4 13/15] Hibernate: introduced SNAPSHOT_SIG_HASH
  config for select hash algorithm
 Date: Thu, 26 Sep 2013 09:43:39 +0800
-Message-ID: <1380159819.32302.24.camel__11912.4571713202$1380159833$gmane$org@linux-s257.site>
+Message-ID: <1380159819.32302.24.camel__33105.8729127564$1380159840$gmane$org@linux-s257.site>
 References: <1379206621-18639-1-git-send-email-jlee@suse.com>
 	 <1379206621-18639-14-git-send-email-jlee@suse.com>
 	 <20130918134535.GA3748@amd.pavel.ucw.cz>
@@ -27,15 +27,10 @@ Cc: linux-kernel@vger.kernel.org,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nue.novell.com ([195.135.221.5]:47475 "EHLO
-	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751384Ab3IZBnk (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Sep 2013 21:43:40 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20130918134535.GA3748@amd.pavel.ucw.cz>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E4=B8=89=EF=BC=8C2013-09-18 =E6=96=BC 15:45 +0200=EF=BC=8CPa=
 vel Machek =E6=8F=90=E5=88=B0=EF=BC=9A
