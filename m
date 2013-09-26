@@ -2,7 +2,7 @@ From: joeyli <jlee@suse.com>
 Subject: Re: [RFC V4 PATCH 00/15] Signature verification of hibernate
  snapshot
 Date: Thu, 26 Sep 2013 21:20:38 +0800
-Message-ID: <1380201638.32302.90.camel__11281.5675246113$1380201694$gmane$org@linux-s257.site>
+Message-ID: <1380201638.32302.90.camel__6502.82887877456$1380201697$gmane$org@linux-s257.site>
 References: <Pine.LNX.4.44L0.1309251723001.26508-100000@netrider.rowland.org>
 	 <1380161957.32302.42.camel@linux-s257.site>
 	 <1380192218.32302.69.camel@linux-s257.site>
@@ -29,15 +29,10 @@ Cc: Pavel Machek <pavel@ucw.cz>,
 	"H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>,
 	Gary Lin <GLin@suse.com>, Vivek Goyal <vgoyal@redhat.com>
 To: Vojtech Pavlik <vojtech@suse.cz>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.nue.novell.com ([195.135.221.5]:48361 "EHLO
-	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757113Ab3IZNUu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Sep 2013 09:20:50 -0400
+Return-path: <linux-pm-owner@vger.kernel.org>
 In-Reply-To: <20130926122210.GA30225@suse.cz>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-pm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 =E6=96=BC =E5=9B=9B=EF=BC=8C2013-09-26 =E6=96=BC 14:22 +0200=EF=BC=8CVo=
 jtech Pavlik =E6=8F=90=E5=88=B0=EF=BC=9A
@@ -73,3 +68,4 @@ of LZO hibernate image.
 
 Thanks a lot!
 Joey Lee
+
