@@ -1,50 +1,89 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: Re: [PATCH 2/3] ARM: mxs: crypto: Add Freescale MXS DCP driver
-Date: Thu, 26 Sep 2013 08:27:15 -0300
-Message-ID: <CAOMZO5AU_R5aeHKbkGRGuyXsVOVdUwdF5oZXdEZZYs442nFnEA@mail.gmail.com>
+From: =?utf-8?Q?Lothar_Wa=C3=9Fmann?= <LW@KARO-electronics.de>
+Subject: Re: [PATCH 3/3] ARM: mxs: dts: Enable DCP for MXS
+Date: Thu, 26 Sep 2013 13:36:10 +0200
+Message-ID: <21060.7210.127710.800708@ipc1.ka-ro>
 References: <1380194306-5243-1-git-send-email-marex@denx.de>
-	<1380194306-5243-2-git-send-email-marex@denx.de>
+	<1380194306-5243-3-git-send-email-marex@denx.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-crypto@vger.kernel.org,
+	Fabio Estevam <fabio.estevam@freescale.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
+	Shawn Guo <shawn.guo@linaro.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Shawn Guo <shawn.guo@linaro.org>
+	linux-arm-kernel@lists.infradead.org
 To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vb0-f50.google.com ([209.85.212.50]:47114 "EHLO
-	mail-vb0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756628Ab3IZL1Q (ORCPT
+Received: from mail.karo-electronics.de ([81.173.242.67]:62309 "EHLO
+	mail.karo-electronics.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756554Ab3IZLgY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Sep 2013 07:27:16 -0400
-Received: by mail-vb0-f50.google.com with SMTP id x14so710707vbb.23
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Sep 2013 04:27:15 -0700 (PDT)
-In-Reply-To: <1380194306-5243-2-git-send-email-marex@denx.de>
+	Thu, 26 Sep 2013 07:36:24 -0400
+In-Reply-To: <1380194306-5243-3-git-send-email-marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Marek,
+Hi,
 
-On Thu, Sep 26, 2013 at 8:18 AM, Marek Vasut <marex@denx.de> wrote:
-> Add support for the MXS DCP block. The driver currently supports
-> SHA-1/SHA-256 hashing and AES-128 CBC/ECB modes. The non-standard
-> CRC32 is not yet supported.
->
+Marek Vasut writes:
+> Enable the DCP by default on both i.MX23 and i.MX28.
+>=20
 > Signed-off-by: Marek Vasut <marex@denx.de>
 > Cc: Herbert Xu <herbert@gondor.apana.org.au>
 > Cc: David S. Miller <davem@davemloft.net>
+> Cc: Fabio Estevam <fabio.estevam@freescale.com>
+> Cc: Shawn Guo <shawn.guo@linaro.org>
+> To: linux-crypto@vger.kernel.org
 > ---
->  drivers/crypto/Kconfig   |   17 +
->  drivers/crypto/Makefile  |    1 +
->  drivers/crypto/mxs-dcp.c | 1082 ++++++++++++++++++++++++++++++++++++++++++++++
+>  arch/arm/boot/dts/imx23.dtsi | 4 +++-
+>  arch/arm/boot/dts/imx28.dtsi | 5 +++--
+>  2 files changed, 6 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/arch/arm/boot/dts/imx23.dtsi b/arch/arm/boot/dts/imx23.d=
+tsi
+> index 87faa6e..0630a9a 100644
+> --- a/arch/arm/boot/dts/imx23.dtsi
+> +++ b/arch/arm/boot/dts/imx23.dtsi
+> @@ -337,8 +337,10 @@
+>  			};
+> =20
+>  			dcp@80028000 {
+> +				compatible =3D "fsl,mxs-dcp";
+>  				reg =3D <0x80028000 0x2000>;
+> -				status =3D "disabled";
+> +				interrupts =3D <53 54>;
+> +				status =3D "okay";
+>  			};
+AFAICT the policy seems to be that nodes, that are always enabled
+don't get a 'status' property at all.
 
-What about the existing DCP driver at drivers/crypto/dcp.c ?
+>  			pxp@8002a000 {
+> diff --git a/arch/arm/boot/dts/imx28.dtsi b/arch/arm/boot/dts/imx28.d=
+tsi
+> index 918d419..8b5ad60 100644
+> --- a/arch/arm/boot/dts/imx28.dtsi
+> +++ b/arch/arm/boot/dts/imx28.dtsi
+> @@ -782,9 +782,10 @@
+>  			};
+> =20
+>  			dcp: dcp@80028000 {
+> +				compatible =3D "fsl,mxs-dcp";
+>  				reg =3D <0x80028000 0x2000>;
+> -				interrupts =3D <52 53 54>;
+> -				compatible =3D "fsl-dcp";
+>
+What about drivers/crypto/dcp.c that is currently using this property?
 
-Why do we need to have two drivers for the same IP block? It looks
-confusing to have both.
 
-Regards,
+Lothar Wa=C3=9Fmann
+--=20
+___________________________________________________________
 
-Fabio Estevam
+Ka-Ro electronics GmbH | Pascalstra=C3=9Fe 22 | D - 52076 Aachen
+Phone: +49 2408 1402-0 | Fax: +49 2408 1402-10
+Gesch=C3=A4ftsf=C3=BChrer: Matthias Kaussen
+Handelsregistereintrag: Amtsgericht Aachen, HRB 4996
+
+www.karo-electronics.de | info@karo-electronics.de
+___________________________________________________________
