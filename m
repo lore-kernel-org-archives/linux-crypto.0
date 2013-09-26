@@ -1,37 +1,80 @@
 From: Marek Vasut <marex@denx.de>
 Subject: Re: [PATCH 2/3] ARM: mxs: crypto: Add Freescale MXS DCP driver
-Date: Thu, 26 Sep 2013 16:02:01 +0200
-Message-ID: <201309261602.01689.marex@denx.de>
-References: <1380194306-5243-1-git-send-email-marex@denx.de> <1380194306-5243-2-git-send-email-marex@denx.de> <CAO+CcW=h1AZPYDR1q6LUcxbHWFbjMn7DwQnDnfXMS6MykApfdw@mail.gmail.com>
+Date: Thu, 26 Sep 2013 16:04:36 +0200
+Message-ID: <201309261604.37168.marex@denx.de>
+References: <1380194306-5243-1-git-send-email-marex@denx.de> <1380194306-5243-2-git-send-email-marex@denx.de> <21060.9453.908125.71858@ipc1.ka-ro>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: Text/Plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-arm-kernel@lists.infradead.org,
 	"David S. Miller" <davem@davemloft.net>
-To: "Veli-Pekka Peltola" <veli-pekka.peltola@iki.fi>
+To: Lothar =?iso-8859-1?q?Wa=DFmann?= <LW@karo-electronics.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:49701 "EHLO
+Received: from mail-out.m-online.net ([212.18.0.9]:42882 "EHLO
 	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750749Ab3IZOCG (ORCPT
+	with ESMTP id S1750888Ab3IZOEk convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Sep 2013 10:02:06 -0400
-In-Reply-To: <CAO+CcW=h1AZPYDR1q6LUcxbHWFbjMn7DwQnDnfXMS6MykApfdw@mail.gmail.com>
+	Thu, 26 Sep 2013 10:04:40 -0400
+In-Reply-To: <21060.9453.908125.71858@ipc1.ka-ro>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear Veli-Pekka Peltola,
+Dear Lothar Wa=DFmann,
 
 > Hi Marek,
-> 
-> > +         To compile this driver as a module, choose M here: the module
-> > +         will be called atmel-sha.
-> 
-> This is probably wrong?
+>=20
+> some small comments below.
+>=20
+> Marek Vasut writes:
+> > diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+> > new file mode 100644
+> > index 0000000..c2b35c7
+> > --- /dev/null
+> > +++ b/drivers/crypto/mxs-dcp.c
+>=20
+> [...]
+>=20
+> > +/* AES 128 ECB and AES 128 CBC */
+> > +static struct crypto_alg dcp_aes_algs[] =3D {
+> > +	[0] =3D {
+> > +		.cra_name		=3D "ecb(aes)",
+> > +		.cra_driver_name	=3D "ecb-aes-dcp",
+> > +		.cra_priority		=3D 400,
+> > +		.cra_alignmask		=3D 15,
+> > +		.cra_flags		=3D CRYPTO_ALG_TYPE_ABLKCIPHER |
+> > +					  CRYPTO_ALG_ASYNC |
+> > +					  CRYPTO_ALG_NEED_FALLBACK,
+> > +		.cra_init		=3D mxs_dcp_aes_fallback_init,
+> > +		.cra_exit		=3D mxs_dcp_aes_fallback_exit,
+> > +		.cra_blocksize		=3D AES_BLOCK_SIZE,
+> > +		.cra_ctxsize		=3D sizeof(struct dcp_async_ctx),
+> > +		.cra_type		=3D &crypto_ablkcipher_type,
+> > +		.cra_module		=3D THIS_MODULE,
+> > +		.cra_u	=3D {
+> > +			.ablkcipher =3D {
+> > +				.min_keysize	=3D AES_MIN_KEY_SIZE,
+> > +				.max_keysize	=3D AES_MAX_KEY_SIZE,
+> > +				.setkey		=3D mxs_dcp_aes_setkey,
+> > +				.encrypt	=3D mxs_dcp_aes_ecb_encrypt,
+> > +				.decrypt	=3D mxs_dcp_aes_ecb_decrypt
+> > +			}
+>=20
+> missing ',' after '}'
 
-Certainly. Nice to have you back btw. ;-)
+Is this a problem? The last ',' is not needed by the C standard.
+
+[...]
+
+
+>=20
+> > +static const struct of_device_id mxs_dcp_dt_ids[] =3D {
+> > +	{.compatible =3D "fsl,mxs-dcp", .data =3D NULL,},
+>=20
+> missing spaces after '{' and before '}'
+
+Thanks!
 
 Best regards,
 Marek Vasut
