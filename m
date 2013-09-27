@@ -1,61 +1,89 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [PATCH 00/51] DMA mask changes
-Date: Fri, 27 Sep 2013 09:27:04 +0100
-Message-ID: <20130927082703.GZ25647@n2100.arm.linux.org.uk>
-References: <20130919212235.GD12758@n2100.arm.linux.org.uk>
- <CACna6rxkpYzdD8_Jfi22vA2suUa3k-JM65_gCySQpp4crVCoPg@mail.gmail.com>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: Asymmetric cryptography HW offloading
+Date: Fri, 27 Sep 2013 13:58:23 +0300
+Message-ID: <524564CF.6030508@freescale.com>
+References: <524034A1.70204@freescale.com> <524041EE.5070209@gnutls.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: alsa-devel@alsa-project.org, linux-doc@vger.kernel.org,
- linux-mmc@vger.kernel.org, linux-fbdev@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-ide@vger.kernel.org,
- "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
- linux-samsung-soc@vger.kernel.org,
- Linux SCSI List <linux-scsi@vger.kernel.org>,
- e1000-devel@lists.sourceforge.net, b43-dev <b43-dev@lists.infradead.org>,
- linux-media@vger.kernel.org, devicetree@vger.kernel.org,
- dri-devel <dri-devel@lists.freedesktop.org>, linux-tegra@vger.kernel.org,
- linux-omap@vger.kernel.org,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- Solarflare linux maintainers <linux-net-drivers@solarflare.com>,
- Network Development <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
- "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
- linux-crypto@vger.kernel.org, uclinux-dist-devel@black
-To: =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-Return-path: <alsa-devel-bounces@alsa-project.org>
-Content-Disposition: inline
-In-Reply-To: <CACna6rxkpYzdD8_Jfi22vA2suUa3k-JM65_gCySQpp4crVCoPg@mail.gmail.com>
-List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
-List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
-List-Post: <mailto:alsa-devel@alsa-project.org>
-List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
-List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
-Errors-To: alsa-devel-bounces@alsa-project.org
-Sender: alsa-devel-bounces@alsa-project.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Yashpal Dutta <yashpal.dutta@freescale.com>
+To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from co9ehsobe002.messaging.microsoft.com ([207.46.163.25]:29867
+	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751801Ab3I0K6m convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Sep 2013 06:58:42 -0400
+In-Reply-To: <524041EE.5070209@gnutls.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gVGh1LCBTZXAgMjYsIDIwMTMgYXQgMTA6MjM6MDhQTSArMDIwMCwgUmFmYcWCIE1pxYJlY2tp
-IHdyb3RlOgo+IDIwMTMvOS8xOSBSdXNzZWxsIEtpbmcgLSBBUk0gTGludXggPGxpbnV4QGFybS5s
-aW51eC5vcmcudWs+Ogo+ID4gVGhpcyBlbWFpbCBpcyBvbmx5IGJlaW5nIHNlbnQgdG8gdGhlIG1h
-aWxpbmcgbGlzdHMgaW4gcXVlc3Rpb24sIG5vdCB0bwo+ID4gYW55b25lIHBlcnNvbmFsbHkuICBU
-aGUgbGlzdCBvZiBpbmRpdmlkdWFscyBpcyBmYXIgdG8gZ3JlYXQgdG8gZG8gdGhhdC4KPiA+IEkn
-bSBob3Bpbmcgbm8gbWFpbGluZyBsaXN0cyByZWplY3QgdGhlIHBhdGNoZXMgYmFzZWQgb24gdGhl
-IG51bWJlciBvZgo+ID4gcmVjaXBpZW50cy4KPiAKPiBIdWgsIEkgdGhpbmsgaXQgd2FzIGVub3Vn
-aCB0byBzZW5kIG9ubHkgMyBwYXRjaGVzIHRvIHRoZSBiNDMtZGV2QC4gTGlrZToKPiBbUEFUQ0gg
-MDEvNTFdIERNQS1BUEk6IHByb3ZpZGUgYSBoZWxwZXIgdG8gc2V0IGJvdGggRE1BIGFuZCBjb2hl
-cmVudCBETUEgbWFza3MKPiBbUEFUQ0ggMTQvNTFdIERNQS1BUEk6IG5ldDogYjQzOiAoLi4uKQo+
-IFtQQVRDSCAxNS81MV0gRE1BLUFQSTogbmV0OiBiNDNsZWdhY3k6ICguLi4pCj4gOykKPiAKPiBJ
-IGJlbGlldmUgSm9lIGhhcyBzb21lIG5pY2Ugc2NyaXB0IGZvciBkb2luZyBpdCB0aGF0IHdheS4g
-V2hlbiBmaXhpbmcKPiBzb21lIGNvZGluZyBzdHlsZSAvIGZvcm1hdHRpbmcsIGhlIHNlbmRzIG9u
-bHkgcmVsYXRlZCBwYXRjaGVzIHRvIHRoZQo+IGdpdmVuIE1MLgoKSWYgSSBkaWQgdGhhdCwgdGhl
-biB0aGUgbWFpbGluZyBsaXN0cyB3b3VsZCBub3QgZ2V0IHRoZSBmaXJzdCBwYXRjaCwKYmVjYXVz
-ZSBhbG1vc3Qgbm9uZSBvZiB0aGUgbGlzdHMgd291bGQgYmUgcmVmZXJyZWQgdG8gYnkgcGF0Y2gg
-MS4KCk1vcmVvdmVyLCBwZW9wbGUgY29tcGxhaW4gd2hlbiB0aGV5IGRvbid0IGhhdmUgYWNjZXNz
-IHRvIHRoZSBmdWxsCnBhdGNoIHNlcmllcyAtIHRoZXkgYXNzdW1lIHBhdGNoZXMgYXJlIG1pc3Np
-bmcgZm9yIHNvbWUgcmVhc29uLCBhbmQKdGhleSBhc2sgZm9yIHRoZSByZXN0IG9mIHRoZSBzZXJp
-ZXMuCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkFsc2Et
-ZGV2ZWwgbWFpbGluZyBsaXN0CkFsc2EtZGV2ZWxAYWxzYS1wcm9qZWN0Lm9yZwpodHRwOi8vbWFp
-bG1hbi5hbHNhLXByb2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8vYWxzYS1kZXZlbAo=
+On 9/23/2013 4:28 PM, Nikos Mavrogiannopoulos wrote:
+> On 09/23/2013 02:31 PM, Horia Geant=C4=83 wrote:
+>> Hi,
+>>
+>> CAAM crypto engine (drivers/crypto/caam/*) is capable of asymmetric
+>> operations, like: modular exponentiation, RSA
+>> sign/verify/encrypt/decrypt, (EC)DSA sign etc.
+>> I would appreciate some design guidelines on how to harness these
+>> capabilities, for crypto engines in general.
+>>
+>> 1. In-kernel interface for asymmetric crypto
+>> Should crypto/asymmetric_keys/* be used, i.e. appended with modular
+>> exponentiation, other asymmetric operations?
+> The BSD's cryptodev supports the following operations which may help =
+in
+> that aspect (no elliptic curve operations present). I don't know if a=
+ll
+> of them worth the context switch.
+>
+> #define CRK_MOD_EXP		0
+> #define CRK_MOD_EXP_CRT		1
+> #define CRK_DSA_SIGN		2
+> #define CRK_DSA_VERIFY		3
+> #define CRK_DH_COMPUTE_KEY	4
+> #define CRK_MOD_ADD		5
+> #define CRK_MOD_ADDINV		6
+> #define CRK_MOD_SUB		7
+> #define CRK_MOD_MULT		8
+> #define CRK_MOD_MULTINV		9
+> #define CRK_MOD			10
+
+Thanks for the tip.
+I took a look at BSD - AFAICT there is no SW implementation and crypto=20
+engine drivers handle only the first two operations (MOD_EXP).
+
+My main concern now is the asymmetric ciphers API, that would eventuall=
+y=20
+allow implementing the operations in SW/HW.
+I was wondering whether the same logic as for symmetric ciphers=20
+could/should be used (the API layering mentioned in=20
+Documentation/crypto/api-intro.txt).
+=46or example, crypto/asymmetric_keys/rsa.c could be registered and the=
+n=20
+used via Crypto API:
+rsa.c: crypto_alg->cra_name =3D "rsa";=20
+crypto_alg->cra_driver_name=3D"rsa-generic"; crypto_register_alg(crypto=
+_alg);
+user: tfm =3D crypto_alloc_tfm("rsa",...);
+User would get either the "rsa-generic" SW implementation or a HW=20
+implementation, if available.
+
+>
+>> 2. User space interface
+>> Should AF_ALG be expanded to provide access to this new asymmetric c=
+ypto
+>> API? The API would allow user space applications to offload PKC oper=
+ations in
+>> HW.
+> I'd be interested into adding this support into cryptodev-linux once
+> present in kernel.
+
+Thanks.
+We already have a draft implementation of asymmetric crypto +=20
+cryptodev-linux, but was developed prior to crypto/asymmetric_keys=20
+addition and thus has to be reworked.
+
+Horia
