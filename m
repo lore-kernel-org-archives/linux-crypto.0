@@ -1,52 +1,39 @@
-From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Subject: Re: Asymmetric cryptography HW offloading
-Date: Sun, 29 Sep 2013 19:50:56 +0200
-Message-ID: <52486880.4060009@gnutls.org>
-References: <524034A1.70204@freescale.com> <524041EE.5070209@gnutls.org> <524564CF.6030508@freescale.com>
+From: =?ISO-8859-1?Q?Emilio_L=F3pez?= <emilio@elopez.com.ar>
+Subject: Getting started with crypto drivers
+Date: Sun, 29 Sep 2013 15:10:27 -0300
+Message-ID: <52486D13.1000800@elopez.com.ar>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Yashpal Dutta <yashpal.dutta@freescale.com>
-To: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+To: herbert@gondor.apana.org.au, David Miller <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ee0-f51.google.com ([74.125.83.51]:46740 "EHLO
-	mail-ee0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754682Ab3I2Ru7 (ORCPT
+Received: from zetta.elopez.com.ar ([199.30.59.35]:54592 "EHLO
+	zetta.elopez.com.ar" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754676Ab3I2SKf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 29 Sep 2013 13:50:59 -0400
-Received: by mail-ee0-f51.google.com with SMTP id c1so2225137eek.10
-        for <linux-crypto@vger.kernel.org>; Sun, 29 Sep 2013 10:50:58 -0700 (PDT)
-In-Reply-To: <524564CF.6030508@freescale.com>
+	Sun, 29 Sep 2013 14:10:35 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 09/27/2013 12:58 PM, Horia Geant=C4=83 wrote:
+Hello everyone,
 
-> Thanks for the tip.
-> I took a look at BSD - AFAICT there is no SW implementation and crypt=
-o
-> engine drivers handle only the first two operations (MOD_EXP).
->=20
-> My main concern now is the asymmetric ciphers API, that would eventua=
-lly
-> allow implementing the operations in SW/HW.
-> I was wondering whether the same logic as for symmetric ciphers
-> could/should be used (the API layering mentioned in
-> Documentation/crypto/api-intro.txt).
-> For example, crypto/asymmetric_keys/rsa.c could be registered and the=
-n
-> used via Crypto API:
-> rsa.c: crypto_alg->cra_name =3D "rsa";
+I would like to write a driver to support the "Security System" hardware 
+block on some Allwinner ARM SoCs. The hardware supports AES, DES, 3DES, 
+SHA-1, MD5 and has a PRNG. Data passing is done via two FIFOs. You can 
+find some ugly userspace code to calculate a SHA1 hash here, so you can 
+get an idea of how it works:
 
-As RSA fits into the encryption API it may be just ok. I'd say do it an=
-d
-then we see whether that API causes some bottleneck for asymmetric
-encryption. But how would you fit modexp in that case?
+http://git.elopez.com.ar/ss-poc/raw/31c57d893ce8913aa0d87c982f5350433fbe89c7/md5-tool.c
 
-Having the expensive big number operations could be useful to non-crypt=
-o
-number crunching projects as well (e.g. gmp and its users).
+My main issue at the moment is that I do not have any experience working 
+with the crypto API, and that I found the documentation on 
+Documentation/ lacking for my purposes. I'd be very grateful if you 
+could suggest me reading material to understand the "hardware-oriented" 
+API better, and if you could point me to good drivers I could use as an 
+example when developing my own.
 
-regards,
-Nikos
+Thanks!
+
+Emilio
