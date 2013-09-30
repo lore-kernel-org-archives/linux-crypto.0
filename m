@@ -1,72 +1,42 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH 3/3] ARM: mxs: dts: Enable DCP for MXS
-Date: Mon, 30 Sep 2013 00:11:43 +0200
-Message-ID: <201309300011.44070.marex@denx.de>
-References: <1380194306-5243-1-git-send-email-marex@denx.de> <1380194306-5243-3-git-send-email-marex@denx.de> <21060.7210.127710.800708@ipc1.ka-ro>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org,
-	Fabio Estevam <fabio.estevam@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Shawn Guo <shawn.guo@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org
-To: Lothar =?iso-8859-1?q?Wa=DFmann?= <LW@karo-electronics.de>
+From: Sachin Kamat <sachin.kamat@linaro.org>
+Subject: [PATCH 1/2] crypto: sahara: Remove redundant of_match_ptr
+Date: Mon, 30 Sep 2013 08:49:41 +0530
+Message-ID: <1380511182-18424-1-git-send-email-sachin.kamat@linaro.org>
+Cc: herbert@gondor.apana.org.au, sachin.kamat@linaro.org,
+	Javier Martin <javier.martin@vista-silicon.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:59319 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751232Ab3I2WLz convert rfc822-to-8bit (ORCPT
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:41848 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753594Ab3I3DTz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 29 Sep 2013 18:11:55 -0400
-In-Reply-To: <21060.7210.127710.800708@ipc1.ka-ro>
+	Sun, 29 Sep 2013 23:19:55 -0400
+Received: by mail-pa0-f43.google.com with SMTP id hz1so5215338pad.30
+        for <linux-crypto@vger.kernel.org>; Sun, 29 Sep 2013 20:19:54 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear Lothar Wa=DFmann,
+The data structure of_match_ptr() protects is always compiled in.
+Hence of_match_ptr() is not needed.
 
-> Hi,
->=20
-> Marek Vasut writes:
-> > Enable the DCP by default on both i.MX23 and i.MX28.
-> >=20
-> > Signed-off-by: Marek Vasut <marex@denx.de>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: David S. Miller <davem@davemloft.net>
-> > Cc: Fabio Estevam <fabio.estevam@freescale.com>
-> > Cc: Shawn Guo <shawn.guo@linaro.org>
-> > To: linux-crypto@vger.kernel.org
-> > ---
-> >=20
-> >  arch/arm/boot/dts/imx23.dtsi | 4 +++-
-> >  arch/arm/boot/dts/imx28.dtsi | 5 +++--
-> >  2 files changed, 6 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/arch/arm/boot/dts/imx23.dtsi b/arch/arm/boot/dts/imx23=
-=2Edtsi
-> > index 87faa6e..0630a9a 100644
-> > --- a/arch/arm/boot/dts/imx23.dtsi
-> > +++ b/arch/arm/boot/dts/imx23.dtsi
-> > @@ -337,8 +337,10 @@
-> >=20
-> >  			};
-> >  		=09
-> >  			dcp@80028000 {
-> >=20
-> > +				compatible =3D "fsl,mxs-dcp";
-> >=20
-> >  				reg =3D <0x80028000 0x2000>;
-> >=20
-> > -				status =3D "disabled";
-> > +				interrupts =3D <53 54>;
-> > +				status =3D "okay";
-> >=20
-> >  			};
->=20
-> AFAICT the policy seems to be that nodes, that are always enabled
-> don't get a 'status' property at all.
+Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
+Cc: Javier Martin <javier.martin@vista-silicon.com>
+---
+ drivers/crypto/sahara.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Is this documented somewhere ?
-
-Best regards,
-Marek Vasut
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index d7bb8ba..785a9de 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -1058,7 +1058,7 @@ static struct platform_driver sahara_driver = {
+ 	.driver		= {
+ 		.name	= SAHARA_NAME,
+ 		.owner	= THIS_MODULE,
+-		.of_match_table = of_match_ptr(sahara_dt_ids),
++		.of_match_table = sahara_dt_ids,
+ 	},
+ 	.id_table = sahara_platform_ids,
+ };
+-- 
+1.7.9.5
