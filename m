@@ -1,77 +1,41 @@
 From: Kevin Mulvey <kevin@kevinmulvey.net>
-Subject: [PATCH] Crypto: change all occurances of "kerneli" to kernel Bug #60848
-Date: Wed,  2 Oct 2013 11:56:23 -0400
-Message-ID: <1380729383-42275-1-git-send-email-kevin@kevinmulvey.net>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+Subject: [PATCH] Documentation: "kerneli" typo in description for "Serpent cipher algorithm" Bug #60848
+Date: Wed,  2 Oct 2013 12:10:37 -0400
+Message-ID: <1380730237-42543-1-git-send-email-kevin@kevinmulvey.net>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org, Kevin Mulvey <kevin@kevinmulvey.net>
-To: herbert@gondor.apana.org.au
+To: rob@landley.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qa0-f46.google.com ([209.85.216.46]:41193 "EHLO
-	mail-qa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753610Ab3JBP5O (ORCPT
+Received: from mail-qe0-f41.google.com ([209.85.128.41]:38928 "EHLO
+	mail-qe0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753692Ab3JBQKn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Oct 2013 11:57:14 -0400
-Received: by mail-qa0-f46.google.com with SMTP id j7so4501178qaq.12
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Oct 2013 08:57:13 -0700 (PDT)
+	Wed, 2 Oct 2013 12:10:43 -0400
+Received: by mail-qe0-f41.google.com with SMTP id 1so728628qee.0
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Oct 2013 09:10:43 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-replace all kerneli with kernel
+change kerneli to kernel as well as kerneli.org to kernel.org
 
 Signed-off-by: Kevin Mulvey <kevin@kevinmulvey.net>
 ---
- crypto/Kconfig           | 2 +-
- crypto/serpent_generic.c | 2 +-
- crypto/testmgr.h         | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ Documentation/crypto/api-intro.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 69ce573..84698cf 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1084,7 +1084,7 @@ config CRYPTO_SERPENT
+diff --git a/Documentation/crypto/api-intro.txt b/Documentation/crypto/api-intro.txt
+index 8b49302..94c2e8c 100644
+--- a/Documentation/crypto/api-intro.txt
++++ b/Documentation/crypto/api-intro.txt
+@@ -155,7 +155,7 @@ of the API:
  
- 	  Keys are allowed to be from 0 to 256 bits in length, in steps
- 	  of 8 bits.  Also includes the 'Tnepres' algorithm, a reversed
--	  variant of Serpent for compatibility with old kerneli.org code.
-+	  variant of Serpent for compatibility with old kernel.org code.
- 
- 	  See also:
- 	  <http://www.cl.cam.ac.uk/~rja14/serpent.html>
-diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
-index 7ddbd7e..03f58b1 100644
---- a/crypto/serpent_generic.c
-+++ b/crypto/serpent_generic.c
-@@ -663,7 +663,7 @@ module_init(serpent_mod_init);
- module_exit(serpent_mod_fini);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Serpent and tnepres (kerneli compatible serpent reversed) Cipher Algorithm");
-+MODULE_DESCRIPTION("Serpent and tnepres (kernel compatible serpent reversed) Cipher Algorithm");
- MODULE_AUTHOR("Dag Arne Osvik <osvik@ii.uib.no>");
- MODULE_ALIAS("tnepres");
- MODULE_ALIAS("serpent");
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 7d44aa3..e791172 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -585,7 +585,7 @@ static struct hash_testvec sha256_tv_template[] = {
- };
- 
- /*
-- * SHA384 test vectors from from NIST and kerneli
-+ * SHA384 test vectors from from NIST and kernel
-  */
- #define SHA384_TEST_VECTORS	4
- 
-@@ -634,7 +634,7 @@ static struct hash_testvec sha384_tv_template[] = {
- };
- 
- /*
-- * SHA512 test vectors from from NIST and kerneli
-+ * SHA512 test vectors from from NIST and kernel
-  */
- #define SHA512_TEST_VECTORS	4
- 
+ Portions of this API were derived from the following projects:
+   
+-  Kerneli Cryptoapi (http://www.kerneli.org/)
++  Kernel Cryptoapi (http://www.kernel.org/)
+     Alexander Kjeldaas
+     Herbert Valerio Riedel
+     Kyle McMartin
 -- 
 1.8.1.4
