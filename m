@@ -1,41 +1,26 @@
-From: Kevin Mulvey <kevin@kevinmulvey.net>
-Subject: [PATCH] Documentation: "kerneli" typo in description for "Serpent cipher algorithm" Bug #60848
-Date: Wed,  2 Oct 2013 12:10:37 -0400
-Message-ID: <1380730237-42543-1-git-send-email-kevin@kevinmulvey.net>
+From: Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH] Crypto: change all occurances of "kerneli" to kernel Bug
+ #60848
+Date: Wed, 2 Oct 2013 09:32:09 -0700
+Message-ID: <20131002163209.GA13959@infradead.org>
+References: <1380729383-42275-1-git-send-email-kevin@kevinmulvey.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Kevin Mulvey <kevin@kevinmulvey.net>
-To: rob@landley.net
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kevin Mulvey <kevin@kevinmulvey.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qe0-f41.google.com ([209.85.128.41]:38928 "EHLO
-	mail-qe0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753692Ab3JBQKn (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:44376 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753339Ab3JBQcQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Oct 2013 12:10:43 -0400
-Received: by mail-qe0-f41.google.com with SMTP id 1so728628qee.0
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Oct 2013 09:10:43 -0700 (PDT)
+	Wed, 2 Oct 2013 12:32:16 -0400
+Content-Disposition: inline
+In-Reply-To: <1380729383-42275-1-git-send-email-kevin@kevinmulvey.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-change kerneli to kernel as well as kerneli.org to kernel.org
+On Wed, Oct 02, 2013 at 11:56:23AM -0400, Kevin Mulvey wrote:
+> replace all kerneli with kernel
 
-Signed-off-by: Kevin Mulvey <kevin@kevinmulvey.net>
----
- Documentation/crypto/api-intro.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/crypto/api-intro.txt b/Documentation/crypto/api-intro.txt
-index 8b49302..94c2e8c 100644
---- a/Documentation/crypto/api-intro.txt
-+++ b/Documentation/crypto/api-intro.txt
-@@ -155,7 +155,7 @@ of the API:
- 
- Portions of this API were derived from the following projects:
-   
--  Kerneli Cryptoapi (http://www.kerneli.org/)
-+  Kernel Cryptoapi (http://www.kernel.org/)
-     Alexander Kjeldaas
-     Herbert Valerio Riedel
-     Kyle McMartin
--- 
-1.8.1.4
+kerneli is correct in this case.
