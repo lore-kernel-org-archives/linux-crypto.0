@@ -1,85 +1,53 @@
-From: Jim Davis <jim.epost@gmail.com>
-Subject: Re: randconfig build error with next-20131002, in crypto
-Date: Wed, 2 Oct 2013 19:54:01 -0700
-Message-ID: <CA+r1ZhhEL22-8N3McHaHZ9hmsC84mwkgz39O8t9sC967FjM_4g@mail.gmail.com>
-References: <CA+r1ZhgsXTZ_x-jzS2OpjryhCExrG0B6nB_Ph4gb9_BJL4zeCA@mail.gmail.com>
-	<20131002235615.GA7419@pd.tnic>
+From: tobias.polzer@fau.de
+Subject: Re: crypto: GCM API usage
+Date: Thu, 3 Oct 2013 08:03:45 +0200
+Message-ID: <b2497b2c434ee21c2c700427f48cc398.squirrel@faumail.uni-erlangen.de>
+References: <65abe254e199230984fd6a15dec39a76.squirrel@faumail.uni-erlangen.de>
+    <20130916183411.GC3380@d-paulus.de>
+    <20130919203316.GA31494@oc8526070481.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Borislav Petkov <bp@alien8.de>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <20131002235615.GA7419@pd.tnic>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: "Dominik Paulus" <dominik@d-paulus.de>,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, tobias.polzer@fau.de,
+	linux-kernel@i4.cs.fau.de
+To: "Marcelo Cerri" <mhcerri@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx-rz-3.rrze.uni-erlangen.de ([131.188.11.22]:41376 "EHLO
+	mx-rz-3.rrze.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754608Ab3JCGNr (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Oct 2013 02:13:47 -0400
+In-Reply-To: <20130919203316.GA31494@oc8526070481.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 2, 2013 at 4:56 PM, Borislav Petkov <bp@alien8.de> wrote:
-> On Wed, Oct 02, 2013 at 03:19:51PM -0700, Jim Davis wrote:
->> Building with the attached random configuration file,
->>
->>   LD      init/built-in.o
->> crypto/built-in.o: In function `RSA_verify_signature':
->> rsa.c:(.text+0x2dc5e): undefined reference to `mpi_get_nbits'
->> rsa.c:(.text+0x2dc68): undefined reference to `mpi_get_nbits'
->> rsa.c:(.text+0x2dc89): undefined reference to `mpi_free'
->> rsa.c:(.text+0x2dca4): undefined reference to `mpi_cmp_ui'
->> rsa.c:(.text+0x2dcb7): undefined reference to `mpi_cmp'
->> rsa.c:(.text+0x2dcc6): undefined reference to `mpi_alloc'
->> rsa.c:(.text+0x2dce7): undefined reference to `mpi_powm'
->> rsa.c:(.text+0x2dcff): undefined reference to `mpi_get_nbits'
->> rsa.c:(.text+0x2dd1c): undefined reference to `mpi_get_buffer'
->> rsa.c:(.text+0x2de07): undefined reference to `mpi_free'
->> make: *** [vmlinux] Error 1
+> I haven't used the IV generation facility of the Crypto API, but it
+> seems to be very straightforward although there's no documentation
+> about that.
 >
-> Looks like someone has forgotten this completely unused MPILIB_EXTRA
-> thing in there.
+> You should use aead_givcrypt_set_callback(), aead_givcrypt_set_assoc()
+> and aead_givcrypt_set_crypt() as you would use the regular aead
+> functions, that includes that you have to provide a buffer with length
+> equals to the algorithm block size for the IV. And then you should call
+> aead_givcrypt_set_giv() passing a counter and another IV buffer.
 >
-> Does this totally untested but obvious patch help?
+> The difference between the two IV buffers that you have to provide to
+> aead_givcrypt_set_crypt() and aead_givcrypt_set_giv() is that the first
+> one will be updated by the algorithm during the encryption of each block
+> and the second one will contain the generated IV that you will have to
+> use to decrypt data.
 >
-> ---
-> From: Borislav Petkov <bp@suse.de>
-> Date: Thu, 3 Oct 2013 01:51:15 +0200
-> Subject: [PATCH] crypto: Correct RSA MPI dependency
->
-> 9e235dcaf4f6 ("Revert "crypto: GnuPG based MPI lib - additional sources
-> (part 4)") removed the MPI lib extra stuff but left RSA selecting it
-> while it should select CONFIG_MPILIB instead. Fix it.
->
-> Reported-by: Jim Davis <jim.epost@gmail.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: David Howells <dhowells@redhat.com>
-> Signed-off-by: Borislav Petkov <bp@suse.de>
-> ---
->  crypto/asymmetric_keys/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-> index 6d2c2ea12559..755f6174585a 100644
-> --- a/crypto/asymmetric_keys/Kconfig
-> +++ b/crypto/asymmetric_keys/Kconfig
-> @@ -21,7 +21,7 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
->  config PUBLIC_KEY_ALGO_RSA
->         tristate "RSA public-key algorithm"
->         depends on ASYMMETRIC_PUBLIC_KEY_SUBTYPE
-> -       select MPILIB_EXTRA
-> +       select MPILIB
->         help
->           This option enables support for the RSA algorithm (PKCS#1, RFC3447).
->
-> --
-> 1.8.4
->
-> --
-> Regards/Gruss,
->     Boris.
->
-> Sent from a fat crate under my desk. Formatting is fine.
-> --
+> The last step is to call crypto_aead_givencrypt() as you would call
+> crypto_aead_encrypt().
 
-Yes, with the change that configuration file didn't generate a build
-error.  Tested-by: jim.epost@gmail.com (if it isn't overkill for for
-an obvious patch!).  Thanks.
+We discovered those functions, yet the only way we found how to use them was
+to use one of the ipsec modes, e.g.:
+	crypto_alloc_aead("rfc4106(gcm(aes))", 0, 0)
+
+Is this the only way this API should be used, or is there some high level
+interface to use iv generators like seqiv?
+
+Thank you for your help,
+	Dominik Paulus and Tobias Polzer
