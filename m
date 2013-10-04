@@ -1,3106 +1,1121 @@
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH v2 3/3] ARM: add support for bit sliced AES using NEON
- instructions
-Date: Thu, 3 Oct 2013 20:38:58 -0400 (EDT)
-Message-ID: <alpine.LFD.2.03.1310032036570.3023@syhkavp.arg>
-References: <1380837566-18242-1-git-send-email-ard.biesheuvel@linaro.org> <1380837566-18242-4-git-send-email-ard.biesheuvel@linaro.org>
+From: Jim Davis <jim.epost@gmail.com>
+Subject: randconfig build error with next-20131003, in crypto
+Date: Fri, 4 Oct 2013 10:23:20 -0700
+Message-ID: <CA+r1Zhg4jy0xA2+QWKywqQnGz_JbFCF7ibZ-gr06JeMereTggw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	patches@linaro.org,
-	Russell King - ARM Linux <linux@arm.linux.org.uk>,
-	Andy Polyakov <appro@openssl.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: multipart/mixed; boundary=047d7bd6a8800d8b2804e7ed8ff2
+To: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qe0-f42.google.com ([209.85.128.42]:47006 "EHLO
-	mail-qe0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752016Ab3JDAjD (ORCPT
+Received: from mail-qc0-f169.google.com ([209.85.216.169]:37786 "EHLO
+	mail-qc0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751957Ab3JDRXW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Oct 2013 20:39:03 -0400
-Received: by mail-qe0-f42.google.com with SMTP id 1so2382974qec.15
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Oct 2013 17:39:01 -0700 (PDT)
-In-Reply-To: <1380837566-18242-4-git-send-email-ard.biesheuvel@linaro.org>
+	Fri, 4 Oct 2013 13:23:22 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 3 Oct 2013, Ard Biesheuvel wrote:
+--047d7bd6a8800d8b2804e7ed8ff2
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-> Bit sliced AES gives around 45% speedup on Cortex-A15 for encryption
-> and around 25% for decryption. This implementation of the AES algorithm
-> does not rely on any lookup tables so it is believed to be invulnerable
-> to cache timing attacks.
-> 
-> This algorithm processes up to 8 blocks in parallel in constant time. This
-> means that it is not usable by chaining modes that are strictly sequential
-> in nature, such as CBC encryption. CBC decryption, however, can benefit from
-> this implementation and runs about 25% faster. The other chaining modes
-> implemented in this module, XTS and CTR, can execute fully in parallel in
-> both directions.
-> 
-> The core code has been adopted from the OpenSSL project (in collaboration
-> with the original author, on cc). For ease of maintenance, this version is
-> identical to the upstream OpenSSL code, i.e., all modifications that were
-> required to make it suitable for inclusion into the kernel have been made
-> upstream. The original [called bsaes-armv7.pl] can be found here:
-> 
->     http://git.openssl.org/gitweb/?p=openssl.git;a=commit;h=6f6a6130
-> 
-> Note to integrators:
-> While this implementation is significantly faster than the existing table
-> based ones (generic or ARM asm), especially in CTR mode, the effects on
-> power efficiency are unclear as of yet. This code does fundamentally more
-> work, by calculating values that the table based code obtains by a simple
-> lookup; only by doing all of that work in a SIMD fashion, it manages to
-> perform better.
-> 
-> Cc: Andy Polyakov <appro@openssl.org>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Building with the attached random configuration file,
 
-Acked-by: Nicolas Pitre <nico@linaro.org>
+  CC      crypto/asymmetric_keys/x509_public_key.o
+crypto/asymmetric_keys/x509_public_key.c: In function =91x509_key_preparse=
+=92:
+crypto/asymmetric_keys/x509_public_key.c:237:35: error:
+=91system_trusted_keyring=92 undeclared (first use in this function)
+crypto/asymmetric_keys/x509_public_key.c:237:35: note: each undeclared
+identifier is reported only once for each function it appears in
+make[2]: *** [crypto/asymmetric_keys/x509_public_key.o] Error 1
+make[1]: *** [crypto/asymmetric_keys] Error 2
+make: *** [crypto] Error 2
 
-> ---
->  arch/arm/crypto/Makefile     |    6 +-
->  arch/arm/crypto/aesbs-core.S | 2544 ++++++++++++++++++++++++++++++++++++++++++
->  arch/arm/crypto/aesbs-glue.c |  435 ++++++++
->  crypto/Kconfig               |   16 +
->  4 files changed, 2999 insertions(+), 2 deletions(-)
->  create mode 100644 arch/arm/crypto/aesbs-core.S
->  create mode 100644 arch/arm/crypto/aesbs-glue.c
-> 
-> diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
-> index a2c8385..bda5848 100644
-> --- a/arch/arm/crypto/Makefile
-> +++ b/arch/arm/crypto/Makefile
-> @@ -3,7 +3,9 @@
->  #
->  
->  obj-$(CONFIG_CRYPTO_AES_ARM) += aes-arm.o
-> +obj-$(CONFIG_CRYPTO_AES_ARM_BS) += aes-arm-bs.o
->  obj-$(CONFIG_CRYPTO_SHA1_ARM) += sha1-arm.o
->  
-> -aes-arm-y  := aes-armv4.o aes_glue.o
-> -sha1-arm-y := sha1-armv4-large.o sha1_glue.o
-> +aes-arm-y	:= aes-armv4.o aes_glue.o
-> +aes-arm-bs-y	:= aesbs-core.o aesbs-glue.o
-> +sha1-arm-y	:= sha1-armv4-large.o sha1_glue.o
-> diff --git a/arch/arm/crypto/aesbs-core.S b/arch/arm/crypto/aesbs-core.S
-> new file mode 100644
-> index 0000000..64205d4
-> --- /dev/null
-> +++ b/arch/arm/crypto/aesbs-core.S
-> @@ -0,0 +1,2544 @@
-> +
-> +@ ====================================================================
-> +@ Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
-> +@ project. The module is, however, dual licensed under OpenSSL and
-> +@ CRYPTOGAMS licenses depending on where you obtain it. For further
-> +@ details see http://www.openssl.org/~appro/cryptogams/.
-> +@
-> +@ Specific modes and adaptation for Linux kernel by Ard Biesheuvel
-> +@ <ard.biesheuvel@linaro.org>. Permission to use under GPL terms is
-> +@ granted.
-> +@ ====================================================================
-> +
-> +@ Bit-sliced AES for ARM NEON
-> +@
-> +@ February 2012.
-> +@
-> +@ This implementation is direct adaptation of bsaes-x86_64 module for
-> +@ ARM NEON. Except that this module is endian-neutral [in sense that
-> +@ it can be compiled for either endianness] by courtesy of vld1.8's
-> +@ neutrality. Initial version doesn't implement interface to OpenSSL,
-> +@ only low-level primitives and unsupported entry points, just enough
-> +@ to collect performance results, which for Cortex-A8 core are:
-> +@
-> +@ encrypt	19.5 cycles per byte processed with 128-bit key
-> +@ decrypt	22.1 cycles per byte processed with 128-bit key
-> +@ key conv.	440  cycles per 128-bit key/0.18 of 8x block
-> +@
-> +@ Snapdragon S4 encrypts byte in 17.6 cycles and decrypts in 19.7,
-> +@ which is [much] worse than anticipated (for further details see
-> +@ http://www.openssl.org/~appro/Snapdragon-S4.html).
-> +@
-> +@ Cortex-A15 manages in 14.2/16.1 cycles [when integer-only code
-> +@ manages in 20.0 cycles].
-> +@
-> +@ When comparing to x86_64 results keep in mind that NEON unit is
-> +@ [mostly] single-issue and thus can't [fully] benefit from
-> +@ instruction-level parallelism. And when comparing to aes-armv4
-> +@ results keep in mind key schedule conversion overhead (see
-> +@ bsaes-x86_64.pl for further details)...
-> +@
-> +@						<appro@openssl.org>
-> +
-> +@ April-August 2013
-> +@
-> +@ Add CBC, CTR and XTS subroutines, adapt for kernel use.
-> +@
-> +@					<ard.biesheuvel@linaro.org>
-> +
-> +#ifndef __KERNEL__
-> +# include "arm_arch.h"
-> +
-> +# define VFP_ABI_PUSH	vstmdb	sp!,{d8-d15}
-> +# define VFP_ABI_POP	vldmia	sp!,{d8-d15}
-> +# define VFP_ABI_FRAME	0x40
-> +#else
-> +# define VFP_ABI_PUSH
-> +# define VFP_ABI_POP
-> +# define VFP_ABI_FRAME	0
-> +# define BSAES_ASM_EXTENDED_KEY
-> +# define XTS_CHAIN_TWEAK
-> +# define __ARM_ARCH__ __LINUX_ARM_ARCH__
-> +#endif
-> +
-> +#ifdef __thumb__
-> +# define adrl adr
-> +#endif
-> +
-> +#if __ARM_ARCH__>=7
-> +.text
-> +.syntax	unified 	@ ARMv7-capable assembler is expected to handle this
-> +#ifdef __thumb2__
-> +.thumb
-> +#else
-> +.code   32
-> +#endif
-> +
-> +.fpu	neon
-> +
-> +.type	_bsaes_decrypt8,%function
-> +.align	4
-> +_bsaes_decrypt8:
-> +	adr	r6,_bsaes_decrypt8
-> +	vldmia	r4!, {q9}		@ round 0 key
-> +	add	r6,r6,#.LM0ISR-_bsaes_decrypt8
-> +
-> +	vldmia	r6!, {q8}		@ .LM0ISR
-> +	veor	q10, q0, q9	@ xor with round0 key
-> +	veor	q11, q1, q9
-> +	 vtbl.8	d0, {q10}, d16
-> +	 vtbl.8	d1, {q10}, d17
-> +	veor	q12, q2, q9
-> +	 vtbl.8	d2, {q11}, d16
-> +	 vtbl.8	d3, {q11}, d17
-> +	veor	q13, q3, q9
-> +	 vtbl.8	d4, {q12}, d16
-> +	 vtbl.8	d5, {q12}, d17
-> +	veor	q14, q4, q9
-> +	 vtbl.8	d6, {q13}, d16
-> +	 vtbl.8	d7, {q13}, d17
-> +	veor	q15, q5, q9
-> +	 vtbl.8	d8, {q14}, d16
-> +	 vtbl.8	d9, {q14}, d17
-> +	veor	q10, q6, q9
-> +	 vtbl.8	d10, {q15}, d16
-> +	 vtbl.8	d11, {q15}, d17
-> +	veor	q11, q7, q9
-> +	 vtbl.8	d12, {q10}, d16
-> +	 vtbl.8	d13, {q10}, d17
-> +	 vtbl.8	d14, {q11}, d16
-> +	 vtbl.8	d15, {q11}, d17
-> +	vmov.i8	q8,#0x55			@ compose .LBS0
-> +	vmov.i8	q9,#0x33			@ compose .LBS1
-> +	vshr.u64	q10, q6, #1
-> +	 vshr.u64	q11, q4, #1
-> +	veor		q10, q10, q7
-> +	 veor		q11, q11, q5
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q7, q7, q10
-> +	vshl.u64	q10, q10, #1
-> +	 veor		q5, q5, q11
-> +	 vshl.u64	q11, q11, #1
-> +	veor		q6, q6, q10
-> +	 veor		q4, q4, q11
-> +	vshr.u64	q10, q2, #1
-> +	 vshr.u64	q11, q0, #1
-> +	veor		q10, q10, q3
-> +	 veor		q11, q11, q1
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q3, q3, q10
-> +	vshl.u64	q10, q10, #1
-> +	 veor		q1, q1, q11
-> +	 vshl.u64	q11, q11, #1
-> +	veor		q2, q2, q10
-> +	 veor		q0, q0, q11
-> +	vmov.i8	q8,#0x0f			@ compose .LBS2
-> +	vshr.u64	q10, q5, #2
-> +	 vshr.u64	q11, q4, #2
-> +	veor		q10, q10, q7
-> +	 veor		q11, q11, q6
-> +	vand		q10, q10, q9
-> +	 vand		q11, q11, q9
-> +	veor		q7, q7, q10
-> +	vshl.u64	q10, q10, #2
-> +	 veor		q6, q6, q11
-> +	 vshl.u64	q11, q11, #2
-> +	veor		q5, q5, q10
-> +	 veor		q4, q4, q11
-> +	vshr.u64	q10, q1, #2
-> +	 vshr.u64	q11, q0, #2
-> +	veor		q10, q10, q3
-> +	 veor		q11, q11, q2
-> +	vand		q10, q10, q9
-> +	 vand		q11, q11, q9
-> +	veor		q3, q3, q10
-> +	vshl.u64	q10, q10, #2
-> +	 veor		q2, q2, q11
-> +	 vshl.u64	q11, q11, #2
-> +	veor		q1, q1, q10
-> +	 veor		q0, q0, q11
-> +	vshr.u64	q10, q3, #4
-> +	 vshr.u64	q11, q2, #4
-> +	veor		q10, q10, q7
-> +	 veor		q11, q11, q6
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q7, q7, q10
-> +	vshl.u64	q10, q10, #4
-> +	 veor		q6, q6, q11
-> +	 vshl.u64	q11, q11, #4
-> +	veor		q3, q3, q10
-> +	 veor		q2, q2, q11
-> +	vshr.u64	q10, q1, #4
-> +	 vshr.u64	q11, q0, #4
-> +	veor		q10, q10, q5
-> +	 veor		q11, q11, q4
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q5, q5, q10
-> +	vshl.u64	q10, q10, #4
-> +	 veor		q4, q4, q11
-> +	 vshl.u64	q11, q11, #4
-> +	veor		q1, q1, q10
-> +	 veor		q0, q0, q11
-> +	sub	r5,r5,#1
-> +	b	.Ldec_sbox
-> +.align	4
-> +.Ldec_loop:
-> +	vldmia	r4!, {q8-q11}
-> +	veor	q8, q8, q0
-> +	veor	q9, q9, q1
-> +	vtbl.8	d0, {q8}, d24
-> +	vtbl.8	d1, {q8}, d25
-> +	vldmia	r4!, {q8}
-> +	veor	q10, q10, q2
-> +	vtbl.8	d2, {q9}, d24
-> +	vtbl.8	d3, {q9}, d25
-> +	vldmia	r4!, {q9}
-> +	veor	q11, q11, q3
-> +	vtbl.8	d4, {q10}, d24
-> +	vtbl.8	d5, {q10}, d25
-> +	vldmia	r4!, {q10}
-> +	vtbl.8	d6, {q11}, d24
-> +	vtbl.8	d7, {q11}, d25
-> +	vldmia	r4!, {q11}
-> +	veor	q8, q8, q4
-> +	veor	q9, q9, q5
-> +	vtbl.8	d8, {q8}, d24
-> +	vtbl.8	d9, {q8}, d25
-> +	veor	q10, q10, q6
-> +	vtbl.8	d10, {q9}, d24
-> +	vtbl.8	d11, {q9}, d25
-> +	veor	q11, q11, q7
-> +	vtbl.8	d12, {q10}, d24
-> +	vtbl.8	d13, {q10}, d25
-> +	vtbl.8	d14, {q11}, d24
-> +	vtbl.8	d15, {q11}, d25
-> +.Ldec_sbox:
-> +	 veor	q1, q1, q4
-> +	veor	q3, q3, q4
-> +
-> +	veor	q4, q4, q7
-> +	 veor	q1, q1, q6
-> +	veor	q2, q2, q7
-> +	veor	q6, q6, q4
-> +
-> +	veor	q0, q0, q1
-> +	veor	q2, q2, q5
-> +	 veor	q7, q7, q6
-> +	veor	q3, q3, q0
-> +	veor	q5, q5, q0
-> +	veor	q1, q1, q3
-> +	veor	q11, q3, q0
-> +	veor	q10, q7, q4
-> +	veor	q9, q1, q6
-> +	veor	q13, q4, q0
-> +	 vmov	q8, q10
-> +	veor	q12, q5, q2
-> +
-> +	vorr	q10, q10, q9
-> +	veor	q15, q11, q8
-> +	vand	q14, q11, q12
-> +	vorr	q11, q11, q12
-> +	veor	q12, q12, q9
-> +	vand	q8, q8, q9
-> +	veor	q9, q6, q2
-> +	vand	q15, q15, q12
-> +	vand	q13, q13, q9
-> +	veor	q9, q3, q7
-> +	veor	q12, q1, q5
-> +	veor	q11, q11, q13
-> +	veor	q10, q10, q13
-> +	vand	q13, q9, q12
-> +	vorr	q9, q9, q12
-> +	veor	q11, q11, q15
-> +	veor	q8, q8, q13
-> +	veor	q10, q10, q14
-> +	veor	q9, q9, q15
-> +	veor	q8, q8, q14
-> +	vand	q12, q4, q6
-> +	veor	q9, q9, q14
-> +	vand	q13, q0, q2
-> +	vand	q14, q7, q1
-> +	vorr	q15, q3, q5
-> +	veor	q11, q11, q12
-> +	veor	q9, q9, q14
-> +	veor	q8, q8, q15
-> +	veor	q10, q10, q13
-> +
-> +	@ Inv_GF16 	0, 	1, 	2, 	3, s0, s1, s2, s3
-> +
-> +	@ new smaller inversion
-> +
-> +	vand	q14, q11, q9
-> +	vmov	q12, q8
-> +
-> +	veor	q13, q10, q14
-> +	veor	q15, q8, q14
-> +	veor	q14, q8, q14	@ q14=q15
-> +
-> +	vbsl	q13, q9, q8
-> +	vbsl	q15, q11, q10
-> +	veor	q11, q11, q10
-> +
-> +	vbsl	q12, q13, q14
-> +	vbsl	q8, q14, q13
-> +
-> +	vand	q14, q12, q15
-> +	veor	q9, q9, q8
-> +
-> +	veor	q14, q14, q11
-> +	veor	q12, q5, q2
-> +	veor	q8, q1, q6
-> +	veor 	q10, q15, q14
-> +	vand	q10, q10, q5
-> +	veor	q5, q5, q1
-> +	vand	q11, q1, q15
-> +	vand	q5, q5, q14
-> +	veor	q1, q11, q10
-> +	veor	q5, q5, q11
-> +	veor	q15, q15, q13
-> +	veor	q14, q14, q9
-> +	veor	q11, q15, q14
-> +	 veor 	q10, q13, q9
-> +	vand	q11, q11, q12
-> +	 vand	q10, q10, q2
-> +	veor	q12, q12, q8
-> +	 veor	q2, q2, q6
-> +	vand	q8, q8, q15
-> +	 vand	q6, q6, q13
-> +	vand	q12, q12, q14
-> +	 vand	q2, q2, q9
-> +	veor	q8, q8, q12
-> +	 veor	q2, q2, q6
-> +	veor	q12, q12, q11
-> +	 veor	q6, q6, q10
-> +	veor	q5, q5, q12
-> +	veor	q2, q2, q12
-> +	veor	q1, q1, q8
-> +	veor	q6, q6, q8
-> +
-> +	veor	q12, q3, q0
-> +	veor	q8, q7, q4
-> +	veor	q11, q15, q14
-> +	 veor 	q10, q13, q9
-> +	vand	q11, q11, q12
-> +	 vand	q10, q10, q0
-> +	veor	q12, q12, q8
-> +	 veor	q0, q0, q4
-> +	vand	q8, q8, q15
-> +	 vand	q4, q4, q13
-> +	vand	q12, q12, q14
-> +	 vand	q0, q0, q9
-> +	veor	q8, q8, q12
-> +	 veor	q0, q0, q4
-> +	veor	q12, q12, q11
-> +	 veor	q4, q4, q10
-> +	veor	q15, q15, q13
-> +	veor	q14, q14, q9
-> +	veor 	q10, q15, q14
-> +	vand	q10, q10, q3
-> +	veor	q3, q3, q7
-> +	vand	q11, q7, q15
-> +	vand	q3, q3, q14
-> +	veor	q7, q11, q10
-> +	veor	q3, q3, q11
-> +	veor	q3, q3, q12
-> +	veor	q0, q0, q12
-> +	veor	q7, q7, q8
-> +	veor	q4, q4, q8
-> +	veor	q1, q1, q7
-> +	veor	q6, q6, q5
-> +
-> +	veor	q4, q4, q1
-> +	veor	q2, q2, q7
-> +	veor	q5, q5, q7
-> +	veor	q4, q4, q2
-> +	 veor 	q7, q7, q0
-> +	veor	q4, q4, q5
-> +	 veor	q3, q3, q6
-> +	 veor	q6, q6, q1
-> +	veor	q3, q3, q4
-> +
-> +	veor	q4, q4, q0
-> +	veor	q7, q7, q3
-> +	subs	r5,r5,#1
-> +	bcc	.Ldec_done
-> +	@ multiplication by 0x05-0x00-0x04-0x00
-> +	vext.8	q8, q0, q0, #8
-> +	vext.8	q14, q3, q3, #8
-> +	vext.8	q15, q5, q5, #8
-> +	veor	q8, q8, q0
-> +	vext.8	q9, q1, q1, #8
-> +	veor	q14, q14, q3
-> +	vext.8	q10, q6, q6, #8
-> +	veor	q15, q15, q5
-> +	vext.8	q11, q4, q4, #8
-> +	veor	q9, q9, q1
-> +	vext.8	q12, q2, q2, #8
-> +	veor	q10, q10, q6
-> +	vext.8	q13, q7, q7, #8
-> +	veor	q11, q11, q4
-> +	veor	q12, q12, q2
-> +	veor	q13, q13, q7
-> +
-> +	 veor	q0, q0, q14
-> +	 veor	q1, q1, q14
-> +	 veor	q6, q6, q8
-> +	 veor	q2, q2, q10
-> +	 veor	q4, q4, q9
-> +	 veor	q1, q1, q15
-> +	 veor	q6, q6, q15
-> +	 veor	q2, q2, q14
-> +	 veor	q7, q7, q11
-> +	 veor	q4, q4, q14
-> +	 veor	q3, q3, q12
-> +	 veor	q2, q2, q15
-> +	 veor	q7, q7, q15
-> +	 veor	q5, q5, q13
-> +	vext.8	q8, q0, q0, #12	@ x0 <<< 32
-> +	vext.8	q9, q1, q1, #12
-> +	 veor	q0, q0, q8		@ x0 ^ (x0 <<< 32)
-> +	vext.8	q10, q6, q6, #12
-> +	 veor	q1, q1, q9
-> +	vext.8	q11, q4, q4, #12
-> +	 veor	q6, q6, q10
-> +	vext.8	q12, q2, q2, #12
-> +	 veor	q4, q4, q11
-> +	vext.8	q13, q7, q7, #12
-> +	 veor	q2, q2, q12
-> +	vext.8	q14, q3, q3, #12
-> +	 veor	q7, q7, q13
-> +	vext.8	q15, q5, q5, #12
-> +	 veor	q3, q3, q14
-> +
-> +	veor	q9, q9, q0
-> +	 veor	q5, q5, q15
-> +	 vext.8	q0, q0, q0, #8		@ (x0 ^ (x0 <<< 32)) <<< 64)
-> +	veor	q10, q10, q1
-> +	veor	q8, q8, q5
-> +	veor	q9, q9, q5
-> +	 vext.8	q1, q1, q1, #8
-> +	veor	q13, q13, q2
-> +	 veor	q0, q0, q8
-> +	veor	q14, q14, q7
-> +	 veor	q1, q1, q9
-> +	 vext.8	q8, q2, q2, #8
-> +	veor	q12, q12, q4
-> +	 vext.8	q9, q7, q7, #8
-> +	veor	q15, q15, q3
-> +	 vext.8	q2, q4, q4, #8
-> +	veor	q11, q11, q6
-> +	 vext.8	q7, q5, q5, #8
-> +	veor	q12, q12, q5
-> +	 vext.8	q4, q3, q3, #8
-> +	veor	q11, q11, q5
-> +	 vext.8	q3, q6, q6, #8
-> +	veor	q5, q9, q13
-> +	veor	q11, q11, q2
-> +	veor	q7, q7, q15
-> +	veor	q6, q4, q14
-> +	veor	q4, q8, q12
-> +	veor	q2, q3, q10
-> +	vmov	q3, q11
-> +	 @ vmov	q5, q9
-> +	vldmia	r6, {q12}		@ .LISR
-> +	ite	eq				@ Thumb2 thing, sanity check in ARM
-> +	addeq	r6,r6,#0x10
-> +	bne	.Ldec_loop
-> +	vldmia	r6, {q12}		@ .LISRM0
-> +	b	.Ldec_loop
-> +.align	4
-> +.Ldec_done:
-> +	vmov.i8	q8,#0x55			@ compose .LBS0
-> +	vmov.i8	q9,#0x33			@ compose .LBS1
-> +	vshr.u64	q10, q3, #1
-> +	 vshr.u64	q11, q2, #1
-> +	veor		q10, q10, q5
-> +	 veor		q11, q11, q7
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q5, q5, q10
-> +	vshl.u64	q10, q10, #1
-> +	 veor		q7, q7, q11
-> +	 vshl.u64	q11, q11, #1
-> +	veor		q3, q3, q10
-> +	 veor		q2, q2, q11
-> +	vshr.u64	q10, q6, #1
-> +	 vshr.u64	q11, q0, #1
-> +	veor		q10, q10, q4
-> +	 veor		q11, q11, q1
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q4, q4, q10
-> +	vshl.u64	q10, q10, #1
-> +	 veor		q1, q1, q11
-> +	 vshl.u64	q11, q11, #1
-> +	veor		q6, q6, q10
-> +	 veor		q0, q0, q11
-> +	vmov.i8	q8,#0x0f			@ compose .LBS2
-> +	vshr.u64	q10, q7, #2
-> +	 vshr.u64	q11, q2, #2
-> +	veor		q10, q10, q5
-> +	 veor		q11, q11, q3
-> +	vand		q10, q10, q9
-> +	 vand		q11, q11, q9
-> +	veor		q5, q5, q10
-> +	vshl.u64	q10, q10, #2
-> +	 veor		q3, q3, q11
-> +	 vshl.u64	q11, q11, #2
-> +	veor		q7, q7, q10
-> +	 veor		q2, q2, q11
-> +	vshr.u64	q10, q1, #2
-> +	 vshr.u64	q11, q0, #2
-> +	veor		q10, q10, q4
-> +	 veor		q11, q11, q6
-> +	vand		q10, q10, q9
-> +	 vand		q11, q11, q9
-> +	veor		q4, q4, q10
-> +	vshl.u64	q10, q10, #2
-> +	 veor		q6, q6, q11
-> +	 vshl.u64	q11, q11, #2
-> +	veor		q1, q1, q10
-> +	 veor		q0, q0, q11
-> +	vshr.u64	q10, q4, #4
-> +	 vshr.u64	q11, q6, #4
-> +	veor		q10, q10, q5
-> +	 veor		q11, q11, q3
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q5, q5, q10
-> +	vshl.u64	q10, q10, #4
-> +	 veor		q3, q3, q11
-> +	 vshl.u64	q11, q11, #4
-> +	veor		q4, q4, q10
-> +	 veor		q6, q6, q11
-> +	vshr.u64	q10, q1, #4
-> +	 vshr.u64	q11, q0, #4
-> +	veor		q10, q10, q7
-> +	 veor		q11, q11, q2
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q7, q7, q10
-> +	vshl.u64	q10, q10, #4
-> +	 veor		q2, q2, q11
-> +	 vshl.u64	q11, q11, #4
-> +	veor		q1, q1, q10
-> +	 veor		q0, q0, q11
-> +	vldmia	r4, {q8}			@ last round key
-> +	veor	q6, q6, q8
-> +	veor	q4, q4, q8
-> +	veor	q2, q2, q8
-> +	veor	q7, q7, q8
-> +	veor	q3, q3, q8
-> +	veor	q5, q5, q8
-> +	veor	q0, q0, q8
-> +	veor	q1, q1, q8
-> +	bx	lr
-> +.size	_bsaes_decrypt8,.-_bsaes_decrypt8
-> +
-> +.type	_bsaes_const,%object
-> +.align	6
-> +_bsaes_const:
-> +.LM0ISR:	@ InvShiftRows constants
-> +	.quad	0x0a0e0206070b0f03, 0x0004080c0d010509
-> +.LISR:
-> +	.quad	0x0504070602010003, 0x0f0e0d0c080b0a09
-> +.LISRM0:
-> +	.quad	0x01040b0e0205080f, 0x0306090c00070a0d
-> +.LM0SR:		@ ShiftRows constants
-> +	.quad	0x0a0e02060f03070b, 0x0004080c05090d01
-> +.LSR:
-> +	.quad	0x0504070600030201, 0x0f0e0d0c0a09080b
-> +.LSRM0:
-> +	.quad	0x0304090e00050a0f, 0x01060b0c0207080d
-> +.LM0:
-> +	.quad	0x02060a0e03070b0f, 0x0004080c0105090d
-> +.LREVM0SR:
-> +	.quad	0x090d01050c000408, 0x03070b0f060a0e02
-> +.asciz	"Bit-sliced AES for NEON, CRYPTOGAMS by <appro@openssl.org>"
-> +.align	6
-> +.size	_bsaes_const,.-_bsaes_const
-> +
-> +.type	_bsaes_encrypt8,%function
-> +.align	4
-> +_bsaes_encrypt8:
-> +	adr	r6,_bsaes_encrypt8
-> +	vldmia	r4!, {q9}		@ round 0 key
-> +	sub	r6,r6,#_bsaes_encrypt8-.LM0SR
-> +
-> +	vldmia	r6!, {q8}		@ .LM0SR
-> +_bsaes_encrypt8_alt:
-> +	veor	q10, q0, q9	@ xor with round0 key
-> +	veor	q11, q1, q9
-> +	 vtbl.8	d0, {q10}, d16
-> +	 vtbl.8	d1, {q10}, d17
-> +	veor	q12, q2, q9
-> +	 vtbl.8	d2, {q11}, d16
-> +	 vtbl.8	d3, {q11}, d17
-> +	veor	q13, q3, q9
-> +	 vtbl.8	d4, {q12}, d16
-> +	 vtbl.8	d5, {q12}, d17
-> +	veor	q14, q4, q9
-> +	 vtbl.8	d6, {q13}, d16
-> +	 vtbl.8	d7, {q13}, d17
-> +	veor	q15, q5, q9
-> +	 vtbl.8	d8, {q14}, d16
-> +	 vtbl.8	d9, {q14}, d17
-> +	veor	q10, q6, q9
-> +	 vtbl.8	d10, {q15}, d16
-> +	 vtbl.8	d11, {q15}, d17
-> +	veor	q11, q7, q9
-> +	 vtbl.8	d12, {q10}, d16
-> +	 vtbl.8	d13, {q10}, d17
-> +	 vtbl.8	d14, {q11}, d16
-> +	 vtbl.8	d15, {q11}, d17
-> +_bsaes_encrypt8_bitslice:
-> +	vmov.i8	q8,#0x55			@ compose .LBS0
-> +	vmov.i8	q9,#0x33			@ compose .LBS1
-> +	vshr.u64	q10, q6, #1
-> +	 vshr.u64	q11, q4, #1
-> +	veor		q10, q10, q7
-> +	 veor		q11, q11, q5
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q7, q7, q10
-> +	vshl.u64	q10, q10, #1
-> +	 veor		q5, q5, q11
-> +	 vshl.u64	q11, q11, #1
-> +	veor		q6, q6, q10
-> +	 veor		q4, q4, q11
-> +	vshr.u64	q10, q2, #1
-> +	 vshr.u64	q11, q0, #1
-> +	veor		q10, q10, q3
-> +	 veor		q11, q11, q1
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q3, q3, q10
-> +	vshl.u64	q10, q10, #1
-> +	 veor		q1, q1, q11
-> +	 vshl.u64	q11, q11, #1
-> +	veor		q2, q2, q10
-> +	 veor		q0, q0, q11
-> +	vmov.i8	q8,#0x0f			@ compose .LBS2
-> +	vshr.u64	q10, q5, #2
-> +	 vshr.u64	q11, q4, #2
-> +	veor		q10, q10, q7
-> +	 veor		q11, q11, q6
-> +	vand		q10, q10, q9
-> +	 vand		q11, q11, q9
-> +	veor		q7, q7, q10
-> +	vshl.u64	q10, q10, #2
-> +	 veor		q6, q6, q11
-> +	 vshl.u64	q11, q11, #2
-> +	veor		q5, q5, q10
-> +	 veor		q4, q4, q11
-> +	vshr.u64	q10, q1, #2
-> +	 vshr.u64	q11, q0, #2
-> +	veor		q10, q10, q3
-> +	 veor		q11, q11, q2
-> +	vand		q10, q10, q9
-> +	 vand		q11, q11, q9
-> +	veor		q3, q3, q10
-> +	vshl.u64	q10, q10, #2
-> +	 veor		q2, q2, q11
-> +	 vshl.u64	q11, q11, #2
-> +	veor		q1, q1, q10
-> +	 veor		q0, q0, q11
-> +	vshr.u64	q10, q3, #4
-> +	 vshr.u64	q11, q2, #4
-> +	veor		q10, q10, q7
-> +	 veor		q11, q11, q6
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q7, q7, q10
-> +	vshl.u64	q10, q10, #4
-> +	 veor		q6, q6, q11
-> +	 vshl.u64	q11, q11, #4
-> +	veor		q3, q3, q10
-> +	 veor		q2, q2, q11
-> +	vshr.u64	q10, q1, #4
-> +	 vshr.u64	q11, q0, #4
-> +	veor		q10, q10, q5
-> +	 veor		q11, q11, q4
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q5, q5, q10
-> +	vshl.u64	q10, q10, #4
-> +	 veor		q4, q4, q11
-> +	 vshl.u64	q11, q11, #4
-> +	veor		q1, q1, q10
-> +	 veor		q0, q0, q11
-> +	sub	r5,r5,#1
-> +	b	.Lenc_sbox
-> +.align	4
-> +.Lenc_loop:
-> +	vldmia	r4!, {q8-q11}
-> +	veor	q8, q8, q0
-> +	veor	q9, q9, q1
-> +	vtbl.8	d0, {q8}, d24
-> +	vtbl.8	d1, {q8}, d25
-> +	vldmia	r4!, {q8}
-> +	veor	q10, q10, q2
-> +	vtbl.8	d2, {q9}, d24
-> +	vtbl.8	d3, {q9}, d25
-> +	vldmia	r4!, {q9}
-> +	veor	q11, q11, q3
-> +	vtbl.8	d4, {q10}, d24
-> +	vtbl.8	d5, {q10}, d25
-> +	vldmia	r4!, {q10}
-> +	vtbl.8	d6, {q11}, d24
-> +	vtbl.8	d7, {q11}, d25
-> +	vldmia	r4!, {q11}
-> +	veor	q8, q8, q4
-> +	veor	q9, q9, q5
-> +	vtbl.8	d8, {q8}, d24
-> +	vtbl.8	d9, {q8}, d25
-> +	veor	q10, q10, q6
-> +	vtbl.8	d10, {q9}, d24
-> +	vtbl.8	d11, {q9}, d25
-> +	veor	q11, q11, q7
-> +	vtbl.8	d12, {q10}, d24
-> +	vtbl.8	d13, {q10}, d25
-> +	vtbl.8	d14, {q11}, d24
-> +	vtbl.8	d15, {q11}, d25
-> +.Lenc_sbox:
-> +	veor	q2, q2, q1
-> +	veor	q5, q5, q6
-> +	veor	q3, q3, q0
-> +	veor	q6, q6, q2
-> +	veor	q5, q5, q0
-> +
-> +	veor	q6, q6, q3
-> +	veor	q3, q3, q7
-> +	veor	q7, q7, q5
-> +	veor	q3, q3, q4
-> +	veor	q4, q4, q5
-> +
-> +	veor	q2, q2, q7
-> +	veor	q3, q3, q1
-> +	veor	q1, q1, q5
-> +	veor	q11, q7, q4
-> +	veor	q10, q1, q2
-> +	veor	q9, q5, q3
-> +	veor	q13, q2, q4
-> +	 vmov	q8, q10
-> +	veor	q12, q6, q0
-> +
-> +	vorr	q10, q10, q9
-> +	veor	q15, q11, q8
-> +	vand	q14, q11, q12
-> +	vorr	q11, q11, q12
-> +	veor	q12, q12, q9
-> +	vand	q8, q8, q9
-> +	veor	q9, q3, q0
-> +	vand	q15, q15, q12
-> +	vand	q13, q13, q9
-> +	veor	q9, q7, q1
-> +	veor	q12, q5, q6
-> +	veor	q11, q11, q13
-> +	veor	q10, q10, q13
-> +	vand	q13, q9, q12
-> +	vorr	q9, q9, q12
-> +	veor	q11, q11, q15
-> +	veor	q8, q8, q13
-> +	veor	q10, q10, q14
-> +	veor	q9, q9, q15
-> +	veor	q8, q8, q14
-> +	vand	q12, q2, q3
-> +	veor	q9, q9, q14
-> +	vand	q13, q4, q0
-> +	vand	q14, q1, q5
-> +	vorr	q15, q7, q6
-> +	veor	q11, q11, q12
-> +	veor	q9, q9, q14
-> +	veor	q8, q8, q15
-> +	veor	q10, q10, q13
-> +
-> +	@ Inv_GF16 	0, 	1, 	2, 	3, s0, s1, s2, s3
-> +
-> +	@ new smaller inversion
-> +
-> +	vand	q14, q11, q9
-> +	vmov	q12, q8
-> +
-> +	veor	q13, q10, q14
-> +	veor	q15, q8, q14
-> +	veor	q14, q8, q14	@ q14=q15
-> +
-> +	vbsl	q13, q9, q8
-> +	vbsl	q15, q11, q10
-> +	veor	q11, q11, q10
-> +
-> +	vbsl	q12, q13, q14
-> +	vbsl	q8, q14, q13
-> +
-> +	vand	q14, q12, q15
-> +	veor	q9, q9, q8
-> +
-> +	veor	q14, q14, q11
-> +	veor	q12, q6, q0
-> +	veor	q8, q5, q3
-> +	veor 	q10, q15, q14
-> +	vand	q10, q10, q6
-> +	veor	q6, q6, q5
-> +	vand	q11, q5, q15
-> +	vand	q6, q6, q14
-> +	veor	q5, q11, q10
-> +	veor	q6, q6, q11
-> +	veor	q15, q15, q13
-> +	veor	q14, q14, q9
-> +	veor	q11, q15, q14
-> +	 veor 	q10, q13, q9
-> +	vand	q11, q11, q12
-> +	 vand	q10, q10, q0
-> +	veor	q12, q12, q8
-> +	 veor	q0, q0, q3
-> +	vand	q8, q8, q15
-> +	 vand	q3, q3, q13
-> +	vand	q12, q12, q14
-> +	 vand	q0, q0, q9
-> +	veor	q8, q8, q12
-> +	 veor	q0, q0, q3
-> +	veor	q12, q12, q11
-> +	 veor	q3, q3, q10
-> +	veor	q6, q6, q12
-> +	veor	q0, q0, q12
-> +	veor	q5, q5, q8
-> +	veor	q3, q3, q8
-> +
-> +	veor	q12, q7, q4
-> +	veor	q8, q1, q2
-> +	veor	q11, q15, q14
-> +	 veor 	q10, q13, q9
-> +	vand	q11, q11, q12
-> +	 vand	q10, q10, q4
-> +	veor	q12, q12, q8
-> +	 veor	q4, q4, q2
-> +	vand	q8, q8, q15
-> +	 vand	q2, q2, q13
-> +	vand	q12, q12, q14
-> +	 vand	q4, q4, q9
-> +	veor	q8, q8, q12
-> +	 veor	q4, q4, q2
-> +	veor	q12, q12, q11
-> +	 veor	q2, q2, q10
-> +	veor	q15, q15, q13
-> +	veor	q14, q14, q9
-> +	veor 	q10, q15, q14
-> +	vand	q10, q10, q7
-> +	veor	q7, q7, q1
-> +	vand	q11, q1, q15
-> +	vand	q7, q7, q14
-> +	veor	q1, q11, q10
-> +	veor	q7, q7, q11
-> +	veor	q7, q7, q12
-> +	veor	q4, q4, q12
-> +	veor	q1, q1, q8
-> +	veor	q2, q2, q8
-> +	veor	q7, q7, q0
-> +	veor	q1, q1, q6
-> +	veor	q6, q6, q0
-> +	veor	q4, q4, q7
-> +	veor	q0, q0, q1
-> +
-> +	veor	q1, q1, q5
-> +	veor	q5, q5, q2
-> +	veor	q2, q2, q3
-> +	veor	q3, q3, q5
-> +	veor	q4, q4, q5
-> +
-> +	veor	q6, q6, q3
-> +	subs	r5,r5,#1
-> +	bcc	.Lenc_done
-> +	vext.8	q8, q0, q0, #12	@ x0 <<< 32
-> +	vext.8	q9, q1, q1, #12
-> +	 veor	q0, q0, q8		@ x0 ^ (x0 <<< 32)
-> +	vext.8	q10, q4, q4, #12
-> +	 veor	q1, q1, q9
-> +	vext.8	q11, q6, q6, #12
-> +	 veor	q4, q4, q10
-> +	vext.8	q12, q3, q3, #12
-> +	 veor	q6, q6, q11
-> +	vext.8	q13, q7, q7, #12
-> +	 veor	q3, q3, q12
-> +	vext.8	q14, q2, q2, #12
-> +	 veor	q7, q7, q13
-> +	vext.8	q15, q5, q5, #12
-> +	 veor	q2, q2, q14
-> +
-> +	veor	q9, q9, q0
-> +	 veor	q5, q5, q15
-> +	 vext.8	q0, q0, q0, #8		@ (x0 ^ (x0 <<< 32)) <<< 64)
-> +	veor	q10, q10, q1
-> +	veor	q8, q8, q5
-> +	veor	q9, q9, q5
-> +	 vext.8	q1, q1, q1, #8
-> +	veor	q13, q13, q3
-> +	 veor	q0, q0, q8
-> +	veor	q14, q14, q7
-> +	 veor	q1, q1, q9
-> +	 vext.8	q8, q3, q3, #8
-> +	veor	q12, q12, q6
-> +	 vext.8	q9, q7, q7, #8
-> +	veor	q15, q15, q2
-> +	 vext.8	q3, q6, q6, #8
-> +	veor	q11, q11, q4
-> +	 vext.8	q7, q5, q5, #8
-> +	veor	q12, q12, q5
-> +	 vext.8	q6, q2, q2, #8
-> +	veor	q11, q11, q5
-> +	 vext.8	q2, q4, q4, #8
-> +	veor	q5, q9, q13
-> +	veor	q4, q8, q12
-> +	veor	q3, q3, q11
-> +	veor	q7, q7, q15
-> +	veor	q6, q6, q14
-> +	 @ vmov	q4, q8
-> +	veor	q2, q2, q10
-> +	 @ vmov	q5, q9
-> +	vldmia	r6, {q12}		@ .LSR
-> +	ite	eq				@ Thumb2 thing, samity check in ARM
-> +	addeq	r6,r6,#0x10
-> +	bne	.Lenc_loop
-> +	vldmia	r6, {q12}		@ .LSRM0
-> +	b	.Lenc_loop
-> +.align	4
-> +.Lenc_done:
-> +	vmov.i8	q8,#0x55			@ compose .LBS0
-> +	vmov.i8	q9,#0x33			@ compose .LBS1
-> +	vshr.u64	q10, q2, #1
-> +	 vshr.u64	q11, q3, #1
-> +	veor		q10, q10, q5
-> +	 veor		q11, q11, q7
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q5, q5, q10
-> +	vshl.u64	q10, q10, #1
-> +	 veor		q7, q7, q11
-> +	 vshl.u64	q11, q11, #1
-> +	veor		q2, q2, q10
-> +	 veor		q3, q3, q11
-> +	vshr.u64	q10, q4, #1
-> +	 vshr.u64	q11, q0, #1
-> +	veor		q10, q10, q6
-> +	 veor		q11, q11, q1
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q6, q6, q10
-> +	vshl.u64	q10, q10, #1
-> +	 veor		q1, q1, q11
-> +	 vshl.u64	q11, q11, #1
-> +	veor		q4, q4, q10
-> +	 veor		q0, q0, q11
-> +	vmov.i8	q8,#0x0f			@ compose .LBS2
-> +	vshr.u64	q10, q7, #2
-> +	 vshr.u64	q11, q3, #2
-> +	veor		q10, q10, q5
-> +	 veor		q11, q11, q2
-> +	vand		q10, q10, q9
-> +	 vand		q11, q11, q9
-> +	veor		q5, q5, q10
-> +	vshl.u64	q10, q10, #2
-> +	 veor		q2, q2, q11
-> +	 vshl.u64	q11, q11, #2
-> +	veor		q7, q7, q10
-> +	 veor		q3, q3, q11
-> +	vshr.u64	q10, q1, #2
-> +	 vshr.u64	q11, q0, #2
-> +	veor		q10, q10, q6
-> +	 veor		q11, q11, q4
-> +	vand		q10, q10, q9
-> +	 vand		q11, q11, q9
-> +	veor		q6, q6, q10
-> +	vshl.u64	q10, q10, #2
-> +	 veor		q4, q4, q11
-> +	 vshl.u64	q11, q11, #2
-> +	veor		q1, q1, q10
-> +	 veor		q0, q0, q11
-> +	vshr.u64	q10, q6, #4
-> +	 vshr.u64	q11, q4, #4
-> +	veor		q10, q10, q5
-> +	 veor		q11, q11, q2
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q5, q5, q10
-> +	vshl.u64	q10, q10, #4
-> +	 veor		q2, q2, q11
-> +	 vshl.u64	q11, q11, #4
-> +	veor		q6, q6, q10
-> +	 veor		q4, q4, q11
-> +	vshr.u64	q10, q1, #4
-> +	 vshr.u64	q11, q0, #4
-> +	veor		q10, q10, q7
-> +	 veor		q11, q11, q3
-> +	vand		q10, q10, q8
-> +	 vand		q11, q11, q8
-> +	veor		q7, q7, q10
-> +	vshl.u64	q10, q10, #4
-> +	 veor		q3, q3, q11
-> +	 vshl.u64	q11, q11, #4
-> +	veor		q1, q1, q10
-> +	 veor		q0, q0, q11
-> +	vldmia	r4, {q8}			@ last round key
-> +	veor	q4, q4, q8
-> +	veor	q6, q6, q8
-> +	veor	q3, q3, q8
-> +	veor	q7, q7, q8
-> +	veor	q2, q2, q8
-> +	veor	q5, q5, q8
-> +	veor	q0, q0, q8
-> +	veor	q1, q1, q8
-> +	bx	lr
-> +.size	_bsaes_encrypt8,.-_bsaes_encrypt8
-> +.type	_bsaes_key_convert,%function
-> +.align	4
-> +_bsaes_key_convert:
-> +	adr	r6,_bsaes_key_convert
-> +	vld1.8	{q7},  [r4]!		@ load round 0 key
-> +	sub	r6,r6,#_bsaes_key_convert-.LM0
-> +	vld1.8	{q15}, [r4]!		@ load round 1 key
-> +
-> +	vmov.i8	q8,  #0x01			@ bit masks
-> +	vmov.i8	q9,  #0x02
-> +	vmov.i8	q10, #0x04
-> +	vmov.i8	q11, #0x08
-> +	vmov.i8	q12, #0x10
-> +	vmov.i8	q13, #0x20
-> +	vldmia	r6, {q14}		@ .LM0
-> +
-> +#ifdef __ARMEL__
-> +	vrev32.8	q7,  q7
-> +	vrev32.8	q15, q15
-> +#endif
-> +	sub	r5,r5,#1
-> +	vstmia	r12!, {q7}		@ save round 0 key
-> +	b	.Lkey_loop
-> +
-> +.align	4
-> +.Lkey_loop:
-> +	vtbl.8	d14,{q15},d28
-> +	vtbl.8	d15,{q15},d29
-> +	vmov.i8	q6,  #0x40
-> +	vmov.i8	q15, #0x80
-> +
-> +	vtst.8	q0, q7, q8
-> +	vtst.8	q1, q7, q9
-> +	vtst.8	q2, q7, q10
-> +	vtst.8	q3, q7, q11
-> +	vtst.8	q4, q7, q12
-> +	vtst.8	q5, q7, q13
-> +	vtst.8	q6, q7, q6
-> +	vtst.8	q7, q7, q15
-> +	vld1.8	{q15}, [r4]!		@ load next round key
-> +	vmvn	q0, q0		@ "pnot"
-> +	vmvn	q1, q1
-> +	vmvn	q5, q5
-> +	vmvn	q6, q6
-> +#ifdef __ARMEL__
-> +	vrev32.8	q15, q15
-> +#endif
-> +	subs	r5,r5,#1
-> +	vstmia	r12!,{q0-q7}		@ write bit-sliced round key
-> +	bne	.Lkey_loop
-> +
-> +	vmov.i8	q7,#0x63			@ compose .L63
-> +	@ don't save last round key
-> +	bx	lr
-> +.size	_bsaes_key_convert,.-_bsaes_key_convert
-> +.extern AES_cbc_encrypt
-> +.extern AES_decrypt
-> +
-> +.global	bsaes_cbc_encrypt
-> +.type	bsaes_cbc_encrypt,%function
-> +.align	5
-> +bsaes_cbc_encrypt:
-> +#ifndef	__KERNEL__
-> +	cmp	r2, #128
-> +#ifndef	__thumb__
-> +	blo	AES_cbc_encrypt
-> +#else
-> +	bhs	1f
-> +	b	AES_cbc_encrypt
-> +1:
-> +#endif
-> +#endif
-> +
-> +	@ it is up to the caller to make sure we are called with enc == 0
-> +
-> +	mov	ip, sp
-> +	stmdb	sp!, {r4-r10, lr}
-> +	VFP_ABI_PUSH
-> +	ldr	r8, [ip]			@ IV is 1st arg on the stack
-> +	mov	r2, r2, lsr#4		@ len in 16 byte blocks
-> +	sub	sp, #0x10			@ scratch space to carry over the IV
-> +	mov	r9, sp				@ save sp
-> +
-> +	ldr	r10, [r3, #240]		@ get # of rounds
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	@ allocate the key schedule on the stack
-> +	sub	r12, sp, r10, lsl#7		@ 128 bytes per inner round key
-> +	add	r12, #96			@ sifze of bit-slices key schedule
-> +
-> +	@ populate the key schedule
-> +	mov	r4, r3			@ pass key
-> +	mov	r5, r10			@ pass # of rounds
-> +	mov	sp, r12				@ sp is sp
-> +	bl	_bsaes_key_convert
-> +	vldmia	sp, {q6}
-> +	vstmia	r12,  {q15}		@ save last round key
-> +	veor	q7, q7, q6	@ fix up round 0 key
-> +	vstmia	sp, {q7}
-> +#else
-> +	ldr	r12, [r3, #244]
-> +	eors	r12, #1
-> +	beq	0f
-> +
-> +	@ populate the key schedule
-> +	str	r12, [r3, #244]
-> +	mov	r4, r3			@ pass key
-> +	mov	r5, r10			@ pass # of rounds
-> +	add	r12, r3, #248			@ pass key schedule
-> +	bl	_bsaes_key_convert
-> +	add	r4, r3, #248
-> +	vldmia	r4, {q6}
-> +	vstmia	r12, {q15}			@ save last round key
-> +	veor	q7, q7, q6	@ fix up round 0 key
-> +	vstmia	r4, {q7}
-> +
-> +.align	2
-> +0:
-> +#endif
-> +
-> +	vld1.8	{q15}, [r8]		@ load IV
-> +	b	.Lcbc_dec_loop
-> +
-> +.align	4
-> +.Lcbc_dec_loop:
-> +	subs	r2, r2, #0x8
-> +	bmi	.Lcbc_dec_loop_finish
-> +
-> +	vld1.8	{q0-q1}, [r0]!	@ load input
-> +	vld1.8	{q2-q3}, [r0]!
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	mov	r4, sp			@ pass the key
-> +#else
-> +	add	r4, r3, #248
-> +#endif
-> +	vld1.8	{q4-q5}, [r0]!
-> +	mov	r5, r10
-> +	vld1.8	{q6-q7}, [r0]
-> +	sub	r0, r0, #0x60
-> +	vstmia	r9, {q15}			@ put aside IV
-> +
-> +	bl	_bsaes_decrypt8
-> +
-> +	vldmia	r9, {q14}			@ reload IV
-> +	vld1.8	{q8-q9}, [r0]!	@ reload input
-> +	veor	q0, q0, q14	@ ^= IV
-> +	vld1.8	{q10-q11}, [r0]!
-> +	veor	q1, q1, q8
-> +	veor	q6, q6, q9
-> +	vld1.8	{q12-q13}, [r0]!
-> +	veor	q4, q4, q10
-> +	veor	q2, q2, q11
-> +	vld1.8	{q14-q15}, [r0]!
-> +	veor	q7, q7, q12
-> +	vst1.8	{q0-q1}, [r1]!	@ write output
-> +	veor	q3, q3, q13
-> +	vst1.8	{q6}, [r1]!
-> +	veor	q5, q5, q14
-> +	vst1.8	{q4}, [r1]!
-> +	vst1.8	{q2}, [r1]!
-> +	vst1.8	{q7}, [r1]!
-> +	vst1.8	{q3}, [r1]!
-> +	vst1.8	{q5}, [r1]!
-> +
-> +	b	.Lcbc_dec_loop
-> +
-> +.Lcbc_dec_loop_finish:
-> +	adds	r2, r2, #8
-> +	beq	.Lcbc_dec_done
-> +
-> +	vld1.8	{q0}, [r0]!		@ load input
-> +	cmp	r2, #2
-> +	blo	.Lcbc_dec_one
-> +	vld1.8	{q1}, [r0]!
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	mov	r4, sp			@ pass the key
-> +#else
-> +	add	r4, r3, #248
-> +#endif
-> +	mov	r5, r10
-> +	vstmia	r9, {q15}			@ put aside IV
-> +	beq	.Lcbc_dec_two
-> +	vld1.8	{q2}, [r0]!
-> +	cmp	r2, #4
-> +	blo	.Lcbc_dec_three
-> +	vld1.8	{q3}, [r0]!
-> +	beq	.Lcbc_dec_four
-> +	vld1.8	{q4}, [r0]!
-> +	cmp	r2, #6
-> +	blo	.Lcbc_dec_five
-> +	vld1.8	{q5}, [r0]!
-> +	beq	.Lcbc_dec_six
-> +	vld1.8	{q6}, [r0]!
-> +	sub	r0, r0, #0x70
-> +
-> +	bl	_bsaes_decrypt8
-> +
-> +	vldmia	r9, {q14}			@ reload IV
-> +	vld1.8	{q8-q9}, [r0]!	@ reload input
-> +	veor	q0, q0, q14	@ ^= IV
-> +	vld1.8	{q10-q11}, [r0]!
-> +	veor	q1, q1, q8
-> +	veor	q6, q6, q9
-> +	vld1.8	{q12-q13}, [r0]!
-> +	veor	q4, q4, q10
-> +	veor	q2, q2, q11
-> +	vld1.8	{q15}, [r0]!
-> +	veor	q7, q7, q12
-> +	vst1.8	{q0-q1}, [r1]!	@ write output
-> +	veor	q3, q3, q13
-> +	vst1.8	{q6}, [r1]!
-> +	vst1.8	{q4}, [r1]!
-> +	vst1.8	{q2}, [r1]!
-> +	vst1.8	{q7}, [r1]!
-> +	vst1.8	{q3}, [r1]!
-> +	b	.Lcbc_dec_done
-> +.align	4
-> +.Lcbc_dec_six:
-> +	sub	r0, r0, #0x60
-> +	bl	_bsaes_decrypt8
-> +	vldmia	r9,{q14}			@ reload IV
-> +	vld1.8	{q8-q9}, [r0]!	@ reload input
-> +	veor	q0, q0, q14	@ ^= IV
-> +	vld1.8	{q10-q11}, [r0]!
-> +	veor	q1, q1, q8
-> +	veor	q6, q6, q9
-> +	vld1.8	{q12}, [r0]!
-> +	veor	q4, q4, q10
-> +	veor	q2, q2, q11
-> +	vld1.8	{q15}, [r0]!
-> +	veor	q7, q7, q12
-> +	vst1.8	{q0-q1}, [r1]!	@ write output
-> +	vst1.8	{q6}, [r1]!
-> +	vst1.8	{q4}, [r1]!
-> +	vst1.8	{q2}, [r1]!
-> +	vst1.8	{q7}, [r1]!
-> +	b	.Lcbc_dec_done
-> +.align	4
-> +.Lcbc_dec_five:
-> +	sub	r0, r0, #0x50
-> +	bl	_bsaes_decrypt8
-> +	vldmia	r9, {q14}			@ reload IV
-> +	vld1.8	{q8-q9}, [r0]!	@ reload input
-> +	veor	q0, q0, q14	@ ^= IV
-> +	vld1.8	{q10-q11}, [r0]!
-> +	veor	q1, q1, q8
-> +	veor	q6, q6, q9
-> +	vld1.8	{q15}, [r0]!
-> +	veor	q4, q4, q10
-> +	vst1.8	{q0-q1}, [r1]!	@ write output
-> +	veor	q2, q2, q11
-> +	vst1.8	{q6}, [r1]!
-> +	vst1.8	{q4}, [r1]!
-> +	vst1.8	{q2}, [r1]!
-> +	b	.Lcbc_dec_done
-> +.align	4
-> +.Lcbc_dec_four:
-> +	sub	r0, r0, #0x40
-> +	bl	_bsaes_decrypt8
-> +	vldmia	r9, {q14}			@ reload IV
-> +	vld1.8	{q8-q9}, [r0]!	@ reload input
-> +	veor	q0, q0, q14	@ ^= IV
-> +	vld1.8	{q10}, [r0]!
-> +	veor	q1, q1, q8
-> +	veor	q6, q6, q9
-> +	vld1.8	{q15}, [r0]!
-> +	veor	q4, q4, q10
-> +	vst1.8	{q0-q1}, [r1]!	@ write output
-> +	vst1.8	{q6}, [r1]!
-> +	vst1.8	{q4}, [r1]!
-> +	b	.Lcbc_dec_done
-> +.align	4
-> +.Lcbc_dec_three:
-> +	sub	r0, r0, #0x30
-> +	bl	_bsaes_decrypt8
-> +	vldmia	r9, {q14}			@ reload IV
-> +	vld1.8	{q8-q9}, [r0]!	@ reload input
-> +	veor	q0, q0, q14	@ ^= IV
-> +	vld1.8	{q15}, [r0]!
-> +	veor	q1, q1, q8
-> +	veor	q6, q6, q9
-> +	vst1.8	{q0-q1}, [r1]!	@ write output
-> +	vst1.8	{q6}, [r1]!
-> +	b	.Lcbc_dec_done
-> +.align	4
-> +.Lcbc_dec_two:
-> +	sub	r0, r0, #0x20
-> +	bl	_bsaes_decrypt8
-> +	vldmia	r9, {q14}			@ reload IV
-> +	vld1.8	{q8}, [r0]!		@ reload input
-> +	veor	q0, q0, q14	@ ^= IV
-> +	vld1.8	{q15}, [r0]!		@ reload input
-> +	veor	q1, q1, q8
-> +	vst1.8	{q0-q1}, [r1]!	@ write output
-> +	b	.Lcbc_dec_done
-> +.align	4
-> +.Lcbc_dec_one:
-> +	sub	r0, r0, #0x10
-> +	mov	r10, r1			@ save original out pointer
-> +	mov	r1, r9			@ use the iv scratch space as out buffer
-> +	mov	r2, r3
-> +	vmov	q4,q15		@ just in case ensure that IV
-> +	vmov	q5,q0			@ and input are preserved
-> +	bl	AES_decrypt
-> +	vld1.8	{q0}, [r9,:64]		@ load result
-> +	veor	q0, q0, q4	@ ^= IV
-> +	vmov	q15, q5		@ q5 holds input
-> +	vst1.8	{q0}, [r10]		@ write output
-> +
-> +.Lcbc_dec_done:
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	vmov.i32	q0, #0
-> +	vmov.i32	q1, #0
-> +.Lcbc_dec_bzero:				@ wipe key schedule [if any]
-> +	vstmia		sp!, {q0-q1}
-> +	cmp		sp, r9
-> +	bne		.Lcbc_dec_bzero
-> +#endif
-> +
-> +	mov	sp, r9
-> +	add	sp, #0x10			@ add sp,r9,#0x10 is no good for thumb
-> +	vst1.8	{q15}, [r8]		@ return IV
-> +	VFP_ABI_POP
-> +	ldmia	sp!, {r4-r10, pc}
-> +.size	bsaes_cbc_encrypt,.-bsaes_cbc_encrypt
-> +.extern	AES_encrypt
-> +.global	bsaes_ctr32_encrypt_blocks
-> +.type	bsaes_ctr32_encrypt_blocks,%function
-> +.align	5
-> +bsaes_ctr32_encrypt_blocks:
-> +	cmp	r2, #8			@ use plain AES for
-> +	blo	.Lctr_enc_short			@ small sizes
-> +
-> +	mov	ip, sp
-> +	stmdb	sp!, {r4-r10, lr}
-> +	VFP_ABI_PUSH
-> +	ldr	r8, [ip]			@ ctr is 1st arg on the stack
-> +	sub	sp, sp, #0x10			@ scratch space to carry over the ctr
-> +	mov	r9, sp				@ save sp
-> +
-> +	ldr	r10, [r3, #240]		@ get # of rounds
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	@ allocate the key schedule on the stack
-> +	sub	r12, sp, r10, lsl#7		@ 128 bytes per inner round key
-> +	add	r12, #96			@ size of bit-sliced key schedule
-> +
-> +	@ populate the key schedule
-> +	mov	r4, r3			@ pass key
-> +	mov	r5, r10			@ pass # of rounds
-> +	mov	sp, r12				@ sp is sp
-> +	bl	_bsaes_key_convert
-> +	veor	q7,q7,q15	@ fix up last round key
-> +	vstmia	r12, {q7}			@ save last round key
-> +
-> +	vld1.8	{q0}, [r8]		@ load counter
-> +	add	r8, r6, #.LREVM0SR-.LM0	@ borrow r8
-> +	vldmia	sp, {q4}		@ load round0 key
-> +#else
-> +	ldr	r12, [r3, #244]
-> +	eors	r12, #1
-> +	beq	0f
-> +
-> +	@ populate the key schedule
-> +	str	r12, [r3, #244]
-> +	mov	r4, r3			@ pass key
-> +	mov	r5, r10			@ pass # of rounds
-> +	add	r12, r3, #248			@ pass key schedule
-> +	bl	_bsaes_key_convert
-> +	veor	q7,q7,q15	@ fix up last round key
-> +	vstmia	r12, {q7}			@ save last round key
-> +
-> +.align	2
-> +0:	add	r12, r3, #248
-> +	vld1.8	{q0}, [r8]		@ load counter
-> +	adrl	r8, .LREVM0SR			@ borrow r8
-> +	vldmia	r12, {q4}			@ load round0 key
-> +	sub	sp, #0x10			@ place for adjusted round0 key
-> +#endif
-> +
-> +	vmov.i32	q8,#1		@ compose 1<<96
-> +	veor		q9,q9,q9
-> +	vrev32.8	q0,q0
-> +	vext.8		q8,q9,q8,#4
-> +	vrev32.8	q4,q4
-> +	vadd.u32	q9,q8,q8	@ compose 2<<96
-> +	vstmia	sp, {q4}		@ save adjusted round0 key
-> +	b	.Lctr_enc_loop
-> +
-> +.align	4
-> +.Lctr_enc_loop:
-> +	vadd.u32	q10, q8, q9	@ compose 3<<96
-> +	vadd.u32	q1, q0, q8	@ +1
-> +	vadd.u32	q2, q0, q9	@ +2
-> +	vadd.u32	q3, q0, q10	@ +3
-> +	vadd.u32	q4, q1, q10
-> +	vadd.u32	q5, q2, q10
-> +	vadd.u32	q6, q3, q10
-> +	vadd.u32	q7, q4, q10
-> +	vadd.u32	q10, q5, q10	@ next counter
-> +
-> +	@ Borrow prologue from _bsaes_encrypt8 to use the opportunity
-> +	@ to flip byte order in 32-bit counter
-> +
-> +	vldmia		sp, {q9}		@ load round0 key
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x10		@ pass next round key
-> +#else
-> +	add		r4, r3, #264
-> +#endif
-> +	vldmia		r8, {q8}			@ .LREVM0SR
-> +	mov		r5, r10			@ pass rounds
-> +	vstmia		r9, {q10}			@ save next counter
-> +	sub		r6, r8, #.LREVM0SR-.LSR	@ pass constants
-> +
-> +	bl		_bsaes_encrypt8_alt
-> +
-> +	subs		r2, r2, #8
-> +	blo		.Lctr_enc_loop_done
-> +
-> +	vld1.8		{q8-q9}, [r0]!	@ load input
-> +	vld1.8		{q10-q11}, [r0]!
-> +	veor		q0, q8
-> +	veor		q1, q9
-> +	vld1.8		{q12-q13}, [r0]!
-> +	veor		q4, q10
-> +	veor		q6, q11
-> +	vld1.8		{q14-q15}, [r0]!
-> +	veor		q3, q12
-> +	vst1.8		{q0-q1}, [r1]!	@ write output
-> +	veor		q7, q13
-> +	veor		q2, q14
-> +	vst1.8		{q4}, [r1]!
-> +	veor		q5, q15
-> +	vst1.8		{q6}, [r1]!
-> +	vmov.i32	q8, #1			@ compose 1<<96
-> +	vst1.8		{q3}, [r1]!
-> +	veor		q9, q9, q9
-> +	vst1.8		{q7}, [r1]!
-> +	vext.8		q8, q9, q8, #4
-> +	vst1.8		{q2}, [r1]!
-> +	vadd.u32	q9,q8,q8		@ compose 2<<96
-> +	vst1.8		{q5}, [r1]!
-> +	vldmia		r9, {q0}			@ load counter
-> +
-> +	bne		.Lctr_enc_loop
-> +	b		.Lctr_enc_done
-> +
-> +.align	4
-> +.Lctr_enc_loop_done:
-> +	add		r2, r2, #8
-> +	vld1.8		{q8}, [r0]!	@ load input
-> +	veor		q0, q8
-> +	vst1.8		{q0}, [r1]!	@ write output
-> +	cmp		r2, #2
-> +	blo		.Lctr_enc_done
-> +	vld1.8		{q9}, [r0]!
-> +	veor		q1, q9
-> +	vst1.8		{q1}, [r1]!
-> +	beq		.Lctr_enc_done
-> +	vld1.8		{q10}, [r0]!
-> +	veor		q4, q10
-> +	vst1.8		{q4}, [r1]!
-> +	cmp		r2, #4
-> +	blo		.Lctr_enc_done
-> +	vld1.8		{q11}, [r0]!
-> +	veor		q6, q11
-> +	vst1.8		{q6}, [r1]!
-> +	beq		.Lctr_enc_done
-> +	vld1.8		{q12}, [r0]!
-> +	veor		q3, q12
-> +	vst1.8		{q3}, [r1]!
-> +	cmp		r2, #6
-> +	blo		.Lctr_enc_done
-> +	vld1.8		{q13}, [r0]!
-> +	veor		q7, q13
-> +	vst1.8		{q7}, [r1]!
-> +	beq		.Lctr_enc_done
-> +	vld1.8		{q14}, [r0]
-> +	veor		q2, q14
-> +	vst1.8		{q2}, [r1]!
-> +
-> +.Lctr_enc_done:
-> +	vmov.i32	q0, #0
-> +	vmov.i32	q1, #0
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +.Lctr_enc_bzero:			@ wipe key schedule [if any]
-> +	vstmia		sp!, {q0-q1}
-> +	cmp		sp, r9
-> +	bne		.Lctr_enc_bzero
-> +#else
-> +	vstmia		sp, {q0-q1}
-> +#endif
-> +
-> +	mov	sp, r9
-> +	add	sp, #0x10		@ add sp,r9,#0x10 is no good for thumb
-> +	VFP_ABI_POP
-> +	ldmia	sp!, {r4-r10, pc}	@ return
-> +
-> +.align	4
-> +.Lctr_enc_short:
-> +	ldr	ip, [sp]		@ ctr pointer is passed on stack
-> +	stmdb	sp!, {r4-r8, lr}
-> +
-> +	mov	r4, r0		@ copy arguments
-> +	mov	r5, r1
-> +	mov	r6, r2
-> +	mov	r7, r3
-> +	ldr	r8, [ip, #12]		@ load counter LSW
-> +	vld1.8	{q1}, [ip]		@ load whole counter value
-> +#ifdef __ARMEL__
-> +	rev	r8, r8
-> +#endif
-> +	sub	sp, sp, #0x10
-> +	vst1.8	{q1}, [sp,:64]	@ copy counter value
-> +	sub	sp, sp, #0x10
-> +
-> +.Lctr_enc_short_loop:
-> +	add	r0, sp, #0x10		@ input counter value
-> +	mov	r1, sp			@ output on the stack
-> +	mov	r2, r7			@ key
-> +
-> +	bl	AES_encrypt
-> +
-> +	vld1.8	{q0}, [r4]!	@ load input
-> +	vld1.8	{q1}, [sp,:64]	@ load encrypted counter
-> +	add	r8, r8, #1
-> +#ifdef __ARMEL__
-> +	rev	r0, r8
-> +	str	r0, [sp, #0x1c]		@ next counter value
-> +#else
-> +	str	r8, [sp, #0x1c]		@ next counter value
-> +#endif
-> +	veor	q0,q0,q1
-> +	vst1.8	{q0}, [r5]!	@ store output
-> +	subs	r6, r6, #1
-> +	bne	.Lctr_enc_short_loop
-> +
-> +	vmov.i32	q0, #0
-> +	vmov.i32	q1, #0
-> +	vstmia		sp!, {q0-q1}
-> +
-> +	ldmia	sp!, {r4-r8, pc}
-> +.size	bsaes_ctr32_encrypt_blocks,.-bsaes_ctr32_encrypt_blocks
-> +.globl	bsaes_xts_encrypt
-> +.type	bsaes_xts_encrypt,%function
-> +.align	4
-> +bsaes_xts_encrypt:
-> +	mov	ip, sp
-> +	stmdb	sp!, {r4-r10, lr}		@ 0x20
-> +	VFP_ABI_PUSH
-> +	mov	r6, sp				@ future r3
-> +
-> +	mov	r7, r0
-> +	mov	r8, r1
-> +	mov	r9, r2
-> +	mov	r10, r3
-> +
-> +	sub	r0, sp, #0x10			@ 0x10
-> +	bic	r0, #0xf			@ align at 16 bytes
-> +	mov	sp, r0
-> +
-> +#ifdef	XTS_CHAIN_TWEAK
-> +	ldr	r0, [ip]			@ pointer to input tweak
-> +#else
-> +	@ generate initial tweak
-> +	ldr	r0, [ip, #4]			@ iv[]
-> +	mov	r1, sp
-> +	ldr	r2, [ip, #0]			@ key2
-> +	bl	AES_encrypt
-> +	mov	r0,sp				@ pointer to initial tweak
-> +#endif
-> +
-> +	ldr	r1, [r10, #240]		@ get # of rounds
-> +	mov	r3, r6
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	@ allocate the key schedule on the stack
-> +	sub	r12, sp, r1, lsl#7		@ 128 bytes per inner round key
-> +	@ add	r12, #96			@ size of bit-sliced key schedule
-> +	sub	r12, #48			@ place for tweak[9]
-> +
-> +	@ populate the key schedule
-> +	mov	r4, r10			@ pass key
-> +	mov	r5, r1			@ pass # of rounds
-> +	mov	sp, r12
-> +	add	r12, #0x90			@ pass key schedule
-> +	bl	_bsaes_key_convert
-> +	veor	q7, q7, q15	@ fix up last round key
-> +	vstmia	r12, {q7}			@ save last round key
-> +#else
-> +	ldr	r12, [r10, #244]
-> +	eors	r12, #1
-> +	beq	0f
-> +
-> +	str	r12, [r10, #244]
-> +	mov	r4, r10			@ pass key
-> +	mov	r5, r1			@ pass # of rounds
-> +	add	r12, r10, #248			@ pass key schedule
-> +	bl	_bsaes_key_convert
-> +	veor	q7, q7, q15	@ fix up last round key
-> +	vstmia	r12, {q7}
-> +
-> +.align	2
-> +0:	sub	sp, #0x90			@ place for tweak[9]
-> +#endif
-> +
-> +	vld1.8	{q8}, [r0]			@ initial tweak
-> +	adr	r2, .Lxts_magic
-> +
-> +	subs	r9, #0x80
-> +	blo	.Lxts_enc_short
-> +	b	.Lxts_enc_loop
-> +
-> +.align	4
-> +.Lxts_enc_loop:
-> +	vldmia		r2, {q5}	@ load XTS magic
-> +	vshr.s64	q6, q8, #63
-> +	mov		r0, sp
-> +	vand		q6, q6, q5
-> +	vadd.u64	q9, q8, q8
-> +	vst1.64		{q8}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q9, #63
-> +	veor		q9, q9, q6
-> +	vand		q7, q7, q5
-> +	vadd.u64	q10, q9, q9
-> +	vst1.64		{q9}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q10, #63
-> +	veor		q10, q10, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q0}, [r7]!
-> +	vadd.u64	q11, q10, q10
-> +	vst1.64		{q10}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q11, #63
-> +	veor		q11, q11, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q1}, [r7]!
-> +	veor		q0, q0, q8
-> +	vadd.u64	q12, q11, q11
-> +	vst1.64		{q11}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q12, #63
-> +	veor		q12, q12, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q2}, [r7]!
-> +	veor		q1, q1, q9
-> +	vadd.u64	q13, q12, q12
-> +	vst1.64		{q12}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q13, #63
-> +	veor		q13, q13, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q3}, [r7]!
-> +	veor		q2, q2, q10
-> +	vadd.u64	q14, q13, q13
-> +	vst1.64		{q13}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q14, #63
-> +	veor		q14, q14, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q4}, [r7]!
-> +	veor		q3, q3, q11
-> +	vadd.u64	q15, q14, q14
-> +	vst1.64		{q14}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q15, #63
-> +	veor		q15, q15, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q5}, [r7]!
-> +	veor		q4, q4, q12
-> +	vadd.u64	q8, q15, q15
-> +	vst1.64		{q15}, [r0,:128]!
-> +	vswp		d15,d14
-> +	veor		q8, q8, q7
-> +	vst1.64		{q8}, [r0,:128]		@ next round tweak
-> +
-> +	vld1.8		{q6-q7}, [r7]!
-> +	veor		q5, q5, q13
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q6, q6, q14
-> +	mov		r5, r1			@ pass rounds
-> +	veor		q7, q7, q15
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_encrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10-q11}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	vld1.64		{q12-q13}, [r0,:128]!
-> +	veor		q1, q1, q9
-> +	veor		q8, q4, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	veor		q9, q6, q11
-> +	vld1.64		{q14-q15}, [r0,:128]!
-> +	veor		q10, q3, q12
-> +	vst1.8		{q8-q9}, [r8]!
-> +	veor		q11, q7, q13
-> +	veor		q12, q2, q14
-> +	vst1.8		{q10-q11}, [r8]!
-> +	veor		q13, q5, q15
-> +	vst1.8		{q12-q13}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +
-> +	subs		r9, #0x80
-> +	bpl		.Lxts_enc_loop
-> +
-> +.Lxts_enc_short:
-> +	adds		r9, #0x70
-> +	bmi		.Lxts_enc_done
-> +
-> +	vldmia		r2, {q5}	@ load XTS magic
-> +	vshr.s64	q7, q8, #63
-> +	mov		r0, sp
-> +	vand		q7, q7, q5
-> +	vadd.u64	q9, q8, q8
-> +	vst1.64		{q8}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q9, #63
-> +	veor		q9, q9, q7
-> +	vand		q6, q6, q5
-> +	vadd.u64	q10, q9, q9
-> +	vst1.64		{q9}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q10, #63
-> +	veor		q10, q10, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q0}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_enc_1
-> +	vadd.u64	q11, q10, q10
-> +	vst1.64		{q10}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q11, #63
-> +	veor		q11, q11, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q1}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_enc_2
-> +	veor		q0, q0, q8
-> +	vadd.u64	q12, q11, q11
-> +	vst1.64		{q11}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q12, #63
-> +	veor		q12, q12, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q2}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_enc_3
-> +	veor		q1, q1, q9
-> +	vadd.u64	q13, q12, q12
-> +	vst1.64		{q12}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q13, #63
-> +	veor		q13, q13, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q3}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_enc_4
-> +	veor		q2, q2, q10
-> +	vadd.u64	q14, q13, q13
-> +	vst1.64		{q13}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q14, #63
-> +	veor		q14, q14, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q4}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_enc_5
-> +	veor		q3, q3, q11
-> +	vadd.u64	q15, q14, q14
-> +	vst1.64		{q14}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q15, #63
-> +	veor		q15, q15, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q5}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_enc_6
-> +	veor		q4, q4, q12
-> +	sub		r9, #0x10
-> +	vst1.64		{q15}, [r0,:128]		@ next round tweak
-> +
-> +	vld1.8		{q6}, [r7]!
-> +	veor		q5, q5, q13
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q6, q6, q14
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_encrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10-q11}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	vld1.64		{q12-q13}, [r0,:128]!
-> +	veor		q1, q1, q9
-> +	veor		q8, q4, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	veor		q9, q6, q11
-> +	vld1.64		{q14}, [r0,:128]!
-> +	veor		q10, q3, q12
-> +	vst1.8		{q8-q9}, [r8]!
-> +	veor		q11, q7, q13
-> +	veor		q12, q2, q14
-> +	vst1.8		{q10-q11}, [r8]!
-> +	vst1.8		{q12}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_enc_done
-> +.align	4
-> +.Lxts_enc_6:
-> +	vst1.64		{q14}, [r0,:128]		@ next round tweak
-> +
-> +	veor		q4, q4, q12
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q5, q5, q13
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_encrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10-q11}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	vld1.64		{q12-q13}, [r0,:128]!
-> +	veor		q1, q1, q9
-> +	veor		q8, q4, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	veor		q9, q6, q11
-> +	veor		q10, q3, q12
-> +	vst1.8		{q8-q9}, [r8]!
-> +	veor		q11, q7, q13
-> +	vst1.8		{q10-q11}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_enc_done
-> +
-> +@ put this in range for both ARM and Thumb mode adr instructions
-> +.align	5
-> +.Lxts_magic:
-> +	.quad	1, 0x87
-> +
-> +.align	5
-> +.Lxts_enc_5:
-> +	vst1.64		{q13}, [r0,:128]		@ next round tweak
-> +
-> +	veor		q3, q3, q11
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q4, q4, q12
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_encrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10-q11}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	vld1.64		{q12}, [r0,:128]!
-> +	veor		q1, q1, q9
-> +	veor		q8, q4, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	veor		q9, q6, q11
-> +	veor		q10, q3, q12
-> +	vst1.8		{q8-q9}, [r8]!
-> +	vst1.8		{q10}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_enc_done
-> +.align	4
-> +.Lxts_enc_4:
-> +	vst1.64		{q12}, [r0,:128]		@ next round tweak
-> +
-> +	veor		q2, q2, q10
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q3, q3, q11
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_encrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10-q11}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	veor		q1, q1, q9
-> +	veor		q8, q4, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	veor		q9, q6, q11
-> +	vst1.8		{q8-q9}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_enc_done
-> +.align	4
-> +.Lxts_enc_3:
-> +	vst1.64		{q11}, [r0,:128]		@ next round tweak
-> +
-> +	veor		q1, q1, q9
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q2, q2, q10
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_encrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	veor		q1, q1, q9
-> +	veor		q8, q4, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	vst1.8		{q8}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_enc_done
-> +.align	4
-> +.Lxts_enc_2:
-> +	vst1.64		{q10}, [r0,:128]		@ next round tweak
-> +
-> +	veor		q0, q0, q8
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q1, q1, q9
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_encrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	veor		q1, q1, q9
-> +	vst1.8		{q0-q1}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_enc_done
-> +.align	4
-> +.Lxts_enc_1:
-> +	mov		r0, sp
-> +	veor		q0, q8
-> +	mov		r1, sp
-> +	vst1.8		{q0}, [sp,:128]
-> +	mov		r2, r10
-> +	mov		r4, r3				@ preserve fp
-> +
-> +	bl		AES_encrypt
-> +
-> +	vld1.8		{q0}, [sp,:128]
-> +	veor		q0, q0, q8
-> +	vst1.8		{q0}, [r8]!
-> +	mov		r3, r4
-> +
-> +	vmov		q8, q9		@ next round tweak
-> +
-> +.Lxts_enc_done:
-> +#ifndef	XTS_CHAIN_TWEAK
-> +	adds		r9, #0x10
-> +	beq		.Lxts_enc_ret
-> +	sub		r6, r8, #0x10
-> +
-> +.Lxts_enc_steal:
-> +	ldrb		r0, [r7], #1
-> +	ldrb		r1, [r8, #-0x10]
-> +	strb		r0, [r8, #-0x10]
-> +	strb		r1, [r8], #1
-> +
-> +	subs		r9, #1
-> +	bhi		.Lxts_enc_steal
-> +
-> +	vld1.8		{q0}, [r6]
-> +	mov		r0, sp
-> +	veor		q0, q0, q8
-> +	mov		r1, sp
-> +	vst1.8		{q0}, [sp,:128]
-> +	mov		r2, r10
-> +	mov		r4, r3			@ preserve fp
-> +
-> +	bl		AES_encrypt
-> +
-> +	vld1.8		{q0}, [sp,:128]
-> +	veor		q0, q0, q8
-> +	vst1.8		{q0}, [r6]
-> +	mov		r3, r4
-> +#endif
-> +
-> +.Lxts_enc_ret:
-> +	bic		r0, r3, #0xf
-> +	vmov.i32	q0, #0
-> +	vmov.i32	q1, #0
-> +#ifdef	XTS_CHAIN_TWEAK
-> +	ldr		r1, [r3, #0x20+VFP_ABI_FRAME]	@ chain tweak
-> +#endif
-> +.Lxts_enc_bzero:				@ wipe key schedule [if any]
-> +	vstmia		sp!, {q0-q1}
-> +	cmp		sp, r0
-> +	bne		.Lxts_enc_bzero
-> +
-> +	mov		sp, r3
-> +#ifdef	XTS_CHAIN_TWEAK
-> +	vst1.8		{q8}, [r1]
-> +#endif
-> +	VFP_ABI_POP
-> +	ldmia		sp!, {r4-r10, pc}	@ return
-> +
-> +.size	bsaes_xts_encrypt,.-bsaes_xts_encrypt
-> +
-> +.globl	bsaes_xts_decrypt
-> +.type	bsaes_xts_decrypt,%function
-> +.align	4
-> +bsaes_xts_decrypt:
-> +	mov	ip, sp
-> +	stmdb	sp!, {r4-r10, lr}		@ 0x20
-> +	VFP_ABI_PUSH
-> +	mov	r6, sp				@ future r3
-> +
-> +	mov	r7, r0
-> +	mov	r8, r1
-> +	mov	r9, r2
-> +	mov	r10, r3
-> +
-> +	sub	r0, sp, #0x10			@ 0x10
-> +	bic	r0, #0xf			@ align at 16 bytes
-> +	mov	sp, r0
-> +
-> +#ifdef	XTS_CHAIN_TWEAK
-> +	ldr	r0, [ip]			@ pointer to input tweak
-> +#else
-> +	@ generate initial tweak
-> +	ldr	r0, [ip, #4]			@ iv[]
-> +	mov	r1, sp
-> +	ldr	r2, [ip, #0]			@ key2
-> +	bl	AES_encrypt
-> +	mov	r0, sp				@ pointer to initial tweak
-> +#endif
-> +
-> +	ldr	r1, [r10, #240]		@ get # of rounds
-> +	mov	r3, r6
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	@ allocate the key schedule on the stack
-> +	sub	r12, sp, r1, lsl#7		@ 128 bytes per inner round key
-> +	@ add	r12, #96			@ size of bit-sliced key schedule
-> +	sub	r12, #48			@ place for tweak[9]
-> +
-> +	@ populate the key schedule
-> +	mov	r4, r10			@ pass key
-> +	mov	r5, r1			@ pass # of rounds
-> +	mov	sp, r12
-> +	add	r12, #0x90			@ pass key schedule
-> +	bl	_bsaes_key_convert
-> +	add	r4, sp, #0x90
-> +	vldmia	r4, {q6}
-> +	vstmia	r12,  {q15}		@ save last round key
-> +	veor	q7, q7, q6	@ fix up round 0 key
-> +	vstmia	r4, {q7}
-> +#else
-> +	ldr	r12, [r10, #244]
-> +	eors	r12, #1
-> +	beq	0f
-> +
-> +	str	r12, [r10, #244]
-> +	mov	r4, r10			@ pass key
-> +	mov	r5, r1			@ pass # of rounds
-> +	add	r12, r10, #248			@ pass key schedule
-> +	bl	_bsaes_key_convert
-> +	add	r4, r10, #248
-> +	vldmia	r4, {q6}
-> +	vstmia	r12,  {q15}		@ save last round key
-> +	veor	q7, q7, q6	@ fix up round 0 key
-> +	vstmia	r4, {q7}
-> +
-> +.align	2
-> +0:	sub	sp, #0x90			@ place for tweak[9]
-> +#endif
-> +	vld1.8	{q8}, [r0]			@ initial tweak
-> +	adr	r2, .Lxts_magic
-> +
-> +	tst	r9, #0xf			@ if not multiple of 16
-> +	it	ne				@ Thumb2 thing, sanity check in ARM
-> +	subne	r9, #0x10			@ subtract another 16 bytes
-> +	subs	r9, #0x80
-> +
-> +	blo	.Lxts_dec_short
-> +	b	.Lxts_dec_loop
-> +
-> +.align	4
-> +.Lxts_dec_loop:
-> +	vldmia		r2, {q5}	@ load XTS magic
-> +	vshr.s64	q6, q8, #63
-> +	mov		r0, sp
-> +	vand		q6, q6, q5
-> +	vadd.u64	q9, q8, q8
-> +	vst1.64		{q8}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q9, #63
-> +	veor		q9, q9, q6
-> +	vand		q7, q7, q5
-> +	vadd.u64	q10, q9, q9
-> +	vst1.64		{q9}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q10, #63
-> +	veor		q10, q10, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q0}, [r7]!
-> +	vadd.u64	q11, q10, q10
-> +	vst1.64		{q10}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q11, #63
-> +	veor		q11, q11, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q1}, [r7]!
-> +	veor		q0, q0, q8
-> +	vadd.u64	q12, q11, q11
-> +	vst1.64		{q11}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q12, #63
-> +	veor		q12, q12, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q2}, [r7]!
-> +	veor		q1, q1, q9
-> +	vadd.u64	q13, q12, q12
-> +	vst1.64		{q12}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q13, #63
-> +	veor		q13, q13, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q3}, [r7]!
-> +	veor		q2, q2, q10
-> +	vadd.u64	q14, q13, q13
-> +	vst1.64		{q13}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q14, #63
-> +	veor		q14, q14, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q4}, [r7]!
-> +	veor		q3, q3, q11
-> +	vadd.u64	q15, q14, q14
-> +	vst1.64		{q14}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q15, #63
-> +	veor		q15, q15, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q5}, [r7]!
-> +	veor		q4, q4, q12
-> +	vadd.u64	q8, q15, q15
-> +	vst1.64		{q15}, [r0,:128]!
-> +	vswp		d15,d14
-> +	veor		q8, q8, q7
-> +	vst1.64		{q8}, [r0,:128]		@ next round tweak
-> +
-> +	vld1.8		{q6-q7}, [r7]!
-> +	veor		q5, q5, q13
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q6, q6, q14
-> +	mov		r5, r1			@ pass rounds
-> +	veor		q7, q7, q15
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_decrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10-q11}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	vld1.64		{q12-q13}, [r0,:128]!
-> +	veor		q1, q1, q9
-> +	veor		q8, q6, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	veor		q9, q4, q11
-> +	vld1.64		{q14-q15}, [r0,:128]!
-> +	veor		q10, q2, q12
-> +	vst1.8		{q8-q9}, [r8]!
-> +	veor		q11, q7, q13
-> +	veor		q12, q3, q14
-> +	vst1.8		{q10-q11}, [r8]!
-> +	veor		q13, q5, q15
-> +	vst1.8		{q12-q13}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +
-> +	subs		r9, #0x80
-> +	bpl		.Lxts_dec_loop
-> +
-> +.Lxts_dec_short:
-> +	adds		r9, #0x70
-> +	bmi		.Lxts_dec_done
-> +
-> +	vldmia		r2, {q5}	@ load XTS magic
-> +	vshr.s64	q7, q8, #63
-> +	mov		r0, sp
-> +	vand		q7, q7, q5
-> +	vadd.u64	q9, q8, q8
-> +	vst1.64		{q8}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q9, #63
-> +	veor		q9, q9, q7
-> +	vand		q6, q6, q5
-> +	vadd.u64	q10, q9, q9
-> +	vst1.64		{q9}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q10, #63
-> +	veor		q10, q10, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q0}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_dec_1
-> +	vadd.u64	q11, q10, q10
-> +	vst1.64		{q10}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q11, #63
-> +	veor		q11, q11, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q1}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_dec_2
-> +	veor		q0, q0, q8
-> +	vadd.u64	q12, q11, q11
-> +	vst1.64		{q11}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q12, #63
-> +	veor		q12, q12, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q2}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_dec_3
-> +	veor		q1, q1, q9
-> +	vadd.u64	q13, q12, q12
-> +	vst1.64		{q12}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q13, #63
-> +	veor		q13, q13, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q3}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_dec_4
-> +	veor		q2, q2, q10
-> +	vadd.u64	q14, q13, q13
-> +	vst1.64		{q13}, [r0,:128]!
-> +	vswp		d13,d12
-> +	vshr.s64	q7, q14, #63
-> +	veor		q14, q14, q6
-> +	vand		q7, q7, q5
-> +	vld1.8		{q4}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_dec_5
-> +	veor		q3, q3, q11
-> +	vadd.u64	q15, q14, q14
-> +	vst1.64		{q14}, [r0,:128]!
-> +	vswp		d15,d14
-> +	vshr.s64	q6, q15, #63
-> +	veor		q15, q15, q7
-> +	vand		q6, q6, q5
-> +	vld1.8		{q5}, [r7]!
-> +	subs		r9, #0x10
-> +	bmi		.Lxts_dec_6
-> +	veor		q4, q4, q12
-> +	sub		r9, #0x10
-> +	vst1.64		{q15}, [r0,:128]		@ next round tweak
-> +
-> +	vld1.8		{q6}, [r7]!
-> +	veor		q5, q5, q13
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q6, q6, q14
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_decrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10-q11}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	vld1.64		{q12-q13}, [r0,:128]!
-> +	veor		q1, q1, q9
-> +	veor		q8, q6, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	veor		q9, q4, q11
-> +	vld1.64		{q14}, [r0,:128]!
-> +	veor		q10, q2, q12
-> +	vst1.8		{q8-q9}, [r8]!
-> +	veor		q11, q7, q13
-> +	veor		q12, q3, q14
-> +	vst1.8		{q10-q11}, [r8]!
-> +	vst1.8		{q12}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_dec_done
-> +.align	4
-> +.Lxts_dec_6:
-> +	vst1.64		{q14}, [r0,:128]		@ next round tweak
-> +
-> +	veor		q4, q4, q12
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q5, q5, q13
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_decrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10-q11}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	vld1.64		{q12-q13}, [r0,:128]!
-> +	veor		q1, q1, q9
-> +	veor		q8, q6, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	veor		q9, q4, q11
-> +	veor		q10, q2, q12
-> +	vst1.8		{q8-q9}, [r8]!
-> +	veor		q11, q7, q13
-> +	vst1.8		{q10-q11}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_dec_done
-> +.align	4
-> +.Lxts_dec_5:
-> +	vst1.64		{q13}, [r0,:128]		@ next round tweak
-> +
-> +	veor		q3, q3, q11
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q4, q4, q12
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_decrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10-q11}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	vld1.64		{q12}, [r0,:128]!
-> +	veor		q1, q1, q9
-> +	veor		q8, q6, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	veor		q9, q4, q11
-> +	veor		q10, q2, q12
-> +	vst1.8		{q8-q9}, [r8]!
-> +	vst1.8		{q10}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_dec_done
-> +.align	4
-> +.Lxts_dec_4:
-> +	vst1.64		{q12}, [r0,:128]		@ next round tweak
-> +
-> +	veor		q2, q2, q10
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q3, q3, q11
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_decrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10-q11}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	veor		q1, q1, q9
-> +	veor		q8, q6, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	veor		q9, q4, q11
-> +	vst1.8		{q8-q9}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_dec_done
-> +.align	4
-> +.Lxts_dec_3:
-> +	vst1.64		{q11}, [r0,:128]		@ next round tweak
-> +
-> +	veor		q1, q1, q9
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q2, q2, q10
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_decrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	vld1.64		{q10}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	veor		q1, q1, q9
-> +	veor		q8, q6, q10
-> +	vst1.8		{q0-q1}, [r8]!
-> +	vst1.8		{q8}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_dec_done
-> +.align	4
-> +.Lxts_dec_2:
-> +	vst1.64		{q10}, [r0,:128]		@ next round tweak
-> +
-> +	veor		q0, q0, q8
-> +#ifndef	BSAES_ASM_EXTENDED_KEY
-> +	add		r4, sp, #0x90			@ pass key schedule
-> +#else
-> +	add		r4, r10, #248			@ pass key schedule
-> +#endif
-> +	veor		q1, q1, q9
-> +	mov		r5, r1			@ pass rounds
-> +	mov		r0, sp
-> +
-> +	bl		_bsaes_decrypt8
-> +
-> +	vld1.64		{q8-q9}, [r0,:128]!
-> +	veor		q0, q0, q8
-> +	veor		q1, q1, q9
-> +	vst1.8		{q0-q1}, [r8]!
-> +
-> +	vld1.64		{q8}, [r0,:128]		@ next round tweak
-> +	b		.Lxts_dec_done
-> +.align	4
-> +.Lxts_dec_1:
-> +	mov		r0, sp
-> +	veor		q0, q8
-> +	mov		r1, sp
-> +	vst1.8		{q0}, [sp,:128]
-> +	mov		r2, r10
-> +	mov		r4, r3				@ preserve fp
-> +	mov		r5, r2			@ preserve magic
-> +
-> +	bl		AES_decrypt
-> +
-> +	vld1.8		{q0}, [sp,:128]
-> +	veor		q0, q0, q8
-> +	vst1.8		{q0}, [r8]!
-> +	mov		r3, r4
-> +	mov		r2, r5
-> +
-> +	vmov		q8, q9		@ next round tweak
-> +
-> +.Lxts_dec_done:
-> +#ifndef	XTS_CHAIN_TWEAK
-> +	adds		r9, #0x10
-> +	beq		.Lxts_dec_ret
-> +
-> +	@ calculate one round of extra tweak for the stolen ciphertext
-> +	vldmia		r2, {q5}
-> +	vshr.s64	q6, q8, #63
-> +	vand		q6, q6, q5
-> +	vadd.u64	q9, q8, q8
-> +	vswp		d13,d12
-> +	veor		q9, q9, q6
-> +
-> +	@ perform the final decryption with the last tweak value
-> +	vld1.8		{q0}, [r7]!
-> +	mov		r0, sp
-> +	veor		q0, q0, q9
-> +	mov		r1, sp
-> +	vst1.8		{q0}, [sp,:128]
-> +	mov		r2, r10
-> +	mov		r4, r3			@ preserve fp
-> +
-> +	bl		AES_decrypt
-> +
-> +	vld1.8		{q0}, [sp,:128]
-> +	veor		q0, q0, q9
-> +	vst1.8		{q0}, [r8]
-> +
-> +	mov		r6, r8
-> +.Lxts_dec_steal:
-> +	ldrb		r1, [r8]
-> +	ldrb		r0, [r7], #1
-> +	strb		r1, [r8, #0x10]
-> +	strb		r0, [r8], #1
-> +
-> +	subs		r9, #1
-> +	bhi		.Lxts_dec_steal
-> +
-> +	vld1.8		{q0}, [r6]
-> +	mov		r0, sp
-> +	veor		q0, q8
-> +	mov		r1, sp
-> +	vst1.8		{q0}, [sp,:128]
-> +	mov		r2, r10
-> +
-> +	bl		AES_decrypt
-> +
-> +	vld1.8		{q0}, [sp,:128]
-> +	veor		q0, q0, q8
-> +	vst1.8		{q0}, [r6]
-> +	mov		r3, r4
-> +#endif
-> +
-> +.Lxts_dec_ret:
-> +	bic		r0, r3, #0xf
-> +	vmov.i32	q0, #0
-> +	vmov.i32	q1, #0
-> +#ifdef	XTS_CHAIN_TWEAK
-> +	ldr		r1, [r3, #0x20+VFP_ABI_FRAME]	@ chain tweak
-> +#endif
-> +.Lxts_dec_bzero:				@ wipe key schedule [if any]
-> +	vstmia		sp!, {q0-q1}
-> +	cmp		sp, r0
-> +	bne		.Lxts_dec_bzero
-> +
-> +	mov		sp, r3
-> +#ifdef	XTS_CHAIN_TWEAK
-> +	vst1.8		{q8}, [r1]
-> +#endif
-> +	VFP_ABI_POP
-> +	ldmia		sp!, {r4-r10, pc}	@ return
-> +
-> +.size	bsaes_xts_decrypt,.-bsaes_xts_decrypt
-> +#endif
-> diff --git a/arch/arm/crypto/aesbs-glue.c b/arch/arm/crypto/aesbs-glue.c
-> new file mode 100644
-> index 0000000..e809443
-> --- /dev/null
-> +++ b/arch/arm/crypto/aesbs-glue.c
-> @@ -0,0 +1,435 @@
-> +/*
-> + * linux/arch/arm/crypto/aesbs-glue.c - glue code for NEON bit sliced AES
-> + *
-> + * Copyright (C) 2013 Linaro Ltd <ard.biesheuvel@linaro.org>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
-> +
-> +#include <asm/neon.h>
-> +#include <crypto/aes.h>
-> +#include <crypto/ablk_helper.h>
-> +#include <crypto/algapi.h>
-> +#include <linux/module.h>
-> +
-> +#include "aes_glue.h"
-> +
-> +#define BIT_SLICED_KEY_MAXSIZE	(128 * (AES_MAXNR - 1) + 2 * AES_BLOCK_SIZE)
-> +
-> +struct BS_KEY {
-> +	struct AES_KEY	rk;
-> +	int		converted;
-> +	u8 __aligned(8)	bs[BIT_SLICED_KEY_MAXSIZE];
-> +} __aligned(8);
-> +
-> +asmlinkage void bsaes_enc_key_convert(u8 out[], struct AES_KEY const *in);
-> +asmlinkage void bsaes_dec_key_convert(u8 out[], struct AES_KEY const *in);
-> +
-> +asmlinkage void bsaes_cbc_encrypt(u8 const in[], u8 out[], u32 bytes,
-> +				  struct BS_KEY *key, u8 iv[]);
-> +
-> +asmlinkage void bsaes_ctr32_encrypt_blocks(u8 const in[], u8 out[], u32 blocks,
-> +					   struct BS_KEY *key, u8 const iv[]);
-> +
-> +asmlinkage void bsaes_xts_encrypt(u8 const in[], u8 out[], u32 bytes,
-> +				  struct BS_KEY *key, u8 tweak[]);
-> +
-> +asmlinkage void bsaes_xts_decrypt(u8 const in[], u8 out[], u32 bytes,
-> +				  struct BS_KEY *key, u8 tweak[]);
-> +
-> +struct aesbs_cbc_ctx {
-> +	struct AES_KEY	enc;
-> +	struct BS_KEY	dec;
-> +};
-> +
-> +struct aesbs_ctr_ctx {
-> +	struct BS_KEY	enc;
-> +};
-> +
-> +struct aesbs_xts_ctx {
-> +	struct BS_KEY	enc;
-> +	struct BS_KEY	dec;
-> +	struct AES_KEY	twkey;
-> +};
-> +
-> +static int aesbs_cbc_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> +			     unsigned int key_len)
-> +{
-> +	struct aesbs_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
-> +	int bits = key_len * 8;
-> +
-> +	if (private_AES_set_encrypt_key(in_key, bits, &ctx->enc)) {
-> +		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-> +		return -EINVAL;
-> +	}
-> +	ctx->dec.rk = ctx->enc;
-> +	private_AES_set_decrypt_key(in_key, bits, &ctx->dec.rk);
-> +	ctx->dec.converted = 0;
-> +	return 0;
-> +}
-> +
-> +static int aesbs_ctr_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> +			     unsigned int key_len)
-> +{
-> +	struct aesbs_ctr_ctx *ctx = crypto_tfm_ctx(tfm);
-> +	int bits = key_len * 8;
-> +
-> +	if (private_AES_set_encrypt_key(in_key, bits, &ctx->enc.rk)) {
-> +		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-> +		return -EINVAL;
-> +	}
-> +	ctx->enc.converted = 0;
-> +	return 0;
-> +}
-> +
-> +static int aesbs_xts_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> +			     unsigned int key_len)
-> +{
-> +	struct aesbs_xts_ctx *ctx = crypto_tfm_ctx(tfm);
-> +	int bits = key_len * 4;
-> +
-> +	if (private_AES_set_encrypt_key(in_key, bits, &ctx->enc.rk)) {
-> +		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-> +		return -EINVAL;
-> +	}
-> +	ctx->dec.rk = ctx->enc.rk;
-> +	private_AES_set_decrypt_key(in_key, bits, &ctx->dec.rk);
-> +	private_AES_set_encrypt_key(in_key + key_len / 2, bits, &ctx->twkey);
-> +	ctx->enc.converted = ctx->dec.converted = 0;
-> +	return 0;
-> +}
-> +
-> +static int aesbs_cbc_encrypt(struct blkcipher_desc *desc,
-> +			     struct scatterlist *dst,
-> +			     struct scatterlist *src, unsigned int nbytes)
-> +{
-> +	struct aesbs_cbc_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-> +	struct blkcipher_walk walk;
-> +	int err;
-> +
-> +	blkcipher_walk_init(&walk, dst, src, nbytes);
-> +	err = blkcipher_walk_virt(desc, &walk);
-> +
-> +	while (walk.nbytes) {
-> +		u32 blocks = walk.nbytes / AES_BLOCK_SIZE;
-> +		u8 *src = walk.src.virt.addr;
-> +
-> +		if (walk.dst.virt.addr == walk.src.virt.addr) {
-> +			u8 *iv = walk.iv;
-> +
-> +			do {
-> +				crypto_xor(src, iv, AES_BLOCK_SIZE);
-> +				AES_encrypt(src, src, &ctx->enc);
-> +				iv = src;
-> +				src += AES_BLOCK_SIZE;
-> +			} while (--blocks);
-> +			memcpy(walk.iv, iv, AES_BLOCK_SIZE);
-> +		} else {
-> +			u8 *dst = walk.dst.virt.addr;
-> +
-> +			do {
-> +				crypto_xor(walk.iv, src, AES_BLOCK_SIZE);
-> +				AES_encrypt(walk.iv, dst, &ctx->enc);
-> +				memcpy(walk.iv, dst, AES_BLOCK_SIZE);
-> +				src += AES_BLOCK_SIZE;
-> +				dst += AES_BLOCK_SIZE;
-> +			} while (--blocks);
-> +		}
-> +		err = blkcipher_walk_done(desc, &walk, 0);
-> +	}
-> +	return err;
-> +}
-> +
-> +static int aesbs_cbc_decrypt(struct blkcipher_desc *desc,
-> +			     struct scatterlist *dst,
-> +			     struct scatterlist *src, unsigned int nbytes)
-> +{
-> +	struct aesbs_cbc_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-> +	struct blkcipher_walk walk;
-> +	int err;
-> +
-> +	blkcipher_walk_init(&walk, dst, src, nbytes);
-> +	err = blkcipher_walk_virt_block(desc, &walk, 8 * AES_BLOCK_SIZE);
-> +
-> +	while ((walk.nbytes / AES_BLOCK_SIZE) >= 8) {
-> +		kernel_neon_begin();
-> +		bsaes_cbc_encrypt(walk.src.virt.addr, walk.dst.virt.addr,
-> +				  walk.nbytes, &ctx->dec, walk.iv);
-> +		kernel_neon_end();
-> +		err = blkcipher_walk_done(desc, &walk, 0);
-> +	}
-> +	while (walk.nbytes) {
-> +		u32 blocks = walk.nbytes / AES_BLOCK_SIZE;
-> +		u8 *dst = walk.dst.virt.addr;
-> +		u8 *src = walk.src.virt.addr;
-> +		u8 *iv = walk.iv;
-> +
-> +		do {
-> +			u8 bk[2][AES_BLOCK_SIZE];
-> +
-> +			if (walk.dst.virt.addr == walk.src.virt.addr)
-> +				memcpy(bk[blocks & 1], src, AES_BLOCK_SIZE);
-> +
-> +			AES_decrypt(src, dst, &ctx->dec.rk);
-> +			crypto_xor(dst, iv, AES_BLOCK_SIZE);
-> +
-> +			if (walk.dst.virt.addr == walk.src.virt.addr)
-> +				iv = bk[blocks & 1];
-> +			else
-> +				iv = src;
-> +
-> +			dst += AES_BLOCK_SIZE;
-> +			src += AES_BLOCK_SIZE;
-> +		} while (--blocks);
-> +		err = blkcipher_walk_done(desc, &walk, 0);
-> +	}
-> +	return err;
-> +}
-> +
-> +static void inc_be128_ctr(__be32 ctr[], u32 addend)
-> +{
-> +	int i;
-> +
-> +	for (i = 3; i >= 0; i--, addend = 1) {
-> +		u32 n = be32_to_cpu(ctr[i]) + addend;
-> +
-> +		ctr[i] = cpu_to_be32(n);
-> +		if (n >= addend)
-> +			break;
-> +	}
-> +}
-> +
-> +static int aesbs_ctr_encrypt(struct blkcipher_desc *desc,
-> +			     struct scatterlist *dst, struct scatterlist *src,
-> +			     unsigned int nbytes)
-> +{
-> +	struct aesbs_ctr_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-> +	struct blkcipher_walk walk;
-> +	u32 blocks;
-> +	int err;
-> +
-> +	blkcipher_walk_init(&walk, dst, src, nbytes);
-> +	err = blkcipher_walk_virt_block(desc, &walk, 8 * AES_BLOCK_SIZE);
-> +
-> +	while ((blocks = walk.nbytes / AES_BLOCK_SIZE)) {
-> +		u32 tail = walk.nbytes % AES_BLOCK_SIZE;
-> +		__be32 *ctr = (__be32 *)walk.iv;
-> +		u32 headroom = UINT_MAX - be32_to_cpu(ctr[3]);
-> +
-> +		/* avoid 32 bit counter overflow in the NEON code */
-> +		if (unlikely(headroom < blocks)) {
-> +			blocks = headroom + 1;
-> +			tail = walk.nbytes - blocks * AES_BLOCK_SIZE;
-> +		}
-> +		kernel_neon_begin();
-> +		bsaes_ctr32_encrypt_blocks(walk.src.virt.addr,
-> +					   walk.dst.virt.addr, blocks,
-> +					   &ctx->enc, walk.iv);
-> +		kernel_neon_end();
-> +		inc_be128_ctr(ctr, blocks);
-> +
-> +		nbytes -= blocks * AES_BLOCK_SIZE;
-> +		if (nbytes && nbytes == tail && nbytes <= AES_BLOCK_SIZE)
-> +			break;
-> +
-> +		err = blkcipher_walk_done(desc, &walk, tail);
-> +	}
-> +	if (walk.nbytes) {
-> +		u8 *tdst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
-> +		u8 *tsrc = walk.src.virt.addr + blocks * AES_BLOCK_SIZE;
-> +		u8 ks[AES_BLOCK_SIZE];
-> +
-> +		AES_encrypt(walk.iv, ks, &ctx->enc.rk);
-> +		if (tdst != tsrc)
-> +			memcpy(tdst, tsrc, nbytes);
-> +		crypto_xor(tdst, ks, nbytes);
-> +		err = blkcipher_walk_done(desc, &walk, 0);
-> +	}
-> +	return err;
-> +}
-> +
-> +static int aesbs_xts_encrypt(struct blkcipher_desc *desc,
-> +			     struct scatterlist *dst,
-> +			     struct scatterlist *src, unsigned int nbytes)
-> +{
-> +	struct aesbs_xts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-> +	struct blkcipher_walk walk;
-> +	int err;
-> +
-> +	blkcipher_walk_init(&walk, dst, src, nbytes);
-> +	err = blkcipher_walk_virt_block(desc, &walk, 8 * AES_BLOCK_SIZE);
-> +
-> +	/* generate the initial tweak */
-> +	AES_encrypt(walk.iv, walk.iv, &ctx->twkey);
-> +
-> +	while (walk.nbytes) {
-> +		kernel_neon_begin();
-> +		bsaes_xts_encrypt(walk.src.virt.addr, walk.dst.virt.addr,
-> +				  walk.nbytes, &ctx->enc, walk.iv);
-> +		kernel_neon_end();
-> +		err = blkcipher_walk_done(desc, &walk, 0);
-> +	}
-> +	return err;
-> +}
-> +
-> +static int aesbs_xts_decrypt(struct blkcipher_desc *desc,
-> +			     struct scatterlist *dst,
-> +			     struct scatterlist *src, unsigned int nbytes)
-> +{
-> +	struct aesbs_xts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-> +	struct blkcipher_walk walk;
-> +	int err;
-> +
-> +	blkcipher_walk_init(&walk, dst, src, nbytes);
-> +	err = blkcipher_walk_virt_block(desc, &walk, 8 * AES_BLOCK_SIZE);
-> +
-> +	/* generate the initial tweak */
-> +	AES_encrypt(walk.iv, walk.iv, &ctx->twkey);
-> +
-> +	while (walk.nbytes) {
-> +		kernel_neon_begin();
-> +		bsaes_xts_decrypt(walk.src.virt.addr, walk.dst.virt.addr,
-> +				  walk.nbytes, &ctx->dec, walk.iv);
-> +		kernel_neon_end();
-> +		err = blkcipher_walk_done(desc, &walk, 0);
-> +	}
-> +	return err;
-> +}
-> +
-> +static struct crypto_alg aesbs_algs[] = { {
-> +	.cra_name		= "__cbc-aes-neonbs",
-> +	.cra_driver_name	= "__driver-cbc-aes-neonbs",
-> +	.cra_priority		= 0,
-> +	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-> +	.cra_blocksize		= AES_BLOCK_SIZE,
-> +	.cra_ctxsize		= sizeof(struct aesbs_cbc_ctx),
-> +	.cra_alignmask		= 7,
-> +	.cra_type		= &crypto_blkcipher_type,
-> +	.cra_module		= THIS_MODULE,
-> +	.cra_blkcipher = {
-> +		.min_keysize	= AES_MIN_KEY_SIZE,
-> +		.max_keysize	= AES_MAX_KEY_SIZE,
-> +		.ivsize		= AES_BLOCK_SIZE,
-> +		.setkey		= aesbs_cbc_set_key,
-> +		.encrypt	= aesbs_cbc_encrypt,
-> +		.decrypt	= aesbs_cbc_decrypt,
-> +	},
-> +}, {
-> +	.cra_name		= "__ctr-aes-neonbs",
-> +	.cra_driver_name	= "__driver-ctr-aes-neonbs",
-> +	.cra_priority		= 0,
-> +	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-> +	.cra_blocksize		= 1,
-> +	.cra_ctxsize		= sizeof(struct aesbs_ctr_ctx),
-> +	.cra_alignmask		= 7,
-> +	.cra_type		= &crypto_blkcipher_type,
-> +	.cra_module		= THIS_MODULE,
-> +	.cra_blkcipher = {
-> +		.min_keysize	= AES_MIN_KEY_SIZE,
-> +		.max_keysize	= AES_MAX_KEY_SIZE,
-> +		.ivsize		= AES_BLOCK_SIZE,
-> +		.setkey		= aesbs_ctr_set_key,
-> +		.encrypt	= aesbs_ctr_encrypt,
-> +		.decrypt	= aesbs_ctr_encrypt,
-> +	},
-> +}, {
-> +	.cra_name		= "__xts-aes-neonbs",
-> +	.cra_driver_name	= "__driver-xts-aes-neonbs",
-> +	.cra_priority		= 0,
-> +	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-> +	.cra_blocksize		= AES_BLOCK_SIZE,
-> +	.cra_ctxsize		= sizeof(struct aesbs_xts_ctx),
-> +	.cra_alignmask		= 7,
-> +	.cra_type		= &crypto_blkcipher_type,
-> +	.cra_module		= THIS_MODULE,
-> +	.cra_blkcipher = {
-> +		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
-> +		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
-> +		.ivsize		= AES_BLOCK_SIZE,
-> +		.setkey		= aesbs_xts_set_key,
-> +		.encrypt	= aesbs_xts_encrypt,
-> +		.decrypt	= aesbs_xts_decrypt,
-> +	},
-> +}, {
-> +	.cra_name		= "cbc(aes)",
-> +	.cra_driver_name	= "cbc-aes-neonbs",
-> +	.cra_priority		= 300,
-> +	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
-> +	.cra_blocksize		= AES_BLOCK_SIZE,
-> +	.cra_ctxsize		= sizeof(struct async_helper_ctx),
-> +	.cra_alignmask		= 7,
-> +	.cra_type		= &crypto_ablkcipher_type,
-> +	.cra_module		= THIS_MODULE,
-> +	.cra_init		= ablk_init,
-> +	.cra_exit		= ablk_exit,
-> +	.cra_ablkcipher = {
-> +		.min_keysize	= AES_MIN_KEY_SIZE,
-> +		.max_keysize	= AES_MAX_KEY_SIZE,
-> +		.ivsize		= AES_BLOCK_SIZE,
-> +		.setkey		= ablk_set_key,
-> +		.encrypt	= __ablk_encrypt,
-> +		.decrypt	= ablk_decrypt,
-> +	}
-> +}, {
-> +	.cra_name		= "ctr(aes)",
-> +	.cra_driver_name	= "ctr-aes-neonbs",
-> +	.cra_priority		= 300,
-> +	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
-> +	.cra_blocksize		= 1,
-> +	.cra_ctxsize		= sizeof(struct async_helper_ctx),
-> +	.cra_alignmask		= 7,
-> +	.cra_type		= &crypto_ablkcipher_type,
-> +	.cra_module		= THIS_MODULE,
-> +	.cra_init		= ablk_init,
-> +	.cra_exit		= ablk_exit,
-> +	.cra_ablkcipher = {
-> +		.min_keysize	= AES_MIN_KEY_SIZE,
-> +		.max_keysize	= AES_MAX_KEY_SIZE,
-> +		.ivsize		= AES_BLOCK_SIZE,
-> +		.setkey		= ablk_set_key,
-> +		.encrypt	= ablk_encrypt,
-> +		.decrypt	= ablk_decrypt,
-> +	}
-> +}, {
-> +	.cra_name		= "xts(aes)",
-> +	.cra_driver_name	= "xts-aes-neonbs",
-> +	.cra_priority		= 300,
-> +	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER|CRYPTO_ALG_ASYNC,
-> +	.cra_blocksize		= AES_BLOCK_SIZE,
-> +	.cra_ctxsize		= sizeof(struct async_helper_ctx),
-> +	.cra_alignmask		= 7,
-> +	.cra_type		= &crypto_ablkcipher_type,
-> +	.cra_module		= THIS_MODULE,
-> +	.cra_init		= ablk_init,
-> +	.cra_exit		= ablk_exit,
-> +	.cra_ablkcipher = {
-> +		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
-> +		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
-> +		.ivsize		= AES_BLOCK_SIZE,
-> +		.setkey		= ablk_set_key,
-> +		.encrypt	= ablk_encrypt,
-> +		.decrypt	= ablk_decrypt,
-> +	}
-> +} };
-> +
-> +static int __init aesbs_mod_init(void)
-> +{
-> +	if (!cpu_has_neon())
-> +		return -ENODEV;
-> +
-> +	return crypto_register_algs(aesbs_algs, ARRAY_SIZE(aesbs_algs));
-> +}
-> +
-> +static void __exit aesbs_mod_exit(void)
-> +{
-> +	crypto_unregister_algs(aesbs_algs, ARRAY_SIZE(aesbs_algs));
-> +}
-> +
-> +module_init(aesbs_mod_init);
-> +module_exit(aesbs_mod_exit);
-> +
-> +MODULE_DESCRIPTION("Bit sliced AES in CBC/CTR/XTS modes using NEON");
-> +MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
-> +MODULE_LICENSE("GPL");
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 8179ae6..4d6e656 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -780,6 +780,22 @@ config CRYPTO_AES_ARM
->  
->  	  See <http://csrc.nist.gov/encryption/aes/> for more information.
->  
-> +config CRYPTO_AES_ARM_BS
-> +	tristate "Bit sliced AES using NEON instructions"
-> +	depends on ARM && KERNEL_MODE_NEON
-> +	select CRYPTO_ALGAPI
-> +	select CRYPTO_AES_ARM
-> +	select CRYPTO_ABLK_HELPER
-> +	help
-> +	  Use a faster and more secure NEON based implementation of AES in CBC,
-> +	  CTR and XTS modes
-> +
-> +	  Bit sliced AES gives around 45% speedup on Cortex-A15 for CTR mode
-> +	  and for XTS mode encryption, CBC and XTS mode decryption speedup is
-> +	  around 25%. (CBC encryption speed is not affected by this driver.)
-> +	  This implementation does not rely on any lookup tables so it is
-> +	  believed to be invulnerable to cache timing attacks.
-> +
->  config CRYPTO_ANUBIS
->  	tristate "Anubis cipher algorithm"
->  	select CRYPTO_ALGAPI
-> -- 
-> 1.8.1.2
-> 
+--047d7bd6a8800d8b2804e7ed8ff2
+Content-Type: text/plain; charset=US-ASCII; name="randconfig-1380901782.txt"
+Content-Disposition: attachment; filename="randconfig-1380901782.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_hmdoh3x00
+
+IwojIEF1dG9tYXRpY2FsbHkgZ2VuZXJhdGVkIGZpbGU7IERPIE5PVCBFRElULgojIExpbnV4L3g4
+NiAzLjEyLjAtcmMzIEtlcm5lbCBDb25maWd1cmF0aW9uCiMKIyBDT05GSUdfNjRCSVQgaXMgbm90
+IHNldApDT05GSUdfWDg2XzMyPXkKQ09ORklHX1g4Nj15CkNPTkZJR19JTlNUUlVDVElPTl9ERUNP
+REVSPXkKQ09ORklHX09VVFBVVF9GT1JNQVQ9ImVsZjMyLWkzODYiCkNPTkZJR19BUkNIX0RFRkNP
+TkZJRz0iYXJjaC94ODYvY29uZmlncy9pMzg2X2RlZmNvbmZpZyIKQ09ORklHX0xPQ0tERVBfU1VQ
+UE9SVD15CkNPTkZJR19TVEFDS1RSQUNFX1NVUFBPUlQ9eQpDT05GSUdfSEFWRV9MQVRFTkNZVE9Q
+X1NVUFBPUlQ9eQpDT05GSUdfTU1VPXkKQ09ORklHX05FRURfRE1BX01BUF9TVEFURT15CkNPTkZJ
+R19ORUVEX1NHX0RNQV9MRU5HVEg9eQpDT05GSUdfR0VORVJJQ19JU0FfRE1BPXkKQ09ORklHX0dF
+TkVSSUNfSFdFSUdIVD15CkNPTkZJR19BUkNIX01BWV9IQVZFX1BDX0ZEQz15CkNPTkZJR19SV1NF
+TV9YQ0hHQUREX0FMR09SSVRITT15CkNPTkZJR19HRU5FUklDX0NBTElCUkFURV9ERUxBWT15CkNP
+TkZJR19BUkNIX0hBU19DUFVfUkVMQVg9eQpDT05GSUdfQVJDSF9IQVNfQ0FDSEVfTElORV9TSVpF
+PXkKQ09ORklHX0FSQ0hfSEFTX0NQVV9BVVRPUFJPQkU9eQpDT05GSUdfSEFWRV9TRVRVUF9QRVJf
+Q1BVX0FSRUE9eQpDT05GSUdfTkVFRF9QRVJfQ1BVX0VNQkVEX0ZJUlNUX0NIVU5LPXkKQ09ORklH
+X05FRURfUEVSX0NQVV9QQUdFX0ZJUlNUX0NIVU5LPXkKQ09ORklHX0FSQ0hfSElCRVJOQVRJT05f
+UE9TU0lCTEU9eQpDT05GSUdfQVJDSF9TVVNQRU5EX1BPU1NJQkxFPXkKQ09ORklHX0FSQ0hfV0FO
+VF9IVUdFX1BNRF9TSEFSRT15CkNPTkZJR19BUkNIX1dBTlRfR0VORVJBTF9IVUdFVExCPXkKIyBD
+T05GSUdfWk9ORV9ETUEzMiBpcyBub3Qgc2V0CiMgQ09ORklHX0FVRElUX0FSQ0ggaXMgbm90IHNl
+dApDT05GSUdfQVJDSF9TVVBQT1JUU19PUFRJTUlaRURfSU5MSU5JTkc9eQpDT05GSUdfQVJDSF9T
+VVBQT1JUU19ERUJVR19QQUdFQUxMT0M9eQpDT05GSUdfWDg2XzMyX1NNUD15CkNPTkZJR19YODZf
+SFQ9eQpDT05GSUdfQVJDSF9IV0VJR0hUX0NGTEFHUz0iLWZjYWxsLXNhdmVkLWVjeCAtZmNhbGwt
+c2F2ZWQtZWR4IgpDT05GSUdfQVJDSF9TVVBQT1JUU19VUFJPQkVTPXkKQ09ORklHX0RFRkNPTkZJ
+R19MSVNUPSIvbGliL21vZHVsZXMvJFVOQU1FX1JFTEVBU0UvLmNvbmZpZyIKQ09ORklHX0lSUV9X
+T1JLPXkKQ09ORklHX0JVSUxEVElNRV9FWFRBQkxFX1NPUlQ9eQoKIwojIEdlbmVyYWwgc2V0dXAK
+IwpDT05GSUdfSU5JVF9FTlZfQVJHX0xJTUlUPTMyCkNPTkZJR19DUk9TU19DT01QSUxFPSIiCkNP
+TkZJR19DT01QSUxFX1RFU1Q9eQpDT05GSUdfTE9DQUxWRVJTSU9OPSIiCiMgQ09ORklHX0xPQ0FM
+VkVSU0lPTl9BVVRPIGlzIG5vdCBzZXQKQ09ORklHX0hBVkVfS0VSTkVMX0daSVA9eQpDT05GSUdf
+SEFWRV9LRVJORUxfQlpJUDI9eQpDT05GSUdfSEFWRV9LRVJORUxfTFpNQT15CkNPTkZJR19IQVZF
+X0tFUk5FTF9YWj15CkNPTkZJR19IQVZFX0tFUk5FTF9MWk89eQpDT05GSUdfSEFWRV9LRVJORUxf
+TFo0PXkKQ09ORklHX0tFUk5FTF9HWklQPXkKIyBDT05GSUdfS0VSTkVMX0JaSVAyIGlzIG5vdCBz
+ZXQKIyBDT05GSUdfS0VSTkVMX0xaTUEgaXMgbm90IHNldAojIENPTkZJR19LRVJORUxfWFogaXMg
+bm90IHNldAojIENPTkZJR19LRVJORUxfTFpPIGlzIG5vdCBzZXQKIyBDT05GSUdfS0VSTkVMX0xa
+NCBpcyBub3Qgc2V0CkNPTkZJR19ERUZBVUxUX0hPU1ROQU1FPSIobm9uZSkiCiMgQ09ORklHX1NZ
+U1ZJUEMgaXMgbm90IHNldAojIENPTkZJR19GSEFORExFIGlzIG5vdCBzZXQKCiMKIyBJUlEgc3Vi
+c3lzdGVtCiMKQ09ORklHX0dFTkVSSUNfSVJRX1BST0JFPXkKQ09ORklHX0dFTkVSSUNfSVJRX1NI
+T1c9eQpDT05GSUdfR0VORVJJQ19QRU5ESU5HX0lSUT15CkNPTkZJR19HRU5FUklDX0lSUV9DSElQ
+PXkKQ09ORklHX0lSUV9ET01BSU49eQojIENPTkZJR19JUlFfRE9NQUlOX0RFQlVHIGlzIG5vdCBz
+ZXQKQ09ORklHX0lSUV9GT1JDRURfVEhSRUFESU5HPXkKQ09ORklHX1NQQVJTRV9JUlE9eQpDT05G
+SUdfQ0xPQ0tTT1VSQ0VfV0FUQ0hET0c9eQpDT05GSUdfS1RJTUVfU0NBTEFSPXkKQ09ORklHX0dF
+TkVSSUNfQ0xPQ0tFVkVOVFM9eQpDT05GSUdfR0VORVJJQ19DTE9DS0VWRU5UU19CVUlMRD15CkNP
+TkZJR19HRU5FUklDX0NMT0NLRVZFTlRTX0JST0FEQ0FTVD15CkNPTkZJR19HRU5FUklDX0NMT0NL
+RVZFTlRTX01JTl9BREpVU1Q9eQpDT05GSUdfR0VORVJJQ19DTU9TX1VQREFURT15CgojCiMgVGlt
+ZXJzIHN1YnN5c3RlbQojCkNPTkZJR19USUNLX09ORVNIT1Q9eQpDT05GSUdfSFpfUEVSSU9ESUM9
+eQojIENPTkZJR19OT19IWl9JRExFIGlzIG5vdCBzZXQKIyBDT05GSUdfTk9fSFogaXMgbm90IHNl
+dApDT05GSUdfSElHSF9SRVNfVElNRVJTPXkKCiMKIyBDUFUvVGFzayB0aW1lIGFuZCBzdGF0cyBh
+Y2NvdW50aW5nCiMKQ09ORklHX1RJQ0tfQ1BVX0FDQ09VTlRJTkc9eQojIENPTkZJR19JUlFfVElN
+RV9BQ0NPVU5USU5HIGlzIG5vdCBzZXQKIyBDT05GSUdfQlNEX1BST0NFU1NfQUNDVCBpcyBub3Qg
+c2V0CgojCiMgUkNVIFN1YnN5c3RlbQojCkNPTkZJR19UUkVFX1JDVT15CiMgQ09ORklHX1BSRUVN
+UFRfUkNVIGlzIG5vdCBzZXQKQ09ORklHX1JDVV9TVEFMTF9DT01NT049eQpDT05GSUdfUkNVX0ZB
+Tk9VVD0zMgpDT05GSUdfUkNVX0ZBTk9VVF9MRUFGPTE2CiMgQ09ORklHX1JDVV9GQU5PVVRfRVhB
+Q1QgaXMgbm90IHNldApDT05GSUdfVFJFRV9SQ1VfVFJBQ0U9eQojIENPTkZJR19SQ1VfTk9DQl9D
+UFUgaXMgbm90IHNldAojIENPTkZJR19JS0NPTkZJRyBpcyBub3Qgc2V0CkNPTkZJR19MT0dfQlVG
+X1NISUZUPTE3CkNPTkZJR19IQVZFX1VOU1RBQkxFX1NDSEVEX0NMT0NLPXkKQ09ORklHX0FSQ0hf
+U1VQUE9SVFNfTlVNQV9CQUxBTkNJTkc9eQpDT05GSUdfQVJDSF9XQU5UU19QUk9UX05VTUFfUFJP
+VF9OT05FPXkKQ09ORklHX0NHUk9VUFM9eQpDT05GSUdfQ0dST1VQX0RFQlVHPXkKQ09ORklHX0NH
+Uk9VUF9GUkVFWkVSPXkKQ09ORklHX0NHUk9VUF9ERVZJQ0U9eQojIENPTkZJR19DUFVTRVRTIGlz
+IG5vdCBzZXQKIyBDT05GSUdfQ0dST1VQX0NQVUFDQ1QgaXMgbm90IHNldAojIENPTkZJR19SRVNP
+VVJDRV9DT1VOVEVSUyBpcyBub3Qgc2V0CkNPTkZJR19DR1JPVVBfUEVSRj15CkNPTkZJR19DR1JP
+VVBfU0NIRUQ9eQpDT05GSUdfRkFJUl9HUk9VUF9TQ0hFRD15CiMgQ09ORklHX0NGU19CQU5EV0lE
+VEggaXMgbm90IHNldApDT05GSUdfUlRfR1JPVVBfU0NIRUQ9eQojIENPTkZJR19DSEVDS1BPSU5U
+X1JFU1RPUkUgaXMgbm90IHNldAojIENPTkZJR19OQU1FU1BBQ0VTIGlzIG5vdCBzZXQKQ09ORklH
+X1VJREdJRF9TVFJJQ1RfVFlQRV9DSEVDS1M9eQpDT05GSUdfU0NIRURfQVVUT0dST1VQPXkKQ09O
+RklHX1NZU0ZTX0RFUFJFQ0FURUQ9eQpDT05GSUdfU1lTRlNfREVQUkVDQVRFRF9WMj15CiMgQ09O
+RklHX1JFTEFZIGlzIG5vdCBzZXQKQ09ORklHX0JMS19ERVZfSU5JVFJEPXkKQ09ORklHX0lOSVRS
+QU1GU19TT1VSQ0U9IiIKIyBDT05GSUdfUkRfR1pJUCBpcyBub3Qgc2V0CiMgQ09ORklHX1JEX0Ja
+SVAyIGlzIG5vdCBzZXQKIyBDT05GSUdfUkRfTFpNQSBpcyBub3Qgc2V0CiMgQ09ORklHX1JEX1ha
+IGlzIG5vdCBzZXQKIyBDT05GSUdfUkRfTFpPIGlzIG5vdCBzZXQKQ09ORklHX1JEX0xaND15CkNP
+TkZJR19DQ19PUFRJTUlaRV9GT1JfU0laRT15CkNPTkZJR19BTk9OX0lOT0RFUz15CkNPTkZJR19I
+QVZFX1VJRDE2PXkKQ09ORklHX1NZU0NUTF9FWENFUFRJT05fVFJBQ0U9eQpDT05GSUdfSEFWRV9Q
+Q1NQS1JfUExBVEZPUk09eQpDT05GSUdfRVhQRVJUPXkKIyBDT05GSUdfVUlEMTYgaXMgbm90IHNl
+dApDT05GSUdfS0FMTFNZTVM9eQpDT05GSUdfS0FMTFNZTVNfQUxMPXkKIyBDT05GSUdfUFJJTlRL
+IGlzIG5vdCBzZXQKIyBDT05GSUdfQlVHIGlzIG5vdCBzZXQKIyBDT05GSUdfRUxGX0NPUkUgaXMg
+bm90IHNldAojIENPTkZJR19QQ1NQS1JfUExBVEZPUk0gaXMgbm90IHNldAojIENPTkZJR19CQVNF
+X0ZVTEwgaXMgbm90IHNldApDT05GSUdfRlVURVg9eQpDT05GSUdfRVBPTEw9eQpDT05GSUdfU0lH
+TkFMRkQ9eQojIENPTkZJR19USU1FUkZEIGlzIG5vdCBzZXQKQ09ORklHX0VWRU5URkQ9eQojIENP
+TkZJR19TSE1FTSBpcyBub3Qgc2V0CiMgQ09ORklHX0FJTyBpcyBub3Qgc2V0CkNPTkZJR19QQ0lf
+UVVJUktTPXkKQ09ORklHX0VNQkVEREVEPXkKQ09ORklHX0hBVkVfUEVSRl9FVkVOVFM9eQoKIwoj
+IEtlcm5lbCBQZXJmb3JtYW5jZSBFdmVudHMgQW5kIENvdW50ZXJzCiMKQ09ORklHX1BFUkZfRVZF
+TlRTPXkKIyBDT05GSUdfREVCVUdfUEVSRl9VU0VfVk1BTExPQyBpcyBub3Qgc2V0CkNPTkZJR19W
+TV9FVkVOVF9DT1VOVEVSUz15CiMgQ09ORklHX1NMVUJfREVCVUcgaXMgbm90IHNldAojIENPTkZJ
+R19DT01QQVRfQlJLIGlzIG5vdCBzZXQKIyBDT05GSUdfU0xBQiBpcyBub3Qgc2V0CkNPTkZJR19T
+TFVCPXkKIyBDT05GSUdfU0xPQiBpcyBub3Qgc2V0CkNPTkZJR19TTFVCX0NQVV9QQVJUSUFMPXkK
+IyBDT05GSUdfUFJPRklMSU5HIGlzIG5vdCBzZXQKQ09ORklHX0hBVkVfT1BST0ZJTEU9eQpDT05G
+SUdfT1BST0ZJTEVfTk1JX1RJTUVSPXkKQ09ORklHX0pVTVBfTEFCRUw9eQojIENPTkZJR19IQVZF
+XzY0QklUX0FMSUdORURfQUNDRVNTIGlzIG5vdCBzZXQKQ09ORklHX0hBVkVfRUZGSUNJRU5UX1VO
+QUxJR05FRF9BQ0NFU1M9eQpDT05GSUdfQVJDSF9VU0VfQlVJTFRJTl9CU1dBUD15CkNPTkZJR19I
+QVZFX0lPUkVNQVBfUFJPVD15CkNPTkZJR19IQVZFX0tQUk9CRVM9eQpDT05GSUdfSEFWRV9LUkVU
+UFJPQkVTPXkKQ09ORklHX0hBVkVfT1BUUFJPQkVTPXkKQ09ORklHX0hBVkVfS1BST0JFU19PTl9G
+VFJBQ0U9eQpDT05GSUdfSEFWRV9BUkNIX1RSQUNFSE9PSz15CkNPTkZJR19IQVZFX0RNQV9BVFRS
+Uz15CkNPTkZJR19IQVZFX0RNQV9DT05USUdVT1VTPXkKQ09ORklHX1VTRV9HRU5FUklDX1NNUF9I
+RUxQRVJTPXkKQ09ORklHX0dFTkVSSUNfU01QX0lETEVfVEhSRUFEPXkKQ09ORklHX0hBVkVfUkVH
+U19BTkRfU1RBQ0tfQUNDRVNTX0FQST15CkNPTkZJR19IQVZFX0RNQV9BUElfREVCVUc9eQpDT05G
+SUdfSEFWRV9IV19CUkVBS1BPSU5UPXkKQ09ORklHX0hBVkVfTUlYRURfQlJFQUtQT0lOVFNfUkVH
+Uz15CkNPTkZJR19IQVZFX1VTRVJfUkVUVVJOX05PVElGSUVSPXkKQ09ORklHX0hBVkVfUEVSRl9F
+VkVOVFNfTk1JPXkKQ09ORklHX0hBVkVfUEVSRl9SRUdTPXkKQ09ORklHX0hBVkVfUEVSRl9VU0VS
+X1NUQUNLX0RVTVA9eQpDT05GSUdfSEFWRV9BUkNIX0pVTVBfTEFCRUw9eQpDT05GSUdfQVJDSF9I
+QVZFX05NSV9TQUZFX0NNUFhDSEc9eQpDT05GSUdfSEFWRV9BTElHTkVEX1NUUlVDVF9QQUdFPXkK
+Q09ORklHX0hBVkVfQ01QWENIR19MT0NBTD15CkNPTkZJR19IQVZFX0NNUFhDSEdfRE9VQkxFPXkK
+Q09ORklHX0FSQ0hfV0FOVF9JUENfUEFSU0VfVkVSU0lPTj15CkNPTkZJR19IQVZFX0FSQ0hfU0VD
+Q09NUF9GSUxURVI9eQpDT05GSUdfSEFWRV9JUlFfVElNRV9BQ0NPVU5USU5HPXkKQ09ORklHX0hB
+VkVfQVJDSF9UUkFOU1BBUkVOVF9IVUdFUEFHRT15CkNPTkZJR19IQVZFX0FSQ0hfU09GVF9ESVJU
+WT15CkNPTkZJR19NT0RVTEVTX1VTRV9FTEZfUkVMPXkKQ09ORklHX0NMT05FX0JBQ0tXQVJEUz15
+CkNPTkZJR19PTERfU0lHU1VTUEVORDM9eQpDT05GSUdfT0xEX1NJR0FDVElPTj15CgojCiMgR0NP
+Vi1iYXNlZCBrZXJuZWwgcHJvZmlsaW5nCiMKIyBDT05GSUdfR0NPVl9LRVJORUwgaXMgbm90IHNl
+dApDT05GSUdfSEFWRV9HRU5FUklDX0RNQV9DT0hFUkVOVD15CkNPTkZJR19SVF9NVVRFWEVTPXkK
+Q09ORklHX0JBU0VfU01BTEw9MQojIENPTkZJR19TWVNURU1fVFJVU1RFRF9LRVlSSU5HIGlzIG5v
+dCBzZXQKIyBDT05GSUdfTU9EVUxFUyBpcyBub3Qgc2V0CkNPTkZJR19TVE9QX01BQ0hJTkU9eQoj
+IENPTkZJR19CTE9DSyBpcyBub3Qgc2V0CkNPTkZJR19QQURBVEE9eQpDT05GSUdfQVNOMT15CkNP
+TkZJR19VTklOTElORV9TUElOX1VOTE9DSz15CkNPTkZJR19GUkVFWkVSPXkKCiMKIyBQcm9jZXNz
+b3IgdHlwZSBhbmQgZmVhdHVyZXMKIwojIENPTkZJR19aT05FX0RNQSBpcyBub3Qgc2V0CkNPTkZJ
+R19TTVA9eQpDT05GSUdfWDg2X01QUEFSU0U9eQpDT05GSUdfWDg2X0JJR1NNUD15CiMgQ09ORklH
+X1g4Nl9FWFRFTkRFRF9QTEFURk9STSBpcyBub3Qgc2V0CiMgQ09ORklHX1g4Nl9JTlRFTF9MUFNT
+IGlzIG5vdCBzZXQKQ09ORklHX1g4Nl8zMl9JUklTPXkKQ09ORklHX1NDSEVEX09NSVRfRlJBTUVf
+UE9JTlRFUj15CiMgQ09ORklHX0hZUEVSVklTT1JfR1VFU1QgaXMgbm90IHNldApDT05GSUdfTk9f
+Qk9PVE1FTT15CkNPTkZJR19NRU1URVNUPXkKIyBDT05GSUdfTTQ4NiBpcyBub3Qgc2V0CiMgQ09O
+RklHX001ODYgaXMgbm90IHNldAojIENPTkZJR19NNTg2VFNDIGlzIG5vdCBzZXQKIyBDT05GSUdf
+TTU4Nk1NWCBpcyBub3Qgc2V0CkNPTkZJR19NNjg2PXkKIyBDT05GSUdfTVBFTlRJVU1JSSBpcyBu
+b3Qgc2V0CiMgQ09ORklHX01QRU5USVVNSUlJIGlzIG5vdCBzZXQKIyBDT05GSUdfTVBFTlRJVU1N
+IGlzIG5vdCBzZXQKIyBDT05GSUdfTVBFTlRJVU00IGlzIG5vdCBzZXQKIyBDT05GSUdfTUs2IGlz
+IG5vdCBzZXQKIyBDT05GSUdfTUs3IGlzIG5vdCBzZXQKIyBDT05GSUdfTUs4IGlzIG5vdCBzZXQK
+IyBDT05GSUdfTUNSVVNPRSBpcyBub3Qgc2V0CiMgQ09ORklHX01FRkZJQ0VPTiBpcyBub3Qgc2V0
+CiMgQ09ORklHX01XSU5DSElQQzYgaXMgbm90IHNldAojIENPTkZJR19NV0lOQ0hJUDNEIGlzIG5v
+dCBzZXQKIyBDT05GSUdfTUVMQU4gaXMgbm90IHNldAojIENPTkZJR19NR0VPREVHWDEgaXMgbm90
+IHNldAojIENPTkZJR19NR0VPREVfTFggaXMgbm90IHNldAojIENPTkZJR19NQ1lSSVhJSUkgaXMg
+bm90IHNldAojIENPTkZJR19NVklBQzNfMiBpcyBub3Qgc2V0CiMgQ09ORklHX01WSUFDNyBpcyBu
+b3Qgc2V0CiMgQ09ORklHX01DT1JFMiBpcyBub3Qgc2V0CiMgQ09ORklHX01BVE9NIGlzIG5vdCBz
+ZXQKIyBDT05GSUdfWDg2X0dFTkVSSUMgaXMgbm90IHNldApDT05GSUdfWDg2X0lOVEVSTk9ERV9D
+QUNIRV9TSElGVD01CkNPTkZJR19YODZfTDFfQ0FDSEVfU0hJRlQ9NQpDT05GSUdfWDg2X1BQUk9f
+RkVOQ0U9eQpDT05GSUdfWDg2X1VTRV9QUFJPX0NIRUNLU1VNPXkKQ09ORklHX1g4Nl9UU0M9eQpD
+T05GSUdfWDg2X0NNUFhDSEc2ND15CkNPTkZJR19YODZfQ01PVj15CkNPTkZJR19YODZfTUlOSU1V
+TV9DUFVfRkFNSUxZPTUKQ09ORklHX1g4Nl9ERUJVR0NUTE1TUj15CiMgQ09ORklHX1BST0NFU1NP
+Ul9TRUxFQ1QgaXMgbm90IHNldApDT05GSUdfQ1BVX1NVUF9JTlRFTD15CkNPTkZJR19DUFVfU1VQ
+X0NZUklYXzMyPXkKQ09ORklHX0NQVV9TVVBfQU1EPXkKQ09ORklHX0NQVV9TVVBfQ0VOVEFVUj15
+CkNPTkZJR19DUFVfU1VQX1RSQU5TTUVUQV8zMj15CkNPTkZJR19DUFVfU1VQX1VNQ18zMj15CkNP
+TkZJR19IUEVUX1RJTUVSPXkKIyBDT05GSUdfRE1JIGlzIG5vdCBzZXQKQ09ORklHX05SX0NQVVM9
+MzIKQ09ORklHX1NDSEVEX1NNVD15CkNPTkZJR19TQ0hFRF9NQz15CkNPTkZJR19QUkVFTVBUX05P
+TkU9eQojIENPTkZJR19QUkVFTVBUX1ZPTFVOVEFSWSBpcyBub3Qgc2V0CiMgQ09ORklHX1BSRUVN
+UFQgaXMgbm90IHNldApDT05GSUdfWDg2X0xPQ0FMX0FQSUM9eQpDT05GSUdfWDg2X0lPX0FQSUM9
+eQpDT05GSUdfWDg2X1JFUk9VVEVfRk9SX0JST0tFTl9CT09UX0lSUVM9eQojIENPTkZJR19YODZf
+TUNFIGlzIG5vdCBzZXQKIyBDT05GSUdfVk04NiBpcyBub3Qgc2V0CiMgQ09ORklHX1RPU0hJQkEg
+aXMgbm90IHNldApDT05GSUdfSThLPXkKIyBDT05GSUdfWDg2X1JFQk9PVEZJWFVQUyBpcyBub3Qg
+c2V0CiMgQ09ORklHX01JQ1JPQ09ERSBpcyBub3Qgc2V0CiMgQ09ORklHX01JQ1JPQ09ERV9JTlRF
+TF9FQVJMWSBpcyBub3Qgc2V0CiMgQ09ORklHX01JQ1JPQ09ERV9BTURfRUFSTFkgaXMgbm90IHNl
+dApDT05GSUdfWDg2X01TUj15CiMgQ09ORklHX1g4Nl9DUFVJRCBpcyBub3Qgc2V0CiMgQ09ORklH
+X05PSElHSE1FTSBpcyBub3Qgc2V0CkNPTkZJR19ISUdITUVNNEc9eQojIENPTkZJR19ISUdITUVN
+NjRHIGlzIG5vdCBzZXQKQ09ORklHX1ZNU1BMSVRfM0c9eQojIENPTkZJR19WTVNQTElUXzNHX09Q
+VCBpcyBub3Qgc2V0CiMgQ09ORklHX1ZNU1BMSVRfMkcgaXMgbm90IHNldAojIENPTkZJR19WTVNQ
+TElUXzJHX09QVCBpcyBub3Qgc2V0CiMgQ09ORklHX1ZNU1BMSVRfMUcgaXMgbm90IHNldApDT05G
+SUdfUEFHRV9PRkZTRVQ9MHhDMDAwMDAwMApDT05GSUdfSElHSE1FTT15CkNPTkZJR19BUkNIX0ZM
+QVRNRU1fRU5BQkxFPXkKQ09ORklHX0FSQ0hfU1BBUlNFTUVNX0VOQUJMRT15CkNPTkZJR19BUkNI
+X1NFTEVDVF9NRU1PUllfTU9ERUw9eQpDT05GSUdfSUxMRUdBTF9QT0lOVEVSX1ZBTFVFPTAKQ09O
+RklHX1NFTEVDVF9NRU1PUllfTU9ERUw9eQpDT05GSUdfRkxBVE1FTV9NQU5VQUw9eQojIENPTkZJ
+R19TUEFSU0VNRU1fTUFOVUFMIGlzIG5vdCBzZXQKQ09ORklHX0ZMQVRNRU09eQpDT05GSUdfRkxB
+VF9OT0RFX01FTV9NQVA9eQpDT05GSUdfU1BBUlNFTUVNX1NUQVRJQz15CkNPTkZJR19IQVZFX01F
+TUJMT0NLPXkKQ09ORklHX0hBVkVfTUVNQkxPQ0tfTk9ERV9NQVA9eQpDT05GSUdfQVJDSF9ESVND
+QVJEX01FTUJMT0NLPXkKIyBDT05GSUdfSEFWRV9CT09UTUVNX0lORk9fTk9ERSBpcyBub3Qgc2V0
+CkNPTkZJR19QQUdFRkxBR1NfRVhURU5ERUQ9eQpDT05GSUdfU1BMSVRfUFRMT0NLX0NQVVM9OTk5
+OTk5CiMgQ09ORklHX0JBTExPT05fQ09NUEFDVElPTiBpcyBub3Qgc2V0CkNPTkZJR19DT01QQUNU
+SU9OPXkKQ09ORklHX01JR1JBVElPTj15CiMgQ09ORklHX1BIWVNfQUREUl9UXzY0QklUIGlzIG5v
+dCBzZXQKQ09ORklHX1pPTkVfRE1BX0ZMQUc9MApDT05GSUdfVklSVF9UT19CVVM9eQpDT05GSUdf
+S1NNPXkKQ09ORklHX0RFRkFVTFRfTU1BUF9NSU5fQUREUj00MDk2CkNPTkZJR19UUkFOU1BBUkVO
+VF9IVUdFUEFHRT15CkNPTkZJR19UUkFOU1BBUkVOVF9IVUdFUEFHRV9BTFdBWVM9eQojIENPTkZJ
+R19UUkFOU1BBUkVOVF9IVUdFUEFHRV9NQURWSVNFIGlzIG5vdCBzZXQKIyBDT05GSUdfQ1JPU1Nf
+TUVNT1JZX0FUVEFDSCBpcyBub3Qgc2V0CkNPTkZJR19DTEVBTkNBQ0hFPXkKIyBDT05GSUdfQ01B
+IGlzIG5vdCBzZXQKIyBDT05GSUdfWkJVRCBpcyBub3Qgc2V0CkNPTkZJR19ISUdIUFRFPXkKIyBD
+T05GSUdfWDg2X0NIRUNLX0JJT1NfQ09SUlVQVElPTiBpcyBub3Qgc2V0CkNPTkZJR19YODZfUkVT
+RVJWRV9MT1c9NjQKIyBDT05GSUdfTUFUSF9FTVVMQVRJT04gaXMgbm90IHNldApDT05GSUdfTVRS
+Uj15CkNPTkZJR19NVFJSX1NBTklUSVpFUj15CkNPTkZJR19NVFJSX1NBTklUSVpFUl9FTkFCTEVf
+REVGQVVMVD0wCkNPTkZJR19NVFJSX1NBTklUSVpFUl9TUEFSRV9SRUdfTlJfREVGQVVMVD0xCkNP
+TkZJR19YODZfUEFUPXkKQ09ORklHX0FSQ0hfVVNFU19QR19VTkNBQ0hFRD15CiMgQ09ORklHX0FS
+Q0hfUkFORE9NIGlzIG5vdCBzZXQKQ09ORklHX1g4Nl9TTUFQPXkKQ09ORklHX0VGST15CkNPTkZJ
+R19FRklfU1RVQj15CkNPTkZJR19TRUNDT01QPXkKQ09ORklHX0NDX1NUQUNLUFJPVEVDVE9SPXkK
+IyBDT05GSUdfSFpfMTAwIGlzIG5vdCBzZXQKQ09ORklHX0haXzI1MD15CiMgQ09ORklHX0haXzMw
+MCBpcyBub3Qgc2V0CiMgQ09ORklHX0haXzEwMDAgaXMgbm90IHNldApDT05GSUdfSFo9MjUwCkNP
+TkZJR19TQ0hFRF9IUlRJQ0s9eQpDT05GSUdfS0VYRUM9eQojIENPTkZJR19DUkFTSF9EVU1QIGlz
+IG5vdCBzZXQKQ09ORklHX1BIWVNJQ0FMX1NUQVJUPTB4MTAwMDAwMAojIENPTkZJR19SRUxPQ0FU
+QUJMRSBpcyBub3Qgc2V0CkNPTkZJR19QSFlTSUNBTF9BTElHTj0weDEwMDAwMDAKQ09ORklHX0hP
+VFBMVUdfQ1BVPXkKIyBDT05GSUdfQk9PVFBBUkFNX0hPVFBMVUdfQ1BVMCBpcyBub3Qgc2V0CiMg
+Q09ORklHX0RFQlVHX0hPVFBMVUdfQ1BVMCBpcyBub3Qgc2V0CkNPTkZJR19DT01QQVRfVkRTTz15
+CkNPTkZJR19DTURMSU5FX0JPT0w9eQpDT05GSUdfQ01ETElORT0iIgpDT05GSUdfQ01ETElORV9P
+VkVSUklERT15CkNPTkZJR19BUkNIX0VOQUJMRV9NRU1PUllfSE9UUExVRz15CgojCiMgUG93ZXIg
+bWFuYWdlbWVudCBhbmQgQUNQSSBvcHRpb25zCiMKIyBDT05GSUdfU1VTUEVORCBpcyBub3Qgc2V0
+CkNPTkZJR19QTV9SVU5USU1FPXkKQ09ORklHX1BNPXkKIyBDT05GSUdfUE1fREVCVUcgaXMgbm90
+IHNldAojIENPTkZJR19XUV9QT1dFUl9FRkZJQ0lFTlRfREVGQVVMVCBpcyBub3Qgc2V0CkNPTkZJ
+R19BQ1BJPXkKIyBDT05GSUdfQUNQSV9FQ19ERUJVR0ZTIGlzIG5vdCBzZXQKQ09ORklHX0FDUElf
+QUM9eQpDT05GSUdfQUNQSV9CQVRURVJZPXkKQ09ORklHX0FDUElfQlVUVE9OPXkKQ09ORklHX0FD
+UElfVklERU89eQpDT05GSUdfQUNQSV9GQU49eQojIENPTkZJR19BQ1BJX0RPQ0sgaXMgbm90IHNl
+dApDT05GSUdfQUNQSV9QUk9DRVNTT1I9eQpDT05GSUdfQUNQSV9JUE1JPXkKQ09ORklHX0FDUElf
+SE9UUExVR19DUFU9eQpDT05GSUdfQUNQSV9QUk9DRVNTT1JfQUdHUkVHQVRPUj15CkNPTkZJR19B
+Q1BJX1RIRVJNQUw9eQpDT05GSUdfQUNQSV9DVVNUT01fRFNEVF9GSUxFPSIiCiMgQ09ORklHX0FD
+UElfQ1VTVE9NX0RTRFQgaXMgbm90IHNldAojIENPTkZJR19BQ1BJX0lOSVRSRF9UQUJMRV9PVkVS
+UklERSBpcyBub3Qgc2V0CkNPTkZJR19BQ1BJX0JMQUNLTElTVF9ZRUFSPTAKQ09ORklHX0FDUElf
+REVCVUc9eQpDT05GSUdfQUNQSV9QQ0lfU0xPVD15CiMgQ09ORklHX1g4Nl9QTV9USU1FUiBpcyBu
+b3Qgc2V0CkNPTkZJR19BQ1BJX0NPTlRBSU5FUj15CkNPTkZJR19BQ1BJX1NCUz15CkNPTkZJR19B
+Q1BJX0hFRD15CiMgQ09ORklHX0FDUElfQ1VTVE9NX01FVEhPRCBpcyBub3Qgc2V0CkNPTkZJR19B
+Q1BJX0JHUlQ9eQpDT05GSUdfQUNQSV9BUEVJPXkKIyBDT05GSUdfQUNQSV9BUEVJX0dIRVMgaXMg
+bm90IHNldApDT05GSUdfQUNQSV9BUEVJX1BDSUVBRVI9eQpDT05GSUdfQUNQSV9BUEVJX0VJTko9
+eQpDT05GSUdfQUNQSV9BUEVJX0VSU1RfREVCVUc9eQojIENPTkZJR19TRkkgaXMgbm90IHNldAoK
+IwojIENQVSBGcmVxdWVuY3kgc2NhbGluZwojCiMgQ09ORklHX0NQVV9GUkVRIGlzIG5vdCBzZXQK
+CiMKIyBDUFUgSWRsZQojCkNPTkZJR19DUFVfSURMRT15CkNPTkZJR19DUFVfSURMRV9NVUxUSVBM
+RV9EUklWRVJTPXkKQ09ORklHX0NQVV9JRExFX0dPVl9MQURERVI9eQojIENPTkZJR19DUFVfSURM
+RV9HT1ZfTUVOVSBpcyBub3Qgc2V0CiMgQ09ORklHX0FSQ0hfTkVFRFNfQ1BVX0lETEVfQ09VUExF
+RCBpcyBub3Qgc2V0CkNPTkZJR19JTlRFTF9JRExFPXkKCiMKIyBCdXMgb3B0aW9ucyAoUENJIGV0
+Yy4pCiMKQ09ORklHX1BDST15CiMgQ09ORklHX1BDSV9HT0JJT1MgaXMgbm90IHNldAojIENPTkZJ
+R19QQ0lfR09NTUNPTkZJRyBpcyBub3Qgc2V0CiMgQ09ORklHX1BDSV9HT0RJUkVDVCBpcyBub3Qg
+c2V0CiMgQ09ORklHX1BDSV9HT09MUEMgaXMgbm90IHNldApDT05GSUdfUENJX0dPQU5ZPXkKQ09O
+RklHX1BDSV9CSU9TPXkKQ09ORklHX1BDSV9ESVJFQ1Q9eQpDT05GSUdfUENJX01NQ09ORklHPXkK
+Q09ORklHX1BDSV9PTFBDPXkKQ09ORklHX1BDSV9ET01BSU5TPXkKQ09ORklHX1BDSV9DTkIyMExF
+X1FVSVJLPXkKQ09ORklHX1BDSUVQT1JUQlVTPXkKIyBDT05GSUdfSE9UUExVR19QQ0lfUENJRSBp
+cyBub3Qgc2V0CkNPTkZJR19QQ0lFQUVSPXkKQ09ORklHX1BDSUVfRUNSQz15CkNPTkZJR19QQ0lF
+QUVSX0lOSkVDVD15CiMgQ09ORklHX1BDSUVBU1BNIGlzIG5vdCBzZXQKQ09ORklHX1BDSUVfUE1F
+PXkKIyBDT05GSUdfUENJX01TSSBpcyBub3Qgc2V0CkNPTkZJR19QQ0lfREVCVUc9eQpDT05GSUdf
+UENJX1JFQUxMT0NfRU5BQkxFX0FVVE89eQpDT05GSUdfUENJX1NUVUI9eQpDT05GSUdfSFRfSVJR
+PXkKIyBDT05GSUdfUENJX0lPViBpcyBub3Qgc2V0CiMgQ09ORklHX1BDSV9QUkkgaXMgbm90IHNl
+dAojIENPTkZJR19QQ0lfUEFTSUQgaXMgbm90IHNldApDT05GSUdfUENJX0lPQVBJQz15CkNPTkZJ
+R19QQ0lfTEFCRUw9eQoKIwojIFBDSSBob3N0IGNvbnRyb2xsZXIgZHJpdmVycwojCkNPTkZJR19J
+U0FfRE1BX0FQST15CkNPTkZJR19JU0E9eQpDT05GSUdfRUlTQT15CiMgQ09ORklHX0VJU0FfVkxC
+X1BSSU1JTkcgaXMgbm90IHNldApDT05GSUdfRUlTQV9QQ0lfRUlTQT15CiMgQ09ORklHX0VJU0Ff
+VklSVFVBTF9ST09UIGlzIG5vdCBzZXQKIyBDT05GSUdfRUlTQV9OQU1FUyBpcyBub3Qgc2V0CiMg
+Q09ORklHX1NDeDIwMCBpcyBub3Qgc2V0CkNPTkZJR19PTFBDPXkKQ09ORklHX09MUENfWE8xNV9T
+Q0k9eQojIENPTkZJR19BTElYIGlzIG5vdCBzZXQKIyBDT05GSUdfTkVUNTUwMSBpcyBub3Qgc2V0
+CkNPTkZJR19BTURfTkI9eQpDT05GSUdfUENDQVJEPXkKQ09ORklHX1BDTUNJQT15CiMgQ09ORklH
+X1BDTUNJQV9MT0FEX0NJUyBpcyBub3Qgc2V0CiMgQ09ORklHX0NBUkRCVVMgaXMgbm90IHNldAoK
+IwojIFBDLWNhcmQgYnJpZGdlcwojCkNPTkZJR19ZRU5UQT15CkNPTkZJR19ZRU5UQV9PMj15CiMg
+Q09ORklHX1lFTlRBX1JJQ09IIGlzIG5vdCBzZXQKQ09ORklHX1lFTlRBX1RJPXkKQ09ORklHX1lF
+TlRBX1RPU0hJQkE9eQpDT05GSUdfUEQ2NzI5PXkKIyBDT05GSUdfSTgyMDkyIGlzIG5vdCBzZXQK
+Q09ORklHX0k4MjM2NT15CkNPTkZJR19UQ0lDPXkKQ09ORklHX1BDTUNJQV9QUk9CRT15CkNPTkZJ
+R19QQ0NBUkRfTk9OU1RBVElDPXkKQ09ORklHX0hPVFBMVUdfUENJPXkKQ09ORklHX0hPVFBMVUdf
+UENJX0NPTVBBUT15CkNPTkZJR19IT1RQTFVHX1BDSV9DT01QQVFfTlZSQU09eQpDT05GSUdfSE9U
+UExVR19QQ0lfSUJNPXkKIyBDT05GSUdfSE9UUExVR19QQ0lfQUNQSSBpcyBub3Qgc2V0CiMgQ09O
+RklHX0hPVFBMVUdfUENJX0NQQ0kgaXMgbm90IHNldApDT05GSUdfSE9UUExVR19QQ0lfU0hQQz15
+CiMgQ09ORklHX1JBUElESU8gaXMgbm90IHNldApDT05GSUdfWDg2X1NZU0ZCPXkKCiMKIyBFeGVj
+dXRhYmxlIGZpbGUgZm9ybWF0cyAvIEVtdWxhdGlvbnMKIwpDT05GSUdfQklORk1UX0VMRj15CkNP
+TkZJR19BUkNIX0JJTkZNVF9FTEZfUkFORE9NSVpFX1BJRT15CkNPTkZJR19CSU5GTVRfU0NSSVBU
+PXkKQ09ORklHX0hBVkVfQU9VVD15CkNPTkZJR19CSU5GTVRfQU9VVD15CkNPTkZJR19CSU5GTVRf
+TUlTQz15CkNPTkZJR19DT1JFRFVNUD15CkNPTkZJR19IQVZFX0FUT01JQ19JT01BUD15CiMgQ09O
+RklHX05FVCBpcyBub3Qgc2V0CgojCiMgRGV2aWNlIERyaXZlcnMKIwoKIwojIEdlbmVyaWMgRHJp
+dmVyIE9wdGlvbnMKIwpDT05GSUdfVUVWRU5UX0hFTFBFUl9QQVRIPSIiCkNPTkZJR19ERVZUTVBG
+Uz15CkNPTkZJR19ERVZUTVBGU19NT1VOVD15CiMgQ09ORklHX1NUQU5EQUxPTkUgaXMgbm90IHNl
+dApDT05GSUdfUFJFVkVOVF9GSVJNV0FSRV9CVUlMRD15CkNPTkZJR19GV19MT0FERVI9eQpDT05G
+SUdfRklSTVdBUkVfSU5fS0VSTkVMPXkKQ09ORklHX0VYVFJBX0ZJUk1XQVJFPSIiCkNPTkZJR19G
+V19MT0FERVJfVVNFUl9IRUxQRVI9eQojIENPTkZJR19ERUJVR19EUklWRVIgaXMgbm90IHNldAoj
+IENPTkZJR19ERUJVR19ERVZSRVMgaXMgbm90IHNldAojIENPTkZJR19TWVNfSFlQRVJWSVNPUiBp
+cyBub3Qgc2V0CiMgQ09ORklHX0dFTkVSSUNfQ1BVX0RFVklDRVMgaXMgbm90IHNldApDT05GSUdf
+UkVHTUFQPXkKQ09ORklHX1JFR01BUF9JMkM9eQpDT05GSUdfUkVHTUFQX01NSU89eQpDT05GSUdf
+UkVHTUFQX0lSUT15CkNPTkZJR19ETUFfU0hBUkVEX0JVRkZFUj15CgojCiMgQnVzIGRldmljZXMK
+IwojIENPTkZJR19NVEQgaXMgbm90IHNldApDT05GSUdfT0Y9eQoKIwojIERldmljZSBUcmVlIGFu
+ZCBPcGVuIEZpcm13YXJlIHN1cHBvcnQKIwojIENPTkZJR19PRl9TRUxGVEVTVCBpcyBub3Qgc2V0
+CkNPTkZJR19PRl9QUk9NVFJFRT15CkNPTkZJR19PRl9BRERSRVNTPXkKQ09ORklHX09GX0lSUT15
+CkNPTkZJR19PRl9QQ0k9eQpDT05GSUdfT0ZfUENJX0lSUT15CkNPTkZJR19QQVJQT1JUPXkKQ09O
+RklHX1BBUlBPUlRfUEM9eQpDT05GSUdfUEFSUE9SVF9TRVJJQUw9eQpDT05GSUdfUEFSUE9SVF9Q
+Q19GSUZPPXkKIyBDT05GSUdfUEFSUE9SVF9QQ19TVVBFUklPIGlzIG5vdCBzZXQKQ09ORklHX1BB
+UlBPUlRfUENfUENNQ0lBPXkKIyBDT05GSUdfUEFSUE9SVF9HU0MgaXMgbm90IHNldAojIENPTkZJ
+R19QQVJQT1JUX0FYODg3OTYgaXMgbm90IHNldAojIENPTkZJR19QQVJQT1JUXzEyODQgaXMgbm90
+IHNldApDT05GSUdfUE5QPXkKIyBDT05GSUdfUE5QX0RFQlVHX01FU1NBR0VTIGlzIG5vdCBzZXQK
+CiMKIyBQcm90b2NvbHMKIwojIENPTkZJR19JU0FQTlAgaXMgbm90IHNldAojIENPTkZJR19QTlBC
+SU9TIGlzIG5vdCBzZXQKQ09ORklHX1BOUEFDUEk9eQoKIwojIE1pc2MgZGV2aWNlcwojCkNPTkZJ
+R19TRU5TT1JTX0xJUzNMVjAyRD15CkNPTkZJR19BRDUyNVhfRFBPVD15CkNPTkZJR19BRDUyNVhf
+RFBPVF9JMkM9eQojIENPTkZJR19EVU1NWV9JUlEgaXMgbm90IHNldAojIENPTkZJR19JQk1fQVNN
+IGlzIG5vdCBzZXQKQ09ORklHX1BIQU5UT009eQpDT05GSUdfSU5URUxfTUlEX1BUST15CkNPTkZJ
+R19TR0lfSU9DND15CiMgQ09ORklHX1RJRk1fQ09SRSBpcyBub3Qgc2V0CiMgQ09ORklHX0lDUzkz
+MlM0MDEgaXMgbm90IHNldAojIENPTkZJR19BVE1FTF9TU0MgaXMgbm90IHNldApDT05GSUdfRU5D
+TE9TVVJFX1NFUlZJQ0VTPXkKQ09ORklHX0NTNTUzNV9NRkdQVD15CkNPTkZJR19DUzU1MzVfTUZH
+UFRfREVGQVVMVF9JUlE9NwpDT05GSUdfQ1M1NTM1X0NMT0NLX0VWRU5UX1NSQz15CkNPTkZJR19I
+UF9JTE89eQpDT05GSUdfQVBEUzk4MDJBTFM9eQpDT05GSUdfSVNMMjkwMDM9eQpDT05GSUdfSVNM
+MjkwMjA9eQpDT05GSUdfU0VOU09SU19UU0wyNTUwPXkKIyBDT05GSUdfU0VOU09SU19CSDE3ODAg
+aXMgbm90IHNldApDT05GSUdfU0VOU09SU19CSDE3NzA9eQpDT05GSUdfU0VOU09SU19BUERTOTkw
+WD15CkNPTkZJR19ITUM2MzUyPXkKQ09ORklHX0RTMTY4Mj15CiMgQ09ORklHX0JNUDA4NV9JMkMg
+aXMgbm90IHNldAojIENPTkZJR19QQ0hfUEhVQiBpcyBub3Qgc2V0CkNPTkZJR19VU0JfU1dJVENI
+X0ZTQTk0ODA9eQpDT05GSUdfU1JBTT15CkNPTkZJR19DMlBPUlQ9eQojIENPTkZJR19DMlBPUlRf
+RFVSQU1BUl8yMTUwIGlzIG5vdCBzZXQKCiMKIyBFRVBST00gc3VwcG9ydAojCiMgQ09ORklHX0VF
+UFJPTV9BVDI0IGlzIG5vdCBzZXQKQ09ORklHX0VFUFJPTV9MRUdBQ1k9eQpDT05GSUdfRUVQUk9N
+X01BWDY4NzU9eQpDT05GSUdfRUVQUk9NXzkzQ1g2PXkKQ09ORklHX0NCNzEwX0NPUkU9eQpDT05G
+SUdfQ0I3MTBfREVCVUc9eQpDT05GSUdfQ0I3MTBfREVCVUdfQVNTVU1QVElPTlM9eQoKIwojIFRl
+eGFzIEluc3RydW1lbnRzIHNoYXJlZCB0cmFuc3BvcnQgbGluZSBkaXNjaXBsaW5lCiMKQ09ORklH
+X1NFTlNPUlNfTElTM19JMkM9eQoKIwojIEFsdGVyYSBGUEdBIGZpcm13YXJlIGRvd25sb2FkIG1v
+ZHVsZQojCiMgQ09ORklHX0FMVEVSQV9TVEFQTCBpcyBub3Qgc2V0CkNPTkZJR19WTVdBUkVfVk1D
+ST15CgojCiMgSW50ZWwgTUlDIEhvc3QgRHJpdmVyCiMKCiMKIyBJbnRlbCBNSUMgQ2FyZCBEcml2
+ZXIKIwpDT05GSUdfSEFWRV9JREU9eQoKIwojIFNDU0kgZGV2aWNlIHN1cHBvcnQKIwpDT05GSUdf
+U0NTSV9NT0Q9eQojIENPTkZJR19TQ1NJX0RNQSBpcyBub3Qgc2V0CiMgQ09ORklHX1NDU0lfTkVU
+TElOSyBpcyBub3Qgc2V0CkNPTkZJR19GVVNJT049eQpDT05GSUdfRlVTSU9OX01BWF9TR0U9MTI4
+CkNPTkZJR19GVVNJT05fTE9HR0lORz15CgojCiMgSUVFRSAxMzk0IChGaXJlV2lyZSkgc3VwcG9y
+dAojCiMgQ09ORklHX0ZJUkVXSVJFIGlzIG5vdCBzZXQKIyBDT05GSUdfRklSRVdJUkVfTk9TWSBp
+cyBub3Qgc2V0CiMgQ09ORklHX0kyTyBpcyBub3Qgc2V0CkNPTkZJR19NQUNJTlRPU0hfRFJJVkVS
+Uz15CgojCiMgSW5wdXQgZGV2aWNlIHN1cHBvcnQKIwpDT05GSUdfSU5QVVQ9eQpDT05GSUdfSU5Q
+VVRfRkZfTUVNTEVTUz15CkNPTkZJR19JTlBVVF9QT0xMREVWPXkKQ09ORklHX0lOUFVUX1NQQVJT
+RUtNQVA9eQpDT05GSUdfSU5QVVRfTUFUUklYS01BUD15CgojCiMgVXNlcmxhbmQgaW50ZXJmYWNl
+cwojCiMgQ09ORklHX0lOUFVUX01PVVNFREVWIGlzIG5vdCBzZXQKQ09ORklHX0lOUFVUX0pPWURF
+Vj15CkNPTkZJR19JTlBVVF9FVkRFVj15CkNPTkZJR19JTlBVVF9FVkJVRz15CgojCiMgSW5wdXQg
+RGV2aWNlIERyaXZlcnMKIwpDT05GSUdfSU5QVVRfS0VZQk9BUkQ9eQpDT05GSUdfS0VZQk9BUkRf
+QURQNTU4OD15CkNPTkZJR19LRVlCT0FSRF9BRFA1NTg5PXkKQ09ORklHX0tFWUJPQVJEX0FUS0JE
+PXkKQ09ORklHX0tFWUJPQVJEX1FUMTA3MD15CkNPTkZJR19LRVlCT0FSRF9RVDIxNjA9eQpDT05G
+SUdfS0VZQk9BUkRfTEtLQkQ9eQpDT05GSUdfS0VZQk9BUkRfR1BJTz15CiMgQ09ORklHX0tFWUJP
+QVJEX0dQSU9fUE9MTEVEIGlzIG5vdCBzZXQKQ09ORklHX0tFWUJPQVJEX1RDQTY0MTY9eQpDT05G
+SUdfS0VZQk9BUkRfVENBODQxOD15CkNPTkZJR19LRVlCT0FSRF9NQVRSSVg9eQpDT05GSUdfS0VZ
+Qk9BUkRfTE04MzIzPXkKIyBDT05GSUdfS0VZQk9BUkRfTE04MzMzIGlzIG5vdCBzZXQKIyBDT05G
+SUdfS0VZQk9BUkRfTUFYNzM1OSBpcyBub3Qgc2V0CkNPTkZJR19LRVlCT0FSRF9NQ1M9eQpDT05G
+SUdfS0VZQk9BUkRfTVBSMTIxPXkKIyBDT05GSUdfS0VZQk9BUkRfTkVXVE9OIGlzIG5vdCBzZXQK
+Q09ORklHX0tFWUJPQVJEX09QRU5DT1JFUz15CkNPTkZJR19LRVlCT0FSRF9TVE9XQVdBWT15CkNP
+TkZJR19LRVlCT0FSRF9TVU5LQkQ9eQpDT05GSUdfS0VZQk9BUkRfU1RNUEU9eQpDT05GSUdfS0VZ
+Qk9BUkRfVFdMNDAzMD15CkNPTkZJR19LRVlCT0FSRF9YVEtCRD15CkNPTkZJR19LRVlCT0FSRF9D
+Uk9TX0VDPXkKQ09ORklHX0lOUFVUX01PVVNFPXkKIyBDT05GSUdfTU9VU0VfUFMyIGlzIG5vdCBz
+ZXQKQ09ORklHX01PVVNFX1NFUklBTD15CkNPTkZJR19NT1VTRV9DWUFQQT15CkNPTkZJR19NT1VT
+RV9JTlBPUlQ9eQojIENPTkZJR19NT1VTRV9BVElYTCBpcyBub3Qgc2V0CkNPTkZJR19NT1VTRV9M
+T0dJQk09eQpDT05GSUdfTU9VU0VfUEMxMTBQQUQ9eQojIENPTkZJR19NT1VTRV9WU1hYWEFBIGlz
+IG5vdCBzZXQKIyBDT05GSUdfTU9VU0VfR1BJTyBpcyBub3Qgc2V0CkNPTkZJR19NT1VTRV9TWU5B
+UFRJQ1NfSTJDPXkKIyBDT05GSUdfSU5QVVRfSk9ZU1RJQ0sgaXMgbm90IHNldAojIENPTkZJR19J
+TlBVVF9UQUJMRVQgaXMgbm90IHNldAojIENPTkZJR19JTlBVVF9UT1VDSFNDUkVFTiBpcyBub3Qg
+c2V0CiMgQ09ORklHX0lOUFVUX01JU0MgaXMgbm90IHNldAoKIwojIEhhcmR3YXJlIEkvTyBwb3J0
+cwojCkNPTkZJR19TRVJJTz15CkNPTkZJR19TRVJJT19JODA0Mj15CkNPTkZJR19TRVJJT19TRVJQ
+T1JUPXkKQ09ORklHX1NFUklPX0NUODJDNzEwPXkKQ09ORklHX1NFUklPX1BBUktCRD15CiMgQ09O
+RklHX1NFUklPX1BDSVBTMiBpcyBub3Qgc2V0CkNPTkZJR19TRVJJT19MSUJQUzI9eQpDT05GSUdf
+U0VSSU9fUkFXPXkKQ09ORklHX1NFUklPX0FMVEVSQV9QUzI9eQpDT05GSUdfU0VSSU9fUFMyTVVM
+VD15CkNPTkZJR19TRVJJT19BUkNfUFMyPXkKQ09ORklHX1NFUklPX0FQQlBTMj15CkNPTkZJR19T
+RVJJT19PTFBDX0FQU1A9eQpDT05GSUdfR0FNRVBPUlQ9eQpDT05GSUdfR0FNRVBPUlRfTlM1NTg9
+eQojIENPTkZJR19HQU1FUE9SVF9MNCBpcyBub3Qgc2V0CiMgQ09ORklHX0dBTUVQT1JUX0VNVTEw
+SzEgaXMgbm90IHNldApDT05GSUdfR0FNRVBPUlRfRk04MDE9eQoKIwojIENoYXJhY3RlciBkZXZp
+Y2VzCiMKQ09ORklHX1RUWT15CiMgQ09ORklHX1ZUIGlzIG5vdCBzZXQKIyBDT05GSUdfVU5JWDk4
+X1BUWVMgaXMgbm90IHNldAojIENPTkZJR19MRUdBQ1lfUFRZUyBpcyBub3Qgc2V0CkNPTkZJR19T
+RVJJQUxfTk9OU1RBTkRBUkQ9eQpDT05GSUdfUk9DS0VUUE9SVD15CkNPTkZJR19DWUNMQURFUz15
+CiMgQ09ORklHX0NZWl9JTlRSIGlzIG5vdCBzZXQKQ09ORklHX01PWEFfSU5URUxMSU89eQojIENP
+TkZJR19NT1hBX1NNQVJUSU8gaXMgbm90IHNldApDT05GSUdfU1lOQ0xJTks9eQpDT05GSUdfU1lO
+Q0xJTktNUD15CkNPTkZJR19TWU5DTElOS19HVD15CiMgQ09ORklHX05PWk9NSSBpcyBub3Qgc2V0
+CiMgQ09ORklHX0lTSSBpcyBub3Qgc2V0CkNPTkZJR19OX0hETEM9eQpDT05GSUdfVFJBQ0VfUk9V
+VEVSPXkKQ09ORklHX1RSQUNFX1NJTks9eQojIENPTkZJR19ERVZLTUVNIGlzIG5vdCBzZXQKCiMK
+IyBTZXJpYWwgZHJpdmVycwojCkNPTkZJR19TRVJJQUxfODI1MD15CiMgQ09ORklHX1NFUklBTF84
+MjUwX0RFUFJFQ0FURURfT1BUSU9OUyBpcyBub3Qgc2V0CiMgQ09ORklHX1NFUklBTF84MjUwX1BO
+UCBpcyBub3Qgc2V0CiMgQ09ORklHX1NFUklBTF84MjUwX0NPTlNPTEUgaXMgbm90IHNldApDT05G
+SUdfRklYX0VBUkxZQ09OX01FTT15CkNPTkZJR19TRVJJQUxfODI1MF9ETUE9eQpDT05GSUdfU0VS
+SUFMXzgyNTBfUENJPXkKIyBDT05GSUdfU0VSSUFMXzgyNTBfQ1MgaXMgbm90IHNldApDT05GSUdf
+U0VSSUFMXzgyNTBfTlJfVUFSVFM9NApDT05GSUdfU0VSSUFMXzgyNTBfUlVOVElNRV9VQVJUUz00
+CiMgQ09ORklHX1NFUklBTF84MjUwX0VYVEVOREVEIGlzIG5vdCBzZXQKIyBDT05GSUdfU0VSSUFM
+XzgyNTBfRFcgaXMgbm90IHNldAoKIwojIE5vbi04MjUwIHNlcmlhbCBwb3J0IHN1cHBvcnQKIwpD
+T05GSUdfU0VSSUFMX01GRF9IU1U9eQpDT05GSUdfU0VSSUFMX01GRF9IU1VfQ09OU09MRT15CiMg
+Q09ORklHX1NFUklBTF9VQVJUTElURSBpcyBub3Qgc2V0CkNPTkZJR19TRVJJQUxfQ09SRT15CkNP
+TkZJR19TRVJJQUxfQ09SRV9DT05TT0xFPXkKQ09ORklHX1NFUklBTF9KU009eQojIENPTkZJR19T
+RVJJQUxfT0ZfUExBVEZPUk0gaXMgbm90IHNldApDT05GSUdfU0VSSUFMX1NDQ05YUD15CkNPTkZJ
+R19TRVJJQUxfU0NDTlhQX0NPTlNPTEU9eQpDT05GSUdfU0VSSUFMX1RJTUJFUkRBTEU9eQpDT05G
+SUdfU0VSSUFMX0FMVEVSQV9KVEFHVUFSVD15CkNPTkZJR19TRVJJQUxfQUxURVJBX0pUQUdVQVJU
+X0NPTlNPTEU9eQojIENPTkZJR19TRVJJQUxfQUxURVJBX0pUQUdVQVJUX0NPTlNPTEVfQllQQVNT
+IGlzIG5vdCBzZXQKQ09ORklHX1NFUklBTF9BTFRFUkFfVUFSVD15CkNPTkZJR19TRVJJQUxfQUxU
+RVJBX1VBUlRfTUFYUE9SVFM9NApDT05GSUdfU0VSSUFMX0FMVEVSQV9VQVJUX0JBVURSQVRFPTEx
+NTIwMApDT05GSUdfU0VSSUFMX0FMVEVSQV9VQVJUX0NPTlNPTEU9eQpDT05GSUdfU0VSSUFMX1BD
+SF9VQVJUPXkKQ09ORklHX1NFUklBTF9QQ0hfVUFSVF9DT05TT0xFPXkKQ09ORklHX1NFUklBTF9Y
+SUxJTlhfUFNfVUFSVD15CkNPTkZJR19TRVJJQUxfWElMSU5YX1BTX1VBUlRfQ09OU09MRT15CkNP
+TkZJR19TRVJJQUxfQVJDPXkKQ09ORklHX1NFUklBTF9BUkNfQ09OU09MRT15CkNPTkZJR19TRVJJ
+QUxfQVJDX05SX1BPUlRTPTEKIyBDT05GSUdfU0VSSUFMX1JQMiBpcyBub3Qgc2V0CkNPTkZJR19T
+RVJJQUxfRlNMX0xQVUFSVD15CkNPTkZJR19TRVJJQUxfRlNMX0xQVUFSVF9DT05TT0xFPXkKQ09O
+RklHX1NFUklBTF9TVF9BU0M9eQojIENPTkZJR19TRVJJQUxfU1RfQVNDX0NPTlNPTEUgaXMgbm90
+IHNldApDT05GSUdfVFRZX1BSSU5USz15CkNPTkZJR19QUklOVEVSPXkKQ09ORklHX0xQX0NPTlNP
+TEU9eQojIENPTkZJR19QUERFViBpcyBub3Qgc2V0CkNPTkZJR19IVkNfRFJJVkVSPXkKQ09ORklH
+X1ZJUlRJT19DT05TT0xFPXkKQ09ORklHX0lQTUlfSEFORExFUj15CkNPTkZJR19JUE1JX1BBTklD
+X0VWRU5UPXkKQ09ORklHX0lQTUlfUEFOSUNfU1RSSU5HPXkKIyBDT05GSUdfSVBNSV9ERVZJQ0Vf
+SU5URVJGQUNFIGlzIG5vdCBzZXQKQ09ORklHX0lQTUlfU0k9eQpDT05GSUdfSVBNSV9XQVRDSERP
+Rz15CkNPTkZJR19JUE1JX1BPV0VST0ZGPXkKQ09ORklHX0hXX1JBTkRPTT15CkNPTkZJR19IV19S
+QU5ET01fVElNRVJJT01FTT15CiMgQ09ORklHX0hXX1JBTkRPTV9JTlRFTCBpcyBub3Qgc2V0CkNP
+TkZJR19IV19SQU5ET01fQU1EPXkKIyBDT05GSUdfSFdfUkFORE9NX0dFT0RFIGlzIG5vdCBzZXQK
+Q09ORklHX0hXX1JBTkRPTV9WSUE9eQojIENPTkZJR19IV19SQU5ET01fVklSVElPIGlzIG5vdCBz
+ZXQKIyBDT05GSUdfSFdfUkFORE9NX1RQTSBpcyBub3Qgc2V0CkNPTkZJR19OVlJBTT15CkNPTkZJ
+R19EVExLPXkKIyBDT05GSUdfUjM5NjQgaXMgbm90IHNldApDT05GSUdfQVBQTElDT009eQpDT05G
+SUdfU09OWVBJPXkKCiMKIyBQQ01DSUEgY2hhcmFjdGVyIGRldmljZXMKIwojIENPTkZJR19TWU5D
+TElOS19DUyBpcyBub3Qgc2V0CkNPTkZJR19DQVJETUFOXzQwMDA9eQpDT05GSUdfQ0FSRE1BTl80
+MDQwPXkKIyBDT05GSUdfTVdBVkUgaXMgbm90IHNldAojIENPTkZJR19QQzg3MzZ4X0dQSU8gaXMg
+bm90IHNldApDT05GSUdfTlNDX0dQSU89eQojIENPTkZJR19IUEVUIGlzIG5vdCBzZXQKIyBDT05G
+SUdfSEFOR0NIRUNLX1RJTUVSIGlzIG5vdCBzZXQKQ09ORklHX1RDR19UUE09eQpDT05GSUdfVENH
+X1RJUz15CkNPTkZJR19UQ0dfVElTX0kyQ19JTkZJTkVPTj15CiMgQ09ORklHX1RDR19OU0MgaXMg
+bm90IHNldAojIENPTkZJR19UQ0dfQVRNRUwgaXMgbm90IHNldAojIENPTkZJR19UQ0dfSU5GSU5F
+T04gaXMgbm90IHNldApDT05GSUdfVENHX1NUMzNfSTJDPXkKQ09ORklHX1RFTENMT0NLPXkKQ09O
+RklHX0RFVlBPUlQ9eQpDT05GSUdfSTJDPXkKQ09ORklHX0kyQ19CT0FSRElORk89eQpDT05GSUdf
+STJDX0NPTVBBVD15CiMgQ09ORklHX0kyQ19DSEFSREVWIGlzIG5vdCBzZXQKIyBDT05GSUdfSTJD
+X01VWCBpcyBub3Qgc2V0CkNPTkZJR19JMkNfSEVMUEVSX0FVVE89eQpDT05GSUdfSTJDX1NNQlVT
+PXkKQ09ORklHX0kyQ19BTEdPQklUPXkKCiMKIyBJMkMgSGFyZHdhcmUgQnVzIHN1cHBvcnQKIwoK
+IwojIFBDIFNNQnVzIGhvc3QgY29udHJvbGxlciBkcml2ZXJzCiMKQ09ORklHX0kyQ19BTEkxNTM1
+PXkKIyBDT05GSUdfSTJDX0FMSTE1NjMgaXMgbm90IHNldApDT05GSUdfSTJDX0FMSTE1WDM9eQoj
+IENPTkZJR19JMkNfQU1ENzU2IGlzIG5vdCBzZXQKQ09ORklHX0kyQ19BTUQ4MTExPXkKQ09ORklH
+X0kyQ19JODAxPXkKQ09ORklHX0kyQ19JU0NIPXkKQ09ORklHX0kyQ19JU01UPXkKQ09ORklHX0ky
+Q19QSUlYND15CiMgQ09ORklHX0kyQ19ORk9SQ0UyIGlzIG5vdCBzZXQKQ09ORklHX0kyQ19TSVM1
+NTk1PXkKQ09ORklHX0kyQ19TSVM2MzA9eQojIENPTkZJR19JMkNfU0lTOTZYIGlzIG5vdCBzZXQK
+IyBDT05GSUdfSTJDX1ZJQSBpcyBub3Qgc2V0CiMgQ09ORklHX0kyQ19WSUFQUk8gaXMgbm90IHNl
+dAoKIwojIEFDUEkgZHJpdmVycwojCiMgQ09ORklHX0kyQ19TQ01JIGlzIG5vdCBzZXQKCiMKIyBJ
+MkMgc3lzdGVtIGJ1cyBkcml2ZXJzIChtb3N0bHkgZW1iZWRkZWQgLyBzeXN0ZW0tb24tY2hpcCkK
+IwpDT05GSUdfSTJDX0NCVVNfR1BJTz15CkNPTkZJR19JMkNfREVTSUdOV0FSRV9DT1JFPXkKQ09O
+RklHX0kyQ19ERVNJR05XQVJFX1BDST15CkNPTkZJR19JMkNfRUcyMFQ9eQojIENPTkZJR19JMkNf
+R1BJTyBpcyBub3Qgc2V0CkNPTkZJR19JMkNfT0NPUkVTPXkKIyBDT05GSUdfSTJDX1BDQV9QTEFU
+Rk9STSBpcyBub3Qgc2V0CiMgQ09ORklHX0kyQ19QWEEgaXMgbm90IHNldAojIENPTkZJR19JMkNf
+UFhBX1BDSSBpcyBub3Qgc2V0CiMgQ09ORklHX0kyQ19TSU1URUMgaXMgbm90IHNldAojIENPTkZJ
+R19JMkNfWElMSU5YIGlzIG5vdCBzZXQKCiMKIyBFeHRlcm5hbCBJMkMvU01CdXMgYWRhcHRlciBk
+cml2ZXJzCiMKQ09ORklHX0kyQ19QQVJQT1JUPXkKIyBDT05GSUdfSTJDX1BBUlBPUlRfTElHSFQg
+aXMgbm90IHNldApDT05GSUdfSTJDX1RBT1NfRVZNPXkKCiMKIyBPdGhlciBJMkMvU01CdXMgYnVz
+IGRyaXZlcnMKIwojIENPTkZJR19JMkNfUENBX0lTQSBpcyBub3Qgc2V0CkNPTkZJR19TQ3gyMDBf
+QUNCPXkKQ09ORklHX0kyQ19ERUJVR19DT1JFPXkKQ09ORklHX0kyQ19ERUJVR19BTEdPPXkKQ09O
+RklHX0kyQ19ERUJVR19CVVM9eQojIENPTkZJR19TUEkgaXMgbm90IHNldAojIENPTkZJR19IU0kg
+aXMgbm90IHNldAoKIwojIFBQUyBzdXBwb3J0CiMKQ09ORklHX1BQUz15CkNPTkZJR19QUFNfREVC
+VUc9eQojIENPTkZJR19OVFBfUFBTIGlzIG5vdCBzZXQKCiMKIyBQUFMgY2xpZW50cyBzdXBwb3J0
+CiMKIyBDT05GSUdfUFBTX0NMSUVOVF9LVElNRVIgaXMgbm90IHNldApDT05GSUdfUFBTX0NMSUVO
+VF9MRElTQz15CkNPTkZJR19QUFNfQ0xJRU5UX1BBUlBPUlQ9eQojIENPTkZJR19QUFNfQ0xJRU5U
+X0dQSU8gaXMgbm90IHNldAoKIwojIFBQUyBnZW5lcmF0b3JzIHN1cHBvcnQKIwoKIwojIFBUUCBj
+bG9jayBzdXBwb3J0CiMKIyBDT05GSUdfUFRQXzE1ODhfQ0xPQ0sgaXMgbm90IHNldAoKIwojIEVu
+YWJsZSBQSFlMSUIgYW5kIE5FVFdPUktfUEhZX1RJTUVTVEFNUElORyB0byBzZWUgdGhlIGFkZGl0
+aW9uYWwgY2xvY2tzLgojCiMgQ09ORklHX1BUUF8xNTg4X0NMT0NLX1BDSCBpcyBub3Qgc2V0CkNP
+TkZJR19BUkNIX1dBTlRfT1BUSU9OQUxfR1BJT0xJQj15CkNPTkZJR19HUElPX0RFVlJFUz15CkNP
+TkZJR19HUElPTElCPXkKQ09ORklHX09GX0dQSU89eQpDT05GSUdfR1BJT19BQ1BJPXkKIyBDT05G
+SUdfREVCVUdfR1BJTyBpcyBub3Qgc2V0CkNPTkZJR19HUElPX1NZU0ZTPXkKQ09ORklHX0dQSU9f
+R0VORVJJQz15CiMgQ09ORklHX0dQSU9fREE5MDUyIGlzIG5vdCBzZXQKQ09ORklHX0dQSU9fTUFY
+NzMwWD15CgojCiMgTWVtb3J5IG1hcHBlZCBHUElPIGRyaXZlcnM6CiMKIyBDT05GSUdfR1BJT19H
+RU5FUklDX1BMQVRGT1JNIGlzIG5vdCBzZXQKIyBDT05GSUdfR1BJT19JVDg3NjFFIGlzIG5vdCBz
+ZXQKQ09ORklHX0dQSU9fRjcxODhYPXkKIyBDT05GSUdfR1BJT19UUzU1MDAgaXMgbm90IHNldAoj
+IENPTkZJR19HUElPX1NDSCBpcyBub3Qgc2V0CkNPTkZJR19HUElPX0lDSD15CiMgQ09ORklHX0dQ
+SU9fVlg4NTUgaXMgbm90IHNldApDT05GSUdfR1BJT19MWU5YUE9JTlQ9eQpDT05GSUdfR1BJT19H
+UkdQSU89eQoKIwojIEkyQyBHUElPIGV4cGFuZGVyczoKIwpDT05GSUdfR1BJT19BUklaT05BPXkK
+Q09ORklHX0dQSU9fTUFYNzMwMD15CiMgQ09ORklHX0dQSU9fTUFYNzMyWCBpcyBub3Qgc2V0CiMg
+Q09ORklHX0dQSU9fUENBOTUzWCBpcyBub3Qgc2V0CkNPTkZJR19HUElPX1BDRjg1N1g9eQojIENP
+TkZJR19HUElPX1JDNVQ1ODMgaXMgbm90IHNldApDT05GSUdfR1BJT19TWDE1MFg9eQpDT05GSUdf
+R1BJT19TVE1QRT15CkNPTkZJR19HUElPX1RQUzY1OTEyPXkKQ09ORklHX0dQSU9fVFdMNDAzMD15
+CkNPTkZJR19HUElPX1RXTDYwNDA9eQojIENPTkZJR19HUElPX1dNODM1MCBpcyBub3Qgc2V0CkNP
+TkZJR19HUElPX1dNODk5ND15CkNPTkZJR19HUElPX0FEUDU1ODg9eQpDT05GSUdfR1BJT19BRFA1
+NTg4X0lSUT15CkNPTkZJR19HUElPX0FETlA9eQoKIwojIFBDSSBHUElPIGV4cGFuZGVyczoKIwpD
+T05GSUdfR1BJT19DUzU1MzU9eQpDT05GSUdfR1BJT19CVDhYWD15CkNPTkZJR19HUElPX0FNRDgx
+MTE9eQpDT05GSUdfR1BJT19MQU5HV0VMTD15CkNPTkZJR19HUElPX1BDSD15CkNPTkZJR19HUElP
+X01MX0lPSD15CiMgQ09ORklHX0dQSU9fU09EQVZJTExFIGlzIG5vdCBzZXQKQ09ORklHX0dQSU9f
+VElNQkVSREFMRT15CkNPTkZJR19HUElPX1JEQzMyMVg9eQoKIwojIFNQSSBHUElPIGV4cGFuZGVy
+czoKIwojIENPTkZJR19HUElPX01DUDIzUzA4IGlzIG5vdCBzZXQKCiMKIyBBQzk3IEdQSU8gZXhw
+YW5kZXJzOgojCgojCiMgTFBDIEdQSU8gZXhwYW5kZXJzOgojCgojCiMgTU9EVUxidXMgR1BJTyBl
+eHBhbmRlcnM6CiMKQ09ORklHX0dQSU9fSkFOWl9UVEw9eQojIENPTkZJR19HUElPX1BBTE1BUyBp
+cyBub3Qgc2V0CiMgQ09ORklHX0dQSU9fVFBTNjU5MTAgaXMgbm90IHNldAojIENPTkZJR19HUElP
+X0JDTV9LT05BIGlzIG5vdCBzZXQKCiMKIyBVU0IgR1BJTyBleHBhbmRlcnM6CiMKQ09ORklHX1cx
+PXkKCiMKIyAxLXdpcmUgQnVzIE1hc3RlcnMKIwojIENPTkZJR19XMV9NQVNURVJfTUFUUk9YIGlz
+IG5vdCBzZXQKIyBDT05GSUdfVzFfTUFTVEVSX0RTMjQ4MiBpcyBub3Qgc2V0CiMgQ09ORklHX1cx
+X01BU1RFUl9EUzFXTSBpcyBub3Qgc2V0CkNPTkZJR19XMV9NQVNURVJfR1BJTz15CgojCiMgMS13
+aXJlIFNsYXZlcwojCkNPTkZJR19XMV9TTEFWRV9USEVSTT15CiMgQ09ORklHX1cxX1NMQVZFX1NN
+RU0gaXMgbm90IHNldAojIENPTkZJR19XMV9TTEFWRV9EUzI0MDggaXMgbm90IHNldApDT05GSUdf
+VzFfU0xBVkVfRFMyNDEzPXkKQ09ORklHX1cxX1NMQVZFX0RTMjQyMz15CkNPTkZJR19XMV9TTEFW
+RV9EUzI0MzE9eQpDT05GSUdfVzFfU0xBVkVfRFMyNDMzPXkKQ09ORklHX1cxX1NMQVZFX0RTMjQz
+M19DUkM9eQojIENPTkZJR19XMV9TTEFWRV9EUzI3NjAgaXMgbm90IHNldApDT05GSUdfVzFfU0xB
+VkVfRFMyNzgwPXkKQ09ORklHX1cxX1NMQVZFX0RTMjc4MT15CiMgQ09ORklHX1cxX1NMQVZFX0RT
+MjhFMDQgaXMgbm90IHNldAojIENPTkZJR19XMV9TTEFWRV9CUTI3MDAwIGlzIG5vdCBzZXQKQ09O
+RklHX1BPV0VSX1NVUFBMWT15CkNPTkZJR19QT1dFUl9TVVBQTFlfREVCVUc9eQojIENPTkZJR19Q
+REFfUE9XRVIgaXMgbm90IHNldApDT05GSUdfV004MzUwX1BPV0VSPXkKQ09ORklHX1RFU1RfUE9X
+RVI9eQojIENPTkZJR19CQVRURVJZX0RTMjc4MCBpcyBub3Qgc2V0CkNPTkZJR19CQVRURVJZX0RT
+Mjc4MT15CiMgQ09ORklHX0JBVFRFUllfRFMyNzgyIGlzIG5vdCBzZXQKQ09ORklHX0JBVFRFUllf
+T0xQQz15CiMgQ09ORklHX0JBVFRFUllfU0JTIGlzIG5vdCBzZXQKQ09ORklHX0JBVFRFUllfQlEy
+N3gwMD15CkNPTkZJR19CQVRURVJZX0JRMjdYMDBfSTJDPXkKIyBDT05GSUdfQkFUVEVSWV9CUTI3
+WDAwX1BMQVRGT1JNIGlzIG5vdCBzZXQKIyBDT05GSUdfQkFUVEVSWV9EQTkwNTIgaXMgbm90IHNl
+dAojIENPTkZJR19CQVRURVJZX01BWDE3MDQwIGlzIG5vdCBzZXQKQ09ORklHX0JBVFRFUllfTUFY
+MTcwNDI9eQojIENPTkZJR19CQVRURVJZX1RXTDQwMzBfTUFEQyBpcyBub3Qgc2V0CkNPTkZJR19D
+SEFSR0VSX1BDRjUwNjMzPXkKQ09ORklHX0JBVFRFUllfUlg1MT15CkNPTkZJR19DSEFSR0VSX01B
+WDg5MDM9eQojIENPTkZJR19DSEFSR0VSX1RXTDQwMzAgaXMgbm90IHNldApDT05GSUdfQ0hBUkdF
+Ul9MUDg3Mjc9eQojIENPTkZJR19DSEFSR0VSX0dQSU8gaXMgbm90IHNldAojIENPTkZJR19DSEFS
+R0VSX0JRMjQxNVggaXMgbm90IHNldApDT05GSUdfQ0hBUkdFUl9CUTI0MTkwPXkKQ09ORklHX0NI
+QVJHRVJfU01CMzQ3PXkKQ09ORklHX0JBVFRFUllfR09MREZJU0g9eQpDT05GSUdfUE9XRVJfUkVT
+RVQ9eQojIENPTkZJR19QT1dFUl9SRVNFVF9HUElPIGlzIG5vdCBzZXQKQ09ORklHX1BPV0VSX0FW
+Uz15CkNPTkZJR19IV01PTj15CkNPTkZJR19IV01PTl9WSUQ9eQojIENPTkZJR19IV01PTl9ERUJV
+R19DSElQIGlzIG5vdCBzZXQKCiMKIyBOYXRpdmUgZHJpdmVycwojCiMgQ09ORklHX1NFTlNPUlNf
+QUQ3NDE0IGlzIG5vdCBzZXQKIyBDT05GSUdfU0VOU09SU19BRDc0MTggaXMgbm90IHNldApDT05G
+SUdfU0VOU09SU19BRE0xMDIxPXkKIyBDT05GSUdfU0VOU09SU19BRE0xMDI1IGlzIG5vdCBzZXQK
+Q09ORklHX1NFTlNPUlNfQURNMTAyNj15CkNPTkZJR19TRU5TT1JTX0FETTEwMjk9eQojIENPTkZJ
+R19TRU5TT1JTX0FETTEwMzEgaXMgbm90IHNldApDT05GSUdfU0VOU09SU19BRE05MjQwPXkKQ09O
+RklHX1NFTlNPUlNfQURUN1gxMD15CkNPTkZJR19TRU5TT1JTX0FEVDc0MTA9eQpDT05GSUdfU0VO
+U09SU19BRFQ3NDExPXkKIyBDT05GSUdfU0VOU09SU19BRFQ3NDYyIGlzIG5vdCBzZXQKQ09ORklH
+X1NFTlNPUlNfQURUNzQ3MD15CkNPTkZJR19TRU5TT1JTX0FEVDc0NzU9eQpDT05GSUdfU0VOU09S
+U19BU0M3NjIxPXkKQ09ORklHX1NFTlNPUlNfSzhURU1QPXkKQ09ORklHX1NFTlNPUlNfSzEwVEVN
+UD15CiMgQ09ORklHX1NFTlNPUlNfRkFNMTVIX1BPV0VSIGlzIG5vdCBzZXQKQ09ORklHX1NFTlNP
+UlNfQVNCMTAwPXkKQ09ORklHX1NFTlNPUlNfQVRYUDE9eQpDT05GSUdfU0VOU09SU19EUzYyMD15
+CkNPTkZJR19TRU5TT1JTX0RTMTYyMT15CkNPTkZJR19TRU5TT1JTX0RBOTA1Ml9BREM9eQpDT05G
+SUdfU0VOU09SU19JNUtfQU1CPXkKIyBDT05GSUdfU0VOU09SU19GNzE4MDVGIGlzIG5vdCBzZXQK
+IyBDT05GSUdfU0VOU09SU19GNzE4ODJGRyBpcyBub3Qgc2V0CkNPTkZJR19TRU5TT1JTX0Y3NTM3
+NVM9eQpDT05GSUdfU0VOU09SU19GU0NITUQ9eQpDT05GSUdfU0VOU09SU19HNzYwQT15CkNPTkZJ
+R19TRU5TT1JTX0c3NjI9eQojIENPTkZJR19TRU5TT1JTX0dMNTE4U00gaXMgbm90IHNldAojIENP
+TkZJR19TRU5TT1JTX0dMNTIwU00gaXMgbm90IHNldAojIENPTkZJR19TRU5TT1JTX0dQSU9fRkFO
+IGlzIG5vdCBzZXQKQ09ORklHX1NFTlNPUlNfSElINjEzMD15CkNPTkZJR19TRU5TT1JTX0hUVTIx
+PXkKQ09ORklHX1NFTlNPUlNfQ09SRVRFTVA9eQojIENPTkZJR19TRU5TT1JTX0lCTUFFTSBpcyBu
+b3Qgc2V0CkNPTkZJR19TRU5TT1JTX0lCTVBFWD15CiMgQ09ORklHX1NFTlNPUlNfSVQ4NyBpcyBu
+b3Qgc2V0CkNPTkZJR19TRU5TT1JTX0pDNDI9eQojIENPTkZJR19TRU5TT1JTX0xJTkVBR0UgaXMg
+bm90IHNldApDT05GSUdfU0VOU09SU19MTTYzPXkKIyBDT05GSUdfU0VOU09SU19MTTczIGlzIG5v
+dCBzZXQKQ09ORklHX1NFTlNPUlNfTE03NT15CkNPTkZJR19TRU5TT1JTX0xNNzc9eQojIENPTkZJ
+R19TRU5TT1JTX0xNNzggaXMgbm90IHNldAojIENPTkZJR19TRU5TT1JTX0xNODAgaXMgbm90IHNl
+dApDT05GSUdfU0VOU09SU19MTTgzPXkKQ09ORklHX1NFTlNPUlNfTE04NT15CkNPTkZJR19TRU5T
+T1JTX0xNODc9eQpDT05GSUdfU0VOU09SU19MTTkwPXkKIyBDT05GSUdfU0VOU09SU19MTTkyIGlz
+IG5vdCBzZXQKQ09ORklHX1NFTlNPUlNfTE05Mz15CkNPTkZJR19TRU5TT1JTX0xUQzQxNTE9eQoj
+IENPTkZJR19TRU5TT1JTX0xUQzQyMTUgaXMgbm90IHNldApDT05GSUdfU0VOU09SU19MVEM0MjQ1
+PXkKIyBDT05GSUdfU0VOU09SU19MVEM0MjYxIGlzIG5vdCBzZXQKIyBDT05GSUdfU0VOU09SU19M
+TTk1MjM0IGlzIG5vdCBzZXQKIyBDT05GSUdfU0VOU09SU19MTTk1MjQxIGlzIG5vdCBzZXQKIyBD
+T05GSUdfU0VOU09SU19MTTk1MjQ1IGlzIG5vdCBzZXQKQ09ORklHX1NFTlNPUlNfTUFYMTYwNjU9
+eQojIENPTkZJR19TRU5TT1JTX01BWDE2MTkgaXMgbm90IHNldApDT05GSUdfU0VOU09SU19NQVgx
+NjY4PXkKIyBDT05GSUdfU0VOU09SU19NQVgxOTcgaXMgbm90IHNldAojIENPTkZJR19TRU5TT1JT
+X01BWDY2MzkgaXMgbm90IHNldAojIENPTkZJR19TRU5TT1JTX01BWDY2NDIgaXMgbm90IHNldApD
+T05GSUdfU0VOU09SU19NQVg2NjUwPXkKIyBDT05GSUdfU0VOU09SU19NQVg2Njk3IGlzIG5vdCBz
+ZXQKQ09ORklHX1NFTlNPUlNfTUNQMzAyMT15CkNPTkZJR19TRU5TT1JTX05DVDY3NzU9eQpDT05G
+SUdfU0VOU09SU19QQzg3MzYwPXkKQ09ORklHX1NFTlNPUlNfUEM4NzQyNz15CkNPTkZJR19TRU5T
+T1JTX1BDRjg1OTE9eQpDT05GSUdfUE1CVVM9eQpDT05GSUdfU0VOU09SU19QTUJVUz15CiMgQ09O
+RklHX1NFTlNPUlNfQURNMTI3NSBpcyBub3Qgc2V0CiMgQ09ORklHX1NFTlNPUlNfTE0yNTA2NiBp
+cyBub3Qgc2V0CkNPTkZJR19TRU5TT1JTX0xUQzI5Nzg9eQpDT05GSUdfU0VOU09SU19NQVgxNjA2
+ND15CiMgQ09ORklHX1NFTlNPUlNfTUFYMzQ0NDAgaXMgbm90IHNldAojIENPTkZJR19TRU5TT1JT
+X01BWDg2ODggaXMgbm90IHNldApDT05GSUdfU0VOU09SU19VQ0Q5MDAwPXkKIyBDT05GSUdfU0VO
+U09SU19VQ0Q5MjAwIGlzIG5vdCBzZXQKIyBDT05GSUdfU0VOU09SU19aTDYxMDAgaXMgbm90IHNl
+dAojIENPTkZJR19TRU5TT1JTX1NIVDE1IGlzIG5vdCBzZXQKQ09ORklHX1NFTlNPUlNfU0hUMjE9
+eQpDT05GSUdfU0VOU09SU19TSVM1NTk1PXkKQ09ORklHX1NFTlNPUlNfU01NNjY1PXkKQ09ORklH
+X1NFTlNPUlNfRE1FMTczNz15CiMgQ09ORklHX1NFTlNPUlNfRU1DMTQwMyBpcyBub3Qgc2V0CiMg
+Q09ORklHX1NFTlNPUlNfRU1DMjEwMyBpcyBub3Qgc2V0CkNPTkZJR19TRU5TT1JTX0VNQzZXMjAx
+PXkKQ09ORklHX1NFTlNPUlNfU01TQzQ3TTE9eQpDT05GSUdfU0VOU09SU19TTVNDNDdNMTkyPXkK
+Q09ORklHX1NFTlNPUlNfU01TQzQ3QjM5Nz15CiMgQ09ORklHX1NFTlNPUlNfU0NINTZYWF9DT01N
+T04gaXMgbm90IHNldApDT05GSUdfU0VOU09SU19BRFMxMDE1PXkKQ09ORklHX1NFTlNPUlNfQURT
+NzgyOD15CkNPTkZJR19TRU5TT1JTX0FNQzY4MjE9eQpDT05GSUdfU0VOU09SU19JTkEyMDk9eQpD
+T05GSUdfU0VOU09SU19JTkEyWFg9eQpDT05GSUdfU0VOU09SU19USE1DNTA9eQpDT05GSUdfU0VO
+U09SU19UTVAxMDI9eQpDT05GSUdfU0VOU09SU19UTVA0MDE9eQojIENPTkZJR19TRU5TT1JTX1RN
+UDQyMSBpcyBub3Qgc2V0CkNPTkZJR19TRU5TT1JTX1RXTDQwMzBfTUFEQz15CkNPTkZJR19TRU5T
+T1JTX1ZJQV9DUFVURU1QPXkKIyBDT05GSUdfU0VOU09SU19WSUE2ODZBIGlzIG5vdCBzZXQKQ09O
+RklHX1NFTlNPUlNfVlQxMjExPXkKQ09ORklHX1NFTlNPUlNfVlQ4MjMxPXkKQ09ORklHX1NFTlNP
+UlNfVzgzNzgxRD15CkNPTkZJR19TRU5TT1JTX1c4Mzc5MUQ9eQojIENPTkZJR19TRU5TT1JTX1c4
+Mzc5MkQgaXMgbm90IHNldAojIENPTkZJR19TRU5TT1JTX1c4Mzc5MyBpcyBub3Qgc2V0CkNPTkZJ
+R19TRU5TT1JTX1c4Mzc5NT15CkNPTkZJR19TRU5TT1JTX1c4Mzc5NV9GQU5DVFJMPXkKQ09ORklH
+X1NFTlNPUlNfVzgzTDc4NVRTPXkKIyBDT05GSUdfU0VOU09SU19XODNMNzg2TkcgaXMgbm90IHNl
+dApDT05GSUdfU0VOU09SU19XODM2MjdIRj15CkNPTkZJR19TRU5TT1JTX1c4MzYyN0VIRj15CkNP
+TkZJR19TRU5TT1JTX1dNODM1MD15CkNPTkZJR19TRU5TT1JTX0FQUExFU01DPXkKCiMKIyBBQ1BJ
+IGRyaXZlcnMKIwpDT05GSUdfU0VOU09SU19BQ1BJX1BPV0VSPXkKIyBDT05GSUdfU0VOU09SU19B
+VEswMTEwIGlzIG5vdCBzZXQKQ09ORklHX1RIRVJNQUw9eQojIENPTkZJR19USEVSTUFMX0hXTU9O
+IGlzIG5vdCBzZXQKQ09ORklHX1RIRVJNQUxfREVGQVVMVF9HT1ZfU1RFUF9XSVNFPXkKIyBDT05G
+SUdfVEhFUk1BTF9ERUZBVUxUX0dPVl9GQUlSX1NIQVJFIGlzIG5vdCBzZXQKIyBDT05GSUdfVEhF
+Uk1BTF9ERUZBVUxUX0dPVl9VU0VSX1NQQUNFIGlzIG5vdCBzZXQKIyBDT05GSUdfVEhFUk1BTF9H
+T1ZfRkFJUl9TSEFSRSBpcyBub3Qgc2V0CkNPTkZJR19USEVSTUFMX0dPVl9TVEVQX1dJU0U9eQpD
+T05GSUdfVEhFUk1BTF9HT1ZfVVNFUl9TUEFDRT15CkNPTkZJR19USEVSTUFMX0VNVUxBVElPTj15
+CkNPTkZJR19JTlRFTF9QT1dFUkNMQU1QPXkKCiMKIyBUZXhhcyBJbnN0cnVtZW50cyB0aGVybWFs
+IGRyaXZlcnMKIwojIENPTkZJR19XQVRDSERPRyBpcyBub3Qgc2V0CkNPTkZJR19TU0JfUE9TU0lC
+TEU9eQoKIwojIFNvbmljcyBTaWxpY29uIEJhY2twbGFuZQojCiMgQ09ORklHX1NTQiBpcyBub3Qg
+c2V0CkNPTkZJR19CQ01BX1BPU1NJQkxFPXkKCiMKIyBCcm9hZGNvbSBzcGVjaWZpYyBBTUJBCiMK
+Q09ORklHX0JDTUE9eQpDT05GSUdfQkNNQV9IT1NUX1BDSV9QT1NTSUJMRT15CiMgQ09ORklHX0JD
+TUFfSE9TVF9QQ0kgaXMgbm90IHNldAojIENPTkZJR19CQ01BX0hPU1RfU09DIGlzIG5vdCBzZXQK
+Q09ORklHX0JDTUFfRFJJVkVSX0dNQUNfQ01OPXkKIyBDT05GSUdfQkNNQV9EUklWRVJfR1BJTyBp
+cyBub3Qgc2V0CkNPTkZJR19CQ01BX0RFQlVHPXkKCiMKIyBNdWx0aWZ1bmN0aW9uIGRldmljZSBk
+cml2ZXJzCiMKQ09ORklHX01GRF9DT1JFPXkKQ09ORklHX01GRF9DUzU1MzU9eQojIENPTkZJR19N
+RkRfQVMzNzExIGlzIG5vdCBzZXQKIyBDT05GSUdfUE1JQ19BRFA1NTIwIGlzIG5vdCBzZXQKQ09O
+RklHX01GRF9BQVQyODcwX0NPUkU9eQpDT05GSUdfTUZEX0NST1NfRUM9eQpDT05GSUdfTUZEX0NS
+T1NfRUNfSTJDPXkKIyBDT05GSUdfUE1JQ19EQTkwM1ggaXMgbm90IHNldApDT05GSUdfUE1JQ19E
+QTkwNTI9eQpDT05GSUdfTUZEX0RBOTA1Ml9JMkM9eQojIENPTkZJR19NRkRfREE5MDU1IGlzIG5v
+dCBzZXQKIyBDT05GSUdfTUZEX0RBOTA2MyBpcyBub3Qgc2V0CiMgQ09ORklHX01GRF9NQzEzWFhY
+X0kyQyBpcyBub3Qgc2V0CkNPTkZJR19IVENfUEFTSUMzPXkKIyBDT05GSUdfSFRDX0kyQ1BMRCBp
+cyBub3Qgc2V0CkNPTkZJR19MUENfSUNIPXkKQ09ORklHX0xQQ19TQ0g9eQpDT05GSUdfTUZEX0pB
+TlpfQ01PRElPPXkKIyBDT05GSUdfTUZEX0tFTVBMRCBpcyBub3Qgc2V0CiMgQ09ORklHX01GRF84
+OFBNODAwIGlzIG5vdCBzZXQKQ09ORklHX01GRF84OFBNODA1PXkKIyBDT05GSUdfTUZEXzg4UE04
+NjBYIGlzIG5vdCBzZXQKIyBDT05GSUdfTUZEX01BWDc3Njg2IGlzIG5vdCBzZXQKQ09ORklHX01G
+RF9NQVg3NzY5Mz15CkNPTkZJR19NRkRfTUFYODkwNz15CiMgQ09ORklHX01GRF9NQVg4OTI1IGlz
+IG5vdCBzZXQKQ09ORklHX01GRF9NQVg4OTk3PXkKIyBDT05GSUdfTUZEX01BWDg5OTggaXMgbm90
+IHNldApDT05GSUdfTUZEX1JFVFU9eQpDT05GSUdfTUZEX1BDRjUwNjMzPXkKQ09ORklHX1BDRjUw
+NjMzX0FEQz15CkNPTkZJR19QQ0Y1MDYzM19HUElPPXkKIyBDT05GSUdfVUNCMTQwMF9DT1JFIGlz
+IG5vdCBzZXQKQ09ORklHX01GRF9SREMzMjFYPXkKQ09ORklHX01GRF9SVFNYX1BDST15CkNPTkZJ
+R19NRkRfUkM1VDU4Mz15CiMgQ09ORklHX01GRF9TRUNfQ09SRSBpcyBub3Qgc2V0CkNPTkZJR19N
+RkRfU0k0NzZYX0NPUkU9eQpDT05GSUdfTUZEX1NNNTAxPXkKQ09ORklHX01GRF9TTTUwMV9HUElP
+PXkKIyBDT05GSUdfTUZEX1NNU0MgaXMgbm90IHNldApDT05GSUdfQUJYNTAwX0NPUkU9eQpDT05G
+SUdfQUIzMTAwX0NPUkU9eQpDT05GSUdfQUIzMTAwX09UUD15CkNPTkZJR19NRkRfU1RNUEU9eQoK
+IwojIFNUTWljcm9lbGVjdHJvbmljcyBTVE1QRSBJbnRlcmZhY2UgRHJpdmVycwojCkNPTkZJR19T
+VE1QRV9JMkM9eQpDT05GSUdfTUZEX1NZU0NPTj15CiMgQ09ORklHX01GRF9USV9BTTMzNVhfVFND
+QURDIGlzIG5vdCBzZXQKIyBDT05GSUdfTUZEX0xQODc4OCBpcyBub3Qgc2V0CkNPTkZJR19NRkRf
+UEFMTUFTPXkKQ09ORklHX1RQUzYxMDVYPXkKIyBDT05GSUdfVFBTNjUwMTAgaXMgbm90IHNldApD
+T05GSUdfVFBTNjUwN1g9eQojIENPTkZJR19NRkRfVFBTNjUwOTAgaXMgbm90IHNldAojIENPTkZJ
+R19NRkRfVFBTNjUyMTcgaXMgbm90IHNldAojIENPTkZJR19NRkRfVFBTNjU4NlggaXMgbm90IHNl
+dApDT05GSUdfTUZEX1RQUzY1OTEwPXkKQ09ORklHX01GRF9UUFM2NTkxMj15CkNPTkZJR19NRkRf
+VFBTNjU5MTJfSTJDPXkKIyBDT05GSUdfTUZEX1RQUzgwMDMxIGlzIG5vdCBzZXQKQ09ORklHX1RX
+TDQwMzBfQ09SRT15CkNPTkZJR19UV0w0MDMwX01BREM9eQojIENPTkZJR19NRkRfVFdMNDAzMF9B
+VURJTyBpcyBub3Qgc2V0CkNPTkZJR19UV0w2MDQwX0NPUkU9eQpDT05GSUdfTUZEX1dMMTI3M19D
+T1JFPXkKQ09ORklHX01GRF9MTTM1MzM9eQpDT05GSUdfTUZEX1RJTUJFUkRBTEU9eQojIENPTkZJ
+R19NRkRfVEMzNTg5WCBpcyBub3Qgc2V0CiMgQ09ORklHX01GRF9UTUlPIGlzIG5vdCBzZXQKIyBD
+T05GSUdfTUZEX1ZYODU1IGlzIG5vdCBzZXQKQ09ORklHX01GRF9BUklaT05BPXkKQ09ORklHX01G
+RF9BUklaT05BX0kyQz15CiMgQ09ORklHX01GRF9XTTUxMDIgaXMgbm90IHNldApDT05GSUdfTUZE
+X1dNNTExMD15CiMgQ09ORklHX01GRF9XTTg5OTcgaXMgbm90IHNldApDT05GSUdfTUZEX1dNODQw
+MD15CiMgQ09ORklHX01GRF9XTTgzMVhfSTJDIGlzIG5vdCBzZXQKQ09ORklHX01GRF9XTTgzNTA9
+eQpDT05GSUdfTUZEX1dNODM1MF9JMkM9eQpDT05GSUdfTUZEX1dNODk5ND15CkNPTkZJR19SRUdV
+TEFUT1I9eQpDT05GSUdfUkVHVUxBVE9SX0RFQlVHPXkKQ09ORklHX1JFR1VMQVRPUl9GSVhFRF9W
+T0xUQUdFPXkKQ09ORklHX1JFR1VMQVRPUl9WSVJUVUFMX0NPTlNVTUVSPXkKQ09ORklHX1JFR1VM
+QVRPUl9VU0VSU1BBQ0VfQ09OU1VNRVI9eQojIENPTkZJR19SRUdVTEFUT1JfQUQ1Mzk4IGlzIG5v
+dCBzZXQKIyBDT05GSUdfUkVHVUxBVE9SX0FOQVRPUCBpcyBub3Qgc2V0CkNPTkZJR19SRUdVTEFU
+T1JfQUFUMjg3MD15CiMgQ09ORklHX1JFR1VMQVRPUl9BQjMxMDAgaXMgbm90IHNldAojIENPTkZJ
+R19SRUdVTEFUT1JfREE5MDUyIGlzIG5vdCBzZXQKQ09ORklHX1JFR1VMQVRPUl9EQTkyMTA9eQoj
+IENPTkZJR19SRUdVTEFUT1JfRkFONTM1NTUgaXMgbm90IHNldAojIENPTkZJR19SRUdVTEFUT1Jf
+R1BJTyBpcyBub3Qgc2V0CkNPTkZJR19SRUdVTEFUT1JfSVNMNjI3MUE9eQpDT05GSUdfUkVHVUxB
+VE9SX0xQMzk3MT15CkNPTkZJR19SRUdVTEFUT1JfTFAzOTcyPXkKIyBDT05GSUdfUkVHVUxBVE9S
+X0xQODcyWCBpcyBub3Qgc2V0CkNPTkZJR19SRUdVTEFUT1JfTFA4NzU1PXkKQ09ORklHX1JFR1VM
+QVRPUl9NQVgxNTg2PXkKQ09ORklHX1JFR1VMQVRPUl9NQVg4NjQ5PXkKQ09ORklHX1JFR1VMQVRP
+Ul9NQVg4NjYwPXkKQ09ORklHX1JFR1VMQVRPUl9NQVg4OTA3PXkKQ09ORklHX1JFR1VMQVRPUl9N
+QVg4OTUyPXkKQ09ORklHX1JFR1VMQVRPUl9NQVg4OTczPXkKIyBDT05GSUdfUkVHVUxBVE9SX01B
+WDg5OTcgaXMgbm90IHNldApDT05GSUdfUkVHVUxBVE9SX01BWDc3NjkzPXkKQ09ORklHX1JFR1VM
+QVRPUl9QQUxNQVM9eQpDT05GSUdfUkVHVUxBVE9SX1BDRjUwNjMzPXkKQ09ORklHX1JFR1VMQVRP
+Ul9QRlVaRTEwMD15CiMgQ09ORklHX1JFR1VMQVRPUl9SQzVUNTgzIGlzIG5vdCBzZXQKQ09ORklH
+X1JFR1VMQVRPUl9UUFM1MTYzMj15CkNPTkZJR19SRUdVTEFUT1JfVFBTNjEwNVg9eQpDT05GSUdf
+UkVHVUxBVE9SX1RQUzYyMzYwPXkKQ09ORklHX1JFR1VMQVRPUl9UUFM2NTAyMz15CkNPTkZJR19S
+RUdVTEFUT1JfVFBTNjUwN1g9eQojIENPTkZJR19SRUdVTEFUT1JfVFBTNjU5MTAgaXMgbm90IHNl
+dApDT05GSUdfUkVHVUxBVE9SX1RQUzY1OTEyPXkKQ09ORklHX1JFR1VMQVRPUl9UV0w0MDMwPXkK
+IyBDT05GSUdfUkVHVUxBVE9SX1dNODM1MCBpcyBub3Qgc2V0CiMgQ09ORklHX1JFR1VMQVRPUl9X
+TTg0MDAgaXMgbm90IHNldApDT05GSUdfUkVHVUxBVE9SX1dNODk5ND15CkNPTkZJR19NRURJQV9T
+VVBQT1JUPXkKCiMKIyBNdWx0aW1lZGlhIGNvcmUgc3VwcG9ydAojCkNPTkZJR19NRURJQV9DQU1F
+UkFfU1VQUE9SVD15CiMgQ09ORklHX01FRElBX0FOQUxPR19UVl9TVVBQT1JUIGlzIG5vdCBzZXQK
+IyBDT05GSUdfTUVESUFfRElHSVRBTF9UVl9TVVBQT1JUIGlzIG5vdCBzZXQKQ09ORklHX01FRElB
+X1JBRElPX1NVUFBPUlQ9eQojIENPTkZJR19NRURJQV9SQ19TVVBQT1JUIGlzIG5vdCBzZXQKQ09O
+RklHX01FRElBX0NPTlRST0xMRVI9eQpDT05GSUdfVklERU9fREVWPXkKQ09ORklHX1ZJREVPX1Y0
+TDJfU1VCREVWX0FQST15CkNPTkZJR19WSURFT19WNEwyPXkKQ09ORklHX1ZJREVPX0FEVl9ERUJV
+Rz15CkNPTkZJR19WSURFT19GSVhFRF9NSU5PUl9SQU5HRVM9eQojIENPTkZJR19WSURFT19WNEwy
+X0lOVF9ERVZJQ0UgaXMgbm90IHNldAojIENPTkZJR19UVFBDSV9FRVBST00gaXMgbm90IHNldAoK
+IwojIE1lZGlhIGRyaXZlcnMKIwojIENPTkZJR19NRURJQV9QQ0lfU1VQUE9SVCBpcyBub3Qgc2V0
+CiMgQ09ORklHX1Y0TF9QTEFURk9STV9EUklWRVJTIGlzIG5vdCBzZXQKIyBDT05GSUdfVjRMX01F
+TTJNRU1fRFJJVkVSUyBpcyBub3Qgc2V0CkNPTkZJR19WNExfVEVTVF9EUklWRVJTPXkKIyBDT05G
+SUdfVklERU9fVklWSSBpcyBub3Qgc2V0CiMgQ09ORklHX1ZJREVPX01FTTJNRU1fVEVTVERFViBp
+cyBub3Qgc2V0CgojCiMgU3VwcG9ydGVkIE1NQy9TRElPIGFkYXB0ZXJzCiMKQ09ORklHX01FRElB
+X1BBUlBPUlRfU1VQUE9SVD15CiMgQ09ORklHX1ZJREVPX0JXUUNBTSBpcyBub3Qgc2V0CiMgQ09O
+RklHX1ZJREVPX0NRQ0FNIGlzIG5vdCBzZXQKIyBDT05GSUdfVklERU9fUE1TIGlzIG5vdCBzZXQK
+IyBDT05GSUdfUkFESU9fQURBUFRFUlMgaXMgbm90IHNldAoKIwojIE1lZGlhIGFuY2lsbGFyeSBk
+cml2ZXJzICh0dW5lcnMsIHNlbnNvcnMsIGkyYywgZnJvbnRlbmRzKQojCkNPTkZJR19NRURJQV9T
+VUJEUlZfQVVUT1NFTEVDVD15CgojCiMgQXVkaW8gZGVjb2RlcnMsIHByb2Nlc3NvcnMgYW5kIG1p
+eGVycwojCgojCiMgUkRTIGRlY29kZXJzCiMKCiMKIyBWaWRlbyBkZWNvZGVycwojCgojCiMgVmlk
+ZW8gYW5kIGF1ZGlvIGRlY29kZXJzCiMKCiMKIyBWaWRlbyBlbmNvZGVycwojCgojCiMgQ2FtZXJh
+IHNlbnNvciBkZXZpY2VzCiMKCiMKIyBGbGFzaCBkZXZpY2VzCiMKCiMKIyBWaWRlbyBpbXByb3Zl
+bWVudCBjaGlwcwojCgojCiMgTWlzY2VsYW5lb3VzIGhlbHBlciBjaGlwcwojCgojCiMgU2Vuc29y
+cyB1c2VkIG9uIHNvY19jYW1lcmEgZHJpdmVyCiMKQ09ORklHX01FRElBX1RVTkVSPXkKQ09ORklH
+X01FRElBX1RVTkVSX1NJTVBMRT15CkNPTkZJR19NRURJQV9UVU5FUl9UREE4MjkwPXkKQ09ORklH
+X01FRElBX1RVTkVSX1REQTgyN1g9eQpDT05GSUdfTUVESUFfVFVORVJfVERBMTgyNzE9eQpDT05G
+SUdfTUVESUFfVFVORVJfVERBOTg4Nz15CkNPTkZJR19NRURJQV9UVU5FUl9URUE1NzYxPXkKQ09O
+RklHX01FRElBX1RVTkVSX1RFQTU3Njc9eQpDT05GSUdfTUVESUFfVFVORVJfTVQyMFhYPXkKQ09O
+RklHX01FRElBX1RVTkVSX1hDMjAyOD15CkNPTkZJR19NRURJQV9UVU5FUl9YQzUwMDA9eQpDT05G
+SUdfTUVESUFfVFVORVJfWEM0MDAwPXkKQ09ORklHX01FRElBX1RVTkVSX01DNDRTODAzPXkKCiMK
+IyBUb29scyB0byBkZXZlbG9wIG5ldyBmcm9udGVuZHMKIwojIENPTkZJR19EVkJfRFVNTVlfRkUg
+aXMgbm90IHNldAoKIwojIEdyYXBoaWNzIHN1cHBvcnQKIwpDT05GSUdfQUdQPXkKIyBDT05GSUdf
+QUdQX0FMSSBpcyBub3Qgc2V0CkNPTkZJR19BR1BfQVRJPXkKQ09ORklHX0FHUF9BTUQ9eQojIENP
+TkZJR19BR1BfQU1ENjQgaXMgbm90IHNldAojIENPTkZJR19BR1BfSU5URUwgaXMgbm90IHNldApD
+T05GSUdfQUdQX05WSURJQT15CkNPTkZJR19BR1BfU0lTPXkKQ09ORklHX0FHUF9TV09SS1M9eQpD
+T05GSUdfQUdQX1ZJQT15CkNPTkZJR19BR1BfRUZGSUNFT049eQpDT05GSUdfVkdBX0FSQj15CkNP
+TkZJR19WR0FfQVJCX01BWF9HUFVTPTE2CiMgQ09ORklHX1ZHQV9TV0lUQ0hFUk9PIGlzIG5vdCBz
+ZXQKQ09ORklHX0RSTT15CkNPTkZJR19EUk1fS01TX0hFTFBFUj15CiMgQ09ORklHX0RSTV9MT0FE
+X0VESURfRklSTVdBUkUgaXMgbm90IHNldApDT05GSUdfRFJNX1RUTT15CgojCiMgSTJDIGVuY29k
+ZXIgb3IgaGVscGVyIGNoaXBzCiMKQ09ORklHX0RSTV9JMkNfQ0g3MDA2PXkKIyBDT05GSUdfRFJN
+X0kyQ19TSUwxNjQgaXMgbm90IHNldApDT05GSUdfRFJNX0kyQ19OWFBfVERBOTk4WD15CkNPTkZJ
+R19EUk1fVERGWD15CiMgQ09ORklHX0RSTV9SMTI4IGlzIG5vdCBzZXQKQ09ORklHX0RSTV9SQURF
+T049eQojIENPTkZJR19EUk1fUkFERU9OX1VNUyBpcyBub3Qgc2V0CkNPTkZJR19EUk1fTk9VVkVB
+VT15CkNPTkZJR19OT1VWRUFVX0RFQlVHPTUKQ09ORklHX05PVVZFQVVfREVCVUdfREVGQVVMVD0z
+CiMgQ09ORklHX0RSTV9OT1VWRUFVX0JBQ0tMSUdIVCBpcyBub3Qgc2V0CiMgQ09ORklHX0RSTV9N
+R0EgaXMgbm90IHNldAojIENPTkZJR19EUk1fU0lTIGlzIG5vdCBzZXQKIyBDT05GSUdfRFJNX1ZJ
+QSBpcyBub3Qgc2V0CkNPTkZJR19EUk1fU0FWQUdFPXkKQ09ORklHX0RSTV9WTVdHRlg9eQpDT05G
+SUdfRFJNX1ZNV0dGWF9GQkNPTj15CkNPTkZJR19EUk1fR01BNTAwPXkKQ09ORklHX0RSTV9HTUE2
+MDA9eQojIENPTkZJR19EUk1fR01BMzYwMCBpcyBub3Qgc2V0CkNPTkZJR19EUk1fQVNUPXkKQ09O
+RklHX0RSTV9NR0FHMjAwPXkKIyBDT05GSUdfRFJNX0NJUlJVU19RRU1VIGlzIG5vdCBzZXQKQ09O
+RklHX0RSTV9RWEw9eQpDT05GSUdfVkdBU1RBVEU9eQpDT05GSUdfVklERU9fT1VUUFVUX0NPTlRS
+T0w9eQpDT05GSUdfSERNST15CkNPTkZJR19GQj15CiMgQ09ORklHX0ZJUk1XQVJFX0VESUQgaXMg
+bm90IHNldApDT05GSUdfRkJfRERDPXkKQ09ORklHX0ZCX0JPT1RfVkVTQV9TVVBQT1JUPXkKQ09O
+RklHX0ZCX0NGQl9GSUxMUkVDVD15CkNPTkZJR19GQl9DRkJfQ09QWUFSRUE9eQpDT05GSUdfRkJf
+Q0ZCX0lNQUdFQkxJVD15CiMgQ09ORklHX0ZCX0NGQl9SRVZfUElYRUxTX0lOX0JZVEUgaXMgbm90
+IHNldApDT05GSUdfRkJfU1lTX0ZJTExSRUNUPXkKQ09ORklHX0ZCX1NZU19DT1BZQVJFQT15CkNP
+TkZJR19GQl9TWVNfSU1BR0VCTElUPXkKIyBDT05GSUdfRkJfRk9SRUlHTl9FTkRJQU4gaXMgbm90
+IHNldApDT05GSUdfRkJfU1lTX0ZPUFM9eQpDT05GSUdfRkJfREVGRVJSRURfSU89eQpDT05GSUdf
+RkJfSEVDVUJBPXkKQ09ORklHX0ZCX1NWR0FMSUI9eQojIENPTkZJR19GQl9NQUNNT0RFUyBpcyBu
+b3Qgc2V0CkNPTkZJR19GQl9CQUNLTElHSFQ9eQpDT05GSUdfRkJfTU9ERV9IRUxQRVJTPXkKQ09O
+RklHX0ZCX1RJTEVCTElUVElORz15CgojCiMgRnJhbWUgYnVmZmVyIGhhcmR3YXJlIGRyaXZlcnMK
+IwojIENPTkZJR19GQl9DSVJSVVMgaXMgbm90IHNldAojIENPTkZJR19GQl9QTTIgaXMgbm90IHNl
+dApDT05GSUdfRkJfQ1lCRVIyMDAwPXkKQ09ORklHX0ZCX0NZQkVSMjAwMF9EREM9eQpDT05GSUdf
+RkJfQVJDPXkKQ09ORklHX0ZCX0FTSUxJQU5UPXkKIyBDT05GSUdfRkJfSU1TVFQgaXMgbm90IHNl
+dAojIENPTkZJR19GQl9WR0ExNiBpcyBub3Qgc2V0CkNPTkZJR19GQl9WRVNBPXkKIyBDT05GSUdf
+RkJfRUZJIGlzIG5vdCBzZXQKQ09ORklHX0ZCX040MTE9eQpDT05GSUdfRkJfSEdBPXkKQ09ORklH
+X0ZCX1MxRDEzWFhYPXkKIyBDT05GSUdfRkJfTlZJRElBIGlzIG5vdCBzZXQKQ09ORklHX0ZCX1JJ
+VkE9eQpDT05GSUdfRkJfUklWQV9JMkM9eQojIENPTkZJR19GQl9SSVZBX0RFQlVHIGlzIG5vdCBz
+ZXQKIyBDT05GSUdfRkJfUklWQV9CQUNLTElHSFQgaXMgbm90IHNldAojIENPTkZJR19GQl9JNzQw
+IGlzIG5vdCBzZXQKQ09ORklHX0ZCX0xFODA1Nzg9eQpDT05GSUdfRkJfQ0FSSUxMT19SQU5DSD15
+CiMgQ09ORklHX0ZCX01BVFJPWCBpcyBub3Qgc2V0CkNPTkZJR19GQl9SQURFT049eQojIENPTkZJ
+R19GQl9SQURFT05fSTJDIGlzIG5vdCBzZXQKIyBDT05GSUdfRkJfUkFERU9OX0JBQ0tMSUdIVCBp
+cyBub3Qgc2V0CkNPTkZJR19GQl9SQURFT05fREVCVUc9eQpDT05GSUdfRkJfQVRZMTI4PXkKIyBD
+T05GSUdfRkJfQVRZMTI4X0JBQ0tMSUdIVCBpcyBub3Qgc2V0CkNPTkZJR19GQl9BVFk9eQojIENP
+TkZJR19GQl9BVFlfQ1QgaXMgbm90IHNldAojIENPTkZJR19GQl9BVFlfR1ggaXMgbm90IHNldApD
+T05GSUdfRkJfQVRZX0JBQ0tMSUdIVD15CkNPTkZJR19GQl9TMz15CkNPTkZJR19GQl9TM19EREM9
+eQojIENPTkZJR19GQl9TQVZBR0UgaXMgbm90IHNldAojIENPTkZJR19GQl9TSVMgaXMgbm90IHNl
+dAojIENPTkZJR19GQl9WSUEgaXMgbm90IHNldApDT05GSUdfRkJfTkVPTUFHSUM9eQpDT05GSUdf
+RkJfS1lSTz15CiMgQ09ORklHX0ZCXzNERlggaXMgbm90IHNldAojIENPTkZJR19GQl9WT09ET08x
+IGlzIG5vdCBzZXQKIyBDT05GSUdfRkJfVlQ4NjIzIGlzIG5vdCBzZXQKIyBDT05GSUdfRkJfVFJJ
+REVOVCBpcyBub3Qgc2V0CkNPTkZJR19GQl9BUks9eQojIENPTkZJR19GQl9QTTMgaXMgbm90IHNl
+dAojIENPTkZJR19GQl9DQVJNSU5FIGlzIG5vdCBzZXQKQ09ORklHX0ZCX0dFT0RFPXkKIyBDT05G
+SUdfRkJfR0VPREVfTFggaXMgbm90IHNldApDT05GSUdfRkJfR0VPREVfR1g9eQojIENPTkZJR19G
+Ql9HRU9ERV9HWDEgaXMgbm90IHNldAojIENPTkZJR19GQl9UTUlPIGlzIG5vdCBzZXQKIyBDT05G
+SUdfRkJfU001MDEgaXMgbm90IHNldAojIENPTkZJR19GQl9HT0xERklTSCBpcyBub3Qgc2V0CkNP
+TkZJR19GQl9WSVJUVUFMPXkKQ09ORklHX0ZCX01FVFJPTk9NRT15CkNPTkZJR19GQl9NQjg2MlhY
+PXkKQ09ORklHX0ZCX01CODYyWFhfUENJX0dEQz15CiMgQ09ORklHX0ZCX01CODYyWFhfSTJDIGlz
+IG5vdCBzZXQKQ09ORklHX0ZCX0JST0FEU0hFRVQ9eQpDT05GSUdfRkJfQVVPX0sxOTBYPXkKQ09O
+RklHX0ZCX0FVT19LMTkwMD15CiMgQ09ORklHX0ZCX0FVT19LMTkwMSBpcyBub3Qgc2V0CkNPTkZJ
+R19GQl9TSU1QTEU9eQojIENPTkZJR19FWFlOT1NfVklERU8gaXMgbm90IHNldApDT05GSUdfQkFD
+S0xJR0hUX0xDRF9TVVBQT1JUPXkKQ09ORklHX0xDRF9DTEFTU19ERVZJQ0U9eQpDT05GSUdfTENE
+X1BMQVRGT1JNPXkKQ09ORklHX0JBQ0tMSUdIVF9DTEFTU19ERVZJQ0U9eQojIENPTkZJR19CQUNL
+TElHSFRfR0VORVJJQyBpcyBub3Qgc2V0CkNPTkZJR19CQUNLTElHSFRfTE0zNTMzPXkKIyBDT05G
+SUdfQkFDS0xJR0hUX0NBUklMTE9fUkFOQ0ggaXMgbm90IHNldApDT05GSUdfQkFDS0xJR0hUX1BX
+TT15CiMgQ09ORklHX0JBQ0tMSUdIVF9EQTkwNTIgaXMgbm90IHNldApDT05GSUdfQkFDS0xJR0hU
+X0FQUExFPXkKQ09ORklHX0JBQ0tMSUdIVF9TQUhBUkE9eQpDT05GSUdfQkFDS0xJR0hUX0FEUDg4
+NjA9eQpDT05GSUdfQkFDS0xJR0hUX0FEUDg4NzA9eQpDT05GSUdfQkFDS0xJR0hUX1BDRjUwNjMz
+PXkKQ09ORklHX0JBQ0tMSUdIVF9BQVQyODcwPXkKQ09ORklHX0JBQ0tMSUdIVF9MTTM2MzA9eQoj
+IENPTkZJR19CQUNLTElHSFRfTE0zNjM5IGlzIG5vdCBzZXQKIyBDT05GSUdfQkFDS0xJR0hUX0xQ
+ODU1WCBpcyBub3Qgc2V0CkNPTkZJR19CQUNLTElHSFRfT1QyMDA9eQojIENPTkZJR19CQUNLTElH
+SFRfUEFORE9SQSBpcyBub3Qgc2V0CiMgQ09ORklHX0JBQ0tMSUdIVF9HUElPIGlzIG5vdCBzZXQK
+IyBDT05GSUdfQkFDS0xJR0hUX0xWNTIwN0xQIGlzIG5vdCBzZXQKIyBDT05GSUdfQkFDS0xJR0hU
+X0JENjEwNyBpcyBub3Qgc2V0CiMgQ09ORklHX0xPR08gaXMgbm90IHNldApDT05GSUdfRkJfU1NE
+MTMwNz15CkNPTkZJR19TT1VORD15CkNPTkZJR19TT1VORF9PU1NfQ09SRT15CkNPTkZJR19TT1VO
+RF9PU1NfQ09SRV9QUkVDTEFJTT15CkNPTkZJR19TTkQ9eQpDT05GSUdfU05EX1RJTUVSPXkKQ09O
+RklHX1NORF9QQ009eQpDT05GSUdfU05EX0hXREVQPXkKQ09ORklHX1NORF9SQVdNSURJPXkKQ09O
+RklHX1NORF9KQUNLPXkKQ09ORklHX1NORF9TRVFVRU5DRVI9eQpDT05GSUdfU05EX1NFUV9EVU1N
+WT15CkNPTkZJR19TTkRfT1NTRU1VTD15CiMgQ09ORklHX1NORF9NSVhFUl9PU1MgaXMgbm90IHNl
+dApDT05GSUdfU05EX1BDTV9PU1M9eQpDT05GSUdfU05EX1BDTV9PU1NfUExVR0lOUz15CiMgQ09O
+RklHX1NORF9TRVFVRU5DRVJfT1NTIGlzIG5vdCBzZXQKQ09ORklHX1NORF9IUlRJTUVSPXkKQ09O
+RklHX1NORF9TRVFfSFJUSU1FUl9ERUZBVUxUPXkKQ09ORklHX1NORF9EWU5BTUlDX01JTk9SUz15
+CkNPTkZJR19TTkRfTUFYX0NBUkRTPTMyCiMgQ09ORklHX1NORF9TVVBQT1JUX09MRF9BUEkgaXMg
+bm90IHNldAojIENPTkZJR19TTkRfVkVSQk9TRV9QUklOVEsgaXMgbm90IHNldApDT05GSUdfU05E
+X0RFQlVHPXkKIyBDT05GSUdfU05EX0RFQlVHX1ZFUkJPU0UgaXMgbm90IHNldApDT05GSUdfU05E
+X1ZNQVNURVI9eQpDT05GSUdfU05EX0tDVExfSkFDSz15CkNPTkZJR19TTkRfRE1BX1NHQlVGPXkK
+Q09ORklHX1NORF9SQVdNSURJX1NFUT15CkNPTkZJR19TTkRfT1BMM19MSUJfU0VRPXkKIyBDT05G
+SUdfU05EX09QTDRfTElCX1NFUSBpcyBub3Qgc2V0CiMgQ09ORklHX1NORF9TQkFXRV9TRVEgaXMg
+bm90IHNldAojIENPTkZJR19TTkRfRU1VMTBLMV9TRVEgaXMgbm90IHNldApDT05GSUdfU05EX01Q
+VTQwMV9VQVJUPXkKQ09ORklHX1NORF9PUEwzX0xJQj15CkNPTkZJR19TTkRfVlhfTElCPXkKQ09O
+RklHX1NORF9BQzk3X0NPREVDPXkKQ09ORklHX1NORF9EUklWRVJTPXkKIyBDT05GSUdfU05EX0RV
+TU1ZIGlzIG5vdCBzZXQKQ09ORklHX1NORF9BTE9PUD15CkNPTkZJR19TTkRfVklSTUlEST15CkNP
+TkZJR19TTkRfTVRQQVY9eQojIENPTkZJR19TTkRfTVRTNjQgaXMgbm90IHNldApDT05GSUdfU05E
+X1NFUklBTF9VMTY1NTA9eQpDT05GSUdfU05EX01QVTQwMT15CkNPTkZJR19TTkRfUE9SVE1BTjJY
+ND15CiMgQ09ORklHX1NORF9BQzk3X1BPV0VSX1NBVkUgaXMgbm90IHNldApDT05GSUdfU05EX1NC
+X0NPTU1PTj15CkNPTkZJR19TTkRfU0IxNl9EU1A9eQojIENPTkZJR19TTkRfSVNBIGlzIG5vdCBz
+ZXQKQ09ORklHX1NORF9QQ0k9eQpDT05GSUdfU05EX0FEMTg4OT15CkNPTkZJR19TTkRfQUxTMzAw
+PXkKIyBDT05GSUdfU05EX0FMUzQwMDAgaXMgbm90IHNldAojIENPTkZJR19TTkRfQUxJNTQ1MSBp
+cyBub3Qgc2V0CiMgQ09ORklHX1NORF9BU0lIUEkgaXMgbm90IHNldAojIENPTkZJR19TTkRfQVRJ
+SVhQIGlzIG5vdCBzZXQKQ09ORklHX1NORF9BVElJWFBfTU9ERU09eQpDT05GSUdfU05EX0FVODgx
+MD15CiMgQ09ORklHX1NORF9BVTg4MjAgaXMgbm90IHNldAojIENPTkZJR19TTkRfQVU4ODMwIGlz
+IG5vdCBzZXQKQ09ORklHX1NORF9BVzI9eQpDT05GSUdfU05EX0FaVDMzMjg9eQojIENPTkZJR19T
+TkRfQlQ4N1ggaXMgbm90IHNldApDT05GSUdfU05EX0NBMDEwNj15CiMgQ09ORklHX1NORF9DTUlQ
+Q0kgaXMgbm90IHNldApDT05GSUdfU05EX09YWUdFTl9MSUI9eQpDT05GSUdfU05EX09YWUdFTj15
+CiMgQ09ORklHX1NORF9DUzQyODEgaXMgbm90IHNldApDT05GSUdfU05EX0NTNDZYWD15CkNPTkZJ
+R19TTkRfQ1M0NlhYX05FV19EU1A9eQpDT05GSUdfU05EX0NTNTUzMD15CiMgQ09ORklHX1NORF9D
+UzU1MzVBVURJTyBpcyBub3Qgc2V0CiMgQ09ORklHX1NORF9DVFhGSSBpcyBub3Qgc2V0CiMgQ09O
+RklHX1NORF9EQVJMQTIwIGlzIG5vdCBzZXQKIyBDT05GSUdfU05EX0dJTkEyMCBpcyBub3Qgc2V0
+CkNPTkZJR19TTkRfTEFZTEEyMD15CkNPTkZJR19TTkRfREFSTEEyND15CiMgQ09ORklHX1NORF9H
+SU5BMjQgaXMgbm90IHNldApDT05GSUdfU05EX0xBWUxBMjQ9eQpDT05GSUdfU05EX01PTkE9eQoj
+IENPTkZJR19TTkRfTUlBIGlzIG5vdCBzZXQKQ09ORklHX1NORF9FQ0hPM0c9eQpDT05GSUdfU05E
+X0lORElHTz15CkNPTkZJR19TTkRfSU5ESUdPSU89eQojIENPTkZJR19TTkRfSU5ESUdPREogaXMg
+bm90IHNldApDT05GSUdfU05EX0lORElHT0lPWD15CkNPTkZJR19TTkRfSU5ESUdPREpYPXkKIyBD
+T05GSUdfU05EX0VNVTEwSzEgaXMgbm90IHNldApDT05GSUdfU05EX0VNVTEwSzFYPXkKQ09ORklH
+X1NORF9FTlMxMzcwPXkKQ09ORklHX1NORF9FTlMxMzcxPXkKIyBDT05GSUdfU05EX0VTMTkzOCBp
+cyBub3Qgc2V0CkNPTkZJR19TTkRfRVMxOTY4PXkKQ09ORklHX1NORF9FUzE5NjhfSU5QVVQ9eQoj
+IENPTkZJR19TTkRfRVMxOTY4X1JBRElPIGlzIG5vdCBzZXQKIyBDT05GSUdfU05EX0ZNODAxIGlz
+IG5vdCBzZXQKQ09ORklHX1NORF9IREFfSU5URUw9eQpDT05GSUdfU05EX0hEQV9QUkVBTExPQ19T
+SVpFPTY0CkNPTkZJR19TTkRfSERBX0hXREVQPXkKQ09ORklHX1NORF9IREFfUkVDT05GSUc9eQpD
+T05GSUdfU05EX0hEQV9JTlBVVF9CRUVQPXkKQ09ORklHX1NORF9IREFfSU5QVVRfQkVFUF9NT0RF
+PTEKIyBDT05GSUdfU05EX0hEQV9JTlBVVF9KQUNLIGlzIG5vdCBzZXQKQ09ORklHX1NORF9IREFf
+UEFUQ0hfTE9BREVSPXkKIyBDT05GSUdfU05EX0hEQV9DT0RFQ19SRUFMVEVLIGlzIG5vdCBzZXQK
+IyBDT05GSUdfU05EX0hEQV9DT0RFQ19BTkFMT0cgaXMgbm90IHNldApDT05GSUdfU05EX0hEQV9D
+T0RFQ19TSUdNQVRFTD15CkNPTkZJR19TTkRfSERBX0NPREVDX1ZJQT15CkNPTkZJR19TTkRfSERB
+X0NPREVDX0hETUk9eQojIENPTkZJR19TTkRfSERBX0NPREVDX0NJUlJVUyBpcyBub3Qgc2V0CkNP
+TkZJR19TTkRfSERBX0NPREVDX0NPTkVYQU5UPXkKQ09ORklHX1NORF9IREFfQ09ERUNfQ0EwMTEw
+PXkKIyBDT05GSUdfU05EX0hEQV9DT0RFQ19DQTAxMzIgaXMgbm90IHNldAojIENPTkZJR19TTkRf
+SERBX0NPREVDX0NNRURJQSBpcyBub3Qgc2V0CkNPTkZJR19TTkRfSERBX0NPREVDX1NJMzA1ND15
+CkNPTkZJR19TTkRfSERBX0dFTkVSSUM9eQpDT05GSUdfU05EX0hEQV9QT1dFUl9TQVZFX0RFRkFV
+TFQ9MApDT05GSUdfU05EX0hEU1A9eQoKIwojIERvbid0IGZvcmdldCB0byBhZGQgYnVpbHQtaW4g
+ZmlybXdhcmVzIGZvciBIRFNQIGRyaXZlcgojCiMgQ09ORklHX1NORF9IRFNQTSBpcyBub3Qgc2V0
+CkNPTkZJR19TTkRfSUNFMTcxMj15CkNPTkZJR19TTkRfSUNFMTcyND15CkNPTkZJR19TTkRfSU5U
+RUw4WDA9eQojIENPTkZJR19TTkRfSU5URUw4WDBNIGlzIG5vdCBzZXQKQ09ORklHX1NORF9LT1JH
+MTIxMj15CkNPTkZJR19TTkRfTE9MQT15CiMgQ09ORklHX1NORF9MWDY0NjRFUyBpcyBub3Qgc2V0
+CiMgQ09ORklHX1NORF9NQUVTVFJPMyBpcyBub3Qgc2V0CkNPTkZJR19TTkRfTUlYQVJUPXkKIyBD
+T05GSUdfU05EX05NMjU2IGlzIG5vdCBzZXQKQ09ORklHX1NORF9QQ1hIUj15CkNPTkZJR19TTkRf
+UklQVElERT15CkNPTkZJR19TTkRfUk1FMzI9eQpDT05GSUdfU05EX1JNRTk2PXkKQ09ORklHX1NO
+RF9STUU5NjUyPXkKQ09ORklHX1NORF9TSVM3MDE5PXkKQ09ORklHX1NORF9TT05JQ1ZJQkVTPXkK
+Q09ORklHX1NORF9UUklERU5UPXkKQ09ORklHX1NORF9WSUE4MlhYPXkKQ09ORklHX1NORF9WSUE4
+MlhYX01PREVNPXkKQ09ORklHX1NORF9WSVJUVU9TTz15CiMgQ09ORklHX1NORF9WWDIyMiBpcyBu
+b3Qgc2V0CkNPTkZJR19TTkRfWU1GUENJPXkKQ09ORklHX1NORF9QQ01DSUE9eQpDT05GSUdfU05E
+X1ZYUE9DS0VUPXkKQ09ORklHX1NORF9QREFVRElPQ0Y9eQojIENPTkZJR19TTkRfU09DIGlzIG5v
+dCBzZXQKIyBDT05GSUdfU09VTkRfUFJJTUUgaXMgbm90IHNldApDT05GSUdfQUM5N19CVVM9eQoK
+IwojIEhJRCBzdXBwb3J0CiMKQ09ORklHX0hJRD15CkNPTkZJR19ISURfQkFUVEVSWV9TVFJFTkdU
+SD15CiMgQ09ORklHX0hJRFJBVyBpcyBub3Qgc2V0CkNPTkZJR19VSElEPXkKIyBDT05GSUdfSElE
+X0dFTkVSSUMgaXMgbm90IHNldAoKIwojIFNwZWNpYWwgSElEIGRyaXZlcnMKIwpDT05GSUdfSElE
+X0E0VEVDSD15CkNPTkZJR19ISURfQUNSVVg9eQpDT05GSUdfSElEX0FDUlVYX0ZGPXkKQ09ORklH
+X0hJRF9BUFBMRT15CiMgQ09ORklHX0hJRF9BVVJFQUwgaXMgbm90IHNldApDT05GSUdfSElEX0JF
+TEtJTj15CkNPTkZJR19ISURfQ0hFUlJZPXkKQ09ORklHX0hJRF9DSElDT05ZPXkKQ09ORklHX0hJ
+RF9QUk9ESUtFWVM9eQpDT05GSUdfSElEX0NZUFJFU1M9eQpDT05GSUdfSElEX0RSQUdPTlJJU0U9
+eQpDT05GSUdfRFJBR09OUklTRV9GRj15CkNPTkZJR19ISURfRU1TX0ZGPXkKQ09ORklHX0hJRF9F
+TEVDT009eQpDT05GSUdfSElEX0VaS0VZPXkKQ09ORklHX0hJRF9LRVlUT1VDSD15CiMgQ09ORklH
+X0hJRF9LWUUgaXMgbm90IHNldApDT05GSUdfSElEX1VDTE9HSUM9eQojIENPTkZJR19ISURfV0FM
+VE9QIGlzIG5vdCBzZXQKIyBDT05GSUdfSElEX0dZUkFUSU9OIGlzIG5vdCBzZXQKQ09ORklHX0hJ
+RF9JQ0FERT15CkNPTkZJR19ISURfVFdJTkhBTj15CkNPTkZJR19ISURfS0VOU0lOR1RPTj15CkNP
+TkZJR19ISURfTENQT1dFUj15CkNPTkZJR19ISURfTEVOT1ZPX1RQS0JEPXkKQ09ORklHX0hJRF9M
+T0dJVEVDSD15CkNPTkZJR19ISURfTE9HSVRFQ0hfREo9eQojIENPTkZJR19MT0dJVEVDSF9GRiBp
+cyBub3Qgc2V0CkNPTkZJR19MT0dJUlVNQkxFUEFEMl9GRj15CkNPTkZJR19MT0dJRzk0MF9GRj15
+CiMgQ09ORklHX0xPR0lXSEVFTFNfRkYgaXMgbm90IHNldAojIENPTkZJR19ISURfTUFHSUNNT1VT
+RSBpcyBub3Qgc2V0CkNPTkZJR19ISURfTUlDUk9TT0ZUPXkKQ09ORklHX0hJRF9NT05URVJFWT15
+CiMgQ09ORklHX0hJRF9NVUxUSVRPVUNIIGlzIG5vdCBzZXQKQ09ORklHX0hJRF9PUlRFSz15CkNP
+TkZJR19ISURfUEFOVEhFUkxPUkQ9eQpDT05GSUdfUEFOVEhFUkxPUkRfRkY9eQpDT05GSUdfSElE
+X1BFVEFMWU5YPXkKIyBDT05GSUdfSElEX1BJQ09MQ0QgaXMgbm90IHNldAojIENPTkZJR19ISURf
+UFJJTUFYIGlzIG5vdCBzZXQKIyBDT05GSUdfSElEX1NBSVRFSyBpcyBub3Qgc2V0CkNPTkZJR19I
+SURfU0FNU1VORz15CkNPTkZJR19ISURfU1BFRURMSU5LPXkKIyBDT05GSUdfSElEX1NURUVMU0VS
+SUVTIGlzIG5vdCBzZXQKQ09ORklHX0hJRF9TVU5QTFVTPXkKQ09ORklHX0hJRF9HUkVFTkFTSUE9
+eQojIENPTkZJR19HUkVFTkFTSUFfRkYgaXMgbm90IHNldApDT05GSUdfSElEX1NNQVJUSk9ZUExV
+Uz15CiMgQ09ORklHX1NNQVJUSk9ZUExVU19GRiBpcyBub3Qgc2V0CkNPTkZJR19ISURfVElWTz15
+CkNPTkZJR19ISURfVE9QU0VFRD15CiMgQ09ORklHX0hJRF9USElOR00gaXMgbm90IHNldApDT05G
+SUdfSElEX1RIUlVTVE1BU1RFUj15CkNPTkZJR19USFJVU1RNQVNURVJfRkY9eQojIENPTkZJR19I
+SURfV0FDT00gaXMgbm90IHNldApDT05GSUdfSElEX1dJSU1PVEU9eQojIENPTkZJR19ISURfWElO
+TU8gaXMgbm90IHNldApDT05GSUdfSElEX1pFUk9QTFVTPXkKQ09ORklHX1pFUk9QTFVTX0ZGPXkK
+IyBDT05GSUdfSElEX1pZREFDUk9OIGlzIG5vdCBzZXQKQ09ORklHX0hJRF9TRU5TT1JfSFVCPXkK
+CiMKIyBJMkMgSElEIHN1cHBvcnQKIwpDT05GSUdfSTJDX0hJRD15CkNPTkZJR19VU0JfT0hDSV9M
+SVRUTEVfRU5ESUFOPXkKIyBDT05GSUdfVVNCX1NVUFBPUlQgaXMgbm90IHNldApDT05GSUdfVVdC
+PXkKIyBDT05GSUdfVVdCX1dIQ0kgaXMgbm90IHNldApDT05GSUdfTU1DPXkKIyBDT05GSUdfTU1D
+X0RFQlVHIGlzIG5vdCBzZXQKIyBDT05GSUdfTU1DX1VOU0FGRV9SRVNVTUUgaXMgbm90IHNldAoj
+IENPTkZJR19NTUNfQ0xLR0FURSBpcyBub3Qgc2V0CgojCiMgTU1DL1NEL1NESU8gQ2FyZCBEcml2
+ZXJzCiMKQ09ORklHX1NESU9fVUFSVD15CkNPTkZJR19NTUNfVEVTVD15CgojCiMgTU1DL1NEL1NE
+SU8gSG9zdCBDb250cm9sbGVyIERyaXZlcnMKIwpDT05GSUdfTU1DX1NESENJPXkKIyBDT05GSUdf
+TU1DX1NESENJX1BDSSBpcyBub3Qgc2V0CiMgQ09ORklHX01NQ19TREhDSV9BQ1BJIGlzIG5vdCBz
+ZXQKQ09ORklHX01NQ19TREhDSV9QTFRGTT15CkNPTkZJR19NTUNfT01BUF9IUz15CiMgQ09ORklH
+X01NQ19XQlNEIGlzIG5vdCBzZXQKIyBDT05GSUdfTU1DX1RJRk1fU0QgaXMgbm90IHNldApDT05G
+SUdfTU1DX1NEUklDT0hfQ1M9eQojIENPTkZJR19NTUNfQ0I3MTAgaXMgbm90IHNldApDT05GSUdf
+TU1DX1ZJQV9TRE1NQz15CiMgQ09ORklHX01NQ19SRUFMVEVLX1BDSSBpcyBub3Qgc2V0CkNPTkZJ
+R19NRU1TVElDSz15CkNPTkZJR19NRU1TVElDS19ERUJVRz15CgojCiMgTWVtb3J5U3RpY2sgZHJp
+dmVycwojCkNPTkZJR19NRU1TVElDS19VTlNBRkVfUkVTVU1FPXkKCiMKIyBNZW1vcnlTdGljayBI
+b3N0IENvbnRyb2xsZXIgRHJpdmVycwojCiMgQ09ORklHX01FTVNUSUNLX1RJRk1fTVMgaXMgbm90
+IHNldApDT05GSUdfTUVNU1RJQ0tfSk1JQ1JPTl8zOFg9eQpDT05GSUdfTUVNU1RJQ0tfUjU5Mj15
+CkNPTkZJR19NRU1TVElDS19SRUFMVEVLX1BDST15CkNPTkZJR19ORVdfTEVEUz15CkNPTkZJR19M
+RURTX0NMQVNTPXkKCiMKIyBMRUQgZHJpdmVycwojCiMgQ09ORklHX0xFRFNfTE0zNTMwIGlzIG5v
+dCBzZXQKQ09ORklHX0xFRFNfTE0zNTMzPXkKIyBDT05GSUdfTEVEU19MTTM2NDIgaXMgbm90IHNl
+dApDT05GSUdfTEVEU19QQ0E5NTMyPXkKIyBDT05GSUdfTEVEU19QQ0E5NTMyX0dQSU8gaXMgbm90
+IHNldApDT05GSUdfTEVEU19HUElPPXkKQ09ORklHX0xFRFNfTFAzOTQ0PXkKQ09ORklHX0xFRFNf
+TFA1NVhYX0NPTU1PTj15CkNPTkZJR19MRURTX0xQNTUyMT15CiMgQ09ORklHX0xFRFNfTFA1NTIz
+IGlzIG5vdCBzZXQKQ09ORklHX0xFRFNfTFA1NTYyPXkKQ09ORklHX0xFRFNfTFA4NTAxPXkKQ09O
+RklHX0xFRFNfUENBOTU1WD15CiMgQ09ORklHX0xFRFNfUENBOTYzWCBpcyBub3Qgc2V0CiMgQ09O
+RklHX0xFRFNfV004MzUwIGlzIG5vdCBzZXQKQ09ORklHX0xFRFNfREE5MDUyPXkKIyBDT05GSUdf
+TEVEU19QV00gaXMgbm90IHNldApDT05GSUdfTEVEU19SRUdVTEFUT1I9eQpDT05GSUdfTEVEU19C
+RDI4MDI9eQpDT05GSUdfTEVEU19MVDM1OTM9eQojIENPTkZJR19MRURTX0RFTExfTkVUQk9PS1Mg
+aXMgbm90IHNldApDT05GSUdfTEVEU19UQ0E2NTA3PXkKQ09ORklHX0xFRFNfTUFYODk5Nz15CiMg
+Q09ORklHX0xFRFNfTE0zNTV4IGlzIG5vdCBzZXQKIyBDT05GSUdfTEVEU19PVDIwMCBpcyBub3Qg
+c2V0CkNPTkZJR19MRURTX0JMSU5LTT15CgojCiMgTEVEIFRyaWdnZXJzCiMKQ09ORklHX0xFRFNf
+VFJJR0dFUlM9eQpDT05GSUdfTEVEU19UUklHR0VSX1RJTUVSPXkKQ09ORklHX0xFRFNfVFJJR0dF
+Ul9PTkVTSE9UPXkKQ09ORklHX0xFRFNfVFJJR0dFUl9IRUFSVEJFQVQ9eQojIENPTkZJR19MRURT
+X1RSSUdHRVJfQkFDS0xJR0hUIGlzIG5vdCBzZXQKIyBDT05GSUdfTEVEU19UUklHR0VSX0NQVSBp
+cyBub3Qgc2V0CkNPTkZJR19MRURTX1RSSUdHRVJfR1BJTz15CkNPTkZJR19MRURTX1RSSUdHRVJf
+REVGQVVMVF9PTj15CgojCiMgaXB0YWJsZXMgdHJpZ2dlciBpcyB1bmRlciBOZXRmaWx0ZXIgY29u
+ZmlnIChMRUQgdGFyZ2V0KQojCkNPTkZJR19MRURTX1RSSUdHRVJfVFJBTlNJRU5UPXkKQ09ORklH
+X0xFRFNfVFJJR0dFUl9DQU1FUkE9eQpDT05GSUdfQUNDRVNTSUJJTElUWT15CiMgQ09ORklHX0VE
+QUMgaXMgbm90IHNldApDT05GSUdfUlRDX0xJQj15CiMgQ09ORklHX1JUQ19DTEFTUyBpcyBub3Qg
+c2V0CkNPTkZJR19ETUFERVZJQ0VTPXkKIyBDT05GSUdfRE1BREVWSUNFU19ERUJVRyBpcyBub3Qg
+c2V0CgojCiMgRE1BIERldmljZXMKIwojIENPTkZJR19JTlRFTF9NSURfRE1BQyBpcyBub3Qgc2V0
+CiMgQ09ORklHX0lOVEVMX0lPQVRETUEgaXMgbm90IHNldApDT05GSUdfRFdfRE1BQ19DT1JFPXkK
+Q09ORklHX0RXX0RNQUM9eQojIENPTkZJR19EV19ETUFDX1BDSSBpcyBub3Qgc2V0CiMgQ09ORklH
+X1RJTUJfRE1BIGlzIG5vdCBzZXQKIyBDT05GSUdfUENIX0RNQSBpcyBub3Qgc2V0CkNPTkZJR19E
+TUFfRU5HSU5FPXkKQ09ORklHX0RNQV9BQ1BJPXkKQ09ORklHX0RNQV9PRj15CgojCiMgRE1BIENs
+aWVudHMKIwojIENPTkZJR19BU1lOQ19UWF9ETUEgaXMgbm90IHNldApDT05GSUdfRE1BVEVTVD15
+CkNPTkZJR19BVVhESVNQTEFZPXkKQ09ORklHX0tTMDEwOD15CkNPTkZJR19LUzAxMDhfUE9SVD0w
+eDM3OApDT05GSUdfS1MwMTA4X0RFTEFZPTIKIyBDT05GSUdfQ0ZBRzEyODY0QiBpcyBub3Qgc2V0
+CkNPTkZJR19VSU89eQpDT05GSUdfVUlPX0NJRj15CkNPTkZJR19VSU9fUERSVl9HRU5JUlE9eQpD
+T05GSUdfVUlPX0RNRU1fR0VOSVJRPXkKIyBDT05GSUdfVUlPX0FFQyBpcyBub3Qgc2V0CkNPTkZJ
+R19VSU9fU0VSQ09TMz15CkNPTkZJR19VSU9fUENJX0dFTkVSSUM9eQojIENPTkZJR19VSU9fTkVU
+WCBpcyBub3Qgc2V0CkNPTkZJR19VSU9fTUY2MjQ9eQpDT05GSUdfVklSVF9EUklWRVJTPXkKQ09O
+RklHX1ZJUlRJTz15CgojCiMgVmlydGlvIGRyaXZlcnMKIwojIENPTkZJR19WSVJUSU9fUENJIGlz
+IG5vdCBzZXQKQ09ORklHX1ZJUlRJT19CQUxMT09OPXkKQ09ORklHX1ZJUlRJT19NTUlPPXkKIyBD
+T05GSUdfVklSVElPX01NSU9fQ01ETElORV9ERVZJQ0VTIGlzIG5vdCBzZXQKCiMKIyBNaWNyb3Nv
+ZnQgSHlwZXItViBndWVzdCBzdXBwb3J0CiMKQ09ORklHX1NUQUdJTkc9eQojIENPTkZJR19FQ0hP
+IGlzIG5vdCBzZXQKQ09ORklHX0ZCX09MUENfRENPTj15CkNPTkZJR19GQl9PTFBDX0RDT05fMT15
+CkNPTkZJR19GQl9PTFBDX0RDT05fMV81PXkKIyBDT05GSUdfUEFORUwgaXMgbm90IHNldApDT05G
+SUdfRFhfU0VQPXkKQ09ORklHX1pTTUFMTE9DPXkKQ09ORklHX0ZCX1NNN1hYPXkKQ09ORklHX0NS
+WVNUQUxIRD15CkNPTkZJR19GQl9YR0k9eQpDT05GSUdfQUNQSV9RVUlDS1NUQVJUPXkKQ09ORklH
+X0ZUMTAwMD15CgojCiMgU3BlYWt1cCBjb25zb2xlIHNwZWVjaAojCkNPTkZJR19UT1VDSFNDUkVF
+Tl9DTEVBUlBBRF9UTTEyMTc9eQojIENPTkZJR19UT1VDSFNDUkVFTl9TWU5BUFRJQ1NfSTJDX1JN
+STQgaXMgbm90IHNldAojIENPTkZJR19TVEFHSU5HX01FRElBIGlzIG5vdCBzZXQKCiMKIyBBbmRy
+b2lkCiMKIyBDT05GSUdfQU5EUk9JRCBpcyBub3Qgc2V0CkNPTkZJR19ER1JQPXkKQ09ORklHX1hJ
+TExZQlVTPXkKQ09ORklHX1hJTExZQlVTX1BDSUU9eQpDT05GSUdfWElMTFlCVVNfT0Y9eQpDT05G
+SUdfREdOQz15CkNPTkZJR19ER0FQPXkKQ09ORklHX1g4Nl9QTEFURk9STV9ERVZJQ0VTPXkKIyBD
+T05GSUdfQUNFUl9XTUkgaXMgbm90IHNldApDT05GSUdfQUNFUkhERj15CiMgQ09ORklHX0FTVVNf
+TEFQVE9QIGlzIG5vdCBzZXQKQ09ORklHX0RFTExfTEFQVE9QPXkKQ09ORklHX0RFTExfV01JPXkK
+Q09ORklHX0RFTExfV01JX0FJTz15CkNPTkZJR19GVUpJVFNVX0xBUFRPUD15CkNPTkZJR19GVUpJ
+VFNVX0xBUFRPUF9ERUJVRz15CkNPTkZJR19GVUpJVFNVX1RBQkxFVD15CkNPTkZJR19UQzExMDBf
+V01JPXkKQ09ORklHX0hQX0FDQ0VMPXkKQ09ORklHX0hQX1dNST15CkNPTkZJR19QQU5BU09OSUNf
+TEFQVE9QPXkKQ09ORklHX1RISU5LUEFEX0FDUEk9eQpDT05GSUdfVEhJTktQQURfQUNQSV9BTFNB
+X1NVUFBPUlQ9eQojIENPTkZJR19USElOS1BBRF9BQ1BJX0RFQlVHRkFDSUxJVElFUyBpcyBub3Qg
+c2V0CkNPTkZJR19USElOS1BBRF9BQ1BJX0RFQlVHPXkKQ09ORklHX1RISU5LUEFEX0FDUElfVU5T
+QUZFX0xFRFM9eQpDT05GSUdfVEhJTktQQURfQUNQSV9WSURFTz15CkNPTkZJR19USElOS1BBRF9B
+Q1BJX0hPVEtFWV9QT0xMPXkKIyBDT05GSUdfU0VOU09SU19IREFQUyBpcyBub3Qgc2V0CiMgQ09O
+RklHX0lOVEVMX01FTkxPVyBpcyBub3Qgc2V0CkNPTkZJR19FRUVQQ19MQVBUT1A9eQojIENPTkZJ
+R19BU1VTX1dNSSBpcyBub3Qgc2V0CkNPTkZJR19BQ1BJX1dNST15CiMgQ09ORklHX01TSV9XTUkg
+aXMgbm90IHNldApDT05GSUdfVE9QU1RBUl9MQVBUT1A9eQojIENPTkZJR19BQ1BJX1RPU0hJQkEg
+aXMgbm90IHNldAojIENPTkZJR19UT1NISUJBX0JUX1JGS0lMTCBpcyBub3Qgc2V0CiMgQ09ORklH
+X0FDUElfQ01QQyBpcyBub3Qgc2V0CkNPTkZJR19JTlRFTF9JUFM9eQpDT05GSUdfSUJNX1JUTD15
+CkNPTkZJR19YTzE1X0VCT09LPXkKQ09ORklHX1NBTVNVTkdfTEFQVE9QPXkKQ09ORklHX01YTV9X
+TUk9eQpDT05GSUdfU0FNU1VOR19RMTA9eQpDT05GSUdfQVBQTEVfR01VWD15CkNPTkZJR19JTlRF
+TF9SU1Q9eQojIENPTkZJR19JTlRFTF9TTUFSVENPTk5FQ1QgaXMgbm90IHNldAojIENPTkZJR19Q
+VlBBTklDIGlzIG5vdCBzZXQKCiMKIyBIYXJkd2FyZSBTcGlubG9jayBkcml2ZXJzCiMKQ09ORklH
+X0NMS1NSQ19JODI1Mz15CkNPTkZJR19DTEtFVlRfSTgyNTM9eQpDT05GSUdfQ0xLQkxEX0k4MjUz
+PXkKIyBDT05GSUdfTUFJTEJPWCBpcyBub3Qgc2V0CiMgQ09ORklHX0lPTU1VX1NVUFBPUlQgaXMg
+bm90IHNldAoKIwojIFJlbW90ZXByb2MgZHJpdmVycwojCkNPTkZJR19SRU1PVEVQUk9DPXkKQ09O
+RklHX1NURV9NT0RFTV9SUFJPQz15CgojCiMgUnBtc2cgZHJpdmVycwojCkNPTkZJR19QTV9ERVZG
+UkVRPXkKCiMKIyBERVZGUkVRIEdvdmVybm9ycwojCiMgQ09ORklHX0RFVkZSRVFfR09WX1NJTVBM
+RV9PTkRFTUFORCBpcyBub3Qgc2V0CkNPTkZJR19ERVZGUkVRX0dPVl9QRVJGT1JNQU5DRT15CiMg
+Q09ORklHX0RFVkZSRVFfR09WX1BPV0VSU0FWRSBpcyBub3Qgc2V0CkNPTkZJR19ERVZGUkVRX0dP
+Vl9VU0VSU1BBQ0U9eQoKIwojIERFVkZSRVEgRHJpdmVycwojCiMgQ09ORklHX0VYVENPTiBpcyBu
+b3Qgc2V0CkNPTkZJR19NRU1PUlk9eQojIENPTkZJR19JSU8gaXMgbm90IHNldAojIENPTkZJR19O
+VEIgaXMgbm90IHNldAojIENPTkZJR19WTUVfQlVTIGlzIG5vdCBzZXQKQ09ORklHX1BXTT15CkNP
+TkZJR19QV01fU1lTRlM9eQojIENPTkZJR19QV01fUENBOTY4NSBpcyBub3Qgc2V0CkNPTkZJR19Q
+V01fVFdMPXkKQ09ORklHX1BXTV9UV0xfTEVEPXkKQ09ORklHX0lSUUNISVA9eQojIENPTkZJR19J
+UEFDS19CVVMgaXMgbm90IHNldApDT05GSUdfUkVTRVRfQ09OVFJPTExFUj15CkNPTkZJR19GTUM9
+eQojIENPTkZJR19GTUNfRkFLRURFViBpcyBub3Qgc2V0CiMgQ09ORklHX0ZNQ19UUklWSUFMIGlz
+IG5vdCBzZXQKQ09ORklHX0ZNQ19XUklURV9FRVBST009eQojIENPTkZJR19GTUNfQ0hBUkRFViBp
+cyBub3Qgc2V0CgojCiMgUEhZIFN1YnN5c3RlbQojCkNPTkZJR19HRU5FUklDX1BIWT15CgojCiMg
+RmlybXdhcmUgRHJpdmVycwojCiMgQ09ORklHX0VERCBpcyBub3Qgc2V0CkNPTkZJR19GSVJNV0FS
+RV9NRU1NQVA9eQojIENPTkZJR19ERUxMX1JCVSBpcyBub3Qgc2V0CkNPTkZJR19EQ0RCQVM9eQpD
+T05GSUdfSVNDU0lfSUJGVF9GSU5EPXkKIyBDT05GSUdfR09PR0xFX0ZJUk1XQVJFIGlzIG5vdCBz
+ZXQKCiMKIyBFRkkgKEV4dGVuc2libGUgRmlybXdhcmUgSW50ZXJmYWNlKSBTdXBwb3J0CiMKQ09O
+RklHX0VGSV9WQVJTPXkKIyBDT05GSUdfRUZJX1ZBUlNfUFNUT1JFIGlzIG5vdCBzZXQKCiMKIyBG
+aWxlIHN5c3RlbXMKIwpDT05GSUdfRENBQ0hFX1dPUkRfQUNDRVNTPXkKIyBDT05GSUdfRlNfUE9T
+SVhfQUNMIGlzIG5vdCBzZXQKIyBDT05GSUdfRklMRV9MT0NLSU5HIGlzIG5vdCBzZXQKQ09ORklH
+X0ZTTk9USUZZPXkKIyBDT05GSUdfRE5PVElGWSBpcyBub3Qgc2V0CkNPTkZJR19JTk9USUZZX1VT
+RVI9eQpDT05GSUdfRkFOT1RJRlk9eQpDT05GSUdfRkFOT1RJRllfQUNDRVNTX1BFUk1JU1NJT05T
+PXkKQ09ORklHX1FVT1RBPXkKQ09ORklHX1BSSU5UX1FVT1RBX1dBUk5JTkc9eQpDT05GSUdfUVVP
+VEFfREVCVUc9eQpDT05GSUdfUVVPVEFfVFJFRT15CiMgQ09ORklHX1FGTVRfVjEgaXMgbm90IHNl
+dApDT05GSUdfUUZNVF9WMj15CkNPTkZJR19RVU9UQUNUTD15CkNPTkZJR19BVVRPRlM0X0ZTPXkK
+Q09ORklHX0ZVU0VfRlM9eQpDT05GSUdfQ1VTRT15CgojCiMgQ2FjaGVzCiMKQ09ORklHX0ZTQ0FD
+SEU9eQojIENPTkZJR19GU0NBQ0hFX0RFQlVHIGlzIG5vdCBzZXQKCiMKIyBQc2V1ZG8gZmlsZXN5
+c3RlbXMKIwojIENPTkZJR19QUk9DX0ZTIGlzIG5vdCBzZXQKQ09ORklHX1NZU0ZTPXkKQ09ORklH
+X0hVR0VUTEJGUz15CkNPTkZJR19IVUdFVExCX1BBR0U9eQpDT05GSUdfQ09ORklHRlNfRlM9eQpD
+T05GSUdfTUlTQ19GSUxFU1lTVEVNUz15CiMgQ09ORklHX0VDUllQVF9GUyBpcyBub3Qgc2V0CkNP
+TkZJR19QU1RPUkU9eQojIENPTkZJR19QU1RPUkVfQ09OU09MRSBpcyBub3Qgc2V0CkNPTkZJR19Q
+U1RPUkVfUkFNPXkKIyBDT05GSUdfRUZJVkFSX0ZTIGlzIG5vdCBzZXQKQ09ORklHX05MUz15CkNP
+TkZJR19OTFNfREVGQVVMVD0iaXNvODg1OS0xIgpDT05GSUdfTkxTX0NPREVQQUdFXzQzNz15CiMg
+Q09ORklHX05MU19DT0RFUEFHRV83MzcgaXMgbm90IHNldAojIENPTkZJR19OTFNfQ09ERVBBR0Vf
+Nzc1IGlzIG5vdCBzZXQKIyBDT05GSUdfTkxTX0NPREVQQUdFXzg1MCBpcyBub3Qgc2V0CiMgQ09O
+RklHX05MU19DT0RFUEFHRV84NTIgaXMgbm90IHNldApDT05GSUdfTkxTX0NPREVQQUdFXzg1NT15
+CkNPTkZJR19OTFNfQ09ERVBBR0VfODU3PXkKQ09ORklHX05MU19DT0RFUEFHRV84NjA9eQpDT05G
+SUdfTkxTX0NPREVQQUdFXzg2MT15CiMgQ09ORklHX05MU19DT0RFUEFHRV84NjIgaXMgbm90IHNl
+dApDT05GSUdfTkxTX0NPREVQQUdFXzg2Mz15CkNPTkZJR19OTFNfQ09ERVBBR0VfODY0PXkKQ09O
+RklHX05MU19DT0RFUEFHRV84NjU9eQpDT05GSUdfTkxTX0NPREVQQUdFXzg2Nj15CkNPTkZJR19O
+TFNfQ09ERVBBR0VfODY5PXkKIyBDT05GSUdfTkxTX0NPREVQQUdFXzkzNiBpcyBub3Qgc2V0CkNP
+TkZJR19OTFNfQ09ERVBBR0VfOTUwPXkKQ09ORklHX05MU19DT0RFUEFHRV85MzI9eQpDT05GSUdf
+TkxTX0NPREVQQUdFXzk0OT15CkNPTkZJR19OTFNfQ09ERVBBR0VfODc0PXkKQ09ORklHX05MU19J
+U084ODU5Xzg9eQpDT05GSUdfTkxTX0NPREVQQUdFXzEyNTA9eQpDT05GSUdfTkxTX0NPREVQQUdF
+XzEyNTE9eQpDT05GSUdfTkxTX0FTQ0lJPXkKIyBDT05GSUdfTkxTX0lTTzg4NTlfMSBpcyBub3Qg
+c2V0CkNPTkZJR19OTFNfSVNPODg1OV8yPXkKQ09ORklHX05MU19JU084ODU5XzM9eQpDT05GSUdf
+TkxTX0lTTzg4NTlfND15CiMgQ09ORklHX05MU19JU084ODU5XzUgaXMgbm90IHNldAojIENPTkZJ
+R19OTFNfSVNPODg1OV82IGlzIG5vdCBzZXQKQ09ORklHX05MU19JU084ODU5Xzc9eQojIENPTkZJ
+R19OTFNfSVNPODg1OV85IGlzIG5vdCBzZXQKQ09ORklHX05MU19JU084ODU5XzEzPXkKQ09ORklH
+X05MU19JU084ODU5XzE0PXkKQ09ORklHX05MU19JU084ODU5XzE1PXkKQ09ORklHX05MU19LT0k4
+X1I9eQpDT05GSUdfTkxTX0tPSThfVT15CiMgQ09ORklHX05MU19NQUNfUk9NQU4gaXMgbm90IHNl
+dApDT05GSUdfTkxTX01BQ19DRUxUSUM9eQpDT05GSUdfTkxTX01BQ19DRU5URVVSTz15CkNPTkZJ
+R19OTFNfTUFDX0NST0FUSUFOPXkKQ09ORklHX05MU19NQUNfQ1lSSUxMSUM9eQojIENPTkZJR19O
+TFNfTUFDX0dBRUxJQyBpcyBub3Qgc2V0CkNPTkZJR19OTFNfTUFDX0dSRUVLPXkKQ09ORklHX05M
+U19NQUNfSUNFTEFORD15CiMgQ09ORklHX05MU19NQUNfSU5VSVQgaXMgbm90IHNldAojIENPTkZJ
+R19OTFNfTUFDX1JPTUFOSUFOIGlzIG5vdCBzZXQKIyBDT05GSUdfTkxTX01BQ19UVVJLSVNIIGlz
+IG5vdCBzZXQKQ09ORklHX05MU19VVEY4PXkKCiMKIyBLZXJuZWwgaGFja2luZwojCkNPTkZJR19U
+UkFDRV9JUlFGTEFHU19TVVBQT1JUPXkKCiMKIyBwcmludGsgYW5kIGRtZXNnIG9wdGlvbnMKIwpD
+T05GSUdfREVGQVVMVF9NRVNTQUdFX0xPR0xFVkVMPTQKCiMKIyBDb21waWxlLXRpbWUgY2hlY2tz
+IGFuZCBjb21waWxlciBvcHRpb25zCiMKIyBDT05GSUdfREVCVUdfSU5GTyBpcyBub3Qgc2V0CkNP
+TkZJR19FTkFCTEVfV0FSTl9ERVBSRUNBVEVEPXkKIyBDT05GSUdfRU5BQkxFX01VU1RfQ0hFQ0sg
+aXMgbm90IHNldApDT05GSUdfRlJBTUVfV0FSTj0xMDI0CiMgQ09ORklHX1NUUklQX0FTTV9TWU1T
+IGlzIG5vdCBzZXQKQ09ORklHX1JFQURBQkxFX0FTTT15CiMgQ09ORklHX1VOVVNFRF9TWU1CT0xT
+IGlzIG5vdCBzZXQKQ09ORklHX0RFQlVHX0ZTPXkKIyBDT05GSUdfSEVBREVSU19DSEVDSyBpcyBu
+b3Qgc2V0CiMgQ09ORklHX0RFQlVHX1NFQ1RJT05fTUlTTUFUQ0ggaXMgbm90IHNldApDT05GSUdf
+QVJDSF9XQU5UX0ZSQU1FX1BPSU5URVJTPXkKQ09ORklHX0ZSQU1FX1BPSU5URVI9eQpDT05GSUdf
+REVCVUdfRk9SQ0VfV0VBS19QRVJfQ1BVPXkKQ09ORklHX01BR0lDX1NZU1JRPXkKQ09ORklHX0RF
+QlVHX0tFUk5FTD15CgojCiMgTWVtb3J5IERlYnVnZ2luZwojCkNPTkZJR19ERUJVR19QQUdFQUxM
+T0M9eQpDT05GSUdfV0FOVF9QQUdFX0RFQlVHX0ZMQUdTPXkKQ09ORklHX1BBR0VfR1VBUkQ9eQoj
+IENPTkZJR19ERUJVR19PQkpFQ1RTIGlzIG5vdCBzZXQKQ09ORklHX1NMVUJfU1RBVFM9eQpDT05G
+SUdfSEFWRV9ERUJVR19LTUVNTEVBSz15CkNPTkZJR19ERUJVR19LTUVNTEVBSz15CkNPTkZJR19E
+RUJVR19LTUVNTEVBS19FQVJMWV9MT0dfU0laRT00MDAKIyBDT05GSUdfREVCVUdfS01FTUxFQUtf
+REVGQVVMVF9PRkYgaXMgbm90IHNldApDT05GSUdfREVCVUdfU1RBQ0tfVVNBR0U9eQpDT05GSUdf
+REVCVUdfVk09eQojIENPTkZJR19ERUJVR19WTV9SQiBpcyBub3Qgc2V0CiMgQ09ORklHX0RFQlVH
+X1ZJUlRVQUwgaXMgbm90IHNldAojIENPTkZJR19ERUJVR19NRU1PUllfSU5JVCBpcyBub3Qgc2V0
+CkNPTkZJR19ERUJVR19QRVJfQ1BVX01BUFM9eQpDT05GSUdfREVCVUdfSElHSE1FTT15CkNPTkZJ
+R19IQVZFX0RFQlVHX1NUQUNLT1ZFUkZMT1c9eQojIENPTkZJR19ERUJVR19TVEFDS09WRVJGTE9X
+IGlzIG5vdCBzZXQKQ09ORklHX0hBVkVfQVJDSF9LTUVNQ0hFQ0s9eQpDT05GSUdfREVCVUdfU0hJ
+UlE9eQoKIwojIERlYnVnIExvY2t1cHMgYW5kIEhhbmdzCiMKQ09ORklHX0xPQ0tVUF9ERVRFQ1RP
+Uj15CkNPTkZJR19IQVJETE9DS1VQX0RFVEVDVE9SPXkKQ09ORklHX0JPT1RQQVJBTV9IQVJETE9D
+S1VQX1BBTklDPXkKQ09ORklHX0JPT1RQQVJBTV9IQVJETE9DS1VQX1BBTklDX1ZBTFVFPTEKIyBD
+T05GSUdfQk9PVFBBUkFNX1NPRlRMT0NLVVBfUEFOSUMgaXMgbm90IHNldApDT05GSUdfQk9PVFBB
+UkFNX1NPRlRMT0NLVVBfUEFOSUNfVkFMVUU9MAojIENPTkZJR19ERVRFQ1RfSFVOR19UQVNLIGlz
+IG5vdCBzZXQKQ09ORklHX1BBTklDX09OX09PUFM9eQpDT05GSUdfUEFOSUNfT05fT09QU19WQUxV
+RT0xCgojCiMgTG9jayBEZWJ1Z2dpbmcgKHNwaW5sb2NrcywgbXV0ZXhlcywgZXRjLi4uKQojCkNP
+TkZJR19ERUJVR19SVF9NVVRFWEVTPXkKQ09ORklHX0RFQlVHX1BJX0xJU1Q9eQpDT05GSUdfUlRf
+TVVURVhfVEVTVEVSPXkKQ09ORklHX0RFQlVHX1NQSU5MT0NLPXkKQ09ORklHX0RFQlVHX01VVEVY
+RVM9eQpDT05GSUdfREVCVUdfV1dfTVVURVhfU0xPV1BBVEg9eQpDT05GSUdfREVCVUdfTE9DS19B
+TExPQz15CkNPTkZJR19QUk9WRV9MT0NLSU5HPXkKQ09ORklHX0xPQ0tERVA9eQojIENPTkZJR19M
+T0NLX1NUQVQgaXMgbm90IHNldApDT05GSUdfREVCVUdfTE9DS0RFUD15CiMgQ09ORklHX0RFQlVH
+X0FUT01JQ19TTEVFUCBpcyBub3Qgc2V0CkNPTkZJR19ERUJVR19MT0NLSU5HX0FQSV9TRUxGVEVT
+VFM9eQpDT05GSUdfVFJBQ0VfSVJRRkxBR1M9eQpDT05GSUdfU1RBQ0tUUkFDRT15CiMgQ09ORklH
+X0RFQlVHX0tPQkpFQ1QgaXMgbm90IHNldAojIENPTkZJR19ERUJVR19LT0JKRUNUX1JFTEVBU0Ug
+aXMgbm90IHNldAojIENPTkZJR19ERUJVR19XUklURUNPVU5UIGlzIG5vdCBzZXQKIyBDT05GSUdf
+REVCVUdfTElTVCBpcyBub3Qgc2V0CiMgQ09ORklHX0RFQlVHX1NHIGlzIG5vdCBzZXQKQ09ORklH
+X0RFQlVHX05PVElGSUVSUz15CkNPTkZJR19ERUJVR19DUkVERU5USUFMUz15CgojCiMgUkNVIERl
+YnVnZ2luZwojCkNPTkZJR19QUk9WRV9SQ1U9eQpDT05GSUdfUFJPVkVfUkNVX1JFUEVBVEVETFk9
+eQpDT05GSUdfU1BBUlNFX1JDVV9QT0lOVEVSPXkKQ09ORklHX1JDVV9UT1JUVVJFX1RFU1Q9eQpD
+T05GSUdfUkNVX1RPUlRVUkVfVEVTVF9SVU5OQUJMRT15CkNPTkZJR19SQ1VfQ1BVX1NUQUxMX1RJ
+TUVPVVQ9MjEKIyBDT05GSUdfUkNVX0NQVV9TVEFMTF9JTkZPIGlzIG5vdCBzZXQKQ09ORklHX1JD
+VV9UUkFDRT15CiMgQ09ORklHX05PVElGSUVSX0VSUk9SX0lOSkVDVElPTiBpcyBub3Qgc2V0CiMg
+Q09ORklHX0ZBVUxUX0lOSkVDVElPTiBpcyBub3Qgc2V0CkNPTkZJR19BUkNIX0hBU19ERUJVR19T
+VFJJQ1RfVVNFUl9DT1BZX0NIRUNLUz15CkNPTkZJR19ERUJVR19TVFJJQ1RfVVNFUl9DT1BZX0NI
+RUNLUz15CkNPTkZJR19VU0VSX1NUQUNLVFJBQ0VfU1VQUE9SVD15CkNPTkZJR19IQVZFX0ZVTkNU
+SU9OX1RSQUNFUj15CkNPTkZJR19IQVZFX0ZVTkNUSU9OX0dSQVBIX1RSQUNFUj15CkNPTkZJR19I
+QVZFX0ZVTkNUSU9OX0dSQVBIX0ZQX1RFU1Q9eQpDT05GSUdfSEFWRV9GVU5DVElPTl9UUkFDRV9N
+Q09VTlRfVEVTVD15CkNPTkZJR19IQVZFX0RZTkFNSUNfRlRSQUNFPXkKQ09ORklHX0hBVkVfRFlO
+QU1JQ19GVFJBQ0VfV0lUSF9SRUdTPXkKQ09ORklHX0hBVkVfRlRSQUNFX01DT1VOVF9SRUNPUkQ9
+eQpDT05GSUdfSEFWRV9TWVNDQUxMX1RSQUNFUE9JTlRTPXkKQ09ORklHX0hBVkVfQ19SRUNPUkRN
+Q09VTlQ9eQpDT05GSUdfVFJBQ0VfQ0xPQ0s9eQpDT05GSUdfVFJBQ0lOR19TVVBQT1JUPXkKIyBD
+T05GSUdfRlRSQUNFIGlzIG5vdCBzZXQKCiMKIyBSdW50aW1lIFRlc3RpbmcKIwpDT05GSUdfVEVT
+VF9MSVNUX1NPUlQ9eQpDT05GSUdfQkFDS1RSQUNFX1NFTEZfVEVTVD15CiMgQ09ORklHX1JCVFJF
+RV9URVNUIGlzIG5vdCBzZXQKQ09ORklHX0FUT01JQzY0X1NFTEZURVNUPXkKIyBDT05GSUdfVEVT
+VF9TVFJJTkdfSEVMUEVSUyBpcyBub3Qgc2V0CkNPTkZJR19URVNUX0tTVFJUT1g9eQojIENPTkZJ
+R19QUk9WSURFX09IQ0kxMzk0X0RNQV9JTklUIGlzIG5vdCBzZXQKQ09ORklHX0RNQV9BUElfREVC
+VUc9eQojIENPTkZJR19TQU1QTEVTIGlzIG5vdCBzZXQKQ09ORklHX0hBVkVfQVJDSF9LR0RCPXkK
+IyBDT05GSUdfS0dEQiBpcyBub3Qgc2V0CiMgQ09ORklHX1NUUklDVF9ERVZNRU0gaXMgbm90IHNl
+dApDT05GSUdfWDg2X1ZFUkJPU0VfQk9PVFVQPXkKIyBDT05GSUdfRUFSTFlfUFJJTlRLIGlzIG5v
+dCBzZXQKIyBDT05GSUdfWDg2X1BURFVNUCBpcyBub3Qgc2V0CiMgQ09ORklHX0RFQlVHX1JPREFU
+QSBpcyBub3Qgc2V0CiMgQ09ORklHX0RPVUJMRUZBVUxUIGlzIG5vdCBzZXQKQ09ORklHX0RFQlVH
+X1RMQkZMVVNIPXkKIyBDT05GSUdfSU9NTVVfU1RSRVNTIGlzIG5vdCBzZXQKQ09ORklHX0hBVkVf
+TU1JT1RSQUNFX1NVUFBPUlQ9eQpDT05GSUdfSU9fREVMQVlfVFlQRV8wWDgwPTAKQ09ORklHX0lP
+X0RFTEFZX1RZUEVfMFhFRD0xCkNPTkZJR19JT19ERUxBWV9UWVBFX1VERUxBWT0yCkNPTkZJR19J
+T19ERUxBWV9UWVBFX05PTkU9MwpDT05GSUdfSU9fREVMQVlfMFg4MD15CiMgQ09ORklHX0lPX0RF
+TEFZXzBYRUQgaXMgbm90IHNldAojIENPTkZJR19JT19ERUxBWV9VREVMQVkgaXMgbm90IHNldAoj
+IENPTkZJR19JT19ERUxBWV9OT05FIGlzIG5vdCBzZXQKQ09ORklHX0RFRkFVTFRfSU9fREVMQVlf
+VFlQRT0wCiMgQ09ORklHX0RFQlVHX0JPT1RfUEFSQU1TIGlzIG5vdCBzZXQKQ09ORklHX0NQQV9E
+RUJVRz15CkNPTkZJR19PUFRJTUlaRV9JTkxJTklORz15CiMgQ09ORklHX0RFQlVHX05NSV9TRUxG
+VEVTVCBpcyBub3Qgc2V0CkNPTkZJR19YODZfREVCVUdfU1RBVElDX0NQVV9IQVM9eQoKIwojIFNl
+Y3VyaXR5IG9wdGlvbnMKIwpDT05GSUdfS0VZUz15CkNPTkZJR19QRVJTSVNURU5UX0tFWVJJTkdT
+PXkKQ09ORklHX1RSVVNURURfS0VZUz15CkNPTkZJR19FTkNSWVBURURfS0VZUz15CiMgQ09ORklH
+X0tFWVNfREVCVUdfUFJPQ19LRVlTIGlzIG5vdCBzZXQKQ09ORklHX1NFQ1VSSVRZX0RNRVNHX1JF
+U1RSSUNUPXkKQ09ORklHX1NFQ1VSSVRZPXkKQ09ORklHX1NFQ1VSSVRZRlM9eQojIENPTkZJR19T
+RUNVUklUWV9ORVRXT1JLIGlzIG5vdCBzZXQKQ09ORklHX1NFQ1VSSVRZX1BBVEg9eQpDT05GSUdf
+U0VDVVJJVFlfWUFNQT15CiMgQ09ORklHX1NFQ1VSSVRZX1lBTUFfU1RBQ0tFRCBpcyBub3Qgc2V0
+CiMgQ09ORklHX0lNQSBpcyBub3Qgc2V0CiMgQ09ORklHX0VWTSBpcyBub3Qgc2V0CkNPTkZJR19E
+RUZBVUxUX1NFQ1VSSVRZX1lBTUE9eQojIENPTkZJR19ERUZBVUxUX1NFQ1VSSVRZX0RBQyBpcyBu
+b3Qgc2V0CkNPTkZJR19ERUZBVUxUX1NFQ1VSSVRZPSJ5YW1hIgpDT05GSUdfQ1JZUFRPPXkKCiMK
+IyBDcnlwdG8gY29yZSBvciBoZWxwZXIKIwpDT05GSUdfQ1JZUFRPX0FMR0FQST15CkNPTkZJR19D
+UllQVE9fQUxHQVBJMj15CkNPTkZJR19DUllQVE9fQUVBRD15CkNPTkZJR19DUllQVE9fQUVBRDI9
+eQpDT05GSUdfQ1JZUFRPX0JMS0NJUEhFUj15CkNPTkZJR19DUllQVE9fQkxLQ0lQSEVSMj15CkNP
+TkZJR19DUllQVE9fSEFTSD15CkNPTkZJR19DUllQVE9fSEFTSDI9eQpDT05GSUdfQ1JZUFRPX1JO
+Rz15CkNPTkZJR19DUllQVE9fUk5HMj15CkNPTkZJR19DUllQVE9fUENPTVAyPXkKQ09ORklHX0NS
+WVBUT19NQU5BR0VSPXkKQ09ORklHX0NSWVBUT19NQU5BR0VSMj15CkNPTkZJR19DUllQVE9fTUFO
+QUdFUl9ESVNBQkxFX1RFU1RTPXkKQ09ORklHX0NSWVBUT19HRjEyOE1VTD15CkNPTkZJR19DUllQ
+VE9fTlVMTD15CkNPTkZJR19DUllQVE9fUENSWVBUPXkKQ09ORklHX0NSWVBUT19XT1JLUVVFVUU9
+eQpDT05GSUdfQ1JZUFRPX0NSWVBURD15CiMgQ09ORklHX0NSWVBUT19BVVRIRU5DIGlzIG5vdCBz
+ZXQKQ09ORklHX0NSWVBUT19BQkxLX0hFTFBFUj15CkNPTkZJR19DUllQVE9fR0xVRV9IRUxQRVJf
+WDg2PXkKCiMKIyBBdXRoZW50aWNhdGVkIEVuY3J5cHRpb24gd2l0aCBBc3NvY2lhdGVkIERhdGEK
+IwpDT05GSUdfQ1JZUFRPX0NDTT15CkNPTkZJR19DUllQVE9fR0NNPXkKQ09ORklHX0NSWVBUT19T
+RVFJVj15CgojCiMgQmxvY2sgbW9kZXMKIwpDT05GSUdfQ1JZUFRPX0NCQz15CkNPTkZJR19DUllQ
+VE9fQ1RSPXkKIyBDT05GSUdfQ1JZUFRPX0NUUyBpcyBub3Qgc2V0CiMgQ09ORklHX0NSWVBUT19F
+Q0IgaXMgbm90IHNldApDT05GSUdfQ1JZUFRPX0xSVz15CkNPTkZJR19DUllQVE9fUENCQz15CkNP
+TkZJR19DUllQVE9fWFRTPXkKCiMKIyBIYXNoIG1vZGVzCiMKQ09ORklHX0NSWVBUT19DTUFDPXkK
+Q09ORklHX0NSWVBUT19ITUFDPXkKQ09ORklHX0NSWVBUT19YQ0JDPXkKIyBDT05GSUdfQ1JZUFRP
+X1ZNQUMgaXMgbm90IHNldAoKIwojIERpZ2VzdAojCiMgQ09ORklHX0NSWVBUT19DUkMzMkMgaXMg
+bm90IHNldApDT05GSUdfQ1JZUFRPX0NSQzMyQ19JTlRFTD15CkNPTkZJR19DUllQVE9fQ1JDMzI9
+eQpDT05GSUdfQ1JZUFRPX0NSQzMyX1BDTE1VTD15CkNPTkZJR19DUllQVE9fQ1JDVDEwRElGPXkK
+Q09ORklHX0NSWVBUT19HSEFTSD15CiMgQ09ORklHX0NSWVBUT19NRDQgaXMgbm90IHNldApDT05G
+SUdfQ1JZUFRPX01ENT15CiMgQ09ORklHX0NSWVBUT19NSUNIQUVMX01JQyBpcyBub3Qgc2V0CiMg
+Q09ORklHX0NSWVBUT19STUQxMjggaXMgbm90IHNldApDT05GSUdfQ1JZUFRPX1JNRDE2MD15CkNP
+TkZJR19DUllQVE9fUk1EMjU2PXkKQ09ORklHX0NSWVBUT19STUQzMjA9eQpDT05GSUdfQ1JZUFRP
+X1NIQTE9eQpDT05GSUdfQ1JZUFRPX1NIQTI1Nj15CiMgQ09ORklHX0NSWVBUT19TSEE1MTIgaXMg
+bm90IHNldApDT05GSUdfQ1JZUFRPX1RHUjE5Mj15CiMgQ09ORklHX0NSWVBUT19XUDUxMiBpcyBu
+b3Qgc2V0CgojCiMgQ2lwaGVycwojCkNPTkZJR19DUllQVE9fQUVTPXkKQ09ORklHX0NSWVBUT19B
+RVNfNTg2PXkKQ09ORklHX0NSWVBUT19BRVNfTklfSU5URUw9eQpDT05GSUdfQ1JZUFRPX0FOVUJJ
+Uz15CkNPTkZJR19DUllQVE9fQVJDND15CiMgQ09ORklHX0NSWVBUT19CTE9XRklTSCBpcyBub3Qg
+c2V0CiMgQ09ORklHX0NSWVBUT19DQU1FTExJQSBpcyBub3Qgc2V0CiMgQ09ORklHX0NSWVBUT19D
+QVNUNSBpcyBub3Qgc2V0CiMgQ09ORklHX0NSWVBUT19DQVNUNiBpcyBub3Qgc2V0CiMgQ09ORklH
+X0NSWVBUT19ERVMgaXMgbm90IHNldApDT05GSUdfQ1JZUFRPX0ZDUllQVD15CkNPTkZJR19DUllQ
+VE9fS0hBWkFEPXkKQ09ORklHX0NSWVBUT19TQUxTQTIwPXkKQ09ORklHX0NSWVBUT19TQUxTQTIw
+XzU4Nj15CkNPTkZJR19DUllQVE9fU0VFRD15CkNPTkZJR19DUllQVE9fU0VSUEVOVD15CkNPTkZJ
+R19DUllQVE9fU0VSUEVOVF9TU0UyXzU4Nj15CkNPTkZJR19DUllQVE9fVEVBPXkKQ09ORklHX0NS
+WVBUT19UV09GSVNIPXkKQ09ORklHX0NSWVBUT19UV09GSVNIX0NPTU1PTj15CiMgQ09ORklHX0NS
+WVBUT19UV09GSVNIXzU4NiBpcyBub3Qgc2V0CgojCiMgQ29tcHJlc3Npb24KIwojIENPTkZJR19D
+UllQVE9fREVGTEFURSBpcyBub3Qgc2V0CiMgQ09ORklHX0NSWVBUT19aTElCIGlzIG5vdCBzZXQK
+IyBDT05GSUdfQ1JZUFRPX0xaTyBpcyBub3Qgc2V0CiMgQ09ORklHX0NSWVBUT19MWjQgaXMgbm90
+IHNldAojIENPTkZJR19DUllQVE9fTFo0SEMgaXMgbm90IHNldAoKIwojIFJhbmRvbSBOdW1iZXIg
+R2VuZXJhdGlvbgojCkNPTkZJR19DUllQVE9fQU5TSV9DUFJORz15CiMgQ09ORklHX0NSWVBUT19I
+VyBpcyBub3Qgc2V0CkNPTkZJR19BU1lNTUVUUklDX0tFWV9UWVBFPXkKQ09ORklHX0FTWU1NRVRS
+SUNfUFVCTElDX0tFWV9TVUJUWVBFPXkKQ09ORklHX1BVQkxJQ19LRVlfQUxHT19SU0E9eQpDT05G
+SUdfWDUwOV9DRVJUSUZJQ0FURV9QQVJTRVI9eQpDT05GSUdfSEFWRV9LVk09eQpDT05GSUdfVklS
+VFVBTElaQVRJT049eQojIENPTkZJR19MR1VFU1QgaXMgbm90IHNldAojIENPTkZJR19CSU5BUllf
+UFJJTlRGIGlzIG5vdCBzZXQKCiMKIyBMaWJyYXJ5IHJvdXRpbmVzCiMKQ09ORklHX0JJVFJFVkVS
+U0U9eQpDT05GSUdfR0VORVJJQ19TVFJOQ1BZX0ZST01fVVNFUj15CkNPTkZJR19HRU5FUklDX1NU
+Uk5MRU5fVVNFUj15CkNPTkZJR19HRU5FUklDX0ZJTkRfRklSU1RfQklUPXkKQ09ORklHX0dFTkVS
+SUNfUENJX0lPTUFQPXkKQ09ORklHX0dFTkVSSUNfSU9NQVA9eQpDT05GSUdfR0VORVJJQ19JTz15
+CkNPTkZJR19DUkNfQ0NJVFQ9eQpDT05GSUdfQ1JDMTY9eQojIENPTkZJR19DUkNfVDEwRElGIGlz
+IG5vdCBzZXQKQ09ORklHX0NSQ19JVFVfVD15CkNPTkZJR19DUkMzMj15CkNPTkZJR19DUkMzMl9T
+RUxGVEVTVD15CkNPTkZJR19DUkMzMl9TTElDRUJZOD15CiMgQ09ORklHX0NSQzMyX1NMSUNFQlk0
+IGlzIG5vdCBzZXQKIyBDT05GSUdfQ1JDMzJfU0FSV0FURSBpcyBub3Qgc2V0CiMgQ09ORklHX0NS
+QzMyX0JJVCBpcyBub3Qgc2V0CkNPTkZJR19DUkM3PXkKIyBDT05GSUdfTElCQ1JDMzJDIGlzIG5v
+dCBzZXQKQ09ORklHX0NSQzg9eQpDT05GSUdfWkxJQl9JTkZMQVRFPXkKQ09ORklHX1pMSUJfREVG
+TEFURT15CkNPTkZJR19MWk9fQ09NUFJFU1M9eQpDT05GSUdfTFpPX0RFQ09NUFJFU1M9eQpDT05G
+SUdfTFo0X0RFQ09NUFJFU1M9eQojIENPTkZJR19YWl9ERUMgaXMgbm90IHNldAojIENPTkZJR19Y
+Wl9ERUNfQkNKIGlzIG5vdCBzZXQKQ09ORklHX0RFQ09NUFJFU1NfTFo0PXkKQ09ORklHX0dFTkVS
+SUNfQUxMT0NBVE9SPXkKQ09ORklHX1JFRURfU09MT01PTj15CkNPTkZJR19SRUVEX1NPTE9NT05f
+RU5DOD15CkNPTkZJR19SRUVEX1NPTE9NT05fREVDOD15CkNPTkZJR19BU1NPQ0lBVElWRV9BUlJB
+WT15CkNPTkZJR19IQVNfSU9NRU09eQpDT05GSUdfSEFTX0lPUE9SVD15CkNPTkZJR19IQVNfRE1B
+PXkKQ09ORklHX0NQVU1BU0tfT0ZGU1RBQ0s9eQpDT05GSUdfQVJDSF9IQVNfQVRPTUlDNjRfREVD
+X0lGX1BPU0lUSVZFPXkKQ09ORklHX0FWRVJBR0U9eQpDT05GSUdfQ0xaX1RBQj15CiMgQ09ORklH
+X0NPUkRJQyBpcyBub3Qgc2V0CiMgQ09ORklHX0REUiBpcyBub3Qgc2V0CkNPTkZJR19NUElMSUI9
+eQpDT05GSUdfT0lEX1JFR0lTVFJZPXkKQ09ORklHX1VDUzJfU1RSSU5HPXkK
+--047d7bd6a8800d8b2804e7ed8ff2--
