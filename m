@@ -1,36 +1,80 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] sha256_ssse3: also test for BMI2
-Date: Mon, 7 Oct 2013 18:11:19 +1100
-Message-ID: <20131007071119.GF7522@gondor.apana.org.au>
-References: <1380630886-6863-1-git-send-email-oliver@neukum.org>
+From: "Christoph G. Baumann" <cb@sgoc.de>
+Subject: Re: [PATCH 2/3] ARM: mxs: crypto: Add Freescale MXS DCP driver
+Date: Mon, 7 Oct 2013 11:50:39 +0200 (CEST)
+Message-ID: <632804650.191291.1381139440065.open-xchange@email.1und1.de>
+References: <1380194306-5243-1-git-send-email-marex@denx.de> <201309261407.33923.marex@denx.de> <5245AC5B.80800@gmail.com> <201309280535.33672.marex@denx.de>
+Reply-To: "Christoph G. Baumann" <cb@sgoc.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
-	Oliver Neukum <oneukum@suse.de>
-To: oliver@neukum.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Shawn Guo <shawn.guo@linaro.org>,
+	Fabio Estevam <festevam@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Tobias Rauter <tobiasrauter@gmail.com>
+To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:35658 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751545Ab3JGHL0 (ORCPT
+Received: from moutng.kundenserver.de ([212.227.17.9]:53260 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755237Ab3JGJu4 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Oct 2013 03:11:26 -0400
-Content-Disposition: inline
-In-Reply-To: <1380630886-6863-1-git-send-email-oliver@neukum.org>
+	Mon, 7 Oct 2013 05:50:56 -0400
+In-Reply-To: <201309280535.33672.marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 01, 2013 at 02:34:46PM +0200, oliver@neukum.org wrote:
-> From: Oliver Neukum <oneukum@suse.de>
-> 
-> The AVX2 implementation also uses BMI2 instructions,
-> but doesn't test for their availability. The assumption
-> that AVX2 and BMI2 always go together is false. Some
-> Haswells have AVX2 but not BMI2.
-> 
-> Signed-off-by: Oliver Neukum <oneukum@suse.de>
+Hello Marek,
 
-Patch applied.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>=C2=A0Marek=C2=A0Vasut=C2=A0<marex@denx.de>=C2=A0hat=C2=A0am=C2=A028.=C2=
+=A0September=C2=A02013=C2=A0um=C2=A005:35=C2=A0geschrieben:
+> [...]
+>=C2=A0>=C2=A0>=C2=A03)=C2=A0What=C2=A0are=C2=A0those=C2=A0ugly=C2=A0ne=
+w=C2=A0IOCTLs=C2=A0in=C2=A0the=C2=A0dcp.c=C2=A0driver?
+>=C2=A0>=C2=A0
+>=C2=A0>=C2=A0When=C2=A0I=C2=A0firstly=C2=A0posted=C2=A0the=C2=A0driver=
+=C2=A0in=C2=A0the=C2=A0mailinglist,=C2=A0there=C2=A0where=C2=A0one
+>=C2=A0>=C2=A0person=C2=A0who=C2=A0actually=C2=A0used=C2=A0this=C2=A0in=
+terface=C2=A0(it=C2=A0was=C2=A0introduced=C2=A0in
+>=C2=A0>=C2=A0Freescale's=C2=A0SDK)=C2=A0to=C2=A0use=C2=A0the=C2=A0OTP=C2=
+=A0keys=C2=A0for=C2=A0crypto.=C2=A0As=C2=A0far=C2=A0as=C2=A0I=C2=A0have
+>=C2=A0>=C2=A0seen,=C2=A0the=C2=A0crypto=C2=A0API=C2=A0does=C2=A0not=C2=
+=A0support=C2=A0such=C2=A0keys=C2=A0(i.e.=C2=A0there=C2=A0seems=C2=A0to
+>=C2=A0>=C2=A0be=C2=A0no=C2=A0way=C2=A0to=C2=A0tell=C2=A0a=C2=A0driver=C2=
+=A0to=C2=A0use=C2=A0some=C2=A0kind=C2=A0of=C2=A0special=C2=A0keys=C2=A0=
+-=C2=A0which
+>=C2=A0>=C2=A0are=C2=A0not=C2=A0delivered=C2=A0by=C2=A0the=C2=A0user=C2=
+=A0-=C2=A0via=C2=A0the=C2=A0API).
+>=C2=A0>=C2=A0Therefore=C2=A0I=C2=A0added=C2=A0this=C2=A0miscdevice=C2=A0=
+and=C2=A0adopted=C2=A0Freescale's=C2=A0interface.
+>=C2=A0
+>=C2=A0The=C2=A0keys=C2=A0are=C2=A0programmed=C2=A0into=C2=A0the=C2=A0O=
+TP=C2=A0registers,=C2=A0correct?=C2=A0There=C2=A0is=C2=A0OCOTP=C2=A0dri=
+ver=C2=A0
+>=C2=A0for=C2=A0the=C2=A0MX23/MX28=C2=A0OTP=C2=A0hardware.=C2=A0This=C2=
+=A0is=C2=A0what=C2=A0should=C2=A0have=C2=A0been=C2=A0used=C2=A0then.
+>=C2=A0
+>=C2=A0NOTE:=C2=A0This=C2=A0IOCTL=C2=A0interface=C2=A0seems=C2=A0like=C2=
+=A0quite=C2=A0an=C2=A0abusive=C2=A0way=C2=A0to=C2=A0allow=C2=A0userland=
+=C2=A0to=C2=A0
+>=C2=A0access=C2=A0the=C2=A0crypto=C2=A0API=C2=A0in=C2=A0kernel.=C2=A0I=
+=C2=A0understand=C2=A0this=C2=A0is=C2=A0used=C2=A0by=C2=A0some=C2=A0Fre=
+escale=C2=A0
+>=C2=A0tool,=C2=A0but=C2=A0won't=C2=A0it=C2=A0be=C2=A0better=C2=A0to=C2=
+=A0fix=C2=A0the=C2=A0Freescale=C2=A0tool=C2=A0instead=C2=A0?
+
+
+the IOCTL interface is used to AES encrypt a bootstream with the AES ke=
+y in
+OCOTP.
+The idea is that only the DCP can read/access the key once it has been
+programmed
+into the OCOTP. If the crypto API has means to tell the DCP to use the =
+key from
+OCOTP, the tool from Freescale is a minor problem.
+
+
+Regards,
+Christoph
