@@ -1,84 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: crypto_memneq - add equality testing of memory regions
- w/o timing leaks
-Date: Mon, 7 Oct 2013 18:10:54 +1100
-Message-ID: <20131007071054.GD7522@gondor.apana.org.au>
-References: <1380183639-6288-1-git-send-email-james@openvpn.net>
+Subject: Re: [PATCH 1/2] crypto: sahara: Remove redundant of_match_ptr
+Date: Mon, 7 Oct 2013 18:11:06 +1100
+Message-ID: <20131007071106.GE7522@gondor.apana.org.au>
+References: <1380511182-18424-1-git-send-email-sachin.kamat@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
-	Daniel Borkmann <dborkman@redhat.com>,
-	Florian Weimer <fw@deneb.enyo.de>
-To: James Yonan <james@openvpn.net>
+	Javier Martin <javier.martin@vista-silicon.com>
+To: Sachin Kamat <sachin.kamat@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48487 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:51168 "EHLO
 	fornost.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751689Ab3JGHLA (ORCPT
+	with ESMTP id S1752800Ab3JGHLJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Oct 2013 03:11:00 -0400
+	Mon, 7 Oct 2013 03:11:09 -0400
 Content-Disposition: inline
-In-Reply-To: <1380183639-6288-1-git-send-email-james@openvpn.net>
+In-Reply-To: <1380511182-18424-1-git-send-email-sachin.kamat@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 26, 2013 at 02:20:39AM -0600, James Yonan wrote:
-> When comparing MAC hashes, AEAD authentication tags, or other hash
-> values in the context of authentication or integrity checking, it
-> is important not to leak timing information to a potential attacker,
-> i.e. when communication happens over a network.
+On Mon, Sep 30, 2013 at 08:49:41AM +0530, Sachin Kamat wrote:
+> The data structure of_match_ptr() protects is always compiled in.
+> Hence of_match_ptr() is not needed.
 > 
-> Bytewise memory comparisons (such as memcmp) are usually optimized so
-> that they return a nonzero value as soon as a mismatch is found. E.g,
-> on x86_64/i5 for 512 bytes this can be ~50 cyc for a full mismatch
-> and up to ~850 cyc for a full match (cold). This early-return behavior
-> can leak timing information as a side channel, allowing an attacker to
-> iteratively guess the correct result.
-> 
-> This patch adds a new method crypto_memneq ("memory not equal to each
-> other") to the crypto API that compares memory areas of the same length
-> in roughly "constant time" (cache misses could change the timing, but
-> since they don't reveal information about the content of the strings
-> being compared, they are effectively benign). Iow, best and worst case
-> behaviour take the same amount of time to complete (in contrast to
-> memcmp).
-> 
-> Note that crypto_memneq (unlike memcmp) can only be used to test for
-> equality or inequality, NOT for lexicographical order. This, however,
-> is not an issue for its use-cases within the crypto API.
-> 
-> We tried to locate all of the places in the crypto API where memcmp was
-> being used for authentication or integrity checking, and convert them
-> over to crypto_memneq.
-> 
-> crypto_memneq is declared noinline, placed in its own source file,
-> and compiled with optimizations that might increase code size disabled
-> ("Os") because a smart compiler (or LTO) might notice that the return
-> value is always compared against zero/nonzero, and might then
-> reintroduce the same early-return optimization that we are trying to
-> avoid.
-> 
-> Using #pragma or __attribute__ optimization annotations of the code
-> for disabling optimization was avoided as it seems to be considered
-> broken or unmaintained for long time in GCC [1]. Therefore, we work
-> around that by specifying the compile flag for memneq.o directly in
-> the Makefile. We found that this seems to be most appropriate.
-> 
-> As we use ("Os"), this patch also provides a loop-free "fast-path" for
-> frequently used 16 byte digests. Similarly to kernel library string
-> functions, leave an option for future even further optimized architecture
-> specific assembler implementations.
-> 
-> This was a joint work of James Yonan and Daniel Borkmann. Also thanks
-> for feedback from Florian Weimer on this and earlier proposals [2].
-> 
->   [1] http://gcc.gnu.org/ml/gcc/2012-07/msg00211.html
->   [2] https://lkml.org/lkml/2013/2/10/131
-> 
-> Signed-off-by: James Yonan <james@openvpn.net>
-> Signed-off-by: Daniel Borkmann <dborkman@redhat.com>
-> Cc: Florian Weimer <fw@deneb.enyo.de>
+> Signed-off-by: Sachin Kamat <sachin.kamat@linaro.org>
+> Cc: Javier Martin <javier.martin@vista-silicon.com>
 
-Patch applied.  Thanks everyone.
+Both patches applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
