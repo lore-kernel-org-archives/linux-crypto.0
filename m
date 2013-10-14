@@ -1,72 +1,55 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and /dev/random
-Date: Mon, 14 Oct 2013 10:14:00 -0400
-Message-ID: <CACXcFmnDjSWHrU-4dR=Nb5n-9t=0PmM9Bc_pOFMTi3eotR2g6A@mail.gmail.com>
-References: <2579337.FPgJGgHYdz@tauon>
-	<CACXcFm=qdv9ktjYDGo+L=ssh+tCs7vVniznNpXyWVTBSB1CMRg@mail.gmail.com>
-	<5356953.K0nNZDGpEZ@tauon>
-	<CACXcFm=_jmeKe2YYbHDi-jTGX-23hDsDeu_weWQkr2F_FpE_6g@mail.gmail.com>
-	<CACXcFm=3Ee1+HGYRpsjhFMwqn2t15qAZNnMpZ8jOsE_HkB2CPg@mail.gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: Fwd: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and /dev/random
+Date: Mon, 14 Oct 2013 16:26:18 +0200
+Message-ID: <1986949.99Vxe5uoXS@tauon>
+References: <2579337.FPgJGgHYdz@tauon> <CACXcFm=3Ee1+HGYRpsjhFMwqn2t15qAZNnMpZ8jOsE_HkB2CPg@mail.gmail.com> <5084508.OCAIYQezeq@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: "Theodore Ts'o" <tytso@mit.edu>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CACXcFm=3Ee1+HGYRpsjhFMwqn2t15qAZNnMpZ8jOsE_HkB2CPg@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Theodore Ts'o <tytso@mit.edu>, LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Sandy Harris <sandyinchina@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:53937 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754084Ab3JNO03 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 14 Oct 2013 10:26:29 -0400
+Received: from tauon.localnet
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S15D> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Mon, 14 Oct 2013 16:26:19 +0200
+In-Reply-To: <5084508.OCAIYQezeq@tauon>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Oct 14, 2013 at 9:38 AM, Sandy Harris <sandyinchina@gmail.com> wrote:
+Am Montag, 14. Oktober 2013, 16:12:24 schrieb Stephan Mueller:
 
-> Stephan Mueller <smueller@chronox.de> wrote:
+Hi Sandy,
 
->> Can you please help me understand why you think that a whitening
->> function (cryptographic or not) is needed in the case of the CPU Jitter
->> RNG, provided that I can show that each individual bit coming from the
->> folding operation has one bit of entropy?
 >
-> Basically, sheer paranoia. I'd mix and whiten just on general
-> principles. Since efficiency is not a large concern, there is little
-> reason not to.
->
-> On the other hand, most RNGs use a hash because they need
-> to distill some large amount of low-entropy input into a smaller
-> high-entropy output. With high input entropy, you do not need
-> the hash and can choose some cheaper mixer.
+>(PS: I am aware that in case none of the individual bits would contain
+>one full bit of entropy, the folding operation may --mathematically
+>spoken-- not deliver one full bit of entropy. However, after speaking
+>with a mathematician, that slight inconsistency is ok, if I can show
+>that the distribution of the folded bit is 50% zeros and 50% ones. That
+>is what I did in section 5.2.1. Thus, the conclusion is that I receive
+>one bit of entropy after the folding loop.)
 
-You could use strong mixing/whitening:
+One followup on this issue: if one believes that he has a problem with 
+that consideration, he can initialize the CPU Jitter RNG with an 
+oversampling rate. That rate simply performs the folding operation 64 
+times oversampling rate.
 
-Feed into random(4) and let it do the mixing.
+To fill the entropy pool completely once, the RNG needs 64 time deltas 
+which are folded into the one bit. All the oversampling rate now does is 
+to calculate more than once the complete entropy pool.
 
-Use some early outputs from your RNG to key an AES
-instance. Then encrypt later outputs; this gives a 64 in 64
-out mixer that is cryptographically strong but perhaps a bit
-slow in the context.
+For example, when you set the oversampling rate to 2, you need twice as 
+long for the random value as each bit the random value is calculated 
+twice. And the two independent 64 bit random values are simply XORed 
+together.
 
-Alternately, quite a few plausible components for fast cheap
-mixing are readily available.
+You can set the oversampling rate to any value above 1.
 
-The Aria cipher has one that is 128 in 128 out. It multiplies
-a 128-bit object by a fixed Boolean matrix, makes every
-output bit depend on many input bits. It is fairly cheap,
-used in every round and the cipher is acceptably fast.
-
-The column transform from AES is 32 in 32 out and makes
-every output byte depend on every input byte. It is fast; has
-to be since it is used four times in every round.
-
-A two-way pseudo-Hadamard transform (PHT) is 2n bits in
-and 2n out, requires only two additions, makes both n-bit
-outputs depend on both inputs.
-
-PHT can be applied recursively to mix 4n, 8n, ...
-
-My QHT is 32 in 32 out, makes every /bit/ of output
-depend on every bit of input. It is a tad expensive;
-two multiplications & two modulo operations. File
-qht.c at:
-ftp://ftp.cs.sjtu.edu.cn:990/sandy/maxwell/
-
-To mix 64 bits, I'd use two qht() calls to mix the 32-bit
-halves then a two-way PHT.
+Ciao
+Stephan
