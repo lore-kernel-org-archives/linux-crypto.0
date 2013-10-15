@@ -1,90 +1,259 @@
-From: Mathias Krause <mathias.krause@secunet.com>
-Subject: [PATCH 5/5] crypto: talitos - Simplify key parsing
-Date: Tue, 15 Oct 2013 13:49:34 +0200
-Message-ID: <998deca85e4f195b7380ef43747118972e239b55.1381831574.git.mathias.krause@secunet.com>
-References: <cover.1381831574.git.mathias.krause@secunet.com>
-Cc: Mathias Krause <mathias.krause@secunet.com>,
-	Christian Hohnstaedt <chohnstaedt@innominate.com>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Jamie Iles <jamie@jamieiles.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-crypto@vger.kernel.org
+From: Nicolas Ferre <nicolas.ferre@atmel.com>
+Subject: [PATCH 1/3] crypto: atmel-tdes - add support for Device Tree
+Date: Tue, 15 Oct 2013 16:43:36 +0200
+Message-ID: <1345d1ba7bb874b32926acc6cad05bf57b26058b.1381848041.git.nicolas.ferre@atmel.com>
+References: <1381768533-31756-1-git-send-email-nicolas.ferre@atmel.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<herbert@gondor.apana.org.au>,
+	Nicolas Ferre <nicolas.ferre@atmel.com>
+To: <linux-arm-kernel@lists.infradead.org>, <eric@eukrea.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:39678 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758780Ab3JOLtq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Oct 2013 07:49:46 -0400
-In-Reply-To: <cover.1381831574.git.mathias.krause@secunet.com>
-In-Reply-To: <cover.1381831574.git.mathias.krause@secunet.com>
-References: <cover.1381831574.git.mathias.krause@secunet.com>
+Received: from eusmtp01.atmel.com ([212.144.249.242]:23149 "EHLO
+	eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932270Ab3JOOnk (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 15 Oct 2013 10:43:40 -0400
+In-Reply-To: <1381768533-31756-1-git-send-email-nicolas.ferre@atmel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use the common helper function crypto_authenc_extractkeys() for key
-parsing.
+Add support for Device Tree and use of the DMA DT API to
+get the channels if needed.
+Documentation is added for these DT nodes.
 
-Cc: Kim Phillips <kim.phillips@freescale.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Signed-off-by: Mathias Krause <mathias.krause@secunet.com>
+Initial code by: Nicolas Royer and Eukrea.
+
+Signed-off-by: Nicolas Ferre <nicolas.ferre@atmel.com>
 ---
-Not tested as I've no such hardware, nor the needed cross compiler!
+ .../devicetree/bindings/crypto/atmel-crypto.txt    |  23 ++++
+ drivers/crypto/atmel-tdes.c                        | 143 ++++++++++++++-------
+ 2 files changed, 117 insertions(+), 49 deletions(-)
 
- drivers/crypto/talitos.c |   35 ++++++++---------------------------
- 1 files changed, 8 insertions(+), 27 deletions(-)
-
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 661dc3e..f6f7c68 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -671,39 +671,20 @@ static int aead_setkey(struct crypto_aead *authenc,
- 		       const u8 *key, unsigned int keylen)
+diff --git a/Documentation/devicetree/bindings/crypto/atmel-crypto.txt b/Documentation/devicetree/bindings/crypto/atmel-crypto.txt
+index d273f0b..9a24fd9 100644
+--- a/Documentation/devicetree/bindings/crypto/atmel-crypto.txt
++++ b/Documentation/devicetree/bindings/crypto/atmel-crypto.txt
+@@ -21,3 +21,26 @@ aes@f8038000 {
+ 	dmas = <&dma1 2 18>,
+ 	       <&dma1 2 19>;
+ 	dma-names = "tx", "rx";
++
++* Triple Data Encryption Standard (Triple DES)
++
++Required properties:
++- compatible : Should be "atmel,at91sam9g46-tdes".
++- reg: Should contain TDES registers location and length.
++- interrupts: Should contain the IRQ line for the TDES.
++
++Optional properties:
++- dmas: List of two DMA specifiers as described in
++        atmel-dma.txt and dma.txt files.
++- dma-names: Contains one identifier string for each DMA specifier
++             in the dmas property.
++
++Example:
++tdes@f803c000 {
++	compatible = "atmel,at91sam9g46-tdes";
++	reg = <0xf803c000 0x100>;
++	interrupts = <44 4 0>;
++	dmas = <&dma1 2 20>,
++	       <&dma1 2 21>;
++	dma-names = "tx", "rx";
++};
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index 4a99564..6cde5b5 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -30,6 +30,7 @@
+ #include <linux/irq.h>
+ #include <linux/scatterlist.h>
+ #include <linux/dma-mapping.h>
++#include <linux/of_device.h>
+ #include <linux/delay.h>
+ #include <linux/crypto.h>
+ #include <linux/cryptohash.h>
+@@ -716,59 +717,50 @@ static int atmel_tdes_dma_init(struct atmel_tdes_dev *dd,
+ 			struct crypto_platform_data *pdata)
  {
- 	struct talitos_ctx *ctx = crypto_aead_ctx(authenc);
--	struct rtattr *rta = (void *)key;
--	struct crypto_authenc_key_param *param;
--	unsigned int authkeylen;
--	unsigned int enckeylen;
--
--	if (!RTA_OK(rta, keylen))
--		goto badkey;
-+	struct crypto_authenc_keys keys;
+ 	int err = -ENOMEM;
+-	dma_cap_mask_t mask_in, mask_out;
++	dma_cap_mask_t mask;
++
++	dma_cap_zero(mask);
++	dma_cap_set(DMA_SLAVE, mask);
++
++	/* Try to grab 2 DMA channels */
++	dd->dma_lch_in.chan = dma_request_slave_channel_compat(mask,
++			atmel_tdes_filter, &pdata->dma_slave->rxdata, dd->dev, "tx");
++	if (!dd->dma_lch_in.chan)
++		goto err_dma_in;
++
++	dd->dma_lch_in.dma_conf.direction = DMA_MEM_TO_DEV;
++	dd->dma_lch_in.dma_conf.dst_addr = dd->phys_base +
++		TDES_IDATA1R;
++	dd->dma_lch_in.dma_conf.src_maxburst = 1;
++	dd->dma_lch_in.dma_conf.src_addr_width =
++		DMA_SLAVE_BUSWIDTH_4_BYTES;
++	dd->dma_lch_in.dma_conf.dst_maxburst = 1;
++	dd->dma_lch_in.dma_conf.dst_addr_width =
++		DMA_SLAVE_BUSWIDTH_4_BYTES;
++	dd->dma_lch_in.dma_conf.device_fc = false;
++
++	dd->dma_lch_out.chan = dma_request_slave_channel_compat(mask,
++			atmel_tdes_filter, &pdata->dma_slave->txdata, dd->dev, "rx");
++	if (!dd->dma_lch_out.chan)
++		goto err_dma_out;
++
++	dd->dma_lch_out.dma_conf.direction = DMA_DEV_TO_MEM;
++	dd->dma_lch_out.dma_conf.src_addr = dd->phys_base +
++		TDES_ODATA1R;
++	dd->dma_lch_out.dma_conf.src_maxburst = 1;
++	dd->dma_lch_out.dma_conf.src_addr_width =
++		DMA_SLAVE_BUSWIDTH_4_BYTES;
++	dd->dma_lch_out.dma_conf.dst_maxburst = 1;
++	dd->dma_lch_out.dma_conf.dst_addr_width =
++		DMA_SLAVE_BUSWIDTH_4_BYTES;
++	dd->dma_lch_out.dma_conf.device_fc = false;
  
--	if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
-+	if (crypto_authenc_extractkeys(&keys, key, keylen) != 0)
- 		goto badkey;
+-	if (pdata && pdata->dma_slave->txdata.dma_dev &&
+-		pdata->dma_slave->rxdata.dma_dev) {
+-
+-		/* Try to grab 2 DMA channels */
+-		dma_cap_zero(mask_in);
+-		dma_cap_set(DMA_SLAVE, mask_in);
+-
+-		dd->dma_lch_in.chan = dma_request_channel(mask_in,
+-				atmel_tdes_filter, &pdata->dma_slave->rxdata);
+-
+-		if (!dd->dma_lch_in.chan)
+-			goto err_dma_in;
+-
+-		dd->dma_lch_in.dma_conf.direction = DMA_MEM_TO_DEV;
+-		dd->dma_lch_in.dma_conf.dst_addr = dd->phys_base +
+-			TDES_IDATA1R;
+-		dd->dma_lch_in.dma_conf.src_maxburst = 1;
+-		dd->dma_lch_in.dma_conf.src_addr_width =
+-			DMA_SLAVE_BUSWIDTH_4_BYTES;
+-		dd->dma_lch_in.dma_conf.dst_maxburst = 1;
+-		dd->dma_lch_in.dma_conf.dst_addr_width =
+-			DMA_SLAVE_BUSWIDTH_4_BYTES;
+-		dd->dma_lch_in.dma_conf.device_fc = false;
+-
+-		dma_cap_zero(mask_out);
+-		dma_cap_set(DMA_SLAVE, mask_out);
+-		dd->dma_lch_out.chan = dma_request_channel(mask_out,
+-				atmel_tdes_filter, &pdata->dma_slave->txdata);
+-
+-		if (!dd->dma_lch_out.chan)
+-			goto err_dma_out;
+-
+-		dd->dma_lch_out.dma_conf.direction = DMA_DEV_TO_MEM;
+-		dd->dma_lch_out.dma_conf.src_addr = dd->phys_base +
+-			TDES_ODATA1R;
+-		dd->dma_lch_out.dma_conf.src_maxburst = 1;
+-		dd->dma_lch_out.dma_conf.src_addr_width =
+-			DMA_SLAVE_BUSWIDTH_4_BYTES;
+-		dd->dma_lch_out.dma_conf.dst_maxburst = 1;
+-		dd->dma_lch_out.dma_conf.dst_addr_width =
+-			DMA_SLAVE_BUSWIDTH_4_BYTES;
+-		dd->dma_lch_out.dma_conf.device_fc = false;
+-
+-		return 0;
+-	} else {
+-		return -ENODEV;
+-	}
++	return 0;
  
--	if (RTA_PAYLOAD(rta) < sizeof(*param))
-+	if (keys.authkeylen + keys.enckeylen > TALITOS_MAX_KEY_SIZE)
- 		goto badkey;
+ err_dma_out:
+ 	dma_release_channel(dd->dma_lch_in.chan);
+ err_dma_in:
++	dev_warn(dd->dev, "no DMA channel available\n");
+ 	return err;
+ }
  
--	param = RTA_DATA(rta);
--	enckeylen = be32_to_cpu(param->enckeylen);
--
--	key += RTA_ALIGN(rta->rta_len);
--	keylen -= RTA_ALIGN(rta->rta_len);
--
--	if (keylen < enckeylen)
--		goto badkey;
-+	memcpy(ctx->key, keys.authkey, keys.authkeylen);
-+	memcpy(&ctx->key[keys.authkeylen], keys.enckey, keys.enckeylen);
+@@ -1317,6 +1309,47 @@ static void atmel_tdes_get_cap(struct atmel_tdes_dev *dd)
+ 	}
+ }
  
--	authkeylen = keylen - enckeylen;
--
--	if (keylen > TALITOS_MAX_KEY_SIZE)
--		goto badkey;
--
--	memcpy(&ctx->key, key, keylen);
--
--	ctx->keylen = keylen;
--	ctx->enckeylen = enckeylen;
--	ctx->authkeylen = authkeylen;
-+	ctx->keylen = keys.authkeylen + keys.enckeylen;
-+	ctx->enckeylen = keys.enckeylen;
-+	ctx->authkeylen = keys.authkeylen;
++#if defined(CONFIG_OF)
++static const struct of_device_id atmel_tdes_dt_ids[] = {
++	{ .compatible = "atmel,at91sam9g46-tdes" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, atmel_tdes_dt_ids);
++
++static struct crypto_platform_data *atmel_tdes_of_init(struct platform_device *pdev)
++{
++	struct device_node *np = pdev->dev.of_node;
++	struct crypto_platform_data *pdata;
++
++	if (!np) {
++		dev_err(&pdev->dev, "device node not found\n");
++		return ERR_PTR(-EINVAL);
++	}
++
++	pdata = devm_kzalloc(&pdev->dev, sizeof(*pdata), GFP_KERNEL);
++	if (!pdata) {
++		dev_err(&pdev->dev, "could not allocate memory for pdata\n");
++		return ERR_PTR(-ENOMEM);
++	}
++
++	pdata->dma_slave = devm_kzalloc(&pdev->dev,
++					sizeof(*(pdata->dma_slave)),
++					GFP_KERNEL);
++	if (!pdata->dma_slave) {
++		dev_err(&pdev->dev, "could not allocate memory for dma_slave\n");
++		devm_kfree(&pdev->dev, pdata);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	return pdata;
++}
++#else /* CONFIG_OF */
++static inline struct crypto_platform_data *atmel_tdes_of_init(struct platform_device *pdev)
++{
++	return ERR_PTR(-EINVAL);
++}
++#endif
++
+ static int atmel_tdes_probe(struct platform_device *pdev)
+ {
+ 	struct atmel_tdes_dev *tdes_dd;
+@@ -1399,13 +1432,24 @@ static int atmel_tdes_probe(struct platform_device *pdev)
+ 	if (tdes_dd->caps.has_dma) {
+ 		pdata = pdev->dev.platform_data;
+ 		if (!pdata) {
+-			dev_err(&pdev->dev, "platform data not available\n");
++			pdata = atmel_tdes_of_init(pdev);
++			if (IS_ERR(pdata)) {
++				dev_err(&pdev->dev, "platform data not available\n");
++				err = PTR_ERR(pdata);
++				goto err_pdata;
++			}
++		}
++		if (!pdata->dma_slave) {
+ 			err = -ENXIO;
+ 			goto err_pdata;
+ 		}
+ 		err = atmel_tdes_dma_init(tdes_dd, pdata);
+ 		if (err)
+ 			goto err_tdes_dma;
++
++		dev_info(dev, "using %s, %s for DMA transfers\n",
++				dma_chan_name(tdes_dd->dma_lch_in.chan),
++				dma_chan_name(tdes_dd->dma_lch_out.chan));
+ 	}
  
- 	return 0;
+ 	spin_lock(&atmel_tdes.lock);
+@@ -1487,6 +1531,7 @@ static struct platform_driver atmel_tdes_driver = {
+ 	.driver		= {
+ 		.name	= "atmel_tdes",
+ 		.owner	= THIS_MODULE,
++		.of_match_table = of_match_ptr(atmel_tdes_dt_ids),
+ 	},
+ };
  
 -- 
-1.7.2.5
+1.8.2.2
