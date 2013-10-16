@@ -1,46 +1,33 @@
-From: Nicolas Ferre <nicolas.ferre@atmel.com>
-Subject: [PATCH 3/3] crypto: atmel-sha - add sha information to the log
-Date: Tue, 15 Oct 2013 16:43:38 +0200
-Message-ID: <09f509fc6cfb779afb0f01c36b37a49bac05f626.1381848041.git.nicolas.ferre@atmel.com>
-References: <1345d1ba7bb874b32926acc6cad05bf57b26058b.1381848041.git.nicolas.ferre@atmel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: mv_cesa: remove deprecated IRQF_DISABLED
+Date: Wed, 16 Oct 2013 20:57:48 +0800
+Message-ID: <20131016125747.GB10906@gondor.apana.org.au>
+References: <1381639753-7042-1-git-send-email-michael.opdenacker@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>,
-	Nicolas Ferre <nicolas.ferre@atmel.com>
-To: <linux-arm-kernel@lists.infradead.org>, <eric@eukrea.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Michael Opdenacker <michael.opdenacker@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eusmtp01.atmel.com ([212.144.249.242]:23328 "EHLO
-	eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758875Ab3JOOo0 (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:33083 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S934239Ab3JPM5x (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Oct 2013 10:44:26 -0400
-In-Reply-To: <1345d1ba7bb874b32926acc6cad05bf57b26058b.1381848041.git.nicolas.ferre@atmel.com>
+	Wed, 16 Oct 2013 08:57:53 -0400
+Content-Disposition: inline
+In-Reply-To: <1381639753-7042-1-git-send-email-michael.opdenacker@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Depending on peripheral capabilities, print SHA information at the end
-of the probe function.
+On Sun, Oct 13, 2013 at 06:49:13AM +0200, Michael Opdenacker wrote:
+> This patch proposes to remove the use of the IRQF_DISABLED flag
+> 
+> It's a NOOP since 2.6.35 and it will be removed one day.
+> 
+> Signed-off-by: Michael Opdenacker <michael.opdenacker@free-electrons.com>
 
-Signed-off-by: Nicolas Ferre <nicolas.ferre@atmel.com>
----
- drivers/crypto/atmel-sha.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index ecfdf72..0618be0 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1469,7 +1469,9 @@ static int atmel_sha_probe(struct platform_device *pdev)
- 	if (err)
- 		goto err_algs;
- 
--	dev_info(dev, "Atmel SHA1/SHA256\n");
-+	dev_info(dev, "Atmel SHA1/SHA256%s%s\n",
-+			sha_dd->caps.has_sha224 ? "/SHA224" : "",
-+			sha_dd->caps.has_sha_384_512 ? "/SHA384/SHA512" : "");
- 
- 	return 0;
- 
+Patch applied.
 -- 
-1.8.2.2
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
