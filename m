@@ -1,47 +1,41 @@
-From: Jiri Kosina <jkosina@suse.cz>
-Subject: Re: [PATCH] [CRYPTO] kconfig: Corrected a typo
-Date: Fri, 18 Oct 2013 00:03:04 +0200 (CEST)
-Message-ID: <alpine.LNX.2.00.1310180002350.12405@pobox.suse.cz>
-References: <1382024351-23743-1-git-send-email-siddharth98391@gmail.com>
-Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Siddharth Goel <siddharth98391@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52269 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1762289Ab3JQWDI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Oct 2013 18:03:08 -0400
-In-Reply-To: <1382024351-23743-1-git-send-email-siddharth98391@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: "Geyslan G. Bem" <geyslan@gmail.com>
+Subject: [PATCH] crypto: n2_core: insert '!err' condition in else scope
+Date: Sat, 19 Oct 2013 10:09:31 -0300
+Message-ID: <1382188171-25595-1-git-send-email-geyslan@gmail.com>
+Cc: "Geyslan G. Bem" <geyslan@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org (open list:CRYPTO API),
+	linux-kernel@vger.kernel.org (open list)
+To: kernel-br@googlegroups.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 17 Oct 2013, Siddharth Goel wrote:
+This patch moves the '!err' condition into the above else scope,
+what is more obvious and has the secondary goal of avoid false-positives
+in statical analyze tools.
 
-> Corrected a typo in option description in Kconfig
-> 
-> Buglink: https://bugzilla.kernel.org/show_bug.cgi?id=60848
-> 
-> Signed-off-by: Siddharth Goel <siddharth98391@gmail.com>
-> ---
->  crypto/Kconfig |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 69ce573..84698cf 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -1084,7 +1084,7 @@ config CRYPTO_SERPENT
->  
->  	  Keys are allowed to be from 0 to 256 bits in length, in steps
->  	  of 8 bits.  Also includes the 'Tnepres' algorithm, a reversed
-> -	  variant of Serpent for compatibility with old kerneli.org code.
-> +	  variant of Serpent for compatibility with old kernel.org code.
+Signed-off-by: Geyslan G. Bem <geyslan@gmail.com>
+---
+ drivers/crypto/n2_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Automatic conversion of kerneli -> kernel is not correct, it's not a typo. 
-Please google for "kerneli" in LKML archives.
-
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index e1f0ab4..afc6983 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -1511,9 +1511,9 @@ static int __n2_register_one_ahash(const struct n2_hash_tmpl *tmpl)
+ 		kfree(p);
+ 	} else {
+ 		pr_info("%s alg registered\n", base->cra_name);
++		if (p->hmac_type != AUTH_TYPE_RESERVED)
++			err = __n2_register_one_hmac(p);
+ 	}
+-	if (!err && p->hmac_type != AUTH_TYPE_RESERVED)
+-		err = __n2_register_one_hmac(p);
+ 	return err;
+ }
+ 
 -- 
-Jiri Kosina
-SUSE Labs
+1.8.4
