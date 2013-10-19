@@ -1,45 +1,69 @@
-From: David Miller <davem@davemloft.net>
+From: =?UTF-8?Q?Geyslan_Greg=C3=B3rio_Bem?= <geyslan@gmail.com>
 Subject: Re: [PATCH] crypto: n2_core: insert '!err' condition in else scope
-Date: Sat, 19 Oct 2013 18:49:19 -0400 (EDT)
-Message-ID: <20131019.184919.1292439830365652584.davem@davemloft.net>
+Date: Sat, 19 Oct 2013 20:13:25 -0300
+Message-ID: <CAGG-pUSfA7ynQM3OEFqHaac3vh3BooisGq2rKO5OmAE_cdKb9A@mail.gmail.com>
 References: <1382188171-25595-1-git-send-email-geyslan@gmail.com>
 	<20131019.183825.2015665991258674429.davem@davemloft.net>
 	<CAGG-pUSMJTbGHEhCOy0PRLNN4+jyVB8oB3mca1O9sb2YbpQ-fg@mail.gmail.com>
+	<20131019.184919.1292439830365652584.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: kernel-br@googlegroups.com, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: geyslan@gmail.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAGG-pUSMJTbGHEhCOy0PRLNN4+jyVB8oB3mca1O9sb2YbpQ-fg@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: kernel-br <kernel-br@googlegroups.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>
+To: David Miller <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ie0-f174.google.com ([209.85.223.174]:64641 "EHLO
+	mail-ie0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750815Ab3JSXN0 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 19 Oct 2013 19:13:26 -0400
+In-Reply-To: <20131019.184919.1292439830365652584.davem@davemloft.net>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-=46rom: Geyslan Greg=F3rio Bem <geyslan@gmail.com>
-Date: Sat, 19 Oct 2013 19:42:35 -0300
-
-> 2013/10/19 David Miller <davem@davemloft.net>:
->> From: "Geyslan G. Bem" <geyslan@gmail.com>
->> Date: Sat, 19 Oct 2013 10:09:31 -0300
->>
->>> This patch moves the '!err' condition into the above else scope,
->>> what is more obvious and has the secondary goal of avoid false-posi=
-tives
->>> in statical analyze tools.
+2013/10/19 David Miller <davem@davemloft.net>:
+> From: Geyslan Greg=C3=B3rio Bem <geyslan@gmail.com>
+> Date: Sat, 19 Oct 2013 19:42:35 -0300
+>
+>> 2013/10/19 David Miller <davem@davemloft.net>:
+>>> From: "Geyslan G. Bem" <geyslan@gmail.com>
+>>> Date: Sat, 19 Oct 2013 10:09:31 -0300
 >>>
->>> Signed-off-by: Geyslan G. Bem <geyslan@gmail.com>
+>>>> This patch moves the '!err' condition into the above else scope,
+>>>> what is more obvious and has the secondary goal of avoid false-pos=
+itives
+>>>> in statical analyze tools.
+>>>>
+>>>> Signed-off-by: Geyslan G. Bem <geyslan@gmail.com>
+>>>
+>>> I do not think patches should be applied to satisfy tools if the
+>>> code is semantically correct.
 >>
->> I do not think patches should be applied to satisfy tools if the
->> code is semantically correct.
->=20
-> Yes, Miller, I agree. But as I mentioned:
-> ".. and has as the 'secondary' goal of avoid false-positives in
-> statical analyze tools."
->=20
-> The 'primary' goal is to not repeat a condition test:
-> "This patch moves the '!err' condition into the above else scope, wha=
-t
-> is more obvious ..."
+>> Yes, Miller, I agree. But as I mentioned:
+>> ".. and has as the 'secondary' goal of avoid false-positives in
+>> statical analyze tools."
+>>
+>> The 'primary' goal is to not repeat a condition test:
+>> "This patch moves the '!err' condition into the above else scope, wh=
+at
+>> is more obvious ..."
+>
+> I still do not feel that this change is a net-positive.  Sorry.
+Miller,
 
-I still do not feel that this change is a net-positive.  Sorry.
+I can understand you. You don't want to break your git history
+(blame). But when a code is clearly more readable/understandable you
+must assume that it has a huge net-positive.
+
+The patch improves the code in three ways:
+- Only one if/else;
+- Not blame on static analysis tools.
+- And avoid more discussion about that in the future (nobody will send
+patches like this to disturb you about that part of code).
+
+The decision is yours.
+
+Thanks again.
