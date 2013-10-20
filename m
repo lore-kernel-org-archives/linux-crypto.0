@@ -1,69 +1,49 @@
-From: =?UTF-8?Q?Geyslan_Greg=C3=B3rio_Bem?= <geyslan@gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] crypto: n2_core: insert '!err' condition in else scope
-Date: Sat, 19 Oct 2013 20:13:25 -0300
-Message-ID: <CAGG-pUSfA7ynQM3OEFqHaac3vh3BooisGq2rKO5OmAE_cdKb9A@mail.gmail.com>
+Date: Sun, 20 Oct 2013 20:12:31 +0800
+Message-ID: <20131020121231.GA20425@gondor.apana.org.au>
 References: <1382188171-25595-1-git-send-email-geyslan@gmail.com>
-	<20131019.183825.2015665991258674429.davem@davemloft.net>
-	<CAGG-pUSMJTbGHEhCOy0PRLNN4+jyVB8oB3mca1O9sb2YbpQ-fg@mail.gmail.com>
-	<20131019.184919.1292439830365652584.davem@davemloft.net>
+ <20131019.183825.2015665991258674429.davem@davemloft.net>
+ <CAGG-pUSMJTbGHEhCOy0PRLNN4+jyVB8oB3mca1O9sb2YbpQ-fg@mail.gmail.com>
+ <20131019.184919.1292439830365652584.davem@davemloft.net>
+ <CAGG-pUSfA7ynQM3OEFqHaac3vh3BooisGq2rKO5OmAE_cdKb9A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: kernel-br <kernel-br@googlegroups.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: David Miller <davem@davemloft.net>,
+	kernel-br <kernel-br@googlegroups.com>,
 	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
 	LKML <linux-kernel@vger.kernel.org>
-To: David Miller <davem@davemloft.net>
+To: Geyslan =?iso-8859-1?Q?Greg=F3rio?= Bem <geyslan@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f174.google.com ([209.85.223.174]:64641 "EHLO
-	mail-ie0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750815Ab3JSXN0 convert rfc822-to-8bit (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:36852 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751305Ab3JTMMj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 19 Oct 2013 19:13:26 -0400
-In-Reply-To: <20131019.184919.1292439830365652584.davem@davemloft.net>
+	Sun, 20 Oct 2013 08:12:39 -0400
+Content-Disposition: inline
+In-Reply-To: <CAGG-pUSfA7ynQM3OEFqHaac3vh3BooisGq2rKO5OmAE_cdKb9A@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-2013/10/19 David Miller <davem@davemloft.net>:
-> From: Geyslan Greg=C3=B3rio Bem <geyslan@gmail.com>
-> Date: Sat, 19 Oct 2013 19:42:35 -0300
->
->> 2013/10/19 David Miller <davem@davemloft.net>:
->>> From: "Geyslan G. Bem" <geyslan@gmail.com>
->>> Date: Sat, 19 Oct 2013 10:09:31 -0300
->>>
->>>> This patch moves the '!err' condition into the above else scope,
->>>> what is more obvious and has the secondary goal of avoid false-pos=
-itives
->>>> in statical analyze tools.
->>>>
->>>> Signed-off-by: Geyslan G. Bem <geyslan@gmail.com>
->>>
->>> I do not think patches should be applied to satisfy tools if the
->>> code is semantically correct.
->>
->> Yes, Miller, I agree. But as I mentioned:
->> ".. and has as the 'secondary' goal of avoid false-positives in
->> statical analyze tools."
->>
->> The 'primary' goal is to not repeat a condition test:
->> "This patch moves the '!err' condition into the above else scope, wh=
-at
->> is more obvious ..."
->
-> I still do not feel that this change is a net-positive.  Sorry.
-Miller,
+On Sat, Oct 19, 2013 at 08:13:25PM -0300, Geyslan Greg=F3rio Bem wrote:
+>=20
+> I can understand you. You don't want to break your git history
+> (blame). But when a code is clearly more readable/understandable you
+> must assume that it has a huge net-positive.
+>=20
+> The patch improves the code in three ways:
+> - Only one if/else;
+> - Not blame on static analysis tools.
+> - And avoid more discussion about that in the future (nobody will sen=
+d
+> patches like this to disturb you about that part of code).
+>=20
+> The decision is yours.
 
-I can understand you. You don't want to break your git history
-(blame). But when a code is clearly more readable/understandable you
-must assume that it has a huge net-positive.
-
-The patch improves the code in three ways:
-- Only one if/else;
-- Not blame on static analysis tools.
-- And avoid more discussion about that in the future (nobody will send
-patches like this to disturb you about that part of code).
-
-The decision is yours.
-
-Thanks again.
+=46WIW I totally agree with David so your patch isn't going in.
+Sorry.
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
