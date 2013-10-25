@@ -1,87 +1,661 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: skcipher - Use eseqiv even on UP machines
-Date: Thu, 24 Oct 2013 20:41:49 +0800
-Message-ID: <20131024124149.GA10587@gondor.apana.org.au>
+From: Ruchika Gupta <ruchika.gupta@freescale.com>
+Subject: [PATCH 1/3] crypto: caam - Add Platform driver for Job Ring
+Date: Fri, 25 Oct 2013 12:01:01 +0530
+Message-ID: <1382682663-18651-1-git-send-email-ruchika.gupta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: "David S. Miller" <davem@davemloft.net>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <herbert@gondor.hengli.com.au>
+To: <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from tx2ehsobe005.messaging.microsoft.com ([65.55.88.15]:27963 "EHLO
+	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751349Ab3JYGgK (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Oct 2013 02:36:10 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi:
-    
-Previously we would use eseqiv on all async ciphers in all cases,
-and sync ciphers if we have more than one CPU.  This meant that
-chainiv is only used in the case of sync ciphers on a UP machine.
+The SEC Job Rings are now available as individual devices.
+This would enable sharing of job rings between kernel and
+user space. Job Rings can now be dynamically bound/unbound
+from kernel.
 
-As chainiv may aid attackers by making the IV predictable, even
-though this risk itself is small, the above usage pattern causes
-it to further leak information about the host.
+Changes are made in the following layers of CAAM Driver
+1. Controller driver
+        - Does basic initialization of CAAM Block.
+        - Creates platform devices for Job Rings.
+(Earlier the initialization of Job ring  was done
+ by the controller driver)
 
-This patch addresses these issues by using eseqiv even if we're
-on a UP machine.
+2. JobRing Platform driver
+        - Manages the platform Job Ring devices created
+          by the controller driver
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
+Reviewed-by: Garg Vakul-B16394 <vakul@freescale.com>
+---
+ drivers/crypto/caam/Kconfig    |  25 +++-
+ drivers/crypto/caam/Makefile   |   4 +-
+ drivers/crypto/caam/caamalg.c  |   4 +-
+ drivers/crypto/caam/caamhash.c |   4 +-
+ drivers/crypto/caam/caamrng.c  |   7 +-
+ drivers/crypto/caam/ctrl.c     |  30 +++--
+ drivers/crypto/caam/intern.h   |   6 +-
+ drivers/crypto/caam/jr.c       | 285 +++++++++++++++++++++++++----------------
+ drivers/crypto/caam/jr.h       |   3 -
+ 9 files changed, 232 insertions(+), 136 deletions(-)
 
---git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-index 7d4a8d2..40886c4 100644
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -16,9 +16,7 @@
- #include <crypto/internal/skcipher.h>
- #include <linux/cpumask.h>
- #include <linux/err.h>
--#include <linux/init.h>
- #include <linux/kernel.h>
--#include <linux/module.h>
- #include <linux/rtnetlink.h>
- #include <linux/sched.h>
- #include <linux/slab.h>
-@@ -30,8 +28,6 @@
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index ca89f6b..e7555ff 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -4,16 +4,29 @@ config CRYPTO_DEV_FSL_CAAM
+ 	help
+ 	  Enables the driver module for Freescale's Cryptographic Accelerator
+ 	  and Assurance Module (CAAM), also known as the SEC version 4 (SEC4).
+-	  This module adds a job ring operation interface, and configures h/w
++	  This module creates job ring devices, and configures h/w
+ 	  to operate as a DPAA component automatically, depending
+ 	  on h/w feature availability.
  
- #include "internal.h"
+ 	  To compile this driver as a module, choose M here: the module
+ 	  will be called caam.
  
--static const char *skcipher_default_geniv __read_mostly;
--
- struct ablkcipher_buffer {
- 	struct list_head	entry;
- 	struct scatter_walk	dst;
-@@ -527,8 +523,7 @@ const char *crypto_default_geniv(const struct crypto_alg *alg)
- 	    alg->cra_blocksize)
- 		return "chainiv";
++config CRYPTO_DEV_FSL_CAAM_JR
++	tristate "Freescale CAAM Job Ring driver backend"
++	depends on CRYPTO_DEV_FSL_CAAM
++	default y
++	help
++	  Enables the driver module for Job Rings which are part of
++	  Freescale's Cryptographic Accelerator
++	  and Assurance Module (CAAM). This module adds a job ring operation
++	  interface.
++
++	  To compile this driver as a module, choose M here: the module
++	  will be called caam_jr.
++
+ config CRYPTO_DEV_FSL_CAAM_RINGSIZE
+ 	int "Job Ring size"
+-	depends on CRYPTO_DEV_FSL_CAAM
++	depends on CRYPTO_DEV_FSL_CAAM_JR
+ 	range 2 9
+ 	default "9"
+ 	help
+@@ -31,7 +44,7 @@ config CRYPTO_DEV_FSL_CAAM_RINGSIZE
  
--	return alg->cra_flags & CRYPTO_ALG_ASYNC ?
--	       "eseqiv" : skcipher_default_geniv;
-+	return "eseqiv";
+ config CRYPTO_DEV_FSL_CAAM_INTC
+ 	bool "Job Ring interrupt coalescing"
+-	depends on CRYPTO_DEV_FSL_CAAM
++	depends on CRYPTO_DEV_FSL_CAAM_JR
+ 	default n
+ 	help
+ 	  Enable the Job Ring's interrupt coalescing feature.
+@@ -62,7 +75,7 @@ config CRYPTO_DEV_FSL_CAAM_INTC_TIME_THLD
+ 
+ config CRYPTO_DEV_FSL_CAAM_CRYPTO_API
+ 	tristate "Register algorithm implementations with the Crypto API"
+-	depends on CRYPTO_DEV_FSL_CAAM
++	depends on CRYPTO_DEV_FSL_CAAM && CRYPTO_DEV_FSL_CAAM_JR
+ 	default y
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_AUTHENC
+@@ -76,7 +89,7 @@ config CRYPTO_DEV_FSL_CAAM_CRYPTO_API
+ 
+ config CRYPTO_DEV_FSL_CAAM_AHASH_API
+ 	tristate "Register hash algorithm implementations with Crypto API"
+-	depends on CRYPTO_DEV_FSL_CAAM
++	depends on CRYPTO_DEV_FSL_CAAM && CRYPTO_DEV_FSL_CAAM_JR
+ 	default y
+ 	select CRYPTO_HASH
+ 	help
+@@ -88,7 +101,7 @@ config CRYPTO_DEV_FSL_CAAM_AHASH_API
+ 
+ config CRYPTO_DEV_FSL_CAAM_RNG_API
+ 	tristate "Register caam device for hwrng API"
+-	depends on CRYPTO_DEV_FSL_CAAM
++	depends on CRYPTO_DEV_FSL_CAAM && CRYPTO_DEV_FSL_CAAM_JR
+ 	default y
+ 	select CRYPTO_RNG
+ 	select HW_RANDOM
+diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
+index d56bd0e..550758a 100644
+--- a/drivers/crypto/caam/Makefile
++++ b/drivers/crypto/caam/Makefile
+@@ -6,8 +6,10 @@ ifeq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG), y)
+ endif
+ 
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM) += caam.o
++obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_JR) += caam_jr.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
+ 
+-caam-objs := ctrl.o jr.o error.o key_gen.o
++caam-objs := ctrl.o
++caam_jr-objs := jr.o key_gen.o error.o
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 86a0d41..ad9781e 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -2071,13 +2071,15 @@ static int caam_cra_init(struct crypto_tfm *tfm)
+ 		 container_of(alg, struct caam_crypto_alg, crypto_alg);
+ 	struct caam_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct caam_drv_private *priv = dev_get_drvdata(caam_alg->ctrldev);
++	struct platform_device *pdev;
+ 	int tgt_jr = atomic_inc_return(&priv->tfm_count);
+ 
+ 	/*
+ 	 * distribute tfms across job rings to ensure in-order
+ 	 * crypto request processing per tfm
+ 	 */
+-	ctx->jrdev = priv->jrdev[(tgt_jr / 2) % priv->total_jobrs];
++	pdev = priv->jrpdev[(tgt_jr / 2) % priv->total_jobrs];
++	ctx->jrdev = &pdev->dev;
+ 
+ 	/* copy descriptor header template value */
+ 	ctx->class1_alg_type = OP_TYPE_CLASS1_ALG | caam_alg->class1_alg_type;
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index ca6218e..91a9354 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1680,12 +1680,14 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
+ 					 HASH_MSG_LEN + SHA512_DIGEST_SIZE };
+ 	int tgt_jr = atomic_inc_return(&priv->tfm_count);
+ 	int ret = 0;
++	struct platform_device *pdev;
+ 
+ 	/*
+ 	 * distribute tfms across job rings to ensure in-order
+ 	 * crypto request processing per tfm
+ 	 */
+-	ctx->jrdev = priv->jrdev[tgt_jr % priv->total_jobrs];
++	pdev = priv->jrpdev[tgt_jr % priv->total_jobrs];
++	ctx->jrdev = &pdev->dev;
+ 
+ 	/* copy descriptor header template value */
+ 	ctx->alg_type = OP_TYPE_CLASS2_ALG | caam_hash->alg_type;
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index 588ad22..4e4ed15 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -279,7 +279,7 @@ static void __exit caam_rng_exit(void)
+ static int __init caam_rng_init(void)
+ {
+ 	struct device_node *dev_node;
+-	struct platform_device *pdev;
++	struct platform_device *pdev, *jrpdev;
+ 	struct device *ctrldev;
+ 	struct caam_drv_private *priv;
+ 
+@@ -305,9 +305,10 @@ static int __init caam_rng_init(void)
+ 	if (!priv)
+ 		return -ENODEV;
+ 
+-	caam_init_rng(&rng_ctx, priv->jrdev[0]);
++	jrpdev = priv->jrpdev[0];
++	caam_init_rng(&rng_ctx, &jrpdev->dev);
+ 
+-	dev_info(priv->jrdev[0], "registering rng-caam\n");
++	dev_info(&jrpdev->dev, "registering rng-caam\n");
+ 	return hwrng_register(&caam_rng);
  }
  
- static int crypto_givcipher_default(struct crypto_alg *alg, u32 type, u32 mask)
-@@ -709,17 +704,3 @@ err:
- 	return ERR_PTR(err);
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 26438cd..52cd6c1 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -268,7 +268,6 @@ static int caam_remove(struct platform_device *pdev)
+ {
+ 	struct device *ctrldev;
+ 	struct caam_drv_private *ctrlpriv;
+-	struct caam_drv_private_jr *jrpriv;
+ 	struct caam_full __iomem *topregs;
+ 	int ring, ret = 0;
+ 
+@@ -276,11 +275,10 @@ static int caam_remove(struct platform_device *pdev)
+ 	ctrlpriv = dev_get_drvdata(ctrldev);
+ 	topregs = (struct caam_full __iomem *)ctrlpriv->ctrl;
+ 
+-	/* shut down JobRs */
++	/* Remove platform devices for JobRs */
+ 	for (ring = 0; ring < ctrlpriv->total_jobrs; ring++) {
+-		ret |= caam_jr_shutdown(ctrlpriv->jrdev[ring]);
+-		jrpriv = dev_get_drvdata(ctrlpriv->jrdev[ring]);
+-		irq_dispose_mapping(jrpriv->irq);
++		if (ctrlpriv->jrpdev[ring])
++			of_device_unregister(ctrlpriv->jrpdev[ring]);
+ 	}
+ 
+ 	/* De-initialize RNG state handles initialized by this driver. */
+@@ -295,7 +293,7 @@ static int caam_remove(struct platform_device *pdev)
+ 	/* Unmap controller region */
+ 	iounmap(&topregs->ctrl);
+ 
+-	kfree(ctrlpriv->jrdev);
++	kfree(ctrlpriv->jrpdev);
+ 	kfree(ctrlpriv);
+ 
+ 	return ret;
+@@ -450,8 +448,9 @@ static int caam_probe(struct platform_device *pdev)
+ 			rspec++;
+ 	}
+ 
+-	ctrlpriv->jrdev = kzalloc(sizeof(struct device *) * rspec, GFP_KERNEL);
+-	if (ctrlpriv->jrdev == NULL) {
++	ctrlpriv->jrpdev = kzalloc(sizeof(struct platform_device *) * rspec,
++								GFP_KERNEL);
++	if (ctrlpriv->jrpdev == NULL) {
+ 		iounmap(&topregs->ctrl);
+ 		return -ENOMEM;
+ 	}
+@@ -459,13 +458,24 @@ static int caam_probe(struct platform_device *pdev)
+ 	ring = 0;
+ 	ctrlpriv->total_jobrs = 0;
+ 	for_each_compatible_node(np, NULL, "fsl,sec-v4.0-job-ring") {
+-		caam_jr_probe(pdev, np, ring);
++		ctrlpriv->jrpdev[ring] =
++				of_platform_device_create(np, NULL, dev);
++		if (!ctrlpriv->jrpdev[ring]) {
++			pr_warn("JR%d Platform device creation error\n", ring);
++			continue;
++		}
+ 		ctrlpriv->total_jobrs++;
+ 		ring++;
+ 	}
+ 	if (!ring) {
+ 		for_each_compatible_node(np, NULL, "fsl,sec4.0-job-ring") {
+-			caam_jr_probe(pdev, np, ring);
++			ctrlpriv->jrpdev[ring] =
++				of_platform_device_create(np, NULL, dev);
++			if (!ctrlpriv->jrpdev[ring]) {
++				pr_warn("JR%d Platform device creation error\n",
++					ring);
++				continue;
++			}
+ 			ctrlpriv->total_jobrs++;
+ 			ring++;
+ 		}
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index bbc1ac9..bff4acd 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -37,8 +37,8 @@ struct caam_jrentry_info {
+ 
+ /* Private sub-storage for a single JobR */
+ struct caam_drv_private_jr {
+-	struct device *parentdev;	/* points back to controller dev */
+-	struct platform_device *jr_pdev;/* points to platform device for JR */
++	struct list_head	list_node;	/* Job Ring device list */
++	struct device		*dev;
+ 	int ridx;
+ 	struct caam_job_ring __iomem *rregs;	/* JobR's register space */
+ 	struct tasklet_struct irqtask;
+@@ -63,7 +63,7 @@ struct caam_drv_private_jr {
+ struct caam_drv_private {
+ 
+ 	struct device *dev;
+-	struct device **jrdev; /* Alloc'ed array per sub-device */
++	struct platform_device **jrpdev; /* Alloc'ed array per sub-device */
+ 	struct platform_device *pdev;
+ 
+ 	/* Physical-presence section */
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 105ba4d..cdeaf25 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -11,6 +11,114 @@
+ #include "desc.h"
+ #include "intern.h"
+ 
++struct jr_driver_data {
++	/* List of Physical JobR's with the Driver */
++	struct list_head	jr_list;
++	spinlock_t		jr_alloc_lock;	/* jr_list lock */
++} ____cacheline_aligned;
++
++static struct jr_driver_data driver_data;
++
++static int caam_reset_hw_jr(struct device *dev)
++{
++	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++	unsigned int timeout = 100000;
++
++	/*
++	 * mask interrupts since we are going to poll
++	 * for reset completion status
++	 */
++	setbits32(&jrp->rregs->rconfig_lo, JRCFG_IMSK);
++
++	/* initiate flush (required prior to reset) */
++	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
++	while (((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) ==
++		JRINT_ERR_HALT_INPROGRESS) && --timeout)
++		cpu_relax();
++
++	if ((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) !=
++	    JRINT_ERR_HALT_COMPLETE || timeout == 0) {
++		dev_err(dev, "failed to flush job ring %d\n", jrp->ridx);
++		return -EIO;
++	}
++
++	/* initiate reset */
++	timeout = 100000;
++	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
++	while ((rd_reg32(&jrp->rregs->jrcommand) & JRCR_RESET) && --timeout)
++		cpu_relax();
++
++	if (timeout == 0) {
++		dev_err(dev, "failed to reset job ring %d\n", jrp->ridx);
++		return -EIO;
++	}
++
++	/* unmask interrupts */
++	clrbits32(&jrp->rregs->rconfig_lo, JRCFG_IMSK);
++
++	return 0;
++}
++
++/*
++ * Shutdown JobR independent of platform property code
++ */
++int caam_jr_shutdown(struct device *dev)
++{
++	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++	dma_addr_t inpbusaddr, outbusaddr;
++	int ret;
++
++	ret = caam_reset_hw_jr(dev);
++
++	tasklet_kill(&jrp->irqtask);
++
++	/* Release interrupt */
++	free_irq(jrp->irq, dev);
++
++	/* Free rings */
++	inpbusaddr = rd_reg64(&jrp->rregs->inpring_base);
++	outbusaddr = rd_reg64(&jrp->rregs->outring_base);
++	dma_free_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
++			  jrp->inpring, inpbusaddr);
++	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
++			  jrp->outring, outbusaddr);
++	kfree(jrp->entinfo);
++
++	return ret;
++}
++
++static int caam_jr_remove(struct platform_device *pdev)
++{
++	int ret;
++	struct device *jrdev;
++	struct caam_drv_private_jr *jrpriv;
++
++	jrdev = &pdev->dev;
++	jrpriv = dev_get_drvdata(jrdev);
++
++	/*
++	 * Make sure ring is empty before release
++	 */
++	if (rd_reg32(&jrpriv->rregs->outring_used) ||
++	    (rd_reg32(&jrpriv->rregs->inpring_avail) != JOBR_DEPTH)) {
++		dev_err(jrdev, "Device is busy\n");
++		return -EBUSY;
++	}
++
++	/* Remove the node from Physical JobR list maintained by driver */
++	spin_lock(&driver_data.jr_alloc_lock);
++	list_del(&jrpriv->list_node);
++	spin_unlock(&driver_data.jr_alloc_lock);
++
++	/* Release ring */
++	ret = caam_jr_shutdown(jrdev);
++	if (ret)
++		dev_err(jrdev, "Failed to shut down job ring\n");
++	irq_dispose_mapping(jrpriv->irq);
++
++	return ret;
++}
++
+ /* Main per-ring interrupt handler */
+ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
+ {
+@@ -205,46 +313,6 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
  }
- EXPORT_SYMBOL_GPL(crypto_alloc_ablkcipher);
--
--static int __init skcipher_module_init(void)
+ EXPORT_SYMBOL(caam_jr_enqueue);
+ 
+-static int caam_reset_hw_jr(struct device *dev)
 -{
--	skcipher_default_geniv = num_possible_cpus() > 1 ?
--				 "eseqiv" : "chainiv";
+-	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+-	unsigned int timeout = 100000;
+-
+-	/*
+-	 * mask interrupts since we are going to poll
+-	 * for reset completion status
+-	 */
+-	setbits32(&jrp->rregs->rconfig_lo, JRCFG_IMSK);
+-
+-	/* initiate flush (required prior to reset) */
+-	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
+-	while (((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) ==
+-		JRINT_ERR_HALT_INPROGRESS) && --timeout)
+-		cpu_relax();
+-
+-	if ((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) !=
+-	    JRINT_ERR_HALT_COMPLETE || timeout == 0) {
+-		dev_err(dev, "failed to flush job ring %d\n", jrp->ridx);
+-		return -EIO;
+-	}
+-
+-	/* initiate reset */
+-	timeout = 100000;
+-	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
+-	while ((rd_reg32(&jrp->rregs->jrcommand) & JRCR_RESET) && --timeout)
+-		cpu_relax();
+-
+-	if (timeout == 0) {
+-		dev_err(dev, "failed to reset job ring %d\n", jrp->ridx);
+-		return -EIO;
+-	}
+-
+-	/* unmask interrupts */
+-	clrbits32(&jrp->rregs->rconfig_lo, JRCFG_IMSK);
+-
 -	return 0;
 -}
 -
--static void skcipher_module_exit(void)
+ /*
+  * Init JobR independent of platform property detection
+  */
+@@ -260,7 +328,7 @@ static int caam_jr_init(struct device *dev)
+ 
+ 	/* Connect job ring interrupt handler. */
+ 	error = request_irq(jrp->irq, caam_jr_interrupt, IRQF_SHARED,
+-			    "caam-jobr", dev);
++			    dev_name(dev), dev);
+ 	if (error) {
+ 		dev_err(dev, "can't connect JobR %d interrupt (%d)\n",
+ 			jrp->ridx, jrp->irq);
+@@ -316,86 +384,43 @@ static int caam_jr_init(struct device *dev)
+ 	return 0;
+ }
+ 
+-/*
+- * Shutdown JobR independent of platform property code
+- */
+-int caam_jr_shutdown(struct device *dev)
 -{
--}
+-	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+-	dma_addr_t inpbusaddr, outbusaddr;
+-	int ret;
 -
--module_init(skcipher_module_init);
--module_exit(skcipher_module_exit);
-
-Cheers,
+-	ret = caam_reset_hw_jr(dev);
+-
+-	tasklet_kill(&jrp->irqtask);
+-
+-	/* Release interrupt */
+-	free_irq(jrp->irq, dev);
+-
+-	/* Free rings */
+-	inpbusaddr = rd_reg64(&jrp->rregs->inpring_base);
+-	outbusaddr = rd_reg64(&jrp->rregs->outring_base);
+-	dma_free_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
+-			  jrp->inpring, inpbusaddr);
+-	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
+-			  jrp->outring, outbusaddr);
+-	kfree(jrp->entinfo);
+-	of_device_unregister(jrp->jr_pdev);
+-
+-	return ret;
+-}
+ 
+ /*
+- * Probe routine for each detected JobR subsystem. It assumes that
+- * property detection was picked up externally.
++ * Probe routine for each detected JobR subsystem.
+  */
+-int caam_jr_probe(struct platform_device *pdev, struct device_node *np,
+-		  int ring)
++static int caam_jr_probe(struct platform_device *pdev)
+ {
+-	struct device *ctrldev, *jrdev;
+-	struct platform_device *jr_pdev;
+-	struct caam_drv_private *ctrlpriv;
++	struct device *jrdev;
++	struct device_node *nprop;
++	struct caam_job_ring __iomem *ctrl;
+ 	struct caam_drv_private_jr *jrpriv;
+-	u32 *jroffset;
++	static int total_jobrs;
+ 	int error;
+ 
+-	ctrldev = &pdev->dev;
+-	ctrlpriv = dev_get_drvdata(ctrldev);
+-
++	jrdev = &pdev->dev;
+ 	jrpriv = kmalloc(sizeof(struct caam_drv_private_jr),
+ 			 GFP_KERNEL);
+-	if (jrpriv == NULL) {
+-		dev_err(ctrldev, "can't alloc private mem for job ring %d\n",
+-			ring);
++	if (!jrpriv)
+ 		return -ENOMEM;
+-	}
+-	jrpriv->parentdev = ctrldev; /* point back to parent */
+-	jrpriv->ridx = ring; /* save ring identity relative to detection */
+ 
+-	/*
+-	 * Derive a pointer to the detected JobRs regs
+-	 * Driver has already iomapped the entire space, we just
+-	 * need to add in the offset to this JobR. Don't know if I
+-	 * like this long-term, but it'll run
+-	 */
+-	jroffset = (u32 *)of_get_property(np, "reg", NULL);
+-	jrpriv->rregs = (struct caam_job_ring __iomem *)((void *)ctrlpriv->ctrl
+-							 + *jroffset);
++	dev_set_drvdata(jrdev, jrpriv);
+ 
+-	/* Build a local dev for each detected queue */
+-	jr_pdev = of_platform_device_create(np, NULL, ctrldev);
+-	if (jr_pdev == NULL) {
+-		kfree(jrpriv);
+-		return -EINVAL;
++	/* save ring identity relative to detection */
++	jrpriv->ridx = total_jobrs++;
++
++	nprop = pdev->dev.of_node;
++	/* Get configuration properties from device tree */
++	/* First, get register page */
++	ctrl = of_iomap(nprop, 0);
++	if (!ctrl) {
++		dev_err(jrdev, "of_iomap() failed\n");
++		return -ENOMEM;
+ 	}
+ 
+-	jrpriv->jr_pdev = jr_pdev;
+-	jrdev = &jr_pdev->dev;
+-	dev_set_drvdata(jrdev, jrpriv);
+-	ctrlpriv->jrdev[ring] = jrdev;
++	jrpriv->rregs = (struct caam_job_ring __force *)ctrl;
+ 
+ 	if (sizeof(dma_addr_t) == sizeof(u64))
+-		if (of_device_is_compatible(np, "fsl,sec-v5.0-job-ring"))
++		if (of_device_is_compatible(nprop, "fsl,sec-v5.0-job-ring"))
+ 			dma_set_mask(jrdev, DMA_BIT_MASK(40));
+ 		else
+ 			dma_set_mask(jrdev, DMA_BIT_MASK(36));
+@@ -403,15 +428,59 @@ int caam_jr_probe(struct platform_device *pdev, struct device_node *np,
+ 		dma_set_mask(jrdev, DMA_BIT_MASK(32));
+ 
+ 	/* Identify the interrupt */
+-	jrpriv->irq = of_irq_to_resource(np, 0, NULL);
++	jrpriv->irq = of_irq_to_resource(nprop, 0, NULL);
+ 
+ 	/* Now do the platform independent part */
+ 	error = caam_jr_init(jrdev); /* now turn on hardware */
+ 	if (error) {
+-		of_device_unregister(jr_pdev);
+ 		kfree(jrpriv);
+ 		return error;
+ 	}
+ 
+-	return error;
++	jrpriv->dev = jrdev;
++	spin_lock(&driver_data.jr_alloc_lock);
++	list_add_tail(&jrpriv->list_node, &driver_data.jr_list);
++	spin_unlock(&driver_data.jr_alloc_lock);
++
++	return 0;
++}
++
++static struct of_device_id caam_jr_match[] = {
++	{
++		.compatible = "fsl,sec-v4.0-job-ring",
++	},
++	{
++		.compatible = "fsl,sec4.0-job-ring",
++	},
++	{},
++};
++MODULE_DEVICE_TABLE(of, caam_jr_match);
++
++static struct platform_driver caam_jr_driver = {
++	.driver = {
++		.name = "caam_jr",
++		.owner = THIS_MODULE,
++		.of_match_table = caam_jr_match,
++	},
++	.probe       = caam_jr_probe,
++	.remove      = caam_jr_remove,
++};
++
++static int __init jr_driver_init(void)
++{
++	spin_lock_init(&driver_data.jr_alloc_lock);
++	INIT_LIST_HEAD(&driver_data.jr_list);
++	return platform_driver_register(&caam_jr_driver);
+ }
++
++static void __exit jr_driver_exit(void)
++{
++	platform_driver_unregister(&caam_jr_driver);
++}
++
++module_init(jr_driver_init);
++module_exit(jr_driver_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("FSL CAAM JR request backend");
++MODULE_AUTHOR("Freescale Semiconductor - NMG/STC");
+diff --git a/drivers/crypto/caam/jr.h b/drivers/crypto/caam/jr.h
+index 9d8741a..02f69bb 100644
+--- a/drivers/crypto/caam/jr.h
++++ b/drivers/crypto/caam/jr.h
+@@ -13,7 +13,4 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+ 				void *areq),
+ 		    void *areq);
+ 
+-extern int caam_jr_probe(struct platform_device *pdev, struct device_node *np,
+-			 int ring);
+-extern int caam_jr_shutdown(struct device *dev);
+ #endif /* JR_H */
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.1.4
