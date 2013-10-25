@@ -1,92 +1,85 @@
-From: Mathias Krause <mathias.krause@secunet.com>
-Subject: [PATCH RESEND] padata: make the sequence counter an atomic_t
-Date: Fri, 25 Oct 2013 12:14:15 +0200
-Message-ID: <1382696055-24264-1-git-send-email-mathias.krause@secunet.com>
-References: <20131025092644.GA20145@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-crypto@vger.kernel.org,
-	Mathias Krause <mathias.krause@secunet.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Michal Nazarewicz <mpn@google.com>
+Subject: [PATCH] crypto: blkcipher: do not read unutialised walk->flags
+Date: Fri, 25 Oct 2013 12:27:35 +0100
+Message-ID: <b83903fdfd4b274d401b2417ca960ab7ff8e0273.1382699979.git.mina86@mina86.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Michal Nazarewicz <mina86@mina86.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:45746 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752016Ab3JYKOk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Oct 2013 06:14:40 -0400
-In-Reply-To: <20131025092644.GA20145@gondor.apana.org.au>
-References: <1380721245-5215-1-git-send-email-mathias.krause@secunet.com> <20131008120824.GN7660@secunet.com> <526A29E0.8070204@secunet.com> <20131025092644.GA20145@gondor.apana.org.au>
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:42655 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751788Ab3JYL2P (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Oct 2013 07:28:15 -0400
+Received: by mail-wg0-f48.google.com with SMTP id b13so3671941wgh.15
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Oct 2013 04:28:14 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Using a spinlock to atomically increase a counter sounds wrong -- we've
-atomic_t for this!
+=46rom: Michal Nazarewicz <mina86@mina86.com>
 
-Also move 'seq_nr' to a different cache line than 'lock' to reduce cache
-line trashing. This has the nice side effect of decreasing the size of
-struct parallel_data from 192 to 128 bytes for a x86-64 build, e.g.
-occupying only two instead of three cache lines.
+blkcipher_walk_virt, blkcipher_walk_virt_block and
+blkcipher_walk_phys functions modify the walk->flags by using
+a binary =E2=80=9C&=3D=E2=80=9D or =E2=80=9C|=3D=E2=80=9D operator.  Th=
+is translate to read followed by
+a write.  However, the walk->flags is usually not initialised so the
+read returns garbage.
 
-Those changes results in a 5% performance increase on an IPsec test run
-using pcrypt.
+At the same time, those functions call blkcipher_walk_first which
+then calls blkcipher_walk_next function which zeroes all flags
+except for BLKCIPHER_WALK_PHYS.  This means, that the read done in
+the virt, virt_block and phys functions is completely meaningless.
 
-Btw. the seq_lock spinlock was never explicitly initialized -- one more
-reason to get rid of it.
+Dropping the read and changing =E2=80=9C&=3D=E2=80=9D/=E2=80=9C|=3D=E2=80=
+=9D with a plain assignment
+clears the confusion without changing any functionality of the API.
 
-Signed-off-by: Mathias Krause <mathias.krause@secunet.com>
-Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Michal Nazarewicz <mina86@mina86.com>
 ---
- include/linux/padata.h |    3 +--
- kernel/padata.c        |    9 ++++-----
- 2 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 86292be..4386946 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -129,10 +129,9 @@ struct parallel_data {
- 	struct padata_serial_queue	__percpu *squeue;
- 	atomic_t			reorder_objects;
- 	atomic_t			refcnt;
-+	atomic_t			seq_nr;
- 	struct padata_cpumask		cpumask;
- 	spinlock_t                      lock ____cacheline_aligned;
--	spinlock_t                      seq_lock;
--	unsigned int			seq_nr;
- 	unsigned int			processed;
- 	struct timer_list		timer;
- };
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 07af2c9..2abd25d 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -46,6 +46,7 @@ static int padata_index_to_cpu(struct parallel_data *pd, int cpu_index)
- 
- static int padata_cpu_hash(struct parallel_data *pd)
+ Admittedly, I'm not familiar with the crypto API, but I believe
+ this to be a valid change.  This has actually been prompted by
+ Coverity scan which detects the read of initialised data.
+
+ crypto/blkcipher.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
+index a79e7e9..3fb99d8 100644
+--- a/crypto/blkcipher.c
++++ b/crypto/blkcipher.c
+@@ -305,7 +305,7 @@ static inline int blkcipher_copy_iv(struct blkciphe=
+r_walk *walk,
+ int blkcipher_walk_virt(struct blkcipher_desc *desc,
+ 			struct blkcipher_walk *walk)
  {
-+	unsigned int seq_nr;
- 	int cpu_index;
- 
- 	/*
-@@ -53,10 +54,8 @@ static int padata_cpu_hash(struct parallel_data *pd)
- 	 * seq_nr mod. number of cpus in use.
- 	 */
- 
--	spin_lock(&pd->seq_lock);
--	cpu_index =  pd->seq_nr % cpumask_weight(pd->cpumask.pcpu);
--	pd->seq_nr++;
--	spin_unlock(&pd->seq_lock);
-+	seq_nr = atomic_inc_return(&pd->seq_nr);
-+	cpu_index = seq_nr % cpumask_weight(pd->cpumask.pcpu);
- 
- 	return padata_index_to_cpu(pd, cpu_index);
+-	walk->flags &=3D ~BLKCIPHER_WALK_PHYS;
++	walk->flags =3D 0;
+ 	walk->blocksize =3D crypto_blkcipher_blocksize(desc->tfm);
+ 	return blkcipher_walk_first(desc, walk);
  }
-@@ -429,7 +428,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
- 	padata_init_pqueues(pd);
- 	padata_init_squeues(pd);
- 	setup_timer(&pd->timer, padata_reorder_timer, (unsigned long)pd);
--	pd->seq_nr = 0;
-+	atomic_set(&pd->seq_nr, -1);
- 	atomic_set(&pd->reorder_objects, 0);
- 	atomic_set(&pd->refcnt, 0);
- 	pd->pinst = pinst;
--- 
-1.7.2.5
+@@ -314,7 +314,7 @@ EXPORT_SYMBOL_GPL(blkcipher_walk_virt);
+ int blkcipher_walk_phys(struct blkcipher_desc *desc,
+ 			struct blkcipher_walk *walk)
+ {
+-	walk->flags |=3D BLKCIPHER_WALK_PHYS;
++	walk->flags =3D BLKCIPHER_WALK_PHYS;
+ 	walk->blocksize =3D crypto_blkcipher_blocksize(desc->tfm);
+ 	return blkcipher_walk_first(desc, walk);
+ }
+@@ -352,7 +352,7 @@ int blkcipher_walk_virt_block(struct blkcipher_desc=
+ *desc,
+ 			      struct blkcipher_walk *walk,
+ 			      unsigned int blocksize)
+ {
+-	walk->flags &=3D ~BLKCIPHER_WALK_PHYS;
++	walk->flags =3D 0;
+ 	walk->blocksize =3D blocksize;
+ 	return blkcipher_walk_first(desc, walk);
+ }
+--=20
+1.8.4
