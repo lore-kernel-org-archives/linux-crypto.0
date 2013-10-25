@@ -1,40 +1,43 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: crypto: skcipher - Use eseqiv even on UP machines
-Date: Fri, 25 Oct 2013 08:50:49 +0200
-Message-ID: <20131025065049.GB31491@secunet.com>
-References: <20131024124149.GA10587@gondor.apana.org.au>
+From: Mathias Krause <mathias.krause@secunet.com>
+Subject: Re: [PATCH] padata: make the sequence counter an atomic_t
+Date: Fri, 25 Oct 2013 10:20:48 +0200
+Message-ID: <526A29E0.8070204@secunet.com>
+References: <1380721245-5215-1-git-send-email-mathias.krause@secunet.com> <20131008120824.GN7660@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:59357 "EHLO a.mx.secunet.com"
+Received: from a.mx.secunet.com ([195.81.216.161]:35383 "EHLO a.mx.secunet.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751168Ab3JYGuz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Oct 2013 02:50:55 -0400
-Content-Disposition: inline
-In-Reply-To: <20131024124149.GA10587@gondor.apana.org.au>
+	id S1752164Ab3JYIUv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Oct 2013 04:20:51 -0400
+In-Reply-To: <20131008120824.GN7660@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 24, 2013 at 08:41:49PM +0800, Herbert Xu wrote:
-> Hi:
->     
-> Previously we would use eseqiv on all async ciphers in all cases,
-> and sync ciphers if we have more than one CPU.  This meant that
-> chainiv is only used in the case of sync ciphers on a UP machine.
+On 08.10.2013 14:08, Steffen Klassert wrote:
+> On Wed, Oct 02, 2013 at 03:40:45PM +0200, Mathias Krause wrote:
+>> Using a spinlock to atomically increase a counter sounds wrong -- we've
+>> atomic_t for this!
+>>
+>> Also move 'seq_nr' to a different cache line than 'lock' to reduce cache
+>> line trashing. This has the nice side effect of decreasing the size of
+>> struct parallel_data from 192 to 128 bytes for a x86-64 build, e.g.
+>> occupying only two instead of three cache lines.
+>>
+>> Those changes results in a 5% performance increase on an IPsec test run
+>> using pcrypt.
+>>
+>> Btw. the seq_lock spinlock was never explicitly initialized -- one more
+>> reason to get rid of it.
+>>
+>> Signed-off-by: Mathias Krause <mathias.krause@secunet.com>
 > 
-> As chainiv may aid attackers by making the IV predictable, even
-> though this risk itself is small, the above usage pattern causes
-> it to further leak information about the host.
+> Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
 > 
-> This patch addresses these issues by using eseqiv even if we're
-> on a UP machine.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
+> Herbert can you take this one?
 
-That's fine by me.
-
-Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+Ping, Herbert? Anything wrong with the patch?
