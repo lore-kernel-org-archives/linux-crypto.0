@@ -1,60 +1,146 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and /dev/random
-Date: Mon, 28 Oct 2013 17:15:38 +0100
-Message-ID: <1433673.JyzufUuaAG@tauon>
-References: <2579337.FPgJGgHYdz@tauon> <2049321.gMV6JUDze7@tauon> <20131028160623.GD15440@khazad-dum.debian.net>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and
+ /dev/random
+Date: Mon, 28 Oct 2013 17:45:49 -0400
+Message-ID: <20131028214549.GA31746@thunk.org>
+References: <2579337.FPgJGgHYdz@tauon>
+ <2049321.gMV6JUDze7@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Theodore Ts'o <tytso@mit.edu>,
-	sandy harris <sandyinchina@gmail.com>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: sandy harris <sandyinchina@gmail.com>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20131028160623.GD15440@khazad-dum.debian.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:51787 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756240Ab3J1WeK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Oct 2013 18:34:10 -0400
+Content-Disposition: inline
+In-Reply-To: <2049321.gMV6JUDze7@tauon>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 28. Oktober 2013, 14:06:23 schrieb Henrique de Moraes 
-Holschuh:
+=46undamentally, what worries me about this scheme (actually, causes th=
+e
+hair on the back of my neck to rise up on end) is this statement in
+your documentation[1]:
 
-Hi Henrique,
+   When looking at the sequence of time deltas gathered
+   during testing=E2=80=8A[D]=E2=80=8A, no pattern can be detected. The=
+refore, the
+   fluctuation and the resulting distribution are not based on a
+   repeating pattern and must be considered random.
 
->On Mon, 28 Oct 2013, Stephan Mueller wrote:
->> If it is accepted that the CPU Jitter RNG delivers entropy, the
->> latter
->> update may now allow us to get rid of storing the seed file during
->> shutdown and restoring it during the next boot sequence.
->
->That's a 4096-bit safety net (uncredited entropy) which at least Debian
->shall not remove.
+[1] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html
 
-That is correct, and I did not want have such safety net removed.
+Just because we can't detect a pattern does **not** mean that it is
+not based on a repeating pattern, and therefore must be considered
+random.  We can't detect a pattern in RDRAND, so does that mean it's
+automatically random?  Why, no.
 
-I have to correct my initial statement: there is a possibility where the 
-CPU Jitter RNG may not deliver data: when the timer resolution is too 
-coarse. Thus, please disregard my notion to remove the user space 
-seeding.
+If all you have is the output of "AES_ENCRPYT(NSA_KEY, i++)". and
+NSA_KEY is not known to you, you won't be able to detect a pattern,
+either.  But I can guarantee to you that it's not random...
 
-My goal is that the entropy pools are filled with entropy at the time 
-when they are created so that they will deliver good random data if the 
-system has a high resolution timer (which is almost always the case as 
-shown with my tests).
+It may be that there is some very complex state which is hidden inside
+the the CPU execution pipeline, the L1 cache, etc., etc.  But just
+because *you* can't figure it out, and just because *I* can't figure
+it out doesn't mean that it is ipso facto something which a really
+bright NSA analyst working in Fort Meade can't figure out.  (Or heck,
+a really clever Intel engineer who has full visibility into the
+internal design of an Intel CPU....)
 
->
->I think Debian also dumps some low-entropy-per-bit crap into
->/dev/random during boot (again, not credited), such as the boot kernel
->logs.  We could increase the density of that entropy a lot using gzip
->-0 or something like that... is an uncredited low-entropy-per-bit dump
->into the pool detrimental to its quality?
+Now, it may be that in practice, an adversary won't be able to carry
+out a practical attack because there will be external interrupts that
+the adversary won't be able to put into his or her model of your CPU
+--- for example, from network interrupts or keyboard interrupts.  But
+in that case, it's to measure just the interrupt, because it may be
+that the 32 interrupts that you got while extracting 128 bits of
+entropy from your jitter engine was only 32 bits of entropy, and the
+rest could be determined by someone with sufficient knowledge and
+understanding of the internal guts of the CPU.  (Treating this
+obscurity as security is probably not a good idea; we have to assume
+the NSA can get its hands on anything it wants, even internal,
+super-secret, "black cover" Intel documents.  :-)
 
-Any mixing of data into the entropy pools can never diminish the 
-entropy, but just further mix the data.
+To be honest, I have exactly the same worry about relying on HDD
+interrupts.  The theoretical basis of this resulting in true
+randomness is based on a 1994 paper by Don Davis: "Cryptographic
+randomness from air turbulence in disk drives"[2]:
 
-Note, a simple write of data into the device files will never update the 
-entropy estimator that is behind the blocking of /dev/random. All that 
-is done by the write to the device files is the mixing of the entropy 
-pools of blocking_pool and nonblocking_pool (and not input_pool).
+[2] http://world.std.com/~dtd/random/forward.pdf
 
-Ciao
-Stephan
+The problem is that almost two decades later, the technology of HDD's,
+and certainly SSD (which didn't exist back then) have changed quite a
+lot.  It is not obvious to me how much entropy you can really get from
+observing the disk completion times if you assume that the adversary
+has complete knowledge to the relative timing and block numbers of the
+disk accesses from the OS (for example, if we boot multiple mobile
+phone from flash for the first time, how many bits of entropy are
+there really?)
+
+But at least back in 1994, there was an attempt to come up with a
+physical theory as to where the entropy was coming from, and then as
+much work as possible to rule out other possible causes of the
+uncertainty.
+
+So if you want to really convince the world that CPU jitter is random,
+it's not enough to claim that it you can't see a pattern.  What you
+need to do is to remove all possible sources of the uncertainty, and
+show that there is still no discernable pattern after you do things
+like (a) run in kernel space, on an otherwise quiscent computer, (b)
+disable interrupts, so that any uncertainty can't be coming from
+interrupts, etc., Try to rule it all out, and then see if you still
+get uncertainty.
+
+If you think it is from DRAM timing, first try accessing the same
+memory location in kernel code with the interrupts off, over and over
+again, so that the memory is pinned into L1 cache.  You should be able
+to get consistent results.  If you can, then if you then try to read
+from DRAM with the L1 and L2 caches disabled, and with interrupts
+turned off, etc, and see if you get consistent results or inconsistent
+results.  If you get consistent results in both cases, then your
+hypothesis is disproven.  If you get consistent results with the
+memory pinned in L1 cache, and inconsistent results when the L1 and L2
+cache are disabled, then maybe the timing of DRAM reads really are
+introducing entropy.  But the point is you need to test each part of
+the system in isolation, so you can point at a specific part of the
+system and say, *that*'s where at least some uncertainty which an
+adversary can not reverse engineer, and here is the physical process
+from which the choatic air patterns, or quantum effects, etc., which
+is hypothesized to cause the uncertainty.
+
+And note that when you do this, you can't use any unbiasing or
+whitening techniques --- you want to use the raw timings, and then do
+things like look very hard for any kind of patterns; Don Davis used
+=46FT's because he wanted to look for any patterns that might be
+introduced by the rotating plattern, which would presumably would show
+up in a frequency domain analysis even if it was invisible in the time
+domain.
+
+If you don't do all of this work, there is no way to know for sure
+where the entropy is coming from.  And if you don't know, that's when
+you have to be very, very conservative, and use a very large
+engineering safety margin.  Currently we use the high resolution CPU
+counter, plus the interrupted IP, and we mix all of this together from
+64 interrupts, and we count this as a single bit of entropy.  I *hope*
+that at least one of those interrupts has sufficient unpredictably,
+perhaps because the remote attacker can't know when a LAN interrupt
+has happened, such that have a single bit of entropy.
+
+Maybe someone can prove that there is more entropy because of some
+instability between the oscillator used by the CPU clock and the one
+used by the ethernet NIC, and so I'm being hopelessly
+over-conservative.  Perhaps; but until we know for sure, using a
+similar analysis to what I described above, I'd much rather be slow
+than be potentially insecure.
+
+The jitter "entropy collector" may be able to generate more
+"randomness" much more quickly, but is the resulting numbers really
+more secure?  Other people will have to judge for themselves, but this
+is why I'm not convinced.
+
+Best regards,
+
+					- Ted
