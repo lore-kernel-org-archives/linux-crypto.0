@@ -1,81 +1,38 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and /dev/random
-Date: Tue, 29 Oct 2013 23:25:28 +0100
-Message-ID: <11529328.Jgjayj3SHB@tauon>
-References: <2579337.FPgJGgHYdz@tauon> <20131029132448.GB691@thunk.org> <7861469.OAmn4h8An0@tauon>
+From: Joel Fernandes <joelf@ti.com>
+Subject: [PATCH] crypto: omap-aes: Fix CTR mode counter length
+Date: Tue, 29 Oct 2013 17:37:38 -0500
+Message-ID: <1383086258-22186-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: sandy harris <sandyinchina@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Theodore Ts'o <tytso@mit.edu>
+Content-Type: text/plain
+Cc: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	Joel Fernandes <joelf@ti.com>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <7861469.OAmn4h8An0@tauon>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 29. Oktober 2013, 15:00:31 schrieb Stephan Mueller:
+NIST vectors for CTR mode in testmgr.h assume the entire IV as the counter. To
+get correct results that match the output of these vectors, we need to set the
+counter length correctly.
 
-Hi Ted,
+Signed-off-by: Joel Fernandes <joelf@ti.com>
+---
+ drivers/crypto/omap-aes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->Am Dienstag, 29. Oktober 2013, 09:24:48 schrieb Theodore Ts'o:
->
->Hi Theodore,
->
->>On Tue, Oct 29, 2013 at 09:42:30AM +0100, Stephan Mueller wrote:
->>> Based on this suggestion, I now added the tests in Appendix F.46.8
->>> where I disable the caches and the tests in Appendix F.46.9 where I
->>> disable the caches and interrupts.
->>
->>What you've added in F.46 is a good start, but as a suggestiom,
->>instead of disabling one thing at a time, try disabling *everything*
->>and then see what you get, and then enabling one thing at a time.  The
->>best thing is if you can get to the point where the amount of entropy
->>is close to zero.  Then as you add things back, there's a much better
->
->I will try to do that.
->
->But please see the different lower boundary values in the different
->subsections of F.46: none of them fall when I disable or change
->anything in the base system (except the power management -- where I
->added additional analyses). Some of the changes imply that the jitter
->increases when I disable certain support.
->
->Thus, expect that we will not see a significant drop in the jitter as
->you fear or expect.
->
->Yet, I will try and report back.
-
-Please have a look at the updated documentation, appendix F.46.10 
-provided in [1].
-
-The interesting result is that some combinations of disabling CPU 
-support do reduce the CPU execution jitter. However, disabling all 
-support is not the lowest jitter measurement.
-
-Though, none of the tried combinations deteriorate the measurement so 
-much that the execution jitter would be insufficient for use in the RNG.
-
-[...]
->>sense of where the unpredictability might be coming from, and whether
->>the unpredictability is coming from something which is fundamentally
->>arising from something which is chaotic or quantum effect, or just
->>because we don't have a good way of modelling the behavior of the
->>L1/L2 cache (for example) and that is spoofing your entropy estimator.
->
->Please note: if the jitter really comes from the oscillator effect of
->the RAM clock vs. the CPU clock (which I suspect), we will not be able
->to alter the jitter software wise.
-
-My current conclusion is that software can have some impact on the 
-execution jitter (as it is visible when executing different OSes on the 
-same hardware system as outlined in appendix F.45.
-
-But none of the software impacts can deteriorate the jitter to the level 
-that it is not usable any more for the RNG and still keep the claim that 
-each output bit would have one bit of entropy.
-
-[1] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index ce791c2..19055a1 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -275,7 +275,7 @@ static int omap_aes_write_ctrl(struct omap_aes_dev *dd)
+ 	if (dd->flags & FLAGS_CBC)
+ 		val |= AES_REG_CTRL_CBC;
+ 	if (dd->flags & FLAGS_CTR) {
+-		val |= AES_REG_CTRL_CTR | AES_REG_CTRL_CTR_WIDTH_32;
++		val |= AES_REG_CTRL_CTR | AES_REG_CTRL_CTR_WIDTH_128;
+ 		mask = AES_REG_CTRL_CTR | AES_REG_CTRL_CTR_WIDTH_MASK;
+ 	}
+ 	if (dd->flags & FLAGS_ENCRYPT)
+-- 
+1.8.1.2
