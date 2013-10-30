@@ -1,75 +1,73 @@
-From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: Re: [RFC] Unaligned CTR mode tests in crypto/testmgr.h
-Date: Wed, 30 Oct 2013 13:09:55 +0200
-Message-ID: <5270E903.3020502@iki.fi>
-References: <52704EAB.5000308@ti.com>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and /dev/random
+Date: Wed, 30 Oct 2013 08:59:24 -0400
+Message-ID: <CACXcFmnEiNFjQ1dUeAJQYHuudEYv7Mo-TJBoYZNMdeHaPBzG+g@mail.gmail.com>
+References: <2579337.FPgJGgHYdz@tauon>
+	<2049321.gMV6JUDze7@tauon>
+	<20131028214549.GA31746@thunk.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Joel Fernandes <joelf@ti.com>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Stephan Mueller <smueller@chronox.de>,
+	sandy harris <sandyinchina@gmail.com>,
+	LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:52562 "EHLO mail.kapsi.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751954Ab3J3LJ7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Oct 2013 07:09:59 -0400
-In-Reply-To: <52704EAB.5000308@ti.com>
+Received: from mail-vc0-f175.google.com ([209.85.220.175]:55609 "EHLO
+	mail-vc0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752101Ab3J3M7Z convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 30 Oct 2013 08:59:25 -0400
+In-Reply-To: <20131028214549.GA31746@thunk.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 30.10.2013 02:11, Joel Fernandes wrote:
-> Hi,
-> 
-> Some tests such as test 5 in AES CTR mode in crypto/testmgr.h have a unaligned
-> input buffer size such as 499 which is not aligned to any > 0 power of 2.
-> 
-> Due to this, omap-aes driver, and I think atmel-aes too error out when
-> encryption is requested for these buffers.
-> 
-> pr_err("request size is not exact amount of AES blocks\n") or a similar message.
-> 
-> Is this failure considered a bug? How do we fix it?
+Theodore Ts'o <tytso@mit.edu> wrote:
 
-Counter mode turns block cipher into stream cipher and implementation must handle
-buffer lengths that do not match the block size of underlying block cipher.
+> Fundamentally, what worries me about this scheme (actually, causes th=
+e
+> hair on the back of my neck to rise up on end) is this statement in
+> your documentation[1]:
+>
+>    When looking at the sequence of time deltas gathered
+>    during testing=E2=80=8A[D]=E2=80=8A, no pattern can be detected. T=
+herefore, the
+>    fluctuation and the resulting distribution are not based on a
+>    repeating pattern and must be considered random.
+>
+> [1] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html
+>
+> Just because we can't detect a pattern does **not** mean that it is
+> not based on a repeating pattern, and therefore must be considered
+> random.  We can't detect a pattern in RDRAND, so does that mean it's
+> automatically random?  Why, no.
+> ...
+> It may be that there is some very complex state which is hidden insid=
+e
+> the the CPU execution pipeline, the L1 cache, etc., etc.  But just
+> because *you* can't figure it out, and just because *I* can't figure
+> it out doesn't mean that it is ipso facto something which a really
+> bright NSA analyst working in Fort Meade can't figure out.  (Or heck,
+> a really clever Intel engineer who has full visibility into the
+> internal design of an Intel CPU....)
+>
+> Now, it may be that in practice, an adversary won't be able to carry
+> out a practical attack ...
 
-> 
-> How were the result output vectors generated, did you use 0 padding? Do we 0 pad
-> the inputs to align in these cases to get correct results?
+It seems worth noting here that Ted's reasons for skepticism
+apply not just to Stephan's Jitter generator, but to others such
+as Havege (already in Debian) which are based on differences
+in speed of arithmetic operations, presumably due to cache
+& TLB misses, pipeline stalls, etc. Also to ones based on
+variations in delays from timer calls such as my maxwell(8).
 
-See crypto/ctr.c:crypto_ctr_crypt_final() how to handle trailing bytes when
-'buflen % AES_BLOCK_SIZE != 0'.
+It is also worth mentioning that, while Stephan has done
+thorough testing on a range of CPUs, others have test
+& rationale info as well. The Havege papers have a lot,
+my maxwell paper has a little, and there's:
+McGuire, Okech & Schiesser,
+Analysis of inherent randomness of the Linux kernel,
+http://lwn.net/images/conf/rtlws11/random-hardware.pdf
 
-Basically, you encrypt the last counter block to generate the last keystream
-block and xor only the 'buflen % AES_BLOCK_SIZE' bytes of last keystream block
-with the tail bytes of source buffer:
-
- key_last[0..15] = ENC(K, counter[0..15]);
- dst_last[0..trailbytes-1] = src_last[0..trailbytes-1] ^ key_last[0..trailbytes-1];
- /* key_last[trailbytes..15] discarded. */
-
-Or if you want to use hardware that only does block-size aligned CTR encryption,
-you can pad input to block size aligned length, do encryption, and then discard
-those padding bytes after encryption:
-
- src_padded[0..trailbytes-1] = src_last[0..trailbytes-1]
- src_padded[trailbytes..15] = /* don't care, can be anything/uninitialized */
- src_padded[0..15] = ENC_HW_CTR(src_padded[0..15]);
- dst_last[0..trailbytes-1] = src_padded[0..trailbytes-1];
- /* src_padded[trailbytes..15] discarded. */
-
-Here, ENC_HW_CTR(in) internally does:
- keystream[0..15] = ENC(K, counter[0..15]); INC_CTR(counter);
- out[0..15] = in[0..15] ^ keystream[0..15];
-
--Jussi
-
-> 
-> thanks,
-> 
-> -Joel
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+I know my stuff is not an adequate answer to Ted, but
+I suspect some of the others may be.
