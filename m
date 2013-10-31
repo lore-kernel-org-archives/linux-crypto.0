@@ -1,81 +1,109 @@
-From: Joel Fernandes <joelf@ti.com>
-Subject: Re: [RFC] Unaligned CTR mode tests in crypto/testmgr.h
-Date: Wed, 30 Oct 2013 16:06:37 -0500
-Message-ID: <527174DD.1010504@ti.com>
-References: <52704EAB.5000308@ti.com> <5270E903.3020502@iki.fi>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: crypto: s390 - Fix aes-cbc IV corruption
+Date: Thu, 31 Oct 2013 11:25:47 +0800
+Message-ID: <20131031032547.GA16528@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Jan Glauber <jang@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:51891 "EHLO comal.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752343Ab3J3VGy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Oct 2013 17:06:54 -0400
-In-Reply-To: <5270E903.3020502@iki.fi>
+Received: from ringil.hengli.com.au ([178.18.16.133]:39472 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750768Ab3JaDZy (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 30 Oct 2013 23:25:54 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/30/2013 06:09 AM, Jussi Kivilinna wrote:
-> On 30.10.2013 02:11, Joel Fernandes wrote:
->> Hi,
->>
->> Some tests such as test 5 in AES CTR mode in crypto/testmgr.h have a unaligned
->> input buffer size such as 499 which is not aligned to any > 0 power of 2.
->>
->> Due to this, omap-aes driver, and I think atmel-aes too error out when
->> encryption is requested for these buffers.
->>
->> pr_err("request size is not exact amount of AES blocks\n") or a similar message.
->>
->> Is this failure considered a bug? How do we fix it?
-> 
-> Counter mode turns block cipher into stream cipher and implementation must handle
-> buffer lengths that do not match the block size of underlying block cipher.
-> 
->>
->> How were the result output vectors generated, did you use 0 padding? Do we 0 pad
->> the inputs to align in these cases to get correct results?
-> 
-> See crypto/ctr.c:crypto_ctr_crypt_final() how to handle trailing bytes when
-> 'buflen % AES_BLOCK_SIZE != 0'.
-> 
-> Basically, you encrypt the last counter block to generate the last keystream
-> block and xor only the 'buflen % AES_BLOCK_SIZE' bytes of last keystream block
-> with the tail bytes of source buffer:
-> 
->  key_last[0..15] = ENC(K, counter[0..15]);
->  dst_last[0..trailbytes-1] = src_last[0..trailbytes-1] ^ key_last[0..trailbytes-1];
->  /* key_last[trailbytes..15] discarded. */
-> 
-> Or if you want to use hardware that only does block-size aligned CTR encryption,
-> you can pad input to block size aligned length, do encryption, and then discard
-> those padding bytes after encryption:
-> 
->  src_padded[0..trailbytes-1] = src_last[0..trailbytes-1]
->  src_padded[trailbytes..15] = /* don't care, can be anything/uninitialized */
->  src_padded[0..15] = ENC_HW_CTR(src_padded[0..15]);
->  dst_last[0..trailbytes-1] = src_padded[0..trailbytes-1];
->  /* src_padded[trailbytes..15] discarded. */
-> 
-> Here, ENC_HW_CTR(in) internally does:
->  keystream[0..15] = ENC(K, counter[0..15]); INC_CTR(counter);
->  out[0..15] = in[0..15] ^ keystream[0..15];
-> 
+Hi:
 
-Thanks, I'll try that. Just one question- is it safe to assume the output buffer
-(req->dst) is capable of holding those many bytes?
+The cbc-aes-s390 algorithm incorrectly places the IV in the tfm
+data structure.  As the tfm is shared between multiple threads,
+this introduces a possibility of data corruption.
 
-In your algorithm above, we're assuming here without allocating explicitly that
-the output buffer passed to the driver has trailbytes..15 available. Because
-otherwise we are in danger of introducing a memory leak, if we just assume they
-are available in the output buffer.
+This patch fixes this by moving the parameter block containing
+the IV and key onto the stack (the block is 48 bytes long).
 
-That said, I don't want to allocate new buffer in the driver and then do copying
-of encrypted data back into the output buffer. Because I did lot of hard work to
-get rid of such code as it is slower.
+The same bug exists elsewhere in the s390 crypto system and they
+will be fixed in subsequent patches.
 
-thanks,
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
--Joel
+diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
+index b4dbade..2e4b5be 100644
+--- a/arch/s390/crypto/aes_s390.c
++++ b/arch/s390/crypto/aes_s390.c
+@@ -35,7 +35,6 @@ static u8 *ctrblk;
+ static char keylen_flag;
+ 
+ struct s390_aes_ctx {
+-	u8 iv[AES_BLOCK_SIZE];
+ 	u8 key[AES_MAX_KEY_SIZE];
+ 	long enc;
+ 	long dec;
+@@ -441,30 +440,36 @@ static int cbc_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 	return aes_set_key(tfm, in_key, key_len);
+ }
+ 
+-static int cbc_aes_crypt(struct blkcipher_desc *desc, long func, void *param,
++static int cbc_aes_crypt(struct blkcipher_desc *desc, long func,
+ 			 struct blkcipher_walk *walk)
+ {
++	struct s390_aes_ctx *sctx = crypto_blkcipher_ctx(desc->tfm);
+ 	int ret = blkcipher_walk_virt(desc, walk);
+ 	unsigned int nbytes = walk->nbytes;
++	struct {
++		u8 iv[AES_BLOCK_SIZE];
++		u8 key[AES_MAX_KEY_SIZE];
++	} param;
+ 
+ 	if (!nbytes)
+ 		goto out;
+ 
+-	memcpy(param, walk->iv, AES_BLOCK_SIZE);
++	memcpy(param.iv, walk->iv, AES_BLOCK_SIZE);
++	memcpy(param.key, sctx->key, sctx->key_len);
+ 	do {
+ 		/* only use complete blocks */
+ 		unsigned int n = nbytes & ~(AES_BLOCK_SIZE - 1);
+ 		u8 *out = walk->dst.virt.addr;
+ 		u8 *in = walk->src.virt.addr;
+ 
+-		ret = crypt_s390_kmc(func, param, out, in, n);
++		ret = crypt_s390_kmc(func, &param, out, in, n);
+ 		if (ret < 0 || ret != n)
+ 			return -EIO;
+ 
+ 		nbytes &= AES_BLOCK_SIZE - 1;
+ 		ret = blkcipher_walk_done(desc, walk, nbytes);
+ 	} while ((nbytes = walk->nbytes));
+-	memcpy(walk->iv, param, AES_BLOCK_SIZE);
++	memcpy(walk->iv, param.iv, AES_BLOCK_SIZE);
+ 
+ out:
+ 	return ret;
+@@ -481,7 +486,7 @@ static int cbc_aes_encrypt(struct blkcipher_desc *desc,
+ 		return fallback_blk_enc(desc, dst, src, nbytes);
+ 
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+-	return cbc_aes_crypt(desc, sctx->enc, sctx->iv, &walk);
++	return cbc_aes_crypt(desc, sctx->enc, &walk);
+ }
+ 
+ static int cbc_aes_decrypt(struct blkcipher_desc *desc,
+@@ -495,7 +500,7 @@ static int cbc_aes_decrypt(struct blkcipher_desc *desc,
+ 		return fallback_blk_dec(desc, dst, src, nbytes);
+ 
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+-	return cbc_aes_crypt(desc, sctx->dec, sctx->iv, &walk);
++	return cbc_aes_crypt(desc, sctx->dec, &walk);
+ }
+ 
+ static struct crypto_alg cbc_aes_alg = {
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
