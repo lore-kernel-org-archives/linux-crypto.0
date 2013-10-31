@@ -1,78 +1,176 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [PATCH 19/51] DMA-API: media: dt3155v4l: replace
-	dma_set_mask()+dma_set_coherent_mask() with new helper
-Date: Thu, 31 Oct 2013 14:49:30 +0000
-Message-ID: <20131031144929.GC25039@n2100.arm.linux.org.uk>
-References: <20130919212235.GD12758@n2100.arm.linux.org.uk> <E1VMm13-0007hO-9l@rmk-PC.arm.linux.org.uk> <5249673B.5020705@xs4all.nl> <20131031094640.205840a2@samsung.com>
+From: Joe Perches <joe@perches.com>
+Subject: [PATCH -next] crypto: padlock: Remove #define PFX, use pr_<level>
+Date: Thu, 31 Oct 2013 11:59:21 -0700
+Message-ID: <1383245961.8740.13.camel@joe-AO722>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Hans Verkuil <hverkuil@xs4all.nl>, alsa-devel@alsa-project.org,
-	linux-doc@vger.kernel.org, linux-mmc@vger.kernel.org,
-	linux-fbdev@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-ide@vger.kernel.org, devel@driverdev.osuosl.org,
-	linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org,
-	e1000-devel@lists.sourceforge.net, b43-dev@lists.infradead.org,
-	linux-media@vger.kernel.org, devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-tegra@vger.kernel.org,
-	linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Solarflare linux maintainers <linux-net-drivers@solarflare.com>,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	uclinux-dist-devel@blackfin.uclinux.org,
-	linuxppc-dev@lists.ozlabs.org
-To: Mauro Carvalho Chehab <m.chehab@samsung.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from caramon.arm.linux.org.uk ([78.32.30.218]:42165 "EHLO
-	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753403Ab3JaOuK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 Oct 2013 10:50:10 -0400
-Content-Disposition: inline
-In-Reply-To: <20131031094640.205840a2@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org,
+	linux-crypto <linux-crypto@vger.kernel.org>
+To: "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Oct 31, 2013 at 09:46:40AM -0200, Mauro Carvalho Chehab wrote:
-> Hi Russell,
-> 
-> Em Mon, 30 Sep 2013 13:57:47 +0200
-> Hans Verkuil <hverkuil@xs4all.nl> escreveu:
-> 
-> > On 09/19/2013 11:44 PM, Russell King wrote:
-> > > Replace the following sequence:
-> > > 
-> > > 	dma_set_mask(dev, mask);
-> > > 	dma_set_coherent_mask(dev, mask);
-> > > 
-> > > with a call to the new helper dma_set_mask_and_coherent().
-> > > 
-> > > Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
-> > 
-> > Acked-by: Hans Verkuil <hans.verkuil@cisco.com>
-> 
-> Somehow, I lost your original post (I got unsubscribed on a few days 
-> from all vger mailing lists at the end of september).
-> 
-> I suspect that you want to sent this via your tree, right?
+Using PFX in system #include files should be discouraged.
+Convert to a more current logging style.
 
-Yes please.
+Add #define pr_fmt, use pr_<level>
 
-> If so:
-> 
-> Acked-by: Mauro Carvalho Chehab <m.chehab@samsung.com>
+Signed-off-by: Joe Perches <joe@perches.com>
+---
+ drivers/char/hw_random/via-rng.c | 12 ++++++------
+ drivers/crypto/padlock-aes.c     | 10 ++++++----
+ drivers/crypto/padlock-sha.c     | 10 ++++++----
+ include/crypto/padlock.h         |  2 --
+ 4 files changed, 18 insertions(+), 16 deletions(-)
 
-Added, thanks.
-
-> > > -	err = dma_set_mask(&pdev->dev, DMA_BIT_MASK(32));
-> > > -	if (err)
-> > > -		return -ENODEV;
-> > > -	err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32));
-> > > +	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-> > >  	if (err)
-> > >  		return -ENODEV;
-
-One thing I've just noticed is that return should be "return err" not
-"return -ENODEV" - are you okay for me to change that in this patch?
-
-Thanks.
+diff --git a/drivers/char/hw_random/via-rng.c b/drivers/char/hw_random/via-rng.c
+index de5a6dc..f9e071c 100644
+--- a/drivers/char/hw_random/via-rng.c
++++ b/drivers/char/hw_random/via-rng.c
+@@ -24,6 +24,8 @@
+  * warranty of any kind, whether express or implied.
+  */
+ 
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
+ #include <crypto/padlock.h>
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+@@ -141,8 +143,7 @@ static int via_rng_init(struct hwrng *rng)
+ 	 * register */
+ 	if ((c->x86 == 6) && (c->x86_model >= 0x0f)) {
+ 		if (!cpu_has_xstore_enabled) {
+-			printk(KERN_ERR PFX "can't enable hardware RNG "
+-				"if XSTORE is not enabled\n");
++			pr_err("can't enable hardware RNG if XSTORE is not enabled\n");
+ 			return -ENODEV;
+ 		}
+ 		return 0;
+@@ -180,7 +181,7 @@ static int via_rng_init(struct hwrng *rng)
+ 	   unneeded */
+ 	rdmsr(MSR_VIA_RNG, lo, hi);
+ 	if ((lo & VIA_RNG_ENABLE) == 0) {
+-		printk(KERN_ERR PFX "cannot enable VIA C3 RNG, aborting\n");
++		pr_err("cannot enable VIA C3 RNG, aborting\n");
+ 		return -ENODEV;
+ 	}
+ 
+@@ -202,11 +203,10 @@ static int __init mod_init(void)
+ 
+ 	if (!cpu_has_xstore)
+ 		return -ENODEV;
+-	printk(KERN_INFO "VIA RNG detected\n");
++	pr_info("VIA RNG detected\n");
+ 	err = hwrng_register(&via_rng);
+ 	if (err) {
+-		printk(KERN_ERR PFX "RNG registering failed (%d)\n",
+-		       err);
++		pr_err("RNG registering failed (%d)\n", err);
+ 		goto out;
+ 	}
+ out:
+diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
+index 633ba94..7404186 100644
+--- a/drivers/crypto/padlock-aes.c
++++ b/drivers/crypto/padlock-aes.c
+@@ -7,6 +7,8 @@
+  *
+  */
+ 
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
+ #include <crypto/algapi.h>
+ #include <crypto/aes.h>
+ #include <crypto/padlock.h>
+@@ -516,7 +518,7 @@ static int __init padlock_init(void)
+ 		return -ENODEV;
+ 
+ 	if (!cpu_has_xcrypt_enabled) {
+-		printk(KERN_NOTICE PFX "VIA PadLock detected, but not enabled. Hmm, strange...\n");
++		pr_notice("VIA PadLock detected, but not enabled. Hmm, strange...\n");
+ 		return -ENODEV;
+ 	}
+ 
+@@ -529,12 +531,12 @@ static int __init padlock_init(void)
+ 	if ((ret = crypto_register_alg(&cbc_aes_alg)))
+ 		goto cbc_aes_err;
+ 
+-	printk(KERN_NOTICE PFX "Using VIA PadLock ACE for AES algorithm.\n");
++	pr_notice("Using VIA PadLock ACE for AES algorithm\n");
+ 
+ 	if (c->x86 == 6 && c->x86_model == 15 && c->x86_mask == 2) {
+ 		ecb_fetch_blocks = MAX_ECB_FETCH_BLOCKS;
+ 		cbc_fetch_blocks = MAX_CBC_FETCH_BLOCKS;
+-		printk(KERN_NOTICE PFX "VIA Nano stepping 2 detected: enabling workaround.\n");
++		pr_notice("VIA Nano stepping 2 detected: enabling workaround\n");
+ 	}
+ 
+ out:
+@@ -545,7 +547,7 @@ cbc_aes_err:
+ ecb_aes_err:
+ 	crypto_unregister_alg(&aes_alg);
+ aes_err:
+-	printk(KERN_ERR PFX "VIA PadLock AES initialization failed.\n");
++	pr_err("VIA PadLock AES initialization failed\n");
+ 	goto out;
+ }
+ 
+diff --git a/drivers/crypto/padlock-sha.c b/drivers/crypto/padlock-sha.c
+index 9266c0e..991cdf7 100644
+--- a/drivers/crypto/padlock-sha.c
++++ b/drivers/crypto/padlock-sha.c
+@@ -12,6 +12,8 @@
+  *
+  */
+ 
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
+ #include <crypto/internal/hash.h>
+ #include <crypto/padlock.h>
+ #include <crypto/sha.h>
+@@ -220,8 +222,8 @@ static int padlock_cra_init(struct crypto_tfm *tfm)
+ 	fallback_tfm = crypto_alloc_shash(fallback_driver_name, 0,
+ 					  CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(fallback_tfm)) {
+-		printk(KERN_WARNING PFX "Fallback driver '%s' could not be loaded!\n",
+-		       fallback_driver_name);
++		pr_warn("Fallback driver '%s' could not be loaded!\n",
++			fallback_driver_name);
+ 		err = PTR_ERR(fallback_tfm);
+ 		goto out;
+ 	}
+@@ -561,7 +563,7 @@ static int __init padlock_init(void)
+ 	if (rc)
+ 		goto out_unreg1;
+ 
+-	printk(KERN_NOTICE PFX "Using VIA PadLock ACE for SHA1/SHA256 algorithms.\n");
++	pr_notice("Using VIA PadLock ACE for SHA1/SHA256 algorithms\n");
+ 
+ 	return 0;
+ 
+@@ -569,7 +571,7 @@ out_unreg1:
+ 	crypto_unregister_shash(sha1);
+ 
+ out:
+-	printk(KERN_ERR PFX "VIA PadLock SHA1/SHA256 initialization failed.\n");
++	pr_err("VIA PadLock SHA1/SHA256 initialization failed\n");
+ 	return rc;
+ }
+ 
+diff --git a/include/crypto/padlock.h b/include/crypto/padlock.h
+index d2cfa2e..4245f86 100644
+--- a/include/crypto/padlock.h
++++ b/include/crypto/padlock.h
+@@ -15,8 +15,6 @@
+ 
+ #define PADLOCK_ALIGNMENT 16
+ 
+-#define PFX	KBUILD_MODNAME ": "
+-
+ #define PADLOCK_CRA_PRIORITY	300
+ #define PADLOCK_COMPOSITE_PRIORITY 400
+ 
