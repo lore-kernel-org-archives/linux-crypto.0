@@ -1,83 +1,57 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and
- /dev/random
-Date: Sun, 3 Nov 2013 07:41:35 -0500
-Message-ID: <20131103124135.GB32091@thunk.org>
-References: <2579337.FPgJGgHYdz@tauon>
- <7861469.OAmn4h8An0@tauon>
- <20131102110112.GA16231@amd.pavel.ucw.cz>
- <3537770.iLHXPOXMiU@tauon>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Pavel Machek <pavel@ucw.cz>, sandy harris <sandyinchina@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 3/4] random: printk notifications for urandom pool initialization
+Date: Sun,  3 Nov 2013 08:33:14 -0500
+Message-ID: <1383485595-2020-4-git-send-email-tytso@mit.edu>
+References: <1383485595-2020-1-git-send-email-tytso@mit.edu>
+Cc: linux-kernel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:53755 "EHLO imap.thunk.org"
+Received: from imap.thunk.org ([74.207.234.97]:53764 "EHLO imap.thunk.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753400Ab3KCMlk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 Nov 2013 07:41:40 -0500
-Content-Disposition: inline
-In-Reply-To: <3537770.iLHXPOXMiU@tauon>
+	id S1753427Ab3KCNdS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 Nov 2013 08:33:18 -0500
+In-Reply-To: <1383485595-2020-1-git-send-email-tytso@mit.edu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 03, 2013 at 08:20:34AM +0100, Stephan Mueller wrote:
-> Another friend of mine mentioned that he assumes the rise and fall times 
-> of transistors varies very slightly and could be the main reason for the 
-> jitter. I do not think that this is really the case, because our gates 
-> that form the CPU instructions comprise of many transistors. The 
-> combined raise/fall jitter should cancel each other out.
+Print a notification to the console when the nonblocking pool is
+initialized.  Also printk a warning when a process tries reading from
+/dev/urandom before it is fully initialized.
 
-The whole point of using a clocked architecture for digital circuitry
-is to avoid differences in the rise/fall times of transitors to lead
-to non-deterministic behavior --- which is important if you want to
-make sure that 2 * 2 == 4 and not 3.99999999.....
+Signed-off-by: "Theodore Ts'o" <tytso@mit.edu>
+---
+ drivers/char/random.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-The one place where you might find differences is when you have
-different subsystems which are clocked using different clock sources,
-and then there's extra circuitry that has to be needed to handle
-interfacing between those differently clocked circuit areas.
-
-The problem, though is that over time, these boundaries can change; it
-may be that on certain chipsets, things that had been in different
-clock circuits, have later been integrated onto a single
-system-on-chip device and all run off of a single clock source.
-
-> That said, the full root cause is is not really known at this time 
-> considering that major chip vendors have no real clue either.
-
-I have trouble beliving that statement; they might not be willing to
-comment, since to do so would expose a internal CPU designs which they
-consider secret, or worse, it might cause people to depend on certain
-implementation details which might not be true in future chipsets ---
-which may either tie their hands, or they may even know that it won't
-be true for CPU version currently under development but not yet
-released.
-
-Sandy Harris pointed out a very good paper that I would definitely
-recommend that people read:
-
-http://lwn.net/images/conf/rtlws11/random-hardware.pdf
-
-It basically describes some efforts made in 2009 by folks to do
-exactly the sort of experiments I was advocating.  What I actually
-think is more important, though, is not the doing of the experiments,
-but the development the tools to do these experiments.  If people can
-create kernel modules (and they have to be done in the kernel, since
-you need to be able to disable interrupts, L1 caches, etc., while you
-run these tests), then it will be possible to do these experiments
-each time a new CPU comes out from Intel, or each time an ARM hardware
-vendor comes out with a new ARM SOC.
-
-It's important that these tests are done all time, and not, "OK, we
-did some tests in 2009 or 2013, and things looked good, and we don't
-have to worry about this any more; CPU-generated entropy is guaranteed
-to be good!"  We need to make sure we can easily do these tests all
-the time, for every new piece of hardware out there --- and when we
-can't explain where the entropy is coming from, we need to be doubly
-on our guard.
-
-Regards,
-
-					- Ted
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index b578c03..f553600 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -655,6 +655,9 @@ retry:
+ 	r->entropy_total += nbits;
+ 	if (!r->initialized && nbits > 0) {
+ 		if (r->entropy_total > 128) {
++			if (r == &nonblocking_pool)
++				pr_notice("random: %s pool is initialized\n",
++					  r->name);
+ 			r->initialized = 1;
+ 			r->entropy_total = 0;
+ 		}
+@@ -1334,7 +1337,14 @@ random_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
+ static ssize_t
+ urandom_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
+ {
+-	int ret = extract_entropy_user(&nonblocking_pool, buf, nbytes);
++	int ret;
++
++	if (unlikely(nonblocking_pool.initialized == 0))
++		printk_once(KERN_NOTICE "random: %s urandom read "
++			    "with %d bits of entropy available\n",
++			    current->comm, nonblocking_pool.entropy_total);
++
++	ret = extract_entropy_user(&nonblocking_pool, buf, nbytes);
+ 
+ 	trace_urandom_read(8 * nbytes, ENTROPY_BITS(&nonblocking_pool),
+ 			   ENTROPY_BITS(&input_pool));
+-- 
+1.7.12.rc0.22.gcdd159b
