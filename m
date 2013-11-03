@@ -1,85 +1,83 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and /dev/random
-Date: Sun, 03 Nov 2013 08:20:34 +0100
-Message-ID: <3537770.iLHXPOXMiU@tauon>
-References: <2579337.FPgJGgHYdz@tauon> <7861469.OAmn4h8An0@tauon> <20131102110112.GA16231@amd.pavel.ucw.cz>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and
+ /dev/random
+Date: Sun, 3 Nov 2013 07:41:35 -0500
+Message-ID: <20131103124135.GB32091@thunk.org>
+References: <2579337.FPgJGgHYdz@tauon>
+ <7861469.OAmn4h8An0@tauon>
+ <20131102110112.GA16231@amd.pavel.ucw.cz>
+ <3537770.iLHXPOXMiU@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Theodore Ts'o <tytso@mit.edu>,
-	sandy harris <sandyinchina@gmail.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Pavel Machek <pavel@ucw.cz>, sandy harris <sandyinchina@gmail.com>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Pavel Machek <pavel@ucw.cz>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:43377 "EHLO mail.eperm.de"
+Received: from imap.thunk.org ([74.207.234.97]:53755 "EHLO imap.thunk.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752101Ab3KCHUn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 Nov 2013 02:20:43 -0500
-Received: from tauon.localnet
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S1D7> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sun, 3 Nov 2013 08:20:35 +0100
-In-Reply-To: <20131102110112.GA16231@amd.pavel.ucw.cz>
+	id S1753400Ab3KCMlk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 Nov 2013 07:41:40 -0500
+Content-Disposition: inline
+In-Reply-To: <3537770.iLHXPOXMiU@tauon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Samstag, 2. November 2013, 12:01:13 schrieb Pavel Machek:
+On Sun, Nov 03, 2013 at 08:20:34AM +0100, Stephan Mueller wrote:
+> Another friend of mine mentioned that he assumes the rise and fall times 
+> of transistors varies very slightly and could be the main reason for the 
+> jitter. I do not think that this is really the case, because our gates 
+> that form the CPU instructions comprise of many transistors. The 
+> combined raise/fall jitter should cancel each other out.
 
-Hi Pavel,
+The whole point of using a clocked architecture for digital circuitry
+is to avoid differences in the rise/fall times of transitors to lead
+to non-deterministic behavior --- which is important if you want to
+make sure that 2 * 2 == 4 and not 3.99999999.....
 
->Hi!
->
->> >sense of where the unpredictability might be coming from, and
->> >whether
->> >the unpredictability is coming from something which is fundamentally
->> >arising from something which is chaotic or quantum effect, or just
->> >because we don't have a good way of modelling the behavior of the
->> >L1/L2 cache (for example) and that is spoofing your entropy
->> >estimator.
->> 
->> Please note: if the jitter really comes from the oscillator effect of
->> the RAM clock vs. the CPU clock (which I suspect), we will not be
->> able
->> to alter the jitter software wise.
->
->Well... if it is really oscillator effect, there should be _no_
->entropy when running with L1/L2 enabled (because DRAM will not be
->accessed at all at that case).
+The one place where you might find differences is when you have
+different subsystems which are clocked using different clock sources,
+and then there's extra circuitry that has to be needed to handle
+interfacing between those differently clocked circuit areas.
 
-That is a good one!
+The problem, though is that over time, these boundaries can change; it
+may be that on certain chipsets, things that had been in different
+clock circuits, have later been integrated onto a single
+system-on-chip device and all run off of a single clock source.
 
-Another friend of mine mentioned that he assumes the rise and fall times 
-of transistors varies very slightly and could be the main reason for the 
-jitter. I do not think that this is really the case, because our gates 
-that form the CPU instructions comprise of many transistors. The 
-combined raise/fall jitter should cancel each other out.
+> That said, the full root cause is is not really known at this time 
+> considering that major chip vendors have no real clue either.
 
-That said, the full root cause is is not really known at this time 
-considering that major chip vendors have no real clue either.
+I have trouble beliving that statement; they might not be willing to
+comment, since to do so would expose a internal CPU designs which they
+consider secret, or worse, it might cause people to depend on certain
+implementation details which might not be true in future chipsets ---
+which may either tie their hands, or they may even know that it won't
+be true for CPU version currently under development but not yet
+released.
 
->
->There should be way to extract entropy more directly from various
->oscillator effects, no?
+Sandy Harris pointed out a very good paper that I would definitely
+recommend that people read:
 
-I am working a different way of measuring such oscillator effects by 
-using the high-resolution timer of the CPU and measure it with a 
-Jiffies-based snapshotting window. So, here I would combine two timers 
-that are differently generated. If their frequencies would be relative 
-prime to each other, we would measure a direct oscillator effect.
+http://lwn.net/images/conf/rtlws11/random-hardware.pdf
 
-This already was tried in the cryptlib RNG, but I try a slightly 
-different approach.
+It basically describes some efforts made in 2009 by folks to do
+exactly the sort of experiments I was advocating.  What I actually
+think is more important, though, is not the doing of the experiments,
+but the development the tools to do these experiments.  If people can
+create kernel modules (and they have to be done in the kernel, since
+you need to be able to disable interrupts, L1 caches, etc., while you
+run these tests), then it will be possible to do these experiments
+each time a new CPU comes out from Intel, or each time an ARM hardware
+vendor comes out with a new ARM SOC.
 
-Yet, nothing is complete at this point.
->
->For DRAM, just perform timing, have entropy. Plus we could for example
->measure PIT vs. other timer sources... (but I suspect that on PCs we
->already have enough entropy...)
+It's important that these tests are done all time, and not, "OK, we
+did some tests in 2009 or 2013, and things looked good, and we don't
+have to worry about this any more; CPU-generated entropy is guaranteed
+to be good!"  We need to make sure we can easily do these tests all
+the time, for every new piece of hardware out there --- and when we
+can't explain where the entropy is coming from, we need to be doubly
+on our guard.
 
-I suspect so too, but my measurements as of now are not conclusive.
->									
-Pavel
+Regards,
 
-
-Ciao
-Stephan
+					- Ted
