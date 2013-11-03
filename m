@@ -1,80 +1,41 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH 4/4] random: don't zap entropy count in rand_initialize()
-Date: Sun,  3 Nov 2013 08:33:15 -0500
-Message-ID: <1383485595-2020-5-git-send-email-tytso@mit.edu>
-References: <1383485595-2020-1-git-send-email-tytso@mit.edu>
+Subject: [PATCH 0/4] random: improve entropy pool initialization at boot time
+Date: Sun,  3 Nov 2013 08:33:11 -0500
+Message-ID: <1383485595-2020-1-git-send-email-tytso@mit.edu>
 Cc: linux-kernel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>
 To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:53762 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753468Ab3KCNdS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 Nov 2013 08:33:18 -0500
-In-Reply-To: <1383485595-2020-1-git-send-email-tytso@mit.edu>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The rand_initialize() function was being run fairly late in the kernel
-boot sequence.  This was unfortunate, since it zero'ed the entropy
-counters, thus throwing away credit that was accumulated earlier in
-the boot sequence, and it also meant that initcall functions run
-before rand_initialize were using a minimally initialized pool.
+These patches improve how /dev/random initializes its entropy pool
+during the kernel boot sequence.  With these changes, using an x86 test
+kernel run under KVM, the urandom pool gets initialized before the init
+scripts start running, and of the kernel users of get_random_bytes(), a
+debugging printk found only two users of get_random_bytes() before the
+nonblocking pool could be fully initialized:
 
-To fix this, fix init_std_data() to no longer zap the entropy counter;
-it wasn't necessary, and move rand_initialize() to be an early
-initcall.
+rc80211_minstrel_ht_init+0x2b/0x6a called get_random_bytes with 22 bits of entropy available
+neigh_hash_alloc+0x82/0x94 called get_random_bytes with 31 bits of entropy available
 
-Signed-off-by: "Theodore Ts'o" <tytso@mit.edu>
----
- drivers/char/random.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+Both of these calls were in a subsys_initcall(); and the first one I'm
+fairly certain could be replaced by the use of prandom_u32().
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index f553600..4a0e458 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1235,14 +1235,11 @@ static void init_std_data(struct entropy_store *r)
- 	ktime_t now = ktime_get_real();
- 	unsigned long rv;
- 
--	r->entropy_count = 0;
--	r->entropy_total = 0;
--	r->last_data_init = 0;
- 	r->last_pulled = jiffies;
- 	mix_pool_bytes(r, &now, sizeof(now), NULL);
- 	for (i = r->poolinfo->poolbytes; i > 0; i -= sizeof(rv)) {
- 		if (!arch_get_random_long(&rv))
--			break;
-+			rv = random_get_entropy();
- 		mix_pool_bytes(r, &rv, sizeof(rv), NULL);
- 	}
- 	mix_pool_bytes(r, utsname(), sizeof(*(utsname())), NULL);
-@@ -1265,7 +1262,7 @@ static int rand_initialize(void)
- 	init_std_data(&nonblocking_pool);
- 	return 0;
- }
--module_init(rand_initialize);
-+early_initcall(rand_initialize);
- 
- #ifdef CONFIG_BLOCK
- void rand_initialize_disk(struct gendisk *disk)
-@@ -1440,10 +1437,15 @@ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
- 		return 0;
- 	case RNDZAPENTCNT:
- 	case RNDCLEARPOOL:
--		/* Clear the entropy pool counters. */
-+		/*
-+		 * Clear the entropy pool counters. We no longer clear
-+		 * the entropy pool, as that's silly.
-+		 */
- 		if (!capable(CAP_SYS_ADMIN))
- 			return -EPERM;
--		rand_initialize();
-+		input_pool.entropy_count = 0;
-+		nonblocking_pool.entropy_count = 0;
-+		blocking_pool.entropy_count = 0;
- 		return 0;
- 	default:
- 		return -EINVAL;
+Note: I've cc'ed these patches to linux-crypto so hopefully more people
+will review these patches.
+
+              	       	     		    	- Ted
+
+Theodore Ts'o (4):
+  random: use device attach events for entropy
+  random: make add_timer_randomness() fill the nonblocking pool first
+  random: printk notifications for urandom pool initialization
+  random: don't zap entropy count in rand_initialize()
+
+ drivers/base/core.c    |  3 +++
+ drivers/char/random.c  | 42 +++++++++++++++++++++++++++++++-----------
+ include/linux/random.h |  2 ++
+ 3 files changed, 36 insertions(+), 11 deletions(-)
+
 -- 
 1.7.12.rc0.22.gcdd159b
