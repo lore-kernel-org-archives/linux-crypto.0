@@ -1,56 +1,76 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH 1/4] random: use device attach events for entropy
-Date: Sun, 3 Nov 2013 18:10:04 -0500
-Message-ID: <20131103231004.GD7376@thunk.org>
-References: <1383485595-2020-1-git-send-email-tytso@mit.edu>
- <1383485595-2020-2-git-send-email-tytso@mit.edu>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and
+ /dev/random
+Date: Mon, 4 Nov 2013 00:32:07 +0100
+Message-ID: <20131103233207.GA5105@amd.pavel.ucw.cz>
+References: <2579337.FPgJGgHYdz@tauon>
+ <7861469.OAmn4h8An0@tauon>
+ <20131102110112.GA16231@amd.pavel.ucw.cz>
+ <3537770.iLHXPOXMiU@tauon>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+Cc: Theodore Ts'o <tytso@mit.edu>,
+	sandy harris <sandyinchina@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:53860 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752439Ab3KCXKH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 Nov 2013 18:10:07 -0500
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:33327 "EHLO
+	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750729Ab3KCXcJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 Nov 2013 18:32:09 -0500
 Content-Disposition: inline
-In-Reply-To: <1383485595-2020-2-git-send-email-tytso@mit.edu>
+In-Reply-To: <3537770.iLHXPOXMiU@tauon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 03, 2013 at 08:33:12AM -0500, Theodore Ts'o wrote:
-> Some investigation from FreeBSD shows that there is entropy available
-> from measuring the device attach times:
-> 
-> http://lists.randombit.net/pipermail/cryptography/2013-October/005689.html
-> 
-> This will hopefully help us more quickly initialize the entropy pools
-> while the system is booting (which is one of the times when we really
-> badly need more entropy, especially in the case of the first boot
-> after an consumer electronics device is taken out of the box).
-> 
-> Measurements indicate this makes a huge improvement in the security of
-> /dev/urandom during the boot sequence, so I'm cc'ing this to the
-> stable kernel series.  Especially for embedded systems, which use
-> flash and which don't necessarily have the network enabled when they
-> first generate ssh or x.509 keys (sigh), this can be a big deal.
-> 
-> Signed-off-by: "Theodore Ts'o" <tytso@mit.edu>
-> Cc: stable@vger.kernel.org
+Hi!
 
-Self-NAK.  After doing some more measurements, I'm not convinced the
-entropy estimator is working well given how we are collecting the
-device attach times.  Instead, we need to measure the delta between
-the start and the end of the device probe, which in turn will only
-work if we have a valid cycle counter.  (random_get_entropy() is not
-going to cut it.)
+> Another friend of mine mentioned that he assumes the rise and fall times 
+> of transistors varies very slightly and could be the main reason for the 
+> jitter. I do not think that this is really the case, because our gates 
+> that form the CPU instructions comprise of many transistors. The 
+> combined raise/fall jitter should cancel each other out.
 
-So with some changes, this approach will improve things on x86, but on
-architectures like ARM, which generally don't have a cycle counter,
-the jiffies counter is not going to have enough resolution to do
-something useful --- and it was on platforms such as ARM and MIPS
-where I was hoping this would be most useful.   Grumble.
+Plus, there's clock that should make sure that this jitter does not
+matter.
 
-Why can't ARM and MIPS have decent cycle counters?   <Shakes fist>
+> >There should be way to extract entropy more directly from various
+> >oscillator effects, no?
+> 
+> I am working a different way of measuring such oscillator effects by 
+> using the high-resolution timer of the CPU and measure it with a 
+> Jiffies-based snapshotting window. So, here I would combine two timers 
+> that are differently generated. If their frequencies would be relative 
+> prime to each other, we would measure a direct oscillator effect.
 
-						- Ted
+I guess main problem is machines that do not have high-resolution
+timer on the CPU (rdtsc). They do not get enough entropy during boot,
+and the hell breaks loose.
+
+But they usually _do_ have RTC or other clock, not driven by CPU
+oscilator. Good.
+
+What about just
+
+while (!enough_entropy) {
+      cur_time = read_rtc();
+      simulated_tsc = 0;
+      while (cur_time == read_rtc())
+      	    simulated_tsc++;
+      gain_entropy_from(simulated_tsc)
+}
+
+(Where enough_entropy should be something like 128 bits).
+
+This should work, we know why it works (drift between rtc and cpu
+clock) and it does _not_ need rdtsc-style fast source.
+
+Disadvantage is that it burns cpu, but, well, you only need 128
+bits. Asuming the rtc used has 100Hz resolution, enough entropy should
+be collected in under 2 seconds. That's acceptable adition to time it
+takes generating ssh keys on slow cpu.
+									Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
