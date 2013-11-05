@@ -1,72 +1,103 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: [RESEND 2][PATCH] hwrng: add randomness to system from rng sources
-Date: Sun, 3 Nov 2013 16:20:30 -0800
-Message-ID: <20131104002030.GA8444@www.outflux.net>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and /dev/random
+Date: Tue, 05 Nov 2013 13:20:57 +0100
+Message-ID: <1762585.cs6mj77ady@tauon>
+References: <2579337.FPgJGgHYdz@tauon> <3537770.iLHXPOXMiU@tauon> <20131103124135.GB32091@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
-	Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Satoru Takeuchi <satoru.takeuchi@gmail.com>
-To: linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Pavel Machek <pavel@ucw.cz>, sandy harris <sandyinchina@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Theodore Ts'o <tytso@mit.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.outflux.net ([198.145.64.163]:35379 "EHLO smtp.outflux.net"
+Received: from mail.eperm.de ([89.247.134.16]:34734 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751033Ab3KDAUq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 Nov 2013 19:20:46 -0500
-Content-Disposition: inline
+	id S1754175Ab3KEMVL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 5 Nov 2013 07:21:11 -0500
+Received: from tauon.localnet
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S1E0> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Tue, 5 Nov 2013 13:21:01 +0100
+In-Reply-To: <20131103124135.GB32091@thunk.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When bringing a new RNG source online, it seems like it would make sense
-to use some of its bytes to make the system entropy pool more random,
-as done with all sorts of other devices that contain per-device or
-per-boot differences.
+Am Sonntag, 3. November 2013, 07:41:35 schrieb Theodore Ts'o:
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
-Added linux-crypto list to CC.
----
- drivers/char/hw_random/core.c |    7 +++++++
- 1 file changed, 7 insertions(+)
+Hi Theodore,
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index a0f7724852eb..6e5bb68a708c 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -41,6 +41,7 @@
- #include <linux/miscdevice.h>
- #include <linux/delay.h>
- #include <linux/slab.h>
-+#include <linux/random.h>
- #include <asm/uaccess.h>
- 
- 
-@@ -305,6 +306,8 @@ int hwrng_register(struct hwrng *rng)
- 	int must_register_misc;
- 	int err = -EINVAL;
- 	struct hwrng *old_rng, *tmp;
-+	unsigned char bytes[16];
-+	int bytes_read;
- 
- 	if (rng->name == NULL ||
- 	    (rng->data_read == NULL && rng->read == NULL))
-@@ -348,6 +351,10 @@ int hwrng_register(struct hwrng *rng)
- 	}
- 	INIT_LIST_HEAD(&rng->list);
- 	list_add_tail(&rng->list, &rng_list);
-+
-+	bytes_read = rng_get_data(rng, bytes, sizeof(bytes), 1);
-+	if (bytes_read > 0)
-+		add_device_randomness(bytes, bytes_read);
- out_unlock:
- 	mutex_unlock(&rng_mutex);
- out:
--- 
-1.7.9.5
+>On Sun, Nov 03, 2013 at 08:20:34AM +0100, Stephan Mueller wrote: 
+>
+>Sandy Harris pointed out a very good paper that I would definitely
+>recommend that people read:
+>
+>http://lwn.net/images/conf/rtlws11/random-hardware.pdf
+>
+>It basically describes some efforts made in 2009 by folks to do
+>exactly the sort of experiments I was advocating.  What I actually
 
+I am wondering whether you have seen my last measurements where I 
+effectively performed the tests you were asking for: disabling all 
+possible CPU features and selectively enabling them.
 
--- 
-Kees Cook
-Chrome OS Security
+The tests described in the above mentioned documents and much more are 
+all already in the test suite and test results I present here.
+
+>think is more important, though, is not the doing of the experiments,
+>but the development the tools to do these experiments.  If people can
+>create kernel modules (and they have to be done in the kernel, since
+>you need to be able to disable interrupts, L1 caches, etc., while you
+>run these tests), then it will be possible to do these experiments
+>each time a new CPU comes out from Intel, or each time an ARM hardware
+>vendor comes out with a new ARM SOC.
+
+The test code is available and it is executed in kernel space.
+>
+>It's important that these tests are done all time, and not, "OK, we
+
+Again, the code is there for the taking, including the analysis part. 
+Yes, it can be easily converted into a fully automated test such that at 
+the end a result of "CPU shows sufficient variations for the RNG" or 
+not.
+
+Therefore, I am asking again:
+
+- Which other CPU mechanisms can I disable that I did not so far?
+
+- The execution time measurements when disabling CPU features show that 
+there is still significant variations available. Given the fact that an 
+adversary is not able to disable the features as I did, he will not be 
+able to reduce the variations induced by the features. He may alter them 
+potentially, but there are still variations which he cannot affect, let 
+alone predict. Therefore, how shall an adversary make predictions of the 
+variations to weaken the RNG?
+
+I heard a nice statement from the developer who implemented the 
+/dev/random device of a different, respected operating system: the last 
+step to accept the underlying root cause of uncertainty for an RNG 
+always requires a leap of faith. Looking at typical noise sources that 
+sounds about right. For example:
+
+- how can we be sure that nobody who measures the key stroke interrupts 
+can do that with a precision that is higher than the estimated entropy 
+the key stroke is awarded (note, an adversary has the means to observe 
+key strokes)? Same applies to mouse movements. Note that X11 allows you 
+to measure these events precisely (the xev application should give a 
+glimpse).
+
+- how can we be sure that fast_pool exhibits no correlation with the 
+other noise sources?
+
+- how can we be sure that the HDD fluctuations are random?
+
+We simply accept that these issues do not allow predicting sequences to 
+the extent that weakens the RNG.
+
+My goal is to give another seed source to add even more uncertainty into 
+the Linux RNG in addition to the existing seed sources. This would also 
+support environments that were typically left in the rain so far, such 
+as virtual machines, early boot sequences, Live CDs, or headless systems 
+without a spinning disk.
+
+Ciao
+Stephan
