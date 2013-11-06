@@ -1,61 +1,63 @@
 From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and /dev/random
-Date: Wed, 06 Nov 2013 12:42:47 +0100
-Message-ID: <6186307.PQMXWdkvke@tauon>
-References: <2579337.FPgJGgHYdz@tauon> <4763730.CsXSbevC1J@tauon> <7447932.fADKoNoZRI@tauon>
+Date: Wed, 06 Nov 2013 12:49:45 +0100
+Message-ID: <4306229.ErfOL470s2@tauon>
+References: <2579337.FPgJGgHYdz@tauon> <20131103124135.GB32091@thunk.org> <1762585.cs6mj77ady@tauon>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Theodore Ts'o <tytso@mit.edu>,
-	sandy harris <sandyinchina@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Pavel Machek <pavel@ucw.cz>
+Cc: Pavel Machek <pavel@ucw.cz>, sandy harris <sandyinchina@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Nicholas Mc Guire <der.herr@hofr.at>
+To: Theodore Ts'o <tytso@mit.edu>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <7447932.fADKoNoZRI@tauon>
+In-Reply-To: <1762585.cs6mj77ady@tauon>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 5. November 2013, 14:45:58 schrieb Stephan Mueller:
+Am Dienstag, 5. November 2013, 13:20:57 schrieb Stephan Mueller:
 
-Hi Pavel,
+Hi Ted,
 
->Am Dienstag, 5. November 2013, 13:25:40 schrieb Stephan Mueller:
+>Am Sonntag, 3. November 2013, 07:41:35 schrieb Theodore Ts'o:
 >
->Hi Pavel,
+>Hi Theodore,
 >
->>Am Montag, 4. November 2013, 00:32:07 schrieb Pavel Machek:
->>>But they usually _do_ have RTC or other clock, not driven by CPU
->>>oscilator. Good.
->>>
->>>What about just
->>>
->>>while (!enough_entropy) {
->>>
->>>      cur_time = read_rtc();
->>>      simulated_tsc = 0;
->>>      while (cur_time == read_rtc())
->>>      
->>>      	    simulated_tsc++;
->>>      
->>>      gain_entropy_from(simulated_tsc)
->>>
->>>}
+>>On Sun, Nov 03, 2013 at 08:20:34AM +0100, Stephan Mueller wrote:
 >>
->>That is an interesting piece of code -- what would you do in the
->>gain_entropy_from function?
+>>Sandy Harris pointed out a very good paper that I would definitely
+>>recommend that people read:
+>>
+>>http://lwn.net/images/conf/rtlws11/random-hardware.pdf
+>>
+>>It basically describes some efforts made in 2009 by folks to do
+>>exactly the sort of experiments I was advocating.  What I actually
 >
->Please disregard my question.
+>I am wondering whether you have seen my last measurements where I
+>effectively performed the tests you were asking for: disabling all
+>possible CPU features and selectively enabling them.
 >
->I plugged that idea into my current Jitter RNG processing and disabled
->the other jitter measurements to get a clear, isolated picture.
->
->The result is also a white noise! And it is even quite fast.
+>The tests described in the above mentioned documents and much more are
+>all already in the test suite and test results I present here.
 
-After doing some more research on this approach, I have to admit that 
-the output not good (i.e. white noise) in all situations. Therefore, I 
-dropped that (for now).
+After this comment, I got back to one of the authors of the cited paper 
+(he is in CC).
 
-But thank you very much for your suggestion.
+Here is a quote from his answer to my question whether he was able to 
+identify the root cause:
+
+"its inherent in the microtiming of Hardware and there is nothing you 
+can do about it if you want the root cause is quantum physics"
+
+That means, no matter how much CPU support you disable, you will always 
+have some jitter -- as I showed in my latest test results in appendix 
+F.46 of [1]. This statement is supported by my tests on even 
+microkernels which have no other job running than my test application. 
+Furthermore, as we see that phenomenon on every tested CPU type on every 
+tested operating system with every tested compiler, I am wondering what 
+else argument is needed to have this solution considered.
+
+[1] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html
 
 Ciao
 Stephan
