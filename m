@@ -1,33 +1,38 @@
 From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and /dev/random
-Date: Thu, 07 Nov 2013 06:21:35 +0100
-Message-ID: <3842150.yBzxVUWavK@tauon>
-References: <2579337.FPgJGgHYdz@tauon> <9172761.DO0L6FkY0c@tauon> <20131106130432.GK14235@thunk.org>
+Date: Thu, 07 Nov 2013 06:26:06 +0100
+Message-ID: <4606253.6dPOReUPaz@tauon>
+References: <2579337.FPgJGgHYdz@tauon> <9172761.DO0L6FkY0c@tauon> <20131107010357.GC1950@opentech.at>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Pavel Machek <pavel@ucw.cz>, sandy harris <sandyinchina@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Nicholas Mc Guire <der.herr@hofr.at>
-To: Theodore Ts'o <tytso@mit.edu>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34802 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750797Ab3KGFVs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 Nov 2013 00:21:48 -0500
-Received: from tauon.localnet
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S1F3> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Thu, 7 Nov 2013 06:21:38 +0100
-In-Reply-To: <20131106130432.GK14235@thunk.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Theodore Ts'o <tytso@mit.edu>, Pavel Machek <pavel@ucw.cz>,
+	sandy harris <sandyinchina@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Nicholas Mc Guire <der.herr@hofr.at>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20131107010357.GC1950@opentech.at>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 6. November 2013, 08:04:32 schrieb Theodore Ts'o:
+Am Donnerstag, 7. November 2013, 02:03:57 schrieb Nicholas Mc Guire:
 
-Hi Theodore,
+Hi Nicholas,
 
->On Wed, Nov 06, 2013 at 01:51:17PM +0100, Stephan Mueller wrote:
+>On Wed, 06 Nov 2013, Stephan Mueller wrote:
+>> Am Mittwoch, 6. November 2013, 07:43:54 schrieb Theodore Ts'o:
+>> 
+>> Hi Theodore,
+>> 
+>> >On Wed, Nov 06, 2013 at 12:49:45PM +0100, Stephan Mueller wrote:
+>> >> Here is a quote from his answer to my question whether he was able
+>> >> to
+>> >> identify the root cause:
+>> >> 
+>> >> "its inherent in the microtiming of Hardware and there is nothing
+>> >> you
+>> >> can do about it if you want the root cause is quantum physics"
+>> >
 >> >That's unfortunate, since it leaves open the question of whether
 >> >this
 >> >jitter is something that could be at least somewhat predictable if
@@ -40,85 +45,60 @@ Hi Theodore,
 >> sequence even if you have the state of the CPU, that is what we are
 >> looking for, is it not?
 >
->I was asking the question about whether someone who knew more about
->the internal _workings_ of the CPU, note of the state of the CPU.
->This is not necessarily "the NSA guy", but someone who knows more
->about the internal workings of the Intel CPU (such as an Intel
->engineer --- and I've had Intel express misgivings about approaches
->which depend on "CPU jitter" approaches), or just someone who has
->spent a lot more time trying to examine the black box of the Intel CPU
->from the outside.
+>unpredictabilitty of the individual event does not imply that you do
+>not have the ability to "guess" with more than 50% - that is just
+>because it is not predictable
+>does not mean itt is bias-free (and more importantly here that the bias
+>is not influenced by controllable factors like load). Attached is a
+>simple demonstration of this problem (gauss.c) that runs in user-space
+>and harvestts entropy by race occurrence, while the distribution is a
+>nice normal distribution (on multticore it is an overlay of multtiple
+>normal distributions - one per core-pairing possible) it is not load
+>independent. Never the less the individual event (race/no-race) is not
+>predictable.
 
-I try to get more information from my contacts to other vendors. But I 
-am wondering what shall we do if the answer is (maybe even proven with 
-some test results) that they see the same issue themselves and have no 
-handle on it?
+Thank you for sharing your ideas and code.
 
-I mean, what is it that I would need to test and demonstrate to prove or 
-disprove my RNG? We can certainly test very much, but one thing we 
-cannot prove, and that is the fundamental jitter, provided it is a 
-result of quantum fluctuations. Just as with any other noise source, 
-basic fundamental principles are hard if not impossible to test.
+There is one deviation of my RNG from your considerations. My RNG is not 
+around race contention (i.e. your software-based uncertainty) but a 
+simple measurement of how long some instruction take to execute.
 
-I would again like to stress the fact that we see the root cause to a 
-similar degree on all major CPUs that we have around us. All of these 
-CPUs work differently and yet they show a common behavior, the execution 
-time variations. I wonder whether this is already a good indication 
->
->I remember making my own home-grown encryption algorithm before I
->entered college, secure in my arrogance that I had created something
->so complicated that no one could crack it.  Of course, as I got older
->and wiser, I realized that it just meant it was just something *I*
->couldn't yet anaylze and crack.  The argument "the internal state of
->the CPU is sooooo large, and the state transitions ar sooooo complex
->that it *must* be unpredictable, because *I* can't predict them" seems
->to be a very similar mistake that I made many years ago when I was in
->high school.
+So, how can I induce skews? By trying to disable CPU logic or fudge with 
+the CPU support (like cache attacks, etc). My tests have shown that 
+disabling some CPU logic may diminish timing variations, but they are 
+still sufficiently large to support the RNG.
 
-Agreed, I do not want to state that nobody is able to obtain the state 
-(especially considering that the CPUs *must* have some hardware 
-debugging hooks somewhere that should allow dumping out the current 
-state of the entire CPU to aid CPU development). However, we also have 
-to consider our threat model: to me, an attacker can only reside in user 
-state of the CPU. All that he can observe there can be used against us. 
-Anything that he can only do when in supervisor state is not of 
-interest, because gathering and maintaining entropy is the least of our 
-worries in this case.
->
->Of course, some of the state in the CPU may not be unknown to the
->attacker, if it is derived by external events that are not visible to
->the attacker, such as a network interrupt.  But if that's the case,
->why not measure network interrupts directly?  We're much less likely
->to overestimate the amount of entropy we can extract the system in
->that case.
+So, when we already have variations that are sufficient (i.e. the 
+entropy is sufficient), using the CPU features that initially have been 
+disabled but are now added on top of an already sufficient set of 
+variations cannot diminish the entropy that is already present. Even 
+when we assume we have full control over the CPU features, I do not see 
+a way how we can use these features to cancel already existing 
+variations out.
 
-To aid that discussion, let us assume that the variations are solely 
-based on the CPU state (which indications show that this is not the 
-case). When you focus on only the interrupts (or only one interrupt for 
-that matter) we limit the base from which we try to obtain entropy.
+Or do you have an idea how that can be established? Note, we all must 
+assume that an attacker is only in user state. Anything else is 
+meaningless.
 
-If you are concerned about the entropy level we add with the proposed 
-jitter RNG, what about the following:
+>> Besides, how on earth shall an attacker even gain knowledge about the
+>> state of the CPU or disable CPU mechanisms? Oh, I forgot, your NSA
+>> guy. But if he is able to do that, all discussions are moot because
+>> he simply disables any noise sources by flipping a bit, reads the
+>> memory that is used to hold the state of the RNG or just overwrites
+>> the memory locations where data is collected, because the general
+>> protection mechanisms offered by the kernel and the underlying
+>> hardware are broken.
+>No need to gain knowledge of the internal CPU state itt would be
+>sufficient to be able to put the CPU in a sub-state-space in which
+>the distribution is shifted. it may be enough to reduce the truely
+>random bits of some key only by a few bits to make it suceptible to
+>brute force attacks.
 
-- when mixing in bits from the jitter RNG into the entropy pools of 
-random.c, we increase the entropy estimator not by the equivalent amount 
-of bits, but some fraction. For example:
-
-...
-ret = jent_read_entropy(&r->entropy_collector, rand, JENTBLOCKSIZE);
-...
-_mix_pool_bytes(r, rand, ret, NULL);
-credit_entropy_bits(r, (ret * 8) / 2);
-
-This code would only increase the entropy estimator by half of the 
-obtained bits
-
-- The jitter RNG allows specifying an oversampling rate where it 
-oversamples the jitter by multiples of the given value. The default is 1 
-(i.e. no oversampling). But we could set it to 2 (double oversampling). 
-The code is here:
-
-r->entropy_collector.osr = 1;
+Note, the proposed RNG contains an unbias operation (the Von-Neumann 
+unbiaser) which is proven to remove any bias when it is established that 
+the individual observations are independent. And the way the 
+observations are generated ensures that they are independent. Thus, a 
+skew should not be a concern here.
 
 Ciao
 Stephan
