@@ -1,41 +1,67 @@
-From: Pavel Machek <pavel@ucw.cz>
+From: Nicholas Mc Guire <der.herr@hofr.at>
 Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and
- /dev/random
-Date: Wed, 6 Nov 2013 14:26:35 +0100
-Message-ID: <20131106132635.GA25971@amd.pavel.ucw.cz>
-References: <2579337.FPgJGgHYdz@tauon>
- <4763730.CsXSbevC1J@tauon>
- <7447932.fADKoNoZRI@tauon>
- <6186307.PQMXWdkvke@tauon>
+	/dev/random
+Date: Thu, 7 Nov 2013 01:36:25 +0100
+Message-ID: <20131107003625.GB1950@opentech.at>
+References: <2579337.FPgJGgHYdz@tauon> <4306229.ErfOL470s2@tauon> <20131106124354.GJ14235@thunk.org> <9172761.DO0L6FkY0c@tauon> <20131106130432.GK14235@thunk.org> <20131106132457.GA13852@amd.pavel.ucw.cz>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Theodore Ts'o <tytso@mit.edu>,
+	Stephan Mueller <smueller@chronox.de>,
 	sandy harris <sandyinchina@gmail.com>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+To: Pavel Machek <pavel@ucw.cz>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from hofr.at ([212.69.189.236]:33465 "EHLO mail.hofr.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752805Ab3KGAqb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 6 Nov 2013 19:46:31 -0500
 Content-Disposition: inline
-In-Reply-To: <6186307.PQMXWdkvke@tauon>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20131106132457.GA13852@amd.pavel.ucw.cz>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
+On Wed, 06 Nov 2013, Pavel Machek wrote:
 
-> >I plugged that idea into my current Jitter RNG processing and disabled
-> >the other jitter measurements to get a clear, isolated picture.
-> >
-> >The result is also a white noise! And it is even quite fast.
+> Hi!
 > 
-> After doing some more research on this approach, I have to admit that 
-> the output not good (i.e. white noise) in all situations. Therefore, I 
-> dropped that (for now).
+> > Of course, some of the state in the CPU may not be unknown to the
+> > attacker, if it is derived by external events that are not visible to
+> > the attacker, such as a network interrupt.  But if that's the case,
+> > why not measure network interrupts directly?  We're much less likely
+> > to overestimate the amount of entropy we can extract the system in
+> > that case.
+> 
+> Actually, I believe Stephan is up to something here.
+> 
+> We _can't_ measure network interrupts directly, because we do not have
+> TSC. (And TSC-less machines are the ones that are problematic, right?)
+>
 
-Is there chance to extract at least some entropy from it? (Can you
-post the code you used for testing?) Because in this case we know
-where the entropy comes from, which is important for Ted.
+If you are interested in entropy then there is no need to compare events against timestamps (which are just an event class) you can use any uncorrelated event (the assumption in using timestamps precisely is that they would be uncorrelated). If you are using jitter then the only question is how to extract it and how your
+extracter can be assured to be sensitive to time differences that are smaller than what can be impacted by external events. Specifically this also means that no mater how you extract jitter you can not assume it is unbiased and you would need to unbias it (e.g. using Neuman/Peres method) - e.g. look at the jitter distributions in the OSADL QA-Farm - it is clear that they are in none of the cases bias-free.
 
-Thanks,
-							Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+E.g. practically all systems we looked at the jitter distribution is sensitive to the amount of memory in the box.
+ 
+> Extracting entropy from the CPU will allow us to pick up entropy from
+> network packets (and timer interrupt jitter) even on machines that
+> lack TSC. And that counts like very cool feature.
+
+if you use external events then I do not see the relation to using CPU inherent non-determinism - why do you want to bind the selectd events to an external and potentially contrtolable event at all ?
+
+> 
+> (And yes, we could just increment variable to get tsc emulation in
+> idle loop, and then extract entropy from that. But we would not be
+> able to enter low power states at that point, and it would not work
+> when cpu is busy computing.)
+>
+there is so much global state information in the kernel that can be
+used to harvest entropy I do not see why we would neeed to implement
+a dedicated method (counter loop or the like) at all - rather
+all that would be needed is an extracter.
+
+Note that using global state though is not directly bound to microtiming (it
+might be too complex to systematically scew never the less but that would need tto be demonstrated). The only think that I believe is directly bound to microttiming are race conditions (also not unbiased though).
+
+thx!
+hofrat
