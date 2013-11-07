@@ -1,155 +1,124 @@
 From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and /dev/random
-Date: Thu, 07 Nov 2013 04:12:52 +0100
-Message-ID: <3111582.KXT7xhOO8M@tauon>
-References: <2579337.FPgJGgHYdz@tauon> <6186307.PQMXWdkvke@tauon> <20131106132635.GA25971@amd.pavel.ucw.cz>
+Date: Thu, 07 Nov 2013 06:21:35 +0100
+Message-ID: <3842150.yBzxVUWavK@tauon>
+References: <2579337.FPgJGgHYdz@tauon> <9172761.DO0L6FkY0c@tauon> <20131106130432.GK14235@thunk.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Theodore Ts'o <tytso@mit.edu>,
-	sandy harris <sandyinchina@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Pavel Machek <pavel@ucw.cz>
+Cc: Pavel Machek <pavel@ucw.cz>, sandy harris <sandyinchina@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Nicholas Mc Guire <der.herr@hofr.at>
+To: Theodore Ts'o <tytso@mit.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:43973 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:34802 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753835Ab3KGDND (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 6 Nov 2013 22:13:03 -0500
+	id S1750797Ab3KGFVs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 7 Nov 2013 00:21:48 -0500
 Received: from tauon.localnet
 	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S1F1> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Thu, 7 Nov 2013 04:12:55 +0100
-In-Reply-To: <20131106132635.GA25971@amd.pavel.ucw.cz>
+	id <S1F3> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Thu, 7 Nov 2013 06:21:38 +0100
+In-Reply-To: <20131106130432.GK14235@thunk.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 6. November 2013, 14:26:35 schrieb Pavel Machek:
+Am Mittwoch, 6. November 2013, 08:04:32 schrieb Theodore Ts'o:
 
-Hi Pavel,
+Hi Theodore,
 
->Hi!
->
->> >I plugged that idea into my current Jitter RNG processing and
->> >disabled
->> >the other jitter measurements to get a clear, isolated picture.
->> >
->> >The result is also a white noise! And it is even quite fast.
+>On Wed, Nov 06, 2013 at 01:51:17PM +0100, Stephan Mueller wrote:
+>> >That's unfortunate, since it leaves open the question of whether
+>> >this
+>> >jitter is something that could be at least somewhat predictable if
+>> >you
+>> >had a lot more information about the internal works of the CPU or
+>> >not....
 >> 
->> After doing some more research on this approach, I have to admit that
->> the output not good (i.e. white noise) in all situations. Therefore,
->> I
->> dropped that (for now).
+>> I do not understand that answer: I thought we are talking about the
+>> search of non-predictable noise sources. If you cannot predict the
+>> sequence even if you have the state of the CPU, that is what we are
+>> looking for, is it not?
 >
->Is there chance to extract at least some entropy from it? (Can you
->post the code you used for testing?) Because in this case we know
->where the entropy comes from, which is important for Ted.
+>I was asking the question about whether someone who knew more about
+>the internal _workings_ of the CPU, note of the state of the CPU.
+>This is not necessarily "the NSA guy", but someone who knows more
+>about the internal workings of the Intel CPU (such as an Intel
+>engineer --- and I've had Intel express misgivings about approaches
+>which depend on "CPU jitter" approaches), or just someone who has
+>spent a lot more time trying to examine the black box of the Intel CPU
+>from the outside.
 
-The code is as follows -- it hooks into the framework of the RNG I 
-already have, so the code folds the obtained data into one bit (use the 
-following function as a drop-in replacement to my RNG code.
+I try to get more information from my contacts to other vendors. But I 
+am wondering what shall we do if the answer is (maybe even proven with 
+some test results) that they see the same issue themselves and have no 
+handle on it?
 
-static __u64 jent_measure_jitter(struct rand_data *entropy_collector)
-{
-        __u64 starttime = 0;
-        __u64 currtime = 0;
-        __u64 counter = 0;
-        __u64 data = 0;
+I mean, what is it that I would need to test and demonstrate to prove or 
+disprove my RNG? We can certainly test very much, but one thing we 
+cannot prove, and that is the fundamental jitter, provided it is a 
+result of quantum fluctuations. Just as with any other noise source, 
+basic fundamental principles are hard if not impossible to test.
 
-        jent_get_ustime(&starttime);
-        jent_get_ustime(&currtime);
-        while(starttime == currtime)
-        {
-                jent_get_ustime(&currtime);
-                counter++;
-        }
-        jent_fold_time(counter, &data, 1);
-        return data;
-}
-
-Consider the following in addition:
-
-static inline void jent_get_ustime(__u64 *out)
-{
-        __u64 tmp = 0;
-        struct timeval time;
-        if(gettimeofday(&time, NULL) == 0)
-                tmp = time.tv_usec;
-        *out = tmp;
-}
-
-For the kernel land, I implemented jent_get_ustime to be identical to 
-do_gettimeofday().
-
-The result is the following on my i7 2nd gen without using the Von-
-Neumann unbias operation:
-
-- user space: looks like good white noise based on the results of ent 
-(Chi square, etc). When I print out the counter variable above and 
-calculate the Shannon Entropy, I get about 1.5 bits, so we have 
-variations. But when you look at the data manually, you see quite some 
-streaks that alternate between two values. Here is an example:
-
-4
-6
-10
-2
-3
-2
-3
-4
-4
-4
-4
-4
-5
-3
-4
-5
-4
-4
-4
-5
-4
-4
-5
-4
-4
-5
-4
-4
-5
-4
-4
-5
-4
-4
-4
-5
-4
-4
-
-
-- kernel space: the resulting binary string is not very good: the chi 
-square is very bad. Moreover, the resulting data string is slightly 
-skewed. The reason is simple by looking at the counter value which I 
-obtained with another debugfs file: there are very very long streaks of 
-the same or alternating values.
-
-So, I guess you may get some entropy, but I am not sure how much.
-
-Also, when I enlarge the timer value to look something like that:
-
-        if(gettimeofday(&time, NULL) == 0)
-                tmp = time.tv_usec>>3;
-
-the counter value is not getting really better, it is still alternating 
-between two or three values.
-
-
+I would again like to stress the fact that we see the root cause to a 
+similar degree on all major CPUs that we have around us. All of these 
+CPUs work differently and yet they show a common behavior, the execution 
+time variations. I wonder whether this is already a good indication 
 >
->Thanks,
->							Pavel
+>I remember making my own home-grown encryption algorithm before I
+>entered college, secure in my arrogance that I had created something
+>so complicated that no one could crack it.  Of course, as I got older
+>and wiser, I realized that it just meant it was just something *I*
+>couldn't yet anaylze and crack.  The argument "the internal state of
+>the CPU is sooooo large, and the state transitions ar sooooo complex
+>that it *must* be unpredictable, because *I* can't predict them" seems
+>to be a very similar mistake that I made many years ago when I was in
+>high school.
 
+Agreed, I do not want to state that nobody is able to obtain the state 
+(especially considering that the CPUs *must* have some hardware 
+debugging hooks somewhere that should allow dumping out the current 
+state of the entire CPU to aid CPU development). However, we also have 
+to consider our threat model: to me, an attacker can only reside in user 
+state of the CPU. All that he can observe there can be used against us. 
+Anything that he can only do when in supervisor state is not of 
+interest, because gathering and maintaining entropy is the least of our 
+worries in this case.
+>
+>Of course, some of the state in the CPU may not be unknown to the
+>attacker, if it is derived by external events that are not visible to
+>the attacker, such as a network interrupt.  But if that's the case,
+>why not measure network interrupts directly?  We're much less likely
+>to overestimate the amount of entropy we can extract the system in
+>that case.
+
+To aid that discussion, let us assume that the variations are solely 
+based on the CPU state (which indications show that this is not the 
+case). When you focus on only the interrupts (or only one interrupt for 
+that matter) we limit the base from which we try to obtain entropy.
+
+If you are concerned about the entropy level we add with the proposed 
+jitter RNG, what about the following:
+
+- when mixing in bits from the jitter RNG into the entropy pools of 
+random.c, we increase the entropy estimator not by the equivalent amount 
+of bits, but some fraction. For example:
+
+...
+ret = jent_read_entropy(&r->entropy_collector, rand, JENTBLOCKSIZE);
+...
+_mix_pool_bytes(r, rand, ret, NULL);
+credit_entropy_bits(r, (ret * 8) / 2);
+
+This code would only increase the entropy estimator by half of the 
+obtained bits
+
+- The jitter RNG allows specifying an oversampling rate where it 
+oversamples the jitter by multiples of the given value. The default is 1 
+(i.e. no oversampling). But we could set it to 2 (double oversampling). 
+The code is here:
+
+r->entropy_collector.osr = 1;
 
 Ciao
 Stephan
