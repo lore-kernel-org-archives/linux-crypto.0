@@ -1,46 +1,52 @@
-From: Mickael Maison <mickael.maison@gmail.com>
-Subject: [PATCH] CRYPTO: async_tx: Fixed a couple of typos
-Date: Sat,  9 Nov 2013 18:30:14 +0100
-Message-ID: <1384018214-28064-1-git-send-email-mickael.maison@gmail.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Mickael Maison <mickael.maison@gmail.com>
-To: dan.j.williams@intel.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f181.google.com ([74.125.82.181]:52597 "EHLO
-	mail-we0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753740Ab3KIRhF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 9 Nov 2013 12:37:05 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Clemens Ladisch <clemens@ladisch.de>
+Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and
+ /dev/random
+Date: Sat, 09 Nov 2013 23:04:07 +0100
+Message-ID: <527EB157.70109@ladisch.de>
+References: <2579337.FPgJGgHYdz@tauon> <9172761.DO0L6FkY0c@tauon> <20131107010357.GC1950@opentech.at> <4606253.6dPOReUPaz@tauon>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Nicholas Mc Guire <der.herr@hofr.at>,
+	Theodore Ts'o <tytso@mit.edu>, Pavel Machek <pavel@ucw.cz>,
+	sandy harris <sandyinchina@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <4606253.6dPOReUPaz@tauon>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Fixed 2 typos in async_xor.c
----
- crypto/async_tx/async_xor.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Stephan Mueller wrote:
+> Am Donnerstag, 7. November 2013, 02:03:57 schrieb Nicholas Mc Guire:
+>> On Wed, 06 Nov 2013, Stephan Mueller wrote:
+>>> Besides, how on earth shall an attacker even gain knowledge about the
+>>> state of the CPU or disable CPU mechanisms? Oh, I forgot, your NSA
+>>> guy. But if he is able to do that, all discussions are moot because
+>>> he simply disables any noise sources by flipping a bit, reads the
+>>> memory that is used to hold the state of the RNG or just overwrites
+>>> the memory locations where data is collected, because the general
+>>> protection mechanisms offered by the kernel and the underlying
+>>> hardware are broken.
+>>
+>> No need to gain knowledge of the internal CPU state itt would be
+>> sufficient to be able to put the CPU in a sub-state-space in which
+>> the distribution is shifted. it may be enough to reduce the truely
+>> random bits of some key only by a few bits to make it suceptible to
+>> brute force attacks.
+>
+> Note, the proposed RNG contains an unbias operation (the Von-Neumann
+> unbiaser) which is proven to remove any bias when it is established that
+> the individual observations are independent. And the way the
+> observations are generated ensures that they are independent.
 
-diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
-index 8ade0a0..bcaa1e9 100644
---- a/crypto/async_tx/async_xor.c
-+++ b/crypto/async_tx/async_xor.c
-@@ -48,7 +48,7 @@ do_async_xor(struct dma_chan *chan, struct page *dest, struct page **src_list,
- 	int xor_src_cnt = 0;
- 	dma_addr_t dma_dest;
- 
--	/* map the dest bidrectional in case it is re-used as a source */
-+	/* map the dest bidirectional in case it is re-used as a source */
- 	dma_dest = dma_map_page(dma->dev, dest, offset, len, DMA_BIDIRECTIONAL);
- 	for (i = 0; i < src_cnt; i++) {
- 		/* only map the dest once */
-@@ -175,7 +175,7 @@ do_sync_xor(struct page *dest, struct page **src_list, unsigned int offset,
-  * xor_blocks always uses the dest as a source so the
-  * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
-  * the calculation.  The assumption with dma eninges is that they only
-- * use the destination buffer as a source when it is explicity specified
-+ * use the destination buffer as a source when it is explicitly specified
-  * in the source list.
-  *
-  * src_list note: if the dest is also a source it must be at index zero.
--- 
-1.7.10.4
+"Independent" does not mean that your own code avoids reusing data from
+the previous loop iteration; it means that the _entire_ process that
+generates the bits is not affected by any memory of the past.
+
+The observations are derived from the internal CPU state, which is *not*
+reset between measurements.
+
+
+Regards,
+Clemens
