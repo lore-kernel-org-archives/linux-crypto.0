@@ -1,46 +1,46 @@
-From: Nicolas Ferre <nicolas.ferre@atmel.com>
-Subject: [PATCH RESEND 7/7] crypto: atmel-sha - add sha information to the log
-Date: Fri, 8 Nov 2013 16:08:16 +0100
-Message-ID: <e8be86b81611f75ff961d93bd448996fcb5b51ef.1383922546.git.nicolas.ferre@atmel.com>
-References: <cover.1383922546.git.nicolas.ferre@atmel.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-kernel@vger.kernel.org>, <eric@eukrea.com>,
-	Nicolas Ferre <nicolas.ferre@atmel.com>
-To: <linux-arm-kernel@lists.infradead.org>,
-	<herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+From: Mickael Maison <mickael.maison@gmail.com>
+Subject: [PATCH] CRYPTO: async_tx: Fixed a couple of typos
+Date: Sat,  9 Nov 2013 18:30:14 +0100
+Message-ID: <1384018214-28064-1-git-send-email-mickael.maison@gmail.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Mickael Maison <mickael.maison@gmail.com>
+To: dan.j.williams@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from eusmtp01.atmel.com ([212.144.249.243]:48430 "EHLO
-	eusmtp01.atmel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754852Ab3KHPK5 (ORCPT
+Received: from mail-we0-f181.google.com ([74.125.82.181]:52597 "EHLO
+	mail-we0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753740Ab3KIRhF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 8 Nov 2013 10:10:57 -0500
-In-Reply-To: <cover.1383922546.git.nicolas.ferre@atmel.com>
+	Sat, 9 Nov 2013 12:37:05 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Depending on peripheral capabilities, print SHA information at the end
-of the probe function.
-
-Signed-off-by: Nicolas Ferre <nicolas.ferre@atmel.com>
+Fixed 2 typos in async_xor.c
 ---
- drivers/crypto/atmel-sha.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ crypto/async_tx/async_xor.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index ecfdf72..0618be0 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1469,7 +1469,9 @@ static int atmel_sha_probe(struct platform_device *pdev)
- 	if (err)
- 		goto err_algs;
+diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
+index 8ade0a0..bcaa1e9 100644
+--- a/crypto/async_tx/async_xor.c
++++ b/crypto/async_tx/async_xor.c
+@@ -48,7 +48,7 @@ do_async_xor(struct dma_chan *chan, struct page *dest, struct page **src_list,
+ 	int xor_src_cnt = 0;
+ 	dma_addr_t dma_dest;
  
--	dev_info(dev, "Atmel SHA1/SHA256\n");
-+	dev_info(dev, "Atmel SHA1/SHA256%s%s\n",
-+			sha_dd->caps.has_sha224 ? "/SHA224" : "",
-+			sha_dd->caps.has_sha_384_512 ? "/SHA384/SHA512" : "");
- 
- 	return 0;
- 
+-	/* map the dest bidrectional in case it is re-used as a source */
++	/* map the dest bidirectional in case it is re-used as a source */
+ 	dma_dest = dma_map_page(dma->dev, dest, offset, len, DMA_BIDIRECTIONAL);
+ 	for (i = 0; i < src_cnt; i++) {
+ 		/* only map the dest once */
+@@ -175,7 +175,7 @@ do_sync_xor(struct page *dest, struct page **src_list, unsigned int offset,
+  * xor_blocks always uses the dest as a source so the
+  * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
+  * the calculation.  The assumption with dma eninges is that they only
+- * use the destination buffer as a source when it is explicity specified
++ * use the destination buffer as a source when it is explicitly specified
+  * in the source list.
+  *
+  * src_list note: if the dest is also a source it must be at index zero.
 -- 
-1.8.2.2
+1.7.10.4
