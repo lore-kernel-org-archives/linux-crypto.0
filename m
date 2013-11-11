@@ -1,36 +1,130 @@
-From: "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and
- /dev/random
-Date: Sun, 10 Nov 2013 18:58:49 -0800
-Message-ID: <528047E9.2020503@zytor.com>
-References: <2579337.FPgJGgHYdz@tauon> <2051753.dJvMFQBFA1@myon.chronox.de> <527FB4CB.7000106@ladisch.de> <8100659.WdgUuKxd0z@myon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: "Theodore Ts'o" <tytso@mit.edu>, Pavel Machek <pavel@ucw.cz>,
-	sandy harris <sandyinchina@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Nicholas Mc Guire <der.herr@hofr.at>
-To: Stephan Mueller <smueller@chronox.de>,
-	Clemens Ladisch <clemens@ladisch.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:35703 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751016Ab3KKC7W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 10 Nov 2013 21:59:22 -0500
-In-Reply-To: <8100659.WdgUuKxd0z@myon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Rob Herring <robherring2@gmail.com>
+Subject: [PATCH] powerpc: add explicit OF includes for ppc4xx
+Date: Sun, 10 Nov 2013 23:35:43 -0600
+Message-ID: <1384148143-14335-1-git-send-email-robherring2@gmail.com>
+Cc: Rob Herring <rob.herring@calxeda.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Paul Mackerras <paulus@samba.org>, Tejun Heo <tj@kernel.org>,
+	Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Vinod Koul <vinod.koul@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	linuxppc-dev@lists.ozlabs.org, linux-ide@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 11/10/2013 09:21 AM, Stephan Mueller wrote:
-> 
-> Here you say it: we *assume*. And please bear in mind that we all know for a 
-> fact that the theory behind quantum physics is not complete, because it does 
-> not work together with the theory of relativity. That again is a hint that 
-> there is NO proof that decay is really unpredictable.
-> 
+From: Rob Herring <rob.herring@calxeda.com>
 
-Honestly, if you want to be taken seriously, this is not the kind of
-thing to put in your discussion.
+Commit b5b4bb3f6a11f9 (of: only include prom.h on sparc) removed implicit
+includes of of_*.h headers by powerpc's prom.h. Some PPC4xx components
+were missed in initial clean-up patch, so add the necessary includes
+to fix ppc4xx builds.
 
-	-hpa
+Signed-off-by: Rob Herring <rob.herring@calxeda.com>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Matt Mackall <mpm@selenic.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Vinod Koul <vinod.koul@intel.com>
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-ide@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+---
+I intend to send this patch to Linus with the rest of the DT clean-up
+series.
+
+Rob
+
+ arch/powerpc/sysdev/ppc4xx_ocm.c     | 1 +
+ arch/powerpc/sysdev/xilinx_intc.c    | 1 +
+ drivers/ata/sata_dwc_460ex.c         | 2 ++
+ drivers/char/hw_random/ppc4xx-rng.c  | 1 +
+ drivers/crypto/amcc/crypto4xx_core.c | 3 +++
+ drivers/dma/ppc4xx/adma.c            | 2 ++
+ 6 files changed, 10 insertions(+)
+
+diff --git a/arch/powerpc/sysdev/ppc4xx_ocm.c b/arch/powerpc/sysdev/ppc4xx_ocm.c
+index 1b15f93..b7c4345 100644
+--- a/arch/powerpc/sysdev/ppc4xx_ocm.c
++++ b/arch/powerpc/sysdev/ppc4xx_ocm.c
+@@ -26,6 +26,7 @@
+ #include <linux/kernel.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/of.h>
++#include <linux/of_address.h>
+ #include <asm/rheap.h>
+ #include <asm/ppc4xx_ocm.h>
+ #include <linux/slab.h>
+diff --git a/arch/powerpc/sysdev/xilinx_intc.c b/arch/powerpc/sysdev/xilinx_intc.c
+index f4fdc94..83f943a 100644
+--- a/arch/powerpc/sysdev/xilinx_intc.c
++++ b/arch/powerpc/sysdev/xilinx_intc.c
+@@ -24,6 +24,7 @@
+ #include <linux/irq.h>
+ #include <linux/of.h>
+ #include <linux/of_address.h>
++#include <linux/of_irq.h>
+ #include <asm/io.h>
+ #include <asm/processor.h>
+ #include <asm/i8259.h>
+diff --git a/drivers/ata/sata_dwc_460ex.c b/drivers/ata/sata_dwc_460ex.c
+index 2e39173..523524b 100644
+--- a/drivers/ata/sata_dwc_460ex.c
++++ b/drivers/ata/sata_dwc_460ex.c
+@@ -31,6 +31,8 @@
+ #include <linux/module.h>
+ #include <linux/init.h>
+ #include <linux/device.h>
++#include <linux/of_address.h>
++#include <linux/of_irq.h>
+ #include <linux/of_platform.h>
+ #include <linux/platform_device.h>
+ #include <linux/libata.h>
+diff --git a/drivers/char/hw_random/ppc4xx-rng.c b/drivers/char/hw_random/ppc4xx-rng.c
+index 732c330..521f76b 100644
+--- a/drivers/char/hw_random/ppc4xx-rng.c
++++ b/drivers/char/hw_random/ppc4xx-rng.c
+@@ -13,6 +13,7 @@
+ #include <linux/platform_device.h>
+ #include <linux/hw_random.h>
+ #include <linux/delay.h>
++#include <linux/of_address.h>
+ #include <linux/of_platform.h>
+ #include <asm/io.h>
+ 
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index f88e3d8..efaf630 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -27,6 +27,9 @@
+ #include <linux/dma-mapping.h>
+ #include <linux/platform_device.h>
+ #include <linux/init.h>
++#include <linux/module.h>
++#include <linux/of_address.h>
++#include <linux/of_irq.h>
+ #include <linux/of_platform.h>
+ #include <linux/slab.h>
+ #include <asm/dcr.h>
+diff --git a/drivers/dma/ppc4xx/adma.c b/drivers/dma/ppc4xx/adma.c
+index 370ff82..e24b5ef 100644
+--- a/drivers/dma/ppc4xx/adma.c
++++ b/drivers/dma/ppc4xx/adma.c
+@@ -42,6 +42,8 @@
+ #include <linux/uaccess.h>
+ #include <linux/proc_fs.h>
+ #include <linux/of.h>
++#include <linux/of_address.h>
++#include <linux/of_irq.h>
+ #include <linux/of_platform.h>
+ #include <asm/dcr.h>
+ #include <asm/dcr-regs.h>
+-- 
+1.8.1.2
