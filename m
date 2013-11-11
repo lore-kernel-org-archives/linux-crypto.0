@@ -1,53 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RESEND] crypto: make sure *blkcipher_walk_init properly
- initialises walk
-Date: Mon, 11 Nov 2013 09:28:09 +0800
-Message-ID: <20131111012809.GA5091@gondor.apana.org.au>
-References: <1384108681-23519-1-git-send-email-mpn@google.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and
+ /dev/random
+Date: Sun, 10 Nov 2013 18:58:49 -0800
+Message-ID: <528047E9.2020503@zytor.com>
+References: <2579337.FPgJGgHYdz@tauon> <2051753.dJvMFQBFA1@myon.chronox.de> <527FB4CB.7000106@ladisch.de> <8100659.WdgUuKxd0z@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Michal Nazarewicz <mina86@mina86.com>
-To: Michal Nazarewicz <mpn@google.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: "Theodore Ts'o" <tytso@mit.edu>, Pavel Machek <pavel@ucw.cz>,
+	sandy harris <sandyinchina@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Nicholas Mc Guire <der.herr@hofr.at>
+To: Stephan Mueller <smueller@chronox.de>,
+	Clemens Ladisch <clemens@ladisch.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:54738 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751163Ab3KKB2R (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 10 Nov 2013 20:28:17 -0500
-Content-Disposition: inline
-In-Reply-To: <1384108681-23519-1-git-send-email-mpn@google.com>
+Received: from terminus.zytor.com ([198.137.202.10]:35703 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751016Ab3KKC7W (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 10 Nov 2013 21:59:22 -0500
+In-Reply-To: <8100659.WdgUuKxd0z@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 10, 2013 at 07:38:01PM +0100, Michal Nazarewicz wrote:
-> From: Michal Nazarewicz <mina86@mina86.com>
+On 11/10/2013 09:21 AM, Stephan Mueller wrote:
 > 
-> blkcipher_walk_init and ablkcipher_walk_init functions are called
-> to initialise a walk structure allocated on stack, which is not
-> initialised by the caller.  This means, that the fields of the
-> structure contain garbage when *_init is run.
+> Here you say it: we *assume*. And please bear in mind that we all know for a 
+> fact that the theory behind quantum physics is not complete, because it does 
+> not work together with the theory of relativity. That again is a hint that 
+> there is NO proof that decay is really unpredictable.
 > 
-> The *_init functions do not initialise all of the fields though,
-> and in particular leave flags field as is.  This results in field
-> containing unspecified value.
-> 
-> Zeroing the whole structure makes sure that all of the fields
-> are initialised to the same value regardless of the values stored
-> on the stack prior to the call to the *_init function.
-> 
-> Signed-off-by: Michal Nazarewicz <mina86@mina86.com>
 
-Nack.  The field flags is used as a bit-field and all bits other
-than those initialised that you see are used internally by the
-walker function and will be initialised on demand.
+Honestly, if you want to be taken seriously, this is not the kind of
+thing to put in your discussion.
 
-Please do not just rely on tools such as coverity and actually
-read the code when submitting patches.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	-hpa
