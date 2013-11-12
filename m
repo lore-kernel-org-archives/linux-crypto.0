@@ -1,145 +1,73 @@
-From: Vinod Koul <vinod.koul@intel.com>
-Subject: Re: [PATCH] powerpc: add explicit OF includes for ppc4xx
-Date: Tue, 12 Nov 2013 10:22:33 +0530
-Message-ID: <20131112045233.GH8834@intel.com>
-References: <1384148143-14335-1-git-send-email-robherring2@gmail.com>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH 2/2] crypto: testmgr - make test_aead also test 'dst !=
+ src' code paths
+Date: Tue, 12 Nov 2013 13:11:53 +0200
+Message-ID: <52820CF9.3070406@freescale.com>
+References: <20120921072647.11790.19493.stgit@localhost6.localdomain6> <20120921072652.11790.31387.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	Rob Herring <rob.herring@calxeda.com>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>, Tejun Heo <tj@kernel.org>,
-	Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dan Williams <dan.j.williams@intel.com>,
-	linuxppc-dev@lists.ozlabs.org, linux-ide@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Rob Herring <robherring2@gmail.com>
-Return-path: <linux-ide-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1384148143-14335-1-git-send-email-robherring2@gmail.com>
-Sender: linux-ide-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+	<linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ch1ehsobe001.messaging.microsoft.com ([216.32.181.181]:36168
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751472Ab3KLLMH (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Nov 2013 06:12:07 -0500
+In-Reply-To: <20120921072652.11790.31387.stgit@localhost6.localdomain6>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 10, 2013 at 11:35:43PM -0600, Rob Herring wrote:
-> From: Rob Herring <rob.herring@calxeda.com>
-> 
-> Commit b5b4bb3f6a11f9 (of: only include prom.h on sparc) removed implicit
-> includes of of_*.h headers by powerpc's prom.h. Some PPC4xx components
-> were missed in initial clean-up patch, so add the necessary includes
-> to fix ppc4xx builds.
-> 
-> Signed-off-by: Rob Herring <rob.herring@calxeda.com>
-> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Cc: Paul Mackerras <paulus@samba.org>
-> Cc: Tejun Heo <tj@kernel.org>
-> Cc: Matt Mackall <mpm@selenic.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Vinod Koul <vinod.koul@intel.com>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: linuxppc-dev@lists.ozlabs.org
-> Cc: linux-ide@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
+On 9/21/2012 10:26 AM, Jussi Kivilinna wrote:
+> Currrently test_aead uses same buffer for destination and source. However
+> in any places, 'dst != src' take different path than 'dst == src' case.
+>
+> Therefore make test_aead also run tests with destination buffer being
+> different than source buffer.
+>
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
 > ---
-> I intend to send this patch to Linus with the rest of the DT clean-up
-> series.
-> 
-> Rob
-> 
->  arch/powerpc/sysdev/ppc4xx_ocm.c     | 1 +
->  arch/powerpc/sysdev/xilinx_intc.c    | 1 +
->  drivers/ata/sata_dwc_460ex.c         | 2 ++
->  drivers/char/hw_random/ppc4xx-rng.c  | 1 +
->  drivers/crypto/amcc/crypto4xx_core.c | 3 +++
->  drivers/dma/ppc4xx/adma.c            | 2 ++
-For this:
+>   crypto/testmgr.c |  153 +++++++++++++++++++++++++++++++++++++-----------------
+>   1 file changed, 105 insertions(+), 48 deletions(-)
+>
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 00f54d5..941d75c 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
 
-Acked-by Vinod Koul <vinod.koul@intel.com>
+> @@ -442,18 +460,26 @@ static int test_aead(struct crypto_aead *tfm, int enc,
+>   			authsize = abs(template[i].rlen - template[i].ilen);
+>   			ret = crypto_aead_setauthsize(tfm, authsize);
+>   			if (ret) {
+> -				printk(KERN_ERR "alg: aead: Failed to set "
+> -				       "authsize to %u on test %d for %s\n",
+> -				       authsize, j, algo);
+> +				pr_err("alg: aead%s: Failed to set authsize to %u on test %d for %s\n",
+> +				       d, authsize, j, algo);
+>   				goto out;
+>   			}
+>   
+>   			sg_init_one(&sg[0], input,
+>   				    template[i].ilen + (enc ? authsize : 0));
+>   
+> +			if (diff_dst) {
+> +				output = xoutbuf[0];
+> +				sg_init_one(&sgout[0], output,
+> +					    template[i].ilen +
+> +						(enc ? authsize : 0));
+> +			} else {
+> +				output = input;
+> +			}
 
---
-~Vinod
->  6 files changed, 10 insertions(+)
-> 
-> diff --git a/arch/powerpc/sysdev/ppc4xx_ocm.c b/arch/powerpc/sysdev/ppc4xx_ocm.c
-> index 1b15f93..b7c4345 100644
-> --- a/arch/powerpc/sysdev/ppc4xx_ocm.c
-> +++ b/arch/powerpc/sysdev/ppc4xx_ocm.c
-> @@ -26,6 +26,7 @@
->  #include <linux/kernel.h>
->  #include <linux/dma-mapping.h>
->  #include <linux/of.h>
-> +#include <linux/of_address.h>
->  #include <asm/rheap.h>
->  #include <asm/ppc4xx_ocm.h>
->  #include <linux/slab.h>
-> diff --git a/arch/powerpc/sysdev/xilinx_intc.c b/arch/powerpc/sysdev/xilinx_intc.c
-> index f4fdc94..83f943a 100644
-> --- a/arch/powerpc/sysdev/xilinx_intc.c
-> +++ b/arch/powerpc/sysdev/xilinx_intc.c
-> @@ -24,6 +24,7 @@
->  #include <linux/irq.h>
->  #include <linux/of.h>
->  #include <linux/of_address.h>
-> +#include <linux/of_irq.h>
->  #include <asm/io.h>
->  #include <asm/processor.h>
->  #include <asm/i8259.h>
-> diff --git a/drivers/ata/sata_dwc_460ex.c b/drivers/ata/sata_dwc_460ex.c
-> index 2e39173..523524b 100644
-> --- a/drivers/ata/sata_dwc_460ex.c
-> +++ b/drivers/ata/sata_dwc_460ex.c
-> @@ -31,6 +31,8 @@
->  #include <linux/module.h>
->  #include <linux/init.h>
->  #include <linux/device.h>
-> +#include <linux/of_address.h>
-> +#include <linux/of_irq.h>
->  #include <linux/of_platform.h>
->  #include <linux/platform_device.h>
->  #include <linux/libata.h>
-> diff --git a/drivers/char/hw_random/ppc4xx-rng.c b/drivers/char/hw_random/ppc4xx-rng.c
-> index 732c330..521f76b 100644
-> --- a/drivers/char/hw_random/ppc4xx-rng.c
-> +++ b/drivers/char/hw_random/ppc4xx-rng.c
-> @@ -13,6 +13,7 @@
->  #include <linux/platform_device.h>
->  #include <linux/hw_random.h>
->  #include <linux/delay.h>
-> +#include <linux/of_address.h>
->  #include <linux/of_platform.h>
->  #include <asm/io.h>
->  
-> diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-> index f88e3d8..efaf630 100644
-> --- a/drivers/crypto/amcc/crypto4xx_core.c
-> +++ b/drivers/crypto/amcc/crypto4xx_core.c
-> @@ -27,6 +27,9 @@
->  #include <linux/dma-mapping.h>
->  #include <linux/platform_device.h>
->  #include <linux/init.h>
-> +#include <linux/module.h>
-> +#include <linux/of_address.h>
-> +#include <linux/of_irq.h>
->  #include <linux/of_platform.h>
->  #include <linux/slab.h>
->  #include <asm/dcr.h>
-> diff --git a/drivers/dma/ppc4xx/adma.c b/drivers/dma/ppc4xx/adma.c
-> index 370ff82..e24b5ef 100644
-> --- a/drivers/dma/ppc4xx/adma.c
-> +++ b/drivers/dma/ppc4xx/adma.c
-> @@ -42,6 +42,8 @@
->  #include <linux/uaccess.h>
->  #include <linux/proc_fs.h>
->  #include <linux/of.h>
-> +#include <linux/of_address.h>
-> +#include <linux/of_irq.h>
->  #include <linux/of_platform.h>
->  #include <asm/dcr.h>
->  #include <asm/dcr-regs.h>
-> -- 
-> 1.8.1.2
-> 
+In case of diff_dst (src != dst), is there any assumption / convention 
+regarding allocation length of req->src and req->dst - are they supposed 
+be equal, even if it's not needed?
+For example, in case of diff_dst && encryption, currently both req->src 
+and req->dst have then length = template[i].ilen + authsize. Shouldn't 
+length of req->src be template[i].ilen, i.e. no space allocated for ICV?
 
--- 
+Thanks,
+Horia
