@@ -1,8 +1,8 @@
 From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH 01/10] crypto: authenc - Find proper IV address in ablkcipher
- callback
-Date: Tue, 12 Nov 2013 11:46:04 -0600
-Message-ID: <20131112174604.19746.83804.stgit@tlendack-t1.amdoffice.net>
+Subject: [PATCH 02/10] crypto: scatterwalk - Set the chain pointer indication
+ bit
+Date: Tue, 12 Nov 2013 11:46:10 -0600
+Message-ID: <20131112174610.19746.91705.stgit@tlendack-t1.amdoffice.net>
 References: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,34 +15,29 @@ In-Reply-To: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-When performing an asynchronous ablkcipher operation the authenc
-completion callback routine is invoked, but it does not locate and use
-the proper IV.
+The scatterwalk_crypto_chain function invokes the scatterwalk_sg_chain
+function to chain two scatterlists, but the chain pointer indication
+bit is not set.  When the resulting scatterlist is used, for example,
+by sg_nents to count the number of scatterlist entries, a segfault occurs
+because sg_nents does not follow the chain pointer to the chained scatterlist.
 
-The callback routine, crypto_authenc_encrypt_done, is updated to use
-the same method of calculating the address of the IV as is done in
-crypto_authenc_encrypt function which sets up the callback.
+Update scatterwalk_sg_chain to set the chain pointer indication bit as is
+done by the sg_chain function.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- crypto/authenc.c |    7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ include/crypto/scatterwalk.h |    1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index ffce19d..528b00b 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -368,9 +368,10 @@ static void crypto_authenc_encrypt_done(struct crypto_async_request *req,
- 	if (!err) {
- 		struct crypto_aead *authenc = crypto_aead_reqtfm(areq);
- 		struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
--		struct ablkcipher_request *abreq = aead_request_ctx(areq);
--		u8 *iv = (u8 *)(abreq + 1) +
--			 crypto_ablkcipher_reqsize(ctx->enc);
-+		struct authenc_request_ctx *areq_ctx = aead_request_ctx(areq);
-+		struct ablkcipher_request *abreq = (void *)(areq_ctx->tail
-+							    + ctx->reqoff);
-+		u8 *iv = (u8 *)abreq - crypto_ablkcipher_ivsize(ctx->enc);
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 13621cc..64ebede 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -36,6 +36,7 @@ static inline void scatterwalk_sg_chain(struct scatterlist *sg1, int num,
+ {
+ 	sg_set_page(&sg1[num - 1], (void *)sg2, 0, 0);
+ 	sg1[num - 1].page_link &= ~0x02;
++	sg1[num - 1].page_link |= 0x01;
+ }
  
- 		err = crypto_authenc_genicv(areq, iv, 0);
- 	}
+ static inline struct scatterlist *scatterwalk_sg_next(struct scatterlist *sg)
