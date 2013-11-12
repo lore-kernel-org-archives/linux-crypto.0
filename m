@@ -1,82 +1,145 @@
-From: Michal Nazarewicz <mina86@mina86.com>
-Subject: Re: [PATCH RESEND] crypto: make sure *blkcipher_walk_init properly initialises walk
-Date: Mon, 11 Nov 2013 12:26:38 +0100
-Message-ID: <xa1t61rzyya9.fsf@mina86.com>
-References: <1384108681-23519-1-git-send-email-mpn@google.com> <20131111012809.GA5091@gondor.apana.org.au>
+From: Vinod Koul <vinod.koul@intel.com>
+Subject: Re: [PATCH] powerpc: add explicit OF includes for ppc4xx
+Date: Tue, 12 Nov 2013 10:22:33 +0530
+Message-ID: <20131112045233.GH8834@intel.com>
+References: <1384148143-14335-1-git-send-email-robherring2@gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-=-="
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ee0-f47.google.com ([74.125.83.47]:38832 "EHLO
-	mail-ee0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752910Ab3KKL0q (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 Nov 2013 06:26:46 -0500
-Received: by mail-ee0-f47.google.com with SMTP id c13so2330187eek.6
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Nov 2013 03:26:45 -0800 (PST)
-In-Reply-To: <20131111012809.GA5091@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org,
+	Rob Herring <rob.herring@calxeda.com>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Paul Mackerras <paulus@samba.org>, Tejun Heo <tj@kernel.org>,
+	Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dan Williams <dan.j.williams@intel.com>,
+	linuxppc-dev@lists.ozlabs.org, linux-ide@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Rob Herring <robherring2@gmail.com>
+Return-path: <linux-ide-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1384148143-14335-1-git-send-email-robherring2@gmail.com>
+Sender: linux-ide-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Sun, Nov 10, 2013 at 11:35:43PM -0600, Rob Herring wrote:
+> From: Rob Herring <rob.herring@calxeda.com>
+> 
+> Commit b5b4bb3f6a11f9 (of: only include prom.h on sparc) removed implicit
+> includes of of_*.h headers by powerpc's prom.h. Some PPC4xx components
+> were missed in initial clean-up patch, so add the necessary includes
+> to fix ppc4xx builds.
+> 
+> Signed-off-by: Rob Herring <rob.herring@calxeda.com>
+> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Matt Mackall <mpm@selenic.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Vinod Koul <vinod.koul@intel.com>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: linuxppc-dev@lists.ozlabs.org
+> Cc: linux-ide@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> ---
+> I intend to send this patch to Linus with the rest of the DT clean-up
+> series.
+> 
+> Rob
+> 
+>  arch/powerpc/sysdev/ppc4xx_ocm.c     | 1 +
+>  arch/powerpc/sysdev/xilinx_intc.c    | 1 +
+>  drivers/ata/sata_dwc_460ex.c         | 2 ++
+>  drivers/char/hw_random/ppc4xx-rng.c  | 1 +
+>  drivers/crypto/amcc/crypto4xx_core.c | 3 +++
+>  drivers/dma/ppc4xx/adma.c            | 2 ++
+For this:
 
-On Mon, Nov 11 2013, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Nack.  The field flags is used as a bit-field and all bits other
-> than those initialised that you see are used internally by the
-> walker function and will be initialised on demand.
->
-> Please do not just rely on tools such as coverity and actually
-> read the code when submitting patches.
+Acked-by Vinod Koul <vinod.koul@intel.com>
 
-I have read the code which is why I concluded that it is safe to replace
-the bit operations with a simple assignment.  Since, as you described,
-all other bit fields are initialised on demand anyway, there is no harm
-in setting them to zero here.  Especially since I see no advantages of
-the current approach, but instead see two disadvantages: longer machine
-code (load-modiy-store vs. store) and confusion of tools such as
-Coverity.
+--
+~Vinod
+>  6 files changed, 10 insertions(+)
+> 
+> diff --git a/arch/powerpc/sysdev/ppc4xx_ocm.c b/arch/powerpc/sysdev/ppc4xx_ocm.c
+> index 1b15f93..b7c4345 100644
+> --- a/arch/powerpc/sysdev/ppc4xx_ocm.c
+> +++ b/arch/powerpc/sysdev/ppc4xx_ocm.c
+> @@ -26,6 +26,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/dma-mapping.h>
+>  #include <linux/of.h>
+> +#include <linux/of_address.h>
+>  #include <asm/rheap.h>
+>  #include <asm/ppc4xx_ocm.h>
+>  #include <linux/slab.h>
+> diff --git a/arch/powerpc/sysdev/xilinx_intc.c b/arch/powerpc/sysdev/xilinx_intc.c
+> index f4fdc94..83f943a 100644
+> --- a/arch/powerpc/sysdev/xilinx_intc.c
+> +++ b/arch/powerpc/sysdev/xilinx_intc.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/irq.h>
+>  #include <linux/of.h>
+>  #include <linux/of_address.h>
+> +#include <linux/of_irq.h>
+>  #include <asm/io.h>
+>  #include <asm/processor.h>
+>  #include <asm/i8259.h>
+> diff --git a/drivers/ata/sata_dwc_460ex.c b/drivers/ata/sata_dwc_460ex.c
+> index 2e39173..523524b 100644
+> --- a/drivers/ata/sata_dwc_460ex.c
+> +++ b/drivers/ata/sata_dwc_460ex.c
+> @@ -31,6 +31,8 @@
+>  #include <linux/module.h>
+>  #include <linux/init.h>
+>  #include <linux/device.h>
+> +#include <linux/of_address.h>
+> +#include <linux/of_irq.h>
+>  #include <linux/of_platform.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/libata.h>
+> diff --git a/drivers/char/hw_random/ppc4xx-rng.c b/drivers/char/hw_random/ppc4xx-rng.c
+> index 732c330..521f76b 100644
+> --- a/drivers/char/hw_random/ppc4xx-rng.c
+> +++ b/drivers/char/hw_random/ppc4xx-rng.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/platform_device.h>
+>  #include <linux/hw_random.h>
+>  #include <linux/delay.h>
+> +#include <linux/of_address.h>
+>  #include <linux/of_platform.h>
+>  #include <asm/io.h>
+>  
+> diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+> index f88e3d8..efaf630 100644
+> --- a/drivers/crypto/amcc/crypto4xx_core.c
+> +++ b/drivers/crypto/amcc/crypto4xx_core.c
+> @@ -27,6 +27,9 @@
+>  #include <linux/dma-mapping.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/init.h>
+> +#include <linux/module.h>
+> +#include <linux/of_address.h>
+> +#include <linux/of_irq.h>
+>  #include <linux/of_platform.h>
+>  #include <linux/slab.h>
+>  #include <asm/dcr.h>
+> diff --git a/drivers/dma/ppc4xx/adma.c b/drivers/dma/ppc4xx/adma.c
+> index 370ff82..e24b5ef 100644
+> --- a/drivers/dma/ppc4xx/adma.c
+> +++ b/drivers/dma/ppc4xx/adma.c
+> @@ -42,6 +42,8 @@
+>  #include <linux/uaccess.h>
+>  #include <linux/proc_fs.h>
+>  #include <linux/of.h>
+> +#include <linux/of_address.h>
+> +#include <linux/of_irq.h>
+>  #include <linux/of_platform.h>
+>  #include <asm/dcr.h>
+>  #include <asm/dcr-regs.h>
+> -- 
+> 1.8.1.2
+> 
 
-But of course, if you want it as it is, I won't be bothering you.
-
---=20
-Best regards,                                         _     _
-.o. | Liege of Serenely Enlightened Majesty of      o' \,=3D./ `o
-..o | Computer Science,  Micha=C5=82 =E2=80=9Cmina86=E2=80=9D Nazarewicz   =
- (o o)
-ooo +--<mpn@google.com>--<xmpp:mina86@jabber.org>--ooO--(_)--Ooo--
-
---=-=-=
-Content-Type: multipart/signed; boundary="==-=-=";
-	micalg=pgp-sha1; protocol="application/pgp-signature"
-
---==-=-=
-Content-Type: text/plain
-
-
---==-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQIcBAEBAgAGBQJSgL7uAAoJECBgQBJQdR/0nxYP/2mR7DEkC9yE4zKXb5CK5eCH
-hfwoCzCInvcBP0M6fM0aNRyDMpoOKF8lAoOUb/5CYyoPrdxFzh5R2xx4kPsK76cn
-rO9zmhez4uQsuqT6tlolk/l51koVa/uQq4VPjZaZKigd+1G+2mwyzVjs8Zh+biGO
-2O5xzXF6U3aV26JGdtfpY/DEZENxr505VfI2UGXUUFjWEg8TrWFcJN80/1HXTkOC
-irP+6b8oG4HsnRhWHMEUmVrJzq1ZOiytiMMjglCOmz3Y9xYnHHXs2LxE1FJpB5TC
-JTrw5mCcbMI0GC77/KOoJsT6w/gOgdKTUh5uJfg/W3Y8s0oZSFIjd2idnqkIzXAt
-ZlCrKbPsqS5h2iWucMTc7iiSiKC0yjO1M44uXIna+qF2uD5QDZwvJlJ8hxQrgOKu
-+auA6kOQMkx7yJX243on6qjnxjGMfOesjTVqndvdPlnhWUBrkOdaStzzdPj2nZjG
-36ttn1x4UwqYh3BuJpU5NW29vV8xtxfpldwE65327o0n4WpmhrUt4D4ZB8nQGaOb
-eH7a9ibraG8ddl8ZLC141wEhpsHa03fs1FEv5GLnY8rO4A8+djzfGN+1oiIUy7PP
-UdicxpThacxSBU6R0yyHPvcYXeks8jFYp3t/FCVkRyLL1ezXL4AzME7Hcb6U0NQB
-B2i9G0t47QTh8JOLKTmo
-=jUH5
------END PGP SIGNATURE-----
---==-=-=--
-
---=-=-=--
+-- 
