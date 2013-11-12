@@ -1,60 +1,48 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: Crypto Update for 3.13
-Date: Tue, 12 Nov 2013 17:59:34 +0100
-Message-ID: <20131112165934.GA13441@pd.tnic>
-References: <20110520235409.GA1722@gondor.apana.org.au>
- <20110724011752.GA14373@gondor.apana.org.au>
- <20111031040952.GA19659@gondor.apana.org.au>
- <20120106041250.GA7759@gondor.apana.org.au>
- <20121004095357.GA11777@gondor.apana.org.au>
- <20121214103156.GA5840@gondor.apana.org.au>
- <20130223023331.GA11002@gondor.apana.org.au>
- <20130907035544.GA22658@gondor.apana.org.au>
- <20131107080131.GA32307@gondor.apana.org.au>
- <20131112164151.GA22645@gondor.apana.org.au>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [PATCH 01/10] crypto: authenc - Find proper IV address in ablkcipher
+ callback
+Date: Tue, 12 Nov 2013 11:46:04 -0600
+Message-ID: <20131112174604.19746.83804.stgit@tlendack-t1.amdoffice.net>
+References: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:41825 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753828Ab3KLQ77 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Nov 2013 11:59:59 -0500
-Content-Disposition: inline
-In-Reply-To: <20131112164151.GA22645@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-kernel@vger.kernel.org>
+To: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+	<herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Nov 13, 2013 at 12:41:52AM +0800, Herbert Xu wrote:
-> Hi Linus:
-> 
-> Here is the crypto update for 3.13:
-> 
-> * Made x86 ablk_helper generic for ARM.
-> * Phase out chainiv in favour of eseqiv (affects IPsec).
-> * Fixed aes-cbc IV corruption on s390.
-> * Added constant-time crypto_memneq which replaces memcmp.
-> 
-> * Fixed aes-ctr in omap-aes.
-> * Added OMAP3 ROM RNG support.
-> * Add PRNG support for MSM SoC's
-> * Add and use Job Ring API in caam.
-> 
-> * Misc fixes.
+When performing an asynchronous ablkcipher operation the authenc
+completion callback routine is invoked, but it does not locate and use
+the proper IV.
 
-Maybe add this one to that:
+The callback routine, crypto_authenc_encrypt_done, is updated to use
+the same method of calculating the address of the IV as is done in
+crypto_authenc_encrypt function which sets up the callback.
 
-http://marc.info/?l=linux-kernel&m=138078878205385&w=2
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
+ crypto/authenc.c |    7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-?
-
--- 
-Regards/Gruss,
-    Boris.
-
-Sent from a fat crate under my desk. Formatting is fine.
---
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index ffce19d..528b00b 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -368,9 +368,10 @@ static void crypto_authenc_encrypt_done(struct crypto_async_request *req,
+ 	if (!err) {
+ 		struct crypto_aead *authenc = crypto_aead_reqtfm(areq);
+ 		struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
+-		struct ablkcipher_request *abreq = aead_request_ctx(areq);
+-		u8 *iv = (u8 *)(abreq + 1) +
+-			 crypto_ablkcipher_reqsize(ctx->enc);
++		struct authenc_request_ctx *areq_ctx = aead_request_ctx(areq);
++		struct ablkcipher_request *abreq = (void *)(areq_ctx->tail
++							    + ctx->reqoff);
++		u8 *iv = (u8 *)abreq - crypto_ablkcipher_ivsize(ctx->enc);
+ 
+ 		err = crypto_authenc_genicv(areq, iv, 0);
+ 	}
