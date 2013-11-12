@@ -1,41 +1,64 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH 10/10] crypto: CCP maintainer information
-Date: Tue, 12 Nov 2013 11:46:57 -0600
-Message-ID: <20131112174657.19746.44224.stgit@tlendack-t1.amdoffice.net>
-References: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Crypto Update for 3.13
+Date: Wed, 13 Nov 2013 02:27:46 +0800
+Message-ID: <20131112182746.GA22711@gondor.apana.org.au>
+References: <20110724011752.GA14373@gondor.apana.org.au>
+ <20111031040952.GA19659@gondor.apana.org.au>
+ <20120106041250.GA7759@gondor.apana.org.au>
+ <20121004095357.GA11777@gondor.apana.org.au>
+ <20121214103156.GA5840@gondor.apana.org.au>
+ <20130223023331.GA11002@gondor.apana.org.au>
+ <20130907035544.GA22658@gondor.apana.org.au>
+ <20131107080131.GA32307@gondor.apana.org.au>
+ <20131112164151.GA22645@gondor.apana.org.au>
+ <20131112165934.GA13441@pd.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-kernel@vger.kernel.org>
-To: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	James Morris <james.l.morris@oracle.com>
+To: Borislav Petkov <bp@alien8.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:40220 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753081Ab3KLS14 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Nov 2013 13:27:56 -0500
+Content-Disposition: inline
+In-Reply-To: <20131112165934.GA13441@pd.tnic>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Update the MAINTAINERS file for the AMD CCP device driver.
+On Tue, Nov 12, 2013 at 05:59:34PM +0100, Borislav Petkov wrote:
+> On Wed, Nov 13, 2013 at 12:41:52AM +0800, Herbert Xu wrote:
+> > Hi Linus:
+> > 
+> > Here is the crypto update for 3.13:
+> > 
+> > * Made x86 ablk_helper generic for ARM.
+> > * Phase out chainiv in favour of eseqiv (affects IPsec).
+> > * Fixed aes-cbc IV corruption on s390.
+> > * Added constant-time crypto_memneq which replaces memcmp.
+> > 
+> > * Fixed aes-ctr in omap-aes.
+> > * Added OMAP3 ROM RNG support.
+> > * Add PRNG support for MSM SoC's
+> > * Add and use Job Ring API in caam.
+> > 
+> > * Misc fixes.
+> 
+> Maybe add this one to that:
+> 
+> http://marc.info/?l=linux-kernel&m=138078878205385&w=2
+> 
+> ?
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- MAINTAINERS |    7 +++++++
- 1 file changed, 7 insertions(+)
+I think this should probably go through James Morris's tree.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 051e4dc..de22604 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -525,6 +525,13 @@ F:	drivers/tty/serial/altera_jtaguart.c
- F:	include/linux/altera_uart.h
- F:	include/linux/altera_jtaguart.h
- 
-+AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER
-+M:	Tom Lendacky <thomas.lendacky@amd.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Supported
-+F:	drivers/crypto/ccp/
-+F:	include/linux/ccp.h
-+
- AMD FAM15H PROCESSOR POWER MONITORING DRIVER
- M:	Andreas Herrmann <herrmann.der.user@googlemail.com>
- L:	lm-sensors@lm-sensors.org
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
