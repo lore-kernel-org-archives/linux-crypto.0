@@ -1,64 +1,69 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Update for 3.13
-Date: Wed, 13 Nov 2013 02:27:46 +0800
-Message-ID: <20131112182746.GA22711@gondor.apana.org.au>
-References: <20110724011752.GA14373@gondor.apana.org.au>
- <20111031040952.GA19659@gondor.apana.org.au>
- <20120106041250.GA7759@gondor.apana.org.au>
- <20121004095357.GA11777@gondor.apana.org.au>
- <20121214103156.GA5840@gondor.apana.org.au>
- <20130223023331.GA11002@gondor.apana.org.au>
- <20130907035544.GA22658@gondor.apana.org.au>
- <20131107080131.GA32307@gondor.apana.org.au>
- <20131112164151.GA22645@gondor.apana.org.au>
- <20131112165934.GA13441@pd.tnic>
+From: "Mark A. Greer" <mgreer@animalcreek.com>
+Subject: [PATCH] crypto: omap-sham - Only release DMA channel if successfully
+ requested
+Date: Tue, 12 Nov 2013 13:12:27 -0700
+Message-ID: <1384287147-19656-1-git-send-email-mgreer@animalcreek.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	James Morris <james.l.morris@oracle.com>
-To: Borislav Petkov <bp@alien8.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:40220 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753081Ab3KLS14 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Nov 2013 13:27:56 -0500
-Content-Disposition: inline
-In-Reply-To: <20131112165934.GA13441@pd.tnic>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Joel Fernandes <joelf@ti.com>,
+ "Mark A. Greer" <mgreer@animalcreek.com>, linux-arm-kernel@lists.infradead.org,
+ linux-omap@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Dan Carpenter <dan.carpenter@oracle.com>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 12, 2013 at 05:59:34PM +0100, Borislav Petkov wrote:
-> On Wed, Nov 13, 2013 at 12:41:52AM +0800, Herbert Xu wrote:
-> > Hi Linus:
-> > 
-> > Here is the crypto update for 3.13:
-> > 
-> > * Made x86 ablk_helper generic for ARM.
-> > * Phase out chainiv in favour of eseqiv (affects IPsec).
-> > * Fixed aes-cbc IV corruption on s390.
-> > * Added constant-time crypto_memneq which replaces memcmp.
-> > 
-> > * Fixed aes-ctr in omap-aes.
-> > * Added OMAP3 ROM RNG support.
-> > * Add PRNG support for MSM SoC's
-> > * Add and use Job Ring API in caam.
-> > 
-> > * Misc fixes.
-> 
-> Maybe add this one to that:
-> 
-> http://marc.info/?l=linux-kernel&m=138078878205385&w=2
-> 
-> ?
+In omap_sham_probe() and omap_sham_remove(), 'dd->dma_lch'
+is released without checking to see if it was successfully
+requested or not.  This is a bug and was identified and
+reported by Dan Carpenter here:
 
-I think this should probably go through James Morris's tree.
+	http://www.spinics.net/lists/devicetree/msg11023.html
 
-Thanks,
+Add code to only release 'dd->dma_lch' when its not NULL
+(that is, when it was successfully requested).
+
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+CC: Joel Fernandes <joelf@ti.com>
+Signed-off-by: Mark A. Greer <mgreer@animalcreek.com>
+---
+ drivers/crypto/omap-sham.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index e28104b..c6ad7d6 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1970,7 +1970,8 @@ err_algs:
+ 			crypto_unregister_ahash(
+ 					&dd->pdata->algs_info[i].algs_list[j]);
+ 	pm_runtime_disable(dev);
+-	dma_release_channel(dd->dma_lch);
++	if (dd->dma_lch)
++		dma_release_channel(dd->dma_lch);
+ data_err:
+ 	dev_err(dev, "initialization failed.\n");
+ 
+@@ -1994,7 +1995,9 @@ static int omap_sham_remove(struct platform_device *pdev)
+ 					&dd->pdata->algs_info[i].algs_list[j]);
+ 	tasklet_kill(&dd->done_task);
+ 	pm_runtime_disable(&pdev->dev);
+-	dma_release_channel(dd->dma_lch);
++
++	if (dd->dma_lch)
++		dma_release_channel(dd->dma_lch);
+ 
+ 	return 0;
+ }
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.3.4
