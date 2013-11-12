@@ -1,9 +1,7 @@
 From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH 02/10] crypto: scatterwalk - Set the chain pointer indication
- bit
-Date: Tue, 12 Nov 2013 11:46:10 -0600
-Message-ID: <20131112174610.19746.91705.stgit@tlendack-t1.amdoffice.net>
-References: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
+Subject: [PATCH 00/10] AMD Cryptographic Coprocessor support
+Date: Tue, 12 Nov 2013 11:45:59 -0600
+Message-ID: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -11,33 +9,64 @@ Cc: <linux-kernel@vger.kernel.org>
 To: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
 	<herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The scatterwalk_crypto_chain function invokes the scatterwalk_sg_chain
-function to chain two scatterlists, but the chain pointer indication
-bit is not set.  When the resulting scatterlist is used, for example,
-by sg_nents to count the number of scatterlist entries, a segfault occurs
-because sg_nents does not follow the chain pointer to the chained scatterlist.
+Resending because of typo in mailing list address...
 
-Update scatterwalk_sg_chain to set the chain pointer indication bit as is
-done by the sg_chain function.
+The following series implements support for the AMD Cryptographic
+Coprocessor (CCP).  The AMD CCP provides hardware encryption, hashing
+and other related operations.
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+This patch series is based on the 3.12 kernel.
+
 ---
- include/crypto/scatterwalk.h |    1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 13621cc..64ebede 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -36,6 +36,7 @@ static inline void scatterwalk_sg_chain(struct scatterlist *sg1, int num,
- {
- 	sg_set_page(&sg1[num - 1], (void *)sg2, 0, 0);
- 	sg1[num - 1].page_link &= ~0x02;
-+	sg1[num - 1].page_link |= 0x01;
- }
- 
- static inline struct scatterlist *scatterwalk_sg_next(struct scatterlist *sg)
+Tom Lendacky (10):
+      crypto: authenc - Find proper IV address in ablkcipher callback
+      crypto: scatterwalk - Set the chain pointer indication bit
+      crypto: CCP device driver and interface support
+      crypto: crypto API interface to the CCP device driver
+      crypto: CCP AES crypto API support
+      crypto: CCP AES CMAC mode crypto API support
+      crypto: CCP XTS-AES crypto API support
+      crypto: CCP SHA crypto API support
+      crytpo: CCP device driver build files
+      crypto: CCP maintainer information
+
+
+ MAINTAINERS                              |    7 
+ crypto/authenc.c                         |    7 
+ drivers/crypto/Kconfig                   |   12 
+ drivers/crypto/Makefile                  |    1 
+ drivers/crypto/ccp/Kconfig               |   23 
+ drivers/crypto/ccp/Makefile              |   10 
+ drivers/crypto/ccp/ccp-crypto-aes-cmac.c |  355 +++++
+ drivers/crypto/ccp/ccp-crypto-aes-xts.c  |  285 ++++
+ drivers/crypto/ccp/ccp-crypto-aes.c      |  375 ++++++
+ drivers/crypto/ccp/ccp-crypto-main.c     |  432 ++++++
+ drivers/crypto/ccp/ccp-crypto-sha.c      |  497 +++++++
+ drivers/crypto/ccp/ccp-crypto.h          |  191 +++
+ drivers/crypto/ccp/ccp-dev.c             |  582 +++++++++
+ drivers/crypto/ccp/ccp-dev.h             |  272 ++++
+ drivers/crypto/ccp/ccp-ops.c             | 2020 ++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/ccp-pci.c             |  360 +++++
+ include/crypto/scatterwalk.h             |    1 
+ include/linux/ccp.h                      |  525 ++++++++
+ 18 files changed, 5952 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/crypto/ccp/Kconfig
+ create mode 100644 drivers/crypto/ccp/Makefile
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-xts.c
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-aes.c
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-main.c
+ create mode 100644 drivers/crypto/ccp/ccp-crypto-sha.c
+ create mode 100644 drivers/crypto/ccp/ccp-crypto.h
+ create mode 100644 drivers/crypto/ccp/ccp-dev.c
+ create mode 100644 drivers/crypto/ccp/ccp-dev.h
+ create mode 100644 drivers/crypto/ccp/ccp-ops.c
+ create mode 100644 drivers/crypto/ccp/ccp-pci.c
+ create mode 100644 include/linux/ccp.h
+
+-- 
+Tom Lendacky
