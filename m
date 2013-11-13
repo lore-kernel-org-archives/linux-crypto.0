@@ -1,41 +1,83 @@
-From: Turbo Fredriksson <turbo@bayour.com>
-Subject: Re: Error inserting sha256_ssse3: No such device
-Date: Wed, 13 Nov 2013 04:33:37 +0100
-Message-ID: <4AB85135-933E-497E-AFBB-64A9954F894B@bayour.com>
-References: <0125C288-B77D-42DA-B018-FAD56CA0FAAC@bayour.com>
-Mime-Version: 1.0 (Apple Message framework v1283)
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-To: linux-crypto@vger.kernel.org
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] CPU Jitter RNG: Executing time variation tests on bare metal
+Date: Wed, 13 Nov 2013 04:37:18 +0100
+Message-ID: <2783048.WEALGJott2@myon.chronox.de>
+References: <2579337.FPgJGgHYdz@tauon> <3160817.9DcncHidey@tauon> <20131029132448.GB691@thunk.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: sandy harris <sandyinchina@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Nicholas Mc Guire <der.herr@hofr.at>,
+	Clemens Ladisch <clemens@ladisch.de>,
+	Pavel Machek <pavel@ucw.cz>
+To: Theodore Ts'o <tytso@mit.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from vsp-authed02.binero.net ([195.74.38.226]:28429 "EHLO
-	vsp-authed-02-02.binero.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755867Ab3KMDdq convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Nov 2013 22:33:46 -0500
-Received: from smtp01.binero.se (unknown [195.74.38.28])
-	by vsp-authed-02-02.binero.net (Halon Mail Gateway) with ESMTPS
-	for <linux-crypto@vger.kernel.org>; Wed, 13 Nov 2013 04:33:38 +0100 (CET)
-Received: from [192.168.69.226] (c83-252-98-74.bredband.comhem.se [83.252.98.74])
-	(Authenticated sender: turbo@bayour.com)
-	by smtp-09-01.atm.binero.net (Postfix) with ESMTPSA id 0C0D93A11F
-	for <linux-crypto@vger.kernel.org>; Wed, 13 Nov 2013 04:33:38 +0100 (CET)
-In-Reply-To: <0125C288-B77D-42DA-B018-FAD56CA0FAAC@bayour.com>
+Received: from mail.eperm.de ([89.247.134.16]:59448 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756037Ab3KMDh1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 Nov 2013 22:37:27 -0500
+Received: from myon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S22E> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Wed, 13 Nov 2013 04:37:20 +0100
+In-Reply-To: <20131029132448.GB691@thunk.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Nov 13, 2013, at 4:08 AM, Turbo Fredriksson wrote:
+Am Dienstag, 29. Oktober 2013, 09:24:48 schrieb Theodore Ts'o:
 
-> 	FATAL: Error inserting sha256_ssse3 (/lib/modules/3.12.0+scst+tf.1/kernel/arch/x86/crypto/sha256-ssse3.ko): No such 
+Hi Theodore,
 
-Ok, so digging through the kernel source, I noticed that SSE? is apparently
-a CPU feature. This is an AMD Phenom II X6 1100T which seems to only support
-SSE and SSE2 (according to /proc/cpuinfo) which might explain the No such
-device.
+> On Tue, Oct 29, 2013 at 09:42:30AM +0100, Stephan Mueller wrote:
+> > Based on this suggestion, I now added the tests in Appendix F.46.8 where
+> > I disable the caches and the tests in Appendix F.46.9 where I disable
+> > the caches and interrupts.
+> 
+> What you've added in F.46 is a good start, but as a suggestiom,
+> instead of disabling one thing at a time, try disabling *everything*
+> and then see what you get, and then enabling one thing at a time.  The
+> best thing is if you can get to the point where the amount of entropy
+> is close to zero.  Then as you add things back, there's a much better
+> sense of where the unpredictability might be coming from, and whether
+> the unpredictability is coming from something which is fundamentally
+> arising from something which is chaotic or quantum effect, or just
+> because we don't have a good way of modelling the behavior of the
+> L1/L2 cache (for example) and that is spoofing your entropy estimator.
 
-Now my question instead is, why did it try to load sha256_ssse3 in the first
-place?
+I was now able to implement two more test buckets that were in my mind for 
+quite some time. They are documented in the new sections 6.3 and 6.4 in [1].
+
+The tests for the time variation measurements are now executed on bare metal, 
+i.e. without *any* operating system underneath. For achieving that, I used the 
+memtest86+ tool, ripped out the memory tests and added the time variation 
+testing into it.
+
+The time variation tests now execute single threaded without any interference 
+from an underlying operating system. Again, I added all the variations of 
+disabling CPU support (TLB flushes, L1/2 flushes, cache disabling, ...).
+
+And, surprise: all the jitter is still there.
+
+Furthermore, I use the same vehicle to just measure the variations by 
+obtaining two timestamps immediately after each other and calculate the 
+difference. As before, there are various tests which disable the different CPU 
+mechanisms.
+
+And, surprise: there is still variations visible. Granted, these variations 
+are smaller than the ones for the folding loop. But the smallest variations 
+still have way more than 1 bit when applying the Shannon Entropy formula.
+
+The code is uploaded to [2] and can be used to play with.
+
+In addition, I added test resutls with varying loads as explained in section 
+6.2 (thanks to Nicholas Mc Guire for helping here).
+
+[1] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html
+
+[2] http://www.chronox.de/
+
+Ciao
+Stephan
 -- 
-I love deadlines. I love the whooshing noise they
-make as they go by.
-- Douglas Adams
+| Cui bono? |
