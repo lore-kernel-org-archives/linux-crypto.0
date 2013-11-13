@@ -1,83 +1,85 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] CPU Jitter RNG: Executing time variation tests on bare metal
-Date: Wed, 13 Nov 2013 04:37:18 +0100
-Message-ID: <2783048.WEALGJott2@myon.chronox.de>
-References: <2579337.FPgJGgHYdz@tauon> <3160817.9DcncHidey@tauon> <20131029132448.GB691@thunk.org>
+From: Horia Geanta <horia.geanta@freescale.com>
+Subject: [PATCH] crypto: talitos - fix locating offending descriptor in error path
+Date: Wed, 13 Nov 2013 12:20:37 +0200
+Message-ID: <1384338037-25287-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: sandy harris <sandyinchina@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Nicholas Mc Guire <der.herr@hofr.at>,
-	Clemens Ladisch <clemens@ladisch.de>,
-	Pavel Machek <pavel@ucw.cz>
-To: Theodore Ts'o <tytso@mit.edu>
+Content-Type: text/plain
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	Lei Xu <Lei.Xu@freescale.com>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59448 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756037Ab3KMDh1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 Nov 2013 22:37:27 -0500
-Received: from myon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S22E> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Wed, 13 Nov 2013 04:37:20 +0100
-In-Reply-To: <20131029132448.GB691@thunk.org>
+Received: from [213.199.154.185] ([213.199.154.185]:19573 "EHLO
+	db8outboundpool.messaging.microsoft.com" rhost-flags-FAIL-FAIL-OK-OK)
+	by vger.kernel.org with ESMTP id S1752881Ab3KMK3a (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 13 Nov 2013 05:29:30 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 29. Oktober 2013, 09:24:48 schrieb Theodore Ts'o:
+Commit 3e721aeb3df3816e283ab18e327cd4652972e213
+("crypto: talitos - handle descriptor not found in error path")
+tried to address the fact that CDPR (Current Descriptor Pointer Register)
+is unreliable.
 
-Hi Theodore,
+As it turns out, there are still issues in the function detecting the
+offending descriptor:
+-only 32 bits of the descriptor address are read, however the address is
+36-bit - since reset_channel() initializes channels with EAE (extended
+address) bit set
+-reading CDPR can return zero in cur_desc; when searching the channel
+fifo for this address, cur_desc == dma_desc (= 0) case might happen,
+leading to an oops when trying to return desc->hdr (desc is zero)
+-read channel's .tail only once; the tail is a moving target; use a
+local variable for the end of search condition
 
-> On Tue, Oct 29, 2013 at 09:42:30AM +0100, Stephan Mueller wrote:
-> > Based on this suggestion, I now added the tests in Appendix F.46.8 where
-> > I disable the caches and the tests in Appendix F.46.9 where I disable
-> > the caches and interrupts.
-> 
-> What you've added in F.46 is a good start, but as a suggestiom,
-> instead of disabling one thing at a time, try disabling *everything*
-> and then see what you get, and then enabling one thing at a time.  The
-> best thing is if you can get to the point where the amount of entropy
-> is close to zero.  Then as you add things back, there's a much better
-> sense of where the unpredictability might be coming from, and whether
-> the unpredictability is coming from something which is fundamentally
-> arising from something which is chaotic or quantum effect, or just
-> because we don't have a good way of modelling the behavior of the
-> L1/L2 cache (for example) and that is spoofing your entropy estimator.
+Signed-off-by: Lei Xu <Lei.Xu@freescale.com>
+Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+Tested-by: Kalyani Chowdhury <Kalyani.Chowdhury@freescale.com>
+---
+ drivers/crypto/talitos.c |   21 +++++++++++++++------
+ 1 files changed, 15 insertions(+), 6 deletions(-)
 
-I was now able to implement two more test buckets that were in my mind for 
-quite some time. They are documented in the new sections 6.3 and 6.4 in [1].
-
-The tests for the time variation measurements are now executed on bare metal, 
-i.e. without *any* operating system underneath. For achieving that, I used the 
-memtest86+ tool, ripped out the memory tests and added the time variation 
-testing into it.
-
-The time variation tests now execute single threaded without any interference 
-from an underlying operating system. Again, I added all the variations of 
-disabling CPU support (TLB flushes, L1/2 flushes, cache disabling, ...).
-
-And, surprise: all the jitter is still there.
-
-Furthermore, I use the same vehicle to just measure the variations by 
-obtaining two timestamps immediately after each other and calculate the 
-difference. As before, there are various tests which disable the different CPU 
-mechanisms.
-
-And, surprise: there is still variations visible. Granted, these variations 
-are smaller than the ones for the folding loop. But the smallest variations 
-still have way more than 1 bit when applying the Shannon Entropy formula.
-
-The code is uploaded to [2] and can be used to play with.
-
-In addition, I added test resutls with varying loads as explained in section 
-6.2 (thanks to Nicholas Mc Guire for helping here).
-
-[1] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html
-
-[2] http://www.chronox.de/
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index f6f7c68..04c5de3b 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -336,20 +336,29 @@ DEF_TALITOS_DONE(ch1_3, TALITOS_ISR_CH_1_3_DONE)
+ static u32 current_desc_hdr(struct device *dev, int ch)
+ {
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+-	int tail = priv->chan[ch].tail;
++	int tail, iter;
+ 	dma_addr_t cur_desc;
+ 
+-	cur_desc = in_be32(priv->chan[ch].reg + TALITOS_CDPR_LO);
++	cur_desc = ((u64)in_be32(priv->chan[ch].reg + TALITOS_CDPR)) << 32;
++	cur_desc |= in_be32(priv->chan[ch].reg + TALITOS_CDPR_LO);
+ 
+-	while (priv->chan[ch].fifo[tail].dma_desc != cur_desc) {
+-		tail = (tail + 1) & (priv->fifo_len - 1);
+-		if (tail == priv->chan[ch].tail) {
++	if (!cur_desc) {
++		dev_err(dev, "CDPR is NULL, giving up search for offending descriptor\n");
++		return 0;
++	}
++
++	tail = priv->chan[ch].tail;
++
++	iter = tail;
++	while (priv->chan[ch].fifo[iter].dma_desc != cur_desc) {
++		iter = (iter + 1) & (priv->fifo_len - 1);
++		if (iter == tail) {
+ 			dev_err(dev, "couldn't locate current descriptor\n");
+ 			return 0;
+ 		}
+ 	}
+ 
+-	return priv->chan[ch].fifo[tail].desc->hdr;
++	return priv->chan[ch].fifo[iter].desc->hdr;
+ }
+ 
+ /*
 -- 
-| Cui bono? |
+1.7.7.6
