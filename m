@@ -1,125 +1,130 @@
-From: Clemens Ladisch <clemens@ladisch.de>
-Subject: Re: [PATCH] CPU Jitter RNG: inclusion into kernel crypto API and
- /dev/random
-Date: Thu, 14 Nov 2013 11:51:03 +0100
-Message-ID: <5284AB17.5050802@ladisch.de>
-References: <2579337.FPgJGgHYdz@tauon> <1391779.T98KINxAMQ@myon.chronox.de> <528367D0.6010900@ladisch.de> <27146362.bQgmetPpTV@tauon>
+From: Jan Glauber <jan.glauber@gmail.com>
+Subject: Re: crypto: s390 - Fix aes-cbc IV corruption
+Date: Thu, 14 Nov 2013 17:10:20 +0100
+Message-ID: <20131114161020.GA19229@hal>
+References: <20131031032547.GA16528@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: Theodore Ts'o <tytso@mit.edu>, Pavel Machek <pavel@ucw.cz>,
-	sandy harris <sandyinchina@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Nicholas Mc Guire <der.herr@hofr.at>
-To: Stephan Mueller <smueller@chronox.de>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Jan Glauber <jang@linux.vnet.ibm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:44788 "EHLO
-	out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752514Ab3KNKvK (ORCPT
+Received: from mail-wg0-f42.google.com ([74.125.82.42]:64021 "EHLO
+	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752880Ab3KNQKY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Nov 2013 05:51:10 -0500
-In-Reply-To: <27146362.bQgmetPpTV@tauon>
+	Thu, 14 Nov 2013 11:10:24 -0500
+Received: by mail-wg0-f42.google.com with SMTP id k14so918711wgh.1
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Nov 2013 08:10:23 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <20131031032547.GA16528@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Stephan Mueller wrote:
-> Am Mittwoch, 13. November 2013, 12:51:44 schrieb Clemens Ladisch:
->> (And any setting that increases accesses to main memory is likey to
->> introduce more entropy due to clock drift between the processor and the
->> memory bus.  Or where do you assume the entropy comes from?)
->
-> You nailed it. When I disable the caches using the CR0 setting, I get a
-> massive increase in variations and thus entropy.
+On Thu, Oct 31, 2013 at 11:25:47AM +0800, Herbert Xu wrote:
+> Hi:
 
-Now this would be an opportunity to use the number of main memory
-accesses to estimate entropy.  (And when you're running out of the
-cache, i.e., deterministically, is there any entropy?)
+Hi Herbert,
 
->>> XOR is a bijective operation.
->>
->> Only XOR with a constant, which is not what you're doing.
->
-> If you want to regain the full 64 bit input bit stream, then you are
-> right.
->
-> But still, XOR is bijective with respect to the two bits that go into
-> the operation.
+just seen this as my old email address is dead... Your patch looks
+fine as it keeps the iv and the key together as required by the instruction.
 
-Please look up what "bijective" actually means:
-<http://en.wikipedia.org/wiki/Bijection>
+However, I'm curious how this could be racy with threads. The encryption must
+be serialized because of the chaining. The decryption could in theory happen
+in parallel, but is this the case here?
 
-> folding based on XOR is an appropriate way to collapse the string and
-> yet retain entropy.
+--Jan
 
-Correct, but the reason for that is not being bijective.
-
->> If the observations are not independent, you cannot just assume that
->> the estimate is off by a certain factor.  It means that the estimate
->> is not applicable _at all_.
->
-> Well, I am not so sure here.
-
-So, what is the factor that you are saying is large enough?
-
->>> The RNG has the following safety margins where it is more conservative than
->>> measurements indicate:
->>
->> You _cannot_ measure entropy by looking at the output.  How would you
->> differentiate between /dev/random and /dev/urandom?
->
-> I think regarding the independence you can very well draw the conclusion
-> based on the output, because any dependencies will ultimately form a
-> pattern.
-
-The output of a pure PRNG (such as /dev/urandom without entropy) is
-dependent on the internal state, but there are no patterns detectable
-from the output alone.
-
-> In addition, we need to keep in mind that the independence claim is
-> relative
-
-No, independence is a property of the process that generates the
-samples.
-
-> If you have an output string that has no detectable patterns, i.e. looks
-> like white noise, you can only assume that the observations are
-> independent of each other. If there are patterns, you know that there
-> are dependencies.
->
-> That statement may *not* apply any more if you look at the internals of
-> the RNG. In such a case, you may have even strong dependencies.
->
-> The best example on this matter are deterministic RNGs with a
-> cryptographic output function. When you see the output string, you only
-> see white noise. As you cannot detect a pattern, you have to assume that
-> the string provides independent observations. At least for you who looks
-> from the outside cannot draw any conclusions from observing some output
-> bit stream which would be the future bit stream. Yet, when you know the
-> state of the RNG, you entire future output bit stream has no
-> independence.
-
-You cannot restrict the analysis to observations from the outside;
-there are many people who can know about the CPU's internal structure.
-
-> Coming back to the jitter RNG: I applied a large array of statistical
-> tests and all of them concluded that the output is white noise, as
-> explained in the documentation. That means when looking from the
-> outside, there are no dependencies visible. Now you may say that this
-> conclusion does not mean that there are no dependencies -- but I reply
-> again, if there would be any, none of the array of statistical tests can
-> detect it. So, how would an attacker detect patterns?
-
-An attacker would not try to detect patterns; he would apply knowledge
-of the internals.
-
-Statistical tests are useful only for detecting the absence of entropy,
-not for the opposite.
-
-
-All your arguments about the output of the CPU jitter RNG also apply to
-the output of /dev/urandom.  So are you saying that it would be a good
-idea to loop the output of /dev/urandom back into /dev/random?
-
-
-Regards,
-Clemens
+> The cbc-aes-s390 algorithm incorrectly places the IV in the tfm
+> data structure.  As the tfm is shared between multiple threads,
+> this introduces a possibility of data corruption.
+> 
+> This patch fixes this by moving the parameter block containing
+> the IV and key onto the stack (the block is 48 bytes long).
+> 
+> The same bug exists elsewhere in the s390 crypto system and they
+> will be fixed in subsequent patches.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
+> index b4dbade..2e4b5be 100644
+> --- a/arch/s390/crypto/aes_s390.c
+> +++ b/arch/s390/crypto/aes_s390.c
+> @@ -35,7 +35,6 @@ static u8 *ctrblk;
+>  static char keylen_flag;
+>  
+>  struct s390_aes_ctx {
+> -	u8 iv[AES_BLOCK_SIZE];
+>  	u8 key[AES_MAX_KEY_SIZE];
+>  	long enc;
+>  	long dec;
+> @@ -441,30 +440,36 @@ static int cbc_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+>  	return aes_set_key(tfm, in_key, key_len);
+>  }
+>  
+> -static int cbc_aes_crypt(struct blkcipher_desc *desc, long func, void *param,
+> +static int cbc_aes_crypt(struct blkcipher_desc *desc, long func,
+>  			 struct blkcipher_walk *walk)
+>  {
+> +	struct s390_aes_ctx *sctx = crypto_blkcipher_ctx(desc->tfm);
+>  	int ret = blkcipher_walk_virt(desc, walk);
+>  	unsigned int nbytes = walk->nbytes;
+> +	struct {
+> +		u8 iv[AES_BLOCK_SIZE];
+> +		u8 key[AES_MAX_KEY_SIZE];
+> +	} param;
+>  
+>  	if (!nbytes)
+>  		goto out;
+>  
+> -	memcpy(param, walk->iv, AES_BLOCK_SIZE);
+> +	memcpy(param.iv, walk->iv, AES_BLOCK_SIZE);
+> +	memcpy(param.key, sctx->key, sctx->key_len);
+>  	do {
+>  		/* only use complete blocks */
+>  		unsigned int n = nbytes & ~(AES_BLOCK_SIZE - 1);
+>  		u8 *out = walk->dst.virt.addr;
+>  		u8 *in = walk->src.virt.addr;
+>  
+> -		ret = crypt_s390_kmc(func, param, out, in, n);
+> +		ret = crypt_s390_kmc(func, &param, out, in, n);
+>  		if (ret < 0 || ret != n)
+>  			return -EIO;
+>  
+>  		nbytes &= AES_BLOCK_SIZE - 1;
+>  		ret = blkcipher_walk_done(desc, walk, nbytes);
+>  	} while ((nbytes = walk->nbytes));
+> -	memcpy(walk->iv, param, AES_BLOCK_SIZE);
+> +	memcpy(walk->iv, param.iv, AES_BLOCK_SIZE);
+>  
+>  out:
+>  	return ret;
+> @@ -481,7 +486,7 @@ static int cbc_aes_encrypt(struct blkcipher_desc *desc,
+>  		return fallback_blk_enc(desc, dst, src, nbytes);
+>  
+>  	blkcipher_walk_init(&walk, dst, src, nbytes);
+> -	return cbc_aes_crypt(desc, sctx->enc, sctx->iv, &walk);
+> +	return cbc_aes_crypt(desc, sctx->enc, &walk);
+>  }
+>  
+>  static int cbc_aes_decrypt(struct blkcipher_desc *desc,
+> @@ -495,7 +500,7 @@ static int cbc_aes_decrypt(struct blkcipher_desc *desc,
+>  		return fallback_blk_dec(desc, dst, src, nbytes);
+>  
+>  	blkcipher_walk_init(&walk, dst, src, nbytes);
+> -	return cbc_aes_crypt(desc, sctx->dec, sctx->iv, &walk);
+> +	return cbc_aes_crypt(desc, sctx->dec, &walk);
+>  }
+>  
+>  static struct crypto_alg cbc_aes_alg = {
+> 
+> Cheers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
