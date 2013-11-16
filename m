@@ -1,98 +1,57 @@
-From: Cedric Le Goater <clg@fr.ibm.com>
-Subject: Re: [PATCH 16/51] DMA-API: ppc: vio.c: replace dma_set_mask()+dma_set_coherent_mask()
- with new helper
-Date: Fri, 15 Nov 2013 17:16:55 +0100
-Message-ID: <528648F7.20900@fr.ibm.com>
-References: <20130919212235.GD12758@n2100.arm.linux.org.uk> <E1VMly8-0007gy-Ru@rmk-PC.arm.linux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: alsa-devel@alsa-project.org, b43-dev@lists.infradead.org,
-	devel@driverdev.osuosl.org, devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, e1000-devel@lists.sourceforge.net,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-media@vger.kernel.org,
-	linux-mmc@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-omap@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	Solarflare linux maintainers <linux-net-drivers@solarflare.com>,
-	uclinux-dist-devel@blackfin.uclinux.org,
-	Paul Mackerras <paulus@samba.org>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>
-To: Russell King <rmk+kernel@arm.linux.org.uk>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e06smtp16.uk.ibm.com ([195.75.94.112]:44228 "EHLO
-	e06smtp16.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751422Ab3KOQRK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 Nov 2013 11:17:10 -0500
-Received: from /spool/local
-	by e06smtp16.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <clg@fr.ibm.com>;
-	Fri, 15 Nov 2013 16:17:08 -0000
-In-Reply-To: <E1VMly8-0007gy-Ru@rmk-PC.arm.linux.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Taras Kondratiuk <taras.kondratiuk@linaro.org>
+Subject: [RFC 09/23] crypto: omap-sham - raw read and write endian fix
+Date: Sat, 16 Nov 2013 02:01:12 +0200
+Message-ID: <1384560086-11994-10-git-send-email-taras.kondratiuk@linaro.org>
+References: <1384560086-11994-1-git-send-email-taras.kondratiuk@linaro.org>
+Cc: linaro-networking@linaro.org,
+	Victor Kamensky <victor.kamensky@linaro.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-omap@vger.kernel.org
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <1384560086-11994-1-git-send-email-taras.kondratiuk@linaro.org>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,=20
+From: Victor Kamensky <victor.kamensky@linaro.org>
 
-On 09/19/2013 11:41 PM, Russell King wrote:
-> Replace the following sequence:
->=20
-> 	dma_set_mask(dev, mask);
-> 	dma_set_coherent_mask(dev, mask);
->=20
-> with a call to the new helper dma_set_mask_and_coherent().
->=20
-> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
-> ---
->  arch/powerpc/kernel/vio.c |    3 +--
->  1 files changed, 1 insertions(+), 2 deletions(-)
->=20
-> diff --git a/arch/powerpc/kernel/vio.c b/arch/powerpc/kernel/vio.c
-> index 78a3506..96b6c97 100644
-> --- a/arch/powerpc/kernel/vio.c
-> +++ b/arch/powerpc/kernel/vio.c
-> @@ -1413,8 +1413,7 @@ struct vio_dev *vio_register_device_node(struct=
- device_node *of_node)
->=20
->  		/* needed to ensure proper operation of coherent allocations
->  		 * later, in case driver doesn't set it explicitly */
-> -		dma_set_mask(&viodev->dev, DMA_BIT_MASK(64));
-> -		dma_set_coherent_mask(&viodev->dev, DMA_BIT_MASK(64));
-> +		dma_set_mask_and_coherent(&viodev->dev, DMA_BIT_MASK(64));
->  	}
->=20
->  	/* register with generic device framework */
->=20
+All OMAP IP blocks expect LE data, but CPU may operate in BE mode.
+Need to use endian neutral functions to read/write h/w registers.
+I.e instead of __raw_read[lw] and __raw_write[lw] functions code
+need to use read[lw]_relaxed and write[lw]_relaxed functions.
+If the first simply reads/writes register, the second will byteswap
+it if host operates in BE mode.
 
-The new helper routine dma_set_mask_and_coherent() breaks the=20
-initialization of the pseries vio devices which do not have an=20
-initial dev->dma_mask. I think we need to use dma_coerce_mask_and_coher=
-ent()
-instead.
+Changes are trivial sed like replacement of __raw_xxx functions
+with xxx_relaxed variant.
 
-Signed-off-by: C=E9dric Le Goater <clg@fr.ibm.com>
+Signed-off-by: Victor Kamensky <victor.kamensky@linaro.org>
+Signed-off-by: Taras Kondratiuk <taras.kondratiuk@linaro.org>
 ---
- arch/powerpc/kernel/vio.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/omap-sham.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/powerpc/kernel/vio.c b/arch/powerpc/kernel/vio.c
-index e7d0c88f..76a6482 100644
---- a/arch/powerpc/kernel/vio.c
-+++ b/arch/powerpc/kernel/vio.c
-@@ -1419,7 +1419,7 @@ struct vio_dev *vio_register_device_node(struct d=
-evice_node *of_node)
-=20
- 		/* needed to ensure proper operation of coherent allocations
- 		 * later, in case driver doesn't set it explicitly */
--		dma_set_mask_and_coherent(&viodev->dev, DMA_BIT_MASK(64));
-+		dma_coerce_mask_and_coherent(&viodev->dev, DMA_BIT_MASK(64));
- 	}
-=20
- 	/* register with generic device framework */
---=20
-1.7.10.4
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 8bdde57..b011b97 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -244,13 +244,13 @@ static struct omap_sham_drv sham = {
+ 
+ static inline u32 omap_sham_read(struct omap_sham_dev *dd, u32 offset)
+ {
+-	return __raw_readl(dd->io_base + offset);
++	return readl_relaxed(dd->io_base + offset);
+ }
+ 
+ static inline void omap_sham_write(struct omap_sham_dev *dd,
+ 					u32 offset, u32 value)
+ {
+-	__raw_writel(value, dd->io_base + offset);
++	writel_relaxed(value, dd->io_base + offset);
+ }
+ 
+ static inline void omap_sham_write_mask(struct omap_sham_dev *dd, u32 address,
+-- 
+1.7.9.5
+
