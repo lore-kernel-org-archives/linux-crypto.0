@@ -1,7 +1,7 @@
 From: Taras Kondratiuk <taras.kondratiuk@linaro.org>
-Subject: [RFC 09/23] crypto: omap-sham - raw read and write endian fix
-Date: Sat, 16 Nov 2013 02:01:12 +0200
-Message-ID: <1384560086-11994-10-git-send-email-taras.kondratiuk@linaro.org>
+Subject: [RFC 08/23] crypto: omap-aes - raw read and write endian fix
+Date: Sat, 16 Nov 2013 02:01:11 +0200
+Message-ID: <1384560086-11994-9-git-send-email-taras.kondratiuk@linaro.org>
 References: <1384560086-11994-1-git-send-email-taras.kondratiuk@linaro.org>
 Cc: linaro-networking@linaro.org,
 	Victor Kamensky <victor.kamensky@linaro.org>,
@@ -9,9 +9,9 @@ Cc: linaro-networking@linaro.org,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: linux-omap@vger.kernel.org
-Return-path: <linux-omap-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1384560086-11994-1-git-send-email-taras.kondratiuk@linaro.org>
-Sender: linux-omap-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 From: Victor Kamensky <victor.kamensky@linaro.org>
@@ -29,29 +29,46 @@ with xxx_relaxed variant.
 Signed-off-by: Victor Kamensky <victor.kamensky@linaro.org>
 Signed-off-by: Taras Kondratiuk <taras.kondratiuk@linaro.org>
 ---
- drivers/crypto/omap-sham.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/omap-aes.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 8bdde57..b011b97 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -244,13 +244,13 @@ static struct omap_sham_drv sham = {
- 
- static inline u32 omap_sham_read(struct omap_sham_dev *dd, u32 offset)
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index ce791c2..777ae0a 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -195,7 +195,7 @@ static DEFINE_SPINLOCK(list_lock);
+ #define omap_aes_read(dd, offset)				\
+ ({								\
+ 	int _read_ret;						\
+-	_read_ret = __raw_readl(dd->io_base + offset);		\
++	_read_ret = readl_relaxed(dd->io_base + offset);		\
+ 	pr_debug("omap_aes_read(" #offset "=%#x)= %#x\n",	\
+ 		 offset, _read_ret);				\
+ 	_read_ret;						\
+@@ -203,7 +203,7 @@ static DEFINE_SPINLOCK(list_lock);
+ #else
+ static inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
  {
 -	return __raw_readl(dd->io_base + offset);
 +	return readl_relaxed(dd->io_base + offset);
  }
+ #endif
  
- static inline void omap_sham_write(struct omap_sham_dev *dd,
- 					u32 offset, u32 value)
+@@ -212,13 +212,13 @@ static inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
+ 	do {								\
+ 		pr_debug("omap_aes_write(" #offset "=%#x) value=%#x\n",	\
+ 			 offset, value);				\
+-		__raw_writel(value, dd->io_base + offset);		\
++		writel_relaxed(value, dd->io_base + offset);		\
+ 	} while (0)
+ #else
+ static inline void omap_aes_write(struct omap_aes_dev *dd, u32 offset,
+ 				  u32 value)
  {
 -	__raw_writel(value, dd->io_base + offset);
 +	writel_relaxed(value, dd->io_base + offset);
  }
+ #endif
  
- static inline void omap_sham_write_mask(struct omap_sham_dev *dd, u32 address,
 -- 
 1.7.9.5
-
