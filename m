@@ -1,74 +1,47 @@
-From: Taras Kondratiuk <taras.kondratiuk@linaro.org>
-Subject: [RFC 08/23] crypto: omap-aes - raw read and write endian fix
-Date: Sat, 16 Nov 2013 02:01:11 +0200
-Message-ID: <1384560086-11994-9-git-send-email-taras.kondratiuk@linaro.org>
-References: <1384560086-11994-1-git-send-email-taras.kondratiuk@linaro.org>
-Cc: linaro-networking@linaro.org,
-	Victor Kamensky <victor.kamensky@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: linux-omap@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1384560086-11994-1-git-send-email-taras.kondratiuk@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: crypto: s390 - Fix aes-cbc IV corruption
+Date: Sun, 17 Nov 2013 20:33:59 +0800
+Message-ID: <20131117123359.GA20753@gondor.apana.org.au>
+References: <20131031032547.GA16528@gondor.apana.org.au>
+ <20131114161020.GA19229@hal>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Jan Glauber <jang@linux.vnet.ibm.com>
+To: Jan Glauber <jan.glauber@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:55291 "EHLO
+	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751453Ab3KQMeG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 17 Nov 2013 07:34:06 -0500
+Content-Disposition: inline
+In-Reply-To: <20131114161020.GA19229@hal>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Victor Kamensky <victor.kamensky@linaro.org>
+On Thu, Nov 14, 2013 at 05:10:20PM +0100, Jan Glauber wrote:
+> On Thu, Oct 31, 2013 at 11:25:47AM +0800, Herbert Xu wrote:
+> > Hi:
+> 
+> Hi Herbert,
+> 
+> just seen this as my old email address is dead... Your patch looks
+> fine as it keeps the iv and the key together as required by the instruction.
 
-All OMAP IP blocks expect LE data, but CPU may operate in BE mode.
-Need to use endian neutral functions to read/write h/w registers.
-I.e instead of __raw_read[lw] and __raw_write[lw] functions code
-need to use read[lw]_relaxed and write[lw]_relaxed functions.
-If the first simply reads/writes register, the second will byteswap
-it if host operates in BE mode.
+Thanks for reviewing.
 
-Changes are trivial sed like replacement of __raw_xxx functions
-with xxx_relaxed variant.
+> However, I'm curious how this could be racy with threads. The encryption must
+> be serialized because of the chaining. The decryption could in theory happen
+> in parallel, but is this the case here?
 
-Signed-off-by: Victor Kamensky <victor.kamensky@linaro.org>
-Signed-off-by: Taras Kondratiuk <taras.kondratiuk@linaro.org>
----
- drivers/crypto/omap-aes.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+A single tfm can be used by multiple threads in parallel.  For
+example, two packets of the same IPsec SA may be processed by
+two CPUs at the same time.  This applies both inbound and outbound
+so it affects both encryption and decryption.
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index ce791c2..777ae0a 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -195,7 +195,7 @@ static DEFINE_SPINLOCK(list_lock);
- #define omap_aes_read(dd, offset)				\
- ({								\
- 	int _read_ret;						\
--	_read_ret = __raw_readl(dd->io_base + offset);		\
-+	_read_ret = readl_relaxed(dd->io_base + offset);		\
- 	pr_debug("omap_aes_read(" #offset "=%#x)= %#x\n",	\
- 		 offset, _read_ret);				\
- 	_read_ret;						\
-@@ -203,7 +203,7 @@ static DEFINE_SPINLOCK(list_lock);
- #else
- static inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
- {
--	return __raw_readl(dd->io_base + offset);
-+	return readl_relaxed(dd->io_base + offset);
- }
- #endif
- 
-@@ -212,13 +212,13 @@ static inline u32 omap_aes_read(struct omap_aes_dev *dd, u32 offset)
- 	do {								\
- 		pr_debug("omap_aes_write(" #offset "=%#x) value=%#x\n",	\
- 			 offset, value);				\
--		__raw_writel(value, dd->io_base + offset);		\
-+		writel_relaxed(value, dd->io_base + offset);		\
- 	} while (0)
- #else
- static inline void omap_aes_write(struct omap_aes_dev *dd, u32 offset,
- 				  u32 value)
- {
--	__raw_writel(value, dd->io_base + offset);
-+	writel_relaxed(value, dd->io_base + offset);
- }
- #endif
- 
+Cheers,
 -- 
-1.7.9.5
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
