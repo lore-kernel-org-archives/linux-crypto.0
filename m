@@ -1,47 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: s390 - Fix aes-cbc IV corruption
-Date: Sun, 17 Nov 2013 20:33:59 +0800
-Message-ID: <20131117123359.GA20753@gondor.apana.org.au>
-References: <20131031032547.GA16528@gondor.apana.org.au>
- <20131114161020.GA19229@hal>
+From: Michael Neuling <mikey@neuling.org>
+Subject: [PATCH] crypto: caam - Add missing Job Ring include
+Date: Mon, 18 Nov 2013 15:20:01 +1100
+Message-ID: <7301.1384748401@ale.ozlabs.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Jan Glauber <jang@linux.vnet.ibm.com>
-To: Jan Glauber <jan.glauber@gmail.com>
+Cc: Garg Vakul-B16394 <vakul@freescale.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, sfr@canb.auug.org.au
+To: Ruchika Gupta <ruchika.gupta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:55291 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751453Ab3KQMeG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 17 Nov 2013 07:34:06 -0500
-Content-Disposition: inline
-In-Reply-To: <20131114161020.GA19229@hal>
+Received: from ozlabs.org ([203.10.76.45]:34651 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751000Ab3KREUD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 17 Nov 2013 23:20:03 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 14, 2013 at 05:10:20PM +0100, Jan Glauber wrote:
-> On Thu, Oct 31, 2013 at 11:25:47AM +0800, Herbert Xu wrote:
-> > Hi:
-> 
-> Hi Herbert,
-> 
-> just seen this as my old email address is dead... Your patch looks
-> fine as it keeps the iv and the key together as required by the instruction.
+linuxnext currently doesn't compile with the powerpc mpc85xx_defconfig
+giving:
 
-Thanks for reviewing.
+  drivers/crypto/caam/jr.c: In function 'caam_jr_probe':
+  drivers/crypto/caam/jr.c:468:2: error: implicit declaration of function 'of_iomap' [-Werror=implicit-function-declaration]
 
-> However, I'm curious how this could be racy with threads. The encryption must
-> be serialized because of the chaining. The decryption could in theory happen
-> in parallel, but is this the case here?
+In:
+  commit 313ea293e9c4d1eabcaddd2c0800f083b03c2a2e
+  Author: Ruchika Gupta <ruchika.gupta@freescale.com>
+  crypto: caam - Add Platform driver for Job Ring
 
-A single tfm can be used by multiple threads in parallel.  For
-example, two packets of the same IPsec SA may be processed by
-two CPUs at the same time.  This applies both inbound and outbound
-so it affects both encryption and decryption.
+We added a reference to of_iomap but did add the necessary include file.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The below adds this include.
+
+Signed-off-by: Michael Neuling <mikey@neuling.org>
+
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index d23356d2..1d80bd3 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -6,6 +6,7 @@
+  */
+ 
+ #include <linux/of_irq.h>
++#include <linux/of_address.h>
+ 
+ #include "compat.h"
+ #include "regs.h"
