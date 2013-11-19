@@ -1,96 +1,121 @@
-From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH] crypto: talitos - corrrectly handle zero-length assoc data
-Date: Tue, 19 Nov 2013 14:57:49 +0200
-Message-ID: <1384865869-24802-1-git-send-email-horia.geanta@freescale.com>
-References: <1348080820-22250-4-git-send-email-horia.geanta@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Kim Phillips <kim.phillips@freescale.com>
-To: <linux-crypto@vger.kernel.org>
+From: Gerald Schaefer <gerald.schaefer@de.ibm.com>
+Subject: [PATCH] crypto: s390 - Fix aes-xts parameter corruption
+Date: Tue, 19 Nov 2013 17:12:47 +0100
+Message-ID: <1384877567-23593-1-git-send-email-gerald.schaefer@de.ibm.com>
+Cc: linux-crypto@vger.kernel.org,
+	Martin Schwidefsky <schwidefsky@de.ibm.com>,
+	Ingo Tuchscherer <ingo.tuchscherer@linux.vnet.ibm.com>,
+	Harald Freudenberger <freude@linux.vnet.ibm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe006.messaging.microsoft.com ([216.32.181.186]:4304
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752119Ab3KSNES (ORCPT
+Received: from e06smtp16.uk.ibm.com ([195.75.94.112]:57995 "EHLO
+	e06smtp16.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751421Ab3KSQM7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Nov 2013 08:04:18 -0500
-In-Reply-To: <1348080820-22250-4-git-send-email-horia.geanta@freescale.com>
+	Tue, 19 Nov 2013 11:12:59 -0500
+Received: from /spool/local
+	by e06smtp16.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <gerald.schaefer@de.ibm.com>;
+	Tue, 19 Nov 2013 16:12:58 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+	by d06dlp02.portsmouth.uk.ibm.com (Postfix) with ESMTP id 7B6362190068
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Nov 2013 16:12:56 +0000 (GMT)
+Received: from d06av08.portsmouth.uk.ibm.com (d06av08.portsmouth.uk.ibm.com [9.149.37.249])
+	by b06cxnps4074.portsmouth.uk.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id rAJGCiQW38797358
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Nov 2013 16:12:44 GMT
+Received: from d06av08.portsmouth.uk.ibm.com (localhost [127.0.0.1])
+	by d06av08.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id rAJGCtdJ012875
+	for <linux-crypto@vger.kernel.org>; Tue, 19 Nov 2013 09:12:56 -0700
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-talitos does not handle well zero-length assoc data. From dmesg:
-talitos ffe30000.crypto: master data transfer error
-talitos ffe30000.crypto: gather return/length error
+Some s390 crypto algorithms incorrectly use the crypto_tfm structure to
+store private data. As the tfm can be shared among multiple threads, this
+can result in data corruption.
 
-Check whether assoc data is provided by inspecting assoclen,
-not assoc pointer.
-This is needed in order to pass testmgr tests.
+This patch fixes aes-xts by moving the xts and pcc parameter blocks from
+the tfm onto the stack (48 + 96 bytes).
 
-Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+Signed-off-by: Gerald Schaefer <gerald.schaefer@de.ibm.com>
 ---
-This patch was submitted late in the 3.6 cycle, but has not
-showed up - neither in 3.6 nor in 3.7. Please apply.
+ arch/s390/crypto/aes_s390.c | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
- drivers/crypto/talitos.c |   21 ++++++++++++++++-----
- 1 files changed, 16 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index f6f7c68..af3e7dc 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -788,7 +788,7 @@ static void ipsec_esp_unmap(struct device *dev,
+diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
+index 4363528..b3feabd 100644
+--- a/arch/s390/crypto/aes_s390.c
++++ b/arch/s390/crypto/aes_s390.c
+@@ -55,8 +55,7 @@ struct pcc_param {
  
- 	if (edesc->assoc_chained)
- 		talitos_unmap_sg_chain(dev, areq->assoc, DMA_TO_DEVICE);
--	else
-+	else if (areq->assoclen)
- 		/* assoc_nents counts also for IV in non-contiguous cases */
- 		dma_unmap_sg(dev, areq->assoc,
- 			     edesc->assoc_nents ? edesc->assoc_nents - 1 : 1,
-@@ -971,7 +971,11 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 		dma_sync_single_for_device(dev, edesc->dma_link_tbl,
- 					   edesc->dma_len, DMA_BIDIRECTIONAL);
- 	} else {
--		to_talitos_ptr(&desc->ptr[1], sg_dma_address(areq->assoc));
-+		if (areq->assoclen)
-+			to_talitos_ptr(&desc->ptr[1],
-+				       sg_dma_address(areq->assoc));
-+		else
-+			to_talitos_ptr(&desc->ptr[1], edesc->iv_dma);
- 		desc->ptr[1].j_extent = 0;
- 	}
+ struct s390_xts_ctx {
+ 	u8 key[32];
+-	u8 xts_param[16];
+-	struct pcc_param pcc;
++	u8 pcc_key[32];
+ 	long enc;
+ 	long dec;
+ 	int key_len;
+@@ -591,7 +590,7 @@ static int xts_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 		xts_ctx->enc = KM_XTS_128_ENCRYPT;
+ 		xts_ctx->dec = KM_XTS_128_DECRYPT;
+ 		memcpy(xts_ctx->key + 16, in_key, 16);
+-		memcpy(xts_ctx->pcc.key + 16, in_key + 16, 16);
++		memcpy(xts_ctx->pcc_key + 16, in_key + 16, 16);
+ 		break;
+ 	case 48:
+ 		xts_ctx->enc = 0;
+@@ -602,7 +601,7 @@ static int xts_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 		xts_ctx->enc = KM_XTS_256_ENCRYPT;
+ 		xts_ctx->dec = KM_XTS_256_DECRYPT;
+ 		memcpy(xts_ctx->key, in_key, 32);
+-		memcpy(xts_ctx->pcc.key, in_key + 32, 32);
++		memcpy(xts_ctx->pcc_key, in_key + 32, 32);
+ 		break;
+ 	default:
+ 		*flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+@@ -621,29 +620,33 @@ static int xts_aes_crypt(struct blkcipher_desc *desc, long func,
+ 	unsigned int nbytes = walk->nbytes;
+ 	unsigned int n;
+ 	u8 *in, *out;
+-	void *param;
++	struct pcc_param pcc_param;
++	struct {
++		u8 key[32];
++		u8 init[16];
++	} xts_param;
  
-@@ -1120,10 +1124,10 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 		return ERR_PTR(-EINVAL);
- 	}
+ 	if (!nbytes)
+ 		goto out;
  
--	if (iv)
-+	if (ivsize)
- 		iv_dma = dma_map_single(dev, iv, ivsize, DMA_TO_DEVICE);
+-	memset(xts_ctx->pcc.block, 0, sizeof(xts_ctx->pcc.block));
+-	memset(xts_ctx->pcc.bit, 0, sizeof(xts_ctx->pcc.bit));
+-	memset(xts_ctx->pcc.xts, 0, sizeof(xts_ctx->pcc.xts));
+-	memcpy(xts_ctx->pcc.tweak, walk->iv, sizeof(xts_ctx->pcc.tweak));
+-	param = xts_ctx->pcc.key + offset;
+-	ret = crypt_s390_pcc(func, param);
++	memset(pcc_param.block, 0, sizeof(pcc_param.block));
++	memset(pcc_param.bit, 0, sizeof(pcc_param.bit));
++	memset(pcc_param.xts, 0, sizeof(pcc_param.xts));
++	memcpy(pcc_param.tweak, walk->iv, sizeof(pcc_param.tweak));
++	memcpy(pcc_param.key, xts_ctx->pcc_key, 32);
++	ret = crypt_s390_pcc(func, &pcc_param.key[offset]);
+ 	if (ret < 0)
+ 		return -EIO;
  
--	if (assoc) {
-+	if (assoclen) {
- 		/*
- 		 * Currently it is assumed that iv is provided whenever assoc
- 		 * is.
-@@ -1171,9 +1175,16 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
+-	memcpy(xts_ctx->xts_param, xts_ctx->pcc.xts, 16);
+-	param = xts_ctx->key + offset;
++	memcpy(xts_param.key, xts_ctx->key, 32);
++	memcpy(xts_param.init, pcc_param.xts, 16);
+ 	do {
+ 		/* only use complete blocks */
+ 		n = nbytes & ~(AES_BLOCK_SIZE - 1);
+ 		out = walk->dst.virt.addr;
+ 		in = walk->src.virt.addr;
  
- 	edesc = kmalloc(alloc_len, GFP_DMA | flags);
- 	if (!edesc) {
--		talitos_unmap_sg_chain(dev, assoc, DMA_TO_DEVICE);
-+		if (assoc_chained)
-+			talitos_unmap_sg_chain(dev, assoc, DMA_TO_DEVICE);
-+		else if (assoclen)
-+			dma_unmap_sg(dev, assoc,
-+				     assoc_nents ? assoc_nents - 1 : 1,
-+				     DMA_TO_DEVICE);
-+
- 		if (iv_dma)
- 			dma_unmap_single(dev, iv_dma, ivsize, DMA_TO_DEVICE);
-+
- 		dev_err(dev, "could not allocate edescriptor\n");
- 		return ERR_PTR(-ENOMEM);
- 	}
+-		ret = crypt_s390_km(func, param, out, in, n);
++		ret = crypt_s390_km(func, &xts_param.key[offset], out, in, n);
+ 		if (ret < 0 || ret != n)
+ 			return -EIO;
+ 
 -- 
-1.7.7.6
+1.8.3.4
