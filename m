@@ -1,152 +1,96 @@
-From: Harald Freudenberger <freude@linux.vnet.ibm.com>
-Subject: [PATCH] s390/crypto: fix aes ctr concurrency issue
-Date: Tue, 19 Nov 2013 11:22:12 +0100
-Message-ID: <1384856532-17247-2-git-send-email-freude@linux.vnet.ibm.com>
-References: <1384856532-17247-1-git-send-email-freude@linux.vnet.ibm.com>
-Cc: linux-crypto@vger.kernel.org,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>,
-	Ingo Tuchscherer <ingo.tuchscherer@linux.vnet.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-	Harald Freudenberger <freude@de.ibm.com>,
-	Harald Freudenberger <freude@linux.vnet.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Horia Geanta <horia.geanta@freescale.com>
+Subject: [PATCH] crypto: talitos - corrrectly handle zero-length assoc data
+Date: Tue, 19 Nov 2013 14:57:49 +0200
+Message-ID: <1384865869-24802-1-git-send-email-horia.geanta@freescale.com>
+References: <1348080820-22250-4-git-send-email-horia.geanta@freescale.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: Herbert Xu <herbert@gondor.hengli.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e06smtp16.uk.ibm.com ([195.75.94.112]:48032 "EHLO
-	e06smtp16.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751985Ab3KSKWm (ORCPT
+Received: from ch1ehsobe006.messaging.microsoft.com ([216.32.181.186]:4304
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752119Ab3KSNES (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Nov 2013 05:22:42 -0500
-Received: from /spool/local
-	by e06smtp16.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <freude@linux.vnet.ibm.com>;
-	Tue, 19 Nov 2013 10:22:40 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-	by d06dlp02.portsmouth.uk.ibm.com (Postfix) with ESMTP id CEEC3219005C
-	for <linux-crypto@vger.kernel.org>; Tue, 19 Nov 2013 10:22:32 +0000 (GMT)
-Received: from d06av06.portsmouth.uk.ibm.com (d06av06.portsmouth.uk.ibm.com [9.149.37.217])
-	by b06cxnps4074.portsmouth.uk.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id rAJAMKXH16384176
-	for <linux-crypto@vger.kernel.org>; Tue, 19 Nov 2013 10:22:20 GMT
-Received: from d06av06.portsmouth.uk.ibm.com (localhost [127.0.0.1])
-	by d06av06.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id rAJAMWuP017500
-	for <linux-crypto@vger.kernel.org>; Tue, 19 Nov 2013 03:22:32 -0700
-In-Reply-To: <1384856532-17247-1-git-send-email-freude@linux.vnet.ibm.com>
+	Tue, 19 Nov 2013 08:04:18 -0500
+In-Reply-To: <1348080820-22250-4-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The aes-ctr mode used one preallocated page without any concurrency
-protection. When multiple threads run aes-ctr encryption or decryption
-this could lead to data corruption.
+talitos does not handle well zero-length assoc data. From dmesg:
+talitos ffe30000.crypto: master data transfer error
+talitos ffe30000.crypto: gather return/length error
 
-The patch introduces locking for the preallocated page and alternatively
-allocating and freeing of an temp page in concurrency situations.
+Check whether assoc data is provided by inspecting assoclen,
+not assoc pointer.
+This is needed in order to pass testmgr tests.
+
+Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- arch/s390/crypto/aes_s390.c |   55 ++++++++++++++++++++++++++++++++----------
- 1 files changed, 42 insertions(+), 13 deletions(-)
+This patch was submitted late in the 3.6 cycle, but has not
+showed up - neither in 3.6 nor in 3.7. Please apply.
 
-diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-index 4363528..fcb5297 100644
---- a/arch/s390/crypto/aes_s390.c
-+++ b/arch/s390/crypto/aes_s390.c
-@@ -25,6 +25,7 @@
- #include <linux/err.h>
- #include <linux/module.h>
- #include <linux/init.h>
-+#include <linux/mutex.h>
- #include "crypt_s390.h"
+ drivers/crypto/talitos.c |   21 ++++++++++++++++-----
+ 1 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index f6f7c68..af3e7dc 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -788,7 +788,7 @@ static void ipsec_esp_unmap(struct device *dev,
  
- #define AES_KEYLEN_128		1
-@@ -32,6 +33,7 @@
- #define AES_KEYLEN_256		4
- 
- static u8 *ctrblk;
-+static DEFINE_MUTEX(ctrblk_lock);
- static char keylen_flag;
- 
- struct s390_aes_ctx {
-@@ -762,11 +764,25 @@ static int ctr_aes_crypt(struct blkcipher_desc *desc, long func,
- 	unsigned int i, n, nbytes;
- 	u8 buf[AES_BLOCK_SIZE];
- 	u8 *out, *in;
-+	u8 *ctrpage;
- 
- 	if (!walk->nbytes)
- 		return ret;
- 
--	memcpy(ctrblk, walk->iv, AES_BLOCK_SIZE);
-+	if (mutex_trylock(&ctrblk_lock)) {
-+		/* ctrblk is now reserved for us */
-+		ctrpage = ctrblk;
-+	} else {
-+		/* ctrblk is in use by someone else, alloc our own page */
-+		ctrpage = (u8*) __get_free_page(GFP_ATOMIC);
-+		if (!ctrpage) {
-+			/* gfp failed, wait until ctrblk becomes available */
-+			mutex_lock(&ctrblk_lock);
-+			ctrpage = ctrblk;
-+		}
-+	}
-+
-+	memcpy(ctrpage, walk->iv, AES_BLOCK_SIZE);
- 	while ((nbytes = walk->nbytes) >= AES_BLOCK_SIZE) {
- 		out = walk->dst.virt.addr;
- 		in = walk->src.virt.addr;
-@@ -775,17 +791,19 @@ static int ctr_aes_crypt(struct blkcipher_desc *desc, long func,
- 			n = (nbytes > PAGE_SIZE) ? PAGE_SIZE :
- 						 nbytes & ~(AES_BLOCK_SIZE - 1);
- 			for (i = AES_BLOCK_SIZE; i < n; i += AES_BLOCK_SIZE) {
--				memcpy(ctrblk + i, ctrblk + i - AES_BLOCK_SIZE,
-+				memcpy(ctrpage + i, ctrpage + i - AES_BLOCK_SIZE,
- 				       AES_BLOCK_SIZE);
--				crypto_inc(ctrblk + i, AES_BLOCK_SIZE);
-+				crypto_inc(ctrpage + i, AES_BLOCK_SIZE);
-+			}
-+			ret = crypt_s390_kmctr(func, sctx->key, out, in, n, ctrpage);
-+			if (ret < 0 || ret != n) {
-+				ret = -EIO;
-+				goto out;
- 			}
--			ret = crypt_s390_kmctr(func, sctx->key, out, in, n, ctrblk);
--			if (ret < 0 || ret != n)
--				return -EIO;
- 			if (n > AES_BLOCK_SIZE)
--				memcpy(ctrblk, ctrblk + n - AES_BLOCK_SIZE,
-+				memcpy(ctrpage, ctrpage + n - AES_BLOCK_SIZE,
- 				       AES_BLOCK_SIZE);
--			crypto_inc(ctrblk, AES_BLOCK_SIZE);
-+			crypto_inc(ctrpage, AES_BLOCK_SIZE);
- 			out += n;
- 			in += n;
- 			nbytes -= n;
-@@ -799,14 +817,25 @@ static int ctr_aes_crypt(struct blkcipher_desc *desc, long func,
- 		out = walk->dst.virt.addr;
- 		in = walk->src.virt.addr;
- 		ret = crypt_s390_kmctr(func, sctx->key, buf, in,
--				       AES_BLOCK_SIZE, ctrblk);
--		if (ret < 0 || ret != AES_BLOCK_SIZE)
--			return -EIO;
-+				       AES_BLOCK_SIZE, ctrpage);
-+		if (ret < 0 || ret != AES_BLOCK_SIZE) {
-+			ret = -EIO;
-+			goto out;
-+		}
- 		memcpy(out, buf, nbytes);
--		crypto_inc(ctrblk, AES_BLOCK_SIZE);
-+		crypto_inc(ctrpage, AES_BLOCK_SIZE);
- 		ret = blkcipher_walk_done(desc, walk, 0);
+ 	if (edesc->assoc_chained)
+ 		talitos_unmap_sg_chain(dev, areq->assoc, DMA_TO_DEVICE);
+-	else
++	else if (areq->assoclen)
+ 		/* assoc_nents counts also for IV in non-contiguous cases */
+ 		dma_unmap_sg(dev, areq->assoc,
+ 			     edesc->assoc_nents ? edesc->assoc_nents - 1 : 1,
+@@ -971,7 +971,11 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
+ 		dma_sync_single_for_device(dev, edesc->dma_link_tbl,
+ 					   edesc->dma_len, DMA_BIDIRECTIONAL);
+ 	} else {
+-		to_talitos_ptr(&desc->ptr[1], sg_dma_address(areq->assoc));
++		if (areq->assoclen)
++			to_talitos_ptr(&desc->ptr[1],
++				       sg_dma_address(areq->assoc));
++		else
++			to_talitos_ptr(&desc->ptr[1], edesc->iv_dma);
+ 		desc->ptr[1].j_extent = 0;
  	}
--	memcpy(walk->iv, ctrblk, AES_BLOCK_SIZE);
-+	memcpy(walk->iv, ctrpage, AES_BLOCK_SIZE);
-+
-+out:
-+	if (ctrpage == ctrblk) {
-+		/* free the reservation for ctrblk now */
-+		mutex_unlock(&ctrblk_lock);
-+	} else {
-+		/* free the page allocated above */
-+		free_page((unsigned long) ctrpage);
-+	}
- 	return ret;
- }
  
+@@ -1120,10 +1124,10 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
+ 		return ERR_PTR(-EINVAL);
+ 	}
+ 
+-	if (iv)
++	if (ivsize)
+ 		iv_dma = dma_map_single(dev, iv, ivsize, DMA_TO_DEVICE);
+ 
+-	if (assoc) {
++	if (assoclen) {
+ 		/*
+ 		 * Currently it is assumed that iv is provided whenever assoc
+ 		 * is.
+@@ -1171,9 +1175,16 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
+ 
+ 	edesc = kmalloc(alloc_len, GFP_DMA | flags);
+ 	if (!edesc) {
+-		talitos_unmap_sg_chain(dev, assoc, DMA_TO_DEVICE);
++		if (assoc_chained)
++			talitos_unmap_sg_chain(dev, assoc, DMA_TO_DEVICE);
++		else if (assoclen)
++			dma_unmap_sg(dev, assoc,
++				     assoc_nents ? assoc_nents - 1 : 1,
++				     DMA_TO_DEVICE);
++
+ 		if (iv_dma)
+ 			dma_unmap_single(dev, iv_dma, ivsize, DMA_TO_DEVICE);
++
+ 		dev_err(dev, "could not allocate edescriptor\n");
+ 		return ERR_PTR(-ENOMEM);
+ 	}
 -- 
-1.7.0.4
+1.7.7.6
