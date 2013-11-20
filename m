@@ -1,96 +1,91 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/3] ARM: mxs: crypto: Add Freescale MXS DCP driver
-Date: Wed, 20 Nov 2013 19:20:11 +0800
-Message-ID: <20131120112010.GA20958@gondor.apana.org.au>
-References: <1380194306-5243-1-git-send-email-marex@denx.de>
- <20131008043631.GA18365@gondor.apana.org.au>
- <201310081233.37136.marex@denx.de>
- <201311101848.12215.marex@denx.de>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH 00/10] AMD Cryptographic Coprocessor support
+Date: Wed, 20 Nov 2013 10:20:10 -0600
+Message-ID: <5441273.HtAtgCrPKB@tlendack-t1>
+References: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "Christoph G. Baumann" <cb@sgoc.de>, linux-crypto@vger.kernel.org,
-	Shawn Guo <shawn.guo@linaro.org>,
-	Fabio Estevam <festevam@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Tobias Rauter <tobiasrauter@gmail.com>
-To: Marek Vasut <marex@denx.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:43863 "EHLO
-	fornost.hengli.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751944Ab3KTLU1 (ORCPT
+Received: from co1ehsobe003.messaging.microsoft.com ([216.32.180.186]:59420
+	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754001Ab3KTQUc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 Nov 2013 06:20:27 -0500
-Content-Disposition: inline
-In-Reply-To: <201311101848.12215.marex@denx.de>
+	Wed, 20 Nov 2013 11:20:32 -0500
+In-Reply-To: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 10, 2013 at 06:48:11PM +0100, Marek Vasut wrote:
-> Hi,
-> 
-> > Hello Herbert,
-> > 
-> > > On Mon, Oct 07, 2013 at 05:48:26PM +0200, Marek Vasut wrote:
-> > > > Hello Christoph,
-> > > > 
-> > > > > Hello Marek,
-> > > > > 
-> > > > > > Marek Vasut <marex@denx.de> hat am 28. September 2013 um 05:35
-> > > > > > geschrieben: [...]
-> > > > > > 
-> > > > > > > > 3) What are those ugly new IOCTLs in the dcp.c driver?
-> > > > > > > 
-> > > > > > > When I firstly posted the driver in the mailinglist, there where
-> > > > > > > one person who actually used this interface (it was introduced in
-> > > > > > > Freescale's SDK) to use the OTP keys for crypto. As far as I have
-> > > > > > > seen, the crypto API does not support such keys (i.e. there seems
-> > > > > > > to be no way to tell a driver to use some kind of special keys -
-> > > > > > > which are not delivered by the user - via the API).
-> > > > > > > Therefore I added this miscdevice and adopted Freescale's
-> > > > > > > interface.
-> > > > > > 
-> > > > > > The keys are programmed into the OTP registers, correct? There is
-> > > > > > OCOTP d
-> > > > > >
-> > > > > >river
-> > > > > >for the MX23/MX28 OTP hardware. This is what should have been used
-> > > > > >then.
-> > > > > >
-> > > > > > NOTE: This IOCTL interface seems like quite an abusive way to allow
-> > > > > > userl
-> > > > > >
-> > > > > >and to
-> > > > > >access the crypto API in kernel. I understand this is used by some
-> > > > > >Freesc ale tool, but won't it be better to fix the Freescale tool
-> > > > > >instead ?
-> > > > > 
-> > > > > the IOCTL interface is used to AES encrypt a bootstream with the AES
-> > > > > key in OCOTP.
-> > > > > The idea is that only the DCP can read/access the key once it has
-> > > > > been programmed
-> > > > > into the OCOTP. If the crypto API has means to tell the DCP to use
-> > > > > the key from OCOTP, the tool from Freescale is a minor problem.
-> > > > 
-> > > > Ah right. I suspect the crypto API services shall not be exported into
-> > > > userland at all, yes ? So there has to be some kind of workaround here
-> > > > for this freescale tool, which is rather unfortunate.
-> > > 
-> > > These ioctls have to go.  I should have never let them through in
-> > > the first place.  Can someone cook up a patch to kill them please?
-> > 
-> > I can do that. I wonder if we can't agree to nuke the in-tree driver
-> > altogether instead and replace it by this one though. Does it not sound
-> > more reasonable?
-> 
-> Bump?
+Hi Herbert,
 
-Well as it's been months and nobody has stepped up to maintain
-the in-tree driver then yes we can get rid of it.
+Is the crypto tree the right tree to go through for this support
+or would you prefer I go through another tree?
 
 Thanks,
+Tom
+
+On Tuesday, November 12, 2013 11:45:59 AM Tom Lendacky wrote:
+> Resending because of typo in mailing list address...
+> 
+> The following series implements support for the AMD Cryptographic
+> Coprocessor (CCP).  The AMD CCP provides hardware encryption, hashing
+> and other related operations.
+> 
+> This patch series is based on the 3.12 kernel.
+> 
+> ---
+> 
+> Tom Lendacky (10):
+>       crypto: authenc - Find proper IV address in ablkcipher callback
+>       crypto: scatterwalk - Set the chain pointer indication bit
+>       crypto: CCP device driver and interface support
+>       crypto: crypto API interface to the CCP device driver
+>       crypto: CCP AES crypto API support
+>       crypto: CCP AES CMAC mode crypto API support
+>       crypto: CCP XTS-AES crypto API support
+>       crypto: CCP SHA crypto API support
+>       crytpo: CCP device driver build files
+>       crypto: CCP maintainer information
+> 
+> 
+>  MAINTAINERS                              |    7
+>  crypto/authenc.c                         |    7
+>  drivers/crypto/Kconfig                   |   12
+>  drivers/crypto/Makefile                  |    1
+>  drivers/crypto/ccp/Kconfig               |   23
+>  drivers/crypto/ccp/Makefile              |   10
+>  drivers/crypto/ccp/ccp-crypto-aes-cmac.c |  355 +++++
+>  drivers/crypto/ccp/ccp-crypto-aes-xts.c  |  285 ++++
+>  drivers/crypto/ccp/ccp-crypto-aes.c      |  375 ++++++
+>  drivers/crypto/ccp/ccp-crypto-main.c     |  432 ++++++
+>  drivers/crypto/ccp/ccp-crypto-sha.c      |  497 +++++++
+>  drivers/crypto/ccp/ccp-crypto.h          |  191 +++
+>  drivers/crypto/ccp/ccp-dev.c             |  582 +++++++++
+>  drivers/crypto/ccp/ccp-dev.h             |  272 ++++
+>  drivers/crypto/ccp/ccp-ops.c             | 2020
+> ++++++++++++++++++++++++++++++ drivers/crypto/ccp/ccp-pci.c             | 
+> 360 +++++
+>  include/crypto/scatterwalk.h             |    1
+>  include/linux/ccp.h                      |  525 ++++++++
+>  18 files changed, 5952 insertions(+), 3 deletions(-)
+>  create mode 100644 drivers/crypto/ccp/Kconfig
+>  create mode 100644 drivers/crypto/ccp/Makefile
+>  create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+>  create mode 100644 drivers/crypto/ccp/ccp-crypto-aes-xts.c
+>  create mode 100644 drivers/crypto/ccp/ccp-crypto-aes.c
+>  create mode 100644 drivers/crypto/ccp/ccp-crypto-main.c
+>  create mode 100644 drivers/crypto/ccp/ccp-crypto-sha.c
+>  create mode 100644 drivers/crypto/ccp/ccp-crypto.h
+>  create mode 100644 drivers/crypto/ccp/ccp-dev.c
+>  create mode 100644 drivers/crypto/ccp/ccp-dev.h
+>  create mode 100644 drivers/crypto/ccp/ccp-ops.c
+>  create mode 100644 drivers/crypto/ccp/ccp-pci.c
+>  create mode 100644 include/linux/ccp.h
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Tom
+
+Thomas Lendacky
+Advanced Micro Devices, Inc.
