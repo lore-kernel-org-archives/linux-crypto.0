@@ -1,68 +1,54 @@
-From: Shawn Landden <shawnlandden@gmail.com>
-Subject: Re: AF_ALG buggy with sendfile
-Date: Sun, 24 Nov 2013 14:04:14 -0800
-Message-ID: <CAJusiZVxBg7=GX1-gQjXyyXznKvAnv26EWzVFu59+TBm5mGRsA@mail.gmail.com>
-References: <CAJusiZVq3O1rok20HyYaoJDWxjtBdvMbDtjCif+sCyKPzpXMNA@mail.gmail.com>
-	<CAJusiZXN4dOxg9S4ZiCziVXfNZ+=yu7a=84vUikV2RhbhYU7QA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
+From: Richard Weinberger <richard@nod.at>
+Subject: [PATCH] pipe_to_sendpage: Ensure that MSG_MORE is set if we set MSG_SENDPAGE_NOTLAST
+Date: Mon, 25 Nov 2013 00:42:07 +0100
+Message-ID: <1385336527-27304-1-git-send-email-richard@nod.at>
+References: <CAJusiZXN4dOxg9S4ZiCziVXfNZ+=yu7a=84vUikV2RhbhYU7QA@mail.gmail.com>
+Cc: linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+	shawnlandden@gmail.com, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org, herbert@gondor.apana.org.au,
+	Richard Weinberger <richard@nod.at>,
+	Tom Herbert <therbert@google.com>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, <stable@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f177.google.com ([209.85.223.177]:39580 "EHLO
-	mail-ie0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752512Ab3KXWEO (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 24 Nov 2013 17:04:14 -0500
+Received: from b.ns.miles-group.at ([95.130.255.144]:1663 "EHLO radon.swed.at"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752926Ab3KXXmY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 24 Nov 2013 18:42:24 -0500
 In-Reply-To: <CAJusiZXN4dOxg9S4ZiCziVXfNZ+=yu7a=84vUikV2RhbhYU7QA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-If you build https://kernel.googlesource.com/pub/scm/network/connman/connman/+/0.80/tools/alg-test.c
-from the connman source code and compare the output to coreutils
-sha1sum you can see the problem.
+Commit 35f9c09fe (tcp: tcp_sendpages() should call tcp_push() once)
+added an internal flag MSG_SENDPAGE_NOTLAST.
+We have to ensure that MSG_MORE is also set if we set MSG_SENDPAGE_NOTLAST.
+Otherwise users that check against MSG_MORE will not see it.
 
-shawn@debian-T61:~/git/test$ make connman_afalg
-cc     connman_afalg.c   -o connman_afalg
-shawn@debian-T61:~/git/test$ ./connman_afalg /bin/true
-send 27080 bytes
-recv 20 bytes
-45384483cf9cd0d82eba164131795b4807c6d39d  /bin/true
-shawn@debian-T61:~/git/test$ sha1sum /bin/true
-82667ba2ec681d8e55b0ee3b6db2970f9911680d  /bin/true
+This fixes sendfile() on AF_ALG.
 
-On Sun, Nov 24, 2013 at 2:00 PM, Shawn Landden <shawnlandden@gmail.com> wrote:
-> heres a version of the test case that builds.....
->
-> Sorry about that.
->
-> On Sun, Nov 24, 2013 at 9:21 AM, Shawn Landden <shawnlandden@gmail.com> wrote:
->> If I use sendfile() to send to a accept()ed AF_ALG socket set up for
->> "hash", I get the wrong
->> answer, if I read() and then write() I get the right answer. None of
->> the system calls return an error.
->>
->> test case attached.
->>
->> --
->>
->> ---
->> Shawn Landden
->> +1 360 389 3001 (SMS preferred)
->
->
->
-> --
->
-> ---
-> Shawn Landden
-> +1 360 389 3001 (SMS preferred)
-
-
-
--- 
-
+Cc: Tom Herbert <therbert@google.com>
+Cc: Eric Dumazet <eric.dumazet@gmail.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: <stable@vger.kernel.org> # 3.4.x
+Reported-and-tested-by: Shawn Landden <shawnlandden@gmail.com>
+Signed-off-by: Richard Weinberger <richard@nod.at>
 ---
-Shawn Landden
-+1 360 389 3001 (SMS preferred)
+ fs/splice.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/splice.c b/fs/splice.c
+index 3b7ee65..b93f1b8 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -701,7 +701,7 @@ static int pipe_to_sendpage(struct pipe_inode_info *pipe,
+ 	more = (sd->flags & SPLICE_F_MORE) ? MSG_MORE : 0;
+ 
+ 	if (sd->len < sd->total_len && pipe->nrbufs > 1)
+-		more |= MSG_SENDPAGE_NOTLAST;
++		more |= MSG_SENDPAGE_NOTLAST | MSG_MORE;
+ 
+ 	return file->f_op->sendpage(file, buf->page, buf->offset,
+ 				    sd->len, &pos, more);
+-- 
+1.8.1.4
