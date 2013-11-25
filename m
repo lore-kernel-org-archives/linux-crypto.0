@@ -1,7 +1,7 @@
 From: Shawn Landden <shawn@churchofgit.com>
-Subject: [PATCH] Commit 35f9c09fe (tcp: tcp_sendpages() should call tcp_push() once) added an internal flag MSG_SENDPAGE_NOTLAST, similar to MSG_MORE.
-Date: Sun, 24 Nov 2013 18:04:17 -0800
-Message-ID: <1385345057-1987-1-git-send-email-shawn@churchofgit.com>
+Subject: [PATCH] update consumers of MSG_MORE to recognize MSG_SENDPAGE_NOTLAST
+Date: Sun, 24 Nov 2013 18:08:59 -0800
+Message-ID: <1385345339-2184-1-git-send-email-shawn@churchofgit.com>
 References: <1385342706.10637.125.camel@edumazet-glaptop2.roam.corp.google.com>
 Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
@@ -12,14 +12,18 @@ Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Shawn Landden <shawn@churchofgit.com>
 To: Eric Dumazet <eric.dumazet@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f170.google.com ([209.85.192.170]:62835 "EHLO
-	mail-pd0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752965Ab3KYCFC (ORCPT
+Received: from mail-pd0-f173.google.com ([209.85.192.173]:56813 "EHLO
+	mail-pd0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752997Ab3KYCJa (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 24 Nov 2013 21:05:02 -0500
+	Sun, 24 Nov 2013 21:09:30 -0500
 In-Reply-To: <1385342706.10637.125.camel@edumazet-glaptop2.roam.corp.google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
+
+Commit 35f9c09fe (tcp: tcp_sendpages() should call tcp_push() once)
+added an internal flag MSG_SENDPAGE_NOTLAST, similar to
+MSG_MORE.
 
 algif_hash and algif_skcipher used MSG_MORE from tcp_sendpages()
 and need to see the new flag as identical to MSG_MORE.
