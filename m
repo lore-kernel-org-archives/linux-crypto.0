@@ -1,71 +1,44 @@
 From: Cesar Eduardo Barros <cesarb@cesarb.eti.br>
 Subject: Re: [PATCH] crypto: more robust crypto_memneq
-Date: Mon, 25 Nov 2013 19:56:42 -0200
-Message-ID: <5293C79A.1070808@cesarb.eti.br>
-References: <1385327535-27991-1-git-send-email-cesarb@cesarb.eti.br> <529373C7.10201@openvpn.net>
+Date: Mon, 25 Nov 2013 20:00:46 -0200
+Message-ID: <5293C88E.9000203@cesarb.eti.br>
+References: <1385327535-27991-1-git-send-email-cesarb@cesarb.eti.br> <529373C7.10201@openvpn.net> <52937A51.6070603@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.hengli.com.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Daniel Borkmann <dborkman@redhat.com>,
 	Florian Weimer <fw@deneb.enyo.de>, linux-kernel@vger.kernel.org
-To: James Yonan <james@openvpn.net>, linux-crypto@vger.kernel.org
+To: Daniel Borkmann <dborkman@redhat.com>,
+	James Yonan <james@openvpn.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from hm1480-38.locaweb.com.br ([201.76.49.169]:60533 "EHLO
-	hm1480-38.locaweb.com.br" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751005Ab3KYW22 (ORCPT
+Received: from hm1479-39.locaweb.com.br ([201.76.49.220]:35074 "EHLO
+	hm1479-39.locaweb.com.br" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751119Ab3KYWcZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Nov 2013 17:28:28 -0500
-In-Reply-To: <529373C7.10201@openvpn.net>
+	Mon, 25 Nov 2013 17:32:25 -0500
+In-Reply-To: <52937A51.6070603@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Em 25-11-2013 13:59, James Yonan escreveu:
-> On 24/11/2013 14:12, Cesar Eduardo Barros wrote:
->> Disabling compiler optimizations can be fragile, since a new
->> optimization could be added to -O0 or -Os that breaks the assumptions
->> the code is making.
+Em 25-11-2013 14:26, Daniel Borkmann escreveu:
+> On 11/25/2013 04:59 PM, James Yonan wrote:
+>> This approach using __asm__ ("" : "=r" (var) : "0" (var)) to try to
+>> prevent compiler optimizations of var is interesting.
 >>
->> Instead of disabling compiler optimizations, use a dummy inline assembly
->> (based on RELOC_HIDE) to block the problematic kinds of optimization,
->> while still allowing other optimizations to be applied to the code.
->>
->> The dummy inline assembly is added after every OR, and has the
->> accumulator variable as its input and output. The compiler is forced to
->> assume that the dummy inline assembly could both depend on the
->> accumulator variable and change the accumulator variable, so it is
->> forced to compute the value correctly before the inline assembly, and
->> cannot assume anything about its value after the inline assembly.
->>
->> This change should be enough to make crypto_memneq work correctly (with
->> data-independent timing) even if it is inlined at its call sites. That
->> can be done later in a followup patch.
->>
->> Compile-tested on x86_64.
->>
->> Signed-off-by: Cesar Eduardo Barros <cesarb@cesarb.eti.br>
+>> I like the fact that it's finer-grained than -Os and doesn't preclude
+>> inlining.
 >
-> This approach using __asm__ ("" : "=r" (var) : "0" (var)) to try to
-> prevent compiler optimizations of var is interesting.
+> Agreed. This looks much better than the Makefile workaround. Do we have
+> a hard guarantee that in future, this will not be detected and optimized
+> away by the compiler?
 
-It is not novel; I copied it from RELOC_HIDE.
-
-> I like the fact that it's finer-grained than -Os and doesn't preclude
-> inlining.
->
-> One concern would be that __asm__ could be optimized out unless
-> __volatile__ is present.
-
-It cannot be optimized out, because the __asm__'s output is used. Of 
-course, if the __asm__ output is never used, it could be optimized out, 
-but that is the desired result in this case (it means the result of 
-crypto_memneq is being ignored, so the whole function should be elided).
-
-AFAIK, __volatile__ also has the side effect that it forces ordering 
-with everything (this fact is used in the definition of the barrier() 
-macro). This level of barrier is not needed for crypto_memneq; ordering 
-on "neq" is more than enough.
+That guarantee is something only the compiler people can give you. But 
+given that RELOC_HIDE will break if that ever changes, and there are 
+other constructs depending on the optimization-blocking behavior of 
+inline assembly (like the many kinds of barriers in the kernel), I am 
+not worried about that.
 
 -- 
 Cesar Eduardo Barros
