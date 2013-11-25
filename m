@@ -1,85 +1,57 @@
-From: Richard Weinberger <richard@nod.at>
-Subject: Re: WARNING: CPU: 0 PID: 1 at init/main.c:711 do_one_initcall()
-Date: Mon, 25 Nov 2013 15:43:47 +0100
-Message-ID: <2845101.Wgsx5afvdX@sandpuppy>
-References: <20131122060223.GP9991@yliu-dev.sh.intel.com> <CAFLxGvynVV=aY755xTPTa7-57O25Dwzc+cbWELj+4xxFKznKMg@mail.gmail.com> <52935F73.4090209@panasas.com>
+From: James Yonan <james@openvpn.net>
+Subject: Re: [PATCH] crypto: more robust crypto_memneq
+Date: Mon, 25 Nov 2013 08:59:03 -0700
+Message-ID: <529373C7.10201@openvpn.net>
+References: <1385327535-27991-1-git-send-email-cesarb@cesarb.eti.br>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: LKP <fnstml-lkp@cn.fujitsu.com>,
-	Fengguang Wu <fengguang.wu@intel.com>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To: Boaz Harrosh <bharrosh@panasas.com>,
-	Yuanhan Liu <yuanhan.liu@linux.intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <52935F73.4090209@panasas.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Daniel Borkmann <dborkman@redhat.com>,
+	Florian Weimer <fw@deneb.enyo.de>, linux-kernel@vger.kernel.org
+To: Cesar Eduardo Barros <cesarb@cesarb.eti.br>,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.yonan.net ([54.244.116.145]:49823 "EHLO mail.yonan.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751809Ab3KYQIH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Nov 2013 11:08:07 -0500
+In-Reply-To: <1385327535-27991-1-git-send-email-cesarb@cesarb.eti.br>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 25. November 2013, 16:32:19 schrieb Boaz Harrosh:
-> On 11/25/2013 04:15 PM, Richard Weinberger wrote:
-> > On Fri, Nov 22, 2013 at 7:02 AM, Yuanhan Liu
-> > 
-> > <yuanhan.liu@linux.intel.com> wrote:
-> >> Greetings,
-> >> 
-> >> I got the below dmesg and the first bad commit is
-> >> 
-> >> commit 20545536cd8ea949c61527b6395ec8c0d2c237b1
-> >> Author: Boaz Harrosh <bharrosh@panasas.com>
-> >> Date:   Thu Jul 19 15:22:37 2012 +0300
-> >> 
-> >>     RFC: do_xor_speed Broken on UML do to jiffies
-> >>     
-> >>     Remember that hang I reported a while back on UML. Well
-> >>     I'm at it again, and it still hangs and I found why.
-> >>     
-> >>     I have dprinted jiffies and it never advances during the
-> >>     loop at do_xor_speed. There for it is stuck in an endless
-> >>     loop. I have also dprinted current_kernel_time() and it
-> >>     returns the same constant value as well.
-> >>     
-> >>     Note that it does usually work on UML, only during
-> >>     the modprobe of xor.ko while that test is running. It looks
-> >>     like some lucking is preventing the clock from ticking.
-> >>     
-> >>     However ktime_get_ts does work for me so I changed the code
-> >>     as below, so I can work. See how I put several safety
-> >>     guards, to never get hangs again.
-> >>     And I think my time based approach is more accurate then
-> >>     previous system.
-> >>     
-> >>     UML guys please investigate the jiffies issue? what is
-> >>     xor.ko not doing right?
-> > 
-> > This patch never hit my mailbox...
-> > 
-> >>     Signed-off-by: Boaz Harrosh <bharrosh@panasas.com>
-> 
-> Sir Richard
-> 
-> I never followed on this patch. Sorry. I do think it is in
-> the right direction, but it has a dev-by-zero problem and
-> a 32 bitness problem. (So I never sent it, beyond the initial
-> query)
-> 
-> [It stopped to be very important for me since I stopped using
->  UM very much. Ever since FC17 I'm unable to produce a running
->  image. It just will not boot, an image that a kvm would. So
->  very sad me, but no UML for me anymore.]
+On 24/11/2013 14:12, Cesar Eduardo Barros wrote:
+> Disabling compiler optimizations can be fragile, since a new
+> optimization could be added to -O0 or -Os that breaks the assumptions
+> the code is making.
+>
+> Instead of disabling compiler optimizations, use a dummy inline assembly
+> (based on RELOC_HIDE) to block the problematic kinds of optimization,
+> while still allowing other optimizations to be applied to the code.
+>
+> The dummy inline assembly is added after every OR, and has the
+> accumulator variable as its input and output. The compiler is forced to
+> assume that the dummy inline assembly could both depend on the
+> accumulator variable and change the accumulator variable, so it is
+> forced to compute the value correctly before the inline assembly, and
+> cannot assume anything about its value after the inline assembly.
+>
+> This change should be enough to make crypto_memneq work correctly (with
+> data-independent timing) even if it is inlined at its call sites. That
+> can be done later in a followup patch.
+>
+> Compile-tested on x86_64.
+>
+> Signed-off-by: Cesar Eduardo Barros <cesarb@cesarb.eti.br>
 
-Sad to hear.
-Did you try one from http://fs.devloop.org.uk/?
-Just booted a FC18 on UML. Works fine.
+This approach using __asm__ ("" : "=r" (var) : "0" (var)) to try to 
+prevent compiler optimizations of var is interesting.
 
-In the past we've had some issues with systemd-enabled distros.
-systemd uncovered problem in the UML tty driver.
+I like the fact that it's finer-grained than -Os and doesn't preclude 
+inlining.
 
-> If you want to investigate. try doing a modprobe xor.ko on
-> a uml and see. since xor.ko is only built on demand for example
-> enabling exofs or object-layout-driver will select it. ,or MD-raid5.
+One concern would be that __asm__ could be optimized out unless 
+__volatile__ is present.
 
-Ok.
-
-Thanks,
-//richard
+James
