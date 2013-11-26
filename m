@@ -1,61 +1,47 @@
-From: Shawn Landden <shawn@churchofgit.com>
-Subject: Re: [PATCH] update consumers of MSG_MORE to recognize MSG_SENDPAGE_NOTLAST
-Date: Mon, 25 Nov 2013 18:43:56 -0800
-Message-ID: <CAJusiZV-NeiAfW=O-eUDPhW-BmTh5fNTn6R86axt22=mg-HDnA@mail.gmail.com>
+From: <shh.xie@gmail.com>
+Subject: [PATCH] crypto/caam/jr.c: include linux/of_address.h
+Date: Tue, 26 Nov 2013 14:30:05 +0800
+Message-ID: <1385447405-7784-1-git-send-email-shh.xie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-	Shawn Landden <shawnlandden@gmail.com>,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Tom Herbert <therbert@google.com>,
-	"David S. Miller" <davem@davemloft.net>, stable@vger.kernel.org,
-	Richard Weinberger <richard@nod.at>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <herbert@gondor.hengli.com.au>, <davem@davemloft.net>,
+	Shaohui Xie <Shaohui.Xie@freescale.com>
+To: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from co1ehsobe005.messaging.microsoft.com ([216.32.180.188]:3961
+	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752003Ab3KZHuA (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 Nov 2013 02:50:00 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 25, 2013 at 7:36 AM, Shawn Landden <shawn@churchofgit.com> wrote:
-> Commit 35f9c09fe (tcp: tcp_sendpages() should call tcp_push() once)
-> added an internal flag MSG_SENDPAGE_NOTLAST, similar to
-> MSG_MORE.
->
-> algif_hash, algif_skcipher, and udp used MSG_MORE from tcp_sendpages()
-> and need to see the new flag as identical to MSG_MORE.
->
-> This fixes sendfile() on AF_ALG.
->
-> v3: also fix udp
->
-> Cc: Tom Herbert <therbert@google.com>
-> Cc: Eric Dumazet <eric.dumazet@gmail.com>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: <stable@vger.kernel.org> # 3.4.x + 3.2.x
-> Reported-and-tested-by: Shawn Landden <shawnlandden@gmail.com>
-> Original-patch: Richard Weinberger <richard@nod.at>
-> Signed-off-by: Shawn Landden <shawn@churchofgit.com>
+From: Shaohui Xie <Shaohui.Xie@freescale.com>
 
->May I ask why you took over the my patch without even CC'in me nor
->replying to the original
->thread "[PATCH] pipe_to_sendpage: Ensure that MSG_MORE is set if we
->set MSG_SENDPAGE_NOTLAST"?
->You are acting very rude.
-Not CCing you was an oversight.
+to avoid a compile error:
 
->The discussion at the original thread is not done.
->Does skcipher_sendpage() really also need fixing? or UDP?
+drivers/crypto/caam/jr.c: In function 'caam_jr_probe':
+drivers/crypto/caam/jr.c:468:2: error: implicit declaration of function
+'of_iomap' [-Werror=implicit-function-declaration]
+drivers/crypto/caam/jr.c:468:7: warning: assignment makes pointer from
+integer without a cast [enabled by default]
 
-UDP needs it or it will send out packets mid-sendfile. skcipher needs
-it or it will produce incorrect
-output like hash.
->I didn't send another patch because I'm waiting for Eric's answer first.
-Eric forgot to update consumers internal consumers of MSG_MORE when he created
-this distinction in sendpage. That became clear when he first
-responded. Changing this where the consumers are makes sense. I just
-want this bug fixed, feel free to send your next version.
+Signed-off-by: Shaohui Xie <Shaohui.Xie@freescale.com>
+---
+ drivers/crypto/caam/jr.c | 1 +
+ 1 file changed, 1 insertion(+)
 
->Thanks,
->//richard
-
--Shawn
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index d23356d2..1d80bd3 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -6,6 +6,7 @@
+  */
+ 
+ #include <linux/of_irq.h>
++#include <linux/of_address.h>
+ 
+ #include "compat.h"
+ #include "regs.h"
+-- 
+1.8.4.1
