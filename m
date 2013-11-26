@@ -1,32 +1,34 @@
-From: Boaz Harrosh <bharrosh@panasas.com>
-Subject: Re: WARNING: CPU: 0 PID: 1 at init/main.c:711 do_one_initcall()
-Date: Tue, 26 Nov 2013 12:54:17 +0200
-Message-ID: <52947DD9.7070807@panasas.com>
-References: <20131122060223.GP9991@yliu-dev.sh.intel.com> <529329DE.4010709@panasas.com> <20131125132542.GX9991@yliu-dev.sh.intel.com> <52935754.1070208@panasas.com> <20131126103719.GG17626@yliu-dev.sh.intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: caam - Add missing Job Ring include
+Date: Tue, 26 Nov 2013 20:59:46 +0800
+Message-ID: <20131126125946.GA27502@gondor.apana.org.au>
+References: <7301.1384748401@ale.ozlabs.ibm.com>
+ <B2B5EF0D8FDD10429C8DE6C4C2B3828209470566@039-SN2MPN1-023.039d.mgd.msft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Fengguang Wu <fengguang.wu@intel.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: Yuanhan Liu <yuanhan.liu@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Michael Neuling <mikey@neuling.org>,
+	Vakul Garg <vakul@freescale.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"sfr@canb.auug.org.au" <sfr@canb.auug.org.au>
+To: Ruchika Gupta <ruchika.gupta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from natasha.panasas.com ([209.166.131.148]:50160 "EHLO
-	natasha.panasas.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752433Ab3KZKy2 (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:39868 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753841Ab3KZM7x (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Nov 2013 05:54:28 -0500
-In-Reply-To: <20131126103719.GG17626@yliu-dev.sh.intel.com>
+	Tue, 26 Nov 2013 07:59:53 -0500
+Content-Disposition: inline
+In-Reply-To: <B2B5EF0D8FDD10429C8DE6C4C2B3828209470566@039-SN2MPN1-023.039d.mgd.msft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 11/26/2013 12:37 PM, Yuanhan Liu wrote:
-> 
-> If you like, I can add you into the build-notify list. Once the build
-> finished, you might get an email like following:
-> 
-> 	--yliu
+On Tue, Nov 19, 2013 at 04:17:31AM +0000, Ruchika Gupta wrote:
+> Acked-by: Ruchika Gupta <ruchika.gupta@freescale.com>
 
-Na, its fine. thanks though
+Patch applied to crypto.
 
-Cheers
-Boaz
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
