@@ -1,36 +1,61 @@
-From: Eric Dumazet <eric.dumazet@gmail.com>
-Subject: Re: [PATCH] pipe_to_sendpage: Ensure that MSG_MORE is set if we set
- MSG_SENDPAGE_NOTLAST
-Date: Mon, 25 Nov 2013 16:02:00 -0800
-Message-ID: <1385424120.10637.136.camel@edumazet-glaptop2.roam.corp.google.com>
-References: <CAJusiZXN4dOxg9S4ZiCziVXfNZ+=yu7a=84vUikV2RhbhYU7QA@mail.gmail.com>
-	 <1385336527-27304-1-git-send-email-richard@nod.at>
-	 <1385342706.10637.125.camel@edumazet-glaptop2.roam.corp.google.com>
-	 <47783210.a9ocpbYofP@sandpuppy>
+From: Shawn Landden <shawn@churchofgit.com>
+Subject: Re: [PATCH] update consumers of MSG_MORE to recognize MSG_SENDPAGE_NOTLAST
+Date: Mon, 25 Nov 2013 18:43:56 -0800
+Message-ID: <CAJusiZV-NeiAfW=O-eUDPhW-BmTh5fNTn6R86axt22=mg-HDnA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	viro@zeniv.linux.org.uk, shawnlandden@gmail.com,
+Content-Type: text/plain; charset=ISO-8859-1
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+	Shawn Landden <shawnlandden@gmail.com>,
 	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	herbert@gondor.apana.org.au, Tom Herbert <therbert@google.com>,
-	"David S. Miller" <davem@davemloft.net>, stable@vger.kernel.org
-To: Richard Weinberger <richard@nod.at>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <47783210.a9ocpbYofP@sandpuppy>
-Sender: stable-owner@vger.kernel.org
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Tom Herbert <therbert@google.com>,
+	"David S. Miller" <davem@davemloft.net>, stable@vger.kernel.org,
+	Richard Weinberger <richard@nod.at>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, 2013-11-25 at 08:42 +0100, Richard Weinberger wrote:
+On Mon, Nov 25, 2013 at 7:36 AM, Shawn Landden <shawn@churchofgit.com> wrote:
+> Commit 35f9c09fe (tcp: tcp_sendpages() should call tcp_push() once)
+> added an internal flag MSG_SENDPAGE_NOTLAST, similar to
+> MSG_MORE.
+>
+> algif_hash, algif_skcipher, and udp used MSG_MORE from tcp_sendpages()
+> and need to see the new flag as identical to MSG_MORE.
+>
+> This fixes sendfile() on AF_ALG.
+>
+> v3: also fix udp
+>
+> Cc: Tom Herbert <therbert@google.com>
+> Cc: Eric Dumazet <eric.dumazet@gmail.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: <stable@vger.kernel.org> # 3.4.x + 3.2.x
+> Reported-and-tested-by: Shawn Landden <shawnlandden@gmail.com>
+> Original-patch: Richard Weinberger <richard@nod.at>
+> Signed-off-by: Shawn Landden <shawn@churchofgit.com>
 
-> In the commit message of your patch you wrote "For all sendpage() providers, 
-> its a transparent change.". Why does AF_ALG need special handling?
-> If users have to care about MSG_SENDPAGE_NOTLAST it is no longer really an 
-> internal flag.
+>May I ask why you took over the my patch without even CC'in me nor
+>replying to the original
+>thread "[PATCH] pipe_to_sendpage: Ensure that MSG_MORE is set if we
+>set MSG_SENDPAGE_NOTLAST"?
+>You are acting very rude.
+Not CCing you was an oversight.
 
-MSG_SENDPAGE_NOTLAST is an internal (kernel) flag.
+>The discussion at the original thread is not done.
+>Does skcipher_sendpage() really also need fixing? or UDP?
 
-Fact that I missed some MSG_MORE 'users' in the kernel was an oversight.
+UDP needs it or it will send out packets mid-sendfile. skcipher needs
+it or it will produce incorrect
+output like hash.
+>I didn't send another patch because I'm waiting for Eric's answer first.
+Eric forgot to update consumers internal consumers of MSG_MORE when he created
+this distinction in sendpage. That became clear when he first
+responded. Changing this where the consumers are makes sense. I just
+want this bug fixed, feel free to send your next version.
 
-I am not saying your patch is not needed, I am only saying it reverts
-a useful TCP optimization, and we can do better, dont we ?
+>Thanks,
+>//richard
+
+-Shawn
