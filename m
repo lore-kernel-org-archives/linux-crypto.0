@@ -1,42 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 02/10] crypto: scatterwalk - Set the chain pointer
- indication bit
-Date: Thu, 28 Nov 2013 22:21:30 +0800
-Message-ID: <20131128142130.GC32124@gondor.apana.org.au>
-References: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
- <20131112174610.19746.91705.stgit@tlendack-t1.amdoffice.net>
+Subject: Re: [PATCH] crypto: talitos - corrrectly handle zero-length assoc
+ data
+Date: Thu, 28 Nov 2013 22:25:46 +0800
+Message-ID: <20131128142546.GD32124@gondor.apana.org.au>
+References: <1348080820-22250-4-git-send-email-horia.geanta@freescale.com>
+ <1384865869-24802-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: Horia Geanta <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:39362 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:53639 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751536Ab3K1OVe (ORCPT
+	with ESMTP id S1751271Ab3K1OZs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Nov 2013 09:21:34 -0500
+	Thu, 28 Nov 2013 09:25:48 -0500
 Content-Disposition: inline
-In-Reply-To: <20131112174610.19746.91705.stgit@tlendack-t1.amdoffice.net>
+In-Reply-To: <1384865869-24802-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 12, 2013 at 11:46:10AM -0600, Tom Lendacky wrote:
-> The scatterwalk_crypto_chain function invokes the scatterwalk_sg_chain
-> function to chain two scatterlists, but the chain pointer indication
-> bit is not set.  When the resulting scatterlist is used, for example,
-> by sg_nents to count the number of scatterlist entries, a segfault occurs
-> because sg_nents does not follow the chain pointer to the chained scatterlist.
+On Tue, Nov 19, 2013 at 02:57:49PM +0200, Horia Geanta wrote:
+> talitos does not handle well zero-length assoc data. From dmesg:
+> talitos ffe30000.crypto: master data transfer error
+> talitos ffe30000.crypto: gather return/length error
 > 
-> Update scatterwalk_sg_chain to set the chain pointer indication bit as is
-> done by the sg_chain function.
+> Check whether assoc data is provided by inspecting assoclen,
+> not assoc pointer.
+> This is needed in order to pass testmgr tests.
 > 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 
 Patch applied.  Thanks!
-
-We should also get rid of the crypto-specific SG helpers since
-the generic SG helpers are now available everywhere.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
