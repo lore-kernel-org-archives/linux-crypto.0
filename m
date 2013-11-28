@@ -1,44 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] s390/crypto: fix aes ctr concurrency issue
-Date: Thu, 28 Nov 2013 22:00:46 +0800
-Message-ID: <20131128140045.GA32124@gondor.apana.org.au>
-References: <1384856532-17247-1-git-send-email-freude@linux.vnet.ibm.com>
- <1384856532-17247-2-git-send-email-freude@linux.vnet.ibm.com>
+Subject: Re: [PATCH 01/10] crypto: authenc - Find proper IV address in
+ ablkcipher callback
+Date: Thu, 28 Nov 2013 22:18:33 +0800
+Message-ID: <20131128141832.GB32124@gondor.apana.org.au>
+References: <20131112174558.19746.47262.stgit@tlendack-t1.amdoffice.net>
+ <20131112174604.19746.83804.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>,
-	Ingo Tuchscherer <ingo.tuchscherer@linux.vnet.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-	Harald Freudenberger <freude@de.ibm.com>
-To: Harald Freudenberger <freude@linux.vnet.ibm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:44391 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751271Ab3K1OAy (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Nov 2013 09:00:54 -0500
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1384856532-17247-2-git-send-email-freude@linux.vnet.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20131112174604.19746.83804.stgit@tlendack-t1.amdoffice.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Nov 19, 2013 at 11:22:12AM +0100, Harald Freudenberger wrote:
-> The aes-ctr mode used one preallocated page without any concurrency
-> protection. When multiple threads run aes-ctr encryption or decryption
-> this could lead to data corruption.
+On Tue, Nov 12, 2013 at 11:46:04AM -0600, Tom Lendacky wrote:
+> When performing an asynchronous ablkcipher operation the authenc
+> completion callback routine is invoked, but it does not locate and use
+> the proper IV.
 > 
-> The patch introduces locking for the preallocated page and alternatively
-> allocating and freeing of an temp page in concurrency situations.
+> The callback routine, crypto_authenc_encrypt_done, is updated to use
+> the same method of calculating the address of the IV as is done in
+> crypto_authenc_encrypt function which sets up the callback.
+> 
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-You can't use mutex_lock because you may be in a non-sleepable
-context.  Perhaps just fall back to doing it block-by-block, like
-we do in aesni-intel on x86?
-
-I have to say that your hardware has a funny way of doing CTR.
-Somebody was generalising out of their backside :)
-
-Thanks,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
