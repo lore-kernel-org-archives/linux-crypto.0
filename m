@@ -1,42 +1,49 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: RE: [PATCH] crypto: remove unnecessary includes
-Date: Fri, 29 Nov 2013 12:07:07 +0000
-Message-ID: <1628287275CAA9409F1E349DEF3C6CCE77CDBE@039-SN2MPN1-012.039d.mgd.msft.net>
-References: <1385658987-16012-1-git-send-email-cristian.stoica@freescale.com>
- <20131129020657.GA5650@gondor.apana.org.au>
- <1628287275CAA9409F1E349DEF3C6CCE77CB99@039-SN2MPN1-012.039d.mgd.msft.net>
- <20131129113430.GA9542@gondor.apana.org.au>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH] update consumers of MSG_MORE to recognize
+ MSG_SENDPAGE_NOTLAST
+Date: Fri, 29 Nov 2013 16:33:39 -0500 (EST)
+Message-ID: <20131129.163339.2047522433275114284.davem@davemloft.net>
+References: <20131125042633.GA4156@order.stressinduktion.org>
+	<1385361388-2175-1-git-send-email-shawn@churchofgit.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: hannes@stressinduktion.org, eric.dumazet@gmail.com,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	viro@zeniv.linux.org.uk, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org, herbert@gondor.apana.org.au,
+	therbert@google.com, stable@vger.kernel.org
+To: shawn@churchofgit.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co1ehsobe003.messaging.microsoft.com ([216.32.180.186]:8835
-	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751813Ab3K2MHM convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Nov 2013 07:07:12 -0500
-In-Reply-To: <20131129113430.GA9542@gondor.apana.org.au>
-Content-Language: en-US
+Received: from shards.monkeyblade.net ([149.20.54.216]:54889 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752545Ab3K2Vdm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Nov 2013 16:33:42 -0500
+In-Reply-To: <1385361388-2175-1-git-send-email-shawn@churchofgit.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> On Fri, Nov 29, 2013 at 08:49:42AM +0000, Cristian Stoica wrote:
-> > >From what I could see there is nothing from those includes that is
-> used inside authenc.c.
-> > The build passes without them.
-> 
-> Just because it compiles it doesn't meant that the files you
-> removed are unnecessary.
-> 
-> The only file that is really unnecessary here is spinlock.h.
-> 
-[] 
-OK then, but let's reverse the question. In a construct similar to authenc.c, what would be the purpose of slab.h and kernel.h?
-(That leads to the next question which is - what is the purpose of those files in authenc.c?)
+From: Shawn Landden <shawn@churchofgit.com>
+Date: Sun, 24 Nov 2013 22:36:28 -0800
 
-Thanks,
-Cristian S.
+> Commit 35f9c09fe (tcp: tcp_sendpages() should call tcp_push() once)
+> added an internal flag MSG_SENDPAGE_NOTLAST, similar to
+> MSG_MORE.
+> 
+> algif_hash, algif_skcipher, and udp used MSG_MORE from tcp_sendpages()
+> and need to see the new flag as identical to MSG_MORE.
+> 
+> This fixes sendfile() on AF_ALG.
+> 
+> v3: also fix udp
+> 
+> Cc: Tom Herbert <therbert@google.com>
+> Cc: Eric Dumazet <eric.dumazet@gmail.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: <stable@vger.kernel.org> # 3.4.x + 3.2.x
+> Reported-and-tested-by: Shawn Landden <shawnlandden@gmail.com>
+> Original-patch: Richard Weinberger <richard@nod.at>
+> Signed-off-by: Shawn Landden <shawn@churchofgit.com>
+
+Applied and queued up for -stable, thanks everyone.
