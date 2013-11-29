@@ -1,35 +1,46 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH 0/2] pcrypt/padata rcu fixes
-Date: Thu, 28 Nov 2013 19:20:03 +0100
-Message-ID: <1385662805-16919-1-git-send-email-minipli@googlemail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Mathias Krause <minipli@googlemail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] s390/crypto: fix aes ctr concurrency issue
+Date: Fri, 29 Nov 2013 09:50:23 +0800
+Message-ID: <20131129015023.GA5381@gondor.apana.org.au>
+References: <1384856532-17247-1-git-send-email-freude@linux.vnet.ibm.com>
+ <1384856532-17247-2-git-send-email-freude@linux.vnet.ibm.com>
+ <20131128140045.GA32124@gondor.apana.org.au>
+ <1385653183.3131.14.camel@myubuntu10>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+	Martin Schwidefsky <schwidefsky@de.ibm.com>,
+	Ingo Tuchscherer <ingo.tuchscherer@linux.vnet.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@de.ibm.com>
+To: Harald Freudenberger <hfreude@linux.vnet.ibm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bk0-f52.google.com ([209.85.214.52]:56114 "EHLO
-	mail-bk0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754031Ab3K1SUS (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:46225 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752003Ab3K2BvJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 Nov 2013 13:20:18 -0500
-Received: by mail-bk0-f52.google.com with SMTP id u14so3892560bkz.25
-        for <linux-crypto@vger.kernel.org>; Thu, 28 Nov 2013 10:20:17 -0800 (PST)
+	Thu, 28 Nov 2013 20:51:09 -0500
+Content-Disposition: inline
+In-Reply-To: <1385653183.3131.14.camel@myubuntu10>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Two small RCU related fixes, lockdep complained about.
+On Thu, Nov 28, 2013 at 04:39:43PM +0100, Harald Freudenberger wrote:
+>
+> > You can't use mutex_lock because you may be in a non-sleepable
+> > context.  Perhaps just fall back to doing it block-by-block, like
+> > we do in aesni-intel on x86?
+> 
+> The first attempt to lock the mutex is done with mutex_trylock() which
+> should be safe for non-sleepable context. If this fails, an attempt is
+> made to allocate a fresh page __get_free_page(GFP_ATOMIC). If this also
+> fails, well what could be done then ? I think, it is valid to wait for
+> the preallocated page to get released with an mutex_lock(). Should I
+> really add code here for handling the 3rd level of the exceptional
+> path ?
 
-Please apply!
-
-
-Mathias Krause (2):
-  crypto: pcrypt - Fix wrong usage of rcu_dereference()
-  padata: Fix wrong usage of rcu_dereference()
-
- crypto/pcrypt.c |    2 +-
- kernel/padata.c |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
+If it's wrong per se, how does hiding it behind two if's make it
+OK?
 -- 
-1.7.10.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
