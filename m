@@ -1,51 +1,47 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: RE: [PATCH] crypto: remove unnecessary includes
-Date: Fri, 29 Nov 2013 08:49:42 +0000
-Message-ID: <1628287275CAA9409F1E349DEF3C6CCE77CB99@039-SN2MPN1-012.039d.mgd.msft.net>
-References: <1385658987-16012-1-git-send-email-cristian.stoica@freescale.com>
- <20131129020657.GA5650@gondor.apana.org.au>
+From: Richard Weinberger <richard@nod.at>
+Subject: Re: [PATCH] update consumers of MSG_MORE to recognize MSG_SENDPAGE_NOTLAST
+Date: Fri, 29 Nov 2013 09:50:11 +0100
+Message-ID: <5125331.5M593Q7tBS@sandpuppy>
+References: <20131125042633.GA4156@order.stressinduktion.org> <1385361388-2175-1-git-send-email-shawn@churchofgit.com> <20131129054704.GI24171@order.stressinduktion.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Transfer-Encoding: 7Bit
+Cc: Shawn Landden <shawn@churchofgit.com>,
+	Eric Dumazet <eric.dumazet@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	viro@zeniv.linux.org.uk, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	Tom Herbert <therbert@google.com>,
+	"David S. Miller" <davem@davemloft.net>, stable@vger.kernel.org
+To: Hannes Frederic Sowa <hannes@stressinduktion.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe001.messaging.microsoft.com ([216.32.180.11]:19090
-	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751016Ab3K2Itq convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Nov 2013 03:49:46 -0500
-In-Reply-To: <20131129020657.GA5650@gondor.apana.org.au>
-Content-Language: en-US
+Received: from b.ns.miles-group.at ([95.130.255.144]:1664 "EHLO radon.swed.at"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752633Ab3K2IuU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 Nov 2013 03:50:20 -0500
+In-Reply-To: <20131129054704.GI24171@order.stressinduktion.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
->From what I could see there is nothing from those includes that is used inside authenc.c.
-The build passes without them.
+Shawn,
 
-Cristian S.
-
-> > diff --git a/crypto/authenc.c b/crypto/authenc.c
-> > index 1875e70..7d4bfaa 100644
-> > --- a/crypto/authenc.c
-> > +++ b/crypto/authenc.c
-> > @@ -17,11 +17,8 @@
-> >  #include <crypto/scatterwalk.h>
-> >  #include <linux/err.h>
-> >  #include <linux/init.h>
-> > -#include <linux/kernel.h>
-> >  #include <linux/module.h>
-> >  #include <linux/rtnetlink.h>
-> > -#include <linux/slab.h>
-> > -#include <linux/spinlock.h>
-> >
-> >  typedef u8 *(*authenc_ahash_t)(struct aead_request *req, unsigned int
-> flags);
+Am Freitag, 29. November 2013, 06:47:04 schrieb Hannes Frederic Sowa:
+> On Sun, Nov 24, 2013 at 10:36:28PM -0800, Shawn Landden wrote:
+> > Commit 35f9c09fe (tcp: tcp_sendpages() should call tcp_push() once)
+> > added an internal flag MSG_SENDPAGE_NOTLAST, similar to
+> > MSG_MORE.
+> > 
+> > algif_hash, algif_skcipher, and udp used MSG_MORE from tcp_sendpages()
+> > and need to see the new flag as identical to MSG_MORE.
+> > 
+> > This fixes sendfile() on AF_ALG.
+> > 
+> > v3: also fix udp
 > 
-> Why are these includes unnecessary?
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> The UDP bits look fine to me.
+
+please don't forget to resend the patch (only the UDP fix).
+I sent the AF_ALG part already.
+
+Thanks,
+//richard
