@@ -1,49 +1,68 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH] update consumers of MSG_MORE to recognize
- MSG_SENDPAGE_NOTLAST
-Date: Fri, 29 Nov 2013 16:33:39 -0500 (EST)
-Message-ID: <20131129.163339.2047522433275114284.davem@davemloft.net>
-References: <20131125042633.GA4156@order.stressinduktion.org>
-	<1385361388-2175-1-git-send-email-shawn@churchofgit.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: hannes@stressinduktion.org, eric.dumazet@gmail.com,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	viro@zeniv.linux.org.uk, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, herbert@gondor.apana.org.au,
-	therbert@google.com, stable@vger.kernel.org
-To: shawn@churchofgit.com
+From: Marek Vasut <marex@denx.de>
+Subject: [PATCH 4/5] ARM: mxs: dts: Enable DCP for MXS
+Date: Sun,  1 Dec 2013 22:20:22 +0100
+Message-ID: <1385932823-3860-4-git-send-email-marex@denx.de>
+References: <1385932823-3860-1-git-send-email-marex@denx.de>
+Cc: Marek Vasut <marex@denx.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Fabio Estevam <fabio.estevam@freescale.com>,
+	Shawn Guo <shawn.guo@linaro.org>, linux-crypto@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:54889 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752545Ab3K2Vdm (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:52392 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750828Ab3LAVWc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Nov 2013 16:33:42 -0500
-In-Reply-To: <1385361388-2175-1-git-send-email-shawn@churchofgit.com>
+	Sun, 1 Dec 2013 16:22:32 -0500
+In-Reply-To: <1385932823-3860-1-git-send-email-marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Shawn Landden <shawn@churchofgit.com>
-Date: Sun, 24 Nov 2013 22:36:28 -0800
+Enable the DCP by default on both i.MX23 and i.MX28.
 
-> Commit 35f9c09fe (tcp: tcp_sendpages() should call tcp_push() once)
-> added an internal flag MSG_SENDPAGE_NOTLAST, similar to
-> MSG_MORE.
-> 
-> algif_hash, algif_skcipher, and udp used MSG_MORE from tcp_sendpages()
-> and need to see the new flag as identical to MSG_MORE.
-> 
-> This fixes sendfile() on AF_ALG.
-> 
-> v3: also fix udp
-> 
-> Cc: Tom Herbert <therbert@google.com>
-> Cc: Eric Dumazet <eric.dumazet@gmail.com>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: <stable@vger.kernel.org> # 3.4.x + 3.2.x
-> Reported-and-tested-by: Shawn Landden <shawnlandden@gmail.com>
-> Original-patch: Richard Weinberger <richard@nod.at>
-> Signed-off-by: Shawn Landden <shawn@churchofgit.com>
+Signed-off-by: Marek Vasut <marex@denx.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Fabio Estevam <fabio.estevam@freescale.com>
+Cc: Shawn Guo <shawn.guo@linaro.org>
+Cc: linux-crypto@vger.kernel.org
+---
+ arch/arm/boot/dts/imx23.dtsi | 4 +++-
+ arch/arm/boot/dts/imx28.dtsi | 3 ++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-Applied and queued up for -stable, thanks everyone.
+diff --git a/arch/arm/boot/dts/imx23.dtsi b/arch/arm/boot/dts/imx23.dtsi
+index c96ceae..581b754 100644
+--- a/arch/arm/boot/dts/imx23.dtsi
++++ b/arch/arm/boot/dts/imx23.dtsi
+@@ -337,8 +337,10 @@
+ 			};
+ 
+ 			dcp@80028000 {
++				compatible = "fsl,imx23-dcp";
+ 				reg = <0x80028000 0x2000>;
+-				status = "disabled";
++				interrupts = <53 54>;
++				status = "okay";
+ 			};
+ 
+ 			pxp@8002a000 {
+diff --git a/arch/arm/boot/dts/imx28.dtsi b/arch/arm/boot/dts/imx28.dtsi
+index 51ff335..08cda07 100644
+--- a/arch/arm/boot/dts/imx28.dtsi
++++ b/arch/arm/boot/dts/imx28.dtsi
+@@ -826,9 +826,10 @@
+ 			};
+ 
+ 			dcp: dcp@80028000 {
++				compatible = "fsl,imx28-dcp", "fsl,imx23-dcp";
+ 				reg = <0x80028000 0x2000>;
+ 				interrupts = <52 53 54>;
+-				compatible = "fsl-dcp";
++				status = "okay";
+ 			};
+ 
+ 			pxp: pxp@8002a000 {
+-- 
+1.8.4.2
