@@ -1,44 +1,36 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH 2/3] ARM: mxs: crypto: Add Freescale MXS DCP driver
-Date: Sun, 1 Dec 2013 23:20:43 +0100
-Message-ID: <201312012320.43292.marex@denx.de>
-References: <1380194306-5243-1-git-send-email-marex@denx.de> <201311101848.12215.marex@denx.de> <20131120112010.GA20958@gondor.apana.org.au>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH 0/2] pcrypt/padata rcu fixes
+Date: Mon, 2 Dec 2013 13:12:33 +0100
+Message-ID: <20131202121233.GP31491@secunet.com>
+References: <1385662805-16919-1-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "Christoph G. Baumann" <cb@sgoc.de>, linux-crypto@vger.kernel.org,
-	Shawn Guo <shawn.guo@linaro.org>,
-	Fabio Estevam <festevam@gmail.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Tobias Rauter <tobiasrauter@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	linux-crypto@vger.kernel.org
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:33651 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751596Ab3LAW5z (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 1 Dec 2013 17:57:55 -0500
-In-Reply-To: <20131120112010.GA20958@gondor.apana.org.au>
+Received: from a.mx.secunet.com ([195.81.216.161]:46588 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753781Ab3LBMMm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 2 Dec 2013 07:12:42 -0500
+Content-Disposition: inline
+In-Reply-To: <1385662805-16919-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
-
-[...]
-
-> > > I can do that. I wonder if we can't agree to nuke the in-tree driver
-> > > altogether instead and replace it by this one though. Does it not sound
-> > > more reasonable?
-> > 
-> > Bump?
+On Thu, Nov 28, 2013 at 07:20:03PM +0100, Mathias Krause wrote:
+> Two small RCU related fixes, lockdep complained about.
 > 
-> Well as it's been months and nobody has stepped up to maintain
-> the in-tree driver then yes we can get rid of it.
+> Please apply!
+> 
+> 
+> Mathias Krause (2):
+>   crypto: pcrypt - Fix wrong usage of rcu_dereference()
+>   padata: Fix wrong usage of rcu_dereference()
+> 
 
-OK, I updated the DCP patches and re-posted them. Thanks!
+Both
+Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
 
-Best regards,
-Marek Vasut
+Thanks!
