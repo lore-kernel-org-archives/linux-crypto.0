@@ -1,1004 +1,1232 @@
 From: Shawn Guo <shawn.guo@linaro.org>
-Subject: Re: [PATCH 2/5] ARM: mxs: crypto: Remove the old DCP driver
-Date: Tue, 3 Dec 2013 19:07:33 +0800
-Message-ID: <20131203110731.GE13726@S2101-09.ap.freescale.net>
+Subject: Re: [PATCH V2 3/5] ARM: mxs: crypto: Add Freescale MXS DCP driver
+Date: Tue, 3 Dec 2013 19:10:02 +0800
+Message-ID: <20131203110958.GF13726@S2101-09.ap.freescale.net>
 References: <1385932823-3860-1-git-send-email-marex@denx.de>
- <1385932823-3860-2-git-send-email-marex@denx.de>
+ <1385932823-3860-3-git-send-email-marex@denx.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Fabio Estevam <fabio.estevam@freescale.com>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-arm-kernel@lists.infradead.org,
- "David S. Miller" <davem@davemloft.net>
+Cc: <linux-arm-kernel@lists.infradead.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Fabio Estevam <fabio.estevam@freescale.com>,
+	<linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>
 To: Marek Vasut <marex@denx.de>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from co1ehsobe002.messaging.microsoft.com ([216.32.180.185]:1757
+	"EHLO co1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753220Ab3LCLG4 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 Dec 2013 06:06:56 -0500
 Content-Disposition: inline
-In-Reply-To: <1385932823-3860-2-git-send-email-marex@denx.de>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1385932823-3860-3-git-send-email-marex@denx.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Dec 01, 2013 at 10:20:20PM +0100, Marek Vasut wrote:
-> Remove the old DCP driver as it had multiple severe issues. The driver
-> will be replaced by a more robust implementation. Here is a short list
-> of problems with this driver:
-> 
-> 1) It only supports AES_CBC
-> 2) The driver was apparently never ran behind anyone working with MXS. ie.:
->    -> Restarting the DCP block is not done via mxs_reset_block()
->    -> The DT name is not "fsl,dcp" or "fsl,mxs-dcp" as other MXS drivers
-> 3) Introduces new ad-hoc IOCTLs
-> 4) The IRQ handler can't use usual completion() in the driver because that'd
->    trigger "scheduling while atomic" oops, yes?
+On Sun, Dec 01, 2013 at 10:20:21PM +0100, Marek Vasut wrote:
+> Add support for the MXS DCP block. The driver currently supports
+> SHA-1/SHA-256 hashing and AES-128 CBC/ECB modes. The non-standard
+> CRC32 is not yet supported.
 > 
 > Signed-off-by: Marek Vasut <marex@denx.de>
-
-Please drop "ARM: mxs: " from patch subject, since it's not a patch
-touching arch/arm/mach-mxs anyhow.  It's there confusing people.
-
-Shawn
-
 > Cc: Herbert Xu <herbert@gondor.apana.org.au>
 > Cc: David S. Miller <davem@davemloft.net>
 > Cc: Fabio Estevam <fabio.estevam@freescale.com>
 > Cc: Shawn Guo <shawn.guo@linaro.org>
 > Cc: linux-crypto@vger.kernel.org
 > ---
->  drivers/crypto/Kconfig  |  10 -
->  drivers/crypto/Makefile |   1 -
->  drivers/crypto/dcp.c    | 903 ------------------------------------------------
->  3 files changed, 914 deletions(-)
->  delete mode 100644 drivers/crypto/dcp.c
+>  .../devicetree/bindings/crypto/fsl-dcp.txt         |   18 +
+>  drivers/crypto/Kconfig                             |   17 +
+>  drivers/crypto/Makefile                            |    1 +
+>  drivers/crypto/mxs-dcp.c                           | 1100 ++++++++++++++++++++
+>  4 files changed, 1136 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/fsl-dcp.txt
+
+Since it creates new device tree bindings, please copy
+devicetree@vger.kernel.org, so that DT experts can have a chance to
+review the bindings.
+
+Shawn
+
+>  create mode 100644 drivers/crypto/mxs-dcp.c
 > 
+> V2: Use dma_{un,}map_single instead of large coherent chunk
+>       Use the DMA mapping function on DCP buffers instead of the large
+>       coherent chunk. This reduces the amount of cache flushes/invalidations
+>       and write buffer drains as we do not need to do this every time we
+>       operate with the coherent memory chunk, but only when really needed.
+>     Make sure rctx is always inited
+>       The crypto request context is not zeroed out by the crypto API. While
+>       this is not documented anywhere, it will produce arcane and hard to
+>       debug problems. Fix the DCP code so that the request context is always
+>       properly initialized.
+>     Minor code and coding-style fixes.
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/fsl-dcp.txt b/Documentation/devicetree/bindings/crypto/fsl-dcp.txt
+> new file mode 100644
+> index 0000000..ee8fbf9
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/fsl-dcp.txt
+> @@ -0,0 +1,18 @@
+> +Freescale DCP (Data Co-Processor) found on i.MX23/i.MX28 .
+> +
+> +Required properties:
+> +- compatible : Should be "fsl,<soc>-dcp"
+> +- reg : Should contain MXS DCP registers location and length
+> +- interrupts : Should contain MXS DCP interrupt numbers, VMI IRQ and DCP IRQ
+> +               must be supplied, optionally Secure IRQ can be present, but
+> +	       is currently not implemented and not used.
+> +
+> +Example:
+> +
+> +dcp@80028000 {
+> +	compatible = "fsl,imx28-dcp", "fsl,imx23-dcp";
+> +	reg = <0x80028000 0x2000>;
+> +	interrupts = <52 53>;
+> +	status = "okay";
+> +};
+> +
 > diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index f4fd837..776d308 100644
+> index 776d308..a7c2e17 100644
 > --- a/drivers/crypto/Kconfig
 > +++ b/drivers/crypto/Kconfig
-> @@ -289,16 +289,6 @@ config CRYPTO_DEV_SAHARA
->  	  This option enables support for the SAHARA HW crypto accelerator
->  	  found in some Freescale i.MX chips.
+> @@ -389,4 +389,21 @@ config CRYPTO_DEV_ATMEL_SHA
+>  	  To compile this driver as a module, choose M here: the module
+>  	  will be called atmel-sha.
 >  
-> -config CRYPTO_DEV_DCP
-> -	tristate "Support for the DCP engine"
-> -	depends on ARCH_MXS && OF
-> -	select CRYPTO_BLKCIPHER
-> -	select CRYPTO_AES
-> -	select CRYPTO_CBC
-> -	help
-> -	  This options enables support for the hardware crypto-acceleration
-> -	  capabilities of the DCP co-processor
-> -
->  config CRYPTO_DEV_S5P
->  	tristate "Support for Samsung S5PV210 crypto accelerator"
->  	depends on ARCH_S5PV210
+> +config CRYPTO_DEV_MXS_DCP
+> +	tristate "Support for Freescale MXS DCP"
+> +	depends on ARCH_MXS
+> +	select CRYPTO_SHA1
+> +	select CRYPTO_SHA256
+> +	select CRYPTO_CBC
+> +	select CRYPTO_ECB
+> +	select CRYPTO_AES
+> +	select CRYPTO_BLKCIPHER
+> +	select CRYPTO_ALGAPI
+> +	help
+> +	  The Freescale i.MX23/i.MX28 has SHA1/SHA256 and AES128 CBC/ECB
+> +	  co-processor on the die.
+> +
+> +	  To compile this driver as a module, choose M here: the module
+> +	  will be called mxs-dcp.
+> +
+>  endif # CRYPTO_HW
 > diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-> index b4946dd..38ce13d 100644
+> index 38ce13d..c7be214 100644
 > --- a/drivers/crypto/Makefile
 > +++ b/drivers/crypto/Makefile
-> @@ -13,7 +13,6 @@ obj-$(CONFIG_CRYPTO_DEV_OMAP_SHAM) += omap-sham.o
->  obj-$(CONFIG_CRYPTO_DEV_OMAP_AES) += omap-aes.o
->  obj-$(CONFIG_CRYPTO_DEV_PICOXCELL) += picoxcell_crypto.o
->  obj-$(CONFIG_CRYPTO_DEV_SAHARA) += sahara.o
-> -obj-$(CONFIG_CRYPTO_DEV_DCP) += dcp.o
->  obj-$(CONFIG_CRYPTO_DEV_S5P) += s5p-sss.o
->  obj-$(CONFIG_CRYPTO_DEV_TEGRA_AES) += tegra-aes.o
->  obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
-> diff --git a/drivers/crypto/dcp.c b/drivers/crypto/dcp.c
-> deleted file mode 100644
-> index 247ab80..0000000
-> --- a/drivers/crypto/dcp.c
-> +++ /dev/null
-> @@ -1,903 +0,0 @@
-> -/*
-> - * Cryptographic API.
-> - *
-> - * Support for DCP cryptographic accelerator.
-> - *
-> - * Copyright (c) 2013
-> - * Author: Tobias Rauter <tobias.rauter@gmail.com>
-> - *
-> - * This program is free software; you can redistribute it and/or modify
-> - * it under the terms of the GNU General Public License version 2 as published
-> - * by the Free Software Foundation.
-> - *
-> - * Based on tegra-aes.c, dcp.c (from freescale SDK) and sahara.c
-> - */
-> -#include <linux/module.h>
-> -#include <linux/init.h>
-> -#include <linux/errno.h>
-> -#include <linux/kernel.h>
-> -#include <linux/platform_device.h>
-> -#include <linux/dma-mapping.h>
-> -#include <linux/io.h>
-> -#include <linux/mutex.h>
-> -#include <linux/interrupt.h>
-> -#include <linux/completion.h>
-> -#include <linux/workqueue.h>
-> -#include <linux/delay.h>
-> -#include <linux/crypto.h>
-> -#include <linux/miscdevice.h>
-> -
-> -#include <crypto/scatterwalk.h>
-> -#include <crypto/aes.h>
-> -
-> -
-> -/* IOCTL for DCP OTP Key AES - taken from Freescale's SDK*/
-> -#define DBS_IOCTL_BASE   'd'
-> -#define DBS_ENC	_IOW(DBS_IOCTL_BASE, 0x00, uint8_t[16])
-> -#define DBS_DEC _IOW(DBS_IOCTL_BASE, 0x01, uint8_t[16])
-> -
-> -/* DCP channel used for AES */
-> -#define USED_CHANNEL 1
-> -/* Ring Buffers' maximum size */
-> -#define DCP_MAX_PKG 20
-> -
-> -/* Control Register */
-> -#define DCP_REG_CTRL 0x000
-> -#define DCP_CTRL_SFRST (1<<31)
-> -#define DCP_CTRL_CLKGATE (1<<30)
-> -#define DCP_CTRL_CRYPTO_PRESENT (1<<29)
-> -#define DCP_CTRL_SHA_PRESENT (1<<28)
-> -#define DCP_CTRL_GATHER_RES_WRITE (1<<23)
-> -#define DCP_CTRL_ENABLE_CONTEXT_CACHE (1<<22)
-> -#define DCP_CTRL_ENABLE_CONTEXT_SWITCH (1<<21)
-> -#define DCP_CTRL_CH_IRQ_E_0 0x01
-> -#define DCP_CTRL_CH_IRQ_E_1 0x02
-> -#define DCP_CTRL_CH_IRQ_E_2 0x04
-> -#define DCP_CTRL_CH_IRQ_E_3 0x08
-> -
-> -/* Status register */
-> -#define DCP_REG_STAT 0x010
-> -#define DCP_STAT_OTP_KEY_READY (1<<28)
-> -#define DCP_STAT_CUR_CHANNEL(stat) ((stat>>24)&0x0F)
-> -#define DCP_STAT_READY_CHANNEL(stat) ((stat>>16)&0x0F)
-> -#define DCP_STAT_IRQ(stat) (stat&0x0F)
-> -#define DCP_STAT_CHAN_0 (0x01)
-> -#define DCP_STAT_CHAN_1 (0x02)
-> -#define DCP_STAT_CHAN_2 (0x04)
-> -#define DCP_STAT_CHAN_3 (0x08)
-> -
-> -/* Channel Control Register */
-> -#define DCP_REG_CHAN_CTRL 0x020
-> -#define DCP_CHAN_CTRL_CH0_IRQ_MERGED (1<<16)
-> -#define DCP_CHAN_CTRL_HIGH_PRIO_0 (0x0100)
-> -#define DCP_CHAN_CTRL_HIGH_PRIO_1 (0x0200)
-> -#define DCP_CHAN_CTRL_HIGH_PRIO_2 (0x0400)
-> -#define DCP_CHAN_CTRL_HIGH_PRIO_3 (0x0800)
-> -#define DCP_CHAN_CTRL_ENABLE_0 (0x01)
-> -#define DCP_CHAN_CTRL_ENABLE_1 (0x02)
-> -#define DCP_CHAN_CTRL_ENABLE_2 (0x04)
-> -#define DCP_CHAN_CTRL_ENABLE_3 (0x08)
-> -
-> -/*
-> - * Channel Registers:
-> - * The DCP has 4 channels. Each of this channels
-> - * has 4 registers (command pointer, semaphore, status and options).
-> - * The address of register REG of channel CHAN is obtained by
-> - * dcp_chan_reg(REG, CHAN)
-> - */
-> -#define DCP_REG_CHAN_PTR	0x00000100
-> -#define DCP_REG_CHAN_SEMA	0x00000110
-> -#define DCP_REG_CHAN_STAT	0x00000120
-> -#define DCP_REG_CHAN_OPT	0x00000130
-> -
-> -#define DCP_CHAN_STAT_NEXT_CHAIN_IS_0	0x010000
-> -#define DCP_CHAN_STAT_NO_CHAIN		0x020000
-> -#define DCP_CHAN_STAT_CONTEXT_ERROR	0x030000
-> -#define DCP_CHAN_STAT_PAYLOAD_ERROR	0x040000
-> -#define DCP_CHAN_STAT_INVALID_MODE	0x050000
-> -#define DCP_CHAN_STAT_PAGEFAULT		0x40
-> -#define DCP_CHAN_STAT_DST		0x20
-> -#define DCP_CHAN_STAT_SRC		0x10
-> -#define DCP_CHAN_STAT_PACKET		0x08
-> -#define DCP_CHAN_STAT_SETUP		0x04
-> -#define DCP_CHAN_STAT_MISMATCH		0x02
-> -
-> -/* hw packet control*/
-> -
-> -#define DCP_PKT_PAYLOAD_KEY	(1<<11)
-> -#define DCP_PKT_OTP_KEY		(1<<10)
-> -#define DCP_PKT_CIPHER_INIT	(1<<9)
-> -#define DCP_PKG_CIPHER_ENCRYPT	(1<<8)
-> -#define DCP_PKT_CIPHER_ENABLE	(1<<5)
-> -#define DCP_PKT_DECR_SEM	(1<<1)
-> -#define DCP_PKT_CHAIN		(1<<2)
-> -#define DCP_PKT_IRQ		1
-> -
-> -#define DCP_PKT_MODE_CBC	(1<<4)
-> -#define DCP_PKT_KEYSELECT_OTP	(0xFF<<8)
-> -
-> -/* cipher flags */
-> -#define DCP_ENC		0x0001
-> -#define DCP_DEC		0x0002
-> -#define DCP_ECB		0x0004
-> -#define DCP_CBC		0x0008
-> -#define DCP_CBC_INIT	0x0010
-> -#define DCP_NEW_KEY	0x0040
-> -#define DCP_OTP_KEY	0x0080
-> -#define DCP_AES		0x1000
-> -
-> -/* DCP Flags */
-> -#define DCP_FLAG_BUSY	0x01
-> -#define DCP_FLAG_PRODUCING	0x02
-> -
-> -/* clock defines */
-> -#define CLOCK_ON	1
-> -#define CLOCK_OFF	0
-> -
-> -struct dcp_dev_req_ctx {
-> -	int mode;
-> -};
-> -
-> -struct dcp_op {
-> -	unsigned int		flags;
-> -	u8			key[AES_KEYSIZE_128];
-> -	int			keylen;
-> -
-> -	struct ablkcipher_request	*req;
-> -	struct crypto_ablkcipher	*fallback;
-> -
-> -	uint32_t stat;
-> -	uint32_t pkt1;
-> -	uint32_t pkt2;
-> -	struct ablkcipher_walk walk;
-> -};
-> -
-> -struct dcp_dev {
-> -	struct device *dev;
-> -	void __iomem *dcp_regs_base;
-> -
-> -	int dcp_vmi_irq;
-> -	int dcp_irq;
-> -
-> -	spinlock_t queue_lock;
-> -	struct crypto_queue queue;
-> -
-> -	uint32_t pkt_produced;
-> -	uint32_t pkt_consumed;
-> -
-> -	struct dcp_hw_packet *hw_pkg[DCP_MAX_PKG];
-> -	dma_addr_t hw_phys_pkg;
-> -
-> -	/* [KEY][IV] Both with 16 Bytes */
-> -	u8 *payload_base;
-> -	dma_addr_t payload_base_dma;
-> -
-> -
-> -	struct tasklet_struct	done_task;
-> -	struct tasklet_struct	queue_task;
-> -	struct timer_list	watchdog;
-> -
-> -	unsigned long		flags;
-> -
-> -	struct dcp_op *ctx;
-> -
-> -	struct miscdevice dcp_bootstream_misc;
-> -};
-> -
-> -struct dcp_hw_packet {
-> -	uint32_t next;
-> -	uint32_t pkt1;
-> -	uint32_t pkt2;
-> -	uint32_t src;
-> -	uint32_t dst;
-> -	uint32_t size;
-> -	uint32_t payload;
-> -	uint32_t stat;
-> -};
-> -
-> -static struct dcp_dev *global_dev;
-> -
-> -static inline u32 dcp_chan_reg(u32 reg, int chan)
-> -{
-> -	return reg + (chan) * 0x40;
-> -}
-> -
-> -static inline void dcp_write(struct dcp_dev *dev, u32 data, u32 reg)
-> -{
-> -	writel(data, dev->dcp_regs_base + reg);
-> -}
-> -
-> -static inline void dcp_set(struct dcp_dev *dev, u32 data, u32 reg)
-> -{
-> -	writel(data, dev->dcp_regs_base + (reg | 0x04));
-> -}
-> -
-> -static inline void dcp_clear(struct dcp_dev *dev, u32 data, u32 reg)
-> -{
-> -	writel(data, dev->dcp_regs_base + (reg | 0x08));
-> -}
-> -
-> -static inline void dcp_toggle(struct dcp_dev *dev, u32 data, u32 reg)
-> -{
-> -	writel(data, dev->dcp_regs_base + (reg | 0x0C));
-> -}
-> -
-> -static inline unsigned int dcp_read(struct dcp_dev *dev, u32 reg)
-> -{
-> -	return readl(dev->dcp_regs_base + reg);
-> -}
-> -
-> -static void dcp_dma_unmap(struct dcp_dev *dev, struct dcp_hw_packet *pkt)
-> -{
-> -	dma_unmap_page(dev->dev, pkt->src, pkt->size, DMA_TO_DEVICE);
-> -	dma_unmap_page(dev->dev, pkt->dst, pkt->size, DMA_FROM_DEVICE);
-> -	dev_dbg(dev->dev, "unmap packet %x", (unsigned int) pkt);
-> -}
-> -
-> -static int dcp_dma_map(struct dcp_dev *dev,
-> -	struct ablkcipher_walk *walk, struct dcp_hw_packet *pkt)
-> -{
-> -	dev_dbg(dev->dev, "map packet %x", (unsigned int) pkt);
-> -	/* align to length = 16 */
-> -	pkt->size = walk->nbytes - (walk->nbytes % 16);
-> -
-> -	pkt->src = dma_map_page(dev->dev, walk->src.page, walk->src.offset,
-> -		pkt->size, DMA_TO_DEVICE);
-> -
-> -	if (pkt->src == 0) {
-> -		dev_err(dev->dev, "Unable to map src");
-> -		return -ENOMEM;
-> -	}
-> -
-> -	pkt->dst = dma_map_page(dev->dev, walk->dst.page, walk->dst.offset,
-> -		pkt->size, DMA_FROM_DEVICE);
-> -
-> -	if (pkt->dst == 0) {
-> -		dev_err(dev->dev, "Unable to map dst");
-> -		dma_unmap_page(dev->dev, pkt->src, pkt->size, DMA_TO_DEVICE);
-> -		return -ENOMEM;
-> -	}
-> -
-> -	return 0;
-> -}
-> -
-> -static void dcp_op_one(struct dcp_dev *dev, struct dcp_hw_packet *pkt,
-> -			uint8_t last)
-> -{
-> -	struct dcp_op *ctx = dev->ctx;
-> -	pkt->pkt1 = ctx->pkt1;
-> -	pkt->pkt2 = ctx->pkt2;
-> -
-> -	pkt->payload = (u32) dev->payload_base_dma;
-> -	pkt->stat = 0;
-> -
-> -	if (ctx->flags & DCP_CBC_INIT) {
-> -		pkt->pkt1 |= DCP_PKT_CIPHER_INIT;
-> -		ctx->flags &= ~DCP_CBC_INIT;
-> -	}
-> -
-> -	mod_timer(&dev->watchdog, jiffies + msecs_to_jiffies(500));
-> -	pkt->pkt1 |= DCP_PKT_IRQ;
-> -	if (!last)
-> -		pkt->pkt1 |= DCP_PKT_CHAIN;
-> -
-> -	dev->pkt_produced++;
-> -
-> -	dcp_write(dev, 1,
-> -		dcp_chan_reg(DCP_REG_CHAN_SEMA, USED_CHANNEL));
-> -}
-> -
-> -static void dcp_op_proceed(struct dcp_dev *dev)
-> -{
-> -	struct dcp_op *ctx = dev->ctx;
-> -	struct dcp_hw_packet *pkt;
-> -
-> -	while (ctx->walk.nbytes) {
-> -		int err = 0;
-> -
-> -		pkt = dev->hw_pkg[dev->pkt_produced % DCP_MAX_PKG];
-> -		err = dcp_dma_map(dev, &ctx->walk, pkt);
-> -		if (err) {
-> -			dev->ctx->stat |= err;
-> -			/* start timer to wait for already set up calls */
-> -			mod_timer(&dev->watchdog,
-> -				jiffies + msecs_to_jiffies(500));
-> -			break;
-> -		}
-> -
-> -
-> -		err = ctx->walk.nbytes - pkt->size;
-> -		ablkcipher_walk_done(dev->ctx->req, &dev->ctx->walk, err);
-> -
-> -		dcp_op_one(dev, pkt, ctx->walk.nbytes == 0);
-> -		/* we have to wait if no space is left in buffer */
-> -		if (dev->pkt_produced - dev->pkt_consumed == DCP_MAX_PKG)
-> -			break;
-> -	}
-> -	clear_bit(DCP_FLAG_PRODUCING, &dev->flags);
-> -}
-> -
-> -static void dcp_op_start(struct dcp_dev *dev, uint8_t use_walk)
-> -{
-> -	struct dcp_op *ctx = dev->ctx;
-> -
-> -	if (ctx->flags & DCP_NEW_KEY) {
-> -		memcpy(dev->payload_base, ctx->key, ctx->keylen);
-> -		ctx->flags &= ~DCP_NEW_KEY;
-> -	}
-> -
-> -	ctx->pkt1 = 0;
-> -	ctx->pkt1 |= DCP_PKT_CIPHER_ENABLE;
-> -	ctx->pkt1 |= DCP_PKT_DECR_SEM;
-> -
-> -	if (ctx->flags & DCP_OTP_KEY)
-> -		ctx->pkt1 |= DCP_PKT_OTP_KEY;
-> -	else
-> -		ctx->pkt1 |= DCP_PKT_PAYLOAD_KEY;
-> -
-> -	if (ctx->flags & DCP_ENC)
-> -		ctx->pkt1 |= DCP_PKG_CIPHER_ENCRYPT;
-> -
-> -	ctx->pkt2 = 0;
-> -	if (ctx->flags & DCP_CBC)
-> -		ctx->pkt2 |= DCP_PKT_MODE_CBC;
-> -
-> -	dev->pkt_produced = 0;
-> -	dev->pkt_consumed = 0;
-> -
-> -	ctx->stat = 0;
-> -	dcp_clear(dev, -1, dcp_chan_reg(DCP_REG_CHAN_STAT, USED_CHANNEL));
-> -	dcp_write(dev, (u32) dev->hw_phys_pkg,
-> -		dcp_chan_reg(DCP_REG_CHAN_PTR, USED_CHANNEL));
-> -
-> -	set_bit(DCP_FLAG_PRODUCING, &dev->flags);
-> -
-> -	if (use_walk) {
-> -		ablkcipher_walk_init(&ctx->walk, ctx->req->dst,
-> -				ctx->req->src, ctx->req->nbytes);
-> -		ablkcipher_walk_phys(ctx->req, &ctx->walk);
-> -		dcp_op_proceed(dev);
-> -	} else {
-> -		dcp_op_one(dev, dev->hw_pkg[0], 1);
-> -		clear_bit(DCP_FLAG_PRODUCING, &dev->flags);
-> -	}
-> -}
-> -
-> -static void dcp_done_task(unsigned long data)
-> -{
-> -	struct dcp_dev *dev = (struct dcp_dev *)data;
-> -	struct dcp_hw_packet *last_packet;
-> -	int fin;
-> -	fin = 0;
-> -
-> -	for (last_packet = dev->hw_pkg[(dev->pkt_consumed) % DCP_MAX_PKG];
-> -		last_packet->stat == 1;
-> -		last_packet =
-> -			dev->hw_pkg[++(dev->pkt_consumed) % DCP_MAX_PKG]) {
-> -
-> -		dcp_dma_unmap(dev, last_packet);
-> -		last_packet->stat = 0;
-> -		fin++;
-> -	}
-> -	/* the last call of this function already consumed this IRQ's packet */
-> -	if (fin == 0)
-> -		return;
-> -
-> -	dev_dbg(dev->dev,
-> -		"Packet(s) done with status %x; finished: %d, produced:%d, complete consumed: %d",
-> -		dev->ctx->stat, fin, dev->pkt_produced, dev->pkt_consumed);
-> -
-> -	last_packet = dev->hw_pkg[(dev->pkt_consumed - 1) % DCP_MAX_PKG];
-> -	if (!dev->ctx->stat && last_packet->pkt1 & DCP_PKT_CHAIN) {
-> -		if (!test_and_set_bit(DCP_FLAG_PRODUCING, &dev->flags))
-> -			dcp_op_proceed(dev);
-> -		return;
-> -	}
-> -
-> -	while (unlikely(dev->pkt_consumed < dev->pkt_produced)) {
-> -		dcp_dma_unmap(dev,
-> -			dev->hw_pkg[dev->pkt_consumed++ % DCP_MAX_PKG]);
-> -	}
-> -
-> -	if (dev->ctx->flags & DCP_OTP_KEY) {
-> -		/* we used the miscdevice, no walk to finish */
-> -		clear_bit(DCP_FLAG_BUSY, &dev->flags);
-> -		return;
-> -	}
-> -
-> -	ablkcipher_walk_complete(&dev->ctx->walk);
-> -	dev->ctx->req->base.complete(&dev->ctx->req->base,
-> -			dev->ctx->stat);
-> -	dev->ctx->req = NULL;
-> -	/* in case there are other requests in the queue */
-> -	tasklet_schedule(&dev->queue_task);
-> -}
-> -
-> -static void dcp_watchdog(unsigned long data)
-> -{
-> -	struct dcp_dev *dev = (struct dcp_dev *)data;
-> -	dev->ctx->stat |= dcp_read(dev,
-> -			dcp_chan_reg(DCP_REG_CHAN_STAT, USED_CHANNEL));
-> -
-> -	dev_err(dev->dev, "Timeout, Channel status: %x", dev->ctx->stat);
-> -
-> -	if (!dev->ctx->stat)
-> -		dev->ctx->stat = -ETIMEDOUT;
-> -
-> -	dcp_done_task(data);
-> -}
-> -
-> -
-> -static irqreturn_t dcp_common_irq(int irq, void *context)
-> -{
-> -	u32 msk;
-> -	struct dcp_dev *dev = (struct dcp_dev *) context;
-> -
-> -	del_timer(&dev->watchdog);
-> -
-> -	msk = DCP_STAT_IRQ(dcp_read(dev, DCP_REG_STAT));
-> -	dcp_clear(dev, msk, DCP_REG_STAT);
-> -	if (msk == 0)
-> -		return IRQ_NONE;
-> -
-> -	dev->ctx->stat |= dcp_read(dev,
-> -			dcp_chan_reg(DCP_REG_CHAN_STAT, USED_CHANNEL));
-> -
-> -	if (msk & DCP_STAT_CHAN_1)
-> -		tasklet_schedule(&dev->done_task);
-> -
-> -	return IRQ_HANDLED;
-> -}
-> -
-> -static irqreturn_t dcp_vmi_irq(int irq, void *context)
-> -{
-> -	return dcp_common_irq(irq, context);
-> -}
-> -
-> -static irqreturn_t dcp_irq(int irq, void *context)
-> -{
-> -	return dcp_common_irq(irq, context);
-> -}
-> -
-> -static void dcp_crypt(struct dcp_dev *dev, struct dcp_op *ctx)
-> -{
-> -	dev->ctx = ctx;
-> -
-> -	if ((ctx->flags & DCP_CBC) && ctx->req->info) {
-> -		ctx->flags |= DCP_CBC_INIT;
-> -		memcpy(dev->payload_base + AES_KEYSIZE_128,
-> -			ctx->req->info, AES_KEYSIZE_128);
-> -	}
-> -
-> -	dcp_op_start(dev, 1);
-> -}
-> -
-> -static void dcp_queue_task(unsigned long data)
-> -{
-> -	struct dcp_dev *dev = (struct dcp_dev *) data;
-> -	struct crypto_async_request *async_req, *backlog;
-> -	struct crypto_ablkcipher *tfm;
-> -	struct dcp_op *ctx;
-> -	struct dcp_dev_req_ctx *rctx;
-> -	struct ablkcipher_request *req;
-> -	unsigned long flags;
-> -
-> -	spin_lock_irqsave(&dev->queue_lock, flags);
-> -
-> -	backlog = crypto_get_backlog(&dev->queue);
-> -	async_req = crypto_dequeue_request(&dev->queue);
-> -
-> -	spin_unlock_irqrestore(&dev->queue_lock, flags);
-> -
-> -	if (!async_req)
-> -		goto ret_nothing_done;
-> -
-> -	if (backlog)
-> -		backlog->complete(backlog, -EINPROGRESS);
-> -
-> -	req = ablkcipher_request_cast(async_req);
-> -	tfm = crypto_ablkcipher_reqtfm(req);
-> -	rctx = ablkcipher_request_ctx(req);
-> -	ctx = crypto_ablkcipher_ctx(tfm);
-> -
-> -	if (!req->src || !req->dst)
-> -		goto ret_nothing_done;
-> -
-> -	ctx->flags |= rctx->mode;
-> -	ctx->req = req;
-> -
-> -	dcp_crypt(dev, ctx);
-> -
-> -	return;
-> -
-> -ret_nothing_done:
-> -	clear_bit(DCP_FLAG_BUSY, &dev->flags);
-> -}
-> -
-> -
-> -static int dcp_cra_init(struct crypto_tfm *tfm)
-> -{
-> -	const char *name = tfm->__crt_alg->cra_name;
-> -	struct dcp_op *ctx = crypto_tfm_ctx(tfm);
-> -
-> -	tfm->crt_ablkcipher.reqsize = sizeof(struct dcp_dev_req_ctx);
-> -
-> -	ctx->fallback = crypto_alloc_ablkcipher(name, 0,
-> -				CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
-> -
-> -	if (IS_ERR(ctx->fallback)) {
-> -		dev_err(global_dev->dev, "Error allocating fallback algo %s\n",
-> -			name);
-> -		return PTR_ERR(ctx->fallback);
-> -	}
-> -
-> -	return 0;
-> -}
-> -
-> -static void dcp_cra_exit(struct crypto_tfm *tfm)
-> -{
-> -	struct dcp_op *ctx = crypto_tfm_ctx(tfm);
-> -
-> -	if (ctx->fallback)
-> -		crypto_free_ablkcipher(ctx->fallback);
-> -
-> -	ctx->fallback = NULL;
-> -}
-> -
-> -/* async interface */
-> -static int dcp_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
-> -		unsigned int len)
-> -{
-> -	struct dcp_op *ctx = crypto_ablkcipher_ctx(tfm);
-> -	unsigned int ret = 0;
-> -	ctx->keylen = len;
-> -	ctx->flags = 0;
-> -	if (len == AES_KEYSIZE_128) {
-> -		if (memcmp(ctx->key, key, AES_KEYSIZE_128)) {
-> -			memcpy(ctx->key, key, len);
-> -			ctx->flags |= DCP_NEW_KEY;
-> -		}
-> -		return 0;
-> -	}
-> -
-> -	ctx->fallback->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
-> -	ctx->fallback->base.crt_flags |=
-> -		(tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK);
-> -
-> -	ret = crypto_ablkcipher_setkey(ctx->fallback, key, len);
-> -	if (ret) {
-> -		struct crypto_tfm *tfm_aux = crypto_ablkcipher_tfm(tfm);
-> -
-> -		tfm_aux->crt_flags &= ~CRYPTO_TFM_RES_MASK;
-> -		tfm_aux->crt_flags |=
-> -			(ctx->fallback->base.crt_flags & CRYPTO_TFM_RES_MASK);
-> -	}
-> -	return ret;
-> -}
-> -
-> -static int dcp_aes_cbc_crypt(struct ablkcipher_request *req, int mode)
-> -{
-> -	struct dcp_dev_req_ctx *rctx = ablkcipher_request_ctx(req);
-> -	struct dcp_dev *dev = global_dev;
-> -	unsigned long flags;
-> -	int err = 0;
-> -
-> -	if (!IS_ALIGNED(req->nbytes, AES_BLOCK_SIZE))
-> -		return -EINVAL;
-> -
-> -	rctx->mode = mode;
-> -
-> -	spin_lock_irqsave(&dev->queue_lock, flags);
-> -	err = ablkcipher_enqueue_request(&dev->queue, req);
-> -	spin_unlock_irqrestore(&dev->queue_lock, flags);
-> -
-> -	flags = test_and_set_bit(DCP_FLAG_BUSY, &dev->flags);
-> -
-> -	if (!(flags & DCP_FLAG_BUSY))
-> -		tasklet_schedule(&dev->queue_task);
-> -
-> -	return err;
-> -}
-> -
-> -static int dcp_aes_cbc_encrypt(struct ablkcipher_request *req)
-> -{
-> -	struct crypto_tfm *tfm =
-> -		crypto_ablkcipher_tfm(crypto_ablkcipher_reqtfm(req));
-> -	struct dcp_op *ctx = crypto_ablkcipher_ctx(
-> -		crypto_ablkcipher_reqtfm(req));
-> -
-> -	if (unlikely(ctx->keylen != AES_KEYSIZE_128)) {
-> -		int err = 0;
-> -		ablkcipher_request_set_tfm(req, ctx->fallback);
-> -		err = crypto_ablkcipher_encrypt(req);
-> -		ablkcipher_request_set_tfm(req, __crypto_ablkcipher_cast(tfm));
-> -		return err;
-> -	}
-> -
-> -	return dcp_aes_cbc_crypt(req, DCP_AES | DCP_ENC | DCP_CBC);
-> -}
-> -
-> -static int dcp_aes_cbc_decrypt(struct ablkcipher_request *req)
-> -{
-> -	struct crypto_tfm *tfm =
-> -		crypto_ablkcipher_tfm(crypto_ablkcipher_reqtfm(req));
-> -	struct dcp_op *ctx = crypto_ablkcipher_ctx(
-> -		crypto_ablkcipher_reqtfm(req));
-> -
-> -	if (unlikely(ctx->keylen != AES_KEYSIZE_128)) {
-> -		int err = 0;
-> -		ablkcipher_request_set_tfm(req, ctx->fallback);
-> -		err = crypto_ablkcipher_decrypt(req);
-> -		ablkcipher_request_set_tfm(req, __crypto_ablkcipher_cast(tfm));
-> -		return err;
-> -	}
-> -	return dcp_aes_cbc_crypt(req, DCP_AES | DCP_DEC | DCP_CBC);
-> -}
-> -
-> -static struct crypto_alg algs[] = {
-> -	{
-> -		.cra_name = "cbc(aes)",
-> -		.cra_driver_name = "dcp-cbc-aes",
-> -		.cra_alignmask = 3,
-> -		.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC |
-> -			  CRYPTO_ALG_NEED_FALLBACK,
-> -		.cra_blocksize = AES_KEYSIZE_128,
-> -		.cra_type = &crypto_ablkcipher_type,
-> -		.cra_priority = 300,
-> -		.cra_u.ablkcipher = {
-> -			.min_keysize =	AES_KEYSIZE_128,
-> -			.max_keysize = AES_KEYSIZE_128,
-> -			.setkey = dcp_aes_setkey,
-> -			.encrypt = dcp_aes_cbc_encrypt,
-> -			.decrypt = dcp_aes_cbc_decrypt,
-> -			.ivsize = AES_KEYSIZE_128,
-> -		}
-> -
-> -	},
-> -};
-> -
-> -/* DCP bootstream verification interface: uses OTP key for crypto */
-> -static int dcp_bootstream_open(struct inode *inode, struct file *file)
-> -{
-> -	file->private_data = container_of((file->private_data),
-> -			struct dcp_dev, dcp_bootstream_misc);
-> -	return 0;
-> -}
-> -
-> -static long dcp_bootstream_ioctl(struct file *file,
-> -					 unsigned int cmd, unsigned long arg)
-> -{
-> -	struct dcp_dev *dev = (struct dcp_dev *) file->private_data;
-> -	void __user *argp = (void __user *)arg;
-> -	int ret;
-> -
-> -	if (dev == NULL)
-> -		return -EBADF;
-> -
-> -	if (cmd != DBS_ENC && cmd != DBS_DEC)
-> -		return -EINVAL;
-> -
-> -	if (copy_from_user(dev->payload_base, argp, 16))
-> -		return -EFAULT;
-> -
-> -	if (test_and_set_bit(DCP_FLAG_BUSY, &dev->flags))
-> -		return -EAGAIN;
-> -
-> -	dev->ctx = kzalloc(sizeof(struct dcp_op), GFP_KERNEL);
-> -	if (!dev->ctx) {
-> -		dev_err(dev->dev,
-> -			"cannot allocate context for OTP crypto");
-> -		clear_bit(DCP_FLAG_BUSY, &dev->flags);
-> -		return -ENOMEM;
-> -	}
-> -
-> -	dev->ctx->flags = DCP_AES | DCP_ECB | DCP_OTP_KEY | DCP_CBC_INIT;
-> -	dev->ctx->flags |= (cmd == DBS_ENC) ? DCP_ENC : DCP_DEC;
-> -	dev->hw_pkg[0]->src = dev->payload_base_dma;
-> -	dev->hw_pkg[0]->dst = dev->payload_base_dma;
-> -	dev->hw_pkg[0]->size = 16;
-> -
-> -	dcp_op_start(dev, 0);
-> -
-> -	while (test_bit(DCP_FLAG_BUSY, &dev->flags))
-> -		cpu_relax();
-> -
-> -	ret = dev->ctx->stat;
-> -	if (!ret && copy_to_user(argp, dev->payload_base, 16))
-> -		ret =  -EFAULT;
-> -
-> -	kfree(dev->ctx);
-> -
-> -	return ret;
-> -}
-> -
-> -static const struct file_operations dcp_bootstream_fops = {
-> -	.owner =		THIS_MODULE,
-> -	.unlocked_ioctl =	dcp_bootstream_ioctl,
-> -	.open =			dcp_bootstream_open,
-> -};
-> -
-> -static int dcp_probe(struct platform_device *pdev)
-> -{
-> -	struct dcp_dev *dev = NULL;
-> -	struct resource *r;
-> -	int i, ret, j;
-> -
-> -	dev = devm_kzalloc(&pdev->dev, sizeof(*dev), GFP_KERNEL);
-> -	if (!dev)
-> -		return -ENOMEM;
-> -
-> -	global_dev = dev;
-> -	dev->dev = &pdev->dev;
-> -
-> -	platform_set_drvdata(pdev, dev);
-> -
-> -	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-> -	dev->dcp_regs_base = devm_ioremap_resource(&pdev->dev, r);
-> -	if (IS_ERR(dev->dcp_regs_base))
-> -		return PTR_ERR(dev->dcp_regs_base);
-> -
-> -	dcp_set(dev, DCP_CTRL_SFRST, DCP_REG_CTRL);
-> -	udelay(10);
-> -	dcp_clear(dev, DCP_CTRL_SFRST | DCP_CTRL_CLKGATE, DCP_REG_CTRL);
-> -
-> -	dcp_write(dev, DCP_CTRL_GATHER_RES_WRITE |
-> -		DCP_CTRL_ENABLE_CONTEXT_CACHE | DCP_CTRL_CH_IRQ_E_1,
-> -		DCP_REG_CTRL);
-> -
-> -	dcp_write(dev, DCP_CHAN_CTRL_ENABLE_1, DCP_REG_CHAN_CTRL);
-> -
-> -	for (i = 0; i < 4; i++)
-> -		dcp_clear(dev, -1, dcp_chan_reg(DCP_REG_CHAN_STAT, i));
-> -
-> -	dcp_clear(dev, -1, DCP_REG_STAT);
-> -
-> -
-> -	r = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
-> -	if (!r) {
-> -		dev_err(&pdev->dev, "can't get IRQ resource (0)\n");
-> -		return -EIO;
-> -	}
-> -	dev->dcp_vmi_irq = r->start;
-> -	ret = devm_request_irq(&pdev->dev, dev->dcp_vmi_irq, dcp_vmi_irq, 0,
-> -			       "dcp", dev);
-> -	if (ret != 0) {
-> -		dev_err(&pdev->dev, "can't request_irq (0)\n");
-> -		return -EIO;
-> -	}
-> -
-> -	r = platform_get_resource(pdev, IORESOURCE_IRQ, 1);
-> -	if (!r) {
-> -		dev_err(&pdev->dev, "can't get IRQ resource (1)\n");
-> -		return -EIO;
-> -	}
-> -	dev->dcp_irq = r->start;
-> -	ret = devm_request_irq(&pdev->dev, dev->dcp_irq, dcp_irq, 0, "dcp",
-> -			       dev);
-> -	if (ret != 0) {
-> -		dev_err(&pdev->dev, "can't request_irq (1)\n");
-> -		return -EIO;
-> -	}
-> -
-> -	dev->hw_pkg[0] = dma_alloc_coherent(&pdev->dev,
-> -			DCP_MAX_PKG * sizeof(struct dcp_hw_packet),
-> -			&dev->hw_phys_pkg,
-> -			GFP_KERNEL);
-> -	if (!dev->hw_pkg[0]) {
-> -		dev_err(&pdev->dev, "Could not allocate hw descriptors\n");
-> -		return -ENOMEM;
-> -	}
-> -
-> -	for (i = 1; i < DCP_MAX_PKG; i++) {
-> -		dev->hw_pkg[i - 1]->next = dev->hw_phys_pkg
-> -				+ i * sizeof(struct dcp_hw_packet);
-> -		dev->hw_pkg[i] = dev->hw_pkg[i - 1] + 1;
-> -	}
-> -	dev->hw_pkg[i - 1]->next = dev->hw_phys_pkg;
-> -
-> -
-> -	dev->payload_base = dma_alloc_coherent(&pdev->dev, 2 * AES_KEYSIZE_128,
-> -			&dev->payload_base_dma, GFP_KERNEL);
-> -	if (!dev->payload_base) {
-> -		dev_err(&pdev->dev, "Could not allocate memory for key\n");
-> -		ret = -ENOMEM;
-> -		goto err_free_hw_packet;
-> -	}
-> -	tasklet_init(&dev->queue_task, dcp_queue_task,
-> -		(unsigned long) dev);
-> -	tasklet_init(&dev->done_task, dcp_done_task,
-> -		(unsigned long) dev);
-> -	spin_lock_init(&dev->queue_lock);
-> -
-> -	crypto_init_queue(&dev->queue, 10);
-> -
-> -	init_timer(&dev->watchdog);
-> -	dev->watchdog.function = &dcp_watchdog;
-> -	dev->watchdog.data = (unsigned long)dev;
-> -
-> -	dev->dcp_bootstream_misc.minor = MISC_DYNAMIC_MINOR,
-> -	dev->dcp_bootstream_misc.name = "dcpboot",
-> -	dev->dcp_bootstream_misc.fops = &dcp_bootstream_fops,
-> -	ret = misc_register(&dev->dcp_bootstream_misc);
-> -	if (ret != 0) {
-> -		dev_err(dev->dev, "Unable to register misc device\n");
-> -		goto err_free_key_iv;
-> -	}
-> -
-> -	for (i = 0; i < ARRAY_SIZE(algs); i++) {
-> -		algs[i].cra_priority = 300;
-> -		algs[i].cra_ctxsize = sizeof(struct dcp_op);
-> -		algs[i].cra_module = THIS_MODULE;
-> -		algs[i].cra_init = dcp_cra_init;
-> -		algs[i].cra_exit = dcp_cra_exit;
-> -		if (crypto_register_alg(&algs[i])) {
-> -			dev_err(&pdev->dev, "register algorithm failed\n");
-> -			ret = -ENOMEM;
-> -			goto err_unregister;
-> -		}
-> -	}
-> -	dev_notice(&pdev->dev, "DCP crypto enabled.!\n");
-> -
-> -	return 0;
-> -
-> -err_unregister:
-> -	for (j = 0; j < i; j++)
-> -		crypto_unregister_alg(&algs[j]);
-> -err_free_key_iv:
-> -	tasklet_kill(&dev->done_task);
-> -	tasklet_kill(&dev->queue_task);
-> -	dma_free_coherent(&pdev->dev, 2 * AES_KEYSIZE_128, dev->payload_base,
-> -			dev->payload_base_dma);
-> -err_free_hw_packet:
-> -	dma_free_coherent(&pdev->dev, DCP_MAX_PKG *
-> -		sizeof(struct dcp_hw_packet), dev->hw_pkg[0],
-> -		dev->hw_phys_pkg);
-> -
-> -	return ret;
-> -}
-> -
-> -static int dcp_remove(struct platform_device *pdev)
-> -{
-> -	struct dcp_dev *dev;
-> -	int j;
-> -	dev = platform_get_drvdata(pdev);
-> -
-> -	misc_deregister(&dev->dcp_bootstream_misc);
-> -
-> -	for (j = 0; j < ARRAY_SIZE(algs); j++)
-> -		crypto_unregister_alg(&algs[j]);
-> -
-> -	tasklet_kill(&dev->done_task);
-> -	tasklet_kill(&dev->queue_task);
-> -
-> -	dma_free_coherent(&pdev->dev, 2 * AES_KEYSIZE_128, dev->payload_base,
-> -			dev->payload_base_dma);
-> -
-> -	dma_free_coherent(&pdev->dev,
-> -			DCP_MAX_PKG * sizeof(struct dcp_hw_packet),
-> -			dev->hw_pkg[0],	dev->hw_phys_pkg);
-> -
-> -	return 0;
-> -}
-> -
-> -static struct of_device_id fs_dcp_of_match[] = {
-> -	{	.compatible = "fsl-dcp"},
-> -	{},
-> -};
-> -
-> -static struct platform_driver fs_dcp_driver = {
-> -	.probe = dcp_probe,
-> -	.remove = dcp_remove,
-> -	.driver = {
-> -		.name = "fsl-dcp",
-> -		.owner = THIS_MODULE,
-> -		.of_match_table = fs_dcp_of_match
-> -	}
-> -};
-> -
-> -module_platform_driver(fs_dcp_driver);
-> -
-> -
-> -MODULE_AUTHOR("Tobias Rauter <tobias.rauter@gmail.com>");
-> -MODULE_DESCRIPTION("Freescale DCP Crypto Driver");
-> -MODULE_LICENSE("GPL");
+> @@ -21,3 +21,4 @@ obj-$(CONFIG_CRYPTO_DEV_NX) += nx/
+>  obj-$(CONFIG_CRYPTO_DEV_ATMEL_AES) += atmel-aes.o
+>  obj-$(CONFIG_CRYPTO_DEV_ATMEL_TDES) += atmel-tdes.o
+>  obj-$(CONFIG_CRYPTO_DEV_ATMEL_SHA) += atmel-sha.o
+> +obj-$(CONFIG_CRYPTO_DEV_MXS_DCP) += mxs-dcp.o
+> diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+> new file mode 100644
+> index 0000000..d41917c
+> --- /dev/null
+> +++ b/drivers/crypto/mxs-dcp.c
+> @@ -0,0 +1,1100 @@
+> +/*
+> + * Freescale i.MX23/i.MX28 Data Co-Processor driver
+> + *
+> + * Copyright (C) 2013 Marek Vasut <marex@denx.de>
+> + *
+> + * The code contained herein is licensed under the GNU General Public
+> + * License. You may obtain a copy of the GNU General Public License
+> + * Version 2 or later at the following locations:
+> + *
+> + * http://www.opensource.org/licenses/gpl-license.html
+> + * http://www.gnu.org/copyleft/gpl.html
+> + */
+> +
+> +#include <linux/crypto.h>
+> +#include <linux/dma-mapping.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/io.h>
+> +#include <linux/kernel.h>
+> +#include <linux/kthread.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/stmp_device.h>
+> +
+> +#include <crypto/aes.h>
+> +#include <crypto/sha.h>
+> +#include <crypto/internal/hash.h>
+> +
+> +#define DCP_MAX_CHANS	4
+> +#define DCP_BUF_SZ	PAGE_SIZE
+> +
+> +/* DCP DMA descriptor. */
+> +struct dcp_dma_desc {
+> +	uint32_t	next_cmd_addr;
+> +	uint32_t	control0;
+> +	uint32_t	control1;
+> +	uint32_t	source;
+> +	uint32_t	destination;
+> +	uint32_t	size;
+> +	uint32_t	payload;
+> +	uint32_t	status;
+> +};
+> +
+> +/* Coherent aligned block for bounce buffering. */
+> +struct dcp_coherent_block {
+> +	uint8_t			aes_in_buf[DCP_BUF_SZ];
+> +	uint8_t			aes_out_buf[DCP_BUF_SZ];
+> +	uint8_t			sha_in_buf[DCP_BUF_SZ];
+> +
+> +	uint8_t			aes_key[2 * AES_KEYSIZE_128];
+> +	uint8_t			sha_digest[SHA256_DIGEST_SIZE];
+> +
+> +	struct dcp_dma_desc	desc[DCP_MAX_CHANS];
+> +};
+> +
+> +struct dcp {
+> +	struct device			*dev;
+> +	void __iomem			*base;
+> +
+> +	uint32_t			caps;
+> +
+> +	struct dcp_coherent_block	*coh;
+> +
+> +	struct completion		completion[DCP_MAX_CHANS];
+> +	struct mutex			mutex[DCP_MAX_CHANS];
+> +	struct task_struct		*thread[DCP_MAX_CHANS];
+> +	struct crypto_queue		queue[DCP_MAX_CHANS];
+> +};
+> +
+> +enum dcp_chan {
+> +	DCP_CHAN_HASH_SHA	= 0,
+> +	DCP_CHAN_CRYPTO		= 2,
+> +};
+> +
+> +struct dcp_async_ctx {
+> +	/* Common context */
+> +	enum dcp_chan	chan;
+> +	uint32_t	fill;
+> +
+> +	/* SHA Hash-specific context */
+> +	struct mutex			mutex;
+> +	uint32_t			alg;
+> +	unsigned int			hot:1;
+> +
+> +	/* Crypto-specific context */
+> +	unsigned int			enc:1;
+> +	unsigned int			ecb:1;
+> +	struct crypto_ablkcipher	*fallback;
+> +	unsigned int			key_len;
+> +	uint8_t				key[AES_KEYSIZE_128];
+> +};
+> +
+> +struct dcp_sha_req_ctx {
+> +	unsigned int	init:1;
+> +	unsigned int	fini:1;
+> +};
+> +
+> +/*
+> + * There can even be only one instance of the MXS DCP due to the
+> + * design of Linux Crypto API.
+> + */
+> +static struct dcp *global_sdcp;
+> +DEFINE_MUTEX(global_mutex);
+> +
+> +/* DCP register layout. */
+> +#define MXS_DCP_CTRL				0x00
+> +#define MXS_DCP_CTRL_GATHER_RESIDUAL_WRITES	(1 << 23)
+> +#define MXS_DCP_CTRL_ENABLE_CONTEXT_CACHING	(1 << 22)
+> +
+> +#define MXS_DCP_STAT				0x10
+> +#define MXS_DCP_STAT_CLR			0x18
+> +#define MXS_DCP_STAT_IRQ_MASK			0xf
+> +
+> +#define MXS_DCP_CHANNELCTRL			0x20
+> +#define MXS_DCP_CHANNELCTRL_ENABLE_CHANNEL_MASK	0xff
+> +
+> +#define MXS_DCP_CAPABILITY1			0x40
+> +#define MXS_DCP_CAPABILITY1_SHA256		(4 << 16)
+> +#define MXS_DCP_CAPABILITY1_SHA1		(1 << 16)
+> +#define MXS_DCP_CAPABILITY1_AES128		(1 << 0)
+> +
+> +#define MXS_DCP_CONTEXT				0x50
+> +
+> +#define MXS_DCP_CH_N_CMDPTR(n)			(0x100 + ((n) * 0x40))
+> +
+> +#define MXS_DCP_CH_N_SEMA(n)			(0x110 + ((n) * 0x40))
+> +
+> +#define MXS_DCP_CH_N_STAT(n)			(0x120 + ((n) * 0x40))
+> +#define MXS_DCP_CH_N_STAT_CLR(n)		(0x128 + ((n) * 0x40))
+> +
+> +/* DMA descriptor bits. */
+> +#define MXS_DCP_CONTROL0_HASH_TERM		(1 << 13)
+> +#define MXS_DCP_CONTROL0_HASH_INIT		(1 << 12)
+> +#define MXS_DCP_CONTROL0_PAYLOAD_KEY		(1 << 11)
+> +#define MXS_DCP_CONTROL0_CIPHER_ENCRYPT		(1 << 8)
+> +#define MXS_DCP_CONTROL0_CIPHER_INIT		(1 << 9)
+> +#define MXS_DCP_CONTROL0_ENABLE_HASH		(1 << 6)
+> +#define MXS_DCP_CONTROL0_ENABLE_CIPHER		(1 << 5)
+> +#define MXS_DCP_CONTROL0_DECR_SEMAPHORE		(1 << 1)
+> +#define MXS_DCP_CONTROL0_INTERRUPT		(1 << 0)
+> +
+> +#define MXS_DCP_CONTROL1_HASH_SELECT_SHA256	(2 << 16)
+> +#define MXS_DCP_CONTROL1_HASH_SELECT_SHA1	(0 << 16)
+> +#define MXS_DCP_CONTROL1_CIPHER_MODE_CBC	(1 << 4)
+> +#define MXS_DCP_CONTROL1_CIPHER_MODE_ECB	(0 << 4)
+> +#define MXS_DCP_CONTROL1_CIPHER_SELECT_AES128	(0 << 0)
+> +
+> +static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+> +{
+> +	struct dcp *sdcp = global_sdcp;
+> +	const int chan = actx->chan;
+> +	uint32_t stat;
+> +	int ret;
+> +	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+> +
+> +	dma_addr_t desc_phys = dma_map_single(sdcp->dev, desc, sizeof(*desc),
+> +					      DMA_TO_DEVICE);
+> +
+> +	reinit_completion(&sdcp->completion[chan]);
+> +
+> +	/* Clear status register. */
+> +	writel(0xffffffff, sdcp->base + MXS_DCP_CH_N_STAT_CLR(chan));
+> +
+> +	/* Load the DMA descriptor. */
+> +	writel(desc_phys, sdcp->base + MXS_DCP_CH_N_CMDPTR(chan));
+> +
+> +	/* Increment the semaphore to start the DMA transfer. */
+> +	writel(1, sdcp->base + MXS_DCP_CH_N_SEMA(chan));
+> +
+> +	ret = wait_for_completion_timeout(&sdcp->completion[chan],
+> +					  msecs_to_jiffies(1000));
+> +	if (!ret) {
+> +		dev_err(sdcp->dev, "Channel %i timeout (DCP_STAT=0x%08x)\n",
+> +			chan, readl(sdcp->base + MXS_DCP_STAT));
+> +		return -ETIMEDOUT;
+> +	}
+> +
+> +	stat = readl(sdcp->base + MXS_DCP_CH_N_STAT(chan));
+> +	if (stat & 0xff) {
+> +		dev_err(sdcp->dev, "Channel %i error (CH_STAT=0x%08x)\n",
+> +			chan, stat);
+> +		return -EINVAL;
+> +	}
+> +
+> +	dma_unmap_single(sdcp->dev, desc_phys, sizeof(*desc), DMA_TO_DEVICE);
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Encryption (AES128)
+> + */
+> +static int mxs_dcp_run_aes(struct dcp_async_ctx *actx, int init)
+> +{
+> +	struct dcp *sdcp = global_sdcp;
+> +	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+> +	int ret;
+> +
+> +	dma_addr_t key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
+> +					     2 * AES_KEYSIZE_128,
+> +					     DMA_TO_DEVICE);
+> +	dma_addr_t src_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_in_buf,
+> +					     DCP_BUF_SZ, DMA_TO_DEVICE);
+> +	dma_addr_t dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
+> +					     DCP_BUF_SZ, DMA_FROM_DEVICE);
+> +
+> +	/* Fill in the DMA descriptor. */
+> +	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
+> +		    MXS_DCP_CONTROL0_INTERRUPT |
+> +		    MXS_DCP_CONTROL0_ENABLE_CIPHER;
+> +
+> +	/* Payload contains the key. */
+> +	desc->control0 |= MXS_DCP_CONTROL0_PAYLOAD_KEY;
+> +
+> +	if (actx->enc)
+> +		desc->control0 |= MXS_DCP_CONTROL0_CIPHER_ENCRYPT;
+> +	if (init)
+> +		desc->control0 |= MXS_DCP_CONTROL0_CIPHER_INIT;
+> +
+> +	desc->control1 = MXS_DCP_CONTROL1_CIPHER_SELECT_AES128;
+> +
+> +	if (actx->ecb)
+> +		desc->control1 |= MXS_DCP_CONTROL1_CIPHER_MODE_ECB;
+> +	else
+> +		desc->control1 |= MXS_DCP_CONTROL1_CIPHER_MODE_CBC;
+> +
+> +	desc->next_cmd_addr = 0;
+> +	desc->source = src_phys;
+> +	desc->destination = dst_phys;
+> +	desc->size = actx->fill;
+> +	desc->payload = key_phys;
+> +	desc->status = 0;
+> +
+> +	ret = mxs_dcp_start_dma(actx);
+> +
+> +	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+> +			 DMA_TO_DEVICE);
+> +	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+> +	dma_unmap_single(sdcp->dev, dst_phys, DCP_BUF_SZ, DMA_FROM_DEVICE);
+> +
+> +	return ret;
+> +}
+> +
+> +static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+> +{
+> +	struct dcp *sdcp = global_sdcp;
+> +
+> +	struct ablkcipher_request *req = ablkcipher_request_cast(arq);
+> +	struct dcp_async_ctx *actx = crypto_tfm_ctx(arq->tfm);
+> +
+> +	struct scatterlist *dst = req->dst;
+> +	struct scatterlist *src = req->src;
+> +	const int nents = sg_nents(req->src);
+> +
+> +	const int out_off = DCP_BUF_SZ;
+> +	uint8_t *in_buf = sdcp->coh->aes_in_buf;
+> +	uint8_t *out_buf = sdcp->coh->aes_out_buf;
+> +
+> +	uint8_t *out_tmp, *src_buf, *dst_buf = NULL;
+> +	uint32_t dst_off = 0;
+> +
+> +	uint8_t *key = sdcp->coh->aes_key;
+> +
+> +	int ret = 0;
+> +	int split = 0;
+> +	unsigned int i, len, clen, rem = 0;
+> +	int init = 0;
+> +
+> +	actx->fill = 0;
+> +
+> +	/* Copy the key from the temporary location. */
+> +	memcpy(key, actx->key, actx->key_len);
+> +
+> +	if (!actx->ecb) {
+> +		/* Copy the CBC IV just past the key. */
+> +		memcpy(key + AES_KEYSIZE_128, req->info, AES_KEYSIZE_128);
+> +		/* CBC needs the INIT set. */
+> +		init = 1;
+> +	} else {
+> +		memset(key + AES_KEYSIZE_128, 0, AES_KEYSIZE_128);
+> +	}
+> +
+> +	for_each_sg(req->src, src, nents, i) {
+> +		src_buf = sg_virt(src);
+> +		len = sg_dma_len(src);
+> +
+> +		do {
+> +			if (actx->fill + len > out_off)
+> +				clen = out_off - actx->fill;
+> +			else
+> +				clen = len;
+> +
+> +			memcpy(in_buf + actx->fill, src_buf, clen);
+> +			len -= clen;
+> +			src_buf += clen;
+> +			actx->fill += clen;
+> +
+> +			/*
+> +			 * If we filled the buffer or this is the last SG,
+> +			 * submit the buffer.
+> +			 */
+> +			if (actx->fill == out_off || sg_is_last(src)) {
+> +				ret = mxs_dcp_run_aes(actx, init);
+> +				if (ret)
+> +					return ret;
+> +				init = 0;
+> +
+> +				out_tmp = out_buf;
+> +				while (dst && actx->fill) {
+> +					if (!split) {
+> +						dst_buf = sg_virt(dst);
+> +						dst_off = 0;
+> +					}
+> +					rem = min(sg_dma_len(dst) - dst_off,
+> +						  actx->fill);
+> +
+> +					memcpy(dst_buf + dst_off, out_tmp, rem);
+> +					out_tmp += rem;
+> +					dst_off += rem;
+> +					actx->fill -= rem;
+> +
+> +					if (dst_off == sg_dma_len(dst)) {
+> +						dst = sg_next(dst);
+> +						split = 0;
+> +					} else {
+> +						split = 1;
+> +					}
+> +				}
+> +			}
+> +		} while (len);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int dcp_chan_thread_aes(void *data)
+> +{
+> +	struct dcp *sdcp = global_sdcp;
+> +	const int chan = DCP_CHAN_CRYPTO;
+> +
+> +	struct crypto_async_request *backlog;
+> +	struct crypto_async_request *arq;
+> +
+> +	int ret;
+> +
+> +	do {
+> +		__set_current_state(TASK_INTERRUPTIBLE);
+> +
+> +		mutex_lock(&sdcp->mutex[chan]);
+> +		backlog = crypto_get_backlog(&sdcp->queue[chan]);
+> +		arq = crypto_dequeue_request(&sdcp->queue[chan]);
+> +		mutex_unlock(&sdcp->mutex[chan]);
+> +
+> +		if (backlog)
+> +			backlog->complete(backlog, -EINPROGRESS);
+> +
+> +		if (arq) {
+> +			ret = mxs_dcp_aes_block_crypt(arq);
+> +			arq->complete(arq, ret);
+> +			continue;
+> +		}
+> +
+> +		schedule();
+> +	} while (!kthread_should_stop());
+> +
+> +	return 0;
+> +}
+> +
+> +static int mxs_dcp_block_fallback(struct ablkcipher_request *req, int enc)
+> +{
+> +	struct crypto_tfm *tfm =
+> +		crypto_ablkcipher_tfm(crypto_ablkcipher_reqtfm(req));
+> +	struct dcp_async_ctx *ctx = crypto_ablkcipher_ctx(
+> +		crypto_ablkcipher_reqtfm(req));
+> +	int ret;
+> +
+> +	ablkcipher_request_set_tfm(req, ctx->fallback);
+> +
+> +	if (enc)
+> +		ret = crypto_ablkcipher_encrypt(req);
+> +	else
+> +		ret = crypto_ablkcipher_decrypt(req);
+> +
+> +	ablkcipher_request_set_tfm(req, __crypto_ablkcipher_cast(tfm));
+> +
+> +	return ret;
+> +}
+> +
+> +static int mxs_dcp_aes_enqueue(struct ablkcipher_request *req, int enc, int ecb)
+> +{
+> +	struct dcp *sdcp = global_sdcp;
+> +	struct crypto_async_request *arq = &req->base;
+> +	struct dcp_async_ctx *actx = crypto_tfm_ctx(arq->tfm);
+> +	int ret;
+> +
+> +	if (unlikely(actx->key_len != AES_KEYSIZE_128))
+> +		return mxs_dcp_block_fallback(req, enc);
+> +
+> +	actx->enc = enc;
+> +	actx->ecb = ecb;
+> +	actx->chan = DCP_CHAN_CRYPTO;
+> +
+> +	mutex_lock(&sdcp->mutex[actx->chan]);
+> +	ret = crypto_enqueue_request(&sdcp->queue[actx->chan], &req->base);
+> +	mutex_unlock(&sdcp->mutex[actx->chan]);
+> +
+> +	wake_up_process(sdcp->thread[actx->chan]);
+> +
+> +	return -EINPROGRESS;
+> +}
+> +
+> +static int mxs_dcp_aes_ecb_decrypt(struct ablkcipher_request *req)
+> +{
+> +	return mxs_dcp_aes_enqueue(req, 0, 1);
+> +}
+> +
+> +static int mxs_dcp_aes_ecb_encrypt(struct ablkcipher_request *req)
+> +{
+> +	return mxs_dcp_aes_enqueue(req, 1, 1);
+> +}
+> +
+> +static int mxs_dcp_aes_cbc_decrypt(struct ablkcipher_request *req)
+> +{
+> +	return mxs_dcp_aes_enqueue(req, 0, 0);
+> +}
+> +
+> +static int mxs_dcp_aes_cbc_encrypt(struct ablkcipher_request *req)
+> +{
+> +	return mxs_dcp_aes_enqueue(req, 1, 0);
+> +}
+> +
+> +static int mxs_dcp_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+> +			      unsigned int len)
+> +{
+> +	struct dcp_async_ctx *actx = crypto_ablkcipher_ctx(tfm);
+> +	unsigned int ret;
+> +
+> +	/*
+> +	 * AES 128 is supposed by the hardware, store key into temporary
+> +	 * buffer and exit. We must use the temporary buffer here, since
+> +	 * there can still be an operation in progress.
+> +	 */
+> +	actx->key_len = len;
+> +	if (len == AES_KEYSIZE_128) {
+> +		memcpy(actx->key, key, len);
+> +		return 0;
+> +	}
+> +
+> +	/* Check if the key size is supported by kernel at all. */
+> +	if (len != AES_KEYSIZE_192 && len != AES_KEYSIZE_256) {
+> +		tfm->base.crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
+> +		return -EINVAL;
+> +	}
+> +
+> +	/*
+> +	 * If the requested AES key size is not supported by the hardware,
+> +	 * but is supported by in-kernel software implementation, we use
+> +	 * software fallback.
+> +	 */
+> +	actx->fallback->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
+> +	actx->fallback->base.crt_flags |=
+> +		tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK;
+> +
+> +	ret = crypto_ablkcipher_setkey(actx->fallback, key, len);
+> +	if (!ret)
+> +		return 0;
+> +
+> +	tfm->base.crt_flags &= ~CRYPTO_TFM_RES_MASK;
+> +	tfm->base.crt_flags |=
+> +		actx->fallback->base.crt_flags & CRYPTO_TFM_RES_MASK;
+> +
+> +	return ret;
+> +}
+> +
+> +static int mxs_dcp_aes_fallback_init(struct crypto_tfm *tfm)
+> +{
+> +	const char *name = tfm->__crt_alg->cra_name;
+> +	const uint32_t flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK;
+> +	struct dcp_async_ctx *actx = crypto_tfm_ctx(tfm);
+> +	struct crypto_ablkcipher *blk;
+> +
+> +	blk = crypto_alloc_ablkcipher(name, 0, flags);
+> +	if (IS_ERR(blk))
+> +		return PTR_ERR(blk);
+> +
+> +	actx->fallback = blk;
+> +	tfm->crt_ablkcipher.reqsize = sizeof(struct dcp_async_ctx);
+> +	return 0;
+> +}
+> +
+> +static void mxs_dcp_aes_fallback_exit(struct crypto_tfm *tfm)
+> +{
+> +	struct dcp_async_ctx *actx = crypto_tfm_ctx(tfm);
+> +
+> +	crypto_free_ablkcipher(actx->fallback);
+> +	actx->fallback = NULL;
+> +}
+> +
+> +/*
+> + * Hashing (SHA1/SHA256)
+> + */
+> +static int mxs_dcp_run_sha(struct ahash_request *req)
+> +{
+> +	struct dcp *sdcp = global_sdcp;
+> +	int ret;
+> +
+> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+> +	struct dcp_async_ctx *actx = crypto_ahash_ctx(tfm);
+> +	struct dcp_sha_req_ctx *rctx = ahash_request_ctx(req);
+> +
+> +	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+> +	dma_addr_t digest_phys = dma_map_single(sdcp->dev,
+> +						sdcp->coh->sha_digest,
+> +						SHA256_DIGEST_SIZE,
+> +						DMA_FROM_DEVICE);
+> +
+> +	dma_addr_t buf_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_in_buf,
+> +					     DCP_BUF_SZ, DMA_TO_DEVICE);
+> +
+> +	/* Fill in the DMA descriptor. */
+> +	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
+> +		    MXS_DCP_CONTROL0_INTERRUPT |
+> +		    MXS_DCP_CONTROL0_ENABLE_HASH;
+> +	if (rctx->init)
+> +		desc->control0 |= MXS_DCP_CONTROL0_HASH_INIT;
+> +
+> +	desc->control1 = actx->alg;
+> +	desc->next_cmd_addr = 0;
+> +	desc->source = buf_phys;
+> +	desc->destination = 0;
+> +	desc->size = actx->fill;
+> +	desc->payload = 0;
+> +	desc->status = 0;
+> +
+> +	/* Set HASH_TERM bit for last transfer block. */
+> +	if (rctx->fini) {
+> +		desc->control0 |= MXS_DCP_CONTROL0_HASH_TERM;
+> +		desc->payload = digest_phys;
+> +	}
+> +
+> +	ret = mxs_dcp_start_dma(actx);
+> +
+> +	dma_unmap_single(sdcp->dev, digest_phys, SHA256_DIGEST_SIZE,
+> +			 DMA_FROM_DEVICE);
+> +	dma_unmap_single(sdcp->dev, buf_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+> +
+> +	return ret;
+> +}
+> +
+> +static int dcp_sha_req_to_buf(struct crypto_async_request *arq)
+> +{
+> +	struct dcp *sdcp = global_sdcp;
+> +
+> +	struct ahash_request *req = ahash_request_cast(arq);
+> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+> +	struct dcp_async_ctx *actx = crypto_ahash_ctx(tfm);
+> +	struct dcp_sha_req_ctx *rctx = ahash_request_ctx(req);
+> +	struct hash_alg_common *halg = crypto_hash_alg_common(tfm);
+> +	const int nents = sg_nents(req->src);
+> +
+> +	uint8_t *digest = sdcp->coh->sha_digest;
+> +	uint8_t *in_buf = sdcp->coh->sha_in_buf;
+> +
+> +	uint8_t *src_buf;
+> +
+> +	struct scatterlist *src;
+> +
+> +	unsigned int i, len, clen;
+> +	int ret;
+> +
+> +	int fin = rctx->fini;
+> +	if (fin)
+> +		rctx->fini = 0;
+> +
+> +	for_each_sg(req->src, src, nents, i) {
+> +		src_buf = sg_virt(src);
+> +		len = sg_dma_len(src);
+> +
+> +		do {
+> +			if (actx->fill + len > DCP_BUF_SZ)
+> +				clen = DCP_BUF_SZ - actx->fill;
+> +			else
+> +				clen = len;
+> +
+> +			memcpy(in_buf + actx->fill, src_buf, clen);
+> +			len -= clen;
+> +			src_buf += clen;
+> +			actx->fill += clen;
+> +
+> +			/*
+> +			 * If we filled the buffer and still have some
+> +			 * more data, submit the buffer.
+> +			 */
+> +			if (len && actx->fill == DCP_BUF_SZ) {
+> +				ret = mxs_dcp_run_sha(req);
+> +				if (ret)
+> +					return ret;
+> +				actx->fill = 0;
+> +				rctx->init = 0;
+> +			}
+> +		} while (len);
+> +	}
+> +
+> +	if (fin) {
+> +		rctx->fini = 1;
+> +
+> +		/* Submit whatever is left. */
+> +		ret = mxs_dcp_run_sha(req);
+> +		if (ret || !req->result)
+> +			return ret;
+> +		actx->fill = 0;
+> +
+> +		/* For some reason, the result is flipped. */
+> +		for (i = 0; i < halg->digestsize; i++)
+> +			req->result[i] = digest[halg->digestsize - i - 1];
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int dcp_chan_thread_sha(void *data)
+> +{
+> +	struct dcp *sdcp = global_sdcp;
+> +	const int chan = DCP_CHAN_HASH_SHA;
+> +
+> +	struct crypto_async_request *backlog;
+> +	struct crypto_async_request *arq;
+> +
+> +	struct dcp_sha_req_ctx *rctx;
+> +
+> +	struct ahash_request *req;
+> +	int ret, fini;
+> +
+> +	do {
+> +		__set_current_state(TASK_INTERRUPTIBLE);
+> +
+> +		mutex_lock(&sdcp->mutex[chan]);
+> +		backlog = crypto_get_backlog(&sdcp->queue[chan]);
+> +		arq = crypto_dequeue_request(&sdcp->queue[chan]);
+> +		mutex_unlock(&sdcp->mutex[chan]);
+> +
+> +		if (backlog)
+> +			backlog->complete(backlog, -EINPROGRESS);
+> +
+> +		if (arq) {
+> +			req = ahash_request_cast(arq);
+> +			rctx = ahash_request_ctx(req);
+> +
+> +			ret = dcp_sha_req_to_buf(arq);
+> +			fini = rctx->fini;
+> +			arq->complete(arq, ret);
+> +			if (!fini)
+> +				continue;
+> +		}
+> +
+> +		schedule();
+> +	} while (!kthread_should_stop());
+> +
+> +	return 0;
+> +}
+> +
+> +static int dcp_sha_init(struct ahash_request *req)
+> +{
+> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+> +	struct dcp_async_ctx *actx = crypto_ahash_ctx(tfm);
+> +
+> +	struct hash_alg_common *halg = crypto_hash_alg_common(tfm);
+> +
+> +	/*
+> +	 * Start hashing session. The code below only inits the
+> +	 * hashing session context, nothing more.
+> +	 */
+> +	memset(actx, 0, sizeof(*actx));
+> +
+> +	if (strcmp(halg->base.cra_name, "sha1") == 0)
+> +		actx->alg = MXS_DCP_CONTROL1_HASH_SELECT_SHA1;
+> +	else
+> +		actx->alg = MXS_DCP_CONTROL1_HASH_SELECT_SHA256;
+> +
+> +	actx->fill = 0;
+> +	actx->hot = 0;
+> +	actx->chan = DCP_CHAN_HASH_SHA;
+> +
+> +	mutex_init(&actx->mutex);
+> +
+> +	return 0;
+> +}
+> +
+> +static int dcp_sha_update_fx(struct ahash_request *req, int fini)
+> +{
+> +	struct dcp *sdcp = global_sdcp;
+> +
+> +	struct dcp_sha_req_ctx *rctx = ahash_request_ctx(req);
+> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+> +	struct dcp_async_ctx *actx = crypto_ahash_ctx(tfm);
+> +
+> +	int ret;
+> +
+> +	/*
+> +	 * Ignore requests that have no data in them and are not
+> +	 * the trailing requests in the stream of requests.
+> +	 */
+> +	if (!req->nbytes && !fini)
+> +		return 0;
+> +
+> +	mutex_lock(&actx->mutex);
+> +
+> +	rctx->fini = fini;
+> +
+> +	if (!actx->hot) {
+> +		actx->hot = 1;
+> +		rctx->init = 1;
+> +	}
+> +
+> +	mutex_lock(&sdcp->mutex[actx->chan]);
+> +	ret = crypto_enqueue_request(&sdcp->queue[actx->chan], &req->base);
+> +	mutex_unlock(&sdcp->mutex[actx->chan]);
+> +
+> +	wake_up_process(sdcp->thread[actx->chan]);
+> +	mutex_unlock(&actx->mutex);
+> +
+> +	return -EINPROGRESS;
+> +}
+> +
+> +static int dcp_sha_update(struct ahash_request *req)
+> +{
+> +	return dcp_sha_update_fx(req, 0);
+> +}
+> +
+> +static int dcp_sha_final(struct ahash_request *req)
+> +{
+> +	ahash_request_set_crypt(req, NULL, req->result, 0);
+> +	req->nbytes = 0;
+> +	return dcp_sha_update_fx(req, 1);
+> +}
+> +
+> +static int dcp_sha_finup(struct ahash_request *req)
+> +{
+> +	return dcp_sha_update_fx(req, 1);
+> +}
+> +
+> +static int dcp_sha_digest(struct ahash_request *req)
+> +{
+> +	int ret;
+> +
+> +	ret = dcp_sha_init(req);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return dcp_sha_finup(req);
+> +}
+> +
+> +static int dcp_sha_cra_init(struct crypto_tfm *tfm)
+> +{
+> +	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
+> +				 sizeof(struct dcp_sha_req_ctx));
+> +	return 0;
+> +}
+> +
+> +static void dcp_sha_cra_exit(struct crypto_tfm *tfm)
+> +{
+> +}
+> +
+> +/* AES 128 ECB and AES 128 CBC */
+> +static struct crypto_alg dcp_aes_algs[] = {
+> +	{
+> +		.cra_name		= "ecb(aes)",
+> +		.cra_driver_name	= "ecb-aes-dcp",
+> +		.cra_priority		= 400,
+> +		.cra_alignmask		= 15,
+> +		.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+> +					  CRYPTO_ALG_ASYNC |
+> +					  CRYPTO_ALG_NEED_FALLBACK,
+> +		.cra_init		= mxs_dcp_aes_fallback_init,
+> +		.cra_exit		= mxs_dcp_aes_fallback_exit,
+> +		.cra_blocksize		= AES_BLOCK_SIZE,
+> +		.cra_ctxsize		= sizeof(struct dcp_async_ctx),
+> +		.cra_type		= &crypto_ablkcipher_type,
+> +		.cra_module		= THIS_MODULE,
+> +		.cra_u	= {
+> +			.ablkcipher = {
+> +				.min_keysize	= AES_MIN_KEY_SIZE,
+> +				.max_keysize	= AES_MAX_KEY_SIZE,
+> +				.setkey		= mxs_dcp_aes_setkey,
+> +				.encrypt	= mxs_dcp_aes_ecb_encrypt,
+> +				.decrypt	= mxs_dcp_aes_ecb_decrypt
+> +			},
+> +		},
+> +	}, {
+> +		.cra_name		= "cbc(aes)",
+> +		.cra_driver_name	= "cbc-aes-dcp",
+> +		.cra_priority		= 400,
+> +		.cra_alignmask		= 15,
+> +		.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+> +					  CRYPTO_ALG_ASYNC |
+> +					  CRYPTO_ALG_NEED_FALLBACK,
+> +		.cra_init		= mxs_dcp_aes_fallback_init,
+> +		.cra_exit		= mxs_dcp_aes_fallback_exit,
+> +		.cra_blocksize		= AES_BLOCK_SIZE,
+> +		.cra_ctxsize		= sizeof(struct dcp_async_ctx),
+> +		.cra_type		= &crypto_ablkcipher_type,
+> +		.cra_module		= THIS_MODULE,
+> +		.cra_u = {
+> +			.ablkcipher = {
+> +				.min_keysize	= AES_MIN_KEY_SIZE,
+> +				.max_keysize	= AES_MAX_KEY_SIZE,
+> +				.setkey		= mxs_dcp_aes_setkey,
+> +				.encrypt	= mxs_dcp_aes_cbc_encrypt,
+> +				.decrypt	= mxs_dcp_aes_cbc_decrypt,
+> +				.ivsize		= AES_BLOCK_SIZE,
+> +			},
+> +		},
+> +	},
+> +};
+> +
+> +/* SHA1 */
+> +static struct ahash_alg dcp_sha1_alg = {
+> +	.init	= dcp_sha_init,
+> +	.update	= dcp_sha_update,
+> +	.final	= dcp_sha_final,
+> +	.finup	= dcp_sha_finup,
+> +	.digest	= dcp_sha_digest,
+> +	.halg	= {
+> +		.digestsize	= SHA1_DIGEST_SIZE,
+> +		.base		= {
+> +			.cra_name		= "sha1",
+> +			.cra_driver_name	= "sha1-dcp",
+> +			.cra_priority		= 400,
+> +			.cra_alignmask		= 63,
+> +			.cra_flags		= CRYPTO_ALG_ASYNC,
+> +			.cra_blocksize		= SHA1_BLOCK_SIZE,
+> +			.cra_ctxsize		= sizeof(struct dcp_async_ctx),
+> +			.cra_module		= THIS_MODULE,
+> +			.cra_init		= dcp_sha_cra_init,
+> +			.cra_exit		= dcp_sha_cra_exit,
+> +		},
+> +	},
+> +};
+> +
+> +/* SHA256 */
+> +static struct ahash_alg dcp_sha256_alg = {
+> +	.init	= dcp_sha_init,
+> +	.update	= dcp_sha_update,
+> +	.final	= dcp_sha_final,
+> +	.finup	= dcp_sha_finup,
+> +	.digest	= dcp_sha_digest,
+> +	.halg	= {
+> +		.digestsize	= SHA256_DIGEST_SIZE,
+> +		.base		= {
+> +			.cra_name		= "sha256",
+> +			.cra_driver_name	= "sha256-dcp",
+> +			.cra_priority		= 400,
+> +			.cra_alignmask		= 63,
+> +			.cra_flags		= CRYPTO_ALG_ASYNC,
+> +			.cra_blocksize		= SHA256_BLOCK_SIZE,
+> +			.cra_ctxsize		= sizeof(struct dcp_async_ctx),
+> +			.cra_module		= THIS_MODULE,
+> +			.cra_init		= dcp_sha_cra_init,
+> +			.cra_exit		= dcp_sha_cra_exit,
+> +		},
+> +	},
+> +};
+> +
+> +static irqreturn_t mxs_dcp_irq(int irq, void *context)
+> +{
+> +	struct dcp *sdcp = context;
+> +	uint32_t stat;
+> +	int i;
+> +
+> +	stat = readl(sdcp->base + MXS_DCP_STAT);
+> +	stat &= MXS_DCP_STAT_IRQ_MASK;
+> +	if (!stat)
+> +		return IRQ_NONE;
+> +
+> +	/* Clear the interrupts. */
+> +	writel(stat, sdcp->base + MXS_DCP_STAT_CLR);
+> +
+> +	/* Complete the DMA requests that finished. */
+> +	for (i = 0; i < DCP_MAX_CHANS; i++)
+> +		if (stat & (1 << i))
+> +			complete(&sdcp->completion[i]);
+> +
+> +	return IRQ_HANDLED;
+> +}
+> +
+> +static int mxs_dcp_probe(struct platform_device *pdev)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct dcp *sdcp = NULL;
+> +	int i, ret;
+> +
+> +	struct resource *iores;
+> +	int dcp_vmi_irq, dcp_irq;
+> +
+> +	mutex_lock(&global_mutex);
+> +	if (global_sdcp) {
+> +		dev_err(dev, "Only one DCP instance allowed!\n");
+> +		ret = -ENODEV;
+> +		goto err_mutex;
+> +	}
+> +
+> +	iores = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> +	dcp_vmi_irq = platform_get_irq(pdev, 0);
+> +	dcp_irq = platform_get_irq(pdev, 1);
+> +	if (dcp_vmi_irq < 0 || dcp_irq < 0) {
+> +		ret = -EINVAL;
+> +		goto err_mutex;
+> +	}
+> +
+> +	sdcp = devm_kzalloc(dev, sizeof(*sdcp), GFP_KERNEL);
+> +	if (!sdcp) {
+> +		ret = -ENOMEM;
+> +		goto err_mutex;
+> +	}
+> +
+> +	sdcp->dev = dev;
+> +	sdcp->base = devm_ioremap_resource(dev, iores);
+> +	if (IS_ERR(sdcp->base)) {
+> +		ret = PTR_ERR(sdcp->base);
+> +		goto err_mutex;
+> +	}
+> +
+> +	ret = devm_request_irq(dev, dcp_vmi_irq, mxs_dcp_irq, 0,
+> +			       "dcp-vmi-irq", sdcp);
+> +	if (ret) {
+> +		dev_err(dev, "Failed to claim DCP VMI IRQ!\n");
+> +		goto err_mutex;
+> +	}
+> +
+> +	ret = devm_request_irq(dev, dcp_irq, mxs_dcp_irq, 0,
+> +			       "dcp-irq", sdcp);
+> +	if (ret) {
+> +		dev_err(dev, "Failed to claim DCP IRQ!\n");
+> +		goto err_mutex;
+> +	}
+> +
+> +	/* Allocate coherent helper block. */
+> +	sdcp->coh = kzalloc(sizeof(struct dcp_coherent_block), GFP_KERNEL);
+> +	if (!sdcp->coh) {
+> +		dev_err(dev, "Error allocating coherent block\n");
+> +		ret = -ENOMEM;
+> +		goto err_mutex;
+> +	}
+> +
+> +	/* Restart the DCP block. */
+> +	stmp_reset_block(sdcp->base);
+> +
+> +	/* Initialize control register. */
+> +	writel(MXS_DCP_CTRL_GATHER_RESIDUAL_WRITES |
+> +	       MXS_DCP_CTRL_ENABLE_CONTEXT_CACHING | 0xf,
+> +	       sdcp->base + MXS_DCP_CTRL);
+> +
+> +	/* Enable all DCP DMA channels. */
+> +	writel(MXS_DCP_CHANNELCTRL_ENABLE_CHANNEL_MASK,
+> +	       sdcp->base + MXS_DCP_CHANNELCTRL);
+> +
+> +	/*
+> +	 * We do not enable context switching. Give the context buffer a
+> +	 * pointer to an illegal address so if context switching is
+> +	 * inadvertantly enabled, the DCP will return an error instead of
+> +	 * trashing good memory. The DCP DMA cannot access ROM, so any ROM
+> +	 * address will do.
+> +	 */
+> +	writel(0xffff0000, sdcp->base + MXS_DCP_CONTEXT);
+> +	for (i = 0; i < DCP_MAX_CHANS; i++)
+> +		writel(0xffffffff, sdcp->base + MXS_DCP_CH_N_STAT_CLR(i));
+> +	writel(0xffffffff, sdcp->base + MXS_DCP_STAT_CLR);
+> +
+> +	global_sdcp = sdcp;
+> +
+> +	platform_set_drvdata(pdev, sdcp);
+> +
+> +	for (i = 0; i < DCP_MAX_CHANS; i++) {
+> +		mutex_init(&sdcp->mutex[i]);
+> +		init_completion(&sdcp->completion[i]);
+> +		crypto_init_queue(&sdcp->queue[i], 50);
+> +	}
+> +
+> +	/* Create the SHA and AES handler threads. */
+> +	sdcp->thread[DCP_CHAN_HASH_SHA] = kthread_run(dcp_chan_thread_sha,
+> +						      NULL, "mxs_dcp_chan/sha");
+> +	if (IS_ERR(sdcp->thread[DCP_CHAN_HASH_SHA])) {
+> +		dev_err(dev, "Error starting SHA thread!\n");
+> +		ret = PTR_ERR(sdcp->thread[DCP_CHAN_HASH_SHA]);
+> +		goto err_free_coherent;
+> +	}
+> +
+> +	sdcp->thread[DCP_CHAN_CRYPTO] = kthread_run(dcp_chan_thread_aes,
+> +						    NULL, "mxs_dcp_chan/aes");
+> +	if (IS_ERR(sdcp->thread[DCP_CHAN_CRYPTO])) {
+> +		dev_err(dev, "Error starting SHA thread!\n");
+> +		ret = PTR_ERR(sdcp->thread[DCP_CHAN_CRYPTO]);
+> +		goto err_destroy_sha_thread;
+> +	}
+> +
+> +	/* Register the various crypto algorithms. */
+> +	sdcp->caps = readl(sdcp->base + MXS_DCP_CAPABILITY1);
+> +
+> +	if (sdcp->caps & MXS_DCP_CAPABILITY1_AES128) {
+> +		ret = crypto_register_algs(dcp_aes_algs,
+> +					   ARRAY_SIZE(dcp_aes_algs));
+> +		if (ret) {
+> +			/* Failed to register algorithm. */
+> +			dev_err(dev, "Failed to register AES crypto!\n");
+> +			goto err_destroy_aes_thread;
+> +		}
+> +	}
+> +
+> +	if (sdcp->caps & MXS_DCP_CAPABILITY1_SHA1) {
+> +		ret = crypto_register_ahash(&dcp_sha1_alg);
+> +		if (ret) {
+> +			dev_err(dev, "Failed to register %s hash!\n",
+> +				dcp_sha1_alg.halg.base.cra_name);
+> +			goto err_unregister_aes;
+> +		}
+> +	}
+> +
+> +	if (sdcp->caps & MXS_DCP_CAPABILITY1_SHA256) {
+> +		ret = crypto_register_ahash(&dcp_sha256_alg);
+> +		if (ret) {
+> +			dev_err(dev, "Failed to register %s hash!\n",
+> +				dcp_sha256_alg.halg.base.cra_name);
+> +			goto err_unregister_sha1;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +
+> +err_unregister_sha1:
+> +	if (sdcp->caps & MXS_DCP_CAPABILITY1_SHA1)
+> +		crypto_unregister_ahash(&dcp_sha1_alg);
+> +
+> +err_unregister_aes:
+> +	if (sdcp->caps & MXS_DCP_CAPABILITY1_AES128)
+> +		crypto_unregister_algs(dcp_aes_algs, ARRAY_SIZE(dcp_aes_algs));
+> +
+> +err_destroy_aes_thread:
+> +	kthread_stop(sdcp->thread[DCP_CHAN_CRYPTO]);
+> +
+> +err_destroy_sha_thread:
+> +	kthread_stop(sdcp->thread[DCP_CHAN_HASH_SHA]);
+> +
+> +err_free_coherent:
+> +	kfree(sdcp->coh);
+> +err_mutex:
+> +	mutex_unlock(&global_mutex);
+> +	return ret;
+> +}
+> +
+> +static int mxs_dcp_remove(struct platform_device *pdev)
+> +{
+> +	struct dcp *sdcp = platform_get_drvdata(pdev);
+> +
+> +	kfree(sdcp->coh);
+> +
+> +	if (sdcp->caps & MXS_DCP_CAPABILITY1_SHA256)
+> +		crypto_unregister_ahash(&dcp_sha256_alg);
+> +
+> +	if (sdcp->caps & MXS_DCP_CAPABILITY1_SHA1)
+> +		crypto_unregister_ahash(&dcp_sha1_alg);
+> +
+> +	if (sdcp->caps & MXS_DCP_CAPABILITY1_AES128)
+> +		crypto_unregister_algs(dcp_aes_algs, ARRAY_SIZE(dcp_aes_algs));
+> +
+> +	kthread_stop(sdcp->thread[DCP_CHAN_HASH_SHA]);
+> +	kthread_stop(sdcp->thread[DCP_CHAN_CRYPTO]);
+> +
+> +	platform_set_drvdata(pdev, NULL);
+> +
+> +	mutex_lock(&global_mutex);
+> +	global_sdcp = NULL;
+> +	mutex_unlock(&global_mutex);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct of_device_id mxs_dcp_dt_ids[] = {
+> +	{ .compatible = "fsl,imx23-dcp", .data = NULL, },
+> +	{ .compatible = "fsl,imx28-dcp", .data = NULL, },
+> +	{ /* sentinel */ }
+> +};
+> +
+> +MODULE_DEVICE_TABLE(of, mxs_dcp_dt_ids);
+> +
+> +static struct platform_driver mxs_dcp_driver = {
+> +	.probe	= mxs_dcp_probe,
+> +	.remove	= mxs_dcp_remove,
+> +	.driver	= {
+> +		.name		= "mxs-dcp",
+> +		.owner		= THIS_MODULE,
+> +		.of_match_table	= mxs_dcp_dt_ids,
+> +	},
+> +};
+> +
+> +module_platform_driver(mxs_dcp_driver);
+> +
+> +MODULE_AUTHOR("Marek Vasut <marex@denx.de>");
+> +MODULE_DESCRIPTION("Freescale MXS DCP Driver");
+> +MODULE_LICENSE("GPL");
+> +MODULE_ALIAS("platform:mxs-dcp");
 > -- 
 > 1.8.4.2
 > 
