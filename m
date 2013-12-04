@@ -1,55 +1,84 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH 2/5] ARM: mxs: crypto: Remove the old DCP driver
-Date: Tue, 3 Dec 2013 13:28:20 +0100
-Message-ID: <201312031328.20860.marex@denx.de>
-References: <1385932823-3860-1-git-send-email-marex@denx.de> <1385932823-3860-2-git-send-email-marex@denx.de> <20131203110731.GE13726@S2101-09.ap.freescale.net>
+From: Nishanth Menon <nm@ti.com>
+Subject: [PATCH] crypto: omap-aes: add error check for pm_runtime_get_sync
+Date: Tue, 3 Dec 2013 19:43:13 -0600
+Message-ID: <1386121393-32464-1-git-send-email-nm@ti.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-arm-kernel@lists.infradead.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Fabio Estevam <fabio.estevam@freescale.com>,
-	linux-crypto@vger.kernel.org
-To: Shawn Guo <shawn.guo@linaro.org>
+Content-Type: text/plain
+Cc: Tobias Jakobi <tjakobi@math.uni-bielefeld.de>,
+	Joel F <joelf@ti.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+	Nishanth Menon <nm@ti.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:60937 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751041Ab3LCN0K (ORCPT
+Received: from devils.ext.ti.com ([198.47.26.153]:57653 "EHLO
+	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755110Ab3LDBnc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 Dec 2013 08:26:10 -0500
-In-Reply-To: <20131203110731.GE13726@S2101-09.ap.freescale.net>
+	Tue, 3 Dec 2013 20:43:32 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dear Shawn Guo,
+The AES driver currently assumes that pm_runtime_get_sync will always
+succeed, which may not always be true, so add error handling for the
+same.
 
-> On Sun, Dec 01, 2013 at 10:20:20PM +0100, Marek Vasut wrote:
-> > Remove the old DCP driver as it had multiple severe issues. The driver
-> > will be replaced by a more robust implementation. Here is a short list
-> > of problems with this driver:
-> > 
-> > 1) It only supports AES_CBC
-> > 
-> > 2) The driver was apparently never ran behind anyone working with MXS. ie.:
-> >    -> Restarting the DCP block is not done via mxs_reset_block()
-> >    -> The DT name is not "fsl,dcp" or "fsl,mxs-dcp" as other MXS drivers
-> > 
-> > 3) Introduces new ad-hoc IOCTLs
-> > 4) The IRQ handler can't use usual completion() in the driver because
-> > that'd
-> > 
-> >    trigger "scheduling while atomic" oops, yes?
-> > 
-> > Signed-off-by: Marek Vasut <marex@denx.de>
-> 
-> Please drop "ARM: mxs: " from patch subject, since it's not a patch
-> touching arch/arm/mach-mxs anyhow.  It's there confusing people.
-> 
-> Shawn
+This scenario was reported in the following bug:
+place.  https://bugzilla.kernel.org/show_bug.cgi?id=66441
 
-Removed. Will gather more feedback and repost V2.
+Reported-by: Tobias Jakobi <tjakobi@math.uni-bielefeld.de>
+Signed-off-by: Nishanth Menon <nm@ti.com>
+---
 
-Best regards,
-Marek Vasut
+Note: the bug in OMAP pm_domain layer is addressed here:
+https://patchwork.kernel.org/patch/3280531/
+
+Proper fixes required to make this work is part of the series:
+http://marc.info/?l=linux-kernel&m=138541594910233&w=2
+
+ drivers/crypto/omap-aes.c |   16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index a9ccbf1..dde41f1d 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -784,6 +784,7 @@ static int omap_aes_ctr_decrypt(struct ablkcipher_request *req)
+ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ {
+ 	struct omap_aes_dev *dd = NULL;
++	int err;
+ 
+ 	/* Find AES device, currently picks the first device */
+ 	spin_lock_bh(&list_lock);
+@@ -792,7 +793,13 @@ static int omap_aes_cra_init(struct crypto_tfm *tfm)
+ 	}
+ 	spin_unlock_bh(&list_lock);
+ 
+-	pm_runtime_get_sync(dd->dev);
++	err = pm_runtime_get_sync(dd->dev);
++	if (err < 0) {
++		dev_err(dd->dev, "%s: failed to get_sync(%d)\n",
++			__func__, err);
++		return err;
++	}
++
+ 	tfm->crt_ablkcipher.reqsize = sizeof(struct omap_aes_reqctx);
+ 
+ 	return 0;
+@@ -1182,7 +1189,12 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 	dd->phys_base = res.start;
+ 
+ 	pm_runtime_enable(dev);
+-	pm_runtime_get_sync(dev);
++	err = pm_runtime_get_sync(dev);
++	if (err < 0) {
++		dev_err(dev, "%s: failed to get_sync(%d)\n",
++			__func__, err);
++		goto err_res;
++	}
+ 
+ 	omap_aes_dma_stop(dd);
+ 
+-- 
+1.7.9.5
