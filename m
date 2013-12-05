@@ -1,60 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3] crypto: more robust crypto_memneq
-Date: Thu, 5 Dec 2013 22:36:01 +0800
-Message-ID: <20131205143601.GD1976@gondor.apana.org.au>
-References: <1385424041-18064-1-git-send-email-cesarb@cesarb.eti.br>
- <5294F625.5040506@redhat.com>
- <52951640.6080805@cesarb.eti.br>
- <5295EB77.8040803@redhat.com>
+Subject: Re: [PATCH 0/2] pcrypt/padata rcu fixes
+Date: Thu, 5 Dec 2013 22:36:15 +0800
+Message-ID: <20131205143615.GE1976@gondor.apana.org.au>
+References: <1385662805-16919-1-git-send-email-minipli@googlemail.com>
+ <20131202121233.GP31491@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Cesar Eduardo Barros <cesarb@cesarb.eti.br>,
-	linux-crypto@vger.kernel.org,
+Cc: Mathias Krause <minipli@googlemail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	James Yonan <james@openvpn.net>,
-	Florian Weimer <fw@deneb.enyo.de>, linux-kernel@vger.kernel.org
-To: Daniel Borkmann <dborkman@redhat.com>
+	linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:55123 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:56286 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752509Ab3LEOgT (ORCPT
+	with ESMTP id S1756807Ab3LEOgY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Dec 2013 09:36:19 -0500
+	Thu, 5 Dec 2013 09:36:24 -0500
 Content-Disposition: inline
-In-Reply-To: <5295EB77.8040803@redhat.com>
+In-Reply-To: <20131202121233.GP31491@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 27, 2013 at 01:54:15PM +0100, Daniel Borkmann wrote:
-> On 11/26/2013 10:44 PM, Cesar Eduardo Barros wrote:
-> >Em 26-11-2013 17:27, Daniel Borkmann escreveu:
-> >>On 11/26/2013 01:00 AM, Cesar Eduardo Barros wrote:
-> >>>Compile-tested on x86_64.
-> >>
-> >>Actually with yet another version, I hoped that the "compile-tested"-only
-> >>statement would eventually disappear, ohh well. ;)
-> >
-> >I did compile test each version ;-) including verifying (with "make crypto/memneq.i") that the macro was really generating the expected inline assembly (with these #ifdef chains, one has to be careful with typos).
-> >
-> >(Actually, I compile tested with "make crypto/memneq.o crypto/memneq.s crypto/memneq.i". I took a peek at the assembly to see if it made sense.)
-> >
-> >>Resolving the OPTIMIZER_HIDE_VAR() macro for others than GCC jnto a
-> >>barrier() seems a bit suboptimal, but assuming 99% of people will use
-> >>GCC anyway, then for the minority of the remaining, they will worst case
-> >>have a clever compiler and eventually mimic memcmp() in some situations,
-> >>or have a not-so-clever compiler and execute the full code as is.
-> >
-> >I do not think any compiler other than gcc and icc can compile unmodified upstream kernel code. LLVM's clang would be the one which comes closest, but it has gcc-compatible inline assembly, as does icc AFAIK.
-> >
-> >The #define to barrier() within compiler-intel.h is for some compiler called ECC (not icc). From what I could find about it on a quick search, it appears to be some kind of Itanium compiler.
-> >
-> >That part of the header was added back in 2003, and I do not believe it is still relevant. A comment within that #ifdef block says "Intel ECC compiler doesn't support gcc specific asm stmts", but there are many uses of unprotected inline assembly all over the kernel (including on the ia64 headers), so if that comment is true, the kernel will not compile with that compiler. It is probably a piece of leftover dead code. I only added to it because I am following RELOC_HIDE's example, and RELOC_HIDE is there.
+On Mon, Dec 02, 2013 at 01:12:33PM +0100, Steffen Klassert wrote:
+> On Thu, Nov 28, 2013 at 07:20:03PM +0100, Mathias Krause wrote:
+> > Two small RCU related fixes, lockdep complained about.
+> > 
+> > Please apply!
+> > 
+> > 
+> > Mathias Krause (2):
+> >   crypto: pcrypt - Fix wrong usage of rcu_dereference()
+> >   padata: Fix wrong usage of rcu_dereference()
+> > 
 > 
-> Yep.
-> 
-> Acked-by: Daniel Borkmann <dborkman@redhat.com>
+> Both
+> Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
 
-Patch applied.  Thanks!
+Both patches applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
