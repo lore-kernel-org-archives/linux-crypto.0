@@ -1,42 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] pcrypt/padata rcu fixes
-Date: Thu, 5 Dec 2013 22:36:15 +0800
-Message-ID: <20131205143615.GE1976@gondor.apana.org.au>
-References: <1385662805-16919-1-git-send-email-minipli@googlemail.com>
- <20131202121233.GP31491@secunet.com>
+Subject: Re: [PATCH] crypto: omap-aes: add error check for pm_runtime_get_sync
+Date: Thu, 5 Dec 2013 22:36:32 +0800
+Message-ID: <20131205143632.GF1976@gondor.apana.org.au>
+References: <1386121393-32464-1-git-send-email-nm@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Mathias Krause <minipli@googlemail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Tobias Jakobi <tjakobi@math.uni-bielefeld.de>,
+	Joel F <joelf@ti.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org
+To: Nishanth Menon <nm@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:56286 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:52397 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756807Ab3LEOgY (ORCPT
+	with ESMTP id S1756774Ab3LEOgl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Dec 2013 09:36:24 -0500
+	Thu, 5 Dec 2013 09:36:41 -0500
 Content-Disposition: inline
-In-Reply-To: <20131202121233.GP31491@secunet.com>
+In-Reply-To: <1386121393-32464-1-git-send-email-nm@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 02, 2013 at 01:12:33PM +0100, Steffen Klassert wrote:
-> On Thu, Nov 28, 2013 at 07:20:03PM +0100, Mathias Krause wrote:
-> > Two small RCU related fixes, lockdep complained about.
-> > 
-> > Please apply!
-> > 
-> > 
-> > Mathias Krause (2):
-> >   crypto: pcrypt - Fix wrong usage of rcu_dereference()
-> >   padata: Fix wrong usage of rcu_dereference()
-> > 
+On Tue, Dec 03, 2013 at 07:43:13PM -0600, Nishanth Menon wrote:
+> The AES driver currently assumes that pm_runtime_get_sync will always
+> succeed, which may not always be true, so add error handling for the
+> same.
 > 
-> Both
-> Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+> This scenario was reported in the following bug:
+> place.  https://bugzilla.kernel.org/show_bug.cgi?id=66441
+> 
+> Reported-by: Tobias Jakobi <tjakobi@math.uni-bielefeld.de>
+> Signed-off-by: Nishanth Menon <nm@ti.com>
 
-Both patches applied.
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
