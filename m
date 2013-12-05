@@ -1,84 +1,48 @@
-From: Nishanth Menon <nm@ti.com>
-Subject: [PATCH] crypto: omap-aes: add error check for pm_runtime_get_sync
-Date: Tue, 3 Dec 2013 19:43:13 -0600
-Message-ID: <1386121393-32464-1-git-send-email-nm@ti.com>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: RE: [PATCH] crypto: remove unnecessary includes
+Date: Thu, 5 Dec 2013 08:14:55 +0000
+Message-ID: <1628287275CAA9409F1E349DEF3C6CCE78CBF0@039-SN2MPN1-012.039d.mgd.msft.net>
+References: <1385658987-16012-1-git-send-email-cristian.stoica@freescale.com>
+ <20131129020657.GA5650@gondor.apana.org.au>
+ <1628287275CAA9409F1E349DEF3C6CCE77CB99@039-SN2MPN1-012.039d.mgd.msft.net>
+ <20131129113430.GA9542@gondor.apana.org.au>
+ <1628287275CAA9409F1E349DEF3C6CCE77CDBE@039-SN2MPN1-012.039d.mgd.msft.net>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Tobias Jakobi <tjakobi@math.uni-bielefeld.de>,
-	Joel F <joelf@ti.com>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-	Nishanth Menon <nm@ti.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Cristian Stoica <cristian.stoica@freescale.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from devils.ext.ti.com ([198.47.26.153]:57653 "EHLO
-	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755110Ab3LDBnc (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 Dec 2013 20:43:32 -0500
+Received: from mail-db9lp0248.outbound.messaging.microsoft.com ([213.199.154.248]:5548
+	"EHLO db9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753546Ab3LEIPB convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Dec 2013 03:15:01 -0500
+In-Reply-To: <1628287275CAA9409F1E349DEF3C6CCE77CDBE@039-SN2MPN1-012.039d.mgd.msft.net>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The AES driver currently assumes that pm_runtime_get_sync will always
-succeed, which may not always be true, so add error handling for the
-same.
+Hi Herbert,
 
-This scenario was reported in the following bug:
-place.  https://bugzilla.kernel.org/show_bug.cgi?id=66441
+Your original response was terse and left me more puzzled. Do you have a sensible explanation why some includes should be kept in the source even they serve no purpose during the build?
 
-Reported-by: Tobias Jakobi <tjakobi@math.uni-bielefeld.de>
-Signed-off-by: Nishanth Menon <nm@ti.com>
----
+Thanks,
 
-Note: the bug in OMAP pm_domain layer is addressed here:
-https://patchwork.kernel.org/patch/3280531/
+Cristian S.
 
-Proper fixes required to make this work is part of the series:
-http://marc.info/?l=linux-kernel&m=138541594910233&w=2
 
- drivers/crypto/omap-aes.c |   16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index a9ccbf1..dde41f1d 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -784,6 +784,7 @@ static int omap_aes_ctr_decrypt(struct ablkcipher_request *req)
- static int omap_aes_cra_init(struct crypto_tfm *tfm)
- {
- 	struct omap_aes_dev *dd = NULL;
-+	int err;
- 
- 	/* Find AES device, currently picks the first device */
- 	spin_lock_bh(&list_lock);
-@@ -792,7 +793,13 @@ static int omap_aes_cra_init(struct crypto_tfm *tfm)
- 	}
- 	spin_unlock_bh(&list_lock);
- 
--	pm_runtime_get_sync(dd->dev);
-+	err = pm_runtime_get_sync(dd->dev);
-+	if (err < 0) {
-+		dev_err(dd->dev, "%s: failed to get_sync(%d)\n",
-+			__func__, err);
-+		return err;
-+	}
-+
- 	tfm->crt_ablkcipher.reqsize = sizeof(struct omap_aes_reqctx);
- 
- 	return 0;
-@@ -1182,7 +1189,12 @@ static int omap_aes_probe(struct platform_device *pdev)
- 	dd->phys_base = res.start;
- 
- 	pm_runtime_enable(dev);
--	pm_runtime_get_sync(dev);
-+	err = pm_runtime_get_sync(dev);
-+	if (err < 0) {
-+		dev_err(dev, "%s: failed to get_sync(%d)\n",
-+			__func__, err);
-+		goto err_res;
-+	}
- 
- 	omap_aes_dma_stop(dd);
- 
--- 
-1.7.9.5
+> > Just because it compiles it doesn't meant that the files you
+> > removed are unnecessary.
+> >
+> > The only file that is really unnecessary here is spinlock.h.
+> >
+> []
+> OK then, but let's reverse the question. In a construct similar to
+> authenc.c, what would be the purpose of slab.h and kernel.h?
+> (That leads to the next question which is - what is the purpose of those
+> files in authenc.c?)
