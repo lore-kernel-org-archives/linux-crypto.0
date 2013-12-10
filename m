@@ -1,53 +1,92 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: randconfig build error with next-20131210, in drivers/crypto/ccp/ccp-pci.c
-Date: Tue, 10 Dec 2013 09:34:48 -0600
-Message-ID: <1785749.ip5jsEzFz7@tlendack-t1>
-References: <CA+r1ZhhhUWhMqeyS0J7V5j-iYtCk24gszpJFif8hF2cwr5K6hg@mail.gmail.com>
+From: Jan Kara <jack@suse.cz>
+Subject: Re: 3.11.4: kernel BUG at fs/buffer.c:1268
+Date: Tue, 10 Dec 2013 17:21:46 +0100
+Message-ID: <20131210162146.GF1543@quack.suse.cz>
+References: <20131128153420.GA21176@quack.suse.cz>
+ <20131210093528.23399.qmail@science.horizon.com>
+ <20131210152701.GE1543@quack.suse.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	<linux-next@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Jim Davis <jim.epost@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: jack@suse.cz, linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tytso@mit.edu, viro@ZenIV.linux.org.uk,
+	linux-crypto@vger.kernel.org, x86@kernel.org
+To: George Spelvin <linux@horizon.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CA+r1ZhhhUWhMqeyS0J7V5j-iYtCk24gszpJFif8hF2cwr5K6hg@mail.gmail.com>
+Content-Disposition: inline
+In-Reply-To: <20131210152701.GE1543@quack.suse.cz>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Tue 10-12-13 16:27:01, Jan Kara wrote:
+> On Tue 10-12-13 04:35:28, George Spelvin wrote:
+> > One of those additional WARN_ON tests tripped, hooray!
+> > And it turned out to be in the ext4 metadata checksumming.  To be
+> > precise, ext4_block_bitmap_csum_set() returned with irqs disabled,
+> > and kaboom.
+>   Ha, great. Thanks for the persistence in testing.
+> 
+> > Since I have this experimental feature turned on and most people don't,
+> > this explains why I'm finding it and World+Dog aren't.
+> > 
+> > I appear to be the designated finder of ext4 metadata_csum bugs, so tytso
+> > notified on general principles.  I dropped the generic linux-fsdevel
+> > list from the Cc: list.
+> > 
+> > But looking at the code, it just calls into the linux-crypto layer and
+> > Tim Chen's SSE CRC32C implementation which uses kernel_fpu_begin()
+> > and kernel_fpu_end() if the block is large enough.
+>   Yup, that code was also my last hope but I can't say I see any problem in
+> there either.
+  BTW, given you always see the problem when ext4_truncate() gets called 
+as a response to application catching a deadly signal and thus
+task_work_run() gets called, I think there's something in irq_fpu_usable()
+which isn't exactly right. But I know nothing about the logic there. Or
+maybe the signal is caught in some unlucky moment when FPU is in some
+strange state?
 
-On Tuesday, December 10, 2013 07:21:36 AM Jim Davis wrote:
-> Building with the attached random configuration file,
->=20
-> drivers/crypto/ccp/ccp-pci.c: In function =E2=80=98ccp_get_msix_irqs=E2=
-=80=99:
-> drivers/crypto/ccp/ccp-pci.c:44:20: error: array type has incomplete
-> element type
-> drivers/crypto/ccp/ccp-pci.c:48:18: error: negative width in bit-fiel=
-d
-> =E2=80=98<anonymous>=E2=80=99
-> drivers/crypto/ccp/ccp-pci.c:51:2: error: implicit declaration of
-> function =E2=80=98pci_enable_msix=E2=80=99 [-Werror=3Dimplicit-functi=
-on-declaration]
-> drivers/crypto/ccp/ccp-pci.c:76:2: error: implicit declaration of
-> function =E2=80=98pci_disable_msix=E2=80=99 [-Werror=3Dimplicit-funct=
-ion-declaration]
-> drivers/crypto/ccp/ccp-pci.c:44:20: warning: unused variable
-> =E2=80=98msix_entry=E2=80=99 [-Wunused-variable]
-> drivers/crypto/ccp/ccp-pci.c: In function =E2=80=98ccp_get_msi_irq=E2=
-=80=99:
-> drivers/crypto/ccp/ccp-pci.c:89:2: error: implicit declaration of
-> function =E2=80=98pci_enable_msi=E2=80=99 [-Werror=3Dimplicit-functio=
-n-declaration]
-> drivers/crypto/ccp/ccp-pci.c:102:2: error: implicit declaration of
-> function =E2=80=98pci_disable_msi=E2=80=99 [-Werror=3Dimplicit-functi=
-on-declaration]
-> cc1: some warnings being treated as errors
-> make[3]: *** [drivers/crypto/ccp/ccp-pci.o] Error 1
+								Honza
 
-Thanks for finding this, I'll update to the Kconfig to add PCI to
-the 'depends on' statement.
-
-Tom
+> > I was going to add and Herbert Xu and Tim Chen and all those mailing
+> > lists, but looking at the code, it sure *looks* like they're Doing The
+> > right Thing, so I'm holding off for a bit.
+> > 
+> > I'm not sure quite where to pass th buck on this one.
+> > 
+> > Relevant platform info:
+> > - Intel i7-2700K processor, with SSE4.2 and thus the CRC32C instruction.
+> > - CONFIG_PREEMPT_VOLUNTARY=y
+> > - # CONFIG_PREEMPT_NONE is not set
+> > - CONFIG_PREEMPT_VOLUNTARY=y
+> > - # CONFIG_PREEMPT is not set
+> > - CONFIG_PREEMPT_COUNT=y
+> > - CONFIG_DEBUG_ATOMIC_SLEEP=y
+> > - CONFIG_DEBUG_BUGVERBOSE=y
+> > 
+> ...
+> > 
+> > === Discussion ===
+> > desc.shash.tfm is filled in from sbi->s_chksum_driver, which is filled in at
+> > ext4_fill_super() time by crypto_alloc_shash("crc32c", 0, 0).
+> > 
+> > Thus, shash->update should turn into a call to crypto/crc32c.c:chksum_update(),
+> > which calls lib/crc32.c:__crc32c_le().
+> > 
+> > Now, I happen to be running an i7-2700k which has sse4_2, and thus calls
+> > into the x86 specific code, and apparently for large blocks it uses PCLMULQDQ,
+> > which requires kernel_fpu_begin/end.
+> > 
+> > At least that makes some degree of sense.  The low level code, though
+> > uses the functions in a very simple way that I can't see how it could fail
+> > to unlock at the end.
+>   Hum, can you try disabling the HW support of CRC32C implementation
+> (CRYPTO_CRC32C_INTEL)? If the problem disappears, we know there's some
+> problem in the HW support code...
+> 
+> 								Honza
+> -- 
+> Jan Kara <jack@suse.cz>
+> SUSE Labs, CR
+-- 
+Jan Kara <jack@suse.cz>
+SUSE Labs, CR
