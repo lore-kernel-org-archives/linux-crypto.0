@@ -1,58 +1,40 @@
-From: Daniel Borkmann <dborkman@redhat.com>
-Subject: [PATCH cryptodev] crypto: arch - use crypto_memneq instead of memcmp
-Date: Wed, 11 Dec 2013 11:28:59 +0100
-Message-ID: <1386757739-32564-1-git-send-email-dborkman@redhat.com>
-Cc: linux-crypto@vger.kernel.org, James Yonan <james@openvpn.net>
-To: herbert@gondor.apana.org.au
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: re: crypto: ccp - CCP SHA crypto API support
+Date: Wed, 11 Dec 2013 13:51:50 +0300
+Message-ID: <20131211105150.GA422@elgon.mountain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: thomas.lendacky@amd.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:11386 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751183Ab3LKK3M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Dec 2013 05:29:12 -0500
+Received: from aserp1040.oracle.com ([141.146.126.69]:37656 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750864Ab3LKKvv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 Dec 2013 05:51:51 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Replace remaining occurences (just as we did in crypto/) under arch/*/crypto/
-that make use of memcmp() for comparing keys or authentication tags for
-usage with crypto_memneq(). It can simply be used as a drop-in replacement
-for the normal memcmp().
+Hello Tom Lendacky,
 
-Signed-off-by: Daniel Borkmann <dborkman@redhat.com>
-Cc: James Yonan <james@openvpn.net>
----
- arch/s390/crypto/des_s390.c        | 6 +++---
- arch/x86/crypto/aesni-intel_glue.c | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+The patch 0ab0a1d505ab: "crypto: ccp - CCP SHA crypto API support"
+from Nov 12, 2013, leads to the following static checker warning:
+	drivers/crypto/ccp/ccp-crypto-sha.c:182 ccp_do_sha_update()
+	warn: should 'rctx->hash_cnt << 3' be a 64 bit type?
 
-diff --git a/arch/s390/crypto/des_s390.c b/arch/s390/crypto/des_s390.c
-index bcca01c..200f2a1 100644
---- a/arch/s390/crypto/des_s390.c
-+++ b/arch/s390/crypto/des_s390.c
-@@ -237,9 +237,9 @@ static int des3_setkey(struct crypto_tfm *tfm, const u8 *key,
- 	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
- 	u32 *flags = &tfm->crt_flags;
- 
--	if (!(memcmp(key, &key[DES_KEY_SIZE], DES_KEY_SIZE) &&
--	    memcmp(&key[DES_KEY_SIZE], &key[DES_KEY_SIZE * 2],
--		   DES_KEY_SIZE)) &&
-+	if (!(crypto_memneq(key, &key[DES_KEY_SIZE], DES_KEY_SIZE) &&
-+	    crypto_memneq(&key[DES_KEY_SIZE], &key[DES_KEY_SIZE * 2],
-+			  DES_KEY_SIZE)) &&
- 	    (*flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
- 		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
- 		return -EINVAL;
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 835488b..aba34b8 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1001,7 +1001,7 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
- 		authTag, auth_tag_len);
- 
- 	/* Compare generated tag with passed in tag. */
--	retval = memcmp(src + tempCipherLen, authTag, auth_tag_len) ?
-+	retval = crypto_memneq(src + tempCipherLen, authTag, auth_tag_len) ?
- 		-EBADMSG : 0;
- 
- 	if (one_entry_in_sg) {
--- 
-1.8.3.1
+drivers/crypto/ccp/ccp-crypto-sha.c
+   180                  sg_mark_end(sg);
+   181  
+   182          rctx->msg_bits += (rctx->hash_cnt << 3);        /* Total in bits */
+                                   ^^^^^^^^^^^^^^^^^^^
+This operation wraps if the msg is over 500MB.  I'm not sure if that's
+possible, but ->msg_bits is declared as a u64 here and in
+rctx->cmd.u.sha.msg_bits as well.
+
+   183  
+   184          memset(&rctx->cmd, 0, sizeof(rctx->cmd));
+
+
+regards,
+dan carpenter
