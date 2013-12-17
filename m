@@ -1,355 +1,67 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: [PATCH 2/2] crypto: Added speed tests for AEAD crypto alogrithms
- in tcrypt test suite
-Date: Wed, 11 Dec 2013 14:28:47 -0800
-Message-ID: <1386800927.2624.10.camel@schen9-DESK>
-References: <a9c60c786b1b0d32664547342550ed3ddfe92364.1386772173.git.tim.c.chen@linux.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Erdinc Ozturk <erdinc.ozturk@intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	Huang Ying <ying.huang@intel.com>,
-	Alessandro Salvatori <sandr8@gmail.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <a9c60c786b1b0d32664547342550ed3ddfe92364.1386772173.git.tim.c.chen@linux.intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: karl@hiramoto.org
+Subject: [PATCH] tcrypt:  add hash speed tests for hmac().
+Date: Tue, 17 Dec 2013 11:51:46 +0100
+Message-ID: <1387277506-25907-1-git-send-email-karl@hiramoto.org>
+Cc: karl@hiramoto.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from hapkido.dreamhost.com ([66.33.216.122]:60050 "EHLO
+	hapkido.dreamhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750839Ab3LQK42 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Dec 2013 05:56:28 -0500
+Received: from homiemail-a109.g.dreamhost.com (mailbigip.dreamhost.com [208.97.132.5])
+	by hapkido.dreamhost.com (Postfix) with ESMTP id E0843DC3B0
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Dec 2013 02:56:26 -0800 (PST)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Adding simple speed tests for a range of block sizes for AEAD crypto
-algorithms.
-
-Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+Signed-off-by: Karl Hiramoto <karl@hiramoto.org>
 ---
- crypto/tcrypt.c | 270 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/tcrypt.h |  10 +++
- 2 files changed, 280 insertions(+)
+ crypto/tcrypt.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 001f07c..0d9003a 100644
+index 001f07c..fb57ad7 100644
 --- a/crypto/tcrypt.c
 +++ b/crypto/tcrypt.c
-@@ -137,7 +137,272 @@ out:
- 	return ret;
- }
+@@ -1510,6 +1510,37 @@ static int do_test(int m)
+ 		test_hash_speed("crct10dif", sec, generic_hash_speed_template);
+ 		if (mode > 300 && mode < 400) break;
  
-+static int test_aead_jiffies(struct aead_request *req, int enc,
-+				int blen, int sec)
-+{
-+	unsigned long start, end;
-+	int bcount;
-+	int ret;
++	case 319:
++		test_hash_speed("hmac(md5)", sec, hash_speed_template_16);
++		if (mode > 300 && mode < 400) break;
++	case 320:
++		test_hash_speed("hmac(sha1)", sec, hash_speed_template_16);
++		if (mode > 300 && mode < 400) break;
 +
-+	for (start = jiffies, end = start + sec * HZ, bcount = 0;
-+	     time_before(jiffies, end); bcount++) {
-+		if (enc)
-+			ret = crypto_aead_encrypt(req);
-+		else
-+			ret = crypto_aead_decrypt(req);
++	case 321:
++		test_hash_speed("hmac(sha256)", sec, hash_speed_template_16);
++		if (mode > 300 && mode < 400) break;
 +
-+		if (ret)
-+			return ret;
-+	}
++	case 322:
++		test_hash_speed("hmac(sha384)", sec, hash_speed_template_16);
++		if (mode > 300 && mode < 400) break;
++	case 323:
++		test_hash_speed("hmac(sha512)", sec, hash_speed_template_16);
++		if (mode > 300 && mode < 400) break;
++	case 324:
++		test_hash_speed("hmac(sha224)", sec, hash_speed_template_16);
++		if (mode > 300 && mode < 400) break;
 +
-+	printk("%d operations in %d seconds (%ld bytes)\n",
-+	       bcount, sec, (long)bcount * blen);
-+	return 0;
-+}
++	case 325:
++		test_hash_speed("hmac(rmd128)", sec, hash_speed_template_16);
++		if (mode > 300 && mode < 400) break;
++	case 326:
++		test_hash_speed("hmac(rmd160)", sec, hash_speed_template_16);
++		if (mode > 300 && mode < 400) break;
++	case 327:
++		test_hash_speed("hmac(crc32)", sec, hash_speed_template_16);
++		if (mode > 300 && mode < 400) break;
 +
-+static int test_aead_cycles(struct aead_request *req, int enc, int blen)
-+{
-+	unsigned long cycles = 0;
-+	int ret = 0;
-+	int i;
-+
-+	local_irq_disable();
-+
-+	/* Warm-up run. */
-+	for (i = 0; i < 4; i++) {
-+		if (enc)
-+			ret = crypto_aead_encrypt(req);
-+		else
-+			ret = crypto_aead_decrypt(req);
-+
-+		if (ret)
-+			goto out;
-+	}
-+
-+	/* The real thing. */
-+	for (i = 0; i < 8; i++) {
-+		cycles_t start, end;
-+
-+		start = get_cycles();
-+		if (enc)
-+			ret = crypto_aead_encrypt(req);
-+		else
-+			ret = crypto_aead_decrypt(req);
-+		end = get_cycles();
-+
-+		if (ret)
-+			goto out;
-+
-+		cycles += end - start;
-+	}
-+
-+out:
-+	local_irq_enable();
-+
-+	if (ret == 0)
-+		printk("1 operation in %lu cycles (%d bytes)\n",
-+		       (cycles + 4) / 8, blen);
-+
-+	return ret;
-+}
-+
- static u32 block_sizes[] = { 16, 64, 256, 1024, 8192, 0 };
-+static u32 aead_sizes[] = { 16, 64, 256, 512, 1024, 2048, 4096, 8192, 0 };
-+
-+#define XBUFSIZE 8
-+#define MAX_IVLEN 32
-+
-+static int testmgr_alloc_buf(char *buf[XBUFSIZE])
-+{
-+	int i;
-+
-+	for (i = 0; i < XBUFSIZE; i++) {
-+		buf[i] = (void *)__get_free_page(GFP_KERNEL);
-+		if (!buf[i])
-+			goto err_free_buf;
-+	}
-+
-+	return 0;
-+
-+err_free_buf:
-+	while (i-- > 0)
-+		free_page((unsigned long)buf[i]);
-+
-+	return -ENOMEM;
-+}
-+
-+static void testmgr_free_buf(char *buf[XBUFSIZE])
-+{
-+	int i;
-+
-+	for (i = 0; i < XBUFSIZE; i++)
-+		free_page((unsigned long)buf[i]);
-+}
-+
-+static void sg_init_aead(struct scatterlist *sg, char *xbuf[XBUFSIZE],
-+			unsigned int buflen)
-+{
-+	int np = (buflen + PAGE_SIZE - 1)/PAGE_SIZE;
-+	int k, rem;
-+
-+	np = (np > XBUFSIZE) ? XBUFSIZE : np;
-+	rem = buflen % PAGE_SIZE;
-+	if (np > XBUFSIZE) {
-+		rem = PAGE_SIZE;
-+		np = XBUFSIZE;
-+	}
-+	sg_init_table(sg, np);
-+	for (k = 0; k < np; ++k) {
-+		if (k == (np-1))
-+			sg_set_buf(&sg[k], xbuf[k], rem);
-+		else
-+			sg_set_buf(&sg[k], xbuf[k], PAGE_SIZE);
-+	}
-+}
-+
-+static void test_aead_speed(const char *algo, int enc, unsigned int sec,
-+			    struct aead_speed_template *template,
-+			    unsigned int tcount, u8 authsize,
-+			    unsigned int aad_size, u8 *keysize)
-+{
-+	unsigned int i, j;
-+	struct crypto_aead *tfm;
-+	int ret = -ENOMEM;
-+	const char *key;
-+	struct aead_request *req;
-+	struct scatterlist *sg;
-+	struct scatterlist *asg;
-+	struct scatterlist *sgout;
-+	const char *e;
-+	void *assoc;
-+	char iv[MAX_IVLEN];
-+	char *xbuf[XBUFSIZE];
-+	char *xoutbuf[XBUFSIZE];
-+	char *axbuf[XBUFSIZE];
-+	unsigned int *b_size;
-+	unsigned int iv_len;
-+
-+	if (enc == ENCRYPT)
-+		e = "encryption";
-+	else
-+		e = "decryption";
-+
-+	if (testmgr_alloc_buf(xbuf))
-+		goto out_noxbuf;
-+	if (testmgr_alloc_buf(axbuf))
-+		goto out_noaxbuf;
-+	if (testmgr_alloc_buf(xoutbuf))
-+		goto out_nooutbuf;
-+
-+	sg = kmalloc(sizeof(*sg) * 8 * 3, GFP_KERNEL);
-+	if (!sg)
-+		goto out_nosg;
-+	asg = &sg[8];
-+	sgout = &asg[8];
-+
-+
-+	printk(KERN_INFO "\ntesting speed of %s %s\n", algo, e);
-+
-+	tfm = crypto_alloc_aead(algo, 0, 0);
-+
-+	if (IS_ERR(tfm)) {
-+		pr_err("alg: aead: Failed to load transform for %s: %ld\n", algo,
-+		       PTR_ERR(tfm));
-+		return;
-+	}
-+
-+	req = aead_request_alloc(tfm, GFP_KERNEL);
-+	if (!req) {
-+		pr_err("alg: aead: Failed to allocate request for %s\n",
-+		       algo);
-+		goto out;
-+	}
-+
-+	i = 0;
-+	do {
-+		b_size = aead_sizes;
-+		do {
-+			assoc = axbuf[0];
-+
-+			if (aad_size < PAGE_SIZE)
-+				memset(assoc, 0xff, aad_size);
-+			else {
-+				pr_err("associate data length (%u) too big\n",
-+					aad_size);
-+				goto out_nosg;
-+			}
-+			sg_init_one(&asg[0], assoc, aad_size);
-+
-+			if ((*keysize + *b_size) > TVMEMSIZE * PAGE_SIZE) {
-+				pr_err("template (%u) too big for tvmem (%lu)\n",
-+				       *keysize + *b_size,
-+					TVMEMSIZE * PAGE_SIZE);
-+				goto out;
-+			}
-+
-+			key = tvmem[0];
-+			for (j = 0; j < tcount; j++) {
-+				if (template[j].klen == *keysize) {
-+					key = template[j].key;
-+					break;
-+				}
-+			}
-+			ret = crypto_aead_setkey(tfm, key, *keysize);
-+			ret = crypto_aead_setauthsize(tfm, authsize);
-+
-+			iv_len = crypto_aead_ivsize(tfm);
-+			if (iv_len)
-+				memset(&iv, 0xff, iv_len);
-+
-+			crypto_aead_clear_flags(tfm, ~0);
-+			printk(KERN_INFO "test %u (%d bit key, %d byte blocks): ",
-+					i, *keysize * 8, *b_size);
-+
-+
-+			memset(tvmem[0], 0xff, PAGE_SIZE);
-+
-+			if (ret) {
-+				pr_err("setkey() failed flags=%x\n",
-+						crypto_aead_get_flags(tfm));
-+				goto out;
-+			}
-+
-+			sg_init_aead(&sg[0], xbuf,
-+				    *b_size + (enc ? authsize : 0));
-+
-+			sg_init_aead(&sgout[0], xoutbuf,
-+				    *b_size + (enc ? authsize : 0));
-+
-+			aead_request_set_crypt(req, sg, sgout, *b_size, iv);
-+			aead_request_set_assoc(req, asg, aad_size);
-+
-+			if (sec)
-+				ret = test_aead_jiffies(req, enc, *b_size, sec);
-+			else
-+				ret = test_aead_cycles(req, enc, *b_size);
-+
-+			if (ret) {
-+				pr_err("%s() failed return code=%d\n", e, ret);
-+				break;
-+			}
-+			b_size++;
-+			i++;
-+		} while (*b_size);
-+		keysize++;
-+	} while (*keysize);
-+
-+out:
-+	crypto_free_aead(tfm);
-+	kfree(sg);
-+out_nosg:
-+	testmgr_free_buf(xoutbuf);
-+out_nooutbuf:
-+	testmgr_free_buf(axbuf);
-+out_noaxbuf:
-+	testmgr_free_buf(xbuf);
-+out_noxbuf:
-+	return;
-+}
- 
- static void test_cipher_speed(const char *algo, int enc, unsigned int sec,
- 			      struct cipher_speed_template *template,
-@@ -1427,6 +1692,11 @@ static int do_test(int m)
- 				  speed_template_32_64);
+ 	case 399:
  		break;
  
-+	case 211:
-+		test_aead_speed("rfc4106(gcm(aes))", ENCRYPT, sec,
-+				NULL, 0, 16, 8, aead_speed_template_20);
-+		break;
-+
- 	case 300:
- 		/* fall through */
- 
-diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
-index ecdeeb1..6c7e21a 100644
---- a/crypto/tcrypt.h
-+++ b/crypto/tcrypt.h
-@@ -22,6 +22,11 @@ struct cipher_speed_template {
- 	unsigned int klen;
- };
- 
-+struct aead_speed_template {
-+	const char *key;
-+	unsigned int klen;
-+};
-+
- struct hash_speed {
- 	unsigned int blen;	/* buffer length */
- 	unsigned int plen;	/* per-update length */
-@@ -58,6 +63,11 @@ static u8 speed_template_32_48_64[] = {32, 48, 64, 0};
- static u8 speed_template_32_64[] = {32, 64, 0};
- 
- /*
-+ * AEAD speed tests
-+ */
-+static u8 aead_speed_template_20[] = {20, 0};
-+
-+/*
-  * Digest speed tests
-  */
- static struct hash_speed generic_hash_speed_template[] = {
 -- 
-1.7.11.7
+1.8.3.2
