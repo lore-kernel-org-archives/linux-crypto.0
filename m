@@ -1,113 +1,60 @@
-From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH] crypto: caam - simplify and harden key parsing
-Date: Thu, 19 Dec 2013 17:27:35 +0200
-Message-ID: <1387466855-4705-1-git-send-email-horia.geanta@freescale.com>
+From: Mickael Maison <mickael.maison@gmail.com>
+Subject: Re: [PATCH] CRYPTO: async_tx: Fixed a couple of typos
+Date: Thu, 19 Dec 2013 17:06:20 +0100
+Message-ID: <CA+OCqnbstyRxTswbgLAt450X5Mu+zk7tbWsy=frNYaDyM1F3kw@mail.gmail.com>
+References: <1384018214-28064-1-git-send-email-mickael.maison@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: dan.j.williams@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-db9lp0253.outbound.messaging.microsoft.com ([213.199.154.253]:3848
-	"EHLO db9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753444Ab3LSPeM (ORCPT
+Received: from mail-vb0-f44.google.com ([209.85.212.44]:35812 "EHLO
+	mail-vb0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753870Ab3LSQGl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 19 Dec 2013 10:34:12 -0500
+	Thu, 19 Dec 2013 11:06:41 -0500
+In-Reply-To: <1384018214-28064-1-git-send-email-mickael.maison@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use the common helper function crypto_authenc_extractkeys() for key
-parsing.
-Also fix the key buffer overflow condition: use split key pad length
-instead of authentication key length.
+Hi,
 
-Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
----
- drivers/crypto/caam/caamalg.c |   36 +++++++++++++-----------------------
- 1 files changed, 13 insertions(+), 23 deletions(-)
+Are you interested in patches fixing typos ? I've found a bunch more
+under /crypto but as I haven't received any responses on this one, I'm
+not sure I should send new patches in.
+This was my first patch so if I'm doing anything wrong, please tell me !
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 4cf5dec..b71f2fd 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -467,24 +467,10 @@ static int aead_setkey(struct crypto_aead *aead,
- 	static const u8 mdpadlen[] = { 16, 20, 32, 32, 64, 64 };
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	struct device *jrdev = ctx->jrdev;
--	struct rtattr *rta = (void *)key;
--	struct crypto_authenc_key_param *param;
--	unsigned int authkeylen;
--	unsigned int enckeylen;
-+	struct crypto_authenc_keys keys;
- 	int ret = 0;
- 
--	param = RTA_DATA(rta);
--	enckeylen = be32_to_cpu(param->enckeylen);
--
--	key += RTA_ALIGN(rta->rta_len);
--	keylen -= RTA_ALIGN(rta->rta_len);
--
--	if (keylen < enckeylen)
--		goto badkey;
--
--	authkeylen = keylen - enckeylen;
--
--	if (keylen > CAAM_MAX_KEY_SIZE)
-+	if (crypto_authenc_extractkeys(&keys, key, keylen) != 0)
- 		goto badkey;
- 
- 	/* Pick class 2 key length from algorithm submask */
-@@ -492,25 +478,29 @@ static int aead_setkey(struct crypto_aead *aead,
- 				      OP_ALG_ALGSEL_SHIFT] * 2;
- 	ctx->split_key_pad_len = ALIGN(ctx->split_key_len, 16);
- 
-+	if (ctx->split_key_pad_len + keys.enckeylen > CAAM_MAX_KEY_SIZE)
-+		goto badkey;
-+
- #ifdef DEBUG
- 	printk(KERN_ERR "keylen %d enckeylen %d authkeylen %d\n",
--	       keylen, enckeylen, authkeylen);
-+	       keys.authkeylen + keys.enckeylen, keys.enckeylen,
-+	       keys.authkeylen);
- 	printk(KERN_ERR "split_key_len %d split_key_pad_len %d\n",
- 	       ctx->split_key_len, ctx->split_key_pad_len);
- 	print_hex_dump(KERN_ERR, "key in @"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
- #endif
- 
--	ret = gen_split_aead_key(ctx, key, authkeylen);
-+	ret = gen_split_aead_key(ctx, keys.authkey, keys.authkeylen);
- 	if (ret) {
- 		goto badkey;
- 	}
- 
- 	/* postpend encryption key to auth split key */
--	memcpy(ctx->key + ctx->split_key_pad_len, key + authkeylen, enckeylen);
-+	memcpy(ctx->key + ctx->split_key_pad_len, keys.enckey, keys.enckeylen);
- 
- 	ctx->key_dma = dma_map_single(jrdev, ctx->key, ctx->split_key_pad_len +
--				       enckeylen, DMA_TO_DEVICE);
-+				      keys.enckeylen, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, ctx->key_dma)) {
- 		dev_err(jrdev, "unable to map key i/o memory\n");
- 		return -ENOMEM;
-@@ -518,15 +508,15 @@ static int aead_setkey(struct crypto_aead *aead,
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "ctx.key@"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, ctx->key,
--		       ctx->split_key_pad_len + enckeylen, 1);
-+		       ctx->split_key_pad_len + keys.enckeylen, 1);
- #endif
- 
--	ctx->enckeylen = enckeylen;
-+	ctx->enckeylen = keys.enckeylen;
- 
- 	ret = aead_set_sh_desc(aead);
- 	if (ret) {
- 		dma_unmap_single(jrdev, ctx->key_dma, ctx->split_key_pad_len +
--				 enckeylen, DMA_TO_DEVICE);
-+				 keys.enckeylen, DMA_TO_DEVICE);
- 	}
- 
- 	return ret;
--- 
-1.7.7.6
+Mickael
+
+On Sat, Nov 9, 2013 at 6:30 PM, Mickael Maison <mickael.maison@gmail.com> wrote:
+> Fixed 2 typos in async_xor.c
+> ---
+>  crypto/async_tx/async_xor.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
+> index 8ade0a0..bcaa1e9 100644
+> --- a/crypto/async_tx/async_xor.c
+> +++ b/crypto/async_tx/async_xor.c
+> @@ -48,7 +48,7 @@ do_async_xor(struct dma_chan *chan, struct page *dest, struct page **src_list,
+>         int xor_src_cnt = 0;
+>         dma_addr_t dma_dest;
+>
+> -       /* map the dest bidrectional in case it is re-used as a source */
+> +       /* map the dest bidirectional in case it is re-used as a source */
+>         dma_dest = dma_map_page(dma->dev, dest, offset, len, DMA_BIDIRECTIONAL);
+>         for (i = 0; i < src_cnt; i++) {
+>                 /* only map the dest once */
+> @@ -175,7 +175,7 @@ do_sync_xor(struct page *dest, struct page **src_list, unsigned int offset,
+>   * xor_blocks always uses the dest as a source so the
+>   * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
+>   * the calculation.  The assumption with dma eninges is that they only
+> - * use the destination buffer as a source when it is explicity specified
+> + * use the destination buffer as a source when it is explicitly specified
+>   * in the source list.
+>   *
+>   * src_list note: if the dest is also a source it must be at index zero.
+> --
+> 1.7.10.4
+>
