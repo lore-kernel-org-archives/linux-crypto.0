@@ -1,60 +1,63 @@
-From: Mickael Maison <mickael.maison@gmail.com>
-Subject: Re: [PATCH] CRYPTO: async_tx: Fixed a couple of typos
-Date: Thu, 19 Dec 2013 17:06:20 +0100
-Message-ID: <CA+OCqnbstyRxTswbgLAt450X5Mu+zk7tbWsy=frNYaDyM1F3kw@mail.gmail.com>
-References: <1384018214-28064-1-git-send-email-mickael.maison@gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: randconfig build error with next-20131210, in drivers/crypto/ccp/ccp-pci.c
+Date: Thu, 19 Dec 2013 11:35:09 -0800
+Message-ID: <52B34A6D.7010903@infradead.org>
+References: <CA+r1ZhhhUWhMqeyS0J7V5j-iYtCk24gszpJFif8hF2cwr5K6hg@mail.gmail.com> <1785749.ip5jsEzFz7@tlendack-t1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: dan.j.williams@intel.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-vb0-f44.google.com ([209.85.212.44]:35812 "EHLO
-	mail-vb0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753870Ab3LSQGl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 19 Dec 2013 11:06:41 -0500
-In-Reply-To: <1384018214-28064-1-git-send-email-mickael.maison@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+	Jim Davis <jim.epost@gmail.com>
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <1785749.ip5jsEzFz7@tlendack-t1>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On 12/10/13 07:34, Tom Lendacky wrote:
+>=20
+> On Tuesday, December 10, 2013 07:21:36 AM Jim Davis wrote:
+>> Building with the attached random configuration file,
+>>
+>> drivers/crypto/ccp/ccp-pci.c: In function =E2=80=98ccp_get_msix_irqs=
+=E2=80=99:
+>> drivers/crypto/ccp/ccp-pci.c:44:20: error: array type has incomplete
+>> element type
+>> drivers/crypto/ccp/ccp-pci.c:48:18: error: negative width in bit-fie=
+ld
+>> =E2=80=98<anonymous>=E2=80=99
+>> drivers/crypto/ccp/ccp-pci.c:51:2: error: implicit declaration of
+>> function =E2=80=98pci_enable_msix=E2=80=99 [-Werror=3Dimplicit-funct=
+ion-declaration]
+>> drivers/crypto/ccp/ccp-pci.c:76:2: error: implicit declaration of
+>> function =E2=80=98pci_disable_msix=E2=80=99 [-Werror=3Dimplicit-func=
+tion-declaration]
+>> drivers/crypto/ccp/ccp-pci.c:44:20: warning: unused variable
+>> =E2=80=98msix_entry=E2=80=99 [-Wunused-variable]
+>> drivers/crypto/ccp/ccp-pci.c: In function =E2=80=98ccp_get_msi_irq=E2=
+=80=99:
+>> drivers/crypto/ccp/ccp-pci.c:89:2: error: implicit declaration of
+>> function =E2=80=98pci_enable_msi=E2=80=99 [-Werror=3Dimplicit-functi=
+on-declaration]
+>> drivers/crypto/ccp/ccp-pci.c:102:2: error: implicit declaration of
+>> function =E2=80=98pci_disable_msi=E2=80=99 [-Werror=3Dimplicit-funct=
+ion-declaration]
+>> cc1: some warnings being treated as errors
+>> make[3]: *** [drivers/crypto/ccp/ccp-pci.o] Error 1
+>=20
+> Thanks for finding this, I'll update to the Kconfig to add PCI to
+> the 'depends on' statement.
 
-Are you interested in patches fixing typos ? I've found a bunch more
-under /crypto but as I haven't received any responses on this one, I'm
-not sure I should send new patches in.
-This was my first patch so if I'm doing anything wrong, please tell me !
+Tom,
 
-Mickael
+Can you get this patch and the HW_RANDOM patch merged into linux-next, =
+please?
+linux-next builds are still failing for both of these reasons.
 
-On Sat, Nov 9, 2013 at 6:30 PM, Mickael Maison <mickael.maison@gmail.com> wrote:
-> Fixed 2 typos in async_xor.c
-> ---
->  crypto/async_tx/async_xor.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
-> index 8ade0a0..bcaa1e9 100644
-> --- a/crypto/async_tx/async_xor.c
-> +++ b/crypto/async_tx/async_xor.c
-> @@ -48,7 +48,7 @@ do_async_xor(struct dma_chan *chan, struct page *dest, struct page **src_list,
->         int xor_src_cnt = 0;
->         dma_addr_t dma_dest;
->
-> -       /* map the dest bidrectional in case it is re-used as a source */
-> +       /* map the dest bidirectional in case it is re-used as a source */
->         dma_dest = dma_map_page(dma->dev, dest, offset, len, DMA_BIDIRECTIONAL);
->         for (i = 0; i < src_cnt; i++) {
->                 /* only map the dest once */
-> @@ -175,7 +175,7 @@ do_sync_xor(struct page *dest, struct page **src_list, unsigned int offset,
->   * xor_blocks always uses the dest as a source so the
->   * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
->   * the calculation.  The assumption with dma eninges is that they only
-> - * use the destination buffer as a source when it is explicity specified
-> + * use the destination buffer as a source when it is explicitly specified
->   * in the source list.
->   *
->   * src_list note: if the dest is also a source it must be at index zero.
-> --
-> 1.7.10.4
->
+thanks,
+--=20
+~Randy
