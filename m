@@ -1,64 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: omap-sham: Fix Polling mode for larger blocks
-Date: Fri, 20 Dec 2013 22:08:18 +0800
-Message-ID: <20131220140818.GD356@gondor.apana.org.au>
-References: <1387373613-1718-1-git-send-email-lokeshvutla@ti.com>
+Subject: Re: [PATCH 1/2] crypto: AVX and AVX2 version of AESNI-GCM encode and
+ decode
+Date: Fri, 20 Dec 2013 22:08:02 +0800
+Message-ID: <20131220140802.GC356@gondor.apana.org.au>
+References: <1386800921.2624.9.camel@schen9-DESK>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
-	rnayak@ti.com
-To: Lokesh Vutla <lokeshvutla@ti.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Erdinc Ozturk <erdinc.ozturk@intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	Huang Ying <ying.huang@intel.com>,
+	Alessandro Salvatori <sandr8@gmail.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:57958 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:54734 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932535Ab3LTOIU (ORCPT
+	with ESMTP id S932535Ab3LTOIW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Dec 2013 09:08:20 -0500
+	Fri, 20 Dec 2013 09:08:22 -0500
 Content-Disposition: inline
-In-Reply-To: <1387373613-1718-1-git-send-email-lokeshvutla@ti.com>
+In-Reply-To: <1386800921.2624.9.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 18, 2013 at 07:03:33PM +0530, Lokesh Vutla wrote:
-> Command "tcrypt sec=1 mode=403" give the follwoing error for Polling
-> mode:
-> root@am335x-evm:/# insmod tcrypt.ko sec=1 mode=403
-> [...]
+On Wed, Dec 11, 2013 at 02:28:41PM -0800, Tim Chen wrote:
+> We have added AVX and AVX2 routines that optimize AESNI-GCM encode/decode.
+> These routines are optimized for encrypt and decrypt of large buffers.
+> In tests we have seen up to 6% speedup for 1K, 11% speedup for 2K and
+> 18% speedup for 8K buffer over the existing SSE version.  These routines
+> should provide even better speedup for future Intel x86_64 cpus.
 > 
-> [  346.982754] test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates):   4352 opers/sec,  17825792 bytes/sec
-> [  347.992661] test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates):   7095 opers/sec,  29061120 bytes/sec
-> [  349.002667] test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates):
-> [  349.010882] Unable to handle kernel NULL pointer dereference at virtual address 00000000
-> [  349.020037] pgd = ddeac000
-> [  349.022884] [00000000] *pgd=9dcb4831, *pte=00000000, *ppte=00000000
-> [  349.029816] Internal error: Oops: 17 [#1] PREEMPT SMP ARM
-> [  349.035482] Modules linked in: tcrypt(+)
-> [  349.039617] CPU: 0 PID: 1473 Comm: insmod Not tainted 3.12.4-01566-g6279006-dirty #38
-> [  349.047832] task: dda91540 ti: ddcd2000 task.ti: ddcd2000
-> [  349.053517] PC is at omap_sham_xmit_dma+0x6c/0x238
-> [  349.058544] LR is at omap_sham_xmit_dma+0x38/0x238
-> [  349.063570] pc : [<c04eb7cc>]    lr : [<c04eb798>]    psr: 20000013
-> [  349.063570] sp : ddcd3c78  ip : 00000000  fp : 9d8980b8
-> [  349.075610] r10: 00000000  r9 : 00000000  r8 : 00000000
-> [  349.081090] r7 : 00001000  r6 : dd898000  r5 : 00000040  r4 : ddb10550
-> [  349.087935] r3 : 00000004  r2 : 00000010  r1 : 53100080  r0 : 00000000
-> [  349.094783] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
-> [  349.102268] Control: 10c5387d  Table: 9deac019  DAC: 00000015
-> [  349.108294] Process insmod (pid: 1473, stack limit = 0xddcd2248)
-> 
-> [...]
-> 
-> This is because polling_mode is not enabled for ctx without FLAGS_FINUP.
-> 
-> For polling mode the bufcnt is made 0 unconditionally. But it should be made 0
-> only if it is a final update or a total is not zero(This condition is similar
-> to what is done in DMA case). Because of this wrong hashes are produced.
-> 
-> Fixing the same.
-> 
-> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 
-Patch applied.  Thanks!
+Both patches applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
