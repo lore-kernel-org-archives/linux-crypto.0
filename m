@@ -1,44 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: AVX and AVX2 version of AESNI-GCM encode and
- decode
-Date: Fri, 20 Dec 2013 22:08:02 +0800
-Message-ID: <20131220140802.GC356@gondor.apana.org.au>
-References: <1386800921.2624.9.camel@schen9-DESK>
+Subject: Re: [PATCH] crypto: caam - simplify and harden key parsing
+Date: Fri, 20 Dec 2013 22:08:30 +0800
+Message-ID: <20131220140830.GE356@gondor.apana.org.au>
+References: <1387466855-4705-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Erdinc Ozturk <erdinc.ozturk@intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	Huang Ying <ying.huang@intel.com>,
-	Alessandro Salvatori <sandr8@gmail.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
+Cc: linux-crypto@vger.kernel.org
+To: Horia Geanta <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:54734 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:46924 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932535Ab3LTOIW (ORCPT
+	with ESMTP id S1422647Ab3LTOIc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Dec 2013 09:08:22 -0500
+	Fri, 20 Dec 2013 09:08:32 -0500
 Content-Disposition: inline
-In-Reply-To: <1386800921.2624.9.camel@schen9-DESK>
+In-Reply-To: <1387466855-4705-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 11, 2013 at 02:28:41PM -0800, Tim Chen wrote:
-> We have added AVX and AVX2 routines that optimize AESNI-GCM encode/decode.
-> These routines are optimized for encrypt and decrypt of large buffers.
-> In tests we have seen up to 6% speedup for 1K, 11% speedup for 2K and
-> 18% speedup for 8K buffer over the existing SSE version.  These routines
-> should provide even better speedup for future Intel x86_64 cpus.
+On Thu, Dec 19, 2013 at 05:27:35PM +0200, Horia Geanta wrote:
+> Use the common helper function crypto_authenc_extractkeys() for key
+> parsing.
+> Also fix the key buffer overflow condition: use split key pad length
+> instead of authentication key length.
 > 
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 
-Both patches applied.  Thanks!
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
