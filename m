@@ -1,63 +1,68 @@
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: randconfig build error with next-20131210, in drivers/crypto/ccp/ccp-pci.c
-Date: Thu, 19 Dec 2013 11:35:09 -0800
-Message-ID: <52B34A6D.7010903@infradead.org>
-References: <CA+r1ZhhhUWhMqeyS0J7V5j-iYtCk24gszpJFif8hF2cwr5K6hg@mail.gmail.com> <1785749.ip5jsEzFz7@tlendack-t1>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/5] crypto: Fully restore ahash request before completing
+Date: Fri, 20 Dec 2013 20:04:08 +0800
+Message-ID: <20131220120408.GA31738@gondor.apana.org.au>
+References: <1386703583-8386-1-git-send-email-marex@denx.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Tom Lendacky <thomas.lendacky@amd.com>,
-	Jim Davis <jim.epost@gmail.com>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <1785749.ip5jsEzFz7@tlendack-t1>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-arm-kernel@lists.infradead.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Fabio Estevam <fabio.estevam@freescale.com>,
+	Shawn Guo <shawn.guo@linaro.org>, linux-crypto@vger.kernel.org
+To: Marek Vasut <marex@denx.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:57896 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755863Ab3LTMEj (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 20 Dec 2013 07:04:39 -0500
+Content-Disposition: inline
+In-Reply-To: <1386703583-8386-1-git-send-email-marex@denx.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 12/10/13 07:34, Tom Lendacky wrote:
->=20
-> On Tuesday, December 10, 2013 07:21:36 AM Jim Davis wrote:
->> Building with the attached random configuration file,
->>
->> drivers/crypto/ccp/ccp-pci.c: In function =E2=80=98ccp_get_msix_irqs=
-=E2=80=99:
->> drivers/crypto/ccp/ccp-pci.c:44:20: error: array type has incomplete
->> element type
->> drivers/crypto/ccp/ccp-pci.c:48:18: error: negative width in bit-fie=
-ld
->> =E2=80=98<anonymous>=E2=80=99
->> drivers/crypto/ccp/ccp-pci.c:51:2: error: implicit declaration of
->> function =E2=80=98pci_enable_msix=E2=80=99 [-Werror=3Dimplicit-funct=
-ion-declaration]
->> drivers/crypto/ccp/ccp-pci.c:76:2: error: implicit declaration of
->> function =E2=80=98pci_disable_msix=E2=80=99 [-Werror=3Dimplicit-func=
-tion-declaration]
->> drivers/crypto/ccp/ccp-pci.c:44:20: warning: unused variable
->> =E2=80=98msix_entry=E2=80=99 [-Wunused-variable]
->> drivers/crypto/ccp/ccp-pci.c: In function =E2=80=98ccp_get_msi_irq=E2=
-=80=99:
->> drivers/crypto/ccp/ccp-pci.c:89:2: error: implicit declaration of
->> function =E2=80=98pci_enable_msi=E2=80=99 [-Werror=3Dimplicit-functi=
-on-declaration]
->> drivers/crypto/ccp/ccp-pci.c:102:2: error: implicit declaration of
->> function =E2=80=98pci_disable_msi=E2=80=99 [-Werror=3Dimplicit-funct=
-ion-declaration]
->> cc1: some warnings being treated as errors
->> make[3]: *** [drivers/crypto/ccp/ccp-pci.o] Error 1
->=20
-> Thanks for finding this, I'll update to the Kconfig to add PCI to
-> the 'depends on' statement.
+On Tue, Dec 10, 2013 at 08:26:19PM +0100, Marek Vasut wrote:
+> When finishing the ahash request, the ahash_op_unaligned_done() will
+> call complete() on the request. Yet, this will not call the correct
+> complete callback. The correct complete callback was previously stored
+> in the requests' private data, as seen in ahash_op_unaligned(). This
+> patch restores the correct complete callback and .data field of the
+> request before calling complete() on it.
+> 
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Fabio Estevam <fabio.estevam@freescale.com>
+> Cc: Shawn Guo <shawn.guo@linaro.org>
+> Cc: linux-crypto@vger.kernel.org
+> ---
+>  crypto/ahash.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/crypto/ahash.c b/crypto/ahash.c
+> index 793a27f..a92dc38 100644
+> --- a/crypto/ahash.c
+> +++ b/crypto/ahash.c
+> @@ -213,7 +213,10 @@ static void ahash_op_unaligned_done(struct crypto_async_request *req, int err)
+>  
+>  	ahash_op_unaligned_finish(areq, err);
+>  
+> -	complete(data, err);
+> +	areq->base.complete = complete;
+> +	areq->base.data = data;
+> +
+> +	complete(&areq->base, err);
 
-Tom,
+This looks completely bogus.  While restoring areq isn't wrong per
+se, calling complete with &areq->base makes no sense.  The original
+completion data is in the variable "data".
 
-Can you get this patch and the HW_RANDOM patch merged into linux-next, =
-please?
-linux-next builds are still failing for both of these reasons.
+Which driver relies on this behaviour?
 
-thanks,
---=20
-~Randy
+Also, does your subsequent patches rely on this?
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
