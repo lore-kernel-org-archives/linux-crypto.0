@@ -1,50 +1,79 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: randconfig build error with next-20131223, in
- arch/x86/crypto/aesni-intel_avx.S
-Date: Mon, 23 Dec 2013 17:02:38 +0100
-Message-ID: <20131223160238.GA15360@pd.tnic>
-References: <CA+r1Zhh5As3QByXMvz0ha5Or2Xtxa3Y=QzuR75O7FwBKTk8XVA@mail.gmail.com>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH 1/5] crypto: Fully restore ahash request before completing
+Date: Fri, 27 Dec 2013 01:21:36 +0100
+Message-ID: <201312270121.36578.marex@denx.de>
+References: <1386703583-8386-1-git-send-email-marex@denx.de> <20131220120408.GA31738@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, tglx@linutronix.de,
-	mingo@redhat.com, hpa@zytor.com, x86@kernel.org,
-	linux-crypto@vger.kernel.org, Tim Chen <tim.c.chen@linux.intel.com>
-To: Jim Davis <jim.epost@gmail.com>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.infradead.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Fabio Estevam <fabio.estevam@freescale.com>,
+	Shawn Guo <shawn.guo@linaro.org>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:39802 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752356Ab3LWQCm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Dec 2013 11:02:42 -0500
-Content-Disposition: inline
-In-Reply-To: <CA+r1Zhh5As3QByXMvz0ha5Or2Xtxa3Y=QzuR75O7FwBKTk8XVA@mail.gmail.com>
+Received: from mail-out.m-online.net ([212.18.0.10]:44159 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754078Ab3L0Cmf (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 Dec 2013 21:42:35 -0500
+In-Reply-To: <20131220120408.GA31738@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 23, 2013 at 08:09:18AM -0700, Jim Davis wrote:
-> Building with the attached random configuration file,
+On Friday, December 20, 2013 at 01:04:08 PM, Herbert Xu wrote:
+> On Tue, Dec 10, 2013 at 08:26:19PM +0100, Marek Vasut wrote:
+> > When finishing the ahash request, the ahash_op_unaligned_done() will
+> > call complete() on the request. Yet, this will not call the correct
+> > complete callback. The correct complete callback was previously stored
+> > in the requests' private data, as seen in ahash_op_unaligned(). This
+> > patch restores the correct complete callback and .data field of the
+> > request before calling complete() on it.
+> > 
+> > Signed-off-by: Marek Vasut <marex@denx.de>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: David S. Miller <davem@davemloft.net>
+> > Cc: Fabio Estevam <fabio.estevam@freescale.com>
+> > Cc: Shawn Guo <shawn.guo@linaro.org>
+> > Cc: linux-crypto@vger.kernel.org
+> > ---
+> > 
+> >  crypto/ahash.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/crypto/ahash.c b/crypto/ahash.c
+> > index 793a27f..a92dc38 100644
+> > --- a/crypto/ahash.c
+> > +++ b/crypto/ahash.c
+> > @@ -213,7 +213,10 @@ static void ahash_op_unaligned_done(struct
+> > crypto_async_request *req, int err)
+> > 
+> >  	ahash_op_unaligned_finish(areq, err);
+> > 
+> > -	complete(data, err);
+> > +	areq->base.complete = complete;
+> > +	areq->base.data = data;
+> > +
+> > +	complete(&areq->base, err);
 > 
-> arch/x86/crypto/aesni-intel_avx.S: Assembler messages:
-> arch/x86/crypto/aesni-intel_avx.S:1449: Error: bad register name `%r12'
-> [...]
-> arch/x86/crypto/aesni-intel_avx.S:2807: Error: bad register name `%r12'
-> make[2]: *** [arch/x86/crypto/aesni-intel_avx.o] Error 1
+> This looks completely bogus.  While restoring areq isn't wrong per
+> se, calling complete with &areq->base makes no sense.  The original
+> completion data is in the variable "data".
 
-> #
-> # Automatically generated file; DO NOT EDIT.
-> # Linux/x86 3.13.0-rc5 Kernel Configuration
-> #
-> # CONFIG_64BIT is not set
-> CONFIG_X86_32=y
+Is there some documentation for this so I can understand why this is wrong, 
+please? I really don't quite get it, sorry. Actually, is there some 
+documentation for writing crypto API drivers at all please ?
 
-Sounds like this aesni-intel_avx.S thing wasn't meant to be built for
-32-bit.
+> Which driver relies on this behaviour?
 
--- 
-Regards/Gruss,
-    Boris.
+This one.
 
-Sent from a fat crate under my desk. Formatting is fine.
---
+> Also, does your subsequent patches rely on this?
+
+Yes
+
+> Cheers,
+
+Best regards,
+Marek Vasut
