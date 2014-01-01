@@ -1,35 +1,56 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1] crypto: aesni - fix build on x86 (32bit)
-Date: Tue, 31 Dec 2013 19:57:43 +0800
-Message-ID: <20131231115743.GA17120@gondor.apana.org.au>
-References: <1388411544-4559-1-git-send-email-andriy.shevchenko@linux.intel.com>
+Subject: Crypto Fixes for 3.13
+Date: Wed, 1 Jan 2014 14:10:16 +0800
+Message-ID: <20140101061016.GA22579@gondor.apana.org.au>
+References: <20101215115035.GA25248@gondor.apana.org.au>
+ <20110216053911.GA10999@gondor.apana.org.au>
+ <20110328071322.GA6569@gondor.apana.org.au>
+ <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Borislav Petkov <bp@alien8.de>, hpa@zytor.com
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:50763 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:49003 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752796Ab3LaL5s (ORCPT
+	with ESMTP id S1751986AbaAAGK0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 31 Dec 2013 06:57:48 -0500
+	Wed, 1 Jan 2014 01:10:26 -0500
 Content-Disposition: inline
-In-Reply-To: <1388411544-4559-1-git-send-email-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <20131209115705.GA1361@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 30, 2013 at 03:52:24PM +0200, Andy Shevchenko wrote:
-> It seems commit d764593a "crypto: aesni - AVX and AVX2 version of AESNI-GCM
-> encode and decode" breaks a build on x86_32 since it's designed only for
-> x86_64. This patch makes a compilation unit conditional to CONFIG_64BIT and
-> functions usage to CONFIG_X86_64.
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Hi Linus:
 
-Patch applied.  Thanks a lot!
--- 
+This push fixes a build error on ARM that was introduced in 3.13-rc1.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Krzysztof Ha=C5=82asa (1):
+      crypto: ixp4xx - Fix kernel compile error
+
+ drivers/crypto/ixp4xx_crypto.c |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
+
+Thanks,
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
