@@ -1,56 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.13
-Date: Wed, 1 Jan 2014 14:10:16 +0800
-Message-ID: <20140101061016.GA22579@gondor.apana.org.au>
-References: <20101215115035.GA25248@gondor.apana.org.au>
- <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
+From: Russell King <rmk+kernel@arm.linux.org.uk>
+Subject: [PATCH RFC] CRYPTO: Fix more AES build errors:
+Date: Thu, 02 Jan 2014 17:17:56 +0000
+Message-ID: <E1Vylu8-0005Q9-MO@rmk-PC.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:49003 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751986AbaAAGK0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Jan 2014 01:10:26 -0500
-Content-Disposition: inline
-In-Reply-To: <20131209115705.GA1361@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+Building a multi-arch kernel results in:
 
-This push fixes a build error on ARM that was introduced in 3.13-rc1.
+arch/arm/crypto/built-in.o: In function `aesbs_xts_decrypt':
+sha1_glue.c:(.text+0x15c8): undefined reference to `bsaes_xts_decrypt'
+arch/arm/crypto/built-in.o: In function `aesbs_xts_encrypt':
+sha1_glue.c:(.text+0x1664): undefined reference to `bsaes_xts_encrypt'
+arch/arm/crypto/built-in.o: In function `aesbs_ctr_encrypt':
+sha1_glue.c:(.text+0x184c): undefined reference to `bsaes_ctr32_encrypt_blocks'
+arch/arm/crypto/built-in.o: In function `aesbs_cbc_decrypt':
+sha1_glue.c:(.text+0x19b4): undefined reference to `bsaes_cbc_encrypt'
 
-Please pull from
+This code is already runtime-conditional on NEON being supported, so
+there's no point compiling it out depending on the minimum build
+architecture.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+---
+This is more a request for acks since I'd like to keep it/push it through
+my tree to reduce the autobuilder failures.
 
-or
+ arch/arm/crypto/bsaes-armv7.pl |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Krzysztof Ha=C5=82asa (1):
-      crypto: ixp4xx - Fix kernel compile error
-
- drivers/crypto/ixp4xx_crypto.c |    4 +---
- 1 files changed, 1 insertions(+), 3 deletions(-)
-
-Thanks,
---=20
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/arch/arm/crypto/bsaes-armv7.pl b/arch/arm/crypto/bsaes-armv7.pl
+index f3d96d932573..be068db960ee 100644
+--- a/arch/arm/crypto/bsaes-armv7.pl
++++ b/arch/arm/crypto/bsaes-armv7.pl
+@@ -701,7 +701,7 @@ $code.=<<___;
+ # define VFP_ABI_FRAME	0
+ # define BSAES_ASM_EXTENDED_KEY
+ # define XTS_CHAIN_TWEAK
+-# define __ARM_ARCH__ __LINUX_ARM_ARCH__
++# define __ARM_ARCH__	7
+ #endif
+ 
+ #ifdef __thumb__
+-- 
+1.7.4.4
