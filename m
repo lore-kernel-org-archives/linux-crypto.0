@@ -1,69 +1,66 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH 1/5] crypto: Fully restore ahash request before completing
-Date: Sat, 4 Jan 2014 08:20:09 +0100
-Message-ID: <201401040820.09129.marex@denx.de>
-References: <1386703583-8386-1-git-send-email-marex@denx.de> <10214668.cztjge9Iie@tlendack-t1> <20140103223344.GA15394@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH RFC] CRYPTO: Fix more AES build errors:
+Date: Sun, 5 Jan 2014 20:51:05 +0800
+Message-ID: <20140105125105.GA26174@gondor.apana.org.au>
+References: <E1Vylu8-0005Q9-MO@rmk-PC.arm.linux.org.uk>
+ <CAKv+Gu9SrF_jkNc1ie+AX07YVGUdAYMGoKnJopFyirwh=acDVQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Tom Lendacky <thomas.lendacky@amd.com>,
-	linux-arm-kernel@lists.infradead.org,
+Content-Type: text/plain; charset=us-ascii
+Cc: Russell King <rmk+kernel@arm.linux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
-	Fabio Estevam <fabio.estevam@freescale.com>,
-	Shawn Guo <shawn.guo@linaro.org>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:41166 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751274AbaADKOD (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:33280 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751081AbaAEMwE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 4 Jan 2014 05:14:03 -0500
-In-Reply-To: <20140103223344.GA15394@gondor.apana.org.au>
+	Sun, 5 Jan 2014 07:52:04 -0500
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu9SrF_jkNc1ie+AX07YVGUdAYMGoKnJopFyirwh=acDVQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Friday, January 03, 2014 at 11:33:44 PM, Herbert Xu wrote:
-> On Fri, Jan 03, 2014 at 09:10:30AM -0600, Tom Lendacky wrote:
-> > On Monday, December 30, 2013 05:01:13 PM Herbert Xu wrote:
-> > > On Fri, Dec 27, 2013 at 01:21:36AM +0100, Marek Vasut wrote:
-> > > > > > -	complete(data, err);
-> > > > > > +	areq->base.complete = complete;
-> > > > > > +	areq->base.data = data;
-> > > > > > +
-> > > > > > +	complete(&areq->base, err);
-> > > > > 
-> > > > > This looks completely bogus.  While restoring areq isn't wrong per
-> > > > > se, calling complete with &areq->base makes no sense.  The original
-> > > > > completion data is in the variable "data".
-> > > > 
-> > > > Is there some documentation for this so I can understand why this is
-> > > > wrong, please? I really don't quite get it, sorry. Actually, is
-> > > > there some documentation for writing crypto API drivers at all
-> > > > please ?
-> > > 
-> > > Well it's wrong because the completion function (req->base.complete)
-> > > is meant to take data (req->base.data) as its first argument.  So
-> > > giving it a pointer to req->base makes no sense.
-> > 
-> > The crypto_completion_t typdef is defined as:
-> > 
-> > typedef void (*crypto_completion_t)(struct crypto_async_request *req, int
-> > err);
-> > 
-> > so I believe &areq->base is the proper first argument (which is actually
-> > just the req parameter on the ahash_op_unaligned_done function).
+On Thu, Jan 02, 2014 at 07:16:46PM +0100, Ard Biesheuvel wrote:
+> On 2 January 2014 18:17, Russell King <rmk+kernel@arm.linux.org.uk> wrote:
+> > Building a multi-arch kernel results in:
+> >
+> > arch/arm/crypto/built-in.o: In function `aesbs_xts_decrypt':
+> > sha1_glue.c:(.text+0x15c8): undefined reference to `bsaes_xts_decrypt'
+> > arch/arm/crypto/built-in.o: In function `aesbs_xts_encrypt':
+> > sha1_glue.c:(.text+0x1664): undefined reference to `bsaes_xts_encrypt'
+> > arch/arm/crypto/built-in.o: In function `aesbs_ctr_encrypt':
+> > sha1_glue.c:(.text+0x184c): undefined reference to `bsaes_ctr32_encrypt_blocks'
+> > arch/arm/crypto/built-in.o: In function `aesbs_cbc_decrypt':
+> > sha1_glue.c:(.text+0x19b4): undefined reference to `bsaes_cbc_encrypt'
+> >
 > 
-> You are right.  This unaligned code obviously has never worked.
-> I will apply Marek's patch to fix this up.
+> Interestingly, when I try to reproduce this, the reference is
+> (correctly) reported to reside in aesbs-glue.c and not sha1_glue.c
 > 
-> > Additionally, you should probably also fix up ahash_def_finup_done2 and
-> > ahash_def_finup_done1.
+> > This code is already runtime-conditional on NEON being supported, so
+> > there's no point compiling it out depending on the minimum build
+> > architecture.
+> >
 > 
-> Yep I'll fix them up too.
+> Agreed. It is a leftover from the way this code was embedded into
+> OpenSSL originally.
+> 
+> > Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+> > ---
+> > This is more a request for acks since I'd like to keep it/push it through
+> > my tree to reduce the autobuilder failures.
+> >
+> >  arch/arm/crypto/bsaes-armv7.pl |    2 +-
+> 
+> The .S_shipped file produced by this script should be updated at the same time.
+> 
+> Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-I'll try to cook some patches shortly, I will probably also cook some 
-documentation for writing drivers using the crypto API, what do you say ?
-
-Best regards,
-Marek Vasut
+Patch applied to the crypto tree.  Thanks a lot!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
