@@ -1,7 +1,7 @@
 From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH 6/6] crypto: ccp - CCP device enabled/disabled changes
-Date: Mon, 6 Jan 2014 13:34:29 -0600
-Message-ID: <20140106193429.26918.74497.stgit@tlendack-t1.amdoffice.net>
+Subject: [PATCH 2/6] crypto: ccp - Cleanup scatterlist usage
+Date: Mon, 6 Jan 2014 13:34:05 -0600
+Message-ID: <20140106193405.26918.91782.stgit@tlendack-t1.amdoffice.net>
 References: <20140106193353.26918.5804.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -14,94 +14,139 @@ In-Reply-To: <20140106193353.26918.5804.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The CCP cannot be hot-plugged so it will either be there
-or it won't.  Do not allow the driver to stay loaded if the
-CCP does not successfully initialize.
-
-Provide stub routines in the ccp.h file that return -ENODEV
-if the CCP has not been configured in the build.
+Cleanup up the usage of scatterlists to make the code cleaner
+and avoid extra memory allocations when not needed.
 
 Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- drivers/crypto/ccp/ccp-dev.c |   15 ++++++++++++++-
- drivers/crypto/ccp/ccp-pci.c |    3 +++
- include/linux/ccp.h          |   12 ++++++++++++
- 3 files changed, 29 insertions(+), 1 deletion(-)
+ drivers/crypto/ccp/ccp-crypto-aes-cmac.c |    6 ++-
+ drivers/crypto/ccp/ccp-crypto-sha.c      |   53 ++++++++++++++++--------------
+ 2 files changed, 33 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index b2038a7..c3bc212 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -552,6 +552,7 @@ static const struct x86_cpu_id ccp_support[] = {
- static int __init ccp_mod_init(void)
- {
- 	struct cpuinfo_x86 *cpuinfo = &boot_cpu_data;
-+	int ret;
+diff --git a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+index 398832c..646c8d1 100644
+--- a/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
++++ b/drivers/crypto/ccp/ccp-crypto-aes-cmac.c
+@@ -125,8 +125,10 @@ static int ccp_do_cmac_update(struct ahash_request *req, unsigned int nbytes,
+ 		sg_init_one(&rctx->pad_sg, rctx->pad, pad_length);
+ 		sg = ccp_crypto_sg_table_add(&rctx->data_sg, &rctx->pad_sg);
+ 	}
+-	if (sg)
++	if (sg) {
+ 		sg_mark_end(sg);
++		sg = rctx->data_sg.sgl;
++	}
  
- 	if (!x86_match_cpu(ccp_support))
- 		return -ENODEV;
-@@ -560,7 +561,19 @@ static int __init ccp_mod_init(void)
- 	case 22:
- 		if ((cpuinfo->x86_model < 48) || (cpuinfo->x86_model > 63))
- 			return -ENODEV;
--		return ccp_pci_init();
-+
-+		ret = ccp_pci_init();
+ 	/* Initialize the K1/K2 scatterlist */
+ 	if (final)
+@@ -143,7 +145,7 @@ static int ccp_do_cmac_update(struct ahash_request *req, unsigned int nbytes,
+ 	rctx->cmd.u.aes.key_len = ctx->u.aes.key_len;
+ 	rctx->cmd.u.aes.iv = &rctx->iv_sg;
+ 	rctx->cmd.u.aes.iv_len = AES_BLOCK_SIZE;
+-	rctx->cmd.u.aes.src = (sg) ? rctx->data_sg.sgl : NULL;
++	rctx->cmd.u.aes.src = sg;
+ 	rctx->cmd.u.aes.src_len = rctx->hash_cnt;
+ 	rctx->cmd.u.aes.dst = NULL;
+ 	rctx->cmd.u.aes.cmac_key = cmac_key_sg;
+diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
+index 0571940..bf913cb 100644
+--- a/drivers/crypto/ccp/ccp-crypto-sha.c
++++ b/drivers/crypto/ccp/ccp-crypto-sha.c
+@@ -122,7 +122,6 @@ static int ccp_do_sha_update(struct ahash_request *req, unsigned int nbytes,
+ 			     unsigned int final)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	struct ccp_ctx *ctx = crypto_ahash_ctx(tfm);
+ 	struct ccp_sha_req_ctx *rctx = ahash_request_ctx(req);
+ 	struct scatterlist *sg;
+ 	unsigned int block_size =
+@@ -153,35 +152,32 @@ static int ccp_do_sha_update(struct ahash_request *req, unsigned int nbytes,
+ 	/* Initialize the context scatterlist */
+ 	sg_init_one(&rctx->ctx_sg, rctx->ctx, sizeof(rctx->ctx));
+ 
+-	/* Build the data scatterlist table - allocate enough entries for all
+-	 * possible data pieces (hmac ipad, buffer, input data)
+-	 */
+-	sg_count = (nbytes) ? sg_nents(req->src) + 2 : 2;
+-	gfp = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
+-		GFP_KERNEL : GFP_ATOMIC;
+-	ret = sg_alloc_table(&rctx->data_sg, sg_count, gfp);
+-	if (ret)
+-		return ret;
+-
+ 	sg = NULL;
+-	if (rctx->first && ctx->u.sha.key_len) {
+-		rctx->hash_cnt += block_size;
+-
+-		sg_init_one(&rctx->pad_sg, ctx->u.sha.ipad, block_size);
+-		sg = ccp_crypto_sg_table_add(&rctx->data_sg, &rctx->pad_sg);
+-	}
++	if (rctx->buf_count && nbytes) {
++		/* Build the data scatterlist table - allocate enough entries
++		 * for both data pieces (buffer and input data)
++		 */
++		gfp = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
++			GFP_KERNEL : GFP_ATOMIC;
++		sg_count = sg_nents(req->src) + 1;
++		ret = sg_alloc_table(&rctx->data_sg, sg_count, gfp);
 +		if (ret)
 +			return ret;
-+
-+		/* Don't leave the driver loaded if init failed */
-+		if (!ccp_get_device()) {
-+			ccp_pci_exit();
-+			return -ENODEV;
-+		}
-+
-+		return 0;
-+
- 		break;
- 	}
  
-diff --git a/drivers/crypto/ccp/ccp-pci.c b/drivers/crypto/ccp/ccp-pci.c
-index 1fbeaf1..11836b7 100644
---- a/drivers/crypto/ccp/ccp-pci.c
-+++ b/drivers/crypto/ccp/ccp-pci.c
-@@ -268,6 +268,9 @@ static void ccp_pci_remove(struct pci_dev *pdev)
- 	struct device *dev = &pdev->dev;
- 	struct ccp_device *ccp = dev_get_drvdata(dev);
+-	if (rctx->buf_count) {
+ 		sg_init_one(&rctx->buf_sg, rctx->buf, rctx->buf_count);
+ 		sg = ccp_crypto_sg_table_add(&rctx->data_sg, &rctx->buf_sg);
+-	}
+-
+-	if (nbytes)
+ 		sg = ccp_crypto_sg_table_add(&rctx->data_sg, req->src);
+-
+-	if (sg)
+ 		sg_mark_end(sg);
  
-+	if (!ccp)
-+		return;
++		sg = rctx->data_sg.sgl;
++	} else if (rctx->buf_count) {
++		sg_init_one(&rctx->buf_sg, rctx->buf, rctx->buf_count);
 +
- 	ccp_destroy(ccp);
++		sg = &rctx->buf_sg;
++	} else if (nbytes) {
++		sg = req->src;
++	}
++
+ 	rctx->msg_bits += (rctx->hash_cnt << 3);	/* Total in bits */
  
- 	pci_iounmap(pdev, ccp->io_map);
-diff --git a/include/linux/ccp.h b/include/linux/ccp.h
-index 12f1cfd..b941ab9 100644
---- a/include/linux/ccp.h
-+++ b/include/linux/ccp.h
-@@ -23,6 +23,9 @@
- struct ccp_device;
- struct ccp_cmd;
+ 	memset(&rctx->cmd, 0, sizeof(rctx->cmd));
+@@ -190,7 +186,7 @@ static int ccp_do_sha_update(struct ahash_request *req, unsigned int nbytes,
+ 	rctx->cmd.u.sha.type = rctx->type;
+ 	rctx->cmd.u.sha.ctx = &rctx->ctx_sg;
+ 	rctx->cmd.u.sha.ctx_len = sizeof(rctx->ctx);
+-	rctx->cmd.u.sha.src = (sg) ? rctx->data_sg.sgl : NULL;
++	rctx->cmd.u.sha.src = sg;
+ 	rctx->cmd.u.sha.src_len = rctx->hash_cnt;
+ 	rctx->cmd.u.sha.final = rctx->final;
+ 	rctx->cmd.u.sha.msg_bits = rctx->msg_bits;
+@@ -205,9 +201,12 @@ static int ccp_do_sha_update(struct ahash_request *req, unsigned int nbytes,
+ static int ccp_sha_init(struct ahash_request *req)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct ccp_ctx *ctx = crypto_ahash_ctx(tfm);
+ 	struct ccp_sha_req_ctx *rctx = ahash_request_ctx(req);
+ 	struct ccp_crypto_ahash_alg *alg =
+ 		ccp_crypto_ahash_alg(crypto_ahash_tfm(tfm));
++	unsigned int block_size =
++		crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
  
-+#if defined(CONFIG_CRYPTO_DEV_CCP_DD) || \
-+	defined(CONFIG_CRYPTO_DEV_CCP_DD_MODULE)
-+
- /**
-  * ccp_enqueue_cmd - queue an operation for processing by the CCP
-  *
-@@ -48,6 +51,15 @@ struct ccp_cmd;
-  */
- int ccp_enqueue_cmd(struct ccp_cmd *cmd);
+ 	memset(rctx, 0, sizeof(*rctx));
  
-+#else /* CONFIG_CRYPTO_DEV_CCP_DD is not enabled */
-+
-+static inline int ccp_enqueue_cmd(struct ccp_cmd *cmd)
-+{
-+	return -ENODEV;
-+}
-+
-+#endif /* CONFIG_CRYPTO_DEV_CCP_DD */
-+
+@@ -215,6 +214,12 @@ static int ccp_sha_init(struct ahash_request *req)
+ 	rctx->type = alg->type;
+ 	rctx->first = 1;
  
- /***** AES engine *****/
- /**
++	if (ctx->u.sha.key_len) {
++		/* Buffer the HMAC key for first update */
++		memcpy(rctx->buf, ctx->u.sha.ipad, block_size);
++		rctx->buf_count = block_size;
++	}
++
+ 	return 0;
+ }
+ 
