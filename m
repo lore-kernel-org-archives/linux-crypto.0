@@ -1,53 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1] crypto: aesni - fix build on x86 (32bit)
-Date: Tue, 7 Jan 2014 09:30:38 +0800
-Message-ID: <20140107013038.GA11416@gondor.apana.org.au>
-References: <1388411544-4559-1-git-send-email-andriy.shevchenko@linux.intel.com>
- <1389030119.2624.19.camel@schen9-DESK>
- <637fa237-687f-4e88-88d2-4a9dd0c2bf14@email.android.com>
- <1389031023.2624.21.camel@schen9-DESK>
- <52CAEF55.5090308@zytor.com>
- <1389031855.2624.26.camel@schen9-DESK>
- <20140106202640.GB17863@pd.tnic>
- <52CB1E45.6060204@zytor.com>
- <1389051546.2624.31.camel@schen9-DESK>
- <52CB3F3F.5070105@zytor.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-crypto@vger.kernel.org
-To: "H. Peter Anvin" <hpa@zytor.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:34765 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751446AbaAGBbF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 Jan 2014 20:31:05 -0500
-Content-Disposition: inline
-In-Reply-To: <52CB3F3F.5070105@zytor.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Naveen Krishna Ch <ch.naveen@samsung.com>
+Subject: [PATCH 0/5] crypto:s5p-sss: Add DT and Exynos5 support
+Date: Tue, 07 Jan 2014 17:21:44 +0530
+Message-ID: <1389095509-14357-1-git-send-email-ch.naveen@samsung.com>
+Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
+	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
+	cpgs@samsung.com
+To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jan 06, 2014 at 03:41:51PM -0800, H. Peter Anvin wrote:
-> On 01/06/2014 03:39 PM, Tim Chen wrote:
-> > 
-> > Will renaming the file to aesni_intel_avx-x86_64.S make things clearer
-> > now?
-> > 
-> > Tim
-> 
-> Yes.
-> 
-> Acked-by: H. Peter Anvin <hpa@linux.intel.com>
-> 
-> Herbert, can you pick it up?
+SSS module on Exynos5 SoCs has added features to the one on S5PV210
+However minor changes to the s5p-sss.c driver are required to support
+SSS modules on Exynos5 SoCs.
 
-Sure I'll apply this patch.
+This patch set
+1. Adds device tree support to the s5p-sss.c driver
+2. Adds code to support SSS module on Exynos5 SoCs
+3. Adds device tree node to Exynos5420
+4. Also adds the DT binding documentation
 
-Thanks!
+Naveen Krishna Ch (4): [crypto-2.6.git]
+  crypto:s5p-sss: Use platform_get_irq() instead of _byname()
+  crypto:s5p-sss: Add device tree and Exynos5 support
+  crypto:s5p-sss: Add support for SSS module on Exynos5
+  crypto:s5p-sss: Exynos5 SoCs too can select SSS driver
+
+Naveen Krishna Chatradhi (1): [linuxsamsung.git]
+  ARM: exynos5420: add dt node for sss module
+
+ .../devicetree/bindings/crypto/samsung-sss.txt     |   24 ++++
+ arch/arm/boot/dts/exynos5420.dtsi                  |   10 ++
+ drivers/crypto/Kconfig                             |    8 +-
+ drivers/crypto/s5p-sss.c                           |  115 +++++++++++++++-----
+ 4 files changed, 127 insertions(+), 30 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/samsung-sss.txt
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.9.5
