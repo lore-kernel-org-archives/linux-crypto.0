@@ -1,111 +1,100 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v1] crypto: aesni - fix build on x86 (32bit)
-Date: Thu, 09 Jan 2014 08:57:42 -0800
-Message-ID: <1389286662.2624.32.camel@schen9-DESK>
-References: <1388411544-4559-1-git-send-email-andriy.shevchenko@linux.intel.com>
-	 <1389030119.2624.19.camel@schen9-DESK>
-	 <637fa237-687f-4e88-88d2-4a9dd0c2bf14@email.android.com>
-	 <1389031023.2624.21.camel@schen9-DESK> <52CAEF55.5090308@zytor.com>
-	 <1389031855.2624.26.camel@schen9-DESK> <20140106202640.GB17863@pd.tnic>
-	 <52CB1E45.6060204@zytor.com> <1389051546.2624.31.camel@schen9-DESK>
-	 <20140109090302.GA11622@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Rafael Aquini <aquini@redhat.com>
+Subject: [RFC PATCH] char: random: stir the output pools differently when the random_write lenght allows splitting the seed
+Date: Thu,  9 Jan 2014 21:15:53 -0200
+Message-ID: <42f6dc88535d5ecdab13b1376db7ccbbbc550600.1389297772.git.aquini@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Stephan Mueller <stephan.mueller@atsec.com>
+To: "Theodore Ts'o" <tytso@mit.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:40487 "EHLO mga02.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:39186 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751705AbaAIQ5o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Jan 2014 11:57:44 -0500
-In-Reply-To: <20140109090302.GA11622@gondor.apana.org.au>
+	id S1751330AbaAIXQ2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 9 Jan 2014 18:16:28 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 2014-01-09 at 17:03 +0800, Herbert Xu wrote:
-> On Mon, Jan 06, 2014 at 03:39:06PM -0800, Tim Chen wrote:
-> > On Mon, 2014-01-06 at 13:21 -0800, H. Peter Anvin wrote:
-> > > On 01/06/2014 12:26 PM, Borislav Petkov wrote:
-> > > > On Mon, Jan 06, 2014 at 10:10:55AM -0800, Tim Chen wrote:
-> > > >> Yes, the code is in the file named aesni_intel_avx.S. So it should be
-> > > >> clear that the code is meant for x86_64.
-> > > > 
-> > > > How do you deduce aesni_intel_avx.S is meant for x86_64 only from the
-> > > > name?
-> > > > 
-> > > > Shouldn't it be called aesni_intel_avx-x86_64.S, as is the naming
-> > > > convention in arch/x86/crypto/
-> > > > 
-> > > 
-> > > Quite.
-> > > 
-> > > 	-hpa
-> > > 
-> > > 
-> > 
-> > Will renaming the file to aesni_intel_avx-x86_64.S make things clearer
-> > now?
-> > 
-> > Tim
-> > 
-> > ---cut---here---
-> > 
-> > >From 41656afcbd63ccb92357d4937a75629499f4fd4f Mon Sep 17 00:00:00 2001
-> > From: Tim Chen <tim.c.chen@linux.intel.com>
-> > Date: Mon, 6 Jan 2014 07:23:52 -0800
-> > Subject: [PATCH] crypto: Rename aesni-intel_avx.S to indicate it only
-> >  supports x86_64
-> > To: Herbert Xu <herbert@gondor.apana.org.au>, H. Peter Anvin <hpa@zytor.com>
-> > Cc: Borislav Petkov <bp@alien8.de>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, linux-crypto@vger.kernel.org
-> > 
-> > We rename aesni-intel_avx.S to aesni-intel_avx-x86_64.S to indicate
-> > that it is only used by x86_64 architecture.
-> 
-> Hmm, where is the signed-off-by line? Please resend.  Thanks.
+Since commit "7f397dc random: fix seeding with zero entropy" we are adding
+data from zero-entropy random_writes directly to output pools. We can leverage
+the fact the seed used for such case is usually long enough to completely stir
+all bits from the input pool which is, by default, 4 times longer than the
+output pools and break it in two to stir differently the output pools. This
+can help on making a stronger security claim on output pool internal state.
 
-Oops, here it is again.
+This patch introduces changes to the random_write method so it can split the
+given seed and completely stir the output pools with different halves of it, 
+when seed lenght allows us doing so. 
 
-Tim
-
-
----cut---here---
->From 41656afcbd63ccb92357d4937a75629499f4fd4f Mon Sep 17 00:00:00 2001
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Date: Mon, 6 Jan 2014 07:23:52 -0800
-Subject: [PATCH] crypto: Rename aesni-intel_avx.S to indicate it only
- supports x86_64
-To: Herbert Xu <herbert@gondor.apana.org.au>, H. Peter Anvin <hpa@zytor.com>
-Cc: Borislav Petkov <bp@alien8.de>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, linux-crypto@vger.kernel.org
-
-We rename aesni-intel_avx.S to aesni-intel_avx-x86_64.S to indicate
-that it is only used by x86_64 architecture.
+Signed-off-by: Rafael Aquini <aquini@redhat.com>
 ---
- arch/x86/crypto/Makefile                                        | 2 +-
- arch/x86/crypto/{aesni-intel_avx.S => aesni-intel_avx-x86_64.S} | 0
- 2 files changed, 1 insertion(+), 1 deletion(-)
- rename arch/x86/crypto/{aesni-intel_avx.S => aesni-intel_avx-x86_64.S} (100%)
+Suggested by Stephan Mueller <stephan.mueller@atsec.com>
 
-Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
----
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 188b993..6ba54d6 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -76,7 +76,7 @@ ifeq ($(avx2_supported),yes)
- endif
+ drivers/char/random.c | 38 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 429b75b..d623234 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -274,6 +274,7 @@
+ #define INPUT_POOL_WORDS	(1 << (INPUT_POOL_SHIFT-5))
+ #define OUTPUT_POOL_SHIFT	10
+ #define OUTPUT_POOL_WORDS	(1 << (OUTPUT_POOL_SHIFT-5))
++#define OUTPUT_POOL_SIZE	((1 << OUTPUT_POOL_SHIFT) >> 3)
+ #define SEC_XFER_SIZE		512
+ #define EXTRACT_SIZE		10
  
- aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o fpu.o
--aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx.o
-+aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o
- ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
- sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
- crc32c-intel-y := crc32c-intel_glue.o
-diff --git a/arch/x86/crypto/aesni-intel_avx.S b/arch/x86/crypto/aesni-intel_avx-x86_64.S
-similarity index 100%
-rename from arch/x86/crypto/aesni-intel_avx.S
-rename to arch/x86/crypto/aesni-intel_avx-x86_64.S
+@@ -1387,19 +1388,44 @@ write_pool(struct entropy_store *r, const char __user *buffer, size_t count)
+ 	return 0;
+ }
+ 
+-static ssize_t random_write(struct file *file, const char __user *buffer,
+-			    size_t count, loff_t *ppos)
++static size_t __do_random_write(const char __user *buffer,
++				size_t count, bool split_buffer)
+ {
+-	size_t ret;
++	size_t ret, offset, count1, count2;
++	struct entropy_store *pool1, *pool2;
++
++	offset = 0;
++	count1 = count2 = count;
++	pool1 = &blocking_pool;
++	pool2 = &nonblocking_pool;
++
++	if (split_buffer) {
++		size_t rnd;
++		count1 = count / 2;
++		count2 = count - count1;
++		offset = count1;
++
++		get_random_bytes(&rnd, 2);
++		if (rnd % 2) {
++			pool1 = &nonblocking_pool;
++			pool2 = &blocking_pool;
++		}
++	}
+ 
+-	ret = write_pool(&blocking_pool, buffer, count);
++	ret = write_pool(pool1, buffer, count1);
+ 	if (ret)
+ 		return ret;
+-	ret = write_pool(&nonblocking_pool, buffer, count);
++	ret = write_pool(pool2, buffer + offset, count2);
+ 	if (ret)
+ 		return ret;
+ 
+-	return (ssize_t)count;
++	return count;
++}
++
++static ssize_t random_write(struct file *file, const char __user *buffer,
++			    size_t count, loff_t *ppos)
++{
++	return __do_random_write(buffer, count, (count >= 2*OUTPUT_POOL_SIZE));
+ }
+ 
+ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 -- 
-1.7.11.7
+1.8.3.1
