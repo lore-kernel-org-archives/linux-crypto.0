@@ -1,63 +1,44 @@
-From: Sachin Kamat <sachin.kamat@linaro.org>
-Subject: Re: [PATCH 2/6 v2] crypto:s5p-sss: Add device tree support
-Date: Fri, 10 Jan 2014 11:50:13 +0530
-Message-ID: <CAK9yfHymqqKTdmvV0CcfzKGceQLpJJOnVYUD_GqbwJeqLLJZRA@mail.gmail.com>
-References: <1389095509-14357-3-git-send-email-ch.naveen@samsung.com>
-	<1389243541-13122-1-git-send-email-ch.naveen@samsung.com>
-	<52CEAEB0.80304@samsung.com>
-	<CAHfPSqA=xkHX1kajjYfNz2KMrnfHGdWzu9GWvSE4ZjWWZb-hQA@mail.gmail.com>
+From: Clemens Ladisch <clemens@ladisch.de>
+Subject: Re: [RFC PATCH] char: random: stir the output pools differently when
+ the random_write lenght allows splitting the seed
+Date: Fri, 10 Jan 2014 09:13:57 +0100
+Message-ID: <52CFABC5.5030806@ladisch.de>
+References: <42f6dc88535d5ecdab13b1376db7ccbbbc550600.1389297772.git.aquini@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Tomasz Figa <t.figa@samsung.com>,
-	Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
-	linux-crypto@vger.kernel.org,
-	"linux-samsung-soc@vger.kernel.org"
-	<linux-samsung-soc@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Vladimir Zapolskiy <vzapolskiy@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Tomasz Figa <tomasz.figa@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>
-To: Naveen Krishna Ch <naveenkrishna.ch@gmail.com>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-Reply-To: <CAHfPSqA=xkHX1kajjYfNz2KMrnfHGdWzu9GWvSE4ZjWWZb-hQA@mail.gmail.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Stephan Mueller <stephan.mueller@atsec.com>
+To: Rafael Aquini <aquini@redhat.com>, Theodore Ts'o <tytso@mit.edu>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtprelay03.ispgateway.de ([80.67.31.41]:60292 "EHLO
+	smtprelay03.ispgateway.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751750AbaAJIYQ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 10 Jan 2014 03:24:16 -0500
+In-Reply-To: <42f6dc88535d5ecdab13b1376db7ccbbbc550600.1389297772.git.aquini@redhat.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Naveen,
-
-On 10 January 2014 11:37, Naveen Krishna Ch <naveenkrishna.ch@gmail.com> wrote:
-> Hello Tomasz,
+Rafael Aquini wrote:
+> This patch introduces changes to the random_write method so it can split the
+> given seed and completely stir the output pools with different halves of it,
+> when seed lenght allows us doing so.
 >
+> -	ret = write_pool(&blocking_pool, buffer, count);
+> +	ret = write_pool(pool1, buffer, count1);
+>  	if (ret)
+>  		return ret;
+> -	ret = write_pool(&nonblocking_pool, buffer, count);
+> +	ret = write_pool(pool2, buffer + offset, count2);
 
-[snip]
->>> *pdev)
->>>   static struct platform_driver s5p_aes_crypto = {
->>>         .probe  = s5p_aes_probe,
->>>         .remove = s5p_aes_remove,
->>> +       .id_table       = s5p_sss_ids,
->>>         .driver = {
->>>                 .owner  = THIS_MODULE,
->>>                 .name   = "s5p-secss",
->>> +               .of_match_table = s5p_sss_dt_match,
->>
->>
->> .of_match_table = of_match_ptr(s5p_sss_dt_match),
-> I dint use it, Some time back there was a patchset from Sachin
-> https://lkml.org/lkml/2013/9/28/61
-> Please suggest me on this.
+Doesn't this assume that both halves of the buffer contain some
+(uncredited) entropy?  In other words, wouldn't this result in worse
+randomness for pool2 if the second half of the buffer contains just zero
+padding?
 
-In those cases the structure was always compiled in. i.e., it was not protected
-by #ifdef CONFIG_OF. Hence use of of_match_ptr was not required. of_match_ptr
-abstracts this check depending on OF is enabled or not. In the case of
-this (sss) driver,
-since you are using CONFIG_OF to selectively compile out the code (and esp.
-s5p_sss_dt_match structure), use of of_match_ptr will make the code
-simpler as it
-avoids the use of a dummy structure definition (the #else part of the
-struct definition) when OF is
-disabled. Hope this clarifies.
 
--- 
-With warm regards,
-Sachin
+Regards,
+Clemens
