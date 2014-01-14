@@ -1,7 +1,8 @@
 From: Marek Vasut <marex@denx.de>
-Subject: [PATCH] dcp: aes: Move the AES operation type from actx to rctx
-Date: Tue, 14 Jan 2014 18:31:01 +0100
-Message-ID: <1389720661-5820-1-git-send-email-marex@denx.de>
+Subject: [PATCH 3/3] crypto: Simplify the ahash_finup implementation
+Date: Tue, 14 Jan 2014 18:33:49 +0100
+Message-ID: <1389720829-5963-4-git-send-email-marex@denx.de>
+References: <1389720829-5963-1-git-send-email-marex@denx.de>
 Cc: linux-crypto@vger.kernel.org, Marek Vasut <marex@denx.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	Fabio Estevam <fabio.estevam@freescale.com>,
@@ -10,30 +11,21 @@ Cc: linux-crypto@vger.kernel.org, Marek Vasut <marex@denx.de>,
 	Tom Lendacky <thomas.lendacky@amd.com>
 To: linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:56396 "EHLO
+Received: from mail-out.m-online.net ([212.18.0.9]:41260 "EHLO
 	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751329AbaANRbH (ORCPT
+	with ESMTP id S1751631AbaANRd6 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jan 2014 12:31:07 -0500
+	Tue, 14 Jan 2014 12:33:58 -0500
+In-Reply-To: <1389720829-5963-1-git-send-email-marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Move the AES operation type and mode from async crypto context to
-crypto request context. This allows for recycling of the async crypto
-context for different kinds of operations.
+The ahash_def_finup() can make use of the request save/restore functions,
+thus make it so. This simplifies the code a little and unifies the code
+paths.
 
-I found this problem when I used dm-crypt, which uses the same async
-crypto context (actx) for both encryption and decryption requests.
-Since the requests are enqueued into the processing queue, immediatelly
-storing the type of operation into async crypto context (actx) caused
-corruption of this information when encryption and decryption operations
-followed imediatelly one after the other. When the first operation was
-dequeued, the second operation was already enqueued and overwritten the
-type of operation in actx, thus causing incorrect result of the first
-operation.
-
-Fix this problem by storing the type of operation into the crypto request
-context.
+Note that the same remark about free()ing the req->priv applies here, the
+req->priv can only be free()'d after the original request was restored.
 
 Signed-off-by: Marek Vasut <marex@denx.de>
 Cc: David S. Miller <davem@davemloft.net>
@@ -42,114 +34,93 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Shawn Guo <shawn.guo@linaro.org>
 Cc: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- drivers/crypto/mxs-dcp.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
+ crypto/ahash.c | 53 ++++++++++++++++++++---------------------------------
+ 1 file changed, 20 insertions(+), 33 deletions(-)
 
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index d41917c..48f12dd 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -83,13 +83,16 @@ struct dcp_async_ctx {
- 	unsigned int			hot:1;
- 
- 	/* Crypto-specific context */
--	unsigned int			enc:1;
--	unsigned int			ecb:1;
- 	struct crypto_ablkcipher	*fallback;
- 	unsigned int			key_len;
- 	uint8_t				key[AES_KEYSIZE_128];
- };
- 
-+struct dcp_aes_req_ctx {
-+	unsigned int	enc:1;
-+	unsigned int	ecb:1;
-+};
-+
- struct dcp_sha_req_ctx {
- 	unsigned int	init:1;
- 	unsigned int	fini:1;
-@@ -190,10 +193,12 @@ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
- /*
-  * Encryption (AES128)
-  */
--static int mxs_dcp_run_aes(struct dcp_async_ctx *actx, int init)
-+static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
-+			   struct ablkcipher_request *req, int init)
- {
- 	struct dcp *sdcp = global_sdcp;
- 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
-+	struct dcp_aes_req_ctx *rctx = ablkcipher_request_ctx(req);
- 	int ret;
- 
- 	dma_addr_t key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
-@@ -212,14 +217,14 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx, int init)
- 	/* Payload contains the key. */
- 	desc->control0 |= MXS_DCP_CONTROL0_PAYLOAD_KEY;
- 
--	if (actx->enc)
-+	if (rctx->enc)
- 		desc->control0 |= MXS_DCP_CONTROL0_CIPHER_ENCRYPT;
- 	if (init)
- 		desc->control0 |= MXS_DCP_CONTROL0_CIPHER_INIT;
- 
- 	desc->control1 = MXS_DCP_CONTROL1_CIPHER_SELECT_AES128;
- 
--	if (actx->ecb)
-+	if (rctx->ecb)
- 		desc->control1 |= MXS_DCP_CONTROL1_CIPHER_MODE_ECB;
- 	else
- 		desc->control1 |= MXS_DCP_CONTROL1_CIPHER_MODE_CBC;
-@@ -247,6 +252,7 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
- 
- 	struct ablkcipher_request *req = ablkcipher_request_cast(arq);
- 	struct dcp_async_ctx *actx = crypto_tfm_ctx(arq->tfm);
-+	struct dcp_aes_req_ctx *rctx = ablkcipher_request_ctx(req);
- 
- 	struct scatterlist *dst = req->dst;
- 	struct scatterlist *src = req->src;
-@@ -271,7 +277,7 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
- 	/* Copy the key from the temporary location. */
- 	memcpy(key, actx->key, actx->key_len);
- 
--	if (!actx->ecb) {
-+	if (!rctx->ecb) {
- 		/* Copy the CBC IV just past the key. */
- 		memcpy(key + AES_KEYSIZE_128, req->info, AES_KEYSIZE_128);
- 		/* CBC needs the INIT set. */
-@@ -300,7 +306,7 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
- 			 * submit the buffer.
- 			 */
- 			if (actx->fill == out_off || sg_is_last(src)) {
--				ret = mxs_dcp_run_aes(actx, init);
-+				ret = mxs_dcp_run_aes(actx, req, init);
- 				if (ret)
- 					return ret;
- 				init = 0;
-@@ -391,13 +397,14 @@ static int mxs_dcp_aes_enqueue(struct ablkcipher_request *req, int enc, int ecb)
- 	struct dcp *sdcp = global_sdcp;
- 	struct crypto_async_request *arq = &req->base;
- 	struct dcp_async_ctx *actx = crypto_tfm_ctx(arq->tfm);
-+	struct dcp_aes_req_ctx *rctx = ablkcipher_request_ctx(req);
- 	int ret;
- 
- 	if (unlikely(actx->key_len != AES_KEYSIZE_128))
- 		return mxs_dcp_block_fallback(req, enc);
- 
--	actx->enc = enc;
--	actx->ecb = ecb;
-+	rctx->enc = enc;
-+	rctx->ecb = ecb;
- 	actx->chan = DCP_CHAN_CRYPTO;
- 
- 	mutex_lock(&sdcp->mutex[actx->chan]);
-@@ -484,7 +491,7 @@ static int mxs_dcp_aes_fallback_init(struct crypto_tfm *tfm)
- 		return PTR_ERR(blk);
- 
- 	actx->fallback = blk;
--	tfm->crt_ablkcipher.reqsize = sizeof(struct dcp_async_ctx);
-+	tfm->crt_ablkcipher.reqsize = sizeof(struct dcp_aes_req_ctx);
- 	return 0;
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 635cd49..561ebaf 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -350,20 +350,19 @@ static void ahash_def_finup_finish2(struct ahash_request *req, int err)
+ 	if (!err)
+ 		memcpy(priv->result, req->result,
+ 		       crypto_ahash_digestsize(crypto_ahash_reqtfm(req)));
+-
+-	kzfree(priv);
  }
  
+-static void ahash_def_finup_done2(struct crypto_async_request *req, int err)
++static void ahash_def_finup_done2(struct crypto_async_request *areq, int err)
+ {
+-	struct ahash_request *areq = req->data;
+-	struct ahash_request_priv *priv = areq->priv;
+-	crypto_completion_t complete = priv->complete;
+-	void *data = priv->data;
++	struct ahash_request *req = areq->data;
++	struct crypto_async_request *data;
+ 
+-	ahash_def_finup_finish2(areq, err);
++	ahash_def_finup_finish2(req, err);
+ 
+-	complete(data, err);
++	ahash_restore_req(req);
++
++	data = req->base.data;
++	req->base.complete(data, err);
+ }
+ 
+ static int ahash_def_finup_finish1(struct ahash_request *req, int err)
+@@ -380,39 +379,27 @@ out:
+ 	return err;
+ }
+ 
+-static void ahash_def_finup_done1(struct crypto_async_request *req, int err)
++static void ahash_def_finup_done1(struct crypto_async_request *areq, int err)
+ {
+-	struct ahash_request *areq = req->data;
+-	struct ahash_request_priv *priv = areq->priv;
+-	crypto_completion_t complete = priv->complete;
+-	void *data = priv->data;
++	struct ahash_request *req = areq->data;
++	struct crypto_async_request *data;
+ 
+-	err = ahash_def_finup_finish1(areq, err);
++	err = ahash_def_finup_finish1(req, err);
++
++	ahash_restore_req(req);
+ 
+-	complete(data, err);
++	data = req->base.data;
++	req->base.complete(data, err);
+ }
+ 
+ static int ahash_def_finup(struct ahash_request *req)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	unsigned long alignmask = crypto_ahash_alignmask(tfm);
+-	unsigned int ds = crypto_ahash_digestsize(tfm);
+-	struct ahash_request_priv *priv;
+-
+-	priv = kmalloc(sizeof(*priv) + ahash_align_buffer_size(ds, alignmask),
+-		       (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-		       GFP_KERNEL : GFP_ATOMIC);
+-	if (!priv)
+-		return -ENOMEM;
+-
+-	priv->result = req->result;
+-	priv->complete = req->base.complete;
+-	priv->data = req->base.data;
++	int err;
+ 
+-	req->result = PTR_ALIGN((u8 *)priv->ubuf, alignmask + 1);
+-	req->base.complete = ahash_def_finup_done1;
+-	req->base.data = req;
+-	req->priv = priv;
++	err = ahash_save_req(req, ahash_def_finup_done1);
++	if (err)
++		return err;
+ 
+ 	return ahash_def_finup_finish1(req, tfm->update(req));
+ }
 -- 
 1.8.5.2
