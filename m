@@ -1,8 +1,7 @@
 From: Marek Vasut <marex@denx.de>
-Subject: [PATCH 2/3] crypto: Pull out the functions to save/restore request
-Date: Tue, 14 Jan 2014 18:33:48 +0100
-Message-ID: <1389720829-5963-3-git-send-email-marex@denx.de>
-References: <1389720829-5963-1-git-send-email-marex@denx.de>
+Subject: [PATCH 0/3] crypto: Clean up ahash handling confusion
+Date: Tue, 14 Jan 2014 18:33:46 +0100
+Message-ID: <1389720829-5963-1-git-send-email-marex@denx.de>
 Cc: linux-crypto@vger.kernel.org, Marek Vasut <marex@denx.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	Fabio Estevam <fabio.estevam@freescale.com>,
@@ -11,168 +10,33 @@ Cc: linux-crypto@vger.kernel.org, Marek Vasut <marex@denx.de>,
 	Tom Lendacky <thomas.lendacky@amd.com>
 To: linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:46954 "EHLO
+Received: from mail-out.m-online.net ([212.18.0.10]:41328 "EHLO
 	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751631AbaANReF (ORCPT
+	with ESMTP id S1751494AbaANReF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Tue, 14 Jan 2014 12:34:05 -0500
-In-Reply-To: <1389720829-5963-1-git-send-email-marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The functions to save original request within a newly adjusted request
-and it's counterpart to restore the original request can be re-used by
-more code in the crypto/ahash.c file. Pull these functions out from the
-code so they're available.
+This set of patches shall clean up the confusion in restoring the ahash request
+context in crypto/ahash.c . The code was a bit refactored to make it easier to
+understand as well.
 
-Signed-off-by: Marek Vasut <marex@denx.de>
+Please, make sure the code is well tested before applying. Also, please review
+very thoroughly.
+
+Marek Vasut (3):
+  crypto: Fix the pointer voodoo in unaligned ahash
+  crypto: Pull out the functions to save/restore request
+  crypto: Simplify the ahash_finup implementation
+
+ crypto/ahash.c | 172 ++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 110 insertions(+), 62 deletions(-)
+
 Cc: David S. Miller <davem@davemloft.net>
 Cc: Fabio Estevam <fabio.estevam@freescale.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Shawn Guo <shawn.guo@linaro.org>
 Cc: Tom Lendacky <thomas.lendacky@amd.com>
----
- crypto/ahash.c | 112 +++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 65 insertions(+), 47 deletions(-)
-
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 5ca8ede..635cd49 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -191,58 +191,14 @@ static inline unsigned int ahash_align_buffer_size(unsigned len,
- 	return len + (mask & ~(crypto_tfm_ctx_alignment() - 1));
- }
- 
--static void ahash_op_unaligned_finish(struct ahash_request *req, int err)
--{
--	struct ahash_request_priv *priv = req->priv;
--
--	if (err == -EINPROGRESS)
--		return;
--
--	if (!err)
--		memcpy(priv->result, req->result,
--		       crypto_ahash_digestsize(crypto_ahash_reqtfm(req)));
--}
-+static void ahash_op_unaligned_done(struct crypto_async_request *areq, int err);
- 
--static void ahash_op_unaligned_done(struct crypto_async_request *areq, int err)
--{
--	struct ahash_request *req = areq->data;
--	struct ahash_request_priv *priv = req->priv;
--	struct crypto_async_request *data;
--
--	/*
--	 * Restore the original request, see ahash_op_unaligned() for what
--	 * goes where.
--	 *
--	 * The "struct ahash_request *req" here is in fact the "req.base"
--	 * from the ADJUSTED request from ahash_op_unaligned(), thus as it
--	 * is a pointer to self, it is also the ADJUSTED "req" .
--	 */
--
--	/* First copy req->result into req->priv.result */
--	ahash_op_unaligned_finish(req, err);
--
--	/* Restore the original crypto request. */
--	req->result = priv->result;
--	req->base.complete = priv->complete;
--	req->base.data = priv->data;
--	req->priv = priv->priv;
--
--	/* Free the req->priv.priv from the ADJUSTED request. */
--	kzfree(priv);
--
--	/* Complete the ORIGINAL request. */
--	data = req->base.data;
--	req->base.complete(data, err);
--}
--
--static int ahash_op_unaligned(struct ahash_request *req,
--			      int (*op)(struct ahash_request *))
-+static int ahash_save_req(struct ahash_request *req, crypto_completion_t cplt)
- {
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	unsigned long alignmask = crypto_ahash_alignmask(tfm);
- 	unsigned int ds = crypto_ahash_digestsize(tfm);
- 	struct ahash_request_priv *priv;
--	int err;
- 
- 	priv = kmalloc(sizeof(*priv) + ahash_align_buffer_size(ds, alignmask),
- 		       (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
-@@ -282,10 +238,72 @@ static int ahash_op_unaligned(struct ahash_request *req,
- 	priv->priv = req->priv;
- 
- 	req->result = PTR_ALIGN((u8 *)priv->ubuf, alignmask + 1);
--	req->base.complete = ahash_op_unaligned_done;
-+	req->base.complete = cplt;
- 	req->base.data = req;
- 	req->priv = priv;
- 
-+	return 0;
-+}
-+
-+static void ahash_restore_req(struct ahash_request *req)
-+{
-+	struct ahash_request_priv *priv = req->priv;
-+
-+	/* Restore the original crypto request. */
-+	req->result = priv->result;
-+	req->base.complete = priv->complete;
-+	req->base.data = priv->data;
-+	req->priv = priv->priv;
-+
-+	/* Free the req->priv.priv from the ADJUSTED request. */
-+	kzfree(priv);
-+}
-+
-+static void ahash_op_unaligned_finish(struct ahash_request *req, int err)
-+{
-+	struct ahash_request_priv *priv = req->priv;
-+
-+	if (err == -EINPROGRESS)
-+		return;
-+
-+	if (!err)
-+		memcpy(priv->result, req->result,
-+		       crypto_ahash_digestsize(crypto_ahash_reqtfm(req)));
-+}
-+
-+static void ahash_op_unaligned_done(struct crypto_async_request *areq, int err)
-+{
-+	struct ahash_request *req = areq->data;
-+	struct crypto_async_request *data;
-+
-+	/*
-+	 * Restore the original request, see ahash_op_unaligned() for what
-+	 * goes where.
-+	 *
-+	 * The "struct ahash_request *req" here is in fact the "req.base"
-+	 * from the ADJUSTED request from ahash_op_unaligned(), thus as it
-+	 * is a pointer to self, it is also the ADJUSTED "req" .
-+	 */
-+
-+	/* First copy req->result into req->priv.result */
-+	ahash_op_unaligned_finish(req, err);
-+
-+	ahash_restore_req(req);
-+
-+	/* Complete the ORIGINAL request. */
-+	data = req->base.data;
-+	req->base.complete(data, err);
-+}
-+
-+static int ahash_op_unaligned(struct ahash_request *req,
-+			      int (*op)(struct ahash_request *))
-+{
-+	int err;
-+
-+	err = ahash_save_req(req, ahash_op_unaligned_done);
-+	if (err)
-+		return err;
-+
- 	err = op(req);
- 	ahash_op_unaligned_finish(req, err);
- 
 -- 
 1.8.5.2
