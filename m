@@ -1,56 +1,69 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1] crypto: aesni - fix build on x86 (32bit)
-Date: Wed, 15 Jan 2014 11:43:24 +0800
-Message-ID: <20140115034323.GC13556@gondor.apana.org.au>
-References: <1389030119.2624.19.camel@schen9-DESK>
- <637fa237-687f-4e88-88d2-4a9dd0c2bf14@email.android.com>
- <1389031023.2624.21.camel@schen9-DESK>
- <52CAEF55.5090308@zytor.com>
- <1389031855.2624.26.camel@schen9-DESK>
- <20140106202640.GB17863@pd.tnic>
- <52CB1E45.6060204@zytor.com>
- <1389051546.2624.31.camel@schen9-DESK>
- <20140109090302.GA11622@gondor.apana.org.au>
- <1389286662.2624.32.camel@schen9-DESK>
+From: Naveen Krishna Ch <naveenkrishna.ch@gmail.com>
+Subject: Re: [PATCH 7/8 v3] crypto:s5p-sss: validate iv before memcpy
+Date: Wed, 15 Jan 2014 12:15:16 +0530
+Message-ID: <CAHfPSqAtm-Nk1BeC3sWmtUi0dvyfweXSXYnYiQMFzzdWYiDhAg@mail.gmail.com>
+References: <1389243640-13282-1-git-send-email-ch.naveen@samsung.com>
+ <1389354321-32096-1-git-send-email-ch.naveen@samsung.com> <52D019BD.30401@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-crypto@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:37407 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751042AbaAODoE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Jan 2014 22:44:04 -0500
-Content-Disposition: inline
-In-Reply-To: <1389286662.2624.32.camel@schen9-DESK>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
+	linux-crypto@vger.kernel.org,
+	"linux-samsung-soc@vger.kernel.org"
+	<linux-samsung-soc@vger.kernel.org>, linux-kernel@vger.kernel.org,
+	Vladimir Zapolskiy <vzapolskiy@gmail.com>,
+	herbert@gondor.apana.org.au, cpgs@samsung.com,
+	tomasz.figa@gmail.com
+To: Tomasz Figa <t.figa@samsung.com>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <52D019BD.30401@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 09, 2014 at 08:57:42AM -0800, Tim Chen wrote:
+Hello Tomasz,
+
+On 10 January 2014 21:33, Tomasz Figa <t.figa@samsung.com> wrote:
+> Hi Naveen,
 >
-> >From 41656afcbd63ccb92357d4937a75629499f4fd4f Mon Sep 17 00:00:00 2001
-> From: Tim Chen <tim.c.chen@linux.intel.com>
-> Date: Mon, 6 Jan 2014 07:23:52 -0800
-> Subject: [PATCH] crypto: Rename aesni-intel_avx.S to indicate it only
->  supports x86_64
-> To: Herbert Xu <herbert@gondor.apana.org.au>, H. Peter Anvin <hpa@zytor.com>
-> Cc: Borislav Petkov <bp@alien8.de>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, linux-crypto@vger.kernel.org
-> 
-> We rename aesni-intel_avx.S to aesni-intel_avx-x86_64.S to indicate
-> that it is only used by x86_64 architecture.
-> ---
->  arch/x86/crypto/Makefile                                        | 2 +-
->  arch/x86/crypto/{aesni-intel_avx.S => aesni-intel_avx-x86_64.S} | 0
->  2 files changed, 1 insertion(+), 1 deletion(-)
->  rename arch/x86/crypto/{aesni-intel_avx.S => aesni-intel_avx-x86_64.S} (100%)
-> 
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+>
+> On 10.01.2014 12:45, Naveen Krishna Chatradhi wrote:
+>>
+>> This patch adds code to validate "iv" buffer before trying to
+>> memcpy the contents
+>>
+>> Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+>> ---
+>> Changes since v2:
+>> None
+>>
+>>   drivers/crypto/s5p-sss.c |    5 +++--
+>>   1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+>> index f274f5f..7058bb6 100644
+>> --- a/drivers/crypto/s5p-sss.c
+>> +++ b/drivers/crypto/s5p-sss.c
+>> @@ -381,8 +381,9 @@ static void s5p_set_aes(struct s5p_aes_dev *dev,
+>>         struct samsung_aes_variant *var = dev->variant;
+>>         void __iomem *keystart;
+>>
+>> -       memcpy(dev->ioaddr + SSS_REG_AES_IV_DATA
+>> -                               (var->aes_offset, 0), iv, 0x10);
+>> +       if (iv)
+>> +               memcpy(dev->ioaddr + SSS_REG_AES_IV_DATA
+>> +                                       (var->aes_offset, 0), iv, 0x10);
+>
+>
+> In what conditions can the iv end up being NULL?
+req->info is the initialization vector in our case, which comes from user space.
+Its good to have a check to avoid any crashes.
 
-Patch applied.
+Also AES ECB mode does not use IV.
+>
+> Best regards,
+> Tomasz
+
+
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Shine bright,
+(: Nav :)
