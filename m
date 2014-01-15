@@ -1,41 +1,59 @@
 From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 7/8 v4] crypto:s5p-sss: validate iv before memcpy
-Date: Wed, 15 Jan 2014 14:47:27 +0530
-Message-ID: <1389777447-15225-1-git-send-email-ch.naveen@samsung.com>
-References: <1389243640-13282-1-git-send-email-ch.naveen@samsung.com>
+Subject: [PATCH 8/8 v4] crypto:s5p-sss: Use clk_prepare/clk_unprepare
+Date: Wed, 15 Jan 2014 14:47:52 +0530
+Message-ID: <1389777472-15294-1-git-send-email-ch.naveen@samsung.com>
+References: <1389354331-32142-1-git-send-email-ch.naveen@samsung.com>
 Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
 	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
 	cpgs@samsung.com, tomasz.figa@gmail.com
 To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
 Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-reply-to: <1389243640-13282-1-git-send-email-ch.naveen@samsung.com>
+In-reply-to: <1389354331-32142-1-git-send-email-ch.naveen@samsung.com>
 Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds code to validate "iv" buffer before trying to
-memcpy the contents
+This patch set adds use of clk_prepare/clk_unprepare as
+required by generic clock framework.
 
 Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+Reviewed-by: Tomasz Figa <t.figa@samsung.com>
 ---
 Changes since v3:
 None
 
- drivers/crypto/s5p-sss.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/crypto/s5p-sss.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 69130b2..f7c66c7 100644
+index f7c66c7..870e794 100644
 --- a/drivers/crypto/s5p-sss.c
 +++ b/drivers/crypto/s5p-sss.c
-@@ -380,7 +380,8 @@ static void s5p_set_aes(struct s5p_aes_dev *dev,
- {
- 	void __iomem *keystart;
+@@ -648,7 +648,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 		return -ENOENT;
+ 	}
  
--	memcpy(dev->aes_ioaddr + SSS_REG_AES_IV_DATA (0), iv, 0x10);
-+	if (iv)
-+		memcpy(dev->aes_ioaddr + SSS_REG_AES_IV_DATA (0), iv, 0x10);
+-	clk_enable(pdata->clk);
++	clk_prepare_enable(pdata->clk);
  
- 	if (keylen == AES_KEYSIZE_256)
- 		keystart = dev->aes_ioaddr + SSS_REG_AES_KEY_DATA(0);
+ 	spin_lock_init(&pdata->lock);
+ 	pdata->ioaddr = devm_ioremap(dev, res->start,
+@@ -711,7 +711,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 	tasklet_kill(&pdata->tasklet);
+ 
+  err_irq:
+-	clk_disable(pdata->clk);
++	clk_disable_unprepare(pdata->clk);
+ 
+ 	s5p_dev = NULL;
+ 
+@@ -731,7 +731,7 @@ static int s5p_aes_remove(struct platform_device *pdev)
+ 
+ 	tasklet_kill(&pdata->tasklet);
+ 
+-	clk_disable(pdata->clk);
++	clk_disable_unprepare(pdata->clk);
+ 
+ 	s5p_dev = NULL;
+ 
 -- 
 1.7.9.5
