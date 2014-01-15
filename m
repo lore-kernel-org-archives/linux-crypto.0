@@ -1,38 +1,23 @@
 From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 1/8 v4] crypto:s5p-sss: Use platform_get_irq() instead of
- _byname()
-Date: Wed, 15 Jan 2014 14:44:22 +0530
-Message-ID: <1389777262-14978-1-git-send-email-ch.naveen@samsung.com>
-References: <1389095509-14357-2-git-send-email-ch.naveen@samsung.com>
+Subject: [PATCH 2/8 v4] crypto:s5p-sss: Add device tree support
+Date: Wed, 15 Jan 2014 14:44:51 +0530
+Message-ID: <1389777291-15026-1-git-send-email-ch.naveen@samsung.com>
+References: <1389243541-13122-1-git-send-email-ch.naveen@samsung.com>
 Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
 	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
 	cpgs@samsung.com, tomasz.figa@gmail.com,
-	Naveen Krishna Ch <ch.naveen@samsung.com>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout4.samsung.com ([203.254.224.34]:22668 "EHLO
-	mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750928AbaAOJOL (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 15 Jan 2014 04:14:11 -0500
-In-reply-to: <1389095509-14357-2-git-send-email-ch.naveen@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-reply-to: <1389243541-13122-1-git-send-email-ch.naveen@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Naveen Krishna Ch <ch.naveen@samsung.com>
+This patch adds device tree support to the s5p-sss.c crypto driver.
 
-This patch uses the platform_get_irq() instead of the
-platform_get_irq_byname(). Making feeder control interrupt
-as resource "0" and hash interrupt as "1".
-
-reasons for this change.
-1. Cannot find any Arch which is currently using this driver
-2. Samsung Exynos4 and 5 SoCs only use the feeder control interrupt
-3. Patches adding support for DT and H/W version are in pipeline
+Also, Documentation under devicetree/bindings added.
 
 Signed-off-by: Naveen Krishna Ch <ch.naveen@samsung.com>
-Reviewed-by: Tomasz Figa <t.figa@samsung.com>
 CC: Herbert Xu <herbert@gondor.apana.org.au>
 CC: David S. Miller <davem@davemloft.net>
 CC: Vladimir Zapolskiy <vzapolskiy@gmail.com>
@@ -42,54 +27,71 @@ CC: <linux-samsung-soc@vger.kernel.org>
 Changes since v3:
 None
 
- drivers/crypto/s5p-sss.c |   24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ .../devicetree/bindings/crypto/samsung-sss.txt     |   20 ++++++++++++++++++++
+ drivers/crypto/s5p-sss.c                           |   10 +++++++++-
+ 2 files changed, 29 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/samsung-sss.txt
 
+diff --git a/Documentation/devicetree/bindings/crypto/samsung-sss.txt b/Documentation/devicetree/bindings/crypto/samsung-sss.txt
+new file mode 100644
+index 0000000..2f9d7e4
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/samsung-sss.txt
+@@ -0,0 +1,20 @@
++Samsung SoC SSS (Security SubSystem) module
++
++The SSS module in S5PV210 SoC supports the following:
++-- Feeder (FeedCtrl)
++-- Advanced Encryption Standard (AES)
++-- Data Encryption Standard (DES)/3DES
++-- Public Key Accelerator (PKA)
++-- SHA-1/SHA-256/MD5/HMAC (SHA-1/SHA-256/MD5)/PRNG
++-- PRNG: Pseudo Random Number Generator
++
++Required properties:
++
++- compatible : Should contain entries for this and backward compatible
++  SSS versions:
++  - "samsung,s5pv210-secss" for S5PV210 SoC.
++- reg : Offset and length of the register set for the module
++- interrupts : the interrupt-specifier for the SSS module.
++		Two interrupts "feed control and hash" in case of S5PV210
++- clocks : the required gating clock for the SSS module.
++- clock-names : the gating clock name to be requested in the SSS driver.
 diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index cf149b1..93cddeb 100644
+index 93cddeb..2da5617 100644
 --- a/drivers/crypto/s5p-sss.c
 +++ b/drivers/crypto/s5p-sss.c
-@@ -592,29 +592,29 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 	pdata->ioaddr = devm_ioremap(dev, res->start,
- 				     resource_size(res));
+@@ -22,6 +22,7 @@
+ #include <linux/scatterlist.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/io.h>
++#include <linux/of.h>
+ #include <linux/crypto.h>
+ #include <linux/interrupt.h>
  
--	pdata->irq_hash = platform_get_irq_byname(pdev, "hash");
--	if (pdata->irq_hash < 0) {
--		err = pdata->irq_hash;
--		dev_warn(dev, "hash interrupt is not available.\n");
-+	pdata->irq_fc = platform_get_irq(pdev, 0);
-+	if (pdata->irq_fc < 0) {
-+		err = pdata->irq_fc;
-+		dev_warn(dev, "feed control interrupt is not available.\n");
- 		goto err_irq;
- 	}
--	err = devm_request_irq(dev, pdata->irq_hash, s5p_aes_interrupt,
-+	err = devm_request_irq(dev, pdata->irq_fc, s5p_aes_interrupt,
- 			       IRQF_SHARED, pdev->name, pdev);
- 	if (err < 0) {
--		dev_warn(dev, "hash interrupt is not available.\n");
-+		dev_warn(dev, "feed control interrupt is not available.\n");
- 		goto err_irq;
- 	}
+@@ -177,6 +178,12 @@ struct s5p_aes_dev {
  
--	pdata->irq_fc = platform_get_irq_byname(pdev, "feed control");
--	if (pdata->irq_fc < 0) {
--		err = pdata->irq_fc;
--		dev_warn(dev, "feed control interrupt is not available.\n");
-+	pdata->irq_hash = platform_get_irq(pdev, 1);
-+	if (pdata->irq_hash < 0) {
-+		err = pdata->irq_hash;
-+		dev_warn(dev, "hash interrupt is not available.\n");
- 		goto err_irq;
- 	}
--	err = devm_request_irq(dev, pdata->irq_fc, s5p_aes_interrupt,
-+	err = devm_request_irq(dev, pdata->irq_hash, s5p_aes_interrupt,
- 			       IRQF_SHARED, pdev->name, pdev);
- 	if (err < 0) {
--		dev_warn(dev, "feed control interrupt is not available.\n");
-+		dev_warn(dev, "hash interrupt is not available.\n");
- 		goto err_irq;
- 	}
+ static struct s5p_aes_dev *s5p_dev;
+ 
++static const struct of_device_id s5p_sss_dt_match[] = {
++	{ .compatible = "samsung,s5pv210-secss", },
++	{ },
++};
++MODULE_DEVICE_TABLE(of, s5p_sss_dt_match);
++
+ static void s5p_set_dma_indata(struct s5p_aes_dev *dev, struct scatterlist *sg)
+ {
+ 	SSS_WRITE(dev, FCBRDMAS, sg_dma_address(sg));
+@@ -676,7 +683,8 @@ static struct platform_driver s5p_aes_crypto = {
+ 	.remove	= s5p_aes_remove,
+ 	.driver	= {
+ 		.owner	= THIS_MODULE,
+-		.name	= "s5p-secss",
++		.name	= "s5pv210-secss",
++		.of_match_table = s5p_sss_dt_match,
+ 	},
+ };
  
 -- 
 1.7.9.5
