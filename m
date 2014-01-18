@@ -1,170 +1,159 @@
-From: Harald Freudenberger <freude@linux.vnet.ibm.com>
-Subject: [PATCH] crypto: s390 - fix concurrency issue in aes-ctr mode
-Date: Thu, 16 Jan 2014 16:01:11 +0100
-Message-ID: <1389884471-24964-1-git-send-email-freude@linux.vnet.ibm.com>
-Cc: linux-crypto@vger.kernel.org,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>,
-	Ingo Tuchscherer <ingo.tuchscherer@linux.vnet.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-	Harald Freudenberger <freude@de.ibm.com>,
-	Harald Freudenberger <freude@linux.vnet.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e06smtp12.uk.ibm.com ([195.75.94.108]:38698 "EHLO
-	e06smtp12.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751271AbaAPPBa (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Jan 2014 10:01:30 -0500
-Received: from /spool/local
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <freude@de.ibm.com>;
-	Thu, 16 Jan 2014 15:01:28 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-	by d06dlp02.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3C267219005E
-	for <linux-crypto@vger.kernel.org>; Thu, 16 Jan 2014 15:01:25 +0000 (GMT)
-Received: from d06av06.portsmouth.uk.ibm.com (d06av06.portsmouth.uk.ibm.com [9.149.37.217])
-	by b06cxnps4074.portsmouth.uk.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id s0GF1Ekm65798206
-	for <linux-crypto@vger.kernel.org>; Thu, 16 Jan 2014 15:01:14 GMT
-Received: from d06av06.portsmouth.uk.ibm.com (localhost [127.0.0.1])
-	by d06av06.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id s0GF1PLc015045
-	for <linux-crypto@vger.kernel.org>; Thu, 16 Jan 2014 08:01:26 -0700
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH RFC 1/2] crypto: Simple crypto algorithm load balancer
+Date: Sat, 18 Jan 2014 00:46:08 +0000
+Message-ID: <52d9ced0.jqhVV3OvRxex2A9/%tadeusz.struk@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	davem@davemloft.net, tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The aes-ctr mode uses one preallocated page without any concurrency
-protection. When multiple threads run aes-ctr encryption or decryption
-this can lead to data corruption.
+Hi,
+In case of multiple crypto devices implementing the same algorithms
+the arbitration, which one to use is based on the cra_priority.
+Currently the algorithm with the highest priority is always be used.
+In case of two algorithms with the same priority the one added last is used.
+There is no load balancing and on a busy system there can be a situation when
+there more crypto accelerators, but only one is used for all crypto jobs
+and the others sit idle.
+This patch implements a simple load balancing based on the priority
+of an algorithm and its usage refctr. The distribution for 10 algorithms
+and 3000000 tfm_alloc allocations is as follows:
 
-The patch introduces locking for the page and a fallback solution with
-slower en/decryption performance in concurrency situations.
+ === Algorithm load balancig test results for 3000000 allocatoins ===
+ All different alg priorities:
+ Algorithm 1 with cra_pri 1 allocated 3 times. That's ~0%
+ Algorithm 2 with cra_pri 2 allocated 10 times. That's ~0%
+ Algorithm 3 with cra_pri 3 allocated 38 times. That's ~0%
+ Algorithm 4 with cra_pri 4 allocated 168 times. That's ~0%
+ Algorithm 5 with cra_pri 5 allocated 781 times. That's ~0%
+ Algorithm 6 with cra_pri 6 allocated 3757 times. That's ~0%
+ Algorithm 7 with cra_pri 7 allocated 18483 times. That's ~0%
+ Algorithm 8 with cra_pri 8 allocated 92540 times. That's ~3%
+ Algorithm 9 with cra_pri 9 allocated 469918 times. That's ~15%
+ Algorithm 10 with cra_pri 10 allocated 2414312 times. That's ~80%
 
-Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
+ All the same alg priorities:
+ Algorithm 1 with cra_pri 10 allocated 297521 times. That's ~9%
+ Algorithm 2 with cra_pri 10 allocated 297521 times. That's ~9%
+ Algorithm 3 with cra_pri 10 allocated 297521 times. That's ~9%
+ Algorithm 4 with cra_pri 10 allocated 297522 times. That's ~9%
+ Algorithm 5 with cra_pri 10 allocated 297522 times. That's ~9%
+ Algorithm 6 with cra_pri 10 allocated 297522 times. That's ~9%
+ Algorithm 7 with cra_pri 10 allocated 297522 times. That's ~9%
+ Algorithm 8 with cra_pri 10 allocated 297522 times. That's ~9%
+ Algorithm 9 with cra_pri 10 allocated 297522 times. That's ~9%
+ Algorithm 10 with cra_pri 10 allocated 297522 times. That's ~9%
+
+ A mix of alg priorities:
+ Algorithm 1 with cra_pri 9 allocated 1938 times. That's ~0%
+ Algorithm 2 with cra_pri 4 allocated 8 times. That's ~0%
+ Algorithm 3 with cra_pri 1 allocated 2 times. That's ~0%
+ Algorithm 4 with cra_pri 4 allocated 9 times. That's ~0%
+ Algorithm 5 with cra_pri 5 allocated 62 times. That's ~0%
+ Algorithm 6 with cra_pri 20 allocated 157052 times. That's ~5%
+ Algorithm 7 with cra_pri 21 allocated 1410070 times. That's ~47%
+ Algorithm 8 with cra_pri 10 allocated 10215 times. That's ~0%
+ Algorithm 9 with cra_pri 21 allocated 1420284 times. That's ~47%
+ Algorithm 10 with cra_pri 7 allocated 370 times. That's ~0%
+
+ A mix of alg priorities with one very big:
+ Algorithm 1 with cra_pri 9 allocated 6 times. That's ~0%
+ Algorithm 2 with cra_pri 4 allocated 1 times. That's ~0%
+ Algorithm 3 with cra_pri 1 allocated 1 times. That's ~0%
+ Algorithm 4 with cra_pri 4 allocated 1 times. That's ~0%
+ Algorithm 5 with cra_pri 500 allocated 2993808 times. That's ~99%
+ Algorithm 6 with cra_pri 20 allocated 346 times. That's ~0%
+ Algorithm 7 with cra_pri 21 allocated 2899 times. That's ~0%
+ Algorithm 8 with cra_pri 10 allocated 23 times. That's ~0%
+ Algorithm 9 with cra_pri 21 allocated 2922 times. That's ~0%
+ Algorithm 10 with cra_pri 7 allocated 3 times. That's ~0%
+
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- arch/s390/crypto/aes_s390.c |   65 ++++++++++++++++++++++++++++++-------------
- 1 file changed, 46 insertions(+), 19 deletions(-)
+ crypto/api.c           |   25 ++++++++++++++++++++++---
+ include/linux/crypto.h |    3 ++-
+ 2 files changed, 24 insertions(+), 4 deletions(-)
 
-diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-index b3feabd..cf3c008 100644
---- a/arch/s390/crypto/aes_s390.c
-+++ b/arch/s390/crypto/aes_s390.c
-@@ -25,6 +25,7 @@
- #include <linux/err.h>
- #include <linux/module.h>
- #include <linux/init.h>
-+#include <linux/spinlock.h>
- #include "crypt_s390.h"
+diff --git a/crypto/api.c b/crypto/api.c
+index a2b39c5..0c0f1c3 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -63,7 +63,7 @@ static struct crypto_alg *__crypto_alg_lookup(const char *name, u32 type,
+ 	int best = -2;
  
- #define AES_KEYLEN_128		1
-@@ -32,6 +33,7 @@
- #define AES_KEYLEN_256		4
+ 	list_for_each_entry(q, &crypto_alg_list, cra_list) {
+-		int exact, fuzzy;
++		int exact, fuzzy, relative_priority;
  
- static u8 *ctrblk;
-+static DEFINE_SPINLOCK(ctrblk_lock);
- static char keylen_flag;
+ 		if (crypto_is_moribund(q))
+ 			continue;
+@@ -78,13 +78,15 @@ static struct crypto_alg *__crypto_alg_lookup(const char *name, u32 type,
  
- struct s390_aes_ctx {
-@@ -758,43 +760,67 @@ static int ctr_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 	return aes_set_key(tfm, in_key, key_len);
- }
+ 		exact = !strcmp(q->cra_driver_name, name);
+ 		fuzzy = !strcmp(q->cra_name, name);
+-		if (!exact && !(fuzzy && q->cra_priority > best))
++		relative_priority = q->cra_priority -
++					atomic_read(&q->cra_lbalance);
++		if (!exact && !(fuzzy && relative_priority > best))
+ 			continue;
  
-+static unsigned int __ctrblk_init(u8 *ctrptr, unsigned int nbytes)
-+{
-+	unsigned int i, n;
-+
-+	/* only use complete blocks, max. PAGE_SIZE */
-+	n = (nbytes > PAGE_SIZE) ? PAGE_SIZE : nbytes & ~(AES_BLOCK_SIZE - 1);
-+	for (i = AES_BLOCK_SIZE; i < n; i += AES_BLOCK_SIZE) {
-+		memcpy(ctrptr + i, ctrptr + i - AES_BLOCK_SIZE,
-+		       AES_BLOCK_SIZE);
-+		crypto_inc(ctrptr + i, AES_BLOCK_SIZE);
-+	}
-+	return n;
-+}
-+
- static int ctr_aes_crypt(struct blkcipher_desc *desc, long func,
- 			 struct s390_aes_ctx *sctx, struct blkcipher_walk *walk)
- {
- 	int ret = blkcipher_walk_virt_block(desc, walk, AES_BLOCK_SIZE);
--	unsigned int i, n, nbytes;
--	u8 buf[AES_BLOCK_SIZE];
--	u8 *out, *in;
-+	unsigned int n, nbytes;
-+	u8 buf[AES_BLOCK_SIZE], ctrbuf[AES_BLOCK_SIZE];
-+	u8 *out, *in, *ctrptr = ctrbuf;
+ 		if (unlikely(!crypto_mod_get(q)))
+ 			continue;
  
- 	if (!walk->nbytes)
- 		return ret;
- 
--	memcpy(ctrblk, walk->iv, AES_BLOCK_SIZE);
-+	if (spin_trylock(&ctrblk_lock))
-+		ctrptr = ctrblk;
-+
-+	memcpy(ctrptr, walk->iv, AES_BLOCK_SIZE);
- 	while ((nbytes = walk->nbytes) >= AES_BLOCK_SIZE) {
- 		out = walk->dst.virt.addr;
- 		in = walk->src.virt.addr;
- 		while (nbytes >= AES_BLOCK_SIZE) {
--			/* only use complete blocks, max. PAGE_SIZE */
--			n = (nbytes > PAGE_SIZE) ? PAGE_SIZE :
--						 nbytes & ~(AES_BLOCK_SIZE - 1);
--			for (i = AES_BLOCK_SIZE; i < n; i += AES_BLOCK_SIZE) {
--				memcpy(ctrblk + i, ctrblk + i - AES_BLOCK_SIZE,
--				       AES_BLOCK_SIZE);
--				crypto_inc(ctrblk + i, AES_BLOCK_SIZE);
--			}
--			ret = crypt_s390_kmctr(func, sctx->key, out, in, n, ctrblk);
--			if (ret < 0 || ret != n)
-+			if (ctrptr == ctrblk)
-+				n = __ctrblk_init(ctrptr, nbytes);
-+			else
-+				n = AES_BLOCK_SIZE;
-+			ret = crypt_s390_kmctr(func, sctx->key, out, in,
-+					       n, ctrptr);
-+			if (ret < 0 || ret != n) {
-+				if (ctrptr == ctrblk)
-+					spin_unlock(&ctrblk_lock);
- 				return -EIO;
+-		best = q->cra_priority;
++		best = relative_priority;
+ 		if (alg)
+ 			crypto_mod_put(alg);
+ 		alg = q;
+@@ -92,6 +94,23 @@ static struct crypto_alg *__crypto_alg_lookup(const char *name, u32 type,
+ 		if (exact)
+ 			break;
+ 	}
++	if (!alg) {
++		list_for_each_entry(q, &crypto_alg_list, cra_list) {
++			int best = -2;
++			if (best < q->cra_priority) {
++				alg = q;
++				best = q->cra_priority;
 +			}
- 			if (n > AES_BLOCK_SIZE)
--				memcpy(ctrblk, ctrblk + n - AES_BLOCK_SIZE,
-+				memcpy(ctrptr, ctrptr + n - AES_BLOCK_SIZE,
- 				       AES_BLOCK_SIZE);
--			crypto_inc(ctrblk, AES_BLOCK_SIZE);
-+			crypto_inc(ctrptr, AES_BLOCK_SIZE);
- 			out += n;
- 			in += n;
- 			nbytes -= n;
- 		}
- 		ret = blkcipher_walk_done(desc, walk, nbytes);
- 	}
-+	if (ctrptr == ctrblk) {
-+		if (nbytes)
-+			memcpy(ctrbuf, ctrptr, AES_BLOCK_SIZE);
-+		else
-+			memcpy(walk->iv, ctrptr, AES_BLOCK_SIZE);
-+		spin_unlock(&ctrblk_lock);
++			atomic_set(&q->cra_lbalance, 0);
++		}
 +	}
- 	/*
- 	 * final block may be < AES_BLOCK_SIZE, copy only nbytes
- 	 */
-@@ -802,14 +828,15 @@ static int ctr_aes_crypt(struct blkcipher_desc *desc, long func,
- 		out = walk->dst.virt.addr;
- 		in = walk->src.virt.addr;
- 		ret = crypt_s390_kmctr(func, sctx->key, buf, in,
--				       AES_BLOCK_SIZE, ctrblk);
-+				       AES_BLOCK_SIZE, ctrbuf);
- 		if (ret < 0 || ret != AES_BLOCK_SIZE)
- 			return -EIO;
- 		memcpy(out, buf, nbytes);
--		crypto_inc(ctrblk, AES_BLOCK_SIZE);
-+		crypto_inc(ctrbuf, AES_BLOCK_SIZE);
- 		ret = blkcipher_walk_done(desc, walk, 0);
-+		memcpy(walk->iv, ctrbuf, AES_BLOCK_SIZE);
- 	}
--	memcpy(walk->iv, ctrblk, AES_BLOCK_SIZE);
-+
- 	return ret;
++	atomic_inc(&alg->cra_lbalance);
++	list_for_each_entry(q, &crypto_alg_list, cra_list) {
++		if (alg == q)
++			continue;
++		if (q->cra_priority > alg->cra_priority)
++			atomic_set(&q->cra_lbalance, 0);
++	}
+ 
+ 	return alg;
  }
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index b92eadf..6c24b27 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -288,6 +288,7 @@ struct crypto_alg {
+ 
+ 	int cra_priority;
+ 	atomic_t cra_refcnt;
++	atomic_t cra_lbalance;
+ 
+ 	char cra_name[CRYPTO_MAX_ALG_NAME];
+ 	char cra_driver_name[CRYPTO_MAX_ALG_NAME];
+@@ -306,7 +307,7 @@ struct crypto_alg {
+ 	int (*cra_init)(struct crypto_tfm *tfm);
+ 	void (*cra_exit)(struct crypto_tfm *tfm);
+ 	void (*cra_destroy)(struct crypto_alg *alg);
+-	
++
+ 	struct module *cra_module;
+ };
  
 -- 
-1.7.9.5
+1.7.10.4
