@@ -1,154 +1,141 @@
-From: Paul Gortmaker <paul.gortmaker@windriver.com>
-Subject: [PATCH 62/73] drivers/crypto: delete non-required instances of include <linux/init.h>
-Date: Tue, 21 Jan 2014 16:23:05 -0500
-Message-ID: <1390339396-3479-63-git-send-email-paul.gortmaker@windriver.com>
-References: <1390339396-3479-1-git-send-email-paul.gortmaker@windriver.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-arch@vger.kernel.org>,
-	Paul Gortmaker <paul.gortmaker@windriver.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>
-To: <linux-kernel@vger.kernel.org>
+From: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Subject: [PATCH] crypto: s390 - fix des and des3_ede cbc concurrency issue
+Date: Wed, 22 Jan 2014 13:00:04 +0100
+Message-ID: <1390392004-4968-1-git-send-email-freude@linux.vnet.ibm.com>
+Cc: linux-crypto@vger.kernel.org,
+	Martin Schwidefsky <schwidefsky@de.ibm.com>,
+	Ingo Tuchscherer <ingo.tuchscherer@linux.vnet.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+	Harald Freudenberger <freude@de.ibm.com>,
+	Harald Freudenberger <freude@linux.vnet.ibm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail1.windriver.com ([147.11.146.13]:50791 "EHLO
-	mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754875AbaAUVZk (ORCPT
+Received: from e06smtp14.uk.ibm.com ([195.75.94.110]:49273 "EHLO
+	e06smtp14.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755161AbaAVMAG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 Jan 2014 16:25:40 -0500
-In-Reply-To: <1390339396-3479-1-git-send-email-paul.gortmaker@windriver.com>
+	Wed, 22 Jan 2014 07:00:06 -0500
+Received: from /spool/local
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <freude@de.ibm.com>;
+	Wed, 22 Jan 2014 12:00:03 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+	by d06dlp02.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6CEF5219005E
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Jan 2014 12:00:00 +0000 (GMT)
+Received: from d06av01.portsmouth.uk.ibm.com (d06av01.portsmouth.uk.ibm.com [9.149.37.212])
+	by b06cxnps4076.portsmouth.uk.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id s0MBxnYQ39845928
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Jan 2014 11:59:49 GMT
+Received: from d06av01.portsmouth.uk.ibm.com (localhost [127.0.0.1])
+	by d06av01.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id s0MC00Hc028583
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Jan 2014 05:00:01 -0700
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-None of these files are actually using any __init type directives
-and hence don't need to include <linux/init.h>.  Most are just a
-left over from __devinit and __cpuinit removal, or simply due to
-code getting copied from one driver to the next.
+In s390 des and des3_ede cbc mode the iv value is not protected
+against concurrency access and modifications from another running
+en/decrypt operation which is using the very same tfm struct
+instance. This fix copies the iv to the local stack before
+the crypto operation and stores the value back when done.
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
 ---
- drivers/crypto/atmel-aes.c        | 1 -
- drivers/crypto/atmel-sha.c        | 1 -
- drivers/crypto/atmel-tdes.c       | 1 -
- drivers/crypto/nx/nx_debugfs.c    | 1 -
- drivers/crypto/omap-aes.c         | 1 -
- drivers/crypto/omap-sham.c        | 1 -
- drivers/crypto/picoxcell_crypto.c | 1 -
- drivers/crypto/s5p-sss.c          | 1 -
- drivers/crypto/tegra-aes.c        | 1 -
- 9 files changed, 9 deletions(-)
+ arch/s390/crypto/des_s390.c |   26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index d7c9e31..70fb6fb 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -24,7 +24,6 @@
- #include <linux/platform_device.h>
+diff --git a/arch/s390/crypto/des_s390.c b/arch/s390/crypto/des_s390.c
+index 200f2a1..82a0a2a 100644
+--- a/arch/s390/crypto/des_s390.c
++++ b/arch/s390/crypto/des_s390.c
+@@ -105,29 +105,35 @@ static int ecb_desall_crypt(struct blkcipher_desc *desc, long func,
+ }
  
- #include <linux/device.h>
--#include <linux/init.h>
- #include <linux/errno.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 0618be0..637141b 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -24,7 +24,6 @@
- #include <linux/platform_device.h>
+ static int cbc_desall_crypt(struct blkcipher_desc *desc, long func,
+-			    u8 *iv, struct blkcipher_walk *walk)
++			    struct blkcipher_walk *walk)
+ {
++	struct s390_des_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+ 	int ret = blkcipher_walk_virt(desc, walk);
+ 	unsigned int nbytes = walk->nbytes;
++	struct {
++		u8 iv[DES_BLOCK_SIZE];
++		u8 key[DES3_KEY_SIZE];
++	} param;
  
- #include <linux/device.h>
--#include <linux/init.h>
- #include <linux/errno.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 6cde5b5..604a67f 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -24,7 +24,6 @@
- #include <linux/platform_device.h>
+ 	if (!nbytes)
+ 		goto out;
  
- #include <linux/device.h>
--#include <linux/init.h>
- #include <linux/errno.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
-diff --git a/drivers/crypto/nx/nx_debugfs.c b/drivers/crypto/nx/nx_debugfs.c
-index 7ab2e8d..899d857 100644
---- a/drivers/crypto/nx/nx_debugfs.c
-+++ b/drivers/crypto/nx/nx_debugfs.c
-@@ -24,7 +24,6 @@
- #include <linux/string.h>
- #include <linux/debugfs.h>
- #include <linux/module.h>
--#include <linux/init.h>
- #include <linux/crypto.h>
- #include <crypto/hash.h>
- #include <asm/vio.h>
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index dde41f1d..6d34dac 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -19,7 +19,6 @@
+-	memcpy(iv, walk->iv, DES_BLOCK_SIZE);
++	memcpy(param.iv, walk->iv, DES_BLOCK_SIZE);
++	memcpy(param.key, ctx->key, DES3_KEY_SIZE);
+ 	do {
+ 		/* only use complete blocks */
+ 		unsigned int n = nbytes & ~(DES_BLOCK_SIZE - 1);
+ 		u8 *out = walk->dst.virt.addr;
+ 		u8 *in = walk->src.virt.addr;
  
- #include <linux/err.h>
- #include <linux/module.h>
--#include <linux/init.h>
- #include <linux/errno.h>
- #include <linux/kernel.h>
- #include <linux/platform_device.h>
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index a727a6a..5d303eb 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -19,7 +19,6 @@
- #include <linux/err.h>
- #include <linux/device.h>
- #include <linux/module.h>
--#include <linux/init.h>
- #include <linux/errno.h>
- #include <linux/interrupt.h>
- #include <linux/kernel.h>
-diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
-index a6175ba..e50a1b9 100644
---- a/drivers/crypto/picoxcell_crypto.c
-+++ b/drivers/crypto/picoxcell_crypto.c
-@@ -29,7 +29,6 @@
- #include <linux/dma-mapping.h>
- #include <linux/dmapool.h>
- #include <linux/err.h>
--#include <linux/init.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/list.h>
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index cf149b1..78b7eed 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -14,7 +14,6 @@
- #include <linux/delay.h>
- #include <linux/err.h>
- #include <linux/module.h>
--#include <linux/init.h>
- #include <linux/errno.h>
- #include <linux/kernel.h>
- #include <linux/clk.h>
-diff --git a/drivers/crypto/tegra-aes.c b/drivers/crypto/tegra-aes.c
-index 060eecc..4c0548f 100644
---- a/drivers/crypto/tegra-aes.c
-+++ b/drivers/crypto/tegra-aes.c
-@@ -30,7 +30,6 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+-		ret = crypt_s390_kmc(func, iv, out, in, n);
++		ret = crypt_s390_kmc(func, &param, out, in, n);
+ 		if (ret < 0 || ret != n)
+ 			return -EIO;
  
- #include <linux/module.h>
--#include <linux/init.h>
- #include <linux/errno.h>
- #include <linux/kernel.h>
- #include <linux/clk.h>
+ 		nbytes &= DES_BLOCK_SIZE - 1;
+ 		ret = blkcipher_walk_done(desc, walk, nbytes);
+ 	} while ((nbytes = walk->nbytes));
+-	memcpy(walk->iv, iv, DES_BLOCK_SIZE);
++	memcpy(walk->iv, param.iv, DES_BLOCK_SIZE);
+ 
+ out:
+ 	return ret;
+@@ -179,22 +185,20 @@ static int cbc_des_encrypt(struct blkcipher_desc *desc,
+ 			   struct scatterlist *dst, struct scatterlist *src,
+ 			   unsigned int nbytes)
+ {
+-	struct s390_des_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+ 	struct blkcipher_walk walk;
+ 
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+-	return cbc_desall_crypt(desc, KMC_DEA_ENCRYPT, ctx->iv, &walk);
++	return cbc_desall_crypt(desc, KMC_DEA_ENCRYPT, &walk);
+ }
+ 
+ static int cbc_des_decrypt(struct blkcipher_desc *desc,
+ 			   struct scatterlist *dst, struct scatterlist *src,
+ 			   unsigned int nbytes)
+ {
+-	struct s390_des_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+ 	struct blkcipher_walk walk;
+ 
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+-	return cbc_desall_crypt(desc, KMC_DEA_DECRYPT, ctx->iv, &walk);
++	return cbc_desall_crypt(desc, KMC_DEA_DECRYPT, &walk);
+ }
+ 
+ static struct crypto_alg cbc_des_alg = {
+@@ -327,22 +331,20 @@ static int cbc_des3_encrypt(struct blkcipher_desc *desc,
+ 			    struct scatterlist *dst, struct scatterlist *src,
+ 			    unsigned int nbytes)
+ {
+-	struct s390_des_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+ 	struct blkcipher_walk walk;
+ 
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+-	return cbc_desall_crypt(desc, KMC_TDEA_192_ENCRYPT, ctx->iv, &walk);
++	return cbc_desall_crypt(desc, KMC_TDEA_192_ENCRYPT, &walk);
+ }
+ 
+ static int cbc_des3_decrypt(struct blkcipher_desc *desc,
+ 			    struct scatterlist *dst, struct scatterlist *src,
+ 			    unsigned int nbytes)
+ {
+-	struct s390_des_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+ 	struct blkcipher_walk walk;
+ 
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+-	return cbc_desall_crypt(desc, KMC_TDEA_192_DECRYPT, ctx->iv, &walk);
++	return cbc_desall_crypt(desc, KMC_TDEA_192_DECRYPT, &walk);
+ }
+ 
+ static struct crypto_alg cbc_des3_alg = {
 -- 
-1.8.4.1
+1.7.9.5
