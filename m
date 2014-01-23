@@ -1,62 +1,51 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH 2/8 v4] crypto:s5p-sss: Add device tree support
-Date: Thu, 23 Jan 2014 17:59:30 +0000
-Message-ID: <20140123175930.GJ15586@e106331-lin.cambridge.arm.com>
-References: <1389243541-13122-1-git-send-email-ch.naveen@samsung.com>
- <1389777291-15026-1-git-send-email-ch.naveen@samsung.com>
- <52E0EEB8.4080602@samsung.com>
- <20140123174121.GI15586@e106331-lin.cambridge.arm.com>
- <52E155AD.9070802@samsung.com>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: [PATCH] CRC32C: crc32c module soft dependency
+Date: Thu, 23 Jan 2014 11:35:20 -0800
+Message-ID: <1390505720.3138.77.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-samsung-soc@vger.kernel.org"
-	<linux-samsung-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"vzapolskiy@gmail.com" <vzapolskiy@gmail.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"naveenkrishna.ch@gmail.com" <naveenkrishna.ch@gmail.com>,
-	"cpgs@samsung.com" <cpgs@samsung.com>,
-	"tomasz.figa@gmail.com" <tomasz.figa@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	devicetree <devicetree@vger.kernel.org>
-To: Sylwester Nawrocki <s.nawrocki@samsung.com>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <52E155AD.9070802@samsung.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:44206 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753403AbaAWTfl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Jan 2014 14:35:41 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 23, 2014 at 05:47:25PM +0000, Sylwester Nawrocki wrote:
-> On 23/01/14 18:41, Mark Rutland wrote:
-> >>> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-> >>> > > index 93cddeb..2da5617 100644
-> >>> > > --- a/drivers/crypto/s5p-sss.c
-> >>> > > +++ b/drivers/crypto/s5p-sss.c
-> >>> > > @@ -22,6 +22,7 @@
-> >>> > >  #include <linux/scatterlist.h>
-> >>> > >  #include <linux/dma-mapping.h>
-> >>> > >  #include <linux/io.h>
-> >>> > > +#include <linux/of.h>
-> >>> > >  #include <linux/crypto.h>
-> >>> > >  #include <linux/interrupt.h>
-> >>> > >  
-> >>> > > @@ -177,6 +178,12 @@ struct s5p_aes_dev {
-> >>> > >  
-> >>> > >  static struct s5p_aes_dev *s5p_dev;
-> >>> > >  
-> >>> > > +static const struct of_device_id s5p_sss_dt_match[] = {
-> >>> > > +	{ .compatible = "samsung,s5pv210-secss", },
-> >> > 
-> >> > nit: the first semicolon could be omitted.
-> >
-> > I assume you mean comma ratehr than semicolon?
-> 
-> Indeed...and it's actually the second one :-/
+Herbert,
 
-Also, I meant "rather" rather than "ratehr". At least we figured it out
-in the end. :)
+It seems like we haven't folded in changes for adding
+soft dependency to crc32c to ensure that the accelerated
+version is loaded when available.
 
-Thanks,
-Mark.
+I take a crack with the patch below.
+
+Tim
+
+---->o-----
+commit 016a709ef06bce5451a4b88e49f207a838c348e5
+Author: Tim Chen <tim.c.chen@linux.intel.com>
+Date:   Thu Jan 23 03:25:47 2014 -0800
+
+    CRC32C: Add soft module dependency to load other accelerated crc32c
+    modules
+    
+    We add the soft module dependency of crc32c module alias
+    to generic crc32c module so other hardware accelerated crc32c
+    modules could get loaded and used before the generic version.
+
+Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+---
+diff --git a/crypto/crc32c.c b/crypto/crc32c.c
+index 06f7018..d9c7beb 100644
+--- a/crypto/crc32c.c
++++ b/crypto/crc32c.c
+@@ -170,3 +170,5 @@ module_exit(crc32c_mod_fini);
+ MODULE_AUTHOR("Clay Haapala <chaapala@cisco.com>");
+ MODULE_DESCRIPTION("CRC32c (Castagnoli) calculations wrapper for lib/crc32c");
+ MODULE_LICENSE("GPL");
++MODULE_ALIAS("crc32c");
++MODULE_SOFTDEP("pre: crc32c");
