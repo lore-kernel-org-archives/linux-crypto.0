@@ -1,165 +1,117 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 3.14
-Date: Thu, 23 Jan 2014 19:53:19 +0800
-Message-ID: <20140123115319.GA20602@gondor.apana.org.au>
-References: <20110315145940.GA15373@gondor.apana.org.au>
- <20110520235409.GA1722@gondor.apana.org.au>
- <20110724011752.GA14373@gondor.apana.org.au>
- <20111031040952.GA19659@gondor.apana.org.au>
- <20120106041250.GA7759@gondor.apana.org.au>
- <20121004095357.GA11777@gondor.apana.org.au>
- <20121214103156.GA5840@gondor.apana.org.au>
- <20130223023331.GA11002@gondor.apana.org.au>
- <20130907035544.GA22658@gondor.apana.org.au>
- <20131107080131.GA32307@gondor.apana.org.au>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH 2/8 v4] crypto:s5p-sss: Add device tree support
+Date: Thu, 23 Jan 2014 17:41:21 +0000
+Message-ID: <20140123174121.GI15586@e106331-lin.cambridge.arm.com>
+References: <1389243541-13122-1-git-send-email-ch.naveen@samsung.com>
+ <1389777291-15026-1-git-send-email-ch.naveen@samsung.com>
+ <52E0EEB8.4080602@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
+Cc: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-samsung-soc@vger.kernel.org"
+	<linux-samsung-soc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"vzapolskiy@gmail.com" <vzapolskiy@gmail.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"naveenkrishna.ch@gmail.com" <naveenkrishna.ch@gmail.com>,
+	"cpgs@samsung.com" <cpgs@samsung.com>,
+	"tomasz.figa@gmail.com" <tomasz.figa@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	devicetree <devicetree@vger.kernel.org>
+To: Sylwester Nawrocki <s.nawrocki@samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:39107 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750719AbaAWLx2 (ORCPT
+Received: from cam-admin0.cambridge.arm.com ([217.140.96.50]:56608 "EHLO
+	cam-admin0.cambridge.arm.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753035AbaAWRlf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Jan 2014 06:53:28 -0500
+	Thu, 23 Jan 2014 12:41:35 -0500
 Content-Disposition: inline
-In-Reply-To: <20131107080131.GA32307@gondor.apana.org.au>
+In-Reply-To: <52E0EEB8.4080602@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Thu, Jan 23, 2014 at 10:28:08AM +0000, Sylwester Nawrocki wrote:
+> Hi,
+> 
+> (Adding missing devicetre ML list at CC.)
+> 
+> On 15/01/14 10:14, Naveen Krishna Chatradhi wrote:
+> > This patch adds device tree support to the s5p-sss.c crypto driver.
+> > 
+> > Also, Documentation under devicetree/bindings added.
+> > 
+> > Signed-off-by: Naveen Krishna Ch <ch.naveen@samsung.com>
+> > CC: Herbert Xu <herbert@gondor.apana.org.au>
+> > CC: David S. Miller <davem@davemloft.net>
+> > CC: Vladimir Zapolskiy <vzapolskiy@gmail.com>
+> > TO: <linux-crypto@vger.kernel.org>
+> > CC: <linux-samsung-soc@vger.kernel.org>
+> > ---
+> > Changes since v3:
+> > None
+> > 
+> >  .../devicetree/bindings/crypto/samsung-sss.txt     |   20 ++++++++++++++++++++
+> >  drivers/crypto/s5p-sss.c                           |   10 +++++++++-
+> >  2 files changed, 29 insertions(+), 1 deletion(-)
+> >  create mode 100644 Documentation/devicetree/bindings/crypto/samsung-sss.txt
+> > 
+> > diff --git a/Documentation/devicetree/bindings/crypto/samsung-sss.txt b/Documentation/devicetree/bindings/crypto/samsung-sss.txt
+> > new file mode 100644
+> > index 0000000..2f9d7e4
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/crypto/samsung-sss.txt
+> > @@ -0,0 +1,20 @@
+> > +Samsung SoC SSS (Security SubSystem) module
+> > +
+> > +The SSS module in S5PV210 SoC supports the following:
+> > +-- Feeder (FeedCtrl)
+> > +-- Advanced Encryption Standard (AES)
+> > +-- Data Encryption Standard (DES)/3DES
+> > +-- Public Key Accelerator (PKA)
+> > +-- SHA-1/SHA-256/MD5/HMAC (SHA-1/SHA-256/MD5)/PRNG
+> > +-- PRNG: Pseudo Random Number Generator
+> > +
+> > +Required properties:
+> > +
+> > +- compatible : Should contain entries for this and backward compatible
+> > +  SSS versions:
+> > +  - "samsung,s5pv210-secss" for S5PV210 SoC.
+> > +- reg : Offset and length of the register set for the module
+> > +- interrupts : the interrupt-specifier for the SSS module.
+> > +		Two interrupts "feed control and hash" in case of S5PV210
+> 
+> It should be described in what order both interrupts are supposed to be
+> specified.
+> 
+> > +- clocks : the required gating clock for the SSS module.
+> > +- clock-names : the gating clock name to be requested in the SSS driver.
 
-Here is the crypto update for 3.14:
+The _exact_ names expected must be described in the binding, or this
+property is useless.
 
-* Improved crypto_memneq helper.
-* Use cyprto_memneq in arch-specific crypto code.
-* Replaced orphaned DCP driver with Freescale MXS DCP driver.
-* Added AVX/AVX2 version of AESNI-GCM encode and decode.
-* Added AMD Cryptographic Coprocessor (CCP) driver.
-* Misc fixes.
+> > diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+> > index 93cddeb..2da5617 100644
+> > --- a/drivers/crypto/s5p-sss.c
+> > +++ b/drivers/crypto/s5p-sss.c
+> > @@ -22,6 +22,7 @@
+> >  #include <linux/scatterlist.h>
+> >  #include <linux/dma-mapping.h>
+> >  #include <linux/io.h>
+> > +#include <linux/of.h>
+> >  #include <linux/crypto.h>
+> >  #include <linux/interrupt.h>
+> >  
+> > @@ -177,6 +178,12 @@ struct s5p_aes_dev {
+> >  
+> >  static struct s5p_aes_dev *s5p_dev;
+> >  
+> > +static const struct of_device_id s5p_sss_dt_match[] = {
+> > +	{ .compatible = "samsung,s5pv210-secss", },
+> 
+> nit: the first semicolon could be omitted.
 
+I assume you mean comma ratehr than semicolon?
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-
-Andy Shevchenko (1):
-      crypto: aesni - fix build on x86 (32bit)
-
-Cesar Eduardo Barros (1):
-      crypto: more robust crypto_memneq
-
-Daniel Borkmann (2):
-      crypto: memneq - fix for archs without efficient unaligned access
-      crypto: arch - use crypto_memneq instead of memcmp
-
-Fengguang Wu (1):
-      crytpo: ccp - fix coccinelle warnings
-
-Horia Geanta (2):
-      crypto: talitos - fix locating offending descriptor in error path
-      crypto: caam - simplify and harden key parsing
-
-Lokesh Vutla (1):
-      crypto: omap-sham - Fix Polling mode for larger blocks
-
-Marek Vasut (5):
-      crypto: ahash - Fully restore ahash request before completing
-      crypto: mxs - Remove the old DCP driver
-      crypto: mxs - Add Freescale MXS DCP driver
-      ARM: mxs: dts: Enable DCP for MXS
-      crypto: drivers - Sort drivers/crypto/Makefile
-
-Mark A. Greer (1):
-      crypto: omap-sham - Only release DMA channel if successfully requested
-
-Mathias Krause (2):
-      crypto: pcrypt - Fix wrong usage of rcu_dereference()
-      padata: Fix wrong usage of rcu_dereference()
-
-Nishanth Menon (1):
-      crypto: omap-aes - add error check for pm_runtime_get_sync
-
-Sachin Kamat (3):
-      crypto: crypto4xx - Remove redundant dev_set_drvdata
-      crypto: ccp - Remove redundant dev_set_drvdata
-      crypto: talitos - Remove redundant dev_set_drvdata
-
-Tim Chen (3):
-      crypto: aesni - AVX and AVX2 version of AESNI-GCM encode and decode
-      crypto: tcrypt - Added speed tests for AEAD crypto alogrithms in tcrypt test suite
-      crypto: aesni - fix build on x86 (32bit)
-
-Tom Lendacky (17):
-      crypto: ccp - CCP device driver and interface support
-      crypto: ccp - crypto API interface to the CCP device driver
-      crypto: ccp - CCP AES crypto API support
-      crypto: ccp - CCP AES CMAC mode crypto API support
-      crypto: ccp - CCP XTS-AES crypto API support
-      crypto: ccp - CCP SHA crypto API support
-      crytpo: ccp - CCP device driver build files
-      crypto: ccp - CCP maintainer information
-      crypto: ccp - Fix sparse warnings in ccp-crypto-sha.c
-      crypto: ccp - CCP Kconfig fixes
-      crypto: ccp - Remove user triggerable pr_err calls
-      crypto: ccp - Apply appropriate gfp_t type to memory allocations
-      crypto: ccp - Cleanup scatterlist usage
-      crypto: ccp - Check for caller result area before using it
-      crypto: ccp - Change data length declarations to u64
-      crypto: ccp - Cleanup hash invocation calls
-      crypto: ccp - CCP device enabled/disabled changes
-
-Wei Yongjun (1):
-      crypto: mxs - Fix sparse non static symbol warning
-
- .../devicetree/bindings/crypto/fsl-dcp.txt         |   17 +
- MAINTAINERS                                        |    7 +
- arch/arm/boot/dts/imx23.dtsi                       |    4 +-
- arch/arm/boot/dts/imx28.dtsi                       |    3 +-
- arch/s390/crypto/des_s390.c                        |    6 +-
- arch/x86/crypto/Makefile                           |    1 +
- arch/x86/crypto/aesni-intel_avx-x86_64.S           | 2811 ++++++++++++++++++++
- arch/x86/crypto/aesni-intel_glue.c                 |  147 +-
- crypto/Makefile                                    |    5 -
- crypto/ahash.c                                     |    5 +-
- crypto/memneq.c                                    |   80 +-
- crypto/pcrypt.c                                    |    2 +-
- crypto/tcrypt.c                                    |  270 ++
- crypto/tcrypt.h                                    |   10 +
- drivers/crypto/Kconfig                             |   39 +-
- drivers/crypto/Makefile                            |   33 +-
- drivers/crypto/amcc/crypto4xx_core.c               |    1 -
- drivers/crypto/caam/caamalg.c                      |   36 +-
- drivers/crypto/ccp/Kconfig                         |   24 +
- drivers/crypto/ccp/Makefile                        |   10 +
- drivers/crypto/ccp/ccp-crypto-aes-cmac.c           |  365 +++
- drivers/crypto/ccp/ccp-crypto-aes-xts.c            |  279 ++
- drivers/crypto/ccp/ccp-crypto-aes.c                |  369 +++
- drivers/crypto/ccp/ccp-crypto-main.c               |  432 +++
- drivers/crypto/ccp/ccp-crypto-sha.c                |  517 ++++
- drivers/crypto/ccp/ccp-crypto.h                    |  197 ++
- drivers/crypto/ccp/ccp-dev.c                       |  595 +++++
- drivers/crypto/ccp/ccp-dev.h                       |  272 ++
- drivers/crypto/ccp/ccp-ops.c                       | 2024 ++++++++++++++
- drivers/crypto/ccp/ccp-pci.c                       |  361 +++
- drivers/crypto/dcp.c                               |  903 -------
- drivers/crypto/mxs-dcp.c                           | 1100 ++++++++
- drivers/crypto/omap-aes.c                          |   16 +-
- drivers/crypto/omap-sham.c                         |   19 +-
- drivers/crypto/talitos.c                           |   23 +-
- include/linux/ccp.h                                |  537 ++++
- include/linux/compiler-gcc.h                       |    3 +
- include/linux/compiler-intel.h                     |    7 +
- include/linux/compiler.h                           |    4 +
- kernel/padata.c                                    |    2 +-
- 40 files changed, 10527 insertions(+), 1009 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Cheers,
+Mark.
