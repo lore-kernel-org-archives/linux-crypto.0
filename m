@@ -1,57 +1,64 @@
 From: Tomasz Figa <t.figa@samsung.com>
-Subject: Re: [PATCH 3/8 v4] crypto:s5p-sss: Add support for SSS module on Exynos
-Date: Fri, 24 Jan 2014 15:09:58 +0100
-Message-ID: <52E27436.5040908@samsung.com>
-References: <1389243569-13161-1-git-send-email-ch.naveen@samsung.com>
- <1389777316-15070-1-git-send-email-ch.naveen@samsung.com>
+Subject: Re: [PATCH 5/8 v4] clk: samsung: exynos5250/5420: Add gate clock for
+ SSS module
+Date: Fri, 24 Jan 2014 16:26:38 +0100
+Message-ID: <52E2862E.9020402@samsung.com>
+References: <1389354229-31936-1-git-send-email-ch.naveen@samsung.com>
+ <1389777366-15147-1-git-send-email-ch.naveen@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
 	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
 	cpgs@samsung.com, tomasz.figa@gmail.com,
-	"David S. Miller" <davem@davemloft.net>
+	Kukjin Kim <kgene.kim@samsung.com>
 To: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
 	linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
 Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-reply-to: <1389777316-15070-1-git-send-email-ch.naveen@samsung.com>
+In-reply-to: <1389777366-15147-1-git-send-email-ch.naveen@samsung.com>
 Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 Hi Naveen,
 
-On 15.01.2014 10:15, Naveen Krishna Chatradhi wrote:
-> This patch adds new compatible and variant struct to support the SSS
-> module on Exynos4 (Exynos4210), Exynos5 (Exynos5420 and Exynos5250)
-> for which
-> 1. AES register are at an offset of 0x200 and
-> 2. hash interrupt is not available
-[snip]
->   Required properties:
+Exynos5250 specific part looks good, but I have a little doubt in case 
+of Exynos5420.
+
+On 15.01.2014 10:16, Naveen Krishna Chatradhi wrote:
+> This patch adds gating clock for SSS(Security SubSystem)
+> module on Exynos5250/5420.
 >
->   - compatible : Should contain entries for this and backward compatible
->     SSS versions:
->     - "samsung,s5pv210-secss" for S5PV210 SoC.
-> +  - "samsung,exynos4210-secss" for Exynos4210, Exynos4212, Exynos4412, Exynos5250,
-> +		Exynos5260 and Exynos5420 SoCs.
->   - reg : Offset and length of the register set for the module
->   - interrupts : the interrupt-specifier for the SSS module.
-> -		Two interrupts "feed control and hash" in case of S5PV210
-> -- clocks : the required gating clock for the SSS module.
-> -- clock-names : the gating clock name to be requested in the SSS driver.
-> +		-- Two interrupts "feed control and hash" in case of
-> +		   "samsung,s5pv210-secss"
-> +		-- One interrupts "feed control" in case of
-> +		   "samsung,exynos4210-secss".
-> +- clocks : list of clock phandle and specifier pairs for all clocks  listed in
-> +		clock-names property.
-> +- clock-names : list of device clock input names; should contain one entry
-> +		"secss".
+> Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+> TO: <linux-samsung-soc@vger.kernel.org>
+> TO: Tomasz Figa <t.figa@samsung.com>
+> CC: Kukjin Kim <kgene.kim@samsung.com>
+> CC: <linux-crypto@vger.kernel.org>
+> ---
+> Changes since v3:
+> 1. Rebased on to https://git.kernel.org/pub/scm/linux/kernel/git/tfiga/samsung-clk.git
+> 2. Added new ID for SSS clock on Exynos5250, with Documentation and
+> 3. Added gate clocks definitions for SSS on Exynos5420 and Exynos5250
+[snip]
+> --- a/drivers/clk/samsung/clk-exynos5420.c
+> +++ b/drivers/clk/samsung/clk-exynos5420.c
+> @@ -26,6 +26,7 @@
+>   #define DIV_CPU1		0x504
+>   #define GATE_BUS_CPU		0x700
+>   #define GATE_SCLK_CPU		0x800
+> +#define GATE_BUS_G2D		0x8700
+>   #define CPLL_LOCK		0x10020
+>   #define DPLL_LOCK		0x10030
+>   #define EPLL_LOCK		0x10040
+> @@ -702,6 +703,9 @@ static struct samsung_gate_clock exynos5420_gate_clks[] __initdata = {
+>   		0),
+>   	GATE(CLK_SMMU_MIXER, "smmu_mixer", "aclk200_disp1", GATE_IP_DISP1, 9, 0,
+>   		0),
+> +
+> +	/* SSS */
+> +	GATE(CLK_SSS, "sss", "aclk266_g2d", GATE_BUS_G2D, 2, 0, 0),
 
-Hmm, I guess this is a rebase error, because this should rather be 
-squashed with patch 2/8.
-
-Otherwise the patch looks good to me.
+Isn't there a combined gate for all SSS clocks in one of GATE_IP_* 
+registers?
 
 Best regards,
 Tomasz
