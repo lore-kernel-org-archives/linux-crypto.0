@@ -1,57 +1,47 @@
 From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: Fix ccp_run_passthru_cmd dma variable assignments
-Date: Fri, 24 Jan 2014 14:17:12 -0600
-Message-ID: <52E2CA48.4070500@amd.com>
-References: <20140124183934.GA3423@redhat.com>
+Subject: [PATCH 0/4] crypto: ccp - selective algorithm registration and
+ ipsec-related fixes
+Date: Fri, 24 Jan 2014 16:17:50 -0600
+Message-ID: <20140124221750.1894.48517.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-To: Dave Jones <davej@redhat.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co9ehsobe005.messaging.microsoft.com ([207.46.163.28]:27709
-	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751157AbaAXURU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Jan 2014 15:17:20 -0500
-In-Reply-To: <20140124183934.GA3423@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: <linux-kernel@vger.kernel.org>
+To: <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 01/24/2014 12:39 PM, Dave Jones wrote:
-> There are some suspicious looking lines of code in the new ccp driver, including
-> one that assigns a variable to itself, and another that overwrites a previous assignment.
-> 
-> This may have been a cut-and-paste error where 'src' was forgotten to be changed to 'dst'.
-> I have no hardware to test this, so this is untested.
+Patch 1: Allow for selectively disabling the registration of an algorithm
+family (sha or aes algorithms) via module parameters.
 
-Yes, this was a cut-and-paste error that was not discovered with my tests. I've
-updated my testcases and tested/verified this fix.
+Patch 2-4: Fix errors/issues that were found during IPSec testing. In
+order to prevent deadlocks with the networking code, the crypto callback
+was changed to run as a tasklet.  In order for the callback to be run as
+a tasklet, the HMAC calculation needed to be moved out of the callback
+path (since it sleeps) and into the CCP sha operation logic.  Additionally,
+trying to allow concurrency within the tfm while maintaining serialization
+of the tfm per CPU was not working properly so a single queue is used now.
 
-Herbert, this should probably go through the cryptodev-2.6 tree right?
+This patch series is based on the cryptodev-2.6 kernel tree.
 
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
 
-Thanks,
-Tom
+Tom Lendacky (4):
+      crypto: ccp - Allow for selective disablement of crypto API algorithms
+      crypto: ccp - Move HMAC calculation down to ccp ops file
+      crypto: ccp - Use a single queue for proper ordering of tfm requests
+      crypto: ccp - Perform completion callbacks using a tasklet
 
-> 
-> Signed-off-by: Dave Jones <davej@fedoraproject.org>
-> 
-> diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-> index 71ed3ade7e12..c266a7b154bb 100644
-> --- a/drivers/crypto/ccp/ccp-ops.c
-> +++ b/drivers/crypto/ccp/ccp-ops.c
-> @@ -1666,8 +1666,8 @@ static int ccp_run_passthru_cmd(struct ccp_cmd_queue *cmd_q,
->   
->   		op.dst.type = CCP_MEMTYPE_SYSTEM;
->   		op.dst.u.dma.address = sg_dma_address(dst.sg_wa.sg);
-> -		op.src.u.dma.offset = dst.sg_wa.sg_used;
-> -		op.src.u.dma.length = op.src.u.dma.length;
-> +		op.dst.u.dma.offset = dst.sg_wa.sg_used;
-> +		op.dst.u.dma.length = op.src.u.dma.length;
->   
->   		ret = ccp_perform_passthru(&op);
->   		if (ret) {
-> 
+
+ drivers/crypto/ccp/ccp-crypto-main.c |  201 ++++++++++++----------------------
+ drivers/crypto/ccp/ccp-crypto-sha.c  |  130 ++++------------------
+ drivers/crypto/ccp/ccp-crypto.h      |    8 +
+ drivers/crypto/ccp/ccp-dev.c         |   21 +++-
+ drivers/crypto/ccp/ccp-ops.c         |  104 +++++++++++++++++-
+ include/linux/ccp.h                  |    7 +
+ 6 files changed, 229 insertions(+), 242 deletions(-)
+
+-- 
+Tom Lendacky
