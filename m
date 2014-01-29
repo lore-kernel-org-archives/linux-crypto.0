@@ -1,34 +1,72 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH 2/2] crypto: mxs-dcp: Check the return value of stmp_reset_block()
-Date: Wed, 29 Jan 2014 01:58:36 +0100
-Message-ID: <201401290158.36968.marex@denx.de>
-References: <1390955772-6936-1-git-send-email-festevam@gmail.com> <1390955772-6936-2-git-send-email-festevam@gmail.com>
+From: Naveen Krishna Ch <naveenkrishna.ch@gmail.com>
+Subject: Re: [PATCH 8/8 v4] crypto:s5p-sss: Use clk_prepare/clk_unprepare
+Date: Wed, 29 Jan 2014 13:07:47 +0530
+Message-ID: <CAHfPSqDsg9O42RignJwj7KqmU3yrecbjai2oy+m6VhRpQVQgaA@mail.gmail.com>
+References: <1389354331-32142-1-git-send-email-ch.naveen@samsung.com>
+ <1389777472-15294-1-git-send-email-ch.naveen@samsung.com> <CAHfPSqCHGbVX3iMC-LNnFYkdutRYFuk07RCeYLU4KAaTpgyQ0w@mail.gmail.com>
+ <52E0F1D7.4030401@samsung.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	Fabio Estevam <fabio.estevam@freescale.com>
-To: Fabio Estevam <festevam@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
+	linux-crypto@vger.kernel.org,
+	"linux-samsung-soc@vger.kernel.org"
+	<linux-samsung-soc@vger.kernel.org>, linux-kernel@vger.kernel.org,
+	Vladimir Zapolskiy <vzapolskiy@gmail.com>,
+	herbert@gondor.apana.org.au, cpgs@samsung.com,
+	tomasz.figa@gmail.com
+To: Sylwester Nawrocki <s.nawrocki@samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:49535 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754026AbaA2A6n (ORCPT
+Received: from mail-pd0-f177.google.com ([209.85.192.177]:50359 "EHLO
+	mail-pd0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751821AbaA2HiH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Jan 2014 19:58:43 -0500
-In-Reply-To: <1390955772-6936-2-git-send-email-festevam@gmail.com>
+	Wed, 29 Jan 2014 02:38:07 -0500
+In-Reply-To: <52E0F1D7.4030401@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday, January 29, 2014 at 01:36:12 AM, Fabio Estevam wrote:
-> From: Fabio Estevam <fabio.estevam@freescale.com>
-> 
-> stmp_reset_block() may fail, so check its return value and propagate it in
-> the case of error.
-> 
-> Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
+Hello Sylwester,
 
-Acked-by: Marek Vasut <marex@denx.de>
+On 23 January 2014 16:11, Sylwester Nawrocki <s.nawrocki@samsung.com> wrote:
+> Hi,
+>
+> On 23/01/14 11:18, Naveen Krishna Ch wrote:
+>> Hello All,
+>>
+>> On 15 January 2014 14:47, Naveen Krishna Chatradhi
+>> <ch.naveen@samsung.com> wrote:
+>>> This patch set adds use of clk_prepare/clk_unprepare as
+>>> required by generic clock framework.
+>>>
+>>> Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+>>> Reviewed-by: Tomasz Figa <t.figa@samsung.com>
+>>> ---
+>>> Changes since v3:
+>>> None
+>>>
+>>>  drivers/crypto/s5p-sss.c |    6 +++---
+>>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+>>> index f7c66c7..870e794 100644
+>>> --- a/drivers/crypto/s5p-sss.c
+>>> +++ b/drivers/crypto/s5p-sss.c
+>>> @@ -648,7 +648,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
+>>>                 return -ENOENT;
+>>>         }
+>>>
+>>> -       clk_enable(pdata->clk);
+>>> +       clk_prepare_enable(pdata->clk);
+>
+> How about properly checking the return value ?
+Sure, Thanks.
+>
+> --
+> Thanks,
+> Sylwester
 
-Best regards,
-Marek Vasut
+
+
+-- 
+Shine bright,
+(: Nav :)
