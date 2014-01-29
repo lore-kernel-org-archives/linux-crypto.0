@@ -1,72 +1,97 @@
 From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 6/9 v5] ARM: dts: exynos5250/5420: add dt node for sss module
-Date: Wed, 29 Jan 2014 14:54:47 +0530
-Message-ID: <1390987487-18830-1-git-send-email-ch.naveen@samsung.com>
-References: <1389777397-15193-1-git-send-email-ch.naveen@samsung.com>
+Subject: [PATCH 5/9 v5] clk: samsung exynos5250/5420: Add gate clock for SSS
+ module
+Date: Wed, 29 Jan 2014 14:54:06 +0530
+Message-ID: <1390987446-18784-1-git-send-email-ch.naveen@samsung.com>
+References: <1389354229-31936-1-git-send-email-ch.naveen@samsung.com>
 Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
 	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
 	cpgs@samsung.com, devicetree@vger.kernel.org,
 	Kukjin Kim <kgene.kim@samsung.com>
 To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <1389777397-15193-1-git-send-email-ch.naveen@samsung.com>
+In-reply-to: <1389354229-31936-1-git-send-email-ch.naveen@samsung.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds the device tree node for SSS module
-found on Exynos5420 and Exynos5250
+This patch adds gating clock for SSS(Security SubSystem)
+module on Exynos5250/5420.
 
 Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Reviewed-by: Tomasz Figa <t.figa@samsung.com>
 TO: <linux-samsung-soc@vger.kernel.org>
+TO: Tomasz Figa <t.figa@samsung.com>
 CC: Kukjin Kim <kgene.kim@samsung.com>
 CC: <linux-crypto@vger.kernel.org>
 ---
 Changes since v4:
-None
+Use register GATE_IP_G2D instead of GATE_BUS_G2D for Exynos5420
 Changes since v3:
-1. Modified the SSS clock ID as per dt-bindings for Exynos5250 in
-   samsung-clk.git tree.
+1. Rebased on to https://git.kernel.org/pub/scm/linux/kernel/git/tfiga/samsung-clk.git
+2. Added new ID for SSS clock on Exynos5250, with Documentation and 
+3. Added gate clocks definitions for SSS on Exynos5420 and Exynos5250
+ .../devicetree/bindings/clock/exynos5250-clock.txt |    1 +
+ drivers/clk/samsung/clk-exynos5250.c               |    1 +
+ drivers/clk/samsung/clk-exynos5420.c               |    4 ++++
+ include/dt-bindings/clock/exynos5250.h             |    1 +
+ 4 files changed, 7 insertions(+)
 
- arch/arm/boot/dts/exynos5250.dtsi |    8 ++++++++
- arch/arm/boot/dts/exynos5420.dtsi |   10 ++++++++++
- 2 files changed, 18 insertions(+)
-
-diff --git a/arch/arm/boot/dts/exynos5250.dtsi b/arch/arm/boot/dts/exynos5250.dtsi
-index c341e55..1d249df 100644
---- a/arch/arm/boot/dts/exynos5250.dtsi
-+++ b/arch/arm/boot/dts/exynos5250.dtsi
-@@ -704,4 +704,12 @@
- 		io-channel-ranges;
- 		status = "disabled";
- 	};
+diff --git a/Documentation/devicetree/bindings/clock/exynos5250-clock.txt b/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
+index 492ed09..a845fc6 100644
+--- a/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
++++ b/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
+@@ -162,6 +162,7 @@ clock which they consume.
+   g2d			345
+   mdma0			346
+   smmu_mdma0		347
++  sss			348
+ 
+ 
+    [Clock Muxes]
+diff --git a/drivers/clk/samsung/clk-exynos5250.c b/drivers/clk/samsung/clk-exynos5250.c
+index ff4beeb..2c52fe1 100644
+--- a/drivers/clk/samsung/clk-exynos5250.c
++++ b/drivers/clk/samsung/clk-exynos5250.c
+@@ -387,6 +387,7 @@ static struct samsung_gate_clock exynos5250_gate_clks[] __initdata = {
+ 	 * CMU_ACP
+ 	 */
+ 	GATE(CLK_MDMA0, "mdma0", "div_aclk266", GATE_IP_ACP, 1, 0, 0),
++	GATE(CLK_SSS, "sss", "div_aclk266", GATE_IP_ACP, 2, 0, 0),
+ 	GATE(CLK_G2D, "g2d", "div_aclk200", GATE_IP_ACP, 3, 0, 0),
+ 	GATE(CLK_SMMU_MDMA0, "smmu_mdma0", "div_aclk266", GATE_IP_ACP, 5, 0, 0),
+ 
+diff --git a/drivers/clk/samsung/clk-exynos5420.c b/drivers/clk/samsung/clk-exynos5420.c
+index ab4f2f7..c93d4d5 100644
+--- a/drivers/clk/samsung/clk-exynos5420.c
++++ b/drivers/clk/samsung/clk-exynos5420.c
+@@ -26,6 +26,7 @@
+ #define DIV_CPU1		0x504
+ #define GATE_BUS_CPU		0x700
+ #define GATE_SCLK_CPU		0x800
++#define GATE_IP_G2D		0x8800
+ #define CPLL_LOCK		0x10020
+ #define DPLL_LOCK		0x10030
+ #define EPLL_LOCK		0x10040
+@@ -702,6 +703,9 @@ static struct samsung_gate_clock exynos5420_gate_clks[] __initdata = {
+ 		0),
+ 	GATE(CLK_SMMU_MIXER, "smmu_mixer", "aclk200_disp1", GATE_IP_DISP1, 9, 0,
+ 		0),
 +
-+	sss@10830000 {
-+		compatible = "samsung,exynos4210-secss";
-+		reg = <0x10830000 0x10000>;
-+		interrupts = <0 112 0>;
-+		clocks = <&clock 348>;
-+		clock-names = "secss";
-+	};
++	/* SSS */
++	GATE(CLK_SSS, "sss", "aclk266_g2d", GATE_IP_G2D, 2, 0, 0),
  };
-diff --git a/arch/arm/boot/dts/exynos5420.dtsi b/arch/arm/boot/dts/exynos5420.dtsi
-index 11dd202..56a3f3e 100644
---- a/arch/arm/boot/dts/exynos5420.dtsi
-+++ b/arch/arm/boot/dts/exynos5420.dtsi
-@@ -652,4 +652,14 @@
- 		clocks = <&clock 319>, <&clock 318>;
- 		clock-names = "tmu_apbif", "tmu_triminfo_apbif";
- 	};
-+
-+	sss@10830000 {
-+		compatible = "samsung,exynos4210-secss";
-+		reg = <0x10830000 0x10000>;
-+		interrupts = <0 112 0>;
-+		clocks = <&clock 471>;
-+		clock-names = "secss";
-+		samsung,power-domain = <&g2d_pd>;
-+	};
-+
- };
+ 
+ static struct samsung_pll_clock exynos5420_plls[nr_plls] __initdata = {
+diff --git a/include/dt-bindings/clock/exynos5250.h b/include/dt-bindings/clock/exynos5250.h
+index 922f2dc..f9b452b 100644
+--- a/include/dt-bindings/clock/exynos5250.h
++++ b/include/dt-bindings/clock/exynos5250.h
+@@ -150,6 +150,7 @@
+ #define CLK_G2D			345
+ #define CLK_MDMA0		346
+ #define CLK_SMMU_MDMA0		347
++#define CLK_SSS			348
+ 
+ /* mux clocks */
+ #define CLK_MOUT_HDMI		1024
 -- 
 1.7.9.5
