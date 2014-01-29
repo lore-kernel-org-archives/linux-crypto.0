@@ -1,72 +1,90 @@
-From: Naveen Krishna Ch <naveenkrishna.ch@gmail.com>
-Subject: Re: [PATCH 8/8 v4] crypto:s5p-sss: Use clk_prepare/clk_unprepare
-Date: Wed, 29 Jan 2014 13:07:47 +0530
-Message-ID: <CAHfPSqDsg9O42RignJwj7KqmU3yrecbjai2oy+m6VhRpQVQgaA@mail.gmail.com>
-References: <1389354331-32142-1-git-send-email-ch.naveen@samsung.com>
- <1389777472-15294-1-git-send-email-ch.naveen@samsung.com> <CAHfPSqCHGbVX3iMC-LNnFYkdutRYFuk07RCeYLU4KAaTpgyQ0w@mail.gmail.com>
- <52E0F1D7.4030401@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
-	linux-crypto@vger.kernel.org,
-	"linux-samsung-soc@vger.kernel.org"
-	<linux-samsung-soc@vger.kernel.org>, linux-kernel@vger.kernel.org,
-	Vladimir Zapolskiy <vzapolskiy@gmail.com>,
-	herbert@gondor.apana.org.au, cpgs@samsung.com,
-	tomasz.figa@gmail.com
-To: Sylwester Nawrocki <s.nawrocki@samsung.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f177.google.com ([209.85.192.177]:50359 "EHLO
-	mail-pd0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751821AbaA2HiH (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jan 2014 02:38:07 -0500
-In-Reply-To: <52E0F1D7.4030401@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+Subject: [PATCH 1/9 v5] crypto:s5p-sss: Use platform_get_irq() instead of
+ _byname()
+Date: Wed, 29 Jan 2014 14:49:24 +0530
+Message-ID: <1390987164-18459-1-git-send-email-ch.naveen@samsung.com>
+References: <1389095509-14357-2-git-send-email-ch.naveen@samsung.com>
+Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
+	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
+	cpgs@samsung.com, Naveen Krishna Ch <ch.naveen@samsung.com>,
+	"David S. Miller" <davem@davemloft.net>
+To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-reply-to: <1389095509-14357-2-git-send-email-ch.naveen@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello Sylwester,
+From: Naveen Krishna Ch <ch.naveen@samsung.com>
 
-On 23 January 2014 16:11, Sylwester Nawrocki <s.nawrocki@samsung.com> wrote:
-> Hi,
->
-> On 23/01/14 11:18, Naveen Krishna Ch wrote:
->> Hello All,
->>
->> On 15 January 2014 14:47, Naveen Krishna Chatradhi
->> <ch.naveen@samsung.com> wrote:
->>> This patch set adds use of clk_prepare/clk_unprepare as
->>> required by generic clock framework.
->>>
->>> Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
->>> Reviewed-by: Tomasz Figa <t.figa@samsung.com>
->>> ---
->>> Changes since v3:
->>> None
->>>
->>>  drivers/crypto/s5p-sss.c |    6 +++---
->>>  1 file changed, 3 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
->>> index f7c66c7..870e794 100644
->>> --- a/drivers/crypto/s5p-sss.c
->>> +++ b/drivers/crypto/s5p-sss.c
->>> @@ -648,7 +648,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
->>>                 return -ENOENT;
->>>         }
->>>
->>> -       clk_enable(pdata->clk);
->>> +       clk_prepare_enable(pdata->clk);
->
-> How about properly checking the return value ?
-Sure, Thanks.
->
-> --
-> Thanks,
-> Sylwester
+This patch uses the platform_get_irq() instead of the
+platform_get_irq_byname(). Making feeder control interrupt
+as resource "0" and hash interrupt as "1".
 
+reasons for this change.
+1. Cannot find any Arch which is currently using this driver
+2. Samsung Exynos4 and 5 SoCs only use the feeder control interrupt
+3. Patches adding support for DT and H/W version are in pipeline
 
+Signed-off-by: Naveen Krishna Ch <ch.naveen@samsung.com>
+Reviewed-by: Tomasz Figa <t.figa@samsung.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>
+CC: David S. Miller <davem@davemloft.net>
+CC: Vladimir Zapolskiy <vzapolskiy@gmail.com>
+TO: <linux-crypto@vger.kernel.org>
+CC: <linux-samsung-soc@vger.kernel.org>
+---
+Changes since v4:
+None
+Changes since v3:
+None
+ drivers/crypto/s5p-sss.c |   24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index cf149b1..93cddeb 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -592,29 +592,29 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 	pdata->ioaddr = devm_ioremap(dev, res->start,
+ 				     resource_size(res));
+ 
+-	pdata->irq_hash = platform_get_irq_byname(pdev, "hash");
+-	if (pdata->irq_hash < 0) {
+-		err = pdata->irq_hash;
+-		dev_warn(dev, "hash interrupt is not available.\n");
++	pdata->irq_fc = platform_get_irq(pdev, 0);
++	if (pdata->irq_fc < 0) {
++		err = pdata->irq_fc;
++		dev_warn(dev, "feed control interrupt is not available.\n");
+ 		goto err_irq;
+ 	}
+-	err = devm_request_irq(dev, pdata->irq_hash, s5p_aes_interrupt,
++	err = devm_request_irq(dev, pdata->irq_fc, s5p_aes_interrupt,
+ 			       IRQF_SHARED, pdev->name, pdev);
+ 	if (err < 0) {
+-		dev_warn(dev, "hash interrupt is not available.\n");
++		dev_warn(dev, "feed control interrupt is not available.\n");
+ 		goto err_irq;
+ 	}
+ 
+-	pdata->irq_fc = platform_get_irq_byname(pdev, "feed control");
+-	if (pdata->irq_fc < 0) {
+-		err = pdata->irq_fc;
+-		dev_warn(dev, "feed control interrupt is not available.\n");
++	pdata->irq_hash = platform_get_irq(pdev, 1);
++	if (pdata->irq_hash < 0) {
++		err = pdata->irq_hash;
++		dev_warn(dev, "hash interrupt is not available.\n");
+ 		goto err_irq;
+ 	}
+-	err = devm_request_irq(dev, pdata->irq_fc, s5p_aes_interrupt,
++	err = devm_request_irq(dev, pdata->irq_hash, s5p_aes_interrupt,
+ 			       IRQF_SHARED, pdev->name, pdev);
+ 	if (err < 0) {
+-		dev_warn(dev, "feed control interrupt is not available.\n");
++		dev_warn(dev, "hash interrupt is not available.\n");
+ 		goto err_irq;
+ 	}
+ 
 -- 
-Shine bright,
-(: Nav :)
+1.7.9.5
