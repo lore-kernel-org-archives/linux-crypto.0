@@ -1,66 +1,72 @@
 From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 8/9 v5] crypto:s5p-sss: Use clk_prepare/clk_unprepare
-Date: Wed, 29 Jan 2014 14:56:01 +0530
-Message-ID: <1390987561-18914-1-git-send-email-ch.naveen@samsung.com>
-References: <1389354331-32142-1-git-send-email-ch.naveen@samsung.com>
+Subject: [PATCH 6/9 v5] ARM: dts: exynos5250/5420: add dt node for sss module
+Date: Wed, 29 Jan 2014 14:54:47 +0530
+Message-ID: <1390987487-18830-1-git-send-email-ch.naveen@samsung.com>
+References: <1389777397-15193-1-git-send-email-ch.naveen@samsung.com>
 Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
 	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
-	cpgs@samsung.com, devicetree@vger.kernel.org
+	cpgs@samsung.com, devicetree@vger.kernel.org,
+	Kukjin Kim <kgene.kim@samsung.com>
 To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <1389354331-32142-1-git-send-email-ch.naveen@samsung.com>
+In-reply-to: <1389777397-15193-1-git-send-email-ch.naveen@samsung.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch set adds use of clk_prepare/clk_unprepare as
-required by generic clock framework.
+This patch adds the device tree node for SSS module
+found on Exynos5420 and Exynos5250
 
 Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
 Reviewed-by: Tomasz Figa <t.figa@samsung.com>
+TO: <linux-samsung-soc@vger.kernel.org>
+CC: Kukjin Kim <kgene.kim@samsung.com>
+CC: <linux-crypto@vger.kernel.org>
 ---
 Changes since v4:
-Handle return value of clk_prepare_enable
-
-Changes since v3:
 None
+Changes since v3:
+1. Modified the SSS clock ID as per dt-bindings for Exynos5250 in
+   samsung-clk.git tree.
 
- drivers/crypto/s5p-sss.c |   10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ arch/arm/boot/dts/exynos5250.dtsi |    8 ++++++++
+ arch/arm/boot/dts/exynos5420.dtsi |   10 ++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index a890273..5bd3bd9 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -648,7 +648,11 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 		return -ENOENT;
- 	}
- 
--	clk_enable(pdata->clk);
-+	err = clk_prepare_enable(pdata->clk);
-+	if (err < 0) {
-+		dev_err(dev, "Enabling SSS clk failed, err %d\n", err);
-+		return err;
-+	}
- 
- 	spin_lock_init(&pdata->lock);
- 	pdata->ioaddr = devm_ioremap(dev, res->start,
-@@ -711,7 +715,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 	tasklet_kill(&pdata->tasklet);
- 
-  err_irq:
--	clk_disable(pdata->clk);
-+	clk_disable_unprepare(pdata->clk);
- 
- 	s5p_dev = NULL;
- 
-@@ -731,7 +735,7 @@ static int s5p_aes_remove(struct platform_device *pdev)
- 
- 	tasklet_kill(&pdata->tasklet);
- 
--	clk_disable(pdata->clk);
-+	clk_disable_unprepare(pdata->clk);
- 
- 	s5p_dev = NULL;
- 
+diff --git a/arch/arm/boot/dts/exynos5250.dtsi b/arch/arm/boot/dts/exynos5250.dtsi
+index c341e55..1d249df 100644
+--- a/arch/arm/boot/dts/exynos5250.dtsi
++++ b/arch/arm/boot/dts/exynos5250.dtsi
+@@ -704,4 +704,12 @@
+ 		io-channel-ranges;
+ 		status = "disabled";
+ 	};
++
++	sss@10830000 {
++		compatible = "samsung,exynos4210-secss";
++		reg = <0x10830000 0x10000>;
++		interrupts = <0 112 0>;
++		clocks = <&clock 348>;
++		clock-names = "secss";
++	};
+ };
+diff --git a/arch/arm/boot/dts/exynos5420.dtsi b/arch/arm/boot/dts/exynos5420.dtsi
+index 11dd202..56a3f3e 100644
+--- a/arch/arm/boot/dts/exynos5420.dtsi
++++ b/arch/arm/boot/dts/exynos5420.dtsi
+@@ -652,4 +652,14 @@
+ 		clocks = <&clock 319>, <&clock 318>;
+ 		clock-names = "tmu_apbif", "tmu_triminfo_apbif";
+ 	};
++
++	sss@10830000 {
++		compatible = "samsung,exynos4210-secss";
++		reg = <0x10830000 0x10000>;
++		interrupts = <0 112 0>;
++		clocks = <&clock 471>;
++		clock-names = "secss";
++		samsung,power-domain = <&g2d_pd>;
++	};
++
+ };
 -- 
 1.7.9.5
