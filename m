@@ -1,66 +1,45 @@
 From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 4/9 v5] crypto:s5p-sss: Kconfig: Let Exynos SoCs select SSS
- driver
-Date: Wed, 29 Jan 2014 14:52:34 +0530
-Message-ID: <1390987354-18665-1-git-send-email-ch.naveen@samsung.com>
-References: <1389243595-13207-1-git-send-email-ch.naveen@samsung.com>
+Subject: [PATCH 7/9 v5] crypto:s5p-sss: validate iv before memcpy
+Date: Wed, 29 Jan 2014 14:55:28 +0530
+Message-ID: <1390987528-18862-1-git-send-email-ch.naveen@samsung.com>
+References: <1389243640-13282-1-git-send-email-ch.naveen@samsung.com>
 Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
 	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
-	cpgs@samsung.com, devicetree@vger.kernel.org,
-	Naveen Krishna Ch <ch.naveen@samsung.com>,
-	"David S. Miller" <davem@davemloft.net>
+	cpgs@samsung.com, devicetree@vger.kernel.org
 To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout3.samsung.com ([203.254.224.33]:16121 "EHLO
-	mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750851AbaA2JWl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Jan 2014 04:22:41 -0500
-In-reply-to: <1389243595-13207-1-git-send-email-ch.naveen@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-reply-to: <1389243640-13282-1-git-send-email-ch.naveen@samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Naveen Krishna Ch <ch.naveen@samsung.com>
+This patch adds code to validate "iv" buffer before trying to
+memcpy the contents
 
-This patch modifies Kconfig such that ARCH_EXYNOS SoCs
-which includes (Exynos4210, Exynos5250 and Exynos5420)
-can also select Samsung SSS(Security SubSystem) driver.
-
-Signed-off-by: Naveen Krishna Ch <ch.naveen@samsung.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: David S. Miller <davem@davemloft.net>
-CC: Vladimir Zapolskiy <vzapolskiy@gmail.com>
-TO: <linux-crypto@vger.kernel.org>
-CC: <linux-samsung-soc@vger.kernel.org>
+Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+Reviewed-by: Tomasz Figa <t.figa@samsung.com>
 ---
 Changes since v4:
-none
-Changes since v3:
-Modified description to use "Exynos" instead of individual SoC name
- drivers/crypto/Kconfig |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+None
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index f4fd837..cb38863 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -300,14 +300,14 @@ config CRYPTO_DEV_DCP
- 	  capabilities of the DCP co-processor
+Changes since v3:
+None
+
+ drivers/crypto/s5p-sss.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index da1c8943..a890273 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -380,7 +380,8 @@ static void s5p_set_aes(struct s5p_aes_dev *dev,
+ {
+ 	void __iomem *keystart;
  
- config CRYPTO_DEV_S5P
--	tristate "Support for Samsung S5PV210 crypto accelerator"
--	depends on ARCH_S5PV210
-+	tristate "Support for Samsung S5PV210/Exynos crypto accelerator"
-+	depends on ARCH_S5PV210 || ARCH_EXYNOS
- 	select CRYPTO_AES
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_BLKCIPHER
- 	help
- 	  This option allows you to have support for S5P crypto acceleration.
--	  Select this to offload Samsung S5PV210 or S5PC110 from AES
-+	  Select this to offload Samsung S5PV210 or S5PC110, Exynos from AES
- 	  algorithms execution.
+-	memcpy(dev->aes_ioaddr + SSS_REG_AES_IV_DATA (0), iv, 0x10);
++	if (iv)
++		memcpy(dev->aes_ioaddr + SSS_REG_AES_IV_DATA (0), iv, 0x10);
  
- config CRYPTO_DEV_TEGRA_AES
+ 	if (keylen == AES_KEYSIZE_256)
+ 		keystart = dev->aes_ioaddr + SSS_REG_AES_KEY_DATA(0);
 -- 
 1.7.9.5
