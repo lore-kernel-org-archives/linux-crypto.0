@@ -1,97 +1,229 @@
-From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 5/9 v5] clk: samsung exynos5250/5420: Add gate clock for SSS
- module
-Date: Wed, 29 Jan 2014 14:54:06 +0530
-Message-ID: <1390987446-18784-1-git-send-email-ch.naveen@samsung.com>
-References: <1389354229-31936-1-git-send-email-ch.naveen@samsung.com>
-Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
-	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
-	cpgs@samsung.com, devicetree@vger.kernel.org,
-	Kukjin Kim <kgene.kim@samsung.com>
-To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <1389354229-31936-1-git-send-email-ch.naveen@samsung.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Rafael Aquini <aquini@redhat.com>
+Subject: Re: [RFC PATCH] char: random: stir the output pools differently when
+ the random_write lenght allows splitting the seed
+Date: Thu, 30 Jan 2014 11:22:03 -0200
+Message-ID: <20140130132203.GA19784@localhost.localdomain>
+References: <42f6dc88535d5ecdab13b1376db7ccbbbc550600.1389297772.git.aquini@redhat.com>
+ <1510904.XsOZgVgixq@tauon>
+ <52CFDB76.2030207@ladisch.de>
+ <5743525.Bz4yhBJ8Tl@tauon>
+ <52CFE84A.9050107@ladisch.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Clemens Ladisch <clemens@ladisch.de>,
+	"Theodore Ts'o" <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	lwang@redhat.com, sgrubb@redhat.com
+To: Stephan Mueller <stephan.mueller@atsec.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:18797 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752666AbaA3NWW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Jan 2014 08:22:22 -0500
+Content-Disposition: inline
+In-Reply-To: <52CFE84A.9050107@ladisch.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds gating clock for SSS(Security SubSystem)
-module on Exynos5250/5420.
+On Fri, Jan 10, 2014 at 01:32:10PM +0100, Clemens Ladisch wrote:
+> Stephan Mueller wrote:
+> > Am Freitag, 10. Januar 2014, 12:37:26 schrieb Clemens Ladisch:
+> >> Stephan Mueller wrote:
+> >>> Am Freitag, 10. Januar 2014, 09:13:57 schrieb Clemens Ladisch:
+> >>>> Rafael Aquini wrote:
+> >>>>> This patch introduces changes to the random_write method so it can
+> >>>>> split the given seed and completely stir the output pools with
+> >>>>> different halves of it, when seed lenght allows us doing so.
+> >>>>>
+> >>>>> -	ret = write_pool(&blocking_pool, buffer, count);
+> >>>>> +	ret = write_pool(pool1, buffer, count1);
+> >>>>>
+> >>>>>  	if (ret)
+> >>>>>  	
+> >>>>>  		return ret;
+> >>>>>
+> >>>>> -	ret = write_pool(&nonblocking_pool, buffer, count);
+> >>>>> +	ret = write_pool(pool2, buffer + offset, count2);
+> >>>>
+> >>>> Doesn't this assume that both halves of the buffer contain some
+> >>>> (uncredited) entropy?  In other words, wouldn't this result in worse
+> >>>> randomness for pool2 if the second half of the buffer contains just
+> >>>> zero padding?
+> >>>
+> >>> [...]
+> >>> Coming back to your concern: sure, the caller can pad any data
+> >>> injected into /dev/?random with zeros.
+> >>
+> >> Assume that the userspace of an embedded device wants to do the same
+> >> kind of initialization that a call to add_device_randomness() does, and
+> >> that it has some data like "char serial_number[256]".  The padding
+> >> wouldn't be done intentionally, it's just a property of the data (and
+> >> it wouldn't have mattered before this patch).
+> >>
+> >>> But as writing to the character files is allowed to every user, this
+> >>> per definition must not matter (e.g. an attacker may simply write
+> >>> zeros or other known data into the character file). And the random.c
+> >>> driver handles that case appropriately by not increasing the entropy
+> >>> estimator when receiving data.
+> >>
+> >> The problem is not with the entropy estimate.
+> >>
+> >>> All the patch tries to achieve is to ensure that both pools are not
+> >>> always mixed with the same values.
+> >>
+> >> Before this patch, both pools got mixed with the same values.  After
+> >> this patch, both pools indeed get mixed with different values, but now
+> >> one pool gets mixed with a known value if one half of the buffer
+> >> happens to be known.
+> >
+> > Do you imply in your example above that the serial number is unknown?
+> > Anything that unprivileged user space tries to inject into /dev/?random
+> > should be considered data with known value.
+> 
+> Like the kernel's add_device_randomness() function, this example assumes
+> that there is no persistent storage with a saved seed (or that it isn't
+> yet available), and that mixing a device-specific value at least
+> prevents multiple device instances from generating identical random
+> numbers.
+> 
+> This indeed helps only against attackers that do not know that serial
+> number.
+> 
+> If the data written by unprivileged users to /dev/?random were
+> considered known to *all* attackers, then it wouldn't make sense to
+> allow such writes at all.
+> 
 
-Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-TO: <linux-samsung-soc@vger.kernel.org>
-TO: Tomasz Figa <t.figa@samsung.com>
-CC: Kukjin Kim <kgene.kim@samsung.com>
-CC: <linux-crypto@vger.kernel.org>
+Sorry folks, 
+
+Although I left this one a little behind, I'd like to follow it up and reach
+some consensus.
+
+
+After re-reading the whole discussion, it became clear to me that the source of
+Stephan's request on splitting the seed we feed into the LRNG lies around the
+fact that any unprivileged user is capable to inject data and stir the entropy
+extraction pools arbitrarily.
+
+$ ls -l /dev/{u,}random
+crw-rw-rw-. 1 root root 1, 8 Jan 21 23:44 /dev/random
+crw-rw-rw-. 1 root root 1, 9 Jan 21 23:44 /dev/urandom
+
+Considering what goes within this thread, wouldn't be simpler to just remove the
+privileged of writing to /dev/{u,}random from the wild world? 
+
+Stephan, I'll repeat myself here: theoretically speaking there's no diff between
+using the same seed to mix both output pools and splitting it to use its
+different halves to stir the pools separately, for the /dev/{u,}random writes,
+if an attacker could successfully compromise the pools by feeding them with a
+known pattern seed. I understand you raised the split-the-seed point on a
+security concern and that concern might eventually become a requirement.
+Please, let us (me) know know if:
+
+a) is this request based on an existent pronouncement of standardization?
+b) is this (potential) pronouncement based on math proof that one could 
+   compromise the LRNG internal state by feeding known seeds into /dev/{u,}random?
+
+If (a) & (b) are true, and there's no code in the actual random.c implementation
+that does not address those security claims, and the naive approach of
+restricting who can actually write to /dev/{u,}random is not deemed feasible,
+then something like the (ugly) hack that goes bellow would be considered
+feasible? (perhaps making it conditional to fips_enabled)
+
+
+Thank you all for the comments till here, and have you all a nice weekend!
+
+Rafael
 ---
-Changes since v4:
-Use register GATE_IP_G2D instead of GATE_BUS_G2D for Exynos5420
-Changes since v3:
-1. Rebased on to https://git.kernel.org/pub/scm/linux/kernel/git/tfiga/samsung-clk.git
-2. Added new ID for SSS clock on Exynos5250, with Documentation and 
-3. Added gate clocks definitions for SSS on Exynos5420 and Exynos5250
- .../devicetree/bindings/clock/exynos5250-clock.txt |    1 +
- drivers/clk/samsung/clk-exynos5250.c               |    1 +
- drivers/clk/samsung/clk-exynos5420.c               |    4 ++++
- include/dt-bindings/clock/exynos5250.h             |    1 +
- 4 files changed, 7 insertions(+)
+vers/char/random.c | 66 +++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 56 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/clock/exynos5250-clock.txt b/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
-index 492ed09..a845fc6 100644
---- a/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
-+++ b/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
-@@ -162,6 +162,7 @@ clock which they consume.
-   g2d			345
-   mdma0			346
-   smmu_mdma0		347
-+  sss			348
- 
- 
-    [Clock Muxes]
-diff --git a/drivers/clk/samsung/clk-exynos5250.c b/drivers/clk/samsung/clk-exynos5250.c
-index ff4beeb..2c52fe1 100644
---- a/drivers/clk/samsung/clk-exynos5250.c
-+++ b/drivers/clk/samsung/clk-exynos5250.c
-@@ -387,6 +387,7 @@ static struct samsung_gate_clock exynos5250_gate_clks[] __initdata = {
- 	 * CMU_ACP
- 	 */
- 	GATE(CLK_MDMA0, "mdma0", "div_aclk266", GATE_IP_ACP, 1, 0, 0),
-+	GATE(CLK_SSS, "sss", "div_aclk266", GATE_IP_ACP, 2, 0, 0),
- 	GATE(CLK_G2D, "g2d", "div_aclk200", GATE_IP_ACP, 3, 0, 0),
- 	GATE(CLK_SMMU_MDMA0, "smmu_mdma0", "div_aclk266", GATE_IP_ACP, 5, 0, 0),
- 
-diff --git a/drivers/clk/samsung/clk-exynos5420.c b/drivers/clk/samsung/clk-exynos5420.c
-index ab4f2f7..c93d4d5 100644
---- a/drivers/clk/samsung/clk-exynos5420.c
-+++ b/drivers/clk/samsung/clk-exynos5420.c
-@@ -26,6 +26,7 @@
- #define DIV_CPU1		0x504
- #define GATE_BUS_CPU		0x700
- #define GATE_SCLK_CPU		0x800
-+#define GATE_IP_G2D		0x8800
- #define CPLL_LOCK		0x10020
- #define DPLL_LOCK		0x10030
- #define EPLL_LOCK		0x10040
-@@ -702,6 +703,9 @@ static struct samsung_gate_clock exynos5420_gate_clks[] __initdata = {
- 		0),
- 	GATE(CLK_SMMU_MIXER, "smmu_mixer", "aclk200_disp1", GATE_IP_DISP1, 9, 0,
- 		0),
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 429b75b..63e8852 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -274,6 +274,7 @@
+ #define INPUT_POOL_WORDS       (1 << (INPUT_POOL_SHIFT-5))
+ #define OUTPUT_POOL_SHIFT      10
+ #define OUTPUT_POOL_WORDS      (1 << (OUTPUT_POOL_SHIFT-5))
++#define OUTPUT_POOL_SIZE       ((1 << OUTPUT_POOL_SHIFT) >> 3)
+ #define SEC_XFER_SIZE          512
+ #define EXTRACT_SIZE           10
+
+@@ -1387,19 +1388,64 @@ write_pool(struct entropy_store *r, const char __user *buffer, size_t count)
+        return 0;
+ }
+
+-static ssize_t random_write(struct file *file, const char __user *buffer,
+-                           size_t count, loff_t *ppos)
++static size_t __do_random_write(const char __user *buffer, size_t count)
+ {
+-       size_t ret;
+-
+-       ret = write_pool(&blocking_pool, buffer, count);
+-       if (ret)
+-               return ret;
+-       ret = write_pool(&nonblocking_pool, buffer, count);
++       struct entropy_store *randomwrite_pool, *output_pool1, *output_pool2;
++       __u32 *randomwrite_pool_data, *rnd_seed;
++       size_t dime, ret = -ENOMEM;
 +
-+	/* SSS */
-+	GATE(CLK_SSS, "sss", "aclk266_g2d", GATE_IP_G2D, 2, 0, 0),
- };
- 
- static struct samsung_pll_clock exynos5420_plls[nr_plls] __initdata = {
-diff --git a/include/dt-bindings/clock/exynos5250.h b/include/dt-bindings/clock/exynos5250.h
-index 922f2dc..f9b452b 100644
---- a/include/dt-bindings/clock/exynos5250.h
-+++ b/include/dt-bindings/clock/exynos5250.h
-@@ -150,6 +150,7 @@
- #define CLK_G2D			345
- #define CLK_MDMA0		346
- #define CLK_SMMU_MDMA0		347
-+#define CLK_SSS			348
- 
- /* mux clocks */
- #define CLK_MOUT_HDMI		1024
++       randomwrite_pool_data = kzalloc(OUTPUT_POOL_SIZE, GFP_KERNEL);
++       if (!randomwrite_pool_data)
++               goto out_0;
++
++       randomwrite_pool = kzalloc(sizeof(struct entropy_store), GFP_KERNEL);
++       if (!randomwrite_pool)
++               goto out_1;
++
++       rnd_seed = kzalloc(OUTPUT_POOL_SIZE, GFP_KERNEL);
++       if (!rnd_seed)
++               goto out_2;
++
++       /* init an auxiliary pool and give it a stir with the input bias */
++       get_random_bytes(randomwrite_pool_data, OUTPUT_POOL_SIZE);
++       spin_lock_init(&randomwrite_pool->lock);
++       randomwrite_pool->poolinfo = &poolinfo_table[1];
++       randomwrite_pool->pool = randomwrite_pool_data;
++       randomwrite_pool->name = "randomwrite_pool";
++       ret = write_pool(randomwrite_pool, buffer, count);
+        if (ret)
+-               return ret;
++               goto out_3;
++
++       /* flip a coin before deciding the output pool seeding order */
++       output_pool1 = &blocking_pool;
++       output_pool2 = &nonblocking_pool;
++       get_random_bytes(&dime, 1);
++       if (dime % 2) {
++               output_pool1 = &nonblocking_pool;
++               output_pool2 = &blocking_pool;
++       }
++
++       extract_entropy(randomwrite_pool, rnd_seed, OUTPUT_POOL_SIZE, 0, 0);
++       mix_pool_bytes(output_pool1, rnd_seed, OUTPUT_POOL_SIZE, NULL);
+
+-       return (ssize_t)count;
++       extract_entropy(randomwrite_pool, rnd_seed, OUTPUT_POOL_SIZE, 0, 0);
++       mix_pool_bytes(output_pool2, rnd_seed, OUTPUT_POOL_SIZE, NULL);
++
++       ret = count;
++out_3:
++       kfree(rnd_seed);
++out_2:
++       kfree(randomwrite_pool);
++out_1:
++       kfree(randomwrite_pool_data);
++out_0:
++       return ret;
++}
++
++static ssize_t random_write(struct file *file, const char __user *buffer,
++                           size_t count, loff_t *ppos)
++{
++       return __do_random_write(buffer, count);
+ }
+
+ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 -- 
-1.7.9.5
