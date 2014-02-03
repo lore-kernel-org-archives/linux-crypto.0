@@ -1,41 +1,59 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: s390 - fix des and des3_ede ctr concurrency issue
-Date: Thu, 30 Jan 2014 22:10:36 +0800
-Message-ID: <20140130141036.GA30437@gondor.apana.org.au>
-References: <1390392093-5002-1-git-send-email-freude@linux.vnet.ibm.com>
+Subject: Crypto Fixes for 3.14
+Date: Mon, 3 Feb 2014 20:59:44 +0800
+Message-ID: <20140203125944.GA31446@gondor.apana.org.au>
+References: <20110216053911.GA10999@gondor.apana.org.au>
+ <20110328071322.GA6569@gondor.apana.org.au>
+ <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>,
-	Ingo Tuchscherer <ingo.tuchscherer@linux.vnet.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-	Harald Freudenberger <freude@de.ibm.com>
-To: Harald Freudenberger <freude@linux.vnet.ibm.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:54993 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:52506 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753729AbaA3OKr (ORCPT
+	with ESMTP id S1751280AbaBCM77 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Jan 2014 09:10:47 -0500
+	Mon, 3 Feb 2014 07:59:59 -0500
 Content-Disposition: inline
-In-Reply-To: <1390392093-5002-1-git-send-email-freude@linux.vnet.ibm.com>
+In-Reply-To: <20140101061016.GA22579@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 22, 2014 at 01:01:33PM +0100, Harald Freudenberger wrote:
-> In s390 des and 3des ctr mode there is one preallocated page
-> used to speed up the en/decryption. This page is not protected
-> against concurrent usage and thus there is a potential of data
-> corruption with multiple threads.
-> 
-> The fix introduces locking/unlocking the ctr page and a slower
-> fallback solution at concurrency situations.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Hi Linus:
 
-All three patches applied to crypto.  Thanks for fixing these
-bugs.
+This push fixes a number of concurrency issues on s390 where
+multiple users of the same crypto transform may clobber each
+other's results.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+ 
+Harald Freudenberger (3):
+      crypto: s390 - fix concurrency issue in aes-ctr mode
+      crypto: s390 - fix des and des3_ede cbc concurrency issue
+      crypto: s390 - fix des and des3_ede ctr concurrency issue
+
+ arch/s390/crypto/aes_s390.c |   65 +++++++++++++++++++++---------
+ arch/s390/crypto/des_s390.c |   95 ++++++++++++++++++++++++++++---------------
+ 2 files changed, 108 insertions(+), 52 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
