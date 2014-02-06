@@ -1,60 +1,106 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.14
-Date: Mon, 3 Feb 2014 20:59:44 +0800
-Message-ID: <20140203125944.GA31446@gondor.apana.org.au>
-References: <20110216053911.GA10999@gondor.apana.org.au>
- <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
- <20140101061016.GA22579@gondor.apana.org.au>
+From: Alex Porosanu <alexandru.porosanu@freescale.com>
+Subject: [PATCH] crypto: caam - fix ERA retrieval function
+Date: Thu, 6 Feb 2014 10:27:19 +0200
+Message-ID: <1391675239-11289-1-git-send-email-alexandru.porosanu@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain
+Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
+	<vakul@freescale.com>, <ruchika.gupta@freescale.com>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:52506 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751280AbaBCM77 (ORCPT
+Received: from am1ehsobe001.messaging.microsoft.com ([213.199.154.204]:5053
+	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932100AbaBFI3I (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Feb 2014 07:59:59 -0500
-Content-Disposition: inline
-In-Reply-To: <20140101061016.GA22579@gondor.apana.org.au>
+	Thu, 6 Feb 2014 03:29:08 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+SEC ERA has to be retrieved by reading the "fsl,sec-era" property
+from the device tree. This property is updated/filled in by
+u-boot.
 
-This push fixes a number of concurrency issues on s390 where
-multiple users of the same crypto transform may clobber each
-other's results.
+Change-Id: Ie1620354a0cf2cac5cd2c72bd5f2449f55858378
+Signed-off-by: Alex Porosanu <alexandru.porosanu@freescale.com>
+---
+ drivers/crypto/caam/ctrl.c | 36 ++++++++++--------------------------
+ drivers/crypto/caam/ctrl.h |  2 +-
+ 2 files changed, 11 insertions(+), 27 deletions(-)
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 63fb1af..ebb5617 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -14,7 +14,6 @@
+ #include "jr.h"
+ #include "desc_constr.h"
+ #include "error.h"
+-#include "ctrl.h"
  
-Harald Freudenberger (3):
-      crypto: s390 - fix concurrency issue in aes-ctr mode
-      crypto: s390 - fix des and des3_ede cbc concurrency issue
-      crypto: s390 - fix des and des3_ede ctr concurrency issue
-
- arch/s390/crypto/aes_s390.c |   65 +++++++++++++++++++++---------
- arch/s390/crypto/des_s390.c |   95 ++++++++++++++++++++++++++++---------------
- 2 files changed, 108 insertions(+), 52 deletions(-)
-
-Thanks,
+ /*
+  * Descriptor to instantiate RNG State Handle 0 in normal mode and
+@@ -352,32 +351,17 @@ static void kick_trng(struct platform_device *pdev, int ent_delay)
+ 
+ /**
+  * caam_get_era() - Return the ERA of the SEC on SoC, based
+- * on the SEC_VID register.
+- * Returns the ERA number (1..4) or -ENOTSUPP if the ERA is unknown.
+- * @caam_id - the value of the SEC_VID register
++ * on "sec-era" propery in the DTS. This property is updated by u-boot.
+  **/
+-int caam_get_era(u64 caam_id)
++int caam_get_era(void)
+ {
+-	struct sec_vid *sec_vid = (struct sec_vid *)&caam_id;
+-	static const struct {
+-		u16 ip_id;
+-		u8 maj_rev;
+-		u8 era;
+-	} caam_eras[] = {
+-		{0x0A10, 1, 1},
+-		{0x0A10, 2, 2},
+-		{0x0A12, 1, 3},
+-		{0x0A14, 1, 3},
+-		{0x0A14, 2, 4},
+-		{0x0A16, 1, 4},
+-		{0x0A11, 1, 4}
+-	};
+-	int i;
+-
+-	for (i = 0; i < ARRAY_SIZE(caam_eras); i++)
+-		if (caam_eras[i].ip_id == sec_vid->ip_id &&
+-			caam_eras[i].maj_rev == sec_vid->maj_rev)
+-				return caam_eras[i].era;
++	struct device_node *caam_node;
++	for_each_compatible_node(caam_node, NULL, "fsl,sec-v4.0") {
++		const uint32_t *prop = (uint32_t *)of_get_property(caam_node,
++				"fsl,sec-era",
++				NULL);
++		return prop ? *prop : -ENOTSUPP;
++	}
+ 
+ 	return -ENOTSUPP;
+ }
+@@ -564,7 +548,7 @@ static int caam_probe(struct platform_device *pdev)
+ 
+ 	/* Report "alive" for developer to see */
+ 	dev_info(dev, "device ID = 0x%016llx (Era %d)\n", caam_id,
+-		 caam_get_era(caam_id));
++		 caam_get_era());
+ 	dev_info(dev, "job rings = %d, qi = %d\n",
+ 		 ctrlpriv->total_jobrs, ctrlpriv->qi_present);
+ 
+diff --git a/drivers/crypto/caam/ctrl.h b/drivers/crypto/caam/ctrl.h
+index 980d44e..cac5402 100644
+--- a/drivers/crypto/caam/ctrl.h
++++ b/drivers/crypto/caam/ctrl.h
+@@ -8,6 +8,6 @@
+ #define CTRL_H
+ 
+ /* Prototypes for backend-level services exposed to APIs */
+-int caam_get_era(u64 caam_id);
++int caam_get_era(void);
+ 
+ #endif /* CTRL_H */
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.3.1
