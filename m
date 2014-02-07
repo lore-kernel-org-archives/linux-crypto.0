@@ -1,65 +1,93 @@
 From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 4/9 v6] crypto:s5p-sss: Kconfig: Let Exynos SoCs select SSS
- driver
-Date: Fri, 07 Feb 2014 10:53:23 +0530
-Message-ID: <1391750603-27370-1-git-send-email-ch.naveen@samsung.com>
-References: <1389095509-14357-5-git-send-email-ch.naveen@samsung.com>
+Subject: [PATCH 5/9 v6] clk: samsung exynos5250/5420: Add gate clock for SSS
+ module
+Date: Fri, 07 Feb 2014 10:54:14 +0530
+Message-ID: <1391750654-27401-1-git-send-email-ch.naveen@samsung.com>
+References: <1389354229-31936-1-git-send-email-ch.naveen@samsung.com>
 Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
 	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
-	cpgs@samsung.com, Naveen Krishna Ch <ch.naveen@samsung.com>,
-	"David S. Miller" <davem@davemloft.net>
+	cpgs@samsung.com, Kukjin Kim <kgene.kim@samsung.com>
 To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout4.samsung.com ([203.254.224.34]:23917 "EHLO
-	mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751246AbaBGFXl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 7 Feb 2014 00:23:41 -0500
-In-reply-to: <1389095509-14357-5-git-send-email-ch.naveen@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-reply-to: <1389354229-31936-1-git-send-email-ch.naveen@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Naveen Krishna Ch <ch.naveen@samsung.com>
+This patch adds gating clock for SSS(Security SubSystem)
+module on Exynos5250/5420.
 
-This patch modifies Kconfig such that ARCH_EXYNOS SoCs
-which includes (Exynos4210, Exynos5250 and Exynos5420)
-can also select Samsung SSS(Security SubSystem) driver.
-
-Signed-off-by: Naveen Krishna Ch <ch.naveen@samsung.com>
+Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
 Reviewed-by: Tomasz Figa <t.figa@samsung.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: David S. Miller <davem@davemloft.net>
-CC: Vladimir Zapolskiy <vzapolskiy@gmail.com>
-TO: <linux-crypto@vger.kernel.org>
-CC: <linux-samsung-soc@vger.kernel.org>
+TO: <linux-samsung-soc@vger.kernel.org>
+CC: Kukjin Kim <kgene.kim@samsung.com>
+CC: <linux-crypto@vger.kernel.org>
 ---
-Change since v5:
-None
+changes since v5:
+1. Added Reviewed-by: Tomasz Figa <t.figa@samsung.com>
 
- drivers/crypto/Kconfig |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ .../devicetree/bindings/clock/exynos5250-clock.txt |    1 +
+ drivers/clk/samsung/clk-exynos5250.c               |    1 +
+ drivers/clk/samsung/clk-exynos5420.c               |    4 ++++
+ include/dt-bindings/clock/exynos5250.h             |    1 +
+ 4 files changed, 7 insertions(+)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 13857f5..e866489 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -290,14 +290,14 @@ config CRYPTO_DEV_SAHARA
- 	  found in some Freescale i.MX chips.
+diff --git a/Documentation/devicetree/bindings/clock/exynos5250-clock.txt b/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
+index 72ce617..87f1539 100644
+--- a/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
++++ b/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
+@@ -162,6 +162,7 @@ clock which they consume.
+   g2d			345
+   mdma0			346
+   smmu_mdma0		347
++  sss			348
  
- config CRYPTO_DEV_S5P
--	tristate "Support for Samsung S5PV210 crypto accelerator"
--	depends on ARCH_S5PV210
-+	tristate "Support for Samsung S5PV210/Exynos crypto accelerator"
-+	depends on ARCH_S5PV210 || ARCH_EXYNOS
- 	select CRYPTO_AES
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_BLKCIPHER
- 	help
- 	  This option allows you to have support for S5P crypto acceleration.
--	  Select this to offload Samsung S5PV210 or S5PC110 from AES
-+	  Select this to offload Samsung S5PV210 or S5PC110, Exynos from AES
- 	  algorithms execution.
  
- config CRYPTO_DEV_TEGRA_AES
+    [Clock Muxes]
+diff --git a/drivers/clk/samsung/clk-exynos5250.c b/drivers/clk/samsung/clk-exynos5250.c
+index ff4beeb..2c52fe1 100644
+--- a/drivers/clk/samsung/clk-exynos5250.c
++++ b/drivers/clk/samsung/clk-exynos5250.c
+@@ -387,6 +387,7 @@ static struct samsung_gate_clock exynos5250_gate_clks[] __initdata = {
+ 	 * CMU_ACP
+ 	 */
+ 	GATE(CLK_MDMA0, "mdma0", "div_aclk266", GATE_IP_ACP, 1, 0, 0),
++	GATE(CLK_SSS, "sss", "div_aclk266", GATE_IP_ACP, 2, 0, 0),
+ 	GATE(CLK_G2D, "g2d", "div_aclk200", GATE_IP_ACP, 3, 0, 0),
+ 	GATE(CLK_SMMU_MDMA0, "smmu_mdma0", "div_aclk266", GATE_IP_ACP, 5, 0, 0),
+ 
+diff --git a/drivers/clk/samsung/clk-exynos5420.c b/drivers/clk/samsung/clk-exynos5420.c
+index ab4f2f7..c93d4d5 100644
+--- a/drivers/clk/samsung/clk-exynos5420.c
++++ b/drivers/clk/samsung/clk-exynos5420.c
+@@ -26,6 +26,7 @@
+ #define DIV_CPU1		0x504
+ #define GATE_BUS_CPU		0x700
+ #define GATE_SCLK_CPU		0x800
++#define GATE_IP_G2D		0x8800
+ #define CPLL_LOCK		0x10020
+ #define DPLL_LOCK		0x10030
+ #define EPLL_LOCK		0x10040
+@@ -702,6 +703,9 @@ static struct samsung_gate_clock exynos5420_gate_clks[] __initdata = {
+ 		0),
+ 	GATE(CLK_SMMU_MIXER, "smmu_mixer", "aclk200_disp1", GATE_IP_DISP1, 9, 0,
+ 		0),
++
++	/* SSS */
++	GATE(CLK_SSS, "sss", "aclk266_g2d", GATE_IP_G2D, 2, 0, 0),
+ };
+ 
+ static struct samsung_pll_clock exynos5420_plls[nr_plls] __initdata = {
+diff --git a/include/dt-bindings/clock/exynos5250.h b/include/dt-bindings/clock/exynos5250.h
+index 922f2dc..f9b452b 100644
+--- a/include/dt-bindings/clock/exynos5250.h
++++ b/include/dt-bindings/clock/exynos5250.h
+@@ -150,6 +150,7 @@
+ #define CLK_G2D			345
+ #define CLK_MDMA0		346
+ #define CLK_SMMU_MDMA0		347
++#define CLK_SSS			348
+ 
+ /* mux clocks */
+ #define CLK_MOUT_HDMI		1024
 -- 
 1.7.9.5
