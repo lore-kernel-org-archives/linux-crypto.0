@@ -1,54 +1,50 @@
-From: Tomasz Figa <t.figa@samsung.com>
-Subject: Re: [PATCH 5/9 v5] clk: samsung exynos5250/5420: Add gate clock for
- SSS module
-Date: Thu, 06 Feb 2014 15:43:12 +0100
-Message-ID: <52F39F80.1090709@samsung.com>
-References: <1389354229-31936-1-git-send-email-ch.naveen@samsung.com>
- <1390987446-18784-1-git-send-email-ch.naveen@samsung.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC PATCH 0/3] support for interleaving in generic chaining
+ modes
+Date: Fri, 7 Feb 2014 10:23:35 +0800
+Message-ID: <20140207022335.GA27694@gondor.apana.org.au>
+References: <1391689504-28160-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
-	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
-	cpgs@samsung.com, devicetree@vger.kernel.org,
-	Kukjin Kim <kgene.kim@samsung.com>
-To: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
-	linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
+	jussi.kivilinna@iki.fi
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:10091 "EHLO
-	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751872AbaBFOnQ (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:59896 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751056AbaBGCYQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Feb 2014 09:43:16 -0500
-In-reply-to: <1390987446-18784-1-git-send-email-ch.naveen@samsung.com>
+	Thu, 6 Feb 2014 21:24:16 -0500
+Content-Disposition: inline
+In-Reply-To: <1391689504-28160-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Naveen,
+On Thu, Feb 06, 2014 at 01:25:01PM +0100, Ard Biesheuvel wrote:
+> My apologies if this has been discussed/debated before on linux-crypto.
+> 
+> When working on accelerated crypto for ARM and arm64, I noticed that many of
+> the existing accelerated implementations for other architectures duplicate much
+> of the chaining modes, not because they can be accelerated themselves but mainly
+> because the generic chaining mode implementations cannot present the data in
+> large enough chunks for the accelerated implementations to reach their optimal
+> speed.
+> 
+> This series proposes a way to improve on that. I have only implemented the CBC
+> example because it makes for nice a benchmark, but CTR and XTS are other obvious
+> candidates for the treatment.
+> 
+> I have included my arm64 AES cipher implementation for reference.
 
-On 29.01.2014 10:24, Naveen Krishna Chatradhi wrote:
-> This patch adds gating clock for SSS(Security SubSystem)
-> module on Exynos5250/5420.
->
-> Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-> TO: <linux-samsung-soc@vger.kernel.org>
-> TO: Tomasz Figa <t.figa@samsung.com>
-> CC: Kukjin Kim <kgene.kim@samsung.com>
-> CC: <linux-crypto@vger.kernel.org>
-> ---
-> Changes since v4:
-> Use register GATE_IP_G2D instead of GATE_BUS_G2D for Exynos5420
-> Changes since v3:
-> 1. Rebased on to https://git.kernel.org/pub/scm/linux/kernel/git/tfiga/samsung-clk.git
-> 2. Added new ID for SSS clock on Exynos5250, with Documentation and
-> 3. Added gate clocks definitions for SSS on Exynos5420 and Exynos5250
->   .../devicetree/bindings/clock/exynos5250-clock.txt |    1 +
->   drivers/clk/samsung/clk-exynos5250.c               |    1 +
->   drivers/clk/samsung/clk-exynos5420.c               |    4 ++++
->   include/dt-bindings/clock/exynos5250.h             |    1 +
->   4 files changed, 7 insertions(+)
+We can already do this using the existing blkcipher interface
+if the underlying accelerated implementation exports an ECB
+version of itself.
 
-Reviewed-by: Tomasz Figa <t.figa@samsung.com>
+So if we're going to do this I'd like to see CBC/CTR/XTS simply
+be modified to use ecb(X) instead of X where appropriate.
 
-Best regards,
-Tomasz
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
