@@ -1,45 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH 0/3] support for interleaving in generic chaining
- modes
-Date: Fri, 7 Feb 2014 17:53:41 +0800
-Message-ID: <20140207095341.GA3120@gondor.apana.org.au>
-References: <1391689504-28160-1-git-send-email-ard.biesheuvel@linaro.org>
- <20140207022335.GA27694@gondor.apana.org.au>
- <CAKv+Gu-4J6jO135QgNrLrEX96U7aS7k4BE82j9ZLzwe60HfTTQ@mail.gmail.com>
- <20140207092304.GA2573@gondor.apana.org.au>
- <CAKv+Gu_kQFA26Ntc1p1yNRpxfJd8xgk27OnS7LG4V5qzH5NBjg@mail.gmail.com>
- <20140207094406.GA3012@gondor.apana.org.au>
- <CAKv+Gu_uZRYqhi_8ReKabBGJxtKQSR4X4DJBse4muDOMMMf8Ww@mail.gmail.com>
+From: Kim Phillips <kim.phillips@linaro.org>
+Subject: Re: [PATCH] crypto: caam - fix ERA retrieval function
+Date: Fri, 7 Feb 2014 19:36:42 -0600
+Message-ID: <20140207193642.a4c76876a569ec678bfac525@linaro.org>
+References: <1391675239-11289-1-git-send-email-alexandru.porosanu@freescale.com>
+	<52F358C8.2020105@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: alexandru.porosanu@freescale.com, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au, vakul@freescale.com,
+	ruchika.gupta@freescale.com
+To: horia.geanta@freescale.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:55128 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751446AbaBGJxn (ORCPT
+Received: from mail-ob0-f180.google.com ([209.85.214.180]:63244 "EHLO
+	mail-ob0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750706AbaBHBgp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 7 Feb 2014 04:53:43 -0500
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_uZRYqhi_8ReKabBGJxtKQSR4X4DJBse4muDOMMMf8Ww@mail.gmail.com>
+	Fri, 7 Feb 2014 20:36:45 -0500
+Received: by mail-ob0-f180.google.com with SMTP id wp4so4927471obc.11
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Feb 2014 17:36:44 -0800 (PST)
+In-Reply-To: <52F358C8.2020105@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Feb 07, 2014 at 10:51:08AM +0100, Ard Biesheuvel wrote:
-> 
-> So i get your point: I will have a go at passing the entire buffer to
-> ecb(%s), and then wrapping the chaining mode around that.
-> I guess you don't think the (avoidable) additional memory usage is a concern?
+On Thu, 6 Feb 2014 11:41:28 +0200
+Horia Geant=C4=83 <horia.geanta@freescale.com> wrote:
 
-You mean the temporary buffer for the in-place case? It's a hard
-problem and this will more likely determine how much you can pass
-to ecb than anything else.  If you find a good solution we could
-make use of it in other places, e.g., ctr on s390.
+> On 2/6/2014 10:27 AM, Alex Porosanu wrote:
+> > Signed-off-by: Alex Porosanu <alexandru.porosanu@freescale.com>
+> > ---
+> >   drivers/crypto/caam/ctrl.c | 36 ++++++++++-----------------------=
+---
+> >   drivers/crypto/caam/ctrl.h |  2 +-
+> >   2 files changed, 11 insertions(+), 27 deletions(-)
+>=20
+> Reviewed-by: Horia Geanta <horia.geanta@freescale.com>
+>=20
+> "fsl, sec-era" has been in u-boot and in dt bindings for over a year.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+yours maybe.  It's an optional property.
+
+Kim
