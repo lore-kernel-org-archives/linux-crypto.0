@@ -1,60 +1,79 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] crypto: remove a duplicate checks in __cbc_decrypt()
-Date: Thu, 13 Feb 2014 17:58:32 +0300
-Message-ID: <20140213145832.GA11059@elgon.mountain>
+From: Kukjin Kim <kgene.kim@samsung.com>
+Subject: Re: [PATCH 6/9 v6] ARM: dts: exynos5250/5420: add dt node for sss
+ module
+Date: Fri, 14 Feb 2014 08:28:46 +0900
+Message-ID: <52FD552E.8040008@samsung.com>
+References: <1389095509-14357-6-git-send-email-ch.naveen@samsung.com> <1391750695-27447-1-git-send-email-ch.naveen@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-	Johannes Goetzfried
-	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:38811 "EHLO
-	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751105AbaBMO7Q (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Feb 2014 09:59:16 -0500
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
+	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
+	cpgs@samsung.com, Kukjin Kim <kgene.kim@samsung.com>
+To: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <1391750695-27447-1-git-send-email-ch.naveen@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-We checked "nbytes < bsize" before so it can't happen here.
+On 02/07/14 14:24, Naveen Krishna Chatradhi wrote:
+> This patch adds the device tree node for SSS module
+> found on Exynos5420 and Exynos5250
+>
+> Signed-off-by: Naveen Krishna Chatradhi<ch.naveen@samsung.com>
+> Reviewed-by: Tomasz Figa<t.figa@samsung.com>
+> TO:<linux-samsung-soc@vger.kernel.org>
+> CC: Kukjin Kim<kgene.kim@samsung.com>
+> CC:<linux-crypto@vger.kernel.org>
+> ---
+> changes since v5:
+> 1. Added Reviewed-by: Tomasz Figa<t.figa@samsung.com>
+>
+>   arch/arm/boot/dts/exynos5250.dtsi |    8 ++++++++
+>   arch/arm/boot/dts/exynos5420.dtsi |   10 ++++++++++
+>   2 files changed, 18 insertions(+)
+>
+> diff --git a/arch/arm/boot/dts/exynos5250.dtsi b/arch/arm/boot/dts/exynos5250.dtsi
+> index b7dec41..46b04e8 100644
+> --- a/arch/arm/boot/dts/exynos5250.dtsi
+> +++ b/arch/arm/boot/dts/exynos5250.dtsi
+> @@ -706,4 +706,12 @@
+>   		io-channel-ranges;
+>   		status = "disabled";
+>   	};
+> +
+> +	sss@10830000 {
+> +		compatible = "samsung,exynos4210-secss";
+> +		reg =<0x10830000 0x10000>;
+> +		interrupts =<0 112 0>;
+> +		clocks =<&clock 348>;
+> +		clock-names = "secss";
+> +	};
+>   };
+> diff --git a/arch/arm/boot/dts/exynos5420.dtsi b/arch/arm/boot/dts/exynos5420.dtsi
+> index 8db792b..b503e96 100644
+> --- a/arch/arm/boot/dts/exynos5420.dtsi
+> +++ b/arch/arm/boot/dts/exynos5420.dtsi
+> @@ -652,4 +652,14 @@
+>   		clocks =<&clock 319>,<&clock 318>;
+>   		clock-names = "tmu_apbif", "tmu_triminfo_apbif";
+>   	};
+> +
+> +	sss@10830000 {
+> +		compatible = "samsung,exynos4210-secss";
+> +		reg =<0x10830000 0x10000>;
+> +		interrupts =<0 112 0>;
+> +		clocks =<&clock 471>;
+> +		clock-names = "secss";
+> +		samsung,power-domain =<&g2d_pd>;
+> +	};
+> +
+>   };
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
-This doesn't change how the code works, but maybe their is a bug in the
-original code.  Please review?
+Applied, thanks.
 
-diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
-index e6a3700489b9..e57e20ab5e0b 100644
---- a/arch/x86/crypto/cast5_avx_glue.c
-+++ b/arch/x86/crypto/cast5_avx_glue.c
-@@ -203,9 +203,6 @@ static unsigned int __cbc_decrypt(struct blkcipher_desc *desc,
- 			src -= 1;
- 			dst -= 1;
- 		} while (nbytes >= bsize * CAST5_PARALLEL_BLOCKS);
--
--		if (nbytes < bsize)
--			goto done;
- 	}
- 
- 	/* Handle leftovers */
-diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
-index 50ec333b70e6..8af519ed73d1 100644
---- a/arch/x86/crypto/blowfish_glue.c
-+++ b/arch/x86/crypto/blowfish_glue.c
-@@ -223,9 +223,6 @@ static unsigned int __cbc_decrypt(struct blkcipher_desc *desc,
- 			src -= 1;
- 			dst -= 1;
- 		} while (nbytes >= bsize * 4);
--
--		if (nbytes < bsize)
--			goto done;
- 	}
- 
- 	/* Handle leftovers */
+BTW, I think the numbering is strange...maybe I missed something?
+[PATCH 5/5], [PATCH 5/6 V2], [PATCH 6/8 V3] and this [PATCH 6/9 V6]
+
+- Kukjin
