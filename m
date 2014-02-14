@@ -1,60 +1,71 @@
-From: Joel Fernandes <joelf@ti.com>
-Subject: [PATCH v2 2/2] crypto: omap-des: Add config and build options
-Date: Fri, 14 Feb 2014 10:49:47 -0600
-Message-ID: <1392396587-24524-1-git-send-email-joelf@ti.com>
+From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Subject: Re: [patch] crypto: remove a duplicate checks in __cbc_decrypt()
+Date: Fri, 14 Feb 2014 19:43:51 +0200
+Message-ID: <52FE55D7.7020706@iki.fi>
+References: <20140213145832.GA11059@elgon.mountain>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-	Linux OMAP List <linux-omap@vger.kernel.org>,
-	Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Joel Fernandes <joelf@ti.com>
-To: <herbert@gondor.apana.org.au>, <rnayak@ti.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+	Johannes Goetzfried
+	<Johannes.Goetzfried@informatik.stud.uni-erlangen.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.kapsi.fi ([217.30.184.167]:45532 "EHLO mail.kapsi.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751277AbaBNRou (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 14 Feb 2014 12:44:50 -0500
+In-Reply-To: <20140213145832.GA11059@elgon.mountain>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add config and build options for the omap-des driver.
+On 13.02.2014 16:58, Dan Carpenter wrote:
+> We checked "nbytes < bsize" before so it can't happen here.
+> 
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-Signed-off-by: Joel Fernandes <joelf@ti.com>
----
- drivers/crypto/Kconfig  |   11 +++++++++++
- drivers/crypto/Makefile |    1 +
- 2 files changed, 12 insertions(+)
+Acked-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 13857f5..8e38000 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -262,6 +262,17 @@ config CRYPTO_DEV_OMAP_AES
- 	  OMAP processors have AES module accelerator. Select this if you
- 	  want to use the OMAP module for AES algorithms.
- 
-+config CRYPTO_DEV_OMAP_DES
-+	tristate "Support for OMAP DES3DES hw engine"
-+	depends on ARCH_OMAP2PLUS
-+	select CRYPTO_DES
-+	select CRYPTO_BLKCIPHER2
-+	help
-+	  OMAP processors have DES/3DES module accelerator. Select this if you
-+	  want to use the OMAP module for DES and 3DES algorithms. Currently
-+	  the ECB and CBC modes of operation supported by the driver. Also
-+	  accesses made on unaligned boundaries are also supported.
-+
- config CRYPTO_DEV_PICOXCELL
- 	tristate "Support for picoXcell IPSEC and Layer2 crypto engines"
- 	depends on ARCH_PICOXCELL && HAVE_CLK
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 0bc6aa0..9a53fb8 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -13,6 +13,7 @@ obj-$(CONFIG_CRYPTO_DEV_NIAGARA2) += n2_crypto.o
- n2_crypto-y := n2_core.o n2_asm.o
- obj-$(CONFIG_CRYPTO_DEV_NX) += nx/
- obj-$(CONFIG_CRYPTO_DEV_OMAP_AES) += omap-aes.o
-+obj-$(CONFIG_CRYPTO_DEV_OMAP_DES) += omap-des.o
- obj-$(CONFIG_CRYPTO_DEV_OMAP_SHAM) += omap-sham.o
- obj-$(CONFIG_CRYPTO_DEV_PADLOCK_AES) += padlock-aes.o
- obj-$(CONFIG_CRYPTO_DEV_PADLOCK_SHA) += padlock-sha.o
--- 
-1.7.9.5
+> ---
+> This doesn't change how the code works, but maybe their is a bug in the
+> original code.  Please review?
+> 
+> diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
+> index e6a3700489b9..e57e20ab5e0b 100644
+> --- a/arch/x86/crypto/cast5_avx_glue.c
+> +++ b/arch/x86/crypto/cast5_avx_glue.c
+> @@ -203,9 +203,6 @@ static unsigned int __cbc_decrypt(struct blkcipher_desc *desc,
+>  			src -= 1;
+>  			dst -= 1;
+>  		} while (nbytes >= bsize * CAST5_PARALLEL_BLOCKS);
+> -
+> -		if (nbytes < bsize)
+> -			goto done;
+>  	}
+>  
+>  	/* Handle leftovers */
+> diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
+> index 50ec333b70e6..8af519ed73d1 100644
+> --- a/arch/x86/crypto/blowfish_glue.c
+> +++ b/arch/x86/crypto/blowfish_glue.c
+> @@ -223,9 +223,6 @@ static unsigned int __cbc_decrypt(struct blkcipher_desc *desc,
+>  			src -= 1;
+>  			dst -= 1;
+>  		} while (nbytes >= bsize * 4);
+> -
+> -		if (nbytes < bsize)
+> -			goto done;
+>  	}
+>  
+>  	/* Handle leftovers */
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
