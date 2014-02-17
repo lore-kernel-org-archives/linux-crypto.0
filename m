@@ -1,123 +1,62 @@
-From: Naveen Krishna Ch <naveenkrishna.ch@gmail.com>
-Subject: Re: [PATCH 6/9 v6] ARM: dts: exynos5250/5420: add dt node for sss module
-Date: Mon, 17 Feb 2014 14:26:10 +0530
-Message-ID: <CAHfPSqAaxuS1S5Buy2FUqvy7_8zGGYp5Dc2mK4bogxe1eH1VJA@mail.gmail.com>
-References: <1389095509-14357-6-git-send-email-ch.naveen@samsung.com>
- <1391750695-27447-1-git-send-email-ch.naveen@samsung.com> <52FD552E.8040008@samsung.com>
- <52FDF5FA.4000909@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Kukjin Kim <kgene.kim@samsung.com>,
-	Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
-	linux-crypto@vger.kernel.org,
-	"linux-samsung-soc@vger.kernel.org"
-	<linux-samsung-soc@vger.kernel.org>, linux-kernel@vger.kernel.org,
-	Vladimir Zapolskiy <vzapolskiy@gmail.com>,
-	herbert@gondor.apana.org.au, cpgs@samsung.com
-To: Tomasz Figa <t.figa@samsung.com>
+From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+Subject: [PATCH 0/9 v7] crypto:s5p-sss: Add DT and Exynos support
+Date: Mon, 17 Feb 2014 15:14:26 +0530
+Message-ID: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com>
+Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
+	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
+	cpgs@samsung.com, davem@davemloft.net
+To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:43818 "EHLO
-	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751277AbaBQI4b (ORCPT
+Received: from mailout4.samsung.com ([203.254.224.34]:29185 "EHLO
+	mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752572AbaBQJpI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Feb 2014 03:56:31 -0500
-In-Reply-To: <52FDF5FA.4000909@samsung.com>
+	Mon, 17 Feb 2014 04:45:08 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello Tomasz,
+SSS module on Exynos4210, Exynos5250 and Exynos5420 SoCs has added
+features to the one on S5PV210. However with minor changes the s5p-sss.c
+driver can be reused to support SSS modules on Exynos4 and 5 SoCs.
 
-On 14 February 2014 16:24, Tomasz Figa <t.figa@samsung.com> wrote:
-> Hi Kukjin,
->
->
-> On 14.02.2014 00:28, Kukjin Kim wrote:
->>
->> On 02/07/14 14:24, Naveen Krishna Chatradhi wrote:
->>>
->>> This patch adds the device tree node for SSS module
->>> found on Exynos5420 and Exynos5250
->>>
->>> Signed-off-by: Naveen Krishna Chatradhi<ch.naveen@samsung.com>
->>> Reviewed-by: Tomasz Figa<t.figa@samsung.com>
->>> TO:<linux-samsung-soc@vger.kernel.org>
->>> CC: Kukjin Kim<kgene.kim@samsung.com>
->>> CC:<linux-crypto@vger.kernel.org>
->>> ---
->>> changes since v5:
->>> 1. Added Reviewed-by: Tomasz Figa<t.figa@samsung.com>
->>>
->>>   arch/arm/boot/dts/exynos5250.dtsi |    8 ++++++++
->>>   arch/arm/boot/dts/exynos5420.dtsi |   10 ++++++++++
->>>   2 files changed, 18 insertions(+)
->>>
->>> diff --git a/arch/arm/boot/dts/exynos5250.dtsi
->>> b/arch/arm/boot/dts/exynos5250.dtsi
->>> index b7dec41..46b04e8 100644
->>> --- a/arch/arm/boot/dts/exynos5250.dtsi
->>> +++ b/arch/arm/boot/dts/exynos5250.dtsi
->>> @@ -706,4 +706,12 @@
->>>           io-channel-ranges;
->>>           status = "disabled";
->>>       };
->>> +
->>> +    sss@10830000 {
->>> +        compatible = "samsung,exynos4210-secss";
->>> +        reg =<0x10830000 0x10000>;
->>> +        interrupts =<0 112 0>;
->>> +        clocks =<&clock 348>;
->>> +        clock-names = "secss";
->>> +    };
->>>   };
->>> diff --git a/arch/arm/boot/dts/exynos5420.dtsi
->>> b/arch/arm/boot/dts/exynos5420.dtsi
->>> index 8db792b..b503e96 100644
->>> --- a/arch/arm/boot/dts/exynos5420.dtsi
->>> +++ b/arch/arm/boot/dts/exynos5420.dtsi
->>> @@ -652,4 +652,14 @@
->>>           clocks =<&clock 319>,<&clock 318>;
->>>           clock-names = "tmu_apbif", "tmu_triminfo_apbif";
->>>       };
->>> +
->>> +    sss@10830000 {
->>> +        compatible = "samsung,exynos4210-secss";
->>> +        reg =<0x10830000 0x10000>;
->>> +        interrupts =<0 112 0>;
->>> +        clocks =<&clock 471>;
->>> +        clock-names = "secss";
->>> +        samsung,power-domain =<&g2d_pd>;
->>> +    };
->>> +
->>>   };
->>
->>
->> Applied, thanks.
->>
->> BTW, I think the numbering is strange...maybe I missed something?
->> [PATCH 5/5], [PATCH 5/6 V2], [PATCH 6/8 V3] and this [PATCH 6/9 V6]
->
->
-> I would wait with applying any patches from this series until they are acked
-> by crypto subsystem maintainer and DT bindings by DT maintainers.
->
-> I'd like Naveen to resend this series in separate thread, with proper
-> message threading, so we can make sure that we are not missing anything.
-> Naveen, please also add
-Sure, i will respin the v6 version of this patchset without using the
-In-Reply-To option.
->
-> David S. Miller <davem@davemloft.net>
-I've added David S.Miller for few of the patches, i will cc him for
-all the patches.
->
-> to Cc list, as he is also listed as crypto maintainer in MAINTAINERS file.
->
-> Best regards,
-> Tomasz
-Sure, thanks Tomasz.
+This patch set
+1. Adds device tree support to the s5p-sss.c driver and Documentation
+2. Adds code to support SSS module on Exynos4 and 5 SoCs
+3. Adds device tree node to Exynos5250 and Exynos5420
+4. Adds variant struct to handle the differences in SSS modules
+5. Adds clk_prepare/clk_unprepare clocks to the s5p-sss.c driver
 
+Note: Compatible "exynos4210-secss" should work for Exynos4412 and
+      Exynos5260 (Exynos5260, for which ARCH code is under review)
+I couldn't test on Exynos4412 and Exynos4210 boards, Should be able to
+test with addition of DT node and clocks support.
 
+Naveen Krishna Ch (7): [crypto-2.6.git]
+  crypto:s5p-sss: Use platform_get_irq() instead of _byname()
+  crypto:s5p-sss: Kconfig: Let Exynos SoCs select SSS driver
+  crypto:s5p-sss: Look for the next request in the queue
+  crypto:s5p-sss: Add device tree support
+  crypto:s5p-sss: Add support for SSS module on Exynos
+  crypto:s5p-sss: validate iv before memcpy
+  crypto:s5p-sss: Use clk_prepare/clk_unprepare
+
+Naveen Krishna Chatradhi (1): [samsung-clk.git]
+  clk: samsung exynos5250/5420: Add gate clock for SSS module
+
+Naveen Krishna Chatradhi (1): [linuxsamsung.git]
+  ARM: dts: exynos5250/5420: add dt node for sss module
+
+ .../devicetree/bindings/clock/exynos5250-clock.txt |    1 +
+ .../devicetree/bindings/crypto/samsung-sss.txt     |   35 +++++
+ arch/arm/boot/dts/exynos5250.dtsi                  |    8 ++
+ arch/arm/boot/dts/exynos5420.dtsi                  |    9 ++
+ drivers/clk/samsung/clk-exynos5250.c               |    1 +
+ drivers/clk/samsung/clk-exynos5420.c               |    4 +
+ drivers/crypto/Kconfig                             |    6 +-
+ drivers/crypto/s5p-sss.c                           |  145 +++++++++++++++-----
+ include/dt-bindings/clock/exynos5250.h             |    1 +
+ 9 files changed, 174 insertions(+), 36 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/samsung-sss.txt
 
 -- 
-Shine bright,
-(: Nav :)
+1.7.9.5
