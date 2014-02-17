@@ -1,8 +1,8 @@
 From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 4/9 v7] crypto:s5p-sss: Kconfig: Let Exynos SoCs select SSS
- driver
-Date: Mon, 17 Feb 2014 15:14:30 +0530
-Message-ID: <1392630275-8667-5-git-send-email-ch.naveen@samsung.com>
+Subject: [PATCH 1/9 v7] crypto:s5p-sss: Use platform_get_irq() instead of
+ _byname()
+Date: Mon, 17 Feb 2014 15:14:27 +0530
+Message-ID: <1392630275-8667-2-git-send-email-ch.naveen@samsung.com>
 References: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com>
 Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
 	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
@@ -16,9 +16,14 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Naveen Krishna Ch <ch.naveen@samsung.com>
 
-This patch modifies Kconfig such that ARCH_EXYNOS SoCs
-which includes (Exynos4210, Exynos5250 and Exynos5420)
-can also select Samsung SSS(Security SubSystem) driver.
+This patch uses the platform_get_irq() instead of the
+platform_get_irq_byname(). Making feeder control interrupt
+as resource "0" and hash interrupt as "1".
+
+reasons for this change.
+1. Cannot find any Arch which is currently using this driver
+2. Samsung Exynos4 and 5 SoCs only use the feeder control interrupt
+3. Patches adding support for DT and H/W version are in pipeline
 
 Signed-off-by: Naveen Krishna Ch <ch.naveen@samsung.com>
 Reviewed-by: Tomasz Figa <t.figa@samsung.com>
@@ -28,36 +33,59 @@ CC: Vladimir Zapolskiy <vzapolskiy@gmail.com>
 TO: <linux-crypto@vger.kernel.org>
 CC: <linux-samsung-soc@vger.kernel.org>
 ---
-Change since v6:
+Changes since v6:
+None
+Changes since v5:
 None
 
-Change since v5:
-None
+ drivers/crypto/s5p-sss.c |   24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
- drivers/crypto/Kconfig |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 13857f5..e866489 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -290,14 +290,14 @@ config CRYPTO_DEV_SAHARA
- 	  found in some Freescale i.MX chips.
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index cf149b1..93cddeb 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -592,29 +592,29 @@ static int s5p_aes_probe(struct platform_device *pdev)
+ 	pdata->ioaddr = devm_ioremap(dev, res->start,
+ 				     resource_size(res));
  
- config CRYPTO_DEV_S5P
--	tristate "Support for Samsung S5PV210 crypto accelerator"
--	depends on ARCH_S5PV210
-+	tristate "Support for Samsung S5PV210/Exynos crypto accelerator"
-+	depends on ARCH_S5PV210 || ARCH_EXYNOS
- 	select CRYPTO_AES
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_BLKCIPHER
- 	help
- 	  This option allows you to have support for S5P crypto acceleration.
--	  Select this to offload Samsung S5PV210 or S5PC110 from AES
-+	  Select this to offload Samsung S5PV210 or S5PC110, Exynos from AES
- 	  algorithms execution.
+-	pdata->irq_hash = platform_get_irq_byname(pdev, "hash");
+-	if (pdata->irq_hash < 0) {
+-		err = pdata->irq_hash;
+-		dev_warn(dev, "hash interrupt is not available.\n");
++	pdata->irq_fc = platform_get_irq(pdev, 0);
++	if (pdata->irq_fc < 0) {
++		err = pdata->irq_fc;
++		dev_warn(dev, "feed control interrupt is not available.\n");
+ 		goto err_irq;
+ 	}
+-	err = devm_request_irq(dev, pdata->irq_hash, s5p_aes_interrupt,
++	err = devm_request_irq(dev, pdata->irq_fc, s5p_aes_interrupt,
+ 			       IRQF_SHARED, pdev->name, pdev);
+ 	if (err < 0) {
+-		dev_warn(dev, "hash interrupt is not available.\n");
++		dev_warn(dev, "feed control interrupt is not available.\n");
+ 		goto err_irq;
+ 	}
  
- config CRYPTO_DEV_TEGRA_AES
+-	pdata->irq_fc = platform_get_irq_byname(pdev, "feed control");
+-	if (pdata->irq_fc < 0) {
+-		err = pdata->irq_fc;
+-		dev_warn(dev, "feed control interrupt is not available.\n");
++	pdata->irq_hash = platform_get_irq(pdev, 1);
++	if (pdata->irq_hash < 0) {
++		err = pdata->irq_hash;
++		dev_warn(dev, "hash interrupt is not available.\n");
+ 		goto err_irq;
+ 	}
+-	err = devm_request_irq(dev, pdata->irq_fc, s5p_aes_interrupt,
++	err = devm_request_irq(dev, pdata->irq_hash, s5p_aes_interrupt,
+ 			       IRQF_SHARED, pdev->name, pdev);
+ 	if (err < 0) {
+-		dev_warn(dev, "feed control interrupt is not available.\n");
++		dev_warn(dev, "hash interrupt is not available.\n");
+ 		goto err_irq;
+ 	}
+ 
 -- 
 1.7.9.5
