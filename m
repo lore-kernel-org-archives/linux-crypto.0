@@ -1,69 +1,69 @@
-From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 6/9 v7] ARM: dts: exynos5250/5420: add dt node for sss module
-Date: Mon, 17 Feb 2014 15:14:32 +0530
-Message-ID: <1392630275-8667-7-git-send-email-ch.naveen@samsung.com>
-References: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com>
-Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
-	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
-	cpgs@samsung.com, davem@davemloft.net,
-	Kukjin Kim <kgene.kim@samsung.com>
-To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: [PATCH] crypto: Add soft module dependency to load HW
+ accelerated crypto modules
+Date: Mon, 17 Feb 2014 07:08:06 -0500
+Message-ID: <20140217120806.GA17382@hmsreliant.think-freely.org>
+References: <1392405277.27116.72.camel@schen9-DESK>
+ <20140215012314.GA28843@gondor.apana.org.au>
+ <1392429666.27116.93.camel@schen9-DESK>
+ <20140215234122.GA3401@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Tim Chen <tim.c.chen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:47755 "EHLO
+	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750929AbaBQMIZ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 17 Feb 2014 07:08:25 -0500
+Content-Disposition: inline
+In-Reply-To: <20140215234122.GA3401@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds the device tree node for SSS module
-found on Exynos5420 and Exynos5250
+On Sun, Feb 16, 2014 at 07:41:23AM +0800, Herbert Xu wrote:
+> On Fri, Feb 14, 2014 at 06:01:06PM -0800, Tim Chen wrote:
+> > 
+> > Module A selects CRYPTO_ALG_B in config, which causes the generic
+> > ALG_B to get built and a module dependency to the generic
+> > ALG_B to be established.  Then when module A loads,
+> 
+> No, if you select ALG_B then yes it'll get built but it certainly
+> won't establish a module dependency on ALG_B.  Only a softdep could
+> create such a dependency.
+> 
+My understanding was that the soft dependencies were there to work exactly at
+the softdep directive was in modprobe.conf.  That it to say, "Module B would
+like to have Module A installed, but it won't be fatal if it can't be done".
+The more correct example I've seen thus far has been the crct10dif crc
+algorithm for x86.  In lib/crc-t10dif we have a crc-t10dif function which makes
+use of the generic crc_t10dif_generic function defined in crct10dif_common.c.
+However, x86 has an accelerated version of the function defined in the
+crct10dif-pcmul module (thats aliased to crct10dif).  So the library funcion in
+the kernel lists crct10dif as a soft dependency and modprobe tries to load it,
+but just carries on if it fails.
 
-Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Reviewed-by: Tomasz Figa <t.figa@samsung.com>
-TO: <linux-samsung-soc@vger.kernel.org>
-CC: David S. Miller <davem@davemloft.net>
-CC: Kukjin Kim <kgene.kim@samsung.com>
-CC: <linux-crypto@vger.kernel.org>
----
-Changes since v6:
-None
+Although as I write that, several things confuse me.  When are module
+dependencies meant to be satisfied on behalf of the monolithic kernel, where
+that dependecy is defined?  I'm guessing right before the init routine is
+called for that code, but I'm not sure.  Also, I'm a bit confused by Marco and
+Lukas' statement about how they see soft dependencies working.  I'm not sure
+where the requirement to recognize soft dependencies comes from in depmod.
 
- arch/arm/boot/dts/exynos5250.dtsi |    8 ++++++++
- arch/arm/boot/dts/exynos5420.dtsi |    9 +++++++++
- 2 files changed, 17 insertions(+)
+Regards
+Neil
 
-diff --git a/arch/arm/boot/dts/exynos5250.dtsi b/arch/arm/boot/dts/exynos5250.dtsi
-index a76a189..13b748f 100644
---- a/arch/arm/boot/dts/exynos5250.dtsi
-+++ b/arch/arm/boot/dts/exynos5250.dtsi
-@@ -715,4 +715,12 @@
- 		io-channel-ranges;
- 		status = "disabled";
- 	};
-+
-+	sss@10830000 {
-+		compatible = "samsung,exynos4210-secss";
-+		reg = <0x10830000 0x10000>;
-+		interrupts = <0 112 0>;
-+		clocks = <&clock 348>;
-+		clock-names = "secss";
-+	};
- };
-diff --git a/arch/arm/boot/dts/exynos5420.dtsi b/arch/arm/boot/dts/exynos5420.dtsi
-index 9c834cc..b4ce625 100644
---- a/arch/arm/boot/dts/exynos5420.dtsi
-+++ b/arch/arm/boot/dts/exynos5420.dtsi
-@@ -666,4 +666,13 @@
- 		clock-names = "watchdog";
- 		samsung,syscon-phandle = <&pmu_system_controller>;
-         };
-+
-+	sss@10830000 {
-+		compatible = "samsung,exynos4210-secss";
-+		reg = <0x10830000 0x10000>;
-+		interrupts = <0 112 0>;
-+		clocks = <&clock 471>;
-+		clock-names = "secss";
-+		samsung,power-domain = <&g2d_pd>;
-+	};
- };
--- 
-1.7.9.5
+> Cheers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
