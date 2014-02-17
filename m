@@ -1,73 +1,98 @@
 From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 8/9 v7] crypto:s5p-sss: Use clk_prepare/clk_unprepare
-Date: Mon, 17 Feb 2014 15:14:34 +0530
-Message-ID: <1392630275-8667-9-git-send-email-ch.naveen@samsung.com>
+Subject: [PATCH 5/9 v7] clk: samsung exynos5250/5420: Add gate clock for SSS
+ module
+Date: Mon, 17 Feb 2014 15:14:31 +0530
+Message-ID: <1392630275-8667-6-git-send-email-ch.naveen@samsung.com>
 References: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com>
 Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
 	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
-	cpgs@samsung.com, davem@davemloft.net
+	cpgs@samsung.com, davem@davemloft.net,
+	Kukjin Kim <kgene.kim@samsung.com>
 To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout4.samsung.com ([203.254.224.34]:29241 "EHLO
-	mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752910AbaBQJp0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Feb 2014 04:45:26 -0500
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-reply-to: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch set adds use of clk_prepare/clk_unprepare as
-required by generic clock framework.
+This patch adds gating clock for SSS(Security SubSystem)
+module on Exynos5250/5420.
 
 Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
 Reviewed-by: Tomasz Figa <t.figa@samsung.com>
+TO: <linux-samsung-soc@vger.kernel.org>
+TO: Tomasz Figa <t.figa@samsung.com>
 CC: David S. Miller <davem@davemloft.net>
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Vladimir Zapolskiy <vzapolskiy@gmail.com>
-TO: <linux-crypto@vger.kernel.org>
-CC: <linux-samsung-soc@vger.kernel.org>
+CC: Kukjin Kim <kgene.kim@samsung.com>
+CC: <linux-crypto@vger.kernel.org>
 ---
-Changes since v6:
+changes since v6:
 None
+changes since v5:
+1. Added Reviewed-by: Tomasz Figa <t.figa@samsung.com>
 
- drivers/crypto/s5p-sss.c |   10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ .../devicetree/bindings/clock/exynos5250-clock.txt |    1 +
+ drivers/clk/samsung/clk-exynos5250.c               |    1 +
+ drivers/clk/samsung/clk-exynos5420.c               |    4 ++++
+ include/dt-bindings/clock/exynos5250.h             |    1 +
+ 4 files changed, 7 insertions(+)
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 7da1da4..429b4c1 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -648,7 +648,11 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 		return -ENOENT;
- 	}
+diff --git a/Documentation/devicetree/bindings/clock/exynos5250-clock.txt b/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
+index 72ce617..87f1539 100644
+--- a/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
++++ b/Documentation/devicetree/bindings/clock/exynos5250-clock.txt
+@@ -162,6 +162,7 @@ clock which they consume.
+   g2d			345
+   mdma0			346
+   smmu_mdma0		347
++  sss			348
  
--	clk_enable(pdata->clk);
-+	err = clk_prepare_enable(pdata->clk);
-+	if (err < 0) {
-+		dev_err(dev, "Enabling SSS clk failed, err %d\n", err);
-+		return err;
-+	}
  
- 	spin_lock_init(&pdata->lock);
- 	pdata->ioaddr = devm_ioremap(dev, res->start,
-@@ -711,7 +715,7 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 	tasklet_kill(&pdata->tasklet);
+    [Clock Muxes]
+diff --git a/drivers/clk/samsung/clk-exynos5250.c b/drivers/clk/samsung/clk-exynos5250.c
+index e7ee442..d1d16cf 100644
+--- a/drivers/clk/samsung/clk-exynos5250.c
++++ b/drivers/clk/samsung/clk-exynos5250.c
+@@ -428,6 +428,7 @@ static struct samsung_gate_clock exynos5250_gate_clks[] __initdata = {
+ 	 * CMU_ACP
+ 	 */
+ 	GATE(CLK_MDMA0, "mdma0", "div_aclk266", GATE_IP_ACP, 1, 0, 0),
++	GATE(CLK_SSS, "sss", "div_aclk266", GATE_IP_ACP, 2, 0, 0),
+ 	GATE(CLK_G2D, "g2d", "div_aclk200", GATE_IP_ACP, 3, 0, 0),
+ 	GATE(CLK_SMMU_MDMA0, "smmu_mdma0", "div_aclk266", GATE_IP_ACP, 5, 0, 0),
  
-  err_irq:
--	clk_disable(pdata->clk);
-+	clk_disable_unprepare(pdata->clk);
+diff --git a/drivers/clk/samsung/clk-exynos5420.c b/drivers/clk/samsung/clk-exynos5420.c
+index 60b2681..35311e1 100644
+--- a/drivers/clk/samsung/clk-exynos5420.c
++++ b/drivers/clk/samsung/clk-exynos5420.c
+@@ -27,6 +27,7 @@
+ #define DIV_CPU1		0x504
+ #define GATE_BUS_CPU		0x700
+ #define GATE_SCLK_CPU		0x800
++#define GATE_IP_G2D		0x8800
+ #define CPLL_LOCK		0x10020
+ #define DPLL_LOCK		0x10030
+ #define EPLL_LOCK		0x10040
+@@ -743,6 +744,9 @@ static struct samsung_gate_clock exynos5420_gate_clks[] __initdata = {
+ 		0),
+ 	GATE(CLK_SMMU_MIXER, "smmu_mixer", "aclk200_disp1", GATE_IP_DISP1, 9, 0,
+ 		0),
++
++	/* SSS */
++	GATE(CLK_SSS, "sss", "aclk266_g2d", GATE_IP_G2D, 2, 0, 0),
+ };
  
- 	s5p_dev = NULL;
+ static struct samsung_pll_clock exynos5420_plls[nr_plls] __initdata = {
+diff --git a/include/dt-bindings/clock/exynos5250.h b/include/dt-bindings/clock/exynos5250.h
+index 922f2dc..f9b452b 100644
+--- a/include/dt-bindings/clock/exynos5250.h
++++ b/include/dt-bindings/clock/exynos5250.h
+@@ -150,6 +150,7 @@
+ #define CLK_G2D			345
+ #define CLK_MDMA0		346
+ #define CLK_SMMU_MDMA0		347
++#define CLK_SSS			348
  
-@@ -731,7 +735,7 @@ static int s5p_aes_remove(struct platform_device *pdev)
- 
- 	tasklet_kill(&pdata->tasklet);
- 
--	clk_disable(pdata->clk);
-+	clk_disable_unprepare(pdata->clk);
- 
- 	s5p_dev = NULL;
- 
+ /* mux clocks */
+ #define CLK_MOUT_HDMI		1024
 -- 
 1.7.9.5
