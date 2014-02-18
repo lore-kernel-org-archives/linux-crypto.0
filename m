@@ -1,69 +1,33 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH] crypto: Add soft module dependency to load HW
- accelerated crypto modules
-Date: Mon, 17 Feb 2014 07:08:06 -0500
-Message-ID: <20140217120806.GA17382@hmsreliant.think-freely.org>
-References: <1392405277.27116.72.camel@schen9-DESK>
- <20140215012314.GA28843@gondor.apana.org.au>
- <1392429666.27116.93.camel@schen9-DESK>
- <20140215234122.GA3401@gondor.apana.org.au>
-Mime-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+Subject: Support for ECDH P-192 and P-256
+Date: Mon, 17 Feb 2014 23:41:07 -0800
+Message-ID: <88CA6BC5-E6E7-43C3-8A2A-829D27E76CE8@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
 Content-Type: text/plain; charset=us-ascii
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Transfer-Encoding: 8BIT
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:47755 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750929AbaBQMIZ (ORCPT
+Received: from senator.holtmann.net ([87.106.208.187]:55062 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754289AbaBRHlT convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Feb 2014 07:08:25 -0500
-Content-Disposition: inline
-In-Reply-To: <20140215234122.GA3401@gondor.apana.org.au>
+	Tue, 18 Feb 2014 02:41:19 -0500
+Received: from [192.168.1.107] (S010620c9d099deff.vc.shawcable.net [24.84.124.211])
+	by mail.holtmann.org (Postfix) with ESMTPSA id 02AF28B30E
+	for <linux-crypto@vger.kernel.org>; Tue, 18 Feb 2014 08:41:11 +0100 (CET)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Feb 16, 2014 at 07:41:23AM +0800, Herbert Xu wrote:
-> On Fri, Feb 14, 2014 at 06:01:06PM -0800, Tim Chen wrote:
-> > 
-> > Module A selects CRYPTO_ALG_B in config, which causes the generic
-> > ALG_B to get built and a module dependency to the generic
-> > ALG_B to be established.  Then when module A loads,
-> 
-> No, if you select ALG_B then yes it'll get built but it certainly
-> won't establish a module dependency on ALG_B.  Only a softdep could
-> create such a dependency.
-> 
-My understanding was that the soft dependencies were there to work exactly at
-the softdep directive was in modprobe.conf.  That it to say, "Module B would
-like to have Module A installed, but it won't be fatal if it can't be done".
-The more correct example I've seen thus far has been the crct10dif crc
-algorithm for x86.  In lib/crc-t10dif we have a crc-t10dif function which makes
-use of the generic crc_t10dif_generic function defined in crct10dif_common.c.
-However, x86 has an accelerated version of the function defined in the
-crct10dif-pcmul module (thats aliased to crct10dif).  So the library funcion in
-the kernel lists crct10dif as a soft dependency and modprobe tries to load it,
-but just carries on if it fails.
+Hello,
 
-Although as I write that, several things confuse me.  When are module
-dependencies meant to be satisfied on behalf of the monolithic kernel, where
-that dependecy is defined?  I'm guessing right before the init routine is
-called for that code, but I'm not sure.  Also, I'm a bit confused by Marco and
-Lukas' statement about how they see soft dependencies working.  I'm not sure
-where the requirement to recognize soft dependencies comes from in depmod.
+we are looking at adding support for Bluetooth Secure Connections to the Security Manager of the Bluetooth subsystem. For that we would need support for ECDH P-256 and eventually also P-192.
+
+Right now we are bit lost on how this could be achieved best. I saw that the symmetric_keys feature has support for public_keys, but as far as I can tell that requires that userspace loads the public keys into the kernel and the private keys stay in userspace.
+
+What we need is to generate private/public key pairs using elliptic curve with P-192 and P-256. We only need the private/public key pair for the Bluetooth pairing. After successful pairing, we derive link keys or long term keys and we can throw the private/public key pair away. Any further authentication between Bluetooth devices is done via their link keys or long term keys.
+
+Has anybody looked into extending the kernel crypto framework to support ECDH P-192 and P-256. If nobody has, what are the best starting points to do so.
 
 Regards
-Neil
 
-> Cheers,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+Marcel
