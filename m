@@ -1,44 +1,47 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] crypto: caam - writel() arguments are swapped
-Date: Fri, 21 Feb 2014 11:51:31 +0300
-Message-ID: <20140221085131.GB13078@elgon.mountain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Alex Porosanu <alexandru.porosanu@freescale.com>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	Vakul Garg <vakul@freescale.com>,
-	Andy Fleming <afleming@freescale.com>,
-	linux-crypto@vger.kernel.org, Steve Cornelius <sec@pobox.com>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	kernel-janitors@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Content-Disposition: inline
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Alexander Shiyan <shc_work@mail.ru>
+Subject: [PATCH 2/2] crypto: sahara: Use return value of devm_request_irq() on error
+Date: Sat, 22 Feb 2014 16:55:35 +0400
+Message-ID: <1393073735-16092-2-git-send-email-shc_work@mail.ru>
+References: <1393073735-16092-1-git-send-email-shc_work@mail.ru>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Shawn Guo <shawn.guo@linaro.org>,
+	Sascha Hauer <kernel@pengutronix.de>,
+	Alexander Shiyan <shc_work@mail.ru>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from fallback7.mail.ru ([94.100.176.135]:47638 "EHLO
+	fallback7.mail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750737AbaBVM4B (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 22 Feb 2014 07:56:01 -0500
+In-Reply-To: <1393073735-16092-1-git-send-email-shc_work@mail.ru>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-My guess is that this little endian configuration is never found in real
-life, but if it were then the writel() arguments are in the wrong order
-so the driver would crash immediately.
-
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Alexander Shiyan <shc_work@mail.ru>
 ---
-I can't compile this code.
+ drivers/crypto/sahara.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index d50174f45b21..cbde8b95a6f8 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -74,10 +74,10 @@
- #endif
- #else
- #ifdef __LITTLE_ENDIAN
--#define wr_reg32(reg, data) __raw_writel(reg, data)
-+#define wr_reg32(reg, data) __raw_writel(data, reg)
- #define rd_reg32(reg) __raw_readl(reg)
- #ifdef CONFIG_64BIT
--#define wr_reg64(reg, data) __raw_writeq(reg, data)
-+#define wr_reg64(reg, data) __raw_writeq(data, reg)
- #define rd_reg64(reg) __raw_readq(reg)
- #endif
- #endif
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index 894468f..07a5987 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -896,10 +896,11 @@ static int sahara_probe(struct platform_device *pdev)
+ 		return irq;
+ 	}
+ 
+-	if (devm_request_irq(&pdev->dev, irq, sahara_irq_handler,
+-		0, SAHARA_NAME, dev) < 0) {
++	err = devm_request_irq(&pdev->dev, irq, sahara_irq_handler,
++			       0, dev_name(&pdev->dev), dev);
++	if (err) {
+ 		dev_err(&pdev->dev, "failed to request irq\n");
+-		return -ENOENT;
++		return err;
+ 	}
+ 
+ 	/* clocks */
+-- 
+1.8.3.2
