@@ -1,39 +1,41 @@
 From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH 0/3] crypto: ccp - minor code fixes
-Date: Mon, 24 Feb 2014 08:41:56 -0600
-Message-ID: <20140224144156.16181.81272.stgit@tlendack-t1.amdoffice.net>
+Subject: [PATCH 1/3] crypto: ccp - Prevent a possible lost CCP command request
+Date: Mon, 24 Feb 2014 08:42:02 -0600
+Message-ID: <20140224144202.16181.68619.stgit@tlendack-t1.amdoffice.net>
+References: <20140224144156.16181.81272.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Cc: <linux-kernel@vger.kernel.org>
 To: <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
 	<davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from am1ehsobe002.messaging.microsoft.com ([213.199.154.205]:40979
-	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752473AbaBXOmF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Feb 2014 09:42:05 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20140224144156.16181.81272.stgit@tlendack-t1.amdoffice.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The following series implements some fixes to some code paths executed
-during crypto API request processing.  These fixes address processing of
-requests when the CCP driver returns -EBUSY and freeing memory in error
-paths.
+If a CCP command has been queued for processing at the
+crypto layer then, when dequeueing it for processing, the
+"can backlog" flag must be set so that the request isn't
+lost if the CCP backlog queue limit is reached.
 
-This patch series is based on the cryptodev-2.6 kernel tree.
-
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
+ drivers/crypto/ccp/ccp-crypto-main.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-Tom Lendacky (3):
-      crypto: ccp - Prevent a possible lost CCP command request
-      crypto: ccp - Invoke context callback when there is a backlog error
-      crypto: ccp - Account for CCP backlog processing
-
-
- drivers/crypto/ccp/ccp-crypto-main.c |   25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
-
--- 
-Tom Lendacky
+diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+index 010fded..9d30d6f 100644
+--- a/drivers/crypto/ccp/ccp-crypto-main.c
++++ b/drivers/crypto/ccp/ccp-crypto-main.c
+@@ -174,6 +174,10 @@ static void ccp_crypto_complete(void *data, int err)
+ 
+ 	/* Submit the next cmd */
+ 	while (held) {
++		/* Since we have already queued the cmd, we must indicate that
++		 * we can backlog so as not to "lose" this request.
++		 */
++		held->cmd->flags |= CCP_CMD_MAY_BACKLOG;
+ 		ret = ccp_enqueue_cmd(held->cmd);
+ 		if (ccp_crypto_success(ret))
+ 			break;
