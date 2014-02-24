@@ -1,59 +1,39 @@
-From: Alexander Shiyan <shc_work@mail.ru>
-Subject: [PATCH 1/2] crypto: sahara: Use devm_ioremap_resource()
-Date: Sat, 22 Feb 2014 16:55:34 +0400
-Message-ID: <1393073735-16092-1-git-send-email-shc_work@mail.ru>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Shawn Guo <shawn.guo@linaro.org>,
-	Sascha Hauer <kernel@pengutronix.de>,
-	Alexander Shiyan <shc_work@mail.ru>
-To: linux-crypto@vger.kernel.org
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [PATCH 0/3] crypto: ccp - minor code fixes
+Date: Mon, 24 Feb 2014 08:41:56 -0600
+Message-ID: <20140224144156.16181.81272.stgit@tlendack-t1.amdoffice.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-kernel@vger.kernel.org>
+To: <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fallback3.mail.ru ([94.100.176.58]:40354 "EHLO
-	fallback3.mail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750737AbaBVM4H (ORCPT
+Received: from am1ehsobe002.messaging.microsoft.com ([213.199.154.205]:40979
+	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752473AbaBXOmF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 22 Feb 2014 07:56:07 -0500
+	Mon, 24 Feb 2014 09:42:05 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use devm_ioremap_resource() in order to make the code simpler and
-it gives proper codes on errors.
+The following series implements some fixes to some code paths executed
+during crypto API request processing.  These fixes address processing of
+requests when the CCP driver returns -EBUSY and freeing memory in error
+paths.
 
-Signed-off-by: Alexander Shiyan <shc_work@mail.ru>
+This patch series is based on the cryptodev-2.6 kernel tree.
+
 ---
- drivers/crypto/sahara.c | 19 +++----------------
- 1 file changed, 3 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-index 785a9de..894468f 100644
---- a/drivers/crypto/sahara.c
-+++ b/drivers/crypto/sahara.c
-@@ -885,22 +885,9 @@ static int sahara_probe(struct platform_device *pdev)
- 
- 	/* Get the base address */
- 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	if (!res) {
--		dev_err(&pdev->dev, "failed to get memory region resource\n");
--		return -ENODEV;
--	}
--
--	if (devm_request_mem_region(&pdev->dev, res->start,
--			resource_size(res), SAHARA_NAME) == NULL) {
--		dev_err(&pdev->dev, "failed to request memory region\n");
--		return -ENOENT;
--	}
--	dev->regs_base = devm_ioremap(&pdev->dev, res->start,
--				      resource_size(res));
--	if (!dev->regs_base) {
--		dev_err(&pdev->dev, "failed to ioremap address region\n");
--		return -ENOENT;
--	}
-+	dev->regs_base = devm_ioremap_resource(&pdev->dev, res);
-+	if (IS_ERR(dev->regs_base))
-+		return PTR_ERR(dev->regs_base);
- 
- 	/* Get the IRQ */
- 	irq = platform_get_irq(pdev,  0);
+Tom Lendacky (3):
+      crypto: ccp - Prevent a possible lost CCP command request
+      crypto: ccp - Invoke context callback when there is a backlog error
+      crypto: ccp - Account for CCP backlog processing
+
+
+ drivers/crypto/ccp/ccp-crypto-main.c |   25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
+
 -- 
-1.8.3.2
+Tom Lendacky
