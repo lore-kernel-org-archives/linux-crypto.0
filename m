@@ -1,34 +1,50 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH] crypto: tegra: remove driver
-Date: Tue, 25 Feb 2014 20:18:47 +0800
-Message-ID: <20140225121846.GH12216@gondor.apana.org.au>
-References: <1392759778-13904-1-git-send-email-swarren@wwwdotorg.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [patch] crypto: caam - writel() arguments are swapped
+Date: Tue, 25 Feb 2014 20:18:58 +0800
+Message-ID: <20140225121857.GI12216@gondor.apana.org.au>
+References: <20140221085131.GB13078@elgon.mountain>
+ <20140224184142.b8d3a2cfb35dfe5f31d332ee@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>,
-	Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-To: Stephen Warren <swarren-3lzwWm7+Weoh9ZMKESR00Q@public.gmane.org>
-Return-path: <linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Dan Carpenter <dan.carpenter@oracle.com>,
+	Alex Porosanu <alexandru.porosanu@freescale.com>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>,
+	Vakul Garg <vakul@freescale.com>, linux-crypto@vger.kernel.org,
+	Steve Cornelius <sec@pobox.com>,
+	kernel-janitors@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:53512 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752541AbaBYMTQ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Feb 2014 07:19:16 -0500
 Content-Disposition: inline
-In-Reply-To: <1392759778-13904-1-git-send-email-swarren-3lzwWm7+Weoh9ZMKESR00Q@public.gmane.org>
-Sender: linux-tegra-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20140224184142.b8d3a2cfb35dfe5f31d332ee@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 18, 2014 at 02:42:57PM -0700, Stephen Warren wrote:
-> From: Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+On Mon, Feb 24, 2014 at 06:41:42PM -0600, Kim Phillips wrote:
+> On Fri, 21 Feb 2014 11:51:31 +0300
+> Dan Carpenter <dan.carpenter@oracle.com> wrote:
 > 
-> This driver has never been hooked up in any board file, and cannot be
-> instantiated via device tree. I've been told that, at least on Tegra20,
-> the HW is slower at crypto than the main CPU. I have no test-case for
-> it. Hence, remove it.
+> > My guess is that this little endian configuration is never found in real
+> > life, 
 > 
-> Cc: Varun Wadekar <vwadekar-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Stephen Warren <swarren-DDmLM1+adcrQT0dZR+AlfA@public.gmane.org>
+> it is, but the code has not been upstreamed.  Steve?
+> 
+> > but if it were then the writel() arguments are in the wrong order
+> > so the driver would crash immediately.
+> > 
+> > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> > ---
+> 
+> Meanwhile:
+> 
+> Acked-by: Kim Phillips <kim.phillips@freescale.com>
 
 Patch applied.
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
