@@ -1,44 +1,52 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [patch] crypto: caam - writel() arguments are swapped
-Date: Mon, 24 Feb 2014 18:41:42 -0600
-Message-ID: <20140224184142.b8d3a2cfb35dfe5f31d332ee@freescale.com>
-References: <20140221085131.GB13078@elgon.mountain>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/9 v7] crypto:s5p-sss: Add DT and Exynos support
+Date: Tue, 25 Feb 2014 14:16:31 +0800
+Message-ID: <20140225061630.GA9934@gondor.apana.org.au>
+References: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Alex Porosanu <alexandru.porosanu@freescale.com>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	Vakul Garg <vakul@freescale.com>,
-	<linux-crypto@vger.kernel.org>, Steve Cornelius <sec@pobox.com>,
-	<kernel-janitors@vger.kernel.org>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from va3ehsobe010.messaging.microsoft.com ([216.32.180.30]:30682
-	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751489AbaBYAq7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Feb 2014 19:46:59 -0500
-In-Reply-To: <20140221085131.GB13078@elgon.mountain>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
+	naveenkrishna.ch@gmail.com, cpgs@samsung.com, davem@davemloft.net
+To: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, 21 Feb 2014 11:51:31 +0300
-Dan Carpenter <dan.carpenter@oracle.com> wrote:
-
-> My guess is that this little endian configuration is never found in real
-> life, 
-
-it is, but the code has not been upstreamed.  Steve?
-
-> but if it were then the writel() arguments are in the wrong order
-> so the driver would crash immediately.
+On Mon, Feb 17, 2014 at 03:14:26PM +0530, Naveen Krishna Chatradhi wrote:
+> SSS module on Exynos4210, Exynos5250 and Exynos5420 SoCs has added
+> features to the one on S5PV210. However with minor changes the s5p-sss.c
+> driver can be reused to support SSS modules on Exynos4 and 5 SoCs.
 > 
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
+> This patch set
+> 1. Adds device tree support to the s5p-sss.c driver and Documentation
+> 2. Adds code to support SSS module on Exynos4 and 5 SoCs
+> 3. Adds device tree node to Exynos5250 and Exynos5420
+> 4. Adds variant struct to handle the differences in SSS modules
+> 5. Adds clk_prepare/clk_unprepare clocks to the s5p-sss.c driver
+> 
+> Note: Compatible "exynos4210-secss" should work for Exynos4412 and
+>       Exynos5260 (Exynos5260, for which ARCH code is under review)
+> I couldn't test on Exynos4412 and Exynos4210 boards, Should be able to
+> test with addition of DT node and clocks support.
+> 
+> Naveen Krishna Ch (7): [crypto-2.6.git]
+>   crypto:s5p-sss: Use platform_get_irq() instead of _byname()
+>   crypto:s5p-sss: Kconfig: Let Exynos SoCs select SSS driver
+>   crypto:s5p-sss: Look for the next request in the queue
+>   crypto:s5p-sss: Add device tree support
+>   crypto:s5p-sss: Add support for SSS module on Exynos
+>   crypto:s5p-sss: validate iv before memcpy
+>   crypto:s5p-sss: Use clk_prepare/clk_unprepare
 
-Meanwhile:
+FWIW these patches are fine by me.
 
-Acked-by: Kim Phillips <kim.phillips@freescale.com>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Kim
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
