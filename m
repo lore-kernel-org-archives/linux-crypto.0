@@ -1,41 +1,44 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH 2/3] crypto: ccp - Invoke context callback when there is a
- backlog error
-Date: Mon, 24 Feb 2014 08:42:08 -0600
-Message-ID: <20140224144208.16181.98860.stgit@tlendack-t1.amdoffice.net>
-References: <20140224144156.16181.81272.stgit@tlendack-t1.amdoffice.net>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [patch] crypto: caam - writel() arguments are swapped
+Date: Mon, 24 Feb 2014 18:41:42 -0600
+Message-ID: <20140224184142.b8d3a2cfb35dfe5f31d332ee@freescale.com>
+References: <20140221085131.GB13078@elgon.mountain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Cc: <linux-kernel@vger.kernel.org>
-To: <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140224144156.16181.81272.stgit@tlendack-t1.amdoffice.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Alex Porosanu <alexandru.porosanu@freescale.com>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>,
+	Vakul Garg <vakul@freescale.com>,
+	<linux-crypto@vger.kernel.org>, Steve Cornelius <sec@pobox.com>,
+	<kernel-janitors@vger.kernel.org>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from va3ehsobe010.messaging.microsoft.com ([216.32.180.30]:30682
+	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751489AbaBYAq7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 24 Feb 2014 19:46:59 -0500
+In-Reply-To: <20140221085131.GB13078@elgon.mountain>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Invoke the callback routine associated with the crypto context
-if an error is encountered sending the command to the CCP during
-backlog processing.  This is needed to free any resources used
-by the command.
+On Fri, 21 Feb 2014 11:51:31 +0300
+Dan Carpenter <dan.carpenter@oracle.com> wrote:
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- drivers/crypto/ccp/ccp-crypto-main.c |    3 +++
- 1 file changed, 3 insertions(+)
+> My guess is that this little endian configuration is never found in real
+> life, 
 
-diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
-index 9d30d6f..7d98635 100644
---- a/drivers/crypto/ccp/ccp-crypto-main.c
-+++ b/drivers/crypto/ccp/ccp-crypto-main.c
-@@ -183,6 +183,9 @@ static void ccp_crypto_complete(void *data, int err)
- 			break;
- 
- 		/* Error occurred, report it and get the next entry */
-+		ctx = crypto_tfm_ctx(held->req->tfm);
-+		if (ctx->complete)
-+			ret = ctx->complete(held->req, ret);
- 		held->req->complete(held->req, ret);
- 
- 		next = ccp_crypto_cmd_complete(held, &backlog);
+it is, but the code has not been upstreamed.  Steve?
+
+> but if it were then the writel() arguments are in the wrong order
+> so the driver would crash immediately.
+> 
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+
+Meanwhile:
+
+Acked-by: Kim Phillips <kim.phillips@freescale.com>
+
+Kim
