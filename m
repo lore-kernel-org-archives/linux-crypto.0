@@ -1,63 +1,47 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH v2 1/3] crypto: update generic ECB's driver_name to 'ecb_generic'
-Date: Tue, 25 Feb 2014 08:34:18 +0100
-Message-ID: <1393313660-5258-2-git-send-email-ard.biesheuvel@linaro.org>
-References: <1393313660-5258-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC PATCH] arm64: add support for AES in CCM mode using Crypto
+ Extensions
+Date: Tue, 25 Feb 2014 17:08:35 +0800
+Message-ID: <20140225090835.GA11135@gondor.apana.org.au>
+References: <1392106905-28709-1-git-send-email-ard.biesheuvel@linaro.org>
+ <20140225070252.GB9934@gondor.apana.org.au>
+ <CAKv+Gu-HnTk5RCLRoCnae7-HH7C-Tq2YJF57Nc-hOEykdY52XA@mail.gmail.com>
+ <20140225071626.GA10524@gondor.apana.org.au>
+ <CAKv+Gu_A_04P=nOoPfxhJMC3bbEPTcpgZO0Ldw2H4BV7T_gTbw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Will Deacon <will.deacon@arm.com>,
+	Nicolas Pitre <nico@linaro.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f175.google.com ([74.125.82.175]:62799 "EHLO
-	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750707AbaBYHe1 (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:41260 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750708AbaBYJIl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Feb 2014 02:34:27 -0500
-Received: by mail-we0-f175.google.com with SMTP id q59so16612wes.6
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Feb 2014 23:34:26 -0800 (PST)
-In-Reply-To: <1393313660-5258-1-git-send-email-ard.biesheuvel@linaro.org>
+	Tue, 25 Feb 2014 04:08:41 -0500
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu_A_04P=nOoPfxhJMC3bbEPTcpgZO0Ldw2H4BV7T_gTbw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-As ECB could potentially be wrapped by other chaining modes to operate on
-larger chunks of data in parallel, we would like to distinguish between the
-generic ECB and accelerated implementations of ECB, as using the former will
-not result in any speedup.
+On Tue, Feb 25, 2014 at 08:21:22AM +0100, Ard Biesheuvel wrote:
+> 
+> For the authenticate-only data, this is manageable as you are only
+> dealing with input, but when dealing with both in- and output, as in
+> the core of CCM, it becomes very tedious.
+> So instead, I have opted for an inner blkcipher instance which takes
+> care of all of that. Could you suggest another approach that if
+> preferable?
 
-Therefore, update the driver name of generic ECB to 'ecb_generic(%s)'.
+I don't think the walk helper actually needs the tfm apart from
+getting a couple of parameters out of it, so perhaps we can just
+change the helper to not depend on a tfm.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- crypto/ecb.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/crypto/ecb.c b/crypto/ecb.c
-index 935cfef4aa84..46a6a61fbcb9 100644
---- a/crypto/ecb.c
-+++ b/crypto/ecb.c
-@@ -134,6 +134,12 @@ static struct crypto_instance *crypto_ecb_alloc(struct rtattr **tb)
- 	if (IS_ERR(inst))
- 		goto out_put_alg;
- 
-+	err = -ENAMETOOLONG;
-+	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-+		     "ecb_generic(%s)", alg->cra_driver_name)
-+	    >= CRYPTO_MAX_ALG_NAME)
-+		goto out_err;
-+
- 	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
- 	inst->alg.cra_priority = alg->cra_priority;
- 	inst->alg.cra_blocksize = alg->cra_blocksize;
-@@ -155,6 +161,12 @@ static struct crypto_instance *crypto_ecb_alloc(struct rtattr **tb)
- out_put_alg:
- 	crypto_mod_put(alg);
- 	return inst;
-+
-+out_err:
-+	crypto_drop_spawn(crypto_instance_ctx(inst));
-+	kfree(inst);
-+	crypto_mod_put(alg);
-+	return ERR_PTR(err);
- }
- 
- static void crypto_ecb_free(struct crypto_instance *inst)
+Cheers,
 -- 
-1.8.3.2
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
