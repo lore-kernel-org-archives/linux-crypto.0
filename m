@@ -1,29 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] crypto: ccp - minor code fixes
-Date: Tue, 25 Feb 2014 20:19:11 +0800
-Message-ID: <20140225121911.GJ12216@gondor.apana.org.au>
-References: <20140224144156.16181.81272.stgit@tlendack-t1.amdoffice.net>
+Subject: Re: [patch] crypto: remove a duplicate checks in __cbc_decrypt()
+Date: Tue, 25 Feb 2014 20:18:00 +0800
+Message-ID: <20140225121800.GE12216@gondor.apana.org.au>
+References: <20140213145832.GA11059@elgon.mountain>
+ <20140214175544.GI2591@kronos.hofmann.stw.uni-erlangen.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
-	linux-kernel@vger.kernel.org
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Dan Carpenter <dan.carpenter@oracle.com>,
+	Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+	"David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Johannes =?iso-8859-1?Q?G=F6tzfried?=
+	<johannes.goetzfried@cs.fau.de>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20140224144156.16181.81272.stgit@tlendack-t1.amdoffice.net>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20140214175544.GI2591@kronos.hofmann.stw.uni-erlangen.de>
+Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 24, 2014 at 08:41:56AM -0600, Tom Lendacky wrote:
-> The following series implements some fixes to some code paths executed
-> during crypto API request processing.  These fixes address processing of
-> requests when the CCP driver returns -EBUSY and freeing memory in error
-> paths.
-> 
-> This patch series is based on the cryptodev-2.6 kernel tree.
+On Fri, Feb 14, 2014 at 06:55:45PM +0100, Johannes G=F6tzfried wrote:
+> On Thu, Feb 13, 2014 at 05:58:32PM +0300, Dan Carpenter wrote:
+> > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+>=20
+> Acked-by: Johannes G=F6tzfried <johannes.goetzfried@cs.fau.de>
 
-All applied.  Thanks!
--- 
+Patch applied.  Thanks!
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe kernel-janito=
+rs" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
