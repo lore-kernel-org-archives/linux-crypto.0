@@ -1,56 +1,48 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [RFC PATCH] arm64: add support for AES in CCM mode using Crypto Extensions
-Date: Tue, 25 Feb 2014 08:21:22 +0100
-Message-ID: <CAKv+Gu_A_04P=nOoPfxhJMC3bbEPTcpgZO0Ldw2H4BV7T_gTbw@mail.gmail.com>
-References: <1392106905-28709-1-git-send-email-ard.biesheuvel@linaro.org>
-	<20140225070252.GB9934@gondor.apana.org.au>
-	<CAKv+Gu-HnTk5RCLRoCnae7-HH7C-Tq2YJF57Nc-hOEykdY52XA@mail.gmail.com>
-	<20140225071626.GA10524@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	Will Deacon <will.deacon@arm.com>,
-	Nicolas Pitre <nico@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [RFC PATCH v2 0/3] support for interleaving in generic chaining modes
+Date: Tue, 25 Feb 2014 08:34:17 +0100
+Message-ID: <1393313660-5258-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f171.google.com ([209.85.217.171]:53635 "EHLO
-	mail-lb0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750706AbaBYHVY (ORCPT
+Received: from mail-we0-f177.google.com ([74.125.82.177]:33165 "EHLO
+	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750706AbaBYHe1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Feb 2014 02:21:24 -0500
-Received: by mail-lb0-f171.google.com with SMTP id w7so339473lbi.30
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Feb 2014 23:21:22 -0800 (PST)
-In-Reply-To: <20140225071626.GA10524@gondor.apana.org.au>
+	Tue, 25 Feb 2014 02:34:27 -0500
+Received: by mail-we0-f177.google.com with SMTP id t61so15346wes.22
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Feb 2014 23:34:25 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 25 February 2014 08:16, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Tue, Feb 25, 2014 at 08:12:36AM +0100, Ard Biesheuvel wrote:
->>
->> Do you have any comments specifically about using an inner blkcipher
->> instance to implement the aead?
->
-> Indeed, the inner block cipher looks superfluous since it's only
-> used once by ccm and there is no nesting similar to aesni-intel.
->
-> Inner algorithms are only needed if you want to nest it, e.g.,
-> through fpu().  Otherwise I don't see any difference vs. calling
-> the underlying functions directly, especially since you seem to
-> be calling them directly anyway.
->
+Herbert, all,
 
-Well, the problem is that aead does not provide the blkcipher walk
-API, which means it is up to the caller to map/unmap the scatterlists
-and keep track of the in and out pointers etc.
+This is the alternate approach you suggested for interleaving in generic
+chaining modes. The non-overlapping case seems an obvious win,  but may benefit
+from a crypto_xor() optimized for larger sizes. For the inplace case, it is more
+problematic as we still require a block count for the chunk.
 
-For the authenticate-only data, this is manageable as you are only
-dealing with input, but when dealing with both in- and output, as in
-the core of CCM, it becomes very tedious.
-So instead, I have opted for an inner blkcipher instance which takes
-care of all of that. Could you suggest another approach that if
-preferable?
+Anyway, no performance numbers yet. I will post back once I produce any.
 
-Thanks,
+-- 
 Ard.
+
+
+
+Ard Biesheuvel (3):
+  crypto: update generic ECB's driver_name to 'ecb_generic'
+  crypto: use ECB to implement CBC decryption
+  arm64: add Crypto Extensions based core AES cipher and 4-way ECB
+
+ arch/arm64/Makefile               |   1 +
+ arch/arm64/crypto/Makefile        |  13 ++
+ arch/arm64/crypto/aes-ce-cipher.c | 382 ++++++++++++++++++++++++++++++++++++++
+ crypto/Kconfig                    |   6 +
+ crypto/cbc.c                      | 234 +++++++++++++++++++++--
+ crypto/ecb.c                      |  12 ++
+ 6 files changed, 635 insertions(+), 13 deletions(-)
+ create mode 100644 arch/arm64/crypto/Makefile
+ create mode 100644 arch/arm64/crypto/aes-ce-cipher.c
+
+-- 
+1.8.3.2
