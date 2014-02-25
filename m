@@ -1,38 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/4] crypto: picoxcell - Use devm_ioremap_resource()
-Date: Tue, 25 Feb 2014 20:17:22 +0800
-Message-ID: <20140225121721.GC12216@gondor.apana.org.au>
-References: <000301cf27a9$fd5c61c0$f8152540$%han@samsung.com>
+Subject: Re: [PATCH] crypto: mxs-dcp: Fix platform_get_irq() error handling
+Date: Tue, 25 Feb 2014 20:18:15 +0800
+Message-ID: <20140225121815.GF12216@gondor.apana.org.au>
+References: <1392347084-7801-1-git-send-email-festevam@gmail.com>
+ <201402140922.03163.marex@denx.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: 'David Miller' <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	'Mathias Krause' <mathias.krause@secunet.com>,
-	'Jamie Iles' <jamie@jamieiles.com>
-To: Jingoo Han <jg1.han@samsung.com>
+Cc: Fabio Estevam <festevam@gmail.com>, linux-crypto@vger.kernel.org,
+	Fabio Estevam <fabio.estevam@freescale.com>
+To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:45338 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:58567 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753173AbaBYMRc (ORCPT
+	with ESMTP id S1753201AbaBYMSW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Feb 2014 07:17:32 -0500
+	Tue, 25 Feb 2014 07:18:22 -0500
 Content-Disposition: inline
-In-Reply-To: <000301cf27a9$fd5c61c0$f8152540$%han@samsung.com>
+In-Reply-To: <201402140922.03163.marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Feb 12, 2014 at 01:22:06PM +0900, Jingoo Han wrote:
-> >From c0c9c31eba90635cac93f3d5e5311beb10afafb7 Mon Sep 17 00:00:00 2001
-> From: Jingoo Han <jg1.han@samsung.com>
-> Date: Wed, 12 Feb 2014 13:08:54 +0900
-> Subject: [PATCH 1/4] crypto: picoxcell - Use devm_ioremap_resource()
+On Fri, Feb 14, 2014 at 09:22:03AM +0100, Marek Vasut wrote:
+> On Friday, February 14, 2014 at 04:04:44 AM, Fabio Estevam wrote:
+> > From: Fabio Estevam <fabio.estevam@freescale.com>
+> > 
+> > We should test the error case for each platform_get_irq() assignment and
+> > propagate the error accordingly.
+> > 
+> > Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
 > 
-> Use devm_ioremap_resource() in order to make the code simpler,
-> and remove redundant return value check of platform_get_resource()
-> because the value is checked by devm_ioremap_resource().
-> 
-> Signed-off-by: Jingoo Han <jg1.han@samsung.com>
+> Acked-by: Marek Vasut <marex@denx.de>
 
-All applied except for 4/4 since we're removing tegra.  Thanks.
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
