@@ -1,367 +1,467 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH v2 2/3] crypto: use ECB to implement CBC decryption
-Date: Tue, 25 Feb 2014 08:34:19 +0100
-Message-ID: <1393313660-5258-3-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH v2 3/3] arm64: add Crypto Extensions based core AES cipher and 4-way ECB
+Date: Tue, 25 Feb 2014 08:34:20 +0100
+Message-ID: <1393313660-5258-4-git-send-email-ard.biesheuvel@linaro.org>
 References: <1393313660-5258-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f46.google.com ([74.125.82.46]:64763 "EHLO
-	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750706AbaBYHe3 (ORCPT
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:44880 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750707AbaBYHea (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Feb 2014 02:34:29 -0500
-Received: by mail-wg0-f46.google.com with SMTP id z12so17181wgg.5
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Feb 2014 23:34:27 -0800 (PST)
+	Tue, 25 Feb 2014 02:34:30 -0500
+Received: by mail-wi0-f169.google.com with SMTP id e4so3933517wiv.4
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Feb 2014 23:34:28 -0800 (PST)
 In-Reply-To: <1393313660-5258-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch updates the generic CBC implementation so it attempts to use ECB
-rather than the core cipher if the available ECB implementation is not the
-generic one. This enables the use ECB implementations that are faster but
-only if they are allowed to operate on multiple blocks at once.
-
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/cbc.c | 234 +++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 221 insertions(+), 13 deletions(-)
+ arch/arm64/Makefile               |   1 +
+ arch/arm64/crypto/Makefile        |  13 ++
+ arch/arm64/crypto/aes-ce-cipher.c | 382 ++++++++++++++++++++++++++++++++++++++
+ crypto/Kconfig                    |   6 +
+ 4 files changed, 402 insertions(+)
+ create mode 100644 arch/arm64/crypto/Makefile
+ create mode 100644 arch/arm64/crypto/aes-ce-cipher.c
 
-diff --git a/crypto/cbc.c b/crypto/cbc.c
-index 61ac42e1e32b..7fa22ea155c8 100644
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -11,6 +11,7 @@
-  */
+diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+index 2fceb71ac3b7..8185a913c5ed 100644
+--- a/arch/arm64/Makefile
++++ b/arch/arm64/Makefile
+@@ -45,6 +45,7 @@ export	TEXT_OFFSET GZFLAGS
+ core-y		+= arch/arm64/kernel/ arch/arm64/mm/
+ core-$(CONFIG_KVM) += arch/arm64/kvm/
+ core-$(CONFIG_XEN) += arch/arm64/xen/
++core-$(CONFIG_CRYPTO) += arch/arm64/crypto/
+ libs-y		:= arch/arm64/lib/ $(libs-y)
+ libs-y		+= $(LIBGCC)
  
- #include <crypto/algapi.h>
-+#include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
-@@ -19,15 +20,23 @@
- #include <linux/scatterlist.h>
- #include <linux/slab.h>
- 
-+struct cbc_instance_ctx {
-+	struct crypto_spawn cipher;
-+	struct crypto_skcipher_spawn ecb;
-+	int have_ecb;
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+new file mode 100644
+index 000000000000..ac58945c50b3
+--- /dev/null
++++ b/arch/arm64/crypto/Makefile
+@@ -0,0 +1,13 @@
++#
++# linux/arch/arm64/crypto/Makefile
++#
++# Copyright (C) 2013 Linaro Ltd <ard.biesheuvel@linaro.org>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License version 2 as
++# published by the Free Software Foundation.
++#
++
++obj-$(CONFIG_CRYPTO_AES_ARM64_CE) += aes-ce-cipher.o
++
++CFLAGS_aes-ce-cipher.o += -march=armv8-a+crypto
+diff --git a/arch/arm64/crypto/aes-ce-cipher.c b/arch/arm64/crypto/aes-ce-cipher.c
+new file mode 100644
+index 000000000000..e2015aae4e86
+--- /dev/null
++++ b/arch/arm64/crypto/aes-ce-cipher.c
+@@ -0,0 +1,382 @@
++/*
++ * linux/arch/arm64/crypto/aes-ce-cipher.c
++ *
++ * Copyright (C) 2013 - 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <asm/hwcap.h>
++#include <asm/neon.h>
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++
++MODULE_DESCRIPTION("Synchronous AES cipher using ARMv8 Crypto Extensions");
++MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
++MODULE_LICENSE("GPL");
++
++struct aes_vec {
++	u8 __attribute__((vector_size(16))) v;
 +};
 +
- struct crypto_cbc_ctx {
--	struct crypto_cipher *child;
-+	struct crypto_cipher *cipher;
-+	struct crypto_ablkcipher *ecb;
- };
- 
- static int crypto_cbc_setkey(struct crypto_tfm *parent, const u8 *key,
- 			     unsigned int keylen)
- {
- 	struct crypto_cbc_ctx *ctx = crypto_tfm_ctx(parent);
--	struct crypto_cipher *child = ctx->child;
-+	struct crypto_cipher *child = ctx->cipher;
-+	struct crypto_ablkcipher *ecb = ctx->ecb;
- 	int err;
- 
- 	crypto_cipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-@@ -36,6 +45,17 @@ static int crypto_cbc_setkey(struct crypto_tfm *parent, const u8 *key,
- 	err = crypto_cipher_setkey(child, key, keylen);
- 	crypto_tfm_set_flags(parent, crypto_cipher_get_flags(child) &
- 				     CRYPTO_TFM_RES_MASK);
++struct aes_vec4 {
++	u8 __attribute__((vector_size(16))) v[4];
++};
 +
-+	if (err || !ecb)
-+		return err;
-+
-+	crypto_ablkcipher_clear_flags(ecb, CRYPTO_TFM_REQ_MASK);
-+	crypto_ablkcipher_set_flags(ecb, crypto_tfm_get_flags(parent) &
-+					 CRYPTO_TFM_REQ_MASK);
-+	err = crypto_ablkcipher_setkey(ecb, key, keylen);
-+	crypto_tfm_set_flags(parent, crypto_ablkcipher_get_flags(ecb) &
-+				     CRYPTO_TFM_RES_MASK);
-+
- 	return err;
- }
- 
-@@ -94,7 +114,7 @@ static int crypto_cbc_encrypt(struct blkcipher_desc *desc,
- 	struct blkcipher_walk walk;
- 	struct crypto_blkcipher *tfm = desc->tfm;
- 	struct crypto_cbc_ctx *ctx = crypto_blkcipher_ctx(tfm);
--	struct crypto_cipher *child = ctx->child;
-+	struct crypto_cipher *child = ctx->cipher;
- 	int err;
- 
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
-@@ -173,7 +193,7 @@ static int crypto_cbc_decrypt(struct blkcipher_desc *desc,
- 	struct blkcipher_walk walk;
- 	struct crypto_blkcipher *tfm = desc->tfm;
- 	struct crypto_cbc_ctx *ctx = crypto_blkcipher_ctx(tfm);
--	struct crypto_cipher *child = ctx->child;
-+	struct crypto_cipher *child = ctx->cipher;
- 	int err;
- 
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
-@@ -190,37 +210,175 @@ static int crypto_cbc_decrypt(struct blkcipher_desc *desc,
- 	return err;
- }
- 
-+static int crypto_cbc_decrypt_chunked_inplace(struct blkcipher_desc *desc,
-+					      struct blkcipher_walk *walk,
-+					      int bsize, int csize,
-+					      int seglen)
++static int num_rounds(struct crypto_aes_ctx *ctx)
 +{
-+	struct crypto_cbc_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct {
-+		struct ablkcipher_request req;
-+		u8 priv[crypto_ablkcipher_reqsize(ctx->ecb)];
-+	} ecb_req;
-+	struct scatterlist out;
-+	u8 *src = walk->src.virt.addr;
-+	u8 *iv = walk->iv;
-+	u8 buf[2][csize];
-+	int err;
-+	int i;
-+
-+	ablkcipher_request_set_tfm(&ecb_req.req, ctx->ecb);
-+	ablkcipher_request_set_crypt(&ecb_req.req, &out, &out, csize, NULL);
-+
-+	for (i = 0; seglen > 0; seglen -= csize, src += csize, i = !i) {
-+		memcpy(buf[i], src, csize);
-+		sg_init_one(&out, src, csize);
-+
-+		err = crypto_ablkcipher_decrypt(&ecb_req.req);
-+		if (err)
-+			return err;
-+
-+		if (iv + bsize == buf[i]) {
-+			crypto_xor(src, iv, csize);
-+		} else {
-+			crypto_xor(src, iv, bsize);
-+			crypto_xor(src + bsize, buf[i], csize - bsize);
-+		}
-+		iv = buf[i] + csize - bsize;
-+	}
-+	memcpy(walk->iv, iv, bsize);
-+	return 0;
-+}
-+
-+static int crypto_cbc_decrypt_chunked_segment(struct blkcipher_desc *desc,
-+					      struct blkcipher_walk *walk,
-+					      int bsize, int seglen)
-+{
-+	struct crypto_cbc_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct {
-+		struct ablkcipher_request req;
-+		u8 priv[crypto_ablkcipher_reqsize(ctx->ecb)];
-+	} ecb_req;
-+	struct scatterlist out, in;
-+	int err;
-+
-+	sg_init_one(&out, walk->dst.virt.addr, seglen);
-+	sg_init_one(&in, walk->src.virt.addr, seglen);
-+
-+	ablkcipher_request_set_tfm(&ecb_req.req, ctx->ecb);
-+	ablkcipher_request_set_crypt(&ecb_req.req, &in, &out, seglen, NULL);
-+
-+	err = crypto_ablkcipher_decrypt(&ecb_req.req);
-+	if (err)
-+		return err;
-+
-+	crypto_xor(walk->dst.virt.addr, walk->iv, bsize);
-+	crypto_xor(walk->dst.virt.addr + bsize, walk->src.virt.addr,
-+		   seglen - bsize);
-+	memcpy(walk->iv, walk->src.virt.addr + seglen - bsize, bsize);
-+	return 0;
-+}
-+
-+#define CHUNKS	8
-+
-+static int crypto_cbc_decrypt_chunked(struct blkcipher_desc *desc,
-+				      struct scatterlist *dst,
-+				      struct scatterlist *src,
-+				      unsigned int nbytes)
-+{
-+	struct crypto_cbc_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-+	struct crypto_cipher *child = ctx->cipher;
-+	int bsize = crypto_cipher_blocksize(ctx->cipher);
-+	struct blkcipher_walk walk;
-+	int csize = CHUNKS * bsize;
-+	int err;
-+
-+	blkcipher_walk_init(&walk, dst, src, nbytes);
-+	err = blkcipher_walk_virt_block(desc, &walk, csize);
-+
-+	while (walk.nbytes >= csize) {
-+		int seglen = walk.nbytes & ~(csize - 1);
-+
-+		if (walk.src.virt.addr == walk.dst.virt.addr)
-+			err = crypto_cbc_decrypt_chunked_inplace(desc, &walk,
-+								 bsize, csize,
-+								 seglen);
-+		else
-+			err = crypto_cbc_decrypt_chunked_segment(desc, &walk,
-+								 bsize, seglen);
-+		if (err)
-+			return err;
-+		err = blkcipher_walk_done(desc, &walk, walk.nbytes - seglen);
-+	}
-+	if ((nbytes = walk.nbytes)) {
-+		if (walk.src.virt.addr == walk.dst.virt.addr)
-+			nbytes = crypto_cbc_decrypt_inplace(desc, &walk, child);
-+		else
-+			nbytes = crypto_cbc_decrypt_segment(desc, &walk, child);
-+		err = blkcipher_walk_done(desc, &walk, nbytes);
-+	}
-+	return err;
-+}
-+
- static int crypto_cbc_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
--	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
-+	struct cbc_instance_ctx *ictx = crypto_instance_ctx(inst);
- 	struct crypto_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct crypto_cipher *cipher;
-+	int err;
- 
--	cipher = crypto_spawn_cipher(spawn);
-+	cipher = crypto_spawn_cipher(&ictx->cipher);
- 	if (IS_ERR(cipher))
- 		return PTR_ERR(cipher);
- 
--	ctx->child = cipher;
-+	if (ictx->have_ecb) {
-+		struct crypto_ablkcipher *ecb;
-+
-+		ecb = crypto_spawn_skcipher(&ictx->ecb);
-+		err = PTR_ERR(ecb);
-+		if (IS_ERR(ecb))
-+			goto err_free_cipher;
-+		ctx->ecb = ecb;
-+	}
-+	ctx->cipher = cipher;
- 	return 0;
-+
-+err_free_cipher:
-+	crypto_free_cipher(cipher);
-+	return err;
- }
- 
- static void crypto_cbc_exit_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_cbc_ctx *ctx = crypto_tfm_ctx(tfm);
--	crypto_free_cipher(ctx->child);
-+
-+	crypto_free_cipher(ctx->cipher);
-+	if (ctx->ecb)
-+		crypto_free_ablkcipher(ctx->ecb);
- }
- 
- static struct crypto_instance *crypto_cbc_alloc(struct rtattr **tb)
- {
- 	struct crypto_instance *inst;
- 	struct crypto_alg *alg;
-+	struct cbc_instance_ctx *ictx;
-+	const char *cipher_name;
-+	char ecb_name[CRYPTO_MAX_ALG_NAME];
- 	int err;
- 
- 	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
- 	if (err)
- 		return ERR_PTR(err);
- 
-+	cipher_name = crypto_attr_alg_name(tb[1]);
-+	if (IS_ERR(cipher_name))
-+		return ERR_CAST(cipher_name);
-+
-+	if (snprintf(ecb_name, CRYPTO_MAX_ALG_NAME, "ecb(%s)",
-+		     cipher_name) >= CRYPTO_MAX_ALG_NAME)
-+		return ERR_PTR(-ENAMETOOLONG);
-+
- 	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
- 				  CRYPTO_ALG_TYPE_MASK);
- 	if (IS_ERR(alg))
-@@ -230,9 +388,21 @@ static struct crypto_instance *crypto_cbc_alloc(struct rtattr **tb)
- 	if (!is_power_of_2(alg->cra_blocksize))
- 		goto out_put_alg;
- 
--	inst = crypto_alloc_instance("cbc", alg);
--	if (IS_ERR(inst))
--		goto out_put_alg;
-+	inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
-+	err = -ENOMEM;
-+	if (!inst)
-+		goto out_err;
-+
-+	err = -ENAMETOOLONG;
-+	if (snprintf(inst->alg.cra_name, CRYPTO_MAX_ALG_NAME, "cbc(%s)",
-+		     cipher_name) >= CRYPTO_MAX_ALG_NAME)
-+		goto err_free_inst;
-+
-+	ictx = crypto_instance_ctx(inst);
-+
-+	err = crypto_init_spawn(&ictx->cipher, alg, inst, CRYPTO_ALG_TYPE_MASK);
-+	if (err)
-+		goto err_free_inst;
- 
- 	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
- 	inst->alg.cra_priority = alg->cra_priority;
-@@ -254,16 +424,54 @@ static struct crypto_instance *crypto_cbc_alloc(struct rtattr **tb)
- 
- 	inst->alg.cra_blkcipher.setkey = crypto_cbc_setkey;
- 	inst->alg.cra_blkcipher.encrypt = crypto_cbc_encrypt;
--	inst->alg.cra_blkcipher.decrypt = crypto_cbc_decrypt;
-+
 +	/*
-+	 * If we have an accelerated ecb implementation (i.e., another one than
-+	 * 'ecb_generic'), use it to perform CBC decryption in chunks.
++	 * # of rounds specified by AES:
++	 * 128 bit key		10 rounds
++	 * 192 bit key		12 rounds
++	 * 256 bit key		14 rounds
++	 * => n byte key	=> 6 + (n/4) rounds
 +	 */
-+	crypto_set_skcipher_spawn(&ictx->ecb, inst);
-+	err = crypto_grab_skcipher(&ictx->ecb, ecb_name, 0, CRYPTO_ALG_ASYNC);
-+	if (!err) {
-+		struct crypto_alg *ecb = crypto_skcipher_spawn_alg(&ictx->ecb);
++	return 6 + ctx->key_length / 4;
++}
 +
-+		if (strncmp(ecb->cra_driver_name, "ecb_generic", 11)) {
-+			err = -ENAMETOOLONG;
-+			if (snprintf(inst->alg.cra_driver_name, 
-+				     CRYPTO_MAX_ALG_NAME, "cbc(%s,%s)",
-+				     alg->cra_driver_name, ecb->cra_driver_name)
-+			    >= CRYPTO_MAX_ALG_NAME)
-+				goto err_drop_ecb;
++static void aes_encrypt(struct crypto_aes_ctx *ctx,
++			struct aes_vec *dst, struct aes_vec const *src)
++{
++	void *d1;
++	int d2;
 +
-+			inst->alg.cra_alignmask |= ecb->cra_alignmask;
-+			ictx->have_ecb = 1;
++	__asm__("	ld1	{v0.16b}, %[in]			;"
++		"	ld1	{v1.2d}, [%[key]]		;"
++		"	cmp	%[rounds], #10			;"
++		"	bmi	0f				;"
++		"	bne	3f				;"
++		"	mov	v3.16b, v1.16b			;"
++		"	b	2f				;"
++		"0:	mov	v2.16b, v1.16b			;"
++		"	ld1	{v3.2d}, [%[key]], #16		;"
++		"1:	aese	v0.16b, v2.16b			;"
++		"	aesmc	v0.16b, v0.16b			;"
++		"2:	ld1	{v1.2d}, [%[key]], #16		;"
++		"	aese	v0.16b, v3.16b			;"
++		"	aesmc	v0.16b, v0.16b			;"
++		"3:	ld1	{v2.2d}, [%[key]], #16		;"
++		"	subs	%[rounds], %[rounds], #3	;"
++		"	aese	v0.16b, v1.16b			;"
++		"	aesmc	v0.16b, v0.16b			;"
++		"	ld1	{v3.2d}, [%[key]], #16		;"
++		"	bpl	1b				;"
++		"	aese	v0.16b, v2.16b			;"
++		"	eor	v0.16b, v0.16b, v3.16b		;"
++		"	st1	{v0.16b}, %[out]		;"
++
++	:	[out]		"=m"(*dst),
++				"=r"(d1), "=r"(d2) /* dummies */
++	:	[in]		"m"(*src),
++		[key]		"1"(ctx->key_enc),
++		[rounds]	"2"(num_rounds(ctx) - 2)
++	:	"cc");
++}
++
++static void aes_decrypt(struct crypto_aes_ctx *ctx,
++			struct aes_vec *dst, struct aes_vec const *src)
++{
++	void *d1;
++	int d2;
++
++	__asm__("	ld1	{v0.16b}, %[in]			;"
++		"	ld1	{v1.2d}, [%[key]]		;"
++		"	cmp	%[rounds], #10			;"
++		"	bmi	0f				;"
++		"	bne	3f				;"
++		"	mov	v3.16b, v1.16b			;"
++		"	b	2f				;"
++		"0:	mov	v2.16b, v1.16b			;"
++		"	ld1	{v3.2d}, [%[key]], #16		;"
++		"1:	aesd	v0.16b, v2.16b			;"
++		"	aesimc	v0.16b, v0.16b			;"
++		"2:	ld1	{v1.2d}, [%[key]], #16		;"
++		"	aesd	v0.16b, v3.16b			;"
++		"	aesimc	v0.16b, v0.16b			;"
++		"3:	ld1	{v2.2d}, [%[key]], #16		;"
++		"	subs	%[rounds], %[rounds], #3	;"
++		"	aesd	v0.16b, v1.16b			;"
++		"	aesimc	v0.16b, v0.16b			;"
++		"	ld1	{v3.2d}, [%[key]], #16		;"
++		"	bpl	1b				;"
++		"	aese	v0.16b, v2.16b			;"
++		"	eor	v0.16b, v0.16b, v3.16b		;"
++		"	st1	{v0.16b}, %[out]		;"
++
++	:	[out]		"=m"(*dst),
++				"=r"(d1), "=r"(d2) /* dummies */
++	:	[in]		"m"(*src),
++		[key]		"1"(ctx->key_dec),
++		[rounds]	"2"(num_rounds(ctx) - 2)
++	:	"cc");
++}
++
++static void aes_cipher_encrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
++{
++	kernel_neon_begin_partial(4);
++	aes_encrypt(crypto_tfm_ctx(tfm),
++		    (struct aes_vec *)dst, (struct aes_vec *)src);
++	kernel_neon_end();
++}
++
++static void aes_cipher_decrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
++{
++	kernel_neon_begin_partial(4);
++	aes_decrypt(crypto_tfm_ctx(tfm),
++		    (struct aes_vec *)dst, (struct aes_vec *)src);
++	kernel_neon_end();
++}
++
++static void aes_encrypt_4x(struct crypto_aes_ctx *ctx,
++			   struct aes_vec4 *dst, struct aes_vec4 const *src)
++{
++	void *d1;
++	int d2;
++
++	__asm__("	ld1	{v0.16b-v3.16b}, %[in]		;"
++		"	ld1	{v4.2d}, [%[key]]		;"
++		"	cmp	%[rounds], #10			;"
++		"	bmi	0f				;"
++		"	bne	3f				;"
++		"	mov	v6.16b, v4.16b			;"
++		"	b	2f				;"
++		"0:	mov	v5.16b, v4.16b			;"
++		"	ld1	{v6.2d}, [%[key]], #16		;"
++		"1:	aese	v0.16b, v5.16b			;"
++		"	aesmc	v0.16b, v0.16b			;"
++		"	aese	v1.16b, v5.16b			;"
++		"	aesmc	v1.16b, v1.16b			;"
++		"	aese	v2.16b, v5.16b			;"
++		"	aesmc	v2.16b, v2.16b			;"
++		"	aese	v3.16b, v5.16b			;"
++		"	aesmc	v3.16b, v3.16b			;"
++		"2:	ld1	{v4.2d}, [%[key]], #16		;"
++		"	aese	v0.16b, v6.16b			;"
++		"	aesmc	v0.16b, v0.16b			;"
++		"	aese	v1.16b, v6.16b			;"
++		"	aesmc	v1.16b, v1.16b			;"
++		"	aese	v2.16b, v6.16b			;"
++		"	aesmc	v2.16b, v2.16b			;"
++		"	aese	v3.16b, v6.16b			;"
++		"	aesmc	v3.16b, v3.16b			;"
++		"3:	ld1	{v5.2d}, [%[key]], #16		;"
++		"	subs	%[rounds], %[rounds], #3	;"
++		"	aese	v0.16b, v4.16b			;"
++		"	aesmc	v0.16b, v0.16b			;"
++		"	aese	v1.16b, v4.16b			;"
++		"	aesmc	v1.16b, v1.16b			;"
++		"	aese	v2.16b, v4.16b			;"
++		"	aesmc	v2.16b, v2.16b			;"
++		"	aese	v3.16b, v4.16b			;"
++		"	aesmc	v3.16b, v3.16b			;"
++		"	ld1	{v6.2d}, [%[key]], #16		;"
++		"	bpl	1b				;"
++		"	aese	v0.16b, v5.16b			;"
++		"	aese	v1.16b, v5.16b			;"
++		"	aese	v2.16b, v5.16b			;"
++		"	aese	v3.16b, v5.16b			;"
++		"	eor	v0.16b, v0.16b, v6.16b		;"
++		"	eor	v1.16b, v1.16b, v6.16b		;"
++		"	eor	v2.16b, v2.16b, v6.16b		;"
++		"	eor	v3.16b, v3.16b, v6.16b		;"
++		"	st1	{v0.16b-v3.16b}, %[out]		;"
++
++	:	[out]		"=m"(*dst),
++				"=r"(d1), "=r"(d2) /* dummies */
++	:	[in]		"m"(*src),
++		[key]		"1"(ctx->key_dec),
++		[rounds]	"2"(num_rounds(ctx) - 2)
++	:	"cc");
++}
++
++static void aes_decrypt_4x(struct crypto_aes_ctx *ctx,
++			   struct aes_vec4 *dst, struct aes_vec4 const *src)
++{
++	void *d1;
++	int d2;
++
++	__asm__("	ld1	{v0.16b-v3.16b}, %[in]		;"
++		"	ld1	{v4.2d}, [%[key]], #16		;"
++		"	cmp	%[rounds], #10			;"
++		"	bmi	0f				;"
++		"	bne	3f				;"
++		"	mov	v6.16b, v4.16b			;"
++		"	b	2f				;"
++		"0:	mov	v5.16b, v4.16b			;"
++		"	ld1	{v6.2d}, [%[key]], #16		;"
++		"1:	aesd	v0.16b, v5.16b			;"
++		"	aesimc	v0.16b, v0.16b			;"
++		"	aesd	v1.16b, v5.16b			;"
++		"	aesimc	v1.16b, v1.16b			;"
++		"	aesd	v2.16b, v5.16b			;"
++		"	aesimc	v2.16b, v2.16b			;"
++		"	aesd	v3.16b, v5.16b			;"
++		"	aesimc	v3.16b, v3.16b			;"
++		"2:	ld1	{v4.2d}, [%[key]], #16		;"
++		"	aesd	v0.16b, v6.16b			;"
++		"	aesimc	v0.16b, v0.16b			;"
++		"	aesd	v1.16b, v6.16b			;"
++		"	aesimc	v1.16b, v1.16b			;"
++		"	aesd	v2.16b, v6.16b			;"
++		"	aesimc	v2.16b, v2.16b			;"
++		"	aesd	v3.16b, v6.16b			;"
++		"	aesimc	v3.16b, v3.16b			;"
++		"3:	ld1	{v5.2d}, [%[key]], #16		;"
++		"	subs	%[rounds], %[rounds], #3	;"
++		"	aesd	v0.16b, v4.16b			;"
++		"	aesimc	v0.16b, v0.16b			;"
++		"	aesd	v1.16b, v4.16b			;"
++		"	aesimc	v1.16b, v1.16b			;"
++		"	aesd	v2.16b, v4.16b			;"
++		"	aesimc	v2.16b, v2.16b			;"
++		"	aesd	v3.16b, v4.16b			;"
++		"	aesimc	v3.16b, v3.16b			;"
++		"	ld1	{v6.2d}, [%[key]], #16		;"
++		"	bpl	1b				;"
++		"	aesd	v0.16b, v5.16b			;"
++		"	aesd	v1.16b, v5.16b			;"
++		"	aesd	v2.16b, v5.16b			;"
++		"	aesd	v3.16b, v5.16b			;"
++		"	eor	v0.16b, v0.16b, v6.16b		;"
++		"	eor	v1.16b, v1.16b, v6.16b		;"
++		"	eor	v2.16b, v2.16b, v6.16b		;"
++		"	eor	v3.16b, v3.16b, v6.16b		;"
++		"	st1	{v0.16b-v3.16b}, %[out]		;"
++
++	:	[out]		"=m"(*dst),
++				"=r"(d1), "=r"(d2) /* dummies */
++	:	[in]		"m"(*src),
++		[key]		"1"(ctx->key_dec),
++		[rounds]	"2"(num_rounds(ctx) - 2)
++	:	"cc");
++}
++
++static int ecb_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++		       struct scatterlist *src, unsigned int nbytes)
++{
++	struct crypto_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	int err;
++
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt_block(desc, &walk, 4 * AES_BLOCK_SIZE);
++
++	kernel_neon_begin_partial(7);
++
++	do {
++		u8 *out = walk.dst.virt.addr;
++		u8 *in = walk.src.virt.addr;
++		int bl;
++
++		for (bl = walk.nbytes / AES_BLOCK_SIZE; bl >= 4; bl -= 4) {
++			aes_encrypt_4x(ctx, (struct aes_vec4 *)out,
++				       (struct aes_vec4 *)in);
++			out += 4 * AES_BLOCK_SIZE;
++			in += 4 * AES_BLOCK_SIZE;
 +		}
++		while (bl--) {
++			aes_encrypt(ctx, (struct aes_vec *)out,
++				    (struct aes_vec *)in);
++			out += AES_BLOCK_SIZE;
++			in += AES_BLOCK_SIZE;
++		}
++		err = blkcipher_walk_done(desc, &walk, 0);
++	} while (walk.nbytes);
++
++	kernel_neon_end();
++
++	return err;
++}
++
++static int ecb_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++                       struct scatterlist *src, unsigned int nbytes)
++{
++	struct crypto_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	int err;
++
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt_block(desc, &walk, 4 * AES_BLOCK_SIZE);
++
++	kernel_neon_begin_partial(7);
++
++	do {
++		u8 *out = walk.dst.virt.addr;
++		u8 *in = walk.src.virt.addr;
++		int bl;
++
++		for (bl = walk.nbytes / AES_BLOCK_SIZE; bl >= 4; bl -= 4) {
++			aes_decrypt_4x(ctx, (struct aes_vec4 *)out,
++				       (struct aes_vec4 *)in);
++			out += 4 * AES_BLOCK_SIZE;
++			in += 4 * AES_BLOCK_SIZE;
++		}
++		while (bl--) {
++			aes_decrypt(ctx, (struct aes_vec *)out,
++				    (struct aes_vec *)in);
++			out += AES_BLOCK_SIZE;
++			in += AES_BLOCK_SIZE;
++		}
++		err = blkcipher_walk_done(desc, &walk, 0);
++	} while (walk.nbytes);
++
++	kernel_neon_end();
++
++	return err;
++}
++
++static struct crypto_alg aes_algs[] = { {
++	.cra_name		= "aes",
++	.cra_driver_name	= "aes-ce",
++	.cra_priority		= 300,
++	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
++	.cra_module		= THIS_MODULE,
++	.cra_cipher = {
++		.cia_min_keysize	= AES_MIN_KEY_SIZE,
++		.cia_max_keysize	= AES_MAX_KEY_SIZE,
++		.cia_setkey		= crypto_aes_set_key,
++		.cia_encrypt		= aes_cipher_encrypt,
++		.cia_decrypt		= aes_cipher_decrypt,
 +	}
++}, {
++	.cra_name		= "ecb(aes)",
++	.cra_driver_name	= "ecb-aes-ce",
++	.cra_priority		= 300,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
++	.cra_alignmask		= 7,
++	.cra_type		= &crypto_blkcipher_type,
++	.cra_module		= THIS_MODULE,
++	.cra_blkcipher = {
++		.min_keysize	= AES_MIN_KEY_SIZE,
++		.max_keysize	= AES_MAX_KEY_SIZE,
++		.ivsize		= AES_BLOCK_SIZE,
++		.setkey		= crypto_aes_set_key,
++		.encrypt	= ecb_encrypt,
++		.decrypt	= ecb_decrypt,
++	}
++} };
 +
-+	inst->alg.cra_blkcipher.decrypt = ictx->have_ecb ?
-+					  crypto_cbc_decrypt_chunked :
-+					  crypto_cbc_decrypt;
++static int __init aes_mod_init(void)
++{
++	if (!(elf_hwcap & HWCAP_AES))
++		return -ENODEV;
++	return crypto_register_algs(aes_algs, ARRAY_SIZE(aes_algs));
++}
++
++static void __exit aes_mod_exit(void)
++{
++	crypto_unregister_algs(aes_algs, ARRAY_SIZE(aes_algs));
++}
++
++module_init(aes_mod_init);
++module_exit(aes_mod_exit);
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 7bcb70d216e1..f1d98bc346b6 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -791,6 +791,12 @@ config CRYPTO_AES_ARM_BS
+ 	  This implementation does not rely on any lookup tables so it is
+ 	  believed to be invulnerable to cache timing attacks.
  
- out_put_alg:
- 	crypto_mod_put(alg);
- 	return inst;
++config CRYPTO_AES_ARM64_CE
++	tristate "Synchronous AES cipher using ARMv8 Crypto Extensions"
++	depends on ARM64 && KERNEL_MODE_NEON
++	select CRYPTO_ALGAPI
++	select CRYPTO_AES
 +
-+err_drop_ecb:
-+	crypto_drop_skcipher(&ictx->ecb);
-+	crypto_drop_spawn(&ictx->cipher);
-+err_free_inst:
-+	kfree(inst);
-+out_err:
-+	inst = ERR_PTR(err);
-+	goto out_put_alg;
-+
- }
- 
- static void crypto_cbc_free(struct crypto_instance *inst)
- {
--	crypto_drop_spawn(crypto_instance_ctx(inst));
-+	struct cbc_instance_ctx *ctx = crypto_instance_ctx(inst);
-+
-+	crypto_drop_spawn(&ctx->cipher);
-+	crypto_drop_skcipher(&ctx->ecb);
- 	kfree(inst);
- }
- 
+ config CRYPTO_ANUBIS
+ 	tristate "Anubis cipher algorithm"
+ 	select CRYPTO_ALGAPI
 -- 
 1.8.3.2
