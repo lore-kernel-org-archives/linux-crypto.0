@@ -1,303 +1,175 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [RFC][PATCH] SP800-90A DRBG
-Date: Tue, 25 Feb 2014 22:25:24 +0100
-Message-ID: <3318114.8Il0YIGDM1@myon.chronox.de>
+From: Sonic Zhang <sonic.adi@gmail.com>
+Subject: [PATCH] crypt: bfin_crc: Remove useless SSYNC instruction and cache flush to DMA coherent memory
+Date: Wed, 26 Feb 2014 10:39:16 +0800
+Message-ID: <1393382356-9422-1-git-send-email-sonic.adi@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-To: LKML <linux-kernel@vger.kernel.org>, herbert@gondor.apana.org.au,
-	davem@davemloft.net, linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>,
+	<adi-buildroot-devel@lists.sourceforge.net>,
+	Sonic Zhang <sonic.zhang@analog.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ch1ehsobe004.messaging.microsoft.com ([216.32.181.184]:6918
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751399AbaBZCgn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Feb 2014 21:36:43 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+From: Sonic Zhang <sonic.zhang@analog.com>
 
-As defined in SP800-131A, the ANSI X9.31 DRNG is to be sunset by the end of 
-this year for official uses, including FIPS 140-2 compliance.
+1) SSYNC instruction is blackfin specific and takes no effect in this driver.
+2) DMA descriptor and SG middle buffer are in DMA coherent memory. No need
+to flush.
+3) Turn kzalloc, ioremap and request_irq into managed device APIs respectively.
 
-I created a clean-room implementation of the DRBGs defined in SP800-90A, 
-specifically the Hash DRBG, HMAC DRBG and CTR DRBG. All three DRBGs are 
-implemented with a derivation function and with the support of prediction 
-resistance.
-
-The implementation is available at [1]. That implementation is functionally 
-complete as it implements all aspects defined by SP800-90A. [1] is a self-
-contained implementation that registers the different DRBGs with the kernel 
-crypto API. In addition, a test module is provided that demonstrates the 
-proper operation of all DRBGs. The provided code is ready for testing by 
-simply calling make and loading the resulting kernel module into the kernel. A 
-second test module is provided in tests/kernel and demonstrates how to use the 
-DRBG with the kernel crypto API.
-
-The code [1] just needs some small refactoring to turn them into a patch for 
-the request for inclusion into the kernel -- and asking for an official review 
-:-) . For example, the self tests need to be extracted and put into the 
-testmgr.c. Also, the contents drbg-kernel.h needs to go into the drbg.c file. 
-I am happy to perform the changes and offer ready-to-go patches. The current 
-code, however, allows for easy development. But before making a full patch 
-set, there are several issues that need to be clarified. All issues are marked 
-with TODOs throughout the code. With the following list, all issues are 
-extracted.
-
-May I ask for help to clarify the following questions:
-
-* The kernel crypto API does not offer a reseed API call. Wouldn't it make 
-sense to add such a reseed API? Attached is a patch that I would propose -- 
-this patch includes the reseed function for the existing ANSI X9.31 DRNG. 
-Although this patch is against 3.11, it works with 3.13. If accepted, I would 
-add that patch to the to-be-developed overall patch set for the DRBG and 
-integrate the DRBG reseed invocation.
-
-* The SP800-90A defines that a caller requesting the initialization of the 
-DRBG may provide a so-called "personalization string" that is used as data 
-concatenated with real seed. The DRBG code implements the proper handling of 
-the personalization string. Though, the kernel crypto API initialization call 
-cra_init does not allow the caller to provide such additional data.
-
-* Similar to for initialization, SP800-90A allows the requestor of random bits 
-to provide "additional information" which are to be mixed into the DRBG before 
-generating the random bits. The DRBG code implements the proper handling of 
-the additional information string. Though, the kernel crypto API call of 
-cra_u.rng.rng_make_random does not allow the caller to provide such additional 
-data.
-
-* I am unsure what the reset call of the kernel crypto API mean for a DRBG. As 
-the DRBG gathers its seed data automatically and not from the caller, a 
-clearing of the DRBG state and reinstantiation does not seem to provide any 
-logical reasons.  
-
-[1] http://www.chronox.de/drbg.html
-
-Ciao
-Stephan
+Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
 ---
-diff -purN linux-3.11.orig/crypto/ansi_cprng.c linux-3.11/crypto/ansi_cprng.c
---- linux-3.11.orig/crypto/ansi_cprng.c	2013-09-30 14:44:05.378128532 +0200
-+++ linux-3.11/crypto/ansi_cprng.c	2013-09-30 14:51:57.726790936 +0200
-@@ -53,6 +53,7 @@ struct prng_context {
- 	u32 rand_data_valid;
- 	struct crypto_cipher *tfm;
- 	u32 flags;
-+	u8 vpos;
- };
- 
- static int dbg;
-@@ -368,17 +369,40 @@ static int cprng_reset(struct crypto_rng
- 	struct prng_context *prng = crypto_rng_ctx(tfm);
- 	u8 *key = seed + DEFAULT_BLK_SZ;
- 	u8 *dt = NULL;
-+	int rc = 0;
- 
-+	/* reseed the RNG in case we have too little data to reset */
- 	if (slen < DEFAULT_PRNG_KSZ + DEFAULT_BLK_SZ)
--		return -EINVAL;
--
--	if (slen >= (2 * DEFAULT_BLK_SZ + DEFAULT_PRNG_KSZ))
--		dt = key + DEFAULT_PRNG_KSZ;
-+		rc = cprng_reseed(prng, seed, slen);
-+	else
-+	{
-+		if (slen >= (2 * DEFAULT_BLK_SZ + DEFAULT_PRNG_KSZ))
-+			dt = key + DEFAULT_PRNG_KSZ;
-+		rc = reset_prng_context(prng, key, DEFAULT_PRNG_KSZ, seed, 
-dt);
-+		if (prng->flags & PRNG_NEED_RESET)
-+			return -EINVAL;
-+	}
- 
--	reset_prng_context(prng, key, DEFAULT_PRNG_KSZ, seed, dt);
-+	return rc;
-+}
- 
--	if (prng->flags & PRNG_NEED_RESET)
-+static int cprng_reseed(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
-+{
-+	struct prng_context *prng = crypto_rng_ctx(tfm);
-+	unsigned int i = 0;
-+	if(!slen)
- 		return -EINVAL;
-+	if(!seed)
-+		return -EINVAL;
-+
-+	spin_lock_bh(&prng->prng_lock);
-+	for (i = 0; i < slen; i++)
-+	{
-+		prng->V[prng->vpos++] ^= seed[i];
-+		if(DEFAULT_BLK_SZ == prng->vpos)
-+			prng->vpos = 0;
-+	}
-+	spin_unlock_bh(&prng->prng_lock);
- 	return 0;
- }
- 
-@@ -399,12 +423,13 @@ static int fips_cprng_reset(struct crypt
- 
- 	struct prng_context *prng = crypto_rng_ctx(tfm);
- 
--	if (slen < DEFAULT_PRNG_KSZ + DEFAULT_BLK_SZ)
--		return -EINVAL;
--
--	/* fips strictly requires seed != key */
--	if (!memcmp(seed, key, DEFAULT_PRNG_KSZ))
--		return -EINVAL;
-+	/* Only perform FIPS test if we set the seed together with the key */
-+	if (slen >= DEFAULT_PRNG_KSZ + DEFAULT_BLK_SZ)
-+	{
-+		/* fips strictly requires seed != key */
-+		if (!memcmp(seed, key, DEFAULT_PRNG_KSZ))
-+			return -EINVAL;
-+	}
- 
- 	rc = cprng_reset(tfm, seed, slen);
- 
-@@ -434,7 +459,9 @@ static struct crypto_alg rng_algs[] = {
- 		.rng = {
- 			.rng_make_random	= cprng_get_random,
- 			.rng_reset		= cprng_reset,
-+			.rng_reseed		= cprng_reseed,
- 			.seedsize = DEFAULT_PRNG_KSZ + 2*DEFAULT_BLK_SZ,
-+			.reseedsize = DEFAULT_BLK_SZ,
- 		}
- 	}
- #ifdef CONFIG_CRYPTO_FIPS
-@@ -452,7 +479,9 @@ static struct crypto_alg rng_algs[] = {
- 		.rng = {
- 			.rng_make_random	= fips_cprng_get_random,
- 			.rng_reset		= fips_cprng_reset,
-+			.rng_reseed		= cprng_reseed,
- 			.seedsize = DEFAULT_PRNG_KSZ + 2*DEFAULT_BLK_SZ,
-+			.reseedsize = DEFAULT_BLK_SZ,
- 		}
- 	}
- #endif
-diff -purN linux-3.11.orig/crypto/krng.c linux-3.11/crypto/krng.c
---- linux-3.11.orig/crypto/krng.c	2013-09-30 14:44:05.285128408 +0200
-+++ linux-3.11/crypto/krng.c	2013-09-30 14:45:42.692261818 +0200
-@@ -22,11 +22,6 @@ static int krng_get_random(struct crypto
- 	return 0;
- }
- 
--static int krng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
--{
--	return 0;
--}
--
- static struct crypto_alg krng_alg = {
- 	.cra_name		= "stdrng",
- 	.cra_driver_name	= "krng",
-@@ -38,8 +33,8 @@ static struct crypto_alg krng_alg = {
- 	.cra_u			= {
- 		.rng = {
- 			.rng_make_random	= krng_get_random,
--			.rng_reset		= krng_reset,
- 			.seedsize		= 0,
-+			.reseedsize		= 0,
- 		}
- 	}
- };
-diff -purN linux-3.11.orig/crypto/rng.c linux-3.11/crypto/rng.c
---- linux-3.11.orig/crypto/rng.c	2013-09-30 14:44:05.269128387 +0200
-+++ linux-3.11/crypto/rng.c	2013-09-30 14:45:42.693261819 +0200
-@@ -29,7 +29,8 @@ struct crypto_rng *crypto_default_rng;
- EXPORT_SYMBOL_GPL(crypto_default_rng);
- static int crypto_default_rng_refcnt;
- 
--static int rngapi_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
-+static int rngapi_seeding(struct crypto_rng *tfm, u8 *seed, unsigned int 
-slen,
-+			  int (*rng_update)(struct crypto_rng *tfm, u8 *seed, 
-unsigned int slen))
- {
- 	u8 *buf = NULL;
- 	int err;
-@@ -43,12 +44,26 @@ static int rngapi_reset(struct crypto_rn
- 		seed = buf;
- 	}
- 
--	err = crypto_rng_alg(tfm)->rng_reset(tfm, seed, slen);
-+	err = rng_update(tfm, seed, slen);
- 
- 	kfree(buf);
- 	return err;
- }
- 
-+static int rngapi_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
-+{
-+	if(!crypto_rng_alg(tfm)->rng_reset)
-+		return 0;
-+	return rngapi_seeding(tfm, seed, slen, crypto_rng_alg(tfm)-
->rng_reset);
-+}
-+
-+static int rngapi_reseed(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
-+{
-+	if(!crypto_rng_alg(tfm)->rng_reseed)
-+		return 0;
-+	return rngapi_seeding(tfm, seed, slen, crypto_rng_alg(tfm)-
->rng_reseed);
-+}
-+
- static int crypto_init_rng_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
- {
- 	struct rng_alg *alg = &tfm->__crt_alg->cra_rng;
-@@ -56,6 +71,7 @@ static int crypto_init_rng_ops(struct cr
- 
- 	ops->rng_gen_random = alg->rng_make_random;
- 	ops->rng_reset = rngapi_reset;
-+	ops->rng_reseed = rngapi_reseed;
+ drivers/crypto/bfin_crc.c | 45 +++++++++++----------------------------------
+ 1 file changed, 11 insertions(+), 34 deletions(-)
+
+diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
+index d797f31..c9ff298 100644
+--- a/drivers/crypto/bfin_crc.c
++++ b/drivers/crypto/bfin_crc.c
+@@ -139,7 +139,6 @@ static int bfin_crypto_crc_init_hw(struct bfin_crypto_crc *crc, u32 key)
+ 	/* setup CRC interrupts */
+ 	crc->regs->status = CMPERRI | DCNTEXPI;
+ 	crc->regs->intrenset = CMPERRI | DCNTEXPI;
+-	SSYNC();
  
  	return 0;
  }
-diff -purN linux-3.11.orig/include/crypto/rng.h 
-linux-3.11/include/crypto/rng.h
---- linux-3.11.orig/include/crypto/rng.h	2013-09-30 14:44:18.627146241 
-+0200
-+++ linux-3.11/include/crypto/rng.h	2013-09-30 14:45:42.693261819 +0200
-@@ -67,9 +67,20 @@ static inline int crypto_rng_reset(struc
- 	return crypto_rng_crt(tfm)->rng_reset(tfm, seed, slen);
+@@ -285,17 +284,12 @@ static void bfin_crypto_crc_config_dma(struct bfin_crypto_crc *crc)
+ 	if (i == 0)
+ 		return;
+ 
+-	flush_dcache_range((unsigned int)crc->sg_cpu,
+-			(unsigned int)crc->sg_cpu +
+-			i * sizeof(struct dma_desc_array));
+-
+ 	/* Set the last descriptor to stop mode */
+ 	crc->sg_cpu[i - 1].cfg &= ~(DMAFLOW | NDSIZE);
+ 	crc->sg_cpu[i - 1].cfg |= DI_EN;
+ 	set_dma_curr_desc_addr(crc->dma_ch, (unsigned long *)crc->sg_dma);
+ 	set_dma_x_count(crc->dma_ch, 0);
+ 	set_dma_x_modify(crc->dma_ch, 0);
+-	SSYNC();
+ 	set_dma_config(crc->dma_ch, dma_config);
  }
  
-+static inline int crypto_rng_reseed(struct crypto_rng *tfm,
-+				    u8 *seed, unsigned int slen)
-+{
-+	return crypto_rng_crt(tfm)->rng_reseed(tfm, seed, slen);
-+}
-+
- static inline int crypto_rng_seedsize(struct crypto_rng *tfm)
- {
- 	return crypto_rng_alg(tfm)->seedsize;
+@@ -415,7 +409,6 @@ finish_update:
+ 
+ 	/* finally kick off CRC operation */
+ 	crc->regs->control |= BLKEN;
+-	SSYNC();
+ 
+ 	return -EINPROGRESS;
  }
+@@ -539,7 +532,6 @@ static irqreturn_t bfin_crypto_crc_handler(int irq, void *dev_id)
  
-+static inline int crypto_rng_reseedsize(struct crypto_rng *tfm)
-+{
-+	return crypto_rng_alg(tfm)->reseedsize;
-+}
-+
- #endif
-diff -purN linux-3.11.orig/include/linux/crypto.h 
-linux-3.11/include/linux/crypto.h
---- linux-3.11.orig/include/linux/crypto.h	2013-09-30 14:44:22.248151116 
-+0200
-+++ linux-3.11/include/linux/crypto.h	2013-09-30 14:45:42.694261821 +0200
-@@ -265,8 +265,10 @@ struct rng_alg {
- 	int (*rng_make_random)(struct crypto_rng *tfm, u8 *rdata,
- 			       unsigned int dlen);
- 	int (*rng_reset)(struct crypto_rng *tfm, u8 *seed, unsigned int slen);
-+	int (*rng_reseed)(struct crypto_rng *tfm, u8 *seed, unsigned int 
-slen);
+ 	if (crc->regs->status & DCNTEXP) {
+ 		crc->regs->status = DCNTEXP;
+-		SSYNC();
  
- 	unsigned int seedsize;
-+	unsigned int reseedsize;
- };
+ 		/* prepare results */
+ 		put_unaligned_le32(crc->regs->result, crc->req->result);
+@@ -594,7 +586,7 @@ static int bfin_crypto_crc_probe(struct platform_device *pdev)
+ 	unsigned int timeout = 100000;
+ 	int ret;
  
+-	crc = kzalloc(sizeof(*crc), GFP_KERNEL);
++	crc = devm_kzalloc(dev, sizeof(*crc), GFP_KERNEL);
+ 	if (!crc) {
+ 		dev_err(&pdev->dev, "fail to malloc bfin_crypto_crc\n");
+ 		return -ENOMEM;
+@@ -610,42 +602,39 @@ static int bfin_crypto_crc_probe(struct platform_device *pdev)
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	if (res == NULL) {
+ 		dev_err(&pdev->dev, "Cannot get IORESOURCE_MEM\n");
+-		ret = -ENOENT;
+-		goto out_error_free_mem;
++		return -ENOENT;
+ 	}
  
-@@ -400,6 +402,7 @@ struct rng_tfm {
- 	int (*rng_gen_random)(struct crypto_rng *tfm, u8 *rdata,
- 			      unsigned int dlen);
- 	int (*rng_reset)(struct crypto_rng *tfm, u8 *seed, unsigned int slen);
-+	int (*rng_reseed)(struct crypto_rng *tfm, u8 *seed, unsigned int 
-slen);
- };
+-	crc->regs = ioremap(res->start, resource_size(res));
+-	if (!crc->regs) {
++	crc->regs = devm_ioremap_resource(dev, res);
++	if (IS_ERR((void *)crc->regs)) {
+ 		dev_err(&pdev->dev, "Cannot map CRC IO\n");
+-		ret = -ENXIO;
+-		goto out_error_free_mem;
++		return PTR_ERR((void *)crc->regs);
+ 	}
  
- #define crt_ablkcipher	crt_u.ablkcipher
+ 	crc->irq = platform_get_irq(pdev, 0);
+ 	if (crc->irq < 0) {
+ 		dev_err(&pdev->dev, "No CRC DCNTEXP IRQ specified\n");
+-		ret = -ENOENT;
+-		goto out_error_unmap;
++		return -ENOENT;
+ 	}
+ 
+-	ret = request_irq(crc->irq, bfin_crypto_crc_handler, IRQF_SHARED, dev_name(dev), crc);
++	ret = devm_request_irq(dev, crc->irq, bfin_crypto_crc_handler,
++			IRQF_SHARED, dev_name(dev), crc);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Unable to request blackfin crc irq\n");
+-		goto out_error_unmap;
++		return ret;
+ 	}
+ 
+ 	res = platform_get_resource(pdev, IORESOURCE_DMA, 0);
+ 	if (res == NULL) {
+ 		dev_err(&pdev->dev, "No CRC DMA channel specified\n");
+-		ret = -ENOENT;
+-		goto out_error_irq;
++		return -ENOENT;
+ 	}
+ 	crc->dma_ch = res->start;
+ 
+ 	ret = request_dma(crc->dma_ch, dev_name(dev));
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Unable to attach Blackfin CRC DMA channel\n");
+-		goto out_error_irq;
++		return ret;
+ 	}
+ 
+ 	crc->sg_cpu = dma_alloc_coherent(&pdev->dev, PAGE_SIZE, &crc->sg_dma, GFP_KERNEL);
+@@ -660,9 +649,7 @@ static int bfin_crypto_crc_probe(struct platform_device *pdev)
+ 	crc->sg_mid_buf = (u8 *)(crc->sg_cpu + ((CRC_MAX_DMA_DESC + 1) << 1));
+ 
+ 	crc->regs->control = 0;
+-	SSYNC();
+ 	crc->regs->poly = crc->poly = (u32)pdev->dev.platform_data;
+-	SSYNC();
+ 
+ 	while (!(crc->regs->status & LUTDONE) && (--timeout) > 0)
+ 		cpu_relax();
+@@ -693,12 +680,6 @@ out_error_dma:
+ 	if (crc->sg_cpu)
+ 		dma_free_coherent(&pdev->dev, PAGE_SIZE, crc->sg_cpu, crc->sg_dma);
+ 	free_dma(crc->dma_ch);
+-out_error_irq:
+-	free_irq(crc->irq, crc);
+-out_error_unmap:
+-	iounmap((void *)crc->regs);
+-out_error_free_mem:
+-	kfree(crc);
+ 
+ 	return ret;
+ }
+@@ -721,10 +702,6 @@ static int bfin_crypto_crc_remove(struct platform_device *pdev)
+ 	crypto_unregister_ahash(&algs);
+ 	tasklet_kill(&crc->done_task);
+ 	free_dma(crc->dma_ch);
+-	if (crc->irq > 0)
+-		free_irq(crc->irq, crc);
+-	iounmap((void *)crc->regs);
+-	kfree(crc);
+ 
+ 	return 0;
+ }
+-- 
+1.8.2.3
