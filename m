@@ -1,45 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Support for ECDH P-192 and P-256
-Date: Thu, 27 Feb 2014 06:03:33 +0800
-Message-ID: <20140226220333.GA28414@gondor.apana.org.au>
-References: <88CA6BC5-E6E7-43C3-8A2A-829D27E76CE8@holtmann.org>
+From: Jingoo Han <jg1.han@samsung.com>
+Subject: [PATCH 1/3] crypto: omap-aes - Use SIMPLE_DEV_PM_OPS macro
+Date: Thu, 27 Feb 2014 20:31:38 +0900
+Message-ID: <000301cf33af$7ad7cc50$708764f0$%han@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <88CA6BC5-E6E7-43C3-8A2A-829D27E76CE8@holtmann.org>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Cc: 'David Miller' <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	'Jingoo Han' <jg1.han@samsung.com>,
+	'Nishanth Menon' <nm@ti.com>, 'Joel Fernandes' <joelf@ti.com>
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout4.samsung.com ([203.254.224.34]:45747 "EHLO
+	mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752471AbaB0Lbk (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 27 Feb 2014 06:31:40 -0500
+Received: from epcpsbgr3.samsung.com
+ (u143.gpu120.samsung.co.kr [203.254.230.143])
+ by mailout4.samsung.com (Oracle Communications Messaging Server 7u4-24.01
+ (7.0.4.24.0) 64bit (built Nov 17 2011))
+ with ESMTP id <0N1N008QSK0R0880@mailout4.samsung.com> for
+ linux-crypto@vger.kernel.org; Thu, 27 Feb 2014 20:31:39 +0900 (KST)
+Content-language: ko
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hello,
-> 
-> we are looking at adding support for Bluetooth Secure Connections to the Security Manager of the Bluetooth subsystem. For that we would need support for ECDH P-256 and eventually also P-192.
-> 
-> Right now we are bit lost on how this could be achieved best. I saw that the symmetric_keys feature has support for public_keys, but as far as I can tell that requires that userspace loads the public keys into the kernel and the private keys stay in userspace.
-> 
-> What we need is to generate private/public key pairs using elliptic curve with P-192 and P-256. We only need the private/public key pair for the Bluetooth pairing. After successful pairing, we derive link keys or long term keys and we can throw the private/public key pair away. Any further authentication between Bluetooth devices is done via their link keys or long term keys.
-> 
-> Has anybody looked into extending the kernel crypto framework to support ECDH P-192 and P-256. If nobody has, what are the best starting points to do so.
+Use SIMPLE_DEV_PM_OPS macro in order to make the code simpler.
 
-Normally key exchange is conducted in user-space because it isn't
-performance-critical so as not to bloat the kernel.  For example,
-only the data-path of IPsec is implemented in the kernel, while
-the key exchange protocol IKE Is done in user-space.  That's why
-there is no current support for key exchange-related algorithms
-in the kernel crypto API.
+Signed-off-by: Jingoo Han <jg1.han@samsung.com>
+---
+ drivers/crypto/omap-aes.c |    4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-If there is agreement that Bluetooth's key exchange must be done
-in the kernel, then we certainly start adding these algorithms.
-
-I haven't been following this but is there a consensus from the
-networking folks regarding Bluetooth's key exchange code?
-
-Thanks,
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index dde41f1d..cb98fa5 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -1307,9 +1307,7 @@ static int omap_aes_resume(struct device *dev)
+ }
+ #endif
+ 
+-static const struct dev_pm_ops omap_aes_pm_ops = {
+-	SET_SYSTEM_SLEEP_PM_OPS(omap_aes_suspend, omap_aes_resume)
+-};
++static SIMPLE_DEV_PM_OPS(omap_aes_pm_ops, omap_aes_suspend, omap_aes_resume);
+ 
+ static struct platform_driver omap_aes_driver = {
+ 	.probe	= omap_aes_probe,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.10.4
