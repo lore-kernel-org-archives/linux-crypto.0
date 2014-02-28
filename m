@@ -1,173 +1,57 @@
-From: chandramouli narayanan <mouli@linux.intel.com>
-Subject: [PATCH 2/2] SHA1 transform: x86_64 AVX2 optimization - glue &
- build - version2
-Date: Thu, 27 Feb 2014 14:38:39 -0800
-Message-ID: <1393540719.7495.110.camel@pegasus.jf.intel.com>
+From: Joel Fernandes <joelf@ti.com>
+Subject: Re: [PATCH] crypto: omap-des - make local functions static
+Date: Thu, 27 Feb 2014 18:59:48 -0600
+Message-ID: <530FDF84.6060705@ti.com>
+References: <000701cf33af$e46a9f80$ad3fde80$%han@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
-Cc: ilya.albrekht@intel.com, maxim.locktyukhin@intel.com,
-	ronen.zohar@intel.com, wajdi.k.feghali@intel.com,
-	tim.c.chen@linux.intel.com, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net, hpa@zytor.com
+Cc: "'David Miller'" <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>
+To: Jingoo Han <jg1.han@samsung.com>,
+	"'Herbert Xu'" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:6307 "EHLO mga02.intel.com"
+Received: from arroyo.ext.ti.com ([192.94.94.40]:54774 "EHLO arroyo.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751232AbaB0Whu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Feb 2014 17:37:50 -0500
+	id S1751699AbaB1BAC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 27 Feb 2014 20:00:02 -0500
+In-Reply-To: <000701cf33af$e46a9f80$ad3fde80$%han@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This git patch adds the glue, build and configuration changes
-to include x86_64 AVX2 optimization of SHA1 transform to
-crypto support. The patch has been tested with 3.14.0-rc1
-kernel.
+On 02/27/2014 05:34 AM, Jingoo Han wrote:
+> Make omap_des_copy_needed(), omap_des_copy_sgs(), because these
+> functions are used only in this file.
+> 
+> Signed-off-by: Jingoo Han <jg1.han@samsung.com>
 
-Changes from the initial version of this patch are in
-a) check for BMI2 in addition to AVX2 support since
-__sha1_transform_avx2() uses rorx
-b) Since the module build has dependency on 64bit, it is
-redundant to check it in the code here.
+Ok with me,
+Acked-by: Joel Fernandes <joelf@ti.com>
 
-On a Haswell desktop, with turbo disabled and all cpus running
-at maximum frequency, tcrypt shows AVX2 performance improvement
-from 3% for 256 bytes update to 16% for 1024 bytes update over
-AVX implementation. 
-
-Signed-off-by: Chandramouli Narayanan <mouli@linux.intel.com>
-
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 6ba54d6..61d6e28 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -79,6 +79,9 @@ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o fpu.o
- aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o
- ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
- sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
-+ifeq ($(avx2_supported),yes)
-+sha1-ssse3-y += sha1_avx2_x86_64_asm.o
-+endif
- crc32c-intel-y := crc32c-intel_glue.o
- crc32c-intel-$(CONFIG_64BIT) += crc32c-pcl-intel-asm_64.o
- crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index 4a11a9d..bdd6295 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -10,6 +10,7 @@
-  * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
-  * Copyright (c) Jean-Francois Dive <jef@linuxbe.org>
-  * Copyright (c) Mathias Krause <minipli@googlemail.com>
-+ * Copyright (c) Chandramouli Narayanan <mouli@linux.intel.com>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-@@ -39,6 +40,12 @@ asmlinkage void sha1_transform_ssse3(u32 *digest, const char *data,
- asmlinkage void sha1_transform_avx(u32 *digest, const char *data,
- 				   unsigned int rounds);
- #endif
-+#ifdef CONFIG_AS_AVX2
-+#define SHA1_AVX2_BLOCK_OPTSIZE	4	/* optimal 4*64 bytes of SHA1 blocks */
-+
-+asmlinkage void sha1_transform_avx2(u32 *digest, const char *data,
-+				unsigned int rounds);
-+#endif
- 
- static asmlinkage void (*sha1_transform_asm)(u32 *, const char *, unsigned int);
- 
-@@ -165,6 +172,19 @@ static int sha1_ssse3_import(struct shash_desc *desc, const void *in)
- 	return 0;
- }
- 
-+#ifdef CONFIG_AS_AVX2
-+static void __sha1_transform_avx2(u32 *digest, const char *data,
-+				unsigned int rounds)
-+{
-+
-+	/* Select the optimal transform based on data block size */
-+	if (rounds >= SHA1_AVX2_BLOCK_OPTSIZE)
-+		sha1_transform_avx2(digest, data, rounds);
-+	else
-+		sha1_transform_avx(digest, data, rounds);
-+}
-+#endif
-+
- static struct shash_alg alg = {
- 	.digestsize	=	SHA1_DIGEST_SIZE,
- 	.init		=	sha1_ssse3_init,
-@@ -189,7 +209,11 @@ static bool __init avx_usable(void)
- {
- 	u64 xcr0;
- 
-+#if defined(CONFIG_AS_AVX2)
-+	if (!cpu_has_avx || !cpu_has_avx2 || !cpu_has_osxsave)
-+#else
- 	if (!cpu_has_avx || !cpu_has_osxsave)
-+#endif
- 		return false;
- 
- 	xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
-@@ -205,23 +229,35 @@ static bool __init avx_usable(void)
- 
- static int __init sha1_ssse3_mod_init(void)
- {
-+	char *algo_name;
- 	/* test for SSSE3 first */
--	if (cpu_has_ssse3)
-+	if (cpu_has_ssse3) {
- 		sha1_transform_asm = sha1_transform_ssse3;
-+		algo_name = "SSSE3";
-+	}
- 
- #ifdef CONFIG_AS_AVX
- 	/* allow AVX to override SSSE3, it's a little faster */
--	if (avx_usable())
--		sha1_transform_asm = sha1_transform_avx;
-+	if (avx_usable()) {
-+		if (cpu_has_avx) {
-+			sha1_transform_asm = sha1_transform_avx;
-+			algo_name = "AVX";
-+		}
-+#ifdef CONFIG_AS_AVX2
-+		if (cpu_has_avx2 && boot_cpu_has(X86_FEATURE_BMI2)) {
-+			/* allow AVX2 to override AVX, it's a little faster */
-+			sha1_transform_asm = __sha1_transform_avx2;
-+			algo_name = "AVX2";
-+		}
-+#endif
-+	}
- #endif
- 
- 	if (sha1_transform_asm) {
--		pr_info("Using %s optimized SHA-1 implementation\n",
--		        sha1_transform_asm == sha1_transform_ssse3 ? "SSSE3"
--		                                                   : "AVX");
-+		pr_info("Using %s optimized SHA-1 implementation\n", algo_name);
- 		return crypto_register_shash(&alg);
- 	}
--	pr_info("Neither AVX nor SSSE3 is available/usable.\n");
-+	pr_info("Neither AVX nor AVX2 nor SSSE3 is available/usable.\n");
- 
- 	return -ENODEV;
- }
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 7bcb70d..ce4012a 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -491,14 +491,14 @@ config CRYPTO_SHA1
- 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2).
- 
- config CRYPTO_SHA1_SSSE3
--	tristate "SHA1 digest algorithm (SSSE3/AVX)"
-+	tristate "SHA1 digest algorithm (SSSE3/AVX/AVX2)"
- 	depends on X86 && 64BIT
- 	select CRYPTO_SHA1
- 	select CRYPTO_HASH
- 	help
- 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
- 	  using Supplemental SSE3 (SSSE3) instructions or Advanced Vector
--	  Extensions (AVX), when available.
-+	  Extensions (AVX/AVX2), when available.
- 
- config CRYPTO_SHA256_SSSE3
- 	tristate "SHA256 digest algorithm (SSSE3/AVX/AVX2)"
+> ---
+>  drivers/crypto/omap-des.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+> index 758919e..ec5f131 100644
+> --- a/drivers/crypto/omap-des.c
+> +++ b/drivers/crypto/omap-des.c
+> @@ -535,7 +535,7 @@ static int omap_des_crypt_dma_stop(struct omap_des_dev *dd)
+>  	return err;
+>  }
+>  
+> -int omap_des_copy_needed(struct scatterlist *sg)
+> +static int omap_des_copy_needed(struct scatterlist *sg)
+>  {
+>  	while (sg) {
+>  		if (!IS_ALIGNED(sg->offset, 4))
+> @@ -547,7 +547,7 @@ int omap_des_copy_needed(struct scatterlist *sg)
+>  	return 0;
+>  }
+>  
+> -int omap_des_copy_sgs(struct omap_des_dev *dd)
+> +static int omap_des_copy_sgs(struct omap_des_dev *dd)
+>  {
+>  	void *buf_in, *buf_out;
+>  	int pages;
+> 
