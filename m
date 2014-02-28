@@ -1,57 +1,99 @@
-From: Joel Fernandes <joelf@ti.com>
-Subject: Re: [PATCH] crypto: omap-des - make local functions static
-Date: Thu, 27 Feb 2014 18:59:48 -0600
-Message-ID: <530FDF84.6060705@ti.com>
-References: <000701cf33af$e46a9f80$ad3fde80$%han@samsung.com>
+From: "McCaffrey, Timothy M" <Timothy.McCaffrey@unisys.com>
+Subject: [PATCH 1/2] Crypto: Add support for 192 & 256 bit keys to AESNI
+ RFC4106
+Date: Fri, 28 Feb 2014 17:00:26 -0600
+Message-ID: <62FCA75CAF88C148AA5FC0EC0E4321C70127AA61ADC6@USEA-EXCH7.na.uis.unisys.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: "'David Miller'" <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>
-To: Jingoo Han <jg1.han@samsung.com>,
-	"'Herbert Xu'" <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>
+To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from arroyo.ext.ti.com ([192.94.94.40]:54774 "EHLO arroyo.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751699AbaB1BAC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Feb 2014 20:00:02 -0500
-In-Reply-To: <000701cf33af$e46a9f80$ad3fde80$%han@samsung.com>
+Received: from mail1.bemta8.messagelabs.com ([216.82.243.201]:36628 "EHLO
+	mail1.bemta8.messagelabs.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751787AbaB1XH0 convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 28 Feb 2014 18:07:26 -0500
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 02/27/2014 05:34 AM, Jingoo Han wrote:
-> Make omap_des_copy_needed(), omap_des_copy_sgs(), because these
-> functions are used only in this file.
-> 
-> Signed-off-by: Jingoo Han <jg1.han@samsung.com>
 
-Ok with me,
-Acked-by: Joel Fernandes <joelf@ti.com>
+These patches fix the RFC4106 implementation in the aesni-intel module so it supports 192 & 256 bit keys.
+Since AVX was recently added to this module, and this patch only affects the SSE implementation, changes 
+were also made to use the SSE version if key sizes other than 128 are specified.
 
-> ---
->  drivers/crypto/omap-des.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-> index 758919e..ec5f131 100644
-> --- a/drivers/crypto/omap-des.c
-> +++ b/drivers/crypto/omap-des.c
-> @@ -535,7 +535,7 @@ static int omap_des_crypt_dma_stop(struct omap_des_dev *dd)
->  	return err;
->  }
->  
-> -int omap_des_copy_needed(struct scatterlist *sg)
-> +static int omap_des_copy_needed(struct scatterlist *sg)
->  {
->  	while (sg) {
->  		if (!IS_ALIGNED(sg->offset, 4))
-> @@ -547,7 +547,7 @@ int omap_des_copy_needed(struct scatterlist *sg)
->  	return 0;
->  }
->  
-> -int omap_des_copy_sgs(struct omap_des_dev *dd)
-> +static int omap_des_copy_sgs(struct omap_des_dev *dd)
->  {
->  	void *buf_in, *buf_out;
->  	int pages;
-> 
+RFC4106 specifies that 192 & 256 bit keys must be supported (section 8.4).
+
+Also, this should fix Strongswan issue 341 where the aesni module needs to be unloaded if 256 bit keys are used:
+http://wiki.strongswan.org/issues/341
+
+This patch has been tested with Sandy Bridge and Haswell processors.  With 128 bit keys and 
+input buffers > 512 bytes a slight performance degradation was noticed (~1%), input buffers 
+less than 512 bytes there was no performance impact.  Compared to 128 bit keys,
+256 bit key size performance is approx. .5 cycles per byte slower on Sandy Bridge, 
+and .37 cycles per byte slower on Haswell (vs. SSE code).
+
+This patch has also been tested with StrongSwan IPSec connections where it worked correctly.
+
+I created this diff from a git clone of crypto-2.6.git.  
+
+Any questions, please feel free to contact me.
+
+Signed off by: Timothy.McCaffrey@Unisys.com
+
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 948ad0e..df37cd7 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -177,7 +177,8 @@ static void aesni_gcm_enc_avx(void *ctx, u8 *out,
+ 			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
+ 			u8 *auth_tag, unsigned long auth_tag_len)
+ {
+-	if (plaintext_len < AVX_GEN2_OPTSIZE) {
++        struct crypto_aes_ctx *aes_ctx = (struct crypto_aes_ctx*)ctx;
++	if ((plaintext_len < AVX_GEN2_OPTSIZE) || (aes_ctx-> key_length != AES_KEYSIZE_128)){
+ 		aesni_gcm_enc(ctx, out, in, plaintext_len, iv, hash_subkey, aad,
+ 				aad_len, auth_tag, auth_tag_len);
+ 	} else {
+@@ -192,7 +193,8 @@ static void aesni_gcm_dec_avx(void *ctx, u8 *out,
+ 			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
+ 			u8 *auth_tag, unsigned long auth_tag_len)
+ {
+-	if (ciphertext_len < AVX_GEN2_OPTSIZE) {
++        struct crypto_aes_ctx *aes_ctx = (struct crypto_aes_ctx*)ctx;
++	if ((ciphertext_len < AVX_GEN2_OPTSIZE) || (aes_ctx-> key_length != AES_KEYSIZE_128)) {
+ 		aesni_gcm_dec(ctx, out, in, ciphertext_len, iv, hash_subkey, aad,
+ 				aad_len, auth_tag, auth_tag_len);
+ 	} else {
+@@ -226,7 +228,8 @@ static void aesni_gcm_enc_avx2(void *ctx, u8 *out,
+ 			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
+ 			u8 *auth_tag, unsigned long auth_tag_len)
+ {
+-	if (plaintext_len < AVX_GEN2_OPTSIZE) {
++       struct crypto_aes_ctx *aes_ctx = (struct crypto_aes_ctx*)ctx;
++	if ((plaintext_len < AVX_GEN2_OPTSIZE) || (aes_ctx-> key_length != AES_KEYSIZE_128)) {
+ 		aesni_gcm_enc(ctx, out, in, plaintext_len, iv, hash_subkey, aad,
+ 				aad_len, auth_tag, auth_tag_len);
+ 	} else if (plaintext_len < AVX_GEN4_OPTSIZE) {
+@@ -245,7 +248,8 @@ static void aesni_gcm_dec_avx2(void *ctx, u8 *out,
+ 			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
+ 			u8 *auth_tag, unsigned long auth_tag_len)
+ {
+-	if (ciphertext_len < AVX_GEN2_OPTSIZE) {
++       struct crypto_aes_ctx *aes_ctx = (struct crypto_aes_ctx*)ctx;
++	if ((ciphertext_len < AVX_GEN2_OPTSIZE) || (aes_ctx-> key_length != AES_KEYSIZE_128)) {
+ 		aesni_gcm_dec(ctx, out, in, ciphertext_len, iv, hash_subkey,
+ 				aad, aad_len, auth_tag, auth_tag_len);
+ 	} else if (ciphertext_len < AVX_GEN4_OPTSIZE) {
+@@ -878,7 +882,8 @@ static int rfc4106_set_key(struct crypto_aead *parent, const u8 *key,
+ 	}
+ 	/*Account for 4 byte nonce at the end.*/
+ 	key_len -= 4;
+-	if (key_len != AES_KEYSIZE_128) {
++	if (key_len != AES_KEYSIZE_128 && key_len != AES_KEYSIZE_192 &&
++	    key_len != AES_KEYSIZE_256) {
+ 		crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 		return -EINVAL;
+ 	}
