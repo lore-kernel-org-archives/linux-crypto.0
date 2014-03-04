@@ -1,71 +1,43 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH][RESEND 3] hwrng: add randomness to system from rng sources
-Date: Mon, 3 Mar 2014 15:51:48 -0800
-Message-ID: <20140303235148.GA7601@www.outflux.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Satoru Takeuchi <satoru.takeuchi@gmail.com>,
-	linux-crypto@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
-	Andrew Morton <akpm@linux-foundation.org>
-To: linux-kernel@vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 0/3] take 2: repurposing blkcipher walk api for aead
+Date: Tue,  4 Mar 2014 13:28:37 +0800
+Message-ID: <1393910920-5796-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.outflux.net ([198.145.64.163]:54986 "EHLO smtp.outflux.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755248AbaCCXwF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Mar 2014 18:52:05 -0500
-Content-Disposition: inline
+Received: from mail-pb0-f44.google.com ([209.85.160.44]:49588 "EHLO
+	mail-pb0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751185AbaCDF2z (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 4 Mar 2014 00:28:55 -0500
+Received: by mail-pb0-f44.google.com with SMTP id rp16so4724328pbb.17
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Mar 2014 21:28:54 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When bringing a new RNG source online, it seems like it would make sense
-to use some of its bytes to make the system entropy pool more random,
-as done with all sorts of other devices that contain per-device or
-per-boot differences.
+I think this is a better approach than the one I proposed before. This time,
+I have only added a single function specifically for use by aeads:
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- drivers/char/hw_random/core.c |    7 +++++++
- 1 file changed, 7 insertions(+)
+blkcipher_aead_walk_virt_block()
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index a0f7724852eb..6e5bb68a708c 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -41,6 +41,7 @@
- #include <linux/miscdevice.h>
- #include <linux/delay.h>
- #include <linux/slab.h>
-+#include <linux/random.h>
- #include <asm/uaccess.h>
- 
- 
-@@ -305,6 +306,8 @@ int hwrng_register(struct hwrng *rng)
- 	int must_register_misc;
- 	int err = -EINVAL;
- 	struct hwrng *old_rng, *tmp;
-+	unsigned char bytes[16];
-+	int bytes_read;
- 
- 	if (rng->name == NULL ||
- 	    (rng->data_read == NULL && rng->read == NULL))
-@@ -348,6 +351,10 @@ int hwrng_register(struct hwrng *rng)
- 	}
- 	INIT_LIST_HEAD(&rng->list);
- 	list_add_tail(&rng->list, &rng_list);
-+
-+	bytes_read = rng_get_data(rng, bytes, sizeof(bytes), 1);
-+	if (bytes_read > 0)
-+		add_device_randomness(bytes, bytes_read);
- out_unlock:
- 	mutex_unlock(&rng_mutex);
- out:
--- 
-1.7.9.5
+which takes an additional aead param which is used to get the ivsize, alignmask
+and blocksize of the underlying transform.
 
+Ard Biesheuvel (3):
+  crypto: remove direct blkcipher_walk dependency on transform
+  crypto: allow blkcipher walks over AEAD data
+  arm64: add support for AES in CCM mode using Crypto Extensions
+
+ arch/arm64/Makefile                |   1 +
+ arch/arm64/crypto/Makefile         |  12 ++
+ arch/arm64/crypto/aesce-ccm-core.S | 222 +++++++++++++++++++++++++++
+ arch/arm64/crypto/aesce-ccm-glue.c | 297 +++++++++++++++++++++++++++++++++++++
+ crypto/blkcipher.c                 |  81 +++++-----
+ include/crypto/algapi.h            |   9 +-
+ 6 files changed, 587 insertions(+), 35 deletions(-)
+ create mode 100644 arch/arm64/crypto/Makefile
+ create mode 100644 arch/arm64/crypto/aesce-ccm-core.S
+ create mode 100644 arch/arm64/crypto/aesce-ccm-glue.c
 
 -- 
-Kees Cook
-Chrome OS Security
+1.8.3.2
