@@ -1,104 +1,51 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH][RESEND 3] hwrng: add randomness to system from rng
- sources
-Date: Tue, 4 Mar 2014 10:38:42 -0500
-Message-ID: <20140304153841.GN1872@titan.lakedaemon.net>
-References: <20140303235148.GA7601@www.outflux.net>
+From: Joel Fernandes <joelf@ti.com>
+Subject: [PATCH v2] crypto: omap-sham: kmap SG pages before appending
+Date: Tue, 4 Mar 2014 12:30:54 -0600
+Message-ID: <1393957854-10961-1-git-send-email-joelf@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Satoru Takeuchi <satoru.takeuchi@gmail.com>,
-	linux-crypto@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Kees Cook <keescook@chromium.org>, Theodore Ts'o <tytso@mit.edu>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:20832 "EHLO
-	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753356AbaCDPiw (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Mar 2014 10:38:52 -0500
-Content-Disposition: inline
-In-Reply-To: <20140303235148.GA7601@www.outflux.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: <lokeshvutla@ti.com>, Joel Fernandes <joelf@ti.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: <linux-crypto@vger.kernel.org>, <linux-omap@vger.kernel.org>
+Return-path: <linux-omap-owner@vger.kernel.org>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Kees, Ted,
+HIGHMEM pages may not be mapped so we must kmap them before accessing.
+This resolves a random OOPs error that was showing up during OpenSSL SHA tests.
 
-On Mon, Mar 03, 2014 at 03:51:48PM -0800, Kees Cook wrote:
-> When bringing a new RNG source online, it seems like it would make sense
-> to use some of its bytes to make the system entropy pool more random,
-> as done with all sorts of other devices that contain per-device or
-> per-boot differences.
+Signed-off-by: Joel Fernandes <joelf@ti.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+---
+v2 changes:
+	- don't check for HIGHMEM, kmap/kunmap do them anyway (Thanks Herbert).
 
-Why is this necessary?  init_std_data() already calls
-arch_get_random_long() while stirring each of the pools.
+ drivers/crypto/omap-sham.c |    8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-I'm a little concerned here because this gives potentially untrusted
-hwrngs more influence over the entropy pools initial state than most
-users of random.c expect.  Many of the drivers in hw_random/ are
-platform drivers and are initialized before random.c.
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index e45aaaf..207eac1 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -636,11 +636,17 @@ static size_t omap_sham_append_buffer(struct omap_sham_reqctx *ctx,
+ static size_t omap_sham_append_sg(struct omap_sham_reqctx *ctx)
+ {
+ 	size_t count;
++	const u8 *vaddr;
+ 
+ 	while (ctx->sg) {
++		vaddr = kmap(sg_page(ctx->sg));
++
+ 		count = omap_sham_append_buffer(ctx,
+-				sg_virt(ctx->sg) + ctx->offset,
++				vaddr + ctx->offset,
+ 				ctx->sg->length - ctx->offset);
++
++		kunmap((void *)vaddr);
++
+ 		if (!count)
+ 			break;
+ 		ctx->offset += count;
+-- 
+1.7.9.5
 
-I'm comfortable with the design decisions Ted has made wrt random.c and
-hwrngs.  However, I think that this changes that trust relationship in a
-fundamental way.  I'm ok with building support into my kernels for
-hwrngs as long as random.c's internal use of them is limited to the
-mixing in extract_buf() and init_std_data().
-
-By adding this patch, even without crediting entropy to the pool, a
-rogue hwrng now has significantly more influence over the initial state
-of the entropy pools.  Or, am I missing something?
-
-thx,
-
-Jason.
-
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  drivers/char/hw_random/core.c |    7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index a0f7724852eb..6e5bb68a708c 100644
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -41,6 +41,7 @@
->  #include <linux/miscdevice.h>
->  #include <linux/delay.h>
->  #include <linux/slab.h>
-> +#include <linux/random.h>
->  #include <asm/uaccess.h>
->  
->  
-> @@ -305,6 +306,8 @@ int hwrng_register(struct hwrng *rng)
->  	int must_register_misc;
->  	int err = -EINVAL;
->  	struct hwrng *old_rng, *tmp;
-> +	unsigned char bytes[16];
-> +	int bytes_read;
->  
->  	if (rng->name == NULL ||
->  	    (rng->data_read == NULL && rng->read == NULL))
-> @@ -348,6 +351,10 @@ int hwrng_register(struct hwrng *rng)
->  	}
->  	INIT_LIST_HEAD(&rng->list);
->  	list_add_tail(&rng->list, &rng_list);
-> +
-> +	bytes_read = rng_get_data(rng, bytes, sizeof(bytes), 1);
-> +	if (bytes_read > 0)
-> +		add_device_randomness(bytes, bytes_read);
->  out_unlock:
->  	mutex_unlock(&rng_mutex);
->  out:
-> -- 
-> 1.7.9.5
-> 
-> 
-> -- 
-> Kees Cook
-> Chrome OS Security
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
