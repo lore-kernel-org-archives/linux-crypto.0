@@ -1,89 +1,185 @@
-From: Joel Fernandes <joelf@ti.com>
-Subject: Re: [PATCH v2] crypto: omap-sham: kmap SG pages before appending
-Date: Wed, 5 Mar 2014 09:42:38 -0600
-Message-ID: <531745EE.2060804@ti.com>
-References: <1393957854-10961-1-git-send-email-joelf@ti.com> <20140305015953.GA20702@gondor.apana.org.au> <39412163-4B61-4490-ABC8-5BA633CC6618@ti.com> <20140305071109.GA22178@gondor.apana.org.au>
+From: Jason Cooper <jason@lakedaemon.net>
+Subject: Re: [PATCH][RESEND 3] hwrng: add randomness to system from rng
+ sources
+Date: Wed, 5 Mar 2014 16:11:45 -0500
+Message-ID: <20140305211145.GV1872@titan.lakedaemon.net>
+References: <20140303235148.GA7601@www.outflux.net>
+ <20140304153841.GN1872@titan.lakedaemon.net>
+ <CAGXu5jKqB62ZaD0HEG=vJoROOqvdSYeHYB2h61Kw1-ov5phFww@mail.gmail.com>
+ <20140304195356.GS1872@titan.lakedaemon.net>
+ <CAGXu5jL5JBHL0tqZzA03LY67HZU4jEQ0_V=bJs9TV3g0Bfwr_w@mail.gmail.com>
+ <1393972797.8344.190.camel@calx>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
-	"Vutla, Lokesh" <lokeshvutla@ti.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-omap-owner@vger.kernel.org>
-In-Reply-To: <20140305071109.GA22178@gondor.apana.org.au>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Kees Cook <keescook@chromium.org>, Theodore Ts'o <tytso@mit.edu>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	Satoru Takeuchi <satoru.takeuchi@gmail.com>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+To: Matt Mackall <mpm@selenic.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:29732 "EHLO
+	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751879AbaCEVLz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Mar 2014 16:11:55 -0500
+Content-Disposition: inline
+In-Reply-To: <1393972797.8344.190.camel@calx>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/05/2014 01:11 AM, Herbert Xu wrote:
-> On Wed, Mar 05, 2014 at 04:18:12AM +0000, Fernandes, Joel wrote:
->>
->>
->>> On Mar 4, 2014, at 8:00 PM, "Herbert Xu" <herbert@gondor.apana.org.au> wrote:
->>>
->>>> On Tue, Mar 04, 2014 at 12:30:54PM -0600, Joel Fernandes wrote:
->>>> HIGHMEM pages may not be mapped so we must kmap them before accessing.
->>>> This resolves a random OOPs error that was showing up during OpenSSL SHA tests.
->>>>
->>>> Signed-off-by: Joel Fernandes <joelf@ti.com>
->>>> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->>>> ---
->>>> v2 changes:
->>>>    - don't check for HIGHMEM, kmap/kunmap do them anyway (Thanks Herbert).
->>>>
->>>> drivers/crypto/omap-sham.c |    8 +++++++-
->>>> 1 file changed, 7 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
->>>> index e45aaaf..207eac1 100644
->>>> --- a/drivers/crypto/omap-sham.c
->>>> +++ b/drivers/crypto/omap-sham.c
->>>> @@ -636,11 +636,17 @@ static size_t omap_sham_append_buffer(struct omap_sham_reqctx *ctx,
->>>> static size_t omap_sham_append_sg(struct omap_sham_reqctx *ctx)
->>>> {
->>>>    size_t count;
->>>> +    const u8 *vaddr;
->>>>
->>>>    while (ctx->sg) {
->>>> +        vaddr = kmap(sg_page(ctx->sg));
->>>
->>> Are you sure you can safely use kmap here as opposed to kmap_atomic?
->>
->> Yes I made sure it is not called in interrupt context and also tested the patch.
+Matt, Kees,
+
+On Tue, Mar 04, 2014 at 04:39:57PM -0600, Matt Mackall wrote:
+> On Tue, 2014-03-04 at 11:59 -0800, Kees Cook wrote:
+> > On Tue, Mar 4, 2014 at 11:53 AM, Jason Cooper <jason@lakedaemon.net> wrote:
+> > > On Tue, Mar 04, 2014 at 11:01:49AM -0800, Kees Cook wrote:
+> > >> On Tue, Mar 4, 2014 at 7:38 AM, Jason Cooper <jason@lakedaemon.net> wrote:
+> > >> > On Mon, Mar 03, 2014 at 03:51:48PM -0800, Kees Cook wrote:
+...
+> > Well, I think there's confusion here over "the" hwrng and "a" hwrng. I
+> > have devices with multiple entropy sources, and all my hwrngs are
+> > built as modules, so I choose when to load them into my kernel. "The"
+> > arch-specific entropy source (e.g. RDRAND) is very different.
+
+Dynamically loading modules _after_ boot is fine.  Especially with
+Matt's clear explanation.  I'm not concerned about that scenario.
+
+> > > Please understand, my point-of-view is as someone who installs Linux on
+> > > equipment *after* purchase (hobbyist, tinkers).  If I control the part
+> > > selection and sourcing of the board components, of course I have more
+> > > trust in the hwrng.
+> > >
+> > > So my situation is similar to buying an Intel based laptop.  I can't do
+> > > a special order at Bestbuy and ask for a system without the RDRAND
+> > > instruction.  Same with the hobbyist market.  We buy the gear, but we
+> > > have no control over what's inside it.
+> > >
+> > > In that situation, without this patch, I would enable the hwrng for the
+> > > board.  With the patch in it's current form, I would start looking for
+> > > research papers and discussions regarding using the hwrng for input.  If
+> > > the patch provided arch_get_random_long(), I would feel comfortable
+> > > enabling the hwrng.
+> > >
+> > > Perhaps I'm being too conservative, but I'd rather have the discussion
+> > > now and have concerns proven unfounded than have someone say "How the
+> > > hell did this happen?" three releases down the road.
+> > 
+> > Sure, and I don't want to be the one weakening the entropy pool.
 > 
-> What about omap_sham_update => omap_sham_append_sg? As the former
-> can be called in softirq context what is preventing it from calling
-> kmap?
+> [temporarily coming out of retirement to provide a clue]
 
-In my testing it wasn't called from softirq, I'm using cryptodev which is
-called from openssl through ioctl, here is a traceback (sorry about wrap):
+Thanks, Matt!
 
-[<bf8010bb>] (cryptodev_ioctl+0x282/0x59c [cryptodev])
-[  220.015390] [<bf8010bb>] (cryptodev_ioctl+0x282/0x59c [cryptodev]) from
-[<c00cdaa5>] (do_vfs_ioctl+0x61/0x41c)
-[  220.025909] [<c00cdaa5>] (do_vfs_ioctl+0x61/0x41c) from [<c00cdeab>]
-(SyS_ioctl+0x4b/0x50)
-[  220.034602] [<c00cdeab>] (SyS_ioctl+0x4b/0x50) from [<c000cf01>]
-(ret_fast_syscall+0x1/0x46)
-[  220.045254] CPU: 0 PID: 1798 Comm: openssl Tainted: G           O
-3.12.9-00581-g5fa084c-dirty #32
-[  220.054636] [<c0012d05>] (unwind_backtrace+0x1/0x9c) from [<c000fa6d>]
-(show_stack+0x11/0x14)
-[  220.063619] [<c000fa6d>] (show_stack+0x11/0x14) from [<c0342edb>]
-(dump_stack+0x4b/0x60)
-[  220.072144] [<c0342edb>] (dump_stack+0x4b/0x60) from [<c02a1b3f>]
-(omap_sham_update+0x1f/0xa4)
-[  220.081214] [<c02a1b3f>] (omap_sham_update+0x1f/0xa4) from [<bf801f67>]
-(cryptodev_hash_update+0x26/0x80 [cryptodev])
-
-
-Could you suggest, what other place is update() called in softirq context?
-I may be missing something.
-
-Thanks,
--Joel
-
+> The pool mixing function is intentionally _reversible_. This is a
+> crucial security property.
 > 
-> Cheers,
+> That means, if I have an initial secret pool state X, and hostile
+> attacker controlled data Y, then we can do:
 > 
+> X' = mix(X, Y)
+> 
+>  and 
+> 
+> X = unmix(X', Y)
+> 
+> We can see from this that the combination of (X' and Y) still contain
+> the information that was originally in X. Since it's clearly not in Y..
+> it must all remain in X'.
+> 
+> In other words, if there are 4096 bits of "unknownness" in X to start
+> with, and I can get those same 4096 bits of "unknownness" back by
+> unmixing X' and Y, then there must still be 4096 bits of "unknownness"
+> in X'. If X' is 4096 bits long, then we've just proven that
+> reversibility means the attacker can know nothing about the contents of
+> X' by his choice of Y.
 
+Well, this reinforces my comfortability with loadable modules.  The pool
+is already initialized by the point at which the driver is loaded.
+
+Unfortunately, any of the drivers in hw_random can be built in.  When
+built in, hwrng_register is going to be called during the kernel
+initialization process.  In that case, the unknownness in X is not 4096
+bits, but far less.  Also, the items that may have seeded X (MAC addr,
+time, etc) are discoverable by a potential attacker.  This is also well
+before random-seed has been fed in.
+
+That's the crux of my concern with this patch.  Basically, the user can
+choose 'y' over 'm', say when building a dedicated system w/o loadable
+modules, and not realize how much more trust he has placed in the hwrng.
+
+How does this patch look?  I'm not claiming my change is acceptable for
+mainline, just seeking feedback on the concept.  IS_MODULE() really
+doesn't have many users afaict.
+
+This builds without warning on ARCH=arm with multi_v7_defconfig when
+HW_RANDOM={y,m,n}
+
+thx,
+
+Jason.
+
+-------->8--------------------------
+commit 0fcc0669ee4bbeae355c0f61f79a6b319a32ba12
+Author: Kees Cook <keescook@chromium.org>
+Date:   Mon Mar 3 15:51:48 2014 -0800
+
+    hwrng: add randomness to system from rng sources
+    
+    When bringing a new RNG source online, it seems like it would make sense
+    to use some of its bytes to make the system entropy pool more random,
+    as done with all sorts of other devices that contain per-device or
+    per-boot differences.
+    
+    [jac] prevent the code from being called at boot up, before the entropy
+    pool has had time to build and be well initialized.  We do this by
+    making the code conditional on being built as a module.
+    
+    Signed-off-by: Kees Cook <keescook@chromium.org>
+    Signed-off-by: Jason Cooper <jason@lakedaemon.net>
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index a0f7724852eb..5c3314cbf671 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -41,6 +41,8 @@
+ #include <linux/miscdevice.h>
+ #include <linux/delay.h>
+ #include <linux/slab.h>
++#include <linux/random.h>
++#include <linux/kconfig.h>
+ #include <asm/uaccess.h>
+ 
+ 
+@@ -305,6 +307,10 @@ int hwrng_register(struct hwrng *rng)
+ 	int must_register_misc;
+ 	int err = -EINVAL;
+ 	struct hwrng *old_rng, *tmp;
++#if IS_MODULE(CONFIG_HW_RANDOM)
++	unsigned char bytes[16];
++	int bytes_read;
++#endif
+ 
+ 	if (rng->name == NULL ||
+ 	    (rng->data_read == NULL && rng->read == NULL))
+@@ -348,6 +354,18 @@ int hwrng_register(struct hwrng *rng)
+ 	}
+ 	INIT_LIST_HEAD(&rng->list);
+ 	list_add_tail(&rng->list, &rng_list);
++
++	/*
++	 * Out of an abundance of caution, we should avoid seeding the entropy
++	 * pool when it is first initialized (ie at kernel boot time).
++	 * Therefore, we take advantage of the hwrng when it is built as a
++	 * module, but not when built in.
++	 */
++#if IS_MODULE(CONFIG_HW_RANDOM)
++	bytes_read = rng_get_data(rng, bytes, sizeof(bytes), 1);
++	if (bytes_read > 0)
++		add_device_randomness(bytes, bytes_read);
++#endif
+ out_unlock:
+ 	mutex_unlock(&rng_mutex);
+ out:
