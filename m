@@ -1,63 +1,72 @@
-From: Matt Mackall <mpm@selenic.com>
-Subject: Re: [PATCH][RESEND 3] hwrng: add randomness to system from rng
- sources
-Date: Wed, 05 Mar 2014 18:52:27 -0600
-Message-ID: <1394067147.17842.45.camel@calx>
+From: Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH][RESEND 3] hwrng: add randomness to system from rng sources
+Date: Wed, 5 Mar 2014 17:34:48 -0800
+Message-ID: <CAGXu5j+ddoy_v4y-cwgZmiKCe5DTARgkQYNntfNaY5msyADvtg@mail.gmail.com>
 References: <20140303235148.GA7601@www.outflux.net>
-	 <20140304153841.GN1872@titan.lakedaemon.net>
-	 <CAGXu5jKqB62ZaD0HEG=vJoROOqvdSYeHYB2h61Kw1-ov5phFww@mail.gmail.com>
-	 <20140304195356.GS1872@titan.lakedaemon.net>
-	 <CAGXu5jL5JBHL0tqZzA03LY67HZU4jEQ0_V=bJs9TV3g0Bfwr_w@mail.gmail.com>
-	 <1393972797.8344.190.camel@calx>
-	 <20140305211145.GV1872@titan.lakedaemon.net>
+	<20140304153841.GN1872@titan.lakedaemon.net>
+	<CAGXu5jKqB62ZaD0HEG=vJoROOqvdSYeHYB2h61Kw1-ov5phFww@mail.gmail.com>
+	<20140304195356.GS1872@titan.lakedaemon.net>
+	<CAGXu5jL5JBHL0tqZzA03LY67HZU4jEQ0_V=bJs9TV3g0Bfwr_w@mail.gmail.com>
+	<1393972797.8344.190.camel@calx>
+	<20140305211145.GV1872@titan.lakedaemon.net>
+	<1394067147.17842.45.camel@calx>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Kees Cook <keescook@chromium.org>, Theodore Ts'o <tytso@mit.edu>,
+Content-Type: text/plain; charset=UTF-8
+Cc: Jason Cooper <jason@lakedaemon.net>,
+	"Theodore Ts'o" <tytso@mit.edu>,
 	LKML <linux-kernel@vger.kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Rusty Russell <rusty@rustcorp.com.au>,
 	Satoru Takeuchi <satoru.takeuchi@gmail.com>,
 	linux-crypto <linux-crypto@vger.kernel.org>,
 	Andrew Morton <akpm@linux-foundation.org>
-To: Jason Cooper <jason@lakedaemon.net>
+To: Matt Mackall <mpm@selenic.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from waste.org ([173.11.57.241]:40456 "EHLO waste.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755512AbaCFAwn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 5 Mar 2014 19:52:43 -0500
-In-Reply-To: <20140305211145.GV1872@titan.lakedaemon.net>
+Received: from mail-oa0-f53.google.com ([209.85.219.53]:39112 "EHLO
+	mail-oa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756064AbaCFBes (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Mar 2014 20:34:48 -0500
+Received: by mail-oa0-f53.google.com with SMTP id j17so1929866oag.12
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Mar 2014 17:34:48 -0800 (PST)
+In-Reply-To: <1394067147.17842.45.camel@calx>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2014-03-05 at 16:11 -0500, Jason Cooper wrote:
-> > In other words, if there are 4096 bits of "unknownness" in X to start
-> > with, and I can get those same 4096 bits of "unknownness" back by
-> > unmixing X' and Y, then there must still be 4096 bits of "unknownness"
-> > in X'. If X' is 4096 bits long, then we've just proven that
-> > reversibility means the attacker can know nothing about the contents of
-> > X' by his choice of Y.
-> 
-> Well, this reinforces my comfortability with loadable modules.  The pool
-> is already initialized by the point at which the driver is loaded.
-> 
-> Unfortunately, any of the drivers in hw_random can be built in.  When
-> built in, hwrng_register is going to be called during the kernel
-> initialization process.  In that case, the unknownness in X is not 4096
-> bits, but far less.  Also, the items that may have seeded X (MAC addr,
-> time, etc) are discoverable by a potential attacker.  This is also well
-> before random-seed has been fed in.
+On Wed, Mar 5, 2014 at 4:52 PM, Matt Mackall <mpm@selenic.com> wrote:
+> On Wed, 2014-03-05 at 16:11 -0500, Jason Cooper wrote:
+>> > In other words, if there are 4096 bits of "unknownness" in X to start
+>> > with, and I can get those same 4096 bits of "unknownness" back by
+>> > unmixing X' and Y, then there must still be 4096 bits of "unknownness"
+>> > in X'. If X' is 4096 bits long, then we've just proven that
+>> > reversibility means the attacker can know nothing about the contents of
+>> > X' by his choice of Y.
+>>
+>> Well, this reinforces my comfortability with loadable modules.  The pool
+>> is already initialized by the point at which the driver is loaded.
+>>
+>> Unfortunately, any of the drivers in hw_random can be built in.  When
+>> built in, hwrng_register is going to be called during the kernel
+>> initialization process.  In that case, the unknownness in X is not 4096
+>> bits, but far less.  Also, the items that may have seeded X (MAC addr,
+>> time, etc) are discoverable by a potential attacker.  This is also well
+>> before random-seed has been fed in.
+>
+> To which I would respond.. so?
+>
+> If the pool is in an attacker-knowable state at early boot, adding
+> attacker-controlled data does not make the situation any worse. In fact,
+> if the attacker has less-than-perfect control of the inputs, mixing more
+> things in will make things exponentially harder for the attacker.
+>
+> Put another way: mixing can't ever removes unknownness from the pool, it
+> can only add more. So the only reason you should ever choose not to mix
+> something into the pool is performance.
 
-To which I would respond.. so?
+Excellent. So it sounds like you're okay with my original patch as-is?
 
-If the pool is in an attacker-knowable state at early boot, adding
-attacker-controlled data does not make the situation any worse. In fact,
-if the attacker has less-than-perfect control of the inputs, mixing more
-things in will make things exponentially harder for the attacker.
-
-Put another way: mixing can't ever removes unknownness from the pool, it
-can only add more. So the only reason you should ever choose not to mix
-something into the pool is performance.
+-Kees
 
 -- 
-Mathematics is the supreme nostalgia of our time.
+Kees Cook
+Chrome OS Security
