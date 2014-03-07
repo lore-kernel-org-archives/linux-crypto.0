@@ -1,88 +1,88 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH][RESEND 3] hwrng: add randomness to system from rng
- sources
-Date: Thu, 6 Mar 2014 07:55:33 -0500
-Message-ID: <20140306125533.GA1872@titan.lakedaemon.net>
-References: <20140303235148.GA7601@www.outflux.net>
+From: Nitesh Lal <NiteshNarayanLal@freescale.com>
+Subject: [PATCH] crypto: caam - Dynamic memory allocation for caam_rng_ctx object
+Date: Fri, 7 Mar 2014 16:06:08 +0530
+Message-ID: <1394188568-11884-1-git-send-email-NiteshNarayanLal@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Satoru Takeuchi <satoru.takeuchi@gmail.com>,
-	linux-crypto@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Kees Cook <keescook@chromium.org>
+Content-Type: text/plain
+Cc: Nitesh Lal <NiteshNarayanLal@freescale.com>
+To: <linux-crypto@vger.kernel.org>, <r66431@freescale.com>,
+	<b05456@freescale.com>, <herbert@gondor.apana.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:16019 "EHLO
-	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750829AbaCFMzi (ORCPT
+Received: from co9ehsobe001.messaging.microsoft.com ([207.46.163.24]:25556
+	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750833AbaCGFXh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Mar 2014 07:55:38 -0500
-Content-Disposition: inline
-In-Reply-To: <20140303235148.GA7601@www.outflux.net>
+	Fri, 7 Mar 2014 00:23:37 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 03, 2014 at 03:51:48PM -0800, Kees Cook wrote:
-> When bringing a new RNG source online, it seems like it would make sense
-> to use some of its bytes to make the system entropy pool more random,
-> as done with all sorts of other devices that contain per-device or
-> per-boot differences.
-> 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  drivers/char/hw_random/core.c |    7 +++++++
->  1 file changed, 7 insertions(+)
+This patch allocates memory from DMAable region to the caam_rng_ctx object,
+earlier it had been statically allocated which resulted in errorneous
+behaviour on inserting the caamrng module at the runtime.
 
-fwiw,
+Signed-off-by: Nitesh Lal <NiteshNarayanLal@freescale.com>
+---
+ drivers/crypto/caam/caamrng.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-Reviewed-by: Jason Cooper <jason@lakedaemon.net>
-
-thx,
-
-Jason.
-
-> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index a0f7724852eb..6e5bb68a708c 100644
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -41,6 +41,7 @@
->  #include <linux/miscdevice.h>
->  #include <linux/delay.h>
->  #include <linux/slab.h>
-> +#include <linux/random.h>
->  #include <asm/uaccess.h>
->  
->  
-> @@ -305,6 +306,8 @@ int hwrng_register(struct hwrng *rng)
->  	int must_register_misc;
->  	int err = -EINVAL;
->  	struct hwrng *old_rng, *tmp;
-> +	unsigned char bytes[16];
-> +	int bytes_read;
->  
->  	if (rng->name == NULL ||
->  	    (rng->data_read == NULL && rng->read == NULL))
-> @@ -348,6 +351,10 @@ int hwrng_register(struct hwrng *rng)
->  	}
->  	INIT_LIST_HEAD(&rng->list);
->  	list_add_tail(&rng->list, &rng_list);
-> +
-> +	bytes_read = rng_get_data(rng, bytes, sizeof(bytes), 1);
-> +	if (bytes_read > 0)
-> +		add_device_randomness(bytes, bytes_read);
->  out_unlock:
->  	mutex_unlock(&rng_mutex);
->  out:
-> -- 
-> 1.7.9.5
-> 
-> 
-> -- 
-> Kees Cook
-> Chrome OS Security
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index 28486b1..403d8d5 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -76,7 +76,7 @@ struct caam_rng_ctx {
+ 	struct buf_data bufs[2];
+ };
+ 
+-static struct caam_rng_ctx rng_ctx;
++static struct caam_rng_ctx *rng_ctx;
+ 
+ static inline void rng_unmap_buf(struct device *jrdev, struct buf_data *bd)
+ {
+@@ -137,7 +137,7 @@ static inline int submit_job(struct caam_rng_ctx *ctx, int to_current)
+ 
+ static int caam_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ {
+-	struct caam_rng_ctx *ctx = &rng_ctx;
++	struct caam_rng_ctx *ctx = rng_ctx;
+ 	struct buf_data *bd = &ctx->bufs[ctx->current_buf];
+ 	int next_buf_idx, copied_idx;
+ 	int err;
+@@ -237,12 +237,12 @@ static void caam_cleanup(struct hwrng *rng)
+ 	struct buf_data *bd;
+ 
+ 	for (i = 0; i < 2; i++) {
+-		bd = &rng_ctx.bufs[i];
++		bd = &rng_ctx->bufs[i];
+ 		if (atomic_read(&bd->empty) == BUF_PENDING)
+ 			wait_for_completion(&bd->filled);
+ 	}
+ 
+-	rng_unmap_ctx(&rng_ctx);
++	rng_unmap_ctx(rng_ctx);
+ }
+ 
+ static void caam_init_buf(struct caam_rng_ctx *ctx, int buf_id)
+@@ -273,8 +273,9 @@ static struct hwrng caam_rng = {
+ 
+ static void __exit caam_rng_exit(void)
+ {
+-	caam_jr_free(rng_ctx.jrdev);
++	caam_jr_free(rng_ctx->jrdev);
+ 	hwrng_unregister(&caam_rng);
++	kfree(rng_ctx);
+ }
+ 
+ static int __init caam_rng_init(void)
+@@ -286,7 +287,9 @@ static int __init caam_rng_init(void)
+ 		pr_err("Job Ring Device allocation for transform failed\n");
+ 		return PTR_ERR(dev);
+ 	}
+-
++	rng_ctx = kmalloc(sizeof(struct caam_rng_ctx), GFP_DMA);
++	if (!rng_ctx)
++		return -ENOMEM;
+ 	caam_init_rng(&rng_ctx, dev);
+ 
+ 	dev_info(dev, "registering rng-caam\n");
+-- 
+1.8.1.4
