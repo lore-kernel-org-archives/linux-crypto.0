@@ -1,37 +1,74 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 4/6] compile the DRBG code
-Date: Sun, 09 Mar 2014 00:48:14 +0100
-Message-ID: <3266401.GHYe0GEnsC@myon.chronox.de>
-References: <2396177.vxvG2ljJL8@myon.chronox.de> <2077366.gxQRUloqnc@myon.chronox.de> <3520786.epXSPkTVhr@myon.chronox.de>
+Subject: [PATCH 0/6] SP800-90A Deterministic Random Bit Generator
+Date: Sun, 09 Mar 2014 00:43:33 +0100
+Message-ID: <2396177.vxvG2ljJL8@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: aquini@redhat.com, jeremy.wayne.powell@gmail.com
 To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.160]:37964 "EHLO
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.218]:60394 "EHLO
 	mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751767AbaCHXuu (ORCPT
+	with ESMTP id S1751946AbaCHXux (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 8 Mar 2014 18:50:50 -0500
-In-Reply-To: <3520786.epXSPkTVhr@myon.chronox.de>
+	Sat, 8 Mar 2014 18:50:53 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hi,
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+the following set of patches implements the deterministic random bit generator
+(DRBG) specified by SP800-90A.
 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index b29402a..0d63373 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -92,6 +92,7 @@ obj-$(CONFIG_CRYPTO_842) += 842.o
- obj-$(CONFIG_CRYPTO_RNG2) += rng.o
- obj-$(CONFIG_CRYPTO_RNG2) += krng.o
- obj-$(CONFIG_CRYPTO_ANSI_CPRNG) += ansi_cprng.o
-+obj-$(CONFIG_CRYTPO_DRBG) += drbg.o
- obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
- obj-$(CONFIG_CRYPTO_GHASH) += ghash-generic.o
- obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+The DRBG implementation offers the following:
+
+	* All three DRBG types are implemented with a derivation function.
+	* All DRBG types are available with and without prediction resistance.
+	* All SHA types of SHA-1, SHA-256, SHA-384, SHA-512 are available
+	  for the HMAC and Hash DRBGs.
+	* All AES types of AES-128, AES-192 and AES-256 are available for the
+	  CTR DRBG.
+	* A self test is implemented with drbg_healthcheck().
+	* The FIPS 140-2 continuous self test is implemented.
+	* Additional cipher primitives, such as Serpent or Twofish, can be
+	  added to the DRBG without changing the implementation. The only
+	  change necessary is to the DRBG definition given in the cores[]
+	  array.
+
+As defined in SP800-131A, the ANSI X9.31 DRNG is to be sunset by the end of 
+this year for official uses, including FIPS 140-2 compliance.
+
+Additional tests are available at [1].
+
+[1] http://www.chronox.de/drbg.html
+
+Stephan Mueller (6):
+  SP800-90A Deterministic Random Bit Generator
+  header file for DRBG
+  DRBG kernel configuration options
+  compile the DRBG code
+  DRBG testmgr test vectors
+  Add DRBG test code to testmgr
+
+ crypto/Kconfig        |   36 +-
+ crypto/Makefile       |    1 +
+ crypto/drbg.c         | 1941 +++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.c      |  269 +++++++
+ crypto/testmgr.h      |  877 ++++++++++++++++++++++
+ include/crypto/drbg.h |  340 +++++++++
+ 6 files changed, 3463 insertions(+), 1 deletion(-)
+ create mode 100644 crypto/drbg.c
+ create mode 100644 include/crypto/drbg.h
+
 -- 
 1.8.5.3
+
+,
+
+
+
+Ciao
+Stephan
+-- 
+| Cui bono? |
