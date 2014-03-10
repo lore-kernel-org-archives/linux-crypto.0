@@ -1,38 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: avoid module request when lookup crypto larval
- of template
-Date: Mon, 10 Mar 2014 19:57:21 +0800
-Message-ID: <20140310115721.GA9657@gondor.apana.org.au>
-References: <1394443371-12181-1-git-send-email-jlee@suse.com>
+Subject: Re: [PATCH 1/2] SHA1 transform: x86_64 AVX2 optimization - assembly
+ code
+Date: Mon, 10 Mar 2014 20:15:28 +0800
+Message-ID: <20140310121528.GA10149@gondor.apana.org.au>
+References: <1393520815.7495.88.camel@pegasus.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Lee, Chun-Yi" <jlee@suse.com>
-To: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+Cc: davem@davemloft.net, hpa@zytor.com, ilya.albrekht@intel.com,
+	maxim.locktyukhin@intel.com, ronen.zohar@intel.com,
+	wajdi.k.feghali@intel.com, tim.c.chen@linux.intel.com,
+	linux-crypto@vger.kernel.org
+To: chandramouli narayanan <mouli@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:33593 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:40310 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752193AbaCJL5j (ORCPT
+	with ESMTP id S1752668AbaCJMPp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Mar 2014 07:57:39 -0400
+	Mon, 10 Mar 2014 08:15:45 -0400
 Content-Disposition: inline
-In-Reply-To: <1394443371-12181-1-git-send-email-jlee@suse.com>
+In-Reply-To: <1393520815.7495.88.camel@pegasus.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 10, 2014 at 05:22:51PM +0800, Lee, Chun-Yi wrote:
-> When allocate crypto algorithms, e.g. crypto_alloc_shash(), using
-> template model will run into the path that call module_request().
-> But there have no any module alias that match with the template name.
+On Thu, Feb 27, 2014 at 09:06:55AM -0800, chandramouli narayanan wrote:
+> This git patch adds x86_64 AVX2 optimization of SHA1 transform
+> to crypto support. The patch has been tested with 3.14.0-rc1
+> kernel.
+> 
+> On a Haswell desktop, with turbo disabled and all cpus running
+> at maximum frequency, tcrypt shows AVX2 performance improvement
+> from 3% for 256 bytes update to 16% for 1024 bytes update over
+> AVX implementation. 
+> 
+> Signed-off-by: Chandramouli Narayanan <mouli@linux.intel.com>
 
-There aren't any but there could be.  For example, as it is
-all direct implementations of cbc(aes) rely on the fact that
-they also happen to provide aes to autoload themselves.
+Sorry but your patch is corrupted:
 
-We may well have a case where it makes sense for a module to
-provide just cbc(aes) for example, in which case it would need
-such an alias for it to be loaded automatically.
+Applying: crypto: sha1 - x86_64 AVX2 optimization - assembly code
+fatal: corrupt patch at line 160
+Patch failed at 0012 crypto: sha1 - x86_64 AVX2 optimization - assembly code
+
+Please test by applying the patch from your own email.
 
 Thanks,
 -- 
