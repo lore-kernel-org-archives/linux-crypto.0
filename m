@@ -1,35 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: omap-des - make local functions static
-Date: Mon, 10 Mar 2014 20:21:46 +0800
-Message-ID: <20140310122146.GE10556@gondor.apana.org.au>
-References: <000701cf33af$e46a9f80$ad3fde80$%han@samsung.com>
- <530FDF84.6060705@ti.com>
+Subject: Re: [PATCH] crypto: mxs-dcp: Align the bounce buffers
+Date: Mon, 10 Mar 2014 20:22:00 +0800
+Message-ID: <20140310122200.GF10556@gondor.apana.org.au>
+References: <1393806195-6415-1-git-send-email-marex@denx.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Jingoo Han <jg1.han@samsung.com>,
-	'David Miller' <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Joel Fernandes <joelf@ti.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Fabio Estevam <fabio.estevam@freescale.com>,
+	Shawn Guo <shawn.guo@linaro.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>
+To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:36920 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:46234 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752671AbaCJMVw (ORCPT
+	with ESMTP id S1752959AbaCJMWR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Mar 2014 08:21:52 -0400
+	Mon, 10 Mar 2014 08:22:17 -0400
 Content-Disposition: inline
-In-Reply-To: <530FDF84.6060705@ti.com>
+In-Reply-To: <1393806195-6415-1-git-send-email-marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 27, 2014 at 06:59:48PM -0600, Joel Fernandes wrote:
-> On 02/27/2014 05:34 AM, Jingoo Han wrote:
-> > Make omap_des_copy_needed(), omap_des_copy_sgs(), because these
-> > functions are used only in this file.
-> > 
-> > Signed-off-by: Jingoo Han <jg1.han@samsung.com>
+On Mon, Mar 03, 2014 at 01:23:15AM +0100, Marek Vasut wrote:
+> The DCP needs the bounce buffers, DMA descriptors and result buffers aligned
+> to 64 bytes (yet another hardware limitation). Make sure they are aligned by
+> properly aligning the structure which contains them during allocation.
 > 
-> Ok with me,
-> Acked-by: Joel Fernandes <joelf@ti.com>
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Fabio Estevam <fabio.estevam@freescale.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Shawn Guo <shawn.guo@linaro.org>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
 
 Patch applied.
 -- 
