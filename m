@@ -1,47 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH][RESEND 3] hwrng: add randomness to system from rng
- sources
-Date: Mon, 10 Mar 2014 20:22:29 +0800
-Message-ID: <20140310122228.GH10556@gondor.apana.org.au>
-References: <20140303235148.GA7601@www.outflux.net>
- <20140306125533.GA1872@titan.lakedaemon.net>
+Subject: Re: [RFC PATCH 1/3] crypto: remove direct blkcipher_walk dependency
+ on transform
+Date: Mon, 10 Mar 2014 20:22:54 +0800
+Message-ID: <20140310122254.GI10556@gondor.apana.org.au>
+References: <1393910920-5796-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1393910920-5796-2-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org,
-	Matt Mackall <mpm@selenic.com>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Satoru Takeuchi <satoru.takeuchi@gmail.com>,
-	linux-crypto@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Jason Cooper <jason@lakedaemon.net>
+Cc: linux-crypto@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:33248 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:43188 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753053AbaCJMWw (ORCPT
+	with ESMTP id S1753186AbaCJMW4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Mar 2014 08:22:52 -0400
+	Mon, 10 Mar 2014 08:22:56 -0400
 Content-Disposition: inline
-In-Reply-To: <20140306125533.GA1872@titan.lakedaemon.net>
+In-Reply-To: <1393910920-5796-2-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 06, 2014 at 07:55:33AM -0500, Jason Cooper wrote:
-> On Mon, Mar 03, 2014 at 03:51:48PM -0800, Kees Cook wrote:
-> > When bringing a new RNG source online, it seems like it would make sense
-> > to use some of its bytes to make the system entropy pool more random,
-> > as done with all sorts of other devices that contain per-device or
-> > per-boot differences.
-> > 
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
-> > ---
-> >  drivers/char/hw_random/core.c |    7 +++++++
-> >  1 file changed, 7 insertions(+)
+On Tue, Mar 04, 2014 at 01:28:38PM +0800, Ard Biesheuvel wrote:
+> In order to allow other uses of the blkcipher walk API than the blkcipher
+> algos themselves, this patch copies some of the transform data members to the
+> walk struct so the transform is only accessed at walk init time.
 > 
-> fwiw,
-> 
-> Reviewed-by: Jason Cooper <jason@lakedaemon.net>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Patch applied.  Thanks everyone!
+Applied patches 1 & 2.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
