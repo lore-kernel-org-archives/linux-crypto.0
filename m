@@ -1,52 +1,53 @@
-From: Tomasz Figa <tomasz.figa@gmail.com>
-Subject: Re: [PATCH 5/9 v7] clk: samsung exynos5250/5420: Add gate clock for
- SSS module
-Date: Mon, 10 Mar 2014 01:19:18 +0100
-Message-ID: <531D0506.7080209@gmail.com>
-References: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com> <1392630275-8667-6-git-send-email-ch.naveen@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
-	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
-	cpgs@samsung.com, davem@davemloft.net,
-	Kukjin Kim <kgene.kim@samsung.com>
-To: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
-	linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ea0-f173.google.com ([209.85.215.173]:63950 "EHLO
-	mail-ea0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752714AbaCJATW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 9 Mar 2014 20:19:22 -0400
-In-Reply-To: <1392630275-8667-6-git-send-email-ch.naveen@samsung.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+Subject: [PATCH] crypto: avoid module request when lookup crypto larval of template
+Date: Mon, 10 Mar 2014 17:22:51 +0800
+Message-ID: <1394443371-12181-1-git-send-email-jlee@suse.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Lee, Chun-Yi" <jlee@suse.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 17.02.2014 10:44, Naveen Krishna Chatradhi wrote:
-> This patch adds gating clock for SSS(Security SubSystem)
-> module on Exynos5250/5420.
->
-> Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-> Reviewed-by: Tomasz Figa <t.figa@samsung.com>
-> TO: <linux-samsung-soc@vger.kernel.org>
-> TO: Tomasz Figa <t.figa@samsung.com>
-> CC: David S. Miller <davem@davemloft.net>
-> CC: Kukjin Kim <kgene.kim@samsung.com>
-> CC: <linux-crypto@vger.kernel.org>
-> ---
-> changes since v6:
-> None
-> changes since v5:
-> 1. Added Reviewed-by: Tomasz Figa <t.figa@samsung.com>
->
->   .../devicetree/bindings/clock/exynos5250-clock.txt |    1 +
->   drivers/clk/samsung/clk-exynos5250.c               |    1 +
->   drivers/clk/samsung/clk-exynos5420.c               |    4 ++++
->   include/dt-bindings/clock/exynos5250.h             |    1 +
->   4 files changed, 7 insertions(+)
+When allocate crypto algorithms, e.g. crypto_alloc_shash(), using
+template model will run into the path that call module_request().
+But there have no any module alias that match with the template name.
 
-Applied to samsung-clk tree.
+e.g.
+Enable the module_request tracing event then run "modprobe tcrypt
+mode=10" to test, it produces module_request event:
+[...]
+        modprobe-4965  [000] ....   123.504690: module_request: ecb(aes)
+wait=1 call_site=crypto_larval_lookup
+        modprobe-4965  [002] ....   123.506826: module_request:
+ecb(aes)-all wait=1 call_site=crypto_larval_lookup
+ cryptomgr_probe-4970  [003] ....   123.509007: module_request: ecb
+wait=1 call_site=crypto_lookup_template
 
-Best regards,
-Tomasz
+Here should not call module_request() for ecb(aes) because the template
+name doesn't match with any driver's alias.
+
+This patch add the name checking in crypto_larval_lookup() to
+filter out the template before request kernel module.
+
+Signed-off-by: Lee, Chun-Yi <jlee@suse.com>
+---
+ crypto/api.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/crypto/api.c b/crypto/api.c
+index a2b39c5..9aac892 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -215,7 +215,7 @@ struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask)
+ 	type &= mask;
+ 
+ 	alg = crypto_alg_lookup(name, type, mask);
+-	if (!alg) {
++	if (!alg && !strchr(name, '(')) {
+ 		request_module("%s", name);
+ 
+ 		if (!((type ^ CRYPTO_ALG_NEED_FALLBACK) & mask &
+-- 
+1.6.4.2
