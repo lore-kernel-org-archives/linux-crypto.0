@@ -1,33 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/2] crypto: sahara: Use return value of
- devm_request_irq() on error
-Date: Mon, 10 Mar 2014 20:20:29 +0800
-Message-ID: <20140310122029.GA10556@gondor.apana.org.au>
-References: <1393073735-16092-1-git-send-email-shc_work@mail.ru>
- <1393073735-16092-2-git-send-email-shc_work@mail.ru>
+Subject: Re: [PATCH] crypt: bfin_crc: Remove useless SSYNC instruction and
+ cache flush to DMA coherent memory
+Date: Mon, 10 Mar 2014 20:21:00 +0800
+Message-ID: <20140310122059.GB10556@gondor.apana.org.au>
+References: <1393382356-9422-1-git-send-email-sonic.adi@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Shawn Guo <shawn.guo@linaro.org>,
-	Sascha Hauer <kernel@pengutronix.de>
-To: Alexander Shiyan <shc_work@mail.ru>
+	adi-buildroot-devel@lists.sourceforge.net,
+	Sonic Zhang <sonic.zhang@analog.com>
+To: Sonic Zhang <sonic.adi@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:54893 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:47469 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752522AbaCJMUh (ORCPT
+	with ESMTP id S1753139AbaCJMVD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Mar 2014 08:20:37 -0400
+	Mon, 10 Mar 2014 08:21:03 -0400
 Content-Disposition: inline
-In-Reply-To: <1393073735-16092-2-git-send-email-shc_work@mail.ru>
+In-Reply-To: <1393382356-9422-1-git-send-email-sonic.adi@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Feb 22, 2014 at 12:55:35PM +0000, Alexander Shiyan wrote:
-> Signed-off-by: Alexander Shiyan <shc_work@mail.ru>
+On Wed, Feb 26, 2014 at 10:39:16AM +0800, Sonic Zhang wrote:
+> From: Sonic Zhang <sonic.zhang@analog.com>
+> 
+> 1) SSYNC instruction is blackfin specific and takes no effect in this driver.
+> 2) DMA descriptor and SG middle buffer are in DMA coherent memory. No need
+> to flush.
+> 3) Turn kzalloc, ioremap and request_irq into managed device APIs respectively.
+> 
+> Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
 
-Patch 1/2 dropped since it's already in the tree.  Patch 2/2
-applied.  Thanks!
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
