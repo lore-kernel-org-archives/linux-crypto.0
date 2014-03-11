@@ -1,47 +1,46 @@
-From: "McCaffrey, Timothy M" <Timothy.McCaffrey@unisys.com>
-Subject: RE: [PATCH 2/2] Crypto: Add support for 192 & 256 bit keys to AESNI
- RFC4106 - fixed whitespace
-Date: Mon, 10 Mar 2014 18:12:12 -0500
-Message-ID: <62FCA75CAF88C148AA5FC0EC0E4321C70127AA9741A9@USEA-EXCH7.na.uis.unisys.com>
-References: <62FCA75CAF88C148AA5FC0EC0E4321C70127AA6F5222@USEA-EXCH7.na.uis.unisys.com>
-	 <1394239315.27116.142.camel@schen9-DESK>
-	 <62FCA75CAF88C148AA5FC0EC0E4321C70127AA973760@USEA-EXCH7.na.uis.unisys.com>
-	 <1394243568.27116.151.camel@schen9-DESK>
-	 <62FCA75CAF88C148AA5FC0EC0E4321C70127AA973763@USEA-EXCH7.na.uis.unisys.com>
- <1394493051.27116.155.camel@schen9-DESK>
+From: joeyli <jlee@suse.com>
+Subject: Re: [PATCH] crypto: avoid module request when lookup crypto larval
+ of template
+Date: Tue, 11 Mar 2014 22:02:58 +0800
+Message-ID: <1394546578.26565.43.camel@linux-s257.site>
+References: <1394443371-12181-1-git-send-email-jlee@suse.com>
+	 <20140310115721.GA9657@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	James Guilford <james.guilford@intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>
-To: Tim Chen <tim.c.chen@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail1.bemta8.messagelabs.com ([216.82.243.201]:28113 "EHLO
-	mail1.bemta8.messagelabs.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752439AbaCJXMQ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Mar 2014 19:12:16 -0400
-In-Reply-To: <1394493051.27116.155.camel@schen9-DESK>
-Content-Language: en-US
+Received: from smtp.nue.novell.com ([195.135.221.5]:57455 "EHLO
+	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752889AbaCKODm (ORCPT
+	<rfc822;groupwise-linux-crypto@vger.kernel.org:0:0>);
+	Tue, 11 Mar 2014 10:03:42 -0400
+In-Reply-To: <20140310115721.GA9657@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-VGhhbmtzLiAgDQpJJ2xsIGdldCB0aGUgcmV2aXNpb24gZm9yIGdsdWUuYyBkb25lICggYW5kIHRo
-ZSBlLW1haWwgcHJvYmxlbSBmaXhlZCwgcHJvYmFibHkgZnJvbSBhIGRpZmZlcmVudCBhZGRyZXNz
-KSBzb29uLiAgDQoNCgktIFRpbQ0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTog
-VGltIENoZW4gW21haWx0bzp0aW0uYy5jaGVuQGxpbnV4LmludGVsLmNvbV0gDQpTZW50OiBNb25k
-YXksIE1hcmNoIDEwLCAyMDE0IDc6MTEgUE0NClRvOiBNY0NhZmZyZXksIFRpbW90aHkgTQ0KQ2M6
-IGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdTsgbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9y
-ZzsgSmFtZXMgR3VpbGZvcmQ7IFZpbm9kaCBHb3BhbA0KU3ViamVjdDogUkU6IFtQQVRDSCAyLzJd
-IENyeXB0bzogQWRkIHN1cHBvcnQgZm9yIDE5MiAmIDI1NiBiaXQga2V5cyB0byBBRVNOSSBSRkM0
-MTA2IC0gZml4ZWQgd2hpdGVzcGFjZQ0KDQpPbiBGcmksIDIwMTQtMDMtMDcgYXQgMTk6NTYgLTA2
-MDAsIE1jQ2FmZnJleSwgVGltb3RoeSBNIHdyb3RlOg0KPiBPaywgd2lsbCBnZW5lcmF0ZSBhbm90
-aGVyIHBhdGNoIGZvciBnbHVlLmMuICBTaW5jZSB0aGUgYXNtIGRvZXNuJ3QgdmVyaWZ5IHRoZSBh
-YWRsZW4gb3IgdGFnbGVuIGVpdGhlciAodGhleSBoYXZlIGEgY29uc3RyYWluZWQgc2V0IG9mIHZh
-bHVlcyBhcyB3ZWxsKSwgcGVyaGFwcyB0aGV5IHNob3VsZCBiZSB2ZXJpZmllZCBieSBnbHVlLmMg
-YXMgd2VsbD8NCj4gDQo+IAktIFRpbQ0KPiANCg0KUmFuIHRocm91Z2ggdGhlIHZhbGlkYXRpb24g
-dGVzdHMgYW5kIHRoZSBuZXcgY29kZSBsb29rcyBnb29kLiAgVGhlDQpwZXJmb3JtYW5jZSBkaWZm
-ZXJlbmNlIGlzIG5lZ2xpZ2libGUgYmV0d2VlbiB0aGUgbmV3IGFuZCBvcmlnaW5hbCANCmNvZGUg
-Zm9yIDEyOCBiaXQga2V5Lg0KDQpUaW0gQ2hlbg0KDQo=
+Hi Herbert,=20
+
+=E6=96=BC =E4=B8=80=EF=BC=8C2014-03-10 =E6=96=BC 19:57 +0800=EF=BC=8CHe=
+rbert Xu =E6=8F=90=E5=88=B0=EF=BC=9A
+> On Mon, Mar 10, 2014 at 05:22:51PM +0800, Lee, Chun-Yi wrote:
+> > When allocate crypto algorithms, e.g. crypto_alloc_shash(), using
+> > template model will run into the path that call module_request().
+> > But there have no any module alias that match with the template nam=
+e.
+>=20
+> There aren't any but there could be.  For example, as it is
+> all direct implementations of cbc(aes) rely on the fact that
+> they also happen to provide aes to autoload themselves.
+>=20
+> We may well have a case where it makes sense for a module to
+> provide just cbc(aes) for example, in which case it would need
+> such an alias for it to be loaded automatically.
+>=20
+> Thanks,
+
+Thanks for your quick explanation!
+
+Joey Lee
