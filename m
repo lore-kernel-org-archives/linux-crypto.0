@@ -1,7 +1,7 @@
 From: Jason Cooper <jason@lakedaemon.net>
-Subject: [RFC PATCH 16/22] staging: crypto: skein: fix do/while brace formatting
-Date: Tue, 11 Mar 2014 21:32:48 +0000
-Message-ID: <2f243f3b49ec31d57e4f44c9eb1168feca232ed0.1394570068.git.jason@lakedaemon.net>
+Subject: [RFC PATCH 21/22] staging: crypto: skein: remove unnecessary line continuation
+Date: Tue, 11 Mar 2014 21:32:53 +0000
+Message-ID: <44383723f82fc37502f8732b2796c51bb61535a8.1394570068.git.jason@lakedaemon.net>
 References: <cover.1394570067.git.jason@lakedaemon.net>
 Cc: devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org,
 	Jason Cooper <jason@lakedaemon.net>
@@ -9,11 +9,11 @@ To: Greg KH <gregkh@linuxfoundation.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:52034 "EHLO
+Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:52089 "EHLO
 	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755781AbaCKVzp (ORCPT
+	with ESMTP id S1755782AbaCKVzq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Mar 2014 17:55:45 -0400
+	Tue, 11 Mar 2014 17:55:46 -0400
 In-Reply-To: <cover.1394570067.git.jason@lakedaemon.net>
 In-Reply-To: <cover.1394570067.git.jason@lakedaemon.net>
 References: <cover.1394570067.git.jason@lakedaemon.net>
@@ -22,42 +22,21 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Jason Cooper <jason@lakedaemon.net>
 ---
- drivers/staging/skein/skein_block.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ drivers/staging/skein/skein_block.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/staging/skein/skein_block.c b/drivers/staging/skein/skein_block.c
-index 780b4936f783..6e0f4a21aae3 100644
+index 707a21ae53c6..fd96ca0ad0ed 100644
 --- a/drivers/staging/skein/skein_block.c
 +++ b/drivers/staging/skein/skein_block.c
-@@ -215,8 +215,7 @@ void Skein_256_Process_Block(struct skein_256_ctx *ctx, const u8 *blkPtr,
- 		Skein_Show_Round(BLK_BITS, &ctx->h, SKEIN_RND_FEED_FWD, ctx->X);
+@@ -477,7 +477,7 @@ unsigned int Skein_512_Unroll_Cnt(void)
  
- 		ts[1] &= ~SKEIN_T1_FLAG_FIRST;
--	}
--	while (--blkCnt);
-+	} while (--blkCnt);
- 	ctx->h.T[0] = ts[0];
- 	ctx->h.T[1] = ts[1];
- }
-@@ -434,8 +433,7 @@ void Skein_512_Process_Block(struct skein_512_ctx *ctx, const u8 *blkPtr,
- 		Skein_Show_Round(BLK_BITS, &ctx->h, SKEIN_RND_FEED_FWD, ctx->X);
- 
- 		ts[1] &= ~SKEIN_T1_FLAG_FIRST;
--	}
--	while (--blkCnt);
-+	} while (--blkCnt);
- 	ctx->h.T[0] = ts[0];
- 	ctx->h.T[1] = ts[1];
- }
-@@ -717,8 +715,7 @@ void Skein1024_Process_Block(struct skein1024_ctx *ctx, const u8 *blkPtr, \
- 
- 		ts[1] &= ~SKEIN_T1_FLAG_FIRST;
- 		blkPtr += SKEIN1024_BLOCK_BYTES;
--	}
--	while (--blkCnt);
-+	} while (--blkCnt);
- 	ctx->h.T[0] = ts[0];
- 	ctx->h.T[1] = ts[1];
- }
+ /*****************************  Skein1024 ******************************/
+ #if !(SKEIN_USE_ASM & 1024)
+-void Skein1024_Process_Block(struct skein1024_ctx *ctx, const u8 *blkPtr, \
++void Skein1024_Process_Block(struct skein1024_ctx *ctx, const u8 *blkPtr,
+ 				size_t blkCnt, size_t byteCntAdd)
+ { /* do it in C, always looping (unrolled is bigger AND slower!) */
+ 	enum {
 -- 
 1.9.0
