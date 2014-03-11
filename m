@@ -1,7 +1,7 @@
 From: Jason Cooper <jason@lakedaemon.net>
-Subject: [RFC PATCH 05/22] staging: crypto: skein: remove skein_port.h
-Date: Tue, 11 Mar 2014 21:32:37 +0000
-Message-ID: <c1753034873f688fa6510c2422403ad776bcaf3c.1394570067.git.jason@lakedaemon.net>
+Subject: [RFC PATCH 03/22] staging: crypto: skein: allow building statically
+Date: Tue, 11 Mar 2014 21:32:35 +0000
+Message-ID: <e3d822cba2ff9e9bbb57fc613039bd0983186c05.1394570067.git.jason@lakedaemon.net>
 References: <cover.1394570067.git.jason@lakedaemon.net>
 Cc: devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org,
 	Jason Cooper <jason@lakedaemon.net>
@@ -9,209 +9,428 @@ To: Greg KH <gregkh@linuxfoundation.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:51804 "EHLO
-	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754649AbaCKVzk (ORCPT
+Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:22231 "EHLO
+	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755043AbaCKVzj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Mar 2014 17:55:40 -0400
+	Tue, 11 Mar 2014 17:55:39 -0400
 In-Reply-To: <cover.1394570067.git.jason@lakedaemon.net>
 In-Reply-To: <cover.1394570067.git.jason@lakedaemon.net>
 References: <cover.1394570067.git.jason@lakedaemon.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+These are the minimum changes required to get the code to build
+statically in the kernel.  It's necessary to do this first so that we
+can empirically determine that future cleanup patches aren't changing
+the generated object code.
+
 Signed-off-by: Jason Cooper <jason@lakedaemon.net>
 ---
- drivers/staging/skein/include/skein.h      |  14 +++-
- drivers/staging/skein/include/skein_port.h | 108 -----------------------------
- drivers/staging/skein/skein.c              |  21 ------
- 3 files changed, 13 insertions(+), 130 deletions(-)
- delete mode 100644 drivers/staging/skein/include/skein_port.h
+ drivers/staging/Kconfig                      |  2 +
+ drivers/staging/Makefile                     |  1 +
+ drivers/staging/skein/CMakeLists.txt         | 27 -------------
+ drivers/staging/skein/Kconfig                | 32 ++++++++++++++++
+ drivers/staging/skein/Makefile               | 13 +++++++
+ drivers/staging/skein/include/brg_types.h    | 57 ----------------------------
+ drivers/staging/skein/include/skein.h        | 10 -----
+ drivers/staging/skein/include/skeinApi.h     |  2 +-
+ drivers/staging/skein/include/skein_port.h   | 16 +-------
+ drivers/staging/skein/include/threefishApi.h |  2 +-
+ drivers/staging/skein/skein.c                |  2 +-
+ drivers/staging/skein/skeinApi.c             |  4 +-
+ drivers/staging/skein/skeinBlockNo3F.c       |  2 +-
+ drivers/staging/skein/skein_block.c          |  2 +-
+ drivers/staging/skein/threefish1024Block.c   |  3 +-
+ drivers/staging/skein/threefish256Block.c    |  3 +-
+ drivers/staging/skein/threefish512Block.c    |  3 +-
+ drivers/staging/skein/threefishApi.c         |  3 +-
+ 18 files changed, 59 insertions(+), 125 deletions(-)
+ delete mode 100755 drivers/staging/skein/CMakeLists.txt
+ create mode 100644 drivers/staging/skein/Kconfig
+ create mode 100644 drivers/staging/skein/Makefile
 
-diff --git a/drivers/staging/skein/include/skein.h b/drivers/staging/skein/include/skein.h
-index 315cdcd14413..211aca1b1036 100644
---- a/drivers/staging/skein/include/skein.h
-+++ b/drivers/staging/skein/include/skein.h
-@@ -33,7 +33,19 @@ extern "C"
+diff --git a/drivers/staging/Kconfig b/drivers/staging/Kconfig
+index 99375f0a9440..fbcbe833dc89 100644
+--- a/drivers/staging/Kconfig
++++ b/drivers/staging/Kconfig
+@@ -146,4 +146,6 @@ source "drivers/staging/dgnc/Kconfig"
+ 
+ source "drivers/staging/dgap/Kconfig"
+ 
++source "drivers/staging/skein/Kconfig"
++
+ endif # STAGING
+diff --git a/drivers/staging/Makefile b/drivers/staging/Makefile
+index ddc3c4a5d39d..2dee51d1a483 100644
+--- a/drivers/staging/Makefile
++++ b/drivers/staging/Makefile
+@@ -65,3 +65,4 @@ obj-$(CONFIG_XILLYBUS)		+= xillybus/
+ obj-$(CONFIG_DGNC)			+= dgnc/
+ obj-$(CONFIG_DGAP)			+= dgap/
+ obj-$(CONFIG_MTD_SPINAND_MT29F)	+= mt29f_spinand/
++obj-$(CONFIG_CRYPTO_SKEIN) += skein/
+diff --git a/drivers/staging/skein/CMakeLists.txt b/drivers/staging/skein/CMakeLists.txt
+deleted file mode 100755
+index 604aaa394cb1..000000000000
+--- a/drivers/staging/skein/CMakeLists.txt
++++ /dev/null
+@@ -1,27 +0,0 @@
+-cmake_minimum_required (VERSION 2.6)
+-
+-include_directories (${CMAKE_CURRENT_SOURCE_DIR}/include)
+-
+-# set(skeinBlock_src skein_block.c)
+-set(skeinBlock_src skeinBlockNo3F.c)
+-
+-set(skein_src 
+-    ${skeinBlock_src}
+-    skein.c
+-    skeinApi.c
+-    )
+-
+-set(threefish_src
+-    threefishApi.c
+-    threefish256Block.c
+-    threefish512Block.c
+-    threefish1024Block.c
+-    )
+-set(s3f_src ${skein_src} ${threefish_src})
+-
+-add_library(skein3fish SHARED ${s3f_src})
+-set_target_properties(skein3fish PROPERTIES VERSION ${VERSION} SOVERSION ${SOVERSION})
+-target_link_libraries(skein3fish ${LIBS})
+-
+-install(TARGETS skein3fish DESTINATION ${LIBDIRNAME})
+-
+diff --git a/drivers/staging/skein/Kconfig b/drivers/staging/skein/Kconfig
+new file mode 100644
+index 000000000000..8f5a72a90ced
+--- /dev/null
++++ b/drivers/staging/skein/Kconfig
+@@ -0,0 +1,32 @@
++config CRYPTO_SKEIN
++	bool "Skein digest algorithm"
++	depends on (X86 || UML_X86) && 64BIT
++	select CRYPTO_THREEFISH
++	select CRYPTO_HASH
++	help
++	  Skein secure hash algorithm is one of 5 finalists from the NIST SHA3
++	  competition.
++
++	  Skein is optimized for modern, 64bit processors and is highly
++	  customizable.  See:
++
++	  http://www.skein-hash.info/sites/default/files/skein1.3.pdf
++
++	  for more information.  This module depends on the threefish block
++	  cipher module.
++
++config CRYPTO_THREEFISH
++	bool "Threefish tweakable block cipher"
++	depends on (X86 || UML_X86) && 64BIT
++	select CRYPTO_ALGAPI
++	help
++	  Threefish cipher algorithm is the tweakable block cipher underneath
++	  the Skein family of secure hash algorithms.  Skein is one of 5
++	  finalists from the NIST SHA3 competition.
++
++	  Skein is optimized for modern, 64bit processors and is highly
++	  customizable.  See:
++
++	  http://www.skein-hash.info/sites/default/files/skein1.3.pdf
++
++	  for more information.
+diff --git a/drivers/staging/skein/Makefile b/drivers/staging/skein/Makefile
+new file mode 100644
+index 000000000000..2bb386e1e58c
+--- /dev/null
++++ b/drivers/staging/skein/Makefile
+@@ -0,0 +1,13 @@
++#
++# Makefile for the skein secure hash algorithm
++#
++subdir-ccflags-y := -I$(src)/include/
++
++obj-$(CONFIG_CRYPTO_SKEIN) +=   skein.o \
++				skeinApi.o \
++				skein_block.o
++
++obj-$(CONFIG_CRYPTO_THREEFISH) += threefish1024Block.o \
++				  threefish256Block.o \
++				  threefish512Block.o \
++				  threefishApi.o
+diff --git a/drivers/staging/skein/include/brg_types.h b/drivers/staging/skein/include/brg_types.h
+index 6db737d71b9e..3d9fe0df5238 100644
+--- a/drivers/staging/skein/include/brg_types.h
++++ b/drivers/staging/skein/include/brg_types.h
+@@ -46,83 +46,26 @@
+ extern "C" {
  #endif
  
- #include <stddef.h>                          /* get size_t definition */
--#include <skein_port.h>               /* get platform-specific definitions */
-+
-+typedef unsigned int    uint_t;             /* native unsigned integer */
-+typedef uint8_t         u08b_t;             /*  8-bit unsigned integer */
-+typedef uint64_t        u64b_t;             /* 64-bit unsigned integer */
-+
-+#ifndef RotL_64
-+#define RotL_64(x,N)    (((x) << (N)) | ((x) >> (64-(N))))
-+#endif
-+
-+/* below two prototype assume we are handed aligned data */
-+#define Skein_Put64_LSB_First(dst08,src64,bCnt) memcpy(dst08,src64,bCnt)
-+#define Skein_Get64_LSB_First(dst64,src08,wCnt) memcpy(dst64,src08,8*(wCnt))
-+#define Skein_Swap64(w64)  (w64)
+-#include <limits.h>
+-
+ #ifndef BRG_UI8
+ #  define BRG_UI8
+-#  if UCHAR_MAX == 255u
+      typedef unsigned char uint_8t;
+-#  else
+-#    error Please define uint_8t as an 8-bit unsigned integer type in brg_types.h
+-#  endif
+ #endif
  
- enum
-     {
+ #ifndef BRG_UI16
+ #  define BRG_UI16
+-#  if USHRT_MAX == 65535u
+      typedef unsigned short uint_16t;
+-#  else
+-#    error Please define uint_16t as a 16-bit unsigned short type in brg_types.h
+-#  endif
+ #endif
+ 
+ #ifndef BRG_UI32
+ #  define BRG_UI32
+-#  if UINT_MAX == 4294967295u
+ #    define li_32(h) 0x##h##u
+      typedef unsigned int uint_32t;
+-#  elif ULONG_MAX == 4294967295u
+-#    define li_32(h) 0x##h##ul
+-     typedef unsigned long uint_32t;
+-#  elif defined( _CRAY )
+-#    error This code needs 32-bit data types, which Cray machines do not provide
+-#  else
+-#    error Please define uint_32t as a 32-bit unsigned integer type in brg_types.h
+-#  endif
+ #endif
+ 
+ #ifndef BRG_UI64
+-#  if defined( __BORLANDC__ ) && !defined( __MSDOS__ )
+-#    define BRG_UI64
+-#    define li_64(h) 0x##h##ui64
+-     typedef unsigned __int64 uint_64t;
+-#  elif defined( _MSC_VER ) && ( _MSC_VER < 1300 )    /* 1300 == VC++ 7.0 */
+-#    define BRG_UI64
+-#    define li_64(h) 0x##h##ui64
+-     typedef unsigned __int64 uint_64t;
+-#  elif defined( __sun ) && defined(ULONG_MAX) && ULONG_MAX == 0xfffffffful
+-#    define BRG_UI64
+-#    define li_64(h) 0x##h##ull
+-     typedef unsigned long long uint_64t;
+-#  elif defined( UINT_MAX ) && UINT_MAX > 4294967295u
+-#    if UINT_MAX == 18446744073709551615u
+-#      define BRG_UI64
+-#      define li_64(h) 0x##h##u
+-       typedef unsigned int uint_64t;
+-#    endif
+-#  elif defined( ULONG_MAX ) && ULONG_MAX > 4294967295u
+-#    if ULONG_MAX == 18446744073709551615ul
+-#      define BRG_UI64
+-#      define li_64(h) 0x##h##ul
+-       typedef unsigned long uint_64t;
+-#    endif
+-#  elif defined( ULLONG_MAX ) && ULLONG_MAX > 4294967295u
+-#    if ULLONG_MAX == 18446744073709551615ull
+-#      define BRG_UI64
+-#      define li_64(h) 0x##h##ull
+-       typedef unsigned long long uint_64t;
+-#    endif
+-#  elif defined( ULONG_LONG_MAX ) && ULONG_LONG_MAX > 4294967295u
+-#    if ULONG_LONG_MAX == 18446744073709551615ull
+ #      define BRG_UI64
+ #      define li_64(h) 0x##h##ull
+        typedef unsigned long long uint_64t;
+-#    endif
+-#  elif defined(__GNUC__)  /* DLW: avoid mingw problem with -ansi */
+-#      define BRG_UI64
+-#      define li_64(h) 0x##h##ull
+-       typedef unsigned long long uint_64t;
+-#  endif
+ #endif
+ 
+ #if defined( NEED_UINT_64T ) && !defined( BRG_UI64 )
+diff --git a/drivers/staging/skein/include/skein.h b/drivers/staging/skein/include/skein.h
+index cb613fa09d9e..315cdcd14413 100644
+--- a/drivers/staging/skein/include/skein.h
++++ b/drivers/staging/skein/include/skein.h
+@@ -261,18 +261,8 @@ int  Skein1024_Output   (Skein1024_Ctxt_t *ctx, u08b_t * hashVal);
+ #define Skein_Show_Key(bits,ctx,key,keyBytes)
+ #endif
+ 
+-#ifndef SKEIN_ERR_CHECK        /* run-time checks (e.g., bad params, uninitialized context)? */
+ #define Skein_Assert(x,retCode)/* default: ignore all Asserts, for performance */
+ #define Skein_assert(x)
+-#elif   defined(SKEIN_ASSERT)
+-#include <assert.h>     
+-#define Skein_Assert(x,retCode) assert(x) 
+-#define Skein_assert(x)         assert(x) 
+-#else
+-#include <assert.h>     
+-#define Skein_Assert(x,retCode) { if (!(x)) return retCode; } /*  caller  error */
+-#define Skein_assert(x)         assert(x)                     /* internal error */
+-#endif
+ 
+ /*****************************************************************
+ ** Skein block function constants (shared across Ref and Opt code)
+diff --git a/drivers/staging/skein/include/skeinApi.h b/drivers/staging/skein/include/skeinApi.h
+index 19c3225460fc..734d27b79f01 100755
+--- a/drivers/staging/skein/include/skeinApi.h
++++ b/drivers/staging/skein/include/skeinApi.h
+@@ -78,8 +78,8 @@ OTHER DEALINGS IN THE SOFTWARE.
+  * 
+  */
+ 
++#include <linux/types.h>
+ #include <skein.h>
+-#include <stdint.h>
+ 
+ #ifdef __cplusplus
+ extern "C"
 diff --git a/drivers/staging/skein/include/skein_port.h b/drivers/staging/skein/include/skein_port.h
-deleted file mode 100644
-index e78c976dccc5..000000000000
+index 18d892553c8d..1c68070358ce 100644
 --- a/drivers/staging/skein/include/skein_port.h
-+++ /dev/null
-@@ -1,108 +0,0 @@
--#ifndef _SKEIN_PORT_H_
--#define _SKEIN_PORT_H_
--/*******************************************************************
--**
--** Platform-specific definitions for Skein hash function.
--**
--** Source code author: Doug Whiting, 2008.
--**
--** This algorithm and source code is released to the public domain.
--**
--** Many thanks to Brian Gladman for his portable header files.
--**
--** To port Skein to an "unsupported" platform, change the definitions
--** in this file appropriately.
--** 
--********************************************************************/
++++ b/drivers/staging/skein/include/skein_port.h
+@@ -44,24 +44,10 @@ typedef uint_64t        u64b_t;             /* 64-bit unsigned integer */
+  * platform-specific code instead (e.g., for big-endian CPUs).
+  *
+  */
+-#ifndef SKEIN_NEED_SWAP /* compile-time "override" for endianness? */
 -
--typedef unsigned int    uint_t;             /* native unsigned integer */
--typedef uint8_t         u08b_t;             /*  8-bit unsigned integer */
--typedef uint64_t        u64b_t;             /* 64-bit unsigned integer */
--
--#ifndef RotL_64
--#define RotL_64(x,N)    (((x) << (N)) | ((x) >> (64-(N))))
+-#include <brg_endian.h>              /* get endianness selection */
+-#if   PLATFORM_BYTE_ORDER == IS_BIG_ENDIAN
+-    /* here for big-endian CPUs */
+-#define SKEIN_NEED_SWAP   (1)
+-#elif PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN
+-    /* here for x86 and x86-64 CPUs (and other detected little-endian CPUs) */
+ #define SKEIN_NEED_SWAP   (0)
+-#if   PLATFORM_MUST_ALIGN == 0              /* ok to use "fast" versions? */
++/* below two prototype assume we are handed aligned data */
+ #define Skein_Put64_LSB_First(dst08,src64,bCnt) memcpy(dst08,src64,bCnt)
+ #define Skein_Get64_LSB_First(dst64,src08,wCnt) memcpy(dst64,src08,8*(wCnt))
 -#endif
--
--/*
-- * Skein is "natively" little-endian (unlike SHA-xxx), for optimal
-- * performance on x86 CPUs.  The Skein code requires the following
-- * definitions for dealing with endianness:
-- *
-- *    SKEIN_NEED_SWAP:  0 for little-endian, 1 for big-endian
-- *    Skein_Put64_LSB_First
-- *    Skein_Get64_LSB_First
-- *    Skein_Swap64
-- *
-- * If SKEIN_NEED_SWAP is defined at compile time, it is used here
-- * along with the portable versions of Put64/Get64/Swap64, which 
-- * are slow in general.
-- *
-- * Otherwise, an "auto-detect" of endianness is attempted below.
-- * If the default handling doesn't work well, the user may insert
-- * platform-specific code instead (e.g., for big-endian CPUs).
-- *
-- */
--#define SKEIN_NEED_SWAP   (0)
--/* below two prototype assume we are handed aligned data */
--#define Skein_Put64_LSB_First(dst08,src64,bCnt) memcpy(dst08,src64,bCnt)
--#define Skein_Get64_LSB_First(dst64,src08,wCnt) memcpy(dst64,src08,8*(wCnt))
--
--/*
-- ******************************************************************
-- *      Provide any definitions still needed.
-- ******************************************************************
-- */
--#ifndef Skein_Swap64  /* swap for big-endian, nop for little-endian */
--#if     SKEIN_NEED_SWAP
--#define Skein_Swap64(w64)                       \
--  ( (( ((u64b_t)(w64))       & 0xFF) << 56) |   \
--    (((((u64b_t)(w64)) >> 8) & 0xFF) << 48) |   \
--    (((((u64b_t)(w64)) >>16) & 0xFF) << 40) |   \
--    (((((u64b_t)(w64)) >>24) & 0xFF) << 32) |   \
--    (((((u64b_t)(w64)) >>32) & 0xFF) << 24) |   \
--    (((((u64b_t)(w64)) >>40) & 0xFF) << 16) |   \
--    (((((u64b_t)(w64)) >>48) & 0xFF) <<  8) |   \
--    (((((u64b_t)(w64)) >>56) & 0xFF)      ) )
 -#else
--#define Skein_Swap64(w64)  (w64)
+-#error "Skein needs endianness setting!"
 -#endif
--#endif  /* ifndef Skein_Swap64 */
 -
--
--#ifndef Skein_Put64_LSB_First
--void    Skein_Put64_LSB_First(u08b_t *dst,const u64b_t *src,size_t bCnt)
--#ifdef  SKEIN_PORT_CODE /* instantiate the function code here? */
--    { /* this version is fully portable (big-endian or little-endian), but slow */
--    size_t n;
--
--    for (n=0;n<bCnt;n++)
--        dst[n] = (u08b_t) (src[n>>3] >> (8*(n&7)));
--    }
--#else
--    ;    /* output only the function prototype */
--#endif
--#endif   /* ifndef Skein_Put64_LSB_First */
--
--
--#ifndef Skein_Get64_LSB_First
--void    Skein_Get64_LSB_First(u64b_t *dst,const u08b_t *src,size_t wCnt)
--#ifdef  SKEIN_PORT_CODE /* instantiate the function code here? */
--    { /* this version is fully portable (big-endian or little-endian), but slow */
--    size_t n;
--
--    for (n=0;n<8*wCnt;n+=8)
--        dst[n/8] = (((u64b_t) src[n  ])      ) +
--                   (((u64b_t) src[n+1]) <<  8) +
--                   (((u64b_t) src[n+2]) << 16) +
--                   (((u64b_t) src[n+3]) << 24) +
--                   (((u64b_t) src[n+4]) << 32) +
--                   (((u64b_t) src[n+5]) << 40) +
--                   (((u64b_t) src[n+6]) << 48) +
--                   (((u64b_t) src[n+7]) << 56) ;
--    }
--#else
--    ;    /* output only the function prototype */
--#endif
--#endif   /* ifndef Skein_Get64_LSB_First */
--
--#endif   /* ifndef _SKEIN_PORT_H_ */
+-#endif /* ifndef SKEIN_NEED_SWAP */
+ 
+ /*
+  ******************************************************************
+diff --git a/drivers/staging/skein/include/threefishApi.h b/drivers/staging/skein/include/threefishApi.h
+index 85afd72fe987..dae270cf71d3 100644
+--- a/drivers/staging/skein/include/threefishApi.h
++++ b/drivers/staging/skein/include/threefishApi.h
+@@ -28,8 +28,8 @@
+ @endcode
+  */
+ 
++#include <linux/types.h>
+ #include <skein.h>
+-#include <stdint.h>
+ 
+ #define KeyScheduleConst 0x1BD11BDAA9FC1A22L
+ 
 diff --git a/drivers/staging/skein/skein.c b/drivers/staging/skein/skein.c
-index 3fae6fdf7c75..44468b6701ab 100644
+index f0b176ac1dc7..3fae6fdf7c75 100644
 --- a/drivers/staging/skein/skein.c
 +++ b/drivers/staging/skein/skein.c
-@@ -102,13 +102,6 @@ int Skein_256_InitExt(Skein_256_Ctxt_t *ctx,size_t hashBitLen,u64b_t treeInfo, c
-         Skein_256_Update(ctx,key,keyBytes);     /* hash the key */
-         Skein_256_Final_Pad(ctx,cfg.b);         /* put result into cfg.b[] */
-         memcpy(ctx->X,cfg.b,sizeof(cfg.b));     /* copy over into ctx->X[] */
--#if SKEIN_NEED_SWAP
--        {
--            uint_t i;
--            for (i=0;i<SKEIN_256_STATE_WORDS;i++)   /* convert key bytes to context words */
--                ctx->X[i] = Skein_Swap64(ctx->X[i]);
--        }
--#endif
-     }
-     /* build/process the config block, type == CONFIG (could be precomputed for each key) */
-     ctx->h.hashBitLen = hashBitLen;             /* output hash bit count */
-@@ -297,13 +290,6 @@ int Skein_512_InitExt(Skein_512_Ctxt_t *ctx,size_t hashBitLen,u64b_t treeInfo, c
-         Skein_512_Update(ctx,key,keyBytes);     /* hash the key */
-         Skein_512_Final_Pad(ctx,cfg.b);         /* put result into cfg.b[] */
-         memcpy(ctx->X,cfg.b,sizeof(cfg.b));     /* copy over into ctx->X[] */
--#if SKEIN_NEED_SWAP
--        {
--            uint_t i;
--            for (i=0;i<SKEIN_512_STATE_WORDS;i++)   /* convert key bytes to context words */
--                ctx->X[i] = Skein_Swap64(ctx->X[i]);
--        }
--#endif
-     }
-     /* build/process the config block, type == CONFIG (could be precomputed for each key) */
-     ctx->h.hashBitLen = hashBitLen;             /* output hash bit count */
-@@ -489,13 +475,6 @@ int Skein1024_InitExt(Skein1024_Ctxt_t *ctx,size_t hashBitLen,u64b_t treeInfo, c
-         Skein1024_Update(ctx,key,keyBytes);     /* hash the key */
-         Skein1024_Final_Pad(ctx,cfg.b);         /* put result into cfg.b[] */
-         memcpy(ctx->X,cfg.b,sizeof(cfg.b));     /* copy over into ctx->X[] */
--#if SKEIN_NEED_SWAP
--        {
--            uint_t i;
--            for (i=0;i<SKEIN1024_STATE_WORDS;i++)   /* convert key bytes to context words */
--                ctx->X[i] = Skein_Swap64(ctx->X[i]);
--        }
--#endif
-     }
-     /* build/process the config block, type == CONFIG (could be precomputed for each key) */
-     ctx->h.hashBitLen = hashBitLen;             /* output hash bit count */
+@@ -10,7 +10,7 @@
+ 
+ #define  SKEIN_PORT_CODE /* instantiate any code in skein_port.h */
+ 
+-#include <string.h>       /* get the memcpy/memset functions */
++#include <linux/string.h>       /* get the memcpy/memset functions */
+ #include <skein.h> /* get the Skein API definitions   */
+ #include <skein_iv.h>    /* get precomputed IVs */
+ 
+diff --git a/drivers/staging/skein/skeinApi.c b/drivers/staging/skein/skeinApi.c
+index 7b963758d32c..579b92efbf65 100755
+--- a/drivers/staging/skein/skeinApi.c
++++ b/drivers/staging/skein/skeinApi.c
+@@ -24,10 +24,8 @@ OTHER DEALINGS IN THE SOFTWARE.
+ 
+ */
+ 
+-#define SKEIN_ERR_CHECK 1
++#include <linux/string.h>
+ #include <skeinApi.h>
+-#include <string.h>
+-#include <stdio.h>
+ 
+ int skeinCtxPrepare(SkeinCtx_t* ctx, SkeinSize_t size)
+ {
+diff --git a/drivers/staging/skein/skeinBlockNo3F.c b/drivers/staging/skein/skeinBlockNo3F.c
+index 4ad6c50360e7..6a19ceb17d0f 100644
+--- a/drivers/staging/skein/skeinBlockNo3F.c
++++ b/drivers/staging/skein/skeinBlockNo3F.c
+@@ -1,5 +1,5 @@
+ 
+-#include <string.h>
++#include <linux/string.h>
+ #include <skein.h>
+ #include <threefishApi.h>
+ 
+diff --git a/drivers/staging/skein/skein_block.c b/drivers/staging/skein/skein_block.c
+index 86724a2443b5..b5be41af6d17 100644
+--- a/drivers/staging/skein/skein_block.c
++++ b/drivers/staging/skein/skein_block.c
+@@ -14,7 +14,7 @@
+ **
+ ************************************************************************/
+ 
+-#include <string.h>
++#include <linux/string.h>
+ #include <skein.h>
+ 
+ #ifndef SKEIN_USE_ASM
+diff --git a/drivers/staging/skein/threefish1024Block.c b/drivers/staging/skein/threefish1024Block.c
+index 8b43586f46bc..58a8c26a1f6f 100644
+--- a/drivers/staging/skein/threefish1024Block.c
++++ b/drivers/staging/skein/threefish1024Block.c
+@@ -1,6 +1,5 @@
++#include <linux/string.h>
+ #include <threefishApi.h>
+-#include <stdint.h>
+-#include <string.h>
+ 
+ 
+ void threefishEncrypt1024(ThreefishKey_t* keyCtx, uint64_t* input, uint64_t* output)
+diff --git a/drivers/staging/skein/threefish256Block.c b/drivers/staging/skein/threefish256Block.c
+index db2b81978c91..a7e06f905186 100644
+--- a/drivers/staging/skein/threefish256Block.c
++++ b/drivers/staging/skein/threefish256Block.c
+@@ -1,6 +1,5 @@
++#include <linux/string.h>
+ #include <threefishApi.h>
+-#include <stdint.h>
+-#include <string.h>
+ 
+ 
+ void threefishEncrypt256(ThreefishKey_t* keyCtx, uint64_t* input, uint64_t* output)
+diff --git a/drivers/staging/skein/threefish512Block.c b/drivers/staging/skein/threefish512Block.c
+index 4fe708fea066..3cbfcd9af5c9 100644
+--- a/drivers/staging/skein/threefish512Block.c
++++ b/drivers/staging/skein/threefish512Block.c
+@@ -1,6 +1,5 @@
++#include <linux/string.h>
+ #include <threefishApi.h>
+-#include <stdint.h>
+-#include <string.h>
+ 
+ 
+ void threefishEncrypt512(ThreefishKey_t* keyCtx, uint64_t* input, uint64_t* output)
+diff --git a/drivers/staging/skein/threefishApi.c b/drivers/staging/skein/threefishApi.c
+index 5afa0338aef4..968d3d21fe61 100644
+--- a/drivers/staging/skein/threefishApi.c
++++ b/drivers/staging/skein/threefishApi.c
+@@ -1,8 +1,7 @@
+ 
+ 
++#include <linux/string.h>
+ #include <threefishApi.h>
+-#include <stdlib.h>
+-#include <string.h>
+ 
+ void threefishSetKey(ThreefishKey_t* keyCtx, ThreefishSize_t stateSize,
+                      uint64_t* keyData, uint64_t* tweak)
 -- 
 1.9.0
