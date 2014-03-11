@@ -1,115 +1,175 @@
 From: Jason Cooper <jason@lakedaemon.net>
-Subject: [RFC PATCH 00/22] staging: add skein/threefish crypto algos
-Date: Tue, 11 Mar 2014 21:32:32 +0000
-Message-ID: <cover.1394570067.git.jason@lakedaemon.net>
+Subject: [RFC PATCH 01/22] scripts: objdiff: detect object code changes between two commits
+Date: Tue, 11 Mar 2014 21:32:33 +0000
+Message-ID: <cc773270b6481ffe69516d994fbe98c13bcfdb5a.1394570067.git.jason@lakedaemon.net>
+References: <cover.1394570067.git.jason@lakedaemon.net>
 Cc: devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org,
 	Jason Cooper <jason@lakedaemon.net>
 To: Greg KH <gregkh@linuxfoundation.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:51745 "EHLO
-	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754649AbaCKVzj (ORCPT
+Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:22212 "EHLO
+	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752081AbaCKVzi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Mar 2014 17:55:39 -0400
+	Tue, 11 Mar 2014 17:55:38 -0400
+In-Reply-To: <cover.1394570067.git.jason@lakedaemon.net>
+In-Reply-To: <cover.1394570067.git.jason@lakedaemon.net>
+References: <cover.1394570067.git.jason@lakedaemon.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Greg, all,
+objdiff is useful when doing large code cleanups.  For example, when
+removing checkpatch warnings and errors from new drivers in the staging
+tree.
 
-Attached is a series I've sat on for the past month and a half.
+objdiff can be used in conjunction with a git rebase to confirm that
+each commit made no changes to the resulting object code.  It has the
+same return values as diff(1).
 
-I'm hoping that by posting it in it's incomplete state, it will either a)
-motivate me to finish hooking into the crypto API, or b) motivate someone else
-to pitch in. ;-)
+This was written specifically to support adding the skein and threefish
+cryto drivers to the staging tree.  I needed a programmatic way to
+confirm that commits changing >90% of the lines didn't inadvertently
+change the code.
 
->From patch 3, all commits build successfully.  In addition, using the script I
-added in patch 1, I can confirm that no object code was harmed in this process.
-
-I'm under no time crunch with this, and I add to it as I find time.  If Greg
-wants to take it for v3.15, great.  Otherwise is fine as well.  It's been a
-while since I watched the inner workings of the staging tree, so I'm not
-familiar with how strict it is recently.
-
-Barring a few false-positives, this series makes the code checkpatch-clean, but
-it is not ready for mainline as yet.  In particular, I really don't like the
-adhoc macro definitions, nor the camelCase.
-
-The plan is to get skein and threefish registered into the crypto API, build as
-modules, and then move it to crypto/.
-
-To facilitate tinkering with this, One can pull from the following:
-
-  git://git.infradead.org/users/jcooper/linux.git tags/staging-skein-3.14-rc1
-
-This is based on v3.14-rc1, and is prone to rebasing based on comments.
-
-thx,
-
-Jason.
-
-Jason Cooper (22):
-  scripts: objdiff: detect object code changes between two commits
-  staging: crypto: skein: import code from Skein3Fish.git
-  staging: crypto: skein: allow building statically
-  staging: crypto: skein: remove brg_*.h includes
-  staging: crypto: skein: remove skein_port.h
-  staging: crypto: skein: remove __cplusplus and an unneeded stddef.h
-  staging: crypto: skein: remove unneeded typedefs
-  staging: crypto: skein: remove all typedef {struct,enum}
-  staging: crypto: skein: use u8, u64 vice uint*_t
-  staging: crypto: skein: fixup pointer whitespace
-  staging: crypto: skein: cleanup whitespace around operators/punc.
-  staging: crypto: skein: dos2unix, remove executable perms
-  staging: crypto: skein: fix leading whitespace
-  staging: crypto: skein: remove trailing whitespace
-  staging: crypto: skein: cleanup >80 character lines
-  staging: crypto: skein: fix do/while brace formatting
-  staging: crypto: skein: fix brace placement errors
-  staging: crypto: skein: wrap multi-line macros in do-while loops
-  staging: crypto: skein: remove externs from .c files
-  staging: crypto: skein: remove braces from single-statement block
-  staging: crypto: skein: remove unnecessary line continuation
-  staging: crypto: skein: add TODO file
-
- drivers/staging/Kconfig                      |    2 +
- drivers/staging/Makefile                     |    1 +
- drivers/staging/skein/Kconfig                |   32 +
- drivers/staging/skein/Makefile               |   13 +
- drivers/staging/skein/TODO                   |   11 +
- drivers/staging/skein/include/skein.h        |  344 ++
- drivers/staging/skein/include/skeinApi.h     |  230 ++
- drivers/staging/skein/include/skein_block.h  |   22 +
- drivers/staging/skein/include/skein_iv.h     |  186 +
- drivers/staging/skein/include/threefishApi.h |  164 +
- drivers/staging/skein/skein.c                |  880 +++++
- drivers/staging/skein/skeinApi.c             |  237 ++
- drivers/staging/skein/skeinBlockNo3F.c       |  175 +
- drivers/staging/skein/skein_block.c          |  770 ++++
- drivers/staging/skein/threefish1024Block.c   | 4900 ++++++++++++++++++++++++++
- drivers/staging/skein/threefish256Block.c    | 1137 ++++++
- drivers/staging/skein/threefish512Block.c    | 2223 ++++++++++++
- drivers/staging/skein/threefishApi.c         |   79 +
- scripts/objdiff                              |  126 +
- 19 files changed, 11532 insertions(+)
- create mode 100644 drivers/staging/skein/Kconfig
- create mode 100644 drivers/staging/skein/Makefile
- create mode 100644 drivers/staging/skein/TODO
- create mode 100644 drivers/staging/skein/include/skein.h
- create mode 100644 drivers/staging/skein/include/skeinApi.h
- create mode 100644 drivers/staging/skein/include/skein_block.h
- create mode 100644 drivers/staging/skein/include/skein_iv.h
- create mode 100644 drivers/staging/skein/include/threefishApi.h
- create mode 100644 drivers/staging/skein/skein.c
- create mode 100644 drivers/staging/skein/skeinApi.c
- create mode 100644 drivers/staging/skein/skeinBlockNo3F.c
- create mode 100644 drivers/staging/skein/skein_block.c
- create mode 100644 drivers/staging/skein/threefish1024Block.c
- create mode 100644 drivers/staging/skein/threefish256Block.c
- create mode 100644 drivers/staging/skein/threefish512Block.c
- create mode 100644 drivers/staging/skein/threefishApi.c
+Signed-off-by: Jason Cooper <jason@lakedaemon.net>
+---
+ scripts/objdiff | 126 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 126 insertions(+)
  create mode 100755 scripts/objdiff
 
+diff --git a/scripts/objdiff b/scripts/objdiff
+new file mode 100755
+index 000000000000..9e1ad8df2d07
+--- /dev/null
++++ b/scripts/objdiff
+@@ -0,0 +1,126 @@
++#!/bin/bash
++
++# objdiff - a small script for validating that a commit or series of commits
++# didn't change object code.
++#
++# Copyright 2014, Jason Cooper <jason@lakedaemon.net>
++#
++# Licensed under the terms of the GNU GPL version 2
++
++# usage example:
++#
++# $ git checkout COMMIT_A
++# $ <your fancy build command here>
++# $ ./scripts/objdiff record path/to/*.o
++#
++# $ git checkout COMMIT_B
++# $ <your fancy build command here>
++# $ ./scripts/objdiff record path/to/*.o
++#
++# $ ./scripts/objdiff diff COMMIT_A COMMIT_B
++# $
++
++# And to clean up (everything is in /tmp/objdiff-*)
++# $ ./scripts/objdiff clean all
++
++usage() {
++	echo "Usage: $0 <command> <args>"
++	echo "  record    <list of object files>"
++	echo "  diff      <commitA> <commitB>"
++	echo "  clean     all | <commit>"
++	exit 1
++}
++
++dorecord() {
++	[ $# -eq 0 ] && usage
++
++	FILES="$*"
++
++	CMT="`git rev-parse --short HEAD`"
++
++	OBJDUMP="${CROSS_COMPILE}objdump"
++	OBJDIFFD="/tmp/objdiff-$CMT"
++
++	[ ! -d "$OBJDIFFD" ] && mkdir -p "$OBJDIFFD"
++
++	for f in $FILES; do
++		dn="${f%/*}"
++		bn="${f##*/}"
++
++		[ ! -d "$OBJDIFFD/$dn" ] && mkdir -p "$OBJDIFFD/$dn"
++
++		# remove addresses for a more clear diff
++		# http://dummdida.tumblr.com/post/60924060451/binary-diff-between-libc-from-scientificlinux-and
++		$OBJDUMP -D "$f" | sed "s/^[[:space:]]\+[0-9a-f]\+//" \
++			>"$OBJDIFFD/$dn/$bn"
++
++		# force rebuild
++		rm -f "$f"
++	done
++}
++
++dodiff() {
++	[ $# -ne 2 ] && usage
++
++	SRC="`git rev-parse --short $1`"
++	DST="`git rev-parse --short $2`"
++
++	DIFF="`which colordiff`"
++
++	if [ ${#DIFF} -eq 0 ] || [ ! -x "$DIFF" ]; then
++		DIFF="`which diff`"
++	fi
++
++	SRCD="/tmp/objdiff-$SRC"
++	DSTD="/tmp/objdiff-$DST"
++
++	if [ ! -d "$SRCD" ]; then
++		echo "ERROR: $SRCD doesn't exist"
++		exit 1
++	fi
++
++	if [ ! -d "$DSTD" ]; then
++		echo "ERROR: $DSTD doesn't exist"
++		exit 1
++	fi
++
++	$DIFF -Nurd $SRCD $DSTD
++}
++
++doclean() {
++	[ $# -eq 0 ] && usage
++	[ $# -gt 1 ] && usage
++
++	if [ "x$1" = "xall" ]; then
++		rm -rf /tmp/objdiff-*
++	else
++		CMT="`git rev-parse --short $1`"
++
++		if [ -d "/tmp/objdiff-$CMT" ]; then
++			rm -rf /tmp/objdiff-$CMT
++		else
++			echo "$CMT not found"
++		fi
++	fi
++}
++
++[ $# -eq 0 ] &&	usage
++
++case "$1" in
++	record)
++		shift
++		dorecord $*
++		;;
++	diff)
++		shift
++		dodiff $*
++		;;
++	clean)
++		shift
++		doclean $*
++		;;
++	*)
++		echo "Unrecognized command '$1'"
++		exit 1
++		;;
++esac
 -- 
 1.9.0
