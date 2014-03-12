@@ -1,40 +1,98 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/3 V2] crypto: Simplify the ahash_finup implementation
-Date: Wed, 12 Mar 2014 20:11:01 +0800
-Message-ID: <20140312121101.GB25881@gondor.apana.org.au>
-References: <1389720829-5963-1-git-send-email-marex@denx.de>
- <1393806108-6374-1-git-send-email-marex@denx.de>
- <1393806108-6374-3-git-send-email-marex@denx.de>
+From: Jason Cooper <jason@lakedaemon.net>
+Subject: Re: [RFC PATCH 00/22] staging: add skein/threefish crypto algos
+Date: Wed, 12 Mar 2014 12:55:01 -0400
+Message-ID: <20140312165501.GC7811@titan.lakedaemon.net>
+References: <cover.1394570067.git.jason@lakedaemon.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Fabio Estevam <fabio.estevam@freescale.com>,
-	Shawn Guo <shawn.guo@linaro.org>,
-	Tom Lendacky <thomas.lendacky@amd.com>
-To: Marek Vasut <marex@denx.de>
+Cc: devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org
+To: Greg KH <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:38547 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750846AbaCLMLJ (ORCPT
+Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:41392 "EHLO
+	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751674AbaCLQzJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 12 Mar 2014 08:11:09 -0400
+	Wed, 12 Mar 2014 12:55:09 -0400
 Content-Disposition: inline
-In-Reply-To: <1393806108-6374-3-git-send-email-marex@denx.de>
+In-Reply-To: <cover.1394570067.git.jason@lakedaemon.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 03, 2014 at 01:21:48AM +0100, Marek Vasut wrote:
->
-> -static void ahash_def_finup_done2(struct crypto_async_request *req, int err)
-> +static void ahash_def_finup_done2(struct crypto_async_request *areq, int err)
+On Tue, Mar 11, 2014 at 09:32:32PM +0000, Jason Cooper wrote:
+> To facilitate tinkering with this, One can pull from the following:
+> 
+>   git://git.infradead.org/users/jcooper/linux.git tags/staging-skein-3.14-rc1
+> 
+> This is based on v3.14-rc1, and is prone to rebasing based on comments.
 
-Please keep the existing name to be consistent with the rest
-of the crypto API code.  You should also use the same name in
-your second patch for consistency.
+Hmmm, apparently, I forgot to tell you *how* to tinker with this :)
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Once you've pulled in the series,
+
+$ make ARCH=x86_64 defconfig
+
+enable CRYPTO_SKEIN (implies CRYPTO_THREEFISH) under drivers/staging.
+
+$ git rebase -i v3.14-rc1
+
+In the rebase config file:
+
+#######################################
+pick cc77327 scripts: objdiff: detect object code changes between two commits
+pick bdb4dad staging: crypto: skein: import code from Skein3Fish.git
+pick e3d822c staging: crypto: skein: allow building statically
+x kbuild.sh none
+x ./scripts/objdiff record drivers/staging/skein/*.o
+
+pick 227c819 staging: crypto: skein: remove brg_*.h includes
+x kbuild.sh none
+x ./scripts/objdiff record drivers/staging/skein/*.o
+x ./scripts/objdiff diff HEAD^ HEAD
+
+pick c175303 staging: crypto: skein: remove skein_port.h
+x kbuild.sh none
+x ./scripts/objdiff record drivers/staging/skein/*.o
+x ./scripts/objdiff diff HEAD^ HEAD
+
+pick a612f45 staging: crypto: skein: remove __cplusplus and an unneeded stddef.h
+x kbuild.sh none
+x ./scripts/objdiff record drivers/staging/skein/*.o
+x ./scripts/objdiff diff HEAD^ HEAD
+
+... lather, rinse, repeat ...
+
+pick 4438372 staging: crypto: skein: remove unnecessary line continuation
+x kbuild.sh none
+x ./scripts/objdiff record drivers/staging/skein/*.o
+x ./scripts/objdiff diff HEAD^ HEAD
+
+pick 641f05d staging: crypto: skein: add TODO file
+x kbuild.sh none
+x ./scripts/objdiff record drivers/staging/skein/*.o
+x ./scripts/objdiff diff HEAD^ HEAD
+
+...
+#######################################
+
+Save, quit, let it run (kbuild.sh is my local script for building the
+kernel)
+
+If it makes it to the end, then the object code never changed.  Well, it
+works here. ;-)
+
+Once you're finished poking around (objdump output in is
+/tmp/objdiff-<commit>/):
+
+$ ./scripts/objdiff clean all
+
+Also, it looks like linux-crypto dropped several of the patches for
+being too large.  Here's a link to the top of the series (choose the
+linuxdriverproject archive):
+
+https://lkml.kernel.org/r/cover.1394570067.git.jason@lakedaemon.net
+
+hth,
+
+Jason.
