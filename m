@@ -1,155 +1,43 @@
-From: Marek Vasut <marex@denx.de>
-Subject: [PATCH 1/3 V3] crypto: Fix the pointer voodoo in unaligned ahash
-Date: Thu, 13 Mar 2014 02:41:23 +0100
-Message-ID: <1394674885-7776-1-git-send-email-marex@denx.de>
-Cc: linux-crypto@vger.kernel.org, Marek Vasut <marex@denx.de>,
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/3 V2] crypto: Fix the pointer voodoo in unaligned ahash
+Date: Thu, 13 Mar 2014 09:56:25 +0800
+Message-ID: <20140313015624.GA2680@gondor.apana.org.au>
+References: <1389720829-5963-1-git-send-email-marex@denx.de>
+ <1393806108-6374-1-git-send-email-marex@denx.de>
+ <20140312120814.GA25881@gondor.apana.org.au>
+ <201403130220.29346.marex@denx.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Fabio Estevam <fabio.estevam@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
 	Shawn Guo <shawn.guo@linaro.org>,
 	Tom Lendacky <thomas.lendacky@amd.com>
-To: linux-arm-kernel@lists.infradead.org
+To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:36230 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752382AbaCMBlj (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:44844 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752961AbaCMB4m (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 12 Mar 2014 21:41:39 -0400
+	Wed, 12 Mar 2014 21:56:42 -0400
+Content-Disposition: inline
+In-Reply-To: <201403130220.29346.marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add documentation for the pointer voodoo that is happening in crypto/ahash.c
-in ahash_op_unaligned(). This code is quite confusing, so add a beefy chunk
-of documentation.
+On Thu, Mar 13, 2014 at 02:20:29AM +0100, Marek Vasut wrote:
+>
+> OK, understood. But shall we not preserve the request intact in case a crypto-
+> api function called crypto_ahash_final() with request which has .priv already 
+> set? Then we would have really funny corruption of the request going on and I'm 
+> not sure that'd be nice.
 
-Moreover, make sure the mangled request is completely restored after finishing
-this unaligned operation. This means restoring all of .result, .priv, .base.data
-and .base.complete .
+The priv field is only ever used by ahash.c so how can this happen?
+The crypto API refers to code in the API itself, excluding drivers
+and users.
 
-Also, remove the crypto_completion_t complete = ... line present in the
-ahash_op_unaligned_done() function. This type actually declares a function
-pointer, which is very confusing.
-
-Finally, yet very important nonetheless, make sure the req->priv is free()'d
-only after the original request is restored in ahash_op_unaligned_done().
-The req->priv data must not be free()'d before that in ahash_op_unaligned_finish(),
-since we would be accessing previously free()'d data in ahash_op_unaligned_done()
-and cause corruption.
-
-Signed-off-by: Marek Vasut <marex@denx.de>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Fabio Estevam <fabio.estevam@freescale.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Shawn Guo <shawn.guo@linaro.org>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
----
- crypto/ahash.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 47 insertions(+), 7 deletions(-)
-
-V2: Move the restoration of the ORIGINAL crypto request fields from
-    ahash_op_unaligned_done() to ahash_op_unaligned_finish(). This way,
-    we handle both Sync-HASH and Async-HASH cases properly:
-     SYNC:  ahash_op_unaligned_finish() is called with err=0 . Data are
-            copied from ADJUSTED request to ORIGINAL request, ORIGINAL
-	    request is correctly restored and free'd.
-     ASYNC: ahash_op_unaligned_finish() is called with err=-EINPROGRESS,
-            returns. Later, ahash_op_unaligned_finish() is called again
-	    from ahash_op_unaligned_done() callback. Data are copied
-	    from ADJUSTED request to ORIGINAL request, ORIGINAL request
-	    is correctly restored and free'd.
-V3: Swap the names of req<->areq variables to be consistent with the rest
-    of the crypto API again.
-
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index a92dc38..c3b1f50 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -29,6 +29,7 @@
- struct ahash_request_priv {
- 	crypto_completion_t complete;
- 	void *data;
-+	void *priv;
- 	u8 *result;
- 	void *ubuf[] CRYPTO_MINALIGN_ATTR;
- };
-@@ -201,22 +202,34 @@ static void ahash_op_unaligned_finish(struct ahash_request *req, int err)
- 		memcpy(priv->result, req->result,
- 		       crypto_ahash_digestsize(crypto_ahash_reqtfm(req)));
- 
-+	/* Restore the original crypto request. */
-+	req->result = priv->result;
-+	req->base.complete = priv->complete;
-+	req->base.data = priv->data;
-+	req->priv = priv->priv;
-+
-+	/* Free the req->priv.priv from the ADJUSTED request. */
- 	kzfree(priv);
- }
- 
- static void ahash_op_unaligned_done(struct crypto_async_request *req, int err)
- {
- 	struct ahash_request *areq = req->data;
--	struct ahash_request_priv *priv = areq->priv;
--	crypto_completion_t complete = priv->complete;
--	void *data = priv->data;
- 
--	ahash_op_unaligned_finish(areq, err);
-+	/*
-+	 * Restore the original request, see ahash_op_unaligned() for what
-+	 * goes where.
-+	 *
-+	 * The "struct ahash_request *req" here is in fact the "req.base"
-+	 * from the ADJUSTED request from ahash_op_unaligned(), thus as it
-+	 * is a pointer to self, it is also the ADJUSTED "req" .
-+	 */
- 
--	areq->base.complete = complete;
--	areq->base.data = data;
-+	/* First copy areq->result into areq->priv.result */
-+	ahash_op_unaligned_finish(areq, err);
- 
--	complete(&areq->base, err);
-+	/* Complete the ORIGINAL request. */
-+	areq->base.complete(&areq->base, err);
- }
- 
- static int ahash_op_unaligned(struct ahash_request *req,
-@@ -234,9 +247,36 @@ static int ahash_op_unaligned(struct ahash_request *req,
- 	if (!priv)
- 		return -ENOMEM;
- 
-+	/*
-+	 * WARNING: Voodoo programming below!
-+	 *
-+	 * The code below is obscure and hard to understand, thus explanation
-+	 * is necessary. See include/crypto/hash.h and include/linux/crypto.h
-+	 * to understand the layout of structures used here!
-+	 *
-+	 * The code here will replace portions of the ORIGINAL request with
-+	 * pointers to new code and buffers so the hashing operation can store
-+	 * the result in aligned buffer. We will call the modified request
-+	 * an ADJUSTED request.
-+	 *
-+	 * The newly mangled request will look as such:
-+	 *
-+	 * req {
-+	 *   .result        = ADJUSTED[new aligned buffer]
-+	 *   .base.complete = ADJUSTED[pointer to completion function]
-+	 *   .base.data     = ADJUSTED[*req (pointer to self)]
-+	 *   .priv          = ADJUSTED[new priv] {
-+	 *           .result   = ORIGINAL(result)
-+	 *           .complete = ORIGINAL(base.complete)
-+	 *           .data     = ORIGINAL(base.data)
-+	 *           .priv     = ORIGINAL(priv)
-+	 *   }
-+	 */
-+
- 	priv->result = req->result;
- 	priv->complete = req->base.complete;
- 	priv->data = req->base.data;
-+	priv->priv = req->priv;
- 
- 	req->result = PTR_ALIGN((u8 *)priv->ubuf, alignmask + 1);
- 	req->base.complete = ahash_op_unaligned_done;
+Cheers,
 -- 
-1.8.5.2
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
