@@ -1,43 +1,30 @@
-From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH crypto] crypto: caam - add missing key_dma unmap
-Date: Fri, 14 Mar 2014 17:48:30 +0200
-Message-ID: <1394812110-14139-1-git-send-email-horia.geanta@freescale.com>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: algif for compression?
+Date: Fri, 14 Mar 2014 14:05:01 -0400
+Message-ID: <CALZtONBFtCqQEfOgjNs_MqLm0xXP+9QK47a1t_HE4DuUBkxpsg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from am1ehsobe006.messaging.microsoft.com ([213.199.154.209]:36907
-	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755324AbaCNPso (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:64065 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754622AbaCNSFW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Mar 2014 11:48:44 -0400
+	Fri, 14 Mar 2014 14:05:22 -0400
+Received: by mail-we0-f174.google.com with SMTP id t60so2422026wes.19
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Mar 2014 11:05:21 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-(struct caam_ctx) ctx->key_dma needs to be unmapped
-when context is cleaned up.
+I see the algif_hash and algif_blkcipher implementations to allow
+userspace AF_ALG socket access to kernel blkcipher and hash
+algorithms, but has anyone done a algif_compression to allow userspace
+access to compression algs?  I'm asking specifically wrt the 842
+crypto module, which uses the hardware compression coprocessors on
+newer powerpc systems.
 
-Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
----
- drivers/crypto/caam/caamalg.c | 5 +++++
- 1 file changed, 5 insertions(+)
+If not, is there any reason against adding a algif_compression to
+provide the access?
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index b71f2fd749df..f44cfe065eb3 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -2099,6 +2099,11 @@ static void caam_cra_exit(struct crypto_tfm *tfm)
- 		dma_unmap_single(ctx->jrdev, ctx->sh_desc_givenc_dma,
- 				 desc_bytes(ctx->sh_desc_givenc),
- 				 DMA_TO_DEVICE);
-+	if (ctx->key_dma &&
-+	    !dma_mapping_error(ctx->jrdev, ctx->key_dma))
-+		dma_unmap_single(ctx->jrdev, ctx->key_dma,
-+				 ctx->enckeylen + ctx->split_key_pad_len,
-+				 DMA_TO_DEVICE);
- 
- 	caam_jr_free(ctx->jrdev);
- }
--- 
-1.8.3.1
+Thanks!
