@@ -1,306 +1,489 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH cryptodev 3/4] crypto: testmgr - add aead null encryption test vectors
-Date: Fri, 14 Mar 2014 17:46:51 +0200
-Message-ID: <1394812012-13714-3-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH cryptodev 4/4] crypto: caam - add support for aead null encryption
+Date: Fri, 14 Mar 2014 17:46:52 +0200
+Message-ID: <1394812012-13714-4-git-send-email-horia.geanta@freescale.com>
 References: <1394812012-13714-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>
+Cc: <linux-crypto@vger.kernel.org>,
+	Tudor Ambarus <tudor.ambarus@freescale.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tx2ehsobe003.messaging.microsoft.com ([65.55.88.13]:19616 "EHLO
+Received: from tx2ehsobe003.messaging.microsoft.com ([65.55.88.13]:20653 "EHLO
 	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755389AbaCNPrg (ORCPT
+	by vger.kernel.org with ESMTP id S1755195AbaCNPrk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Mar 2014 11:47:36 -0400
+	Fri, 14 Mar 2014 11:47:40 -0400
 In-Reply-To: <1394812012-13714-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add test vectors for aead with null encryption and md5,
-respectively sha1 authentication.
-Input data is taken from test vectors listed in RFC2410.
+Add support for the following combinations:
+-encryption: null
+-authentication: md5, sha* (1, 224, 256, 384, 512)
 
+Signed-off-by: Tudor Ambarus <tudor.ambarus@freescale.com>
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- crypto/tcrypt.c  |   8 +++
- crypto/testmgr.c |  32 ++++++++++
- crypto/testmgr.h | 180 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 220 insertions(+)
+ drivers/crypto/caam/caamalg.c     | 327 +++++++++++++++++++++++++++++++++++++-
+ drivers/crypto/caam/compat.h      |   1 +
+ drivers/crypto/caam/desc_constr.h |  27 ++--
+ 3 files changed, 342 insertions(+), 13 deletions(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 0d9003ae8c61..870be7b4dc05 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1511,6 +1511,14 @@ static int do_test(int m)
- 		ret += tcrypt_test("authenc(hmac(sha1),cbc(aes))");
- 		break;
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 5016e63b6c25..a9ba8b159636 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -70,6 +70,10 @@
+ #define DESC_AEAD_DEC_LEN		(DESC_AEAD_BASE + 18 * CAAM_CMD_SZ)
+ #define DESC_AEAD_GIVENC_LEN		(DESC_AEAD_ENC_LEN + 7 * CAAM_CMD_SZ)
  
-+	case 156:
-+		ret += tcrypt_test("authenc(hmac(md5),ecb(cipher_null))");
-+		break;
++#define DESC_AEAD_NULL_BASE		(3 * CAAM_CMD_SZ)
++#define DESC_AEAD_NULL_ENC_LEN		(DESC_AEAD_NULL_BASE + 14 * CAAM_CMD_SZ)
++#define DESC_AEAD_NULL_DEC_LEN		(DESC_AEAD_NULL_BASE + 17 * CAAM_CMD_SZ)
 +
-+	case 157:
-+		ret += tcrypt_test("authenc(hmac(sha1),ecb(cipher_null))");
-+		break;
-+
- 	case 200:
- 		test_cipher_speed("ecb(aes)", ENCRYPT, sec, NULL, 0,
- 				speed_template_16_24_32);
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 77955507f6f1..dc3cf3535ef0 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1809,6 +1809,22 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		.alg = "authenc(hmac(md5),ecb(cipher_null))",
-+		.test = alg_test_aead,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.aead = {
-+				.enc = {
-+					.vecs = hmac_md5_ecb_cipher_null_enc_tv_template,
-+					.count = HMAC_MD5_ECB_CIPHER_NULL_ENC_TEST_VECTORS
-+				},
-+				.dec = {
-+					.vecs = hmac_md5_ecb_cipher_null_dec_tv_template,
-+					.count = HMAC_MD5_ECB_CIPHER_NULL_DEC_TEST_VECTORS
-+				}
-+			}
-+		}
-+	}, {
- 		.alg = "authenc(hmac(sha1),cbc(aes))",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
-@@ -1821,6 +1837,22 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		.alg = "authenc(hmac(sha1),ecb(cipher_null))",
-+		.test = alg_test_aead,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.aead = {
-+				.enc = {
-+					.vecs = hmac_sha1_ecb_cipher_null_enc_tv_template,
-+					.count = HMAC_SHA1_ECB_CIPHER_NULL_ENC_TEST_VECTORS
-+				},
-+				.dec = {
-+					.vecs = hmac_sha1_ecb_cipher_null_dec_tv_template,
-+					.count = HMAC_SHA1_ECB_CIPHER_NULL_DEC_TEST_VECTORS
-+				}
-+			}
-+		}
-+	}, {
- 		.alg = "authenc(hmac(sha256),cbc(aes))",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 7d44aa3d6b44..3db83dbba1d9 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -12821,6 +12821,10 @@ static struct cipher_testvec cast6_xts_dec_tv_template[] = {
- #define AES_DEC_TEST_VECTORS 4
- #define AES_CBC_ENC_TEST_VECTORS 5
- #define AES_CBC_DEC_TEST_VECTORS 5
-+#define HMAC_MD5_ECB_CIPHER_NULL_ENC_TEST_VECTORS 2
-+#define HMAC_MD5_ECB_CIPHER_NULL_DEC_TEST_VECTORS 2
-+#define HMAC_SHA1_ECB_CIPHER_NULL_ENC_TEST_VECTORS 2
-+#define HMAC_SHA1_ECB_CIPHER_NULL_DEC_TEST_VECTORS 2
- #define HMAC_SHA1_AES_CBC_ENC_TEST_VECTORS 7
- #define HMAC_SHA256_AES_CBC_ENC_TEST_VECTORS 7
- #define HMAC_SHA512_AES_CBC_ENC_TEST_VECTORS 7
-@@ -13627,6 +13631,90 @@ static struct cipher_testvec aes_cbc_dec_tv_template[] = {
- 	},
- };
+ #define DESC_ABLKCIPHER_BASE		(3 * CAAM_CMD_SZ)
+ #define DESC_ABLKCIPHER_ENC_LEN		(DESC_ABLKCIPHER_BASE + \
+ 					 20 * CAAM_CMD_SZ)
+@@ -109,9 +113,9 @@ static inline void append_dec_op1(u32 *desc, u32 type)
+  */
+ static inline void aead_append_src_dst(u32 *desc, u32 msg_type)
+ {
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | KEY_VLF);
+ 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_BOTH |
+ 			     KEY_VLF | msg_type | FIFOLD_TYPE_LASTBOTH);
+-	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | KEY_VLF);
+ }
  
-+static struct aead_testvec hmac_md5_ecb_cipher_null_enc_tv_template[] = {
-+	{ /* Input data from RFC 2410 Case 1 */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
+ /*
+@@ -200,6 +204,196 @@ static void init_sh_desc_key_aead(u32 *desc, struct caam_ctx *ctx,
+ 	set_jump_tgt_here(desc, key_jump_cmd);
+ }
+ 
++static int aead_null_set_sh_desc(struct crypto_aead *aead)
++{
++	struct aead_tfm *tfm = &aead->base.crt_aead;
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	struct device *jrdev = ctx->jrdev;
++	bool keys_fit_inline = false;
++	u32 *key_jump_cmd, *jump_cmd, *read_move_cmd, *write_move_cmd;
++	u32 *desc;
++
++	/*
++	 * Job Descriptor and Shared Descriptors
++	 * must all fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (DESC_AEAD_NULL_ENC_LEN + DESC_JOB_IO_LEN +
++	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
++		keys_fit_inline = true;
++
++	/* aead_encrypt shared descriptor */
++	desc = ctx->sh_desc_enc;
++
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
++
++	/* Skip if already shared */
++	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
++				   JUMP_COND_SHRD);
++	if (keys_fit_inline)
++		append_key_as_imm(desc, ctx->key, ctx->split_key_pad_len,
++				  ctx->split_key_len, CLASS_2 |
++				  KEY_DEST_MDHA_SPLIT | KEY_ENC);
++	else
++		append_key(desc, ctx->key_dma, ctx->split_key_len, CLASS_2 |
++			   KEY_DEST_MDHA_SPLIT | KEY_ENC);
++	set_jump_tgt_here(desc, key_jump_cmd);
++
++	/* cryptlen = seqoutlen - authsize */
++	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
++
++	/*
++	 * NULL encryption; IV is zero
++	 * assoclen = (assoclen + cryptlen) - cryptlen
++	 */
++	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
++
++	/* read assoc before reading payload */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_MSG |
++			     KEY_VLF);
++
++	/* Prepare to read and write cryptlen bytes */
++	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
++	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
++
++	/*
++	 * MOVE_LEN opcode is not available in all SEC HW revisions,
++	 * thus need to do some magic, i.e. self-patch the descriptor
++	 * buffer.
++	 */
++	read_move_cmd = append_move(desc, MOVE_SRC_DESCBUF |
++				    MOVE_DEST_MATH3 |
++				    (0x6 << MOVE_LEN_SHIFT));
++	write_move_cmd = append_move(desc, MOVE_SRC_MATH3 |
++				     MOVE_DEST_DESCBUF |
++				     MOVE_WAITCOMP |
++				     (0x8 << MOVE_LEN_SHIFT));
++
++	/* Class 2 operation */
++	append_operation(desc, ctx->class2_alg_type |
++			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
++
++	/* Read and write cryptlen bytes */
++	aead_append_src_dst(desc, FIFOLD_TYPE_MSG | FIFOLD_TYPE_FLUSH1);
++
++	set_move_tgt_here(desc, read_move_cmd);
++	set_move_tgt_here(desc, write_move_cmd);
++	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
++	append_move(desc, MOVE_SRC_INFIFO_CL | MOVE_DEST_OUTFIFO |
++		    MOVE_AUX_LS);
++
++	/* Write ICV */
++	append_seq_store(desc, ctx->authsize, LDST_CLASS_2_CCB |
++			 LDST_SRCDST_BYTE_CONTEXT);
++
++	ctx->sh_desc_enc_dma = dma_map_single(jrdev, desc,
++					      desc_bytes(desc),
++					      DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, ctx->sh_desc_enc_dma)) {
++		dev_err(jrdev, "unable to map shared descriptor\n");
++		return -ENOMEM;
++	}
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR,
++		       "aead null enc shdesc@"__stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
++		       desc_bytes(desc), 1);
 +#endif
-+			  "\x00\x00\x00\x00"	/* enc key length */
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.klen   = 8 + 16 + 0,
-+		.iv     = "",
-+		.input  = "\x01\x23\x45\x67\x89\xab\xcd\xef",
-+		.ilen   = 8,
-+		.result = "\x01\x23\x45\x67\x89\xab\xcd\xef"
-+			  "\xaa\x42\xfe\x43\x8d\xea\xa3\x5a"
-+			  "\xb9\x3d\x9f\xb1\xa3\x8e\x9b\xae",
-+		.rlen   = 8 + 16,
-+	}, { /* Input data from RFC 2410 Case 2 */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
++
++	/*
++	 * Job Descriptor and Shared Descriptors
++	 * must all fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (DESC_AEAD_NULL_DEC_LEN + DESC_JOB_IO_LEN +
++	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
++		keys_fit_inline = true;
++
++	desc = ctx->sh_desc_dec;
++
++	/* aead_decrypt shared descriptor */
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
++
++	/* Skip if already shared */
++	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
++				   JUMP_COND_SHRD);
++	if (keys_fit_inline)
++		append_key_as_imm(desc, ctx->key, ctx->split_key_pad_len,
++				  ctx->split_key_len, CLASS_2 |
++				  KEY_DEST_MDHA_SPLIT | KEY_ENC);
++	else
++		append_key(desc, ctx->key_dma, ctx->split_key_len, CLASS_2 |
++			   KEY_DEST_MDHA_SPLIT | KEY_ENC);
++	set_jump_tgt_here(desc, key_jump_cmd);
++
++	/* Class 2 operation */
++	append_operation(desc, ctx->class2_alg_type |
++			 OP_ALG_AS_INITFINAL | OP_ALG_DECRYPT | OP_ALG_ICV_ON);
++
++	/* assoclen + cryptlen = seqinlen - ivsize - authsize */
++	append_math_sub_imm_u32(desc, REG3, SEQINLEN, IMM,
++				ctx->authsize + tfm->ivsize);
++	/* assoclen = (assoclen + cryptlen) - cryptlen */
++	append_math_sub(desc, REG2, SEQOUTLEN, REG0, CAAM_CMD_SZ);
++	append_math_sub(desc, VARSEQINLEN, REG3, REG2, CAAM_CMD_SZ);
++
++	/* read assoc before reading payload */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS2 | FIFOLD_TYPE_MSG |
++			     KEY_VLF);
++
++	/* Prepare to read and write cryptlen bytes */
++	append_math_add(desc, VARSEQINLEN, ZERO, REG2, CAAM_CMD_SZ);
++	append_math_add(desc, VARSEQOUTLEN, ZERO, REG2, CAAM_CMD_SZ);
++
++	/*
++	 * MOVE_LEN opcode is not available in all SEC HW revisions,
++	 * thus need to do some magic, i.e. self-patch the descriptor
++	 * buffer.
++	 */
++	read_move_cmd = append_move(desc, MOVE_SRC_DESCBUF |
++				    MOVE_DEST_MATH2 |
++				    (0x6 << MOVE_LEN_SHIFT));
++	write_move_cmd = append_move(desc, MOVE_SRC_MATH2 |
++				     MOVE_DEST_DESCBUF |
++				     MOVE_WAITCOMP |
++				     (0x8 << MOVE_LEN_SHIFT));
++
++	/* Read and write cryptlen bytes */
++	aead_append_src_dst(desc, FIFOLD_TYPE_MSG | FIFOLD_TYPE_FLUSH1);
++
++	/*
++	 * Insert a NOP here, since we need at least 4 instructions between
++	 * code patching the descriptor buffer and the location being patched.
++	 */
++	jump_cmd = append_jump(desc, JUMP_TEST_ALL);
++	set_jump_tgt_here(desc, jump_cmd);
++
++	set_move_tgt_here(desc, read_move_cmd);
++	set_move_tgt_here(desc, write_move_cmd);
++	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
++	append_move(desc, MOVE_SRC_INFIFO_CL | MOVE_DEST_OUTFIFO |
++		    MOVE_AUX_LS);
++	append_cmd(desc, CMD_LOAD | ENABLE_AUTO_INFO_FIFO);
++
++	/* Load ICV */
++	append_seq_fifo_load(desc, ctx->authsize, FIFOLD_CLASS_CLASS2 |
++			     FIFOLD_TYPE_LAST2 | FIFOLD_TYPE_ICV);
++
++	ctx->sh_desc_dec_dma = dma_map_single(jrdev, desc,
++					      desc_bytes(desc),
++					      DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, ctx->sh_desc_dec_dma)) {
++		dev_err(jrdev, "unable to map shared descriptor\n");
++		return -ENOMEM;
++	}
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR,
++		       "aead null dec shdesc@"__stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
++		       desc_bytes(desc), 1);
 +#endif
-+			  "\x00\x00\x00\x00"	/* enc key length */
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.klen   = 8 + 16 + 0,
-+		.iv     = "",
-+		.input  = "Network Security People Have A Strange Sense Of Humor",
-+		.ilen   = 53,
-+		.result = "Network Security People Have A Strange Sense Of Humor"
-+			  "\x73\xa5\x3e\x1c\x08\x0e\x8a\x8a"
-+			  "\x8e\xb5\x5f\x90\x8e\xfe\x13\x23",
-+		.rlen   = 53 + 16,
++
++	return 0;
++}
++
+ static int aead_set_sh_desc(struct crypto_aead *aead)
+ {
+ 	struct aead_tfm *tfm = &aead->base.crt_aead;
+@@ -209,9 +403,13 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	u32 geniv, moveiv;
+ 	u32 *desc;
+ 
+-	if (!ctx->enckeylen || !ctx->authsize)
++	if (!ctx->authsize)
+ 		return 0;
+ 
++	/* NULL encryption / decryption */
++	if (!ctx->enckeylen)
++		return aead_null_set_sh_desc(aead);
++
+ 	/*
+ 	 * Job Descriptor and Shared Descriptors
+ 	 * must all fit into the 64-word Descriptor h/w Buffer
+@@ -290,7 +488,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 
+ 	/* assoclen + cryptlen = seqinlen - ivsize - authsize */
+ 	append_math_sub_imm_u32(desc, REG3, SEQINLEN, IMM,
+-				ctx->authsize + tfm->ivsize)
++				ctx->authsize + tfm->ivsize);
+ 	/* assoclen = (assoclen + cryptlen) - cryptlen */
+ 	append_math_sub(desc, REG2, SEQOUTLEN, REG0, CAAM_CMD_SZ);
+ 	append_math_sub(desc, VARSEQINLEN, REG3, REG2, CAAM_CMD_SZ);
+@@ -1419,6 +1617,11 @@ static int aead_givencrypt(struct aead_givcrypt_request *areq)
+ 	return ret;
+ }
+ 
++static int aead_null_givencrypt(struct aead_givcrypt_request *areq)
++{
++	return aead_encrypt(&areq->areq);
++}
++
+ /*
+  * allocate and map the ablkcipher extended descriptor for ablkcipher
+  */
+@@ -1608,6 +1811,124 @@ struct caam_alg_template {
+ static struct caam_alg_template driver_algs[] = {
+ 	/* single-pass ipsec_esp descriptor */
+ 	{
++		.name = "authenc(hmac(md5),ecb(cipher_null))",
++		.driver_name = "authenc-hmac-md5-ecb-cipher_null-caam",
++		.blocksize = NULL_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
++		.template_aead = {
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.givencrypt = aead_null_givencrypt,
++			.geniv = "<built-in>",
++			.ivsize = NULL_IV_SIZE,
++			.maxauthsize = MD5_DIGEST_SIZE,
++			},
++		.class1_alg_type = 0,
++		.class2_alg_type = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC_PRECOMP,
++		.alg_op = OP_ALG_ALGSEL_MD5 | OP_ALG_AAI_HMAC,
 +	},
-+};
-+
-+static struct aead_testvec hmac_md5_ecb_cipher_null_dec_tv_template[] = {
 +	{
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x00"	/* enc key length */
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.klen   = 8 + 16 + 0,
-+		.iv     = "",
-+		.input  = "\x01\x23\x45\x67\x89\xab\xcd\xef"
-+			  "\xaa\x42\xfe\x43\x8d\xea\xa3\x5a"
-+			  "\xb9\x3d\x9f\xb1\xa3\x8e\x9b\xae",
-+		.ilen   = 8 + 16,
-+		.result = "\x01\x23\x45\x67\x89\xab\xcd\xef",
-+		.rlen   = 8,
-+	}, {
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x00"	/* enc key length */
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.klen   = 8 + 16 + 0,
-+		.iv     = "",
-+		.input  = "Network Security People Have A Strange Sense Of Humor"
-+			  "\x73\xa5\x3e\x1c\x08\x0e\x8a\x8a"
-+			  "\x8e\xb5\x5f\x90\x8e\xfe\x13\x23",
-+		.ilen   = 53 + 16,
-+		.result = "Network Security People Have A Strange Sense Of Humor",
-+		.rlen   = 53,
++		.name = "authenc(hmac(sha1),ecb(cipher_null))",
++		.driver_name = "authenc-hmac-sha1-ecb-cipher_null-caam",
++		.blocksize = NULL_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
++		.template_aead = {
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.givencrypt = aead_null_givencrypt,
++			.geniv = "<built-in>",
++			.ivsize = NULL_IV_SIZE,
++			.maxauthsize = SHA1_DIGEST_SIZE,
++			},
++		.class1_alg_type = 0,
++		.class2_alg_type = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC_PRECOMP,
++		.alg_op = OP_ALG_ALGSEL_SHA1 | OP_ALG_AAI_HMAC,
 +	},
-+};
-+
- static struct aead_testvec hmac_sha1_aes_cbc_enc_tv_template[] = {
- 	{ /* RFC 3602 Case 1 */
- #ifdef __LITTLE_ENDIAN
-@@ -13876,6 +13964,98 @@ static struct aead_testvec hmac_sha1_aes_cbc_enc_tv_template[] = {
- 	},
- };
- 
-+static struct aead_testvec hmac_sha1_ecb_cipher_null_enc_tv_template[] = {
-+	{ /* Input data from RFC 2410 Case 1 */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x00"	/* enc key length */
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00",
-+		.klen   = 8 + 20 + 0,
-+		.iv     = "",
-+		.input  = "\x01\x23\x45\x67\x89\xab\xcd\xef",
-+		.ilen   = 8,
-+		.result = "\x01\x23\x45\x67\x89\xab\xcd\xef"
-+			  "\x40\xc3\x0a\xa1\xc9\xa0\x28\xab"
-+			  "\x99\x5e\x19\x04\xd1\x72\xef\xb8"
-+			  "\x8c\x5e\xe4\x08",
-+		.rlen   = 8 + 20,
-+	}, { /* Input data from RFC 2410 Case 2 */
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x00"	/* enc key length */
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00",
-+		.klen   = 8 + 20 + 0,
-+		.iv     = "",
-+		.input  = "Network Security People Have A Strange Sense Of Humor",
-+		.ilen   = 53,
-+		.result = "Network Security People Have A Strange Sense Of Humor"
-+			  "\x75\x6f\x42\x1e\xf8\x50\x21\xd2"
-+			  "\x65\x47\xee\x8e\x1a\xef\x16\xf6"
-+			  "\x91\x56\xe4\xd6",
-+		.rlen   = 53 + 20,
-+	},
-+};
-+
-+static struct aead_testvec hmac_sha1_ecb_cipher_null_dec_tv_template[] = {
 +	{
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x00"	/* enc key length */
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00",
-+		.klen   = 8 + 20 + 0,
-+		.iv     = "",
-+		.input  = "\x01\x23\x45\x67\x89\xab\xcd\xef"
-+			  "\x40\xc3\x0a\xa1\xc9\xa0\x28\xab"
-+			  "\x99\x5e\x19\x04\xd1\x72\xef\xb8"
-+			  "\x8c\x5e\xe4\x08",
-+		.ilen   = 8 + 20,
-+		.result = "\x01\x23\x45\x67\x89\xab\xcd\xef",
-+		.rlen   = 8,
-+	}, {
-+#ifdef __LITTLE_ENDIAN
-+		.key    = "\x08\x00"		/* rta length */
-+			  "\x01\x00"		/* rta type */
-+#else
-+		.key    = "\x00\x08"		/* rta length */
-+			  "\x00\x01"		/* rta type */
-+#endif
-+			  "\x00\x00\x00\x00"	/* enc key length */
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00",
-+		.klen   = 8 + 20 + 0,
-+		.iv     = "",
-+		.input  = "Network Security People Have A Strange Sense Of Humor"
-+			  "\x75\x6f\x42\x1e\xf8\x50\x21\xd2"
-+			  "\x65\x47\xee\x8e\x1a\xef\x16\xf6"
-+			  "\x91\x56\xe4\xd6",
-+		.ilen   = 53 + 20,
-+		.result = "Network Security People Have A Strange Sense Of Humor",
-+		.rlen   = 53,
++		.name = "authenc(hmac(sha224),ecb(cipher_null))",
++		.driver_name = "authenc-hmac-sha224-ecb-cipher_null-caam",
++		.blocksize = NULL_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
++		.template_aead = {
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.givencrypt = aead_null_givencrypt,
++			.geniv = "<built-in>",
++			.ivsize = NULL_IV_SIZE,
++			.maxauthsize = SHA224_DIGEST_SIZE,
++			},
++		.class1_alg_type = 0,
++		.class2_alg_type = OP_ALG_ALGSEL_SHA224 |
++				   OP_ALG_AAI_HMAC_PRECOMP,
++		.alg_op = OP_ALG_ALGSEL_SHA224 | OP_ALG_AAI_HMAC,
 +	},
-+};
++	{
++		.name = "authenc(hmac(sha256),ecb(cipher_null))",
++		.driver_name = "authenc-hmac-sha256-ecb-cipher_null-caam",
++		.blocksize = NULL_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
++		.template_aead = {
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.givencrypt = aead_null_givencrypt,
++			.geniv = "<built-in>",
++			.ivsize = NULL_IV_SIZE,
++			.maxauthsize = SHA256_DIGEST_SIZE,
++			},
++		.class1_alg_type = 0,
++		.class2_alg_type = OP_ALG_ALGSEL_SHA256 |
++				   OP_ALG_AAI_HMAC_PRECOMP,
++		.alg_op = OP_ALG_ALGSEL_SHA256 | OP_ALG_AAI_HMAC,
++	},
++	{
++		.name = "authenc(hmac(sha384),ecb(cipher_null))",
++		.driver_name = "authenc-hmac-sha384-ecb-cipher_null-caam",
++		.blocksize = NULL_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
++		.template_aead = {
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.givencrypt = aead_null_givencrypt,
++			.geniv = "<built-in>",
++			.ivsize = NULL_IV_SIZE,
++			.maxauthsize = SHA384_DIGEST_SIZE,
++			},
++		.class1_alg_type = 0,
++		.class2_alg_type = OP_ALG_ALGSEL_SHA384 |
++				   OP_ALG_AAI_HMAC_PRECOMP,
++		.alg_op = OP_ALG_ALGSEL_SHA384 | OP_ALG_AAI_HMAC,
++	},
++	{
++		.name = "authenc(hmac(sha512),ecb(cipher_null))",
++		.driver_name = "authenc-hmac-sha512-ecb-cipher_null-caam",
++		.blocksize = NULL_BLOCK_SIZE,
++		.type = CRYPTO_ALG_TYPE_AEAD,
++		.template_aead = {
++			.setkey = aead_setkey,
++			.setauthsize = aead_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.givencrypt = aead_null_givencrypt,
++			.geniv = "<built-in>",
++			.ivsize = NULL_IV_SIZE,
++			.maxauthsize = SHA512_DIGEST_SIZE,
++			},
++		.class1_alg_type = 0,
++		.class2_alg_type = OP_ALG_ALGSEL_SHA512 |
++				   OP_ALG_AAI_HMAC_PRECOMP,
++		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
++	},
++	{
+ 		.name = "authenc(hmac(md5),cbc(aes))",
+ 		.driver_name = "authenc-hmac-md5-cbc-aes-caam",
+ 		.blocksize = AES_BLOCK_SIZE,
+diff --git a/drivers/crypto/caam/compat.h b/drivers/crypto/caam/compat.h
+index 762aeff626ac..f227922cea38 100644
+--- a/drivers/crypto/caam/compat.h
++++ b/drivers/crypto/caam/compat.h
+@@ -26,6 +26,7 @@
+ #include <net/xfrm.h>
+ 
+ #include <crypto/algapi.h>
++#include <crypto/null.h>
+ #include <crypto/aes.h>
+ #include <crypto/des.h>
+ #include <crypto/sha.h>
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+index cd5f678847ce..7eec20bb3849 100644
+--- a/drivers/crypto/caam/desc_constr.h
++++ b/drivers/crypto/caam/desc_constr.h
+@@ -155,21 +155,29 @@ static inline void append_cmd_data(u32 *desc, void *data, int len,
+ 	append_data(desc, data, len);
+ }
+ 
+-static inline u32 *append_jump(u32 *desc, u32 options)
+-{
+-	u32 *cmd = desc_end(desc);
+-
+-	PRINT_POS;
+-	append_cmd(desc, CMD_JUMP | options);
+-
+-	return cmd;
++#define APPEND_CMD_RET(cmd, op) \
++static inline u32 *append_##cmd(u32 *desc, u32 options) \
++{ \
++	u32 *cmd = desc_end(desc); \
++	PRINT_POS; \
++	append_cmd(desc, CMD_##op | options); \
++	return cmd; \
+ }
++APPEND_CMD_RET(jump, JUMP)
++APPEND_CMD_RET(move, MOVE)
+ 
+ static inline void set_jump_tgt_here(u32 *desc, u32 *jump_cmd)
+ {
+ 	*jump_cmd = *jump_cmd | (desc_len(desc) - (jump_cmd - desc));
+ }
+ 
++static inline void set_move_tgt_here(u32 *desc, u32 *move_cmd)
++{
++	*move_cmd &= ~MOVE_OFFSET_MASK;
++	*move_cmd = *move_cmd | ((desc_len(desc) << (MOVE_OFFSET_SHIFT + 2)) &
++				 MOVE_OFFSET_MASK);
++}
 +
- static struct aead_testvec hmac_sha256_aes_cbc_enc_tv_template[] = {
- 	{ /* RFC 3602 Case 1 */
- #ifdef __LITTLE_ENDIAN
+ #define APPEND_CMD(cmd, op) \
+ static inline void append_##cmd(u32 *desc, u32 options) \
+ { \
+@@ -177,7 +185,6 @@ static inline void append_##cmd(u32 *desc, u32 options) \
+ 	append_cmd(desc, CMD_##op | options); \
+ }
+ APPEND_CMD(operation, OPERATION)
+-APPEND_CMD(move, MOVE)
+ 
+ #define APPEND_CMD_LEN(cmd, op) \
+ static inline void append_##cmd(u32 *desc, unsigned int len, u32 options) \
+@@ -328,7 +335,7 @@ append_cmd(desc, CMD_MATH | MATH_FUN_##op | MATH_DEST_##dest | \
+ do { \
+ 	APPEND_MATH(op, desc, dest, src_0, src_1, CAAM_CMD_SZ); \
+ 	append_cmd(desc, data); \
+-} while (0);
++} while (0)
+ 
+ #define append_math_add_imm_u32(desc, dest, src0, src1, data) \
+ 	APPEND_MATH_IMM_u32(ADD, desc, dest, src0, src1, data)
 -- 
 1.8.3.1
