@@ -1,71 +1,306 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH cryptodev 2/4] crypto: export NULL algorithms defines
-Date: Fri, 14 Mar 2014 17:46:50 +0200
-Message-ID: <1394812012-13714-2-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH cryptodev 3/4] crypto: testmgr - add aead null encryption test vectors
+Date: Fri, 14 Mar 2014 17:46:51 +0200
+Message-ID: <1394812012-13714-3-git-send-email-horia.geanta@freescale.com>
 References: <1394812012-13714-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from am1ehsobe006.messaging.microsoft.com ([213.199.154.209]:54735
-	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755389AbaCNPr2 (ORCPT
+Received: from tx2ehsobe003.messaging.microsoft.com ([65.55.88.13]:19616 "EHLO
+	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755389AbaCNPrg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Mar 2014 11:47:28 -0400
+	Fri, 14 Mar 2014 11:47:36 -0400
 In-Reply-To: <1394812012-13714-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-These defines might be needed by crypto drivers.
+Add test vectors for aead with null encryption and md5,
+respectively sha1 authentication.
+Input data is taken from test vectors listed in RFC2410.
 
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- crypto/crypto_null.c  |  6 +-----
- include/crypto/null.h | 11 +++++++++++
- 2 files changed, 12 insertions(+), 5 deletions(-)
- create mode 100644 include/crypto/null.h
+ crypto/tcrypt.c  |   8 +++
+ crypto/testmgr.c |  32 ++++++++++
+ crypto/testmgr.h | 180 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 220 insertions(+)
 
-diff --git a/crypto/crypto_null.c b/crypto/crypto_null.c
-index fee7265cd35d..1dc54bb95a87 100644
---- a/crypto/crypto_null.c
-+++ b/crypto/crypto_null.c
-@@ -17,6 +17,7 @@
-  *
-  */
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 0d9003ae8c61..870be7b4dc05 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1511,6 +1511,14 @@ static int do_test(int m)
+ 		ret += tcrypt_test("authenc(hmac(sha1),cbc(aes))");
+ 		break;
  
-+#include <crypto/null.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/init.h>
-@@ -24,11 +25,6 @@
- #include <linux/mm.h>
- #include <linux/string.h>
++	case 156:
++		ret += tcrypt_test("authenc(hmac(md5),ecb(cipher_null))");
++		break;
++
++	case 157:
++		ret += tcrypt_test("authenc(hmac(sha1),ecb(cipher_null))");
++		break;
++
+ 	case 200:
+ 		test_cipher_speed("ecb(aes)", ENCRYPT, sec, NULL, 0,
+ 				speed_template_16_24_32);
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 77955507f6f1..dc3cf3535ef0 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1809,6 +1809,22 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "authenc(hmac(md5),ecb(cipher_null))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs = hmac_md5_ecb_cipher_null_enc_tv_template,
++					.count = HMAC_MD5_ECB_CIPHER_NULL_ENC_TEST_VECTORS
++				},
++				.dec = {
++					.vecs = hmac_md5_ecb_cipher_null_dec_tv_template,
++					.count = HMAC_MD5_ECB_CIPHER_NULL_DEC_TEST_VECTORS
++				}
++			}
++		}
++	}, {
+ 		.alg = "authenc(hmac(sha1),cbc(aes))",
+ 		.test = alg_test_aead,
+ 		.fips_allowed = 1,
+@@ -1821,6 +1837,22 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "authenc(hmac(sha1),ecb(cipher_null))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs = hmac_sha1_ecb_cipher_null_enc_tv_template,
++					.count = HMAC_SHA1_ECB_CIPHER_NULL_ENC_TEST_VECTORS
++				},
++				.dec = {
++					.vecs = hmac_sha1_ecb_cipher_null_dec_tv_template,
++					.count = HMAC_SHA1_ECB_CIPHER_NULL_DEC_TEST_VECTORS
++				}
++			}
++		}
++	}, {
+ 		.alg = "authenc(hmac(sha256),cbc(aes))",
+ 		.test = alg_test_aead,
+ 		.fips_allowed = 1,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 7d44aa3d6b44..3db83dbba1d9 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -12821,6 +12821,10 @@ static struct cipher_testvec cast6_xts_dec_tv_template[] = {
+ #define AES_DEC_TEST_VECTORS 4
+ #define AES_CBC_ENC_TEST_VECTORS 5
+ #define AES_CBC_DEC_TEST_VECTORS 5
++#define HMAC_MD5_ECB_CIPHER_NULL_ENC_TEST_VECTORS 2
++#define HMAC_MD5_ECB_CIPHER_NULL_DEC_TEST_VECTORS 2
++#define HMAC_SHA1_ECB_CIPHER_NULL_ENC_TEST_VECTORS 2
++#define HMAC_SHA1_ECB_CIPHER_NULL_DEC_TEST_VECTORS 2
+ #define HMAC_SHA1_AES_CBC_ENC_TEST_VECTORS 7
+ #define HMAC_SHA256_AES_CBC_ENC_TEST_VECTORS 7
+ #define HMAC_SHA512_AES_CBC_ENC_TEST_VECTORS 7
+@@ -13627,6 +13631,90 @@ static struct cipher_testvec aes_cbc_dec_tv_template[] = {
+ 	},
+ };
  
--#define NULL_KEY_SIZE		0
--#define NULL_BLOCK_SIZE		1
--#define NULL_DIGEST_SIZE	0
--#define NULL_IV_SIZE		0
--
- static int null_compress(struct crypto_tfm *tfm, const u8 *src,
- 			 unsigned int slen, u8 *dst, unsigned int *dlen)
- {
-diff --git a/include/crypto/null.h b/include/crypto/null.h
-new file mode 100644
-index 000000000000..b7c864cc70df
---- /dev/null
-+++ b/include/crypto/null.h
-@@ -0,0 +1,11 @@
-+/* Values for NULL algorithms */
-+
-+#ifndef _CRYPTO_NULL_H
-+#define _CRYPTO_NULL_H
-+
-+#define NULL_KEY_SIZE		0
-+#define NULL_BLOCK_SIZE		1
-+#define NULL_DIGEST_SIZE	0
-+#define NULL_IV_SIZE		0
-+
++static struct aead_testvec hmac_md5_ecb_cipher_null_enc_tv_template[] = {
++	{ /* Input data from RFC 2410 Case 1 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
 +#endif
++			  "\x00\x00\x00\x00"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.klen   = 8 + 16 + 0,
++		.iv     = "",
++		.input  = "\x01\x23\x45\x67\x89\xab\xcd\xef",
++		.ilen   = 8,
++		.result = "\x01\x23\x45\x67\x89\xab\xcd\xef"
++			  "\xaa\x42\xfe\x43\x8d\xea\xa3\x5a"
++			  "\xb9\x3d\x9f\xb1\xa3\x8e\x9b\xae",
++		.rlen   = 8 + 16,
++	}, { /* Input data from RFC 2410 Case 2 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x00"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.klen   = 8 + 16 + 0,
++		.iv     = "",
++		.input  = "Network Security People Have A Strange Sense Of Humor",
++		.ilen   = 53,
++		.result = "Network Security People Have A Strange Sense Of Humor"
++			  "\x73\xa5\x3e\x1c\x08\x0e\x8a\x8a"
++			  "\x8e\xb5\x5f\x90\x8e\xfe\x13\x23",
++		.rlen   = 53 + 16,
++	},
++};
++
++static struct aead_testvec hmac_md5_ecb_cipher_null_dec_tv_template[] = {
++	{
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x00"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.klen   = 8 + 16 + 0,
++		.iv     = "",
++		.input  = "\x01\x23\x45\x67\x89\xab\xcd\xef"
++			  "\xaa\x42\xfe\x43\x8d\xea\xa3\x5a"
++			  "\xb9\x3d\x9f\xb1\xa3\x8e\x9b\xae",
++		.ilen   = 8 + 16,
++		.result = "\x01\x23\x45\x67\x89\xab\xcd\xef",
++		.rlen   = 8,
++	}, {
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x00"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.klen   = 8 + 16 + 0,
++		.iv     = "",
++		.input  = "Network Security People Have A Strange Sense Of Humor"
++			  "\x73\xa5\x3e\x1c\x08\x0e\x8a\x8a"
++			  "\x8e\xb5\x5f\x90\x8e\xfe\x13\x23",
++		.ilen   = 53 + 16,
++		.result = "Network Security People Have A Strange Sense Of Humor",
++		.rlen   = 53,
++	},
++};
++
+ static struct aead_testvec hmac_sha1_aes_cbc_enc_tv_template[] = {
+ 	{ /* RFC 3602 Case 1 */
+ #ifdef __LITTLE_ENDIAN
+@@ -13876,6 +13964,98 @@ static struct aead_testvec hmac_sha1_aes_cbc_enc_tv_template[] = {
+ 	},
+ };
+ 
++static struct aead_testvec hmac_sha1_ecb_cipher_null_enc_tv_template[] = {
++	{ /* Input data from RFC 2410 Case 1 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x00"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00",
++		.klen   = 8 + 20 + 0,
++		.iv     = "",
++		.input  = "\x01\x23\x45\x67\x89\xab\xcd\xef",
++		.ilen   = 8,
++		.result = "\x01\x23\x45\x67\x89\xab\xcd\xef"
++			  "\x40\xc3\x0a\xa1\xc9\xa0\x28\xab"
++			  "\x99\x5e\x19\x04\xd1\x72\xef\xb8"
++			  "\x8c\x5e\xe4\x08",
++		.rlen   = 8 + 20,
++	}, { /* Input data from RFC 2410 Case 2 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x00"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00",
++		.klen   = 8 + 20 + 0,
++		.iv     = "",
++		.input  = "Network Security People Have A Strange Sense Of Humor",
++		.ilen   = 53,
++		.result = "Network Security People Have A Strange Sense Of Humor"
++			  "\x75\x6f\x42\x1e\xf8\x50\x21\xd2"
++			  "\x65\x47\xee\x8e\x1a\xef\x16\xf6"
++			  "\x91\x56\xe4\xd6",
++		.rlen   = 53 + 20,
++	},
++};
++
++static struct aead_testvec hmac_sha1_ecb_cipher_null_dec_tv_template[] = {
++	{
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x00"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00",
++		.klen   = 8 + 20 + 0,
++		.iv     = "",
++		.input  = "\x01\x23\x45\x67\x89\xab\xcd\xef"
++			  "\x40\xc3\x0a\xa1\xc9\xa0\x28\xab"
++			  "\x99\x5e\x19\x04\xd1\x72\xef\xb8"
++			  "\x8c\x5e\xe4\x08",
++		.ilen   = 8 + 20,
++		.result = "\x01\x23\x45\x67\x89\xab\xcd\xef",
++		.rlen   = 8,
++	}, {
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x00"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00",
++		.klen   = 8 + 20 + 0,
++		.iv     = "",
++		.input  = "Network Security People Have A Strange Sense Of Humor"
++			  "\x75\x6f\x42\x1e\xf8\x50\x21\xd2"
++			  "\x65\x47\xee\x8e\x1a\xef\x16\xf6"
++			  "\x91\x56\xe4\xd6",
++		.ilen   = 53 + 20,
++		.result = "Network Security People Have A Strange Sense Of Humor",
++		.rlen   = 53,
++	},
++};
++
+ static struct aead_testvec hmac_sha256_aes_cbc_enc_tv_template[] = {
+ 	{ /* RFC 3602 Case 1 */
+ #ifdef __LITTLE_ENDIAN
 -- 
 1.8.3.1
