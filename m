@@ -1,175 +1,43 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH cryptodev 1/4] crypto: caam - remove error propagation handling
-Date: Fri, 14 Mar 2014 17:46:49 +0200
-Message-ID: <1394812012-13714-1-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH crypto] crypto: caam - add missing key_dma unmap
+Date: Fri, 14 Mar 2014 17:48:30 +0200
+Message-ID: <1394812110-14139-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from am1ehsobe005.messaging.microsoft.com ([213.199.154.208]:13761
+Received: from am1ehsobe006.messaging.microsoft.com ([213.199.154.209]:36907
 	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754713AbaCNPrx (ORCPT
+	by vger.kernel.org with ESMTP id S1755324AbaCNPso (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Mar 2014 11:47:53 -0400
+	Fri, 14 Mar 2014 11:48:44 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Commit 61bb86bba169507a5f223b94b9176c32c84b4721
-("crypto: caam - set descriptor sharing type to SERIAL")
-changed the descriptor sharing mode from SHARE_WAIT to SHARE_SERIAL.
-
-All descriptor commands that handle the "ok to share" and
-"error propagation" settings should also go away, since they have no
-meaning for SHARE_SERIAL.
+(struct caam_ctx) ctx->key_dma needs to be unmapped
+when context is cleaned up.
 
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- drivers/crypto/caam/caamalg.c | 54 ++++++-------------------------------------
- 1 file changed, 7 insertions(+), 47 deletions(-)
+ drivers/crypto/caam/caamalg.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index b71f2fd749df..5016e63b6c25 100644
+index b71f2fd749df..f44cfe065eb3 100644
 --- a/drivers/crypto/caam/caamalg.c
 +++ b/drivers/crypto/caam/caamalg.c
-@@ -66,8 +66,8 @@
+@@ -2099,6 +2099,11 @@ static void caam_cra_exit(struct crypto_tfm *tfm)
+ 		dma_unmap_single(ctx->jrdev, ctx->sh_desc_givenc_dma,
+ 				 desc_bytes(ctx->sh_desc_givenc),
+ 				 DMA_TO_DEVICE);
++	if (ctx->key_dma &&
++	    !dma_mapping_error(ctx->jrdev, ctx->key_dma))
++		dma_unmap_single(ctx->jrdev, ctx->key_dma,
++				 ctx->enckeylen + ctx->split_key_pad_len,
++				 DMA_TO_DEVICE);
  
- /* length of descriptors text */
- #define DESC_AEAD_BASE			(4 * CAAM_CMD_SZ)
--#define DESC_AEAD_ENC_LEN		(DESC_AEAD_BASE + 16 * CAAM_CMD_SZ)
--#define DESC_AEAD_DEC_LEN		(DESC_AEAD_BASE + 21 * CAAM_CMD_SZ)
-+#define DESC_AEAD_ENC_LEN		(DESC_AEAD_BASE + 15 * CAAM_CMD_SZ)
-+#define DESC_AEAD_DEC_LEN		(DESC_AEAD_BASE + 18 * CAAM_CMD_SZ)
- #define DESC_AEAD_GIVENC_LEN		(DESC_AEAD_ENC_LEN + 7 * CAAM_CMD_SZ)
- 
- #define DESC_ABLKCIPHER_BASE		(3 * CAAM_CMD_SZ)
-@@ -104,19 +104,6 @@ static inline void append_dec_op1(u32 *desc, u32 type)
+ 	caam_jr_free(ctx->jrdev);
  }
- 
- /*
-- * Wait for completion of class 1 key loading before allowing
-- * error propagation
-- */
--static inline void append_dec_shr_done(u32 *desc)
--{
--	u32 *jump_cmd;
--
--	jump_cmd = append_jump(desc, JUMP_CLASS_CLASS1 | JUMP_TEST_ALL);
--	set_jump_tgt_here(desc, jump_cmd);
--	append_cmd(desc, SET_OK_NO_PROP_ERRORS | CMD_LOAD);
--}
--
--/*
-  * For aead functions, read payload and write payload,
-  * both of which are specified in req->src and req->dst
-  */
-@@ -211,9 +198,6 @@ static void init_sh_desc_key_aead(u32 *desc, struct caam_ctx *ctx,
- 	append_key_aead(desc, ctx, keys_fit_inline);
- 
- 	set_jump_tgt_here(desc, key_jump_cmd);
--
--	/* Propagate errors from shared to job descriptor */
--	append_cmd(desc, SET_OK_NO_PROP_ERRORS | CMD_LOAD);
- }
- 
- static int aead_set_sh_desc(struct crypto_aead *aead)
-@@ -222,7 +206,6 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	struct device *jrdev = ctx->jrdev;
- 	bool keys_fit_inline = false;
--	u32 *key_jump_cmd, *jump_cmd;
- 	u32 geniv, moveiv;
- 	u32 *desc;
- 
-@@ -253,7 +236,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	/* assoclen + cryptlen = seqinlen - ivsize */
- 	append_math_sub_imm_u32(desc, REG2, SEQINLEN, IMM, tfm->ivsize);
- 
--	/* assoclen + cryptlen = (assoclen + cryptlen) - cryptlen */
-+	/* assoclen = (assoclen + cryptlen) - cryptlen */
- 	append_math_sub(desc, VARSEQINLEN, REG2, REG3, CAAM_CMD_SZ);
- 
- 	/* read assoc before reading payload */
-@@ -296,28 +279,16 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	    CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
- 
--	desc = ctx->sh_desc_dec;
--
- 	/* aead_decrypt shared descriptor */
--	init_sh_desc(desc, HDR_SHARE_SERIAL);
--
--	/* Skip if already shared */
--	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
--				   JUMP_COND_SHRD);
--
--	append_key_aead(desc, ctx, keys_fit_inline);
-+	desc = ctx->sh_desc_dec;
- 
--	/* Only propagate error immediately if shared */
--	jump_cmd = append_jump(desc, JUMP_TEST_ALL);
--	set_jump_tgt_here(desc, key_jump_cmd);
--	append_cmd(desc, SET_OK_NO_PROP_ERRORS | CMD_LOAD);
--	set_jump_tgt_here(desc, jump_cmd);
-+	init_sh_desc_key_aead(desc, ctx, keys_fit_inline);
- 
- 	/* Class 2 operation */
- 	append_operation(desc, ctx->class2_alg_type |
- 			 OP_ALG_AS_INITFINAL | OP_ALG_DECRYPT | OP_ALG_ICV_ON);
- 
--	/* assoclen + cryptlen = seqinlen - ivsize */
-+	/* assoclen + cryptlen = seqinlen - ivsize - authsize */
- 	append_math_sub_imm_u32(desc, REG3, SEQINLEN, IMM,
- 				ctx->authsize + tfm->ivsize)
- 	/* assoclen = (assoclen + cryptlen) - cryptlen */
-@@ -340,7 +311,6 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	/* Load ICV */
- 	append_seq_fifo_load(desc, ctx->authsize, FIFOLD_CLASS_CLASS2 |
- 			     FIFOLD_TYPE_LAST2 | FIFOLD_TYPE_ICV);
--	append_dec_shr_done(desc);
- 
- 	ctx->sh_desc_dec_dma = dma_map_single(jrdev, desc,
- 					      desc_bytes(desc),
-@@ -532,7 +502,7 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 	struct ablkcipher_tfm *tfm = &ablkcipher->base.crt_ablkcipher;
- 	struct device *jrdev = ctx->jrdev;
- 	int ret = 0;
--	u32 *key_jump_cmd, *jump_cmd;
-+	u32 *key_jump_cmd;
- 	u32 *desc;
- 
- #ifdef DEBUG
-@@ -563,9 +533,6 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 
- 	set_jump_tgt_here(desc, key_jump_cmd);
- 
--	/* Propagate errors from shared to job descriptor */
--	append_cmd(desc, SET_OK_NO_PROP_ERRORS | CMD_LOAD);
--
- 	/* Load iv */
- 	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
- 		   LDST_CLASS_1_CCB | tfm->ivsize);
-@@ -603,11 +570,7 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 			  ctx->enckeylen, CLASS_1 |
- 			  KEY_DEST_CLASS_REG);
- 
--	/* For aead, only propagate error immediately if shared */
--	jump_cmd = append_jump(desc, JUMP_TEST_ALL);
- 	set_jump_tgt_here(desc, key_jump_cmd);
--	append_cmd(desc, SET_OK_NO_PROP_ERRORS | CMD_LOAD);
--	set_jump_tgt_here(desc, jump_cmd);
- 
- 	/* load IV */
- 	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_BYTE_CONTEXT |
-@@ -619,9 +582,6 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 	/* Perform operation */
- 	ablkcipher_append_src_dst(desc);
- 
--	/* Wait for key to load before allowing propagating error */
--	append_dec_shr_done(desc);
--
- 	ctx->sh_desc_dec_dma = dma_map_single(jrdev, desc,
- 					      desc_bytes(desc),
- 					      DMA_TO_DEVICE);
 -- 
 1.8.3.1
