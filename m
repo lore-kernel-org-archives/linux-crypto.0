@@ -1,163 +1,331 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH 1/2] SHA1 transform: x86_64 AVX2 optimization - assembly code-v2
-Date: Fri, 14 Mar 2014 06:34:39 +0100
-Message-ID: <201403140634.40045.marex@denx.de>
-References: <1394650063.7495.133.camel@pegasus.jf.intel.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, hpa@zytor.com,
-	ilya.albrekht@intel.com, maxim.locktyukhin@intel.com,
-	ronen.zohar@intel.com, wajdi.k.feghali@intel.com,
-	tim.c.chen@linux.intel.com, linux-crypto@vger.kernel.org
-To: chandramouli narayanan <mouli@linux.intel.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] arm64/lib: add optimized implementation of sha_transform
+Date: Fri, 14 Mar 2014 16:02:33 +0100
+Message-ID: <1394809353-16707-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: nico@linaro.org, steve.capper@linaro.org,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	catalin.marinas@arm.com, will.deacon@arm.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:52750 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751836AbaCNFkf (ORCPT
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:56101 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754962AbaCNPCk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Mar 2014 01:40:35 -0400
-In-Reply-To: <1394650063.7495.133.camel@pegasus.jf.intel.com>
+	Fri, 14 Mar 2014 11:02:40 -0400
+Received: by mail-wi0-f170.google.com with SMTP id n15so782898wiw.1
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Mar 2014 08:02:39 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday, March 12, 2014 at 07:47:43 PM, chandramouli narayanan wrote:
-> This git patch adds x86_64 AVX2 optimization of SHA1 transform
-> to crypto support. The patch has been tested with 3.14.0-rc1
-> kernel.
-> 
-> On a Haswell desktop, with turbo disabled and all cpus running
-> at maximum frequency, tcrypt shows AVX2 performance improvement
-> from 3% for 256 bytes update to 16% for 1024 bytes update over
-> AVX implementation.
-> 
-> Signed-off-by: Chandramouli Narayanan <mouli@linux.intel.com>
-> 
-> diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-> b/arch/x86/crypto/sha1_avx2_x86_64_asm.S new file mode 100644
-> index 0000000..2f71294
-> --- /dev/null
-> +++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-> @@ -0,0 +1,732 @@
-> +/*
-> +	Implement fast SHA-1 with AVX2 instructions. (x86_64)
-> +
-> +  This file is provided under a dual BSD/GPLv2 license.  When using or
-> +  redistributing this file, you may do so under either license.
-> +
-> +  GPL LICENSE SUMMARY
+This implementation keeps the 64 bytes of workspace in registers rather than
+on the stack, eliminating most of the loads and stores, and reducing the
+instruction count by about 25%.
 
-Please see Documentation/CodingStyle chapter 8 for the preffered comment style.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+Hello all,
 
-[...]
+No performance numbers I am allowed to share, unfortunately, so if anyone else
+(with access to actual, representative hardware) would care to have a go, I
+would be very grateful.
 
-> +*/
-> +
-> +#---------------------
-> +#
-> +#SHA-1 implementation with Intel(R) AVX2 instruction set extensions.
+This can be done by building the tcrypt.ko module (CONFIG_CRYPTO_TEST=m), and
+inserting the module using 'mode=303' as a parameter (note that the insmod
+always fails, but produces its test output to the kernel log). Also note that
+the sha_transform() function will be part of the kernel proper, so just
+rebuilding the sha1_generic module is not sufficient.
 
-DTTO here.
+Cheers,
 
-> +#This implementation is based on the previous SSSE3 release:
-> +#Visit http://software.intel.com/en-us/articles/
-> +#and refer to improving-the-performance-of-the-secure-hash-algorithm-1/
-> +#
-> +#Updates 20-byte SHA-1 record in 'hash' for even number of
-> +#'num_blocks' consecutive 64-byte blocks
-> +#
-> +#extern "C" void sha1_transform_avx2(
-> +#	int *hash, const char* input, size_t num_blocks );
-> +#
-> +
-> +#ifdef CONFIG_AS_AVX2
 
-I wonder, is this large #ifdef around the entire file needed here? Can you not 
-just handle not-compiling this file in in the Makefile ?
+ arch/arm64/kernel/arm64ksyms.c |   3 +
+ arch/arm64/lib/Makefile        |   2 +-
+ arch/arm64/lib/sha1.S          | 256 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 260 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/lib/sha1.S
 
-[...]
-
-> +        push %rbx
-> +        push %rbp
-> +        push %r12
-> +        push %r13
-> +        push %r14
-> +        push %r15
-> +	#FIXME: Save rsp
-> +
-> +        RESERVE_STACK  = (W_SIZE*4 + 8+24)
-> +
-> +        # Align stack
-> +        mov     %rsp, %rbx
-> +        and     $(0x1000-1), %rbx
-> +        sub     $(8+32), %rbx
-> +        sub     %rbx, %rsp
-> +        push    %rbx
-> +        sub     $RESERVE_STACK, %rsp
-> +
-> +        avx2_zeroupper
-> +
-> +	lea	K_XMM_AR(%rip), K_BASE
-
-Can you please use TABs for indent consistently (see the CodingStyle again) ?
-
-[...]
-
-> +    .align 32
-> +    _loop:
-> +	# code loops through more than one block
-> +	# we use K_BASE value as a signal of a last block,
-> +	# it is set below by: cmovae BUFFER_PTR, K_BASE
-> +        cmp K_BASE, BUFFER_PTR
-> +        jne _begin
-> +    .align 32
-> +        jmp _end
-> +    .align 32
-> +    _begin:
-> +
-> +        # Do first block
-> +        RR 0
-> +        RR 2
-> +        RR 4
-> +        RR 6
-> +        RR 8
-> +
-> +        jmp _loop0
-> +_loop0:
-> +
-> +        RR 10
-> +        RR 12
-> +        RR 14
-> +        RR 16
-> +        RR 18
-> +
-> +        RR 20
-> +        RR 22
-> +        RR 24
-> +        RR 26
-> +        RR 28
-
-Can you not generate these repeated sequences with some of the AS's macro voodoo 
-? Like .rept or somesuch ?
-
-[...]
-
-> +.macro UPDATE_HASH  hash, val
-> +	add	\hash, \val
-> +	mov	\val, \hash
-> +.endm
-
-This macro is defined below the point where it's used, which is a little 
-counter-intuitive.
-[...]
-
-> +
-> +/* AVX2 optimized implementation:
-> + *   extern "C" void sha1_transform_avx2(
-> + *	int *hash, const char* input, size_t num_blocks );
-
-What does this comment tell me ?
-
-btw. you might want to squash 1/2 and 2/2 , since they are not two logical 
-separate blocks I think.
+diff --git a/arch/arm64/kernel/arm64ksyms.c b/arch/arm64/kernel/arm64ksyms.c
+index 338b568cd8ae..1f5693fb5d93 100644
+--- a/arch/arm64/kernel/arm64ksyms.c
++++ b/arch/arm64/kernel/arm64ksyms.c
+@@ -56,3 +56,6 @@ EXPORT_SYMBOL(clear_bit);
+ EXPORT_SYMBOL(test_and_clear_bit);
+ EXPORT_SYMBOL(change_bit);
+ EXPORT_SYMBOL(test_and_change_bit);
++
++	/* SHA-1 implementation under lib/ */
++EXPORT_SYMBOL(sha_transform);
+diff --git a/arch/arm64/lib/Makefile b/arch/arm64/lib/Makefile
+index 328ce1a99daa..ea093ebb9a9a 100644
+--- a/arch/arm64/lib/Makefile
++++ b/arch/arm64/lib/Makefile
+@@ -1,4 +1,4 @@
+ lib-y		:= bitops.o clear_user.o delay.o copy_from_user.o	\
+ 		   copy_to_user.o copy_in_user.o copy_page.o		\
+ 		   clear_page.o memchr.o memcpy.o memmove.o memset.o	\
+-		   strchr.o strrchr.o
++		   strchr.o strrchr.o sha1.o
+diff --git a/arch/arm64/lib/sha1.S b/arch/arm64/lib/sha1.S
+new file mode 100644
+index 000000000000..877b8d70e992
+--- /dev/null
++++ b/arch/arm64/lib/sha1.S
+@@ -0,0 +1,256 @@
++/*
++ * linux/arch/arm64/lib/sha1.S
++ *
++ * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/linkage.h>
++#include <asm/assembler.h>
++
++	.text
++
++	k		.req	w1
++
++	res		.req	w2
++	xres		.req	x2
++
++	wA		.req	w3
++	wB		.req	w4
++	wC		.req	w5
++	wD		.req	w6
++	wE		.req	w7
++
++	tmp		.req	w16
++	xtmp		.req	x16
++
++	.macro		sha1_choose, out, b, c, d
++	eor		\out, \c, \d
++	and		\out, \out, \b
++	eor		\out, \out, \d
++	.endm
++
++	.macro		sha1_parity, out, b, c, d
++	eor		\out, \b, \c
++	eor		\out, \out, \d
++	.endm
++
++	.macro		sha1_majority, out, b, c, d
++	eor		tmp, \b, \c
++	and		\out, \b, \c
++	and		tmp, tmp, \d
++	add		\out, \out, tmp
++	.endm
++
++	.macro		mix_state, st0, st1, st4, st6, st7
++	extr		xtmp, \st7, \st6, #32
++	eor		\st0, \st0, \st1
++	eor		xtmp, xtmp, \st4
++	eor		xtmp, xtmp, \st0
++	ror		res, tmp, #(32 - 1)
++	lsr		xtmp, xtmp, #32
++	ror		tmp, tmp, #(32 - 1)
++	orr		\st0, xres, xtmp, lsl #32
++	.endm
++
++	.macro		sha1_round, func, r, h, a, b, c, d, e
++	sha1_\func	res, \b, \c, \d
++	add		res, res, \e
++	ror		\e, \a, #(32 - 5)
++	.ifc		\h, h
++	add		xres, xres, x\r, lsr #32
++	.else
++	add		res, res, w\r
++	.endif
++	add		\e, \e, k
++	ror		\b, \b, #2
++	add		\e, \e, res
++	.endm
++
++	/*
++	 * void sha_transform(__u32 *digest, const char *data, __u32 *array)
++	 */
++ENTRY(sha_transform)
++	/* load input into state array */
++	ldp		x8, x9, [x1]
++	ldp		x10, x11, [x1, #16]
++	ldp		x12, x13, [x1, #32]
++	ldp		x14, x15, [x1, #48]
++
++	/* load digest input */
++	ldr		wA, [x0]
++	ldp		wB, wC, [x0, #4]
++	ldp		wD, wE, [x0, #12]
++
++	/* endian-reverse the input on LE builds */
++CPU_LE( rev32		x8, x8		)
++CPU_LE( rev32		x9, x9		)
++CPU_LE( rev32		x10, x10	)
++CPU_LE( rev32		x11, x11	)
++CPU_LE( rev32		x12, x12	)
++CPU_LE( rev32		x13, x13	)
++CPU_LE( rev32		x14, x14	)
++CPU_LE( rev32		x15, x15	)
++
++	/* round 1 */
++	ldr		k, =0x5a827999
++	sha1_round	choose,  8, l, wA, wB, wC, wD, wE
++	sha1_round	choose,  8, h, wE, wA, wB, wC, wD
++	sha1_round	choose,  9, l, wD, wE, wA, wB, wC
++	sha1_round	choose,  9, h, wC, wD, wE, wA, wB
++	sha1_round	choose, 10, l, wB, wC, wD, wE, wA
++	sha1_round	choose, 10, h, wA, wB, wC, wD, wE
++	sha1_round	choose, 11, l, wE, wA, wB, wC, wD
++	sha1_round	choose, 11, h, wD, wE, wA, wB, wC
++	sha1_round	choose, 12, l, wC, wD, wE, wA, wB
++	sha1_round	choose, 12, h, wB, wC, wD, wE, wA
++	sha1_round	choose, 13, l, wA, wB, wC, wD, wE
++	sha1_round	choose, 13, h, wE, wA, wB, wC, wD
++	sha1_round	choose, 14, l, wD, wE, wA, wB, wC
++	sha1_round	choose, 14, h, wC, wD, wE, wA, wB
++	sha1_round	choose, 15, l, wB, wC, wD, wE, wA
++	sha1_round	choose, 15, h, wA, wB, wC, wD, wE
++
++	mix_state	x8, x9, x12, x14, x15
++	sha1_round	choose,  8, l, wE, wA, wB, wC, wD
++	sha1_round	choose,  8, h, wD, wE, wA, wB, wC
++	mix_state	x9, x10, x13, x15, x8
++	sha1_round	choose,  9, l, wC, wD, wE, wA, wB
++	sha1_round	choose,  9, h, wB, wC, wD, wE, wA
++
++	/* round 2 */
++	ldr		k, =0x6ed9eba1
++	mix_state	x10, x11, x14, x8, x9
++	sha1_round	parity, 10, l, wA, wB, wC, wD, wE
++	sha1_round	parity, 10, h, wE, wA, wB, wC, wD
++	mix_state	x11, x12, x15, x9, x10
++	sha1_round	parity, 11, l, wD, wE, wA, wB, wC
++	sha1_round	parity, 11, h, wC, wD, wE, wA, wB
++	mix_state	x12, x13, x8, x10, x11
++	sha1_round	parity, 12, l, wB, wC, wD, wE, wA
++	sha1_round	parity, 12, h, wA, wB, wC, wD, wE
++	mix_state	x13, x14, x9, x11, x12
++	sha1_round	parity, 13, l, wE, wA, wB, wC, wD
++	sha1_round	parity, 13, h, wD, wE, wA, wB, wC
++	mix_state	x14, x15, x10, x12, x13
++	sha1_round	parity, 14, l, wC, wD, wE, wA, wB
++	sha1_round	parity, 14, h, wB, wC, wD, wE, wA
++	mix_state	x15, x8, x11, x13, x14
++	sha1_round	parity, 15, l, wA, wB, wC, wD, wE
++	sha1_round	parity, 15, h, wE, wA, wB, wC, wD
++	mix_state	x8, x9, x12, x14, x15
++	sha1_round	parity,  8, l, wD, wE, wA, wB, wC
++	sha1_round	parity,  8, h, wC, wD, wE, wA, wB
++	mix_state	x9, x10, x13, x15, x8
++	sha1_round	parity,  9, l, wB, wC, wD, wE, wA
++	sha1_round	parity,  9, h, wA, wB, wC, wD, wE
++	mix_state	x10, x11, x14, x8, x9
++	sha1_round	parity, 10, l, wE, wA, wB, wC, wD
++	sha1_round	parity, 10, h, wD, wE, wA, wB, wC
++	mix_state	x11, x12, x15, x9, x10
++	sha1_round	parity, 11, l, wC, wD, wE, wA, wB
++	sha1_round	parity, 11, h, wB, wC, wD, wE, wA
++
++	/* round 3 */
++	ldr		k, =0x8f1bbcdc
++	mix_state	x12, x13, x8, x10, x11
++	sha1_round	majority, 12, l, wA, wB, wC, wD, wE
++	sha1_round	majority, 12, h, wE, wA, wB, wC, wD
++	mix_state	x13, x14, x9, x11, x12
++	sha1_round	majority, 13, l, wD, wE, wA, wB, wC
++	sha1_round	majority, 13, h, wC, wD, wE, wA, wB
++	mix_state	x14, x15, x10, x12, x13
++	sha1_round	majority, 14, l, wB, wC, wD, wE, wA
++	sha1_round	majority, 14, h, wA, wB, wC, wD, wE
++	mix_state	x15, x8, x11, x13, x14
++	sha1_round	majority, 15, l, wE, wA, wB, wC, wD
++	sha1_round	majority, 15, h, wD, wE, wA, wB, wC
++	mix_state	x8, x9, x12, x14, x15
++	sha1_round	majority,  8, l, wC, wD, wE, wA, wB
++	sha1_round	majority,  8, h, wB, wC, wD, wE, wA
++	mix_state	x9, x10, x13, x15, x8
++	sha1_round	majority,  9, l, wA, wB, wC, wD, wE
++	sha1_round	majority,  9, h, wE, wA, wB, wC, wD
++	mix_state	x10, x11, x14, x8, x9
++	sha1_round	majority, 10, l, wD, wE, wA, wB, wC
++	sha1_round	majority, 10, h, wC, wD, wE, wA, wB
++	mix_state	x11, x12, x15, x9, x10
++	sha1_round	majority, 11, l, wB, wC, wD, wE, wA
++	sha1_round	majority, 11, h, wA, wB, wC, wD, wE
++	mix_state	x12, x13, x8, x10, x11
++	sha1_round	majority, 12, l, wE, wA, wB, wC, wD
++	sha1_round	majority, 12, h, wD, wE, wA, wB, wC
++	mix_state	x13, x14, x9, x11, x12
++	sha1_round	majority, 13, l, wC, wD, wE, wA, wB
++	sha1_round	majority, 13, h, wB, wC, wD, wE, wA
++
++	/* round 4 */
++	ldr		k, =0xca62c1d6
++	mix_state	x14, x15, x10, x12, x13
++	sha1_round	parity, 14, l, wA, wB, wC, wD, wE
++	sha1_round	parity, 14, h, wE, wA, wB, wC, wD
++	mix_state	x15, x8, x11, x13, x14
++	sha1_round	parity, 15, l, wD, wE, wA, wB, wC
++	sha1_round	parity, 15, h, wC, wD, wE, wA, wB
++	mix_state	x8, x9, x12, x14, x15
++	sha1_round	parity,  8, l, wB, wC, wD, wE, wA
++	sha1_round	parity,  8, h, wA, wB, wC, wD, wE
++	mix_state	x9, x10, x13, x15, x8
++	sha1_round	parity,  9, l, wE, wA, wB, wC, wD
++	sha1_round	parity,  9, h, wD, wE, wA, wB, wC
++	mix_state	x10, x11, x14, x8, x9
++	sha1_round	parity, 10, l, wC, wD, wE, wA, wB
++	sha1_round	parity, 10 ,h, wB, wC, wD, wE, wA
++	mix_state	x11, x12, x15, x9, x10
++	sha1_round	parity, 11, l, wA, wB, wC, wD, wE
++	sha1_round	parity, 11, h, wE, wA, wB, wC, wD
++	mix_state	x12, x13, x8, x10, x11
++	sha1_round	parity, 12, l, wD, wE, wA, wB, wC
++	sha1_round	parity, 12, h, wC, wD, wE, wA, wB
++	mix_state	x13, x14, x9, x11, x12
++	sha1_round	parity, 13, l, wB, wC, wD, wE, wA
++	sha1_round	parity, 13, h, wA, wB, wC, wD, wE
++	mix_state	x14, x15, x10, x12, x13
++	sha1_round	parity, 14, l, wE, wA, wB, wC, wD
++	sha1_round	parity, 14, h, wD, wE, wA, wB, wC
++	mix_state	x15, x8, x11, x13, x14
++
++	/* reload digest input */
++	ldr		w8, [x0]
++	ldp		w9, w10, [x0, #4]
++	ldp		w11, w12, [x0, #12]
++
++	sha1_round	parity, 15, l, wC, wD, wE, wA, wB
++	sha1_round	parity, 15, h, wB, wC, wD, wE, wA
++
++	/* add this round's output to digest */
++	add		wA, wA, w8
++	add		wB, wB, w9
++	add		wC, wC, w10
++	add		wD, wD, w11
++	add		wE, wE, w12
++
++	/* store digest */
++	str		wA, [x0]
++	stp		wB, wC, [x0, #4]
++	stp		wD, wE, [x0, #12]
++	ret
++ENDPROC(sha_transform)
++
++	/*
++	 * void sha_init(__u32 *buf)
++	 */
++ENTRY(sha_init)
++	ldr	w1, =0x67452301
++	ldr	w2, =0xefcdab89
++	ldr	w3, =0x98badcfe
++	ldr	w4, =0x10325476
++	ldr	w5, =0xc3d2e1f0
++	str	w1, [x0]
++	stp	w2, w3, [x0, #4]
++	stp	w4, w5, [x0, #12]
++	ret
++ENDPROC(sha_init)
+-- 
+1.8.3.2
