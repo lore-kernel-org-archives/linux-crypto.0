@@ -1,30 +1,55 @@
-From: Dan Streetman <ddstreet@ieee.org>
-Subject: algif for compression?
-Date: Fri, 14 Mar 2014 14:05:01 -0400
-Message-ID: <CALZtONBFtCqQEfOgjNs_MqLm0xXP+9QK47a1t_HE4DuUBkxpsg@mail.gmail.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH][RESEND 3] hwrng: add randomness to system from rng sources
+Date: Sun, 16 Mar 2014 15:56:33 -0700
+Message-ID: <53262C21.6000608@zytor.com>
+References: <20140303235148.GA7601@www.outflux.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	Satoru Takeuchi <satoru.takeuchi@gmail.com>,
+	linux-crypto@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
+	Andrew Morton <akpm@linux-foundation.org>
+To: Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:64065 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754622AbaCNSFW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Mar 2014 14:05:22 -0400
-Received: by mail-we0-f174.google.com with SMTP id t60so2422026wes.19
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Mar 2014 11:05:21 -0700 (PDT)
+Received: from terminus.zytor.com ([198.137.202.10]:55634 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751248AbaCPW5H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 16 Mar 2014 18:57:07 -0400
+In-Reply-To: <20140303235148.GA7601@www.outflux.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I see the algif_hash and algif_blkcipher implementations to allow
-userspace AF_ALG socket access to kernel blkcipher and hash
-algorithms, but has anyone done a algif_compression to allow userspace
-access to compression algs?  I'm asking specifically wrt the 842
-crypto module, which uses the hardware compression coprocessors on
-newer powerpc systems.
+On 03/03/2014 03:51 PM, Kees Cook wrote:
+> When bringing a new RNG source online, it seems like it would make sense
+> to use some of its bytes to make the system entropy pool more random,
+> as done with all sorts of other devices that contain per-device or
+> per-boot differences.
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-If not, is there any reason against adding a algif_compression to
-provide the access?
+I would like to raise again the concept of at least optionally using a
+kernel thread, rather than a user-space daemon, to feed hwrng output to
+the kernel pools.  The main service rngd provides is FIPS tests, but
+those FIPS tests were withdrawn as a standard over 10 years ago and are
+known to be extremely weak, at the very best a minimal sanity check.
+Furthermore, they are completely useless against the output of any RNG
+which contains a cryptographic whitener, which is the vast majority of
+commercial sources -- this is especially so since rngd doesn't expect to
+have to do any data reduction for output coming from hwrng.
 
-Thanks!
+Furthermore, if more than one hwrng device is available, rngd will only
+be able to read one of them because of the way /dev/hwrng is implemented
+in the kernel.
+
+For contrast, the kernel could do data reduction just fine by only
+crediting the entropy coming out of each hwrng driver with a fractional
+amount.
+
+That does *not* mean that there aren't random number generators which
+require significant computation better done in user space.  For example,
+an audio noise daemon or a lava lamp camera which requires video processing.
+
+	-hpa
