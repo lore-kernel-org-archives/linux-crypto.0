@@ -1,51 +1,77 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [RFC PATCH 03/22] staging: crypto: skein: allow building
- statically
-Date: Mon, 17 Mar 2014 14:52:52 -0700
-Message-ID: <20140317215252.GA24150@kroah.com>
-References: <cover.1394570067.git.jason@lakedaemon.net>
- <e3d822cba2ff9e9bbb57fc613039bd0983186c05.1394570067.git.jason@lakedaemon.net>
+From: Kukjin Kim <kgene.kim@samsung.com>
+Subject: Re: [PATCH 6/9 v7] ARM: dts: exynos5250/5420: add dt node for sss
+ module
+Date: Tue, 18 Mar 2014 07:36:45 +0900
+Message-ID: <532778FD.5080509@samsung.com>
+References: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com> <1392630275-8667-7-git-send-email-ch.naveen@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org
-To: Jason Cooper <jason@lakedaemon.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:48592 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751757AbaCQVuv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Mar 2014 17:50:51 -0400
-Content-Disposition: inline
-In-Reply-To: <e3d822cba2ff9e9bbb57fc613039bd0983186c05.1394570067.git.jason@lakedaemon.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
+	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
+	cpgs@samsung.com, davem@davemloft.net,
+	Kukjin Kim <kgene.kim@samsung.com>
+To: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1392630275-8667-7-git-send-email-ch.naveen@samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Mar 11, 2014 at 09:32:35PM +0000, Jason Cooper wrote:
-> These are the minimum changes required to get the code to build
-> statically in the kernel.  It's necessary to do this first so that we
-> can empirically determine that future cleanup patches aren't changing
-> the generated object code.
-> 
-> Signed-off-by: Jason Cooper <jason@lakedaemon.net>
+On 02/17/14 18:44, Naveen Krishna Chatradhi wrote:
+> This patch adds the device tree node for SSS module
+> found on Exynos5420 and Exynos5250
+>
+> Signed-off-by: Naveen Krishna Chatradhi<ch.naveen@samsung.com>
+> Reviewed-by: Tomasz Figa<t.figa@samsung.com>
+> TO:<linux-samsung-soc@vger.kernel.org>
+> CC: David S. Miller<davem@davemloft.net>
+> CC: Kukjin Kim<kgene.kim@samsung.com>
+> CC:<linux-crypto@vger.kernel.org>
+> ---
+> Changes since v6:
+> None
+>
+>   arch/arm/boot/dts/exynos5250.dtsi |    8 ++++++++
+>   arch/arm/boot/dts/exynos5420.dtsi |    9 +++++++++
+>   2 files changed, 17 insertions(+)
+>
+> diff --git a/arch/arm/boot/dts/exynos5250.dtsi b/arch/arm/boot/dts/exynos5250.dtsi
+> index a76a189..13b748f 100644
+> --- a/arch/arm/boot/dts/exynos5250.dtsi
+> +++ b/arch/arm/boot/dts/exynos5250.dtsi
+> @@ -715,4 +715,12 @@
+>   		io-channel-ranges;
+>   		status = "disabled";
+>   	};
+> +
+> +	sss@10830000 {
+> +		compatible = "samsung,exynos4210-secss";
+> +		reg =<0x10830000 0x10000>;
+> +		interrupts =<0 112 0>;
+> +		clocks =<&clock 348>;
+> +		clock-names = "secss";
+> +	};
+>   };
+> diff --git a/arch/arm/boot/dts/exynos5420.dtsi b/arch/arm/boot/dts/exynos5420.dtsi
+> index 9c834cc..b4ce625 100644
+> --- a/arch/arm/boot/dts/exynos5420.dtsi
+> +++ b/arch/arm/boot/dts/exynos5420.dtsi
+> @@ -666,4 +666,13 @@
+>   		clock-names = "watchdog";
+>   		samsung,syscon-phandle =<&pmu_system_controller>;
+>           };
+> +
+> +	sss@10830000 {
+> +		compatible = "samsung,exynos4210-secss";
+> +		reg =<0x10830000 0x10000>;
+> +		interrupts =<0 112 0>;
+> +		clocks =<&clock 471>;
+> +		clock-names = "secss";
+> +		samsung,power-domain =<&g2d_pd>;
+> +	};
+>   };
 
-This doesn't apply to my latest tree :(
+Applied, thanks.
 
-> --- a/drivers/staging/Makefile
-> +++ b/drivers/staging/Makefile
-> @@ -65,3 +65,4 @@ obj-$(CONFIG_XILLYBUS)		+= xillybus/
->  obj-$(CONFIG_DGNC)			+= dgnc/
->  obj-$(CONFIG_DGAP)			+= dgap/
->  obj-$(CONFIG_MTD_SPINAND_MT29F)	+= mt29f_spinand/
-> +obj-$(CONFIG_CRYPTO_SKEIN) += skein/
-
-Care to align these up with the way this file is formatted?
-
-And I have no objection to taking the drivers/staging/ patches, the
-script looks useful, but I can't take it through the staging tree,
-sorry.
-
-thanks,
-
-greg k-h
+- Kukjin
