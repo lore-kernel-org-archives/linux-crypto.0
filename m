@@ -1,58 +1,37 @@
-From: "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH][RESEND 3] hwrng: add randomness to system from rng sources
-Date: Sun, 16 Mar 2014 19:12:05 -0700
-Message-ID: <532659F5.2030005@zytor.com>
-References: <20140303235148.GA7601@www.outflux.net>	 <20140304153841.GN1872@titan.lakedaemon.net>	 <CAGXu5jKqB62ZaD0HEG=vJoROOqvdSYeHYB2h61Kw1-ov5phFww@mail.gmail.com>	 <20140304195356.GS1872@titan.lakedaemon.net>	 <CAGXu5jL5JBHL0tqZzA03LY67HZU4jEQ0_V=bJs9TV3g0Bfwr_w@mail.gmail.com> <1393972797.8344.190.camel@calx>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2 4/6] compile the DRBG code
+Date: Mon, 17 Mar 2014 08:37:33 +0100
+Message-ID: <3319954.xS7rx9A3Ha@myon.chronox.de>
+References: <2396177.vxvG2ljJL8@myon.chronox.de> <2831049.lrfGvkkTou@myon.chronox.de> <2589470.EoGAcF9qRN@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Jason Cooper <jason@lakedaemon.net>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Satoru Takeuchi <satoru.takeuchi@gmail.com>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Matt Mackall <mpm@selenic.com>, Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: aquini@redhat.com, jeremy.wayne.powell@gmail.com
+To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:56864 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755818AbaCQCMr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 16 Mar 2014 22:12:47 -0400
-In-Reply-To: <1393972797.8344.190.camel@calx>
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.220]:56851 "EHLO
+	mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756205AbaCQHkp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 17 Mar 2014 03:40:45 -0400
+In-Reply-To: <2589470.EoGAcF9qRN@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/04/2014 02:39 PM, Matt Mackall wrote:
-> 
-> [temporarily coming out of retirement to provide a clue]
-> 
-> The pool mixing function is intentionally _reversible_. This is a
-> crucial security property.
-> 
-> That means, if I have an initial secret pool state X, and hostile
-> attacker controlled data Y, then we can do:
-> 
-> X' = mix(X, Y)
-> 
->  and 
-> 
-> X = unmix(X', Y)
-> 
-> We can see from this that the combination of (X' and Y) still contain
-> the information that was originally in X. Since it's clearly not in Y..
-> it must all remain in X'.
-> 
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
 
-This of course assumes that the attacker doesn't know the state of the
-pool X.
-
-The other thing to note is that reversible doesn't necessarily mean
-linear (the current mixing function is linear.)  AES, for example, is
-reversible (if and only if you possess the key) but is highly nonlinear.
-
-I'm not saying we should use AES to mix the pool -- it is almost
-guaranteed to be too expensive.
-
-	-hpa
+diff --git a/crypto/Makefile b/crypto/Makefile
+index b29402a..0d63373 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -92,6 +92,7 @@ obj-$(CONFIG_CRYPTO_842) += 842.o
+ obj-$(CONFIG_CRYPTO_RNG2) += rng.o
+ obj-$(CONFIG_CRYPTO_RNG2) += krng.o
+ obj-$(CONFIG_CRYPTO_ANSI_CPRNG) += ansi_cprng.o
++obj-$(CONFIG_CRYTPO_DRBG) += drbg.o
+ obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
+ obj-$(CONFIG_CRYPTO_GHASH) += ghash-generic.o
+ obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+-- 
+1.8.5.3
