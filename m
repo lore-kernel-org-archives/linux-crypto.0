@@ -1,55 +1,58 @@
 From: "H. Peter Anvin" <hpa@zytor.com>
 Subject: Re: [PATCH][RESEND 3] hwrng: add randomness to system from rng sources
-Date: Sun, 16 Mar 2014 15:56:33 -0700
-Message-ID: <53262C21.6000608@zytor.com>
-References: <20140303235148.GA7601@www.outflux.net>
+Date: Sun, 16 Mar 2014 19:12:05 -0700
+Message-ID: <532659F5.2030005@zytor.com>
+References: <20140303235148.GA7601@www.outflux.net>	 <20140304153841.GN1872@titan.lakedaemon.net>	 <CAGXu5jKqB62ZaD0HEG=vJoROOqvdSYeHYB2h61Kw1-ov5phFww@mail.gmail.com>	 <20140304195356.GS1872@titan.lakedaemon.net>	 <CAGXu5jL5JBHL0tqZzA03LY67HZU4jEQ0_V=bJs9TV3g0Bfwr_w@mail.gmail.com> <1393972797.8344.190.camel@calx>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Cc: Matt Mackall <mpm@selenic.com>,
+Cc: Jason Cooper <jason@lakedaemon.net>,
+	"Theodore Ts'o" <tytso@mit.edu>,
+	LKML <linux-kernel@vger.kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Rusty Russell <rusty@rustcorp.com.au>,
 	Satoru Takeuchi <satoru.takeuchi@gmail.com>,
-	linux-crypto@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
 	Andrew Morton <akpm@linux-foundation.org>
-To: Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
+To: Matt Mackall <mpm@selenic.com>, Kees Cook <keescook@chromium.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:55634 "EHLO mail.zytor.com"
+Received: from terminus.zytor.com ([198.137.202.10]:56864 "EHLO mail.zytor.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751248AbaCPW5H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 16 Mar 2014 18:57:07 -0400
-In-Reply-To: <20140303235148.GA7601@www.outflux.net>
+	id S1755818AbaCQCMr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 16 Mar 2014 22:12:47 -0400
+In-Reply-To: <1393972797.8344.190.camel@calx>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/03/2014 03:51 PM, Kees Cook wrote:
-> When bringing a new RNG source online, it seems like it would make sense
-> to use some of its bytes to make the system entropy pool more random,
-> as done with all sorts of other devices that contain per-device or
-> per-boot differences.
+On 03/04/2014 02:39 PM, Matt Mackall wrote:
 > 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> [temporarily coming out of retirement to provide a clue]
+> 
+> The pool mixing function is intentionally _reversible_. This is a
+> crucial security property.
+> 
+> That means, if I have an initial secret pool state X, and hostile
+> attacker controlled data Y, then we can do:
+> 
+> X' = mix(X, Y)
+> 
+>  and 
+> 
+> X = unmix(X', Y)
+> 
+> We can see from this that the combination of (X' and Y) still contain
+> the information that was originally in X. Since it's clearly not in Y..
+> it must all remain in X'.
+> 
 
-I would like to raise again the concept of at least optionally using a
-kernel thread, rather than a user-space daemon, to feed hwrng output to
-the kernel pools.  The main service rngd provides is FIPS tests, but
-those FIPS tests were withdrawn as a standard over 10 years ago and are
-known to be extremely weak, at the very best a minimal sanity check.
-Furthermore, they are completely useless against the output of any RNG
-which contains a cryptographic whitener, which is the vast majority of
-commercial sources -- this is especially so since rngd doesn't expect to
-have to do any data reduction for output coming from hwrng.
+This of course assumes that the attacker doesn't know the state of the
+pool X.
 
-Furthermore, if more than one hwrng device is available, rngd will only
-be able to read one of them because of the way /dev/hwrng is implemented
-in the kernel.
+The other thing to note is that reversible doesn't necessarily mean
+linear (the current mixing function is linear.)  AES, for example, is
+reversible (if and only if you possess the key) but is highly nonlinear.
 
-For contrast, the kernel could do data reduction just fine by only
-crediting the entropy coming out of each hwrng driver with a fractional
-amount.
-
-That does *not* mean that there aren't random number generators which
-require significant computation better done in user space.  For example,
-an audio noise daemon or a lava lamp camera which requires video processing.
+I'm not saying we should use AES to mix the pool -- it is almost
+guaranteed to be too expensive.
 
 	-hpa
