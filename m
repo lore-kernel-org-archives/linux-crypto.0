@@ -1,72 +1,70 @@
-From: Jason Cooper <jason@lakedaemon.net>
+From: Greg KH <gregkh@linuxfoundation.org>
 Subject: Re: [RFC PATCH 03/22] staging: crypto: skein: allow building
  statically
-Date: Tue, 18 Mar 2014 08:58:49 -0400
-Message-ID: <20140318125849.GQ15608@titan.lakedaemon.net>
+Date: Tue, 18 Mar 2014 14:28:20 +0000
+Message-ID: <20140318142820.GA11892@kroah.com>
 References: <cover.1394570067.git.jason@lakedaemon.net>
  <e3d822cba2ff9e9bbb57fc613039bd0983186c05.1394570067.git.jason@lakedaemon.net>
  <20140317215252.GA24150@kroah.com>
+ <20140318125849.GQ15608@titan.lakedaemon.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org
-To: Greg KH <gregkh@linuxfoundation.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:54497 "EHLO
-	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754912AbaCRM6x (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 18 Mar 2014 08:58:53 -0400
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: devel@driverdev.osuosl.org, "David S. Miller" <davem@davemloft.net>,
+ linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+To: Jason Cooper <jason@lakedaemon.net>
+Return-path: <driverdev-devel-bounces@linuxdriverproject.org>
 Content-Disposition: inline
-In-Reply-To: <20140317215252.GA24150@kroah.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20140318125849.GQ15608@titan.lakedaemon.net>
+List-Unsubscribe: <http://driverdev.linuxdriverproject.org/mailman/options/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=unsubscribe>
+List-Archive: <http://driverdev.linuxdriverproject.org/pipermail/driverdev-devel>
+List-Post: <mailto:driverdev-devel@linuxdriverproject.org>
+List-Help: <mailto:driverdev-devel-request@linuxdriverproject.org?subject=help>
+List-Subscribe: <http://driverdev.linuxdriverproject.org/mailman/listinfo/driverdev-devel>,
+ <mailto:driverdev-devel-request@linuxdriverproject.org?subject=subscribe>
+Errors-To: driverdev-devel-bounces@linuxdriverproject.org
+Sender: driverdev-devel-bounces@linuxdriverproject.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Mar 17, 2014 at 02:52:52PM -0700, Greg KH wrote:
-> On Tue, Mar 11, 2014 at 09:32:35PM +0000, Jason Cooper wrote:
-> > These are the minimum changes required to get the code to build
-> > statically in the kernel.  It's necessary to do this first so that we
-> > can empirically determine that future cleanup patches aren't changing
-> > the generated object code.
+On Tue, Mar 18, 2014 at 08:58:49AM -0400, Jason Cooper wrote:
+> On Mon, Mar 17, 2014 at 02:52:52PM -0700, Greg KH wrote:
+> > On Tue, Mar 11, 2014 at 09:32:35PM +0000, Jason Cooper wrote:
+> > > These are the minimum changes required to get the code to build
+> > > statically in the kernel.  It's necessary to do this first so that we
+> > > can empirically determine that future cleanup patches aren't changing
+> > > the generated object code.
+> > > 
+> > > Signed-off-by: Jason Cooper <jason@lakedaemon.net>
 > > 
-> > Signed-off-by: Jason Cooper <jason@lakedaemon.net>
+> > This doesn't apply to my latest tree :(
 > 
-> This doesn't apply to my latest tree :(
-
-Ah, ok.  I'll rebase this series on the staging tree.
-
-> > --- a/drivers/staging/Makefile
-> > +++ b/drivers/staging/Makefile
-> > @@ -65,3 +65,4 @@ obj-$(CONFIG_XILLYBUS)		+= xillybus/
-> >  obj-$(CONFIG_DGNC)			+= dgnc/
-> >  obj-$(CONFIG_DGAP)			+= dgap/
-> >  obj-$(CONFIG_MTD_SPINAND_MT29F)	+= mt29f_spinand/
-> > +obj-$(CONFIG_CRYPTO_SKEIN) += skein/
+> Ah, ok.  I'll rebase this series on the staging tree.
 > 
-> Care to align these up with the way this file is formatted?
+> > > --- a/drivers/staging/Makefile
+> > > +++ b/drivers/staging/Makefile
+> > > @@ -65,3 +65,4 @@ obj-$(CONFIG_XILLYBUS)		+= xillybus/
+> > >  obj-$(CONFIG_DGNC)			+= dgnc/
+> > >  obj-$(CONFIG_DGAP)			+= dgap/
+> > >  obj-$(CONFIG_MTD_SPINAND_MT29F)	+= mt29f_spinand/
+> > > +obj-$(CONFIG_CRYPTO_SKEIN) += skein/
+> > 
+> > Care to align these up with the way this file is formatted?
+> 
+> Of course, not sure what happened there (well, other than the obvious
+> :-P)
+> 
+> > And I have no objection to taking the drivers/staging/ patches, the
+> > script looks useful, but I can't take it through the staging tree,
+> > sorry.
+> 
+> Ok, I'll pull that out as a separate branch.  Do you mind taking a
+> series that depends on a topic branch from another tree?  We do it a lot
+> in arm-soc, but I'm not sure how popular that is elsewhere.
 
-Of course, not sure what happened there (well, other than the obvious
-:-P)
+It's not a dependancy at all, and I don't take git pull requests for the
+staging tree, just email patches, sorry.
 
-> And I have no objection to taking the drivers/staging/ patches, the
-> script looks useful, but I can't take it through the staging tree,
-> sorry.
+So just resend these patches thanks.
 
-Ok, I'll pull that out as a separate branch.  Do you mind taking a
-series that depends on a topic branch from another tree?  We do it a lot
-in arm-soc, but I'm not sure how popular that is elsewhere.
-
-It's purely an audit/testing dependency, but it would be nice to have it
-available in the history if someone wants to audit the changes.
-
-I have one change I'd like to do to the objdiff script.  I'd like it to
-assume 'HEAD^ HEAD' when the user executes './scripts/objdiff diff'.
-
-I'll respin both and submit a v1.
-
-Thanks for the review.
-
-thx,
-
-Jason.
+greg k-h
