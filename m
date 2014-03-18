@@ -1,73 +1,72 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH] arm64/lib: add optimized implementation of sha_transform
-Date: Tue, 18 Mar 2014 12:51:57 +0100
-Message-ID: <201403181251.57252.marex@denx.de>
-References: <1394809353-16707-1-git-send-email-ard.biesheuvel@linaro.org> <201403171918.35632.marex@denx.de> <CAKv+Gu9=SXJngmeYC9bDjgr+VF-b-Hj1jf_NWdPwNzn8z3MVKA@mail.gmail.com>
+From: Jason Cooper <jason@lakedaemon.net>
+Subject: Re: [RFC PATCH 03/22] staging: crypto: skein: allow building
+ statically
+Date: Tue, 18 Mar 2014 08:58:49 -0400
+Message-ID: <20140318125849.GQ15608@titan.lakedaemon.net>
+References: <cover.1394570067.git.jason@lakedaemon.net>
+ <e3d822cba2ff9e9bbb57fc613039bd0983186c05.1394570067.git.jason@lakedaemon.net>
+ <20140317215252.GA24150@kroah.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will.deacon@arm.com>,
-	Steve Capper <steve.capper@linaro.org>,
-	Nicolas Pitre <nico@linaro.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org
+To: Greg KH <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:41706 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752205AbaCRMK4 (ORCPT
+Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:54497 "EHLO
+	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754912AbaCRM6x (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 18 Mar 2014 08:10:56 -0400
-In-Reply-To: <CAKv+Gu9=SXJngmeYC9bDjgr+VF-b-Hj1jf_NWdPwNzn8z3MVKA@mail.gmail.com>
+	Tue, 18 Mar 2014 08:58:53 -0400
+Content-Disposition: inline
+In-Reply-To: <20140317215252.GA24150@kroah.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tuesday, March 18, 2014 at 08:26:00 AM, Ard Biesheuvel wrote:
-> On 17 March 2014 22:18, Marek Vasut <marex@denx.de> wrote:
-> > On Friday, March 14, 2014 at 04:02:33 PM, Ard Biesheuvel wrote:
-> >> This implementation keeps the 64 bytes of workspace in registers rather
-> >> than on the stack, eliminating most of the loads and stores, and
-> >> reducing the instruction count by about 25%.
-> >> 
-> >> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> >> ---
-> >> Hello all,
-> >> 
-> >> No performance numbers I am allowed to share, unfortunately, so if
-> >> anyone else (with access to actual, representative hardware) would care
-> >> to have a go, I would be very grateful.
-> >> 
-> >> This can be done by building the tcrypt.ko module
-> >> (CONFIG_CRYPTO_TEST=m), and inserting the module using 'mode=303' as a
-> >> parameter (note that the insmod always fails, but produces its test
-> >> output to the kernel log). Also note that the sha_transform() function
-> >> will be part of the kernel proper, so just rebuilding the sha1_generic
-> >> module is not sufficient.
-> >> 
-> >> Cheers,
+On Mon, Mar 17, 2014 at 02:52:52PM -0700, Greg KH wrote:
+> On Tue, Mar 11, 2014 at 09:32:35PM +0000, Jason Cooper wrote:
+> > These are the minimum changes required to get the code to build
+> > statically in the kernel.  It's necessary to do this first so that we
+> > can empirically determine that future cleanup patches aren't changing
+> > the generated object code.
 > > 
-> > Won't the function sha_transform() collide with the one in lib/sha1.c ?
-> > Or will the one in lib/sha1.c be overriden somehow ?
+> > Signed-off-by: Jason Cooper <jason@lakedaemon.net>
 > 
-> No, this works pretty well, in fact: arch/*/lib has precedence over
-> lib/, and objects (declared with lib-y +=)  are only included to
-> satisfy unresolved dependencies. So the second (generic) sha1.o will
-> not get linked.
+> This doesn't apply to my latest tree :(
 
-Thanks for clearing this !
+Ah, ok.  I'll rebase this series on the staging tree.
 
-> > Otherwise:
-> > 
-> > Reviewed-by: Marek Vasut <marex@denx.de>
+> > --- a/drivers/staging/Makefile
+> > +++ b/drivers/staging/Makefile
+> > @@ -65,3 +65,4 @@ obj-$(CONFIG_XILLYBUS)		+= xillybus/
+> >  obj-$(CONFIG_DGNC)			+= dgnc/
+> >  obj-$(CONFIG_DGAP)			+= dgap/
+> >  obj-$(CONFIG_MTD_SPINAND_MT29F)	+= mt29f_spinand/
+> > +obj-$(CONFIG_CRYPTO_SKEIN) += skein/
 > 
-> Thanks. I did send a v2 which is actually a lot different from the
-> version you reviewed, so I won't carry over your reviewed-by without
-> your acknowledgement.
+> Care to align these up with the way this file is formatted?
 
-Thanks!
+Of course, not sure what happened there (well, other than the obvious
+:-P)
 
-Best regards,
-Marek Vasut
+> And I have no objection to taking the drivers/staging/ patches, the
+> script looks useful, but I can't take it through the staging tree,
+> sorry.
+
+Ok, I'll pull that out as a separate branch.  Do you mind taking a
+series that depends on a topic branch from another tree?  We do it a lot
+in arm-soc, but I'm not sure how popular that is elsewhere.
+
+It's purely an audit/testing dependency, but it would be nice to have it
+available in the history if someone wants to audit the changes.
+
+I have one change I'd like to do to the objdiff script.  I'd like it to
+assume 'HEAD^ HEAD' when the user executes './scripts/objdiff diff'.
+
+I'll respin both and submit a v1.
+
+Thanks for the review.
+
+thx,
+
+Jason.
