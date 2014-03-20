@@ -1,32 +1,31 @@
 From: Yashpal Dutta <yashpal.dutta@freescale.com>
-Subject: [PATCH] crypto: caam - power management support for caam job-ring
-Date: Thu, 20 Mar 2014 08:03:17 +0545
-Message-ID: <1395281897-45211-1-git-send-email-yashpal.dutta@freescale.com>
+Subject: [PATCH v2] crypto: caam - power management support for caam job-ring
+Date: Thu, 20 Mar 2014 08:12:05 +0545
+Message-ID: <1395282425-45385-1-git-send-email-yashpal.dutta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Yashpal Dutta <yashpal.dutta@freescale.com>
 To: <linux-crypto@vger.kernel.org>, <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe005.messaging.microsoft.com ([216.32.181.185]:45440
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750758AbaCSSX2 (ORCPT
+Received: from tx2ehsobe001.messaging.microsoft.com ([65.55.88.11]:27291 "EHLO
+	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751064AbaCSScR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Mar 2014 14:23:28 -0400
-Received: from mail217-ch1 (localhost [127.0.0.1])	by
- mail217-ch1-R.bigfish.com (Postfix) with ESMTP id 6C4071E0108	for
- <linux-crypto@vger.kernel.org>; Wed, 19 Mar 2014 18:23:27 +0000 (UTC)
+	Wed, 19 Mar 2014 14:32:17 -0400
+Received: from mail101-tx2 (localhost [127.0.0.1])	by
+ mail101-tx2-R.bigfish.com (Postfix) with ESMTP id BFD304A0155	for
+ <linux-crypto@vger.kernel.org>; Wed, 19 Mar 2014 18:32:15 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Job ring is suspended gracefully and resume afresh.
-Pending Jobs not yet processed by CAAM are marked with error for
-producer
+Job ring is suspended gracefully and resume afresh. Pending Jobs
+not yet processed by CAAM are marked with error for producer
 
 Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
 ---
  drivers/crypto/caam/intern.h |   2 +
- drivers/crypto/caam/jr.c     | 253 ++++++++++++++++++++++++++++++++-----------
- 2 files changed, 189 insertions(+), 66 deletions(-)
+ drivers/crypto/caam/jr.c     | 254 ++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 190 insertions(+), 66 deletions(-)
 
 diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
 index 6d85fcc..0d41d05 100644
@@ -42,7 +41,7 @@ index 6d85fcc..0d41d05 100644
  	int out_ring_read_index;	/* Output index "tail" */
  	int tail;			/* entinfo (s/w ring) tail index */
 diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 1d80bd3..33d1cf7 100644
+index 1d80bd3..74c5fa2 100644
 --- a/drivers/crypto/caam/jr.c
 +++ b/drivers/crypto/caam/jr.c
 @@ -68,7 +68,6 @@ static int caam_reset_hw_jr(struct device *dev)
@@ -340,7 +339,7 @@ index 1d80bd3..33d1cf7 100644
  	int i, error;
  
  	jrp = dev_get_drvdata(dev);
-@@ -397,10 +515,10 @@ static int caam_jr_init(struct device *dev)
+@@ -397,10 +515,11 @@ static int caam_jr_init(struct device *dev)
  		return error;
  
  	jrp->inpring = dma_alloc_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
@@ -349,11 +348,12 @@ index 1d80bd3..33d1cf7 100644
  
  	jrp->outring = dma_alloc_coherent(dev, sizeof(struct jr_outentry) *
 -					  JOBR_DEPTH, &outbusaddr, GFP_KERNEL);
-+					  JOBR_DEPTH, &jrp->outbusaddr, GFP_KERNEL);
++					  JOBR_DEPTH, &jrp->outbusaddr,
++					  GFP_KERNEL);
  
  	jrp->entinfo = kzalloc(sizeof(struct caam_jrentry_info) * JOBR_DEPTH,
  			       GFP_KERNEL);
-@@ -421,8 +539,8 @@ static int caam_jr_init(struct device *dev)
+@@ -421,8 +540,8 @@ static int caam_jr_init(struct device *dev)
  	jrp->head = 0;
  	jrp->tail = 0;
  
@@ -364,7 +364,7 @@ index 1d80bd3..33d1cf7 100644
  	wr_reg32(&jrp->rregs->inpring_size, JOBR_DEPTH);
  	wr_reg32(&jrp->rregs->outring_size, JOBR_DEPTH);
  
-@@ -518,6 +636,9 @@ static struct platform_driver caam_jr_driver = {
+@@ -518,6 +637,9 @@ static struct platform_driver caam_jr_driver = {
  		.name = "caam_jr",
  		.owner = THIS_MODULE,
  		.of_match_table = caam_jr_match,
