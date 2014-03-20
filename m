@@ -1,67 +1,50 @@
-From: Naveen Krishna Ch <naveenkrishna.ch@gmail.com>
-Subject: Re: [PATCH 0/9 v7] crypto:s5p-sss: Add DT and Exynos support
-Date: Thu, 20 Mar 2014 11:43:46 +0900
-Message-ID: <CAHfPSqBeO1zoVd6H-r+ZBrKmQR-t6HgcbL4rmshuX_qhjR7JQw@mail.gmail.com>
-References: <1392630275-8667-1-git-send-email-ch.naveen@samsung.com> <20140225061630.GA9934@gondor.apana.org.au>
+From: Clemens Ladisch <clemens@ladisch.de>
+Subject: Re: [PATCH v2 1/6] SP800-90A Deterministic Random Bit Generator
+Date: Thu, 20 Mar 2014 09:12:55 +0100
+Message-ID: <532AA307.504@ladisch.de>
+References: <2396177.vxvG2ljJL8@myon.chronox.de> <5770301.bQ9lKffXf3@myon.chronox.de> <3662681.npTzbSq3ye@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
-	linux-crypto@vger.kernel.org,
-	"linux-samsung-soc@vger.kernel.org"
-	<linux-samsung-soc@vger.kernel.org>, linux-kernel@vger.kernel.org,
-	Vladimir Zapolskiy <vzapolskiy@gmail.com>, cpgs@samsung.com,
-	davem@davemloft.net
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-Reply-To: <20140225061630.GA9934@gondor.apana.org.au>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: aquini@redhat.com, jeremy.wayne.powell@gmail.com
+To: Stephan Mueller <smueller@chronox.de>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from dehamd003.servertools24.de ([31.47.254.18]:48288 "EHLO
+	dehamd003.servertools24.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753223AbaCTIM6 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Mar 2014 04:12:58 -0400
+In-Reply-To: <3662681.npTzbSq3ye@myon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hello Everyone,
+Stephan Mueller wrote:
+> This is a clean-room implementation of the DRBG defined in SP800-90A.
 
-On 25 February 2014 15:16, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Mon, Feb 17, 2014 at 03:14:26PM +0530, Naveen Krishna Chatradhi wrote:
->> SSS module on Exynos4210, Exynos5250 and Exynos5420 SoCs has added
->> features to the one on S5PV210. However with minor changes the s5p-sss.c
->> driver can be reused to support SSS modules on Exynos4 and 5 SoCs.
->>
->> This patch set
->> 1. Adds device tree support to the s5p-sss.c driver and Documentation
->> 2. Adds code to support SSS module on Exynos4 and 5 SoCs
->> 3. Adds device tree node to Exynos5250 and Exynos5420
->> 4. Adds variant struct to handle the differences in SSS modules
->> 5. Adds clk_prepare/clk_unprepare clocks to the s5p-sss.c driver
->>
->> Note: Compatible "exynos4210-secss" should work for Exynos4412 and
->>       Exynos5260 (Exynos5260, for which ARCH code is under review)
->> I couldn't test on Exynos4412 and Exynos4210 boards, Should be able to
->> test with addition of DT node and clocks support.
->>
->> Naveen Krishna Ch (7): [crypto-2.6.git]
->>   crypto:s5p-sss: Use platform_get_irq() instead of _byname()
->>   crypto:s5p-sss: Kconfig: Let Exynos SoCs select SSS driver
->>   crypto:s5p-sss: Look for the next request in the queue
->>   crypto:s5p-sss: Add device tree support
->>   crypto:s5p-sss: Add support for SSS module on Exynos
->>   crypto:s5p-sss: validate iv before memcpy
->>   crypto:s5p-sss: Use clk_prepare/clk_unprepare
->
-> FWIW these patches are fine by me.
->
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> Thanks,
-Any update on this patchset. They are already reviewed by Tomasz
-and Acked by Herbert.
-Anything else to be done from my side.
+Why?  I guess it's for certification?
 
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> +static bool drbg_fips_continuous_test(struct drbg_state *drbg,
+> +				     unsigned char *buf)
+> ...
+> +	ret = memcmp(drbg->prev, buf, drbg_blocklen(drbg));
+> +	...
+> +	/* invert the memcmp result, because the test shall pass when the
+> +	 * two compared values do not match */
+> +	if (ret)
+> +		return true;
+> +	else
+> +		return false;
+
+This looks strange.  The return value of memcmp() is not really
+a boolean, and the code appears not to match the comment because the
+numeric value of ret is not actually inverted.  How about this:
+
+	ret = memcmp(...);
+	...
+	/* the test shall pass when the compared values are not equal */
+	return ret != 0;
 
 
-
--- 
-Shine bright,
-(: Nav :)
+Regards,
+Clemens
