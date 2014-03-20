@@ -1,403 +1,902 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] arm64: SHA-224/SHA-256 using ARMv8 Crypto Extensions
-Date: Thu, 20 Mar 2014 15:48:06 +0100
-Message-ID: <1395326886-5866-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: steve.capper@linaro.org, catalin.marinas@arm.com
+From: chandramouli narayanan <mouli@linux.intel.com>
+Subject: [PATCH v5 1/1] crypto: SHA1 transform x86_64 AVX2
+Date: Thu, 20 Mar 2014 10:45:17 -0700
+Message-ID: <1395337517.2367.50.camel@pegasus.jf.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Ilya Albrekht <ilya.albrekht@intel.com>,
+	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
+	Ronen Zohar <ronen.zohar@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Chandramouli Narayanan <mouli@linux.intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	Marek Vasut <marex@denx.de>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f176.google.com ([74.125.82.176]:38645 "EHLO
-	mail-we0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933701AbaCTOsC (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Mar 2014 10:48:02 -0400
-Received: by mail-we0-f176.google.com with SMTP id x48so669135wes.21
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2014 07:48:00 -0700 (PDT)
+Received: from mga02.intel.com ([134.134.136.20]:19835 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754731AbaCTRqa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Mar 2014 13:46:30 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds support for the SHA-224 and SHA-256 hash algorithms using the
-NEON based SHA-256 instructions that were introduced in ARM v8.
+This git patch adds x86_64 AVX2 optimization of SHA1
+transform to crypto support. The patch has been tested with 3.14.0-rc1
+kernel.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+On a Haswell desktop, with turbo disabled and all cpus running
+at maximum frequency, tcrypt shows AVX2 performance improvement
+from 3% for 256 bytes update to 16% for 1024 bytes update over
+AVX implementation.
+
+This patch adds sha1_avx2_transform(), the glue, build and
+configuration changes needed for AVX2 optimization of
+SHA1 transform to crypto support.
+
+sha1-ssse3 is one module which adds the necessary optimization
+support (SSSE3/AVX/AVX2) for the low-level SHA1 transform function. With better
+optimization support, transform function is overridden as the case may be.
+In the case of AVX2, due to performance reasons across datablock sizes,
+the AVX or AVX2 transform function is used at run-time as it suits best.
+The Makefile change therefore appends the necessary objects to the linkage.
+Due to this, the patch merely appends AVX2 transform to the existing build mix
+and Kconfig support and leaves the configuration build support as is.
+
+Signed-off-by: Chandramouli Narayanan <mouli@linux.intel.com>
 ---
+ arch/x86/crypto/Makefile               |   3 +
+ arch/x86/crypto/sha1_avx2_x86_64_asm.S | 702 +++++++++++++++++++++++++++++++++
+ arch/x86/crypto/sha1_ssse3_glue.c      |  50 ++-
+ crypto/Kconfig                         |   4 +-
+ 4 files changed, 750 insertions(+), 9 deletions(-)
+ create mode 100644 arch/x86/crypto/sha1_avx2_x86_64_asm.S
 
-Again, this patch depends on the FPSIMD optimization patches that I have posted
-to the LAKML a while ago.
-
- arch/arm64/crypto/Kconfig        |   5 +
- arch/arm64/crypto/Makefile       |   3 +
- arch/arm64/crypto/sha2-ce-core.S | 131 ++++++++++++++++++++++++++
- arch/arm64/crypto/sha2-ce-glue.c | 198 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 337 insertions(+)
- create mode 100644 arch/arm64/crypto/sha2-ce-core.S
- create mode 100644 arch/arm64/crypto/sha2-ce-glue.c
-
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index af378bb608e8..c14e2ae98193 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -10,4 +10,9 @@ config CRYPTO_SHA1_ARM64_CE
- 	depends on ARM64 && KERNEL_MODE_NEON
- 	select CRYPTO_HASH
- 
-+config CRYPTO_SHA2_ARM64_CE
-+	tristate "SHA-224/SHA-256 digest algorithm (ARMv8 Crypto Extensions)"
-+	depends on ARM64 && KERNEL_MODE_NEON
-+	select CRYPTO_HASH
-+
- endif
-diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-index 18ceebc308dd..330742db69b3 100644
---- a/arch/arm64/crypto/Makefile
-+++ b/arch/arm64/crypto/Makefile
-@@ -10,3 +10,6 @@
- 
- obj-$(CONFIG_CRYPTO_SHA1_ARM64_CE) += sha1-ce.o
- sha1-ce-y := sha1-ce-glue.o sha1-ce-core.o
-+
-+obj-$(CONFIG_CRYPTO_SHA2_ARM64_CE) += sha2-ce.o
-+sha2-ce-y := sha2-ce-glue.o sha2-ce-core.o
-diff --git a/arch/arm64/crypto/sha2-ce-core.S b/arch/arm64/crypto/sha2-ce-core.S
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 6ba54d6..61d6e28 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -79,6 +79,9 @@ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o fpu.o
+ aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o
+ ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
+ sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
++ifeq ($(avx2_supported),yes)
++sha1-ssse3-y += sha1_avx2_x86_64_asm.o
++endif
+ crc32c-intel-y := crc32c-intel_glue.o
+ crc32c-intel-$(CONFIG_64BIT) += crc32c-pcl-intel-asm_64.o
+ crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
+diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
 new file mode 100644
-index 000000000000..79ade4be41c3
+index 0000000..7c8992c
 --- /dev/null
-+++ b/arch/arm64/crypto/sha2-ce-core.S
-@@ -0,0 +1,131 @@
++++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+@@ -0,0 +1,702 @@
 +/*
-+ * sha2-ce-core.S - core SHA-224/SHA-256 transform using v8 Crypto Extensions
++ *	Implement fast SHA-1 with AVX2 instructions. (x86_64)
 + *
-+ * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++ * This file is provided under a dual BSD/GPLv2 license.  When using or
++ * redistributing this file, you may do so under either license.
++ *
++ * GPL LICENSE SUMMARY
++ *
++ * Copyright(c) 2014 Intel Corporation.
 + *
 + * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
++ * it under the terms of version 2 of the GNU General Public License as
 + * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * Contact Information:
++ * Ilya Albrekht <ilya.albrekht@intel.com>
++ * Maxim Locktyukhin <maxim.locktyukhin@intel.com>
++ * Ronen Zohar <ronen.zohar@intel.com>
++ * Chandramouli Narayanan <mouli@linux.intel.com>
++ *
++ * BSD LICENSE
++ *
++ * Copyright(c) 2014 Intel Corporation.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * Redistributions of source code must retain the above copyright
++ * notice, this list of conditions and the following disclaimer.
++ * Redistributions in binary form must reproduce the above copyright
++ * notice, this list of conditions and the following disclaimer in
++ * the documentation and/or other materials provided with the
++ * distribution.
++ * Neither the name of Intel Corporation nor the names of its
++ * contributors may be used to endorse or promote products derived
++ * from this software without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ */
++
++/*
++ *
++ * SHA-1 implementation with Intel(R) AVX2 instruction set extensions.
++ *
++ *This implementation is based on the previous SSSE3 release:
++ *Visit http://software.intel.com/en-us/articles/
++ *and refer to improving-the-performance-of-the-secure-hash-algorithm-1/
++ *
++ *Updates 20-byte SHA-1 record in 'hash' for even number of
++ *'num_blocks' consecutive 64-byte blocks
++ *
++ *extern "C" void sha1_transform_avx2(
++ *	int *hash, const char* input, size_t num_blocks );
 + */
 +
 +#include <linux/linkage.h>
 +
-+	.text
-+	.arch		armv8-a+crypto
++#define CTX	%rdi	/* arg1 */
++#define BUF	%rsi	/* arg2 */
++#define CNT	%rdx	/* arg3 */
 +
-+	dga		.req	q20
-+	dgav		.req	v20
-+	dgb		.req	q21
-+	dgbv		.req	v21
++#define REG_A	%ecx
++#define REG_B	%esi
++#define REG_C	%edi
++#define REG_D	%eax
++#define REG_E	%edx
++#define REG_TB  %ebx
++#define REG_TA  %r12d
++#define REG_RA  %rcx
++#define REG_RB  %rsi
++#define REG_RC  %rdi
++#define REG_RD  %rax
++#define REG_RE  %rdx
++#define REG_RTA %r12
++#define REG_RTB %rbx
++#define REG_T1  %ebp
++#define xmm_mov	vmovups
++#define avx2_zeroupper	vzeroupper
++#define RND_F1	1
++#define RND_F2	2
++#define RND_F3	3
 +
-+	t0		.req	v22
-+	t1		.req	v23
++.macro REGALLOC
++	.set A, REG_A
++	.set B, REG_B
++	.set C, REG_C
++	.set D, REG_D
++	.set E, REG_E
++	.set TB, REG_TB
++	.set TA, REG_TA
 +
-+	dg0q		.req	q24
-+	dg0v		.req	v24
-+	dg1q		.req	q25
-+	dg1v		.req	v25
-+	dg2q		.req	q26
-+	dg2v		.req	v26
++	.set RA, REG_RA
++	.set RB, REG_RB
++	.set RC, REG_RC
++	.set RD, REG_RD
++	.set RE, REG_RE
 +
-+	.macro		add_only, ev, rc, s0
-+	mov		dg2v.16b, dg0v.16b
-+	.ifc		\ev, ev
-+	add		t1.4s, v\s0\().4s, \rc\().4s
-+	sha256h		dg0q, dg1q, t0.4s
-+	sha256h2	dg1q, dg2q, t0.4s
++	.set RTA, REG_RTA
++	.set RTB, REG_RTB
++
++	.set T1, REG_T1
++.endm
++
++#define K_BASE		%r8
++#define HASH_PTR	%r9
++#define BUFFER_PTR	%r10
++#define BUFFER_PTR2	%r13
++#define BUFFER_END	%r11
++
++#define PRECALC_BUF	%r14
++#define WK_BUF		%r15
++
++#define W_TMP		%xmm0
++#define WY_TMP		%ymm0
++#define WY_TMP2		%ymm9
++
++# AVX2 variables
++#define WY0		%ymm3
++#define WY4		%ymm5
++#define WY08		%ymm7
++#define WY12		%ymm8
++#define WY16		%ymm12
++#define WY20		%ymm13
++#define WY24		%ymm14
++#define WY28		%ymm15
++
++#define YMM_SHUFB_BSWAP	%ymm10
++
++/* Keep 2 iterations precalculated at a time:
++ *    - 80 DWORDs per iteration * 2
++ */
++#define W_SIZE		(80*2*2 +16)
++
++#define WK(t)	((((t) % 80) / 4)*32 + ( (t) % 4)*4 + ((t)/80)*16 )(WK_BUF)
++#define PRECALC_WK(t)	((t)*2*2)(PRECALC_BUF)
++
++
++.macro UPDATE_HASH  hash, val
++	add	\hash, \val
++	mov	\val, \hash
++.endm
++
++.macro PRECALC_RESET_WY
++	.set WY_00, WY0
++	.set WY_04, WY4
++	.set WY_08, WY08
++	.set WY_12, WY12
++	.set WY_16, WY16
++	.set WY_20, WY20
++	.set WY_24, WY24
++	.set WY_28, WY28
++	.set WY_32, WY_00
++.endm
++
++.macro PRECALC_ROTATE_WY
++	/* Rotate macros */
++	.set WY_32, WY_28
++	.set WY_28, WY_24
++	.set WY_24, WY_20
++	.set WY_20, WY_16
++	.set WY_16, WY_12
++	.set WY_12, WY_08
++	.set WY_08, WY_04
++	.set WY_04, WY_00
++	.set WY_00, WY_32
++
++	/* Define register aliases */
++	.set WY, WY_00
++	.set WY_minus_04, WY_04
++	.set WY_minus_08, WY_08
++	.set WY_minus_12, WY_12
++	.set WY_minus_16, WY_16
++	.set WY_minus_20, WY_20
++	.set WY_minus_24, WY_24
++	.set WY_minus_28, WY_28
++	.set WY_minus_32, WY
++.endm
++
++.macro PRECALC_00_15
++	.if (i == 0) # Initialize and rotate registers
++		PRECALC_RESET_WY
++		PRECALC_ROTATE_WY
++	.endif
++
++	/* message scheduling pre-compute for rounds 0-15 */
++	.if   ((i & 7) == 0)
++		/*
++		 * blended AVX2 and ALU instruction scheduling
++		 * 1 vector iteration per 8 rounds
++		 */
++		vmovdqu ((i * 2) + PRECALC_OFFSET)(BUFFER_PTR), W_TMP
++	.elseif ((i & 7) == 1)
++		vinsertf128 $1, (((i-1) * 2)+PRECALC_OFFSET)(BUFFER_PTR2),\
++			 WY_TMP, WY_TMP
++	.elseif ((i & 7) == 2)
++		vpshufb YMM_SHUFB_BSWAP, WY_TMP, WY
++	.elseif ((i & 7) == 4)
++		vpaddd  K_XMM(K_BASE), WY, WY_TMP
++	.elseif ((i & 7) == 7)
++		vmovdqu  WY_TMP, PRECALC_WK(i&~7)
++
++		PRECALC_ROTATE_WY
++	.endif
++.endm
++
++.macro PRECALC_16_31
++	/*
++	 * message scheduling pre-compute for rounds 16-31
++	 * calculating last 32 w[i] values in 8 XMM registers
++	 * pre-calculate K+w[i] values and store to mem
++	 * for later load by ALU add instruction
++	 *
++	 * "brute force" vectorization for rounds 16-31 only
++	 * due to w[i]->w[i-3] dependency
++	 */
++	.if   ((i & 7) == 0)
++		/*
++		 * blended AVX2 and ALU instruction scheduling
++		 * 1 vector iteration per 8 rounds
++		 */
++		vpalignr $8, WY_minus_16, WY_minus_12, WY      /* w[i-14] */
++		vpsrldq  $4, WY_minus_04, WY_TMP               /* w[i-3] */
++	.elseif ((i & 7) == 1)
++		vpxor    WY_minus_08, WY, WY
++		vpxor    WY_minus_16, WY_TMP, WY_TMP
++	.elseif ((i & 7) == 2)
++		vpxor    WY_TMP, WY, WY
++		vpslldq  $12, WY, WY_TMP2
++	.elseif ((i & 7) == 3)
++		vpslld   $1, WY, WY_TMP
++		vpsrld   $31, WY, WY
++	.elseif ((i & 7) == 4)
++		vpor     WY, WY_TMP, WY_TMP
++		vpslld   $2, WY_TMP2, WY
++	.elseif ((i & 7) == 5)
++		vpsrld   $30, WY_TMP2, WY_TMP2
++		vpxor    WY, WY_TMP, WY_TMP
++	.elseif ((i & 7) == 7)
++		vpxor    WY_TMP2, WY_TMP, WY
++		vpaddd  K_XMM(K_BASE), WY, WY_TMP
++		vmovdqu  WY_TMP, PRECALC_WK(i&~7)
++
++		PRECALC_ROTATE_WY
++	.endif
++.endm
++
++.macro PRECALC_32_79
++	/*
++	 * in SHA-1 specification:
++	 * w[i] = (w[i-3] ^ w[i-8]  ^ w[i-14] ^ w[i-16]) rol 1
++	 * instead we do equal:
++	 * w[i] = (w[i-6] ^ w[i-16] ^ w[i-28] ^ w[i-32]) rol 2
++	 * allows more efficient vectorization
++	 * since w[i]=>w[i-3] dependency is broken
++	 */
++
++	.if   ((i & 7) == 0)
++	/*
++	 * blended AVX2 and ALU instruction scheduling
++	 * 1 vector iteration per 8 rounds
++	 */
++		vpalignr $8, WY_minus_08, WY_minus_04, WY_TMP
++	.elseif ((i & 7) == 1)
++		/* W is W_minus_32 before xor */
++		vpxor    WY_minus_28, WY, WY
++	.elseif ((i & 7) == 2)
++		vpxor    WY_minus_16, WY_TMP, WY_TMP
++	.elseif ((i & 7) == 3)
++		vpxor    WY_TMP, WY, WY
++	.elseif ((i & 7) == 4)
++		vpslld   $2, WY, WY_TMP
++	.elseif ((i & 7) == 5)
++		vpsrld   $30, WY, WY
++		vpor     WY, WY_TMP, WY
++	.elseif ((i & 7) == 7)
++		vpaddd  K_XMM(K_BASE), WY, WY_TMP
++		vmovdqu  WY_TMP, PRECALC_WK(i&~7)
++
++		PRECALC_ROTATE_WY
++	.endif
++.endm
++
++.macro PRECALC r, s
++	.set i, \r
++
++	.if (i < 40)
++		.set K_XMM, 32*0
++	.elseif (i < 80)
++		.set K_XMM, 32*1
++	.elseif (i < 120)
++		.set K_XMM, 32*2
 +	.else
-+	.ifnb		\s0
-+	add		t0.4s, v\s0\().4s, \rc\().4s
++		.set K_XMM, 32*3
 +	.endif
-+	sha256h		dg0q, dg1q, t1.4s
-+	sha256h2	dg1q, dg2q, t1.4s
++
++	.if (i<32)
++		PRECALC_00_15 \s
++	.elseif (i<64)
++		PRECALC_16_31 \s
++	.elseif (i < 160)
++		PRECALC_32_79 \s
 +	.endif
-+	.endm
++.endm
 +
-+	.macro		add_update, ev, rc, s0, s1, s2, s3
-+	sha256su0	v\s0\().4s, v\s1\().4s
-+	sha256su1	v\s0\().4s, v\s2\().4s, v\s3\().4s
-+	add_only	\ev, \rc, \s1
-+	.endm
++.macro ROTATE_STATE
++	.set T_REG, E
++	.set E, D
++	.set D, C
++	.set C, B
++	.set B, TB
++	.set TB, A
++	.set A, T_REG
 +
-+	/*
-+	 * The SHA-256 round constants
++	.set T_REG, RE
++	.set RE, RD
++	.set RD, RC
++	.set RC, RB
++	.set RB, RTB
++	.set RTB, RA
++	.set RA, T_REG
++.endm
++
++/* Macro relies on saved ROUND_Fx */
++
++.macro RND_FUN f, r
++	.if (\f == RND_F1)
++		ROUND_F1 \r
++	.elseif (\f == RND_F2)
++		ROUND_F2 \r
++	.elseif (\f == RND_F3)
++		ROUND_F3 \r
++	.endif
++.endm
++
++.macro RR r
++	.set round_id, (\r % 80)
++
++	.if (round_id == 0)        /* Precalculate F for first round */
++		.set ROUND_FUNC, RND_F1
++		mov B, TB
++
++		rorx $(32-30), B, B    /* b>>>2 */
++		andn D, TB, T1
++		and  C, TB
++		xor  T1, TB
++	.endif
++
++	RND_FUN ROUND_FUNC, \r
++	ROTATE_STATE
++
++	.if   (round_id == 18)
++		.set ROUND_FUNC, RND_F2
++	.elseif (round_id == 38)
++		.set ROUND_FUNC, RND_F3
++	.elseif (round_id == 58)
++		.set ROUND_FUNC, RND_F2
++	.endif
++
++	.set round_id, ( (\r+1) % 80)
++
++	RND_FUN ROUND_FUNC, (\r+1)
++	ROTATE_STATE
++.endm
++
++.macro ROUND_F1 r
++	add  WK(\r), E
++
++	andn C, A, T1			/* ~b&d */
++	lea  (RE,RTB), E		/* Add F from the previous round */
++
++	rorx $(32-5), A, TA		/* T2 = A >>> 5 */
++	rorx $(32-30),A, TB		/* b>>>2 for next round */
++
++	PRECALC     (\r)		/* msg scheduling for next 2 blocks */
++
++	/* Calculate F for the next round
++	 * (b & c) ^ andn[b, d]
 +	 */
-+	.align		4
-+.Lsha2_rcon:
-+	.word		0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5
-+	.word		0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5
-+	.word		0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3
-+	.word		0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174
-+	.word		0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc
-+	.word		0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da
-+	.word		0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7
-+	.word		0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967
-+	.word		0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13
-+	.word		0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85
-+	.word		0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3
-+	.word		0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070
-+	.word		0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5
-+	.word		0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3
-+	.word		0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208
-+	.word		0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
++	and  B, A			/* b&c */
++	xor  T1, A			/* F1 = (b&c) ^ (~b&d) */
 +
-+	/*
-+	 * void sha2_ce_transform(u32 *state, u8 const *src, int blocks)
++	lea  (RE,RTA), E		/* E += A >>> 5 */
++.endm
++
++.macro ROUND_F2 r
++	add  WK(\r), E
++	lea  (RE,RTB), E		/* Add F from the previous round */
++
++	/* Calculate F for the next round */
++	rorx $(32-5), A, TA		/* T2 = A >>> 5 */
++	.if ((round_id) < 79)
++		rorx $(32-30), A, TB	/* b>>>2 for next round */
++	.endif
++	PRECALC     (\r)	/* msg scheduling for next 2 blocks */
++
++	.if ((round_id) < 79)
++		xor B, A
++	.endif
++
++	add  TA, E			/* E += A >>> 5 */
++
++	.if ((round_id) < 79)
++		xor C, A
++	.endif
++.endm
++
++.macro ROUND_F3 r
++	add  WK(\r), E
++	PRECALC     (\r)		/* msg scheduling for next 2 blocks */
++
++	lea  (RE,RTB), E		/* Add F from the previous round */
++
++	mov B, T1
++	or  A, T1
++
++	rorx $(32-5), A, TA		/* T2 = A >>> 5 */
++	rorx $(32-30), A, TB		/* b>>>2 for next round */
++
++	/* Calculate F for the next round
++	 * (b and c) or (d and (b or c))
 +	 */
-+ENTRY(sha2_ce_transform)
-+	/* load round constants */
-+	adr		x3, .Lsha2_rcon
-+	.irp		r, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-+	ldr		q\r, [x3], #16
++	and C, T1
++	and B, A
++	or  T1, A
++
++	add  TA, E			/* E += A >>> 5 */
++
++.endm
++
++/*
++ * macro implements 80 rounds of SHA-1, for multiple blocks with s/w pipelining
++ */
++.macro SHA1_PIPELINED_MAIN_BODY
++
++        REGALLOC
++
++        mov   (HASH_PTR), A
++        mov  4(HASH_PTR), B
++        mov  8(HASH_PTR), C
++        mov 12(HASH_PTR), D
++        mov 16(HASH_PTR), E
++
++        mov %rsp, PRECALC_BUF
++        lea (2*4*80+32)(%rsp), WK_BUF
++
++        # Precalc WK for first 2 blocks
++        PRECALC_OFFSET = 0
++        .set i, 0
++        .rept    160
++            PRECALC i
++            .set i, i + 1
++        .endr
++        PRECALC_OFFSET = 128
++        xchg WK_BUF, PRECALC_BUF
++
++	.align 32
++_loop:
++	/* code loops through more than one block
++	 * we use K_BASE value as a signal of a last block,
++	 * it is set below by: cmovae BUFFER_PTR, K_BASE
++	 */
++        cmp K_BASE, BUFFER_PTR
++        jne _begin
++	.align 32
++        jmp _end
++	.align 32
++_begin:
++
++	/* Do first block
++	 * rounds: 0,2,4,6,8
++	 */
++	.set j, 0
++	.rept 5
++		RR j
++		.set j, j+2
 +	.endr
 +
-+	/* load state */
-+	ldr		dga, [x0]
-+	ldr		dgb, [x0, #16]
++        jmp _loop0
++_loop0:
 +
-+	/* load input */
-+0:	ld1		{v16.4s-v19.4s}, [x1], #64
++	/* rounds:
++	 * 10,12,14,16,18
++	 * 20,22,24,26,28
++	 * 30,32,34,36,38
++	 * 40,42,44,46,48
++	 * 50,52,54,56,58
++	 */
++	.rept 25
++		RR j
++		.set j, j+2
++	.endr
 +
-+	sub		w2, w2, #1
++        add   $(2*64), BUFFER_PTR       /* move to next odd-64-byte block */
++        cmp   BUFFER_END, BUFFER_PTR    /* is current block the last one? */
++        cmovae K_BASE, BUFFER_PTR	/* signal the last iteration smartly */
 +
-+	rev32		v16.16b, v16.16b
-+	rev32		v17.16b, v17.16b
-+	rev32		v18.16b, v18.16b
-+	rev32		v19.16b, v19.16b
++	/* rounds
++	 * 60,62,64,66,68
++	 * 70,72,74,76,78
++	 */
++	.rept 10
++		RR j
++		.set j, j+2
++	.endr
 +
-+	add		t0.4s, v16.4s, v0.4s
-+	mov		dg0v.16b, dgav.16b
-+	mov		dg1v.16b, dgbv.16b
++        UPDATE_HASH   (HASH_PTR), A
++        UPDATE_HASH  4(HASH_PTR), TB
++        UPDATE_HASH  8(HASH_PTR), C
++        UPDATE_HASH 12(HASH_PTR), D
++        UPDATE_HASH 16(HASH_PTR), E
 +
-+	add_update	ev,  v1, 16, 17, 18, 19
-+	add_update	od,  v2, 17, 18, 19, 16
-+	add_update	ev,  v3, 18, 19, 16, 17
-+	add_update	od,  v4, 19, 16, 17, 18
++        cmp   K_BASE, BUFFER_PTR	/* is current block the last one? */
++        je _loop
 +
-+	add_update	ev,  v5, 16, 17, 18, 19
-+	add_update	od,  v6, 17, 18, 19, 16
-+	add_update	ev,  v7, 18, 19, 16, 17
-+	add_update	od,  v8, 19, 16, 17, 18
++        mov TB, B
 +
-+	add_update	ev,  v9, 16, 17, 18, 19
-+	add_update	od, v10, 17, 18, 19, 16
-+	add_update	ev, v11, 18, 19, 16, 17
-+	add_update	od, v12, 19, 16, 17, 18
++        /* Process second block */
++	/* rounds
++	 *  0+80, 2+80, 4+80, 6+80, 8+80
++	 * 10+80,12+80,14+80,16+80,18+80
++	 */
 +
-+	add_only	ev, v13, 17
-+	add_only	od, v14, 18
-+	add_only	ev, v15, 19
-+	add_only	od
++	.set j, 0
++	.rept 10
++		RR j+80
++		.set j, j+2
++	.endr
 +
-+	/* update state */
-+	add		dgav.4s, dgav.4s, dg0v.4s
-+	add		dgbv.4s, dgbv.4s, dg1v.4s
-+	cbnz		w2, 0b
++        jmp _loop1
++_loop1:
++	/* rounds
++	 * 20+80,22+80,24+80,26+80,28+80
++	 * 30+80,32+80,34+80,36+80,38+80
++	 */
++	.rept 10
++		RR j+80
++		.set j, j+2
++	.endr
 +
-+	/* store new state */
-+	str		dga, [x0]
-+	str		dgb, [x0, #16]
-+	ret
-+ENDPROC(sha2_ce_transform)
-diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
-new file mode 100644
-index 000000000000..5c896221e282
---- /dev/null
-+++ b/arch/arm64/crypto/sha2-ce-glue.c
-@@ -0,0 +1,198 @@
++        jmp _loop2
++_loop2:
++
++	/* rounds
++	 * 40+80,42+80,44+80,46+80,48+80
++	 * 50+80,52+80,54+80,56+80,58+80
++	 */
++	.rept 10
++		RR j+80
++		.set j, j+2
++	.endr
++
++        add   $(2*64), BUFFER_PTR2      /* move to next even-64-byte block */
++
++        cmp   BUFFER_END, BUFFER_PTR2   /* is current block the last one */
++        cmovae K_BASE, BUFFER_PTR       /* signal the last iteration smartly */
++
++        jmp _loop3
++_loop3:
++
++	/* rounds
++	 * 60+80,62+80,64+80,66+80,68+80
++	 * 70+80,72+80,74+80,76+80,78+80
++	 */
++	.rept 10
++		RR j+80
++		.set j, j+2
++	.endr
++
++        UPDATE_HASH   (HASH_PTR), A
++        UPDATE_HASH  4(HASH_PTR), TB
++        UPDATE_HASH  8(HASH_PTR), C
++        UPDATE_HASH 12(HASH_PTR), D
++        UPDATE_HASH 16(HASH_PTR), E
++
++        /* Reset state for AVX2 reg permutation */
++        mov A, TA
++        mov TB, A
++        mov C, TB
++        mov E, C
++        mov D, B
++        mov TA, D
++
++        REGALLOC
++
++        xchg WK_BUF, PRECALC_BUF
++
++        jmp _loop
++
++	.align 32
++    _end:
++
++.endm
 +/*
-+ * sha2-ce-glue.c - SHA-224/SHA-256 using ARMv8 Crypto Extensions
-+ *
-+ * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
-+ *
-+ * Derived from linux/crypto/sha1_generic.c
-+ *
-+ * Copyright (c) Alan Smithee.
-+ * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
-+ * Copyright (c) Jean-Francois Dive <jef@linuxbe.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ * macro implements SHA-1 function's body for several 64-byte blocks
++ * param: function's name
 + */
++.macro SHA1_VECTOR_ASM  name
++	ENTRY(\name)
++	.align 4096
 +
-+#include <asm/byteorder.h>
-+#include <asm/hwcap.h>
-+#include <asm/neon.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/sha.h>
-+#include <linux/cpufeature.h>
-+#include <linux/crypto.h>
-+#include <linux/module.h>
++        push %rbx
++        push %rbp
++        push %r12
++        push %r13
++        push %r14
++        push %r15
 +
-+MODULE_DESCRIPTION("SHA-224/SHA-256 secure hash using ARMv8 Crypto Extensions");
-+MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
-+MODULE_LICENSE("GPL v2");
++        RESERVE_STACK  = (W_SIZE*4 + 8+24)
 +
-+asmlinkage void sha2_ce_transform(u32 *state, u8 const *src, int blocks);
++	/* Align stack */
++        mov     %rsp, %rbx
++        and     $(0x1000-1), %rbx
++        sub     $(8+32), %rbx
++        sub     %rbx, %rsp
++        push    %rbx
++        sub     $RESERVE_STACK, %rsp
 +
-+static int sha224_init(struct shash_desc *desc)
++        avx2_zeroupper
++
++	lea	K_XMM_AR(%rip), K_BASE
++
++        mov     CTX, HASH_PTR
++        mov     BUF, BUFFER_PTR
++        lea     64(BUF), BUFFER_PTR2
++
++        shl     $6, CNT			/* mul by 64 */
++        add     BUF, CNT
++        add     $64, CNT
++        mov     CNT, BUFFER_END
++
++        cmp     BUFFER_END, BUFFER_PTR2
++        cmovae  K_BASE, BUFFER_PTR2
++
++        xmm_mov BSWAP_SHUFB_CTL(%rip), YMM_SHUFB_BSWAP
++
++        SHA1_PIPELINED_MAIN_BODY
++
++        avx2_zeroupper
++
++        add $RESERVE_STACK, %rsp
++        pop %rbx
++        add %rbx, %rsp
++
++        pop %r15
++        pop %r14
++        pop %r13
++        pop %r12
++        pop %rbp
++        pop %rbx
++
++        ret
++
++	ENDPROC(\name)
++.endm
++
++.section .rodata
++
++#define K1 0x5a827999
++#define K2 0x6ed9eba1
++#define K3 0x8f1bbcdc
++#define K4 0xca62c1d6
++
++.align 128
++K_XMM_AR:
++	.long K1, K1, K1, K1
++	.long K1, K1, K1, K1
++	.long K2, K2, K2, K2
++	.long K2, K2, K2, K2
++	.long K3, K3, K3, K3
++	.long K3, K3, K3, K3
++	.long K4, K4, K4, K4
++	.long K4, K4, K4, K4
++
++BSWAP_SHUFB_CTL:
++	.long 0x00010203
++	.long 0x04050607
++	.long 0x08090a0b
++	.long 0x0c0d0e0f
++	.long 0x00010203
++	.long 0x04050607
++	.long 0x08090a0b
++	.long 0x0c0d0e0f
++.text
++
++SHA1_VECTOR_ASM     sha1_transform_avx2
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index 4a11a9d..7c1f1de 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -10,6 +10,7 @@
+  * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
+  * Copyright (c) Jean-Francois Dive <jef@linuxbe.org>
+  * Copyright (c) Mathias Krause <minipli@googlemail.com>
++ * Copyright (c) Chandramouli Narayanan <mouli@linux.intel.com>
+  *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU General Public License as published by the Free
+@@ -39,6 +40,12 @@ asmlinkage void sha1_transform_ssse3(u32 *digest, const char *data,
+ asmlinkage void sha1_transform_avx(u32 *digest, const char *data,
+ 				   unsigned int rounds);
+ #endif
++#ifdef CONFIG_AS_AVX2
++#define SHA1_AVX2_BLOCK_OPTSIZE	4	/* optimal 4*64 bytes of SHA1 blocks */
++
++asmlinkage void sha1_transform_avx2(u32 *digest, const char *data,
++				unsigned int rounds);
++#endif
+ 
+ static asmlinkage void (*sha1_transform_asm)(u32 *, const char *, unsigned int);
+ 
+@@ -165,6 +172,19 @@ static int sha1_ssse3_import(struct shash_desc *desc, const void *in)
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_AS_AVX2
++static void sha1_apply_transform_avx2(u32 *digest, const char *data,
++				unsigned int rounds)
 +{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
 +
-+	*sctx = (struct sha256_state){
-+		.state = {
-+			SHA224_H0, SHA224_H1, SHA224_H2, SHA224_H3,
-+			SHA224_H4, SHA224_H5, SHA224_H6, SHA224_H7,
-+		}
-+	};
-+	return 0;
++	/* Select the optimal transform based on data block size */
++	if (rounds >= SHA1_AVX2_BLOCK_OPTSIZE)
++		sha1_transform_avx2(digest, data, rounds);
++	else
++		sha1_transform_avx(digest, data, rounds);
 +}
++#endif
 +
-+static int sha256_init(struct shash_desc *desc)
-+{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+
-+	*sctx = (struct sha256_state){
-+		.state = {
-+			SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
-+			SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7,
-+		}
-+	};
-+	return 0;
-+}
-+
-+static int sha2_update(struct shash_desc *desc, const u8 *data,
-+		       unsigned int len)
-+{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+	unsigned int partial, done = 0;
-+
-+	partial = sctx->count % SHA256_BLOCK_SIZE;
-+
-+	if ((partial + len) >= SHA256_BLOCK_SIZE) {
-+		int blocks;
-+
-+		kernel_neon_begin();
-+		if (partial) {
-+			done = SHA256_BLOCK_SIZE - partial;
-+			memcpy(sctx->buf + partial, data, done);
-+			sha2_ce_transform(sctx->state, sctx->buf, 1);
-+			partial = 0;
-+		}
-+
-+		blocks = (len - done) / SHA256_BLOCK_SIZE;
-+		if (blocks) {
-+			sha2_ce_transform(sctx->state, data + done, blocks);
-+			done += blocks * SHA256_BLOCK_SIZE;
-+		}
-+		kernel_neon_end();
+ static struct shash_alg alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+ 	.init		=	sha1_ssse3_init,
+@@ -189,7 +209,11 @@ static bool __init avx_usable(void)
+ {
+ 	u64 xcr0;
+ 
++#if defined(CONFIG_AS_AVX2)
++	if (!cpu_has_avx || !cpu_has_avx2 || !cpu_has_osxsave)
++#else
+ 	if (!cpu_has_avx || !cpu_has_osxsave)
++#endif
+ 		return false;
+ 
+ 	xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
+@@ -205,23 +229,35 @@ static bool __init avx_usable(void)
+ 
+ static int __init sha1_ssse3_mod_init(void)
+ {
++	char *algo_name;
+ 	/* test for SSSE3 first */
+-	if (cpu_has_ssse3)
++	if (cpu_has_ssse3) {
+ 		sha1_transform_asm = sha1_transform_ssse3;
++		algo_name = "SSSE3";
 +	}
-+	if (len > done)
-+		memcpy(sctx->buf + partial, data + done, len - done);
-+	sctx->count += len;
-+	return 0;
-+}
-+
-+static void sha2_final(struct shash_desc *desc)
-+{
-+	static const u8 padding[SHA256_BLOCK_SIZE] = { 0x80, };
-+
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+	__be64 bits = cpu_to_be64(sctx->count << 3);
-+	u32 padlen = SHA256_BLOCK_SIZE
-+		     - ((sctx->count + sizeof(bits)) % SHA256_BLOCK_SIZE);
-+
-+	sha2_update(desc, padding, padlen);
-+	sha2_update(desc, (const u8 *)&bits, sizeof(bits));
-+}
-+
-+static int sha224_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+	__be32 *dst = (__be32 *)out;
-+	int i;
-+
-+	sha2_final(desc);
-+
-+	for (i = 0; i < SHA224_DIGEST_SIZE / sizeof(*dst); i++)
-+		dst[i] = cpu_to_be32(sctx->state[i]);
-+
-+	*sctx = (struct sha256_state){};
-+	return 0;
-+}
-+
-+static int sha256_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+	__be32 *dst = (__be32 *)out;
-+	int i;
-+
-+	sha2_final(desc);
-+
-+	for (i = 0; i < SHA256_DIGEST_SIZE / sizeof(*dst); i++)
-+		dst[i] = cpu_to_be32(sctx->state[i]);
-+
-+	*sctx = (struct sha256_state){};
-+	return 0;
-+}
-+
-+static int sha2_export(struct shash_desc *desc, void *out)
-+{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+	struct sha256_state *dst = out;
-+
-+	*dst = *sctx;
-+	return 0;
-+}
-+
-+static int sha2_import(struct shash_desc *desc, const void *in)
-+{
-+	struct sha256_state *sctx = shash_desc_ctx(desc);
-+	struct sha256_state const *src = in;
-+
-+	*sctx = *src;
-+	return 0;
-+}
-+
-+static struct shash_alg algs[] = { {
-+	.digestsize		= SHA224_DIGEST_SIZE,
-+	.init			= sha224_init,
-+	.update			= sha2_update,
-+	.final			= sha224_final,
-+	.export			= sha2_export,
-+	.import			= sha2_import,
-+	.descsize		= sizeof(struct sha256_state),
-+	.statesize		= sizeof(struct sha256_state),
-+	.base			= {
-+		.cra_name		= "sha224",
-+		.cra_driver_name	= "sha224-ce",
-+		.cra_priority		= 200,
-+		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize		= SHA256_BLOCK_SIZE,
-+		.cra_module		= THIS_MODULE,
+ 
+ #ifdef CONFIG_AS_AVX
+ 	/* allow AVX to override SSSE3, it's a little faster */
+-	if (avx_usable())
+-		sha1_transform_asm = sha1_transform_avx;
++	if (avx_usable()) {
++		if (cpu_has_avx) {
++			sha1_transform_asm = sha1_transform_avx;
++			algo_name = "AVX";
++		}
++#ifdef CONFIG_AS_AVX2
++		if (cpu_has_avx2 && boot_cpu_has(X86_FEATURE_BMI2)) {
++			/* allow AVX2 to override AVX, it's a little faster */
++			sha1_transform_asm = sha1_apply_transform_avx2;
++			algo_name = "AVX2";
++		}
++#endif
 +	}
-+}, {
-+	.digestsize		= SHA256_DIGEST_SIZE,
-+	.init			= sha256_init,
-+	.update			= sha2_update,
-+	.final			= sha256_final,
-+	.export			= sha2_export,
-+	.import			= sha2_import,
-+	.descsize		= sizeof(struct sha256_state),
-+	.statesize		= sizeof(struct sha256_state),
-+	.base			= {
-+		.cra_name		= "sha256",
-+		.cra_driver_name	= "sha256-ce",
-+		.cra_priority		= 200,
-+		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize		= SHA256_BLOCK_SIZE,
-+		.cra_module		= THIS_MODULE,
-+	}
-+} };
-+
-+static int __init sha2_generic_mod_init(void)
-+{
-+	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
-+}
-+
-+static void __exit sha2_generic_mod_fini(void)
-+{
-+	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
-+}
-+
-+module_cpu_feature_match(SHA2, sha2_generic_mod_init);
-+module_exit(sha2_generic_mod_fini);
+ #endif
+ 
+ 	if (sha1_transform_asm) {
+-		pr_info("Using %s optimized SHA-1 implementation\n",
+-		        sha1_transform_asm == sha1_transform_ssse3 ? "SSSE3"
+-		                                                   : "AVX");
++		pr_info("Using %s optimized SHA-1 implementation\n", algo_name);
+ 		return crypto_register_shash(&alg);
+ 	}
+-	pr_info("Neither AVX nor SSSE3 is available/usable.\n");
++	pr_info("Neither AVX nor AVX2 nor SSSE3 is available/usable.\n");
+ 
+ 	return -ENODEV;
+ }
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 7bcb70d..ce4012a 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -491,14 +491,14 @@ config CRYPTO_SHA1
+ 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2).
+ 
+ config CRYPTO_SHA1_SSSE3
+-	tristate "SHA1 digest algorithm (SSSE3/AVX)"
++	tristate "SHA1 digest algorithm (SSSE3/AVX/AVX2)"
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_HASH
+ 	help
+ 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
+ 	  using Supplemental SSE3 (SSSE3) instructions or Advanced Vector
+-	  Extensions (AVX), when available.
++	  Extensions (AVX/AVX2), when available.
+ 
+ config CRYPTO_SHA256_SSSE3
+ 	tristate "SHA256 digest algorithm (SSSE3/AVX/AVX2)"
 -- 
-1.8.3.2
+1.8.2.1
