@@ -1,92 +1,385 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH cryptodev 1/4] crypto: caam - remove error propagation
- handling
-Date: Thu, 20 Mar 2014 11:44:02 +0200
-Message-ID: <532AB862.3070703@freescale.com>
-References: <1394812012-13714-1-git-send-email-horia.geanta@freescale.com> <201403171923.11855.marex@denx.de> <5329D31C.6030807@freescale.com> <201403192001.56356.marex@denx.de>
+From: Yashpal Dutta <yashpal.dutta@freescale.com>
+Subject: [PATCH v3] crypto: caam - power management support for caam job-ring
+Date: Fri, 21 Mar 2014 00:35:56 +0545
+Message-ID: <1395341456-60542-1-git-send-email-yashpal.dutta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	<linux-crypto@vger.kernel.org>
-To: Marek Vasut <marex@denx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe005.messaging.microsoft.com ([216.32.181.185]:40230
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757087AbaCTJoT convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Mar 2014 05:44:19 -0400
-In-Reply-To: <201403192001.56356.marex@denx.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: Yashpal Dutta <yashpal.dutta@freescale.com>,
+	<stable@vger.kernel.org>
+To: <linux-crypto@vger.kernel.org>, <horia.geanta@freescale.com>,
+	<vakul@freescale.com>, <ruchika.gupta@freescale.com>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 3/19/2014 9:01 PM, Marek Vasut wrote:
-> On Wednesday, March 19, 2014 at 06:25:48 PM, Horia Geant=C4=83 wrote:
->> On 3/17/2014 8:23 PM, Marek Vasut wrote:
->>> On Friday, March 14, 2014 at 04:46:49 PM, Horia Geanta wrote:
->>>> Commit 61bb86bba169507a5f223b94b9176c32c84b4721
->>>> ("crypto: caam - set descriptor sharing type to SERIAL")
->>>> changed the descriptor sharing mode from SHARE_WAIT to SHARE_SERIA=
-L.
->>>>
->>>> All descriptor commands that handle the "ok to share" and
->>>> "error propagation" settings should also go away, since they have =
-no
->>>> meaning for SHARE_SERIAL.
->>>
->>> [...]
->>>
->>>> @@ -253,7 +236,7 @@ static int aead_set_sh_desc(struct crypto_aead
->>>> *aead)
->>>>
->>>>    	/* assoclen + cryptlen =3D seqinlen - ivsize */
->>>>    	append_math_sub_imm_u32(desc, REG2, SEQINLEN, IMM, tfm->ivsize=
-);
->>>>
->>>> -	/* assoclen + cryptlen =3D (assoclen + cryptlen) - cryptlen */
->>>> +	/* assoclen =3D (assoclen + cryptlen) - cryptlen */
->>>
->>> This comment basically says 'x =3D x' , but it doesn't explain anyt=
-hing to
->>> uninformed observer. Can you fix such comments please ?
->>
->> The line under the comment is:
->> append_math_sub(desc, VARSEQINLEN, REG2, REG3, CAAM_CMD_SZ);
->>
->> which translates to:
->> VARSEQINLEN =3D REG2 - REG3
->>
->> The comment basically says that VARSEQINLEN gets assoclen by
->> substracting REG3 =3D cryptlen from REG2 =3D assoclen + cryptlen.
->>
->> If you still think this is "cryptic", that's perfectly fine - I'll
->> respin the patch.
->
-> OK, I don't get it anyway. But that's OK, I am sure the next Marek th=
-at comes
-> across this code won't get it either. So I'd suggest you produce a pa=
-tch
-> afterwards, which cleans up the documentation ugliness in this driver=
-=2E Would
-> that work for you?
+Job ring is suspended gracefully and resume afresh.
 
-VARSEQINLEN, REG2, REG3 are registers of the crypto engine.
-aead_set_sh_desc() is meant to generate microprograms / descriptors to=20
-be executed by the engine.
+Both Sleep (where device will remain powered-on) and Deep-sleep (where
+device will be powered-down are handled gracefully. Persistance sessions
+are not supported across deep-sleep.
 
-Due to inherent complexity of the engine, it's difficult to explain=20
-these microprograms in a few lines of comments.
-Having a basic understanding of the HW block is mandatory.
+Cc: stable@vger.kernel.org
+Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
+---
+ drivers/crypto/caam/intern.h |   2 +
+ drivers/crypto/caam/jr.c     | 257 +++++++++++++++++++++++++++++++------------
+ 2 files changed, 190 insertions(+), 69 deletions(-)
 
-I'll consider your suggestion of improving documentation in a subsequen=
-t=20
-patch.
-
->
-> Best regards,
-> Marek Vasut
->
->
->
->
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index 6d85fcc..0d41d05 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -54,6 +54,8 @@ struct caam_drv_private_jr {
+ 	int inp_ring_write_index;	/* Input index "tail" */
+ 	int head;			/* entinfo (s/w ring) head index */
+ 	dma_addr_t *inpring;	/* Base of input ring, alloc DMA-safe */
++	dma_addr_t inpbusaddr;	/* Input ring physical address */
++	dma_addr_t outbusaddr;	/* Output ring physical address */
+ 	spinlock_t outlock ____cacheline_aligned; /* Output ring index lock */
+ 	int out_ring_read_index;	/* Output index "tail" */
+ 	int tail;			/* entinfo (s/w ring) tail index */
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 1d80bd3..2a79218 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -68,7 +68,6 @@ static int caam_reset_hw_jr(struct device *dev)
+ int caam_jr_shutdown(struct device *dev)
+ {
+ 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+-	dma_addr_t inpbusaddr, outbusaddr;
+ 	int ret;
+ 
+ 	ret = caam_reset_hw_jr(dev);
+@@ -78,13 +77,10 @@ int caam_jr_shutdown(struct device *dev)
+ 	/* Release interrupt */
+ 	free_irq(jrp->irq, dev);
+ 
+-	/* Free rings */
+-	inpbusaddr = rd_reg64(&jrp->rregs->inpring_base);
+-	outbusaddr = rd_reg64(&jrp->rregs->outring_base);
+ 	dma_free_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
+-			  jrp->inpring, inpbusaddr);
++			  jrp->inpring, jrp->inpbusaddr);
+ 	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
+-			  jrp->outring, outbusaddr);
++			  jrp->outring, jrp->outbusaddr);
+ 	kfree(jrp->entinfo);
+ 
+ 	return ret;
+@@ -159,78 +155,82 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
+ 	return IRQ_HANDLED;
+ }
+ 
+-/* Deferred service handler, run as interrupt-fired tasklet */
+-static void caam_jr_dequeue(unsigned long devarg)
++/* Consume the processed output ring Job */
++static inline void caam_jr_consume(struct device *dev)
+ {
+ 	int hw_idx, sw_idx, i, head, tail;
+-	struct device *dev = (struct device *)devarg;
+ 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+ 	void (*usercall)(struct device *dev, u32 *desc, u32 status, void *arg);
+ 	u32 *userdesc, userstatus;
+ 	void *userarg;
+ 
+-	while (rd_reg32(&jrp->rregs->outring_used)) {
++	head = ACCESS_ONCE(jrp->head);
++	spin_lock(&jrp->outlock);
+ 
+-		head = ACCESS_ONCE(jrp->head);
++	sw_idx = tail = jrp->tail;
++	hw_idx = jrp->out_ring_read_index;
+ 
+-		spin_lock(&jrp->outlock);
++	for (i = 0; CIRC_CNT(head, tail + i, JOBR_DEPTH) >= 1; i++) {
++		sw_idx = (tail + i) & (JOBR_DEPTH - 1);
+ 
+-		sw_idx = tail = jrp->tail;
+-		hw_idx = jrp->out_ring_read_index;
++		smp_read_barrier_depends();
++		if (jrp->outring[hw_idx].desc ==
++		    jrp->entinfo[sw_idx].desc_addr_dma)
++			break; /* found */
++	}
++	/* we should never fail to find a matching descriptor */
++	BUG_ON(CIRC_CNT(head, tail + i, JOBR_DEPTH) <= 0);
+ 
+-		for (i = 0; CIRC_CNT(head, tail + i, JOBR_DEPTH) >= 1; i++) {
+-			sw_idx = (tail + i) & (JOBR_DEPTH - 1);
++	/* Unmap just-run descriptor so we can post-process */
++	dma_unmap_single(dev, jrp->outring[hw_idx].desc,
++			 jrp->entinfo[sw_idx].desc_size,
++			 DMA_TO_DEVICE);
+ 
+-			smp_read_barrier_depends();
++	/* mark completed, avoid matching on a recycled desc addr */
++	jrp->entinfo[sw_idx].desc_addr_dma = 0;
+ 
+-			if (jrp->outring[hw_idx].desc ==
+-			    jrp->entinfo[sw_idx].desc_addr_dma)
+-				break; /* found */
+-		}
+-		/* we should never fail to find a matching descriptor */
+-		BUG_ON(CIRC_CNT(head, tail + i, JOBR_DEPTH) <= 0);
+-
+-		/* Unmap just-run descriptor so we can post-process */
+-		dma_unmap_single(dev, jrp->outring[hw_idx].desc,
+-				 jrp->entinfo[sw_idx].desc_size,
+-				 DMA_TO_DEVICE);
+-
+-		/* mark completed, avoid matching on a recycled desc addr */
+-		jrp->entinfo[sw_idx].desc_addr_dma = 0;
+-
+-		/* Stash callback params for use outside of lock */
+-		usercall = jrp->entinfo[sw_idx].callbk;
+-		userarg = jrp->entinfo[sw_idx].cbkarg;
+-		userdesc = jrp->entinfo[sw_idx].desc_addr_virt;
+-		userstatus = jrp->outring[hw_idx].jrstatus;
+-
+-		/* set done */
+-		wr_reg32(&jrp->rregs->outring_rmvd, 1);
+-
+-		jrp->out_ring_read_index = (jrp->out_ring_read_index + 1) &
+-					   (JOBR_DEPTH - 1);
+-
+-		/*
+-		 * if this job completed out-of-order, do not increment
+-		 * the tail.  Otherwise, increment tail by 1 plus the
+-		 * number of subsequent jobs already completed out-of-order
+-		 */
+-		if (sw_idx == tail) {
+-			do {
+-				tail = (tail + 1) & (JOBR_DEPTH - 1);
+-				smp_read_barrier_depends();
+-			} while (CIRC_CNT(head, tail, JOBR_DEPTH) >= 1 &&
+-				 jrp->entinfo[tail].desc_addr_dma == 0);
+-
+-			jrp->tail = tail;
+-		}
++	/* Stash callback params for use outside of lock */
++	usercall = jrp->entinfo[sw_idx].callbk;
++	userarg = jrp->entinfo[sw_idx].cbkarg;
++	userdesc = jrp->entinfo[sw_idx].desc_addr_virt;
++	userstatus = jrp->outring[hw_idx].jrstatus;
+ 
+-		spin_unlock(&jrp->outlock);
++	/* set done */
++	wr_reg32(&jrp->rregs->outring_rmvd, 1);
+ 
+-		/* Finally, execute user's callback */
+-		usercall(dev, userdesc, userstatus, userarg);
++	jrp->out_ring_read_index = (jrp->out_ring_read_index + 1) &
++				   (JOBR_DEPTH - 1);
++
++	/*
++	 * if this job completed out-of-order, do not increment
++	 * the tail.  Otherwise, increment tail by 1 plus the
++	 * number of subsequent jobs already completed out-of-order
++	 */
++	if (sw_idx == tail) {
++		do {
++			tail = (tail + 1) & (JOBR_DEPTH - 1);
++			smp_read_barrier_depends();
++		} while (CIRC_CNT(head, tail, JOBR_DEPTH) >= 1 &&
++			 jrp->entinfo[tail].desc_addr_dma == 0);
++
++		jrp->tail = tail;
+ 	}
+ 
++	spin_unlock(&jrp->outlock);
++
++	/* Finally, execute user's callback */
++	usercall(dev, userdesc, userstatus, userarg);
++}
++
++/* Deferred service handler, run as interrupt-fired tasklet */
++static void caam_jr_dequeue(unsigned long devarg)
++{
++	struct device *dev = (struct device *)devarg;
++	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++
++	while (rd_reg32(&jrp->rregs->outring_used))
++		caam_jr_consume(dev);
++
+ 	/* reenable / unmask IRQs */
+ 	clrbits32(&jrp->rregs->rconfig_lo, JRCFG_IMSK);
+ }
+@@ -368,13 +368,131 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+ }
+ EXPORT_SYMBOL(caam_jr_enqueue);
+ 
++#ifdef CONFIG_PM
++/* Return Failure for Job pending in input ring */
++static void caam_fail_inpjobs(struct device *dev)
++{
++	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++	void (*usercall)(struct device *dev, u32 *desc, u32 status, void *arg);
++	u32 *userdesc;
++	void *userarg;
++	int sw_idx;
++
++	/* Check for jobs left after reaching output ring and return error */
++	for (sw_idx = 0; sw_idx < JOBR_DEPTH; sw_idx++) {
++		if (jrp->entinfo[sw_idx].desc_addr_dma != 0) {
++			usercall = jrp->entinfo[sw_idx].callbk;
++			userarg = jrp->entinfo[sw_idx].cbkarg;
++			userdesc = jrp->entinfo[sw_idx].desc_addr_virt;
++			usercall(dev, userdesc, -EIO, userarg);
++			jrp->entinfo[sw_idx].desc_addr_dma = 0;
++		}
++	}
++}
++
++/* Suspend handler for Job Ring */
++static int jr_suspend(struct device *dev)
++{
++	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++	unsigned int timeout = 100000;
++	int ret = 0;
++
++	/*
++	 * mask interrupts since we are going to poll
++	 * for reset completion status
++	 */
++	setbits32(&jrp->rregs->rconfig_lo, JRCFG_IMSK);
++
++	/*
++	 * Cleanup all the pending completed Jobs to make room for
++	 * in Job's coming to Outring during flush
++	 */
++	while (rd_reg32(&jrp->rregs->outring_used))
++		caam_jr_consume(dev);
++
++	/* initiate flush (required prior to reset) */
++	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
++	while (((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) ==
++		JRINT_ERR_HALT_INPROGRESS) && --timeout)
++		cpu_relax();
++
++	if ((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) !=
++	    JRINT_ERR_HALT_COMPLETE || timeout == 0) {
++		dev_err(dev, "failed to flush job ring %d\n", jrp->ridx);
++		ret = -EIO;
++		goto err;
++	}
++
++	/*
++	 * Disallow any further addition in Job Ring by making input_ring
++	 * size ZERO. If output complete ring processing try to enqueue
++	 * more Job's back to JR, it will return -EBUSY
++	 */
++	wr_reg32(&jrp->rregs->inpring_size, 0);
++
++	while (rd_reg32(&jrp->rregs->outring_used))
++		caam_jr_consume(dev);
++
++	caam_fail_inpjobs(dev);
++
++	/* initiate reset */
++	timeout = 100000;
++	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
++	while ((rd_reg32(&jrp->rregs->jrcommand) & JRCR_RESET) && --timeout)
++		cpu_relax();
++
++	if (timeout == 0) {
++		dev_err(dev, "failed to reset job ring %d\n", jrp->ridx);
++		ret = -EIO;
++		goto err;
++	}
++
++err:
++	/* unmask interrupts */
++	clrbits32(&jrp->rregs->rconfig_lo, JRCFG_IMSK);
++	return ret;
++}
++
++/* Resume handler for Job Ring */
++static int jr_resume(struct device *dev)
++{
++	struct caam_drv_private_jr *jrp;
++
++	jrp = dev_get_drvdata(dev);
++
++	memset(jrp->entinfo, 0, sizeof(struct caam_jrentry_info) * JOBR_DEPTH);
++
++	/* Setup rings */
++	jrp->inp_ring_write_index = 0;
++	jrp->out_ring_read_index = 0;
++	jrp->head = 0;
++	jrp->tail = 0;
++
++	/* Setup ring base registers */
++	wr_reg64(&jrp->rregs->inpring_base, jrp->inpbusaddr);
++	wr_reg64(&jrp->rregs->outring_base, jrp->outbusaddr);
++	/* Setup ring size */
++	wr_reg32(&jrp->rregs->inpring_size, JOBR_DEPTH);
++	wr_reg32(&jrp->rregs->outring_size, JOBR_DEPTH);
++
++	setbits32(&jrp->rregs->rconfig_lo, JOBR_INTC |
++		  (JOBR_INTC_COUNT_THLD << JRCFG_ICDCT_SHIFT) |
++		  (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
++	return 0;
++}
++
++const struct dev_pm_ops jr_pm_ops = {
++	.suspend = jr_suspend,
++	.resume = jr_resume,
++};
++#endif /* CONFIG_PM */
++
+ /*
+  * Init JobR independent of platform property detection
+  */
+ static int caam_jr_init(struct device *dev)
+ {
+ 	struct caam_drv_private_jr *jrp;
+-	dma_addr_t inpbusaddr, outbusaddr;
+ 	int i, error;
+ 
+ 	jrp = dev_get_drvdata(dev);
+@@ -397,10 +515,11 @@ static int caam_jr_init(struct device *dev)
+ 		return error;
+ 
+ 	jrp->inpring = dma_alloc_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
+-					  &inpbusaddr, GFP_KERNEL);
++					  &jrp->inpbusaddr, GFP_KERNEL);
+ 
+ 	jrp->outring = dma_alloc_coherent(dev, sizeof(struct jr_outentry) *
+-					  JOBR_DEPTH, &outbusaddr, GFP_KERNEL);
++					  JOBR_DEPTH, &jrp->outbusaddr,
++					  GFP_KERNEL);
+ 
+ 	jrp->entinfo = kzalloc(sizeof(struct caam_jrentry_info) * JOBR_DEPTH,
+ 			       GFP_KERNEL);
+@@ -412,17 +531,14 @@ static int caam_jr_init(struct device *dev)
+ 		return -ENOMEM;
+ 	}
+ 
+-	for (i = 0; i < JOBR_DEPTH; i++)
+-		jrp->entinfo[i].desc_addr_dma = !0;
+-
+ 	/* Setup rings */
+ 	jrp->inp_ring_write_index = 0;
+ 	jrp->out_ring_read_index = 0;
+ 	jrp->head = 0;
+ 	jrp->tail = 0;
+ 
+-	wr_reg64(&jrp->rregs->inpring_base, inpbusaddr);
+-	wr_reg64(&jrp->rregs->outring_base, outbusaddr);
++	wr_reg64(&jrp->rregs->inpring_base, jrp->inpbusaddr);
++	wr_reg64(&jrp->rregs->outring_base, jrp->outbusaddr);
+ 	wr_reg32(&jrp->rregs->inpring_size, JOBR_DEPTH);
+ 	wr_reg32(&jrp->rregs->outring_size, JOBR_DEPTH);
+ 
+@@ -518,6 +634,9 @@ static struct platform_driver caam_jr_driver = {
+ 		.name = "caam_jr",
+ 		.owner = THIS_MODULE,
+ 		.of_match_table = caam_jr_match,
++#ifdef CONFIG_PM
++		.pm = &jr_pm_ops,
++#endif
+ 	},
+ 	.probe       = caam_jr_probe,
+ 	.remove      = caam_jr_remove,
+-- 
+1.8.1.2
