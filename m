@@ -1,19 +1,35 @@
-From: Ruchika Gupta <ruchika.gupta@freescale.com>
-Subject: [PATCH] crypto: caam - Check for CAAM block presence before registering with crypto layer
-Date: Fri, 21 Mar 2014 12:14:21 +0530
-Message-ID: <1395384261-30377-1-git-send-email-ruchika.gupta@freescale.com>
+From: "yashpal.dutta@freescale.com" <yashpal.dutta@freescale.com>
+Subject: RE: [PATCH] crypto: caam - Check for CAAM block presence before
+ registering with crypto layer
+Date: Fri, 21 Mar 2014 07:07:33 +0000
+Message-ID: <89ccb37664c84d079117807ba54accea@BY2PR03MB458.namprd03.prod.outlook.com>
+References: <1395384261-30377-1-git-send-email-ruchika.gupta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <herbert@gondor.apana.org.au>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ch1ehsobe005.messaging.microsoft.com ([216.32.181.185]:52432
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756809AbaCUGpg (ORCPT
+Received: from mail-by2lp0241.outbound.protection.outlook.com ([207.46.163.241]:40506
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752498AbaCUHHg convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Mar 2014 02:45:36 -0400
+	Fri, 21 Mar 2014 03:07:36 -0400
+In-Reply-To: <1395384261-30377-1-git-send-email-ruchika.gupta@freescale.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
+
+Reviewed by: Yashpal Dutta <yashpal.dutta@freescale.com>
+
+-----Original Message-----
+From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Ruchika Gupta
+Sent: Friday, March 21, 2014 12:14 PM
+To: linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au
+Subject: [PATCH] crypto: caam - Check for CAAM block presence before registering with crypto layer
 
 The layer which registers with the crypto API should check for the presence of
 the CAAM device it is going to use.  If the platform's device tree doesn't have
@@ -145,3 +161,5 @@ index 403d8d5..7c9803b 100644
  	if (IS_ERR(dev)) {
 -- 
 1.8.1.4
+
+
