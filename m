@@ -1,66 +1,60 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 1/1] crypto: SHA1 transform x86_64 AVX2
-Date: Fri, 21 Mar 2014 22:41:01 +0800
-Message-ID: <20140321144101.GE25820@gondor.apana.org.au>
-References: <1395353640.2367.56.camel@pegasus.jf.intel.com>
- <201403202324.17029.marex@denx.de>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH 1/3 V4] crypto: Fix the pointer voodoo in unaligned ahash
+Date: Fri, 21 Mar 2014 19:31:02 +0100
+Message-ID: <201403211931.02812.marex@denx.de>
+References: <1394761026-7292-1-git-send-email-marex@denx.de> <20140321144007.GA25820@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: chandramouli narayanan <mouli@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Ilya Albrekht <ilya.albrekht@intel.com>,
-	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
-	Ronen Zohar <ronen.zohar@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org
-To: Marek Vasut <marex@denx.de>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Fabio Estevam <fabio.estevam@freescale.com>,
+	Shawn Guo <shawn.guo@linaro.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:48964 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754421AbaCUOlU (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:39274 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750769AbaCUSbG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Mar 2014 10:41:20 -0400
-Content-Disposition: inline
-In-Reply-To: <201403202324.17029.marex@denx.de>
+	Fri, 21 Mar 2014 14:31:06 -0400
+In-Reply-To: <20140321144007.GA25820@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 20, 2014 at 11:24:16PM +0100, Marek Vasut wrote:
-> On Thursday, March 20, 2014 at 11:14:00 PM, chandramouli narayanan wrote:
-> > This git patch adds x86_64 AVX2 optimization of SHA1
-> > transform to crypto support. The patch has been tested with 3.14.0-rc1
-> > kernel.
+On Friday, March 21, 2014 at 03:40:07 PM, Herbert Xu wrote:
+> On Fri, Mar 14, 2014 at 02:37:04AM +0100, Marek Vasut wrote:
+> > Add documentation for the pointer voodoo that is happening in
+> > crypto/ahash.c in ahash_op_unaligned(). This code is quite confusing, so
+> > add a beefy chunk of documentation.
 > > 
-> > On a Haswell desktop, with turbo disabled and all cpus running
-> > at maximum frequency, tcrypt shows AVX2 performance improvement
-> > from 3% for 256 bytes update to 16% for 1024 bytes update over
-> > AVX implementation.
+> > Moreover, make sure the mangled request is completely restored after
+> > finishing this unaligned operation. This means restoring all of .result,
+> > .base.data and .base.complete .
 > > 
-> > This patch adds sha1_avx2_transform(), the glue, build and
-> > configuration changes needed for AVX2 optimization of
-> > SHA1 transform to crypto support.
+> > Also, remove the crypto_completion_t complete = ... line present in the
+> > ahash_op_unaligned_done() function. This type actually declares a
+> > function pointer, which is very confusing.
 > > 
-> > sha1-ssse3 is one module which adds the necessary optimization
-> > support (SSSE3/AVX/AVX2) for the low-level SHA1 transform function.
-> > With better optimization support, transform function is overridden
-> > as the case may be. In the case of AVX2, due to performance reasons
-> > across datablock sizes, the AVX or AVX2 transform function is used
-> > at run-time as it suits best. The Makefile change therefore appends
-> > the necessary objects to the linkage. Due to this, the patch merely
-> > appends AVX2 transform to the existing build mix and Kconfig support
-> > and leaves the configuration build support as is.
+> > Finally, yet very important nonetheless, make sure the req->priv is
+> > free()'d only after the original request is restored in
+> > ahash_op_unaligned_done(). The req->priv data must not be free()'d
+> > before that in ahash_op_unaligned_finish(), since we would be accessing
+> > previously free()'d data in ahash_op_unaligned_done() and cause
+> > corruption.
 > > 
-> > Signed-off-by: Chandramouli Narayanan <mouli@linux.intel.com>
+> > Signed-off-by: Marek Vasut <marex@denx.de>
+> > Cc: David S. Miller <davem@davemloft.net>
+> > Cc: Fabio Estevam <fabio.estevam@freescale.com>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: Shawn Guo <shawn.guo@linaro.org>
+> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
 > 
-> Very nice, good job. Thank you!
-> 
-> Reviewed-by: Marek Vasut <marex@denx.de>
+> All applied.  Thanks Marek!
 
-Patch applied.  Thanks for reviewing.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thank you for kicking me in the right direction all the time and thanks for your 
+patience with me !
+
+Best regards,
+Marek Vasut
