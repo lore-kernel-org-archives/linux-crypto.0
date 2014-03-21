@@ -1,54 +1,39 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH] Fix late crypto work queue initialization
-Date: Thu, 20 Mar 2014 17:18:00 -0700
-Message-ID: <1395361080.2970.29.camel@schen9-DESK>
-References: <1395100347.2970.14.camel@schen9-DESK>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v6 1/1] crypto: SHA1 transform x86_64 AVX2
+Date: Thu, 20 Mar 2014 20:21:19 -0700
+Message-ID: <532BB02F.7030506@zytor.com>
+References: <1395353640.2367.56.camel@pegasus.jf.intel.com> <532B6A5F.7070104@zytor.com> <20140321000939.GA20397@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
+Cc: chandramouli narayanan <mouli@linux.intel.com>,
 	"David S.Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"Huang, Ying" <ying.huang@intel.com>
+	Ilya Albrekht <ilya.albrekht@intel.com>,
+	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
+	Ronen Zohar <ronen.zohar@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	Marek Vasut <marex@denx.de>, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1395100347.2970.14.camel@schen9-DESK>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from terminus.zytor.com ([198.137.202.10]:59144 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754987AbaCUDWE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Mar 2014 23:22:04 -0400
+In-Reply-To: <20140321000939.GA20397@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2014-03-17 at 16:52 -0700, Tim Chen wrote:
-> The crypto algorithm modules utilizing the crypto daemon could
-> be used early when the system start up.  Using module_init
-> does not guarantee that the daemon's work queue is initialized
-> when the cypto alorithm depending on crypto_wq starts.  It is necessary
-> to initialize the crypto work queue earlier at the subsystem
-> init time to make sure that it is initialized
-> when used.
+On 03/20/2014 05:09 PM, Herbert Xu wrote:
+> On Thu, Mar 20, 2014 at 03:23:27PM -0700, H. Peter Anvin wrote:
+>> Again... Herbert, David... yours or mine?
 > 
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
-> ---
->  crypto/crypto_wq.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Yes I will be taking this through cryptodev.
 > 
-> diff --git a/crypto/crypto_wq.c b/crypto/crypto_wq.c
-> index adad92a..2f1b8d1 100644
-> --- a/crypto/crypto_wq.c
-> +++ b/crypto/crypto_wq.c
-> @@ -33,7 +33,7 @@ static void __exit crypto_wq_exit(void)
->  	destroy_workqueue(kcrypto_wq);
->  }
->  
-> -module_init(crypto_wq_init);
-> +subsys_initcall(crypto_wq_init);
->  module_exit(crypto_wq_exit);
->  
->  MODULE_LICENSE("GPL");
 
-Herbert,
+Thanks!
 
-Any feedback on this patch?
+Acked-by: H. Peter Anvin <hpa@linux.intel.com>
 
-Thanks.
-
-Tim
+	-hpa
