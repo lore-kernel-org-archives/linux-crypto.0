@@ -1,165 +1,107 @@
-From: "yashpal.dutta@freescale.com" <yashpal.dutta@freescale.com>
-Subject: RE: [PATCH] crypto: caam - Check for CAAM block presence before
- registering with crypto layer
-Date: Fri, 21 Mar 2014 07:07:33 +0000
-Message-ID: <89ccb37664c84d079117807ba54accea@BY2PR03MB458.namprd03.prod.outlook.com>
-References: <1395384261-30377-1-git-send-email-ruchika.gupta@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [cryptodev:master 44/45] drivers/crypto/caam/caamrng.c:293:2:
+ warning: passing argument 1 of 'caam_init_rng' from incompatible pointer
+ type
+Date: Fri, 21 Mar 2014 21:34:10 +0800
+Message-ID: <20140321133410.GB24469@gondor.apana.org.au>
+References: <53229935.5J5QhGQU1gPnTTIo%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Nitesh Lal <NiteshNarayanLal@freescale.com>, kbuild-all@01.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Ruchika Gupta <ruchika.gupta@freescale.com>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: kbuild test robot <fengguang.wu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2lp0241.outbound.protection.outlook.com ([207.46.163.241]:40506
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752498AbaCUHHg convert rfc822-to-8bit (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:38806 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1761016AbaCUNeR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Mar 2014 03:07:36 -0400
-In-Reply-To: <1395384261-30377-1-git-send-email-ruchika.gupta@freescale.com>
-Content-Language: en-US
+	Fri, 21 Mar 2014 09:34:17 -0400
+Content-Disposition: inline
+In-Reply-To: <53229935.5J5QhGQU1gPnTTIo%fengguang.wu@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Reviewed by: Yashpal Dutta <yashpal.dutta@freescale.com>
+On Fri, Mar 14, 2014 at 01:52:53PM +0800, kbuild test robot wrote:
+> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> head:   26a05489ee0eb2a69b729438e63b1038b472fa57
+> commit: 6e4e603a9a99c6e27a74c1a813a7c751d85a721d [44/45] crypto: caam - Dynamic memory allocation for caam_rng_ctx object
+> config: make ARCH=powerpc corenet32_smp_defconfig
+> 
+> All warnings:
+> 
+>    drivers/crypto/caam/caamrng.c: In function 'caam_rng_init':
+> >> drivers/crypto/caam/caamrng.c:293:2: warning: passing argument 1 of 'caam_init_rng' from incompatible pointer type [enabled by default]
+>      caam_init_rng(&rng_ctx, dev);
+>      ^
+>    drivers/crypto/caam/caamrng.c:258:13: note: expected 'struct caam_rng_ctx *' but argument is of type 'struct caam_rng_ctx **'
+>     static void caam_init_rng(struct caam_rng_ctx *ctx, struct device *jrdev)
+>                 ^
+> 
+> vim +/caam_init_rng +293 drivers/crypto/caam/caamrng.c
+> 
+> e24f7c9e Yuan Kang     2012-06-22  277  	hwrng_unregister(&caam_rng);
+> 6e4e603a Nitesh Lal    2014-03-07  278  	kfree(rng_ctx);
+> e24f7c9e Yuan Kang     2012-06-22  279  }
+> e24f7c9e Yuan Kang     2012-06-22  280  
+> e24f7c9e Yuan Kang     2012-06-22  281  static int __init caam_rng_init(void)
+> e24f7c9e Yuan Kang     2012-06-22  282  {
+> cfc6f11b Ruchika Gupta 2013-10-25  283  	struct device *dev;
+> e24f7c9e Yuan Kang     2012-06-22  284  
+> cfc6f11b Ruchika Gupta 2013-10-25  285  	dev = caam_jr_alloc();
+> cfc6f11b Ruchika Gupta 2013-10-25  286  	if (IS_ERR(dev)) {
+> cfc6f11b Ruchika Gupta 2013-10-25  287  		pr_err("Job Ring Device allocation for transform failed\n");
+> cfc6f11b Ruchika Gupta 2013-10-25  288  		return PTR_ERR(dev);
+> cfc6f11b Ruchika Gupta 2013-10-25  289  	}
+> 6e4e603a Nitesh Lal    2014-03-07  290  	rng_ctx = kmalloc(sizeof(struct caam_rng_ctx), GFP_DMA);
+> 6e4e603a Nitesh Lal    2014-03-07  291  	if (!rng_ctx)
+> 6e4e603a Nitesh Lal    2014-03-07  292  		return -ENOMEM;
+> cfc6f11b Ruchika Gupta 2013-10-25 @293  	caam_init_rng(&rng_ctx, dev);
+> e24f7c9e Yuan Kang     2012-06-22  294  
+> cfc6f11b Ruchika Gupta 2013-10-25  295  	dev_info(dev, "registering rng-caam\n");
+> e24f7c9e Yuan Kang     2012-06-22  296  	return hwrng_register(&caam_rng);
+> e24f7c9e Yuan Kang     2012-06-22  297  }
+> e24f7c9e Yuan Kang     2012-06-22  298  
+> e24f7c9e Yuan Kang     2012-06-22  299  module_init(caam_rng_init);
+> e24f7c9e Yuan Kang     2012-06-22  300  module_exit(caam_rng_exit);
+> e24f7c9e Yuan Kang     2012-06-22  301  
+> 
+> :::::: The code at line 293 was first introduced by commit
+> :::::: cfc6f11b768a9bdda17aac280474de1f0e344fea crypto: caam - Modify the interface layers to use JR API's
+> 
+> :::::: TO: Ruchika Gupta <ruchika.gupta@freescale.com>
+> :::::: CC: Herbert Xu <herbert@gondor.apana.org.au>
 
------Original Message-----
-From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Ruchika Gupta
-Sent: Friday, March 21, 2014 12:14 PM
-To: linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au
-Subject: [PATCH] crypto: caam - Check for CAAM block presence before registering with crypto layer
+I've add the following patch to fix this.
 
-The layer which registers with the crypto API should check for the presence of
-the CAAM device it is going to use.  If the platform's device tree doesn't have
-the required CAAM node, the layer should return an error and not register the
-algorithms with crypto API layer.
+commit 85e0da925b2ddbf39a6cefb4e02ad51d0a0912c0
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Fri Mar 21 21:32:54 2014 +0800
 
-Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
----
- drivers/crypto/caam/caamalg.c  | 27 +++++++++++++++++++++++++++
- drivers/crypto/caam/caamhash.c | 26 ++++++++++++++++++++++++++
- drivers/crypto/caam/caamrng.c  | 26 ++++++++++++++++++++++++++
- 3 files changed, 79 insertions(+)
+    crypto: caam - Fix first parameter to caam_init_rng
+    
+    Found by the kbuild test robot, the first argument to caam_init_rng
+    has a spurious ampersand.
+    
+    Reported-by: kbuild test robot <fengguang.wu@intel.com>
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index b71f2fd..4335e38 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -2164,8 +2164,35 @@ static struct caam_crypto_alg *caam_alg_alloc(struct caam_alg_template
- 
- static int __init caam_algapi_init(void)
- {
-+	struct device_node *dev_node;
-+	struct platform_device *pdev;
-+	struct device *ctrldev;
-+	void *priv;
- 	int i = 0, err = 0;
- 
-+	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-+	if (!dev_node) {
-+		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
-+		if (!dev_node)
-+			return -ENODEV;
-+	}
-+
-+	pdev = of_find_device_by_node(dev_node);
-+	if (!pdev)
-+		return -ENODEV;
-+
-+	ctrldev = &pdev->dev;
-+	priv = dev_get_drvdata(ctrldev);
-+	of_node_put(dev_node);
-+
-+	/*
-+	 * If priv is NULL, it's probably because the caam driver wasn't
-+	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
-+	 */
-+	if (!priv)
-+		return -ENODEV;
-+
-+
- 	INIT_LIST_HEAD(&alg_list);
- 
- 	/* register crypto algorithms the device supports */
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 0378328..5592fec 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -1797,8 +1797,34 @@ caam_hash_alloc(struct caam_hash_template *template,
- 
- static int __init caam_algapi_hash_init(void)
- {
-+	struct device_node *dev_node;
-+	struct platform_device *pdev;
-+	struct device *ctrldev;
-+	void *priv;
- 	int i = 0, err = 0;
- 
-+	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-+	if (!dev_node) {
-+		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
-+		if (!dev_node)
-+			return -ENODEV;
-+	}
-+
-+	pdev = of_find_device_by_node(dev_node);
-+	if (!pdev)
-+		return -ENODEV;
-+
-+	ctrldev = &pdev->dev;
-+	priv = dev_get_drvdata(ctrldev);
-+	of_node_put(dev_node);
-+
-+	/*
-+	 * If priv is NULL, it's probably because the caam driver wasn't
-+	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
-+	 */
-+	if (!priv)
-+		return -ENODEV;
-+
- 	INIT_LIST_HEAD(&hash_list);
- 
- 	/* register crypto algorithms the device supports */
 diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 403d8d5..7c9803b 100644
+index 403d8d5..3529b54 100644
 --- a/drivers/crypto/caam/caamrng.c
 +++ b/drivers/crypto/caam/caamrng.c
-@@ -281,6 +281,32 @@ static void __exit caam_rng_exit(void)
- static int __init caam_rng_init(void)
- {
- 	struct device *dev;
-+	struct device_node *dev_node;
-+	struct platform_device *pdev;
-+	struct device *ctrldev;
-+	void *priv;
-+
-+	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-+	if (!dev_node) {
-+		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
-+		if (!dev_node)
-+			return -ENODEV;
-+	}
-+
-+	pdev = of_find_device_by_node(dev_node);
-+	if (!pdev)
-+		return -ENODEV;
-+
-+	ctrldev = &pdev->dev;
-+	priv = dev_get_drvdata(ctrldev);
-+	of_node_put(dev_node);
-+
-+	/*
-+	 * If priv is NULL, it's probably because the caam driver wasn't
-+	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
-+	 */
-+	if (!priv)
-+		return -ENODEV;
+@@ -290,7 +290,7 @@ static int __init caam_rng_init(void)
+ 	rng_ctx = kmalloc(sizeof(struct caam_rng_ctx), GFP_DMA);
+ 	if (!rng_ctx)
+ 		return -ENOMEM;
+-	caam_init_rng(&rng_ctx, dev);
++	caam_init_rng(rng_ctx, dev);
  
- 	dev = caam_jr_alloc();
- 	if (IS_ERR(dev)) {
+ 	dev_info(dev, "registering rng-caam\n");
+ 	return hwrng_register(&caam_rng);
+
+Thanks,
 -- 
-1.8.1.4
-
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
