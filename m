@@ -1,33 +1,65 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - Check for CAAM block presence before
- registering with crypto layer
-Date: Fri, 21 Mar 2014 22:41:19 +0800
-Message-ID: <20140321144118.GF25820@gondor.apana.org.au>
-References: <1395384261-30377-1-git-send-email-ruchika.gupta@freescale.com>
+Subject: Re: [PATCH v6 1/1] crypto: SHA1 transform x86_64 AVX2
+Date: Fri, 21 Mar 2014 22:41:01 +0800
+Message-ID: <20140321144101.GE25820@gondor.apana.org.au>
+References: <1395353640.2367.56.camel@pegasus.jf.intel.com>
+ <201403202324.17029.marex@denx.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Ruchika Gupta <ruchika.gupta@freescale.com>
+Cc: chandramouli narayanan <mouli@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Ilya Albrekht <ilya.albrekht@intel.com>,
+	Maxim Locktyukhin <maxim.locktyukhin@intel.com>,
+	Ronen Zohar <ronen.zohar@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org
+To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:47876 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:48964 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759128AbaCUOlV (ORCPT
+	with ESMTP id S1754421AbaCUOlU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Mar 2014 10:41:21 -0400
+	Fri, 21 Mar 2014 10:41:20 -0400
 Content-Disposition: inline
-In-Reply-To: <1395384261-30377-1-git-send-email-ruchika.gupta@freescale.com>
+In-Reply-To: <201403202324.17029.marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 21, 2014 at 12:14:21PM +0530, Ruchika Gupta wrote:
-> The layer which registers with the crypto API should check for the presence of
-> the CAAM device it is going to use.  If the platform's device tree doesn't have
-> the required CAAM node, the layer should return an error and not register the
-> algorithms with crypto API layer.
+On Thu, Mar 20, 2014 at 11:24:16PM +0100, Marek Vasut wrote:
+> On Thursday, March 20, 2014 at 11:14:00 PM, chandramouli narayanan wrote:
+> > This git patch adds x86_64 AVX2 optimization of SHA1
+> > transform to crypto support. The patch has been tested with 3.14.0-rc1
+> > kernel.
+> > 
+> > On a Haswell desktop, with turbo disabled and all cpus running
+> > at maximum frequency, tcrypt shows AVX2 performance improvement
+> > from 3% for 256 bytes update to 16% for 1024 bytes update over
+> > AVX implementation.
+> > 
+> > This patch adds sha1_avx2_transform(), the glue, build and
+> > configuration changes needed for AVX2 optimization of
+> > SHA1 transform to crypto support.
+> > 
+> > sha1-ssse3 is one module which adds the necessary optimization
+> > support (SSSE3/AVX/AVX2) for the low-level SHA1 transform function.
+> > With better optimization support, transform function is overridden
+> > as the case may be. In the case of AVX2, due to performance reasons
+> > across datablock sizes, the AVX or AVX2 transform function is used
+> > at run-time as it suits best. The Makefile change therefore appends
+> > the necessary objects to the linkage. Due to this, the patch merely
+> > appends AVX2 transform to the existing build mix and Kconfig support
+> > and leaves the configuration build support as is.
+> > 
+> > Signed-off-by: Chandramouli Narayanan <mouli@linux.intel.com>
 > 
-> Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
+> Very nice, good job. Thank you!
+> 
+> Reviewed-by: Marek Vasut <marex@denx.de>
 
-Patch applied.
+Patch applied.  Thanks for reviewing.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
