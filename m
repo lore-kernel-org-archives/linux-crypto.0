@@ -1,75 +1,51 @@
-From: Ben Hutchings <ben@decadent.org.uk>
-Subject: Re: [PATCH v3] crypto: caam - power management support for caam
+From: "yashpal.dutta@freescale.com" <yashpal.dutta@freescale.com>
+Subject: RE: [PATCH v3] crypto: caam - power management support for caam
  job-ring
-Date: Sat, 22 Mar 2014 16:24:16 +0000
-Message-ID: <1395505456.2770.70.camel@deadeye.wl.decadent.org.uk>
+Date: Sat, 22 Mar 2014 17:35:41 +0000
+Message-ID: <111265ae51f946ac9b96dde8e0501fb9@BY2PR03MB458.namprd03.prod.outlook.com>
 References: <1395341456-60542-1-git-send-email-yashpal.dutta@freescale.com>
+ <1395505456.2770.70.camel@deadeye.wl.decadent.org.uk>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-Cr+0hl0GQHeg/SBX67c4"
-Cc: linux-crypto@vger.kernel.org, horia.geanta@freescale.com,
-	vakul@freescale.com, ruchika.gupta@freescale.com,
-	stable@vger.kernel.org
-To: Yashpal Dutta <yashpal.dutta@freescale.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"Horia.Geanta@freescale.com" <Horia.Geanta@freescale.com>,
+	Vakul Garg <vakul@freescale.com>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+To: Ben Hutchings <ben@decadent.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:37757 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751655AbaCVQYY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 22 Mar 2014 12:24:24 -0400
-In-Reply-To: <1395341456-60542-1-git-send-email-yashpal.dutta@freescale.com>
+Received: from mail-bn1lp0141.outbound.protection.outlook.com ([207.46.163.141]:31787
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751058AbaCVRuT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 22 Mar 2014 13:50:19 -0400
+In-Reply-To: <1395505456.2770.70.camel@deadeye.wl.decadent.org.uk>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
---=-Cr+0hl0GQHeg/SBX67c4
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, 2014-03-21 at 00:35 +0545, Yashpal Dutta wrote:
-> Job ring is suspended gracefully and resume afresh.
->=20
-> Both Sleep (where device will remain powered-on) and Deep-sleep (where
-> device will be powered-down are handled gracefully. Persistance sessions
-> are not supported across deep-sleep.
->=20
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
-> ---
->  drivers/crypto/caam/intern.h |   2 +
->  drivers/crypto/caam/jr.c     | 257 +++++++++++++++++++++++++++++++------=
-------
->  2 files changed, 190 insertions(+), 69 deletions(-)
-[...]
-
-This is too big for stable; is a simpler fix possible?
-
-Ben.
-
---=20
-Ben Hutchings
-I'm not a reverse psychological virus.  Please don't copy me into your sig.
-
---=-Cr+0hl0GQHeg/SBX67c4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIVAwUAUy25MOe/yOyVhhEJAQr6OQ//biCONDc/MQ2M/IyBN0qNiE0Wv93CAxun
-ZpOif+fvp/ptq9zb51ZdZ9vsg/XwKN4tNiNfHNsolmPTyEf/CYs7CnnLGkE5djr0
-Ag+0E5oJzN1+8geCxpHP9QQiZfyfac1s+mFzzOzNAz4i3sFhcZ3KiBW4BFYl9vOG
-EoibFJI1ldqEvAreT2Ub4sjbRUFhF3yMdkW1pV/dr4Tt/gbYOeS5v8LtBnjePGTO
-6QQk9osEsdrgwVzeI7+7yX+Dzu5yokEpeAL6daV92MJ3AOY9gpy7V4Tte6WbEbfc
-KKTI2DoYjLmsLYXil+yKxvgWdffdvVcEUkw8dKHlfCrmkspgb0Cw9ZijjOCj8H7d
-BIezoTv0SN6pm6Y5DGW3t9k06t3R8LNecDErGfQz0WwC8ZnNpn3Oyl8m5HhmIKSC
-vlMErn+iK5VI8xTvnQ7RXSAubsmpRfT46B2e05RUVlsakbIIwGb4m0S6ckUkS8Wg
-AsGWFXplNJvsU0tljWA3fprhfRCXjTfLAcKtz7SIXLP5KjNBFcUmsncbh6lF0UDC
-AZm2x9gq1LUK3JSGWm3H13j+VBuXhOXsz5N2D9pD48zvKKGL7leRuERApUwprIOU
-Ck0B6sdtGfWMtxRS4ZGubwTXB3KfmZUuwNcLm2KxurghXJkxdWrdAgyr16kaKffT
-AdrT3v/HGCM=
-=v6EV
------END PGP SIGNATURE-----
-
---=-Cr+0hl0GQHeg/SBX67c4--
+SSB0cmllZCB0byByZWR1Y2UgdGhlIHBhdGNoIHRvIHNtYWxsZXN0IHBvc3NpYmxlIHNpemUgd2hp
+Y2ggcmVzdWx0ZWQgaW4gY3VycmVudCBwYXRjaC4gDQoNCkkgZGlkbuKAmXQgZmluZCBhIHdheSB0
+byBjb21wcmVzcyBvciBicmVhayBpdCBmdXJ0aGVyIHRvIGxpbWl0IG9mIHN0YWJsZSB0cmVlIHBh
+dGNoIGV4cGVjdGF0aW9ucy4NCg0KWWFzaA0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZy
+b206IEJlbiBIdXRjaGluZ3MgW21haWx0bzpiZW5AZGVjYWRlbnQub3JnLnVrXSANClNlbnQ6IFNh
+dHVyZGF5LCBNYXJjaCAyMiwgMjAxNCA5OjU0IFBNDQpUbzogRHV0dGEgWWFzaHBhbC1CMDU0NTYN
+CkNjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBHZWFudGEgTmVhZyBIb3JpYSBJb2Fu
+LUIwNTQ3MTsgR2FyZyBWYWt1bC1CMTYzOTQ7IEd1cHRhIFJ1Y2hpa2EtUjY2NDMxOyBzdGFibGVA
+dmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogW1BBVENIIHYzXSBjcnlwdG86IGNhYW0gLSBw
+b3dlciBtYW5hZ2VtZW50IHN1cHBvcnQgZm9yIGNhYW0gam9iLXJpbmcNCg0KT24gRnJpLCAyMDE0
+LTAzLTIxIGF0IDAwOjM1ICswNTQ1LCBZYXNocGFsIER1dHRhIHdyb3RlOg0KPiBKb2IgcmluZyBp
+cyBzdXNwZW5kZWQgZ3JhY2VmdWxseSBhbmQgcmVzdW1lIGFmcmVzaC4NCj4gDQo+IEJvdGggU2xl
+ZXAgKHdoZXJlIGRldmljZSB3aWxsIHJlbWFpbiBwb3dlcmVkLW9uKSBhbmQgRGVlcC1zbGVlcCAo
+d2hlcmUgDQo+IGRldmljZSB3aWxsIGJlIHBvd2VyZWQtZG93biBhcmUgaGFuZGxlZCBncmFjZWZ1
+bGx5LiBQZXJzaXN0YW5jZSANCj4gc2Vzc2lvbnMgYXJlIG5vdCBzdXBwb3J0ZWQgYWNyb3NzIGRl
+ZXAtc2xlZXAuDQo+IA0KPiBDYzogc3RhYmxlQHZnZXIua2VybmVsLm9yZw0KPiBTaWduZWQtb2Zm
+LWJ5OiBZYXNocGFsIER1dHRhIDx5YXNocGFsLmR1dHRhQGZyZWVzY2FsZS5jb20+DQo+IC0tLQ0K
+PiAgZHJpdmVycy9jcnlwdG8vY2FhbS9pbnRlcm4uaCB8ICAgMiArDQo+ICBkcml2ZXJzL2NyeXB0
+by9jYWFtL2pyLmMgICAgIHwgMjU3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0t
+LS0tLS0tLS0NCj4gIDIgZmlsZXMgY2hhbmdlZCwgMTkwIGluc2VydGlvbnMoKyksIDY5IGRlbGV0
+aW9ucygtKQ0KWy4uLl0NCg0KVGhpcyBpcyB0b28gYmlnIGZvciBzdGFibGU7IGlzIGEgc2ltcGxl
+ciBmaXggcG9zc2libGU/DQoNCkJlbi4NCg0KLS0NCkJlbiBIdXRjaGluZ3MNCkknbSBub3QgYSBy
+ZXZlcnNlIHBzeWNob2xvZ2ljYWwgdmlydXMuICBQbGVhc2UgZG9uJ3QgY29weSBtZSBpbnRvIHlv
+dXIgc2lnLg0K
