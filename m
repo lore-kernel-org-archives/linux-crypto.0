@@ -1,51 +1,53 @@
-From: "yashpal.dutta@freescale.com" <yashpal.dutta@freescale.com>
-Subject: RE: [PATCH v3] crypto: caam - power management support for caam
- job-ring
-Date: Sat, 22 Mar 2014 17:35:41 +0000
-Message-ID: <111265ae51f946ac9b96dde8e0501fb9@BY2PR03MB458.namprd03.prod.outlook.com>
-References: <1395341456-60542-1-git-send-email-yashpal.dutta@freescale.com>
- <1395505456.2770.70.camel@deadeye.wl.decadent.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Horia.Geanta@freescale.com" <Horia.Geanta@freescale.com>,
-	Vakul Garg <vakul@freescale.com>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
+From: Monam Agarwal <monamagarwal123@gmail.com>
+Subject: [PATCH] drivers/crypto: Use RCU_INIT_POINTER(x, NULL) in nx/nx-842.c
+Date: Sun, 23 Mar 2014 02:04:13 +0530
+Message-ID: <1395520453-3077-1-git-send-email-monamagarwal123@gmail.com>
+To: rcj@linux.vnet.ibm.com, mhcerri@linux.vnet.ibm.com,
+	fin@linux.vnet.ibm.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0141.outbound.protection.outlook.com ([207.46.163.141]:31787
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751058AbaCVRuT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 22 Mar 2014 13:50:19 -0400
-In-Reply-To: <1395505456.2770.70.camel@deadeye.wl.decadent.org.uk>
-Content-Language: en-US
+Received: from mail-pb0-f48.google.com ([209.85.160.48]:50504 "EHLO
+	mail-pb0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750985AbaCVUfO (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 22 Mar 2014 16:35:14 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SSB0cmllZCB0byByZWR1Y2UgdGhlIHBhdGNoIHRvIHNtYWxsZXN0IHBvc3NpYmxlIHNpemUgd2hp
-Y2ggcmVzdWx0ZWQgaW4gY3VycmVudCBwYXRjaC4gDQoNCkkgZGlkbuKAmXQgZmluZCBhIHdheSB0
-byBjb21wcmVzcyBvciBicmVhayBpdCBmdXJ0aGVyIHRvIGxpbWl0IG9mIHN0YWJsZSB0cmVlIHBh
-dGNoIGV4cGVjdGF0aW9ucy4NCg0KWWFzaA0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZy
-b206IEJlbiBIdXRjaGluZ3MgW21haWx0bzpiZW5AZGVjYWRlbnQub3JnLnVrXSANClNlbnQ6IFNh
-dHVyZGF5LCBNYXJjaCAyMiwgMjAxNCA5OjU0IFBNDQpUbzogRHV0dGEgWWFzaHBhbC1CMDU0NTYN
-CkNjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBHZWFudGEgTmVhZyBIb3JpYSBJb2Fu
-LUIwNTQ3MTsgR2FyZyBWYWt1bC1CMTYzOTQ7IEd1cHRhIFJ1Y2hpa2EtUjY2NDMxOyBzdGFibGVA
-dmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogW1BBVENIIHYzXSBjcnlwdG86IGNhYW0gLSBw
-b3dlciBtYW5hZ2VtZW50IHN1cHBvcnQgZm9yIGNhYW0gam9iLXJpbmcNCg0KT24gRnJpLCAyMDE0
-LTAzLTIxIGF0IDAwOjM1ICswNTQ1LCBZYXNocGFsIER1dHRhIHdyb3RlOg0KPiBKb2IgcmluZyBp
-cyBzdXNwZW5kZWQgZ3JhY2VmdWxseSBhbmQgcmVzdW1lIGFmcmVzaC4NCj4gDQo+IEJvdGggU2xl
-ZXAgKHdoZXJlIGRldmljZSB3aWxsIHJlbWFpbiBwb3dlcmVkLW9uKSBhbmQgRGVlcC1zbGVlcCAo
-d2hlcmUgDQo+IGRldmljZSB3aWxsIGJlIHBvd2VyZWQtZG93biBhcmUgaGFuZGxlZCBncmFjZWZ1
-bGx5LiBQZXJzaXN0YW5jZSANCj4gc2Vzc2lvbnMgYXJlIG5vdCBzdXBwb3J0ZWQgYWNyb3NzIGRl
-ZXAtc2xlZXAuDQo+IA0KPiBDYzogc3RhYmxlQHZnZXIua2VybmVsLm9yZw0KPiBTaWduZWQtb2Zm
-LWJ5OiBZYXNocGFsIER1dHRhIDx5YXNocGFsLmR1dHRhQGZyZWVzY2FsZS5jb20+DQo+IC0tLQ0K
-PiAgZHJpdmVycy9jcnlwdG8vY2FhbS9pbnRlcm4uaCB8ICAgMiArDQo+ICBkcml2ZXJzL2NyeXB0
-by9jYWFtL2pyLmMgICAgIHwgMjU3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0t
-LS0tLS0tLS0NCj4gIDIgZmlsZXMgY2hhbmdlZCwgMTkwIGluc2VydGlvbnMoKyksIDY5IGRlbGV0
-aW9ucygtKQ0KWy4uLl0NCg0KVGhpcyBpcyB0b28gYmlnIGZvciBzdGFibGU7IGlzIGEgc2ltcGxl
-ciBmaXggcG9zc2libGU/DQoNCkJlbi4NCg0KLS0NCkJlbiBIdXRjaGluZ3MNCkknbSBub3QgYSBy
-ZXZlcnNlIHBzeWNob2xvZ2ljYWwgdmlydXMuICBQbGVhc2UgZG9uJ3QgY29weSBtZSBpbnRvIHlv
-dXIgc2lnLg0K
+This patch replaces rcu_assign_pointer(x, NULL) with RCU_INIT_POINTER(x, NULL)
+
+The rcu_assign_pointer() ensures that the initialization of a structure       
+is carried out before storing a pointer to that structure. 
+And in the case of the NULL pointer, there is no structure to initialize. 
+So, rcu_assign_pointer(p, NULL) can be safely converted to RCU_INIT_POINTER(p, NULL)
+
+Signed-off-by: Monam Agarwal <monamagarwal123@gmail.com>
+---
+ drivers/crypto/nx/nx-842.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
+index 1e5481d..c4fcbf4 100644
+--- a/drivers/crypto/nx/nx-842.c
++++ b/drivers/crypto/nx/nx-842.c
+@@ -1234,7 +1234,7 @@ static int __exit nx842_remove(struct vio_dev *viodev)
+ 	old_devdata = rcu_dereference_check(devdata,
+ 			lockdep_is_held(&devdata_mutex));
+ 	of_reconfig_notifier_unregister(&nx842_of_nb);
+-	rcu_assign_pointer(devdata, NULL);
++	RCU_INIT_POINTER(devdata, NULL);
+ 	spin_unlock_irqrestore(&devdata_mutex, flags);
+ 	synchronize_rcu();
+ 	dev_set_drvdata(&viodev->dev, NULL);
+@@ -1285,7 +1285,7 @@ static void __exit nx842_exit(void)
+ 	spin_lock_irqsave(&devdata_mutex, flags);
+ 	old_devdata = rcu_dereference_check(devdata,
+ 			lockdep_is_held(&devdata_mutex));
+-	rcu_assign_pointer(devdata, NULL);
++	RCU_INIT_POINTER(devdata, NULL);
+ 	spin_unlock_irqrestore(&devdata_mutex, flags);
+ 	synchronize_rcu();
+ 	if (old_devdata)
+-- 
+1.7.9.5
