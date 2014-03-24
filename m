@@ -1,96 +1,53 @@
-From: Arend van Spriel <arend@broadcom.com>
-Subject: Re: [PATCH] drivers/crypto: Use RCU_INIT_POINTER(x, NULL) in nx/nx-842.c
-Date: Mon, 24 Mar 2014 13:03:29 +0100
-Message-ID: <53301F11.9030305@broadcom.com>
-References: <1395603064-16537-1-git-send-email-monamagarwal123@gmail.com> <20140324111606.GB19368@hmsreliant.think-freely.org>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH v3] crypto: caam - power management support for caam job-ring
+Date: Mon, 24 Mar 2014 14:33:24 +0200
+Message-ID: <53302614.7040804@freescale.com>
+References: <1395341456-60542-1-git-send-email-yashpal.dutta@freescale.com> <1395505456.2770.70.camel@deadeye.wl.decadent.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: <rcj@linux.vnet.ibm.com>, <mhcerri@linux.vnet.ibm.com>,
-	<fin@linux.vnet.ibm.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-To: Neil Horman <nhorman@tuxdriver.com>,
-	Monam Agarwal <monamagarwal123@gmail.com>
+Cc: Ben Hutchings <ben@decadent.org.uk>,
+	<linux-crypto@vger.kernel.org>, <vakul@freescale.com>,
+	<ruchika.gupta@freescale.com>, <stable@vger.kernel.org>
+To: Yashpal Dutta <yashpal.dutta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-gw1-out.broadcom.com ([216.31.210.62]:2043 "EHLO
-	mail-gw1-out.broadcom.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752985AbaCXMDh (ORCPT
+Received: from ch1ehsobe003.messaging.microsoft.com ([216.32.181.183]:12675
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752754AbaCXMdm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Mar 2014 08:03:37 -0400
-In-Reply-To: <20140324111606.GB19368@hmsreliant.think-freely.org>
+	Mon, 24 Mar 2014 08:33:42 -0400
+In-Reply-To: <1395505456.2770.70.camel@deadeye.wl.decadent.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 24/03/14 12:16, Neil Horman wrote:
-> On Mon, Mar 24, 2014 at 01:01:04AM +0530, Monam Agarwal wrote:
->> This patch replaces rcu_assign_pointer(x, NULL) with RCU_INIT_POINTER(x, NULL)
+On 3/22/2014 6:24 PM, Ben Hutchings wrote:
+> On Fri, 2014-03-21 at 00:35 +0545, Yashpal Dutta wrote:
+>> Job ring is suspended gracefully and resume afresh.
 >>
->> The rcu_assign_pointer() ensures that the initialization of a structure
->> is carried out before storing a pointer to that structure.
->> And in the case of the NULL pointer, there is no structure to initialize.
->> So, rcu_assign_pointer(p, NULL) can be safely converted to RCU_INIT_POINTER(p, NULL)
+>> Both Sleep (where device will remain powered-on) and Deep-sleep (where
+>> device will be powered-down are handled gracefully. Persistance sessions
+>> are not supported across deep-sleep.
 >>
->> Signed-off-by: Monam Agarwal <monamagarwal123@gmail.com>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Yashpal Dutta <yashpal.dutta@freescale.com>
 >> ---
->>   drivers/crypto/nx/nx-842.c |    4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
->> index 1e5481d..c4fcbf4 100644
->> --- a/drivers/crypto/nx/nx-842.c
->> +++ b/drivers/crypto/nx/nx-842.c
->> @@ -1234,7 +1234,7 @@ static int __exit nx842_remove(struct vio_dev *viodev)
->>   	old_devdata = rcu_dereference_check(devdata,
->>   			lockdep_is_held(&devdata_mutex));
->>   	of_reconfig_notifier_unregister(&nx842_of_nb);
->> -	rcu_assign_pointer(devdata, NULL);
->> +	RCU_INIT_POINTER(devdata, NULL);
->>   	spin_unlock_irqrestore(&devdata_mutex, flags);
->>   	synchronize_rcu();
->>   	dev_set_drvdata(&viodev->dev, NULL);
->> @@ -1285,7 +1285,7 @@ static void __exit nx842_exit(void)
->>   	spin_lock_irqsave(&devdata_mutex, flags);
->>   	old_devdata = rcu_dereference_check(devdata,
->>   			lockdep_is_held(&devdata_mutex));
->> -	rcu_assign_pointer(devdata, NULL);
->> +	RCU_INIT_POINTER(devdata, NULL);
->>   	spin_unlock_irqrestore(&devdata_mutex, flags);
->>   	synchronize_rcu();
->>   	if (old_devdata)
+>>   drivers/crypto/caam/intern.h |   2 +
+>>   drivers/crypto/caam/jr.c     | 257 +++++++++++++++++++++++++++++++------------
+>>   2 files changed, 190 insertions(+), 69 deletions(-)
+> [...]
 >
-> This really does't seem right.  rcu_assign_pointer users ACCESS_ONCE to protect
-> against multiple loads that allow for concurrent read/write use with parallel
-> rcu_dereference calls, whereas RCU_INIT_POINTER does not.  It also just doesn't
-> look right.  We've already initalized the pointerin nx842_init, we don't need to
-> re-initalize it here, we need to assign it to NULL.
+> This is too big for stable; is a simpler fix possible?
+>
 
-I was being cautious as well, but Paul gave me an explanation [1]
+Besides size, I'd also question whether this is a bug fix or a feature.
+ From Documentation/stable_kernel_rules.txt:
+  - It must fix a problem that causes a build error (but not for things
+    marked CONFIG_BROKEN), an oops, a hang, data corruption, a real
+    security issue, or some "oh, that's not good" issue.  In short,
+something critical.
 
-Hope it helps you as well ;-)
-
-But I think I also saw a patch that modifies rcu_assign_pointer to 
-handle NULL assignment. Don't recall the thread.
+On top of that - does it apply cleanly && has it been tested with 
+-stable kernels?
 
 Regards,
-Arend
-
-[1] http://mid.gmane.org/20140320150601.GK4405@linux.vnet.ibm.com
-
->
-> Neil
->
->> --
->> 1.7.9.5
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
->
+Horia
