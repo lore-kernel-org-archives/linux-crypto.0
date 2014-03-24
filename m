@@ -1,7 +1,7 @@
 From: Jason Cooper <jason@lakedaemon.net>
-Subject: [PATCH V2 08/21] staging: crypto: skein: use u8, u64 vice uint*_t
-Date: Mon, 24 Mar 2014 01:49:05 +0000
-Message-ID: <8d29e7047b74093ff2270a4613be9bb46d158c0a.1395625123.git.jason@lakedaemon.net>
+Subject: [PATCH V2 13/21] staging: crypto: skein: remove trailing whitespace
+Date: Mon, 24 Mar 2014 01:49:10 +0000
+Message-ID: <f2ef44f292ff3a5e7525f9bb29cb6135eca3d297.1395625123.git.jason@lakedaemon.net>
 References: <cover.1394570067.git.jason@lakedaemon.net>
  <cover.1395625123.git.jason@lakedaemon.net>
 Cc: devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org,
@@ -10,11 +10,11 @@ To: Greg KH <gregkh@linuxfoundation.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:30384 "EHLO
+Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:30432 "EHLO
 	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751405AbaCXBtm (ORCPT
+	with ESMTP id S1751730AbaCXBto (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 23 Mar 2014 21:49:42 -0400
+	Sun, 23 Mar 2014 21:49:44 -0400
 In-Reply-To: <cover.1395625123.git.jason@lakedaemon.net>
 In-Reply-To: <cover.1395625123.git.jason@lakedaemon.net>
 References: <cover.1395625123.git.jason@lakedaemon.net>
@@ -23,433 +23,421 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Jason Cooper <jason@lakedaemon.net>
 ---
- drivers/staging/skein/include/skeinApi.h     |  8 ++++----
- drivers/staging/skein/include/threefishApi.h | 22 +++++++++++-----------
- drivers/staging/skein/skeinApi.c             | 22 +++++++++++-----------
- drivers/staging/skein/threefish1024Block.c   | 18 +++++++++---------
- drivers/staging/skein/threefish256Block.c    | 18 +++++++++---------
- drivers/staging/skein/threefish512Block.c    | 18 +++++++++---------
- drivers/staging/skein/threefishApi.c         | 20 ++++++++++----------
- 7 files changed, 63 insertions(+), 63 deletions(-)
+ drivers/staging/skein/include/skein.h        | 16 +++++-----
+ drivers/staging/skein/include/skeinApi.h     | 44 ++++++++++++++--------------
+ drivers/staging/skein/include/threefishApi.h | 40 ++++++++++++-------------
+ drivers/staging/skein/skeinBlockNo3F.c       |  6 ++--
+ drivers/staging/skein/skein_block.c          | 20 ++++++-------
+ 5 files changed, 63 insertions(+), 63 deletions(-)
 
+diff --git a/drivers/staging/skein/include/skein.h b/drivers/staging/skein/include/skein.h
+index 906bcee41c39..dd9a210cf5dd 100644
+--- a/drivers/staging/skein/include/skein.h
++++ b/drivers/staging/skein/include/skein.h
+@@ -9,7 +9,7 @@
+ ** This algorithm and source code is released to the public domain.
+ **
+ ***************************************************************************
+-** 
++**
+ ** The following compile-time switches may be defined to control some
+ ** tradeoffs between speed, code size, error checking, and security.
+ **
+@@ -20,8 +20,8 @@
+ **                            [default: no callouts (no overhead)]
+ **
+ **  SKEIN_ERR_CHECK        -- how error checking is handled inside Skein
+-**                            code. If not defined, most error checking 
+-**                            is disabled (for performance). Otherwise, 
++**                            code. If not defined, most error checking
++**                            is disabled (for performance). Otherwise,
+ **                            the switch value is interpreted as:
+ **                                0: use assert()      to flag errors
+ **                                1: return SKEIN_FAIL to flag errors
+@@ -109,12 +109,12 @@ int  Skein1024_Final(struct skein1024_ctx *ctx, u8 *hashVal);
+ **   After an InitExt() call, just use Update/Final calls as with Init().
+ **
+ **   Notes: Same parameters as _Init() calls, plus treeInfo/key/keyBytes.
+-**          When keyBytes == 0 and treeInfo == SKEIN_SEQUENTIAL, 
++**          When keyBytes == 0 and treeInfo == SKEIN_SEQUENTIAL,
+ **              the results of InitExt() are identical to calling Init().
+ **          The function Init() may be called once to "precompute" the IV for
+ **              a given hashBitLen value, then by saving a copy of the context
+ **              the IV computation may be avoided in later calls.
+-**          Similarly, the function InitExt() may be called once per MAC key 
++**          Similarly, the function InitExt() may be called once per MAC key
+ **              to precompute the MAC IV, then a copy of the context saved and
+ **              reused for each new MAC computation.
+ **/
+@@ -142,7 +142,7 @@ int  Skein1024_Output(struct skein1024_ctx *ctx, u8 *hashVal);
+ 
+ /*****************************************************************
+ ** "Internal" Skein definitions
+-**    -- not needed for sequential hashing API, but will be 
++**    -- not needed for sequential hashing API, but will be
+ **           helpful for other uses of Skein (e.g., tree hash mode).
+ **    -- included here so that they can be shared between
+ **           reference and optimized code.
+@@ -269,8 +269,8 @@ int  Skein1024_Output(struct skein1024_ctx *ctx, u8 *hashVal);
+ /*****************************************************************
+ ** Skein block function constants (shared across Ref and Opt code)
+ ******************************************************************/
+-enum    
+-	{   
++enum
++	{
+ 	    /* Skein_256 round rotation constants */
+ 	R_256_0_0 = 14, R_256_0_1 = 16,
+ 	R_256_1_0 = 52, R_256_1_1 = 57,
 diff --git a/drivers/staging/skein/include/skeinApi.h b/drivers/staging/skein/include/skeinApi.h
-index 548c639431de..4ad294f7945d 100755
+index 0d7d59eff460..ace931a67c23 100644
 --- a/drivers/staging/skein/include/skeinApi.h
 +++ b/drivers/staging/skein/include/skeinApi.h
-@@ -173,7 +173,7 @@ OTHER DEALINGS IN THE SOFTWARE.
-      * @return
-      *     SKEIN_SUCESS of SKEIN_FAIL
-      */
--    int skeinMacInit(struct skein_ctx* ctx, const uint8_t *key, size_t keyLen,
-+    int skeinMacInit(struct skein_ctx* ctx, const u8 *key, size_t keyLen,
-                      size_t hashBitLen);
+@@ -36,46 +36,46 @@ OTHER DEALINGS IN THE SOFTWARE.
+  * of Skein. The design and the way to use the functions follow the openSSL
+  * design but at the same time take care of some Skein specific behaviour
+  * and possibilities.
+- * 
++ *
+  * The functions enable applications to create a normal Skein hashes and
+  * message authentication codes (MAC).
+- * 
++ *
+  * Using these functions is simple and straight forward:
+- * 
++ *
+  * @code
+- * 
++ *
+  * #include <skeinApi.h>
+- * 
++ *
+  * ...
+  * struct skein_ctx ctx;             // a Skein hash or MAC context
+- * 
++ *
+  * // prepare context, here for a Skein with a state size of 512 bits.
+  * skeinCtxPrepare(&ctx, Skein512);
+- * 
++ *
+  * // Initialize the context to set the requested hash length in bits
+  * // here request a output hash size of 31 bits (Skein supports variable
+  * // output sizes even very strange sizes)
+  * skeinInit(&ctx, 31);
+- * 
++ *
+  * // Now update Skein with any number of message bits. A function that
+  * // takes a number of bytes is also available.
+  * skeinUpdateBits(&ctx, message, msgLength);
+- * 
++ *
+  * // Now get the result of the Skein hash. The output buffer must be
+  * // large enough to hold the request number of output bits. The application
+  * // may now extract the bits.
+  * skeinFinal(&ctx, result);
+  * ...
+  * @endcode
+- * 
++ *
+  * An application may use @c skeinReset to reset a Skein context and use
+  * it for creation of another hash with the same Skein state size and output
+  * bit length. In this case the API implementation restores some internal
+  * internal state data and saves a full Skein initialization round.
+- * 
+- * To create a MAC the application just uses @c skeinMacInit instead of 
++ *
++ * To create a MAC the application just uses @c skeinMacInit instead of
+  * @c skeinInit. All other functions calls remain the same.
+- * 
++ *
+  */
  
-     /**
-@@ -188,7 +188,7 @@ OTHER DEALINGS IN THE SOFTWARE.
-      * @return
-      *     Success or error code.
-      */
--    int skeinUpdate(struct skein_ctx *ctx, const uint8_t *msg,
-+    int skeinUpdate(struct skein_ctx *ctx, const u8 *msg,
-                     size_t msgByteCnt);
- 
-     /**
-@@ -204,7 +204,7 @@ OTHER DEALINGS IN THE SOFTWARE.
-      * @param msgBitCnt
-      *     Length of the message in @b bits.
-      */
--    int skeinUpdateBits(struct skein_ctx *ctx, const uint8_t *msg,
-+    int skeinUpdateBits(struct skein_ctx *ctx, const u8 *msg,
-                         size_t msgBitCnt);
- 
-     /**
-@@ -222,7 +222,7 @@ OTHER DEALINGS IN THE SOFTWARE.
-      *     Success or error code.
-      * @see skeinReset
-      */
--    int skeinFinal(struct skein_ctx* ctx, uint8_t* hash);
-+    int skeinFinal(struct skein_ctx* ctx, u8* hash);
+ #include <linux/types.h>
+@@ -111,7 +111,7 @@ struct skein_ctx {
  
  /**
-  * @}
+  * Prepare a Skein context.
+- * 
++ *
+  * An application must call this function before it can use the Skein
+  * context. The functions clears memory and initializes size dependent
+  * variables.
+@@ -128,7 +128,7 @@ int skeinCtxPrepare(struct skein_ctx *ctx, enum skein_size size);
+ /**
+  * Initialize a Skein context.
+  *
+- * Initializes the context with this data and saves the resulting Skein 
++ * Initializes the context with this data and saves the resulting Skein
+  * state variables for further use.
+  *
+  * @param ctx
+@@ -143,11 +143,11 @@ int skeinInit(struct skein_ctx *ctx, size_t hashBitLen);
+ 
+ /**
+  * Resets a Skein context for further use.
+- * 
+- * Restores the saved chaining variables to reset the Skein context. 
+- * Thus applications can reuse the same setup to  process several 
++ *
++ * Restores the saved chaining variables to reset the Skein context.
++ * Thus applications can reuse the same setup to  process several
+  * messages. This saves a complete Skein initialization cycle.
+- * 
++ *
+  * @param ctx
+  *     Pointer to a pre-initialized Skein MAC context
+  */
+@@ -155,8 +155,8 @@ void skeinReset(struct skein_ctx *ctx);
+ 
+ /**
+  * Initializes a Skein context for MAC usage.
+- * 
+- * Initializes the context with this data and saves the resulting Skein 
++ *
++ * Initializes the context with this data and saves the resulting Skein
+  * state variables for further use.
+  *
+  * Applications call the normal Skein functions to update the MAC and
+@@ -209,7 +209,7 @@ int skeinUpdateBits(struct skein_ctx *ctx, const u8 *msg,
+ 
+ /**
+  * Finalize Skein and return the hash.
+- * 
++ *
+  * Before an application can reuse a Skein setup the application must
+  * reset the Skein context.
+  *
 diff --git a/drivers/staging/skein/include/threefishApi.h b/drivers/staging/skein/include/threefishApi.h
-index 4c1cd81f30c4..194e313b6b62 100644
+index 199257e37813..5d92bbff8c9f 100644
 --- a/drivers/staging/skein/include/threefishApi.h
 +++ b/drivers/staging/skein/include/threefishApi.h
-@@ -72,7 +72,7 @@
-      * @param tweak
-      *     Pointer to the two tweak words (word has 64 bits).
-      */
--    void threefishSetKey(struct threefish_key* keyCtx, enum threefish_size stateSize, uint64_t* keyData, uint64_t* tweak);
-+    void threefishSetKey(struct threefish_key* keyCtx, enum threefish_size stateSize, u64* keyData, u64* tweak);
-     
-     /**
-      * Encrypt Threefisch block (bytes).
-@@ -89,7 +89,7 @@
-      * @param out
-      *     Pointer to cipher buffer.
-      */
--    void threefishEncryptBlockBytes(struct threefish_key* keyCtx, uint8_t* in, uint8_t* out);
-+    void threefishEncryptBlockBytes(struct threefish_key* keyCtx, u8* in, u8* out);
-     
-     /**
-      * Encrypt Threefisch block (words).
-@@ -108,7 +108,7 @@
-      * @param out
-      *     Pointer to cipher buffer.
-      */
--    void threefishEncryptBlockWords(struct threefish_key* keyCtx, uint64_t* in, uint64_t* out);
-+    void threefishEncryptBlockWords(struct threefish_key* keyCtx, u64* in, u64* out);
+@@ -8,14 +8,14 @@
+  * @{
+  *
+  * This API and the functions that implement this API simplify the usage
+- * of the Threefish cipher. The design and the way to use the functions 
++ * of the Threefish cipher. The design and the way to use the functions
+  * follow the openSSL design but at the same time take care of some Threefish
+  * specific behaviour and possibilities.
+  *
+  * These are the low level functions that deal with Threefisch blocks only.
+- * Implementations for cipher modes such as ECB, CFB, or CBC may use these 
++ * Implementations for cipher modes such as ECB, CFB, or CBC may use these
+  * functions.
+- * 
++ *
+ @code
+     // Threefish cipher context data
+     struct threefish_key keyCtx;
+@@ -44,7 +44,7 @@ enum threefish_size {
  
-     /**
-      * Decrypt Threefisch block (bytes).
-@@ -125,7 +125,7 @@
-      * @param out
-      *     Pointer to plaintext buffer.
-      */
--    void threefishDecryptBlockBytes(struct threefish_key* keyCtx, uint8_t* in, uint8_t* out);
-+    void threefishDecryptBlockBytes(struct threefish_key* keyCtx, u8* in, u8* out);
- 
-     /**
-      * Decrypt Threefisch block (words).
-@@ -144,14 +144,14 @@
-      * @param out
-      *     Pointer to plaintext buffer.
-      */
--    void threefishDecryptBlockWords(struct threefish_key* keyCtx, uint64_t* in, uint64_t* out);
-+    void threefishDecryptBlockWords(struct threefish_key* keyCtx, u64* in, u64* out);
- 
--    void threefishEncrypt256(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output);
--    void threefishEncrypt512(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output);
--    void threefishEncrypt1024(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output);
--    void threefishDecrypt256(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output);
--    void threefishDecrypt512(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output);
--    void threefishDecrypt1024(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output);
-+    void threefishEncrypt256(struct threefish_key* keyCtx, u64* input, u64* output);
-+    void threefishEncrypt512(struct threefish_key* keyCtx, u64* input, u64* output);
-+    void threefishEncrypt1024(struct threefish_key* keyCtx, u64* input, u64* output);
-+    void threefishDecrypt256(struct threefish_key* keyCtx, u64* input, u64* output);
-+    void threefishDecrypt512(struct threefish_key* keyCtx, u64* input, u64* output);
-+    void threefishDecrypt1024(struct threefish_key* keyCtx, u64* input, u64* output);
  /**
-  * @}
-  */
-diff --git a/drivers/staging/skein/skeinApi.c b/drivers/staging/skein/skeinApi.c
-index ce5c5ae575e7..6bd2da0eaa5f 100755
---- a/drivers/staging/skein/skeinApi.c
-+++ b/drivers/staging/skein/skeinApi.c
-@@ -42,7 +42,7 @@ int skeinInit(struct skein_ctx* ctx, size_t hashBitLen)
-     int ret = SKEIN_FAIL;
-     size_t Xlen = 0;
-     u64*  X = NULL;
--    uint64_t treeInfo = SKEIN_CFG_TREE_INFO_SEQUENTIAL;
-+    u64 treeInfo = SKEIN_CFG_TREE_INFO_SEQUENTIAL;
+  * Context for Threefish key and tweak words.
+- * 
++ *
+  * This structure was setup with some know-how of the internal
+  * Skein structures, in particular ordering of header and size dependent
+  * variables. If Skein implementation changes this, the adapt these
+@@ -58,10 +58,10 @@ struct threefish_key {
  
-     Skein_Assert(ctx, SKEIN_FAIL);
-     /*
-@@ -78,13 +78,13 @@ int skeinInit(struct skein_ctx* ctx, size_t hashBitLen)
-     return ret;
- }
+ /**
+  * Set Threefish key and tweak data.
+- * 
++ *
+  * This function sets the key and tweak data for the Threefish cipher of
+  * the given size. The key data must have the same length (number of bits)
+- * as the state size 
++ * as the state size
+  *
+  * @param keyCtx
+  *     Pointer to a Threefish key structure.
+@@ -76,12 +76,12 @@ void threefishSetKey(struct threefish_key *keyCtx, enum threefish_size stateSize
  
--int skeinMacInit(struct skein_ctx* ctx, const uint8_t *key, size_t keyLen,
-+int skeinMacInit(struct skein_ctx* ctx, const u8 *key, size_t keyLen,
-                  size_t hashBitLen)
- {
-     int ret = SKEIN_FAIL;
-     u64*  X = NULL;
-     size_t Xlen = 0;
--    uint64_t treeInfo = SKEIN_CFG_TREE_INFO_SEQUENTIAL;
-+    u64 treeInfo = SKEIN_CFG_TREE_INFO_SEQUENTIAL;
+ /**
+  * Encrypt Threefisch block (bytes).
+- * 
+- * The buffer must have at least the same length (number of bits) aas the 
++ *
++ * The buffer must have at least the same length (number of bits) aas the
+  * state size for this key. The function uses the first @c stateSize bits
+  * of the input buffer, encrypts them and stores the result in the output
+  * buffer.
+- * 
++ *
+  * @param keyCtx
+  *     Pointer to a Threefish key structure.
+  * @param in
+@@ -93,14 +93,14 @@ void threefishEncryptBlockBytes(struct threefish_key *keyCtx, u8 *in, u8 *out);
  
-     Skein_Assert(ctx, SKEIN_FAIL);
+ /**
+  * Encrypt Threefisch block (words).
+- * 
+- * The buffer must have at least the same length (number of bits) aas the 
++ *
++ * The buffer must have at least the same length (number of bits) aas the
+  * state size for this key. The function uses the first @c stateSize bits
+  * of the input buffer, encrypts them and stores the result in the output
+  * buffer.
+- * 
++ *
+  * The wordsize ist set to 64 bits.
+- * 
++ *
+  * @param keyCtx
+  *     Pointer to a Threefish key structure.
+  * @param in
+@@ -112,12 +112,12 @@ void threefishEncryptBlockWords(struct threefish_key *keyCtx, u64 *in, u64 *out)
  
-@@ -138,7 +138,7 @@ void skeinReset(struct skein_ctx* ctx)
-     Skein_Start_New_Type(&ctx->m, MSG);
- }
+ /**
+  * Decrypt Threefisch block (bytes).
+- * 
+- * The buffer must have at least the same length (number of bits) aas the 
++ *
++ * The buffer must have at least the same length (number of bits) aas the
+  * state size for this key. The function uses the first @c stateSize bits
+  * of the input buffer, decrypts them and stores the result in the output
+  * buffer
+- * 
++ *
+  * @param keyCtx
+  *     Pointer to a Threefish key structure.
+  * @param in
+@@ -129,14 +129,14 @@ void threefishDecryptBlockBytes(struct threefish_key *keyCtx, u8 *in, u8 *out);
  
--int skeinUpdate(struct skein_ctx *ctx, const uint8_t *msg,
-+int skeinUpdate(struct skein_ctx *ctx, const u8 *msg,
-                 size_t msgByteCnt)
- {
-     int ret = SKEIN_FAIL;
-@@ -159,7 +159,7 @@ int skeinUpdate(struct skein_ctx *ctx, const uint8_t *msg,
+ /**
+  * Decrypt Threefisch block (words).
+- * 
+- * The buffer must have at least the same length (number of bits) aas the 
++ *
++ * The buffer must have at least the same length (number of bits) aas the
+  * state size for this key. The function uses the first @c stateSize bits
+  * of the input buffer, encrypts them and stores the result in the output
+  * buffer.
+- * 
++ *
+  * The wordsize ist set to 64 bits.
+- * 
++ *
+  * @param keyCtx
+  *     Pointer to a Threefish key structure.
+  * @param in
+diff --git a/drivers/staging/skein/skeinBlockNo3F.c b/drivers/staging/skein/skeinBlockNo3F.c
+index 3c2878c966e1..376cd63d8f83 100644
+--- a/drivers/staging/skein/skeinBlockNo3F.c
++++ b/drivers/staging/skein/skeinBlockNo3F.c
+@@ -29,7 +29,7 @@ void Skein_256_Process_Block(struct skein_256_ctx *ctx, const u8 *blkPtr,
+ 			carry += words[i];
+ 			words[i] = carry;
+ 			carry >>= 32;
+-		}        
++		}
+ 		tweak[0] = words[0] & 0xffffffffL;
+ 		tweak[0] |= (words[1] & 0xffffffffL) << 32;
+ 		tweak[1] |= words[2] & 0xffffffffL;
+@@ -79,7 +79,7 @@ void Skein_512_Process_Block(struct skein_512_ctx *ctx, const u8 *blkPtr,
+ 			carry += words[i];
+ 			words[i] = carry;
+ 			carry >>= 32;
+-		}        
++		}
+ 		tweak[0] = words[0] & 0xffffffffL;
+ 		tweak[0] |= (words[1] & 0xffffffffL) << 32;
+ 		tweak[1] |= words[2] & 0xffffffffL;
+@@ -133,7 +133,7 @@ void Skein1024_Process_Block(struct skein1024_ctx *ctx, const u8 *blkPtr,
+ 			carry += words[i];
+ 			words[i] = carry;
+ 			carry >>= 32;
+-		}        
++		}
+ 		tweak[0] = words[0] & 0xffffffffL;
+ 		tweak[0] |= (words[1] & 0xffffffffL) << 32;
+ 		tweak[1] |= words[2] & 0xffffffffL;
+diff --git a/drivers/staging/skein/skein_block.c b/drivers/staging/skein/skein_block.c
+index bb36860fafdf..d315f547feae 100644
+--- a/drivers/staging/skein/skein_block.c
++++ b/drivers/staging/skein/skein_block.c
+@@ -28,7 +28,7 @@
+ #define BLK_BITS        (WCNT*64)               /* some useful definitions for code here */
+ #define KW_TWK_BASE     (0)
+ #define KW_KEY_BASE     (3)
+-#define ks              (kw + KW_KEY_BASE)                
++#define ks              (kw + KW_KEY_BASE)
+ #define ts              (kw + KW_TWK_BASE)
  
- }
+ #ifdef SKEIN_DEBUG
+@@ -76,7 +76,7 @@ void Skein_256_Process_Block(struct skein_256_ctx *ctx, const u8 *blkPtr, size_t
+ 		ts[0] += byteCntAdd;                    /* update processed length */
  
--int skeinUpdateBits(struct skein_ctx *ctx, const uint8_t *msg,
-+int skeinUpdateBits(struct skein_ctx *ctx, const u8 *msg,
-                     size_t msgBitCnt)
- {
-     /*
-@@ -168,8 +168,8 @@ int skeinUpdateBits(struct skein_ctx *ctx, const uint8_t *msg,
-      * arithmetic.
-      */
-     size_t length;
--    uint8_t mask;
--    uint8_t* up;
-+    u8 mask;
-+    u8* up;
+ 		/* precompute the key schedule for this block */
+-		ks[0] = ctx->X[0];     
++		ks[0] = ctx->X[0];
+ 		ks[1] = ctx->X[1];
+ 		ks[2] = ctx->X[2];
+ 		ks[3] = ctx->X[3];
+@@ -103,7 +103,7 @@ void Skein_256_Process_Block(struct skein_256_ctx *ctx, const u8 *blkPtr, size_t
+ 	X##p0 += X##p1; X##p1 = RotL_64(X##p1, ROT##_0); X##p1 ^= X##p0; \
+ 	X##p2 += X##p3; X##p3 = RotL_64(X##p3, ROT##_1); X##p3 ^= X##p2; \
  
-     /* only the final Update() call is allowed do partial bytes, else assert an error */
-     Skein_Assert((ctx->m.h.T[1] & SKEIN_T1_FLAG_BIT_PAD) == 0 || msgBitCnt == 0, SKEIN_FAIL);
-@@ -186,20 +186,20 @@ int skeinUpdateBits(struct skein_ctx *ctx, const uint8_t *msg,
-      * Skein's real partial block buffer.
-      * If this layout ever changes we have to adapt this as well.
-      */
--    up = (uint8_t*)ctx->m.s256.X + ctx->skeinSize / 8;
-+    up = (u8*)ctx->m.s256.X + ctx->skeinSize / 8;
+-#if SKEIN_UNROLL_256 == 0                       
++#if SKEIN_UNROLL_256 == 0
+ #define R256(p0, p1, p2, p3, ROT, rNum)           /* fully unrolled */   \
+ 	Round256(p0, p1, p2, p3, ROT, rNum)                                  \
+ 	Skein_Show_R_Ptr(BLK_BITS, &ctx->h, rNum, Xptr);
+@@ -129,8 +129,8 @@ void Skein_256_Process_Block(struct skein_256_ctx *ctx, const u8 *blkPtr, size_t
+ 	Skein_Show_R_Ptr(BLK_BITS, &ctx->h, SKEIN_RND_KEY_INJECT, Xptr);
  
-     Skein_Set_Bit_Pad_Flag(ctx->m.h);                       /* set tweak flag for the skeinFinal call */
+ 	for (r = 1; r < 2 * RCNT; r += 2 * SKEIN_UNROLL_256)  /* loop thru it */
+-#endif  
+-		{    
++#endif
++		{
+ #define R256_8_rounds(R)                  \
+ 		R256(0, 1, 2, 3, R_256_0, 8 * (R) + 1);  \
+ 		R256(0, 3, 2, 1, R_256_1, 8 * (R) + 2);  \
+@@ -270,7 +270,7 @@ void Skein_512_Process_Block(struct skein_512_ctx *ctx, const u8 *blkPtr, size_t
+ 		ks[5] = ctx->X[5];
+ 		ks[6] = ctx->X[6];
+ 		ks[7] = ctx->X[7];
+-		ks[8] = ks[0] ^ ks[1] ^ ks[2] ^ ks[3] ^ 
++		ks[8] = ks[0] ^ ks[1] ^ ks[2] ^ ks[3] ^
+ 			ks[4] ^ ks[5] ^ ks[6] ^ ks[7] ^ SKEIN_KS_PARITY;
  
-     /* now "pad" the final partial byte the way NIST likes */
-     length = ctx->m.h.bCnt;                                 /* get the bCnt value (same location for all block sizes) */
-     Skein_assert(length != 0);                              /* internal sanity check: there IS a partial byte in the buffer! */
--    mask = (uint8_t) (1u << (7 - (msgBitCnt & 7)));         /* partial byte bit mask */
--    up[length-1]  = (uint8_t)((up[length-1] & (0-mask))|mask);   /* apply bit padding on final byte (in the buffer) */
-+    mask = (u8) (1u << (7 - (msgBitCnt & 7)));         /* partial byte bit mask */
-+    up[length-1]  = (u8)((up[length-1] & (0-mask))|mask);   /* apply bit padding on final byte (in the buffer) */
+ 		ts[2] = ts[0] ^ ts[1];
+@@ -298,7 +298,7 @@ void Skein_512_Process_Block(struct skein_512_ctx *ctx, const u8 *blkPtr, size_t
+ 		X##p4 += X##p5; X##p5 = RotL_64(X##p5, ROT##_2); X##p5 ^= X##p4; \
+ 		X##p6 += X##p7; X##p7 = RotL_64(X##p7, ROT##_3); X##p7 ^= X##p6; \
  
-     return SKEIN_SUCCESS;
- }
+-#if SKEIN_UNROLL_512 == 0                       
++#if SKEIN_UNROLL_512 == 0
+ #define R512(p0, p1, p2, p3, p4, p5, p6, p7, ROT, rNum)      /* unrolled */  \
+ 		Round512(p0, p1, p2, p3, p4, p5, p6, p7, ROT, rNum)                      \
+ 		Skein_Show_R_Ptr(BLK_BITS, &ctx->h, rNum, Xptr);
+@@ -529,7 +529,7 @@ void Skein1024_Process_Block(struct skein1024_ctx *ctx, const u8 *blkPtr, size_t
+ 		X##pC += X##pD; X##pD = RotL_64(X##pD, ROT##_6); X##pD ^= X##pC;   \
+ 		X##pE += X##pF; X##pF = RotL_64(X##pF, ROT##_7); X##pF ^= X##pE;   \
  
--int skeinFinal(struct skein_ctx* ctx, uint8_t* hash)
-+int skeinFinal(struct skein_ctx* ctx, u8* hash)
- {
-     int ret = SKEIN_FAIL;
-     Skein_Assert(ctx, SKEIN_FAIL);
-diff --git a/drivers/staging/skein/threefish1024Block.c b/drivers/staging/skein/threefish1024Block.c
-index 738ec523406b..9e821fcdb067 100644
---- a/drivers/staging/skein/threefish1024Block.c
-+++ b/drivers/staging/skein/threefish1024Block.c
-@@ -2,10 +2,10 @@
- #include <threefishApi.h>
+-#if SKEIN_UNROLL_1024 == 0                      
++#if SKEIN_UNROLL_1024 == 0
+ #define R1024(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, pA, pB, pC, pD, pE, pF, ROT, rn) \
+ 		Round1024(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, pA, pB, pC, pD, pE, pF, ROT, rn) \
+ 		Skein_Show_R_Ptr(BLK_BITS, &ctx->h, rn, Xptr);
+@@ -551,7 +551,7 @@ void Skein1024_Process_Block(struct skein1024_ctx *ctx, const u8 *blkPtr, size_t
+ 		X13   += ks[((R) + 14) % 17] + ts[((R) + 1) % 3];                   \
+ 		X14   += ks[((R) + 15) % 17] + ts[((R) + 2) % 3];                   \
+ 		X15   += ks[((R) + 16) % 17] +     (R) + 1;                         \
+-		Skein_Show_R_Ptr(BLK_BITS, &ctx->h, SKEIN_RND_KEY_INJECT, Xptr); 
++		Skein_Show_R_Ptr(BLK_BITS, &ctx->h, SKEIN_RND_KEY_INJECT, Xptr);
+ #else                                       /* looping version */
+ #define R1024(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, pA, pB, pC, pD, pE, pF, ROT, rn) \
+ 		Round1024(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, pA, pB, pC, pD, pE, pF, ROT, rn) \
+@@ -579,7 +579,7 @@ void Skein1024_Process_Block(struct skein1024_ctx *ctx, const u8 *blkPtr, size_t
+ 		Skein_Show_R_Ptr(BLK_BITSi, &ctx->h, SKEIN_RND_KEY_INJECT, Xptr);
  
- 
--void threefishEncrypt1024(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output)
-+void threefishEncrypt1024(struct threefish_key* keyCtx, u64* input, u64* output)
-         {
- 
--    uint64_t b0 = input[0], b1 = input[1],
-+    u64 b0 = input[0], b1 = input[1],
-       b2 = input[2], b3 = input[3],
-       b4 = input[4], b5 = input[5],
-       b6 = input[6], b7 = input[7],
-@@ -13,7 +13,7 @@ void threefishEncrypt1024(struct threefish_key* keyCtx, uint64_t* input, uint64_
-       b10 = input[10], b11 = input[11],
-       b12 = input[12], b13 = input[13],
-       b14 = input[14], b15 = input[15];
--    uint64_t k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-+    u64 k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-       k2 = keyCtx->key[2], k3 = keyCtx->key[3],
-       k4 = keyCtx->key[4], k5 = keyCtx->key[5],
-       k6 = keyCtx->key[6], k7 = keyCtx->key[7],
-@@ -22,7 +22,7 @@ void threefishEncrypt1024(struct threefish_key* keyCtx, uint64_t* input, uint64_
-       k12 = keyCtx->key[12], k13 = keyCtx->key[13],
-       k14 = keyCtx->key[14], k15 = keyCtx->key[15],
-       k16 = keyCtx->key[16];
--    uint64_t t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-+    u64 t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-       t2 = keyCtx->tweak[2];
- 
-             b1 += k1; b0 += b1 + k0; b1 = ((b1 << 24) | (b1 >> (64 - 24))) ^ b0;
-@@ -684,10 +684,10 @@ void threefishEncrypt1024(struct threefish_key* keyCtx, uint64_t* input, uint64_
-             output[15] = b15 + k1 + 20;
-         }
- 
--void threefishDecrypt1024(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output)
-+void threefishDecrypt1024(struct threefish_key* keyCtx, u64* input, u64* output)
- {
- 
--    uint64_t b0 = input[0], b1 = input[1],
-+    u64 b0 = input[0], b1 = input[1],
-       b2 = input[2], b3 = input[3],
-       b4 = input[4], b5 = input[5],
-       b6 = input[6], b7 = input[7],
-@@ -695,7 +695,7 @@ void threefishDecrypt1024(struct threefish_key* keyCtx, uint64_t* input, uint64_
-       b10 = input[10], b11 = input[11],
-       b12 = input[12], b13 = input[13],
-       b14 = input[14], b15 = input[15];
--    uint64_t k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-+    u64 k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-       k2 = keyCtx->key[2], k3 = keyCtx->key[3],
-       k4 = keyCtx->key[4], k5 = keyCtx->key[5],
-       k6 = keyCtx->key[6], k7 = keyCtx->key[7],
-@@ -704,9 +704,9 @@ void threefishDecrypt1024(struct threefish_key* keyCtx, uint64_t* input, uint64_
-       k12 = keyCtx->key[12], k13 = keyCtx->key[13],
-       k14 = keyCtx->key[14], k15 = keyCtx->key[15],
-       k16 = keyCtx->key[16];
--    uint64_t t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-+    u64 t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-       t2 = keyCtx->tweak[2];
--    uint64_t tmp;
-+    u64 tmp;
- 
-             b0 -= k3;
-             b1 -= k4;
-diff --git a/drivers/staging/skein/threefish256Block.c b/drivers/staging/skein/threefish256Block.c
-index b81cb3a65b04..68ac4c50f01e 100644
---- a/drivers/staging/skein/threefish256Block.c
-+++ b/drivers/staging/skein/threefish256Block.c
-@@ -2,15 +2,15 @@
- #include <threefishApi.h>
- 
- 
--void threefishEncrypt256(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output)
-+void threefishEncrypt256(struct threefish_key* keyCtx, u64* input, u64* output)
-   {
- 
--    uint64_t b0 = input[0], b1 = input[1],
-+    u64 b0 = input[0], b1 = input[1],
-       b2 = input[2], b3 = input[3];
--    uint64_t k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-+    u64 k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-       k2 = keyCtx->key[2], k3 = keyCtx->key[3],
-       k4 = keyCtx->key[4];
--    uint64_t t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-+    u64 t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-       t2 = keyCtx->tweak[2];
- 
-     b1 += k1 + t0; b0 += b1 + k0; b1 = ((b1 << 14) | (b1 >> (64 - 14))) ^ b0;
-@@ -172,17 +172,17 @@ void threefishEncrypt256(struct threefish_key* keyCtx, uint64_t* input, uint64_t
-     output[3] = b3 + k1 + 18;
-   }
- 
--void threefishDecrypt256(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output)
-+void threefishDecrypt256(struct threefish_key* keyCtx, u64* input, u64* output)
-   {
--    uint64_t b0 = input[0], b1 = input[1],
-+    u64 b0 = input[0], b1 = input[1],
-       b2 = input[2], b3 = input[3];
--    uint64_t k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-+    u64 k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-       k2 = keyCtx->key[2], k3 = keyCtx->key[3],
-       k4 = keyCtx->key[4];
--    uint64_t t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-+    u64 t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-       t2 = keyCtx->tweak[2];
- 
--    uint64_t tmp;
-+    u64 tmp;
- 
-     b0 -= k3;
-     b1 -= k4 + t0;
-diff --git a/drivers/staging/skein/threefish512Block.c b/drivers/staging/skein/threefish512Block.c
-index 7eed6aeb3742..e94bb93722df 100644
---- a/drivers/staging/skein/threefish512Block.c
-+++ b/drivers/staging/skein/threefish512Block.c
-@@ -2,19 +2,19 @@
- #include <threefishApi.h>
- 
- 
--void threefishEncrypt512(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output)
-+void threefishEncrypt512(struct threefish_key* keyCtx, u64* input, u64* output)
-     {
- 
--    uint64_t b0 = input[0], b1 = input[1],
-+    u64 b0 = input[0], b1 = input[1],
-       b2 = input[2], b3 = input[3],
-       b4 = input[4], b5 = input[5],
-       b6 = input[6], b7 = input[7];
--    uint64_t k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-+    u64 k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-       k2 = keyCtx->key[2], k3 = keyCtx->key[3],
-       k4 = keyCtx->key[4], k5 = keyCtx->key[5],
-       k6 = keyCtx->key[6], k7 = keyCtx->key[7],
-       k8 = keyCtx->key[8];
--    uint64_t t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-+    u64 t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-       t2 = keyCtx->tweak[2];
- 
-         b1 += k1; b0 += b1 + k0; b1 = ((b1 << 46) | (b1 >> (64 - 46))) ^ b0;
-@@ -316,22 +316,22 @@ void threefishEncrypt512(struct threefish_key* keyCtx, uint64_t* input, uint64_t
-         output[7] = b7 + k7 + 18;
-     }
- 
--void threefishDecrypt512(struct threefish_key* keyCtx, uint64_t* input, uint64_t* output)
-+void threefishDecrypt512(struct threefish_key* keyCtx, u64* input, u64* output)
-     {
- 
--    uint64_t b0 = input[0], b1 = input[1],
-+    u64 b0 = input[0], b1 = input[1],
-       b2 = input[2], b3 = input[3],
-       b4 = input[4], b5 = input[5],
-       b6 = input[6], b7 = input[7];
--    uint64_t k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-+    u64 k0 = keyCtx->key[0], k1 = keyCtx->key[1],
-       k2 = keyCtx->key[2], k3 = keyCtx->key[3],
-       k4 = keyCtx->key[4], k5 = keyCtx->key[5],
-       k6 = keyCtx->key[6], k7 = keyCtx->key[7],
-       k8 = keyCtx->key[8];
--    uint64_t t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-+    u64 t0 = keyCtx->tweak[0], t1 = keyCtx->tweak[1],
-       t2 = keyCtx->tweak[2];
- 
--      uint64_t tmp;
-+      u64 tmp;
- 
-         b0 -= k0;
-         b1 -= k1;
-diff --git a/drivers/staging/skein/threefishApi.c b/drivers/staging/skein/threefishApi.c
-index 5cd3eb9bd9f2..37f96215159d 100644
---- a/drivers/staging/skein/threefishApi.c
-+++ b/drivers/staging/skein/threefishApi.c
-@@ -4,11 +4,11 @@
- #include <threefishApi.h>
- 
- void threefishSetKey(struct threefish_key* keyCtx, enum threefish_size stateSize,
--                     uint64_t* keyData, uint64_t* tweak)
-+                     u64* keyData, u64* tweak)
- {
-     int keyWords = stateSize / 64;
-     int i;
--    uint64_t parity = KeyScheduleConst;
-+    u64 parity = KeyScheduleConst;
- 
-     keyCtx->tweak[0] = tweak[0];
-     keyCtx->tweak[1] = tweak[1];
-@@ -22,8 +22,8 @@ void threefishSetKey(struct threefish_key* keyCtx, enum threefish_size stateSize
-     keyCtx->stateSize = stateSize;
- }
- 
--void threefishEncryptBlockBytes(struct threefish_key* keyCtx, uint8_t* in,
--                                uint8_t* out)
-+void threefishEncryptBlockBytes(struct threefish_key* keyCtx, u8* in,
-+                                u8* out)
- {
-     u64 plain[SKEIN_MAX_STATE_WORDS];        /* max number of words*/
-     u64 cipher[SKEIN_MAX_STATE_WORDS];
-@@ -33,8 +33,8 @@ void threefishEncryptBlockBytes(struct threefish_key* keyCtx, uint8_t* in,
-     Skein_Put64_LSB_First(out, cipher, keyCtx->stateSize / 8);  /* words to bytes */
- }
- 
--void threefishEncryptBlockWords(struct threefish_key* keyCtx, uint64_t* in,
--                                uint64_t* out)
-+void threefishEncryptBlockWords(struct threefish_key* keyCtx, u64* in,
-+                                u64* out)
- {
-     switch (keyCtx->stateSize) {
-         case Threefish256:
-@@ -49,8 +49,8 @@ void threefishEncryptBlockWords(struct threefish_key* keyCtx, uint64_t* in,
-     }
- }
- 
--void threefishDecryptBlockBytes(struct threefish_key* keyCtx, uint8_t* in,
--                                uint8_t* out)
-+void threefishDecryptBlockBytes(struct threefish_key* keyCtx, u8* in,
-+                                u8* out)
- {
-     u64 plain[SKEIN_MAX_STATE_WORDS];        /* max number of words*/
-     u64 cipher[SKEIN_MAX_STATE_WORDS];
-@@ -60,8 +60,8 @@ void threefishDecryptBlockBytes(struct threefish_key* keyCtx, uint8_t* in,
-     Skein_Put64_LSB_First(out, plain, keyCtx->stateSize / 8);   /* words to bytes */
- }
- 
--void threefishDecryptBlockWords(struct threefish_key* keyCtx, uint64_t* in,
--                                uint64_t* out)
-+void threefishDecryptBlockWords(struct threefish_key* keyCtx, u64* in,
-+                                u64* out)
- {
-     switch (keyCtx->stateSize) {
-         case Threefish256:
+ 		for (r = 1; r <= 2 * RCNT; r += 2 * SKEIN_UNROLL_1024)    /* loop thru it */
+-#endif  
++#endif
+ 		{
+ #define R1024_8_rounds(R)    /* do 8 full rounds */                               \
+ 			R1024(00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, R1024_0, 8*(R) + 1); \
 -- 
 1.9.1
