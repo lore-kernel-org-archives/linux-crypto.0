@@ -1,49 +1,39 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH 3/3] crypto: x86/sha1 - reduce size of the AVX2 asm implementation
-Date: Mon, 24 Mar 2014 17:10:39 +0100
-Message-ID: <1395677439-7478-4-git-send-email-minipli@googlemail.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH 0/3] crypto: x86/sha1 - regression and other fixes
+Date: Mon, 24 Mar 2014 10:04:57 -0700
+Message-ID: <533065B9.8000106@zytor.com>
 References: <1395677439-7478-1-git-send-email-minipli@googlemail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Cc: linux-crypto@vger.kernel.org,
-	Mathias Krause <minipli@googlemail.com>,
 	Chandramouli Narayanan <mouli@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Marek Vasut <marex@denx.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Marek Vasut <marex@denx.de>
+To: Mathias Krause <minipli@googlemail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bk0-f49.google.com ([209.85.214.49]:64826 "EHLO
-	mail-bk0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753418AbaCXQKv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Mar 2014 12:10:51 -0400
-Received: by mail-bk0-f49.google.com with SMTP id my13so566251bkb.36
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Mar 2014 09:10:50 -0700 (PDT)
+Received: from terminus.zytor.com ([198.137.202.10]:45630 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752638AbaCXRFW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 24 Mar 2014 13:05:22 -0400
 In-Reply-To: <1395677439-7478-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-There is really no need to page align sha1_transform_avx2. The default
-alignment is just fine. This is not the hot code but only the entry
-point, after all.
+On 03/24/2014 09:10 AM, Mathias Krause wrote:
+> The recent addition of the AVX2 variant of the SHA1 hash function wrongly
+> disabled the AVX variant by introducing a flaw in the feature test. Fixed
+> in patch 1.
+> 
+> The alignment calculations of the AVX2 assembler implementation are
+> questionable, too. Especially the page alignment of the stack pointer is
+> broken in multiple ways. Fixed in patch 2. In patch 3 another issue for
+> code alignment is fixed.
+> 
+> Please apply!
+> 
 
-Cc: Chandramouli Narayanan <mouli@linux.intel.com>
-Cc: H. Peter Anvin <hpa@zytor.com>
-Cc: Marek Vasut <marex@denx.de>
-Signed-off-by: Mathias Krause <minipli@googlemail.com>
----
- arch/x86/crypto/sha1_avx2_x86_64_asm.S |    1 -
- 1 file changed, 1 deletion(-)
+Yikes.  Yes... the alignment calculation is confused in the extreme.
 
-diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-index bacac22b20..1cd792db15 100644
---- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-+++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
-@@ -623,7 +623,6 @@ _loop3:
-  */
- .macro SHA1_VECTOR_ASM  name
- 	ENTRY(\name)
--	.align 4096
- 
- 	push	%rbx
- 	push	%rbp
--- 
-1.7.10.4
+	-hpa
