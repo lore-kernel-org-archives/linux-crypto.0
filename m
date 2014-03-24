@@ -1,26 +1,27 @@
-From: chandramouli narayanan <mouli@linux.intel.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
 Subject: Re: [PATCH 0/3] crypto: x86/sha1 - regression and other fixes
-Date: Mon, 24 Mar 2014 10:29:33 -0700
-Message-ID: <1395682173.2367.66.camel@pegasus.jf.intel.com>
+Date: Mon, 24 Mar 2014 10:31:30 -0700
+Message-ID: <53306BF2.7030000@zytor.com>
 References: <1395677439-7478-1-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+Cc: linux-crypto@vger.kernel.org,
+	Chandramouli Narayanan <mouli@linux.intel.com>,
 	Marek Vasut <marex@denx.de>
-To: Mathias Krause <minipli@googlemail.com>
+To: Mathias Krause <minipli@googlemail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:34978 "EHLO mga09.intel.com"
+Received: from terminus.zytor.com ([198.137.202.10]:45879 "EHLO mail.zytor.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752675AbaCXR2s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Mar 2014 13:28:48 -0400
+	id S1752200AbaCXRbu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 24 Mar 2014 13:31:50 -0400
 In-Reply-To: <1395677439-7478-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2014-03-24 at 17:10 +0100, Mathias Krause wrote:
+On 03/24/2014 09:10 AM, Mathias Krause wrote:
 > The recent addition of the AVX2 variant of the SHA1 hash function wrongly
 > disabled the AVX variant by introducing a flaw in the feature test. Fixed
 > in patch 1.
@@ -41,10 +42,11 @@ On Mon, 2014-03-24 at 17:10 +0100, Mathias Krause wrote:
 >  arch/x86/crypto/sha1_ssse3_glue.c      |   26 ++++++++++++++++----------
 >  2 files changed, 18 insertions(+), 16 deletions(-)
 > 
-Your fixes are the right on mark. I went through your patches and tested
-them and found to be correct.
 
-Sorry for causing regression and missing alignment issues in the patches
-I submitted.
+For all these patches:
 
-- mouli
+Reviewed-by: H. Peter Anvin <hpa@linux.intel.com>
+
+Thank you for doing these.
+
+	-hpa
