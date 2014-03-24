@@ -1,7 +1,7 @@
 From: Jason Cooper <jason@lakedaemon.net>
-Subject: [PATCH V2 19/21] staging: crypto: skein: remove braces from single-statement block
-Date: Mon, 24 Mar 2014 01:49:16 +0000
-Message-ID: <68994e9fb0a986c61899e2d2d0385e465a8f3bde.1395625123.git.jason@lakedaemon.net>
+Subject: [PATCH V2 18/21] staging: crypto: skein: remove externs from .c files
+Date: Mon, 24 Mar 2014 01:49:15 +0000
+Message-ID: <8360f0f1d402ca0ec7c909b57d2599701fc29c89.1395625123.git.jason@lakedaemon.net>
 References: <cover.1394570067.git.jason@lakedaemon.net>
  <cover.1395625123.git.jason@lakedaemon.net>
 Cc: devel@driverdev.osuosl.org, linux-crypto@vger.kernel.org,
@@ -10,9 +10,9 @@ To: Greg KH <gregkh@linuxfoundation.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:30558 "EHLO
+Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:30544 "EHLO
 	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751809AbaCXBtr (ORCPT
+	with ESMTP id S1751221AbaCXBtr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Sun, 23 Mar 2014 21:49:47 -0400
 In-Reply-To: <cover.1395625123.git.jason@lakedaemon.net>
@@ -23,24 +23,59 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 Signed-off-by: Jason Cooper <jason@lakedaemon.net>
 ---
- drivers/staging/skein/skeinApi.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/staging/skein/include/skein_block.h | 22 ++++++++++++++++++++++
+ drivers/staging/skein/skein.c               | 10 +---------
+ 2 files changed, 23 insertions(+), 9 deletions(-)
+ create mode 100644 drivers/staging/skein/include/skein_block.h
 
-diff --git a/drivers/staging/skein/skeinApi.c b/drivers/staging/skein/skeinApi.c
-index f0015d5b10f5..dd109bf6f7b9 100644
---- a/drivers/staging/skein/skeinApi.c
-+++ b/drivers/staging/skein/skeinApi.c
-@@ -188,9 +188,9 @@ int skeinUpdateBits(struct skein_ctx *ctx, const u8 *msg,
- 			msgBitCnt == 0, SKEIN_FAIL);
- 
- 	/* if number of bits is a multiple of bytes - that's easy */
--	if ((msgBitCnt & 0x7) == 0) {
-+	if ((msgBitCnt & 0x7) == 0)
- 		return skeinUpdate(ctx, msg, msgBitCnt >> 3);
--	}
+diff --git a/drivers/staging/skein/include/skein_block.h b/drivers/staging/skein/include/skein_block.h
+new file mode 100644
+index 000000000000..b15c079b5bd4
+--- /dev/null
++++ b/drivers/staging/skein/include/skein_block.h
+@@ -0,0 +1,22 @@
++/***********************************************************************
++**
++** Implementation of the Skein hash function.
++**
++** Source code author: Doug Whiting, 2008.
++**
++** This algorithm and source code is released to the public domain.
++**
++************************************************************************/
++#ifndef _SKEIN_BLOCK_H_
++#define _SKEIN_BLOCK_H_
 +
- 	skeinUpdate(ctx, msg, (msgBitCnt >> 3) + 1);
++#include <skein.h> /* get the Skein API definitions   */
++
++void Skein_256_Process_Block(struct skein_256_ctx *ctx, const u8 *blkPtr,
++				size_t blkCnt, size_t byteCntAdd);
++void Skein_512_Process_Block(struct skein_512_ctx *ctx, const u8 *blkPtr,
++				size_t blkCnt, size_t byteCntAdd);
++void Skein1024_Process_Block(struct skein1024_ctx *ctx, const u8 *blkPtr,
++				size_t blkCnt, size_t byteCntAdd);
++
++#endif
+diff --git a/drivers/staging/skein/skein.c b/drivers/staging/skein/skein.c
+index 0d8c70c02c6f..096b86bf9430 100644
+--- a/drivers/staging/skein/skein.c
++++ b/drivers/staging/skein/skein.c
+@@ -13,15 +13,7 @@
+ #include <linux/string.h>       /* get the memcpy/memset functions */
+ #include <skein.h> /* get the Skein API definitions   */
+ #include <skein_iv.h>    /* get precomputed IVs */
+-
+-/*****************************************************************/
+-/* External function to process blkCnt (nonzero) full block(s) of data. */
+-void Skein_256_Process_Block(struct skein_256_ctx *ctx, const u8 *blkPtr,
+-				size_t blkCnt, size_t byteCntAdd);
+-void Skein_512_Process_Block(struct skein_512_ctx *ctx, const u8 *blkPtr,
+-				size_t blkCnt, size_t byteCntAdd);
+-void Skein1024_Process_Block(struct skein1024_ctx *ctx, const u8 *blkPtr,
+-				size_t blkCnt, size_t byteCntAdd);
++#include <skein_block.h>
  
- 	/*
+ /*****************************************************************/
+ /*     256-bit Skein                                             */
 -- 
 1.9.1
