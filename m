@@ -1,47 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] crypto: x86/sha1 - regression and other fixes
-Date: Tue, 25 Mar 2014 20:44:28 +0800
-Message-ID: <20140325124428.GA23877@gondor.apana.org.au>
-References: <1395677439-7478-1-git-send-email-minipli@googlemail.com>
- <201403242119.44692.marex@denx.de>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH] Fix late crypto work queue initialization
+Date: Tue, 25 Mar 2014 16:40:56 -0700
+Message-ID: <1395790856.2970.33.camel@schen9-DESK>
+References: <1395100347.2970.14.camel@schen9-DESK>
+	 <20140321144040.GD25820@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Mathias Krause <minipli@googlemail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>
-To: Marek Vasut <marex@denx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:38039 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751539AbaCYMoo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Mar 2014 08:44:44 -0400
-Content-Disposition: inline
-In-Reply-To: <201403242119.44692.marex@denx.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	"Huang, Ying" <ying.huang@intel.com>, stable@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20140321144040.GD25820@gondor.apana.org.au>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Mar 24, 2014 at 09:19:44PM +0100, Marek Vasut wrote:
-> On Monday, March 24, 2014 at 05:10:36 PM, Mathias Krause wrote:
-> > The recent addition of the AVX2 variant of the SHA1 hash function wrongly
-> > disabled the AVX variant by introducing a flaw in the feature test. Fixed
-> > in patch 1.
+On Fri, 2014-03-21 at 22:40 +0800, Herbert Xu wrote:
+> On Mon, Mar 17, 2014 at 04:52:26PM -0700, Tim Chen wrote:
+> > The crypto algorithm modules utilizing the crypto daemon could
+> > be used early when the system start up.  Using module_init
+> > does not guarantee that the daemon's work queue is initialized
+> > when the cypto alorithm depending on crypto_wq starts.  It is necessary
+> > to initialize the crypto work queue earlier at the subsystem
+> > init time to make sure that it is initialized
+> > when used.
 > > 
-> > The alignment calculations of the AVX2 assembler implementation are
-> > questionable, too. Especially the page alignment of the stack pointer is
-> > broken in multiple ways. Fixed in patch 2. In patch 3 another issue for
-> > code alignment is fixed.
-> > 
-> > Please apply!
+> > Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 > 
-> Nice,
-> 
-> Reviewed-by: Marek Vasut <marex@denx.de>
+> Patch applied.
 
-All applied.  Thanks Mathias!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Herbert,
+
+Probably this patch should go to the stable patches as well.
+Copying Greg.
+
+Thanks.
+
+Tim
