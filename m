@@ -1,111 +1,47 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] x86/crypto: ghash: use C implementation for setkey()
-Date: Thu, 27 Mar 2014 12:29:00 +0100
-Message-ID: <1395919740-20774-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	x86@kernel.org, mingo@redhat.com, hpa@zytor.com
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] x86/crypto: ghash: use C implementation for setkey()
+Date: Thu, 27 Mar 2014 19:36:10 +0800
+Message-ID: <20140327113610.GA8402@gondor.apana.org.au>
+References: <1395919740-20774-1-git-send-email-ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org, mingo@redhat.com,
+	hpa@zytor.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f177.google.com ([74.125.82.177]:62795 "EHLO
-	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751519AbaC0L2l (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:38025 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754856AbaC0LgS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Mar 2014 07:28:41 -0400
-Received: by mail-we0-f177.google.com with SMTP id u57so1687407wes.36
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Mar 2014 04:28:40 -0700 (PDT)
+	Thu, 27 Mar 2014 07:36:18 -0400
+Content-Disposition: inline
+In-Reply-To: <1395919740-20774-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The GHASH setkey() function uses SSE registers but fails to call
-kernel_fpu_begin()/kernel_fpu_end(). Instead of adding these calls, and
-then having to deal with the restriction that they cannot be called from
-interrupt context, move the setkey() implementation to the C domain.
+On Thu, Mar 27, 2014 at 12:29:00PM +0100, Ard Biesheuvel wrote:
+> The GHASH setkey() function uses SSE registers but fails to call
+> kernel_fpu_begin()/kernel_fpu_end(). Instead of adding these calls, and
+> then having to deal with the restriction that they cannot be called from
+> interrupt context, move the setkey() implementation to the C domain.
 
-Note that setkey() does not use any particular SSE features and is not
-expected to become a performance bottleneck.
+Note that setkey cannot be called from interrupt context since
+allocation/setkey is supposed to be slow-path material.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
+But your approach is fine by me.
 
-I suppose this should be marked for stable as well?
+> Note that setkey() does not use any particular SSE features and is not
+> expected to become a performance bottleneck.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+> 
+> I suppose this should be marked for stable as well?
 
+Sure I'll add the cc.
 
- arch/x86/crypto/ghash-clmulni-intel_asm.S  | 29 -----------------------------
- arch/x86/crypto/ghash-clmulni-intel_glue.c | 12 +++++++++++-
- 2 files changed, 11 insertions(+), 30 deletions(-)
-
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-index 586f41aac361..185fad49d86f 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
-+++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-@@ -24,10 +24,6 @@
- .align 16
- .Lbswap_mask:
- 	.octa 0x000102030405060708090a0b0c0d0e0f
--.Lpoly:
--	.octa 0xc2000000000000000000000000000001
--.Ltwo_one:
--	.octa 0x00000001000000000000000000000001
- 
- #define DATA	%xmm0
- #define SHASH	%xmm1
-@@ -134,28 +130,3 @@ ENTRY(clmul_ghash_update)
- .Lupdate_just_ret:
- 	ret
- ENDPROC(clmul_ghash_update)
--
--/*
-- * void clmul_ghash_setkey(be128 *shash, const u8 *key);
-- *
-- * Calculate hash_key << 1 mod poly
-- */
--ENTRY(clmul_ghash_setkey)
--	movaps .Lbswap_mask, BSWAP
--	movups (%rsi), %xmm0
--	PSHUFB_XMM BSWAP %xmm0
--	movaps %xmm0, %xmm1
--	psllq $1, %xmm0
--	psrlq $63, %xmm1
--	movaps %xmm1, %xmm2
--	pslldq $8, %xmm1
--	psrldq $8, %xmm2
--	por %xmm1, %xmm0
--	# reduction
--	pshufd $0b00100100, %xmm2, %xmm1
--	pcmpeqd .Ltwo_one, %xmm1
--	pand .Lpoly, %xmm1
--	pxor %xmm1, %xmm0
--	movups %xmm0, (%rdi)
--	ret
--ENDPROC(clmul_ghash_setkey)
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-index 6759dd1135be..3945d8095e80 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-+++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-@@ -58,13 +58,23 @@ static int ghash_setkey(struct crypto_shash *tfm,
- 			const u8 *key, unsigned int keylen)
- {
- 	struct ghash_ctx *ctx = crypto_shash_ctx(tfm);
-+	be128 *x = (be128 *)key;
-+	u64 a, b;
- 
- 	if (keylen != GHASH_BLOCK_SIZE) {
- 		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
- 		return -EINVAL;
- 	}
- 
--	clmul_ghash_setkey(&ctx->shash, key);
-+	/* perform multiplication by 'x' in GF(2^128) */
-+	a = be64_to_cpu(x->a);
-+	b = be64_to_cpu(x->b);
-+
-+	ctx->shash.a = (__be64)((b << 1) ^ (a >> 63));
-+	ctx->shash.b = (__be64)((a << 1) | (b >> 63));
-+
-+	if (a >> 63)
-+		ctx->shash.b ^= cpu_to_be64(0xc2);
- 
- 	return 0;
- }
+Thanks,
 -- 
-1.8.3.2
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
