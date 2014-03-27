@@ -1,47 +1,123 @@
-From: "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH] x86/crypto: ghash: use C implementation for setkey()
-Date: Thu, 27 Mar 2014 09:43:22 -0700
-Message-ID: <5334552A.1020203@zytor.com>
-References: <1395919740-20774-1-git-send-email-ard.biesheuvel@linaro.org>	<20140327113610.GA8402@gondor.apana.org.au> <CAKv+Gu8jgerfVGTLfu2+eNXnsbBGCzdd3jH+oTbBOr=Tm2sjPQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"x86@kernel.org" <x86@kernel.org>,
-	"mingo@redhat.com" <mingo@redhat.com>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v2] x86/crypto: ghash: use C implementation for setkey()
+Date: Thu, 27 Mar 2014 18:14:40 +0100
+Message-ID: <1395940480-3827-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	x86@kernel.org, hpa@zytor.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:56858 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752124AbaC0Qnr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 27 Mar 2014 12:43:47 -0400
-In-Reply-To: <CAKv+Gu8jgerfVGTLfu2+eNXnsbBGCzdd3jH+oTbBOr=Tm2sjPQ@mail.gmail.com>
+Received: from mail-we0-f176.google.com ([74.125.82.176]:39095 "EHLO
+	mail-we0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756045AbaC0ROV (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 27 Mar 2014 13:14:21 -0400
+Received: by mail-we0-f176.google.com with SMTP id x48so2019005wes.35
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Mar 2014 10:14:20 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/27/2014 04:46 AM, Ard Biesheuvel wrote:
-> On 27 March 2014 12:36, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->> On Thu, Mar 27, 2014 at 12:29:00PM +0100, Ard Biesheuvel wrote:
->>> The GHASH setkey() function uses SSE registers but fails to call
->>> kernel_fpu_begin()/kernel_fpu_end(). Instead of adding these calls, and
->>> then having to deal with the restriction that they cannot be called from
->>> interrupt context, move the setkey() implementation to the C domain.
->>
->> Note that setkey cannot be called from interrupt context since
->> allocation/setkey is supposed to be slow-path material.
->>
->> But your approach is fine by me.
-> 
-> I agree that it makes little sense to call this from atomic context,
-> but that still means (I think, but the x86 guys should confirm) that
-> you are supposed to call kernel_fpu_begin() and kernel_fpu_end().
-> 
+The GHASH setkey() function uses SSE registers but fails to call
+kernel_fpu_begin()/kernel_fpu_end(). Instead of adding these calls, and
+then having to deal with the restriction that they cannot be called from
+interrupt context, move the setkey() implementation to the C domain.
 
-Yes.  I'm suspecting calling kernel_fpu_begin() for a single GF
-operation is probably not worth it, so I'm fine with reimplementing it
-in integer logic.
+Note that setkey() does not use any particular SSE features and is not
+expected to become a performance bottleneck.
 
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Acked-by: H. Peter Anvin <hpa@linux.intel.com>
+Fixes: 0e1227d356e9b (crypto: ghash - Add PCLMULQDQ accelerated implementation)
+---
 
-	-hpa
+Changes since v1:
+- added hpa's ack and 'fixes' line for cc stable annotation
+- removed clmul_ghash_setkey() forward declaration
+
+ arch/x86/crypto/ghash-clmulni-intel_asm.S  | 29 -----------------------------
+ arch/x86/crypto/ghash-clmulni-intel_glue.c | 14 +++++++++++---
+ 2 files changed, 11 insertions(+), 32 deletions(-)
+
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+index 586f41aac361..185fad49d86f 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
++++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+@@ -24,10 +24,6 @@
+ .align 16
+ .Lbswap_mask:
+ 	.octa 0x000102030405060708090a0b0c0d0e0f
+-.Lpoly:
+-	.octa 0xc2000000000000000000000000000001
+-.Ltwo_one:
+-	.octa 0x00000001000000000000000000000001
+ 
+ #define DATA	%xmm0
+ #define SHASH	%xmm1
+@@ -134,28 +130,3 @@ ENTRY(clmul_ghash_update)
+ .Lupdate_just_ret:
+ 	ret
+ ENDPROC(clmul_ghash_update)
+-
+-/*
+- * void clmul_ghash_setkey(be128 *shash, const u8 *key);
+- *
+- * Calculate hash_key << 1 mod poly
+- */
+-ENTRY(clmul_ghash_setkey)
+-	movaps .Lbswap_mask, BSWAP
+-	movups (%rsi), %xmm0
+-	PSHUFB_XMM BSWAP %xmm0
+-	movaps %xmm0, %xmm1
+-	psllq $1, %xmm0
+-	psrlq $63, %xmm1
+-	movaps %xmm1, %xmm2
+-	pslldq $8, %xmm1
+-	psrldq $8, %xmm2
+-	por %xmm1, %xmm0
+-	# reduction
+-	pshufd $0b00100100, %xmm2, %xmm1
+-	pcmpeqd .Ltwo_one, %xmm1
+-	pand .Lpoly, %xmm1
+-	pxor %xmm1, %xmm0
+-	movups %xmm0, (%rdi)
+-	ret
+-ENDPROC(clmul_ghash_setkey)
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+index 6759dd1135be..d785cf2c529c 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
++++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+@@ -30,8 +30,6 @@ void clmul_ghash_mul(char *dst, const be128 *shash);
+ void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
+ 			const be128 *shash);
+ 
+-void clmul_ghash_setkey(be128 *shash, const u8 *key);
+-
+ struct ghash_async_ctx {
+ 	struct cryptd_ahash *cryptd_tfm;
+ };
+@@ -58,13 +56,23 @@ static int ghash_setkey(struct crypto_shash *tfm,
+ 			const u8 *key, unsigned int keylen)
+ {
+ 	struct ghash_ctx *ctx = crypto_shash_ctx(tfm);
++	be128 *x = (be128 *)key;
++	u64 a, b;
+ 
+ 	if (keylen != GHASH_BLOCK_SIZE) {
+ 		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 		return -EINVAL;
+ 	}
+ 
+-	clmul_ghash_setkey(&ctx->shash, key);
++	/* perform multiplication by 'x' in GF(2^128) */
++	a = be64_to_cpu(x->a);
++	b = be64_to_cpu(x->b);
++
++	ctx->shash.a = (__be64)((b << 1) | (a >> 63));
++	ctx->shash.b = (__be64)((a << 1) | (b >> 63));
++
++	if (a >> 63)
++		ctx->shash.b ^= cpu_to_be64(0xc2);
+ 
+ 	return 0;
+ }
+-- 
+1.8.3.2
