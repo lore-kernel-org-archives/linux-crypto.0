@@ -1,30 +1,38 @@
-From: Jari Ruusu <jariruusu@users.sourceforge.net>
-Subject: Announce loop-AES-v3.7b file/swap crypto package
-Date: Tue, 01 Apr 2014 08:18:26 +0300
-Message-ID: <533A4C22.1285779C@users.sourceforge.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] x86/crypto: ghash: use C implementation for setkey()
+Date: Tue, 1 Apr 2014 17:23:28 +0800
+Message-ID: <20140401092327.GA12328@gondor.apana.org.au>
+References: <1395940480-3827-1-git-send-email-ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org, hpa@zytor.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailq1.tnnet.fi ([217.112.240.127]:35765 "EHLO mailq1.tnnet.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751057AbaDAF0Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Apr 2014 01:26:16 -0400
+Received: from ringil.hengli.com.au ([178.18.16.133]:34559 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751089AbaDAJXe (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Apr 2014 05:23:34 -0400
+Content-Disposition: inline
+In-Reply-To: <1395940480-3827-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-loop-AES changes since previous release:
-- Worked around block layer interface changes on 3.14 kernels.
+On Thu, Mar 27, 2014 at 06:14:40PM +0100, Ard Biesheuvel wrote:
+> The GHASH setkey() function uses SSE registers but fails to call
+> kernel_fpu_begin()/kernel_fpu_end(). Instead of adding these calls, and
+> then having to deal with the restriction that they cannot be called from
+> interrupt context, move the setkey() implementation to the C domain.
+> 
+> Note that setkey() does not use any particular SSE features and is not
+> expected to become a performance bottleneck.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Acked-by: H. Peter Anvin <hpa@linux.intel.com>
+> Fixes: 0e1227d356e9b (crypto: ghash - Add PCLMULQDQ accelerated implementation)
 
-bzip2 compressed tarball is here:
-
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7b.tar.bz2
-    md5sum 204572f246eddd08705f88189dd3b44d
-
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7b.tar.bz2.sign
-
-I have new release signing key. New key is signed with the old key.
-
+Patch applied.  Thanks!
 -- 
-Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
