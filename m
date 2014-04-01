@@ -1,54 +1,109 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [crypto:master 60/60]
- arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to restricted
- __be64
-Date: Tue, 1 Apr 2014 20:48:24 +0800
-Message-ID: <20140401124824.GA13642@gondor.apana.org.au>
-References: <533aa1ae.qq4Hi3RBnPzgncue%fengguang.wu@intel.com>
- <CAKv+Gu_unwqLWWn-VDegy=vF=rprC5qFhazo_sJFNm738MVgaQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	kbuild test robot <fengguang.wu@intel.com>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] crypto: add test cases for SHA-1, SHA-224 and SHA-256
+Date: Tue,  1 Apr 2014 18:18:21 +0200
+Message-ID: <1396369101-2302-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:53016 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751190AbaDAMs2 (ORCPT
+Received: from mail-we0-f175.google.com ([74.125.82.175]:35330 "EHLO
+	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752470AbaDAQSf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Apr 2014 08:48:28 -0400
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_unwqLWWn-VDegy=vF=rprC5qFhazo_sJFNm738MVgaQ@mail.gmail.com>
+	Tue, 1 Apr 2014 12:18:35 -0400
+Received: by mail-we0-f175.google.com with SMTP id q58so6598126wes.34
+        for <linux-crypto@vger.kernel.org>; Tue, 01 Apr 2014 09:18:34 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 01, 2014 at 02:37:20PM +0200, Ard Biesheuvel wrote:
-> On 1 April 2014 13:23, kbuild test robot <fengguang.wu@intel.com> wrote:
-> > tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-> > head:   8ceee72808d1ae3fb191284afc2257a2be964725
-> > commit: 8ceee72808d1ae3fb191284afc2257a2be964725 [60/60] crypto: ghash-clmulni-intel - use C implementation for setkey()
-> > reproduce: make C=1 CF=-D__CHECK_ENDIAN__
-> >
-> >
-> > sparse warnings: (new ones prefixed by >>)
-> >
-> >>> arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to restricted __be64
-> >>> arch/x86/crypto/ghash-clmulni-intel_glue.c:72:25: sparse: cast to restricted __be64
-> >
-> 
-> Sigh.
-> 
-> The sparse warnings /without/ the be64 casts are even worse.
-> 
-> The obvious fix is not to use a be128 for the key, as it is obviously
-> an opaque type that just represents a byte array.
-> So, Herbert, if you prefer, I can rework this patch to use be128
-> instead of u128 inside struct ghash_ctx, but it will have some fallout
-> throughout the file. Or instead, we cast to '__force __be64',
-> basically just telling sparse to shut up ...
+This adds a test case for each of SHA-1, SHA-224 and SHA-256 with a plaintext
+size of 64 bytes, which is exactly the block size. The reason is that some
+implementations may use a different code path for inputs that are an exact
+multiple of the block size.
+---
 
-I'll add the __force to shut it up.  Thanks!
+Just some trivial test vectors I have been using locally for my work on arm64,
+but may be useful to send upstream. If not, that's also fine.
+
+Regards,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ard.
+
+
+
+ crypto/testmgr.h | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 7d44aa3d6b44..af00e3abd7f5 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -487,7 +487,7 @@ static struct hash_testvec crct10dif_tv_template[] = {
+  * SHA1 test vectors  from from FIPS PUB 180-1
+  * Long vector from CAVS 5.0
+  */
+-#define SHA1_TEST_VECTORS	3
++#define SHA1_TEST_VECTORS	4
+ 
+ static struct hash_testvec sha1_tv_template[] = {
+ 	{
+@@ -529,6 +529,11 @@ static struct hash_testvec sha1_tv_template[] = {
+ 			  "\x45\x9c\x02\xb6\x9b\x4a\xa8\xf5\x82\x17",
+ 		.np	= 4,
+ 		.tap	= { 63, 64, 31, 5 }
++	}, {
++		.plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-",
++		.psize	= 64,
++		.digest = "\xc8\x71\xf6\x9a\x63\xcc\xa9\x84\x84\x82"
++			  "\x64\xe7\x79\x95\x5d\xd7\x19\x41\x7c\x91",
+ 	}
+ };
+ 
+@@ -536,7 +541,7 @@ static struct hash_testvec sha1_tv_template[] = {
+ /*
+  * SHA224 test vectors from from FIPS PUB 180-2
+  */
+-#define SHA224_TEST_VECTORS     2
++#define SHA224_TEST_VECTORS     3
+ 
+ static struct hash_testvec sha224_tv_template[] = {
+ 	{
+@@ -556,13 +561,20 @@ static struct hash_testvec sha224_tv_template[] = {
+ 			  "\x52\x52\x25\x25",
+ 		.np     = 2,
+ 		.tap    = { 28, 28 }
++	}, {
++		.plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-",
++		.psize	= 64,
++		.digest = "\xc4\xdb\x2b\x3a\x58\xc3\x99\x01"
++			  "\x42\xfd\x10\x92\xaa\x4e\x04\x08"
++			  "\x58\xbb\xbb\xe8\xf8\x14\xa7\x0c"
++			  "\xef\x3b\xcb\x0e",
+ 	}
+ };
+ 
+ /*
+  * SHA256 test vectors from from NIST
+  */
+-#define SHA256_TEST_VECTORS	2
++#define SHA256_TEST_VECTORS	3
+ 
+ static struct hash_testvec sha256_tv_template[] = {
+ 	{
+@@ -581,7 +593,14 @@ static struct hash_testvec sha256_tv_template[] = {
+ 			  "\xf6\xec\xed\xd4\x19\xdb\x06\xc1",
+ 		.np	= 2,
+ 		.tap	= { 28, 28 }
+-	},
++	}, {
++		.plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-",
++		.psize	= 64,
++		.digest = "\xb5\xfe\xad\x56\x7d\xff\xcb\xa4"
++			  "\x2c\x32\x29\x32\x19\xbb\xfb\xfa"
++			  "\xd6\xff\x94\xa3\x72\x91\x85\x66"
++			  "\x3b\xa7\x87\x77\x58\xa3\x40\x3a",
++	}
+ };
+ 
+ /*
+-- 
+1.8.3.2
