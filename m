@@ -1,45 +1,30 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: Does talitos driver support mpc8272 ?
-Date: Mon, 31 Mar 2014 17:50:11 -0500
-Message-ID: <20140331175011.a199ed5e6d06067ac06b034e@freescale.com>
-References: <CAKwbz4wM3U3AW7LewUEOurSwRAt99h-Z6jeZKQhJ+UK_amE0cg@mail.gmail.com>
-	<CAKwbz4zGyd7xAYEVKRnbZLzF+eQjF-AYf1PCk-FoUaywJaRaUQ@mail.gmail.com>
-	<CAKwbz4yoMH3WVuoLBy09YwmSsqgjATNaUnbtRt25ZDQhm98xmA@mail.gmail.com>
-	<CAKwbz4ztGYPkwU5DGKKz3UTFuwDwsPatdT7fJaYiWR7Fqg+TbQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Announce loop-AES-v3.7b file/swap crypto package
+Date: Tue, 01 Apr 2014 08:18:26 +0300
+Message-ID: <533A4C22.1285779C@users.sourceforge.net>
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>
-To: christophe leroy <chleroy2@gmail.com>
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from tx2ehsobe005.messaging.microsoft.com ([65.55.88.15]:32112 "EHLO
-	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750977AbaCaWzM (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 31 Mar 2014 18:55:12 -0400
-In-Reply-To: <CAKwbz4ztGYPkwU5DGKKz3UTFuwDwsPatdT7fJaYiWR7Fqg+TbQ@mail.gmail.com>
+Received: from mailq1.tnnet.fi ([217.112.240.127]:35765 "EHLO mailq1.tnnet.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751057AbaDAF0Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Apr 2014 01:26:16 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, 29 Mar 2014 17:07:43 +0000
-christophe leroy <chleroy2@gmail.com> wrote:
+loop-AES changes since previous release:
+- Worked around block layer interface changes on 3.14 kernels.
 
-> Hi
-> Does the talitos driver support mpc 8272 or does any other driver do ?
+bzip2 compressed tarball is here:
 
-none upstream that I know of.
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7b.tar.bz2
+    md5sum 204572f246eddd08705f88189dd3b44d
 
-> i see that CONFIG_CRYPTO_DEV_TALITOS is not set in mpc8272ads config, and
-> mpc8272ads dts does includeba compatible for fsl,sec1.0 while talitos
-> driver match is fsl,sec2.0
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7b.tar.bz2.sign
 
-my (dated) understanding was that talitos would need to be ported to
-the SEC1, that e.g., uses a different ring buffer mechanism vs.
-SEC2's Fetch FIFOs.
+I have new release signing key. New key is signed with the old key.
 
-drivers/crypto/mxs-dcp.c and esp. the later drivers/crypto/sahara.c
-share some bits; although since they're in i.MX parts, it's likely
-the number of differences from a networking part like the 8272 is
-higher than that of talitos.
-
-Kim
+-- 
+Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
