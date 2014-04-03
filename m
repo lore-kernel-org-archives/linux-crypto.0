@@ -1,33 +1,45 @@
-From: Josh Cartwright <joshc@codeaurora.org>
+From: Courtney Cavin <courtney.cavin@sonymobile.com>
 Subject: Re: [PATCH 3/9] crypto: qce: Add dma and sg helpers
-Date: Thu, 3 Apr 2014 13:25:21 -0500
-Message-ID: <20140403182520.GH28265@joshc.qualcomm.com>
+Date: Thu, 3 Apr 2014 16:15:26 -0700
+Message-ID: <20140403231525.GE17066@sonymobile.com>
 References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com>
  <1396541886-10966-4-git-send-email-svarbanov@mm-sol.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>
 To: Stanimir Varbanov <svarbanov@mm-sol.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.11.231]:40367 "EHLO
-	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752907AbaDCS2t (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Apr 2014 14:28:49 -0400
+Return-path: <linux-arm-msm-owner@vger.kernel.org>
 Content-Disposition: inline
 In-Reply-To: <1396541886-10966-4-git-send-email-svarbanov@mm-sol.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-arm-msm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Nitworthy comments :).
+On Thu, Apr 03, 2014 at 06:18:00PM +0200, Stanimir Varbanov wrote:
+> This adds dmaengine and sg-list helper functions used by
+> other parts of the crypto driver.
+> 
+> Signed-off-by: Stanimir Varbanov <svarbanov@mm-sol.com>
+> ---
+>  drivers/crypto/qce/dma.c | 201 +++++++++++++++++++++++++++++++++++++++++++++++
+>  drivers/crypto/qce/dma.h |  57 ++++++++++++++
+>  2 files changed, 258 insertions(+)
+>  create mode 100644 drivers/crypto/qce/dma.c
+>  create mode 100644 drivers/crypto/qce/dma.h
 
-On Thu, Apr 03, 2014 at 07:18:00PM +0300, Stanimir Varbanov wrote:
-[..]
+More nitpicking, because everyone loves that....
+
+> 
+> diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
+> new file mode 100644
+> index 000000000000..1bad958db2f9
+> --- /dev/null
 > +++ b/drivers/crypto/qce/dma.c
-[..]
+> @@ -0,0 +1,201 @@
+[...]
 > +int qce_dma_request(struct device *dev, struct qce_dma_data *dma)
 > +{
 > +	unsigned int memsize;
@@ -38,6 +50,9 @@ On Thu, Apr 03, 2014 at 07:18:00PM +0300, Stanimir Varbanov wrote:
 > +	if (IS_ERR(dma->txchan)) {
 > +		ret = PTR_ERR(dma->txchan);
 > +		return ret;
+
+You can just return PTR_ERR(dma->txchan) here, no need to set 'ret'.
+
 > +	}
 > +
 > +	dma->rxchan = dma_request_slave_channel_reason(dev, "rx");
@@ -48,30 +63,167 @@ On Thu, Apr 03, 2014 at 07:18:00PM +0300, Stanimir Varbanov wrote:
 > +
 > +	memsize = QCE_RESULT_BUF_SZ + QCE_IGNORE_BUF_SZ;
 > +	va = kzalloc(memsize, GFP_KERNEL);
+
+'memsize' is only used here.  Just pass 'QCE_RESULT_BUF_SZ +
+QCE_IGNORE_BUF_SZ' directly to kzalloc().
+
+Additionally, is there some particular reason why we need to zero this
+memory?
+
 > +	if (!va) {
 > +		ret = -ENOMEM;
 > +		goto error_nomem;
 > +	}
 > +
 > +	dma->result_buf = va;
+
+Is there some requirement that we don't set dma->result_buf on error?
+If not, we can discard the 'va' variable as well.
+
 > +	dma->ignore_buf = dma->result_buf + QCE_RESULT_BUF_SZ;
 > +
 > +	return 0;
 > +error_nomem:
 > +	if (!IS_ERR(dma->rxchan))
-
-How could this condition ever be false?
-
 > +		dma_release_channel(dma->rxchan);
 > +error_rx:
 > +	if (!IS_ERR(dma->txchan))
-
-Same here.
-
 > +		dma_release_channel(dma->txchan);
 > +	return ret;
 > +}
+> +
+> +void qce_dma_release(struct qce_dma_data *dma)
+> +{
+> +	dma_release_channel(dma->txchan);
+> +	dma_release_channel(dma->rxchan);
+> +	kfree(dma->result_buf);
+> +}
+> +
+> +int qce_mapsg(struct device *dev, struct scatterlist *sg, unsigned int nents,
+> +	      enum dma_data_direction dir, bool chained)
+> +{
+> +	int err;
+> +
+> +	if (chained) {
+> +		while (sg) {
+> +			err = dma_map_sg(dev, sg, 1, dir);
+> +			if (!err)
+> +				goto error;
+> +			sg = scatterwalk_sg_next(sg);
+> +		}
+> +	} else {
+> +		err = dma_map_sg(dev, sg, nents, dir);
+> +		if (!err)
+> +			goto error;
+> +	}
+> +
+> +	return nents;
+> +error:
+> +	return -EFAULT;
 
--- 
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
-hosted by The Linux Foundation
+No need for this label, as there's no cleanup.  Just return
+-EFAULT directly on error.
+
+> +}
+[...]
+> +struct scatterlist *
+> +qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl)
+> +{
+> +	struct scatterlist *sg = sgt->sgl, *sg_last = NULL;
+> +
+> +	while (sg) {
+> +		if (!sg_page(sg))
+> +			break;
+> +		sg = sg_next(sg);
+> +	}
+> +
+> +	if (!sg)
+> +		goto error;
+> +
+> +	while (new_sgl && sg) {
+> +		sg_set_page(sg, sg_page(new_sgl), new_sgl->length,
+> +			    new_sgl->offset);
+> +		sg_last = sg;
+> +		sg = sg_next(sg);
+> +		new_sgl = sg_next(new_sgl);
+> +	}
+> +
+> +	if (new_sgl)
+> +		goto error;
+> +
+> +	return sg_last;
+> +error:
+> +	return ERR_PTR(-EINVAL);
+
+No need for this label, as there's no cleanup.  Just return
+ERR_PTR(-EINVAL) directly on error.
+
+> +}
+> +
+> +static int qce_dma_prep_sg(struct dma_chan *chan, struct scatterlist *sg,
+> +			   int nents, unsigned long flags,
+> +			   enum dma_transfer_direction dir,
+> +			   dma_async_tx_callback cb, void *cb_param)
+> +{
+> +	struct dma_async_tx_descriptor *desc;
+> +
+> +	if (!sg || !nents)
+> +		return -EINVAL;
+> +
+> +	desc = dmaengine_prep_slave_sg(chan, sg, nents, dir, flags);
+> +	if (!desc)
+> +		return -EINVAL;
+> +
+> +	desc->callback = cb;
+> +	desc->callback_param = cb_param;
+> +	dmaengine_submit(desc);
+
+Do we not care if there is an error here?
+
+dma_cookie_t cookie;
+...
+cookie = dmaengine_submit(desc);
+return dma_submit_error(cookie);
+
+> +	return 0;
+> +}
+[...]
+> diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
+> new file mode 100644
+> index 000000000000..932b02fd8f25
+> --- /dev/null
+> +++ b/drivers/crypto/qce/dma.h
+> @@ -0,0 +1,57 @@
+> +/*
+> + * Copyright (c) 2011-2014, The Linux Foundation. All rights reserved.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 and
+> + * only version 2 as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + */
+> +
+> +#ifndef _DMA_H_
+> +#define _DMA_H_
+> +
+> +#define QCE_AUTHIV_REGS_CNT		16
+> +#define QCE_AUTH_BYTECOUNT_REGS_CNT	4
+> +#define QCE_CNTRIV_REGS_CNT		4
+> +
+> +/* result dump format */
+> +struct qce_result_dump {
+> +	u32 auth_iv[QCE_AUTHIV_REGS_CNT];
+> +	u32 auth_byte_count[QCE_AUTH_BYTECOUNT_REGS_CNT];
+> +	u32 encr_cntr_iv[QCE_CNTRIV_REGS_CNT];
+> +	u32 status;
+> +	u32 status2;
+> +};
+> +
+> +#define QCE_IGNORE_BUF_SZ	(2 * QCE_BAM_BURST_SIZE)
+
+QCE_BAM_BURST_SIZE is defined in common.h in 6/9.  Either that file
+needs to be included from this one, or the definition needs to be moved.
