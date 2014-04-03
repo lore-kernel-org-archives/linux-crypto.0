@@ -1,55 +1,212 @@
-From: Dan Streetman <ddstreet@ieee.org>
-Subject: Re: algif for compression?
-Date: Thu, 3 Apr 2014 14:03:30 -0400
-Message-ID: <CALZtONA3xqBG=6n0UERJ=Ve7DEH1P5ZVu5C_dRN0Tt324MjvFw@mail.gmail.com>
-References: <CALZtONBFtCqQEfOgjNs_MqLm0xXP+9QK47a1t_HE4DuUBkxpsg@mail.gmail.com>
- <20140403124136.GA32279@gondor.apana.org.au>
+From: Josh Cartwright <joshc@codeaurora.org>
+Subject: Re: [PATCH 1/9] crypto: qce: Add core driver implementation
+Date: Thu, 3 Apr 2014 13:19:14 -0500
+Message-ID: <20140403181914.GG28265@joshc.qualcomm.com>
+References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com>
+ <1396541886-10966-2-git-send-email-svarbanov@mm-sol.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+To: Stanimir Varbanov <svarbanov@mm-sol.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f170.google.com ([74.125.82.170]:38526 "EHLO
-	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753255AbaDCSDw (ORCPT
+Received: from smtp.codeaurora.org ([198.145.11.231]:39798 "EHLO
+	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753378AbaDCSWo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Apr 2014 14:03:52 -0400
-Received: by mail-we0-f170.google.com with SMTP id w61so2284695wes.15
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Apr 2014 11:03:51 -0700 (PDT)
-In-Reply-To: <20140403124136.GA32279@gondor.apana.org.au>
+	Thu, 3 Apr 2014 14:22:44 -0400
+Content-Disposition: inline
+In-Reply-To: <1396541886-10966-2-git-send-email-svarbanov@mm-sol.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 3, 2014 at 8:41 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Dan Streetman <ddstreet@ieee.org> wrote:
->> I see the algif_hash and algif_blkcipher implementations to allow
->> userspace AF_ALG socket access to kernel blkcipher and hash
->> algorithms, but has anyone done a algif_compression to allow userspace
->> access to compression algs?  I'm asking specifically wrt the 842
->> crypto module, which uses the hardware compression coprocessors on
->> newer powerpc systems.
->>
->> If not, is there any reason against adding a algif_compression to
->> provide the access?
->
-> For a start nx-842 isn't even hooked into the crypto layer so
-> there is no chance of exporting it through algif as is.
+Hey Stanimir-
 
-Wait, isn't it?  The crypto/842.c driver connects right to it.  Well,
-it connects to the compression part of it, but that's the only part
-I'm looking at exporting to userspace right now.
+Just a few comments/questions from a quick scan of your patchset:
 
+On Thu, Apr 03, 2014 at 07:17:58PM +0300, Stanimir Varbanov wrote:
+[..]
+> +++ b/drivers/crypto/qce/core.c
+[..]
+> +
+> +static struct qce_algo_ops qce_ops[] = {
+> +	{
+> +		.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
+> +		.register_alg = qce_ablkcipher_register,
+> +	},
+> +	{
+> +		.type = CRYPTO_ALG_TYPE_AHASH,
+> +		.register_alg = qce_ahash_register,
+> +	},
+> +};
+> +
+> +static void qce_unregister_algs(struct qce_device *qce)
+> +{
+> +	struct qce_alg_template *tmpl, *n;
+> +
+> +	list_for_each_entry_safe(tmpl, n, &qce->alg_list, entry) {
+> +		if (tmpl->crypto_alg_type == CRYPTO_ALG_TYPE_AHASH)
+> +			crypto_unregister_ahash(&tmpl->alg.ahash);
+> +		else
+> +			crypto_unregister_alg(&tmpl->alg.crypto);
 
+Why no 'unregister_alg' member in qce_algo_ops?
 
-> There is no reason why you couldn't add it of course but that'd
-> be a first step.
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +
+> +		list_del(&tmpl->entry);
+> +		kfree(tmpl);
+> +	}
+> +}
+> +
+> +static int qce_register_algs(struct qce_device *qce)
+> +{
+> +	struct qce_algo_ops *ops;
+> +	int i, rc = -ENODEV;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(qce_ops); i++) {
+> +		ops = &qce_ops[i];
+> +		ops->async_req_queue = qce_async_request_queue;
+> +		ops->async_req_done = qce_async_request_done;
+
+Why not set these statically?
+
+> +		rc = ops->register_alg(qce, ops);
+> +		if (rc)
+> +			break;
+> +	}
+> +
+> +	if (rc)
+> +		qce_unregister_algs(qce);
+> +
+> +	return rc;
+> +}
+[..]
+> +static int qce_get_version(struct qce_device *qce)
+> +{
+> +	u32 major, minor, step;
+> +	u32 val;
+> +
+> +	val = readl(qce->base + REG_VERSION);
+> +	major = (val & CORE_MAJOR_REV_MASK) >> CORE_MAJOR_REV;
+> +	minor = (val & CORE_MINOR_REV_MASK) >> CORE_MINOR_REV;
+> +	step = (val & CORE_STEP_REV_MASK) >> CORE_STEP_REV;
+> +
+> +	/*
+> +	 * the driver does not support v5 with minor 0 because it has special
+> +	 * alignment requirements.
+> +	 */
+> +	if (major < QCE_MAJOR_VERSION5 && minor == 0)
+> +		return -ENODEV;
+> +
+> +	qce->burst_size = QCE_BAM_BURST_SIZE;
+> +	qce->pipe_pair_index = 1;
+> +
+> +	dev_info(qce->dev, "Crypto device found, version %d.%d.%d\n",
+> +		 major, minor, step);
+
+I'd suggest dev_dbg().  Kernel boot is chatty enough.
+
+[..]
+> +static int qce_clks_enable(struct qce_device *qce, int enable)
+> +{
+> +	int rc = 0;
+> +	int i;
+> +
+> +	for (i = 0; i < QCE_CLKS_NUM; i++) {
+> +		if (enable)
+> +			rc = clk_prepare_enable(qce->clks[i]);
+> +		else
+> +			clk_disable_unprepare(qce->clks[i]);
+> +
+> +		if (rc)
+> +			break;
+> +	}
+> +
+> +	if (rc)
+> +		do
+> +			clk_disable_unprepare(qce->clks[i]);
+> +		while (--i >= 0);
+> +
+> +	return rc;
+> +}
+
+See my below comment about lumping clocks together.
+
+[..]
+> +static int qce_crypto_remove(struct platform_device *pdev)
+> +{
+> +	struct qce_device *qce = platform_get_drvdata(pdev);
+> +
+> +	cancel_work_sync(&qce->queue_work);
+> +	destroy_workqueue(qce->queue_wq);
+> +	tasklet_kill(&qce->done_tasklet);
+> +	qce_unregister_algs(qce);
+> +	qce_dma_release(&qce->dma);
+> +	qce_clks_enable(qce, 0);
+
+qce_clks_enable(qce, 0) is really confusing....I'd suggest creating
+separate qce_clks_enable() and qce_clks_disable() functions.
+
+[..]
+> +static const struct of_device_id qce_crypto_of_match[] = {
+> +	{ .compatible = "qcom,crypto-v5.1", },
+> +	{}
+> +};
+
+MODULE_DEVICE_TABLE()?
+
+[..]
+> +++ b/drivers/crypto/qce/core.h
+> @@ -0,0 +1,69 @@
+> +/*
+> + * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 and
+> + * only version 2 as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + */
+> +
+> +#ifndef _CORE_H_
+> +#define _CORE_H_
+> +
+> +static const char * const clk_names[] = {
+> +	"core",		/* GCC_CE_CLK */
+> +	"iface",	/* GCC_CE_AHB_CLK */
+> +	"bus",		/* GCC_CE_AXI_CLK */
+> +};
+
+You probably don't want this in a header file, as now each compilation
+unit will have a copy :(.
+
+Lumping all the clocks together assumes that you will only ever have all
+clocks enabled, or all clocks disabled, are you sure that's what you
+want?
+
+[..]
+> +struct qce_algo_ops {
+> +	u32 type;
+> +	int (*register_alg)(struct qce_device *qce, struct qce_algo_ops *ops);
+> +	int (*async_req_queue)(struct qce_device *qce,
+> +			       struct crypto_async_request *req);
+> +	void (*async_req_done)(struct qce_device *qce, int ret);
+
+What is the relationship between qce_algo_ops and the qce_alg_template
+(which has these same two identically named callbacks)?
+
+> +	int (*async_req_handle)(struct crypto_async_request *async_req);
+> +};
+> +
+> +#endif /* _CORE_H_ */
+
+-- 
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
+hosted by The Linux Foundation
