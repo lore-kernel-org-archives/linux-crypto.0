@@ -1,154 +1,55 @@
-From: Sonic Zhang <sonic.adi@gmail.com>
-Subject: Re: [PATCH] crypt: bfin_crc: access crc registers by ioread32 and
- iowrite32 functions
-Date: Wed, 2 Apr 2014 12:57:17 +0800
-Message-ID: <CAJxxZ0PpNzh-QsRqWpg_3rys8w3=7iaU5W_Ckw=DAcMK_j14yA@mail.gmail.com>
-References: <1395910353-2853-1-git-send-email-sonic.adi@gmail.com>
+From: Jingoo Han <jg1.han@samsung.com>
+Subject: [PATCH] crypto: omap-des - use devm_ioremap_resource()
+Date: Thu, 03 Apr 2014 09:18:49 +0900
+Message-ID: <001d01cf4ed2$494fd0e0$dbef72a0$%han@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-crypto@vger.kernel.org,
-	adi-buildroot-devel@lists.sourceforge.net,
-	Sonic Zhang <sonic.zhang@analog.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: 'David Miller' <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	'Jingoo Han' <jg1.han@samsung.com>,
+	'Joel Fernandes' <joelf@ti.com>
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ob0-f179.google.com ([209.85.214.179]:49666 "EHLO
-	mail-ob0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754937AbaDBE5R (ORCPT
+Received: from mailout3.samsung.com ([203.254.224.33]:29745 "EHLO
+	mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933591AbaDCASv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Apr 2014 00:57:17 -0400
-Received: by mail-ob0-f179.google.com with SMTP id va2so12197061obc.24
-        for <linux-crypto@vger.kernel.org>; Tue, 01 Apr 2014 21:57:17 -0700 (PDT)
-In-Reply-To: <1395910353-2853-1-git-send-email-sonic.adi@gmail.com>
+	Wed, 2 Apr 2014 20:18:51 -0400
+Received: from epcpsbgr5.samsung.com
+ (u145.gpu120.samsung.co.kr [203.254.230.145])
+ by mailout3.samsung.com (Oracle Communications Messaging Server 7u4-24.01
+ (7.0.4.24.0) 64bit (built Nov 17 2011))
+ with ESMTP id <0N3F002DZI7DMX10@mailout3.samsung.com> for
+ linux-crypto@vger.kernel.org; Thu, 03 Apr 2014 09:18:50 +0900 (KST)
+Content-language: ko
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Ping
+Use devm_ioremap_resource() because devm_request_and_ioremap() is
+obsoleted by devm_ioremap_resource().
 
-On Thu, Mar 27, 2014 at 4:52 PM, Sonic Zhang <sonic.adi@gmail.com> wrote:
-> From: Sonic Zhang <sonic.zhang@analog.com>
->
-> Move architecture independant crc header file out of the blackfin folder.
->
-> Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
-> ---
->  drivers/crypto/bfin_crc.c                          | 38 ++++++++++++----------
->  .../include/asm => drivers/crypto}/bfin_crc.h      |  0
->  2 files changed, 21 insertions(+), 17 deletions(-)
->  rename {arch/blackfin/include/asm => drivers/crypto}/bfin_crc.h (100%)
->
-> diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
-> index c9ff298..d4f731d 100644
-> --- a/drivers/crypto/bfin_crc.c
-> +++ b/drivers/crypto/bfin_crc.c
-> @@ -30,9 +30,11 @@
->  #include <crypto/internal/hash.h>
->
->  #include <asm/blackfin.h>
-> -#include <asm/bfin_crc.h>
->  #include <asm/dma.h>
->  #include <asm/portmux.h>
-> +#include <asm/io.h>
-> +
-> +#include "bfin_crc.h"
->
->  #define CRC_CCRYPTO_QUEUE_LENGTH       5
->
-> @@ -54,7 +56,7 @@ struct bfin_crypto_crc {
->         int                     irq;
->         int                     dma_ch;
->         u32                     poly;
-> -       volatile struct crc_register *regs;
-> +       struct crc_register     *regs;
->
->         struct ahash_request    *req; /* current request in operation */
->         struct dma_desc_array   *sg_cpu; /* virt addr of sg dma descriptors */
-> @@ -132,13 +134,13 @@ static struct scatterlist *sg_get(struct scatterlist *sg_list, unsigned int nent
->
->  static int bfin_crypto_crc_init_hw(struct bfin_crypto_crc *crc, u32 key)
->  {
-> -       crc->regs->datacntrld = 0;
-> -       crc->regs->control = MODE_CALC_CRC << OPMODE_OFFSET;
-> -       crc->regs->curresult = key;
-> +       iowrite32(0, &crc->regs->datacntrld);
-> +       iowrite32(MODE_CALC_CRC << OPMODE_OFFSET, &crc->regs->control);
-> +       iowrite32(key, &crc->regs->curresult);
->
->         /* setup CRC interrupts */
-> -       crc->regs->status = CMPERRI | DCNTEXPI;
-> -       crc->regs->intrenset = CMPERRI | DCNTEXPI;
-> +       iowrite32(CMPERRI | DCNTEXPI, &crc->regs->status);
-> +       iowrite32(CMPERRI | DCNTEXPI, &crc->regs->intrenset);
->
->         return 0;
->  }
-> @@ -402,13 +404,13 @@ finish_update:
->                 ctx->sg_buflen += CHKSUM_DIGEST_SIZE;
->
->         /* set CRC data count before start DMA */
-> -       crc->regs->datacnt = ctx->sg_buflen >> 2;
-> +       iowrite32(ctx->sg_buflen >> 2, &crc->regs->datacnt);
->
->         /* setup and enable CRC DMA */
->         bfin_crypto_crc_config_dma(crc);
->
->         /* finally kick off CRC operation */
-> -       crc->regs->control |= BLKEN;
-> +       iowrite32(ioread32(&crc->regs->control) | BLKEN, &crc->regs->control);
->
->         return -EINPROGRESS;
->  }
-> @@ -530,13 +532,14 @@ static irqreturn_t bfin_crypto_crc_handler(int irq, void *dev_id)
->  {
->         struct bfin_crypto_crc *crc = dev_id;
->
-> -       if (crc->regs->status & DCNTEXP) {
-> -               crc->regs->status = DCNTEXP;
-> +       if (ioread32(&crc->regs->status) & DCNTEXP) {
-> +               iowrite32(DCNTEXP, &crc->regs->status);
->
->                 /* prepare results */
-> -               put_unaligned_le32(crc->regs->result, crc->req->result);
-> +               put_unaligned_le32(ioread32(&crc->regs->result),
-> +                       crc->req->result);
->
-> -               crc->regs->control &= ~BLKEN;
-> +               iowrite32(ioread32(&crc->regs->control) & ~BLKEN, &crc->regs->control);
->                 crc->busy = 0;
->
->                 if (crc->req->base.complete)
-> @@ -560,7 +563,7 @@ static int bfin_crypto_crc_suspend(struct platform_device *pdev, pm_message_t st
->         struct bfin_crypto_crc *crc = platform_get_drvdata(pdev);
->         int i = 100000;
->
-> -       while ((crc->regs->control & BLKEN) && --i)
-> +       while ((ioread32(&crc->regs->control) & BLKEN) && --i)
->                 cpu_relax();
->
->         if (i == 0)
-> @@ -648,10 +651,11 @@ static int bfin_crypto_crc_probe(struct platform_device *pdev)
->          */
->         crc->sg_mid_buf = (u8 *)(crc->sg_cpu + ((CRC_MAX_DMA_DESC + 1) << 1));
->
-> -       crc->regs->control = 0;
-> -       crc->regs->poly = crc->poly = (u32)pdev->dev.platform_data;
-> +       iowrite32(0, &crc->regs->control);
-> +       crc->poly = (u32)pdev->dev.platform_data;
-> +       iowrite32(crc->poly, &crc->regs->poly);
->
-> -       while (!(crc->regs->status & LUTDONE) && (--timeout) > 0)
-> +       while (!(ioread32(&crc->regs->status) & LUTDONE) && (--timeout) > 0)
->                 cpu_relax();
->
->         if (timeout == 0)
-> diff --git a/arch/blackfin/include/asm/bfin_crc.h b/drivers/crypto/bfin_crc.h
-> similarity index 100%
-> rename from arch/blackfin/include/asm/bfin_crc.h
-> rename to drivers/crypto/bfin_crc.h
-> --
-> 1.8.2.3
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Jingoo Han <jg1.han@samsung.com>
+---
+ drivers/crypto/omap-des.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index ec5f131..f5bafd0 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -1074,10 +1074,10 @@ static int omap_des_probe(struct platform_device *pdev)
+ 	if (err)
+ 		goto err_res;
+ 
+-	dd->io_base = devm_request_and_ioremap(dev, res);
+-	if (!dd->io_base) {
++	dd->io_base = devm_ioremap_resource(dev, res);
++	if (IS_ERR(dd->io_base)) {
+ 		dev_err(dev, "can't ioremap\n");
+-		err = -ENOMEM;
++		err = PTR_ERR(dd->io_base);
+ 		goto err_res;
+ 	}
+ 	dd->phys_base = res->start;
+-- 
+1.7.10.4
