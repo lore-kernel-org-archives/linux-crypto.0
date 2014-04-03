@@ -1,55 +1,42 @@
-From: Jingoo Han <jg1.han@samsung.com>
-Subject: [PATCH] crypto: omap-des - use devm_ioremap_resource()
-Date: Thu, 03 Apr 2014 09:18:49 +0900
-Message-ID: <001d01cf4ed2$494fd0e0$dbef72a0$%han@samsung.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: algif for compression?
+Date: Thu, 3 Apr 2014 20:41:36 +0800
+Message-ID: <20140403124136.GA32279@gondor.apana.org.au>
+References: <CALZtONBFtCqQEfOgjNs_MqLm0xXP+9QK47a1t_HE4DuUBkxpsg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: 'David Miller' <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	'Jingoo Han' <jg1.han@samsung.com>,
-	'Joel Fernandes' <joelf@ti.com>
-To: 'Herbert Xu' <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Dan Streetman <ddstreet@ieee.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout3.samsung.com ([203.254.224.33]:29745 "EHLO
-	mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933591AbaDCASv (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:53869 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751655AbaDCMlk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 2 Apr 2014 20:18:51 -0400
-Received: from epcpsbgr5.samsung.com
- (u145.gpu120.samsung.co.kr [203.254.230.145])
- by mailout3.samsung.com (Oracle Communications Messaging Server 7u4-24.01
- (7.0.4.24.0) 64bit (built Nov 17 2011))
- with ESMTP id <0N3F002DZI7DMX10@mailout3.samsung.com> for
- linux-crypto@vger.kernel.org; Thu, 03 Apr 2014 09:18:50 +0900 (KST)
-Content-language: ko
+	Thu, 3 Apr 2014 08:41:40 -0400
+Content-Disposition: inline
+In-Reply-To: <CALZtONBFtCqQEfOgjNs_MqLm0xXP+9QK47a1t_HE4DuUBkxpsg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use devm_ioremap_resource() because devm_request_and_ioremap() is
-obsoleted by devm_ioremap_resource().
+Dan Streetman <ddstreet@ieee.org> wrote:
+> I see the algif_hash and algif_blkcipher implementations to allow
+> userspace AF_ALG socket access to kernel blkcipher and hash
+> algorithms, but has anyone done a algif_compression to allow userspace
+> access to compression algs?  I'm asking specifically wrt the 842
+> crypto module, which uses the hardware compression coprocessors on
+> newer powerpc systems.
+> 
+> If not, is there any reason against adding a algif_compression to
+> provide the access?
 
-Signed-off-by: Jingoo Han <jg1.han@samsung.com>
----
- drivers/crypto/omap-des.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+For a start nx-842 isn't even hooked into the crypto layer so
+there is no chance of exporting it through algif as is.
 
-diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-index ec5f131..f5bafd0 100644
---- a/drivers/crypto/omap-des.c
-+++ b/drivers/crypto/omap-des.c
-@@ -1074,10 +1074,10 @@ static int omap_des_probe(struct platform_device *pdev)
- 	if (err)
- 		goto err_res;
- 
--	dd->io_base = devm_request_and_ioremap(dev, res);
--	if (!dd->io_base) {
-+	dd->io_base = devm_ioremap_resource(dev, res);
-+	if (IS_ERR(dd->io_base)) {
- 		dev_err(dev, "can't ioremap\n");
--		err = -ENOMEM;
-+		err = PTR_ERR(dd->io_base);
- 		goto err_res;
- 	}
- 	dd->phys_base = res->start;
+There is no reason why you couldn't add it of course but that'd
+be a first step.
+
+Cheers,
 -- 
-1.7.10.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
