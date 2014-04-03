@@ -1,229 +1,116 @@
 From: Courtney Cavin <courtney.cavin@sonymobile.com>
-Subject: Re: [PATCH 3/9] crypto: qce: Add dma and sg helpers
-Date: Thu, 3 Apr 2014 16:15:26 -0700
-Message-ID: <20140403231525.GE17066@sonymobile.com>
+Subject: Re: [PATCH 1/9] crypto: qce: Add core driver implementation
+Date: Thu, 3 Apr 2014 16:38:44 -0700
+Message-ID: <20140403233844.GF17066@sonymobile.com>
 References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com>
- <1396541886-10966-4-git-send-email-svarbanov@mm-sol.com>
+ <1396541886-10966-2-git-send-email-svarbanov@mm-sol.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
+	Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
 	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>
 To: Stanimir Varbanov <svarbanov@mm-sol.com>
-Return-path: <linux-arm-msm-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from seldrel01.sonyericsson.com ([212.209.106.2]:2691 "EHLO
+	seldrel01.sonyericsson.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753818AbaDCXgo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Apr 2014 19:36:44 -0400
 Content-Disposition: inline
-In-Reply-To: <1396541886-10966-4-git-send-email-svarbanov@mm-sol.com>
-Sender: linux-arm-msm-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1396541886-10966-2-git-send-email-svarbanov@mm-sol.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 03, 2014 at 06:18:00PM +0200, Stanimir Varbanov wrote:
-> This adds dmaengine and sg-list helper functions used by
-> other parts of the crypto driver.
+On Thu, Apr 03, 2014 at 06:17:58PM +0200, Stanimir Varbanov wrote:
+> This adds core driver files. The core part is implementing a
+> platform driver probe and remove callbaks, the probe enables
+> clocks, checks crypto version, initialize and request dma
+> channels, create done tasklet and work queue and finally
+> register the algorithms into crypto subsystem.
 > 
 > Signed-off-by: Stanimir Varbanov <svarbanov@mm-sol.com>
 > ---
->  drivers/crypto/qce/dma.c | 201 +++++++++++++++++++++++++++++++++++++++++++++++
->  drivers/crypto/qce/dma.h |  57 ++++++++++++++
->  2 files changed, 258 insertions(+)
->  create mode 100644 drivers/crypto/qce/dma.c
->  create mode 100644 drivers/crypto/qce/dma.h
-
-More nitpicking, because everyone loves that....
-
+>  drivers/crypto/qce/core.c | 333 ++++++++++++++++++++++++++++++++++++++++++++++
+>  drivers/crypto/qce/core.h |  69 ++++++++++
+>  2 files changed, 402 insertions(+)
+>  create mode 100644 drivers/crypto/qce/core.c
+>  create mode 100644 drivers/crypto/qce/core.h
 > 
-> diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
-> new file mode 100644
-> index 000000000000..1bad958db2f9
-> --- /dev/null
-> +++ b/drivers/crypto/qce/dma.c
-> @@ -0,0 +1,201 @@
+> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
 [...]
-> +int qce_dma_request(struct device *dev, struct qce_dma_data *dma)
-> +{
-> +	unsigned int memsize;
-> +	void *va;
-> +	int ret;
-> +
-> +	dma->txchan = dma_request_slave_channel_reason(dev, "tx");
-> +	if (IS_ERR(dma->txchan)) {
-> +		ret = PTR_ERR(dma->txchan);
-> +		return ret;
-
-You can just return PTR_ERR(dma->txchan) here, no need to set 'ret'.
-
-> +	}
-> +
-> +	dma->rxchan = dma_request_slave_channel_reason(dev, "rx");
-> +	if (IS_ERR(dma->rxchan)) {
-> +		ret = PTR_ERR(dma->rxchan);
-> +		goto error_rx;
-> +	}
-> +
-> +	memsize = QCE_RESULT_BUF_SZ + QCE_IGNORE_BUF_SZ;
-> +	va = kzalloc(memsize, GFP_KERNEL);
-
-'memsize' is only used here.  Just pass 'QCE_RESULT_BUF_SZ +
-QCE_IGNORE_BUF_SZ' directly to kzalloc().
-
-Additionally, is there some particular reason why we need to zero this
-memory?
-
-> +	if (!va) {
-> +		ret = -ENOMEM;
-> +		goto error_nomem;
-> +	}
-> +
-> +	dma->result_buf = va;
-
-Is there some requirement that we don't set dma->result_buf on error?
-If not, we can discard the 'va' variable as well.
-
-> +	dma->ignore_buf = dma->result_buf + QCE_RESULT_BUF_SZ;
-> +
-> +	return 0;
-> +error_nomem:
-> +	if (!IS_ERR(dma->rxchan))
-> +		dma_release_channel(dma->rxchan);
-> +error_rx:
-> +	if (!IS_ERR(dma->txchan))
-> +		dma_release_channel(dma->txchan);
-> +	return ret;
-> +}
-> +
-> +void qce_dma_release(struct qce_dma_data *dma)
-> +{
-> +	dma_release_channel(dma->txchan);
-> +	dma_release_channel(dma->rxchan);
-> +	kfree(dma->result_buf);
-> +}
-> +
-> +int qce_mapsg(struct device *dev, struct scatterlist *sg, unsigned int nents,
-> +	      enum dma_data_direction dir, bool chained)
-> +{
-> +	int err;
-> +
-> +	if (chained) {
-> +		while (sg) {
-> +			err = dma_map_sg(dev, sg, 1, dir);
-> +			if (!err)
-> +				goto error;
-> +			sg = scatterwalk_sg_next(sg);
-> +		}
-> +	} else {
-> +		err = dma_map_sg(dev, sg, nents, dir);
-> +		if (!err)
-> +			goto error;
-> +	}
-> +
-> +	return nents;
-> +error:
-> +	return -EFAULT;
-
-No need for this label, as there's no cleanup.  Just return
--EFAULT directly on error.
-
-> +}
-[...]
-> +struct scatterlist *
-> +qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl)
-> +{
-> +	struct scatterlist *sg = sgt->sgl, *sg_last = NULL;
-> +
-> +	while (sg) {
-> +		if (!sg_page(sg))
-> +			break;
-> +		sg = sg_next(sg);
-> +	}
-> +
-> +	if (!sg)
-> +		goto error;
-> +
-> +	while (new_sgl && sg) {
-> +		sg_set_page(sg, sg_page(new_sgl), new_sgl->length,
-> +			    new_sgl->offset);
-> +		sg_last = sg;
-> +		sg = sg_next(sg);
-> +		new_sgl = sg_next(new_sgl);
-> +	}
-> +
-> +	if (new_sgl)
-> +		goto error;
-> +
-> +	return sg_last;
-> +error:
-> +	return ERR_PTR(-EINVAL);
-
-No need for this label, as there's no cleanup.  Just return
-ERR_PTR(-EINVAL) directly on error.
-
-> +}
-> +
-> +static int qce_dma_prep_sg(struct dma_chan *chan, struct scatterlist *sg,
-> +			   int nents, unsigned long flags,
-> +			   enum dma_transfer_direction dir,
-> +			   dma_async_tx_callback cb, void *cb_param)
-> +{
-> +	struct dma_async_tx_descriptor *desc;
-> +
-> +	if (!sg || !nents)
-> +		return -EINVAL;
-> +
-> +	desc = dmaengine_prep_slave_sg(chan, sg, nents, dir, flags);
-> +	if (!desc)
-> +		return -EINVAL;
-> +
-> +	desc->callback = cb;
-> +	desc->callback_param = cb_param;
-> +	dmaengine_submit(desc);
-
-Do we not care if there is an error here?
-
-dma_cookie_t cookie;
-...
-cookie = dmaengine_submit(desc);
-return dma_submit_error(cookie);
-
-> +	return 0;
-> +}
-[...]
-> diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
-> new file mode 100644
-> index 000000000000..932b02fd8f25
-> --- /dev/null
-> +++ b/drivers/crypto/qce/dma.h
-> @@ -0,0 +1,57 @@
-> +/*
-> + * Copyright (c) 2011-2014, The Linux Foundation. All rights reserved.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 and
-> + * only version 2 as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + */
-> +
-> +#ifndef _DMA_H_
-> +#define _DMA_H_
-> +
-> +#define QCE_AUTHIV_REGS_CNT		16
-> +#define QCE_AUTH_BYTECOUNT_REGS_CNT	4
-> +#define QCE_CNTRIV_REGS_CNT		4
-> +
-> +/* result dump format */
-> +struct qce_result_dump {
-> +	u32 auth_iv[QCE_AUTHIV_REGS_CNT];
-> +	u32 auth_byte_count[QCE_AUTH_BYTECOUNT_REGS_CNT];
-> +	u32 encr_cntr_iv[QCE_CNTRIV_REGS_CNT];
-> +	u32 status;
-> +	u32 status2;
+> +static struct qce_algo_ops qce_ops[] = {
+> +	{
+> +		.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
+> +		.register_alg = qce_ablkcipher_register,
+> +	},
+> +	{
+> +		.type = CRYPTO_ALG_TYPE_AHASH,
+> +		.register_alg = qce_ahash_register,
+> +	},
 > +};
 > +
-> +#define QCE_IGNORE_BUF_SZ	(2 * QCE_BAM_BURST_SIZE)
+> +static void qce_unregister_algs(struct qce_device *qce)
+> +{
+> +	struct qce_alg_template *tmpl, *n;
+> +
+> +	list_for_each_entry_safe(tmpl, n, &qce->alg_list, entry) {
+> +		if (tmpl->crypto_alg_type == CRYPTO_ALG_TYPE_AHASH)
+> +			crypto_unregister_ahash(&tmpl->alg.ahash);
+> +		else
+> +			crypto_unregister_alg(&tmpl->alg.crypto);
+> +
+> +		list_del(&tmpl->entry);
+> +		kfree(tmpl);
 
-QCE_BAM_BURST_SIZE is defined in common.h in 6/9.  Either that file
-needs to be included from this one, or the definition needs to be moved.
+I find this whole memory/list management to be very disorganised.
+ops->register_alg() is supposed to allocate this item--more precisely,
+multiple items--using something that must be able to be kfree'd
+directly, register it with the crypto core, and put it on this list
+manually.  Here we unregister/remove/free this in the core.  Josh's
+recommendation of a unregister_alg callback might help, but it all
+remains a bit unclear with register_alg/unregister_alg managing X
+algorithms per call. 
+
+Additionally, above you have qce_ops, which clearly defines the
+operations for specific algorithms types/groups, which in later patches
+are shown to be seperated out into independent implementations.
+
+>From what I can tell, this seems to be a framework with built-in yet
+independent crypto implementations which call the crypto API directly.
+
+It would be more logical to me if this was seperated out into a
+"library/core" API, with the individual implementations as platform
+drivers of their own.  Then they can register with the core, managing
+memory how they please.
+
+What am I missing?
+
+> +	}
+> +}
+> +
+> +static int qce_register_algs(struct qce_device *qce)
+> +{
+> +	struct qce_algo_ops *ops;
+> +	int i, rc = -ENODEV;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(qce_ops); i++) {
+> +		ops = &qce_ops[i];
+> +		ops->async_req_queue = qce_async_request_queue;
+> +		ops->async_req_done = qce_async_request_done;
+> +		rc = ops->register_alg(qce, ops);
+> +		if (rc)
+> +			break;
+> +	}
+> +
+> +	if (rc)
+> +		qce_unregister_algs(qce);
+> +
+> +	return rc;
+> +}
+
+-Courtney
