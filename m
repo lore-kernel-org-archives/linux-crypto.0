@@ -1,36 +1,35 @@
 From: Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: [PATCH 4/9] crypto: qce: Add ablkcipher algorithms
-Date: Thu,  3 Apr 2014 19:18:01 +0300
-Message-ID: <1396541886-10966-5-git-send-email-svarbanov@mm-sol.com>
+Subject: [PATCH 5/9] crypto: qce: Adds sha and hmac transforms
+Date: Thu,  3 Apr 2014 19:18:02 +0300
+Message-ID: <1396541886-10966-6-git-send-email-svarbanov@mm-sol.com>
 References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com>
 Cc: Stanimir Varbanov <svarbanov@mm-sol.com>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-arm-msm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com>
-Sender: linux-arm-msm-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Here is the implementation of AES, DES and 3DES crypto API
-callbacks, the crypto register alg function, the async request
-handler and its dma done callback function.
+Here is the implementation and registration of ahash crypto type.
+It includes sha1, sha256, hmac(sha1) and hmac(sha256).
 
 Signed-off-by: Stanimir Varbanov <svarbanov@mm-sol.com>
 ---
- drivers/crypto/qce/ablkcipher.c | 397 ++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/qce/cipher.h     |  62 +++++++
- 2 files changed, 459 insertions(+)
- create mode 100644 drivers/crypto/qce/ablkcipher.c
- create mode 100644 drivers/crypto/qce/cipher.h
+ drivers/crypto/qce/sha.c | 595 +++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/qce/sha.h |  74 ++++++
+ 2 files changed, 669 insertions(+)
+ create mode 100644 drivers/crypto/qce/sha.c
+ create mode 100644 drivers/crypto/qce/sha.h
 
-diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
+diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
 new file mode 100644
-index 000000000000..364162187c8c
+index 000000000000..d63818360c92
 --- /dev/null
-+++ b/drivers/crypto/qce/ablkcipher.c
-@@ -0,0 +1,397 @@
++++ b/drivers/crypto/qce/sha.c
+@@ -0,0 +1,595 @@
 +/*
 + * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
 + *
@@ -45,138 +44,113 @@ index 000000000000..364162187c8c
 + */
 +
 +#include <linux/interrupt.h>
-+#include <linux/types.h>
-+#include <crypto/aes.h>
-+#include <crypto/algapi.h>
-+#include <crypto/des.h>
++#include <crypto/internal/hash.h>
++#include <crypto/scatterwalk.h>
++#include <crypto/sha.h>
 +
 +#include "dma.h"
 +#include "core.h"
 +#include "common.h"
-+#include "cipher.h"
++#include "sha.h"
 +
-+static void qce_ablkcipher_dma_done(void *data)
++/* crypto hw padding constant for first operation */
++#define SHA_PADDING		64
++#define SHA_PADDING_MASK	(SHA_PADDING - 1)
++
++static const __be32 std_iv_sha1[SHA256_DIGEST_SIZE / sizeof(__be32)] = {
++	SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4, 0, 0, 0
++};
++
++static const __be32 std_iv_sha256[SHA256_DIGEST_SIZE / sizeof(__be32)] = {
++	SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
++	SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7
++};
++
++static void qce_ahash_dma_done(void *data)
 +{
 +	struct crypto_async_request *async_req = data;
-+	struct ablkcipher_request *req = ablkcipher_request_cast(async_req);
-+	struct qce_cipher_reqctx *rctx = ablkcipher_request_ctx(req);
-+	struct qce_cipher_ctx *ctx = crypto_tfm_ctx(async_req->tfm);
-+	struct qce_alg_template *tmpl = to_cipher_tmpl(async_req->tfm);
++	struct ahash_request *req = ahash_request_cast(async_req);
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
++	struct qce_alg_template *tmpl = to_ahash_tmpl(async_req->tfm);
 +	struct qce_device *qce = tmpl->qce;
 +	struct qce_result_dump *result = qce->dma.result_buf;
-+	enum dma_data_direction dir_src, dir_dst;
-+	u32 status;
++	unsigned int digestsize = crypto_ahash_digestsize(ahash);
 +	int error;
-+
-+	dir_src = (req->src == req->dst) ? DMA_BIDIRECTIONAL : DMA_TO_DEVICE;
-+	dir_dst = (req->src == req->dst) ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
++	u32 status;
 +
 +	qce_dma_terminate_all(&qce->dma);
 +
-+	if (req->src != req->dst)
-+		qce_unmapsg(qce->dev, rctx->src_sg, rctx->src_nents, dir_src,
-+			    rctx->dst_chained);
-+	qce_unmapsg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst,
-+		    rctx->dst_chained);
++	qce_unmapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
++		     rctx->src_chained);
++	qce_unmapsg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE, 0);
 +
-+	sg_free_table(&rctx->dst_tbl);
++	memcpy(rctx->digest, result->auth_iv, digestsize);
++	if (req->result)
++		memcpy(req->result, result->auth_iv, digestsize);
++
++	rctx->byte_count[0] = cpu_to_be32(result->auth_byte_count[0]);
++	rctx->byte_count[1] = cpu_to_be32(result->auth_byte_count[1]);
 +
 +	error = qce_check_status(qce, &status);
 +	if (error < 0)
-+		dev_err(qce->dev, "ablkcipher operation error (%x)\n", status);
++		dev_err(qce->dev, "ahash operation error (%x)\n", status);
 +
-+	if (IS_ECB(rctx->flags))
-+		goto done;
++	req->src = rctx->src;
++	req->nbytes = rctx->nbytes;
 +
-+	memcpy(ctx->iv, result->encr_cntr_iv, rctx->ivsize);
++	rctx->last_blk = false;
++	rctx->first_blk = false;
 +
-+done:
 +	tmpl->async_req_done(tmpl->qce, error);
 +}
 +
-+static int
-+qce_ablkcipher_async_req_handle(struct crypto_async_request *async_req)
++static int qce_ahash_async_req_handle(struct crypto_async_request *async_req)
 +{
-+	struct ablkcipher_request *req = ablkcipher_request_cast(async_req);
-+	struct qce_cipher_reqctx *rctx = ablkcipher_request_ctx(req);
-+	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
-+	struct qce_alg_template *tmpl = to_cipher_tmpl(async_req->tfm);
++	struct ahash_request *req = ahash_request_cast(async_req);
++	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
++	struct qce_sha_ctx *ctx = crypto_tfm_ctx(async_req->tfm);
++	struct qce_alg_template *tmpl = to_ahash_tmpl(async_req->tfm);
 +	struct qce_device *qce = tmpl->qce;
-+	enum dma_data_direction dir_src, dir_dst;
-+	struct scatterlist *sg;
-+	bool diff_dst;
-+	gfp_t gfp;
++	u32 flags = rctx->flags;
 +	int rc;
 +
-+	rctx->iv = req->info;
-+	rctx->ivsize = crypto_ablkcipher_ivsize(ablkcipher);
-+	rctx->cryptlen = req->nbytes;
-+
-+	diff_dst = (req->src != req->dst) ? true : false;
-+
-+	dir_src = diff_dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL;
-+	dir_dst = diff_dst ? DMA_FROM_DEVICE : DMA_BIDIRECTIONAL;
++	if (IS_SHA(flags)) {
++		rctx->authkey = NULL;
++		rctx->authklen = 0;
++	} else if (IS_SHA_HMAC(flags)) {
++		rctx->authkey = ctx->authkey;
++		rctx->authklen = QCE_SHA_HMAC_KEY_SIZE;
++	} else if (IS_CMAC(flags)) {
++		rctx->authkey = ctx->authkey;
++		rctx->authklen = AES_KEYSIZE_128;
++	} else {
++		dev_err(qce->dev, "unsupported ahash algorithm\n");
++		return -EINVAL;
++	}
 +
 +	rctx->src_nents = qce_countsg(req->src, req->nbytes,
 +				      &rctx->src_chained);
-+	if (diff_dst) {
-+		rctx->dst_nents = qce_countsg(req->dst, req->nbytes,
-+					      &rctx->dst_chained);
-+	} else {
-+		rctx->dst_nents = rctx->src_nents;
-+		rctx->dst_chained = rctx->src_chained;
-+	}
-+
-+	rctx->dst_nents += 1;
-+
-+	gfp = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
-+						GFP_KERNEL : GFP_ATOMIC;
-+
-+	rc = sg_alloc_table(&rctx->dst_tbl, rctx->dst_nents, gfp);
-+	if (rc)
++	rc = qce_mapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
++		       rctx->src_chained);
++	if (rc < 0)
 +		return rc;
 +
 +	sg_init_one(&rctx->result_sg, qce->dma.result_buf, QCE_RESULT_BUF_SZ);
 +
-+	sg = qce_sgtable_add(&rctx->dst_tbl, req->dst);
-+	if (IS_ERR(sg)) {
-+		rc = PTR_ERR(sg);
-+		goto error_free;
-+	}
-+
-+	sg = qce_sgtable_add(&rctx->dst_tbl, &rctx->result_sg);
-+	if (IS_ERR(sg)) {
-+		rc = PTR_ERR(sg);
-+		goto error_free;
-+	}
-+
-+	sg_mark_end(sg);
-+	rctx->dst_sg = rctx->dst_tbl.sgl;
-+
-+	rc = qce_mapsg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst,
-+		       rctx->dst_chained);
++	rc = qce_mapsg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE, 0);
 +	if (rc < 0)
-+		goto error_free;
++		goto error_unmap_src;
 +
-+	if (diff_dst) {
-+		rc = qce_mapsg(qce->dev, req->src, rctx->src_nents, dir_src,
-+			       rctx->src_chained);
-+		if (rc < 0)
-+			goto error_unmap_dst;
-+		rctx->src_sg = req->src;
-+	} else {
-+		rctx->src_sg = rctx->dst_sg;
-+	}
-+
-+	rc = qce_dma_prep_sgs(&qce->dma, rctx->src_sg, rctx->src_nents,
-+			      rctx->dst_sg, rctx->dst_nents,
-+			      qce_ablkcipher_dma_done, async_req);
++	rc = qce_dma_prep_sgs(&qce->dma, req->src, rctx->src_nents,
++			      &rctx->result_sg, 1,
++			      qce_ahash_dma_done, async_req);
 +	if (rc)
 +		goto error_unmap_src;
 +
 +	qce_dma_issue_pending(&qce->dma);
 +
-+	rc = qce_start(async_req, tmpl->crypto_alg_type, req->nbytes, 0);
++	rc = qce_start(async_req, tmpl->crypto_alg_type, 0, 0);
 +	if (rc)
 +		goto error_terminate;
 +
@@ -184,187 +158,404 @@ index 000000000000..364162187c8c
 +
 +error_terminate:
 +	qce_dma_terminate_all(&qce->dma);
++	qce_unmapsg(qce->dev, &rctx->result_sg, 1, DMA_FROM_DEVICE, 0);
 +error_unmap_src:
-+	if (diff_dst)
-+		qce_unmapsg(qce->dev, req->src, rctx->src_nents, dir_src,
-+			    rctx->src_chained);
-+error_unmap_dst:
-+	qce_unmapsg(qce->dev, rctx->dst_sg, rctx->dst_nents, dir_dst,
-+		    rctx->dst_chained);
-+error_free:
-+	sg_free_table(&rctx->dst_tbl);
++	qce_unmapsg(qce->dev, req->src, rctx->src_nents, DMA_TO_DEVICE,
++		     rctx->src_chained);
 +	return rc;
 +}
 +
-+static int qce_ablkcipher_setkey(struct crypto_ablkcipher *ablk, const u8 *key,
-+				 unsigned int keylen)
++static int qce_ahash_init(struct ahash_request *req)
 +{
-+	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(ablk);
-+	struct qce_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct qce_alg_template *tmpl = to_cipher_tmpl(&ablk->base);
-+	u32 flags = tmpl->alg_flags;
++	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
++	struct qce_alg_template *tmpl = to_ahash_tmpl(req->base.tfm);
++	const __be32 *std_iv = tmpl->std_iv;
++
++	memset(rctx, 0, sizeof(*rctx));
++	rctx->first_blk = true;
++	rctx->last_blk = false;
++	rctx->flags = tmpl->alg_flags;
++	memcpy(rctx->digest, std_iv, sizeof(rctx->digest));
++
++	return 0;
++}
++
++static int qce_ahash_export(struct ahash_request *req, void *out)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
++	u32 flags = rctx->flags;
++	unsigned int digestsize = crypto_ahash_digestsize(ahash);
++	unsigned int blocksize;
 +	int ret = 0;
 +
-+	if (!key || !keylen)
-+		return -EINVAL;
++	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(ahash));
 +
-+	if (IS_AES(flags)) {
-+		switch (keylen) {
-+		case AES_KEYSIZE_128:
-+		case AES_KEYSIZE_256:
-+			break;
-+		default:
-+			goto badkey;
-+		}
-+	} else if (IS_DES(flags)) {
-+		u32 tmp[DES_EXPKEY_WORDS];
++	if (IS_SHA1(flags) || IS_SHA1_HMAC(flags)) {
++		struct sha1_state *out_state = out;
 +
-+		if (keylen != QCE_DES_KEY_SIZE)
-+			goto badkey;
++		out_state->count = rctx->count;
++		qce_cpu_to_be32p_array(out_state->state, rctx->digest,
++				       digestsize);
++		memcpy(out_state->buffer, rctx->trailing_buf, blocksize);
 +
-+		ret = des_ekey(tmp, key);
-+		if (!ret && crypto_ablkcipher_get_flags(ablk) &
-+		    CRYPTO_TFM_REQ_WEAK_KEY)
-+			goto weakkey;
-+	} else if (IS_3DES(flags)) {
-+		if (keylen != DES3_EDE_KEY_SIZE)
-+			goto badkey;
++	} else if (IS_SHA256(flags) || IS_SHA256_HMAC(flags)) {
++		struct sha256_state *out_state = out;
++
++		out_state->count = rctx->count;
++		qce_cpu_to_be32p_array(out_state->state, rctx->digest,
++				       digestsize);
++		memcpy(out_state->buf, rctx->trailing_buf, blocksize);
++	} else {
++		ret = -EINVAL;
 +	}
 +
-+	ctx->enc_keylen = keylen;
-+	memcpy(ctx->enc_key, key, keylen);
++	return ret;
++}
++
++static int qce_import_common(struct ahash_request *req, u64 in_count,
++				 u32 *state, u8 *buffer, bool hmac)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
++	u64 count = in_count;
++	unsigned int digestsize = crypto_ahash_digestsize(ahash);
++	unsigned int blocksize;
++
++	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(ahash));
++	rctx->count = in_count;
++	memcpy(rctx->trailing_buf, buffer, blocksize);
++
++	if (in_count <= blocksize) {
++		rctx->first_blk = 1;
++	} else {
++		rctx->first_blk = 0;
++		/*
++		 * For HMAC, there is a hardware padding done when first block
++		 * is set. Therefore the byte_count must be incremened by 64
++		 * after the first block operation.
++		 */
++		if (hmac)
++			count += SHA_PADDING;
++	}
++
++	rctx->byte_count[0] = (u32)(count & ~SHA_PADDING_MASK);
++	rctx->byte_count[1] = (u32)(count >> 32);
++	qce_cpu_to_be32p_array((__be32 *)rctx->digest, (const u8 *)state,
++			       digestsize);
++	rctx->trailing_buf_len = (unsigned int)(in_count & (blocksize - 1));
++
 +	return 0;
-+badkey:
-+	crypto_ablkcipher_set_flags(ablk, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+	return -EINVAL;
-+weakkey:
-+	crypto_ablkcipher_set_flags(ablk, CRYPTO_TFM_RES_WEAK_KEY);
-+	return -EINVAL;
 +}
 +
-+static int qce_ablkcipher_encrypt(struct ablkcipher_request *req)
++static int qce_ahash_import(struct ahash_request *req, const void *in)
 +{
-+	struct qce_cipher_reqctx *rctx = ablkcipher_request_ctx(req);
-+	struct qce_alg_template *tmpl = to_cipher_tmpl(req->base.tfm);
++	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
++	u32 flags = rctx->flags;
++	bool hmac = IS_SHA_HMAC(flags);
++	int ret;
 +
-+	rctx->flags = QCE_ENCRYPT | tmpl->alg_flags;
++	if (IS_SHA1(flags) || IS_SHA1_HMAC(flags)) {
++		struct sha1_state *state = (struct sha1_state *)in;
++
++		ret = qce_import_common(req, state->count, state->state,
++					state->buffer, hmac);
++	} else if (IS_SHA256(flags) || IS_SHA256_HMAC(flags)) {
++		struct sha256_state *state = (struct sha256_state *)in;
++
++		ret = qce_import_common(req, state->count, state->state,
++					state->buf, hmac);
++	} else {
++		ret = -EINVAL;
++	}
++
++	return ret;
++}
++
++static int qce_ahash_update(struct ahash_request *req)
++{
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
++	struct qce_alg_template *tmpl = to_ahash_tmpl(req->base.tfm);
++	unsigned int total, len;
++	int nents;
++	struct scatterlist *sg_last;
++	u8 *buf;
++	u32 pad_len;
++	u32 trailing_buf_len;
++	u32 nbytes;
++	u32 offset;
++	u32 bytes;
++	u8 *staging;
++	bool chained;
++	unsigned int blocksize;
++
++	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
++	rctx->count += req->nbytes;
++
++	/* check for trailing buffer from previous updates and append it */
++	total = req->nbytes + rctx->trailing_buf_len;
++	len = req->nbytes;
++
++	if (total <= blocksize) {
++		buf = &rctx->trailing_buf[rctx->trailing_buf_len];
++		nents = qce_countsg(req->src, len, &chained);
++		bytes = sg_copy_to_buffer(req->src, nents, buf, len);
++		if (bytes != len) {
++			rctx->count -= req->nbytes;
++			return -EINVAL;
++		}
++
++		rctx->trailing_buf_len = total;
++		return 0;
++	}
++
++	/* save the original req structure fields */
++	rctx->src = req->src;
++	rctx->nbytes = req->nbytes;
++
++	staging = rctx->staging_buf;
++	staging = PTR_ALIGN(staging, dma_get_cache_alignment());
++	memcpy(staging, rctx->trailing_buf, rctx->trailing_buf_len);
++	buf = rctx->trailing_buf;
++
++	/* get new trailing buffer */
++	pad_len = ALIGN(total, blocksize) - total;
++	trailing_buf_len = blocksize - pad_len;
++	offset = req->nbytes - trailing_buf_len;
++
++	if (offset != req->nbytes)
++		scatterwalk_map_and_copy(buf, req->src, offset,
++					 trailing_buf_len, 0);
++
++	nbytes = total - trailing_buf_len;
++
++	len = rctx->trailing_buf_len;
++	sg_last = req->src;
++
++	while (len < nbytes) {
++		if ((len + sg_last->length) > nbytes)
++			break;
++		len += sg_last->length;
++		sg_last = scatterwalk_sg_next(sg_last);
++	}
++
++	sg_mark_end(sg_last);
++
++	if (rctx->trailing_buf_len) {
++		sg_init_table(rctx->sg, 2);
++		sg_set_buf(&rctx->sg[0], staging, rctx->trailing_buf_len);
++		scatterwalk_sg_chain(rctx->sg, 2, req->src);
++		req->src = rctx->sg;
++	}
++
++	req->nbytes = nbytes;
++	rctx->trailing_buf_len = trailing_buf_len;
++
 +	return tmpl->async_req_queue(tmpl->qce, &req->base);
 +}
 +
-+static int qce_ablkcipher_decrypt(struct ablkcipher_request *req)
++static int qce_ahash_final(struct ahash_request *req)
 +{
-+	struct qce_cipher_reqctx *rctx = ablkcipher_request_ctx(req);
-+	struct qce_alg_template *tmpl = to_cipher_tmpl(req->base.tfm);
++	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
++	struct qce_alg_template *tmpl = to_ahash_tmpl(req->base.tfm);
++	u8 *staging;
 +
-+	rctx->flags = QCE_DECRYPT | tmpl->alg_flags;
++	rctx->last_blk = true;
++
++	/* save the original req structure fields */
++	rctx->src = req->src;
++	rctx->nbytes = req->nbytes;
++
++	staging = rctx->staging_buf;
++	staging = PTR_ALIGN(staging, dma_get_cache_alignment());
++	memcpy(staging, rctx->trailing_buf, rctx->trailing_buf_len);
++	sg_init_one(rctx->sg, staging, rctx->trailing_buf_len);
++
++	req->src = rctx->sg;
++	req->nbytes = rctx->trailing_buf_len;
++
 +	return tmpl->async_req_queue(tmpl->qce, &req->base);
 +}
 +
-+static int qce_ablkcipher_init(struct crypto_tfm *tfm)
++static int qce_ahash_digest(struct ahash_request *req)
 +{
-+	struct qce_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
++	struct qce_alg_template *tmpl = to_ahash_tmpl(req->base.tfm);
++	int ret;
 +
++	ret = qce_ahash_init(req);
++	if (ret)
++		return ret;
++
++	/* save the original req structure fields */
++	rctx->src = req->src;
++	rctx->nbytes = req->nbytes;
++	rctx->first_blk = true;
++	rctx->last_blk = true;
++
++	return tmpl->async_req_queue(tmpl->qce, &req->base);
++}
++
++struct qce_ahash_result {
++	struct completion completion;
++	int error;
++};
++
++static void qce_setkey_complete(struct crypto_async_request *req, int error)
++{
++	struct qce_ahash_result *result = req->data;
++
++	if (error == -EINPROGRESS)
++		return;
++
++	result->error = error;
++	complete(&result->completion);
++}
++
++static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
++				 unsigned int keylen)
++{
++	unsigned int digestsize = crypto_ahash_digestsize(tfm);
++	struct qce_sha_ctx *ctx = crypto_tfm_ctx(&tfm->base);
++	struct qce_ahash_result result;
++	struct ahash_request *req;
++	struct scatterlist sg;
++	unsigned int blocksize;
++	struct crypto_ahash *ahash_tfm;
++	u8 *buf;
++	int ret;
++	const char *alg_name;
++
++	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
++	memset(ctx->authkey, 0, blocksize);
++
++	if (keylen <= blocksize) {
++		memcpy(ctx->authkey, key, keylen);
++		ret = 0;
++		goto done;
++	}
++
++	if (digestsize == SHA1_DIGEST_SIZE)
++		alg_name = "sha1";
++	else
++		alg_name = "sha256";
++
++	ahash_tfm = crypto_alloc_ahash(alg_name, CRYPTO_ALG_TYPE_AHASH,
++				       CRYPTO_ALG_TYPE_AHASH_MASK);
++	if (IS_ERR(ahash_tfm))
++		return PTR_ERR(ahash_tfm);
++
++	req = ahash_request_alloc(ahash_tfm, GFP_KERNEL);
++	if (!req) {
++		ret = -ENOMEM;
++		goto err_free_ahash;
++	}
++
++	init_completion(&result.completion);
++	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				   qce_setkey_complete, &result);
++	crypto_ahash_clear_flags(ahash_tfm, ~0);
++
++	buf = kzalloc(keylen + QCE_MAX_ALIGN_SIZE, GFP_KERNEL);
++	if (!buf) {
++		ret = -ENOMEM;
++		goto err_free_req;
++	}
++
++	memcpy(buf, key, keylen);
++	sg_init_one(&sg, buf, keylen);
++	ahash_request_set_crypt(req, &sg, ctx->authkey, keylen);
++
++	ret = crypto_ahash_digest(req);
++	if (ret == -EINPROGRESS || ret == -EBUSY) {
++		ret = wait_for_completion_interruptible(&result.completion);
++		if (!ret)
++			ret = result.error;
++	}
++
++	if (ret)
++		crypto_ahash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++
++	kfree(buf);
++err_free_req:
++	ahash_request_free(req);
++err_free_ahash:
++	crypto_free_ahash(ahash_tfm);
++done:
++	return ret;
++}
++
++static int qce_ahash_cra_init(struct crypto_tfm *tfm)
++{
++	struct crypto_ahash *ahash = __crypto_ahash_cast(tfm);
++	struct qce_sha_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	crypto_ahash_set_reqsize(ahash, sizeof(struct qce_sha_reqctx));
 +	memset(ctx, 0, sizeof(*ctx));
-+	get_random_bytes(ctx->iv, QCE_MAX_IV_SIZE);
-+	tfm->crt_ablkcipher.reqsize = sizeof(struct qce_cipher_reqctx);
 +	return 0;
 +}
 +
-+static void qce_ablkcipher_exit(struct crypto_tfm *tfm)
++static void qce_ahash_cra_exit(struct crypto_tfm *tfm)
 +{
 +}
 +
-+struct qce_ablkcipher_def {
++struct qce_ahash_def {
 +	u32 flags;
 +	const char *name;
 +	const char *drv_name;
++	unsigned int digestsize;
 +	unsigned int blocksize;
-+	unsigned int ivsize;
-+	unsigned int min_keysize;
-+	unsigned int max_keysize;
++	unsigned int statesize;
++	const __be32 *std_iv;
 +};
 +
-+static const struct qce_ablkcipher_def ablkcipher_def[] = {
++static const struct qce_ahash_def ahash_def[] = {
 +	{
-+		.flags		= QCE_ALG_AES | QCE_MODE_ECB,
-+		.name		= "ecb(aes)",
-+		.drv_name	= "ecb-aes-qce",
-+		.blocksize	= AES_BLOCK_SIZE,
-+		.ivsize		= AES_BLOCK_SIZE,
-+		.min_keysize	= AES_MIN_KEY_SIZE,
-+		.max_keysize	= AES_MAX_KEY_SIZE,
++		.flags		= QCE_HASH_SHA1,
++		.name		= "sha1",
++		.drv_name	= "sha1-qce",
++		.digestsize	= SHA1_DIGEST_SIZE,
++		.blocksize	= SHA1_BLOCK_SIZE,
++		.statesize	= sizeof(struct sha1_state),
++		.std_iv		= std_iv_sha1,
 +	},
 +	{
-+		.flags		= QCE_ALG_AES | QCE_MODE_CBC,
-+		.name		= "cbc(aes)",
-+		.drv_name	= "cbc-aes-qce",
-+		.blocksize	= AES_BLOCK_SIZE,
-+		.ivsize		= AES_BLOCK_SIZE,
-+		.min_keysize	= AES_MIN_KEY_SIZE,
-+		.max_keysize	= AES_MAX_KEY_SIZE,
++		.flags		= QCE_HASH_SHA256,
++		.name		= "sha256",
++		.drv_name	= "sha256-qce",
++		.digestsize	= SHA256_DIGEST_SIZE,
++		.blocksize	= SHA256_BLOCK_SIZE,
++		.statesize	= sizeof(struct sha256_state),
++		.std_iv		= std_iv_sha256,
 +	},
 +	{
-+		.flags		= QCE_ALG_AES | QCE_MODE_CTR,
-+		.name		= "ctr(aes)",
-+		.drv_name	= "ctr-aes-qce",
-+		.blocksize	= AES_BLOCK_SIZE,
-+		.ivsize		= AES_BLOCK_SIZE,
-+		.min_keysize	= AES_MIN_KEY_SIZE,
-+		.max_keysize	= AES_MAX_KEY_SIZE,
++		.flags		= QCE_HASH_SHA1_HMAC,
++		.name		= "hmac(sha1)",
++		.drv_name	= "hmac-sha1-qce",
++		.digestsize	= SHA1_DIGEST_SIZE,
++		.blocksize	= SHA1_BLOCK_SIZE,
++		.statesize	= sizeof(struct sha1_state),
++		.std_iv		= std_iv_sha1,
 +	},
 +	{
-+		.flags		= QCE_ALG_AES | QCE_MODE_XTS,
-+		.name		= "xts(aes)",
-+		.drv_name	= "xts-aes-qce",
-+		.blocksize	= AES_BLOCK_SIZE,
-+		.ivsize		= AES_BLOCK_SIZE,
-+		.min_keysize	= AES_MIN_KEY_SIZE,
-+		.max_keysize	= AES_MAX_KEY_SIZE,
-+	},
-+	{
-+		.flags		= QCE_ALG_DES | QCE_MODE_ECB,
-+		.name		= "ecb(des)",
-+		.drv_name	= "ecb-des-qce",
-+		.blocksize	= DES_BLOCK_SIZE,
-+		.ivsize		= 0,
-+		.min_keysize	= QCE_DES_KEY_SIZE,
-+		.max_keysize	= QCE_DES_KEY_SIZE,
-+	},
-+	{
-+		.flags		= QCE_ALG_DES | QCE_MODE_CBC,
-+		.name		= "cbc(des)",
-+		.drv_name	= "cbc-des-qce",
-+		.blocksize	= DES_BLOCK_SIZE,
-+		.ivsize		= DES_BLOCK_SIZE,
-+		.min_keysize	= QCE_DES_KEY_SIZE,
-+		.max_keysize	= QCE_DES_KEY_SIZE,
-+	},
-+	{
-+		.flags		= QCE_ALG_3DES | QCE_MODE_ECB,
-+		.name		= "ecb(des3_ede)",
-+		.drv_name	= "ecb-3des-qce",
-+		.blocksize	= DES3_EDE_BLOCK_SIZE,
-+		.ivsize		= 0,
-+		.min_keysize	= DES3_EDE_KEY_SIZE,
-+		.max_keysize	= DES3_EDE_KEY_SIZE,
-+	},
-+	{
-+		.flags		= QCE_ALG_3DES | QCE_MODE_CBC,
-+		.name		= "cbc(des3_ede)",
-+		.drv_name	= "cbc-3des-qce",
-+		.blocksize	= DES3_EDE_BLOCK_SIZE,
-+		.ivsize		= DES3_EDE_BLOCK_SIZE,
-+		.min_keysize	= DES3_EDE_KEY_SIZE,
-+		.max_keysize	= DES3_EDE_KEY_SIZE,
++		.flags		= QCE_HASH_SHA256_HMAC,
++		.name		= "hmac(sha256)",
++		.drv_name	= "hmac-sha256-qce",
++		.digestsize	= SHA256_DIGEST_SIZE,
++		.blocksize	= SHA256_BLOCK_SIZE,
++		.statesize	= sizeof(struct sha256_state),
++		.std_iv		= std_iv_sha256,
 +	},
 +};
 +
-+static int qce_ablk_register_one(const struct qce_ablkcipher_def *def,
-+				 struct qce_device *qce,
-+				 struct qce_algo_ops *ops)
++static int qce_ahash_register_one(const struct qce_ahash_def *def,
++				  struct qce_device *qce,
++				  struct qce_algo_ops *ops)
 +{
 +	struct qce_alg_template *tmpl;
-+	struct crypto_alg *alg;
++	struct ahash_alg *alg;
++	struct crypto_alg *base;
 +	struct list_head *alg_list = &qce->alg_list;
 +	int rc;
 +
@@ -372,68 +563,74 @@ index 000000000000..364162187c8c
 +	if (!tmpl)
 +		return -ENOMEM;
 +
-+	alg = &tmpl->alg.crypto;
++	tmpl->std_iv = def->std_iv;
 +
-+	snprintf(alg->cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);
-+	snprintf(alg->cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
++	alg = &tmpl->alg.ahash;
++	alg->init = qce_ahash_init;
++	alg->update = qce_ahash_update;
++	alg->final = qce_ahash_final;
++	alg->digest = qce_ahash_digest;
++	alg->export = qce_ahash_export;
++	alg->import = qce_ahash_import;
++	if (IS_SHA_HMAC(def->flags))
++		alg->setkey = qce_ahash_hmac_setkey;
++	alg->halg.digestsize = def->digestsize;
++	alg->halg.statesize = def->statesize;
++
++	base = &alg->halg.base;
++	base->cra_blocksize = def->blocksize;
++	base->cra_priority = 300;
++	base->cra_flags = CRYPTO_ALG_TYPE_AHASH | CRYPTO_ALG_ASYNC;
++	base->cra_ctxsize = sizeof(struct qce_sha_ctx);
++	base->cra_alignmask = 0;
++	base->cra_type = &crypto_ahash_type;
++	base->cra_module = THIS_MODULE;
++	base->cra_init = qce_ahash_cra_init;
++	base->cra_exit = qce_ahash_cra_exit;
++	INIT_LIST_HEAD(&base->cra_list);
++
++	snprintf(base->cra_name, CRYPTO_MAX_ALG_NAME, "%s", def->name);
++	snprintf(base->cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s",
 +		 def->drv_name);
 +
-+	alg->cra_blocksize = def->blocksize;
-+	alg->cra_ablkcipher.ivsize = def->ivsize;
-+	alg->cra_ablkcipher.min_keysize = def->min_keysize;
-+	alg->cra_ablkcipher.max_keysize = def->max_keysize;
-+	alg->cra_ablkcipher.setkey = qce_ablkcipher_setkey;
-+	alg->cra_ablkcipher.encrypt = qce_ablkcipher_encrypt;
-+	alg->cra_ablkcipher.decrypt = qce_ablkcipher_decrypt;
-+
-+	alg->cra_priority = 300;
-+	alg->cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC;
-+	alg->cra_ctxsize = sizeof(struct qce_cipher_ctx);
-+	alg->cra_alignmask = 0;
-+	alg->cra_type = &crypto_ablkcipher_type;
-+	alg->cra_module = THIS_MODULE;
-+	alg->cra_init = qce_ablkcipher_init;
-+	alg->cra_exit = qce_ablkcipher_exit;
-+	INIT_LIST_HEAD(&alg->cra_list);
-+
 +	INIT_LIST_HEAD(&tmpl->entry);
-+	tmpl->crypto_alg_type = CRYPTO_ALG_TYPE_ABLKCIPHER;
++	tmpl->crypto_alg_type = CRYPTO_ALG_TYPE_AHASH;
 +	tmpl->alg_flags = def->flags;
 +	tmpl->qce = qce;
 +	tmpl->async_req_queue = ops->async_req_queue;
 +	tmpl->async_req_done = ops->async_req_done;
-+	ops->async_req_handle = qce_ablkcipher_async_req_handle;
++	ops->async_req_handle = qce_ahash_async_req_handle;
 +
-+	rc = crypto_register_alg(alg);
++	rc = crypto_register_ahash(alg);
 +	if (rc) {
-+		dev_err(qce->dev, "%s registration failed\n", alg->cra_name);
++		dev_err(qce->dev, "%s registration failed\n", base->cra_name);
 +		kfree(tmpl);
 +		return rc;
 +	}
 +
 +	list_add_tail(&tmpl->entry, alg_list);
-+	dev_info(qce->dev, "%s is registered\n", alg->cra_name);
++	dev_info(qce->dev, "%s is registered\n", base->cra_name);
 +	return 0;
 +}
 +
-+int qce_ablkcipher_register(struct qce_device *qce, struct qce_algo_ops *ops)
++int qce_ahash_register(struct qce_device *qce, struct qce_algo_ops *ops)
 +{
 +	int rc, i;
 +
-+	for (i = 0; i < ARRAY_SIZE(ablkcipher_def); i++) {
-+		rc = qce_ablk_register_one(&ablkcipher_def[i], qce, ops);
++	for (i = 0; i < ARRAY_SIZE(ahash_def); i++) {
++		rc = qce_ahash_register_one(&ahash_def[i], qce, ops);
 +		if (rc)
 +			return rc;
 +	}
 +
 +	return 0;
 +}
-diff --git a/drivers/crypto/qce/cipher.h b/drivers/crypto/qce/cipher.h
+diff --git a/drivers/crypto/qce/sha.h b/drivers/crypto/qce/sha.h
 new file mode 100644
-index 000000000000..df6d31b4a241
+index 000000000000..4a99a8f0de82
 --- /dev/null
-+++ b/drivers/crypto/qce/cipher.h
-@@ -0,0 +1,62 @@
++++ b/drivers/crypto/qce/sha.h
+@@ -0,0 +1,74 @@
 +/*
 + * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
 + *
@@ -447,54 +644,66 @@ index 000000000000..df6d31b4a241
 + * GNU General Public License for more details.
 + */
 +
-+#ifndef _CIPHER_H_
-+#define _CIPHER_H_
++#ifndef _SHA_H_
++#define _SHA_H_
 +
-+struct qce_cipher_ctx {
-+	u8 iv[QCE_MAX_IV_SIZE];
-+	u8 enc_key[QCE_MAX_KEY_SIZE];
-+	unsigned int enc_keylen;
++struct qce_sha_ctx {
++	u8 authkey[SHA256_BLOCK_SIZE];
 +};
++
++#define STAGING_BUF_SZ	\
++	(SHA256_BLOCK_SIZE + SHA256_DIGEST_SIZE + QCE_MAX_ALIGN_SIZE)
 +
 +/*
 + * @flags: operation flags
-+ * @iv: pointer to the IV
-+ * @ivsize: IV size
-+ * @src_nents: source entries
-+ * @dst_nents: destination entries
-+ * @src_chained: is source chained
-+ * @dst_chained: is destination chained
++ * @src: request sg
++ * @src_chained: is source scatterlist chained
++ * @src_nents: source number of entries
++ * @nbytes: request number of bytes
++ * @byte_count: byte count
++ * @count: save count in states during update, import and export
++ * @first_blk: is it the first block
++ * @last_blk: is it the last block
++ * @trailing_buf: used during update, import and export
++ * @trailing_buf_len: lenght of the trailing buffer
++ * @staging_buf: buffer for internal use
++ * @digest: calculated digest
++ * @sg: used to chain sg lists
++ * @authkey: pointer to auth key in sha ctx
++ * @authklen: auth key length
 + * @result_sg: scatterlist used for result buffer
-+ * @dst_tbl: destination sg table
-+ * @dst_sg: destination sg pointer table beginning;
-+ * @src_tbl: source sg table
-+ * @src_sg: source sg pointer table beginning;
-+ * @cryptlen: crypto length
 + */
-+struct qce_cipher_reqctx {
++struct qce_sha_reqctx {
 +	u32 flags;
-+	u8 *iv;
-+	unsigned int ivsize;
-+	int src_nents;
-+	int dst_nents;
++	struct scatterlist *src;
 +	bool src_chained;
-+	bool dst_chained;
++	int src_nents;
++	unsigned int nbytes;
++	u32 byte_count[2];
++	u64 count;
++	bool first_blk;
++	bool last_blk;
++	u8 trailing_buf[SHA256_BLOCK_SIZE];
++	unsigned int trailing_buf_len;
++	u8 staging_buf[STAGING_BUF_SZ];
++	u8 digest[SHA256_DIGEST_SIZE];
++	struct scatterlist sg[2];
++	u8 *authkey;
++	unsigned int authklen;
 +	struct scatterlist result_sg;
-+	struct sg_table dst_tbl;
-+	struct scatterlist *dst_sg;
-+	struct sg_table src_tbl;
-+	struct scatterlist *src_sg;
-+	unsigned int cryptlen;
 +};
 +
-+static inline struct qce_alg_template *to_cipher_tmpl(struct crypto_tfm *tfm)
++int qce_ahash_register(struct qce_device *qce, struct qce_algo_ops *ops);
++
++static inline struct qce_alg_template *to_ahash_tmpl(struct crypto_tfm *tfm)
 +{
-+	struct crypto_alg *alg = tfm->__crt_alg;
-+	return container_of(alg, struct qce_alg_template, alg.crypto);
++	struct crypto_ahash *ahash = __crypto_ahash_cast(tfm);
++	struct ahash_alg *alg = container_of(crypto_hash_alg_common(ahash),
++					     struct ahash_alg, halg);
++
++	return container_of(alg, struct qce_alg_template, alg.ahash);
 +}
 +
-+int qce_ablkcipher_register(struct qce_device *qce, struct qce_algo_ops *ops);
-+
-+#endif /* _CIPHER_H_ */
++#endif /* _SHA_H_ */
 -- 
 1.8.4.4
