@@ -1,90 +1,65 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Fwd: [crypto:master 60/60] arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25:
- sparse: cast to restricted __be64
-Date: Fri, 4 Apr 2014 10:11:19 +0200
-Message-ID: <CAKv+Gu9bg1AgDSb3H-tMGBq53_ySaTZAeYsQeDYKS6cTnaBGUA@mail.gmail.com>
-References: <533aa1ae.qq4Hi3RBnPzgncue%fengguang.wu@intel.com>
-	<CAKv+Gu_unwqLWWn-VDegy=vF=rprC5qFhazo_sJFNm738MVgaQ@mail.gmail.com>
-	<20140401124824.GA13642@gondor.apana.org.au>
+From: Stanimir Varbanov <svarbanov@mm-sol.com>
+Subject: Re: [PATCH 3/9] crypto: qce: Add dma and sg helpers
+Date: Fri, 04 Apr 2014 11:49:19 +0300
+Message-ID: <533E720F.6050609@mm-sol.com>
+References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com> <1396541886-10966-4-git-send-email-svarbanov@mm-sol.com> <20140403182520.GH28265@joshc.qualcomm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f178.google.com ([209.85.217.178]:35436 "EHLO
-	mail-lb0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751155AbaDDILV (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Apr 2014 04:11:21 -0400
-Received: by mail-lb0-f178.google.com with SMTP id s7so2177253lbd.37
-        for <linux-crypto@vger.kernel.org>; Fri, 04 Apr 2014 01:11:20 -0700 (PDT)
-In-Reply-To: <20140401124824.GA13642@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+To: Josh Cartwright <joshc@codeaurora.org>
+Return-path: <linux-arm-msm-owner@vger.kernel.org>
+In-Reply-To: <20140403182520.GH28265@joshc.qualcomm.com>
+Sender: linux-arm-msm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Greg,
+On 04/03/2014 09:25 PM, Josh Cartwright wrote:
+> Nitworthy comments :).
+> 
+> On Thu, Apr 03, 2014 at 07:18:00PM +0300, Stanimir Varbanov wrote:
+> [..]
+>> +++ b/drivers/crypto/qce/dma.c
+> [..]
+>> +int qce_dma_request(struct device *dev, struct qce_dma_data *dma)
+>> +{
+>> +	unsigned int memsize;
+>> +	void *va;
+>> +	int ret;
+>> +
+>> +	dma->txchan = dma_request_slave_channel_reason(dev, "tx");
+>> +	if (IS_ERR(dma->txchan)) {
+>> +		ret = PTR_ERR(dma->txchan);
+>> +		return ret;
+>> +	}
+>> +
+>> +	dma->rxchan = dma_request_slave_channel_reason(dev, "rx");
+>> +	if (IS_ERR(dma->rxchan)) {
+>> +		ret = PTR_ERR(dma->rxchan);
+>> +		goto error_rx;
+>> +	}
+>> +
+>> +	memsize = QCE_RESULT_BUF_SZ + QCE_IGNORE_BUF_SZ;
+>> +	va = kzalloc(memsize, GFP_KERNEL);
+>> +	if (!va) {
+>> +		ret = -ENOMEM;
+>> +		goto error_nomem;
+>> +	}
+>> +
+>> +	dma->result_buf = va;
+>> +	dma->ignore_buf = dma->result_buf + QCE_RESULT_BUF_SZ;
+>> +
+>> +	return 0;
+>> +error_nomem:
+>> +	if (!IS_ERR(dma->rxchan))
+> 
+> How could this condition ever be false?
 
-This pertains to commit 8ceee72808d1 (crypto: ghash-clmulni-intel -
-use C implementation for setkey()) that has been pulled by Linus
-during the current merge window.
+Good catch. This is a leftover after error path restructuring. Will fix
+it on next version.
 
-It is missing two things:
-- a cc to stable annotation
-- a fix for the sparse warning below (change cast from __be64 to __force __be64)
-
-The reason for cc'ing stable on this patch is that it fixes a
-potential data corruption issue where the ghash setkey() method uses
-SSE registers without calling kernel_fpu_begin() first. This issue was
-introduced by 0e1227d356e9b (crypto: ghash - Add PCLMULQDQ accelerated
-implementation).
-
-So how would you like to proceed with this? Should I propose a new
-patch somewhere?
-
-Regards,
-Ard.
-
-
----------- Forwarded message ----------
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: 1 April 2014 14:48
-Subject: Re: [crypto:master 60/60]
-arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to
-restricted __be64
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-kbuild test robot <fengguang.wu@intel.com>
-
-
-On Tue, Apr 01, 2014 at 02:37:20PM +0200, Ard Biesheuvel wrote:
-> On 1 April 2014 13:23, kbuild test robot <fengguang.wu@intel.com> wrote:
-> > tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-> > head:   8ceee72808d1ae3fb191284afc2257a2be964725
-> > commit: 8ceee72808d1ae3fb191284afc2257a2be964725 [60/60] crypto: ghash-clmulni-intel - use C implementation for setkey()
-> > reproduce: make C=1 CF=-D__CHECK_ENDIAN__
-> >
-> >
-> > sparse warnings: (new ones prefixed by >>)
-> >
-> >>> arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to restricted __be64
-> >>> arch/x86/crypto/ghash-clmulni-intel_glue.c:72:25: sparse: cast to restricted __be64
-> >
->
-> Sigh.
->
-> The sparse warnings /without/ the be64 casts are even worse.
->
-> The obvious fix is not to use a be128 for the key, as it is obviously
-> an opaque type that just represents a byte array.
-> So, Herbert, if you prefer, I can rework this patch to use be128
-> instead of u128 inside struct ghash_ctx, but it will have some fallout
-> throughout the file. Or instead, we cast to '__force __be64',
-> basically just telling sparse to shut up ...
-
-I'll add the __force to shut it up.  Thanks!
---
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-- 
+regards,
+Stan
