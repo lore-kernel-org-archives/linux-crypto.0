@@ -1,241 +1,50 @@
-From: Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: Re: [PATCH 1/9] crypto: qce: Add core driver implementation
-Date: Fri, 04 Apr 2014 18:54:52 +0300
-Message-ID: <533ED5CC.50909@mm-sol.com>
-References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com> <1396541886-10966-2-git-send-email-svarbanov@mm-sol.com> <20140403181914.GG28265@joshc.qualcomm.com>
+From: Stanimir Vabanov <svarbanov@mm-sol.com>
+Subject: Re: [PATCH 2/9] crypto: qce: Add register defines
+Date: Sat, 05 Apr 2014 01:14:04 +0300
+Message-ID: <533F2EAC.20501@mm-sol.com>
+References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com> <1396541886-10966-3-git-send-email-svarbanov@mm-sol.com> <533E7A05.9060806@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Grant Likely <grant.likely@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org
-To: Josh Cartwright <joshc@codeaurora.org>
+To: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-arm-msm-owner@vger.kernel.org>
-In-Reply-To: <20140403181914.GG28265@joshc.qualcomm.com>
+In-Reply-To: <533E7A05.9060806@linaro.org>
 Sender: linux-arm-msm-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Josh,
+Hi Srini,
 
-Thanks for the comments!
+Thanks for the comments.
 
-On 04/03/2014 09:19 PM, Josh Cartwright wrote:
-> Hey Stanimir-
+On 04/04/2014 12:23 PM, Srinivas Kandagatla wrote:
 > 
-> Just a few comments/questions from a quick scan of your patchset:
+> Minor nitpicks.
 > 
-> On Thu, Apr 03, 2014 at 07:17:58PM +0300, Stanimir Varbanov wrote:
-> [..]
->> +++ b/drivers/crypto/qce/core.c
-> [..]
->> +
->> +static struct qce_algo_ops qce_ops[] = {
->> +	{
->> +		.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
->> +		.register_alg = qce_ablkcipher_register,
->> +	},
->> +	{
->> +		.type = CRYPTO_ALG_TYPE_AHASH,
->> +		.register_alg = qce_ahash_register,
->> +	},
->> +};
->> +
->> +static void qce_unregister_algs(struct qce_device *qce)
->> +{
->> +	struct qce_alg_template *tmpl, *n;
->> +
->> +	list_for_each_entry_safe(tmpl, n, &qce->alg_list, entry) {
->> +		if (tmpl->crypto_alg_type == CRYPTO_ALG_TYPE_AHASH)
->> +			crypto_unregister_ahash(&tmpl->alg.ahash);
->> +		else
->> +			crypto_unregister_alg(&tmpl->alg.crypto);
+> On 03/04/14 17:17, Stanimir Varbanov wrote:
+>> +#define REQ_SIZE            17 /* bit 20-17 */
 > 
-> Why no 'unregister_alg' member in qce_algo_ops?
+> I would have defined macros like this with _SHIFT at the end, something
+> like this:
+> 
+> #define REQ_SIZE_SHIFT         17
 
-Because we have a common unregister function :). We have common
-unregster function because in my opinion there is no need to copy the
-same piece of code on every algorithm file (ablkcipher.c, sha.c and one
-or two more could be added in the future). Something more, I'm not the
-inventor of this asymmetric calling convention in driver internals, it
-is widely spread in crypto drivers. So, I'm just have been inspired by
-this idea, and giving that I personally do not like the monotonic and
-linear  coding thus it was easy to me to borrow it.
+sure, I will add _SHIFT suffix to all places where it is applicable.
 
 > 
->> +
->> +		list_del(&tmpl->entry);
->> +		kfree(tmpl);
->> +	}
->> +}
->> +
->> +static int qce_register_algs(struct qce_device *qce)
->> +{
->> +	struct qce_algo_ops *ops;
->> +	int i, rc = -ENODEV;
->> +
->> +	for (i = 0; i < ARRAY_SIZE(qce_ops); i++) {
->> +		ops = &qce_ops[i];
->> +		ops->async_req_queue = qce_async_request_queue;
->> +		ops->async_req_done = qce_async_request_done;
+>> +#define REQ_SIZE_MASK            (0xf << REQ_SIZE)
+> You could possibly use GENMASK macro for this, its much readable, in
+> *some cases* it could reduce few more lines in header too.
 > 
-> Why not set these statically?
-
-To save few lines of code. If this breaks readability I could move those
-function pointers to the qce_ops[].
-
+> #define REQ_SIZE_MASK        GENMASK(20, 17)
 > 
->> +		rc = ops->register_alg(qce, ops);
->> +		if (rc)
->> +			break;
->> +	}
->> +
->> +	if (rc)
->> +		qce_unregister_algs(qce);
->> +
->> +	return rc;
->> +}
-> [..]
->> +static int qce_get_version(struct qce_device *qce)
->> +{
->> +	u32 major, minor, step;
->> +	u32 val;
->> +
->> +	val = readl(qce->base + REG_VERSION);
->> +	major = (val & CORE_MAJOR_REV_MASK) >> CORE_MAJOR_REV;
->> +	minor = (val & CORE_MINOR_REV_MASK) >> CORE_MINOR_REV;
->> +	step = (val & CORE_STEP_REV_MASK) >> CORE_STEP_REV;
->> +
->> +	/*
->> +	 * the driver does not support v5 with minor 0 because it has special
->> +	 * alignment requirements.
->> +	 */
->> +	if (major < QCE_MAJOR_VERSION5 && minor == 0)
->> +		return -ENODEV;
->> +
->> +	qce->burst_size = QCE_BAM_BURST_SIZE;
->> +	qce->pipe_pair_index = 1;
->> +
->> +	dev_info(qce->dev, "Crypto device found, version %d.%d.%d\n",
->> +		 major, minor, step);
 > 
-> I'd suggest dev_dbg().  Kernel boot is chatty enough.
+> My comments are equally applicable to most macros in this header file.
 
-OK.
+yes, right will do. Thanks.
 
-> 
-> [..]
->> +static int qce_clks_enable(struct qce_device *qce, int enable)
->> +{
->> +	int rc = 0;
->> +	int i;
->> +
->> +	for (i = 0; i < QCE_CLKS_NUM; i++) {
->> +		if (enable)
->> +			rc = clk_prepare_enable(qce->clks[i]);
->> +		else
->> +			clk_disable_unprepare(qce->clks[i]);
->> +
->> +		if (rc)
->> +			break;
->> +	}
->> +
->> +	if (rc)
->> +		do
->> +			clk_disable_unprepare(qce->clks[i]);
->> +		while (--i >= 0);
->> +
->> +	return rc;
->> +}
-> 
-> See my below comment about lumping clocks together.
-> 
-> [..]
->> +static int qce_crypto_remove(struct platform_device *pdev)
->> +{
->> +	struct qce_device *qce = platform_get_drvdata(pdev);
->> +
->> +	cancel_work_sync(&qce->queue_work);
->> +	destroy_workqueue(qce->queue_wq);
->> +	tasklet_kill(&qce->done_tasklet);
->> +	qce_unregister_algs(qce);
->> +	qce_dma_release(&qce->dma);
->> +	qce_clks_enable(qce, 0);
-> 
-> qce_clks_enable(qce, 0) is really confusing....I'd suggest creating
-> separate qce_clks_enable() and qce_clks_disable() functions.
-> 
-
-OK will do.
-
-> [..]
->> +static const struct of_device_id qce_crypto_of_match[] = {
->> +	{ .compatible = "qcom,crypto-v5.1", },
->> +	{}
->> +};
-> 
-> MODULE_DEVICE_TABLE()?
-
-Good catch. Thanks.
-
-> 
-> [..]
->> +++ b/drivers/crypto/qce/core.h
->> @@ -0,0 +1,69 @@
->> +/*
->> + * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 and
->> + * only version 2 as published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + */
->> +
->> +#ifndef _CORE_H_
->> +#define _CORE_H_
->> +
->> +static const char * const clk_names[] = {
->> +	"core",		/* GCC_CE_CLK */
->> +	"iface",	/* GCC_CE_AHB_CLK */
->> +	"bus",		/* GCC_CE_AXI_CLK */
->> +};
-> 
-> You probably don't want this in a header file, as now each compilation
-> unit will have a copy :(.
-
-It is my fault, I just forgot to move this array in the core.c.
-
-> 
-> Lumping all the clocks together assumes that you will only ever have all
-> clocks enabled, or all clocks disabled, are you sure that's what you
-> want?
-
-At least until now all clocks are needed. When adding power management
-this code should be revised.
-
-> 
-> [..]
->> +struct qce_algo_ops {
->> +	u32 type;
->> +	int (*register_alg)(struct qce_device *qce, struct qce_algo_ops *ops);
->> +	int (*async_req_queue)(struct qce_device *qce,
->> +			       struct crypto_async_request *req);
->> +	void (*async_req_done)(struct qce_device *qce, int ret);
-> 
-> What is the relationship between qce_algo_ops and the qce_alg_template
-> (which has these same two identically named callbacks)?
-
-This is a way of passing function pointers from core.c to the
-ablkcipher.c and sha.c (where they are needed to queue up new crypto
-async requests and finish the requests with done counterpart). This
-avoids prototyping those core.c functions and calling them directly.
-
--- 
 regards,
 Stan
