@@ -1,144 +1,266 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [crypto:master 60/60]
- arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to restricted
- __be64
-Date: Fri, 4 Apr 2014 21:06:07 +0800
-Message-ID: <20140404130607.GA9604@gondor.apana.org.au>
-References: <533aa1ae.qq4Hi3RBnPzgncue%fengguang.wu@intel.com>
- <CAKv+Gu_unwqLWWn-VDegy=vF=rprC5qFhazo_sJFNm738MVgaQ@mail.gmail.com>
- <20140401124824.GA13642@gondor.apana.org.au>
- <20140404122537.GA9389@gondor.apana.org.au>
- <CAKv+Gu84=VWiS+4EBopjfte-ZrXkGg-1K1Gh6-iA+=bKR8vC8g@mail.gmail.com>
+From: Stanimir Varbanov <svarbanov@mm-sol.com>
+Subject: Re: [PATCH 3/9] crypto: qce: Add dma and sg helpers
+Date: Fri, 04 Apr 2014 16:07:13 +0300
+Message-ID: <533EAE81.6060109@mm-sol.com>
+References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com> <1396541886-10966-4-git-send-email-svarbanov@mm-sol.com> <20140403231525.GE17066@sonymobile.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	kbuild test robot <fengguang.wu@intel.com>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:47547 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752388AbaDDNGK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Apr 2014 09:06:10 -0400
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu84=VWiS+4EBopjfte-ZrXkGg-1K1Gh6-iA+=bKR8vC8g@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>
+To: Courtney Cavin <courtney.cavin@sonymobile.com>
+Return-path: <linux-arm-msm-owner@vger.kernel.org>
+In-Reply-To: <20140403231525.GE17066@sonymobile.com>
+Sender: linux-arm-msm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Apr 04, 2014 at 03:03:55PM +0200, Ard Biesheuvel wrote:
-> On 4 April 2014 14:25, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > On Tue, Apr 01, 2014 at 08:48:24PM +0800, Herbert Xu wrote:
-> >> On Tue, Apr 01, 2014 at 02:37:20PM +0200, Ard Biesheuvel wrote:
-> >> > On 1 April 2014 13:23, kbuild test robot <fengguang.wu@intel.com> wrote:
-> >> > > tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-> >> > > head:   8ceee72808d1ae3fb191284afc2257a2be964725
-> >> > > commit: 8ceee72808d1ae3fb191284afc2257a2be964725 [60/60] crypto: ghash-clmulni-intel - use C implementation for setkey()
-> >> > > reproduce: make C=1 CF=-D__CHECK_ENDIAN__
-> >> > >
-> >> > >
-> >> > > sparse warnings: (new ones prefixed by >>)
-> >> > >
-> >> > >>> arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to restricted __be64
-> >> > >>> arch/x86/crypto/ghash-clmulni-intel_glue.c:72:25: sparse: cast to restricted __be64
-> >> > >
-> >> >
-> >> > Sigh.
-> >> >
-> >> > The sparse warnings /without/ the be64 casts are even worse.
-> >> >
-> >> > The obvious fix is not to use a be128 for the key, as it is obviously
-> >> > an opaque type that just represents a byte array.
-> >> > So, Herbert, if you prefer, I can rework this patch to use be128
-> >> > instead of u128 inside struct ghash_ctx, but it will have some fallout
-> >> > throughout the file. Or instead, we cast to '__force __be64',
-> >> > basically just telling sparse to shut up ...
-> >>
-> >> I'll add the __force to shut it up.  Thanks!
-> >
-> > On closer inspection I think your suggestion to use u128 makes
-> > more sense.  So I have added the following patch to cryptodev.
-> >
-> > commit 91eef5ab1b378e10e6f87c28c9bb46614a1cc491
-> > Author: Herbert Xu <herbert@gondor.apana.org.au>
-> > Date:   Fri Apr 4 20:24:03 2014 +0800
-> >
-> >     crypto: ghash-clmulni-intel - Use u128 instead of be128 for internal key
-> >
-> >     The internal key isn't actually in big-endian format so let's switch
-> >     to u128 which also happens to allow us to remove a sparse warning.
-> >
-> >     Based on suggestion by Ard Biesheuvel.
-> >
-> >     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> >
-> > diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-> > index 185fad4..5d1e007 100644
-> > --- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
-> > +++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-> > @@ -92,7 +92,7 @@ __clmul_gf128mul_ble:
-> >         ret
-> >  ENDPROC(__clmul_gf128mul_ble)
-> >
-> > -/* void clmul_ghash_mul(char *dst, const be128 *shash) */
-> > +/* void clmul_ghash_mul(char *dst, const u128 *shash) */
-> >  ENTRY(clmul_ghash_mul)
-> >         movups (%rdi), DATA
-> >         movups (%rsi), SHASH
-> > @@ -106,7 +106,7 @@ ENDPROC(clmul_ghash_mul)
-> >
-> >  /*
-> >   * void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
-> > - *                        const be128 *shash);
-> > + *                        const u128 *shash);
-> >   */
-> >  ENTRY(clmul_ghash_update)
-> >         cmp $16, %rdx
-> > diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> > index d785cf2..00eacd2 100644
-> > --- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> > +++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> > @@ -25,17 +25,17 @@
-> >  #define GHASH_BLOCK_SIZE       16
-> >  #define GHASH_DIGEST_SIZE      16
-> >
-> > -void clmul_ghash_mul(char *dst, const be128 *shash);
-> > +void clmul_ghash_mul(char *dst, const u128 *shash);
-> >
-> >  void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
-> > -                       const be128 *shash);
-> > +                       const u128 *shash);
-> >
-> >  struct ghash_async_ctx {
-> >         struct cryptd_ahash *cryptd_tfm;
-> >  };
-> >
-> >  struct ghash_ctx {
-> > -       be128 shash;
-> > +       u128 shash;
-> >  };
-> >
-> >  struct ghash_desc_ctx {
-> > @@ -68,11 +68,11 @@ static int ghash_setkey(struct crypto_shash *tfm,
-> >         a = be64_to_cpu(x->a);
-> >         b = be64_to_cpu(x->b);
-> >
-> > -       ctx->shash.a = (__be64)((b << 1) | (a >> 63));
-> > -       ctx->shash.b = (__be64)((a << 1) | (b >> 63));
-> > +       ctx->shash.a = (b << 1) | (a >> 63);
-> > +       ctx->shash.b = (a << 1) | (b >> 63);
-> >
-> >         if (a >> 63)
-> > -               ctx->shash.b ^= cpu_to_be64(0xc2);
-> > +               ctx->shash.b ^= ((u64)0xc2) << 48;
-> >
-> 
-> I think you mean '0xc2 << 56' here
-> 
-> Other than that:
-> Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Hi Courtney,
 
-Thanks for catching the error.  I'll fix it and add your ack.
+Thanks for the comments!
+
+On 04/04/2014 02:15 AM, Courtney Cavin wrote:
+> On Thu, Apr 03, 2014 at 06:18:00PM +0200, Stanimir Varbanov wrote:
+>> This adds dmaengine and sg-list helper functions used by
+>> other parts of the crypto driver.
+>>
+>> Signed-off-by: Stanimir Varbanov <svarbanov@mm-sol.com>
+>> ---
+>>  drivers/crypto/qce/dma.c | 201 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  drivers/crypto/qce/dma.h |  57 ++++++++++++++
+>>  2 files changed, 258 insertions(+)
+>>  create mode 100644 drivers/crypto/qce/dma.c
+>>  create mode 100644 drivers/crypto/qce/dma.h
+> 
+> More nitpicking, because everyone loves that....
+> 
+>>
+>> diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
+>> new file mode 100644
+>> index 000000000000..1bad958db2f9
+>> --- /dev/null
+>> +++ b/drivers/crypto/qce/dma.c
+>> @@ -0,0 +1,201 @@
+> [...]
+>> +int qce_dma_request(struct device *dev, struct qce_dma_data *dma)
+>> +{
+>> +	unsigned int memsize;
+>> +	void *va;
+>> +	int ret;
+>> +
+>> +	dma->txchan = dma_request_slave_channel_reason(dev, "tx");
+>> +	if (IS_ERR(dma->txchan)) {
+>> +		ret = PTR_ERR(dma->txchan);
+>> +		return ret;
+> 
+> You can just return PTR_ERR(dma->txchan) here, no need to set 'ret'.
+
+I think the idea was to have only one exit point from the function,
+never mind I will return from here.
+
+> 
+>> +	}
+>> +
+>> +	dma->rxchan = dma_request_slave_channel_reason(dev, "rx");
+>> +	if (IS_ERR(dma->rxchan)) {
+>> +		ret = PTR_ERR(dma->rxchan);
+>> +		goto error_rx;
+>> +	}
+>> +
+>> +	memsize = QCE_RESULT_BUF_SZ + QCE_IGNORE_BUF_SZ;
+>> +	va = kzalloc(memsize, GFP_KERNEL);
+> 
+> 'memsize' is only used here.  Just pass 'QCE_RESULT_BUF_SZ +
+> QCE_IGNORE_BUF_SZ' directly to kzalloc().
+> 
+
+The only reason to have "memsize" variable is to avoid carry over the
+new line. The compiler is smart enough to delete this variable. But this
+is a minor issue and I tend to agree with you.
+
+> Additionally, is there some particular reason why we need to zero this
+> memory?
+
+IMO, it makes sense when debugging some issue related to dma to this
+memory.
+
+> 
+>> +	if (!va) {
+>> +		ret = -ENOMEM;
+>> +		goto error_nomem;
+>> +	}
+>> +
+>> +	dma->result_buf = va;
+> 
+> Is there some requirement that we don't set dma->result_buf on error?
+> If not, we can discard the 'va' variable as well.
+
+No, there is no such requirement, the error is fatal and driver will
+refuse to .probe.
+
+> 
+>> +	dma->ignore_buf = dma->result_buf + QCE_RESULT_BUF_SZ;
+>> +
+>> +	return 0;
+>> +error_nomem:
+>> +	if (!IS_ERR(dma->rxchan))
+>> +		dma_release_channel(dma->rxchan);
+>> +error_rx:
+>> +	if (!IS_ERR(dma->txchan))
+>> +		dma_release_channel(dma->txchan);
+>> +	return ret;
+>> +}
+>> +
+>> +void qce_dma_release(struct qce_dma_data *dma)
+>> +{
+>> +	dma_release_channel(dma->txchan);
+>> +	dma_release_channel(dma->rxchan);
+>> +	kfree(dma->result_buf);
+>> +}
+>> +
+>> +int qce_mapsg(struct device *dev, struct scatterlist *sg, unsigned int nents,
+>> +	      enum dma_data_direction dir, bool chained)
+>> +{
+>> +	int err;
+>> +
+>> +	if (chained) {
+>> +		while (sg) {
+>> +			err = dma_map_sg(dev, sg, 1, dir);
+>> +			if (!err)
+>> +				goto error;
+>> +			sg = scatterwalk_sg_next(sg);
+>> +		}
+>> +	} else {
+>> +		err = dma_map_sg(dev, sg, nents, dir);
+>> +		if (!err)
+>> +			goto error;
+>> +	}
+>> +
+>> +	return nents;
+>> +error:
+>> +	return -EFAULT;
+> 
+> No need for this label, as there's no cleanup.  Just return
+> -EFAULT directly on error.
+
+Sure, will do.
+
+> 
+>> +}
+> [...]
+>> +struct scatterlist *
+>> +qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl)
+>> +{
+>> +	struct scatterlist *sg = sgt->sgl, *sg_last = NULL;
+>> +
+>> +	while (sg) {
+>> +		if (!sg_page(sg))
+>> +			break;
+>> +		sg = sg_next(sg);
+>> +	}
+>> +
+>> +	if (!sg)
+>> +		goto error;
+>> +
+>> +	while (new_sgl && sg) {
+>> +		sg_set_page(sg, sg_page(new_sgl), new_sgl->length,
+>> +			    new_sgl->offset);
+>> +		sg_last = sg;
+>> +		sg = sg_next(sg);
+>> +		new_sgl = sg_next(new_sgl);
+>> +	}
+>> +
+>> +	if (new_sgl)
+>> +		goto error;
+>> +
+>> +	return sg_last;
+>> +error:
+>> +	return ERR_PTR(-EINVAL);
+> 
+> No need for this label, as there's no cleanup.  Just return
+> ERR_PTR(-EINVAL) directly on error.
+
+Sure, will fix it.
+
+> 
+>> +}
+>> +
+>> +static int qce_dma_prep_sg(struct dma_chan *chan, struct scatterlist *sg,
+>> +			   int nents, unsigned long flags,
+>> +			   enum dma_transfer_direction dir,
+>> +			   dma_async_tx_callback cb, void *cb_param)
+>> +{
+>> +	struct dma_async_tx_descriptor *desc;
+>> +
+>> +	if (!sg || !nents)
+>> +		return -EINVAL;
+>> +
+>> +	desc = dmaengine_prep_slave_sg(chan, sg, nents, dir, flags);
+>> +	if (!desc)
+>> +		return -EINVAL;
+>> +
+>> +	desc->callback = cb;
+>> +	desc->callback_param = cb_param;
+>> +	dmaengine_submit(desc);
+> 
+> Do we not care if there is an error here?
+> 
+> dma_cookie_t cookie;
+> ...
+> cookie = dmaengine_submit(desc);
+> return dma_submit_error(cookie);
+> 
+
+Good catch, we should care. Will check the error. Thanks.
+
+>> +	return 0;
+>> +}
+> [...]
+>> diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
+>> new file mode 100644
+>> index 000000000000..932b02fd8f25
+>> --- /dev/null
+>> +++ b/drivers/crypto/qce/dma.h
+>> @@ -0,0 +1,57 @@
+>> +/*
+>> + * Copyright (c) 2011-2014, The Linux Foundation. All rights reserved.
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 and
+>> + * only version 2 as published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + */
+>> +
+>> +#ifndef _DMA_H_
+>> +#define _DMA_H_
+>> +
+>> +#define QCE_AUTHIV_REGS_CNT		16
+>> +#define QCE_AUTH_BYTECOUNT_REGS_CNT	4
+>> +#define QCE_CNTRIV_REGS_CNT		4
+>> +
+>> +/* result dump format */
+>> +struct qce_result_dump {
+>> +	u32 auth_iv[QCE_AUTHIV_REGS_CNT];
+>> +	u32 auth_byte_count[QCE_AUTH_BYTECOUNT_REGS_CNT];
+>> +	u32 encr_cntr_iv[QCE_CNTRIV_REGS_CNT];
+>> +	u32 status;
+>> +	u32 status2;
+>> +};
+>> +
+>> +#define QCE_IGNORE_BUF_SZ	(2 * QCE_BAM_BURST_SIZE)
+> 
+> QCE_BAM_BURST_SIZE is defined in common.h in 6/9.  Either that file
+> needs to be included from this one, or the definition needs to be moved.
+
+I decided to not include any files in driver private headers. Thus I
+include the private header files in relevant c files in order.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+regards,
+Stan
