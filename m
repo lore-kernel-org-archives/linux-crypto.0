@@ -1,116 +1,90 @@
-From: Courtney Cavin <courtney.cavin@sonymobile.com>
-Subject: Re: [PATCH 1/9] crypto: qce: Add core driver implementation
-Date: Thu, 3 Apr 2014 16:38:44 -0700
-Message-ID: <20140403233844.GF17066@sonymobile.com>
-References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com>
- <1396541886-10966-2-git-send-email-svarbanov@mm-sol.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Fwd: [crypto:master 60/60] arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25:
+ sparse: cast to restricted __be64
+Date: Fri, 4 Apr 2014 10:11:19 +0200
+Message-ID: <CAKv+Gu9bg1AgDSb3H-tMGBq53_ySaTZAeYsQeDYKS6cTnaBGUA@mail.gmail.com>
+References: <533aa1ae.qq4Hi3RBnPzgncue%fengguang.wu@intel.com>
+	<CAKv+Gu_unwqLWWn-VDegy=vF=rprC5qFhazo_sJFNm738MVgaQ@mail.gmail.com>
+	<20140401124824.GA13642@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Grant Likely <grant.likely@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>
-To: Stanimir Varbanov <svarbanov@mm-sol.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from seldrel01.sonyericsson.com ([212.209.106.2]:2691 "EHLO
-	seldrel01.sonyericsson.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753818AbaDCXgo (ORCPT
+Received: from mail-lb0-f178.google.com ([209.85.217.178]:35436 "EHLO
+	mail-lb0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751155AbaDDILV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Apr 2014 19:36:44 -0400
-Content-Disposition: inline
-In-Reply-To: <1396541886-10966-2-git-send-email-svarbanov@mm-sol.com>
+	Fri, 4 Apr 2014 04:11:21 -0400
+Received: by mail-lb0-f178.google.com with SMTP id s7so2177253lbd.37
+        for <linux-crypto@vger.kernel.org>; Fri, 04 Apr 2014 01:11:20 -0700 (PDT)
+In-Reply-To: <20140401124824.GA13642@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 03, 2014 at 06:17:58PM +0200, Stanimir Varbanov wrote:
-> This adds core driver files. The core part is implementing a
-> platform driver probe and remove callbaks, the probe enables
-> clocks, checks crypto version, initialize and request dma
-> channels, create done tasklet and work queue and finally
-> register the algorithms into crypto subsystem.
-> 
-> Signed-off-by: Stanimir Varbanov <svarbanov@mm-sol.com>
-> ---
->  drivers/crypto/qce/core.c | 333 ++++++++++++++++++++++++++++++++++++++++++++++
->  drivers/crypto/qce/core.h |  69 ++++++++++
->  2 files changed, 402 insertions(+)
->  create mode 100644 drivers/crypto/qce/core.c
->  create mode 100644 drivers/crypto/qce/core.h
-> 
-> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-[...]
-> +static struct qce_algo_ops qce_ops[] = {
-> +	{
-> +		.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
-> +		.register_alg = qce_ablkcipher_register,
-> +	},
-> +	{
-> +		.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.register_alg = qce_ahash_register,
-> +	},
-> +};
-> +
-> +static void qce_unregister_algs(struct qce_device *qce)
-> +{
-> +	struct qce_alg_template *tmpl, *n;
-> +
-> +	list_for_each_entry_safe(tmpl, n, &qce->alg_list, entry) {
-> +		if (tmpl->crypto_alg_type == CRYPTO_ALG_TYPE_AHASH)
-> +			crypto_unregister_ahash(&tmpl->alg.ahash);
-> +		else
-> +			crypto_unregister_alg(&tmpl->alg.crypto);
-> +
-> +		list_del(&tmpl->entry);
-> +		kfree(tmpl);
+Greg,
 
-I find this whole memory/list management to be very disorganised.
-ops->register_alg() is supposed to allocate this item--more precisely,
-multiple items--using something that must be able to be kfree'd
-directly, register it with the crypto core, and put it on this list
-manually.  Here we unregister/remove/free this in the core.  Josh's
-recommendation of a unregister_alg callback might help, but it all
-remains a bit unclear with register_alg/unregister_alg managing X
-algorithms per call. 
+This pertains to commit 8ceee72808d1 (crypto: ghash-clmulni-intel -
+use C implementation for setkey()) that has been pulled by Linus
+during the current merge window.
 
-Additionally, above you have qce_ops, which clearly defines the
-operations for specific algorithms types/groups, which in later patches
-are shown to be seperated out into independent implementations.
+It is missing two things:
+- a cc to stable annotation
+- a fix for the sparse warning below (change cast from __be64 to __force __be64)
 
->From what I can tell, this seems to be a framework with built-in yet
-independent crypto implementations which call the crypto API directly.
+The reason for cc'ing stable on this patch is that it fixes a
+potential data corruption issue where the ghash setkey() method uses
+SSE registers without calling kernel_fpu_begin() first. This issue was
+introduced by 0e1227d356e9b (crypto: ghash - Add PCLMULQDQ accelerated
+implementation).
 
-It would be more logical to me if this was seperated out into a
-"library/core" API, with the individual implementations as platform
-drivers of their own.  Then they can register with the core, managing
-memory how they please.
+So how would you like to proceed with this? Should I propose a new
+patch somewhere?
 
-What am I missing?
+Regards,
+Ard.
 
-> +	}
-> +}
-> +
-> +static int qce_register_algs(struct qce_device *qce)
-> +{
-> +	struct qce_algo_ops *ops;
-> +	int i, rc = -ENODEV;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(qce_ops); i++) {
-> +		ops = &qce_ops[i];
-> +		ops->async_req_queue = qce_async_request_queue;
-> +		ops->async_req_done = qce_async_request_done;
-> +		rc = ops->register_alg(qce, ops);
-> +		if (rc)
-> +			break;
-> +	}
-> +
-> +	if (rc)
-> +		qce_unregister_algs(qce);
-> +
-> +	return rc;
-> +}
 
--Courtney
+---------- Forwarded message ----------
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Date: 1 April 2014 14:48
+Subject: Re: [crypto:master 60/60]
+arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to
+restricted __be64
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+kbuild test robot <fengguang.wu@intel.com>
+
+
+On Tue, Apr 01, 2014 at 02:37:20PM +0200, Ard Biesheuvel wrote:
+> On 1 April 2014 13:23, kbuild test robot <fengguang.wu@intel.com> wrote:
+> > tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
+> > head:   8ceee72808d1ae3fb191284afc2257a2be964725
+> > commit: 8ceee72808d1ae3fb191284afc2257a2be964725 [60/60] crypto: ghash-clmulni-intel - use C implementation for setkey()
+> > reproduce: make C=1 CF=-D__CHECK_ENDIAN__
+> >
+> >
+> > sparse warnings: (new ones prefixed by >>)
+> >
+> >>> arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to restricted __be64
+> >>> arch/x86/crypto/ghash-clmulni-intel_glue.c:72:25: sparse: cast to restricted __be64
+> >
+>
+> Sigh.
+>
+> The sparse warnings /without/ the be64 casts are even worse.
+>
+> The obvious fix is not to use a be128 for the key, as it is obviously
+> an opaque type that just represents a byte array.
+> So, Herbert, if you prefer, I can rework this patch to use be128
+> instead of u128 inside struct ghash_ctx, but it will have some fallout
+> throughout the file. Or instead, we cast to '__force __be64',
+> basically just telling sparse to shut up ...
+
+I'll add the __force to shut it up.  Thanks!
+--
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
