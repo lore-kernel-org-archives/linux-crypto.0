@@ -1,65 +1,45 @@
-From: Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: Re: [PATCH 3/9] crypto: qce: Add dma and sg helpers
-Date: Fri, 04 Apr 2014 11:49:19 +0300
-Message-ID: <533E720F.6050609@mm-sol.com>
-References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com> <1396541886-10966-4-git-send-email-svarbanov@mm-sol.com> <20140403182520.GH28265@joshc.qualcomm.com>
+From: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
+Subject: Re: [PATCH 2/9] crypto: qce: Add register defines
+Date: Fri, 04 Apr 2014 10:23:17 +0100
+Message-ID: <533E7A05.9060806@linaro.org>
+References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com> <1396541886-10966-3-git-send-email-svarbanov@mm-sol.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org
-To: Josh Cartwright <joshc@codeaurora.org>
+To: Stanimir Varbanov <svarbanov@mm-sol.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-arm-msm-owner@vger.kernel.org>
-In-Reply-To: <20140403182520.GH28265@joshc.qualcomm.com>
+In-Reply-To: <1396541886-10966-3-git-send-email-svarbanov@mm-sol.com>
 Sender: linux-arm-msm-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 04/03/2014 09:25 PM, Josh Cartwright wrote:
-> Nitworthy comments :).
-> 
-> On Thu, Apr 03, 2014 at 07:18:00PM +0300, Stanimir Varbanov wrote:
-> [..]
->> +++ b/drivers/crypto/qce/dma.c
-> [..]
->> +int qce_dma_request(struct device *dev, struct qce_dma_data *dma)
->> +{
->> +	unsigned int memsize;
->> +	void *va;
->> +	int ret;
->> +
->> +	dma->txchan = dma_request_slave_channel_reason(dev, "tx");
->> +	if (IS_ERR(dma->txchan)) {
->> +		ret = PTR_ERR(dma->txchan);
->> +		return ret;
->> +	}
->> +
->> +	dma->rxchan = dma_request_slave_channel_reason(dev, "rx");
->> +	if (IS_ERR(dma->rxchan)) {
->> +		ret = PTR_ERR(dma->rxchan);
->> +		goto error_rx;
->> +	}
->> +
->> +	memsize = QCE_RESULT_BUF_SZ + QCE_IGNORE_BUF_SZ;
->> +	va = kzalloc(memsize, GFP_KERNEL);
->> +	if (!va) {
->> +		ret = -ENOMEM;
->> +		goto error_nomem;
->> +	}
->> +
->> +	dma->result_buf = va;
->> +	dma->ignore_buf = dma->result_buf + QCE_RESULT_BUF_SZ;
->> +
->> +	return 0;
->> +error_nomem:
->> +	if (!IS_ERR(dma->rxchan))
-> 
-> How could this condition ever be false?
 
-Good catch. This is a leftover after error path restructuring. Will fix
-it on next version.
+Minor nitpicks.
 
--- 
-regards,
-Stan
+On 03/04/14 17:17, Stanimir Varbanov wrote:
+> +#define REQ_SIZE			17 /* bit 20-17 */
+
+I would have defined macros like this with _SHIFT at the end, something=
+=20
+like this:
+
+#define REQ_SIZE_SHIFT 		17
+
+> +#define REQ_SIZE_MASK			(0xf << REQ_SIZE)
+You could possibly use GENMASK macro for this, its much readable, in=20
+*some cases* it could reduce few more lines in header too.
+
+#define REQ_SIZE_MASK		GENMASK(20, 17)
+
+
+My comments are equally applicable to most macros in this header file.
+
+--
+srini
+Linaro Qualcomm Landing Team.
+Linaro.org =E2=94=82 Open source software for ARM SoCs
+=46ollow Linaro: Facebook | Twitter | Blog
