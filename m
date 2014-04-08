@@ -1,71 +1,61 @@
-From: Courtney Cavin <courtney.cavin@sonymobile.com>
-Subject: Re: [PATCH 3/9] crypto: qce: Add dma and sg helpers
-Date: Mon, 7 Apr 2014 15:42:56 -0700
-Message-ID: <20140407224256.GG17066@sonymobile.com>
-References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com>
- <1396541886-10966-4-git-send-email-svarbanov@mm-sol.com>
- <20140403231525.GE17066@sonymobile.com>
- <533EAE81.6060109@mm-sol.com>
+From: Jingoo Han <jg1.han@samsung.com>
+Subject: [PATCH V2] crypto: omap-des - use devm_ioremap_resource()
+Date: Tue, 08 Apr 2014 13:54:22 +0900
+Message-ID: <008301cf52e6$9b764990$d262dcb0$%han@samsung.com>
+References: <001d01cf4ed2$494fd0e0$dbef72a0$%han@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>
-To: Stanimir Varbanov <svarbanov@mm-sol.com>
-Return-path: <linux-arm-msm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <533EAE81.6060109@mm-sol.com>
-Sender: linux-arm-msm-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: 'David Miller' <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	'Joel Fernandes' <joelf@ti.com>,
+	'Jingoo Han' <jg1.han@samsung.com>
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout4.samsung.com ([203.254.224.34]:40101 "EHLO
+	mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750904AbaDHEyX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Apr 2014 00:54:23 -0400
+Received: from epcpsbgr3.samsung.com
+ (u143.gpu120.samsung.co.kr [203.254.230.143])
+ by mailout4.samsung.com (Oracle Communications Messaging Server 7u4-24.01
+ (7.0.4.24.0) 64bit (built Nov 17 2011))
+ with ESMTP id <0N3P00HAH4AMR160@mailout4.samsung.com> for
+ linux-crypto@vger.kernel.org; Tue, 08 Apr 2014 13:54:22 +0900 (KST)
+In-reply-to: <001d01cf4ed2$494fd0e0$dbef72a0$%han@samsung.com>
+Content-language: ko
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 04, 2014 at 03:07:13PM +0200, Stanimir Varbanov wrote:
-> >> diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
-> >> new file mode 100644
-> >> index 000000000000..932b02fd8f25
-> >> --- /dev/null
-> >> +++ b/drivers/crypto/qce/dma.h
-> >> @@ -0,0 +1,57 @@
-> >> +/*
-> >> + * Copyright (c) 2011-2014, The Linux Foundation. All rights reserved.
-> >> + *
-> >> + * This program is free software; you can redistribute it and/or modify
-> >> + * it under the terms of the GNU General Public License version 2 and
-> >> + * only version 2 as published by the Free Software Foundation.
-> >> + *
-> >> + * This program is distributed in the hope that it will be useful,
-> >> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> >> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> >> + * GNU General Public License for more details.
-> >> + */
-> >> +
-> >> +#ifndef _DMA_H_
-> >> +#define _DMA_H_
-> >> +
-> >> +#define QCE_AUTHIV_REGS_CNT		16
-> >> +#define QCE_AUTH_BYTECOUNT_REGS_CNT	4
-> >> +#define QCE_CNTRIV_REGS_CNT		4
-> >> +
-> >> +/* result dump format */
-> >> +struct qce_result_dump {
-> >> +	u32 auth_iv[QCE_AUTHIV_REGS_CNT];
-> >> +	u32 auth_byte_count[QCE_AUTH_BYTECOUNT_REGS_CNT];
-> >> +	u32 encr_cntr_iv[QCE_CNTRIV_REGS_CNT];
-> >> +	u32 status;
-> >> +	u32 status2;
-> >> +};
-> >> +
-> >> +#define QCE_IGNORE_BUF_SZ	(2 * QCE_BAM_BURST_SIZE)
-> > 
-> > QCE_BAM_BURST_SIZE is defined in common.h in 6/9.  Either that file
-> > needs to be included from this one, or the definition needs to be moved.
-> 
-> I decided to not include any files in driver private headers. Thus I
-> include the private header files in relevant c files in order.
+Use devm_ioremap_resource() because devm_request_and_ioremap() is
+obsoleted by devm_ioremap_resource().
 
-Actually, that is exactly what I was trying to indicate as undesirable.
-Please modify this so that each individual header file doesn't require
-you to include another file for usage.
+Signed-off-by: Jingoo Han <jg1.han@samsung.com>
+---
+Changes since v1:
+- remove unnecessary error message, because devm_ioremap_resource()
+  already prints one in all failure cases.
 
--Courtney
+ drivers/crypto/omap-des.c |    7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index ec5f131..4a13624 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -1074,10 +1074,9 @@ static int omap_des_probe(struct platform_device *pdev)
+ 	if (err)
+ 		goto err_res;
+ 
+-	dd->io_base = devm_request_and_ioremap(dev, res);
+-	if (!dd->io_base) {
+-		dev_err(dev, "can't ioremap\n");
+-		err = -ENOMEM;
++	dd->io_base = devm_ioremap_resource(dev, res);
++	if (IS_ERR(dd->io_base)) {
++		err = PTR_ERR(dd->io_base);
+ 		goto err_res;
+ 	}
+ 	dd->phys_base = res->start;
+-- 
+1.7.10.4
