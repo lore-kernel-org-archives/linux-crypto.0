@@ -1,61 +1,67 @@
-From: Joel Fernandes <joelf@ti.com>
-Subject: Re: [PATCH V2] crypto: omap-des - use devm_ioremap_resource()
-Date: Wed, 9 Apr 2014 10:35:32 -0500
-Message-ID: <534568C4.8070102@ti.com>
-References: <001d01cf4ed2$494fd0e0$dbef72a0$%han@samsung.com> <008301cf52e6$9b764990$d262dcb0$%han@samsung.com>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH] crypt: bfin_crc: access crc registers by ioread32 and iowrite32 functions
+Date: Wed, 9 Apr 2014 19:32:01 +0200
+Message-ID: <201404091932.02072.marex@denx.de>
+References: <1395910353-2853-1-git-send-email-sonic.adi@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+Content-Type: Text/Plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: "'David Miller'" <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>
-To: Jingoo Han <jg1.han@samsung.com>,
-	"'Herbert Xu'" <herbert@gondor.apana.org.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org,
+	adi-buildroot-devel@lists.sourceforge.net,
+	Sonic Zhang <sonic.zhang@analog.com>
+To: Sonic Zhang <sonic.adi@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from devils.ext.ti.com ([198.47.26.153]:39071 "EHLO
-	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932786AbaDIPfo (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.10]:54738 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933776AbaDIRqi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 9 Apr 2014 11:35:44 -0400
-In-Reply-To: <008301cf52e6$9b764990$d262dcb0$%han@samsung.com>
+	Wed, 9 Apr 2014 13:46:38 -0400
+In-Reply-To: <1395910353-2853-1-git-send-email-sonic.adi@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 04/07/2014 11:54 PM, Jingoo Han wrote:
-> Use devm_ioremap_resource() because devm_request_and_ioremap() is
-> obsoleted by devm_ioremap_resource().
+On Thursday, March 27, 2014 at 09:52:33 AM, Sonic Zhang wrote:
+> From: Sonic Zhang <sonic.zhang@analog.com>
 > 
-> Signed-off-by: Jingoo Han <jg1.han@samsung.com>
-> ---
-> Changes since v1:
-> - remove unnecessary error message, because devm_ioremap_resource()
->   already prints one in all failure cases.
+> Move architecture independant crc header file out of the blackfin folder.
 > 
->  drivers/crypto/omap-des.c |    7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+> Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
+
+[...]
+
+> @@ -530,13 +532,14 @@ static irqreturn_t bfin_crypto_crc_handler(int irq,
+> void *dev_id) {
+>  	struct bfin_crypto_crc *crc = dev_id;
 > 
-> diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-> index ec5f131..4a13624 100644
-> --- a/drivers/crypto/omap-des.c
-> +++ b/drivers/crypto/omap-des.c
-> @@ -1074,10 +1074,9 @@ static int omap_des_probe(struct platform_device *pdev)
->  	if (err)
->  		goto err_res;
->  
-> -	dd->io_base = devm_request_and_ioremap(dev, res);
-> -	if (!dd->io_base) {
-> -		dev_err(dev, "can't ioremap\n");
-> -		err = -ENOMEM;
-> +	dd->io_base = devm_ioremap_resource(dev, res);
-> +	if (IS_ERR(dd->io_base)) {
-> +		err = PTR_ERR(dd->io_base);
->  		goto err_res;
->  	}
->  	dd->phys_base = res->start;
+> -	if (crc->regs->status & DCNTEXP) {
+> -		crc->regs->status = DCNTEXP;
+> +	if (ioread32(&crc->regs->status) & DCNTEXP) {
+> +		iowrite32(DCNTEXP, &crc->regs->status);
 > 
+>  		/* prepare results */
+> -		put_unaligned_le32(crc->regs->result, crc->req->result);
+> +		put_unaligned_le32(ioread32(&crc->regs->result),
+> +			crc->req->result);
+> 
+> -		crc->regs->control &= ~BLKEN;
+> +		iowrite32(ioread32(&crc->regs->control) & ~BLKEN, &crc->regs-
+>control);
 
+You should avoid combining the IO accessors into each other like this, it's 
+rather cryptic. Please introduce some variable like so:
 
-Acked-by: Joel Fernandes <joelf@ti.com>
+u32 reg;
+reg = ioread32(...);
+reg &= ~....
+iowrite32(reg, ...);
 
-Thanks,
+[...]
 
--Joel
+Why do you not use readl()/writel() ?
+
+Other than that, it's a move in the right direction.
+
+Best regards,
+Marek Vasut
