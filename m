@@ -1,71 +1,82 @@
-From: Boaz Harrosh <bharrosh@panasas.com>
-Subject: Re: [uml/do_xor_speed] WARNING: CPU: 0 PID: 1 at init/main.c:708
- do_one_initcall()
-Date: Thu, 10 Apr 2014 10:38:40 +0300
-Message-ID: <53464A80.3060202@panasas.com>
-References: <20140410065330.GB2132@localhost>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH] crypt: bfin_crc: access crc registers by ioread32 and iowrite32 functions
+Date: Thu, 10 Apr 2014 09:48:30 +0200
+Message-ID: <201404100948.30352.marex@denx.de>
+References: <1395910353-2853-1-git-send-email-sonic.adi@gmail.com> <201404091932.02072.marex@denx.de> <CAJxxZ0OgK2EP51wv1_rqigfLOvMAXMiuNciDws2xSyxnaTFUdg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: Text/Plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	Jet Chen <jet.chen@intel.com>
-To: Fengguang Wu <fengguang.wu@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org,
+	adi-buildroot-devel@lists.sourceforge.net,
+	Sonic Zhang <sonic.zhang@analog.com>
+To: Sonic Zhang <sonic.adi@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from natasha.panasas.com ([209.166.131.148]:53226 "EHLO
-	natasha.panasas.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S964877AbaDJHn6 (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:48131 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965323AbaDJIUu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Apr 2014 03:43:58 -0400
-In-Reply-To: <20140410065330.GB2132@localhost>
+	Thu, 10 Apr 2014 04:20:50 -0400
+In-Reply-To: <CAJxxZ0OgK2EP51wv1_rqigfLOvMAXMiuNciDws2xSyxnaTFUdg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 04/10/2014 09:53 AM, Fengguang Wu wrote:
-> Hi Boaz,
+On Thursday, April 10, 2014 at 05:50:37 AM, Sonic Zhang wrote:
+> Hi Marek,
 > 
-> I catch the below warning again in
+> On Thu, Apr 10, 2014 at 1:32 AM, Marek Vasut <marex@denx.de> wrote:
+> > On Thursday, March 27, 2014 at 09:52:33 AM, Sonic Zhang wrote:
+> >> From: Sonic Zhang <sonic.zhang@analog.com>
+> >> 
+> >> Move architecture independant crc header file out of the blackfin
+> >> folder.
+> >> 
+> >> Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
+> > 
+> > [...]
+> > 
+> >> @@ -530,13 +532,14 @@ static irqreturn_t bfin_crypto_crc_handler(int
+> >> irq, void *dev_id) {
+> >> 
+> >>       struct bfin_crypto_crc *crc = dev_id;
+> >> 
+> >> -     if (crc->regs->status & DCNTEXP) {
+> >> -             crc->regs->status = DCNTEXP;
+> >> +     if (ioread32(&crc->regs->status) & DCNTEXP) {
+> >> +             iowrite32(DCNTEXP, &crc->regs->status);
+> >> 
+> >>               /* prepare results */
+> >> 
+> >> -             put_unaligned_le32(crc->regs->result, crc->req->result);
+> >> +             put_unaligned_le32(ioread32(&crc->regs->result),
+> >> +                     crc->req->result);
+> >> 
+> >> -             crc->regs->control &= ~BLKEN;
+> >> +             iowrite32(ioread32(&crc->regs->control) & ~BLKEN,
+> >> &crc->regs-
+> >>
+> >>control);
+> >>
+> > You should avoid combining the IO accessors into each other like this,
+> > it's rather cryptic. Please introduce some variable like so:
+> > 
+> > u32 reg;
+> > reg = ioread32(...);
+> > reg &= ~....
+> > iowrite32(reg, ...);
+> > 
+> > [...]
 > 
-> git://git.open-osd.org/linux-open-osd.git raid6
+> OK
 > 
-
-OK Thanks. Daa I thought I fixed it but I forgot the obvious problem.
-
-I pushed a new tree I think it might be good this time. (finally)
-
-Thanks
-Boaz
-
-
-> commit 60e833d86a01ad9d8204a04b8db324106ab50395
-> Author:     Boaz Harrosh <bharrosh@panasas.com>
-> AuthorDate: Thu Jul 19 15:22:37 2012 +0300
-> Commit:     Boaz Harrosh <bharrosh@panasas.com>
-> CommitDate: Tue Apr 8 08:42:14 2014 +0300
+> > Why do you not use readl()/writel() ?
 > 
->     RFC: do_xor_speed Broken on UML do to jiffies
->     
->     Remember that hang I reported a while back on UML. Well
->     I'm at it again, and it still hangs and I found why.
->     
->     I have dprinted jiffies and it never advances during the
->     loop at do_xor_speed. There for it is stuck in an endless
->     loop. I have also dprinted current_kernel_time() and it
->     returns the same constant value as well.
->     
->     Note that it does usually work on UML, only during
->     the modprobe of xor.ko while that test is running. It looks
->     like some lucking is preventing the clock from ticking.
->     
->     However ktime_get_ts does work for me so I changed the code
->     as below, so I can work. See how I put several safety
->     guards, to never get hangs again.
->     And I think my time based approach is more accurate then
->     previous system.
->     
->     UML guys please investigate the jiffies issue? what is
->     xor.ko not doing right?
->     
->     Signed-off-by: Boaz Harrosh <bharrosh@panasas.com>
-> 
-<>
-> [    0.383315] WARNING: CPU: 0 PID: 1 at init/main.c:708 do_one_initcall+0x11d/0x136()
+> ioread and iowrite are inline function, which do parameter type
+> checking, while readl and writel don't as a macro.
+> I am fine if you prefer readl/writel in crypto code.
+
+I was just curious what the rationale behind this was.
+
+Best regards,
+Marek Vasut
