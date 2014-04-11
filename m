@@ -1,49 +1,71 @@
-From: Fan Du <fan.du@windriver.com>
-Subject: Why care about signal when instantiate an crypt template
-Date: Fri, 11 Apr 2014 15:37:53 +0800
-Message-ID: <53479BD1.3050508@windriver.com>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH v2 1/2] crypto: bfin_crc: ignore duplicated registration of the same algorithm
+Date: Fri, 11 Apr 2014 09:47:50 +0200
+Message-ID: <201404110947.50951.marex@denx.de>
+References: <1397193024-17802-1-git-send-email-sonic.adi@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: <linux-crypto@vger.kernel.org>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org,
+	adi-buildroot-devel@lists.sourceforge.net,
+	Sonic Zhang <sonic.zhang@analog.com>
+To: Sonic Zhang <sonic.adi@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.windriver.com ([147.11.1.11]:50059 "EHLO
-	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754992AbaDKHeF (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.10]:42771 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750817AbaDKIRg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Apr 2014 03:34:05 -0400
-Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com [147.11.189.40])
-	by mail.windriver.com (8.14.5/8.14.5) with ESMTP id s3B7Y4gP011713
-	(version=TLSv1/SSLv3 cipher=AES128-SHA bits=128 verify=FAIL)
-	for <linux-crypto@vger.kernel.org>; Fri, 11 Apr 2014 00:34:04 -0700 (PDT)
+	Fri, 11 Apr 2014 04:17:36 -0400
+In-Reply-To: <1397193024-17802-1-git-send-email-sonic.adi@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Friday, April 11, 2014 at 07:10:24 AM, Sonic Zhang wrote:
+> From: Sonic Zhang <sonic.zhang@analog.com>
+> 
+> in case of multiple crc devices are probed.
+> Call platform_set_drvdata() before adding new CRC device into the list.
+> 
+> Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
+> ---
+> v2-chagnes:
+> - check the CRC list and avoid call crypto_register_ahash() if not empty
+> - move platform_set_drvdata() before adding CRC device into the list
+> 
+>  drivers/crypto/bfin_crc.c | 25 ++++++++++++++-----------
+>  1 file changed, 14 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
+> index cea3e8c..7154d68 100644
+> --- a/drivers/crypto/bfin_crc.c
+> +++ b/drivers/crypto/bfin_crc.c
+> @@ -665,20 +665,23 @@ static int bfin_crypto_crc_probe(struct
+> platform_device *pdev) if (timeout == 0)
+>  		dev_info(&pdev->dev, "init crc poly timeout\n");
+> 
+> +	platform_set_drvdata(pdev, crc);
+> +
+>  	spin_lock(&crc_list.lock);
+> -	list_add(&crc->list, &crc_list.dev_list);
+> -	spin_unlock(&crc_list.lock);
+> 
+> -	platform_set_drvdata(pdev, crc);
+> +	if (list_empty(&crc_list.dev_list)) {
 
-I recently bump into a issue, ike daemon got interrupted(EINTR),
-after looking at the code, it seems there are places in crypto code
-where returning EINTR when current tasks has signal pending.
+Try the following, which would remove the need for the else{} branch altogether:
 
-=46or example:
-crypto_alloc_base and crypto_alloc_tfm
+list_add(...);
+if (list_is_singular(...)) {
+  crypto_register_....
+  ...
+}
 
-435 err:
-436                 if (err !=3D -EAGAIN)
-437                         break;
-438                 if (signal_pending(current)) {
-439                         err =3D -EINTR;
-440                         break;
-441                 }
-442         }
 
-I can't understand why the codes here needs to care about signals?
+Other than that
 
-Thanks a lot for any explanations.
+Reviewed-by: Marek Vasut <marex@denx.de>
 
---=20
-=E6=B5=AE=E6=B2=89=E9=9A=8F=E6=B5=AA=E5=8F=AA=E8=AE=B0=E4=BB=8A=E6=9C=9D=
-=E7=AC=91
-
---fan
+Best regards,
+Marek Vasut
