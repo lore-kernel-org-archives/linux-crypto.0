@@ -1,50 +1,69 @@
-From: Stephen Boyd <sboyd@codeaurora.org>
-Subject: Re: [PATCH 5/9] crypto: qce: Adds sha and hmac transforms
-Date: Fri, 11 Apr 2014 13:12:27 -0700
-Message-ID: <20140411201227.GA20486@codeaurora.org>
-References: <1396541886-10966-1-git-send-email-svarbanov@mm-sol.com>
- <1396541886-10966-6-git-send-email-svarbanov@mm-sol.com>
- <20140409000931.GN9985@codeaurora.org>
- <5346AD64.1000409@mm-sol.com>
+From: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+Subject: Re: Fwd: [crypto:master 60/60]
+ arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to restricted
+ __be64
+Date: Fri, 11 Apr 2014 13:34:03 -0700
+Message-ID: <20140411203403.GA17945@kroah.com>
+References: <533aa1ae.qq4Hi3RBnPzgncue%fengguang.wu@intel.com>
+ <CAKv+Gu_unwqLWWn-VDegy=vF=rprC5qFhazo_sJFNm738MVgaQ@mail.gmail.com>
+ <20140401124824.GA13642@gondor.apana.org.au>
+ <CAKv+Gu9bg1AgDSb3H-tMGBq53_ySaTZAeYsQeDYKS6cTnaBGUA@mail.gmail.com>
+ <20140411160312.GB31676@kroah.com>
+ <CAKv+Gu-ZKVz7JKhW9iWuZeKiRnyS3Z4uakPn2_UMW_CpSBgXkw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-To: Stanimir Varbanov <svarbanov@mm-sol.com>
-Return-path: <linux-arm-msm-owner@vger.kernel.org>
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <5346AD64.1000409@mm-sol.com>
-Sender: linux-arm-msm-owner@vger.kernel.org
+In-Reply-To: <CAKv+Gu-ZKVz7JKhW9iWuZeKiRnyS3Z4uakPn2_UMW_CpSBgXkw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 04/10, Stanimir Varbanov wrote:
-> On 04/09/2014 03:09 AM, Stephen Boyd wrote:
-> > On 04/03, Stanimir Varbanov wrote:
-> > 
-> >> +
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static int qce_ahash_import(struct ahash_request *req, const void *in)
-> >> +{
-> >> +	struct qce_sha_reqctx *rctx = ahash_request_ctx(req);
-> >> +	u32 flags = rctx->flags;
-> >> +	bool hmac = IS_SHA_HMAC(flags);
-> >> +	int ret;
-> >> +
-> >> +	if (IS_SHA1(flags) || IS_SHA1_HMAC(flags)) {
-> >> +		struct sha1_state *state = (struct sha1_state *)in;
-> > 
-> > Unnecessary cast from void *.
+On Fri, Apr 11, 2014 at 09:48:42PM +0200, Ard Biesheuvel wrote:
+> On 11 April 2014 18:03, gregkh@linuxfoundation.org
+> <gregkh@linuxfoundation.org> wrote:
+> > On Fri, Apr 04, 2014 at 10:11:19AM +0200, Ard Biesheuvel wrote:
+> >> Greg,
+> >>
+> >> This pertains to commit 8ceee72808d1 (crypto: ghash-clmulni-intel -
+> >> use C implementation for setkey()) that has been pulled by Linus
+> >> during the current merge window.
+> >>
+> >> It is missing two things:
+> >> - a cc to stable annotation
+> >> - a fix for the sparse warning below (change cast from __be64 to __force __be64)
+> >>
+> >> The reason for cc'ing stable on this patch is that it fixes a
+> >> potential data corruption issue where the ghash setkey() method uses
+> >> SSE registers without calling kernel_fpu_begin() first. This issue was
+> >> introduced by 0e1227d356e9b (crypto: ghash - Add PCLMULQDQ accelerated
+> >> implementation).
+> >>
+> >> So how would you like to proceed with this? Should I propose a new
+> >> patch somewhere?
+> >
+> > No problem, I'll apply this as-is.  But it doesn't apply to the
+> > 3.4-stable tree cleanly, can you send me a backported version if it's
+> > still needed there as well?
+> >
 > 
-> Nope, "in" is "const void *". Cast is needed to avoid compiler warnings.
+> Yes, the code was broken from the start. 3.4 version is attached, the
+> only difference is the missing ENDPROC() at the end of the asm file.
 > 
+> In the mean time, Herbert has submitted a fix for the sparse warning,
+> but we settled on a different fix than I had suggested before.
+> https://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=0ea481466d1c
+> 
+> Note that this code has not been tested (not by me, at least), so I
+> wouldn't suggest you take it straight away, but if you care about the
+> sparse warning, we could add a cc stable to it as well, I suppose.
 
-Ouch. Why are we casting away const? It should be possible to
-make qce_import_common() take const state and buffer arguments?
+No, I don't care about a sparse warning, unless it's fixing a real bug.
 
--- 
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
-hosted by The Linux Foundation
+I'll queue this up for the next 3.4 release after the one that happens
+this weekend, thanks.
+
+greg k-h
