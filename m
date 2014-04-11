@@ -1,75 +1,49 @@
-From: Sonic Zhang <sonic.adi@gmail.com>
-Subject: [PATCH v2 1/2] crypto: bfin_crc: ignore duplicated registration of the same algorithm
-Date: Fri, 11 Apr 2014 13:10:24 +0800
-Message-ID: <1397193024-17802-1-git-send-email-sonic.adi@gmail.com>
+From: Fan Du <fan.du@windriver.com>
+Subject: Why care about signal when instantiate an crypt template
+Date: Fri, 11 Apr 2014 15:37:53 +0800
+Message-ID: <53479BD1.3050508@windriver.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>,
-	<adi-buildroot-devel@lists.sourceforge.net>,
-	Sonic Zhang <sonic.zhang@analog.com>
-To: Marek Vasut <marex@denx.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from co9ehsobe002.messaging.microsoft.com ([207.46.163.25]:8738 "EHLO
-	co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755130AbaDKFIi (ORCPT
+Received: from mail.windriver.com ([147.11.1.11]:50059 "EHLO
+	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754992AbaDKHeF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Apr 2014 01:08:38 -0400
+	Fri, 11 Apr 2014 03:34:05 -0400
+Received: from ALA-HCA.corp.ad.wrs.com (ala-hca.corp.ad.wrs.com [147.11.189.40])
+	by mail.windriver.com (8.14.5/8.14.5) with ESMTP id s3B7Y4gP011713
+	(version=TLSv1/SSLv3 cipher=AES128-SHA bits=128 verify=FAIL)
+	for <linux-crypto@vger.kernel.org>; Fri, 11 Apr 2014 00:34:04 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Sonic Zhang <sonic.zhang@analog.com>
+Hi,
 
-in case of multiple crc devices are probed.
-Call platform_set_drvdata() before adding new CRC device into the list.
+I recently bump into a issue, ike daemon got interrupted(EINTR),
+after looking at the code, it seems there are places in crypto code
+where returning EINTR when current tasks has signal pending.
 
-Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
----
-v2-chagnes:
-- check the CRC list and avoid call crypto_register_ahash() if not empty
-- move platform_set_drvdata() before adding CRC device into the list
+=46or example:
+crypto_alloc_base and crypto_alloc_tfm
 
- drivers/crypto/bfin_crc.c | 25 ++++++++++++++-----------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+435 err:
+436                 if (err !=3D -EAGAIN)
+437                         break;
+438                 if (signal_pending(current)) {
+439                         err =3D -EINTR;
+440                         break;
+441                 }
+442         }
 
-diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
-index cea3e8c..7154d68 100644
---- a/drivers/crypto/bfin_crc.c
-+++ b/drivers/crypto/bfin_crc.c
-@@ -665,20 +665,23 @@ static int bfin_crypto_crc_probe(struct platform_device *pdev)
- 	if (timeout == 0)
- 		dev_info(&pdev->dev, "init crc poly timeout\n");
- 
-+	platform_set_drvdata(pdev, crc);
-+
- 	spin_lock(&crc_list.lock);
--	list_add(&crc->list, &crc_list.dev_list);
--	spin_unlock(&crc_list.lock);
- 
--	platform_set_drvdata(pdev, crc);
-+	if (list_empty(&crc_list.dev_list)) {
-+		list_add(&crc->list, &crc_list.dev_list);
-+		ret = crypto_register_ahash(&algs);
-+		if (ret) {
-+			spin_unlock(&crc_list.lock);
-+			dev_err(&pdev->dev,
-+				"Cann't register crypto ahash device\n");
-+			goto out_error_dma;
-+		}
-+	} else
-+		list_add(&crc->list, &crc_list.dev_list);
- 
--	ret = crypto_register_ahash(&algs);
--	if (ret) {
--		spin_lock(&crc_list.lock);
--		list_del(&crc->list);
--		spin_unlock(&crc_list.lock);
--		dev_err(&pdev->dev, "Cann't register crypto ahash device\n");
--		goto out_error_dma;
--	}
-+	spin_unlock(&crc_list.lock);
- 
- 	dev_info(&pdev->dev, "initialized\n");
- 
--- 
-1.8.2.3
+I can't understand why the codes here needs to care about signals?
+
+Thanks a lot for any explanations.
+
+--=20
+=E6=B5=AE=E6=B2=89=E9=9A=8F=E6=B5=AA=E5=8F=AA=E8=AE=B0=E4=BB=8A=E6=9C=9D=
+=E7=AC=91
+
+--fan
