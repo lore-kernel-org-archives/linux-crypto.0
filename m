@@ -1,73 +1,54 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH v3 1/2] crypto: bfin_crc: ignore duplicated registration of the same algorithm
-Date: Fri, 11 Apr 2014 11:33:37 +0200
-Message-ID: <201404111133.37451.marex@denx.de>
-References: <1397208625-23522-1-git-send-email-sonic.adi@gmail.com>
+From: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+Subject: Re: Fwd: [crypto:master 60/60]
+ arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to restricted
+ __be64
+Date: Fri, 11 Apr 2014 09:03:12 -0700
+Message-ID: <20140411160312.GB31676@kroah.com>
+References: <533aa1ae.qq4Hi3RBnPzgncue%fengguang.wu@intel.com>
+ <CAKv+Gu_unwqLWWn-VDegy=vF=rprC5qFhazo_sJFNm738MVgaQ@mail.gmail.com>
+ <20140401124824.GA13642@gondor.apana.org.au>
+ <CAKv+Gu9bg1AgDSb3H-tMGBq53_ySaTZAeYsQeDYKS6cTnaBGUA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	adi-buildroot-devel@lists.sourceforge.net,
-	Sonic Zhang <sonic.zhang@analog.com>
-To: Sonic Zhang <sonic.adi@gmail.com>
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, stable@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:43441 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751917AbaDKJdh (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:56202 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754211AbaDKQAY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Apr 2014 05:33:37 -0400
-In-Reply-To: <1397208625-23522-1-git-send-email-sonic.adi@gmail.com>
+	Fri, 11 Apr 2014 12:00:24 -0400
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu9bg1AgDSb3H-tMGBq53_ySaTZAeYsQeDYKS6cTnaBGUA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Friday, April 11, 2014 at 11:30:25 AM, Sonic Zhang wrote:
-> From: Sonic Zhang <sonic.zhang@analog.com>
+On Fri, Apr 04, 2014 at 10:11:19AM +0200, Ard Biesheuvel wrote:
+> Greg,
 > 
-> in case of multiple crc devices are probed.
-> Call platform_set_drvdata() before adding new CRC device into the list.
+> This pertains to commit 8ceee72808d1 (crypto: ghash-clmulni-intel -
+> use C implementation for setkey()) that has been pulled by Linus
+> during the current merge window.
 > 
-> Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
-> ---
-> v3-change:
-> - check list_is_singular() before register the algorithm
+> It is missing two things:
+> - a cc to stable annotation
+> - a fix for the sparse warning below (change cast from __be64 to __force __be64)
 > 
->  drivers/crypto/bfin_crc.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+> The reason for cc'ing stable on this patch is that it fixes a
+> potential data corruption issue where the ghash setkey() method uses
+> SSE registers without calling kernel_fpu_begin() first. This issue was
+> introduced by 0e1227d356e9b (crypto: ghash - Add PCLMULQDQ accelerated
+> implementation).
 > 
-> diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
-> index cea3e8c..892b6d2 100644
-> --- a/drivers/crypto/bfin_crc.c
-> +++ b/drivers/crypto/bfin_crc.c
-> @@ -665,19 +665,19 @@ static int bfin_crypto_crc_probe(struct
-> platform_device *pdev) if (timeout == 0)
->  		dev_info(&pdev->dev, "init crc poly timeout\n");
-> 
-> +	platform_set_drvdata(pdev, crc);
-> +
->  	spin_lock(&crc_list.lock);
->  	list_add(&crc->list, &crc_list.dev_list);
->  	spin_unlock(&crc_list.lock);
-> 
-> -	platform_set_drvdata(pdev, crc);
-> -
-> -	ret = crypto_register_ahash(&algs);
-> -	if (ret) {
-> -		spin_lock(&crc_list.lock);
-> -		list_del(&crc->list);
-> -		spin_unlock(&crc_list.lock);
-> -		dev_err(&pdev->dev, "Cann't register crypto ahash device\n");
-> -		goto out_error_dma;
-> +	if (list_is_singular(&crc_list.dev_list)) {
-> +		ret = crypto_register_ahash(&algs);
-> +		if (ret) {
-> +			dev_err(&pdev->dev,
-> +				"Cann't register crypto ahash device\n");
+> So how would you like to proceed with this? Should I propose a new
+> patch somewhere?
 
-"Cann't" with two Ns ;-/
+No problem, I'll apply this as-is.  But it doesn't apply to the
+3.4-stable tree cleanly, can you send me a backported version if it's
+still needed there as well?
 
-Well, add "Reviewed-by: Marek Vasut <marex@denx.de>" into the next go please :)
+thanks,
 
-Best regards,
-Marek Vasut
+greg k-h
