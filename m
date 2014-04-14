@@ -1,57 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.15
-Date: Mon, 14 Apr 2014 07:34:11 +0800
-Message-ID: <20140413233411.GA19019@gondor.apana.org.au>
-References: <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
- <20140101061016.GA22579@gondor.apana.org.au>
- <20140203125944.GA31446@gondor.apana.org.au>
+From: Sonic Zhang <sonic.adi@gmail.com>
+Subject: Re: [PATCH v2] crypt: bfin_crc: access crc registers by readl and
+ writel functions
+Date: Mon, 14 Apr 2014 12:21:41 +0800
+Message-ID: <CAJxxZ0PW-WerKp1XuEpU5PEBSsG1qwX5zMW83ZzyxoK8VC1e1w@mail.gmail.com>
+References: <1397111456-17371-1-git-send-email-sonic.adi@gmail.com>
+	<201404101001.34907.marex@denx.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org,
+	adi-buildroot-devel@lists.sourceforge.net,
+	Sonic Zhang <sonic.zhang@analog.com>
+To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:37387 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751317AbaDMXeR (ORCPT
+Received: from mail-oa0-f48.google.com ([209.85.219.48]:40837 "EHLO
+	mail-oa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750900AbaDNEVl (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 13 Apr 2014 19:34:17 -0400
-Content-Disposition: inline
-In-Reply-To: <20140203125944.GA31446@gondor.apana.org.au>
+	Mon, 14 Apr 2014 00:21:41 -0400
+Received: by mail-oa0-f48.google.com with SMTP id m1so8671441oag.35
+        for <linux-crypto@vger.kernel.org>; Sun, 13 Apr 2014 21:21:41 -0700 (PDT)
+In-Reply-To: <201404101001.34907.marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Hi Herbert,
 
-This push fixes a potential boot crash on bcm2835 due to the
-recent change that now causes hardware RNGs to be accessed on
-registration.
+Could you please review this patch?
 
-Please pull from
+Thanks
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Sonic Zhang
 
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Matt Porter (1):
-      hwrng: bcm2835 - fix oops when rng h/w is accessed during registration
-
- drivers/char/hw_random/bcm2835-rng.c |   10 +++++-----
- 1 files changed, 5 insertions(+), 5 deletions(-)
- 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On Thu, Apr 10, 2014 at 4:01 PM, Marek Vasut <marex@denx.de> wrote:
+> On Thursday, April 10, 2014 at 08:30:56 AM, Sonic Zhang wrote:
+>> From: Sonic Zhang <sonic.zhang@analog.com>
+>>
+>> Move architecture independant crc header file out of the blackfin folder.
+>>
+>>
+>> Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
+>> ---
+>> v2-changes:
+>> - avoid combine the IO accessors into each other
+>> - use readl/writel other than ioread32/iowrite32
+>
+> Reviewed-by: Marek Vasut <marex@denx.de>
+>
+> Best regards,
+> Marek Vasut
