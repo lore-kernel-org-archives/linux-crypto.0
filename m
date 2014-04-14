@@ -1,10 +1,11 @@
 From: Sonic Zhang <sonic.adi@gmail.com>
-Subject: Re: [PATCH v3 1/2] crypto: bfin_crc: ignore duplicated registration
- of the same algorithm
-Date: Mon, 14 Apr 2014 12:23:11 +0800
-Message-ID: <CAJxxZ0OhbEnw02y0ZTYKeJD0S6FYZgZ+KPL558kLfw=uGB0_UA@mail.gmail.com>
-References: <1397208625-23522-1-git-send-email-sonic.adi@gmail.com>
-	<201404111133.37451.marex@denx.de>
+Subject: Re: [PATCH 2/2] crypto: bfin_crc: avoid get physical address of
+ coherence memory by dma_map_single
+Date: Mon, 14 Apr 2014 12:41:31 +0800
+Message-ID: <CAJxxZ0Ox0SJz0TYth2oUoo967Db-ZtfP1uhUatbWSiEaLXfA3A@mail.gmail.com>
+References: <1397119259-20638-1-git-send-email-sonic.adi@gmail.com>
+	<1397119259-20638-2-git-send-email-sonic.adi@gmail.com>
+	<201404101102.51947.marex@denx.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -13,14 +14,14 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	Sonic Zhang <sonic.zhang@analog.com>
 To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ob0-f178.google.com ([209.85.214.178]:34920 "EHLO
-	mail-ob0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750879AbaDNEXL (ORCPT
+Received: from mail-ob0-f176.google.com ([209.85.214.176]:54717 "EHLO
+	mail-ob0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750900AbaDNElb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Apr 2014 00:23:11 -0400
-Received: by mail-ob0-f178.google.com with SMTP id wp18so8507789obc.37
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Apr 2014 21:23:11 -0700 (PDT)
-In-Reply-To: <201404111133.37451.marex@denx.de>
+	Mon, 14 Apr 2014 00:41:31 -0400
+Received: by mail-ob0-f176.google.com with SMTP id wp18so8454726obc.21
+        for <linux-crypto@vger.kernel.org>; Sun, 13 Apr 2014 21:41:31 -0700 (PDT)
+In-Reply-To: <201404101102.51947.marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -32,53 +33,24 @@ Thanks
 
 Sonic Zhang
 
-On Fri, Apr 11, 2014 at 5:33 PM, Marek Vasut <marex@denx.de> wrote:
-> On Friday, April 11, 2014 at 11:30:25 AM, Sonic Zhang wrote:
+
+On Thu, Apr 10, 2014 at 5:02 PM, Marek Vasut <marex@denx.de> wrote:
+> On Thursday, April 10, 2014 at 10:40:59 AM, Sonic Zhang wrote:
 >> From: Sonic Zhang <sonic.zhang@analog.com>
 >>
->> in case of multiple crc devices are probed.
->> Call platform_set_drvdata() before adding new CRC device into the list.
+>> - The 4-byte sg_mid_buf is located in the middle of the coherence memory
+>> sg_cpu. Don't call dma_map_single to get its physical address. Get the its
+>> base physical address from the physical address of sg_cpu instead.
+>> - Should set up the dma descriptor data after the 4-byte sg_mid_buf is
+>> filled in completely from next sg buffer.
+>> - memory copy from sg buffer should be done via virtual address.
+>> - Remove unused reference to blackfin header
 >>
 >> Signed-off-by: Sonic Zhang <sonic.zhang@analog.com>
->> ---
->> v3-change:
->> - check list_is_singular() before register the algorithm
->>
->>  drivers/crypto/bfin_crc.c | 18 +++++++++---------
->>  1 file changed, 9 insertions(+), 9 deletions(-)
->>
->> diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
->> index cea3e8c..892b6d2 100644
->> --- a/drivers/crypto/bfin_crc.c
->> +++ b/drivers/crypto/bfin_crc.c
->> @@ -665,19 +665,19 @@ static int bfin_crypto_crc_probe(struct
->> platform_device *pdev) if (timeout == 0)
->>               dev_info(&pdev->dev, "init crc poly timeout\n");
->>
->> +     platform_set_drvdata(pdev, crc);
->> +
->>       spin_lock(&crc_list.lock);
->>       list_add(&crc->list, &crc_list.dev_list);
->>       spin_unlock(&crc_list.lock);
->>
->> -     platform_set_drvdata(pdev, crc);
->> -
->> -     ret = crypto_register_ahash(&algs);
->> -     if (ret) {
->> -             spin_lock(&crc_list.lock);
->> -             list_del(&crc->list);
->> -             spin_unlock(&crc_list.lock);
->> -             dev_err(&pdev->dev, "Cann't register crypto ahash device\n");
->> -             goto out_error_dma;
->> +     if (list_is_singular(&crc_list.dev_list)) {
->> +             ret = crypto_register_ahash(&algs);
->> +             if (ret) {
->> +                     dev_err(&pdev->dev,
->> +                             "Cann't register crypto ahash device\n");
 >
-> "Cann't" with two Ns ;-/
+> I don't see any obvious problems,
 >
-> Well, add "Reviewed-by: Marek Vasut <marex@denx.de>" into the next go please :)
+> Reviewed-by: Marek Vasut <marex@denx.de>
 >
 > Best regards,
 > Marek Vasut
