@@ -1,70 +1,94 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH 05/28] Remove MPILIB_EXTRA
-Date: Tue, 15 Apr 2014 11:21:48 +0200
-Message-ID: <20140415092147.GA4302@pd.tnic>
-References: <1391971686-9517-1-git-send-email-richard@nod.at>
- <1391971686-9517-6-git-send-email-richard@nod.at>
- <1391977123.25855.24.camel@x220>
- <1397552794.1985.19.camel@x220>
+From: Nishanth Menon <nm@ti.com>
+Subject: [PATCH] crypto: omap-des - handle error of pm_runtime_get_sync
+Date: Tue, 15 Apr 2014 10:33:02 -0500
+Message-ID: <1397575982-24866-1-git-send-email-nm@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Richard Weinberger <richard@nod.at>,
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-omap@vger.kernel.org>,
+	Joachim Eastwood <manabian@gmail.com>,
+	Nishanth Menon <nm@ti.com>
+To: Joel Fernandes <joelf@ti.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	James Morris <james.l.morris@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:51209 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750972AbaDOJVu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Apr 2014 05:21:50 -0400
-Content-Disposition: inline
-In-Reply-To: <1397552794.1985.19.camel@x220>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-omap-owner@vger.kernel.org>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Apr 15, 2014 at 11:06:34AM +0200, Paul Bolle wrote:
-> On Sun, 2014-02-09 at 21:18 +0100, Paul Bolle wrote:
-> > On Sun, 2014-02-09 at 19:47 +0100, Richard Weinberger wrote:
-> > > The symbol is an orphan, get rid of it.
-> > > 
-> > > Signed-off-by: Richard Weinberger <richard@nod.at>
-> > 
-> > Acked-by: Paul Bolle <pebolle@tiscali.nl>
-> > 
-> > > ---
-> > >  crypto/asymmetric_keys/Kconfig | 1 -
-> > >  1 file changed, 1 deletion(-)
-> > > 
-> > > diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-> > > index 03a6eb9..0320c7d 100644
-> > > --- a/crypto/asymmetric_keys/Kconfig
-> > > +++ b/crypto/asymmetric_keys/Kconfig
-> > > @@ -22,7 +22,6 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
-> > >  
-> > >  config PUBLIC_KEY_ALGO_RSA
-> > >  	tristate "RSA public-key algorithm"
-> > > -	select MPILIB_EXTRA
-> > >  	select MPILIB
-> > >  	help
-> > >  	  This option enables support for the RSA algorithm (PKCS#1, RFC3447).
-> > 
-> > I tried this a year ago (see https://lkml.org/lkml/2013/3/8/142 ).
-> 
-> Did anyone else ever find some time to look at this oneliner?
+pm_runtime_get_sync may not always succeed depending on SoC involved. So
+handle the error appropriately.
 
-Last time I asked about that part of the tree, Herbert said it should go
-through James Morris' tree. CCed.
+Reported-by: Joachim Eastwood <manabian@gmail.com>
+Signed-off-by: Nishanth Menon <nm@ti.com>
+---
 
-http://lkml.kernel.org/r/20131112182746.GA22711@gondor.apana.org.au
+based on v3.15-rc1
 
-Unless akpm picks it up first. Also CCed.
+Report-thread: http://marc.info/?t=139750330400002&r=1&w=2
 
+omap2plus_defconfig + CONFIG_CRYPTO_DEV_OMAP_DES=y
+
+pandaboard-es-before: http://slexy.org/raw/s21rGPFnKl
+pandaboard-es-after:  http://slexy.org/raw/s2A4UFQVna
+
+ drivers/crypto/omap-des.c |   18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index ec5f131..c2d362f 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -223,12 +223,18 @@ static void omap_des_write_n(struct omap_des_dev *dd, u32 offset,
+ 
+ static int omap_des_hw_init(struct omap_des_dev *dd)
+ {
++	int err;
++
+ 	/*
+ 	 * clocks are enabled when request starts and disabled when finished.
+ 	 * It may be long delays between requests.
+ 	 * Device might go to off mode to save power.
+ 	 */
+-	pm_runtime_get_sync(dd->dev);
++	err = pm_runtime_get_sync(dd->dev);
++	if (err < 0) {
++		dev_err(dd->dev, "failed to get_sync(%d)\n", err);
++		return err;
++	}
+ 
+ 	if (!(dd->flags & FLAGS_INIT)) {
+ 		dd->flags |= FLAGS_INIT;
+@@ -1083,7 +1089,11 @@ static int omap_des_probe(struct platform_device *pdev)
+ 	dd->phys_base = res->start;
+ 
+ 	pm_runtime_enable(dev);
+-	pm_runtime_get_sync(dev);
++	err = pm_runtime_get_sync(dev);
++	if (err < 0) {
++		dev_err(dd->dev, "failed to get_sync(%d)\n", err);
++		goto err_get;
++	}
+ 
+ 	omap_des_dma_stop(dd);
+ 
+@@ -1148,6 +1158,7 @@ err_algs:
+ err_irq:
+ 	tasklet_kill(&dd->done_task);
+ 	tasklet_kill(&dd->queue_task);
++err_get:
+ 	pm_runtime_disable(dev);
+ err_res:
+ 	dd = NULL;
+@@ -1191,8 +1202,7 @@ static int omap_des_suspend(struct device *dev)
+ 
+ static int omap_des_resume(struct device *dev)
+ {
+-	pm_runtime_get_sync(dev);
+-	return 0;
++	return pm_runtime_get_sync(dev);
+ }
+ #endif
+ 
 -- 
-Regards/Gruss,
-    Boris.
+1.7.9.5
 
-Sent from a fat crate under my desk. Formatting is fine.
---
