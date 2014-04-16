@@ -1,33 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: testmgr: add empty and large test vectors for
- SHA-1, SHA-224, SHA-256, SHA-384 and SHA-512
-Date: Wed, 16 Apr 2014 21:50:00 +0800
-Message-ID: <20140416135000.GG4684@gondor.apana.org.au>
-References: <20140412123529.5372.69900.stgit@localhost6.localdomain6>
+Subject: Re: [PATCH] crypto/ccp: Use pci_enable_msix_range() instead of
+ pci_enable_msix()
+Date: Wed, 16 Apr 2014 21:50:12 +0800
+Message-ID: <20140416135011.GH4684@gondor.apana.org.au>
+References: <1397548471-24441-1-git-send-email-agordeev@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:39104 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756330AbaDPNuD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 16 Apr 2014 09:50:03 -0400
+Cc: linux-kernel@vger.kernel.org,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org
+To: Alexander Gordeev <agordeev@redhat.com>
+Return-path: <linux-pci-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20140412123529.5372.69900.stgit@localhost6.localdomain6>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1397548471-24441-1-git-send-email-agordeev@redhat.com>
+Sender: linux-pci-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Apr 12, 2014 at 03:35:29PM +0300, Jussi Kivilinna wrote:
-> Patch adds large test-vectors for SHA algorithms for better code coverage in
-> optimized assembly implementations. Empty test-vectors are also added, as some
-> crypto drivers appear to have special case handling for empty input.
+On Tue, Apr 15, 2014 at 09:54:31AM +0200, Alexander Gordeev wrote:
+> As result of deprecation of MSI-X/MSI enablement functions
+> pci_enable_msix() and pci_enable_msi_block() all drivers
+> using these two interfaces need to be updated to use the
+> new pci_enable_msi_range()  or pci_enable_msi_exact()
+> and pci_enable_msix_range() or pci_enable_msix_exact()
+> interfaces.
 > 
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+> Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-pci@vger.kernel.org
 
-Patch applied.  Thanks!
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
