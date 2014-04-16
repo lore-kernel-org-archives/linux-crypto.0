@@ -1,56 +1,38 @@
-From: Joel Fernandes <joelf@ti.com>
-Subject: Re: [PATCH V2] crypto: omap-des - handle error of pm_runtime_get_sync
-Date: Tue, 15 Apr 2014 12:51:43 -0500
-Message-ID: <534D71AF.2090808@ti.com>
-References: <534D61DF.9090203@ti.com>	<1397581111-21148-1-git-send-email-nm@ti.com> <CAGhQ9Vxv682wD982sNDtc5-Zk4y7H2eULWcm8CJ2SiG=s7V=Pg@mail.gmail.com> <534D69D0.207@ti.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH V2] crypto: omap-des - use devm_ioremap_resource()
+Date: Wed, 16 Apr 2014 21:48:25 +0800
+Message-ID: <20140416134825.GB4684@gondor.apana.org.au>
+References: <001d01cf4ed2$494fd0e0$dbef72a0$%han@samsung.com>
+ <008301cf52e6$9b764990$d262dcb0$%han@samsung.com>
+ <5346BEF6.9090104@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	<linux-omap@vger.kernel.org>, <balbi@ti.com>
-To: Nishanth Menon <nm@ti.com>, Joachim Eastwood <manabian@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Jingoo Han <jg1.han@samsung.com>,
+	'David Miller' <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Joel Fernandes <joelf@ti.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from arroyo.ext.ti.com ([192.94.94.40]:38758 "EHLO arroyo.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753177AbaDORvt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Apr 2014 13:51:49 -0400
-In-Reply-To: <534D69D0.207@ti.com>
+Received: from ringil.hengli.com.au ([178.18.16.133]:53795 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1161121AbaDPNsd (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 16 Apr 2014 09:48:33 -0400
+Content-Disposition: inline
+In-Reply-To: <5346BEF6.9090104@ti.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 04/15/2014 12:18 PM, Nishanth Menon wrote:
-> On 04/15/2014 12:06 PM, Joachim Eastwood wrote:
->> On 15 April 2014 18:58, Nishanth Menon <nm@ti.com> wrote:
->>> pm_runtime_get_sync may not always succeed depending on SoC involved.
->>> So handle the error appropriately ensuring usage_count is accurate in
->>> case of failure.
->>>
->>> Signed-off-by: Nishanth Menon <nm@ti.com>
->>> ---
->>> V2:
->>>         - review fixes, print function names in error log as well.
->>>
->>> V1: https://patchwork.kernel.org/patch/3993861/
->>>  drivers/crypto/omap-des.c |   26 +++++++++++++++++++++++---
->>>  1 file changed, 23 insertions(+), 3 deletions(-)
->>>
->>
->> Fixes the runtime warning from omap_l3_noc when omap-des is built-in
->> on my VAR-SOM-OM44 (OMAP4460) board.
->>
->> Tested-by: Joachim Eastwood <manabian@gmail.com>
+On Thu, Apr 10, 2014 at 10:55:34AM -0500, Joel Fernandes wrote:
+> On 04/07/2014 11:54 PM, Jingoo Han wrote:
+> > Use devm_ioremap_resource() because devm_request_and_ioremap() is
+> > obsoleted by devm_ioremap_resource().
+> > 
+> > Signed-off-by: Jingoo Han <jg1.han@samsung.com>
 > 
-> Thanks Joachim. Looks like in my hurry, I missed proper
-> acknowledgement of your report. adding the following for patchworks to
-> pickup.
-> 
-> Reported-by: Joachim Eastwood <manabian@gmail.com>
-> 
+> Acked-by: Joel Fernandes <joelf@ti.com>
 
-Acked-by: Joel Fernandes <joelf@ti.com>
-
-Regards,
--Joel
+Patch applied.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
