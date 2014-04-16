@@ -1,30 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: add test cases for SHA-1, SHA-224, SHA-256 and
- AES-CCM
-Date: Wed, 16 Apr 2014 21:49:48 +0800
-Message-ID: <20140416134948.GF4684@gondor.apana.org.au>
-References: <1397150203-12654-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: testmgr: add empty and large test vectors for
+ SHA-1, SHA-224, SHA-256, SHA-384 and SHA-512
+Date: Wed, 16 Apr 2014 21:50:00 +0800
+Message-ID: <20140416135000.GG4684@gondor.apana.org.au>
+References: <20140412123529.5372.69900.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:59998 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:39104 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756330AbaDPNtu (ORCPT
+	with ESMTP id S1756330AbaDPNuD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 16 Apr 2014 09:49:50 -0400
+	Wed, 16 Apr 2014 09:50:03 -0400
 Content-Disposition: inline
-In-Reply-To: <1397150203-12654-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <20140412123529.5372.69900.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 10, 2014 at 07:16:43PM +0200, Ard Biesheuvel wrote:
-> This adds test cases for SHA-1, SHA-224, SHA-256 and AES-CCM with an input size
-> that is an exact multiple of the block size. The reason is that some
-> implementations use a different code path for these cases.
+On Sat, Apr 12, 2014 at 03:35:29PM +0300, Jussi Kivilinna wrote:
+> Patch adds large test-vectors for SHA algorithms for better code coverage in
+> optimized assembly implementations. Empty test-vectors are also added, as some
+> crypto drivers appear to have special case handling for empty input.
 > 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 
 Patch applied.  Thanks!
 -- 
