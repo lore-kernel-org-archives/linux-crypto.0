@@ -1,35 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Why care about signal when instantiate an crypt template
-Date: Thu, 17 Apr 2014 17:52:44 +0800
-Message-ID: <20140417095244.GA25307@gondor.apana.org.au>
-References: <20140417074449.GA24539@gondor.apana.org.au>
- <534F9CE2.1050509@windriver.com>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH] crypto: sha{256,512}_ssse3 - remove asmlinkage from static functions
+Date: Thu, 17 Apr 2014 17:28:41 +0200
+Message-ID: <201404171728.41994.marex@denx.de>
+References: <1397665190-12491-1-git-send-email-nasa4836@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Fan Du <fan.du@windriver.com>
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+	x86@kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Jianyu Zhan <nasa4836@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:36180 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754233AbaDQJws (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:44218 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751076AbaDQPpc convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Apr 2014 05:52:48 -0400
-Content-Disposition: inline
-In-Reply-To: <534F9CE2.1050509@windriver.com>
+	Thu, 17 Apr 2014 11:45:32 -0400
+In-Reply-To: <1397665190-12491-1-git-send-email-nasa4836@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 17, 2014 at 05:20:34PM +0800, Fan Du wrote:
-> 
-> The signal checking is only to bail out from the infinite loop, it shouldn't
-> override original err code -EAGAIN with -EINTR.
-> 
-> With -EAGAIN, user space app can try again, what do you think?
+On Wednesday, April 16, 2014 at 06:19:50 PM, Jianyu Zhan wrote:
+> Commit 128ea04a9885("lto: Make asmlinkage __visible") restricts
+> asmlinkage to externally_visible, this causes compilation warnings:
+>=20
+>     arch/x86/crypto/sha256_ssse3_glue.c:56:1:
+>     warning: =E2=80=98externally_visible=E2=80=99 attribute have effe=
+ct only on public
+> objects [-Wattributes]
+>=20
+>     static asmlinkage void (*sha256_transform_asm)(const char *, u32 =
+*,
+> u64); ^
+>=20
+>     arch/x86/crypto/sha512_ssse3_glue.c:55:1:
+>     warning: =E2=80=98externally_visible=E2=80=99 attribute have effe=
+ct only on public
+> objects [-Wattributes] static asmlinkage void
+> (*sha512_transform_asm)(const char *, u64 *, ^
+>=20
+> Drop asmlinkage here to avoid such warnings.
+>=20
+> Also see Commit 8783dd3a37a5853689e1("irqchip: Remove asmlinkage from
+> static functions")
+>=20
+> Signed-off-by: Jianyu Zhan <nasa4836@gmail.com>
 
-EAGAIN makes no sense when we bail out due to a signal.
+Makes sense, please add my humble
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Reviewed-by: Marek Vasut <marex@denx.de>
+
+Best regards,
+Marek Vasut
