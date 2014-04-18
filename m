@@ -1,49 +1,56 @@
-From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH crypto 2/2] crypto: caam - add allocation failure handling in SPRINTFCAT macro
-Date: Fri, 18 Apr 2014 13:01:42 +0300
-Message-ID: <1397815302-15915-2-git-send-email-horia.geanta@freescale.com>
-References: <1397815302-15915-1-git-send-email-horia.geanta@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <stable@vger.kernel.org>,
-	Kim Phillips <kim.phillips@freescale.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <1397815302-15915-1-git-send-email-horia.geanta@freescale.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH] splice: sendfile() at once fails for big files
+Date: Fri, 18 Apr 2014 14:49:19 +0200 (CEST)
+Message-ID: <20140418124919.CBE731A4BE8@localhost.localdomain>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Alexander Viro <viro@zeniv.linux.org.uk>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from pegase1.c-s.fr ([93.17.236.30]:45414 "EHLO mailhub1.si.c-s.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753367AbaDRMtW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 18 Apr 2014 08:49:22 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-GFP_ATOMIC memory allocation could fail.
-In this case, avoid NULL pointer dereference and notify user.
+When big files (over 64kbytes) are sent with sendfile(), they are sent by blocks
+of 64kbytes. In that case, the target must be informed that the current block is
+not the last one, otherwise if might take wrong actions.
+The issue was observed while sending a file to an AF_ALG socket for hashing. The
+hash was reset at each 64k block.
+This patch adds SPLICE_F_MORE to the flags when more data is pending.
 
-Cc: <stable@vger.kernel.org> # 3.2+
-Cc: Kim Phillips <kim.phillips@freescale.com>
-Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
----
- drivers/crypto/caam/error.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
-diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
-index 9f25f5296029..0eabd81e1a90 100644
---- a/drivers/crypto/caam/error.c
-+++ b/drivers/crypto/caam/error.c
-@@ -16,9 +16,13 @@
- 	char *tmp;						\
- 								\
- 	tmp = kmalloc(sizeof(format) + max_alloc, GFP_ATOMIC);	\
--	sprintf(tmp, format, param);				\
--	strcat(str, tmp);					\
--	kfree(tmp);						\
-+	if (likely(tmp)) {					\
-+		sprintf(tmp, format, param);			\
-+		strcat(str, tmp);				\
-+		kfree(tmp);					\
-+	} else {						\
-+		strcat(str, "kmalloc failure in SPRINTFCAT");	\
-+	}							\
- }
+Index: b/fs/splice.c
+===================================================================
+--- a/fs/splice.c	(revision 5615)
++++ b/fs/splice.c	(working copy)
+@@ -1171,7 +1171,7 @@
+ 	long ret, bytes;
+ 	umode_t i_mode;
+ 	size_t len;
+-	int i, flags;
++	int i, flags, more;
  
- static void report_jump_idx(u32 status, char *outstr)
--- 
-1.8.3.1
+ 	/*
+ 	 * We require the input being a regular file, as we don't want to
+@@ -1214,6 +1214,7 @@
+ 	 * Don't block on output, we have to drain the direct pipe.
+ 	 */
+ 	sd->flags &= ~SPLICE_F_NONBLOCK;
++	more = sd->flags & SPLICE_F_MORE;
+ 
+ 	while (len) {
+ 		size_t read_len;
+@@ -1226,6 +1227,10 @@
+ 		read_len = ret;
+ 		sd->total_len = read_len;
+ 
++		if (read_len < len)
++			sd->flags |= SPLICE_F_MORE;
++		else if (!more)
++			sd->flags &= ~SPLICE_F_MORE;
+ 		/*
+ 		 * NOTE: nonblocking mode only applies to the input. We
+ 		 * must not do the output in nonblocking mode as then we
