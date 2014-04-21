@@ -1,80 +1,96 @@
 From: Christian Engelmayer <cengelma@gmx.at>
-Subject: [PATCH 2/3] crypto: Fix potential leak in test_aead_speed() if
- crypto_alloc_aead() fails
-Date: Mon, 21 Apr 2014 20:46:40 +0200
-Message-ID: <20140421204640.76380365@spike>
+Subject: [PATCH 1/3] crypto: Fix potential leak in test_aead_speed() if
+ aad_size is too big
+Date: Mon, 21 Apr 2014 20:45:59 +0200
+Message-ID: <20140421204559.75b8aa71@spike>
 References: <20140421204439.7999f1c6@spike>
 Mime-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
- boundary="Sig_//O1rreyrO7_4r_Z671jpHem"; protocol="application/pgp-signature"
+ boundary="Sig_//NIrK910qeX6IIquH3yMDSB"; protocol="application/pgp-signature"
 Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: tim.c.chen@linux.intel.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.gmx.net ([212.227.15.18]:54290 "EHLO mout.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752775AbaDUSvi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Apr 2014 14:51:38 -0400
 In-Reply-To: <20140421204439.7999f1c6@spike>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
---Sig_//O1rreyrO7_4r_Z671jpHem
+--Sig_//NIrK910qeX6IIquH3yMDSB
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
 Fix a potential memory leak in the error handling of test_aead_speed(). In =
 case
-crypto_alloc_aead() fails, the function returns without going through the
-centralized cleanup path. Reported by Coverity - CID 1163870.
+the size check on the associate data length parameter fails, the function g=
+oes
+through the wrong exit label. Reported by Coverity - CID 1163870.
 
 Signed-off-by: Christian Engelmayer <cengelma@gmx.at>
 ---
- crypto/tcrypt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ crypto/tcrypt.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 1856d7f..1849155 100644
+index 870be7b..1856d7f 100644
 --- a/crypto/tcrypt.c
 +++ b/crypto/tcrypt.c
-@@ -313,7 +313,7 @@ static void test_aead_speed(const char *algo, int enc, =
-unsigned int sec,
- 	if (IS_ERR(tfm)) {
- 		pr_err("alg: aead: Failed to load transform for %s: %ld\n", algo,
- 		       PTR_ERR(tfm));
--		return;
-+		goto out_notfm;
- 	}
+@@ -282,6 +282,11 @@ static void test_aead_speed(const char *algo, int enc,=
+ unsigned int sec,
+ 	unsigned int *b_size;
+ 	unsigned int iv_len;
 =20
- 	req =3D aead_request_alloc(tfm, GFP_KERNEL);
-@@ -391,6 +391,7 @@ static void test_aead_speed(const char *algo, int enc, =
-unsigned int sec,
++	if (aad_size >=3D PAGE_SIZE) {
++		pr_err("associate data length (%u) too big\n", aad_size);
++		return;
++	}
++
+ 	if (enc =3D=3D ENCRYPT)
+ 		e =3D "encryption";
+ 	else
+@@ -323,14 +328,7 @@ static void test_aead_speed(const char *algo, int enc,=
+ unsigned int sec,
+ 		b_size =3D aead_sizes;
+ 		do {
+ 			assoc =3D axbuf[0];
+-
+-			if (aad_size < PAGE_SIZE)
+-				memset(assoc, 0xff, aad_size);
+-			else {
+-				pr_err("associate data length (%u) too big\n",
+-					aad_size);
+-				goto out_nosg;
+-			}
++			memset(assoc, 0xff, aad_size);
+ 			sg_init_one(&asg[0], assoc, aad_size);
 =20
- out:
- 	crypto_free_aead(tfm);
-+out_notfm:
- 	kfree(sg);
- out_nosg:
- 	testmgr_free_buf(xoutbuf);
+ 			if ((*keysize + *b_size) > TVMEMSIZE * PAGE_SIZE) {
 --=20
 1.9.1
 
---Sig_//O1rreyrO7_4r_Z671jpHem
+--Sig_//NIrK910qeX6IIquH3yMDSB
 Content-Type: application/pgp-signature; name=signature.asc
 Content-Disposition: attachment; filename=signature.asc
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJTVWeQAAoJEKssnEpaPQKE5dIP/10SxMtgvSwS12sqq+0TnxBE
-BdtYTkn9E4UR2tozjPZTUkSX3iTHpn5WMhUxb3ZYwC4LyW8kZhJsyx2HgXQplvMg
-zJWughLMQJ7oZV3bo6mrHc5ZeNrLDNMU6AIzRGXqgohn2gXJDedV8moQj2frG/FA
-sjxwKi5oz1JREfBD16O07ej9qhBVvUp/nLc6/mH95dj/9enfC3zFPTnyKtJZnppk
-+l2rSVUQ/nJYIgysMzEwR0C4sTx750d7mOHGO3xbmqNhWrz9dh5On+dn+bOXU8FT
-Vb2tsHyvmMjoYXpD4nX32W1g2Yn4A3vTRT9Gk1s65BoW+nL4uk5KFdtZZ5A+bQRe
-eJ3v+5zcsZG1uSRKsBk8290iwRSXgssflhQbIiHpINhVaOUgYEigj3qylsLeVqAT
-hYg3ZuSnQDagIX1bZ7dPcc6I9yPq9mzkPLu7QWS4xfvxn6lVesHWMZs+zpMJp7ak
-kJJakpNvDK58Pg44pA9quFM9HSxnd6qeGfZKXIDBZIkiqUqftVolJF0OhPvA2FQ6
-XUcQuwfYoHJuX9Q/98GjR8jPosrMIu3CsmwT7t0p88rHeALmtqqEoKhC1AaZk6bP
-Hh6zyTuVBeFk+9YEjU9iACOCy2JNC9oZ2d7XsIPFZaDxMjeTd2IQHAwcu6McJRyl
-nLNVgqYVS4lGN1ozV2En
-=w51F
+iQIcBAEBAgAGBQJTVWdnAAoJEKssnEpaPQKE0VAQAK/LdWfQLyEusWka6j82P5Sf
+VrMpFDAxGxjh5Igp7e2LhySNw7lNXA2UYY33J5cHeT6oc7wn4gJulhWpzJwtKgSC
++XYfzzYVVJUDh3z8sBWeb7J68sFOxPUyUvSCkfQjHtIs6z/AYOJqEfGMYzqyW7w3
+T3XKaM12Vky9Of7NZp/o9izZmxuDlJbTDNABfYccdTpNGnRF2+4uJHuhfswY7kpy
+kzXrfw8uA+w89yNqx+xzB30PwextbO4LJLDRVTOnqrF9F0S0nKt006XVa41+X6j/
+uz9y8bytnkEng9Xpok6IS4LmZCwDV8w7x4m/mDuM+fZuZBIv4jjsPjd/RGVrHZo5
+wHHu7q4493NvMSHeswBoqWsA/nksW/ke2uUniSGpqAjPfxspyt5leuxz4Witn8l3
+mAjZZpQp/kp7LMKktOjaTxLYw1pzahUdDXOf+ZDRpv7Dqqz61KU/Yzk6+W36eL9S
+J6P3BztqUNO4wM27pbR6nhPFflBMndbc4vevsUP4ZRbceGinSdPCo594A1/gH+/Y
+wS9D0kYdL1gHkrCJy6zyFMSvEzH3EaxHFEFrkfL+kioUUIe3D8bPmhLjn2O4YjK6
+UZliamt2hMydlWIicofN9TtAToYGqKWQ3NulsjMpJeM8RRBgzrVreUy2t8SzBeem
+gsqh4kUGcenXxVaBjpQ3
+=LxHZ
 -----END PGP SIGNATURE-----
 
---Sig_//O1rreyrO7_4r_Z671jpHem--
+--Sig_//NIrK910qeX6IIquH3yMDSB--
