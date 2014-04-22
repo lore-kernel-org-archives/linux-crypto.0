@@ -1,65 +1,42 @@
 From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH crypto 2/2] crypto: caam - add allocation failure handling in SPRINTFCAT macro
-Date: Wed, 23 Apr 2014 01:56:41 +0200
-Message-ID: <201404230156.41234.marex@denx.de>
-References: <1397815302-15915-1-git-send-email-horia.geanta@freescale.com> <1397815302-15915-2-git-send-email-horia.geanta@freescale.com>
+Subject: Re: [PATCH 1/3] crypto: Fix potential leak in test_aead_speed() if aad_size is too big
+Date: Wed, 23 Apr 2014 01:33:05 +0200
+Message-ID: <201404230133.05256.marex@denx.de>
+References: <20140421204439.7999f1c6@spike> <20140421204559.75b8aa71@spike>
 Mime-Version: 1.0
 Content-Type: Text/Plain;
   charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, stable@vger.kernel.org,
-	Kim Phillips <kim.phillips@freescale.com>
-To: Horia Geanta <horia.geanta@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:37659 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751255AbaDVX7G (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Apr 2014 19:59:06 -0400
-In-Reply-To: <1397815302-15915-2-git-send-email-horia.geanta@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: tim.c.chen@linux.intel.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Christian Engelmayer <cengelma@gmx.at>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20140421204559.75b8aa71@spike>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Friday, April 18, 2014 at 12:01:42 PM, Horia Geanta wrote:
-> GFP_ATOMIC memory allocation could fail.
-> In this case, avoid NULL pointer dereference and notify user.
+On Monday, April 21, 2014 at 08:45:59 PM, Christian Engelmayer wrote:
+> Fix a potential memory leak in the error handling of test_aead_speed(). In
+> case the size check on the associate data length parameter fails, the
+> function goes through the wrong exit label. Reported by Coverity - CID
+> 1163870.
 > 
-> Cc: <stable@vger.kernel.org> # 3.2+
-
-If I recall correctly, you need to get the patch accepted into mainline before 
-sending it for -stable .
-
-> Cc: Kim Phillips <kim.phillips@freescale.com>
-> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+> Signed-off-by: Christian Engelmayer <cengelma@gmx.at>
 > ---
->  drivers/crypto/caam/error.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+>  crypto/tcrypt.c | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
 > 
-> diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
-> index 9f25f5296029..0eabd81e1a90 100644
-> --- a/drivers/crypto/caam/error.c
-> +++ b/drivers/crypto/caam/error.c
-> @@ -16,9 +16,13 @@
->  	char *tmp;						\
->  								\
->  	tmp = kmalloc(sizeof(format) + max_alloc, GFP_ATOMIC);	\
-> -	sprintf(tmp, format, param);				\
-> -	strcat(str, tmp);					\
-> -	kfree(tmp);						\
-> +	if (likely(tmp)) {					\
-> +		sprintf(tmp, format, param);			\
-> +		strcat(str, tmp);				\
-> +		kfree(tmp);					\
-> +	} else {						\
-> +		strcat(str, "kmalloc failure in SPRINTFCAT");	\
+> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+> index 870be7b..1856d7f 100644
+> --- a/crypto/tcrypt.c
+> +++ b/crypto/tcrypt.c
+> @@ -282,6 +282,11 @@ static void test_aead_speed(const char *algo, int enc,
+> unsigned int sec, unsigned int *b_size;
+>  	unsigned int iv_len;
+> 
+> +	if (aad_size >= PAGE_SIZE) {
 
-This entire macro looks somewhat strange.
-1) Can't you just snprintf() into $str + some offset ? Something like:
-   snprintf(str + strlen(str), str_total_sz - strlen(str), format, param);
-   
-2) Why is noone checking if the $str has enough space for contents of $tmp ?
+On an unrelated note ... Won't if (aad_size > PAGE_SIZE) be sufficient here?
 
-Best regards,
-Marek Vasut
+Cheers!
