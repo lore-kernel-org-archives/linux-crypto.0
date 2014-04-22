@@ -1,47 +1,47 @@
-From: Leilei Zhao <leilei.zhao@atmel.com>
-Subject: [PATCH 2/2] crypto: atmel-aes: check alignment of cfb64 mode
-Date: Tue, 22 Apr 2014 15:23:24 +0800
-Message-ID: <1398151404-23408-3-git-send-email-leilei.zhao@atmel.com>
-References: <1398151404-23408-1-git-send-email-leilei.zhao@atmel.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<nicolas@eukrea.com>, <nicolas.ferre@atmel.com>,
-	<leilei.zhao@atmel.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: [PATCH] crypto_user: Fix out-of-bounds read
+Date: Tue, 22 Apr 2014 12:30:28 -0700
+Message-ID: <57bf4e51f05fad506a0d1638852a5233b359e1dc.1398194946.git.luto@amacapital.net>
+Cc: security@kernel.org, ebiederm@xmission.com,
+	Andy Lutomirski <luto@amacapital.net>, stable@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from nasmtp02.atmel.com ([204.2.163.16]:45182 "EHLO
-	SJOEDG01.corp.atmel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753024AbaDVHbG (ORCPT
+Received: from mail-pb0-f51.google.com ([209.85.160.51]:48980 "EHLO
+	mail-pb0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751275AbaDVTae (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Apr 2014 03:31:06 -0400
-In-Reply-To: <1398151404-23408-1-git-send-email-leilei.zhao@atmel.com>
+	Tue, 22 Apr 2014 15:30:34 -0400
+Received: by mail-pb0-f51.google.com with SMTP id uo5so5275715pbc.38
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Apr 2014 12:30:33 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The length shoule be 64 bit alignment and the block size shoule be 64 bit in aes cfb64 mode.
+This is unlikely to be exploitable for anything except an OOPS.
 
-Signed-off-by: Leilei Zhao <leilei.zhao@atmel.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Andy Lutomirski <luto@amacapital.net>
 ---
- drivers/crypto/atmel-aes.c |    6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 12628a7..a083474 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -716,6 +716,12 @@ static int atmel_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
- 			return -EINVAL;
- 		}
- 		ctx->block_size = CFB32_BLOCK_SIZE;
-+	} else if (mode & AES_FLAGS_CFB64) {
-+		if (!IS_ALIGNED(req->nbytes, CFB64_BLOCK_SIZE)) {
-+			pr_err("request size is not exact amount of CFB64 blocks\n");
-+			return -EINVAL;
-+		}
-+		ctx->block_size = CFB64_BLOCK_SIZE;
- 	} else {
- 		if (!IS_ALIGNED(req->nbytes, AES_BLOCK_SIZE)) {
- 			pr_err("request size is not exact amount of AES blocks\n");
+Notes:
+    This is entirely untested, but it looks obviously correct to me.
+
+ crypto/crypto_user.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+index 1512e41..bc7c4b5 100644
+--- a/crypto/crypto_user.c
++++ b/crypto/crypto_user.c
+@@ -460,7 +460,7 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
+ 	int type, err;
+ 
+ 	type = nlh->nlmsg_type;
+-	if (type > CRYPTO_MSG_MAX)
++	if (type < CRYPTO_MSG_BASE || type > CRYPTO_MSG_MAX)
+ 		return -EINVAL;
+ 
+ 	type -= CRYPTO_MSG_BASE;
 -- 
-1.7.9.5
+1.9.0
