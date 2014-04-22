@@ -1,80 +1,34 @@
-From: Christian Engelmayer <cengelma@gmx.at>
-Subject: [PATCH 3/3] crypto: Fix leak of struct aead_request in
- test_aead_speed()
-Date: Mon, 21 Apr 2014 20:47:05 +0200
-Message-ID: <20140421204705.07cb8278@spike>
-References: <20140421204439.7999f1c6@spike>
+From: Leilei Zhao <leilei.zhao@atmel.com>
+Subject: [PATCH 0/2] crypto: atmel-aes: fixes on block size of aes cfb mode
+Date: Tue, 22 Apr 2014 15:23:22 +0800
+Message-ID: <1398151404-23408-1-git-send-email-leilei.zhao@atmel.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- boundary="Sig_/VsKpQugEMs+xyMYtiqyszJX"; protocol="application/pgp-signature"
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: tim.c.chen@linux.intel.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140421204439.7999f1c6@spike>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<nicolas@eukrea.com>, <nicolas.ferre@atmel.com>,
+	<leilei.zhao@atmel.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from nasmtp01.atmel.com ([192.199.1.246]:49164 "EHLO
+	DVREDG02.corp.atmel.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752133AbaDVHar (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 22 Apr 2014 03:30:47 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
---Sig_/VsKpQugEMs+xyMYtiqyszJX
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi:
 
-Fix leakage of memory for struct aead_request that is allocated via
-aead_request_alloc() but not released via aead_request_free().
-Reported by Coverity - CID 1163869.
+These two patches correct the block size in atmel-aes driver while processing cfb8 and cfb64 mode of aes.
 
-Signed-off-by: Christian Engelmayer <cengelma@gmx.at>
----
- crypto/tcrypt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thanks
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 1849155..09c93ff2 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -320,7 +320,7 @@ static void test_aead_speed(const char *algo, int enc, =
-unsigned int sec,
- 	if (!req) {
- 		pr_err("alg: aead: Failed to allocate request for %s\n",
- 		       algo);
--		goto out;
-+		goto out_noreq;
- 	}
-=20
- 	i =3D 0;
-@@ -390,6 +390,8 @@ static void test_aead_speed(const char *algo, int enc, =
-unsigned int sec,
- 	} while (*keysize);
-=20
- out:
-+	aead_request_free(req);
-+out_noreq:
- 	crypto_free_aead(tfm);
- out_notfm:
- 	kfree(sg);
---=20
-1.9.1
+Leilei Zhao (2):
+  crypto: atmel-aes: correct block size of cfb8 mode
+  crypto: atmel-aes: check alignment of cfb64 mode
 
---Sig_/VsKpQugEMs+xyMYtiqyszJX
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
+ drivers/crypto/atmel-aes.c |    8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJTVWepAAoJEKssnEpaPQKEG1sQAIrzdS97m11xatQoL2arCpJi
-LRELctUwW5QF9rcwoE9xfUrzzi/22GdPD8F/7JVjwPzYikcf3KP7llZzGlfkXerj
-wY7JFkQqoeCtuVfCAt1R2giMx85aiu7CJj5Yw6LtoQraiQ6i1qbhK8QnRmi6cSfA
-uXkeRAu9zIuUSJx1L1pOp1K6Mvps7pbqor4cWYQQEKnuDh5792eE3xUXIEjuxfP+
-j1VQEREyJH5HQINlwbrV2leu2+0et9ipogonBP7vp3OEuFybb7CDtBlNVoxeodmL
-zcphuJPub5g/vlXi3akMsPXAkvJD95c1o5o9LFPd4h97twox8Qmj/AI2Up+EjaRa
-oIvM92zhn3cWsYJCtRToHVFc7vNuV6H8SOBaAfZTrSetMdx/YpxBW8FwXdTdNS8s
-+9GJGTTA/y2oURZXvtbe9Frz7nfF6fIKzoJsKVRwGhdz+tiE7J0uF0aTlq4r/sDY
-4Z7I1owBPxyPOGY3JeQu1sQw2YH7isz+XucbFthtLccMF+AtnDx0Bg3Y9BcXPIF5
-uMIE1eTljDOHfKQhrhNSf343b/EEMrRu+9I399VPWSoS+Vfrwpz6ME8jHDYL0O4p
-icICOoU/gxYrW7VgN9AyjIeEsabZGMd/XCSAsD5bd6H3hwLf6t1ofTNh/fgWzh+R
-HUfS/hEYAaEZnxgfeweH
-=7QJe
------END PGP SIGNATURE-----
-
---Sig_/VsKpQugEMs+xyMYtiqyszJX--
+-- 
+1.7.9.5
