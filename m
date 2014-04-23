@@ -1,98 +1,98 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH crypto 2/2] crypto: caam - add allocation failure handling
- in SPRINTFCAT macro
-Date: Wed, 23 Apr 2014 19:35:45 +0300
-Message-ID: <5357EBE1.9000402@freescale.com>
-References: <1397815302-15915-1-git-send-email-horia.geanta@freescale.com>
- <1397815302-15915-2-git-send-email-horia.geanta@freescale.com>
- <201404230156.41234.marex@denx.de>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH crypto 2/2] crypto: caam - add allocation failure handling in SPRINTFCAT macro
+Date: Wed, 23 Apr 2014 19:12:19 +0200
+Message-ID: <201404231912.19922.marex@denx.de>
+References: <1397815302-15915-1-git-send-email-horia.geanta@freescale.com> <201404230156.41234.marex@denx.de> <5357EBE1.9000402@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>, <stable@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, stable@vger.kernel.org,
 	Kim Phillips <kim.phillips@freescale.com>
-To: Marek Vasut <marex@denx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2lp0239.outbound.protection.outlook.com ([207.46.163.239]:28834
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1756730AbaDWQuv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Apr 2014 12:50:51 -0400
-In-Reply-To: <201404230156.41234.marex@denx.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Horia =?utf-8?q?Geant=C4=83?= <horia.geanta@freescale.com>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <5357EBE1.9000402@freescale.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 4/23/2014 2:56 AM, Marek Vasut wrote:
-> On Friday, April 18, 2014 at 12:01:42 PM, Horia Geanta wrote:
->> GFP_ATOMIC memory allocation could fail.
->> In this case, avoid NULL pointer dereference and notify user.
->>
->> Cc: <stable@vger.kernel.org> # 3.2+
->
-> If I recall correctly, you need to get the patch accepted into mainline before
-> sending it for -stable .
->
+On Wednesday, April 23, 2014 at 06:35:45 PM, Horia Geant=C4=83 wrote:
 
- From Documentation/stable_kernel_rules.txt
-  - To have the patch automatically included in the stable tree, add the tag
-      Cc: stable@vger.kernel.org
-    in the sign-off area. Once the patch is merged it will be applied to
-    the stable tree without anything else needing to be done by the author
-    or subsystem maintainer.
+[...]
 
->> Cc: Kim Phillips <kim.phillips@freescale.com>
->> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
->> ---
->>   drivers/crypto/caam/error.c | 10 +++++++---
->>   1 file changed, 7 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
->> index 9f25f5296029..0eabd81e1a90 100644
->> --- a/drivers/crypto/caam/error.c
->> +++ b/drivers/crypto/caam/error.c
->> @@ -16,9 +16,13 @@
->>   	char *tmp;						\
->>   								\
->>   	tmp = kmalloc(sizeof(format) + max_alloc, GFP_ATOMIC);	\
->> -	sprintf(tmp, format, param);				\
->> -	strcat(str, tmp);					\
->> -	kfree(tmp);						\
->> +	if (likely(tmp)) {					\
->> +		sprintf(tmp, format, param);			\
->> +		strcat(str, tmp);				\
->> +		kfree(tmp);					\
->> +	} else {						\
->> +		strcat(str, "kmalloc failure in SPRINTFCAT");	\
->
-> This entire macro looks somewhat strange.
+> > This entire macro looks somewhat strange.
+>=20
+> I am trying to fix it with minimal changes, so the patch qualifies fo=
+r
+> -stable.
 
-I am trying to fix it with minimal changes, so the patch qualifies for 
--stable.
+This is just broken and you're not fixing it. You're just feeding this =
+slimy=20
+monster called technical debt more and more code, so it can grow and ge=
+t uglier=20
+and uglier. I hope you have no attachment to this abomination, since I'=
+d like to=20
+see it dead.
 
-> 1) Can't you just snprintf() into $str + some offset ? Something like:
->     snprintf(str + strlen(str), str_total_sz - strlen(str), format, param);
->
+> > 1) Can't you just snprintf() into $str + some offset ? Something li=
+ke:
+> >     snprintf(str + strlen(str), str_total_sz - strlen(str), format,
+> >     param);
+>=20
+> I think this would work. It also gets rid of memory allocation.
+>=20
+> Note that strlen(str) is undefined if str is not initialized /
+> null-terminated.
+> However, all code paths seem to touch this line in caam_jr_strstatus(=
+):
+> sprintf(outstr, "%s: ", status_src[ssrc].error);
+> before reaching SPRINTFCAT macros, so str is null-terminated.
+>=20
+> I'll send v2.
 
-I think this would work. It also gets rid of memory allocation.
+No, let us first agree on how to fix this insane abomination please.
 
-Note that strlen(str) is undefined if str is not initialized / 
-null-terminated.
-However, all code paths seem to touch this line in caam_jr_strstatus():
-sprintf(outstr, "%s: ", status_src[ssrc].error);
-before reaching SPRINTFCAT macros, so str is null-terminated.
+But while I am looking, I see stuff like:
 
-I'll send v2.
+caam_jr_strstatus() can call report_ccb_status( , "CCB"); (basically wi=
+th a=20
+fixed-size string argument):
 
-> 2) Why is noone checking if the $str has enough space for contents of $tmp ?
+265         if (status_src[ssrc].report_ssed)
+266                 status_src[ssrc].report_ssed(status, outstr);
 
-All call sites reach this macro via caam_jr_strstatus(tmp, ...), which 
-is always called having:
-char tmp[CAAM_ERROR_STR_MAX];
+Report_ccb_status( , "CCB"); will call report_jump_idx( , "CCB"); (stil=
+l with=20
+fixed-size string arg), which contains your SPRINTFCAT() macro.
 
-CAAM_ERROR_STR_MAX is 302, probably enough according to commit
-de2954d66408da3ae34effda777bb564fd17781b (crypto: caam - fix printk 
-recursion for long error texts).
+This will expand to:
 
-Horia
+=2E..
+strcat("CCB", tmp);
+=2E..
+
+So basically you are writing into a fixed-size string? But the string i=
+s three-
+bytes long, so you are overwriting kernel memory ?
+
+If I read the code wrong, I really apologize in advance.
+
+> > 2) Why is noone checking if the $str has enough space for contents =
+of
+> > $tmp ?
+>=20
+> All call sites reach this macro via caam_jr_strstatus(tmp, ...), whic=
+h
+> is always called having:
+> char tmp[CAAM_ERROR_STR_MAX];
+>=20
+> CAAM_ERROR_STR_MAX is 302, probably enough according to commit
+> de2954d66408da3ae34effda777bb564fd17781b (crypto: caam - fix printk
+> recursion for long error texts).
+
+You are digging in Linux's crypto code, not OpenSSL. We need accurate f=
+ixes and=20
+accurate discussion ... using 'probably' does not work here.
+
+Best regards,
+Marek Vasut
