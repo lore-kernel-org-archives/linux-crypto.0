@@ -1,66 +1,57 @@
-From: Jitendra Lulla <lulla.jitendra@gmail.com>
-Subject: RE: RFC: Crypto API User-interface
-Date: Wed, 23 Apr 2014 16:07:27 +0530
-Message-ID: <CAEux+EPz9NRhyiYRTC4POSCURVX176uWsPOp2D1trNXH2g-68Q@mail.gmail.com>
-Reply-To: lullajd@yahoo.com
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH] crypto_user: Fix out-of-bounds read
+Date: Wed, 23 Apr 2014 14:40:39 +0300
+Message-ID: <20140423114039.GY4963@mwanda>
+References: <57bf4e51f05fad506a0d1638852a5233b359e1dc.1398194946.git.luto@amacapital.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f177.google.com ([209.85.192.177]:58626 "EHLO
-	mail-pd0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932484AbaDWKhr (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Apr 2014 06:37:47 -0400
-Received: by mail-pd0-f177.google.com with SMTP id y10so638073pdj.8
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Apr 2014 03:37:47 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	security@kernel.org, ebiederm@xmission.com, stable@vger.kernel.org
+To: Andy Lutomirski <luto@amacapital.net>
+Return-path: <stable-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <57bf4e51f05fad506a0d1638852a5233b359e1dc.1398194946.git.luto@amacapital.net>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+On Tue, Apr 22, 2014 at 12:30:28PM -0700, Andy Lutomirski wrote:
+> This is unlikely to be exploitable for anything except an OOPS.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Andy Lutomirski <luto@amacapital.net>
+> ---
+> 
+> Notes:
+>     This is entirely untested, but it looks obviously correct to me.
+> 
+>  crypto/crypto_user.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+> index 1512e41..bc7c4b5 100644
+> --- a/crypto/crypto_user.c
+> +++ b/crypto/crypto_user.c
+> @@ -460,7 +460,7 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
+>  	int type, err;
+>  
+>  	type = nlh->nlmsg_type;
+> -	if (type > CRYPTO_MSG_MAX)
+> +	if (type < CRYPTO_MSG_BASE || type > CRYPTO_MSG_MAX)
+>  		return -EINVAL;
 
-This is regarding the hash computation over a file with AF_ALG from
-user space. [without OpenSSL]
+Adding a check here is obviously harmless but I think this is only
+called from netlink_rcv_skb() which already checks:
 
-The following link has the mail from Herbert with subject : "RFC:
-Crypto API User-interface"
-http://lwn.net/Articles/410848/
+	if (nlh->nlmsg_type < NLMSG_MIN_TYPE)
+		goto ack;
 
-I was trying to take help from the code snippet he has put in his mail
-and I was doing the following to compute
-hash over a file of 16 bytes. The file contents are "123456789012345\n".
-I read the first 10 bytes first and computed hash over it. Then I read
-the next 6 bytes from
-the file and computed the hash and I had taken care of using the flags
-MSG_MORE and MSG_OOB.
+NLMSG_MIN_TYPE is 0x10 as well, so I don't think we can hit your
+condition.
 
-Following is what I am doing:
+Your patch freaked me out a little because this is one of the bugs that
+I should have caught throught static analysis.
 
-1. send(opfd, sbuf, len, MSG_MORE);
-2. read(opfd, state, 20);
-3. send(opfd, state, 20, MSG_OOB);
-
-4. send(opfd, sbuf, len, MSG_MORE);
-5. read(opfd, state, 20);
-6. /*restore from a partial hash state */
-7. send(opfd, state, 20, MSG_OOB);
-
-8.  /* finalize */
-9. send(opfd, sbuf, 0, 0);
-10. read(opfd, buf, 20);
-
-sbuf
-in line 1 contains: "1234567890" (the " is not part of the data, the
-data is plain 10 ascii bytes for 1 through 9), len is 10.
-the state after line 2 contains correct hash of the above data.
-
-sbuf in line 4 contains: "12345\n". Len is 6.
-
-The hash I am seeing in buf after line 10 is not correct one.
-
-Is there anything obviously wrong with the above code? I am using
-2.6.39.4 kernel on rhel 6.4 (santiago)
-
-Thanks for the help!
-
-~Jitendra
+regards,
+dan carpenter
