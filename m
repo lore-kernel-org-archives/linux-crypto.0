@@ -1,58 +1,90 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH 3/3] crypto: Fix leak of struct aead_request in
- test_aead_speed()
-Date: Wed, 23 Apr 2014 10:26:06 -0700
-Message-ID: <1398273966.2970.55.camel@schen9-DESK>
-References: <20140421204439.7999f1c6@spike>  <20140421204705.07cb8278@spike>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH crypto 2/2] crypto: caam - add allocation failure handling in SPRINTFCAT macro
+Date: Wed, 23 Apr 2014 19:41:02 +0200
+Message-ID: <201404231941.02739.marex@denx.de>
+References: <1397815302-15915-1-git-send-email-horia.geanta@freescale.com> <5357EBE1.9000402@freescale.com> <201404231912.19922.marex@denx.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Christian Engelmayer <cengelma@gmx.at>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:3843 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751449AbaDWR00 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Apr 2014 13:26:26 -0400
-In-Reply-To: <20140421204705.07cb8278@spike>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, stable@vger.kernel.org,
+	Kim Phillips <kim.phillips@freescale.com>
+To: Horia =?utf-8?q?Geant=C4=83?= <horia.geanta@freescale.com>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <201404231912.19922.marex@denx.de>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, 2014-04-21 at 20:47 +0200, Christian Engelmayer wrote:
-> Fix leakage of memory for struct aead_request that is allocated via
-> aead_request_alloc() but not released via aead_request_free().
-> Reported by Coverity - CID 1163869.
-> 
-> Signed-off-by: Christian Engelmayer <cengelma@gmx.at>
+On Wednesday, April 23, 2014 at 07:12:19 PM, Marek Vasut wrote:
+> On Wednesday, April 23, 2014 at 06:35:45 PM, Horia Geant=C4=83 wrote:
+>=20
+> [...]
+>=20
+> > > This entire macro looks somewhat strange.
+> >=20
+> > I am trying to fix it with minimal changes, so the patch qualifies =
+for
+> > -stable.
+>=20
+> This is just broken and you're not fixing it. You're just feeding thi=
+s
+> slimy monster called technical debt more and more code, so it can gro=
+w and
+> get uglier and uglier. I hope you have no attachment to this abominat=
+ion,
+> since I'd like to see it dead.
+>=20
+> > > 1) Can't you just snprintf() into $str + some offset ? Something =
+like:
+> > >     snprintf(str + strlen(str), str_total_sz - strlen(str), forma=
+t,
+> > >     param);
+> >=20
+> > I think this would work. It also gets rid of memory allocation.
+> >=20
+> > Note that strlen(str) is undefined if str is not initialized /
+> > null-terminated.
+> > However, all code paths seem to touch this line in caam_jr_strstatu=
+s():
+> > sprintf(outstr, "%s: ", status_src[ssrc].error);
+> > before reaching SPRINTFCAT macros, so str is null-terminated.
+> >=20
+> > I'll send v2.
+>=20
+> No, let us first agree on how to fix this insane abomination please.
+>=20
+> But while I am looking, I see stuff like:
+>=20
+> caam_jr_strstatus() can call report_ccb_status( , "CCB"); (basically =
+with a
+> fixed-size string argument):
+>=20
+> 265         if (status_src[ssrc].report_ssed)
+> 266                 status_src[ssrc].report_ssed(status, outstr);
+>=20
+> Report_ccb_status( , "CCB"); will call report_jump_idx( , "CCB"); (st=
+ill
+> with fixed-size string arg), which contains your SPRINTFCAT() macro.
+>=20
+> This will expand to:
+>=20
+> ...
+> strcat("CCB", tmp);
+> ...
+>=20
+> So basically you are writing into a fixed-size string? But the string=
+ is
+> three- bytes long, so you are overwriting kernel memory ?
 
-Acked.  Thanks for fixing the leak.
+Ok, I apologize. You were right. The 'strcat()' is always called with a=
+ fixed-
+length 302byte long buffer allocated on stack. Thus this code is only f=
+ragile.
 
-Tim
+I will need to think of this code a bit more before I blurt out some se=
+rious=20
+nonsense again.
 
-> ---
->  crypto/tcrypt.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-> index 1849155..09c93ff2 100644
-> --- a/crypto/tcrypt.c
-> +++ b/crypto/tcrypt.c
-> @@ -320,7 +320,7 @@ static void test_aead_speed(const char *algo, int enc, unsigned int sec,
->  	if (!req) {
->  		pr_err("alg: aead: Failed to allocate request for %s\n",
->  		       algo);
-> -		goto out;
-> +		goto out_noreq;
->  	}
->  
->  	i = 0;
-> @@ -390,6 +390,8 @@ static void test_aead_speed(const char *algo, int enc, unsigned int sec,
->  	} while (*keysize);
->  
->  out:
-> +	aead_request_free(req);
-> +out_noreq:
->  	crypto_free_aead(tfm);
->  out_notfm:
->  	kfree(sg);
+Best regards,
+Marek Vasut
