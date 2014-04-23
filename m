@@ -1,90 +1,72 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH crypto 2/2] crypto: caam - add allocation failure handling in SPRINTFCAT macro
-Date: Wed, 23 Apr 2014 19:41:02 +0200
-Message-ID: <201404231941.02739.marex@denx.de>
-References: <1397815302-15915-1-git-send-email-horia.geanta@freescale.com> <5357EBE1.9000402@freescale.com> <201404231912.19922.marex@denx.de>
+From: Christian Engelmayer <cengelma@gmx.at>
+Subject: Re: [PATCH 1/3] crypto: Fix potential leak in test_aead_speed() if
+ aad_size is too big
+Date: Wed, 23 Apr 2014 19:43:35 +0200
+Message-ID: <20140423194335.2d72d7a4@spike>
+References: <20140421204439.7999f1c6@spike>
+	<20140421204559.75b8aa71@spike>
+	<201404230133.05256.marex@denx.de>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, stable@vger.kernel.org,
-	Kim Phillips <kim.phillips@freescale.com>
-To: Horia =?utf-8?q?Geant=C4=83?= <horia.geanta@freescale.com>
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <201404231912.19922.marex@denx.de>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ boundary="Sig_//SuvCvuci+K/glLkCjY/wjv"; protocol="application/pgp-signature"
+Cc: tim.c.chen@linux.intel.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Marek Vasut <marex@denx.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mout.gmx.net ([212.227.17.22]:49156 "EHLO mout.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756629AbaDWRnx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Apr 2014 13:43:53 -0400
+In-Reply-To: <201404230133.05256.marex@denx.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday, April 23, 2014 at 07:12:19 PM, Marek Vasut wrote:
-> On Wednesday, April 23, 2014 at 06:35:45 PM, Horia Geant=C4=83 wrote:
->=20
-> [...]
->=20
-> > > This entire macro looks somewhat strange.
-> >=20
-> > I am trying to fix it with minimal changes, so the patch qualifies =
-for
-> > -stable.
->=20
-> This is just broken and you're not fixing it. You're just feeding thi=
-s
-> slimy monster called technical debt more and more code, so it can gro=
-w and
-> get uglier and uglier. I hope you have no attachment to this abominat=
-ion,
-> since I'd like to see it dead.
->=20
-> > > 1) Can't you just snprintf() into $str + some offset ? Something =
-like:
-> > >     snprintf(str + strlen(str), str_total_sz - strlen(str), forma=
-t,
-> > >     param);
-> >=20
-> > I think this would work. It also gets rid of memory allocation.
-> >=20
-> > Note that strlen(str) is undefined if str is not initialized /
-> > null-terminated.
-> > However, all code paths seem to touch this line in caam_jr_strstatu=
-s():
-> > sprintf(outstr, "%s: ", status_src[ssrc].error);
-> > before reaching SPRINTFCAT macros, so str is null-terminated.
-> >=20
-> > I'll send v2.
->=20
-> No, let us first agree on how to fix this insane abomination please.
->=20
-> But while I am looking, I see stuff like:
->=20
-> caam_jr_strstatus() can call report_ccb_status( , "CCB"); (basically =
-with a
-> fixed-size string argument):
->=20
-> 265         if (status_src[ssrc].report_ssed)
-> 266                 status_src[ssrc].report_ssed(status, outstr);
->=20
-> Report_ccb_status( , "CCB"); will call report_jump_idx( , "CCB"); (st=
-ill
-> with fixed-size string arg), which contains your SPRINTFCAT() macro.
->=20
-> This will expand to:
->=20
-> ...
-> strcat("CCB", tmp);
-> ...
->=20
-> So basically you are writing into a fixed-size string? But the string=
- is
-> three- bytes long, so you are overwriting kernel memory ?
+--Sig_//SuvCvuci+K/glLkCjY/wjv
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Ok, I apologize. You were right. The 'strcat()' is always called with a=
- fixed-
-length 302byte long buffer allocated on stack. Thus this code is only f=
-ragile.
+On Wed, 23 Apr 2014 01:33:05 +0200, Marek Vasut <marex@denx.de> wrote:
+> On Monday, April 21, 2014 at 08:45:59 PM, Christian Engelmayer wrote:
+> > +	if (aad_size >=3D PAGE_SIZE) {
+>=20
+> On an unrelated note ... Won't if (aad_size > PAGE_SIZE) be sufficient he=
+re?
 
-I will need to think of this code a bit more before I blurt out some se=
-rious=20
-nonsense again.
+=46rom what I have seen how the buffers are allocated via __get_free_page() I
+thought so too. However, as it previously read
 
-Best regards,
-Marek Vasut
+	if (aad_size < PAGE_SIZE)
+		memset(assoc, 0xff, aad_size);
+	else {
+
+my intention was simply to make the modification so that the bug is address=
+ed
+without introducing an additional change.
+
+Regards,
+Christian
+
+--Sig_//SuvCvuci+K/glLkCjY/wjv
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJTV/vHAAoJEKssnEpaPQKEbvAP/R0pH9/JW+ljtvpi+thy7DnM
+KJ2yCr/OTDMuSvbvcPyeXxaaTfd/thDZL8J41tBrlb60fx/u5ncHCikOm/0DeEET
+DNCrRf57Ql/GoVhhHSfTEGlQ2dwsVM5y8gxh8O9C3WhWTHFt7spp0/ihaLqKRlQA
+ZJdOfgd1Cn6fi+K/5cI0NBjBHkYIMDgtFPyrvDz1gG0sK0T2M+p0K/gouz3D78te
+J54g+BmPNgFKOS/0rGQxlcPYdoaCosBrBcMVVobM/gfB+zpcWUH4wu0+FuktxNdH
+O474xrfiwVzLx9O/bumstBgnhUeUaaVPEuQMy1mFMnWVKiT2GCW6FSLyD6Qa9Qfe
+/7gVQC7d4Rbddp5nljkANUf/b3jNCSTiaQ6S5AbkXTUDLKLPs+pTTRKYnRuv0SXa
+wECbRPd4JMK+D5z6YbrtgDge8yaI8sm97ycJ/eMjDAtnWhK48rE2uK/LlLVGvzKf
+GtT0oQ0BRUY7BA77DOgIXptg+1Wv1zvfQfF1BpSHzab8zJ4hZPVT7Npv76N+0I2y
+0KxTqD0BKq+bRHr2k+Vl4Nwak/1ajqZUTdosz2j0O/MV2m4H5bEp89UztrSw0vHC
+VFq6XE3GKh989wKfUxV5Na3qsJsXxyMKV1KTabWxivbzk1+G+a1NR+aSqD5lg61b
+A0tf/fKNz15EZmP8oM5t
+=yzZ/
+-----END PGP SIGNATURE-----
+
+--Sig_//SuvCvuci+K/glLkCjY/wjv--
