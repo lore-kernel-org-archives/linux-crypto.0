@@ -1,32 +1,51 @@
-From: leroy christophe <christophe.leroy@c-s.fr>
-Subject: Freescale SEC1 and AEAD / IPSEC
-Date: Thu, 24 Apr 2014 15:34:25 +0200
-Message-ID: <535912E1.5000109@c-s.fr>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
+From: Marek Vasut <marex@denx.de>
+Subject: [PATCH 00/11] crypto: caam: Error reporting fixes
+Date: Thu, 24 Apr 2014 20:05:11 +0200
+Message-ID: <1398362722-16430-1-git-send-email-marex@denx.de>
+Cc: Marek Vasut <marex@denx.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Horia Geanta <horia.geanta@freescale.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:21542 "EHLO mailhub1.si.c-s.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753344AbaDXNea (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 24 Apr 2014 09:34:30 -0400
+Received: from mail-out.m-online.net ([212.18.0.9]:44399 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757983AbaDXSFb (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 24 Apr 2014 14:05:31 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I'm progressing well on the SEC1 implementation. I now have HASH (non 
-HMAC) , DES and AES working properly.
-So it is now time to look at AEAD.
-I don't know much yet about crypto algorithm so forgive me if I ask 
-stupid questions.
+First stab at reworking the error.c thing in Freescale CAAM.
+This patchset cleans it up so it's not doing any too insane
+string messing anymore.
 
-The SEC1 doesn't have the IPSEC descriptor that SEC2 has. However, the 
-SEC Lite Descriptor Programmer's Guide tells us to use the 
-hmac_snoop_no_afeu descriptor to perform IPSEC.
+NOTE: Can someone please test this on real hardware? I have
+      none at hand, so THIS IS COMPILE-TESTED ONLY!
 
-Are both descriptors (more or less) equivalent ? Can the Talitos driver 
-be easily modified to use that descriptor ? Are there any limitations or 
-impossibilities to do so ?
+Marek Vasut (11):
+  crypto: caam: Contain caam_jr_strstatus() ugliness
+  crypto: caam: Pull all the error codes out
+  crypto: caam: Implement fast-path for error codes with no handler
+  crypto: caam: Pass error type into the functions
+  crypto: caam: Kill the easy targets
+  crypto: caam: Dissolve report_jump_idx()
+  crypto: caam: Clean up report_ccb_status()
+  crypto: caam: Clean up report_deco_status()
+  crypto: caam: Kill SPRINTFCAT() with fire
+  crypto: caam: Sweep the remnants
+  crypto: caam: Fix the 'quoted string split across lines'
 
-Christophe
+ drivers/crypto/caam/caamalg.c  |  28 +--
+ drivers/crypto/caam/caamhash.c |  28 +--
+ drivers/crypto/caam/caamrng.c  |   7 +-
+ drivers/crypto/caam/error.c    | 389 +++++++++++++++++++----------------------
+ drivers/crypto/caam/error.h    |   2 +-
+ drivers/crypto/caam/key_gen.c  |   7 +-
+ 6 files changed, 200 insertions(+), 261 deletions(-)
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Horia Geanta <horia.geanta@freescale.com>
+
+-- 
+1.9.2
