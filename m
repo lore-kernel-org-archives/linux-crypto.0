@@ -1,139 +1,98 @@
-From: Marek Vasut <marex@denx.de>
-Subject: [PATCH 10/11] crypto: caam: Sweep the remnants
-Date: Thu, 24 Apr 2014 20:05:21 +0200
-Message-ID: <1398362722-16430-11-git-send-email-marex@denx.de>
-References: <1398362722-16430-1-git-send-email-marex@denx.de>
-Cc: Marek Vasut <marex@denx.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Horia Geanta <horia.geanta@freescale.com>
+From: Matthias-Christian Ott <ott@mirix.org>
+Subject: [PATCH] crypto: user - Allow CRYPTO_MSG_GETALG without CAP_NET_ADMIN
+Date: Fri, 25 Apr 2014 00:51:06 +0200
+Message-ID: <5359955A.4070903@mirix.org>
+References: <534016A0.6020702@mirix.org>
+Mime-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="------------040408040300080004030802"
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:35612 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758657AbaDXSFh (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 24 Apr 2014 14:05:37 -0400
-In-Reply-To: <1398362722-16430-1-git-send-email-marex@denx.de>
+Received: from a.mirix.org ([78.46.130.147]:38753 "EHLO a.mirix.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1759139AbaDXWuY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 24 Apr 2014 18:50:24 -0400
+Received: from [2003:5c:ad74:c200:e415:150c:e790:6883]
+	by a.mirix.org with esmtpsa (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:256)
+	(Exim 4.80)
+	(envelope-from <ott@mirix.org>)
+	id 1WdSTG-0003PQ-MS
+	for linux-crypto@vger.kernel.org; Fri, 25 Apr 2014 00:50:22 +0200
+In-Reply-To: <534016A0.6020702@mirix.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Clean up the remnants from the rework. Constify function arguments.
+This is a multi-part message in MIME format.
+--------------040408040300080004030802
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Note that checkpatch again complains about this space before newline,
-but this is the original code behavior, so I'm keeping it.
 
-Signed-off-by: Marek Vasut <marex@denx.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Horia Geanta <horia.geanta@freescale.com>
+CRYPTO_USER requires CAP_NET_ADMIN for all operations. Most information
+provided by CRYPTO_MSG_GETALG is also accessible through /proc/modules
+and AF_ALG. CRYPTO_MSG_GETALG should not require CAP_NET_ADMIN so that
+processes without CAP_NET_ADMIN can use CRYPTO_MSG_GETALG to get cipher
+details, such as cipher priorities, for AF_ALG.
+
+Signed-off-by: Matthias-Christian Ott <ott@mirix.org>
 ---
- drivers/crypto/caam/error.c | 41 ++++++++++++++++++++---------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+ crypto/crypto_user.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
-index 7ed2e4f..0f4725c 100644
---- a/drivers/crypto/caam/error.c
-+++ b/drivers/crypto/caam/error.c
-@@ -13,7 +13,7 @@
+
+
+--------------040408040300080004030802
+Content-Type: text/x-patch;
+ name="0001-crypto-user-Allow-CRYPTO_MSG_GETALG-without-CAP_NET_.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename*0="0001-crypto-user-Allow-CRYPTO_MSG_GETALG-without-CAP_NET_.pa";
+ filename*1="tch"
+
+diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+index 1512e41..aa906b8 100644
+--- a/crypto/crypto_user.c
++++ b/crypto/crypto_user.c
+@@ -265,6 +265,9 @@ static int crypto_update_alg(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	struct nlattr *priority = attrs[CRYPTOCFGA_PRIORITY_VAL];
+ 	LIST_HEAD(list);
  
- static const struct {
- 	u8 value;
--	char *error_text;
-+	const char *error_text;
- } desc_error_list[] = {
- 	{ 0x00, "No error." },
- 	{ 0x01, "SGT Length Error. The descriptor is trying to read "
-@@ -158,8 +158,8 @@ static const char * const rng_err_id_list[] = {
- 	"Secure key generation",
- };
++	if (!capable(CAP_NET_ADMIN))
++		return -EPERM;
++
+ 	if (!null_terminated(p->cru_name) || !null_terminated(p->cru_driver_name))
+ 		return -EINVAL;
  
--static void report_ccb_status(struct device *jrdev, u32 status,
--			      const char *error, char *__outstr)
-+static void report_ccb_status(struct device *jrdev, const u32 status,
-+			      const char *error)
- {
- 	u8 cha_id = (status & JRSTA_CCBERR_CHAID_MASK) >>
- 		    JRSTA_CCBERR_CHAID_SHIFT;
-@@ -198,21 +198,21 @@ static void report_ccb_status(struct device *jrdev, u32 status,
- 		err_str, err_err_code);
- }
+@@ -295,6 +298,9 @@ static int crypto_del_alg(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	struct crypto_alg *alg;
+ 	struct crypto_user_alg *p = nlmsg_data(nlh);
  
--static void report_jump_status(struct device *jrdev, u32 status,
--			       const char *error, char *outstr)
-+static void report_jump_status(struct device *jrdev, const u32 status,
-+			       const char *error)
- {
- 	dev_err(jrdev, "%08x: %s: %s() not implemented\n",
- 		status, error, __func__);
- }
++	if (!capable(CAP_NET_ADMIN))
++		return -EPERM;
++
+ 	if (!null_terminated(p->cru_name) || !null_terminated(p->cru_driver_name))
+ 		return -EINVAL;
  
--static void report_deco_status(struct device *jrdev, u32 status,
--			       const char *error, char *__outstr)
-+static void report_deco_status(struct device *jrdev, const u32 status,
-+			       const char *error)
- {
- 	u8 err_id = status & JRSTA_DECOERR_ERROR_MASK;
- 	u8 idx = (status & JRSTA_DECOERR_INDEX_MASK) >>
- 		  JRSTA_DECOERR_INDEX_SHIFT;
- 	char *idx_str;
--	char *err_str = "unidentified error value 0x";
-+	const char *err_str = "unidentified error value 0x";
- 	char err_err_code[3] = { 0 };
- 	int i;
+@@ -379,6 +385,9 @@ static int crypto_add_alg(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	struct crypto_user_alg *p = nlmsg_data(nlh);
+ 	struct nlattr *priority = attrs[CRYPTOCFGA_PRIORITY_VAL];
  
-@@ -234,15 +234,15 @@ static void report_deco_status(struct device *jrdev, u32 status,
- 		status, error, idx_str, idx, err_str, err_err_code);
- }
++	if (!capable(CAP_NET_ADMIN))
++		return -EPERM;
++
+ 	if (!null_terminated(p->cru_name) || !null_terminated(p->cru_driver_name))
+ 		return -EINVAL;
  
--static void report_jr_status(struct device *jrdev, u32 status,
--			     const char *error, char *outstr)
-+static void report_jr_status(struct device *jrdev, const u32 status,
-+			     const char *error)
- {
- 	dev_err(jrdev, "%08x: %s: %s() not implemented\n",
- 		status, error, __func__);
- }
+@@ -466,9 +475,6 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
+ 	type -= CRYPTO_MSG_BASE;
+ 	link = &crypto_dispatch[type];
  
--static void report_cond_code_status(struct device *jrdev, u32 status,
--				    const char *error, char *outstr)
-+static void report_cond_code_status(struct device *jrdev, const u32 status,
-+				    const char *error)
- {
- 	dev_err(jrdev, "%08x: %s: %s() not implemented\n",
- 		status, error, __func__);
-@@ -251,8 +251,8 @@ static void report_cond_code_status(struct device *jrdev, u32 status,
- void caam_jr_strstatus(struct device *jrdev, u32 status)
- {
- 	static const struct stat_src {
--		void (*report_ssed)(struct device *jrdev, u32 status,
--				    const char *error, char *outstr);
-+		void (*report_ssed)(struct device *jrdev, const u32 status,
-+				    const char *error);
- 		const char *error;
- 	} status_src[] = {
- 		{ NULL, "No error" },
-@@ -265,17 +265,16 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
- 		{ report_cond_code_status, "Condition Code" },
- 	};
- 	u32 ssrc = status >> JRSTA_SSRC_SHIFT;
-+	const char *error = status_src[ssrc].error;
- 
- 	/*
- 	 * If there is no further error handling function, just
--	 * print the error code, error string and exit.
-+	 * print the error code, error string and exit. Otherwise
-+	 * call the handler function.
- 	 */
--	if (!status_src[ssrc].report_ssed) {
-+	if (!status_src[ssrc].report_ssed)
- 		dev_err(jrdev, "%08x: %s: \n", status, status_src[ssrc].error);
--		return;
--	}
+-	if (!capable(CAP_NET_ADMIN))
+-		return -EPERM;
 -
--	status_src[ssrc].report_ssed(jrdev, status,
--			status_src[ssrc].error, NULL);
-+	else
-+		status_src[ssrc].report_ssed(jrdev, status, error);
- }
- EXPORT_SYMBOL(caam_jr_strstatus);
--- 
-1.9.2
+ 	if ((type == (CRYPTO_MSG_GETALG - CRYPTO_MSG_BASE) &&
+ 	    (nlh->nlmsg_flags & NLM_F_DUMP))) {
+ 		struct crypto_alg *alg;
+
+
+--------------040408040300080004030802--
