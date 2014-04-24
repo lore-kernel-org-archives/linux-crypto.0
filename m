@@ -1,120 +1,89 @@
 From: Marek Vasut <marex@denx.de>
-Subject: [PATCH 05/11] crypto: caam: Kill the easy targets
-Date: Thu, 24 Apr 2014 20:05:16 +0200
-Message-ID: <1398362722-16430-6-git-send-email-marex@denx.de>
+Subject: [PATCH 08/11] crypto: caam: Clean up report_deco_status()
+Date: Thu, 24 Apr 2014 20:05:19 +0200
+Message-ID: <1398362722-16430-9-git-send-email-marex@denx.de>
 References: <1398362722-16430-1-git-send-email-marex@denx.de>
 Cc: Marek Vasut <marex@denx.de>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Horia Geanta <horia.geanta@freescale.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:35612 "EHLO
+Received: from mail-out.m-online.net ([212.18.0.9]:55517 "EHLO
 	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758588AbaDXSFg (ORCPT
+	with ESMTP id S1758205AbaDXSFg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
 	Thu, 24 Apr 2014 14:05:36 -0400
 In-Reply-To: <1398362722-16430-1-git-send-email-marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix the functions which can be obviously done right with a simple
-dev_err() now. While at it, further press the on-stack allocation
-of buffer for sprintf() voodoo down into the abominated functions.
-
-This patch cleans up most of the functions and leaves just two
-remaining functions, report_ccb_status() and report_deco_status()
-ugly and unhappy.
+Clean this function up and rework it into sensible shape. This function
+now contains one single dev_err() instead of the previous insanity full
+of memory allocation, chaotic string handling and use of SPRINTFCAT().
 
 Signed-off-by: Marek Vasut <marex@denx.de>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Horia Geanta <horia.geanta@freescale.com>
 ---
- drivers/crypto/caam/error.c | 29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+ drivers/crypto/caam/error.c | 31 +++++++++++++------------------
+ 1 file changed, 13 insertions(+), 18 deletions(-)
+
+NOTE: This one I am unsure about. This _should_ work with me printing
+      the numeric codes into $cha_err_code, $err_err_code using snprintf(),
+      but please verify thoroughly.
 
 diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
-index 7ce1d03..a8736abd7 100644
+index 91cc5fc..66a7461 100644
 --- a/drivers/crypto/caam/error.c
 +++ b/drivers/crypto/caam/error.c
-@@ -182,8 +182,10 @@ static void report_jump_idx(u32 status, char *outstr)
- }
- 
- static void report_ccb_status(struct device *jrdev, u32 status,
--			      const char *error, char *outstr)
-+			      const char *error, char *__outstr)
- {
-+	char outstr[CAAM_ERROR_STR_MAX];
-+
- 	u8 cha_id = (status & JRSTA_CCBERR_CHAID_MASK) >>
- 		    JRSTA_CCBERR_CHAID_SHIFT;
- 	u8 err_id = status & JRSTA_CCBERR_ERRID_MASK;
-@@ -213,18 +215,22 @@ static void report_ccb_status(struct device *jrdev, u32 status,
- 		SPRINTFCAT(outstr, "unidentified err_id value 0x%02x",
- 			   err_id, sizeof("ff"));
- 	}
-+
-+	dev_err(jrdev, "%08x: %s\n", status, outstr);
- }
- 
- static void report_jump_status(struct device *jrdev, u32 status,
- 			       const char *error, char *outstr)
- {
--	sprintf(outstr, "%s: ", error);
--	SPRINTFCAT(outstr, "%s() not implemented", __func__, sizeof(__func__));
-+	dev_err(jrdev, "%08x: %s: %s() not implemented\n",
-+		status, error, __func__);
- }
- 
+@@ -218,35 +218,30 @@ static void report_jump_status(struct device *jrdev, u32 status,
  static void report_deco_status(struct device *jrdev, u32 status,
--			       const char *error, char *outstr)
-+			       const char *error, char *__outstr)
+ 			       const char *error, char *__outstr)
  {
-+	char outstr[CAAM_ERROR_STR_MAX];
-+
- 	u8 desc_error = status & JRSTA_DECOERR_ERROR_MASK;
+-	char outstr[CAAM_ERROR_STR_MAX];
+-
+-	u8 desc_error = status & JRSTA_DECOERR_ERROR_MASK;
++	u8 err_id = status & JRSTA_DECOERR_ERROR_MASK;
+ 	u8 idx = (status & JRSTA_DECOERR_INDEX_MASK) >>
+ 		  JRSTA_DECOERR_INDEX_SHIFT;
+-
++	char *idx_str;
++	char *err_str = "unidentified error value 0x";
++	char err_err_code[3] = { 0 };
  	int i;
- 	sprintf(outstr, "%s: ", error);
-@@ -242,25 +248,26 @@ static void report_deco_status(struct device *jrdev, u32 status,
- 		SPRINTFCAT(outstr, "unidentified error value 0x%02x",
- 			   desc_error, sizeof("ff"));
- 	}
-+
-+	dev_err(jrdev, "%08x: %s\n", status, outstr);
+-	sprintf(outstr, "%s: ", error);
+ 
+ 	if (status & JRSTA_DECOERR_JUMP)
+-		strcat(outstr, "jump tgt desc idx ");
++		idx_str = "jump tgt desc idx";
+ 	else
+-		strcat(outstr, "desc idx ");
+-
+-	SPRINTFCAT(outstr, "%d: ", idx, sizeof("255"));
++		idx_str = "desc idx";
+ 
+ 	for (i = 0; i < ARRAY_SIZE(desc_error_list); i++)
+-		if (desc_error_list[i].value == desc_error)
++		if (desc_error_list[i].value == err_id)
+ 			break;
+ 
+-	if (i != ARRAY_SIZE(desc_error_list) && desc_error_list[i].error_text) {
+-		SPRINTFCAT(outstr, "%s", desc_error_list[i].error_text,
+-			   strlen(desc_error_list[i].error_text));
+-	} else {
+-		SPRINTFCAT(outstr, "unidentified error value 0x%02x",
+-			   desc_error, sizeof("ff"));
+-	}
++	if (i != ARRAY_SIZE(desc_error_list) && desc_error_list[i].error_text)
++		err_str = desc_error_list[i].error_text;
++	else
++		snprintf(err_err_code, sizeof(err_err_code), "%02x", err_id);
+ 
+-	dev_err(jrdev, "%08x: %s\n", status, outstr);
++	dev_err(jrdev, "%08x: %s: %s %d: %s%s\n",
++		status, error, idx_str, idx, err_str, err_err_code);
  }
  
  static void report_jr_status(struct device *jrdev, u32 status,
- 			     const char *error, char *outstr)
- {
--	sprintf(outstr, "%s: ", error);
--	SPRINTFCAT(outstr, "%s() not implemented", __func__, sizeof(__func__));
-+	dev_err(jrdev, "%08x: %s: %s() not implemented\n",
-+		status, error, __func__);
- }
- 
- static void report_cond_code_status(struct device *jrdev, u32 status,
- 				    const char *error, char *outstr)
- {
--	sprintf(outstr, "%s: ", error);
--	SPRINTFCAT(outstr, "%s() not implemented", __func__, sizeof(__func__));
-+	dev_err(jrdev, "%08x: %s: %s() not implemented\n",
-+		status, error, __func__);
- }
- 
- void caam_jr_strstatus(struct device *jrdev, u32 status)
- {
--	char outstr[CAAM_ERROR_STR_MAX];
- 	static const struct stat_src {
- 		void (*report_ssed)(struct device *jrdev, u32 status,
- 				    const char *error, char *outstr);
-@@ -287,8 +294,6 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
- 	}
- 
- 	status_src[ssrc].report_ssed(jrdev, status,
--			status_src[ssrc].error, outstr);
--
--	dev_err(jrdev, "%08x: %s\n", status, outstr);
-+			status_src[ssrc].error, NULL);
- }
- EXPORT_SYMBOL(caam_jr_strstatus);
 -- 
 1.9.2
