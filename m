@@ -1,98 +1,76 @@
-From: Matthias-Christian Ott <ott@mirix.org>
-Subject: [PATCH] crypto: user - Allow CRYPTO_MSG_GETALG without CAP_NET_ADMIN
-Date: Fri, 25 Apr 2014 00:51:06 +0200
-Message-ID: <5359955A.4070903@mirix.org>
-References: <534016A0.6020702@mirix.org>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: Freescale SEC1 and AEAD / IPSEC
+Date: Fri, 25 Apr 2014 12:03:59 -0400
+Message-ID: <CACXcFmmMGpELM7vKHc5HVUSjeL1M+rVmnKia+fA-sWpBf1_bpA@mail.gmail.com>
+References: <535912E1.5000109@c-s.fr>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------040408040300080004030802"
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Kim Phillips <kim.phillips@freescale.com>,
+	linux-crypto@vger.kernel.org
+To: leroy christophe <christophe.leroy@c-s.fr>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mirix.org ([78.46.130.147]:38753 "EHLO a.mirix.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759139AbaDXWuY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 24 Apr 2014 18:50:24 -0400
-Received: from [2003:5c:ad74:c200:e415:150c:e790:6883]
-	by a.mirix.org with esmtpsa (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:256)
-	(Exim 4.80)
-	(envelope-from <ott@mirix.org>)
-	id 1WdSTG-0003PQ-MS
-	for linux-crypto@vger.kernel.org; Fri, 25 Apr 2014 00:50:22 +0200
-In-Reply-To: <534016A0.6020702@mirix.org>
+Received: from mail-vc0-f170.google.com ([209.85.220.170]:55814 "EHLO
+	mail-vc0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751989AbaDYQEA (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Apr 2014 12:04:00 -0400
+Received: by mail-vc0-f170.google.com with SMTP id hr9so5112917vcb.29
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Apr 2014 09:03:59 -0700 (PDT)
+In-Reply-To: <535912E1.5000109@c-s.fr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------040408040300080004030802
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+On Thu, Apr 24, 2014 at 9:34 AM, leroy christophe
+<christophe.leroy@c-s.fr> wrote:
 
+> I'm progressing well on the SEC1 implementation. I now have HASH (non HMAC)
+> , DES and AES working properly.
 
-CRYPTO_USER requires CAP_NET_ADMIN for all operations. Most information
-provided by CRYPTO_MSG_GETALG is also accessible through /proc/modules
-and AF_ALG. CRYPTO_MSG_GETALG should not require CAP_NET_ADMIN so that
-processes without CAP_NET_ADMIN can use CRYPTO_MSG_GETALG to get cipher
-details, such as cipher priorities, for AF_ALG.
+Why DES? More than a decade ago, the first Linux IPsec implementation
+refused to do single DES because it was known to be insecure.
+http://www.freeswan.org/freeswan_trees/freeswan-1.97/doc/faq.html#noDES.faq
 
-Signed-off-by: Matthias-Christian Ott <ott@mirix.org>
----
- crypto/crypto_user.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+At that time, we had to have DES internally so we could implement triple DES.
+We just did not provide single DES in the user interface or the list of cipher
+suites we would negotiate.
 
+Today you could consider dropping DES entirely since AES is so widespread,
+far faster than triple DES, and thought secure. As of 2001 or so, it roughly
+doubled IPsec throughput:
+http://www.freeswan.org/freeswan_trees/freeswan-1.97/doc/performance.html#perf.more
+Today it probably does even better; there has been a lot of work on
+optimising it.
 
+> So it is now time to look at AEAD.
 
---------------040408040300080004030802
-Content-Type: text/x-patch;
- name="0001-crypto-user-Allow-CRYPTO_MSG_GETALG-without-CAP_NET_.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename*0="0001-crypto-user-Allow-CRYPTO_MSG_GETALG-without-CAP_NET_.pa";
- filename*1="tch"
+A fine idea. AES-GCM is the first obvious candidate. Newer work includes:
+http://tools.ietf.org/html/draft-agl-tls-chacha20poly1305-00
 
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index 1512e41..aa906b8 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -265,6 +265,9 @@ static int crypto_update_alg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	struct nlattr *priority = attrs[CRYPTOCFGA_PRIORITY_VAL];
- 	LIST_HEAD(list);
- 
-+	if (!capable(CAP_NET_ADMIN))
-+		return -EPERM;
-+
- 	if (!null_terminated(p->cru_name) || !null_terminated(p->cru_driver_name))
- 		return -EINVAL;
- 
-@@ -295,6 +298,9 @@ static int crypto_del_alg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	struct crypto_alg *alg;
- 	struct crypto_user_alg *p = nlmsg_data(nlh);
- 
-+	if (!capable(CAP_NET_ADMIN))
-+		return -EPERM;
-+
- 	if (!null_terminated(p->cru_name) || !null_terminated(p->cru_driver_name))
- 		return -EINVAL;
- 
-@@ -379,6 +385,9 @@ static int crypto_add_alg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	struct crypto_user_alg *p = nlmsg_data(nlh);
- 	struct nlattr *priority = attrs[CRYPTOCFGA_PRIORITY_VAL];
- 
-+	if (!capable(CAP_NET_ADMIN))
-+		return -EPERM;
-+
- 	if (!null_terminated(p->cru_name) || !null_terminated(p->cru_driver_name))
- 		return -EINVAL;
- 
-@@ -466,9 +475,6 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh)
- 	type -= CRYPTO_MSG_BASE;
- 	link = &crypto_dispatch[type];
- 
--	if (!capable(CAP_NET_ADMIN))
--		return -EPERM;
--
- 	if ((type == (CRYPTO_MSG_GETALG - CRYPTO_MSG_BASE) &&
- 	    (nlh->nlmsg_flags & NLM_F_DUMP))) {
- 		struct crypto_alg *alg;
+There is a competition for new AEAD methods, still in early stages so it
+does not yet give any solid results you could implement. Likely worth a
+look, though:
+http://competitions.cr.yp.to/caesar.html
+https://aezoo.compute.dtu.dk/doku.php
 
+> I don't know much yet about crypto algorithm so forgive me if I ask stupid
+> questions.
 
---------------040408040300080004030802--
+An area that was a problem a decade ago was forward secrecy.
+
+http://www.freeswan.org/freeswan_trees/freeswan-1.97/doc/interop.html#req.features
+"FreeS/WAN default is to provide perfect forward secrecy. ... The PFS
+settings on the two ends must match. There is no provision in the
+protocol for negotiating whether to use PFS; you need to either set
+both ends to use it or set them both not to."
+
+The difference is what happens if an enemy gets the keys used in
+authenticating connection setup. Without PFS, that lets him obtain
+actual encryption keys and read everything sent on those connections,
+possibly including old messages he has archived. With PFS he gets no
+message content without doing a man-in-the-middle attack (using the
+authentication keys to trick servers into giving him data that lets
+him get encryption keys), he has to do another such attack every time
+you change keys, and there is no way to do one for old messages.
+
+I do not know if the revised RFCs have fixed this, but I am very much
+of the opinion that PFS should be the default everywhere.
