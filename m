@@ -1,97 +1,74 @@
-From: Vakul Garg <vakul@freescale.com>
-Subject: [PATCH] crypto: caam - Fix key inlining in AEAD shared descriptors
-Date: Sun, 27 Apr 2014 11:26:14 -0400
-Message-ID: <1398612374-1746-1-git-send-email-vakul@freescale.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [RFC] /dev/random for in-kernel use
+Date: Sun, 27 Apr 2014 20:49:48 +0200
+Message-ID: <2174751.G4Kehsg85c@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
-	<ruchika.gupta@freescale.com>, <alexandru.porosanu@freescale.com>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+To: Theodore Tso <tytso@mit.edu>, LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0139.outbound.protection.outlook.com ([207.46.163.139]:46119
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752744AbaD0GOB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 27 Apr 2014 02:14:01 -0400
+Received: from mail.eperm.de ([89.247.134.16]:44313 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754066AbaD0St7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 27 Apr 2014 14:49:59 -0400
+Received: from myon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S8B> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Sun, 27 Apr 2014 20:49:49 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The variable 'keys_fit_inline' is initialised correctly to avoid using
-its stale value while creating shared descriptor for decryption and
-given-iv-encryption.
+Hi,
 
-Signed-off-by: Vakul Garg <vakul@freescale.com>
----
- drivers/crypto/caam/caamalg.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+before I start, please allow me to point out that this email is not a 
+discussion about entropy. There was already too much such discussion without 
+any conclusion. This email shall just explore the pros and cons as well as an 
+implementation of making the logic behind /dev/random available for in-kernel 
+use.
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 5f89125..99fda94 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -209,7 +209,7 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
- 	struct aead_tfm *tfm = &aead->base.crt_aead;
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	struct device *jrdev = ctx->jrdev;
--	bool keys_fit_inline = false;
-+	bool keys_fit_inline;
- 	u32 *key_jump_cmd, *jump_cmd, *read_move_cmd, *write_move_cmd;
- 	u32 *desc;
- 
-@@ -220,6 +220,8 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
- 	if (DESC_AEAD_NULL_ENC_LEN + DESC_JOB_IO_LEN +
- 	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
-+	else
-+		keys_fit_inline = false;
- 
- 	/* aead_encrypt shared descriptor */
- 	desc = ctx->sh_desc_enc;
-@@ -306,6 +308,8 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
- 	if (DESC_AEAD_NULL_DEC_LEN + DESC_JOB_IO_LEN +
- 	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
-+	else
-+		keys_fit_inline = false;
- 
- 	desc = ctx->sh_desc_dec;
- 
-@@ -399,7 +403,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	struct aead_tfm *tfm = &aead->base.crt_aead;
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	struct device *jrdev = ctx->jrdev;
--	bool keys_fit_inline = false;
-+	bool keys_fit_inline;
- 	u32 geniv, moveiv;
- 	u32 *desc;
- 
-@@ -418,6 +422,9 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	    ctx->split_key_pad_len + ctx->enckeylen <=
- 	    CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
-+	else
-+		keys_fit_inline = false;
-+
- 
- 	/* aead_encrypt shared descriptor */
- 	desc = ctx->sh_desc_enc;
-@@ -476,6 +483,8 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	    ctx->split_key_pad_len + ctx->enckeylen <=
- 	    CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
-+	else
-+		keys_fit_inline = false;
- 
- 	/* aead_decrypt shared descriptor */
- 	desc = ctx->sh_desc_dec;
-@@ -531,6 +540,8 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	    ctx->split_key_pad_len + ctx->enckeylen <=
- 	    CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
-+	else
-+		keys_fit_inline = false;
- 
- 	/* aead_givencrypt shared descriptor */
- 	desc = ctx->sh_desc_givenc;
+With the heavy update of random.c during the 3.13 development, the re-seeding 
+of the nonblocking_pool from the input_pool is now prevented for a duration of 
+random_min_urandom_seed seconds. Furthermore, the nonblocking_pool can be read 
+from user space such that it acts as a deterministic RNG due to the non-
+blocking behavior if more data is pulled than is delivered by the noise 
+sources. As the nonblocking_pool is used when a in-kernel user invokes 
+get_random_bytes, the described deterministic behavior also applies to this 
+function.
+
+Now, get_random_bytes is the only function inside the kernel that can deliver 
+entropy. For most use cases, the described approach is just fine. However, 
+when using well defined deterministic RNGs, like the already existing ANSI 
+X9.31 or the suggested SP800-90A DRBG, seeding these DRNGs from the DRNG of 
+the nonblocking_pool is typically not a suggested way. This is visible in user 
+space where /dev/random is preferred when seeding deterministic RNGs (see 
+libgcrypt as an example).
+
+Therefore may I propose the implementation of the blocking concept of 
+/dev/random as a provider of entropy to in-kernel callers like DRNGs? I would 
+recommend a function of
+
+void get_blocking_bytes_nowait(void *buf, int nbytes,
+	void (*cb)(void *buf, int buflen))
+
+which supplements get_random_bytes that implements the following:
+
+- one work queue that collects data from blocking_pool (or directly from the 
+input_pool?) with an identical concept as random_read from 
+drivers/char/random.c
+
+- the cb function is triggered when nbytes of data is gathered by the work 
+queue. The cb function is implemented by the caller to obtain the requested 
+data. The returned data is supplied with buf. The caller allocates that buffer 
+and supplies the pointer to that buffer in the invocation of 
+get_blocking_bytes_nowait.
+
+- any invocation of get_blocking_bytes_nowait registers the request in a list. 
+The work queue processes the list in a FIFO order and removes completed 
+requests until the list is empty again. The list has a set length. If the list 
+length is exceeded, the cb function is called right away with buflen set to 0.
+
+Ciao
+Stephan
 -- 
-1.8.1.4
+| Cui bono? |
