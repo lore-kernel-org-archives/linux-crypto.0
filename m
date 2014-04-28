@@ -1,47 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH v2 4/9] crypto: qce: Add ablkcipher algorithms
-Date: Mon, 28 Apr 2014 16:18:05 +0800
-Message-ID: <20140428081805.GA15980@gondor.apana.org.au>
+Subject: Re: [RFC PATCH v2 1/9] crypto: qce: Add core driver implementation
+Date: Mon, 28 Apr 2014 16:50:16 +0800
+Message-ID: <20140428085016.GA16275@gondor.apana.org.au>
 References: <1397479725-20954-1-git-send-email-svarbanov@mm-sol.com>
- <1397479725-20954-5-git-send-email-svarbanov@mm-sol.com>
+ <1397479725-20954-2-git-send-email-svarbanov@mm-sol.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
+	Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
 	linux-arm-msm@vger.kernel.org,
 	Mona Hossain <mhossain@codeaurora.org>,
 	Hariprasad Dhalinarasimha <hnamgund@codeaurora.org>,
 	Zhen Kong <zkong@codeaurora.org>,
 	Niranjana Vishwanathapura <nvishwan@codeaurora.org>,
 	Rohit Vaswani <rvaswani@codeaurora.org>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org
 To: Stanimir Varbanov <svarbanov@mm-sol.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:58995 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751438AbaD1ISN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Apr 2014 04:18:13 -0400
+Return-path: <linux-arm-msm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1397479725-20954-5-git-send-email-svarbanov@mm-sol.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1397479725-20954-2-git-send-email-svarbanov@mm-sol.com>
+Sender: linux-arm-msm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Apr 14, 2014 at 03:48:40PM +0300, Stanimir Varbanov wrote:
+On Mon, Apr 14, 2014 at 03:48:37PM +0300, Stanimir Varbanov wrote:
 >
-> +	} else if (IS_DES(flags)) {
-> +		u32 tmp[DES_EXPKEY_WORDS];
-> +
-> +		if (keylen != QCE_DES_KEY_SIZE)
-> +			goto badkey;
+> +	if (backlog)
+> +		backlog->complete(backlog, -EINPROGRESS);
 
-No need to check here since you've already set min_keysize and
-max_keysize correctly.
-
-> +	} else if (IS_3DES(flags)) {
-> +		if (keylen != DES3_EDE_KEY_SIZE)
-> +			goto badkey;
-
-Ditto.
+The completion function needs to be called with BH disabled.
 
 Cheers,
 -- 
