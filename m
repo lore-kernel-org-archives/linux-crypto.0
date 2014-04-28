@@ -1,90 +1,88 @@
-From: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Subject: [PATCH 1/7 v8] crypto:s5p-sss: Use platform_get_irq() instead of
- _byname()
-Date: Mon, 28 Apr 2014 16:14:53 +0530
-Message-ID: <1398681899-20782-2-git-send-email-ch.naveen@samsung.com>
-References: <1398681899-20782-1-git-send-email-ch.naveen@samsung.com>
-Cc: linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
-	herbert@gondor.apana.org.au, naveenkrishna.ch@gmail.com,
-	cpgs@samsung.com, t.figa@samsung.com, davem@davemloft.net
-To: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [RFC] /dev/random for in-kernel use
+Date: Mon, 28 Apr 2014 10:23:50 -0400
+Message-ID: <20140428142350.GB4534@thunk.org>
+References: <2174751.G4Kehsg85c@myon.chronox.de>
+ <20140428001941.GA15379@thunk.org>
+ <1692538.agAioWpnT4@myon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-reply-to: <1398681899-20782-1-git-send-email-ch.naveen@samsung.com>
+Content-Disposition: inline
+In-Reply-To: <1692538.agAioWpnT4@myon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch uses the platform_get_irq() instead of the
-platform_get_irq_byname(). Making feeder control interrupt
-as resource "0" and hash interrupt as "1".
+On Mon, Apr 28, 2014 at 08:00:19AM +0200, Stephan Mueller wrote:
+> > However, given that we're reseeding once a minute (or as needed), it's
+> > actually not a deterministic RNG (per SP 800-90A, section 8.6.5, a
+> > DRBG is forbidden to reseed itself automatically).
+> 
+> To be honest, I do not read that in this section. Moreover, a DRBG must reseed 
+> itself -- the caller shall only have the ability to add additional data or 
+> trigger a reseeding earlier (the proposed DRBG implementation directly draws 
+> from get_random_bytes automatically). 
 
-reasons for this change.
-1. Cannot find any Arch which is currently using this driver
-2. Samsung Exynos4 and 5 SoCs only use the feeder control interrupt
-3. Patches adding support for DT and H/W version are in pipeline
+It seems pretty clear to me: 
 
-Signed-off-by: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-Reviewed-by: Tomasz Figa <t.figa@samsung.com>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-CC: David S. Miller <davem@davemloft.net>
-CC: Vladimir Zapolskiy <vzapolskiy@gmail.com>
-TO: <linux-crypto@vger.kernel.org>
-CC: <linux-samsung-soc@vger.kernel.org>
----
-Changes since v7:
-Added Acked-by from Herbert Xu
-Changes since v6:
-None
-Changes since v5:
-None
+   The source of the entropy input (EI) SHALL be either:
+       ...
 
- drivers/crypto/s5p-sss.c |   24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+   3.  An approved DRBG, thus forming a chain of at least two DRBGs;
+       the initial DRBG in the chain SHALL be seeded by an approved
+       NRBG or an approved entropy source. A DRBG instantiation may
+       seed or reseed another DRBG instantiation, but SHALL NOT reseed
+       itself.
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index be45762..2876fa3 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -587,29 +587,29 @@ static int s5p_aes_probe(struct platform_device *pdev)
- 
- 	spin_lock_init(&pdata->lock);
- 
--	pdata->irq_hash = platform_get_irq_byname(pdev, "hash");
--	if (pdata->irq_hash < 0) {
--		err = pdata->irq_hash;
--		dev_warn(dev, "hash interrupt is not available.\n");
-+	pdata->irq_fc = platform_get_irq(pdev, 0);
-+	if (pdata->irq_fc < 0) {
-+		err = pdata->irq_fc;
-+		dev_warn(dev, "feed control interrupt is not available.\n");
- 		goto err_irq;
- 	}
--	err = devm_request_irq(dev, pdata->irq_hash, s5p_aes_interrupt,
-+	err = devm_request_irq(dev, pdata->irq_fc, s5p_aes_interrupt,
- 			       IRQF_SHARED, pdev->name, pdev);
- 	if (err < 0) {
--		dev_warn(dev, "hash interrupt is not available.\n");
-+		dev_warn(dev, "feed control interrupt is not available.\n");
- 		goto err_irq;
- 	}
- 
--	pdata->irq_fc = platform_get_irq_byname(pdev, "feed control");
--	if (pdata->irq_fc < 0) {
--		err = pdata->irq_fc;
--		dev_warn(dev, "feed control interrupt is not available.\n");
-+	pdata->irq_hash = platform_get_irq(pdev, 1);
-+	if (pdata->irq_hash < 0) {
-+		err = pdata->irq_hash;
-+		dev_warn(dev, "hash interrupt is not available.\n");
- 		goto err_irq;
- 	}
--	err = devm_request_irq(dev, pdata->irq_fc, s5p_aes_interrupt,
-+	err = devm_request_irq(dev, pdata->irq_hash, s5p_aes_interrupt,
- 			       IRQF_SHARED, pdev->name, pdev);
- 	if (err < 0) {
--		dev_warn(dev, "feed control interrupt is not available.\n");
-+		dev_warn(dev, "hash interrupt is not available.\n");
- 		goto err_irq;
- 	}
- 
--- 
-1.7.9.5
+The last "SHALL NOT" is what makes me think that the DRBG shouldn't be
+doing this automatically.  So if it is only being done via explicit
+user request (i.e., an ioctl) then the blocking interface should be
+sufficient.
+
+> Anticipating that the compliance to SP800-90B/C would be required for a 
+> successful FIPS validation somewhen in the future, making the blocking 
+> behavior available to in-kernel users would be of interest.
+> ....
+> 
+> I am not too convinced of RDRAND due to the lack of usable source code (i.e. 
+> source code that I can build myself). But that is my personal taste :-)
+
+The problem is the FIPS validation would presumably require obeying
+the SP-800A requirement for an approved entropy source, and while we
+can't audit RDRAND to satisfy ourselves that the US government hasn't
+introduced a back door, if the only purpose of the FIPS validation is
+so that people can sell into the US government market, presuambly the
+US government is OK with a potential NSA-introduced back door.  :-)
+
+That being said, there is some FIPS compliance code in
+drivers/char/random.c, which was introduced while Matt Mackall was
+maintaining the driver, and it mystifies me, since I never thought
+/dev/random could be an approved FIPS compliant generator --- not that
+I care, since I'm not trying to sell into the US government market,
+but the FIPS compliance code is largely harmless, so I've never
+bothered to remove it.
+
+> Thanks for these suggestions. Shall I take these suggestions and turn them 
+> into a full patch?
+
+Sure, go for it.
+
+> Moreover, I read that even for in-kernel users we should use the blocking 
+> pool. Or shall we conceive of a third output pool, say, a kernel pool that is 
+> independent of the output pools to user space? Adding such a pool more or less 
+> only requires to define a new struct entropy_pool instance.
+
+I've audited most of the in-kernel users, and most of them aren't even
+using them for a session key; they're using it for something less
+critical (e.g. ASLR, stack magic, etc.).  CIFS is perhaps the only
+place where it is generating a session key, and session key generation
+is just fine with the /dev/urandom pool.
+
+So making all of the in-kernel users deal with a blocking interface is
+not worth it, IMHO.
+
+Regards,
+
+						- Ted
