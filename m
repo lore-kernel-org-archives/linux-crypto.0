@@ -1,40 +1,49 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH] crypto: user - Allow CRYPTO_MSG_GETALG without CAP_NET_ADMIN
-Date: Mon, 28 Apr 2014 23:37:34 +0200
-Message-ID: <201404282337.34142.marex@denx.de>
-References: <534016A0.6020702@mirix.org> <5359955A.4070903@mirix.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH crypto 2/2] crypto: caam - add allocation failure
+ handling in SPRINTFCAT macro
+Date: Tue, 29 Apr 2014 05:53:23 +0800
+Message-ID: <20140428215323.GA22018@gondor.apana.org.au>
+References: <1397815302-15915-1-git-send-email-horia.geanta@freescale.com>
+ <1397815302-15915-2-git-send-email-horia.geanta@freescale.com>
+ <20140428102441.GA17037@gondor.apana.org.au>
+ <201404282128.41302.marex@denx.de>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: "Matthias-Christian Ott" <ott@mirix.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:47435 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753873AbaD1VwM (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Apr 2014 17:52:12 -0400
-In-Reply-To: <5359955A.4070903@mirix.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Horia Geanta <horia.geanta@freescale.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, stable@vger.kernel.org,
+	Kim Phillips <kim.phillips@freescale.com>
+To: Marek Vasut <marex@denx.de>
+Return-path: <stable-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <201404282128.41302.marex@denx.de>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Friday, April 25, 2014 at 12:51:06 AM, Matthias-Christian Ott wrote:
-> CRYPTO_USER requires CAP_NET_ADMIN for all operations. Most information
-> provided by CRYPTO_MSG_GETALG is also accessible through /proc/modules
-> and AF_ALG. CRYPTO_MSG_GETALG should not require CAP_NET_ADMIN so that
-> processes without CAP_NET_ADMIN can use CRYPTO_MSG_GETALG to get cipher
-> details, such as cipher priorities, for AF_ALG.
+On Mon, Apr 28, 2014 at 09:28:41PM +0200, Marek Vasut wrote:
+> On Monday, April 28, 2014 at 12:24:41 PM, Herbert Xu wrote:
+> > On Fri, Apr 18, 2014 at 01:01:42PM +0300, Horia Geanta wrote:
+> > > GFP_ATOMIC memory allocation could fail.
+> > > In this case, avoid NULL pointer dereference and notify user.
+> > > 
+> > > Cc: <stable@vger.kernel.org> # 3.2+
+> > > Cc: Kim Phillips <kim.phillips@freescale.com>
+> > > Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+> > 
+> > Patch applied to the crypto tree.  Thanks.
 > 
-> Signed-off-by: Matthias-Christian Ott <ott@mirix.org>
-> ---
->  crypto/crypto_user.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
+> Hi Herbert,
+> 
+> Don't you instead want to apply my 11-patch series from
+> Message-Id: <1398362722-16430-1-git-send-email-marex@denx.de>
+> Subject: [PATCH 00/11] crypto: caam: Error reporting fixes
+> which actually fixes this SPRINTFCAT() horror properly please ?
 
-Can you please submit the patch using git send-email so we can properly review 
-it?
+This patch is going into the current release while your patches
+are better suited for the next merge window.
 
-Thank you !
-
-Best regards,
-Marek Vasut
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
