@@ -1,35 +1,40 @@
 From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH] staging: crypto: skein: depend upon CRYPTO
-Date: Mon, 28 Apr 2014 23:38:19 +0200
-Message-ID: <201404282338.19758.marex@denx.de>
-References: <20140425151554.GB31117@localhost> <1398444309-24672-1-git-send-email-jason@lakedaemon.net>
+Subject: Re: [PATCH] crypto: user - Allow CRYPTO_MSG_GETALG without CAP_NET_ADMIN
+Date: Mon, 28 Apr 2014 23:37:34 +0200
+Message-ID: <201404282337.34142.marex@denx.de>
+References: <534016A0.6020702@mirix.org> <5359955A.4070903@mirix.org>
 Mime-Version: 1.0
 Content-Type: Text/Plain;
   charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-	Fengguang Wu <fengguang.wu@intel.com>, kbuild-all@01.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Jason Cooper <jason@lakedaemon.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1398444309-24672-1-git-send-email-jason@lakedaemon.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+To: "Matthias-Christian Ott" <ott@mirix.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-out.m-online.net ([212.18.0.10]:47435 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753873AbaD1VwM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Apr 2014 17:52:12 -0400
+In-Reply-To: <5359955A.4070903@mirix.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Friday, April 25, 2014 at 06:45:09 PM, Jason Cooper wrote:
-> Fengguang's randconfig kernel build tester discovered the following
-> warnings:
+On Friday, April 25, 2014 at 12:51:06 AM, Matthias-Christian Ott wrote:
+> CRYPTO_USER requires CAP_NET_ADMIN for all operations. Most information
+> provided by CRYPTO_MSG_GETALG is also accessible through /proc/modules
+> and AF_ALG. CRYPTO_MSG_GETALG should not require CAP_NET_ADMIN so that
+> processes without CAP_NET_ADMIN can use CRYPTO_MSG_GETALG to get cipher
+> details, such as cipher priorities, for AF_ALG.
 > 
-> warning: (CRYPTO_THREEFISH) selects CRYPTO_ALGAPI which has unmet direct
-> dependencies (CRYPTO) warning: (DM_VERITY && CRYPTO_SKEIN) selects
-> CRYPTO_HASH which has unmet direct dependencies (CRYPTO)
-> 
-> Fix this in the Kconfig by depending on CRYPTO.
-> 
-> Reported-by: Fengguang Wu <fengguang.wu@intel.com>
-> Signed-off-by: Jason Cooper <jason@lakedaemon.net>
+> Signed-off-by: Matthias-Christian Ott <ott@mirix.org>
+> ---
+>  crypto/crypto_user.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 
-Reviewed-by: Marek Vasut <marex@denx.de>
+Can you please submit the patch using git send-email so we can properly review 
+it?
+
+Thank you !
 
 Best regards,
 Marek Vasut
