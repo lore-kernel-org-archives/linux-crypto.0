@@ -1,8 +1,8 @@
 From: Stanimir Varbanov <svarbanov@mm-sol.com>
 Subject: Re: [RFC PATCH v2 4/9] crypto: qce: Add ablkcipher algorithms
-Date: Tue, 29 Apr 2014 17:24:16 +0300
-Message-ID: <535FB610.8070006@mm-sol.com>
-References: <1397479725-20954-1-git-send-email-svarbanov@mm-sol.com> <1397479725-20954-5-git-send-email-svarbanov@mm-sol.com> <20140428080006.GA14510@gondor.apana.org.au>
+Date: Tue, 29 Apr 2014 17:31:36 +0300
+Message-ID: <535FB7C8.3090302@mm-sol.com>
+References: <1397479725-20954-1-git-send-email-svarbanov@mm-sol.com> <1397479725-20954-5-git-send-email-svarbanov@mm-sol.com> <20140428081805.GA15980@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
@@ -15,36 +15,32 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Rohit Vaswani <rvaswani@codeaurora.org>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.mm-sol.com ([37.157.136.199]:60862 "EHLO extserv.mm-sol.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933428AbaD2OYT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 Apr 2014 10:24:19 -0400
-In-Reply-To: <20140428080006.GA14510@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-arm-msm-owner@vger.kernel.org>
+In-Reply-To: <20140428081805.GA15980@gondor.apana.org.au>
+Sender: linux-arm-msm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 Thanks for the review!
 
-On 04/28/2014 11:00 AM, Herbert Xu wrote:
+On 04/28/2014 11:18 AM, Herbert Xu wrote:
 > On Mon, Apr 14, 2014 at 03:48:40PM +0300, Stanimir Varbanov wrote:
 >>
->> +	if (IS_AES(flags)) {
->> +		switch (keylen) {
->> +		case AES_KEYSIZE_128:
->> +		case AES_KEYSIZE_256:
->> +			break;
->> +		default:
+>> +	} else if (IS_DES(flags)) {
+>> +		u32 tmp[DES_EXPKEY_WORDS];
+>> +
+>> +		if (keylen != QCE_DES_KEY_SIZE)
 >> +			goto badkey;
 > 
-> You need to support 192 here.  If the hardware doesn't do that
-> you can work around it by using a software fallback.
-
-Sure, I will make a software fallback. Thanks.
-
+> No need to check here since you've already set min_keysize and
+> max_keysize correctly.
 > 
-> In general you need to provide everything that is supported by
-> the generic software implementation.
+>> +	} else if (IS_3DES(flags)) {
+>> +		if (keylen != DES3_EDE_KEY_SIZE)
+>> +			goto badkey;
+> 
+> Ditto.
+
+OK, I will delete those needless keylen checks.
 
 
 -- 
