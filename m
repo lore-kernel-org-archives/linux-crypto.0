@@ -1,19 +1,18 @@
 From: Ruchika Gupta <ruchika.gupta@freescale.com>
 Subject: [PATCH] crypto:caam - Modify width of few read only registers
-Date: Tue, 29 Apr 2014 15:32:23 +0530
-Message-ID: <1398765743-24721-1-git-send-email-ruchika.gupta@freescale.com>
-References: <herbert@gondor.apana.org.au, kim.phillips@freescale.com>
+Date: Tue, 29 Apr 2014 15:34:37 +0530
+Message-ID: <1398765877-24779-1-git-send-email-ruchika.gupta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Ruchika Gupta <ruchika.gupta@freescale.com>
-To: <linux-crypto@vger.kernel.org>
+To: <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+	<kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2lp0235.outbound.protection.outlook.com ([207.46.163.235]:14234
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+Received: from mail-bn1blp0182.outbound.protection.outlook.com ([207.46.163.182]:14103
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S933194AbaD2KFe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 Apr 2014 06:05:34 -0400
-In-Reply-To: <herbert@gondor.apana.org.au, kim.phillips@freescale.com>
+	id S933570AbaD2KHG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Apr 2014 06:07:06 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
