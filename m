@@ -1,48 +1,52 @@
-From: Ruchika Gupta <ruchika.gupta@freescale.com>
-Subject: [PATCH] crypto:caam - Define setbits32() and clrbits32() for ARM in the Freescale CAAM driver
-Date: Tue, 29 Apr 2014 15:41:39 +0530
-Message-ID: <1398766299-30412-1-git-send-email-ruchika.gupta@freescale.com>
+From: Stanimir Varbanov <svarbanov@mm-sol.com>
+Subject: Re: [RFC PATCH v2 4/9] crypto: qce: Add ablkcipher algorithms
+Date: Tue, 29 Apr 2014 17:24:16 +0300
+Message-ID: <535FB610.8070006@mm-sol.com>
+References: <1397479725-20954-1-git-send-email-svarbanov@mm-sol.com> <1397479725-20954-5-git-send-email-svarbanov@mm-sol.com> <20140428080006.GA14510@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Ruchika Gupta <ruchika.gupta@freescale.com>,
-	Victoria Milhoan <vicki.milhoan@freescale.com>
-To: <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-	<kim.phillips@freescale.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-arm-msm@vger.kernel.org,
+	Mona Hossain <mhossain@codeaurora.org>,
+	Hariprasad Dhalinarasimha <hnamgund@codeaurora.org>,
+	Zhen Kong <zkong@codeaurora.org>,
+	Niranjana Vishwanathapura <nvishwan@codeaurora.org>,
+	Rohit Vaswani <rvaswani@codeaurora.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0144.outbound.protection.outlook.com ([207.46.163.144]:16714
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1756462AbaD2KOA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 Apr 2014 06:14:00 -0400
+Received: from ns.mm-sol.com ([37.157.136.199]:60862 "EHLO extserv.mm-sol.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933428AbaD2OYT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Apr 2014 10:24:19 -0400
+In-Reply-To: <20140428080006.GA14510@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The kernel defines setbits32() and clrbits32() macros only for
-Power-based architectures.  This patch modifies the Freescale CAAM
-driver to add macros for use on ARM architectures.
+Thanks for the review!
 
-Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
-Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
----
- drivers/crypto/caam/regs.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+On 04/28/2014 11:00 AM, Herbert Xu wrote:
+> On Mon, Apr 14, 2014 at 03:48:40PM +0300, Stanimir Varbanov wrote:
+>>
+>> +	if (IS_AES(flags)) {
+>> +		switch (keylen) {
+>> +		case AES_KEYSIZE_128:
+>> +		case AES_KEYSIZE_256:
+>> +			break;
+>> +		default:
+>> +			goto badkey;
+> 
+> You need to support 192 here.  If the hardware doesn't do that
+> you can work around it by using a software fallback.
 
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 7bb898d..16a3d2e 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -83,6 +83,12 @@
- #endif
- #endif
- 
-+#ifdef CONFIG_ARM
-+/* These are common macros for Power, put here for ARMs */
-+#define setbits32(_addr, _v) writel((readl(_addr) | (_v)), (_addr))
-+#define clrbits32(_addr, _v) writel((readl(_addr) & ~(_v)), (_addr))
-+#endif
-+
- #ifndef CONFIG_64BIT
- static inline void wr_reg64(u64 __iomem *reg, u64 data)
- {
+Sure, I will make a software fallback. Thanks.
+
+> 
+> In general you need to provide everything that is supported by
+> the generic software implementation.
+
+
 -- 
-1.8.1.4
+regards,
+Stan
