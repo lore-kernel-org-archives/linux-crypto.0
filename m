@@ -1,11 +1,13 @@
-From: Stanimir Varbanov <svarbanov@mm-sol.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [RFC PATCH v2 1/9] crypto: qce: Add core driver implementation
-Date: Tue, 29 Apr 2014 17:38:14 +0300
-Message-ID: <535FB956.5020600@mm-sol.com>
-References: <1397479725-20954-1-git-send-email-svarbanov@mm-sol.com> <1397479725-20954-2-git-send-email-svarbanov@mm-sol.com> <20140428085016.GA16275@gondor.apana.org.au>
+Date: Wed, 30 Apr 2014 08:03:40 +0800
+Message-ID: <20140430000340.GA32173@gondor.apana.org.au>
+References: <1397479725-20954-1-git-send-email-svarbanov@mm-sol.com>
+ <1397479725-20954-2-git-send-email-svarbanov@mm-sol.com>
+ <20140428085016.GA16275@gondor.apana.org.au>
+ <535FB956.5020600@mm-sol.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Grant Likely <grant.likely@linaro.org>,
 	Rob Herring <robh+dt@kernel.org>,
@@ -17,29 +19,26 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Rohit Vaswani <rvaswani@codeaurora.org>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	devicetree@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stanimir Varbanov <svarbanov@mm-sol.com>
 Return-path: <linux-arm-msm-owner@vger.kernel.org>
-In-Reply-To: <20140428085016.GA16275@gondor.apana.org.au>
+Content-Disposition: inline
+In-Reply-To: <535FB956.5020600@mm-sol.com>
 Sender: linux-arm-msm-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Thanks for the review!
+On Tue, Apr 29, 2014 at 05:38:14PM +0300, Stanimir Varbanov wrote:
+>
+> This is new for me because I saw similar code in cryptd.c where in
+> cryptd_queue_worker() (workqueue context) the backlog->complete() is
+> called outside of local_bh_disable().
 
-On 04/28/2014 11:50 AM, Herbert Xu wrote:
-> On Mon, Apr 14, 2014 at 03:48:37PM +0300, Stanimir Varbanov wrote:
->>
->> +	if (backlog)
->> +		backlog->complete(backlog, -EINPROGRESS);
-> 
-> The completion function needs to be called with BH disabled.
-> 
-> Cheers,
-> 
+That's what I thought :)
 
-This is new for me because I saw similar code in cryptd.c where in
-cryptd_queue_worker() (workqueue context) the backlog->complete() is
-called outside of local_bh_disable().
+If you dig deeper you'll find that when cryptd calls the actual
+completion functions (rather than its own) it disables BH.
 
+Cheers,
 -- 
-regards,
-Stan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
