@@ -1,42 +1,75 @@
-From: Matthias-Christian Ott <ott@mirix.org>
-Subject: Re: [PATCH] crypto: user - Allow CRYPTO_MSG_GETALG without CAP_NET_ADMIN
-Date: Wed, 30 Apr 2014 21:23:40 +0200
-Message-ID: <53614DBC.9090304@mirix.org>
-References: <534016A0.6020702@mirix.org> <5359955A.4070903@mirix.org> <201404282337.34142.marex@denx.de>
+From: Vladimir Zapolskiy <vz@mleia.com>
+Subject: Re: [PATCH 0/7 v8] crypto:s5p-sss: Add Device tree and Exynos support
+Date: Wed, 30 Apr 2014 22:51:45 +0300
+Message-ID: <53615451.4090500@mleia.com>
+References: <1398681899-20782-1-git-send-email-ch.naveen@samsung.com> <CAHfPSqDc=WYzdkuJuCY6uQQbcZQQ5SuD+kOfy-aymFL1v7=csg@mail.gmail.com> <20140430121450.GA5754@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Marek Vasut <marex@denx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mirix.org ([78.46.130.147]:57567 "EHLO a.mirix.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758944AbaD3TW4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Apr 2014 15:22:56 -0400
-In-Reply-To: <201404282337.34142.marex@denx.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
+	linux-crypto@vger.kernel.org,
+	"linux-samsung-soc@vger.kernel.org"
+	<linux-samsung-soc@vger.kernel.org>, linux-kernel@vger.kernel.org,
+	cpgs@samsung.com, t.figa@samsung.com, davem@davemloft.net
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Naveen Krishna Ch <naveenkrishna.ch@gmail.com>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <20140430121450.GA5754@gondor.apana.org.au>
+Sender: linux-samsung-soc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 04/28/14 23:37, Marek Vasut wrote:
-> On Friday, April 25, 2014 at 12:51:06 AM, Matthias-Christian Ott wrote:
->> CRYPTO_USER requires CAP_NET_ADMIN for all operations. Most information
->> provided by CRYPTO_MSG_GETALG is also accessible through /proc/modules
->> and AF_ALG. CRYPTO_MSG_GETALG should not require CAP_NET_ADMIN so that
->> processes without CAP_NET_ADMIN can use CRYPTO_MSG_GETALG to get cipher
->> details, such as cipher priorities, for AF_ALG.
+Hi Naveen, Herbert,
+
+On 04/30/14 15:14, Herbert Xu wrote:
+> On Wed, Apr 30, 2014 at 04:38:05PM +0530, Naveen Krishna Ch wrote:
+>> Hello All,
 >>
->> Signed-off-by: Matthias-Christian Ott <ott@mirix.org>
->> ---
->>  crypto/crypto_user.c | 12 +++++++++---
->>  1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> Can you please submit the patch using git send-email so we can properly review 
-> it?
+>> On 28 April 2014 16:14, Naveen Krishna Chatradhi<ch.naveen@samsung.com>  wrote:
+>>> SSS module on Exynos4210, Exynos5250 and Exynos5420 SoCs has added
+>>> features to the one on S5PV210. However with minor changes the s5p-sss.c
+>>> driver can be reused to support SSS modules on Exynos4 and 5 SoCs.
+>>>
+>>> This patch set
+>>> 1. Adds device tree support to the s5p-sss.c driver and Documentation
+>>> 2. Adds code to support SSS module on Exynos4 and 5 SoCs
+>>> 3. Adds variant struct to handle the differences in SSS modules
+>>> 4. Adds clk_prepare/clk_unprepare clocks to the s5p-sss.c driver
+>>>
+>>> Note: Compatible "exynos4210-secss" should work for Exynos4412 and
+>>>        Exynos5260 (Exynos5260, for which ARCH code is under review)
+>>> I couldn't test on Exynos4412 and Exynos4210 boards, Should be able to
+>>> test with addition of DT node and clocks support.
+>>>
+>>> These patches are under review at
+>>> https://lkml.org/lkml/2014/2/17/124
+>>>
+>>> Naveen Krishna Chatradhi (7):
+>>>    crypto:s5p-sss: Use platform_get_irq() instead of _byname()
+>>>    crypto:s5p-sss: Kconfig: Let Exynos SoCs select SSS driver
+>>>    crypto:s5p-sss: Look for the next request in the queue
+>>>    crypto:s5p-sss: Add device tree support
+>>>    crypto:s5p-sss: Add support for SSS module on Exynos
+>>>    crypto:s5p-sss: validate iv before memcpy
+>>>    crypto:s5p-sss: Use clk_prepare/clk_unprepare
+>>>
+>>>   .../devicetree/bindings/crypto/samsung-sss.txt     |   35 +++++
+>>>   drivers/crypto/Kconfig                             |    6 +-
+>>>   drivers/crypto/s5p-sss.c                           |  145 +++++++++++++++-----
+>>>   3 files changed, 150 insertions(+), 36 deletions(-)
+>>>   create mode 100644 Documentation/devicetree/bindings/crypto/samsung-sss.txt
+>>
+>> Can we get this series merged in.
+>> Its has got reviewed and re-based several times and got acked by a
+>> couple of seniors.
+>
+> Do you want me to pick these series up?
+>
+> Cheers,
 
-git-send-email or more specifically Net::SMTP only works with IPv4. The
-SMTP server I use for submission only listens IPv6 addresses. Moreover,
-TLS seems broken. I patched Net::SMTP to use IO::Socket::INET6 but gave
-up because of the TLS issues and used git format-patch and git imap-send.
+thank you for this changeset, in my opinion it is quite good. To all changes
 
-Regards,
-Matthias-Christian
+Acked-by: Vladimir Zapolskiy <vz@mleia.com>
+
+--
+With best wishes,
+Vladimir
