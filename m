@@ -1,53 +1,94 @@
-From: Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: Re: [RFC PATCH v2 1/9] crypto: qce: Add core driver implementation
-Date: Wed, 30 Apr 2014 19:35:41 +0300
-Message-ID: <5361265D.2000706@mm-sol.com>
-References: <1397479725-20954-1-git-send-email-svarbanov@mm-sol.com> <1397479725-20954-2-git-send-email-svarbanov@mm-sol.com> <20140428085928.GA16310@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Grant Likely <grant.likely@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	linux-arm-msm@vger.kernel.org,
-	Mona Hossain <mhossain@codeaurora.org>,
-	Hariprasad Dhalinarasimha <hnamgund@codeaurora.org>,
-	Zhen Kong <zkong@codeaurora.org>,
-	Niranjana Vishwanathapura <nvishwan@codeaurora.org>,
-	Rohit Vaswani <rvaswani@codeaurora.org>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140428085928.GA16310@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Milos Vyletel <milos.vyletel@gmail.com>
+Subject: [PATCH] crypto: x86/sha1: fix coverity CID 1195603
+Date: Wed, 30 Apr 2014 15:17:54 -0400
+Message-ID: <1398885474-21388-1-git-send-email-milos.vyletel@gmail.com>
+Cc: linux-coverity@vger.kernel.org,
+	Milos Vyletel <milos.vyletel@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	x86@kernel.org (maintainer:X86 ARCHITECTURE...),
+	linux-crypto@vger.kernel.org (open list:CRYPTO API),
+	linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE...)
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qg0-f43.google.com ([209.85.192.43]:45392 "EHLO
+	mail-qg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753424AbaD3TSI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 30 Apr 2014 15:18:08 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Coverity detected possible use of uninitialized pointer when printing info
+message during module load. While this is higly unlikely to cause any troubles
+simple change in sha1_ssse3_mod_init to make it look like sha256/512 init
+function will fix this.
 
-On 04/28/2014 11:59 AM, Herbert Xu wrote:
-> On Mon, Apr 14, 2014 at 03:48:37PM +0300, Stanimir Varbanov wrote:
->>
->> +#define QCE_MAJOR_VERSION5	0x05
->> +#define QCE_QUEUE_LENGTH	50
-> 
-> What is the purpose of this software queue? Why can't you directly
-> feed the requests to the hardware?
+260
+   	6. Condition sha1_transform_asm, taking true branch
+261        if (sha1_transform_asm) {
 
-Good question. This is a leftover from original driver.
+CID 1195603 (#1 of 1): Uninitialized pointer read (UNINIT)
+7. uninit_use_in_call: Using uninitialized value algo_name when calling printk.
+262                pr_info("Using %s optimized SHA-1 implementation\n", algo_name);
+263                return crypto_register_shash(&alg);
+264        }
 
-The hardware can handle one request at a time. After you raise the
-question I think the queue length should be 1 or remove it completely. I
-don't know why the original codeaurora's driver use 50.
+Reported-by: <scan-admin@coverity.com>
+Signed-off-by: Milos Vyletel <milos.vyletel@gmail.com>
+---
+ arch/x86/crypto/sha1_ssse3_glue.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-> 
-> If the hardware can't handle more than 50 requests in-flight,
-> then your software queue has failed to handle this since you're
-> taking requests off the queue before you touch the hardware so
-> you're not really limiting it to 50.  That is, for users that
-> can wait you're potentially dropping their requests instead
-> of letting them wait through the backlog mechanism.
-
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index 74d16ef..5352196 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -235,31 +235,33 @@ static bool __init avx2_usable(void)
+ 
+ static int __init sha1_ssse3_mod_init(void)
+ {
+-	char *algo_name;
+-
+ 	/* test for SSSE3 first */
+-	if (cpu_has_ssse3) {
++	if (cpu_has_ssse3)
+ 		sha1_transform_asm = sha1_transform_ssse3;
+-		algo_name = "SSSE3";
+-	}
+ 
+ #ifdef CONFIG_AS_AVX
+ 	/* allow AVX to override SSSE3, it's a little faster */
+ 	if (avx_usable()) {
+ 		sha1_transform_asm = sha1_transform_avx;
+-		algo_name = "AVX";
+ #ifdef CONFIG_AS_AVX2
+ 		/* allow AVX2 to override AVX, it's a little faster */
+-		if (avx2_usable()) {
++		if (avx2_usable())
+ 			sha1_transform_asm = sha1_apply_transform_avx2;
+-			algo_name = "AVX2";
+-		}
+ #endif
+ 	}
+ #endif
+ 
+ 	if (sha1_transform_asm) {
+-		pr_info("Using %s optimized SHA-1 implementation\n", algo_name);
++#ifdef CONFIG_AS_AVX
++		if (sha1_transform_asm == sha1_transform_avx)
++			pr_info("Using AVX optimized SHA-1 implementation\n");
++#ifdef CONFIG_AS_AVX2
++		else if (sha1_transform_asm == sha1_transform_avx2)
++			pr_info("Using AVX2 optimized SHA-1 implementation\n");
++#endif
++		else
++#endif
++			pr_info("Using SSSE3 optimized SHA-1 implementation\n");
+ 		return crypto_register_shash(&alg);
+ 	}
+ 	pr_info("Neither AVX nor AVX2 nor SSSE3 is available/usable.\n");
 -- 
-regards,
-Stan
+1.9.0
