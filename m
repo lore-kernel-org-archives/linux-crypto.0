@@ -1,85 +1,53 @@
-From: Naveen Krishna Ch <naveenkrishna.ch@gmail.com>
-Subject: Re: [PATCH 0/7 v8] crypto:s5p-sss: Add Device tree and Exynos support
-Date: Wed, 30 Apr 2014 17:49:35 +0530
-Message-ID: <CAHfPSqCy=61+1TG9NO2mdPMxRfc37AR6sOVzXojg8bWsSeDD0A@mail.gmail.com>
-References: <1398681899-20782-1-git-send-email-ch.naveen@samsung.com>
- <CAHfPSqDc=WYzdkuJuCY6uQQbcZQQ5SuD+kOfy-aymFL1v7=csg@mail.gmail.com> <20140430121450.GA5754@gondor.apana.org.au>
+From: Stanimir Varbanov <svarbanov@mm-sol.com>
+Subject: Re: [RFC PATCH v2 1/9] crypto: qce: Add core driver implementation
+Date: Wed, 30 Apr 2014 19:35:41 +0300
+Message-ID: <5361265D.2000706@mm-sol.com>
+References: <1397479725-20954-1-git-send-email-svarbanov@mm-sol.com> <1397479725-20954-2-git-send-email-svarbanov@mm-sol.com> <20140428085928.GA16310@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Naveen Krishna Chatradhi <ch.naveen@samsung.com>,
-	linux-crypto@vger.kernel.org,
-	"linux-samsung-soc@vger.kernel.org"
-	<linux-samsung-soc@vger.kernel.org>, linux-kernel@vger.kernel.org,
-	Vladimir Zapolskiy <vzapolskiy@gmail.com>, cpgs@samsung.com,
-	t.figa@samsung.com, davem@davemloft.net
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	linux-arm-msm@vger.kernel.org,
+	Mona Hossain <mhossain@codeaurora.org>,
+	Hariprasad Dhalinarasimha <hnamgund@codeaurora.org>,
+	Zhen Kong <zkong@codeaurora.org>,
+	Niranjana Vishwanathapura <nvishwan@codeaurora.org>,
+	Rohit Vaswani <rvaswani@codeaurora.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oa0-f43.google.com ([209.85.219.43]:55142 "EHLO
-	mail-oa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757878AbaD3MTz (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Apr 2014 08:19:55 -0400
-In-Reply-To: <20140430121450.GA5754@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20140428085928.GA16310@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello Herbert,
+Hi Herbert,
 
-On 30 April 2014 17:44, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Wed, Apr 30, 2014 at 04:38:05PM +0530, Naveen Krishna Ch wrote:
->> Hello All,
+On 04/28/2014 11:59 AM, Herbert Xu wrote:
+> On Mon, Apr 14, 2014 at 03:48:37PM +0300, Stanimir Varbanov wrote:
 >>
->> On 28 April 2014 16:14, Naveen Krishna Chatradhi <ch.naveen@samsung.com> wrote:
->> > SSS module on Exynos4210, Exynos5250 and Exynos5420 SoCs has added
->> > features to the one on S5PV210. However with minor changes the s5p-sss.c
->> > driver can be reused to support SSS modules on Exynos4 and 5 SoCs.
->> >
->> > This patch set
->> > 1. Adds device tree support to the s5p-sss.c driver and Documentation
->> > 2. Adds code to support SSS module on Exynos4 and 5 SoCs
->> > 3. Adds variant struct to handle the differences in SSS modules
->> > 4. Adds clk_prepare/clk_unprepare clocks to the s5p-sss.c driver
->> >
->> > Note: Compatible "exynos4210-secss" should work for Exynos4412 and
->> >       Exynos5260 (Exynos5260, for which ARCH code is under review)
->> > I couldn't test on Exynos4412 and Exynos4210 boards, Should be able to
->> > test with addition of DT node and clocks support.
->> >
->> > These patches are under review at
->> > https://lkml.org/lkml/2014/2/17/124
->> >
->> > Naveen Krishna Chatradhi (7):
->> >   crypto:s5p-sss: Use platform_get_irq() instead of _byname()
->> >   crypto:s5p-sss: Kconfig: Let Exynos SoCs select SSS driver
->> >   crypto:s5p-sss: Look for the next request in the queue
->> >   crypto:s5p-sss: Add device tree support
->> >   crypto:s5p-sss: Add support for SSS module on Exynos
->> >   crypto:s5p-sss: validate iv before memcpy
->> >   crypto:s5p-sss: Use clk_prepare/clk_unprepare
->> >
->> >  .../devicetree/bindings/crypto/samsung-sss.txt     |   35 +++++
->> >  drivers/crypto/Kconfig                             |    6 +-
->> >  drivers/crypto/s5p-sss.c                           |  145 +++++++++++++++-----
->> >  3 files changed, 150 insertions(+), 36 deletions(-)
->> >  create mode 100644 Documentation/devicetree/bindings/crypto/samsung-sss.txt
->>
->> Can we get this series merged in.
->> Its has got reviewed and re-based several times and got acked by a
->> couple of seniors.
->
-> Do you wa1nt me to pick these series up?
-Yes please.
->
-> Cheers,
-Thanks,
-Naveen
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>> +#define QCE_MAJOR_VERSION5	0x05
+>> +#define QCE_QUEUE_LENGTH	50
+> 
+> What is the purpose of this software queue? Why can't you directly
+> feed the requests to the hardware?
 
+Good question. This is a leftover from original driver.
 
+The hardware can handle one request at a time. After you raise the
+question I think the queue length should be 1 or remove it completely. I
+don't know why the original codeaurora's driver use 50.
+
+> 
+> If the hardware can't handle more than 50 requests in-flight,
+> then your software queue has failed to handle this since you're
+> taking requests off the queue before you touch the hardware so
+> you're not really limiting it to 50.  That is, for users that
+> can wait you're potentially dropping their requests instead
+> of letting them wait through the backlog mechanism.
 
 -- 
-Shine bright,
-(: Nav :)
+regards,
+Stan
