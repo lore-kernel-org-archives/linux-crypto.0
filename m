@@ -1,197 +1,227 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH resend 02/15] arm64: add abstractions for FPSIMD state manipulation
-Date: Thu,  1 May 2014 17:49:34 +0200
-Message-ID: <1398959381-8126-3-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH resend 04/15] arm64: add support for kernel mode NEON in interrupt context
+Date: Thu,  1 May 2014 17:49:36 +0200
+Message-ID: <1398959381-8126-5-git-send-email-ard.biesheuvel@linaro.org>
 References: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: catalin.marinas@arm.com, will.deacon@arm.com,
 	steve.capper@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:65373 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751833AbaEAPtw (ORCPT
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:37921 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751833AbaEAPtz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 1 May 2014 11:49:52 -0400
-Received: by mail-we0-f174.google.com with SMTP id k48so3374361wev.33
-        for <linux-crypto@vger.kernel.org>; Thu, 01 May 2014 08:49:51 -0700 (PDT)
+	Thu, 1 May 2014 11:49:55 -0400
+Received: by mail-wi0-f175.google.com with SMTP id cc10so964649wib.8
+        for <linux-crypto@vger.kernel.org>; Thu, 01 May 2014 08:49:54 -0700 (PDT)
 In-Reply-To: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-There are two tacit assumptions in the FPSIMD handling code that will no longer
-hold after the next patch that optimizes away some FPSIMD state restores:
-. the FPSIMD registers of this CPU contain the userland FPSIMD state of
-  task 'current';
-. when switching to a task, its FPSIMD state will always be restored from
-  memory.
-
-This patch adds the following functions to abstract away from straight FPSIMD
-register file saves and restores:
-- fpsimd_preserve_current_state -> ensure current's FPSIMD state is saved
-- fpsimd_restore_current_state -> ensure current's FPSIMD state is loaded
-- fpsimd_update_current_state -> replace current's FPSIMD state
-- fpsimd_flush_task_state -> invalidate live copies of a task's FPSIMD state
-
-Where necessary, the ptrace, signal handling and fork code are updated to use
-the above wrappers instead of poking into the FPSIMD registers directly.
+This patch modifies kernel_neon_begin() and kernel_neon_end(), so
+they may be called from any context. To address the case where only
+a couple of registers are needed, kernel_neon_begin_partial(u32) is
+introduced which takes as a parameter the number of bottom 'n' NEON
+q-registers required. To mark the end of such a partial section, the
+regular kernel_neon_end() should be used.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/include/asm/fpsimd.h |  6 ++++++
- arch/arm64/kernel/fpsimd.c      | 33 +++++++++++++++++++++++++++++++++
- arch/arm64/kernel/process.c     |  2 +-
- arch/arm64/kernel/ptrace.c      |  2 ++
- arch/arm64/kernel/signal.c      |  9 +++------
- arch/arm64/kernel/signal32.c    |  9 +++------
- 6 files changed, 48 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/fpsimd.h       | 15 ++++++++++++
+ arch/arm64/include/asm/fpsimdmacros.h | 35 ++++++++++++++++++++++++++++
+ arch/arm64/include/asm/neon.h         |  6 ++++-
+ arch/arm64/kernel/entry-fpsimd.S      | 24 +++++++++++++++++++
+ arch/arm64/kernel/fpsimd.c            | 44 ++++++++++++++++++++++++-----------
+ 5 files changed, 109 insertions(+), 15 deletions(-)
 
 diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index c43b4ac13008..9f9b8e438546 100644
+index 7a900142dbc8..05e1b24aca4c 100644
 --- a/arch/arm64/include/asm/fpsimd.h
 +++ b/arch/arm64/include/asm/fpsimd.h
-@@ -58,6 +58,12 @@ extern void fpsimd_load_state(struct fpsimd_state *state);
- extern void fpsimd_thread_switch(struct task_struct *next);
- extern void fpsimd_flush_thread(void);
+@@ -41,6 +41,17 @@ struct fpsimd_state {
+ 	unsigned int cpu;
+ };
  
-+extern void fpsimd_preserve_current_state(void);
-+extern void fpsimd_restore_current_state(void);
-+extern void fpsimd_update_current_state(struct fpsimd_state *state);
++/*
++ * Struct for stacking the bottom 'n' FP/SIMD registers.
++ */
++struct fpsimd_partial_state {
++	u32		num_regs;
++	u32		fpsr;
++	u32		fpcr;
++	__uint128_t	vregs[32] __aligned(16);
++} __aligned(16);
 +
-+extern void fpsimd_flush_task_state(struct task_struct *target);
++
+ #if defined(__KERNEL__) && defined(CONFIG_COMPAT)
+ /* Masks for extracting the FPSR and FPCR from the FPSCR */
+ #define VFP_FPSCR_STAT_MASK	0xf800009f
+@@ -66,6 +77,10 @@ extern void fpsimd_update_current_state(struct fpsimd_state *state);
+ 
+ extern void fpsimd_flush_task_state(struct task_struct *target);
+ 
++extern void fpsimd_save_partial_state(struct fpsimd_partial_state *state,
++				      u32 num_regs);
++extern void fpsimd_load_partial_state(struct fpsimd_partial_state *state);
 +
  #endif
  
  #endif
+diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
+index bbec599c96bd..69e75134689d 100644
+--- a/arch/arm64/include/asm/fpsimdmacros.h
++++ b/arch/arm64/include/asm/fpsimdmacros.h
+@@ -62,3 +62,38 @@
+ 	ldr	w\tmpnr, [\state, #16 * 2 + 4]
+ 	msr	fpcr, x\tmpnr
+ .endm
++
++.altmacro
++.macro fpsimd_save_partial state, numnr, tmpnr1, tmpnr2
++	mrs	x\tmpnr1, fpsr
++	str	w\numnr, [\state]
++	mrs	x\tmpnr2, fpcr
++	stp	w\tmpnr1, w\tmpnr2, [\state, #4]
++	adr	x\tmpnr1, 0f
++	add	\state, \state, x\numnr, lsl #4
++	sub	x\tmpnr1, x\tmpnr1, x\numnr, lsl #1
++	br	x\tmpnr1
++	.irp	qa, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0
++	.irp	qb, %(qa + 1)
++	stp	q\qa, q\qb, [\state, # -16 * \qa - 16]
++	.endr
++	.endr
++0:
++.endm
++
++.macro fpsimd_restore_partial state, tmpnr1, tmpnr2
++	ldp	w\tmpnr1, w\tmpnr2, [\state, #4]
++	msr	fpsr, x\tmpnr1
++	msr	fpcr, x\tmpnr2
++	adr	x\tmpnr1, 0f
++	ldr	w\tmpnr2, [\state]
++	add	\state, \state, x\tmpnr2, lsl #4
++	sub	x\tmpnr1, x\tmpnr1, x\tmpnr2, lsl #1
++	br	x\tmpnr1
++	.irp	qa, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0
++	.irp	qb, %(qa + 1)
++	ldp	q\qa, q\qb, [\state, # -16 * \qa - 16]
++	.endr
++	.endr
++0:
++.endm
+diff --git a/arch/arm64/include/asm/neon.h b/arch/arm64/include/asm/neon.h
+index b0cc58a97780..13ce4cc18e26 100644
+--- a/arch/arm64/include/asm/neon.h
++++ b/arch/arm64/include/asm/neon.h
+@@ -8,7 +8,11 @@
+  * published by the Free Software Foundation.
+  */
+ 
++#include <linux/types.h>
++
+ #define cpu_has_neon()		(1)
+ 
+-void kernel_neon_begin(void);
++#define kernel_neon_begin()	kernel_neon_begin_partial(32)
++
++void kernel_neon_begin_partial(u32 num_regs);
+ void kernel_neon_end(void);
+diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
+index 6a27cd6dbfa6..d358ccacfc00 100644
+--- a/arch/arm64/kernel/entry-fpsimd.S
++++ b/arch/arm64/kernel/entry-fpsimd.S
+@@ -41,3 +41,27 @@ ENTRY(fpsimd_load_state)
+ 	fpsimd_restore x0, 8
+ 	ret
+ ENDPROC(fpsimd_load_state)
++
++#ifdef CONFIG_KERNEL_MODE_NEON
++
++/*
++ * Save the bottom n FP registers.
++ *
++ * x0 - pointer to struct fpsimd_partial_state
++ */
++ENTRY(fpsimd_save_partial_state)
++	fpsimd_save_partial x0, 1, 8, 9
++	ret
++ENDPROC(fpsimd_load_partial_state)
++
++/*
++ * Load the bottom n FP registers.
++ *
++ * x0 - pointer to struct fpsimd_partial_state
++ */
++ENTRY(fpsimd_load_partial_state)
++	fpsimd_restore_partial x0, 8, 9
++	ret
++ENDPROC(fpsimd_load_partial_state)
++
++#endif
 diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 4aef42a04bdc..86ac6a9bc86a 100644
+index 6cfbb4ef27d7..82ebc259a787 100644
 --- a/arch/arm64/kernel/fpsimd.c
 +++ b/arch/arm64/kernel/fpsimd.c
-@@ -87,6 +87,39 @@ void fpsimd_flush_thread(void)
- 	preempt_enable();
- }
+@@ -218,29 +218,45 @@ void fpsimd_flush_task_state(struct task_struct *t)
  
-+/*
-+ * Save the userland FPSIMD state of 'current' to memory
-+ */
-+void fpsimd_preserve_current_state(void)
-+{
-+	fpsimd_save_state(&current->thread.fpsimd_state);
-+}
-+
-+/*
-+ * Load the userland FPSIMD state of 'current' from memory
-+ */
-+void fpsimd_restore_current_state(void)
-+{
-+	fpsimd_load_state(&current->thread.fpsimd_state);
-+}
-+
-+/*
-+ * Load an updated userland FPSIMD state for 'current' from memory
-+ */
-+void fpsimd_update_current_state(struct fpsimd_state *state)
-+{
-+	preempt_disable();
-+	fpsimd_load_state(state);
-+	preempt_enable();
-+}
-+
-+/*
-+ * Invalidate live CPU copies of task t's FPSIMD state
-+ */
-+void fpsimd_flush_task_state(struct task_struct *t)
-+{
-+}
-+
  #ifdef CONFIG_KERNEL_MODE_NEON
  
++static DEFINE_PER_CPU(struct fpsimd_partial_state, hardirq_fpsimdstate);
++static DEFINE_PER_CPU(struct fpsimd_partial_state, softirq_fpsimdstate);
++
  /*
-diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-index 6391485f342d..c5693163408c 100644
---- a/arch/arm64/kernel/process.c
-+++ b/arch/arm64/kernel/process.c
-@@ -205,7 +205,7 @@ void release_thread(struct task_struct *dead_task)
- 
- int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
+  * Kernel-side NEON support functions
+  */
+-void kernel_neon_begin(void)
++void kernel_neon_begin_partial(u32 num_regs)
  {
--	fpsimd_save_state(&current->thread.fpsimd_state);
-+	fpsimd_preserve_current_state();
- 	*dst = *src;
- 	return 0;
+-	/* Avoid using the NEON in interrupt context */
+-	BUG_ON(in_interrupt());
+-	preempt_disable();
++	if (in_interrupt()) {
++		struct fpsimd_partial_state *s = this_cpu_ptr(
++			in_irq() ? &hardirq_fpsimdstate : &softirq_fpsimdstate);
+ 
+-	/*
+-	 * Save the userland FPSIMD state if we have one and if we haven't done
+-	 * so already. Clear fpsimd_last_state to indicate that there is no
+-	 * longer userland FPSIMD state in the registers.
+-	 */
+-	if (current->mm && !test_and_set_thread_flag(TIF_FOREIGN_FPSTATE))
+-		fpsimd_save_state(&current->thread.fpsimd_state);
+-	this_cpu_write(fpsimd_last_state, NULL);
++		BUG_ON(num_regs > 32);
++		fpsimd_save_partial_state(s, roundup(num_regs, 2));
++	} else {
++		/*
++		 * Save the userland FPSIMD state if we have one and if we
++		 * haven't done so already. Clear fpsimd_last_state to indicate
++		 * that there is no longer userland FPSIMD state in the
++		 * registers.
++		 */
++		preempt_disable();
++		if (current->mm &&
++		    !test_and_set_thread_flag(TIF_FOREIGN_FPSTATE))
++			fpsimd_save_state(&current->thread.fpsimd_state);
++		this_cpu_write(fpsimd_last_state, NULL);
++	}
  }
-diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
-index 6a8928bba03c..f8700eca24e7 100644
---- a/arch/arm64/kernel/ptrace.c
-+++ b/arch/arm64/kernel/ptrace.c
-@@ -517,6 +517,7 @@ static int fpr_set(struct task_struct *target, const struct user_regset *regset,
- 		return ret;
+-EXPORT_SYMBOL(kernel_neon_begin);
++EXPORT_SYMBOL(kernel_neon_begin_partial);
  
- 	target->thread.fpsimd_state.user_fpsimd = newstate;
-+	fpsimd_flush_task_state(target);
- 	return ret;
+ void kernel_neon_end(void)
+ {
+-	preempt_enable();
++	if (in_interrupt()) {
++		struct fpsimd_partial_state *s = this_cpu_ptr(
++			in_irq() ? &hardirq_fpsimdstate : &softirq_fpsimdstate);
++		fpsimd_load_partial_state(s);
++	} else {
++		preempt_enable();
++	}
  }
+ EXPORT_SYMBOL(kernel_neon_end);
  
-@@ -764,6 +765,7 @@ static int compat_vfp_set(struct task_struct *target,
- 		uregs->fpcr = fpscr & VFP_FPSCR_CTRL_MASK;
- 	}
- 
-+	fpsimd_flush_task_state(target);
- 	return ret;
- }
- 
-diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
-index 890a591f75dd..06448a77ff53 100644
---- a/arch/arm64/kernel/signal.c
-+++ b/arch/arm64/kernel/signal.c
-@@ -51,7 +51,7 @@ static int preserve_fpsimd_context(struct fpsimd_context __user *ctx)
- 	int err;
- 
- 	/* dump the hardware registers to the fpsimd_state structure */
--	fpsimd_save_state(fpsimd);
-+	fpsimd_preserve_current_state();
- 
- 	/* copy the FP and status/control registers */
- 	err = __copy_to_user(ctx->vregs, fpsimd->vregs, sizeof(fpsimd->vregs));
-@@ -86,11 +86,8 @@ static int restore_fpsimd_context(struct fpsimd_context __user *ctx)
- 	__get_user_error(fpsimd.fpcr, &ctx->fpcr, err);
- 
- 	/* load the hardware registers from the fpsimd_state structure */
--	if (!err) {
--		preempt_disable();
--		fpsimd_load_state(&fpsimd);
--		preempt_enable();
--	}
-+	if (!err)
-+		fpsimd_update_current_state(&fpsimd);
- 
- 	return err ? -EFAULT : 0;
- }
-diff --git a/arch/arm64/kernel/signal32.c b/arch/arm64/kernel/signal32.c
-index b3fc9f5ec6d3..ac7e237d0bda 100644
---- a/arch/arm64/kernel/signal32.c
-+++ b/arch/arm64/kernel/signal32.c
-@@ -219,7 +219,7 @@ static int compat_preserve_vfp_context(struct compat_vfp_sigframe __user *frame)
- 	 * Note that this also saves V16-31, which aren't visible
- 	 * in AArch32.
- 	 */
--	fpsimd_save_state(fpsimd);
-+	fpsimd_preserve_current_state();
- 
- 	/* Place structure header on the stack */
- 	__put_user_error(magic, &frame->magic, err);
-@@ -282,11 +282,8 @@ static int compat_restore_vfp_context(struct compat_vfp_sigframe __user *frame)
- 	 * We don't need to touch the exception register, so
- 	 * reload the hardware state.
- 	 */
--	if (!err) {
--		preempt_disable();
--		fpsimd_load_state(&fpsimd);
--		preempt_enable();
--	}
-+	if (!err)
-+		fpsimd_update_current_state(&fpsimd);
- 
- 	return err ? -EFAULT : 0;
- }
 -- 
 1.8.3.2
