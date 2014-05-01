@@ -1,51 +1,91 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH] crypto: user - Allow CRYPTO_MSG_GETALG without CAP_NET_ADMIN
-Date: Thu, 1 May 2014 12:53:25 +0200
-Message-ID: <201405011253.25329.marex@denx.de>
-References: <534016A0.6020702@mirix.org> <201404282337.34142.marex@denx.de> <53614DBC.9090304@mirix.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: "Matthias-Christian Ott" <ott@mirix.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH resend 00/15] arm64 crypto roundup
+Date: Thu,  1 May 2014 17:49:32 +0200
+Message-ID: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: catalin.marinas@arm.com, will.deacon@arm.com,
+	steve.capper@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:57619 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751286AbaEAO1o (ORCPT
+Received: from mail-we0-f173.google.com ([74.125.82.173]:47986 "EHLO
+	mail-we0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751009AbaEAPtt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 1 May 2014 10:27:44 -0400
-In-Reply-To: <53614DBC.9090304@mirix.org>
+	Thu, 1 May 2014 11:49:49 -0400
+Received: by mail-we0-f173.google.com with SMTP id w61so3369182wes.32
+        for <linux-crypto@vger.kernel.org>; Thu, 01 May 2014 08:49:48 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday, April 30, 2014 at 09:23:40 PM, Matthias-Christian Ott wrote:
-> On 04/28/14 23:37, Marek Vasut wrote:
-> > On Friday, April 25, 2014 at 12:51:06 AM, Matthias-Christian Ott wrote:
-> >> CRYPTO_USER requires CAP_NET_ADMIN for all operations. Most information
-> >> provided by CRYPTO_MSG_GETALG is also accessible through /proc/modules
-> >> and AF_ALG. CRYPTO_MSG_GETALG should not require CAP_NET_ADMIN so that
-> >> processes without CAP_NET_ADMIN can use CRYPTO_MSG_GETALG to get cipher
-> >> details, such as cipher priorities, for AF_ALG.
-> >> 
-> >> Signed-off-by: Matthias-Christian Ott <ott@mirix.org>
-> >> ---
-> >> 
-> >>  crypto/crypto_user.c | 12 +++++++++---
-> >>  1 file changed, 9 insertions(+), 3 deletions(-)
-> > 
-> > Can you please submit the patch using git send-email so we can properly
-> > review it?
-> 
-> git-send-email or more specifically Net::SMTP only works with IPv4. The
-> SMTP server I use for submission only listens IPv6 addresses. Moreover,
-> TLS seems broken. I patched Net::SMTP to use IO::Socket::INET6 but gave
-> up because of the TLS issues and used git format-patch and git imap-send.
+This is a repost of the arm64 crypto patches that I have posted to the LAKML
+over the past months. They have now been verified on actual hardware
+(Cortex-A57) so if there are no remaining issues I would like to propose them
+for 3.16.
 
-You can always set up a separate mailserver or use one of the many free-to-use 
-mailservers to follow the agreed-upon submission process, right?
+Ard Biesheuvel (15):
+  asm-generic: allow generic unaligned access if the arch supports it
+  arm64: add abstractions for FPSIMD state manipulation
+  arm64: defer reloading a task's FPSIMD state to userland resume
+  arm64: add support for kernel mode NEON in interrupt context
+  arm64/crypto: SHA-1 using ARMv8 Crypto Extensions
+  arm64/crypto: SHA-224/SHA-256 using ARMv8 Crypto Extensions
+  arm64/crypto: GHASH secure hash using ARMv8 Crypto Extensions
+  arm64/crypto: AES using ARMv8 Crypto Extensions
+  arm64/crypto: AES in CCM mode using ARMv8 Crypto Extensions
+  arm64: pull in <asm/simd.h> from asm-generic
+  arm64/crypto: AES-ECB/CBC/CTR/XTS using ARMv8 NEON and Crypto
+    Extensions
+  arm64/crypto: add shared macro to test for NEED_RESCHED
+  arm64/crypto: add voluntary preemption to Crypto Extensions SHA1
+  arm64/crypto: add voluntary preemption to Crypto Extensions SHA2
+  arm64/crypto: add voluntary preemption to Crypto Extensions GHASH
 
-Of course, patches for Net::SMTP are welcome.
+ arch/arm64/Kconfig                    |   3 +
+ arch/arm64/Makefile                   |   1 +
+ arch/arm64/crypto/Kconfig             |  53 ++++
+ arch/arm64/crypto/Makefile            |  38 +++
+ arch/arm64/crypto/aes-ce-ccm-core.S   | 222 ++++++++++++++
+ arch/arm64/crypto/aes-ce-ccm-glue.c   | 297 ++++++++++++++++++
+ arch/arm64/crypto/aes-ce-cipher.c     | 155 ++++++++++
+ arch/arm64/crypto/aes-ce.S            | 147 +++++++++
+ arch/arm64/crypto/aes-glue.c          | 446 +++++++++++++++++++++++++++
+ arch/arm64/crypto/aes-modes.S         | 548 ++++++++++++++++++++++++++++++++++
+ arch/arm64/crypto/aes-neon.S          | 382 ++++++++++++++++++++++++
+ arch/arm64/crypto/ghash-ce-core.S     |  97 ++++++
+ arch/arm64/crypto/ghash-ce-glue.c     | 172 +++++++++++
+ arch/arm64/crypto/sha1-ce-core.S      | 154 ++++++++++
+ arch/arm64/crypto/sha1-ce-glue.c      | 201 +++++++++++++
+ arch/arm64/crypto/sha2-ce-core.S      | 159 ++++++++++
+ arch/arm64/crypto/sha2-ce-glue.c      | 281 +++++++++++++++++
+ arch/arm64/include/asm/Kbuild         |   1 +
+ arch/arm64/include/asm/assembler.h    |  21 ++
+ arch/arm64/include/asm/fpsimd.h       |  23 ++
+ arch/arm64/include/asm/fpsimdmacros.h |  35 +++
+ arch/arm64/include/asm/neon.h         |   6 +-
+ arch/arm64/include/asm/thread_info.h  |   4 +-
+ arch/arm64/kernel/entry-fpsimd.S      |  24 ++
+ arch/arm64/kernel/entry.S             |   2 +-
+ arch/arm64/kernel/fpsimd.c            | 187 ++++++++++--
+ arch/arm64/kernel/process.c           |   2 +-
+ arch/arm64/kernel/ptrace.c            |   2 +
+ arch/arm64/kernel/signal.c            |  13 +-
+ arch/arm64/kernel/signal32.c          |   9 +-
+ include/asm-generic/unaligned.h       |  21 +-
+ 31 files changed, 3662 insertions(+), 44 deletions(-)
+ create mode 100644 arch/arm64/crypto/Kconfig
+ create mode 100644 arch/arm64/crypto/Makefile
+ create mode 100644 arch/arm64/crypto/aes-ce-ccm-core.S
+ create mode 100644 arch/arm64/crypto/aes-ce-ccm-glue.c
+ create mode 100644 arch/arm64/crypto/aes-ce-cipher.c
+ create mode 100644 arch/arm64/crypto/aes-ce.S
+ create mode 100644 arch/arm64/crypto/aes-glue.c
+ create mode 100644 arch/arm64/crypto/aes-modes.S
+ create mode 100644 arch/arm64/crypto/aes-neon.S
+ create mode 100644 arch/arm64/crypto/ghash-ce-core.S
+ create mode 100644 arch/arm64/crypto/ghash-ce-glue.c
+ create mode 100644 arch/arm64/crypto/sha1-ce-core.S
+ create mode 100644 arch/arm64/crypto/sha1-ce-glue.c
+ create mode 100644 arch/arm64/crypto/sha2-ce-core.S
+ create mode 100644 arch/arm64/crypto/sha2-ce-glue.c
 
-Best regards,
-Marek Vasut
+-- 
+1.8.3.2
