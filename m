@@ -1,75 +1,75 @@
-From: Vakul Garg <vakul@freescale.com>
-Subject: RE: [PATCH] crypto: caam - Fix key inlining in AEAD shared
- descriptors
-Date: Sat, 3 May 2014 11:44:39 +0000
-Message-ID: <72e203ad27a64b66b1b876e7b9978e5c@BL2PR03MB162.namprd03.prod.outlook.com>
-References: <1398612374-1746-1-git-send-email-vakul@freescale.com>
- <20140502191008.db1408c0735f14ed1a0bdb8b@freescale.com>
+From: Matthias-Christian Ott <ott@mirix.org>
+Subject: Re: [PATCH] crypto: user - Allow CRYPTO_MSG_GETALG without CAP_NET_ADMIN
+Date: Sun, 04 May 2014 01:45:42 +0200
+Message-ID: <53657FA6.8090707@mirix.org>
+References: <534016A0.6020702@mirix.org> <201404282337.34142.marex@denx.de> <53614DBC.9090304@mirix.org> <201405011253.25329.marex@denx.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"Horia.Geanta@freescale.com" <Horia.Geanta@freescale.com>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	"alexandru.porosanu@freescale.com" <alexandru.porosanu@freescale.com>
-To: Kim Phillips <Kim.Phillips@freescale.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org
+To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0141.outbound.protection.outlook.com ([207.46.163.141]:3425
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751012AbaECLon convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 3 May 2014 07:44:43 -0400
-In-Reply-To: <20140502191008.db1408c0735f14ed1a0bdb8b@freescale.com>
-Content-Language: en-US
+Received: from a.mirix.org ([78.46.130.147]:38476 "EHLO a.mirix.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752897AbaEDBnr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 3 May 2014 21:43:47 -0400
+In-Reply-To: <201405011253.25329.marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On 05/01/14 12:53, Marek Vasut wrote:
+> On Wednesday, April 30, 2014 at 09:23:40 PM, Matthias-Christian Ott w=
+rote:
+>> On 04/28/14 23:37, Marek Vasut wrote:
+>>> On Friday, April 25, 2014 at 12:51:06 AM, Matthias-Christian Ott wr=
+ote:
+>>>> CRYPTO_USER requires CAP_NET_ADMIN for all operations. Most inform=
+ation
+>>>> provided by CRYPTO_MSG_GETALG is also accessible through /proc/mod=
+ules
+>>>> and AF_ALG. CRYPTO_MSG_GETALG should not require CAP_NET_ADMIN so =
+that
+>>>> processes without CAP_NET_ADMIN can use CRYPTO_MSG_GETALG to get c=
+ipher
+>>>> details, such as cipher priorities, for AF_ALG.
+>>>>
+>>>> Signed-off-by: Matthias-Christian Ott <ott@mirix.org>
+>>>> ---
+>>>>
+>>>>  crypto/crypto_user.c | 12 +++++++++---
+>>>>  1 file changed, 9 insertions(+), 3 deletions(-)
+>>>
+>>> Can you please submit the patch using git send-email so we can prop=
+erly
+>>> review it?
+>>
+>> git-send-email or more specifically Net::SMTP only works with IPv4. =
+The
+>> SMTP server I use for submission only listens IPv6 addresses. Moreov=
+er,
+>> TLS seems broken. I patched Net::SMTP to use IO::Socket::INET6 but g=
+ave
+>> up because of the TLS issues and used git format-patch and git imap-=
+send.
+>=20
+> You can always set up a separate mailserver or use one of the many fr=
+ee-to-use=20
+> mailservers to follow the agreed-upon submission process, right?
 
+I don't comment on this statement to keep this discussion focused (send
+me a private email if you want to discuss it).
 
-> -----Original Message-----
-> From: Kim Phillips [mailto:kim.phillips@freescale.com]
-> Sent: Saturday, May 03, 2014 5:40 AM
-> To: Garg Vakul-B16394
-> Cc: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au; Geanta
-> Neag Horia Ioan-B05471; Gupta Ruchika-R66431; Porosanu Alexandru-B06830
-> Subject: Re: [PATCH] crypto: caam - Fix key inlining in AEAD shared
-> descriptors
-> 
-> On Sun, 27 Apr 2014 11:26:14 -0400
-> Vakul Garg <vakul@freescale.com> wrote:
-> 
-> > The variable 'keys_fit_inline' is initialised correctly to avoid using
-> > its stale value while creating shared descriptor for decryption and
-> > given-iv-encryption.
-> 
-> you mean givencrypt?  That's "generate an IV and encrypt".
+I did try to submit the email directly (with SPF disabled) from git
+send-email to vger.kernel.org but vger.kernel.org uses greylisting, so =
+I
+can't help you with that.
 
-I will modify it and submit next patch version.
+Can you simply copy the file that was attached on the first email I
+sent, save it to the filesystem and simply commit it in git? You would
+have to do this anyway if I filed a bug in the Kernel Bug Tracker. So
+there is an =93agreed-upon submission process=94 to commit a file.
 
-> 
-> > @@ -220,6 +220,8 @@ static int aead_null_set_sh_desc(struct crypto_aead
-> *aead)
-> >  	if (DESC_AEAD_NULL_ENC_LEN + DESC_JOB_IO_LEN +
-> >  	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
-> >  		keys_fit_inline = true;
-> > +	else
-> > +		keys_fit_inline = false;
-> 
-> Can we do the easier to read:
-> 
-> 	keys_fit_inline = false;
-> 	if (DESC_AEAD_NULL_ENC_LEN + DESC_JOB_IO_LEN +
-> 	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
-> 		keys_fit_inline = true;
-> 
-> ?
+> Of course, patches for Net::SMTP are welcome.
 
-Why pre-init a variable with default value when it could be overwritten?
-I think that the form I submitted is equally easy to read.
-
-> 
-> Thanks.
-> 
-> Kim
+I reported the bug and someone who actually knows Perl is working on it=
+=2E
