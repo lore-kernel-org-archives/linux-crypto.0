@@ -1,10 +1,10 @@
 From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH resend 04/15] arm64: add support for kernel mode NEON in
- interrupt context
-Date: Tue, 6 May 2014 17:49:19 +0100
-Message-ID: <20140506164918.GK23957@arm.com>
+Subject: Re: [PATCH resend 03/15] arm64: defer reloading a task's FPSIMD
+ state to userland resume
+Date: Tue, 6 May 2014 17:08:26 +0100
+Message-ID: <20140506160826.GI23957@arm.com>
 References: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org>
- <1398959381-8126-5-git-send-email-ard.biesheuvel@linaro.org>
+ <1398959381-8126-4-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -15,7 +15,8 @@ Cc: "steve.capper@linaro.org" <steve.capper@linaro.org>,
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <1398959381-8126-5-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <1398959381-8126-4-git-send-email-ard.biesheuvel@linaro.org>
+Content-Language: en-US
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -27,74 +28,40 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 01, 2014 at 04:49:36PM +0100, Ard Biesheuvel wrote:
-> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-> index 7a900142dbc8..05e1b24aca4c 100644
-> --- a/arch/arm64/include/asm/fpsimd.h
-> +++ b/arch/arm64/include/asm/fpsimd.h
-> @@ -41,6 +41,17 @@ struct fpsimd_state {
->  	unsigned int cpu;
->  };
->  
-> +/*
-> + * Struct for stacking the bottom 'n' FP/SIMD registers.
-> + */
-> +struct fpsimd_partial_state {
-> +	u32		num_regs;
-> +	u32		fpsr;
-> +	u32		fpcr;
-> +	__uint128_t	vregs[32] __aligned(16);
-> +} __aligned(16);
+On Thu, May 01, 2014 at 04:49:35PM +0100, Ard Biesheuvel wrote:
+> @@ -153,12 +252,11 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
+>  {
+>         switch (cmd) {
+>         case CPU_PM_ENTER:
+> -               if (current->mm)
+> +               if (current->mm && !test_thread_flag(TIF_FOREIGN_FPSTATE))
+>                         fpsimd_save_state(&current->thread.fpsimd_state);
+>                 break;
+>         case CPU_PM_EXIT:
+> -               if (current->mm)
+> -                       fpsimd_load_state(&current->thread.fpsimd_state);
+> +               set_thread_flag(TIF_FOREIGN_FPSTATE);
 
-Do we need this explicit alignment here?
+I think we could enter a PM state on a kernel thread (idle), so we
+should preserve the current->mm check as well.
 
-> diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
-> index bbec599c96bd..69e75134689d 100644
-> --- a/arch/arm64/include/asm/fpsimdmacros.h
-> +++ b/arch/arm64/include/asm/fpsimdmacros.h
-> @@ -62,3 +62,38 @@
->  	ldr	w\tmpnr, [\state, #16 * 2 + 4]
->  	msr	fpcr, x\tmpnr
->  .endm
+>                 break;
+>         case CPU_PM_ENTER_FAILED:
+>         default:
+> diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
+> index 06448a77ff53..882f01774365 100644
+> --- a/arch/arm64/kernel/signal.c
+> +++ b/arch/arm64/kernel/signal.c
+> @@ -413,4 +413,8 @@ asmlinkage void do_notify_resume(struct pt_regs *regs,
+>                 clear_thread_flag(TIF_NOTIFY_RESUME);
+>                 tracehook_notify_resume(regs);
+>         }
 > +
-> +.altmacro
-> +.macro fpsimd_save_partial state, numnr, tmpnr1, tmpnr2
-> +	mrs	x\tmpnr1, fpsr
-> +	str	w\numnr, [\state]
-> +	mrs	x\tmpnr2, fpcr
-> +	stp	w\tmpnr1, w\tmpnr2, [\state, #4]
-> +	adr	x\tmpnr1, 0f
-> +	add	\state, \state, x\numnr, lsl #4
-> +	sub	x\tmpnr1, x\tmpnr1, x\numnr, lsl #1
-> +	br	x\tmpnr1
-> +	.irp	qa, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0
-> +	.irp	qb, %(qa + 1)
-> +	stp	q\qa, q\qb, [\state, # -16 * \qa - 16]
-> +	.endr
-> +	.endr
-> +0:
-> +.endm
-> +
-> +.macro fpsimd_restore_partial state, tmpnr1, tmpnr2
-> +	ldp	w\tmpnr1, w\tmpnr2, [\state, #4]
-> +	msr	fpsr, x\tmpnr1
-> +	msr	fpcr, x\tmpnr2
-> +	adr	x\tmpnr1, 0f
-> +	ldr	w\tmpnr2, [\state]
-> +	add	\state, \state, x\tmpnr2, lsl #4
-> +	sub	x\tmpnr1, x\tmpnr1, x\tmpnr2, lsl #1
-> +	br	x\tmpnr1
-> +	.irp	qa, 30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0
-> +	.irp	qb, %(qa + 1)
-> +	ldp	q\qa, q\qb, [\state, # -16 * \qa - 16]
-> +	.endr
-> +	.endr
-> +0:
-> +.endm
+> +       if (thread_flags & _TIF_FOREIGN_FPSTATE)
+> +               fpsimd_restore_current_state();
 
-BTW, it may be better if num_regs is placed at the end of the structure,
-especially since you use stp to store both fpsr and fpcr (though I
-haven't rewritten the above to see how they look).
+I think this should be safe. Even if we get preempted here, ret_to_user
+would loop over TI_FLAGS with interrupts disabled until no work pending.
 
 -- 
 Catalin
