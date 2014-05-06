@@ -1,95 +1,88 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH resend 01/15] asm-generic: allow generic unaligned access
- if the arch supports it
-Date: Tue, 6 May 2014 16:34:23 +0200
-Message-ID: <CAKv+Gu_YAd=0gsB=XG0syR+aEJerunvr_SQKtMopMPr5WOQ66w@mail.gmail.com>
-References: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org>
-	<1398959381-8126-2-git-send-email-ard.biesheuvel@linaro.org>
-	<20140506143120.GD23957@arm.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] crypto: caam - Fix key inlining in AEAD shared
+ descriptors
+Date: Tue, 6 May 2014 15:11:14 -0500
+Message-ID: <20140506151114.e44a1af14c9d5b63ecbac603@freescale.com>
+References: <1398612374-1746-1-git-send-email-vakul@freescale.com>
+	<20140502191008.db1408c0735f14ed1a0bdb8b@freescale.com>
+	<72e203ad27a64b66b1b876e7b9978e5c@BL2PR03MB162.namprd03.prod.outlook.com>
+	<20140505133725.33abd0d08a1662a147c498f5@freescale.com>
+	<70e10fa687e249f08a102f148edd3231@BL2PR03MB162.namprd03.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Will Deacon <Will.Deacon@arm.com>,
-	"steve.capper@linaro.org" <steve.capper@linaro.org>,
-	Russell King - ARM Linux <linux@arm.linux.org.uk>
-To: Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"Geanta Neag Horia Ioan-B05471" <Horia.Geanta@freescale.com>,
+	Gupta Ruchika-R66431 <ruchika.gupta@freescale.com>,
+	Porosanu Alexandru-B06830 <alexandru.porosanu@freescale.com>
+To: Garg Vakul-B16394 <vakul@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f173.google.com ([209.85.217.173]:39921 "EHLO
-	mail-lb0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751087AbaEFOeZ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 May 2014 10:34:25 -0400
-Received: by mail-lb0-f173.google.com with SMTP id 10so1664805lbg.4
-        for <linux-crypto@vger.kernel.org>; Tue, 06 May 2014 07:34:24 -0700 (PDT)
-In-Reply-To: <20140506143120.GD23957@arm.com>
+Received: from mail-by2lp0238.outbound.protection.outlook.com ([207.46.163.238]:50059
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751207AbaEFUQU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 6 May 2014 16:16:20 -0400
+In-Reply-To: <70e10fa687e249f08a102f148edd3231@BL2PR03MB162.namprd03.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 6 May 2014 16:31, Catalin Marinas <catalin.marinas@arm.com> wrote:
-> On Thu, May 01, 2014 at 04:49:33PM +0100, Ard Biesheuvel wrote:
->> Switch the default unaligned access method to 'hardware implemented'
->> if HAVE_EFFICIENT_UNALIGNED_ACCESS is set.
->>
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> Acked-by: Arnd Bergmann <arnd@arndb.de>
->> ---
->>  include/asm-generic/unaligned.h | 21 +++++++++++++--------
->>  1 file changed, 13 insertions(+), 8 deletions(-)
->
-> I'm happy to take this patch via the arm64 tree. But arm is affected as
-> well, so it would be good to know if Russell has any objections (cc'ed).
->
-> Patch below for reference. Thanks.
->
+On Mon, 5 May 2014 22:39:09 -0500
+Garg Vakul-B16394 <vakul@freescale.com> wrote:
 
-Russell has already replied to that:
-http://marc.info/?l=linux-arm-kernel&m=139696976302889&w=2
+> Hi Kim
 
-Regards,
-Ard.
+Hi Vakul,
 
+> > From: Kim Phillips [mailto:kim.phillips@freescale.com]
+> > Sent: Tuesday, May 06, 2014 12:07 AM
+> > 
+> > On Sat, 3 May 2014 06:44:39 -0500
+> > Garg Vakul-B16394 <vakul@freescale.com> wrote:
+> > 
+> > > > From: Kim Phillips [mailto:kim.phillips@freescale.com]
+> > > > Sent: Saturday, May 03, 2014 5:40 AM
+> > > >
+> > > > On Sun, 27 Apr 2014 11:26:14 -0400
+> > > > Vakul Garg <vakul@freescale.com> wrote:
+> > > >
+> > > > > @@ -220,6 +220,8 @@ static int aead_null_set_sh_desc(struct
+> > > > > crypto_aead
+> > > > *aead)
+> > > > >  	if (DESC_AEAD_NULL_ENC_LEN + DESC_JOB_IO_LEN +
+> > > > >  	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
+> > > > >  		keys_fit_inline = true;
+> > > > > +	else
+> > > > > +		keys_fit_inline = false;
+> > > >
+> > > > Can we do the easier to read:
+> > > >
+> > > > 	keys_fit_inline = false;
+> > > > 	if (DESC_AEAD_NULL_ENC_LEN + DESC_JOB_IO_LEN +
+> > > > 	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
+> > > > 		keys_fit_inline = true;
+> > > >
+> > > > ?
+> > >
+> > > Why pre-init a variable with default value when it could be
+> > overwritten?
+> > 
+> > why not?  compiler output doesn't differ in this regard.
+> 
+> Agree that compiler output doesn't differ.
+> But why depend upon compiler's optimization capability while writing code when we can be explicit?
 
->> diff --git a/include/asm-generic/unaligned.h b/include/asm-generic/unaligned.h
->> index 03cf5936bad6..1ac097279db1 100644
->> --- a/include/asm-generic/unaligned.h
->> +++ b/include/asm-generic/unaligned.h
->> @@ -4,22 +4,27 @@
->>  /*
->>   * This is the most generic implementation of unaligned accesses
->>   * and should work almost anywhere.
->> - *
->> - * If an architecture can handle unaligned accesses in hardware,
->> - * it may want to use the linux/unaligned/access_ok.h implementation
->> - * instead.
->>   */
->>  #include <asm/byteorder.h>
->>
->> +/* Set by the arch if it can handle unaligned accesses in hardware. */
->> +#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
->> +# include <linux/unaligned/access_ok.h>
->> +#endif
->> +
->>  #if defined(__LITTLE_ENDIAN)
->> -# include <linux/unaligned/le_struct.h>
->> -# include <linux/unaligned/be_byteshift.h>
->> +# ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
->> +#  include <linux/unaligned/le_struct.h>
->> +#  include <linux/unaligned/be_byteshift.h>
->> +# endif
->>  # include <linux/unaligned/generic.h>
->>  # define get_unaligned       __get_unaligned_le
->>  # define put_unaligned       __put_unaligned_le
->>  #elif defined(__BIG_ENDIAN)
->> -# include <linux/unaligned/be_struct.h>
->> -# include <linux/unaligned/le_byteshift.h>
->> +# ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
->> +#  include <linux/unaligned/be_struct.h>
->> +#  include <linux/unaligned/le_byteshift.h>
->> +# endif
->>  # include <linux/unaligned/generic.h>
->>  # define get_unaligned       __get_unaligned_be
->>  # define put_unaligned       __put_unaligned_be
->> --
->> 1.8.3.2
+?  with optimizations turned off, the explicit 'else' *adds* an
+extra CoF..
+
+> > > I think that the form I submitted is equally easy to read.
+> > 
+> > adding one line instead of two -> less lines overall -> more code on one
+> > screen -> easier to read.
+> 
+> I think that this is a matter of personal coding choice.
+> Both the approaches are fine and compliant to kernel coding guidelines.
+
+I disagree, for the reasons already mentioned above.
+
+Kim
