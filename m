@@ -1,80 +1,86 @@
 From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH resend 02/15] arm64: add abstractions for FPSIMD state
- manipulation
-Date: Tue, 6 May 2014 16:12:55 +0100
-Message-ID: <20140506151255.GF23957@arm.com>
+Subject: Re: [PATCH resend 01/15] asm-generic: allow generic unaligned access
+ if the arch supports it
+Date: Tue, 6 May 2014 15:31:20 +0100
+Message-ID: <20140506143120.GD23957@arm.com>
 References: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org>
- <1398959381-8126-3-git-send-email-ard.biesheuvel@linaro.org>
- <20140506144340.GE23957@arm.com>
- <CAKv+Gu_3876kGtFOauLK4Uz=-74aSGq4a-m=9MmsVVzgsdYG3g@mail.gmail.com>
+ <1398959381-8126-2-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "steve.capper@linaro.org" <steve.capper@linaro.org>,
- Will Deacon <Will.Deacon@arm.com>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Will Deacon <Will.Deacon@arm.com>,
+	"steve.capper@linaro.org" <steve.capper@linaro.org>,
+	Russell King - ARM Linux <linux@arm.linux.org.uk>
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from fw-tnat.austin.arm.com ([217.140.110.23]:25636 "EHLO
+	collaborate-mta1.arm.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1754661AbaEFOb6 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 6 May 2014 10:31:58 -0400
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_3876kGtFOauLK4Uz=-74aSGq4a-m=9MmsVVzgsdYG3g@mail.gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1398959381-8126-2-git-send-email-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 06, 2014 at 03:48:08PM +0100, Ard Biesheuvel wrote:
-> On 6 May 2014 16:43, Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Thu, May 01, 2014 at 04:49:34PM +0100, Ard Biesheuvel wrote:
-> >> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> >> index 4aef42a04bdc..86ac6a9bc86a 100644
-> >> --- a/arch/arm64/kernel/fpsimd.c
-> >> +++ b/arch/arm64/kernel/fpsimd.c
-> >> @@ -87,6 +87,39 @@ void fpsimd_flush_thread(void)
-> >>       preempt_enable();
-> >>  }
-> >>
-> >> +/*
-> >> + * Save the userland FPSIMD state of 'current' to memory
-> >> + */
-> >> +void fpsimd_preserve_current_state(void)
-> >> +{
-> >> +     fpsimd_save_state(&current->thread.fpsimd_state);
-> >> +}
-> >> +
-> >> +/*
-> >> + * Load the userland FPSIMD state of 'current' from memory
-> >> + */
-> >> +void fpsimd_restore_current_state(void)
-> >> +{
-> >> +     fpsimd_load_state(&current->thread.fpsimd_state);
-> >> +}
-> >> +
-> >> +/*
-> >> + * Load an updated userland FPSIMD state for 'current' from memory
-> >> + */
-> >> +void fpsimd_update_current_state(struct fpsimd_state *state)
-> >> +{
-> >> +     preempt_disable();
-> >> +     fpsimd_load_state(state);
-> >> +     preempt_enable();
-> >> +}
-> >
-> > Minor - please update the comment above the functions to state that
-> > preemption needs to be disabled by the caller.
-> >
+On Thu, May 01, 2014 at 04:49:33PM +0100, Ard Biesheuvel wrote:
+> Switch the default unaligned access method to 'hardware implemented'
+> if HAVE_EFFICIENT_UNALIGNED_ACCESS is set.
 > 
-> Do you mean in all three cases? And, by implication, that the
-> preempt_disable()/enable() pair should be moved to the call site for
-> fpsimd_update_current_state() ?
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Acked-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  include/asm-generic/unaligned.h | 21 +++++++++++++--------
+>  1 file changed, 13 insertions(+), 8 deletions(-)
 
-No, just the comment for the first two functions updated.
+I'm happy to take this patch via the arm64 tree. But arm is affected as
+well, so it would be good to know if Russell has any objections (cc'ed).
 
--- 
+Patch below for reference. Thanks.
+
 Catalin
+
+> diff --git a/include/asm-generic/unaligned.h b/include/asm-generic/unaligned.h
+> index 03cf5936bad6..1ac097279db1 100644
+> --- a/include/asm-generic/unaligned.h
+> +++ b/include/asm-generic/unaligned.h
+> @@ -4,22 +4,27 @@
+>  /*
+>   * This is the most generic implementation of unaligned accesses
+>   * and should work almost anywhere.
+> - *
+> - * If an architecture can handle unaligned accesses in hardware,
+> - * it may want to use the linux/unaligned/access_ok.h implementation
+> - * instead.
+>   */
+>  #include <asm/byteorder.h>
+>  
+> +/* Set by the arch if it can handle unaligned accesses in hardware. */
+> +#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+> +# include <linux/unaligned/access_ok.h>
+> +#endif
+> +
+>  #if defined(__LITTLE_ENDIAN)
+> -# include <linux/unaligned/le_struct.h>
+> -# include <linux/unaligned/be_byteshift.h>
+> +# ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+> +#  include <linux/unaligned/le_struct.h>
+> +#  include <linux/unaligned/be_byteshift.h>
+> +# endif
+>  # include <linux/unaligned/generic.h>
+>  # define get_unaligned	__get_unaligned_le
+>  # define put_unaligned	__put_unaligned_le
+>  #elif defined(__BIG_ENDIAN)
+> -# include <linux/unaligned/be_struct.h>
+> -# include <linux/unaligned/le_byteshift.h>
+> +# ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+> +#  include <linux/unaligned/be_struct.h>
+> +#  include <linux/unaligned/le_byteshift.h>
+> +# endif
+>  # include <linux/unaligned/generic.h>
+>  # define get_unaligned	__get_unaligned_be
+>  # define put_unaligned	__put_unaligned_be
+> -- 
+> 1.8.3.2
