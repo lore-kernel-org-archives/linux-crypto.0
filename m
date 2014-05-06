@@ -1,88 +1,66 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH] crypto: caam - Fix key inlining in AEAD shared
- descriptors
-Date: Tue, 6 May 2014 15:11:14 -0500
-Message-ID: <20140506151114.e44a1af14c9d5b63ecbac603@freescale.com>
-References: <1398612374-1746-1-git-send-email-vakul@freescale.com>
-	<20140502191008.db1408c0735f14ed1a0bdb8b@freescale.com>
-	<72e203ad27a64b66b1b876e7b9978e5c@BL2PR03MB162.namprd03.prod.outlook.com>
-	<20140505133725.33abd0d08a1662a147c498f5@freescale.com>
-	<70e10fa687e249f08a102f148edd3231@BL2PR03MB162.namprd03.prod.outlook.com>
+Subject: Re: [PATCH] crypto:caam - Modify width of few read only registers
+Date: Tue, 6 May 2014 15:32:05 -0500
+Message-ID: <20140506153205.1fae83075e1c15e5495b4a87@freescale.com>
+References: <1398765877-24779-1-git-send-email-ruchika.gupta@freescale.com>
+	<20140501154513.70af868ccc62066a2d5a8870@freescale.com>
+	<b1d6e178b6d44b749e4f41f9ff2a9152@BL2PR03MB466.namprd03.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"Geanta Neag Horia Ioan-B05471" <Horia.Geanta@freescale.com>,
-	Gupta Ruchika-R66431 <ruchika.gupta@freescale.com>,
-	Porosanu Alexandru-B06830 <alexandru.porosanu@freescale.com>
-To: Garg Vakul-B16394 <vakul@freescale.com>
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+To: Gupta Ruchika-R66431 <ruchika.gupta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2lp0238.outbound.protection.outlook.com ([207.46.163.238]:50059
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+Received: from dns-bn1lp0143.outbound.protection.outlook.com ([207.46.163.143]:52388
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751207AbaEFUQU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 May 2014 16:16:20 -0400
-In-Reply-To: <70e10fa687e249f08a102f148edd3231@BL2PR03MB162.namprd03.prod.outlook.com>
+	id S1754191AbaEFUxN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 6 May 2014 16:53:13 -0400
+In-Reply-To: <b1d6e178b6d44b749e4f41f9ff2a9152@BL2PR03MB466.namprd03.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 5 May 2014 22:39:09 -0500
-Garg Vakul-B16394 <vakul@freescale.com> wrote:
-
-> Hi Kim
-
-Hi Vakul,
+On Tue, 6 May 2014 05:11:23 -0500
+Gupta Ruchika-R66431 <ruchika.gupta@freescale.com> wrote:
 
 > > From: Kim Phillips [mailto:kim.phillips@freescale.com]
-> > Sent: Tuesday, May 06, 2014 12:07 AM
+> > Sent: Friday, May 02, 2014 2:15 AM
 > > 
-> > On Sat, 3 May 2014 06:44:39 -0500
-> > Garg Vakul-B16394 <vakul@freescale.com> wrote:
+> > On Tue, 29 Apr 2014 15:34:37 +0530
+> > Ruchika Gupta <ruchika.gupta@freescale.com> wrote:
 > > 
-> > > > From: Kim Phillips [mailto:kim.phillips@freescale.com]
-> > > > Sent: Saturday, May 03, 2014 5:40 AM
-> > > >
-> > > > On Sun, 27 Apr 2014 11:26:14 -0400
-> > > > Vakul Garg <vakul@freescale.com> wrote:
-> > > >
-> > > > > @@ -220,6 +220,8 @@ static int aead_null_set_sh_desc(struct
-> > > > > crypto_aead
-> > > > *aead)
-> > > > >  	if (DESC_AEAD_NULL_ENC_LEN + DESC_JOB_IO_LEN +
-> > > > >  	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
-> > > > >  		keys_fit_inline = true;
-> > > > > +	else
-> > > > > +		keys_fit_inline = false;
-> > > >
-> > > > Can we do the easier to read:
-> > > >
-> > > > 	keys_fit_inline = false;
-> > > > 	if (DESC_AEAD_NULL_ENC_LEN + DESC_JOB_IO_LEN +
-> > > > 	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
-> > > > 		keys_fit_inline = true;
-> > > >
-> > > > ?
-> > >
-> > > Why pre-init a variable with default value when it could be
-> > overwritten?
+> > > Few read only registers like CHAVID, CTPR etc were wrongly defined as
+> > > 64 bit registers. This functioned properly on the powerpc platforms.
+> > > However ARM SoC's wouldn't function correctly if these registers are
+> > > defined as 64 bit.
 > > 
-> > why not?  compiler output doesn't differ in this regard.
+> > why wouldn't they function correctly?
 > 
-> Agree that compiler output doesn't differ.
-> But why depend upon compiler's optimization capability while writing code when we can be explicit?
+> The SEC IP guide states these registers as 2 32 bit registers. So register definition in
 
-?  with optimizations turned off, the explicit 'else' *adds* an
-extra CoF..
+I'm looking at LS2100A's SEC reference manual, it clearly has the
+CHAVID defined as one, single 64-bit register.  What are you looking
+at?
 
-> > > I think that the form I submitted is equally easy to read.
-> > 
-> > adding one line instead of two -> less lines overall -> more code on one
-> > screen -> easier to read.
+> crypto code should also have them defined as 32 bit registers. Defining them as 64 bit in this case would be incorrect.
 > 
-> I think that this is a matter of personal coding choice.
-> Both the approaches are fine and compliant to kernel coding guidelines.
+> Endianness of the CAAM IP varies with core's endiannes. In ARM SoC's , CAAM block is also little endian.  So in case the 2 - 32 bit registers are treated as a 64 bit register, the result would be word swapped as compared to powerpc platforms. As a result, the reads won't return the right result.
+> 
+> For eg.
+> For the 2 32 bit registers CHAVID_MS(at address 0x0) and CHAVID_LS(address 0x4) , if core reads them as 64 bit word, 
+> 
+> In powerpc (big endian) platform -
+> CHAVID_MS would be available in most significant portion of the 64 bit word.
+> CHAVID_LS would be the in least significant portion.
+> This is as expected.
+> 
+> In ARM (little endian) platform, 64 bit read would result in -
+> CHAVID_MS in Least significant portion of the word and 
+> CHAVID_LS in the most significant location. 
+> This result is word swapped and  the value read wouldn't be correct.
 
-I disagree, for the reasons already mentioned above.
+hmm, have you looked at using the DWT "Double Word Transpose" bit in
+the MCFGR?
 
 Kim
