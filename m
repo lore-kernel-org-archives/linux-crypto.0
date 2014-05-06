@@ -1,57 +1,74 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH] crypto: x86/sha1: fix coverity CID 1195603
-Date: Tue, 6 May 2014 23:11:28 +0200
-Message-ID: <20140506211128.GA13218@amd.pavel.ucw.cz>
-References: <1398885474-21388-1-git-send-email-milos.vyletel@gmail.com>
- <20140506082846.GB20931@xo-6d-61-c0.localdomain>
- <CAAFXRd3UPRU7AgZCGbxo_YW_PGuO-FPvB4VC5zKb+LuqGxFxkQ@mail.gmail.com>
+From: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+Subject: Re: Fwd: [crypto:master 60/60]
+ arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25: sparse: cast to restricted
+ __be64
+Date: Tue, 6 May 2014 15:42:17 -0700
+Message-ID: <20140506224217.GC4185@kroah.com>
+References: <533aa1ae.qq4Hi3RBnPzgncue%fengguang.wu@intel.com>
+ <CAKv+Gu_unwqLWWn-VDegy=vF=rprC5qFhazo_sJFNm738MVgaQ@mail.gmail.com>
+ <20140401124824.GA13642@gondor.apana.org.au>
+ <CAKv+Gu9bg1AgDSb3H-tMGBq53_ySaTZAeYsQeDYKS6cTnaBGUA@mail.gmail.com>
+ <20140411160312.GB31676@kroah.com>
+ <CAKv+Gu-ZKVz7JKhW9iWuZeKiRnyS3Z4uakPn2_UMW_CpSBgXkw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"maintainer:X86 ARCHITECTURE..." <x86@kernel.org>,
-	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-	"open list:X86 ARCHITECTURE..." <linux-kernel@vger.kernel.org>,
-	linux-coverity@vger.kernel.org
-To: Milos Vyletel <milos.vyletel@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.linuxfoundation.org ([140.211.169.12]:43783 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754104AbaEGB0x (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 6 May 2014 21:26:53 -0400
 Content-Disposition: inline
-In-Reply-To: <CAAFXRd3UPRU7AgZCGbxo_YW_PGuO-FPvB4VC5zKb+LuqGxFxkQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <CAKv+Gu-ZKVz7JKhW9iWuZeKiRnyS3Z4uakPn2_UMW_CpSBgXkw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
-
-> Most likely yes but I wanted to keep sha1_ssse3_mod_init consistent
-> with sha256_ssse3_mod_init/sha512_ssse3_mod_init functions.
-
-
-> > > Reported-by: <scan-admin@coverity.com>
-> > > Signed-off-by: Milos Vyletel <milos.vyletel@gmail.com>
-> > > ---
-> > >  arch/x86/crypto/sha1_ssse3_glue.c | 22 ++++++++++++----------
-> > >  1 file changed, 12 insertions(+), 10 deletions(-)
-> > >
-> > > diff --git a/arch/x86/crypto/sha1_ssse3_glue.c
-> > b/arch/x86/crypto/sha1_ssse3_glue.c
-> > > index 74d16ef..5352196 100644
-> > > --- a/arch/x86/crypto/sha1_ssse3_glue.c
-> > > +++ b/arch/x86/crypto/sha1_ssse3_glue.c
-> > > @@ -235,31 +235,33 @@ static bool __init avx2_usable(void)
-> > >
-> > >  static int __init sha1_ssse3_mod_init(void)
-> > >  {
-> > > -     char *algo_name;
-> > > -
+On Fri, Apr 11, 2014 at 09:48:42PM +0200, Ard Biesheuvel wrote:
+> On 11 April 2014 18:03, gregkh@linuxfoundation.org
+> <gregkh@linuxfoundation.org> wrote:
+> > On Fri, Apr 04, 2014 at 10:11:19AM +0200, Ard Biesheuvel wrote:
+> >> Greg,
+> >>
+> >> This pertains to commit 8ceee72808d1 (crypto: ghash-clmulni-intel -
+> >> use C implementation for setkey()) that has been pulled by Linus
+> >> during the current merge window.
+> >>
+> >> It is missing two things:
+> >> - a cc to stable annotation
+> >> - a fix for the sparse warning below (change cast from __be64 to __force __be64)
+> >>
+> >> The reason for cc'ing stable on this patch is that it fixes a
+> >> potential data corruption issue where the ghash setkey() method uses
+> >> SSE registers without calling kernel_fpu_begin() first. This issue was
+> >> introduced by 0e1227d356e9b (crypto: ghash - Add PCLMULQDQ accelerated
+> >> implementation).
+> >>
+> >> So how would you like to proceed with this? Should I propose a new
+> >> patch somewhere?
 > >
-> > Would simple "algo_name = NULL" be enough to fix this?
+> > No problem, I'll apply this as-is.  But it doesn't apply to the
+> > 3.4-stable tree cleanly, can you send me a backported version if it's
+> > still needed there as well?
+> >
+> 
+> Yes, the code was broken from the start. 3.4 version is attached, the
+> only difference is the missing ENDPROC() at the end of the asm file.
 
-Dunno. I'd say that single-line change that is obviously right is
-preferable to rewrite inspired by some other function.
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Now applied, thanks.
+
+> In the mean time, Herbert has submitted a fix for the sparse warning,
+> but we settled on a different fix than I had suggested before.
+> https://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=0ea481466d1c
+> 
+> Note that this code has not been tested (not by me, at least), so I
+> wouldn't suggest you take it straight away, but if you care about the
+> sparse warning, we could add a cc stable to it as well, I suppose.
+
+If it's a real bugfix that people can hit, then yse, I'll take it.  Just
+let me know when it hits Linus's tree.
+
+greg k-h
