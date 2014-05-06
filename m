@@ -1,66 +1,57 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH] crypto:caam - Modify width of few read only registers
-Date: Tue, 6 May 2014 15:32:05 -0500
-Message-ID: <20140506153205.1fae83075e1c15e5495b4a87@freescale.com>
-References: <1398765877-24779-1-git-send-email-ruchika.gupta@freescale.com>
-	<20140501154513.70af868ccc62066a2d5a8870@freescale.com>
-	<b1d6e178b6d44b749e4f41f9ff2a9152@BL2PR03MB466.namprd03.prod.outlook.com>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH] crypto: x86/sha1: fix coverity CID 1195603
+Date: Tue, 6 May 2014 23:11:28 +0200
+Message-ID: <20140506211128.GA13218@amd.pavel.ucw.cz>
+References: <1398885474-21388-1-git-send-email-milos.vyletel@gmail.com>
+ <20140506082846.GB20931@xo-6d-61-c0.localdomain>
+ <CAAFXRd3UPRU7AgZCGbxo_YW_PGuO-FPvB4VC5zKb+LuqGxFxkQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-To: Gupta Ruchika-R66431 <ruchika.gupta@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from dns-bn1lp0143.outbound.protection.outlook.com ([207.46.163.143]:52388
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754191AbaEFUxN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 May 2014 16:53:13 -0400
-In-Reply-To: <b1d6e178b6d44b749e4f41f9ff2a9152@BL2PR03MB466.namprd03.prod.outlook.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"maintainer:X86 ARCHITECTURE..." <x86@kernel.org>,
+	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+	"open list:X86 ARCHITECTURE..." <linux-kernel@vger.kernel.org>,
+	linux-coverity@vger.kernel.org
+To: Milos Vyletel <milos.vyletel@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAAFXRd3UPRU7AgZCGbxo_YW_PGuO-FPvB4VC5zKb+LuqGxFxkQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 6 May 2014 05:11:23 -0500
-Gupta Ruchika-R66431 <ruchika.gupta@freescale.com> wrote:
+Hi!
 
-> > From: Kim Phillips [mailto:kim.phillips@freescale.com]
-> > Sent: Friday, May 02, 2014 2:15 AM
-> > 
-> > On Tue, 29 Apr 2014 15:34:37 +0530
-> > Ruchika Gupta <ruchika.gupta@freescale.com> wrote:
-> > 
-> > > Few read only registers like CHAVID, CTPR etc were wrongly defined as
-> > > 64 bit registers. This functioned properly on the powerpc platforms.
-> > > However ARM SoC's wouldn't function correctly if these registers are
-> > > defined as 64 bit.
-> > 
-> > why wouldn't they function correctly?
-> 
-> The SEC IP guide states these registers as 2 32 bit registers. So register definition in
+> Most likely yes but I wanted to keep sha1_ssse3_mod_init consistent
+> with sha256_ssse3_mod_init/sha512_ssse3_mod_init functions.
 
-I'm looking at LS2100A's SEC reference manual, it clearly has the
-CHAVID defined as one, single 64-bit register.  What are you looking
-at?
 
-> crypto code should also have them defined as 32 bit registers. Defining them as 64 bit in this case would be incorrect.
-> 
-> Endianness of the CAAM IP varies with core's endiannes. In ARM SoC's , CAAM block is also little endian.  So in case the 2 - 32 bit registers are treated as a 64 bit register, the result would be word swapped as compared to powerpc platforms. As a result, the reads won't return the right result.
-> 
-> For eg.
-> For the 2 32 bit registers CHAVID_MS(at address 0x0) and CHAVID_LS(address 0x4) , if core reads them as 64 bit word, 
-> 
-> In powerpc (big endian) platform -
-> CHAVID_MS would be available in most significant portion of the 64 bit word.
-> CHAVID_LS would be the in least significant portion.
-> This is as expected.
-> 
-> In ARM (little endian) platform, 64 bit read would result in -
-> CHAVID_MS in Least significant portion of the word and 
-> CHAVID_LS in the most significant location. 
-> This result is word swapped and  the value read wouldn't be correct.
+> > > Reported-by: <scan-admin@coverity.com>
+> > > Signed-off-by: Milos Vyletel <milos.vyletel@gmail.com>
+> > > ---
+> > >  arch/x86/crypto/sha1_ssse3_glue.c | 22 ++++++++++++----------
+> > >  1 file changed, 12 insertions(+), 10 deletions(-)
+> > >
+> > > diff --git a/arch/x86/crypto/sha1_ssse3_glue.c
+> > b/arch/x86/crypto/sha1_ssse3_glue.c
+> > > index 74d16ef..5352196 100644
+> > > --- a/arch/x86/crypto/sha1_ssse3_glue.c
+> > > +++ b/arch/x86/crypto/sha1_ssse3_glue.c
+> > > @@ -235,31 +235,33 @@ static bool __init avx2_usable(void)
+> > >
+> > >  static int __init sha1_ssse3_mod_init(void)
+> > >  {
+> > > -     char *algo_name;
+> > > -
+> >
+> > Would simple "algo_name = NULL" be enough to fix this?
 
-hmm, have you looked at using the DWT "Double Word Transpose" bit in
-the MCFGR?
-
-Kim
+Dunno. I'd say that single-line change that is obviously right is
+preferable to rewrite inspired by some other function.
+									Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
