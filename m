@@ -1,75 +1,84 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH resend 03/15] arm64: defer reloading a task's FPSIMD state
- to userland resume
-Date: Tue, 6 May 2014 18:25:14 +0200
-Message-ID: <CAKv+Gu9ogEHb6rOT6KgPMDXjTwR5Krz0s7pkiaW_7vtZipu2Hw@mail.gmail.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH resend 02/15] arm64: add abstractions for FPSIMD state
+ manipulation
+Date: Tue, 6 May 2014 16:42:44 +0100
+Message-ID: <20140506154244.GH23957@arm.com>
 References: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org>
-	<1398959381-8126-4-git-send-email-ard.biesheuvel@linaro.org>
-	<20140506160826.GI23957@arm.com>
+ <1398959381-8126-3-git-send-email-ard.biesheuvel@linaro.org>
+ <20140506144340.GE23957@arm.com>
+ <CAKv+Gu_3876kGtFOauLK4Uz=-74aSGq4a-m=9MmsVVzgsdYG3g@mail.gmail.com>
+ <20140506151255.GF23957@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Cc: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
 	Will Deacon <Will.Deacon@arm.com>,
 	"steve.capper@linaro.org" <steve.capper@linaro.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f179.google.com ([209.85.217.179]:63879 "EHLO
-	mail-lb0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750969AbaEFQZR (ORCPT
+Received: from fw-tnat.austin.arm.com ([217.140.110.23]:30211 "EHLO
+	collaborate-mta1.arm.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752018AbaEFPna (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 May 2014 12:25:17 -0400
-Received: by mail-lb0-f179.google.com with SMTP id c11so5160147lbj.10
-        for <linux-crypto@vger.kernel.org>; Tue, 06 May 2014 09:25:15 -0700 (PDT)
-In-Reply-To: <20140506160826.GI23957@arm.com>
+	Tue, 6 May 2014 11:43:30 -0400
+Content-Disposition: inline
+In-Reply-To: <20140506151255.GF23957@arm.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 6 May 2014 18:08, Catalin Marinas <catalin.marinas@arm.com> wrote:
-> On Thu, May 01, 2014 at 04:49:35PM +0100, Ard Biesheuvel wrote:
->> @@ -153,12 +252,11 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
->>  {
->>         switch (cmd) {
->>         case CPU_PM_ENTER:
->> -               if (current->mm)
->> +               if (current->mm && !test_thread_flag(TIF_FOREIGN_FPSTATE))
->>                         fpsimd_save_state(&current->thread.fpsimd_state);
->>                 break;
->>         case CPU_PM_EXIT:
->> -               if (current->mm)
->> -                       fpsimd_load_state(&current->thread.fpsimd_state);
->> +               set_thread_flag(TIF_FOREIGN_FPSTATE);
->
-> I think we could enter a PM state on a kernel thread (idle), so we
-> should preserve the current->mm check as well.
->
+On Tue, May 06, 2014 at 04:12:55PM +0100, Catalin Marinas wrote:
+> On Tue, May 06, 2014 at 03:48:08PM +0100, Ard Biesheuvel wrote:
+> > On 6 May 2014 16:43, Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > > On Thu, May 01, 2014 at 04:49:34PM +0100, Ard Biesheuvel wrote:
+> > >> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> > >> index 4aef42a04bdc..86ac6a9bc86a 100644
+> > >> --- a/arch/arm64/kernel/fpsimd.c
+> > >> +++ b/arch/arm64/kernel/fpsimd.c
+> > >> @@ -87,6 +87,39 @@ void fpsimd_flush_thread(void)
+> > >>       preempt_enable();
+> > >>  }
+> > >>
+> > >> +/*
+> > >> + * Save the userland FPSIMD state of 'current' to memory
+> > >> + */
+> > >> +void fpsimd_preserve_current_state(void)
+> > >> +{
+> > >> +     fpsimd_save_state(&current->thread.fpsimd_state);
+> > >> +}
+> > >> +
+> > >> +/*
+> > >> + * Load the userland FPSIMD state of 'current' from memory
+> > >> + */
+> > >> +void fpsimd_restore_current_state(void)
+> > >> +{
+> > >> +     fpsimd_load_state(&current->thread.fpsimd_state);
+> > >> +}
+> > >> +
+> > >> +/*
+> > >> + * Load an updated userland FPSIMD state for 'current' from memory
+> > >> + */
+> > >> +void fpsimd_update_current_state(struct fpsimd_state *state)
+> > >> +{
+> > >> +     preempt_disable();
+> > >> +     fpsimd_load_state(state);
+> > >> +     preempt_enable();
+> > >> +}
+> > >
+> > > Minor - please update the comment above the functions to state that
+> > > preemption needs to be disabled by the caller.
+> > >
+> > 
+> > Do you mean in all three cases? And, by implication, that the
+> > preempt_disable()/enable() pair should be moved to the call site for
+> > fpsimd_update_current_state() ?
+> 
+> No, just the comment for the first two functions updated.
 
-OK
-
->>                 break;
->>         case CPU_PM_ENTER_FAILED:
->>         default:
->> diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
->> index 06448a77ff53..882f01774365 100644
->> --- a/arch/arm64/kernel/signal.c
->> +++ b/arch/arm64/kernel/signal.c
->> @@ -413,4 +413,8 @@ asmlinkage void do_notify_resume(struct pt_regs *regs,
->>                 clear_thread_flag(TIF_NOTIFY_RESUME);
->>                 tracehook_notify_resume(regs);
->>         }
->> +
->> +       if (thread_flags & _TIF_FOREIGN_FPSTATE)
->> +               fpsimd_restore_current_state();
->
-> I think this should be safe. Even if we get preempted here, ret_to_user
-> would loop over TI_FLAGS with interrupts disabled until no work pending.
->
-
-I don't follow. Do you think I should change something here?
-
-Anyway, inside fpsimd_restore_current_state() the TIF_FOREIGN_FPSTATE
-is checked again, but this time with preemption disabled.
+I noticed in a subsequent patch that you add preempt_disable/enable
+already in the first two functions. You could do it here as well to
+avoid confusion (and no need to update the comment).
 
 -- 
-Ard.
+Catalin
