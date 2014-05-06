@@ -1,80 +1,75 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH resend 02/15] arm64: add abstractions for FPSIMD state
- manipulation
-Date: Tue, 6 May 2014 15:43:40 +0100
-Message-ID: <20140506144340.GE23957@arm.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH resend 03/15] arm64: defer reloading a task's FPSIMD state
+ to userland resume
+Date: Tue, 6 May 2014 18:25:14 +0200
+Message-ID: <CAKv+Gu9ogEHb6rOT6KgPMDXjTwR5Krz0s7pkiaW_7vtZipu2Hw@mail.gmail.com>
 References: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org>
- <1398959381-8126-3-git-send-email-ard.biesheuvel@linaro.org>
+	<1398959381-8126-4-git-send-email-ard.biesheuvel@linaro.org>
+	<20140506160826.GI23957@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: "steve.capper@linaro.org" <steve.capper@linaro.org>,
- Will Deacon <Will.Deacon@arm.com>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <1398959381-8126-3-git-send-email-ard.biesheuvel@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Will Deacon <Will.Deacon@arm.com>,
+	"steve.capper@linaro.org" <steve.capper@linaro.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-lb0-f179.google.com ([209.85.217.179]:63879 "EHLO
+	mail-lb0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750969AbaEFQZR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 6 May 2014 12:25:17 -0400
+Received: by mail-lb0-f179.google.com with SMTP id c11so5160147lbj.10
+        for <linux-crypto@vger.kernel.org>; Tue, 06 May 2014 09:25:15 -0700 (PDT)
+In-Reply-To: <20140506160826.GI23957@arm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 01, 2014 at 04:49:34PM +0100, Ard Biesheuvel wrote:
-> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> index 4aef42a04bdc..86ac6a9bc86a 100644
-> --- a/arch/arm64/kernel/fpsimd.c
-> +++ b/arch/arm64/kernel/fpsimd.c
-> @@ -87,6 +87,39 @@ void fpsimd_flush_thread(void)
->  	preempt_enable();
->  }
->  
-> +/*
-> + * Save the userland FPSIMD state of 'current' to memory
-> + */
-> +void fpsimd_preserve_current_state(void)
-> +{
-> +	fpsimd_save_state(&current->thread.fpsimd_state);
-> +}
-> +
-> +/*
-> + * Load the userland FPSIMD state of 'current' from memory
-> + */
-> +void fpsimd_restore_current_state(void)
-> +{
-> +	fpsimd_load_state(&current->thread.fpsimd_state);
-> +}
-> +
-> +/*
-> + * Load an updated userland FPSIMD state for 'current' from memory
-> + */
-> +void fpsimd_update_current_state(struct fpsimd_state *state)
-> +{
-> +	preempt_disable();
-> +	fpsimd_load_state(state);
-> +	preempt_enable();
-> +}
+On 6 May 2014 18:08, Catalin Marinas <catalin.marinas@arm.com> wrote:
+> On Thu, May 01, 2014 at 04:49:35PM +0100, Ard Biesheuvel wrote:
+>> @@ -153,12 +252,11 @@ static int fpsimd_cpu_pm_notifier(struct notifier_block *self,
+>>  {
+>>         switch (cmd) {
+>>         case CPU_PM_ENTER:
+>> -               if (current->mm)
+>> +               if (current->mm && !test_thread_flag(TIF_FOREIGN_FPSTATE))
+>>                         fpsimd_save_state(&current->thread.fpsimd_state);
+>>                 break;
+>>         case CPU_PM_EXIT:
+>> -               if (current->mm)
+>> -                       fpsimd_load_state(&current->thread.fpsimd_state);
+>> +               set_thread_flag(TIF_FOREIGN_FPSTATE);
+>
+> I think we could enter a PM state on a kernel thread (idle), so we
+> should preserve the current->mm check as well.
+>
 
-Minor - please update the comment above the functions to state that
-preemption needs to be disabled by the caller.
+OK
 
-> +/*
-> + * Invalidate live CPU copies of task t's FPSIMD state
-> + */
-> +void fpsimd_flush_task_state(struct task_struct *t)
-> +{
-> +}
+>>                 break;
+>>         case CPU_PM_ENTER_FAILED:
+>>         default:
+>> diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
+>> index 06448a77ff53..882f01774365 100644
+>> --- a/arch/arm64/kernel/signal.c
+>> +++ b/arch/arm64/kernel/signal.c
+>> @@ -413,4 +413,8 @@ asmlinkage void do_notify_resume(struct pt_regs *regs,
+>>                 clear_thread_flag(TIF_NOTIFY_RESUME);
+>>                 tracehook_notify_resume(regs);
+>>         }
+>> +
+>> +       if (thread_flags & _TIF_FOREIGN_FPSTATE)
+>> +               fpsimd_restore_current_state();
+>
+> I think this should be safe. Even if we get preempted here, ret_to_user
+> would loop over TI_FLAGS with interrupts disabled until no work pending.
+>
 
-I guess this will be added in a subsequent patch. You could either move
-it there or add a comment in the commit log that it is a dummy function
-for now (I prefer the former).
+I don't follow. Do you think I should change something here?
+
+Anyway, inside fpsimd_restore_current_state() the TIF_FOREIGN_FPSTATE
+is checked again, but this time with preemption disabled.
 
 -- 
-Catalin
+Ard.
