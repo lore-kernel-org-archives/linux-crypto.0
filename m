@@ -1,84 +1,59 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: Fwd: [crypto:master 60/60] arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25:
- sparse: cast to restricted __be64
-Date: Wed, 7 May 2014 08:49:59 +0200
-Message-ID: <CAKv+Gu_LwiU-WvXeJjOSPJh53g+nKz9x-ZtUP3E02d8UEEyshw@mail.gmail.com>
-References: <533aa1ae.qq4Hi3RBnPzgncue%fengguang.wu@intel.com>
-	<CAKv+Gu_unwqLWWn-VDegy=vF=rprC5qFhazo_sJFNm738MVgaQ@mail.gmail.com>
-	<20140401124824.GA13642@gondor.apana.org.au>
-	<CAKv+Gu9bg1AgDSb3H-tMGBq53_ySaTZAeYsQeDYKS6cTnaBGUA@mail.gmail.com>
-	<20140411160312.GB31676@kroah.com>
-	<CAKv+Gu-ZKVz7JKhW9iWuZeKiRnyS3Z4uakPn2_UMW_CpSBgXkw@mail.gmail.com>
-	<20140506224217.GC4185@kroah.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH resend 00/15] arm64 crypto roundup
+Date: Wed, 7 May 2014 15:45:54 +0100
+Message-ID: <20140507144554.GC17253@arm.com>
+References: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+	Will Deacon <Will.Deacon@arm.com>,
+	"steve.capper@linaro.org" <steve.capper@linaro.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f175.google.com ([209.85.217.175]:62320 "EHLO
-	mail-lb0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751753AbaEGGuB (ORCPT
+Received: from fw-tnat.austin.arm.com ([217.140.110.23]:46661 "EHLO
+	collaborate-mta1.arm.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1753784AbaEGOqb (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 May 2014 02:50:01 -0400
-Received: by mail-lb0-f175.google.com with SMTP id l4so695390lbv.20
-        for <linux-crypto@vger.kernel.org>; Tue, 06 May 2014 23:49:59 -0700 (PDT)
-In-Reply-To: <20140506224217.GC4185@kroah.com>
+	Wed, 7 May 2014 10:46:31 -0400
+Content-Disposition: inline
+In-Reply-To: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 7 May 2014 00:42, gregkh@linuxfoundation.org
-<gregkh@linuxfoundation.org> wrote:
-> On Fri, Apr 11, 2014 at 09:48:42PM +0200, Ard Biesheuvel wrote:
->> On 11 April 2014 18:03, gregkh@linuxfoundation.org
->> <gregkh@linuxfoundation.org> wrote:
->> > On Fri, Apr 04, 2014 at 10:11:19AM +0200, Ard Biesheuvel wrote:
->> >> Greg,
->> >>
->> >> This pertains to commit 8ceee72808d1 (crypto: ghash-clmulni-intel -
->> >> use C implementation for setkey()) that has been pulled by Linus
->> >> during the current merge window.
->> >>
->> >> It is missing two things:
->> >> - a cc to stable annotation
->> >> - a fix for the sparse warning below (change cast from __be64 to __force __be64)
->> >>
->> >> The reason for cc'ing stable on this patch is that it fixes a
->> >> potential data corruption issue where the ghash setkey() method uses
->> >> SSE registers without calling kernel_fpu_begin() first. This issue was
->> >> introduced by 0e1227d356e9b (crypto: ghash - Add PCLMULQDQ accelerated
->> >> implementation).
->> >>
->> >> So how would you like to proceed with this? Should I propose a new
->> >> patch somewhere?
->> >
->> > No problem, I'll apply this as-is.  But it doesn't apply to the
->> > 3.4-stable tree cleanly, can you send me a backported version if it's
->> > still needed there as well?
->> >
->>
->> Yes, the code was broken from the start. 3.4 version is attached, the
->> only difference is the missing ENDPROC() at the end of the asm file.
->
-> Now applied, thanks.
->
->> In the mean time, Herbert has submitted a fix for the sparse warning,
->> but we settled on a different fix than I had suggested before.
->> https://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=0ea481466d1c
->>
->> Note that this code has not been tested (not by me, at least), so I
->> wouldn't suggest you take it straight away, but if you care about the
->> sparse warning, we could add a cc stable to it as well, I suppose.
->
-> If it's a real bugfix that people can hit, then yse, I'll take it.  Just
-> let me know when it hits Linus's tree.
->
+On Thu, May 01, 2014 at 04:49:32PM +0100, Ard Biesheuvel wrote:
+> This is a repost of the arm64 crypto patches that I have posted to the LAKML
+> over the past months. They have now been verified on actual hardware
+> (Cortex-A57) so if there are no remaining issues I would like to propose them
+> for 3.16.
+> 
+> Ard Biesheuvel (15):
+>   asm-generic: allow generic unaligned access if the arch supports it
+>   arm64: add abstractions for FPSIMD state manipulation
+>   arm64: defer reloading a task's FPSIMD state to userland resume
+>   arm64: add support for kernel mode NEON in interrupt context
+>   arm64/crypto: SHA-1 using ARMv8 Crypto Extensions
+>   arm64/crypto: SHA-224/SHA-256 using ARMv8 Crypto Extensions
+>   arm64/crypto: GHASH secure hash using ARMv8 Crypto Extensions
+>   arm64/crypto: AES using ARMv8 Crypto Extensions
+>   arm64/crypto: AES in CCM mode using ARMv8 Crypto Extensions
+>   arm64: pull in <asm/simd.h> from asm-generic
+>   arm64/crypto: AES-ECB/CBC/CTR/XTS using ARMv8 NEON and Crypto
+>     Extensions
+>   arm64/crypto: add shared macro to test for NEED_RESCHED
+>   arm64/crypto: add voluntary preemption to Crypto Extensions SHA1
+>   arm64/crypto: add voluntary preemption to Crypto Extensions SHA2
+>   arm64/crypto: add voluntary preemption to Crypto Extensions GHASH
 
-Hardly. The only thing it fixes is a diagnostic related to the use of
-be128 where u128 is more appropriate,  only this time, it changes the
-type throughout the file rather than using a __force cast when
-accessing the variable, as I did in my original fix.
+There are about 5 patches that make sense to me ;) and apart from a few
+minor comments they look fine.
+
+There are the other 10 crypto patches that are beyond my knowledge. Do
+you know anyone who could do a sanity check on them? Are there any tests
+that would show the correctness of the implementation?
+
+Thanks.
 
 -- 
-Ard.
+Catalin
