@@ -1,34 +1,84 @@
-From: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
-Subject: ahash vs. shash
-Date: Wed, 7 May 2014 09:35:52 +0300
-Message-ID: <CACE9dm-6kTZ91Ha8sMS=Zviqg-Dx6tzeTRVJtsGHKxwwP+TRzQ@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: Fwd: [crypto:master 60/60] arch/x86/crypto/ghash-clmulni-intel_glue.c:71:25:
+ sparse: cast to restricted __be64
+Date: Wed, 7 May 2014 08:49:59 +0200
+Message-ID: <CAKv+Gu_LwiU-WvXeJjOSPJh53g+nKz9x-ZtUP3E02d8UEEyshw@mail.gmail.com>
+References: <533aa1ae.qq4Hi3RBnPzgncue%fengguang.wu@intel.com>
+	<CAKv+Gu_unwqLWWn-VDegy=vF=rprC5qFhazo_sJFNm738MVgaQ@mail.gmail.com>
+	<20140401124824.GA13642@gondor.apana.org.au>
+	<CAKv+Gu9bg1AgDSb3H-tMGBq53_ySaTZAeYsQeDYKS6cTnaBGUA@mail.gmail.com>
+	<20140411160312.GB31676@kroah.com>
+	<CAKv+Gu-ZKVz7JKhW9iWuZeKiRnyS3Z4uakPn2_UMW_CpSBgXkw@mail.gmail.com>
+	<20140506224217.GC4185@kroah.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-To: linux-crypto <linux-crypto@vger.kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:51299 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750912AbaEGGfy (ORCPT
+Received: from mail-lb0-f175.google.com ([209.85.217.175]:62320 "EHLO
+	mail-lb0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751753AbaEGGuB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 May 2014 02:35:54 -0400
-Received: by mail-wi0-f175.google.com with SMTP id f8so4731036wiw.8
-        for <linux-crypto@vger.kernel.org>; Tue, 06 May 2014 23:35:53 -0700 (PDT)
+	Wed, 7 May 2014 02:50:01 -0400
+Received: by mail-lb0-f175.google.com with SMTP id l4so695390lbv.20
+        for <linux-crypto@vger.kernel.org>; Tue, 06 May 2014 23:49:59 -0700 (PDT)
+In-Reply-To: <20140506224217.GC4185@kroah.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On 7 May 2014 00:42, gregkh@linuxfoundation.org
+<gregkh@linuxfoundation.org> wrote:
+> On Fri, Apr 11, 2014 at 09:48:42PM +0200, Ard Biesheuvel wrote:
+>> On 11 April 2014 18:03, gregkh@linuxfoundation.org
+>> <gregkh@linuxfoundation.org> wrote:
+>> > On Fri, Apr 04, 2014 at 10:11:19AM +0200, Ard Biesheuvel wrote:
+>> >> Greg,
+>> >>
+>> >> This pertains to commit 8ceee72808d1 (crypto: ghash-clmulni-intel -
+>> >> use C implementation for setkey()) that has been pulled by Linus
+>> >> during the current merge window.
+>> >>
+>> >> It is missing two things:
+>> >> - a cc to stable annotation
+>> >> - a fix for the sparse warning below (change cast from __be64 to __force __be64)
+>> >>
+>> >> The reason for cc'ing stable on this patch is that it fixes a
+>> >> potential data corruption issue where the ghash setkey() method uses
+>> >> SSE registers without calling kernel_fpu_begin() first. This issue was
+>> >> introduced by 0e1227d356e9b (crypto: ghash - Add PCLMULQDQ accelerated
+>> >> implementation).
+>> >>
+>> >> So how would you like to proceed with this? Should I propose a new
+>> >> patch somewhere?
+>> >
+>> > No problem, I'll apply this as-is.  But it doesn't apply to the
+>> > 3.4-stable tree cleanly, can you send me a backported version if it's
+>> > still needed there as well?
+>> >
+>>
+>> Yes, the code was broken from the start. 3.4 version is attached, the
+>> only difference is the missing ENDPROC() at the end of the asm file.
+>
+> Now applied, thanks.
+>
+>> In the mean time, Herbert has submitted a fix for the sparse warning,
+>> but we settled on a different fix than I had suggested before.
+>> https://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=0ea481466d1c
+>>
+>> Note that this code has not been tested (not by me, at least), so I
+>> wouldn't suggest you take it straight away, but if you care about the
+>> sparse warning, we could add a cc stable to it as well, I suppose.
+>
+> If it's a real bugfix that people can hit, then yse, I'll take it.  Just
+> let me know when it hits Linus's tree.
+>
 
-ahash allows to use HW acceleration, but usually it comes at a cost of
-additional HW related configuration overhead, such as configuring hash
-module, DMA, etc. For that reason hashing small chucks of data is
-faster doing it with shash (CPU) rather than HW acceleration.
+Hardly. The only thing it fixes is a diagnostic related to the use of
+be128 where u128 is more appropriate,  only this time, it changes the
+type throughout the file rather than using a __force cast when
+accessing the variable, as I did in my original fix.
 
-I measured long time ago on omap-sham driver but cannot recall any data.
-
-Does anyone have any experience under what data size it is still
-better to use shash?
-
-
-Thanks,
-
-Dmitry
+-- 
+Ard.
