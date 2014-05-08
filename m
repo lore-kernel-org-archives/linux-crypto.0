@@ -1,79 +1,57 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH resend 00/15] arm64 crypto roundup
-Date: Thu, 8 May 2014 22:50:25 +0100
-Message-ID: <760C2409-2C8F-45B7-8EC0-220545D0B51B@arm.com>
-References: <1398959381-8126-1-git-send-email-ard.biesheuvel@linaro.org> <20140507144554.GC17253@arm.com> <CAKv+Gu-sLaDJxFcvXwD93qdzyTuPCNL0DXbRp2BKb8U=8Q8c2A@mail.gmail.com>
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Will Deacon <Will.Deacon@arm.com>,
-	"steve.capper@linaro.org" <steve.capper@linaro.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:65261 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755414AbaEHVu2 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 May 2014 17:50:28 -0400
-Received: by mail-wi0-f180.google.com with SMTP id hi2so407229wib.7
-        for <linux-crypto@vger.kernel.org>; Thu, 08 May 2014 14:50:26 -0700 (PDT)
-In-Reply-To: <CAKv+Gu-sLaDJxFcvXwD93qdzyTuPCNL0DXbRp2BKb8U=8Q8c2A@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Stanimir Vabanov <svarbanov@mm-sol.com>
+Subject: Re: [RFC PATCH v2 1/9] crypto: qce: Add core driver implementation
+Date: Fri, 09 May 2014 00:57:39 +0300
+Message-ID: <536BFDD3.9090609@mm-sol.com>
+References: <1397479725-20954-1-git-send-email-svarbanov@mm-sol.com> <1397479725-20954-2-git-send-email-svarbanov@mm-sol.com> <20140428085928.GA16310@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	linux-arm-msm@vger.kernel.org,
+	Mona Hossain <mhossain@codeaurora.org>,
+	Hariprasad Dhalinarasimha <hnamgund@codeaurora.org>,
+	Zhen Kong <zkong@codeaurora.org>,
+	Niranjana Vishwanathapura <nvishwan@codeaurora.org>,
+	Rohit Vaswani <rvaswani@codeaurora.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-arm-msm-owner@vger.kernel.org>
+In-Reply-To: <20140428085928.GA16310@gondor.apana.org.au>
+Sender: linux-arm-msm-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 8 May 2014, at 12:22, Ard Biesheuvel <ard.biesheuvel@linaro.org> wro=
-te:
-> On 7 May 2014 16:45, Catalin Marinas <catalin.marinas@arm.com> wrote:
->> On Thu, May 01, 2014 at 04:49:32PM +0100, Ard Biesheuvel wrote:
->>> This is a repost of the arm64 crypto patches that I have posted to =
-the LAKML
->>> over the past months. They have now been verified on actual hardwar=
-e
->>> (Cortex-A57) so if there are no remaining issues I would like to pr=
-opose them
->>> for 3.16.
->>>=20
->>> Ard Biesheuvel (15):
->>>  asm-generic: allow generic unaligned access if the arch supports i=
-t
->>>  arm64: add abstractions for FPSIMD state manipulation
->>>  arm64: defer reloading a task's FPSIMD state to userland resume
->>>  arm64: add support for kernel mode NEON in interrupt context
->>>  arm64/crypto: SHA-1 using ARMv8 Crypto Extensions
->>>  arm64/crypto: SHA-224/SHA-256 using ARMv8 Crypto Extensions
->>>  arm64/crypto: GHASH secure hash using ARMv8 Crypto Extensions
->>>  arm64/crypto: AES using ARMv8 Crypto Extensions
->>>  arm64/crypto: AES in CCM mode using ARMv8 Crypto Extensions
->>>  arm64: pull in <asm/simd.h> from asm-generic
->>>  arm64/crypto: AES-ECB/CBC/CTR/XTS using ARMv8 NEON and Crypto
->>>    Extensions
->>>  arm64/crypto: add shared macro to test for NEED_RESCHED
->>>  arm64/crypto: add voluntary preemption to Crypto Extensions SHA1
->>>  arm64/crypto: add voluntary preemption to Crypto Extensions SHA2
->>>  arm64/crypto: add voluntary preemption to Crypto Extensions GHASH
->>=20
->> There are about 5 patches that make sense to me ;) and apart from a =
-few
->> minor comments they look fine.
->>=20
->> There are the other 10 crypto patches that are beyond my knowledge. =
-Do
->> you know anyone who could do a sanity check on them? Are there any t=
-ests
->> that would show the correctness of the implementation?
->=20
-> I will re-send the 3 FPSIMD patches separately with your review
-> comments addressed.
+Hi Herbert,
 
-Thanks. If you get another acked/reviewed-by tag on the rest of the
-patches it=92s even better (I plan to get the series in for 3.16, after
-we do some tests internally as well).
+On 04/28/2014 11:59 AM, Herbert Xu wrote:
+> On Mon, Apr 14, 2014 at 03:48:37PM +0300, Stanimir Varbanov wrote:
+>>
+>> +#define QCE_MAJOR_VERSION5	0x05
+>> +#define QCE_QUEUE_LENGTH	50
+> 
+> What is the purpose of this software queue? Why can't you directly
+> feed the requests to the hardware?
+> 
+> If the hardware can't handle more than 50 requests in-flight,
+> then your software queue has failed to handle this since you're
+> taking requests off the queue before you touch the hardware so
+> you're not really limiting it to 50.  That is, for users that
+> can wait you're potentially dropping their requests instead
+> of letting them wait through the backlog mechanism.
 
-Catalin--
-To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
- in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+My assumption was that crypto_ablkcipher_encrypt/decrypt couldn't sleep
+and I should take the request almost immediately and return the
+appropriate error value - EINPROGRESS if the hardware is idle and EBUSY
+if the hardware working on some previous request. Thus if the returned
+error is EBUSY and the request could be backlogged I should call
+backlog->complete() when this request is taken actually for processing.
+
+What I've done in practice is another story.
+
+Is that assumption correct? If so, is crypto_enqueue|dequeue_request()
+are the proper tools to implement this behaviour?
+
+regards,
+Stan
