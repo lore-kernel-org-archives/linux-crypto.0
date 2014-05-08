@@ -1,53 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: x86/sha1: fix coverity CID 1195603
-Date: Thu, 8 May 2014 21:30:25 +0800
-Message-ID: <20140508133025.GB12700@gondor.apana.org.au>
-References: <1398885474-21388-1-git-send-email-milos.vyletel@gmail.com>
+Subject: Re: [PATCH] crypto: caam - Fix key inlining in AEAD shared
+ descriptors
+Date: Thu, 8 May 2014 21:52:55 +0800
+Message-ID: <20140508135255.GA13355@gondor.apana.org.au>
+References: <1398612374-1746-1-git-send-email-vakul@freescale.com>
+ <20140502191008.db1408c0735f14ed1a0bdb8b@freescale.com>
+ <72e203ad27a64b66b1b876e7b9978e5c@BL2PR03MB162.namprd03.prod.outlook.com>
+ <20140505133725.33abd0d08a1662a147c498f5@freescale.com>
+ <70e10fa687e249f08a102f148edd3231@BL2PR03MB162.namprd03.prod.outlook.com>
+ <20140506151114.e44a1af14c9d5b63ecbac603@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"maintainer:X86 ARCHITECTURE..." <x86@kernel.org>,
-	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-	"open list:X86 ARCHITECTURE..." <linux-kernel@vger.kernel.org>,
-	linux-coverity@vger.kernel.org
-To: Milos Vyletel <milos.vyletel@gmail.com>
+Cc: Garg Vakul-B16394 <vakul@freescale.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Geanta Neag Horia Ioan-B05471 <Horia.Geanta@freescale.com>,
+	Gupta Ruchika-R66431 <ruchika.gupta@freescale.com>,
+	Porosanu Alexandru-B06830 <alexandru.porosanu@freescale.com>
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:60498 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:47539 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752940AbaEHNat (ORCPT
+	with ESMTP id S1753697AbaEHNw7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 May 2014 09:30:49 -0400
+	Thu, 8 May 2014 09:52:59 -0400
 Content-Disposition: inline
-In-Reply-To: <1398885474-21388-1-git-send-email-milos.vyletel@gmail.com>
+In-Reply-To: <20140506151114.e44a1af14c9d5b63ecbac603@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 30, 2014 at 03:17:54PM -0400, Milos Vyletel wrote:
-> Coverity detected possible use of uninitialized pointer when printing info
-> message during module load. While this is higly unlikely to cause any troubles
-> simple change in sha1_ssse3_mod_init to make it look like sha256/512 init
-> function will fix this.
+On Tue, May 06, 2014 at 03:11:14PM -0500, Kim Phillips wrote:
+>
+> > > > I think that the form I submitted is equally easy to read.
+> > > 
+> > > adding one line instead of two -> less lines overall -> more code on one
+> > > screen -> easier to read.
+> > 
+> > I think that this is a matter of personal coding choice.
+> > Both the approaches are fine and compliant to kernel coding guidelines.
 > 
-> 260
->    	6. Condition sha1_transform_asm, taking true branch
-> 261        if (sha1_transform_asm) {
-> 
-> CID 1195603 (#1 of 1): Uninitialized pointer read (UNINIT)
-> 7. uninit_use_in_call: Using uninitialized value algo_name when calling printk.
-> 262                pr_info("Using %s optimized SHA-1 implementation\n", algo_name);
-> 263                return crypto_register_shash(&alg);
-> 264        }
-> 
-> Reported-by: <scan-admin@coverity.com>
-> Signed-off-by: Milos Vyletel <milos.vyletel@gmail.com>
+> I disagree, for the reasons already mentioned above.
 
-Unless I'm missing something there is no way this code can use
-the variable without initialising it.
-
-So this is a false positive and I'm not applying this.
+I like Kim's version better.  Kim, could you respin a patch in
+the way you described?
 
 Thanks,
 -- 
