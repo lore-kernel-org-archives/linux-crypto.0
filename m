@@ -1,35 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 00/11] crypto: caam: Error reporting fixes
-Date: Thu, 8 May 2014 22:01:06 +0800
-Message-ID: <20140508140106.GA13769@gondor.apana.org.au>
-References: <1398362722-16430-1-git-send-email-marex@denx.de>
+Subject: Re: [PATCH 0/7 v8] crypto:s5p-sss: Add Device tree and Exynos support
+Date: Thu, 8 May 2014 22:01:34 +0800
+Message-ID: <20140508140134.GC13769@gondor.apana.org.au>
+References: <1398681899-20782-1-git-send-email-ch.naveen@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Horia Geanta <horia.geanta@freescale.com>
-To: Marek Vasut <marex@denx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:60133 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752434AbaEHOBK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 8 May 2014 10:01:10 -0400
+Cc: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vzapolskiy@gmail.com,
+	naveenkrishna.ch@gmail.com, cpgs@samsung.com, t.figa@samsung.com,
+	davem@davemloft.net
+To: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1398362722-16430-1-git-send-email-marex@denx.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1398681899-20782-1-git-send-email-ch.naveen@samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Apr 24, 2014 at 08:05:11PM +0200, Marek Vasut wrote:
-> First stab at reworking the error.c thing in Freescale CAAM.
-> This patchset cleans it up so it's not doing any too insane
-> string messing anymore.
+On Mon, Apr 28, 2014 at 10:44:52AM +0000, Naveen Krishna Chatradhi wrote:
+> SSS module on Exynos4210, Exynos5250 and Exynos5420 SoCs has added
+> features to the one on S5PV210. However with minor changes the s5p-sss.c
+> driver can be reused to support SSS modules on Exynos4 and 5 SoCs.
 > 
-> NOTE: Can someone please test this on real hardware? I have
->       none at hand, so THIS IS COMPILE-TESTED ONLY!
+> This patch set
+> 1. Adds device tree support to the s5p-sss.c driver and Documentation
+> 2. Adds code to support SSS module on Exynos4 and 5 SoCs
+> 3. Adds variant struct to handle the differences in SSS modules
+> 4. Adds clk_prepare/clk_unprepare clocks to the s5p-sss.c driver
 > 
-> Marek Vasut (11):
+> Note: Compatible "exynos4210-secss" should work for Exynos4412 and
+>       Exynos5260 (Exynos5260, for which ARCH code is under review)
+> I couldn't test on Exynos4412 and Exynos4210 boards, Should be able to
+> test with addition of DT node and clocks support.
+> 
+> These patches are under review at
+> https://lkml.org/lkml/2014/2/17/124
+> 
+> Naveen Krishna Chatradhi (7):
 
-All applied.  Thanks Marek.
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
