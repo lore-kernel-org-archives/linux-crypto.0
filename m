@@ -1,75 +1,60 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: Re: mxs-dcp: BUG: init/1 still has locks held!
-Date: Sun, 11 May 2014 17:09:27 -0300
-Message-ID: <CAOMZO5Bh9E5Y53TVhHPE=Zo9K47xgwz-Axx9d55YFcRH+_fV8Q@mail.gmail.com>
+From: =?UTF-8?B?QWxleGFuZGVyIFNoaXlhbg==?= <shc_work@mail.ru>
+Subject: =?UTF-8?B?UmU6IG14cy1kY3A6IEJVRzogaW5pdC8xIHN0aWxsIGhhcyBsb2NrcyBoZWxk?=
+ =?UTF-8?B?IQ==?=
+Date: Mon, 12 May 2014 00:22:34 +0400
+Message-ID: <1399839754.36608614@f427.i.mail.ru>
 References: <CAOMZO5AdHCsCXW-WhRpkZJJcsmoQKvob_zhx-7fu8RSim5-dQA@mail.gmail.com>
-	<1399838888.578955384@f427.i.mail.ru>
+ <1399838888.578955384@f427.i.mail.ru>
+ <CAOMZO5Bh9E5Y53TVhHPE=Zo9K47xgwz-Axx9d55YFcRH+_fV8Q@mail.gmail.com>
+Reply-To: =?UTF-8?B?QWxleGFuZGVyIFNoaXlhbg==?= <shc_work@mail.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	=?UTF-8?B?TWFyZWsgVmHFoXV0?= <marex@denx.de>,
-	Shawn Guo <shawn.guo@freescale.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-To: Alexander Shiyan <shc_work@mail.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+Cc: =?UTF-8?B?TWFyZWsgVmHFoXV0?= <marex@denx.de>,
+	=?UTF-8?B?bGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3Jn?=
+	<linux-arm-kernel@lists.infradead.org>,
+	=?UTF-8?B?SGVyYmVydCBYdQ==?= <herbert@gondor.apana.org.au>,
+	=?UTF-8?B?U2hhd24gR3Vv?= <shawn.guo@freescale.com>,
+	linux-crypto@vger.kernel.org
+To: =?UTF-8?B?RmFiaW8gRXN0ZXZhbQ==?= <festevam@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ve0-f182.google.com ([209.85.128.182]:35295 "EHLO
-	mail-ve0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758398AbaEKUJ2 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 11 May 2014 16:09:28 -0400
-Received: by mail-ve0-f182.google.com with SMTP id sa20so7700460veb.41
-        for <linux-crypto@vger.kernel.org>; Sun, 11 May 2014 13:09:27 -0700 (PDT)
-In-Reply-To: <1399838888.578955384@f427.i.mail.ru>
+Received: from f427.i.mail.ru ([185.5.136.98]:41375 "EHLO f427.i.mail.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757657AbaEKUWj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 11 May 2014 16:22:39 -0400
+In-Reply-To: <CAOMZO5Bh9E5Y53TVhHPE=Zo9K47xgwz-Axx9d55YFcRH+_fV8Q@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, May 11, 2014 at 5:08 PM, Alexander Shiyan <shc_work@mail.ru> wr=
-ote:
-> Sun, 11 May 2014 16:57:57 -0300 =D0=BE=D1=82 Fabio Estevam <festevam@=
-gmail.com>:
->> Hi,
->>
->> Running linux-next 20140509 on a mx28evk I observe the following war=
-ning:
->>
->> [    8.526613] Freeing unused kernel memory: 232K (c0683000 - c06bd0=
-00)
->> starting pid 56, tty '': '/etc/rc.d/rcS'
->> [    9.110314]
->> [    9.111864] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> [    9.116603] [ BUG: init/1 still has locks held! ]
->> [    9.121488] 3.15.0-rc4-next-20140509-00001-g319564e #1154 Not tai=
-nted
->> [    9.128071] -------------------------------------
->> [    9.132825] 1 lock held by init/1:
->> [    9.136252]  #0:  (global_mutex){+.+.+.}, at: [<c0387d68>] mxs_dc=
-p_probe+0x14
->> [    9.144196]
->> [    9.144196] stack backtrace:
->> [    9.148888] CPU: 0 PID: 1 Comm: init Not tainted 3.15.0-rc4-next-=
-20140509-004
->> [    9.157610] [<c000da40>] (unwind_backtrace) from [<c000bda4>] (sh=
-ow_stack+0x)
->> [    9.165595] [<c000bda4>] (show_stack) from [<c00153d4>] (do_fork+=
-0x2c8/0x3cc)
->> [    9.172921] [<c00153d4>] (do_fork) from [<c0015550>] (sys_vfork+0=
-x20/0x2c)
->> [    9.179973] [<c0015550>] (sys_vfork) from [<c0009580>] (ret_fast_=
-syscall+0x0)
->> Mounting /proc and /sys
->>
->> Should we really use a global mutex here? What is a proper fix for t=
-his?
->
-> On my opinion mutex_lock/unlock should not be used in probe.
-> Try to remove this entirely.
-
-I think the same. Will submit a patch doing as suggested.
-
-Regards,
-
-=46abio Estevam
+U3VuLCAxMSBNYXkgMjAxNCAxNzowOToyNyAtMDMwMCDQvtGCIEZhYmlvIEVzdGV2YW0gPGZlc3Rl
+dmFtQGdtYWlsLmNvbT46Cj4gT24gU3VuLCBNYXkgMTEsIDIwMTQgYXQgNTowOCBQTSwgQWxleGFu
+ZGVyIFNoaXlhbiA8c2hjX3dvcmtAbWFpbC5ydT4gd3JvdGU6Cj4gPiBTdW4sIDExIE1heSAyMDE0
+IDE2OjU3OjU3IC0wMzAwINC+0YIgRmFiaW8gRXN0ZXZhbSA8ZmVzdGV2YW1AZ21haWwuY29tPjoK
+PiA+PiBIaSwKPiA+Pgo+ID4+IFJ1bm5pbmcgbGludXgtbmV4dCAyMDE0MDUwOSBvbiBhIG14Mjhl
+dmsgSSBvYnNlcnZlIHRoZSBmb2xsb3dpbmcgd2FybmluZzoKPiA+Pgo+ID4+IFsgICAgOC41MjY2
+MTNdIEZyZWVpbmcgdW51c2VkIGtlcm5lbCBtZW1vcnk6IDIzMksgKGMwNjgzMDAwIC0gYzA2YmQw
+MDApCj4gPj4gc3RhcnRpbmcgcGlkIDU2LCB0dHkgJyc6ICcvZXRjL3JjLmQvcmNTJwo+ID4+IFsg
+ICAgOS4xMTAzMTRdCj4gPj4gWyAgICA5LjExMTg2NF0gPT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PQo+ID4+IFsgICAgOS4xMTY2MDNdIFsgQlVHOiBpbml0LzEgc3RpbGwgaGFz
+IGxvY2tzIGhlbGQhIF0KPiA+PiBbICAgIDkuMTIxNDg4XSAzLjE1LjAtcmM0LW5leHQtMjAxNDA1
+MDktMDAwMDEtZzMxOTU2NGUgIzExNTQgTm90IHRhaW50ZWQKPiA+PiBbICAgIDkuMTI4MDcxXSAt
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gPj4gWyAgICA5LjEzMjgyNV0g
+MSBsb2NrIGhlbGQgYnkgaW5pdC8xOgo+ID4+IFsgICAgOS4xMzYyNTJdICAjMDogIChnbG9iYWxf
+bXV0ZXgpeysuKy4rLn0sIGF0OiBbPGMwMzg3ZDY4Pl0gbXhzX2RjcF9wcm9iZSsweDE0Cj4gPj4g
+WyAgICA5LjE0NDE5Nl0KPiA+PiBbICAgIDkuMTQ0MTk2XSBzdGFjayBiYWNrdHJhY2U6Cj4gPj4g
+WyAgICA5LjE0ODg4OF0gQ1BVOiAwIFBJRDogMSBDb21tOiBpbml0IE5vdCB0YWludGVkIDMuMTUu
+MC1yYzQtbmV4dC0yMDE0MDUwOS0wMDQKPiA+PiBbICAgIDkuMTU3NjEwXSBbPGMwMDBkYTQwPl0g
+KHVud2luZF9iYWNrdHJhY2UpIGZyb20gWzxjMDAwYmRhND5dIChzaG93X3N0YWNrKzB4KQo+ID4+
+IFsgICAgOS4xNjU1OTVdIFs8YzAwMGJkYTQ+XSAoc2hvd19zdGFjaykgZnJvbSBbPGMwMDE1M2Q0
+Pl0gKGRvX2ZvcmsrMHgyYzgvMHgzY2MpCj4gPj4gWyAgICA5LjE3MjkyMV0gWzxjMDAxNTNkND5d
+IChkb19mb3JrKSBmcm9tIFs8YzAwMTU1NTA+XSAoc3lzX3Zmb3JrKzB4MjAvMHgyYykKPiA+PiBb
+ICAgIDkuMTc5OTczXSBbPGMwMDE1NTUwPl0gKHN5c192Zm9yaykgZnJvbSBbPGMwMDA5NTgwPl0g
+KHJldF9mYXN0X3N5c2NhbGwrMHgwKQo+ID4+IE1vdW50aW5nIC9wcm9jIGFuZCAvc3lzCj4gPj4K
+PiA+PiBTaG91bGQgd2UgcmVhbGx5IHVzZSBhIGdsb2JhbCBtdXRleCBoZXJlPyBXaGF0IGlzIGEg
+cHJvcGVyIGZpeCBmb3IgdGhpcz8KPiA+Cj4gPiBPbiBteSBvcGluaW9uIG11dGV4X2xvY2svdW5s
+b2NrIHNob3VsZCBub3QgYmUgdXNlZCBpbiBwcm9iZS4KPiA+IFRyeSB0byByZW1vdmUgdGhpcyBl
+bnRpcmVseS4KPiAKPiBJIHRoaW5rIHRoZSBzYW1lLiBXaWxsIHN1Ym1pdCBhIHBhdGNoIGRvaW5n
+IGFzIHN1Z2dlc3RlZC4KCkFGQUlLLCBwcm9iZS9yZW1vdmUgYXJlIHNlcmlhbGl6ZWQgYW5kIHJ1
+bm5pbmcgb25seSBvbiBvbmUgQ1BVL3RocmVhZCwKc28gYW55IG11dGV4ZXMvc3BpbmxvY2tzIHJl
+YWxseSBub3QgbmVlZGVkLgoKMk1MOiBQbGVhc2UsIEZJWE1FIGlmIEkgYW0gdGhpbmsgaW5jb3Jy
+ZWN0LgoKLS0tCgo=
