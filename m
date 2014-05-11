@@ -1,161 +1,56 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 0/2] Add in-kernel /dev/random equivalent
-Date: Mon, 12 May 2014 00:36:01 +0200
-Message-ID: <1937020.H2HvEFgXrB@myon.chronox.de>
+Subject: arch_random_refill
+Date: Mon, 12 May 2014 01:01:58 +0200
+Message-ID: <21542339.0lFnPSyGRS@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="nextPart1929063.BgsACCXYyd"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-To: Theodore Ts'o <tytso@mit.edu>, LKML <linux-kernel@vger.kernel.org>,
+Cc: Theodore Ts'o <tytso@mit.edu>, LKML <linux-kernel@vger.kernel.org>,
 	linux-crypto@vger.kernel.org
+To: "H. Peter Anvin" <hpa@linux.intel.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This is a multi-part message in MIME format.
+Hi Peter,
 
---nextPart1929063.BgsACCXYyd
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+some time back when the RDRAND instruction was debated, a patch was offered 
+for driver/char/random.c that in essence turned /dev/random into a frontend 
+for RDRAND in case that instruction was available. The patch kind of 
+monopolized the noise sources such that if a user space "random number hog" 
+pulled data from /dev/random endlessly, the (almost) only noise source was 
+RDRAND. As that patch treated RDRAND to provide entropy, the blocking behavior 
+went away for /dev/random.
 
-Hi,
+That patch did not sit well with some developers and it got finally changed 
+such that the output of RDRAND is now just XORed with the output of the 
+"classic" /dev/random behavior -- /dev/random is still blocking. 
 
-as discussed in thread [1], an in-kernel equivalent to the blocking 
-/dev/random device behavior is suggested. This in-kernel blocking access to 
-the RNG can be used to seed deterministic random number generators with random 
-numbers that are directly backed by the underlying noise sources.
+With the current development cycle for 3.15, the function arch_random_refill 
+is added as presented in [1]. It now uses RDSEED instead of RDRAND. Yet, the 
+way this function is called in random_read seems (as I have no system with an 
+RDSEED, I cannot test) to show the very same behavior as the aforementioned 
+RDRAND patch: the blocking behavior of /dev/random will be gone and RDSEED 
+will monopolize the noise sources in case of a user space hog.
 
-The following patch implements this concept by adding a third output pool, the 
-kernel_pool that is only accessible inside the kernel. That kernel_pool feeds 
-the blocking operation API calls to obtain random numbers.
+Note, I do not see an issue with the patch that adds RDSEED as part of 
+add_interrupt_randomness outlined in [2]. The reason is that this patch does 
+not monopolizes the noise sources.
 
-Please find a test kernel module attached. You can unload it even while the 
-collection process is ongoing.
+I do not want to imply that Intel (or any other chip manufacturer that will 
+hook into arch_random_refill) intentionally provides bad entropy (and this 
+email shall not start a discussion about entropy again), but I would like to 
+be able to only use noise sources that I can fully audit. As it is with 
+hardware, I am not able to see what it is doing.
 
-[1] https://lkml.org/lkml/2014/4/27/174
+Thus, may I ask that arch_random_refill is revised such that it will not 
+monopolize the noise sources? If somebody wants that, he can easily use rngd.
 
-Stephan Mueller (2):
-  Addition of kernel_pool
-  Asynchronous and syncronous API for accessing kernel_pool
+[1] https://lkml.org/lkml/2014/3/4/968
 
- drivers/char/random.c  | 163 
-+++++++++++++++++++++++++++++++++++++++++++++----
- include/linux/random.h |  16 +++++
- 2 files changed, 166 insertions(+), 13 deletions(-)
+[2] https://lkml.org/lkml/2014/3/4/934
 
+Thanks
+Stephan
 -- 
-1.9.0
---nextPart1929063.BgsACCXYyd
-Content-Disposition: attachment; filename="lrng-asym.c"
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/x-csrc; charset="UTF-8"; name="lrng-asym.c"
-
-/* Test module for verifying the correct operation of the
- * SP800-90A DRBG
- *
- * Use: compile, load into the kernel and observe dmesg
- *
- * Written by: Stephan Mueller <smueller@chronox.de>
- * Copyright (c) 2014
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- *                          NO WARRANTY
- *
- *  BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
- *  FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
- *  OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
- *  PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
- *  OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- *  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS
- *  TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE
- *  PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
- *  REPAIR OR CORRECTION.
- *
- *  IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
- *  WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
- *  REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
- *  INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
- *  OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED
- *  TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
- *  YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
- *  PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
- *  POSSIBILITY OF SUCH DAMAGES.
- */
-
-#include <linux/random.h>
-#include <linux/module.h>
-#include <linux/slab.h> /* needed for kzalloc */
-
-MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-MODULE_DESCRIPTION("Test module for verifying the correct operation of async LRNG operation");
-
-static struct random_work my_work;
-static struct random_work my_work1;
-static struct random_work my_work2;
-static struct random_work my_work3;
-static struct random_work my_work4;
-static struct random_work my_work5;
-static struct random_work my_work6;
-static struct random_work my_work7;
-static struct random_work my_work8;
-static struct random_work my_work9;
-#define LEN 1024
-static char buffer[LEN];
-
-void lrng_cb(void *buf, ssize_t buflen)
-{
-	printk("received %d bytes\n", (int)buflen);
-}
-
-static void cn(struct random_work *work)
-{
-	get_blocking_random_bytes_cancel(work);
-	cancel_work_sync(&work->rw_work);
-}
-
-static int __init lrng_init(void)
-{
-	get_blocking_random_bytes_cb(NULL, &my_work, buffer, LEN, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work1, buffer, LEN, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work2, buffer, LEN, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work3, buffer, LEN, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work4, buffer, LEN, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work5, buffer, LEN, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work6, buffer, LEN, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work7, buffer, LEN, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work8, buffer, LEN, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work9, buffer, LEN, lrng_cb);
-
-	/* cancel one work to see that work can be canceled independent from
-	 * others */
-	cn(&my_work);
-	return 0;
-}
-
-void __exit lrng_exit(void)
-{
-	cn(&my_work1);
-	cn(&my_work2);
-	cn(&my_work3);
-	cn(&my_work4);
-	cn(&my_work5);
-	cn(&my_work6);
-	cn(&my_work7);
-	cn(&my_work8);
-	cn(&my_work9);
-}
-
-module_init(lrng_init);
-module_exit(lrng_exit);
-
-
---nextPart1929063.BgsACCXYyd--
+| Cui bono? |
