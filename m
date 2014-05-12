@@ -1,73 +1,47 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: "H. Peter Anvin" <hpa@linux.intel.com>
 Subject: Re: arch_random_refill
-Date: Mon, 12 May 2014 05:36:48 +0200
-Message-ID: <3260147.sUis3H5ONm@myon.chronox.de>
-References: <21542339.0lFnPSyGRS@myon.chronox.de> <53703E74.9020700@linux.intel.com>
+Date: Sun, 11 May 2014 20:44:03 -0700
+Message-ID: <53704383.8060504@linux.intel.com>
+References: <21542339.0lFnPSyGRS@myon.chronox.de> <53703E74.9020700@linux.intel.com> <3260147.sUis3H5ONm@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Cc: Theodore Ts'o <tytso@mit.edu>, LKML <linux-kernel@vger.kernel.org>,
 	linux-crypto@vger.kernel.org
-To: "H. Peter Anvin" <hpa@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:46356 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752115AbaELDhI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 11 May 2014 23:37:08 -0400
-Received: from myon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <SD4> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Mon, 12 May 2014 05:36:50 +0200
-In-Reply-To: <53703E74.9020700@linux.intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <3260147.sUis3H5ONm@myon.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Sonntag, 11. Mai 2014, 20:22:28 schrieb H. Peter Anvin:
-
-Hi Peter,
+On 05/11/2014 08:36 PM, Stephan Mueller wrote:
 > 
-> > Note, I do not see an issue with the patch that adds RDSEED as part of
-> > add_interrupt_randomness outlined in [2]. The reason is that this patch
-> > does not monopolizes the noise sources.
-> > 
-> > I do not want to imply that Intel (or any other chip manufacturer that
-> > will
-> > hook into arch_random_refill) intentionally provides bad entropy (and this
-> > email shall not start a discussion about entropy again), but I would like
-> > to be able to only use noise sources that I can fully audit. As it is
-> > with hardware, I am not able to see what it is doing.
+> Ohh, ok, thanks for fixing that. :-) 
 > 
-> I have to point out the irony in this given your previous proposals,
-> however...
-
-I guess that is the funny nature of entropy :-)
-
-But in our current predicament, not everybody trusts a few potentially easily 
-manipulated gates that have no other purpose than produce white noise which 
-are developed by the biggest chip vendor in the US. Gates which have other 
-purposes may not be that easily manipulated.
+> Though what makes me wonder is the following: why are some RNGs forced to use 
+> the hw_random framework whereas some others are not? What is the driver for 
+> that?
 > 
-> > Thus, may I ask that arch_random_refill is revised such that it will not
-> > monopolize the noise sources? If somebody wants that, he can easily use
-> > rngd.
-> Feel free to build the kernel without CONFIG_ARCH_RANDOM, or use the
-> "nordrand" option to the kernel.  These options are there for a reason.
+> The current state of random.c vs. drivers/char/hw_random and the strong in-
+> kernel separation between both makes me wonder. Isn't that all kind of 
+> inconsistent?
 > 
-> Now when you mention it, though, the nordrand option should turn off
-> RDSEED as well as RDRAND.  It currently doesn't; that is a bug, plain
-> and simple.
 
-Ohh, ok, thanks for fixing that. :-) 
+The main differences are speed of access, trivial interface, and
+architectural guarantees.  You also don't have to deal with enumeration,
+DMA engines, interrupts, indirect access, or bus drivers, which all are
+utterly unacceptable on a synchronous path.
 
-Though what makes me wonder is the following: why are some RNGs forced to use 
-the hw_random framework whereas some others are not? What is the driver for 
-that?
+That being said, it is getting clear that we most likely would be better
+off with the kernel directly feeding from at least a subset of the
+hw_random drivers, rather than waiting for user space to come along and
+launch a daemon... after $DEITY knows how many other processes have
+already been launched.  There are patches being worked on to make that
+happen, although there are a fair number of potential issues, including
+the fact that some of the hw_random drivers are believed to be dodgy --
+for example, the TPM driver: some TPMs are believed to not contain any
+entropy element and simply rely on a factory-seeded nonvolatile counter
+(since the TPM has to have support for nonvolatile counters anyway, this
+hardware is already present.)
 
-The current state of random.c vs. drivers/char/hw_random and the strong in-
-kernel separation between both makes me wonder. Isn't that all kind of 
-inconsistent?
-
-Ciao
-Stephan
--- 
-| Cui bono? |
+	-hpa
