@@ -1,56 +1,69 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: arch_random_refill
-Date: Mon, 12 May 2014 01:01:58 +0200
-Message-ID: <21542339.0lFnPSyGRS@myon.chronox.de>
+From: Jingoo Han <jg1.han@samsung.com>
+Subject: Re: [PATCH] crypto: s5p-sss: fix multiplatform build
+Date: Mon, 12 May 2014 11:31:05 +0900
+Message-ID: <000701cf6d8a$399b0990$acd11cb0$%han@samsung.com>
+References: <4525493.CM3akEXMYf@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Theodore Ts'o <tytso@mit.edu>, LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: "H. Peter Anvin" <hpa@linux.intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+	"'David S. Miller'" <davem@davemloft.net>,
+	'Naveen Krishna Chatradhi' <ch.naveen@samsung.com>,
+	'Tomasz Figa' <t.figa@samsung.com>,
+	linux-samsung-soc@vger.kernel.org,
+	'Vladimir Zapolskiy' <vz@mleia.com>,
+	'Jingoo Han' <jg1.han@samsung.com>
+To: 'Arnd Bergmann' <arnd@arndb.de>,
+	'Herbert Xu' <herbert@gondor.apana.org.au>
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-reply-to: <4525493.CM3akEXMYf@wuerfel>
+Content-language: ko
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Peter,
+On Friday, May 09, 2014 8:36 PM, Arnd Bergmann wrote:
+> 
+> As we are preparing to enable multiplatform support on EXYNOS,
+> we can no longer include mach/*.h or plat/*.h headers from device
+> drivers.
+> 
+> The s5p-sss driver was just enabled for EXYNOS when it used to
+> be used only on s5pv210, and it includes two samsung platform
+> specific header files for historic reasons. Fortunately, it no
+> longer actually needs them, so we can remove the #includes and
+> avoid the problem
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Cc: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
+> Cc: Tomasz Figa <t.figa@samsung.com>
+> Cc: <linux-samsung-soc@vger.kernel.org>
+> Cc: Vladimir Zapolskiy <vz@mleia.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
 
-some time back when the RDRAND instruction was debated, a patch was offered 
-for driver/char/random.c that in essence turned /dev/random into a frontend 
-for RDRAND in case that instruction was available. The patch kind of 
-monopolized the noise sources such that if a user space "random number hog" 
-pulled data from /dev/random endlessly, the (almost) only noise source was 
-RDRAND. As that patch treated RDRAND to provide entropy, the blocking behavior 
-went away for /dev/random.
+I checked that these machine specific headers are
+unnecessary. Thanks!
 
-That patch did not sit well with some developers and it got finally changed 
-such that the output of RDRAND is now just XORed with the output of the 
-"classic" /dev/random behavior -- /dev/random is still blocking. 
+Reviewed-by: Jingoo Han <jg1.han@samsung.com>
 
-With the current development cycle for 3.15, the function arch_random_refill 
-is added as presented in [1]. It now uses RDSEED instead of RDRAND. Yet, the 
-way this function is called in random_read seems (as I have no system with an 
-RDSEED, I cannot test) to show the very same behavior as the aforementioned 
-RDRAND patch: the blocking behavior of /dev/random will be gone and RDSEED 
-will monopolize the noise sources in case of a user space hog.
+Best regards,
+Jingoo Han
 
-Note, I do not see an issue with the patch that adds RDSEED as part of 
-add_interrupt_randomness outlined in [2]. The reason is that this patch does 
-not monopolizes the noise sources.
-
-I do not want to imply that Intel (or any other chip manufacturer that will 
-hook into arch_random_refill) intentionally provides bad entropy (and this 
-email shall not start a discussion about entropy again), but I would like to 
-be able to only use noise sources that I can fully audit. As it is with 
-hardware, I am not able to see what it is doing.
-
-Thus, may I ask that arch_random_refill is revised such that it will not 
-monopolize the noise sources? If somebody wants that, he can easily use rngd.
-
-[1] https://lkml.org/lkml/2014/3/4/968
-
-[2] https://lkml.org/lkml/2014/3/4/934
-
-Thanks
-Stephan
--- 
-| Cui bono? |
+> ---
+> Please apply on top of the other s5p-sss patches
+> 
+> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+> index 47c568e..4197ad9 100644
+> --- a/drivers/crypto/s5p-sss.c
+> +++ b/drivers/crypto/s5p-sss.c
+> @@ -30,9 +30,6 @@
+>  #include <crypto/aes.h>
+>  #include <crypto/ctr.h>
+> 
+> -#include <plat/cpu.h>
+> -#include <mach/dma.h>
+> -
+>  #define _SBF(s, v)                      ((v) << (s))
+>  #define _BIT(b)                         _SBF(b, 1)
+> 
+> 
+> --
