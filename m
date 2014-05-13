@@ -1,53 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: s5p-sss: fix multiplatform build
-Date: Tue, 13 May 2014 19:45:10 +0800
-Message-ID: <20140513114510.GA22078@gondor.apana.org.au>
-References: <4525493.CM3akEXMYf@wuerfel>
- <000701cf6d8a$399b0990$acd11cb0$%han@samsung.com>
+Subject: Re: [PATCH] crypto: caam - reinitialize keys_fit_inline for decrypt
+ and givencrypt
+Date: Tue, 13 May 2014 19:45:31 +0800
+Message-ID: <20140513114531.GB22078@gondor.apana.org.au>
+References: <1398612374-1746-1-git-send-email-vakul@freescale.com>
+ <20140502191008.db1408c0735f14ed1a0bdb8b@freescale.com>
+ <72e203ad27a64b66b1b876e7b9978e5c@BL2PR03MB162.namprd03.prod.outlook.com>
+ <20140505133725.33abd0d08a1662a147c498f5@freescale.com>
+ <70e10fa687e249f08a102f148edd3231@BL2PR03MB162.namprd03.prod.outlook.com>
+ <20140506151114.e44a1af14c9d5b63ecbac603@freescale.com>
+ <20140508135255.GA13355@gondor.apana.org.au>
+ <20140509203440.6148a33a29c0e7003b7f152b@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: 'Arnd Bergmann' <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-	"'David S. Miller'" <davem@davemloft.net>,
-	'Naveen Krishna Chatradhi' <ch.naveen@samsung.com>,
-	'Tomasz Figa' <t.figa@samsung.com>,
-	linux-samsung-soc@vger.kernel.org,
-	'Vladimir Zapolskiy' <vz@mleia.com>
-To: Jingoo Han <jg1.han@samsung.com>
+Cc: Garg Vakul-B16394 <vakul@freescale.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Geanta Neag Horia Ioan-B05471 <Horia.Geanta@freescale.com>,
+	Gupta Ruchika-R66431 <ruchika.gupta@freescale.com>,
+	Porosanu Alexandru-B06830 <alexandru.porosanu@freescale.com>
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:42654 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:55283 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752985AbaEMLp0 (ORCPT
+	with ESMTP id S1759422AbaEMLpf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 May 2014 07:45:26 -0400
+	Tue, 13 May 2014 07:45:35 -0400
 Content-Disposition: inline
-In-Reply-To: <000701cf6d8a$399b0990$acd11cb0$%han@samsung.com>
+In-Reply-To: <20140509203440.6148a33a29c0e7003b7f152b@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 12, 2014 at 11:31:05AM +0900, Jingoo Han wrote:
-> On Friday, May 09, 2014 8:36 PM, Arnd Bergmann wrote:
-> > 
-> > As we are preparing to enable multiplatform support on EXYNOS,
-> > we can no longer include mach/*.h or plat/*.h headers from device
-> > drivers.
-> > 
-> > The s5p-sss driver was just enabled for EXYNOS when it used to
-> > be used only on s5pv210, and it includes two samsung platform
-> > specific header files for historic reasons. Fortunately, it no
-> > longer actually needs them, so we can remove the #includes and
-> > avoid the problem
-> > 
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> > Cc: Naveen Krishna Chatradhi <ch.naveen@samsung.com>
-> > Cc: Tomasz Figa <t.figa@samsung.com>
-> > Cc: <linux-samsung-soc@vger.kernel.org>
-> > Cc: Vladimir Zapolskiy <vz@mleia.com>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+On Fri, May 09, 2014 at 08:34:40PM -0500, Kim Phillips wrote:
+> From: Vakul Garg <vakul@freescale.com>
 > 
-> I checked that these machine specific headers are
-> unnecessary. Thanks!
+> Re-initialize keys_fit_inline to avoid using its stale encrypt() shared
+> descriptor value prior to building descriptors for the decrypt() and
+> givencrypt() cases.
 > 
-> Reviewed-by: Jingoo Han <jg1.han@samsung.com>
+> Signed-off-by: Vakul Garg <vakul@freescale.com>
+> [reworded commit text, enhanced code readability]
+> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
 
 Patch applied.  Thanks!
 -- 
