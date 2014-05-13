@@ -1,8 +1,7 @@
 From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: [PATCH 4/6] crypto: SHA1 multibuffer submit and flush routines for
- AVX2
-Date: Tue, 13 May 2014 16:19:53 -0700
-Message-ID: <1400023193.2970.241.camel@schen9-DESK>
+Subject: [PATCH 2/6] crypto: SHA1 multibuffer crypto hash infrastructure
+Date: Tue, 13 May 2014 16:19:45 -0700
+Message-ID: <1400023185.2970.239.camel@schen9-DESK>
 References: <cover.1399990803.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -18,664 +17,879 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S.Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:22241 "EHLO mga09.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:46747 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753088AbaEMXT5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 May 2014 19:19:57 -0400
+	id S1753088AbaEMXTz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 13 May 2014 19:19:55 -0400
 In-Reply-To: <cover.1399990803.git.tim.c.chen@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch introduces the routines used to submit and flush buffers
-belonging to SHA1 crypto jobs to the SHA1 multibuffer algorithm.  It is
-implemented mostly in assembly optimized with AVX2 instructions.
+This patch introduces the multi-buffer crypto daemon which is responsible
+for submitting crypto jobs in a work queue to the responsible multi-buffer
+crypto algorithm.  The idea of the multi-buffer algorihtm is to put
+data streams from multiple jobs in a wide (AVX2) register and then
+take advantage of SIMD instructions to do crypto computation on several
+buffers simultaneously.
+
+The multi-buffer crypto daemon is also responsbile for flushing the
+remaining buffers to complete the computation if no new buffers arrive
+for a while.
 
 Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
- arch/x86/crypto/sha-mb/sha1_mb_mgr_flush_avx2.S  | 327 +++++++++++++++++++++++
- arch/x86/crypto/sha-mb/sha1_mb_mgr_init_avx2.c   |  64 +++++
- arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S | 228 ++++++++++++++++
- 3 files changed, 619 insertions(+)
- create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_flush_avx2.S
- create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_init_avx2.c
- create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S
+ crypto/Kconfig                 |  30 +++
+ crypto/Makefile                |   1 +
+ crypto/mcryptd.c               | 576 +++++++++++++++++++++++++++++++++++++++++
+ crypto/shash.c                 |  48 ++++
+ include/crypto/internal/hash.h |   9 +
+ include/crypto/mcryptd.h       | 109 ++++++++
+ 6 files changed, 773 insertions(+)
+ create mode 100644 crypto/mcryptd.c
+ create mode 100644 include/crypto/mcryptd.h
 
-diff --git a/arch/x86/crypto/sha-mb/sha1_mb_mgr_flush_avx2.S b/arch/x86/crypto/sha-mb/sha1_mb_mgr_flush_avx2.S
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 7bcb70d..fe8396c 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -157,6 +157,20 @@ config CRYPTO_CRYPTD
+ 	  converts an arbitrary synchronous software crypto algorithm
+ 	  into an asynchronous algorithm that executes in a kernel thread.
+ 
++config CRYPTO_MCRYPTD
++	tristate "Software async multi-buffer crypto daemon"
++	select CRYPTO_BLKCIPHER
++	select CRYPTO_HASH
++	select CRYPTO_MANAGER
++	select CRYPTO_WORKQUEUE
++	help
++	  This is a generic software asynchronous crypto daemon that
++	  provides the kernel thread to assist multi-buffer crypto
++	  algorithms for submitting jobs and flushing jobs in multi-buffer
++	  crypto algorithms.  Multi-buffer crypto algorithms are executed
++	  in the context of this kernel thread and drivers can post
++	  their crypto request asyncrhously and process by this daemon.
++
+ config CRYPTO_AUTHENC
+ 	tristate "Authenc support"
+ 	select CRYPTO_AEAD
+@@ -547,6 +561,22 @@ config CRYPTO_SHA1_PPC
+ 	  This is the powerpc hardware accelerated implementation of the
+ 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2).
+ 
++config CRYPTO_SHA1_MB
++	tristate "SHA1 digest algorithm (x86_64 Multi-Buffer, Experimental)"
++	depends on X86 && 64BIT
++	select CRYPTO_SHA1
++	select CRYPTO_HASH
++	select CRYPTO_MCRYPTD
++	help
++	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
++	  using multi-buffer technique.  This algorithm computes on
++	  multiple data lanes concurrently with SIMD instructions for
++	  better throughput.  It should not be enabled by default but
++	  used when there is significant amount of work to keep the keep
++	  the data lanes filled to get performance benefit.  If the data
++	  lanes remain unfilled, a flush operation will be initiated to
++	  process the crypto jobs, adding a slight latency.
++
+ config CRYPTO_SHA256
+ 	tristate "SHA224 and SHA256 digest algorithm"
+ 	select CRYPTO_HASH
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 38e64231..27dbbad 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -60,6 +60,7 @@ obj-$(CONFIG_CRYPTO_GCM) += gcm.o
+ obj-$(CONFIG_CRYPTO_CCM) += ccm.o
+ obj-$(CONFIG_CRYPTO_PCRYPT) += pcrypt.o
+ obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
++obj-$(CONFIG_CRYPTO_MCRYPTD) += mcryptd.o
+ obj-$(CONFIG_CRYPTO_DES) += des_generic.o
+ obj-$(CONFIG_CRYPTO_FCRYPT) += fcrypt.o
+ obj-$(CONFIG_CRYPTO_BLOWFISH) += blowfish_generic.o
+diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
 new file mode 100644
-index 0000000..85c4e1c
+index 0000000..9bda577
 --- /dev/null
-+++ b/arch/x86/crypto/sha-mb/sha1_mb_mgr_flush_avx2.S
-@@ -0,0 +1,327 @@
++++ b/crypto/mcryptd.c
+@@ -0,0 +1,576 @@
 +/*
-+ * Flush routine for SHA1 multibuffer
++ * Software multibuffer async crypto daemon.
 + *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
++ * Copyright (c) 2014 Tim Chen <tim.c.chen@linux.intel.com>
 + *
-+ * GPL LICENSE SUMMARY
++ * Adapted from crypto daemon.
 + *
-+ *  Copyright(c) 2014 Intel Corporation.
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
 + *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of version 2 of the GNU General Public License as
-+ *  published by the Free Software Foundation.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but
-+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  General Public License for more details.
-+ *
-+ *  Contact Information:
-+ *      James Guilford <james.guilford@intel.com>
-+ *	Tim Chen <tim.c.chen@linux.intel.com>
-+ *
-+ *  BSD LICENSE
-+ *
-+ *  Copyright(c) 2014 Intel Corporation.
-+ *
-+ *  Redistribution and use in source and binary forms, with or without
-+ *  modification, are permitted provided that the following conditions
-+ *  are met:
-+ *
-+ *    * Redistributions of source code must retain the above copyright
-+ *      notice, this list of conditions and the following disclaimer.
-+ *    * Redistributions in binary form must reproduce the above copyright
-+ *      notice, this list of conditions and the following disclaimer in
-+ *      the documentation and/or other materials provided with the
-+ *      distribution.
-+ *    * Neither the name of Intel Corporation nor the names of its
-+ *      contributors may be used to endorse or promote products derived
-+ *      from this software without specific prior written permission.
-+ *
-+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ */
-+#include <linux/linkage.h>
-+#include "sha1_mb_mgr_datastruct.S"
-+
-+
-+.extern sha1_x8_avx2
-+
-+# LINUX register definitions
-+#define arg1    %rdi
-+#define arg2    %rsi
-+
-+# Common definitions
-+#define state   arg1
-+#define job     arg2
-+#define len2    arg2
-+
-+# idx must be a register not clobbered by sha1_x8_avx2
-+#define idx		%r8
-+#define DWORD_idx	%r8d
-+
-+#define unused_lanes    %rbx
-+#define lane_data       %rbx
-+#define tmp2            %rbx
-+#define tmp2_w		%ebx
-+
-+#define job_rax         %rax
-+#define tmp1            %rax
-+#define size_offset     %rax
-+#define tmp             %rax
-+#define start_offset    %rax
-+
-+#define tmp3            %arg1
-+
-+#define extra_blocks    %arg2
-+#define p               %arg2
-+
-+
-+# STACK_SPACE needs to be an odd multiple of 8
-+_XMM_SAVE_SIZE  = 10*16
-+_GPR_SAVE_SIZE  = 8*8
-+_ALIGN_SIZE     = 8
-+
-+_XMM_SAVE       = 0
-+_GPR_SAVE       = _XMM_SAVE + _XMM_SAVE_SIZE
-+STACK_SPACE     = _GPR_SAVE + _GPR_SAVE_SIZE + _ALIGN_SIZE
-+
-+.macro LABEL prefix n
-+\prefix\n\():
-+.endm
-+
-+.macro JNE_SKIP i
-+jne     skip_\i
-+.endm
-+
-+.altmacro
-+.macro SET_OFFSET _offset
-+offset = \_offset
-+.endm
-+.noaltmacro
-+
-+# JOB* sha1_mb_mgr_flush_avx2(MB_MGR *state)
-+# arg 1 : rcx : state
-+ENTRY(sha1_mb_mgr_flush_avx2)
-+	mov	%rsp, %r10
-+	sub     $STACK_SPACE, %rsp
-+	and     $~31, %rsp
-+	mov     %rbx, _GPR_SAVE(%rsp)
-+	mov     %r10, _GPR_SAVE+8*1(%rsp) #save rsp
-+	mov	%rbp, _GPR_SAVE+8*3(%rsp)
-+	mov	%r12, _GPR_SAVE+8*4(%rsp)
-+	mov	%r13, _GPR_SAVE+8*5(%rsp)
-+	mov	%r14, _GPR_SAVE+8*6(%rsp)
-+	mov	%r15, _GPR_SAVE+8*7(%rsp)
-+
-+	# If bit (32+3) is set, then all lanes are empty
-+	mov     _unused_lanes(state), unused_lanes
-+	bt      $32+3, unused_lanes
-+	jc      return_null
-+
-+	# find a lane with a non-null job
-+	xor     idx, idx
-+	offset = (_ldata + 1 * _LANE_DATA_size + _job_in_lane)
-+	cmpq    $0, offset(state)
-+	cmovne  one(%rip), idx
-+	offset = (_ldata + 2 * _LANE_DATA_size + _job_in_lane)
-+	cmpq    $0, offset(state)
-+	cmovne  two(%rip), idx
-+	offset = (_ldata + 3 * _LANE_DATA_size + _job_in_lane)
-+	cmpq    $0, offset(state)
-+	cmovne  three(%rip), idx
-+	offset = (_ldata + 4 * _LANE_DATA_size + _job_in_lane)
-+	cmpq    $0, offset(state)
-+	cmovne  four(%rip), idx
-+	offset = (_ldata + 5 * _LANE_DATA_size + _job_in_lane)
-+	cmpq    $0, offset(state)
-+	cmovne  five(%rip), idx
-+	offset = (_ldata + 6 * _LANE_DATA_size + _job_in_lane)
-+	cmpq    $0, offset(state)
-+	cmovne  six(%rip), idx
-+	offset = (_ldata + 7 * _LANE_DATA_size + _job_in_lane)
-+	cmpq    $0, offset(state)
-+	cmovne  seven(%rip), idx
-+
-+	# copy idx to empty lanes
-+copy_lane_data:
-+	offset =  (_args + _data_ptr)
-+	mov     offset(state,idx,8), tmp
-+
-+	I = 0
-+.rep 8
-+	offset =  (_ldata + I * _LANE_DATA_size + _job_in_lane)
-+	cmpq    $0, offset(state)
-+.altmacro
-+	JNE_SKIP %I
-+	offset =  (_args + _data_ptr + 8*I)
-+	mov     tmp, offset(state)
-+	offset =  (_lens + 4*I)
-+	movl    $0xFFFFFFFF, offset(state)
-+LABEL skip_ %I
-+	I = (I+1)
-+.noaltmacro
-+.endr
-+
-+	# Find min length
-+	vmovdqa _lens+0*16(state), %xmm0
-+	vmovdqa _lens+1*16(state), %xmm1
-+
-+	vpminud %xmm1, %xmm0, %xmm2     # xmm2 has {D,C,B,A}
-+	vpalignr $8, %xmm2, %xmm3, %xmm3   # xmm3 has {x,x,D,C}
-+	vpminud %xmm3, %xmm2, %xmm2        # xmm2 has {x,x,E,F}
-+	vpalignr $4, %xmm2, %xmm3, %xmm3    # xmm3 has {x,x,x,E}
-+	vpminud %xmm3, %xmm2, %xmm2        # xmm2 has min value in low dword
-+
-+	vmovd   %xmm2, DWORD_idx
-+	mov	idx, len2
-+	and	$0xF, idx
-+	shr	$4, len2
-+	jz	len_is_0
-+
-+	vpand   clear_low_nibble(%rip), %xmm2, %xmm2
-+	vpshufd $0, %xmm2, %xmm2
-+
-+	vpsubd  %xmm2, %xmm0, %xmm0
-+	vpsubd  %xmm2, %xmm1, %xmm1
-+
-+	vmovdqa %xmm0, _lens+0*16(state)
-+	vmovdqa %xmm1, _lens+1*16(state)
-+
-+	# "state" and "args" are the same address, arg1
-+	# len is arg2
-+	call	sha1_x8_avx2
-+	# state and idx are intact
-+
-+
-+len_is_0:
-+	# process completed job "idx"
-+	imul    $_LANE_DATA_size, idx, lane_data
-+	lea     _ldata(state, lane_data), lane_data
-+
-+	mov     _job_in_lane(lane_data), job_rax
-+	movq    $0, _job_in_lane(lane_data)
-+	movl    $STS_COMPLETED, _status(job_rax)
-+	mov     _unused_lanes(state), unused_lanes
-+	shl     $4, unused_lanes
-+	or      idx, unused_lanes
-+	mov     unused_lanes, _unused_lanes(state)
-+
-+	movl	$0xFFFFFFFF, _lens(state, idx, 4)
-+
-+	vmovd    _args_digest(state , idx, 4) , %xmm0
-+	vpinsrd  $1, _args_digest+1*32(state, idx, 4), %xmm0, %xmm0
-+	vpinsrd  $2, _args_digest+2*32(state, idx, 4), %xmm0, %xmm0
-+	vpinsrd  $3, _args_digest+3*32(state, idx, 4), %xmm0, %xmm0
-+	movl    _args_digest+4*32(state, idx, 4), tmp2_w
-+
-+	vmovdqu  %xmm0, _result_digest(job_rax)
-+	offset =  (_result_digest + 1*16)
-+	mov     tmp2_w, offset(job_rax)
-+
-+return:
-+
-+	mov     _GPR_SAVE(%rsp), %rbx
-+	mov     _GPR_SAVE+8*1(%rsp), %r10 #saved rsp
-+	mov	_GPR_SAVE+8*3(%rsp), %rbp
-+	mov	_GPR_SAVE+8*4(%rsp), %r12
-+	mov	_GPR_SAVE+8*5(%rsp), %r13
-+	mov	_GPR_SAVE+8*6(%rsp), %r14
-+	mov	_GPR_SAVE+8*7(%rsp), %r15
-+	mov     %r10, %rsp
-+
-+	ret
-+
-+return_null:
-+	xor     job_rax, job_rax
-+	jmp     return
-+ENDPROC(sha1_mb_mgr_flush_avx2)
-+
-+
-+#################################################################
-+
-+.align 16
-+ENTRY(sha1_mb_mgr_get_comp_job_avx2)
-+	push    %rbx
-+
-+	## if bit 32+3 is set, then all lanes are empty
-+	mov     _unused_lanes(state), unused_lanes
-+	bt      $(32+3), unused_lanes
-+	jc      .return_null
-+
-+	# Find min length
-+	vmovdqa _lens(state), %xmm0
-+	vmovdqa _lens+1*16(state), %xmm1
-+
-+	vpminud %xmm1, %xmm0, %xmm2        # xmm2 has {D,C,B,A}
-+	vpalignr $8, %xmm2, %xmm3, %xmm3   # xmm3 has {x,x,D,C}
-+	vpminud %xmm3, %xmm2, %xmm2        # xmm2 has {x,x,E,F}
-+	vpalignr $4, %xmm2, %xmm3, %xmm3    # xmm3 has {x,x,x,E}
-+	vpminud %xmm3, %xmm2, %xmm2        # xmm2 has min value in low dword
-+
-+	vmovd   %xmm2, DWORD_idx
-+	test    $~0xF, idx
-+	jnz     .return_null
-+
-+	# process completed job "idx"
-+	imul    $_LANE_DATA_size, idx, lane_data
-+	lea     _ldata(state, lane_data), lane_data
-+
-+	mov     _job_in_lane(lane_data), job_rax
-+	movq    $0,  _job_in_lane(lane_data)
-+	movl    $STS_COMPLETED, _status(job_rax)
-+	mov     _unused_lanes(state), unused_lanes
-+	shl     $4, unused_lanes
-+	or      idx, unused_lanes
-+	mov     unused_lanes, _unused_lanes(state)
-+
-+	movl    $0xFFFFFFFF, _lens(state,  idx, 4)
-+
-+	vmovd   _args_digest(state, idx, 4), %xmm0
-+	vpinsrd $1, _args_digest+1*32(state, idx, 4), %xmm0, %xmm0
-+	vpinsrd $2, _args_digest+2*32(state, idx, 4), %xmm0, %xmm0
-+	vpinsrd $3, _args_digest+3*32(state, idx, 4), %xmm0, %xmm0
-+	movl    _args_digest+4*32(state, idx, 4), tmp2_w
-+
-+	vmovdqu %xmm0, _result_digest(job_rax)
-+	movl    tmp2_w, _result_digest+1*16(job_rax)
-+
-+	pop     %rbx
-+
-+	ret
-+
-+.return_null:
-+	xor     job_rax, job_rax
-+	pop     %rbx
-+	ret
-+ENDPROC(sha1_mb_mgr_get_comp_job_avx2)
-+
-+.data
-+
-+.align 16
-+clear_low_nibble:
-+.octa	0x000000000000000000000000FFFFFFF0
-+one:
-+.quad  1
-+two:
-+.quad  2
-+three:
-+.quad  3
-+four:
-+.quad  4
-+five:
-+.quad  5
-+six:
-+.quad  6
-+seven:
-+.quad  7
-diff --git a/arch/x86/crypto/sha-mb/sha1_mb_mgr_init_avx2.c b/arch/x86/crypto/sha-mb/sha1_mb_mgr_init_avx2.c
-new file mode 100644
-index 0000000..4ca7e16
---- /dev/null
-+++ b/arch/x86/crypto/sha-mb/sha1_mb_mgr_init_avx2.c
-@@ -0,0 +1,64 @@
-+/*
-+ * Initialization code for multi buffer SHA1 algorithm for AVX2
-+ *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
-+ *
-+ * GPL LICENSE SUMMARY
-+ *
-+ *  Copyright(c) 2014 Intel Corporation.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of version 2 of the GNU General Public License as
-+ *  published by the Free Software Foundation.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but
-+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  General Public License for more details.
-+ *
-+ *  Contact Information:
-+ *	Tim Chen <tim.c.chen@linux.intel.com>
-+ *
-+ *  BSD LICENSE
-+ *
-+ *  Copyright(c) 2014 Intel Corporation.
-+ *
-+ *  Redistribution and use in source and binary forms, with or without
-+ *  modification, are permitted provided that the following conditions
-+ *  are met:
-+ *
-+ *    * Redistributions of source code must retain the above copyright
-+ *      notice, this list of conditions and the following disclaimer.
-+ *    * Redistributions in binary form must reproduce the above copyright
-+ *      notice, this list of conditions and the following disclaimer in
-+ *      the documentation and/or other materials provided with the
-+ *      distribution.
-+ *    * Neither the name of Intel Corporation nor the names of its
-+ *      contributors may be used to endorse or promote products derived
-+ *      from this software without specific prior written permission.
-+ *
-+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 + */
 +
-+#include "sha_mb_mgr.h"
++#include <crypto/algapi.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/aead.h>
++#include <crypto/mcryptd.h>
++#include <crypto/crypto_wq.h>
++#include <linux/err.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/list.h>
++#include <linux/module.h>
++#include <linux/scatterlist.h>
++#include <linux/sched.h>
++#include <linux/slab.h>
++#include <linux/hardirq.h>
 +
-+void sha1_mb_mgr_init_avx2(struct sha1_mb_mgr *state)
++#define MCRYPTD_MAX_CPU_QLEN 100
++#define MCRYPTD_BATCH 9
++
++static void *mcryptd_alloc_instance(struct crypto_alg *alg, unsigned int head,
++				   unsigned int tail);
++
++struct hashd_instance_ctx {
++	struct crypto_shash_spawn spawn;
++	struct mcryptd_queue *queue;
++};
++
++static void mcryptd_queue_worker(struct work_struct *work);
++
++static int mcryptd_init_queue(struct mcryptd_queue *queue,
++			     unsigned int max_cpu_qlen)
 +{
-+	unsigned int j;
-+	state->unused_lanes = 0xF76543210;
-+	for (j = 0; j < 8; j++) {
-+		state->lens[j] = 0xFFFFFFFF;
-+		state->ldata[j].job_in_lane = NULL;
++	int cpu;
++	struct mcryptd_cpu_queue *cpu_queue;
++
++	queue->cpu_queue = alloc_percpu(struct mcryptd_cpu_queue);
++	pr_debug("mqueue:%p mcryptd_cpu_queue %p\n", queue, queue->cpu_queue);
++	if (!queue->cpu_queue)
++		return -ENOMEM;
++	for_each_possible_cpu(cpu) {
++		cpu_queue = per_cpu_ptr(queue->cpu_queue, cpu);
++		pr_debug("cpu_queue #%d %p\n", cpu, queue->cpu_queue);
++		crypto_init_queue(&cpu_queue->queue, max_cpu_qlen);
++		INIT_WORK(&cpu_queue->work, mcryptd_queue_worker);
++	}
++	return 0;
++}
++
++static void mcryptd_fini_queue(struct mcryptd_queue *queue)
++{
++	int cpu;
++	struct mcryptd_cpu_queue *cpu_queue;
++
++	for_each_possible_cpu(cpu) {
++		cpu_queue = per_cpu_ptr(queue->cpu_queue, cpu);
++		BUG_ON(cpu_queue->queue.qlen);
++	}
++	free_percpu(queue->cpu_queue);
++}
++
++static int mcryptd_enqueue_request(struct mcryptd_queue *queue,
++				  struct crypto_async_request *request,
++				  struct mcryptd_hash_request_ctx *rctx)
++{
++	int cpu, err;
++	struct mcryptd_cpu_queue *cpu_queue;
++
++	cpu = get_cpu();
++	cpu_queue = this_cpu_ptr(queue->cpu_queue);
++	rctx->tag.cpu = cpu;
++
++	err = crypto_enqueue_request(&cpu_queue->queue, request);
++	pr_debug("enqueue request: cpu %d cpu_queue %p request %p\n",
++		 cpu, cpu_queue, request);
++	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
++	put_cpu();
++
++	return err;
++}
++
++/* Called in workqueue context, do one real cryption work (via
++ * req->complete) and reschedule itself if there are more work to
++ * do. */
++static void mcryptd_queue_worker(struct work_struct *work)
++{
++	struct mcryptd_cpu_queue *cpu_queue;
++	struct crypto_async_request *req, *backlog;
++	int i;
++
++	/*
++	 * Need to loop through more than once for multi-buffer to
++	 * be effective.
++	 */
++
++	cpu_queue = container_of(work, struct mcryptd_cpu_queue, work);
++	for (i = 0; i < MCRYPTD_BATCH; ++i) {
++		/*
++		 * preempt_disable/enable is used to prevent
++		 * being preempted by mcryptd_enqueue_request()
++		 */
++		local_bh_disable();
++		preempt_disable();
++		backlog = crypto_get_backlog(&cpu_queue->queue);
++		req = crypto_dequeue_request(&cpu_queue->queue);
++		preempt_enable();
++		local_bh_enable();
++
++		if (!req)
++			return;
++
++		if (backlog)
++			backlog->complete(backlog, -EINPROGRESS);
++		req->complete(req, 0);
++		if (!cpu_queue->queue.qlen)
++			return;
++	}
++	if (cpu_queue->queue.qlen)
++		queue_work(kcrypto_wq, &cpu_queue->work);
++}
++
++void mcryptd_flusher(struct work_struct *__work)
++{
++	struct	mcryptd_alg_cstate	*alg_cpu_state;
++	struct  mcryptd_alg_state	*alg_state;
++
++	alg_cpu_state = container_of(to_delayed_work(__work),
++				     struct mcryptd_alg_cstate, flush);
++	alg_state = alg_cpu_state->alg_state;
++	if (alg_cpu_state->cpu != smp_processor_id())
++		pr_debug("mcryptd error: work on cpu %d, should be cpu %d\n",
++				smp_processor_id(), alg_cpu_state->cpu);
++
++	alg_state->flusher(alg_cpu_state);
++}
++EXPORT_SYMBOL_GPL(mcryptd_flusher);
++
++static inline struct mcryptd_queue *mcryptd_get_queue(struct crypto_tfm *tfm)
++{
++	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
++	struct mcryptd_instance_ctx *ictx = crypto_instance_ctx(inst);
++
++	return ictx->queue;
++}
++
++static void *mcryptd_alloc_instance(struct crypto_alg *alg, unsigned int head,
++				   unsigned int tail)
++{
++	char *p;
++	struct crypto_instance *inst;
++	int err;
++
++	p = kzalloc(head + sizeof(*inst) + tail, GFP_KERNEL);
++	if (!p)
++		return ERR_PTR(-ENOMEM);
++
++	inst = (void *)(p + head);
++
++	err = -ENAMETOOLONG;
++	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
++		    "mcryptd(%s)", alg->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
++		goto out_free_inst;
++
++	memcpy(inst->alg.cra_name, alg->cra_name, CRYPTO_MAX_ALG_NAME);
++
++	inst->alg.cra_priority = alg->cra_priority + 50;
++	inst->alg.cra_blocksize = alg->cra_blocksize;
++	inst->alg.cra_alignmask = alg->cra_alignmask;
++
++out:
++	return p;
++
++out_free_inst:
++	kfree(p);
++	p = ERR_PTR(err);
++	goto out;
++}
++
++static int mcryptd_hash_init_tfm(struct crypto_tfm *tfm)
++{
++	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
++	struct hashd_instance_ctx *ictx = crypto_instance_ctx(inst);
++	struct crypto_shash_spawn *spawn = &ictx->spawn;
++	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct crypto_shash *hash;
++
++	hash = crypto_spawn_shash(spawn);
++	if (IS_ERR(hash))
++		return PTR_ERR(hash);
++
++	ctx->child = hash;
++	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++				 sizeof(struct mcryptd_hash_request_ctx) +
++				 crypto_shash_descsize(hash));
++	return 0;
++}
++
++static void mcryptd_hash_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	crypto_free_shash(ctx->child);
++}
++
++static int mcryptd_hash_setkey(struct crypto_ahash *parent,
++				   const u8 *key, unsigned int keylen)
++{
++	struct mcryptd_hash_ctx *ctx   = crypto_ahash_ctx(parent);
++	struct crypto_shash *child = ctx->child;
++	int err;
++
++	crypto_shash_clear_flags(child, CRYPTO_TFM_REQ_MASK);
++	crypto_shash_set_flags(child, crypto_ahash_get_flags(parent) &
++				      CRYPTO_TFM_REQ_MASK);
++	err = crypto_shash_setkey(child, key, keylen);
++	crypto_ahash_set_flags(parent, crypto_shash_get_flags(child) &
++				       CRYPTO_TFM_RES_MASK);
++	return err;
++}
++
++static int mcryptd_hash_enqueue(struct ahash_request *req,
++				crypto_completion_t complete)
++{
++	int ret;
++
++	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct mcryptd_queue *queue =
++		mcryptd_get_queue(crypto_ahash_tfm(tfm));
++	struct mcryptd_hash_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct mcryptd_alg_state *alg_state = ctx->alg_state;
++
++	rctx->complete = req->base.complete;
++	req->base.complete = complete;
++
++	ret = mcryptd_enqueue_request(queue, &req->base, rctx);
++
++	return ret;
++}
++
++static void mcryptd_hash_init(struct crypto_async_request *req_async, int err)
++{
++	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(req_async->tfm);
++	struct crypto_shash *child = ctx->child;
++	struct ahash_request *req = ahash_request_cast(req_async);
++	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++	struct shash_desc *desc = &rctx->desc;
++
++	if (unlikely(err == -EINPROGRESS))
++		goto out;
++
++	desc->tfm = child;
++	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
++
++	err = crypto_shash_init(desc);
++
++	req->base.complete = rctx->complete;
++
++out:
++	local_bh_disable();
++	rctx->complete(&req->base, err);
++	local_bh_enable();
++}
++
++static int mcryptd_hash_init_enqueue(struct ahash_request *req)
++{
++	return mcryptd_hash_enqueue(req, mcryptd_hash_init);
++}
++
++static void mcryptd_hash_update(struct crypto_async_request *req_async, int err)
++{
++	struct ahash_request *req = ahash_request_cast(req_async);
++	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++
++	if (unlikely(err == -EINPROGRESS))
++		goto out;
++
++	err = shash_ahash_mcryptd_update(req, &rctx->desc);
++	if (err) {
++		req->base.complete = rctx->complete;
++		goto out;
++	}
++
++	return;
++out:
++	local_bh_disable();
++	rctx->complete(&req->base, err);
++	local_bh_enable();
++}
++
++static int mcryptd_hash_update_enqueue(struct ahash_request *req)
++{
++	return mcryptd_hash_enqueue(req, mcryptd_hash_update);
++}
++
++static void mcryptd_hash_final(struct crypto_async_request *req_async, int err)
++{
++	struct ahash_request *req = ahash_request_cast(req_async);
++	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++
++	if (unlikely(err == -EINPROGRESS))
++		goto out;
++
++	err = shash_ahash_mcryptd_final(req, &rctx->desc);
++	if (err) {
++		req->base.complete = rctx->complete;
++		goto out;
++	}
++
++	return;
++out:
++	local_bh_disable();
++	rctx->complete(&req->base, err);
++	local_bh_enable();
++}
++
++static int mcryptd_hash_final_enqueue(struct ahash_request *req)
++{
++	return mcryptd_hash_enqueue(req, mcryptd_hash_final);
++}
++
++static void mcryptd_hash_finup(struct crypto_async_request *req_async, int err)
++{
++	struct ahash_request *req = ahash_request_cast(req_async);
++	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++
++	if (unlikely(err == -EINPROGRESS))
++		goto out;
++
++	err = shash_ahash_mcryptd_finup(req, &rctx->desc);
++
++	if (err) {
++		req->base.complete = rctx->complete;
++		goto out;
++	}
++
++	return;
++out:
++	local_bh_disable();
++	rctx->complete(&req->base, err);
++	local_bh_enable();
++}
++
++static int mcryptd_hash_finup_enqueue(struct ahash_request *req)
++{
++	return mcryptd_hash_enqueue(req, mcryptd_hash_finup);
++}
++
++static void mcryptd_hash_digest(struct crypto_async_request *req_async, int err)
++{
++	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(req_async->tfm);
++	struct crypto_shash *child = ctx->child;
++	struct ahash_request *req = ahash_request_cast(req_async);
++	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++	struct shash_desc *desc = &rctx->desc;
++
++	if (unlikely(err == -EINPROGRESS))
++		goto out;
++
++	desc->tfm = child;
++	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;  /* check this again */
++
++	err = shash_ahash_mcryptd_digest(req, desc);
++
++	if (err) {
++		req->base.complete = rctx->complete;
++		goto out;
++	}
++
++	return;
++out:
++	local_bh_disable();
++	rctx->complete(&req->base, err);
++	local_bh_enable();
++}
++
++static int mcryptd_hash_digest_enqueue(struct ahash_request *req)
++{
++	return mcryptd_hash_enqueue(req, mcryptd_hash_digest);
++}
++
++static int mcryptd_hash_export(struct ahash_request *req, void *out)
++{
++	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++
++	return crypto_shash_export(&rctx->desc, out);
++}
++
++static int mcryptd_hash_import(struct ahash_request *req, const void *in)
++{
++	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++
++	return crypto_shash_import(&rctx->desc, in);
++}
++
++static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
++			      struct mcryptd_queue *queue)
++{
++	struct hashd_instance_ctx *ctx;
++	struct ahash_instance *inst;
++	struct shash_alg *salg;
++	struct crypto_alg *alg;
++	int err;
++
++	salg = shash_attr_alg(tb[1], 0, 0);
++	if (IS_ERR(salg))
++		return PTR_ERR(salg);
++
++	alg = &salg->base;
++	pr_debug("crypto: mcryptd hash alg: %s\n", alg->cra_name);
++	inst = mcryptd_alloc_instance(alg, ahash_instance_headroom(),
++					sizeof(*ctx));
++	err = PTR_ERR(inst);
++	if (IS_ERR(inst))
++		goto out_put_alg;
++
++	ctx = ahash_instance_ctx(inst);
++	ctx->queue = queue;
++
++	err = crypto_init_shash_spawn(&ctx->spawn, salg,
++				      ahash_crypto_instance(inst));
++	if (err)
++		goto out_free_inst;
++
++	inst->alg.halg.base.cra_flags = CRYPTO_ALG_ASYNC;
++
++	inst->alg.halg.digestsize = salg->digestsize;
++	inst->alg.halg.base.cra_ctxsize = sizeof(struct mcryptd_hash_ctx);
++
++	inst->alg.halg.base.cra_init = mcryptd_hash_init_tfm;
++	inst->alg.halg.base.cra_exit = mcryptd_hash_exit_tfm;
++
++	inst->alg.init   = mcryptd_hash_init_enqueue;
++	inst->alg.update = mcryptd_hash_update_enqueue;
++	inst->alg.final  = mcryptd_hash_final_enqueue;
++	inst->alg.finup  = mcryptd_hash_finup_enqueue;
++	inst->alg.export = mcryptd_hash_export;
++	inst->alg.import = mcryptd_hash_import;
++	inst->alg.setkey = mcryptd_hash_setkey;
++	inst->alg.digest = mcryptd_hash_digest_enqueue;
++
++	err = ahash_register_instance(tmpl, inst);
++	if (err) {
++		crypto_drop_shash(&ctx->spawn);
++out_free_inst:
++		kfree(inst);
++	}
++
++out_put_alg:
++	crypto_mod_put(alg);
++	return err;
++}
++
++static struct mcryptd_queue mqueue;
++
++static int mcryptd_create(struct crypto_template *tmpl, struct rtattr **tb)
++{
++	struct crypto_attr_type *algt;
++
++	algt = crypto_get_attr_type(tb);
++	if (IS_ERR(algt))
++		return PTR_ERR(algt);
++
++	switch (algt->type & algt->mask & CRYPTO_ALG_TYPE_MASK) {
++	case CRYPTO_ALG_TYPE_DIGEST:
++		return mcryptd_create_hash(tmpl, tb, &mqueue);
++	break;
++	}
++
++	return -EINVAL;
++}
++
++static void mcryptd_free(struct crypto_instance *inst)
++{
++	struct mcryptd_instance_ctx *ctx = crypto_instance_ctx(inst);
++	struct hashd_instance_ctx *hctx = crypto_instance_ctx(inst);
++
++	switch (inst->alg.cra_flags & CRYPTO_ALG_TYPE_MASK) {
++	case CRYPTO_ALG_TYPE_AHASH:
++		crypto_drop_shash(&hctx->spawn);
++		kfree(ahash_instance(inst));
++		return;
++	default:
++		crypto_drop_spawn(&ctx->spawn);
++		kfree(inst);
 +	}
 +}
-diff --git a/arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S b/arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S
++
++static struct crypto_template mcryptd_tmpl = {
++	.name = "mcryptd",
++	.create = mcryptd_create,
++	.free = mcryptd_free,
++	.module = THIS_MODULE,
++};
++
++struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
++					u32 type, u32 mask)
++{
++	char mcryptd_alg_name[CRYPTO_MAX_ALG_NAME];
++	struct crypto_ahash *tfm;
++
++	if (snprintf(mcryptd_alg_name, CRYPTO_MAX_ALG_NAME,
++		     "mcryptd(%s)", alg_name) >= CRYPTO_MAX_ALG_NAME)
++		return ERR_PTR(-EINVAL);
++	tfm = crypto_alloc_ahash(mcryptd_alg_name, type, mask);
++	if (IS_ERR(tfm))
++		return ERR_CAST(tfm);
++	if (tfm->base.__crt_alg->cra_module != THIS_MODULE) {
++		crypto_free_ahash(tfm);
++		return ERR_PTR(-EINVAL);
++	}
++
++	return __mcryptd_ahash_cast(tfm);
++}
++EXPORT_SYMBOL_GPL(mcryptd_alloc_ahash);
++
++struct crypto_shash *mcryptd_ahash_child(struct mcryptd_ahash *tfm)
++{
++	struct mcryptd_hash_ctx *ctx = crypto_ahash_ctx(&tfm->base);
++
++	return ctx->child;
++}
++EXPORT_SYMBOL_GPL(mcryptd_ahash_child);
++
++struct shash_desc *mcryptd_shash_desc(struct ahash_request *req)
++{
++	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++	return &rctx->desc;
++}
++EXPORT_SYMBOL_GPL(mcryptd_shash_desc);
++
++void mcryptd_free_ahash(struct mcryptd_ahash *tfm)
++{
++	crypto_free_ahash(&tfm->base);
++}
++EXPORT_SYMBOL_GPL(mcryptd_free_ahash);
++
++
++static int __init mcryptd_init(void)
++{
++	int err;
++
++	err = mcryptd_init_queue(&mqueue, MCRYPTD_MAX_CPU_QLEN);
++	if (err)
++		return err;
++
++	err = crypto_register_template(&mcryptd_tmpl);
++	if (err)
++		mcryptd_fini_queue(&mqueue);
++
++	return err;
++}
++
++static void __exit mcryptd_exit(void)
++{
++	mcryptd_fini_queue(&mqueue);
++	crypto_unregister_template(&mcryptd_tmpl);
++}
++
++subsys_initcall(mcryptd_init);
++module_exit(mcryptd_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Software async multibuffer crypto daemon");
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 929058a..6f40424 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -229,6 +229,42 @@ int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc)
+ }
+ EXPORT_SYMBOL_GPL(shash_ahash_update);
+ 
++int shash_ahash_mcryptd_update(struct ahash_request *req,
++			       struct shash_desc *desc)
++{
++	struct crypto_shash *tfm = desc->tfm;
++	struct shash_alg *shash = crypto_shash_alg(tfm);
++
++	/* alignment is to be done by multi-buffer crypto algorithm if needed */
++
++	return shash->update(desc, NULL, 0);
++}
++EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_update);
++
++int shash_ahash_mcryptd_finup(struct ahash_request *req,
++			      struct shash_desc *desc)
++{
++	struct crypto_shash *tfm = desc->tfm;
++	struct shash_alg *shash = crypto_shash_alg(tfm);
++
++	/* alignment is to be done by multi-buffer crypto algorithm if needed */
++
++	return shash->finup(desc, NULL, 0, req->result);
++}
++EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_finup);
++
++int shash_ahash_mcryptd_final(struct ahash_request *req,
++			      struct shash_desc *desc)
++{
++	struct crypto_shash *tfm = desc->tfm;
++	struct shash_alg *shash = crypto_shash_alg(tfm);
++
++	/* alignment is to be done by multi-buffer crypto algorithm if needed */
++
++	return shash->final(desc, req->result);
++}
++EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_final);
++
+ static int shash_async_update(struct ahash_request *req)
+ {
+ 	return shash_ahash_update(req, ahash_request_ctx(req));
+@@ -271,6 +307,18 @@ static int shash_async_finup(struct ahash_request *req)
+ 	return shash_ahash_finup(req, desc);
+ }
+ 
++int shash_ahash_mcryptd_digest(struct ahash_request *req,
++			       struct shash_desc *desc)
++{
++	int err;
++
++	err = crypto_shash_init(desc) ?:
++	      shash_ahash_mcryptd_finup(req, desc);
++
++	return err;
++}
++EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_digest);
++
+ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
+ {
+ 	struct scatterlist *sg = req->src;
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 821eae8..dd75ed9 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -104,6 +104,15 @@ int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc);
+ int shash_ahash_finup(struct ahash_request *req, struct shash_desc *desc);
+ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc);
+ 
++int shash_ahash_mcryptd_update(struct ahash_request *req,
++			       struct shash_desc *desc);
++int shash_ahash_mcryptd_final(struct ahash_request *req,
++			      struct shash_desc *desc);
++int shash_ahash_mcryptd_finup(struct ahash_request *req,
++			      struct shash_desc *desc);
++int shash_ahash_mcryptd_digest(struct ahash_request *req,
++			       struct shash_desc *desc);
++
+ int crypto_init_shash_ops_async(struct crypto_tfm *tfm);
+ 
+ static inline void *crypto_ahash_ctx(struct crypto_ahash *tfm)
+diff --git a/include/crypto/mcryptd.h b/include/crypto/mcryptd.h
 new file mode 100644
-index 0000000..2ab9560
+index 0000000..73b21a6
 --- /dev/null
-+++ b/arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S
-@@ -0,0 +1,228 @@
++++ b/include/crypto/mcryptd.h
+@@ -0,0 +1,109 @@
 +/*
-+ * Buffer submit code for multi buffer SHA1 algorithm
++ * Software async multibuffer crypto daemon headers
 + *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
++ *    Author:
++ *             Tim Chen <tim.c.chen@linux.intel.com>
 + *
-+ * GPL LICENSE SUMMARY
-+ *
-+ *  Copyright(c) 2014 Intel Corporation.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of version 2 of the GNU General Public License as
-+ *  published by the Free Software Foundation.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but
-+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  General Public License for more details.
-+ *
-+ *  Contact Information:
-+ *      James Guilford <james.guilford@intel.com>
-+ *	Tim Chen <tim.c.chen@linux.intel.com>
-+ *
-+ *  BSD LICENSE
-+ *
-+ *  Copyright(c) 2014 Intel Corporation.
-+ *
-+ *  Redistribution and use in source and binary forms, with or without
-+ *  modification, are permitted provided that the following conditions
-+ *  are met:
-+ *
-+ *    * Redistributions of source code must retain the above copyright
-+ *      notice, this list of conditions and the following disclaimer.
-+ *    * Redistributions in binary form must reproduce the above copyright
-+ *      notice, this list of conditions and the following disclaimer in
-+ *      the documentation and/or other materials provided with the
-+ *      distribution.
-+ *    * Neither the name of Intel Corporation nor the names of its
-+ *      contributors may be used to endorse or promote products derived
-+ *      from this software without specific prior written permission.
-+ *
-+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *    Copyright (c) 2014, Intel Corporation.
 + */
 +
-+#include <linux/linkage.h>
-+#include "sha1_mb_mgr_datastruct.S"
++#ifndef _CRYPTO_MCRYPT_H
++#define _CRYPTO_MCRYPT_H
 +
++#include <linux/crypto.h>
++#include <linux/kernel.h>
++#include <crypto/hash.h>
 +
-+.extern sha1_x8_avx
++struct mcryptd_ahash {
++	struct crypto_ahash base;
++};
 +
-+# LINUX register definitions
-+arg1    = %rdi
-+arg2    = %rsi
-+size_offset	= %rcx
-+tmp2		= %rcx
-+extra_blocks	= %rdx
++static inline struct mcryptd_ahash *__mcryptd_ahash_cast(
++	struct crypto_ahash *tfm)
++{
++	return (struct mcryptd_ahash *)tfm;
++}
 +
-+# Common definitions
-+#define state   arg1
-+#define job     %rsi
-+#define len2    arg2
-+#define p2      arg2
++struct mcryptd_cpu_queue {
++	struct crypto_queue queue;
++	struct work_struct work;
++};
 +
-+# idx must be a register not clobberred by sha1_x8_avx2
-+idx		= %r8
-+DWORD_idx	= %r8d
-+last_len	= %r8
++struct mcryptd_queue {
++	struct mcryptd_cpu_queue __percpu *cpu_queue;
++};
 +
-+p               = %r11
-+start_offset    = %r11
++struct mcryptd_instance_ctx {
++	struct crypto_spawn spawn;
++	struct mcryptd_queue *queue;
++};
 +
-+unused_lanes    = %rbx
-+BYTE_unused_lanes = %bl
++struct mcryptd_hash_ctx {
++	struct crypto_shash *child;
++	struct mcryptd_alg_state *alg_state;
++};
 +
-+job_rax         = %rax
-+len             = %rax
-+DWORD_len	= %eax
++struct mcryptd_tag {
++	/* seq number of request */
++	unsigned seq_num;
++	/* arrival time of request */
++	unsigned long arrival;
++	unsigned long expire;
++	int	cpu;
++};
 +
-+lane            = %rbp
-+tmp3            = %rbp
++struct mcryptd_hash_request_ctx {
++	struct list_head waiter;
++	crypto_completion_t complete;
++	struct mcryptd_tag tag;
++	struct crypto_hash_walk walk;
++	u8 *out;
++	int flag;
++	struct shash_desc desc;
++};
 +
-+tmp             = %r9
-+DWORD_tmp	= %r9d
++struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
++					u32 type, u32 mask);
++struct crypto_shash *mcryptd_ahash_child(struct mcryptd_ahash *tfm);
++struct shash_desc *mcryptd_shash_desc(struct ahash_request *req);
++void mcryptd_free_ahash(struct mcryptd_ahash *tfm);
++void mcryptd_flusher(struct work_struct *work);
 +
-+lane_data       = %r10
++enum mcryptd_req_type {
++	MCRYPTD_NONE,
++	MCRYPTD_UPDATE,
++	MCRYPTD_FINUP,
++	MCRYPTD_DIGEST,
++	MCRYPTD_FINAL
++};
 +
-+# STACK_SPACE needs to be an odd multiple of 8
-+STACK_SPACE     = 8*8 + 16*10 + 8
++struct mcryptd_alg_cstate {
++	unsigned long next_flush;
++	unsigned next_seq_num;
++	bool	flusher_engaged;
++	struct  delayed_work flush;
++	int	cpu;
++	struct  mcryptd_alg_state *alg_state;
++	void	*mgr;
++	spinlock_t work_lock;
++	struct list_head work_list;
++};
 +
-+# JOB* submit_mb_mgr_submit_avx2(MB_MGR *state, job_sha1 *job)
-+# arg 1 : rcx : state
-+# arg 2 : rdx : job
-+ENTRY(sha1_mb_mgr_submit_avx2)
++struct mcryptd_alg_state {
++	struct mcryptd_alg_cstate __percpu *alg_cstate;
++	unsigned long (*flusher)(struct mcryptd_alg_cstate *cstate);
++};
 +
-+	mov	%rsp, %r10
-+	sub     $STACK_SPACE, %rsp
-+	and	$~31, %rsp
++/* return delay in jiffies from current time */
++static unsigned long get_delay(unsigned long t)
++{
++	long delay;
 +
-+	mov     %rbx, (%rsp)
-+	mov	%r10, 8*2(%rsp)	#save old rsp
-+	mov     %rbp, 8*3(%rsp)
-+	mov	%r12, 8*4(%rsp)
-+	mov	%r13, 8*5(%rsp)
-+	mov	%r14, 8*6(%rsp)
-+	mov	%r15, 8*7(%rsp)
++	delay = (long) t - (long) jiffies;
++	if (delay <= 0)
++		return 0;
++	else
++		return (unsigned long) delay;
++}
 +
-+	mov     _unused_lanes(state), unused_lanes
-+	mov	unused_lanes, lane
-+	and	$0xF, lane
-+	shr     $4, unused_lanes
-+	imul    $_LANE_DATA_size, lane, lane_data
-+	movl    $STS_BEING_PROCESSED, _status(job)
-+	lea     _ldata(state, lane_data), lane_data
-+	mov     unused_lanes, _unused_lanes(state)
-+	movl    _len(job),  DWORD_len
-+
-+	mov	job, _job_in_lane(lane_data)
-+	shl	$4, len
-+	or	lane, len
-+
-+	movl    DWORD_len,  _lens(state , lane, 4)
-+
-+	# Load digest words from result_digest
-+	vmovdqu	_result_digest(job), %xmm0
-+	mov	_result_digest+1*16(job), DWORD_tmp
-+	vmovd    %xmm0, _args_digest(state, lane, 4)
-+	vpextrd  $1, %xmm0, _args_digest+1*32(state , lane, 4)
-+	vpextrd  $2, %xmm0, _args_digest+2*32(state , lane, 4)
-+	vpextrd  $3, %xmm0, _args_digest+3*32(state , lane, 4)
-+	movl    DWORD_tmp, _args_digest+4*32(state , lane, 4)
-+
-+	mov     _buffer(job), p
-+	mov     p, _args_data_ptr(state, lane, 8)
-+
-+	cmp     $0xF, unused_lanes
-+	jne     return_null
-+
-+start_loop:
-+	# Find min length
-+	vmovdqa _lens(state), %xmm0
-+	vmovdqa _lens+1*16(state), %xmm1
-+
-+	vpminud %xmm1, %xmm0, %xmm2        # xmm2 has {D,C,B,A}
-+	vpalignr $8, %xmm2, %xmm3, %xmm3   # xmm3 has {x,x,D,C}
-+	vpminud %xmm3, %xmm2, %xmm2        # xmm2 has {x,x,E,F}
-+	vpalignr $4, %xmm2, %xmm3, %xmm3   # xmm3 has {x,x,x,E}
-+	vpminud %xmm3, %xmm2, %xmm2        # xmm2 has min value in low dword
-+
-+	vmovd   %xmm2, DWORD_idx
-+	mov    idx, len2
-+	and    $0xF, idx
-+	shr    $4, len2
-+	jz     len_is_0
-+
-+	vpand   clear_low_nibble(%rip), %xmm2, %xmm2
-+	vpshufd $0, %xmm2, %xmm2
-+
-+	vpsubd  %xmm2, %xmm0, %xmm0
-+	vpsubd  %xmm2, %xmm1, %xmm1
-+
-+	vmovdqa %xmm0, _lens + 0*16(state)
-+	vmovdqa %xmm1, _lens + 1*16(state)
-+
-+
-+	# "state" and "args" are the same address, arg1
-+	# len is arg2
-+	call    sha1_x8_avx2
-+
-+	# state and idx are intact
-+
-+len_is_0:
-+	# process completed job "idx"
-+	imul    $_LANE_DATA_size, idx, lane_data
-+	lea     _ldata(state, lane_data), lane_data
-+
-+	mov     _job_in_lane(lane_data), job_rax
-+	mov     _unused_lanes(state), unused_lanes
-+	movq    $0, _job_in_lane(lane_data)
-+	movl    $STS_COMPLETED, _status(job_rax)
-+	shl     $4, unused_lanes
-+	or      idx, unused_lanes
-+	mov     unused_lanes, _unused_lanes(state)
-+
-+	movl	$0xFFFFFFFF, _lens(state, idx, 4)
-+
-+	vmovd    _args_digest(state, idx, 4), %xmm0
-+	vpinsrd  $1, _args_digest+1*32(state , idx, 4), %xmm0, %xmm0
-+	vpinsrd  $2, _args_digest+2*32(state , idx, 4), %xmm0, %xmm0
-+	vpinsrd  $3, _args_digest+3*32(state , idx, 4), %xmm0, %xmm0
-+	movl    4*32(state, idx, 4), DWORD_tmp
-+
-+	vmovdqu  %xmm0, _result_digest(job_rax)
-+	movl    DWORD_tmp, _result_digest+1*16(job_rax)
-+
-+return:
-+
-+	mov     (%rsp), %rbx
-+	mov	8*2(%rsp), %r10	#save old rsp
-+	mov     8*3(%rsp), %rbp
-+	mov	8*4(%rsp), %r12
-+	mov	8*5(%rsp), %r13
-+	mov	8*6(%rsp), %r14
-+	mov	8*7(%rsp), %r15
-+	mov     %r10, %rsp
-+
-+	ret
-+
-+return_null:
-+	xor     job_rax, job_rax
-+	jmp     return
-+
-+ENDPROC(sha1_mb_mgr_submit_avx2)
-+
-+.data
-+
-+.align 16
-+clear_low_nibble:
-+	.octa	0x000000000000000000000000FFFFFFF0
++#endif
 -- 
 1.7.11.7
