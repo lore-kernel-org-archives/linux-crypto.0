@@ -1,71 +1,57 @@
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: Re: [net] BUG: unable to handle kernel NULL pointer dereference at
- 000000000000022f
-Date: Tue, 13 May 2014 09:43:54 +0200
-Message-ID: <5371CD3A.9020500@pengutronix.de>
-References: <537188D4.6050201@intel.com> <5371AA32.6070407@hartkopp.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 3.15
+Date: Tue, 13 May 2014 19:02:33 +0800
+Message-ID: <20140513110233.GA21743@gondor.apana.org.au>
+References: <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20140413233411.GA19019@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="aE5Cpud0re1qwkow6nH8No27ccbAfE4wm"
-Cc: Fengguang Wu <fengguang.wu@intel.com>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	netdev@vger.kernel.org, linux-can@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, netfilter@vger.kernel.org
-To: Oliver Hartkopp <socketcan@hartkopp.net>,
-	Jet Chen <jet.chen@intel.com>
-Return-path: <linux-can-owner@vger.kernel.org>
-In-Reply-To: <5371AA32.6070407@hartkopp.net>
-Sender: linux-can-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20140413233411.GA19019@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aE5Cpud0re1qwkow6nH8No27ccbAfE4wm
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hi Linus:
 
-On 05/13/2014 07:14 AM, Oliver Hartkopp wrote:
-> Hello Jet,
->=20
-> this is likely not CAN related, as
->=20
-> # CONFIG_CAN is not set
->=20
-> and all the CAN changes introduced by Marc's merge are not even compile=
-d in
-> your setup.
->=20
-> So I assume the issue somewhere in the netlink or ipv6 stuff (see commi=
-t at
-> the end.
+This push fixes a NULL pointer dereference on allocation failure
+in caam, as well as a regression in the ctr mode on s390 that was
+added with the recent concurrency fixes.
 
-Yes, I my merge is probably broken. That was an attempt to merge net
-into net-next, but I'm going to ask David Miller to do so. As I'm going
-to rebase this branch onto David's net-next (after the net merge), we
-can ignore this for now.
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Harald Freudenberger (1):
+      crypto: s390 - fix aes,des ctr mode concurrency finding.
+
+Horia Geanta (1):
+      crypto: caam - add allocation failure handling in SPRINTFCAT macro
+
+ arch/s390/crypto/aes_s390.c |    3 +++
+ arch/s390/crypto/des_s390.c |    3 +++
+ drivers/crypto/caam/error.c |   10 +++++++---
+ 3 files changed, 13 insertions(+), 3 deletions(-)
 
 Thanks,
-Marc
-
---=20
-Pengutronix e.K.                  | Marc Kleine-Budde           |
-Industrial Linux Solutions        | Phone: +49-231-2826-924     |
-Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
-Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
-
-
---aE5Cpud0re1qwkow6nH8No27ccbAfE4wm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-Comment: Using GnuPG with Icedove - http://www.enigmail.net/
-
-iEUEARECAAYFAlNxzToACgkQjTAFq1RaXHNFhgCePnlpFMg20DmQ41uY84kmf4dR
-+W4AmL25rmtvz5Ukx1sawbuHARW9Wbw=
-=+9h6
------END PGP SIGNATURE-----
-
---aE5Cpud0re1qwkow6nH8No27ccbAfE4wm--
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
