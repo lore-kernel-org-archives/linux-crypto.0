@@ -1,48 +1,114 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - reinitialize keys_fit_inline for decrypt
- and givencrypt
-Date: Tue, 13 May 2014 19:45:31 +0800
-Message-ID: <20140513114531.GB22078@gondor.apana.org.au>
-References: <1398612374-1746-1-git-send-email-vakul@freescale.com>
- <20140502191008.db1408c0735f14ed1a0bdb8b@freescale.com>
- <72e203ad27a64b66b1b876e7b9978e5c@BL2PR03MB162.namprd03.prod.outlook.com>
- <20140505133725.33abd0d08a1662a147c498f5@freescale.com>
- <70e10fa687e249f08a102f148edd3231@BL2PR03MB162.namprd03.prod.outlook.com>
- <20140506151114.e44a1af14c9d5b63ecbac603@freescale.com>
- <20140508135255.GA13355@gondor.apana.org.au>
- <20140509203440.6148a33a29c0e7003b7f152b@freescale.com>
+From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Subject: Re: [PATCH resend 13/15] arm64/crypto: add voluntary preemption to
+ Crypto Extensions SHA1
+Date: Tue, 13 May 2014 21:58:51 +0300
+Message-ID: <53726B6B.6070007@iki.fi>
+References: <1398959486-8222-1-git-send-email-ard.biesheuvel@linaro.org> <1398959486-8222-4-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Garg Vakul-B16394 <vakul@freescale.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Geanta Neag Horia Ioan-B05471 <Horia.Geanta@freescale.com>,
-	Gupta Ruchika-R66431 <ruchika.gupta@freescale.com>,
-	Porosanu Alexandru-B06830 <alexandru.porosanu@freescale.com>
-To: Kim Phillips <kim.phillips@freescale.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: catalin.marinas@arm.com, will.deacon@arm.com,
+	steve.capper@linaro.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:55283 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759422AbaEMLpf (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 May 2014 07:45:35 -0400
-Content-Disposition: inline
-In-Reply-To: <20140509203440.6148a33a29c0e7003b7f152b@freescale.com>
+Received: from mail.kapsi.fi ([217.30.184.167]:53706 "EHLO mail.kapsi.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752274AbaEMS65 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 13 May 2014 14:58:57 -0400
+In-Reply-To: <1398959486-8222-4-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 09, 2014 at 08:34:40PM -0500, Kim Phillips wrote:
-> From: Vakul Garg <vakul@freescale.com>
+On 01.05.2014 18:51, Ard Biesheuvel wrote:
+> The Crypto Extensions based SHA1 implementation uses the NEON register file,
+> and hence runs with preemption disabled. This patch adds a TIF_NEED_RESCHED
+> check to its inner loop so we at least give up the CPU voluntarily when we
+> are running in process context and have been tagged for preemption by the
+> scheduler.
 > 
-> Re-initialize keys_fit_inline to avoid using its stale encrypt() shared
-> descriptor value prior to building descriptors for the decrypt() and
-> givencrypt() cases.
-> 
-> Signed-off-by: Vakul Garg <vakul@freescale.com>
-> [reworded commit text, enhanced code readability]
-> Signed-off-by: Kim Phillips <kim.phillips@freescale.com>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+<snip>
+> @@ -42,6 +42,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+>  	sctx->count += len;
+>  
+>  	if ((partial + len) >= SHA1_BLOCK_SIZE) {
+> +		struct thread_info *ti = NULL;
+>  		int blocks;
+>  
+>  		if (partial) {
+> @@ -52,16 +53,30 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+>  			len -= p;
+>  		}
+>  
+> +		/*
+> +		 * Pass current's thread info pointer to sha1_ce_transform()
+> +		 * below if we want it to play nice under preemption.
+> +		 */
+> +		if ((IS_ENABLED(CONFIG_PREEMPT_VOLUNTARY) ||
+> +		     IS_ENABLED(CONFIG_PREEMPT)) && !in_interrupt())
+> +			ti = current_thread_info();
+> +
+>  		blocks = len / SHA1_BLOCK_SIZE;
+>  		len %= SHA1_BLOCK_SIZE;
+>  
+> -		kernel_neon_begin_partial(16);
+> -		sha1_ce_transform(blocks, data, sctx->state,
+> -				  partial ? sctx->buffer : NULL, 0);
+> -		kernel_neon_end();
+> +		do {
+> +			int rem;
+> +
+> +			kernel_neon_begin_partial(16);
+> +			rem = sha1_ce_transform(blocks, data, sctx->state,
+> +						partial ? sctx->buffer : NULL,
+> +						0, ti);
+> +			kernel_neon_end();
+>  
+> -		data += blocks * SHA1_BLOCK_SIZE;
+> -		partial = 0;
+> +			data += (blocks - rem) * SHA1_BLOCK_SIZE;
+> +			blocks = rem;
+> +			partial = 0;
+> +		} while (unlikely(ti && blocks > 0));
+>  	}
+>  	if (len)
+>  		memcpy(sctx->buffer + partial, data, len);
+> @@ -94,6 +109,7 @@ static int sha1_finup(struct shash_desc *desc, const u8 *data,
+>  		      unsigned int len, u8 *out)
+>  {
+>  	struct sha1_state *sctx = shash_desc_ctx(desc);
+> +	struct thread_info *ti = NULL;
+>  	__be32 *dst = (__be32 *)out;
+>  	int blocks;
+>  	int i;
+> @@ -111,9 +127,20 @@ static int sha1_finup(struct shash_desc *desc, const u8 *data,
+>  	 */
+>  	blocks = len / SHA1_BLOCK_SIZE;
+>  
+> -	kernel_neon_begin_partial(16);
+> -	sha1_ce_transform(blocks, data, sctx->state, NULL, len);
+> -	kernel_neon_end();
+> +	if ((IS_ENABLED(CONFIG_PREEMPT_VOLUNTARY) ||
+> +	     IS_ENABLED(CONFIG_PREEMPT)) && !in_interrupt())
+> +		ti = current_thread_info();
+> +
+> +	do {
+> +		int rem;
+> +
+> +		kernel_neon_begin_partial(16);
+> +		rem = sha1_ce_transform(blocks, data, sctx->state,
+> +					NULL, len, ti);
+> +		kernel_neon_end();
+> +		data += (blocks - rem) * SHA1_BLOCK_SIZE;
+> +		blocks = rem;
+> +	} while (unlikely(ti && blocks > 0));
+>  
 
-Patch applied.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+These seem to be similar, how about renaming assembly function to __sha1_ce_transform
+and moving this loop to new sha1_ce_transform.
+
+Otherwise, patches looks good.
+
+-Jussi
