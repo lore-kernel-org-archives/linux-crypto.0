@@ -1,68 +1,75 @@
-From: Oliver Hartkopp <socketcan@hartkopp.net>
+From: Marc Kleine-Budde <mkl@pengutronix.de>
 Subject: Re: [net] BUG: unable to handle kernel NULL pointer dereference at
  000000000000022f
-Date: Tue, 13 May 2014 07:14:26 +0200
-Message-ID: <5371AA32.6070407@hartkopp.net>
-References: <537188D4.6050201@intel.com>
+Date: Tue, 13 May 2014 09:51:58 +0200
+Message-ID: <5371CF1E.8090903@pengutronix.de>
+References: <537188D4.6050201@intel.com> <5371AA32.6070407@hartkopp.net> <5371CD3A.9020500@pengutronix.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="0oJNWNKvum3OuhJMmlIcnicfDPNj3I9gq"
 Cc: Fengguang Wu <fengguang.wu@intel.com>,
 	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
 	netdev@vger.kernel.org, linux-can@vger.kernel.org,
 	netfilter-devel@vger.kernel.org, netfilter@vger.kernel.org
-To: Jet Chen <jet.chen@intel.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.220]:60221 "EHLO
-	mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752100AbaEMFO3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 May 2014 01:14:29 -0400
-In-Reply-To: <537188D4.6050201@intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Oliver Hartkopp <socketcan@hartkopp.net>,
+	Jet Chen <jet.chen@intel.com>
+Return-path: <linux-can-owner@vger.kernel.org>
+In-Reply-To: <5371CD3A.9020500@pengutronix.de>
+Sender: linux-can-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello Jet,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0oJNWNKvum3OuhJMmlIcnicfDPNj3I9gq
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-this is likely not CAN related, as
+On 05/13/2014 09:43 AM, Marc Kleine-Budde wrote:
+> On 05/13/2014 07:14 AM, Oliver Hartkopp wrote:
+>> Hello Jet,
+>>
+>> this is likely not CAN related, as
+>>
+>> # CONFIG_CAN is not set
+>>
+>> and all the CAN changes introduced by Marc's merge are not even compil=
+ed in
+>> your setup.
+>>
+>> So I assume the issue somewhere in the netlink or ipv6 stuff (see comm=
+it at
+>> the end.
+>=20
+> Yes, I my merge is probably broken. That was an attempt to merge net
+> into net-next, but I'm going to ask David Miller to do so. As I'm going=
 
-# CONFIG_CAN is not set
+> to rebase this branch onto David's net-next (after the net merge), we
+> can ignore this for now.
 
-and all the CAN changes introduced by Marc's merge are not even compiled in
-your setup.
+While I was asleep David merged net to net-master ;) I just rebased this
+branch and updated it. The oops should be gone now.
 
-So I assume the issue somewhere in the netlink or ipv6 stuff (see commit at
-the end.
+Marc
 
-Best regards,
-Oliver
-
-
-On 13.05.2014 04:52, Jet Chen wrote:
-
-> [    1.301982]  [<ffffffff8163ee35>] netlink_bind+0x1e5/0x220
-> [    1.301982]  [<ffffffff815f57e8>] SYSC_bind+0xb8/0xf0
-> [    1.301982]  [<ffffffff815fbcd8>] ? sock_setsockopt+0x1a8/0x9c0
-> [    1.301982]  [<ffffffff815f6926>] ? SyS_setsockopt+0xb6/0xd0
-> [    1.301982]  [<ffffffff815f671e>] SyS_bind+0xe/0x10
-> [    1.301982]  [<ffffffff81752be9>] system_call_fastpath+0x16/0x1b
-> [    1.301982] Code: 50 48 85 c0 74 06 ff d0 5d c3 66 90 41 ff 51 40 5d c3 66
-> 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41 54 41 89 d4 53 <48>
-> 8b 87 30 02 00 00 48 89 f3 48 8b 78 18 e8 ae 94 a7 ff 31 d2 [    1.301982]
-> RIP  [<ffffffff815f7b3f>] sk_ns_capable+0xf/0x40
-> [    1.301982]  RSP <ffff88000becfe58>
-> [    1.301982] CR2: 000000000000022f
-> [    1.337456] ---[ end trace e34617f32717aa50 ]---
-> [    1.338240] Kernel panic - not syncing: Fatal exception
-> 
-> Attached dmesg for the parent commit, too, to help confirm whether it is a
-> noise error.
-> 
+--=20
+Pengutronix e.K.                  | Marc Kleine-Budde           |
+Industrial Linux Solutions        | Phone: +49-231-2826-924     |
+Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
+Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
 
 
-> # first bad commit: [0a240764becbec91589bd579b591c2fcf2df2bcf] Merge tag
-> 'linux-can-fixes-for-3.15-20140424' into HEAD
-> git bisect good 163cd4e817a4444e348ca577cb74c71d245f0c72  # 01:08     60+     
-> 2  ipv6: remove parameter rt from fib6_prune_clones()
-> git bisect good 367525c8c20a34560afe1d0c7cca52a44ccd62e9  # 01:11     60+     
+--0oJNWNKvum3OuhJMmlIcnicfDPNj3I9gq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: Using GnuPG with Icedove - http://www.enigmail.net/
+
+iEYEARECAAYFAlNxzx4ACgkQjTAFq1RaXHPcPQCgmCNTHEPQSYNlBdr0GuJLbZm6
+T8MAoIGfXp5A5Fva6d38QFfdIDuzb7Y3
+=NgTP
+-----END PGP SIGNATURE-----
+
+--0oJNWNKvum3OuhJMmlIcnicfDPNj3I9gq--
