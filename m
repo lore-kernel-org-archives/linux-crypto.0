@@ -1,39 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH resend 13/15] arm64/crypto: add voluntary preemption to
- Crypto Extensions SHA1
-Date: Wed, 14 May 2014 09:36:39 +0800
-Message-ID: <20140514013639.GA29126@gondor.apana.org.au>
-References: <1398959486-8222-4-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: ahash vs. shash
+Date: Wed, 14 May 2014 09:39:40 +0800
+Message-ID: <20140514013940.GA29183@gondor.apana.org.au>
+References: <CACE9dm-6kTZ91Ha8sMS=Zviqg-Dx6tzeTRVJtsGHKxwwP+TRzQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	catalin.marinas@arm.com, will.deacon@arm.com,
-	steve.capper@linaro.org, ard.biesheuvel@linaro.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-crypto@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:36121 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:51544 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750793AbaENBgr (ORCPT
+	with ESMTP id S1751319AbaENBjn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 May 2014 21:36:47 -0400
+	Tue, 13 May 2014 21:39:43 -0400
 Content-Disposition: inline
-In-Reply-To: <1398959486-8222-4-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <CACE9dm-6kTZ91Ha8sMS=Zviqg-Dx6tzeTRVJtsGHKxwwP+TRzQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> +               /*
-> +                * Pass current's thread info pointer to sha1_ce_transform()
-> +                * below if we want it to play nice under preemption.
-> +                */
-> +               if ((IS_ENABLED(CONFIG_PREEMPT_VOLUNTARY) ||
-> +                    IS_ENABLED(CONFIG_PREEMPT)) && !in_interrupt())
-> +                       ti = current_thread_info();
+Dmitry Kasatkin <dmitry.kasatkin@gmail.com> wrote:
+> Hi,
+> 
+> ahash allows to use HW acceleration, but usually it comes at a cost of
+> additional HW related configuration overhead, such as configuring hash
+> module, DMA, etc. For that reason hashing small chucks of data is
+> faster doing it with shash (CPU) rather than HW acceleration.
+> 
+> I measured long time ago on omap-sham driver but cannot recall any data.
+> 
+> Does anyone have any experience under what data size it is still
+> better to use shash?
 
-Instead of in_interrupt you should test CRYPTO_TFM_REQ_MAY_SLEEP.
-It's not a matter of correctness but it may avoid unnecessary
-breaks in the loop.
+It's going to be hardware-specific.  It'll also depend on whether
+you're coming from user-space or not as that would entail a bigger
+per-request overhead, meaning that you need more data to break
+even.
 
 Cheers,
 -- 
