@@ -1,51 +1,56 @@
-From: Marek Vasut <marex@denx.de>
-Subject: [PATCH] [RFC] crypto: cesa: Don't use tfm->__crt_alg->cra_type directly
-Date: Wed, 14 May 2014 11:42:52 +0200
-Message-ID: <1400060572-11692-1-git-send-email-marex@denx.de>
-Cc: herbert@gondor.apana.org.au, Marek Vasut <marex@denx.de>,
-	Bill Pemberton <wfp5p@virginia.edu>,
-	Kent Yoder <key@linux.vnet.ibm.com>,
-	Jamie Iles <jamie@jamieiles.com>,
-	Phil Sutter <phil.sutter@viprinet.com>
-To: linux-crypto@vger.kernel.org
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH 2/6] crypto: SHA1 multibuffer crypto hash infrastructure
+Date: Wed, 14 May 2014 09:08:48 -0700
+Message-ID: <1400083728.2970.248.camel@schen9-DESK>
+References: <cover.1399990803.git.tim.c.chen@linux.intel.com>
+	 <1400023185.2970.239.camel@schen9-DESK>
+	 <20140514001020.GA28593@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Chandramouli Narayanan <mouli@linux.intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:43844 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751308AbaENJmx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 May 2014 05:42:53 -0400
+Received: from mga02.intel.com ([134.134.136.20]:59993 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752479AbaENQIu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 May 2014 12:08:50 -0400
+In-Reply-To: <20140514001020.GA28593@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The checking for the type of algorithm implementation is pretty
-strange here. Use regular flags to check for the type instead.
+On Wed, 2014-05-14 at 08:10 +0800, Herbert Xu wrote:
+> On Tue, May 13, 2014 at 04:19:45PM -0700, Tim Chen wrote:
+> >
+> > diff --git a/crypto/shash.c b/crypto/shash.c
+> > index 929058a..6f40424 100644
+> > --- a/crypto/shash.c
+> > +++ b/crypto/shash.c
+> > @@ -229,6 +229,42 @@ int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc)
+> >  }
+> >  EXPORT_SYMBOL_GPL(shash_ahash_update);
+> >  
+> > +int shash_ahash_mcryptd_update(struct ahash_request *req,
+> > +			       struct shash_desc *desc)
+> > +{
+> > +	struct crypto_shash *tfm = desc->tfm;
+> > +	struct shash_alg *shash = crypto_shash_alg(tfm);
+> > +
+> > +	/* alignment is to be done by multi-buffer crypto algorithm if needed */
+> > +
+> > +	return shash->update(desc, NULL, 0);
+> > +}
+> > +EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_update);
+> 
+> Why are these functions in shash.c instead of mcryptd.c?
 
-Signed-off-by: Marek Vasut <marex@denx.de>
-Cc: Bill Pemberton <wfp5p@virginia.edu>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kent Yoder <key@linux.vnet.ibm.com>
-Cc: Jamie Iles <jamie@jamieiles.com>
-Cc: Phil Sutter <phil.sutter@viprinet.com>
----
- drivers/crypto/mv_cesa.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Sure, I can move them to mcryptd.c.
 
-NOTE: I am not sure this is correct, please review proper.
-
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 1549db7..29d0ee5 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -622,8 +622,8 @@ static int queue_manag(void *data)
- 		}
- 
- 		if (async_req) {
--			if (async_req->tfm->__crt_alg->cra_type !=
--			    &crypto_ahash_type) {
-+			if (crypto_tfm_alg_type(async_req->tfm) !=
-+			    CRYPTO_ALG_TYPE_AHASH) {
- 				struct ablkcipher_request *req =
- 				    ablkcipher_request_cast(async_req);
- 				mv_start_new_crypt_req(req);
--- 
-2.0.0.rc0
+Tim
