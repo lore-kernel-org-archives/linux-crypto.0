@@ -1,445 +1,327 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 01/11] arm64/crypto: SHA-1 using ARMv8 Crypto Extensions
-Date: Wed, 14 May 2014 11:17:21 -0700
-Message-ID: <1400091451-9117-2-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 03/11] arm64/crypto: GHASH secure hash using ARMv8 Crypto Extensions
+Date: Wed, 14 May 2014 11:17:23 -0700
+Message-ID: <1400091451-9117-4-git-send-email-ard.biesheuvel@linaro.org>
 References: <1400091451-9117-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
 	Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: catalin.marinas@arm.com, jussi.kivilinna@iki.fi,
 	herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yk0-f180.google.com ([209.85.160.180]:43918 "EHLO
-	mail-yk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751126AbaENSRn (ORCPT
+Received: from mail-yk0-f174.google.com ([209.85.160.174]:62455 "EHLO
+	mail-yk0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751527AbaENSRr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 May 2014 14:17:43 -0400
-Received: by mail-yk0-f180.google.com with SMTP id q9so1893216ykb.11
-        for <linux-crypto@vger.kernel.org>; Wed, 14 May 2014 11:17:42 -0700 (PDT)
+	Wed, 14 May 2014 14:17:47 -0400
+Received: by mail-yk0-f174.google.com with SMTP id 9so1898529ykp.5
+        for <linux-crypto@vger.kernel.org>; Wed, 14 May 2014 11:17:47 -0700 (PDT)
 In-Reply-To: <1400091451-9117-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds support for the SHA-1 Secure Hash Algorithm for CPUs that
-have support for the SHA-1 part of the ARM v8 Crypto Extensions.
+This is a port to ARMv8 (Crypto Extensions) of the Intel implementation of the
+GHASH Secure Hash (used in the Galois/Counter chaining mode). It relies on the
+optional PMULL/PMULL2 instruction (polynomial multiply long, what Intel call
+carry-less multiply).
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/arm64/Kconfig               |   3 +
- arch/arm64/Makefile              |   1 +
- arch/arm64/crypto/Kconfig        |  16 ++++
- arch/arm64/crypto/Makefile       |  12 +++
- arch/arm64/crypto/sha1-ce-core.S | 153 ++++++++++++++++++++++++++++++++++
- arch/arm64/crypto/sha1-ce-glue.c | 174 +++++++++++++++++++++++++++++++++++++++
- 6 files changed, 359 insertions(+)
- create mode 100644 arch/arm64/crypto/Kconfig
- create mode 100644 arch/arm64/crypto/Makefile
- create mode 100644 arch/arm64/crypto/sha1-ce-core.S
- create mode 100644 arch/arm64/crypto/sha1-ce-glue.c
+ arch/arm64/crypto/Kconfig         |   6 ++
+ arch/arm64/crypto/Makefile        |   3 +
+ arch/arm64/crypto/ghash-ce-core.S |  95 +++++++++++++++++++++++
+ arch/arm64/crypto/ghash-ce-glue.c | 155 ++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 259 insertions(+)
+ create mode 100644 arch/arm64/crypto/ghash-ce-core.S
+ create mode 100644 arch/arm64/crypto/ghash-ce-glue.c
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index e6e4d3749a6e..1cefc6fe969a 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -342,5 +342,8 @@ source "arch/arm64/Kconfig.debug"
- source "security/Kconfig"
- 
- source "crypto/Kconfig"
-+if CRYPTO
-+source "arch/arm64/crypto/Kconfig"
-+endif
- 
- source "lib/Kconfig"
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 2fceb71ac3b7..8185a913c5ed 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -45,6 +45,7 @@ export	TEXT_OFFSET GZFLAGS
- core-y		+= arch/arm64/kernel/ arch/arm64/mm/
- core-$(CONFIG_KVM) += arch/arm64/kvm/
- core-$(CONFIG_XEN) += arch/arm64/xen/
-+core-$(CONFIG_CRYPTO) += arch/arm64/crypto/
- libs-y		:= arch/arm64/lib/ $(libs-y)
- libs-y		+= $(LIBGCC)
- 
 diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-new file mode 100644
-index 000000000000..7956881b5986
---- /dev/null
+index eb1e99770c21..0c50859ee7b9 100644
+--- a/arch/arm64/crypto/Kconfig
 +++ b/arch/arm64/crypto/Kconfig
-@@ -0,0 +1,16 @@
+@@ -18,4 +18,10 @@ config CRYPTO_SHA2_ARM64_CE
+ 	depends on ARM64 && KERNEL_MODE_NEON
+ 	select CRYPTO_HASH
+ 
 +
-+menuconfig ARM64_CRYPTO
-+	bool "ARM64 Accelerated Cryptographic Algorithms"
-+	depends on ARM64
-+	help
-+	  Say Y here to choose from a selection of cryptographic algorithms
-+	  implemented using ARM64 specific CPU features or instructions.
-+
-+if ARM64_CRYPTO
-+
-+config CRYPTO_SHA1_ARM64_CE
-+	tristate "SHA-1 digest algorithm (ARMv8 Crypto Extensions)"
++config CRYPTO_GHASH_ARM64_CE
++	tristate "GHASH (for GCM chaining mode) using ARMv8 Crypto Extensions"
 +	depends on ARM64 && KERNEL_MODE_NEON
 +	select CRYPTO_HASH
 +
-+endif
+ endif
 diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-new file mode 100644
-index 000000000000..0ed3caaec81b
---- /dev/null
+index 0b3885a60d43..e8c81a068868 100644
+--- a/arch/arm64/crypto/Makefile
 +++ b/arch/arm64/crypto/Makefile
-@@ -0,0 +1,12 @@
-+#
-+# linux/arch/arm64/crypto/Makefile
-+#
-+# Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License version 2 as
-+# published by the Free Software Foundation.
-+#
+@@ -13,3 +13,6 @@ sha1-ce-y := sha1-ce-glue.o sha1-ce-core.o
+ 
+ obj-$(CONFIG_CRYPTO_SHA2_ARM64_CE) += sha2-ce.o
+ sha2-ce-y := sha2-ce-glue.o sha2-ce-core.o
 +
-+obj-$(CONFIG_CRYPTO_SHA1_ARM64_CE) += sha1-ce.o
-+sha1-ce-y := sha1-ce-glue.o sha1-ce-core.o
-diff --git a/arch/arm64/crypto/sha1-ce-core.S b/arch/arm64/crypto/sha1-ce-core.S
++obj-$(CONFIG_CRYPTO_GHASH_ARM64_CE) += ghash-ce.o
++ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
+diff --git a/arch/arm64/crypto/ghash-ce-core.S b/arch/arm64/crypto/ghash-ce-core.S
 new file mode 100644
-index 000000000000..09d57d98609c
+index 000000000000..b9e6eaf41c9b
 --- /dev/null
-+++ b/arch/arm64/crypto/sha1-ce-core.S
-@@ -0,0 +1,153 @@
++++ b/arch/arm64/crypto/ghash-ce-core.S
+@@ -0,0 +1,95 @@
 +/*
-+ * sha1-ce-core.S - SHA-1 secure hash using ARMv8 Crypto Extensions
++ * Accelerated GHASH implementation with ARMv8 PMULL instructions.
 + *
-+ * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ * Based on arch/x86/crypto/ghash-pmullni-intel_asm.S
++ *
++ * Copyright (c) 2009 Intel Corp.
++ *   Author: Huang Ying <ying.huang@intel.com>
++ *           Vinodh Gopal
++ *           Erdinc Ozturk
++ *           Deniz Karakoyunlu
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2 as published
++ * by the Free Software Foundation.
 + */
 +
 +#include <linux/linkage.h>
 +#include <asm/assembler.h>
 +
++	DATA	.req	v0
++	SHASH	.req	v1
++	IN1	.req	v2
++	T1	.req	v2
++	T2	.req	v3
++	T3	.req	v4
++	VZR	.req	v5
++
 +	.text
 +	.arch		armv8-a+crypto
 +
-+	k0		.req	v0
-+	k1		.req	v1
-+	k2		.req	v2
-+	k3		.req	v3
-+
-+	t0		.req	v4
-+	t1		.req	v5
-+
-+	dga		.req	q6
-+	dgav		.req	v6
-+	dgb		.req	s7
-+	dgbv		.req	v7
-+
-+	dg0q		.req	q12
-+	dg0s		.req	s12
-+	dg0v		.req	v12
-+	dg1s		.req	s13
-+	dg1v		.req	v13
-+	dg2s		.req	s14
-+
-+	.macro		add_only, op, ev, rc, s0, dg1
-+	.ifc		\ev, ev
-+	add		t1.4s, v\s0\().4s, \rc\().4s
-+	sha1h		dg2s, dg0s
-+	.ifnb		\dg1
-+	sha1\op		dg0q, \dg1, t0.4s
-+	.else
-+	sha1\op		dg0q, dg1s, t0.4s
-+	.endif
-+	.else
-+	.ifnb		\s0
-+	add		t0.4s, v\s0\().4s, \rc\().4s
-+	.endif
-+	sha1h		dg1s, dg0s
-+	sha1\op		dg0q, dg2s, t1.4s
-+	.endif
-+	.endm
-+
-+	.macro		add_update, op, ev, rc, s0, s1, s2, s3, dg1
-+	sha1su0		v\s0\().4s, v\s1\().4s, v\s2\().4s
-+	add_only	\op, \ev, \rc, \s1, \dg1
-+	sha1su1		v\s0\().4s, v\s3\().4s
-+	.endm
-+
 +	/*
-+	 * The SHA1 round constants
++	 * void pmull_ghash_update(int blocks, u64 dg[], const char *src,
++	 *			   struct ghash_key const *k, const char *head)
 +	 */
-+	.align		4
-+.Lsha1_rcon:
-+	.word		0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6
++ENTRY(pmull_ghash_update)
++	ld1		{DATA.16b}, [x1]
++	ld1		{SHASH.16b}, [x3]
++	eor		VZR.16b, VZR.16b, VZR.16b
 +
-+	/*
-+	 * void sha1_ce_transform(int blocks, u8 const *src, u32 *state,
-+	 * 			  u8 *head, long bytes)
-+	 */
-+ENTRY(sha1_ce_transform)
-+	/* load round constants */
-+	adr		x6, .Lsha1_rcon
-+	ld1r		{k0.4s}, [x6], #4
-+	ld1r		{k1.4s}, [x6], #4
-+	ld1r		{k2.4s}, [x6], #4
-+	ld1r		{k3.4s}, [x6]
-+
-+	/* load state */
-+	ldr		dga, [x2]
-+	ldr		dgb, [x2, #16]
-+
-+	/* load partial state (if supplied) */
-+	cbz		x3, 0f
-+	ld1		{v8.4s-v11.4s}, [x3]
++	/* do the head block first, if supplied */
++	cbz		x4, 0f
++	ld1		{IN1.2d}, [x4]
 +	b		1f
 +
-+	/* load input */
-+0:	ld1		{v8.4s-v11.4s}, [x1], #64
++0:	ld1		{IN1.2d}, [x2], #16
 +	sub		w0, w0, #1
++1:	ext		IN1.16b, IN1.16b, IN1.16b, #8
++CPU_LE(	rev64		IN1.16b, IN1.16b	)
++	eor		DATA.16b, DATA.16b, IN1.16b
 +
-+1:
-+CPU_LE(	rev32		v8.16b, v8.16b		)
-+CPU_LE(	rev32		v9.16b, v9.16b		)
-+CPU_LE(	rev32		v10.16b, v10.16b	)
-+CPU_LE(	rev32		v11.16b, v11.16b	)
++	/* multiply DATA by SHASH in GF(2^128) */
++	ext		T2.16b, DATA.16b, DATA.16b, #8
++	ext		T3.16b, SHASH.16b, SHASH.16b, #8
++	eor		T2.16b, T2.16b, DATA.16b
++	eor		T3.16b, T3.16b, SHASH.16b
 +
-+2:	add		t0.4s, v8.4s, k0.4s
-+	mov		dg0v.16b, dgav.16b
++	pmull2		T1.1q, SHASH.2d, DATA.2d	// a1 * b1
++	pmull		DATA.1q, SHASH.1d, DATA.1d	// a0 * b0
++	pmull		T2.1q, T2.1d, T3.1d		// (a1 + a0)(b1 + b0)
++	eor		T2.16b, T2.16b, T1.16b		// (a0 * b1) + (a1 * b0)
++	eor		T2.16b, T2.16b, DATA.16b
 +
-+	add_update	c, ev, k0,  8,  9, 10, 11, dgb
-+	add_update	c, od, k0,  9, 10, 11,  8
-+	add_update	c, ev, k0, 10, 11,  8,  9
-+	add_update	c, od, k0, 11,  8,  9, 10
-+	add_update	c, ev, k1,  8,  9, 10, 11
++	ext		T3.16b, VZR.16b, T2.16b, #8
++	ext		T2.16b, T2.16b, VZR.16b, #8
++	eor		DATA.16b, DATA.16b, T3.16b
++	eor		T1.16b, T1.16b, T2.16b	// <T1:DATA> is result of
++						// carry-less multiplication
 +
-+	add_update	p, od, k1,  9, 10, 11,  8
-+	add_update	p, ev, k1, 10, 11,  8,  9
-+	add_update	p, od, k1, 11,  8,  9, 10
-+	add_update	p, ev, k1,  8,  9, 10, 11
-+	add_update	p, od, k2,  9, 10, 11,  8
++	/* first phase of the reduction */
++	shl		T3.2d, DATA.2d, #1
++	eor		T3.16b, T3.16b, DATA.16b
++	shl		T3.2d, T3.2d, #5
++	eor		T3.16b, T3.16b, DATA.16b
++	shl		T3.2d, T3.2d, #57
++	ext		T2.16b, VZR.16b, T3.16b, #8
++	ext		T3.16b, T3.16b, VZR.16b, #8
++	eor		DATA.16b, DATA.16b, T2.16b
++	eor		T1.16b, T1.16b, T3.16b
 +
-+	add_update	m, ev, k2, 10, 11,  8,  9
-+	add_update	m, od, k2, 11,  8,  9, 10
-+	add_update	m, ev, k2,  8,  9, 10, 11
-+	add_update	m, od, k2,  9, 10, 11,  8
-+	add_update	m, ev, k3, 10, 11,  8,  9
-+
-+	add_update	p, od, k3, 11,  8,  9, 10
-+	add_only	p, ev, k3,  9
-+	add_only	p, od, k3, 10
-+	add_only	p, ev, k3, 11
-+	add_only	p, od
-+
-+	/* update state */
-+	add		dgbv.2s, dgbv.2s, dg1v.2s
-+	add		dgav.4s, dgav.4s, dg0v.4s
++	/* second phase of the reduction */
++	ushr		T2.2d, DATA.2d, #5
++	eor		T2.16b, T2.16b, DATA.16b
++	ushr		T2.2d, T2.2d, #1
++	eor		T2.16b, T2.16b, DATA.16b
++	ushr		T2.2d, T2.2d, #1
++	eor		T1.16b, T1.16b, T2.16b
++	eor		DATA.16b, DATA.16b, T1.16b
 +
 +	cbnz		w0, 0b
 +
-+	/*
-+	 * Final block: add padding and total bit count.
-+	 * Skip if we have no total byte count in x4. In that case, the input
-+	 * size was not a round multiple of the block size, and the padding is
-+	 * handled by the C code.
-+	 */
-+	cbz		x4, 3f
-+	movi		v9.2d, #0
-+	mov		x8, #0x80000000
-+	movi		v10.2d, #0
-+	ror		x7, x4, #29		// ror(lsl(x4, 3), 32)
-+	fmov		d8, x8
-+	mov		x4, #0
-+	mov		v11.d[0], xzr
-+	mov		v11.d[1], x7
-+	b		2b
-+
-+	/* store new state */
-+3:	str		dga, [x2]
-+	str		dgb, [x2, #16]
++	st1		{DATA.16b}, [x1]
 +	ret
-+ENDPROC(sha1_ce_transform)
-diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
++ENDPROC(pmull_ghash_update)
+diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
 new file mode 100644
-index 000000000000..6fe83f37a750
+index 000000000000..b92baf3f68c7
 --- /dev/null
-+++ b/arch/arm64/crypto/sha1-ce-glue.c
-@@ -0,0 +1,174 @@
++++ b/arch/arm64/crypto/ghash-ce-glue.c
+@@ -0,0 +1,155 @@
 +/*
-+ * sha1-ce-glue.c - SHA-1 secure hash using ARMv8 Crypto Extensions
++ * Accelerated GHASH implementation with ARMv8 PMULL instructions.
 + *
-+ * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License version 2 as published
++ * by the Free Software Foundation.
 + */
 +
 +#include <asm/neon.h>
 +#include <asm/unaligned.h>
 +#include <crypto/internal/hash.h>
-+#include <crypto/sha.h>
 +#include <linux/cpufeature.h>
 +#include <linux/crypto.h>
 +#include <linux/module.h>
 +
-+MODULE_DESCRIPTION("SHA1 secure hash using ARMv8 Crypto Extensions");
++MODULE_DESCRIPTION("GHASH secure hash using ARMv8 Crypto Extensions");
 +MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
 +MODULE_LICENSE("GPL v2");
 +
-+asmlinkage void sha1_ce_transform(int blocks, u8 const *src, u32 *state,
-+				  u8 *head, long bytes);
++#define GHASH_BLOCK_SIZE	16
++#define GHASH_DIGEST_SIZE	16
 +
-+static int sha1_init(struct shash_desc *desc)
++struct ghash_key {
++	u64 a;
++	u64 b;
++};
++
++struct ghash_desc_ctx {
++	u64 digest[GHASH_DIGEST_SIZE/sizeof(u64)];
++	u8 buf[GHASH_BLOCK_SIZE];
++	u32 count;
++};
++
++asmlinkage void pmull_ghash_update(int blocks, u64 dg[], const char *src,
++				   struct ghash_key const *k, const char *head);
++
++static int ghash_init(struct shash_desc *desc)
 +{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
++	struct ghash_desc_ctx *ctx = shash_desc_ctx(desc);
 +
-+	*sctx = (struct sha1_state){
-+		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
-+	};
++	*ctx = (struct ghash_desc_ctx){};
 +	return 0;
 +}
 +
-+static int sha1_update(struct shash_desc *desc, const u8 *data,
-+		       unsigned int len)
++static int ghash_update(struct shash_desc *desc, const u8 *src,
++			unsigned int len)
 +{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
++	struct ghash_desc_ctx *ctx = shash_desc_ctx(desc);
++	unsigned int partial = ctx->count % GHASH_BLOCK_SIZE;
 +
-+	sctx->count += len;
++	ctx->count += len;
 +
-+	if ((partial + len) >= SHA1_BLOCK_SIZE) {
++	if ((partial + len) >= GHASH_BLOCK_SIZE) {
++		struct ghash_key *key = crypto_shash_ctx(desc->tfm);
 +		int blocks;
 +
 +		if (partial) {
-+			int p = SHA1_BLOCK_SIZE - partial;
++			int p = GHASH_BLOCK_SIZE - partial;
 +
-+			memcpy(sctx->buffer + partial, data, p);
-+			data += p;
++			memcpy(ctx->buf + partial, src, p);
++			src += p;
 +			len -= p;
 +		}
 +
-+		blocks = len / SHA1_BLOCK_SIZE;
-+		len %= SHA1_BLOCK_SIZE;
++		blocks = len / GHASH_BLOCK_SIZE;
++		len %= GHASH_BLOCK_SIZE;
 +
-+		kernel_neon_begin_partial(16);
-+		sha1_ce_transform(blocks, data, sctx->state,
-+				  partial ? sctx->buffer : NULL, 0);
++		kernel_neon_begin_partial(6);
++		pmull_ghash_update(blocks, ctx->digest, src, key,
++				   partial ? ctx->buf : NULL);
 +		kernel_neon_end();
-+
-+		data += blocks * SHA1_BLOCK_SIZE;
-+		partial = 0;
++		src += blocks * GHASH_BLOCK_SIZE;
 +	}
 +	if (len)
-+		memcpy(sctx->buffer + partial, data, len);
++		memcpy(ctx->buf + partial, src, len);
 +	return 0;
 +}
 +
-+static int sha1_final(struct shash_desc *desc, u8 *out)
++static int ghash_final(struct shash_desc *desc, u8 *dst)
 +{
-+	static const u8 padding[SHA1_BLOCK_SIZE] = { 0x80, };
++	struct ghash_desc_ctx *ctx = shash_desc_ctx(desc);
++	unsigned int partial = ctx->count % GHASH_BLOCK_SIZE;
 +
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+	__be64 bits = cpu_to_be64(sctx->count << 3);
-+	__be32 *dst = (__be32 *)out;
-+	int i;
++	if (partial) {
++		struct ghash_key *key = crypto_shash_ctx(desc->tfm);
 +
-+	u32 padlen = SHA1_BLOCK_SIZE
-+		     - ((sctx->count + sizeof(bits)) % SHA1_BLOCK_SIZE);
++		memset(ctx->buf + partial, 0, GHASH_BLOCK_SIZE - partial);
 +
-+	sha1_update(desc, padding, padlen);
-+	sha1_update(desc, (const u8 *)&bits, sizeof(bits));
++		kernel_neon_begin_partial(6);
++		pmull_ghash_update(1, ctx->digest, ctx->buf, key, NULL);
++		kernel_neon_end();
++	}
++	put_unaligned_be64(ctx->digest[1], dst);
++	put_unaligned_be64(ctx->digest[0], dst + 8);
 +
-+	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(__be32); i++)
-+		put_unaligned_be32(sctx->state[i], dst++);
-+
-+	*sctx = (struct sha1_state){};
++	*ctx = (struct ghash_desc_ctx){};
 +	return 0;
 +}
 +
-+static int sha1_finup(struct shash_desc *desc, const u8 *data,
-+		      unsigned int len, u8 *out)
++static int ghash_setkey(struct crypto_shash *tfm,
++			const u8 *inkey, unsigned int keylen)
 +{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+	__be32 *dst = (__be32 *)out;
-+	int blocks;
-+	int i;
++	struct ghash_key *key = crypto_shash_ctx(tfm);
++	u64 a, b;
 +
-+	if (sctx->count || !len || (len % SHA1_BLOCK_SIZE)) {
-+		sha1_update(desc, data, len);
-+		return sha1_final(desc, out);
++	if (keylen != GHASH_BLOCK_SIZE) {
++		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
 +	}
 +
-+	/*
-+	 * Use a fast path if the input is a multiple of 64 bytes. In
-+	 * this case, there is no need to copy data around, and we can
-+	 * perform the entire digest calculation in a single invocation
-+	 * of sha1_ce_transform()
-+	 */
-+	blocks = len / SHA1_BLOCK_SIZE;
++	/* perform multiplication by 'x' in GF(2^128) */
++	b = get_unaligned_be64(inkey);
++	a = get_unaligned_be64(inkey + 8);
 +
-+	kernel_neon_begin_partial(16);
-+	sha1_ce_transform(blocks, data, sctx->state, NULL, len);
-+	kernel_neon_end();
++	key->a = (a << 1) | (b >> 63);
++	key->b = (b << 1) | (a >> 63);
 +
-+	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(__be32); i++)
-+		put_unaligned_be32(sctx->state[i], dst++);
++	if (b >> 63)
++		key->b ^= 0xc200000000000000UL;
 +
-+	*sctx = (struct sha1_state){};
 +	return 0;
 +}
 +
-+static int sha1_export(struct shash_desc *desc, void *out)
-+{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+	struct sha1_state *dst = out;
-+
-+	*dst = *sctx;
-+	return 0;
-+}
-+
-+static int sha1_import(struct shash_desc *desc, const void *in)
-+{
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
-+	struct sha1_state const *src = in;
-+
-+	*sctx = *src;
-+	return 0;
-+}
-+
-+static struct shash_alg alg = {
-+	.init			= sha1_init,
-+	.update			= sha1_update,
-+	.final			= sha1_final,
-+	.finup			= sha1_finup,
-+	.export			= sha1_export,
-+	.import			= sha1_import,
-+	.descsize		= sizeof(struct sha1_state),
-+	.digestsize		= SHA1_DIGEST_SIZE,
-+	.statesize		= sizeof(struct sha1_state),
-+	.base			= {
-+		.cra_name		= "sha1",
-+		.cra_driver_name	= "sha1-ce",
++static struct shash_alg ghash_alg = {
++	.digestsize	= GHASH_DIGEST_SIZE,
++	.init		= ghash_init,
++	.update		= ghash_update,
++	.final		= ghash_final,
++	.setkey		= ghash_setkey,
++	.descsize	= sizeof(struct ghash_desc_ctx),
++	.base		= {
++		.cra_name		= "ghash",
++		.cra_driver_name	= "ghash-ce",
 +		.cra_priority		= 200,
 +		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize		= SHA1_BLOCK_SIZE,
++		.cra_blocksize		= GHASH_BLOCK_SIZE,
++		.cra_ctxsize		= sizeof(struct ghash_key),
 +		.cra_module		= THIS_MODULE,
-+	}
++	},
 +};
 +
-+static int __init sha1_ce_mod_init(void)
++static int __init ghash_ce_mod_init(void)
 +{
-+	return crypto_register_shash(&alg);
++	return crypto_register_shash(&ghash_alg);
 +}
 +
-+static void __exit sha1_ce_mod_fini(void)
++static void __exit ghash_ce_mod_exit(void)
 +{
-+	crypto_unregister_shash(&alg);
++	crypto_unregister_shash(&ghash_alg);
 +}
 +
-+module_cpu_feature_match(SHA1, sha1_ce_mod_init);
-+module_exit(sha1_ce_mod_fini);
++module_cpu_feature_match(PMULL, ghash_ce_mod_init);
++module_exit(ghash_ce_mod_exit);
 -- 
 1.8.3.2
