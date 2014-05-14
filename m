@@ -1,133 +1,232 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 11/11] arm64/crypto: add voluntary preemption to Crypto Extensions GHASH
-Date: Wed, 14 May 2014 11:17:31 -0700
-Message-ID: <1400091451-9117-12-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 04/11] arm64/crypto: AES using ARMv8 Crypto Extensions
+Date: Wed, 14 May 2014 11:17:24 -0700
+Message-ID: <1400091451-9117-5-git-send-email-ard.biesheuvel@linaro.org>
 References: <1400091451-9117-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: catalin.marinas@arm.com, jussi.kivilinna@iki.fi,
-	herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-yh0-f41.google.com ([209.85.213.41]:52091 "EHLO
-	mail-yh0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751339AbaENSSH (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 May 2014 14:18:07 -0400
-Received: by mail-yh0-f41.google.com with SMTP id f73so2063048yha.28
-        for <linux-crypto@vger.kernel.org>; Wed, 14 May 2014 11:18:06 -0700 (PDT)
+ herbert@gondor.apana.org.au
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1400091451-9117-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-The Crypto Extensions based GHASH implementation uses the NEON register file,
-and hence runs with preemption disabled. This patch adds a TIF_NEED_RESCHED
-check to its inner loop so we at least give up the CPU voluntarily when we
-are running in process context and have been tagged for preemption by the
-scheduler.
+This patch adds support for the AES symmetric encryption algorithm for CPUs
+that have support for the AES part of the ARM v8 Crypto Extensions.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/arm64/crypto/ghash-ce-core.S | 10 ++++++----
- arch/arm64/crypto/ghash-ce-glue.c | 34 ++++++++++++++++++++++++++--------
- 2 files changed, 32 insertions(+), 12 deletions(-)
+ arch/arm64/crypto/Kconfig         |   7 +-
+ arch/arm64/crypto/Makefile        |   3 +
+ arch/arm64/crypto/aes-ce-cipher.c | 155 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 164 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/crypto/aes-ce-cipher.c
 
-diff --git a/arch/arm64/crypto/ghash-ce-core.S b/arch/arm64/crypto/ghash-ce-core.S
-index b9e6eaf41c9b..523432f24ed2 100644
---- a/arch/arm64/crypto/ghash-ce-core.S
-+++ b/arch/arm64/crypto/ghash-ce-core.S
-@@ -31,8 +31,9 @@
- 	.arch		armv8-a+crypto
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index 0c50859ee7b9..9ba32c0da871 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -18,10 +18,15 @@ config CRYPTO_SHA2_ARM64_CE
+ 	depends on ARM64 && KERNEL_MODE_NEON
+ 	select CRYPTO_HASH
  
- 	/*
--	 * void pmull_ghash_update(int blocks, u64 dg[], const char *src,
--	 *			   struct ghash_key const *k, const char *head)
-+	 * int pmull_ghash_update(int blocks, u64 dg[], const char *src,
-+	 *			  struct ghash_key const *k, const char *head,
-+	 * 			  struct thread_info *ti)
- 	 */
- ENTRY(pmull_ghash_update)
- 	ld1		{DATA.16b}, [x1]
-@@ -88,8 +89,9 @@ CPU_LE(	rev64		IN1.16b, IN1.16b	)
- 	eor		T1.16b, T1.16b, T2.16b
- 	eor		DATA.16b, DATA.16b, T1.16b
+-
+ config CRYPTO_GHASH_ARM64_CE
+ 	tristate "GHASH (for GCM chaining mode) using ARMv8 Crypto Extensions"
+ 	depends on ARM64 && KERNEL_MODE_NEON
+ 	select CRYPTO_HASH
  
--	cbnz		w0, 0b
-+	cbz		w0, 2f
-+	b_if_no_resched	x5, x7, 0b
- 
--	st1		{DATA.16b}, [x1]
-+2:	st1		{DATA.16b}, [x1]
- 	ret
- ENDPROC(pmull_ghash_update)
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index b92baf3f68c7..b8f58f9bcf00 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -33,8 +33,9 @@ struct ghash_desc_ctx {
- 	u32 count;
- };
- 
--asmlinkage void pmull_ghash_update(int blocks, u64 dg[], const char *src,
--				   struct ghash_key const *k, const char *head);
-+asmlinkage int pmull_ghash_update(int blocks, u64 dg[], const char *src,
-+				  struct ghash_key const *k, const char *head,
-+				  struct thread_info *ti);
- 
- static int ghash_init(struct shash_desc *desc)
- {
-@@ -54,6 +55,7 @@ static int ghash_update(struct shash_desc *desc, const u8 *src,
- 
- 	if ((partial + len) >= GHASH_BLOCK_SIZE) {
- 		struct ghash_key *key = crypto_shash_ctx(desc->tfm);
-+		struct thread_info *ti = NULL;
- 		int blocks;
- 
- 		if (partial) {
-@@ -64,14 +66,30 @@ static int ghash_update(struct shash_desc *desc, const u8 *src,
- 			len -= p;
- 		}
- 
-+		/*
-+		 * Pass current's thread info pointer to pmull_ghash_update()
-+		 * below if we want it to play nice under preemption.
-+		 */
-+		if ((IS_ENABLED(CONFIG_PREEMPT_VOLUNTARY) ||
-+		     IS_ENABLED(CONFIG_PREEMPT))
-+		    && (desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP))
-+			ti = current_thread_info();
++config CRYPTO_AES_ARM64_CE
++	tristate "AES core cipher using ARMv8 Crypto Extensions"
++	depends on ARM64 && KERNEL_MODE_NEON
++	select CRYPTO_ALGAPI
++	select CRYPTO_AES
 +
- 		blocks = len / GHASH_BLOCK_SIZE;
- 		len %= GHASH_BLOCK_SIZE;
+ endif
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index e8c81a068868..908abd9242b1 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -16,3 +16,6 @@ sha2-ce-y := sha2-ce-glue.o sha2-ce-core.o
  
--		kernel_neon_begin_partial(6);
--		pmull_ghash_update(blocks, ctx->digest, src, key,
--				   partial ? ctx->buf : NULL);
--		kernel_neon_end();
--		src += blocks * GHASH_BLOCK_SIZE;
-+		do {
-+			int rem;
+ obj-$(CONFIG_CRYPTO_GHASH_ARM64_CE) += ghash-ce.o
+ ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
 +
-+			kernel_neon_begin_partial(6);
-+			rem = pmull_ghash_update(blocks, ctx->digest, src, key,
-+						 partial ? ctx->buf : NULL, ti);
-+			kernel_neon_end();
++obj-$(CONFIG_CRYPTO_AES_ARM64_CE) += aes-ce-cipher.o
++CFLAGS_aes-ce-cipher.o += -march=armv8-a+crypto
+diff --git a/arch/arm64/crypto/aes-ce-cipher.c b/arch/arm64/crypto/aes-ce-cipher.c
+new file mode 100644
+index 000000000000..2075e1acae6b
+--- /dev/null
++++ b/arch/arm64/crypto/aes-ce-cipher.c
+@@ -0,0 +1,155 @@
++/*
++ * aes-ce-cipher.c - core AES cipher using ARMv8 Crypto Extensions
++ *
++ * Copyright (C) 2013 - 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
 +
-+			src += (blocks - rem) * GHASH_BLOCK_SIZE;
-+			blocks = rem;
-+			partial = 0;
-+		} while (unlikely(ti && blocks > 0));
- 	}
- 	if (len)
- 		memcpy(ctx->buf + partial, src, len);
-@@ -89,7 +107,7 @@ static int ghash_final(struct shash_desc *desc, u8 *dst)
- 		memset(ctx->buf + partial, 0, GHASH_BLOCK_SIZE - partial);
- 
- 		kernel_neon_begin_partial(6);
--		pmull_ghash_update(1, ctx->digest, ctx->buf, key, NULL);
-+		pmull_ghash_update(1, ctx->digest, ctx->buf, key, NULL, NULL);
- 		kernel_neon_end();
- 	}
- 	put_unaligned_be64(ctx->digest[1], dst);
++#include <asm/neon.h>
++#include <crypto/aes.h>
++#include <linux/cpufeature.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++
++MODULE_DESCRIPTION("Synchronous AES cipher using ARMv8 Crypto Extensions");
++MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
++MODULE_LICENSE("GPL v2");
++
++struct aes_block {
++	u8 b[AES_BLOCK_SIZE];
++};
++
++static int num_rounds(struct crypto_aes_ctx *ctx)
++{
++	/*
++	 * # of rounds specified by AES:
++	 * 128 bit key		10 rounds
++	 * 192 bit key		12 rounds
++	 * 256 bit key		14 rounds
++	 * => n byte key	=> 6 + (n/4) rounds
++	 */
++	return 6 + ctx->key_length / 4;
++}
++
++static void aes_cipher_encrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
++{
++	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct aes_block *out = (struct aes_block *)dst;
++	struct aes_block const *in = (struct aes_block *)src;
++	void *dummy0;
++	int dummy1;
++
++	kernel_neon_begin_partial(4);
++
++	__asm__("	ld1	{v0.16b}, %[in]			;"
++		"	ld1	{v1.2d}, [%[key]], #16		;"
++		"	cmp	%w[rounds], #10			;"
++		"	bmi	0f				;"
++		"	bne	3f				;"
++		"	mov	v3.16b, v1.16b			;"
++		"	b	2f				;"
++		"0:	mov	v2.16b, v1.16b			;"
++		"	ld1	{v3.2d}, [%[key]], #16		;"
++		"1:	aese	v0.16b, v2.16b			;"
++		"	aesmc	v0.16b, v0.16b			;"
++		"2:	ld1	{v1.2d}, [%[key]], #16		;"
++		"	aese	v0.16b, v3.16b			;"
++		"	aesmc	v0.16b, v0.16b			;"
++		"3:	ld1	{v2.2d}, [%[key]], #16		;"
++		"	subs	%w[rounds], %w[rounds], #3	;"
++		"	aese	v0.16b, v1.16b			;"
++		"	aesmc	v0.16b, v0.16b			;"
++		"	ld1	{v3.2d}, [%[key]], #16		;"
++		"	bpl	1b				;"
++		"	aese	v0.16b, v2.16b			;"
++		"	eor	v0.16b, v0.16b, v3.16b		;"
++		"	st1	{v0.16b}, %[out]		;"
++
++	:	[out]		"=Q"(*out),
++		[key]		"=r"(dummy0),
++		[rounds]	"=r"(dummy1)
++	:	[in]		"Q"(*in),
++				"1"(ctx->key_enc),
++				"2"(num_rounds(ctx) - 2)
++	:	"cc");
++
++	kernel_neon_end();
++}
++
++static void aes_cipher_decrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
++{
++	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct aes_block *out = (struct aes_block *)dst;
++	struct aes_block const *in = (struct aes_block *)src;
++	void *dummy0;
++	int dummy1;
++
++	kernel_neon_begin_partial(4);
++
++	__asm__("	ld1	{v0.16b}, %[in]			;"
++		"	ld1	{v1.2d}, [%[key]], #16		;"
++		"	cmp	%w[rounds], #10			;"
++		"	bmi	0f				;"
++		"	bne	3f				;"
++		"	mov	v3.16b, v1.16b			;"
++		"	b	2f				;"
++		"0:	mov	v2.16b, v1.16b			;"
++		"	ld1	{v3.2d}, [%[key]], #16		;"
++		"1:	aesd	v0.16b, v2.16b			;"
++		"	aesimc	v0.16b, v0.16b			;"
++		"2:	ld1	{v1.2d}, [%[key]], #16		;"
++		"	aesd	v0.16b, v3.16b			;"
++		"	aesimc	v0.16b, v0.16b			;"
++		"3:	ld1	{v2.2d}, [%[key]], #16		;"
++		"	subs	%w[rounds], %w[rounds], #3	;"
++		"	aesd	v0.16b, v1.16b			;"
++		"	aesimc	v0.16b, v0.16b			;"
++		"	ld1	{v3.2d}, [%[key]], #16		;"
++		"	bpl	1b				;"
++		"	aesd	v0.16b, v2.16b			;"
++		"	eor	v0.16b, v0.16b, v3.16b		;"
++		"	st1	{v0.16b}, %[out]		;"
++
++	:	[out]		"=Q"(*out),
++		[key]		"=r"(dummy0),
++		[rounds]	"=r"(dummy1)
++	:	[in]		"Q"(*in),
++				"1"(ctx->key_dec),
++				"2"(num_rounds(ctx) - 2)
++	:	"cc");
++
++	kernel_neon_end();
++}
++
++static struct crypto_alg aes_alg = {
++	.cra_name		= "aes",
++	.cra_driver_name	= "aes-ce",
++	.cra_priority		= 300,
++	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize		= AES_BLOCK_SIZE,
++	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
++	.cra_module		= THIS_MODULE,
++	.cra_cipher = {
++		.cia_min_keysize	= AES_MIN_KEY_SIZE,
++		.cia_max_keysize	= AES_MAX_KEY_SIZE,
++		.cia_setkey		= crypto_aes_set_key,
++		.cia_encrypt		= aes_cipher_encrypt,
++		.cia_decrypt		= aes_cipher_decrypt
++	}
++};
++
++static int __init aes_mod_init(void)
++{
++	return crypto_register_alg(&aes_alg);
++}
++
++static void __exit aes_mod_exit(void)
++{
++	crypto_unregister_alg(&aes_alg);
++}
++
++module_cpu_feature_match(AES, aes_mod_init);
++module_exit(aes_mod_exit);
 -- 
 1.8.3.2
