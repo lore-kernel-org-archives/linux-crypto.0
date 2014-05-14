@@ -1,56 +1,445 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH 2/6] crypto: SHA1 multibuffer crypto hash infrastructure
-Date: Wed, 14 May 2014 09:08:48 -0700
-Message-ID: <1400083728.2970.248.camel@schen9-DESK>
-References: <cover.1399990803.git.tim.c.chen@linux.intel.com>
-	 <1400023185.2970.239.camel@schen9-DESK>
-	 <20140514001020.GA28593@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 01/11] arm64/crypto: SHA-1 using ARMv8 Crypto Extensions
+Date: Wed, 14 May 2014 11:17:21 -0700
+Message-ID: <1400091451-9117-2-git-send-email-ard.biesheuvel@linaro.org>
+References: <1400091451-9117-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: catalin.marinas@arm.com, jussi.kivilinna@iki.fi,
+	herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:59993 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752479AbaENQIu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 May 2014 12:08:50 -0400
-In-Reply-To: <20140514001020.GA28593@gondor.apana.org.au>
+Received: from mail-yk0-f180.google.com ([209.85.160.180]:43918 "EHLO
+	mail-yk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751126AbaENSRn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 May 2014 14:17:43 -0400
+Received: by mail-yk0-f180.google.com with SMTP id q9so1893216ykb.11
+        for <linux-crypto@vger.kernel.org>; Wed, 14 May 2014 11:17:42 -0700 (PDT)
+In-Reply-To: <1400091451-9117-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2014-05-14 at 08:10 +0800, Herbert Xu wrote:
-> On Tue, May 13, 2014 at 04:19:45PM -0700, Tim Chen wrote:
-> >
-> > diff --git a/crypto/shash.c b/crypto/shash.c
-> > index 929058a..6f40424 100644
-> > --- a/crypto/shash.c
-> > +++ b/crypto/shash.c
-> > @@ -229,6 +229,42 @@ int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc)
-> >  }
-> >  EXPORT_SYMBOL_GPL(shash_ahash_update);
-> >  
-> > +int shash_ahash_mcryptd_update(struct ahash_request *req,
-> > +			       struct shash_desc *desc)
-> > +{
-> > +	struct crypto_shash *tfm = desc->tfm;
-> > +	struct shash_alg *shash = crypto_shash_alg(tfm);
-> > +
-> > +	/* alignment is to be done by multi-buffer crypto algorithm if needed */
-> > +
-> > +	return shash->update(desc, NULL, 0);
-> > +}
-> > +EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_update);
-> 
-> Why are these functions in shash.c instead of mcryptd.c?
+This patch adds support for the SHA-1 Secure Hash Algorithm for CPUs that
+have support for the SHA-1 part of the ARM v8 Crypto Extensions.
 
-Sure, I can move them to mcryptd.c.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ arch/arm64/Kconfig               |   3 +
+ arch/arm64/Makefile              |   1 +
+ arch/arm64/crypto/Kconfig        |  16 ++++
+ arch/arm64/crypto/Makefile       |  12 +++
+ arch/arm64/crypto/sha1-ce-core.S | 153 ++++++++++++++++++++++++++++++++++
+ arch/arm64/crypto/sha1-ce-glue.c | 174 +++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 359 insertions(+)
+ create mode 100644 arch/arm64/crypto/Kconfig
+ create mode 100644 arch/arm64/crypto/Makefile
+ create mode 100644 arch/arm64/crypto/sha1-ce-core.S
+ create mode 100644 arch/arm64/crypto/sha1-ce-glue.c
 
-Tim
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index e6e4d3749a6e..1cefc6fe969a 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -342,5 +342,8 @@ source "arch/arm64/Kconfig.debug"
+ source "security/Kconfig"
+ 
+ source "crypto/Kconfig"
++if CRYPTO
++source "arch/arm64/crypto/Kconfig"
++endif
+ 
+ source "lib/Kconfig"
+diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+index 2fceb71ac3b7..8185a913c5ed 100644
+--- a/arch/arm64/Makefile
++++ b/arch/arm64/Makefile
+@@ -45,6 +45,7 @@ export	TEXT_OFFSET GZFLAGS
+ core-y		+= arch/arm64/kernel/ arch/arm64/mm/
+ core-$(CONFIG_KVM) += arch/arm64/kvm/
+ core-$(CONFIG_XEN) += arch/arm64/xen/
++core-$(CONFIG_CRYPTO) += arch/arm64/crypto/
+ libs-y		:= arch/arm64/lib/ $(libs-y)
+ libs-y		+= $(LIBGCC)
+ 
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+new file mode 100644
+index 000000000000..7956881b5986
+--- /dev/null
++++ b/arch/arm64/crypto/Kconfig
+@@ -0,0 +1,16 @@
++
++menuconfig ARM64_CRYPTO
++	bool "ARM64 Accelerated Cryptographic Algorithms"
++	depends on ARM64
++	help
++	  Say Y here to choose from a selection of cryptographic algorithms
++	  implemented using ARM64 specific CPU features or instructions.
++
++if ARM64_CRYPTO
++
++config CRYPTO_SHA1_ARM64_CE
++	tristate "SHA-1 digest algorithm (ARMv8 Crypto Extensions)"
++	depends on ARM64 && KERNEL_MODE_NEON
++	select CRYPTO_HASH
++
++endif
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+new file mode 100644
+index 000000000000..0ed3caaec81b
+--- /dev/null
++++ b/arch/arm64/crypto/Makefile
+@@ -0,0 +1,12 @@
++#
++# linux/arch/arm64/crypto/Makefile
++#
++# Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License version 2 as
++# published by the Free Software Foundation.
++#
++
++obj-$(CONFIG_CRYPTO_SHA1_ARM64_CE) += sha1-ce.o
++sha1-ce-y := sha1-ce-glue.o sha1-ce-core.o
+diff --git a/arch/arm64/crypto/sha1-ce-core.S b/arch/arm64/crypto/sha1-ce-core.S
+new file mode 100644
+index 000000000000..09d57d98609c
+--- /dev/null
++++ b/arch/arm64/crypto/sha1-ce-core.S
+@@ -0,0 +1,153 @@
++/*
++ * sha1-ce-core.S - SHA-1 secure hash using ARMv8 Crypto Extensions
++ *
++ * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/linkage.h>
++#include <asm/assembler.h>
++
++	.text
++	.arch		armv8-a+crypto
++
++	k0		.req	v0
++	k1		.req	v1
++	k2		.req	v2
++	k3		.req	v3
++
++	t0		.req	v4
++	t1		.req	v5
++
++	dga		.req	q6
++	dgav		.req	v6
++	dgb		.req	s7
++	dgbv		.req	v7
++
++	dg0q		.req	q12
++	dg0s		.req	s12
++	dg0v		.req	v12
++	dg1s		.req	s13
++	dg1v		.req	v13
++	dg2s		.req	s14
++
++	.macro		add_only, op, ev, rc, s0, dg1
++	.ifc		\ev, ev
++	add		t1.4s, v\s0\().4s, \rc\().4s
++	sha1h		dg2s, dg0s
++	.ifnb		\dg1
++	sha1\op		dg0q, \dg1, t0.4s
++	.else
++	sha1\op		dg0q, dg1s, t0.4s
++	.endif
++	.else
++	.ifnb		\s0
++	add		t0.4s, v\s0\().4s, \rc\().4s
++	.endif
++	sha1h		dg1s, dg0s
++	sha1\op		dg0q, dg2s, t1.4s
++	.endif
++	.endm
++
++	.macro		add_update, op, ev, rc, s0, s1, s2, s3, dg1
++	sha1su0		v\s0\().4s, v\s1\().4s, v\s2\().4s
++	add_only	\op, \ev, \rc, \s1, \dg1
++	sha1su1		v\s0\().4s, v\s3\().4s
++	.endm
++
++	/*
++	 * The SHA1 round constants
++	 */
++	.align		4
++.Lsha1_rcon:
++	.word		0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6
++
++	/*
++	 * void sha1_ce_transform(int blocks, u8 const *src, u32 *state,
++	 * 			  u8 *head, long bytes)
++	 */
++ENTRY(sha1_ce_transform)
++	/* load round constants */
++	adr		x6, .Lsha1_rcon
++	ld1r		{k0.4s}, [x6], #4
++	ld1r		{k1.4s}, [x6], #4
++	ld1r		{k2.4s}, [x6], #4
++	ld1r		{k3.4s}, [x6]
++
++	/* load state */
++	ldr		dga, [x2]
++	ldr		dgb, [x2, #16]
++
++	/* load partial state (if supplied) */
++	cbz		x3, 0f
++	ld1		{v8.4s-v11.4s}, [x3]
++	b		1f
++
++	/* load input */
++0:	ld1		{v8.4s-v11.4s}, [x1], #64
++	sub		w0, w0, #1
++
++1:
++CPU_LE(	rev32		v8.16b, v8.16b		)
++CPU_LE(	rev32		v9.16b, v9.16b		)
++CPU_LE(	rev32		v10.16b, v10.16b	)
++CPU_LE(	rev32		v11.16b, v11.16b	)
++
++2:	add		t0.4s, v8.4s, k0.4s
++	mov		dg0v.16b, dgav.16b
++
++	add_update	c, ev, k0,  8,  9, 10, 11, dgb
++	add_update	c, od, k0,  9, 10, 11,  8
++	add_update	c, ev, k0, 10, 11,  8,  9
++	add_update	c, od, k0, 11,  8,  9, 10
++	add_update	c, ev, k1,  8,  9, 10, 11
++
++	add_update	p, od, k1,  9, 10, 11,  8
++	add_update	p, ev, k1, 10, 11,  8,  9
++	add_update	p, od, k1, 11,  8,  9, 10
++	add_update	p, ev, k1,  8,  9, 10, 11
++	add_update	p, od, k2,  9, 10, 11,  8
++
++	add_update	m, ev, k2, 10, 11,  8,  9
++	add_update	m, od, k2, 11,  8,  9, 10
++	add_update	m, ev, k2,  8,  9, 10, 11
++	add_update	m, od, k2,  9, 10, 11,  8
++	add_update	m, ev, k3, 10, 11,  8,  9
++
++	add_update	p, od, k3, 11,  8,  9, 10
++	add_only	p, ev, k3,  9
++	add_only	p, od, k3, 10
++	add_only	p, ev, k3, 11
++	add_only	p, od
++
++	/* update state */
++	add		dgbv.2s, dgbv.2s, dg1v.2s
++	add		dgav.4s, dgav.4s, dg0v.4s
++
++	cbnz		w0, 0b
++
++	/*
++	 * Final block: add padding and total bit count.
++	 * Skip if we have no total byte count in x4. In that case, the input
++	 * size was not a round multiple of the block size, and the padding is
++	 * handled by the C code.
++	 */
++	cbz		x4, 3f
++	movi		v9.2d, #0
++	mov		x8, #0x80000000
++	movi		v10.2d, #0
++	ror		x7, x4, #29		// ror(lsl(x4, 3), 32)
++	fmov		d8, x8
++	mov		x4, #0
++	mov		v11.d[0], xzr
++	mov		v11.d[1], x7
++	b		2b
++
++	/* store new state */
++3:	str		dga, [x2]
++	str		dgb, [x2, #16]
++	ret
++ENDPROC(sha1_ce_transform)
+diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
+new file mode 100644
+index 000000000000..6fe83f37a750
+--- /dev/null
++++ b/arch/arm64/crypto/sha1-ce-glue.c
+@@ -0,0 +1,174 @@
++/*
++ * sha1-ce-glue.c - SHA-1 secure hash using ARMv8 Crypto Extensions
++ *
++ * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <asm/neon.h>
++#include <asm/unaligned.h>
++#include <crypto/internal/hash.h>
++#include <crypto/sha.h>
++#include <linux/cpufeature.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++
++MODULE_DESCRIPTION("SHA1 secure hash using ARMv8 Crypto Extensions");
++MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
++MODULE_LICENSE("GPL v2");
++
++asmlinkage void sha1_ce_transform(int blocks, u8 const *src, u32 *state,
++				  u8 *head, long bytes);
++
++static int sha1_init(struct shash_desc *desc)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++
++	*sctx = (struct sha1_state){
++		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
++	};
++	return 0;
++}
++
++static int sha1_update(struct shash_desc *desc, const u8 *data,
++		       unsigned int len)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
++
++	sctx->count += len;
++
++	if ((partial + len) >= SHA1_BLOCK_SIZE) {
++		int blocks;
++
++		if (partial) {
++			int p = SHA1_BLOCK_SIZE - partial;
++
++			memcpy(sctx->buffer + partial, data, p);
++			data += p;
++			len -= p;
++		}
++
++		blocks = len / SHA1_BLOCK_SIZE;
++		len %= SHA1_BLOCK_SIZE;
++
++		kernel_neon_begin_partial(16);
++		sha1_ce_transform(blocks, data, sctx->state,
++				  partial ? sctx->buffer : NULL, 0);
++		kernel_neon_end();
++
++		data += blocks * SHA1_BLOCK_SIZE;
++		partial = 0;
++	}
++	if (len)
++		memcpy(sctx->buffer + partial, data, len);
++	return 0;
++}
++
++static int sha1_final(struct shash_desc *desc, u8 *out)
++{
++	static const u8 padding[SHA1_BLOCK_SIZE] = { 0x80, };
++
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	__be64 bits = cpu_to_be64(sctx->count << 3);
++	__be32 *dst = (__be32 *)out;
++	int i;
++
++	u32 padlen = SHA1_BLOCK_SIZE
++		     - ((sctx->count + sizeof(bits)) % SHA1_BLOCK_SIZE);
++
++	sha1_update(desc, padding, padlen);
++	sha1_update(desc, (const u8 *)&bits, sizeof(bits));
++
++	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(__be32); i++)
++		put_unaligned_be32(sctx->state[i], dst++);
++
++	*sctx = (struct sha1_state){};
++	return 0;
++}
++
++static int sha1_finup(struct shash_desc *desc, const u8 *data,
++		      unsigned int len, u8 *out)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	__be32 *dst = (__be32 *)out;
++	int blocks;
++	int i;
++
++	if (sctx->count || !len || (len % SHA1_BLOCK_SIZE)) {
++		sha1_update(desc, data, len);
++		return sha1_final(desc, out);
++	}
++
++	/*
++	 * Use a fast path if the input is a multiple of 64 bytes. In
++	 * this case, there is no need to copy data around, and we can
++	 * perform the entire digest calculation in a single invocation
++	 * of sha1_ce_transform()
++	 */
++	blocks = len / SHA1_BLOCK_SIZE;
++
++	kernel_neon_begin_partial(16);
++	sha1_ce_transform(blocks, data, sctx->state, NULL, len);
++	kernel_neon_end();
++
++	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(__be32); i++)
++		put_unaligned_be32(sctx->state[i], dst++);
++
++	*sctx = (struct sha1_state){};
++	return 0;
++}
++
++static int sha1_export(struct shash_desc *desc, void *out)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state *dst = out;
++
++	*dst = *sctx;
++	return 0;
++}
++
++static int sha1_import(struct shash_desc *desc, const void *in)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state const *src = in;
++
++	*sctx = *src;
++	return 0;
++}
++
++static struct shash_alg alg = {
++	.init			= sha1_init,
++	.update			= sha1_update,
++	.final			= sha1_final,
++	.finup			= sha1_finup,
++	.export			= sha1_export,
++	.import			= sha1_import,
++	.descsize		= sizeof(struct sha1_state),
++	.digestsize		= SHA1_DIGEST_SIZE,
++	.statesize		= sizeof(struct sha1_state),
++	.base			= {
++		.cra_name		= "sha1",
++		.cra_driver_name	= "sha1-ce",
++		.cra_priority		= 200,
++		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize		= SHA1_BLOCK_SIZE,
++		.cra_module		= THIS_MODULE,
++	}
++};
++
++static int __init sha1_ce_mod_init(void)
++{
++	return crypto_register_shash(&alg);
++}
++
++static void __exit sha1_ce_mod_fini(void)
++{
++	crypto_unregister_shash(&alg);
++}
++
++module_cpu_feature_match(SHA1, sha1_ce_mod_init);
++module_exit(sha1_ce_mod_fini);
+-- 
+1.8.3.2
