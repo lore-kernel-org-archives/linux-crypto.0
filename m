@@ -1,73 +1,98 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH 1/6] crypto: SHA1 multibuffer map scatter gather walk's
- buffer address directly for x86_64
-Date: Thu, 15 May 2014 11:12:03 -0700
-Message-ID: <1400177523.2970.267.camel@schen9-DESK>
-References: <cover.1399990803.git.tim.c.chen@linux.intel.com>
-	 <1400023182.2970.238.camel@schen9-DESK>
-	 <20140513233410.GA28134@gondor.apana.org.au>
-	 <1400024458.2970.247.camel@schen9-DESK>
-	 <20140513235813.GA28455@gondor.apana.org.au>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2 09/11] arm64/crypto: add voluntary preemption to Crypto
+ Extensions SHA1
+Date: Thu, 15 May 2014 14:35:50 -0700
+Message-ID: <CAKv+Gu-9P+vDPnvr2Cz4Bcw5=5SuEMw-xFxLM4=SoF65ESvhcQ@mail.gmail.com>
+References: <1400091451-9117-1-git-send-email-ard.biesheuvel@linaro.org>
+	<1400091451-9117-10-git-send-email-ard.biesheuvel@linaro.org>
+	<20140515172458.GE1499@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: "jussi.kivilinna@iki.fi" <jussi.kivilinna@iki.fi>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:18843 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752014AbaEOSU1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 May 2014 14:20:27 -0400
-In-Reply-To: <20140513235813.GA28455@gondor.apana.org.au>
+Received: from mail-lb0-f171.google.com ([209.85.217.171]:45458 "EHLO
+	mail-lb0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752719AbaEOVfw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 15 May 2014 17:35:52 -0400
+Received: by mail-lb0-f171.google.com with SMTP id 10so1277145lbg.30
+        for <linux-crypto@vger.kernel.org>; Thu, 15 May 2014 14:35:50 -0700 (PDT)
+In-Reply-To: <20140515172458.GE1499@arm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2014-05-14 at 07:58 +0800, Herbert Xu wrote:
-> On Tue, May 13, 2014 at 04:40:58PM -0700, Tim Chen wrote:
-> > On Wed, 2014-05-14 at 07:34 +0800, Herbert Xu wrote:
-> > 
-> > > 
-> > > Why do we need this patch since kmap_atomic is equivalent to
-> > > page_address plus preempt_disable on x86-64?
-> > 
-> > For multi-buffers, you may still have some data lanes with jobs 
-> > that are partially completed when you need to put the thread
-> > to sleep.  With kmap_atomic, you cannot sleep before unmapping.
-> 
-> Hmm, it seems that the existing users of this helper is abusing
-> the ahash interface since if they were really asynchronous they
-> would be sleeping on this kmap_atomic.
+On 15 May 2014 10:24, Catalin Marinas <catalin.marinas@arm.com> wrote:
+> On Wed, May 14, 2014 at 07:17:29PM +0100, Ard Biesheuvel wrote:
+>> The Crypto Extensions based SHA1 implementation uses the NEON register file,
+>> and hence runs with preemption disabled. This patch adds a TIF_NEED_RESCHED
+>> check to its inner loop so we at least give up the CPU voluntarily when we
+>> are running in process context and have been tagged for preemption by the
+>> scheduler.
+>
+> Sorry, I haven't got to the bottom of your series earlier and I now
+> realised that the last patches are not just new crypto algorithms.
+>
+>> +static u8 const *sha1_do_update(struct shash_desc *desc, const u8 *data,
+>> +                             int blocks, u8 *head, unsigned int len)
+>> +{
+>> +     struct sha1_state *sctx = shash_desc_ctx(desc);
+>> +     struct thread_info *ti = NULL;
+>> +
+>> +     /*
+>> +      * Pass current's thread info pointer to sha1_ce_transform()
+>> +      * below if we want it to play nice under preemption.
+>> +      */
+>> +     if ((IS_ENABLED(CONFIG_PREEMPT_VOLUNTARY) || IS_ENABLED(CONFIG_PREEMPT))
+>> +         && (desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP))
+>> +             ti = current_thread_info();
+>> +
+>> +     do {
+>> +             int rem;
+>> +
+>> +             kernel_neon_begin_partial(16);
+>> +             rem = sha1_ce_transform(blocks, data, sctx->state, head, 0, ti);
+>> +             kernel_neon_end();
+>> +
+>> +             data += (blocks - rem) * SHA1_BLOCK_SIZE;
+>> +             blocks = rem;
+>> +             head = NULL;
+>> +     } while (unlikely(ti && blocks > 0));
+>> +     return data;
+>> +}
+>
+> What latencies are we talking about? Would it make sense to always
+> call cond_resched() even if preemption is disabled?
+>
 
-The multi-buffer case certainly ran into trouble with kmap_atomic.
-The scheduler complains when the crypto thread schedules out.
+Calculating the SHA256 (which is the most striking example) hash of a
+4k buffer takes ~10 microseconds, so perhaps this is all a bit moot as
+I don't think there will generally be many in-kernel users hashing
+substantially larger quantities of data at a time.
 
-> 
-> So we should keep the existing hash walk interface for sync users
-> only and create a new interface for async users.  They could in
-> fact share the same underlying code and use the ASYNC bit to
-> indicate that we're async.
-> 
-> In which case your patch would basically do kmap if ASYNC and
-> kmap_atomic otherwise.
-> 
-> I'll try to make such a patch.
+> With PREEMPT_VOLUNTARY I don't think the above code does any voluntary
+> preemption. The preempt_enable() in kernel_neon_end() only reschedules
+> if PREEMPT.
+>
 
-It will be nice if scatterwalk_map and unmap can also be made
-async aware. Right now it also uses kmap_atomic.
-This will allow multi-buffer encryption to make use of it.  
+Right, my mistake.
 
-> 
-> Eventually the existing users (which appear to be polling) should
-> either be converted over to shash or switch to interrupt-based
-> completion.
+> But I think we should have this loop always rescheduling if
+> CRYPTO_TFM_REQ_MAY_SLEEP. I can see there is a crypto_yield() function
+> that conditionally reschedules. What's the overhead of calling
+> sha1_ce_transform() in a loop vs a single call for the entire data?
+>
 
-Thanks.
+For SHA256 we lose at least 10% if we call into the core function for
+each 64 byte block rather than letting it chew away at all the data
+itself. (This is due to the fact that it needs to load 64 32-bit round
+keys) But perhaps (considering the above) it is better to just shelve
+the last 4 patches in this series until it becomes a problem for
+anyone.
 
-Tim
+-- 
+Ard.
