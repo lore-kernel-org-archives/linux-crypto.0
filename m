@@ -1,43 +1,60 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 09/11] arm64/crypto: add voluntary preemption to
- Crypto Extensions SHA1
-Date: Fri, 16 May 2014 09:57:48 +0100
-Message-ID: <20140516085748.GD5624@arm.com>
-References: <1400091451-9117-1-git-send-email-ard.biesheuvel@linaro.org>
- <1400091451-9117-10-git-send-email-ard.biesheuvel@linaro.org>
- <20140515172458.GE1499@arm.com>
- <CAKv+Gu-9P+vDPnvr2Cz4Bcw5=5SuEMw-xFxLM4=SoF65ESvhcQ@mail.gmail.com>
- <E28B9BA9-468D-45BD-A479-5D9289616798@arm.com>
- <CAKv+Gu_Tupu8jJX+6hRx_LOM0y05A5+MPXndzSKRNYQcG-yAvw@mail.gmail.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: Fix DMA-API warning
+Date: Mon, 19 May 2014 09:51:33 -0700
+Message-ID: <20140519165133.GA3365@gitlad.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "jussi.kivilinna@iki.fi" <jussi.kivilinna@iki.fi>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: tadeusz.struk@intel.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from fw-tnat.austin.arm.com ([217.140.110.23]:41448 "EHLO
-	collaborate-mta1.arm.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1755619AbaEPI63 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 May 2014 04:58:29 -0400
+Received: from mga02.intel.com ([134.134.136.20]:22289 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932072AbaESQwD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 19 May 2014 12:52:03 -0400
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_Tupu8jJX+6hRx_LOM0y05A5+MPXndzSKRNYQcG-yAvw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 15, 2014 at 11:10:20PM +0100, Ard Biesheuvel wrote:
-> On 15 May 2014 14:47, Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > For the time being I would drop the last 4 patches. We can revisit them
-> > for the next kernel version.
-> 
-> Agreed.
-> 
-> Should I send an updated pull request?
+With DMA-API debug enabled testmgr triggers a "DMA-API: device driver maps memory from stack" warning, when tested on a crypto HW accelerator.
 
-As it's not a signed tag anyway, I can merge up to the relevant commit.
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ crypto/testmgr.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index dc3cf35..75c78e6 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -414,16 +414,18 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 	void *input;
+ 	void *output;
+ 	void *assoc;
+-	char iv[MAX_IVLEN];
++	char *iv;
+ 	char *xbuf[XBUFSIZE];
+ 	char *xoutbuf[XBUFSIZE];
+ 	char *axbuf[XBUFSIZE];
+ 
++	iv = kzalloc(MAX_IVLEN, GFP_KERNEL);
++	if (!iv)
++		return ret;
+ 	if (testmgr_alloc_buf(xbuf))
+ 		goto out_noxbuf;
+ 	if (testmgr_alloc_buf(axbuf))
+ 		goto out_noaxbuf;
+-
+ 	if (diff_dst && testmgr_alloc_buf(xoutbuf))
+ 		goto out_nooutbuf;
+ 
+@@ -767,6 +769,7 @@ out_nooutbuf:
+ out_noaxbuf:
+ 	testmgr_free_buf(xbuf);
+ out_noxbuf:
++	kfree(iv);
+ 	return ret;
+ }
+ 
 -- 
-Catalin
+1.8.5.rc2.6.gc6f1b92.dirty
