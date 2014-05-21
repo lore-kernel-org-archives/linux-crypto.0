@@ -1,159 +1,1022 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v7 0/6] SP800-90A Deterministic Random Bit Generator
-Date: Wed, 21 May 2014 06:18:11 +0200
-Message-ID: <16102625.1uoi9eJz6k@myon.chronox.de>
+From: Nitesh Lal <NiteshNarayanLal@freescale.com>
+Subject: [PATCH] crypto: testmgr - add aead cbc des, des3_ede tests
+Date: Wed, 21 May 2014 17:09:08 +0530
+Message-ID: <1400672348-1658-1-git-send-email-NiteshNarayanLal@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: aquini@redhat.com, jeremy.wayne.powell@gmail.com,
-	clemens@ladisch.de, pwalten@au1.ibm.com, joe@perches.com
-To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain
+Cc: Nitesh Lal <NiteshNarayanLal@freescale.com>,
+	Vakul Garg <vakul@freescale.com>
+To: <ruchika.gupta@freescale.com>, <herbert@gondor.apana.org.au>,
+	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:48372 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751640AbaEUEf0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 May 2014 00:35:26 -0400
-Received: from myon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <SFF> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Wed, 21 May 2014 06:35:07 +0200
+Received: from dns-bn1lp0143.outbound.protection.outlook.com ([207.46.163.143]:47066
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752328AbaEULl5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 May 2014 07:41:57 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Test vectors were taken from existing test for
+CBC(DES3_EDE). Associated data has been added to test vectors.
+HMAC computed with Crypto++ has been used. Following algos have
+been covered.
 
-the following set of patches implements the deterministic random bit generator
-(DRBG) specified by SP800-90A.
+        (a) "authenc(hmac(sha1),cbc(des))"
+        (b) "authenc(hmac(sha1),cbc(des3_ede))"
+        (c) "authenc(hmac(sha224),cbc(des))"
+        (d) "authenc(hmac(sha224),cbc(des3_ede))"
+        (e) "authenc(hmac(sha256),cbc(des))"
+        (f) "authenc(hmac(sha256),cbc(des3_ede))"
+        (g) "authenc(hmac(sha384),cbc(des))"
+        (h) "authenc(hmac(sha384),cbc(des3_ede))"
+        (i) "authenc(hmac(sha512),cbc(des))"
+        (j) "authenc(hmac(sha512),cbc(des3_ede))"
 
-The DRBG implementation offers the following:
+Signed-off-by: Vakul Garg <vakul@freescale.com>
+[NiteshNarayanLal@freescale.com: added hooks for the missing algorithms test and tested the patch]
+Signed-off-by: Nitesh Lal <NiteshNarayanLal@freescale.com>
+---
+ crypto/tcrypt.c  |  31 ++-
+ crypto/testmgr.c | 174 ++++++++++++++-
+ crypto/testmgr.h | 666 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 848 insertions(+), 23 deletions(-)
 
-	* All three DRBG types are implemented with a derivation function.
-	* All DRBG types are available with and without prediction resistance.
-	* All SHA types of SHA-1, SHA-256, SHA-384, SHA-512 are available
-	  for the HMAC and Hash DRBGs.
-	* All AES types of AES-128, AES-192 and AES-256 are available for the
-	  CTR DRBG.
-	* A self test is implemented with drbg_healthcheck().
-	* The FIPS 140-2 continuous self test is implemented.
-	* Additional cipher primitives, such as Serpent or Twofish, can be
-	  added to the DRBG without changing the implementation. The only
-	  change necessary is to the DRBG definition given in the cores[]
-	  array.
-
-As defined in SP800-131A, the ANSI X9.31 DRNG is to be sunset by the end of
-this year for official uses, including FIPS 140-2 compliance.
-
-Additional tests including the CAVS test framework are available at [1].
-
-[1] http://www.chronox.de/drbg.html
-
-Stephan Mueller (6):
-  SP800-90A Deterministic Random Bit Generator
-  header file for DRBG
-  DRBG kernel configuration options
-  compile the DRBG code
-  DRBG testmgr test vectors
-  Add DRBG test code to testmgr
-
- crypto/Kconfig        |   36 +-
- crypto/Makefile       |    1 +
- crypto/drbg.c         | 2005 
-+++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/testmgr.c      |  248 +++++++
- crypto/testmgr.h      |  843 +++++++++++++++++++++
- include/crypto/drbg.h |  291 +++++++
- 6 files changed, 3442 insertions(+), 1 deletion(-)
- create mode 100644 crypto/drbg.c
- create mode 100644 include/crypto/drbg.h
-
-Changes v2:
-
- * Overhauling code structure for simpler code as suggested by Rafael
-   Aquini:
-     - each DRBG type exports only two crypto functions,
-     - the individual DRBG implementations structure closely according
-       to
-       SP 800-90A,
-     - using struct drbg_string to refer to buffers to avoid too many
-       function parameters and prevent multiple data structure
-       conversions
-     - use inline more thoroughly
-     - replace macros with small inline functions
-     - remove unnecessary indirections
-     - replace of large stack variables with a scratch buffer allocated
-       at
-       the beginning of DRBG operation -- see comments about scratchpad
-       throughout the code
- * Revamping DRBG flags usage: flags are only intended to select the
-   appropriate DRBG type and DRBG strength. Flags are not intended to be
-   visible to external callers.
- * Adding comments throughout the code to refer to the appropriate steps
-   documented in SP 800-90A.
- * Fix invocation of kernel crypto API hash
- * Fix coding style and apply scripts/checkpatch.pl
- * Change locking approach: only very small code sections are guarded by
-   a lock. This implies that the entire DRBG operates on a shadow copy
-   of the original DRBG state -- see comments for drbg_copy_drbg
- * Perform thorough testing:
-   - Performing of a full scale CAVS test with CAVS interface available
-     at http://www.chronox.de/drbg.html
-   - Performing tests by obtaining data which is not a multiple of
-     cipher block size and check it with the ent tool to ensure that the
-     generation loop does not reuse stale buffers to avoid errors like
-     CVE-2013-4345.
-
-Changes v3:
-
- * fix invocation of drbg_sec_strength to determine the amount of seed
-   needed for the DRBG. The function returns information as a byte
-   value, but the invoker assumed a bit value.
- * change default value returned by drbg_sec_strength to be the maximum
-   entropy defined by SP800-90A to catch erroneous invocations of the 
-function.
- * Fix invocaction of d_ops in drbg_generate: drbg->d_ops ==>
-   shadow->d_ops
- * Make return of drbg_fips_continuous_test cleaner as suggested by
-   Clemens Ladisch
- * Fix comments on how to invoke the DRBG at the beginning of the file
-   drbg_ctr_df: replace the for loop for calculation of padlen that used
-   to call up to 16 modulo operations with one modulo operation
- * drbg_ctr_df: replace plain integer values with sizeof() to make code
-   clearer
- * drbg_hash_hashgen: replace memset() on drbg->scratchpad with memset()
-   on src/dst pointers to make code clearer
- * as recommended by Peter Waltenberg: add re-invocation of self tests
-   as required by 11.3.3 -- the tests are commented out because they make
-   no mathematical sense. However, if a FIPS 140-2 validation requires
-   these tests, the code just needs to be activated.
- * as recommended by Peter Waltenberg: add error path tests as required
-   by 11.3.2 -- see new function of drbg_healthcheck_sanity
- * add debug printk
- * perform testing in FIPS 140-2 mode
- * as recommended by Peter Waltenberg: add drbg_generate_long to
-   generate arbitrary long strings
-
-Changes v4:
- * change return codes of generate functions to signed int to convey
-   error codes and to match the kernel crypto API expecations on the
-   generate function.
- * add BUG_ON throughout drbg_healthcheck_sanity() since any failure
-   should be caught to prevent the DRBG from operating
- * change layout of debugging printk
-
-Changes v5:
- * make numerous character buffer pointers and drbg_string pointers
-   const as suggested by Joe Perches
-
-Changes v6:
- * change name of array cores to drbg_cores as suggested by Joe Perches
- * make drbg_cores static as suggested by Joe Perches
- * catch programming error regarding array overflow in drbg_algs
-   gracefully
-
-Changes v7:
- * editorial changes: cleanup comments and make them KNF-conformant as
-   requested by Rafael Aquini
- * rebase patch to 3.15-rc5
-
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 09c93ff2..ba247cf 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1519,7 +1519,36 @@ static int do_test(int m)
+ 	case 157:
+ 		ret += tcrypt_test("authenc(hmac(sha1),ecb(cipher_null))");
+ 		break;
+-
++	case 181:
++		ret += tcrypt_test("authenc(hmac(sha1),cbc(des))");
++		break;
++	case 182:
++		ret += tcrypt_test("authenc(hmac(sha1),cbc(des3_ede))");
++		break;
++	case 183:
++		ret += tcrypt_test("authenc(hmac(sha224),cbc(des))");
++		break;
++	case 184:
++		ret += tcrypt_test("authenc(hmac(sha224),cbc(des3_ede))");
++		break;
++	case 185:
++		ret += tcrypt_test("authenc(hmac(sha256),cbc(des))");
++		break;
++	case 186:
++		ret += tcrypt_test("authenc(hmac(sha256),cbc(des3_ede))");
++		break;
++	case 187:
++		ret += tcrypt_test("authenc(hmac(sha384),cbc(des))");
++		break;
++	case 188:
++		ret += tcrypt_test("authenc(hmac(sha384),cbc(des3_ede))");
++		break;
++	case 189:
++		ret += tcrypt_test("authenc(hmac(sha512),cbc(des))");
++		break;
++	case 190:
++		ret += tcrypt_test("authenc(hmac(sha512),cbc(des3_ede))");
++		break;
+ 	case 200:
+ 		test_cipher_speed("ecb(aes)", ENCRYPT, sec, NULL, 0,
+ 				speed_template_16_24_32);
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index dc3cf35..40c99c6 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1831,8 +1831,38 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.aead = {
+ 				.enc = {
+-					.vecs = hmac_sha1_aes_cbc_enc_tv_template,
+-					.count = HMAC_SHA1_AES_CBC_ENC_TEST_VECTORS
++					.vecs =
++					hmac_sha1_aes_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA1_AES_CBC_ENC_TEST_VEC
++				}
++			}
++		}
++	}, {
++		.alg = "authenc(hmac(sha1),cbc(des))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs =
++					hmac_sha1_des_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA1_DES_CBC_ENC_TEST_VEC
++				}
++			}
++		}
++	}, {
++		.alg = "authenc(hmac(sha1),cbc(des3_ede))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs =
++					hmac_sha1_des3_ede_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA1_DES3_EDE_CBC_ENC_TEST_VEC
+ 				}
+ 			}
+ 		}
+@@ -1843,12 +1873,44 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.aead = {
+ 				.enc = {
+-					.vecs = hmac_sha1_ecb_cipher_null_enc_tv_template,
+-					.count = HMAC_SHA1_ECB_CIPHER_NULL_ENC_TEST_VECTORS
++					.vecs =
++					hmac_sha1_ecb_cipher_null_enc_tv_temp,
++					.count =
++					HMAC_SHA1_ECB_CIPHER_NULL_ENC_TEST_VEC
+ 				},
+ 				.dec = {
+-					.vecs = hmac_sha1_ecb_cipher_null_dec_tv_template,
+-					.count = HMAC_SHA1_ECB_CIPHER_NULL_DEC_TEST_VECTORS
++					.vecs =
++					hmac_sha1_ecb_cipher_null_dec_tv_temp,
++					.count =
++					HMAC_SHA1_ECB_CIPHER_NULL_DEC_TEST_VEC
++				}
++			}
++		}
++	}, {
++		.alg = "authenc(hmac(sha224),cbc(des))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs =
++					hmac_sha224_des_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA224_DES_CBC_ENC_TEST_VEC
++				}
++			}
++		}
++	}, {
++		.alg = "authenc(hmac(sha224),cbc(des3_ede))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs =
++					hmac_sha224_des3_ede_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA224_DES3_EDE_CBC_ENC_TEST_VEC
+ 				}
+ 			}
+ 		}
+@@ -1859,8 +1921,66 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.aead = {
+ 				.enc = {
+-					.vecs = hmac_sha256_aes_cbc_enc_tv_template,
+-					.count = HMAC_SHA256_AES_CBC_ENC_TEST_VECTORS
++					.vecs =
++					hmac_sha256_aes_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA256_AES_CBC_ENC_TEST_VEC
++				}
++			}
++		}
++	}, {
++		.alg = "authenc(hmac(sha256),cbc(des))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs =
++					hmac_sha256_des_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA256_DES_CBC_ENC_TEST_VEC
++				}
++			}
++		}
++	}, {
++		.alg = "authenc(hmac(sha256),cbc(des3_ede))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs =
++					hmac_sha256_des3_ede_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA256_DES3_EDE_CBC_ENC_TEST_VEC
++				}
++			}
++		}
++	}, {
++		.alg = "authenc(hmac(sha384),cbc(des))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs =
++					hmac_sha384_des_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA384_DES_CBC_ENC_TEST_VEC
++				}
++			}
++		}
++	}, {
++		.alg = "authenc(hmac(sha384),cbc(des3_ede))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs =
++					hmac_sha384_des3_ede_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA384_DES3_EDE_CBC_ENC_TEST_VEC
+ 				}
+ 			}
+ 		}
+@@ -1871,8 +1991,38 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.aead = {
+ 				.enc = {
+-					.vecs = hmac_sha512_aes_cbc_enc_tv_template,
+-					.count = HMAC_SHA512_AES_CBC_ENC_TEST_VECTORS
++					.vecs =
++					hmac_sha512_aes_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA512_AES_CBC_ENC_TEST_VEC
++				}
++			}
++		}
++	}, {
++		.alg = "authenc(hmac(sha512),cbc(des))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs =
++					hmac_sha512_des_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA512_DES_CBC_ENC_TEST_VEC
++				}
++			}
++		}
++	}, {
++		.alg = "authenc(hmac(sha512),cbc(des3_ede))",
++		.test = alg_test_aead,
++		.fips_allowed = 1,
++		.suite = {
++			.aead = {
++				.enc = {
++					.vecs =
++					hmac_sha512_des3_ede_cbc_enc_tv_temp,
++					.count =
++					HMAC_SHA512_DES3_EDE_CBC_ENC_TEST_VEC
+ 				}
+ 			}
+ 		}
+@@ -3273,8 +3423,8 @@ test_done:
+ 		panic("%s: %s alg self test failed in fips mode!\n", driver, alg);
+ 
+ 	if (fips_enabled && !rc)
+-		printk(KERN_INFO "alg: self-tests for %s (%s) passed\n",
+-		       driver, alg);
++		pr_info(KERN_INFO "alg: self-tests for %s (%s) passed\n",
++			driver, alg);
+ 
+ 	return rc;
+ 
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 3c95bda..69d0dd8 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -13556,11 +13556,11 @@ static struct cipher_testvec cast6_xts_dec_tv_template[] = {
+ #define AES_CBC_DEC_TEST_VECTORS 5
+ #define HMAC_MD5_ECB_CIPHER_NULL_ENC_TEST_VECTORS 2
+ #define HMAC_MD5_ECB_CIPHER_NULL_DEC_TEST_VECTORS 2
+-#define HMAC_SHA1_ECB_CIPHER_NULL_ENC_TEST_VECTORS 2
+-#define HMAC_SHA1_ECB_CIPHER_NULL_DEC_TEST_VECTORS 2
+-#define HMAC_SHA1_AES_CBC_ENC_TEST_VECTORS 7
+-#define HMAC_SHA256_AES_CBC_ENC_TEST_VECTORS 7
+-#define HMAC_SHA512_AES_CBC_ENC_TEST_VECTORS 7
++#define HMAC_SHA1_ECB_CIPHER_NULL_ENC_TEST_VEC 2
++#define HMAC_SHA1_ECB_CIPHER_NULL_DEC_TEST_VEC 2
++#define HMAC_SHA1_AES_CBC_ENC_TEST_VEC 7
++#define HMAC_SHA256_AES_CBC_ENC_TEST_VEC 7
++#define HMAC_SHA512_AES_CBC_ENC_TEST_VEC 7
+ #define AES_LRW_ENC_TEST_VECTORS 8
+ #define AES_LRW_DEC_TEST_VECTORS 8
+ #define AES_XTS_ENC_TEST_VECTORS 5
+@@ -14448,7 +14448,7 @@ static struct aead_testvec hmac_md5_ecb_cipher_null_dec_tv_template[] = {
+ 	},
+ };
+ 
+-static struct aead_testvec hmac_sha1_aes_cbc_enc_tv_template[] = {
++static struct aead_testvec hmac_sha1_aes_cbc_enc_tv_temp[] = {
+ 	{ /* RFC 3602 Case 1 */
+ #ifdef __LITTLE_ENDIAN
+ 		.key    = "\x08\x00"		/* rta length */
+@@ -14697,7 +14697,7 @@ static struct aead_testvec hmac_sha1_aes_cbc_enc_tv_template[] = {
+ 	},
+ };
+ 
+-static struct aead_testvec hmac_sha1_ecb_cipher_null_enc_tv_template[] = {
++static struct aead_testvec hmac_sha1_ecb_cipher_null_enc_tv_temp[] = {
+ 	{ /* Input data from RFC 2410 Case 1 */
+ #ifdef __LITTLE_ENDIAN
+ 		.key    = "\x08\x00"		/* rta length */
+@@ -14743,7 +14743,7 @@ static struct aead_testvec hmac_sha1_ecb_cipher_null_enc_tv_template[] = {
+ 	},
+ };
+ 
+-static struct aead_testvec hmac_sha1_ecb_cipher_null_dec_tv_template[] = {
++static struct aead_testvec hmac_sha1_ecb_cipher_null_dec_tv_temp[] = {
+ 	{
+ #ifdef __LITTLE_ENDIAN
+ 		.key    = "\x08\x00"		/* rta length */
+@@ -14789,7 +14789,7 @@ static struct aead_testvec hmac_sha1_ecb_cipher_null_dec_tv_template[] = {
+ 	},
+ };
+ 
+-static struct aead_testvec hmac_sha256_aes_cbc_enc_tv_template[] = {
++static struct aead_testvec hmac_sha256_aes_cbc_enc_tv_temp[] = {
+ 	{ /* RFC 3602 Case 1 */
+ #ifdef __LITTLE_ENDIAN
+ 		.key    = "\x08\x00"		/* rta length */
+@@ -15052,7 +15052,7 @@ static struct aead_testvec hmac_sha256_aes_cbc_enc_tv_template[] = {
+ 	},
+ };
+ 
+-static struct aead_testvec hmac_sha512_aes_cbc_enc_tv_template[] = {
++static struct aead_testvec hmac_sha512_aes_cbc_enc_tv_temp[] = {
+ 	{ /* RFC 3602 Case 1 */
+ #ifdef __LITTLE_ENDIAN
+ 		.key    = "\x08\x00"		/* rta length */
+@@ -15371,6 +15371,652 @@ static struct aead_testvec hmac_sha512_aes_cbc_enc_tv_template[] = {
+ 	},
+ };
+ 
++#define HMAC_SHA1_DES_CBC_ENC_TEST_VEC	1
++
++static struct aead_testvec hmac_sha1_des_cbc_enc_tv_temp[] = {
++	{ /*Generated with cryptopp*/
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++	.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x08"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++		  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55"
++			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24",
++		.klen	= 8 + 20 + 8,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result	= "\x70\xd6\xde\x64\x87\x17\xf1\xe8"
++			  "\x54\x31\x85\x37\xed\x6b\x01\x8d"
++			  "\xe3\xcc\xe0\x1d\x5e\xf3\xfe\xf1"
++			  "\x41\xaa\x33\x91\xa7\x7d\x99\x88"
++			  "\x4d\x85\x6e\x2f\xa3\x69\xf5\x82"
++			  "\x3a\x6f\x25\xcb\x7d\x58\x1f\x9b"
++			  "\xaa\x9c\x11\xd5\x76\x67\xce\xde"
++			  "\x56\xd7\x5a\x80\x69\xea\x3a\x02"
++			  "\xf0\xc7\x7c\xe3\xcb\x40\xe5\x52"
++			  "\xd1\x10\x92\x78\x0b\x8e\x5b\xf1"
++			  "\xe3\x26\x1f\xe1\x15\x41\xc7\xba"
++			  "\x99\xdb\x08\x51\x1c\xd3\x01\xf4"
++			  "\x87\x47\x39\xb8\xd2\xdd\xbd\xfb"
++			  "\x66\x13\xdf\x1c\x01\x44\xf0\x7a"
++			  "\x1a\x6b\x13\xf5\xd5\x0b\xb8\xba"
++			  "\x53\xba\xe1\x76\xe3\x82\x07\x86"
++			  "\x95\x16\x20\x09\xf5\x95\x19\xfd"
++			  "\x3c\xc7\xe0\x42\xc0\x14\x69\xfa"
++			  "\x5c\x44\xa9\x37",
++			  .rlen	= 128 + 20,
++	},
++};
++
++#define HMAC_SHA224_DES_CBC_ENC_TEST_VEC	1
++
++static struct aead_testvec hmac_sha224_des_cbc_enc_tv_temp[] = {
++	{ /*Generated with cryptopp*/
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x08"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++		  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24",
++		.klen	= 8 + 24 + 8,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result	= "\x70\xd6\xde\x64\x87\x17\xf1\xe8"
++			  "\x54\x31\x85\x37\xed\x6b\x01\x8d"
++			  "\xe3\xcc\xe0\x1d\x5e\xf3\xfe\xf1"
++			  "\x41\xaa\x33\x91\xa7\x7d\x99\x88"
++			  "\x4d\x85\x6e\x2f\xa3\x69\xf5\x82"
++			  "\x3a\x6f\x25\xcb\x7d\x58\x1f\x9b"
++			  "\xaa\x9c\x11\xd5\x76\x67\xce\xde"
++			  "\x56\xd7\x5a\x80\x69\xea\x3a\x02"
++			  "\xf0\xc7\x7c\xe3\xcb\x40\xe5\x52"
++			  "\xd1\x10\x92\x78\x0b\x8e\x5b\xf1"
++			  "\xe3\x26\x1f\xe1\x15\x41\xc7\xba"
++			  "\x99\xdb\x08\x51\x1c\xd3\x01\xf4"
++		  "\x87\x47\x39\xb8\xd2\xdd\xbd\xfb"
++			  "\x66\x13\xdf\x1c\x01\x44\xf0\x7a"
++			  "\x1a\x6b\x13\xf5\xd5\x0b\xb8\xba"
++			  "\x53\xba\xe1\x76\xe3\x82\x07\x86"
++			  "\x9c\x2d\x7e\xee\x20\x34\x55\x0a"
++			  "\xce\xb5\x4e\x64\x53\xe7\xbf\x91"
++			  "\xab\xd4\xd9\xda\xc9\x12\xae\xf7",
++		.rlen	= 128 + 24,
++	},
++};
++
++#define HMAC_SHA256_DES_CBC_ENC_TEST_VEC	1
++
++static struct aead_testvec hmac_sha256_des_cbc_enc_tv_temp[] = {
++	{ /*Generated with cryptopp*/
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x08"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24",
++		.klen	= 8 + 32 + 8,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result	= "\x70\xd6\xde\x64\x87\x17\xf1\xe8"
++			  "\x54\x31\x85\x37\xed\x6b\x01\x8d"
++			  "\xe3\xcc\xe0\x1d\x5e\xf3\xfe\xf1"
++			  "\x41\xaa\x33\x91\xa7\x7d\x99\x88"
++			  "\x4d\x85\x6e\x2f\xa3\x69\xf5\x82"
++			  "\x3a\x6f\x25\xcb\x7d\x58\x1f\x9b"
++			  "\xaa\x9c\x11\xd5\x76\x67\xce\xde"
++			  "\x56\xd7\x5a\x80\x69\xea\x3a\x02"
++			  "\xf0\xc7\x7c\xe3\xcb\x40\xe5\x52"
++			  "\xd1\x10\x92\x78\x0b\x8e\x5b\xf1"
++			  "\xe3\x26\x1f\xe1\x15\x41\xc7\xba"
++		  "\x99\xdb\x08\x51\x1c\xd3\x01\xf4"
++			  "\x87\x47\x39\xb8\xd2\xdd\xbd\xfb"
++		  "\x66\x13\xdf\x1c\x01\x44\xf0\x7a"
++		  "\x1a\x6b\x13\xf5\xd5\x0b\xb8\xba"
++			  "\x53\xba\xe1\x76\xe3\x82\x07\x86"
++			  "\xc6\x58\xa1\x60\x70\x91\x39\x36"
++			  "\x50\xf6\x5d\xab\x4b\x51\x4e\x5e"
++			  "\xde\x63\xde\x76\x52\xde\x9f\xba"
++			  "\x90\xcf\x15\xf2\xbb\x6e\x84\x00",
++		.rlen	= 128 + 32,
++	},
++};
++
++#define HMAC_SHA384_DES_CBC_ENC_TEST_VEC	1
++
++static struct aead_testvec hmac_sha384_des_cbc_enc_tv_temp[] = {
++	{ /*Generated with cryptopp*/
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x08"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
++			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
++			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24",
++		.klen	= 8 + 48 + 8,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result	= "\x70\xd6\xde\x64\x87\x17\xf1\xe8"
++			  "\x54\x31\x85\x37\xed\x6b\x01\x8d"
++			  "\xe3\xcc\xe0\x1d\x5e\xf3\xfe\xf1"
++			  "\x41\xaa\x33\x91\xa7\x7d\x99\x88"
++			  "\x4d\x85\x6e\x2f\xa3\x69\xf5\x82"
++			  "\x3a\x6f\x25\xcb\x7d\x58\x1f\x9b"
++			  "\xaa\x9c\x11\xd5\x76\x67\xce\xde"
++			  "\x56\xd7\x5a\x80\x69\xea\x3a\x02"
++			  "\xf0\xc7\x7c\xe3\xcb\x40\xe5\x52"
++			  "\xd1\x10\x92\x78\x0b\x8e\x5b\xf1"
++			  "\xe3\x26\x1f\xe1\x15\x41\xc7\xba"
++			  "\x99\xdb\x08\x51\x1c\xd3\x01\xf4"
++			  "\x87\x47\x39\xb8\xd2\xdd\xbd\xfb"
++			  "\x66\x13\xdf\x1c\x01\x44\xf0\x7a"
++			  "\x1a\x6b\x13\xf5\xd5\x0b\xb8\xba"
++			  "\x53\xba\xe1\x76\xe3\x82\x07\x86"
++			  "\xa8\x8e\x9c\x74\x8c\x2b\x99\xa0"
++			  "\xc8\x8c\xef\x25\x07\x83\x11\x3a"
++			  "\x31\x8d\xbe\x3b\x6a\xd7\x96\xfe"
++			  "\x5e\x67\xb5\x74\xe7\xe7\x85\x61"
++			  "\x6a\x95\x26\x75\xcc\x53\x89\xf3"
++			  "\x74\xc9\x2a\x76\x20\xa2\x64\x62",
++		.rlen	= 128 + 48,
++	},
++};
++
++#define HMAC_SHA512_DES_CBC_ENC_TEST_VEC	1
++
++static struct aead_testvec hmac_sha512_des_cbc_enc_tv_temp[] = {
++	{ /*Generated with cryptopp*/
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++		  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x08"	/* enc key length */
++		  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
++			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
++			  "\x44\x55\x66\x77\x88\x99\xaa\xbb"
++			  "\xcc\xdd\xee\xff\x11\x22\x33\x44"
++			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24",
++		.klen	= 8 + 64 + 8,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result	= "\x70\xd6\xde\x64\x87\x17\xf1\xe8"
++			  "\x54\x31\x85\x37\xed\x6b\x01\x8d"
++			  "\xe3\xcc\xe0\x1d\x5e\xf3\xfe\xf1"
++			  "\x41\xaa\x33\x91\xa7\x7d\x99\x88"
++			  "\x4d\x85\x6e\x2f\xa3\x69\xf5\x82"
++			  "\x3a\x6f\x25\xcb\x7d\x58\x1f\x9b"
++			  "\xaa\x9c\x11\xd5\x76\x67\xce\xde"
++		  "\x56\xd7\x5a\x80\x69\xea\x3a\x02"
++			  "\xf0\xc7\x7c\xe3\xcb\x40\xe5\x52"
++		  "\xd1\x10\x92\x78\x0b\x8e\x5b\xf1"
++			  "\xe3\x26\x1f\xe1\x15\x41\xc7\xba"
++			  "\x99\xdb\x08\x51\x1c\xd3\x01\xf4"
++			  "\x87\x47\x39\xb8\xd2\xdd\xbd\xfb"
++			  "\x66\x13\xdf\x1c\x01\x44\xf0\x7a"
++		  "\x1a\x6b\x13\xf5\xd5\x0b\xb8\xba"
++			  "\x53\xba\xe1\x76\xe3\x82\x07\x86"
++			  "\xc6\x2c\x73\x88\xb0\x9d\x5f\x3e"
++			  "\x5b\x78\xca\x0e\xab\x8a\xa3\xbb"
++			  "\xd9\x1d\xc3\xe3\x05\xac\x76\xfb"
++			  "\x58\x83\xda\x67\xfb\x21\x24\xa2"
++			  "\xb1\xa7\xd7\x66\xa6\x8d\xa6\x93"
++			  "\x97\xe2\xe3\xb8\xaa\x48\x85\xee"
++			  "\x8c\xf6\x07\x95\x1f\xa6\x6c\x96"
++			  "\x99\xc7\x5c\x8d\xd8\xb5\x68\x7b",
++		.rlen	= 128 + 64,
++	},
++};
++
++#define HMAC_SHA1_DES3_EDE_CBC_ENC_TEST_VEC	1
++
++static struct aead_testvec hmac_sha1_des3_ede_cbc_enc_tv_temp[] = {
++	{ /*Generated with cryptopp*/
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x18"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55"
++		  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
++			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
++			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
++		.klen	= 8 + 20 + 24,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++		  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result	= "\x0e\x2d\xb6\x97\x3c\x56\x33\xf4"
++			  "\x67\x17\x21\xc7\x6e\x8a\xd5\x49"
++		  "\x74\xb3\x49\x05\xc5\x1c\xd0\xed"
++		  "\x12\x56\x5c\x53\x96\xb6\x00\x7d"
++		  "\x90\x48\xfc\xf5\x8d\x29\x39\xcc"
++			  "\x8a\xd5\x35\x18\x36\x23\x4e\xd7"
++			  "\x76\xd1\xda\x0c\x94\x67\xbb\x04"
++			  "\x8b\xf2\x03\x6c\xa8\xcf\xb6\xea"
++		  "\x22\x64\x47\xaa\x8f\x75\x13\xbf"
++			  "\x9f\xc2\xc3\xf0\xc9\x56\xc5\x7a"
++			  "\x71\x63\x2e\x89\x7b\x1e\x12\xca"
++			  "\xe2\x5f\xaf\xd8\xa4\xf8\xc9\x7a"
++			  "\xd6\xf9\x21\x31\x62\x44\x45\xa6"
++			  "\xd6\xbc\x5a\xd3\x2d\x54\x43\xcc"
++			  "\x9d\xde\xa5\x70\xe9\x42\x45\x8a"
++			  "\x6b\xfa\xb1\x91\x13\xb0\xd9\x19"
++			  "\x67\x6d\xb1\xf5\xb8\x10\xdc\xc6"
++			  "\x75\x86\x96\x6b\xb1\xc5\xe4\xcf"
++			  "\xd1\x60\x91\xb3",
++			  .rlen	= 128 + 20,
++	},
++};
++
++#define HMAC_SHA224_DES3_EDE_CBC_ENC_TEST_VEC	1
++
++static struct aead_testvec hmac_sha224_des3_ede_cbc_enc_tv_temp[] = {
++	{ /*Generated with cryptopp*/
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x18"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
++			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
++			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
++		.klen	= 8 + 24 + 24,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++		  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result	= "\x0e\x2d\xb6\x97\x3c\x56\x33\xf4"
++		  "\x67\x17\x21\xc7\x6e\x8a\xd5\x49"
++			  "\x74\xb3\x49\x05\xc5\x1c\xd0\xed"
++			  "\x12\x56\x5c\x53\x96\xb6\x00\x7d"
++			  "\x90\x48\xfc\xf5\x8d\x29\x39\xcc"
++			  "\x8a\xd5\x35\x18\x36\x23\x4e\xd7"
++			  "\x76\xd1\xda\x0c\x94\x67\xbb\x04"
++		  "\x8b\xf2\x03\x6c\xa8\xcf\xb6\xea"
++			  "\x22\x64\x47\xaa\x8f\x75\x13\xbf"
++			  "\x9f\xc2\xc3\xf0\xc9\x56\xc5\x7a"
++			  "\x71\x63\x2e\x89\x7b\x1e\x12\xca"
++			  "\xe2\x5f\xaf\xd8\xa4\xf8\xc9\x7a"
++			  "\xd6\xf9\x21\x31\x62\x44\x45\xa6"
++		  "\xd6\xbc\x5a\xd3\x2d\x54\x43\xcc"
++			  "\x9d\xde\xa5\x70\xe9\x42\x45\x8a"
++		  "\x6b\xfa\xb1\x91\x13\xb0\xd9\x19"
++			  "\x15\x24\x7f\x5a\x45\x4a\x66\xce"
++			  "\x2b\x0b\x93\x99\x2f\x9d\x0c\x6c"
++			  "\x56\x1f\xe1\xa6\x41\xb2\x4c\xd0",
++			  .rlen	= 128 + 24,
++	},
++};
++
++#define HMAC_SHA256_DES3_EDE_CBC_ENC_TEST_VEC	1
++
++static struct aead_testvec hmac_sha256_des3_ede_cbc_enc_tv_temp[] = {
++	{ /*Generated with cryptopp*/
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x18"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
++			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
++			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
++		.klen	= 8 + 32 + 24,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result	= "\x0e\x2d\xb6\x97\x3c\x56\x33\xf4"
++			  "\x67\x17\x21\xc7\x6e\x8a\xd5\x49"
++			  "\x74\xb3\x49\x05\xc5\x1c\xd0\xed"
++			  "\x12\x56\x5c\x53\x96\xb6\x00\x7d"
++			  "\x90\x48\xfc\xf5\x8d\x29\x39\xcc"
++			  "\x8a\xd5\x35\x18\x36\x23\x4e\xd7"
++			  "\x76\xd1\xda\x0c\x94\x67\xbb\x04"
++			  "\x8b\xf2\x03\x6c\xa8\xcf\xb6\xea"
++			  "\x22\x64\x47\xaa\x8f\x75\x13\xbf"
++			  "\x9f\xc2\xc3\xf0\xc9\x56\xc5\x7a"
++			  "\x71\x63\x2e\x89\x7b\x1e\x12\xca"
++			  "\xe2\x5f\xaf\xd8\xa4\xf8\xc9\x7a"
++			  "\xd6\xf9\x21\x31\x62\x44\x45\xa6"
++			  "\xd6\xbc\x5a\xd3\x2d\x54\x43\xcc"
++			  "\x9d\xde\xa5\x70\xe9\x42\x45\x8a"
++			  "\x6b\xfa\xb1\x91\x13\xb0\xd9\x19"
++			  "\x73\xb0\xea\x9f\xe8\x18\x80\xd6"
++			  "\x56\x38\x44\xc0\xdb\xe3\x4f\x71"
++			  "\xf7\xce\xd1\xd3\xf8\xbd\x3e\x4f"
++			  "\xca\x43\x95\xdf\x80\x61\x81\xa9",
++		.rlen	= 128 + 32,
++	},
++};
++
++#define HMAC_SHA384_DES3_EDE_CBC_ENC_TEST_VEC	1
++
++static struct aead_testvec hmac_sha384_des3_ede_cbc_enc_tv_temp[] = {
++	{ /*Generated with cryptopp*/
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x18"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
++			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
++			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
++			  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
++			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
++		.klen	= 8 + 48 + 24,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++	.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++			  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result	= "\x0e\x2d\xb6\x97\x3c\x56\x33\xf4"
++			  "\x67\x17\x21\xc7\x6e\x8a\xd5\x49"
++			  "\x74\xb3\x49\x05\xc5\x1c\xd0\xed"
++			  "\x12\x56\x5c\x53\x96\xb6\x00\x7d"
++			  "\x90\x48\xfc\xf5\x8d\x29\x39\xcc"
++			  "\x8a\xd5\x35\x18\x36\x23\x4e\xd7"
++			  "\x76\xd1\xda\x0c\x94\x67\xbb\x04"
++			  "\x8b\xf2\x03\x6c\xa8\xcf\xb6\xea"
++			  "\x22\x64\x47\xaa\x8f\x75\x13\xbf"
++			  "\x9f\xc2\xc3\xf0\xc9\x56\xc5\x7a"
++			  "\x71\x63\x2e\x89\x7b\x1e\x12\xca"
++			  "\xe2\x5f\xaf\xd8\xa4\xf8\xc9\x7a"
++			  "\xd6\xf9\x21\x31\x62\x44\x45\xa6"
++			  "\xd6\xbc\x5a\xd3\x2d\x54\x43\xcc"
++			  "\x9d\xde\xa5\x70\xe9\x42\x45\x8a"
++			  "\x6b\xfa\xb1\x91\x13\xb0\xd9\x19"
++			  "\x6d\x77\xfc\x80\x9d\x8a\x9c\xb7"
++		  "\x70\xe7\x93\xbf\x73\xe6\x9f\x83"
++			  "\x99\x62\x23\xe6\x5b\xd0\xda\x18"
++			  "\xa4\x32\x8a\x0b\x46\xd7\xf0\x39"
++			  "\x36\x5d\x13\x2f\x86\x10\x78\xd6"
++			  "\xd6\xbe\x5c\xb9\x15\x89\xf9\x1b",
++		.rlen	= 128 + 48,
++	},
++};
++
++#define HMAC_SHA512_DES3_EDE_CBC_ENC_TEST_VEC	1
++
++static struct aead_testvec hmac_sha512_des3_ede_cbc_enc_tv_temp[] = {
++	{ /*Generated with cryptopp*/
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x18"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x22\x33\x44\x55\x66\x77\x88\x99"
++			  "\xaa\xbb\xcc\xdd\xee\xff\x11\x22"
++			  "\x33\x44\x55\x66\x77\x88\x99\xaa"
++			  "\xbb\xcc\xdd\xee\xff\x11\x22\x33"
++			  "\x44\x55\x66\x77\x88\x99\xaa\xbb"
++			  "\xcc\xdd\xee\xff\x11\x22\x33\x44"
++			  "\xE9\xC0\xFF\x2E\x76\x0B\x64\x24"
++		  "\x44\x4D\x99\x5A\x12\xD6\x40\xC0"
++			  "\xEA\xC2\x84\xE8\x14\x95\xDB\xE8",
++		.klen	= 8 + 64 + 24,
++		.iv	= "\x7D\x33\x88\x93\x0F\x93\xB2\x42",
++		.assoc  = "\x00\x00\x43\x21\x00\x00\x00\x01",
++		.alen   = 8,
++		.input	= "\x6f\x54\x20\x6f\x61\x4d\x79\x6e"
++			  "\x53\x20\x63\x65\x65\x72\x73\x74"
++			  "\x54\x20\x6f\x6f\x4d\x20\x6e\x61"
++			  "\x20\x79\x65\x53\x72\x63\x74\x65"
++			  "\x20\x73\x6f\x54\x20\x6f\x61\x4d"
++			  "\x79\x6e\x53\x20\x63\x65\x65\x72"
++			  "\x73\x74\x54\x20\x6f\x6f\x4d\x20"
++			  "\x6e\x61\x20\x79\x65\x53\x72\x63"
++		  "\x74\x65\x20\x73\x6f\x54\x20\x6f"
++			  "\x61\x4d\x79\x6e\x53\x20\x63\x65"
++			  "\x65\x72\x73\x74\x54\x20\x6f\x6f"
++			  "\x4d\x20\x6e\x61\x20\x79\x65\x53"
++			  "\x72\x63\x74\x65\x20\x73\x6f\x54"
++			  "\x20\x6f\x61\x4d\x79\x6e\x53\x20"
++			  "\x63\x65\x65\x72\x73\x74\x54\x20"
++			  "\x6f\x6f\x4d\x20\x6e\x61\x0a\x79",
++		.ilen	= 128,
++		.result	= "\x0e\x2d\xb6\x97\x3c\x56\x33\xf4"
++			  "\x67\x17\x21\xc7\x6e\x8a\xd5\x49"
++			  "\x74\xb3\x49\x05\xc5\x1c\xd0\xed"
++			  "\x12\x56\x5c\x53\x96\xb6\x00\x7d"
++			  "\x90\x48\xfc\xf5\x8d\x29\x39\xcc"
++			  "\x8a\xd5\x35\x18\x36\x23\x4e\xd7"
++			  "\x76\xd1\xda\x0c\x94\x67\xbb\x04"
++			  "\x8b\xf2\x03\x6c\xa8\xcf\xb6\xea"
++			  "\x22\x64\x47\xaa\x8f\x75\x13\xbf"
++			  "\x9f\xc2\xc3\xf0\xc9\x56\xc5\x7a"
++			  "\x71\x63\x2e\x89\x7b\x1e\x12\xca"
++			  "\xe2\x5f\xaf\xd8\xa4\xf8\xc9\x7a"
++			  "\xd6\xf9\x21\x31\x62\x44\x45\xa6"
++			  "\xd6\xbc\x5a\xd3\x2d\x54\x43\xcc"
++			  "\x9d\xde\xa5\x70\xe9\x42\x45\x8a"
++			  "\x6b\xfa\xb1\x91\x13\xb0\xd9\x19"
++			  "\x41\xb5\x1f\xbb\xbd\x4e\xb8\x32"
++			  "\x22\x86\x4e\x57\x1b\x2a\xd8\x6e"
++			  "\xa9\xfb\xc8\xf3\xbf\x2d\xae\x2b"
++			  "\x3b\xbc\x41\xe8\x38\xbb\xf1\x60"
++			  "\x4c\x68\xa9\x4e\x8c\x73\xa7\xc0"
++			  "\x2a\x74\xd4\x65\x12\xcb\x55\xf2"
++			  "\xd5\x02\x6d\xe6\xaf\xc9\x2f\xf2"
++			  "\x57\xaa\x85\xf7\xf3\x6a\xcb\xdb",
++		.rlen	= 128 + 64,
++	},
++};
++
+ static struct cipher_testvec aes_lrw_enc_tv_template[] = {
+ 	/* from http://grouper.ieee.org/groups/1619/email/pdf00017.pdf */
+ 	{ /* LRW-32-AES 1 */
 -- 
-1.9.0
+1.8.1.4
