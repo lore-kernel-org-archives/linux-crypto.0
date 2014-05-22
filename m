@@ -1,30 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Fix DMA-API warning
-Date: Thu, 22 May 2014 21:09:25 +0800
-Message-ID: <20140522130924.GE3598@gondor.apana.org.au>
-References: <20140519165133.GA3365@gitlad.jf.intel.com>
+Subject: Re: [PATCH] crypto: testmgr - add aead cbc des, des3_ede tests
+Date: Thu, 22 May 2014 21:09:34 +0800
+Message-ID: <20140522130934.GF3598@gondor.apana.org.au>
+References: <1400672348-1658-1-git-send-email-NiteshNarayanLal@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: ruchika.gupta@freescale.com, linux-crypto@vger.kernel.org,
+	Vakul Garg <vakul@freescale.com>
+To: Nitesh Lal <NiteshNarayanLal@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:35617 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:34639 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752402AbaEVNJc (ORCPT
+	with ESMTP id S1752935AbaEVNJg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 May 2014 09:09:32 -0400
+	Thu, 22 May 2014 09:09:36 -0400
 Content-Disposition: inline
-In-Reply-To: <20140519165133.GA3365@gitlad.jf.intel.com>
+In-Reply-To: <1400672348-1658-1-git-send-email-NiteshNarayanLal@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 19, 2014 at 09:51:33AM -0700, Tadeusz Struk wrote:
-> With DMA-API debug enabled testmgr triggers a "DMA-API: device driver maps memory from stack" warning, when tested on a crypto HW accelerator.
+On Wed, May 21, 2014 at 05:09:08PM +0530, Nitesh Lal wrote:
+> Test vectors were taken from existing test for
+> CBC(DES3_EDE). Associated data has been added to test vectors.
+> HMAC computed with Crypto++ has been used. Following algos have
+> been covered.
 > 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+>         (a) "authenc(hmac(sha1),cbc(des))"
+>         (b) "authenc(hmac(sha1),cbc(des3_ede))"
+>         (c) "authenc(hmac(sha224),cbc(des))"
+>         (d) "authenc(hmac(sha224),cbc(des3_ede))"
+>         (e) "authenc(hmac(sha256),cbc(des))"
+>         (f) "authenc(hmac(sha256),cbc(des3_ede))"
+>         (g) "authenc(hmac(sha384),cbc(des))"
+>         (h) "authenc(hmac(sha384),cbc(des3_ede))"
+>         (i) "authenc(hmac(sha512),cbc(des))"
+>         (j) "authenc(hmac(sha512),cbc(des3_ede))"
+> 
+> Signed-off-by: Vakul Garg <vakul@freescale.com>
+> [NiteshNarayanLal@freescale.com: added hooks for the missing algorithms test and tested the patch]
+> Signed-off-by: Nitesh Lal <NiteshNarayanLal@freescale.com>
 
-Patch applied.  Thanks!
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
