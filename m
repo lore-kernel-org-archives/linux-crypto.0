@@ -1,81 +1,48 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH 1/6] crypto: SHA1 multibuffer map scatter gather walk's
- buffer address directly for x86_64
-Date: Wed, 21 May 2014 15:18:45 -0700
-Message-ID: <1400710725.2970.315.camel@schen9-DESK>
-References: <cover.1399990803.git.tim.c.chen@linux.intel.com>
-	 <1400023182.2970.238.camel@schen9-DESK>
-	 <20140513233410.GA28134@gondor.apana.org.au>
-	 <1400024458.2970.247.camel@schen9-DESK>
-	 <20140513235813.GA28455@gondor.apana.org.au>
-	 <1400177523.2970.267.camel@schen9-DESK>
-	 <20140521130504.GA24401@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] mxs-dcp: Remove global mutex
+Date: Thu, 22 May 2014 21:08:38 +0800
+Message-ID: <20140522130838.GA3598@gondor.apana.org.au>
+References: <1399895068-3326-1-git-send-email-fabio.estevam@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, shawn.guo@freescale.com,
+	marex@denx.de, shc_work@mail.ru
+To: Fabio Estevam <fabio.estevam@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:48188 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753374AbaEUWUp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 May 2014 18:20:45 -0400
-In-Reply-To: <20140521130504.GA24401@gondor.apana.org.au>
+Received: from ringil.hengli.com.au ([178.18.16.133]:60416 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755080AbaEVNIp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 22 May 2014 09:08:45 -0400
+Content-Disposition: inline
+In-Reply-To: <1399895068-3326-1-git-send-email-fabio.estevam@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2014-05-21 at 21:05 +0800, Herbert Xu wrote:
-> On Thu, May 15, 2014 at 11:12:03AM -0700, Tim Chen wrote:
-> >
-> > > In which case your patch would basically do kmap if ASYNC and
-> > > kmap_atomic otherwise.
-> > > 
-> > > I'll try to make such a patch.
+On Mon, May 12, 2014 at 08:44:28AM -0300, Fabio Estevam wrote:
+> Remove mutex_lock from probe in order to avoid the following warning:
 > 
-> Please see attached.
-
-> > It will be nice if scatterwalk_map and unmap can also be made
-> > async aware. Right now it also uses kmap_atomic.
-> > This will allow multi-buffer encryption to make use of it.  
+> [    8.526613] Freeing unused kernel memory: 232K (c0683000 - c06bd000)
+> starting pid 56, tty '': '/etc/rc.d/rcS'
+> [    9.110314]
+> [    9.111864] =====================================
+> [    9.116603] [ BUG: init/1 still has locks held! ]
+> [    9.121488] 3.15.0-rc4-next-20140509-00001-g319564e #1154 Not tainted
+> [    9.128071] -------------------------------------
+> [    9.132825] 1 lock held by init/1:
+> [    9.136252]  #0:  (global_mutex){+.+.+.}, at: [<c0387d68>] mxs_dcp_probe+0x14
+> [    9.144196]
+> [    9.144196] stack backtrace:
+> [    9.148888] CPU: 0 PID: 1 Comm: init Not tainted 3.15.0-rc4-next-20140509-004
+> [    9.157610] [<c000da40>] (unwind_backtrace) from [<c000bda4>] (show_stack+0x)
+> [    9.165595] [<c000bda4>] (show_stack) from [<c00153d4>] (do_fork+0x2c8/0x3cc)
+> [    9.172921] [<c00153d4>] (do_fork) from [<c0015550>] (sys_vfork+0x20/0x2c)
+> [    9.179973] [<c0015550>] (sys_vfork) from [<c0009580>] (ret_fast_syscall+0x0)
 > 
-> Is this for ciphers? Could you use ablkcipher_walk since it doesn't
-> actually map anything meaning that you can map it yourself?
-> 
-> commit 75ecb231ff45b54afa9f4ec9137965c3c00868f4
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Wed May 21 20:56:12 2014 +0800
-> 
->     crypto: hash - Add real ahash walk interface
->     
->     Although the existing hash walk interface has already been used
->     by a number of ahash crypto drivers, it turns out that none of
->     them were really asynchronous.  They were all essentially polling
->     for completion.
->     
->     That's why nobody has noticed until now that the walk interface
->     couldn't work with a real asynchronous driver since the memory
->     is mapped using kmap_atomic.
->     
->     As we now have a use-case for a real ahash implementation on x86,
->     this patch creates a minimal ahash walk interface.  Basically it
->     just calls kmap instead of kmap_atomic and does away with the
->     crypto_yield call.  Real ahash crypto drivers don't need to yield
->     since by definition they won't be hogging the CPU.
->     
->     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
+> Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
 
-
-Herbert,
-
-Thanks for the patch.  I'll test it out for multi-buffer sha1
-and then send out an update of the patch series.
-
-Tim
+Patch applied.  Thanks a lot!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
