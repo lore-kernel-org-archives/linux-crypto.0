@@ -1,7 +1,8 @@
 From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: [PATCH v2 2/5] crypto: SHA1 multibuffer algorithm data structures
-Date: Fri, 23 May 2014 16:02:22 -0700
-Message-ID: <1400886142.2970.358.camel@schen9-DESK>
+Subject: [PATCH v2 4/5] crypto: SHA1 multibuffer crypto computation (x8
+ AVX2)
+Date: Fri, 23 May 2014 16:02:29 -0700
+Message-ID: <1400886149.2970.360.camel@schen9-DESK>
 References: <cover.1400856726.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -17,37 +18,33 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S.Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:57995 "EHLO mga02.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:58053 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751154AbaEWXEw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 May 2014 19:04:52 -0400
+	id S1751154AbaEWXFC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 23 May 2014 19:05:02 -0400
 In-Reply-To: <cover.1400856726.git.tim.c.chen@linux.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch introduces the data structures and prototypes of functions
-needed for computing SHA1 hash using multi-buffer.  Included are the
-structures of the multi-buffer SHA1 job, job scheduler in C and x86
-assembly.
+This patch introduces the assembly routines to do SHA1 computation on
+buffers belonging to serveral jobs at once.  The assembly routines are
+optimized with AVX2 instructions that have 8 data lanes and using AVX2
+registers.
 
 Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
- arch/x86/crypto/sha-mb/sha1_mb_mgr_datastruct.S | 287 ++++++++++++++++++++++++
- arch/x86/crypto/sha-mb/sha_mb_ctx.h             | 136 +++++++++++
- arch/x86/crypto/sha-mb/sha_mb_mgr.h             | 110 +++++++++
- 3 files changed, 533 insertions(+)
- create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_datastruct.S
- create mode 100644 arch/x86/crypto/sha-mb/sha_mb_ctx.h
- create mode 100644 arch/x86/crypto/sha-mb/sha_mb_mgr.h
+ arch/x86/crypto/sha-mb/sha1_x8_avx2.S | 472 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 472 insertions(+)
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_x8_avx2.S
 
-diff --git a/arch/x86/crypto/sha-mb/sha1_mb_mgr_datastruct.S b/arch/x86/crypto/sha-mb/sha1_mb_mgr_datastruct.S
+diff --git a/arch/x86/crypto/sha-mb/sha1_x8_avx2.S b/arch/x86/crypto/sha-mb/sha1_x8_avx2.S
 new file mode 100644
-index 0000000..86688c6
+index 0000000..8e1b477
 --- /dev/null
-+++ b/arch/x86/crypto/sha-mb/sha1_mb_mgr_datastruct.S
-@@ -0,0 +1,287 @@
++++ b/arch/x86/crypto/sha-mb/sha1_x8_avx2.S
+@@ -0,0 +1,472 @@
 +/*
-+ * Header file for multi buffer SHA1 algorithm data structure
++ * Multi-buffer SHA1 algorithm hash compute routine
 + *
 + * This file is provided under a dual BSD/GPLv2 license.  When using or
 + * redistributing this file, you may do so under either license.
@@ -100,496 +97,423 @@ index 0000000..86688c6
 + * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 + */
 +
-+# Macros for defining data structures
++#include <linux/linkage.h>
++#include "sha1_mb_mgr_datastruct.S"
 +
-+# Usage example
++## code to compute oct SHA1 using SSE-256
++## outer calling routine takes care of save and restore of XMM registers
 +
-+#START_FIELDS	# JOB_AES
-+###	name		size	align
-+#FIELD	_plaintext,	8,	8	# pointer to plaintext
-+#FIELD	_ciphertext,	8,	8	# pointer to ciphertext
-+#FIELD	_IV,		16,	8	# IV
-+#FIELD	_keys,		8,	8	# pointer to keys
-+#FIELD	_len,		4,	4	# length in bytes
-+#FIELD	_status,	4,	4	# status enumeration
-+#FIELD	_user_data,	8,	8	# pointer to user data
-+#UNION  _union,         size1,  align1, \
-+#	                size2,  align2, \
-+#	                size3,  align3, \
-+#	                ...
-+#END_FIELDS
-+#%assign _JOB_AES_size	_FIELD_OFFSET
-+#%assign _JOB_AES_align	_STRUCT_ALIGN
++## Function clobbers: rax, rcx, rdx,   rbx, rsi, rdi, r9-r15# ymm0-15
++##
++## Linux clobbers:    rax rbx rcx rdx rsi            r9 r10 r11 r12 r13 r14 r15
++## Linux preserves:                       rdi rbp r8
++##
++## clobbers ymm0-15
 +
-+#########################################################################
 +
-+# Alternate "struc-like" syntax:
-+#	STRUCT job_aes2
-+#	RES_Q	.plaintext,	1
-+#	RES_Q	.ciphertext,	1
-+#	RES_DQ	.IV,		1
-+#	RES_B	.nested,	_JOB_AES_SIZE, _JOB_AES_ALIGN
-+#	RES_U	.union,		size1, align1, \
-+#				size2, align2, \
-+#				...
-+#	ENDSTRUCT
-+#	# Following only needed if nesting
-+#	%assign job_aes2_size	_FIELD_OFFSET
-+#	%assign job_aes2_align	_STRUCT_ALIGN
++# TRANSPOSE8 r0, r1, r2, r3, r4, r5, r6, r7, t0, t1
++# "transpose" data in {r0...r7} using temps {t0...t1}
++# Input looks like: {r0 r1 r2 r3 r4 r5 r6 r7}
++# r0 = {a7 a6 a5 a4   a3 a2 a1 a0}
++# r1 = {b7 b6 b5 b4   b3 b2 b1 b0}
++# r2 = {c7 c6 c5 c4   c3 c2 c1 c0}
++# r3 = {d7 d6 d5 d4   d3 d2 d1 d0}
++# r4 = {e7 e6 e5 e4   e3 e2 e1 e0}
++# r5 = {f7 f6 f5 f4   f3 f2 f1 f0}
++# r6 = {g7 g6 g5 g4   g3 g2 g1 g0}
++# r7 = {h7 h6 h5 h4   h3 h2 h1 h0}
 +#
-+# RES_* macros take a name, a count and an optional alignment.
-+# The count in in terms of the base size of the macro, and the
-+# default alignment is the base size.
-+# The macros are:
-+# Macro    Base size
-+# RES_B	    1
-+# RES_W	    2
-+# RES_D     4
-+# RES_Q     8
-+# RES_DQ   16
-+# RES_Y    32
-+# RES_Z    64
-+#
-+# RES_U defines a union. It's arguments are a name and two or more
-+# pairs of "size, alignment"
-+#
-+# The two assigns are only needed if this structure is being nested
-+# within another. Even if the assigns are not done, one can still use
-+# STRUCT_NAME_size as the size of the structure.
-+#
-+# Note that for nesting, you still need to assign to STRUCT_NAME_size.
-+#
-+# The differences between this and using "struc" directly are that each
-+# type is implicitly aligned to its natural length (although this can be
-+# over-ridden with an explicit third parameter), and that the structure
-+# is padded at the end to its overall alignment.
++# Output looks like: {r0 r1 r2 r3 r4 r5 r6 r7}
++# r0 = {h0 g0 f0 e0   d0 c0 b0 a0}
++# r1 = {h1 g1 f1 e1   d1 c1 b1 a1}
++# r2 = {h2 g2 f2 e2   d2 c2 b2 a2}
++# r3 = {h3 g3 f3 e3   d3 c3 b3 a3}
++# r4 = {h4 g4 f4 e4   d4 c4 b4 a4}
++# r5 = {h5 g5 f5 e5   d5 c5 b5 a5}
++# r6 = {h6 g6 f6 e6   d6 c6 b6 a6}
++# r7 = {h7 g7 f7 e7   d7 c7 b7 a7}
 +#
 +
-+#########################################################################
++.macro TRANSPOSE8 r0 r1 r2 r3 r4 r5 r6 r7 t0 t1
++	# process top half (r0..r3) {a...d}
++	vshufps  $0x44, \r1, \r0, \t0 # t0 = {b5 b4 a5 a4   b1 b0 a1 a0}
++	vshufps  $0xEE, \r1, \r0, \r0 # r0 = {b7 b6 a7 a6   b3 b2 a3 a2}
++	vshufps  $0x44, \r3, \r2, \t1 # t1 = {d5 d4 c5 c4   d1 d0 c1 c0}
++	vshufps  $0xEE, \r3, \r2, \r2 # r2 = {d7 d6 c7 c6   d3 d2 c3 c2}
++	vshufps  $0xDD, \t1, \t0, \r3 # r3 = {d5 c5 b5 a5   d1 c1 b1 a1}
++	vshufps  $0x88, \r2, \r0, \r1 # r1 = {d6 c6 b6 a6   d2 c2 b2 a2}
++	vshufps  $0xDD, \r2, \r0, \r0 # r0 = {d7 c7 b7 a7   d3 c3 b3 a3}
++	vshufps  $0x88, \t1, \t0, \t0 # t0 = {d4 c4 b4 a4   d0 c0 b0 a0}
 +
-+#ifndef _SHA1_MB_MGR_DATASTRUCT_ASM_
-+#define _SHA1_MB_MGR_DATASTRUCT_ASM_
++	# use r2 in place of t0
++	# process bottom half (r4..r7) {e...h}
++	vshufps  $0x44, \r5, \r4, \r2 # r2 = {f5 f4 e5 e4   f1 f0 e1 e0}
++	vshufps  $0xEE, \r5, \r4, \r4 # r4 = {f7 f6 e7 e6   f3 f2 e3 e2}
++	vshufps  $0x44, \r7, \r6, \t1 # t1 = {h5 h4 g5 g4   h1 h0 g1 g0}
++	vshufps  $0xEE, \r7, \r6, \r6 # r6 = {h7 h6 g7 g6   h3 h2 g3 g2}
++	vshufps  $0xDD, \t1, \r2, \r7 # r7 = {h5 g5 f5 e5   h1 g1 f1 e1}
++	vshufps  $0x88, \r6, \r4, \r5 # r5 = {h6 g6 f6 e6   h2 g2 f2 e2}
++	vshufps  $0xDD, \r6, \r4, \r4 # r4 = {h7 g7 f7 e7   h3 g3 f3 e3}
++	vshufps  $0x88, \t1, \r2, \t1 # t1 = {h4 g4 f4 e4   h0 g0 f0 e0}
 +
-+## START_FIELDS
-+.macro START_FIELDS
-+ _FIELD_OFFSET = 0
-+ _STRUCT_ALIGN = 0
++	vperm2f128      $0x13, \r1, \r5, \r6  # h6...a6
++	vperm2f128      $0x02, \r1, \r5, \r2  # h2...a2
++	vperm2f128      $0x13, \r3, \r7, \r5  # h5...a5
++	vperm2f128      $0x02, \r3, \r7, \r1  # h1...a1
++	vperm2f128      $0x13, \r0, \r4, \r7  # h7...a7
++	vperm2f128      $0x02, \r0, \r4, \r3  # h3...a3
++	vperm2f128      $0x13, \t0, \t1, \r4  # h4...a4
++	vperm2f128      $0x02, \t0, \t1, \r0  # h0...a0
++
++.endm
++##
++## Magic functions defined in FIPS 180-1
++##
++# macro MAGIC_F0 F,B,C,D,T   ## F = (D ^ (B & (C ^ D)))
++.macro MAGIC_F0 regF regB regC regD regT
++    vpxor \regD, \regC, \regF
++    vpand \regB, \regF, \regF
++    vpxor \regD, \regF, \regF
 +.endm
 +
-+## FIELD name size align
-+.macro FIELD name size align
-+ _FIELD_OFFSET = (_FIELD_OFFSET + (\align) - 1) & (~ ((\align)-1))
-+ \name	= _FIELD_OFFSET
-+ _FIELD_OFFSET = _FIELD_OFFSET + (\size)
-+.if (\align > _STRUCT_ALIGN)
-+ _STRUCT_ALIGN = \align
-+.endif
++# macro MAGIC_F1 F,B,C,D,T   ## F = (B ^ C ^ D)
++.macro MAGIC_F1 regF regB regC regD regT
++    vpxor  \regC, \regD, \regF
++    vpxor  \regB, \regF, \regF
 +.endm
 +
-+## END_FIELDS
-+.macro END_FIELDS
-+ _FIELD_OFFSET = (_FIELD_OFFSET + _STRUCT_ALIGN-1) & (~ (_STRUCT_ALIGN-1))
++# macro MAGIC_F2 F,B,C,D,T   ## F = ((B & C) | (B & D) | (C & D))
++.macro MAGIC_F2 regF regB regC regD regT
++    vpor  \regC, \regB, \regF
++    vpand \regC, \regB, \regT
++    vpand \regD, \regF, \regF
++    vpor  \regT, \regF, \regF
++.endm
++
++# macro MAGIC_F3 F,B,C,D,T   ## F = (B ^ C ^ D)
++.macro MAGIC_F3 regF regB regC regD regT
++    MAGIC_F1 \regF,\regB,\regC,\regD,\regT
++.endm
++
++# PROLD reg, imm, tmp
++.macro PROLD reg imm tmp
++	vpsrld  $(32-\imm), \reg, \tmp
++	vpslld  $\imm, \reg, \reg
++	vpor    \tmp, \reg, \reg
++.endm
++
++.macro PROLD_nd reg imm tmp src
++	vpsrld  $(32-\imm), \src, \tmp
++	vpslld  $\imm, \src, \reg
++	vpor	\tmp, \reg, \reg
++.endm
++
++.macro SHA1_STEP_00_15 regA regB regC regD regE regT regF memW immCNT MAGIC
++	vpaddd	\immCNT, \regE, \regE
++	vpaddd	\memW*32(%rsp), \regE, \regE
++	PROLD_nd \regT, 5, \regF, \regA
++	vpaddd	\regT, \regE, \regE
++	\MAGIC  \regF, \regB, \regC, \regD, \regT
++        PROLD   \regB, 30, \regT
++        vpaddd  \regF, \regE, \regE
++.endm
++
++.macro SHA1_STEP_16_79 regA regB regC regD regE regT regF memW immCNT MAGIC
++	vpaddd	\immCNT, \regE, \regE
++	offset = ((\memW - 14) & 15) * 32
++	vmovdqu offset(%rsp), W14
++	vpxor	W14, W16, W16
++	offset = ((\memW -  8) & 15) * 32
++	vpxor	offset(%rsp), W16, W16
++	offset = ((\memW -  3) & 15) * 32
++	vpxor	offset(%rsp), W16, W16
++	vpsrld	$(32-1), W16, \regF
++	vpslld	$1, W16, W16
++	vpor	W16, \regF, \regF
++
++	ROTATE_W
++
++	offset = ((\memW - 0) & 15) * 32
++	vmovdqu	\regF, offset(%rsp)
++	vpaddd	\regF, \regE, \regE
++	PROLD_nd \regT, 5, \regF, \regA
++	vpaddd	\regT, \regE, \regE
++	\MAGIC \regF,\regB,\regC,\regD,\regT      ## FUN  = MAGIC_Fi(B,C,D)
++	PROLD   \regB,30, \regT
++	vpaddd  \regF, \regE, \regE
 +.endm
 +
 +########################################################################
-+
-+.macro STRUCT p1
-+START_FIELDS
-+.struc \p1
-+.endm
-+
-+.macro ENDSTRUCT
-+ tmp = _FIELD_OFFSET
-+ END_FIELDS
-+ tmp = (_FIELD_OFFSET - %%tmp)
-+.if (tmp > 0)
-+	.lcomm	tmp
-+.endif
-+.endstruc
-+.endm
-+
-+## RES_int name size align
-+.macro RES_int p1 p2 p3
-+ name = \p1
-+ size = \p2
-+ align = .\p3
-+
-+ _FIELD_OFFSET = (_FIELD_OFFSET + (align) - 1) & (~ ((align)-1))
-+.align align
-+.lcomm name size
-+ _FIELD_OFFSET = _FIELD_OFFSET + (size)
-+.if (align > _STRUCT_ALIGN)
-+ _STRUCT_ALIGN = align
-+.endif
-+.endm
-+
-+
-+
-+# macro RES_B name, size [, align]
-+.macro RES_B _name, _size, _align=1
-+RES_int _name _size _align
-+.endm
-+
-+# macro RES_W name, size [, align]
-+.macro RES_W _name, _size, _align=2
-+RES_int _name 2*(_size) _align
-+.endm
-+
-+# macro RES_D name, size [, align]
-+.macro RES_D _name, _size, _align=4
-+RES_int _name 4*(_size) _align
-+.endm
-+
-+# macro RES_Q name, size [, align]
-+.macro RES_Q _name, _size, _align=8
-+RES_int _name 8*(_size) _align
-+.endm
-+
-+# macro RES_DQ name, size [, align]
-+.macro RES_DQ _name, _size, _align=16
-+RES_int _name 16*(_size) _align
-+.endm
-+
-+# macro RES_Y name, size [, align]
-+.macro RES_Y _name, _size, _align=32
-+RES_int _name 32*(_size) _align
-+.endm
-+
-+# macro RES_Z name, size [, align]
-+.macro RES_Z _name, _size, _align=64
-+RES_int _name 64*(_size) _align
-+.endm
-+
-+
-+#endif
-+
 +########################################################################
-+#### Define constants
 +########################################################################
 +
-+########################################################################
-+#### Define SHA1 Out Of Order Data Structures
-+########################################################################
++## FRAMESZ plus pushes must be an odd multiple of 8
++YMM_SAVE = (15-15)*32
++FRAMESZ = 32*16 + YMM_SAVE
++_YMM  =   FRAMESZ - YMM_SAVE
 +
-+START_FIELDS    # LANE_DATA
-+###     name            size    align
-+FIELD   _job_in_lane,   8,      8       # pointer to job object
-+END_FIELDS
++#define VMOVPS   vmovups
 +
-+_LANE_DATA_size = _FIELD_OFFSET
-+_LANE_DATA_align = _STRUCT_ALIGN
++IDX  = %rax
++inp0 = %r9
++inp1 = %r10
++inp2 = %r11
++inp3 = %r12
++inp4 = %r13
++inp5 = %r14
++inp6 = %r15
++inp7 = %rcx
++arg1 = %rdi
++arg2 = %rsi
++RSP_SAVE = %rdx
 +
-+########################################################################
-+
-+START_FIELDS    # SHA1_ARGS_X8
-+###     name            size    align
-+FIELD   _digest,        4*5*8,  16      # transposed digest
-+FIELD   _data_ptr,      8*8,    8       # array of pointers to data
-+END_FIELDS
-+
-+_SHA1_ARGS_X4_size =     _FIELD_OFFSET
-+_SHA1_ARGS_X4_align =    _STRUCT_ALIGN
-+_SHA1_ARGS_X8_size =     _FIELD_OFFSET
-+_SHA1_ARGS_X8_align =    _STRUCT_ALIGN
-+
-+########################################################################
-+
-+START_FIELDS    # MB_MGR
-+###     name            size    align
-+FIELD   _args,          _SHA1_ARGS_X4_size, _SHA1_ARGS_X4_align
-+FIELD   _lens,          4*8,    8
-+FIELD   _unused_lanes,  8,      8
-+FIELD   _ldata,         _LANE_DATA_size*8, _LANE_DATA_align
-+END_FIELDS
-+
-+_MB_MGR_size =   _FIELD_OFFSET
-+_MB_MGR_align =  _STRUCT_ALIGN
-+
-+_args_digest    =     _args + _digest
-+_args_data_ptr  =     _args + _data_ptr
++# ymm0 A
++# ymm1 B
++# ymm2 C
++# ymm3 D
++# ymm4 E
++# ymm5         F       AA
++# ymm6         T0      BB
++# ymm7         T1      CC
++# ymm8         T2      DD
++# ymm9         T3      EE
++# ymm10                T4      TMP
++# ymm11                T5      FUN
++# ymm12                T6      K
++# ymm13                T7      W14
++# ymm14                T8      W15
++# ymm15                T9      W16
 +
 +
-+########################################################################
-+#### Define constants
-+########################################################################
++A  =     %ymm0
++B  =     %ymm1
++C  =     %ymm2
++D  =     %ymm3
++E  =     %ymm4
++F  =     %ymm5
++T0 =	 %ymm6
++T1 =     %ymm7
++T2 =     %ymm8
++T3 =     %ymm9
++T4 =     %ymm10
++T5 =     %ymm11
++T6 =     %ymm12
++T7 =     %ymm13
++T8  =     %ymm14
++T9  =     %ymm15
 +
-+#define STS_UNKNOWN             0
-+#define STS_BEING_PROCESSED     1
-+#define STS_COMPLETED           2
++AA  =     %ymm5
++BB  =     %ymm6
++CC  =     %ymm7
++DD  =     %ymm8
++EE  =     %ymm9
++TMP =     %ymm10
++FUN =     %ymm11
++K   =     %ymm12
++W14 =     %ymm13
++W15 =     %ymm14
++W16 =     %ymm15
 +
-+########################################################################
-+#### Define JOB_SHA1 structure
-+########################################################################
++.macro ROTATE_ARGS
++ TMP_ = E
++ E = D
++ D = C
++ C = B
++ B = A
++ A = TMP_
++.endm
 +
-+START_FIELDS    # JOB_SHA1
++.macro ROTATE_W
++TMP_  = W16
++W16  = W15
++W15  = W14
++W14  = TMP_
++.endm
 +
-+###     name                            size    align
-+FIELD   _buffer,                        8,      8       # pointer to buffer
-+FIELD   _len,                           4,      4       # length in bytes
-+FIELD   _result_digest,                 5*4,    32      # Digest (output)
-+FIELD   _status,                        4,      4
-+FIELD   _user_data,                     8,      8
-+END_FIELDS
++# 8 streams x 5 32bit words per digest x 4 bytes per word
++#define DIGEST_SIZE (8*5*4)
 +
-+_JOB_SHA1_size =  _FIELD_OFFSET
-+_JOB_SHA1_align = _STRUCT_ALIGN
-diff --git a/arch/x86/crypto/sha-mb/sha_mb_ctx.h b/arch/x86/crypto/sha-mb/sha_mb_ctx.h
-new file mode 100644
-index 0000000..e36069d
---- /dev/null
-+++ b/arch/x86/crypto/sha-mb/sha_mb_ctx.h
-@@ -0,0 +1,136 @@
-+/*
-+ * Header file for multi buffer SHA context
-+ *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
-+ *
-+ * GPL LICENSE SUMMARY
-+ *
-+ *  Copyright(c) 2014 Intel Corporation.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of version 2 of the GNU General Public License as
-+ *  published by the Free Software Foundation.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but
-+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  General Public License for more details.
-+ *
-+ *  Contact Information:
-+ *	Tim Chen <tim.c.chen@linux.intel.com>
-+ *
-+ *  BSD LICENSE
-+ *
-+ *  Copyright(c) 2014 Intel Corporation.
-+ *
-+ *  Redistribution and use in source and binary forms, with or without
-+ *  modification, are permitted provided that the following conditions
-+ *  are met:
-+ *
-+ *    * Redistributions of source code must retain the above copyright
-+ *      notice, this list of conditions and the following disclaimer.
-+ *    * Redistributions in binary form must reproduce the above copyright
-+ *      notice, this list of conditions and the following disclaimer in
-+ *      the documentation and/or other materials provided with the
-+ *      distribution.
-+ *    * Neither the name of Intel Corporation nor the names of its
-+ *      contributors may be used to endorse or promote products derived
-+ *      from this software without specific prior written permission.
-+ *
-+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ */
++.align 32
 +
-+#ifndef _SHA_MB_CTX_INTERNAL_H
-+#define _SHA_MB_CTX_INTERNAL_H
++# void sha1_x8_avx2(void **input_data, UINT128 *digest, UINT32 size)
++# arg 1 : pointer to array[4] of pointer to input data
++# arg 2 : size (in blocks) ;; assumed to be >= 1
++#
++ENTRY(sha1_x8_avx2)
 +
-+#include "sha_mb_mgr.h"
++	push	RSP_SAVE
 +
-+#define HASH_UPDATE          0x00
-+#define HASH_FIRST           0x01
-+#define HASH_LAST            0x02
-+#define HASH_ENTIRE          0x03
-+#define HASH_DONE	     0x04
-+#define HASH_FINAL	     0x08
++	#save rsp
++	mov	%rsp, RSP_SAVE
++	sub     $FRAMESZ, %rsp
 +
-+#define HASH_CTX_STS_IDLE       0x00
-+#define HASH_CTX_STS_PROCESSING 0x01
-+#define HASH_CTX_STS_LAST       0x02
-+#define HASH_CTX_STS_COMPLETE   0x04
++	#align rsp to 32 Bytes
++	and	$~0x1F, %rsp
 +
-+enum hash_ctx_error {
-+	HASH_CTX_ERROR_NONE               =  0,
-+	HASH_CTX_ERROR_INVALID_FLAGS      = -1,
-+	HASH_CTX_ERROR_ALREADY_PROCESSING = -2,
-+	HASH_CTX_ERROR_ALREADY_COMPLETED  = -3,
++	## Initialize digests
++	vmovdqu  0*32(arg1), A
++	vmovdqu  1*32(arg1), B
++	vmovdqu  2*32(arg1), C
++	vmovdqu  3*32(arg1), D
++	vmovdqu  4*32(arg1), E
 +
-+#ifdef HASH_CTX_DEBUG
-+	HASH_CTX_ERROR_DEBUG_DIGEST_MISMATCH = -4,
-+#endif
-+};
++	## transpose input onto stack
++	mov     _data_ptr+0*8(arg1),inp0
++	mov     _data_ptr+1*8(arg1),inp1
++	mov     _data_ptr+2*8(arg1),inp2
++	mov     _data_ptr+3*8(arg1),inp3
++	mov     _data_ptr+4*8(arg1),inp4
++	mov     _data_ptr+5*8(arg1),inp5
++	mov     _data_ptr+6*8(arg1),inp6
++	mov     _data_ptr+7*8(arg1),inp7
 +
++	xor     IDX, IDX
++lloop:
++	vmovdqu  PSHUFFLE_BYTE_FLIP_MASK(%rip), F
++	I=0
++.rep 2
++	VMOVPS   (inp0, IDX), T0
++	VMOVPS   (inp1, IDX), T1
++	VMOVPS   (inp2, IDX), T2
++	VMOVPS   (inp3, IDX), T3
++	VMOVPS   (inp4, IDX), T4
++	VMOVPS   (inp5, IDX), T5
++	VMOVPS   (inp6, IDX), T6
++	VMOVPS   (inp7, IDX), T7
 +
-+#define hash_ctx_user_data(ctx)  ((ctx)->user_data)
-+#define hash_ctx_digest(ctx)     ((ctx)->job.result_digest)
-+#define hash_ctx_processing(ctx) ((ctx)->status & HASH_CTX_STS_PROCESSING)
-+#define hash_ctx_complete(ctx)   ((ctx)->status == HASH_CTX_STS_COMPLETE)
-+#define hash_ctx_status(ctx)     ((ctx)->status)
-+#define hash_ctx_error(ctx)      ((ctx)->error)
-+#define hash_ctx_init(ctx) \
-+	do { \
-+		(ctx)->error = HASH_CTX_ERROR_NONE; \
-+		(ctx)->status = HASH_CTX_STS_COMPLETE; \
-+	} while (0)
++	TRANSPOSE8       T0, T1, T2, T3, T4, T5, T6, T7, T8, T9
++	vpshufb  F, T0, T0
++	vmovdqu  T0, (I*8)*32(%rsp)
++	vpshufb  F, T1, T1
++	vmovdqu  T1, (I*8+1)*32(%rsp)
++	vpshufb  F, T2, T2
++	vmovdqu  T2, (I*8+2)*32(%rsp)
++	vpshufb  F, T3, T3
++	vmovdqu  T3, (I*8+3)*32(%rsp)
++	vpshufb  F, T4, T4
++	vmovdqu  T4, (I*8+4)*32(%rsp)
++	vpshufb  F, T5, T5
++	vmovdqu  T5, (I*8+5)*32(%rsp)
++	vpshufb  F, T6, T6
++	vmovdqu  T6, (I*8+6)*32(%rsp)
++	vpshufb  F, T7, T7
++	vmovdqu  T7, (I*8+7)*32(%rsp)
++	add     $32, IDX
++	I = (I+1)
++.endr
++	# save old digests
++	vmovdqu  A,AA
++	vmovdqu  B,BB
++	vmovdqu  C,CC
++	vmovdqu  D,DD
++	vmovdqu  E,EE
 +
++##
++## perform 0-79 steps
++##
++	vmovdqu  K00_19(%rip), K
++## do rounds 0...15
++	I = 0
++.rep 16
++	SHA1_STEP_00_15 A,B,C,D,E, TMP,FUN, I, K, MAGIC_F0
++	ROTATE_ARGS
++	I = (I+1)
++.endr
 +
-+/* Hash Constants and Typedefs */
-+#define SHA1_DIGEST_LENGTH          5
-+#define SHA1_LOG2_BLOCK_SIZE        6
++## do rounds 16...19
++	vmovdqu  ((16 - 16) & 15) * 32 (%rsp), W16
++	vmovdqu  ((16 - 15) & 15) * 32 (%rsp), W15
++.rep 4
++	SHA1_STEP_16_79 A,B,C,D,E, TMP,FUN, I, K, MAGIC_F0
++	ROTATE_ARGS
++	I = (I+1)
++.endr
 +
-+#define SHA1_PADLENGTHFIELD_SIZE    8
++## do rounds 20...39
++	vmovdqu  K20_39(%rip), K
++.rep 20
++	SHA1_STEP_16_79 A,B,C,D,E, TMP,FUN, I, K, MAGIC_F1
++	ROTATE_ARGS
++	I = (I+1)
++.endr
 +
-+#ifdef SHA_MB_DEBUG
-+#define assert(expr) \
-+do { \
-+	if (unlikely(!(expr))) { \
-+		printk(KERN_ERR "Assertion failed! %s,%s,%s,line=%d\n", \
-+		#expr, __FILE__, __func__, __LINE__); \
-+	} \
-+} while (0)
-+#else
-+#define assert(expr) do {} while (0)
-+#endif
++## do rounds 40...59
++	vmovdqu  K40_59(%rip), K
++.rep 20
++	SHA1_STEP_16_79 A,B,C,D,E, TMP,FUN, I, K, MAGIC_F2
++	ROTATE_ARGS
++	I = (I+1)
++.endr
 +
-+struct sha1_ctx_mgr {
-+	struct sha1_mb_mgr mgr;
-+};
++## do rounds 60...79
++	vmovdqu  K60_79(%rip), K
++.rep 20
++	SHA1_STEP_16_79 A,B,C,D,E, TMP,FUN, I, K, MAGIC_F3
++	ROTATE_ARGS
++	I = (I+1)
++.endr
 +
-+/* typedef struct sha1_ctx_mgr sha1_ctx_mgr; */
++	vpaddd   AA,A,A
++	vpaddd   BB,B,B
++	vpaddd   CC,C,C
++	vpaddd   DD,D,D
++	vpaddd   EE,E,E
 +
-+struct sha1_hash_ctx {
-+	/* Must be at struct offset 0 */
-+	struct job_sha1       job;
-+	/* status flag */
-+	int status;
-+	/* error flag */
-+	int error;
++	sub     $1, arg2
++	jne     lloop
 +
-+	uint32_t	total_length;
-+	const void	*incoming_buffer;
-+	uint32_t	incoming_buffer_length;
-+	uint8_t		partial_block_buffer[SHA1_BLOCK_SIZE * 2];
-+	uint32_t	partial_block_buffer_length;
-+	void		*user_data;
-+};
++	# write out digests
++	vmovdqu  A, 0*32(arg1)
++	vmovdqu  B, 1*32(arg1)
++	vmovdqu  C, 2*32(arg1)
++	vmovdqu  D, 3*32(arg1)
++	vmovdqu  E, 4*32(arg1)
 +
-+#endif
-diff --git a/arch/x86/crypto/sha-mb/sha_mb_mgr.h b/arch/x86/crypto/sha-mb/sha_mb_mgr.h
-new file mode 100644
-index 0000000..08ad1a9
---- /dev/null
-+++ b/arch/x86/crypto/sha-mb/sha_mb_mgr.h
-@@ -0,0 +1,110 @@
-+/*
-+ * Header file for multi buffer SHA1 algorithm manager
-+ *
-+ * This file is provided under a dual BSD/GPLv2 license.  When using or
-+ * redistributing this file, you may do so under either license.
-+ *
-+ * GPL LICENSE SUMMARY
-+ *
-+ *  Copyright(c) 2014 Intel Corporation.
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of version 2 of the GNU General Public License as
-+ *  published by the Free Software Foundation.
-+ *
-+ *  This program is distributed in the hope that it will be useful, but
-+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  General Public License for more details.
-+ *
-+ *  Contact Information:
-+ *      James Guilford <james.guilford@intel.com>
-+ *	Tim Chen <tim.c.chen@linux.intel.com>
-+ *
-+ *  BSD LICENSE
-+ *
-+ *  Copyright(c) 2014 Intel Corporation.
-+ *
-+ *  Redistribution and use in source and binary forms, with or without
-+ *  modification, are permitted provided that the following conditions
-+ *  are met:
-+ *
-+ *    * Redistributions of source code must retain the above copyright
-+ *      notice, this list of conditions and the following disclaimer.
-+ *    * Redistributions in binary form must reproduce the above copyright
-+ *      notice, this list of conditions and the following disclaimer in
-+ *      the documentation and/or other materials provided with the
-+ *      distribution.
-+ *    * Neither the name of Intel Corporation nor the names of its
-+ *      contributors may be used to endorse or promote products derived
-+ *      from this software without specific prior written permission.
-+ *
-+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+ */
-+#ifndef __SHA_MB_MGR_H
-+#define __SHA_MB_MGR_H
++	# update input pointers
++	add     IDX, inp0
++	add     IDX, inp1
++	add     IDX, inp2
++	add     IDX, inp3
++	add     IDX, inp4
++	add     IDX, inp5
++	add     IDX, inp6
++	add     IDX, inp7
++	mov     inp0, _data_ptr (arg1)
++	mov     inp1, _data_ptr + 1*8(arg1)
++	mov     inp2, _data_ptr + 2*8(arg1)
++	mov     inp3, _data_ptr + 3*8(arg1)
++	mov     inp4, _data_ptr + 4*8(arg1)
++	mov     inp5, _data_ptr + 5*8(arg1)
++	mov     inp6, _data_ptr + 6*8(arg1)
++	mov     inp7, _data_ptr + 7*8(arg1)
++
++	################
++	## Postamble
++
++	mov     RSP_SAVE, %rsp
++	pop	RSP_SAVE
++
++	ret
++ENDPROC(sha1_x8_avx2)
 +
 +
-+#include <linux/types.h>
++.data
 +
-+#define NUM_SHA1_DIGEST_WORDS 5
-+
-+enum job_sts {	STS_UNKNOWN = 0,
-+		STS_BEING_PROCESSED = 1,
-+		STS_COMPLETED = 2,
-+		STS_INTERNAL_ERROR = 3,
-+		STS_ERROR = 4
-+};
-+
-+struct job_sha1 {
-+	u8	*buffer;
-+	u32	len;
-+	u32	result_digest[NUM_SHA1_DIGEST_WORDS] __aligned(32);
-+	enum	job_sts status;
-+	void	*user_data;
-+};
-+
-+/* SHA1 out-of-order scheduler */
-+
-+/* typedef uint32_t sha1_digest_array[5][8]; */
-+
-+struct sha1_args_x8 {
-+	uint32_t	digest[5][8];
-+	uint8_t		*data_ptr[8];
-+};
-+
-+struct sha1_lane_data {
-+	struct job_sha1 *job_in_lane;
-+};
-+
-+struct sha1_mb_mgr {
-+	struct sha1_args_x8 args;
-+
-+	uint32_t lens[8];
-+
-+	/* each byte is index (0...7) of unused lanes */
-+	uint64_t unused_lanes;
-+	/* byte 4 is set to FF as a flag */
-+	struct sha1_lane_data ldata[8];
-+};
-+
-+
-+#define SHA1_MB_MGR_NUM_LANES_AVX2 8
-+
-+void sha1_mb_mgr_init_avx2(struct sha1_mb_mgr *state);
-+struct job_sha1 *sha1_mb_mgr_submit_avx2(struct sha1_mb_mgr *state,
-+					 struct job_sha1 *job);
-+struct job_sha1 *sha1_mb_mgr_flush_avx2(struct sha1_mb_mgr *state);
-+struct job_sha1 *sha1_mb_mgr_get_comp_job_avx2(struct sha1_mb_mgr *state);
-+
-+#endif
++.align 32
++K00_19:
++.octa 0x5A8279995A8279995A8279995A827999
++.octa 0x5A8279995A8279995A8279995A827999
++K20_39:
++.octa 0x6ED9EBA16ED9EBA16ED9EBA16ED9EBA1
++.octa 0x6ED9EBA16ED9EBA16ED9EBA16ED9EBA1
++K40_59:
++.octa 0x8F1BBCDC8F1BBCDC8F1BBCDC8F1BBCDC
++.octa 0x8F1BBCDC8F1BBCDC8F1BBCDC8F1BBCDC
++K60_79:
++.octa 0xCA62C1D6CA62C1D6CA62C1D6CA62C1D6
++.octa 0xCA62C1D6CA62C1D6CA62C1D6CA62C1D6
++PSHUFFLE_BYTE_FLIP_MASK:
++.octa 0x0c0d0e0f08090a0b0405060700010203
++.octa 0x0c0d0e0f08090a0b0405060700010203
 -- 
 1.7.11.7
