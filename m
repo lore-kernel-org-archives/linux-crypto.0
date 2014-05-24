@@ -1,66 +1,43 @@
 From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH 1/3] dt: Add DT bindings documentation for SUNXI Security
- System
-Date: Sat, 24 May 2014 13:21:32 +0200
-Message-ID: <201405241321.32147.marex@denx.de>
-References: <1400771396-9686-1-git-send-email-clabbe.montjoie@gmail.com>
- <1400771396-9686-2-git-send-email-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH] crypto:caam - Define setbits32() and clrbits32() for ARM in the Freescale CAAM driver
+Date: Sat, 24 May 2014 14:36:39 +0200
+Message-ID: <201405241436.39306.marex@denx.de>
+References: <1398766299-30412-1-git-send-email-ruchika.gupta@freescale.com> <20140501154650.48fde3cbe2036a062de08fb3@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: Text/Plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: mark.rutland@arm.com, devicetree@vger.kernel.org, linux@arm.linux.org.uk,
- herbert@gondor.apana.org.au, pawel.moll@arm.com, ijc+devicetree@hellion.org.uk,
- rdunlap@infradead.org, linux-kernel@vger.kernel.org, robh+dt@kernel.org,
- LABBE Corentin <clabbe.montjoie@gmail.com>, linux-crypto@vger.kernel.org,
- galak@codeaurora.org, grant.likely@linaro.org,
- maxime.ripard@free-electrons.com, davem@davemloft.net
-To: linux-arm-kernel@lists.infradead.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1400771396-9686-2-git-send-email-clabbe.montjoie@gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Ruchika Gupta <ruchika.gupta@freescale.com>,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	"Victoria Milhoan" <vicki.milhoan@freescale.com>
+To: Kim Phillips <kim.phillips@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-out.m-online.net ([212.18.0.10]:39968 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751133AbaEXRvj (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 24 May 2014 13:51:39 -0400
+In-Reply-To: <20140501154650.48fde3cbe2036a062de08fb3@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday, May 22, 2014 at 05:09:54 PM, LABBE Corentin wrote:
-
-Missing commit message. Please fix this and send a V2.
-
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
-> ---
->  Documentation/devicetree/bindings/crypto/sunxi-ss.txt | 9 +++++++++
->  1 file changed, 9 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+On Thursday, May 01, 2014 at 10:46:50 PM, Kim Phillips wrote:
+> On Tue, 29 Apr 2014 15:41:39 +0530
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
-> b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt new file mode
-> 100644
-> index 0000000..356563b
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
-> @@ -0,0 +1,9 @@
-> +* Allwinner Security System found on A20 SoC
-> +
-> +Required properties:
-> +- compatible : Should be "allwinner,sun7i-a20-crypto".
+> Ruchika Gupta <ruchika.gupta@freescale.com> wrote:
+> > The kernel defines setbits32() and clrbits32() macros only for
+> > Power-based architectures.  This patch modifies the Freescale CAAM
+> > driver to add macros for use on ARM architectures.
+> > 
+> > Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+> > Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
+> > ---
+> 
+> Add these macros to arch/arm's io.h instead of duplicating their
+> definitions in drivers such as caam.
 
-Why sun7i-a20 ? Is the crypto unit different in other sunxi chips ? Can that not 
-be described by DT props ?
-
-> +- reg: Should contain the SS register location and length.
-
-SS? What is that? Fix this text to be actually descriptive please.
-
-> +- interrupts: Should contain the IRQ line for the SS.
-> +- clocks : A phandle to the functional clock node of the SS module
-> +- clock-names : Name of the functional clock, should be "ahb" and "mod".
-> +
+I'd rather see the driver not using such ad-hoc stuff at all. Instead, it should 
+just implement the r-m-w itself.
 
 Best regards,
 Marek Vasut
