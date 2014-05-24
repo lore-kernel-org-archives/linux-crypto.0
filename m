@@ -1,58 +1,58 @@
 From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH] crypto: x86/sha1: fix coverity CID 1195603
-Date: Sat, 24 May 2014 14:30:42 +0200
-Message-ID: <201405241430.42673.marex@denx.de>
-References: <1398885474-21388-1-git-send-email-milos.vyletel@gmail.com> <20140508133025.GB12700@gondor.apana.org.au>
+Subject: Re: [PATCH 3/3] crypto: Add Allwinner Security System crypto
+ accelerator
+Date: Sat, 24 May 2014 13:26:26 +0200
+Message-ID: <201405241326.26260.marex@denx.de>
+References: <1400771396-9686-1-git-send-email-clabbe.montjoie@gmail.com>
+ <537E3E2F.7000407@gmail.com> <201405231246.10365.arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Milos Vyletel <milos.vyletel@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"maintainer:X86 ARCHITECTURE..." <x86@kernel.org>,
-	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-	"open list:X86 ARCHITECTURE..." <linux-kernel@vger.kernel.org>,
-	linux-coverity@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140508133025.GB12700@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: mark.rutland@arm.com, devicetree@vger.kernel.org, linux@arm.linux.org.uk,
+ herbert@gondor.apana.org.au, pawel.moll@arm.com, ijc+devicetree@hellion.org.uk,
+ rdunlap@infradead.org, linux-kernel@vger.kernel.org, robh+dt@kernel.org,
+ Corentin LABBE <clabbe.montjoie@gmail.com>, linux-crypto@vger.kernel.org,
+ galak@codeaurora.org, grant.likely@linaro.org,
+ maxime.ripard@free-electrons.com, davem@davemloft.net,
+ linux-arm-kernel@lists.infradead.org
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <201405231246.10365.arnd@arndb.de>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thursday, May 08, 2014 at 03:30:25 PM, Herbert Xu wrote:
-> On Wed, Apr 30, 2014 at 03:17:54PM -0400, Milos Vyletel wrote:
-> > Coverity detected possible use of uninitialized pointer when printing
-> > info message during module load. While this is higly unlikely to cause
-> > any troubles simple change in sha1_ssse3_mod_init to make it look like
-> > sha256/512 init function will fix this.
-> > 
-> > 260
-> > 
-> >    	6. Condition sha1_transform_asm, taking true branch
-> > 
-> > 261        if (sha1_transform_asm) {
-> > 
-> > CID 1195603 (#1 of 1): Uninitialized pointer read (UNINIT)
-> > 7. uninit_use_in_call: Using uninitialized value algo_name when calling
-> > printk. 262                pr_info("Using %s optimized SHA-1
-> > implementation\n", algo_name); 263                return
-> > crypto_register_shash(&alg);
-> > 264        }
-> > 
-> > Reported-by: <scan-admin@coverity.com>
-> > Signed-off-by: Milos Vyletel <milos.vyletel@gmail.com>
-> 
-> Unless I'm missing something there is no way this code can use
-> the variable without initialising it.
-> 
-> So this is a false positive and I'm not applying this.
+On Friday, May 23, 2014 at 12:46:10 PM, Arnd Bergmann wrote:
+> On Thursday 22 May 2014, Corentin LABBE wrote:
+> > Le 22/05/2014 17:28, Arnd Bergmann a =E9crit :
+> > > On Thursday 22 May 2014 17:09:56 LABBE Corentin wrote:
+> > >> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+> > > =
 
-I suppose changing the commit message to "align the code with sha256 ... NOTE: 
-this also fixed CIDxyz." would work better and might get this applied ? I think 
-unification of code is always good.
+> > > My feeling is that this should either be one driver that provides
+> > > all five algorithms unconditionally, or five drivers that are each
+> > > separate loadable modules and based on top of a common module
+> > > that only exports functions but has no active logic itself
+> > =
+
+> > I agree for the split.
+> > It was my first intention but I feared to add too many files.
+> > So I propose to split in 6, sunxi-ss-hash.c, sunxi-ss-des.c,
+> > sunxi-ss-aes.c, sunxi-ss-rng.c, sunxi-ss-common.c and sunxi-ss.h Does
+> > can I add a sunxi-ss directory in drivers/crypto ?
+> =
+
+> Yes, I think a subdirectory would be best.
+
+Full ACK on this one. Use drivers/crypto/sunxi-ss/ .
+[...]
 
 Best regards,
 Marek Vasut
