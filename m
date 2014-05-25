@@ -1,103 +1,81 @@
-From: Maxime Ripard <maxime.ripard@free-electrons.com>
-Subject: Re: [PATCH 1/3] dt: Add DT bindings documentation for SUNXI Security
- System
-Date: Sun, 25 May 2014 15:09:31 +0200
-Message-ID: <20140525130931.GI10768@lukather>
-References: <1400771396-9686-1-git-send-email-clabbe.montjoie@gmail.com>
- <201405242143.42693.marex@denx.de>
- <5380F85F.7020601@gmail.com>
- <201405242159.30505.marex@denx.de>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH 3/3] crypto: Add Allwinner Security System crypto accelerator
+Date: Sun, 25 May 2014 16:30:09 +0200
+Message-ID: <201405251630.09753.marex@denx.de>
+References: <1400771396-9686-1-git-send-email-clabbe.montjoie@gmail.com> <201405241400.03456.marex@denx.de> <5381DAEF.20007@gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xQR6quUbZ63TTuTU"
-Cc: Tomasz Figa <tomasz.figa@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com,
-	devicetree@vger.kernel.org, linux@arm.linux.org.uk,
-	herbert@gondor.apana.org.au, pawel.moll@arm.com,
-	ijc+devicetree@hellion.org.uk, rdunlap@infradead.org,
-	linux-kernel@vger.kernel.org, robh+dt@kernel.org,
-	LABBE Corentin <clabbe.montjoie@gmail.com>,
-	linux-crypto@vger.kernel.org, galak@codeaurora.org,
-	grant.likely@linaro.org, davem@davemloft.net
-To: Marek Vasut <marex@denx.de>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
+	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
+	rdunlap@infradead.org, maxime.ripard@free-electrons.com,
+	linux@arm.linux.org.uk, herbert@gondor.apana.org.au,
+	davem@davemloft.net, grant.likely@linaro.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Corentin LABBE <clabbe.montjoie@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <201405242159.30505.marex@denx.de>
+In-Reply-To: <5381DAEF.20007@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
+On Sunday, May 25, 2014 at 01:58:39 PM, Corentin LABBE wrote:
 
---xQR6quUbZ63TTuTU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[...]
 
-On Sat, May 24, 2014 at 09:59:30PM +0200, Marek Vasut wrote:
-> On Saturday, May 24, 2014 at 09:51:59 PM, Tomasz Figa wrote:
-> [...]
-> > >>> Why sun7i-a20 ? Is the crypto unit different in other sunxi chips ?=
- Can
-> > >>> that not be described by DT props ?
-> > >>=20
-> > >> A widely used convention is to define compatible strings after first
-> > >> SoCs on which particular IP blocks appear. It is quite common among =
-IP
-> > >> blocks for which there is no well defined versioning scheme.
-> > >=20
-> > > Well yeah, that's fine. But in this case, "sun7i" is the entire group=
- of
-> > > CPUs manufactured by AW. I find that information redundant, the
-> > > "allwinner,a20- crypto" would suffice. But I wonder if that IP block
-> > > might have appeared even earlier ? Or if it is CPU family specific, t=
-hus
-> > > "allwinner,sun7i-crypto" would be a better string ?
-> >=20
-> > I'm not aware of Allwinner naming schemes too much, so please correct me
-> > if I'm wrong, but if A20 implies sun7i, then "allwinner,a20-crypto"
-> > would be better indeed.
->=20
-> True.
->=20
-> > Whether it was really the first SoC is another thing. Obviously this
-> > needs to be checked, although it isn't really that important. For this
-> > particular naming scheme you need to specify all the SoCs for which
-> > given compatible string can be used for this IP anyway, because there is
-> > usually no other source of information about this available (except
-> > directly comparing two datasheets...).
->=20
-> Better get the DT stuff correctly right from the start. That's why I'm as=
-king=20
-> what chips contains the IP block, so we can guess the right name.
+> > This is one IP block and it provides 5 algorithms. Put it under one
+> > config option please.
+> 
+> I want to let the user choose what it want to be used. Someone could want
+> only to accelerate md5 and to not use the PRNG. Lots of other hw crypto
+> driver do the same.
 
-The name is fine, please stop this bikeshedding.
+I don't find this useful, most users will enable all of them anyway.
 
-Maxime
+> > Also, just shorted this to CONFIG_CRYPTO_SUNXI_SS , the _DEV stuff in the
+> > name is useless.
+> 
+> I think not, most of cryptographic hardware driver begin with CRYPTO_DEV
+> (CRYPTO_DEV_PADLOCK, CRYPTO_DEV_GEODE, CRYPTO_DEV_TALITOS etc...), only
+> S390 does not have a _DEV.
 
---=20
-Maxime Ripard, Free Electrons
-Embedded Linux, Kernel and Android engineering
-http://free-electrons.com
+OK. I don't mind either way.
 
---xQR6quUbZ63TTuTU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+> > [...]
+> > 
+> >> diff --git a/drivers/crypto/sunxi-ss.c b/drivers/crypto/sunxi-ss.c
+> >> new file mode 100644
+> >> index 0000000..bbf57bc
+> >> --- /dev/null
+> >> +++ b/drivers/crypto/sunxi-ss.c
+> >> @@ -0,0 +1,1476 @@
+> >> +/*
+> >> + * sunxi-ss.c - hardware cryptographic accelerator for Allwinner A20
+> >> SoC
+> > 
+> > Why can this not be generic Allwinner-all-chips driver ? Does the IP
+> > block change that dramatically between the chips?
+> 
+> As I said in my introduction email, lots of allwinner chips seems to have
+> the same crypto device. But since I do not own any of those hardware, and
+> in most case does not have a datasheet, I only assume support for A20. I
+> will add this comment in the header of the driver.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+Can you ask others to test with other chips? Surely, you can easily prepare some 
+kind of a test for others to verify on their chips.
 
-iQIcBAEBAgAGBQJTgeuLAAoJEBx+YmzsjxAgAsgP/jOt5x1dVFqyNp8JHXhwwCM/
-+498kRuqZX2bYt5j0+c3kH2FzIA6AeEP9gFGry60I3gbdH1M/Tv3UxE9JLieMhid
-73UVhciaHwndN+i7J7GKGXNlpJa+7tEjAZvMMsgUWvDNUdLaotes/ogihA9s0TqG
-8QcKWVwG7ZeFNtvKOpdiTBncrH4AWmt7/6mD1A1ktk5S3RxbRlDh9VapmlQTVZ6O
-bSC08udgoUGjtD+aJd+Y9CGS7vfw8wpNLhFX4+14L/ciwTFtyAL9CadFzS1VF84Z
-AAjBgcIS0CjbULGC5xLzGXRgmh24dtO1bUhSh2tADG04LwurEf8d7qstPic/7qE6
-hbRK6b96vpAw+L6uvIrUIH/9DCpdlrIeLNoB89AODRGPFX4dSYowhKlQ+SF866CS
-wby1jyLTUepQ87NxSoTgzJEww49gtwKCZw5lEHi/jGo/Tzq01bZG/RpUPQyt+3WR
-fYE81HubHzi6NBtinJfiwNbCBDsq8Ha+GruDnONNaJ5N2jHh1jdn89wKH5//4pnn
-2L7wGz4a5gLEhL9QbZL/Ufyei58Kgkav04U0y6wRMGg3hMs3WopHHvN15gTBGlh6
-WIuuDz1d6cy3IDnqHcsRa+gahFZxwr3J2uNLjlGPYNTYIzVrLyJwWpH0yJUTK23F
-U6CiRpCzMCPq2gVFrVjk
-=oTL/
------END PGP SIGNATURE-----
+[...]
 
---xQR6quUbZ63TTuTU--
+> >> +		dev_dbg(ss_ctx->dev, "DEBUG Seed %d %x\n", i, v);
+> >> +	}
+> > 
+> > But this debug instrumentation looks quite useless anyway.
+> 
+> As I said in my introduction mail, I cannot get PRNG to work, so it is the
+> reason of lots of dev_dbg() Anyway, I will remove them.
+
+Then please don't submit non-functional code for inclusion into kernel. Just 
+discard the PRNG part completely until it's operational. Submit just the 
+portions of code that are working please.
+[...]
