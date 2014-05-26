@@ -1,62 +1,56 @@
 From: Marek Vasut <marex@denx.de>
-Subject: [PATCH] crypto: Move crypto_yield() to algapi.h
-Date: Mon, 26 May 2014 15:32:05 +0200
-Message-ID: <1401111125-10286-1-git-send-email-marex@denx.de>
-Cc: herbert@gondor.apana.org.au, Marek Vasut <marex@denx.de>
+Subject: [QUESTION] Crypto queue handling
+Date: Mon, 26 May 2014 17:58:19 +0200
+Message-ID: <201405261758.19425.marex@denx.de>
+Mime-Version: 1.0
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, Arnd Bergmann <arnd@arndb.de>,
+	Pantelis Antoniou <panto@antoniou-consulting.com>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:44566 "EHLO
+Received: from mail-out.m-online.net ([212.18.0.9]:50759 "EHLO
 	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752100AbaEZNb7 (ORCPT
+	with ESMTP id S1752602AbaEZQAv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 26 May 2014 09:31:59 -0400
+	Mon, 26 May 2014 12:00:51 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It makes no sense for crypto_yield() to be defined in scatterwalk.h ,
-move it into algapi.h as it's an internal function to crypto API.
+Hello,
 
-Signed-off-by: Marek Vasut <marex@denx.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
----
- include/crypto/algapi.h      | 6 ++++++
- include/crypto/scatterwalk.h | 6 ------
- 2 files changed, 6 insertions(+), 6 deletions(-)
+I'm digging in crypto/algapi.c , in the crypto_enqueue_request() function. I 
+don't quite understand how the backlog mechanism should work. According to [1], 
+I suspect it should limit the amount of requests in the queue to $max_qlen and 
+allow one more request to be enqueued into the $backlog ; and if there is more 
+requests than $max_qlen, it should start dropping the requests ?
 
-NOTE: I didn't manage to compile-test it, but logically it should work, since
-      scatterwalk.h includes algapi.h .
+Inspecting the code, I see these situations:
+1) qlen < max_qlen
+   -> The request is enqueued, qlen is increased , returns -EINPROGRESS
+2) qlen >= max_qlen
+   -> The crypto_enqueue_request() returns -EBUSY in this case
+   2a) request->flags has CRYPTO_TFM_REQ_MAY_BACKLOG unset
+       => Request is not enqueued , qlen is not increased
+   2b) request->flags has CRYPTO_TFM_REQ_MAY_BACKLOG set
+       => Request is enqueued , qlen is increased
 
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 016c2f1..623a59c 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -410,4 +410,10 @@ static inline int crypto_memneq(const void *a, const void *b, size_t size)
- 	return __crypto_memneq(a, b, size) != 0UL ? 1 : 0;
- }
- 
-+static inline void crypto_yield(u32 flags)
-+{
-+	if (flags & CRYPTO_TFM_REQ_MAY_SLEEP)
-+		cond_resched();
-+}
-+
- #endif	/* _CRYPTO_ALGAPI_H */
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 6a626a5..7ef512f 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -25,12 +25,6 @@
- #include <linux/scatterlist.h>
- #include <linux/sched.h>
- 
--static inline void crypto_yield(u32 flags)
--{
--	if (flags & CRYPTO_TFM_REQ_MAY_SLEEP)
--		cond_resched();
--}
--
- static inline void scatterwalk_sg_chain(struct scatterlist *sg1, int num,
- 					struct scatterlist *sg2)
- {
--- 
-2.0.0.rc0
+Therefore, I suspect if 2b) case happens repeatedly, the queue will grow 
+indefinitelly. I'm not sure if this can happen, but I suspect that's really 
+possible. My understanding is that the driver will call crypto_enqueue_request() 
+and propagate it's return value to the upper layers. They upper layet can 
+generate such a request that has CRYPTO_TFM_REQ_MAY_BACKLOG set .
+
+But how shall the upper layers handle the -EBUSY return value from the crypto 
+API calls? Shall they stop saturating the crypto API with requests ? How can the 
+upper layers determine when can they resume sending crypto requests ? Shall they 
+just try calling crypto_enqueue_request() again to see if it still returns -
+EBUSY ?
+
+Sorry if this is an obvious question and thanks for the help!
+
+[1] http://permalink.gmane.org/gmane.linux.kernel.cryptoapi/735
+
+Best regards,
+Marek Vasut
