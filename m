@@ -1,41 +1,56 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v7 1/6] SP800-90A Deterministic Random Bit Generator
-Date: Mon, 26 May 2014 07:44:15 +0200
-Message-ID: <2006828.NMLXLGt5ck@myon.chronox.de>
-References: <20140523211007.GA20955@gondor.apana.org.au>
+Subject: [PATCH v8 7/7] Add documentation of drbg.stdrng
+Date: Mon, 26 May 2014 13:30:36 +0200
+Message-ID: <1427752.f9YxQ9FBNN@myon.chronox.de>
+References: <1672386.pGc00MSMM2@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	aquini@redhat.com, jeremy.wayne.powell@gmail.com,
-	clemens@ladisch.de, pwalten@au1.ibm.com, joe@perches.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140523211007.GA20955@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: herbert@gondor.apana.org.au, aquini@redhat.com,
+	jeremy.wayne.powell@gmail.com, clemens@ladisch.de,
+	pwalten@au1.ibm.com, joe@perches.com
+To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:43780 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751975AbaEZLbG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 26 May 2014 07:31:06 -0400
+Received: from myon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S110> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Mon, 26 May 2014 13:30:58 +0200
+In-Reply-To: <1672386.pGc00MSMM2@myon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Samstag, 24. Mai 2014, 05:10:07 schrieb Herbert Xu:
+The drbg.stdrng kernel command line flag allows the selection of the
+DRBG used as stdrng.
 
-Hi Herbert,
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ Documentation/kernel-parameters.txt | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-> Stephan Mueller <smueller@chronox.de> wrote:
-> > +       memset(&drbg_algs[i], 0, sizeof(struct crypto_alg));
-> > +       if (pr) {
-> > +               memcpy(drbg_algs[i].cra_name, "drbg(pr(", 8);
-> > +               memcpy(drbg_algs[i].cra_driver_name, "drbg_pr_", 8);
-> > +               pos = 8;
-> 
-> You shouldn't use the brackets here since this not a real template.
-> Just use one name for both cra_name and cra_driver_name.
-
-Thanks for the hint: I would use the name specified for cra_driver_name also 
-for cra_name
-> 
-> Cheers,
-
-
-Ciao
-Stephan
+diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
+index 30a8ad0d..b970ba2 100644
+--- a/Documentation/kernel-parameters.txt
++++ b/Documentation/kernel-parameters.txt
+@@ -855,6 +855,16 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
+ 			The filter can be disabled or changed to another
+ 			driver later using sysfs.
+ 
++	drbg.stdrng=<name>
++			Kernel crypto API name of the SP800-90A DRBG that
++			is marked as "stdrng". Parts of the kernel requiring
++			random numbers may use the "stdrng" random number
++			generator. In FIPS mode (when the kernel command line
++			parameter fips=1 is provided), the priority of the
++			DRBG stdrng is increased to be higher than other
++			stdrng definitions. This implies, the DRBG is used as
++			default in FIPS mode.
++
+ 	drm_kms_helper.edid_firmware=[<connector>:]<file>
+ 			Broken monitors, graphic adapters and KVMs may
+ 			send no or incorrect EDID data sets. This parameter
 -- 
-| Cui bono? |
+1.9.3
