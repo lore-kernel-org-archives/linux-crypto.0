@@ -1,81 +1,89 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH 3/3] crypto: Add Allwinner Security System crypto accelerator
-Date: Sun, 25 May 2014 16:30:09 +0200
-Message-ID: <201405251630.09753.marex@denx.de>
-References: <1400771396-9686-1-git-send-email-clabbe.montjoie@gmail.com> <201405241400.03456.marex@denx.de> <5381DAEF.20007@gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v7 0/6] SP800-90A Deterministic Random Bit Generator
+Date: Mon, 26 May 2014 07:42:57 +0200
+Message-ID: <1449817.RiX7azh5Ri@myon.chronox.de>
+References: <20140523211459.GA21019@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
-	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
-	rdunlap@infradead.org, maxime.ripard@free-electrons.com,
-	linux@arm.linux.org.uk, herbert@gondor.apana.org.au,
-	davem@davemloft.net, grant.likely@linaro.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Corentin LABBE <clabbe.montjoie@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	aquini@redhat.com, jeremy.wayne.powell@gmail.com,
+	clemens@ladisch.de, pwalten@au1.ibm.com, joe@perches.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5381DAEF.20007@gmail.com>
+In-Reply-To: <20140523211459.GA21019@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sunday, May 25, 2014 at 01:58:39 PM, Corentin LABBE wrote:
+Am Samstag, 24. Mai 2014, 05:14:59 schrieb Herbert Xu:
 
-[...]
+Hi Herbert,
 
-> > This is one IP block and it provides 5 algorithms. Put it under one
-> > config option please.
-> 
-> I want to let the user choose what it want to be used. Someone could want
-> only to accelerate md5 and to not use the PRNG. Lots of other hw crypto
-> driver do the same.
-
-I don't find this useful, most users will enable all of them anyway.
-
-> > Also, just shorted this to CONFIG_CRYPTO_SUNXI_SS , the _DEV stuff in the
-> > name is useless.
-> 
-> I think not, most of cryptographic hardware driver begin with CRYPTO_DEV
-> (CRYPTO_DEV_PADLOCK, CRYPTO_DEV_GEODE, CRYPTO_DEV_TALITOS etc...), only
-> S390 does not have a _DEV.
-
-OK. I don't mind either way.
-
-> > [...]
+> Stephan Mueller <smueller@chronox.de> wrote:
+> > Hi,
 > > 
-> >> diff --git a/drivers/crypto/sunxi-ss.c b/drivers/crypto/sunxi-ss.c
-> >> new file mode 100644
-> >> index 0000000..bbf57bc
-> >> --- /dev/null
-> >> +++ b/drivers/crypto/sunxi-ss.c
-> >> @@ -0,0 +1,1476 @@
-> >> +/*
-> >> + * sunxi-ss.c - hardware cryptographic accelerator for Allwinner A20
-> >> SoC
+> > the following set of patches implements the deterministic random bit
+> > generator (DRBG) specified by SP800-90A.
 > > 
-> > Why can this not be generic Allwinner-all-chips driver ? Does the IP
-> > block change that dramatically between the chips?
+> > The DRBG implementation offers the following:
+> >        * All three DRBG types are implemented with a derivation function.
+> >        * All DRBG types are available with and without prediction
+> >        resistance.
+> >        * All SHA types of SHA-1, SHA-256, SHA-384, SHA-512 are available
+> >        
+> >          for the HMAC and Hash DRBGs.
+> >        
+> >        * All AES types of AES-128, AES-192 and AES-256 are available for
+> >        the
+> >        
+> >          CTR DRBG.
+> >        
+> >        * A self test is implemented with drbg_healthcheck().
+> >        * The FIPS 140-2 continuous self test is implemented.
+> >        * Additional cipher primitives, such as Serpent or Twofish, can be
+> >        
+> >          added to the DRBG without changing the implementation. The only
+> >          change necessary is to the DRBG definition given in the cores[]
+> >          array.
 > 
-> As I said in my introduction email, lots of allwinner chips seems to have
-> the same crypto device. But since I do not own any of those hardware, and
-> in most case does not have a datasheet, I only assume support for A20. I
-> will add this comment in the header of the driver.
+> Where is the code that actually uses this?
 
-Can you ask others to test with other chips? Surely, you can easily prepare some 
-kind of a test for others to verify on their chips.
+There are several answers to this.
 
-[...]
+First: as required by NIST SP800-131A, the ANSI X9.31 DRNG is considered to be 
+sunset by the end of 2015. The FIPS 140-2 validation part of NIST requires 
+that ANSI X9.31 DRNGs are not allowed for new validations since the start of 
+this year and prohibited for revalidations starting next year. The replacement 
+of ANSI X9.31 is SP800-90A.
 
-> >> +		dev_dbg(ss_ctx->dev, "DEBUG Seed %d %x\n", i, v);
-> >> +	}
-> > 
-> > But this debug instrumentation looks quite useless anyway.
-> 
-> As I said in my introduction mail, I cannot get PRNG to work, so it is the
-> reason of lots of dev_dbg() Anyway, I will remove them.
+The Linux kernel currently implements one DRNG in ansi_cprng.c. This DRNG is 
+an ANSI X9.31 DRNG. This means, the offered SP800-90A implementation can be 
+considered a replacement of ansi_cprng.c.
 
-Then please don't submit non-functional code for inclusion into kernel. Just 
-discard the PRNG part completely until it's operational. Submit just the 
-portions of code that are working please.
-[...]
+A second aspect is the implementation of the stdrng. Currently, the offered 
+patch does not include the stdrng selection. I am currently working on the 
+completion of the addition of the stdrng selection to the offered patch. My 
+idea is the following: currently, all DRBG types are registered with their own 
+cra_name. However, there shall be one particular DRBG registered twice. When 
+registering the instance again, the cra_name shall be "stdrng". In addition, 
+if the kernel command line contains fips=1, the cra_priority of that stdrng 
+should be set to 300. That implies that when the kernel resolves the stdrng, 
+it resolves to get_random_bytes in normal mode, but to the stdrng DRBG in FIPS 
+mode.
+
+Here some code snippet from my patch I am working on:
+
+if (fips_stdrng) {
+                memcpy(alg->cra_name, "stdrng", 6);
+
+...
+
+if (fips_stdrng)
+                alg->cra_priority = 300;
+        else
+                alg->cra_priority = 100;
+
+Ciao
+Stephan
+-- 
+| Cui bono? |
