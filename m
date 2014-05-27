@@ -1,80 +1,47 @@
-From: Eric Dumazet <eric.dumazet@gmail.com>
-Subject: [PATCH] crypto: lzo: try kmalloc() before vmalloc()
-Date: Tue, 27 May 2014 10:28:55 -0700
-Message-ID: <1401211735.5367.254.camel@edumazet-glaptop2.roam.corp.google.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: lzo: try kmalloc() before vmalloc()
+Date: Wed, 28 May 2014 01:30:50 +0800
+Message-ID: <20140527173050.GA18214@gondor.apana.org.au>
+References: <1401211735.5367.254.camel@edumazet-glaptop2.roam.corp.google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org,
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	Seth Jennings <sjennings@variantweb.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f44.google.com ([209.85.220.44]:34488 "EHLO
-	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752616AbaE0R24 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 May 2014 13:28:56 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Eric Dumazet <eric.dumazet@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1401211735.5367.254.camel@edumazet-glaptop2.roam.corp.google.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Eric Dumazet <edumazet@google.com>
+On Tue, May 27, 2014 at 10:28:55AM -0700, Eric Dumazet wrote:
+> From: Eric Dumazet <edumazet@google.com>
+> 
+> zswap allocates one LZO context per online cpu.
+> 
+> Using vmalloc() for small (16KB) memory areas has drawback of slowing
+> down /proc/vmallocinfo and /proc/meminfo reads, TLB pressure and poor
+> NUMA locality, as default NUMA policy at boot time is to interleave
+> pages :
+> 
+> edumazet:~# grep lzo /proc/vmallocinfo | head -4
+> 0xffffc90006062000-0xffffc90006067000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
+> 0xffffc90006067000-0xffffc9000606c000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
+> 0xffffc9000606c000-0xffffc90006071000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
+> 0xffffc90006071000-0xffffc90006076000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
+> 
+> This patch tries a regular kmalloc() and fallback to vmalloc in case
+> memory is too fragmented.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-zswap allocates one LZO context per online cpu.
+Looks good to me.  This would seem like something that could be
+generalised to other vmalloc users, no?
 
-Using vmalloc() for small (16KB) memory areas has drawback of slowing
-down /proc/vmallocinfo and /proc/meminfo reads, TLB pressure and poor
-NUMA locality, as default NUMA policy at boot time is to interleave
-pages :
-
-edumazet:~# grep lzo /proc/vmallocinfo | head -4
-0xffffc90006062000-0xffffc90006067000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
-0xffffc90006067000-0xffffc9000606c000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
-0xffffc9000606c000-0xffffc90006071000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
-0xffffc90006071000-0xffffc90006076000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
-
-This patch tries a regular kmalloc() and fallback to vmalloc in case
-memory is too fragmented.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- crypto/lzo.c |   11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/lzo.c b/crypto/lzo.c
-index 1c2aa69c54b8..252e791d0ccc 100644
---- a/crypto/lzo.c
-+++ b/crypto/lzo.c
-@@ -20,6 +20,7 @@
- #include <linux/module.h>
- #include <linux/crypto.h>
- #include <linux/vmalloc.h>
-+#include <linux/mm.h>
- #include <linux/lzo.h>
- 
- struct lzo_ctx {
-@@ -30,7 +31,10 @@ static int lzo_init(struct crypto_tfm *tfm)
- {
- 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	ctx->lzo_comp_mem = vmalloc(LZO1X_MEM_COMPRESS);
-+	ctx->lzo_comp_mem = kmalloc(LZO1X_MEM_COMPRESS,
-+				    GFP_KERNEL | __GFP_NOWARN | __GFP_REPEAT);
-+	if (!ctx->lzo_comp_mem)
-+		ctx->lzo_comp_mem = vmalloc(LZO1X_MEM_COMPRESS);
- 	if (!ctx->lzo_comp_mem)
- 		return -ENOMEM;
- 
-@@ -41,7 +45,10 @@ static void lzo_exit(struct crypto_tfm *tfm)
- {
- 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	vfree(ctx->lzo_comp_mem);
-+	if (is_vmalloc_addr(ctx->lzo_comp_mem))
-+		vfree(ctx->lzo_comp_mem);
-+	else
-+		kfree(ctx->lzo_comp_mem);
- }
- 
- static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
