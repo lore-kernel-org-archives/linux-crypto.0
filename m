@@ -1,50 +1,80 @@
-From: Marek Vasut <marex@denx.de>
-Subject: [PATCH] crypto: skcipher: Don't use __crypto_dequeue_request()
-Date: Mon, 26 May 2014 18:51:48 +0200
-Message-ID: <1401123108-31700-1-git-send-email-marex@denx.de>
-Cc: herbert@gondor.apana.org.au, Marek Vasut <marex@denx.de>,
-	Pantelis Antoniou <panto@antoniou-consulting.com>
-To: linux-crypto@vger.kernel.org
+From: Eric Dumazet <eric.dumazet@gmail.com>
+Subject: [PATCH] crypto: lzo: try kmalloc() before vmalloc()
+Date: Tue, 27 May 2014 10:28:55 -0700
+Message-ID: <1401211735.5367.254.camel@edumazet-glaptop2.roam.corp.google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Seth Jennings <sjennings@variantweb.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:40400 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751440AbaEZQvn (ORCPT
+Received: from mail-pa0-f44.google.com ([209.85.220.44]:34488 "EHLO
+	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752616AbaE0R24 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 26 May 2014 12:51:43 -0400
+	Tue, 27 May 2014 13:28:56 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use skcipher_givcrypt_cast(crypto_dequeue_request(queue)) instead, which
-does the same thing in much cleaner way. The skcipher_givcrypt_cast()
-actually uses container_of() instead of messing around with offsetof()
-too.
+From: Eric Dumazet <edumazet@google.com>
 
-Signed-off-by: Marek Vasut <marex@denx.de>
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Pantelis Antoniou <panto@antoniou-consulting.com>
+zswap allocates one LZO context per online cpu.
+
+Using vmalloc() for small (16KB) memory areas has drawback of slowing
+down /proc/vmallocinfo and /proc/meminfo reads, TLB pressure and poor
+NUMA locality, as default NUMA policy at boot time is to interleave
+pages :
+
+edumazet:~# grep lzo /proc/vmallocinfo | head -4
+0xffffc90006062000-0xffffc90006067000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
+0xffffc90006067000-0xffffc9000606c000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
+0xffffc9000606c000-0xffffc90006071000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
+0xffffc90006071000-0xffffc90006076000   20480 lzo_init+0x1b/0x30 pages=4 vmalloc N0=2 N1=2
+
+This patch tries a regular kmalloc() and fallback to vmalloc in case
+memory is too fragmented.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/crypto/internal/skcipher.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ crypto/lzo.c |   11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-NOTE: I only compile-tested this one.
-NOTE: Is there any way we can get rid of __crypto_dequeue_request() for good ?
-      I doubt we can, since it's exported symbol and thus part of kernel ABI,
-      right?
-
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index 06e8b32..b3a46c5 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -81,8 +81,7 @@ static inline int skcipher_enqueue_givcrypt(
- static inline struct skcipher_givcrypt_request *skcipher_dequeue_givcrypt(
- 	struct crypto_queue *queue)
+diff --git a/crypto/lzo.c b/crypto/lzo.c
+index 1c2aa69c54b8..252e791d0ccc 100644
+--- a/crypto/lzo.c
++++ b/crypto/lzo.c
+@@ -20,6 +20,7 @@
+ #include <linux/module.h>
+ #include <linux/crypto.h>
+ #include <linux/vmalloc.h>
++#include <linux/mm.h>
+ #include <linux/lzo.h>
+ 
+ struct lzo_ctx {
+@@ -30,7 +31,10 @@ static int lzo_init(struct crypto_tfm *tfm)
  {
--	return __crypto_dequeue_request(
--		queue, offsetof(struct skcipher_givcrypt_request, creq.base));
-+	return skcipher_givcrypt_cast(crypto_dequeue_request(queue));
+ 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	ctx->lzo_comp_mem = vmalloc(LZO1X_MEM_COMPRESS);
++	ctx->lzo_comp_mem = kmalloc(LZO1X_MEM_COMPRESS,
++				    GFP_KERNEL | __GFP_NOWARN | __GFP_REPEAT);
++	if (!ctx->lzo_comp_mem)
++		ctx->lzo_comp_mem = vmalloc(LZO1X_MEM_COMPRESS);
+ 	if (!ctx->lzo_comp_mem)
+ 		return -ENOMEM;
+ 
+@@ -41,7 +45,10 @@ static void lzo_exit(struct crypto_tfm *tfm)
+ {
+ 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	vfree(ctx->lzo_comp_mem);
++	if (is_vmalloc_addr(ctx->lzo_comp_mem))
++		vfree(ctx->lzo_comp_mem);
++	else
++		kfree(ctx->lzo_comp_mem);
  }
  
- static inline void *skcipher_givcrypt_reqctx(
--- 
-2.0.0.rc0
+ static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
