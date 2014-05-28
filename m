@@ -1,31 +1,42 @@
-From: Eric Dumazet <eric.dumazet@gmail.com>
-Subject: Re: [PATCH] crypto: lzo: try kmalloc() before vmalloc()
-Date: Wed, 28 May 2014 10:41:20 -0700
-Message-ID: <1401298880.3645.16.camel@edumazet-glaptop2.roam.corp.google.com>
-References: <1401211735.5367.254.camel@edumazet-glaptop2.roam.corp.google.com>
-	 <20140527173050.GA18214@gondor.apana.org.au>
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] crypto/nx/nx-842: dev_set_drvdata can no longer fail
+Date: Wed, 28 May 2014 13:39:23 -0700
+Message-ID: <20140528203923.GA3687@kroah.com>
+References: <20140528140224.3352b072@endymion.delvare>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+	Robert Jennings <rcj@linux.vnet.ibm.com>,
+	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
+	Fionnuala Gunter <fin@linux.vnet.ibm.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>
+To: Jean Delvare <jdelvare@suse.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f52.google.com ([209.85.220.52]:61542 "EHLO
-	mail-pa0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751413AbaE1RlV (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:40789 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751694AbaE1Ufs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 May 2014 13:41:21 -0400
-Received: by mail-pa0-f52.google.com with SMTP id fa1so11339991pad.25
-        for <linux-crypto@vger.kernel.org>; Wed, 28 May 2014 10:41:21 -0700 (PDT)
-In-Reply-To: <20140527173050.GA18214@gondor.apana.org.au>
+	Wed, 28 May 2014 16:35:48 -0400
+Content-Disposition: inline
+In-Reply-To: <20140528140224.3352b072@endymion.delvare>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2014-05-28 at 01:30 +0800, Herbert Xu wrote:
+On Wed, May 28, 2014 at 02:02:24PM +0200, Jean Delvare wrote:
+> Don't check if dev_set_drvdata() failed, it can't, and it returns void
+> now.
+> 
+> Signed-off-by: Jean Delvare <jdelvare@suse.de>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Robert Jennings <rcj@linux.vnet.ibm.com>
+> Cc: Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>
+> Cc: Fionnuala Gunter <fin@linux.vnet.ibm.com>
+> ---
+> I believe this should go through Greg's driver-core tree, as this is
+> where the rest of the dev_set_drvdata() changes are.
 
-> Looks good to me.  This would seem like something that could be
-> generalised to other vmalloc users, no?
+You forgot a reported-by: field :(
 
-BTW, any objections if I send patches to add NUMA allocations into
-crypto layer, or was it already considered ?
+I'll add it but be more careful in the future...
+
+greg k-h
