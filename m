@@ -1,61 +1,39 @@
-From: Jean Delvare <jdelvare@suse.de>
-Subject: [PATCH] crypto: Add 2 missing __exit_p
-Date: Thu, 29 May 2014 09:54:35 +0200
-Message-ID: <20140529095435.72cb6b6e@endymion.delvare>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: lzo: try kmalloc() before vmalloc()
+Date: Thu, 29 May 2014 20:35:41 +0800
+Message-ID: <20140529123541.GA2198@gondor.apana.org.au>
+References: <1401211735.5367.254.camel@edumazet-glaptop2.roam.corp.google.com>
+ <20140527173050.GA18214@gondor.apana.org.au>
+ <1401298880.3645.16.camel@edumazet-glaptop2.roam.corp.google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Robert Jennings <rcj@linux.vnet.ibm.com>,
-	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
-	Fionnuala Gunter <fin@linux.vnet.ibm.com>
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: Eric Dumazet <eric.dumazet@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42964 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751206AbaE2Hyj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 29 May 2014 03:54:39 -0400
+Received: from helcar.apana.org.au ([209.40.204.226]:43641 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932437AbaE2Nou (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 29 May 2014 09:44:50 -0400
+Content-Disposition: inline
+In-Reply-To: <1401298880.3645.16.camel@edumazet-glaptop2.roam.corp.google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-References to __exit functions must be wrapped with __exit_p.
+On Wed, May 28, 2014 at 10:41:20AM -0700, Eric Dumazet wrote:
+> On Wed, 2014-05-28 at 01:30 +0800, Herbert Xu wrote:
+> 
+> > Looks good to me.  This would seem like something that could be
+> > generalised to other vmalloc users, no?
+> 
+> BTW, any objections if I send patches to add NUMA allocations into
+> crypto layer, or was it already considered ?
 
-Signed-off-by: Jean Delvare <jdelvare@suse.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Robert Jennings <rcj@linux.vnet.ibm.com>
-Cc: Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>
-Cc: Fionnuala Gunter <fin@linux.vnet.ibm.com>
----
- drivers/crypto/amcc/crypto4xx_core.c |    2 +-
- drivers/crypto/nx/nx-842.c           |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+No please go ahead.
 
---- linux-3.15-rc7.orig/drivers/crypto/amcc/crypto4xx_core.c	2014-03-31 05:40:15.000000000 +0200
-+++ linux-3.15-rc7/drivers/crypto/amcc/crypto4xx_core.c	2014-05-28 16:03:06.856588584 +0200
-@@ -1292,7 +1292,7 @@ static struct platform_driver crypto4xx_
- 		.of_match_table = crypto4xx_match,
- 	},
- 	.probe		= crypto4xx_probe,
--	.remove		= crypto4xx_remove,
-+	.remove		= __exit_p(crypto4xx_remove),
- };
- 
- module_platform_driver(crypto4xx_driver);
---- linux-3.15-rc7.orig/drivers/crypto/nx/nx-842.c	2014-05-28 15:37:10.831538018 +0200
-+++ linux-3.15-rc7/drivers/crypto/nx/nx-842.c	2014-05-28 16:02:44.926136000 +0200
-@@ -1247,7 +1247,7 @@ static struct vio_device_id nx842_driver
- static struct vio_driver nx842_driver = {
- 	.name = MODULE_NAME,
- 	.probe = nx842_probe,
--	.remove = nx842_remove,
-+	.remove = __exit_p(nx842_remove),
- 	.get_desired_dma = nx842_get_desired_dma,
- 	.id_table = nx842_driver_ids,
- };
-
-
+Thanks,
 -- 
-Jean Delvare
-SUSE L3 Support
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
