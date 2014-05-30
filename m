@@ -1,50 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [QUESTION] Crypto queue handling
-Date: Fri, 30 May 2014 21:41:35 +0800
-Message-ID: <20140530134135.GA14778@gondor.apana.org.au>
-References: <201405261758.19425.marex@denx.de>
- <20140530093030.GC12760@gondor.apana.org.au>
- <A83C99F8370D4D42BEB2D2B3153A6BBC30807A82@NASANEXD02C.na.qualcomm.com>
+From: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
+Subject: [QUESTION] multi-core, multi-crypto,  ipsec/udp out of order.
+Date: Fri, 30 May 2014 14:22:17 +0000
+Message-ID: <A83C99F8370D4D42BEB2D2B3153A6BBC30807AE1@NASANEXD02C.na.qualcomm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Marek Vasut <marex@denx.de>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Pantelis Antoniou <panto@antoniou-consulting.com>
-To: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:36345 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752856AbaE3Nlt (ORCPT
+Received: from sabertooth01.qualcomm.com ([65.197.215.72]:27519 "EHLO
+	sabertooth01.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751782AbaE3OWU convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 30 May 2014 09:41:49 -0400
-Content-Disposition: inline
-In-Reply-To: <A83C99F8370D4D42BEB2D2B3153A6BBC30807A82@NASANEXD02C.na.qualcomm.com>
+	Fri, 30 May 2014 10:22:20 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 30, 2014 at 01:33:06PM +0000, Hsieh, Che-Min wrote:
-> 
-> It is nice to know that the request queue is per tfm. We are currently on android-3.10.  I believe all the drivers under drivers/crypto/   don't follow this rule.  At the minimum, our driver qcrypto does not.  Other than backlogging function, does it break anything? How critical is it to fix the driver soon?
+Hi! Herbert:
 
-Sorry I don't know what I was smoking when I said that but it's
-bollocks :)
+  In a system of multi cpu core, with multiple crypto hardware, different irq for each, is it possible the udp receive get out of order for the same tfm?
+ 
+Let us say, of the same tfm, driver distributes requests to any available crypto hardware.  For the same tfm, driver re-sequences response before complete callout to the same arrival sequence of the requests. The complete callout is running at tasklet level of the system.
 
-Marek is quite correct that MAY_BACKLOG users can indefinitely
-add to the backlog queue.  However, it is meant to be limited
-to one entry per-tfm.
+Each irq is assigned to a different irq affinity cpu core to improve the performance. Therefore the iprecv and ipsec processing can be done by multiple cpu cores at the same time for the same tfm/udp.
 
-This is because the user is supposed to back off once they get
-EBUSY, until they're notified once the backlog entry is popped
-off (but not processed, it must be resubmitted).
+I am seeing the following -   if I assign irq affinity to different cpu cores, iperf server of udp session displays receive out of order message. If I assign them to the same core, or take default, then message stops. The assignment is done by hand while the system is running, by updating  /proc/irq/xxx/smp_affinity, where xxx is the irq number. This scenario is very repeatable. 
 
-We don't really do any checking right now as there aren't many
-MAY_BACKLOG users.  But if it becomes a problem we can always
-add a check to ensure each tfm does not add more than one backlog
-request.
+We are on linux-3.10.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Does it make sense?
+
+Regards,
+
+Chemin
