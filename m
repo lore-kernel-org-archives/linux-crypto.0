@@ -1,8 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v9 2/6] header file for DRBG
-Date: Sat, 31 May 2014 17:21:48 +0200
-Message-ID: <1501551.EInFeOJ2js@myon.chronox.de>
-References: <22272963.fKEMicLVWl@myon.chronox.de>
+Subject: [PATCH v9 0/6] SP800-90A Deterministic Random Bit Generator
+Date: Sat, 31 May 2014 15:43:37 +0200
+Message-ID: <22272963.fKEMicLVWl@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -11,346 +10,174 @@ Cc: herbert@gondor.apana.org.au, aquini@redhat.com, joe@perches.com,
 	clemens@ladisch.de
 To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54790 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:54806 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756967AbaFAMEo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 1 Jun 2014 08:04:44 -0400
+	id S1757013AbaFAMHL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 1 Jun 2014 08:07:11 -0400
 Received: from myon.chronox.de
 	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S13B> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sun, 1 Jun 2014 14:04:30 +0200
-In-Reply-To: <22272963.fKEMicLVWl@myon.chronox.de>
+	id <S13D> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Sun, 1 Jun 2014 14:06:51 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The header file includes the definition of:
+Hi,
 
-* DRBG data structures with
-        - struct drbg_state as main structure
-        - struct drbg_core referencing the backend ciphers
-        - struct drbg_state_ops callbach handlers for specific code
-          supporting the Hash, HMAC, CTR DRBG implementations
-        - struct drbg_conc defining a linked list for input data
-        - struct drbg_test_data holding the test "entropy" data for CAVS
-          testing and testmgr.c
-        - struct drbg_gen allowing test data, additional information
-          string and personalization string data to be funneled through
-          the kernel crypto API -- the DRBG requires additional
-          parameters when invoking the reset and random number
-          generation requests than intended by the kernel crypto API
+the following set of patches implements the deterministic random bit generator
+(DRBG) specified by SP800-90A.
 
-* wrapper function to the kernel crypto API functions using struct
-  drbg_gen to pass through all data needed for DRBG
+The DRBG implementation offers the following:
 
-* wrapper functions to kernel crypto API functions usable for testing
-  code to inject test_data into the DRBG as needed by CAVS testing and
-  testmgr.c.
+	* All three DRBG types are implemented with a derivation function.
+	* All DRBG types are available with and without prediction resistance.
+	* All SHA types of SHA-1, SHA-256, SHA-384, SHA-512 are available
+	  for the HMAC and Hash DRBGs.
+	* All AES types of AES-128, AES-192 and AES-256 are available for the
+	  CTR DRBG.
+	* A self test is implemented with drbg_healthcheck().
+	* The FIPS 140-2 continuous self test is implemented.
+	* Additional cipher primitives, such as Serpent or Twofish, can be
+	  added to the DRBG without changing the implementation. The only
+	  change necessary is to the DRBG definition given in the cores[]
+	  array.
 
-* DRBG flags required for the operation of the DRBG and for selecting
-  the particular DRBG type and backend cipher
+As defined in SP800-131A, the ANSI X9.31 DRNG is to be sunset by the end of
+this year for official uses, including FIPS 140-2 compliance.
 
-* getter functions for data from struct drbg_core
+Additional tests including the CAVS test framework are available at [1].
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- include/crypto/drbg.h | 289 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 289 insertions(+)
+[1] http://www.chronox.de/drbg.html
+
+Changes v2:
+
+ * Overhauling code structure for simpler code as suggested by Rafael
+   Aquini:
+     - each DRBG type exports only two crypto functions,
+     - the individual DRBG implementations structure closely according
+       to
+       SP 800-90A,
+     - using struct drbg_string to refer to buffers to avoid too many
+       function parameters and prevent multiple data structure
+       conversions
+     - use inline more thoroughly
+     - replace macros with small inline functions
+     - remove unnecessary indirections
+     - replace of large stack variables with a scratch buffer allocated
+       at
+       the beginning of DRBG operation -- see comments about scratchpad
+       throughout the code
+ * Revamping DRBG flags usage: flags are only intended to select the
+   appropriate DRBG type and DRBG strength. Flags are not intended to be
+   visible to external callers.
+ * Adding comments throughout the code to refer to the appropriate steps
+   documented in SP 800-90A.
+ * Fix invocation of kernel crypto API hash
+ * Fix coding style and apply scripts/checkpatch.pl
+ * Change locking approach: only very small code sections are guarded by
+   a lock. This implies that the entire DRBG operates on a shadow copy
+   of the original DRBG state -- see comments for drbg_copy_drbg
+ * Perform thorough testing:
+   - Performing of a full scale CAVS test with CAVS interface available
+     at http://www.chronox.de/drbg.html
+   - Performing tests by obtaining data which is not a multiple of
+     cipher block size and check it with the ent tool to ensure that the
+     generation loop does not reuse stale buffers to avoid errors like
+     CVE-2013-4345.
+
+Changes v3:
+
+ * fix invocation of drbg_sec_strength to determine the amount of seed
+   needed for the DRBG. The function returns information as a byte
+   value, but the invoker assumed a bit value.
+ * change default value returned by drbg_sec_strength to be the maximum
+   entropy defined by SP800-90A to catch erroneous invocations of the function.
+ * Fix invocaction of d_ops in drbg_generate: drbg->d_ops ==>
+   shadow->d_ops
+ * Make return of drbg_fips_continuous_test cleaner as suggested by
+   Clemens Ladisch
+ * Fix comments on how to invoke the DRBG at the beginning of the file
+   drbg_ctr_df: replace the for loop for calculation of padlen that used
+   to call up to 16 modulo operations with one modulo operation
+ * drbg_ctr_df: replace plain integer values with sizeof() to make code
+   clearer
+ * drbg_hash_hashgen: replace memset() on drbg->scratchpad with memset()
+   on src/dst pointers to make code clearer
+ * as recommended by Peter Waltenberg: add re-invocation of self tests
+   as required by 11.3.3 -- the tests are commented out because they make
+   no mathematical sense. However, if a FIPS 140-2 validation requires
+   these tests, the code just needs to be activated.
+ * as recommended by Peter Waltenberg: add error path tests as required
+   by 11.3.2 -- see new function of drbg_healthcheck_sanity
+ * add debug printk
+ * perform testing in FIPS 140-2 mode
+ * as recommended by Peter Waltenberg: add drbg_generate_long to
+   generate arbitrary long strings
+
+Changes v4:
+ * change return codes of generate functions to signed int to convey
+   error codes and to match the kernel crypto API expectations on the
+   generate function.
+ * add BUG_ON throughout drbg_healthcheck_sanity() since any failure
+   should be caught to prevent the DRBG from operating
+ * change layout of debugging printk
+
+Changes v5:
+ * make numerous character buffer pointers and drbg_string pointers
+   const as suggested by Joe Perches
+
+Changes v6:
+ * change name of array cores to drbg_cores as suggested by Joe Perches
+ * make drbg_cores static as suggested by Joe Perches
+ * catch programming error regarding array overflow in drbg_algs
+   gracefully
+
+Changes v7:
+ * editorial changes: cleanup comments and make them KNF-conformant as
+   requested by Rafael Aquini
+ * rebase patch to 3.15-rc5
+
+Changes v8:
+ * fix of always triggering BUG_ON in drbg_healthcheck_sanity
+ * add logic to name one DRBG instance as stdrng in cra_name. The default
+   DRBG to be named stdrng is hard coded. Using the module option of
+   "stdrng", the caller can select its own stdrng DRBG.
+ * as recommended by Herbert Xu: cra_name is equal to cra_driver_name
+   (this change implies changes to the testmgr.c file)
+ * make drbg_fill_array more readable by replacing the parameters of
+   i and j with references to drbg_cores and crypto_alg
+ * add documentation of drbg.stdrng to Documentation/kernel-parameters.txt
+ * rebase patch to 3.15-rc7
+
+Changes v9:
+ * register all DRBGs as stdrng as suggested by Herbert Xu which implies the
+   following changes:
+   - remove of the kernel command line flag drbg.stdrng
+   - shuffling of the drbg_cores array as the order of entries now matters
+     (each DRBG is registered with a different cra_priority where the later
+     definitions receive a higher priority -- the latest entry in this array
+     is the default DRBG)
+   - cra_priority in FIPS mode starts at 300 and in non-fips mode at 100
+     (the krng defintion has a priority of 200: in FIPS mode, the DRBG is
+     chosen as stdrng, in non-fips mode, the krng).
+
+
+Stephan Mueller (6):
+  SP800-90A Deterministic Random Bit Generator
+  header file for DRBG
+  DRBG kernel configuration options
+  compile the DRBG code
+  DRBG testmgr test vectors
+  Add DRBG test code to testmgr
+
+ crypto/Kconfig        |   36 +-
+ crypto/Makefile       |    1 +
+ crypto/drbg.c         | 2007 +++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.c      |  247 ++++++
+ crypto/testmgr.h      |  843 +++++++++++++++++++++
+ include/crypto/drbg.h |  289 +++++++
+ 6 files changed, 3422 insertions(+), 1 deletion(-)
+ create mode 100644 crypto/drbg.c
  create mode 100644 include/crypto/drbg.h
 
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-new file mode 100644
-index 0000000..b507c5b6
---- /dev/null
-+++ b/include/crypto/drbg.h
-@@ -0,0 +1,289 @@
-+/*
-+ * DRBG based on NIST SP800-90A
-+ *
-+ * Copyright Stephan Mueller <smueller@chronox.de>, 2014
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, and the entire permission notice in its entirety,
-+ *    including the disclaimer of warranties.
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in the
-+ *    documentation and/or other materials provided with the distribution.
-+ * 3. The name of the author may not be used to endorse or promote
-+ *    products derived from this software without specific prior
-+ *    written permission.
-+ *
-+ * ALTERNATIVELY, this product may be distributed under the terms of
-+ * the GNU General Public License, in which case the provisions of the GPL are
-+ * required INSTEAD OF the above restrictions.  (This clause is
-+ * necessary due to a potential bad interaction between the GPL and
-+ * the restrictions contained in a BSD-style copyright.)
-+ *
-+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
-+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
-+ * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
-+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-+ * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
-+ * DAMAGE.
-+ */
-+
-+#ifndef _DRBG_H
-+#define _DRBG_H
-+
-+
-+#include <linux/random.h>
-+#include <linux/scatterlist.h>
-+#include <crypto/hash.h>
-+#include <linux/module.h>
-+#include <linux/crypto.h>
-+#include <linux/slab.h>
-+#include <crypto/internal/rng.h>
-+#include <crypto/rng.h>
-+#include <linux/fips.h>
-+#include <linux/spinlock.h>
-+
-+/*
-+ * Concatenation Helper and string operation helper
-+ *
-+ * SP800-90A requires the concatenation of different data. To avoid copying
-+ * buffers around or allocate additional memory, the following data structure
-+ * is used to point to the original memory with its size. In addition, it
-+ * is used to build a linked list. The linked list defines the concatenation
-+ * of individual buffers. The order of memory block referenced in that
-+ * linked list determines the order of concatenation.
-+ */
-+struct drbg_string {
-+	const unsigned char *buf;
-+	size_t len;
-+	struct drbg_string *next;
-+};
-+
-+static inline void drbg_string_fill(struct drbg_string *string,
-+				    const unsigned char *buf, size_t len)
-+{
-+	string->buf = buf;
-+	string->len = len;
-+	string->next = NULL;
-+}
-+
-+struct drbg_state;
-+typedef uint32_t drbg_flag_t;
-+
-+struct drbg_core {
-+	drbg_flag_t flags;	/* flags for the cipher */
-+	__u8 statelen;		/* maximum state length */
-+	/*
-+	 * maximum length of personalization string or additional input
-+	 * string -- exponent for base 2
-+	 */
-+	__u8 max_addtllen;
-+	/* maximum bits per RNG request -- exponent for base 2*/
-+	__u8 max_bits;
-+	/* maximum number of requests -- exponent for base 2 */
-+	__u8 max_req;
-+	__u8 blocklen_bytes;	/* block size of output in bytes */
-+	char cra_name[CRYPTO_MAX_ALG_NAME]; /* mapping to kernel crypto API */
-+	 /* kernel crypto API backend cipher name */
-+	char backend_cra_name[CRYPTO_MAX_ALG_NAME];
-+};
-+
-+struct drbg_state_ops {
-+	int (*update)(struct drbg_state *drbg, struct drbg_string *seed,
-+		      int reseed);
-+	int (*generate)(struct drbg_state *drbg,
-+			unsigned char *buf, unsigned int buflen,
-+			struct drbg_string *addtl);
-+	int (*crypto_init)(struct drbg_state *drbg);
-+	int (*crypto_fini)(struct drbg_state *drbg);
-+
-+};
-+
-+struct drbg_test_data {
-+	struct drbg_string *testentropy; /* TEST PARAMETER: test entropy */
-+};
-+
-+struct drbg_state {
-+	spinlock_t drbg_lock;	/* lock around DRBG */
-+	unsigned char *V;	/* internal state 10.1.1.1 1a) */
-+	/* hash: static value 10.1.1.1 1b) hmac / ctr: key */
-+	unsigned char *C;
-+	/* Number of RNG requests since last reseed -- 10.1.1.1 1c) */
-+	size_t reseed_ctr;
-+	 /* some memory the DRBG can use for its operation */
-+	unsigned char *scratchpad;
-+	void *priv_data;	/* Cipher handle */
-+	bool seeded;		/* DRBG fully seeded? */
-+	bool pr;		/* Prediction resistance enabled? */
-+#ifdef CONFIG_CRYPTO_FIPS
-+	bool fips_primed;	/* Continuous test primed? */
-+	unsigned char *prev;	/* FIPS 140-2 continuous test value */
-+#endif
-+	const struct drbg_state_ops *d_ops;
-+	const struct drbg_core *core;
-+	struct drbg_test_data *test_data;
-+};
-+
-+static inline __u8 drbg_statelen(struct drbg_state *drbg)
-+{
-+	if (drbg && drbg->core)
-+		return drbg->core->statelen;
-+	return 0;
-+}
-+
-+static inline __u8 drbg_blocklen(struct drbg_state *drbg)
-+{
-+	if (drbg && drbg->core)
-+		return drbg->core->blocklen_bytes;
-+	return 0;
-+}
-+
-+static inline __u8 drbg_keylen(struct drbg_state *drbg)
-+{
-+	if (drbg && drbg->core)
-+		return (drbg->core->statelen - drbg->core->blocklen_bytes);
-+	return 0;
-+}
-+
-+static inline size_t drbg_max_request_bytes(struct drbg_state *drbg)
-+{
-+	/* max_bits is in bits, but buflen is in bytes */
-+	return (1 << (drbg->core->max_bits - 3));
-+}
-+
-+static inline size_t drbg_max_addtl(struct drbg_state *drbg)
-+{
-+	return (1UL<<(drbg->core->max_addtllen));
-+}
-+
-+static inline size_t drbg_max_requests(struct drbg_state *drbg)
-+{
-+	return (1UL<<(drbg->core->max_req));
-+}
-+
-+/*
-+ * kernel crypto API input data structure for DRBG generate in case dlen
-+ * is set to 0
-+ */
-+struct drbg_gen {
-+	unsigned char *outbuf;	/* output buffer for random numbers */
-+	unsigned int outlen;	/* size of output buffer */
-+	struct drbg_string *addtl;	/* additional information string */
-+	struct drbg_test_data *test_data;	/* test data */
-+};
-+
-+/*
-+ * This is a wrapper to the kernel crypto API function of
-+ * crypto_rng_get_bytes() to allow the caller to provide additional data.
-+ *
-+ * @drng DRBG handle -- see crypto_rng_get_bytes
-+ * @outbuf output buffer -- see crypto_rng_get_bytes
-+ * @outlen length of output buffer -- see crypto_rng_get_bytes
-+ * @addtl_input additional information string input buffer
-+ * @addtllen length of additional information string buffer
-+ *
-+ * return
-+ *	see crypto_rng_get_bytes
-+ */
-+static inline int crypto_drbg_get_bytes_addtl(struct crypto_rng *drng,
-+			unsigned char *outbuf, unsigned int outlen,
-+			struct drbg_string *addtl)
-+{
-+	int ret;
-+	struct drbg_gen genbuf;
-+	genbuf.outbuf = outbuf;
-+	genbuf.outlen = outlen;
-+	genbuf.addtl = addtl;
-+	genbuf.test_data = NULL;
-+	ret = crypto_rng_get_bytes(drng, (u8 *)&genbuf, 0);
-+	return ret;
-+}
-+
-+/*
-+ * TEST code
-+ *
-+ * This is a wrapper to the kernel crypto API function of
-+ * crypto_rng_get_bytes() to allow the caller to provide additional data and
-+ * allow furnishing of test_data
-+ *
-+ * @drng DRBG handle -- see crypto_rng_get_bytes
-+ * @outbuf output buffer -- see crypto_rng_get_bytes
-+ * @outlen length of output buffer -- see crypto_rng_get_bytes
-+ * @addtl_input additional information string input buffer
-+ * @addtllen length of additional information string buffer
-+ * @test_data filled test data
-+ *
-+ * return
-+ *	see crypto_rng_get_bytes
-+ */
-+static inline int crypto_drbg_get_bytes_addtl_test(struct crypto_rng *drng,
-+			unsigned char *outbuf, unsigned int outlen,
-+			struct drbg_string *addtl,
-+			struct drbg_test_data *test_data)
-+{
-+	int ret;
-+	struct drbg_gen genbuf;
-+	genbuf.outbuf = outbuf;
-+	genbuf.outlen = outlen;
-+	genbuf.addtl = addtl;
-+	genbuf.test_data = test_data;
-+	ret = crypto_rng_get_bytes(drng, (u8 *)&genbuf, 0);
-+	return ret;
-+}
-+
-+/*
-+ * TEST code
-+ *
-+ * This is a wrapper to the kernel crypto API function of
-+ * crypto_rng_reset() to allow the caller to provide test_data
-+ *
-+ * @drng DRBG handle -- see crypto_rng_reset
-+ * @pers personalization string input buffer
-+ * @perslen length of additional information string buffer
-+ * @test_data filled test data
-+ *
-+ * return
-+ *	see crypto_rng_reset
-+ */
-+static inline int crypto_drbg_reset_test(struct crypto_rng *drng,
-+					 struct drbg_string *pers,
-+					 struct drbg_test_data *test_data)
-+{
-+	int ret;
-+	struct drbg_gen genbuf;
-+	genbuf.outbuf = NULL;
-+	genbuf.outlen = 0;
-+	genbuf.addtl = pers;
-+	genbuf.test_data = test_data;
-+	ret = crypto_rng_reset(drng, (u8 *)&genbuf, 0);
-+	return ret;
-+}
-+
-+/* DRBG type flags */
-+#define DRBG_CTR	((drbg_flag_t)1<<0)
-+#define DRBG_HMAC	((drbg_flag_t)1<<1)
-+#define DRBG_HASH	((drbg_flag_t)1<<2)
-+#define DRBG_TYPE_MASK	(DRBG_CTR | DRBG_HMAC | DRBG_HASH)
-+/* DRBG strength flags */
-+#define DRBG_STRENGTH128	((drbg_flag_t)1<<3)
-+#define DRBG_STRENGTH192	((drbg_flag_t)1<<4)
-+#define DRBG_STRENGTH256	((drbg_flag_t)1<<5)
-+#define DRBG_STRENGTH_MASK	(DRBG_STRENGTH128 | DRBG_STRENGTH192 | \
-+				 DRBG_STRENGTH256)
-+
-+enum drbg_prefixes {
-+	DRBG_PREFIX0 = 0x00,
-+	DRBG_PREFIX1,
-+	DRBG_PREFIX2,
-+	DRBG_PREFIX3
-+};
-+
-+#endif /* _DRBG_H */
 -- 
 1.9.3
