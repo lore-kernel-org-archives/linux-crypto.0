@@ -1,46 +1,147 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [QUESTION] multi-core, multi-crypto,  ipsec/udp out of order.
-Date: Mon, 2 Jun 2014 20:46:49 +0800
-Message-ID: <20140602124649.GA2503@gondor.apana.org.au>
-References: <A83C99F8370D4D42BEB2D2B3153A6BBC30807AE1@NASANEXD02C.na.qualcomm.com>
+From: Todor Colov <todorcolov@gmail.com>
+Subject: Re: IV is not send by kernel (ESP packet)
+Date: Tue, 3 Jun 2014 06:23:09 +0000 (UTC)
+Message-ID: <loom.20140603T081949-176@post.gmane.org>
+References: <51ADDD52.8010404@wasko.pl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>
-To: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:43127 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752201AbaFBMq7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Jun 2014 08:46:59 -0400
-Content-Disposition: inline
-In-Reply-To: <A83C99F8370D4D42BEB2D2B3153A6BBC30807AE1@NASANEXD02C.na.qualcomm.com>
+Received: from plane.gmane.org ([80.91.229.3]:36254 "EHLO plane.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932190AbaFCGaF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 Jun 2014 02:30:05 -0400
+Received: from list by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <glkc-linux-crypto@m.gmane.org>)
+	id 1WriEV-0002G2-4d
+	for linux-crypto@vger.kernel.org; Tue, 03 Jun 2014 08:30:03 +0200
+Received: from zatc01cs102.atlanta.hp.com ([15.227.185.72])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Jun 2014 08:30:03 +0200
+Received: from todorcolov by zatc01cs102.atlanta.hp.com with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Jun 2014 08:30:03 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 30, 2014 at 02:22:17PM +0000, Hsieh, Che-Min wrote:
-> Hi! Herbert:
-> 
->   In a system of multi cpu core, with multiple crypto hardware, different irq for each, is it possible the udp receive get out of order for the same tfm?
->  
-> Let us say, of the same tfm, driver distributes requests to any available crypto hardware.  For the same tfm, driver re-sequences response before complete callout to the same arrival sequence of the requests. The complete callout is running at tasklet level of the system.
-> 
-> Each irq is assigned to a different irq affinity cpu core to improve the performance. Therefore the iprecv and ipsec processing can be done by multiple cpu cores at the same time for the same tfm/udp.
-> 
-> I am seeing the following -   if I assign irq affinity to different cpu cores, iperf server of udp session displays receive out of order message. If I assign them to the same core, or take default, then message stops. The assignment is done by hand while the system is running, by updating  /proc/irq/xxx/smp_affinity, where xxx is the irq number. This scenario is very repeatable. 
-> 
-> We are on linux-3.10.
-> 
-> Does it make sense?
+Hi Grzegorz,
 
-Are we talking about an in-tree driver? If so which one?
 
-It's not certainly not meant to change packet ordering.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+
+
+
+IV generator "eseqiv" adds one block more with "seq of SA" to the "src" 
+
+packet which is being encrypted with "IV salt" and send as IV.
+
+
+
+Change your default IV generation method to "chainiv" and you'll solve the 
+
+
+
+issue.Proposed patch is something like:
+
+
+
+
+
+
+
+--- linux-3.14.4/crypto/cbc.c   2014-05-13 14:33:14.000000000 +0300
+
+
+
+
+
+
+
++++ linux-3.14.4-mod/crypto/cbc.c       2014-06-01 09:26:18.311525275 +0300
+
+
+
+
+
+
+
+@@ -255,6 +255,7 @@
+
+
+
+
+
+
+
+        inst->alg.cra_blkcipher.setkey = crypto_cbc_setkey;
+
+
+
+
+
+
+
+         inst->alg.cra_blkcipher.encrypt = crypto_cbc_encrypt;
+
+
+
+
+
+
+
+        inst->alg.cra_blkcipher.decrypt = crypto_cbc_decrypt;
+
+
+
+
+
+
+
++       inst->alg.cra_blkcipher.geniv = "chainiv";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ out_put_alg:
+
+
+
+
+
+
+
+         crypto_mod_put(alg);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Regads,
+
+
+
+Todor
