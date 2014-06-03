@@ -1,7 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [RFC][PATCH 0/4] crypto: Intel QAT driver
-Date: Tue, 3 Jun 2014 11:23:04 -0700
-Message-ID: <20140603182304.GA18567@gitlad.jf.intel.com>
+Subject: [RFC][PATCH 4/4] crypto: Updated makefiles to add QAT
+Date: Tue, 3 Jun 2014 11:24:00 -0700
+Message-ID: <20140603182400.GA18752@gitlad.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: tadeusz.struk@intel.com, john.griffin@intel.com,
@@ -11,113 +11,80 @@ Cc: tadeusz.struk@intel.com, john.griffin@intel.com,
 	linux-kernel@vger.kernel.org, dwmw2@infradead.org,
 	ben@decadent.org.uk
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:10107 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753937AbaFCSYa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 Jun 2014 14:24:30 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
-This patchset adds support for Intel Quick Assist Technology and DH895xxC hardware accelerator.
-First patch adds a common infractructure that will be used by all QAT devices.
-Second patch adds a firmware loader module that is used to load the microcode to the acceleration engines and start them.
-Third patch adds dh895xcc hardware specific code, which hooks to the common infrastructure and provides acceleration for
-the following algorithms:
-authenc(hmac(sha1),cbc(aes)), authenc(hmac(sha256),cbc(aes)), authenc(hmac(sha512),cbc(aes))
-Forth patch updates makefiles etc.
-
-More info on the hardware accelerator and the Quick Assist can be on:
-https://01.org/packet-processing/intel%C2%AE-quickassist-technology-drivers-and-patches
-
+Update to makefiles etc.
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-Signed-off-by: Karen Xiang <karen.xiang@intel.com>
-Signed-off-by: Pingchaox Yang <pingchaox.yang@intel.com>
-Acked-by: John Griffin <john.griffin@intel.com>
-Acked-by: Bo Cui <bo.cui@intel.com>
-Reviewed-by: Bruce W. Allan <bruce.w.allan@intel.com>
 ---
- drivers/crypto/Kconfig                                      |    1 +
- drivers/crypto/Makefile                                     |    1 +
- drivers/crypto/qat/qat_common/Makefile                      |   13 +
- drivers/crypto/qat/qat_common/adf_accel_devices.h           |  204 +++++++++++++++
- drivers/crypto/qat/qat_common/adf_accel_engine.c            |  168 ++++++++++++
- drivers/crypto/qat/qat_common/adf_aer.c                     |  258 +++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_cfg.c                     |  359 ++++++++++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_cfg.h                     |   87 +++++++
- drivers/crypto/qat/qat_common/adf_cfg_common.h              |  100 ++++++++
- drivers/crypto/qat/qat_common/adf_cfg_strings.h             |   83 ++++++
- drivers/crypto/qat/qat_common/adf_cfg_user.h                |   94 +++++++
- drivers/crypto/qat/qat_common/adf_common_drv.h              |  192 ++++++++++++++
- drivers/crypto/qat/qat_common/adf_ctl_drv.c                 |  490 +++++++++++++++++++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_dev_mgr.c                 |  215 ++++++++++++++++
- drivers/crypto/qat/qat_common/adf_init.c                    |  388 ++++++++++++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_transport.c               |  565 +++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_transport.h               |   63 +++++
- drivers/crypto/qat/qat_common/adf_transport_access_macros.h |  160 ++++++++++++
- drivers/crypto/qat/qat_common/adf_transport_debug.c         |  301 ++++++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_transport_internal.h      |  115 +++++++++
- drivers/crypto/qat/qat_common/icp_qat_fw.h                  |  316 +++++++++++++++++++++++
- drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h       |  131 ++++++++++
- drivers/crypto/qat/qat_common/icp_qat_fw_la.h               |  403 +++++++++++++++++++++++++++++
- drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h    |   78 ++++++
- drivers/crypto/qat/qat_common/icp_qat_hal.h                 |  125 +++++++++
- drivers/crypto/qat/qat_common/icp_qat_hw.h                  |  305 ++++++++++++++++++++++
- drivers/crypto/qat/qat_common/icp_qat_uclo.h                |  377 +++++++++++++++++++++++++++
- drivers/crypto/qat/qat_common/qat_algs.c                    | 1033 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/qat/qat_common/qat_crypto.c                  |  284 +++++++++++++++++++++
- drivers/crypto/qat/qat_common/qat_crypto.h                  |   83 ++++++
- drivers/crypto/qat/qat_common/qat_hal.c                     | 1402 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/qat/qat_common/qat_uclo.c                    | 1191 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/qat/qat_dh895xcc/Makefile                    |    8 +
- drivers/crypto/qat/qat_dh895xcc/adf_admin.c                 |  144 +++++++++++
- drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c      |  214 ++++++++++++++++
- drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h      |   86 +++++++
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c                   |  448 ++++++++++++++++++++++++++++++++
- drivers/crypto/qat/qat_dh895xcc/adf_drv.h                   |   67 +++++
- drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c            |  159 ++++++++++++
- drivers/crypto/qat/qat_dh895xcc/adf_isr.c                   |  266 +++++++++++++++++++
- drivers/crypto/qat/qat_dh895xcc/qat_admin.c                 |  107 ++++++++
- firmware/Makefile                                           |    1 +
- 44 files changed, 11092 insertions(+)
- create mode 100644 drivers/crypto/qat/qat_common/Makefile
- create mode 100644 drivers/crypto/qat/qat_common/adf_accel_devices.h
- create mode 100644 drivers/crypto/qat/qat_common/adf_accel_engine.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_aer.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_cfg.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_cfg.h
- create mode 100644 drivers/crypto/qat/qat_common/adf_cfg_common.h
- create mode 100644 drivers/crypto/qat/qat_common/adf_cfg_strings.h
- create mode 100644 drivers/crypto/qat/qat_common/adf_cfg_user.h
- create mode 100644 drivers/crypto/qat/qat_common/adf_common_drv.h
- create mode 100644 drivers/crypto/qat/qat_common/adf_ctl_drv.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_dev_mgr.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_init.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_transport.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_transport.h
- create mode 100644 drivers/crypto/qat/qat_common/adf_transport_access_macros.h
- create mode 100644 drivers/crypto/qat/qat_common/adf_transport_debug.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_transport_internal.h
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw.h
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_la.h
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hal.h
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hw.h
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_uclo.h
- create mode 100644 drivers/crypto/qat/qat_common/qat_algs.c
- create mode 100644 drivers/crypto/qat/qat_common/qat_crypto.c
- create mode 100644 drivers/crypto/qat/qat_common/qat_crypto.h
- create mode 100644 drivers/crypto/qat/qat_common/qat_hal.c
- create mode 100644 drivers/crypto/qat/qat_common/qat_uclo.c
- create mode 100644 drivers/crypto/qat/qat_dh895xcc/Makefile
- create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_admin.c
- create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
- create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
- create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_drv.c
- create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_drv.h
- create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c
- create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_isr.c
- create mode 100644 drivers/crypto/qat/qat_dh895xcc/qat_admin.c
+ Documentation/ioctl/ioctl-number.txt | 1 +
+ MAINTAINERS                          | 6 ++++++
+ drivers/crypto/Kconfig               | 1 +
+ drivers/crypto/Makefile              | 1 +
+ firmware/Makefile                    | 1 +
+ 5 files changed, 10 insertions(+)
+
+diff --git a/Documentation/ioctl/ioctl-number.txt b/Documentation/ioctl/ioctl-number.txt
+index d7e43fa..7e240a7 100644
+--- a/Documentation/ioctl/ioctl-number.txt
++++ b/Documentation/ioctl/ioctl-number.txt
+@@ -197,6 +197,7 @@ Code  Seq#(hex)	Include File		Comments
+ 					<mailto:gregkh@linuxfoundation.org>
+ 'a'	all	linux/atm*.h, linux/sonet.h	ATM on linux
+ 					<http://lrcwww.epfl.ch/>
++'a'	00-0F	drivers/crypto/qat/qat_common/adf_cfg_common.h	conflict! qat driver
+ 'b'	00-FF				conflict! bit3 vme host bridge
+ 					<mailto:natalia@nikhefk.nikhef.nl>
+ 'c'	all	linux/cm4000_cs.h	conflict!
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 3467445..5482679 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -7060,6 +7060,12 @@ M:	Robert Jarzmik <robert.jarzmik@free.fr>
+ L:	rtc-linux@googlegroups.com
+ S:	Maintained
+ 
++QAT DRIVER
++M:      Tadeusz Struk <tadeusz.struk@intel.com>
++L:      qat-linux@intel.com
++S:      Supported
++F:      drivers/crypto/qat/
++
+ QIB DRIVER
+ M:	Mike Marciniszyn <infinipath@intel.com>
+ L:	linux-rdma@vger.kernel.org
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index f066fa2..1f20814 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -418,4 +418,5 @@ config CRYPTO_DEV_MXS_DCP
+ 	  To compile this driver as a module, choose M here: the module
+ 	  will be called mxs-dcp.
+ 
++source "drivers/crypto/qat/Kconfig"
+ endif # CRYPTO_HW
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 482f090..f996ed7 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -23,3 +23,4 @@ obj-$(CONFIG_CRYPTO_DEV_S5P) += s5p-sss.o
+ obj-$(CONFIG_CRYPTO_DEV_SAHARA) += sahara.o
+ obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
+ obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
++obj-$(CONFIG_CRYPTO_DEV_QAT) += qat/
+diff --git a/firmware/Makefile b/firmware/Makefile
+index cbb09ce..89ac80b 100644
+--- a/firmware/Makefile
++++ b/firmware/Makefile
+@@ -135,6 +135,7 @@ fw-shipped-$(CONFIG_USB_SERIAL_XIRCOM) += keyspan_pda/xircom_pgs.fw
+ fw-shipped-$(CONFIG_USB_VICAM) += vicam/firmware.fw
+ fw-shipped-$(CONFIG_VIDEO_CPIA2) += cpia2/stv0672_vp4.bin
+ fw-shipped-$(CONFIG_YAM) += yam/1200.bin yam/9600.bin
++fw-shipped-$(CONFIG_CRYPTO_DEV_QAT_DH895xCC) += qat_895xcc.bin
+ 
+ fw-shipped-all := $(fw-shipped-y) $(fw-shipped-m) $(fw-shipped-)
+ 
+-- 
+1.8.5.rc2.6.gc6f1b92.dirty
