@@ -1,199 +1,151 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 3.16
-Date: Thu, 5 Jun 2014 14:23:37 +0800
-Message-ID: <20140605062336.GA14440@gondor.apana.org.au>
-References: <20110724011752.GA14373@gondor.apana.org.au>
- <20111031040952.GA19659@gondor.apana.org.au>
- <20120106041250.GA7759@gondor.apana.org.au>
- <20121004095357.GA11777@gondor.apana.org.au>
- <20121214103156.GA5840@gondor.apana.org.au>
- <20130223023331.GA11002@gondor.apana.org.au>
- <20130907035544.GA22658@gondor.apana.org.au>
- <20131107080131.GA32307@gondor.apana.org.au>
- <20140123115319.GA20602@gondor.apana.org.au>
- <20140401100001.GA12386@gondor.apana.org.au>
+From: "Hsieh, Che-Min" <cheminh@qti.qualcomm.com>
+Subject: [QUESTION] authenc(hmac(sha 1 or 256),cbc(aes))  fallback
+Date: Thu, 5 Jun 2014 15:01:19 +0000
+Message-ID: <A83C99F8370D4D42BEB2D2B3153A6BBC30808F0A@NASANEXD02C.na.qualcomm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:57009 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750743AbaFEGXu (ORCPT
+Received: from wolverine02.qualcomm.com ([199.106.114.251]:10172 "EHLO
+	wolverine02.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752244AbaFEPBV convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Jun 2014 02:23:50 -0400
-Content-Disposition: inline
-In-Reply-To: <20140401100001.GA12386@gondor.apana.org.au>
+	Thu, 5 Jun 2014 11:01:21 -0400
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Herbert:  
 
-Here is the crypto update for 3.16:
+Did anyone report problem on the area of authen(hmac(sha1), cbc(aes)) fallback, since linux 3-10?
+I am working on android linux 3-10.
+Our hardware does not support aes 192.
+I am following the example from picoxcell_crypto.c. In the cra_init, driver does the following to allocate
+a fallback crypto_aead.
+tx->sw_cipher = crypto_alloc_aead
+                                     (alg->cra_name, 0,
+                                     CRYPTO_ALG_ASYNC |
+                                    CRYPTO_ALG_NEED_FALLBACK);
 
-* Added test vectors for SHA/AES-CCM/DES-CBC/3DES-CBC.
-* Fixed a number of error-path memory leaks in tcrypt.
-* Fixed error-path memory leak in caam.
-* Removed unnecessary global mutex from mxs-dcp.
-* Added ahash walk interface that can actually be asynchronous.
-* Cleaned up caam error reporting.
-* Allow crypto_user get operation to be used by non-root users.
-* Add support for SSS module on Exynos.
-* Misc fixes.
+I define two xfrm. 
+They are as such:
+#ip xfrm  state show
+src 10.2.243.105 dst 10.2.243.29
+        proto esp spi 0x00000701 reqid 0 mode transport
+        replay-window 0
+        auth-trunc hmac(sha256) 0x8d967d88f6caa9d714800ab3d48051d63f73a3120102030405060708090a0b 96
+        enc cbc(aes) 0x7d8adc5f52e6b2291f27a4c0384624a7
+        sel src 0.0.0.0/0 dst 0.0.0.0/0
+src 10.2.243.29 dst 10.2.243.105
+        proto esp spi 0x00000601 reqid 0 mode transport
+        replay-window 0
+        auth-trunc hmac(sha256) 0x8d967d88f6caa9d714800ab3d48051d63f73a3120102030405060708090a0b 96
+        enc cbc(aes) 0x7d8adc5f52e6b2291f27a4c0384624a7
+        sel src 0.0.0.0/0 dst 0.0.0.0/0
+
+It seems the 2nd xfrm->__crt_alg  is pointing to software implementation algorithm, instead of our driver. 
+
+xfrm state is aes128 ciphering and the sw implementation  is not supposedly to happen. As the result of 2nd xfrm pointing to software implementation, one direction of traffic (for the 2nd xfrm)  is "aead"ed  by software implementation.
+Does it make sense? 
+I put trace in crypto modules.  After 
+ip xfrm state add command for both xfrm, the trace displays as included at end of this mail.
+I put some notes,  with  indentation as <==, in time [132.061018], [  132.067901], [  132.104352], [  132.335460] , [  132.370316] , [  132.377779]  ,[  132.381226]   
 
 
-Please pull from
+ [  131.951846] crypto_alg_mod_lookup name hmac(sha256) type 408 mask 40e
+[  131.957094] crypto_alg_lookup hmac(sha256) 408 40e
+[  131.962022] crypto_alg_lookup hmac(sha256) 408 40e alg   (null)
+[  131.971769]  crypto_larval_lookup. request_module hmac(sha256)
+[  131.976593] crypto_alg_lookup hmac(sha256) 408 40e
+[  131.981335] crypto_alg_lookup hmac(sha256) 408 40e alg   (null)
+[  131.987259]  crypto_larval_lookup. crypto_larval_add hmac(sha256) 408 40e
+[  131.994088] crypto_alg_mod_lookup name sha256 type 409 mask 40f
+[  131.999755] crypto_alg_lookup sha256 409 40f
+[  132.004236] crypto_alg_lookup sha256 409 40f alg c08308ac
+[  132.009544]  return larval c08308ac
+[  132.013128]  return alg cbdcf62c
+[  132.016257] crypto_alg_mod_lookup name cbc(aes) type 404 mask 40c
+[  132.022130] crypto_alg_lookup cbc(aes) 404 40c
+[  132.026756] crypto_alg_lookup cbc(aes) 404 40c alg e73be008
+[  132.032286]  return larval e73be008
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+[  132.035825] crypto_alg_mod_lookup name authenc(hmac(sha256),cbc(aes)) type 403 mask 40f
+[  132.043571] crypto_alg_lookup authenc(hmac(sha256),cbc(aes)) 403 40f
+[  132.050123] crypto_alg_lookup authenc(hmac(sha256),cbc(aes)) 403 40f alg cbb1d008
+[  132.057571]  return larval cbb1d008
+[  132.061018]  crypto_alloc_aead authenc(hmac(sha256),cbc(aes)) 3 f cbb1d008
+       <== for the first xfrm, alg is 0xcbb1d008
+[  132.067901] crypto_alg_mod_lookup name authenc(hmac(sha256),cbc(aes)) type 403 mask 58f
+        <==  driver does crypto_alloc_aead() with CRYPTO_ALG_NEED_FALLBACK (0x100) set in mask.
+[  132.075708] crypto_alg_lookup authenc(hmac(sha256),cbc(aes)) 403 58f
+[  132.082200] crypto_alg_lookup authenc(hmac(sha256),cbc(aes)) 403 58f alg   (null)
+[  132.091553] crypto_alg_lookup authenc(hmac(sha256),cbc(aes)) 403 58f
+[  132.096887] crypto_alg_lookup authenc(hmac(sha256),cbc(aes)) 403 58f alg   (null)
+[  132.104352]  crypto_larval_lookup. crypto_larval_add authenc(hmac(sha256),cbc(aes)) 403 58f
+     <== add larval for sw implementation algorithm.
+[  132.112737] crypto_alg_mod_lookup name hmac(sha256) type 40a mask 40c
+[  132.118928] crypto_alg_lookup hmac(sha256) 408 40c
+[  132.123862] crypto_alg_lookup hmac(sha256) 408 40c alg cbb1d910
+[  132.129788]  return larval cbb1d910
+[  132.133236] crypto_alg_mod_lookup name cbc(aes) type 404 mask 48c
+[  132.139160] crypto_alg_lookup cbc(aes) 404 48c
+[  132.143738] crypto_alg_lookup cbc(aes) 404 48c alg   (null)
+[  132.152931]  crypto_larval_lookup. request_module cbc(aes)
+[  132.157399] crypto_alg_lookup cbc(aes) 404 48c
+[  132.161802] crypto_alg_lookup cbc(aes) 404 48c alg   (null)
+[  132.167378]  crypto_larval_lookup. crypto_larval_add cbc(aes) 404 48c
+[  132.173840] crypto_alg_mod_lookup name aes type 401 mask 40f
+[  132.179273] crypto_alg_lookup aes 401 40f
+[  132.183415] crypto_alg_lookup aes 401 40f alg c0831074
+[  132.188560]  return larval c0831074
+[  132.192121]  return alg cbdcf200
+[  132.195245] crypto_alg_mod_lookup name cbc(aes) type 404 mask 8c
+[  132.201033] crypto_alg_lookup cbc(aes) 4 8c
+[  132.205406] crypto_alg_lookup cbc(aes) 4 8c alg cbdcf200
+[  132.210669]  return larval cbdcf200
+[  132.214168] crypto_alg_lookup cbc(aes-generic) 6 8f
+[  132.219006] crypto_alg_lookup cbc(aes-generic) 6 8f alg   (null)
+[  132.228647]  crypto_larval_lookup. request_module cbc(aes-generic)
+[  132.233782] crypto_alg_lookup cbc(aes-generic) 6 8f
+[  132.238673] crypto_alg_lookup cbc(aes-generic) 6 8f alg   (null)
+[  132.244699]  crypto_larval_lookup. crypto_larval_add cbc(aes-generic) 6 8f
+[  132.251494] crypto_alg_mod_lookup name stdrng type 40c mask 40f
+[  132.257242] crypto_alg_lookup stdrng 40c 40f
+[  132.261648] crypto_alg_lookup stdrng 40c 40f alg c08315d0
+[  132.267051]  return larval c08315d0
+[  132.270503] crypto_alg_mod_lookup name cbc(aes-generic) type 404 mask 68c
+[  132.277122] crypto_alg_lookup cbc(aes-generic) 404 68c
+[  132.282393] crypto_alg_lookup cbc(aes-generic) 404 68c alg cbdcf200
+[  132.288744]  return larval cbdcf200
+[  132.292208] crypto_alg_mod_lookup name hmac(sha256) type 40a mask 40c
+[  132.298400] crypto_alg_lookup hmac(sha256) 408 40c
+[  132.303314] crypto_alg_lookup hmac(sha256) 408 40c alg cbb1d910
+[  132.309239]  return larval cbb1d910
+[  132.312688] crypto_alg_mod_lookup name cbc(aes) type 404 mask 48c
+[  132.318612] crypto_alg_lookup cbc(aes) 404 48c
+[  132.323191] crypto_alg_lookup cbc(aes) 404 48c alg cbde2000
+[  132.328769]  return larval cbde2000
+ [  132.332317]  return alg cbde2a00
+ [  132.335460]  crypto_alloc_aead authenc(hmac(sha256),cbc(aes)) 3 18f cbde2a00
+
+        <=== fallback xfrm, algorithm is cbde2a00.
+[  132.342465] _qcrypto_ahash_hmac_cra_init cbd2a480
+[  132.347282] _qcrypto_aes-aead_setkey setkey
+[  132.351488] _qcrypto_do_aead_setkey setkey
+[  132.356993] crypto_alg_mod_lookup name authenc(hmac(sha256),cbc(aes)) type 403 mask 40f
+     <== 2nd xfrm. NO CRYPTO_ALG_NEED_FALLBACK
+[  132.363777] crypto_alg_lookup authenc(hmac(sha256),cbc(aes)) 403 40f
+[  132.370316] crypto_alg_lookup authenc(hmac(sha256),cbc(aes)) 403 40f alg cbde2a00
+[  132.377779]  return larval cbde2a00
+     ==> why it finds the larval for the sw implementation??
+
+[  132.381226]  crypto_alloc_aead authenc(hmac(sha256),cbc(aes)) 3 f cbde2a00
+    ==> alg is cbde2a00 of sw implementation.
+    ==> same as alg of fallback xfrm
+[  132.388108] _qcrypto_ahash_hmac_cra_init cbd2ab80
 
 
-Alexander Gordeev (1):
-      crypto: ccp - Use pci_enable_msix_range() instead of pci_enable_msix()
-
-Ard Biesheuvel (1):
-      crypto: testmgr - add test cases for SHA-1, SHA-224, SHA-256 and AES-CCM
-
-Arnd Bergmann (1):
-      crypto: s5p-sss - fix multiplatform build
-
-Christian Engelmayer (3):
-      crypto: tcrypt - Fix potential leak in test_aead_speed() if aad_size is too big
-      crypto: tcrypt - Fix potential leak in test_aead_speed() if crypto_alloc_aead() fails
-      crypto: tcrypt - Fix leak of struct aead_request in test_aead_speed()
-
-Fabio Estevam (1):
-      crypto: mxs-dcp - Remove global mutex
-
-Herbert Xu (2):
-      crypto: ghash-clmulni-intel - Use u128 instead of be128 for internal key
-      crypto: hash - Add real ahash walk interface
-
-Himangi Saraogi (1):
-      hwrng: n2-drv - Introduce the use of the managed version of kzalloc
-
-Horia Geanta (1):
-      crypto: caam - fix mem leak in ahash_setkey
-
-Jean Delvare (3):
-      hwrng: Move UML_RANDOM at the last position
-      hwrng: Turn HW_RANDOM into a menuconfig
-      hwrng: Fix a few driver dependencies and defaults
-
-Jingoo Han (3):
-      crypto: omap-des - use devm_ioremap_resource()
-      hwrng: omap - remove unnecessary OOM messages
-      hwrng: timeriomem - remove unnecessary OOM messages
-
-Jussi Kivilinna (1):
-      crypto: testmgr - add empty and large test vectors for SHA-1, SHA-224, SHA-256, SHA-384 and SHA-512
-
-Leilei Zhao (2):
-      crypto: atmel-aes - correct block size of cfb8 mode
-      crypto: atmel-aes - check alignment of cfb64 mode
-
-Marek Vasut (23):
-      crypto: caam - Contain caam_jr_strstatus() ugliness
-      crypto: caam - Pull all the error codes out
-      crypto: caam - Implement fast-path for error codes with no handler
-      crypto: caam - Pass error type into the functions
-      crypto: caam - Kill the easy targets
-      crypto: caam - Dissolve report_jump_idx()
-      crypto: caam - Clean up report_ccb_status()
-      crypto: caam - Clean up report_deco_status()
-      crypto: caam - Kill SPRINTFCAT() with fire
-      crypto: caam - Sweep the remnants
-      crypto: caam - Fix the 'quoted string split across lines'
-      crypto: geode - Kill AES_MIN_BLOCK_SIZE
-      crypto: geode - Kill AES_IV_LENGTH
-      crypto: geode - Consistently use AES_KEYSIZE_128
-      crypto: geode - Weed out printk() from probe()
-      crypto: geode - Don't use tfm->__crt_alg->cra_name directly
-      crypto: ccp - tfm->__crt_alg->cra_name directly
-      crypto: cesa - tfm->__crt_alg->cra_name directly
-      crypto: dcp - tfm->__crt_alg->cra_name directly
-      crypto: n2 - tfm->__crt_alg->cra_name directly
-      crypto: padlock - tfm->__crt_alg->cra_name directly
-      crypto: sahara - tfm->__crt_alg->cra_name directly
-      crypto: cesa - tfm->__crt_alg->cra_type directly
-
-Matthias-Christian Ott (1):
-      crypto: user - Allow CRYPTO_MSG_GETALG without CAP_NET_ADMIN
-
-Monam Agarwal (1):
-      crypto: nx - Use RCU_INIT_POINTER(x, NULL)
-
-Naveen Krishna Chatradhi (7):
-      crypto: s5p-sss - Use platform_get_irq() instead of _byname()
-      crypto: s5p-sss - Add device tree support
-      crypto: s5p-sss - Add support for SSS module on Exynos
-      crypto: s5p-sss - Let Exynos SoCs select SSS driver
-      crypto: s5p-sss - validate iv before memcpy
-      crypto: s5p-sss - Use clk_prepare/clk_unprepare
-      crypto: s5p-sss - Look for the next request in the queue
-
-Nishanth Menon (1):
-      crypto: omap-des - handle error of pm_runtime_get_sync
-
-Nitesh Lal (1):
-      crypto: testmgr - add aead cbc des, des3_ede tests
-
-Paul Bolle (1):
-      hwrng: picoxcell - remove unbuildable picoxcell TRNG
-
-Sonic Zhang (3):
-      crypto: bfin_crc - access crc registers by readl and writel functions
-      crypto: bfin_crc - ignore duplicated registration of the same algorithm
-      cryptoo: bfin_crc - avoid get physical address of coherence memory by dma_map_single
-
-Tadeusz Struk (1):
-      crypto: testmgr - Fix DMA-API warning
-
-Vakul Garg (1):
-      crypto: caam - reinitialize keys_fit_inline for decrypt and givencrypt
-
- .../devicetree/bindings/crypto/samsung-sss.txt     |   34 +
- arch/x86/crypto/ghash-clmulni-intel_asm.S          |    4 +-
- arch/x86/crypto/ghash-clmulni-intel_glue.c         |   12 +-
- crypto/ahash.c                                     |   41 +-
- crypto/crypto_user.c                               |   12 +-
- crypto/tcrypt.c                                    |   52 +-
- crypto/testmgr.c                                   |  181 ++-
- crypto/testmgr.h                                   | 1441 +++++++++++++++++++-
- drivers/char/hw_random/Kconfig                     |  103 +-
- drivers/char/hw_random/Makefile                    |    1 -
- drivers/char/hw_random/n2-drv.c                    |   24 +-
- drivers/char/hw_random/omap-rng.c                  |    4 +-
- drivers/char/hw_random/picoxcell-rng.c             |  181 ---
- drivers/char/hw_random/timeriomem-rng.c            |    4 +-
- drivers/crypto/Kconfig                             |    6 +-
- drivers/crypto/atmel-aes.c                         |    8 +-
- drivers/crypto/bfin_crc.c                          |  103 +-
- .../include/asm => drivers/crypto}/bfin_crc.h      |    0
- drivers/crypto/caam/caamalg.c                      |   31 +-
- drivers/crypto/caam/caamhash.c                     |   32 +-
- drivers/crypto/caam/caamrng.c                      |    7 +-
- drivers/crypto/caam/error.c                        |  389 +++---
- drivers/crypto/caam/error.h                        |    2 +-
- drivers/crypto/caam/key_gen.c                      |    7 +-
- drivers/crypto/ccp/ccp-crypto-aes-xts.c            |    4 +-
- drivers/crypto/ccp/ccp-pci.c                       |    7 +-
- drivers/crypto/geode-aes.c                         |   28 +-
- drivers/crypto/geode-aes.h                         |    6 +-
- drivers/crypto/mv_cesa.c                           |    6 +-
- drivers/crypto/mxs-dcp.c                           |   52 +-
- drivers/crypto/n2_core.c                           |    4 +-
- drivers/crypto/nx/nx-842.c                         |    4 +-
- drivers/crypto/omap-des.c                          |   33 +-
- drivers/crypto/padlock-sha.c                       |    2 +-
- drivers/crypto/s5p-sss.c                           |  148 +-
- drivers/crypto/sahara.c                            |    2 +-
- include/crypto/internal/hash.h                     |   13 +
- 37 files changed, 2245 insertions(+), 743 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks.
+Chemin
