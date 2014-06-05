@@ -1,7 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [RFC][PATCH 2/8 v4] crypto: Intel(R) QAT transport code
-Date: Thu, 05 Jun 2014 13:42:58 -0700
-Message-ID: <20140605204245.1400.25892.stgit@gitlad.jf.intel.com>
+Subject: [RFC][PATCH 3/8 v4] crypto: Intel(R) QAT FW interface
+Date: Thu, 05 Jun 2014 13:43:15 -0700
+Message-ID: <20140605204303.1400.69524.stgit@gitlad.jf.intel.com>
 References: <20140605204133.1400.64237.stgit@gitlad.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -13,40 +13,37 @@ Cc: tadeusz.struk@intel.com, davem@davemloft.net,
 	linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:48963 "EHLO mga01.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:21515 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751651AbaFEUnC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Jun 2014 16:43:02 -0400
+	id S1751651AbaFEUnS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Jun 2014 16:43:18 -0400
 In-Reply-To: <20140605204133.1400.64237.stgit@gitlad.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds a code that implements communication channel between the
-driver and the firmware.
+This patch adds FW interface structure definitions.
 
 Acked-by: John Griffin <john.griffin@intel.com>
 Reviewed-by: Bruce W. Allan <bruce.w.allan@intel.com>
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
 
- drivers/crypto/qat/qat_common/adf_transport.c      |  565 ++++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_transport.h      |   63 ++
- .../qat/qat_common/adf_transport_access_macros.h   |  160 ++++++
- .../crypto/qat/qat_common/adf_transport_debug.c    |  301 +++++++++++
- .../crypto/qat/qat_common/adf_transport_internal.h |  115 ++++
- 5 files changed, 1204 insertions(+)
- create mode 100644 drivers/crypto/qat/qat_common/adf_transport.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_transport.h
- create mode 100644 drivers/crypto/qat/qat_common/adf_transport_access_macros.h
- create mode 100644 drivers/crypto/qat/qat_common/adf_transport_debug.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_transport_internal.h
+ drivers/crypto/qat/qat_common/icp_qat_fw.h         |  316 ++++++++++++++++
+ .../crypto/qat/qat_common/icp_qat_fw_init_admin.h  |  131 +++++++
+ drivers/crypto/qat/qat_common/icp_qat_fw_la.h      |  403 ++++++++++++++++++++
+ drivers/crypto/qat/qat_common/icp_qat_hw.h         |  305 +++++++++++++++
+ 4 files changed, 1155 insertions(+)
+ create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw.h
+ create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
+ create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_la.h
+ create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hw.h
 
-diff --git a/drivers/crypto/qat/qat_common/adf_transport.c b/drivers/crypto/qat/qat_common/adf_transport.c
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw.h b/drivers/crypto/qat/qat_common/icp_qat_fw.h
 new file mode 100644
-index 0000000..b213010
+index 0000000..f1e30e2
 --- /dev/null
-+++ b/drivers/crypto/qat/qat_common/adf_transport.c
-@@ -0,0 +1,565 @@
++++ b/drivers/crypto/qat/qat_common/icp_qat_fw.h
+@@ -0,0 +1,316 @@
 +/*
 +  This file is provided under a dual BSD/GPLv2 license.  When using or
 +  redistributing this file, you may do so under either license.
@@ -93,600 +90,282 @@ index 0000000..b213010
 +  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 +  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 +*/
-+#include <linux/delay.h>
-+#include "adf_accel_devices.h"
-+#include "adf_transport_internal.h"
-+#include "adf_transport_access_macros.h"
-+#include "adf_cfg.h"
-+#include "adf_common_drv.h"
-+
-+static inline uint32_t adf_modulo(uint32_t data, uint32_t shift)
-+{
-+	uint32_t div = data >> shift;
-+	uint32_t mult = div << shift;
-+	return data - mult;
-+}
-+
-+static inline int adf_check_ring_alignment(uint64_t addr, uint64_t size)
-+{
-+	if (((size - 1) & addr) != 0)
-+		return -EFAULT;
-+	return 0;
-+}
-+
-+static int adf_verify_ring_size(uint32_t msg_size, uint32_t msg_num)
-+{
-+	int i = ADF_MIN_RING_SIZE;
-+	for (; i <= ADF_MAX_RING_SIZE; i++)
-+		if ((msg_size * msg_num) == ADF_SIZE_TO_RING_SIZE_IN_BYTES(i))
-+			return i;
-+
-+	return ADF_DEFAULT_RING_SIZE;
-+}
-+
-+static int adf_reserve_ring(struct adf_etr_bank_data *bank, uint32_t ring)
-+{
-+	spin_lock(&bank->lock);
-+	if (bank->ring_mask & (1 << ring)) {
-+		spin_unlock(&bank->lock);
-+		return -EFAULT;
-+	}
-+	bank->ring_mask |= (1 << ring);
-+	spin_unlock(&bank->lock);
-+	return 0;
-+}
-+
-+static void adf_unreserve_ring(struct adf_etr_bank_data *bank, uint32_t ring)
-+{
-+	spin_lock(&bank->lock);
-+	bank->ring_mask &= ~(1 << ring);
-+	spin_unlock(&bank->lock);
-+}
-+
-+static void adf_enable_ring_irq(struct adf_etr_bank_data *bank, uint32_t ring)
-+{
-+	spin_lock_bh(&bank->lock);
-+	bank->irq_mask |= (1 << ring);
-+	spin_unlock_bh(&bank->lock);
-+	WRITE_CSR_INT_COL_EN(bank->csr_addr, bank->bank_number, bank->irq_mask);
-+	WRITE_CSR_INT_COL_CTL(bank->csr_addr, bank->bank_number,
-+			      bank->irq_coalesc_timer);
-+}
-+
-+static void adf_disable_ring_irq(struct adf_etr_bank_data *bank, uint32_t ring)
-+{
-+	spin_lock_bh(&bank->lock);
-+	bank->irq_mask &= ~(1 << ring);
-+	spin_unlock_bh(&bank->lock);
-+	WRITE_CSR_INT_COL_EN(bank->csr_addr, bank->bank_number, bank->irq_mask);
-+}
-+
-+int adf_send_message(struct adf_etr_ring_data *ring, uint32_t *msg)
-+{
-+	if (atomic_add_return(1, ring->inflights) >
-+	    ADF_MAX_INFLIGHTS(ring->ring_size, ring->msg_size)) {
-+		atomic_dec(ring->inflights);
-+		return -EAGAIN;
-+	}
-+	spin_lock_bh(&ring->lock);
-+	memcpy(ring->base_addr + ring->tail, msg,
-+	       ADF_MSG_SIZE_TO_BYTES(ring->msg_size));
-+
-+	ring->tail = adf_modulo(ring->tail +
-+				ADF_MSG_SIZE_TO_BYTES(ring->msg_size),
-+				ADF_RING_SIZE_MODULO(ring->ring_size));
-+	WRITE_CSR_RING_TAIL(ring->bank->csr_addr, ring->bank->bank_number,
-+			    ring->ring_number, ring->tail);
-+	spin_unlock_bh(&ring->lock);
-+	return 0;
-+}
-+
-+static int adf_handle_response(struct adf_etr_ring_data *ring)
-+{
-+	uint32_t msg_counter = 0;
-+	uint32_t *msg = (uint32_t *)(ring->base_addr + ring->head);
-+
-+	while (*msg != ADF_RING_EMPTY_SIG) {
-+		ring->callback((uint32_t *)msg);
-+		*msg = ADF_RING_EMPTY_SIG;
-+		ring->head = adf_modulo(ring->head +
-+					ADF_MSG_SIZE_TO_BYTES(ring->msg_size),
-+					ADF_RING_SIZE_MODULO(ring->ring_size));
-+		msg_counter++;
-+		msg = (uint32_t *)(ring->base_addr + ring->head);
-+	}
-+	if (msg_counter > 0) {
-+		WRITE_CSR_RING_HEAD(ring->bank->csr_addr,
-+				    ring->bank->bank_number,
-+				    ring->ring_number, ring->head);
-+		atomic_sub(msg_counter, ring->inflights);
-+	}
-+	return 0;
-+}
-+
-+static void adf_configure_tx_ring(struct adf_etr_ring_data *ring)
-+{
-+	uint32_t ring_config = BUILD_RING_CONFIG(ring->ring_size);
-+
-+	WRITE_CSR_RING_CONFIG(ring->bank->csr_addr, ring->bank->bank_number,
-+			      ring->ring_number, ring_config);
-+}
-+
-+static void adf_configure_rx_ring(struct adf_etr_ring_data *ring)
-+{
-+	uint32_t ring_config =
-+			BUILD_RESP_RING_CONFIG(ring->ring_size,
-+					       ADF_RING_NEAR_WATERMARK_512,
-+					       ADF_RING_NEAR_WATERMARK_0);
-+
-+	WRITE_CSR_RING_CONFIG(ring->bank->csr_addr, ring->bank->bank_number,
-+			      ring->ring_number, ring_config);
-+}
-+
-+static int adf_init_ring(struct adf_etr_ring_data *ring)
-+{
-+	struct adf_etr_bank_data *bank = ring->bank;
-+	struct adf_accel_dev *accel_dev = bank->accel_dev;
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	uint64_t ring_base;
-+	uint32_t ring_size_bytes =
-+			ADF_SIZE_TO_RING_SIZE_IN_BYTES(ring->ring_size);
-+
-+	ring_size_bytes = ADF_RING_SIZE_BYTES_MIN(ring_size_bytes);
-+	ring->base_addr = dma_alloc_coherent(&GET_DEV(accel_dev),
-+					     ring_size_bytes, &ring->dma_addr,
-+					     GFP_KERNEL);
-+	if (!ring->base_addr)
-+		return -ENOMEM;
-+
-+	memset(ring->base_addr, 0x7F, ring_size_bytes);
-+	/* The base_addr has to be aligned to the size of the buffer */
-+	if (adf_check_ring_alignment(ring->dma_addr, ring_size_bytes)) {
-+		pr_err("QAT: Ring address not aligned\n");
-+		dma_free_coherent(&GET_DEV(accel_dev), ring_size_bytes,
-+				  ring->base_addr, ring->dma_addr);
-+		return -EFAULT;
-+	}
-+
-+	if (hw_data->tx_rings_mask & (1 << ring->ring_number))
-+		adf_configure_tx_ring(ring);
-+
-+	else
-+		adf_configure_rx_ring(ring);
-+
-+	ring_base = BUILD_RING_BASE_ADDR(ring->dma_addr, ring->ring_size);
-+	WRITE_CSR_RING_BASE(ring->bank->csr_addr, ring->bank->bank_number,
-+			    ring->ring_number, ring_base);
-+	spin_lock_init(&ring->lock);
-+	return 0;
-+}
-+
-+static void adf_cleanup_ring(struct adf_etr_ring_data *ring)
-+{
-+	uint32_t ring_size_bytes =
-+			ADF_SIZE_TO_RING_SIZE_IN_BYTES(ring->ring_size);
-+	ring_size_bytes = ADF_RING_SIZE_BYTES_MIN(ring_size_bytes);
-+
-+	if (ring->base_addr) {
-+		memset(ring->base_addr, 0x7F, ring_size_bytes);
-+		dma_free_coherent(&GET_DEV(ring->bank->accel_dev),
-+				  ring_size_bytes, ring->base_addr,
-+				  ring->dma_addr);
-+	}
-+}
-+
-+int adf_create_ring(struct adf_accel_dev *accel_dev, const char *section,
-+		    uint32_t bank_num, uint32_t num_msgs,
-+		    uint32_t msg_size, const char *ring_name,
-+		    adf_callback_fn callback, int poll_mode,
-+		    struct adf_etr_ring_data **ring_ptr)
-+{
-+	struct adf_etr_data *transport_data = accel_dev->transport;
-+	struct adf_etr_bank_data *bank;
-+	struct adf_etr_ring_data *ring;
-+	char val[ADF_CFG_MAX_VAL_LEN_IN_BYTES];
-+	uint32_t ring_num;
-+	int ret;
-+
-+	if (bank_num >= GET_MAX_BANKS(accel_dev)) {
-+		pr_err("QAT: Invalid bank number\n");
-+		return -EFAULT;
-+	}
-+	if (msg_size > ADF_MSG_SIZE_TO_BYTES(ADF_MAX_MSG_SIZE)) {
-+		pr_err("QAT: Invalid msg size\n");
-+		return -EFAULT;
-+	}
-+	if (ADF_MAX_INFLIGHTS(adf_verify_ring_size(msg_size, num_msgs),
-+			      ADF_BYTES_TO_MSG_SIZE(msg_size)) < 2) {
-+		pr_err("QAT: Invalid ring size for given msg size\n");
-+		return -EFAULT;
-+	}
-+	if (adf_cfg_get_param_value(accel_dev, section, ring_name, val)) {
-+		pr_err("QAT: Section %s, no such entry : %s\n",
-+		       section, ring_name);
-+		return -EFAULT;
-+	}
-+	if (kstrtouint(val, 10, &ring_num)) {
-+		pr_err("QAT: Can't get ring number\n");
-+		return -EFAULT;
-+	}
-+
-+	bank = &transport_data->banks[bank_num];
-+	if (adf_reserve_ring(bank, ring_num)) {
-+		pr_err("QAT: Ring %d, %s already exists.\n",
-+		       ring_num, ring_name);
-+		return -EFAULT;
-+	}
-+	ring = &bank->rings[ring_num];
-+	ring->ring_number = ring_num;
-+	ring->bank = bank;
-+	ring->callback = callback;
-+	ring->msg_size = ADF_BYTES_TO_MSG_SIZE(msg_size);
-+	ring->ring_size = adf_verify_ring_size(msg_size, num_msgs);
-+	ring->head = 0;
-+	ring->tail = 0;
-+	atomic_set(ring->inflights, 0);
-+	ret = adf_init_ring(ring);
-+	if (ret)
-+		goto err;
-+
-+	/* Enable HW arbitration for the given ring */
-+	accel_dev->hw_device->hw_arb_ring_enable(ring);
-+
-+	if (adf_ring_debugfs_add(ring, ring_name)) {
-+		pr_err("QAT: Couldn't add ring debugfs entry\n");
-+		ret = -EFAULT;
-+		goto err;
-+	}
-+
-+	/* Enable interrupts if needed */
-+	if (callback && (!poll_mode))
-+		adf_enable_ring_irq(bank, ring->ring_number);
-+	*ring_ptr = ring;
-+	return 0;
-+err:
-+	adf_cleanup_ring(ring);
-+	adf_unreserve_ring(bank, ring_num);
-+	accel_dev->hw_device->hw_arb_ring_disable(ring);
-+	return ret;
-+}
-+
-+void adf_remove_ring(struct adf_etr_ring_data *ring)
-+{
-+	struct adf_etr_bank_data *bank = ring->bank;
-+	struct adf_accel_dev *accel_dev = bank->accel_dev;
-+
-+	/* Disable interrupts for the given ring */
-+	adf_disable_ring_irq(bank, ring->ring_number);
-+
-+	/* Clear PCI config space */
-+	WRITE_CSR_RING_CONFIG(bank->csr_addr, bank->bank_number,
-+			      ring->ring_number, 0);
-+	WRITE_CSR_RING_BASE(bank->csr_addr, bank->bank_number,
-+			    ring->ring_number, 0);
-+	adf_ring_debugfs_rm(ring);
-+	adf_unreserve_ring(bank, ring->ring_number);
-+	/* Disable HW arbitration for the given ring */
-+	accel_dev->hw_device->hw_arb_ring_disable(ring);
-+	adf_cleanup_ring(ring);
-+}
-+
-+static void adf_ring_response_handler(struct adf_etr_bank_data *bank)
-+{
-+	uint32_t empty_rings, i;
-+
-+	empty_rings = READ_CSR_E_STAT(bank->csr_addr, bank->bank_number);
-+	empty_rings = ~empty_rings & bank->irq_mask;
-+
-+	for (i = 0; i < ADF_ETR_MAX_RINGS_PER_BANK; ++i) {
-+		if (empty_rings & (1 << i))
-+			adf_handle_response(&bank->rings[i]);
-+	}
-+}
-+
-+/**
-+ * adf_response_handler() - Bottom half handler response handler
-+ * @bank_addr:  Address of a ring bank for with the BH was scheduled.
-+ *
-+ * Function is the bottom half handler for the response from acceleration
-+ * device. There is one handler for every ring bank. Function checks all
-+ * communication rings in the bank.
-+ * To be used by QAT device specific drivers.
-+ *
-+ * Return: void
-+ */
-+void adf_response_handler(unsigned long bank_addr)
-+{
-+	struct adf_etr_bank_data *bank = (void *)bank_addr;
-+
-+	/* Handle all the responses nad reenable IRQs */
-+	adf_ring_response_handler(bank);
-+	WRITE_CSR_INT_FLAG_AND_COL(bank->csr_addr, bank->bank_number,
-+				   bank->irq_mask);
-+}
-+EXPORT_SYMBOL_GPL(adf_response_handler);
-+
-+static inline int adf_get_cfg_int(struct adf_accel_dev *accel_dev,
-+				  const char *section, const char *format,
-+				  uint32_t key, uint32_t *value)
-+{
-+	char key_buf[ADF_CFG_MAX_KEY_LEN_IN_BYTES];
-+	char val_buf[ADF_CFG_MAX_VAL_LEN_IN_BYTES];
-+
-+	snprintf(key_buf, ADF_CFG_MAX_KEY_LEN_IN_BYTES, format, key);
-+
-+	if (adf_cfg_get_param_value(accel_dev, section, key_buf, val_buf))
-+		return -EFAULT;
-+
-+	if (kstrtouint(val_buf, 10, value))
-+		return -EFAULT;
-+	return 0;
-+}
-+
-+static void adf_enable_coalesc(struct adf_etr_bank_data *bank,
-+			       const char *section, uint32_t bank_num_in_accel)
-+{
-+	if (adf_get_cfg_int(bank->accel_dev, section,
-+			    ADF_ETRMGR_COALESCE_TIMER_FORMAT,
-+			    bank_num_in_accel, &bank->irq_coalesc_timer))
-+		bank->irq_coalesc_timer = ADF_COALESCING_DEF_TIME;
-+
-+	if (ADF_COALESCING_MAX_TIME < bank->irq_coalesc_timer ||
-+	    ADF_COALESCING_MIN_TIME > bank->irq_coalesc_timer)
-+		bank->irq_coalesc_timer = ADF_COALESCING_DEF_TIME;
-+}
-+
-+static int adf_init_bank(struct adf_accel_dev *accel_dev,
-+			 struct adf_etr_bank_data *bank,
-+			 uint32_t bank_num, void __iomem *csr_addr)
-+{
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	struct adf_etr_ring_data *ring;
-+	struct adf_etr_ring_data *tx_ring;
-+	uint32_t i, coalesc_enabled;
-+
-+	memset(bank, 0, sizeof(*bank));
-+	bank->bank_number = bank_num;
-+	bank->csr_addr = csr_addr;
-+	bank->accel_dev = accel_dev;
-+	spin_lock_init(&bank->lock);
-+
-+	/* Enable IRQ coalescing always. This will allow to use
-+	 * the optimised flag and coalesc register.
-+	 * If it is disabled in the config file just use min time value */
-+	if (adf_get_cfg_int(accel_dev, "Accelerator0",
-+			    ADF_ETRMGR_COALESCING_ENABLED_FORMAT,
-+			    bank_num, &coalesc_enabled) && coalesc_enabled)
-+		adf_enable_coalesc(bank, "Accelerator0", bank_num);
-+	else
-+		bank->irq_coalesc_timer = ADF_COALESCING_MIN_TIME;
-+
-+	for (i = 0; i < ADF_ETR_MAX_RINGS_PER_BANK; i++) {
-+		WRITE_CSR_RING_CONFIG(csr_addr, bank_num, i, 0);
-+		WRITE_CSR_RING_BASE(csr_addr, bank_num, i, 0);
-+		ring = &bank->rings[i];
-+		if (hw_data->tx_rings_mask & (1 << i)) {
-+			ring->inflights = kzalloc_node(sizeof(atomic_t),
-+						       GFP_KERNEL,
-+						       accel_dev->numa_node);
-+			if (!ring->inflights)
-+				goto err;
-+		} else {
-+			if (i < hw_data->tx_rx_gap) {
-+				pr_err("QAT: Invalid tx rings mask config\n");
-+				goto err;
-+			}
-+			tx_ring = &bank->rings[i - hw_data->tx_rx_gap];
-+			ring->inflights = tx_ring->inflights;
-+		}
-+	}
-+	if (adf_bank_debugfs_add(bank)) {
-+		pr_err("QAT: Failed to add bank debugfs entry\n");
-+		goto err;
-+	}
-+
-+	WRITE_CSR_INT_SRCSEL(csr_addr, bank_num);
-+	return 0;
-+err:
-+	for (i = 0; i < ADF_ETR_MAX_RINGS_PER_BANK; i++) {
-+		ring = &bank->rings[i];
-+		if (hw_data->tx_rings_mask & (1 << i) && ring->inflights)
-+			kfree(ring->inflights);
-+	}
-+	return -ENOMEM;
-+}
-+
-+/**
-+ * adf_init_etr_data() - Initialize transport rings for acceleration device
-+ * @accel_dev:  Pointer to acceleration device.
-+ *
-+ * Function is the initializes the communications channels (rings) to the
-+ * acceleration device accel_dev.
-+ * To be used by QAT device specific drivers.
-+ *
-+ * Return: 0 on success, error code othewise.
-+ */
-+int adf_init_etr_data(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_etr_data *etr_data;
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	void __iomem *csr_addr;
-+	uint32_t size;
-+	uint32_t num_banks = 0;
-+	int i, ret;
-+
-+	etr_data = kzalloc_node(sizeof(*etr_data), GFP_KERNEL,
-+				accel_dev->numa_node);
-+	if (!etr_data)
-+		return -ENOMEM;
-+
-+	num_banks = GET_MAX_BANKS(accel_dev);
-+	size = num_banks * sizeof(struct adf_etr_bank_data);
-+	etr_data->banks = kzalloc_node(size, GFP_KERNEL, accel_dev->numa_node);
-+	if (!etr_data->banks) {
-+		ret = -ENOMEM;
-+		goto err_bank;
-+	}
-+
-+	accel_dev->transport = etr_data;
-+	i = hw_data->get_etr_bar_id(hw_data);
-+	csr_addr = accel_dev->accel_pci_dev.pci_bars[i].virt_addr;
-+
-+	/* accel_dev->debugfs_dir should always be non-NULL here */
-+	etr_data->debug = debugfs_create_dir("transport",
-+					     accel_dev->debugfs_dir);
-+	if (!etr_data->debug) {
-+		pr_err("QAT: Unable to create transport debugfs entry\n");
-+		ret = -ENOENT;
-+		goto err_bank_debug;
-+	}
-+
-+	for (i = 0; i < num_banks; i++) {
-+		ret = adf_init_bank(accel_dev, &etr_data->banks[i], i,
-+				    csr_addr);
-+		if (ret)
-+			goto err_bank_all;
-+	}
-+
-+	return 0;
-+
-+err_bank_all:
-+	debugfs_remove(etr_data->debug);
-+err_bank_debug:
-+	kfree(etr_data->banks);
-+err_bank:
-+	kfree(etr_data);
-+	accel_dev->transport = NULL;
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(adf_init_etr_data);
-+
-+static void cleanup_bank(struct adf_etr_bank_data *bank)
-+{
-+	uint32_t i;
-+
-+	for (i = 0; i < ADF_ETR_MAX_RINGS_PER_BANK; i++) {
-+		struct adf_accel_dev *accel_dev = bank->accel_dev;
-+		struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+		struct adf_etr_ring_data *ring = &bank->rings[i];
-+
-+		if (bank->ring_mask & (1 << i))
-+			adf_cleanup_ring(ring);
-+
-+		if (hw_data->tx_rings_mask & (1 << i))
-+			kfree(ring->inflights);
-+	}
-+	adf_bank_debugfs_rm(bank);
-+	memset(bank, 0, sizeof(*bank));
-+}
-+
-+static void adf_cleanup_etr_handles(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_etr_data *etr_data = accel_dev->transport;
-+	uint32_t i, num_banks = GET_MAX_BANKS(accel_dev);
-+
-+	for (i = 0; i < num_banks; i++)
-+		cleanup_bank(&etr_data->banks[i]);
-+}
-+
-+/**
-+ * adf_cleanup_etr_data() - Clear transport rings for acceleration device
-+ * @accel_dev:  Pointer to acceleration device.
-+ *
-+ * Function is the clears the communications channels (rings) of the
-+ * acceleration device accel_dev.
-+ * To be used by QAT device specific drivers.
-+ *
-+ * Return: void
-+ */
-+void adf_cleanup_etr_data(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_etr_data *etr_data = accel_dev->transport;
-+
-+	if (etr_data) {
-+		adf_cleanup_etr_handles(accel_dev);
-+		debugfs_remove(etr_data->debug);
-+		kfree(etr_data->banks);
-+		kfree(etr_data);
-+		accel_dev->transport = NULL;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(adf_cleanup_etr_data);
-diff --git a/drivers/crypto/qat/qat_common/adf_transport.h b/drivers/crypto/qat/qat_common/adf_transport.h
-new file mode 100644
-index 0000000..386485b
---- /dev/null
-+++ b/drivers/crypto/qat/qat_common/adf_transport.h
-@@ -0,0 +1,63 @@
-+/*
-+  This file is provided under a dual BSD/GPLv2 license.  When using or
-+  redistributing this file, you may do so under either license.
-+
-+  GPL LICENSE SUMMARY
-+  Copyright(c) 2014 Intel Corporation.
-+  This program is free software; you can redistribute it and/or modify
-+  it under the terms of version 2 of the GNU General Public License as
-+  published by the Free Software Foundation.
-+
-+  This program is distributed in the hope that it will be useful, but
-+  WITHOUT ANY WARRANTY; without even the implied warranty of
-+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+  General Public License for more details.
-+
-+  Contact Information:
-+  qat-linux@intel.com
-+
-+  BSD LICENSE
-+  Copyright(c) 2014 Intel Corporation.
-+  Redistribution and use in source and binary forms, with or without
-+  modification, are permitted provided that the following conditions
-+  are met:
-+
-+    * Redistributions of source code must retain the above copyright
-+      notice, this list of conditions and the following disclaimer.
-+    * Redistributions in binary form must reproduce the above copyright
-+      notice, this list of conditions and the following disclaimer in
-+      the documentation and/or other materials provided with the
-+      distribution.
-+    * Neither the name of Intel Corporation nor the names of its
-+      contributors may be used to endorse or promote products derived
-+      from this software without specific prior written permission.
-+
-+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+*/
-+#ifndef ADF_TRANSPORT_H
-+#define ADF_TRANSPORT_H
-+
-+#include "adf_accel_devices.h"
-+
-+struct adf_etr_ring_data;
-+
-+typedef void (*adf_callback_fn)(void *resp_msg);
-+
-+int adf_create_ring(struct adf_accel_dev *accel_dev, const char *section,
-+		    uint32_t bank_num, uint32_t num_mgs, uint32_t msg_size,
-+		    const char *ring_name, adf_callback_fn callback,
-+		    int poll_mode, struct adf_etr_ring_data **ring_ptr);
-+
-+int adf_send_message(struct adf_etr_ring_data *ring, uint32_t *msg);
-+void adf_remove_ring(struct adf_etr_ring_data *ring);
++#ifndef _ICP_QAT_FW_H_
++#define _ICP_QAT_FW_H_
++#include <linux/types.h>
++#include "icp_qat_hw.h"
++
++#define QAT_FIELD_SET(flags, val, bitpos, mask) \
++{ (flags) = (((flags) & (~((mask) << (bitpos)))) | \
++		(((val) & (mask)) << (bitpos))) ; }
++
++#define QAT_FIELD_GET(flags, bitpos, mask) \
++	(((flags) >> (bitpos)) & (mask))
++
++#define ICP_QAT_FW_REQ_DEFAULT_SZ 128
++#define ICP_QAT_FW_RESP_DEFAULT_SZ 32
++#define ICP_QAT_FW_COMN_ONE_BYTE_SHIFT 8
++#define ICP_QAT_FW_COMN_SINGLE_BYTE_MASK 0xFF
++#define ICP_QAT_FW_NUM_LONGWORDS_1 1
++#define ICP_QAT_FW_NUM_LONGWORDS_2 2
++#define ICP_QAT_FW_NUM_LONGWORDS_3 3
++#define ICP_QAT_FW_NUM_LONGWORDS_4 4
++#define ICP_QAT_FW_NUM_LONGWORDS_5 5
++#define ICP_QAT_FW_NUM_LONGWORDS_6 6
++#define ICP_QAT_FW_NUM_LONGWORDS_7 7
++#define ICP_QAT_FW_NUM_LONGWORDS_10 10
++#define ICP_QAT_FW_NUM_LONGWORDS_13 13
++#define ICP_QAT_FW_NULL_REQ_SERV_ID 1
++
++enum icp_qat_fw_comn_resp_serv_id {
++	ICP_QAT_FW_COMN_RESP_SERV_NULL,
++	ICP_QAT_FW_COMN_RESP_SERV_CPM_FW,
++	ICP_QAT_FW_COMN_RESP_SERV_DELIMITER
++};
++
++enum icp_qat_fw_comn_request_id {
++	ICP_QAT_FW_COMN_REQ_NULL = 0,
++	ICP_QAT_FW_COMN_REQ_CPM_FW_PKE = 3,
++	ICP_QAT_FW_COMN_REQ_CPM_FW_LA = 4,
++	ICP_QAT_FW_COMN_REQ_CPM_FW_DMA = 7,
++	ICP_QAT_FW_COMN_REQ_CPM_FW_COMP = 9,
++	ICP_QAT_FW_COMN_REQ_DELIMITER
++};
++
++struct icp_qat_fw_comn_req_hdr_cd_pars {
++	union {
++		struct {
++			uint64_t content_desc_addr;
++			uint16_t content_desc_resrvd1;
++			uint8_t content_desc_params_sz;
++			uint8_t content_desc_hdr_resrvd2;
++			uint32_t content_desc_resrvd3;
++		} s;
++		struct {
++			uint32_t serv_specif_fields[4];
++		} s1;
++	} u;
++};
++
++struct icp_qat_fw_comn_req_mid {
++	uint64_t opaque_data;
++	uint64_t src_data_addr;
++	uint64_t dest_data_addr;
++	uint32_t src_length;
++	uint32_t dst_length;
++};
++
++struct icp_qat_fw_comn_req_cd_ctrl {
++	uint32_t content_desc_ctrl_lw[ICP_QAT_FW_NUM_LONGWORDS_5];
++};
++
++struct icp_qat_fw_comn_req_hdr {
++	uint8_t resrvd1;
++	uint8_t service_cmd_id;
++	uint8_t service_type;
++	uint8_t hdr_flags;
++	uint16_t serv_specif_flags;
++	uint16_t comn_req_flags;
++};
++
++struct icp_qat_fw_comn_req_rqpars {
++	uint32_t serv_specif_rqpars_lw[ICP_QAT_FW_NUM_LONGWORDS_13];
++};
++
++struct icp_qat_fw_comn_req {
++	struct icp_qat_fw_comn_req_hdr comn_hdr;
++	struct icp_qat_fw_comn_req_hdr_cd_pars cd_pars;
++	struct icp_qat_fw_comn_req_mid comn_mid;
++	struct icp_qat_fw_comn_req_rqpars serv_specif_rqpars;
++	struct icp_qat_fw_comn_req_cd_ctrl cd_ctrl;
++};
++
++struct icp_qat_fw_comn_error {
++	uint8_t xlat_err_code;
++	uint8_t cmp_err_code;
++};
++
++struct icp_qat_fw_comn_resp_hdr {
++	uint8_t resrvd1;
++	uint8_t service_id;
++	uint8_t response_type;
++	uint8_t hdr_flags;
++	struct icp_qat_fw_comn_error comn_error;
++	uint8_t comn_status;
++	uint8_t cmd_id;
++};
++
++struct icp_qat_fw_comn_resp {
++	struct icp_qat_fw_comn_resp_hdr comn_hdr;
++	uint64_t opaque_data;
++	uint32_t resrvd[ICP_QAT_FW_NUM_LONGWORDS_4];
++};
++
++#define ICP_QAT_FW_COMN_REQ_FLAG_SET 1
++#define ICP_QAT_FW_COMN_REQ_FLAG_CLR 0
++#define ICP_QAT_FW_COMN_VALID_FLAG_BITPOS 7
++#define ICP_QAT_FW_COMN_VALID_FLAG_MASK 0x1
++#define ICP_QAT_FW_COMN_HDR_RESRVD_FLD_MASK 0x7F
++
++#define ICP_QAT_FW_COMN_OV_SRV_TYPE_GET(icp_qat_fw_comn_req_hdr_t) \
++	icp_qat_fw_comn_req_hdr_t.service_type
++
++#define ICP_QAT_FW_COMN_OV_SRV_TYPE_SET(icp_qat_fw_comn_req_hdr_t, val) \
++	icp_qat_fw_comn_req_hdr_t.service_type = val
++
++#define ICP_QAT_FW_COMN_OV_SRV_CMD_ID_GET(icp_qat_fw_comn_req_hdr_t) \
++	icp_qat_fw_comn_req_hdr_t.service_cmd_id
++
++#define ICP_QAT_FW_COMN_OV_SRV_CMD_ID_SET(icp_qat_fw_comn_req_hdr_t, val) \
++	icp_qat_fw_comn_req_hdr_t.service_cmd_id = val
++
++#define ICP_QAT_FW_COMN_HDR_VALID_FLAG_GET(hdr_t) \
++	ICP_QAT_FW_COMN_VALID_FLAG_GET(hdr_t.hdr_flags)
++
++#define ICP_QAT_FW_COMN_HDR_VALID_FLAG_SET(hdr_t, val) \
++	ICP_QAT_FW_COMN_VALID_FLAG_SET(hdr_t, val)
++
++#define ICP_QAT_FW_COMN_VALID_FLAG_GET(hdr_flags) \
++	QAT_FIELD_GET(hdr_flags, \
++	ICP_QAT_FW_COMN_VALID_FLAG_BITPOS, \
++	ICP_QAT_FW_COMN_VALID_FLAG_MASK)
++
++#define ICP_QAT_FW_COMN_HDR_RESRVD_FLD_GET(hdr_flags) \
++	(hdr_flags & ICP_QAT_FW_COMN_HDR_RESRVD_FLD_MASK)
++
++#define ICP_QAT_FW_COMN_VALID_FLAG_SET(hdr_t, val) \
++	QAT_FIELD_SET((hdr_t.hdr_flags), (val), \
++	ICP_QAT_FW_COMN_VALID_FLAG_BITPOS, \
++	ICP_QAT_FW_COMN_VALID_FLAG_MASK)
++
++#define ICP_QAT_FW_COMN_HDR_FLAGS_BUILD(valid) \
++	(((valid) & ICP_QAT_FW_COMN_VALID_FLAG_MASK) << \
++	 ICP_QAT_FW_COMN_VALID_FLAG_BITPOS)
++
++#define QAT_COMN_PTR_TYPE_BITPOS 0
++#define QAT_COMN_PTR_TYPE_MASK 0x1
++#define QAT_COMN_CD_FLD_TYPE_BITPOS 1
++#define QAT_COMN_CD_FLD_TYPE_MASK 0x1
++#define QAT_COMN_PTR_TYPE_FLAT 0x0
++#define QAT_COMN_PTR_TYPE_SGL 0x1
++#define QAT_COMN_CD_FLD_TYPE_64BIT_ADR 0x0
++#define QAT_COMN_CD_FLD_TYPE_16BYTE_DATA 0x1
++
++#define ICP_QAT_FW_COMN_FLAGS_BUILD(cdt, ptr) \
++	((((cdt) & QAT_COMN_CD_FLD_TYPE_MASK) << QAT_COMN_CD_FLD_TYPE_BITPOS) \
++	 | (((ptr) & QAT_COMN_PTR_TYPE_MASK) << QAT_COMN_PTR_TYPE_BITPOS))
++
++#define ICP_QAT_FW_COMN_PTR_TYPE_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_COMN_PTR_TYPE_BITPOS, QAT_COMN_PTR_TYPE_MASK)
++
++#define ICP_QAT_FW_COMN_CD_FLD_TYPE_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_COMN_CD_FLD_TYPE_BITPOS, \
++			QAT_COMN_CD_FLD_TYPE_MASK)
++
++#define ICP_QAT_FW_COMN_PTR_TYPE_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_COMN_PTR_TYPE_BITPOS, \
++			QAT_COMN_PTR_TYPE_MASK)
++
++#define ICP_QAT_FW_COMN_CD_FLD_TYPE_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_COMN_CD_FLD_TYPE_BITPOS, \
++			QAT_COMN_CD_FLD_TYPE_MASK)
++
++#define ICP_QAT_FW_COMN_NEXT_ID_BITPOS 4
++#define ICP_QAT_FW_COMN_NEXT_ID_MASK 0xF0
++#define ICP_QAT_FW_COMN_CURR_ID_BITPOS 0
++#define ICP_QAT_FW_COMN_CURR_ID_MASK 0x0F
++
++#define ICP_QAT_FW_COMN_NEXT_ID_GET(cd_ctrl_hdr_t) \
++	((((cd_ctrl_hdr_t)->next_curr_id) & ICP_QAT_FW_COMN_NEXT_ID_MASK) \
++	>> (ICP_QAT_FW_COMN_NEXT_ID_BITPOS))
++
++#define ICP_QAT_FW_COMN_NEXT_ID_SET(cd_ctrl_hdr_t, val) \
++	{ ((cd_ctrl_hdr_t)->next_curr_id) = ((((cd_ctrl_hdr_t)->next_curr_id) \
++	& ICP_QAT_FW_COMN_CURR_ID_MASK) | \
++	((val << ICP_QAT_FW_COMN_NEXT_ID_BITPOS) \
++	 & ICP_QAT_FW_COMN_NEXT_ID_MASK)); }
++
++#define ICP_QAT_FW_COMN_CURR_ID_GET(cd_ctrl_hdr_t) \
++	(((cd_ctrl_hdr_t)->next_curr_id) & ICP_QAT_FW_COMN_CURR_ID_MASK)
++
++#define ICP_QAT_FW_COMN_CURR_ID_SET(cd_ctrl_hdr_t, val) \
++	{ ((cd_ctrl_hdr_t)->next_curr_id) = ((((cd_ctrl_hdr_t)->next_curr_id) \
++	& ICP_QAT_FW_COMN_NEXT_ID_MASK) | \
++	((val) & ICP_QAT_FW_COMN_CURR_ID_MASK)); }
++
++#define QAT_COMN_RESP_CRYPTO_STATUS_BITPOS 7
++#define QAT_COMN_RESP_CRYPTO_STATUS_MASK 0x1
++#define QAT_COMN_RESP_CMP_STATUS_BITPOS 5
++#define QAT_COMN_RESP_CMP_STATUS_MASK 0x1
++#define QAT_COMN_RESP_XLAT_STATUS_BITPOS 4
++#define QAT_COMN_RESP_XLAT_STATUS_MASK 0x1
++#define QAT_COMN_RESP_CMP_END_OF_LAST_BLK_BITPOS 3
++#define QAT_COMN_RESP_CMP_END_OF_LAST_BLK_MASK 0x1
++
++#define ICP_QAT_FW_COMN_RESP_STATUS_BUILD(crypto, comp, xlat, eolb) \
++	((((crypto) & QAT_COMN_RESP_CRYPTO_STATUS_MASK) << \
++	QAT_COMN_RESP_CRYPTO_STATUS_BITPOS) | \
++	(((comp) & QAT_COMN_RESP_CMP_STATUS_MASK) << \
++	QAT_COMN_RESP_CMP_STATUS_BITPOS) | \
++	(((xlat) & QAT_COMN_RESP_XLAT_STATUS_MASK) << \
++	QAT_COMN_RESP_XLAT_STATUS_BITPOS) | \
++	(((eolb) & QAT_COMN_RESP_CMP_END_OF_LAST_BLK_MASK) << \
++	QAT_COMN_RESP_CMP_END_OF_LAST_BLK_BITPOS))
++
++#define ICP_QAT_FW_COMN_RESP_CRYPTO_STAT_GET(status) \
++	QAT_FIELD_GET(status, QAT_COMN_RESP_CRYPTO_STATUS_BITPOS, \
++	QAT_COMN_RESP_CRYPTO_STATUS_MASK)
++
++#define ICP_QAT_FW_COMN_RESP_CMP_STAT_GET(status) \
++	QAT_FIELD_GET(status, QAT_COMN_RESP_CMP_STATUS_BITPOS, \
++	QAT_COMN_RESP_CMP_STATUS_MASK)
++
++#define ICP_QAT_FW_COMN_RESP_XLAT_STAT_GET(status) \
++	QAT_FIELD_GET(status, QAT_COMN_RESP_XLAT_STATUS_BITPOS, \
++	QAT_COMN_RESP_XLAT_STATUS_MASK)
++
++#define ICP_QAT_FW_COMN_RESP_CMP_END_OF_LAST_BLK_FLAG_GET(status) \
++	QAT_FIELD_GET(status, QAT_COMN_RESP_CMP_END_OF_LAST_BLK_BITPOS, \
++	QAT_COMN_RESP_CMP_END_OF_LAST_BLK_MASK)
++
++#define ICP_QAT_FW_COMN_STATUS_FLAG_OK 0
++#define ICP_QAT_FW_COMN_STATUS_FLAG_ERROR 1
++#define ICP_QAT_FW_COMN_STATUS_CMP_END_OF_LAST_BLK_FLAG_CLR 0
++#define ICP_QAT_FW_COMN_STATUS_CMP_END_OF_LAST_BLK_FLAG_SET 1
++#define ERR_CODE_NO_ERROR 0
++#define ERR_CODE_INVALID_BLOCK_TYPE -1
++#define ERR_CODE_NO_MATCH_ONES_COMP -2
++#define ERR_CODE_TOO_MANY_LEN_OR_DIS -3
++#define ERR_CODE_INCOMPLETE_LEN -4
++#define ERR_CODE_RPT_LEN_NO_FIRST_LEN -5
++#define ERR_CODE_RPT_GT_SPEC_LEN -6
++#define ERR_CODE_INV_LIT_LEN_CODE_LEN -7
++#define ERR_CODE_INV_DIS_CODE_LEN -8
++#define ERR_CODE_INV_LIT_LEN_DIS_IN_BLK -9
++#define ERR_CODE_DIS_TOO_FAR_BACK -10
++#define ERR_CODE_OVERFLOW_ERROR -11
++#define ERR_CODE_SOFT_ERROR -12
++#define ERR_CODE_FATAL_ERROR -13
++#define ERR_CODE_SSM_ERROR -14
++#define ERR_CODE_ENDPOINT_ERROR -15
++
++enum icp_qat_fw_slice {
++	ICP_QAT_FW_SLICE_NULL = 0,
++	ICP_QAT_FW_SLICE_CIPHER = 1,
++	ICP_QAT_FW_SLICE_AUTH = 2,
++	ICP_QAT_FW_SLICE_DRAM_RD = 3,
++	ICP_QAT_FW_SLICE_DRAM_WR = 4,
++	ICP_QAT_FW_SLICE_COMP = 5,
++	ICP_QAT_FW_SLICE_XLAT = 6,
++	ICP_QAT_FW_SLICE_DELIMITER
++};
 +#endif
-diff --git a/drivers/crypto/qat/qat_common/adf_transport_access_macros.h b/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h b/drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
 new file mode 100644
-index 0000000..91d88d6
+index 0000000..72a59fa
 --- /dev/null
-+++ b/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
-@@ -0,0 +1,160 @@
++++ b/drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
+@@ -0,0 +1,131 @@
 +/*
 +  This file is provided under a dual BSD/GPLv2 license.  When using or
 +  redistributing this file, you may do so under either license.
@@ -733,126 +412,97 @@ index 0000000..91d88d6
 +  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 +  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 +*/
-+#ifndef ADF_TRANSPORT_ACCESS_MACROS_H
-+#define ADF_TRANSPORT_ACCESS_MACROS_H
++#ifndef _ICP_QAT_FW_INIT_ADMIN_H_
++#define _ICP_QAT_FW_INIT_ADMIN_H_
 +
-+#include "adf_accel_devices.h"
-+#define ADF_BANK_INT_SRC_SEL_MASK_0 0x4444444CUL
-+#define ADF_BANK_INT_SRC_SEL_MASK_X 0x44444444UL
-+#define ADF_RING_CSR_RING_CONFIG 0x000
-+#define ADF_RING_CSR_RING_LBASE 0x040
-+#define ADF_RING_CSR_RING_UBASE 0x080
-+#define ADF_RING_CSR_RING_HEAD 0x0C0
-+#define ADF_RING_CSR_RING_TAIL 0x100
-+#define ADF_RING_CSR_E_STAT 0x14C
-+#define ADF_RING_CSR_INT_SRCSEL 0x174
-+#define ADF_RING_CSR_INT_SRCSEL_2 0x178
-+#define ADF_RING_CSR_INT_COL_EN 0x17C
-+#define ADF_RING_CSR_INT_COL_CTL 0x180
-+#define ADF_RING_CSR_INT_FLAG_AND_COL 0x184
-+#define ADF_RING_CSR_INT_COL_CTL_ENABLE	0x80000000
-+#define ADF_RING_BUNDLE_SIZE 0x1000
-+#define ADF_RING_CONFIG_NEAR_FULL_WM 0x0A
-+#define ADF_RING_CONFIG_NEAR_EMPTY_WM 0x05
-+#define ADF_COALESCING_MIN_TIME 0x1FF
-+#define ADF_COALESCING_MAX_TIME 0xFFFFF
-+#define ADF_COALESCING_DEF_TIME 0x27FF
-+#define ADF_RING_NEAR_WATERMARK_512 0x08
-+#define ADF_RING_NEAR_WATERMARK_0 0x00
-+#define ADF_RING_EMPTY_SIG 0x7F7F7F7F
++#include "icp_qat_fw.h"
 +
-+/* Valid internal ring size values */
-+#define ADF_RING_SIZE_128 0x01
-+#define ADF_RING_SIZE_256 0x02
-+#define ADF_RING_SIZE_512 0x03
-+#define ADF_RING_SIZE_4K 0x06
-+#define ADF_RING_SIZE_16K 0x08
-+#define ADF_RING_SIZE_4M 0x10
-+#define ADF_MIN_RING_SIZE ADF_RING_SIZE_128
-+#define ADF_MAX_RING_SIZE ADF_RING_SIZE_4M
-+#define ADF_DEFAULT_RING_SIZE ADF_RING_SIZE_16K
++enum icp_qat_fw_init_admin_cmd_id {
++	ICP_QAT_FW_INIT_ME = 0,
++	ICP_QAT_FW_TRNG_ENABLE = 1,
++	ICP_QAT_FW_TRNG_DISABLE = 2,
++	ICP_QAT_FW_CONSTANTS_CFG = 3,
++	ICP_QAT_FW_STATUS_GET = 4,
++	ICP_QAT_FW_COUNTERS_GET = 5,
++	ICP_QAT_FW_LOOPBACK = 6,
++	ICP_QAT_FW_HEARTBEAT_SYNC = 7,
++	ICP_QAT_FW_HEARTBEAT_GET = 8
++};
 +
-+/* Valid internal msg size values internal */
-+#define ADF_MSG_SIZE_32 0x01
-+#define ADF_MSG_SIZE_64 0x02
-+#define ADF_MSG_SIZE_128 0x04
-+#define ADF_MIN_MSG_SIZE ADF_MSG_SIZE_32
-+#define ADF_MAX_MSG_SIZE ADF_MSG_SIZE_128
++enum icp_qat_fw_init_admin_resp_status {
++	ICP_QAT_FW_INIT_RESP_STATUS_SUCCESS = 0,
++	ICP_QAT_FW_INIT_RESP_STATUS_FAIL
++};
 +
-+/* Size to bytes conversion macros for ring and msg values */
-+#define ADF_MSG_SIZE_TO_BYTES(SIZE) (SIZE << 5)
-+#define ADF_BYTES_TO_MSG_SIZE(SIZE) (SIZE >> 5)
-+#define ADF_SIZE_TO_RING_SIZE_IN_BYTES(SIZE) ((1 << (SIZE - 1)) << 7)
-+#define ADF_RING_SIZE_IN_BYTES_TO_SIZE(SIZE) ((1 << (SIZE - 1)) >> 7)
++struct icp_qat_fw_init_admin_req {
++	uint16_t init_cfg_sz;
++	uint8_t resrvd1;
++	uint8_t init_admin_cmd_id;
++	uint32_t resrvd2;
++	uint64_t opaque_data;
++	uint64_t init_cfg_ptr;
++	uint64_t resrvd3;
++};
 +
-+/* Minimum ring bufer size for memory allocation */
-+#define ADF_RING_SIZE_BYTES_MIN(SIZE) ((SIZE < ADF_RING_SIZE_4K) ? \
-+				ADF_RING_SIZE_4K : SIZE)
-+#define ADF_RING_SIZE_MODULO(SIZE) (SIZE + 0x6)
-+#define ADF_MAX_INFLIGHTS(RING_SIZE, MSG_SIZE) \
-+	((((1 << (RING_SIZE - 1)) << 4) >> MSG_SIZE) - 1)
-+#define BUILD_RING_CONFIG(size)	\
-+	((ADF_RING_NEAR_WATERMARK_0 << ADF_RING_CONFIG_NEAR_FULL_WM) \
-+	| (ADF_RING_NEAR_WATERMARK_0 << ADF_RING_CONFIG_NEAR_EMPTY_WM) \
-+	| size)
-+#define BUILD_RESP_RING_CONFIG(size, watermark_nf, watermark_ne) \
-+	((watermark_nf << ADF_RING_CONFIG_NEAR_FULL_WM)	\
-+	| (watermark_ne << ADF_RING_CONFIG_NEAR_EMPTY_WM) \
-+	| size)
-+#define BUILD_RING_BASE_ADDR(addr, size) \
-+	((addr >> 6) & (0xFFFFFFFFFFFFFFFFULL << size))
-+#define READ_CSR_RING_HEAD(csr_base_addr, bank, ring) \
-+	ADF_CSR_RD(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+			ADF_RING_CSR_RING_HEAD + (ring << 2))
-+#define READ_CSR_RING_TAIL(csr_base_addr, bank, ring) \
-+	ADF_CSR_RD(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+			ADF_RING_CSR_RING_TAIL + (ring << 2))
-+#define READ_CSR_E_STAT(csr_base_addr, bank) \
-+	ADF_CSR_RD(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+			ADF_RING_CSR_E_STAT)
-+#define WRITE_CSR_RING_CONFIG(csr_base_addr, bank, ring, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+		ADF_RING_CSR_RING_CONFIG + (ring << 2), value)
-+#define WRITE_CSR_RING_BASE(csr_base_addr, bank, ring, value) \
-+do { \
-+	uint32_t l_base = 0, u_base = 0; \
-+	l_base = (uint32_t)(value & 0xFFFFFFFF); \
-+	u_base = (uint32_t)((value & 0xFFFFFFFF00000000ULL) >> 32); \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+		ADF_RING_CSR_RING_LBASE + (ring << 2), l_base);	\
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+		ADF_RING_CSR_RING_UBASE + (ring << 2), u_base);	\
-+} while (0)
-+#define WRITE_CSR_RING_HEAD(csr_base_addr, bank, ring, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+		ADF_RING_CSR_RING_HEAD + (ring << 2), value)
-+#define WRITE_CSR_RING_TAIL(csr_base_addr, bank, ring, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+		ADF_RING_CSR_RING_TAIL + (ring << 2), value)
-+#define WRITE_CSR_INT_SRCSEL(csr_base_addr, bank) \
-+do { \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+	ADF_RING_CSR_INT_SRCSEL, ADF_BANK_INT_SRC_SEL_MASK_0);	\
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+	ADF_RING_CSR_INT_SRCSEL_2, ADF_BANK_INT_SRC_SEL_MASK_X); \
-+} while (0)
-+#define WRITE_CSR_INT_COL_EN(csr_base_addr, bank, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+			ADF_RING_CSR_INT_COL_EN, value)
-+#define WRITE_CSR_INT_COL_CTL(csr_base_addr, bank, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+			ADF_RING_CSR_INT_COL_CTL, \
-+			ADF_RING_CSR_INT_COL_CTL_ENABLE | value)
-+#define WRITE_CSR_INT_FLAG_AND_COL(csr_base_addr, bank, value) \
-+	ADF_CSR_WR(csr_base_addr, (ADF_RING_BUNDLE_SIZE * bank) + \
-+			ADF_RING_CSR_INT_FLAG_AND_COL, value)
++struct icp_qat_fw_init_admin_resp_hdr {
++	uint8_t flags;
++	uint8_t resrvd1;
++	uint8_t status;
++	uint8_t init_admin_cmd_id;
++};
++
++struct icp_qat_fw_init_admin_resp_pars {
++	union {
++		uint32_t resrvd1[ICP_QAT_FW_NUM_LONGWORDS_4];
++		struct {
++			uint32_t version_patch_num;
++			uint8_t context_id;
++			uint8_t ae_id;
++			uint16_t resrvd1;
++			uint64_t resrvd2;
++		} s1;
++		struct {
++			uint64_t req_rec_count;
++			uint64_t resp_sent_count;
++		} s2;
++	} u;
++};
++
++struct icp_qat_fw_init_admin_resp {
++	struct icp_qat_fw_init_admin_resp_hdr init_resp_hdr;
++	union {
++		uint32_t resrvd2;
++		struct {
++			uint16_t version_minor_num;
++			uint16_t version_major_num;
++		} s;
++	} u;
++	uint64_t opaque_data;
++	struct icp_qat_fw_init_admin_resp_pars init_resp_pars;
++};
++
++#define ICP_QAT_FW_COMN_HEARTBEAT_OK 0
++#define ICP_QAT_FW_COMN_HEARTBEAT_BLOCKED 1
++#define ICP_QAT_FW_COMN_HEARTBEAT_FLAG_BITPOS 0
++#define ICP_QAT_FW_COMN_HEARTBEAT_FLAG_MASK 0x1
++#define ICP_QAT_FW_COMN_STATUS_RESRVD_FLD_MASK 0xFE
++#define ICP_QAT_FW_COMN_HEARTBEAT_HDR_FLAG_GET(hdr_t) \
++	ICP_QAT_FW_COMN_HEARTBEAT_FLAG_GET(hdr_t.flags)
++
++#define ICP_QAT_FW_COMN_HEARTBEAT_HDR_FLAG_SET(hdr_t, val) \
++	ICP_QAT_FW_COMN_HEARTBEAT_FLAG_SET(hdr_t, val)
++
++#define ICP_QAT_FW_COMN_HEARTBEAT_FLAG_GET(flags) \
++	QAT_FIELD_GET(flags, \
++		 ICP_QAT_FW_COMN_HEARTBEAT_FLAG_BITPOS, \
++		 ICP_QAT_FW_COMN_HEARTBEAT_FLAG_MASK)
 +#endif
-diff --git a/drivers/crypto/qat/qat_common/adf_transport_debug.c b/drivers/crypto/qat/qat_common/adf_transport_debug.c
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw_la.h b/drivers/crypto/qat/qat_common/icp_qat_fw_la.h
 new file mode 100644
-index 0000000..d83a581
+index 0000000..d1d4802
 --- /dev/null
-+++ b/drivers/crypto/qat/qat_common/adf_transport_debug.c
-@@ -0,0 +1,301 @@
++++ b/drivers/crypto/qat/qat_common/icp_qat_fw_la.h
+@@ -0,0 +1,403 @@
 +/*
 +  This file is provided under a dual BSD/GPLv2 license.  When using or
 +  redistributing this file, you may do so under either license.
@@ -899,379 +549,671 @@ index 0000000..d83a581
 +  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 +  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 +*/
-+#include <linux/mutex.h>
-+#include <linux/slab.h>
-+#include <linux/seq_file.h>
-+#include "adf_accel_devices.h"
-+#include "adf_transport_internal.h"
-+#include "adf_transport_access_macros.h"
++#ifndef _ICP_QAT_FW_LA_H_
++#define _ICP_QAT_FW_LA_H_
++#include "icp_qat_fw.h"
 +
-+static DEFINE_MUTEX(ring_read_lock);
-+static DEFINE_MUTEX(bank_read_lock);
-+
-+static void *adf_ring_start(struct seq_file *sfile, loff_t *pos)
-+{
-+	struct adf_etr_ring_data *ring = sfile->private;
-+	mutex_lock(&ring_read_lock);
-+	if (*pos == 0)
-+		return SEQ_START_TOKEN;
-+
-+	if (*pos >= (ADF_SIZE_TO_RING_SIZE_IN_BYTES(ring->ring_size) /
-+		     ADF_MSG_SIZE_TO_BYTES(ring->msg_size)))
-+		return NULL;
-+
-+	return ring->base_addr +
-+		(ADF_MSG_SIZE_TO_BYTES(ring->msg_size) * (*pos)++);
-+}
-+
-+static void *adf_ring_next(struct seq_file *sfile, void *v, loff_t *pos)
-+{
-+	struct adf_etr_ring_data *ring = sfile->private;
-+
-+	if (*pos >= (ADF_SIZE_TO_RING_SIZE_IN_BYTES(ring->ring_size) /
-+		     ADF_MSG_SIZE_TO_BYTES(ring->msg_size)))
-+		return NULL;
-+
-+	return ring->base_addr +
-+		(ADF_MSG_SIZE_TO_BYTES(ring->msg_size) * (*pos)++);
-+}
-+
-+static int adf_ring_show(struct seq_file *sfile, void *v)
-+{
-+	struct adf_etr_ring_data *ring = sfile->private;
-+	struct adf_etr_bank_data *bank = ring->bank;
-+	uint32_t *msg = v;
-+	void __iomem *csr = ring->bank->csr_addr;
-+	int i, x;
-+
-+	if (v == SEQ_START_TOKEN) {
-+		int head, tail, empty;
-+
-+		head = READ_CSR_RING_HEAD(csr, bank->bank_number,
-+					  ring->ring_number);
-+		tail = READ_CSR_RING_TAIL(csr, bank->bank_number,
-+					  ring->ring_number);
-+		empty = READ_CSR_E_STAT(csr, bank->bank_number);
-+
-+		seq_puts(sfile, "------- Ring configuration -------\n");
-+		seq_printf(sfile, "ring num %d, bank num %d\n",
-+			   ring->ring_number, ring->bank->bank_number);
-+		seq_printf(sfile, "head %x, tail %x, empty: %d\n",
-+			   head, tail, (empty & 1 << ring->ring_number)
-+			   >> ring->ring_number);
-+		seq_printf(sfile, "ring size %d, msg size %d\n",
-+			   ADF_SIZE_TO_RING_SIZE_IN_BYTES(ring->ring_size),
-+			   ADF_MSG_SIZE_TO_BYTES(ring->msg_size));
-+		seq_puts(sfile, "----------- Ring data ------------\n");
-+		return 0;
-+	}
-+	seq_printf(sfile, "%p:", msg);
-+	x = 0;
-+	i = 0;
-+	for (; i < (ADF_MSG_SIZE_TO_BYTES(ring->msg_size) >> 2); i++) {
-+		seq_printf(sfile, " %08X", *(msg + i));
-+		if ((ADF_MSG_SIZE_TO_BYTES(ring->msg_size) >> 2) != i + 1 &&
-+		    (++x == 8)) {
-+			seq_printf(sfile, "\n%p:", msg + i + 1);
-+			x = 0;
-+		}
-+	}
-+	seq_puts(sfile, "\n");
-+	return 0;
-+}
-+
-+static void adf_ring_stop(struct seq_file *sfile, void *v)
-+{
-+	mutex_unlock(&ring_read_lock);
-+}
-+
-+static const struct seq_operations adf_ring_sops = {
-+	.start = adf_ring_start,
-+	.next = adf_ring_next,
-+	.stop = adf_ring_stop,
-+	.show = adf_ring_show
++enum icp_qat_fw_la_cmd_id {
++	ICP_QAT_FW_LA_CMD_CIPHER = 0,
++	ICP_QAT_FW_LA_CMD_AUTH = 1,
++	ICP_QAT_FW_LA_CMD_CIPHER_HASH = 2,
++	ICP_QAT_FW_LA_CMD_HASH_CIPHER = 3,
++	ICP_QAT_FW_LA_CMD_TRNG_GET_RANDOM = 4,
++	ICP_QAT_FW_LA_CMD_TRNG_TEST = 5,
++	ICP_QAT_FW_LA_CMD_SSL3_KEY_DERIVE = 6,
++	ICP_QAT_FW_LA_CMD_TLS_V1_1_KEY_DERIVE = 7,
++	ICP_QAT_FW_LA_CMD_TLS_V1_2_KEY_DERIVE = 8,
++	ICP_QAT_FW_LA_CMD_MGF1 = 9,
++	ICP_QAT_FW_LA_CMD_AUTH_PRE_COMP = 10,
++	ICP_QAT_FW_LA_CMD_CIPHER_PRE_COMP = 11,
++	ICP_QAT_FW_LA_CMD_DELIMITER = 12
 +};
 +
-+static int adf_ring_open(struct inode *inode, struct file *file)
-+{
-+	int ret = seq_open(file, &adf_ring_sops);
++#define ICP_QAT_FW_LA_ICV_VER_STATUS_PASS ICP_QAT_FW_COMN_STATUS_FLAG_OK
++#define ICP_QAT_FW_LA_ICV_VER_STATUS_FAIL ICP_QAT_FW_COMN_STATUS_FLAG_ERROR
++#define ICP_QAT_FW_LA_TRNG_STATUS_PASS ICP_QAT_FW_COMN_STATUS_FLAG_OK
++#define ICP_QAT_FW_LA_TRNG_STATUS_FAIL ICP_QAT_FW_COMN_STATUS_FLAG_ERROR
 +
-+	if (!ret) {
-+		struct seq_file *seq_f = file->private_data;
-+		seq_f->private = inode->i_private;
-+	}
-+	return ret;
-+}
-+
-+static const struct file_operations adf_ring_debug_fops = {
-+	.open = adf_ring_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = seq_release
++struct icp_qat_fw_la_bulk_req {
++	struct icp_qat_fw_comn_req_hdr comn_hdr;
++	struct icp_qat_fw_comn_req_hdr_cd_pars cd_pars;
++	struct icp_qat_fw_comn_req_mid comn_mid;
++	struct icp_qat_fw_comn_req_rqpars serv_specif_rqpars;
++	struct icp_qat_fw_comn_req_cd_ctrl cd_ctrl;
 +};
 +
-+int adf_ring_debugfs_add(struct adf_etr_ring_data *ring, const char *name)
-+{
-+	struct adf_etr_ring_debug_entry *ring_debug;
-+	char entry_name[8];
++#define ICP_QAT_FW_LA_GCM_IV_LEN_12_OCTETS 1
++#define ICP_QAT_FW_LA_GCM_IV_LEN_NOT_12_OCTETS 0
++#define QAT_FW_LA_ZUC_3G_PROTO_FLAG_BITPOS 12
++#define ICP_QAT_FW_LA_ZUC_3G_PROTO 1
++#define QAT_FW_LA_ZUC_3G_PROTO_FLAG_MASK 0x1
++#define QAT_LA_GCM_IV_LEN_FLAG_BITPOS 11
++#define QAT_LA_GCM_IV_LEN_FLAG_MASK 0x1
++#define ICP_QAT_FW_LA_DIGEST_IN_BUFFER 1
++#define ICP_QAT_FW_LA_NO_DIGEST_IN_BUFFER 0
++#define QAT_LA_DIGEST_IN_BUFFER_BITPOS	10
++#define QAT_LA_DIGEST_IN_BUFFER_MASK 0x1
++#define ICP_QAT_FW_LA_SNOW_3G_PROTO 4
++#define ICP_QAT_FW_LA_GCM_PROTO	2
++#define ICP_QAT_FW_LA_CCM_PROTO	1
++#define ICP_QAT_FW_LA_NO_PROTO 0
++#define QAT_LA_PROTO_BITPOS 7
++#define QAT_LA_PROTO_MASK 0x7
++#define ICP_QAT_FW_LA_CMP_AUTH_RES 1
++#define ICP_QAT_FW_LA_NO_CMP_AUTH_RES 0
++#define QAT_LA_CMP_AUTH_RES_BITPOS 6
++#define QAT_LA_CMP_AUTH_RES_MASK 0x1
++#define ICP_QAT_FW_LA_RET_AUTH_RES 1
++#define ICP_QAT_FW_LA_NO_RET_AUTH_RES 0
++#define QAT_LA_RET_AUTH_RES_BITPOS 5
++#define QAT_LA_RET_AUTH_RES_MASK 0x1
++#define ICP_QAT_FW_LA_UPDATE_STATE 1
++#define ICP_QAT_FW_LA_NO_UPDATE_STATE 0
++#define QAT_LA_UPDATE_STATE_BITPOS 4
++#define QAT_LA_UPDATE_STATE_MASK 0x1
++#define ICP_QAT_FW_CIPH_AUTH_CFG_OFFSET_IN_CD_SETUP 0
++#define ICP_QAT_FW_CIPH_AUTH_CFG_OFFSET_IN_SHRAM_CP 1
++#define QAT_LA_CIPH_AUTH_CFG_OFFSET_BITPOS 3
++#define QAT_LA_CIPH_AUTH_CFG_OFFSET_MASK 0x1
++#define ICP_QAT_FW_CIPH_IV_64BIT_PTR 0
++#define ICP_QAT_FW_CIPH_IV_16BYTE_DATA 1
++#define QAT_LA_CIPH_IV_FLD_BITPOS 2
++#define QAT_LA_CIPH_IV_FLD_MASK   0x1
++#define ICP_QAT_FW_LA_PARTIAL_NONE 0
++#define ICP_QAT_FW_LA_PARTIAL_START 1
++#define ICP_QAT_FW_LA_PARTIAL_MID 3
++#define ICP_QAT_FW_LA_PARTIAL_END 2
++#define QAT_LA_PARTIAL_BITPOS 0
++#define QAT_LA_PARTIAL_MASK 0x3
++#define ICP_QAT_FW_LA_FLAGS_BUILD(zuc_proto, gcm_iv_len, auth_rslt, proto, \
++	cmp_auth, ret_auth, update_state, \
++	ciph_iv, ciphcfg, partial) \
++	(((zuc_proto & QAT_FW_LA_ZUC_3G_PROTO_FLAG_MASK) << \
++	QAT_FW_LA_ZUC_3G_PROTO_FLAG_BITPOS) | \
++	((gcm_iv_len & QAT_LA_GCM_IV_LEN_FLAG_MASK) << \
++	QAT_LA_GCM_IV_LEN_FLAG_BITPOS) | \
++	((auth_rslt & QAT_LA_DIGEST_IN_BUFFER_MASK) << \
++	QAT_LA_DIGEST_IN_BUFFER_BITPOS) | \
++	((proto & QAT_LA_PROTO_MASK) << \
++	QAT_LA_PROTO_BITPOS)	| \
++	((cmp_auth & QAT_LA_CMP_AUTH_RES_MASK) << \
++	QAT_LA_CMP_AUTH_RES_BITPOS) | \
++	((ret_auth & QAT_LA_RET_AUTH_RES_MASK) << \
++	QAT_LA_RET_AUTH_RES_BITPOS) | \
++	((update_state & QAT_LA_UPDATE_STATE_MASK) << \
++	QAT_LA_UPDATE_STATE_BITPOS) | \
++	((ciph_iv & QAT_LA_CIPH_IV_FLD_MASK) << \
++	QAT_LA_CIPH_IV_FLD_BITPOS) | \
++	((ciphcfg & QAT_LA_CIPH_AUTH_CFG_OFFSET_MASK) << \
++	QAT_LA_CIPH_AUTH_CFG_OFFSET_BITPOS) | \
++	((partial & QAT_LA_PARTIAL_MASK) << \
++	QAT_LA_PARTIAL_BITPOS))
 +
-+	ring_debug = kzalloc(sizeof(*ring_debug), GFP_KERNEL);
-+	if (!ring_debug)
-+		return -ENOMEM;
++#define ICP_QAT_FW_LA_CIPH_IV_FLD_FLAG_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_LA_CIPH_IV_FLD_BITPOS, \
++	QAT_LA_CIPH_IV_FLD_MASK)
 +
-+	strlcpy(ring_debug->ring_name, name, sizeof(ring_debug->ring_name));
-+	snprintf(entry_name, sizeof(entry_name), "ring_%02d",
-+		 ring->ring_number);
++#define ICP_QAT_FW_LA_CIPH_AUTH_CFG_OFFSET_FLAG_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_LA_CIPH_AUTH_CFG_OFFSET_BITPOS, \
++	QAT_LA_CIPH_AUTH_CFG_OFFSET_MASK)
 +
-+	ring_debug->debug = debugfs_create_file(entry_name, S_IRUSR,
-+						ring->bank->bank_debug_dir,
-+						ring, &adf_ring_debug_fops);
-+	if (!ring_debug->debug) {
-+		pr_err("QAT: Failed to create ring debug entry.\n");
-+		kfree(ring_debug);
-+		return -EFAULT;
-+	}
-+	ring->ring_debug = ring_debug;
-+	return 0;
-+}
++#define ICP_QAT_FW_LA_ZUC_3G_PROTO_FLAG_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_FW_LA_ZUC_3G_PROTO_FLAG_BITPOS, \
++	QAT_FW_LA_ZUC_3G_PROTO_FLAG_MASK)
 +
-+void adf_ring_debugfs_rm(struct adf_etr_ring_data *ring)
-+{
-+	if (ring->ring_debug) {
-+		debugfs_remove(ring->ring_debug->debug);
-+		kfree(ring->ring_debug);
-+		ring->ring_debug = NULL;
-+	}
-+}
++#define ICP_QAT_FW_LA_GCM_IV_LEN_FLAG_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_LA_GCM_IV_LEN_FLAG_BITPOS, \
++	QAT_LA_GCM_IV_LEN_FLAG_MASK)
 +
-+static void *adf_bank_start(struct seq_file *sfile, loff_t *pos)
-+{
-+	mutex_lock(&bank_read_lock);
-+	if (*pos == 0)
-+		return SEQ_START_TOKEN;
++#define ICP_QAT_FW_LA_PROTO_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_LA_PROTO_BITPOS, QAT_LA_PROTO_MASK)
 +
-+	if (*pos >= ADF_ETR_MAX_RINGS_PER_BANK)
-+		return NULL;
++#define ICP_QAT_FW_LA_CMP_AUTH_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_LA_CMP_AUTH_RES_BITPOS, \
++	QAT_LA_CMP_AUTH_RES_MASK)
 +
-+	return pos;
-+}
++#define ICP_QAT_FW_LA_RET_AUTH_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_LA_RET_AUTH_RES_BITPOS, \
++	QAT_LA_RET_AUTH_RES_MASK)
 +
-+static void *adf_bank_next(struct seq_file *sfile, void *v, loff_t *pos)
-+{
-+	if (++(*pos) >= ADF_ETR_MAX_RINGS_PER_BANK)
-+		return NULL;
++#define ICP_QAT_FW_LA_DIGEST_IN_BUFFER_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_LA_DIGEST_IN_BUFFER_BITPOS, \
++	QAT_LA_DIGEST_IN_BUFFER_MASK)
 +
-+	return pos;
-+}
++#define ICP_QAT_FW_LA_UPDATE_STATE_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_LA_UPDATE_STATE_BITPOS, \
++	QAT_LA_UPDATE_STATE_MASK)
 +
-+static int adf_bank_show(struct seq_file *sfile, void *v)
-+{
-+	struct adf_etr_bank_data *bank = sfile->private;
++#define ICP_QAT_FW_LA_PARTIAL_GET(flags) \
++	QAT_FIELD_GET(flags, QAT_LA_PARTIAL_BITPOS, \
++	QAT_LA_PARTIAL_MASK)
 +
-+	if (v == SEQ_START_TOKEN) {
-+		seq_printf(sfile, "------- Bank %d configuration -------\n",
-+			   bank->bank_number);
-+	} else {
-+		int ring_id = *((int *)v) - 1;
-+		struct adf_etr_ring_data *ring = &bank->rings[ring_id];
-+		void __iomem *csr = bank->csr_addr;
-+		int head, tail, empty;
++#define ICP_QAT_FW_LA_CIPH_IV_FLD_FLAG_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_LA_CIPH_IV_FLD_BITPOS, \
++	QAT_LA_CIPH_IV_FLD_MASK)
 +
-+		if (!(bank->ring_mask & 1 << ring_id))
-+			return 0;
++#define ICP_QAT_FW_LA_CIPH_AUTH_CFG_OFFSET_FLAG_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_LA_CIPH_AUTH_CFG_OFFSET_BITPOS, \
++	QAT_LA_CIPH_AUTH_CFG_OFFSET_MASK)
 +
-+		head = READ_CSR_RING_HEAD(csr, bank->bank_number,
-+					  ring->ring_number);
-+		tail = READ_CSR_RING_TAIL(csr, bank->bank_number,
-+					  ring->ring_number);
-+		empty = READ_CSR_E_STAT(csr, bank->bank_number);
++#define ICP_QAT_FW_LA_ZUC_3G_PROTO_FLAG_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_FW_LA_ZUC_3G_PROTO_FLAG_BITPOS, \
++	QAT_FW_LA_ZUC_3G_PROTO_FLAG_MASK)
 +
-+		seq_printf(sfile,
-+			   "ring num %02d, head %04x, tail %04x, empty: %d\n",
-+			   ring->ring_number, head, tail,
-+			   (empty & 1 << ring->ring_number) >>
-+			   ring->ring_number);
-+	}
-+	return 0;
-+}
++#define ICP_QAT_FW_LA_GCM_IV_LEN_FLAG_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_LA_GCM_IV_LEN_FLAG_BITPOS, \
++	QAT_LA_GCM_IV_LEN_FLAG_MASK)
 +
-+static void adf_bank_stop(struct seq_file *sfile, void *v)
-+{
-+	mutex_unlock(&bank_read_lock);
-+}
++#define ICP_QAT_FW_LA_PROTO_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_LA_PROTO_BITPOS, \
++	QAT_LA_PROTO_MASK)
 +
-+static const struct seq_operations adf_bank_sops = {
-+	.start = adf_bank_start,
-+	.next = adf_bank_next,
-+	.stop = adf_bank_stop,
-+	.show = adf_bank_show
++#define ICP_QAT_FW_LA_CMP_AUTH_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_LA_CMP_AUTH_RES_BITPOS, \
++	QAT_LA_CMP_AUTH_RES_MASK)
++
++#define ICP_QAT_FW_LA_RET_AUTH_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_LA_RET_AUTH_RES_BITPOS, \
++	QAT_LA_RET_AUTH_RES_MASK)
++
++#define ICP_QAT_FW_LA_DIGEST_IN_BUFFER_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_LA_DIGEST_IN_BUFFER_BITPOS, \
++	QAT_LA_DIGEST_IN_BUFFER_MASK)
++
++#define ICP_QAT_FW_LA_UPDATE_STATE_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_LA_UPDATE_STATE_BITPOS, \
++	QAT_LA_UPDATE_STATE_MASK)
++
++#define ICP_QAT_FW_LA_PARTIAL_SET(flags, val) \
++	QAT_FIELD_SET(flags, val, QAT_LA_PARTIAL_BITPOS, \
++	QAT_LA_PARTIAL_MASK)
++
++struct icp_qat_fw_cipher_req_hdr_cd_pars {
++	union {
++		struct {
++			uint64_t content_desc_addr;
++			uint16_t content_desc_resrvd1;
++			uint8_t content_desc_params_sz;
++			uint8_t content_desc_hdr_resrvd2;
++			uint32_t content_desc_resrvd3;
++		} s;
++		struct {
++			uint32_t cipher_key_array[ICP_QAT_FW_NUM_LONGWORDS_4];
++		} s1;
++	} u;
 +};
 +
-+static int adf_bank_open(struct inode *inode, struct file *file)
-+{
-+	int ret = seq_open(file, &adf_bank_sops);
-+
-+	if (!ret) {
-+		struct seq_file *seq_f = file->private_data;
-+		seq_f->private = inode->i_private;
-+	}
-+	return ret;
-+}
-+
-+static const struct file_operations adf_bank_debug_fops = {
-+	.open = adf_bank_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = seq_release
++struct icp_qat_fw_cipher_auth_req_hdr_cd_pars {
++	union {
++		struct {
++			uint64_t content_desc_addr;
++			uint16_t content_desc_resrvd1;
++			uint8_t content_desc_params_sz;
++			uint8_t content_desc_hdr_resrvd2;
++			uint32_t content_desc_resrvd3;
++		} s;
++		struct {
++			uint32_t cipher_key_array[ICP_QAT_FW_NUM_LONGWORDS_4];
++		} sl;
++	} u;
 +};
 +
-+int adf_bank_debugfs_add(struct adf_etr_bank_data *bank)
-+{
-+	struct adf_accel_dev *accel_dev = bank->accel_dev;
-+	struct dentry *parent = accel_dev->transport->debug;
-+	char name[8];
-+
-+	snprintf(name, sizeof(name), "bank_%02d", bank->bank_number);
-+	bank->bank_debug_dir = debugfs_create_dir(name, parent);
-+	if (!bank->bank_debug_dir) {
-+		pr_err("QAT: Failed to create bank debug dir.\n");
-+		return -EFAULT;
-+	}
-+
-+	bank->bank_debug_cfg = debugfs_create_file("config", S_IRUSR,
-+						   bank->bank_debug_dir, bank,
-+						   &adf_bank_debug_fops);
-+	if (!bank->bank_debug_cfg) {
-+		pr_err("QAT: Failed to create bank debug entry.\n");
-+		debugfs_remove(bank->bank_debug_dir);
-+		return -EFAULT;
-+	}
-+	return 0;
-+}
-+
-+void adf_bank_debugfs_rm(struct adf_etr_bank_data *bank)
-+{
-+	debugfs_remove(bank->bank_debug_cfg);
-+	debugfs_remove(bank->bank_debug_dir);
-+}
-diff --git a/drivers/crypto/qat/qat_common/adf_transport_internal.h b/drivers/crypto/qat/qat_common/adf_transport_internal.h
-new file mode 100644
-index 0000000..4eb8969
---- /dev/null
-+++ b/drivers/crypto/qat/qat_common/adf_transport_internal.h
-@@ -0,0 +1,115 @@
-+/*
-+  This file is provided under a dual BSD/GPLv2 license.  When using or
-+  redistributing this file, you may do so under either license.
-+
-+  GPL LICENSE SUMMARY
-+  Copyright(c) 2014 Intel Corporation.
-+  This program is free software; you can redistribute it and/or modify
-+  it under the terms of version 2 of the GNU General Public License as
-+  published by the Free Software Foundation.
-+
-+  This program is distributed in the hope that it will be useful, but
-+  WITHOUT ANY WARRANTY; without even the implied warranty of
-+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+  General Public License for more details.
-+
-+  Contact Information:
-+  qat-linux@intel.com
-+
-+  BSD LICENSE
-+  Copyright(c) 2014 Intel Corporation.
-+  Redistribution and use in source and binary forms, with or without
-+  modification, are permitted provided that the following conditions
-+  are met:
-+
-+    * Redistributions of source code must retain the above copyright
-+      notice, this list of conditions and the following disclaimer.
-+    * Redistributions in binary form must reproduce the above copyright
-+      notice, this list of conditions and the following disclaimer in
-+      the documentation and/or other materials provided with the
-+      distribution.
-+    * Neither the name of Intel Corporation nor the names of its
-+      contributors may be used to endorse or promote products derived
-+      from this software without specific prior written permission.
-+
-+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+*/
-+#ifndef ADF_TRANSPORT_INTRN_H
-+#define ADF_TRANSPORT_INTRN_H
-+
-+#include <linux/interrupt.h>
-+#include <linux/atomic.h>
-+#include <linux/spinlock_types.h>
-+#include "adf_transport.h"
-+
-+struct adf_etr_ring_debug_entry {
-+	char ring_name[ADF_CFG_MAX_KEY_LEN_IN_BYTES];
-+	struct dentry *debug;
++struct icp_qat_fw_cipher_cd_ctrl_hdr {
++	uint8_t cipher_state_sz;
++	uint8_t cipher_key_sz;
++	uint8_t cipher_cfg_offset;
++	uint8_t next_curr_id;
++	uint8_t cipher_padding_sz;
++	uint8_t resrvd1;
++	uint16_t resrvd2;
++	uint32_t resrvd3[ICP_QAT_FW_NUM_LONGWORDS_3];
 +};
 +
-+struct adf_etr_ring_data {
-+	void *base_addr;
-+	atomic_t *inflights;
-+	spinlock_t lock;	/* protects ring data struct */
-+	adf_callback_fn callback;
-+	struct adf_etr_bank_data *bank;
-+	dma_addr_t dma_addr;
-+	uint16_t head;
-+	uint16_t tail;
-+	uint8_t ring_number;
-+	uint8_t ring_size;
-+	uint8_t msg_size;
-+	uint8_t reserved;
-+	struct adf_etr_ring_debug_entry *ring_debug;
++struct icp_qat_fw_auth_cd_ctrl_hdr {
++	uint32_t resrvd1;
++	uint8_t resrvd2;
++	uint8_t hash_flags;
++	uint8_t hash_cfg_offset;
++	uint8_t next_curr_id;
++	uint8_t resrvd3;
++	uint8_t outer_prefix_sz;
++	uint8_t final_sz;
++	uint8_t inner_res_sz;
++	uint8_t resrvd4;
++	uint8_t inner_state1_sz;
++	uint8_t inner_state2_offset;
++	uint8_t inner_state2_sz;
++	uint8_t outer_config_offset;
++	uint8_t outer_state1_sz;
++	uint8_t outer_res_sz;
++	uint8_t outer_prefix_offset;
++};
++
++struct icp_qat_fw_cipher_auth_cd_ctrl_hdr {
++	uint8_t cipher_state_sz;
++	uint8_t cipher_key_sz;
++	uint8_t cipher_cfg_offset;
++	uint8_t next_curr_id_cipher;
++	uint8_t cipher_padding_sz;
++	uint8_t hash_flags;
++	uint8_t hash_cfg_offset;
++	uint8_t next_curr_id_auth;
++	uint8_t resrvd1;
++	uint8_t outer_prefix_sz;
++	uint8_t final_sz;
++	uint8_t inner_res_sz;
++	uint8_t resrvd2;
++	uint8_t inner_state1_sz;
++	uint8_t inner_state2_offset;
++	uint8_t inner_state2_sz;
++	uint8_t outer_config_offset;
++	uint8_t outer_state1_sz;
++	uint8_t outer_res_sz;
++	uint8_t outer_prefix_offset;
++};
++
++#define ICP_QAT_FW_AUTH_HDR_FLAG_DO_NESTED 1
++#define ICP_QAT_FW_AUTH_HDR_FLAG_NO_NESTED 0
++#define ICP_QAT_FW_CCM_GCM_AAD_SZ_MAX	240
++#define ICP_QAT_FW_HASH_REQUEST_PARAMETERS_OFFSET \
++	(sizeof(struct icp_qat_fw_la_cipher_req_params_t))
++#define ICP_QAT_FW_CIPHER_REQUEST_PARAMETERS_OFFSET (0)
++
++struct icp_qat_fw_la_cipher_req_params {
++	uint32_t cipher_offset;
++	uint32_t cipher_length;
++	union {
++		uint32_t cipher_IV_array[ICP_QAT_FW_NUM_LONGWORDS_4];
++		struct {
++			uint64_t cipher_IV_ptr;
++			uint64_t resrvd1;
++		} s;
++	} u;
++};
++
++struct icp_qat_fw_la_auth_req_params {
++	uint32_t auth_off;
++	uint32_t auth_len;
++	union {
++		uint64_t auth_partial_st_prefix;
++		uint64_t aad_adr;
++	} u1;
++	uint64_t auth_res_addr;
++	union {
++		uint8_t inner_prefix_sz;
++		uint8_t aad_sz;
++	} u2;
++	uint8_t resrvd1;
++	uint8_t hash_state_sz;
++	uint8_t auth_res_sz;
 +} __packed;
 +
-+struct adf_etr_bank_data {
-+	struct adf_etr_ring_data rings[ADF_ETR_MAX_RINGS_PER_BANK];
-+	struct tasklet_struct resp_hanlder;
-+	void __iomem *csr_addr;
-+	struct adf_accel_dev *accel_dev;
-+	uint32_t irq_coalesc_timer;
-+	uint16_t ring_mask;
-+	uint16_t irq_mask;
-+	spinlock_t lock;	/* protects bank data struct */
-+	struct dentry *bank_debug_dir;
-+	struct dentry *bank_debug_cfg;
-+	uint32_t bank_number;
-+} __packed;
-+
-+struct adf_etr_data {
-+	struct adf_etr_bank_data *banks;
-+	struct dentry *debug;
++struct icp_qat_fw_la_auth_req_params_resrvd_flds {
++	uint32_t resrvd[ICP_QAT_FW_NUM_LONGWORDS_6];
++	union {
++		uint8_t inner_prefix_sz;
++		uint8_t aad_sz;
++	} u2;
++	uint8_t resrvd1;
++	uint16_t resrvd2;
 +};
 +
-+void adf_response_handler(unsigned long bank_addr);
-+#ifdef CONFIG_DEBUG_FS
-+#include <linux/debugfs.h>
-+int adf_bank_debugfs_add(struct adf_etr_bank_data *bank);
-+void adf_bank_debugfs_rm(struct adf_etr_bank_data *bank);
-+int adf_ring_debugfs_add(struct adf_etr_ring_data *ring, const char *name);
-+void adf_ring_debugfs_rm(struct adf_etr_ring_data *ring);
-+#else
-+static inline int adf_bank_debugfs_add(struct adf_etr_bank_data *bank)
-+{
-+	return 0;
-+}
-+#define adf_bank_debugfs_rm(bank) do {} while (0)
-+static inline int adf_ring_debugfs_add(struct adf_etr_ring_data *ring,
-+				       const char *name)
-+{
-+	return 0;
-+}
-+#define adf_ring_debugfs_rm(ring) do {} while (0)
++struct icp_qat_fw_la_resp {
++	struct icp_qat_fw_comn_resp_hdr comn_resp;
++	uint64_t opaque_data;
++	uint32_t resrvd[ICP_QAT_FW_NUM_LONGWORDS_4];
++};
++#define ICP_QAT_FW_CIPHER_NEXT_ID_GET(cd_ctrl_hdr_t) \
++	((((cd_ctrl_hdr_t)->next_curr_id_cipher) & \
++	  ICP_QAT_FW_COMN_NEXT_ID_MASK) >> (ICP_QAT_FW_COMN_NEXT_ID_BITPOS))
++
++#define ICP_QAT_FW_CIPHER_NEXT_ID_SET(cd_ctrl_hdr_t, val) \
++{ (cd_ctrl_hdr_t)->next_curr_id_cipher = \
++	((((cd_ctrl_hdr_t)->next_curr_id_cipher) \
++	& ICP_QAT_FW_COMN_CURR_ID_MASK) | \
++	((val << ICP_QAT_FW_COMN_NEXT_ID_BITPOS) \
++	& ICP_QAT_FW_COMN_NEXT_ID_MASK)) }
++
++#define ICP_QAT_FW_CIPHER_CURR_ID_GET(cd_ctrl_hdr_t) \
++	(((cd_ctrl_hdr_t)->next_curr_id_cipher) \
++	& ICP_QAT_FW_COMN_CURR_ID_MASK)
++
++#define ICP_QAT_FW_CIPHER_CURR_ID_SET(cd_ctrl_hdr_t, val) \
++{ (cd_ctrl_hdr_t)->next_curr_id_cipher = \
++	((((cd_ctrl_hdr_t)->next_curr_id_cipher) \
++	& ICP_QAT_FW_COMN_NEXT_ID_MASK) | \
++	((val) & ICP_QAT_FW_COMN_CURR_ID_MASK)) }
++
++#define ICP_QAT_FW_AUTH_NEXT_ID_GET(cd_ctrl_hdr_t) \
++	((((cd_ctrl_hdr_t)->next_curr_id_auth) & ICP_QAT_FW_COMN_NEXT_ID_MASK) \
++	>> (ICP_QAT_FW_COMN_NEXT_ID_BITPOS))
++
++#define ICP_QAT_FW_AUTH_NEXT_ID_SET(cd_ctrl_hdr_t, val) \
++{ (cd_ctrl_hdr_t)->next_curr_id_auth = \
++	((((cd_ctrl_hdr_t)->next_curr_id_auth) \
++	& ICP_QAT_FW_COMN_CURR_ID_MASK) | \
++	((val << ICP_QAT_FW_COMN_NEXT_ID_BITPOS) \
++	& ICP_QAT_FW_COMN_NEXT_ID_MASK)) }
++
++#define ICP_QAT_FW_AUTH_CURR_ID_GET(cd_ctrl_hdr_t) \
++	(((cd_ctrl_hdr_t)->next_curr_id_auth) \
++	& ICP_QAT_FW_COMN_CURR_ID_MASK)
++
++#define ICP_QAT_FW_AUTH_CURR_ID_SET(cd_ctrl_hdr_t, val) \
++{ (cd_ctrl_hdr_t)->next_curr_id_auth = \
++	((((cd_ctrl_hdr_t)->next_curr_id_auth) \
++	& ICP_QAT_FW_COMN_NEXT_ID_MASK) | \
++	((val) & ICP_QAT_FW_COMN_CURR_ID_MASK)) }
++
 +#endif
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_hw.h b/drivers/crypto/qat/qat_common/icp_qat_hw.h
+new file mode 100644
+index 0000000..cc7ec40
+--- /dev/null
++++ b/drivers/crypto/qat/qat_common/icp_qat_hw.h
+@@ -0,0 +1,305 @@
++/*
++  This file is provided under a dual BSD/GPLv2 license.  When using or
++  redistributing this file, you may do so under either license.
++
++  GPL LICENSE SUMMARY
++  Copyright(c) 2014 Intel Corporation.
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of version 2 of the GNU General Public License as
++  published by the Free Software Foundation.
++
++  This program is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++  General Public License for more details.
++
++  Contact Information:
++  qat-linux@intel.com
++
++  BSD LICENSE
++  Copyright(c) 2014 Intel Corporation.
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions
++  are met:
++
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above copyright
++      notice, this list of conditions and the following disclaimer in
++      the documentation and/or other materials provided with the
++      distribution.
++    * Neither the name of Intel Corporation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++#ifndef _ICP_QAT_HW_H_
++#define _ICP_QAT_HW_H_
++
++enum icp_qat_hw_ae_id {
++	ICP_QAT_HW_AE_0 = 0,
++	ICP_QAT_HW_AE_1 = 1,
++	ICP_QAT_HW_AE_2 = 2,
++	ICP_QAT_HW_AE_3 = 3,
++	ICP_QAT_HW_AE_4 = 4,
++	ICP_QAT_HW_AE_5 = 5,
++	ICP_QAT_HW_AE_6 = 6,
++	ICP_QAT_HW_AE_7 = 7,
++	ICP_QAT_HW_AE_8 = 8,
++	ICP_QAT_HW_AE_9 = 9,
++	ICP_QAT_HW_AE_10 = 10,
++	ICP_QAT_HW_AE_11 = 11,
++	ICP_QAT_HW_AE_DELIMITER = 12
++};
++
++enum icp_qat_hw_qat_id {
++	ICP_QAT_HW_QAT_0 = 0,
++	ICP_QAT_HW_QAT_1 = 1,
++	ICP_QAT_HW_QAT_2 = 2,
++	ICP_QAT_HW_QAT_3 = 3,
++	ICP_QAT_HW_QAT_4 = 4,
++	ICP_QAT_HW_QAT_5 = 5,
++	ICP_QAT_HW_QAT_DELIMITER = 6
++};
++
++enum icp_qat_hw_auth_algo {
++	ICP_QAT_HW_AUTH_ALGO_NULL = 0,
++	ICP_QAT_HW_AUTH_ALGO_SHA1 = 1,
++	ICP_QAT_HW_AUTH_ALGO_MD5 = 2,
++	ICP_QAT_HW_AUTH_ALGO_SHA224 = 3,
++	ICP_QAT_HW_AUTH_ALGO_SHA256 = 4,
++	ICP_QAT_HW_AUTH_ALGO_SHA384 = 5,
++	ICP_QAT_HW_AUTH_ALGO_SHA512 = 6,
++	ICP_QAT_HW_AUTH_ALGO_AES_XCBC_MAC = 7,
++	ICP_QAT_HW_AUTH_ALGO_AES_CBC_MAC = 8,
++	ICP_QAT_HW_AUTH_ALGO_AES_F9 = 9,
++	ICP_QAT_HW_AUTH_ALGO_GALOIS_128 = 10,
++	ICP_QAT_HW_AUTH_ALGO_GALOIS_64 = 11,
++	ICP_QAT_HW_AUTH_ALGO_KASUMI_F9 = 12,
++	ICP_QAT_HW_AUTH_ALGO_SNOW_3G_UIA2 = 13,
++	ICP_QAT_HW_AUTH_ALGO_ZUC_3G_128_EIA3 = 14,
++	ICP_QAT_HW_AUTH_RESERVED_1 = 15,
++	ICP_QAT_HW_AUTH_RESERVED_2 = 16,
++	ICP_QAT_HW_AUTH_ALGO_SHA3_256 = 17,
++	ICP_QAT_HW_AUTH_RESERVED_3 = 18,
++	ICP_QAT_HW_AUTH_ALGO_SHA3_512 = 19,
++	ICP_QAT_HW_AUTH_ALGO_DELIMITER = 20
++};
++
++enum icp_qat_hw_auth_mode {
++	ICP_QAT_HW_AUTH_MODE0 = 0,
++	ICP_QAT_HW_AUTH_MODE1 = 1,
++	ICP_QAT_HW_AUTH_MODE2 = 2,
++	ICP_QAT_HW_AUTH_MODE_DELIMITER = 3
++};
++
++struct icp_qat_hw_auth_config {
++	uint32_t config;
++	uint32_t reserved;
++};
++
++#define QAT_AUTH_MODE_BITPOS 4
++#define QAT_AUTH_MODE_MASK 0xF
++#define QAT_AUTH_ALGO_BITPOS 0
++#define QAT_AUTH_ALGO_MASK 0xF
++#define QAT_AUTH_CMP_BITPOS 8
++#define QAT_AUTH_CMP_MASK 0x7F
++#define QAT_AUTH_SHA3_PADDING_BITPOS 16
++#define QAT_AUTH_SHA3_PADDING_MASK 0x1
++#define QAT_AUTH_ALGO_SHA3_BITPOS 22
++#define QAT_AUTH_ALGO_SHA3_MASK 0x3
++#define ICP_QAT_HW_AUTH_CONFIG_BUILD(mode, algo, cmp_len) \
++	((((mode) & QAT_AUTH_MODE_MASK) << QAT_AUTH_MODE_BITPOS) | \
++	(((algo) & QAT_AUTH_ALGO_MASK) << QAT_AUTH_ALGO_BITPOS) | \
++	(((algo >> 4) & QAT_AUTH_ALGO_SHA3_MASK) << \
++	 QAT_AUTH_ALGO_SHA3_BITPOS) | \
++	 (((((algo == ICP_QAT_HW_AUTH_ALGO_SHA3_256) || \
++	(algo == ICP_QAT_HW_AUTH_ALGO_SHA3_512)) ? 1 : 0) \
++	& QAT_AUTH_SHA3_PADDING_MASK) << QAT_AUTH_SHA3_PADDING_BITPOS) | \
++	(((cmp_len) & QAT_AUTH_CMP_MASK) << QAT_AUTH_CMP_BITPOS))
++
++struct icp_qat_hw_auth_counter {
++	__be32 counter;
++	uint32_t reserved;
++};
++
++#define QAT_AUTH_COUNT_MASK 0xFFFFFFFF
++#define QAT_AUTH_COUNT_BITPOS 0
++#define ICP_QAT_HW_AUTH_COUNT_BUILD(val) \
++	(((val) & QAT_AUTH_COUNT_MASK) << QAT_AUTH_COUNT_BITPOS)
++
++struct icp_qat_hw_auth_setup {
++	struct icp_qat_hw_auth_config auth_config;
++	struct icp_qat_hw_auth_counter auth_counter;
++};
++
++#define QAT_HW_DEFAULT_ALIGNMENT 8
++#define QAT_HW_ROUND_UP(val, n) (((val) + ((n)-1)) & (~(n-1)))
++#define ICP_QAT_HW_NULL_STATE1_SZ 32
++#define ICP_QAT_HW_MD5_STATE1_SZ 16
++#define ICP_QAT_HW_SHA1_STATE1_SZ 20
++#define ICP_QAT_HW_SHA224_STATE1_SZ 32
++#define ICP_QAT_HW_SHA256_STATE1_SZ 32
++#define ICP_QAT_HW_SHA3_256_STATE1_SZ 32
++#define ICP_QAT_HW_SHA384_STATE1_SZ 64
++#define ICP_QAT_HW_SHA512_STATE1_SZ 64
++#define ICP_QAT_HW_SHA3_512_STATE1_SZ 64
++#define ICP_QAT_HW_SHA3_224_STATE1_SZ 28
++#define ICP_QAT_HW_SHA3_384_STATE1_SZ 48
++#define ICP_QAT_HW_AES_XCBC_MAC_STATE1_SZ 16
++#define ICP_QAT_HW_AES_CBC_MAC_STATE1_SZ 16
++#define ICP_QAT_HW_AES_F9_STATE1_SZ 32
++#define ICP_QAT_HW_KASUMI_F9_STATE1_SZ 16
++#define ICP_QAT_HW_GALOIS_128_STATE1_SZ 16
++#define ICP_QAT_HW_SNOW_3G_UIA2_STATE1_SZ 8
++#define ICP_QAT_HW_ZUC_3G_EIA3_STATE1_SZ 8
++#define ICP_QAT_HW_NULL_STATE2_SZ 32
++#define ICP_QAT_HW_MD5_STATE2_SZ 16
++#define ICP_QAT_HW_SHA1_STATE2_SZ 20
++#define ICP_QAT_HW_SHA224_STATE2_SZ 32
++#define ICP_QAT_HW_SHA256_STATE2_SZ 32
++#define ICP_QAT_HW_SHA3_256_STATE2_SZ 0
++#define ICP_QAT_HW_SHA384_STATE2_SZ 64
++#define ICP_QAT_HW_SHA512_STATE2_SZ 64
++#define ICP_QAT_HW_SHA3_512_STATE2_SZ 0
++#define ICP_QAT_HW_SHA3_224_STATE2_SZ 0
++#define ICP_QAT_HW_SHA3_384_STATE2_SZ 0
++#define ICP_QAT_HW_AES_XCBC_MAC_KEY_SZ 16
++#define ICP_QAT_HW_AES_CBC_MAC_KEY_SZ 16
++#define ICP_QAT_HW_AES_CCM_CBC_E_CTR0_SZ 16
++#define ICP_QAT_HW_F9_IK_SZ 16
++#define ICP_QAT_HW_F9_FK_SZ 16
++#define ICP_QAT_HW_KASUMI_F9_STATE2_SZ (ICP_QAT_HW_F9_IK_SZ + \
++	ICP_QAT_HW_F9_FK_SZ)
++#define ICP_QAT_HW_AES_F9_STATE2_SZ ICP_QAT_HW_KASUMI_F9_STATE2_SZ
++#define ICP_QAT_HW_SNOW_3G_UIA2_STATE2_SZ 24
++#define ICP_QAT_HW_ZUC_3G_EIA3_STATE2_SZ 32
++#define ICP_QAT_HW_GALOIS_H_SZ 16
++#define ICP_QAT_HW_GALOIS_LEN_A_SZ 8
++#define ICP_QAT_HW_GALOIS_E_CTR0_SZ 16
++
++struct icp_qat_hw_auth_sha512 {
++	struct icp_qat_hw_auth_setup inner_setup;
++	uint8_t state1[ICP_QAT_HW_SHA512_STATE1_SZ];
++	struct icp_qat_hw_auth_setup outer_setup;
++	uint8_t state2[ICP_QAT_HW_SHA512_STATE2_SZ];
++};
++
++struct icp_qat_hw_auth_algo_blk {
++	struct icp_qat_hw_auth_sha512 sha;
++};
++
++#define ICP_QAT_HW_GALOIS_LEN_A_BITPOS 0
++#define ICP_QAT_HW_GALOIS_LEN_A_MASK 0xFFFFFFFF
++
++enum icp_qat_hw_cipher_algo {
++	ICP_QAT_HW_CIPHER_ALGO_NULL = 0,
++	ICP_QAT_HW_CIPHER_ALGO_DES = 1,
++	ICP_QAT_HW_CIPHER_ALGO_3DES = 2,
++	ICP_QAT_HW_CIPHER_ALGO_AES128 = 3,
++	ICP_QAT_HW_CIPHER_ALGO_AES192 = 4,
++	ICP_QAT_HW_CIPHER_ALGO_AES256 = 5,
++	ICP_QAT_HW_CIPHER_ALGO_ARC4 = 6,
++	ICP_QAT_HW_CIPHER_ALGO_KASUMI = 7,
++	ICP_QAT_HW_CIPHER_ALGO_SNOW_3G_UEA2 = 8,
++	ICP_QAT_HW_CIPHER_ALGO_ZUC_3G_128_EEA3 = 9,
++	ICP_QAT_HW_CIPHER_DELIMITER = 10
++};
++
++enum icp_qat_hw_cipher_mode {
++	ICP_QAT_HW_CIPHER_ECB_MODE = 0,
++	ICP_QAT_HW_CIPHER_CBC_MODE = 1,
++	ICP_QAT_HW_CIPHER_CTR_MODE = 2,
++	ICP_QAT_HW_CIPHER_F8_MODE = 3,
++	ICP_QAT_HW_CIPHER_XTS_MODE = 6,
++	ICP_QAT_HW_CIPHER_MODE_DELIMITER = 7
++};
++
++struct icp_qat_hw_cipher_config {
++	uint32_t val;
++	uint32_t reserved;
++};
++
++enum icp_qat_hw_cipher_dir {
++	ICP_QAT_HW_CIPHER_ENCRYPT = 0,
++	ICP_QAT_HW_CIPHER_DECRYPT = 1,
++};
++
++enum icp_qat_hw_cipher_convert {
++	ICP_QAT_HW_CIPHER_NO_CONVERT = 0,
++	ICP_QAT_HW_CIPHER_KEY_CONVERT = 1,
++};
++
++#define QAT_CIPHER_MODE_BITPOS 4
++#define QAT_CIPHER_MODE_MASK 0xF
++#define QAT_CIPHER_ALGO_BITPOS 0
++#define QAT_CIPHER_ALGO_MASK 0xF
++#define QAT_CIPHER_CONVERT_BITPOS 9
++#define QAT_CIPHER_CONVERT_MASK 0x1
++#define QAT_CIPHER_DIR_BITPOS 8
++#define QAT_CIPHER_DIR_MASK 0x1
++#define QAT_CIPHER_MODE_F8_KEY_SZ_MULT 2
++#define QAT_CIPHER_MODE_XTS_KEY_SZ_MULT 2
++#define ICP_QAT_HW_CIPHER_CONFIG_BUILD(mode, algo, convert, dir) \
++	(((mode & QAT_CIPHER_MODE_MASK) << QAT_CIPHER_MODE_BITPOS) | \
++	((algo & QAT_CIPHER_ALGO_MASK) << QAT_CIPHER_ALGO_BITPOS) | \
++	((convert & QAT_CIPHER_CONVERT_MASK) << QAT_CIPHER_CONVERT_BITPOS) | \
++	((dir & QAT_CIPHER_DIR_MASK) << QAT_CIPHER_DIR_BITPOS))
++#define ICP_QAT_HW_DES_BLK_SZ 8
++#define ICP_QAT_HW_3DES_BLK_SZ 8
++#define ICP_QAT_HW_NULL_BLK_SZ 8
++#define ICP_QAT_HW_AES_BLK_SZ 16
++#define ICP_QAT_HW_KASUMI_BLK_SZ 8
++#define ICP_QAT_HW_SNOW_3G_BLK_SZ 8
++#define ICP_QAT_HW_ZUC_3G_BLK_SZ 8
++#define ICP_QAT_HW_NULL_KEY_SZ 256
++#define ICP_QAT_HW_DES_KEY_SZ 8
++#define ICP_QAT_HW_3DES_KEY_SZ 24
++#define ICP_QAT_HW_AES_128_KEY_SZ 16
++#define ICP_QAT_HW_AES_192_KEY_SZ 24
++#define ICP_QAT_HW_AES_256_KEY_SZ 32
++#define ICP_QAT_HW_AES_128_F8_KEY_SZ (ICP_QAT_HW_AES_128_KEY_SZ * \
++	QAT_CIPHER_MODE_F8_KEY_SZ_MULT)
++#define ICP_QAT_HW_AES_192_F8_KEY_SZ (ICP_QAT_HW_AES_192_KEY_SZ * \
++	QAT_CIPHER_MODE_F8_KEY_SZ_MULT)
++#define ICP_QAT_HW_AES_256_F8_KEY_SZ (ICP_QAT_HW_AES_256_KEY_SZ * \
++	QAT_CIPHER_MODE_F8_KEY_SZ_MULT)
++#define ICP_QAT_HW_AES_128_XTS_KEY_SZ (ICP_QAT_HW_AES_128_KEY_SZ * \
++	QAT_CIPHER_MODE_XTS_KEY_SZ_MULT)
++#define ICP_QAT_HW_AES_256_XTS_KEY_SZ (ICP_QAT_HW_AES_256_KEY_SZ * \
++	QAT_CIPHER_MODE_XTS_KEY_SZ_MULT)
++#define ICP_QAT_HW_KASUMI_KEY_SZ 16
++#define ICP_QAT_HW_KASUMI_F8_KEY_SZ (ICP_QAT_HW_KASUMI_KEY_SZ * \
++	QAT_CIPHER_MODE_F8_KEY_SZ_MULT)
++#define ICP_QAT_HW_AES_128_XTS_KEY_SZ (ICP_QAT_HW_AES_128_KEY_SZ * \
++	QAT_CIPHER_MODE_XTS_KEY_SZ_MULT)
++#define ICP_QAT_HW_AES_256_XTS_KEY_SZ (ICP_QAT_HW_AES_256_KEY_SZ * \
++	QAT_CIPHER_MODE_XTS_KEY_SZ_MULT)
++#define ICP_QAT_HW_ARC4_KEY_SZ 256
++#define ICP_QAT_HW_SNOW_3G_UEA2_KEY_SZ 16
++#define ICP_QAT_HW_SNOW_3G_UEA2_IV_SZ 16
++#define ICP_QAT_HW_ZUC_3G_EEA3_KEY_SZ 16
++#define ICP_QAT_HW_ZUC_3G_EEA3_IV_SZ 16
++#define ICP_QAT_HW_MODE_F8_NUM_REG_TO_CLEAR 2
++#define INIT_SHRAM_CONSTANTS_TABLE_SZ 1024
++
++struct icp_qat_hw_cipher_aes256_f8 {
++	struct icp_qat_hw_cipher_config cipher_config;
++	uint8_t key[ICP_QAT_HW_AES_256_F8_KEY_SZ];
++};
++
++struct icp_qat_hw_cipher_algo_blk {
++	struct icp_qat_hw_cipher_aes256_f8 aes;
++};
 +#endif
