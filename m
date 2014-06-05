@@ -1,55 +1,151 @@
-From: Amos Kong <akong@redhat.com>
-Subject: [PATCH] crypto/xor.c: use 2 pages for xor speed testing
-Date: Thu,  5 Jun 2014 09:11:33 +0800
-Message-ID: <1401930693-6549-1-git-send-email-akong@redhat.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, marex@denx.de
-To: linux-crypto@vger.kernel.org
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [RFC][PATCH 0/4 v3] crypto: Add support for Intel(R) QuickAssist
+Date: Wed, 04 Jun 2014 19:25:48 -0700
+Message-ID: <538FD52C.4070500@intel.com>
+References: <20140604225241.16944.94025.stgit@gitlad.jf.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:31701 "EHLO mx1.redhat.com"
+Received: from mga02.intel.com ([134.134.136.20]:38891 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751609AbaFEBLo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 Jun 2014 21:11:44 -0400
+	id S1751958AbaFEC21 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 4 Jun 2014 22:28:27 -0400
+In-Reply-To: <20140604225241.16944.94025.stgit@gitlad.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In crypto/xor.c: calibrate_xor_blocks(), we allocated total 4 pages to
-do xor speed testing, the BENCH_SIZE is 1 page, and we skipped 2 pages
-when we set b2.
+Hi,
+I just realized that patch 1 and 2 never made it to
+linux-crypto@vger.kernel.org.
+The reason is that vger.kernel.org blocks messages longer than 100 000
+characters.
+Both my patches were bigger. I need to brake it into more patches so
+version 4 will be sent out soon.
+Sorry for making so much noise.
+Regards,
+Tadeusz
 
-It seems that total 2 pages are enough without skipping 2 pages.
-
-Signed-off-by: Amos Kong <akong@redhat.com>
----
- crypto/xor.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/xor.c b/crypto/xor.c
-index 35d6b3a..609dfb5 100644
---- a/crypto/xor.c
-+++ b/crypto/xor.c
-@@ -114,12 +114,12 @@ calibrate_xor_blocks(void)
- 	 * test the XOR speed, we don't really want kmemcheck to warn about
- 	 * reading uninitialized bytes here.
- 	 */
--	b1 = (void *) __get_free_pages(GFP_KERNEL | __GFP_NOTRACK, 2);
-+	b1 = (void *) __get_free_pages(GFP_KERNEL | __GFP_NOTRACK, 1);
- 	if (!b1) {
- 		printk(KERN_WARNING "xor: Yikes!  No memory available.\n");
- 		return -ENOMEM;
- 	}
--	b2 = b1 + 2*PAGE_SIZE + BENCH_SIZE;
-+	b2 = b1 + BENCH_SIZE;
- 
- 	/*
- 	 * If this arch/cpu has a short-circuited selection, don't loop through
-@@ -154,7 +154,7 @@ calibrate_xor_blocks(void)
- #undef xor_speed
- 
-  out:
--	free_pages((unsigned long)b1, 2);
-+	free_pages((unsigned long)b1, 1);
- 
- 	active_template = fastest;
- 	return 0;
--- 
-1.9.3
+On 06/04/2014 03:53 PM, Tadeusz Struk wrote:
+> Hi,
+> This patchset adds support for Intel(R) QuickAssist Technology (QAT) and
+> DH895xCC hardware accelerator.
+> First patch adds a common infractructure that will be used by all QAT
+> devices.
+> Second patch adds a firmware loader module that is used to load the
+> microcode to the acceleration engines and start them.
+> Third patch adds dh895xcc hardware specific code, which hooks to the common
+> infrastructure and provides acceleration for
+> the following algorithms:
+> authenc(hmac(sha1),cbc(aes)), authenc(hmac(sha256),cbc(aes)),
+> authenc(hmac(sha512),cbc(aes))
+> Fourth patch updates makefiles etc.
+>
+> More info on the hardware accelerator and the Quick Assist Technology can
+> be found on:
+> https://01.org/packet-processing/intel%C2%AE-quickassist-technology-drivers-and-patches
+>
+> Acked-by: John Griffin <john.griffin@intel.com>
+> Acked-by: Bo Cui <bo.cui@intel.com>
+> Reviewed-by: Bruce W. Allan <bruce.w.allan@intel.com>
+> Signed-off-by: Karen Xiang <karen.xiang@intel.com>
+> Signed-off-by: Pingchaox Yang <pingchaox.yang@intel.com>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> ---
+>
+> Tadeusz Struk (4):
+> 	crypto: Intel(R) QAT driver framework
+>         crypto: Intel(R) QAT FW Loader
+>         crypto: Intel(R) QAT dh895xcc accelerator
+>         crypto: Update to makefiles
+>
+>  Documentation/ioctl/ioctl-number.txt               |    1 
+>  MAINTAINERS                                        |    6 
+>  drivers/crypto/Kconfig                             |    1 
+>  drivers/crypto/Makefile                            |    1 
+>  drivers/crypto/qat/Kconfig                         |   22 
+>  drivers/crypto/qat/Makefile                        |    2 
+>  drivers/crypto/qat/qat_common/Makefile             |   14 
+>  drivers/crypto/qat/qat_common/adf_accel_devices.h  |  204 +++
+>  drivers/crypto/qat/qat_common/adf_accel_engine.c   |  168 ++
+>  drivers/crypto/qat/qat_common/adf_aer.c            |  258 ++++
+>  drivers/crypto/qat/qat_common/adf_cfg.c            |  359 +++++
+>  drivers/crypto/qat/qat_common/adf_cfg.h            |   87 +
+>  drivers/crypto/qat/qat_common/adf_cfg_common.h     |  100 +
+>  drivers/crypto/qat/qat_common/adf_cfg_strings.h    |   83 +
+>  drivers/crypto/qat/qat_common/adf_cfg_user.h       |   94 +
+>  drivers/crypto/qat/qat_common/adf_common_drv.h     |  192 +++
+>  drivers/crypto/qat/qat_common/adf_ctl_drv.c        |  490 +++++++
+>  drivers/crypto/qat/qat_common/adf_dev_mgr.c        |  215 +++
+>  drivers/crypto/qat/qat_common/adf_init.c           |  388 ++++++
+>  drivers/crypto/qat/qat_common/adf_transport.c      |  565 ++++++++
+>  drivers/crypto/qat/qat_common/adf_transport.h      |   63 +
+>  .../qat/qat_common/adf_transport_access_macros.h   |  160 ++
+>  .../crypto/qat/qat_common/adf_transport_debug.c    |  301 ++++
+>  .../crypto/qat/qat_common/adf_transport_internal.h |  115 ++
+>  drivers/crypto/qat/qat_common/icp_qat_fw.h         |  316 +++++
+>  .../crypto/qat/qat_common/icp_qat_fw_init_admin.h  |  131 ++
+>  drivers/crypto/qat/qat_common/icp_qat_fw_la.h      |  403 ++++++
+>  .../qat/qat_common/icp_qat_fw_loader_handle.h      |   78 +
+>  drivers/crypto/qat/qat_common/icp_qat_hal.h        |  125 ++
+>  drivers/crypto/qat/qat_common/icp_qat_hw.h         |  305 ++++
+>  drivers/crypto/qat/qat_common/icp_qat_uclo.h       |  377 +++++
+>  drivers/crypto/qat/qat_common/qat_algs.c           | 1034 +++++++++++++++
+>  drivers/crypto/qat/qat_common/qat_crypto.c         |  284 ++++
+>  drivers/crypto/qat/qat_common/qat_crypto.h         |   83 +
+>  drivers/crypto/qat/qat_common/qat_hal.c            | 1402 ++++++++++++++++++++
+>  drivers/crypto/qat/qat_common/qat_uclo.c           | 1192 +++++++++++++++++
+>  drivers/crypto/qat/qat_dh895xcc/Makefile           |    8 
+>  drivers/crypto/qat/qat_dh895xcc/adf_admin.c        |  144 ++
+>  .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c |  214 +++
+>  .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |   86 +
+>  drivers/crypto/qat/qat_dh895xcc/adf_drv.c          |  448 ++++++
+>  drivers/crypto/qat/qat_dh895xcc/adf_drv.h          |   67 +
+>  drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c   |  159 ++
+>  drivers/crypto/qat/qat_dh895xcc/adf_isr.c          |  266 ++++
+>  drivers/crypto/qat/qat_dh895xcc/qat_admin.c        |  107 ++
+>  45 files changed, 11118 insertions(+)
+>  create mode 100644 drivers/crypto/qat/Kconfig
+>  create mode 100644 drivers/crypto/qat/Makefile
+>  create mode 100644 drivers/crypto/qat/qat_common/Makefile
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_accel_devices.h
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_accel_engine.c
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_aer.c
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_cfg.c
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_cfg.h
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_cfg_common.h
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_cfg_strings.h
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_cfg_user.h
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_common_drv.h
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_ctl_drv.c
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_dev_mgr.c
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_init.c
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_transport.c
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_transport.h
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_transport_access_macros.h
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_transport_debug.c
+>  create mode 100644 drivers/crypto/qat/qat_common/adf_transport_internal.h
+>  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw.h
+>  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
+>  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_la.h
+>  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h
+>  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hal.h
+>  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hw.h
+>  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_uclo.h
+>  create mode 100644 drivers/crypto/qat/qat_common/qat_algs.c
+>  create mode 100644 drivers/crypto/qat/qat_common/qat_crypto.c
+>  create mode 100644 drivers/crypto/qat/qat_common/qat_crypto.h
+>  create mode 100644 drivers/crypto/qat/qat_common/qat_hal.c
+>  create mode 100644 drivers/crypto/qat/qat_common/qat_uclo.c
+>  create mode 100644 drivers/crypto/qat/qat_dh895xcc/Makefile
+>  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_admin.c
+>  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
+>  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+>  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+>  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_drv.h
+>  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c
+>  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_isr.c
+>  create mode 100644 drivers/crypto/qat/qat_dh895xcc/qat_admin.c
+>
