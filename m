@@ -1,151 +1,199 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [RFC][PATCH 0/4 v3] crypto: Add support for Intel(R) QuickAssist
-Date: Wed, 04 Jun 2014 19:25:48 -0700
-Message-ID: <538FD52C.4070500@intel.com>
-References: <20140604225241.16944.94025.stgit@gitlad.jf.intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Update for 3.16
+Date: Thu, 5 Jun 2014 14:23:37 +0800
+Message-ID: <20140605062336.GA14440@gondor.apana.org.au>
+References: <20110724011752.GA14373@gondor.apana.org.au>
+ <20111031040952.GA19659@gondor.apana.org.au>
+ <20120106041250.GA7759@gondor.apana.org.au>
+ <20121004095357.GA11777@gondor.apana.org.au>
+ <20121214103156.GA5840@gondor.apana.org.au>
+ <20130223023331.GA11002@gondor.apana.org.au>
+ <20130907035544.GA22658@gondor.apana.org.au>
+ <20131107080131.GA32307@gondor.apana.org.au>
+ <20140123115319.GA20602@gondor.apana.org.au>
+ <20140401100001.GA12386@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:38891 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751958AbaFEC21 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 Jun 2014 22:28:27 -0400
-In-Reply-To: <20140604225241.16944.94025.stgit@gitlad.jf.intel.com>
+Received: from helcar.apana.org.au ([209.40.204.226]:57009 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750743AbaFEGXu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Jun 2014 02:23:50 -0400
+Content-Disposition: inline
+In-Reply-To: <20140401100001.GA12386@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-I just realized that patch 1 and 2 never made it to
-linux-crypto@vger.kernel.org.
-The reason is that vger.kernel.org blocks messages longer than 100 000
-characters.
-Both my patches were bigger. I need to brake it into more patches so
-version 4 will be sent out soon.
-Sorry for making so much noise.
-Regards,
-Tadeusz
+Hi Linus:
 
-On 06/04/2014 03:53 PM, Tadeusz Struk wrote:
-> Hi,
-> This patchset adds support for Intel(R) QuickAssist Technology (QAT) and
-> DH895xCC hardware accelerator.
-> First patch adds a common infractructure that will be used by all QAT
-> devices.
-> Second patch adds a firmware loader module that is used to load the
-> microcode to the acceleration engines and start them.
-> Third patch adds dh895xcc hardware specific code, which hooks to the common
-> infrastructure and provides acceleration for
-> the following algorithms:
-> authenc(hmac(sha1),cbc(aes)), authenc(hmac(sha256),cbc(aes)),
-> authenc(hmac(sha512),cbc(aes))
-> Fourth patch updates makefiles etc.
->
-> More info on the hardware accelerator and the Quick Assist Technology can
-> be found on:
-> https://01.org/packet-processing/intel%C2%AE-quickassist-technology-drivers-and-patches
->
-> Acked-by: John Griffin <john.griffin@intel.com>
-> Acked-by: Bo Cui <bo.cui@intel.com>
-> Reviewed-by: Bruce W. Allan <bruce.w.allan@intel.com>
-> Signed-off-by: Karen Xiang <karen.xiang@intel.com>
-> Signed-off-by: Pingchaox Yang <pingchaox.yang@intel.com>
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-> ---
->
-> Tadeusz Struk (4):
-> 	crypto: Intel(R) QAT driver framework
->         crypto: Intel(R) QAT FW Loader
->         crypto: Intel(R) QAT dh895xcc accelerator
->         crypto: Update to makefiles
->
->  Documentation/ioctl/ioctl-number.txt               |    1 
->  MAINTAINERS                                        |    6 
->  drivers/crypto/Kconfig                             |    1 
->  drivers/crypto/Makefile                            |    1 
->  drivers/crypto/qat/Kconfig                         |   22 
->  drivers/crypto/qat/Makefile                        |    2 
->  drivers/crypto/qat/qat_common/Makefile             |   14 
->  drivers/crypto/qat/qat_common/adf_accel_devices.h  |  204 +++
->  drivers/crypto/qat/qat_common/adf_accel_engine.c   |  168 ++
->  drivers/crypto/qat/qat_common/adf_aer.c            |  258 ++++
->  drivers/crypto/qat/qat_common/adf_cfg.c            |  359 +++++
->  drivers/crypto/qat/qat_common/adf_cfg.h            |   87 +
->  drivers/crypto/qat/qat_common/adf_cfg_common.h     |  100 +
->  drivers/crypto/qat/qat_common/adf_cfg_strings.h    |   83 +
->  drivers/crypto/qat/qat_common/adf_cfg_user.h       |   94 +
->  drivers/crypto/qat/qat_common/adf_common_drv.h     |  192 +++
->  drivers/crypto/qat/qat_common/adf_ctl_drv.c        |  490 +++++++
->  drivers/crypto/qat/qat_common/adf_dev_mgr.c        |  215 +++
->  drivers/crypto/qat/qat_common/adf_init.c           |  388 ++++++
->  drivers/crypto/qat/qat_common/adf_transport.c      |  565 ++++++++
->  drivers/crypto/qat/qat_common/adf_transport.h      |   63 +
->  .../qat/qat_common/adf_transport_access_macros.h   |  160 ++
->  .../crypto/qat/qat_common/adf_transport_debug.c    |  301 ++++
->  .../crypto/qat/qat_common/adf_transport_internal.h |  115 ++
->  drivers/crypto/qat/qat_common/icp_qat_fw.h         |  316 +++++
->  .../crypto/qat/qat_common/icp_qat_fw_init_admin.h  |  131 ++
->  drivers/crypto/qat/qat_common/icp_qat_fw_la.h      |  403 ++++++
->  .../qat/qat_common/icp_qat_fw_loader_handle.h      |   78 +
->  drivers/crypto/qat/qat_common/icp_qat_hal.h        |  125 ++
->  drivers/crypto/qat/qat_common/icp_qat_hw.h         |  305 ++++
->  drivers/crypto/qat/qat_common/icp_qat_uclo.h       |  377 +++++
->  drivers/crypto/qat/qat_common/qat_algs.c           | 1034 +++++++++++++++
->  drivers/crypto/qat/qat_common/qat_crypto.c         |  284 ++++
->  drivers/crypto/qat/qat_common/qat_crypto.h         |   83 +
->  drivers/crypto/qat/qat_common/qat_hal.c            | 1402 ++++++++++++++++++++
->  drivers/crypto/qat/qat_common/qat_uclo.c           | 1192 +++++++++++++++++
->  drivers/crypto/qat/qat_dh895xcc/Makefile           |    8 
->  drivers/crypto/qat/qat_dh895xcc/adf_admin.c        |  144 ++
->  .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c |  214 +++
->  .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |   86 +
->  drivers/crypto/qat/qat_dh895xcc/adf_drv.c          |  448 ++++++
->  drivers/crypto/qat/qat_dh895xcc/adf_drv.h          |   67 +
->  drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c   |  159 ++
->  drivers/crypto/qat/qat_dh895xcc/adf_isr.c          |  266 ++++
->  drivers/crypto/qat/qat_dh895xcc/qat_admin.c        |  107 ++
->  45 files changed, 11118 insertions(+)
->  create mode 100644 drivers/crypto/qat/Kconfig
->  create mode 100644 drivers/crypto/qat/Makefile
->  create mode 100644 drivers/crypto/qat/qat_common/Makefile
->  create mode 100644 drivers/crypto/qat/qat_common/adf_accel_devices.h
->  create mode 100644 drivers/crypto/qat/qat_common/adf_accel_engine.c
->  create mode 100644 drivers/crypto/qat/qat_common/adf_aer.c
->  create mode 100644 drivers/crypto/qat/qat_common/adf_cfg.c
->  create mode 100644 drivers/crypto/qat/qat_common/adf_cfg.h
->  create mode 100644 drivers/crypto/qat/qat_common/adf_cfg_common.h
->  create mode 100644 drivers/crypto/qat/qat_common/adf_cfg_strings.h
->  create mode 100644 drivers/crypto/qat/qat_common/adf_cfg_user.h
->  create mode 100644 drivers/crypto/qat/qat_common/adf_common_drv.h
->  create mode 100644 drivers/crypto/qat/qat_common/adf_ctl_drv.c
->  create mode 100644 drivers/crypto/qat/qat_common/adf_dev_mgr.c
->  create mode 100644 drivers/crypto/qat/qat_common/adf_init.c
->  create mode 100644 drivers/crypto/qat/qat_common/adf_transport.c
->  create mode 100644 drivers/crypto/qat/qat_common/adf_transport.h
->  create mode 100644 drivers/crypto/qat/qat_common/adf_transport_access_macros.h
->  create mode 100644 drivers/crypto/qat/qat_common/adf_transport_debug.c
->  create mode 100644 drivers/crypto/qat/qat_common/adf_transport_internal.h
->  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw.h
->  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
->  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_la.h
->  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_loader_handle.h
->  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hal.h
->  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hw.h
->  create mode 100644 drivers/crypto/qat/qat_common/icp_qat_uclo.h
->  create mode 100644 drivers/crypto/qat/qat_common/qat_algs.c
->  create mode 100644 drivers/crypto/qat/qat_common/qat_crypto.c
->  create mode 100644 drivers/crypto/qat/qat_common/qat_crypto.h
->  create mode 100644 drivers/crypto/qat/qat_common/qat_hal.c
->  create mode 100644 drivers/crypto/qat/qat_common/qat_uclo.c
->  create mode 100644 drivers/crypto/qat/qat_dh895xcc/Makefile
->  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_admin.c
->  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
->  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
->  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_drv.c
->  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_drv.h
->  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_hw_arbiter.c
->  create mode 100644 drivers/crypto/qat/qat_dh895xcc/adf_isr.c
->  create mode 100644 drivers/crypto/qat/qat_dh895xcc/qat_admin.c
->
+Here is the crypto update for 3.16:
+
+* Added test vectors for SHA/AES-CCM/DES-CBC/3DES-CBC.
+* Fixed a number of error-path memory leaks in tcrypt.
+* Fixed error-path memory leak in caam.
+* Removed unnecessary global mutex from mxs-dcp.
+* Added ahash walk interface that can actually be asynchronous.
+* Cleaned up caam error reporting.
+* Allow crypto_user get operation to be used by non-root users.
+* Add support for SSS module on Exynos.
+* Misc fixes.
+
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+
+
+Alexander Gordeev (1):
+      crypto: ccp - Use pci_enable_msix_range() instead of pci_enable_msix()
+
+Ard Biesheuvel (1):
+      crypto: testmgr - add test cases for SHA-1, SHA-224, SHA-256 and AES-CCM
+
+Arnd Bergmann (1):
+      crypto: s5p-sss - fix multiplatform build
+
+Christian Engelmayer (3):
+      crypto: tcrypt - Fix potential leak in test_aead_speed() if aad_size is too big
+      crypto: tcrypt - Fix potential leak in test_aead_speed() if crypto_alloc_aead() fails
+      crypto: tcrypt - Fix leak of struct aead_request in test_aead_speed()
+
+Fabio Estevam (1):
+      crypto: mxs-dcp - Remove global mutex
+
+Herbert Xu (2):
+      crypto: ghash-clmulni-intel - Use u128 instead of be128 for internal key
+      crypto: hash - Add real ahash walk interface
+
+Himangi Saraogi (1):
+      hwrng: n2-drv - Introduce the use of the managed version of kzalloc
+
+Horia Geanta (1):
+      crypto: caam - fix mem leak in ahash_setkey
+
+Jean Delvare (3):
+      hwrng: Move UML_RANDOM at the last position
+      hwrng: Turn HW_RANDOM into a menuconfig
+      hwrng: Fix a few driver dependencies and defaults
+
+Jingoo Han (3):
+      crypto: omap-des - use devm_ioremap_resource()
+      hwrng: omap - remove unnecessary OOM messages
+      hwrng: timeriomem - remove unnecessary OOM messages
+
+Jussi Kivilinna (1):
+      crypto: testmgr - add empty and large test vectors for SHA-1, SHA-224, SHA-256, SHA-384 and SHA-512
+
+Leilei Zhao (2):
+      crypto: atmel-aes - correct block size of cfb8 mode
+      crypto: atmel-aes - check alignment of cfb64 mode
+
+Marek Vasut (23):
+      crypto: caam - Contain caam_jr_strstatus() ugliness
+      crypto: caam - Pull all the error codes out
+      crypto: caam - Implement fast-path for error codes with no handler
+      crypto: caam - Pass error type into the functions
+      crypto: caam - Kill the easy targets
+      crypto: caam - Dissolve report_jump_idx()
+      crypto: caam - Clean up report_ccb_status()
+      crypto: caam - Clean up report_deco_status()
+      crypto: caam - Kill SPRINTFCAT() with fire
+      crypto: caam - Sweep the remnants
+      crypto: caam - Fix the 'quoted string split across lines'
+      crypto: geode - Kill AES_MIN_BLOCK_SIZE
+      crypto: geode - Kill AES_IV_LENGTH
+      crypto: geode - Consistently use AES_KEYSIZE_128
+      crypto: geode - Weed out printk() from probe()
+      crypto: geode - Don't use tfm->__crt_alg->cra_name directly
+      crypto: ccp - tfm->__crt_alg->cra_name directly
+      crypto: cesa - tfm->__crt_alg->cra_name directly
+      crypto: dcp - tfm->__crt_alg->cra_name directly
+      crypto: n2 - tfm->__crt_alg->cra_name directly
+      crypto: padlock - tfm->__crt_alg->cra_name directly
+      crypto: sahara - tfm->__crt_alg->cra_name directly
+      crypto: cesa - tfm->__crt_alg->cra_type directly
+
+Matthias-Christian Ott (1):
+      crypto: user - Allow CRYPTO_MSG_GETALG without CAP_NET_ADMIN
+
+Monam Agarwal (1):
+      crypto: nx - Use RCU_INIT_POINTER(x, NULL)
+
+Naveen Krishna Chatradhi (7):
+      crypto: s5p-sss - Use platform_get_irq() instead of _byname()
+      crypto: s5p-sss - Add device tree support
+      crypto: s5p-sss - Add support for SSS module on Exynos
+      crypto: s5p-sss - Let Exynos SoCs select SSS driver
+      crypto: s5p-sss - validate iv before memcpy
+      crypto: s5p-sss - Use clk_prepare/clk_unprepare
+      crypto: s5p-sss - Look for the next request in the queue
+
+Nishanth Menon (1):
+      crypto: omap-des - handle error of pm_runtime_get_sync
+
+Nitesh Lal (1):
+      crypto: testmgr - add aead cbc des, des3_ede tests
+
+Paul Bolle (1):
+      hwrng: picoxcell - remove unbuildable picoxcell TRNG
+
+Sonic Zhang (3):
+      crypto: bfin_crc - access crc registers by readl and writel functions
+      crypto: bfin_crc - ignore duplicated registration of the same algorithm
+      cryptoo: bfin_crc - avoid get physical address of coherence memory by dma_map_single
+
+Tadeusz Struk (1):
+      crypto: testmgr - Fix DMA-API warning
+
+Vakul Garg (1):
+      crypto: caam - reinitialize keys_fit_inline for decrypt and givencrypt
+
+ .../devicetree/bindings/crypto/samsung-sss.txt     |   34 +
+ arch/x86/crypto/ghash-clmulni-intel_asm.S          |    4 +-
+ arch/x86/crypto/ghash-clmulni-intel_glue.c         |   12 +-
+ crypto/ahash.c                                     |   41 +-
+ crypto/crypto_user.c                               |   12 +-
+ crypto/tcrypt.c                                    |   52 +-
+ crypto/testmgr.c                                   |  181 ++-
+ crypto/testmgr.h                                   | 1441 +++++++++++++++++++-
+ drivers/char/hw_random/Kconfig                     |  103 +-
+ drivers/char/hw_random/Makefile                    |    1 -
+ drivers/char/hw_random/n2-drv.c                    |   24 +-
+ drivers/char/hw_random/omap-rng.c                  |    4 +-
+ drivers/char/hw_random/picoxcell-rng.c             |  181 ---
+ drivers/char/hw_random/timeriomem-rng.c            |    4 +-
+ drivers/crypto/Kconfig                             |    6 +-
+ drivers/crypto/atmel-aes.c                         |    8 +-
+ drivers/crypto/bfin_crc.c                          |  103 +-
+ .../include/asm => drivers/crypto}/bfin_crc.h      |    0
+ drivers/crypto/caam/caamalg.c                      |   31 +-
+ drivers/crypto/caam/caamhash.c                     |   32 +-
+ drivers/crypto/caam/caamrng.c                      |    7 +-
+ drivers/crypto/caam/error.c                        |  389 +++---
+ drivers/crypto/caam/error.h                        |    2 +-
+ drivers/crypto/caam/key_gen.c                      |    7 +-
+ drivers/crypto/ccp/ccp-crypto-aes-xts.c            |    4 +-
+ drivers/crypto/ccp/ccp-pci.c                       |    7 +-
+ drivers/crypto/geode-aes.c                         |   28 +-
+ drivers/crypto/geode-aes.h                         |    6 +-
+ drivers/crypto/mv_cesa.c                           |    6 +-
+ drivers/crypto/mxs-dcp.c                           |   52 +-
+ drivers/crypto/n2_core.c                           |    4 +-
+ drivers/crypto/nx/nx-842.c                         |    4 +-
+ drivers/crypto/omap-des.c                          |   33 +-
+ drivers/crypto/padlock-sha.c                       |    2 +-
+ drivers/crypto/s5p-sss.c                           |  148 +-
+ drivers/crypto/sahara.c                            |    2 +-
+ include/crypto/internal/hash.h                     |   13 +
+ 37 files changed, 2245 insertions(+), 743 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
