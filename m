@@ -1,7 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [RFC][PATCH 3/8 v4] crypto: Intel(R) QAT FW interface
-Date: Thu, 05 Jun 2014 13:43:15 -0700
-Message-ID: <20140605204303.1400.69524.stgit@gitlad.jf.intel.com>
+Subject: [RFC][PATCH 4/8 v4] crypto: Intel(R) QAT crypto interface
+Date: Thu, 05 Jun 2014 13:43:32 -0700
+Message-ID: <20140605204320.1400.53649.stgit@gitlad.jf.intel.com>
 References: <20140605204133.1400.64237.stgit@gitlad.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -13,37 +13,35 @@ Cc: tadeusz.struk@intel.com, davem@davemloft.net,
 	linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:21515 "EHLO mga11.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:21562 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751651AbaFEUnS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Jun 2014 16:43:18 -0400
+	id S1751541AbaFEUnf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Jun 2014 16:43:35 -0400
 In-Reply-To: <20140605204133.1400.64237.stgit@gitlad.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds FW interface structure definitions.
+This patch adds qat crypto interface.
 
 Acked-by: John Griffin <john.griffin@intel.com>
 Reviewed-by: Bruce W. Allan <bruce.w.allan@intel.com>
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
 
- drivers/crypto/qat/qat_common/icp_qat_fw.h         |  316 ++++++++++++++++
- .../crypto/qat/qat_common/icp_qat_fw_init_admin.h  |  131 +++++++
- drivers/crypto/qat/qat_common/icp_qat_fw_la.h      |  403 ++++++++++++++++++++
- drivers/crypto/qat/qat_common/icp_qat_hw.h         |  305 +++++++++++++++
- 4 files changed, 1155 insertions(+)
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw.h
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_fw_la.h
- create mode 100644 drivers/crypto/qat/qat_common/icp_qat_hw.h
+ drivers/crypto/qat/qat_common/qat_algs.c   | 1034 ++++++++++++++++++++++++++++
+ drivers/crypto/qat/qat_common/qat_crypto.c |  284 ++++++++
+ drivers/crypto/qat/qat_common/qat_crypto.h |   83 ++
+ 3 files changed, 1401 insertions(+)
+ create mode 100644 drivers/crypto/qat/qat_common/qat_algs.c
+ create mode 100644 drivers/crypto/qat/qat_common/qat_crypto.c
+ create mode 100644 drivers/crypto/qat/qat_common/qat_crypto.h
 
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw.h b/drivers/crypto/qat/qat_common/icp_qat_fw.h
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
 new file mode 100644
-index 0000000..f1e30e2
+index 0000000..193b753
 --- /dev/null
-+++ b/drivers/crypto/qat/qat_common/icp_qat_fw.h
-@@ -0,0 +1,316 @@
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -0,0 +1,1034 @@
 +/*
 +  This file is provided under a dual BSD/GPLv2 license.  When using or
 +  redistributing this file, you may do so under either license.
@@ -90,828 +88,1000 @@ index 0000000..f1e30e2
 +  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 +  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 +*/
-+#ifndef _ICP_QAT_FW_H_
-+#define _ICP_QAT_FW_H_
-+#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/slab.h>
++#include <linux/crypto.h>
++#include <crypto/aead.h>
++#include <crypto/aes.h>
++#include <crypto/sha.h>
++#include <crypto/hash.h>
++#include <crypto/algapi.h>
++#include <crypto/authenc.h>
++#include <crypto/rng.h>
++#include <linux/dma-mapping.h>
++#include "adf_accel_devices.h"
++#include "adf_transport.h"
++#include "adf_common_drv.h"
++#include "qat_crypto.h"
 +#include "icp_qat_hw.h"
-+
-+#define QAT_FIELD_SET(flags, val, bitpos, mask) \
-+{ (flags) = (((flags) & (~((mask) << (bitpos)))) | \
-+		(((val) & (mask)) << (bitpos))) ; }
-+
-+#define QAT_FIELD_GET(flags, bitpos, mask) \
-+	(((flags) >> (bitpos)) & (mask))
-+
-+#define ICP_QAT_FW_REQ_DEFAULT_SZ 128
-+#define ICP_QAT_FW_RESP_DEFAULT_SZ 32
-+#define ICP_QAT_FW_COMN_ONE_BYTE_SHIFT 8
-+#define ICP_QAT_FW_COMN_SINGLE_BYTE_MASK 0xFF
-+#define ICP_QAT_FW_NUM_LONGWORDS_1 1
-+#define ICP_QAT_FW_NUM_LONGWORDS_2 2
-+#define ICP_QAT_FW_NUM_LONGWORDS_3 3
-+#define ICP_QAT_FW_NUM_LONGWORDS_4 4
-+#define ICP_QAT_FW_NUM_LONGWORDS_5 5
-+#define ICP_QAT_FW_NUM_LONGWORDS_6 6
-+#define ICP_QAT_FW_NUM_LONGWORDS_7 7
-+#define ICP_QAT_FW_NUM_LONGWORDS_10 10
-+#define ICP_QAT_FW_NUM_LONGWORDS_13 13
-+#define ICP_QAT_FW_NULL_REQ_SERV_ID 1
-+
-+enum icp_qat_fw_comn_resp_serv_id {
-+	ICP_QAT_FW_COMN_RESP_SERV_NULL,
-+	ICP_QAT_FW_COMN_RESP_SERV_CPM_FW,
-+	ICP_QAT_FW_COMN_RESP_SERV_DELIMITER
-+};
-+
-+enum icp_qat_fw_comn_request_id {
-+	ICP_QAT_FW_COMN_REQ_NULL = 0,
-+	ICP_QAT_FW_COMN_REQ_CPM_FW_PKE = 3,
-+	ICP_QAT_FW_COMN_REQ_CPM_FW_LA = 4,
-+	ICP_QAT_FW_COMN_REQ_CPM_FW_DMA = 7,
-+	ICP_QAT_FW_COMN_REQ_CPM_FW_COMP = 9,
-+	ICP_QAT_FW_COMN_REQ_DELIMITER
-+};
-+
-+struct icp_qat_fw_comn_req_hdr_cd_pars {
-+	union {
-+		struct {
-+			uint64_t content_desc_addr;
-+			uint16_t content_desc_resrvd1;
-+			uint8_t content_desc_params_sz;
-+			uint8_t content_desc_hdr_resrvd2;
-+			uint32_t content_desc_resrvd3;
-+		} s;
-+		struct {
-+			uint32_t serv_specif_fields[4];
-+		} s1;
-+	} u;
-+};
-+
-+struct icp_qat_fw_comn_req_mid {
-+	uint64_t opaque_data;
-+	uint64_t src_data_addr;
-+	uint64_t dest_data_addr;
-+	uint32_t src_length;
-+	uint32_t dst_length;
-+};
-+
-+struct icp_qat_fw_comn_req_cd_ctrl {
-+	uint32_t content_desc_ctrl_lw[ICP_QAT_FW_NUM_LONGWORDS_5];
-+};
-+
-+struct icp_qat_fw_comn_req_hdr {
-+	uint8_t resrvd1;
-+	uint8_t service_cmd_id;
-+	uint8_t service_type;
-+	uint8_t hdr_flags;
-+	uint16_t serv_specif_flags;
-+	uint16_t comn_req_flags;
-+};
-+
-+struct icp_qat_fw_comn_req_rqpars {
-+	uint32_t serv_specif_rqpars_lw[ICP_QAT_FW_NUM_LONGWORDS_13];
-+};
-+
-+struct icp_qat_fw_comn_req {
-+	struct icp_qat_fw_comn_req_hdr comn_hdr;
-+	struct icp_qat_fw_comn_req_hdr_cd_pars cd_pars;
-+	struct icp_qat_fw_comn_req_mid comn_mid;
-+	struct icp_qat_fw_comn_req_rqpars serv_specif_rqpars;
-+	struct icp_qat_fw_comn_req_cd_ctrl cd_ctrl;
-+};
-+
-+struct icp_qat_fw_comn_error {
-+	uint8_t xlat_err_code;
-+	uint8_t cmp_err_code;
-+};
-+
-+struct icp_qat_fw_comn_resp_hdr {
-+	uint8_t resrvd1;
-+	uint8_t service_id;
-+	uint8_t response_type;
-+	uint8_t hdr_flags;
-+	struct icp_qat_fw_comn_error comn_error;
-+	uint8_t comn_status;
-+	uint8_t cmd_id;
-+};
-+
-+struct icp_qat_fw_comn_resp {
-+	struct icp_qat_fw_comn_resp_hdr comn_hdr;
-+	uint64_t opaque_data;
-+	uint32_t resrvd[ICP_QAT_FW_NUM_LONGWORDS_4];
-+};
-+
-+#define ICP_QAT_FW_COMN_REQ_FLAG_SET 1
-+#define ICP_QAT_FW_COMN_REQ_FLAG_CLR 0
-+#define ICP_QAT_FW_COMN_VALID_FLAG_BITPOS 7
-+#define ICP_QAT_FW_COMN_VALID_FLAG_MASK 0x1
-+#define ICP_QAT_FW_COMN_HDR_RESRVD_FLD_MASK 0x7F
-+
-+#define ICP_QAT_FW_COMN_OV_SRV_TYPE_GET(icp_qat_fw_comn_req_hdr_t) \
-+	icp_qat_fw_comn_req_hdr_t.service_type
-+
-+#define ICP_QAT_FW_COMN_OV_SRV_TYPE_SET(icp_qat_fw_comn_req_hdr_t, val) \
-+	icp_qat_fw_comn_req_hdr_t.service_type = val
-+
-+#define ICP_QAT_FW_COMN_OV_SRV_CMD_ID_GET(icp_qat_fw_comn_req_hdr_t) \
-+	icp_qat_fw_comn_req_hdr_t.service_cmd_id
-+
-+#define ICP_QAT_FW_COMN_OV_SRV_CMD_ID_SET(icp_qat_fw_comn_req_hdr_t, val) \
-+	icp_qat_fw_comn_req_hdr_t.service_cmd_id = val
-+
-+#define ICP_QAT_FW_COMN_HDR_VALID_FLAG_GET(hdr_t) \
-+	ICP_QAT_FW_COMN_VALID_FLAG_GET(hdr_t.hdr_flags)
-+
-+#define ICP_QAT_FW_COMN_HDR_VALID_FLAG_SET(hdr_t, val) \
-+	ICP_QAT_FW_COMN_VALID_FLAG_SET(hdr_t, val)
-+
-+#define ICP_QAT_FW_COMN_VALID_FLAG_GET(hdr_flags) \
-+	QAT_FIELD_GET(hdr_flags, \
-+	ICP_QAT_FW_COMN_VALID_FLAG_BITPOS, \
-+	ICP_QAT_FW_COMN_VALID_FLAG_MASK)
-+
-+#define ICP_QAT_FW_COMN_HDR_RESRVD_FLD_GET(hdr_flags) \
-+	(hdr_flags & ICP_QAT_FW_COMN_HDR_RESRVD_FLD_MASK)
-+
-+#define ICP_QAT_FW_COMN_VALID_FLAG_SET(hdr_t, val) \
-+	QAT_FIELD_SET((hdr_t.hdr_flags), (val), \
-+	ICP_QAT_FW_COMN_VALID_FLAG_BITPOS, \
-+	ICP_QAT_FW_COMN_VALID_FLAG_MASK)
-+
-+#define ICP_QAT_FW_COMN_HDR_FLAGS_BUILD(valid) \
-+	(((valid) & ICP_QAT_FW_COMN_VALID_FLAG_MASK) << \
-+	 ICP_QAT_FW_COMN_VALID_FLAG_BITPOS)
-+
-+#define QAT_COMN_PTR_TYPE_BITPOS 0
-+#define QAT_COMN_PTR_TYPE_MASK 0x1
-+#define QAT_COMN_CD_FLD_TYPE_BITPOS 1
-+#define QAT_COMN_CD_FLD_TYPE_MASK 0x1
-+#define QAT_COMN_PTR_TYPE_FLAT 0x0
-+#define QAT_COMN_PTR_TYPE_SGL 0x1
-+#define QAT_COMN_CD_FLD_TYPE_64BIT_ADR 0x0
-+#define QAT_COMN_CD_FLD_TYPE_16BYTE_DATA 0x1
-+
-+#define ICP_QAT_FW_COMN_FLAGS_BUILD(cdt, ptr) \
-+	((((cdt) & QAT_COMN_CD_FLD_TYPE_MASK) << QAT_COMN_CD_FLD_TYPE_BITPOS) \
-+	 | (((ptr) & QAT_COMN_PTR_TYPE_MASK) << QAT_COMN_PTR_TYPE_BITPOS))
-+
-+#define ICP_QAT_FW_COMN_PTR_TYPE_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_COMN_PTR_TYPE_BITPOS, QAT_COMN_PTR_TYPE_MASK)
-+
-+#define ICP_QAT_FW_COMN_CD_FLD_TYPE_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_COMN_CD_FLD_TYPE_BITPOS, \
-+			QAT_COMN_CD_FLD_TYPE_MASK)
-+
-+#define ICP_QAT_FW_COMN_PTR_TYPE_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_COMN_PTR_TYPE_BITPOS, \
-+			QAT_COMN_PTR_TYPE_MASK)
-+
-+#define ICP_QAT_FW_COMN_CD_FLD_TYPE_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_COMN_CD_FLD_TYPE_BITPOS, \
-+			QAT_COMN_CD_FLD_TYPE_MASK)
-+
-+#define ICP_QAT_FW_COMN_NEXT_ID_BITPOS 4
-+#define ICP_QAT_FW_COMN_NEXT_ID_MASK 0xF0
-+#define ICP_QAT_FW_COMN_CURR_ID_BITPOS 0
-+#define ICP_QAT_FW_COMN_CURR_ID_MASK 0x0F
-+
-+#define ICP_QAT_FW_COMN_NEXT_ID_GET(cd_ctrl_hdr_t) \
-+	((((cd_ctrl_hdr_t)->next_curr_id) & ICP_QAT_FW_COMN_NEXT_ID_MASK) \
-+	>> (ICP_QAT_FW_COMN_NEXT_ID_BITPOS))
-+
-+#define ICP_QAT_FW_COMN_NEXT_ID_SET(cd_ctrl_hdr_t, val) \
-+	{ ((cd_ctrl_hdr_t)->next_curr_id) = ((((cd_ctrl_hdr_t)->next_curr_id) \
-+	& ICP_QAT_FW_COMN_CURR_ID_MASK) | \
-+	((val << ICP_QAT_FW_COMN_NEXT_ID_BITPOS) \
-+	 & ICP_QAT_FW_COMN_NEXT_ID_MASK)); }
-+
-+#define ICP_QAT_FW_COMN_CURR_ID_GET(cd_ctrl_hdr_t) \
-+	(((cd_ctrl_hdr_t)->next_curr_id) & ICP_QAT_FW_COMN_CURR_ID_MASK)
-+
-+#define ICP_QAT_FW_COMN_CURR_ID_SET(cd_ctrl_hdr_t, val) \
-+	{ ((cd_ctrl_hdr_t)->next_curr_id) = ((((cd_ctrl_hdr_t)->next_curr_id) \
-+	& ICP_QAT_FW_COMN_NEXT_ID_MASK) | \
-+	((val) & ICP_QAT_FW_COMN_CURR_ID_MASK)); }
-+
-+#define QAT_COMN_RESP_CRYPTO_STATUS_BITPOS 7
-+#define QAT_COMN_RESP_CRYPTO_STATUS_MASK 0x1
-+#define QAT_COMN_RESP_CMP_STATUS_BITPOS 5
-+#define QAT_COMN_RESP_CMP_STATUS_MASK 0x1
-+#define QAT_COMN_RESP_XLAT_STATUS_BITPOS 4
-+#define QAT_COMN_RESP_XLAT_STATUS_MASK 0x1
-+#define QAT_COMN_RESP_CMP_END_OF_LAST_BLK_BITPOS 3
-+#define QAT_COMN_RESP_CMP_END_OF_LAST_BLK_MASK 0x1
-+
-+#define ICP_QAT_FW_COMN_RESP_STATUS_BUILD(crypto, comp, xlat, eolb) \
-+	((((crypto) & QAT_COMN_RESP_CRYPTO_STATUS_MASK) << \
-+	QAT_COMN_RESP_CRYPTO_STATUS_BITPOS) | \
-+	(((comp) & QAT_COMN_RESP_CMP_STATUS_MASK) << \
-+	QAT_COMN_RESP_CMP_STATUS_BITPOS) | \
-+	(((xlat) & QAT_COMN_RESP_XLAT_STATUS_MASK) << \
-+	QAT_COMN_RESP_XLAT_STATUS_BITPOS) | \
-+	(((eolb) & QAT_COMN_RESP_CMP_END_OF_LAST_BLK_MASK) << \
-+	QAT_COMN_RESP_CMP_END_OF_LAST_BLK_BITPOS))
-+
-+#define ICP_QAT_FW_COMN_RESP_CRYPTO_STAT_GET(status) \
-+	QAT_FIELD_GET(status, QAT_COMN_RESP_CRYPTO_STATUS_BITPOS, \
-+	QAT_COMN_RESP_CRYPTO_STATUS_MASK)
-+
-+#define ICP_QAT_FW_COMN_RESP_CMP_STAT_GET(status) \
-+	QAT_FIELD_GET(status, QAT_COMN_RESP_CMP_STATUS_BITPOS, \
-+	QAT_COMN_RESP_CMP_STATUS_MASK)
-+
-+#define ICP_QAT_FW_COMN_RESP_XLAT_STAT_GET(status) \
-+	QAT_FIELD_GET(status, QAT_COMN_RESP_XLAT_STATUS_BITPOS, \
-+	QAT_COMN_RESP_XLAT_STATUS_MASK)
-+
-+#define ICP_QAT_FW_COMN_RESP_CMP_END_OF_LAST_BLK_FLAG_GET(status) \
-+	QAT_FIELD_GET(status, QAT_COMN_RESP_CMP_END_OF_LAST_BLK_BITPOS, \
-+	QAT_COMN_RESP_CMP_END_OF_LAST_BLK_MASK)
-+
-+#define ICP_QAT_FW_COMN_STATUS_FLAG_OK 0
-+#define ICP_QAT_FW_COMN_STATUS_FLAG_ERROR 1
-+#define ICP_QAT_FW_COMN_STATUS_CMP_END_OF_LAST_BLK_FLAG_CLR 0
-+#define ICP_QAT_FW_COMN_STATUS_CMP_END_OF_LAST_BLK_FLAG_SET 1
-+#define ERR_CODE_NO_ERROR 0
-+#define ERR_CODE_INVALID_BLOCK_TYPE -1
-+#define ERR_CODE_NO_MATCH_ONES_COMP -2
-+#define ERR_CODE_TOO_MANY_LEN_OR_DIS -3
-+#define ERR_CODE_INCOMPLETE_LEN -4
-+#define ERR_CODE_RPT_LEN_NO_FIRST_LEN -5
-+#define ERR_CODE_RPT_GT_SPEC_LEN -6
-+#define ERR_CODE_INV_LIT_LEN_CODE_LEN -7
-+#define ERR_CODE_INV_DIS_CODE_LEN -8
-+#define ERR_CODE_INV_LIT_LEN_DIS_IN_BLK -9
-+#define ERR_CODE_DIS_TOO_FAR_BACK -10
-+#define ERR_CODE_OVERFLOW_ERROR -11
-+#define ERR_CODE_SOFT_ERROR -12
-+#define ERR_CODE_FATAL_ERROR -13
-+#define ERR_CODE_SSM_ERROR -14
-+#define ERR_CODE_ENDPOINT_ERROR -15
-+
-+enum icp_qat_fw_slice {
-+	ICP_QAT_FW_SLICE_NULL = 0,
-+	ICP_QAT_FW_SLICE_CIPHER = 1,
-+	ICP_QAT_FW_SLICE_AUTH = 2,
-+	ICP_QAT_FW_SLICE_DRAM_RD = 3,
-+	ICP_QAT_FW_SLICE_DRAM_WR = 4,
-+	ICP_QAT_FW_SLICE_COMP = 5,
-+	ICP_QAT_FW_SLICE_XLAT = 6,
-+	ICP_QAT_FW_SLICE_DELIMITER
-+};
-+#endif
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h b/drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
-new file mode 100644
-index 0000000..72a59fa
---- /dev/null
-+++ b/drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
-@@ -0,0 +1,131 @@
-+/*
-+  This file is provided under a dual BSD/GPLv2 license.  When using or
-+  redistributing this file, you may do so under either license.
-+
-+  GPL LICENSE SUMMARY
-+  Copyright(c) 2014 Intel Corporation.
-+  This program is free software; you can redistribute it and/or modify
-+  it under the terms of version 2 of the GNU General Public License as
-+  published by the Free Software Foundation.
-+
-+  This program is distributed in the hope that it will be useful, but
-+  WITHOUT ANY WARRANTY; without even the implied warranty of
-+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+  General Public License for more details.
-+
-+  Contact Information:
-+  qat-linux@intel.com
-+
-+  BSD LICENSE
-+  Copyright(c) 2014 Intel Corporation.
-+  Redistribution and use in source and binary forms, with or without
-+  modification, are permitted provided that the following conditions
-+  are met:
-+
-+    * Redistributions of source code must retain the above copyright
-+      notice, this list of conditions and the following disclaimer.
-+    * Redistributions in binary form must reproduce the above copyright
-+      notice, this list of conditions and the following disclaimer in
-+      the documentation and/or other materials provided with the
-+      distribution.
-+    * Neither the name of Intel Corporation nor the names of its
-+      contributors may be used to endorse or promote products derived
-+      from this software without specific prior written permission.
-+
-+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+*/
-+#ifndef _ICP_QAT_FW_INIT_ADMIN_H_
-+#define _ICP_QAT_FW_INIT_ADMIN_H_
-+
 +#include "icp_qat_fw.h"
++#include "icp_qat_fw_la.h"
 +
-+enum icp_qat_fw_init_admin_cmd_id {
-+	ICP_QAT_FW_INIT_ME = 0,
-+	ICP_QAT_FW_TRNG_ENABLE = 1,
-+	ICP_QAT_FW_TRNG_DISABLE = 2,
-+	ICP_QAT_FW_CONSTANTS_CFG = 3,
-+	ICP_QAT_FW_STATUS_GET = 4,
-+	ICP_QAT_FW_COUNTERS_GET = 5,
-+	ICP_QAT_FW_LOOPBACK = 6,
-+	ICP_QAT_FW_HEARTBEAT_SYNC = 7,
-+	ICP_QAT_FW_HEARTBEAT_GET = 8
-+};
++#define QAT_AES_HW_CONFIG_ENC(alg) \
++	ICP_QAT_HW_CIPHER_CONFIG_BUILD(ICP_QAT_HW_CIPHER_CBC_MODE, alg, \
++			ICP_QAT_HW_CIPHER_NO_CONVERT, \
++			ICP_QAT_HW_CIPHER_ENCRYPT)
 +
-+enum icp_qat_fw_init_admin_resp_status {
-+	ICP_QAT_FW_INIT_RESP_STATUS_SUCCESS = 0,
-+	ICP_QAT_FW_INIT_RESP_STATUS_FAIL
-+};
++#define QAT_AES_HW_CONFIG_DEC(alg) \
++	ICP_QAT_HW_CIPHER_CONFIG_BUILD(ICP_QAT_HW_CIPHER_CBC_MODE, alg, \
++			ICP_QAT_HW_CIPHER_KEY_CONVERT, \
++			ICP_QAT_HW_CIPHER_DECRYPT)
 +
-+struct icp_qat_fw_init_admin_req {
-+	uint16_t init_cfg_sz;
-+	uint8_t resrvd1;
-+	uint8_t init_admin_cmd_id;
-+	uint32_t resrvd2;
-+	uint64_t opaque_data;
-+	uint64_t init_cfg_ptr;
-+	uint64_t resrvd3;
-+};
++static atomic_t active_dev;
 +
-+struct icp_qat_fw_init_admin_resp_hdr {
-+	uint8_t flags;
-+	uint8_t resrvd1;
-+	uint8_t status;
-+	uint8_t init_admin_cmd_id;
-+};
-+
-+struct icp_qat_fw_init_admin_resp_pars {
-+	union {
-+		uint32_t resrvd1[ICP_QAT_FW_NUM_LONGWORDS_4];
-+		struct {
-+			uint32_t version_patch_num;
-+			uint8_t context_id;
-+			uint8_t ae_id;
-+			uint16_t resrvd1;
-+			uint64_t resrvd2;
-+		} s1;
-+		struct {
-+			uint64_t req_rec_count;
-+			uint64_t resp_sent_count;
-+		} s2;
-+	} u;
-+};
-+
-+struct icp_qat_fw_init_admin_resp {
-+	struct icp_qat_fw_init_admin_resp_hdr init_resp_hdr;
-+	union {
-+		uint32_t resrvd2;
-+		struct {
-+			uint16_t version_minor_num;
-+			uint16_t version_major_num;
-+		} s;
-+	} u;
-+	uint64_t opaque_data;
-+	struct icp_qat_fw_init_admin_resp_pars init_resp_pars;
-+};
-+
-+#define ICP_QAT_FW_COMN_HEARTBEAT_OK 0
-+#define ICP_QAT_FW_COMN_HEARTBEAT_BLOCKED 1
-+#define ICP_QAT_FW_COMN_HEARTBEAT_FLAG_BITPOS 0
-+#define ICP_QAT_FW_COMN_HEARTBEAT_FLAG_MASK 0x1
-+#define ICP_QAT_FW_COMN_STATUS_RESRVD_FLD_MASK 0xFE
-+#define ICP_QAT_FW_COMN_HEARTBEAT_HDR_FLAG_GET(hdr_t) \
-+	ICP_QAT_FW_COMN_HEARTBEAT_FLAG_GET(hdr_t.flags)
-+
-+#define ICP_QAT_FW_COMN_HEARTBEAT_HDR_FLAG_SET(hdr_t, val) \
-+	ICP_QAT_FW_COMN_HEARTBEAT_FLAG_SET(hdr_t, val)
-+
-+#define ICP_QAT_FW_COMN_HEARTBEAT_FLAG_GET(flags) \
-+	QAT_FIELD_GET(flags, \
-+		 ICP_QAT_FW_COMN_HEARTBEAT_FLAG_BITPOS, \
-+		 ICP_QAT_FW_COMN_HEARTBEAT_FLAG_MASK)
-+#endif
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw_la.h b/drivers/crypto/qat/qat_common/icp_qat_fw_la.h
-new file mode 100644
-index 0000000..d1d4802
---- /dev/null
-+++ b/drivers/crypto/qat/qat_common/icp_qat_fw_la.h
-@@ -0,0 +1,403 @@
-+/*
-+  This file is provided under a dual BSD/GPLv2 license.  When using or
-+  redistributing this file, you may do so under either license.
-+
-+  GPL LICENSE SUMMARY
-+  Copyright(c) 2014 Intel Corporation.
-+  This program is free software; you can redistribute it and/or modify
-+  it under the terms of version 2 of the GNU General Public License as
-+  published by the Free Software Foundation.
-+
-+  This program is distributed in the hope that it will be useful, but
-+  WITHOUT ANY WARRANTY; without even the implied warranty of
-+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+  General Public License for more details.
-+
-+  Contact Information:
-+  qat-linux@intel.com
-+
-+  BSD LICENSE
-+  Copyright(c) 2014 Intel Corporation.
-+  Redistribution and use in source and binary forms, with or without
-+  modification, are permitted provided that the following conditions
-+  are met:
-+
-+    * Redistributions of source code must retain the above copyright
-+      notice, this list of conditions and the following disclaimer.
-+    * Redistributions in binary form must reproduce the above copyright
-+      notice, this list of conditions and the following disclaimer in
-+      the documentation and/or other materials provided with the
-+      distribution.
-+    * Neither the name of Intel Corporation nor the names of its
-+      contributors may be used to endorse or promote products derived
-+      from this software without specific prior written permission.
-+
-+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+*/
-+#ifndef _ICP_QAT_FW_LA_H_
-+#define _ICP_QAT_FW_LA_H_
-+#include "icp_qat_fw.h"
-+
-+enum icp_qat_fw_la_cmd_id {
-+	ICP_QAT_FW_LA_CMD_CIPHER = 0,
-+	ICP_QAT_FW_LA_CMD_AUTH = 1,
-+	ICP_QAT_FW_LA_CMD_CIPHER_HASH = 2,
-+	ICP_QAT_FW_LA_CMD_HASH_CIPHER = 3,
-+	ICP_QAT_FW_LA_CMD_TRNG_GET_RANDOM = 4,
-+	ICP_QAT_FW_LA_CMD_TRNG_TEST = 5,
-+	ICP_QAT_FW_LA_CMD_SSL3_KEY_DERIVE = 6,
-+	ICP_QAT_FW_LA_CMD_TLS_V1_1_KEY_DERIVE = 7,
-+	ICP_QAT_FW_LA_CMD_TLS_V1_2_KEY_DERIVE = 8,
-+	ICP_QAT_FW_LA_CMD_MGF1 = 9,
-+	ICP_QAT_FW_LA_CMD_AUTH_PRE_COMP = 10,
-+	ICP_QAT_FW_LA_CMD_CIPHER_PRE_COMP = 11,
-+	ICP_QAT_FW_LA_CMD_DELIMITER = 12
-+};
-+
-+#define ICP_QAT_FW_LA_ICV_VER_STATUS_PASS ICP_QAT_FW_COMN_STATUS_FLAG_OK
-+#define ICP_QAT_FW_LA_ICV_VER_STATUS_FAIL ICP_QAT_FW_COMN_STATUS_FLAG_ERROR
-+#define ICP_QAT_FW_LA_TRNG_STATUS_PASS ICP_QAT_FW_COMN_STATUS_FLAG_OK
-+#define ICP_QAT_FW_LA_TRNG_STATUS_FAIL ICP_QAT_FW_COMN_STATUS_FLAG_ERROR
-+
-+struct icp_qat_fw_la_bulk_req {
-+	struct icp_qat_fw_comn_req_hdr comn_hdr;
-+	struct icp_qat_fw_comn_req_hdr_cd_pars cd_pars;
-+	struct icp_qat_fw_comn_req_mid comn_mid;
-+	struct icp_qat_fw_comn_req_rqpars serv_specif_rqpars;
-+	struct icp_qat_fw_comn_req_cd_ctrl cd_ctrl;
-+};
-+
-+#define ICP_QAT_FW_LA_GCM_IV_LEN_12_OCTETS 1
-+#define ICP_QAT_FW_LA_GCM_IV_LEN_NOT_12_OCTETS 0
-+#define QAT_FW_LA_ZUC_3G_PROTO_FLAG_BITPOS 12
-+#define ICP_QAT_FW_LA_ZUC_3G_PROTO 1
-+#define QAT_FW_LA_ZUC_3G_PROTO_FLAG_MASK 0x1
-+#define QAT_LA_GCM_IV_LEN_FLAG_BITPOS 11
-+#define QAT_LA_GCM_IV_LEN_FLAG_MASK 0x1
-+#define ICP_QAT_FW_LA_DIGEST_IN_BUFFER 1
-+#define ICP_QAT_FW_LA_NO_DIGEST_IN_BUFFER 0
-+#define QAT_LA_DIGEST_IN_BUFFER_BITPOS	10
-+#define QAT_LA_DIGEST_IN_BUFFER_MASK 0x1
-+#define ICP_QAT_FW_LA_SNOW_3G_PROTO 4
-+#define ICP_QAT_FW_LA_GCM_PROTO	2
-+#define ICP_QAT_FW_LA_CCM_PROTO	1
-+#define ICP_QAT_FW_LA_NO_PROTO 0
-+#define QAT_LA_PROTO_BITPOS 7
-+#define QAT_LA_PROTO_MASK 0x7
-+#define ICP_QAT_FW_LA_CMP_AUTH_RES 1
-+#define ICP_QAT_FW_LA_NO_CMP_AUTH_RES 0
-+#define QAT_LA_CMP_AUTH_RES_BITPOS 6
-+#define QAT_LA_CMP_AUTH_RES_MASK 0x1
-+#define ICP_QAT_FW_LA_RET_AUTH_RES 1
-+#define ICP_QAT_FW_LA_NO_RET_AUTH_RES 0
-+#define QAT_LA_RET_AUTH_RES_BITPOS 5
-+#define QAT_LA_RET_AUTH_RES_MASK 0x1
-+#define ICP_QAT_FW_LA_UPDATE_STATE 1
-+#define ICP_QAT_FW_LA_NO_UPDATE_STATE 0
-+#define QAT_LA_UPDATE_STATE_BITPOS 4
-+#define QAT_LA_UPDATE_STATE_MASK 0x1
-+#define ICP_QAT_FW_CIPH_AUTH_CFG_OFFSET_IN_CD_SETUP 0
-+#define ICP_QAT_FW_CIPH_AUTH_CFG_OFFSET_IN_SHRAM_CP 1
-+#define QAT_LA_CIPH_AUTH_CFG_OFFSET_BITPOS 3
-+#define QAT_LA_CIPH_AUTH_CFG_OFFSET_MASK 0x1
-+#define ICP_QAT_FW_CIPH_IV_64BIT_PTR 0
-+#define ICP_QAT_FW_CIPH_IV_16BYTE_DATA 1
-+#define QAT_LA_CIPH_IV_FLD_BITPOS 2
-+#define QAT_LA_CIPH_IV_FLD_MASK   0x1
-+#define ICP_QAT_FW_LA_PARTIAL_NONE 0
-+#define ICP_QAT_FW_LA_PARTIAL_START 1
-+#define ICP_QAT_FW_LA_PARTIAL_MID 3
-+#define ICP_QAT_FW_LA_PARTIAL_END 2
-+#define QAT_LA_PARTIAL_BITPOS 0
-+#define QAT_LA_PARTIAL_MASK 0x3
-+#define ICP_QAT_FW_LA_FLAGS_BUILD(zuc_proto, gcm_iv_len, auth_rslt, proto, \
-+	cmp_auth, ret_auth, update_state, \
-+	ciph_iv, ciphcfg, partial) \
-+	(((zuc_proto & QAT_FW_LA_ZUC_3G_PROTO_FLAG_MASK) << \
-+	QAT_FW_LA_ZUC_3G_PROTO_FLAG_BITPOS) | \
-+	((gcm_iv_len & QAT_LA_GCM_IV_LEN_FLAG_MASK) << \
-+	QAT_LA_GCM_IV_LEN_FLAG_BITPOS) | \
-+	((auth_rslt & QAT_LA_DIGEST_IN_BUFFER_MASK) << \
-+	QAT_LA_DIGEST_IN_BUFFER_BITPOS) | \
-+	((proto & QAT_LA_PROTO_MASK) << \
-+	QAT_LA_PROTO_BITPOS)	| \
-+	((cmp_auth & QAT_LA_CMP_AUTH_RES_MASK) << \
-+	QAT_LA_CMP_AUTH_RES_BITPOS) | \
-+	((ret_auth & QAT_LA_RET_AUTH_RES_MASK) << \
-+	QAT_LA_RET_AUTH_RES_BITPOS) | \
-+	((update_state & QAT_LA_UPDATE_STATE_MASK) << \
-+	QAT_LA_UPDATE_STATE_BITPOS) | \
-+	((ciph_iv & QAT_LA_CIPH_IV_FLD_MASK) << \
-+	QAT_LA_CIPH_IV_FLD_BITPOS) | \
-+	((ciphcfg & QAT_LA_CIPH_AUTH_CFG_OFFSET_MASK) << \
-+	QAT_LA_CIPH_AUTH_CFG_OFFSET_BITPOS) | \
-+	((partial & QAT_LA_PARTIAL_MASK) << \
-+	QAT_LA_PARTIAL_BITPOS))
-+
-+#define ICP_QAT_FW_LA_CIPH_IV_FLD_FLAG_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_LA_CIPH_IV_FLD_BITPOS, \
-+	QAT_LA_CIPH_IV_FLD_MASK)
-+
-+#define ICP_QAT_FW_LA_CIPH_AUTH_CFG_OFFSET_FLAG_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_LA_CIPH_AUTH_CFG_OFFSET_BITPOS, \
-+	QAT_LA_CIPH_AUTH_CFG_OFFSET_MASK)
-+
-+#define ICP_QAT_FW_LA_ZUC_3G_PROTO_FLAG_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_FW_LA_ZUC_3G_PROTO_FLAG_BITPOS, \
-+	QAT_FW_LA_ZUC_3G_PROTO_FLAG_MASK)
-+
-+#define ICP_QAT_FW_LA_GCM_IV_LEN_FLAG_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_LA_GCM_IV_LEN_FLAG_BITPOS, \
-+	QAT_LA_GCM_IV_LEN_FLAG_MASK)
-+
-+#define ICP_QAT_FW_LA_PROTO_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_LA_PROTO_BITPOS, QAT_LA_PROTO_MASK)
-+
-+#define ICP_QAT_FW_LA_CMP_AUTH_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_LA_CMP_AUTH_RES_BITPOS, \
-+	QAT_LA_CMP_AUTH_RES_MASK)
-+
-+#define ICP_QAT_FW_LA_RET_AUTH_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_LA_RET_AUTH_RES_BITPOS, \
-+	QAT_LA_RET_AUTH_RES_MASK)
-+
-+#define ICP_QAT_FW_LA_DIGEST_IN_BUFFER_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_LA_DIGEST_IN_BUFFER_BITPOS, \
-+	QAT_LA_DIGEST_IN_BUFFER_MASK)
-+
-+#define ICP_QAT_FW_LA_UPDATE_STATE_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_LA_UPDATE_STATE_BITPOS, \
-+	QAT_LA_UPDATE_STATE_MASK)
-+
-+#define ICP_QAT_FW_LA_PARTIAL_GET(flags) \
-+	QAT_FIELD_GET(flags, QAT_LA_PARTIAL_BITPOS, \
-+	QAT_LA_PARTIAL_MASK)
-+
-+#define ICP_QAT_FW_LA_CIPH_IV_FLD_FLAG_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_LA_CIPH_IV_FLD_BITPOS, \
-+	QAT_LA_CIPH_IV_FLD_MASK)
-+
-+#define ICP_QAT_FW_LA_CIPH_AUTH_CFG_OFFSET_FLAG_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_LA_CIPH_AUTH_CFG_OFFSET_BITPOS, \
-+	QAT_LA_CIPH_AUTH_CFG_OFFSET_MASK)
-+
-+#define ICP_QAT_FW_LA_ZUC_3G_PROTO_FLAG_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_FW_LA_ZUC_3G_PROTO_FLAG_BITPOS, \
-+	QAT_FW_LA_ZUC_3G_PROTO_FLAG_MASK)
-+
-+#define ICP_QAT_FW_LA_GCM_IV_LEN_FLAG_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_LA_GCM_IV_LEN_FLAG_BITPOS, \
-+	QAT_LA_GCM_IV_LEN_FLAG_MASK)
-+
-+#define ICP_QAT_FW_LA_PROTO_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_LA_PROTO_BITPOS, \
-+	QAT_LA_PROTO_MASK)
-+
-+#define ICP_QAT_FW_LA_CMP_AUTH_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_LA_CMP_AUTH_RES_BITPOS, \
-+	QAT_LA_CMP_AUTH_RES_MASK)
-+
-+#define ICP_QAT_FW_LA_RET_AUTH_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_LA_RET_AUTH_RES_BITPOS, \
-+	QAT_LA_RET_AUTH_RES_MASK)
-+
-+#define ICP_QAT_FW_LA_DIGEST_IN_BUFFER_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_LA_DIGEST_IN_BUFFER_BITPOS, \
-+	QAT_LA_DIGEST_IN_BUFFER_MASK)
-+
-+#define ICP_QAT_FW_LA_UPDATE_STATE_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_LA_UPDATE_STATE_BITPOS, \
-+	QAT_LA_UPDATE_STATE_MASK)
-+
-+#define ICP_QAT_FW_LA_PARTIAL_SET(flags, val) \
-+	QAT_FIELD_SET(flags, val, QAT_LA_PARTIAL_BITPOS, \
-+	QAT_LA_PARTIAL_MASK)
-+
-+struct icp_qat_fw_cipher_req_hdr_cd_pars {
-+	union {
-+		struct {
-+			uint64_t content_desc_addr;
-+			uint16_t content_desc_resrvd1;
-+			uint8_t content_desc_params_sz;
-+			uint8_t content_desc_hdr_resrvd2;
-+			uint32_t content_desc_resrvd3;
-+		} s;
-+		struct {
-+			uint32_t cipher_key_array[ICP_QAT_FW_NUM_LONGWORDS_4];
-+		} s1;
-+	} u;
-+};
-+
-+struct icp_qat_fw_cipher_auth_req_hdr_cd_pars {
-+	union {
-+		struct {
-+			uint64_t content_desc_addr;
-+			uint16_t content_desc_resrvd1;
-+			uint8_t content_desc_params_sz;
-+			uint8_t content_desc_hdr_resrvd2;
-+			uint32_t content_desc_resrvd3;
-+		} s;
-+		struct {
-+			uint32_t cipher_key_array[ICP_QAT_FW_NUM_LONGWORDS_4];
-+		} sl;
-+	} u;
-+};
-+
-+struct icp_qat_fw_cipher_cd_ctrl_hdr {
-+	uint8_t cipher_state_sz;
-+	uint8_t cipher_key_sz;
-+	uint8_t cipher_cfg_offset;
-+	uint8_t next_curr_id;
-+	uint8_t cipher_padding_sz;
-+	uint8_t resrvd1;
-+	uint16_t resrvd2;
-+	uint32_t resrvd3[ICP_QAT_FW_NUM_LONGWORDS_3];
-+};
-+
-+struct icp_qat_fw_auth_cd_ctrl_hdr {
-+	uint32_t resrvd1;
-+	uint8_t resrvd2;
-+	uint8_t hash_flags;
-+	uint8_t hash_cfg_offset;
-+	uint8_t next_curr_id;
-+	uint8_t resrvd3;
-+	uint8_t outer_prefix_sz;
-+	uint8_t final_sz;
-+	uint8_t inner_res_sz;
-+	uint8_t resrvd4;
-+	uint8_t inner_state1_sz;
-+	uint8_t inner_state2_offset;
-+	uint8_t inner_state2_sz;
-+	uint8_t outer_config_offset;
-+	uint8_t outer_state1_sz;
-+	uint8_t outer_res_sz;
-+	uint8_t outer_prefix_offset;
-+};
-+
-+struct icp_qat_fw_cipher_auth_cd_ctrl_hdr {
-+	uint8_t cipher_state_sz;
-+	uint8_t cipher_key_sz;
-+	uint8_t cipher_cfg_offset;
-+	uint8_t next_curr_id_cipher;
-+	uint8_t cipher_padding_sz;
-+	uint8_t hash_flags;
-+	uint8_t hash_cfg_offset;
-+	uint8_t next_curr_id_auth;
-+	uint8_t resrvd1;
-+	uint8_t outer_prefix_sz;
-+	uint8_t final_sz;
-+	uint8_t inner_res_sz;
-+	uint8_t resrvd2;
-+	uint8_t inner_state1_sz;
-+	uint8_t inner_state2_offset;
-+	uint8_t inner_state2_sz;
-+	uint8_t outer_config_offset;
-+	uint8_t outer_state1_sz;
-+	uint8_t outer_res_sz;
-+	uint8_t outer_prefix_offset;
-+};
-+
-+#define ICP_QAT_FW_AUTH_HDR_FLAG_DO_NESTED 1
-+#define ICP_QAT_FW_AUTH_HDR_FLAG_NO_NESTED 0
-+#define ICP_QAT_FW_CCM_GCM_AAD_SZ_MAX	240
-+#define ICP_QAT_FW_HASH_REQUEST_PARAMETERS_OFFSET \
-+	(sizeof(struct icp_qat_fw_la_cipher_req_params_t))
-+#define ICP_QAT_FW_CIPHER_REQUEST_PARAMETERS_OFFSET (0)
-+
-+struct icp_qat_fw_la_cipher_req_params {
-+	uint32_t cipher_offset;
-+	uint32_t cipher_length;
-+	union {
-+		uint32_t cipher_IV_array[ICP_QAT_FW_NUM_LONGWORDS_4];
-+		struct {
-+			uint64_t cipher_IV_ptr;
-+			uint64_t resrvd1;
-+		} s;
-+	} u;
-+};
-+
-+struct icp_qat_fw_la_auth_req_params {
-+	uint32_t auth_off;
-+	uint32_t auth_len;
-+	union {
-+		uint64_t auth_partial_st_prefix;
-+		uint64_t aad_adr;
-+	} u1;
-+	uint64_t auth_res_addr;
-+	union {
-+		uint8_t inner_prefix_sz;
-+		uint8_t aad_sz;
-+	} u2;
-+	uint8_t resrvd1;
-+	uint8_t hash_state_sz;
-+	uint8_t auth_res_sz;
++struct qat_alg_buf {
++	uint32_t len;
++	uint32_t resrvd;
++	uint64_t addr;
 +} __packed;
 +
-+struct icp_qat_fw_la_auth_req_params_resrvd_flds {
-+	uint32_t resrvd[ICP_QAT_FW_NUM_LONGWORDS_6];
++struct qat_alg_buf_list {
++	uint64_t resrvd;
++	uint32_t num_bufs;
++	uint32_t num_mapped_bufs;
++	struct qat_alg_buf bufers[];
++} __packed __aligned(64);
++
++/* Common content descriptor */
++struct qat_alg_cd {
 +	union {
-+		uint8_t inner_prefix_sz;
-+		uint8_t aad_sz;
-+	} u2;
-+	uint8_t resrvd1;
-+	uint16_t resrvd2;
++		struct qat_enc { /* Encrypt content desc */
++			struct icp_qat_hw_cipher_algo_blk cipher;
++			struct icp_qat_hw_auth_algo_blk hash;
++		} qat_enc_cd;
++		struct qat_dec { /* Decrytp content desc */
++			struct icp_qat_hw_auth_algo_blk hash;
++			struct icp_qat_hw_cipher_algo_blk cipher;
++		} qat_dec_cd;
++	};
++} __aligned(64);
++
++#define MAX_AUTH_STATE_SIZE sizeof(struct icp_qat_hw_auth_algo_blk)
++
++struct qat_auth_state {
++	uint8_t data[MAX_AUTH_STATE_SIZE];
++} __aligned(64);
++
++struct qat_alg_session_ctx {
++	struct qat_alg_cd *enc_cd;
++	dma_addr_t enc_cd_paddr;
++	struct qat_alg_cd *dec_cd;
++	dma_addr_t dec_cd_paddr;
++	struct qat_auth_state *auth_hw_state_enc;
++	dma_addr_t auth_state_enc_paddr;
++	struct qat_auth_state *auth_hw_state_dec;
++	dma_addr_t auth_state_dec_paddr;
++	struct icp_qat_fw_la_bulk_req enc_fw_req_tmpl;
++	struct icp_qat_fw_la_bulk_req dec_fw_req_tmpl;
++	struct qat_crypto_instance *inst;
++	struct crypto_tfm *tfm;
++	struct crypto_shash *hash_tfm;
++	enum icp_qat_hw_auth_algo qat_hash_alg;
++	uint8_t salt[AES_BLOCK_SIZE];
++	spinlock_t lock;	/* protects qat_alg_session_ctx struct */
 +};
 +
-+struct icp_qat_fw_la_resp {
-+	struct icp_qat_fw_comn_resp_hdr comn_resp;
-+	uint64_t opaque_data;
-+	uint32_t resrvd[ICP_QAT_FW_NUM_LONGWORDS_4];
-+};
-+#define ICP_QAT_FW_CIPHER_NEXT_ID_GET(cd_ctrl_hdr_t) \
-+	((((cd_ctrl_hdr_t)->next_curr_id_cipher) & \
-+	  ICP_QAT_FW_COMN_NEXT_ID_MASK) >> (ICP_QAT_FW_COMN_NEXT_ID_BITPOS))
++static int get_current_node(void)
++{
++	return cpu_data(current_thread_info()->cpu).phys_proc_id;
++}
 +
-+#define ICP_QAT_FW_CIPHER_NEXT_ID_SET(cd_ctrl_hdr_t, val) \
-+{ (cd_ctrl_hdr_t)->next_curr_id_cipher = \
-+	((((cd_ctrl_hdr_t)->next_curr_id_cipher) \
-+	& ICP_QAT_FW_COMN_CURR_ID_MASK) | \
-+	((val << ICP_QAT_FW_COMN_NEXT_ID_BITPOS) \
-+	& ICP_QAT_FW_COMN_NEXT_ID_MASK)) }
++static int qat_get_inter_state_size(enum icp_qat_hw_auth_algo qat_hash_alg)
++{
++	switch (qat_hash_alg) {
++	case ICP_QAT_HW_AUTH_ALGO_SHA1:
++		return ICP_QAT_HW_SHA1_STATE1_SZ;
++	case ICP_QAT_HW_AUTH_ALGO_SHA256:
++		return ICP_QAT_HW_SHA256_STATE1_SZ;
++	case ICP_QAT_HW_AUTH_ALGO_SHA512:
++		return ICP_QAT_HW_SHA512_STATE1_SZ;
++	default:
++		return -EFAULT;
++	};
++	return -EFAULT;
++}
 +
-+#define ICP_QAT_FW_CIPHER_CURR_ID_GET(cd_ctrl_hdr_t) \
-+	(((cd_ctrl_hdr_t)->next_curr_id_cipher) \
-+	& ICP_QAT_FW_COMN_CURR_ID_MASK)
++static int qat_alg_do_precomputes(struct icp_qat_hw_auth_algo_blk *hash,
++				  struct qat_alg_session_ctx *ctx,
++				  const uint8_t *auth_key,
++				  unsigned int auth_keylen, uint8_t *auth_state)
++{
++	struct {
++		struct shash_desc shash;
++		char ctx[crypto_shash_descsize(ctx->hash_tfm)];
++	} desc;
++	struct sha1_state sha1;
++	struct sha256_state sha256;
++	struct sha512_state sha512;
++	int block_size = crypto_shash_blocksize(ctx->hash_tfm);
++	int digest_size = crypto_shash_digestsize(ctx->hash_tfm);
++	uint8_t *ipad = auth_state;
++	uint8_t *opad = ipad + block_size;
++	__be32 *hash_state_out;
++	__be64 *hash512_state_out;
++	int i, offset;
 +
-+#define ICP_QAT_FW_CIPHER_CURR_ID_SET(cd_ctrl_hdr_t, val) \
-+{ (cd_ctrl_hdr_t)->next_curr_id_cipher = \
-+	((((cd_ctrl_hdr_t)->next_curr_id_cipher) \
-+	& ICP_QAT_FW_COMN_NEXT_ID_MASK) | \
-+	((val) & ICP_QAT_FW_COMN_CURR_ID_MASK)) }
++	desc.shash.tfm = ctx->hash_tfm;
++	desc.shash.flags = 0x0;
 +
-+#define ICP_QAT_FW_AUTH_NEXT_ID_GET(cd_ctrl_hdr_t) \
-+	((((cd_ctrl_hdr_t)->next_curr_id_auth) & ICP_QAT_FW_COMN_NEXT_ID_MASK) \
-+	>> (ICP_QAT_FW_COMN_NEXT_ID_BITPOS))
++	if (auth_keylen > block_size) {
++		char buff[SHA512_BLOCK_SIZE];
++		int ret = crypto_shash_digest(&desc.shash, auth_key,
++					      auth_keylen, buff);
++		if (ret)
++			return ret;
 +
-+#define ICP_QAT_FW_AUTH_NEXT_ID_SET(cd_ctrl_hdr_t, val) \
-+{ (cd_ctrl_hdr_t)->next_curr_id_auth = \
-+	((((cd_ctrl_hdr_t)->next_curr_id_auth) \
-+	& ICP_QAT_FW_COMN_CURR_ID_MASK) | \
-+	((val << ICP_QAT_FW_COMN_NEXT_ID_BITPOS) \
-+	& ICP_QAT_FW_COMN_NEXT_ID_MASK)) }
++		memcpy(ipad, buff, digest_size);
++		memcpy(opad, buff, digest_size);
++		memset(ipad + digest_size, 0, block_size - digest_size);
++		memset(opad + digest_size, 0, block_size - digest_size);
++	} else {
++		memcpy(ipad, auth_key, auth_keylen);
++		memcpy(opad, auth_key, auth_keylen);
++		memset(ipad + auth_keylen, 0, block_size - auth_keylen);
++		memset(opad + auth_keylen, 0, block_size - auth_keylen);
++	}
 +
-+#define ICP_QAT_FW_AUTH_CURR_ID_GET(cd_ctrl_hdr_t) \
-+	(((cd_ctrl_hdr_t)->next_curr_id_auth) \
-+	& ICP_QAT_FW_COMN_CURR_ID_MASK)
++	for (i = 0; i < block_size; i++) {
++		char *ipad_ptr = ipad + i;
++		char *opad_ptr = opad + i;
++		*ipad_ptr ^= 0x36;
++		*opad_ptr ^= 0x5C;
++	}
 +
-+#define ICP_QAT_FW_AUTH_CURR_ID_SET(cd_ctrl_hdr_t, val) \
-+{ (cd_ctrl_hdr_t)->next_curr_id_auth = \
-+	((((cd_ctrl_hdr_t)->next_curr_id_auth) \
-+	& ICP_QAT_FW_COMN_NEXT_ID_MASK) | \
-+	((val) & ICP_QAT_FW_COMN_CURR_ID_MASK)) }
++	if (crypto_shash_init(&desc.shash))
++		return -EFAULT;
 +
-+#endif
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_hw.h b/drivers/crypto/qat/qat_common/icp_qat_hw.h
++	if (crypto_shash_update(&desc.shash, ipad, block_size))
++		return -EFAULT;
++
++	hash_state_out = (__be32 *)hash->sha.state1;
++	hash512_state_out = (__be64 *)hash_state_out;
++
++	switch (ctx->qat_hash_alg) {
++	case ICP_QAT_HW_AUTH_ALGO_SHA1:
++		if (crypto_shash_export(&desc.shash, &sha1))
++			return -EFAULT;
++		for (i = 0; i < digest_size >> 2; i++, hash_state_out++)
++			*hash_state_out = cpu_to_be32(*(sha1.state + i));
++		break;
++	case ICP_QAT_HW_AUTH_ALGO_SHA256:
++		if (crypto_shash_export(&desc.shash, &sha256))
++			return -EFAULT;
++		for (i = 0; i < digest_size >> 2; i++, hash_state_out++)
++			*hash_state_out = cpu_to_be32(*(sha256.state + i));
++		break;
++	case ICP_QAT_HW_AUTH_ALGO_SHA512:
++		if (crypto_shash_export(&desc.shash, &sha512))
++			return -EFAULT;
++		for (i = 0; i < digest_size >> 3; i++, hash512_state_out++)
++			*hash512_state_out = cpu_to_be64(*(sha512.state + i));
++		break;
++	default:
++		return -EFAULT;
++	}
++
++	if (crypto_shash_init(&desc.shash))
++		return -EFAULT;
++
++	if (crypto_shash_update(&desc.shash, opad, block_size))
++		return -EFAULT;
++
++	offset = round_up(qat_get_inter_state_size(ctx->qat_hash_alg), 8);
++	hash_state_out = (__be32 *)(hash->sha.state1 + offset);
++	hash512_state_out = (__be64 *)hash_state_out;
++
++	switch (ctx->qat_hash_alg) {
++	case ICP_QAT_HW_AUTH_ALGO_SHA1:
++		if (crypto_shash_export(&desc.shash, &sha1))
++			return -EFAULT;
++		for (i = 0; i < digest_size >> 2; i++, hash_state_out++)
++			*hash_state_out = cpu_to_be32(*(sha1.state + i));
++		break;
++	case ICP_QAT_HW_AUTH_ALGO_SHA256:
++		if (crypto_shash_export(&desc.shash, &sha256))
++			return -EFAULT;
++		for (i = 0; i < digest_size >> 2; i++, hash_state_out++)
++			*hash_state_out = cpu_to_be32(*(sha256.state + i));
++		break;
++	case ICP_QAT_HW_AUTH_ALGO_SHA512:
++		if (crypto_shash_export(&desc.shash, &sha512))
++			return -EFAULT;
++		for (i = 0; i < digest_size >> 3; i++, hash512_state_out++)
++			*hash512_state_out = cpu_to_be64(*(sha512.state + i));
++		break;
++	default:
++		return -EFAULT;
++	}
++	return 0;
++}
++
++static void qat_alg_init_common_hdr(struct icp_qat_fw_comn_req_hdr *header)
++{
++	header->hdr_flags =
++		ICP_QAT_FW_COMN_HDR_FLAGS_BUILD(ICP_QAT_FW_COMN_REQ_FLAG_SET);
++	header->service_type = ICP_QAT_FW_COMN_REQ_CPM_FW_LA;
++	header->comn_req_flags =
++		ICP_QAT_FW_COMN_FLAGS_BUILD(QAT_COMN_CD_FLD_TYPE_64BIT_ADR,
++					    QAT_COMN_PTR_TYPE_SGL);
++	ICP_QAT_FW_LA_DIGEST_IN_BUFFER_SET(header->serv_specif_flags,
++					   ICP_QAT_FW_LA_DIGEST_IN_BUFFER);
++	ICP_QAT_FW_LA_PARTIAL_SET(header->serv_specif_flags,
++				  ICP_QAT_FW_LA_PARTIAL_NONE);
++	ICP_QAT_FW_LA_CIPH_IV_FLD_FLAG_SET(header->serv_specif_flags,
++					   ICP_QAT_FW_CIPH_IV_16BYTE_DATA);
++	ICP_QAT_FW_LA_PROTO_SET(header->serv_specif_flags,
++				ICP_QAT_FW_LA_NO_PROTO);
++	ICP_QAT_FW_LA_UPDATE_STATE_SET(header->serv_specif_flags,
++				       ICP_QAT_FW_LA_NO_UPDATE_STATE);
++}
++
++static int qat_alg_init_enc_session(struct qat_alg_session_ctx *ctx,
++				    int alg, struct crypto_authenc_keys *keys)
++{
++	struct crypto_aead *aead_tfm = __crypto_aead_cast(ctx->tfm);
++	unsigned int digestsize = crypto_aead_crt(aead_tfm)->authsize;
++	struct qat_enc *enc_ctx = &ctx->enc_cd->qat_enc_cd;
++	struct icp_qat_hw_cipher_algo_blk *cipher = &enc_ctx->cipher;
++	struct icp_qat_hw_auth_algo_blk *hash =
++		(struct icp_qat_hw_auth_algo_blk *)((char *)enc_ctx +
++		sizeof(struct icp_qat_hw_auth_setup) + keys->enckeylen);
++	struct icp_qat_fw_la_bulk_req *req_tmpl = &ctx->enc_fw_req_tmpl;
++	struct icp_qat_fw_comn_req_hdr_cd_pars *cd_pars = &req_tmpl->cd_pars;
++	struct icp_qat_fw_comn_req_hdr *header = &req_tmpl->comn_hdr;
++	void *ptr = &req_tmpl->cd_ctrl;
++	struct icp_qat_fw_cipher_cd_ctrl_hdr *cipher_cd_ctrl = ptr;
++	struct icp_qat_fw_auth_cd_ctrl_hdr *hash_cd_ctrl = ptr;
++	struct icp_qat_fw_la_auth_req_params *auth_param =
++		(struct icp_qat_fw_la_auth_req_params *)
++		((char *)&req_tmpl->serv_specif_rqpars +
++		 sizeof(struct icp_qat_fw_la_cipher_req_params));
++
++	/* CD setup */
++	cipher->aes.cipher_config.val = QAT_AES_HW_CONFIG_ENC(alg);
++	memcpy(cipher->aes.key, keys->enckey, keys->enckeylen);
++	hash->sha.inner_setup.auth_config.config =
++		ICP_QAT_HW_AUTH_CONFIG_BUILD(ICP_QAT_HW_AUTH_MODE1,
++					     ctx->qat_hash_alg, digestsize);
++	hash->sha.inner_setup.auth_counter.counter =
++		cpu_to_be32(crypto_shash_blocksize(ctx->hash_tfm));
++
++	if (qat_alg_do_precomputes(hash, ctx, keys->authkey, keys->authkeylen,
++				   (uint8_t *)ctx->auth_hw_state_enc))
++		return -EFAULT;
++
++	/* Request setup */
++	qat_alg_init_common_hdr(header);
++	header->service_cmd_id = ICP_QAT_FW_LA_CMD_CIPHER_HASH;
++	ICP_QAT_FW_LA_RET_AUTH_SET(header->serv_specif_flags,
++				   ICP_QAT_FW_LA_RET_AUTH_RES);
++	ICP_QAT_FW_LA_CMP_AUTH_SET(header->serv_specif_flags,
++				   ICP_QAT_FW_LA_NO_CMP_AUTH_RES);
++	cd_pars->u.s.content_desc_addr = ctx->enc_cd_paddr;
++	cd_pars->u.s.content_desc_params_sz = sizeof(struct qat_alg_cd) >> 3;
++
++	/* Cipher CD config setup */
++	cipher_cd_ctrl->cipher_key_sz = keys->enckeylen >> 3;
++	cipher_cd_ctrl->cipher_state_sz = AES_BLOCK_SIZE >> 3;
++	cipher_cd_ctrl->cipher_cfg_offset = 0;
++	ICP_QAT_FW_COMN_CURR_ID_SET(cipher_cd_ctrl, ICP_QAT_FW_SLICE_CIPHER);
++	ICP_QAT_FW_COMN_NEXT_ID_SET(cipher_cd_ctrl, ICP_QAT_FW_SLICE_AUTH);
++	/* Auth CD config setup */
++	hash_cd_ctrl->hash_cfg_offset = ((char *)hash - (char *)cipher) >> 3;
++	hash_cd_ctrl->hash_flags = ICP_QAT_FW_AUTH_HDR_FLAG_NO_NESTED;
++	hash_cd_ctrl->inner_res_sz = digestsize;
++	hash_cd_ctrl->final_sz = digestsize;
++
++	switch (ctx->qat_hash_alg) {
++	case ICP_QAT_HW_AUTH_ALGO_SHA1:
++		hash_cd_ctrl->inner_state1_sz =
++			round_up(ICP_QAT_HW_SHA1_STATE1_SZ, 8);
++		hash_cd_ctrl->inner_state2_sz =
++			round_up(ICP_QAT_HW_SHA1_STATE2_SZ, 8);
++		break;
++	case ICP_QAT_HW_AUTH_ALGO_SHA256:
++		hash_cd_ctrl->inner_state1_sz = ICP_QAT_HW_SHA256_STATE1_SZ;
++		hash_cd_ctrl->inner_state2_sz = ICP_QAT_HW_SHA256_STATE2_SZ;
++		break;
++	case ICP_QAT_HW_AUTH_ALGO_SHA512:
++		hash_cd_ctrl->inner_state1_sz = ICP_QAT_HW_SHA512_STATE1_SZ;
++		hash_cd_ctrl->inner_state2_sz = ICP_QAT_HW_SHA512_STATE2_SZ;
++		break;
++	default:
++		break;
++	}
++	hash_cd_ctrl->inner_state2_offset = hash_cd_ctrl->hash_cfg_offset +
++			((sizeof(struct icp_qat_hw_auth_setup) +
++			 round_up(hash_cd_ctrl->inner_state1_sz, 8)) >> 3);
++	auth_param->u1.auth_partial_st_prefix = ctx->auth_state_enc_paddr +
++			sizeof(struct icp_qat_hw_auth_counter) +
++			round_up(hash_cd_ctrl->inner_state1_sz, 8);
++	ICP_QAT_FW_COMN_CURR_ID_SET(hash_cd_ctrl, ICP_QAT_FW_SLICE_AUTH);
++	ICP_QAT_FW_COMN_NEXT_ID_SET(hash_cd_ctrl, ICP_QAT_FW_SLICE_DRAM_WR);
++	return 0;
++}
++
++static int qat_alg_init_dec_session(struct qat_alg_session_ctx *ctx,
++				    int alg, struct crypto_authenc_keys *keys)
++{
++	struct crypto_aead *aead_tfm = __crypto_aead_cast(ctx->tfm);
++	unsigned int digestsize = crypto_aead_crt(aead_tfm)->authsize;
++	struct qat_dec *dec_ctx = &ctx->dec_cd->qat_dec_cd;
++	struct icp_qat_hw_auth_algo_blk *hash = &dec_ctx->hash;
++	struct icp_qat_hw_cipher_algo_blk *cipher =
++		(struct icp_qat_hw_cipher_algo_blk *)((char *)dec_ctx +
++		sizeof(struct icp_qat_hw_auth_setup) +
++		roundup(crypto_shash_digestsize(ctx->hash_tfm), 8) * 2);
++	struct icp_qat_fw_la_bulk_req *req_tmpl = &ctx->dec_fw_req_tmpl;
++	struct icp_qat_fw_comn_req_hdr_cd_pars *cd_pars = &req_tmpl->cd_pars;
++	struct icp_qat_fw_comn_req_hdr *header = &req_tmpl->comn_hdr;
++	void *ptr = &req_tmpl->cd_ctrl;
++	struct icp_qat_fw_cipher_cd_ctrl_hdr *cipher_cd_ctrl = ptr;
++	struct icp_qat_fw_auth_cd_ctrl_hdr *hash_cd_ctrl = ptr;
++	struct icp_qat_fw_la_auth_req_params *auth_param =
++		(struct icp_qat_fw_la_auth_req_params *)
++		((char *)&req_tmpl->serv_specif_rqpars +
++		sizeof(struct icp_qat_fw_la_cipher_req_params));
++
++	/* CD setup */
++	cipher->aes.cipher_config.val = QAT_AES_HW_CONFIG_DEC(alg);
++	memcpy(cipher->aes.key, keys->enckey, keys->enckeylen);
++	hash->sha.inner_setup.auth_config.config =
++		ICP_QAT_HW_AUTH_CONFIG_BUILD(ICP_QAT_HW_AUTH_MODE1,
++					     ctx->qat_hash_alg,
++					     digestsize);
++	hash->sha.inner_setup.auth_counter.counter =
++		cpu_to_be32(crypto_shash_blocksize(ctx->hash_tfm));
++
++	if (qat_alg_do_precomputes(hash, ctx, keys->authkey, keys->authkeylen,
++				   (uint8_t *)ctx->auth_hw_state_dec))
++		return -EFAULT;
++
++	/* Request setup */
++	qat_alg_init_common_hdr(header);
++	header->service_cmd_id = ICP_QAT_FW_LA_CMD_HASH_CIPHER;
++	ICP_QAT_FW_LA_RET_AUTH_SET(header->serv_specif_flags,
++				   ICP_QAT_FW_LA_NO_RET_AUTH_RES);
++	ICP_QAT_FW_LA_CMP_AUTH_SET(header->serv_specif_flags,
++				   ICP_QAT_FW_LA_CMP_AUTH_RES);
++	cd_pars->u.s.content_desc_addr = ctx->dec_cd_paddr;
++	cd_pars->u.s.content_desc_params_sz = sizeof(struct qat_alg_cd) >> 3;
++
++	/* Cipher CD config setup */
++	cipher_cd_ctrl->cipher_key_sz = keys->enckeylen >> 3;
++	cipher_cd_ctrl->cipher_state_sz = AES_BLOCK_SIZE >> 3;
++	cipher_cd_ctrl->cipher_cfg_offset =
++		(sizeof(struct icp_qat_hw_auth_setup) +
++		 roundup(crypto_shash_digestsize(ctx->hash_tfm), 8) * 2) >> 3;
++	ICP_QAT_FW_COMN_CURR_ID_SET(cipher_cd_ctrl, ICP_QAT_FW_SLICE_CIPHER);
++	ICP_QAT_FW_COMN_NEXT_ID_SET(cipher_cd_ctrl, ICP_QAT_FW_SLICE_DRAM_WR);
++
++	/* Auth CD config setup */
++	hash_cd_ctrl->hash_cfg_offset = 0;
++	hash_cd_ctrl->hash_flags = ICP_QAT_FW_AUTH_HDR_FLAG_NO_NESTED;
++	hash_cd_ctrl->inner_res_sz = digestsize;
++	hash_cd_ctrl->final_sz = digestsize;
++
++	switch (ctx->qat_hash_alg) {
++	case ICP_QAT_HW_AUTH_ALGO_SHA1:
++		hash_cd_ctrl->inner_state1_sz =
++			round_up(ICP_QAT_HW_SHA1_STATE1_SZ, 8);
++		hash_cd_ctrl->inner_state2_sz =
++			round_up(ICP_QAT_HW_SHA1_STATE2_SZ, 8);
++		break;
++	case ICP_QAT_HW_AUTH_ALGO_SHA256:
++		hash_cd_ctrl->inner_state1_sz = ICP_QAT_HW_SHA256_STATE1_SZ;
++		hash_cd_ctrl->inner_state2_sz = ICP_QAT_HW_SHA256_STATE2_SZ;
++		break;
++	case ICP_QAT_HW_AUTH_ALGO_SHA512:
++		hash_cd_ctrl->inner_state1_sz = ICP_QAT_HW_SHA512_STATE1_SZ;
++		hash_cd_ctrl->inner_state2_sz = ICP_QAT_HW_SHA512_STATE2_SZ;
++		break;
++	default:
++		break;
++	}
++
++	hash_cd_ctrl->inner_state2_offset = hash_cd_ctrl->hash_cfg_offset +
++			((sizeof(struct icp_qat_hw_auth_setup) +
++			 round_up(hash_cd_ctrl->inner_state1_sz, 8)) >> 3);
++	auth_param->u1.auth_partial_st_prefix = ctx->auth_state_enc_paddr +
++			sizeof(struct icp_qat_hw_auth_counter) +
++			round_up(hash_cd_ctrl->inner_state1_sz, 8);
++	auth_param->auth_res_sz = digestsize;
++	ICP_QAT_FW_COMN_CURR_ID_SET(hash_cd_ctrl, ICP_QAT_FW_SLICE_AUTH);
++	ICP_QAT_FW_COMN_NEXT_ID_SET(hash_cd_ctrl, ICP_QAT_FW_SLICE_CIPHER);
++	return 0;
++}
++
++static int qat_alg_init_sessions(struct qat_alg_session_ctx *ctx,
++				 const uint8_t *key, unsigned int keylen)
++{
++	struct crypto_authenc_keys keys;
++	int alg;
++
++	if (crypto_rng_get_bytes(crypto_default_rng, ctx->salt, AES_BLOCK_SIZE))
++		return -EFAULT;
++
++	if (crypto_authenc_extractkeys(&keys, key, keylen))
++		goto bad_key;
++
++	switch (keys.enckeylen) {
++	case AES_KEYSIZE_128:
++		alg = ICP_QAT_HW_CIPHER_ALGO_AES128;
++		break;
++	case AES_KEYSIZE_192:
++		alg = ICP_QAT_HW_CIPHER_ALGO_AES192;
++		break;
++	case AES_KEYSIZE_256:
++		alg = ICP_QAT_HW_CIPHER_ALGO_AES256;
++		break;
++	default:
++		goto bad_key;
++		break;
++	}
++
++	if (qat_alg_init_enc_session(ctx, alg, &keys))
++		goto error;
++
++	if (qat_alg_init_dec_session(ctx, alg, &keys))
++		goto error;
++
++	return 0;
++bad_key:
++	crypto_tfm_set_flags(ctx->tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++	return -EINVAL;
++error:
++	return -EFAULT;
++}
++
++static int qat_alg_setkey(struct crypto_aead *tfm, const uint8_t *key,
++			  unsigned int keylen)
++{
++	struct qat_alg_session_ctx *ctx = crypto_aead_ctx(tfm);
++	struct device *dev;
++
++	spin_lock(&ctx->lock);
++	if (ctx->enc_cd) {
++		/* rekeying */
++		dev = &GET_DEV(ctx->inst->accel_dev);
++		memset(ctx->enc_cd, 0, sizeof(struct qat_alg_cd));
++		memset(ctx->dec_cd, 0, sizeof(struct qat_alg_cd));
++		memset(ctx->auth_hw_state_enc, 0,
++		       sizeof(struct qat_auth_state));
++		memset(ctx->auth_hw_state_dec, 0,
++		       sizeof(struct qat_auth_state));
++		memset(&ctx->enc_fw_req_tmpl, 0,
++		       sizeof(struct icp_qat_fw_la_bulk_req));
++		memset(&ctx->dec_fw_req_tmpl, 0,
++		       sizeof(struct icp_qat_fw_la_bulk_req));
++	} else {
++		/* new key */
++		int node = get_current_node();
++		struct qat_crypto_instance *inst =
++				qat_crypto_get_instance_node(node);
++		if (!inst) {
++			spin_unlock(&ctx->lock);
++			return -EINVAL;
++		}
++
++		dev = &GET_DEV(inst->accel_dev);
++		ctx->inst = inst;
++		ctx->enc_cd = dma_zalloc_coherent(dev,
++						  sizeof(struct qat_alg_cd),
++						  &ctx->enc_cd_paddr,
++						  GFP_ATOMIC);
++		if (!ctx->enc_cd) {
++			spin_unlock(&ctx->lock);
++			return -ENOMEM;
++		}
++		ctx->dec_cd = dma_zalloc_coherent(dev,
++						  sizeof(struct qat_alg_cd),
++						  &ctx->dec_cd_paddr,
++						  GFP_ATOMIC);
++		if (!ctx->dec_cd) {
++			spin_unlock(&ctx->lock);
++			goto out_free_enc;
++		}
++		ctx->auth_hw_state_enc =
++			dma_zalloc_coherent(dev, sizeof(struct qat_auth_state),
++					    &ctx->auth_state_enc_paddr,
++					    GFP_ATOMIC);
++		if (!ctx->auth_hw_state_enc) {
++			spin_unlock(&ctx->lock);
++			goto out_free_dec;
++		}
++		ctx->auth_hw_state_dec =
++			dma_zalloc_coherent(dev, sizeof(struct qat_auth_state),
++					    &ctx->auth_state_dec_paddr,
++					    GFP_ATOMIC);
++		if (!ctx->auth_hw_state_dec) {
++			spin_unlock(&ctx->lock);
++			goto out_free_auth_enc;
++		}
++	}
++	spin_unlock(&ctx->lock);
++	if (qat_alg_init_sessions(ctx, key, keylen))
++		goto out_free_all;
++
++	return 0;
++
++out_free_all:
++	dma_free_coherent(dev, sizeof(struct qat_auth_state),
++			  ctx->auth_hw_state_dec, ctx->auth_state_dec_paddr);
++	ctx->auth_hw_state_dec = NULL;
++out_free_auth_enc:
++	dma_free_coherent(dev, sizeof(struct qat_auth_state),
++			  ctx->auth_hw_state_enc, ctx->auth_state_enc_paddr);
++	ctx->auth_hw_state_enc = NULL;
++out_free_dec:
++	dma_free_coherent(dev, sizeof(struct qat_alg_cd),
++			  ctx->dec_cd, ctx->dec_cd_paddr);
++	ctx->dec_cd = NULL;
++out_free_enc:
++	dma_free_coherent(dev, sizeof(struct qat_alg_cd),
++			  ctx->enc_cd, ctx->enc_cd_paddr);
++	ctx->enc_cd = NULL;
++	return -ENOMEM;
++}
++
++static void qat_alg_free_bufl(struct qat_crypto_instance *inst,
++			      struct qat_crypto_request *qat_req)
++{
++	struct device *dev = &GET_DEV(inst->accel_dev);
++	struct qat_alg_buf_list *bl = qat_req->buf.bl;
++	struct qat_alg_buf_list *blout = qat_req->buf.blout;
++	dma_addr_t blp = qat_req->buf.blp;
++	dma_addr_t blpout = qat_req->buf.bloutp;
++	size_t sz = qat_req->buf.sz;
++	int i, bufs = bl->num_bufs;
++
++	for (i = 0; i < bl->num_bufs; i++)
++		dma_unmap_single(dev, bl->bufers[i].addr,
++				 bl->bufers[i].len, DMA_BIDIRECTIONAL);
++
++	dma_unmap_single(dev, blp, sz, DMA_TO_DEVICE);
++	kfree(bl);
++	if (blp != blpout) {
++		/* If out of place operation dma unmap only data */
++		int bufless = bufs - blout->num_mapped_bufs;
++		for (i = bufless; i < bufs; i++) {
++			dma_unmap_single(dev, blout->bufers[i].addr,
++					 blout->bufers[i].len,
++					 DMA_BIDIRECTIONAL);
++		}
++		dma_unmap_single(dev, blpout, sz, DMA_TO_DEVICE);
++		kfree(blout);
++	}
++}
++
++static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
++			       struct scatterlist *assoc,
++			       struct scatterlist *sgl,
++			       struct scatterlist *sglout, uint8_t *iv,
++			       uint8_t ivlen,
++			       struct qat_crypto_request *qat_req)
++{
++	struct device *dev = &GET_DEV(inst->accel_dev);
++	int i, bufs = 0, n = sg_nents(sgl), assoc_n = sg_nents(assoc);
++	struct qat_alg_buf_list *bufl;
++	struct qat_alg_buf_list *buflout = NULL;
++	dma_addr_t blp;
++	dma_addr_t bloutp = 0;
++	struct scatterlist *sg;
++	size_t sz = sizeof(struct qat_alg_buf_list) +
++			((1 + n + assoc_n) * sizeof(struct qat_alg_buf));
++
++	if (unlikely(!n))
++		return -EINVAL;
++
++	bufl = kmalloc_node(sz, GFP_ATOMIC, inst->accel_dev->numa_node);
++	if (unlikely(!bufl))
++		return -ENOMEM;
++
++	blp = dma_map_single(dev, bufl, sz, DMA_TO_DEVICE);
++	if (unlikely(dma_mapping_error(dev, blp)))
++		goto err;
++
++	for_each_sg(assoc, sg, assoc_n, i) {
++		bufl->bufers[bufs].addr = dma_map_single(dev,
++							 sg_virt(sg),
++							 sg->length,
++							 DMA_BIDIRECTIONAL);
++		bufl->bufers[bufs].len = sg->length;
++		if (unlikely(dma_mapping_error(dev, bufl->bufers[bufs].addr)))
++			goto err;
++		bufs++;
++	}
++	bufl->bufers[bufs].addr = dma_map_single(dev, iv, ivlen,
++						 DMA_BIDIRECTIONAL);
++	bufl->bufers[bufs].len = ivlen;
++	if (unlikely(dma_mapping_error(dev, bufl->bufers[bufs].addr)))
++		goto err;
++	bufs++;
++
++	for_each_sg(sgl, sg, n, i) {
++		int y = i + bufs;
++		bufl->bufers[y].addr = dma_map_single(dev, sg_virt(sg),
++						      sg->length,
++						      DMA_BIDIRECTIONAL);
++		bufl->bufers[y].len = sg->length;
++		if (unlikely(dma_mapping_error(dev, bufl->bufers[y].addr)))
++			goto err;
++	}
++	bufl->num_bufs = n + bufs;
++	qat_req->buf.bl = bufl;
++	qat_req->buf.blp = blp;
++	qat_req->buf.sz = sz;
++	/* Handle out of place operation */
++	if (sgl != sglout) {
++		struct qat_alg_buf *bufers;
++
++		buflout = kmalloc_node(sz, GFP_ATOMIC,
++				       inst->accel_dev->numa_node);
++		if (unlikely(!buflout))
++			goto err;
++		bloutp = dma_map_single(dev, buflout, sz, DMA_TO_DEVICE);
++		if (unlikely(dma_mapping_error(dev, bloutp)))
++			goto err;
++		bufers = buflout->bufers;
++		/* For out of place operation dma map only data and
++		 * reuse assoc mapping and iv */
++		for (i = 0; i < bufs; i++) {
++			bufers[i].len = bufl->bufers[i].len;
++			bufers[i].addr = bufl->bufers[i].addr;
++		}
++		for_each_sg(sglout, sg, n, i) {
++			int y = i + bufs;
++			bufers[y].addr = dma_map_single(dev, sg_virt(sg),
++							sg->length,
++							DMA_BIDIRECTIONAL);
++			buflout->bufers[y].len = sg->length;
++			if (unlikely(dma_mapping_error(dev, bufers[y].addr)))
++				goto err;
++		}
++		buflout->num_bufs = n + bufs;
++		buflout->num_mapped_bufs = n;
++		qat_req->buf.blout = buflout;
++		qat_req->buf.bloutp = bloutp;
++	} else {
++		/* Otherwise set the src and dst to the same address */
++		qat_req->buf.bloutp = qat_req->buf.blp;
++	}
++	return 0;
++err:
++	dev_err(dev, "Failed to map buf for dma\n");
++	for_each_sg(sgl, sg, n + bufs, i) {
++		if (!dma_mapping_error(dev, bufl->bufers[i].addr)) {
++			dma_unmap_single(dev, bufl->bufers[i].addr,
++					 bufl->bufers[i].len,
++					 DMA_BIDIRECTIONAL);
++		}
++	}
++	if (!dma_mapping_error(dev, blp))
++		dma_unmap_single(dev, blp, sz, DMA_TO_DEVICE);
++	kfree(bufl);
++	if (sgl != sglout && buflout) {
++		for_each_sg(sglout, sg, n, i) {
++			int y = i + bufs;
++			if (!dma_mapping_error(dev, buflout->bufers[y].addr))
++				dma_unmap_single(dev, buflout->bufers[y].addr,
++						 buflout->bufers[y].len,
++						 DMA_BIDIRECTIONAL);
++		}
++		if (!dma_mapping_error(dev, bloutp))
++			dma_unmap_single(dev, bloutp, sz, DMA_TO_DEVICE);
++		kfree(buflout);
++	}
++	return -ENOMEM;
++}
++
++void qat_alg_callback(void *resp)
++{
++	struct icp_qat_fw_la_resp *qat_resp = resp;
++	struct qat_crypto_request *qat_req =
++			(void *)(dma_addr_t)qat_resp->opaque_data;
++	struct qat_alg_session_ctx *ctx = qat_req->ctx;
++	struct qat_crypto_instance *inst = ctx->inst;
++	struct aead_request *areq = qat_req->areq;
++	uint8_t stat_filed = qat_resp->comn_resp.comn_status;
++	int res = 0, qat_res = ICP_QAT_FW_COMN_RESP_CRYPTO_STAT_GET(stat_filed);
++
++	qat_alg_free_bufl(inst, qat_req);
++	if (unlikely(qat_res != ICP_QAT_FW_COMN_STATUS_FLAG_OK))
++		res = -EBADMSG;
++	areq->base.complete(&(areq->base), res);
++}
++
++static int qat_alg_dec(struct aead_request *areq)
++{
++	struct crypto_aead *aead_tfm = crypto_aead_reqtfm(areq);
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead_tfm);
++	struct qat_alg_session_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct qat_crypto_request *qat_req = aead_request_ctx(areq);
++	struct icp_qat_fw_la_cipher_req_params *cipher_param;
++	struct icp_qat_fw_la_auth_req_params *auth_param;
++	struct icp_qat_fw_la_bulk_req *msg;
++	int digst_size = crypto_aead_crt(aead_tfm)->authsize;
++	int ret, ctr = 0;
++
++	ret = qat_alg_sgl_to_bufl(ctx->inst, areq->assoc, areq->src, areq->dst,
++				  areq->iv, AES_BLOCK_SIZE, qat_req);
++	if (unlikely(ret))
++		return ret;
++
++	msg = &qat_req->req;
++	*msg = ctx->dec_fw_req_tmpl;
++	qat_req->ctx = ctx;
++	qat_req->areq = areq;
++	qat_req->req.comn_mid.opaque_data = (uint64_t)(dma_addr_t)qat_req;
++	qat_req->req.comn_mid.src_data_addr = qat_req->buf.blp;
++	qat_req->req.comn_mid.dest_data_addr = qat_req->buf.bloutp;
++	cipher_param = (void *)&qat_req->req.serv_specif_rqpars;
++	cipher_param->cipher_length = areq->cryptlen - digst_size;
++	cipher_param->cipher_offset = areq->assoclen + AES_BLOCK_SIZE;
++	memcpy(cipher_param->u.cipher_IV_array, areq->iv, AES_BLOCK_SIZE);
++	auth_param = (void *)((uint8_t *)cipher_param + sizeof(*cipher_param));
++	auth_param->auth_off = 0;
++	auth_param->auth_len = areq->assoclen +
++				cipher_param->cipher_length + AES_BLOCK_SIZE;
++	do {
++		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
++	} while (ret == -EAGAIN && ctr++ < 10);
++
++	if (ret == -EAGAIN) {
++		qat_alg_free_bufl(ctx->inst, qat_req);
++		return -EBUSY;
++	}
++	return -EINPROGRESS;
++}
++
++static int qat_alg_enc_internal(struct aead_request *areq, uint8_t *iv,
++				int enc_iv)
++{
++	struct crypto_aead *aead_tfm = crypto_aead_reqtfm(areq);
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead_tfm);
++	struct qat_alg_session_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct qat_crypto_request *qat_req = aead_request_ctx(areq);
++	struct icp_qat_fw_la_cipher_req_params *cipher_param;
++	struct icp_qat_fw_la_auth_req_params *auth_param;
++	struct icp_qat_fw_la_bulk_req *msg;
++	int ret, ctr = 0;
++
++	ret = qat_alg_sgl_to_bufl(ctx->inst, areq->assoc, areq->src, areq->dst,
++				  iv, AES_BLOCK_SIZE, qat_req);
++	if (unlikely(ret))
++		return ret;
++
++	msg = &qat_req->req;
++	*msg = ctx->enc_fw_req_tmpl;
++	qat_req->ctx = ctx;
++	qat_req->areq = areq;
++	qat_req->req.comn_mid.opaque_data = (uint64_t)(dma_addr_t)qat_req;
++	qat_req->req.comn_mid.src_data_addr = qat_req->buf.blp;
++	qat_req->req.comn_mid.dest_data_addr = qat_req->buf.bloutp;
++	cipher_param = (void *)&qat_req->req.serv_specif_rqpars;
++	auth_param = (void *)((uint8_t *)cipher_param + sizeof(*cipher_param));
++
++	if (enc_iv) {
++		cipher_param->cipher_length = areq->cryptlen + AES_BLOCK_SIZE;
++		cipher_param->cipher_offset = areq->assoclen;
++	} else {
++		memcpy(cipher_param->u.cipher_IV_array, iv, AES_BLOCK_SIZE);
++		cipher_param->cipher_length = areq->cryptlen;
++		cipher_param->cipher_offset = areq->assoclen + AES_BLOCK_SIZE;
++	}
++	auth_param->auth_off = 0;
++	auth_param->auth_len = areq->assoclen + areq->cryptlen + AES_BLOCK_SIZE;
++
++	do {
++		ret = adf_send_message(ctx->inst->sym_tx, (uint32_t *)msg);
++	} while (ret == -EAGAIN && ctr++ < 10);
++
++	if (ret == -EAGAIN) {
++		qat_alg_free_bufl(ctx->inst, qat_req);
++		return -EBUSY;
++	}
++	return -EINPROGRESS;
++}
++
++static int qat_alg_enc(struct aead_request *areq)
++{
++	return qat_alg_enc_internal(areq, areq->iv, 0);
++}
++
++static int qat_alg_genivenc(struct aead_givcrypt_request *req)
++{
++	struct crypto_aead *aead_tfm = crypto_aead_reqtfm(&req->areq);
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead_tfm);
++	struct qat_alg_session_ctx *ctx = crypto_tfm_ctx(tfm);
++	__be64 seq;
++
++	memcpy(req->giv, ctx->salt, AES_BLOCK_SIZE);
++	seq = cpu_to_be64(req->seq);
++	memcpy(req->giv + AES_BLOCK_SIZE - sizeof(uint64_t),
++	       &seq, sizeof(uint64_t));
++	return qat_alg_enc_internal(&req->areq, req->giv, 1);
++}
++
++static int qat_alg_init(struct crypto_tfm *tfm,
++			enum icp_qat_hw_auth_algo hash, const char *hash_name)
++{
++	struct qat_alg_session_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	memset(ctx, '\0', sizeof(*ctx));
++	ctx->hash_tfm = crypto_alloc_shash(hash_name, 0, 0);
++	if (IS_ERR(ctx->hash_tfm))
++		return -EFAULT;
++	spin_lock_init(&ctx->lock);
++	ctx->qat_hash_alg = hash;
++	tfm->crt_aead.reqsize = sizeof(struct aead_request) +
++				sizeof(struct qat_crypto_request);
++	ctx->tfm = tfm;
++	return 0;
++}
++
++static int qat_alg_sha1_init(struct crypto_tfm *tfm)
++{
++	return qat_alg_init(tfm, ICP_QAT_HW_AUTH_ALGO_SHA1, "sha1");
++}
++
++static int qat_alg_sha256_init(struct crypto_tfm *tfm)
++{
++	return qat_alg_init(tfm, ICP_QAT_HW_AUTH_ALGO_SHA256, "sha256");
++}
++
++static int qat_alg_sha512_init(struct crypto_tfm *tfm)
++{
++	return qat_alg_init(tfm, ICP_QAT_HW_AUTH_ALGO_SHA512, "sha512");
++}
++
++static void qat_alg_exit(struct crypto_tfm *tfm)
++{
++	struct qat_alg_session_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct qat_crypto_instance *inst = ctx->inst;
++	struct device *dev;
++
++	if (!IS_ERR(ctx->hash_tfm))
++		crypto_free_shash(ctx->hash_tfm);
++
++	if (!inst)
++		return;
++
++	dev = &GET_DEV(inst->accel_dev);
++	if (ctx->enc_cd)
++		dma_free_coherent(dev, sizeof(struct qat_alg_cd),
++				  ctx->enc_cd, ctx->enc_cd_paddr);
++	if (ctx->dec_cd)
++		dma_free_coherent(dev, sizeof(struct qat_alg_cd),
++				  ctx->dec_cd, ctx->dec_cd_paddr);
++	if (ctx->auth_hw_state_enc)
++		dma_free_coherent(dev, sizeof(struct qat_auth_state),
++				  ctx->auth_hw_state_enc,
++				  ctx->auth_state_enc_paddr);
++
++	if (ctx->auth_hw_state_dec)
++		dma_free_coherent(dev, sizeof(struct qat_auth_state),
++				  ctx->auth_hw_state_dec,
++				  ctx->auth_state_dec_paddr);
++
++	qat_crypto_put_instance(inst);
++}
++
++static struct crypto_alg qat_algs[] = { {
++	.cra_name = "authenc(hmac(sha1),cbc(aes))",
++	.cra_driver_name = "qat_aes_cbc_hmac_sha1",
++	.cra_priority = 4001,
++	.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
++	.cra_blocksize = AES_BLOCK_SIZE,
++	.cra_ctxsize = sizeof(struct qat_alg_session_ctx),
++	.cra_alignmask = 0,
++	.cra_type = &crypto_aead_type,
++	.cra_module = THIS_MODULE,
++	.cra_init = qat_alg_sha1_init,
++	.cra_exit = qat_alg_exit,
++	.cra_u = {
++		.aead = {
++			.setkey = qat_alg_setkey,
++			.decrypt = qat_alg_dec,
++			.encrypt = qat_alg_enc,
++			.givencrypt = qat_alg_genivenc,
++			.ivsize = AES_BLOCK_SIZE,
++			.maxauthsize = SHA1_DIGEST_SIZE,
++		},
++	},
++}, {
++	.cra_name = "authenc(hmac(sha256),cbc(aes))",
++	.cra_driver_name = "qat_aes_cbc_hmac_sha256",
++	.cra_priority = 4001,
++	.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
++	.cra_blocksize = AES_BLOCK_SIZE,
++	.cra_ctxsize = sizeof(struct qat_alg_session_ctx),
++	.cra_alignmask = 0,
++	.cra_type = &crypto_aead_type,
++	.cra_module = THIS_MODULE,
++	.cra_init = qat_alg_sha256_init,
++	.cra_exit = qat_alg_exit,
++	.cra_u = {
++		.aead = {
++			.setkey = qat_alg_setkey,
++			.decrypt = qat_alg_dec,
++			.encrypt = qat_alg_enc,
++			.givencrypt = qat_alg_genivenc,
++			.ivsize = AES_BLOCK_SIZE,
++			.maxauthsize = SHA256_DIGEST_SIZE,
++		},
++	},
++}, {
++	.cra_name = "authenc(hmac(sha512),cbc(aes))",
++	.cra_driver_name = "qat_aes_cbc_hmac_sha512",
++	.cra_priority = 4001,
++	.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC,
++	.cra_blocksize = AES_BLOCK_SIZE,
++	.cra_ctxsize = sizeof(struct qat_alg_session_ctx),
++	.cra_alignmask = 0,
++	.cra_type = &crypto_aead_type,
++	.cra_module = THIS_MODULE,
++	.cra_init = qat_alg_sha512_init,
++	.cra_exit = qat_alg_exit,
++	.cra_u = {
++		.aead = {
++			.setkey = qat_alg_setkey,
++			.decrypt = qat_alg_dec,
++			.encrypt = qat_alg_enc,
++			.givencrypt = qat_alg_genivenc,
++			.ivsize = AES_BLOCK_SIZE,
++			.maxauthsize = SHA512_DIGEST_SIZE,
++		},
++	},
++} };
++
++int qat_algs_register(void)
++{
++	if (atomic_add_return(1, &active_dev) == 1) {
++		int i;
++
++		for (i = 0; i < ARRAY_SIZE(qat_algs); i++)
++			qat_algs[i].cra_flags =	CRYPTO_ALG_TYPE_AEAD |
++						CRYPTO_ALG_ASYNC;
++		return crypto_register_algs(qat_algs, ARRAY_SIZE(qat_algs));
++	}
++	return 0;
++}
++
++int qat_algs_unregister(void)
++{
++	if (atomic_sub_return(1, &active_dev) == 0)
++		return crypto_unregister_algs(qat_algs, ARRAY_SIZE(qat_algs));
++	return 0;
++}
++
++int qat_algs_init(void)
++{
++	atomic_set(&active_dev, 0);
++	crypto_get_default_rng();
++	return 0;
++}
++
++void qat_algs_exit(void)
++{
++	crypto_put_default_rng();
++}
+diff --git a/drivers/crypto/qat/qat_common/qat_crypto.c b/drivers/crypto/qat/qat_common/qat_crypto.c
 new file mode 100644
-index 0000000..cc7ec40
+index 0000000..cc562cb
 --- /dev/null
-+++ b/drivers/crypto/qat/qat_common/icp_qat_hw.h
-@@ -0,0 +1,305 @@
++++ b/drivers/crypto/qat/qat_common/qat_crypto.c
+@@ -0,0 +1,284 @@
 +/*
 +  This file is provided under a dual BSD/GPLv2 license.  When using or
 +  redistributing this file, you may do so under either license.
@@ -958,262 +1128,330 @@ index 0000000..cc7ec40
 +  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 +  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 +*/
-+#ifndef _ICP_QAT_HW_H_
-+#define _ICP_QAT_HW_H_
++#include <linux/module.h>
++#include <linux/slab.h>
++#include "adf_accel_devices.h"
++#include "adf_common_drv.h"
++#include "adf_transport.h"
++#include "adf_cfg.h"
++#include "adf_cfg_strings.h"
++#include "qat_crypto.h"
++#include "icp_qat_fw.h"
 +
-+enum icp_qat_hw_ae_id {
-+	ICP_QAT_HW_AE_0 = 0,
-+	ICP_QAT_HW_AE_1 = 1,
-+	ICP_QAT_HW_AE_2 = 2,
-+	ICP_QAT_HW_AE_3 = 3,
-+	ICP_QAT_HW_AE_4 = 4,
-+	ICP_QAT_HW_AE_5 = 5,
-+	ICP_QAT_HW_AE_6 = 6,
-+	ICP_QAT_HW_AE_7 = 7,
-+	ICP_QAT_HW_AE_8 = 8,
-+	ICP_QAT_HW_AE_9 = 9,
-+	ICP_QAT_HW_AE_10 = 10,
-+	ICP_QAT_HW_AE_11 = 11,
-+	ICP_QAT_HW_AE_DELIMITER = 12
++#define SEC ADF_KERNEL_SEC
++
++static struct service_hndl qat_crypto;
++
++void qat_crypto_put_instance(struct qat_crypto_instance *inst)
++{
++	if (atomic_sub_return(1, &inst->refctr) == 0)
++		adf_dev_put(inst->accel_dev);
++}
++
++static int qat_crypto_free_instances(struct adf_accel_dev *accel_dev)
++{
++	struct qat_crypto_instance *inst;
++	struct list_head *list_ptr, *tmp;
++	int i;
++
++	list_for_each_safe(list_ptr, tmp, &accel_dev->crypto_list) {
++		inst = list_entry(list_ptr, struct qat_crypto_instance, list);
++
++		for (i = 0; i < atomic_read(&inst->refctr); i++)
++			qat_crypto_put_instance(inst);
++
++		if (inst->sym_tx)
++			adf_remove_ring(inst->sym_tx);
++
++		if (inst->sym_rx)
++			adf_remove_ring(inst->sym_rx);
++
++		if (inst->pke_tx)
++			adf_remove_ring(inst->pke_tx);
++
++		if (inst->pke_rx)
++			adf_remove_ring(inst->pke_rx);
++
++		if (inst->rnd_tx)
++			adf_remove_ring(inst->rnd_tx);
++
++		if (inst->rnd_rx)
++			adf_remove_ring(inst->rnd_rx);
++
++		list_del(list_ptr);
++		kfree(inst);
++	}
++	return 0;
++}
++
++struct qat_crypto_instance *qat_crypto_get_instance_node(int node)
++{
++	struct adf_accel_dev *accel_dev = NULL;
++	struct qat_crypto_instance *inst_best = NULL;
++	struct list_head *itr;
++	unsigned long best = ~0;
++
++	list_for_each(itr, adf_devmgr_get_head()) {
++		accel_dev = list_entry(itr, struct adf_accel_dev, list);
++		if (accel_dev->numa_node == node && adf_dev_started(accel_dev))
++			break;
++		accel_dev = NULL;
++	}
++	if (!accel_dev) {
++		pr_err("QAT: Could not find device on give node\n");
++		accel_dev = adf_devmgr_get_first();
++	}
++	if (!accel_dev || !adf_dev_started(accel_dev))
++		return NULL;
++
++	list_for_each(itr, &accel_dev->crypto_list) {
++		struct qat_crypto_instance *inst;
++		unsigned long cur;
++
++		inst = list_entry(itr, struct qat_crypto_instance, list);
++		cur = atomic_read(&inst->refctr);
++		if (best > cur) {
++			inst_best = inst;
++			best = cur;
++		}
++	}
++	if (inst_best) {
++		if (atomic_add_return(1, &inst_best->refctr) == 1) {
++			if (adf_dev_get(accel_dev)) {
++				atomic_dec(&inst_best->refctr);
++				pr_err("QAT: Could increment dev refctr\n");
++				return NULL;
++			}
++		}
++	}
++	return inst_best;
++}
++
++static int qat_crypto_create_instances(struct adf_accel_dev *accel_dev)
++{
++	int i;
++	long unsigned int bank;
++	long unsigned int num_inst, num_msg_sym, num_msg_asym;
++	int msg_size;
++	struct qat_crypto_instance *inst;
++	char key[ADF_CFG_MAX_KEY_LEN_IN_BYTES];
++	char val[ADF_CFG_MAX_VAL_LEN_IN_BYTES];
++
++	INIT_LIST_HEAD(&accel_dev->crypto_list);
++	strlcpy(key, ADF_NUM_CY, sizeof(key));
++
++	if (adf_cfg_get_param_value(accel_dev, SEC, key, val))
++		return -EFAULT;
++
++	if (kstrtoul(val, 0, &num_inst))
++		return -EFAULT;
++
++	for (i = 0; i < num_inst; i++) {
++		inst = kzalloc_node(sizeof(*inst), GFP_KERNEL,
++				    accel_dev->numa_node);
++		if (!inst)
++			goto err;
++
++		list_add_tail(&inst->list, &accel_dev->crypto_list);
++		inst->id = i;
++		atomic_set(&inst->refctr, 0);
++		inst->accel_dev = accel_dev;
++		snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_BANK_NUM, i);
++		if (adf_cfg_get_param_value(accel_dev, SEC, key, val))
++			goto err;
++
++		if (kstrtoul(val, 10, &bank))
++			goto err;
++		snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_SYM_SIZE, i);
++		if (adf_cfg_get_param_value(accel_dev, SEC, key, val))
++			goto err;
++
++		if (kstrtoul(val, 10, &num_msg_sym))
++			goto err;
++		num_msg_sym = num_msg_sym >> 1;
++		snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_ASYM_SIZE, i);
++		if (adf_cfg_get_param_value(accel_dev, SEC, key, val))
++			goto err;
++
++		if (kstrtoul(val, 10, &num_msg_asym))
++			goto err;
++		num_msg_asym = num_msg_asym >> 1;
++
++		msg_size = ICP_QAT_FW_REQ_DEFAULT_SZ;
++		snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_SYM_TX, i);
++		if (adf_create_ring(accel_dev, SEC, bank, num_msg_sym,
++				    msg_size, key, NULL, 0, &inst->sym_tx))
++			goto err;
++
++		snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_RND_TX, i);
++		if (adf_create_ring(accel_dev, SEC, bank, num_msg_asym,
++				    msg_size, key, NULL, 0, &inst->rnd_tx))
++			goto err;
++
++		msg_size = msg_size >> 1;
++		snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_ASYM_TX, i);
++		if (adf_create_ring(accel_dev, SEC, bank, num_msg_asym,
++				    msg_size, key, NULL, 0, &inst->pke_tx))
++			goto err;
++
++		msg_size = ICP_QAT_FW_RESP_DEFAULT_SZ;
++		snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_SYM_RX, i);
++		if (adf_create_ring(accel_dev, SEC, bank, num_msg_sym,
++				    msg_size, key, qat_alg_callback, 0,
++				    &inst->sym_rx))
++			goto err;
++
++		snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_RND_RX, i);
++		if (adf_create_ring(accel_dev, SEC, bank, num_msg_asym,
++				    msg_size, key, qat_alg_callback, 0,
++				    &inst->rnd_rx))
++			goto err;
++
++		snprintf(key, sizeof(key), ADF_CY "%d" ADF_RING_ASYM_RX, i);
++		if (adf_create_ring(accel_dev, SEC, bank, num_msg_asym,
++				    msg_size, key, qat_alg_callback, 0,
++				    &inst->pke_rx))
++			goto err;
++	}
++	return 0;
++err:
++	qat_crypto_free_instances(accel_dev);
++	return -ENOMEM;
++}
++
++static int qat_crypto_init(struct adf_accel_dev *accel_dev)
++{
++	if (qat_crypto_create_instances(accel_dev))
++		return -EFAULT;
++
++	return 0;
++}
++
++static int qat_crypto_shutdown(struct adf_accel_dev *accel_dev)
++{
++	return qat_crypto_free_instances(accel_dev);
++}
++
++static int qat_crypto_event_handler(struct adf_accel_dev *accel_dev,
++				    enum adf_event event)
++{
++	int ret;
++
++	switch (event) {
++	case ADF_EVENT_INIT:
++		ret = qat_crypto_init(accel_dev);
++		break;
++	case ADF_EVENT_SHUTDOWN:
++		ret = qat_crypto_shutdown(accel_dev);
++		break;
++	case ADF_EVENT_RESTARTING:
++	case ADF_EVENT_RESTARTED:
++	case ADF_EVENT_START:
++	case ADF_EVENT_STOP:
++	default:
++		ret = 0;
++	}
++	return ret;
++}
++
++int qat_crypto_register(void)
++{
++	memset(&qat_crypto, 0, sizeof(qat_crypto));
++	qat_crypto.event_hld = qat_crypto_event_handler;
++	qat_crypto.name = "qat_crypto";
++	return adf_service_register(&qat_crypto);
++}
++
++int qat_crypto_unregister(void)
++{
++	return adf_service_unregister(&qat_crypto);
++}
+diff --git a/drivers/crypto/qat/qat_common/qat_crypto.h b/drivers/crypto/qat/qat_common/qat_crypto.h
+new file mode 100644
+index 0000000..ab8468d
+--- /dev/null
++++ b/drivers/crypto/qat/qat_common/qat_crypto.h
+@@ -0,0 +1,83 @@
++/*
++  This file is provided under a dual BSD/GPLv2 license.  When using or
++  redistributing this file, you may do so under either license.
++
++  GPL LICENSE SUMMARY
++  Copyright(c) 2014 Intel Corporation.
++  This program is free software; you can redistribute it and/or modify
++  it under the terms of version 2 of the GNU General Public License as
++  published by the Free Software Foundation.
++
++  This program is distributed in the hope that it will be useful, but
++  WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++  General Public License for more details.
++
++  Contact Information:
++  qat-linux@intel.com
++
++  BSD LICENSE
++  Copyright(c) 2014 Intel Corporation.
++  Redistribution and use in source and binary forms, with or without
++  modification, are permitted provided that the following conditions
++  are met:
++
++    * Redistributions of source code must retain the above copyright
++      notice, this list of conditions and the following disclaimer.
++    * Redistributions in binary form must reproduce the above copyright
++      notice, this list of conditions and the following disclaimer in
++      the documentation and/or other materials provided with the
++      distribution.
++    * Neither the name of Intel Corporation nor the names of its
++      contributors may be used to endorse or promote products derived
++      from this software without specific prior written permission.
++
++  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++*/
++#ifndef _QAT_CRYPTO_INSTANCE_H_
++#define _QAT_CRYPTO_INSTANCE_H_
++
++#include <linux/list.h>
++#include <linux/slab.h>
++#include "adf_accel_devices.h"
++#include "icp_qat_fw_la.h"
++
++struct qat_crypto_instance {
++	struct adf_etr_ring_data *sym_tx;
++	struct adf_etr_ring_data *sym_rx;
++	struct adf_etr_ring_data *pke_tx;
++	struct adf_etr_ring_data *pke_rx;
++	struct adf_etr_ring_data *rnd_tx;
++	struct adf_etr_ring_data *rnd_rx;
++	struct adf_accel_dev *accel_dev;
++	struct list_head list;
++	unsigned long state;
++	int id;
++	atomic_t refctr;
 +};
 +
-+enum icp_qat_hw_qat_id {
-+	ICP_QAT_HW_QAT_0 = 0,
-+	ICP_QAT_HW_QAT_1 = 1,
-+	ICP_QAT_HW_QAT_2 = 2,
-+	ICP_QAT_HW_QAT_3 = 3,
-+	ICP_QAT_HW_QAT_4 = 4,
-+	ICP_QAT_HW_QAT_5 = 5,
-+	ICP_QAT_HW_QAT_DELIMITER = 6
++struct qat_crypto_request_buffs {
++	struct qat_alg_buf_list *bl;
++	dma_addr_t blp;
++	struct qat_alg_buf_list *blout;
++	dma_addr_t bloutp;
++	size_t sz;
 +};
 +
-+enum icp_qat_hw_auth_algo {
-+	ICP_QAT_HW_AUTH_ALGO_NULL = 0,
-+	ICP_QAT_HW_AUTH_ALGO_SHA1 = 1,
-+	ICP_QAT_HW_AUTH_ALGO_MD5 = 2,
-+	ICP_QAT_HW_AUTH_ALGO_SHA224 = 3,
-+	ICP_QAT_HW_AUTH_ALGO_SHA256 = 4,
-+	ICP_QAT_HW_AUTH_ALGO_SHA384 = 5,
-+	ICP_QAT_HW_AUTH_ALGO_SHA512 = 6,
-+	ICP_QAT_HW_AUTH_ALGO_AES_XCBC_MAC = 7,
-+	ICP_QAT_HW_AUTH_ALGO_AES_CBC_MAC = 8,
-+	ICP_QAT_HW_AUTH_ALGO_AES_F9 = 9,
-+	ICP_QAT_HW_AUTH_ALGO_GALOIS_128 = 10,
-+	ICP_QAT_HW_AUTH_ALGO_GALOIS_64 = 11,
-+	ICP_QAT_HW_AUTH_ALGO_KASUMI_F9 = 12,
-+	ICP_QAT_HW_AUTH_ALGO_SNOW_3G_UIA2 = 13,
-+	ICP_QAT_HW_AUTH_ALGO_ZUC_3G_128_EIA3 = 14,
-+	ICP_QAT_HW_AUTH_RESERVED_1 = 15,
-+	ICP_QAT_HW_AUTH_RESERVED_2 = 16,
-+	ICP_QAT_HW_AUTH_ALGO_SHA3_256 = 17,
-+	ICP_QAT_HW_AUTH_RESERVED_3 = 18,
-+	ICP_QAT_HW_AUTH_ALGO_SHA3_512 = 19,
-+	ICP_QAT_HW_AUTH_ALGO_DELIMITER = 20
-+};
-+
-+enum icp_qat_hw_auth_mode {
-+	ICP_QAT_HW_AUTH_MODE0 = 0,
-+	ICP_QAT_HW_AUTH_MODE1 = 1,
-+	ICP_QAT_HW_AUTH_MODE2 = 2,
-+	ICP_QAT_HW_AUTH_MODE_DELIMITER = 3
-+};
-+
-+struct icp_qat_hw_auth_config {
-+	uint32_t config;
-+	uint32_t reserved;
-+};
-+
-+#define QAT_AUTH_MODE_BITPOS 4
-+#define QAT_AUTH_MODE_MASK 0xF
-+#define QAT_AUTH_ALGO_BITPOS 0
-+#define QAT_AUTH_ALGO_MASK 0xF
-+#define QAT_AUTH_CMP_BITPOS 8
-+#define QAT_AUTH_CMP_MASK 0x7F
-+#define QAT_AUTH_SHA3_PADDING_BITPOS 16
-+#define QAT_AUTH_SHA3_PADDING_MASK 0x1
-+#define QAT_AUTH_ALGO_SHA3_BITPOS 22
-+#define QAT_AUTH_ALGO_SHA3_MASK 0x3
-+#define ICP_QAT_HW_AUTH_CONFIG_BUILD(mode, algo, cmp_len) \
-+	((((mode) & QAT_AUTH_MODE_MASK) << QAT_AUTH_MODE_BITPOS) | \
-+	(((algo) & QAT_AUTH_ALGO_MASK) << QAT_AUTH_ALGO_BITPOS) | \
-+	(((algo >> 4) & QAT_AUTH_ALGO_SHA3_MASK) << \
-+	 QAT_AUTH_ALGO_SHA3_BITPOS) | \
-+	 (((((algo == ICP_QAT_HW_AUTH_ALGO_SHA3_256) || \
-+	(algo == ICP_QAT_HW_AUTH_ALGO_SHA3_512)) ? 1 : 0) \
-+	& QAT_AUTH_SHA3_PADDING_MASK) << QAT_AUTH_SHA3_PADDING_BITPOS) | \
-+	(((cmp_len) & QAT_AUTH_CMP_MASK) << QAT_AUTH_CMP_BITPOS))
-+
-+struct icp_qat_hw_auth_counter {
-+	__be32 counter;
-+	uint32_t reserved;
-+};
-+
-+#define QAT_AUTH_COUNT_MASK 0xFFFFFFFF
-+#define QAT_AUTH_COUNT_BITPOS 0
-+#define ICP_QAT_HW_AUTH_COUNT_BUILD(val) \
-+	(((val) & QAT_AUTH_COUNT_MASK) << QAT_AUTH_COUNT_BITPOS)
-+
-+struct icp_qat_hw_auth_setup {
-+	struct icp_qat_hw_auth_config auth_config;
-+	struct icp_qat_hw_auth_counter auth_counter;
-+};
-+
-+#define QAT_HW_DEFAULT_ALIGNMENT 8
-+#define QAT_HW_ROUND_UP(val, n) (((val) + ((n)-1)) & (~(n-1)))
-+#define ICP_QAT_HW_NULL_STATE1_SZ 32
-+#define ICP_QAT_HW_MD5_STATE1_SZ 16
-+#define ICP_QAT_HW_SHA1_STATE1_SZ 20
-+#define ICP_QAT_HW_SHA224_STATE1_SZ 32
-+#define ICP_QAT_HW_SHA256_STATE1_SZ 32
-+#define ICP_QAT_HW_SHA3_256_STATE1_SZ 32
-+#define ICP_QAT_HW_SHA384_STATE1_SZ 64
-+#define ICP_QAT_HW_SHA512_STATE1_SZ 64
-+#define ICP_QAT_HW_SHA3_512_STATE1_SZ 64
-+#define ICP_QAT_HW_SHA3_224_STATE1_SZ 28
-+#define ICP_QAT_HW_SHA3_384_STATE1_SZ 48
-+#define ICP_QAT_HW_AES_XCBC_MAC_STATE1_SZ 16
-+#define ICP_QAT_HW_AES_CBC_MAC_STATE1_SZ 16
-+#define ICP_QAT_HW_AES_F9_STATE1_SZ 32
-+#define ICP_QAT_HW_KASUMI_F9_STATE1_SZ 16
-+#define ICP_QAT_HW_GALOIS_128_STATE1_SZ 16
-+#define ICP_QAT_HW_SNOW_3G_UIA2_STATE1_SZ 8
-+#define ICP_QAT_HW_ZUC_3G_EIA3_STATE1_SZ 8
-+#define ICP_QAT_HW_NULL_STATE2_SZ 32
-+#define ICP_QAT_HW_MD5_STATE2_SZ 16
-+#define ICP_QAT_HW_SHA1_STATE2_SZ 20
-+#define ICP_QAT_HW_SHA224_STATE2_SZ 32
-+#define ICP_QAT_HW_SHA256_STATE2_SZ 32
-+#define ICP_QAT_HW_SHA3_256_STATE2_SZ 0
-+#define ICP_QAT_HW_SHA384_STATE2_SZ 64
-+#define ICP_QAT_HW_SHA512_STATE2_SZ 64
-+#define ICP_QAT_HW_SHA3_512_STATE2_SZ 0
-+#define ICP_QAT_HW_SHA3_224_STATE2_SZ 0
-+#define ICP_QAT_HW_SHA3_384_STATE2_SZ 0
-+#define ICP_QAT_HW_AES_XCBC_MAC_KEY_SZ 16
-+#define ICP_QAT_HW_AES_CBC_MAC_KEY_SZ 16
-+#define ICP_QAT_HW_AES_CCM_CBC_E_CTR0_SZ 16
-+#define ICP_QAT_HW_F9_IK_SZ 16
-+#define ICP_QAT_HW_F9_FK_SZ 16
-+#define ICP_QAT_HW_KASUMI_F9_STATE2_SZ (ICP_QAT_HW_F9_IK_SZ + \
-+	ICP_QAT_HW_F9_FK_SZ)
-+#define ICP_QAT_HW_AES_F9_STATE2_SZ ICP_QAT_HW_KASUMI_F9_STATE2_SZ
-+#define ICP_QAT_HW_SNOW_3G_UIA2_STATE2_SZ 24
-+#define ICP_QAT_HW_ZUC_3G_EIA3_STATE2_SZ 32
-+#define ICP_QAT_HW_GALOIS_H_SZ 16
-+#define ICP_QAT_HW_GALOIS_LEN_A_SZ 8
-+#define ICP_QAT_HW_GALOIS_E_CTR0_SZ 16
-+
-+struct icp_qat_hw_auth_sha512 {
-+	struct icp_qat_hw_auth_setup inner_setup;
-+	uint8_t state1[ICP_QAT_HW_SHA512_STATE1_SZ];
-+	struct icp_qat_hw_auth_setup outer_setup;
-+	uint8_t state2[ICP_QAT_HW_SHA512_STATE2_SZ];
-+};
-+
-+struct icp_qat_hw_auth_algo_blk {
-+	struct icp_qat_hw_auth_sha512 sha;
-+};
-+
-+#define ICP_QAT_HW_GALOIS_LEN_A_BITPOS 0
-+#define ICP_QAT_HW_GALOIS_LEN_A_MASK 0xFFFFFFFF
-+
-+enum icp_qat_hw_cipher_algo {
-+	ICP_QAT_HW_CIPHER_ALGO_NULL = 0,
-+	ICP_QAT_HW_CIPHER_ALGO_DES = 1,
-+	ICP_QAT_HW_CIPHER_ALGO_3DES = 2,
-+	ICP_QAT_HW_CIPHER_ALGO_AES128 = 3,
-+	ICP_QAT_HW_CIPHER_ALGO_AES192 = 4,
-+	ICP_QAT_HW_CIPHER_ALGO_AES256 = 5,
-+	ICP_QAT_HW_CIPHER_ALGO_ARC4 = 6,
-+	ICP_QAT_HW_CIPHER_ALGO_KASUMI = 7,
-+	ICP_QAT_HW_CIPHER_ALGO_SNOW_3G_UEA2 = 8,
-+	ICP_QAT_HW_CIPHER_ALGO_ZUC_3G_128_EEA3 = 9,
-+	ICP_QAT_HW_CIPHER_DELIMITER = 10
-+};
-+
-+enum icp_qat_hw_cipher_mode {
-+	ICP_QAT_HW_CIPHER_ECB_MODE = 0,
-+	ICP_QAT_HW_CIPHER_CBC_MODE = 1,
-+	ICP_QAT_HW_CIPHER_CTR_MODE = 2,
-+	ICP_QAT_HW_CIPHER_F8_MODE = 3,
-+	ICP_QAT_HW_CIPHER_XTS_MODE = 6,
-+	ICP_QAT_HW_CIPHER_MODE_DELIMITER = 7
-+};
-+
-+struct icp_qat_hw_cipher_config {
-+	uint32_t val;
-+	uint32_t reserved;
-+};
-+
-+enum icp_qat_hw_cipher_dir {
-+	ICP_QAT_HW_CIPHER_ENCRYPT = 0,
-+	ICP_QAT_HW_CIPHER_DECRYPT = 1,
-+};
-+
-+enum icp_qat_hw_cipher_convert {
-+	ICP_QAT_HW_CIPHER_NO_CONVERT = 0,
-+	ICP_QAT_HW_CIPHER_KEY_CONVERT = 1,
-+};
-+
-+#define QAT_CIPHER_MODE_BITPOS 4
-+#define QAT_CIPHER_MODE_MASK 0xF
-+#define QAT_CIPHER_ALGO_BITPOS 0
-+#define QAT_CIPHER_ALGO_MASK 0xF
-+#define QAT_CIPHER_CONVERT_BITPOS 9
-+#define QAT_CIPHER_CONVERT_MASK 0x1
-+#define QAT_CIPHER_DIR_BITPOS 8
-+#define QAT_CIPHER_DIR_MASK 0x1
-+#define QAT_CIPHER_MODE_F8_KEY_SZ_MULT 2
-+#define QAT_CIPHER_MODE_XTS_KEY_SZ_MULT 2
-+#define ICP_QAT_HW_CIPHER_CONFIG_BUILD(mode, algo, convert, dir) \
-+	(((mode & QAT_CIPHER_MODE_MASK) << QAT_CIPHER_MODE_BITPOS) | \
-+	((algo & QAT_CIPHER_ALGO_MASK) << QAT_CIPHER_ALGO_BITPOS) | \
-+	((convert & QAT_CIPHER_CONVERT_MASK) << QAT_CIPHER_CONVERT_BITPOS) | \
-+	((dir & QAT_CIPHER_DIR_MASK) << QAT_CIPHER_DIR_BITPOS))
-+#define ICP_QAT_HW_DES_BLK_SZ 8
-+#define ICP_QAT_HW_3DES_BLK_SZ 8
-+#define ICP_QAT_HW_NULL_BLK_SZ 8
-+#define ICP_QAT_HW_AES_BLK_SZ 16
-+#define ICP_QAT_HW_KASUMI_BLK_SZ 8
-+#define ICP_QAT_HW_SNOW_3G_BLK_SZ 8
-+#define ICP_QAT_HW_ZUC_3G_BLK_SZ 8
-+#define ICP_QAT_HW_NULL_KEY_SZ 256
-+#define ICP_QAT_HW_DES_KEY_SZ 8
-+#define ICP_QAT_HW_3DES_KEY_SZ 24
-+#define ICP_QAT_HW_AES_128_KEY_SZ 16
-+#define ICP_QAT_HW_AES_192_KEY_SZ 24
-+#define ICP_QAT_HW_AES_256_KEY_SZ 32
-+#define ICP_QAT_HW_AES_128_F8_KEY_SZ (ICP_QAT_HW_AES_128_KEY_SZ * \
-+	QAT_CIPHER_MODE_F8_KEY_SZ_MULT)
-+#define ICP_QAT_HW_AES_192_F8_KEY_SZ (ICP_QAT_HW_AES_192_KEY_SZ * \
-+	QAT_CIPHER_MODE_F8_KEY_SZ_MULT)
-+#define ICP_QAT_HW_AES_256_F8_KEY_SZ (ICP_QAT_HW_AES_256_KEY_SZ * \
-+	QAT_CIPHER_MODE_F8_KEY_SZ_MULT)
-+#define ICP_QAT_HW_AES_128_XTS_KEY_SZ (ICP_QAT_HW_AES_128_KEY_SZ * \
-+	QAT_CIPHER_MODE_XTS_KEY_SZ_MULT)
-+#define ICP_QAT_HW_AES_256_XTS_KEY_SZ (ICP_QAT_HW_AES_256_KEY_SZ * \
-+	QAT_CIPHER_MODE_XTS_KEY_SZ_MULT)
-+#define ICP_QAT_HW_KASUMI_KEY_SZ 16
-+#define ICP_QAT_HW_KASUMI_F8_KEY_SZ (ICP_QAT_HW_KASUMI_KEY_SZ * \
-+	QAT_CIPHER_MODE_F8_KEY_SZ_MULT)
-+#define ICP_QAT_HW_AES_128_XTS_KEY_SZ (ICP_QAT_HW_AES_128_KEY_SZ * \
-+	QAT_CIPHER_MODE_XTS_KEY_SZ_MULT)
-+#define ICP_QAT_HW_AES_256_XTS_KEY_SZ (ICP_QAT_HW_AES_256_KEY_SZ * \
-+	QAT_CIPHER_MODE_XTS_KEY_SZ_MULT)
-+#define ICP_QAT_HW_ARC4_KEY_SZ 256
-+#define ICP_QAT_HW_SNOW_3G_UEA2_KEY_SZ 16
-+#define ICP_QAT_HW_SNOW_3G_UEA2_IV_SZ 16
-+#define ICP_QAT_HW_ZUC_3G_EEA3_KEY_SZ 16
-+#define ICP_QAT_HW_ZUC_3G_EEA3_IV_SZ 16
-+#define ICP_QAT_HW_MODE_F8_NUM_REG_TO_CLEAR 2
-+#define INIT_SHRAM_CONSTANTS_TABLE_SZ 1024
-+
-+struct icp_qat_hw_cipher_aes256_f8 {
-+	struct icp_qat_hw_cipher_config cipher_config;
-+	uint8_t key[ICP_QAT_HW_AES_256_F8_KEY_SZ];
-+};
-+
-+struct icp_qat_hw_cipher_algo_blk {
-+	struct icp_qat_hw_cipher_aes256_f8 aes;
++struct qat_crypto_request {
++	struct icp_qat_fw_la_bulk_req req;
++	struct qat_alg_session_ctx *ctx;
++	struct aead_request *areq;
++	struct qat_crypto_request_buffs buf;
 +};
 +#endif
