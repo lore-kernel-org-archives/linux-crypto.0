@@ -1,44 +1,55 @@
 From: Amos Kong <akong@redhat.com>
-Subject: Re: RFC: 2 pages are enough for xor speed testing
-Date: Thu, 5 Jun 2014 09:07:07 +0800
-Message-ID: <20140605010707.GA3890@z.redhat.com>
-References: <20140528050152.GA2948@z.redhat.com>
- <201406011853.31268.marex@denx.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-To: Marek Vasut <marex@denx.de>
+Subject: [PATCH] crypto/xor.c: use 2 pages for xor speed testing
+Date: Thu,  5 Jun 2014 09:11:33 +0800
+Message-ID: <1401930693-6549-1-git-send-email-akong@redhat.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, marex@denx.de
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:30494 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:31701 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751340AbaFEBHX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 Jun 2014 21:07:23 -0400
-Content-Disposition: inline
-In-Reply-To: <201406011853.31268.marex@denx.de>
+	id S1751609AbaFEBLo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 4 Jun 2014 21:11:44 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jun 01, 2014 at 06:53:31PM +0200, Marek Vasut wrote:
-> On Wednesday, May 28, 2014 at 07:01:52 AM, Amos Kong wrote:
-> > @@ -154,7 +154,7 @@ calibrate_xor_blocks(void)
-> >  #undef xor_speed
-> >  
-> >   out:
-> > -       free_pages((unsigned long)b1, 2);
-> > +       free_pssssages((unsigned long)b1, 1);
-> >  
-> >         active_template = fastest;
-> >         return 0;
-> 
-> I suppose this part of the patch was not intentional ;-)
+In crypto/xor.c: calibrate_xor_blocks(), we allocated total 4 pages to
+do xor speed testing, the BENCH_SIZE is 1 page, and we skipped 2 pages
+when we set b2.
 
-Sorry, I changed this to know if code was built.
+It seems that total 2 pages are enough without skipping 2 pages.
 
-I will post a new version, thanks!
+Signed-off-by: Amos Kong <akong@redhat.com>
+---
+ crypto/xor.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/crypto/xor.c b/crypto/xor.c
+index 35d6b3a..609dfb5 100644
+--- a/crypto/xor.c
++++ b/crypto/xor.c
+@@ -114,12 +114,12 @@ calibrate_xor_blocks(void)
+ 	 * test the XOR speed, we don't really want kmemcheck to warn about
+ 	 * reading uninitialized bytes here.
+ 	 */
+-	b1 = (void *) __get_free_pages(GFP_KERNEL | __GFP_NOTRACK, 2);
++	b1 = (void *) __get_free_pages(GFP_KERNEL | __GFP_NOTRACK, 1);
+ 	if (!b1) {
+ 		printk(KERN_WARNING "xor: Yikes!  No memory available.\n");
+ 		return -ENOMEM;
+ 	}
+-	b2 = b1 + 2*PAGE_SIZE + BENCH_SIZE;
++	b2 = b1 + BENCH_SIZE;
  
-> Best regards,
-> Marek Vasut
-
+ 	/*
+ 	 * If this arch/cpu has a short-circuited selection, don't loop through
+@@ -154,7 +154,7 @@ calibrate_xor_blocks(void)
+ #undef xor_speed
+ 
+  out:
+-	free_pages((unsigned long)b1, 2);
++	free_pages((unsigned long)b1, 1);
+ 
+ 	active_template = fastest;
+ 	return 0;
 -- 
-			Amos.
+1.9.3
