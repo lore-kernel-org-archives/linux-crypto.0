@@ -1,7 +1,7 @@
 From: Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: [PATCH v3 2/3] crypto: qce: Build Qualcomm crypto driver
-Date: Mon,  9 Jun 2014 15:08:39 +0300
-Message-ID: <1402315720-5042-3-git-send-email-svarbanov@mm-sol.com>
+Subject: [PATCH v3 3/3] ARM: DT: qcom: Add Qualcomm crypto driver binding document
+Date: Mon,  9 Jun 2014 15:08:40 +0300
+Message-ID: <1402315720-5042-4-git-send-email-svarbanov@mm-sol.com>
 References: <1402315720-5042-1-git-send-email-svarbanov@mm-sol.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
@@ -15,66 +15,50 @@ To: Rob Herring <rob.herring@calxeda.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Grant Likely <grant.likely@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-arm-msm-owner@vger.kernel.org>
 In-Reply-To: <1402315720-5042-1-git-send-email-svarbanov@mm-sol.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-arm-msm-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Modify crypto Kconfig and Makefile in order to build the qce
-driver and adds qce Makefile as well.
+Here is Qualcomm crypto driver device tree binding documentation
+to used as a reference example.
 
 Signed-off-by: Stanimir Varbanov <svarbanov@mm-sol.com>
 ---
- drivers/crypto/Kconfig      |   15 +++++++++++++++
- drivers/crypto/Makefile     |    1 +
- drivers/crypto/qce/Makefile |    6 ++++++
- 3 files changed, 22 insertions(+), 0 deletions(-)
- create mode 100644 drivers/crypto/qce/Makefile
+ .../devicetree/bindings/crypto/qcom-qce.txt        |   25 ++++++++++++++++++++
+ 1 files changed, 25 insertions(+), 0 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.txt
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index f066fa2..8b87362 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -418,4 +418,19 @@ config CRYPTO_DEV_MXS_DCP
- 	  To compile this driver as a module, choose M here: the module
- 	  will be called mxs-dcp.
- 
-+config CRYPTO_DEV_QCE
-+	tristate "Qualcomm crypto engine accelerator"
-+	select CRYPTO_AES
-+	select CRYPTO_DES
-+	select CRYPTO_ECB
-+	select CRYPTO_CBC
-+	select CRYPTO_XTS
-+	select CRYPTO_CTR
-+	select CRYPTO_ALGAPI
-+	select CRYPTO_BLKCIPHER
-+	help
-+	  This driver supports Qualcomm crypto engine accelerator
-+	  hardware. To compile this driver as a module, choose M here. The
-+	  module will be called qcrypto.
-+
- endif # CRYPTO_HW
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 482f090..320937b 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -23,3 +23,4 @@ obj-$(CONFIG_CRYPTO_DEV_S5P) += s5p-sss.o
- obj-$(CONFIG_CRYPTO_DEV_SAHARA) += sahara.o
- obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
- obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
-+obj-$(CONFIG_CRYPTO_DEV_QCE) += qce/
-diff --git a/drivers/crypto/qce/Makefile b/drivers/crypto/qce/Makefile
+diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.txt b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
 new file mode 100644
-index 0000000..348dc31
+index 0000000..fdd53b1
 --- /dev/null
-+++ b/drivers/crypto/qce/Makefile
-@@ -0,0 +1,6 @@
-+obj-$(CONFIG_CRYPTO_DEV_QCE) += qcrypto.o
-+qcrypto-objs := core.o \
-+		common.o \
-+		dma.o \
-+		sha.o \
-+		ablkcipher.o
++++ b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
+@@ -0,0 +1,25 @@
++Qualcomm crypto engine driver
++
++Required properties:
++
++- compatible  : should be "qcom,crypto-v5.1"
++- reg         : specifies base physical address and size of the registers map
++- clocks      : phandle to clock-controller plus clock-specifier pair
++- clock-names : "iface" clocks register interface
++                "bus" clocks data transfer interface
++                "core" clocks rest of the crypto block
++- dmas        : DMA specifiers for tx and rx dma channels. For more see
++                Documentation/devicetree/bindings/dma/dma.txt
++- dma-names   : DMA request names should be "rx" and "tx"
++
++Example:
++	crypto@fd45a000 {
++		compatible = "qcom,crypto-v5.1";
++		reg = <0xfd45a000 0x6000>;
++		clocks = <&gcc GCC_CE2_AHB_CLK>,
++			 <&gcc GCC_CE2_AXI_CLK>,
++			 <&gcc GCC_CE2_CLK>;
++		clock-names = "iface", "bus", "core";
++		dmas = <&cryptobam 2>, <&cryptobam 3>;
++		dma-names = "rx", "tx";
++	};
 -- 
 1.7.0.4
