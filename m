@@ -1,31 +1,43 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] crypto: caam - remove duplicate FIFOST_CONT_MASK define
-Date: Mon, 9 Jun 2014 18:19:41 +0300
-Message-ID: <20140609151941.GN9600@mwanda>
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH v3 1/3] crypto: qce: Qualcomm crypto engine driver
+Date: Mon, 09 Jun 2014 09:46:49 -0700
+Message-ID: <1402332409.3142.2.camel@joe-AO725>
+References: <1402315720-5042-1-git-send-email-svarbanov@mm-sol.com>
+	 <1402315720-5042-2-git-send-email-svarbanov@mm-sol.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Alex Porosanu <alexandru.porosanu@freescale.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-Content-Disposition: inline
-Sender: kernel-janitors-owner@vger.kernel.org
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Rob Herring <rob.herring@calxeda.com>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Grant Likely <grant.likely@linaro.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-doc@vger.kernel.org
+To: Stanimir Varbanov <svarbanov@mm-sol.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1402315720-5042-2-git-send-email-svarbanov@mm-sol.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The FIFOST_CONT_MASK define is cut and pasted twice so we can delete the
-second instance.
+On Mon, 2014-06-09 at 15:08 +0300, Stanimir Varbanov wrote:
+> The driver is separated by functional parts. The core part
+> implements a platform driver probe and remove callbaks.
+> The probe enables clocks, checks crypto version, initialize
+> and request dma channels, create done tasklet and init
+> crypto queue and finally register the algorithms into crypto
+> core subsystem.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+trivia:
 
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index 7e4500f..d397ff9 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -321,7 +321,6 @@ struct sec4_sg_entry {
- /* Continue - Not the last FIFO store to come */
- #define FIFOST_CONT_SHIFT	23
- #define FIFOST_CONT_MASK	(1 << FIFOST_CONT_SHIFT)
--#define FIFOST_CONT_MASK	(1 << FIFOST_CONT_SHIFT)
- 
- /*
-  * Extended Length - use 32-bit extended length that
+> diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
+[]
+> +#define AUTH_NONCE_NUM_WORDS_SHIFT	20
+> +#define AUTH_NONCE_NUM_WORDS_MASK	GENMASK(22, 20);
+
+Unnecessary semicolon and appears to be unused.
