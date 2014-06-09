@@ -1,65 +1,73 @@
-From: Steven Miao <realmz6@gmail.com>
-Subject: Re: Crypto Update for 3.16
-Date: Mon, 9 Jun 2014 09:47:23 +0800
-Message-ID: <CAMk6uBmtBBjnSNp2nuwNwfrtxQ8rc6+EY5HVKb2PtpvYGWnBfg@mail.gmail.com>
-References: <20110724011752.GA14373@gondor.apana.org.au>
-	<20111031040952.GA19659@gondor.apana.org.au>
-	<20120106041250.GA7759@gondor.apana.org.au>
-	<20121004095357.GA11777@gondor.apana.org.au>
-	<20121214103156.GA5840@gondor.apana.org.au>
-	<20130223023331.GA11002@gondor.apana.org.au>
-	<20130907035544.GA22658@gondor.apana.org.au>
-	<20131107080131.GA32307@gondor.apana.org.au>
-	<20140123115319.GA20602@gondor.apana.org.au>
-	<20140401100001.GA12386@gondor.apana.org.au>
-	<20140605062336.GA14440@gondor.apana.org.au>
-	<CA+55aFz0d4N5hcjqPxzz894WMaoYxBX7rLWXnCa12z=9ogacTg@mail.gmail.com>
+From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v2] crypto: Add Allwinner Security System crypto accelerator
+Date: Mon,  9 Jun 2014 12:59:07 +0200
+Message-ID: <1402311551-19564-1-git-send-email-clabbe.montjoie@gmail.com>
+Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Sonic Zhang <sonic.zhang@analog.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CA+55aFz0d4N5hcjqPxzz894WMaoYxBX7rLWXnCa12z=9ogacTg@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org,
+	mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
+	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org,
+	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBBVH22OAKGQEBKBBD7Q-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi>
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus,
+Hello
 
-On Sun, Jun 8, 2014 at 10:56 AM, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
-> On Wed, Jun 4, 2014 at 11:23 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->>
->> Here is the crypto update for 3.16:
->
-> There's something odd going on with bfin_crc.h.
->
-> You moved it in commit 52e6e543f2d8 ("crypto: bfin_crc - access crc
-> registers by readl and writel functions").
->
-> It got *deleted* by commit 3356c99ea392 ("bfin_crc: Move architecture
-> independant crc header file out of the blackfin folder") which claims
-> to just move things.
->
-> Both of those commits are by Sonic Zhang, just came to me through two
-> different trees (though your crypto tree, and through Steven Miao's
-> bfin tree).
->
-> I'm assuming that the delete was actually incorrect, and should have
-> been a move, because it looks like the bfin_crc.c file won't compile
-> without it. So I've re-instated that file.
->
-> But the state of the bfin tree seems to be crap. Somebody should take
-> a look at what happened here. My suspicion is that commit 3356c99ea392
-> was broken by Steven Miao trying to only touch files in arch/blackfin
-> or something.
-Yes. I should be a move from arch/blackfin to drivers/crypto, sorry
-for I only formating the arch/blackfin changes.
->
->                Linus
+This is the driver for the Security System included in Allwinner SoC A20.
+The Security System (SS for short) is a hardware cryptographic accelerator that support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+It could be found on others Allwinner SoC: 
+- A10s and A31 diagram speak about it with precisions (AES/DES/3DES/Md5/SHA1/PRNG)
+- A10 and A13 manual give the same datasheet for SS than A20
+- A23 speak about a security system but without precisions
+But I do not have access on any of those hardware, tests are welcome.
 
+This driver currently supports:
+- MD5 and SHA1 hash algorithms
+- AES block cipher in CBC mode with 128/196/256bits keys.
+- DES and 3DES block cipher in CBC mode
+- PRNG
+The driver exposes all those algorithms through the kernel cryptographic API.
 
--steven
+The driver support only CPU driven (aka poll mode) transfer mode since the DMA engine of the A20 does not have a driver yet.
+
+Changes since v1:
+- annotate ss->base as __iomem
+- regroup all mutex in the ss_ctx structure
+- splited driver in 7 modules (core md5 sha1 aes des 3des prng) in sunxi-ss directory
+- use dev_exit_p() for .remove
+- added missing CRYPTO_BLKCIPHER dep in Kconfig
+- use ahash instead of shash
+- use ablkcipher instead of blkcipher
+- use crypto_rng_ctx instead of crypto_tfm_ctx
+- set seed as an u32
+- drop useless comment decoration
+- drop useless debug
+- ss_ctx is now a static pointer and whole structure being allocated
+- fix the platform_get_resource/devm_ioremap_resource pattern
+- invert getting die id and configuring clock
+- set clock value as a const unsigned long
+- add MODULE_ALIAS
+- use define names more consistency (SS_xxx)
+- fix PRNG errors
+- respell SS to Security System in DT documentation
+
+Regards.
