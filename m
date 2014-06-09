@@ -1,64 +1,31 @@
-From: Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: [PATCH v3 3/3] ARM: DT: qcom: Add Qualcomm crypto driver binding document
-Date: Mon,  9 Jun 2014 15:08:40 +0300
-Message-ID: <1402315720-5042-4-git-send-email-svarbanov@mm-sol.com>
-References: <1402315720-5042-1-git-send-email-svarbanov@mm-sol.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-doc@vger.kernel.org, Stanimir Varbanov <svarbanov@mm-sol.com>
-To: Rob Herring <rob.herring@calxeda.com>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Grant Likely <grant.likely@linaro.org>
-Return-path: <linux-arm-msm-owner@vger.kernel.org>
-In-Reply-To: <1402315720-5042-1-git-send-email-svarbanov@mm-sol.com>
-Sender: linux-arm-msm-owner@vger.kernel.org
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch] crypto: caam - remove duplicate FIFOST_CONT_MASK define
+Date: Mon, 9 Jun 2014 18:19:41 +0300
+Message-ID: <20140609151941.GN9600@mwanda>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Alex Porosanu <alexandru.porosanu@freescale.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Here is Qualcomm crypto driver device tree binding documentation
-to used as a reference example.
+The FIFOST_CONT_MASK define is cut and pasted twice so we can delete the
+second instance.
 
-Signed-off-by: Stanimir Varbanov <svarbanov@mm-sol.com>
----
- .../devicetree/bindings/crypto/qcom-qce.txt        |   25 ++++++++++++++++++++
- 1 files changed, 25 insertions(+), 0 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.txt
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.txt b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
-new file mode 100644
-index 0000000..fdd53b1
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
-@@ -0,0 +1,25 @@
-+Qualcomm crypto engine driver
-+
-+Required properties:
-+
-+- compatible  : should be "qcom,crypto-v5.1"
-+- reg         : specifies base physical address and size of the registers map
-+- clocks      : phandle to clock-controller plus clock-specifier pair
-+- clock-names : "iface" clocks register interface
-+                "bus" clocks data transfer interface
-+                "core" clocks rest of the crypto block
-+- dmas        : DMA specifiers for tx and rx dma channels. For more see
-+                Documentation/devicetree/bindings/dma/dma.txt
-+- dma-names   : DMA request names should be "rx" and "tx"
-+
-+Example:
-+	crypto@fd45a000 {
-+		compatible = "qcom,crypto-v5.1";
-+		reg = <0xfd45a000 0x6000>;
-+		clocks = <&gcc GCC_CE2_AHB_CLK>,
-+			 <&gcc GCC_CE2_AXI_CLK>,
-+			 <&gcc GCC_CE2_CLK>;
-+		clock-names = "iface", "bus", "core";
-+		dmas = <&cryptobam 2>, <&cryptobam 3>;
-+		dma-names = "rx", "tx";
-+	};
--- 
-1.7.0.4
+diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
+index 7e4500f..d397ff9 100644
+--- a/drivers/crypto/caam/desc.h
++++ b/drivers/crypto/caam/desc.h
+@@ -321,7 +321,6 @@ struct sec4_sg_entry {
+ /* Continue - Not the last FIFO store to come */
+ #define FIFOST_CONT_SHIFT	23
+ #define FIFOST_CONT_MASK	(1 << FIFOST_CONT_SHIFT)
+-#define FIFOST_CONT_MASK	(1 << FIFOST_CONT_SHIFT)
+ 
+ /*
+  * Extended Length - use 32-bit extended length that
