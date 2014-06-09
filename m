@@ -1,8 +1,8 @@
 From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v2 2/4] crypto: Update makefile and Kconfig for
- Security System
-Date: Mon,  9 Jun 2014 12:59:09 +0200
-Message-ID: <1402311551-19564-3-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 3/4] ARM: sun7i: dt: Add Security System to
+ A20 SoC DTS
+Date: Mon,  9 Jun 2014 12:59:10 +0200
+Message-ID: <1402311551-19564-4-git-send-email-clabbe.montjoie@gmail.com>
 References: <1402311551-19564-1-git-send-email-clabbe.montjoie@gmail.com>
 Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
@@ -24,7 +24,7 @@ To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
 	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
 	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
 	grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBCVH22OAKGQET6SPG5Q-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBDFH22OAKGQEQFP7N6Y-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 In-Reply-To: <1402311551-19564-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
@@ -34,107 +34,35 @@ List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:
 List-Unsubscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Id: linux-crypto.vger.kernel.org
 
-Add necessary changes for configuring and compiling the Security System driver.
+The Security System is a hardware cryptographic accelerator that support
+AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+It could be found on many Allwinner SoC.
+
+This patch enable the Security System on the Allwinner A20 SoC Device-tree.
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- drivers/crypto/Kconfig  | 76 +++++++++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/Makefile |  1 +
- 2 files changed, 77 insertions(+)
+ arch/arm/boot/dts/sun7i-a20.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 03ccdb0..758f63d 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -418,4 +418,80 @@ config CRYPTO_DEV_MXS_DCP
- 	  To compile this driver as a module, choose M here: the module
- 	  will be called mxs-dcp.
+diff --git a/arch/arm/boot/dts/sun7i-a20.dtsi b/arch/arm/boot/dts/sun7i-a20.dtsi
+index 6acdbdf..19b1ced 100644
+--- a/arch/arm/boot/dts/sun7i-a20.dtsi
++++ b/arch/arm/boot/dts/sun7i-a20.dtsi
+@@ -529,6 +529,14 @@
+ 			status = "disabled";
+ 		};
  
-+config CRYPTO_DEV_SUNXI_SS
-+        tristate "Support for Allwinner Security System cryptographic accelerator"
-+        depends on ARCH_SUNXI
-+        help
-+          Some Allwinner SoC have a crypto accelerator named
-+          Security System. Select this if you want to use it.
++		crypto: crypto-engine@01c15000 {
++			compatible = "allwinner,sun7i-a20-crypto";
++			reg = <0x01c15000 0x1000>;
++			interrupts = <0 86 4>;
++			clocks = <&ahb_gates 5>, <&ss_clk>;
++			clock-names = "ahb", "mod";
++		};
 +
-+          To compile this driver as a module, choose M here: the module
-+          will be called sunxi-ss.
-+
-+if CRYPTO_DEV_SUNXI_SS
-+config CRYPTO_DEV_SUNXI_SS_PRNG
-+	tristate "Security System PRNG"
-+	select CRYPTO_RNG2
-+	help
-+	  If you enable this option, the SS will provide a pseudo random
-+	  number generator.
-+
-+          To compile this driver as a module, choose M here: the module
-+          will be called sunxi-ss-prng.
-+
-+config CRYPTO_DEV_SUNXI_SS_MD5
-+	tristate "Security System MD5"
-+	select CRYPTO_MD5
-+	help
-+	  If you enable this option, the SS will provide MD5 hardware
-+	  acceleration.
-+
-+          To compile this driver as a module, choose M here: the module
-+          will be called sunxi-ss-md5.
-+
-+config CRYPTO_DEV_SUNXI_SS_SHA1
-+	tristate "Security System SHA1"
-+	select CRYPTO_SHA1
-+	help
-+	  If you enable this option, the SS will provide SHA1 hardware
-+	  acceleration.
-+
-+          To compile this driver as a module, choose M here: the module
-+          will be called sunxi-ss-sha1.
-+
-+config CRYPTO_DEV_SUNXI_SS_AES
-+	tristate "Security System AES"
-+	select CRYPTO_AES
-+	select CRYPTO_BLKCIPHER
-+	help
-+	  If you enable this option, the SS will provide AES hardware
-+	  acceleration.
-+
-+          To compile this driver as a module, choose M here: the module
-+          will be called sunxi-ss-aes.
-+
-+config CRYPTO_DEV_SUNXI_SS_DES
-+	tristate "Security System DES"
-+	select CRYPTO_DES
-+	select CRYPTO_BLKCIPHER
-+	help
-+	  If you enable this option, the SS will provide DES hardware
-+	  acceleration.
-+
-+          To compile this driver as a module, choose M here: the module
-+          will be called sunxi-ss-des.
-+
-+config CRYPTO_DEV_SUNXI_SS_3DES
-+	tristate "Security System 3DES"
-+	select CRYPTO_DES
-+	select CRYPTO_BLKCIPHER
-+	help
-+	  If you enable this option, the SS will provide 3DES hardware
-+	  acceleration.
-+
-+          To compile this driver as a module, choose M here: the module
-+          will be called sunxi-ss-3des.
-+
-+endif #CRYPTO_DEV_SUNXI_SS
-+
- endif # CRYPTO_HW
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 482f090..855292a 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -23,3 +23,4 @@ obj-$(CONFIG_CRYPTO_DEV_S5P) += s5p-sss.o
- obj-$(CONFIG_CRYPTO_DEV_SAHARA) += sahara.o
- obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
- obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
-+obj-$(CONFIG_CRYPTO_DEV_SUNXI_SS) += sunxi-ss/
+ 		spi2: spi@01c17000 {
+ 			compatible = "allwinner,sun4i-a10-spi";
+ 			reg = <0x01c17000 0x1000>;
 -- 
 1.8.5.5
