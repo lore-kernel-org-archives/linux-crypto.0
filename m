@@ -1,8 +1,8 @@
 From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v3 3/4] ARM: sun7i: dt: Add Security System to
- A20 SoC DTS
-Date: Tue, 10 Jun 2014 14:43:16 +0200
-Message-ID: <1402404197-4236-4-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v3 4/4] ARM: sunxi: dt: Add DT bindings
+ documentation for SUNXI Security System
+Date: Tue, 10 Jun 2014 14:43:17 +0200
+Message-ID: <1402404197-4236-5-git-send-email-clabbe.montjoie@gmail.com>
 References: <1402404197-4236-1-git-send-email-clabbe.montjoie@gmail.com>
 Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
@@ -25,7 +25,7 @@ To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
 	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
 	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
 	grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBB6H23OOAKGQEFFJP32Q-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBB6X23OOAKGQEEFZRXOY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 In-Reply-To: <1402404197-4236-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
@@ -35,35 +35,29 @@ List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:
 List-Unsubscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Id: linux-crypto.vger.kernel.org
 
-The Security System is a hardware cryptographic accelerator that support
-AES/MD5/SHA1/DES/3DES/PRNG algorithms.
-It could be found on many Allwinner SoC.
-
-This patch enable the Security System on the Allwinner A20 SoC Device-tree.
+This patch adds documentation for Device-Tree bindings for the Security
+System cryptographic accelerator driver.
 
 Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- arch/arm/boot/dts/sun7i-a20.dtsi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ Documentation/devicetree/bindings/crypto/sunxi-ss.txt | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/sunxi-ss.txt
 
-diff --git a/arch/arm/boot/dts/sun7i-a20.dtsi b/arch/arm/boot/dts/sun7i-a20.dtsi
-index 6acdbdf..19b1ced 100644
---- a/arch/arm/boot/dts/sun7i-a20.dtsi
-+++ b/arch/arm/boot/dts/sun7i-a20.dtsi
-@@ -529,6 +529,14 @@
- 			status = "disabled";
- 		};
- 
-+		crypto: crypto-engine@01c15000 {
-+			compatible = "allwinner,sun7i-a20-crypto";
-+			reg = <0x01c15000 0x1000>;
-+			interrupts = <0 86 4>;
-+			clocks = <&ahb_gates 5>, <&ss_clk>;
-+			clock-names = "ahb", "mod";
-+		};
+diff --git a/Documentation/devicetree/bindings/crypto/sunxi-ss.txt b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+new file mode 100644
+index 0000000..a566803
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+@@ -0,0 +1,9 @@
++* Allwinner Security System found on A20 SoC
 +
- 		spi2: spi@01c17000 {
- 			compatible = "allwinner,sun4i-a10-spi";
- 			reg = <0x01c17000 0x1000>;
++Required properties:
++- compatible : Should be "allwinner,sun7i-a20-crypto".
++- reg: Should contain the Security System register location and length.
++- interrupts: Should contain the IRQ line for the Security System.
++- clocks : A phandle to the functional clock node of the Security System module
++- clock-names : Name of the functional clock, should be "ahb" and "mod".
++
 -- 
 1.8.5.5
