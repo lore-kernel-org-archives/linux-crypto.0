@@ -1,45 +1,34 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH][v2] crypto: caam - Correct definition of registers in
- memory map
-Date: Thu, 12 Jun 2014 18:14:38 -0500
-Message-ID: <20140612181438.4c02cf6f36148e9adaa0c292@freescale.com>
-References: <1402597326-30920-1-git-send-email-ruchika.gupta@freescale.com>
+Subject: Re: [patch] crypto: caam - remove duplicate FIFOST_CONT_MASK define
+Date: Thu, 12 Jun 2014 18:18:12 -0500
+Message-ID: <20140612181812.cbc7c9b0adfe42d74ea2f636@freescale.com>
+References: <20140609151941.GN9600@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>
-To: Ruchika Gupta <ruchika.gupta@freescale.com>
+Cc: Alex Porosanu <alexandru.porosanu@freescale.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	<linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
+To: Dan Carpenter <dan.carpenter@oracle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2lp0241.outbound.protection.outlook.com ([207.46.163.241]:26456
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+Received: from mail-bl2lp0210.outbound.protection.outlook.com ([207.46.163.210]:6362
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750961AbaFLXTn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Jun 2014 19:19:43 -0400
-In-Reply-To: <1402597326-30920-1-git-send-email-ruchika.gupta@freescale.com>
+	id S1752331AbaFLXXg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 12 Jun 2014 19:23:36 -0400
+In-Reply-To: <20140609151941.GN9600@mwanda>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 12 Jun 2014 23:52:06 +0530
-Ruchika Gupta <ruchika.gupta@freescale.com> wrote:
+On Mon, 9 Jun 2014 18:19:41 +0300
+Dan Carpenter <dan.carpenter@oracle.com> wrote:
 
-> Some registers like SECVID, CHAVID, CHA Revision Number,
-> CTPR were defined as 64 bit resgisters.  The IP provides
-> a DWT bit(Double word Transpose) to transpose the two words when
-> a double word register is accessed. However setting this bit
-> would also affect the operation of job descriptors as well as
-> other registers which are truly double word in nature.
-> So, for the IP to work correctly on big-endian as well as
-> little-endian SoC's, change is required to access all 32 bit
-> registers as 32 bit quantities.
+> The FIFOST_CONT_MASK define is cut and pasted twice so we can delete the
+> second instance.
 > 
-> Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
-> ---
-> Changed in v2:
-> 1. Review comments incorporated
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-only 2 out of 3...see previous version's thread.
-
-Also, please start using scripts/get_maintainer.pl.
+Acked-by: Kim Phillips <kim.phillips@freescale.com>
 
 Thanks,
 
