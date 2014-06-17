@@ -1,67 +1,97 @@
-From: Joe Perches <joe@perches.com>
-Subject: [PATCH -next 05/26] crypto: Use dma_zalloc_coherent
-Date: Sun, 15 Jun 2014 13:37:34 -0700
-Message-ID: <7fe501fdc5705074b8d881a31a099f9f9275cc04.1402863905.git.joe@perches.com>
-References: <cover.1402863904.git.joe@perches.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <cover.1402863904.git.joe@perches.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Amos Kong <akong@redhat.com>
+Subject: Re: [PATCH] crypto/xor.c: use 2 pages for xor speed testing
+Date: Tue, 17 Jun 2014 15:16:03 +0800
+Message-ID: <20140617071603.GC8709@z.redhat.com>
+References: <1401930693-6549-1-git-send-email-akong@redhat.com>
+ <201406052357.55383.marex@denx.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net
+To: Marek Vasut <marex@denx.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:44548 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755105AbaFQHQR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Jun 2014 03:16:17 -0400
+Content-Disposition: inline
+In-Reply-To: <201406052357.55383.marex@denx.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Use the zeroing function instead of dma_alloc_coherent & memset(,0,)
+On Thu, Jun 05, 2014 at 11:57:55PM +0200, Marek Vasut wrote:
+> On Thursday, June 05, 2014 at 03:11:33 AM, Amos Kong wrote:
+> > In crypto/xor.c: calibrate_xor_blocks(), we allocated total 4 pages to
+> > do xor speed testing, the BENCH_SIZE is 1 page, and we skipped 2 pages
+> > when we set b2.
+> > 
+> > It seems that total 2 pages are enough without skipping 2 pages.
+> > 
+> > Signed-off-by: Amos Kong <akong@redhat.com>
+> > ---
+> >  crypto/xor.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/crypto/xor.c b/crypto/xor.c
+> > index 35d6b3a..609dfb5 100644
+> > --- a/crypto/xor.c
+> > +++ b/crypto/xor.c
+> > @@ -114,12 +114,12 @@ calibrate_xor_blocks(void)
+> >  	 * test the XOR speed, we don't really want kmemcheck to warn about
+> >  	 * reading uninitialized bytes here.
+> >  	 */
+> > -	b1 = (void *) __get_free_pages(GFP_KERNEL | __GFP_NOTRACK, 2);
+> > +	b1 = (void *) __get_free_pages(GFP_KERNEL | __GFP_NOTRACK, 1);
+> >  	if (!b1) {
+> >  		printk(KERN_WARNING "xor: Yikes!  No memory available.\n");
+> >  		return -ENOMEM;
+> >  	}
+> > -	b2 = b1 + 2*PAGE_SIZE + BENCH_SIZE;
+> > +	b2 = b1 + BENCH_SIZE;
+> > 
+> >  	/*
+> >  	 * If this arch/cpu has a short-circuited selection, don't loop through
+> > @@ -154,7 +154,7 @@ calibrate_xor_blocks(void)
+> >  #undef xor_speed
+> > 
+> >   out:
+> > -	free_pages((unsigned long)b1, 2);
+> > +	free_pages((unsigned long)b1, 1);
+> > 
+> >  	active_template = fastest;
+> >  	return 0;
+> 
+> I think this does make sense, but I am not 100% sure, sorry.
+> 
+> ...
+> 
+> While looking at this code, can anyone explain to me why we have this stuff in 
+> crypto/xor.c please ?
+> 
+> 135 #define xor_speed(templ)        do_xor_speed((templ), b1, b2)
+> 136 
+> 137         if (fastest) {
+> 138                 printk(KERN_INFO "xor: automatically using best "
+> 139                                  "checksumming function:\n");
+> 140                 xor_speed(fastest);
+> 141                 goto out;
+> 142         } else {
+> [...]
+> 149         }
+> 150 
+> 151         printk(KERN_INFO "xor: using function: %s (%d.%03d MB/sec)\n",
+> 152                fastest->name, fastest->speed / 1000, fastest->speed % 1000);
+> 153 
+> 154 #undef xor_speed
+> 
+> Why do we not call do_xor_speed(fastest, b1, b2); right away , but we #define 
+> xor_speed() instead ? This looks like some remnant or nonsense to me. Shall I 
+> remove that with a patch ?
 
-Signed-off-by: Joe Perches <joe@perches.com>
----
- drivers/crypto/amcc/crypto4xx_core.c | 8 +++-----
- drivers/crypto/ixp4xx_crypto.c       | 8 ++++----
- 2 files changed, 7 insertions(+), 9 deletions(-)
+You are right.
+ 
+> Best regards,
+> Marek Vasut
 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 37f9cc9..d3da537 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -304,14 +304,12 @@ static struct ce_pd *crypto4xx_get_pdp(struct crypto4xx_device *dev,
-  */
- static u32 crypto4xx_build_gdr(struct crypto4xx_device *dev)
- {
--	dev->gdr = dma_alloc_coherent(dev->core_dev->device,
--				      sizeof(struct ce_gd) * PPC4XX_NUM_GD,
--				      &dev->gdr_pa, GFP_ATOMIC);
-+	dev->gdr = dma_zalloc_coherent(dev->core_dev->device,
-+				       sizeof(struct ce_gd) * PPC4XX_NUM_GD,
-+				       &dev->gdr_pa, GFP_ATOMIC);
- 	if (!dev->gdr)
- 		return -ENOMEM;
- 
--	memset(dev->gdr, 0, sizeof(struct ce_gd) * PPC4XX_NUM_GD);
--
- 	return 0;
- }
- 
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index f757a0f..0a32d7c 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -251,12 +251,12 @@ static int setup_crypt_desc(void)
- {
- 	struct device *dev = &pdev->dev;
- 	BUILD_BUG_ON(sizeof(struct crypt_ctl) != 64);
--	crypt_virt = dma_alloc_coherent(dev,
--			NPE_QLEN * sizeof(struct crypt_ctl),
--			&crypt_phys, GFP_ATOMIC);
-+	crypt_virt = dma_zalloc_coherent(dev,
-+					 NPE_QLEN * sizeof(struct crypt_ctl),
-+					 &crypt_phys, GFP_ATOMIC);
- 	if (!crypt_virt)
- 		return -ENOMEM;
--	memset(crypt_virt, 0, NPE_QLEN * sizeof(struct crypt_ctl));
-+
- 	return 0;
- }
- 
 -- 
-1.8.1.2.459.gbcd45b4.dirty
+			Amos.
