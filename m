@@ -1,14 +1,15 @@
-From: Paul Bolle <pebolle@tiscali.nl>
+From: Borislav Petkov <bp@alien8.de>
 Subject: Re: [PATCH 05/28] Remove MPILIB_EXTRA
-Date: Wed, 18 Jun 2014 10:09:54 +0200
-Message-ID: <1403078994.1984.47.camel@x220>
+Date: Wed, 18 Jun 2014 11:48:22 +0200
+Message-ID: <20140618094821.GA24024@pd.tnic>
 References: <1391971686-9517-1-git-send-email-richard@nod.at>
-	 <1391971686-9517-6-git-send-email-richard@nod.at>
-	 <1391977123.25855.24.camel@x220> <1397552794.1985.19.camel@x220>
-	 <20140415092147.GA4302@pd.tnic>
+ <1391971686-9517-6-git-send-email-richard@nod.at>
+ <1391977123.25855.24.camel@x220>
+ <1397552794.1985.19.camel@x220>
+ <20140415092147.GA4302@pd.tnic>
+ <1403078994.1984.47.camel@x220>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
 Cc: Jiri Kosina <trivial@kernel.org>,
 	Richard Weinberger <richard@nod.at>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -16,58 +17,23 @@ Cc: Jiri Kosina <trivial@kernel.org>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	James Morris <james.l.morris@oracle.com>,
 	Andrew Morton <akpm@linux-foundation.org>
-To: Borislav Petkov <bp@alien8.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cpsmtpb-ews02.kpnxchange.com ([213.75.39.5]:54301 "EHLO
-	cpsmtpb-ews02.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S933617AbaFRIJ5 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Jun 2014 04:09:57 -0400
-In-Reply-To: <20140415092147.GA4302@pd.tnic>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Paul Bolle <pebolle@tiscali.nl>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1403078994.1984.47.camel@x220>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, 2014-04-15 at 11:21 +0200, Borislav Petkov wrote:
-> On Tue, Apr 15, 2014 at 11:06:34AM +0200, Paul Bolle wrote:
-> > On Sun, 2014-02-09 at 21:18 +0100, Paul Bolle wrote:
-> > > On Sun, 2014-02-09 at 19:47 +0100, Richard Weinberger wrote:
-> > > > The symbol is an orphan, get rid of it.
-> > > > 
-> > > > Signed-off-by: Richard Weinberger <richard@nod.at>
-> > > 
-> > > Acked-by: Paul Bolle <pebolle@tiscali.nl>
-> > > 
-> > > > ---
-> > > >  crypto/asymmetric_keys/Kconfig | 1 -
-> > > >  1 file changed, 1 deletion(-)
-> > > > 
-> > > > diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-> > > > index 03a6eb9..0320c7d 100644
-> > > > --- a/crypto/asymmetric_keys/Kconfig
-> > > > +++ b/crypto/asymmetric_keys/Kconfig
-> > > > @@ -22,7 +22,6 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
-> > > >  
-> > > >  config PUBLIC_KEY_ALGO_RSA
-> > > >  	tristate "RSA public-key algorithm"
-> > > > -	select MPILIB_EXTRA
-> > > >  	select MPILIB
-> > > >  	help
-> > > >  	  This option enables support for the RSA algorithm (PKCS#1, RFC3447).
-> > > 
-> > > I tried this a year ago (see https://lkml.org/lkml/2013/3/8/142 ).
-> > 
-> > Did anyone else ever find some time to look at this oneliner?
-> 
-> Last time I asked about that part of the tree, Herbert said it should go
-> through James Morris' tree. CCed.
-> 
-> http://lkml.kernel.org/r/20131112182746.GA22711@gondor.apana.org.au
-> 
-> Unless akpm picks it up first. Also CCed.
+On Wed, Jun 18, 2014 at 10:09:54AM +0200, Paul Bolle wrote:
+> This oneliner is neither part of v3.16-rc1 nor part of linux-next. It
+> applies cleanly to next-20140618. Should I hope that Jiri Kosina wants
+> to take it for trivial (CC-ed)?
 
-This oneliner is neither part of v3.16-rc1 nor part of linux-next. It
-applies cleanly to next-20140618. Should I hope that Jiri Kosina wants
-to take it for trivial (CC-ed)?
+Yeah, he will.
 
+-- 
+Regards/Gruss,
+    Boris.
 
-Paul Bolle
+Sent from a fat crate under my desk. Formatting is fine.
+--
