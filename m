@@ -1,40 +1,54 @@
-From: Jiri Kosina <jkosina@suse.cz>
-Subject: Re: [PATCH 05/28] Remove MPILIB_EXTRA
-Date: Wed, 18 Jun 2014 12:38:37 +0200 (CEST)
-Message-ID: <alpine.LNX.2.00.1406181237480.2303@pobox.suse.cz>
-References: <1391971686-9517-1-git-send-email-richard@nod.at> <1391971686-9517-6-git-send-email-richard@nod.at> <1391977123.25855.24.camel@x220> <1397552794.1985.19.camel@x220> <20140415092147.GA4302@pd.tnic> <1403078994.1984.47.camel@x220>
- <20140618094821.GA24024@pd.tnic>
+From: Paul Bolle <pebolle@tiscali.nl>
+Subject: [PATCH] [TRIVIAL] Remove MPILIB_EXTRA
+Date: Wed, 18 Jun 2014 16:18:36 +0200
+Message-ID: <1403101116.1984.120.camel@x220>
+References: <1391971686-9517-1-git-send-email-richard@nod.at>
+	 <1391971686-9517-6-git-send-email-richard@nod.at>
+	 <1391977123.25855.24.camel@x220> <1397552794.1985.19.camel@x220>
+	 <20140415092147.GA4302@pd.tnic> <1403078994.1984.47.camel@x220>
+	 <20140618094821.GA24024@pd.tnic>
+	 <alpine.LNX.2.00.1406181237480.2303@pobox.suse.cz>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: Paul Bolle <pebolle@tiscali.nl>,
-	Richard Weinberger <richard@nod.at>,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Richard Weinberger <richard@nod.at>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>,
 	James Morris <james.l.morris@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-To: Borislav Petkov <bp@alien8.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41428 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965568AbaFRKkL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Jun 2014 06:40:11 -0400
-In-Reply-To: <20140618094821.GA24024@pd.tnic>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jiri Kosina <trivial@kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <alpine.LNX.2.00.1406181237480.2303@pobox.suse.cz>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 18 Jun 2014, Borislav Petkov wrote:
+From: Richard Weinberger <richard@nod.at>
 
-> > This oneliner is neither part of v3.16-rc1 nor part of linux-next. It
-> > applies cleanly to next-20140618. Should I hope that Jiri Kosina wants
-> > to take it for trivial (CC-ed)?
-> 
-> Yeah, he will.
+The symbol is an orphan, get rid of it.
 
-It's not in my queue of patches to be processed though, so I guess I 
-wasn't CCed on the initial submission. Paul, if you want me to pick it up, 
-please bounce it to trivial@kernel.org as well. Thanks,
+Signed-off-by: Richard Weinberger <richard@nod.at>
+Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+---
+Bounced to trivial. Tested with make menuconfig and make oldconfig.
+Since I'm sending this to Jiri myself I've upgraded my Acked-by to
+Signed-off-by.
 
+ crypto/asymmetric_keys/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 03a6eb95ab50..0320c7d4b3e1 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -22,7 +22,6 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+ 
+ config PUBLIC_KEY_ALGO_RSA
+ 	tristate "RSA public-key algorithm"
+-	select MPILIB_EXTRA
+ 	select MPILIB
+ 	help
+ 	  This option enables support for the RSA algorithm (PKCS#1, RFC3447).
 -- 
-Jiri Kosina
-SUSE Labs
+1.9.3
