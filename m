@@ -1,28 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: tcrypt - add ctr(des3_ede) sync speed test
-Date: Sat, 21 Jun 2014 02:42:57 +0800
-Message-ID: <20140620184257.GK3169@gondor.apana.org.au>
-References: <20140609175949.15947.64452.stgit@localhost6.localdomain6>
+Subject: Re: [PATCH] crypto: add 4 more test vectors for GHASH
+Date: Sat, 21 Jun 2014 02:43:34 +0800
+Message-ID: <20140620184334.GM3169@gondor.apana.org.au>
+References: <1402585310-1377-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Cc: linux-crypto@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:56997 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:37470 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965999AbaFTSnA (ORCPT
+	with ESMTP id S965975AbaFTSni (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Jun 2014 14:43:00 -0400
+	Fri, 20 Jun 2014 14:43:38 -0400
 Content-Disposition: inline
-In-Reply-To: <20140609175949.15947.64452.stgit@localhost6.localdomain6>
+In-Reply-To: <1402585310-1377-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 09, 2014 at 08:59:49PM +0300, Jussi Kivilinna wrote:
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+On Thu, Jun 12, 2014 at 05:01:50PM +0200, Ard Biesheuvel wrote:
+> This adds 4 test vectors for GHASH (of which one for chunked mode), making
+> a total of 5.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Both patches applied.
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
