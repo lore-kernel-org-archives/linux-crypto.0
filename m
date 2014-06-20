@@ -1,36 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: Add 2 missing __exit_p
-Date: Sat, 21 Jun 2014 02:41:19 +0800
-Message-ID: <20140620184119.GE3169@gondor.apana.org.au>
-References: <20140529095435.72cb6b6e@endymion.delvare>
+Subject: Re: [PATCH] crypto: caam: Introduce the use of the managed version
+ of kzalloc
+Date: Sat, 21 Jun 2014 02:41:05 +0800
+Message-ID: <20140620184105.GD3169@gondor.apana.org.au>
+References: <20140527182548.GA6333@himangi-Dell>
+ <201406011856.41778.marex@denx.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
+Cc: Himangi Saraogi <himangi774@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Robert Jennings <rcj@linux.vnet.ibm.com>,
-	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
-	Fionnuala Gunter <fin@linux.vnet.ibm.com>
-To: Jean Delvare <jdelvare@suse.de>
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	julia.lawall@lip6.fr
+To: Marek Vasut <marex@denx.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:40693 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:35203 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S966182AbaFTSl0 (ORCPT
+	with ESMTP id S966182AbaFTSlO (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Jun 2014 14:41:26 -0400
+	Fri, 20 Jun 2014 14:41:14 -0400
 Content-Disposition: inline
-In-Reply-To: <20140529095435.72cb6b6e@endymion.delvare>
+In-Reply-To: <201406011856.41778.marex@denx.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 29, 2014 at 09:54:35AM +0200, Jean Delvare wrote:
-> References to __exit functions must be wrapped with __exit_p.
+On Sun, Jun 01, 2014 at 06:56:41PM +0200, Marek Vasut wrote:
+> On Tuesday, May 27, 2014 at 08:25:48 PM, Himangi Saraogi wrote:
+> > This patch moves data allocated using kzalloc to managed data allocated
+> > using devm_kzalloc and cleans now unnecessary kfrees in probe and remove
+> > functions.  Also, linux/device.h is added to make sure the devm_*()
+> > routine declarations are unambiguously available. Earlier, in the probe
+> > function ctrlpriv was leaked on the failure of ctrl = of_iomap(nprop, 0);
+> > as well as on the failure of ctrlpriv->jrpdev = kzalloc(...); . These
+> > two bugs have been fixed by the patch.
+> > 
+> > The following Coccinelle semantic patch was used for making the change:
 > 
-> Signed-off-by: Jean Delvare <jdelvare@suse.de>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Robert Jennings <rcj@linux.vnet.ibm.com>
-> Cc: Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>
-> Cc: Fionnuala Gunter <fin@linux.vnet.ibm.com>
+> Reviewed-by: Marek Vasut <marex@denx.de>
 
 Patch applied.
 -- 
