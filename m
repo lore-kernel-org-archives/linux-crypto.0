@@ -1,48 +1,48 @@
 From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: [PATCH] crypto: des3_ede/x86-64: fix parse warning
-Date: Mon, 23 Jun 2014 19:39:17 +0300
-Message-ID: <20140623163917.9000.14726.stgit@localhost6.localdomain6>
+Subject: [PATCH] crypto: sha512_ssse3: fix byte count to bit count conversion
+Date: Mon, 23 Jun 2014 19:41:05 +0300
+Message-ID: <20140623164105.13319.42220.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Tim Chen <tim.c.chen@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sirokuusama.dnainternet.net ([83.102.40.133]:51849 "EHLO
-	sirokuusama.dnainternet.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755721AbaFWQjX (ORCPT
+Received: from sinikuusama.dnainternet.net ([83.102.40.134]:39231 "EHLO
+	sinikuusama.dnainternet.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755721AbaFWQlM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Jun 2014 12:39:23 -0400
+	Mon, 23 Jun 2014 12:41:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Patch fixes following sparse warning:
+Byte-to-bit-count computation is only partly converted to big-endian and is
+mixing in CPU-endian values. Problem was noticed by sparce with warning:
 
-  CHECK   arch/x86/crypto/des3_ede_glue.c
-arch/x86/crypto/des3_ede_glue.c:308:52: warning: restricted __be64 degrades to integer
-arch/x86/crypto/des3_ede_glue.c:309:52: warning: restricted __be64 degrades to integer
-arch/x86/crypto/des3_ede_glue.c:310:52: warning: restricted __be64 degrades to integer
-arch/x86/crypto/des3_ede_glue.c:326:44: warning: restricted __be64 degrades to integer
+  CHECK   arch/x86/crypto/sha512_ssse3_glue.c
+arch/x86/crypto/sha512_ssse3_glue.c:144:19: warning: restricted __be64 degrades to integer
+arch/x86/crypto/sha512_ssse3_glue.c:144:17: warning: incorrect type in assignment (different base types)
+arch/x86/crypto/sha512_ssse3_glue.c:144:17:    expected restricted __be64 <noident>
+arch/x86/crypto/sha512_ssse3_glue.c:144:17:    got unsigned long long
 
-Reported-by: kbuild test robot <fengguang.wu@intel.com>
+Cc: Tim Chen <tim.c.chen@linux.intel.com>
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 ---
- arch/x86/crypto/des3_ede_glue.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/crypto/sha512_ssse3_glue.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/crypto/des3_ede_glue.c b/arch/x86/crypto/des3_ede_glue.c
-index ebc4215..0e9c066 100644
---- a/arch/x86/crypto/des3_ede_glue.c
-+++ b/arch/x86/crypto/des3_ede_glue.c
-@@ -289,8 +289,8 @@ static unsigned int __ctr_crypt(struct blkcipher_desc *desc,
- 	struct des3_ede_x86_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
- 	unsigned int bsize = DES3_EDE_BLOCK_SIZE;
- 	unsigned int nbytes = walk->nbytes;
--	u64 *src = (u64 *)walk->src.virt.addr;
--	u64 *dst = (u64 *)walk->dst.virt.addr;
-+	__be64 *src = (__be64 *)walk->src.virt.addr;
-+	__be64 *dst = (__be64 *)walk->dst.virt.addr;
- 	u64 ctrblk = be64_to_cpu(*(__be64 *)walk->iv);
- 	__be64 ctrblocks[3];
+diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
+index f30cd10..8626b03 100644
+--- a/arch/x86/crypto/sha512_ssse3_glue.c
++++ b/arch/x86/crypto/sha512_ssse3_glue.c
+@@ -141,7 +141,7 @@ static int sha512_ssse3_final(struct shash_desc *desc, u8 *out)
  
+ 	/* save number of bits */
+ 	bits[1] = cpu_to_be64(sctx->count[0] << 3);
+-	bits[0] = cpu_to_be64(sctx->count[1] << 3) | sctx->count[0] >> 61;
++	bits[0] = cpu_to_be64(sctx->count[1] << 3 | sctx->count[0] >> 61);
+ 
+ 	/* Pad out to 112 mod 128 and append length */
+ 	index = sctx->count[0] & 0x7f;
