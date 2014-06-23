@@ -1,70 +1,39 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v3 1/6] crypto: SHA1 multibuffer crypto hash
- infrastructure
-Date: Mon, 23 Jun 2014 12:48:25 -0700
-Message-ID: <1403552905.2970.618.camel@schen9-DESK>
-References: <cover.1402491749.git.tim.c.chen@linux.intel.com>
-	 <1402520625.2970.537.camel@schen9-DESK>
-	 <20140620175751.GA2802@gondor.apana.org.au>
+From: David Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
+Subject: Re: [PATCH 00/22] Add and use pci_zalloc_consistent
+Date: Mon, 23 Jun 2014 14:49:30 -0700 (PDT)
+Message-ID: <20140623.144930.2077608308662590493.davem@davemloft.net>
+References: <cover.1403530604.git.joe@perches.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:20788 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756811AbaFWTsx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Jun 2014 15:48:53 -0400
-In-Reply-To: <20140620175751.GA2802@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-atm-general-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	iss_storagedev-VXdhtT5mjnY@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	dri-devel-PD4FTy7X32lNgt0PjOBp9y5qC8QIuHrW@public.gmane.org, linux-rdma-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-scsi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-eata-3umIvqjeSgIeIZ0/mPfg9Q@public.gmane.org,
+	devel-gWbeCf7V1WCQmaza687I9mD2FQJk+8+b@public.gmane.org, linux-arch-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org
+Return-path: <linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <cover.1403530604.git.joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
+Sender: linux-rdma-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sat, 2014-06-21 at 01:57 +0800, Herbert Xu wrote:
-> On Wed, Jun 11, 2014 at 02:03:45PM -0700, Tim Chen wrote:
-> >
-> > diff --git a/crypto/shash.c b/crypto/shash.c
-> > index 929058a..234ece0 100644
-> > --- a/crypto/shash.c
-> > +++ b/crypto/shash.c
-> > @@ -271,6 +271,18 @@ static int shash_async_finup(struct ahash_request *req)
-> >  	return shash_ahash_finup(req, desc);
-> >  }
-> >  
-> > +int shash_ahash_mcryptd_digest(struct ahash_request *req,
-> > +			       struct shash_desc *desc)
-> > +{
-> > +	int err;
-> > +
-> > +	err = crypto_shash_init(desc) ?:
-> > +	      shash_ahash_mcryptd_finup(req, desc);
-> > +
-> > +	return err;
-> > +}
-> > +EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_digest);
-> > +
+From: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
+Date: Mon, 23 Jun 2014 06:41:28 -0700
+
+> Adding the helper reduces object code size as well as overall
+> source size line count.
 > 
-> This bit causes your patch to not build for me.
+> It's also consistent with all the various zalloc mechanisms
+> in the kernel.
 > 
-> Please fix and resubmit.
+> Done with a simple cocci script and some typing.
 
-Herbert,
+For networking bits:
 
-Upon further testing, I realize that I have to change my logic
-for doing work in the idle_notifier path to clear out partial tasks.
-The notifier is actually in an atomic context and I may page fault
-when working on the data buffer but I cannot sleep here.
-
-I'll need to wake up the kernel crypto thread instead.  So it
-will take me a bit longer to refine this logic.
-
-Thanks.
-
-Tim
+Acked-by: David S. Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-rdma" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
