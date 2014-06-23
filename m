@@ -1,215 +1,295 @@
-From: Ruchika Gupta <ruchika.gupta@freescale.com>
-Subject: [PATCH] crypto:caam - Correct the dma mapping for sg table
-Date: Mon, 23 Jun 2014 19:50:26 +0530
-Message-ID: <1403533226-13240-1-git-send-email-ruchika.gupta@freescale.com>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH v1 1/3] ima: use ahash API for file hash calculation
+Date: Mon, 23 Jun 2014 07:32:26 -0400
+Message-ID: <1403523146.18772.10.camel@dhcp-9-2-203-236.watson.ibm.com>
+References: <cover.1403191191.git.d.kasatkin@samsung.com>
+	 <7b884b2597badabadf50ebf9120fe76754e1516c.1403191191.git.d.kasatkin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <davem@davemloft.net>, <alexandru.porosanu@freescale.com>,
-	<kim.phillips@freescale.com>, <dan.carpenter@oracle.com>,
-	<horia.geanta@freescale.com>, <marex@denx.de>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>
-To: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-ima-devel@lists.sourceforge.net,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dmitry.kasatkin@gmail.com
+To: Dmitry Kasatkin <d.kasatkin@samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2lp0235.outbound.protection.outlook.com ([207.46.163.235]:55572
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753494AbaFWJDT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Jun 2014 05:03:19 -0400
+Received: from e32.co.us.ibm.com ([32.97.110.150]:56060 "EHLO
+	e32.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752684AbaFWLcb (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 23 Jun 2014 07:32:31 -0400
+Received: from /spool/local
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+	Mon, 23 Jun 2014 05:32:30 -0600
+In-Reply-To: <7b884b2597badabadf50ebf9120fe76754e1516c.1403191191.git.d.kasatkin@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-At few places in caamhash and caamalg, after allocating a dmable
-buffer for sg table , the buffer was being modified.  As per
-definition of DMA_FROM_DEVICE ,afer allocation the memory should
-be treated as read-only by the driver. This patch shifts the
-allocation of dmable buffer for sg table after it is populated
-by the  driver, making it read-only as per the DMA API's requirement.
+On Thu, 2014-06-19 at 18:20 +0300, Dmitry Kasatkin wrote: 
+> Async hash API allows to use HW acceleration for hash calculation.
+> It may give significant performance gain or/and reduce power consumption,
+> which might be very beneficial for battery powered devices.
+> 
+> This patch introduces hash calculation using ahash API.
+> 
+> ahash peformance depends on data size and particular HW. Under certain
+> limit, depending on the system, shash performance may be better.
+> 
+> This patch also introduces 'ima_ahash_size' kernel parameter which can
+> be used to defines minimal data size to use with ahash. When this
+> parameter is not set or file size is smaller than defined by this
+> parameter, shash will be used. Thus, by defult, original shash
+> implementation is used.
+> 
+> Signed-off-by: Dmitry Kasatkin <d.kasatkin@samsung.com>
 
-Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
----
- drivers/crypto/caam/caamalg.c  |  8 ++++----
- drivers/crypto/caam/caamhash.c | 40 +++++++++++++++++++++++-----------------
- 2 files changed, 27 insertions(+), 21 deletions(-)
+Thanks, Dmitry.  What type of values are you using for ima_ahash_size?
+Have you specified ima_ahash_size, when booting with an initramfs?
+ahash should probably only be used after pivoting root.
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index c09ce1f..87d9de4 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1345,8 +1345,6 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct aead_edesc) +
- 			 desc_bytes;
--	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	*all_contig_ptr = all_contig;
- 
- 	sec4_sg_index = 0;
-@@ -1369,6 +1367,8 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 		sg_to_sec4_sg_last(req->dst, dst_nents,
- 				   edesc->sec4_sg + sec4_sg_index, 0);
- 	}
-+	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-+					    sec4_sg_bytes, DMA_TO_DEVICE);
- 
- 	return edesc;
- }
-@@ -1534,8 +1534,6 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
- 	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct aead_edesc) +
- 			 desc_bytes;
--	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	*contig_ptr = contig;
- 
- 	sec4_sg_index = 0;
-@@ -1559,6 +1557,8 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
- 		sg_to_sec4_sg_last(req->dst, dst_nents,
- 				   edesc->sec4_sg + sec4_sg_index, 0);
- 	}
-+	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-+					    sec4_sg_bytes, DMA_TO_DEVICE);
- 
- 	return edesc;
- }
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 0d9284e..2ab057b 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -808,9 +808,6 @@ static int ahash_update_ctx(struct ahash_request *req)
- 		edesc->sec4_sg_bytes = sec4_sg_bytes;
- 		edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 				 DESC_JOB_IO_LEN;
--		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--						     sec4_sg_bytes,
--						     DMA_TO_DEVICE);
- 
- 		ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
- 				   edesc->sec4_sg, DMA_BIDIRECTIONAL);
-@@ -839,6 +836,10 @@ static int ahash_update_ctx(struct ahash_request *req)
- 		init_job_desc_shared(desc, ptr, sh_len, HDR_SHARE_DEFER |
- 				     HDR_REVERSE);
- 
-+		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-+						     sec4_sg_bytes,
-+						     DMA_TO_DEVICE);
-+
- 		append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len +
- 				       to_hash, LDST_SGF);
- 
-@@ -911,8 +912,6 @@ static int ahash_final_ctx(struct ahash_request *req)
- 	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 			 DESC_JOB_IO_LEN;
--	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	edesc->src_nents = 0;
- 
- 	ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len, edesc->sec4_sg,
-@@ -923,6 +922,9 @@ static int ahash_final_ctx(struct ahash_request *req)
- 						last_buflen);
- 	(edesc->sec4_sg + sec4_sg_bytes - 1)->len |= SEC4_SG_LEN_FIN;
- 
-+	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-+					    sec4_sg_bytes, DMA_TO_DEVICE);
-+
- 	append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len + buflen,
- 			  LDST_SGF);
- 
-@@ -989,8 +991,6 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 			 DESC_JOB_IO_LEN;
--	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--					    sec4_sg_bytes, DMA_TO_DEVICE);
- 
- 	ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len, edesc->sec4_sg,
- 			   DMA_TO_DEVICE);
-@@ -1002,6 +1002,9 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	src_map_to_sec4_sg(jrdev, req->src, src_nents, edesc->sec4_sg +
- 			   sec4_sg_src_index, chained);
- 
-+	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-+					    sec4_sg_bytes, DMA_TO_DEVICE);
-+
- 	append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len +
- 			       buflen + req->nbytes, LDST_SGF);
- 
-@@ -1056,8 +1059,6 @@ static int ahash_digest(struct ahash_request *req)
- 	}
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 			  DESC_JOB_IO_LEN;
--	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	edesc->src_nents = src_nents;
- 	edesc->chained = chained;
- 
-@@ -1067,6 +1068,8 @@ static int ahash_digest(struct ahash_request *req)
- 
- 	if (src_nents) {
- 		sg_to_sec4_sg_last(req->src, src_nents, edesc->sec4_sg, 0);
-+		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-+					    sec4_sg_bytes, DMA_TO_DEVICE);
- 		src_dma = edesc->sec4_sg_dma;
- 		options = LDST_SGF;
- 	} else {
-@@ -1197,9 +1200,6 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 		edesc->sec4_sg_bytes = sec4_sg_bytes;
- 		edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 				 DESC_JOB_IO_LEN;
--		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--						    sec4_sg_bytes,
--						    DMA_TO_DEVICE);
- 
- 		state->buf_dma = buf_map_to_sec4_sg(jrdev, edesc->sec4_sg,
- 						    buf, *buflen);
-@@ -1216,6 +1216,10 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 		init_job_desc_shared(desc, ptr, sh_len, HDR_SHARE_DEFER |
- 				     HDR_REVERSE);
- 
-+		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-+						    sec4_sg_bytes,
-+						    DMA_TO_DEVICE);
-+
- 		append_seq_in_ptr(desc, edesc->sec4_sg_dma, to_hash, LDST_SGF);
- 
- 		map_seq_out_ptr_ctx(desc, jrdev, state, ctx->ctx_len);
-@@ -1297,8 +1301,6 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 			 DESC_JOB_IO_LEN;
--	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--					    sec4_sg_bytes, DMA_TO_DEVICE);
- 
- 	state->buf_dma = try_buf_map_to_sec4_sg(jrdev, edesc->sec4_sg, buf,
- 						state->buf_dma, buflen,
-@@ -1307,6 +1309,9 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 	src_map_to_sec4_sg(jrdev, req->src, src_nents, edesc->sec4_sg + 1,
- 			   chained);
- 
-+	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-+					    sec4_sg_bytes, DMA_TO_DEVICE);
-+
- 	append_seq_in_ptr(desc, edesc->sec4_sg_dma, buflen +
- 			       req->nbytes, LDST_SGF);
- 
-@@ -1380,13 +1385,14 @@ static int ahash_update_first(struct ahash_request *req)
- 		edesc->sec4_sg_bytes = sec4_sg_bytes;
- 		edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 				 DESC_JOB_IO_LEN;
--		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
--						    sec4_sg_bytes,
--						    DMA_TO_DEVICE);
- 
- 		if (src_nents) {
- 			sg_to_sec4_sg_last(req->src, src_nents,
- 					   edesc->sec4_sg, 0);
-+			edesc->sec4_sg_dma = dma_map_single(jrdev,
-+							    edesc->sec4_sg,
-+							    sec4_sg_bytes,
-+							    DMA_TO_DEVICE);
- 			src_dma = edesc->sec4_sg_dma;
- 			options = LDST_SGF;
- 		} else {
--- 
-1.8.1.4
+thanks,
+
+Mimi
+
+> ---
+>  Documentation/kernel-parameters.txt |   3 +
+>  security/integrity/ima/ima_crypto.c | 182 +++++++++++++++++++++++++++++++++++-
+>  2 files changed, 181 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
+> index a0c155c..f8efb01 100644
+> --- a/Documentation/kernel-parameters.txt
+> +++ b/Documentation/kernel-parameters.txt
+> @@ -1286,6 +1286,9 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
+>  	ihash_entries=	[KNL]
+>  			Set number of hash buckets for inode cache.
+> 
+> +	ima_ahash_size=size [IMA]
+> +			Set the minimal file size when use ahash API.
+> +
+>  	ima_appraise=	[IMA] appraise integrity measurements
+>  			Format: { "off" | "enforce" | "fix" }
+>  			default: "enforce"
+> diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
+> index ccd0ac8..b7a8650 100644
+> --- a/security/integrity/ima/ima_crypto.c
+> +++ b/security/integrity/ima/ima_crypto.c
+> @@ -25,7 +25,25 @@
+>  #include <crypto/hash_info.h>
+>  #include "ima.h"
+> 
+> +
+> +struct ahash_completion {
+> +	struct completion completion;
+> +	int err;
+> +};
+> +
+>  static struct crypto_shash *ima_shash_tfm;
+> +static struct crypto_ahash *ima_ahash_tfm;
+> +
+> +/* data size for ahash use */
+> +static loff_t ima_ahash_size;
+> +
+> +static int __init ima_ahash_setup(char *str)
+> +{
+> +	int rc = kstrtoll(str, 10, &ima_ahash_size);
+> +	pr_info("ima_ahash_size = %lld\n", ima_ahash_size);
+> +	return !rc;
+> +}
+> +__setup("ima_ahash_size=", ima_ahash_setup);
+> 
+>  /**
+>   * ima_kernel_read - read file content
+> @@ -68,6 +86,14 @@ int ima_init_crypto(void)
+>  		       hash_algo_name[ima_hash_algo], rc);
+>  		return rc;
+>  	}
+> +	ima_ahash_tfm = crypto_alloc_ahash(hash_algo_name[ima_hash_algo], 0, 0);
+> +	if (IS_ERR(ima_ahash_tfm)) {
+> +		rc = PTR_ERR(ima_ahash_tfm);
+> +		crypto_free_shash(ima_shash_tfm);
+> +		pr_err("Can not allocate %s (reason: %ld)\n",
+> +		       hash_algo_name[ima_hash_algo], rc);
+> +		return rc;
+> +	}
+>  	return 0;
+>  }
+> 
+> @@ -93,9 +119,143 @@ static void ima_free_tfm(struct crypto_shash *tfm)
+>  		crypto_free_shash(tfm);
+>  }
+> 
+> -/*
+> - * Calculate the MD5/SHA1 file digest
+> - */
+> +static struct crypto_ahash *ima_alloc_atfm(enum hash_algo algo)
+> +{
+> +	struct crypto_ahash *tfm = ima_ahash_tfm;
+> +	int rc;
+> +
+> +	if (algo != ima_hash_algo && algo < HASH_ALGO__LAST) {
+> +		tfm = crypto_alloc_ahash(hash_algo_name[algo], 0, 0);
+> +		if (IS_ERR(tfm)) {
+> +			rc = PTR_ERR(tfm);
+> +			pr_err("Can not allocate %s (reason: %d)\n",
+> +			       hash_algo_name[algo], rc);
+> +		}
+> +	}
+> +	return tfm;
+> +}
+> +
+> +static void ima_free_atfm(struct crypto_ahash *tfm)
+> +{
+> +	if (tfm != ima_ahash_tfm)
+> +		crypto_free_ahash(tfm);
+> +}
+> +
+> +static void ahash_complete(struct crypto_async_request *req, int err)
+> +{
+> +	struct ahash_completion *res = req->data;
+> +
+> +	if (err == -EINPROGRESS)
+> +		return;
+> +	res->err = err;
+> +	complete(&res->completion);
+> +}
+> +
+> +static int ahash_wait(int err, struct ahash_completion *res)
+> +{
+> +	switch (err) {
+> +	case 0:
+> +		break;
+> +	case -EINPROGRESS:
+> +	case -EBUSY:
+> +		wait_for_completion(&res->completion);
+> +		reinit_completion(&res->completion);
+> +		err = res->err;
+> +		/* fall through */
+> +	default:
+> +		pr_crit("ahash calculation failed: err: %d\n", err);
+> +	}
+> +
+> +	return err;
+> +}
+> +
+> +static int ima_calc_file_hash_atfm(struct file *file,
+> +				   struct ima_digest_data *hash,
+> +				   struct crypto_ahash *tfm)
+> +{
+> +	loff_t i_size, offset;
+> +	char *rbuf;
+> +	int rc, read = 0, rbuf_len;
+> +	struct ahash_request *req;
+> +	struct scatterlist sg[1];
+> +	struct ahash_completion res;
+> +
+> +	hash->length = crypto_ahash_digestsize(tfm);
+> +
+> +	req = ahash_request_alloc(ima_ahash_tfm, GFP_KERNEL);
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+> +	init_completion(&res.completion);
+> +	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+> +				   CRYPTO_TFM_REQ_MAY_SLEEP,
+> +				   ahash_complete, &res);
+> +
+> +	rc = ahash_wait(crypto_ahash_init(req), &res);
+> +	if (rc)
+> +		goto out1;
+> +
+> +	i_size = i_size_read(file_inode(file));
+> +
+> +	if (i_size == 0)
+> +		goto out2;
+> +
+> +	rbuf = kzalloc(PAGE_SIZE, GFP_KERNEL);
+> +	if (!rbuf) {
+> +		rc = -ENOMEM;
+> +		goto out1;
+> +	}
+> +
+> +	if (!(file->f_mode & FMODE_READ)) {
+> +		file->f_mode |= FMODE_READ;
+> +		read = 1;
+> +	}
+> +
+> +	for (offset = 0; offset < i_size; offset += rbuf_len) {
+> +		rbuf_len = ima_kernel_read(file, offset, rbuf, PAGE_SIZE);
+> +		if (rbuf_len < 0) {
+> +			rc = rbuf_len;
+> +			break;
+> +		}
+> +		if (rbuf_len == 0)
+> +			break;
+> +
+> +		sg_init_one(&sg[0], rbuf, rbuf_len);
+> +		ahash_request_set_crypt(req, sg, NULL, rbuf_len);
+> +
+> +		rc = ahash_wait(crypto_ahash_update(req), &res);
+> +		if (rc)
+> +			break;
+> +	}
+> +	if (read)
+> +		file->f_mode &= ~FMODE_READ;
+> +	kfree(rbuf);
+> +out2:
+> +	if (!rc) {
+> +		ahash_request_set_crypt(req, NULL, hash->digest, 0);
+> +		rc = ahash_wait(crypto_ahash_final(req), &res);
+> +	}
+> +out1:
+> +	ahash_request_free(req);
+> +	return rc;
+> +}
+> +
+> +static int ima_calc_file_ahash(struct file *file, struct ima_digest_data *hash)
+> +{
+> +	struct crypto_ahash *tfm;
+> +	int rc;
+> +
+> +	tfm = ima_alloc_atfm(hash->algo);
+> +	if (IS_ERR(tfm))
+> +		return PTR_ERR(tfm);
+> +
+> +	rc = ima_calc_file_hash_atfm(file, hash, tfm);
+> +
+> +	ima_free_atfm(tfm);
+> +
+> +	return rc;
+> +}
+> +
+>  static int ima_calc_file_hash_tfm(struct file *file,
+>  				  struct ima_digest_data *hash,
+>  				  struct crypto_shash *tfm)
+> @@ -156,7 +316,7 @@ out:
+>  	return rc;
+>  }
+> 
+> -int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
+> +static int ima_calc_file_shash(struct file *file, struct ima_digest_data *hash)
+>  {
+>  	struct crypto_shash *tfm;
+>  	int rc;
+> @@ -172,6 +332,20 @@ int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
+>  	return rc;
+>  }
+> 
+> +int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
+> +{
+> +	loff_t i_size = i_size_read(file_inode(file));
+> +
+> +	/* shash is more efficient small data
+> +	 * ahash performance depends on data size and particular HW
+> +	 * ima_ahash_size allows to specify the best value for the system
+> +	 */
+> +	if (ima_ahash_size && i_size >= ima_ahash_size)
+> +		return ima_calc_file_ahash(file, hash);
+> +	else
+> +		return ima_calc_file_shash(file, hash);
+> +}
+> +
+>  /*
+>   * Calculate the hash of template data
+>   */
