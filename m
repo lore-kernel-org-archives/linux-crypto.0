@@ -1,87 +1,70 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH 00/22] Add and use pci_zalloc_consistent
-Date: Mon, 23 Jun 2014 12:13:29 -0700
-Message-ID: <1403550809.15811.13.camel@joe-AO725>
-References: <cover.1403530604.git.joe@perches.com>
- <20140623172512.GA1390@garbanzo.do-not-panic.com>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v3 1/6] crypto: SHA1 multibuffer crypto hash
+ infrastructure
+Date: Mon, 23 Jun 2014 12:48:25 -0700
+Message-ID: <1403552905.2970.618.camel@schen9-DESK>
+References: <cover.1402491749.git.tim.c.chen@linux.intel.com>
+	 <1402520625.2970.537.camel@schen9-DESK>
+	 <20140620175751.GA2802@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: devel@driverdev.osuosl.org, linux-arch@vger.kernel.org,
- linux-scsi@vger.kernel.org, iss_storagedev@hp.com, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, linux-atm-general@lists.sourceforge.net,
- linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-crypto@vger.kernel.org,
- linux-media@vger.kernel.org, linux-eata@i-connect.net
-To: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>, Arnd Bergmann
- <arnd@arndb.de>
-Return-path: <dri-devel-bounces@lists.freedesktop.org>
-In-Reply-To: <20140623172512.GA1390@garbanzo.do-not-panic.com>
-List-Unsubscribe: <http://lists.freedesktop.org/mailman/options/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=unsubscribe>
-List-Archive: <http://lists.freedesktop.org/archives/dri-devel>
-List-Post: <mailto:dri-devel@lists.freedesktop.org>
-List-Help: <mailto:dri-devel-request@lists.freedesktop.org?subject=help>
-List-Subscribe: <http://lists.freedesktop.org/mailman/listinfo/dri-devel>,
- <mailto:dri-devel-request@lists.freedesktop.org?subject=subscribe>
-Errors-To: dri-devel-bounces@lists.freedesktop.org
-Sender: "dri-devel" <dri-devel-bounces@lists.freedesktop.org>
-List-Id: linux-crypto.vger.kernel.org
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Chandramouli Narayanan <mouli@linux.intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:20788 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756811AbaFWTsx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 23 Jun 2014 15:48:53 -0400
+In-Reply-To: <20140620175751.GA2802@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2014-06-23 at 10:25 -0700, Luis R. Rodriguez wrote:
-> On Mon, Jun 23, 2014 at 06:41:28AM -0700, Joe Perches wrote:
-> > Adding the helper reduces object code size as well as overall
-> > source size line count.
-> > 
-> > It's also consistent with all the various zalloc mechanisms
-> > in the kernel.
-> > 
-> > Done with a simple cocci script and some typing.
+On Sat, 2014-06-21 at 01:57 +0800, Herbert Xu wrote:
+> On Wed, Jun 11, 2014 at 02:03:45PM -0700, Tim Chen wrote:
+> >
+> > diff --git a/crypto/shash.c b/crypto/shash.c
+> > index 929058a..234ece0 100644
+> > --- a/crypto/shash.c
+> > +++ b/crypto/shash.c
+> > @@ -271,6 +271,18 @@ static int shash_async_finup(struct ahash_request *req)
+> >  	return shash_ahash_finup(req, desc);
+> >  }
+> >  
+> > +int shash_ahash_mcryptd_digest(struct ahash_request *req,
+> > +			       struct shash_desc *desc)
+> > +{
+> > +	int err;
+> > +
+> > +	err = crypto_shash_init(desc) ?:
+> > +	      shash_ahash_mcryptd_finup(req, desc);
+> > +
+> > +	return err;
+> > +}
+> > +EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_digest);
+> > +
 > 
-> Awesome, any chance you can paste in the SmPL? Also any chance
-> we can get this added to a make coccicheck so that maintainers
-> moving forward can use that to ensure that no new code is
-> added that uses the old school API?
+> This bit causes your patch to not build for me.
+> 
+> Please fix and resubmit.
 
-Not many of these are recent.
+Herbert,
 
-Arnd Bergmann reasonably suggested that the pci_alloc_consistent
-api be converted the the more widely used dma_alloc_coherent.
+Upon further testing, I realize that I have to change my logic
+for doing work in the idle_notifier path to clear out partial tasks.
+The notifier is actually in an atomic context and I may page fault
+when working on the data buffer but I cannot sleep here.
 
-https://lkml.org/lkml/2014/6/23/513
+I'll need to wake up the kernel crypto thread instead.  So it
+will take me a bit longer to refine this logic.
 
-> Shouldn't these drivers just use the normal dma-mapping API now?
+Thanks.
 
-and I replied:
-
-https://lkml.org/lkml/2014/6/23/525
-
-> Maybe.  I wouldn't mind.
-> They do seem to have a trivial bit of unnecessary overhead for 
-> hwdev == NULL ? NULL : &hwdev->dev
-
-Anyway, here's the little script.
-I'm not sure it's worthwhile to add it though.
-
-$ cat ./scripts/coccinelle/api/alloc/pci_zalloc_consistent.cocci
-///
-/// Use pci_zalloc_consistent rather than
-///     pci_alloc_consistent followed by memset with 0
-///
-/// This considers some simple cases that are common and easy to validate
-/// Note in particular that there are no ...s in the rule, so all of the
-/// matched code has to be contiguous
-///
-/// Blatantly cribbed from: scripts/coccinelle/api/alloc/kzalloc-simple.cocci
-
-@@
-type T, T2;
-expression x;
-expression E1,E2,E3;
-statement S;
-@@
-
-- x = (T)pci_alloc_consistent(E1,E2,E3);
-+ x = pci_zalloc_consistent(E1,E2,E3);
-  if ((x==NULL) || ...) S
-- memset((T2)x,0,E2);
+Tim
