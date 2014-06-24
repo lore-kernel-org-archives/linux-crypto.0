@@ -1,57 +1,50 @@
-From: Sonny Rao <sonnyrao@chromium.org>
-Subject: Using s5p-sss hw crypto causes ipsec to break
-Date: Mon, 23 Jun 2014 17:36:20 -0700
-Message-ID: <CAPz6YkUtGt61YNcGh2sYhaL=U5JMSOu26DvuKXuvp-oxi9ftBw@mail.gmail.com>
+From: Eric Dumazet <eric.dumazet@gmail.com>
+Subject: [PATCH] crypto: lzo: use kvfree() helper
+Date: Tue, 24 Jun 2014 01:23:45 -0700
+Message-ID: <1403598225.27425.9.camel@edumazet-glaptop2.roam.corp.google.com>
+References: <1401211735.5367.254.camel@edumazet-glaptop2.roam.corp.google.com>
+	 <20140620184053.GC3169@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Douglas Anderson <dianders@chromium.org>, ch.naveen@samsung.com,
-	linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
-	vzapolskiy@gmail.com
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-Sender: linux-samsung-soc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Seth Jennings <sjennings@variantweb.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:48058 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751365AbaFXIXu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 24 Jun 2014 04:23:50 -0400
+Received: by mail-wi0-f169.google.com with SMTP id hi2so5450394wib.0
+        for <linux-crypto@vger.kernel.org>; Tue, 24 Jun 2014 01:23:49 -0700 (PDT)
+In-Reply-To: <20140620184053.GC3169@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi, I've been investigating an issue relating to hardware crypto which
-is that when I enable the s5p-sss module for hardware cryptographic
-acceleration on Samsung Exynos SoCs the in-kernel IPSec seems to
-break, although cryptographic operations on filesystems/block devices
-using this driver seem to work fine.
+From: Eric Dumazet <edumazet@google.com>
 
-Originally we were looking at an older kernel (3.8 with patches), but
-I've now verified on linux-next from 20140612 (after 3.15) with a few
-additional patches (to enable both s5p-sss and Exynos5420) that this
-is still the case.
+kvfree() helper is now available, use it instead of open code it.
 
-It looks like what is happening in the kernel is that IPsec ends up
-with this callstack
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ crypto/lzo.c |    5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-esp_output()-> crypto_aead_givencrypt()->
-crypto_authenc_givencrypt()-> eseqiv_givencrypt() ->
-crypto_ablkcipher_encrypt()
-
-
-which calls into the s5p-sss driver and that is returning -EINPROGRESS
-(or possibly -EBUSY), and that is passed all the way back up the call
-stack and that seems to be treated as an error condition by the ipsec
-stack.
-
-For example esp_output does this:
-
-       err = crypto_aead_givencrypt(req);
-        if (err == -EINPROGRESS)
-                goto error;
-
-        if (err == -EBUSY)
-                err = NET_XMIT_DROP;
-
-So, I'm not sure how this is supposed to work, or if s5p-sss is doing
-something wrong.
-
-In the case of the block layer, it seems to be tolerant of the
--EINPROGRESS return code.  I looked at some of the other hw crypto
-drivers which are similar to s5p-sss and they also seem to return
--EINPROGRESS or -EBUSY in a similar way.
-
-I was also wondering if esp shouldn't be using the ablkcipher
-interface if it isn't tolerant of the -EINPROGRESS?
+diff --git a/crypto/lzo.c b/crypto/lzo.c
+index 252e791d..a8ff2f7 100644
+--- a/crypto/lzo.c
++++ b/crypto/lzo.c
+@@ -45,10 +45,7 @@ static void lzo_exit(struct crypto_tfm *tfm)
+ {
+ 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	if (is_vmalloc_addr(ctx->lzo_comp_mem))
+-		vfree(ctx->lzo_comp_mem);
+-	else
+-		kfree(ctx->lzo_comp_mem);
++	kvfree(ctx->lzo_comp_mem);
+ }
+ 
+ static int lzo_compress(struct crypto_tfm *tfm, const u8 *src,
