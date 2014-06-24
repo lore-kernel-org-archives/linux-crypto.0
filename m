@@ -1,97 +1,57 @@
-From: Julian Calaby <julian.calaby@gmail.com>
-Subject: Re: [PATCH 00/22] Add and use pci_zalloc_consistent
-Date: Tue, 24 Jun 2014 09:27:25 +1000
-Message-ID: <CAGRGNgVD2f0S-v8YZ-qABEhDJAwk5pp71FU9uLR8aSZ+DhABjg@mail.gmail.com>
-References: <cover.1403530604.git.joe@perches.com> <20140623172512.GA1390@garbanzo.do-not-panic.com>
- <1403550809.15811.13.camel@joe-AO725>
+From: Sonny Rao <sonnyrao@chromium.org>
+Subject: Using s5p-sss hw crypto causes ipsec to break
+Date: Mon, 23 Jun 2014 17:36:20 -0700
+Message-ID: <CAPz6YkUtGt61YNcGh2sYhaL=U5JMSOu26DvuKXuvp-oxi9ftBw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-	linux-arch@vger.kernel.org,
-	linux-scsi <linux-scsi@vger.kernel.org>, iss_storagedev@hp.com,
-	linux-rdma@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-	linux-atm-general@lists.sourceforge.net,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	dri-devel@lists.freedesktop.org, linux-crypto@vger.kernel.org,
-	linux-eata@i-connect.net, linux-media@vger.kernel.org
-To: Joe Perches <joe@perches.com>
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <1403550809.15811.13.camel@joe-AO725>
-Sender: linux-arch-owner@vger.kernel.org
+Cc: Douglas Anderson <dianders@chromium.org>, ch.naveen@samsung.com,
+	linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+	vzapolskiy@gmail.com
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Joe,
+Hi, I've been investigating an issue relating to hardware crypto which
+is that when I enable the s5p-sss module for hardware cryptographic
+acceleration on Samsung Exynos SoCs the in-kernel IPSec seems to
+break, although cryptographic operations on filesystems/block devices
+using this driver seem to work fine.
 
-On Tue, Jun 24, 2014 at 5:13 AM, Joe Perches <joe@perches.com> wrote:
-> On Mon, 2014-06-23 at 10:25 -0700, Luis R. Rodriguez wrote:
->> On Mon, Jun 23, 2014 at 06:41:28AM -0700, Joe Perches wrote:
->> > Adding the helper reduces object code size as well as overall
->> > source size line count.
->> >
->> > It's also consistent with all the various zalloc mechanisms
->> > in the kernel.
->> >
->> > Done with a simple cocci script and some typing.
->>
->> Awesome, any chance you can paste in the SmPL? Also any chance
->> we can get this added to a make coccicheck so that maintainers
->> moving forward can use that to ensure that no new code is
->> added that uses the old school API?
->
-> Not many of these are recent.
->
-> Arnd Bergmann reasonably suggested that the pci_alloc_consistent
-> api be converted the the more widely used dma_alloc_coherent.
->
-> https://lkml.org/lkml/2014/6/23/513
->
->> Shouldn't these drivers just use the normal dma-mapping API now?
->
-> and I replied:
->
-> https://lkml.org/lkml/2014/6/23/525
->
->> Maybe.  I wouldn't mind.
->> They do seem to have a trivial bit of unnecessary overhead for
->> hwdev == NULL ? NULL : &hwdev->dev
->
-> Anyway, here's the little script.
-> I'm not sure it's worthwhile to add it though.
->
-> $ cat ./scripts/coccinelle/api/alloc/pci_zalloc_consistent.cocci
-> ///
-> /// Use pci_zalloc_consistent rather than
-> ///     pci_alloc_consistent followed by memset with 0
-> ///
-> /// This considers some simple cases that are common and easy to validate
-> /// Note in particular that there are no ...s in the rule, so all of the
-> /// matched code has to be contiguous
-> ///
-> /// Blatantly cribbed from: scripts/coccinelle/api/alloc/kzalloc-simple.cocci
->
-> @@
-> type T, T2;
-> expression x;
-> expression E1,E2,E3;
-> statement S;
-> @@
->
-> - x = (T)pci_alloc_consistent(E1,E2,E3);
-> + x = pci_zalloc_consistent(E1,E2,E3);
->   if ((x==NULL) || ...) S
-> - memset((T2)x,0,E2);
+Originally we were looking at an older kernel (3.8 with patches), but
+I've now verified on linux-next from 20140612 (after 3.15) with a few
+additional patches (to enable both s5p-sss and Exynos5420) that this
+is still the case.
 
-I don't know much about SmPL, but wouldn't having that if statement
-there reduce your matches?
+It looks like what is happening in the kernel is that IPsec ends up
+with this callstack
 
-Thanks,
+esp_output()-> crypto_aead_givencrypt()->
+crypto_authenc_givencrypt()-> eseqiv_givencrypt() ->
+crypto_ablkcipher_encrypt()
 
--- 
-Julian Calaby
 
-Email: julian.calaby@gmail.com
-Profile: http://www.google.com/profiles/julian.calaby/
-.Plan: http://sites.google.com/site/juliancalaby/
+which calls into the s5p-sss driver and that is returning -EINPROGRESS
+(or possibly -EBUSY), and that is passed all the way back up the call
+stack and that seems to be treated as an error condition by the ipsec
+stack.
+
+For example esp_output does this:
+
+       err = crypto_aead_givencrypt(req);
+        if (err == -EINPROGRESS)
+                goto error;
+
+        if (err == -EBUSY)
+                err = NET_XMIT_DROP;
+
+So, I'm not sure how this is supposed to work, or if s5p-sss is doing
+something wrong.
+
+In the case of the block layer, it seems to be tolerant of the
+-EINPROGRESS return code.  I looked at some of the other hw crypto
+drivers which are similar to s5p-sss and they also seem to return
+-EINPROGRESS or -EBUSY in a similar way.
+
+I was also wondering if esp shouldn't be using the ablkcipher
+interface if it isn't tolerant of the -EINPROGRESS?
