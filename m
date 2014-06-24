@@ -1,85 +1,80 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 4/4] crypto: qat: Fix error path crash when no firmware is
- present
-Date: Tue, 24 Jun 2014 15:19:40 -0700
-Message-ID: <20140624221940.3872.55853.stgit@tstruk-mobl1.intel.com>
+Subject: [PATCH 1/4] crypto: qat: Fix random config build warnings
+Date: Tue, 24 Jun 2014 15:19:24 -0700
+Message-ID: <20140624221924.3872.42454.stgit@tstruk-mobl1.intel.com>
 References: <20140624221833.3872.65930.stgit@tstruk-mobl1.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: davem@davemloft.net, bruce.w.allan@intel.com,
 	linux-crypto@vger.kernel.org, qat-linux@intel.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:41356 "EHLO mga01.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:50593 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750925AbaFXWWf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 24 Jun 2014 18:22:35 -0400
+	id S1750925AbaFXWWs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 24 Jun 2014 18:22:48 -0400
 In-Reply-To: <20140624221833.3872.65930.stgit@tstruk-mobl1.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Firmware loader crashes when no firmware file is present.
+=46ix random config build warnings:
+
+Implicit-function-declaration =E2=80=98__raw_writel=E2=80=99
+Cast to pointer from integer of different size [-Wint-to-pointer-cast]
 
 Reviewed-by: Bruce Allan <bruce.w.allan@intel.com>
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- drivers/crypto/qat/qat_common/adf_common_drv.h |    2 +-
- drivers/crypto/qat/qat_common/qat_uclo.c       |   10 +++++-----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/crypto/qat/qat_common/adf_accel_devices.h |    1 +
+ drivers/crypto/qat/qat_common/qat_algs.c          |    6 +++---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index 3cea9fa..5e8f9d4 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -186,7 +186,7 @@ int qat_hal_init_nn(struct icp_qat_fw_loader_handle *handle,
- int qat_hal_wr_lm(struct icp_qat_fw_loader_handle *handle,
- 		  unsigned char ae, unsigned short lm_addr, unsigned int value);
- int qat_uclo_wr_all_uimage(struct icp_qat_fw_loader_handle *handle);
--int qat_uclo_del_uof_obj(struct icp_qat_fw_loader_handle *handle);
-+void qat_uclo_del_uof_obj(struct icp_qat_fw_loader_handle *handle);
- int qat_uclo_map_uof_obj(struct icp_qat_fw_loader_handle *handle,
- 			 void *addr_ptr, int mem_size);
- #endif
-diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-index 20b6b42..dd4e0d3 100644
---- a/drivers/crypto/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -959,8 +959,6 @@ static int qat_uclo_parse_uof_obj(struct icp_qat_fw_loader_handle *handle)
- 	obj_handle->encap_uof_obj.beg_uof = obj_handle->obj_hdr->file_buff;
- 	obj_handle->encap_uof_obj.obj_hdr = (struct icp_qat_uof_objhdr *)
- 					     obj_handle->obj_hdr->file_buff;
--	obj_handle->encap_uof_obj.chunk_hdr = (struct icp_qat_uof_chunkhdr *)
--	   (obj_handle->obj_hdr->file_buff + sizeof(struct icp_qat_uof_objhdr));
- 	obj_handle->uword_in_bytes = 6;
- 	obj_handle->prod_type = ICP_QAT_AC_C_CPU_TYPE;
- 	obj_handle->prod_rev = PID_MAJOR_REV |
-@@ -1040,23 +1038,25 @@ out_objbuf_err:
- 	return -ENOMEM;
- }
- 
--int qat_uclo_del_uof_obj(struct icp_qat_fw_loader_handle *handle)
-+void qat_uclo_del_uof_obj(struct icp_qat_fw_loader_handle *handle)
+diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/driver=
+s/crypto/qat/qat_common/adf_accel_devices.h
+index f3206d9..9282381 100644
+--- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+@@ -50,6 +50,7 @@
+ #include <linux/atomic.h>
+ #include <linux/list.h>
+ #include <linux/proc_fs.h>
++#include <linux/io.h>
+ #include "adf_cfg_common.h"
+=20
+ #define PCI_VENDOR_ID_INTEL 0x8086
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/=
+qat/qat_common/qat_algs.c
+index 193b753..c4e8010 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -745,7 +745,7 @@ void qat_alg_callback(void *resp)
  {
- 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
- 	int a;
- 
-+	if (!obj_handle)
-+		return;
-+
- 	kfree(obj_handle->uword_buf);
- 	for (a = 0; a < obj_handle->uimage_num; a++)
- 		kfree(obj_handle->ae_uimage[a].page);
- 
- 	for (a = 0; a <= (int)handle->hal_handle->ae_max_num; a++)
- 		qat_uclo_free_ae_data(&obj_handle->ae_data[a]);
--	kfree(obj_handle->obj_hdr);
- 
-+	kfree(obj_handle->obj_hdr);
- 	kfree(obj_handle->obj_buf);
- 	kfree(obj_handle);
- 	handle->obj_handle = NULL;
--	return 0;
- }
- 
- static void qat_uclo_fill_uwords(struct icp_qat_uclo_objhandle *obj_handle,
+ 	struct icp_qat_fw_la_resp *qat_resp =3D resp;
+ 	struct qat_crypto_request *qat_req =3D
+-			(void *)(dma_addr_t)qat_resp->opaque_data;
++				(void *)(__force long)qat_resp->opaque_data;
+ 	struct qat_alg_session_ctx *ctx =3D qat_req->ctx;
+ 	struct qat_crypto_instance *inst =3D ctx->inst;
+ 	struct aead_request *areq =3D qat_req->areq;
+@@ -779,7 +779,7 @@ static int qat_alg_dec(struct aead_request *areq)
+ 	*msg =3D ctx->dec_fw_req_tmpl;
+ 	qat_req->ctx =3D ctx;
+ 	qat_req->areq =3D areq;
+-	qat_req->req.comn_mid.opaque_data =3D (uint64_t)(dma_addr_t)qat_req;
++	qat_req->req.comn_mid.opaque_data =3D (uint64_t)(__force long)qat_req=
+;
+ 	qat_req->req.comn_mid.src_data_addr =3D qat_req->buf.blp;
+ 	qat_req->req.comn_mid.dest_data_addr =3D qat_req->buf.bloutp;
+ 	cipher_param =3D (void *)&qat_req->req.serv_specif_rqpars;
+@@ -822,7 +822,7 @@ static int qat_alg_enc_internal(struct aead_request=
+ *areq, uint8_t *iv,
+ 	*msg =3D ctx->enc_fw_req_tmpl;
+ 	qat_req->ctx =3D ctx;
+ 	qat_req->areq =3D areq;
+-	qat_req->req.comn_mid.opaque_data =3D (uint64_t)(dma_addr_t)qat_req;
++	qat_req->req.comn_mid.opaque_data =3D (uint64_t)(__force long)qat_req=
+;
+ 	qat_req->req.comn_mid.src_data_addr =3D qat_req->buf.blp;
+ 	qat_req->req.comn_mid.dest_data_addr =3D qat_req->buf.bloutp;
+ 	cipher_param =3D (void *)&qat_req->req.serv_specif_rqpars;
