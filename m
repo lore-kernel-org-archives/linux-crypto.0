@@ -1,44 +1,309 @@
-From: Johannes Berg <johannes@sipsolutions.net>
-Subject: Re: [PATCH 00/22] Add and use pci_zalloc_consistent
-Date: Tue, 24 Jun 2014 13:32:49 +0200
-Message-ID: <1403609569.10831.0.camel@jlt4.sipsolutions.net>
-References: <cover.1403530604.git.joe@perches.com>
-	 <20140623172512.GA1390@garbanzo.do-not-panic.com>
-	 <1403550809.15811.13.camel@joe-AO725>
-	 <CAGRGNgVD2f0S-v8YZ-qABEhDJAwk5pp71FU9uLR8aSZ+DhABjg@mail.gmail.com>
-	 (sfid-20140624_012812_032630_4B31BBC9)
+From: Dmitry Kasatkin <d.kasatkin@samsung.com>
+Subject: Re: [PATCH v1 1/3] ima: use ahash API for file hash calculation
+Date: Tue, 24 Jun 2014 16:34:48 +0300
+Message-ID: <53A97E78.9080703@samsung.com>
+References: <cover.1403191191.git.d.kasatkin@samsung.com>
+ <7b884b2597badabadf50ebf9120fe76754e1516c.1403191191.git.d.kasatkin@samsung.com>
+ <1403523146.18772.10.camel@dhcp-9-2-203-236.watson.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Cc: Joe Perches <joe@perches.com>,
-	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-	linux-arch@vger.kernel.org,
-	linux-scsi <linux-scsi@vger.kernel.org>, iss_storagedev@hp.com,
-	linux-rdma@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-	linux-atm-general@lists.sourceforge.net,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	dri-devel@lists.freedesktop.org, linux-crypto@vger.kernel.org,
-	linux-eata@i-connect.net, linux-media@vger.kernel.org
-To: Julian Calaby <julian.calaby@gmail.com>
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <CAGRGNgVD2f0S-v8YZ-qABEhDJAwk5pp71FU9uLR8aSZ+DhABjg@mail.gmail.com> (sfid-20140624_012812_032630_4B31BBC9)
-Sender: linux-arch-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-ima-devel@lists.sourceforge.net,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dmitry.kasatkin@gmail.com
+To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:18200 "EHLO
+	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751818AbaFXNfi (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 24 Jun 2014 09:35:38 -0400
+In-reply-to: <1403523146.18772.10.camel@dhcp-9-2-203-236.watson.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2014-06-24 at 09:27 +1000, Julian Calaby wrote:
+On 23/06/14 14:32, Mimi Zohar wrote:
+> On Thu, 2014-06-19 at 18:20 +0300, Dmitry Kasatkin wrote: 
+>> Async hash API allows to use HW acceleration for hash calculation.
+>> It may give significant performance gain or/and reduce power consumption,
+>> which might be very beneficial for battery powered devices.
+>>
+>> This patch introduces hash calculation using ahash API.
+>>
+>> ahash peformance depends on data size and particular HW. Under certain
+>> limit, depending on the system, shash performance may be better.
+>>
+>> This patch also introduces 'ima_ahash_size' kernel parameter which can
+>> be used to defines minimal data size to use with ahash. When this
+>> parameter is not set or file size is smaller than defined by this
+>> parameter, shash will be used. Thus, by defult, original shash
+>> implementation is used.
+>>
+>> Signed-off-by: Dmitry Kasatkin <d.kasatkin@samsung.com>
+> Thanks, Dmitry.  What type of values are you using for ima_ahash_size?
+> Have you specified ima_ahash_size, when booting with an initramfs?
+> ahash should probably only be used after pivoting root.
+>
+> thanks,
 
-> > - x = (T)pci_alloc_consistent(E1,E2,E3);
-> > + x = pci_zalloc_consistent(E1,E2,E3);
-> >   if ((x==NULL) || ...) S
-> > - memset((T2)x,0,E2);
-> 
-> I don't know much about SmPL, but wouldn't having that if statement
-> there reduce your matches?
+Hi,
 
-Code that matched without the if statement would be buggy, since it
-wouldn't be checking the pci_zalloc_consistent return value properly.l
+There is no guideline because it depends on the HW...
+On SW it does not mater.
+To check it up and compare you can set it to "1" to make it working for
+"any" file size.
 
-johannes
+- Dmitry
+
+
+>
+> Mimi
+>
+>> ---
+>>  Documentation/kernel-parameters.txt |   3 +
+>>  security/integrity/ima/ima_crypto.c | 182 +++++++++++++++++++++++++++++++++++-
+>>  2 files changed, 181 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
+>> index a0c155c..f8efb01 100644
+>> --- a/Documentation/kernel-parameters.txt
+>> +++ b/Documentation/kernel-parameters.txt
+>> @@ -1286,6 +1286,9 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
+>>  	ihash_entries=	[KNL]
+>>  			Set number of hash buckets for inode cache.
+>>
+>> +	ima_ahash_size=size [IMA]
+>> +			Set the minimal file size when use ahash API.
+>> +
+>>  	ima_appraise=	[IMA] appraise integrity measurements
+>>  			Format: { "off" | "enforce" | "fix" }
+>>  			default: "enforce"
+>> diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
+>> index ccd0ac8..b7a8650 100644
+>> --- a/security/integrity/ima/ima_crypto.c
+>> +++ b/security/integrity/ima/ima_crypto.c
+>> @@ -25,7 +25,25 @@
+>>  #include <crypto/hash_info.h>
+>>  #include "ima.h"
+>>
+>> +
+>> +struct ahash_completion {
+>> +	struct completion completion;
+>> +	int err;
+>> +};
+>> +
+>>  static struct crypto_shash *ima_shash_tfm;
+>> +static struct crypto_ahash *ima_ahash_tfm;
+>> +
+>> +/* data size for ahash use */
+>> +static loff_t ima_ahash_size;
+>> +
+>> +static int __init ima_ahash_setup(char *str)
+>> +{
+>> +	int rc = kstrtoll(str, 10, &ima_ahash_size);
+>> +	pr_info("ima_ahash_size = %lld\n", ima_ahash_size);
+>> +	return !rc;
+>> +}
+>> +__setup("ima_ahash_size=", ima_ahash_setup);
+>>
+>>  /**
+>>   * ima_kernel_read - read file content
+>> @@ -68,6 +86,14 @@ int ima_init_crypto(void)
+>>  		       hash_algo_name[ima_hash_algo], rc);
+>>  		return rc;
+>>  	}
+>> +	ima_ahash_tfm = crypto_alloc_ahash(hash_algo_name[ima_hash_algo], 0, 0);
+>> +	if (IS_ERR(ima_ahash_tfm)) {
+>> +		rc = PTR_ERR(ima_ahash_tfm);
+>> +		crypto_free_shash(ima_shash_tfm);
+>> +		pr_err("Can not allocate %s (reason: %ld)\n",
+>> +		       hash_algo_name[ima_hash_algo], rc);
+>> +		return rc;
+>> +	}
+>>  	return 0;
+>>  }
+>>
+>> @@ -93,9 +119,143 @@ static void ima_free_tfm(struct crypto_shash *tfm)
+>>  		crypto_free_shash(tfm);
+>>  }
+>>
+>> -/*
+>> - * Calculate the MD5/SHA1 file digest
+>> - */
+>> +static struct crypto_ahash *ima_alloc_atfm(enum hash_algo algo)
+>> +{
+>> +	struct crypto_ahash *tfm = ima_ahash_tfm;
+>> +	int rc;
+>> +
+>> +	if (algo != ima_hash_algo && algo < HASH_ALGO__LAST) {
+>> +		tfm = crypto_alloc_ahash(hash_algo_name[algo], 0, 0);
+>> +		if (IS_ERR(tfm)) {
+>> +			rc = PTR_ERR(tfm);
+>> +			pr_err("Can not allocate %s (reason: %d)\n",
+>> +			       hash_algo_name[algo], rc);
+>> +		}
+>> +	}
+>> +	return tfm;
+>> +}
+>> +
+>> +static void ima_free_atfm(struct crypto_ahash *tfm)
+>> +{
+>> +	if (tfm != ima_ahash_tfm)
+>> +		crypto_free_ahash(tfm);
+>> +}
+>> +
+>> +static void ahash_complete(struct crypto_async_request *req, int err)
+>> +{
+>> +	struct ahash_completion *res = req->data;
+>> +
+>> +	if (err == -EINPROGRESS)
+>> +		return;
+>> +	res->err = err;
+>> +	complete(&res->completion);
+>> +}
+>> +
+>> +static int ahash_wait(int err, struct ahash_completion *res)
+>> +{
+>> +	switch (err) {
+>> +	case 0:
+>> +		break;
+>> +	case -EINPROGRESS:
+>> +	case -EBUSY:
+>> +		wait_for_completion(&res->completion);
+>> +		reinit_completion(&res->completion);
+>> +		err = res->err;
+>> +		/* fall through */
+>> +	default:
+>> +		pr_crit("ahash calculation failed: err: %d\n", err);
+>> +	}
+>> +
+>> +	return err;
+>> +}
+>> +
+>> +static int ima_calc_file_hash_atfm(struct file *file,
+>> +				   struct ima_digest_data *hash,
+>> +				   struct crypto_ahash *tfm)
+>> +{
+>> +	loff_t i_size, offset;
+>> +	char *rbuf;
+>> +	int rc, read = 0, rbuf_len;
+>> +	struct ahash_request *req;
+>> +	struct scatterlist sg[1];
+>> +	struct ahash_completion res;
+>> +
+>> +	hash->length = crypto_ahash_digestsize(tfm);
+>> +
+>> +	req = ahash_request_alloc(ima_ahash_tfm, GFP_KERNEL);
+>> +	if (!req)
+>> +		return -ENOMEM;
+>> +
+>> +	init_completion(&res.completion);
+>> +	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+>> +				   CRYPTO_TFM_REQ_MAY_SLEEP,
+>> +				   ahash_complete, &res);
+>> +
+>> +	rc = ahash_wait(crypto_ahash_init(req), &res);
+>> +	if (rc)
+>> +		goto out1;
+>> +
+>> +	i_size = i_size_read(file_inode(file));
+>> +
+>> +	if (i_size == 0)
+>> +		goto out2;
+>> +
+>> +	rbuf = kzalloc(PAGE_SIZE, GFP_KERNEL);
+>> +	if (!rbuf) {
+>> +		rc = -ENOMEM;
+>> +		goto out1;
+>> +	}
+>> +
+>> +	if (!(file->f_mode & FMODE_READ)) {
+>> +		file->f_mode |= FMODE_READ;
+>> +		read = 1;
+>> +	}
+>> +
+>> +	for (offset = 0; offset < i_size; offset += rbuf_len) {
+>> +		rbuf_len = ima_kernel_read(file, offset, rbuf, PAGE_SIZE);
+>> +		if (rbuf_len < 0) {
+>> +			rc = rbuf_len;
+>> +			break;
+>> +		}
+>> +		if (rbuf_len == 0)
+>> +			break;
+>> +
+>> +		sg_init_one(&sg[0], rbuf, rbuf_len);
+>> +		ahash_request_set_crypt(req, sg, NULL, rbuf_len);
+>> +
+>> +		rc = ahash_wait(crypto_ahash_update(req), &res);
+>> +		if (rc)
+>> +			break;
+>> +	}
+>> +	if (read)
+>> +		file->f_mode &= ~FMODE_READ;
+>> +	kfree(rbuf);
+>> +out2:
+>> +	if (!rc) {
+>> +		ahash_request_set_crypt(req, NULL, hash->digest, 0);
+>> +		rc = ahash_wait(crypto_ahash_final(req), &res);
+>> +	}
+>> +out1:
+>> +	ahash_request_free(req);
+>> +	return rc;
+>> +}
+>> +
+>> +static int ima_calc_file_ahash(struct file *file, struct ima_digest_data *hash)
+>> +{
+>> +	struct crypto_ahash *tfm;
+>> +	int rc;
+>> +
+>> +	tfm = ima_alloc_atfm(hash->algo);
+>> +	if (IS_ERR(tfm))
+>> +		return PTR_ERR(tfm);
+>> +
+>> +	rc = ima_calc_file_hash_atfm(file, hash, tfm);
+>> +
+>> +	ima_free_atfm(tfm);
+>> +
+>> +	return rc;
+>> +}
+>> +
+>>  static int ima_calc_file_hash_tfm(struct file *file,
+>>  				  struct ima_digest_data *hash,
+>>  				  struct crypto_shash *tfm)
+>> @@ -156,7 +316,7 @@ out:
+>>  	return rc;
+>>  }
+>>
+>> -int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
+>> +static int ima_calc_file_shash(struct file *file, struct ima_digest_data *hash)
+>>  {
+>>  	struct crypto_shash *tfm;
+>>  	int rc;
+>> @@ -172,6 +332,20 @@ int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
+>>  	return rc;
+>>  }
+>>
+>> +int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
+>> +{
+>> +	loff_t i_size = i_size_read(file_inode(file));
+>> +
+>> +	/* shash is more efficient small data
+>> +	 * ahash performance depends on data size and particular HW
+>> +	 * ima_ahash_size allows to specify the best value for the system
+>> +	 */
+>> +	if (ima_ahash_size && i_size >= ima_ahash_size)
+>> +		return ima_calc_file_ahash(file, hash);
+>> +	else
+>> +		return ima_calc_file_shash(file, hash);
+>> +}
+>> +
+>>  /*
+>>   * Calculate the hash of template data
+>>   */
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-security-module" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
