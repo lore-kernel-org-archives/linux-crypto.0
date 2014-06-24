@@ -1,80 +1,51 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 1/4] crypto: qat: Fix random config build warnings
-Date: Tue, 24 Jun 2014 15:19:24 -0700
-Message-ID: <20140624221924.3872.42454.stgit@tstruk-mobl1.intel.com>
+Subject: [PATCH 2/4] crypto: qat: Updated Firmware Info Metadata
+Date: Tue, 24 Jun 2014 15:19:29 -0700
+Message-ID: <20140624221929.3872.19304.stgit@tstruk-mobl1.intel.com>
 References: <20140624221833.3872.65930.stgit@tstruk-mobl1.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Cc: davem@davemloft.net, bruce.w.allan@intel.com,
 	linux-crypto@vger.kernel.org, qat-linux@intel.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:50593 "EHLO mga11.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:20419 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750925AbaFXWWs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 24 Jun 2014 18:22:48 -0400
+	id S1751206AbaFXWWw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 24 Jun 2014 18:22:52 -0400
 In-Reply-To: <20140624221833.3872.65930.stgit@tstruk-mobl1.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-=46ix random config build warnings:
-
-Implicit-function-declaration =E2=80=98__raw_writel=E2=80=99
-Cast to pointer from integer of different size [-Wint-to-pointer-cast]
+Updated Firmware Info Metadata
 
 Reviewed-by: Bruce Allan <bruce.w.allan@intel.com>
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- drivers/crypto/qat/qat_common/adf_accel_devices.h |    1 +
- drivers/crypto/qat/qat_common/qat_algs.c          |    6 +++---
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ drivers/crypto/qat/Kconfig                |    1 +
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c |    1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/driver=
-s/crypto/qat/qat_common/adf_accel_devices.h
-index f3206d9..9282381 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -50,6 +50,7 @@
- #include <linux/atomic.h>
- #include <linux/list.h>
- #include <linux/proc_fs.h>
-+#include <linux/io.h>
- #include "adf_cfg_common.h"
-=20
- #define PCI_VENDOR_ID_INTEL 0x8086
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/=
-qat/qat_common/qat_algs.c
-index 193b753..c4e8010 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -745,7 +745,7 @@ void qat_alg_callback(void *resp)
- {
- 	struct icp_qat_fw_la_resp *qat_resp =3D resp;
- 	struct qat_crypto_request *qat_req =3D
--			(void *)(dma_addr_t)qat_resp->opaque_data;
-+				(void *)(__force long)qat_resp->opaque_data;
- 	struct qat_alg_session_ctx *ctx =3D qat_req->ctx;
- 	struct qat_crypto_instance *inst =3D ctx->inst;
- 	struct aead_request *areq =3D qat_req->areq;
-@@ -779,7 +779,7 @@ static int qat_alg_dec(struct aead_request *areq)
- 	*msg =3D ctx->dec_fw_req_tmpl;
- 	qat_req->ctx =3D ctx;
- 	qat_req->areq =3D areq;
--	qat_req->req.comn_mid.opaque_data =3D (uint64_t)(dma_addr_t)qat_req;
-+	qat_req->req.comn_mid.opaque_data =3D (uint64_t)(__force long)qat_req=
-;
- 	qat_req->req.comn_mid.src_data_addr =3D qat_req->buf.blp;
- 	qat_req->req.comn_mid.dest_data_addr =3D qat_req->buf.bloutp;
- 	cipher_param =3D (void *)&qat_req->req.serv_specif_rqpars;
-@@ -822,7 +822,7 @@ static int qat_alg_enc_internal(struct aead_request=
- *areq, uint8_t *iv,
- 	*msg =3D ctx->enc_fw_req_tmpl;
- 	qat_req->ctx =3D ctx;
- 	qat_req->areq =3D areq;
--	qat_req->req.comn_mid.opaque_data =3D (uint64_t)(dma_addr_t)qat_req;
-+	qat_req->req.comn_mid.opaque_data =3D (uint64_t)(__force long)qat_req=
-;
- 	qat_req->req.comn_mid.src_data_addr =3D qat_req->buf.blp;
- 	qat_req->req.comn_mid.dest_data_addr =3D qat_req->buf.bloutp;
- 	cipher_param =3D (void *)&qat_req->req.serv_specif_rqpars;
+diff --git a/drivers/crypto/qat/Kconfig b/drivers/crypto/qat/Kconfig
+index 3bd3fd9..49bede2 100644
+--- a/drivers/crypto/qat/Kconfig
++++ b/drivers/crypto/qat/Kconfig
+@@ -8,6 +8,7 @@ config CRYPTO_DEV_QAT
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_SHA256
+ 	select CRYPTO_SHA512
++	select FW_LOADER
+ 
+ config CRYPTO_DEV_QAT_DH895xCC
+ 	tristate "Support for Intel(R) DH895xCC"
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+index 1da2f78..0d0435a 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+@@ -445,4 +445,5 @@ module_exit(adfdrv_release);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_AUTHOR("Intel");
++MODULE_FIRMWARE("qat_895xcc.bin");
+ MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
