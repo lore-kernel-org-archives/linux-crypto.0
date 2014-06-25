@@ -1,64 +1,42 @@
-From: Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: [PATCH v4 3/3] ARM: DT: qcom: Add Qualcomm crypto driver binding document
-Date: Wed, 25 Jun 2014 19:28:59 +0300
-Message-ID: <1403713739-3074-4-git-send-email-svarbanov@mm-sol.com>
-References: <1403713739-3074-1-git-send-email-svarbanov@mm-sol.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-doc@vger.kernel.org, Stanimir Varbanov <svarbanov@mm-sol.com>
-To: Rob Herring <rob.herring@calxeda.com>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Grant Likely <grant.likely@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1403713739-3074-1-git-send-email-svarbanov@mm-sol.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: "John W. Linville" <linville@tuxdriver.com>
+Subject: Re: [PATCH 00/22] Add and use pci_zalloc_consistent
+Date: Wed, 25 Jun 2014 15:41:12 -0400
+Message-ID: <20140625194112.GJ3445@tuxdriver.com>
+References: <cover.1403530604.git.joe@perches.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org,
+	linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+	iss_storagedev@hp.com, linux-crypto@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-eata@i-connect.net,
+	devel@driverdev.osuosl.org, linux-arch@vger.kernel.org
+To: Joe Perches <joe@perches.com>
+Return-path: <linux-arch-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <cover.1403530604.git.joe@perches.com>
+Sender: linux-arch-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Here is Qualcomm crypto driver device tree binding documentation
-to used as a reference example.
+On Mon, Jun 23, 2014 at 06:41:28AM -0700, Joe Perches wrote:
+> Adding the helper reduces object code size as well as overall
+> source size line count.
+> 
+> It's also consistent with all the various zalloc mechanisms
+> in the kernel.
+> 
+> Done with a simple cocci script and some typing.
+> 
+> Joe Perches (22):
 
-Signed-off-by: Stanimir Varbanov <svarbanov@mm-sol.com>
----
- .../devicetree/bindings/crypto/qcom-qce.txt        |   25 ++++++++++++++++++++
- 1 files changed, 25 insertions(+), 0 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/qcom-qce.txt
+>   ipw2100: Use pci_zalloc_consistent
+>   mwl8k: Use pci_zalloc_consistent
+>   rtl818x: Use pci_zalloc_consistent
+>   rtlwifi: Use pci_zalloc_consistent
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.txt b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
-new file mode 100644
-index 0000000..fdd53b1
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/qcom-qce.txt
-@@ -0,0 +1,25 @@
-+Qualcomm crypto engine driver
-+
-+Required properties:
-+
-+- compatible  : should be "qcom,crypto-v5.1"
-+- reg         : specifies base physical address and size of the registers map
-+- clocks      : phandle to clock-controller plus clock-specifier pair
-+- clock-names : "iface" clocks register interface
-+                "bus" clocks data transfer interface
-+                "core" clocks rest of the crypto block
-+- dmas        : DMA specifiers for tx and rx dma channels. For more see
-+                Documentation/devicetree/bindings/dma/dma.txt
-+- dma-names   : DMA request names should be "rx" and "tx"
-+
-+Example:
-+	crypto@fd45a000 {
-+		compatible = "qcom,crypto-v5.1";
-+		reg = <0xfd45a000 0x6000>;
-+		clocks = <&gcc GCC_CE2_AHB_CLK>,
-+			 <&gcc GCC_CE2_AXI_CLK>,
-+			 <&gcc GCC_CE2_CLK>;
-+		clock-names = "iface", "bus", "core";
-+		dmas = <&cryptobam 2>, <&cryptobam 3>;
-+		dma-names = "rx", "tx";
-+	};
+Sure, fine by me.
+
 -- 
-1.7.0.4
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
