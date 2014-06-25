@@ -1,42 +1,54 @@
-From: "John W. Linville" <linville@tuxdriver.com>
-Subject: Re: [PATCH 00/22] Add and use pci_zalloc_consistent
-Date: Wed, 25 Jun 2014 15:41:12 -0400
-Message-ID: <20140625194112.GJ3445@tuxdriver.com>
-References: <cover.1403530604.git.joe@perches.com>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH] crypto/xor.c: use 2 pages for xor speed testing
+Date: Wed, 25 Jun 2014 21:59:18 +0200
+Message-ID: <201406252159.18622.marex@denx.de>
+References: <1401930693-6549-1-git-send-email-akong@redhat.com> <201406052357.55383.marex@denx.de> <20140617071603.GC8709@z.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-	iss_storagedev@hp.com, linux-crypto@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-eata@i-connect.net,
-	devel@driverdev.osuosl.org, linux-arch@vger.kernel.org
-To: Joe Perches <joe@perches.com>
-Return-path: <linux-arch-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <cover.1403530604.git.joe@perches.com>
-Sender: linux-arch-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net
+To: Amos Kong <akong@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-out.m-online.net ([212.18.0.9]:36867 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752529AbaFYT7Y (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 Jun 2014 15:59:24 -0400
+In-Reply-To: <20140617071603.GC8709@z.redhat.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 23, 2014 at 06:41:28AM -0700, Joe Perches wrote:
-> Adding the helper reduces object code size as well as overall
-> source size line count.
+On Tuesday, June 17, 2014 at 09:16:03 AM, Amos Kong wrote:
+[...]
+> > While looking at this code, can anyone explain to me why we have this
+> > stuff in crypto/xor.c please ?
+> > 
+> > 135 #define xor_speed(templ)        do_xor_speed((templ), b1, b2)
+> > 136
+> > 137         if (fastest) {
+> > 138                 printk(KERN_INFO "xor: automatically using best "
+> > 139                                  "checksumming function:\n");
+> > 140                 xor_speed(fastest);
+> > 141                 goto out;
+> > 142         } else {
+> > [...]
+> > 149         }
+> > 150
+> > 151         printk(KERN_INFO "xor: using function: %s (%d.%03d
+> > MB/sec)\n", 152                fastest->name, fastest->speed / 1000,
+> > fastest->speed % 1000); 153
+> > 154 #undef xor_speed
+> > 
+> > Why do we not call do_xor_speed(fastest, b1, b2); right away , but we
+> > #define xor_speed() instead ? This looks like some remnant or nonsense
+> > to me. Shall I remove that with a patch ?
 > 
-> It's also consistent with all the various zalloc mechanisms
-> in the kernel.
-> 
-> Done with a simple cocci script and some typing.
-> 
-> Joe Perches (22):
+> You are right.
 
->   ipw2100: Use pci_zalloc_consistent
->   mwl8k: Use pci_zalloc_consistent
->   rtl818x: Use pci_zalloc_consistent
->   rtlwifi: Use pci_zalloc_consistent
+I'm wrong. The XOR_TRY_TEMPLATES needs this #define xor_speed , so there's no 
+patch happening here. Sorry.
 
-Sure, fine by me.
-
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Best regards,
+Marek Vasut
