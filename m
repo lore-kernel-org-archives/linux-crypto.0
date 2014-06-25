@@ -1,57 +1,69 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] DRBG: simplify ordering of linked list in drbg_ctr_df
-Date: Wed, 25 Jun 2014 17:08:28 +0800
-Message-ID: <20140625090828.GD8727@gondor.apana.org.au>
-References: <5069712.neqH4zuI9U@myon.chronox.de>
- <280704396.67z02n3FAf@myon.chronox.de>
+Subject: Re: [PATCH 1/4] crypto: qat: Fix random config build warnings
+Date: Wed, 25 Jun 2014 21:36:58 +0800
+Message-ID: <20140625133658.GA10122@gondor.apana.org.au>
+References: <20140624221833.3872.65930.stgit@tstruk-mobl1.intel.com>
+ <20140624221924.3872.42454.stgit@tstruk-mobl1.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
-	linux-kernel@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@oracle.com>,
-	Rafael Aquini <aquini@redhat.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: davem@davemloft.net, bruce.w.allan@intel.com,
+	linux-crypto@vger.kernel.org, qat-linux@intel.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:35965 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754202AbaFYNhS (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 25 Jun 2014 09:37:18 -0400
 Content-Disposition: inline
-In-Reply-To: <280704396.67z02n3FAf@myon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20140624221924.3872.42454.stgit@tstruk-mobl1.intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 23, 2014 at 09:11:29AM +0200, Stephan Mueller wrote:
-> As reported by a static code analyzer, the code for the ordering of
-> the linked list can be simplified.
-> 
-> Reported-by: kbuild test robot <fengguang.wu@intel.com>
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+On Tue, Jun 24, 2014 at 03:19:24PM -0700, Tadeusz Struk wrote:
+> Fix random config build warnings:
+>=20
+> Implicit-function-declaration =E2=80=98__raw_writel=E2=80=99
+> Cast to pointer from integer of different size [-Wint-to-pointer-cast=
+]
+>=20
+> Reviewed-by: Bruce Allan <bruce.w.allan@intel.com>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 > ---
->  crypto/drbg.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/crypto/drbg.c b/crypto/drbg.c
-> index faaa2ce..99fa8f8 100644
-> --- a/crypto/drbg.c
-> +++ b/crypto/drbg.c
-> @@ -516,13 +516,13 @@ static int drbg_ctr_df(struct drbg_state *drbg,
->  	S2.next = addtl;
->  
->  	/*
-> -	 * splice in addtl between S2 and S4 -- we place S4 at the end of the
-> -	 * input data chain
-> +	 * Splice in addtl between S2 and S4 -- we place S4 at the end
-> +	 * of the input data chain. As this code is only triggered when
-> +	 * addtl is not NULL, no NULL checks are necessary.
->  	 */
->  	tempstr = addtl;
-> -	for (; NULL != tempstr; tempstr = tempstr->next)
-> -		if (NULL == tempstr->next)
-> -			break;
-> +	while (tempstr->next)
-> +		tempstr = tempstr->next;
->  	tempstr->next = &S4;
+>  drivers/crypto/qat/qat_common/adf_accel_devices.h |    1 +
+>  drivers/crypto/qat/qat_common/qat_algs.c          |    6 +++---
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/driv=
+ers/crypto/qat/qat_common/adf_accel_devices.h
+> index f3206d9..9282381 100644
+> --- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
+> +++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+> @@ -50,6 +50,7 @@
+>  #include <linux/atomic.h>
+>  #include <linux/list.h>
+>  #include <linux/proc_fs.h>
+> +#include <linux/io.h>
+>  #include "adf_cfg_common.h"
+> =20
+>  #define PCI_VENDOR_ID_INTEL 0x8086
+> diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypt=
+o/qat/qat_common/qat_algs.c
+> index 193b753..c4e8010 100644
+> --- a/drivers/crypto/qat/qat_common/qat_algs.c
+> +++ b/drivers/crypto/qat/qat_common/qat_algs.c
+> @@ -745,7 +745,7 @@ void qat_alg_callback(void *resp)
+>  {
+>  	struct icp_qat_fw_la_resp *qat_resp =3D resp;
+>  	struct qat_crypto_request *qat_req =3D
+> -			(void *)(dma_addr_t)qat_resp->opaque_data;
+> +				(void *)(__force long)qat_resp->opaque_data;
 
-This is still broken.
--- 
+Why not just get rid of the (__force long) altogether?
+
+Thanks,
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
