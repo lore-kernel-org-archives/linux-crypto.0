@@ -1,63 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] DRBG: simplify ordering of linked list in drbg_ctr_df
-Date: Thu, 26 Jun 2014 14:45:42 +0800
-Message-ID: <20140626064542.GA17761@gondor.apana.org.au>
-References: <5069712.neqH4zuI9U@myon.chronox.de>
- <280704396.67z02n3FAf@myon.chronox.de>
- <20140625090828.GD8727@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4] crypto: qat: Fix random config build warnings
+Date: Thu, 26 Jun 2014 14:51:44 +0800
+Message-ID: <20140626065144.GA17901@gondor.apana.org.au>
+References: <20140624221833.3872.65930.stgit@tstruk-mobl1.intel.com>
+ <20140624221924.3872.42454.stgit@tstruk-mobl1.intel.com>
+ <20140625133658.GA10122@gondor.apana.org.au>
+ <53AAD410.4090400@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
-	linux-kernel@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@oracle.com>,
-	Rafael Aquini <aquini@redhat.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: davem@davemloft.net, bruce.w.allan@intel.com,
+	linux-crypto@vger.kernel.org, qat-linux@intel.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:58883 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753317AbaFZGvt (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 Jun 2014 02:51:49 -0400
 Content-Disposition: inline
-In-Reply-To: <20140625090828.GD8727@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <53AAD410.4090400@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 25, 2014 at 05:08:28PM +0800, Herbert Xu wrote:
-> On Mon, Jun 23, 2014 at 09:11:29AM +0200, Stephan Mueller wrote:
-> > As reported by a static code analyzer, the code for the ordering of
-> > the linked list can be simplified.
-> > 
-> > Reported-by: kbuild test robot <fengguang.wu@intel.com>
-> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> > ---
-> >  crypto/drbg.c | 10 +++++-----
-> >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/crypto/drbg.c b/crypto/drbg.c
-> > index faaa2ce..99fa8f8 100644
-> > --- a/crypto/drbg.c
-> > +++ b/crypto/drbg.c
-> > @@ -516,13 +516,13 @@ static int drbg_ctr_df(struct drbg_state *drbg,
-> >  	S2.next = addtl;
-> >  
-> >  	/*
-> > -	 * splice in addtl between S2 and S4 -- we place S4 at the end of the
-> > -	 * input data chain
-> > +	 * Splice in addtl between S2 and S4 -- we place S4 at the end
-> > +	 * of the input data chain. As this code is only triggered when
-> > +	 * addtl is not NULL, no NULL checks are necessary.
-> >  	 */
-> >  	tempstr = addtl;
-> > -	for (; NULL != tempstr; tempstr = tempstr->next)
-> > -		if (NULL == tempstr->next)
-> > -			break;
-> > +	while (tempstr->next)
-> > +		tempstr = tempstr->next;
-> >  	tempstr->next = &S4;
-> 
-> This is still broken.
+On Wed, Jun 25, 2014 at 06:52:16AM -0700, Tadeusz Struk wrote:
+> On 06/25/2014 06:36 AM, Herbert Xu wrote:
+> >>  	struct icp_qat_fw_la_resp *qat_resp = resp;
+> >> >  	struct qat_crypto_request *qat_req =
+> >> > -			(void *)(dma_addr_t)qat_resp->opaque_data;
+> >> > +				(void *)(__force long)qat_resp->opaque_data;
+> > Why not just get rid of the (__force long) altogether?
+> It complains when cross compiled for 32bit.
 
-OK I take that back.  As addtl is not NULL neither version will
-do a NULL derference.  But I will apply your cleanup patch anyway.
-
-Thanks,
+OK all applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
