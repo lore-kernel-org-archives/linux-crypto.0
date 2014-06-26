@@ -1,102 +1,120 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2] DRBG: simplify ordering of linked list in drbg_ctr_df
-Date: Thu, 26 Jun 2014 13:33 +0200
-Message-ID: <1735536.DnufTVyFaF@tauon>
-References: <5069712.neqH4zuI9U@myon.chronox.de> <20140625090828.GD8727@gondor.apana.org.au> <20140626064542.GA17761@gondor.apana.org.au>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] crypto: ux500: make interrupt mode plausible
+Date: Thu, 26 Jun 2014 13:43:02 +0200
+Message-ID: <13720857.JmA1VNKFj8@wuerfel>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
-	linux-kernel@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@oracle.com>,
-	Rafael Aquini <aquini@redhat.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Fabio Baltieri <fabio.baltieri@linaro.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-arm-kernel@lists.infradead.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:52846 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757213AbaFZLds (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Jun 2014 07:33:48 -0400
-Received: from tauon.localnet
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S1FC> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Thu, 26 Jun 2014 13:33:04 +0200
-In-Reply-To: <20140626064542.GA17761@gondor.apana.org.au>
+Received: from mout.kundenserver.de ([212.227.17.13]:54829 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756509AbaFZLnU (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 26 Jun 2014 07:43:20 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 26. Juni 2014, 14:45:42 schrieb Herbert Xu:
+The interrupt handler in the ux500 crypto driver has an obviously
+incorrect way to access the data buffer, which for a while has
+caused this build warning:
 
-Hi Herbert,
+../ux500/cryp/cryp_core.c: In function 'cryp_interrupt_handler':
+../ux500/cryp/cryp_core.c:234:5: warning: passing argument 1 of '__fswab32' makes integer from pointer without a cast [enabled by default]
+     writel_relaxed(ctx->indata,
+     ^
+In file included from ../include/linux/swab.h:4:0,
+                 from ../include/uapi/linux/byteorder/big_endian.h:12,
+                 from ../include/linux/byteorder/big_endian.h:4,
+                 from ../arch/arm/include/uapi/asm/byteorder.h:19,
+                 from ../include/asm-generic/bitops/le.h:5,
+                 from ../arch/arm/include/asm/bitops.h:340,
+                 from ../include/linux/bitops.h:33,
+                 from ../include/linux/kernel.h:10,
+                 from ../include/linux/clk.h:16,
+                 from ../drivers/crypto/ux500/cryp/cryp_core.c:12:
+../include/uapi/linux/swab.h:57:119: note: expected '__u32' but argument is of type 'const u8 *'
+ static inline __attribute_const__ __u32 __fswab32(__u32 val)
 
->On Wed, Jun 25, 2014 at 05:08:28PM +0800, Herbert Xu wrote:
->> On Mon, Jun 23, 2014 at 09:11:29AM +0200, Stephan Mueller wrote:
->> > As reported by a static code analyzer, the code for the ordering of
->> > the linked list can be simplified.
->> > 
->> > Reported-by: kbuild test robot <fengguang.wu@intel.com>
->> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
->> > ---
->> > 
->> >  crypto/drbg.c | 10 +++++-----
->> >  1 file changed, 5 insertions(+), 5 deletions(-)
->> > 
->> > diff --git a/crypto/drbg.c b/crypto/drbg.c
->> > index faaa2ce..99fa8f8 100644
->> > --- a/crypto/drbg.c
->> > +++ b/crypto/drbg.c
->> > @@ -516,13 +516,13 @@ static int drbg_ctr_df(struct drbg_state
->> > *drbg,
->> > 
->> >  	S2.next = addtl;
->> >  	
->> >  	/*
->> > 
->> > -	 * splice in addtl between S2 and S4 -- we place S4 at the end 
-of
->> > the -	 * input data chain
->> > +	 * Splice in addtl between S2 and S4 -- we place S4 at the end
->> > +	 * of the input data chain. As this code is only triggered when
->> > +	 * addtl is not NULL, no NULL checks are necessary.
->> > 
->> >  	 */
->> >  	
->> >  	tempstr = addtl;
->> > 
->> > -	for (; NULL != tempstr; tempstr = tempstr->next)
->> > -		if (NULL == tempstr->next)
->> > -			break;
->> > +	while (tempstr->next)
->> > +		tempstr = tempstr->next;
->> > 
->> >  	tempstr->next = &S4;
->> 
->> This is still broken.
->
->OK I take that back.  As addtl is not NULL neither version will
->do a NULL derference.  But I will apply your cleanup patch anyway.
+There are at least two, possibly three problems here:
+a) when writing into the FIFO, we copy the pointer rather than the
+   actual data we want to give to the hardware
+b) the data pointer is an array of 8-bit values, while the FIFO
+   is 32-bit wide, so both the read and write access fail to do
+   a proper type conversion
+c) This seems incorrect for big-endian kernels, on which we need to
+   byte-swap any register access, but not normally FIFO accesses,
+   at least the DMA case doesn't do it either.
 
-When I wrote my first patch considering the NULL pointer, I was already 
-wondering why during my tests I did not observe any crasher. In case the 
-NULL pointer dereference would have been real, it would need to have 
-crashed when pulling random bytes via the kernel crypto API -- I have a 
-test that iterates over all DRBG types, instantiates them and pulls up 
-to 100,000 bytes.
+This converts the bogus loop to use the same readsl/writesl pair
+that we use for the two other modes (DMA and polling). This is
+more efficient and consistent, and probably correct for endianess.
 
-If the NULL pointer dereference would have been real, the following call 
-sequences triggered by normal kernel crypto API usage should have 
-triggered it, because they all set addtl to NULL.
+The bug has existed since the driver was first merged, and was
+probably never detected because nobody tried to use interrupt mode.
+It might make sense to backport this fix to stable kernels, depending
+on how the crypto maintainers feel about that.
 
-crypto_rng_get_bytes
---> drbg_kcapi_random with slen >0
---> drbg_generate_long(drbg, rdata, dlen, NULL);
---> drbg_generate(drbg, rdata, dlen, NULL);
---> drbg_ctr_generate(..., NULL)
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-crypto@vger.kernel.org
+Cc: Fabio Baltieri <fabio.baltieri@linaro.org>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: stable@vger.kernel.org
 
-And here, the following is only called when addtl is not NULL
---> drbg_ctr_update
---> drbg_ctr_df
-
-
-Ciao
-Stephan
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index a999f53..92105f3 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -190,7 +190,7 @@ static void add_session_id(struct cryp_ctx *ctx)
+ static irqreturn_t cryp_interrupt_handler(int irq, void *param)
+ {
+ 	struct cryp_ctx *ctx;
+-	int i;
++	int count;
+ 	struct cryp_device_data *device_data;
+ 
+ 	if (param == NULL) {
+@@ -215,12 +215,11 @@ static irqreturn_t cryp_interrupt_handler(int irq, void *param)
+ 	if (cryp_pending_irq_src(device_data,
+ 				 CRYP_IRQ_SRC_OUTPUT_FIFO)) {
+ 		if (ctx->outlen / ctx->blocksize > 0) {
+-			for (i = 0; i < ctx->blocksize / 4; i++) {
+-				*(ctx->outdata) = readl_relaxed(
+-						&device_data->base->dout);
+-				ctx->outdata += 4;
+-				ctx->outlen -= 4;
+-			}
++			count = ctx->blocksize / 4;
++
++			readsl(&device_data->base->dout, ctx->outdata, count);
++			ctx->outdata += count;
++			ctx->outlen -= count;
+ 
+ 			if (ctx->outlen == 0) {
+ 				cryp_disable_irq_src(device_data,
+@@ -230,12 +229,12 @@ static irqreturn_t cryp_interrupt_handler(int irq, void *param)
+ 	} else if (cryp_pending_irq_src(device_data,
+ 					CRYP_IRQ_SRC_INPUT_FIFO)) {
+ 		if (ctx->datalen / ctx->blocksize > 0) {
+-			for (i = 0 ; i < ctx->blocksize / 4; i++) {
+-				writel_relaxed(ctx->indata,
+-						&device_data->base->din);
+-				ctx->indata += 4;
+-				ctx->datalen -= 4;
+-			}
++			count = ctx->blocksize / 4;
++
++			writesl(&device_data->base->din, ctx->indata, count);
++
++			ctx->indata += count;
++			ctx->datalen -= count;
+ 
+ 			if (ctx->datalen == 0)
+ 				cryp_disable_irq_src(device_data,
