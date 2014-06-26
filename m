@@ -1,120 +1,309 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] crypto: ux500: make interrupt mode plausible
-Date: Thu, 26 Jun 2014 13:43:02 +0200
-Message-ID: <13720857.JmA1VNKFj8@wuerfel>
+From: Mimi Zohar <zohar@linux.vnet.ibm.com>
+Subject: Re: [PATCH v1 1/3] ima: use ahash API for file hash calculation
+Date: Thu, 26 Jun 2014 07:54:50 -0400
+Message-ID: <1403783690.2017.58.camel@dhcp-9-2-203-236.watson.ibm.com>
+References: <cover.1403191191.git.d.kasatkin@samsung.com>
+	 <7b884b2597badabadf50ebf9120fe76754e1516c.1403191191.git.d.kasatkin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Fabio Baltieri <fabio.baltieri@linaro.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-ima-devel@lists.sourceforge.net,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dmitry.kasatkin@gmail.com
+To: Dmitry Kasatkin <d.kasatkin@samsung.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:54829 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756509AbaFZLnU (ORCPT
+Received: from e35.co.us.ibm.com ([32.97.110.153]:40887 "EHLO
+	e35.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757460AbaFZLyz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Jun 2014 07:43:20 -0400
+	Thu, 26 Jun 2014 07:54:55 -0400
+Received: from /spool/local
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <zohar@linux.vnet.ibm.com>;
+	Thu, 26 Jun 2014 05:54:55 -0600
+In-Reply-To: <7b884b2597badabadf50ebf9120fe76754e1516c.1403191191.git.d.kasatkin@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The interrupt handler in the ux500 crypto driver has an obviously
-incorrect way to access the data buffer, which for a while has
-caused this build warning:
+On Thu, 2014-06-19 at 18:20 +0300, Dmitry Kasatkin wrote:
+> Async hash API allows to use HW acceleration for hash calculation.
+> It may give significant performance gain or/and reduce power consumption,
+> which might be very beneficial for battery powered devices.
+> 
+> This patch introduces hash calculation using ahash API.
+> 
+> ahash peformance depends on data size and particular HW. Under certain
+> limit, depending on the system, shash performance may be better.
+> 
+> This patch also introduces 'ima_ahash_size' kernel parameter which can
+> be used to defines minimal data size to use with ahash. When this
+> parameter is not set or file size is smaller than defined by this
+> parameter, shash will be used. Thus, by defult, original shash
+> implementation is used.
+> 
+> Signed-off-by: Dmitry Kasatkin <d.kasatkin@samsung.com>
+> ---
+>  Documentation/kernel-parameters.txt |   3 +
+>  security/integrity/ima/ima_crypto.c | 182 +++++++++++++++++++++++++++++++++++-
+>  2 files changed, 181 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
+> index a0c155c..f8efb01 100644
+> --- a/Documentation/kernel-parameters.txt
+> +++ b/Documentation/kernel-parameters.txt
+> @@ -1286,6 +1286,9 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
+>  	ihash_entries=	[KNL]
+>  			Set number of hash buckets for inode cache.
+> 
+> +	ima_ahash_size=size [IMA]
+> +			Set the minimal file size when use ahash API.
+> +
+>  	ima_appraise=	[IMA] appraise integrity measurements
+>  			Format: { "off" | "enforce" | "fix" }
+>  			default: "enforce"
+> diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
+> index ccd0ac8..b7a8650 100644
+> --- a/security/integrity/ima/ima_crypto.c
+> +++ b/security/integrity/ima/ima_crypto.c
+> @@ -25,7 +25,25 @@
+>  #include <crypto/hash_info.h>
+>  #include "ima.h"
+> 
+> +
+> +struct ahash_completion {
+> +	struct completion completion;
+> +	int err;
+> +};
+> +
+>  static struct crypto_shash *ima_shash_tfm;
+> +static struct crypto_ahash *ima_ahash_tfm;
+> +
+> +/* data size for ahash use */
+> +static loff_t ima_ahash_size;
+> +
+> +static int __init ima_ahash_setup(char *str)
+> +{
+> +	int rc = kstrtoll(str, 10, &ima_ahash_size);
 
-../ux500/cryp/cryp_core.c: In function 'cryp_interrupt_handler':
-../ux500/cryp/cryp_core.c:234:5: warning: passing argument 1 of '__fswab32' makes integer from pointer without a cast [enabled by default]
-     writel_relaxed(ctx->indata,
-     ^
-In file included from ../include/linux/swab.h:4:0,
-                 from ../include/uapi/linux/byteorder/big_endian.h:12,
-                 from ../include/linux/byteorder/big_endian.h:4,
-                 from ../arch/arm/include/uapi/asm/byteorder.h:19,
-                 from ../include/asm-generic/bitops/le.h:5,
-                 from ../arch/arm/include/asm/bitops.h:340,
-                 from ../include/linux/bitops.h:33,
-                 from ../include/linux/kernel.h:10,
-                 from ../include/linux/clk.h:16,
-                 from ../drivers/crypto/ux500/cryp/cryp_core.c:12:
-../include/uapi/linux/swab.h:57:119: note: expected '__u32' but argument is of type 'const u8 *'
- static inline __attribute_const__ __u32 __fswab32(__u32 val)
+In general, variable definitions should be separated from code.  A
+simple initialization is fine.  Please separate variable definitions
+from code with a blank line. 
 
-There are at least two, possibly three problems here:
-a) when writing into the FIFO, we copy the pointer rather than the
-   actual data we want to give to the hardware
-b) the data pointer is an array of 8-bit values, while the FIFO
-   is 32-bit wide, so both the read and write access fail to do
-   a proper type conversion
-c) This seems incorrect for big-endian kernels, on which we need to
-   byte-swap any register access, but not normally FIFO accesses,
-   at least the DMA case doesn't do it either.
+> +	pr_info("ima_ahash_size = %lld\n", ima_ahash_size);
+> +	return !rc;
+> +}
+> +__setup("ima_ahash_size=", ima_ahash_setup);
 
-This converts the bogus loop to use the same readsl/writesl pair
-that we use for the two other modes (DMA and polling). This is
-more efficient and consistent, and probably correct for endianess.
+This boot parameter name doesn't reflect its purpose, defining the
+minimum file size for using ahash. The next patch defines an additional
+boot parameter ima_ahash_bufsize. Perhaps defining a single boot
+parameter (eg. ima_ahash=) with multiple fields would be better. 
 
-The bug has existed since the driver was first merged, and was
-probably never detected because nobody tried to use interrupt mode.
-It might make sense to backport this fix to stable kernels, depending
-on how the crypto maintainers feel about that.
+>  /**
+>   * ima_kernel_read - read file content
+> @@ -68,6 +86,14 @@ int ima_init_crypto(void)
+>  		       hash_algo_name[ima_hash_algo], rc);
+>  		return rc;
+>  	}
+> +	ima_ahash_tfm = crypto_alloc_ahash(hash_algo_name[ima_hash_algo], 0, 0);
+> +	if (IS_ERR(ima_ahash_tfm)) {
+> +		rc = PTR_ERR(ima_ahash_tfm);
+> +		crypto_free_shash(ima_shash_tfm);
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-crypto@vger.kernel.org
-Cc: Fabio Baltieri <fabio.baltieri@linaro.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: stable@vger.kernel.org
+Only crypto_alloc_ahash() failed, not crypto_alloc_shash(). shash has
+worked fine up to now. Why require both shash and ahash to succeed? 
 
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index a999f53..92105f3 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -190,7 +190,7 @@ static void add_session_id(struct cryp_ctx *ctx)
- static irqreturn_t cryp_interrupt_handler(int irq, void *param)
- {
- 	struct cryp_ctx *ctx;
--	int i;
-+	int count;
- 	struct cryp_device_data *device_data;
- 
- 	if (param == NULL) {
-@@ -215,12 +215,11 @@ static irqreturn_t cryp_interrupt_handler(int irq, void *param)
- 	if (cryp_pending_irq_src(device_data,
- 				 CRYP_IRQ_SRC_OUTPUT_FIFO)) {
- 		if (ctx->outlen / ctx->blocksize > 0) {
--			for (i = 0; i < ctx->blocksize / 4; i++) {
--				*(ctx->outdata) = readl_relaxed(
--						&device_data->base->dout);
--				ctx->outdata += 4;
--				ctx->outlen -= 4;
--			}
-+			count = ctx->blocksize / 4;
-+
-+			readsl(&device_data->base->dout, ctx->outdata, count);
-+			ctx->outdata += count;
-+			ctx->outlen -= count;
- 
- 			if (ctx->outlen == 0) {
- 				cryp_disable_irq_src(device_data,
-@@ -230,12 +229,12 @@ static irqreturn_t cryp_interrupt_handler(int irq, void *param)
- 	} else if (cryp_pending_irq_src(device_data,
- 					CRYP_IRQ_SRC_INPUT_FIFO)) {
- 		if (ctx->datalen / ctx->blocksize > 0) {
--			for (i = 0 ; i < ctx->blocksize / 4; i++) {
--				writel_relaxed(ctx->indata,
--						&device_data->base->din);
--				ctx->indata += 4;
--				ctx->datalen -= 4;
--			}
-+			count = ctx->blocksize / 4;
-+
-+			writesl(&device_data->base->din, ctx->indata, count);
-+
-+			ctx->indata += count;
-+			ctx->datalen -= count;
- 
- 			if (ctx->datalen == 0)
- 				cryp_disable_irq_src(device_data,
+> +		pr_err("Can not allocate %s (reason: %ld)\n",
+> +		       hash_algo_name[ima_hash_algo], rc);
+> +		return rc;
+> +	}
+>  	return 0;
+>  }
+> 
+
+> @@ -93,9 +119,143 @@ static void ima_free_tfm(struct crypto_shash *tfm)
+>  		crypto_free_shash(tfm);
+>  }
+> 
+> -/*
+> - * Calculate the MD5/SHA1 file digest
+> - */
+> +static struct crypto_ahash *ima_alloc_atfm(enum hash_algo algo)
+> +{
+> +	struct crypto_ahash *tfm = ima_ahash_tfm;
+> +	int rc;
+> +
+> +	if (algo != ima_hash_algo && algo < HASH_ALGO__LAST) {
+> +		tfm = crypto_alloc_ahash(hash_algo_name[algo], 0, 0);
+> +		if (IS_ERR(tfm)) {
+> +			rc = PTR_ERR(tfm);
+> +			pr_err("Can not allocate %s (reason: %d)\n",
+> +			       hash_algo_name[algo], rc);
+> +		}
+> +	}
+> +	return tfm;
+> +}
+> +
+> +static void ima_free_atfm(struct crypto_ahash *tfm)
+> +{
+> +	if (tfm != ima_ahash_tfm)
+> +		crypto_free_ahash(tfm);
+> +}
+> +
+> +static void ahash_complete(struct crypto_async_request *req, int err)
+> +{
+> +	struct ahash_completion *res = req->data;
+> +
+> +	if (err == -EINPROGRESS)
+> +		return;
+> +	res->err = err;
+> +	complete(&res->completion);
+> +}
+> +
+> +static int ahash_wait(int err, struct ahash_completion *res)
+> +{
+> +	switch (err) {
+> +	case 0:
+> +		break;
+> +	case -EINPROGRESS:
+> +	case -EBUSY:
+> +		wait_for_completion(&res->completion);
+> +		reinit_completion(&res->completion);
+> +		err = res->err;
+> +		/* fall through */
+> +	default:
+> +		pr_crit("ahash calculation failed: err: %d\n", err);
+> +	}
+> +
+> +	return err;
+> +}
+> +
+> +static int ima_calc_file_hash_atfm(struct file *file,
+> +				   struct ima_digest_data *hash,
+> +				   struct crypto_ahash *tfm)
+> +{
+> +	loff_t i_size, offset;
+> +	char *rbuf;
+> +	int rc, read = 0, rbuf_len;
+> +	struct ahash_request *req;
+> +	struct scatterlist sg[1];
+> +	struct ahash_completion res;
+> +
+> +	hash->length = crypto_ahash_digestsize(tfm);
+> +
+> +	req = ahash_request_alloc(ima_ahash_tfm, GFP_KERNEL);
+
+This should be tfm not ima_ahash_tfm.
+
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+> +	init_completion(&res.completion);
+> +	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+> +				   CRYPTO_TFM_REQ_MAY_SLEEP,
+> +				   ahash_complete, &res);
+> +
+> +	rc = ahash_wait(crypto_ahash_init(req), &res);
+> +	if (rc)
+> +		goto out1;
+> +
+> +	i_size = i_size_read(file_inode(file));
+> +
+> +	if (i_size == 0)
+> +		goto out2;
+> +
+> +	rbuf = kzalloc(PAGE_SIZE, GFP_KERNEL);
+> +	if (!rbuf) {
+> +		rc = -ENOMEM;
+> +		goto out1;
+> +	}
+> +
+> +	if (!(file->f_mode & FMODE_READ)) {
+> +		file->f_mode |= FMODE_READ;
+> +		read = 1;
+> +	}
+> +
+> +	for (offset = 0; offset < i_size; offset += rbuf_len) {
+> +		rbuf_len = ima_kernel_read(file, offset, rbuf, PAGE_SIZE);
+> +		if (rbuf_len < 0) {
+> +			rc = rbuf_len;
+> +			break;
+> +		}
+> +		if (rbuf_len == 0)
+> +			break;
+> +
+> +		sg_init_one(&sg[0], rbuf, rbuf_len);
+> +		ahash_request_set_crypt(req, sg, NULL, rbuf_len);
+> +
+> +		rc = ahash_wait(crypto_ahash_update(req), &res);
+> +		if (rc)
+> +			break;
+> +	}
+> +	if (read)
+> +		file->f_mode &= ~FMODE_READ;
+> +	kfree(rbuf);
+> +out2:
+> +	if (!rc) {
+> +		ahash_request_set_crypt(req, NULL, hash->digest, 0);
+> +		rc = ahash_wait(crypto_ahash_final(req), &res);
+> +	}
+> +out1:
+> +	ahash_request_free(req);
+> +	return rc;
+> +}
+> +
+> +static int ima_calc_file_ahash(struct file *file, struct ima_digest_data *hash)
+> +{
+> +	struct crypto_ahash *tfm;
+> +	int rc;
+> +
+> +	tfm = ima_alloc_atfm(hash->algo);
+> +	if (IS_ERR(tfm))
+> +		return PTR_ERR(tfm);
+> +
+> +	rc = ima_calc_file_hash_atfm(file, hash, tfm);
+> +
+> +	ima_free_atfm(tfm);
+> +
+> +	return rc;
+> +}
+> +
+>  static int ima_calc_file_hash_tfm(struct file *file,
+>  				  struct ima_digest_data *hash,
+>  				  struct crypto_shash *tfm)
+> @@ -156,7 +316,7 @@ out:
+>  	return rc;
+>  }
+> 
+> -int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
+> +static int ima_calc_file_shash(struct file *file, struct ima_digest_data *hash)
+>  {
+>  	struct crypto_shash *tfm;
+>  	int rc;
+> @@ -172,6 +332,20 @@ int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
+>  	return rc;
+>  }
+> 
+> +int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
+> +{
+> +	loff_t i_size = i_size_read(file_inode(file));
+> +
+> +	/* shash is more efficient small data
+> +	 * ahash performance depends on data size and particular HW
+> +	 * ima_ahash_size allows to specify the best value for the system
+> +	 */
+> +	if (ima_ahash_size && i_size >= ima_ahash_size)
+> +		return ima_calc_file_ahash(file, hash);
+> +	else
+> +		return ima_calc_file_shash(file, hash);
+> +}
+
+If calculating the file hash using ahash fails, should it fall back to
+using shash?
+
+Mimi
+
+>  /*
+>   * Calculate the hash of template data
+>   */
