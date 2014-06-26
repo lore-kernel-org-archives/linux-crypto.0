@@ -1,64 +1,63 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Using s5p-sss hw crypto causes ipsec to break
-Date: Thu, 26 Jun 2014 14:35:44 +0800
-Message-ID: <20140626063544.GA17608@gondor.apana.org.au>
-References: <CAPz6YkUtGt61YNcGh2sYhaL=U5JMSOu26DvuKXuvp-oxi9ftBw@mail.gmail.com>
+Subject: Re: [PATCH v2] DRBG: simplify ordering of linked list in drbg_ctr_df
+Date: Thu, 26 Jun 2014 14:45:42 +0800
+Message-ID: <20140626064542.GA17761@gondor.apana.org.au>
+References: <5069712.neqH4zuI9U@myon.chronox.de>
+ <280704396.67z02n3FAf@myon.chronox.de>
+ <20140625090828.GD8727@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, dianders@chromium.org,
-	ch.naveen@samsung.com, linux-samsung-soc@vger.kernel.org,
-	vzapolskiy@gmail.com
-To: Sonny Rao <sonnyrao@chromium.org>
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
+	linux-kernel@vger.kernel.org,
+	Dan Carpenter <dan.carpenter@oracle.com>,
+	Rafael Aquini <aquini@redhat.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAPz6YkUtGt61YNcGh2sYhaL=U5JMSOu26DvuKXuvp-oxi9ftBw@mail.gmail.com>
-Sender: linux-samsung-soc-owner@vger.kernel.org
+In-Reply-To: <20140625090828.GD8727@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Sonny Rao <sonnyrao@chromium.org> wrote:
-> Hi, I've been investigating an issue relating to hardware crypto which
-> is that when I enable the s5p-sss module for hardware cryptographic
-> acceleration on Samsung Exynos SoCs the in-kernel IPSec seems to
-> break, although cryptographic operations on filesystems/block devices
-> using this driver seem to work fine.
+On Wed, Jun 25, 2014 at 05:08:28PM +0800, Herbert Xu wrote:
+> On Mon, Jun 23, 2014 at 09:11:29AM +0200, Stephan Mueller wrote:
+> > As reported by a static code analyzer, the code for the ordering of
+> > the linked list can be simplified.
+> > 
+> > Reported-by: kbuild test robot <fengguang.wu@intel.com>
+> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> > ---
+> >  crypto/drbg.c | 10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/crypto/drbg.c b/crypto/drbg.c
+> > index faaa2ce..99fa8f8 100644
+> > --- a/crypto/drbg.c
+> > +++ b/crypto/drbg.c
+> > @@ -516,13 +516,13 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+> >  	S2.next = addtl;
+> >  
+> >  	/*
+> > -	 * splice in addtl between S2 and S4 -- we place S4 at the end of the
+> > -	 * input data chain
+> > +	 * Splice in addtl between S2 and S4 -- we place S4 at the end
+> > +	 * of the input data chain. As this code is only triggered when
+> > +	 * addtl is not NULL, no NULL checks are necessary.
+> >  	 */
+> >  	tempstr = addtl;
+> > -	for (; NULL != tempstr; tempstr = tempstr->next)
+> > -		if (NULL == tempstr->next)
+> > -			break;
+> > +	while (tempstr->next)
+> > +		tempstr = tempstr->next;
+> >  	tempstr->next = &S4;
 > 
-> Originally we were looking at an older kernel (3.8 with patches), but
-> I've now verified on linux-next from 20140612 (after 3.15) with a few
-> additional patches (to enable both s5p-sss and Exynos5420) that this
-> is still the case.
-> 
-> It looks like what is happening in the kernel is that IPsec ends up
-> with this callstack
-> 
-> esp_output()-> crypto_aead_givencrypt()->
-> crypto_authenc_givencrypt()-> eseqiv_givencrypt() ->
-> crypto_ablkcipher_encrypt()
-> 
-> 
-> which calls into the s5p-sss driver and that is returning -EINPROGRESS
-> (or possibly -EBUSY), and that is passed all the way back up the call
-> stack and that seems to be treated as an error condition by the ipsec
-> stack.
-> 
-> For example esp_output does this:
-> 
->       err = crypto_aead_givencrypt(req);
->        if (err == -EINPROGRESS)
->                goto error;
-> 
->        if (err == -EBUSY)
->                err = NET_XMIT_DROP;
-> 
-> So, I'm not sure how this is supposed to work, or if s5p-sss is doing
-> something wrong.
+> This is still broken.
 
-Something else must be happening because EINPROGRESS is meant to
-be handled by xfrm_output_resume (which gets called on the normal
-path as well as on the actual resume path).
+OK I take that back.  As addtl is not NULL neither version will
+do a NULL derference.  But I will apply your cleanup patch anyway.
 
-So I don't think this is your problem.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
