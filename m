@@ -1,808 +1,126 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 2/2] crypto: sha1: add ARM NEON implementation
-Date: Sat, 28 Jun 2014 22:07:29 +0200
-Message-ID: <CAKv+Gu9uWr6E2DT7Nz35k8YVG_zypktMkkdPKUKncPJ=xo2Lsw@mail.gmail.com>
-References: <20140628103959.24628.55994.stgit@localhost6.localdomain6>
-	<20140628104004.24628.72714.stgit@localhost6.localdomain6>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 4/4] DRBG: Call CTR DRBG DF function only once
+Date: Sat, 28 Jun 2014 22:04:25 +0200
+Message-ID: <3742446.V1bYQC64FA@myon.chronox.de>
+References: <4927386.WYHrRe3NJm@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Russell King <linux@arm.linux.org.uk>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
+	Dan Carpenter <dan.carpenter@oracle.com>,
+	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-la0-f47.google.com ([209.85.215.47]:38028 "EHLO
-	mail-la0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751819AbaF1UHc convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 28 Jun 2014 16:07:32 -0400
-Received: by mail-la0-f47.google.com with SMTP id s18so3806553lam.20
-        for <linux-crypto@vger.kernel.org>; Sat, 28 Jun 2014 13:07:30 -0700 (PDT)
-In-Reply-To: <20140628104004.24628.72714.stgit@localhost6.localdomain6>
+Received: from mail.eperm.de ([89.247.134.16]:50035 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751819AbaF1UHk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 28 Jun 2014 16:07:40 -0400
+Received: from myon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S21A> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Sat, 28 Jun 2014 22:06:48 +0200
+In-Reply-To: <4927386.WYHrRe3NJm@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Jussi,
+The CTR DRBG requires the update function to be called twice when
+generating a random number. In both cases, update function must process
+the additional information string by using the DF function. As the DF
+produces the same result in both cases, we can save one invocation of
+the DF function when the first DF function result is reused.
 
-On 28 June 2014 12:40, Jussi Kivilinna <jussi.kivilinna@iki.fi> wrote:
-> This patch adds ARM NEON assembly implementation of SHA-1 algorithm.
->
-> tcrypt benchmark results on Cortex-A8, sha1-arm-asm vs sha1-neon-asm:
->
-> block-size      bytes/update    old-vs-new
-> 16              16              1.06x
-> 64              16              1.05x
-> 64              64              1.09x
-> 256             16              1.04x
-> 256             64              1.11x
-> 256             256             1.28x
-> 1024            16              1.04x
-> 1024            256             1.34x
-> 1024            1024            1.42x
-> 2048            16              1.04x
-> 2048            256             1.35x
-> 2048            1024            1.44x
-> 2048            2048            1.46x
-> 4096            16              1.04x
-> 4096            256             1.36x
-> 4096            1024            1.45x
-> 4096            4096            1.48x
-> 8192            16              1.04x
-> 8192            256             1.36x
-> 8192            1024            1.46x
-> 8192            4096            1.49x
-> 8192            8192            1.49x
->
+The result of the DF function is stored in the scratchpad storage. The
+patch ensures that the scratchpad is not cleared when we want to reuse
+the DF result. For achieving this, the CTR DRBG update function must
+know by whom and in which scenario it is called. This information is
+provided with the reseed parameter to the update function.
 
-This is a nice result: about the same speedup as OpenSSL when
-comparing the ALU asm implementation with the NEON.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/drbg.c | 41 ++++++++++++++++++++++-------------------
+ 1 file changed, 22 insertions(+), 19 deletions(-)
 
-> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-> ---
->  arch/arm/crypto/Makefile           |    2
->  arch/arm/crypto/sha1-armv7-neon.S  |  635 ++++++++++++++++++++++++++=
-++++++++++
->  arch/arm/crypto/sha1_glue.c        |    8
->  arch/arm/crypto/sha1_neon_glue.c   |  197 +++++++++++
->  arch/arm/include/asm/crypto/sha1.h |   10 +
->  crypto/Kconfig                     |   11 +
->  6 files changed, 860 insertions(+), 3 deletions(-)
->  create mode 100644 arch/arm/crypto/sha1-armv7-neon.S
->  create mode 100644 arch/arm/crypto/sha1_neon_glue.c
->  create mode 100644 arch/arm/include/asm/crypto/sha1.h
->
-> diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
-> index 81cda39..374956d 100644
-> --- a/arch/arm/crypto/Makefile
-> +++ b/arch/arm/crypto/Makefile
-> @@ -5,10 +5,12 @@
->  obj-$(CONFIG_CRYPTO_AES_ARM) +=3D aes-arm.o
->  obj-$(CONFIG_CRYPTO_AES_ARM_BS) +=3D aes-arm-bs.o
->  obj-$(CONFIG_CRYPTO_SHA1_ARM) +=3D sha1-arm.o
-> +obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) +=3D sha1-arm-neon.o
->
->  aes-arm-y      :=3D aes-armv4.o aes_glue.o
->  aes-arm-bs-y   :=3D aesbs-core.o aesbs-glue.o
->  sha1-arm-y     :=3D sha1-armv4-large.o sha1_glue.o
-> +sha1-arm-neon-y        :=3D sha1-armv7-neon.o sha1_neon_glue.o
->
->  quiet_cmd_perl =3D PERL    $@
->        cmd_perl =3D $(PERL) $(<) > $(@)
-> diff --git a/arch/arm/crypto/sha1-armv7-neon.S b/arch/arm/crypto/sha1=
--armv7-neon.S
-> new file mode 100644
-> index 0000000..beb1ed1
-> --- /dev/null
-> +++ b/arch/arm/crypto/sha1-armv7-neon.S
-> @@ -0,0 +1,635 @@
-> +/* sha1-armv7-neon.S - ARM/NEON accelerated SHA-1 transform function
-> + *
-> + * Copyright =C2=A9 2013-2014 Jussi Kivilinna <jussi.kivilinna@iki.f=
-i>
-> + *
-> + * This program is free software; you can redistribute it and/or mod=
-ify it
-> + * under the terms of the GNU General Public License as published by=
- the Free
-> + * Software Foundation; either version 2 of the License, or (at your=
- option)
-> + * any later version.
-> + */
-> +
-> +.syntax unified
-> +#ifdef __thumb2__
-> +.thumb
-> +#else
-> +.code   32
-> +#endif
-
-This is all NEON code, which has no size benefit from being assembled
-as Thumb-2. (NEON instructions are 4 bytes in either case)
-If we drop the Thumb-2 versions, there's one less version to test.
-
-> +.fpu neon
-> +
-> +.data
-> +
-> +#define GET_DATA_POINTER(reg, name, rtmp) ldr reg, =3Dname
-> +
-[...]
-> +.align 4
-> +.LK_VEC:
-> +.LK1:  .long K1, K1, K1, K1
-> +.LK2:  .long K2, K2, K2, K2
-> +.LK3:  .long K3, K3, K3, K3
-> +.LK4:  .long K4, K4, K4, K4
-
-If you are going to put these constants in a different section, they
-belong in .rodata not .data.
-But why not just keep them in .text? In that case, you can replace the
-above 'ldr reg, =3Dname' with 'adr reg ,name' (or adrl if required) and
-get rid of the .ltorg and the literal pool.
-
-[...]
-> +/*
-> + * Transform nblks*64 bytes (nblks*16 32-bit words) at DATA.
-> + *
-> + * unsigned int
-> + * sha1_transform_neon (void *ctx, const unsigned char *data,
-> + *                      unsigned int nblks)
-> + */
-> +.align 3
-> +.globl sha1_transform_neon
-> +.type  sha1_transform_neon,%function;
-> +
-> +sha1_transform_neon:
-
-ENTRY(sha1_transform_neon) [and matching ENDPROC() below]
-
-> +  /* input:
-> +   *   r0: ctx, CTX
-> +   *   r1: data (64*nblks bytes)
-> +   *   r2: nblks
-> +   */
-> +
-> +  cmp RNBLKS, #0;
-> +  beq .Ldo_nothing;
-> +
-> +  push {r4-r12, lr};
-> +  /*vpush {q4-q7};*/
-> +
-> +  mov ROLDSTACK, sp;
-> +  GET_DATA_POINTER(RK, .LK_VEC, _a);
-> +
-> +  /* Align stack. */
-> +  sub RT0, sp, #(16*4);
-> +  and RT0, #(~(16-1));
-> +  mov sp, RT0;
-> +
-> +  /* Get the values of the chaining variables. */
-> +  ldm RSTATE, {_a-_e};
-> +
-> +  /* Precalc 0-15. */
-> +  vld1.32 {curK}, [RK]!; /* Load K1. */
-> +  W_PRECALC_00_15();
-> +
-> +  b .Loop;
-> +
-> +.ltorg
-> +.Loop:
-> +  /* Transform 0-15 + Precalc 16-31. */
-> +  _R( _a, _b, _c, _d, _e, F1,  0,
-> +      WPRECALC_16_31_0, WPRECALC_16_31_1, WPRECALC_16_31_2, 16,
-> +      W4, W5, W6, W7, W0, _, _, _ );
-> +  _R( _e, _a, _b, _c, _d, F1,  1,
-> +      WPRECALC_16_31_3, WPRECALC_16_31_4, WPRECALC_16_31_5, 16,
-> +      W4, W5, W6, W7, W0, _, _, _ );
-> +  _R( _d, _e, _a, _b, _c, F1,  2,
-> +      WPRECALC_16_31_6, WPRECALC_16_31_7, WPRECALC_16_31_8, 16,
-> +      W4, W5, W6, W7, W0, _, _, _ );
-> +  _R( _c, _d, _e, _a, _b, F1,  3,
-> +      WPRECALC_16_31_9, WPRECALC_16_31_10,WPRECALC_16_31_11,16,
-> +      W4, W5, W6, W7, W0, _, _, _ );
-> +
-> +  vld1.32 {curK}, [RK]!; /* Load K2. */
-> +  _R( _b, _c, _d, _e, _a, F1,  4,
-> +      WPRECALC_16_31_0, WPRECALC_16_31_1, WPRECALC_16_31_2, 20,
-> +      W3, W4, W5, W6, W7, _, _, _ );
-> +  _R( _a, _b, _c, _d, _e, F1,  5,
-> +      WPRECALC_16_31_3, WPRECALC_16_31_4, WPRECALC_16_31_5, 20,
-> +      W3, W4, W5, W6, W7, _, _, _ );
-> +  _R( _e, _a, _b, _c, _d, F1,  6,
-> +      WPRECALC_16_31_6, WPRECALC_16_31_7, WPRECALC_16_31_8, 20,
-> +      W3, W4, W5, W6, W7, _, _, _ );
-> +  _R( _d, _e, _a, _b, _c, F1,  7,
-> +      WPRECALC_16_31_9, WPRECALC_16_31_10,WPRECALC_16_31_11,20,
-> +      W3, W4, W5, W6, W7, _, _, _ );
-> +
-> +  _R( _c, _d, _e, _a, _b, F1,  8,
-> +      WPRECALC_16_31_0, WPRECALC_16_31_1, WPRECALC_16_31_2, 24,
-> +      W2, W3, W4, W5, W6, _, _, _ );
-> +  _R( _b, _c, _d, _e, _a, F1,  9,
-> +      WPRECALC_16_31_3, WPRECALC_16_31_4, WPRECALC_16_31_5, 24,
-> +      W2, W3, W4, W5, W6, _, _, _ );
-> +  _R( _a, _b, _c, _d, _e, F1, 10,
-> +      WPRECALC_16_31_6, WPRECALC_16_31_7, WPRECALC_16_31_8, 24,
-> +      W2, W3, W4, W5, W6, _, _, _ );
-> +  _R( _e, _a, _b, _c, _d, F1, 11,
-> +      WPRECALC_16_31_9, WPRECALC_16_31_10,WPRECALC_16_31_11,24,
-> +      W2, W3, W4, W5, W6, _, _, _ );
-> +
-> +  _R( _d, _e, _a, _b, _c, F1, 12,
-> +      WPRECALC_16_31_0, WPRECALC_16_31_1, WPRECALC_16_31_2, 28,
-> +      W1, W2, W3, W4, W5, _, _, _ );
-> +  _R( _c, _d, _e, _a, _b, F1, 13,
-> +      WPRECALC_16_31_3, WPRECALC_16_31_4, WPRECALC_16_31_5, 28,
-> +      W1, W2, W3, W4, W5, _, _, _ );
-> +  _R( _b, _c, _d, _e, _a, F1, 14,
-> +      WPRECALC_16_31_6, WPRECALC_16_31_7, WPRECALC_16_31_8, 28,
-> +      W1, W2, W3, W4, W5, _, _, _ );
-> +  _R( _a, _b, _c, _d, _e, F1, 15,
-> +      WPRECALC_16_31_9, WPRECALC_16_31_10,WPRECALC_16_31_11,28,
-> +      W1, W2, W3, W4, W5, _, _, _ );
-> +
-> +  /* Transform 16-63 + Precalc 32-79. */
-> +  _R( _e, _a, _b, _c, _d, F1, 16,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 32,
-> +      W0, W1, W2, W3, W4, W5, W6, W7);
-> +  _R( _d, _e, _a, _b, _c, F1, 17,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 32,
-> +      W0, W1, W2, W3, W4, W5, W6, W7);
-> +  _R( _c, _d, _e, _a, _b, F1, 18,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            32,
-> +      W0, W1, W2, W3, W4, W5, W6, W7);
-> +  _R( _b, _c, _d, _e, _a, F1, 19,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 32,
-> +      W0, W1, W2, W3, W4, W5, W6, W7);
-> +
-> +  _R( _a, _b, _c, _d, _e, F2, 20,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 36,
-> +      W7, W0, W1, W2, W3, W4, W5, W6);
-> +  _R( _e, _a, _b, _c, _d, F2, 21,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 36,
-> +      W7, W0, W1, W2, W3, W4, W5, W6);
-> +  _R( _d, _e, _a, _b, _c, F2, 22,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            36,
-> +      W7, W0, W1, W2, W3, W4, W5, W6);
-> +  _R( _c, _d, _e, _a, _b, F2, 23,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 36,
-> +      W7, W0, W1, W2, W3, W4, W5, W6);
-> +
-> +  vld1.32 {curK}, [RK]!; /* Load K3. */
-> +  _R( _b, _c, _d, _e, _a, F2, 24,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 40,
-> +      W6, W7, W0, W1, W2, W3, W4, W5);
-> +  _R( _a, _b, _c, _d, _e, F2, 25,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 40,
-> +      W6, W7, W0, W1, W2, W3, W4, W5);
-> +  _R( _e, _a, _b, _c, _d, F2, 26,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            40,
-> +      W6, W7, W0, W1, W2, W3, W4, W5);
-> +  _R( _d, _e, _a, _b, _c, F2, 27,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 40,
-> +      W6, W7, W0, W1, W2, W3, W4, W5);
-> +
-> +  _R( _c, _d, _e, _a, _b, F2, 28,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 44,
-> +      W5, W6, W7, W0, W1, W2, W3, W4);
-> +  _R( _b, _c, _d, _e, _a, F2, 29,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 44,
-> +      W5, W6, W7, W0, W1, W2, W3, W4);
-> +  _R( _a, _b, _c, _d, _e, F2, 30,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            44,
-> +      W5, W6, W7, W0, W1, W2, W3, W4);
-> +  _R( _e, _a, _b, _c, _d, F2, 31,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 44,
-> +      W5, W6, W7, W0, W1, W2, W3, W4);
-> +
-> +  _R( _d, _e, _a, _b, _c, F2, 32,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 48,
-> +      W4, W5, W6, W7, W0, W1, W2, W3);
-> +  _R( _c, _d, _e, _a, _b, F2, 33,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 48,
-> +      W4, W5, W6, W7, W0, W1, W2, W3);
-> +  _R( _b, _c, _d, _e, _a, F2, 34,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            48,
-> +      W4, W5, W6, W7, W0, W1, W2, W3);
-> +  _R( _a, _b, _c, _d, _e, F2, 35,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 48,
-> +      W4, W5, W6, W7, W0, W1, W2, W3);
-> +
-> +  _R( _e, _a, _b, _c, _d, F2, 36,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 52,
-> +      W3, W4, W5, W6, W7, W0, W1, W2);
-> +  _R( _d, _e, _a, _b, _c, F2, 37,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 52,
-> +      W3, W4, W5, W6, W7, W0, W1, W2);
-> +  _R( _c, _d, _e, _a, _b, F2, 38,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            52,
-> +      W3, W4, W5, W6, W7, W0, W1, W2);
-> +  _R( _b, _c, _d, _e, _a, F2, 39,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 52,
-> +      W3, W4, W5, W6, W7, W0, W1, W2);
-> +
-> +  _R( _a, _b, _c, _d, _e, F3, 40,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 56,
-> +      W2, W3, W4, W5, W6, W7, W0, W1);
-> +  _R( _e, _a, _b, _c, _d, F3, 41,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 56,
-> +      W2, W3, W4, W5, W6, W7, W0, W1);
-> +  _R( _d, _e, _a, _b, _c, F3, 42,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            56,
-> +      W2, W3, W4, W5, W6, W7, W0, W1);
-> +  _R( _c, _d, _e, _a, _b, F3, 43,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 56,
-> +      W2, W3, W4, W5, W6, W7, W0, W1);
-> +
-> +  vld1.32 {curK}, [RK]!; /* Load K4. */
-> +  _R( _b, _c, _d, _e, _a, F3, 44,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 60,
-> +      W1, W2, W3, W4, W5, W6, W7, W0);
-> +  _R( _a, _b, _c, _d, _e, F3, 45,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 60,
-> +      W1, W2, W3, W4, W5, W6, W7, W0);
-> +  _R( _e, _a, _b, _c, _d, F3, 46,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            60,
-> +      W1, W2, W3, W4, W5, W6, W7, W0);
-> +  _R( _d, _e, _a, _b, _c, F3, 47,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 60,
-> +      W1, W2, W3, W4, W5, W6, W7, W0);
-> +
-> +  _R( _c, _d, _e, _a, _b, F3, 48,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 64,
-> +      W0, W1, W2, W3, W4, W5, W6, W7);
-> +  _R( _b, _c, _d, _e, _a, F3, 49,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 64,
-> +      W0, W1, W2, W3, W4, W5, W6, W7);
-> +  _R( _a, _b, _c, _d, _e, F3, 50,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            64,
-> +      W0, W1, W2, W3, W4, W5, W6, W7);
-> +  _R( _e, _a, _b, _c, _d, F3, 51,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 64,
-> +      W0, W1, W2, W3, W4, W5, W6, W7);
-> +
-> +  _R( _d, _e, _a, _b, _c, F3, 52,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 68,
-> +      W7, W0, W1, W2, W3, W4, W5, W6);
-> +  _R( _c, _d, _e, _a, _b, F3, 53,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 68,
-> +      W7, W0, W1, W2, W3, W4, W5, W6);
-> +  _R( _b, _c, _d, _e, _a, F3, 54,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            68,
-> +      W7, W0, W1, W2, W3, W4, W5, W6);
-> +  _R( _a, _b, _c, _d, _e, F3, 55,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 68,
-> +      W7, W0, W1, W2, W3, W4, W5, W6);
-> +
-> +  _R( _e, _a, _b, _c, _d, F3, 56,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 72,
-> +      W6, W7, W0, W1, W2, W3, W4, W5);
-> +  _R( _d, _e, _a, _b, _c, F3, 57,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 72,
-> +      W6, W7, W0, W1, W2, W3, W4, W5);
-> +  _R( _c, _d, _e, _a, _b, F3, 58,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            72,
-> +      W6, W7, W0, W1, W2, W3, W4, W5);
-> +  _R( _b, _c, _d, _e, _a, F3, 59,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 72,
-> +      W6, W7, W0, W1, W2, W3, W4, W5);
-> +
-> +  sub RK, #64;
-> +  _R( _a, _b, _c, _d, _e, F4, 60,
-> +      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 76,
-> +      W5, W6, W7, W0, W1, W2, W3, W4);
-> +  _R( _e, _a, _b, _c, _d, F4, 61,
-> +      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 76,
-> +      W5, W6, W7, W0, W1, W2, W3, W4);
-> +  _R( _d, _e, _a, _b, _c, F4, 62,
-> +      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            76,
-> +      W5, W6, W7, W0, W1, W2, W3, W4);
-> +  _R( _c, _d, _e, _a, _b, F4, 63,
-> +      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 76,
-> +      W5, W6, W7, W0, W1, W2, W3, W4);
-> +
-> +  subs RNBLKS, #1;
-> +  beq .Lend;
-> +
-> +  /* Transform 64-79 + Precalc 0-15 of next block. */
-> +  vld1.32 {curK}, [RK]!; /* Load K1. */
-> +  _R( _b, _c, _d, _e, _a, F4, 64,
-> +      WPRECALC_00_15_0, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _a, _b, _c, _d, _e, F4, 65,
-> +      WPRECALC_00_15_1, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _e, _a, _b, _c, _d, F4, 66,
-> +      WPRECALC_00_15_2, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _d, _e, _a, _b, _c, F4, 67,
-> +      WPRECALC_00_15_3, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +
-> +  _R( _c, _d, _e, _a, _b, F4, 68,
-> +      dummy,            dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _b, _c, _d, _e, _a, F4, 69,
-> +      dummy,            dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _a, _b, _c, _d, _e, F4, 70,
-> +      WPRECALC_00_15_4, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _e, _a, _b, _c, _d, F4, 71,
-> +      WPRECALC_00_15_5, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +
-> +  _R( _d, _e, _a, _b, _c, F4, 72,
-> +      dummy,            dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _c, _d, _e, _a, _b, F4, 73,
-> +      dummy,            dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _b, _c, _d, _e, _a, F4, 74,
-> +      WPRECALC_00_15_6, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _a, _b, _c, _d, _e, F4, 75,
-> +      WPRECALC_00_15_7, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +
-> +  _R( _e, _a, _b, _c, _d, F4, 76,
-> +      WPRECALC_00_15_8, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _d, _e, _a, _b, _c, F4, 77,
-> +      WPRECALC_00_15_9, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _c, _d, _e, _a, _b, F4, 78,
-> +      WPRECALC_00_15_10, dummy, dummy, _, _, _, _, _, _, _, _, _ );
-> +  _R( _b, _c, _d, _e, _a, F4, 79,
-> +      WPRECALC_00_15_11, dummy, WPRECALC_00_15_12, _, _, _, _, _, _,=
- _, _, _ );
-> +
-> +  /* Update the chaining variables. */
-> +  ldm RSTATE, {RT0-RT2};
-> +  add _a, RT0;
-> +  ldr RT0, [RSTATE, #state_h3];
-> +  add _b, RT1;
-> +  ldr RT1, [RSTATE, #state_h4];
-> +  add _c, RT2;
-> +  add _d, RT0;
-> +  add _e, RT1;
-> +  stm RSTATE, {_a-_e};
-> +
-> +  b .Loop;
-> +
-> +.ltorg
-> +.Lend:
-> +  /* Transform 64-79 */
-> +  R( _b, _c, _d, _e, _a, F4, 64 );
-> +  R( _a, _b, _c, _d, _e, F4, 65 );
-> +  R( _e, _a, _b, _c, _d, F4, 66 );
-> +  R( _d, _e, _a, _b, _c, F4, 67 );
-> +  R( _c, _d, _e, _a, _b, F4, 68 );
-> +  R( _b, _c, _d, _e, _a, F4, 69 );
-> +  R( _a, _b, _c, _d, _e, F4, 70 );
-> +  R( _e, _a, _b, _c, _d, F4, 71 );
-> +  R( _d, _e, _a, _b, _c, F4, 72 );
-> +  R( _c, _d, _e, _a, _b, F4, 73 );
-> +  R( _b, _c, _d, _e, _a, F4, 74 );
-> +  R( _a, _b, _c, _d, _e, F4, 75 );
-> +  R( _e, _a, _b, _c, _d, F4, 76 );
-> +  R( _d, _e, _a, _b, _c, F4, 77 );
-> +  R( _c, _d, _e, _a, _b, F4, 78 );
-> +  R( _b, _c, _d, _e, _a, F4, 79 );
-> +
-> +  mov sp, ROLDSTACK;
-> +
-> +  /* Update the chaining variables. */
-> +  ldm RSTATE, {RT0-RT2};
-> +  add _a, RT0;
-> +  ldr RT0, [RSTATE, #state_h3];
-> +  add _b, RT1;
-> +  ldr RT1, [RSTATE, #state_h4];
-> +  add _c, RT2;
-> +  add _d, RT0;
-> +  /*vpop {q4-q7};*/
-> +  add _e, RT1;
-> +  stm RSTATE, {_a-_e};
-> +
-> +  pop {r4-r12, pc};
-> +
-> +.Ldo_nothing:
-> +  bx lr
-> +
-> +.size sha1_transform_neon,.-sha1_transform_neon
-> diff --git a/arch/arm/crypto/sha1_glue.c b/arch/arm/crypto/sha1_glue.=
-c
-> index c494e57..84f2a75 100644
-> --- a/arch/arm/crypto/sha1_glue.c
-> +++ b/arch/arm/crypto/sha1_glue.c
-> @@ -23,6 +23,7 @@
->  #include <linux/types.h>
->  #include <crypto/sha.h>
->  #include <asm/byteorder.h>
-> +#include <asm/crypto/sha1.h>
->
->
->  asmlinkage void sha1_block_data_order(u32 *digest,
-> @@ -65,8 +66,8 @@ static int __sha1_update(struct sha1_state *sctx, c=
-onst u8 *data,
->  }
->
->
-> -static int sha1_update(struct shash_desc *desc, const u8 *data,
-> -                            unsigned int len)
-> +int sha1_update_arm(struct shash_desc *desc, const u8 *data,
-> +                   unsigned int len)
->  {
->         struct sha1_state *sctx =3D shash_desc_ctx(desc);
->         unsigned int partial =3D sctx->count % SHA1_BLOCK_SIZE;
-> @@ -81,6 +82,7 @@ static int sha1_update(struct shash_desc *desc, con=
-st u8 *data,
->         res =3D __sha1_update(sctx, data, len, partial);
->         return res;
->  }
-> +EXPORT_SYMBOL_GPL(sha1_update_arm);
->
->
->  /* Add padding and return the message digest. */
-> @@ -135,7 +137,7 @@ static int sha1_import(struct shash_desc *desc, c=
-onst void *in)
->  static struct shash_alg alg =3D {
->         .digestsize     =3D       SHA1_DIGEST_SIZE,
->         .init           =3D       sha1_init,
-> -       .update         =3D       sha1_update,
-> +       .update         =3D       sha1_update_arm,
->         .final          =3D       sha1_final,
->         .export         =3D       sha1_export,
->         .import         =3D       sha1_import,
-> diff --git a/arch/arm/crypto/sha1_neon_glue.c b/arch/arm/crypto/sha1_=
-neon_glue.c
-> new file mode 100644
-> index 0000000..6f1b411
-> --- /dev/null
-> +++ b/arch/arm/crypto/sha1_neon_glue.c
-> @@ -0,0 +1,197 @@
-> +/*
-> + * Glue code for the SHA1 Secure Hash Algorithm assembler implementa=
-tion using
-> + * ARM NEON instructions.
-> + *
-> + * Copyright =C2=A9 2014 Jussi Kivilinna <jussi.kivilinna@iki.fi>
-> + *
-> + * This file is based on sha1_generic.c and sha1_ssse3_glue.c:
-> + *  Copyright (c) Alan Smithee.
-> + *  Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
-> + *  Copyright (c) Jean-Francois Dive <jef@linuxbe.org>
-> + *  Copyright (c) Mathias Krause <minipli@googlemail.com>
-> + *  Copyright (c) Chandramouli Narayanan <mouli@linux.intel.com>
-> + *
-> + * This program is free software; you can redistribute it and/or mod=
-ify it
-> + * under the terms of the GNU General Public License as published by=
- the Free
-> + * Software Foundation; either version 2 of the License, or (at your=
- option)
-> + * any later version.
-> + *
-> + */
-> +
-> +#include <crypto/internal/hash.h>
-> +#include <linux/init.h>
-> +#include <linux/module.h>
-> +#include <linux/mm.h>
-> +#include <linux/cryptohash.h>
-> +#include <linux/types.h>
-> +#include <crypto/sha.h>
-> +#include <asm/byteorder.h>
-> +#include <asm/neon.h>
-> +#include <asm/simd.h>
-> +#include <asm/crypto/sha1.h>
-> +
-> +
-> +asmlinkage void sha1_transform_neon(void *state_h, const char *data,
-> +                                   unsigned int rounds);
-> +
-> +
-> +static int sha1_neon_init(struct shash_desc *desc)
-> +{
-> +       struct sha1_state *sctx =3D shash_desc_ctx(desc);
-> +
-> +       *sctx =3D (struct sha1_state){
-> +               .state =3D { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1=
-_H4 },
-> +       };
-> +
-> +       return 0;
-> +}
-> +
-> +static int __sha1_neon_update(struct shash_desc *desc, const u8 *dat=
-a,
-> +                              unsigned int len, unsigned int partial=
-)
-> +{
-> +       struct sha1_state *sctx =3D shash_desc_ctx(desc);
-> +       unsigned int done =3D 0;
-> +
-> +       sctx->count +=3D len;
-> +
-> +       if (partial) {
-> +               done =3D SHA1_BLOCK_SIZE - partial;
-> +               memcpy(sctx->buffer + partial, data, done);
-> +               sha1_transform_neon(sctx->state, sctx->buffer, 1);
-> +       }
-> +
-> +       if (len - done >=3D SHA1_BLOCK_SIZE) {
-> +               const unsigned int rounds =3D (len - done) / SHA1_BLO=
-CK_SIZE;
-> +
-> +               sha1_transform_neon(sctx->state, data + done, rounds)=
-;
-> +               done +=3D rounds * SHA1_BLOCK_SIZE;
-> +       }
-> +
-> +       memcpy(sctx->buffer, data + done, len - done);
-> +
-> +       return 0;
-> +}
-> +
-> +static int sha1_neon_update(struct shash_desc *desc, const u8 *data,
-> +                            unsigned int len)
-> +{
-> +       struct sha1_state *sctx =3D shash_desc_ctx(desc);
-> +       unsigned int partial =3D sctx->count % SHA1_BLOCK_SIZE;
-> +       int res;
-> +
-> +       /* Handle the fast case right here */
-> +       if (partial + len < SHA1_BLOCK_SIZE) {
-> +               sctx->count +=3D len;
-> +               memcpy(sctx->buffer + partial, data, len);
-> +
-> +               return 0;
-> +       }
-> +
-> +       if (!may_use_simd()) {
-> +               res =3D sha1_update_arm(desc, data, len);
-> +       } else {
-> +               kernel_neon_begin();
-> +               res =3D __sha1_neon_update(desc, data, len, partial);
-> +               kernel_neon_end();
-> +       }
-> +
-> +       return res;
-> +}
-> +
-> +
-> +/* Add padding and return the message digest. */
-> +static int sha1_neon_final(struct shash_desc *desc, u8 *out)
-> +{
-> +       struct sha1_state *sctx =3D shash_desc_ctx(desc);
-> +       unsigned int i, index, padlen;
-> +       __be32 *dst =3D (__be32 *)out;
-> +       __be64 bits;
-> +       static const u8 padding[SHA1_BLOCK_SIZE] =3D { 0x80, };
-> +
-> +       bits =3D cpu_to_be64(sctx->count << 3);
-> +
-> +       /* Pad out to 56 mod 64 and append length */
-> +       index =3D sctx->count % SHA1_BLOCK_SIZE;
-> +       padlen =3D (index < 56) ? (56 - index) : ((SHA1_BLOCK_SIZE+56=
-) - index);
-> +       if (!may_use_simd()) {
-> +               sha1_update_arm(desc, padding, padlen);
-> +               sha1_update_arm(desc, (const u8 *)&bits, sizeof(bits)=
-);
-> +       } else {
-> +               kernel_neon_begin();
-> +               /* We need to fill a whole block for __sha1_neon_upda=
-te() */
-> +               if (padlen <=3D 56) {
-> +                       sctx->count +=3D padlen;
-> +                       memcpy(sctx->buffer + index, padding, padlen)=
-;
-> +               } else {
-> +                       __sha1_neon_update(desc, padding, padlen, ind=
-ex);
-> +               }
-> +               __sha1_neon_update(desc, (const u8 *)&bits, sizeof(bi=
-ts), 56);
-> +               kernel_neon_end();
-> +       }
-> +
-> +       /* Store state in digest */
-> +       for (i =3D 0; i < 5; i++)
-> +               dst[i] =3D cpu_to_be32(sctx->state[i]);
-> +
-> +       /* Wipe context */
-> +       memset(sctx, 0, sizeof(*sctx));
-> +
-> +       return 0;
-> +}
-> +
-> +static int sha1_neon_export(struct shash_desc *desc, void *out)
-> +{
-> +       struct sha1_state *sctx =3D shash_desc_ctx(desc);
-> +
-> +       memcpy(out, sctx, sizeof(*sctx));
-> +
-> +       return 0;
-> +}
-> +
-> +static int sha1_neon_import(struct shash_desc *desc, const void *in)
-> +{
-> +       struct sha1_state *sctx =3D shash_desc_ctx(desc);
-> +
-> +       memcpy(sctx, in, sizeof(*sctx));
-> +
-> +       return 0;
-> +}
-> +
-> +static struct shash_alg alg =3D {
-> +       .digestsize     =3D       SHA1_DIGEST_SIZE,
-> +       .init           =3D       sha1_neon_init,
-> +       .update         =3D       sha1_neon_update,
-> +       .final          =3D       sha1_neon_final,
-> +       .export         =3D       sha1_neon_export,
-> +       .import         =3D       sha1_neon_import,
-> +       .descsize       =3D       sizeof(struct sha1_state),
-> +       .statesize      =3D       sizeof(struct sha1_state),
-> +       .base           =3D       {
-> +               .cra_name               =3D "sha1",
-> +               .cra_driver_name        =3D "sha1-neon",
-> +               .cra_priority           =3D 250,
-> +               .cra_flags              =3D CRYPTO_ALG_TYPE_SHASH,
-> +               .cra_blocksize          =3D SHA1_BLOCK_SIZE,
-> +               .cra_module             =3D THIS_MODULE,
-> +       }
-> +};
-> +
-> +static int __init sha1_neon_mod_init(void)
-> +{
-> +       if (!cpu_has_neon())
-> +               return -ENODEV;
-> +
-> +       return crypto_register_shash(&alg);
-> +}
-> +
-> +static void __exit sha1_neon_mod_fini(void)
-> +{
-> +       crypto_unregister_shash(&alg);
-> +}
-> +
-> +module_init(sha1_neon_mod_init);
-> +module_exit(sha1_neon_mod_fini);
-> +
-> +MODULE_LICENSE("GPL");
-> +MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm, NEON accelerated");
-> +MODULE_ALIAS("sha1");
-> diff --git a/arch/arm/include/asm/crypto/sha1.h b/arch/arm/include/as=
-m/crypto/sha1.h
-> new file mode 100644
-> index 0000000..75e6a41
-> --- /dev/null
-> +++ b/arch/arm/include/asm/crypto/sha1.h
-> @@ -0,0 +1,10 @@
-> +#ifndef ASM_ARM_CRYPTO_SHA1_H
-> +#define ASM_ARM_CRYPTO_SHA1_H
-> +
-> +#include <linux/crypto.h>
-> +#include <crypto/sha.h>
-> +
-> +extern int sha1_update_arm(struct shash_desc *desc, const u8 *data,
-> +                          unsigned int len);
-> +
-> +#endif
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 025c510..66d7ce1 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -540,6 +540,17 @@ config CRYPTO_SHA1_ARM
->           SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) impleme=
-nted
->           using optimized ARM assembler.
->
-> +config CRYPTO_SHA1_ARM_NEON
-> +       tristate "SHA1 digest algorithm (ARM NEON)"
-> +       depends on ARM && KERNEL_MODE_NEON && !CPU_BIG_ENDIAN
-> +       select CRYPTO_SHA1_ARM
-> +       select CRYPTO_SHA1
-> +       select CRYPTO_HASH
-> +       help
-> +         SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) impleme=
-nted
-> +         using optimized ARM NEON assembly, when NEON instructions a=
-re
-> +         available.
-> +
->  config CRYPTO_SHA1_PPC
->         tristate "SHA1 digest algorithm (powerpc)"
->         depends on PPC
->
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 4593b3c..53ff20d 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -565,7 +565,21 @@ out:
+ 	return ret;
+ }
+ 
+-/* update function of CTR DRBG as defined in 10.2.1.2 */
++/*
++ * update function of CTR DRBG as defined in 10.2.1.2
++ *
++ * The reseed variable has an enhanced meaning compared to the update
++ * functions of the other DRBGs as follows:
++ * 0 => initial seed from initialization
++ * 1 => reseed via drbg_seed
++ * 2 => first invocation from drbg_ctr_update when addtl is present. In
++ *      this case, the df_data scratchpad is not deleted so that it is
++ *      available for another calls to prevent calling the DF function
++ *      again.
++ * 3 => second invocation from drbg_ctr_update. When the update function
++ *      was called with addtl, the df_data memory already contains the
++ *      DFed addtl information and we do not need to call DF again.
++ */
+ static int drbg_ctr_update(struct drbg_state *drbg, struct list_head *seed,
+ 			   int reseed)
+ {
+@@ -580,7 +594,8 @@ static int drbg_ctr_update(struct drbg_state *drbg, struct list_head *seed,
+ 	unsigned char prefix = DRBG_PREFIX1;
+ 
+ 	memset(temp, 0, drbg_statelen(drbg) + drbg_blocklen(drbg));
+-	memset(df_data, 0, drbg_statelen(drbg));
++	if (3 > reseed)
++		memset(df_data, 0, drbg_statelen(drbg));
+ 
+ 	/* 10.2.1.3.2 step 2 and 10.2.1.4.2 step 2 */
+ 	if (seed) {
+@@ -622,7 +637,8 @@ static int drbg_ctr_update(struct drbg_state *drbg, struct list_head *seed,
+ 
+ out:
+ 	memset(temp, 0, drbg_statelen(drbg) + drbg_blocklen(drbg));
+-	memset(df_data, 0, drbg_statelen(drbg));
++	if (2 != reseed)
++		memset(df_data, 0, drbg_statelen(drbg));
+ 	return ret;
+ }
+ 
+@@ -647,7 +663,7 @@ static int drbg_ctr_generate(struct drbg_state *drbg,
+ 		LIST_HEAD(addtllist);
+ 
+ 		list_add_tail(&addtl->list, &addtllist);
+-		ret = drbg_ctr_update(drbg, &addtllist, 1);
++		ret = drbg_ctr_update(drbg, &addtllist, 2);
+ 		if (ret)
+ 			return 0;
+ 	}
+@@ -678,21 +694,8 @@ static int drbg_ctr_generate(struct drbg_state *drbg,
+ 			drbg_add_buf(drbg->V, drbg_blocklen(drbg), &prefix, 1);
+ 	}
+ 
+-	/*
+-	 * 10.2.1.5.2 step 6
+-	 * The following call invokes the DF function again which could be
+-	 * optimized. In step 2, the "additional_input" after step 2 is the
+-	 * output of the DF function. If this result would be saved, the DF
+-	 * function would not need to be invoked again at this point.
+-	 */
+-	if (addtl && 0 < addtl->len) {
+-		LIST_HEAD(addtllist);
+-
+-		list_add_tail(&addtl->list, &addtllist);
+-		ret = drbg_ctr_update(drbg, &addtllist, 1);
+-	} else {
+-		ret = drbg_ctr_update(drbg, NULL, 1);
+-	}
++	/* 10.2.1.5.2 step 6 */
++	ret = drbg_ctr_update(drbg, NULL, 3);
+ 	if (ret)
+ 		len = ret;
+ 
+-- 
+1.9.3
