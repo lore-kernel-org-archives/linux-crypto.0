@@ -1,10 +1,11 @@
 From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: [PATCH 1/2] crypto: sha1/ARM: make use of common SHA-1 structures
-Date: Sat, 28 Jun 2014 13:39:59 +0300
-Message-ID: <20140628103959.24628.55994.stgit@localhost6.localdomain6>
+Subject: [PATCH 2/2] crypto: sha1: add ARM NEON implementation
+Date: Sat, 28 Jun 2014 13:40:04 +0300
+Message-ID: <20140628104004.24628.72714.stgit@localhost6.localdomain6>
+References: <20140628103959.24628.55994.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
 	Russell King <linux@arm.linux.org.uk>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -12,160 +13,1046 @@ Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sinikuusama.dnainternet.net ([83.102.40.134]:34615 "EHLO
+Received: from sinikuusama.dnainternet.net ([83.102.40.134]:52713 "EHLO
 	sinikuusama.dnainternet.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750846AbaF1KkL (ORCPT
+	by vger.kernel.org with ESMTP id S1750846AbaF1KkR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 28 Jun 2014 06:40:11 -0400
+	Sat, 28 Jun 2014 06:40:17 -0400
+In-Reply-To: <20140628103959.24628.55994.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Common SHA-1 structures are defined in <crypto/sha.h> for code sharing.
+This patch adds ARM NEON assembly implementation of SHA-1 algorithm.
 
-This patch changes SHA-1/ARM glue code to use these structures.
+tcrypt benchmark results on Cortex-A8, sha1-arm-asm vs sha1-neon-asm:
+
+block-size      bytes/update    old-vs-new
+16              16              1.06x
+64              16              1.05x
+64              64              1.09x
+256             16              1.04x
+256             64              1.11x
+256             256             1.28x
+1024            16              1.04x
+1024            256             1.34x
+1024            1024            1.42x
+2048            16              1.04x
+2048            256             1.35x
+2048            1024            1.44x
+2048            2048            1.46x
+4096            16              1.04x
+4096            256             1.36x
+4096            1024            1.45x
+4096            4096            1.48x
+8192            16              1.04x
+8192            256             1.36x
+8192            1024            1.46x
+8192            4096            1.49x
+8192            8192            1.49x
 
 Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 ---
- arch/arm/crypto/sha1_glue.c |   50 +++++++++++++++++++------------------------
- 1 file changed, 22 insertions(+), 28 deletions(-)
+ arch/arm/crypto/Makefile           |    2=20
+ arch/arm/crypto/sha1-armv7-neon.S  |  635 ++++++++++++++++++++++++++++=
+++++++++
+ arch/arm/crypto/sha1_glue.c        |    8=20
+ arch/arm/crypto/sha1_neon_glue.c   |  197 +++++++++++
+ arch/arm/include/asm/crypto/sha1.h |   10 +
+ crypto/Kconfig                     |   11 +
+ 6 files changed, 860 insertions(+), 3 deletions(-)
+ create mode 100644 arch/arm/crypto/sha1-armv7-neon.S
+ create mode 100644 arch/arm/crypto/sha1_neon_glue.c
+ create mode 100644 arch/arm/include/asm/crypto/sha1.h
 
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index 81cda39..374956d 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -5,10 +5,12 @@
+ obj-$(CONFIG_CRYPTO_AES_ARM) +=3D aes-arm.o
+ obj-$(CONFIG_CRYPTO_AES_ARM_BS) +=3D aes-arm-bs.o
+ obj-$(CONFIG_CRYPTO_SHA1_ARM) +=3D sha1-arm.o
++obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) +=3D sha1-arm-neon.o
+=20
+ aes-arm-y	:=3D aes-armv4.o aes_glue.o
+ aes-arm-bs-y	:=3D aesbs-core.o aesbs-glue.o
+ sha1-arm-y	:=3D sha1-armv4-large.o sha1_glue.o
++sha1-arm-neon-y	:=3D sha1-armv7-neon.o sha1_neon_glue.o
+=20
+ quiet_cmd_perl =3D PERL    $@
+       cmd_perl =3D $(PERL) $(<) > $(@)
+diff --git a/arch/arm/crypto/sha1-armv7-neon.S b/arch/arm/crypto/sha1-a=
+rmv7-neon.S
+new file mode 100644
+index 0000000..beb1ed1
+--- /dev/null
++++ b/arch/arm/crypto/sha1-armv7-neon.S
+@@ -0,0 +1,635 @@
++/* sha1-armv7-neon.S - ARM/NEON accelerated SHA-1 transform function
++ *
++ * Copyright =C2=A9 2013-2014 Jussi Kivilinna <jussi.kivilinna@iki.fi>
++ *
++ * This program is free software; you can redistribute it and/or modif=
+y it
++ * under the terms of the GNU General Public License as published by t=
+he Free
++ * Software Foundation; either version 2 of the License, or (at your o=
+ption)
++ * any later version.
++ */
++
++.syntax unified
++#ifdef __thumb2__
++.thumb
++#else
++.code   32
++#endif
++.fpu neon
++
++.data
++
++#define GET_DATA_POINTER(reg, name, rtmp) ldr reg, =3Dname
++
++/* Context structure */
++
++#define state_h0 0
++#define state_h1 4
++#define state_h2 8
++#define state_h3 12
++#define state_h4 16
++
++
++/* Constants */
++
++#define K1  0x5A827999
++#define K2  0x6ED9EBA1
++#define K3  0x8F1BBCDC
++#define K4  0xCA62C1D6
++.align 4
++.LK_VEC:
++.LK1:	.long K1, K1, K1, K1
++.LK2:	.long K2, K2, K2, K2
++.LK3:	.long K3, K3, K3, K3
++.LK4:	.long K4, K4, K4, K4
++
++
++.text
++
++/* Register macros */
++
++#define RSTATE r0
++#define RDATA r1
++#define RNBLKS r2
++#define ROLDSTACK r3
++#define RK lr
++#define RWK r12
++
++#define _a r4
++#define _b r5
++#define _c r6
++#define _d r7
++#define _e r8
++
++#define RT0 r9
++#define RT1 r10
++#define RT2 r11
++
++#define W0 q0
++#define W1 q1
++#define W2 q2
++#define W3 q3
++#define W4 q4
++#define W5 q5
++#define W6 q6
++#define W7 q7
++
++#define tmp0 q8
++#define tmp1 q9
++#define tmp2 q10
++#define tmp3 q11
++
++#define curK q12
++
++
++/* Round function macros. */
++
++#define WK_offs(i) (((i) & 15) * 4)
++
++#define _R_F1(a,b,c,d,e,i,pre1,pre2,pre3,i16,\
++	      W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
++	and RT0, c, b; \
++		pre1(i16,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28); \
++	add e, e, a, ror #(32 - 5); \
++	ldr RT2, [sp, WK_offs(i)]; \
++	bic RT1, d, b; \
++	add e, RT2; \
++		pre2(i16,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28); \
++	ror b, #(32 - 30); \
++	eor RT0, RT1; \
++		pre3(i16,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28); \
++	add e, RT0;
++
++#define _R_F2(a,b,c,d,e,i,pre1,pre2,pre3,i16,\
++	      W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
++	eor RT0, c, b; \
++		pre1(i16,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28); \
++	add e, e, a, ror #(32 - 5); \
++	ldr RT2, [sp, WK_offs(i)]; \
++	eor RT0, d; \
++		pre2(i16,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28); \
++	add e, RT2; \
++	ror b, #(32 - 30); \
++		pre3(i16,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28); \
++	add e, RT0; \
++
++#define _R_F3(a,b,c,d,e,i,pre1,pre2,pre3,i16,\
++	      W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
++	eor RT0, c, b; \
++		pre1(i16,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28); \
++	add e, e, a, ror #(32 - 5); \
++	ldr RT2, [sp, WK_offs(i)]; \
++	and RT1, c, b; \
++	and RT0, d; \
++	add e, RT2; \
++		pre2(i16,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28); \
++	ror b, #(32 - 30); \
++	add e, RT1; \
++		pre3(i16,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28); \
++	add e, RT0;
++
++#define _R_F4(a,b,c,d,e,i,pre1,pre2,pre3,i16,\
++	      W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
++	_R_F2(a,b,c,d,e,i,pre1,pre2,pre3,i16,\
++	      W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28)
++
++#define _R(a,b,c,d,e,f,i,pre1,pre2,pre3,i16,\
++           W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
++	_R_##f(a,b,c,d,e,i,pre1,pre2,pre3,i16,\
++	       W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28)
++
++#define R(a,b,c,d,e,f,i) \
++	_R_##f(a,b,c,d,e,i,dummy,dummy,dummy,i16,\
++	       W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28)
++
++#define dummy(...)
++
++
++/* Input expansion macros. */
++
++/********* Precalc macros for rounds 0-15 ****************************=
+*********/
++
++#define W_PRECALC_00_15() \
++	add       RWK, sp, #(WK_offs(0));			\
++	\
++	vld1.32   {tmp0, tmp1}, [RDATA]!;			\
++	vrev32.8  W0, tmp0;		/* big =3D> little */	\
++	vld1.32   {tmp2, tmp3}, [RDATA]!;			\
++	vadd.u32  tmp0, W0, curK;				\
++	vrev32.8  W7, tmp1;		/* big =3D> little */	\
++	vrev32.8  W6, tmp2;		/* big =3D> little */	\
++	vadd.u32  tmp1, W7, curK;				\
++	vrev32.8  W5, tmp3;		/* big =3D> little */	\
++	vadd.u32  tmp2, W6, curK;				\
++	vst1.32   {tmp0, tmp1}, [RWK]!;				\
++	vadd.u32  tmp3, W5, curK;				\
++	vst1.32   {tmp2, tmp3}, [RWK];				\
++
++#define WPRECALC_00_15_0(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	add       RWK, sp, #(WK_offs(0));			\
++
++#define WPRECALC_00_15_1(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vld1.32   {tmp0, tmp1}, [RDATA]!;			\
++
++#define WPRECALC_00_15_2(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vrev32.8  W0, tmp0;		/* big =3D> little */	\
++
++#define WPRECALC_00_15_3(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vld1.32   {tmp2, tmp3}, [RDATA]!;			\
++
++#define WPRECALC_00_15_4(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vadd.u32  tmp0, W0, curK;				\
++
++#define WPRECALC_00_15_5(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vrev32.8  W7, tmp1;		/* big =3D> little */	\
++
++#define WPRECALC_00_15_6(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vrev32.8  W6, tmp2;		/* big =3D> little */	\
++
++#define WPRECALC_00_15_7(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vadd.u32  tmp1, W7, curK;				\
++
++#define WPRECALC_00_15_8(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vrev32.8  W5, tmp3;		/* big =3D> little */	\
++
++#define WPRECALC_00_15_9(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vadd.u32  tmp2, W6, curK;				\
++
++#define WPRECALC_00_15_10(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m2=
+8) \
++	vst1.32   {tmp0, tmp1}, [RWK]!;				\
++
++#define WPRECALC_00_15_11(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m2=
+8) \
++	vadd.u32  tmp3, W5, curK;				\
++
++#define WPRECALC_00_15_12(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m2=
+8) \
++	vst1.32   {tmp2, tmp3}, [RWK];				\
++
++
++/********* Precalc macros for rounds 16-31 ***************************=
+*********/
++
++#define WPRECALC_16_31_0(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	add       RWK, sp, #(WK_offs(i));	\
++
++#define WPRECALC_16_31_1(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	veor      tmp0, tmp0;			\
++	vext.8    W, W_m16, W_m12, #8;		\
++
++#define WPRECALC_16_31_2(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vext.8    tmp0, W_m04, tmp0, #4;	\
++	veor.32   W, W, W_m08;			\
++
++#define WPRECALC_16_31_3(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	veor      tmp0, tmp0, W_m16;		\
++	veor      tmp1, tmp1;			\
++
++#define WPRECALC_16_31_4(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	veor      W, W, tmp0;			\
++
++#define WPRECALC_16_31_5(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vshl.u32  tmp0, W, #1;			\
++	vext.8    tmp1, tmp1, W, #(16-12);	\
++	vshr.u32  W, W, #31;			\
++
++#define WPRECALC_16_31_6(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vorr      tmp0, tmp0, W;		\
++	vshr.u32  W, tmp1, #30;			\
++
++#define WPRECALC_16_31_7(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vshl.u32  tmp1, tmp1, #2;		\
++
++#define WPRECALC_16_31_8(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	veor      tmp0, tmp0, W;		\
++
++#define WPRECALC_16_31_9(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	veor      W, tmp0, tmp1;		\
++
++#define WPRECALC_16_31_10(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m2=
+8) \
++	vadd.u32  tmp0, W, curK;		\
++
++#define WPRECALC_16_31_11(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m2=
+8) \
++	vst1.32   {tmp0}, [RWK];
++
++
++/********* Precalc macros for rounds 32-79 ***************************=
+*********/
++
++#define WPRECALC_32_79_0(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	add RWK, sp, #(WK_offs(i&~3)); \
++
++#define WPRECALC_32_79_1(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	veor W, W_m28; \
++
++#define WPRECALC_32_79_2(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vext.8 tmp0, W_m08, W_m04, #8; \
++
++#define WPRECALC_32_79_3(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	veor W, W_m16; \
++
++#define WPRECALC_32_79_4(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	veor W, tmp0; \
++
++#define WPRECALC_32_79_5(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vshr.u32 tmp0, W, #30; \
++
++#define WPRECALC_32_79_6(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vshl.u32 W, W, #2; \
++
++#define WPRECALC_32_79_7(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vorr W, tmp0, W; \
++
++#define WPRECALC_32_79_8(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vadd.u32 tmp0, W, curK; \
++
++#define WPRECALC_32_79_9(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28=
+) \
++	vst1.32 {tmp0}, [RWK];
++
++
++/*
++ * Transform nblks*64 bytes (nblks*16 32-bit words) at DATA.
++ *
++ * unsigned int
++ * sha1_transform_neon (void *ctx, const unsigned char *data,
++ *                      unsigned int nblks)
++ */
++.align 3
++.globl sha1_transform_neon
++.type  sha1_transform_neon,%function;
++
++sha1_transform_neon:
++  /* input:
++   *	r0: ctx, CTX
++   *	r1: data (64*nblks bytes)
++   *	r2: nblks
++   */
++
++  cmp RNBLKS, #0;
++  beq .Ldo_nothing;
++
++  push {r4-r12, lr};
++  /*vpush {q4-q7};*/
++
++  mov ROLDSTACK, sp;
++  GET_DATA_POINTER(RK, .LK_VEC, _a);
++
++  /* Align stack. */
++  sub RT0, sp, #(16*4);
++  and RT0, #(~(16-1));
++  mov sp, RT0;
++
++  /* Get the values of the chaining variables. */
++  ldm RSTATE, {_a-_e};
++
++  /* Precalc 0-15. */
++  vld1.32 {curK}, [RK]!; /* Load K1. */
++  W_PRECALC_00_15();
++
++  b .Loop;
++
++.ltorg
++.Loop:
++  /* Transform 0-15 + Precalc 16-31. */
++  _R( _a, _b, _c, _d, _e, F1,  0,
++      WPRECALC_16_31_0, WPRECALC_16_31_1, WPRECALC_16_31_2, 16,
++      W4, W5, W6, W7, W0, _, _, _ );
++  _R( _e, _a, _b, _c, _d, F1,  1,
++      WPRECALC_16_31_3, WPRECALC_16_31_4, WPRECALC_16_31_5, 16,
++      W4, W5, W6, W7, W0, _, _, _ );
++  _R( _d, _e, _a, _b, _c, F1,  2,
++      WPRECALC_16_31_6, WPRECALC_16_31_7, WPRECALC_16_31_8, 16,
++      W4, W5, W6, W7, W0, _, _, _ );
++  _R( _c, _d, _e, _a, _b, F1,  3,
++      WPRECALC_16_31_9, WPRECALC_16_31_10,WPRECALC_16_31_11,16,
++      W4, W5, W6, W7, W0, _, _, _ );
++
++  vld1.32 {curK}, [RK]!; /* Load K2. */
++  _R( _b, _c, _d, _e, _a, F1,  4,
++      WPRECALC_16_31_0, WPRECALC_16_31_1, WPRECALC_16_31_2, 20,
++      W3, W4, W5, W6, W7, _, _, _ );
++  _R( _a, _b, _c, _d, _e, F1,  5,
++      WPRECALC_16_31_3, WPRECALC_16_31_4, WPRECALC_16_31_5, 20,
++      W3, W4, W5, W6, W7, _, _, _ );
++  _R( _e, _a, _b, _c, _d, F1,  6,
++      WPRECALC_16_31_6, WPRECALC_16_31_7, WPRECALC_16_31_8, 20,
++      W3, W4, W5, W6, W7, _, _, _ );
++  _R( _d, _e, _a, _b, _c, F1,  7,
++      WPRECALC_16_31_9, WPRECALC_16_31_10,WPRECALC_16_31_11,20,
++      W3, W4, W5, W6, W7, _, _, _ );
++
++  _R( _c, _d, _e, _a, _b, F1,  8,
++      WPRECALC_16_31_0, WPRECALC_16_31_1, WPRECALC_16_31_2, 24,
++      W2, W3, W4, W5, W6, _, _, _ );
++  _R( _b, _c, _d, _e, _a, F1,  9,
++      WPRECALC_16_31_3, WPRECALC_16_31_4, WPRECALC_16_31_5, 24,
++      W2, W3, W4, W5, W6, _, _, _ );
++  _R( _a, _b, _c, _d, _e, F1, 10,
++      WPRECALC_16_31_6, WPRECALC_16_31_7, WPRECALC_16_31_8, 24,
++      W2, W3, W4, W5, W6, _, _, _ );
++  _R( _e, _a, _b, _c, _d, F1, 11,
++      WPRECALC_16_31_9, WPRECALC_16_31_10,WPRECALC_16_31_11,24,
++      W2, W3, W4, W5, W6, _, _, _ );
++
++  _R( _d, _e, _a, _b, _c, F1, 12,
++      WPRECALC_16_31_0, WPRECALC_16_31_1, WPRECALC_16_31_2, 28,
++      W1, W2, W3, W4, W5, _, _, _ );
++  _R( _c, _d, _e, _a, _b, F1, 13,
++      WPRECALC_16_31_3, WPRECALC_16_31_4, WPRECALC_16_31_5, 28,
++      W1, W2, W3, W4, W5, _, _, _ );
++  _R( _b, _c, _d, _e, _a, F1, 14,
++      WPRECALC_16_31_6, WPRECALC_16_31_7, WPRECALC_16_31_8, 28,
++      W1, W2, W3, W4, W5, _, _, _ );
++  _R( _a, _b, _c, _d, _e, F1, 15,
++      WPRECALC_16_31_9, WPRECALC_16_31_10,WPRECALC_16_31_11,28,
++      W1, W2, W3, W4, W5, _, _, _ );
++
++  /* Transform 16-63 + Precalc 32-79. */
++  _R( _e, _a, _b, _c, _d, F1, 16,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 32,
++      W0, W1, W2, W3, W4, W5, W6, W7);
++  _R( _d, _e, _a, _b, _c, F1, 17,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 32,
++      W0, W1, W2, W3, W4, W5, W6, W7);
++  _R( _c, _d, _e, _a, _b, F1, 18,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            32,
++      W0, W1, W2, W3, W4, W5, W6, W7);
++  _R( _b, _c, _d, _e, _a, F1, 19,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 32,
++      W0, W1, W2, W3, W4, W5, W6, W7);
++
++  _R( _a, _b, _c, _d, _e, F2, 20,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 36,
++      W7, W0, W1, W2, W3, W4, W5, W6);
++  _R( _e, _a, _b, _c, _d, F2, 21,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 36,
++      W7, W0, W1, W2, W3, W4, W5, W6);
++  _R( _d, _e, _a, _b, _c, F2, 22,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            36,
++      W7, W0, W1, W2, W3, W4, W5, W6);
++  _R( _c, _d, _e, _a, _b, F2, 23,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 36,
++      W7, W0, W1, W2, W3, W4, W5, W6);
++
++  vld1.32 {curK}, [RK]!; /* Load K3. */
++  _R( _b, _c, _d, _e, _a, F2, 24,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 40,
++      W6, W7, W0, W1, W2, W3, W4, W5);
++  _R( _a, _b, _c, _d, _e, F2, 25,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 40,
++      W6, W7, W0, W1, W2, W3, W4, W5);
++  _R( _e, _a, _b, _c, _d, F2, 26,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            40,
++      W6, W7, W0, W1, W2, W3, W4, W5);
++  _R( _d, _e, _a, _b, _c, F2, 27,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 40,
++      W6, W7, W0, W1, W2, W3, W4, W5);
++
++  _R( _c, _d, _e, _a, _b, F2, 28,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 44,
++      W5, W6, W7, W0, W1, W2, W3, W4);
++  _R( _b, _c, _d, _e, _a, F2, 29,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 44,
++      W5, W6, W7, W0, W1, W2, W3, W4);
++  _R( _a, _b, _c, _d, _e, F2, 30,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            44,
++      W5, W6, W7, W0, W1, W2, W3, W4);
++  _R( _e, _a, _b, _c, _d, F2, 31,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 44,
++      W5, W6, W7, W0, W1, W2, W3, W4);
++
++  _R( _d, _e, _a, _b, _c, F2, 32,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 48,
++      W4, W5, W6, W7, W0, W1, W2, W3);
++  _R( _c, _d, _e, _a, _b, F2, 33,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 48,
++      W4, W5, W6, W7, W0, W1, W2, W3);
++  _R( _b, _c, _d, _e, _a, F2, 34,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            48,
++      W4, W5, W6, W7, W0, W1, W2, W3);
++  _R( _a, _b, _c, _d, _e, F2, 35,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 48,
++      W4, W5, W6, W7, W0, W1, W2, W3);
++
++  _R( _e, _a, _b, _c, _d, F2, 36,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 52,
++      W3, W4, W5, W6, W7, W0, W1, W2);
++  _R( _d, _e, _a, _b, _c, F2, 37,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 52,
++      W3, W4, W5, W6, W7, W0, W1, W2);
++  _R( _c, _d, _e, _a, _b, F2, 38,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            52,
++      W3, W4, W5, W6, W7, W0, W1, W2);
++  _R( _b, _c, _d, _e, _a, F2, 39,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 52,
++      W3, W4, W5, W6, W7, W0, W1, W2);
++
++  _R( _a, _b, _c, _d, _e, F3, 40,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 56,
++      W2, W3, W4, W5, W6, W7, W0, W1);
++  _R( _e, _a, _b, _c, _d, F3, 41,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 56,
++      W2, W3, W4, W5, W6, W7, W0, W1);
++  _R( _d, _e, _a, _b, _c, F3, 42,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            56,
++      W2, W3, W4, W5, W6, W7, W0, W1);
++  _R( _c, _d, _e, _a, _b, F3, 43,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 56,
++      W2, W3, W4, W5, W6, W7, W0, W1);
++
++  vld1.32 {curK}, [RK]!; /* Load K4. */
++  _R( _b, _c, _d, _e, _a, F3, 44,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 60,
++      W1, W2, W3, W4, W5, W6, W7, W0);
++  _R( _a, _b, _c, _d, _e, F3, 45,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 60,
++      W1, W2, W3, W4, W5, W6, W7, W0);
++  _R( _e, _a, _b, _c, _d, F3, 46,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            60,
++      W1, W2, W3, W4, W5, W6, W7, W0);
++  _R( _d, _e, _a, _b, _c, F3, 47,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 60,
++      W1, W2, W3, W4, W5, W6, W7, W0);
++
++  _R( _c, _d, _e, _a, _b, F3, 48,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 64,
++      W0, W1, W2, W3, W4, W5, W6, W7);
++  _R( _b, _c, _d, _e, _a, F3, 49,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 64,
++      W0, W1, W2, W3, W4, W5, W6, W7);
++  _R( _a, _b, _c, _d, _e, F3, 50,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            64,
++      W0, W1, W2, W3, W4, W5, W6, W7);
++  _R( _e, _a, _b, _c, _d, F3, 51,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 64,
++      W0, W1, W2, W3, W4, W5, W6, W7);
++
++  _R( _d, _e, _a, _b, _c, F3, 52,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 68,
++      W7, W0, W1, W2, W3, W4, W5, W6);
++  _R( _c, _d, _e, _a, _b, F3, 53,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 68,
++      W7, W0, W1, W2, W3, W4, W5, W6);
++  _R( _b, _c, _d, _e, _a, F3, 54,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            68,
++      W7, W0, W1, W2, W3, W4, W5, W6);
++  _R( _a, _b, _c, _d, _e, F3, 55,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 68,
++      W7, W0, W1, W2, W3, W4, W5, W6);
++
++  _R( _e, _a, _b, _c, _d, F3, 56,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 72,
++      W6, W7, W0, W1, W2, W3, W4, W5);
++  _R( _d, _e, _a, _b, _c, F3, 57,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 72,
++      W6, W7, W0, W1, W2, W3, W4, W5);
++  _R( _c, _d, _e, _a, _b, F3, 58,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            72,
++      W6, W7, W0, W1, W2, W3, W4, W5);
++  _R( _b, _c, _d, _e, _a, F3, 59,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 72,
++      W6, W7, W0, W1, W2, W3, W4, W5);
++
++  sub RK, #64;
++  _R( _a, _b, _c, _d, _e, F4, 60,
++      WPRECALC_32_79_0, WPRECALC_32_79_1, WPRECALC_32_79_2, 76,
++      W5, W6, W7, W0, W1, W2, W3, W4);
++  _R( _e, _a, _b, _c, _d, F4, 61,
++      WPRECALC_32_79_3, WPRECALC_32_79_4, WPRECALC_32_79_5, 76,
++      W5, W6, W7, W0, W1, W2, W3, W4);
++  _R( _d, _e, _a, _b, _c, F4, 62,
++      WPRECALC_32_79_6, WPRECALC_32_79_7, dummy,            76,
++      W5, W6, W7, W0, W1, W2, W3, W4);
++  _R( _c, _d, _e, _a, _b, F4, 63,
++      WPRECALC_32_79_8, dummy,            WPRECALC_32_79_9, 76,
++      W5, W6, W7, W0, W1, W2, W3, W4);
++
++  subs RNBLKS, #1;
++  beq .Lend;
++
++  /* Transform 64-79 + Precalc 0-15 of next block. */
++  vld1.32 {curK}, [RK]!; /* Load K1. */
++  _R( _b, _c, _d, _e, _a, F4, 64,
++      WPRECALC_00_15_0, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _a, _b, _c, _d, _e, F4, 65,
++      WPRECALC_00_15_1, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _e, _a, _b, _c, _d, F4, 66,
++      WPRECALC_00_15_2, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _d, _e, _a, _b, _c, F4, 67,
++      WPRECALC_00_15_3, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++
++  _R( _c, _d, _e, _a, _b, F4, 68,
++      dummy,            dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _b, _c, _d, _e, _a, F4, 69,
++      dummy,            dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _a, _b, _c, _d, _e, F4, 70,
++      WPRECALC_00_15_4, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _e, _a, _b, _c, _d, F4, 71,
++      WPRECALC_00_15_5, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++
++  _R( _d, _e, _a, _b, _c, F4, 72,
++      dummy,            dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _c, _d, _e, _a, _b, F4, 73,
++      dummy,            dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _b, _c, _d, _e, _a, F4, 74,
++      WPRECALC_00_15_6, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _a, _b, _c, _d, _e, F4, 75,
++      WPRECALC_00_15_7, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++
++  _R( _e, _a, _b, _c, _d, F4, 76,
++      WPRECALC_00_15_8, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _d, _e, _a, _b, _c, F4, 77,
++      WPRECALC_00_15_9, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _c, _d, _e, _a, _b, F4, 78,
++      WPRECALC_00_15_10, dummy, dummy, _, _, _, _, _, _, _, _, _ );
++  _R( _b, _c, _d, _e, _a, F4, 79,
++      WPRECALC_00_15_11, dummy, WPRECALC_00_15_12, _, _, _, _, _, _, _=
+, _, _ );
++
++  /* Update the chaining variables. */
++  ldm RSTATE, {RT0-RT2};
++  add _a, RT0;
++  ldr RT0, [RSTATE, #state_h3];
++  add _b, RT1;
++  ldr RT1, [RSTATE, #state_h4];
++  add _c, RT2;
++  add _d, RT0;
++  add _e, RT1;
++  stm RSTATE, {_a-_e};
++
++  b .Loop;
++
++.ltorg
++.Lend:
++  /* Transform 64-79 */
++  R( _b, _c, _d, _e, _a, F4, 64 );
++  R( _a, _b, _c, _d, _e, F4, 65 );
++  R( _e, _a, _b, _c, _d, F4, 66 );
++  R( _d, _e, _a, _b, _c, F4, 67 );
++  R( _c, _d, _e, _a, _b, F4, 68 );
++  R( _b, _c, _d, _e, _a, F4, 69 );
++  R( _a, _b, _c, _d, _e, F4, 70 );
++  R( _e, _a, _b, _c, _d, F4, 71 );
++  R( _d, _e, _a, _b, _c, F4, 72 );
++  R( _c, _d, _e, _a, _b, F4, 73 );
++  R( _b, _c, _d, _e, _a, F4, 74 );
++  R( _a, _b, _c, _d, _e, F4, 75 );
++  R( _e, _a, _b, _c, _d, F4, 76 );
++  R( _d, _e, _a, _b, _c, F4, 77 );
++  R( _c, _d, _e, _a, _b, F4, 78 );
++  R( _b, _c, _d, _e, _a, F4, 79 );
++
++  mov sp, ROLDSTACK;
++
++  /* Update the chaining variables. */
++  ldm RSTATE, {RT0-RT2};
++  add _a, RT0;
++  ldr RT0, [RSTATE, #state_h3];
++  add _b, RT1;
++  ldr RT1, [RSTATE, #state_h4];
++  add _c, RT2;
++  add _d, RT0;
++  /*vpop {q4-q7};*/
++  add _e, RT1;
++  stm RSTATE, {_a-_e};
++
++  pop {r4-r12, pc};
++
++.Ldo_nothing:
++  bx lr
++
++.size sha1_transform_neon,.-sha1_transform_neon
 diff --git a/arch/arm/crypto/sha1_glue.c b/arch/arm/crypto/sha1_glue.c
-index 76cd976..c494e57 100644
+index c494e57..84f2a75 100644
 --- a/arch/arm/crypto/sha1_glue.c
 +++ b/arch/arm/crypto/sha1_glue.c
-@@ -24,31 +24,25 @@
+@@ -23,6 +23,7 @@
+ #include <linux/types.h>
  #include <crypto/sha.h>
  #include <asm/byteorder.h>
- 
--struct SHA1_CTX {
--	uint32_t h0,h1,h2,h3,h4;
--	u64 count;
--	u8 data[SHA1_BLOCK_SIZE];
--};
- 
--asmlinkage void sha1_block_data_order(struct SHA1_CTX *digest,
-+asmlinkage void sha1_block_data_order(u32 *digest,
- 		const unsigned char *data, unsigned int rounds);
- 
- 
- static int sha1_init(struct shash_desc *desc)
++#include <asm/crypto/sha1.h>
+=20
+=20
+ asmlinkage void sha1_block_data_order(u32 *digest,
+@@ -65,8 +66,8 @@ static int __sha1_update(struct sha1_state *sctx, con=
+st u8 *data,
+ }
+=20
+=20
+-static int sha1_update(struct shash_desc *desc, const u8 *data,
+-			     unsigned int len)
++int sha1_update_arm(struct shash_desc *desc, const u8 *data,
++		    unsigned int len)
  {
--	struct SHA1_CTX *sctx = shash_desc_ctx(desc);
--	memset(sctx, 0, sizeof(*sctx));
--	sctx->h0 = SHA1_H0;
--	sctx->h1 = SHA1_H1;
--	sctx->h2 = SHA1_H2;
--	sctx->h3 = SHA1_H3;
--	sctx->h4 = SHA1_H4;
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
+ 	struct sha1_state *sctx =3D shash_desc_ctx(desc);
+ 	unsigned int partial =3D sctx->count % SHA1_BLOCK_SIZE;
+@@ -81,6 +82,7 @@ static int sha1_update(struct shash_desc *desc, const=
+ u8 *data,
+ 	res =3D __sha1_update(sctx, data, len, partial);
+ 	return res;
+ }
++EXPORT_SYMBOL_GPL(sha1_update_arm);
+=20
+=20
+ /* Add padding and return the message digest. */
+@@ -135,7 +137,7 @@ static int sha1_import(struct shash_desc *desc, con=
+st void *in)
+ static struct shash_alg alg =3D {
+ 	.digestsize	=3D	SHA1_DIGEST_SIZE,
+ 	.init		=3D	sha1_init,
+-	.update		=3D	sha1_update,
++	.update		=3D	sha1_update_arm,
+ 	.final		=3D	sha1_final,
+ 	.export		=3D	sha1_export,
+ 	.import		=3D	sha1_import,
+diff --git a/arch/arm/crypto/sha1_neon_glue.c b/arch/arm/crypto/sha1_ne=
+on_glue.c
+new file mode 100644
+index 0000000..6f1b411
+--- /dev/null
++++ b/arch/arm/crypto/sha1_neon_glue.c
+@@ -0,0 +1,197 @@
++/*
++ * Glue code for the SHA1 Secure Hash Algorithm assembler implementati=
+on using
++ * ARM NEON instructions.
++ *
++ * Copyright =C2=A9 2014 Jussi Kivilinna <jussi.kivilinna@iki.fi>
++ *
++ * This file is based on sha1_generic.c and sha1_ssse3_glue.c:
++ *  Copyright (c) Alan Smithee.
++ *  Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
++ *  Copyright (c) Jean-Francois Dive <jef@linuxbe.org>
++ *  Copyright (c) Mathias Krause <minipli@googlemail.com>
++ *  Copyright (c) Chandramouli Narayanan <mouli@linux.intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modif=
+y it
++ * under the terms of the GNU General Public License as published by t=
+he Free
++ * Software Foundation; either version 2 of the License, or (at your o=
+ption)
++ * any later version.
++ *
++ */
 +
-+	*sctx = (struct sha1_state){
-+		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
++#include <crypto/internal/hash.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/mm.h>
++#include <linux/cryptohash.h>
++#include <linux/types.h>
++#include <crypto/sha.h>
++#include <asm/byteorder.h>
++#include <asm/neon.h>
++#include <asm/simd.h>
++#include <asm/crypto/sha1.h>
++
++
++asmlinkage void sha1_transform_neon(void *state_h, const char *data,
++				    unsigned int rounds);
++
++
++static int sha1_neon_init(struct shash_desc *desc)
++{
++	struct sha1_state *sctx =3D shash_desc_ctx(desc);
++
++	*sctx =3D (struct sha1_state){
++		.state =3D { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
 +	};
 +
- 	return 0;
- }
- 
- 
--static int __sha1_update(struct SHA1_CTX *sctx, const u8 *data,
--			       unsigned int len, unsigned int partial)
-+static int __sha1_update(struct sha1_state *sctx, const u8 *data,
-+			 unsigned int len, unsigned int partial)
- {
- 	unsigned int done = 0;
- 
-@@ -56,17 +50,17 @@ static int __sha1_update(struct SHA1_CTX *sctx, const u8 *data,
- 
- 	if (partial) {
- 		done = SHA1_BLOCK_SIZE - partial;
--		memcpy(sctx->data + partial, data, done);
--		sha1_block_data_order(sctx, sctx->data, 1);
++	return 0;
++}
++
++static int __sha1_neon_update(struct shash_desc *desc, const u8 *data,
++			       unsigned int len, unsigned int partial)
++{
++	struct sha1_state *sctx =3D shash_desc_ctx(desc);
++	unsigned int done =3D 0;
++
++	sctx->count +=3D len;
++
++	if (partial) {
++		done =3D SHA1_BLOCK_SIZE - partial;
 +		memcpy(sctx->buffer + partial, data, done);
-+		sha1_block_data_order(sctx->state, sctx->buffer, 1);
- 	}
- 
- 	if (len - done >= SHA1_BLOCK_SIZE) {
- 		const unsigned int rounds = (len - done) / SHA1_BLOCK_SIZE;
--		sha1_block_data_order(sctx, data + done, rounds);
-+		sha1_block_data_order(sctx->state, data + done, rounds);
- 		done += rounds * SHA1_BLOCK_SIZE;
- 	}
- 
--	memcpy(sctx->data, data + done, len - done);
++		sha1_transform_neon(sctx->state, sctx->buffer, 1);
++	}
++
++	if (len - done >=3D SHA1_BLOCK_SIZE) {
++		const unsigned int rounds =3D (len - done) / SHA1_BLOCK_SIZE;
++
++		sha1_transform_neon(sctx->state, data + done, rounds);
++		done +=3D rounds * SHA1_BLOCK_SIZE;
++	}
++
 +	memcpy(sctx->buffer, data + done, len - done);
- 	return 0;
- }
- 
-@@ -74,14 +68,14 @@ static int __sha1_update(struct SHA1_CTX *sctx, const u8 *data,
- static int sha1_update(struct shash_desc *desc, const u8 *data,
- 			     unsigned int len)
- {
--	struct SHA1_CTX *sctx = shash_desc_ctx(desc);
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
- 	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
- 	int res;
- 
- 	/* Handle the fast case right here */
- 	if (partial + len < SHA1_BLOCK_SIZE) {
- 		sctx->count += len;
--		memcpy(sctx->data + partial, data, len);
++
++	return 0;
++}
++
++static int sha1_neon_update(struct shash_desc *desc, const u8 *data,
++			     unsigned int len)
++{
++	struct sha1_state *sctx =3D shash_desc_ctx(desc);
++	unsigned int partial =3D sctx->count % SHA1_BLOCK_SIZE;
++	int res;
++
++	/* Handle the fast case right here */
++	if (partial + len < SHA1_BLOCK_SIZE) {
++		sctx->count +=3D len;
 +		memcpy(sctx->buffer + partial, data, len);
- 		return 0;
- 	}
- 	res = __sha1_update(sctx, data, len, partial);
-@@ -92,7 +86,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
- /* Add padding and return the message digest. */
- static int sha1_final(struct shash_desc *desc, u8 *out)
- {
--	struct SHA1_CTX *sctx = shash_desc_ctx(desc);
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
- 	unsigned int i, index, padlen;
- 	__be32 *dst = (__be32 *)out;
- 	__be64 bits;
-@@ -106,7 +100,7 @@ static int sha1_final(struct shash_desc *desc, u8 *out)
- 	/* We need to fill a whole block for __sha1_update() */
- 	if (padlen <= 56) {
- 		sctx->count += padlen;
--		memcpy(sctx->data + index, padding, padlen);
-+		memcpy(sctx->buffer + index, padding, padlen);
- 	} else {
- 		__sha1_update(sctx, padding, padlen, index);
- 	}
-@@ -114,7 +108,7 @@ static int sha1_final(struct shash_desc *desc, u8 *out)
- 
- 	/* Store state in digest */
- 	for (i = 0; i < 5; i++)
--		dst[i] = cpu_to_be32(((u32 *)sctx)[i]);
-+		dst[i] = cpu_to_be32(sctx->state[i]);
- 
- 	/* Wipe context */
- 	memset(sctx, 0, sizeof(*sctx));
-@@ -124,7 +118,7 @@ static int sha1_final(struct shash_desc *desc, u8 *out)
- 
- static int sha1_export(struct shash_desc *desc, void *out)
- {
--	struct SHA1_CTX *sctx = shash_desc_ctx(desc);
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
- 	memcpy(out, sctx, sizeof(*sctx));
- 	return 0;
- }
-@@ -132,7 +126,7 @@ static int sha1_export(struct shash_desc *desc, void *out)
- 
- static int sha1_import(struct shash_desc *desc, const void *in)
- {
--	struct SHA1_CTX *sctx = shash_desc_ctx(desc);
-+	struct sha1_state *sctx = shash_desc_ctx(desc);
- 	memcpy(sctx, in, sizeof(*sctx));
- 	return 0;
- }
-@@ -145,8 +139,8 @@ static struct shash_alg alg = {
- 	.final		=	sha1_final,
- 	.export		=	sha1_export,
- 	.import		=	sha1_import,
--	.descsize	=	sizeof(struct SHA1_CTX),
--	.statesize	=	sizeof(struct SHA1_CTX),
-+	.descsize	=	sizeof(struct sha1_state),
-+	.statesize	=	sizeof(struct sha1_state),
- 	.base		=	{
- 		.cra_name	=	"sha1",
- 		.cra_driver_name=	"sha1-asm",
++
++		return 0;
++	}
++
++	if (!may_use_simd()) {
++		res =3D sha1_update_arm(desc, data, len);
++	} else {
++		kernel_neon_begin();
++		res =3D __sha1_neon_update(desc, data, len, partial);
++		kernel_neon_end();
++	}
++
++	return res;
++}
++
++
++/* Add padding and return the message digest. */
++static int sha1_neon_final(struct shash_desc *desc, u8 *out)
++{
++	struct sha1_state *sctx =3D shash_desc_ctx(desc);
++	unsigned int i, index, padlen;
++	__be32 *dst =3D (__be32 *)out;
++	__be64 bits;
++	static const u8 padding[SHA1_BLOCK_SIZE] =3D { 0x80, };
++
++	bits =3D cpu_to_be64(sctx->count << 3);
++
++	/* Pad out to 56 mod 64 and append length */
++	index =3D sctx->count % SHA1_BLOCK_SIZE;
++	padlen =3D (index < 56) ? (56 - index) : ((SHA1_BLOCK_SIZE+56) - inde=
+x);
++	if (!may_use_simd()) {
++		sha1_update_arm(desc, padding, padlen);
++		sha1_update_arm(desc, (const u8 *)&bits, sizeof(bits));
++	} else {
++		kernel_neon_begin();
++		/* We need to fill a whole block for __sha1_neon_update() */
++		if (padlen <=3D 56) {
++			sctx->count +=3D padlen;
++			memcpy(sctx->buffer + index, padding, padlen);
++		} else {
++			__sha1_neon_update(desc, padding, padlen, index);
++		}
++		__sha1_neon_update(desc, (const u8 *)&bits, sizeof(bits), 56);
++		kernel_neon_end();
++	}
++
++	/* Store state in digest */
++	for (i =3D 0; i < 5; i++)
++		dst[i] =3D cpu_to_be32(sctx->state[i]);
++
++	/* Wipe context */
++	memset(sctx, 0, sizeof(*sctx));
++
++	return 0;
++}
++
++static int sha1_neon_export(struct shash_desc *desc, void *out)
++{
++	struct sha1_state *sctx =3D shash_desc_ctx(desc);
++
++	memcpy(out, sctx, sizeof(*sctx));
++
++	return 0;
++}
++
++static int sha1_neon_import(struct shash_desc *desc, const void *in)
++{
++	struct sha1_state *sctx =3D shash_desc_ctx(desc);
++
++	memcpy(sctx, in, sizeof(*sctx));
++
++	return 0;
++}
++
++static struct shash_alg alg =3D {
++	.digestsize	=3D	SHA1_DIGEST_SIZE,
++	.init		=3D	sha1_neon_init,
++	.update		=3D	sha1_neon_update,
++	.final		=3D	sha1_neon_final,
++	.export		=3D	sha1_neon_export,
++	.import		=3D	sha1_neon_import,
++	.descsize	=3D	sizeof(struct sha1_state),
++	.statesize	=3D	sizeof(struct sha1_state),
++	.base		=3D	{
++		.cra_name		=3D "sha1",
++		.cra_driver_name	=3D "sha1-neon",
++		.cra_priority		=3D 250,
++		.cra_flags		=3D CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize		=3D SHA1_BLOCK_SIZE,
++		.cra_module		=3D THIS_MODULE,
++	}
++};
++
++static int __init sha1_neon_mod_init(void)
++{
++	if (!cpu_has_neon())
++		return -ENODEV;
++
++	return crypto_register_shash(&alg);
++}
++
++static void __exit sha1_neon_mod_fini(void)
++{
++	crypto_unregister_shash(&alg);
++}
++
++module_init(sha1_neon_mod_init);
++module_exit(sha1_neon_mod_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm, NEON accelerated");
++MODULE_ALIAS("sha1");
+diff --git a/arch/arm/include/asm/crypto/sha1.h b/arch/arm/include/asm/=
+crypto/sha1.h
+new file mode 100644
+index 0000000..75e6a41
+--- /dev/null
++++ b/arch/arm/include/asm/crypto/sha1.h
+@@ -0,0 +1,10 @@
++#ifndef ASM_ARM_CRYPTO_SHA1_H
++#define ASM_ARM_CRYPTO_SHA1_H
++
++#include <linux/crypto.h>
++#include <crypto/sha.h>
++
++extern int sha1_update_arm(struct shash_desc *desc, const u8 *data,
++			   unsigned int len);
++
++#endif
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 025c510..66d7ce1 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -540,6 +540,17 @@ config CRYPTO_SHA1_ARM
+ 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
+ 	  using optimized ARM assembler.
+=20
++config CRYPTO_SHA1_ARM_NEON
++	tristate "SHA1 digest algorithm (ARM NEON)"
++	depends on ARM && KERNEL_MODE_NEON && !CPU_BIG_ENDIAN
++	select CRYPTO_SHA1_ARM
++	select CRYPTO_SHA1
++	select CRYPTO_HASH
++	help
++	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
++	  using optimized ARM NEON assembly, when NEON instructions are
++	  available.
++
+ config CRYPTO_SHA1_PPC
+ 	tristate "SHA1 digest algorithm (powerpc)"
+ 	depends on PPC
