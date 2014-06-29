@@ -1,174 +1,110 @@
-From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
-Subject: Re: [PATCH 2/2] crypto: sha1: add ARM NEON implementation
-Date: Sun, 29 Jun 2014 14:25:20 +0300
-Message-ID: <53AFF7A0.1000306@iki.fi>
-References: <20140628103959.24628.55994.stgit@localhost6.localdomain6>	<20140628104004.24628.72714.stgit@localhost6.localdomain6> <CAKv+Gu9uWr6E2DT7Nz35k8YVG_zypktMkkdPKUKncPJ=xo2Lsw@mail.gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 2/4] DRBG: cleanup of preprocessor macros
+Date: Sun, 29 Jun 2014 13:37:05 +0200
+Message-ID: <1616464.nTZ4WdyPoM@myon.chronox.de>
+References: <4927386.WYHrRe3NJm@myon.chronox.de> <3104100.drOBnqUFp8@myon.chronox.de> <53AFC322.2060109@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Russell King <linux@arm.linux.org.uk>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+	kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
+	Dan Carpenter <dan.carpenter@oracle.com>,
+	linux-crypto@vger.kernel.org, linux-next@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:55013 "EHLO mail.kapsi.fi"
+Received: from mail.eperm.de ([89.247.134.16]:34511 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751001AbaF2LZe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 29 Jun 2014 07:25:34 -0400
-In-Reply-To: <CAKv+Gu9uWr6E2DT7Nz35k8YVG_zypktMkkdPKUKncPJ=xo2Lsw@mail.gmail.com>
+	id S1751865AbaF2LiW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 29 Jun 2014 07:38:22 -0400
+Received: from myon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S224> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Sun, 29 Jun 2014 13:37:12 +0200
+In-Reply-To: <53AFC322.2060109@infradead.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 28.06.2014 23:07, Ard Biesheuvel wrote:> Hi Jussi,
->=20
-> On 28 June 2014 12:40, Jussi Kivilinna <jussi.kivilinna@iki.fi> wrote=
-:
->> This patch adds ARM NEON assembly implementation of SHA-1 algorithm.
->>
->> tcrypt benchmark results on Cortex-A8, sha1-arm-asm vs sha1-neon-asm=
-:
->>
->> block-size      bytes/update    old-vs-new
->> 16              16              1.06x
->> 64              16              1.05x
->> 64              64              1.09x
->> 256             16              1.04x
->> 256             64              1.11x
->> 256             256             1.28x
->> 1024            16              1.04x
->> 1024            256             1.34x
->> 1024            1024            1.42x
->> 2048            16              1.04x
->> 2048            256             1.35x
->> 2048            1024            1.44x
->> 2048            2048            1.46x
->> 4096            16              1.04x
->> 4096            256             1.36x
->> 4096            1024            1.45x
->> 4096            4096            1.48x
->> 8192            16              1.04x
->> 8192            256             1.36x
->> 8192            1024            1.46x
->> 8192            4096            1.49x
->> 8192            8192            1.49x
->>
->=20
-> This is a nice result: about the same speedup as OpenSSL when
-> comparing the ALU asm implementation with the NEON.
->=20
->> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
->> ---
->>  arch/arm/crypto/Makefile           |    2
->>  arch/arm/crypto/sha1-armv7-neon.S  |  635 +++++++++++++++++++++++++=
-+++++++++++
->>  arch/arm/crypto/sha1_glue.c        |    8
->>  arch/arm/crypto/sha1_neon_glue.c   |  197 +++++++++++
->>  arch/arm/include/asm/crypto/sha1.h |   10 +
->>  crypto/Kconfig                     |   11 +
->>  6 files changed, 860 insertions(+), 3 deletions(-)
->>  create mode 100644 arch/arm/crypto/sha1-armv7-neon.S
->>  create mode 100644 arch/arm/crypto/sha1_neon_glue.c
->>  create mode 100644 arch/arm/include/asm/crypto/sha1.h
->>
->> diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
->> index 81cda39..374956d 100644
->> --- a/arch/arm/crypto/Makefile
->> +++ b/arch/arm/crypto/Makefile
->> @@ -5,10 +5,12 @@
->>  obj-$(CONFIG_CRYPTO_AES_ARM) +=3D aes-arm.o
->>  obj-$(CONFIG_CRYPTO_AES_ARM_BS) +=3D aes-arm-bs.o
->>  obj-$(CONFIG_CRYPTO_SHA1_ARM) +=3D sha1-arm.o
->> +obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) +=3D sha1-arm-neon.o
->>
->>  aes-arm-y      :=3D aes-armv4.o aes_glue.o
->>  aes-arm-bs-y   :=3D aesbs-core.o aesbs-glue.o
->>  sha1-arm-y     :=3D sha1-armv4-large.o sha1_glue.o
->> +sha1-arm-neon-y        :=3D sha1-armv7-neon.o sha1_neon_glue.o
->>
->>  quiet_cmd_perl =3D PERL    $@
->>        cmd_perl =3D $(PERL) $(<) > $(@)
->> diff --git a/arch/arm/crypto/sha1-armv7-neon.S b/arch/arm/crypto/sha=
-1-armv7-neon.S
->> new file mode 100644
->> index 0000000..beb1ed1
->> --- /dev/null
->> +++ b/arch/arm/crypto/sha1-armv7-neon.S
->> @@ -0,0 +1,635 @@
->> +/* sha1-armv7-neon.S - ARM/NEON accelerated SHA-1 transform functio=
-n
->> + *
->> + * Copyright =C2=A9 2013-2014 Jussi Kivilinna <jussi.kivilinna@iki.=
-fi>
->> + *
->> + * This program is free software; you can redistribute it and/or mo=
-dify it
->> + * under the terms of the GNU General Public License as published b=
-y the Free
->> + * Software Foundation; either version 2 of the License, or (at you=
-r option)
->> + * any later version.
->> + */
->> +
->> +.syntax unified
->> +#ifdef __thumb2__
->> +.thumb
->> +#else
->> +.code   32
->> +#endif
->=20
-> This is all NEON code, which has no size benefit from being assembled
-> as Thumb-2. (NEON instructions are 4 bytes in either case)
-> If we drop the Thumb-2 versions, there's one less version to test.
->=20
+Am Sonntag, 29. Juni 2014, 00:41:22 schrieb Randy Dunlap:
 
-Ok, I'll drop the .thumb part for both SHA1 and SHA512.
+Hi Randy,
 
->> +.fpu neon
->> +
->> +.data
->> +
->> +#define GET_DATA_POINTER(reg, name, rtmp) ldr reg, =3Dname
->> +
-> [...]
->> +.align 4
->> +.LK_VEC:
->> +.LK1:  .long K1, K1, K1, K1
->> +.LK2:  .long K2, K2, K2, K2
->> +.LK3:  .long K3, K3, K3, K3
->> +.LK4:  .long K4, K4, K4, K4
->=20
-> If you are going to put these constants in a different section, they
-> belong in .rodata not .data.
-> But why not just keep them in .text? In that case, you can replace th=
-e
-> above 'ldr reg, =3Dname' with 'adr reg ,name' (or adrl if required) a=
-nd
-> get rid of the .ltorg and the literal pool.
->=20
+> On 06/28/14 22:07, Stephan Mueller wrote:
+> > Am Sonntag, 29. Juni 2014, 12:20:15 schrieb Stephen Rothwell:
+> > 
+> > Hi Stephen,
+> > 
+> >> Hi Stephan,
+> >> 
+> >> On Sat, 28 Jun 2014 22:00:07 +0200 Stephan Mueller <smueller@chronox.de>
+> > 
+> > wrote:
+> >>> diff --git a/crypto/drbg.c b/crypto/drbg.c
+> >>> index 6679a26..03a230e 100644
+> >>> --- a/crypto/drbg.c
+> >>> +++ b/crypto/drbg.c
+> >>> @@ -102,8 +102,13 @@
+> >>> 
+> >>>  #if !defined(CONFIG_CRYPTO_DRBG_HASH) && \
+> >>>  
+> >>>  	!defined(CONFIG_CRYPTO_DRBG_HMAC) && \
+> >>>  	!defined(CONFIG_CRYPTO_DRBG_CTR)
+> >>> 
+> >>> -#warning "The DRBG code is useless without compiling at least one DRBG
+> >>> type" -#endif
+> >>> +#define CRYPTO_DRBG_NONE_STRING "none "
+> >>> +static int __init drbg_init(void)
+> >>> +{
+> >>> +	pr_warn("DRBG: no DRBG core was compiled!\n");
+> >>> +	return -EFAULT;
+> >>> +}
+> >>> +#else
+> >> 
+> >> Wouldn't this be better handled by Kconfig so that we don't even try to
+> >> build this unless one of the required core modules is chosen?
+> > 
+> > I tried that, but it seems that my Kconfig Foo is not too well: adding the
+> > DRBG cores to the depends line of CRYPTO_DRBG as indicated in the
+> > following, I have a circular dependency. With that circular dependency,
+> > the DRBG entries do not show up in make menuconfig.
+> > 
+> > menuconfig CRYTPO_DRBG
+> > 
+> >         tristate "NIST SP800-90A DRBG"
+> >         depends on CRYPTO && (CRYPTO_DRBG_HMAC || CRYPTO_DRBG_CTR ||
+> > 
+> > CRYPTO_DRBG_HASH)
+> > ...
+> > 
+> > if CRYTPO_DRBG
+> > 
+> > config CRYPTO_DRBG_HMAC
+> > 
+> >         bool "Enable HMAC DRBG"
+> >         default y
+> >         depends on CRYTPO_DRBG
+> > 
+> > Do you have a working solution in mind? The goal is that once CRYPTO_DRBG
+> > is selected, at least one of the DRBG cores must be selected.
+> 
+> That sounds like a 'choice' Kconfig could be used.
+> Have you looked at that possibility?
+> 
+> See Documentation/kbuild/kconfig-language.txt and search for 'choice'.
 
-Ok, I'll move these to .text.
+When looking into the documentation and trying it I found:
 
-Actually I realized that these values can be loaded to still free NEON
-registers for additional speed up.
+- bool choices allow me to only select one option, and only one
 
->> +/*
->> + * Transform nblks*64 bytes (nblks*16 32-bit words) at DATA.
->> + *
->> + * unsigned int
->> + * sha1_transform_neon (void *ctx, const unsigned char *data,
->> + *                      unsigned int nblks)
->> + */
->> +.align 3
->> +.globl sha1_transform_neon
->> +.type  sha1_transform_neon,%function;
->> +
->> +sha1_transform_neon:
->=20
-> ENTRY(sha1_transform_neon) [and matching ENDPROC() below]
+- tristate choices allow me to only select one option, if the initial tristate 
+is set to yes. If the initial tristate is set to module, it allows zero to all 
+options to be set.
 
-Sure.
+That said, neither covers my requirement here: require that at least one 
+option is set, but allow more options.
 
--Jussi
+Thanks
+Stephan
+-- 
+| Cui bono? |
