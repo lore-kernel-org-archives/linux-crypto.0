@@ -1,44 +1,78 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 0/4] DRBG: Fixes for sparse tool reports
-Date: Sat, 28 Jun 2014 21:57:49 +0200
-Message-ID: <4927386.WYHrRe3NJm@myon.chronox.de>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH 2/4] DRBG: cleanup of preprocessor macros
+Date: Sun, 29 Jun 2014 12:20:15 +1000
+Message-ID: <20140629122015.43f5178a@canb.auug.org.au>
+References: <4927386.WYHrRe3NJm@myon.chronox.de>
+	<1949550.LXKdkPOvgm@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/r2RpfK=210Dsaq_b2OqAnop"; protocol="application/pgp-signature"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
 	Dan Carpenter <dan.carpenter@oracle.com>,
 	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
 	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:43654 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753031AbaF1UOB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 28 Jun 2014 16:14:01 -0400
-Received: from myon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S21E> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sat, 28 Jun 2014 22:13:07 +0200
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <1949550.LXKdkPOvgm@myon.chronox.de>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+--Sig_/r2RpfK=210Dsaq_b2OqAnop
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-The following patches cover requested changes based on the sparse tool test
-run and suggestions by peer reviewers.
+Hi Stephan,
 
-In addition, a patch to make the CTR DRBG more efficient is added.
+On Sat, 28 Jun 2014 22:00:07 +0200 Stephan Mueller <smueller@chronox.de> wr=
+ote:
+>
+> diff --git a/crypto/drbg.c b/crypto/drbg.c
+> index 6679a26..03a230e 100644
+> --- a/crypto/drbg.c
+> +++ b/crypto/drbg.c
+> @@ -102,8 +102,13 @@
+>  #if !defined(CONFIG_CRYPTO_DRBG_HASH) && \
+>  	!defined(CONFIG_CRYPTO_DRBG_HMAC) && \
+>  	!defined(CONFIG_CRYPTO_DRBG_CTR)
+> -#warning "The DRBG code is useless without compiling at least one DRBG t=
+ype"
+> -#endif
+> +#define CRYPTO_DRBG_NONE_STRING "none "
+> +static int __init drbg_init(void)
+> +{
+> +	pr_warn("DRBG: no DRBG core was compiled!\n");
+> +	return -EFAULT;
+> +}
+> +#else
 
-Stephan Mueller (4):
-  DRBG: use of kernel linked list
-  DRBG: cleanup of preprocessor macros
-  DRBG: Fix format string for debugging statements
-  DRBG: Call CTR DRBG DF function only once
+Wouldn't this be better handled by Kconfig so that we don't even try to
+build this unless one of the required core modules is chosen?
 
- crypto/drbg.c         | 302 ++++++++++++++++++++++++++++----------------------
- include/crypto/drbg.h |   7 +-
- 2 files changed, 174 insertions(+), 135 deletions(-)
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
 
--- 
-1.9.3
+--Sig_/r2RpfK=210Dsaq_b2OqAnop
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJTr3flAAoJEMDTa8Ir7ZwVpUYQAIzvzGuLo5R4I5C8z5PWTB06
+Gdu+7Tps16ZNFfZGDs6SGfLz14HcXeJ7oCoKzDbNEwzuKpKjEYIXF9Oy1Dn7YIp5
+tONPZfxZx0RMloBwFTDaotJfjVEhVQ4VRT/LOH7nWNPSBVmzBsSInM9IyrP9AiTY
+zLxzVO34OgYPK5s3zdB7GeIPMN28dhjKNVr827Wlh5jcsj4Nt4ULK08U5cTn3oTa
+aX3ctijS8vWmDKGFv4FPaKc44lcSRR8k5O0qT2N/5DsCl66dDGiC2hEVacRGpui4
+p/Webmkjelpnm4+6BHDgHWYcHs6NCFcJkUi8o4J7CPtJb5MjdbYV+HAz6rbNA1gL
+LGCSwyoI29gdZkR2eIr3wWfmBlZEi9Z/UOSI7GLJ+UJd8Gq5XMG5I8zxnY02olhT
+EeltG9nuhuqwZlhkZqh3G8zI2tH4dWEUpGS7iZ0qrcvZHROfXrqXVJHZM+yC5rmM
+9Fhb8qS0h9BufEARyNbWEmhFfhi+xPJfNd5cX+1mpD7pDLD8Ey3nsO2O94HvwXTO
+dclQ0oyUS4eh9CXWMLcW4Hvr57WtL8PHHadBrvY1XQHvKX19c5UCBMKf0IqRE4da
+x954BzBCvqg7g4WkPq7Ud24SHytuMnK8wAgL7qBYFLIZGOPzkaMWEOxNM6VhBfLu
+WU7XmuWQSooVReV/NNi4
+=qp+F
+-----END PGP SIGNATURE-----
+
+--Sig_/r2RpfK=210Dsaq_b2OqAnop--
