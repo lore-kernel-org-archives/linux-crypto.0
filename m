@@ -1,70 +1,68 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [crypto] BUG: unable to handle kernel paging request at ffff88000bb88000
-Date: Sun, 29 Jun 2014 21:45:48 +0200
-Message-ID: <42550233.Kxs179MjQV@myon.chronox.de>
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: Re: [crypto] BUG: unable to handle kernel paging request at
+ ffff88000bb88000
+Date: Mon, 30 Jun 2014 13:31:26 +0800
+Message-ID: <20140630053126.GA13887@localhost>
 References: <20140629145246.GA9134@localhost>
+ <42550233.Kxs179MjQV@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	Jet Chen <jet.chen@intel.com>, Su Tao <tao.su@intel.com>,
 	Yuanhan Liu <yuanhan.liu@intel.com>, LKP <lkp@01.org>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	aris@redhat.com, aquini@redhat.com
-To: Fengguang Wu <fengguang.wu@intel.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47487 "EHLO mail.eperm.de"
+Received: from mga14.intel.com ([192.55.52.115]:65133 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753479AbaF2TrI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 29 Jun 2014 15:47:08 -0400
-Received: from myon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S225> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sun, 29 Jun 2014 21:45:55 +0200
-In-Reply-To: <20140629145246.GA9134@localhost>
+	id S1751112AbaF3Fba (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 30 Jun 2014 01:31:30 -0400
+Content-Disposition: inline
+In-Reply-To: <42550233.Kxs179MjQV@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Sonntag, 29. Juni 2014, 22:52:46 schrieb Fengguang Wu:
+Hi Stephan,
 
-Hi Fengguang,
-
-> Greetings,
+On Sun, Jun 29, 2014 at 09:45:48PM +0200, Stephan Mueller wrote:
+> Am Sonntag, 29. Juni 2014, 22:52:46 schrieb Fengguang Wu:
 > 
-> 0day kernel testing robot got the below dmesg and the first bad commit is
+> Hi Fengguang,
+> 
+> > Greetings,
+> > 
+> > 0day kernel testing robot got the below dmesg and the first bad commit is
+> 
+> May I ask whether there is anything special in your kernel config?
 
-May I ask whether there is anything special in your kernel config?
+It's an x86_64 randconfig. You may find it in the attachment of the
+original report email.
 
-This very bug should have been triggered already in all previous code levels! 
-I am seriously wondering why this bug was not triggered before -- does kalloc 
-somehow allocates more memory than you requested? And only your specific 
-kernel config made kalloc to allocate the exact amount of memory that was 
-requested?
+> This very bug should have been triggered already in all previous code levels! 
+> I am seriously wondering why this bug was not triggered before -- does kalloc 
+> somehow allocates more memory than you requested? And only your specific 
+> kernel config made kalloc to allocate the exact amount of memory that was 
+> requested?
 
-The background can be summarized by the following: the scratchpad->temp buffer 
-(i.e. the memory location immediately before the tfm variable upon which the 
-kernel crashed) is the buffer that the BCC function operates on. BCC operates 
-blockwise. drbg_statelen(drbg) is sufficient when the DRBG state length is a 
-multiple of the block size. For AES192 (and maybe other ciphers) this is not 
-correct and the length for temp is insufficient (yes, that also means for such 
-ciphers, the final output of all BCC rounds are truncated before used to 
-update the state of the DRBG!!).
+Yeah the bug may have been triggered in other places. If you see
+anything valuable from this bisect result, it would be great. Judging
+from the comparison of 64d1cdfbe2 and its parent commit 3332ee2a17,
+it's pretty reproducible, so easy to verify the possible fixes.
 
-The DRBG code that triggered the bug defined the buffer to be drbg_statelen() 
-in size. As described, the bug therefore triggered with the AES192 cipher. The 
-patch is simply to enlarge the buffer by blocklen. This ensures that we have 
-no memory corruption.
++----------------------------------------------------------------------------+------------+------------+
+|                                                                            | 3332ee2a17 | 64d1cdfbe2 |
++----------------------------------------------------------------------------+------------+------------+
+| boot_successes                                                             | 81         | 3          |
+| boot_failures                                                              | 0          | 23         |
+| BUG:unable_to_handle_kernel_paging_request                                 | 0          | 20         |
+| Oops                                                                       | 0          | 19         |
+| RIP:kzfree                                                                 | 0          | 15         |
+| WARNING:CPU:PID:at_kernel/rcu/tree.c:rcu_do_batch()                        | 0          | 9          |
+| backtrace:cryptomgr_test                                                   | 0          | 18         |
+| backtrace:cpu_startup_entry                                                | 0          | 3          |
+| kernel_BUG_at_include/linux/mm.h                                           | 0          | 1          |
+...
 
-An official patch is created and released shortly.
-
-More and more I look into and work with SP800-90A, I feel that at least the 
-CTR DRBG and to a lesser degree the Hash DRBG have severe shortcomings. 
-Throwing away information derived from the seed by the aforementioned 
-truncation is definitely not wise. This truncation is in addition to other 
-very odd operations on the seed definitely result in a loss of entropy IMHO.
-
-Though, thanks a lot for the bug report and your testing.
-
--- 
-Ciao
-Stephan
+Thanks,
+Fengguang
