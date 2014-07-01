@@ -1,66 +1,131 @@
 From: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
-Subject: [PATCH v2 0/3] ima: use asynchronous hash API for hash calculation
-Date: Tue,  1 Jul 2014 23:12:48 +0300
-Message-ID: <cover.1404245510.git.d.kasatkin@samsung.com>
+Subject: [PATCH v2 3/3] ima: provide double buffering for hash calculation
+Date: Tue,  1 Jul 2014 23:12:51 +0300
+Message-ID: <6ea50cc1ab984b5dd98e61be0c709a0b82d89dfb.1404245510.git.d.kasatkin@samsung.com>
+References: <cover.1404245510.git.d.kasatkin@samsung.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	Dmitry Kasatkin <d.kasatkin@samsung.com>
 To: zohar@linux.vnet.ibm.com, linux-ima-devel@lists.sourceforge.net,
 	linux-security-module@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:37134 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754356AbaGAUOF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Jul 2014 16:14:05 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+In-Reply-To: <cover.1404245510.git.d.kasatkin@samsung.com>
+In-Reply-To: <cover.1404245510.git.d.kasatkin@samsung.com>
+References: <cover.1404245510.git.d.kasatkin@samsung.com>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Depending on the IMA policy, it might require to measure huge amount of files.
-It may be very important to speedup hash calculation or to reduce (bettery)
-energy required to do it. Currently IMA uses synchronous hash API (shash)
-which is CPU based. CPU based hash calculation is very CPU intensive and on the
-battery powered device will be also high energy consuming.
+Asynchronous hash API allows initiate hash calculation and perform
+other tasks while hash is calculated.
 
-Many platforms provide cryptographic acceleration modules which allow speedup
-and/or reduce energy consumption, and provide asynchronous way to calculate
-hashes. Defacto way to implement drivers for such accelerators is using
-asynchronous hash API (ahash).
+This patch introduces usage of double buffering for simultaneous
+hashing and reading of the next chunk of data from the storage.
 
-The first patch adds use of ahash API to IMA. Performance of using HW
-acceleration depends very much on amount of data to hash and it depends
-on particular HW. It is usually inefficient for small data due to HW
-initialization overhead. In order to make it possible to optimize performance
-for particular system, the patch provides kernel parameter
-'ima_ahash=<min_file_size>', which allows to specify optimal file size
-when start using ahash. By default ahash is disabled until non-zero value
-with 'ima_ahash=' is provided.
+Signed-off-by: Dmitry Kasatkin <d.kasatkin@samsung.com>
+---
+ security/integrity/ima/ima_crypto.c | 63 +++++++++++++++++++++++++++----------
+ 1 file changed, 47 insertions(+), 16 deletions(-)
 
-Second patch introduces multi-page buffers which makes HW acceleration more
-efficient. It extends 'ima_ahash' kernel parameter to specify buffer size:
-'ima_ahash=<min_file_size>[,<bufsize>]'
-
-Third patch introduces double-buffering which allows to readahead next portion
-of data for hashing while calculating the hash.
-
-Changes to v1:
-- ima_ahash_size and ima_ahash_bufsize were combined as ima_ahash
-- ahash pre-allocation moved out from __init code to be able to use
-  ahash crypto modules. Ahash allocated once on the first use.
-- hash calculation falls back to sahsh if ahash allocation/calculation fails
-- complex initialization separated from variable declaration
-- improved comments
-
-- Dmitry
-
-
-Dmitry Kasatkin (3):
-  ima: use ahash API for file hash calculation
-  ima: introduce multi-page collect buffers
-  ima: provide double buffering for hash calculation
-
- Documentation/kernel-parameters.txt |   6 +
- security/integrity/ima/ima_crypto.c | 287 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 290 insertions(+), 3 deletions(-)
-
+diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/ima/ima_crypto.c
+index 41f2695..69d55a7 100644
+--- a/security/integrity/ima/ima_crypto.c
++++ b/security/integrity/ima/ima_crypto.c
+@@ -239,12 +239,12 @@ static int ima_calc_file_hash_atfm(struct file *file,
+ 				   struct crypto_ahash *tfm)
+ {
+ 	loff_t i_size, offset;
+-	char *rbuf;
+-	int rc, read = 0, rbuf_len;
++	char *rbuf[2] = { NULL, };
++	int rc, read = 0, rbuf_len, active = 0, ahash_rc = 0;
+ 	struct ahash_request *req;
+ 	struct scatterlist sg[1];
+ 	struct ahash_completion res;
+-	size_t rbuf_size;
++	size_t rbuf_size[2];
+ 
+ 	hash->length = crypto_ahash_digestsize(tfm);
+ 
+@@ -270,36 +270,67 @@ static int ima_calc_file_hash_atfm(struct file *file,
+ 	 * Try to allocate maximum size of memory, fail if not even single
+ 	 * page cannot be allocated.
+ 	 */
+-	rbuf = ima_alloc_pages(i_size, &rbuf_size, 1);
+-	if (!rbuf) {
++	rbuf[0] = ima_alloc_pages(i_size, &rbuf_size[0], 1);
++	if (!rbuf[0]) {
+ 		rc = -ENOMEM;
+ 		goto out1;
+ 	}
+ 
++	/* Only allocate one buffer if that is enough. */
++	if (i_size > rbuf_size[0]) {
++		/*
++		 * Try to allocate secondary buffer if that fails fallback to
++		 * using single buffering. Use previous memory allocation size
++		 * as baseline for possible allocation size.
++		 */
++		rbuf[1] = ima_alloc_pages(i_size - rbuf_size[0],
++					  &rbuf_size[1], 0);
++	}
++
+ 	if (!(file->f_mode & FMODE_READ)) {
+ 		file->f_mode |= FMODE_READ;
+ 		read = 1;
+ 	}
+ 
+ 	for (offset = 0; offset < i_size; offset += rbuf_len) {
+-		rbuf_len = ima_kernel_read(file, offset, rbuf, PAGE_SIZE);
+-		if (rbuf_len < 0) {
+-			rc = rbuf_len;
+-			break;
++		if (!rbuf[1] && offset) {
++			/* if we do not use second buffer and it is not the
++			 * the first read/request, then wait for completion
++			 */
++			rc = ahash_wait(ahash_rc, &res);
++			if (rc)
++				goto out3;
++		}
++		/* read buffer */
++		rbuf_len = min_t(loff_t, i_size - offset, rbuf_size[active]);
++		rc = ima_kernel_read(file, offset, rbuf[active], rbuf_len);
++		if (rc != rbuf_len)
++			goto out3;
++
++		if (rbuf[1] && offset) {
++			/* if we use second buffer and it is not the the first
++			 * read/request, then wait for completion
++			 */
++			rc = ahash_wait(ahash_rc, &res);
++			if (rc)
++				goto out3;
+ 		}
+-		if (rbuf_len == 0)
+-			break;
+ 
+-		sg_init_one(&sg[0], rbuf, rbuf_len);
++		sg_init_one(&sg[0], rbuf[active], rbuf_len);
+ 		ahash_request_set_crypt(req, sg, NULL, rbuf_len);
+ 
+-		rc = ahash_wait(crypto_ahash_update(req), &res);
+-		if (rc)
+-			break;
++		ahash_rc = crypto_ahash_update(req);
++
++		if (rbuf[1])
++			active = !active; /* swap buffers, if we use two */
+ 	}
++	/* wait for the last request to complete */
++	rc = ahash_wait(ahash_rc, &res);
++out3:
+ 	if (read)
+ 		file->f_mode &= ~FMODE_READ;
+-	ima_free_pages(rbuf, rbuf_size);
++	ima_free_pages(rbuf[0], rbuf_size[0]);
++	ima_free_pages(rbuf[1], rbuf_size[1]);
+ out2:
+ 	if (!rc) {
+ 		ahash_request_set_crypt(req, NULL, hash->digest, 0);
 -- 
 1.9.1
+
