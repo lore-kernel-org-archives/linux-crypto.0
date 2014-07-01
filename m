@@ -1,44 +1,49 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 0/4] DRBG: Fixes for code review comments
-Date: Tue, 01 Jul 2014 17:06:58 +0200
-Message-ID: <36957559.tbJt1gJF6I@myon.chronox.de>
+From: Phil Sutter <phil@nwl.cc>
+Subject: Re: [PATCH 1/2] [v3] crypto: sha1/ARM: make use of common SHA-1
+ structures
+Date: Tue, 1 Jul 2014 17:29:39 +0200
+Message-ID: <20140701152939.GC8243@orbit.nwl.cc>
+References: <20140630163845.32348.80374.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Rafael Aquini <aquini@redhat.com>, aris@redhat.com,
-	Fengguang Wu <fengguang.wu@intel.com>,
-	Jet Chen <jet.chen@intel.com>, Su Tao <tao.su@intel.com>,
-	Yuanhan Liu <yuanhan.liu@intel.com>, LKP <lkp@01.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:46446 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754932AbaGAPSg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Jul 2014 11:18:36 -0400
-Received: from myon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S232> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Tue, 1 Jul 2014 17:17:28 +0200
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: 7bit
+Cc: Russell King <linux@arm.linux.org.uk>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-crypto@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
+To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20140630163845.32348.80374.stgit@localhost6.localdomain6>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
 Hi,
 
-the following fixes cover comments from code reviewers. The patch set
-is an addition to the patch set offered several days ago [1].
+On Mon, Jun 30, 2014 at 07:38:46PM +0300, Jussi Kivilinna wrote:
+> Common SHA-1 structures are defined in <crypto/sha.h> for code sharing.
+> 
+> This patch changes SHA-1/ARM glue code to use these structures.
 
-[1] https://lkml.org/lkml/2014/6/28/497
+I find it worth noting that this patch also fixes mv_cesa if sha1-arm is
+also enabled. This is because software SHA1 is used as fallback,
+accessing the context's data which was layed out differently before this
+patch.
 
-Stephan Mueller (4):
-  DRBG: Select correct DRBG core for stdrng
-  DRBG: Mix a time stamp into DRBG state
-  DRBG: fix memory corruption for AES192
-  DRBG: HMAC-SHA1 DRBG has crypto strength of 128 bits
+I have not checked, but other crypto engine drivers might be affected by
+that, as well.
 
- crypto/drbg.c         | 77 ++++++++++++++++++++++++++++++++-------------------
- include/crypto/drbg.h |  2 +-
- 2 files changed, 49 insertions(+), 30 deletions(-)
+> Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 
--- 
-1.9.3
+Acked-by: Phil Sutter <phil@nwl.cc>
+
+Best wishes, Phil
