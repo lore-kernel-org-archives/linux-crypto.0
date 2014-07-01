@@ -1,8 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 1/4] DRBG: Select correct DRBG core for stdrng
-Date: Tue, 01 Jul 2014 17:07:28 +0200
-Message-ID: <2048210.Q12HSlDxg7@myon.chronox.de>
-References: <36957559.tbJt1gJF6I@myon.chronox.de>
+Subject: [PATCH 0/4] DRBG: Fixes for code review comments
+Date: Tue, 01 Jul 2014 17:06:58 +0200
+Message-ID: <36957559.tbJt1gJF6I@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -13,42 +12,33 @@ Cc: Rafael Aquini <aquini@redhat.com>, aris@redhat.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:46436 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:46446 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754356AbaGAPRI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Jul 2014 11:17:08 -0400
+	id S1754932AbaGAPSg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Jul 2014 11:18:36 -0400
 Received: from myon.chronox.de
 	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S231> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Tue, 1 Jul 2014 17:15:46 +0200
-In-Reply-To: <36957559.tbJt1gJF6I@myon.chronox.de>
+	id <S232> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Tue, 1 Jul 2014 17:17:28 +0200
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When the DRBG is initialized, the core is looked up using the DRBG name.
-The name that can be used for the lookup is registered in
-cra_driver_name. The cra_name value contains stdrng.
+Hi,
 
-Thus, the lookup code must use crypto_tfm_alg_driver_name to obtain the
-precise DRBG name and select the correct DRBG.
+the following fixes cover comments from code reviewers. The patch set
+is an addition to the patch set offered several days ago [1].
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+[1] https://lkml.org/lkml/2014/6/28/497
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 53ff20d..14495df 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1764,7 +1764,7 @@ static int drbg_kcapi_init(struct crypto_tfm *tfm)
- 	bool pr = false;
- 	int coreref = 0;
- 
--	drbg_convert_tfm_core(crypto_tfm_alg_name(tfm), &coreref, &pr);
-+	drbg_convert_tfm_core(crypto_tfm_alg_driver_name(tfm), &coreref, &pr);
- 	/*
- 	 * when personalization string is needed, the caller must call reset
- 	 * and provide the personalization string as seed information
+Stephan Mueller (4):
+  DRBG: Select correct DRBG core for stdrng
+  DRBG: Mix a time stamp into DRBG state
+  DRBG: fix memory corruption for AES192
+  DRBG: HMAC-SHA1 DRBG has crypto strength of 128 bits
+
+ crypto/drbg.c         | 77 ++++++++++++++++++++++++++++++++-------------------
+ include/crypto/drbg.h |  2 +-
+ 2 files changed, 49 insertions(+), 30 deletions(-)
+
 -- 
 1.9.3
