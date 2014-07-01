@@ -1,92 +1,66 @@
-From: =?iso-8859-1?Q?M=E5ns_Rullg=E5rd?= <mans@mansr.com>
-Subject: Re: [PATCH] ARM: convert all "mov.* pc, reg" to "bx reg" for ARMv6+ (part1)
-Date: Tue, 01 Jul 2014 21:04:15 +0100
-Message-ID: <yw1xvbrgethc.fsf@unicorn.mansr.com>
-References: <E1X20mL-00083I-Sv@rmk-PC.arm.linux.org.uk>
-	<yw1x4mz1f2t9.fsf@unicorn.mansr.com>
-	<20140701171346.GP3705@n2100.arm.linux.org.uk>
-	<yw1xzjgtdmas.fsf@unicorn.mansr.com> <20140701173547.GW28164@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>,
-	"davinci-linux-open-source\@linux.davincidsp.com"
-	<davinci-linux-open-source@linux.davincidsp.com>,
-	"linux-samsung-soc\@vger.kernel.org"
-	<linux-samsung-soc@vger.kernel.org>,
-	"kvm\@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-sh\@vger.kernel.org" <linux-sh@vger.kernel.org>,
-	"linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-tegra\@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-	"xen-devel\@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-	"linux-omap\@vger.kernel.org" <linux-omap@vger.kernel.org>,
-	"kvmarm\@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-	"linux-arm-kernel\@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-To: Will Deacon <will.deacon@arm.com>
+From: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+Subject: [PATCH v2 0/3] ima: use asynchronous hash API for hash calculation
+Date: Tue,  1 Jul 2014 23:12:48 +0300
+Message-ID: <cover.1404245510.git.d.kasatkin@samsung.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>
+To: zohar@linux.vnet.ibm.com, linux-ima-devel@lists.sourceforge.net,
+	linux-security-module@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from unicorn.mansr.com ([81.2.72.234]:40314 "EHLO unicorn.mansr.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758707AbaGAUEZ convert rfc822-to-8bit (ORCPT
+Received: from mail-wg0-f47.google.com ([74.125.82.47]:37134 "EHLO
+	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754356AbaGAUOF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Jul 2014 16:04:25 -0400
-In-Reply-To: <20140701173547.GW28164@arm.com> (Will Deacon's message of "Tue,
-	1 Jul 2014 18:35:47 +0100")
+	Tue, 1 Jul 2014 16:14:05 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Will Deacon <will.deacon@arm.com> writes:
+Depending on the IMA policy, it might require to measure huge amount of files.
+It may be very important to speedup hash calculation or to reduce (bettery)
+energy required to do it. Currently IMA uses synchronous hash API (shash)
+which is CPU based. CPU based hash calculation is very CPU intensive and on the
+battery powered device will be also high energy consuming.
 
-> Hi Mans,
->
-> On Tue, Jul 01, 2014 at 06:24:43PM +0100, M=E5ns Rullg=E5rd wrote:
->> Russell King - ARM Linux <linux@arm.linux.org.uk> writes:
->> > As you point out, "bx lr" /may/ be treated specially (I've actuall=
-y been
->>=20
->> Most, if not all, Cortex-A cores do this according the public TRMs.
->> They also do the same thing for "mov pc, lr" so there will probably =
-be
->> no performance gain from this change.  It's still a good idea though=
-,
->> since we don't know what future cores will do.
->
-> Funnily enough, that's not actually true (and is more or less what pr=
-ompted
-> this patch after discussion with Russell). There are cores out there =
-that
-> don't predict mov pc, lr at all (let alone do anything with the retur=
-n
-> stack).
+Many platforms provide cryptographic acceleration modules which allow speedup
+and/or reduce energy consumption, and provide asynchronous way to calculate
+hashes. Defacto way to implement drivers for such accelerators is using
+asynchronous hash API (ahash).
 
-Even ones where the TRM says they do?  I suppose the only way to know
-for sure is to measure it.
+The first patch adds use of ahash API to IMA. Performance of using HW
+acceleration depends very much on amount of data to hash and it depends
+on particular HW. It is usually inefficient for small data due to HW
+initialization overhead. In order to make it possible to optimize performance
+for particular system, the patch provides kernel parameter
+'ima_ahash=<min_file_size>', which allows to specify optimal file size
+when start using ahash. By default ahash is disabled until non-zero value
+with 'ima_ahash=' is provided.
 
->> > discussing this with Will Deacon over the last couple of days, who=
- has
->> > also been talking to the hardware people in ARM, and Will is happy=
- with
->> > this patch as in its current form.)  This is why I've changed all
->> > "mov pc, reg" instructions which return in some way to use this ma=
-cro,
->> > and left others (those which are used to call some function and re=
-turn
->> > back to the same point) alone.
->>=20
->> In that case the patch should be fine.  Your patch description didn'=
-t
->> make it clear that only actual returns were being changed.
->
-> I'm led to believe that some predictors require lr in order to update=
- the
-> return stack, whilst others don't. That part is all horribly
-> micro-architectural, so the current patch is doing the right thing by
-> sticking to the ARM ARM but enabling us to hook into other registers =
-later
-> on if we choose.
+Second patch introduces multi-page buffers which makes HW acceleration more
+efficient. It extends 'ima_ahash' kernel parameter to specify buffer size:
+'ima_ahash=<min_file_size>[,<bufsize>]'
 
-Agreed.
+Third patch introduces double-buffering which allows to readahead next portion
+of data for hashing while calculating the hash.
 
---=20
-M=E5ns Rullg=E5rd
-mans@mansr.com
+Changes to v1:
+- ima_ahash_size and ima_ahash_bufsize were combined as ima_ahash
+- ahash pre-allocation moved out from __init code to be able to use
+  ahash crypto modules. Ahash allocated once on the first use.
+- hash calculation falls back to sahsh if ahash allocation/calculation fails
+- complex initialization separated from variable declaration
+- improved comments
+
+- Dmitry
+
+
+Dmitry Kasatkin (3):
+  ima: use ahash API for file hash calculation
+  ima: introduce multi-page collect buffers
+  ima: provide double buffering for hash calculation
+
+ Documentation/kernel-parameters.txt |   6 +
+ security/integrity/ima/ima_crypto.c | 287 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 290 insertions(+), 3 deletions(-)
+
+-- 
+1.9.1
