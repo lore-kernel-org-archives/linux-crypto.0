@@ -1,31 +1,15 @@
 From: Russell King <rmk+kernel-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org>
 Subject: [PATCH] ARM: convert all "mov.* pc, reg" to "bx reg" for ARMv6+
-Date: Tue, 1 Jul 2014 16:58:24 +0100
-Message-ID: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
+Date: Tue, 1 Jul 2014 17:14:23 +0100
+Message-ID: <E1X20hL-000831-M8@rmk-PC.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>, <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        <linux-sh-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Kevin Hilman <khilman-1D3HCaltpLuhEniVeURVKkEOCMrvLtNR@public.gmane.org>,
-        <linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Thierry Reding <thierry.reding-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, <linux-samsung-soc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-        Kukjin
- Kim <kgene.kim-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>,
-        Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-        Stefano Stabellini <stefano.stabellini-mvvWK6WmYclDPfheJLI6IQ@public.gmane.org>,
-        Magnus Damm
-	<magnus.damm-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Gleb Natapov <gleb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-        Tony Lindgren
-	<tony-4v6yS6AI5VpBDgjK7y7TUQ@public.gmane.org>, <xen-devel-GuqFBffKawtpuQazS67q72D2FQJk+8+b@public.gmane.org>,
-        Sebastian Hesselbarth
-	<sebastian.hesselbarth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-        Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>,
-        Stephen Warren <swarren-3lzwWm7+Weoh9ZMKESR00Q@public.gmane.org>,
-        Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>,
-        Hans Ulli Kroll <ulli.kroll-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>,
-        Haojian Zhuang
-	<h
+Cc: <davinci-linux-open-source-VycZQUHpC/PFrsHnngEfi1aTQe2KTcn/@public.gmane.org>,
+        <linux-samsung-soc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        <linux-sh-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+        <linux-tegra-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <xen-devel-GuqFBffKawtpuQazS67q72D2FQJk+8+b@public.gmane.org>,
+        <linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
 To: <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
 Return-path: <davinci-linux-open-source-bounces-VycZQUHpC/PFrsHnngEfi1aTQe2KTcn/@public.gmane.org>
 List-Unsubscribe: <http://linux.davincidsp.com/mailman/options/davinci-linux-open-source>,
@@ -56,6 +40,8 @@ of deploying this for other registers depending on the CPU selection.
 
 Signed-off-by: Russell King <rmk+kernel-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org>
 ---
+(Resent without the long Cc list)
+
  arch/arm/crypto/aes-armv4.S              |  3 ++-
  arch/arm/include/asm/assembler.h         | 21 +++++++++++++++
  arch/arm/include/asm/entry-macro-multi.S |  2 +-
