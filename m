@@ -1,45 +1,43 @@
 From: Nitesh Narayan Lal <b44382@freescale.com>
-Subject: [PATCH] crypto: dts - Addition of missing SEC compatibile property in c29x device tree
-Date: Tue, 1 Jul 2014 19:37:23 +0530
-Message-ID: <1404223643-32275-1-git-send-email-b44382@freescale.com>
+Subject: [PATCH] crypto: caam - Enabling multiple caam debug support for C29x platform
+Date: Tue, 1 Jul 2014 19:54:54 +0530
+Message-ID: <1404224694-32543-1-git-send-email-b44382@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Nitesh Narayan Lal <b44382@freescale.com>
 To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
 	<r66431@freescale.com>, <b16394@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2lp0208.outbound.protection.outlook.com ([207.46.163.208]:11979
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+Received: from dns-bn1lp0143.outbound.protection.outlook.com ([207.46.163.143]:35010
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753637AbaGAJP2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Jul 2014 05:15:28 -0400
+	id S1751908AbaGAJcn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 1 Jul 2014 05:32:43 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The driver is compatible with SEC version 4.0, which was missing from
-device tree resulting that the caam driver doesn't gets probed. Since
-SEC is backward compatible with older versions, so this patch adds those
-missing versions in c29x device tree.
+In the current setup debug file system enables us to debug the operational
+details for only one CAAM. This patch adds the support for debugging multiple
+CAAM's.
 
 Signed-off-by: Nitesh Narayan Lal <b44382@freescale.com>
 Signed-off-by: Vakul Garg <b16394@freescale.com>
 ---
- arch/powerpc/boot/dts/fsl/qoriq-sec6.0-0.dtsi | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/ctrl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-sec6.0-0.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-sec6.0-0.dtsi
-index f75b4f820..7d4a6a2 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-sec6.0-0.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-sec6.0-0.dtsi
-@@ -32,7 +32,8 @@
-  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  */
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 1d8e003..c6e9d3b 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -588,7 +588,7 @@ static int caam_probe(struct platform_device *pdev)
+ 	 */
+ 	perfmon = (struct caam_perfmon __force *)&ctrl->perfmon;
  
--	compatible = "fsl,sec-v6.0";
-+	compatible = "fsl,sec-v6.0", "fsl,sec-v5.0",
-+		     "fsl,sec-v4.0";
- 	fsl,sec-era = <6>;
- 	#address-cells = <1>;
- 	#size-cells = <1>;
+-	ctrlpriv->dfs_root = debugfs_create_dir("caam", NULL);
++	ctrlpriv->dfs_root = debugfs_create_dir(dev_name(dev), NULL);
+ 	ctrlpriv->ctl = debugfs_create_dir("ctl", ctrlpriv->dfs_root);
+ 
+ 	/* Controller-level - performance monitor counters */
 -- 
 1.8.3.2
