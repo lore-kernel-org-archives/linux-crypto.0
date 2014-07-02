@@ -1,73 +1,34 @@
-From: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+From: Dave Hansen <dave.hansen@intel.com>
 Subject: Re: [PATCH v2 1/3] ima: use ahash API for file hash calculation
-Date: Wed, 2 Jul 2014 21:21:59 +0300
-Message-ID: <CACE9dm8vx9b-n4b+0NAvp=9Er4uPWGwa8eYSGtkiAPv5ahve4A@mail.gmail.com>
-References: <cover.1404245510.git.d.kasatkin@samsung.com>
-	<72d68808fd8db2b896a459b120f3e550e5f976c1.1404245510.git.d.kasatkin@samsung.com>
-	<1404323065.596.65.camel@dhcp-9-2-203-236.watson.ibm.com>
+Date: Wed, 02 Jul 2014 11:33:57 -0700
+Message-ID: <53B45095.80102@intel.com>
+References: <cover.1404245510.git.d.kasatkin@samsung.com> <72d68808fd8db2b896a459b120f3e550e5f976c1.1404245510.git.d.kasatkin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linux-ima-devel@lists.sourceforge.net,
-	linux-security-module <linux-security-module@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	Dmitry Kasatkin <d.kasatkin@samsung.com>
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
+To: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	zohar@linux.vnet.ibm.com, linux-ima-devel@lists.sourceforge.net,
+	linux-security-module@vger.kernel.org
 Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <1404323065.596.65.camel@dhcp-9-2-203-236.watson.ibm.com>
+In-Reply-To: <72d68808fd8db2b896a459b120f3e550e5f976c1.1404245510.git.d.kasatkin@samsung.com>
 Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 2 July 2014 20:44, Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
-> On Tue, 2014-07-01 at 23:12 +0300, Dmitry Kasatkin wrote:
->
->> -/*
->> - * Calculate the MD5/SHA1 file digest
->> - */
->> +static struct crypto_ahash *ima_alloc_atfm(enum hash_algo algo)
->> +{
->> +     struct crypto_ahash *tfm = ima_ahash_tfm;
->> +     int rc;
->> +
->> +     if ((algo != ima_hash_algo && algo < HASH_ALGO__LAST) || !tfm) {
->> +             tfm = crypto_alloc_ahash(hash_algo_name[algo], 0, 0);
->
-> In the case where algo isn't the same as ima_hash_algo, won't this
-> replace the existing ima_ahash_tfm without freeing it?
->
+On 07/01/2014 01:12 PM, Dmitry Kasatkin wrote:
+> +	ima_ahash=	[IMA] Asynchronous hash usage parameters
+> +			Format: <min_file_size>
+> +			Set the minimal file size when use asynchronous hash.
+> +			If ima_ahash is not provided, ahash usage is disabled.
 
-Look to next comment...
+<groan> ... another boot option...
 
-> Mimi
->
->> +             if (!IS_ERR(tfm)) {
->> +                     if (algo == ima_hash_algo)
->> +                             ima_ahash_tfm = tfm;
+Can we just set this to something sane, and then make a sysctl or
+something else at runtime to tweak it?  The kernel won't use IMA much
+before userspace comes up, and it can surely live with a slightly
+suboptimal tuning until the boot scripts have a chance to go bang the
+tunable.
 
-Above will set only new tfm for default ima_hash_algo...
-
-Dmitry
-
->> +             } else {
->> +                     rc = PTR_ERR(tfm);
->> +                     pr_err("Can not allocate %s (reason: %d)\n",
->> +                            hash_algo_name[algo], rc);
->> +             }
->> +     }
->> +     return tfm;
->> +}
->> +
->> +static void ima_free_atfm(struct crypto_ahash *tfm)
->> +{
->> +     if (tfm != ima_ahash_tfm)
->> +             crypto_free_ahash(tfm);
->> +}
->
->
->
-
-
-
--- 
-Thanks,
-Dmitry
+We should reserve command-line parameters for things that really need
+tweaking in early boot or are _needed_ to boot.
