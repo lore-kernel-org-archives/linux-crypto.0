@@ -1,86 +1,59 @@
-From: Nicolas Pitre <nico@fluxnic.net>
+From: Shawn Guo <shawn.guo@freescale.com>
 Subject: Re: [PATCH] ARM: convert all "mov.* pc, reg" to "bx reg" for ARMv6+
- (part1)
-Date: Tue, 01 Jul 2014 23:17:22 -0400 (EDT)
-Message-ID: <alpine.LFD.2.11.1407012314100.16842@knanqh.ubzr>
-References: <E1X20mL-00083I-Sv@rmk-PC.arm.linux.org.uk>
- <yw1x4mz1f2t9.fsf@unicorn.mansr.com>
- <20140701171346.GP3705@n2100.arm.linux.org.uk>
- <yw1xzjgtdmas.fsf@unicorn.mansr.com> <20140701173547.GW28164@arm.com>
+Date: Wed, 2 Jul 2014 13:10:27 +0800
+Message-ID: <20140702051026.GD16176@dragon>
+References: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="Boundary_(ID_mgw8uSma0Mmji5Peh3Zp8w)"
-Cc: =?ISO-8859-15?Q?M=E5ns_Rullg=E5rd?= <mans@mansr.com>,
-	"davinci-linux-open-source@linux.davincidsp.com"
-	<davinci-linux-open-source@linux.davincidsp.com>,
-	"linux-samsung-soc@vger.kernel.org"
-	<linux-samsung-soc@vger.kernel.org>,
-	Russell King - ARM Linux <linux@arm.linux.org.uk>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-sh@vger.kernel.org" <linux-sh@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-	"xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
-	"kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-To: Will Deacon <will.deacon@arm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:12622 "EHLO
-	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751102AbaGBDRZ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 1 Jul 2014 23:17:25 -0400
-In-reply-to: <20140701173547.GW28164@arm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Andrew Lunn <andrew@lunn.ch>, kvm@vger.kernel.org, linux-sh@vger.kernel.org,
+ Kevin Hilman <khilman@deeprootsystems.com>, Sekhar Nori <nsekhar@ti.com>,
+ linux-tegra@vger.kernel.org, Thierry Reding <thierry.reding@gmail.com>,
+ kvmarm@lists.cs.columbia.edu, linux-samsung-soc@vger.kernel.org,
+ Kukjin Kim <kgene.kim@samsung.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Stefano Stabellini <stefano.stabellini@eu.citrix.com>,
+ Magnus Damm <magnus.damm@gmail.com>, Gleb Natapov <gleb@kernel.org>,
+ Tony Lindgren <tony@atomide.com>, xen-devel@lists.xenproject.org,
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+ Jason Cooper <jason@lakedaemon.net>, Stephen Warren <swarren@wwwdotorg.org>,
+ Marc Zyngier <marc.zyngier@arm.com>,
+ Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>, Simon Horman <horms@verge.net.au>,
+ Ben Dooks <ben-linux@fluff.org>,
+To: Russell King <rmk+kernel@arm.linux.org.uk>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---Boundary_(ID_mgw8uSma0Mmji5Peh3Zp8w)
-Content-type: TEXT/PLAIN; charset=iso-8859-1
-Content-transfer-encoding: 8BIT
-
-On Tue, 1 Jul 2014, Will Deacon wrote:
-
-> Hi Mans,
+On Tue, Jul 01, 2014 at 04:58:24PM +0100, Russell King wrote:
+> ARMv6 and greater introduced a new instruction ("bx") which can be used
+> to return from function calls.  Recent CPUs perform better when the
+> "bx lr" instruction is used rather than the "mov pc, lr" instruction,
+> and this sequence is strongly recommended to be used by the ARM
+> architecture manual (section A.4.1.1).
 > 
-> On Tue, Jul 01, 2014 at 06:24:43PM +0100, Måns Rullgård wrote:
-> > Russell King - ARM Linux <linux@arm.linux.org.uk> writes:
-> > > As you point out, "bx lr" /may/ be treated specially (I've actually been
-> > 
-> > Most, if not all, Cortex-A cores do this according the public TRMs.
-> > They also do the same thing for "mov pc, lr" so there will probably be
-> > no performance gain from this change.  It's still a good idea though,
-> > since we don't know what future cores will do.
+> We provide a new macro "ret" with all its variants for the condition
+> code which will resolve to the appropriate instruction.
 > 
-> Funnily enough, that's not actually true (and is more or less what prompted
-> this patch after discussion with Russell). There are cores out there that
-> don't predict mov pc, lr at all (let alone do anything with the return
-> stack).
+> Rather than doing this piecemeal, and miss some instances, change all
+> the "mov pc" instances to use the new macro, with the exception of
+> the "movs" instruction and the kprobes code.  This allows us to detect
+> the "mov pc, lr" case and fix it up - and also gives us the possibility
+> of deploying this for other registers depending on the CPU selection.
 > 
-> > > discussing this with Will Deacon over the last couple of days, who has
-> > > also been talking to the hardware people in ARM, and Will is happy with
-> > > this patch as in its current form.)  This is why I've changed all
-> > > "mov pc, reg" instructions which return in some way to use this macro,
-> > > and left others (those which are used to call some function and return
-> > > back to the same point) alone.
-> > 
-> > In that case the patch should be fine.  Your patch description didn't
-> > make it clear that only actual returns were being changed.
-> 
-> I'm led to believe that some predictors require lr in order to update the
-> return stack, whilst others don't. That part is all horribly
-> micro-architectural, so the current patch is doing the right thing by
-> sticking to the ARM ARM but enabling us to hook into other registers later
-> on if we choose.
+> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+> ---
+...
+>  arch/arm/mach-imx/suspend-imx6.S         |  5 ++--
 
-May I suggest to have a patch with only the macro definition in it and 
-all this discussion in the commit log please?  The usage sites should be 
-done in a separate patch to make it clearer.
-
-
-Nicolas
-
---Boundary_(ID_mgw8uSma0Mmji5Peh3Zp8w)--
+Tested-by: Shawn Guo <shawn.guo@freescale.com>
