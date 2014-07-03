@@ -1,47 +1,46 @@
-From: Vakul Garg <vakul@freescale.com>
-Subject: RE: [PATCH] crypto: caam - fix memleak in caam_jr module
-Date: Thu, 3 Jul 2014 07:52:51 +0000
-Message-ID: <75b67e0fc305452fb5075e5bee5fff9c@BL2PR03MB162.namprd03.prod.outlook.com>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: [PATCH v2] crypto/fips: only panic on bad/missing crypto mod
+ signatures
+Date: Thu, 3 Jul 2014 07:18:06 -0400
+Message-ID: <20140703111806.GE9748@hmsreliant.think-freely.org>
+References: <1403896374-62781-1-git-send-email-jarod@redhat.com>
+ <1404329850-35509-1-git-send-email-jarod@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: "cristian.stoica@freescale.com" <cristian.stoica@freescale.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rusty Russell <rusty@rustcorp.com.au>,
+	Stephan Mueller <stephan.mueller@atsec.com>,
+	linux-crypto@vger.kernel.org
+To: Jarod Wilson <jarod@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2lp0207.outbound.protection.outlook.com ([207.46.163.207]:11986
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1755954AbaGCHxX convert rfc822-to-8bit (ORCPT
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:38019 "EHLO
+	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750978AbaGCLSQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Jul 2014 03:53:23 -0400
-Content-Language: en-US
+	Thu, 3 Jul 2014 07:18:16 -0400
+Content-Disposition: inline
+In-Reply-To: <1404329850-35509-1-git-send-email-jarod@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch fixes a memory leak that appears when caam_jr module is unloaded.
-
-Cc: <stable@vger.kernel.org> # 3.13+
-Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
----
- drivers/crypto/caam/jr.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 1d80bd3..f127f86 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -117,6 +117,7 @@ static int caam_jr_remove(struct platform_device *pdev)
- 	if (ret)
- 		dev_err(jrdev, "Failed to shut down job ring\n");
- 	irq_dispose_mapping(jrpriv->irq);
-+	kfree(jrpriv);
-
-Can you replace kmalloc for jrpriv with devm_kzalloc() instead?
-This will fix leaks for jrpriv in other places as well and make code compact.
- 
- 	return ret;
- }
--- 
-1.8.3.1
-
---
+On Wed, Jul 02, 2014 at 03:37:30PM -0400, Jarod Wilson wrote:
+> Per further discussion with NIST, the requirements for FIPS state that
+> we only need to panic the system on failed kernel module signature checks
+> for crypto subsystem modules. This moves the fips-mode-only module
+> signature check out of the generic module loading code, into the crypto
+> subsystem, at points where we can catch both algorithm module loads and
+> mode module loads. At the same time, make CONFIG_CRYPTO_FIPS dependent on
+> CONFIG_MODULE_SIG, as this is entirely necessary for FIPS mode.
+> 
+> v2: remove extraneous blank line, perform checks in static inline
+> function, drop no longer necessary fips.h include.
+> 
+> CC: Herbert Xu <herbert@gondor.apana.org.au>
+> CC: "David S. Miller" <davem@davemloft.net>
+> CC: Rusty Russell <rusty@rustcorp.com.au>
+> CC: Stephan Mueller <stephan.mueller@atsec.com>
+> CC: linux-crypto@vger.kernel.org
+> Signed-off-by: Jarod Wilson <jarod@redhat.com>
+Acked-by: Neil Horman <nhorman@tuxdriver.com>
