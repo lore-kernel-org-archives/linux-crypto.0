@@ -1,50 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto/fips: only panic on bad/missing crypto mod
- signatures
-Date: Thu, 3 Jul 2014 21:44:12 +0800
-Message-ID: <20140703134412.GD14291@gondor.apana.org.au>
-References: <1403896374-62781-1-git-send-email-jarod@redhat.com>
- <1404329850-35509-1-git-send-email-jarod@redhat.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] crypto: ux500: make interrupt mode plausible
+Date: Thu, 03 Jul 2014 16:01:54 +0200
+Message-ID: <6058264.NMWsAerSr1@wuerfel>
+References: <13720857.JmA1VNKFj8@wuerfel> <20140703134400.GC14291@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org,
+	Fabio Baltieri <fabio.baltieri@linaro.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Stephan Mueller <stephan.mueller@atsec.com>,
-	linux-crypto@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
+	linux-arm-kernel@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:38420 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755959AbaGCNo3 (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.24]:53286 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755096AbaGCOCA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Jul 2014 09:44:29 -0400
-Content-Disposition: inline
-In-Reply-To: <1404329850-35509-1-git-send-email-jarod@redhat.com>
+	Thu, 3 Jul 2014 10:02:00 -0400
+In-Reply-To: <20140703134400.GC14291@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 02, 2014 at 03:37:30PM -0400, Jarod Wilson wrote:
-> Per further discussion with NIST, the requirements for FIPS state that
-> we only need to panic the system on failed kernel module signature checks
-> for crypto subsystem modules. This moves the fips-mode-only module
-> signature check out of the generic module loading code, into the crypto
-> subsystem, at points where we can catch both algorithm module loads and
-> mode module loads. At the same time, make CONFIG_CRYPTO_FIPS dependent on
-> CONFIG_MODULE_SIG, as this is entirely necessary for FIPS mode.
+On Thursday 03 July 2014 21:44:00 Herbert Xu wrote:
 > 
-> v2: remove extraneous blank line, perform checks in static inline
-> function, drop no longer necessary fips.h include.
+> > The bug has existed since the driver was first merged, and was
+> > probably never detected because nobody tried to use interrupt mode.
+> > It might make sense to backport this fix to stable kernels, depending
+> > on how the crypto maintainers feel about that.
 > 
-> CC: Herbert Xu <herbert@gondor.apana.org.au>
-> CC: "David S. Miller" <davem@davemloft.net>
-> CC: Rusty Russell <rusty@rustcorp.com.au>
-> CC: Stephan Mueller <stephan.mueller@atsec.com>
-> CC: linux-crypto@vger.kernel.org
-> Signed-off-by: Jarod Wilson <jarod@redhat.com>
+> Patch applied.  I'm not going to push this to stable though until
+> I see some more testing.  We can always push this later if needed.
 
-Patch applied.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sounds good, thanks!
+
+	Arnd
