@@ -1,43 +1,53 @@
-From: Stephan Mueller <stephan.mueller@atsec.com>
-Subject: Re: [PATCH v2] crypto/fips: only panic on bad/missing crypto mod signatures
-Date: Thu, 03 Jul 2014 16:10:07 +0200
-Message-ID: <2891603.xs6W2pOOfS@tauon>
-References: <1403896374-62781-1-git-send-email-jarod@redhat.com> <1404329850-35509-1-git-send-email-jarod@redhat.com> <20140703111806.GE9748@hmsreliant.think-freely.org>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH v2] crypto: caam - fix memleak in caam_jr module
+Date: Thu, 3 Jul 2014 17:54:06 -0500
+Message-ID: <20140703175406.548b5db8610cf286aa5e2cc9@freescale.com>
+References: <75b67e0fc305452fb5075e5bee5fff9c@BL2PR03MB162.namprd03.prod.outlook.com>
+	<1404389270-19588-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Jarod Wilson <jarod@redhat.com>, linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	linux-crypto@vger.kernel.org
-To: Neil Horman <nhorman@tuxdriver.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140703111806.GE9748@hmsreliant.think-freely.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	<linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+To: Cristian Stoica <cristian.stoica@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-by2lp0235.outbound.protection.outlook.com ([207.46.163.235]:36478
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752275AbaGCW7P (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Jul 2014 18:59:15 -0400
+In-Reply-To: <1404389270-19588-1-git-send-email-cristian.stoica@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 3. Juli 2014, 07:18:06 schrieb Neil Horman:
->On Wed, Jul 02, 2014 at 03:37:30PM -0400, Jarod Wilson wrote:
->> Per further discussion with NIST, the requirements for FIPS state
->> that
->> we only need to panic the system on failed kernel module signature
->> checks for crypto subsystem modules. This moves the fips-mode-only
->> module signature check out of the generic module loading code, into
->> the crypto subsystem, at points where we can catch both algorithm
->> module loads and mode module loads. At the same time, make
->> CONFIG_CRYPTO_FIPS dependent on CONFIG_MODULE_SIG, as this is
->> entirely necessary for FIPS mode.
->> 
->> v2: remove extraneous blank line, perform checks in static inline
->> function, drop no longer necessary fips.h include.
->> 
->> CC: Herbert Xu <herbert@gondor.apana.org.au>
->> CC: "David S. Miller" <davem@davemloft.net>
->> CC: Rusty Russell <rusty@rustcorp.com.au>
->> CC: Stephan Mueller <stephan.mueller@atsec.com>
->> CC: linux-crypto@vger.kernel.org
->> Signed-off-by: Jarod Wilson <jarod@redhat.com>
->
->Acked-by: Neil Horman <nhorman@tuxdriver.com>
-Acked-by: Stephan Mueller <stephan.mueller@atsec.com>
+On Thu, 3 Jul 2014 15:07:50 +0300
+Cristian Stoica <cristian.stoica@freescale.com> wrote:
+
+> This patch fixes a memory leak that appears when caam_jr module is unloaded.
+> 
+> Cc: <stable@vger.kernel.org> # 3.13+
+> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+> ---
+>  drivers/crypto/caam/jr.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+> index 1d80bd3..e0b91fc 100644
+> --- a/drivers/crypto/caam/jr.c
+> +++ b/drivers/crypto/caam/jr.c
+> @@ -453,7 +453,7 @@ static int caam_jr_probe(struct platform_device *pdev)
+>  	int error;
+>  
+>  	jrdev = &pdev->dev;
+> -	jrpriv = kmalloc(sizeof(struct caam_drv_private_jr),
+> +	jrpriv = devm_kzalloc(jrdev, sizeof(struct caam_drv_private_jr),
+>  			 GFP_KERNEL);
+
+alignment.  Also, why are we replacing a _m_alloc with a _z_alloc?
+
+Please start using get_maintainer.pl.
+
+Thanks,
+
+Kim
