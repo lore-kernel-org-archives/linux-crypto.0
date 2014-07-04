@@ -1,157 +1,80 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/4] DRBG: cleanup of preprocessor macros
-Date: Fri, 4 Jul 2014 22:15:41 +0800
-Message-ID: <20140704141541.GB27229@gondor.apana.org.au>
-References: <4927386.WYHrRe3NJm@myon.chronox.de>
- <3104100.drOBnqUFp8@myon.chronox.de>
- <53AFC322.2060109@infradead.org>
- <1616464.nTZ4WdyPoM@myon.chronox.de>
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
+Subject: Re: [PATCH] ARM: convert all "mov.* pc, reg" to "bx reg" for ARMv6+
+Date: Fri, 4 Jul 2014 16:24:38 +0200
+Message-ID: <20140704142438.GA7827@pengutronix.de>
+References: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
-	Dan Carpenter <dan.carpenter@oracle.com>,
-	linux-crypto@vger.kernel.org, linux-next@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:43565 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751554AbaGDOQE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Jul 2014 10:16:04 -0400
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Cc: Andrew Lunn <andrew@lunn.ch>, kvm@vger.kernel.org, linux-sh@vger.kernel.org,
+ Kevin Hilman <khilman@deeprootsystems.com>, Sekhar Nori <nsekhar@ti.com>,
+ linux-tegra@vger.kernel.org, Thierry Reding <thierry.reding@gmail.com>,
+ kvmarm@lists.cs.columbia.edu, linux-samsung-soc@vger.kernel.org,
+ Kukjin Kim <kgene.kim@samsung.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Stefano Stabellini <stefano.stabellini@eu.citrix.com>,
+ Magnus Damm <magnus.damm@gmail.com>, Gleb Natapov <gleb@kernel.org>,
+ Tony Lindgren <tony@atomide.com>, linux-arm-kernel@lists.infradead.org,
+ xen-devel@lists.xenproject.org,
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+ Jason Cooper <jason@lakedaemon.net>, Stephen Warren <swarren@wwwdotorg.org>,
+ Marc Zyngier <marc.zyngier@arm.com>,
+ Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>, Simon Horman <horms@verge.net.
+To: Russell King <rmk+kernel@arm.linux.org.uk>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
-In-Reply-To: <1616464.nTZ4WdyPoM@myon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Jun 29, 2014 at 01:37:05PM +0200, Stephan Mueller wrote:
->
-> When looking into the documentation and trying it I found:
-> 
-> - bool choices allow me to only select one option, and only one
-> 
-> - tristate choices allow me to only select one option, if the initial tristate 
-> is set to yes. If the initial tristate is set to module, it allows zero to all 
-> options to be set.
-> 
-> That said, neither covers my requirement here: require that at least one 
-> option is set, but allow more options.
+On Tue, Jul 01, 2014 at 04:58:24PM +0100, Russell King wrote:
+> ARMv6 and greater introduced a new instruction ("bx") which can be used
+> to return from function calls.  Recent CPUs perform better when the
+> "bx lr" instruction is used rather than the "mov pc, lr" instruction,
+> and this sequence is strongly recommended to be used by the ARM
+> architecture manual (section A.4.1.1).
+> =
 
-I have added the following patch to solve this problem.
+> We provide a new macro "ret" with all its variants for the condition
+> code which will resolve to the appropriate instruction.
+> =
 
-Please respin your patch against this.
+> Rather than doing this piecemeal, and miss some instances, change all
+> the "mov pc" instances to use the new macro, with the exception of
+> the "movs" instruction and the kprobes code.  This allows us to detect
+> the "mov pc, lr" case and fix it up - and also gives us the possibility
+> of deploying this for other registers depending on the CPU selection.
+> =
 
-commit f2c89a10de4fd123a3d15223d26994f2fe1b95d8
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Fri Jul 4 22:15:08 2014 +0800
+> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+Works fine on my ARM-v7M machine:
 
-    crypto: drbg - Use Kconfig to ensure at least one RNG option is set
-    
-    This patch removes the build-time test that ensures at least one RNG
-    is set.  Instead we will simply not build drbg if no options are set
-    through Kconfig.
-    
-    This also fixes a typo in the name of the Kconfig option CRYTPO_DRBG
-    (should be CRYPTO_DRBG).
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+$ objdump -d vmlinux | grep -E 'mov.*pc'
+8c000022:	46e7      	mov	pc, ip
+8c000028:	46ef      	mov	pc, sp
+8c000b26:	46af      	movne	pc, r5
+8c0037e0:	4687      	mov	pc, r0
+8c0828d2:	4697      	mov	pc, r2
+8c1213ee:	469f      	mov	pc, r3
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 1dca374..6345c47 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -23,7 +23,7 @@ comment "Crypto core or helper"
- 
- config CRYPTO_FIPS
- 	bool "FIPS 200 compliance"
--	depends on (CRYPTO_ANSI_CPRNG || CRYTPO_DRBG) && !CRYPTO_MANAGER_DISABLE_TESTS
-+	depends on (CRYPTO_ANSI_CPRNG || CRYPTO_DRBG) && !CRYPTO_MANAGER_DISABLE_TESTS
- 	depends on MODULE_SIG
- 	help
- 	  This options enables the fips boot option which is
-@@ -1394,39 +1394,39 @@ config CRYPTO_ANSI_CPRNG
- 	  ANSI X9.31 A.2.4. Note that this option must be enabled if
- 	  CRYPTO_FIPS is selected
- 
--menuconfig CRYTPO_DRBG
-+menuconfig CRYPTO_DRBG_MENU
- 	tristate "NIST SP800-90A DRBG"
--	depends on CRYPTO
--	select CRYPTO_RNG
- 	help
- 	  NIST SP800-90A compliant DRBG. In the following submenu, one or
- 	  more of the DRBG types must be selected.
- 
--if CRYTPO_DRBG
-+if CRYPTO_DRBG_MENU
- 
- config CRYPTO_DRBG_HMAC
- 	bool "Enable HMAC DRBG"
- 	default y
--	depends on CRYTPO_DRBG
- 	select CRYPTO_HMAC
- 	help
- 	  Enable the HMAC DRBG variant as defined in NIST SP800-90A.
- 
- config CRYPTO_DRBG_HASH
- 	bool "Enable Hash DRBG"
--	depends on CRYTPO_DRBG
- 	select CRYPTO_HASH
- 	help
- 	  Enable the Hash DRBG variant as defined in NIST SP800-90A.
- 
- config CRYPTO_DRBG_CTR
- 	bool "Enable CTR DRBG"
--	depends on CRYTPO_DRBG
- 	select CRYPTO_AES
- 	help
- 	  Enable the CTR DRBG variant as defined in NIST SP800-90A.
- 
--endif #CRYTPO_DRBG
-+config CRYPTO_DRBG
-+	tristate
-+	default CRYPTO_DRBG_MENU if (CRYPTO_DRBG_HMAC || CRYPTO_DRBG_HASH || CRYPTO_DRBG_CTR)
-+	select CRYPTO_RNG
-+
-+endif	# if CRYPTO_DRBG_MENU
- 
- config CRYPTO_USER_API
- 	tristate
-diff --git a/crypto/Makefile b/crypto/Makefile
-index bfa94fa..cfa57b3 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -92,7 +92,7 @@ obj-$(CONFIG_CRYPTO_842) += 842.o
- obj-$(CONFIG_CRYPTO_RNG2) += rng.o
- obj-$(CONFIG_CRYPTO_RNG2) += krng.o
- obj-$(CONFIG_CRYPTO_ANSI_CPRNG) += ansi_cprng.o
--obj-$(CONFIG_CRYTPO_DRBG) += drbg.o
-+obj-$(CONFIG_CRYPTO_DRBG) += drbg.o
- obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
- obj-$(CONFIG_CRYPTO_GHASH) += ghash-generic.o
- obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index d6621a6..acc7523 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -99,12 +99,6 @@
- 
- #include <crypto/drbg.h>
- 
--#if !defined(CONFIG_CRYPTO_DRBG_HASH) && \
--	!defined(CONFIG_CRYPTO_DRBG_HMAC) && \
--	!defined(CONFIG_CRYPTO_DRBG_CTR)
--#warning "The DRBG code is useless without compiling at least one DRBG type"
--#endif
--
- /***************************************************************
-  * Backend cipher definitions available to DRBG
-  ***************************************************************/
+Also boots fine.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Tested-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+
+but I wonder what is the reason to not use bx if \reg !=3D lr.
+
+Thanks
+Uwe
+
+-- =
+
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
