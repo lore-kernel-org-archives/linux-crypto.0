@@ -1,123 +1,109 @@
-From: Joe Perches <joe@perches.com>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH 3/4] DRBG: Fix format string for debugging statements
-Date: Fri, 04 Jul 2014 09:57:20 -0700
-Message-ID: <1404493040.6384.21.camel@joe-AO725>
-References: <4927386.WYHrRe3NJm@myon.chronox.de>
-	 <10901956.0EDQunEZJL@myon.chronox.de>
-	 <20140629122402.0fd014d8@canb.auug.org.au>
-	 <4311965.FMe9YfRAnU@myon.chronox.de> <1404013999.9064.50.camel@joe-AO725>
-	 <20140704112116.GC25934@mwanda>
+Date: Sat, 05 Jul 2014 01:57:50 +0200
+Message-ID: <3856718.HehN4Xqlpl@myon.chronox.de>
+References: <4927386.WYHrRe3NJm@myon.chronox.de> <20140704112116.GC25934@mwanda> <1404493040.6384.21.camel@joe-AO725>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: Stephan Mueller <smueller@chronox.de>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Dan Carpenter <dan.carpenter@oracle.com>,
 	Stephen Rothwell <sfr@canb.auug.org.au>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
 	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
 	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
+To: Joe Perches <joe@perches.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtprelay0205.hostedemail.com ([216.40.44.205]:53877 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752622AbaGDQ5Z (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Jul 2014 12:57:25 -0400
-In-Reply-To: <20140704112116.GC25934@mwanda>
+Received: from mail.eperm.de ([89.247.134.16]:47158 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753619AbaGDX6s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 4 Jul 2014 19:58:48 -0400
+Received: from myon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S23F> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Sat, 5 Jul 2014 01:57:56 +0200
+In-Reply-To: <1404493040.6384.21.camel@joe-AO725>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 2014-07-04 at 14:21 +0300, Dan Carpenter wrote:
-> On Sat, Jun 28, 2014 at 08:53:19PM -0700, Joe Perches wrote:
-> > On Sun, 2014-06-29 at 05:46 +0200, Stephan Mueller wrote:
-> > > Am Sonntag, 29. Juni 2014, 12:24:02 schrieb Stephen Rothwell:
-> > > 
-> > > Hi Stephen,
-> > > 
-> > > > Hi Stephan,
+Am Freitag, 4. Juli 2014, 09:57:20 schrieb Joe Perches:
+
+Hi Joe,
+
+> On Fri, 2014-07-04 at 14:21 +0300, Dan Carpenter wrote:
+> > On Sat, Jun 28, 2014 at 08:53:19PM -0700, Joe Perches wrote:
+> > > On Sun, 2014-06-29 at 05:46 +0200, Stephan Mueller wrote:
+> > > > Am Sonntag, 29. Juni 2014, 12:24:02 schrieb Stephen Rothwell:
 > > > > 
-> > > > On Sat, 28 Jun 2014 22:01:46 +0200 Stephan Mueller <smueller@chronox.de> 
-> > > wrote:
-> > > > > @@ -1987,8 +1987,9 @@ static int __init drbg_init(void)
-> > > > > 
-> > > > >  	if (ARRAY_SIZE(drbg_cores) * 2 > ARRAY_SIZE(drbg_algs)) {
-> > > > >  	
-> > > > >  		pr_info("DRBG: Cannot register all DRBG types"
-> > > > > 
-> > > > > -			"(slots needed: %lu, slots available: %lu)\n",
-> > > > > -			ARRAY_SIZE(drbg_cores) * 2, ARRAY_SIZE(drbg_algs));
-> > > > > +			"(slots needed: %u, slots available: %u)\n",
-> > > > > +			(unsigned int)ARRAY_SIZE(drbg_cores) * 2,
-> > > > > +			(unsigned int)ARRAY_SIZE(drbg_algs));
+> > > > Hi Stephen,
 > > > > 
-> > > > Doesn't ARRAY_SIZE() always return a size_t?  In which case surely we
-> > > > need no casts, but need to us %zu in the format string.
-> > > 
-> > > Unfortunately not at all. On my x86_64, I get the compiler warning that 
-> > > ARRAY_SIZE is a long unsigned int without the cast.
-
-It doesn't seem to for 4.8.
-Is there some specific gcc version where this occurs?
-
-> > diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-[]
-> > -#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
-> > +#define ARRAY_SIZE(arr)						\
-> > +	(sizeof(arr) / sizeof((arr)[0]) + (size_t)__must_be_array(arr))
+> > > > > Hi Stephan,
+> > > > > 
+> > > > > On Sat, 28 Jun 2014 22:01:46 +0200 Stephan Mueller
+> > > > > <smueller@chronox.de>
+> > > > 
+> > > > wrote:
+> > > > > > @@ -1987,8 +1987,9 @@ static int __init drbg_init(void)
+> > > > > > 
+> > > > > >  	if (ARRAY_SIZE(drbg_cores) * 2 > ARRAY_SIZE(drbg_algs)) {
+> > > > > >  	
+> > > > > >  		pr_info("DRBG: Cannot register all DRBG types"
+> > > > > > 
+> > > > > > -			"(slots needed: %lu, slots available: %lu)\n",
+> > > > > > -			ARRAY_SIZE(drbg_cores) * 2, 
+ARRAY_SIZE(drbg_algs));
+> > > > > > +			"(slots needed: %u, slots available: %u)\n",
+> > > > > > +			(unsigned int)ARRAY_SIZE(drbg_cores) * 2,
+> > > > > > +			(unsigned int)ARRAY_SIZE(drbg_algs));
+> > > > > 
+> > > > > Doesn't ARRAY_SIZE() always return a size_t?  In which case surely
+> > > > > we
+> > > > > need no casts, but need to us %zu in the format string.
+> > > > 
+> > > > Unfortunately not at all. On my x86_64, I get the compiler warning
+> > > > that
+> > > > ARRAY_SIZE is a long unsigned int without the cast.
 > 
-> 
-> This change is a no-op isn't it?
+> It doesn't seem to for 4.8.
+> Is there some specific gcc version where this occurs?
 
-Yes, it is.  Dumb idea.
-Assuming there's some odd promotion, size_t should have been around the
-whole thing
-#define ARRAY_SIZE(arr)						\
-	((size_t)((sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr)))
+$ LANG=en_US gcc -v
+Using built-in specs.
+COLLECT_GCC=/usr/bin/gcc
+COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-redhat-linux/4.8.3/lto-wrapper
+Target: x86_64-redhat-linux
+Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --
+infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --
+enable-bootstrap --enable-shared --enable-threads=posix --enable-
+checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-
+exceptions --enable-gnu-unique-object --enable-linker-build-id --with-linker-
+hash-style=gnu --enable-languages=c,c++,objc,obj-c++,java,fortran,ada,go,lto 
+--enable-plugin --enable-initfini-array --enable-java-awt=gtk --disable-dssi 
+--with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-
+multifile --enable-java-maintainer-mode --with-ecj-
+jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-
+isl=/builddir/build/BUILD/gcc-4.8.3-20140624/obj-x86_64-redhat-linux/isl-
+install --with-cloog=/builddir/build/BUILD/gcc-4.8.3-20140624/obj-x86_64-
+redhat-linux/cloog-install --with-tune=generic --with-arch_32=i686 --
+build=x86_64-redhat-linux
+Thread model: posix
+gcc version 4.8.3 20140624 (Red Hat 4.8.3-1) (GCC)
 
-> I think Stephen Rothwell's suggestion
-> is correct.  In linux-next this was changed to %lu which also works...
-> 
-> Are there arches %zu and %lu are different?
+Note, I get a warning when compiling 64 bit with %u and without the unsigned 
+int cast. Initially I had %lu without the cast which worked on my x86_64, but 
+it was reported that this usage caused a warning on 32 bit. So, there is a 
+different type of ARRAY_SIZE.
 
-I get the same output types and error warnings compiling this
-either -m32 or -m64
+> I get the same output types and error warnings compiling this
+> either -m32 or -m64
 
-#include <stdio.h>
-#include <stdlib.h>
+I do not get a warning for the ARRAY_SIZE thing with your code with either -
+m32 or -m64 (I get other warnings though, which should not be of interest 
+here).
 
-#define typecheck(type, x)			\
-({						\
-	type __dummy;				\
-	typeof(x) __dummy2;			\
-	(void)(&__dummy == &__dummy2);		\
-	1;					\
-})
+And I also get the same output. Yet I am not sure how that code can be 
+compared to the code in the kernel.
 
-#define BUILD_BUG_ON_ZERO(e) (sizeof(struct { int:-!!(e); }))
-
-#define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
-#define __must_be_array(a) BUILD_BUG_ON_ZERO(__same_type((a), &(a)[0]))
-#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
-
-int main(int argc, char **argv)
-{
-	char foo[100];
-	size_t array = sizeof(foo);
-	typeof (ARRAY_SIZE(foo)) member = ARRAY_SIZE(foo);
-
-	int member1 = ARRAY_SIZE(foo);
-	size_t member2 = ARRAY_SIZE(foo);
-
-	typecheck(size_t, member);
-	typecheck(int, member);
-
-	typecheck(size_t, member1);
-	typecheck(int, member1);
-
-	typecheck(size_t, member2);
-	typecheck(int, member2);
-
-	printf("array: %zu, member: %zu\n", array, (int)member);
-
-	return 0;
-}
+-- 
+Ciao
+Stephan
