@@ -1,40 +1,41 @@
-From: Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: [PATCH 2/2] crypto: qce: add dependancy to Kconfig
-Date: Fri,  4 Jul 2014 17:03:30 +0300
-Message-ID: <1404482610-25608-3-git-send-email-svarbanov@mm-sol.com>
-References: <1404482610-25608-1-git-send-email-svarbanov@mm-sol.com>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	Stanimir Varbanov <svarbanov@mm-sol.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4] DRBG: use of kernel linked list
+Date: Fri, 4 Jul 2014 22:11:36 +0800
+Message-ID: <20140704141135.GA27229@gondor.apana.org.au>
+References: <4927386.WYHrRe3NJm@myon.chronox.de>
+ <40132217.1npinMrGoS@myon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
+	Dan Carpenter <dan.carpenter@oracle.com>,
+	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.mm-sol.com ([37.157.136.199]:47205 "EHLO extserv.mm-sol.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758703AbaGDOEu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Jul 2014 10:04:50 -0400
-In-Reply-To: <1404482610-25608-1-git-send-email-svarbanov@mm-sol.com>
+Received: from helcar.apana.org.au ([209.40.204.226]:60847 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752202AbaGDOMi (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 4 Jul 2014 10:12:38 -0400
+Content-Disposition: inline
+In-Reply-To: <40132217.1npinMrGoS@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Make qce crypto driver depend on ARCH_QCOM and make
-possible to test driver compilation.
+On Sat, Jun 28, 2014 at 09:58:24PM +0200, Stephan Mueller wrote:
+> The DRBG-style linked list to manage input data that is fed into the
+> cipher invocations is replaced with the kernel linked list
+> implementation.
+> 
+> The change is transparent to users of the interfaces offered by the
+> DRBG. Therefore, no changes to the testmgr code is needed.
+> 
+> Reported-by: kbuild test robot <fengguang.wu@intel.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-Signed-off-by: Stanimir Varbanov <svarbanov@mm-sol.com>
----
- drivers/crypto/Kconfig |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
-
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 3e5186e..5ef9ec9 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -422,6 +422,7 @@ source "drivers/crypto/qat/Kconfig"
- 
- config CRYPTO_DEV_QCE
- 	tristate "Qualcomm crypto engine accelerator"
-+	depends on ARCH_QCOM || COMPILE_TEST
- 	select CRYPTO_AES
- 	select CRYPTO_DES
- 	select CRYPTO_ECB
+Patch applied.
 -- 
-1.7.0.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
