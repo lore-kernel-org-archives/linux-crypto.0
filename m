@@ -1,54 +1,80 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
 Subject: Re: [PATCH 3/4] DRBG: fix memory corruption for AES192
-Date: Fri, 4 Jul 2014 11:12:35 +0800
-Message-ID: <20140704031235.GA22340@gondor.apana.org.au>
-References: <36957559.tbJt1gJF6I@myon.chronox.de>
- <3083657.SRQmeelhqi@myon.chronox.de>
+Date: Fri, 04 Jul 2014 05:32:56 +0200
+Message-ID: <5597906.Ka0eDGbAv1@myon.chronox.de>
+References: <36957559.tbJt1gJF6I@myon.chronox.de> <3083657.SRQmeelhqi@myon.chronox.de> <20140704030810.GA22255@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: Rafael Aquini <aquini@redhat.com>, aris@redhat.com,
 	Fengguang Wu <fengguang.wu@intel.com>,
 	Jet Chen <jet.chen@intel.com>, Su Tao <tao.su@intel.com>,
 	Yuanhan Liu <yuanhan.liu@intel.com>, LKP <lkp@01.org>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:46392 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752120AbaGDDMr (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Jul 2014 23:12:47 -0400
-Content-Disposition: inline
-In-Reply-To: <3083657.SRQmeelhqi@myon.chronox.de>
+Received: from mail.eperm.de ([89.247.134.16]:37954 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752120AbaGDDed (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Jul 2014 23:34:33 -0400
+Received: from myon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S23A> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Fri, 4 Jul 2014 05:33:03 +0200
+In-Reply-To: <20140704030810.GA22255@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 01, 2014 at 05:08:48PM +0200, Stephan Mueller wrote:
-> For the CTR DRBG, the drbg_state->scratchpad temp buffer (i.e. the
-> memory location immediately before the drbg_state->tfm variable
-> is the buffer that the BCC function operates on. BCC operates
-> blockwise. Making the temp buffer drbg_statelen(drbg) in size is
-> sufficient when the DRBG state length is a multiple of the block
-> size. For AES192 this is not the case and the length for temp is
-> insufficient (yes, that also means for such ciphers, the final
-> output of all BCC rounds are truncated before used to update the
-> state of the DRBG!!).
+Am Freitag, 4. Juli 2014, 11:08:10 schrieb Herbert Xu:
+
+Hi Herbert,
+
+> On Tue, Jul 01, 2014 at 05:08:48PM +0200, Stephan Mueller wrote:
+> > For the CTR DRBG, the drbg_state->scratchpad temp buffer (i.e. the
+> > memory location immediately before the drbg_state->tfm variable
+> > is the buffer that the BCC function operates on. BCC operates
+> > blockwise. Making the temp buffer drbg_statelen(drbg) in size is
+> > sufficient when the DRBG state length is a multiple of the block
+> > size. For AES192 this is not the case and the length for temp is
+> > insufficient (yes, that also means for such ciphers, the final
+> > output of all BCC rounds are truncated before used to update the
+> > state of the DRBG!!).
+> > 
+> > The patch enlarges the temp buffer from drbg_statelen to
+> > drbg_statelen + drbg_blocklen to have sufficient space.
+> > 
+> > Reported-by: Fengguang Wu <fengguang.wu@intel.com>
+> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
 > 
-> The patch enlarges the temp buffer from drbg_statelen to
-> drbg_statelen + drbg_blocklen to have sufficient space.
-> 
-> Reported-by: Fengguang Wu <fengguang.wu@intel.com>
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> I have applied just this patch out of your series.  You patches
+> depend on the previous four patches which I have not yet applied
+> since there are still outstanding issues with two of them.
 
-BTW your patches were all corrupted by your mailer so I had to
-fix them by hand.  Please check the cryptodev tree to ensure
-that my fixes are correct.
+Thank you.
 
-In future please test your patches by applying your own patches
-returned via the list.
+The raised issues are for patches [1] and [2].
 
-Thanks,
+The issue around [1] is whether there is Kconfig solution for the problem of 
+selecting at least one or more than one configure option from a set of 
+options. This should avoid having a module init function with returns an 
+error. The selection of DRBG cores shall allow the user to compile the DRBG to 
+suit his needs and reduce the footprint of the DRBG. Since at least one DRBG 
+core must be selected as otherwise the DRBG is meaningless. Unfortunately I 
+have not found a solution with Kconfig and all given suggestions also did not 
+lead to a solution. So, if anybody has a suggestion on how to solve the issue, 
+I will try it out.
+
+Regarding [2], the issue is that ARRAY_SIZE returns different variable types 
+on different platforms (e.g. unsigned long on x86_64 vs unsigned int on i386). 
+Thus I have to use a type cast. This issue may be fixed by forcing a 
+particular type to ARRAY_SIZE. Such change, however, may have quite some 
+ripple effects throughout the kernel. Therefore, IMHO such a patch should not 
+be made in the realm of the DRBG patchset and the type cast should be allowed.
+
+[1] https://lkml.org/lkml/2014/6/28/489
+
+[2] https://lkml.org/lkml/2014/6/28/492
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
