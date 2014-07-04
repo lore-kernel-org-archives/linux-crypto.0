@@ -1,65 +1,153 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 3/4] DRBG: fix memory corruption for AES192
-Date: Fri, 04 Jul 2014 05:36:03 +0200
-Message-ID: <5854363.JdQPrZ9a72@myon.chronox.de>
-References: <36957559.tbJt1gJF6I@myon.chronox.de> <3083657.SRQmeelhqi@myon.chronox.de> <20140704031235.GA22340@gondor.apana.org.au>
+From: Ruchika Gupta <ruchika.gupta@freescale.com>
+Subject: [PATCH] crypto: caam - Check for CAAM block presence before registering with crypto layer
+Date: Fri, 4 Jul 2014 17:10:48 +0530
+Message-ID: <1404474048-30767-1-git-send-email-ruchika.gupta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Rafael Aquini <aquini@redhat.com>, aris@redhat.com,
-	Fengguang Wu <fengguang.wu@intel.com>,
-	Jet Chen <jet.chen@intel.com>, Su Tao <tao.su@intel.com>,
-	Yuanhan Liu <yuanhan.liu@intel.com>, LKP <lkp@01.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain
+Cc: <davem@davemloft.net>, <alexandru.porosanu@freescale.com>,
+	<horia.geanta@freescale.com>, <NiteshNarayanLal@freescale.com>,
+	<vakul@freescale.com>, <marex@denx.de>,
+	<kim.phillips@freescale.com>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>
+To: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:37964 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752248AbaGDDhk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Jul 2014 23:37:40 -0400
-Received: from myon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S23B> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Fri, 4 Jul 2014 05:36:05 +0200
-In-Reply-To: <20140704031235.GA22340@gondor.apana.org.au>
+Received: from mail-by2lp0243.outbound.protection.outlook.com ([207.46.163.243]:21559
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1755807AbaGDGYG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 4 Jul 2014 02:24:06 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 4. Juli 2014, 11:12:35 schrieb Herbert Xu:
+The layer which registers with the crypto API should check for the presence of
+the CAAM device it is going to use.  If the platform's device tree doesn't have
+the required CAAM node, the layer should return an error and not register the
+algorithms with crypto API layer.
 
-Hi Herbert,
+Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
+Reviewed-by: Horia Ioan Geanta Neag <horia.geanta@freescale.com>
+---
+ drivers/crypto/caam/caamalg.c  | 27 +++++++++++++++++++++++++++
+ drivers/crypto/caam/caamhash.c | 26 ++++++++++++++++++++++++++
+ drivers/crypto/caam/caamrng.c  | 26 ++++++++++++++++++++++++++
+ 3 files changed, 79 insertions(+)
 
-> On Tue, Jul 01, 2014 at 05:08:48PM +0200, Stephan Mueller wrote:
-> > For the CTR DRBG, the drbg_state->scratchpad temp buffer (i.e. the
-> > memory location immediately before the drbg_state->tfm variable
-> > is the buffer that the BCC function operates on. BCC operates
-> > blockwise. Making the temp buffer drbg_statelen(drbg) in size is
-> > sufficient when the DRBG state length is a multiple of the block
-> > size. For AES192 this is not the case and the length for temp is
-> > insufficient (yes, that also means for such ciphers, the final
-> > output of all BCC rounds are truncated before used to update the
-> > state of the DRBG!!).
-> > 
-> > The patch enlarges the temp buffer from drbg_statelen to
-> > drbg_statelen + drbg_blocklen to have sufficient space.
-> > 
-> > Reported-by: Fengguang Wu <fengguang.wu@intel.com>
-> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> 
-> BTW your patches were all corrupted by your mailer so I had to
-> fix them by hand.  Please check the cryptodev tree to ensure
-> that my fixes are correct.
-
-The patch fixing the memory corruption is completely and correctly applied.
-
-Apologies for sending broken patches. If I shall resend them corrected, please 
-let me know.
-> 
-> In future please test your patches by applying your own patches
-> returned via the list.
-
-I will do that.
-
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 87d9de4..d479dfb 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -2441,8 +2441,35 @@ static struct caam_crypto_alg *caam_alg_alloc(struct caam_alg_template
+ 
+ static int __init caam_algapi_init(void)
+ {
++	struct device_node *dev_node;
++	struct platform_device *pdev;
++	struct device *ctrldev;
++	void *priv;
+ 	int i = 0, err = 0;
+ 
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
++	if (!dev_node) {
++		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
++		if (!dev_node)
++			return -ENODEV;
++	}
++
++	pdev = of_find_device_by_node(dev_node);
++	if (!pdev)
++		return -ENODEV;
++
++	ctrldev = &pdev->dev;
++	priv = dev_get_drvdata(ctrldev);
++	of_node_put(dev_node);
++
++	/*
++	 * If priv is NULL, it's probably because the caam driver wasn't
++	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
++	 */
++	if (!priv)
++		return -ENODEV;
++
++
+ 	INIT_LIST_HEAD(&alg_list);
+ 
+ 	/* register crypto algorithms the device supports */
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 2ab057b..5e172a2 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1793,8 +1793,34 @@ caam_hash_alloc(struct caam_hash_template *template,
+ 
+ static int __init caam_algapi_hash_init(void)
+ {
++	struct device_node *dev_node;
++	struct platform_device *pdev;
++	struct device *ctrldev;
++	void *priv;
+ 	int i = 0, err = 0;
+ 
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
++	if (!dev_node) {
++		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
++		if (!dev_node)
++			return -ENODEV;
++	}
++
++	pdev = of_find_device_by_node(dev_node);
++	if (!pdev)
++		return -ENODEV;
++
++	ctrldev = &pdev->dev;
++	priv = dev_get_drvdata(ctrldev);
++	of_node_put(dev_node);
++
++	/*
++	 * If priv is NULL, it's probably because the caam driver wasn't
++	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
++	 */
++	if (!priv)
++		return -ENODEV;
++
+ 	INIT_LIST_HEAD(&hash_list);
+ 
+ 	/* register crypto algorithms the device supports */
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index 8c07d31..c4c36c4 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -278,6 +278,32 @@ static void __exit caam_rng_exit(void)
+ static int __init caam_rng_init(void)
+ {
+ 	struct device *dev;
++	struct device_node *dev_node;
++	struct platform_device *pdev;
++	struct device *ctrldev;
++	void *priv;
++
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
++	if (!dev_node) {
++		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
++		if (!dev_node)
++			return -ENODEV;
++	}
++
++	pdev = of_find_device_by_node(dev_node);
++	if (!pdev)
++		return -ENODEV;
++
++	ctrldev = &pdev->dev;
++	priv = dev_get_drvdata(ctrldev);
++	of_node_put(dev_node);
++
++	/*
++	 * If priv is NULL, it's probably because the caam driver wasn't
++	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
++	 */
++	if (!priv)
++		return -ENODEV;
+ 
+ 	dev = caam_jr_alloc();
+ 	if (IS_ERR(dev)) {
 -- 
-Ciao
-Stephan
+1.8.1.4
