@@ -1,53 +1,51 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH v2] crypto: caam - fix memleak in caam_jr module
-Date: Thu, 3 Jul 2014 17:54:06 -0500
-Message-ID: <20140703175406.548b5db8610cf286aa5e2cc9@freescale.com>
-References: <75b67e0fc305452fb5075e5bee5fff9c@BL2PR03MB162.namprd03.prod.outlook.com>
-	<1404389270-19588-1-git-send-email-cristian.stoica@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 3/4] DRBG: fix memory corruption for AES192
+Date: Fri, 4 Jul 2014 11:08:10 +0800
+Message-ID: <20140704030810.GA22255@gondor.apana.org.au>
+References: <36957559.tbJt1gJF6I@myon.chronox.de>
+ <3083657.SRQmeelhqi@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	<linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Cristian Stoica <cristian.stoica@freescale.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Rafael Aquini <aquini@redhat.com>, aris@redhat.com,
+	Fengguang Wu <fengguang.wu@intel.com>,
+	Jet Chen <jet.chen@intel.com>, Su Tao <tao.su@intel.com>,
+	Yuanhan Liu <yuanhan.liu@intel.com>, LKP <lkp@01.org>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2lp0235.outbound.protection.outlook.com ([207.46.163.235]:36478
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752275AbaGCW7P (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Jul 2014 18:59:15 -0400
-In-Reply-To: <1404389270-19588-1-git-send-email-cristian.stoica@freescale.com>
+Received: from helcar.apana.org.au ([209.40.204.226]:34874 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752120AbaGDDI3 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 3 Jul 2014 23:08:29 -0400
+Content-Disposition: inline
+In-Reply-To: <3083657.SRQmeelhqi@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 3 Jul 2014 15:07:50 +0300
-Cristian Stoica <cristian.stoica@freescale.com> wrote:
-
-> This patch fixes a memory leak that appears when caam_jr module is unloaded.
+On Tue, Jul 01, 2014 at 05:08:48PM +0200, Stephan Mueller wrote:
+> For the CTR DRBG, the drbg_state->scratchpad temp buffer (i.e. the
+> memory location immediately before the drbg_state->tfm variable
+> is the buffer that the BCC function operates on. BCC operates
+> blockwise. Making the temp buffer drbg_statelen(drbg) in size is
+> sufficient when the DRBG state length is a multiple of the block
+> size. For AES192 this is not the case and the length for temp is
+> insufficient (yes, that also means for such ciphers, the final
+> output of all BCC rounds are truncated before used to update the
+> state of the DRBG!!).
 > 
-> Cc: <stable@vger.kernel.org> # 3.13+
-> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
-> ---
->  drivers/crypto/caam/jr.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+> The patch enlarges the temp buffer from drbg_statelen to
+> drbg_statelen + drbg_blocklen to have sufficient space.
 > 
-> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-> index 1d80bd3..e0b91fc 100644
-> --- a/drivers/crypto/caam/jr.c
-> +++ b/drivers/crypto/caam/jr.c
-> @@ -453,7 +453,7 @@ static int caam_jr_probe(struct platform_device *pdev)
->  	int error;
->  
->  	jrdev = &pdev->dev;
-> -	jrpriv = kmalloc(sizeof(struct caam_drv_private_jr),
-> +	jrpriv = devm_kzalloc(jrdev, sizeof(struct caam_drv_private_jr),
->  			 GFP_KERNEL);
+> Reported-by: Fengguang Wu <fengguang.wu@intel.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-alignment.  Also, why are we replacing a _m_alloc with a _z_alloc?
+I have applied just this patch out of your series.  You patches
+depend on the previous four patches which I have not yet applied
+since there are still outstanding issues with two of them.
 
-Please start using get_maintainer.pl.
-
-Thanks,
-
-Kim
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
