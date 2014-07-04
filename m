@@ -1,7 +1,7 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH 3/4] DRBG: fix memory corruption for AES192
-Date: Fri, 4 Jul 2014 11:08:10 +0800
-Message-ID: <20140704030810.GA22255@gondor.apana.org.au>
+Date: Fri, 4 Jul 2014 11:12:35 +0800
+Message-ID: <20140704031235.GA22340@gondor.apana.org.au>
 References: <36957559.tbJt1gJF6I@myon.chronox.de>
  <3083657.SRQmeelhqi@myon.chronox.de>
 Mime-Version: 1.0
@@ -13,11 +13,11 @@ Cc: Rafael Aquini <aquini@redhat.com>, aris@redhat.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:34874 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:46392 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752120AbaGDDI3 (ORCPT
+	with ESMTP id S1752120AbaGDDMr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 3 Jul 2014 23:08:29 -0400
+	Thu, 3 Jul 2014 23:12:47 -0400
 Content-Disposition: inline
 In-Reply-To: <3083657.SRQmeelhqi@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
@@ -40,11 +40,14 @@ On Tue, Jul 01, 2014 at 05:08:48PM +0200, Stephan Mueller wrote:
 > Reported-by: Fengguang Wu <fengguang.wu@intel.com>
 > Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-I have applied just this patch out of your series.  You patches
-depend on the previous four patches which I have not yet applied
-since there are still outstanding issues with two of them.
+BTW your patches were all corrupted by your mailer so I had to
+fix them by hand.  Please check the cryptodev tree to ensure
+that my fixes are correct.
 
-Cheers,
+In future please test your patches by applying your own patches
+returned via the list.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
