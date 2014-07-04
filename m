@@ -1,58 +1,86 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] ARM: convert all "mov.* pc, reg" to "bx reg" for ARMv6+
-Date: Fri, 4 Jul 2014 03:11:18 -0700
-Message-ID: <20140704101118.GC20451@cbox>
-References: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [PATCH] Potential NULL pointer deference in drbg_ctr_df
+Date: Fri, 4 Jul 2014 13:50:03 +0300
+Message-ID: <20140704105003.GA25934@mwanda>
+References: <20140620202418.GZ5015@mwanda> <4892293.kf6KiPx6BS@myon.chronox.de>
+ <20140625090646.GB8727@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Andrew Lunn <andrew@lunn.ch>, kvm@vger.kernel.org, linux-sh@vger.kernel.org,
- Kevin Hilman <khilman@deeprootsystems.com>, Sekhar Nori <nsekhar@ti.com>,
- linux-tegra@vger.kernel.org, Thierry Reding <thierry.reding@gmail.com>,
- kvmarm@lists.cs.columbia.edu, linux-samsung-soc@vger.kernel.org,
- Kukjin Kim <kgene.kim@samsung.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Stefano Stabellini <stefano.stabellini@eu.citrix.com>,
- Magnus Damm <magnus.damm@gmail.com>, Gleb Natapov <gleb@kernel.org>,
- Tony Lindgren <tony@atomide.com>, linux-arm-kernel@lists.infradead.org,
- xen-devel@lists.xenproject.org,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
- Jason Cooper <jason@lakedaemon.net>, Stephen Warren <swarren@wwwdotorg.org>,
- Marc Zyngier <marc.zyngier@arm.com>,
- Hans Ulli Kroll <ulli.kroll@googlemail.com>,
- Haojian Zhuang <haojian.zhuang@gmail.com>, Simon Horman <horms@verge.net.
-To: Russell King <rmk+kernel@arm.linux.org.uk>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Cc: Stephan Mueller <smueller@chronox.de>, kbuild@01.org,
+ linux-kernel@vger.kernel.org,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <kbuild-bounces@lists.01.org>
 Content-Disposition: inline
-In-Reply-To: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+In-Reply-To: <20140625090646.GB8727@gondor.apana.org.au>
+List-Unsubscribe: <https://lists.01.org/mailman/options/kbuild>,
+ <mailto:kbuild-request@lists.01.org?subject=unsubscribe>
+List-Archive: <http://lists.01.org/pipermail/kbuild/>
+List-Post: <mailto:kbuild@lists.01.org>
+List-Help: <mailto:kbuild-request@lists.01.org?subject=help>
+List-Subscribe: <https://lists.01.org/mailman/listinfo/kbuild>,
+ <mailto:kbuild-request@lists.01.org?subject=subscribe>
+Errors-To: kbuild-bounces@lists.01.org
+Sender: "kbuild" <kbuild-bounces@lists.01.org>
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 01, 2014 at 04:58:24PM +0100, Russell King wrote:
-> ARMv6 and greater introduced a new instruction ("bx") which can be used
-> to return from function calls.  Recent CPUs perform better when the
-> "bx lr" instruction is used rather than the "mov pc, lr" instruction,
-> and this sequence is strongly recommended to be used by the ARM
-> architecture manual (section A.4.1.1).
-> 
-> We provide a new macro "ret" with all its variants for the condition
-> code which will resolve to the appropriate instruction.
-> 
-> Rather than doing this piecemeal, and miss some instances, change all
-> the "mov pc" instances to use the new macro, with the exception of
-> the "movs" instruction and the kprobes code.  This allows us to detect
-> the "mov pc, lr" case and fix it up - and also gives us the possibility
-> of deploying this for other registers depending on the CPU selection.
-> 
-> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+On Wed, Jun 25, 2014 at 05:06:46PM +0800, Herbert Xu wrote:
+> On Sat, Jun 21, 2014 at 02:26:29PM +0200, Stephan Mueller wrote:
+> > The handling of additional input data / personalization string data may
+> > be subject to a NULL pointer deference for the CTR DRBG. The
+> > caller-provided data may be NULL which must be caught by the DRBG.
+> > 
+> > Reported-by: kbuild test robot <fengguang.wu@intel.com>
 
-For the kvm/hyp related changes:
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Oh, huh.  This bug was actually reported by me but I forgot to change
+the from header and apparently my smtp server allows me to send emails
+as if I work for Intel.  :P
+
+Fengguang is much nicer than I am.  :P
+
+> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> > ---
+> >  crypto/drbg.c | 23 +++++++++++++----------
+> >  1 file changed, 13 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/crypto/drbg.c b/crypto/drbg.c
+> > index faaa2ce..8e7c302 100644
+> > --- a/crypto/drbg.c
+> > +++ b/crypto/drbg.c
+> > @@ -513,17 +513,20 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+> >  	drbg_string_fill(&S2, L_N, sizeof(L_N));
+> >  	drbg_string_fill(&S4, pad, padlen);
+> >  	S1.next = &S2;
+> > -	S2.next = addtl;
+> >  
+> > -	/*
+> > -	 * splice in addtl between S2 and S4 -- we place S4 at the end of the
+> > -	 * input data chain
+> > -	 */
+> > -	tempstr = addtl;
+> > -	for (; NULL != tempstr; tempstr = tempstr->next)
+> > -		if (NULL == tempstr->next)
+> > -			break;
+> > -	tempstr->next = &S4;
+> > +	if (NULL == addtl) {
+> > +		S2.next = &S4;
+> > +	} else {
+> > +		/*
+> > +		 * splice in addtl between S2 and S4 -- we place S4 at the end
+> > +		 * of the input data chain
+> > +		 */
+> > +		S2.next = addtl;
+> > +		tempstr = addtl;
+> > +		while (tempstr->next)
+> > +			tempstr = tempstr->next;
+> > +		tempstr->next = &S4;
+> 
+> You've still got exactly the same NULL dereference.
+
+I was offline for a bit so I'm coming into this late.  It's weird that
+Stephan isn't defending his patch but it looks ok to me...
+
+regards,
+dan carpenter
