@@ -1,86 +1,58 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH 3/4] DRBG: Fix format string for debugging
-	statements
-Date: Fri, 4 Jul 2014 14:21:16 +0300
-Message-ID: <20140704112116.GC25934@mwanda>
-References: <4927386.WYHrRe3NJm@myon.chronox.de>
- <10901956.0EDQunEZJL@myon.chronox.de>
- <20140629122402.0fd014d8@canb.auug.org.au>
- <4311965.FMe9YfRAnU@myon.chronox.de>
- <1404013999.9064.50.camel@joe-AO725>
+From: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
+Subject: Re: [PATCH] ARM: convert all "mov.* pc, reg" to "bx reg" for
+ ARMv6+
+Date: Fri, 4 Jul 2014 12:27:10 +0100
+Message-ID: <alpine.DEB.2.02.1407041226530.17694@kaball.uk.xensource.com>
+References: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Stephan Mueller <smueller@chronox.de>, Randy Dunlap <rdunlap@infradead.org>,
- linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, kbuild@01.org,
- linux-crypto@vger.kernel.org
-To: Joe Perches <joe@perches.com>
-Return-path: <kbuild-bounces@lists.01.org>
-Content-Disposition: inline
-In-Reply-To: <1404013999.9064.50.camel@joe-AO725>
-List-Unsubscribe: <https://lists.01.org/mailman/options/kbuild>,
- <mailto:kbuild-request@lists.01.org?subject=unsubscribe>
-List-Archive: <http://lists.01.org/pipermail/kbuild/>
-List-Post: <mailto:kbuild@lists.01.org>
-List-Help: <mailto:kbuild-request@lists.01.org?subject=help>
-List-Subscribe: <https://lists.01.org/mailman/listinfo/kbuild>,
- <mailto:kbuild-request@lists.01.org?subject=subscribe>
-Errors-To: kbuild-bounces@lists.01.org
-Sender: "kbuild" <kbuild-bounces@lists.01.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, kvm@vger.kernel.org, linux-sh@vger.kernel.org,
+ Kevin Hilman <khilman@deeprootsystems.com>, Sekhar Nori <nsekhar@ti.com>,
+ linux-tegra@vger.kernel.org, Thierry Reding <thierry.reding@gmail.com>,
+ kvmarm@lists.cs.columbia.edu, linux-samsung-soc@vger.kernel.org,
+ Kukjin Kim <kgene.kim@samsung.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Stefano Stabellini <stefano.stabellini@eu.citrix.com>,
+ Magnus Damm <magnus.damm@gmail.com>, Gleb Natapov <gleb@kernel.org>,
+ Tony Lindgren <tony@atomide.com>, linux-arm-kernel@lists.infradead.org,
+ xen-devel@lists.xenproject.org,
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+ Jason Cooper <jason@lakedaemon.net>, Stephen Warren <swarren@wwwdotorg.org>,
+ Marc Zyngier <marc.zyngier@arm.com>,
+ Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>, Simon Horman <horms@verge.net.
+To: Russell King <rmk+kernel@arm.linux.org.uk>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Jun 28, 2014 at 08:53:19PM -0700, Joe Perches wrote:
-> On Sun, 2014-06-29 at 05:46 +0200, Stephan Mueller wrote:
-> > Am Sonntag, 29. Juni 2014, 12:24:02 schrieb Stephen Rothwell:
-> > 
-> > Hi Stephen,
-> > 
-> > > Hi Stephan,
-> > > 
-> > > On Sat, 28 Jun 2014 22:01:46 +0200 Stephan Mueller <smueller@chronox.de> 
-> > wrote:
-> > > > @@ -1987,8 +1987,9 @@ static int __init drbg_init(void)
-> > > > 
-> > > >  	if (ARRAY_SIZE(drbg_cores) * 2 > ARRAY_SIZE(drbg_algs)) {
-> > > >  	
-> > > >  		pr_info("DRBG: Cannot register all DRBG types"
-> > > > 
-> > > > -			"(slots needed: %lu, slots available: %lu)\n",
-> > > > -			ARRAY_SIZE(drbg_cores) * 2, ARRAY_SIZE(drbg_algs));
-> > > > +			"(slots needed: %u, slots available: %u)\n",
-> > > > +			(unsigned int)ARRAY_SIZE(drbg_cores) * 2,
-> > > > +			(unsigned int)ARRAY_SIZE(drbg_algs));
-> > > 
-> > > Doesn't ARRAY_SIZE() always return a size_t?  In which case surely we
-> > > need no casts, but need to us %zu in the format string.
-> > 
-> > Unfortunately not at all. On my x86_64, I get the compiler warning that 
-> > ARRAY_SIZE is a long unsigned int without the cast.
+On Tue, 1 Jul 2014, Russell King wrote:
+> ARMv6 and greater introduced a new instruction ("bx") which can be used
+> to return from function calls.  Recent CPUs perform better when the
+> "bx lr" instruction is used rather than the "mov pc, lr" instruction,
+> and this sequence is strongly recommended to be used by the ARM
+> architecture manual (section A.4.1.1).
 > 
-> This should fix that.
-> ---
->  include/linux/kernel.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> We provide a new macro "ret" with all its variants for the condition
+> code which will resolve to the appropriate instruction.
 > 
-> diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-> index 6e3d497..58bc57d 100644
-> --- a/include/linux/kernel.h
-> +++ b/include/linux/kernel.h
-> @@ -51,7 +51,8 @@
->  #define PTR_ALIGN(p, a)		((typeof(p))ALIGN((unsigned long)(p), (a)))
->  #define IS_ALIGNED(x, a)		(((x) & ((typeof(x))(a) - 1)) == 0)
->  
-> -#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
-> +#define ARRAY_SIZE(arr)						\
-> +	(sizeof(arr) / sizeof((arr)[0]) + (size_t)__must_be_array(arr))
+> Rather than doing this piecemeal, and miss some instances, change all
+> the "mov pc" instances to use the new macro, with the exception of
+> the "movs" instruction and the kprobes code.  This allows us to detect
+> the "mov pc, lr" case and fix it up - and also gives us the possibility
+> of deploying this for other registers depending on the CPU selection.
+> 
+> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 
+For the Xen changes:
 
-This change is a no-op isn't it?  I think Stephen Rothwell's suggestion
-is correct.  In linux-next this was changed to %lu which also works...
-
-Are there arches %zu and %lu are different?
-
-regards,
-dan carpenter
+Acked-by: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
