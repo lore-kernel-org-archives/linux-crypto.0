@@ -1,58 +1,70 @@
-From: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
-Subject: Re: [PATCH] ARM: convert all "mov.* pc, reg" to "bx reg" for
- ARMv6+
-Date: Fri, 4 Jul 2014 12:27:10 +0100
-Message-ID: <alpine.DEB.2.02.1407041226530.17694@kaball.uk.xensource.com>
-References: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Andrew Lunn <andrew@lunn.ch>, kvm@vger.kernel.org, linux-sh@vger.kernel.org,
- Kevin Hilman <khilman@deeprootsystems.com>, Sekhar Nori <nsekhar@ti.com>,
- linux-tegra@vger.kernel.org, Thierry Reding <thierry.reding@gmail.com>,
- kvmarm@lists.cs.columbia.edu, linux-samsung-soc@vger.kernel.org,
- Kukjin Kim <kgene.kim@samsung.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Stefano Stabellini <stefano.stabellini@eu.citrix.com>,
- Magnus Damm <magnus.damm@gmail.com>, Gleb Natapov <gleb@kernel.org>,
- Tony Lindgren <tony@atomide.com>, linux-arm-kernel@lists.infradead.org,
- xen-devel@lists.xenproject.org,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
- Jason Cooper <jason@lakedaemon.net>, Stephen Warren <swarren@wwwdotorg.org>,
- Marc Zyngier <marc.zyngier@arm.com>,
- Hans Ulli Kroll <ulli.kroll@googlemail.com>,
- Haojian Zhuang <haojian.zhuang@gmail.com>, Simon Horman <horms@verge.net.
-To: Russell King <rmk+kernel@arm.linux.org.uk>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Dmitry Kasatkin <d.kasatkin@samsung.com>
+Subject: [PATCH v3 0/3] ima: use asynchronous hash API for hash calculation
+Date: Fri, 04 Jul 2014 15:05:25 +0300
+Message-ID: <cover.1404475462.git.d.kasatkin@samsung.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmitry.kasatkin@gmail.com, Dmitry Kasatkin <d.kasatkin@samsung.com>
+To: zohar@linux.vnet.ibm.com, linux-ima-devel@lists.sourceforge.net,
+	linux-security-module@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:12801 "EHLO
+	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750714AbaGDMGr (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 4 Jul 2014 08:06:47 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 1 Jul 2014, Russell King wrote:
-> ARMv6 and greater introduced a new instruction ("bx") which can be used
-> to return from function calls.  Recent CPUs perform better when the
-> "bx lr" instruction is used rather than the "mov pc, lr" instruction,
-> and this sequence is strongly recommended to be used by the ARM
-> architecture manual (section A.4.1.1).
-> 
-> We provide a new macro "ret" with all its variants for the condition
-> code which will resolve to the appropriate instruction.
-> 
-> Rather than doing this piecemeal, and miss some instances, change all
-> the "mov pc" instances to use the new macro, with the exception of
-> the "movs" instruction and the kprobes code.  This allows us to detect
-> the "mov pc, lr" case and fix it up - and also gives us the possibility
-> of deploying this for other registers depending on the CPU selection.
-> 
-> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+Depending on the IMA policy, it might require to measure huge amount of files.
+It may be very important to speedup hash calculation or to reduce (battery)
+energy required to do it. Currently IMA uses synchronous hash API (shash)
+which is CPU based. CPU based hash calculation is very CPU intensive and on the
+battery powered device will be also high energy consuming.
 
-For the Xen changes:
+Many platforms provide cryptographic acceleration modules which allow speedup
+and/or reduce energy consumption, and provide asynchronous way to calculate
+hashes. Defacto way to implement drivers for such accelerators is using
+asynchronous hash API (ahash).
 
-Acked-by: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
+The first patch adds use of ahash API to IMA. Performance of using HW
+acceleration depends very much on amount of data to hash and it depends
+on particular HW. It is usually inefficient for small data due to HW
+initialization overhead. In order to make it possible to optimize performance
+for particular system, the patch provides kernel module parameter
+'ima.ahash_minsize=<min_file_size>', which allows to specify optimal file size
+when start using ahash. By default ahash is disabled until non-zero value
+is specified.
+
+Second patch introduces multi-page buffers which makes HW acceleration more
+efficient. It provides 'ima.ahash_bufsize=<bufsize>' module parameter to
+specify buffer size. Buffer is 4k if parameter is unspecified.
+
+Third patch introduces double-buffering which allows to readahead next portion
+of data for hashing while calculating the hash.
+
+Changes in v3:
+- kernel parameters replaced with module parameters
+- more clear comments and function descriptions
+- pr_crit replaced with pr_crit_ratelimited
+
+Changes in v2:
+- ima_ahash_size and ima_ahash_bufsize were combined as ima_ahash
+- ahash pre-allocation moved out from __init code to be able to use
+  ahash crypto modules. Ahash allocated once on the first use.
+- hash calculation falls back to sahsh if ahash allocation/calculation fails
+- complex initialization separated from variable declaration
+- improved comments
+
+- Dmitry
+
+Dmitry Kasatkin (3):
+  ima: use ahash API for file hash calculation
+  ima: introduce multi-page collect buffers
+  ima: provide double buffering for hash calculation
+
+ Documentation/kernel-parameters.txt |  17 ++
+ security/integrity/ima/ima_crypto.c | 312 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 326 insertions(+), 3 deletions(-)
+
+-- 
+1.9.1
