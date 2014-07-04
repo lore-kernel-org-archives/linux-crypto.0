@@ -1,80 +1,123 @@
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Subject: Re: [PATCH] ARM: convert all "mov.* pc, reg" to "bx reg" for ARMv6+
-Date: Fri, 4 Jul 2014 16:24:38 +0200
-Message-ID: <20140704142438.GA7827@pengutronix.de>
-References: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH 3/4] DRBG: Fix format string for debugging statements
+Date: Fri, 04 Jul 2014 09:57:20 -0700
+Message-ID: <1404493040.6384.21.camel@joe-AO725>
+References: <4927386.WYHrRe3NJm@myon.chronox.de>
+	 <10901956.0EDQunEZJL@myon.chronox.de>
+	 <20140629122402.0fd014d8@canb.auug.org.au>
+	 <4311965.FMe9YfRAnU@myon.chronox.de> <1404013999.9064.50.camel@joe-AO725>
+	 <20140704112116.GC25934@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Cc: Andrew Lunn <andrew@lunn.ch>, kvm@vger.kernel.org, linux-sh@vger.kernel.org,
- Kevin Hilman <khilman@deeprootsystems.com>, Sekhar Nori <nsekhar@ti.com>,
- linux-tegra@vger.kernel.org, Thierry Reding <thierry.reding@gmail.com>,
- kvmarm@lists.cs.columbia.edu, linux-samsung-soc@vger.kernel.org,
- Kukjin Kim <kgene.kim@samsung.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Stefano Stabellini <stefano.stabellini@eu.citrix.com>,
- Magnus Damm <magnus.damm@gmail.com>, Gleb Natapov <gleb@kernel.org>,
- Tony Lindgren <tony@atomide.com>, linux-arm-kernel@lists.infradead.org,
- xen-devel@lists.xenproject.org,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
- Jason Cooper <jason@lakedaemon.net>, Stephen Warren <swarren@wwwdotorg.org>,
- Marc Zyngier <marc.zyngier@arm.com>,
- Hans Ulli Kroll <ulli.kroll@googlemail.com>,
- Haojian Zhuang <haojian.zhuang@gmail.com>, Simon Horman <horms@verge.net.
-To: Russell King <rmk+kernel@arm.linux.org.uk>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <E1X20Rs-00082S-KI@rmk-PC.arm.linux.org.uk>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
+	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtprelay0205.hostedemail.com ([216.40.44.205]:53877 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752622AbaGDQ5Z (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 4 Jul 2014 12:57:25 -0400
+In-Reply-To: <20140704112116.GC25934@mwanda>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 01, 2014 at 04:58:24PM +0100, Russell King wrote:
-> ARMv6 and greater introduced a new instruction ("bx") which can be used
-> to return from function calls.  Recent CPUs perform better when the
-> "bx lr" instruction is used rather than the "mov pc, lr" instruction,
-> and this sequence is strongly recommended to be used by the ARM
-> architecture manual (section A.4.1.1).
-> =
+On Fri, 2014-07-04 at 14:21 +0300, Dan Carpenter wrote:
+> On Sat, Jun 28, 2014 at 08:53:19PM -0700, Joe Perches wrote:
+> > On Sun, 2014-06-29 at 05:46 +0200, Stephan Mueller wrote:
+> > > Am Sonntag, 29. Juni 2014, 12:24:02 schrieb Stephen Rothwell:
+> > > 
+> > > Hi Stephen,
+> > > 
+> > > > Hi Stephan,
+> > > > 
+> > > > On Sat, 28 Jun 2014 22:01:46 +0200 Stephan Mueller <smueller@chronox.de> 
+> > > wrote:
+> > > > > @@ -1987,8 +1987,9 @@ static int __init drbg_init(void)
+> > > > > 
+> > > > >  	if (ARRAY_SIZE(drbg_cores) * 2 > ARRAY_SIZE(drbg_algs)) {
+> > > > >  	
+> > > > >  		pr_info("DRBG: Cannot register all DRBG types"
+> > > > > 
+> > > > > -			"(slots needed: %lu, slots available: %lu)\n",
+> > > > > -			ARRAY_SIZE(drbg_cores) * 2, ARRAY_SIZE(drbg_algs));
+> > > > > +			"(slots needed: %u, slots available: %u)\n",
+> > > > > +			(unsigned int)ARRAY_SIZE(drbg_cores) * 2,
+> > > > > +			(unsigned int)ARRAY_SIZE(drbg_algs));
+> > > > 
+> > > > Doesn't ARRAY_SIZE() always return a size_t?  In which case surely we
+> > > > need no casts, but need to us %zu in the format string.
+> > > 
+> > > Unfortunately not at all. On my x86_64, I get the compiler warning that 
+> > > ARRAY_SIZE is a long unsigned int without the cast.
 
-> We provide a new macro "ret" with all its variants for the condition
-> code which will resolve to the appropriate instruction.
-> =
+It doesn't seem to for 4.8.
+Is there some specific gcc version where this occurs?
 
-> Rather than doing this piecemeal, and miss some instances, change all
-> the "mov pc" instances to use the new macro, with the exception of
-> the "movs" instruction and the kprobes code.  This allows us to detect
-> the "mov pc, lr" case and fix it up - and also gives us the possibility
-> of deploying this for other registers depending on the CPU selection.
-> =
+> > diff --git a/include/linux/kernel.h b/include/linux/kernel.h
+[]
+> > -#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
+> > +#define ARRAY_SIZE(arr)						\
+> > +	(sizeof(arr) / sizeof((arr)[0]) + (size_t)__must_be_array(arr))
+> 
+> 
+> This change is a no-op isn't it?
 
-> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
-Works fine on my ARM-v7M machine:
+Yes, it is.  Dumb idea.
+Assuming there's some odd promotion, size_t should have been around the
+whole thing
+#define ARRAY_SIZE(arr)						\
+	((size_t)((sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr)))
 
-$ objdump -d vmlinux | grep -E 'mov.*pc'
-8c000022:	46e7      	mov	pc, ip
-8c000028:	46ef      	mov	pc, sp
-8c000b26:	46af      	movne	pc, r5
-8c0037e0:	4687      	mov	pc, r0
-8c0828d2:	4697      	mov	pc, r2
-8c1213ee:	469f      	mov	pc, r3
+> I think Stephen Rothwell's suggestion
+> is correct.  In linux-next this was changed to %lu which also works...
+> 
+> Are there arches %zu and %lu are different?
 
-Also boots fine.
+I get the same output types and error warnings compiling this
+either -m32 or -m64
 
-Tested-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+#include <stdio.h>
+#include <stdlib.h>
 
-but I wonder what is the reason to not use bx if \reg !=3D lr.
+#define typecheck(type, x)			\
+({						\
+	type __dummy;				\
+	typeof(x) __dummy2;			\
+	(void)(&__dummy == &__dummy2);		\
+	1;					\
+})
 
-Thanks
-Uwe
+#define BUILD_BUG_ON_ZERO(e) (sizeof(struct { int:-!!(e); }))
 
--- =
+#define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
+#define __must_be_array(a) BUILD_BUG_ON_ZERO(__same_type((a), &(a)[0]))
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
 
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+int main(int argc, char **argv)
+{
+	char foo[100];
+	size_t array = sizeof(foo);
+	typeof (ARRAY_SIZE(foo)) member = ARRAY_SIZE(foo);
+
+	int member1 = ARRAY_SIZE(foo);
+	size_t member2 = ARRAY_SIZE(foo);
+
+	typecheck(size_t, member);
+	typecheck(int, member);
+
+	typecheck(size_t, member1);
+	typecheck(int, member1);
+
+	typecheck(size_t, member2);
+	typecheck(int, member2);
+
+	printf("array: %zu, member: %zu\n", array, (int)member);
+
+	return 0;
+}
