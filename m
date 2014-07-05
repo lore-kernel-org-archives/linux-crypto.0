@@ -1,59 +1,53 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 3/4] DRBG: Fix format string for debugging statements
-Date: Sat, 05 Jul 2014 02:27:27 +0200
-Message-ID: <2812156.9vUu6vDFVa@myon.chronox.de>
-References: <4927386.WYHrRe3NJm@myon.chronox.de> <3976291.2Ne0xJphcZ@myon.chronox.de> <1404519849.6384.32.camel@joe-AO725>
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: Re: [PATCH] Potential NULL pointer deference in drbg_ctr_df
+Date: Sat, 5 Jul 2014 08:36:07 +0800
+Message-ID: <20140705003607.GA30874@localhost>
+References: <20140620202418.GZ5015@mwanda>
+ <20140625090646.GB8727@gondor.apana.org.au>
+ <20140704105003.GA25934@mwanda>
+ <3313472.TGNVD1jVhQ@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Dan Carpenter <dan.carpenter@oracle.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	kbuild test robot <fengguang.wu@intel.com>, kbuild@01.org,
-	linux-crypto@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>,
-	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Joe Perches <joe@perches.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:41774 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753682AbaGEA2M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 4 Jul 2014 20:28:12 -0400
-Received: from myon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S243> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sat, 5 Jul 2014 02:27:38 +0200
-In-Reply-To: <1404519849.6384.32.camel@joe-AO725>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: 7bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, kbuild@01.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <kbuild-bounces@lists.01.org>
+Content-Disposition: inline
+In-Reply-To: <3313472.TGNVD1jVhQ@myon.chronox.de>
+List-Unsubscribe: <https://lists.01.org/mailman/options/kbuild>,
+ <mailto:kbuild-request@lists.01.org?subject=unsubscribe>
+List-Archive: <http://lists.01.org/pipermail/kbuild/>
+List-Post: <mailto:kbuild@lists.01.org>
+List-Help: <mailto:kbuild-request@lists.01.org?subject=help>
+List-Subscribe: <https://lists.01.org/mailman/listinfo/kbuild>,
+ <mailto:kbuild-request@lists.01.org?subject=subscribe>
+Errors-To: kbuild-bounces@lists.01.org
+Sender: "kbuild" <kbuild-bounces@lists.01.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 4. Juli 2014, 17:24:09 schrieb Joe Perches:
-
-Hi Joe,
-
-> On Sat, 2014-07-05 at 02:15 +0200, Stephan Mueller wrote:
-> > Am Freitag, 4. Juli 2014, 17:09:33 schrieb Joe Perches:
-> > > On Sat, 2014-07-05 at 01:57 +0200, Stephan Mueller wrote:
-> > > > And I also get the same output. Yet I am not sure how that code can be
-> > > > compared to the code in the kernel.
-> > > 
-> > > What that code shows is that the ARRAY_SIZE
-> > > type is size_t.
-> > > 
-> > > The difference is ARRAY_SIZE in the kernel
-> > > should be output with %zu.
+On Sat, Jul 05, 2014 at 02:00:15AM +0200, Stephan Mueller wrote:
+> Am Freitag, 4. Juli 2014, 13:50:03 schrieb Dan Carpenter:
+> 
+> Hi Dan,
+> 
+> > On Wed, Jun 25, 2014 at 05:06:46PM +0800, Herbert Xu wrote:
+> > > On Sat, Jun 21, 2014 at 02:26:29PM +0200, Stephan Mueller wrote:
+> > > > The handling of additional input data / personalization string data may
+> > > > be subject to a NULL pointer deference for the CTR DRBG. The
+> > > > caller-provided data may be NULL which must be caught by the DRBG.
+> > > > 
+> > > > Reported-by: kbuild test robot <fengguang.wu@intel.com>
 > > 
-> > Using %zu works without a warning on my 64 bit machine. So you are saying
-> > that ARRAY_SIZE will always be size_t on every architecture? If yes, I
-> > will update my patch.
+> > Oh, huh.  This bug was actually reported by me but I forgot to change
+> > the from header and apparently my smtp server allows me to send emails
+> > as if I work for Intel.  :P
+> > 
+> > Fengguang is much nicer than I am.  :P
 > 
-> Hi again.
-> 
-> ARRAY_SIZE is size_t in all architectures.
+> Too late, your colleague's name is now in the patches ;-)
 
-Thank you very much, this is the answer I was looking for :-)
+Thank you nice guys! :P
 
-I will update the patch accordingly.
-
--- 
-Ciao
-Stephan
+Thanks,
+Fengguang
