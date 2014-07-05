@@ -1,53 +1,47 @@
-From: Fengguang Wu <fengguang.wu@intel.com>
-Subject: Re: [PATCH] Potential NULL pointer deference in drbg_ctr_df
-Date: Sat, 5 Jul 2014 08:36:07 +0800
-Message-ID: <20140705003607.GA30874@localhost>
-References: <20140620202418.GZ5015@mwanda>
- <20140625090646.GB8727@gondor.apana.org.au>
- <20140704105003.GA25934@mwanda>
- <3313472.TGNVD1jVhQ@myon.chronox.de>
+From: Tomasz Figa <tomasz.figa@gmail.com>
+Subject: Re: [PATCH] ARM: convert all "mov.* pc, reg" to "bx reg" for ARMv6+
+ (part1)
+Date: Sat, 05 Jul 2014 03:06:39 +0200
+Message-ID: <53B74F9F.8030604@gmail.com>
+References: <E1X20mL-00083I-Sv@rmk-PC.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, kbuild@01.org,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <kbuild-bounces@lists.01.org>
-Content-Disposition: inline
-In-Reply-To: <3313472.TGNVD1jVhQ@myon.chronox.de>
-List-Unsubscribe: <https://lists.01.org/mailman/options/kbuild>,
- <mailto:kbuild-request@lists.01.org?subject=unsubscribe>
-List-Archive: <http://lists.01.org/pipermail/kbuild/>
-List-Post: <mailto:kbuild@lists.01.org>
-List-Help: <mailto:kbuild-request@lists.01.org?subject=help>
-List-Subscribe: <https://lists.01.org/mailman/listinfo/kbuild>,
- <mailto:kbuild-request@lists.01.org?subject=subscribe>
-Errors-To: kbuild-bounces@lists.01.org
-Sender: "kbuild" <kbuild-bounces@lists.01.org>
+Cc: davinci-linux-open-source@linux.davincidsp.com,
+	linux-samsung-soc@vger.kernel.org, kvm@vger.kernel.org,
+	linux-sh@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-tegra@vger.kernel.org, xen-devel@lists.xenproject.org,
+	linux-omap@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Russell King <rmk+kernel@arm.linux.org.uk>,
+	linux-arm-kernel@lists.infradead.org
+Return-path: <linux-samsung-soc-owner@vger.kernel.org>
+In-Reply-To: <E1X20mL-00083I-Sv@rmk-PC.arm.linux.org.uk>
+Sender: linux-samsung-soc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, Jul 05, 2014 at 02:00:15AM +0200, Stephan Mueller wrote:
-> Am Freitag, 4. Juli 2014, 13:50:03 schrieb Dan Carpenter:
-> 
-> Hi Dan,
-> 
-> > On Wed, Jun 25, 2014 at 05:06:46PM +0800, Herbert Xu wrote:
-> > > On Sat, Jun 21, 2014 at 02:26:29PM +0200, Stephan Mueller wrote:
-> > > > The handling of additional input data / personalization string data may
-> > > > be subject to a NULL pointer deference for the CTR DRBG. The
-> > > > caller-provided data may be NULL which must be caught by the DRBG.
-> > > > 
-> > > > Reported-by: kbuild test robot <fengguang.wu@intel.com>
-> > 
-> > Oh, huh.  This bug was actually reported by me but I forgot to change
-> > the from header and apparently my smtp server allows me to send emails
-> > as if I work for Intel.  :P
-> > 
-> > Fengguang is much nicer than I am.  :P
-> 
-> Too late, your colleague's name is now in the patches ;-)
+Hi Russell,
 
-Thank you nice guys! :P
+On 01.07.2014 18:19, Russell King wrote:
+> ARMv6 and greater introduced a new instruction ("bx") which can be used
+> to return from function calls.  Recent CPUs perform better when the
+> "bx lr" instruction is used rather than the "mov pc, lr" instruction,
+> and this sequence is strongly recommended to be used by the ARM
+> architecture manual (section A.4.1.1).
+> 
+> We provide a new macro "ret" with all its variants for the condition
+> code which will resolve to the appropriate instruction.
+> 
+> Rather than doing this piecemeal, and miss some instances, change all
+> the "mov pc" instances to use the new macro, with the exception of
+> the "movs" instruction and the kprobes code.  This allows us to detect
+> the "mov pc, lr" case and fix it up - and also gives us the possibility
+> of deploying this for other registers depending on the CPU selection.
+> 
+> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 
-Thanks,
-Fengguang
+Build- and boot-tested on mach-s3c64xx.
+
+Tested-by: Tomasz Figa <tomasz.figa@gmail.com>
+
+Best regards,
+Tomasz
