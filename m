@@ -1,47 +1,45 @@
-From: Tomasz Figa <tomasz.figa@gmail.com>
-Subject: Re: [PATCH] ARM: convert all "mov.* pc, reg" to "bx reg" for ARMv6+
- (part1)
-Date: Sat, 05 Jul 2014 03:06:39 +0200
-Message-ID: <53B74F9F.8030604@gmail.com>
-References: <E1X20mL-00083I-Sv@rmk-PC.arm.linux.org.uk>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 6/6] DRBG: HMAC-SHA1 DRBG has crypto strength of 128 bits
+Date: Sun, 06 Jul 2014 02:26:37 +0200
+Message-ID: <2038501.NQxD5ZZc1H@myon.chronox.de>
+References: <2266932.bfVPMOTOeI@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: davinci-linux-open-source@linux.davincidsp.com,
-	linux-samsung-soc@vger.kernel.org, kvm@vger.kernel.org,
-	linux-sh@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-tegra@vger.kernel.org, xen-devel@lists.xenproject.org,
-	linux-omap@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-To: Russell King <rmk+kernel@arm.linux.org.uk>,
-	linux-arm-kernel@lists.infradead.org
-Return-path: <linux-samsung-soc-owner@vger.kernel.org>
-In-Reply-To: <E1X20mL-00083I-Sv@rmk-PC.arm.linux.org.uk>
-Sender: linux-samsung-soc-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: joe@perches.com, dan.carpenter@oracle.com,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	fengguang.wu@intel.com, Randy Dunlap <rdunlap@infradead.org>,
+	linux-crypto@vger.kernel.org, linux-next@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Rafael Aquini <aquini@redhat.com>,
+	aris@redhat.com
+To: herbert@gondor.apana.org.au
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <2266932.bfVPMOTOeI@myon.chronox.de>
+Sender: linux-next-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi Russell,
+The patch corrects the security strength of the HMAC-SHA1 DRBG to 128
+bits. This strength defines the size of the seed required for the DRBG.
+Thus, the patch lowers the seeding requirement from 256 bits to 128 bits
+for HMAC-SHA1.
 
-On 01.07.2014 18:19, Russell King wrote:
-> ARMv6 and greater introduced a new instruction ("bx") which can be used
-> to return from function calls.  Recent CPUs perform better when the
-> "bx lr" instruction is used rather than the "mov pc, lr" instruction,
-> and this sequence is strongly recommended to be used by the ARM
-> architecture manual (section A.4.1.1).
-> 
-> We provide a new macro "ret" with all its variants for the condition
-> code which will resolve to the appropriate instruction.
-> 
-> Rather than doing this piecemeal, and miss some instances, change all
-> the "mov pc" instances to use the new macro, with the exception of
-> the "movs" instruction and the kprobes code.  This allows us to detect
-> the "mov pc, lr" case and fix it up - and also gives us the possibility
-> of deploying this for other registers depending on the CPU selection.
-> 
-> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/drbg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Build- and boot-tested on mach-s3c64xx.
-
-Tested-by: Tomasz Figa <tomasz.figa@gmail.com>
-
-Best regards,
-Tomasz
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index a76b3cb..84478cb 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -184,7 +184,7 @@ static const struct drbg_core drbg_cores[] = {
+ #endif /* CONFIG_CRYPTO_DRBG_HASH */
+ #ifdef CONFIG_CRYPTO_DRBG_HMAC
+ 	{
+-		.flags = DRBG_HMAC | DRBG_STRENGTH256,
++		.flags = DRBG_HMAC | DRBG_STRENGTH128,
+ 		.statelen = 20, /* block length of cipher */
+ 		.max_addtllen = 35,
+ 		.max_bits = 19,
+-- 
+1.9.3
