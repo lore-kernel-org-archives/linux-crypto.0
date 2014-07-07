@@ -1,161 +1,59 @@
-From: Ruchika Gupta <ruchika.gupta@freescale.com>
-Subject: [PATCH][v2] crypto: caam - Check for CAAM block presence before registering with crypto layer
-Date: Mon, 7 Jul 2014 10:42:12 +0530
-Message-ID: <1404709932-19242-1-git-send-email-ruchika.gupta@freescale.com>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: [PATCH v3] crypto: caam - fix memleak in caam_jr module
+Date: Mon, 7 Jul 2014 11:52:41 +0300
+Message-ID: <1404723161-30180-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: <davem@davemloft.net>, <alexandru.porosanu@freescale.com>,
-	<horia.geanta@freescale.com>, <NiteshNarayanLal@freescale.com>,
-	<vakul@freescale.com>, <marex@denx.de>,
-	<kim.phillips@freescale.com>, <pebolle@tiscali.nl>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>
-To: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>
+Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>,
+	Garg Vakul-B16394 <vakul@freescale.com>,
+	Cristian Stoica <cristian.stoica@freescale.com>,
+	<stable@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from dns-bn1lp0143.outbound.protection.outlook.com ([207.46.163.143]:31865
+Received: from mail-bn1lp0139.outbound.protection.outlook.com ([207.46.163.139]:46718
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750714AbaGGFMr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Jul 2014 01:12:47 -0400
+	id S1751399AbaGGIxO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Jul 2014 04:53:14 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The layer which registers with the crypto API should check for the presence of
-the CAAM device it is going to use.  If the platform's device tree doesn't have
-the required CAAM node, the layer should return an error and not register the
-algorithms with crypto API layer.
+This patch fixes a memory leak that appears when caam_jr module is unloaded.
 
-Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
+Cc: <stable@vger.kernel.org> # 3.13+
+Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
 ---
- drivers/crypto/caam/caamalg.c  | 29 +++++++++++++++++++++++++++++
- drivers/crypto/caam/caamhash.c | 28 ++++++++++++++++++++++++++++
- drivers/crypto/caam/caamrng.c  | 28 ++++++++++++++++++++++++++++
- 3 files changed, 85 insertions(+)
+ drivers/crypto/caam/jr.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-Changes from v1
-Removed the memory leak of dev_node in case of error
-
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 87d9de4..64c606d 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -2441,8 +2441,37 @@ static struct caam_crypto_alg *caam_alg_alloc(struct caam_alg_template
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 1d80bd3..b512a4b 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -453,8 +453,8 @@ static int caam_jr_probe(struct platform_device *pdev)
+ 	int error;
  
- static int __init caam_algapi_init(void)
- {
-+	struct device_node *dev_node;
-+	struct platform_device *pdev;
-+	struct device *ctrldev;
-+	void *priv;
- 	int i = 0, err = 0;
+ 	jrdev = &pdev->dev;
+-	jrpriv = kmalloc(sizeof(struct caam_drv_private_jr),
+-			 GFP_KERNEL);
++	jrpriv = devm_kmalloc(jrdev, sizeof(struct caam_drv_private_jr),
++			      GFP_KERNEL);
+ 	if (!jrpriv)
+ 		return -ENOMEM;
  
-+	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-+	if (!dev_node) {
-+		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
-+		if (!dev_node)
-+			return -ENODEV;
-+	}
-+
-+	pdev = of_find_device_by_node(dev_node);
-+	if (!pdev) {
-+		of_node_put(dev_node);
-+		return -ENODEV;
-+	}
-+
-+	ctrldev = &pdev->dev;
-+	priv = dev_get_drvdata(ctrldev);
-+	of_node_put(dev_node);
-+
-+	/*
-+	 * If priv is NULL, it's probably because the caam driver wasn't
-+	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
-+	 */
-+	if (!priv)
-+		return -ENODEV;
-+
-+
- 	INIT_LIST_HEAD(&alg_list);
+@@ -487,10 +487,8 @@ static int caam_jr_probe(struct platform_device *pdev)
  
- 	/* register crypto algorithms the device supports */
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 2ab057b..7754df4 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -1793,8 +1793,36 @@ caam_hash_alloc(struct caam_hash_template *template,
+ 	/* Now do the platform independent part */
+ 	error = caam_jr_init(jrdev); /* now turn on hardware */
+-	if (error) {
+-		kfree(jrpriv);
++	if (error)
+ 		return error;
+-	}
  
- static int __init caam_algapi_hash_init(void)
- {
-+	struct device_node *dev_node;
-+	struct platform_device *pdev;
-+	struct device *ctrldev;
-+	void *priv;
- 	int i = 0, err = 0;
- 
-+	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-+	if (!dev_node) {
-+		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
-+		if (!dev_node)
-+			return -ENODEV;
-+	}
-+
-+	pdev = of_find_device_by_node(dev_node);
-+	if (!pdev) {
-+		of_node_put(dev_node);
-+		return -ENODEV;
-+	}
-+
-+	ctrldev = &pdev->dev;
-+	priv = dev_get_drvdata(ctrldev);
-+	of_node_put(dev_node);
-+
-+	/*
-+	 * If priv is NULL, it's probably because the caam driver wasn't
-+	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
-+	 */
-+	if (!priv)
-+		return -ENODEV;
-+
- 	INIT_LIST_HEAD(&hash_list);
- 
- 	/* register crypto algorithms the device supports */
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 8c07d31..a4afa8a 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -278,6 +278,34 @@ static void __exit caam_rng_exit(void)
- static int __init caam_rng_init(void)
- {
- 	struct device *dev;
-+	struct device_node *dev_node;
-+	struct platform_device *pdev;
-+	struct device *ctrldev;
-+	void *priv;
-+
-+	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
-+	if (!dev_node) {
-+		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
-+		if (!dev_node)
-+			return -ENODEV;
-+	}
-+
-+	pdev = of_find_device_by_node(dev_node);
-+	if (!pdev) {
-+		of_node_put(dev_node);
-+		return -ENODEV;
-+	}
-+
-+	ctrldev = &pdev->dev;
-+	priv = dev_get_drvdata(ctrldev);
-+	of_node_put(dev_node);
-+
-+	/*
-+	 * If priv is NULL, it's probably because the caam driver wasn't
-+	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
-+	 */
-+	if (!priv)
-+		return -ENODEV;
- 
- 	dev = caam_jr_alloc();
- 	if (IS_ERR(dev)) {
+ 	jrpriv->dev = jrdev;
+ 	spin_lock(&driver_data.jr_alloc_lock);
 -- 
-1.8.1.4
+1.8.3.1
