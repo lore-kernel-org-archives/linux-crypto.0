@@ -1,21 +1,22 @@
 From: Ruchika Gupta <ruchika.gupta@freescale.com>
 Subject: [PATCH][v2] crypto: caam - Check for CAAM block presence before registering with crypto layer
-Date: Mon, 7 Jul 2014 10:39:44 +0530
-Message-ID: <1404709784-19167-1-git-send-email-ruchika.gupta@freescale.com>
+Date: Mon, 7 Jul 2014 10:42:12 +0530
+Message-ID: <1404709932-19242-1-git-send-email-ruchika.gupta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <davem@davemloft.net>, <alexandru.porosanu@freescale.com>,
-	<kim.phillips@freescale.com>, <dan.carpenter@oracle.com>,
-	<horia.geanta@freescale.com>, <marex@denx.de>,
+	<horia.geanta@freescale.com>, <NiteshNarayanLal@freescale.com>,
+	<vakul@freescale.com>, <marex@denx.de>,
+	<kim.phillips@freescale.com>, <pebolle@tiscali.nl>,
 	Ruchika Gupta <ruchika.gupta@freescale.com>
 To: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1blp0186.outbound.protection.outlook.com ([207.46.163.186]:23971
+Received: from dns-bn1lp0143.outbound.protection.outlook.com ([207.46.163.143]:31865
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750714AbaGGFKP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 7 Jul 2014 01:10:15 -0400
+	id S1750714AbaGGFMr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Jul 2014 01:12:47 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
