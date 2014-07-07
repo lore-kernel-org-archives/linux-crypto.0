@@ -1,49 +1,160 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 0/6] DRBG: Rebasing unapplied patches
-Date: Sun, 06 Jul 2014 02:22:29 +0200
-Message-ID: <2266932.bfVPMOTOeI@myon.chronox.de>
+From: Ruchika Gupta <ruchika.gupta@freescale.com>
+Subject: [PATCH][v2] crypto: caam - Check for CAAM block presence before registering with crypto layer
+Date: Mon, 7 Jul 2014 10:39:44 +0530
+Message-ID: <1404709784-19167-1-git-send-email-ruchika.gupta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: joe@perches.com, dan.carpenter@oracle.com,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	fengguang.wu@intel.com, Randy Dunlap <rdunlap@infradead.org>,
-	linux-crypto@vger.kernel.org, linux-next@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Rafael Aquini <aquini@redhat.com>,
-	aris@redhat.com
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain
+Cc: <davem@davemloft.net>, <alexandru.porosanu@freescale.com>,
+	<kim.phillips@freescale.com>, <dan.carpenter@oracle.com>,
+	<horia.geanta@freescale.com>, <marex@denx.de>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>
+To: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:41601 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750828AbaGFAqB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 5 Jul 2014 20:46:01 -0400
-Received: from myon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S255> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sun, 6 Jul 2014 02:44:51 +0200
+Received: from mail-bn1blp0186.outbound.protection.outlook.com ([207.46.163.186]:23971
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750714AbaGGFKP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 7 Jul 2014 01:10:15 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+The layer which registers with the crypto API should check for the presence of
+the CAAM device it is going to use.  If the platform's device tree doesn't have
+the required CAAM node, the layer should return an error and not register the
+algorithms with crypto API layer.
 
-This patchset superseeds the patch sets submitted with [1] and [2]. It
-rebases all non-applied patches to the current Herbert Xu's
-cryptodev-2.6 tree.
+Signed-off-by: Ruchika Gupta <ruchika.gupta@freescale.com>
+---
+ drivers/crypto/caam/caamalg.c  | 29 +++++++++++++++++++++++++++++
+ drivers/crypto/caam/caamhash.c | 28 ++++++++++++++++++++++++++++
+ drivers/crypto/caam/caamrng.c  | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 85 insertions(+)
 
-[1] https://lkml.org/lkml/2014/6/28/497
-[2] https://lkml.org/lkml/2014/7/1/332
+Changes from v1
+Removed the memory leak of dev_node in case of error
 
-Stephan Mueller (6):
-  DRBG: cleanup of preprocessor macros
-  DRBG: Fix format string for debugging statements
-  DRBG: Call CTR DRBG DF function only once
-  DRBG: Select correct DRBG core for stdrng
-  DRBG: Mix a time stamp into DRBG state
-  DRBG: HMAC-SHA1 DRBG has crypto strength of 128 bits
-
- crypto/drbg.c         | 134 +++++++++++++++++++++++++++++---------------------
- include/crypto/drbg.h |   2 +-
- 2 files changed, 78 insertions(+), 58 deletions(-)
-
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 87d9de4..64c606d 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -2441,8 +2441,37 @@ static struct caam_crypto_alg *caam_alg_alloc(struct caam_alg_template
+ 
+ static int __init caam_algapi_init(void)
+ {
++	struct device_node *dev_node;
++	struct platform_device *pdev;
++	struct device *ctrldev;
++	void *priv;
+ 	int i = 0, err = 0;
+ 
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
++	if (!dev_node) {
++		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
++		if (!dev_node)
++			return -ENODEV;
++	}
++
++	pdev = of_find_device_by_node(dev_node);
++	if (!pdev) {
++		of_node_put(dev_node);
++		return -ENODEV;
++	}
++
++	ctrldev = &pdev->dev;
++	priv = dev_get_drvdata(ctrldev);
++	of_node_put(dev_node);
++
++	/*
++	 * If priv is NULL, it's probably because the caam driver wasn't
++	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
++	 */
++	if (!priv)
++		return -ENODEV;
++
++
+ 	INIT_LIST_HEAD(&alg_list);
+ 
+ 	/* register crypto algorithms the device supports */
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 2ab057b..7754df4 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1793,8 +1793,36 @@ caam_hash_alloc(struct caam_hash_template *template,
+ 
+ static int __init caam_algapi_hash_init(void)
+ {
++	struct device_node *dev_node;
++	struct platform_device *pdev;
++	struct device *ctrldev;
++	void *priv;
+ 	int i = 0, err = 0;
+ 
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
++	if (!dev_node) {
++		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
++		if (!dev_node)
++			return -ENODEV;
++	}
++
++	pdev = of_find_device_by_node(dev_node);
++	if (!pdev) {
++		of_node_put(dev_node);
++		return -ENODEV;
++	}
++
++	ctrldev = &pdev->dev;
++	priv = dev_get_drvdata(ctrldev);
++	of_node_put(dev_node);
++
++	/*
++	 * If priv is NULL, it's probably because the caam driver wasn't
++	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
++	 */
++	if (!priv)
++		return -ENODEV;
++
+ 	INIT_LIST_HEAD(&hash_list);
+ 
+ 	/* register crypto algorithms the device supports */
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index 8c07d31..a4afa8a 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -278,6 +278,34 @@ static void __exit caam_rng_exit(void)
+ static int __init caam_rng_init(void)
+ {
+ 	struct device *dev;
++	struct device_node *dev_node;
++	struct platform_device *pdev;
++	struct device *ctrldev;
++	void *priv;
++
++	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
++	if (!dev_node) {
++		dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec4.0");
++		if (!dev_node)
++			return -ENODEV;
++	}
++
++	pdev = of_find_device_by_node(dev_node);
++	if (!pdev) {
++		of_node_put(dev_node);
++		return -ENODEV;
++	}
++
++	ctrldev = &pdev->dev;
++	priv = dev_get_drvdata(ctrldev);
++	of_node_put(dev_node);
++
++	/*
++	 * If priv is NULL, it's probably because the caam driver wasn't
++	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
++	 */
++	if (!priv)
++		return -ENODEV;
+ 
+ 	dev = caam_jr_alloc();
+ 	if (IS_ERR(dev)) {
 -- 
-1.9.3
+1.8.1.4
