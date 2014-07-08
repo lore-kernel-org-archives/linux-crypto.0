@@ -1,107 +1,35 @@
-From: Dmitry Kasatkin <d.kasatkin@samsung.com>
-Subject: Re: [PATCH v3 1/3] ima: use ahash API for file hash calculation
-Date: Tue, 08 Jul 2014 11:07:16 +0300
-Message-ID: <53BBA6B4.7030705@samsung.com>
-References: <cover.1404475462.git.d.kasatkin@samsung.com>
- <dc5977267c662c98f02cd637dd44c42be850916f.1404475462.git.d.kasatkin@samsung.com>
- <1404734207.3029.22.camel@dhcp-9-2-203-236.watson.ibm.com>
- <53BAA281.7040903@samsung.com>
- <1404747894.3029.58.camel@dhcp-9-2-203-236.watson.ibm.com>
- <53BAC6A6.2010509@samsung.com>
- <1404750875.3029.79.camel@dhcp-9-2-203-236.watson.ibm.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch] crypto: qat - remove an unneeded cast
+Date: Tue, 8 Jul 2014 13:59:07 +0300
+Message-ID: <20140708105907.GE19737@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-ima-devel@lists.sourceforge.net,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dmitry.kasatkin@gmail.com
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:61364 "EHLO
-	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750927AbaGHIIc (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 8 Jul 2014 04:08:32 -0400
-In-reply-to: <1404750875.3029.79.camel@dhcp-9-2-203-236.watson.ibm.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Bruce Allan <bruce.w.allan@intel.com>,
+	Pingchaox Yang <pingchaox.yang@intel.com>,
+	Bo Cui <bo.cui@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 07/07/14 19:34, Mimi Zohar wrote:
-> On Mon, 2014-07-07 at 19:11 +0300, Dmitry Kasatkin wrote: 
->> On 07/07/14 18:44, Mimi Zohar wrote:
->>> On Mon, 2014-07-07 at 16:37 +0300, Dmitry Kasatkin wrote: 
->>>> On 07/07/14 14:56, Mimi Zohar wrote:
->>>>> On Fri, 2014-07-04 at 15:05 +0300, Dmitry Kasatkin wrote: 
->>>>>> +/**
->>>>> This is the kernel-doc delimiter.
->>>>>
->>>>>> + * ima_calc_file_hash - calculae file hash
->>>>>> + *
->>>>> Missing kernel-doc argument descriptions.  Refer to
->>>>> Documentation/kernel-doc-nano-HOWTO.txt.
->>> Not defining the arguments results in a kernel-doc warning.  Providing
->>> kernel-doc is nice, but is unnecessary in this case, as it isn't an
->>> exported loadable module, nor an externally visible function to other
->>> kernel files.  Either remove the extra asterisk, making it a regular
->>> comment, or add the arguments.
->>>
->>>> There is no need to explain arguments as they self-evident.
->>>>
->>>>>> + * if ima_ahash_minsize parameter is non-zero, this function uses
->>>>>> + * ahash for hash caclulation. ahash performance varies for different
->>>>>> + * data sizes on different crypto accelerators. shash performance might
->>>>>> + * be better for small file. 'ima.ahash_minsize' module parameter allows
->>>>>> + * to specify the best value for the system.
->>>>>> + *
->>>>>> + * If ahash fails, it fallbacks to shash.
->>>>>> + */
->>>>>> +int ima_calc_file_hash(struct file *file, struct ima_digest_data *hash)
->>>>>> +{
->>>>>> +	loff_t i_size;
->>>>>> +	int rc;
->>>>>> +
->>>>>> +	i_size = i_size_read(file_inode(file));
->>>>>> +
->>>>>> +	if (ima_ahash_minsize && i_size >= ima_ahash_minsize) {
->>>>>> +		rc = ima_calc_file_ahash(file, hash);
->>>>>> +		if (!rc)
->>>>>> +			return 0;
->>>>>> +	}
->>>>>> +
->>>>>> +	return ima_calc_file_shash(file, hash);
->>>>>> +}
->>>>> If the crypto accelerator fails, it falls back to using shash.  Is their
->>>>> any indication that the HW error is intermittent or persistent?  Should
->>>>> ima_ahash_minsize be reset?
->>>> If hw constantly does not work then it is simply broken.
->>> True
->>>
->>>> You want to be protected from "random" failures.
->>>> For me it is not the case either... If it works then it works...
->>> This discussion isn't about your particular HW environment, but a
->>> general question.  For example, suppose we were discussing a laptop with
->>> a HW crypto accelerator.  If the HW crypto broke, I would at least want
->>> to be able to quiesce the system properly.  I'd most likely want to be
->>> able to continue using my laptop with software crypto.
->> Driver probing code will detect that HW is not responding and driver
->> will not be enabled...
->>
->> IMA will not be able to use it...
->>
->> It is the same story as with any other HW and driver in the system.
-> Right, but my concern is not about unloading the kernel module, but
-> about the IMA module parameters left initialized.  The existing code
-> will continue using ahash (software version), even though the kernel
-> module was unloaded, not shash.  My question is about the software
-> implementations of ahash vs. shash performance.
->
-> Mimi
+The cast to (unsigned int *) doesn't hurt anything but it is pointless.
 
-If HW driver will not be available, ahash loads generic driver which is
-using shash.
-Performance of that will be the same as for using shash directly.
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-- Dmitry
-
->
+diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
+index 903ca88..28da876 100644
+--- a/drivers/crypto/qat/qat_common/qat_hal.c
++++ b/drivers/crypto/qat/qat_common/qat_hal.c
+@@ -850,7 +850,7 @@ static int qat_hal_exec_micro_inst(struct icp_qat_fw_loader_handle *handle,
+ 
+ 	if ((inst_num > handle->hal_handle->max_ustore) || !micro_inst) {
+ 		pr_err("QAT: invalid instructs inst_num=%d, micro_inst=0x%p\n ",
+-		       inst_num, (unsigned int *)micro_inst);
++		       inst_num, micro_inst);
+ 		return -EINVAL;
+ 	}
+ 	/* save current context */
