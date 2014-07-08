@@ -1,35 +1,36 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] crypto: qat - remove an unneeded cast
-Date: Tue, 8 Jul 2014 13:59:07 +0300
-Message-ID: <20140708105907.GE19737@mwanda>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: dts - Addition of missing SEC compatibile
+ property in c29x device tree
+Date: Tue, 8 Jul 2014 21:21:11 +0800
+Message-ID: <20140708132111.GA24110@gondor.apana.org.au>
+References: <1404223643-32275-1-git-send-email-b44382@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Bruce Allan <bruce.w.allan@intel.com>,
-	Pingchaox Yang <pingchaox.yang@intel.com>,
-	Bo Cui <bo.cui@intel.com>, qat-linux@intel.com,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, r66431@freescale.com,
+	b16394@freescale.com
+To: Nitesh Narayan Lal <b44382@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:47405 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755080AbaGHNVT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 8 Jul 2014 09:21:19 -0400
 Content-Disposition: inline
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1404223643-32275-1-git-send-email-b44382@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The cast to (unsigned int *) doesn't hurt anything but it is pointless.
+On Tue, Jul 01, 2014 at 07:37:23PM +0530, Nitesh Narayan Lal wrote:
+> The driver is compatible with SEC version 4.0, which was missing from
+> device tree resulting that the caam driver doesn't gets probed. Since
+> SEC is backward compatible with older versions, so this patch adds those
+> missing versions in c29x device tree.
+> 
+> Signed-off-by: Nitesh Narayan Lal <b44382@freescale.com>
+> Signed-off-by: Vakul Garg <b16394@freescale.com>
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-
-diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-index 903ca88..28da876 100644
---- a/drivers/crypto/qat/qat_common/qat_hal.c
-+++ b/drivers/crypto/qat/qat_common/qat_hal.c
-@@ -850,7 +850,7 @@ static int qat_hal_exec_micro_inst(struct icp_qat_fw_loader_handle *handle,
- 
- 	if ((inst_num > handle->hal_handle->max_ustore) || !micro_inst) {
- 		pr_err("QAT: invalid instructs inst_num=%d, micro_inst=0x%p\n ",
--		       inst_num, (unsigned int *)micro_inst);
-+		       inst_num, micro_inst);
- 		return -EINVAL;
- 	}
- 	/* save current context */
+Patch applied.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
