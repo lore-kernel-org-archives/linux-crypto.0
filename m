@@ -1,7 +1,7 @@
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1 3/5] crypto: qat - use seq_hex_dump() to dump buffers
-Date: Wed,  9 Jul 2014 18:24:28 +0300
-Message-ID: <1404919470-26668-4-git-send-email-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1 4/5] parisc: use seq_hex_dump() to dump buffers
+Date: Wed,  9 Jul 2014 18:24:29 +0300
+Message-ID: <1404919470-26668-5-git-send-email-andriy.shevchenko@linux.intel.com>
 References: <1404919470-26668-1-git-send-email-andriy.shevchenko@linux.intel.com>
 Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Tadeusz Struk <tadeusz.struk@intel.com>,
@@ -13,55 +13,69 @@ To: Tadeusz Struk <tadeusz.struk@intel.com>,
 	qat-linux@intel.com, linux-crypto@vger.kernel.org,
 	linux-media@vger.kernel.org, linux-s390@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-media-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1404919470-26668-1-git-send-email-andriy.shevchenko@linux.intel.com>
-Sender: linux-media-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 Instead of custom approach let's use recently introduced seq_hex_dump() helper.
 
-In this case it slightly changes the output, namely the four tetrads will be
-output on one line.
-
 Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- drivers/crypto/qat/qat_common/adf_transport_debug.c | 16 ++--------------
- 1 file changed, 2 insertions(+), 14 deletions(-)
+ drivers/parisc/ccio-dma.c  | 14 +++-----------
+ drivers/parisc/sba_iommu.c | 11 +++--------
+ 2 files changed, 6 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_transport_debug.c b/drivers/crypto/qat/qat_common/adf_transport_debug.c
-index 6b69745..8b103cf 100644
---- a/drivers/crypto/qat/qat_common/adf_transport_debug.c
-+++ b/drivers/crypto/qat/qat_common/adf_transport_debug.c
-@@ -86,9 +86,7 @@ static int adf_ring_show(struct seq_file *sfile, void *v)
- {
- 	struct adf_etr_ring_data *ring = sfile->private;
- 	struct adf_etr_bank_data *bank = ring->bank;
--	uint32_t *msg = v;
- 	void __iomem *csr = ring->bank->csr_addr;
--	int i, x;
+diff --git a/drivers/parisc/ccio-dma.c b/drivers/parisc/ccio-dma.c
+index 8b490d7..9d353d2 100644
+--- a/drivers/parisc/ccio-dma.c
++++ b/drivers/parisc/ccio-dma.c
+@@ -1101,20 +1101,12 @@ static const struct file_operations ccio_proc_info_fops = {
  
- 	if (v == SEQ_START_TOKEN) {
- 		int head, tail, empty;
-@@ -111,18 +109,8 @@ static int adf_ring_show(struct seq_file *sfile, void *v)
- 		seq_puts(sfile, "----------- Ring data ------------\n");
- 		return 0;
- 	}
--	seq_printf(sfile, "%p:", msg);
--	x = 0;
--	i = 0;
--	for (; i < (ADF_MSG_SIZE_TO_BYTES(ring->msg_size) >> 2); i++) {
--		seq_printf(sfile, " %08X", *(msg + i));
--		if ((ADF_MSG_SIZE_TO_BYTES(ring->msg_size) >> 2) != i + 1 &&
--		    (++x == 8)) {
--			seq_printf(sfile, "\n%p:", msg + i + 1);
--			x = 0;
+ static int ccio_proc_bitmap_info(struct seq_file *m, void *p)
+ {
+-	int len = 0;
+ 	struct ioc *ioc = ioc_list;
+ 
+ 	while (ioc != NULL) {
+-		u32 *res_ptr = (u32 *)ioc->res_map;
+-		int j;
+-
+-		for (j = 0; j < (ioc->res_size / sizeof(u32)); j++) {
+-			if ((j & 7) == 0)
+-				len += seq_puts(m, "\n   ");
+-			len += seq_printf(m, "%08x", *res_ptr);
+-			res_ptr++;
 -		}
+-		len += seq_puts(m, "\n\n");
++		seq_hex_dump(m, "   ", DUMP_PREFIX_NONE, 32, 4, ioc->res_map,
++			     ioc->res_size, false);
++		seq_putc(m, '\n');
+ 		ioc = ioc->next;
+ 		break; /* XXX - remove me */
+ 	}
+diff --git a/drivers/parisc/sba_iommu.c b/drivers/parisc/sba_iommu.c
+index 1ff1b67..fbc4db9 100644
+--- a/drivers/parisc/sba_iommu.c
++++ b/drivers/parisc/sba_iommu.c
+@@ -1857,15 +1857,10 @@ sba_proc_bitmap_info(struct seq_file *m, void *p)
+ {
+ 	struct sba_device *sba_dev = sba_list;
+ 	struct ioc *ioc = &sba_dev->ioc[0];	/* FIXME: Multi-IOC support! */
+-	unsigned int *res_ptr = (unsigned int *)ioc->res_map;
+-	int i, len = 0;
+ 
+-	for (i = 0; i < (ioc->res_size/sizeof(unsigned int)); ++i, ++res_ptr) {
+-		if ((i & 7) == 0)
+-			len += seq_printf(m, "\n   ");
+-		len += seq_printf(m, " %08x", *res_ptr);
 -	}
--	seq_puts(sfile, "\n");
-+	seq_hex_dump(sfile, "", DUMP_PREFIX_ADDRESS, 16, 4,
-+		     v, ADF_MSG_SIZE_TO_BYTES(ring->msg_size), false);
+-	len += seq_printf(m, "\n");
++	seq_hex_dump(m, "   ", DUMP_PREFIX_NONE, 32, 4, ioc->res_map,
++		     ioc->res_size, false);
++	seq_printf(m, "\n");
+ 
  	return 0;
  }
- 
 -- 
 2.0.1
