@@ -1,7 +1,8 @@
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1 0/5] fs/seq_file: introduce seq_hex_dump() helper
-Date: Wed,  9 Jul 2014 18:24:25 +0300
-Message-ID: <1404919470-26668-1-git-send-email-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1 5/5] [S390] zcrypt: use seq_hex_dump() to dump buffers
+Date: Wed,  9 Jul 2014 18:24:30 +0300
+Message-ID: <1404919470-26668-6-git-send-email-andriy.shevchenko@linux.intel.com>
+References: <1404919470-26668-1-git-send-email-andriy.shevchenko@linux.intel.com>
 Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Tadeusz Struk <tadeusz.struk@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -13,28 +14,41 @@ To: Tadeusz Struk <tadeusz.struk@intel.com>,
 	linux-media@vger.kernel.org, linux-s390@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1404919470-26668-1-git-send-email-andriy.shevchenko@linux.intel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This introduces a new helper and switches current users to use it.
+Instead of custom approach let's use recently introduced seq_hex_dump() helper.
 
-parisc and s390 weren't tested anyhow, the other are compile tested.
+In this case it slightly changes the output, namely the four tetrads will be
+output on one line.
 
-Andy Shevchenko (5):
-  seq_file: provide an analogue of print_hex_dump()
-  saa7164: convert to seq_hex_dump()
-  crypto: qat - use seq_hex_dump() to dump buffers
-  parisc: use seq_hex_dump() to dump buffers
-  [S390] zcrypt: use seq_hex_dump() to dump buffers
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/s390/crypto/zcrypt_api.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
 
- .../crypto/qat/qat_common/adf_transport_debug.c    | 16 ++--------
- drivers/media/pci/saa7164/saa7164-core.c           | 31 +++----------------
- drivers/parisc/ccio-dma.c                          | 14 ++-------
- drivers/parisc/sba_iommu.c                         | 11 ++-----
- drivers/s390/crypto/zcrypt_api.c                   | 10 +------
- fs/seq_file.c                                      | 35 ++++++++++++++++++++++
- include/linux/seq_file.h                           |  4 +++
- 7 files changed, 52 insertions(+), 69 deletions(-)
-
+diff --git a/drivers/s390/crypto/zcrypt_api.c b/drivers/s390/crypto/zcrypt_api.c
+index 0e18c5d..d1f9983 100644
+--- a/drivers/s390/crypto/zcrypt_api.c
++++ b/drivers/s390/crypto/zcrypt_api.c
+@@ -1203,16 +1203,8 @@ static void sprinthx(unsigned char *title, struct seq_file *m,
+ static void sprinthx4(unsigned char *title, struct seq_file *m,
+ 		      unsigned int *array, unsigned int len)
+ {
+-	int r;
+-
+ 	seq_printf(m, "\n%s\n", title);
+-	for (r = 0; r < len; r++) {
+-		if ((r % 8) == 0)
+-			seq_printf(m, "    ");
+-		seq_printf(m, "%08X ", array[r]);
+-		if ((r % 8) == 7)
+-			seq_putc(m, '\n');
+-	}
++	seq_hex_dump(m, "    ", DUMP_PREFIX_NONE, 32, 4, array, len, false);
+ 	seq_putc(m, '\n');
+ }
+ 
 -- 
 2.0.1
