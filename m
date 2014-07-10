@@ -1,122 +1,76 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH] crypto: ccp - Base AXI DMA cache settings on device tree
-Date: Thu, 10 Jul 2014 10:58:35 -0500
-Message-ID: <20140710155835.17665.84896.stgit@tlendack-t1.amdoffice.net>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: [PATCH] crypto: initialize entry len for null input in crypto hash
+ sg list walk
+Date: Thu, 10 Jul 2014 16:18:08 -0700
+Message-ID: <1405034288.2970.647.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Cc: Chandramouli Narayanan <mouli@linux.intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0145.outbound.protection.outlook.com ([207.46.163.145]:22867
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752009AbaGJP6x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Jul 2014 11:58:53 -0400
+Received: from mga02.intel.com ([134.134.136.20]:33469 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750857AbaGJXSM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 Jul 2014 19:18:12 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The default cache operations for ARM64 were changed during 3.15.
-To use coherent operations a "dma-coherent" device tree property
-is required.  If that property is not present in the device tree
-node then the non-coherent operations are assigned for the device.
+For the special case when we have a null input string, we want
+to initialize the entry len to 0 for the hash/ahash walk, so
+cyrpto_hash_walk_last will return the correct result indicating
+that we have completed the scatter list walk.  Otherwise we may
+keep walking the sg list and access bogus memory address.
 
-Add support to the ccp driver to assign the AXI DMA cache settings
-based on whether the "dma-coherent" property is present in the device
-node.  If present, use settings that work with the caches.  If not
-present, use settings that do not look at the caches.
-
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
- .../devicetree/bindings/crypto/amd-ccp.txt         |    3 +++
- drivers/crypto/ccp/Kconfig                         |    1 +
- drivers/crypto/ccp/ccp-dev.c                       |    2 +-
- drivers/crypto/ccp/ccp-dev.h                       |    4 ++++
- drivers/crypto/ccp/ccp-platform.c                  |    6 ++++++
- 5 files changed, 15 insertions(+), 1 deletion(-)
+ crypto/ahash.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/amd-ccp.txt b/Documentation/devicetree/bindings/crypto/amd-ccp.txt
-index 6e0b11a..8c61183 100644
---- a/Documentation/devicetree/bindings/crypto/amd-ccp.txt
-+++ b/Documentation/devicetree/bindings/crypto/amd-ccp.txt
-@@ -7,6 +7,9 @@ Required properties:
-   that services interrupts for this device
- - interrupts: Should contain the CCP interrupt
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index f2a5d8f..f6a36a5 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -131,8 +131,10 @@ int crypto_hash_walk_first(struct ahash_request *req,
+ {
+ 	walk->total = req->nbytes;
  
-+Optional properties:
-+- dma-coherent: Present if dma operations are coherent
-+
- Example:
- 	ccp@e0100000 {
- 		compatible = "amd,ccp-seattle-v1a";
-diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
-index 7639ffc..474382d 100644
---- a/drivers/crypto/ccp/Kconfig
-+++ b/drivers/crypto/ccp/Kconfig
-@@ -3,6 +3,7 @@ config CRYPTO_DEV_CCP_DD
- 	depends on CRYPTO_DEV_CCP
- 	default m
- 	select HW_RANDOM
-+	select OF if ARM64
- 	help
- 	  Provides the interface to use the AMD Cryptographic Coprocessor
- 	  which can be used to accelerate or offload encryption operations
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index fa1ab10..a7d1106 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -364,7 +364,7 @@ int ccp_init(struct ccp_device *ccp)
+-	if (!walk->total)
++	if (!walk->total) {
++		walk->entrylen = 0;
+ 		return 0;
++	}
  
- #ifdef CONFIG_ARM64
- 		/* For arm64 set the recommended queue cache settings */
--		iowrite32(CACHE_WB_NO_ALLOC, ccp->io_regs + CMD_Q_CACHE_BASE +
-+		iowrite32(ccp->axcache, ccp->io_regs + CMD_Q_CACHE_BASE +
- 			  (CMD_Q_CACHE_INC * i));
- #endif
+ 	walk->alignmask = crypto_ahash_alignmask(crypto_ahash_reqtfm(req));
+ 	walk->sg = req->src;
+@@ -147,8 +149,10 @@ int crypto_ahash_walk_first(struct ahash_request *req,
+ {
+ 	walk->total = req->nbytes;
  
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 1c5651b..62ff35a 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -30,6 +30,7 @@
+-	if (!walk->total)
++	if (!walk->total) {
++		walk->entrylen = 0;
+ 		return 0;
++	}
  
- #define TRNG_RETRIES			10
+ 	walk->alignmask = crypto_ahash_alignmask(crypto_ahash_reqtfm(req));
+ 	walk->sg = req->src;
+@@ -167,8 +171,10 @@ int crypto_hash_walk_first_compat(struct hash_desc *hdesc,
+ {
+ 	walk->total = len;
  
-+#define CACHE_NONE			0x00
- #define CACHE_WB_NO_ALLOC		0xb7
+-	if (!walk->total)
++	if (!walk->total) {
++		walk->entrylen = 0;
+ 		return 0;
++	}
  
- 
-@@ -255,6 +256,9 @@ struct ccp_device {
- 	/* Suspend support */
- 	unsigned int suspending;
- 	wait_queue_head_t suspend_queue;
-+
-+	/* DMA caching attribute support */
-+	unsigned int axcache;
- };
- 
- 
-diff --git a/drivers/crypto/ccp/ccp-platform.c b/drivers/crypto/ccp/ccp-platform.c
-index 65e5829..b0a2806 100644
---- a/drivers/crypto/ccp/ccp-platform.c
-+++ b/drivers/crypto/ccp/ccp-platform.c
-@@ -22,6 +22,7 @@
- #include <linux/spinlock.h>
- #include <linux/delay.h>
- #include <linux/ccp.h>
-+#include <linux/of.h>
- 
- #include "ccp-dev.h"
- 
-@@ -112,6 +113,11 @@ static int ccp_platform_probe(struct platform_device *pdev)
- 	*(dev->dma_mask) = DMA_BIT_MASK(48);
- 	dev->coherent_dma_mask = DMA_BIT_MASK(48);
- 
-+	if (of_property_read_bool(dev->of_node, "dma-coherent"))
-+		ccp->axcache = CACHE_WB_NO_ALLOC;
-+	else
-+		ccp->axcache = CACHE_NONE;
-+
- 	dev_set_drvdata(dev, ccp);
- 
- 	ret = ccp_init(ccp);
+ 	walk->alignmask = crypto_hash_alignmask(hdesc->tfm);
+ 	walk->sg = sg;
+-- 
+1.7.11.7
