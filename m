@@ -1,61 +1,76 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.16
-Date: Thu, 10 Jul 2014 17:03:14 +0800
-Message-ID: <20140710090314.GA15729@gondor.apana.org.au>
-References: <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
- <20140101061016.GA22579@gondor.apana.org.au>
- <20140203125944.GA31446@gondor.apana.org.au>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH v3 1/3] ima: use ahash API for file hash calculation
+Date: Thu, 10 Jul 2014 10:02:07 +0200
+Message-ID: <201407101002.07535.marex@denx.de>
+References: <cover.1404475462.git.d.kasatkin@samsung.com> <201407092300.25224.marex@denx.de> <CACE9dm87U+Cc=jmbFiC=TuZ4D2mDNMUhbwVW64k14stXybZdHw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:54000 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751344AbaGJJDW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 10 Jul 2014 05:03:22 -0400
-Content-Disposition: inline
-In-Reply-To: <20140203125944.GA31446@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	linux-ima-devel@lists.sourceforge.net,
+	"linux-security-module" <linux-security-module@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto" <linux-crypto@vger.kernel.org>
+To: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CACE9dm87U+Cc=jmbFiC=TuZ4D2mDNMUhbwVW64k14stXybZdHw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+On Thursday, July 10, 2014 at 01:05:39 AM, Dmitry Kasatkin wrote:
+> On 10 July 2014 00:00, Marek Vasut <marex@denx.de> wrote:
+> > On Tuesday, July 08, 2014 at 10:07:16 AM, Dmitry Kasatkin wrote:
+> > [...]
+> > 
+> >> > Right, but my concern is not about unloading the kernel module, but
+> >> > about the IMA module parameters left initialized.  The existing code
+> >> > will continue using ahash (software version), even though the kernel
+> >> > module was unloaded, not shash.  My question is about the software
+> >> > implementations of ahash vs. shash performance.
+> >> > 
+> >> > Mimi
+> >> 
+> >> If HW driver will not be available, ahash loads generic driver which is
+> >> using shash.
+> >> Performance of that will be the same as for using shash directly.
+> > 
+> > Hi Dmitry, I think Mimi is concerned about the crypto accelerator dying
+> > mid- flight.
+> > 
+> > Imagine a situation where you have a hardware crypto accelerator
+> > connected via USB. You happily use IMA with this setup for days and then
+> > someone comes around and pulls the USB cable out. Will this be able to
+> > cope with such situation, for example by switching to software
+> > operations or such in some sane way ?
+> > 
+> > I presume that's the concern here.
+> > 
+> > Best regards,
+> > Marek Vasut
+> 
+> Hi Marek,
 
-This push fixes an error in sha512_ssse3 that leads to incorrect
-output as well as a memory leak in caam_jr when the module is
-unloaded.
+Hi!
 
-Please pull from
+> Nice to here from you. How was your rest stay at Japan?
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Thanks for asking, not sure there is a super-positive ultra-awesome word to 
+express that, so in short, I had the time of my life. Love that country ;-)
 
-or
+> I have not seen any expression of such concern.
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+All right, that was my understanding of the entire discussion -- an accelerator 
+dying mid-way and what will IMA do about that.
 
+> But as we fallback to early allocated shash, which is not USB yet,
+> then there is no problem.
+> ahash itself does not bring any other additional problem than shash itself.
+> They are compiled builtin together.
 
-Cristian Stoica (1):
-      crypto: caam - fix memleak in caam_jr module
+Sure, I understood that. But what will happen if the ahash accelerator stops 
+working mid-flight, will IMA also go bonkers or is there some graceful stop?
 
-Jussi Kivilinna (1):
-      crypto: sha512_ssse3 - fix byte count to bit count conversion
-
- arch/x86/crypto/sha512_ssse3_glue.c |    2 +-
- drivers/crypto/caam/jr.c            |    8 +++-----
- 2 files changed, 4 insertions(+), 6 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Best regards,
+Marek Vasut
