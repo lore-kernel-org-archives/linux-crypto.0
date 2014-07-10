@@ -1,29 +1,60 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [patch] crypto: qat - remove an unneeded cast
-Date: Thu, 10 Jul 2014 17:00:15 +0800
-Message-ID: <20140710090015.GC15621@gondor.apana.org.au>
-References: <20140708105907.GE19737@mwanda>
+Subject: Crypto Fixes for 3.16
+Date: Thu, 10 Jul 2014 17:03:14 +0800
+Message-ID: <20140710090314.GA15729@gondor.apana.org.au>
+References: <20110328071322.GA6569@gondor.apana.org.au>
+ <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+To: Linus Torvalds <torvalds@linux-foundation.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Bruce Allan <bruce.w.allan@intel.com>,
-	Pingchaox Yang <pingchaox.yang@intel.com>,
-	Bo Cui <bo.cui@intel.com>, qat-linux@intel.com,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:54000 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751344AbaGJJDW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 10 Jul 2014 05:03:22 -0400
 Content-Disposition: inline
-In-Reply-To: <20140708105907.GE19737@mwanda>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20140203125944.GA31446@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 08, 2014 at 01:59:07PM +0300, Dan Carpenter wrote:
-> The cast to (unsigned int *) doesn't hurt anything but it is pointless.
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Hi Linus:
 
-Patch applied.
+This push fixes an error in sha512_ssse3 that leads to incorrect
+output as well as a memory leak in caam_jr when the module is
+unloaded.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Cristian Stoica (1):
+      crypto: caam - fix memleak in caam_jr module
+
+Jussi Kivilinna (1):
+      crypto: sha512_ssse3 - fix byte count to bit count conversion
+
+ arch/x86/crypto/sha512_ssse3_glue.c |    2 +-
+ drivers/crypto/caam/jr.c            |    8 +++-----
+ 2 files changed, 4 insertions(+), 6 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
