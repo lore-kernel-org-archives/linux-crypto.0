@@ -1,8 +1,8 @@
 From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: [PATCH v4 6/7] sched: add function nr_running_cpu to expose number
- of tasks running on cpu
-Date: Fri, 11 Jul 2014 13:33:04 -0700
-Message-ID: <1405110784.2970.655.camel@schen9-DESK>
+Subject: [PATCH v4 7/7] crypto: SHA1 multibuffer - flush the jobs early if
+ cpu becomes idle
+Date: Fri, 11 Jul 2014 13:33:08 -0700
+Message-ID: <1405110788.2970.656.camel@schen9-DESK>
 References: <cover.1405074379.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -24,50 +24,136 @@ In-Reply-To: <cover.1405074379.git.tim.c.chen@linux.intel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This function will help a thread decide if it wants to to do work
-that can be delayed, to accumulate more tasks for more efficient
-batch processing later.
-
-However, if no other tasks are running on the cpu, it can take
-advantgae of the available cpu cycles to complete the tasks
-for immediate processing to minimize delay, otherwise it will yield.
+This patch adds a notifier to the SHA1 multi-buffer algorithm
+when CPU is giong idle, so it can take advantage of the available
+CPU power to flush out any partially completed jobs.  This
+will eliminate possible extended latency in the multi-buffer
+algorithm.
 
 Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
- include/linux/sched.h | 1 +
- kernel/sched/core.c   | 8 ++++++++
- 2 files changed, 9 insertions(+)
+ arch/x86/crypto/sha-mb/sha1_mb.c | 61 ++++++++++++++++++++++++++++++++++++++++
+ include/crypto/mcryptd.h         |  1 +
+ 2 files changed, 62 insertions(+)
 
-diff --git a/include/linux/sched.h b/include/linux/sched.h
-index 7cb07fd..0884250 100644
---- a/include/linux/sched.h
-+++ b/include/linux/sched.h
-@@ -168,6 +168,7 @@ extern int nr_threads;
- DECLARE_PER_CPU(unsigned long, process_counts);
- extern int nr_processes(void);
- extern unsigned long nr_running(void);
-+extern unsigned long nr_running_cpu(int cpu);
- extern unsigned long nr_iowait(void);
- extern unsigned long nr_iowait_cpu(int cpu);
- extern unsigned long this_cpu_load(void);
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 9cae286..d5bb8e6 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -2283,6 +2283,14 @@ unsigned long nr_running(void)
- 	return sum;
- }
+diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
+index 9c5feae..fd9b219 100644
+--- a/arch/x86/crypto/sha-mb/sha1_mb.c
++++ b/arch/x86/crypto/sha-mb/sha1_mb.c
+@@ -69,6 +69,7 @@
+ #include <asm/xcr.h>
+ #include <asm/xsave.h>
+ #include <linux/hardirq.h>
++#include <linux/sched.h>
+ #include <asm/fpu-internal.h>
+ #include "sha_mb_ctx.h"
  
-+unsigned long nr_running_cpu(int cpu)
+@@ -820,6 +821,60 @@ static struct ahash_alg sha1_mb_async_alg = {
+ 	},
+ };
+ 
++void sha1_mb_force_flush(struct mcryptd_alg_cstate *cstate)
 +{
-+	if (cpumask_test_cpu(cpu, cpu_online_mask))
-+		return cpu_rq(cpu)->nr_running;
-+	else
-+		return 0;
++	struct mcryptd_hash_request_ctx *rctx;
++	struct sha1_hash_ctx *sha_ctx;
++
++	/* force flush uncompleted jobs in all data lanes before cpu becomes idle */
++	while (!list_empty(&cstate->work_list)) {
++		/* turn off flusher as we are flushing here */
++		if (cstate->flusher_engaged)
++			cstate->flusher_engaged = false;
++
++		kernel_fpu_begin();
++		sha_ctx = (struct sha1_hash_ctx *) sha1_ctx_mgr_flush(cstate->mgr);
++		kernel_fpu_end();
++		if (!sha_ctx) {
++			pr_err("sha1_mb error: nothing got flushed for non-empty list\n");
++			break;
++		}
++		rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		sha_finish_walk(&rctx, cstate, true);
++		sha_complete_job(rctx, cstate, 0);
++	}
++
++	return;
 +}
 +
- unsigned long long nr_context_switches(void)
++void sha1_mb_earlyflush(struct work_struct *__work)
++{
++	struct mcryptd_alg_cstate *alg_cpu_state;
++
++	/* do not do early flush if other tasks are running */
++	if (nr_running_cpu(smp_processor_id()) > 1)
++		return;
++
++	alg_cpu_state = container_of(__work, struct mcryptd_alg_cstate, early_flush);
++	sha1_mb_force_flush(alg_cpu_state);
++}
++
++static int sha1_mb_idle_notifier(struct notifier_block *nb, unsigned long val,
++				 void *data)
++{
++	struct mcryptd_alg_cstate *cstate =
++				this_cpu_ptr(sha1_mb_alg_state.alg_cstate);
++
++	if (val == IDLE_START && cstate->flusher_engaged)
++		queue_work_on(smp_processor_id(), kcrypto_wq, &cstate->early_flush);
++
++	return 0;
++}
++
++static struct notifier_block sha1_mb_idle_nb = {
++	.notifier_call = sha1_mb_idle_notifier,
++};
++
+ unsigned long sha1_mb_flusher(struct mcryptd_alg_cstate *cstate)
  {
- 	int i;
+ 	struct mcryptd_hash_request_ctx *rctx;
+@@ -830,6 +885,9 @@ unsigned long sha1_mb_flusher(struct mcryptd_alg_cstate *cstate)
+ 
+ 	cur_time = jiffies;
+ 
++	if (!cstate->flusher_engaged)
++		return 0;
++
+ 	while (!list_empty(&cstate->work_list)) {
+ 		rctx = list_entry(cstate->work_list.next,
+ 				struct mcryptd_hash_request_ctx, waiter);
+@@ -889,6 +947,7 @@ static int __init sha1_mb_mod_init(void)
+ 		cpu_state->next_seq_num = 0;
+ 		cpu_state->flusher_engaged = false;
+ 		INIT_DELAYED_WORK(&cpu_state->flush, mcryptd_flusher);
++		INIT_WORK(&cpu_state->early_flush, sha1_mb_earlyflush);
+ 		cpu_state->cpu = cpu;
+ 		cpu_state->alg_state = &sha1_mb_alg_state;
+ 		cpu_state->mgr = (struct sha1_ctx_mgr *) kzalloc(sizeof(struct sha1_ctx_mgr), GFP_KERNEL);
+@@ -907,6 +966,7 @@ static int __init sha1_mb_mod_init(void)
+ 	if (err)
+ 		goto err1;
+ 
++	idle_notifier_register(&sha1_mb_idle_nb);
+ 
+ 	return 0;
+ err1:
+@@ -925,6 +985,7 @@ static void __exit sha1_mb_mod_fini(void)
+ 	int cpu;
+ 	struct mcryptd_alg_cstate *cpu_state;
+ 
++	idle_notifier_unregister(&sha1_mb_idle_nb);
+ 	crypto_unregister_ahash(&sha1_mb_async_alg);
+ 	crypto_unregister_shash(&sha1_mb_shash_alg);
+ 	for_each_possible_cpu(cpu) {
+diff --git a/include/crypto/mcryptd.h b/include/crypto/mcryptd.h
+index b2b9055..2ef1824 100644
+--- a/include/crypto/mcryptd.h
++++ b/include/crypto/mcryptd.h
+@@ -82,6 +82,7 @@ struct mcryptd_alg_cstate {
+ 	unsigned next_seq_num;
+ 	bool	flusher_engaged;
+ 	struct  delayed_work flush;
++	struct  work_struct early_flush;
+ 	int	cpu;
+ 	struct  mcryptd_alg_state *alg_state;
+ 	void	*mgr;
 -- 
 1.7.11.7
