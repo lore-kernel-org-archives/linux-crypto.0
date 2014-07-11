@@ -1,7 +1,7 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH 06/10] crypto: caam - fix DMA direction mismatch in ahash_done_ctx_dst
-Date: Fri, 11 Jul 2014 15:34:51 +0300
-Message-ID: <1405082095-30146-7-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH 08/10] crypto: caam - fix uninitialized S/G table size in ahash_digest
+Date: Fri, 11 Jul 2014 15:34:53 +0300
+Message-ID: <1405082095-30146-9-git-send-email-horia.geanta@freescale.com>
 References: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -12,78 +12,76 @@ Cc: <linux-crypto@vger.kernel.org>,
 	Kim Phillips <kim.phillips@freescale.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0145.outbound.protection.outlook.com ([207.46.163.145]:22855
+Received: from dns-bn1lp0143.outbound.protection.outlook.com ([207.46.163.143]:23002
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753503AbaGKMgR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Jul 2014 08:36:17 -0400
+	id S1753520AbaGKMgV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Jul 2014 08:36:21 -0400
 In-Reply-To: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-caam_jr ffe301000.jr: DMA-API: device driver frees DMA memory with different direction [device address=0x00000000062ad1ac] [size=28 bytes] [mapped with DMA_FROM_DEVICE] [unmapped with DMA_TO_DEVICE]
-------------[ cut here ]------------
-WARNING: at lib/dma-debug.c:1131
-Modules linked in: caamhash(+) [last unloaded: caamhash]
-CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W     3.16.0-rc1 #23
-task: c0789380 ti: effd2000 task.ti: c07d6000
-NIP: c02885cc LR: c02885cc CTR: c02d7020
-REGS: effd3d50 TRAP: 0700   Tainted: G        W      (3.16.0-rc1)
-MSR: 00021002 <CE,ME>  CR: 44048082  XER: 00000000
+Not initializing edesc->sec4_sg_bytes correctly causes ahash_done
+callback to free unallocated DMA memory:
 
-GPR00: c02885cc effd3e00 c0789380 000000c6 c1de3478 c1de382c 00000000 00021002
-GPR08: 00000007 00000000 01660000 0000012f 84048082 00000000 00000018 c07db080
-GPR16: 00000006 00000100 0000002c eee567e0 c07e1e10 c0da1180 00029002 c0d96708
-GPR24: c07a0000 c07a4acc effd3e58 ee29b140 0000001c ee130210 00000000 c0d96700
-NIP [c02885cc] check_unmap+0x47c/0xab0
-LR [c02885cc] check_unmap+0x47c/0xab0
+caam_jr ffe301000.jr: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x300900000000b44d] [size=46158 bytes]
+WARNING: at lib/dma-debug.c:1080
+Modules linked in: caamhash(+) [last unloaded: caamhash]
+CPU: 0 PID: 1358 Comm: cryptomgr_test Tainted: G        W     3.16.0-rc1 #23
+task: eed04250 ti: effd2000 task.ti: c6046000
+NIP: c02889fc LR: c02889fc CTR: c02d7020
+REGS: effd3d50 TRAP: 0700   Tainted: G        W      (3.16.0-rc1)
+MSR: 00029002 <CE,EE,ME>  CR: 44048082  XER: 00000000
+
+GPR00: c02889fc effd3e00 eed04250 00000091 c1de3478 c1de382c 00000000 00029002
+GPR08: 00000007 00000000 01660000 00000000 22048082 00000000 00000018 c07db080
+GPR16: 00000006 00000100 0000002c ee2497e0 c07e1e10 c0da1180 00029002 c0d912c8
+GPR24: 00000014 ee2497c0 effd3e58 00000000 c078ad4c ee130210 30090000 0000b44d
+NIP [c02889fc] check_unmap+0x8ac/0xab0
+LR [c02889fc] check_unmap+0x8ac/0xab0
 Call Trace:
-[effd3e00] [c02885cc] check_unmap+0x47c/0xab0 (unreliable)
+[effd3e00] [c02889fc] check_unmap+0x8ac/0xab0 (unreliable)
 [effd3e50] [c0288c78] debug_dma_unmap_page+0x78/0x90
-[effd3ed0] [f9350974] ahash_done_ctx_dst+0xa4/0x200 [caamhash]
+[effd3ed0] [f9404fec] ahash_done+0x11c/0x190 [caamhash]
 [effd3f00] [c0429640] caam_jr_dequeue+0x1c0/0x280
 [effd3f50] [c002c94c] tasklet_action+0xcc/0x1a0
 [effd3f80] [c002cb30] __do_softirq+0x110/0x220
 [effd3fe0] [c002cf34] irq_exit+0xa4/0xe0
 [effd3ff0] [c000d834] call_do_irq+0x24/0x3c
-[c07d7d50] [c000489c] do_IRQ+0x8c/0x110
-[c07d7d70] [c000f86c] ret_from_except+0x0/0x18
+[c6047ae0] [c000489c] do_IRQ+0x8c/0x110
+[c6047b00] [c000f86c] ret_from_except+0x0/0x18
 --- Exception: 501 at _raw_spin_unlock_irq+0x30/0x50
     LR = _raw_spin_unlock_irq+0x2c/0x50
-[c07d7e40] [c0053084] finish_task_switch+0x74/0x130
-[c07d7e60] [c058f278] __schedule+0x238/0x620
-[c07d7f70] [c058fb50] schedule_preempt_disabled+0x10/0x20
-[c07d7f80] [c00686a0] cpu_startup_entry+0x100/0x1b0
-[c07d7fb0] [c074793c] start_kernel+0x338/0x34c
-[c07d7ff0] [c00003d8] set_ivor+0x140/0x17c
+[c6047bd0] [c0590158] wait_for_common+0xb8/0x170
+[c6047c10] [c059024c] wait_for_completion_interruptible+0x1c/0x40
+[c6047c20] [c022fc78] do_one_async_hash_op.isra.2.part.3+0x18/0x40
+[c6047c30] [c022ff98] __test_hash+0x2f8/0x6c0
+[c6047de0] [c0230388] test_hash+0x28/0xb0
+[c6047e00] [c0230458] alg_test_hash+0x48/0xc0
+[c6047e20] [c022fa94] alg_test+0x114/0x2e0
+[c6047ea0] [c022cd1c] cryptomgr_test+0x4c/0x60
+[c6047eb0] [c00497a4] kthread+0xc4/0xe0
+[c6047f40] [c000f2fc] ret_from_kernel_thread+0x5c/0x64
 Instruction dump:
-7d495214 7d294214 806a0010 80c90010 811a001c 813a0020 815a0024 90610008
-3c60c06d 90c1000c 3863f764 4830d131 <0fe00000> 3c60c06d 3863f0f4 4830d121
----[ end trace db1fae088c75c270 ]---
-Mapped at:
- [<f9352454>] ahash_update_first+0x5b4/0xba0 [caamhash]
- [<c022ff28>] __test_hash+0x288/0x6c0
- [<c0230388>] test_hash+0x28/0xb0
- [<c02304a4>] alg_test_hash+0x94/0xc0
- [<c022fa94>] alg_test+0x114/0x2e0
+41de01c8 80a9002c 2f850000 40fe0008 80a90008 80fa0018 3c60c06d 811a001c
+3863f4a4 813a0020 815a0024 4830cd01 <0fe00000> 81340048 2f890000 40feff48
 
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- drivers/crypto/caam/caamhash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/caam/caamhash.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 9ee4e0478220..4bb6ff46e339 100644
+index e94dd4518cfb..126d80c23571 100644
 --- a/drivers/crypto/caam/caamhash.c
 +++ b/drivers/crypto/caam/caamhash.c
-@@ -753,7 +753,7 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
+@@ -1097,6 +1097,7 @@ static int ahash_digest(struct ahash_request *req)
+ 	}
+ 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
+ 			  DESC_JOB_IO_LEN;
++	edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 	edesc->src_nents = src_nents;
+ 	edesc->chained = chained;
  
--	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_TO_DEVICE);
-+	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_FROM_DEVICE);
- 	kfree(edesc);
- 
- #ifdef DEBUG
 -- 
 1.8.3.1
