@@ -1,7 +1,7 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH 08/10] crypto: caam - fix uninitialized S/G table size in ahash_digest
-Date: Fri, 11 Jul 2014 15:34:53 +0300
-Message-ID: <1405082095-30146-9-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH 09/10] crypto: caam - fix uninitialized edesc->dst_dma field
+Date: Fri, 11 Jul 2014 15:34:54 +0300
+Message-ID: <1405082095-30146-10-git-send-email-horia.geanta@freescale.com>
 References: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -12,76 +12,84 @@ Cc: <linux-crypto@vger.kernel.org>,
 	Kim Phillips <kim.phillips@freescale.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from dns-bn1lp0143.outbound.protection.outlook.com ([207.46.163.143]:23002
+Received: from mail-bn1blp0187.outbound.protection.outlook.com ([207.46.163.187]:18524
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753520AbaGKMgV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Jul 2014 08:36:21 -0400
+	id S1753508AbaGKMgW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Jul 2014 08:36:22 -0400
 In-Reply-To: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Not initializing edesc->sec4_sg_bytes correctly causes ahash_done
-callback to free unallocated DMA memory:
+dst_dma not being properly initialized causes ahash_done_ctx_dst
+to try to free unallocated DMA memory:
 
-caam_jr ffe301000.jr: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x300900000000b44d] [size=46158 bytes]
+caam_jr ffe301000.jr: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0x0000000006513340] [size=28 bytes]
 WARNING: at lib/dma-debug.c:1080
 Modules linked in: caamhash(+) [last unloaded: caamhash]
-CPU: 0 PID: 1358 Comm: cryptomgr_test Tainted: G        W     3.16.0-rc1 #23
-task: eed04250 ti: effd2000 task.ti: c6046000
+CPU: 0 PID: 1373 Comm: cryptomgr_test Tainted: G        W     3.16.0-rc1 #23
+task: ee23e350 ti: effd2000 task.ti: ee1f6000
 NIP: c02889fc LR: c02889fc CTR: c02d7020
 REGS: effd3d50 TRAP: 0700   Tainted: G        W      (3.16.0-rc1)
 MSR: 00029002 <CE,EE,ME>  CR: 44048082  XER: 00000000
 
-GPR00: c02889fc effd3e00 eed04250 00000091 c1de3478 c1de382c 00000000 00029002
-GPR08: 00000007 00000000 01660000 00000000 22048082 00000000 00000018 c07db080
-GPR16: 00000006 00000100 0000002c ee2497e0 c07e1e10 c0da1180 00029002 c0d912c8
-GPR24: 00000014 ee2497c0 effd3e58 00000000 c078ad4c ee130210 30090000 0000b44d
+GPR00: c02889fc effd3e00 ee23e350 0000008e c1de3478 c1de382c 00000000 00029002
+GPR08: 00000007 00000000 01660000 00000000 24048082 00000000 00000018 c07db080
+GPR16: 00000006 00000100 0000002c eeb4a7e0 c07e1e10 c0da1180 00029002 c0d9b3c8
+GPR24: eeb4a7c0 00000000 effd3e58 00000000 c078ad4c ee130210 00000000 06513340
 NIP [c02889fc] check_unmap+0x8ac/0xab0
 LR [c02889fc] check_unmap+0x8ac/0xab0
 Call Trace:
 [effd3e00] [c02889fc] check_unmap+0x8ac/0xab0 (unreliable)
 [effd3e50] [c0288c78] debug_dma_unmap_page+0x78/0x90
-[effd3ed0] [f9404fec] ahash_done+0x11c/0x190 [caamhash]
+[effd3ed0] [f94b89ec] ahash_done_ctx_dst+0x11c/0x200 [caamhash]
 [effd3f00] [c0429640] caam_jr_dequeue+0x1c0/0x280
 [effd3f50] [c002c94c] tasklet_action+0xcc/0x1a0
 [effd3f80] [c002cb30] __do_softirq+0x110/0x220
 [effd3fe0] [c002cf34] irq_exit+0xa4/0xe0
 [effd3ff0] [c000d834] call_do_irq+0x24/0x3c
-[c6047ae0] [c000489c] do_IRQ+0x8c/0x110
-[c6047b00] [c000f86c] ret_from_except+0x0/0x18
+[ee1f7ae0] [c000489c] do_IRQ+0x8c/0x110
+[ee1f7b00] [c000f86c] ret_from_except+0x0/0x18
 --- Exception: 501 at _raw_spin_unlock_irq+0x30/0x50
     LR = _raw_spin_unlock_irq+0x2c/0x50
-[c6047bd0] [c0590158] wait_for_common+0xb8/0x170
-[c6047c10] [c059024c] wait_for_completion_interruptible+0x1c/0x40
-[c6047c20] [c022fc78] do_one_async_hash_op.isra.2.part.3+0x18/0x40
-[c6047c30] [c022ff98] __test_hash+0x2f8/0x6c0
-[c6047de0] [c0230388] test_hash+0x28/0xb0
-[c6047e00] [c0230458] alg_test_hash+0x48/0xc0
-[c6047e20] [c022fa94] alg_test+0x114/0x2e0
-[c6047ea0] [c022cd1c] cryptomgr_test+0x4c/0x60
-[c6047eb0] [c00497a4] kthread+0xc4/0xe0
-[c6047f40] [c000f2fc] ret_from_kernel_thread+0x5c/0x64
+[ee1f7bd0] [c0590158] wait_for_common+0xb8/0x170
+[ee1f7c10] [c059024c] wait_for_completion_interruptible+0x1c/0x40
+[ee1f7c20] [c022fc78] do_one_async_hash_op.isra.2.part.3+0x18/0x40
+[ee1f7c30] [c022ffb8] __test_hash+0x318/0x6c0
+[ee1f7de0] [c0230388] test_hash+0x28/0xb0
+[ee1f7e00] [c02304a4] alg_test_hash+0x94/0xc0
+[ee1f7e20] [c022fa94] alg_test+0x114/0x2e0
+[ee1f7ea0] [c022cd1c] cryptomgr_test+0x4c/0x60
+[ee1f7eb0] [c00497a4] kthread+0xc4/0xe0
+[ee1f7f40] [c000f2fc] ret_from_kernel_thread+0x5c/0x64
 Instruction dump:
 41de01c8 80a9002c 2f850000 40fe0008 80a90008 80fa0018 3c60c06d 811a001c
 3863f4a4 813a0020 815a0024 4830cd01 <0fe00000> 81340048 2f890000 40feff48
 
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- drivers/crypto/caam/caamhash.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/caam/caamhash.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index e94dd4518cfb..126d80c23571 100644
+index 126d80c23571..44be5ad38ad7 100644
 --- a/drivers/crypto/caam/caamhash.c
 +++ b/drivers/crypto/caam/caamhash.c
-@@ -1097,6 +1097,7 @@ static int ahash_digest(struct ahash_request *req)
- 	}
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 			  DESC_JOB_IO_LEN;
-+	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->src_nents = src_nents;
- 	edesc->chained = chained;
+@@ -1255,6 +1255,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 		edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 		edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
+ 				 DESC_JOB_IO_LEN;
++		edesc->dst_dma = 0;
  
+ 		state->buf_dma = buf_map_to_sec4_sg(jrdev, edesc->sec4_sg,
+ 						    buf, *buflen);
+@@ -1454,6 +1455,7 @@ static int ahash_update_first(struct ahash_request *req)
+ 		edesc->sec4_sg_bytes = sec4_sg_bytes;
+ 		edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
+ 				 DESC_JOB_IO_LEN;
++		edesc->dst_dma = 0;
+ 
+ 		if (src_nents) {
+ 			sg_to_sec4_sg_last(req->src, src_nents,
 -- 
 1.8.3.1
