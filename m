@@ -1,7 +1,7 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH 02/10] crypto: caam - set coherent_dma_mask
-Date: Fri, 11 Jul 2014 15:34:47 +0300
-Message-ID: <1405082095-30146-3-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH 07/10] crypto: caam - fix DMA direction mismatch in ahash_done_ctx_src
+Date: Fri, 11 Jul 2014 15:34:52 +0300
+Message-ID: <1405082095-30146-8-git-send-email-horia.geanta@freescale.com>
 References: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -12,61 +12,78 @@ Cc: <linux-crypto@vger.kernel.org>,
 	Kim Phillips <kim.phillips@freescale.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2lp0211.outbound.protection.outlook.com ([207.46.163.211]:53551
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+Received: from mail-bn1lp0145.outbound.protection.outlook.com ([207.46.163.145]:22855
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753508AbaGKMgO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Jul 2014 08:36:14 -0400
+	id S1753508AbaGKMgT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Jul 2014 08:36:19 -0400
 In-Reply-To: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Replace dma_set_mask with dma_set_mask_and_coherent, since both
-streaming and coherent DMA mappings are being used.
+caam_jr ffe301000.jr: DMA-API: device driver frees DMA memory with different direction [device address=0x0000000006271dac] [size=28 bytes] [mapped with DMA_TO_DEVICE] [unmapped with DMA_FROM_DEVICE]
+------------[ cut here ]------------
+WARNING: at lib/dma-debug.c:1131
+Modules linked in: caamhash(+) [last unloaded: caamhash]
+CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W     3.16.0-rc1 #23
+task: c0789380 ti: effd2000 task.ti: c07d6000
+NIP: c02885cc LR: c02885cc CTR: c02d7020
+REGS: effd3d50 TRAP: 0700   Tainted: G        W      (3.16.0-rc1)
+MSR: 00021002 <CE,ME>  CR: 44048082  XER: 00000000
+
+GPR00: c02885cc effd3e00 c0789380 000000c6 c1de3478 c1de382c 00000000 00021002
+GPR08: 00000007 00000000 01660000 0000012f 84048082 00000000 00000018 c07db080
+GPR16: 00000006 00000100 0000002c c62517a0 c07e1e10 c0da1180 00029002 c0d95f88
+GPR24: c07a0000 c07a4acc effd3e58 ee322bc0 0000001c ee130210 00000000 c0d95f80
+NIP [c02885cc] check_unmap+0x47c/0xab0
+LR [c02885cc] check_unmap+0x47c/0xab0
+Call Trace:
+[effd3e00] [c02885cc] check_unmap+0x47c/0xab0 (unreliable)
+[effd3e50] [c0288c78] debug_dma_unmap_page+0x78/0x90
+[effd3ed0] [f9624d84] ahash_done_ctx_src+0xa4/0x200 [caamhash]
+[effd3f00] [c0429640] caam_jr_dequeue+0x1c0/0x280
+[effd3f50] [c002c94c] tasklet_action+0xcc/0x1a0
+[effd3f80] [c002cb30] __do_softirq+0x110/0x220
+[effd3fe0] [c002cf34] irq_exit+0xa4/0xe0
+[effd3ff0] [c000d834] call_do_irq+0x24/0x3c
+[c07d7d50] [c000489c] do_IRQ+0x8c/0x110
+[c07d7d70] [c000f86c] ret_from_except+0x0/0x18
+--- Exception: 501 at _raw_spin_unlock_irq+0x30/0x50
+    LR = _raw_spin_unlock_irq+0x2c/0x50
+[c07d7e40] [c0053084] finish_task_switch+0x74/0x130
+[c07d7e60] [c058f278] __schedule+0x238/0x620
+[c07d7f70] [c058fb50] schedule_preempt_disabled+0x10/0x20
+[c07d7f80] [c00686a0] cpu_startup_entry+0x100/0x1b0
+[c07d7fb0] [c074793c] start_kernel+0x338/0x34c
+[c07d7ff0] [c00003d8] set_ivor+0x140/0x17c
+Instruction dump:
+7d495214 7d294214 806a0010 80c90010 811a001c 813a0020 815a0024 90610008
+3c60c06d 90c1000c 3863f764 4830d131 <0fe00000> 3c60c06d 3863f0f4 4830d121
+---[ end trace db1fae088c75c280 ]---
+Mapped at:
+ [<f96251bc>] ahash_final_ctx+0x14c/0x7b0 [caamhash]
+ [<c022ff4c>] __test_hash+0x2ac/0x6c0
+ [<c0230388>] test_hash+0x28/0xb0
+ [<c02304a4>] alg_test_hash+0x94/0xc0
+ [<c022fa94>] alg_test+0x114/0x2e0
 
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- drivers/crypto/caam/ctrl.c | 6 +++---
- drivers/crypto/caam/jr.c   | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/crypto/caam/caamhash.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index c6e9d3b2d502..cedb56500b61 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -453,11 +453,11 @@ static int caam_probe(struct platform_device *pdev)
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 4bb6ff46e339..e94dd4518cfb 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -718,7 +718,7 @@ static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
+ 	if (err)
+ 		caam_jr_strstatus(jrdev, err);
  
- 	if (sizeof(dma_addr_t) == sizeof(u64))
- 		if (of_device_is_compatible(nprop, "fsl,sec-v5.0"))
--			dma_set_mask(dev, DMA_BIT_MASK(40));
-+			dma_set_mask_and_coherent(dev, DMA_BIT_MASK(40));
- 		else
--			dma_set_mask(dev, DMA_BIT_MASK(36));
-+			dma_set_mask_and_coherent(dev, DMA_BIT_MASK(36));
- 	else
--		dma_set_mask(dev, DMA_BIT_MASK(32));
-+		dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
+-	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
++	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_TO_DEVICE);
+ 	kfree(edesc);
  
- 	/*
- 	 * Detect and enable JobRs
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 1d80bd3636c5..50cd1b9af2ba 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -476,11 +476,11 @@ static int caam_jr_probe(struct platform_device *pdev)
- 
- 	if (sizeof(dma_addr_t) == sizeof(u64))
- 		if (of_device_is_compatible(nprop, "fsl,sec-v5.0-job-ring"))
--			dma_set_mask(jrdev, DMA_BIT_MASK(40));
-+			dma_set_mask_and_coherent(jrdev, DMA_BIT_MASK(40));
- 		else
--			dma_set_mask(jrdev, DMA_BIT_MASK(36));
-+			dma_set_mask_and_coherent(jrdev, DMA_BIT_MASK(36));
- 	else
--		dma_set_mask(jrdev, DMA_BIT_MASK(32));
-+		dma_set_mask_and_coherent(jrdev, DMA_BIT_MASK(32));
- 
- 	/* Identify the interrupt */
- 	jrpriv->irq = irq_of_parse_and_map(nprop, 0);
+ #ifdef DEBUG
 -- 
 1.8.3.1
