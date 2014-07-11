@@ -1,7 +1,7 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH 07/10] crypto: caam - fix DMA direction mismatch in ahash_done_ctx_src
-Date: Fri, 11 Jul 2014 15:34:52 +0300
-Message-ID: <1405082095-30146-8-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH 03/10] crypto: caam - fix typo in dma_mapping_error
+Date: Fri, 11 Jul 2014 15:34:48 +0300
+Message-ID: <1405082095-30146-4-git-send-email-horia.geanta@freescale.com>
 References: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -12,78 +12,35 @@ Cc: <linux-crypto@vger.kernel.org>,
 	Kim Phillips <kim.phillips@freescale.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0145.outbound.protection.outlook.com ([207.46.163.145]:22855
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-bl2lp0212.outbound.protection.outlook.com ([207.46.163.212]:45363
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753508AbaGKMgT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Jul 2014 08:36:19 -0400
+	id S1753507AbaGKMgS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Jul 2014 08:36:18 -0400
 In-Reply-To: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-caam_jr ffe301000.jr: DMA-API: device driver frees DMA memory with different direction [device address=0x0000000006271dac] [size=28 bytes] [mapped with DMA_TO_DEVICE] [unmapped with DMA_FROM_DEVICE]
-------------[ cut here ]------------
-WARNING: at lib/dma-debug.c:1131
-Modules linked in: caamhash(+) [last unloaded: caamhash]
-CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W     3.16.0-rc1 #23
-task: c0789380 ti: effd2000 task.ti: c07d6000
-NIP: c02885cc LR: c02885cc CTR: c02d7020
-REGS: effd3d50 TRAP: 0700   Tainted: G        W      (3.16.0-rc1)
-MSR: 00021002 <CE,ME>  CR: 44048082  XER: 00000000
-
-GPR00: c02885cc effd3e00 c0789380 000000c6 c1de3478 c1de382c 00000000 00021002
-GPR08: 00000007 00000000 01660000 0000012f 84048082 00000000 00000018 c07db080
-GPR16: 00000006 00000100 0000002c c62517a0 c07e1e10 c0da1180 00029002 c0d95f88
-GPR24: c07a0000 c07a4acc effd3e58 ee322bc0 0000001c ee130210 00000000 c0d95f80
-NIP [c02885cc] check_unmap+0x47c/0xab0
-LR [c02885cc] check_unmap+0x47c/0xab0
-Call Trace:
-[effd3e00] [c02885cc] check_unmap+0x47c/0xab0 (unreliable)
-[effd3e50] [c0288c78] debug_dma_unmap_page+0x78/0x90
-[effd3ed0] [f9624d84] ahash_done_ctx_src+0xa4/0x200 [caamhash]
-[effd3f00] [c0429640] caam_jr_dequeue+0x1c0/0x280
-[effd3f50] [c002c94c] tasklet_action+0xcc/0x1a0
-[effd3f80] [c002cb30] __do_softirq+0x110/0x220
-[effd3fe0] [c002cf34] irq_exit+0xa4/0xe0
-[effd3ff0] [c000d834] call_do_irq+0x24/0x3c
-[c07d7d50] [c000489c] do_IRQ+0x8c/0x110
-[c07d7d70] [c000f86c] ret_from_except+0x0/0x18
---- Exception: 501 at _raw_spin_unlock_irq+0x30/0x50
-    LR = _raw_spin_unlock_irq+0x2c/0x50
-[c07d7e40] [c0053084] finish_task_switch+0x74/0x130
-[c07d7e60] [c058f278] __schedule+0x238/0x620
-[c07d7f70] [c058fb50] schedule_preempt_disabled+0x10/0x20
-[c07d7f80] [c00686a0] cpu_startup_entry+0x100/0x1b0
-[c07d7fb0] [c074793c] start_kernel+0x338/0x34c
-[c07d7ff0] [c00003d8] set_ivor+0x140/0x17c
-Instruction dump:
-7d495214 7d294214 806a0010 80c90010 811a001c 813a0020 815a0024 90610008
-3c60c06d 90c1000c 3863f764 4830d131 <0fe00000> 3c60c06d 3863f0f4 4830d121
----[ end trace db1fae088c75c280 ]---
-Mapped at:
- [<f96251bc>] ahash_final_ctx+0x14c/0x7b0 [caamhash]
- [<c022ff4c>] __test_hash+0x2ac/0x6c0
- [<c0230388>] test_hash+0x28/0xb0
- [<c02304a4>] alg_test_hash+0x94/0xc0
- [<c022fa94>] alg_test+0x114/0x2e0
+dma_mapping_error checks for an incorrect DMA address:
+s/ctx->sh_desc_enc_dma/ctx->sh_desc_dec_dma
 
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- drivers/crypto/caam/caamhash.c | 2 +-
+ drivers/crypto/caam/caamalg.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 4bb6ff46e339..e94dd4518cfb 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -718,7 +718,7 @@ static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
- 
--	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
-+	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_TO_DEVICE);
- 	kfree(edesc);
- 
- #ifdef DEBUG
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 64c606d9e821..31f2e10b5102 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -786,7 +786,7 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
+ 	ctx->sh_desc_dec_dma = dma_map_single(jrdev, desc,
+ 					      desc_bytes(desc),
+ 					      DMA_TO_DEVICE);
+-	if (dma_mapping_error(jrdev, ctx->sh_desc_enc_dma)) {
++	if (dma_mapping_error(jrdev, ctx->sh_desc_dec_dma)) {
+ 		dev_err(jrdev, "unable to map shared descriptor\n");
+ 		return -ENOMEM;
+ 	}
 -- 
 1.8.3.1
