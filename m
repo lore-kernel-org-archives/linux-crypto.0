@@ -1,46 +1,183 @@
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2 trivial 2/6] crypto: ux500: Update error message for dmaengine_prep_slave_sg() API
-Date: Fri, 11 Jul 2014 18:13:24 +0200
-Message-ID: <1405095208-14642-2-git-send-email-geert+renesas@glider.be>
-References: <1405095208-14642-1-git-send-email-geert+renesas@glider.be>
-Cc: dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jiri Kosina <trivial@kernel.org>, linux-crypto@vger.kernel.org
-To: Vinod Koul <vinod.koul@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1405095208-14642-1-git-send-email-geert+renesas@glider.be>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: [PATCH v4 0/7] crypto: SHA1 multibuffer implementation
+Date: Fri, 11 Jul 2014 13:32:39 -0700
+Message-ID: <1405110759.2970.649.camel@schen9-DESK>
+References: <cover.1405074379.git.tim.c.chen@linux.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Chandramouli Narayanan <mouli@linux.intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:61432 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752169AbaGKUcr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Jul 2014 16:32:47 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Commit 7e933d3b1e25b250b58b827ef455a1b489c84157 ("crypto: ux500: use
-dmaengine_prep_slave_sg API") changed the code to use the new API, but
-forgot to update an error message.
+Herbert,
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Jiri Kosina <trivial@kernel.org>
-Cc: linux-crypto@vger.kernel.org
---
-v2:
-  - New
----
- drivers/crypto/ux500/hash/hash_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I've updated my implementation from v3 to flush the jobs early when cpu=
+ goes to idle.
+The flush routine was moved out of the notifier path to the crypto
+thread.  To check that there's no other jobs running, I've added the
+nr_running_cpu function to obtain the information.  I've also cleaned
+up the shash_ahash_mcryptd_digest to mcryptd.c as you have suggested.
+Please note also that a separate bug fix to the crypto scatter gather l=
+ist walk
+for the null string needs to be incorporated, which I encountered durin=
+g
+my testing: http://marc.info/?l=3Dlinux-crypto-vger&m=3D140503429412699=
+&w=3D2
 
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 1c73f4fbc252..ffa05b8f3bd8 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -184,7 +184,7 @@ static int hash_set_dma_transfer(struct hash_ctx *ctx, struct scatterlist *sg,
- 			direction, DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
- 	if (!desc) {
- 		dev_err(ctx->device->dev,
--			"%s: device_prep_slave_sg() failed!\n", __func__);
-+			"%s: dmaengine_prep_slave_sg() failed!\n", __func__);
- 		return -EFAULT;
- 	}
- 
--- 
-1.9.1
+In this patch series, we introduce the multi-buffer crypto algorithm on
+x86_64 and apply it to SHA1 hash computation.  The multi-buffer techniq=
+ue
+takes advantage of the 8 data lanes in the AVX2 registers and allows
+computation to be performed on data from multiple jobs in parallel.
+This allows us to parallelize computations when data inter-dependency i=
+n
+a single crypto job prevents us to fully parallelize our computations.
+The algorithm can be extended to other hashing and encryption schemes
+in the future.
+
+On multi-buffer SHA1 computation with AVX2, we see throughput increase
+up to 2.2x over the existing x86_64 single buffer AVX2 algorithm.
+
+The multi-buffer crypto algorithm is described in the following paper:
+Processing Multiple Buffers in Parallel to Increase Performance on
+Intel=C2=AE Architecture Processors
+http://www.intel.com/content/www/us/en/communications/communications-ia=
+-multi-buffer-paper.html
+
+The outline of the algorithm is sketched below:
+Any driver requesting the crypto service will place an async crypto
+request on the workqueue.  The multi-buffer crypto daemon will pull
+request from work queue and put each request in an empty data lane for
+multi-buffer crypto computation.  When all the empty lanes are filled,
+computation will commence on the jobs in parallel and the job with the
+shortest remaining buffer will get completed and be returned.  To preve=
+nt
+prolonged stall when there is no new jobs arriving, we will flush a
+crypto job if it has not been completed after a maximum allowable delay=
+,
+or when cpu becomes idle and cpu cycles become available.
+
+The multi-buffer algorithm necessitates mapping multiple scatter gather
+buffers to linear addresses simultaneously. The crypto daemon may need
+to sleep and yield the cpu to work on something else from time to time.
+We made a change to not use kmap_atomic to do scatter-gather buffer
+mapping and take advantage of the fact that we can directly translate
+address the buffer's address to its linear address with x86_64.
+To accommodate the fragmented nature of scatter-gather, we will keep
+submitting the next scatter-buffer fragment for a job for multi-buffer
+computation until a job is completed and no more buffer fragments remai=
+n.
+At that time we will pull a new job to fill the now empty data slot.
+We call a get_completed_job function to check whether there are other
+jobs that have been completed when we job when we have no new job arriv=
+al
+to prevent extraneous delay in returning any completed jobs.
+
+The multi-buffer algorithm should be used for cases where crypto jobs
+submissions are at a reasonable high rate.  For low crypto job submissi=
+on
+rate, this algorithm will not be beneficial. The reason is at low rate,
+we do not fill out the data lanes before flushing the jobs instead of
+processing them with all the data lanes full.  We will miss the benefit
+of parallel computation, and adding delay to the processing of the cryp=
+to
+job at the same time.  Some tuning of the maximum latency parameter may
+be needed to get the best performance.
+
+Note that the tcrypt SHA1 speed test, we wait for a previous job to
+be completed before submitting a new job.  Hence this is not a valid
+test for multi-buffer algorithm as it requires multiple outstanding job=
+s
+submitted to fill the all data lanes to be effective (i.e. 8 outstandin=
+g
+jobs for the AVX2 case).
+
+=46eedbacks and testings will be most welcomed.
+
+Tim Chen
+
+Change log:
+v4
+1. Move the early flush of jobs when cpu becomes idle to crypto thread.
+2. Move shash_ahash_mcryptd_digest to mcryptd.c=20
+
+v3
+1. Add notifier to multi-buffer algorithm to flush job when the cpu
+goes to idle to take advantage of available cpu cycles.=20
+2. Clean up of error messages.
+http://marc.info/?l=3Dlinux-crypto-vger&m=3D140252063401632&w=3D2
+
+v2
+1. Change the sha1 crypto walk to use the new crypto_ahash_walk
+interface for proper kmap.
+2. Drop the hack that map buffer in crypto_hash_walk without kmap_atomi=
+c
+as the new crypto_ahash_walk interface is merged.
+3. Reorganize some
+of the mcryptd hash interface code from ahash.c to mcryptd.c
+http://marc.info/?l=3Dlinux-crypto-vger&m=3D140088627927559&w=3D2
+
+v1
+refer to: http://www.spinics.net/lists/linux-crypto/msg10993.html
+
+
+Tim Chen (7):
+  crypto: SHA1 multibuffer crypto hash infrastructure
+  crypto: SHA1 multibuffer algorithm data structures
+  crypto: SHA1 multibuffer submit and flush routines for AVX2
+  crypto: SHA1 multibuffer crypto computation (x8 AVX2)
+  crypto: SHA1 multibuffer scheduler
+  sched: add function nr_running_cpu to expose number of tasks running
+    on     cpu
+  crypto: SHA1 multibuffer - flush the jobs early if cpu becomes idle
+
+ arch/x86/crypto/Makefile                         |    2 +
+ arch/x86/crypto/sha-mb/Makefile                  |   11 +
+ arch/x86/crypto/sha-mb/sha1_mb.c                 | 1004 ++++++++++++++=
+++++++++
+ arch/x86/crypto/sha-mb/sha1_mb_mgr_datastruct.S  |  287 +++++++
+ arch/x86/crypto/sha-mb/sha1_mb_mgr_flush_avx2.S  |  327 +++++++
+ arch/x86/crypto/sha-mb/sha1_mb_mgr_init_avx2.c   |   64 ++
+ arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S |  228 +++++
+ arch/x86/crypto/sha-mb/sha1_x8_avx2.S            |  472 ++++++++++
+ arch/x86/crypto/sha-mb/sha_mb_ctx.h              |  136 +++
+ arch/x86/crypto/sha-mb/sha_mb_mgr.h              |  110 +++
+ crypto/Kconfig                                   |   30 +
+ crypto/Makefile                                  |    1 +
+ crypto/mcryptd.c                                 |  622 ++++++++++++++
+ include/crypto/internal/hash.h                   |    9 +
+ include/crypto/mcryptd.h                         |  110 +++
+ include/linux/sched.h                            |    1 +
+ kernel/sched/core.c                              |    8 +
+ 17 files changed, 3422 insertions(+)
+ create mode 100644 arch/x86/crypto/sha-mb/Makefile
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb.c
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_datastruct.S
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_flush_avx2.S
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_init_avx2.c
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_x8_avx2.S
+ create mode 100644 arch/x86/crypto/sha-mb/sha_mb_ctx.h
+ create mode 100644 arch/x86/crypto/sha-mb/sha_mb_mgr.h
+ create mode 100644 crypto/mcryptd.c
+ create mode 100644 include/crypto/mcryptd.h
+
+--=20
+1.7.11.7
