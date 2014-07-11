@@ -1,7 +1,7 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH 01/10] crypto: testmgr - avoid DMA mapping from text, rodata, stack
-Date: Fri, 11 Jul 2014 15:34:46 +0300
-Message-ID: <1405082095-30146-2-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH 04/10] crypto: caam - fix "failed to check map error" DMA warnings
+Date: Fri, 11 Jul 2014 15:34:49 +0300
+Message-ID: <1405082095-30146-5-git-send-email-horia.geanta@freescale.com>
 References: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -12,187 +12,478 @@ Cc: <linux-crypto@vger.kernel.org>,
 	Kim Phillips <kim.phillips@freescale.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1blp0188.outbound.protection.outlook.com ([207.46.163.188]:43779
+Received: from mail-bn1blp0185.outbound.protection.outlook.com ([207.46.163.185]:18146
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753507AbaGKMgD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 11 Jul 2014 08:36:03 -0400
+	id S1753507AbaGKMgJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Jul 2014 08:36:09 -0400
 In-Reply-To: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-With DMA_API_DEBUG set, following warnings are emitted
-(tested on CAAM accelerator):
-DMA-API: device driver maps memory from kernel text or rodata
-DMA-API: device driver maps memory from stack
-and the culprits are:
--key in __test_aead and __test_hash
--result in __test_hash
+Use dma_mapping_error for every dma_map_single / dma_map_page.
 
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
-There was a previous cryptodev-2.6 commit with similar updates:
-9bac019dad8098a77cce555d929f678e22111783
-("crypto: testmgr - Fix DMA-API warning")
+ drivers/crypto/caam/caamalg.c  |  34 +++++++++++--
+ drivers/crypto/caam/caamhash.c | 106 ++++++++++++++++++++++++++++++++++-------
+ drivers/crypto/caam/caamrng.c  |  51 ++++++++++++++++----
+ 3 files changed, 163 insertions(+), 28 deletions(-)
 
-This patch addresses only warnings seen in CAAM module.
-In other words, warnings might still be encountered in tcrypt, depending on
-crypto accelerator being used.
-
- crypto/testmgr.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++--------
- crypto/testmgr.h |  2 +-
- 2 files changed, 50 insertions(+), 9 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 0f90612a00b9..2d3aa96babff 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -198,13 +198,20 @@ static int __test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
- 	const char *algo = crypto_tfm_alg_driver_name(crypto_ahash_tfm(tfm));
- 	unsigned int i, j, k, temp;
- 	struct scatterlist sg[8];
--	char result[64];
-+	char *result = NULL;
-+	char *key = NULL;
- 	struct ahash_request *req;
- 	struct tcrypt_result tresult;
- 	void *hash_buff;
- 	char *xbuf[XBUFSIZE];
- 	int ret = -ENOMEM;
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 31f2e10b5102..694df4685920 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -1313,8 +1313,13 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 					 DMA_FROM_DEVICE, dst_chained);
+ 	}
  
-+	result = kmalloc(64, GFP_KERNEL);
-+	if (!result)
+-	/* Check if data are contiguous */
+ 	iv_dma = dma_map_single(jrdev, req->iv, ivsize, DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, iv_dma)) {
++		dev_err(jrdev, "unable to map IV\n");
++		return ERR_PTR(-ENOMEM);
++	}
++
++	/* Check if data are contiguous */
+ 	if (assoc_nents || sg_dma_address(req->assoc) + req->assoclen !=
+ 	    iv_dma || src_nents || iv_dma + ivsize !=
+ 	    sg_dma_address(req->src)) {
+@@ -1369,6 +1374,10 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 	}
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
++		dev_err(jrdev, "unable to map S/G table\n");
++		return ERR_PTR(-ENOMEM);
++	}
+ 
+ 	return edesc;
+ }
+@@ -1494,8 +1503,13 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
+ 					 DMA_FROM_DEVICE, dst_chained);
+ 	}
+ 
+-	/* Check if data are contiguous */
+ 	iv_dma = dma_map_single(jrdev, greq->giv, ivsize, DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, iv_dma)) {
++		dev_err(jrdev, "unable to map IV\n");
++		return ERR_PTR(-ENOMEM);
++	}
++
++	/* Check if data are contiguous */
+ 	if (assoc_nents || sg_dma_address(req->assoc) + req->assoclen !=
+ 	    iv_dma || src_nents || iv_dma + ivsize != sg_dma_address(req->src))
+ 		contig &= ~GIV_SRC_CONTIG;
+@@ -1559,6 +1573,10 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
+ 	}
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
++		dev_err(jrdev, "unable to map S/G table\n");
++		return ERR_PTR(-ENOMEM);
++	}
+ 
+ 	return edesc;
+ }
+@@ -1650,11 +1668,16 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
+ 					 DMA_FROM_DEVICE, dst_chained);
+ 	}
+ 
++	iv_dma = dma_map_single(jrdev, req->info, ivsize, DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, iv_dma)) {
++		dev_err(jrdev, "unable to map IV\n");
++		return ERR_PTR(-ENOMEM);
++	}
++
+ 	/*
+ 	 * Check if iv can be contiguous with source and destination.
+ 	 * If so, include it. If not, create scatterlist.
+ 	 */
+-	iv_dma = dma_map_single(jrdev, req->info, ivsize, DMA_TO_DEVICE);
+ 	if (!src_nents && iv_dma + ivsize == sg_dma_address(req->src))
+ 		iv_contig = true;
+ 	else
+@@ -1693,6 +1716,11 @@ static struct ablkcipher_edesc *ablkcipher_edesc_alloc(struct ablkcipher_request
+ 
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
++		dev_err(jrdev, "unable to map S/G table\n");
++		return ERR_PTR(-ENOMEM);
++	}
++
+ 	edesc->iv_dma = iv_dma;
+ 
+ #ifdef DEBUG
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 7754df4c3df1..39f7a933c8fa 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -137,13 +137,20 @@ struct caam_hash_state {
+ /* Common job descriptor seq in/out ptr routines */
+ 
+ /* Map state->caam_ctx, and append seq_out_ptr command that points to it */
+-static inline void map_seq_out_ptr_ctx(u32 *desc, struct device *jrdev,
+-				       struct caam_hash_state *state,
+-				       int ctx_len)
++static inline int map_seq_out_ptr_ctx(u32 *desc, struct device *jrdev,
++				      struct caam_hash_state *state,
++				      int ctx_len)
+ {
+ 	state->ctx_dma = dma_map_single(jrdev, state->caam_ctx,
+ 					ctx_len, DMA_FROM_DEVICE);
++	if (dma_mapping_error(jrdev, state->ctx_dma)) {
++		dev_err(jrdev, "unable to map ctx\n");
++		return -ENOMEM;
++	}
++
+ 	append_seq_out_ptr(desc, state->ctx_dma, ctx_len, 0);
++
++	return 0;
+ }
+ 
+ /* Map req->result, and append seq_out_ptr command that points to it */
+@@ -201,14 +208,19 @@ try_buf_map_to_sec4_sg(struct device *jrdev, struct sec4_sg_entry *sec4_sg,
+ }
+ 
+ /* Map state->caam_ctx, and add it to link table */
+-static inline void ctx_map_to_sec4_sg(u32 *desc, struct device *jrdev,
+-				      struct caam_hash_state *state,
+-				      int ctx_len,
+-				      struct sec4_sg_entry *sec4_sg,
+-				      u32 flag)
++static inline int ctx_map_to_sec4_sg(u32 *desc, struct device *jrdev,
++				     struct caam_hash_state *state, int ctx_len,
++				     struct sec4_sg_entry *sec4_sg, u32 flag)
+ {
+ 	state->ctx_dma = dma_map_single(jrdev, state->caam_ctx, ctx_len, flag);
++	if (dma_mapping_error(jrdev, state->ctx_dma)) {
++		dev_err(jrdev, "unable to map ctx\n");
++		return -ENOMEM;
++	}
++
+ 	dma_to_sec4_sg_one(sec4_sg, state->ctx_dma, ctx_len, 0);
++
++	return 0;
+ }
+ 
+ /* Common shared descriptor commands */
+@@ -809,8 +821,10 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 		edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
+ 				 DESC_JOB_IO_LEN;
+ 
+-		ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
+-				   edesc->sec4_sg, DMA_BIDIRECTIONAL);
++		ret = ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
++					 edesc->sec4_sg, DMA_BIDIRECTIONAL);
++		if (ret)
++			return ret;
+ 
+ 		state->buf_dma = try_buf_map_to_sec4_sg(jrdev,
+ 							edesc->sec4_sg + 1,
+@@ -839,6 +853,10 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 						     sec4_sg_bytes,
+ 						     DMA_TO_DEVICE);
++		if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
++			dev_err(jrdev, "unable to map S/G table\n");
++			return -ENOMEM;
++		}
+ 
+ 		append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len +
+ 				       to_hash, LDST_SGF);
+@@ -914,8 +932,10 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 			 DESC_JOB_IO_LEN;
+ 	edesc->src_nents = 0;
+ 
+-	ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len, edesc->sec4_sg,
+-			   DMA_TO_DEVICE);
++	ret = ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
++				 edesc->sec4_sg, DMA_TO_DEVICE);
++	if (ret)
 +		return ret;
-+	key = kmalloc(MAX_KEYLEN, GFP_KERNEL);
-+	if (!key)
-+		goto out_nobuf;
- 	if (testmgr_alloc_buf(xbuf))
- 		goto out_nobuf;
  
-@@ -239,8 +246,14 @@ static int __test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
+ 	state->buf_dma = try_buf_map_to_sec4_sg(jrdev, edesc->sec4_sg + 1,
+ 						buf, state->buf_dma, buflen,
+@@ -924,12 +944,20 @@ static int ahash_final_ctx(struct ahash_request *req)
  
- 		if (template[i].ksize) {
- 			crypto_ahash_clear_flags(tfm, ~0);
--			ret = crypto_ahash_setkey(tfm, template[i].key,
--						  template[i].ksize);
-+			if (template[i].ksize > MAX_KEYLEN) {
-+				pr_err("alg: hash: setkey failed on test %d for %s: key size %d > %d\n",
-+				       j, algo, template[i].ksize, MAX_KEYLEN);
-+				ret = -EINVAL;
-+				goto out;
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
++		dev_err(jrdev, "unable to map S/G table\n");
++		return -ENOMEM;
++	}
+ 
+ 	append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len + buflen,
+ 			  LDST_SGF);
+ 
+ 	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
+ 						digestsize);
++	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
++		dev_err(jrdev, "unable to map dst\n");
++		return -ENOMEM;
++	}
+ 
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
+@@ -992,8 +1020,10 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
+ 			 DESC_JOB_IO_LEN;
+ 
+-	ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len, edesc->sec4_sg,
+-			   DMA_TO_DEVICE);
++	ret = ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
++				 edesc->sec4_sg, DMA_TO_DEVICE);
++	if (ret)
++		return ret;
+ 
+ 	state->buf_dma = try_buf_map_to_sec4_sg(jrdev, edesc->sec4_sg + 1,
+ 						buf, state->buf_dma, buflen,
+@@ -1004,12 +1034,20 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
++		dev_err(jrdev, "unable to map S/G table\n");
++		return -ENOMEM;
++	}
+ 
+ 	append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len +
+ 			       buflen + req->nbytes, LDST_SGF);
+ 
+ 	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
+ 						digestsize);
++	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
++		dev_err(jrdev, "unable to map dst\n");
++		return -ENOMEM;
++	}
+ 
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
+@@ -1070,6 +1108,10 @@ static int ahash_digest(struct ahash_request *req)
+ 		sg_to_sec4_sg_last(req->src, src_nents, edesc->sec4_sg, 0);
+ 		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
++		if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
++			dev_err(jrdev, "unable to map S/G table\n");
++			return -ENOMEM;
++		}
+ 		src_dma = edesc->sec4_sg_dma;
+ 		options = LDST_SGF;
+ 	} else {
+@@ -1080,6 +1122,10 @@ static int ahash_digest(struct ahash_request *req)
+ 
+ 	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
+ 						digestsize);
++	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
++		dev_err(jrdev, "unable to map dst\n");
++		return -ENOMEM;
++	}
+ 
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
+@@ -1128,11 +1174,19 @@ static int ahash_final_no_ctx(struct ahash_request *req)
+ 	init_job_desc_shared(desc, ptr, sh_len, HDR_SHARE_DEFER | HDR_REVERSE);
+ 
+ 	state->buf_dma = dma_map_single(jrdev, buf, buflen, DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, state->buf_dma)) {
++		dev_err(jrdev, "unable to map src\n");
++		return -ENOMEM;
++	}
+ 
+ 	append_seq_in_ptr(desc, state->buf_dma, buflen, 0);
+ 
+ 	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
+ 						digestsize);
++	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
++		dev_err(jrdev, "unable to map dst\n");
++		return -ENOMEM;
++	}
+ 	edesc->src_nents = 0;
+ 
+ #ifdef DEBUG
+@@ -1219,10 +1273,16 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 						    sec4_sg_bytes,
+ 						    DMA_TO_DEVICE);
++		if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
++			dev_err(jrdev, "unable to map S/G table\n");
++			return -ENOMEM;
++		}
+ 
+ 		append_seq_in_ptr(desc, edesc->sec4_sg_dma, to_hash, LDST_SGF);
+ 
+-		map_seq_out_ptr_ctx(desc, jrdev, state, ctx->ctx_len);
++		ret = map_seq_out_ptr_ctx(desc, jrdev, state, ctx->ctx_len);
++		if (ret)
++			return ret;
+ 
+ #ifdef DEBUG
+ 		print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
+@@ -1311,12 +1371,20 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
++		dev_err(jrdev, "unable to map S/G table\n");
++		return -ENOMEM;
++	}
+ 
+ 	append_seq_in_ptr(desc, edesc->sec4_sg_dma, buflen +
+ 			       req->nbytes, LDST_SGF);
+ 
+ 	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
+ 						digestsize);
++	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
++		dev_err(jrdev, "unable to map dst\n");
++		return -ENOMEM;
++	}
+ 
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
+@@ -1393,6 +1461,10 @@ static int ahash_update_first(struct ahash_request *req)
+ 							    edesc->sec4_sg,
+ 							    sec4_sg_bytes,
+ 							    DMA_TO_DEVICE);
++			if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
++				dev_err(jrdev, "unable to map S/G table\n");
++				return -ENOMEM;
 +			}
-+			memcpy(key, template[i].key, template[i].ksize);
-+			ret = crypto_ahash_setkey(tfm, key, template[i].ksize);
- 			if (ret) {
- 				printk(KERN_ERR "alg: hash: setkey failed on "
- 				       "test %d for %s: ret=%d\n", j, algo,
-@@ -319,8 +332,16 @@ static int __test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
- 			}
+ 			src_dma = edesc->sec4_sg_dma;
+ 			options = LDST_SGF;
+ 		} else {
+@@ -1410,7 +1482,9 @@ static int ahash_update_first(struct ahash_request *req)
  
- 			if (template[i].ksize) {
-+				if (template[i].ksize > MAX_KEYLEN) {
-+					pr_err("alg: hash: setkey failed on test %d for %s: key size %d > %d\n",
-+					       j, algo, template[i].ksize,
-+					       MAX_KEYLEN);
-+					ret = -EINVAL;
-+					goto out;
-+				}
- 				crypto_ahash_clear_flags(tfm, ~0);
--				ret = crypto_ahash_setkey(tfm, template[i].key,
-+				memcpy(key, template[i].key, template[i].ksize);
-+				ret = crypto_ahash_setkey(tfm, key,
- 							  template[i].ksize);
+ 		append_seq_in_ptr(desc, src_dma, to_hash, options);
  
- 				if (ret) {
-@@ -372,6 +393,8 @@ out:
- out_noreq:
- 	testmgr_free_buf(xbuf);
- out_nobuf:
-+	kfree(key);
-+	kfree(result);
- 	return ret;
+-		map_seq_out_ptr_ctx(desc, jrdev, state, ctx->ctx_len);
++		ret = map_seq_out_ptr_ctx(desc, jrdev, state, ctx->ctx_len);
++		if (ret)
++			return ret;
+ 
+ #ifdef DEBUG
+ 		print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index a4afa8a8ef02..ae31e555793c 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -185,7 +185,7 @@ static int caam_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ 				      max - copied_idx, false);
  }
  
-@@ -410,7 +433,7 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
- 	unsigned int i, j, k, n, temp;
- 	int ret = -ENOMEM;
- 	char *q;
--	char *key;
-+	char *key = NULL;
- 	struct aead_request *req;
- 	struct scatterlist *sg;
- 	struct scatterlist *asg;
-@@ -421,7 +444,7 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
- 	void *input;
- 	void *output;
- 	void *assoc;
--	char *iv;
-+	char *iv = NULL;
- 	char *xbuf[XBUFSIZE];
- 	char *xoutbuf[XBUFSIZE];
- 	char *axbuf[XBUFSIZE];
-@@ -429,6 +452,9 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
- 	iv = kzalloc(MAX_IVLEN, GFP_KERNEL);
- 	if (!iv)
- 		return ret;
-+	key = kmalloc(MAX_KEYLEN, GFP_KERNEL);
-+	if (!key)
-+		goto out_noxbuf;
- 	if (testmgr_alloc_buf(xbuf))
- 		goto out_noxbuf;
- 	if (testmgr_alloc_buf(axbuf))
-@@ -493,7 +519,14 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
- 				crypto_aead_set_flags(
- 					tfm, CRYPTO_TFM_REQ_WEAK_KEY);
+-static inline void rng_create_sh_desc(struct caam_rng_ctx *ctx)
++static inline int rng_create_sh_desc(struct caam_rng_ctx *ctx)
+ {
+ 	struct device *jrdev = ctx->jrdev;
+ 	u32 *desc = ctx->sh_desc;
+@@ -203,13 +203,18 @@ static inline void rng_create_sh_desc(struct caam_rng_ctx *ctx)
  
--			key = template[i].key;
-+			if (template[i].klen > MAX_KEYLEN) {
-+				pr_err("alg: aead%s: setkey failed on test %d for %s: key size %d > %d\n",
-+				       d, j, algo, template[i].klen,
-+				       MAX_KEYLEN);
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			memcpy(key, template[i].key, template[i].klen);
- 
- 			ret = crypto_aead_setkey(tfm, key,
- 						 template[i].klen);
-@@ -594,7 +627,14 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
- 			if (template[i].wk)
- 				crypto_aead_set_flags(
- 					tfm, CRYPTO_TFM_REQ_WEAK_KEY);
--			key = template[i].key;
-+			if (template[i].klen > MAX_KEYLEN) {
-+				pr_err("alg: aead%s: setkey failed on test %d for %s: key size %d > %d\n",
-+				       d, j, algo, template[i].klen,
-+				       MAX_KEYLEN);
-+				ret = -EINVAL;
-+				goto out;
-+			}
-+			memcpy(key, template[i].key, template[i].klen);
- 
- 			ret = crypto_aead_setkey(tfm, key, template[i].klen);
- 			if (!ret == template[i].fail) {
-@@ -776,6 +816,7 @@ out_nooutbuf:
- out_noaxbuf:
- 	testmgr_free_buf(xbuf);
- out_noxbuf:
-+	kfree(key);
- 	kfree(iv);
- 	return ret;
+ 	ctx->sh_desc_dma = dma_map_single(jrdev, desc, desc_bytes(desc),
+ 					  DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, ctx->sh_desc_dma)) {
++		dev_err(jrdev, "unable to map shared descriptor\n");
++		return -ENOMEM;
++	}
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "rng shdesc@: ", DUMP_PREFIX_ADDRESS, 16, 4,
+ 		       desc, desc_bytes(desc), 1);
+ #endif
++	return 0;
  }
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 4bb607189b8d..46df9e88bbf3 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -32,7 +32,7 @@
- #define MAX_DIGEST_SIZE		64
- #define MAX_TAP			8
  
--#define MAX_KEYLEN		56
-+#define MAX_KEYLEN		160
- #define MAX_IVLEN		32
+-static inline void rng_create_job_desc(struct caam_rng_ctx *ctx, int buf_id)
++static inline int rng_create_job_desc(struct caam_rng_ctx *ctx, int buf_id)
+ {
+ 	struct device *jrdev = ctx->jrdev;
+ 	struct buf_data *bd = &ctx->bufs[buf_id];
+@@ -220,12 +225,17 @@ static inline void rng_create_job_desc(struct caam_rng_ctx *ctx, int buf_id)
+ 			     HDR_REVERSE);
  
- struct hash_testvec {
+ 	bd->addr = dma_map_single(jrdev, bd->buf, RN_BUF_SIZE, DMA_FROM_DEVICE);
++	if (dma_mapping_error(jrdev, bd->addr)) {
++		dev_err(jrdev, "unable to map dst\n");
++		return -ENOMEM;
++	}
+ 
+ 	append_seq_out_ptr_intlen(desc, bd->addr, RN_BUF_SIZE, 0);
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "rng job desc@: ", DUMP_PREFIX_ADDRESS, 16, 4,
+ 		       desc, desc_bytes(desc), 1);
+ #endif
++	return 0;
+ }
+ 
+ static void caam_cleanup(struct hwrng *rng)
+@@ -242,24 +252,44 @@ static void caam_cleanup(struct hwrng *rng)
+ 	rng_unmap_ctx(rng_ctx);
+ }
+ 
+-static void caam_init_buf(struct caam_rng_ctx *ctx, int buf_id)
++static int caam_init_buf(struct caam_rng_ctx *ctx, int buf_id)
+ {
+ 	struct buf_data *bd = &ctx->bufs[buf_id];
++	int err;
++
++	err = rng_create_job_desc(ctx, buf_id);
++	if (err)
++		return err;
+ 
+-	rng_create_job_desc(ctx, buf_id);
+ 	atomic_set(&bd->empty, BUF_EMPTY);
+ 	submit_job(ctx, buf_id == ctx->current_buf);
+ 	wait_for_completion(&bd->filled);
++
++	return 0;
+ }
+ 
+-static void caam_init_rng(struct caam_rng_ctx *ctx, struct device *jrdev)
++static int caam_init_rng(struct caam_rng_ctx *ctx, struct device *jrdev)
+ {
++	int err;
++
+ 	ctx->jrdev = jrdev;
+-	rng_create_sh_desc(ctx);
++
++	err = rng_create_sh_desc(ctx);
++	if (err)
++		return err;
++
+ 	ctx->current_buf = 0;
+ 	ctx->cur_buf_idx = 0;
+-	caam_init_buf(ctx, 0);
+-	caam_init_buf(ctx, 1);
++
++	err = caam_init_buf(ctx, 0);
++	if (err)
++		return err;
++
++	err = caam_init_buf(ctx, 1);
++	if (err)
++		return err;
++
++	return 0;
+ }
+ 
+ static struct hwrng caam_rng = {
+@@ -282,6 +312,7 @@ static int __init caam_rng_init(void)
+ 	struct platform_device *pdev;
+ 	struct device *ctrldev;
+ 	void *priv;
++	int err;
+ 
+ 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
+ 	if (!dev_node) {
+@@ -315,7 +346,9 @@ static int __init caam_rng_init(void)
+ 	rng_ctx = kmalloc(sizeof(struct caam_rng_ctx), GFP_DMA);
+ 	if (!rng_ctx)
+ 		return -ENOMEM;
+-	caam_init_rng(rng_ctx, dev);
++	err = caam_init_rng(rng_ctx, dev);
++	if (err)
++		return err;
+ 
+ 	dev_info(dev, "registering rng-caam\n");
+ 	return hwrng_register(&caam_rng);
 -- 
 1.8.3.1
