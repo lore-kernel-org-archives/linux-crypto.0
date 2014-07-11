@@ -1,68 +1,71 @@
 From: Dmitry Kasatkin <d.kasatkin@samsung.com>
-Subject: [PATCH 0/2] Fix build break on dependency from CRYPTO
-Date: Fri, 11 Jul 2014 18:59:43 +0300
-Message-ID: <cover.1405094060.git.d.kasatkin@samsung.com>
+Subject: [PATCH 1/2] asymmetric_keys: make crypto builtin if asymmetric keys
+ selected as builtin
+Date: Fri, 11 Jul 2014 18:59:44 +0300
+Message-ID: <acdd27e3b559b0c1bc57a9393e4e5540a90bab36.1405094060.git.d.kasatkin@samsung.com>
+References: <cover.1405094060.git.d.kasatkin@samsung.com>
 Cc: linux-kernel@vger.kernel.org, dmitry.kasatkin@gmail.com,
 	Dmitry Kasatkin <d.kasatkin@samsung.com>
 To: zohar@linux.vnet.ibm.com, dhowells@redhat.com,
 	linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org
-Return-path: <linux-security-module-owner@vger.kernel.org>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:50502 "EHLO
+	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750834AbaGKQBS (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 11 Jul 2014 12:01:18 -0400
+In-reply-to: <cover.1405094060.git.d.kasatkin@samsung.com>
+In-reply-to: <cover.1405094060.git.d.kasatkin@samsung.com>
+References: <cover.1405094060.git.d.kasatkin@samsung.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-I got a message from random config robot that he found a build break...
-It happens because certain modules which are compiled as builtin depends
-on CRYPTO=m and select required components as modules instead of making
-them builtin. Here is couple of patches to fix it.
+When ASYMMETRIC_KEYS=y, but depends on CRYPTO=m, selections will be also modules.
+In random config case OID_REGISTRY, MPILIB and ASN1 became modules producing build
+break. This patch removes asymmetric keys dependency from CRYPTO, but instead
+selects CRYPTO and CRYPTO_HASH as they are needed.
 
-config: i386-randconfig-c1-07060441 (attached as .config)
-
-All error/warnings:
-
-   security/built-in.o: In function `asymmetric_verify':
-   >> (.text+0x75b6): undefined reference to `mpi_read_raw_data'
-      security/built-in.o: In function `asymmetric_verify':
-   >> (.text+0x75d8): undefined reference to `mpi_free'
-         crypto/built-in.o: In function `public_key_destroy':
-    >> (.text+0x383): undefined reference to `mpi_free'
-	    crypto/built-in.o: In function `RSA_verify_signature':
-    >> rsa.c:(.text+0x474): undefined reference to `mpi_get_nbits'
-    >> rsa.c:(.text+0x481): undefined reference to `mpi_get_nbits'
-    >> rsa.c:(.text+0x491): undefined reference to `mpi_cmp_ui'
-    >> rsa.c:(.text+0x49f): undefined reference to `mpi_cmp'
-    >> rsa.c:(.text+0x4aa): undefined reference to `mpi_alloc'
-    >> rsa.c:(.text+0x4c4): undefined reference to `mpi_powm'
-    >> rsa.c:(.text+0x4d2): undefined reference to `mpi_free'
-    >> rsa.c:(.text+0x4f1): undefined reference to `mpi_free'
-    >> rsa.c:(.text+0x52e): undefined reference to `mpi_get_nbits'
-    >> rsa.c:(.text+0x54a): undefined reference to `mpi_get_buffer'
-    >> rsa.c:(.text+0x5fb): undefined reference to `__crypto_memneq'
-    >> rsa.c:(.text+0x618): undefined reference to `__crypto_memneq'
-       crypto/built-in.o: In function `x509_free_certificate':
-    >> (.text+0x90a): undefined reference to `mpi_free'
-         crypto/built-in.o: In function `x509_cert_parse':
-    >> (.text+0x986): undefined reference to `asn1_ber_decoder'
-      crypto/built-in.o: In function `x509_cert_parse':
-    >> (.text+0x9a1): undefined reference to `asn1_ber_decoder'
-        crypto/built-in.o: In function `x509_note_OID':
-    >> (.text+0x9e4): undefined reference to `look_up_OID'
-	   crypto/built-in.o: In function `x509_note_OID':
-   >> (.text+0xa01): undefined reference to `sprint_oid'
-       crypto/built-in.o: In function `rsa_extract_mpi':
-
-
-- Dmitry
-
-Dmitry Kasatkin (2):
-  asymmetric_keys: make crypto builtin if asymmetric keys selected as
-    builtin
-  digsig: make crypto builtin if digsig selected as builtin
-
+Signed-off-by: Dmitry Kasatkin <d.kasatkin@samsung.com>
+---
  crypto/Kconfig                 | 6 +++++-
  crypto/asymmetric_keys/Kconfig | 2 ++
- lib/Kconfig                    | 3 ++-
- 3 files changed, 9 insertions(+), 2 deletions(-)
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index ce4012a..96835d6 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -10,6 +10,11 @@ config XOR_BLOCKS
+ source "crypto/async_tx/Kconfig"
+ 
+ #
++# asymmetric keys
++#
++source crypto/asymmetric_keys/Kconfig
++
++#
+ # Cryptographic API Configuration
+ #
+ menuconfig CRYPTO
+@@ -1405,6 +1410,5 @@ config CRYPTO_HASH_INFO
+ 	bool
+ 
+ source "drivers/crypto/Kconfig"
+-source crypto/asymmetric_keys/Kconfig
+ 
+ endif	# if CRYPTO
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 03a6eb9..a38d2d4 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -30,6 +30,8 @@ config PUBLIC_KEY_ALGO_RSA
+ config X509_CERTIFICATE_PARSER
+ 	tristate "X.509 certificate parser"
+ 	depends on ASYMMETRIC_PUBLIC_KEY_SUBTYPE
++	select CRYPTO
++	select CRYPTO_HASH
+ 	select ASN1
+ 	select OID_REGISTRY
+ 	help
 -- 
 1.9.1
-
