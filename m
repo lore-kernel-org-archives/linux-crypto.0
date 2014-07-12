@@ -1,83 +1,69 @@
-From: Kirill Tkhai <tkhai@yandex.ru>
-Subject: Re: [PATCH v4 6/7] sched: add function nr_running_cpu to expose number
- of tasks running on cpu
-Date: Sat, 12 Jul 2014 13:25:42 +0400
-Message-ID: <53C0FF16.40902@yandex.ru>
-References: <cover.1405074379.git.tim.c.chen@linux.intel.com> <1405110784.2970.655.camel@schen9-DESK>
-Reply-To: tkhai@yandex.ru
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: Chandramouli Narayanan <mouli@linux.intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1405110784.2970.655.camel@schen9-DESK>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: [PATCH v4] crypto: Add Allwinner Security System crypto accelerator
+Date: Sat, 12 Jul 2014 14:59:10 +0200
+Message-ID: <1405169953-13695-1-git-send-email-clabbe.montjoie@gmail.com>
+Cc: devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
+	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
+	rdunlap@infradead.org, maxime.ripard@free-electrons.com,
+	linux@arm.linux.org.uk, herbert@gondor.apana.org.au,
+	davem@davemloft.net, grant.likely@linaro.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-we0-f177.google.com ([74.125.82.177]:38150 "EHLO
+	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752671AbaGLM7T (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 12 Jul 2014 08:59:19 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 12.07.2014 00:33, Tim Chen wrote:
-> This function will help a thread decide if it wants to to do work
-> that can be delayed, to accumulate more tasks for more efficient
-> batch processing later.
-> 
-> However, if no other tasks are running on the cpu, it can take
-> advantgae of the available cpu cycles to complete the tasks
-> for immediate processing to minimize delay, otherwise it will yield.
-> 
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
-> ---
->  include/linux/sched.h | 1 +
->  kernel/sched/core.c   | 8 ++++++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/include/linux/sched.h b/include/linux/sched.h
-> index 7cb07fd..0884250 100644
-> --- a/include/linux/sched.h
-> +++ b/include/linux/sched.h
-> @@ -168,6 +168,7 @@ extern int nr_threads;
->  DECLARE_PER_CPU(unsigned long, process_counts);
->  extern int nr_processes(void);
->  extern unsigned long nr_running(void);
-> +extern unsigned long nr_running_cpu(int cpu);
->  extern unsigned long nr_iowait(void);
->  extern unsigned long nr_iowait_cpu(int cpu);
->  extern unsigned long this_cpu_load(void);
-> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-> index 9cae286..d5bb8e6 100644
-> --- a/kernel/sched/core.c
-> +++ b/kernel/sched/core.c
-> @@ -2283,6 +2283,14 @@ unsigned long nr_running(void)
->  	return sum;
->  }
->  
-> +unsigned long nr_running_cpu(int cpu)
-> +{
-> +	if (cpumask_test_cpu(cpu, cpu_online_mask))
-> +		return cpu_rq(cpu)->nr_running;
-> +	else
-> +		return 0;
-> +}
-> +
 
-Offline cpu should have nr_running equal to 0. We park last
-enqueued thread (migration_thread) at the end of take_cpu_down().
+Hello
 
-So, it's enough to return cpu_rq(cpu)->nr_running.
+This is the driver for the Security System included in Allwinner SoC A20.
+The Security System (SS for short) is a hardware cryptographic accelerator that support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+It could be found on others Allwinner SoC: 
+- A10s and A31 diagram speak about it with precisions (AES/DES/3DES/Md5/SHA1/PRNG)
+- A10 and A13 manual give the same datasheet for SS than A20
+- A23 speak about a security system but without precisions
+But I do not have access on any of those hardware, tests are welcome.
 
->  unsigned long long nr_context_switches(void)
->  {
->  	int i;
-> 
+This driver currently supports:
+- MD5 and SHA1 hash algorithms
+- AES block cipher in CBC mode with 128/196/256bits keys.
+- DES and 3DES block cipher in CBC mode
+The driver exposes all those algorithms through the kernel cryptographic API.
 
-Thanks,
-Kirill
+The driver support only CPU driven (aka poll mode) transfer mode since the DMA engine of the A20 does not have a driver yet.
+
+Changes since v3:
+- Remove all algorithms options from Kconfig, so now only one module is used
+- Add the sunxi_ss_cipher function to unify mode calculation
+- Remove the sunxi_cipher_exit empty function
+- Add some missing mutex_unlock()
+- Drop PRNG support, I wait for more comment on its results before re-enabling it.
+
+Changes since v2:
+- Fix Makefile and Kconfig for static kernel.
+
+Changes since v1:
+- annotate ss->base as __iomem
+- regroup all mutex in the ss_ctx structure
+- splited driver in 7 modules (core md5 sha1 aes des 3des prng) in sunxi-ss directory
+- use dev_exit_p() for .remove
+- added missing CRYPTO_BLKCIPHER dep in Kconfig
+- use ahash instead of shash
+- use ablkcipher instead of blkcipher
+- use crypto_rng_ctx instead of crypto_tfm_ctx
+- set seed as an u32
+- drop useless comment decoration
+- drop useless debug
+- ss_ctx is now a static pointer and whole structure being allocated
+- fix the platform_get_resource/devm_ioremap_resource pattern
+- invert getting die id and configuring clock
+- set clock value as a const unsigned long
+- add MODULE_ALIAS
+- use define names more consistency (SS_xxx)
+- fix PRNG errors
+- respell SS to Security System in DT documentation
