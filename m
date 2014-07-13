@@ -1,40 +1,53 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v4 6/7] sched: add function nr_running_cpu to expose number
- of tasks running on cpu
-Date: Sat, 12 Jul 2014 07:21:49 -0700
-Message-ID: <53C1447D.1010809@intel.com>
-References: <cover.1405074379.git.tim.c.chen@linux.intel.com> <1405110784.2970.655.camel@schen9-DESK>
+From: Chen Gang <gang.chen.5i5j@gmail.com>
+Subject: [PATCH] drivers/crypto/Kconfig: Let 'DEV_QCE' depend on both HAS_DMA
+ and HAS_IOMEM
+Date: Sun, 13 Jul 2014 11:01:38 +0800
+Message-ID: <53C1F692.4000105@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: Chandramouli Narayanan <mouli@linux.intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@kernel.org>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Liqin Chen <liqin.linux@gmail.com>,
+	Lennox Wu <lennox.wu@gmail.com>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:17385 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751299AbaGLOZD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 12 Jul 2014 10:25:03 -0400
-In-Reply-To: <1405110784.2970.655.camel@schen9-DESK>
+Received: from mail-pa0-f46.google.com ([209.85.220.46]:57751 "EHLO
+	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751786AbaGMDBu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 12 Jul 2014 23:01:50 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07/11/2014 01:33 PM, Tim Chen wrote:
-> +unsigned long nr_running_cpu(int cpu)
-> +{
-> +	if (cpumask_test_cpu(cpu, cpu_online_mask))
-> +		return cpu_rq(cpu)->nr_running;
-> +	else
-> +		return 0;
-> +}
-> +
-EXPORT_SYMBOL?
+'DEV_QCE' needs both HAS_DMA and HAS_IOMEM, so let it depend on them.
+
+The related error (with allmodconfig under score):
+
+    MODPOST 1365 modules
+  ERROR: "devm_ioremap_resource" [drivers/crypto/qce/qcrypto.ko] undefined!
+  ERROR: "dma_map_sg" [drivers/crypto/qce/qcrypto.ko] undefined!
+  ERROR: "dma_set_mask" [drivers/crypto/qce/qcrypto.ko] undefined!
+  ERROR: "dma_supported" [drivers/crypto/qce/qcrypto.ko] undefined!
+  ERROR: "dma_unmap_sg" [drivers/crypto/qce/qcrypto.ko] undefined!
+
+Signed-off-by: Chen Gang <gang.chen.5i5j@gmail.com>
+---
+ drivers/crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 5ef9ec9..2fb0fdf 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -422,7 +422,7 @@ source "drivers/crypto/qat/Kconfig"
+ 
+ config CRYPTO_DEV_QCE
+ 	tristate "Qualcomm crypto engine accelerator"
+-	depends on ARCH_QCOM || COMPILE_TEST
++	depends on (ARCH_QCOM || COMPILE_TEST) && HAS_DMA && HAS_IOMEM
+ 	select CRYPTO_AES
+ 	select CRYPTO_DES
+ 	select CRYPTO_ECB
+-- 
+1.7.11.7
