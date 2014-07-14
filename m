@@ -1,19 +1,20 @@
-From: Peter Zijlstra <peterz@infradead.org>
+From: Tim Chen <tim.c.chen@linux.intel.com>
 Subject: Re: [PATCH v4 6/7] sched: add function nr_running_cpu to expose
  number of tasks running on cpu
-Date: Mon, 14 Jul 2014 21:15:04 +0200
-Message-ID: <20140714191504.GO9918@twins.programming.kicks-ass.net>
+Date: Mon, 14 Jul 2014 12:50:50 -0700
+Message-ID: <1405367450.2970.750.camel@schen9-DESK>
 References: <cover.1405074379.git.tim.c.chen@linux.intel.com>
- <1405110784.2970.655.camel@schen9-DESK>
- <20140714101611.GS9918@twins.programming.kicks-ass.net>
- <1405354214.2970.663.camel@schen9-DESK>
- <20140714161432.GC9918@twins.programming.kicks-ass.net>
- <1405357534.2970.701.camel@schen9-DESK>
- <20140714181738.GI9918@twins.programming.kicks-ass.net>
- <1405364908.2970.729.camel@schen9-DESK>
+	 <1405110784.2970.655.camel@schen9-DESK>
+	 <20140714101611.GS9918@twins.programming.kicks-ass.net>
+	 <1405354214.2970.663.camel@schen9-DESK>
+	 <20140714161432.GC9918@twins.programming.kicks-ass.net>
+	 <1405357534.2970.701.camel@schen9-DESK>
+	 <20140714181738.GI9918@twins.programming.kicks-ass.net>
+	 <1405364908.2970.729.camel@schen9-DESK>
+	 <20140714191504.GO9918@twins.programming.kicks-ass.net>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="XZq0mbLCR4KNTYFe"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S.Miller" <davem@davemloft.net>,
@@ -24,74 +25,66 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	Wajdi Feghali <wajdi.k.feghali@intel.com>,
 	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
+To: Peter Zijlstra <peterz@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:53704 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755857AbaGNTPP (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Jul 2014 15:15:15 -0400
-Content-Disposition: inline
-In-Reply-To: <1405364908.2970.729.camel@schen9-DESK>
+Received: from mga09.intel.com ([134.134.136.24]:11022 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756902AbaGNTuy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 14 Jul 2014 15:50:54 -0400
+In-Reply-To: <20140714191504.GO9918@twins.programming.kicks-ass.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Mon, 2014-07-14 at 21:15 +0200, Peter Zijlstra wrote:
+> On Mon, Jul 14, 2014 at 12:08:28PM -0700, Tim Chen wrote:
+> > On Mon, 2014-07-14 at 20:17 +0200, Peter Zijlstra wrote:
+> 
+> > > Your multi-buffer thing isn't generic either, it seems lmiited to sha1.
+> > 
+> > We actually have many other multi-buffer crypto algorithms already
+> > published for encryption and other IPSec usages.  So 
+> > multi-buffer algorithm is not just limited to SHA1.
+> > We hope to port those to the kernel crypto library eventually.
+> > http://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-multi-buffer-ipsec-implementations-ia-processors-paper.pdf 
+> 
+> That's all nice and such; but the code as I've seen in these patches is
+> very much sha1 specific. The mb part isn't separated out.
 
---XZq0mbLCR4KNTYFe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+There is a generic multi-buffer infrastructure portion that manages
+pulling and queuing jobs on the crypto workqueue, and it is separated out
+in patch 1 of the patchset.  The other portions are algorithm specific that defines
+algorithm specific data structure and  does the crypto computation 
+for a particular algorithm, mostly in
+assemblies and C glue code.  The infrastructure code is 
+meant to be reused for other similar 
+multi-buffer algorithms.
 
-On Mon, Jul 14, 2014 at 12:08:28PM -0700, Tim Chen wrote:
-> On Mon, 2014-07-14 at 20:17 +0200, Peter Zijlstra wrote:
+> 
+> > > It does not reuse padata, 
+> > padata tries to speed things up by parallelizing jobs to *multiple*
+> > cpus.  Whereas multi-buffer tries to speed things up by speeding things
+> > up by using multiple data lanes in SIMD register in a *single* cpu.
+> > These two usages are complementary but not the same.
+> 
+> And if its single cpu, wth do you need that nr_running thing for another
+> cpu for?
 
-> > Your multi-buffer thing isn't generic either, it seems lmiited to sha1.
->=20
-> We actually have many other multi-buffer crypto algorithms already
-> published for encryption and other IPSec usages.  So=20
-> multi-buffer algorithm is not just limited to SHA1.
-> We hope to port those to the kernel crypto library eventually.
-> http://www.intel.com/content/dam/www/public/us/en/documents/white-papers/=
-fast-multi-buffer-ipsec-implementations-ia-processors-paper.pdf=20
+We use nr_running_cpu to check whether there are other tasks running on
+the *current* cpu, (not for another cpu), to decide if we should flush
+and compute crypto jobs accumulated.  If there's nobody else running,
+we can take advantage of available cpu cycles on the cpu we are running 
+on to do computation on the existing jobs in a SIMD mannner. 
+Waiting a bit longer may accumulate more jobs to process in parallel
+in a single SIMD instruction, but will have more delay.  
 
-That's all nice and such; but the code as I've seen in these patches is
-very much sha1 specific. The mb part isn't separated out.
+> 
+> Also, this difference wasn't clear to me.
+> 
+> I still loathe all the async work, because it makes a mockery of
+> accounting etc.. but that's a story for another day I suppose :-(
+> 
+> 
 
-> > It does not reuse padata,=20
-> padata tries to speed things up by parallelizing jobs to *multiple*
-> cpus.  Whereas multi-buffer tries to speed things up by speeding things
-> up by using multiple data lanes in SIMD register in a *single* cpu.
-> These two usages are complementary but not the same.
+Thanks.
 
-And if its single cpu, wth do you need that nr_running thing for another
-cpu for?
-
-Also, this difference wasn't clear to me.
-
-I still loathe all the async work, because it makes a mockery of
-accounting etc.. but that's a story for another day I suppose :-(
-
-
-
---XZq0mbLCR4KNTYFe
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJTxCw4AAoJEHZH4aRLwOS6TY4P/AklVJoTWm/aJpCS6h4zP3fX
-a0Bt8E5dDKVvc6km38vZEHvdrSSdi4JC2IksbGSLB5MPMVwxbtQqQ32Tz8w6BKOu
-W/mAIOACmApufx9url5VWgEGDjehoqIh2zcCbik5P9bG17fVU7w/IdOalstu0+KP
-s28LgiIR+iMxaNDVfHt4lus2JFXI0lRg2KlgqEv1sX36kjmqApZkAPRlFW1M4zlr
-Go9XZe6ANN46f4ffe123D7VGAl0DJmXMRf1kFvyRP4V88W2COIYxsnwnEcEYTGFB
-gWH05NufrQgNvSC8jhCktZlHx7yuDUrc1+v4IKM76uGSFyTIsbee+YpiLzJRd/Pu
-BcPlVf3UvxM3bfgCPoYUNiGgTXVGfaPGScL1yZSuAWmckvEKm2Xn2n1VyPjXxOuK
-NyGGwwjXcO0hw0oP/dqzmcrECLBsmnNoUVtz0WB0GPG5NEXS9WVJpihRlLoyt1zT
-2lh4Y//ZhHMfCPoFccwfzWMQ32vZUzreyaPTYfp+OEAaakUPDF16Y3CMHvSFVyjd
-EYtW6+QHUQ7TnIQ02egHl2bLQ7g+heaFhsFl0DbqdrN/yoCJ4k9wu9Dg/54fosba
-FkpCqZlmdSzbMOygEwsGab054nR71DyxdhdXp4dzolKpozWkXCecof94C5fMmQnO
-3aWLkTYlJK+7wi807Sxx
-=6dIe
------END PGP SIGNATURE-----
-
---XZq0mbLCR4KNTYFe--
+Tim
