@@ -1,18 +1,19 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
+From: Peter Zijlstra <peterz@infradead.org>
 Subject: Re: [PATCH v4 6/7] sched: add function nr_running_cpu to expose
  number of tasks running on cpu
-Date: Mon, 14 Jul 2014 12:08:28 -0700
-Message-ID: <1405364908.2970.729.camel@schen9-DESK>
+Date: Mon, 14 Jul 2014 21:15:04 +0200
+Message-ID: <20140714191504.GO9918@twins.programming.kicks-ass.net>
 References: <cover.1405074379.git.tim.c.chen@linux.intel.com>
-	 <1405110784.2970.655.camel@schen9-DESK>
-	 <20140714101611.GS9918@twins.programming.kicks-ass.net>
-	 <1405354214.2970.663.camel@schen9-DESK>
-	 <20140714161432.GC9918@twins.programming.kicks-ass.net>
-	 <1405357534.2970.701.camel@schen9-DESK>
-	 <20140714181738.GI9918@twins.programming.kicks-ass.net>
+ <1405110784.2970.655.camel@schen9-DESK>
+ <20140714101611.GS9918@twins.programming.kicks-ass.net>
+ <1405354214.2970.663.camel@schen9-DESK>
+ <20140714161432.GC9918@twins.programming.kicks-ass.net>
+ <1405357534.2970.701.camel@schen9-DESK>
+ <20140714181738.GI9918@twins.programming.kicks-ass.net>
+ <1405364908.2970.729.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="XZq0mbLCR4KNTYFe"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S.Miller" <davem@davemloft.net>,
@@ -23,73 +24,74 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	Wajdi Feghali <wajdi.k.feghali@intel.com>,
 	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Peter Zijlstra <peterz@infradead.org>
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:4704 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932385AbaGNTIb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Jul 2014 15:08:31 -0400
-In-Reply-To: <20140714181738.GI9918@twins.programming.kicks-ass.net>
+Received: from casper.infradead.org ([85.118.1.10]:53704 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755857AbaGNTPP (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 14 Jul 2014 15:15:15 -0400
+Content-Disposition: inline
+In-Reply-To: <1405364908.2970.729.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2014-07-14 at 20:17 +0200, Peter Zijlstra wrote:
-> On Mon, Jul 14, 2014 at 10:05:34AM -0700, Tim Chen wrote:
-> > I was trying to explain why the algorithm is implemented this way
-> > because of its batching nature.
-> > 
-> > There is a whole class of async algorithm that can provide
-> > substantial speedup by doing batch processing and uses workqueue.
-> > The multi-buffer sha1 version has 2.2x speedup over existing
-> > AVX2 version, and can have even more speedup when AVX3 
-> > comes round.  Workqueue is a natural way to implement 
-> > this.  I don't think a throughput speedup of 2.2x is "crap".
-> > 
-> > We are not inventing anything new, but ask for a 
-> > very simple helper function to know if there's something else
-> > running on our cpu to help us make a better decision 
-> > of whether we should flush the batched jobs immediately.
-> > 
-> > And also asynchronous crypto interface is already used substantially
-> > in crypto and has a well established infrastructure.  
-> 
-> The crap I was talking about is that there's a metric ton of 'async'
-> interfaces all different.
 
-Async interfaces when used appropriately, actually speed things up
-substantially for crypto.  We actually have a case with
-ecyrptfs not using the async crypto interface, causing cpu to stall
-and slowing things down substantially with AES-NI.  And async interface
-with workqueue speed things up (30% to 35% on encryption with SSD). 
-http://marc.info/?l=ecryptfs-users&m=136520541407248 
-http://www.spinics.net/lists/ecryptfs/msg00228.html 
- 
-> 
-> Your multi-buffer thing isn't generic either, it seems lmiited to sha1.
+--XZq0mbLCR4KNTYFe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We actually have many other multi-buffer crypto algorithms already
-published for encryption and other IPSec usages.  So 
-multi-buffer algorithm is not just limited to SHA1.
-We hope to port those to the kernel crypto library eventually.
-http://www.intel.com/content/dam/www/public/us/en/documents/white-papers/fast-multi-buffer-ipsec-implementations-ia-processors-paper.pdf 
+On Mon, Jul 14, 2014 at 12:08:28PM -0700, Tim Chen wrote:
+> On Mon, 2014-07-14 at 20:17 +0200, Peter Zijlstra wrote:
 
-> It does not reuse padata, 
-padata tries to speed things up by parallelizing jobs to *multiple*
-cpus.  Whereas multi-buffer tries to speed things up by speeding things
-up by using multiple data lanes in SIMD register in a *single* cpu.
-These two usages are complementary but not the same.
+> > Your multi-buffer thing isn't generic either, it seems lmiited to sha1.
+>=20
+> We actually have many other multi-buffer crypto algorithms already
+> published for encryption and other IPSec usages.  So=20
+> multi-buffer algorithm is not just limited to SHA1.
+> We hope to port those to the kernel crypto library eventually.
+> http://www.intel.com/content/dam/www/public/us/en/documents/white-papers/=
+fast-multi-buffer-ipsec-implementations-ia-processors-paper.pdf=20
 
-> it does not extend workqueues, 
-Why do I need to extend workqueues if the existing ones already
-meet my needs?
+That's all nice and such; but the code as I've seen in these patches is
+very much sha1 specific. The mb part isn't separated out.
 
-> it does not
-> remove the btrfs nonsense, 
-Not much I can do about btrfs as I don't understand the issues there.
+> > It does not reuse padata,=20
+> padata tries to speed things up by parallelizing jobs to *multiple*
+> cpus.  Whereas multi-buffer tries to speed things up by speeding things
+> up by using multiple data lanes in SIMD register in a *single* cpu.
+> These two usages are complementary but not the same.
 
-> it adds yet anotehr thing.
+And if its single cpu, wth do you need that nr_running thing for another
+cpu for?
+
+Also, this difference wasn't clear to me.
+
+I still loathe all the async work, because it makes a mockery of
+accounting etc.. but that's a story for another day I suppose :-(
 
 
-Thanks.
 
-Tim
+--XZq0mbLCR4KNTYFe
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJTxCw4AAoJEHZH4aRLwOS6TY4P/AklVJoTWm/aJpCS6h4zP3fX
+a0Bt8E5dDKVvc6km38vZEHvdrSSdi4JC2IksbGSLB5MPMVwxbtQqQ32Tz8w6BKOu
+W/mAIOACmApufx9url5VWgEGDjehoqIh2zcCbik5P9bG17fVU7w/IdOalstu0+KP
+s28LgiIR+iMxaNDVfHt4lus2JFXI0lRg2KlgqEv1sX36kjmqApZkAPRlFW1M4zlr
+Go9XZe6ANN46f4ffe123D7VGAl0DJmXMRf1kFvyRP4V88W2COIYxsnwnEcEYTGFB
+gWH05NufrQgNvSC8jhCktZlHx7yuDUrc1+v4IKM76uGSFyTIsbee+YpiLzJRd/Pu
+BcPlVf3UvxM3bfgCPoYUNiGgTXVGfaPGScL1yZSuAWmckvEKm2Xn2n1VyPjXxOuK
+NyGGwwjXcO0hw0oP/dqzmcrECLBsmnNoUVtz0WB0GPG5NEXS9WVJpihRlLoyt1zT
+2lh4Y//ZhHMfCPoFccwfzWMQ32vZUzreyaPTYfp+OEAaakUPDF16Y3CMHvSFVyjd
+EYtW6+QHUQ7TnIQ02egHl2bLQ7g+heaFhsFl0DbqdrN/yoCJ4k9wu9Dg/54fosba
+FkpCqZlmdSzbMOygEwsGab054nR71DyxdhdXp4dzolKpozWkXCecof94C5fMmQnO
+3aWLkTYlJK+7wi807Sxx
+=6dIe
+-----END PGP SIGNATURE-----
+
+--XZq0mbLCR4KNTYFe--
