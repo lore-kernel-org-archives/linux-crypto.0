@@ -1,53 +1,42 @@
-From: Chen Gang <gang.chen.5i5j@gmail.com>
-Subject: [PATCH] drivers/crypto/Kconfig: Let 'DEV_QCE' depend on both HAS_DMA
- and HAS_IOMEM
-Date: Sun, 13 Jul 2014 11:01:38 +0800
-Message-ID: <53C1F692.4000105@gmail.com>
+From: Guruswamy Basavaiah <guru2018@gmail.com>
+Subject: [Question] Queuing packets to work queue ablk_helper.c and packets
+ getting reordered.
+Date: Mon, 14 Jul 2014 14:58:39 +0530
+Message-ID: <CAHSpA5-7Nph-1C_nQjLLEkMFmVLEinw3FaTfGa6D8meexBY9Yw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Liqin Chen <liqin.linux@gmail.com>,
-	Lennox Wu <lennox.wu@gmail.com>
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f46.google.com ([209.85.220.46]:57751 "EHLO
+Received: from mail-pa0-f46.google.com ([209.85.220.46]:60688 "EHLO
 	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751786AbaGMDBu (ORCPT
+	with ESMTP id S1751349AbaGNJ2k (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 12 Jul 2014 23:01:50 -0400
+	Mon, 14 Jul 2014 05:28:40 -0400
+Received: by mail-pa0-f46.google.com with SMTP id eu11so5058073pac.19
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Jul 2014 02:28:39 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-'DEV_QCE' needs both HAS_DMA and HAS_IOMEM, so let it depend on them.
+Hi,
+ Noticed this issue in linux-2.6.34.14 and its same in linux-3.14.4.
 
-The related error (with allmodconfig under score):
+ In ablk_decrypt, we check may_use_simd() function to decrypt the
+packet. If may_use_simd() function returns true, we get the packet
+decrypted immediately and return. If it return false packet will be
+queued for decryption.
 
-    MODPOST 1365 modules
-  ERROR: "devm_ioremap_resource" [drivers/crypto/qce/qcrypto.ko] undefined!
-  ERROR: "dma_map_sg" [drivers/crypto/qce/qcrypto.ko] undefined!
-  ERROR: "dma_set_mask" [drivers/crypto/qce/qcrypto.ko] undefined!
-  ERROR: "dma_supported" [drivers/crypto/qce/qcrypto.ko] undefined!
-  ERROR: "dma_unmap_sg" [drivers/crypto/qce/qcrypto.ko] undefined!
+When queue already have packets for decryption, if for a incoming
+packet "may_use_simd()" function returns true, the packet will get
+decrypted immediately and returned with out checking the packets in
+queue.
 
-Signed-off-by: Chen Gang <gang.chen.5i5j@gmail.com>
----
- drivers/crypto/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So the packets in the queue will be send to upper layer or forwarded
+late, resulting in the reordering of the packets.
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 5ef9ec9..2fb0fdf 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -422,7 +422,7 @@ source "drivers/crypto/qat/Kconfig"
- 
- config CRYPTO_DEV_QCE
- 	tristate "Qualcomm crypto engine accelerator"
--	depends on ARCH_QCOM || COMPILE_TEST
-+	depends on (ARCH_QCOM || COMPILE_TEST) && HAS_DMA && HAS_IOMEM
- 	select CRYPTO_AES
- 	select CRYPTO_DES
- 	select CRYPTO_ECB
+Is this fine?  my understanding was packets will be never be reorder
+in the ipsec layer in kernel.
+Let me know if question is not clear, i will try to frame it better.
+
+Please include my email id in the response
 -- 
-1.7.11.7
+Guruswamy Basavaiah
