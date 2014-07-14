@@ -1,70 +1,63 @@
-From: Chen Gang <gang.chen.5i5j@gmail.com>
-Subject: Re: [PATCH] drivers/crypto/Kconfig: Let 'DEV_QCE' depend on both
- HAS_DMA and HAS_IOMEM
-Date: Mon, 14 Jul 2014 20:12:31 +0800
-Message-ID: <53C3C92F.8010504@gmail.com>
-References: <53C1F692.4000105@gmail.com>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v4 6/7] sched: add function nr_running_cpu to expose
+ number of tasks running on cpu
+Date: Mon, 14 Jul 2014 09:10:14 -0700
+Message-ID: <1405354214.2970.663.camel@schen9-DESK>
+References: <cover.1405074379.git.tim.c.chen@linux.intel.com>
+	 <1405110784.2970.655.camel@schen9-DESK>
+	 <20140714101611.GS9918@twins.programming.kicks-ass.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Liqin Chen <liqin.linux@gmail.com>,
-	Lennox Wu <lennox.wu@gmail.com>
-To: herbert@gondor.apana.org.au
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Ingo Molnar <mingo@kernel.org>,
+	Chandramouli Narayanan <mouli@linux.intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Peter Zijlstra <peterz@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f177.google.com ([209.85.192.177]:58999 "EHLO
-	mail-pd0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753942AbaGNMMf (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 14 Jul 2014 08:12:35 -0400
-In-Reply-To: <53C1F692.4000105@gmail.com>
+Received: from mga09.intel.com ([134.134.136.24]:36510 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755869AbaGNQKl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 14 Jul 2014 12:10:41 -0400
+In-Reply-To: <20140714101611.GS9918@twins.programming.kicks-ass.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello all:
-
-This patch is obsoleted according to the other discussion thread about
-IOMEM and COMPILE_TEST.
-
-I shall fix it, and maybe not need touch drivers/crypto again, so maybe
-not need send patch v2 for it.
-
-Thanks.
-
-On 07/13/2014 11:01 AM, Chen Gang wrote:
-> 'DEV_QCE' needs both HAS_DMA and HAS_IOMEM, so let it depend on them.
+On Mon, 2014-07-14 at 12:16 +0200, Peter Zijlstra wrote:
+> On Fri, Jul 11, 2014 at 01:33:04PM -0700, Tim Chen wrote:
+> > This function will help a thread decide if it wants to to do work
+> > that can be delayed, to accumulate more tasks for more efficient
+> > batch processing later.
+> > 
+> > However, if no other tasks are running on the cpu, it can take
+> > advantgae of the available cpu cycles to complete the tasks
+> > for immediate processing to minimize delay, otherwise it will yield.
 > 
-> The related error (with allmodconfig under score):
+> Ugh.. and ignore topology and everything else.
 > 
->     MODPOST 1365 modules
->   ERROR: "devm_ioremap_resource" [drivers/crypto/qce/qcrypto.ko] undefined!
->   ERROR: "dma_map_sg" [drivers/crypto/qce/qcrypto.ko] undefined!
->   ERROR: "dma_set_mask" [drivers/crypto/qce/qcrypto.ko] undefined!
->   ERROR: "dma_supported" [drivers/crypto/qce/qcrypto.ko] undefined!
->   ERROR: "dma_unmap_sg" [drivers/crypto/qce/qcrypto.ko] undefined!
+> Yet another scheduler on top of the scheduler.
 > 
-> Signed-off-by: Chen Gang <gang.chen.5i5j@gmail.com>
-> ---
->  drivers/crypto/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> We have the padata muck, also only ever used by crypto.
+> We have the workqueue nonsense, used all over the place
+> And we have btrfs doing their own padata like muck.
+> And I'm sure there's at least one more out there, just because.
 > 
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 5ef9ec9..2fb0fdf 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -422,7 +422,7 @@ source "drivers/crypto/qat/Kconfig"
->  
->  config CRYPTO_DEV_QCE
->  	tristate "Qualcomm crypto engine accelerator"
-> -	depends on ARCH_QCOM || COMPILE_TEST
-> +	depends on (ARCH_QCOM || COMPILE_TEST) && HAS_DMA && HAS_IOMEM
->  	select CRYPTO_AES
->  	select CRYPTO_DES
->  	select CRYPTO_ECB
+> Why do we want yet another thing?
 > 
+> I'm inclined to go NAK and get people to reduce the amount of async
+> queueing and processing crap.
 
--- 
-Chen Gang
+The mult-buffer class of crypto algorithms is by nature
+asynchronous.  The algorithm gathers several crypto jobs, and
+put the buffer from each job in a data lane of the SIMD register.
+This allows for parallel processing and increases throughput.
+The gathering of the crypto jobs is an async process and
+queuing is necessary for this class of algorithm.
 
-Open, share, and attitude like air, water, and life which God blessed
+Tim
