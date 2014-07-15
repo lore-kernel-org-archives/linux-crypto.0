@@ -1,9 +1,12 @@
-From: Mike Galbraith <umgwanakikbuti@gmail.com>
+From: Tim Chen <tim.c.chen@linux.intel.com>
 Subject: Re: [PATCH v4 6/7] sched: add function nr_running_cpu to expose
  number of tasks running on cpu
-Date: Tue, 15 Jul 2014 20:06:55 +0200
-Message-ID: <1405447615.5117.36.camel@marge.simpson.net>
-References: <20140714161432.GC9918@twins.programming.kicks-ass.net>
+Date: Tue, 15 Jul 2014 11:40:58 -0700
+Message-ID: <1405449658.2970.797.camel@schen9-DESK>
+References: <1405110784.2970.655.camel@schen9-DESK>
+	 <20140714101611.GS9918@twins.programming.kicks-ass.net>
+	 <1405354214.2970.663.camel@schen9-DESK>
+	 <20140714161432.GC9918@twins.programming.kicks-ass.net>
 	 <1405357534.2970.701.camel@schen9-DESK>
 	 <20140714181738.GI9918@twins.programming.kicks-ass.net>
 	 <1405364908.2970.729.camel@schen9-DESK>
@@ -11,15 +14,10 @@ References: <20140714161432.GC9918@twins.programming.kicks-ass.net>
 	 <1405367450.2970.750.camel@schen9-DESK>
 	 <20140715095045.GV9918@twins.programming.kicks-ass.net>
 	 <20140715120728.GR3588@twins.programming.kicks-ass.net>
-	 <alpine.DEB.2.10.1407151452370.24854@nanos>
-	 <1405435525.5744.29.camel@marge.simpson.net>
-	 <20140715145346.GM9918@twins.programming.kicks-ass.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S.Miller" <davem@davemloft.net>,
 	Ingo Molnar <mingo@kernel.org>,
@@ -31,33 +29,27 @@ Cc: Thomas Gleixner <tglx@linutronix.de>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Peter Zijlstra <peterz@infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:62489 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755153AbaGOSHA (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Jul 2014 14:07:00 -0400
-In-Reply-To: <20140715145346.GM9918@twins.programming.kicks-ass.net>
+Received: from mga02.intel.com ([134.134.136.20]:44620 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757093AbaGOSl2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 15 Jul 2014 14:41:28 -0400
+In-Reply-To: <20140715120728.GR3588@twins.programming.kicks-ass.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2014-07-15 at 16:53 +0200, Peter Zijlstra wrote: 
-> On Tue, Jul 15, 2014 at 04:45:25PM +0200, Mike Galbraith wrote:
-> > 
-> > 3.0.101-default        3.753363 usecs/loop -- avg 3.770737 530.4 KHz   1.000
-> > 3.14.10-default        4.145348 usecs/loop -- avg 4.139987 483.1 KHz    .910     1.000
-> > 3.15.4-default         4.355594 usecs/loop -- avg 4.351961 459.6 KHz    .866      .951    1.000
-> > 3.16.0-default         4.537279 usecs/loop -- avg 4.543532 440.2 KHz    .829      .911     .957
-> > 
-> > 3.0.101-smp            3.692377 usecs/loop -- avg 3.690774 541.9 KHz   1.000
-> > 3.14.10-smp            4.010009 usecs/loop -- avg 4.009019 498.9 KHz    .920
-> > 3.15.4-smp             3.882398 usecs/loop -- avg 3.884095 514.9 KHz    .950
-> > 3.16.0-master          4.061003 usecs/loop -- avg 4.058244 492.8 KHz    .909
+On Tue, 2014-07-15 at 14:07 +0200, Peter Zijlstra wrote:
+> On Tue, Jul 15, 2014 at 11:50:45AM +0200, Peter Zijlstra wrote:
+> > So you already have an idle notifier (which is x86 only, we should fix
+> > that I suppose), and you then double check there really isn't anything
+> > else running.
 > 
-> Urgh,.. I need to go fix that :/
+> Note that we've already done a large part of the expense of going idle
+> by the time we call that idle notifier -- in specific, we've
+> reprogrammed the clock to stop the tick.
+> 
+> Its really wasteful to then generate work again, which means we have to
+> again reprogram the clock etc.
 
-I'm poking about.  It's not just one thing 'course, just lots of change
-adding up to less than wonderful.  Idle changes are costing some, for
-obese config, avg goop.  The select_next_task() reorganization appears
-to be costing, but eyeballing, I can see no excuse for that at all.
+Will try another version of the patch without using the idle notifier.
 
--Mike
+Tim
