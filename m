@@ -1,10 +1,9 @@
 From: Peter Zijlstra <peterz@infradead.org>
 Subject: Re: [PATCH v4 6/7] sched: add function nr_running_cpu to expose
  number of tasks running on cpu
-Date: Tue, 15 Jul 2014 11:50:45 +0200
-Message-ID: <20140715095045.GV9918@twins.programming.kicks-ass.net>
-References: <cover.1405074379.git.tim.c.chen@linux.intel.com>
- <1405110784.2970.655.camel@schen9-DESK>
+Date: Tue, 15 Jul 2014 14:07:28 +0200
+Message-ID: <20140715120728.GR3588@twins.programming.kicks-ass.net>
+References: <1405110784.2970.655.camel@schen9-DESK>
  <20140714101611.GS9918@twins.programming.kicks-ass.net>
  <1405354214.2970.663.camel@schen9-DESK>
  <20140714161432.GC9918@twins.programming.kicks-ass.net>
@@ -13,9 +12,10 @@ References: <cover.1405074379.git.tim.c.chen@linux.intel.com>
  <1405364908.2970.729.camel@schen9-DESK>
  <20140714191504.GO9918@twins.programming.kicks-ass.net>
  <1405367450.2970.750.camel@schen9-DESK>
+ <20140715095045.GV9918@twins.programming.kicks-ass.net>
 Mime-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AJ3oM32U01nchLSz"
+	protocol="application/pgp-signature"; boundary="+S4DbcR7QPeSsP0V"
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S.Miller" <davem@davemloft.net>,
@@ -28,92 +28,52 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:39118 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.9]:56795 "EHLO
 	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758039AbaGOJvA (ORCPT
+	with ESMTP id S1758628AbaGOMHn (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Jul 2014 05:51:00 -0400
+	Tue, 15 Jul 2014 08:07:43 -0400
 Content-Disposition: inline
-In-Reply-To: <1405367450.2970.750.camel@schen9-DESK>
+In-Reply-To: <20140715095045.GV9918@twins.programming.kicks-ass.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
---AJ3oM32U01nchLSz
+--+S4DbcR7QPeSsP0V
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 14, 2014 at 12:50:50PM -0700, Tim Chen wrote:
+On Tue, Jul 15, 2014 at 11:50:45AM +0200, Peter Zijlstra wrote:
+> So you already have an idle notifier (which is x86 only, we should fix
+> that I suppose), and you then double check there really isn't anything
+> else running.
 
-> There is a generic multi-buffer infrastructure portion that manages
-> pulling and queuing jobs on the crypto workqueue, and it is separated out
-> in patch 1 of the patchset.
+Note that we've already done a large part of the expense of going idle
+by the time we call that idle notifier -- in specific, we've
+reprogrammed the clock to stop the tick.
 
-There's one very weird multi-line comment in that patch.
+Its really wasteful to then generate work again, which means we have to
+again reprogram the clock etc.
 
-> The other portions are algorithm specific that defines
-> algorithm specific data structure and  does the crypto computation=20
-> for a particular algorithm, mostly in
-> assemblies and C glue code.  The infrastructure code is=20
-> meant to be reused for other similar=20
-> multi-buffer algorithms.
-
-The flushing part that uses the sched thing is sha1 specific, even
-though it strikes me as not being so. Flushing buffers on idle seems
-like a 'generic' thing.
-
-> We use nr_running_cpu to check whether there are other tasks running on
-> the *current* cpu, (not for another cpu),
-
-And yet, the function allows you do to exactly that..
-
-> to decide if we should flush
-> and compute crypto jobs accumulated.  If there's nobody else running,
-> we can take advantage of available cpu cycles on the cpu we are running=
-=20
-> on to do computation on the existing jobs in a SIMD mannner.=20
-> Waiting a bit longer may accumulate more jobs to process in parallel
-> in a single SIMD instruction, but will have more delay. =20
-
-So you already have an idle notifier (which is x86 only, we should fix
-that I suppose), and you then double check there really isn't anything
-else running.
-
-How much, if anything, does that second check buy you? There's just not
-a single word on that.
-
-Also, there is not a word on the latency vs throughput tradeoff you
-make. I can imagine that for very short idle durations you loose, not
-win with this thing.
-
-So for now I still see no reason for doing this.
-
-Also, I wonder about SMT, the point of this is to make best use of the
-SIMD pipelines, does it still make sense to use siblings at the same
-time even though you're running hand crafted ASM to stuff the pipelines
-to the brim? Should this thing be SMT aware and not gather queues for
-both siblings?
-
---AJ3oM32U01nchLSz
+--+S4DbcR7QPeSsP0V
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAEBAgAGBQJTxPl1AAoJEHZH4aRLwOS69hEP/ijVdpPh1qUhdXCD/dyTioPc
-DIiyXLhIkxkYUo5s1Acu4rF4UCHkXDimMd7y0zGKGbkFANf7RAtSxgotM9qBA2MV
-hObU4QAXF0OtHv+IEd+jdTY0ZFPNEJknDhmJ2cdrSTVtiXdutuYU6JtgQNuSCQ5F
-ZsnjIR5VcBwmO7xdVwmEOK6o9RKdOvDgWr1hDHV3wgKsBAVbnY8FixN3r1UHJZCO
-UWq4AvvlKUx4S2YtHcimRD5Z3q31FPP5cH9ckwBh5h0lK/rWl71QLdfKRurge8p8
-JjStzRCfxjV9im3+ZxgcqdCsdKbsKjsb9afpBWF627DhiPE6xZj7fbssje3eK9wZ
-tUxk3VbZ52noUBFZemzheD8C4DNwQyqbM0lD77qh1Y4973qWaoIfv2YXUmNyBXYy
-ANEdKm0ELgaDl+0WTZWN4NBrBrzf7VSUULcfR53AUerhaCJEDut2REUg3iyY7nZi
-hTZo1OVhJ2fHkKWUmEGjSJFI7yRaXkgZ9iGcZBknCDQWoiISLSwxY6aMLo8u6Ma/
-lD2dKQ0dkm5z1bfaiTcRYgzSDzhA3/hKvYX5Ct5gwkKaUtZDLDkqBJKTN1aSUEKn
-ASeqQxOX8FIoGQ/gvC0kII6pUqmk5bOOzZExr0T9G8jJSas085cW7GEkoOSHQ6Q8
-5TBaGIl43vAZBg/26qoR
-=/5tn
+iQIcBAEBAgAGBQJTxRmAAAoJEHZH4aRLwOS6PT0P/RMh3e40x8wWWOA2RB+kTNx+
+sN9rjgb8LdbOE8DNaPjdGWJMSHfVRHrTX7mLmscRNtMzx4g4r1f/KKWrvY5JJFKl
+Pgk42SEFkphoe7k+vWlOr7UVhkm3excPaALJDRa/uLh7aTgmeWCBym/g0qwiuc8c
+eghO466/6uWIDTyu9Cs2WbuT5/eVHD7WXxcf2IL/vEloM1WPAx3bZoklNTx2Tlty
++hGnF3YJx/igEaC+5uDKCpMpnQB43jYxGSWA3nq3cutJAsgRxAu/RgdcwObu50JD
+92REXd9nUc5Q6jnVQlOUGdD15t37ZbyH2ZPfiWFHKKYw6uE+HxLpCloj/HZwhs1m
+USs5RtiLOyGDJ1M2hwtXBqI2HJQtK9QYIOuEFSkzX6+ZkRq7/pBHdyEtMXEDaZEw
+0XVXF1g7tM4/X0UiUfyp8f3pjbsqxRTHbQ8JJ2OmY+djamkuf06R0ZeT1wyBc5Fp
+b3BdIqy1Mbs57UihYDWgorkWN3yHQpBzrMrYQhqSqszvT7n/mILokjnOWJXFOrRh
+8HKhXehNir74uZeRH7l9+6/La/hTqGYEc1qYzjgJW9Y99u/8zMbK1Q7CKpgMZqYt
+c0odyCQln8sJq5Wx3K2A3XZuUzKo6w/cihnY3CrRekzc7XkpL2hgvkItIdI03l6I
+Q7aKMCbfLpK6vYQfvaJi
+=YwD9
 -----END PGP SIGNATURE-----
 
---AJ3oM32U01nchLSz--
+--+S4DbcR7QPeSsP0V--
