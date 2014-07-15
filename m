@@ -1,15 +1,21 @@
-From: Thomas Gleixner <tglx@linutronix.de>
+From: Peter Zijlstra <peterz@infradead.org>
 Subject: Re: [PATCH v4 6/7] sched: add function nr_running_cpu to expose
  number of tasks running on cpu
-Date: Tue, 15 Jul 2014 14:59:33 +0200 (CEST)
-Message-ID: <alpine.DEB.2.10.1407151452370.24854@nanos>
-References: <1405110784.2970.655.camel@schen9-DESK> <20140714101611.GS9918@twins.programming.kicks-ass.net> <1405354214.2970.663.camel@schen9-DESK> <20140714161432.GC9918@twins.programming.kicks-ass.net> <1405357534.2970.701.camel@schen9-DESK>
- <20140714181738.GI9918@twins.programming.kicks-ass.net> <1405364908.2970.729.camel@schen9-DESK> <20140714191504.GO9918@twins.programming.kicks-ass.net> <1405367450.2970.750.camel@schen9-DESK> <20140715095045.GV9918@twins.programming.kicks-ass.net>
- <20140715120728.GR3588@twins.programming.kicks-ass.net>
+Date: Tue, 15 Jul 2014 15:36:27 +0200
+Message-ID: <20140715133627.GS3588@twins.programming.kicks-ass.net>
+References: <cover.1405074379.git.tim.c.chen@linux.intel.com>
+ <1405110784.2970.655.camel@schen9-DESK>
+ <20140714101611.GS9918@twins.programming.kicks-ass.net>
+ <1405354214.2970.663.camel@schen9-DESK>
+ <20140714161432.GC9918@twins.programming.kicks-ass.net>
+ <1405357534.2970.701.camel@schen9-DESK>
+ <20140714181738.GI9918@twins.programming.kicks-ass.net>
+ <1405364908.2970.729.camel@schen9-DESK>
+ <20140714191504.GO9918@twins.programming.kicks-ass.net>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="GFHULmA0mO3kKGOo"
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	"David S.Miller" <davem@davemloft.net>,
 	Ingo Molnar <mingo@kernel.org>,
@@ -18,49 +24,59 @@ Cc: Tim Chen <tim.c.chen@linux.intel.com>,
 	James Guilford <james.guilford@intel.com>,
 	Wajdi Feghali <wajdi.k.feghali@intel.com>,
 	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Peter Zijlstra <peterz@infradead.org>
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tj@kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www.linutronix.de ([62.245.132.108]:48260 "EHLO
-	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758798AbaGONAJ (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:33538 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751713AbaGONgm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 15 Jul 2014 09:00:09 -0400
-In-Reply-To: <20140715120728.GR3588@twins.programming.kicks-ass.net>
+	Tue, 15 Jul 2014 09:36:42 -0400
+Content-Disposition: inline
+In-Reply-To: <20140714191504.GO9918@twins.programming.kicks-ass.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 15 Jul 2014, Peter Zijlstra wrote:
 
-> On Tue, Jul 15, 2014 at 11:50:45AM +0200, Peter Zijlstra wrote:
-> > So you already have an idle notifier (which is x86 only, we should fix
-> > that I suppose), and you then double check there really isn't anything
-> > else running.
-> 
-> Note that we've already done a large part of the expense of going idle
-> by the time we call that idle notifier -- in specific, we've
-> reprogrammed the clock to stop the tick.
-> 
-> Its really wasteful to then generate work again, which means we have to
-> again reprogram the clock etc.
+--GFHULmA0mO3kKGOo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Doing anything which is not related to idle itself in the idle
-notifier is just plain wrong.
+On Mon, Jul 14, 2014 at 09:15:04PM +0200, Peter Zijlstra wrote:
+> I still loathe all the async work, because it makes a mockery of
+> accounting etc.. but that's a story for another day I suppose :-(
 
-If that stuff wants to utilize idle slots, we really need to come up
-with a generic and general solution. Otherwise we'll grow those warts
-all over the architecture space, with slightly different ways of
-wreckaging the world an some more.
+So, just to expand on this, we're already getting 'bug' reports because
+worker threads are not cgroup aware. If work gets generated inside some
+cgroup, the worker doesn't care and runs the worker thread wherever
+(typically the root cgroup).
 
-This whole attidute of people thinking that they need their own
-specialized scheduling around the real scheduler is a PITA. All this
-stuff is just damanging any sensible approach of power saving, load
-balancing, etc.
+This means that the 'work' escapes the cgroup confines and creates
+resource inversion etc. The same is of course true for nice and RT
+priorities.
 
-What we really want is infrastructure, which allows the scheduler to
-actively query the async work situation and based on the results
-actively decide when to process it and where.
+TJ, are you aware of this and/or given it any throught?
 
-Thanks,
+--GFHULmA0mO3kKGOo
+Content-Type: application/pgp-signature
 
-	tglx
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJTxS5bAAoJEHZH4aRLwOS6RQAQAJMKhbWMWaeaKsQG5RbOSn4g
+rQ0UJ1jpqCioLu6D6lIFtPEK9b3Dl6iFGkJBXv32u1dpAppGmqQNrc5UN/6Rds0G
+fXC0lJXkxxDfNTNQRW/H27KIMuSaO092/QWToLfhYY1c+B4L2JuzFe9AO81s2OyY
+OVoycnDw/SGCaKVD/B+kCYpK13pQiWPu7AUVxIzGhKHIiatvqkCZcmFRaySCF64r
+DstBzmXsVVp+5Q+ffVAgbDBt7QHrlPjtHCNwVRJqhfKZh17E3St9kiOnR6HPBilI
+faC1ynOoJ8JEugnhiqjKy2ayS1o/lMf06f3ewI0FaxorA4SaN+g1FadEUlgd6iVr
+EJN8XGCNcfGGkafQhi3wFtJrxQjyBiA7s6iL7gnq0Y2yOVTPWlyacyTQ7V7AdThq
+paJlkDEK2+Xm6UT+6GMSEB27n0wx71aXzNxljiCGVurXkVbQVd8Dx0nDCv+pcDc3
+RNI2Z7T7idAO3YqohyGRz1eK/DswoxLASYqPx9LKje6iRg1zx6GW6Diuo+3DH0oL
+qB7QedJmX3i6f+UdQ8LxLF0W1TriXhxeHm1rmtG04QcAoV267cArCxWVnNJEb+jv
+iPCbQNUFCO0f87qsmnIjIe2aV+3HJjIH9sLJ1FHIUFIyUrxDOcZ0U78qY6ksICz6
+3ZBm6Tlcme+7bBQ6+iMU
+=Q0Zt
+-----END PGP SIGNATURE-----
+
+--GFHULmA0mO3kKGOo--
