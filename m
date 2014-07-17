@@ -1,239 +1,61 @@
 From: Andy Lutomirski <luto@amacapital.net>
 Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Thu, 17 Jul 2014 13:27:06 -0700
-Message-ID: <53C8319A.8090108@amacapital.net>
-References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
+Date: Thu, 17 Jul 2014 13:35:15 -0700
+Message-ID: <53C83383.4040507@amacapital.net>
+References: <201407171848.s6HImBb4027900@glazunov.sibelius.xs4all.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: linux-abi@vger.kernel.org, linux-crypto@vger.kernel.org,
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	beck@openbsd.org
-To: Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org
+To: Mark Kettenis <mark.kettenis@xs4all.nl>,
+	Theodore Ts'o <tytso@mit.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f45.google.com ([209.85.220.45]:36765 "EHLO
-	mail-pa0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753417AbaGQU1K (ORCPT
+Received: from mail-pd0-f171.google.com ([209.85.192.171]:64165 "EHLO
+	mail-pd0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752334AbaGQUfT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2014 16:27:10 -0400
-Received: by mail-pa0-f45.google.com with SMTP id eu11so4018937pac.4
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Jul 2014 13:27:09 -0700 (PDT)
-In-Reply-To: <1405588695-12014-1-git-send-email-tytso@mit.edu>
+	Thu, 17 Jul 2014 16:35:19 -0400
+Received: by mail-pd0-f171.google.com with SMTP id z10so3743289pdj.16
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Jul 2014 13:35:18 -0700 (PDT)
+In-Reply-To: <201407171848.s6HImBb4027900@glazunov.sibelius.xs4all.nl>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 07/17/2014 02:18 AM, Theodore Ts'o wrote:
-> The getrandom(2) system call was requested by the LibreSSL Portable
-> developers.  It is analoguous to the getentropy(2) system call in
-> OpenBSD.
+On 07/17/2014 11:48 AM, Mark Kettenis wrote:
+> On Thu, Jul 17, 2014, Theodore Ts'o wrote:
+>>
+>> The getrandom(2) system call is a superset of getentropy(2).  When we
+>> add the support for this into glibc, it won't be terribly difficult
+>> nor annoying to drop the following in alongside the standard support
+>> needed for any new system call:
+>>
+>> int getentropy(void *buf, size_t buflen)
+>> {
+>> 	int	ret;
+>>
+>> 	ret = getentropy(buf, buflen, 0);
+>> 	return (ret > 0) ? 0 : ret;
+>> }
 > 
-> The rationale of this system call is to provide resiliance against
-> file descriptor exhaustion attacks, where the attacker consumes all
-> available file descriptors, forcing the use of the fallback code where
-> /dev/[u]random is not available.  Since the fallback code is often not
-> well-tested, it is better to eliminate this potential failure mode
-> entirely.
+> I'm sure you meant to use getrandom() there ;)
 > 
-> The other feature provided by this new system call is the ability to
-> request randomness from the /dev/urandom entropy pool, but to block
-> until at least 128 bits of entropy has been accumulated in the
-> /dev/urandom entropy pool.  Historically, the emphasis in the
-> /dev/urandom development has been to ensure that urandom pool is
-> initialized as quickly as possible after system boot, and preferably
-> before the init scripts start execution.  This is because changing
-> /dev/urandom reads to block represents an interface change that could
-> potentially break userspace which is not acceptable.  In practice, on
-> most x86 desktop and server systems, in general the entropy pool can
-> be initialized before it is needed (and in modern kernels, we will
-> printk a warning message if not).  However, on an embedded system,
-> this may not be hte case.  And so with a new interface, we can provide
-> this requested functionality of blocking until the urandom pool has
-> been initialized.  Any userspace program which uses this new
-> functionality must make sure that if it is used in early boot, that it
-> will not cause the boot up scripts or other portions of the system
-> startup to hang indefinitely.
+> Since for LibreSSL we'd want a getentropy() that cannot fail the
+> getrandom() call should use GRND_BLOCK flag.  Actually it makes sense
+> (to me) to make blocking the default behaviour and have a
+> BRND_NONBLOCK flag.  Much in the same way as you need to specify
+> O_NONBLOCK if you want non-blocking behaviour for files.
 > 
-> SYNOPSIS
-> 	#include <linux/random.h>
-> 
-> 	int getrandom(void *buf, size_t buflen, unsigned int flags);
-> 
-> DESCRIPTION
-> 
-> 	The system call getrandom() fills the buffer pointed to by buf
-> 	with up to buflen random bytes which can be used to seed user
-> 	space random number generators (i.e., DRBG's) or for other
-> 	cryptographic processes.  It should not be used Monte Carlo
-> 	simulations or for other probabilistic sampling applications.
-> 
-> 	If the GRND_RANDOM flags bit is set, then draw from the
-> 	/dev/random pool instead of /dev/urandom pool.  The
-> 	/dev/random pool is limited based on the entropy that can be
-> 	obtained from environmental noise, so if there is insufficient
-> 	entropy, the requested number of bytes may not be returned.
-> 	If there is no entropy available at all, getrandom(2) will
-> 	either return an error with errno set to EAGAIN, or block if
-> 	the GRND_BLOCK flags bit is set.
-> 
-> 	If the GRND_RANDOM flags bit is not set, then the /dev/raundom
-> 	pool will be used.  Unlike reading from the /dev/urandom, if
-> 	the urandom pool has not been sufficiently initialized,
-> 	getrandom(2) will either return an error with errno set to
-> 	EGAIN, or block if the GRND_BLOCK flags bit is set.
-> 
-> RETURN VALUE
->        On success, the number of bytes that was returned is returned.
-> 
->        On error, -1 is returned, and errno is set appropriately
-> 
-> ERRORS
-> 	EINVAL		The buflen value was invalid.
-> 
-> 	EFAULT		buf is outside your accessible address space.
-> 
-> 	EAGAIN		The requested entropy was not available, and the
-> 			getentropy(2) would have blocked if GRND_BLOCK flag
-> 			was set.
-> 
-> Signed-off-by: Theodore Ts'o <tytso@mit.edu>
-> ---
->  arch/x86/syscalls/syscall_32.tbl  |  1 +
->  arch/x86/syscalls/syscall_64.tbl  |  1 +
->  drivers/char/random.c             | 35 +++++++++++++++++++++++++++++++++--
->  include/linux/syscalls.h          |  3 +++
->  include/uapi/asm-generic/unistd.h |  4 +++-
->  include/uapi/linux/random.h       |  9 +++++++++
->  6 files changed, 50 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/syscalls/syscall_32.tbl b/arch/x86/syscalls/syscall_32.tbl
-> index d6b8679..f484e39 100644
-> --- a/arch/x86/syscalls/syscall_32.tbl
-> +++ b/arch/x86/syscalls/syscall_32.tbl
-> @@ -360,3 +360,4 @@
->  351	i386	sched_setattr		sys_sched_setattr
->  352	i386	sched_getattr		sys_sched_getattr
->  353	i386	renameat2		sys_renameat2
-> +354	i386	getrandom		sys_getrandom
-> diff --git a/arch/x86/syscalls/syscall_64.tbl b/arch/x86/syscalls/syscall_64.tbl
-> index ec255a1..6705032 100644
-> --- a/arch/x86/syscalls/syscall_64.tbl
-> +++ b/arch/x86/syscalls/syscall_64.tbl
-> @@ -323,6 +323,7 @@
->  314	common	sched_setattr		sys_sched_setattr
->  315	common	sched_getattr		sys_sched_getattr
->  316	common	renameat2		sys_renameat2
-> +317	common	getrandom		sys_getrandom
->  
->  #
->  # x32-specific system call numbers start at 512 to avoid cache impact
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index aa22fe5..76a56f6 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -258,6 +258,8 @@
->  #include <linux/kmemcheck.h>
->  #include <linux/workqueue.h>
->  #include <linux/irq.h>
-> +#include <linux/syscalls.h>
-> +#include <linux/completion.h>
->  
->  #include <asm/processor.h>
->  #include <asm/uaccess.h>
-> @@ -469,6 +471,8 @@ static struct entropy_store nonblocking_pool = {
->  					push_to_pool),
->  };
->  
-> +DECLARE_COMPLETION(urandom_initialized);
-> +
->  static __u32 const twist_table[8] = {
->  	0x00000000, 0x3b6e20c8, 0x76dc4190, 0x4db26158,
->  	0xedb88320, 0xd6d6a3e8, 0x9b64c2b0, 0xa00ae278 };
-> @@ -657,6 +661,7 @@ retry:
->  		r->entropy_total = 0;
->  		if (r == &nonblocking_pool) {
->  			prandom_reseed_late();
-> +			complete_all(&urandom_initialized);
->  			pr_notice("random: %s pool is initialized\n", r->name);
->  		}
->  	}
-> @@ -1355,7 +1360,7 @@ static int arch_random_refill(void)
->  }
->  
->  static ssize_t
-> -random_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
-> +_random_read(int nonblock, char __user *buf, size_t nbytes)
->  {
->  	ssize_t n;
->  
-> @@ -1379,7 +1384,7 @@ random_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
->  		if (arch_random_refill())
->  			continue;
->  
-> -		if (file->f_flags & O_NONBLOCK)
-> +		if (nonblock)
->  			return -EAGAIN;
->  
->  		wait_event_interruptible(random_read_wait,
-> @@ -1391,6 +1396,12 @@ random_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
->  }
->  
->  static ssize_t
-> +random_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
-> +{
-> +	return _random_read(file->f_flags & O_NONBLOCK, buf, nbytes);
-> +}
-> +
-> +static ssize_t
->  urandom_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
->  {
->  	int ret;
-> @@ -1533,6 +1544,26 @@ const struct file_operations urandom_fops = {
->  	.llseek = noop_llseek,
->  };
->  
-> +SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
-> +		unsigned int, flags)
-> +{
-> +	int r;
-> +
 
-As previously noted, this needs to validate flags.
+Can we please have a mode in which getrandom(2) can neither block nor
+fail?  If that gets added, then this can replace things like AT_RANDOM.
 
-> +	if (count > 256)
-> +		return -EINVAL;
-
-I think I'd rather see this allow any length, at least when using urandom.
-
-> +
-> +	if (flags & GRND_RANDOM) {
-> +		return _random_read(!(flags & GRND_BLOCK), buf, count);
-> +	}
-> +	if (flags & GRND_BLOCK) {
-> +		r = wait_for_completion_interruptible(&urandom_initialized);
-> +		if (r)
-> +			return r;
-> +	} else if (!completion_done(&urandom_initialized))
-> +		return -EAGAIN;
-> +	return urandom_read(NULL, buf, count, NULL);
-
-This can return -ERESTARTSYS.  Does it need any logic to restart correctly?
-
-I don't think it's possible for the urandom case to succeed without
-filling the buffer.  If that's true, can we document it and add a
-corresponding BUG_ON/WARN_ON in the syscall implementation?
+There are non-crypto things out there that will want this.  There are
+also probably VM systems (especially ones that have something like my
+KVM_GET_RNG_SEED patches applied, or many VMs on Haswell, for that
+matter) that will have perfectly fine cryptographically secure urandom
+output immediately after bootup but that won't consider themselves
+"initialized" for a while.  At least these will be perfectly fine from
+the POV of those who trust their hypervisor and Intel :)
 
 --Andy
-
-> +/*
-> + * Flags for getrandom(2)
-> + *
-> + * GAND_BLOCK 		Allow getrandom(2) to block
-> + * GAND_RANDOM		Use the /dev/random pool instead of /dev/urandom
-
-GRND?
-
-> + */
-> +#define GRND_BLOCK	0x0001
-> +#define GRND_RANDOM	0x0002
-> +
->  #endif /* _UAPI_LINUX_RANDOM_H */
-> 
