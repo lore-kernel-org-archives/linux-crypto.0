@@ -1,51 +1,63 @@
-From: Zach Brown <zab-ugsP4Wv/S6ZeoWH0uzbU5w@public.gmane.org>
-Subject: Re: [PATCH, RFC -v2] random: introduce getrandom(2) system call
-Date: Thu, 17 Jul 2014 14:57:14 -0700
-Message-ID: <20140717215714.GF24196@lenny.home.zabbo.net>
-References: <1405633100-4889-1-git-send-email-tytso@mit.edu>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] random: limit the contribution of the hw rng to at most
+ half
+Date: Thu, 17 Jul 2014 18:08:06 -0400
+Message-ID: <20140717220806.GW1491@thunk.org>
+References: <1405591436-15445-1-git-send-email-tytso@mit.edu>
+ <53C80A6D.5010201@zytor.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Developers List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	beck-7YlrpqBBQ3VAfugRpC6u6w@public.gmane.org
-To: Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: "H. Peter Anvin" <hpa@zytor.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:41930 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752829AbaGQWIW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Jul 2014 18:08:22 -0400
 Content-Disposition: inline
-In-Reply-To: <1405633100-4889-1-git-send-email-tytso-3s7WtUTddSA@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <53C80A6D.5010201@zytor.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 17, 2014 at 05:38:20PM -0400, Theodore Ts'o wrote:
-> The getrandom(2) system call was requested by the LibreSSL Portable
-> developers.  It is analoguous to the getentropy(2) system call in
-> OpenBSD.
+On Thu, Jul 17, 2014 at 10:39:57AM -0700, H. Peter Anvin wrote:
+> 
+> I saw exactly one complaint to that nature, but that was from someone
+> who really wanted the "nordrand" option (at which point I observed that
+> it had inadvertently left RDSEED enabled which quickly got rectified.)
+> The implication was that this was a request from a specific customer who
+> presumably have their own "audited" hardware RNG.
 
-> +SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
-> +		unsigned int, flags)
-> +{
-> +	int r;
-> +
-> +	if (flags & ~(GRND_NONBLOCK|GRND_RANDOM))
-> +		return -EINVAL;
-> +
-> +	if (count > INT_MAX)
-> +		count = INT_MAX;
-> +
-> +	if (flags & GRND_RANDOM)
-> +		return _random_read(flags & GRND_NONBLOCK, buf, count);
-> +	if (flags & GRND_NONBLOCK) {
-> +		if (!completion_done(&urandom_initialized))
-> +			return -EAGAIN;
-> +	} else {
-> +		r = wait_for_completion_interruptible(&urandom_initialized);
-> +		if (r)
-> +			return r;
-> +	}
-> +	return urandom_read(NULL, buf, count, NULL);
-> +}
+There was another complaint more recently, that wasn't related to
+nordrand.  And I was rather disturbed that in
+add_interrupt_randomness() 97% of the entropy was coming from RDSEED.
+I'm willing to have some of the entropy come from RDSEED by default,
+but 97% seems to really way too much.
 
-I like how tiny this ends up being.  Feel free to add my rb:.
+And the emergency refill code in random_read() was extremely
+problematic.  First of all, we're dropping 512 bytes on the stack,
+which is kind of bad, but hopefully all of the code paths which call
+random_read() won't have a terribly deep stack.  Secondly, even after
+the emergency refill, we block anyway.  Which is kind of OK, but what
+it means is that we are pulling 512 bytes from RDSEED, and giving
+credit for 2048 bits of entropy; but since we block until the next
+contribution from interrupt randomness, that means we get 1 bit from
+the entropy randomness, and 2048 bits of entropy from RDSEED --- which
+means that from the standpoint of entropy accounting, 99.95%
+(2048/2049) of the entropy is coming from RDSEED when reading from
+/dev/random when its entropy pool is empty.
 
-Reviewed-by: Zach Brown <zab-ugsP4Wv/S6ZeoWH0uzbU5w@public.gmane.org>
+Remember, regardless of whether or not you believe (as a former head
+of NSA's technology directorate recently claimed) that the DUAL-EC p
+and q were generated using NSA's standard high-quality HW RNG system
+which they use to generate all of their crypto variables, or (as the
+NIST advisory panel has recently concluded) that it was highly likely
+that DUAL-EC was backdoored, it's the optics that matter, because
+those of us without top-drawer SI security clearances can't prove
+things one way or another.
 
-- z
+And when 99.95% of the entropy when reading large quantities of keying
+material from /dev/random is coming from RDSEED, that just has
+terrible, terrible optics....
+
+						- Ted
