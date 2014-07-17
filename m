@@ -1,49 +1,78 @@
-From: Greg KH <greg@kroah.com>
+From: Zach Brown <zab@zabbo.net>
 Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Thu, 17 Jul 2014 12:33:30 -0700
-Message-ID: <20140717193330.GB4703@kroah.com>
+Date: Thu, 17 Jul 2014 12:48:12 -0700
+Message-ID: <20140717194812.GC24196@lenny.home.zabbo.net>
 References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
 	linux-crypto@vger.kernel.org, beck@openbsd.org
 To: Theodore Ts'o <tytso@mit.edu>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:59240 "EHLO
-	out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753017AbaGQTdg (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2014 15:33:36 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
 In-Reply-To: <1405588695-12014-1-git-send-email-tytso@mit.edu>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 17, 2014 at 05:18:15AM -0400, Theodore Ts'o wrote:
+> SYNOPSIS
+> 	#include <linux/random.h>
+> 
+> 	int getrandom(void *buf, size_t buflen, unsigned int flags);
+
+I certainly like the idea of getting entropy without having to worry
+about fds.
+
+> 	If the GRND_RANDOM flags bit is not set, then the /dev/raundom
+
+(raundom typo)
+
+> RETURN VALUE
+>        On success, the number of bytes that was returned is returned.
+
+The description talks about filling the buffer, maybe say 'the number of
+bytes filled is returned'?  
+
+> +DECLARE_COMPLETION(urandom_initialized);
+
+static?
+
 > +SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
 > +		unsigned int, flags)
 > +{
 > +	int r;
 > +
+
+Michael Kerrisk wants you to return -EINVAL on unknown flags :)
+
+http://lwn.net/Articles/588444/
+
 > +	if (count > 256)
 > +		return -EINVAL;
-> +
+
+I'd vote for not having the limit.  It seems easy enough to iterate over
+the buffer.  We'd need to clamp the count to ssize_t, though.
+
 > +	if (flags & GRND_RANDOM) {
 > +		return _random_read(!(flags & GRND_BLOCK), buf, count);
 > +	}
+
+Do we want it to block by default and have the flag be _NONBLOCK?  Feels
+more.. familiar.
+
 > +	if (flags & GRND_BLOCK) {
 > +		r = wait_for_completion_interruptible(&urandom_initialized);
 > +		if (r)
 > +			return r;
-> +	} else if (!completion_done(&urandom_initialized))
-> +		return -EAGAIN;
+
+I can *never* remember the rules for -ERESTARTSYS.  The syscall callers
+take care of this?
+
 > +	return urandom_read(NULL, buf, count, NULL);
-> +}
 
-You should fail if any other bits are set that you don't understand in
-the flags value, to make it easier for newer kernels with more flags to
-fail properly on old kernel releases.
+I wonder if we want to refactor the entry points a bit more instead of
+directly calling the device read functions.  get_random_bytes() and
+urandom_read() both have their own uninitialied use warning message and
+tracing.  Does the syscall want its own little extraction function as
+well?
 
-thanks,
-
-greg k-h
+- z
