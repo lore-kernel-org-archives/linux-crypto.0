@@ -1,29 +1,81 @@
-From: David Lang <david@lang.hm>
-Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Thu, 17 Jul 2014 15:21:41 -0700 (PDT)
-Message-ID: <alpine.DEB.2.02.1407171521020.17284@nftneq.ynat.uz>
-References: <201407171848.s6HImBb4027900@glazunov.sibelius.xs4all.nl> <53C83383.4040507@amacapital.net>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [GIT PULL] Keyrings and asymmetric keys patches for 3.17
+Date: Fri, 18 Jul 2014 09:22:03 +1000
+Message-ID: <20140718092203.3bab9fba@canb.auug.org.au>
+References: <23717.1405636445@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Cc: Mark Kettenis <mark.kettenis@xs4all.nl>,
-	"Theodore Ts'o" <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, beck@openbsd.org
-To: Andy Lutomirski <luto@amacapital.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/ddXQZJrWZ_8/a.dviFsEnuE"; protocol="application/pgp-signature"
+Cc: James Morris <jmorris@namei.org>,
+	Mimi Zohar <zohar@linux.vnet.ibm.com>, mimi.e.zohar@gmail.com,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, vgoyal@redhat.com,
+	keyrings@linux-nfs.org, linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.lang.hm ([64.81.33.126]:45882 "EHLO bifrost.lang.hm"
+Received: from ozlabs.org ([103.22.144.67]:50055 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757592AbaGQWfF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2014 18:35:05 -0400
-In-Reply-To: <53C83383.4040507@amacapital.net>
+	id S1758071AbaGQXWL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Jul 2014 19:22:11 -0400
+In-Reply-To: <23717.1405636445@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 17 Jul 2014, Andy Lutomirski wrote:
+--Sig_/ddXQZJrWZ_8/a.dviFsEnuE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> Can we please have a mode in which getrandom(2) can neither block nor
-> fail?  If that gets added, then this can replace things like AT_RANDOM.
+Hi David,
 
-If a call to get random data isn't allowed to either block or fail, what is it 
-supposed to return if there isn't random data available?
+On Thu, 17 Jul 2014 23:34:05 +0100 David Howells <dhowells@redhat.com> wrot=
+e:
+>
+> I have a number of sets of patches for you to pull.  I've git-merged them
+> together into a single branch (keys-next) as there are some conflicts and
+> tagged the end.
+>=20
+> The component subsets are:
+>=20
+>  (1) Tag keys-preparse-1-20140707
+>=20
+>      A set of patches that mostly convert extant key types to perform
+>      preparsing to make it possible to determine the amount of quota in
+>      advance.
+>=20
+>      I haven't fixed the encrypted and trusted keys as yet as they incorr=
+ectly
+>      use the ->update() op, but I'd like to get the changes I have done o=
+ut
+>      the door.
 
-David Lang
+I hate to be a pest, but this whole branch has only your signed off by
+and no indication that any of it has been reviewed/tested by anyone
+else ...
+
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
+
+--Sig_/ddXQZJrWZ_8/a.dviFsEnuE
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJTyFqgAAoJEMDTa8Ir7ZwVI7cP/2LMgnN/CSuh0BXdWvb+qOO5
+INZKsrOO7lDlp8XrrsGo8gWtc4KbwWWwBq5oOVSrWTVi/scMA2WIyknBEKA5oR8P
+pGoREZ3Zh2/l2pc8zfmE4Uq14Ra4UgOXJiZQCKtO4ZCIoVRDWiN/T8+xIJ02F/LY
+qheB4rZOeMIjmt/Rl2ld7dO3Mu1aoidLg91bOWSp2v1dpY8WLR8eX3C5/up/DYPV
+bPg4qWoKwtxGjVYAbwLo0LSuLTLmA2A8RHPIdOhmKU2qbR3zKn39WfCWoqWbsT+e
+VIGOyBjGVK/wGwkrLpDh+ihWSVRRhXFbRWmrVjPErMGNmVgcu+Zwj+bwMf3EM7qU
+JHAhj0xpIAsFDgniUJHYvIJWeiKiC/oJx+/YTUayXFDmg6pPLjGCdglFZaCykBeh
+k1oKB2eRYrSguz6qhuSJJzHS2eq0FQUKn+xbDsEC3aB/cSzU5FKzS8o77Xl/vTTQ
+Nns9o7RraYVTTP0SNqVylUxg9FW0uWCreK3gYNAX0PVS1dpD7OyGFV1CARrMIqKA
+c81wRwlZ3I6gBq+YU9Q1n2VtM1j8Dvdi89vxgyDwOUQeZLogVKe8cCK/pXSQXVKN
+1R0yhJMfrxzcSObhdf3KCWMMTev5wYeMiEQEz8vFT56IcHrs/inni5/0spBv6J+5
+kgTcIPPNJowvpanYZuOj
+=dzhD
+-----END PGP SIGNATURE-----
+
+--Sig_/ddXQZJrWZ_8/a.dviFsEnuE--
