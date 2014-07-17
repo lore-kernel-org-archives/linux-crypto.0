@@ -1,55 +1,43 @@
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+From: Tobias Klauser <tklauser@distanz.ch>
 Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Thu, 17 Jul 2014 12:57:07 +0200
-Message-ID: <1405594627.12194.9.camel@localhost>
+Date: Thu, 17 Jul 2014 14:09:49 +0200
+Message-ID: <20140717120949.GB24362@distanz.ch>
 References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
 	linux-crypto@vger.kernel.org, beck@openbsd.org
 To: Theodore Ts'o <tytso@mit.edu>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
 In-Reply-To: <1405588695-12014-1-git-send-email-tytso@mit.edu>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Do, 2014-07-17 at 05:18 -0400, Theodore Ts'o wrote:
-> SYNOPSIS
-> 	#include <linux/random.h>
+On 2014-07-17 at 11:18:15 +0200, Theodore Ts'o <tytso@mit.edu> wrote:
+
+[...]
+
+> +/*
+> + * Flags for getrandom(2)
+> + *
+> + * GAND_BLOCK 		Allow getrandom(2) to block
+> + * GAND_RANDOM		Use the /dev/random pool instead of /dev/urandom
+> + */
+
+Very minor nitpick: These should probably read GRND_BLOCK/GRND_RANDOM as
+well, no?
+
+> +#define GRND_BLOCK	0x0001
+> +#define GRND_RANDOM	0x0002
+> +
+>  #endif /* _UAPI_LINUX_RANDOM_H */
+> -- 
+> 2.0.0
 > 
-> 	int getrandom(void *buf, size_t buflen, unsigned int flags);
-
-Cool, I think the interface is sane.
-
-Btw. couldn't libressl etc. fall back to binary_sysctl
-kernel.random.uuid and seed with that as a last resort? We have it
-available for few more years.
-
-> +SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
-> +		unsigned int, flags)
-> +{
-> +	int r;
-> +
-> +	if (count > 256)
-> +		return -EINVAL;
-> +
-
-Why this "arbitrary" limitation? Couldn't we just check for > SSIZE_MAX
-or to be more conservative to INT_MAX?
-
-> +	if (flags & GRND_RANDOM) {
-> +		return _random_read(!(flags & GRND_BLOCK), buf, count);
-> +	}
-> +	if (flags & GRND_BLOCK) {
-> +		r = wait_for_completion_interruptible(&urandom_initialized);
-> +		if (r)
-> +			return r;
-> +	} else if (!completion_done(&urandom_initialized))
-> +		return -EAGAIN;
-> +	return urandom_read(NULL, buf, count, NULL);
-> +}
-> +
-
-Great, thanks Ted,
-Hannes
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+> 
