@@ -1,63 +1,40 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] random: limit the contribution of the hw rng to at most
- half
-Date: Thu, 17 Jul 2014 18:08:06 -0400
-Message-ID: <20140717220806.GW1491@thunk.org>
-References: <1405591436-15445-1-git-send-email-tytso@mit.edu>
- <53C80A6D.5010201@zytor.com>
+Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
+Date: Thu, 17 Jul 2014 18:30:29 -0400
+Message-ID: <20140717223029.GY1491@thunk.org>
+References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
+ <20140717161215.GA14951@infradead.org>
+ <20140717170115.GO1491@thunk.org>
+ <CAComcpM9-sUwzT9BPFT7BJjk97V0kj996D=AaivDpeTZUNbiew@mail.gmail.com>
+ <20140717173433.GQ1491@thunk.org>
+ <CAComcpPkOM9oy9tYcDqVfF3siKT_RLe54qskhUJRPLWm-MukEA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org
-To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-api <linux-abi@vger.kernel.org>,
+	linux-crypto <linux-crypto@vger.kernel.org>
+To: Bob Beck <beck@openbsd.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:41930 "EHLO imap.thunk.org"
+Received: from imap.thunk.org ([74.207.234.97]:41956 "EHLO imap.thunk.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752829AbaGQWIW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2014 18:08:22 -0400
+	id S1752829AbaGQWah (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Jul 2014 18:30:37 -0400
 Content-Disposition: inline
-In-Reply-To: <53C80A6D.5010201@zytor.com>
+In-Reply-To: <CAComcpPkOM9oy9tYcDqVfF3siKT_RLe54qskhUJRPLWm-MukEA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 17, 2014 at 10:39:57AM -0700, H. Peter Anvin wrote:
-> 
-> I saw exactly one complaint to that nature, but that was from someone
-> who really wanted the "nordrand" option (at which point I observed that
-> it had inadvertently left RDSEED enabled which quickly got rectified.)
-> The implication was that this was a request from a specific customer who
-> presumably have their own "audited" hardware RNG.
+On Thu, Jul 17, 2014 at 11:45:56AM -0600, Bob Beck wrote:
+> we have diffs pending that will do the syscall method until we start
+> to see it in libc :)
 
-There was another complaint more recently, that wasn't related to
-nordrand.  And I was rather disturbed that in
-add_interrupt_randomness() 97% of the entropy was coming from RDSEED.
-I'm willing to have some of the entropy come from RDSEED by default,
-but 97% seems to really way too much.
+One warning --- please don't check in the syscall number until it
+actually hits mainline.  Kees has another patch outstanding for
+seccomp(2) that is using the same syscall numbers I have in my patch.
+Please treat the numbers in my patch as placeholders until it has been
+accepted and we see what numbers we actually get assigned.
 
-And the emergency refill code in random_read() was extremely
-problematic.  First of all, we're dropping 512 bytes on the stack,
-which is kind of bad, but hopefully all of the code paths which call
-random_read() won't have a terribly deep stack.  Secondly, even after
-the emergency refill, we block anyway.  Which is kind of OK, but what
-it means is that we are pulling 512 bytes from RDSEED, and giving
-credit for 2048 bits of entropy; but since we block until the next
-contribution from interrupt randomness, that means we get 1 bit from
-the entropy randomness, and 2048 bits of entropy from RDSEED --- which
-means that from the standpoint of entropy accounting, 99.95%
-(2048/2049) of the entropy is coming from RDSEED when reading from
-/dev/random when its entropy pool is empty.
-
-Remember, regardless of whether or not you believe (as a former head
-of NSA's technology directorate recently claimed) that the DUAL-EC p
-and q were generated using NSA's standard high-quality HW RNG system
-which they use to generate all of their crypto variables, or (as the
-NIST advisory panel has recently concluded) that it was highly likely
-that DUAL-EC was backdoored, it's the optics that matter, because
-those of us without top-drawer SI security clearances can't prove
-things one way or another.
-
-And when 99.95% of the entropy when reading large quantities of keying
-material from /dev/random is coming from RDSEED, that just has
-terrible, terrible optics....
+Thanks,
 
 						- Ted
