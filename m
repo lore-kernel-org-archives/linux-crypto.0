@@ -1,67 +1,60 @@
-From: Andrey Utkin <andrey.krieger.utkin@gmail.com>
-Subject: [PATCH 3/3] drivers/crypto/omap-{des,aes}.c: fix sanity checks
-Date: Thu, 17 Jul 2014 15:15:24 +0300
-Message-ID: <1405599324-11215-1-git-send-email-andrey.krieger.utkin@gmail.com>
-Cc: dcb314@hotmail.com, davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	Andrey Utkin <andrey.krieger.utkin@gmail.com>
-To: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
+Date: Thu, 17 Jul 2014 08:52:07 -0400
+Message-ID: <20140717125207.GL1491@thunk.org>
+References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
+ <1405594627.12194.9.camel@localhost>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
+	linux-crypto@vger.kernel.org, beck@openbsd.org
+To: Hannes Frederic Sowa <hannes@stressinduktion.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-la0-f52.google.com ([209.85.215.52]:58336 "EHLO
-	mail-la0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755618AbaGQMPi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2014 08:15:38 -0400
+Received: from imap.thunk.org ([74.207.234.97]:40779 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757199AbaGQMwQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Jul 2014 08:52:16 -0400
+Content-Disposition: inline
+In-Reply-To: <1405594627.12194.9.camel@localhost>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Unsigned variable "total" was tested for negativity after subtraction
-operation. 2 instances.
-Replaced that with the test of minuend being greater than subtrahend
-before the subtraction.
+On Thu, Jul 17, 2014 at 12:57:07PM +0200, Hannes Frederic Sowa wrote:
+> 
+> Btw. couldn't libressl etc. fall back to binary_sysctl
+> kernel.random.uuid and seed with that as a last resort? We have it
+> available for few more years.
 
-Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=80421
-Reported-by: David Binderman <dcb314@hotmail.com>
-Signed-off-by: Andrey Utkin <andrey.krieger.utkin@gmail.com>
----
- drivers/crypto/omap-aes.c | 4 ++--
- drivers/crypto/omap-des.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Yes, they could.  But trying to avoid more uses of binary_sysctl seems
+to be a good thing, I think.  The other thing is that is that this
+interface provides is the ability to block until the entropy pool is
+initialized, which isn't a big deal for x86 systems, but might be
+useful as a gentle forcing function to force ARM systems to figure out
+good ways of making sure the entropy pools are initialized (i.e., by
+actually providing !@#!@ cycle counter) without breaking userspace
+compatibility --- since this is a new interface.
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index cb98fa5..413ed78 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -1038,10 +1038,10 @@ static irqreturn_t omap_aes_irq(int irq, void *dev_id)
- 			}
- 		}
- 
-+		BUG_ON(dd->total < AES_BLOCK_SIZE);
-+
- 		dd->total -= AES_BLOCK_SIZE;
- 
--		BUG_ON(dd->total < 0);
--
- 		/* Clear IRQ status */
- 		status &= ~AES_REG_IRQ_DATA_OUT;
- 		omap_aes_write(dd, AES_REG_IRQ_STATUS(dd), status);
-diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-index b8bc84b..93aa213 100644
---- a/drivers/crypto/omap-des.c
-+++ b/drivers/crypto/omap-des.c
-@@ -965,10 +965,10 @@ static irqreturn_t omap_des_irq(int irq, void *dev_id)
- 			}
- 		}
- 
-+		BUG_ON(dd->total < DES_BLOCK_SIZE);
-+
- 		dd->total -= DES_BLOCK_SIZE;
- 
--		BUG_ON(dd->total < 0);
--
- 		/* Clear IRQ status */
- 		status &= ~DES_REG_IRQ_DATA_OUT;
- 		omap_des_write(dd, DES_REG_IRQ_STATUS(dd), status);
--- 
-1.8.5.5
+> > +	if (count > 256)
+> > +		return -EINVAL;
+> > +
+> 
+> Why this "arbitrary" limitation? Couldn't we just check for > SSIZE_MAX
+> or to be more conservative to INT_MAX?
+
+I'm not wedded to this limitation.  OpenBSD's getentropy(2) has an
+architected arbitrary limit of 128 bytes.  I haven't made a final
+decision if the right answer is to hard code some value, or make this
+limit be configurable, or remote the limit entirely (which in practice
+would be SSIZE_MAX or INT_MAX).
+
+The main argument I can see for putting in a limit is to encourage the
+"proper" use of the interface.  In practice, anything larger than 128
+probably means the interface is getting misused, either due to a bug
+or some other kind of oversight.
+
+For example, when I started instrumenting /dev/urandom, I caught
+Google Chrome pulling 4k out of /dev/urandom --- twice --- at startup
+time.  It turns out it was the fault of the NSS library, which was
+using fopen() to access /dev/urandom.  (Sigh.)
+
+						- Ted
