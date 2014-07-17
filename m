@@ -1,40 +1,54 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Thu, 17 Jul 2014 13:34:33 -0400
-Message-ID: <20140717173433.GQ1491@thunk.org>
-References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
- <20140717161215.GA14951@infradead.org>
- <20140717170115.GO1491@thunk.org>
- <CAComcpM9-sUwzT9BPFT7BJjk97V0kj996D=AaivDpeTZUNbiew@mail.gmail.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH] random: limit the contribution of the hw rng to at most
+ half
+Date: Thu, 17 Jul 2014 10:39:57 -0700
+Message-ID: <53C80A6D.5010201@zytor.com>
+References: <1405591436-15445-1-git-send-email-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Christoph Hellwig <hch@infradead.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-abi <linux-abi@vger.kernel.org>,
-	linux-crypto <linux-crypto@vger.kernel.org>
-To: Bob Beck <beck@openbsd.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Linux Kernel Developers List <linux-kernel@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:41429 "EHLO imap.thunk.org"
+Received: from terminus.zytor.com ([198.137.202.10]:56609 "EHLO mail.zytor.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751084AbaGQRen (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2014 13:34:43 -0400
-Content-Disposition: inline
-In-Reply-To: <CAComcpM9-sUwzT9BPFT7BJjk97V0kj996D=AaivDpeTZUNbiew@mail.gmail.com>
+	id S1751100AbaGQRkF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Jul 2014 13:40:05 -0400
+In-Reply-To: <1405591436-15445-1-git-send-email-tytso@mit.edu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 17, 2014 at 11:05:01AM -0600, Bob Beck wrote:
-> Hi Ted, yeah I understand the reasoning, it would be good if there was
-> a way to influence the various libc people to
-> ensure they manage to provide a getentropy().
+On 07/17/2014 03:03 AM, Theodore Ts'o wrote:
+> For people who don't trust a hardware RNG which can not be audited,
+> the changes to add support for RDSEED can be troubling since 97% or
+> more of the entropy will be contributed from the in-CPU hardware RNG.
+> 
+> We now have a in-kernel khwrngd, so for those people who do want to
+> implicitly trust the CPU-based system, we could create an arch-rng
+> hw_random driver, and allow khwrng refill the entropy pool.  This
+> allows system administrator whether or not they trust the CPU (I
+> assume the NSA will trust RDRAND/RDSEED implicitly :-), and if so,
+> what level of entropy derating they want to use.
+> 
+> The reason why this is a really good idea is that if different people
+> use different levels of entropy derating, it will make it much more
+> difficult to design a backdoor'ed hwrng that can be generally
+> exploited in terms of the output of /dev/random when different attack
+> targets are using differing levels of entropy derating.
+> 
+> Signed-off-by: Theodore Ts'o <tytso@mit.edu>
 
-I don't anticipate that to be a problem.  And before they do, and/or
-if you are dealing with a system where the kernel has been upgraded,
-but not libc, you have your choice of either sticking with the
-binary_sysctl approach, or calling getrandom directly using the
-syscall method; and in that case, whether we use getrandom() or
-provide an exact getentropy() replacement system call isn't that much
-difference, since you'd have to have Linux-specific workaround code
-anyway....
+I saw exactly one complaint to that nature, but that was from someone
+who really wanted the "nordrand" option (at which point I observed that
+it had inadvertently left RDSEED enabled which quickly got rectified.)
+The implication was that this was a request from a specific customer who
+presumably have their own "audited" hardware RNG.
 
-				- Ted
+There may have been other complaints (justified or not) but if so I
+haven't seen them.  I'm wondering if we are overgeneralizing here and if
+so if it wouldn't be better to defer this until the hwrng supplier for
+this is ready, which probably won't happen in time for 3.17 just given
+the current timeline.
+
+	-hpa
