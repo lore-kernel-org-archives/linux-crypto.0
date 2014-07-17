@@ -1,38 +1,34 @@
-From: Mark Kettenis <mark.kettenis@xs4all.nl>
+From: Greg KH <greg@kroah.com>
 Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Thu, 17 Jul 2014 20:48:11 +0200 (CEST)
-Message-ID: <201407171848.s6HImBb4027900@glazunov.sibelius.xs4all.nl>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	beck@openbsd.org
-To: "Theodore Ts'o" <tytso@mit.edu>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sibelius.xs4all.nl ([83.163.83.176]:26022 "EHLO
-	glazunov.sibelius.xs4all.nl" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752118AbaGQTWM (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2014 15:22:12 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Date: Thu, 17 Jul 2014 12:31:45 -0700
+Message-ID: <20140717193145.GA4703@kroah.com>
+References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
+	linux-crypto@vger.kernel.org, beck@openbsd.org
+To: Theodore Ts'o <tytso@mit.edu>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1405588695-12014-1-git-send-email-tytso@mit.edu>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 17, 2014, Theodore Ts'o wrote:
-> 
-> The getrandom(2) system call is a superset of getentropy(2).  When we
-> add the support for this into glibc, it won't be terribly difficult
-> nor annoying to drop the following in alongside the standard support
-> needed for any new system call:
-> 
-> int getentropy(void *buf, size_t buflen)
-> {
-> 	int	ret;
-> 
-> 	ret = getentropy(buf, buflen, 0);
-> 	return (ret > 0) ? 0 : ret;
-> }
+On Thu, Jul 17, 2014 at 05:18:15AM -0400, Theodore Ts'o wrote:
 
-I'm sure you meant to use getrandom() there ;)
+Minor nit:
 
-Since for LibreSSL we'd want a getentropy() that cannot fail the
-getrandom() call should use GRND_BLOCK flag.  Actually it makes sense
-(to me) to make blocking the default behaviour and have a
-BRND_NONBLOCK flag.  Much in the same way as you need to specify
-O_NONBLOCK if you want non-blocking behaviour for files.
+> @@ -469,6 +471,8 @@ static struct entropy_store nonblocking_pool = {
+>  					push_to_pool),
+>  };
+>  
+> +DECLARE_COMPLETION(urandom_initialized);
+> +
+
+static DECLARE_COMPLETION(urandom_initialized);
+
+instead?
+
+thanks,
+
+greg k-h
