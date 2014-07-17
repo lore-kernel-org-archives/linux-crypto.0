@@ -1,40 +1,232 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Thu, 17 Jul 2014 18:30:29 -0400
-Message-ID: <20140717223029.GY1491@thunk.org>
-References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
- <20140717161215.GA14951@infradead.org>
- <20140717170115.GO1491@thunk.org>
- <CAComcpM9-sUwzT9BPFT7BJjk97V0kj996D=AaivDpeTZUNbiew@mail.gmail.com>
- <20140717173433.GQ1491@thunk.org>
- <CAComcpPkOM9oy9tYcDqVfF3siKT_RLe54qskhUJRPLWm-MukEA@mail.gmail.com>
+From: David Howells <dhowells@redhat.com>
+Subject: [GIT PULL] Keyrings and asymmetric keys patches for 3.17
+Date: Thu, 17 Jul 2014 23:34:05 +0100
+Message-ID: <23717.1405636445@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Christoph Hellwig <hch@infradead.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-api <linux-abi@vger.kernel.org>,
-	linux-crypto <linux-crypto@vger.kernel.org>
-To: Bob Beck <beck@openbsd.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:41956 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752829AbaGQWah (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2014 18:30:37 -0400
-Content-Disposition: inline
-In-Reply-To: <CAComcpPkOM9oy9tYcDqVfF3siKT_RLe54qskhUJRPLWm-MukEA@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: dhowells@redhat.com, Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	mimi.e.zohar@gmail.com, Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	vgoyal@redhat.com, keyrings@linux-nfs.org,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: James Morris <jmorris@namei.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Content-ID: <23716.1405636445.1@warthog.procyon.org.uk>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 17, 2014 at 11:45:56AM -0600, Bob Beck wrote:
-> we have diffs pending that will do the syscall method until we start
-> to see it in libc :)
+Hi James,
 
-One warning --- please don't check in the syscall number until it
-actually hits mainline.  Kees has another patch outstanding for
-seccomp(2) that is using the same syscall numbers I have in my patch.
-Please treat the numbers in my patch as placeholders until it has been
-accepted and we see what numbers we actually get assigned.
+I have a number of sets of patches for you to pull.  I've git-merged them
+together into a single branch (keys-next) as there are some conflicts and
+tagged the end.
 
-Thanks,
+The component subsets are:
 
-						- Ted
+ (1) Tag keys-preparse-1-20140707
+
+     A set of patches that mostly convert extant key types to perform
+     preparsing to make it possible to determine the amount of quota in
+     advance.
+
+     I haven't fixed the encrypted and trusted keys as yet as they incorrectly
+     use the ->update() op, but I'd like to get the changes I have done out
+     the door.
+
+ (2) Tag keys-pkcs7-20140708
+
+     A set of patches that can parse binary PKCS#7 messages and verify the
+     X.509 certificates and signatures contained therein and look to see if
+     there's an intersection between those certificates/signatures and a ring
+     of trusted keys.
+
+     This has a conflict with (1) that is solved in the merge: A debugging key
+     type is added for testing the PKCS#7 parser and this uses the user
+     keyring type.
+
+ (3) Tag keys-pefile-20140709
+
+     A set of patches that take a signed PE binary, extract the PKCS#7
+     message, validate the signature of the signed parts of the PE binary and
+     verify the PKCS#7 certificate using (2) above.
+
+     Subsets (2) and (3) will then be used to do signed kexec.
+
+ (4) Branch linux-integrity/next-with-key
+
+     Mimi and Dmitry's keyrings patches.
+
+     Note that this branch is on top of their next-without-key branch.  If you
+     pull that first as Mimi has asked, git should connect this correctly.
+
+     This is commit 7d2ce2320e8efdc4a6dcbae7b329ed3f0d1cd778.
+
+ (5) Branch keys-fixes
+
+     Three fixes:
+
+     (a) Allow CAP_SYS_ADMIN capable processes to invalidate keys that are
+     	 appropriately marked.
+
+	 This has a conflict with (4) since both add new key flags.
+
+     (b) Don't select MPILIB_EXTRA as it doesn't exist.
+
+     (c) Select CRYPTO if SIGNATURE is enabled rather than depending on it to
+     	 get module vs built-in correct.
+
+There's some duplicate code between the patches in (2) and (4) for looking up
+a key containing a public key.  The code exists in different places and
+doesn't interfere with each other, so I'll deal with it later when one or both
+of these sets has gone in.
+
+David
+---
+The following changes since commit b6b8a371f5541c2b839caba84fede693f3fcc43d:
+
+  Merge branch 'stable-3.16' of git://git.infradead.org/users/pcmoore/selinux into next (2014-07-17 03:05:51 +1000)
+
+are available in the git repository at:
+
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/keys-next-20140717
+
+for you to fetch changes up to e6df35b37ce9789a636d13f1e625d08ce029851b:
+
+  Merge branch 'keys-fixes' into keys-next (2014-07-17 21:02:01 +0100)
+
+----------------------------------------------------------------
+
+(from the branch description for keys-next local branch)
+
+Keyrings for linux-next
+Keyrings patches
+
+----------------------------------------------------------------
+David Howells (34):
+      X.509: Add bits needed for PKCS#7
+      X.509: Export certificate parse and free functions
+      KEYS: Provide a generic instantiation function
+      KEYS: struct key_preparsed_payload should have two payload pointers
+      KEYS: Allow expiry time to be set when preparsing a key
+      KEYS: Call ->free_preparse() even after ->preparse() returns an error
+      KEYS: user: Use key preparsing
+      KEYS: Ceph: Use key preparsing
+      KEYS: Ceph: Use user_match()
+      KEYS: DNS: Use key preparsing
+      KEYS: RxRPC: Use key preparsing
+      KEYS: big_key: Use key preparsing
+      KEYS: keyring: Provide key preparsing
+      KEYS: request_key_auth: Provide key preparsing
+      PKCS#7: Implement a parser [RFC 2315]
+      PKCS#7: Digest the data in a signed-data message
+      PKCS#7: Find the right key in the PKCS#7 key list and verify the signature
+      PKCS#7: Verify internal certificate chain
+      PKCS#7: Find intersection between PKCS#7 message and known, trusted keys
+      PKCS#7: Provide a key type for testing PKCS#7
+      KEYS: X.509: Fix a spelling mistake
+      Provide PE binary definitions
+      pefile: Parse a PE binary to find a key and a signature contained therein
+      pefile: Strip the wrapper off of the cert data block
+      pefile: Parse the presumed PKCS#7 content of the certificate blob
+      pefile: Parse the "Microsoft individual code signing" data blob
+      pefile: Digest the PE binary and compare to the PKCS#7 data
+      pefile: Validate PKCS#7 trust chain
+      Merge branch 'keys-preparse-1' into keys-next
+      Merge tag 'keys-pkcs7-20140708' into keys-next
+      Merge tag 'keys-pefile-20140709' into keys-next
+      Merge remote-tracking branch 'integrity/next-with-keys' into keys-next
+      KEYS: Allow special keys (eg. DNS results) to be invalidated by CAP_SYS_ADMIN
+      Merge branch 'keys-fixes' into keys-next
+
+Dmitry Kasatkin (9):
+      ima: remove unnecessary i_mutex locking from ima_rdwr_violation_check()
+      ima: delay template descriptor lookup until use
+      ima: use ahash API for file hash calculation
+      ima: introduce multi-page collect buffers
+      ima: provide double buffering for hash calculation
+      KEYS: make partial key id matching as a dedicated function
+      KEYS: validate certificate trust only with selected key
+      KEYS: validate certificate trust only with builtin keys
+      digsig: make crypto builtin if digsig selected as builtin
+
+Jean Delvare (1):
+      RSA: Don't select non-existent symbol
+
+Mimi Zohar (3):
+      KEYS: special dot prefixed keyring name bug fix
+      KEYS: verify a certificate is signed by a 'trusted' key
+      ima: define '.ima' as a builtin 'trusted' keyring
+
+Richard Guy Briggs (1):
+      audit: fix dangling keywords in integrity ima message output
+
+Vivek Goyal (1):
+      pefile: Handle pesign using the wrong OID
+
+ Documentation/kernel-parameters.txt       |  22 ++
+ Documentation/security/keys.txt           |  14 +-
+ crypto/asymmetric_keys/Kconfig            |  34 ++-
+ crypto/asymmetric_keys/Makefile           |  37 +++
+ crypto/asymmetric_keys/asymmetric_keys.h  |   2 +
+ crypto/asymmetric_keys/asymmetric_type.c  |  78 +++--
+ crypto/asymmetric_keys/mscode.asn1        |  28 ++
+ crypto/asymmetric_keys/mscode_parser.c    | 126 ++++++++
+ crypto/asymmetric_keys/pkcs7.asn1         | 127 +++++++++
+ crypto/asymmetric_keys/pkcs7_key_type.c   |  99 +++++++
+ crypto/asymmetric_keys/pkcs7_parser.c     | 396 ++++++++++++++++++++++++++
+ crypto/asymmetric_keys/pkcs7_parser.h     |  61 ++++
+ crypto/asymmetric_keys/pkcs7_trust.c      | 219 ++++++++++++++
+ crypto/asymmetric_keys/pkcs7_verify.c     | 323 +++++++++++++++++++++
+ crypto/asymmetric_keys/verify_pefile.c    | 457 ++++++++++++++++++++++++++++++
+ crypto/asymmetric_keys/verify_pefile.h    |  42 +++
+ crypto/asymmetric_keys/x509.asn1          |   2 +-
+ crypto/asymmetric_keys/x509_cert_parser.c |  20 ++
+ crypto/asymmetric_keys/x509_parser.h      |  13 +-
+ crypto/asymmetric_keys/x509_public_key.c  | 111 +++++++-
+ fs/nfs/idmap.c                            |  10 +-
+ include/crypto/pkcs7.h                    |  36 +++
+ include/keys/big_key-type.h               |   3 +-
+ include/keys/system_keyring.h             |  10 +-
+ include/keys/user-type.h                  |   3 +-
+ include/linux/key-type.h                  |   5 +-
+ include/linux/key.h                       |   2 +
+ include/linux/oid_registry.h              |   8 +-
+ include/linux/pe.h                        | 448 +++++++++++++++++++++++++++++
+ include/linux/verify_pefile.h             |  18 ++
+ kernel/system_keyring.c                   |   1 +
+ lib/Kconfig                               |   3 +-
+ net/ceph/crypto.c                         |  26 +-
+ net/dns_resolver/dns_key.c                |  43 +--
+ net/dns_resolver/dns_query.c              |   1 +
+ net/rxrpc/ar-key.c                        | 165 ++++++-----
+ security/integrity/digsig.c               |  28 ++
+ security/integrity/ima/Kconfig            |  10 +
+ security/integrity/ima/ima.h              |  12 +
+ security/integrity/ima/ima_appraise.c     |   2 +-
+ security/integrity/ima/ima_crypto.c       | 312 +++++++++++++++++++-
+ security/integrity/ima/ima_main.c         |  17 +-
+ security/integrity/ima/ima_policy.c       |   6 +-
+ security/integrity/integrity.h            |   5 +
+ security/keys/big_key.c                   |  41 +--
+ security/keys/encrypted-keys/encrypted.c  |   2 +-
+ security/keys/key.c                       |  49 +++-
+ security/keys/keyctl.c                    |  21 +-
+ security/keys/keyring.c                   |  34 ++-
+ security/keys/request_key_auth.c          |  13 +
+ security/keys/user_defined.c              |  41 +--
+ 51 files changed, 3357 insertions(+), 229 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/mscode.asn1
+ create mode 100644 crypto/asymmetric_keys/mscode_parser.c
+ create mode 100644 crypto/asymmetric_keys/pkcs7.asn1
+ create mode 100644 crypto/asymmetric_keys/pkcs7_key_type.c
+ create mode 100644 crypto/asymmetric_keys/pkcs7_parser.c
+ create mode 100644 crypto/asymmetric_keys/pkcs7_parser.h
+ create mode 100644 crypto/asymmetric_keys/pkcs7_trust.c
+ create mode 100644 crypto/asymmetric_keys/pkcs7_verify.c
+ create mode 100644 crypto/asymmetric_keys/verify_pefile.c
+ create mode 100644 crypto/asymmetric_keys/verify_pefile.h
+ create mode 100644 include/crypto/pkcs7.h
+ create mode 100644 include/linux/pe.h
+ create mode 100644 include/linux/verify_pefile.h
