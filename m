@@ -1,81 +1,119 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [GIT PULL] Keyrings and asymmetric keys patches for 3.17
-Date: Fri, 18 Jul 2014 09:22:03 +1000
-Message-ID: <20140718092203.3bab9fba@canb.auug.org.au>
-References: <23717.1405636445@warthog.procyon.org.uk>
+From: Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>
+Subject: Re: [PATCH, RFC -v2] random: introduce getrandom(2) system call
+Date: Thu, 17 Jul 2014 19:22:25 -0400
+Message-ID: <20140717232225.GB1491@thunk.org>
+References: <1405633100-4889-1-git-send-email-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/ddXQZJrWZ_8/a.dviFsEnuE"; protocol="application/pgp-signature"
-Cc: James Morris <jmorris@namei.org>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>, mimi.e.zohar@gmail.com,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>, vgoyal@redhat.com,
-	keyrings@linux-nfs.org, linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:50055 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758071AbaGQXWL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2014 19:22:11 -0400
-In-Reply-To: <23717.1405636445@warthog.procyon.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	beck-7YlrpqBBQ3VAfugRpC6u6w@public.gmane.org
+To: Linux Kernel Developers List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1405633100-4889-1-git-send-email-tytso-3s7WtUTddSA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
---Sig_/ddXQZJrWZ_8/a.dviFsEnuE
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This is just an update to the commit description (and so I've only
+included it_.  A few more minor typos fixedup, and it includes Zach's
+reviewed-by.
 
-Hi David,
+						- Ted
 
-On Thu, 17 Jul 2014 23:34:05 +0100 David Howells <dhowells@redhat.com> wrot=
-e:
->
-> I have a number of sets of patches for you to pull.  I've git-merged them
-> together into a single branch (keys-next) as there are some conflicts and
-> tagged the end.
->=20
-> The component subsets are:
->=20
->  (1) Tag keys-preparse-1-20140707
->=20
->      A set of patches that mostly convert extant key types to perform
->      preparsing to make it possible to determine the amount of quota in
->      advance.
->=20
->      I haven't fixed the encrypted and trusted keys as yet as they incorr=
-ectly
->      use the ->update() op, but I'd like to get the changes I have done o=
-ut
->      the door.
+random: introduce getrandom(2) system call
 
-I hate to be a pest, but this whole branch has only your signed off by
-and no indication that any of it has been reviewed/tested by anyone
-else ...
+The getrandom(2) system call was requested by the LibreSSL Portable
+developers.  It is analoguous to the getentropy(2) system call in
+OpenBSD.
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
+The rationale of this system call is to provide resiliance against
+file descriptor exhaustion attacks, where the attacker consumes all
+available file descriptors, forcing the use of the fallback code where
+/dev/[u]random is not available.  Since the fallback code is often not
+well-tested, it is better to eliminate this potential failure mode
+entirely.
 
---Sig_/ddXQZJrWZ_8/a.dviFsEnuE
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
+The other feature provided by this new system call is the ability to
+request randomness from the /dev/urandom entropy pool, but to block
+until at least 128 bits of entropy has been accumulated in the
+/dev/urandom entropy pool.  Historically, the emphasis in the
+/dev/urandom development has been to ensure that urandom pool is
+initialized as quickly as possible after system boot, and preferably
+before the init scripts start execution.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+This is because changing /dev/urandom reads to block represents an
+interface change that could potentially break userspace which is not
+acceptable.  In practice, on most x86 desktop and server systems, in
+general the entropy pool can be initialized before it is needed (and
+in modern kernels, we will printk a warning message if not).  However,
+on an embedded system, this may not be the case.  And so with this new
+interface, we can provide the functionality of blocking until the
+urandom pool has been initialized.  Any userspace program which uses
+this new functionality must take care to assure that if it is used
+during the boot process, that it will not cause the init scripts or
+other portions of the system startup to hang indefinitely.
 
-iQIcBAEBCAAGBQJTyFqgAAoJEMDTa8Ir7ZwVI7cP/2LMgnN/CSuh0BXdWvb+qOO5
-INZKsrOO7lDlp8XrrsGo8gWtc4KbwWWwBq5oOVSrWTVi/scMA2WIyknBEKA5oR8P
-pGoREZ3Zh2/l2pc8zfmE4Uq14Ra4UgOXJiZQCKtO4ZCIoVRDWiN/T8+xIJ02F/LY
-qheB4rZOeMIjmt/Rl2ld7dO3Mu1aoidLg91bOWSp2v1dpY8WLR8eX3C5/up/DYPV
-bPg4qWoKwtxGjVYAbwLo0LSuLTLmA2A8RHPIdOhmKU2qbR3zKn39WfCWoqWbsT+e
-VIGOyBjGVK/wGwkrLpDh+ihWSVRRhXFbRWmrVjPErMGNmVgcu+Zwj+bwMf3EM7qU
-JHAhj0xpIAsFDgniUJHYvIJWeiKiC/oJx+/YTUayXFDmg6pPLjGCdglFZaCykBeh
-k1oKB2eRYrSguz6qhuSJJzHS2eq0FQUKn+xbDsEC3aB/cSzU5FKzS8o77Xl/vTTQ
-Nns9o7RraYVTTP0SNqVylUxg9FW0uWCreK3gYNAX0PVS1dpD7OyGFV1CARrMIqKA
-c81wRwlZ3I6gBq+YU9Q1n2VtM1j8Dvdi89vxgyDwOUQeZLogVKe8cCK/pXSQXVKN
-1R0yhJMfrxzcSObhdf3KCWMMTev5wYeMiEQEz8vFT56IcHrs/inni5/0spBv6J+5
-kgTcIPPNJowvpanYZuOj
-=dzhD
------END PGP SIGNATURE-----
+SYNOPSIS
+	#include <linux/random.h>
 
---Sig_/ddXQZJrWZ_8/a.dviFsEnuE--
+	int getrandom(void *buf, size_t buflen, unsigned int flags);
+
+DESCRIPTION
+	The system call getrandom() fills the buffer pointed to by buf
+	with up to buflen random bytes which can be used to seed user
+	space random number generators (i.e., DRBG's) or for other
+	cryptographic processes.  It should not be used Monte Carlo
+	simulations or for other probabilistic sampling applications.
+
+	If the GRND_RANDOM flags bit is set, then draw from the
+	/dev/random pool instead of the /dev/urandom pool.  The
+	/dev/random pool is limited based on the entropy that can be
+	obtained from environmental noise, so if there is insufficient
+	entropy, the requested number of bytes may not be returned.
+	If there is no entropy available at all, getrandom(2) will
+	either block, or return an error with errno set to EAGAIN if
+	the GRND_NONBLOCK bit is set in flags.
+
+	If the GRND_RANDOM bit is not set, then the /dev/urandom pool
+	will be used.  Unlike using read(2) to fetch data from
+	/dev/urandom, if the urandom pool has not been sufficiently
+	initialized, getrandom(2) will block or return -1 with the
+	errno set to EGAIN if the GRND_NONBLOCK bit is set in flags.
+
+	The getentropy(2) system call in OpenBSD can be emulated using
+	the following function:
+
+	    int getentropy(void *buf, size_t buflen)
+	    {
+	            int     ret;
+
+		    ret = getentropy(buf, buflen, 0);
+		    return (ret > 0) ? 0 : ret;
+	    }
+
+RETURN VALUE
+       On success, the number of bytes that was filled in the buf is
+       returned.  This may not be all the bytes requested by the
+       caller via buflen if insufficient entropy was present in the
+       /dev/random pool, or if the system call was interrupted by a
+       signal.
+
+       On error, -1 is returned, and errno is set appropriately.
+
+ERRORS
+	EINVAL		An invalid flag was passed to getrandom(2)
+
+	EFAULT		buf is outside the accessible address space.
+
+	EAGAIN		The requested entropy was not available, and the
+			getentropy(2) would have blocked if GRND_BLOCK flag
+			was set.
+
+	EINTR		While blocked waiting for entropy, the call was
+			interrupted by a signal handler; see the description
+			of how interrupted read(2) calls on "slow" devices
+			are handled with and without the SA_RESTART flag
+			in the signal(7) man page.
+
+Signed-off-by: Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>
+Reviewed-by: Zach Brown <zab-ugsP4Wv/S6ZeoWH0uzbU5w@public.gmane.org>
