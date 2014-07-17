@@ -1,110 +1,55 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH] random: limit the contribution of the hw rng to at most half
-Date: Thu, 17 Jul 2014 06:03:56 -0400
-Message-ID: <1405591436-15445-1-git-send-email-tytso@mit.edu>
-Cc: linux-crypto@vger.kernel.org, hpa@zytor.com,
-	Theodore Ts'o <tytso@mit.edu>
-To: Linux Kernel Developers List <linux-kernel@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:40465 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755374AbaGQKES (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 17 Jul 2014 06:04:18 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
+Date: Thu, 17 Jul 2014 12:57:07 +0200
+Message-ID: <1405594627.12194.9.camel@localhost>
+References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
+	linux-crypto@vger.kernel.org, beck@openbsd.org
+To: Theodore Ts'o <tytso@mit.edu>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1405588695-12014-1-git-send-email-tytso@mit.edu>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-For people who don't trust a hardware RNG which can not be audited,
-the changes to add support for RDSEED can be troubling since 97% or
-more of the entropy will be contributed from the in-CPU hardware RNG.
+On Do, 2014-07-17 at 05:18 -0400, Theodore Ts'o wrote:
+> SYNOPSIS
+> 	#include <linux/random.h>
+> 
+> 	int getrandom(void *buf, size_t buflen, unsigned int flags);
 
-We now have a in-kernel khwrngd, so for those people who do want to
-implicitly trust the CPU-based system, we could create an arch-rng
-hw_random driver, and allow khwrng refill the entropy pool.  This
-allows system administrator whether or not they trust the CPU (I
-assume the NSA will trust RDRAND/RDSEED implicitly :-), and if so,
-what level of entropy derating they want to use.
+Cool, I think the interface is sane.
 
-The reason why this is a really good idea is that if different people
-use different levels of entropy derating, it will make it much more
-difficult to design a backdoor'ed hwrng that can be generally
-exploited in terms of the output of /dev/random when different attack
-targets are using differing levels of entropy derating.
+Btw. couldn't libressl etc. fall back to binary_sysctl
+kernel.random.uuid and seed with that as a last resort? We have it
+available for few more years.
 
-Signed-off-by: Theodore Ts'o <tytso@mit.edu>
----
- drivers/char/random.c | 43 ++++---------------------------------------
- 1 file changed, 4 insertions(+), 39 deletions(-)
+> +SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
+> +		unsigned int, flags)
+> +{
+> +	int r;
+> +
+> +	if (count > 256)
+> +		return -EINVAL;
+> +
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 76a56f6..e7d7ac1 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -911,12 +911,13 @@ void add_interrupt_randomness(int irq, int irq_flags)
- 
- 	/*
- 	 * If we have architectural seed generator, produce a seed and
--	 * add it to the pool.  For the sake of paranoia count it as
--	 * 50% entropic.
-+	 * add it to the pool.  For the sake of paranoia don't let the
-+	 * architectural seed generator dominate the input from the
-+	 * interrupt noise.
- 	 */
- 	if (arch_get_random_seed_long(&seed)) {
- 		__mix_pool_bytes(r, &seed, sizeof(seed));
--		credit += sizeof(seed) * 4;
-+		credit = 1;
- 	}
- 	spin_unlock(&r->lock);
- 
-@@ -1328,37 +1329,6 @@ void rand_initialize_disk(struct gendisk *disk)
- }
- #endif
- 
--/*
-- * Attempt an emergency refill using arch_get_random_seed_long().
-- *
-- * As with add_interrupt_randomness() be paranoid and only
-- * credit the output as 50% entropic.
-- */
--static int arch_random_refill(void)
--{
--	const unsigned int nlongs = 64;	/* Arbitrary number */
--	unsigned int n = 0;
--	unsigned int i;
--	unsigned long buf[nlongs];
--
--	if (!arch_has_random_seed())
--		return 0;
--
--	for (i = 0; i < nlongs; i++) {
--		if (arch_get_random_seed_long(&buf[n]))
--			n++;
--	}
--
--	if (n) {
--		unsigned int rand_bytes = n * sizeof(unsigned long);
--
--		mix_pool_bytes(&input_pool, buf, rand_bytes);
--		credit_entropy_bits(&input_pool, rand_bytes*4);
--	}
--
--	return n;
--}
--
- static ssize_t
- _random_read(int nonblock, char __user *buf, size_t nbytes)
- {
-@@ -1379,11 +1349,6 @@ _random_read(int nonblock, char __user *buf, size_t nbytes)
- 			return n;
- 
- 		/* Pool is (near) empty.  Maybe wait and retry. */
--
--		/* First try an emergency refill */
--		if (arch_random_refill())
--			continue;
--
- 		if (nonblock)
- 			return -EAGAIN;
- 
--- 
-2.0.0
+Why this "arbitrary" limitation? Couldn't we just check for > SSIZE_MAX
+or to be more conservative to INT_MAX?
+
+> +	if (flags & GRND_RANDOM) {
+> +		return _random_read(!(flags & GRND_BLOCK), buf, count);
+> +	}
+> +	if (flags & GRND_BLOCK) {
+> +		r = wait_for_completion_interruptible(&urandom_initialized);
+> +		if (r)
+> +			return r;
+> +	} else if (!completion_done(&urandom_initialized))
+> +		return -EAGAIN;
+> +	return urandom_read(NULL, buf, count, NULL);
+> +}
+> +
+
+Great, thanks Ted,
+Hannes
