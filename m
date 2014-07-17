@@ -1,43 +1,67 @@
-From: Tobias Klauser <tklauser@distanz.ch>
-Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Thu, 17 Jul 2014 14:09:49 +0200
-Message-ID: <20140717120949.GB24362@distanz.ch>
-References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
-	linux-crypto@vger.kernel.org, beck@openbsd.org
-To: Theodore Ts'o <tytso@mit.edu>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1405588695-12014-1-git-send-email-tytso@mit.edu>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Andrey Utkin <andrey.krieger.utkin@gmail.com>
+Subject: [PATCH 3/3] drivers/crypto/omap-{des,aes}.c: fix sanity checks
+Date: Thu, 17 Jul 2014 15:15:24 +0300
+Message-ID: <1405599324-11215-1-git-send-email-andrey.krieger.utkin@gmail.com>
+Cc: dcb314@hotmail.com, davem@davemloft.net,
+	herbert@gondor.apana.org.au,
+	Andrey Utkin <andrey.krieger.utkin@gmail.com>
+To: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-la0-f52.google.com ([209.85.215.52]:58336 "EHLO
+	mail-la0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755618AbaGQMPi (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 17 Jul 2014 08:15:38 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 2014-07-17 at 11:18:15 +0200, Theodore Ts'o <tytso@mit.edu> wrote:
+Unsigned variable "total" was tested for negativity after subtraction
+operation. 2 instances.
+Replaced that with the test of minuend being greater than subtrahend
+before the subtraction.
 
-[...]
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=80421
+Reported-by: David Binderman <dcb314@hotmail.com>
+Signed-off-by: Andrey Utkin <andrey.krieger.utkin@gmail.com>
+---
+ drivers/crypto/omap-aes.c | 4 ++--
+ drivers/crypto/omap-des.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-> +/*
-> + * Flags for getrandom(2)
-> + *
-> + * GAND_BLOCK 		Allow getrandom(2) to block
-> + * GAND_RANDOM		Use the /dev/random pool instead of /dev/urandom
-> + */
-
-Very minor nitpick: These should probably read GRND_BLOCK/GRND_RANDOM as
-well, no?
-
-> +#define GRND_BLOCK	0x0001
-> +#define GRND_RANDOM	0x0002
-> +
->  #endif /* _UAPI_LINUX_RANDOM_H */
-> -- 
-> 2.0.0
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
-> 
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index cb98fa5..413ed78 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -1038,10 +1038,10 @@ static irqreturn_t omap_aes_irq(int irq, void *dev_id)
+ 			}
+ 		}
+ 
++		BUG_ON(dd->total < AES_BLOCK_SIZE);
++
+ 		dd->total -= AES_BLOCK_SIZE;
+ 
+-		BUG_ON(dd->total < 0);
+-
+ 		/* Clear IRQ status */
+ 		status &= ~AES_REG_IRQ_DATA_OUT;
+ 		omap_aes_write(dd, AES_REG_IRQ_STATUS(dd), status);
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index b8bc84b..93aa213 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -965,10 +965,10 @@ static irqreturn_t omap_des_irq(int irq, void *dev_id)
+ 			}
+ 		}
+ 
++		BUG_ON(dd->total < DES_BLOCK_SIZE);
++
+ 		dd->total -= DES_BLOCK_SIZE;
+ 
+-		BUG_ON(dd->total < 0);
+-
+ 		/* Clear IRQ status */
+ 		status &= ~DES_REG_IRQ_DATA_OUT;
+ 		omap_des_write(dd, DES_REG_IRQ_STATUS(dd), status);
+-- 
+1.8.5.5
