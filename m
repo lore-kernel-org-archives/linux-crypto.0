@@ -1,50 +1,73 @@
-From: Rolf Eike Beer <eike-kernel@sf-tec.de>
-Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Fri, 18 Jul 2014 18:36:45 +0200
-Message-ID: <1883713.E4uoxDXDyt@caliban.sf-tec.de>
-References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
+From: Horia Geanta <horia.geanta@freescale.com>
+Subject: [PATCH 2/9] crypto: caam - desc.h fixes
+Date: Fri, 18 Jul 2014 19:37:19 +0300
+Message-ID: <1405701446-13656-3-git-send-email-horia.geanta@freescale.com>
+References: <1405701446-13656-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart22677037.uztPAu2aTS"; micalg="pgp-sha1"; protocol="application/pgp-signature"
-Cc: linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
-	linux-crypto@vger.kernel.org, beck@openbsd.org
-To: Theodore Ts'o <tytso@mit.edu>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1405588695-12014-1-git-send-email-tytso@mit.edu>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Carmen Iorga <carmen.iorga@freescale.com>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	Alexandru Porosanu <alexandru.porosanu@freescale.com>,
+	Vakul Garg <vakul@freescale.com>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>,
+	"Horia Geanta" <horia.geanta@freescale.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	<linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn1lp0145.outbound.protection.outlook.com ([207.46.163.145]:24050
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S932384AbaGRQiu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 18 Jul 2014 12:38:50 -0400
+In-Reply-To: <1405701446-13656-1-git-send-email-horia.geanta@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+1. fix HDR_START_IDX_MASK
+Define HDR_START_IDX_MASK consistently with the other masks:
+mask = bitmask << offset
 
---nextPart22677037.uztPAu2aTS
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+2. fix FIFO_STORE output data type value for AFHA S-Box
 
-Theodore Ts'o wrote:
+3. fix OPERATION pkha modular arithmetic source mask
 
-> DESCRIPTION
-> 
-> 	The system call getrandom() fills the buffer pointed to by buf
-> 	with up to buflen random bytes which can be used to seed user
-> 	space random number generators (i.e., DRBG's) or for other
-> 	cryptographic processes.  It should not be used Monte Carlo
-> 	simulations or for other probabilistic sampling applications.
+Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+---
+ drivers/crypto/caam/desc.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-The "for" looks misplaced, shouldn't this be "for Monte Carlo simulations or 
-other ..."?
-
-Greetings,
-
-Eike
---nextPart22677037.uztPAu2aTS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iEYEABECAAYFAlPJTSMACgkQXKSJPmm5/E6o7gCggoszbVeh52J3cF1yROIdHqc9
-yOAAnA8gcIcFthALvU++/WoUU0HNhDVX
-=YeqZ
------END PGP SIGNATURE-----
-
---nextPart22677037.uztPAu2aTS--
+diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
+index d397ff9d56fd..7a58d6ee801d 100644
+--- a/drivers/crypto/caam/desc.h
++++ b/drivers/crypto/caam/desc.h
+@@ -80,8 +80,8 @@ struct sec4_sg_entry {
+ #define HDR_ZRO			0x00008000
+ 
+ /* Start Index or SharedDesc Length */
+-#define HDR_START_IDX_MASK	0x3f
+ #define HDR_START_IDX_SHIFT	16
++#define HDR_START_IDX_MASK	(0x3f << HDR_START_IDX_SHIFT)
+ 
+ /* If shared descriptor header, 6-bit length */
+ #define HDR_DESCLEN_SHR_MASK	0x3f
+@@ -390,7 +390,7 @@ struct sec4_sg_entry {
+ #define FIFOST_TYPE_PKHA_N	 (0x08 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_PKHA_A	 (0x0c << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_PKHA_B	 (0x0d << FIFOST_TYPE_SHIFT)
+-#define FIFOST_TYPE_AF_SBOX_JKEK (0x10 << FIFOST_TYPE_SHIFT)
++#define FIFOST_TYPE_AF_SBOX_JKEK (0x20 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_AF_SBOX_TKEK (0x21 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_PKHA_E_JKEK	 (0x22 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_PKHA_E_TKEK	 (0x23 << FIFOST_TYPE_SHIFT)
+@@ -1237,7 +1237,7 @@ struct sec4_sg_entry {
+ #define OP_ALG_PKMODE_MOD_PRIMALITY	0x00f
+ 
+ /* PKHA mode copy-memory functions */
+-#define OP_ALG_PKMODE_SRC_REG_SHIFT	13
++#define OP_ALG_PKMODE_SRC_REG_SHIFT	17
+ #define OP_ALG_PKMODE_SRC_REG_MASK	(7 << OP_ALG_PKMODE_SRC_REG_SHIFT)
+ #define OP_ALG_PKMODE_DST_REG_SHIFT	10
+ #define OP_ALG_PKMODE_DST_REG_MASK	(7 << OP_ALG_PKMODE_DST_REG_SHIFT)
+-- 
+1.8.3.1
