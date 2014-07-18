@@ -1,44 +1,34 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] random: limit the contribution of the hw rng to at most
- half
-Date: Fri, 18 Jul 2014 02:23:56 -0400
-Message-ID: <20140718062356.GC1491@thunk.org>
-References: <1405591436-15445-1-git-send-email-tytso@mit.edu>
- <53C80A6D.5010201@zytor.com>
- <20140717220806.GW1491@thunk.org>
- <53C85D50.5040901@zytor.com>
+From: Florian Weimer <fweimer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH, RFC -v2] random: introduce getrandom(2) system call
+Date: Fri, 18 Jul 2014 11:39:17 +0200
+Message-ID: <53C8EB45.20304@redhat.com>
+References: <1405633100-4889-1-git-send-email-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:42529 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755283AbaGRHQO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Jul 2014 03:16:14 -0400
-Content-Disposition: inline
-In-Reply-To: <53C85D50.5040901@zytor.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	beck-7YlrpqBBQ3VAfugRpC6u6w@public.gmane.org
+To: "Theodore Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
+	Linux Kernel Developers List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1405633100-4889-1-git-send-email-tytso-3s7WtUTddSA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jul 17, 2014 at 04:33:36PM -0700, H. Peter Anvin wrote:
-> 
-> I just want to make sure we don't negatively impact the real security of
-> users because of "optics".  We already have a lot of problems with
-> people extracting long-living keys from /dev/urandom because /dev/random
-> is too slow.
+On 07/17/2014 11:38 PM, Theodore Ts'o wrote:
+> 	If the GRND_RANDOM flags bit is set, then draw from the
+> 	/dev/random pool instead of the /dev/urandom pool.  The
+> 	/dev/random pool is limited based on the entropy that can be
+> 	obtained from environmental noise, so if there is insufficient
+> 	entropy, the requested number of bytes may not be returned.
+> 	If there is no entropy available at all, getrandom(2) will
+> 	either block, or return an error with errno set to EAGAIN if
+> 	the GRND_NONBLOCK bit is set in flags.
 
-With a system with RDRAND, we're mixing arch_get_rand_long() as part
-of the extraction process (as the seed for the SHA's IV).  So if you
-trust RDRAND, then using /dev/urandom even when the entropy count is
-zero is going to be secure.  If you don't trust RDRAND, then the
-RDSEED entropy accounting is going to be extremely disturbing.
+Can we get a GRND_INIT flag or something like that which means 
+"block/return EAGAIN until the kernel pool is initialized"?  Thanks.
 
-So the only way that we could be impacting the "real security" of
-users, would be if RDRAND was back-doored, but RDSEED wasn't.  And
-that doesn't seem like a terribly likely scenario to me, but what do I
-know?  :-)
+(See the previous discussion about pool initialization.)
 
-						- Ted
+-- 
+Florian Weimer / Red Hat Product Security
