@@ -1,58 +1,30 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.16
-Date: Fri, 18 Jul 2014 18:57:17 +0800
-Message-ID: <20140718105717.GA18087@gondor.apana.org.au>
-References: <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
- <20140101061016.GA22579@gondor.apana.org.au>
- <20140203125944.GA31446@gondor.apana.org.au>
- <20140710090314.GA15729@gondor.apana.org.au>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH, RFC -v3] random: introduce getrandom(2) system call
+Date: Fri, 18 Jul 2014 07:51:22 -0400
+Message-ID: <20140718115122.GG1491@thunk.org>
+References: <1405677564-16802-1-git-send-email-tytso@mit.edu>
+ <CAFLxGvy7CwWiagxMHixHnuUwvimBOOJyJqs4g2Rq8hzoUA60mw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-abi@vger.kernel.org,
+	linux-crypto@vger.kernel.org, beck@openbsd.org,
+	deraadt@cvs.openbsd.org
+To: Richard Weinberger <richard.weinberger@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48211 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750821AbaGRK53 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Jul 2014 06:57:29 -0400
+Received: from imap.thunk.org ([74.207.234.97]:43074 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1761417AbaGRLvj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 18 Jul 2014 07:51:39 -0400
 Content-Disposition: inline
-In-Reply-To: <20140710090314.GA15729@gondor.apana.org.au>
+In-Reply-To: <CAFLxGvy7CwWiagxMHixHnuUwvimBOOJyJqs4g2Rq8hzoUA60mw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Fri, Jul 18, 2014 at 12:25:17PM +0200, Richard Weinberger wrote:
+> >                     if (ret != buflen)
+> 
+> A small nit-pick, missing "{".
 
-This push fixes a boot hang in virt guests when the virtio RNG
-is enabled.
+Thanks, good catch.   Fixed.
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Amit Shah (2):
-      hwrng: fetch randomness only after device init
-      hwrng: virtio - ensure reads happen after successful probe
-
- drivers/char/hw_random/core.c       |   47 +++++++++++++++++++++++++++++------
- drivers/char/hw_random/virtio-rng.c |   10 ++++++++
- 2 files changed, 49 insertions(+), 8 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+						- Ted
