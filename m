@@ -1,44 +1,58 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [GIT PULL] Keyrings and asymmetric keys patches for 3.17
-Date: Fri, 18 Jul 2014 20:07:47 +0100
-Message-ID: <21814.1405710467@warthog.procyon.org.uk>
-References: <20140718092203.3bab9fba@canb.auug.org.au> <23717.1405636445@warthog.procyon.org.uk>
+From: Dave Airlie <airlied@gmail.com>
+Subject: Re: [PATCH 0/25] Replace DEFINE_PCI_DEVICE_TABLE macro use
+Date: Sat, 19 Jul 2014 07:14:12 +1000
+Message-ID: <CAPM=9tzgWdnv7jc+xjsJUf0EcyGU+V7nFHzzQ16ui1eE0ihyQA@mail.gmail.com>
+References: <1405697232-11785-1-git-send-email-benoit.taine@lip6.fr>
+	<20140718162213.GC31114@tuxdriver.com>
+	<20140718164340.GA24960@kroah.com>
+	<1405702472.30262.1.camel@dabdike.int.hansenpartnership.com>
+	<20140718181759.GB2193@kroah.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, James Morris <jmorris@namei.org>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>, mimi.e.zohar@gmail.com,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>, vgoyal@redhat.com,
-	keyrings@linux-nfs.org, linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:23899 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755377AbaGRTIJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 18 Jul 2014 15:08:09 -0400
-In-Reply-To: <20140718092203.3bab9fba@canb.auug.org.au>
-Content-ID: <21813.1405710467.1@warthog.procyon.org.uk>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: 7bit
+Cc: linux-mips@linux-mips.org,
+	Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
+	linux-pci@vger.kernel.org, dri-devel <dri-devel@lists.freedesktop.org>,
+	virtualization@lists.linux-foundation.org,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Benoit Taine <benoit.taine@lip6.fr>,
+	ath5k-devel@venema.h4ckr.net, linux-acenic@sunsite.dk,
+	Linux SCSI List <linux-scsi@vger.kernel.org>,
+	users@rt2x00.serialmonkey.com, linux-rdma@vger.kernel.org,
+	ath10k@lists.infradead.org, linux-hippi@sunsite.dk,
+	industrypack-devel@lists.sourceforge.net,
+	Linux Wireless List <linux-wireless@vger.kernel.org>,
+	xen-devel@lists.xenproject.org,
+	MPT-FusionLinux.pdl@avagotech.com, ath9k-devel@venema.h4ckr.net,
+	wil6210@qca.qualcomm.com, linux-pcmcia@lists.infradead.org,
+	"John W. Linville" <linville@tuxdriver.com>,
+	linux-can@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+	Network D
+To: Greg KH <greg@kroah.com>
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+In-Reply-To: <20140718181759.GB2193@kroah.com>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
+List-Id: linux-crypto.vger.kernel.org
 
-Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>
+> We have almost 1000 more uses of the non-macro version than the "macro"
+> version in the kernel today:
+> $ git grep -w DEFINE_PCI_DEVICE_TABLE | wc -l
+> 262
+> $ git grep "const struct pci_device_id" | wc -l
+> 1254
 
-> I hate to be a pest, but this whole branch has only your signed off by
-> and no indication that any of it has been reviewed/tested by anyone
-> else ...
+did you check for non-const ones? just to see if we have any of the
+broken case in the tree :-)
 
-Okay, I've got at least one review for most of the patches.  I'll try and get
-some more, but it probably won't be till next week.
+as for consistency, pci_dev vs usb_device :-P
 
-Anyway, I've updated the keys-preparse-1 branch and tagged it anew with
-keys-preparse-1-20140718.  There was a spelling fix in the docs and the
-patches have been rebased on the updated security/next.
-
-I've also rebuilt the keys-next branch, basing it on the updated
-security/next, and tagged it with keys-next-20140718.
-
-	warthog>git diff keys-next-20140717 keys-next-20140718 | diffstat
-	 keys.txt |    2 +-
-	 1 file changed, 1 insertion(+), 1 deletion(-)
-
-David
+Dave.
