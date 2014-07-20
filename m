@@ -1,50 +1,33 @@
-From: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
-Subject: Re: Making the asymmetric keys config option into a top-level option
-Date: Sat, 19 Jul 2014 12:18:01 +0300
-Message-ID: <CACE9dm-OWJCdEfMFAjGx1qOOK17evOSvcDUcw451XUnZiY6gcQ@mail.gmail.com>
-References: <cover.1405094060.git.d.kasatkin@samsung.com>
-	<acdd27e3b559b0c1bc57a9393e4e5540a90bab36.1405094060.git.d.kasatkin@samsung.com>
-	<13161.1405626953@warthog.procyon.org.uk>
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
+Date: Sun, 20 Jul 2014 08:50:06 -0700
+Message-ID: <871ttg3u8h.fsf@tassilo.jf.intel.com>
+References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	linux-security-module <linux-security-module@vger.kernel.org>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <13161.1405626953@warthog.procyon.org.uk>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
+	linux-crypto@vger.kernel.org, beck@openbsd.org
+To: Theodore Ts'o <tytso@mit.edu>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:1304 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752191AbaGTPuH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 20 Jul 2014 11:50:07 -0400
+In-Reply-To: <1405588695-12014-1-git-send-email-tytso@mit.edu> (Theodore
+	Ts'o's message of "Thu, 17 Jul 2014 05:18:15 -0400")
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 17, 2014 at 10:55 PM, David Howells <dhowells@redhat.com> wrote:
-> Dmitry Kasatkin <d.kasatkin@samsung.com> wrote:
->
->> When ASYMMETRIC_KEYS=y, but depends on CRYPTO=m, selections will be also modules.
->> In random config case OID_REGISTRY, MPILIB and ASN1 became modules producing build
->> break. This patch removes asymmetric keys dependency from CRYPTO, but instead
->> selects CRYPTO and CRYPTO_HASH as they are needed.
->
-> You do realise that this makes the asymmetric key config option into a
-> top-level option?  I think, logically, that's the wrong thing to do.  They
-> should still appear under the crypto menu.
->
+Theodore Ts'o <tytso@mit.edu> writes:
+>  
+>  #undef __NR_syscalls
+> -#define __NR_syscalls 277
+> +#define __NR_syscalls 278
 
-Oops, this is not what I wanted to have.
-Yes, I wanted to have still them under crypto but wanted to break dependency.
-I was hurrying before starting the holidays, tested only from command line,
-but did not look to menuconfig.
+You need to add the syscall to kernel/sys_ni.c too, otherwise it will be
+impossible to build without random device.
 
-In overall asymmetric keys does not provide any crypto API.
-Instead they provide key types... They use crypto api them in couple of places.
-So it is more about "selecting" crypto.
-In my opinion "entire" location of asymmetric keys under /crypto is wrong.
-RSA algo may be there, but reset of the stuff can be under /keys.
+-Andi
 
--Dmitry
-
-> Note that I think your patch is really the wrong solution.  The right solution
-> is to fix the configuration tools - but that's quite an undertaking.
->
-> David
+-- 
+ak@linux.intel.com -- Speaking for myself only
