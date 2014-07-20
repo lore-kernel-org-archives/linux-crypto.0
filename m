@@ -1,49 +1,39 @@
-From: "George Spelvin" <linux@horizon.com>
+From: Theodore Ts'o <tytso@mit.edu>
 Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: 20 Jul 2014 13:03:06 -0400
-Message-ID: <20140720170306.15274.qmail@ns.horizon.com>
-References: <20140720162622.29664.qmail@ns.horizon.com>
-Cc: linux@horizon.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, tytso@mit.edu
-To: hannes@stressinduktion.org
+Date: Sun, 20 Jul 2014 13:06:35 -0400
+Message-ID: <20140720170635.GF5017@thunk.org>
+References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
+ <871ttg3u8h.fsf@tassilo.jf.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
+	linux-crypto@vger.kernel.org, beck@openbsd.org
+To: Andi Kleen <andi@firstfloor.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:44719 "HELO ns.horizon.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1752415AbaGTRDI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 20 Jul 2014 13:03:08 -0400
-In-Reply-To: <20140720162622.29664.qmail@ns.horizon.com>
+Received: from imap.thunk.org ([74.207.234.97]:46132 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751509AbaGTRG6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 20 Jul 2014 13:06:58 -0400
+Content-Disposition: inline
+In-Reply-To: <871ttg3u8h.fsf@tassilo.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> In the end people would just recall getentropy in a loop and fetch 256
-> bytes each time. I don't think the artificial limit does make any sense.
-> I agree that this allows a potential misuse of the interface, but
-> doesn't a warning in dmesg suffice?
+On Sun, Jul 20, 2014 at 08:50:06AM -0700, Andi Kleen wrote:
+> Theodore Ts'o <tytso@mit.edu> writes:
+> >  
+> >  #undef __NR_syscalls
+> > -#define __NR_syscalls 277
+> > +#define __NR_syscalls 278
+> 
+> You need to add the syscall to kernel/sys_ni.c too, otherwise it will be
+> impossible to build without random device.
 
-It makes their code not work, so they can are forced to think about
-fixing it before adding the obvious workaround.
+The random device is not optional; it is alaways guaranteed to be
+present.  From drivers/char/Makefile:
 
-> It also makes it easier to port applications from open("/dev/*random"),
-> read(...) to getentropy() by reusing the same limits.
+obj-y			+= mem.o random.o
 
-But such an application *is broken*.  Making it easier to port is
-an anti-goal.  The goal is to make it enough of a hassle that
-people will *fix* their code.
+Cheers,
 
-There's a *reason* that the /dev/random man page explicitly tells
-people not to trust software that reads more than 32 bytes at a time
-from /dev/random:
-
-> While some safety margin above that minimum is reasonable, as a guard
-> against flaws in the CPRNG algorithm, no cryptographic primitive avail-
-> able today can hope to promise more than 256 bits of security, so if
-> any program reads more than 256 bits (32 bytes) from the kernel random
-> pool per invocation, or per reasonable reseed interval (not less than
-> one minute), that should be taken as a sign that its cryptography is
-> *not* skillfully implemented.
-
-("not skilfuly implemented" was the phrase chosen after some discussion to
-convey "either a quick hack or something you dhouldn't trust.")
-
-To expand on what I said in my mail to Ted, 256 is too high.
-I'd go with OpenBSD's 128 bytes or even drop it to 64.
+					- Ted
