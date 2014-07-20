@@ -1,62 +1,35 @@
-From: Theodore Ts'o <tytso@mit.edu>
+From: Andreas Schwab <schwab@linux-m68k.org>
 Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Sun, 20 Jul 2014 13:24:57 -0400
-Message-ID: <20140720172457.GG5017@thunk.org>
-References: <20140720162622.29664.qmail@ns.horizon.com>
+Date: Sun, 20 Jul 2014 19:27:42 +0200
+Message-ID: <87tx6cvt2p.fsf@igel.home>
+References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: George Spelvin <linux@horizon.com>
+Content-Type: text/plain
+Cc: linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
+	linux-crypto@vger.kernel.org, beck@openbsd.org
+To: Theodore Ts'o <tytso@mit.edu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:46143 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751401AbaGTRZZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 20 Jul 2014 13:25:25 -0400
-Content-Disposition: inline
-In-Reply-To: <20140720162622.29664.qmail@ns.horizon.com>
+Received: from mail-out.m-online.net ([212.18.0.10]:60399 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752231AbaGTR1t (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 20 Jul 2014 13:27:49 -0400
+In-Reply-To: <1405588695-12014-1-git-send-email-tytso@mit.edu> (Theodore
+	Ts'o's message of "Thu, 17 Jul 2014 05:18:15 -0400")
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jul 20, 2014 at 12:26:22PM -0400, George Spelvin wrote:
-> One basic question... why limit this to /dev/random?
-> 
-> If we're trying to avoid fd exhaustion attacks, wouldn't an "atomically
-> read a file into a buffer" system call (that could be used on
-> /dev/urandom, or /etc/hostname, or /proc/foo, or...) be more useful?
-> 
-> E.g.
-> 
-> ssize_t readat(int dirfd, char const *path, struct stat *st,
-> 	char *buf, size_t len, int flags);
-> 
-> It's basically equivalent to openat(), optional fstat() (if st is non-NULL),
-> read(), close(), but it doesn't allocate an fd number.
-> 
-> Is it necessary to have a system call just for entropy?
-> 
-> If you want a "urandom that blocks until seeded", you can always create
-> another device node for the purpose.
+Theodore Ts'o <tytso@mit.edu> writes:
 
-I'd really rather not go down this path.  Your readat(2) proposal is
-interesting, but it adds a whole lot of complications.  For example,
-just simply booting a new kernel doesn't guarantee that a new device
-node for "blocks until seeded" will exist.  So that means a lot of
-applications will just either continue to use /dev/urandom, or have to
-put in fallback code to first try the new device name, and then fall
-back to /dev/urandom.  (And of course, they have to deal with what to
-do if /dev/urandom doesn't exist --- which presumably would be
-raise(SIGKILL), but we're now talking about a number of lines of codes
-that application writers would have to get right.)
+> ERRORS
+> 	EINVAL		The buflen value was invalid.
 
-Readat(2) would also have to get linked into auditing, and LSM, and
-honestly, it's a lot more work that I'm not all that interested in
-doing and trying to get right.
+Also on unknown flags?  Without that it would be impossible to probe for
+implemented flags.
 
-> If you do stick with a random-specific call, specifying the entropy
-> in bits (with some specified convention for the last fractional byte)
-> is anothet interesting idea.  Perhaps too prone to bugs, though.
-> (People thinking it's bytes and producing low-entropy keys.)
+Andreas.
 
-Definitely not worth the complexity.
-
-							- Ted
+-- 
+Andreas Schwab, schwab@linux-m68k.org
+GPG Key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
+"And now for something completely different."
