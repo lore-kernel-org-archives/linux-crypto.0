@@ -1,47 +1,49 @@
 From: "George Spelvin" <linux@horizon.com>
 Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: 20 Jul 2014 12:26:22 -0400
-Message-ID: <20140720162622.29664.qmail@ns.horizon.com>
+Date: 20 Jul 2014 13:03:06 -0400
+Message-ID: <20140720170306.15274.qmail@ns.horizon.com>
+References: <20140720162622.29664.qmail@ns.horizon.com>
 Cc: linux@horizon.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: tytso@mit.edu
+	linux-kernel@vger.kernel.org, tytso@mit.edu
+To: hannes@stressinduktion.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:61632 "HELO ns.horizon.com"
+Received: from ns.horizon.com ([71.41.210.147]:44719 "HELO ns.horizon.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751401AbaGTQ0Y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 20 Jul 2014 12:26:24 -0400
+	id S1752415AbaGTRDI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 20 Jul 2014 13:03:08 -0400
+In-Reply-To: <20140720162622.29664.qmail@ns.horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-One basic question... why limit this to /dev/random?
+> In the end people would just recall getentropy in a loop and fetch 256
+> bytes each time. I don't think the artificial limit does make any sense.
+> I agree that this allows a potential misuse of the interface, but
+> doesn't a warning in dmesg suffice?
 
-If we're trying to avoid fd exhaustion attacks, wouldn't an "atomically
-read a file into a buffer" system call (that could be used on
-/dev/urandom, or /etc/hostname, or /proc/foo, or...) be more useful?
+It makes their code not work, so they can are forced to think about
+fixing it before adding the obvious workaround.
 
-E.g.
+> It also makes it easier to port applications from open("/dev/*random"),
+> read(...) to getentropy() by reusing the same limits.
 
-ssize_t readat(int dirfd, char const *path, struct stat *st,
-	char *buf, size_t len, int flags);
+But such an application *is broken*.  Making it easier to port is
+an anti-goal.  The goal is to make it enough of a hassle that
+people will *fix* their code.
 
-It's basically equivalent to openat(), optional fstat() (if st is non-NULL),
-read(), close(), but it doesn't allocate an fd number.
+There's a *reason* that the /dev/random man page explicitly tells
+people not to trust software that reads more than 32 bytes at a time
+from /dev/random:
 
-Is it necessary to have a system call just for entropy?
+> While some safety margin above that minimum is reasonable, as a guard
+> against flaws in the CPRNG algorithm, no cryptographic primitive avail-
+> able today can hope to promise more than 256 bits of security, so if
+> any program reads more than 256 bits (32 bytes) from the kernel random
+> pool per invocation, or per reasonable reseed interval (not less than
+> one minute), that should be taken as a sign that its cryptography is
+> *not* skillfully implemented.
 
-If you want a "urandom that blocks until seeded", you can always create
-another device node for the purpose.
+("not skilfuly implemented" was the phrase chosen after some discussion to
+convey "either a quick hack or something you dhouldn't trust.")
 
-> The main argument I can see for putting in a limit is to encourage the
-> "proper" use of the interface.  In practice, anything larger than 128
-> probably means the interface is getting misused, either due to a bug
-> or some other kind of oversight.
-
-Agreed.  Even 1024 bits is excessive.  32 bytes is the "real" maximum
-that people should be asking for with current primitives, so an interface
-limitation to 64 is quite defensible.  (But 128 isn't *wildly* excessive.)
-
-If you do stick with a random-specific call, specifying the entropy
-in bits (with some specified convention for the last fractional byte)
-is anothet interesting idea.  Perhaps too prone to bugs, though.
-(People thinking it's bytes and producing low-entropy keys.)
+To expand on what I said in my mail to Ted, 256 is too high.
+I'd go with OpenBSD's 128 bytes or even drop it to 64.
