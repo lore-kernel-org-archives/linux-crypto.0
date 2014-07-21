@@ -1,47 +1,61 @@
-From: "George Spelvin" <linux@horizon.com>
-Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: 21 Jul 2014 07:21:02 -0400
-Message-ID: <20140721112102.19300.qmail@ns.horizon.com>
-References: <1405891964.9562.42.camel@localhost>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	tytso@mit.edu
-To: hannes@stressinduktion.org, linux@horizon.com
+From: Horia Geanta <horia.geanta@freescale.com>
+Subject: [PATCH] crypto: caam - fix DECO RSR polling
+Date: Mon, 21 Jul 2014 16:03:21 +0300
+Message-ID: <1405947801-3318-1-git-send-email-horia.geanta@freescale.com>
+References: <53CCC5A5.1070004@freescale.com>
+Mime-Version: 1.0
+Content-Type: text/plain
+Cc: "David S. Miller" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	<linux-crypto@vger.kernel.org>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>,
+	Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:27518 "HELO ns.horizon.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1754157AbaGULVE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 21 Jul 2014 07:21:04 -0400
-In-Reply-To: <1405891964.9562.42.camel@localhost>
+Received: from mail-bn1lp0145.outbound.protection.outlook.com ([207.46.163.145]:1034
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1755209AbaGUNEh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Jul 2014 09:04:37 -0400
+In-Reply-To: <53CCC5A5.1070004@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> I don't like partial reads/writes and think that a lot of people get
-> them wrong, because they often only check for negative return values.
+RSR (Request Source Register) is not used when
+virtualization is disabled, thus don't poll for Valid bit.
 
-The v1 patch, which did it right IMHO, didn't do partial reads in the
-case we're talking about:
+Besides this, if used, timeout has to be reinitialized.
 
-+	if (count > 256)
-+		return -EINVAL;
+Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+---
+Only compile-tested.
+Ruchika / Kim, please review / test.
 
-> In case of urandom extraction, I wouldn't actually limit the number of
-> bytes. A lot of applications I have seen already extract more than 128
-> out of urandom (not for seeding a prng but just to mess around with some
-> memory). I don't see a reason why getrandom shouldn't be used for that.
-> It just adds one more thing to look out for if using getrandom() in
-> urandom mode, especially during porting an application over to this new
-> interface.
+ drivers/crypto/caam/ctrl.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-Again, I disagree.  If it's "just messing around" code, use /dev/urandom.
-It's more portable and you don't care about the fd exhaustion attacks.
-
-If it's actual code to be used in anger, fix it to not abuse /dev/urandom.
-
-You're right that a quick hack might be "broken on purpose", but without
-exception, *all* code that I have seen which reads 64 or more bytes from
-/dev/*random is broken, and highlighting the brokenness is a highly
-desirable thing.
-
-The sole and exclusive reason for this syscall to exist at all is to
-solve a security problem.  Supporting broken security code does no favors
-to anyone.
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index c6e9d3b2d502..84d4b95c761e 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -89,12 +89,15 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc,
+ 	/* Set the bit to request direct access to DECO0 */
+ 	topregs = (struct caam_full __iomem *)ctrlpriv->ctrl;
+ 
+-	if (ctrlpriv->virt_en == 1)
++	if (ctrlpriv->virt_en == 1) {
+ 		setbits32(&topregs->ctrl.deco_rsr, DECORSR_JR0);
+ 
+-	while (!(rd_reg32(&topregs->ctrl.deco_rsr) & DECORSR_VALID) &&
+-	       --timeout)
+-		cpu_relax();
++		while (!(rd_reg32(&topregs->ctrl.deco_rsr) & DECORSR_VALID) &&
++		       --timeout)
++			cpu_relax();
++
++		timeout = 100000;
++	}
+ 
+ 	setbits32(&topregs->ctrl.deco_rq, DECORR_RQD0ENABLE);
+ 
+-- 
+1.8.3.1
