@@ -1,44 +1,63 @@
-From: Dwayne Litzenberger <dlitz@dlitz.net>
-Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Sun, 20 Jul 2014 17:25:40 -0700
-Message-ID: <20140721002540.GA20595@rivest.lan>
-References: <1405588695-12014-1-git-send-email-tytso@mit.edu>
- <20140717161215.GA14951@infradead.org>
- <20140717170115.GO1491@thunk.org>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH 0/25] Replace DEFINE_PCI_DEVICE_TABLE macro use
+Date: Sun, 20 Jul 2014 21:18:13 -0700 (PDT)
+Message-ID: <20140720.211813.942862864883062133.davem@davemloft.net>
+References: <1405697232-11785-1-git-send-email-benoit.taine@lip6.fr>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-To: Theodore Ts'o <tytso@mit.edu>,
-	Christoph Hellwig <hch@infradead.org>,
-	linux-kernel@vger.kernel.org, linux-abi@vger.kernel.org,
-	linux-crypto@vger.kernel.org, beck@openbsd.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20140717170115.GO1491@thunk.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-pci@vger.kernel.org, ath5k-devel@venema.h4ckr.net,
+	ath9k-devel@venema.h4ckr.net, linux-hippi@sunsite.dk,
+	dri-devel@lists.freedesktop.org, linux-acenic@sunsite.dk,
+	wil6210@qca.qualcomm.com, platform-driver-x86@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-mips@linux-mips.org, users@rt2x00.serialmonkey.com,
+	linux-rdma@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	industrypack-devel@lists.sourceforge.net,
+	linux-can@vger.kernel.org, linux-mmc@vger.kernel.org,
+	linux-fbdev@vger.kernel.org, ath10k@lists.infradead.org,
+	linux-crypto@vger.kernel.org, MPT-FusionLinux.pdl@avagotech.com,
+	devel@linuxdriverproject.org, xen-devel@lists.xenproject.org,
+	linux-pcmcia@lists.infradead.org, e1000-devel@lists.sourceforge.net
+To: benoit.taine@lip6.fr
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from shards.monkeyblade.net ([149.20.54.216]:53134 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751061AbaGUESP (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 21 Jul 2014 00:18:15 -0400
+In-Reply-To: <1405697232-11785-1-git-send-email-benoit.taine@lip6.fr>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 17, 2014 at 01:01:16PM -0400, Theodore Ts'o wrote:
->The getrandom(2) system call is a superset of getentropy(2).  When we
->add the support for this into glibc, it won't be terribly difficult
->nor annoying to drop the following in alongside the standard support
->needed for any new system call:
->
->int getentropy(void *buf, size_t buflen)
->{
->	int	ret;
->
->	ret = getentropy(buf, buflen, 0);
->	return (ret > 0) ? 0 : ret;
->}
->
->The reason for the additional flags is that I'm trying to solve more
->problems than just getentropy()'s raison d'etre.  The discussion of
->this is in the commit description; let me know if there bits that I
->could make clearer.
+From: Benoit Taine <benoit.taine@lip6.fr>
+Date: Fri, 18 Jul 2014 17:26:47 +0200
 
-This could still return predictable bytes during early boot, though, 
-right?
+> We should prefer `const struct pci_device_id` over
+> `DEFINE_PCI_DEVICE_TABLE` to meet kernel coding style guidelines.
+> This issue was reported by checkpatch.
+> 
+> A simplified version of the semantic patch that makes this change is as
+> follows (http://coccinelle.lip6.fr/):
+> 
+> // <smpl>
+> 
+> @@
+> identifier i;
+> declarer name DEFINE_PCI_DEVICE_TABLE;
+> initializer z;
+> @@
+> 
+> - DEFINE_PCI_DEVICE_TABLE(i)
+> + const struct pci_device_id i[]
+> = z;
+> 
+> // </smpl>
+> 
+> I have 103 patches ready, and will only send a few for you to judge if
+> it is useful enough, and to prevent from spamming too much.
 
--- 
-Dwayne C. Litzenberger <dlitz@dlitz.net>
- OpenPGP: 19E1 1FE8 B3CF F273 ED17  4A24 928C EC13 39C2 5CF7
+I'm fine with this wrt. the networking changes, but I don't think this should
+be merged via my tree.
