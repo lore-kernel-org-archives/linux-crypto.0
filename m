@@ -1,128 +1,114 @@
-From: Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH 0/25] Replace DEFINE_PCI_DEVICE_TABLE macro use
-Date: Mon, 21 Jul 2014 17:16:03 -0600
-Message-ID: <CAErSpo7svKg0HiL=g8wWAHWUN3vs0UgCvVhvd84DM6nVDmT=FQ@mail.gmail.com>
-References: <1405697232-11785-1-git-send-email-benoit.taine@lip6.fr>
-	<20140718162213.GC31114@tuxdriver.com>
-	<20140718164340.GA24960@kroah.com>
-	<1405702472.30262.1.camel@dabdike.int.hansenpartnership.com>
-	<20140718181759.GB2193@kroah.com>
-	<1405709421.30262.8.camel@dabdike.int.hansenpartnership.com>
+From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
+Date: Tue, 22 Jul 2014 03:02:20 +0200
+Message-ID: <1405990940.28229.4.camel@localhost>
+References: <20140721112102.19300.qmail@ns.horizon.com>
+	 <1405956426.2319.37.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-mips@linux-mips.org" <linux-mips@linux-mips.org>,
-	linux-fbdev@vger.kernel.org,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	DRI mailing list <dri-devel@lists.freedesktop.org>,
-	virtualization@lists.linux-foundation.org,
-	Benoit Taine <benoit.taine@lip6.fr>,
-	ath5k-devel@venema.h4ckr.net, linux-acenic@sunsite.dk,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	users@rt2x00.serialmonkey.com,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	Jingoo Han <jg1.han@samsung.com>, ath10k@lists.infradead.org,
-	linux-hippi@sunsite.dk, industrypack-devel@lists.sourceforge.net,
-	Greg KH <greg@kroah.com>, linux-wireless <linux-wireless@vger.kernel.org>,
-	"xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-	MPT-FusionLinux.pdl@avagotech.com, ath9k-devel@venema.h4ckr.net,
-	wil6210@qca.qualcomm.com, linux-pcmcia@lists.infradead.org,
-	"John
-To: James Bottomley <James.Bottomley@hansenpartnership.com>
-Return-path: <virtualization-bounces@lists.linux-foundation.org>
-In-Reply-To: <1405709421.30262.8.camel@dabdike.int.hansenpartnership.com>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
-List-Post: <mailto:virtualization@lists.linux-foundation.org>
-List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
-	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
-Sender: virtualization-bounces@lists.linux-foundation.org
-Errors-To: virtualization-bounces@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	tytso@mit.edu
+To: George Spelvin <linux@horizon.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1405956426.2319.37.camel@localhost>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-WytjYyBKaW5nb29dCgpPbiBGcmksIEp1bCAxOCwgMjAxNCBhdCAxMjo1MCBQTSwgSmFtZXMgQm90
-dG9tbGV5CjxKYW1lcy5Cb3R0b21sZXlAaGFuc2VucGFydG5lcnNoaXAuY29tPiB3cm90ZToKPiBP
-biBGcmksIDIwMTQtMDctMTggYXQgMTE6MTcgLTA3MDAsIEdyZWcgS0ggd3JvdGU6Cj4+IE9uIEZy
-aSwgSnVsIDE4LCAyMDE0IGF0IDA5OjU0OjMyQU0gLTA3MDAsIEphbWVzIEJvdHRvbWxleSB3cm90
-ZToKPj4gPiBPbiBGcmksIDIwMTQtMDctMTggYXQgMDk6NDMgLTA3MDAsIEdyZWcgS0ggd3JvdGU6
-Cj4+ID4gPiBPbiBGcmksIEp1bCAxOCwgMjAxNCBhdCAxMjoyMjoxM1BNIC0wNDAwLCBKb2huIFcu
-IExpbnZpbGxlIHdyb3RlOgo+PiA+ID4gPiBPbiBGcmksIEp1bCAxOCwgMjAxNCBhdCAwNToyNjo0
-N1BNICswMjAwLCBCZW5vaXQgVGFpbmUgd3JvdGU6Cj4+ID4gPiA+ID4gV2Ugc2hvdWxkIHByZWZl
-ciBgY29uc3Qgc3RydWN0IHBjaV9kZXZpY2VfaWRgIG92ZXIKPj4gPiA+ID4gPiBgREVGSU5FX1BD
-SV9ERVZJQ0VfVEFCTEVgIHRvIG1lZXQga2VybmVsIGNvZGluZyBzdHlsZSBndWlkZWxpbmVzLgo+
-PiA+ID4gPiA+IFRoaXMgaXNzdWUgd2FzIHJlcG9ydGVkIGJ5IGNoZWNrcGF0Y2guCj4+ID4gPiA+
-Cj4+ID4gPiA+IEhvbmVzdGx5LCBJIHByZWZlciB0aGUgbWFjcm8gLS0gaXQgc3RhbmRzLW91dCBt
-b3JlLiAgTWF5YmUgdGhlIHN0eWxlCj4+ID4gPiA+IGd1aWRlbGluZXMgYW5kL29yIGNoZWNrcGF0
-Y2ggc2hvdWxkIGNoYW5nZSBpbnN0ZWFkPwo+PiA+ID4KPj4gPiA+IFRoZSBtYWNybyBpcyBob3Jy
-aWQsIG5vIG90aGVyIGJ1cyBoYXMgdGhpcyB0eXBlIG9mIHRoaW5nIGp1c3QgdG8gc2F2ZSBhCj4+
-ID4gPiBmZXcgY2hhcmFjdGVycyBpbiB0eXBpbmcKPj4gPgo+PiA+IE9LLCBzbyB0aGlzIGlzIHRo
-ZSBtYWNybzoKPj4gPgo+PiA+ICNkZWZpbmUgREVGSU5FX1BDSV9ERVZJQ0VfVEFCTEUoX3RhYmxl
-KSBcCj4+ID4gICAgIGNvbnN0IHN0cnVjdCBwY2lfZGV2aWNlX2lkIF90YWJsZVtdCj4+ID4KPj4g
-PiBDb3VsZCB5b3UgZXhwbGFpbiB3aGF0J3Mgc28gaG9ycmlibGU/Cj4+ID4KPj4gPiBUaGUgcmVh
-c29uIGl0J3MgdXNlZnVsIHRvZGF5IGlzIHRoYXQgcGVvcGxlIGZvcmdldCB0aGUgY29uc3QgKGFu
-ZAo+PiA+IHNvbWV0aW1lcyB0aGUgW10gbWFraW5nIGl0IGEgdHJ1ZSB0YWJsZSBpbnN0ZWFkIG9m
-IGEgcG9pbnRlcikuICBJZiB5b3UKPj4gPiB1c2UgdGhlIERFRklORV9QQ0lfREVWSUNFX1RBQkxF
-IG1hY3JvLCB0aGUgY29tcGlsZSBicmVha3MgaWYgeW91IHVzZSBpdAo+PiA+IHdyb25nbHkgKGdv
-b2QpIGFuZCB5b3UgYXV0b21hdGljYWxseSBnZXQgdGhlIGNvcnJlY3QgYW5ub3RhdGlvbnMuCj4+
-Cj4+IFdlIGhhdmUgYWxtb3N0IDEwMDAgbW9yZSB1c2VzIG9mIHRoZSBub24tbWFjcm8gdmVyc2lv
-biB0aGFuIHRoZSAibWFjcm8iCj4+IHZlcnNpb24gaW4gdGhlIGtlcm5lbCB0b2RheToKPj4gJCBn
-aXQgZ3JlcCAtdyBERUZJTkVfUENJX0RFVklDRV9UQUJMRSB8IHdjIC1sCj4+IDI2Mgo+PiAkIGdp
-dCBncmVwICJjb25zdCBzdHJ1Y3QgcGNpX2RldmljZV9pZCIgfCB3YyAtbAo+PiAxMjU0Cj4+Cj4+
-IE15IGJpZyBjb21wbGFpbnQgaXMgdGhhdCB3ZSBuZWVkIHRvIGJlIGNvbnNpc3RhbnQsIGVpdGhl
-ciBwaWNrIG9uZSBvcgo+PiB0aGUgb3RoZXIgYW5kIHN0aWNrIHRvIGl0LiAgQXMgdGhlIG1hY3Jv
-IGlzIHRoZSBsZWFzdCB1c2VkLCBpdCdzIGVhc2llc3QKPj4gdG8gZml4IHVwLCBhbmQgaXQgYWxz
-byBpcyBtb3JlIGNvbnNpc3RhbnQgd2l0aCBhbGwgb3RoZXIga2VybmVsCj4+IHN1YnN5c3RlbXMg
-d2hpY2ggZG8gbm90IGhhdmUgc3VjaCBhIG1hY3JvLgo+Cj4gSSd2ZSBhIHdlYWsgcHJlZmVyZW5j
-ZSBmb3IgY29uc2lzdGVuY3ksIGJ1dCBub3QgYXQgdGhlIGV4cGVuc2Ugb2YKPiBodW5kcmVkcyBv
-ZiBwYXRjaGVzIGNodXJuaW5nIHRoZSBrZXJuZWwgdG8gcmVtb3ZlIGFuIGlubm9jdW91cyBtYWNy
-by4KPiBDaHVybiBjb3N0cyB0aW1lIGFuZCBlZmZvcnQuCj4KPj4gQXMgdGhlcmUgaXMgbm8gbmVl
-ZCBmb3IgdGhlIF9faW5pdCBtYWNybyBtZXNzIGFueW1vcmUsIHRoZXJlJ3Mgbm8gcmVhbAo+PiBu
-ZWVkIGZvciB0aGUgREVGSU5FX1BDSV9ERVZJQ0VfVEFCTEUgbWFjcm8gZWl0aGVyLiAgSSB0aGlu
-ayBjaGVja3BhdGNoCj4+IHdpbGwgY2F0Y2ggdGhlIHVzZSBvZiBub24tY29uc3QgdXNlcnMgZm9y
-IHRoZSBpZCB0YWJsZSBhbHJlYWR5IHRvZGF5LCBpdAo+PiBjYXRjaGVzIGxvdHMgb2Ygb3RoZXIg
-dXNlcyBsaWtlIHRoaXMgYWxyZWFkeS4KPj4KPj4gPiA+ICwgc28gd2h5IHNob3VsZCBQQ0kgYmUg
-InNwZWNpYWwiIGluIHRoaXMgcmVnYXJkCj4+ID4gPiBhbnltb3JlPwo+PiA+Cj4+ID4gSSB0aGlu
-ayB0aGUgUENJIHVzYWdlIGR3YXJmcyBtb3N0IG90aGVyIGJ1cyB0eXBlcyBub3csIHNvIHlvdSBj
-b3VsZCB0dXJuCj4+ID4gdGhlIHF1ZXN0aW9uIGFyb3VuZC4gIEhvd2V2ZXIsIEkgZG9uJ3QgdGhp
-bmsgbWFqb3JpdHkgdm90aW5nIGlzIGEgZ29vZAo+PiA+IGd1aWRlIHRvIGJlc3QgcHJhY3Rpc2U7
-IGxldHMgZGViYXRlIHRoZSBtZXJpdHMgZm9yIHRoZWlyIG93biBzYWtlLgo+Pgo+PiBOb3QgcmVh
-bGx5ICJkd2FyZiIsIFVTQiBpcyBjbG9zZSB3aXRoIG92ZXIgNzAwIHN1Y2ggc3RydWN0dXJlczoK
-Pj4gJCBnaXQgZ3JlcCAiY29uc3Qgc3RydWN0IHVzYl9kZXZpY2VfaWQiIHwgd2MgLWwKPj4gNzI1
-Cj4+Cj4+IEFuZCBpMmMgaXMgYWxtb3N0IGp1c3QgYXMgYmlnIGFzIFBDSToKPj4gJCBnaXQgZ3Jl
-cCAiY29uc3Qgc3RydWN0IGkyY19kZXZpY2VfaWQiIHwgd2MgLWwKPj4gMTIyMwo+Pgo+PiBTbyBh
-Z2FpbiwgdGhpcyBtYWNybyBpcyBub3QgY29uc2lzdGVudCB3aXRoIHRoZSBtYWpvcml0eSBvZiBQ
-Q0kgZHJpdmVycywKPj4gbm9yIHdpdGggYW55IG90aGVyIHR5cGUgb2YgImRldmljZSBpZCIgZGVj
-bGFyYXRpb24gaW4gdGhlIGtlcm5lbCwgd2hpY2gKPj4gaXMgd2h5IEkgZmVlbCBpdCBzaG91bGQg
-YmUgcmVtb3ZlZC4KPj4KPj4gQW5kIGZpbmFsbHksIHRoZSBQQ0kgZG9jdW1lbnRhdGlvbiBpdHNl
-bGYgc2F5cyB0byBub3QgdXNlIHRoaXMgbWFjcm8sIHNvCj4+IHRoaXMgaXNuJ3QgYSAibmV3IiB0
-aGluZy4gIEZyb20gRG9jdW1lbnRhdGlvbi9QQ0kvcGNpLnR4dDoKPj4KPj4gICAgICAgVGhlIElE
-IHRhYmxlIGlzIGFuIGFycmF5IG9mIHN0cnVjdCBwY2lfZGV2aWNlX2lkIGVudHJpZXMgZW5kaW5n
-IHdpdGggYW4KPj4gICAgICAgYWxsLXplcm8gZW50cnkuICBEZWZpbml0aW9ucyB3aXRoIHN0YXRp
-YyBjb25zdCBhcmUgZ2VuZXJhbGx5IHByZWZlcnJlZC4KPj4gICAgICAgVXNlIG9mIHRoZSBkZXBy
-ZWNhdGVkIG1hY3JvIERFRklORV9QQ0lfREVWSUNFX1RBQkxFIHNob3VsZCBiZSBhdm9pZGVkLgo+
-Pgo+PiBUaGF0IHdvcmRpbmcgd2VudCBpbnRvIHRoZSBmaWxlIGxhc3QgRGVjZW1iZXIsIHdoZW4g
-d2UgbGFzdCB0YWxrZWQgYWJvdXQKPj4gdGhpcyBhbmQgZXZlcnlvbmUgaW4gdGhhdCBkaXNjdXNz
-aW9uIGFncmVlZCB0byByZW1vdmUgdGhlIG1hY3JvIGZvciB0aGUKPj4gYWJvdmUgcmVhc29ucy4K
-Pj4KPj4gQ29uc2lzdGVuY3kgbWF0dGVycy4KPgo+IEluIHRoaXMgY2FzZSwgSSBkb24ndCB0aGlu
-ayBpdCBkb2VzIHRoYXQgbXVjaCAuLi4gYSBjdXQgYW5kIHBhc3RlIGVpdGhlcgo+IHdheSAoZnJv
-bSBhIG1hY3JvIG9yIG5vbi1tYWNybyBiYXNlZCBkcml2ZXIpIHlpZWxkcyBjb3JyZWN0IGNvZGUu
-ICBTaW5jZQo+IHRoZXJlJ3Mgbm8gYnVnIGhlcmUgYW5kIG5vIGFwcGFyZW50IHdheSB0byBtaXN1
-c2UgdGhlIG1hY3JvLCB3aHkgYm90aGVyPwo+Cj4gQW55d2F5LCBpdCdzIFBDSSBjb2RlIC4uLiBs
-ZXQgdGhlIFBDSSBtYWludGFpbmVyIGRlY2lkZS4gIEhvd2V2ZXIsIGlmIGhlCj4gZG9lcyB3YW50
-IHRoaXMgZG8gaXQgYXMgb25lIGJpZyBiYW5nIHBhdGNoIHZpYSBlaXRoZXIgdGhlIFBDSSBvciBU
-cml2aWFsCj4gdHJlZSAobGF0dGVyIGJlY2F1c2UgSmnFmcOtIGhhcyBleHBlcmllbmNlIGRvaW5n
-IHRoaXMsIGJ1dCB0aGUgZm9ybWVyCj4gbWlnaHQgYmUgdXNlZnVsIHNvIHRoZSBkZWNpZGVyIGZl
-ZWxzIHRoZSBwYWluIC4uLikKCkkgZG9uJ3QgZmVlbCBzdHJvbmdseSBlaXRoZXIgd2F5LCBzbyBJ
-IGd1ZXNzIEknbSBPSyB3aXRoIHRoaXMsIGFuZCBpbgp0aGUgc3Bpcml0IG9mIGZlZWxpbmcgdGhl
-IHBhaW4sIEknbSB3aWxsaW5nIHRvIGhhbmRsZSBpdC4gIEppbmdvbwpwcm9wb3NlZCBzaW1pbGFy
-IHBhdGNoZXMsIHNvIGl0IG1pZ2h0IGJlIG5pY2UgdG8gZ2l2ZSBoaW0gc29tZSBjcmVkaXQuCgpC
-ZW5vaXQsIGhvdyBhYm91dCBpZiB5b3Ugd2FpdCB1bnRpbCBhYm91dCBoYWxmLXdheSB0aHJvdWdo
-IHRoZSBtZXJnZQp3aW5kb3cgYWZ0ZXIgdjMuMTYgcmVsZWFzZXMsIGdlbmVyYXRlIGFuIHVwLXRv
-LWRhdGUgc2luZ2xlIHBhdGNoLCBhbmQKcG9zdCB0aGF0PyAgVGhlbiB3ZSBjYW4gdHJ5IHRvIGdl
-dCBpdCBpbiBiZWZvcmUgdjMuMTctcmMxIHRvIG1pbmltaXplCm1lcmdlIGhhc3NsZXMuCgpCam9y
-bgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpWaXJ0dWFs
-aXphdGlvbiBtYWlsaW5nIGxpc3QKVmlydHVhbGl6YXRpb25AbGlzdHMubGludXgtZm91bmRhdGlv
-bi5vcmcKaHR0cHM6Ly9saXN0cy5saW51eGZvdW5kYXRpb24ub3JnL21haWxtYW4vbGlzdGluZm8v
-dmlydHVhbGl6YXRpb24=
+On Mo, 2014-07-21 at 17:27 +0200, Hannes Frederic Sowa wrote:
+> On Mo, 2014-07-21 at 07:21 -0400, George Spelvin wrote:
+> > > I don't like partial reads/writes and think that a lot of people get
+> > > them wrong, because they often only check for negative return values.
+> > 
+> > The v1 patch, which did it right IMHO, didn't do partial reads in the
+> > case we're talking about:
+> > 
+> > +	if (count > 256)
+> > +		return -EINVAL;
+> 
+> I checked and unfortunately it does not; 256 bytes is way too large to
+> guarantee non-existence of partial reads. On a typical older system
+> without rdrand/rdseed you would have to limit the amount of bytes to
+> extract to about 32. That's way too low. That said, the 512 bytes check
+> only in case of extracting bytes from blocking pool would serve no
+> purpose.
+
+Ted, would it make sense to specifiy a 512 byte upper bound limit for
+random entropy extraction (I am not yet convinced to do that for
+urandom) and in case the syscall should block we make sure that we
+extract the amount of bytes the user requested?
+
+Having a quick look maybe something like this? Only compile tested and
+maybe can still be simplified. It guarantees we don't do a partial write
+to user space for sub 512 bytes requests.
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 2721543..c0db6f5 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1345,8 +1345,14 @@ static int arch_random_refill(void)
+ 	return n;
+ }
+ 
++enum blocking_mode {
++	NONBLOCKING,
++	SYSCALL_BLOCK,
++	DEV_RANDOM_BLOCK
++};
++
+ static ssize_t
+-_random_read(int nonblock, char __user *buf, size_t nbytes)
++_random_read(enum blocking_mode mode, char __user *buf, size_t nbytes)
+ {
+ 	ssize_t n;
+ 
+@@ -1361,7 +1367,7 @@ _random_read(int nonblock, char __user *buf, size_t nbytes)
+ 		trace_random_read(n*8, (nbytes-n)*8,
+ 				  ENTROPY_BITS(&blocking_pool),
+ 				  ENTROPY_BITS(&input_pool));
+-		if (n > 0)
++		if (mode != SYSCALL_BLOCK && n > 0)
+ 			return n;
+ 
+ 		/* Pool is (near) empty.  Maybe wait and retry. */
+@@ -1370,7 +1376,7 @@ _random_read(int nonblock, char __user *buf, size_t nbytes)
+ 		if (arch_random_refill())
+ 			continue;
+ 
+-		if (nonblock)
++		if (mode == NONBLOCKING)
+ 			return -EAGAIN;
+ 
+ 		wait_event_interruptible(random_read_wait,
+@@ -1384,7 +1390,8 @@ _random_read(int nonblock, char __user *buf, size_t nbytes)
+ static ssize_t
+ random_read(struct file *file, char __user *buf, size_t nbytes, loff_t *ppos)
+ {
+-	return _random_read(file->f_flags & O_NONBLOCK, buf, nbytes);
++	return _random_read(file->f_flags & O_NONBLOCK ? NONBLOCKING :
++			    DEV_RANDOM_BLOCK, buf, nbytes);
+ }
+ 
+ static ssize_t
+@@ -1534,8 +1541,6 @@ const struct file_operations urandom_fops = {
+ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
+ 		unsigned int, flags)
+ {
+-	int r;
+-
+ 	if (flags & ~(GRND_NONBLOCK|GRND_RANDOM))
+ 		return -EINVAL;
+ 
+@@ -1543,7 +1548,8 @@ SYSCALL_DEFINE3(getrandom, char __user *, buf, size_t, count,
+ 		count = INT_MAX;
+ 
+ 	if (flags & GRND_RANDOM)
+-		return _random_read(flags & GRND_NONBLOCK, buf, count);
++		return _random_read(flags & GRND_NONBLOCK ? NONBLOCKING :
++				    SYSCALL_BLOCK, buf, count);
+ 
+ 	if (unlikely(nonblocking_pool.initialized == 0)) {
+ 		if (flags & GRND_NONBLOCK)
+
+Bye,
+Hannes
