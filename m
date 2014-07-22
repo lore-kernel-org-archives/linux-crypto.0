@@ -1,68 +1,45 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH 01/10] crypto: testmgr - avoid DMA mapping from text,
- rodata, stack
-Date: Tue, 22 Jul 2014 17:37:10 -0500
-Message-ID: <20140722173710.d9956cf5b8a9757eab955b9e@freescale.com>
-References: <1405082095-30146-1-git-send-email-horia.geanta@freescale.com>
-	<1405082095-30146-2-git-send-email-horia.geanta@freescale.com>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
+Date: Tue, 22 Jul 2014 18:59:50 -0400
+Message-ID: <20140722225950.GU25291@thunk.org>
+References: <20140721112102.19300.qmail@ns.horizon.com>
+ <1405956426.2319.37.camel@localhost>
+ <1405990940.28229.4.camel@localhost>
+ <20140722044409.GE24960@thunk.org>
+ <1406022592.2407.9.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	<linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	Vakul Garg <vakul@freescale.com>
-To: Horia Geanta <horia.geanta@freescale.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: George Spelvin <linux@horizon.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Hannes Frederic Sowa <hannes@stressinduktion.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1blp0182.outbound.protection.outlook.com ([207.46.163.182]:34275
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S933141AbaGVWmU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 22 Jul 2014 18:42:20 -0400
-In-Reply-To: <1405082095-30146-2-git-send-email-horia.geanta@freescale.com>
+Received: from imap.thunk.org ([74.207.234.97]:51128 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932866AbaGVW7z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 22 Jul 2014 18:59:55 -0400
+Content-Disposition: inline
+In-Reply-To: <1406022592.2407.9.camel@localhost>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 11 Jul 2014 15:34:46 +0300
-Horia Geanta <horia.geanta@freescale.com> wrote:
+On Tue, Jul 22, 2014 at 11:49:52AM +0200, Hannes Frederic Sowa wrote:
+> 
+> I think a lot of checks are of the type "if (getrandom() < 0)", so this
+> actually was the kind of programming errors I wanted to guard against. 
+> Also, on some systems it is very likely that we return a short write to
+> user space, so it prevents this very common situation. Even if one would
+> like to extract 64 bytes randomness, one would often need two calls to
+> getrandom() on my virtualized systems. Would be great to know that in
+> blocking mode, either I get a -1 or the buffer is always filled and I
+> won't need to do pointer arithmetic to fill the rest of the buffer.
 
-> +++ b/crypto/testmgr.c
-> @@ -198,13 +198,20 @@ static int __test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
->  	const char *algo = crypto_tfm_alg_driver_name(crypto_ahash_tfm(tfm));
->  	unsigned int i, j, k, temp;
->  	struct scatterlist sg[8];
-> -	char result[64];
-> +	char *result = NULL;
-> +	char *key = NULL;
+But why would you need to use GRND_RANDOM in your scenario, and accept
+your application potentially getting stalled and stuck in amber for
+perhaps hours?  If you are going to accept your application stalling
+like that, you can do the pointer arithmatic.  It's really not hard,
+and someone who can't do that, again, shouldn't be allowd anywhere
+near crypto code in the first place (and if they are, they'll probably
+be making lots of other, equally fatal if not more so, newbie
+mistakes).
 
-these needn't be initialized, here and elsewhere.
-
->  	struct ahash_request *req;
->  	struct tcrypt_result tresult;
->  	void *hash_buff;
->  	char *xbuf[XBUFSIZE];
->  	int ret = -ENOMEM;
->  
-> +	result = kmalloc(64, GFP_KERNEL);
-
-s/64/MAX_DIGEST_SIZE
-
-> +++ b/crypto/testmgr.h
-> @@ -32,7 +32,7 @@
->  #define MAX_DIGEST_SIZE		64
->  #define MAX_TAP			8
->  
-> -#define MAX_KEYLEN		56
-> +#define MAX_KEYLEN		160
->  #define MAX_IVLEN		32
-
-this change could use a blurb in the commit message.
-
-Other than that, this series gets my:
-
-Acked-by: Kim Phillips <kim.phillips@freescale.com>
-
-Thanks!
-
-Kim
+							- Ted
