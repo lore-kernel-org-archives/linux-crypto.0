@@ -1,40 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: initialize entry len for null input in crypto
- hash sg list walk
-Date: Wed, 23 Jul 2014 21:09:45 +0800
-Message-ID: <20140723130945.GA29178@gondor.apana.org.au>
-References: <1405034288.2970.647.camel@schen9-DESK>
+Subject: Re: [RFC, prePATCH] crypto: talitos modified for powerpc 88x
+ security engine
+Date: Wed, 23 Jul 2014 21:10:48 +0800
+Message-ID: <20140723131048.GB29178@gondor.apana.org.au>
+References: <20140711120939.DD0031A9740@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+Cc: Kim Phillips <kim.phillips@freescale.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Paul Mackerras <paulus@samba.org>,
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
 	linux-crypto@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
+To: Christophe Leroy <christophe.leroy@c-s.fr>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:35333 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:43071 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751605AbaGWNKN (ORCPT
+	with ESMTP id S1751509AbaGWNL0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Jul 2014 09:10:13 -0400
+	Wed, 23 Jul 2014 09:11:26 -0400
 Content-Disposition: inline
-In-Reply-To: <1405034288.2970.647.camel@schen9-DESK>
+In-Reply-To: <20140711120939.DD0031A9740@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 10, 2014 at 04:18:08PM -0700, Tim Chen wrote:
-> For the special case when we have a null input string, we want
-> to initialize the entry len to 0 for the hash/ahash walk, so
-> cyrpto_hash_walk_last will return the correct result indicating
-> that we have completed the scatter list walk.  Otherwise we may
-> keep walking the sg list and access bogus memory address.
-> 
-> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+On Fri, Jul 11, 2014 at 02:09:39PM +0200, Christophe Leroy wrote:
+> Here is a pre-patch for the support of the SEC ENGINE of MPC88x/MPC82xx
+> I have tried to make use of defines in order to keep a single driver for the two
+> TALITOS variants as suggested by Kim, but I'm not too happy about the quantity
+> of #ifdef
 
-Sorry but which driver is broken by this?
+Yeah these ifdefs have got to go.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
