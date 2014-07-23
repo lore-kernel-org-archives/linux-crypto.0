@@ -1,36 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 3/3] crypto: Add Allwinner Security System crypto
- accelerator
-Date: Wed, 23 Jul 2014 21:16:20 +0800
-Message-ID: <20140723131620.GC29178@gondor.apana.org.au>
-References: <1405169953-13695-1-git-send-email-clabbe.montjoie@gmail.com>
- <1405169953-13695-4-git-send-email-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH] crypto: ccp - Base AXI DMA cache settings on device tree
+Date: Wed, 23 Jul 2014 21:35:27 +0800
+Message-ID: <20140723133527.GA29756@gondor.apana.org.au>
+References: <20140710155835.17665.84896.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
-	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
-	rdunlap@infradead.org, maxime.ripard@free-electrons.com,
-	linux@arm.linux.org.uk, davem@davemloft.net,
-	grant.likely@linaro.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:51786 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751509AbaGWNfb (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Jul 2014 09:35:31 -0400
 Content-Disposition: inline
-In-Reply-To: <1405169953-13695-4-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20140710155835.17665.84896.stgit@tlendack-t1.amdoffice.net>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Jul 12, 2014 at 02:59:13PM +0200, LABBE Corentin wrote:
-> Add support for the Security System included in Allwinner SoC A20.
-> The Security System is a hardware cryptographic accelerator that support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+On Thu, Jul 10, 2014 at 10:58:35AM -0500, Tom Lendacky wrote:
+> The default cache operations for ARM64 were changed during 3.15.
+> To use coherent operations a "dma-coherent" device tree property
+> is required.  If that property is not present in the device tree
+> node then the non-coherent operations are assigned for the device.
 > 
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+> Add support to the ccp driver to assign the AXI DMA cache settings
+> based on whether the "dma-coherent" property is present in the device
+> node.  If present, use settings that work with the caches.  If not
+> present, use settings that do not look at the caches.
+> 
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-This is essentially a synchronous driver, no? If so please
-switch to the blkcipher/shash interface.
-
-Thanks,
+Patch applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
