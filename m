@@ -1,45 +1,58 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v4 3/3] crypto: Add Allwinner Security System crypto
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 3/3] crypto: Add Allwinner Security System crypto
  accelerator
-Date: Wed, 23 Jul 2014 21:54:12 +0800
-Message-ID: <20140723135412.GA30046@gondor.apana.org.au>
-References: <1405169953-13695-1-git-send-email-clabbe.montjoie@gmail.com>
- <1405169953-13695-4-git-send-email-clabbe.montjoie@gmail.com>
- <20140723131620.GC29178@gondor.apana.org.au>
- <20140723134857.GO20328@lukather>
+Date: Wed, 23 Jul 2014 21:57:35 +0800
+Message-ID: <20140723135735.GA30132@gondor.apana.org.au>
+References: <1400771396-9686-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1400771396-9686-4-git-send-email-clabbe.montjoie@gmail.com>
+ <201405241400.03456.marex@denx.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
-	rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: LABBE Corentin <clabbe.montjoie@gmail.com>, robh+dt@kernel.org,
+	pawel.moll@arm.com, mark.rutland@arm.com,
+	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
+	rdunlap@infradead.org, maxime.ripard@free-electrons.com,
+	linux@arm.linux.org.uk, davem@davemloft.net,
+	grant.likely@linaro.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Marek Vasut <marex@denx.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:35542 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752817AbaGWN6S (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Jul 2014 09:58:18 -0400
 Content-Disposition: inline
-In-Reply-To: <20140723134857.GO20328@lukather>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <201405241400.03456.marex@denx.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 23, 2014 at 03:48:57PM +0200, Maxime Ripard wrote:
+On Sat, May 24, 2014 at 02:00:03PM +0200, Marek Vasut wrote:
 >
-> The exact opposite has been asked for during v1's review...
+> > +	}
+> > +#endif
+> > +
+> > +#ifdef CONFIG_CRYPTO_DEV_SUNXI_SS_MD5
+> > +	err = crypto_register_shash(&sunxi_md5_alg);
+> 
+> Do not use shash for such device. This is clearly and ahash (and async in 
+> general) device. The rule of a thumb here is that you use sync algos only for 
+> devices which have dedicated instructions for computing the transformation. For 
+> devices which are attached to some kind of bus, you use async algos (ahash etc).
 
-Indeed but unfortunately it was bogus advice.  The async interface
-brings with it a lot of complexity which should be avoided unless
-you actually need it.
+I'm sorry that I didn't catch this earlier but there is no such
+rule.
 
-Even if you use the sync interface your driver will still be
-available to all async users.
+Unless you need the async interface you should stick to the sync
+interfaces for the sake of simplicity.
+
+We have a number of existing drivers that are synchronous but
+using the async interface.  They should either be converted
+over to the sync interface or made interrupt-driven if possible.
 
 Cheers,
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
