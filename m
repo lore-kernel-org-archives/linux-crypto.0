@@ -1,53 +1,41 @@
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
-Date: Wed, 23 Jul 2014 14:10:16 +0200
-Message-ID: <1406117416.4473.144770005.5B5ED8C2@webmail.messagingengine.com>
-References: <20140723115253.9808.qmail@ns.horizon.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: initialize entry len for null input in crypto
+ hash sg list walk
+Date: Wed, 23 Jul 2014 21:09:45 +0800
+Message-ID: <20140723130945.GA29178@gondor.apana.org.au>
+References: <1405034288.2970.647.camel@schen9-DESK>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: George Spelvin <linux@horizon.com>, tytso@mit.edu
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140723115253.9808.qmail@ns.horizon.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Chandramouli Narayanan <mouli@linux.intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	linux-crypto@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:35333 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751605AbaGWNKN (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 23 Jul 2014 09:10:13 -0400
+Content-Disposition: inline
+In-Reply-To: <1405034288.2970.647.camel@schen9-DESK>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-
-
-On Wed, Jul 23, 2014, at 13:52, George Spelvin wrote:
-> I keep wishing for a more general solution.  For example, some way to
-> have a "spare" extra fd that could be accessed with a special O_NOFAIL
-> flag.
+On Thu, Jul 10, 2014 at 04:18:08PM -0700, Tim Chen wrote:
+> For the special case when we have a null input string, we want
+> to initialize the entry len to 0 for the hash/ahash walk, so
+> cyrpto_hash_walk_last will return the correct result indicating
+> that we have completed the scatter list walk.  Otherwise we may
+> keep walking the sg list and access bogus memory address.
 > 
-> That would allow any number of library functions to not fail, such as
-> logging from nasty corner cases.
-> 
-> But you'd have to provide one per thread, and block non-fatal signals
-> while it was open, so you don't get reentrancy problems.  Ick.
-> 
-> 
-> This overly-specialized system call (and worse yet, a blocking
-> system call that you can't put into a poll() loop) just feels ugly
-> to me.  Is it *absolutely* necessary?
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 
-One point that often came up besides fd exhaustion is missing
-/dev/u?random device nodes in chroot environments.
+Sorry but which driver is broken by this?
 
-I also thought about a more general interface, like e.g. an
-opennod(dev_t device, int flags) call but all those ideas ended up being
-very complex changes besides having design issues. getrandom is simple
-and solves a real problem.
-
-The only problem I see, that we allow access to /dev/random without
-checking any permission bits like we did on opening /dev/random before
-and we cannot restrict applications to deplete the whole entropy pool.
-
-> For example, how about simply making getentropy() a library function that
-> aborts if it can't open /dev/urandom?  If you're suffering fd exhaustion,
-> you're being DoSed already.
-
-Maybe applications want to mitigate fd exhaustion.
-
-Bye,
-Hannes
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
