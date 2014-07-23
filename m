@@ -1,39 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC, prePATCH] crypto: talitos modified for powerpc 88x
- security engine
-Date: Wed, 23 Jul 2014 21:10:48 +0800
-Message-ID: <20140723131048.GB29178@gondor.apana.org.au>
-References: <20140711120939.DD0031A9740@localhost.localdomain>
+Subject: Re: [PATCH v4 3/3] crypto: Add Allwinner Security System crypto
+ accelerator
+Date: Wed, 23 Jul 2014 21:16:20 +0800
+Message-ID: <20140723131620.GC29178@gondor.apana.org.au>
+References: <1405169953-13695-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1405169953-13695-4-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Kim Phillips <kim.phillips@freescale.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	Joakim Tjernlund <joakim.tjernlund@transmode.se>,
+Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
+	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
+	rdunlap@infradead.org, maxime.ripard@free-electrons.com,
+	linux@arm.linux.org.uk, davem@davemloft.net,
+	grant.likely@linaro.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: Christophe Leroy <christophe.leroy@c-s.fr>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:43071 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751509AbaGWNL0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Jul 2014 09:11:26 -0400
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20140711120939.DD0031A9740@localhost.localdomain>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1405169953-13695-4-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 11, 2014 at 02:09:39PM +0200, Christophe Leroy wrote:
-> Here is a pre-patch for the support of the SEC ENGINE of MPC88x/MPC82xx
-> I have tried to make use of defines in order to keep a single driver for the two
-> TALITOS variants as suggested by Kim, but I'm not too happy about the quantity
-> of #ifdef
+On Sat, Jul 12, 2014 at 02:59:13PM +0200, LABBE Corentin wrote:
+> Add support for the Security System included in Allwinner SoC A20.
+> The Security System is a hardware cryptographic accelerator that support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+> 
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 
-Yeah these ifdefs have got to go.
+This is essentially a synchronous driver, no? If so please
+switch to the blkcipher/shash interface.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
