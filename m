@@ -1,28 +1,87 @@
-From: James Morris <jmorris@namei.org>
-Subject: Re: [GIT PULL] Keyrings and asymmetric keys patches for 3.17
-Date: Thu, 24 Jul 2014 21:37:51 +1000 (EST)
-Message-ID: <alpine.LRH.2.11.1407242137280.13682@namei.org>
-References: <25694.1406063229@warthog.procyon.org.uk>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v4 3/3] crypto: Add Allwinner Security System crypto
+ accelerator
+Date: Thu, 24 Jul 2014 21:38:23 +0800
+Message-ID: <20140724133823.GA9638@gondor.apana.org.au>
+References: <1405169953-13695-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1405169953-13695-4-git-send-email-clabbe.montjoie@gmail.com>
+ <20140724060054.GA6545@gondor.apana.org.au>
+ <53D0E857.8000405@gmail.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>, mimi.e.zohar@gmail.com,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>, vgoyal@redhat.com,
-	keyrings@linux-nfs.org, linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <25694.1406063229@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
+	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
+	rdunlap@infradead.org, maxime.ripard@free-electrons.com,
+	linux@arm.linux.org.uk, davem@davemloft.net,
+	grant.likely@linaro.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Corentin LABBE <clabbe.montjoie@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:36218 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758830AbaGXNj0 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 24 Jul 2014 09:39:26 -0400
+Content-Disposition: inline
+In-Reply-To: <53D0E857.8000405@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 22 Jul 2014, David Howells wrote:
+On Thu, Jul 24, 2014 at 01:04:55PM +0200, Corentin LABBE wrote:
+> Le 24/07/2014 08:00, Herbert Xu a =E9crit :
+> > On Sat, Jul 12, 2014 at 02:59:13PM +0200, LABBE Corentin wrote:
+> >>
+> >> +/* sunxi_hash_init: initialize request context
+> >> + * Activate the SS, and configure it for MD5 or SHA1
+> >> + */
+> >> +int sunxi_hash_init(struct ahash_request *areq)
+> >> +{
+> >> +	const char *hash_type;
+> >> +	struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(areq);
+> >> +	struct sunxi_req_ctx *op =3D crypto_ahash_ctx(tfm);
+> >> +
+> >> +	mutex_lock(&ss->lock);
+> >> +
+> >> +	hash_type =3D crypto_tfm_alg_name(areq->base.tfm);
+> >> +
+> >> +	op->byte_count =3D 0;
+> >> +	op->nbwait =3D 0;
+> >> +	op->waitbuf =3D 0;
+> >> +
+> >> +	/* Enable and configure SS for MD5 or SHA1 */
+> >> +	if (strcmp(hash_type, "sha1") =3D=3D 0)
+> >> +		op->mode =3D SS_OP_SHA1;
+> >> +	else
+> >> +		op->mode =3D SS_OP_MD5;
+> >> +
+> >> +	writel(op->mode | SS_ENABLED, ss->base + SS_CTL);
+> >> +	return 0;
+> >=20
+> > The hash driver is completely broken.  You are modifying tfm
+> > ctx data which is shared by all users of a single tfm.  So
+> > if two users conduct hashes in parallel they will step all
+> > over each other.
+>=20
+> So where can I store data for each request ?
 
-> I have a number of sets of patches for you to pull.  I've git-merged them
-> together into a single branch (keys-next) as there are some conflicts and
-> tagged the end.
+Well, first of all you need to stop storing state in the hardware.
+After each operation the hardware may be used by some other user
+for a completely different hash request.  So leaving the hash state
+in the hardware is a no-no.
 
-Pulled, thanks.
+If your hardware supports exporting the hash state then you just
+have to export it after each operation and reimporting before the
+next one.
 
--- 
-James Morris
-<jmorris@namei.org>
+If your hardware is incapable of exporting partial hash state then
+you will have to use a software fallback for init/update.  If your
+hardware is incapable of importing partial hash state then you will
+also have to do finup/final using a software fallback.
+
+Cheers,
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
