@@ -1,7 +1,7 @@
 From: Leonidas Da Silva Barbosa <leosilva@linux.vnet.ibm.com>
-Subject: [PATCH 4/8] Replacing spinlocks by nx_copy_ctx on NX-AES-CTR
-Date: Thu, 24 Jul 2014 10:58:33 -0300
-Message-ID: <20140724135830.GA25269@bluepex.com>
+Subject: [PATCH 5/8] Replacing spinlocks by nx_copy_ctx on NX-AES-ECB
+Date: Thu, 24 Jul 2014 10:59:31 -0300
+Message-ID: <20140724135929.GA25842@bluepex.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Cc: mhcerri@linux.vnet.ibm.com, fin@linux.vnet.ibm.com
@@ -9,15 +9,15 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp02.br.ibm.com ([32.104.18.86]:55462 "EHLO
+Received: from e24smtp02.br.ibm.com ([32.104.18.86]:55606 "EHLO
 	e24smtp02.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758931AbaGXN6j (ORCPT
+	with ESMTP id S1758942AbaGXN7f (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 24 Jul 2014 09:58:39 -0400
+	Thu, 24 Jul 2014 09:59:35 -0400
 Received: from /spool/local
 	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
 	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
-	Thu, 24 Jul 2014 10:58:37 -0300
+	Thu, 24 Jul 2014 10:59:33 -0300
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -27,14 +27,14 @@ possible bottlenecks.
 
 Signed-off-by: Leonidas Da Silva Barbosa <leosilva@linux.vnet.ibm.com>
 ---
- drivers/crypto/nx/nx-aes-ctr.c |   20 ++++++++++++--------
+ drivers/crypto/nx/nx-aes-ecb.c |   20 ++++++++++++--------
  1 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-ctr.c b/drivers/crypto/nx/nx-aes-ctr.c
-index a37d009..4a8a196 100644
---- a/drivers/crypto/nx/nx-aes-ctr.c
-+++ b/drivers/crypto/nx/nx-aes-ctr.c
-@@ -88,34 +88,38 @@ static int ctr_aes_nx_crypt(struct blkcipher_desc *desc,
+diff --git a/drivers/crypto/nx/nx-aes-ecb.c b/drivers/crypto/nx/nx-aes-ecb.c
+index 85a8d23..fcf190c 100644
+--- a/drivers/crypto/nx/nx-aes-ecb.c
++++ b/drivers/crypto/nx/nx-aes-ecb.c
+@@ -70,15 +70,19 @@ static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
  {
  	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
  	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
@@ -55,6 +55,10 @@ index a37d009..4a8a196 100644
 -			   nx_ctx->ap->sglen);
 +			   curr_nx_ctx.ap->sglen);
  
+ 	if (enc)
+ 		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
+@@ -87,22 +91,22 @@ static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
+ 
  	do {
  		to_process = min_t(u64, nbytes - processed,
 -				   nx_ctx->ap->databytelen);
@@ -65,7 +69,7 @@ index a37d009..4a8a196 100644
  
 -		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, to_process,
 +		rc = nx_build_sg_lists(&curr_nx_ctx, desc, dst, src, to_process,
- 				       processed, csbcpb->cpb.aes_ctr.iv);
+ 				processed, NULL);
  		if (rc)
  			goto out;
  
@@ -80,9 +84,9 @@ index a37d009..4a8a196 100644
  				   desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
  		if (rc)
  			goto out;
-@@ -129,7 +133,7 @@ static int ctr_aes_nx_crypt(struct blkcipher_desc *desc,
- 		processed += to_process;
+@@ -115,7 +119,7 @@ static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
  	} while (processed < nbytes);
+ 
  out:
 -	spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
 +	kmem_cache_free(nx_driver.slab, curr_nx_ctx.kmem);
