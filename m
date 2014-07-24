@@ -1,97 +1,70 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/3] crypto: Add Allwinner Security System crypto
+Subject: Re: [PATCH v4 3/3] crypto: Add Allwinner Security System crypto
  accelerator
-Date: Thu, 24 Jul 2014 09:40:57 +0800
-Message-ID: <20140724014057.GA2448@gondor.apana.org.au>
-References: <1400771396-9686-1-git-send-email-clabbe.montjoie@gmail.com>
- <201407231751.02050.marex@denx.de>
- <53D0045C.6090605@gmail.com>
- <201407232138.35268.marex@denx.de>
+Date: Thu, 24 Jul 2014 14:00:54 +0800
+Message-ID: <20140724060054.GA6545@gondor.apana.org.au>
+References: <1405169953-13695-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1405169953-13695-4-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Corentin LABBE <clabbe.montjoie@gmail.com>, robh+dt@kernel.org,
-	pawel.moll@arm.com, mark.rutland@arm.com,
+Content-Type: text/plain; charset=us-ascii
+Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
 	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
 	rdunlap@infradead.org, maxime.ripard@free-electrons.com,
 	linux@arm.linux.org.uk, davem@davemloft.net,
 	grant.likely@linaro.org, devicetree@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: Marek Vasut <marex@denx.de>
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:37420 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:42355 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755787AbaGXBlx (ORCPT
+	with ESMTP id S1750904AbaGXGBx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 23 Jul 2014 21:41:53 -0400
+	Thu, 24 Jul 2014 02:01:53 -0400
 Content-Disposition: inline
-In-Reply-To: <201407232138.35268.marex@denx.de>
+In-Reply-To: <1405169953-13695-4-git-send-email-clabbe.montjoie@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 23, 2014 at 09:38:35PM +0200, Marek Vasut wrote:
-> On Wednesday, July 23, 2014 at 08:52:12 PM, Corentin LABBE wrote:
-> > Le 23/07/2014 17:51, Marek Vasut a =E9crit :
-> > > On Wednesday, July 23, 2014 at 04:13:09 PM, Herbert Xu wrote:
-> > >> On Wed, Jul 23, 2014 at 04:07:20PM +0200, Marek Vasut wrote:
-> > >>> On Wednesday, July 23, 2014 at 03:57:35 PM, Herbert Xu wrote:
-> > >>>> On Sat, May 24, 2014 at 02:00:03PM +0200, Marek Vasut wrote:
-> > >>>>>> +	}
-> > >>>>>> +#endif
-> > >>>>>> +
-> > >>>>>> +#ifdef CONFIG_CRYPTO_DEV_SUNXI_SS_MD5
-> > >>>>>> +	err =3D crypto_register_shash(&sunxi_md5_alg);
-> > >>>>>=20
-> > >>>>> Do not use shash for such device. This is clearly and ahash (=
-and
-> > >>>>> async in general) device. The rule of a thumb here is that yo=
-u use
-> > >>>>> sync algos only for devices which have dedicated instructions=
- for
-> > >>>>> computing the transformation. For devices which are attached =
-to some
-> > >>>>> kind of bus, you use async algos (ahash etc).
-> > >>>>=20
-> > >>>> I'm sorry that I didn't catch this earlier but there is no suc=
-h
-> > >>>> rule.
-> > >>>>=20
-> > >>>> Unless you need the async interface you should stick to the sy=
-nc
-> > >>>> interfaces for the sake of simplicity.
-> > >>>>=20
-> > >>>> We have a number of existing drivers that are synchronous but
-> > >>>> using the async interface.  They should either be converted
-> > >>>> over to the sync interface or made interrupt-driven if possibl=
-e.
-> > >>>=20
-> > >>> Sure, but this device is interrupt driven and uses DMA to feed =
-the
-> > >>> crypto engine, therefore async, right ?
-> > >>=20
-> > >> If it's interrupt-driven, then yes it would certainly make sense=
- to
-> > >> be async.  But all I see is polling in the latest posting, was t=
-he
-> > >> first version different?
-> > >=20
-> > > I stand corrected then, sorry.
-> > >=20
-> > > Is it possible to use DMA to feed the crypto accelerator, Corenti=
-n?
-> > >=20
-> > > Best regards,
-> > > Marek Vasut
-> >=20
-> > Yes, DMA is possible and will be implemented soon.
-> > So if I have well understood, I keep using async interface.
->=20
-> Yeah, in this case, using DMA and async interface combo is the way to=
- go.
+On Sat, Jul 12, 2014 at 02:59:13PM +0200, LABBE Corentin wrote:
+>
+> +/* sunxi_hash_init: initialize request context
+> + * Activate the SS, and configure it for MD5 or SHA1
+> + */
+> +int sunxi_hash_init(struct ahash_request *areq)
+> +{
+> +	const char *hash_type;
+> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+> +	struct sunxi_req_ctx *op = crypto_ahash_ctx(tfm);
+> +
+> +	mutex_lock(&ss->lock);
+> +
+> +	hash_type = crypto_tfm_alg_name(areq->base.tfm);
+> +
+> +	op->byte_count = 0;
+> +	op->nbwait = 0;
+> +	op->waitbuf = 0;
+> +
+> +	/* Enable and configure SS for MD5 or SHA1 */
+> +	if (strcmp(hash_type, "sha1") == 0)
+> +		op->mode = SS_OP_SHA1;
+> +	else
+> +		op->mode = SS_OP_MD5;
+> +
+> +	writel(op->mode | SS_ENABLED, ss->base + SS_CTL);
+> +	return 0;
 
-OK fair enough.
---=20
+The hash driver is completely broken.  You are modifying tfm
+ctx data which is shared by all users of a single tfm.  So
+if two users conduct hashes in parallel they will step all
+over each other.
+
+Worse, the unpaired mutex_lock will quickly lead to dead locks.
+
+You cannot assume that final will be called.
+
+Cheers,
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
