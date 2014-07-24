@@ -1,157 +1,97 @@
 From: Leonidas Da Silva Barbosa <leosilva@linux.vnet.ibm.com>
-Subject: [PATCH 1/8] Adding nx_copy_ctx and kmemcache to handle with crypto
- context
-Date: Thu, 24 Jul 2014 10:47:04 -0300
-Message-ID: <20140724134701.GA23910@bluepex.com>
+Subject: [PATCH 2/8] Replacing spinlocks by nx_copy_ctx on NX-AES-CBC
+Date: Thu, 24 Jul 2014 10:50:59 -0300
+Message-ID: <20140724135056.GA24330@bluepex.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Cc: mhcerri@linux.vnet.ibm.com, fin@linux.vnet.ibm.com
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e24smtp03.br.ibm.com ([32.104.18.24]:42425 "EHLO
+	e24smtp03.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758778AbaGXNvD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 24 Jul 2014 09:51:03 -0400
+Received: from /spool/local
+	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
+	Thu, 24 Jul 2014 10:51:01 -0300
 Content-Disposition: inline
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-- This patch adds kmemcache to nx_driver in replace the use of
-spinlocks in nx.
-- Adds a copy function that handles with the current
-context as a copy of the context in crypto API.
+Replaces spinlock usage by a simple copy of the crypto context, avoiding
+possible bottlenecks.
 
 Signed-off-by: Leonidas Da Silva Barbosa <leosilva@linux.vnet.ibm.com>
 ---
- drivers/crypto/nx/nx.c |   45 +++++++++++++++++++++++++++++++++++++++++++--
- drivers/crypto/nx/nx.h |    8 +++++---
- 2 files changed, 48 insertions(+), 5 deletions(-)
+ drivers/crypto/nx/nx-aes-cbc.c |   20 ++++++++++++--------
+ 1 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
-index 5533fe3..15fe87f 100644
---- a/drivers/crypto/nx/nx.c
-+++ b/drivers/crypto/nx/nx.c
-@@ -255,7 +255,6 @@ int nx_build_sg_lists(struct nx_crypto_ctx  *nx_ctx,
-  */
- void nx_ctx_init(struct nx_crypto_ctx *nx_ctx, unsigned int function)
+diff --git a/drivers/crypto/nx/nx-aes-cbc.c b/drivers/crypto/nx/nx-aes-cbc.c
+index cc00b52..842f8ee 100644
+--- a/drivers/crypto/nx/nx-aes-cbc.c
++++ b/drivers/crypto/nx/nx-aes-cbc.c
+@@ -70,15 +70,19 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
  {
--	spin_lock_init(&nx_ctx->lock);
- 	memset(nx_ctx->kmem, 0, nx_ctx->kmem_len);
- 	nx_ctx->csbcpb->csb.valid |= NX_CSB_VALID_BIT;
+ 	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
+ 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
+-	unsigned long irq_flags;
+ 	unsigned int processed = 0, to_process;
+ 	u32 max_sg_len;
+ 	int rc;
  
-@@ -633,6 +632,7 @@ void nx_crypto_ctx_exit(struct crypto_tfm *tfm)
- 
- static int nx_probe(struct vio_dev *viodev, const struct vio_device_id *id)
- {
-+	int rc;
- 	dev_dbg(&viodev->dev, "driver probed: %s resource id: 0x%x\n",
- 		viodev->name, viodev->resource_id);
- 
-@@ -646,7 +646,17 @@ static int nx_probe(struct vio_dev *viodev, const struct vio_device_id *id)
- 
- 	nx_of_init(&viodev->dev, &nx_driver.of);
- 
--	return nx_register_algs();
-+	nx_driver.slab = kmem_cache_create("nx_slab", 5 * NX_PAGE_SIZE,
-+			0, 0, NULL);
-+	if (!nx_driver.slab) {
-+		dev_err(&viodev->dev, "%s: Failed to allocate slab\n", __func__);
-+		return -ENOMEM;
-+	}
+-	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
++	struct nx_crypto_ctx curr_nx_ctx;
++
++	if (nx_copy_ctx(&curr_nx_ctx, nx_ctx))
++		return -ENOMEM;	
 +	
-+	rc = nx_register_algs();
-+	if (rc)
-+		kmem_cache_destroy(nx_driver.slab);
-+	return rc;
++	csbcpb = curr_nx_ctx.csbcpb;	
+ 
+ 	max_sg_len = min_t(u32, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
+-			   nx_ctx->ap->sglen);
++			   curr_nx_ctx.ap->sglen);
+ 
+ 	if (enc)
+ 		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
+@@ -87,22 +91,22 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
+ 
+ 	do {
+ 		to_process = min_t(u64, nbytes - processed,
+-				   nx_ctx->ap->databytelen);
++				   curr_nx_ctx.ap->databytelen);
+ 		to_process = min_t(u64, to_process,
+ 				   NX_PAGE_SIZE * (max_sg_len - 1));
+ 		to_process = to_process & ~(AES_BLOCK_SIZE - 1);
+ 
+-		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, to_process,
++		rc = nx_build_sg_lists(&curr_nx_ctx, desc, dst, src, to_process,
+ 				       processed, csbcpb->cpb.aes_cbc.iv);
+ 		if (rc)
+ 			goto out;
+ 
+-		if (!nx_ctx->op.inlen || !nx_ctx->op.outlen) {
++		if (!curr_nx_ctx.op.inlen || !curr_nx_ctx.op.outlen) {
+ 			rc = -EINVAL;
+ 			goto out;
+ 		}
+ 
+-		rc = nx_hcall_sync(nx_ctx, &nx_ctx->op,
++		rc = nx_hcall_sync(&curr_nx_ctx, &curr_nx_ctx.op,
+ 				   desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
+ 		if (rc)
+ 			goto out;
+@@ -115,7 +119,7 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
+ 		processed += to_process;
+ 	} while (processed < nbytes);
+ out:
+-	spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
++	kmem_cache_free(nx_driver.slab, curr_nx_ctx.kmem);
+ 	return rc;
  }
  
- static int nx_remove(struct vio_dev *viodev)
-@@ -668,11 +678,42 @@ static int nx_remove(struct vio_dev *viodev)
- 		crypto_unregister_shash(&nx_shash_sha256_alg);
- 		crypto_unregister_shash(&nx_shash_sha512_alg);
- 		crypto_unregister_shash(&nx_shash_aes_xcbc_alg);
-+		kmem_cache_destroy(nx_driver.slab);
- 	}
- 
- 	return 0;
- }
- 
-+int nx_copy_ctx(struct nx_crypto_ctx *dst, 
-+		const struct nx_crypto_ctx *src)
-+{
-+	memcpy(dst, src, sizeof(*src));
-+	dst->kmem = kmem_cache_alloc(nx_driver.slab, GFP_ATOMIC);
-+	if (!dst->kmem)
-+		return -ENOMEM;
-+
-+	/* the csbcpb and scatterlist must be 4k aligned pages */
-+	dst->csbcpb = (struct nx_csbcpb *)(round_up((u64) dst->kmem,
-+							(u64)NX_PAGE_SIZE));
-+	dst->in_sg = (struct nx_sg *)((u8 *) dst->csbcpb + NX_PAGE_SIZE);
-+	dst->out_sg = (struct nx_sg *)((u8 *) dst->in_sg + NX_PAGE_SIZE);
-+	dst->op.csbcpb = __pa(dst->csbcpb);
-+	dst->op.in = __pa(dst->in_sg);
-+	dst->op.out =__pa(dst->out_sg);
-+
-+	if (src->csbcpb->cpb.hdr.mode == NX_MODE_AES_GCM || 
-+			src->csbcpb->cpb.hdr.mode == NX_MODE_AES_CCM) { 
-+		dst->csbcpb_aead = 
-+		     (struct nx_csbcpb *)((u8 *)src->out_sg + NX_PAGE_SIZE);
-+		dst->op_aead.csbcpb = __pa(dst->csbcpb_aead);
-+		dst->op_aead.in = __pa(dst->in_sg);
-+		dst->op_aead.out = __pa(dst->out_sg);
-+
-+		memcpy(dst->csbcpb_aead, src->csbcpb_aead, sizeof(struct nx_csbcpb));
-+	}
-+	memcpy(dst->csbcpb, src->csbcpb, sizeof(struct nx_csbcpb));
-+	return 0;
-+} 
- 
- /* module wide initialization/cleanup */
- static int __init nx_init(void)
-diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-index befda07..af15510 100644
---- a/drivers/crypto/nx/nx.h
-+++ b/drivers/crypto/nx/nx.h
-@@ -6,14 +6,15 @@
- #define NX_STRING	"IBM Power7+ Nest Accelerator Crypto Driver"
- #define NX_VERSION	"1.0"
- 
-+#include <linux/slab.h>
-+
- static const char nx_driver_string[] = NX_STRING;
- static const char nx_driver_version[] = NX_VERSION;
- 
- /* a scatterlist in the format PHYP is expecting */
- struct nx_sg {
- 	u64 addr;
--	u32 rsvd;
--	u32 len;
-+	u64 len;
- } __attribute((packed));
- 
- #define NX_PAGE_SIZE		(4096)
-@@ -87,6 +88,7 @@ struct nx_crypto_driver {
- 	struct vio_dev    *viodev;
- 	struct vio_driver  viodriver;
- 	struct nx_debugfs  dfs;
-+	struct kmem_cache *slab;
- };
- 
- #define NX_GCM4106_NONCE_LEN		(4)
-@@ -117,7 +119,6 @@ struct nx_ctr_priv {
- };
- 
- struct nx_crypto_ctx {
--	spinlock_t lock;	  /* synchronize access to the context */
- 	void *kmem;		  /* unaligned, kmalloc'd buffer */
- 	size_t kmem_len;	  /* length of kmem */
- 	struct nx_csbcpb *csbcpb; /* aligned page given to phyp @ hcall time */
-@@ -160,6 +161,7 @@ int nx_build_sg_lists(struct nx_crypto_ctx *, struct blkcipher_desc *,
- struct nx_sg *nx_walk_and_build(struct nx_sg *, unsigned int,
- 				struct scatterlist *, unsigned int,
- 				unsigned int);
-+int nx_copy_ctx(struct nx_crypto_ctx *, const struct nx_crypto_ctx *);
- 
- #ifdef CONFIG_DEBUG_FS
- #define NX_DEBUGFS_INIT(drv)	nx_debugfs_init(drv)
 -- 
 1.7.1
