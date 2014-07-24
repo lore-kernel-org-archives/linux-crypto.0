@@ -1,50 +1,54 @@
-From: Andy Lutomirski <luto@amacapital.net>
+From: Theodore Ts'o <tytso@mit.edu>
 Subject: Re: [PATCH -v5] random: introduce getrandom(2) system call
-Date: Thu, 24 Jul 2014 13:54:05 -0700
-Message-ID: <CALCETrXtNUSCQEZ+SKJ5Br41rnF35kGqStkFuX6dN-3z5hVdmQ@mail.gmail.com>
+Date: Thu, 24 Jul 2014 19:24:34 -0400
+Message-ID: <20140724232434.GN6673@thunk.org>
 References: <1406212287-9855-1-git-send-email-tytso@mit.edu>
- <20140724151814.GE32421@khazad-dum.debian.net> <CALCETrXAA=UzS-pRCo5tKSjSCOP9xfu66BG9QbRefVrovkavhQ@mail.gmail.com>
- <20140724190206.GL6673@thunk.org> <20140724203019.GA20737@khazad-dum.debian.net>
+ <20140724151814.GE32421@khazad-dum.debian.net>
+ <CALCETrXAA=UzS-pRCo5tKSjSCOP9xfu66BG9QbRefVrovkavhQ@mail.gmail.com>
+ <20140724190206.GL6673@thunk.org>
+ <20140724203019.GA20737@khazad-dum.debian.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "Theodore Ts'o" <tytso@mit.edu>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Andy Lutomirski <luto@amacapital.net>,
 	Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
 	Linux API <linux-api@vger.kernel.org>,
 	linux-crypto@vger.kernel.org
 To: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:55466 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932131AbaGXXYi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 24 Jul 2014 19:24:38 -0400
+Content-Disposition: inline
 In-Reply-To: <20140724203019.GA20737@khazad-dum.debian.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 24, 2014 at 1:30 PM, Henrique de Moraes Holschuh
-<hmh@hmh.eng.br> wrote:
-> On Thu, 24 Jul 2014, Theodore Ts'o wrote:
->> On Thu, Jul 24, 2014 at 08:21:38AM -0700, Andy Lutomirski wrote:
->> > > Should we add E<SOMETHING> to be able to deny access to GRND_RANDOM or some
->> > > future extension ?
->> >
->> > This might actually be needed sooner rather than later.  There are
->> > programs that use containers and intentionally don't pass /dev/random
->> > through into the container.  I know that Sandstorm does this, and I
->> > wouldn't be surprised if other things (Docker?) do the same thing.
->>
->> I wouldn't add the error to the man page until we actually modify the
->> kernel to add such a restriction.
->
+On Thu, Jul 24, 2014 at 05:30:19PM -0300, Henrique de Moraes Holschuh wrote:
+> > I wouldn't add the error to the man page until we actually modify the
+> > kernel to add such a restriction.
+> 
 > By then, it might be too late.  It would be really sad to find ourselves
 > forced to return ENOSYS to getrandom(GRND_RANDOM) when we actually wanted to
 > return EPERM/EACCES.
->
-> Actually, we might not be able to do even that much: all it takes is for
-> someone to have the bright idea of deploying userspace code that checks for
-> ENOSYS only on a first "probe" getrandom() syscall without GRND_RANDOM, and
-> does something idiotic when it gets ENOSYS later on a
-> getrandom(GRND_RANDOM).  meh.  We can't even abuse the system ourselves :-)
->
 
-Or that someone writes userspace code that gets -EPERM/-EACCESS on
-getrandom with GRND_RANDOM and falls back to something worse than
-getrandom w/o GRND_RANDOM.
+I wouldn't worry about.  The reality is that anyone using GRND_RANDOM
+has to be checking for error codes anyway, and if they do something
+stupid because the system call returns EPERM/EACCESS when they weren't
+expecting it, again, they are much more likely to be making many other
+fatal mistakes anyway.
 
---Andy
+In general, all system calls can return errno's other than the ones
+documented in the man page.  This is certainly true for open(2), and
+read(2) if you are using a network file system such as NFS.  Someone
+who assumes that the only errors that they have to handle is the list
+in the man page, and assumes that this list is an exhaustive listing
+of all possible errors, is going to be in a *world* of hurt.
+
+I don't think it's necessary to add a sentence that other errors can
+be returned in the future, and users much check for other errors, but
+if you really think people are that stupid that we need to say
+something which is true for every single system call in Linux, we can
+do that....
+
+						- Ted
