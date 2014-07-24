@@ -1,49 +1,72 @@
-From: Theodore Ts'o <tytso@mit.edu>
+From: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
 Subject: Re: [PATCH -v5] random: introduce getrandom(2) system call
-Date: Thu, 24 Jul 2014 15:02:06 -0400
-Message-ID: <20140724190206.GL6673@thunk.org>
+Date: Thu, 24 Jul 2014 17:30:19 -0300
+Message-ID: <20140724203019.GA20737@khazad-dum.debian.net>
 References: <1406212287-9855-1-git-send-email-tytso@mit.edu>
  <20140724151814.GE32421@khazad-dum.debian.net>
  <CALCETrXAA=UzS-pRCo5tKSjSCOP9xfu66BG9QbRefVrovkavhQ@mail.gmail.com>
+ <20140724190206.GL6673@thunk.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+To: Theodore Ts'o <tytso@mit.edu>,
+	Andy Lutomirski <luto@amacapital.net>,
 	Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
 	Linux API <linux-api@vger.kernel.org>,
 	linux-crypto@vger.kernel.org
-To: Andy Lutomirski <luto@amacapital.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:34641 "EHLO
+	out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S934543AbaGXUal (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 24 Jul 2014 16:30:41 -0400
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by gateway1.nyi.internal (Postfix) with ESMTP id DE80E2108F
+	for <linux-crypto@vger.kernel.org>; Thu, 24 Jul 2014 16:30:30 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <CALCETrXAA=UzS-pRCo5tKSjSCOP9xfu66BG9QbRefVrovkavhQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20140724190206.GL6673@thunk.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 24, 2014 at 08:21:38AM -0700, Andy Lutomirski wrote:
-> >
-> > Should we add E<SOMETHING> to be able to deny access to GRND_RANDOM or some
-> > future extension ?
+On Thu, 24 Jul 2014, Theodore Ts'o wrote:
+> On Thu, Jul 24, 2014 at 08:21:38AM -0700, Andy Lutomirski wrote:
+> > > Should we add E<SOMETHING> to be able to deny access to GRND_RANDOM or some
+> > > future extension ?
+> > 
+> > This might actually be needed sooner rather than later.  There are
+> > programs that use containers and intentionally don't pass /dev/random
+> > through into the container.  I know that Sandstorm does this, and I
+> > wouldn't be surprised if other things (Docker?) do the same thing.
 > 
-> This might actually be needed sooner rather than later.  There are
-> programs that use containers and intentionally don't pass /dev/random
-> through into the container.  I know that Sandstorm does this, and I
-> wouldn't be surprised if other things (Docker?) do the same thing.
+> I wouldn't add the error to the man page until we actually modify the
+> kernel to add such a restriction.
 
-I wouldn't add the error to the man page until we actually modify the
-kernel to add such a restriction.
+By then, it might be too late.  It would be really sad to find ourselves
+forced to return ENOSYS to getrandom(GRND_RANDOM) when we actually wanted to
+return EPERM/EACCES.
 
-However, the thought crossed my mind a while back that perhaps the
-right answer is a cgroup controller which controls the rate at which a
-process is allowed to drain entropy from the /dev/random pool.  This
-could be set to 0, or it could be set to N bits per unit time T, and
-if the process exceeded the value, it would just block or return
-EAGAIN.  So instead of making it be just a binary "you have access" or
-"you don't", it would actually be a kernel resource that could be
-controlled just like disk bandwidth, networking bandwidth, memory, and
-CPU time.
+Actually, we might not be able to do even that much: all it takes is for
+someone to have the bright idea of deploying userspace code that checks for
+ENOSYS only on a first "probe" getrandom() syscall without GRND_RANDOM, and
+does something idiotic when it gets ENOSYS later on a
+getrandom(GRND_RANDOM).  meh.  We can't even abuse the system ourselves :-)
 
-Then I decided that it was overkill, but for people who are trying to
-treat containers as a way to divide up OS resources between mutually
-suspicious customers in a fashion which is more efficient thatn using
-VM's, maybe it is something that someone will want to implement.
+> However, the thought crossed my mind a while back that perhaps the
+> right answer is a cgroup controller which controls the rate at which a
+> process is allowed to drain entropy from the /dev/random pool.  This
+> could be set to 0, or it could be set to N bits per unit time T, and
+> if the process exceeded the value, it would just block or return
+> EAGAIN.  So instead of making it be just a binary "you have access" or
 
-      	       	  	    	 	    	- Ted
+That will teach people to not have a SIGALRM on code that calls a blocking
+syscall, I suppose.  Still, there is a risk it could cause so much bad
+application behaviour to the point of being unusable.
+
+> Then I decided that it was overkill, but for people who are trying to
+
+Indeed :p
+
+-- 
+  "One disk to rule them all, One disk to find them. One disk to bring
+  them all and in the darkness grind them. In the Land of Redmond
+  where the shadows lie." -- The Silicon Valley Tarot
+  Henrique Holschuh
