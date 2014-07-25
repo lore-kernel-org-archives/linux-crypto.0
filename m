@@ -1,14 +1,12 @@
-From: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
+From: One Thousand Gnomes <gnomes-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>
 Subject: Re: General flags to turn things off (getrandom, pid lookup, etc)
-Date: Fri, 25 Jul 2014 13:21:31 -0700
-Message-ID: <CALCETrULRhQCSPsgepntRuCbvx-guEKzpBUT4EoQi2-VU0P8bQ@mail.gmail.com>
+Date: Fri, 25 Jul 2014 22:35:50 +0100
+Message-ID: <20140725223550.3153f436@alan.etchedpixels.co.uk>
 References: <CALCETrWGvBfrX1W5XaFgJZhKHLf+oac9YrwPR3ppK=deQtu5hA@mail.gmail.com>
- <20140725201507.GA23410@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: Dave Jones <davej-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>,
-	"Eric W. Biederman" <ebiederm-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: "Eric W. Biederman" <ebiederm-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>,
 	Julien Tinnes <jln-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
 	David Drysdale <drysdale-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
 	Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
@@ -25,51 +23,23 @@ To: Dave Jones <davej-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
 	"Theodore Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
 	Henrique de Moraes Holschuh <hmh-N3TV7GIv+o9fyO9Q7EP/yw@public.gmane.org>,
 	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
 Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20140725201507.GA23410-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CALCETrWGvBfrX1W5XaFgJZhKHLf+oac9YrwPR3ppK=deQtu5hA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 25, 2014 at 1:15 PM, Dave Jones <davej-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Fri, Jul 25, 2014 at 11:30:48AM -0700, Andy Lutomirski wrote:
->
->  > There is recent interest in having a way to turn generally-available
->  > kernel features off.  Maybe we should add a good one so we can stop
->  > bikeshedding and avoid proliferating dumb interfaces.
->  >
->  > Things that might want to be turn-off-able include:
->  >  - getrandom with GRND_RANDOM [from the getrandom threads]
->  >  - Any lookup of a non-self pid [from the capsicum thread]
->  >  - Any lookup of a pid outside the caller thread group [capsicum]
->  >  - Various architectural things (personal wishlist), e.g.:
->  >     - RDTSC and userspace HPET access
->  >     - CPUID?
->  >     - 32-bit GDT code segments [huge attack surface]
->  >     - 64-bit GDT code segments [probably pointless]
->
-> I'm not sure there's value in disabling cpuid dev interface,
-> when the instruction is unprivileged.
+On Fri, 25 Jul 2014 11:30:48 -0700
+Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org> wrote:
 
-I meant the CPUID instruction.  Some CPUs have a setting that turns
-off the CPUID instruction for user code.  In principle, all VMs can do
-this, too, if the hypervisor would be kind enough to help out.
+> [new thread because this sort of combines two threads]
+> 
+> There is recent interest in having a way to turn generally-available
+> kernel features off.  Maybe we should add a good one so we can stop
+> bikeshedding and avoid proliferating dumb interfaces.
 
-I only mentioned the x86 stuff here to make the point that there are
-quite a few possibilities along these lines.  There's actually already
-a way to turn off RDTSC, but it's not currently very useful because it
-doesn't do the right thing for the vDSO.  That could be fixed, but
-there's certainly no reason to make any of the other stuff here wait
-for that.
+We sort of have one. It's called capable(). Just needs extending to cover
+anything else you care about, and probably all the numeric constants
+replacing with textual names.
 
->
->  > I would propose a new syscall for this:
->  >
->  > long restrict_userspace(int mode, int type, int value, int flags);
->
-> do the restrictions happen system-wide like in say SELinux,
-> or only within the calling process, like seccomp ?
->
-
-The calling process and children, like seccomp.
-
---Andy
+Alan
