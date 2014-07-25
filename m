@@ -1,47 +1,69 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v5 2/7] crypto: SHA1 multibuffer crypto hash
- infrastructure
-Date: Fri, 25 Jul 2014 09:47:24 -0700
-Message-ID: <1406306844.2970.870.camel@schen9-DESK>
-References: <cover.1406033477.git.tim.c.chen@linux.intel.com>
-	 <1406066972.2970.804.camel@schen9-DESK>  <20140725072605.GU3935@laptop>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: General flags to turn things off (getrandom, pid lookup, etc)
+Date: Fri, 25 Jul 2014 11:30:48 -0700
+Message-ID: <CALCETrWGvBfrX1W5XaFgJZhKHLf+oac9YrwPR3ppK=deQtu5hA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Ingo Molnar <mingo@kernel.org>,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Tadeusz Struk <tadeusz.struk@intel.com>, tkhai@yandex.ru,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Peter Zijlstra <peterz@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+To: "Eric W. Biederman" <ebiederm@xmission.com>,
+	Julien Tinnes <jln@google.com>,
+	David Drysdale <drysdale@google.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	LSM List <linux-security-module@vger.kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Paul Moore <paul@paul-moore.com>,
+	James Morris <james.l.morris@oracle.com>,
+	Linux API <linux-api@vger.kernel.org>,
+	Meredydd Luff <meredydd@senatehouse.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	"Theodore Ts'o" <tytso@mit.edu>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+	linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140725072605.GU3935@laptop>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, 2014-07-25 at 09:26 +0200, Peter Zijlstra wrote:
-> On Tue, Jul 22, 2014 at 03:09:32PM -0700, Tim Chen wrote:
-> > This patch introduces the multi-buffer crypto daemon which is responsible
-> > for submitting crypto jobs in a work queue to the responsible multi-buffer
-> > crypto algorithm.  The idea of the multi-buffer algorihtm is to put
-> > data streams from multiple jobs in a wide (AVX2) register and then
-> > take advantage of SIMD instructions to do crypto computation on several
-> > buffers simultaneously.
-> > 
-> > The multi-buffer crypto daemon is also responsbile for flushing the
-> > remaining buffers to complete the computation if no new buffers arrive
-> > for a while.
-> 
-> How is any of this SHA1 specific as the Subject says it is?
+[new thread because this sort of combines two threads]
 
-Yes, I should simply say multibuffer crypto hash infrastructure in the
-subject line.
+There is recent interest in having a way to turn generally-available
+kernel features off.  Maybe we should add a good one so we can stop
+bikeshedding and avoid proliferating dumb interfaces.
 
-Tim
+Things that might want to be turn-off-able include:
+ - getrandom with GRND_RANDOM [from the getrandom threads]
+ - Any lookup of a non-self pid [from the capsicum thread]
+ - Any lookup of a pid outside the caller thread group [capsicum]
+ - Various architectural things (personal wishlist), e.g.:
+    - RDTSC and userspace HPET access
+    - CPUID?
+    - 32-bit GDT code segments [huge attack surface]
+    - 64-bit GDT code segments [probably pointless]
+
+I would propose a new syscall for this:
+
+long restrict_userspace(int mode, int type, int value, int flags);
+
+mode is RESTRICT_SET, RESTRICT_GET, or RESTRICT_LOCK.
+
+type is RESTRICT_GRND_RANDOM, RESTRICT_PID_SCOPE, RESTRICT_X86_TIMING, etc.
+
+Value is zero if RESTRICT_GET.  Otherwise value is the desired value,
+generally 0 or 1.  For RESTRICT_PID_SCOPE, value would be
+RESTRICT_PID_SCOPE_ANY, RESTRICT_PID_SCOPE_THREADGROUP, or
+RESTRICT_PID_SCOPE_SELF.
+
+flags must be zero.  Someday, someone will propose a thread-sync flag.
+
+restrict_userspace requires either no_new_privs or CAP_SYS_ADMIN in
+the current user namespace.
+
+Thoughts?
+
+--Andy
+
+-- 
+Andy Lutomirski
+AMA Capital Management, LLC
