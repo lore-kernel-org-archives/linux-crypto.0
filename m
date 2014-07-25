@@ -1,10 +1,10 @@
 From: Tim Chen <tim.c.chen@linux.intel.com>
 Subject: Re: [PATCH v5 2/7] crypto: SHA1 multibuffer crypto hash
  infrastructure
-Date: Fri, 25 Jul 2014 09:25:21 -0700
-Message-ID: <1406305521.2970.851.camel@schen9-DESK>
+Date: Fri, 25 Jul 2014 09:47:24 -0700
+Message-ID: <1406306844.2970.870.camel@schen9-DESK>
 References: <cover.1406033477.git.tim.c.chen@linux.intel.com>
-	 <1406066972.2970.804.camel@schen9-DESK>  <20140725070800.GS3935@laptop>
+	 <1406066972.2970.804.camel@schen9-DESK>  <20140725072605.GU3935@laptop>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
@@ -21,120 +21,27 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	Tadeusz Struk <tadeusz.struk@intel.com>, tkhai@yandex.ru,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Peter Zijlstra <peterz@infradead.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:64967 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752988AbaGYQZX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Jul 2014 12:25:23 -0400
-In-Reply-To: <20140725070800.GS3935@laptop>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20140725072605.GU3935@laptop>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, 2014-07-25 at 09:08 +0200, Peter Zijlstra wrote:
+On Fri, 2014-07-25 at 09:26 +0200, Peter Zijlstra wrote:
 > On Tue, Jul 22, 2014 at 03:09:32PM -0700, Tim Chen wrote:
-> > +/* Called in workqueue context, do one real cryption work (via
-> > + * req->complete) and reschedule itself if there are more work to
-> > + * do. */
+> > This patch introduces the multi-buffer crypto daemon which is responsible
+> > for submitting crypto jobs in a work queue to the responsible multi-buffer
+> > crypto algorithm.  The idea of the multi-buffer algorihtm is to put
+> > data streams from multiple jobs in a wide (AVX2) register and then
+> > take advantage of SIMD instructions to do crypto computation on several
+> > buffers simultaneously.
+> > 
+> > The multi-buffer crypto daemon is also responsbile for flushing the
+> > remaining buffers to complete the computation if no new buffers arrive
+> > for a while.
 > 
-> You seem to manage the 'normal' comment style in other places, this one
-> 'special' for a reason?
+> How is any of this SHA1 specific as the Subject says it is?
 
-Yes, I'll need to correct it.
-
-> 
-> > +static void mcryptd_queue_worker(struct work_struct *work)
-> > +{
-> > +	struct mcryptd_cpu_queue *cpu_queue;
-> > +	struct crypto_async_request *req, *backlog;
-> > +	int i;
-> > +
-> > +	/*
-> > +	 * Need to loop through more than once for multi-buffer to
-> > +	 * be effective.
-> > +	 */
-> > +
-> > +	cpu_queue = container_of(work, struct mcryptd_cpu_queue, work);
-> > +	i = 0;
-> > +	while (i < MCRYPTD_BATCH || single_task_running()) {
-> > +		/*
-> > +		 * preempt_disable/enable is used to prevent
-> > +		 * being preempted by mcryptd_enqueue_request()
-> > +		 */
-> > +		local_bh_disable();
-> > +		preempt_disable();
-> > +		backlog = crypto_get_backlog(&cpu_queue->queue);
-> > +		req = crypto_dequeue_request(&cpu_queue->queue);
-> > +		preempt_enable();
-> > +		local_bh_enable();
-> > +
-> > +		if (!req)
-> > +			return;
-> > +
-> > +		if (backlog)
-> > +			backlog->complete(backlog, -EINPROGRESS);
-> > +		req->complete(req, 0);
-> > +		if (!cpu_queue->queue.qlen)
-> > +			return;
-> > +		++i;
-> > +	}
-> > +	if (cpu_queue->queue.qlen)
-> > +		queue_work(kcrypto_wq, &cpu_queue->work);
-> > +}
-> 
-> Right, so I don't think you need that single_task_running() thing for
-> this. Also its a rather inconclusive test, a task can come in while
-> processing the request, preempt the processing, complete and by the time
-> we're back to check if we want to continue the loop its only us again.
-> 
-> So its actually misleading..
-> 
-> You could do that, but then you have to keep preemption disabled across
-> the entire thing, and break out on need_resched(), that would entirely
-> obviate the need for single_task_running(), but would increase the
-> preemption latency by however long the req processing takes, so that's
-> bad too.
-> 
-> But you can get similar 'fuzzy' semantics as above by using something
-> like:
-> 
-> static inline bool did_context_switch(unsigned long *nivcs)
-> {
-> 	if (*nivcs != current->nivcs) {
-> 		*nivcs = current->nivcs;
-> 		return true;
-> 	}
-> 	return false;
-> }
-> 
-> static void mcryptd_queue_worker()
-> {
-> 	...
-> 	unsigned long nivcs = current->nivcs;
-> 
-> 	...
-> 
-> 	while (!did_context_switch(&nivcs) || i < MCRYPTD_BATCH)
-
-Won't I need something like 
-
-while ((!did_context_switch(&nivcs) && single_task_running()) 
-	|| i < MCRYPTD_BATCH)
-
-in case I got some new task in my run queue but I did not get
-pre-empted?  I should not continue to run in that case.
-
-> 
-> 	...
-> }
-> 
-> It'll terminate earlier I suppose, its the inverse test. But I think you
-> want to terminate early if there's any activity.
-
-I have some doubts here.
-If I'm still the only task running, why not continue, even if I've been
-pre-empted?  Since there's nothing else to run, why not take
-advantage of the cpu?
-
-Thanks.
+Yes, I should simply say multibuffer crypto hash infrastructure in the
+subject line.
 
 Tim
