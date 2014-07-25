@@ -1,8 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 06/10] crypto: qat: Cleanup - change slice->regions to
-	slice->region
-Date: Fri, 25 Jul 2014 15:55:41 -0700
-Message-ID: <20140725225541.24909.28307.stgit@gitlad.jf.intel.com>
+Subject: [PATCH 07/10] crypto: qat: Cleanup - change ae_num to ae_id
+Date: Fri, 25 Jul 2014 15:55:46 -0700
+Message-ID: <20140725225546.24909.95747.stgit@gitlad.jf.intel.com>
 References: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -13,88 +12,334 @@ Cc: <tadeusz.struk@intel.com>, <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>
 To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:57408 "EHLO mga03.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:21682 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751137AbaGYWzn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Jul 2014 18:55:43 -0400
+	id S1751137AbaGYWzs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Jul 2014 18:55:48 -0400
 In-Reply-To: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Change ptr name slice->regions to slice->region to reflect the same
-in the page struct.
+Change the logic how acceleration engines are indexed to make it
+easier to read. Aslo some return code values updates to better reflect
+what failed.
 
 Signed-off-by: Pingchao Yang <pingchao.yang@intel.com>
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
 
- drivers/crypto/qat/qat_common/icp_qat_uclo.h |    2 +-
- drivers/crypto/qat/qat_common/qat_uclo.c     |   22 +++++++++++-----------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ drivers/crypto/qat/qat_common/qat_hal.c  |   26 ++++++------
+ drivers/crypto/qat/qat_common/qat_uclo.c |   67 ++++++++++++++----------------
+ 2 files changed, 45 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_uclo.h b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-index 120fbce..2132a8c 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
-@@ -124,7 +124,7 @@ struct icp_qat_uclo_region {
- };
+diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
+index 28da876..da9626b 100644
+--- a/drivers/crypto/qat/qat_common/qat_hal.c
++++ b/drivers/crypto/qat/qat_common/qat_hal.c
+@@ -424,7 +424,7 @@ static void qat_hal_reset_timestamp(struct icp_qat_fw_loader_handle *handle)
+ 		SET_GLB_CSR(handle, MISC_CONTROL, misc_ctl &
+ 			    (~MC_TIMESTAMP_ENABLE));
  
- struct icp_qat_uclo_aeslice {
--	struct icp_qat_uclo_region *regions;
-+	struct icp_qat_uclo_region *region;
- 	struct icp_qat_uclo_page *page;
- 	struct icp_qat_uclo_page *cur_page[ICP_QAT_UCLO_MAX_CTX];
- 	struct icp_qat_uclo_encapme *encap_image;
-diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-index b1a16eb..557fa60 100644
---- a/drivers/crypto/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -79,37 +79,37 @@ static int qat_uclo_init_ae_data(struct icp_qat_uclo_objhandle *obj_handle,
- 	} else {
- 		ae_slice->ctx_mask_assigned = 0;
- 	}
--	ae_slice->regions = kzalloc(sizeof(*ae_slice->regions), GFP_KERNEL);
--	if (!ae_slice->regions)
-+	ae_slice->region = kzalloc(sizeof(*ae_slice->region), GFP_KERNEL);
-+	if (!ae_slice->region)
- 		return -ENOMEM;
- 	ae_slice->page = kzalloc(sizeof(*ae_slice->page), GFP_KERNEL);
- 	if (!ae_slice->page)
+-	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
++	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
+ 		if (!(handle->hal_handle->ae_mask & (1 << ae)))
+ 			continue;
+ 		qat_hal_wr_ae_csr(handle, ae, TIMESTAMP_LOW, 0);
+@@ -492,7 +492,7 @@ int qat_hal_clr_reset(struct icp_qat_fw_loader_handle *handle)
  		goto out_err;
- 	page = ae_slice->page;
- 	page->encap_page = encap_image->page;
--	ae_slice->page->region = ae_slice->regions;
-+	ae_slice->page->region = ae_slice->region;
- 	ae_data->slice_num++;
- 	return 0;
- out_err:
--	kfree(ae_slice->regions);
--	ae_slice->regions = NULL;
-+	kfree(ae_slice->region);
-+	ae_slice->region = NULL;
- 	return -ENOMEM;
+ 
+ 	/* Set undefined power-up/reset states to reasonable default values */
+-	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
++	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
+ 		if (!(handle->hal_handle->ae_mask & (1 << ae)))
+ 			continue;
+ 		qat_hal_wr_ae_csr(handle, ae, CTX_ENABLES,
+@@ -608,7 +608,7 @@ static int qat_hal_clear_gpr(struct icp_qat_fw_loader_handle *handle)
+ 	unsigned int savctx = 0;
+ 	int ret = 0;
+ 
+-	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
++	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
+ 		if (!(handle->hal_handle->ae_mask & (1 << ae)))
+ 			continue;
+ 		for (reg = 0; reg < ICP_QAT_UCLO_MAX_GPR_REG; reg++) {
+@@ -637,7 +637,7 @@ static int qat_hal_clear_gpr(struct icp_qat_fw_loader_handle *handle)
+ 		qat_hal_wr_ae_csr(handle, ae, CTX_SIG_EVENTS_ACTIVE, 0);
+ 		qat_hal_enable_ctx(handle, ae, ctx_mask);
+ 	}
+-	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
++	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
+ 		if (!(handle->hal_handle->ae_mask & (1 << ae)))
+ 			continue;
+ 		/* wait for AE to finish */
+@@ -674,17 +674,16 @@ static int qat_hal_clear_gpr(struct icp_qat_fw_loader_handle *handle)
+ #define ICP_DH895XCC_PMISC_BAR 1
+ int qat_hal_init(struct adf_accel_dev *accel_dev)
+ {
+-	unsigned char ae = 0;
+-	unsigned int csr_val = 0;
+-	unsigned int max_en_ae_num = 0;
+-	struct icp_qat_fw_loader_handle *handle = NULL;
++	unsigned char ae;
++	unsigned int max_en_ae_id = 0;
++	struct icp_qat_fw_loader_handle *handle;
+ 	struct adf_accel_pci *pci_info = &accel_dev->accel_pci_dev;
+ 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
+ 	struct adf_bar *bar = &pci_info->pci_bars[ADF_DH895XCC_PMISC_BAR];
+ 
+ 	handle = kzalloc(sizeof(*handle), GFP_KERNEL);
+ 	if (!handle)
+-		goto out_handle;
++		return -ENOMEM;
+ 
+ 	handle->hal_cap_g_ctl_csr_addr_v = bar->virt_addr +
+ 						ICP_DH895XCC_CAP_OFFSET;
+@@ -713,9 +712,9 @@ int qat_hal_init(struct adf_accel_dev *accel_dev)
+ 		    handle->hal_handle->max_ustore;
+ 		handle->hal_handle->aes[ae].live_ctx_mask =
+ 						ICP_QAT_UCLO_AE_ALL_CTX;
+-		max_en_ae_num = ae;
++		max_en_ae_id = ae;
+ 	}
+-	handle->hal_handle->ae_max_num = max_en_ae_num;
++	handle->hal_handle->ae_max_num = max_en_ae_id + 1;
+ 	/* take all AEs out of reset */
+ 	if (qat_hal_clr_reset(handle)) {
+ 		pr_err("QAT: qat_hal_clr_reset error\n");
+@@ -724,7 +723,9 @@ int qat_hal_init(struct adf_accel_dev *accel_dev)
+ 	if (qat_hal_clear_gpr(handle))
+ 		goto out_err;
+ 	/* Set SIGNATURE_ENABLE[0] to 0x1 in order to enable ALU_OUT csr */
+-	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
++	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
++		unsigned int csr_val = 0;
++
+ 		if (!(hw_data->ae_mask & (1 << ae)))
+ 			continue;
+ 		qat_hal_rd_ae_csr(handle, ae, SIGNATURE_ENABLE, &csr_val);
+@@ -738,7 +739,6 @@ out_err:
+ 	kfree(handle->hal_handle);
+ out_hal_handle:
+ 	kfree(handle);
+-out_handle:
+ 	return -EFAULT;
  }
  
- static int qat_uclo_free_ae_data(struct icp_qat_uclo_aedata *ae_data)
+diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
+index 557fa60..ebd5da0 100644
+--- a/drivers/crypto/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/qat/qat_common/qat_uclo.c
+@@ -214,11 +214,10 @@ qat_uclo_cleanup_batch_init_list(struct icp_qat_fw_loader_handle *handle,
+ 
+ static int qat_uclo_parse_num(char *str, unsigned int *num)
  {
--	unsigned int ss = 0;
-+	unsigned int i;
+-	char buf[16];
++	char buf[16] = {0};
+ 	unsigned long ae = 0;
+ 	int i;
  
- 	if (!ae_data) {
- 		pr_err("QAT: bad argument, ae_data is NULL\n ");
- 		return -EINVAL;
+-	memset(buf, '\0', 16);
+ 	strncpy(buf, str, 15);
+ 	for (i = 0; i < 16; i++) {
+ 		if (!isdigit(buf[i])) {
+@@ -418,13 +417,13 @@ static int qat_uclo_init_ustore(struct icp_qat_fw_loader_handle *handle,
+ 	fill_data = kcalloc(ICP_QAT_UCLO_MAX_USTORE, sizeof(uint64_t),
+ 			    GFP_KERNEL);
+ 	if (!fill_data)
+-		return -EFAULT;
++		return -ENOMEM;
+ 	for (i = 0; i < ICP_QAT_UCLO_MAX_USTORE; i++)
+ 		memcpy(&fill_data[i], &uof_image->fill_pattern,
+ 		       sizeof(uint64_t));
+ 	page = image->page;
+ 
+-	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
++	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
+ 		if (!test_bit(ae, (unsigned long *)&uof_image->ae_assigned))
+ 			continue;
+ 		ustore_size = obj_handle->ae_data[ae].eff_ustore_size;
+@@ -442,11 +441,9 @@ static int qat_uclo_init_ustore(struct icp_qat_fw_loader_handle *handle,
+ 
+ static int qat_uclo_init_memory(struct icp_qat_fw_loader_handle *handle)
+ {
+-	unsigned int i;
+-	int status = 0;
++	int i, ae;
+ 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
+ 	struct icp_qat_uof_initmem *initmem = obj_handle->init_mem_tab.init_mem;
+-	int ae;
+ 
+ 	for (i = 0; i < obj_handle->init_mem_tab.entry_num; i++) {
+ 		if (initmem->num_in_bytes) {
+@@ -473,7 +470,7 @@ static int qat_uclo_init_memory(struct icp_qat_fw_loader_handle *handle)
+ 						 &obj_handle->
+ 						 umem_init_tab[ae]);
  	}
+-	return status;
++	return 0;
+ }
  
--	for (ss = 0; ss < ae_data->slice_num; ss++) {
--		kfree(ae_data->ae_slices[ss].regions);
--		ae_data->ae_slices[ss].regions = NULL;
--		kfree(ae_data->ae_slices[ss].page);
--		ae_data->ae_slices[ss].page = NULL;
-+	for (i = 0; i < ae_data->slice_num; i++) {
-+		kfree(ae_data->ae_slices[i].region);
-+		ae_data->ae_slices[i].region = NULL;
-+		kfree(ae_data->ae_slices[i].page);
-+		ae_data->ae_slices[i].page = NULL;
+ static void *qat_uclo_find_chunk(struct icp_qat_uof_objhdr *obj_hdr,
+@@ -526,7 +523,7 @@ qat_uclo_map_chunk(char *buf, struct icp_qat_uof_filehdr *file_hdr,
+ {
+ 	struct icp_qat_uof_filechunkhdr *file_chunk;
+ 	struct icp_qat_uclo_objhdr *obj_hdr;
+-	void *chunk;
++	char *chunk;
+ 	int i;
+ 
+ 	file_chunk = (struct icp_qat_uof_filechunkhdr *)
+@@ -536,7 +533,7 @@ qat_uclo_map_chunk(char *buf, struct icp_qat_uof_filehdr *file_hdr,
+ 			     ICP_QAT_UOF_OBJID_LEN)) {
+ 			chunk = buf + file_chunk->offset;
+ 			if (file_chunk->checksum != qat_uclo_calc_str_checksum(
+-				(char *)chunk, file_chunk->size))
++				chunk, file_chunk->size))
+ 				break;
+ 			obj_hdr = kzalloc(sizeof(*obj_hdr), GFP_KERNEL);
+ 			if (!obj_hdr)
+@@ -595,7 +592,7 @@ qat_uclo_check_image_compat(struct icp_qat_uof_encap_obj *encap_uof_obj,
+ 	return 0;
+ }
+ 
+-static void qat_uclo_map_image_pages(struct icp_qat_uof_encap_obj
++static void qat_uclo_map_image_page(struct icp_qat_uof_encap_obj
+ 				     *encap_uof_obj,
+ 				     struct icp_qat_uof_image *img,
+ 				     struct icp_qat_uclo_encap_page *page)
+@@ -631,7 +628,7 @@ static int qat_uclo_map_uimage(struct icp_qat_uclo_objhandle *obj_handle,
+ 			       struct icp_qat_uclo_encapme *ae_uimage,
+ 			       int max_image)
+ {
+-	int a = 0, i;
++	int i, j;
+ 	struct icp_qat_uof_chunkhdr *chunk_hdr = NULL;
+ 	struct icp_qat_uof_image *image;
+ 	struct icp_qat_uof_objtable *ae_regtab;
+@@ -640,7 +637,7 @@ static int qat_uclo_map_uimage(struct icp_qat_uclo_objhandle *obj_handle,
+ 	struct icp_qat_uof_encap_obj *encap_uof_obj =
+ 					&obj_handle->encap_uof_obj;
+ 
+-	for (a = 0; a < max_image; a++) {
++	for (j = 0; j < max_image; j++) {
+ 		chunk_hdr = qat_uclo_find_chunk(encap_uof_obj->obj_hdr,
+ 						ICP_QAT_UOF_IMAG, chunk_hdr);
+ 		if (!chunk_hdr)
+@@ -650,37 +647,37 @@ static int qat_uclo_map_uimage(struct icp_qat_uclo_objhandle *obj_handle,
+ 		ae_regtab = (struct icp_qat_uof_objtable *)
+ 			   (image->reg_tab_offset +
+ 			   obj_handle->obj_hdr->file_buff);
+-		ae_uimage[a].ae_reg_num = ae_regtab->entry_num;
+-		ae_uimage[a].ae_reg = (struct icp_qat_uof_ae_reg *)
++		ae_uimage[j].ae_reg_num = ae_regtab->entry_num;
++		ae_uimage[j].ae_reg = (struct icp_qat_uof_ae_reg *)
+ 			(((char *)ae_regtab) +
+ 			sizeof(struct icp_qat_uof_objtable));
+ 		init_reg_sym_tab = (struct icp_qat_uof_objtable *)
+ 				   (image->init_reg_sym_tab +
+ 				   obj_handle->obj_hdr->file_buff);
+-		ae_uimage[a].init_regsym_num = init_reg_sym_tab->entry_num;
+-		ae_uimage[a].init_regsym = (struct icp_qat_uof_init_regsym *)
++		ae_uimage[j].init_regsym_num = init_reg_sym_tab->entry_num;
++		ae_uimage[j].init_regsym = (struct icp_qat_uof_init_regsym *)
+ 			(((char *)init_reg_sym_tab) +
+ 			sizeof(struct icp_qat_uof_objtable));
+ 		sbreak_tab = (struct icp_qat_uof_objtable *)
+ 			(image->sbreak_tab + obj_handle->obj_hdr->file_buff);
+-		ae_uimage[a].sbreak_num = sbreak_tab->entry_num;
+-		ae_uimage[a].sbreak = (struct icp_qat_uof_sbreak *)
++		ae_uimage[j].sbreak_num = sbreak_tab->entry_num;
++		ae_uimage[j].sbreak = (struct icp_qat_uof_sbreak *)
+ 				      (((char *)sbreak_tab) +
+ 				      sizeof(struct icp_qat_uof_objtable));
+-		ae_uimage[a].img_ptr = image;
++		ae_uimage[j].img_ptr = image;
+ 		if (qat_uclo_check_image_compat(encap_uof_obj, image))
+ 			goto out_err;
+-		ae_uimage[a].page =
++		ae_uimage[j].page =
+ 			kzalloc(sizeof(struct icp_qat_uclo_encap_page),
+ 				GFP_KERNEL);
+-		if (!ae_uimage[a].page)
++		if (!ae_uimage[j].page)
+ 			goto out_err;
+-		qat_uclo_map_image_pages(encap_uof_obj, image,
+-					 ae_uimage[a].page);
++		qat_uclo_map_image_page(encap_uof_obj, image,
++					ae_uimage[j].page);
+ 	}
+-	return a;
++	return j;
+ out_err:
+-	for (i = 0; i < a; i++)
++	for (i = 0; i < j; i++)
+ 		kfree(ae_uimage[i].page);
+ 	return 0;
+ }
+@@ -875,7 +872,7 @@ static int qat_uclo_init_globals(struct icp_qat_fw_loader_handle *handle)
+ 			return -EINVAL;
+ 		}
+ 	}
+-	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
++	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
+ 		for (s = 0; s < obj_handle->ae_data[ae].slice_num; s++) {
+ 			if (!obj_handle->ae_data[ae].ae_slices[s].encap_image)
+ 				continue;
+@@ -896,7 +893,7 @@ static int qat_uclo_set_ae_mode(struct icp_qat_fw_loader_handle *handle)
+ 	struct icp_qat_uclo_aedata *ae_data;
+ 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
+ 
+-	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
++	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
+ 		if (!test_bit(ae,
+ 			      (unsigned long *)&handle->hal_handle->ae_mask))
+ 			continue;
+@@ -1041,7 +1038,7 @@ out_objbuf_err:
+ void qat_uclo_del_uof_obj(struct icp_qat_fw_loader_handle *handle)
+ {
+ 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
+-	int a;
++	unsigned int a;
+ 
+ 	if (!obj_handle)
+ 		return;
+@@ -1050,7 +1047,7 @@ void qat_uclo_del_uof_obj(struct icp_qat_fw_loader_handle *handle)
+ 	for (a = 0; a < obj_handle->uimage_num; a++)
+ 		kfree(obj_handle->ae_uimage[a].page);
+ 
+-	for (a = 0; a <= (int)handle->hal_handle->ae_max_num; a++)
++	for (a = 0; a < handle->hal_handle->ae_max_num; a++)
+ 		qat_uclo_free_ae_data(&obj_handle->ae_data[a]);
+ 
+ 	kfree(obj_handle->obj_hdr);
+@@ -1127,8 +1124,8 @@ static void qat_uclo_wr_uimage_raw_page(struct icp_qat_fw_loader_handle *handle,
+ 	}
+ }
+ 
+-static void qat_uclo_wr_uimage_pages(struct icp_qat_fw_loader_handle *handle,
+-				     struct icp_qat_uof_image *image)
++static void qat_uclo_wr_uimage_page(struct icp_qat_fw_loader_handle *handle,
++				    struct icp_qat_uof_image *image)
+ {
+ 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
+ 	unsigned int ctx_mask, s;
+@@ -1142,7 +1139,7 @@ static void qat_uclo_wr_uimage_pages(struct icp_qat_fw_loader_handle *handle,
+ 		ctx_mask = 0x55;
+ 	/* load the default page and set assigned CTX PC
+ 	 * to the entrypoint address */
+-	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
++	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
+ 		if (!test_bit(ae, (unsigned long *)&image->ae_assigned))
+ 			continue;
+ 		/* find the slice to which this image is assigned */
+@@ -1181,8 +1178,8 @@ int qat_uclo_wr_all_uimage(struct icp_qat_fw_loader_handle *handle)
+ 			return -EINVAL;
+ 		if (qat_uclo_init_ustore(handle, &obj_handle->ae_uimage[i]))
+ 			return -EINVAL;
+-		qat_uclo_wr_uimage_pages(handle,
+-					 obj_handle->ae_uimage[i].img_ptr);
++		qat_uclo_wr_uimage_page(handle,
++					obj_handle->ae_uimage[i].img_ptr);
  	}
  	return 0;
  }
