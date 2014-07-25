@@ -1,10 +1,10 @@
 From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v5 2/7] crypto: SHA1 multibuffer crypto hash
- infrastructure
-Date: Fri, 25 Jul 2014 09:08:00 +0200
-Message-ID: <20140725070800.GS3935@laptop>
+Subject: Re: [PATCH v5 3/7] crypto: SHA1 multibuffer crypto opportunistic
+ flush
+Date: Fri, 25 Jul 2014 09:22:25 +0200
+Message-ID: <20140725072225.GT3935@laptop>
 References: <cover.1406033477.git.tim.c.chen@linux.intel.com>
- <1406066972.2970.804.camel@schen9-DESK>
+ <1406066975.2970.805.camel@schen9-DESK>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -21,99 +21,39 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:46191 "EHLO
+Received: from casper.infradead.org ([85.118.1.10]:46257 "EHLO
 	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758877AbaGYHIJ (ORCPT
+	with ESMTP id S1750961AbaGYHW3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Jul 2014 03:08:09 -0400
+	Fri, 25 Jul 2014 03:22:29 -0400
 Content-Disposition: inline
-In-Reply-To: <1406066972.2970.804.camel@schen9-DESK>
+In-Reply-To: <1406066975.2970.805.camel@schen9-DESK>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 22, 2014 at 03:09:32PM -0700, Tim Chen wrote:
-> +/* Called in workqueue context, do one real cryption work (via
-> + * req->complete) and reschedule itself if there are more work to
-> + * do. */
+On Tue, Jul 22, 2014 at 03:09:35PM -0700, Tim Chen wrote:
+> The crypto daemon can take advantage of available cpu
+> cycles to flush any unfinished jobs if it is the
+> only task running on the cpu, and there are no more crypto
+> jobs to process.
 
-You seem to manage the 'normal' comment style in other places, this one
-'special' for a reason?
+You conveniently forgot to mention energy efficiency, and the problem
+with short idle durations. Although the latter issue seems overshadowed
+by the not so very robust idle detection.
 
-> +static void mcryptd_queue_worker(struct work_struct *work)
-> +{
-> +	struct mcryptd_cpu_queue *cpu_queue;
-> +	struct crypto_async_request *req, *backlog;
-> +	int i;
-> +
-> +	/*
-> +	 * Need to loop through more than once for multi-buffer to
-> +	 * be effective.
-> +	 */
-> +
-> +	cpu_queue = container_of(work, struct mcryptd_cpu_queue, work);
-> +	i = 0;
-> +	while (i < MCRYPTD_BATCH || single_task_running()) {
-> +		/*
-> +		 * preempt_disable/enable is used to prevent
-> +		 * being preempted by mcryptd_enqueue_request()
-> +		 */
-> +		local_bh_disable();
-> +		preempt_disable();
-> +		backlog = crypto_get_backlog(&cpu_queue->queue);
-> +		req = crypto_dequeue_request(&cpu_queue->queue);
-> +		preempt_enable();
-> +		local_bh_enable();
-> +
-> +		if (!req)
-> +			return;
-> +
-> +		if (backlog)
-> +			backlog->complete(backlog, -EINPROGRESS);
-> +		req->complete(req, 0);
-> +		if (!cpu_queue->queue.qlen)
-> +			return;
-> +		++i;
-> +	}
-> +	if (cpu_queue->queue.qlen)
-> +		queue_work(kcrypto_wq, &cpu_queue->work);
-> +}
+In any case, same as the other patch, you can get similarly inconclusive
+semantics without single_task_running().
 
-Right, so I don't think you need that single_task_running() thing for
-this. Also its a rather inconclusive test, a task can come in while
-processing the request, preempt the processing, complete and by the time
-we're back to check if we want to continue the loop its only us again.
+> Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
+> ---
+>  crypto/mcryptd.c | 39 ++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 36 insertions(+), 3 deletions(-)
 
-So its actually misleading..
+> +/*
+> + * Called in workqueue context, do one real cryption work (via
+>   * req->complete) and reschedule itself if there are more work to
+> - * do. */
+> + * do.
+> + */
 
-You could do that, but then you have to keep preemption disabled across
-the entire thing, and break out on need_resched(), that would entirely
-obviate the need for single_task_running(), but would increase the
-preemption latency by however long the req processing takes, so that's
-bad too.
-
-But you can get similar 'fuzzy' semantics as above by using something
-like:
-
-static inline bool did_context_switch(unsigned long *nivcs)
-{
-	if (*nivcs != current->nivcs) {
-		*nivcs = current->nivcs;
-		return true;
-	}
-	return false;
-}
-
-static void mcryptd_queue_worker()
-{
-	...
-	unsigned long nivcs = current->nivcs;
-
-	...
-
-	while (!did_context_switch(&nivcs) || i < MCRYPTD_BATCH)
-
-	...
-}
-
-It'll terminate earlier I suppose, its the inverse test. But I think you
-want to terminate early if there's any activity.
+See, this should've been in the previous patch :-)
