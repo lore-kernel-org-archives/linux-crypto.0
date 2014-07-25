@@ -1,66 +1,56 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: General flags to turn things off (getrandom, pid lookup, etc)
-Date: Fri, 25 Jul 2014 14:41:47 -0700
-Message-ID: <CALCETrXHNFYaQjksBJyN3O0HJpKw_D_tU7b4O23=nyJt9CPSLg@mail.gmail.com>
-References: <CALCETrWGvBfrX1W5XaFgJZhKHLf+oac9YrwPR3ppK=deQtu5hA@mail.gmail.com>
- <20140725223550.3153f436@alan.etchedpixels.co.uk>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH 00/10] crypto: qat: Checkpatch and other cleanups plus SKU1
+Date: Fri, 25 Jul 2014 15:55:03 -0700
+Message-ID: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "Eric W. Biederman" <ebiederm@xmission.com>,
-	Julien Tinnes <jln@google.com>,
-	David Drysdale <drysdale@google.com>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	LSM List <linux-security-module@vger.kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <james.l.morris@oracle.com>,
-	Linux API <linux-api@vger.kernel.org>,
-	Meredydd Luff <meredydd@senatehouse.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
-	linux-crypto@vger.kernel.org
-To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <tadeusz.struk@intel.com>, <davem@davemloft.net>,
+	<bruce.w.allan@intel.com>, <bo.cui@intel.com>,
+	<pingchao.yang@intel.com>, <qat-linux@intel.com>,
+	<linux-crypto@vger.kernel.org>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f180.google.com ([209.85.217.180]:35975 "EHLO
-	mail-lb0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751247AbaGYVmJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Jul 2014 17:42:09 -0400
-Received: by mail-lb0-f180.google.com with SMTP id v6so3803386lbi.39
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Jul 2014 14:42:07 -0700 (PDT)
-In-Reply-To: <20140725223550.3153f436@alan.etchedpixels.co.uk>
+Received: from mga09.intel.com ([134.134.136.24]:21581 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751137AbaGYWzG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Jul 2014 18:55:06 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 25, 2014 at 2:35 PM, One Thousand Gnomes
-<gnomes@lxorguk.ukuu.org.uk> wrote:
-> On Fri, 25 Jul 2014 11:30:48 -0700
-> Andy Lutomirski <luto@amacapital.net> wrote:
->
->> [new thread because this sort of combines two threads]
->>
->> There is recent interest in having a way to turn generally-available
->> kernel features off.  Maybe we should add a good one so we can stop
->> bikeshedding and avoid proliferating dumb interfaces.
->
-> We sort of have one. It's called capable(). Just needs extending to cover
-> anything else you care about, and probably all the numeric constants
-> replacing with textual names.
->
+issue.
 
-Except that it's all backwards: these are things that default to *on*,
-and people might want them to turn off.  capable() is totally fscked
-if you want otherwise unprivileged users to carry capabilities around,
-and fixing it seems to run into endless claims that the "capability"
-system is carefully designed, flawless, perfect, ideal, amazing, and
-shouldn't be changed, despite the fact that it's empirically damn near
-useless.
+Hi,
+Minor cleanups for the qat driver.
+The last patch fixes SKU1 device startup issue.
+Rest of the patches clean up new checkpatch issues plus some minor
+and cosmetic updates.
+---
 
-Also, capabilities do the wrong thing wrt namespaces.  The things I'm
-talking about aren't namespaced.  They're either on or off.
+Tadeusz Struk (10):
+      crypto: qat: Fixed SKU1 dev issue
+      crypto: qat: Cleanup - Use hweight for bit counting
+      crypto: qat: Cleanup - Updated print outputs
+      crypto: qat: Cleanup - change ae_num to ae_id
+      crypto: qat: Cleanup - change slice->regions to slice->region
+      crypto: qat: Cleanup - use min_t macro
+      crypto: qat: Cleanup - remove unnecessary parentheses
+      crypto: qat: Cleanup - remove unneeded header
+      crypto: qat: Cleanup - checkpatch blank lines
+      crypto: qat: Cleanup - remove unnecessary return codes
 
---Andy
+
+ drivers/crypto/qat/qat_common/adf_accel_engine.c   |    4 
+ drivers/crypto/qat/qat_common/adf_cfg.c            |    1 
+ drivers/crypto/qat/qat_common/adf_init.c           |    2 
+ .../crypto/qat/qat_common/adf_transport_internal.h |    3 
+ drivers/crypto/qat/qat_common/icp_qat_fw_la.h      |    1 
+ drivers/crypto/qat/qat_common/icp_qat_hw.h         |    6 -
+ drivers/crypto/qat/qat_common/icp_qat_uclo.h       |    2 
+ drivers/crypto/qat/qat_common/qat_algs.c           |    2 
+ drivers/crypto/qat/qat_common/qat_hal.c            |   44 ++---
+ drivers/crypto/qat/qat_common/qat_uclo.c           |  180 +++++++++-----------
+ .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    2 
+ 11 files changed, 112 insertions(+), 135 deletions(-)
+
+-- 
