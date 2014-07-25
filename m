@@ -1,41 +1,140 @@
-From: Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>
-Subject: Re: [PATCH -v5] random: introduce getrandom(2) system call
-Date: Fri, 25 Jul 2014 09:22:25 -0400
-Message-ID: <20140725132225.GQ1865@thunk.org>
-References: <1406212287-9855-1-git-send-email-tytso@mit.edu>
- <20140724151814.GE32421@khazad-dum.debian.net>
- <CALCETrXAA=UzS-pRCo5tKSjSCOP9xfu66BG9QbRefVrovkavhQ@mail.gmail.com>
- <20140724190206.GL6673@thunk.org>
- <20140724203019.GA20737@khazad-dum.debian.net>
- <20140724232434.GN6673@thunk.org>
- <CALCETrVgKMVnBuzE+bCXaUPRrqhVxwv4AXmJrUJSYws5rZxhJw@mail.gmail.com>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v5 2/7] crypto: SHA1 multibuffer crypto hash
+ infrastructure
+Date: Fri, 25 Jul 2014 09:25:21 -0700
+Message-ID: <1406305521.2970.851.camel@schen9-DESK>
+References: <cover.1406033477.git.tim.c.chen@linux.intel.com>
+	 <1406066972.2970.804.camel@schen9-DESK>  <20140725070800.GS3935@laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Henrique de Moraes Holschuh <hmh-N3TV7GIv+o9fyO9Q7EP/yw@public.gmane.org>,
-	Linux Kernel Developers List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CALCETrVgKMVnBuzE+bCXaUPRrqhVxwv4AXmJrUJSYws5rZxhJw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Ingo Molnar <mingo@kernel.org>,
+	Chandramouli Narayanan <mouli@linux.intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Tadeusz Struk <tadeusz.struk@intel.com>, tkhai@yandex.ru,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Peter Zijlstra <peterz@infradead.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:64967 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752988AbaGYQZX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Jul 2014 12:25:23 -0400
+In-Reply-To: <20140725070800.GS3935@laptop>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 24, 2014 at 04:27:36PM -0700, Andy Lutomirski wrote:
+On Fri, 2014-07-25 at 09:08 +0200, Peter Zijlstra wrote:
+> On Tue, Jul 22, 2014 at 03:09:32PM -0700, Tim Chen wrote:
+> > +/* Called in workqueue context, do one real cryption work (via
+> > + * req->complete) and reschedule itself if there are more work to
+> > + * do. */
 > 
-> I think that people might do:
+> You seem to manage the 'normal' comment style in other places, this one
+> 'special' for a reason?
+
+Yes, I'll need to correct it.
+
 > 
-> try getrandom(GRND_RANDOM)
-> fall back to /dev/random
-> fall back to something intensely stupid
+> > +static void mcryptd_queue_worker(struct work_struct *work)
+> > +{
+> > +	struct mcryptd_cpu_queue *cpu_queue;
+> > +	struct crypto_async_request *req, *backlog;
+> > +	int i;
+> > +
+> > +	/*
+> > +	 * Need to loop through more than once for multi-buffer to
+> > +	 * be effective.
+> > +	 */
+> > +
+> > +	cpu_queue = container_of(work, struct mcryptd_cpu_queue, work);
+> > +	i = 0;
+> > +	while (i < MCRYPTD_BATCH || single_task_running()) {
+> > +		/*
+> > +		 * preempt_disable/enable is used to prevent
+> > +		 * being preempted by mcryptd_enqueue_request()
+> > +		 */
+> > +		local_bh_disable();
+> > +		preempt_disable();
+> > +		backlog = crypto_get_backlog(&cpu_queue->queue);
+> > +		req = crypto_dequeue_request(&cpu_queue->queue);
+> > +		preempt_enable();
+> > +		local_bh_enable();
+> > +
+> > +		if (!req)
+> > +			return;
+> > +
+> > +		if (backlog)
+> > +			backlog->complete(backlog, -EINPROGRESS);
+> > +		req->complete(req, 0);
+> > +		if (!cpu_queue->queue.qlen)
+> > +			return;
+> > +		++i;
+> > +	}
+> > +	if (cpu_queue->queue.qlen)
+> > +		queue_work(kcrypto_wq, &cpu_queue->work);
+> > +}
 > 
-> We want them to at least attempt the fallback from GRND_RANDOM to !GRND_RANDOM.
+> Right, so I don't think you need that single_task_running() thing for
+> this. Also its a rather inconclusive test, a task can come in while
+> processing the request, preempt the processing, complete and by the time
+> we're back to check if we want to continue the loop its only us again.
+> 
+> So its actually misleading..
+> 
+> You could do that, but then you have to keep preemption disabled across
+> the entire thing, and break out on need_resched(), that would entirely
+> obviate the need for single_task_running(), but would increase the
+> preemption latency by however long the req processing takes, so that's
+> bad too.
+> 
+> But you can get similar 'fuzzy' semantics as above by using something
+> like:
+> 
+> static inline bool did_context_switch(unsigned long *nivcs)
+> {
+> 	if (*nivcs != current->nivcs) {
+> 		*nivcs = current->nivcs;
+> 		return true;
+> 	}
+> 	return false;
+> }
+> 
+> static void mcryptd_queue_worker()
+> {
+> 	...
+> 	unsigned long nivcs = current->nivcs;
+> 
+> 	...
+> 
+> 	while (!did_context_switch(&nivcs) || i < MCRYPTD_BATCH)
 
-We can't legislate against stupidity.  Seriously, the best way to do
-this is to write a good userspace library and encourage application
-writers to use it.
+Won't I need something like 
 
-Regards,
+while ((!did_context_switch(&nivcs) && single_task_running()) 
+	|| i < MCRYPTD_BATCH)
 
-						- Ted
+in case I got some new task in my run queue but I did not get
+pre-empted?  I should not continue to run in that case.
+
+> 
+> 	...
+> }
+> 
+> It'll terminate earlier I suppose, its the inverse test. But I think you
+> want to terminate early if there's any activity.
+
+I have some doubts here.
+If I'm still the only task running, why not continue, even if I've been
+pre-empted?  Since there's nothing else to run, why not take
+advantage of the cpu?
+
+Thanks.
+
+Tim
