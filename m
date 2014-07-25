@@ -1,71 +1,92 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 10/10] crypto: qat: Fixed SKU1 dev issue
-Date: Fri, 25 Jul 2014 15:56:03 -0700
-Message-ID: <20140725225603.24909.4383.stgit@gitlad.jf.intel.com>
-References: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
+From: Mikulas Patocka <mpatocka@redhat.com>
+Subject: [PATCH 1/2] arm64 aes: fix encryption of unaligned data
+Date: Fri, 25 Jul 2014 19:40:20 -0400 (EDT)
+Message-ID: <alpine.LRH.2.02.1407251937110.11227@file01.intranet.prod.int.rdu2.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <tadeusz.struk@intel.com>, <davem@davemloft.net>,
-	<bruce.w.allan@intel.com>, <bo.cui@intel.com>,
-	<pingchao.yang@intel.com>, <qat-linux@intel.com>,
-	<linux-crypto@vger.kernel.org>
-To: <herbert@gondor.apana.org.au>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: Andy Polyakov <appro@openssl.org>, Nicolas Pitre <nico@linaro.org>,
+	"Alasdair G. Kergon" <agk@redhat.com>,
+	linux-crypto@vger.kernel.org, dm-devel@redhat.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:57440 "EHLO mga03.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:65310 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751550AbaGYW4E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Jul 2014 18:56:04 -0400
-In-Reply-To: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
+	id S1750967AbaGYXl1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Jul 2014 19:41:27 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix for issue with SKU1 device.
-SKU1 device has 8 micro engines as opposed to 12 in other SKUs
-so it was not possible to start the non-existing micro engines.
+cryptsetup fails on arm64 when using kernel encryption via AF_ALG socket.
+See https://bugzilla.redhat.com/show_bug.cgi?id=1122937
 
-Signed-off-by: Bo Cui <bo.cui@intel.com>
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
+The bug is caused by incorrect handling of unaligned data in
+arch/arm64/crypto/aes-glue.c. Cryptsetup creates a buffer that is aligned
+on 8 bytes, but not on 16 bytes. It opens AF_ALG socket and uses the
+socket to encrypt data in the buffer. The arm64 crypto accelerator causes
+data corruption or crashes in the scatterwalk_pagedone.
 
- drivers/crypto/qat/qat_common/qat_uclo.c           |    6 +-----
- .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    2 +-
- 2 files changed, 2 insertions(+), 6 deletions(-)
+This patch fixes the bug by passing the residue bytes that were not
+processed as the last parameter to blkcipher_walk_done.
 
-diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-index 2580091..1e27f9f 100644
---- a/drivers/crypto/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -256,10 +256,6 @@ static int qat_uclo_fetch_initmem_ae(struct icp_qat_fw_loader_handle *handle,
- 		pr_err("QAT: Parse num for AE number failed\n");
- 		return -EINVAL;
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+
+Index: linux-3.16.0-0.rc6.git1.1.fc21.aarch64/arch/arm64/crypto/aes-glue.c
+===================================================================
+--- linux-3.16.0-0.rc6.git1.1.fc21.aarch64.orig/arch/arm64/crypto/aes-glue.c
++++ linux-3.16.0-0.rc6.git1.1.fc21.aarch64/arch/arm64/crypto/aes-glue.c
+@@ -106,7 +106,7 @@ static int ecb_encrypt(struct blkcipher_
+ 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
+ 		aes_ecb_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				(u8 *)ctx->key_enc, rounds, blocks, first);
+-		err = blkcipher_walk_done(desc, &walk, 0);
++		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
  	}
--	if (!test_bit(*ae, (unsigned long *)&handle->hal_handle->ae_mask)) {
--		pr_err("QAT: ae %d to be init is fused off\n", *ae);
--		return -EINVAL;
--	}
- 	if (*ae >= ICP_QAT_UCLO_MAX_AE) {
- 		pr_err("QAT: ae %d out of range\n", *ae);
- 		return -EINVAL;
-@@ -456,7 +452,7 @@ static int qat_uclo_init_memory(struct icp_qat_fw_loader_handle *handle)
- 			(sizeof(struct icp_qat_uof_memvar_attr) *
- 			initmem->val_attr_num));
+ 	kernel_neon_end();
+ 	return err;
+@@ -128,7 +128,7 @@ static int ecb_decrypt(struct blkcipher_
+ 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
+ 		aes_ecb_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				(u8 *)ctx->key_dec, rounds, blocks, first);
+-		err = blkcipher_walk_done(desc, &walk, 0);
++		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
  	}
--	for (ae = 0; ae < ICP_QAT_UCLO_MAX_AE; ae++) {
-+	for (ae = 0; ae < handle->hal_handle->ae_max_num; ae++) {
- 		if (qat_hal_batch_wr_lm(handle, ae,
- 					obj_handle->lm_init_tab[ae])) {
- 			pr_err("QAT: fail to batch init lmem for AE %d\n", ae);
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-index c5ce236..b707f29 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-@@ -59,7 +59,7 @@
- #define ADF_DH895XCC_FUSECTL_SKU_4 0x3
- #define ADF_DH895XCC_MAX_ACCELERATORS 6
- #define ADF_DH895XCC_MAX_ACCELENGINES 12
--#define ADF_DH895XCC_ACCELERATORS_REG_OFFSET 18
-+#define ADF_DH895XCC_ACCELERATORS_REG_OFFSET 13
- #define ADF_DH895XCC_ACCELERATORS_MASK 0x3F
- #define ADF_DH895XCC_ACCELENGINES_MASK 0xFFF
- #define ADF_DH895XCC_LEGFUSE_OFFSET 0x4C
+ 	kernel_neon_end();
+ 	return err;
+@@ -151,7 +151,7 @@ static int cbc_encrypt(struct blkcipher_
+ 		aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				(u8 *)ctx->key_enc, rounds, blocks, walk.iv,
+ 				first);
+-		err = blkcipher_walk_done(desc, &walk, 0);
++		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+ 	kernel_neon_end();
+ 	return err;
+@@ -174,7 +174,7 @@ static int cbc_decrypt(struct blkcipher_
+ 		aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				(u8 *)ctx->key_dec, rounds, blocks, walk.iv,
+ 				first);
+-		err = blkcipher_walk_done(desc, &walk, 0);
++		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+ 	kernel_neon_end();
+ 	return err;
+@@ -243,7 +243,7 @@ static int xts_encrypt(struct blkcipher_
+ 		aes_xts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				(u8 *)ctx->key1.key_enc, rounds, blocks,
+ 				(u8 *)ctx->key2.key_enc, walk.iv, first);
+-		err = blkcipher_walk_done(desc, &walk, 0);
++		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+ 	kernel_neon_end();
+ 
+@@ -267,7 +267,7 @@ static int xts_decrypt(struct blkcipher_
+ 		aes_xts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+ 				(u8 *)ctx->key1.key_dec, rounds, blocks,
+ 				(u8 *)ctx->key2.key_enc, walk.iv, first);
+-		err = blkcipher_walk_done(desc, &walk, 0);
++		err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
+ 	}
+ 	kernel_neon_end();
+ 
