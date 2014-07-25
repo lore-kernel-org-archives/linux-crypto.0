@@ -1,7 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 04/10] crypto: qat: Cleanup - remove unnecessary parentheses
-Date: Fri, 25 Jul 2014 15:55:26 -0700
-Message-ID: <20140725225526.24909.50468.stgit@gitlad.jf.intel.com>
+Subject: [PATCH 02/10] crypto: qat: Cleanup - checkpatch blank lines
+Date: Fri, 25 Jul 2014 15:55:15 -0700
+Message-ID: <20140725225515.24909.56399.stgit@gitlad.jf.intel.com>
 References: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -12,222 +12,55 @@ Cc: <tadeusz.struk@intel.com>, <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>
 To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:57350 "EHLO mga03.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:51375 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751137AbaGYWz2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Jul 2014 18:55:28 -0400
+	id S1751137AbaGYWzb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Jul 2014 18:55:31 -0400
 In-Reply-To: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Resolve new strict checkpatch hits
-CHECK:UNNECESSARY_PARENTHESES: Unnecessary parentheses around ...
+Fix new checkpatch hits:
+CHECK:LINE_SPACING: Please use a blank line after
+function/struct/union/enum declarations
 
 Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
 
- drivers/crypto/qat/qat_common/icp_qat_hw.h |    6 ++-
- drivers/crypto/qat/qat_common/qat_algs.c   |    2 +
- drivers/crypto/qat/qat_common/qat_uclo.c   |   54 ++++++++++++++--------------
- 3 files changed, 31 insertions(+), 31 deletions(-)
+ .../crypto/qat/qat_common/adf_transport_internal.h |    3 +++
+ drivers/crypto/qat/qat_common/icp_qat_fw_la.h      |    1 +
+ 2 files changed, 4 insertions(+)
 
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_hw.h b/drivers/crypto/qat/qat_common/icp_qat_hw.h
-index cc7ec40..5031f8c 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_hw.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_hw.h
-@@ -120,14 +120,14 @@ struct icp_qat_hw_auth_config {
- #define QAT_AUTH_ALGO_SHA3_BITPOS 22
- #define QAT_AUTH_ALGO_SHA3_MASK 0x3
- #define ICP_QAT_HW_AUTH_CONFIG_BUILD(mode, algo, cmp_len) \
--	((((mode) & QAT_AUTH_MODE_MASK) << QAT_AUTH_MODE_BITPOS) | \
--	(((algo) & QAT_AUTH_ALGO_MASK) << QAT_AUTH_ALGO_BITPOS) | \
-+	(((mode & QAT_AUTH_MODE_MASK) << QAT_AUTH_MODE_BITPOS) | \
-+	((algo & QAT_AUTH_ALGO_MASK) << QAT_AUTH_ALGO_BITPOS) | \
- 	(((algo >> 4) & QAT_AUTH_ALGO_SHA3_MASK) << \
- 	 QAT_AUTH_ALGO_SHA3_BITPOS) | \
- 	 (((((algo == ICP_QAT_HW_AUTH_ALGO_SHA3_256) || \
- 	(algo == ICP_QAT_HW_AUTH_ALGO_SHA3_512)) ? 1 : 0) \
- 	& QAT_AUTH_SHA3_PADDING_MASK) << QAT_AUTH_SHA3_PADDING_BITPOS) | \
--	(((cmp_len) & QAT_AUTH_CMP_MASK) << QAT_AUTH_CMP_BITPOS))
-+	((cmp_len & QAT_AUTH_CMP_MASK) << QAT_AUTH_CMP_BITPOS))
- 
- struct icp_qat_hw_auth_counter {
- 	__be32 counter;
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index 946686f..59df488 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -759,7 +759,7 @@ void qat_alg_callback(void *resp)
- 	qat_alg_free_bufl(inst, qat_req);
- 	if (unlikely(qat_res != ICP_QAT_FW_COMN_STATUS_FLAG_OK))
- 		res = -EBADMSG;
--	areq->base.complete(&(areq->base), res);
-+	areq->base.complete(&areq->base, res);
- }
- 
- static int qat_alg_dec(struct aead_request *areq)
-diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-index f22b488..17a9954f 100644
---- a/drivers/crypto/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -79,11 +79,11 @@ static int qat_uclo_init_ae_data(struct icp_qat_uclo_objhandle *obj_handle,
- 	} else {
- 		ae_slice->ctx_mask_assigned = 0;
- 	}
--	ae_slice->regions = kzalloc(sizeof(*(ae_slice->regions)), GFP_KERNEL);
--	if (!(ae_slice->regions))
-+	ae_slice->regions = kzalloc(sizeof(*ae_slice->regions), GFP_KERNEL);
-+	if (!ae_slice->regions)
- 		return -ENOMEM;
--	ae_slice->page = kzalloc(sizeof(*(ae_slice->page)), GFP_KERNEL);
--	if (!(ae_slice->page))
-+	ae_slice->page = kzalloc(sizeof(*ae_slice->page), GFP_KERNEL);
-+	if (!ae_slice->page)
- 		goto out_err;
- 	page = ae_slice->page;
- 	page->encap_page = encap_image->page;
-@@ -248,7 +248,7 @@ static int qat_uclo_fetch_initmem_ae(struct icp_qat_fw_loader_handle *handle,
- 		pr_err("QAT: Memory scope for init_mem error\n");
- 		return -EINVAL;
- 	}
--	str = qat_uclo_get_string(&(obj_handle->str_table), init_mem->sym_name);
-+	str = qat_uclo_get_string(&obj_handle->str_table, init_mem->sym_name);
- 	if (!str) {
- 		pr_err("QAT: AE name assigned in uof init table is NULL\n");
- 		return -EINVAL;
-@@ -257,7 +257,7 @@ static int qat_uclo_fetch_initmem_ae(struct icp_qat_fw_loader_handle *handle,
- 		pr_err("QAT: Parse num for AE number failed\n");
- 		return -EINVAL;
- 	}
--	if (!test_bit(*ae, (unsigned long *)&(handle->hal_handle->ae_mask))) {
-+	if (!test_bit(*ae, (unsigned long *)&handle->hal_handle->ae_mask)) {
- 		pr_err("QAT: ae %d to be init is fused off\n", *ae);
- 		return -EINVAL;
- 	}
-@@ -332,7 +332,7 @@ static int qat_uclo_init_lmem_seg(struct icp_qat_fw_loader_handle *handle,
- 				      ICP_QAT_UCLO_MAX_LMEM_REG, &ae))
- 		return -EINVAL;
- 	if (qat_uclo_create_batch_init_list(handle, init_mem, ae,
--					    &(obj_handle->lm_init_tab[ae])))
-+					    &obj_handle->lm_init_tab[ae]))
- 		return -EINVAL;
+diff --git a/drivers/crypto/qat/qat_common/adf_transport_internal.h b/drivers/crypto/qat/qat_common/adf_transport_internal.h
+index 4eb8969..f854bac 100644
+--- a/drivers/crypto/qat/qat_common/adf_transport_internal.h
++++ b/drivers/crypto/qat/qat_common/adf_transport_internal.h
+@@ -104,12 +104,15 @@ static inline int adf_bank_debugfs_add(struct adf_etr_bank_data *bank)
+ {
  	return 0;
  }
-@@ -347,7 +347,7 @@ static int qat_uclo_init_umem_seg(struct icp_qat_fw_loader_handle *handle,
- 	if (qat_uclo_fetch_initmem_ae(handle, init_mem, ustore_size, &ae))
- 		return -EINVAL;
- 	if (qat_uclo_create_batch_init_list(handle, init_mem, ae,
--					    &(obj_handle->umem_init_tab[ae])))
-+					    &obj_handle->umem_init_tab[ae]))
- 		return -EINVAL;
- 	/* set the highest ustore address referenced */
- 	uaddr = (init_mem->addr + init_mem->num_in_bytes) >> 0x2;
-@@ -425,7 +425,7 @@ static int qat_uclo_init_ustore(struct icp_qat_fw_loader_handle *handle,
- 	page = image->page;
- 
- 	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
--		if (!test_bit(ae, (unsigned long *)&(uof_image->ae_assigned)))
-+		if (!test_bit(ae, (unsigned long *)&uof_image->ae_assigned))
- 			continue;
- 		ustore_size = obj_handle->ae_data[ae].eff_ustore_size;
- 		patt_pos = page->beg_addr_p + page->micro_words_num;
-@@ -486,8 +486,8 @@ static void *qat_uclo_find_chunk(struct icp_qat_uof_objhdr *obj_hdr,
- 
- 	for (i = 0; i < obj_hdr->num_chunks; i++) {
- 		if ((cur < (void *)&chunk_hdr[i]) &&
--		    !(strncmp(chunk_hdr[i].chunk_id, chunk_id,
--			      ICP_QAT_UOF_OBJID_LEN))) {
-+		    !strncmp(chunk_hdr[i].chunk_id, chunk_id,
-+			     ICP_QAT_UOF_OBJID_LEN)) {
- 			return &chunk_hdr[i];
- 		}
- 	}
-@@ -532,8 +532,8 @@ qat_uclo_map_chunk(char *buf, struct icp_qat_uof_filehdr *file_hdr,
- 	file_chunk = (struct icp_qat_uof_filechunkhdr *)
- 		(buf + sizeof(struct icp_qat_uof_filehdr));
- 	for (i = 0; i < file_hdr->num_chunks; i++) {
--		if (!(strncmp(file_chunk->chunk_id, chunk_id,
--			      ICP_QAT_UOF_OBJID_LEN))) {
-+		if (!strncmp(file_chunk->chunk_id, chunk_id,
-+			     ICP_QAT_UOF_OBJID_LEN)) {
- 			chunk = buf + file_chunk->offset;
- 			if (file_chunk->checksum != qat_uclo_calc_str_checksum(
- 				(char *)chunk, file_chunk->size))
-@@ -692,12 +692,12 @@ static int qat_uclo_map_ae(struct icp_qat_fw_loader_handle *handle, int max_ae)
- 	struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
- 
- 	for (ae = 0; ae <= max_ae; ae++) {
--		if (!test_bit(ae, (unsigned long *)
--			      &(handle->hal_handle->ae_mask)))
-+		if (!test_bit(ae,
-+			      (unsigned long *)&handle->hal_handle->ae_mask))
- 			continue;
- 		for (i = 0; i < obj_handle->uimage_num; i++) {
- 			if (!test_bit(ae, (unsigned long *)
--			&(obj_handle->ae_uimage[i].img_ptr->ae_assigned)))
-+			&obj_handle->ae_uimage[i].img_ptr->ae_assigned))
- 				continue;
- 			mflag = 1;
- 			if (qat_uclo_init_ae_data(obj_handle, ae, i))
-@@ -898,12 +898,12 @@ static int qat_uclo_set_ae_mode(struct icp_qat_fw_loader_handle *handle)
- 
- 	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
- 		if (!test_bit(ae,
--			      (unsigned long *)&(handle->hal_handle->ae_mask)))
-+			      (unsigned long *)&handle->hal_handle->ae_mask))
- 			continue;
--		ae_data = &(obj_handle->ae_data[ae]);
-+		ae_data = &obj_handle->ae_data[ae];
- 		for (s = 0; s < ae_data->slice_num && s < ICP_QAT_UCLO_MAX_CTX;
- 		     s++) {
--			if (!(obj_handle->ae_data[ae].ae_slices[s].encap_image))
-+			if (!obj_handle->ae_data[ae].ae_slices[s].encap_image)
- 				continue;
- 			uof_image = ae_data->ae_slices[s].encap_image->img_ptr;
- 			if (qat_hal_set_ae_ctx_mode(handle, ae,
-@@ -968,9 +968,9 @@ static int qat_uclo_parse_uof_obj(struct icp_qat_fw_loader_handle *handle)
- 		return -EINVAL;
- 	}
- 	obj_handle->ustore_phy_size = ICP_QAT_UCLO_MAX_USTORE;
--	if (!(obj_handle->obj_hdr->file_buff) ||
--	    !(qat_uclo_map_str_table(obj_handle->obj_hdr, ICP_QAT_UOF_STRT,
--				     &(obj_handle->str_table)))) {
-+	if (!obj_handle->obj_hdr->file_buff ||
-+	    !qat_uclo_map_str_table(obj_handle->obj_hdr, ICP_QAT_UOF_STRT,
-+				    &obj_handle->str_table)) {
- 		pr_err("QAT: uof doesn't have effective images\n");
- 		goto out_err;
- 	}
-@@ -984,8 +984,8 @@ static int qat_uclo_parse_uof_obj(struct icp_qat_fw_loader_handle *handle)
- 		goto out_check_uof_aemask_err;
- 	}
- 	qat_uclo_init_uword_num(handle);
--	qat_uclo_map_initmem_table(&(obj_handle->encap_uof_obj),
--				   &(obj_handle->init_mem_tab));
-+	qat_uclo_map_initmem_table(&obj_handle->encap_uof_obj,
-+				   &obj_handle->init_mem_tab);
- 	if (qat_uclo_set_ae_mode(handle))
- 		goto out_check_uof_aemask_err;
++
+ #define adf_bank_debugfs_rm(bank) do {} while (0)
++
+ static inline int adf_ring_debugfs_add(struct adf_etr_ring_data *ring,
+ 				       const char *name)
+ {
  	return 0;
-@@ -1143,7 +1143,7 @@ static void qat_uclo_wr_uimage_pages(struct icp_qat_fw_loader_handle *handle,
- 	/* load the default page and set assigned CTX PC
- 	 * to the entrypoint address */
- 	for (ae = 0; ae <= handle->hal_handle->ae_max_num; ae++) {
--		if (!test_bit(ae, (unsigned long *)&(image->ae_assigned)))
-+		if (!test_bit(ae, (unsigned long *)&image->ae_assigned))
- 			continue;
- 		/* find the slice to which this image is assigned */
- 		for (s = 0; s < obj_handle->ae_data[ae].slice_num; s++) {
-@@ -1177,9 +1177,9 @@ int qat_uclo_wr_all_uimage(struct icp_qat_fw_loader_handle *handle)
- 	if (qat_uclo_init_globals(handle))
- 		return -EINVAL;
- 	for (i = 0; i < obj_handle->uimage_num; i++) {
--		if (!(obj_handle->ae_uimage[i].img_ptr))
-+		if (!obj_handle->ae_uimage[i].img_ptr)
- 			return -EINVAL;
--		if (qat_uclo_init_ustore(handle, &(obj_handle->ae_uimage[i])))
-+		if (qat_uclo_init_ustore(handle, &obj_handle->ae_uimage[i]))
- 			return -EINVAL;
- 		qat_uclo_wr_uimage_pages(handle,
- 					 obj_handle->ae_uimage[i].img_ptr);
+ }
++
+ #define adf_ring_debugfs_rm(ring) do {} while (0)
+ #endif
+ #endif
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw_la.h b/drivers/crypto/qat/qat_common/icp_qat_fw_la.h
+index d1d4802..c8d2669 100644
+--- a/drivers/crypto/qat/qat_common/icp_qat_fw_la.h
++++ b/drivers/crypto/qat/qat_common/icp_qat_fw_la.h
+@@ -358,6 +358,7 @@ struct icp_qat_fw_la_resp {
+ 	uint64_t opaque_data;
+ 	uint32_t resrvd[ICP_QAT_FW_NUM_LONGWORDS_4];
+ };
++
+ #define ICP_QAT_FW_CIPHER_NEXT_ID_GET(cd_ctrl_hdr_t) \
+ 	((((cd_ctrl_hdr_t)->next_curr_id_cipher) & \
+ 	  ICP_QAT_FW_COMN_NEXT_ID_MASK) >> (ICP_QAT_FW_COMN_NEXT_ID_BITPOS))
