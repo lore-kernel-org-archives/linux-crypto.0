@@ -1,7 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH 08/10] crypto: qat: Cleanup - Updated print outputs
-Date: Fri, 25 Jul 2014 15:55:52 -0700
-Message-ID: <20140725225552.24909.65580.stgit@gitlad.jf.intel.com>
+Subject: [PATCH 09/10] crypto: qat: Cleanup - Use hweight for bit counting
+Date: Fri, 25 Jul 2014 15:55:57 -0700
+Message-ID: <20140725225557.24909.556.stgit@gitlad.jf.intel.com>
 References: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -12,149 +12,54 @@ Cc: <tadeusz.struk@intel.com>, <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>
 To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:60347 "EHLO mga01.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:21728 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751137AbaGYWz5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 25 Jul 2014 18:55:57 -0400
+	id S1751137AbaGYWz7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 25 Jul 2014 18:55:59 -0400
 In-Reply-To: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Updated pr_err output to make it more consistent.
+Use predefined hweight32 function instead of writing a new one.
 
 Signed-off-by: Pingchao Yang <pingchao.yang@intel.com>
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
 
- drivers/crypto/qat/qat_common/adf_accel_engine.c |    4 ++--
- drivers/crypto/qat/qat_common/adf_init.c         |    2 +-
- drivers/crypto/qat/qat_common/qat_hal.c          |    3 +--
- drivers/crypto/qat/qat_common/qat_uclo.c         |   18 +++++++++---------
- 4 files changed, 13 insertions(+), 14 deletions(-)
+ drivers/crypto/qat/qat_common/qat_hal.c |   15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_engine.c b/drivers/crypto/qat/qat_common/adf_accel_engine.c
-index 25801fe..c77453b 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_engine.c
-+++ b/drivers/crypto/qat/qat_common/adf_accel_engine.c
-@@ -67,11 +67,11 @@ int adf_ae_fw_load(struct adf_accel_dev *accel_dev)
- 	uof_size = loader_data->uof_fw->size;
- 	uof_addr = (void *)loader_data->uof_fw->data;
- 	if (qat_uclo_map_uof_obj(loader_data->fw_loader, uof_addr, uof_size)) {
--		pr_err("QAT: Failed to map uof\n");
-+		pr_err("QAT: Failed to map UOF\n");
- 		goto out_err;
- 	}
- 	if (qat_uclo_wr_all_uimage(loader_data->fw_loader)) {
--		pr_err("QAT: Failed to map uof\n");
-+		pr_err("QAT: Failed to map UOF\n");
- 		goto out_err;
- 	}
- 	return 0;
-diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
-index 5c3d6f1..5c0e47a 100644
---- a/drivers/crypto/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/qat/qat_common/adf_init.c
-@@ -136,7 +136,7 @@ int adf_dev_start(struct adf_accel_dev *accel_dev)
- 	set_bit(ADF_STATUS_AE_INITIALISED, &accel_dev->status);
- 
- 	if (adf_ae_fw_load(accel_dev)) {
--		pr_err("Failed to load acceleration FW\n");
-+		pr_err("QAT: Failed to load acceleration FW\n");
- 		adf_ae_fw_release(accel_dev);
- 		return -EFAULT;
- 	}
 diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-index da9626b..8d686a2 100644
+index 8d686a2..9b8a315 100644
 --- a/drivers/crypto/qat/qat_common/qat_hal.c
 +++ b/drivers/crypto/qat/qat_common/qat_hal.c
-@@ -849,8 +849,7 @@ static int qat_hal_exec_micro_inst(struct icp_qat_fw_loader_handle *handle,
- 	unsigned int ctxarb_ctl, ctx_enables;
+@@ -795,17 +795,6 @@ static void qat_hal_get_uwords(struct icp_qat_fw_loader_handle *handle,
+ 	qat_hal_wr_ae_csr(handle, ae, USTORE_ADDRESS, ustore_addr);
+ }
  
- 	if ((inst_num > handle->hal_handle->max_ustore) || !micro_inst) {
--		pr_err("QAT: invalid instructs inst_num=%d, micro_inst=0x%p\n ",
--		       inst_num, micro_inst);
-+		pr_err("QAT: invalid instruction num %d\n", inst_num);
- 		return -EINVAL;
+-static int qat_hal_count_bits(unsigned int word)
+-{
+-	int n = 0;
+-
+-	while (word) {
+-		n++;
+-		word &= word - 1;
+-	}
+-	return n;
+-}
+-
+ void qat_hal_wr_umem(struct icp_qat_fw_loader_handle *handle,
+ 		     unsigned char ae, unsigned int uaddr,
+ 		     unsigned int words_num, unsigned int *data)
+@@ -822,9 +811,9 @@ void qat_hal_wr_umem(struct icp_qat_fw_loader_handle *handle,
+ 			  ((data[i] & 0xff00) << 2) |
+ 			  (0x3 << 8) | (data[i] & 0xff);
+ 		uwrd_hi = (0xf << 4) | ((data[i] & 0xf0000000) >> 28);
+-		uwrd_hi |= (qat_hal_count_bits(data[i] & 0xffff) & 0x1) << 8;
++		uwrd_hi |= (hweight32(data[i] & 0xffff) & 0x1) << 8;
+ 		tmp = ((data[i] >> 0x10) & 0xffff);
+-		uwrd_hi |= (qat_hal_count_bits(tmp) & 0x1) << 9;
++		uwrd_hi |= (hweight32(tmp) & 0x1) << 9;
+ 		qat_hal_wr_ae_csr(handle, ae, USTORE_DATA_LOWER, uwrd_lo);
+ 		qat_hal_wr_ae_csr(handle, ae, USTORE_DATA_UPPER, uwrd_hi);
  	}
- 	/* save current context */
-diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-index ebd5da0..2580091 100644
---- a/drivers/crypto/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -132,7 +132,7 @@ static int qat_uclo_check_format(struct icp_qat_uof_filehdr *hdr)
- 		return -EINVAL;
- 	}
- 	if (min != ICP_QAT_UOF_MINVER || maj != ICP_QAT_UOF_MAJVER) {
--		pr_err("QAT: bad uof version, major 0x%x, minor 0x%x\n",
-+		pr_err("QAT: bad UOF version, major 0x%x, minor 0x%x\n",
- 		       maj, min);
- 		return -EINVAL;
- 	}
-@@ -249,7 +249,7 @@ static int qat_uclo_fetch_initmem_ae(struct icp_qat_fw_loader_handle *handle,
- 	}
- 	str = qat_uclo_get_string(&obj_handle->str_table, init_mem->sym_name);
- 	if (!str) {
--		pr_err("QAT: AE name assigned in uof init table is NULL\n");
-+		pr_err("QAT: AE name assigned in UOF init table is NULL\n");
- 		return -EINVAL;
- 	}
- 	if (qat_uclo_parse_num(str, ae)) {
-@@ -751,14 +751,14 @@ static int qat_uclo_check_uof_compat(struct icp_qat_uclo_objhandle *obj_handle)
- 	unsigned int maj_ver, prod_type = obj_handle->prod_type;
- 
- 	if (!(prod_type & obj_handle->encap_uof_obj.obj_hdr->cpu_type)) {
--		pr_err("QAT: uof type 0x%x not match with cur platform 0x%x\n",
-+		pr_err("QAT: UOF type 0x%x not match with cur platform 0x%x\n",
- 		       obj_handle->encap_uof_obj.obj_hdr->cpu_type, prod_type);
- 		return -EINVAL;
- 	}
- 	maj_ver = obj_handle->prod_rev & 0xff;
- 	if ((obj_handle->encap_uof_obj.obj_hdr->max_cpu_ver < maj_ver) ||
- 	    (obj_handle->encap_uof_obj.obj_hdr->min_cpu_ver > maj_ver)) {
--		pr_err("QAT: uof majVer 0x%x out of range\n", maj_ver);
-+		pr_err("QAT: UOF majVer 0x%x out of range\n", maj_ver);
- 		return -EINVAL;
- 	}
- 	return 0;
-@@ -868,7 +868,7 @@ static int qat_uclo_init_globals(struct icp_qat_fw_loader_handle *handle)
- 		return 0;
- 	if (obj_handle->init_mem_tab.entry_num) {
- 		if (qat_uclo_init_memory(handle)) {
--			pr_err("QAT: initalize memory failed\n");
-+			pr_err("QAT: initialize memory failed\n");
- 			return -EINVAL;
- 		}
- 	}
-@@ -917,13 +917,13 @@ static int qat_uclo_set_ae_mode(struct icp_qat_fw_loader_handle *handle)
- 			if (qat_hal_set_ae_lm_mode(handle, ae, ICP_LMEM0,
- 						   (char)ICP_QAT_LOC_MEM0_MODE
- 						   (uof_image->ae_mode))) {
--				pr_err("QAT: qat_hal_set_ae_lm_mode error\n ");
-+				pr_err("QAT: qat_hal_set_ae_lm_mode LMEM0 error\n");
- 				return -EFAULT;
- 			}
- 			if (qat_hal_set_ae_lm_mode(handle, ae, ICP_LMEM1,
- 						   (char)ICP_QAT_LOC_MEM1_MODE
- 						   (uof_image->ae_mode))) {
--				pr_err("QAT: qat_hal_set_ae_lm_mode error\n ");
-+				pr_err("QAT: qat_hal_set_ae_lm_mode LMEM1 error\n");
- 				return -EFAULT;
- 			}
- 		}
-@@ -961,14 +961,14 @@ static int qat_uclo_parse_uof_obj(struct icp_qat_fw_loader_handle *handle)
- 	obj_handle->prod_rev = PID_MAJOR_REV |
- 			(PID_MINOR_REV & handle->hal_handle->revision_id);
- 	if (qat_uclo_check_uof_compat(obj_handle)) {
--		pr_err("QAT: uof incompatible\n");
-+		pr_err("QAT: UOF incompatible\n");
- 		return -EINVAL;
- 	}
- 	obj_handle->ustore_phy_size = ICP_QAT_UCLO_MAX_USTORE;
- 	if (!obj_handle->obj_hdr->file_buff ||
- 	    !qat_uclo_map_str_table(obj_handle->obj_hdr, ICP_QAT_UOF_STRT,
- 				    &obj_handle->str_table)) {
--		pr_err("QAT: uof doesn't have effective images\n");
-+		pr_err("QAT: UOF doesn't have effective images\n");
- 		goto out_err;
- 	}
- 	obj_handle->uimage_num =
