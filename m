@@ -1,61 +1,46 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: General flags to turn things off (getrandom, pid lookup, etc)
-Date: Fri, 25 Jul 2014 16:54:32 -0700
-Message-ID: <CALCETrUqkRx5yDgbKJSD61E-xkjOYoOL+yrZdWxG-hb8j-mQcQ@mail.gmail.com>
-References: <CALCETrWGvBfrX1W5XaFgJZhKHLf+oac9YrwPR3ppK=deQtu5hA@mail.gmail.com>
- <53D2EB98.3090802@zytor.com>
+From: James Morris <jmorris@namei.org>
+Subject: Re: [GIT PULL] Keyrings: PKCS#7 fixup
+Date: Sat, 26 Jul 2014 10:26:27 +1000 (EST)
+Message-ID: <alpine.LRH.2.11.1407261026160.7832@namei.org>
+References: <22574.1406291448@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "Eric W. Biederman" <ebiederm@xmission.com>,
-	Julien Tinnes <jln@google.com>,
-	David Drysdale <drysdale@google.com>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	LSM List <linux-security-module@vger.kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <james.l.morris@oracle.com>,
-	Linux API <linux-api@vger.kernel.org>,
-	Meredydd Luff <meredydd@senatehouse.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
-	linux-crypto@vger.kernel.org
-To: "H. Peter Anvin" <hpa@zytor.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: sfr@canb.auug.org.au, Mimi Zohar <zohar@linux.vnet.ibm.com>,
+	mimi.e.zohar@gmail.com, Dmitry Kasatkin <d.kasatkin@samsung.com>,
+	vgoyal@redhat.com, keyrings@linux-nfs.org,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <53D2EB98.3090802@zytor.com>
+In-Reply-To: <22574.1406291448@warthog.procyon.org.uk>
 Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 25, 2014 at 4:43 PM, H. Peter Anvin <hpa@zytor.com> wrote:
-> On 07/25/2014 11:30 AM, Andy Lutomirski wrote:
->>     - 32-bit GDT code segments [huge attack surface]
->>     - 64-bit GDT code segments [probably pointless]
->
-> I presume you mean s/GDT/LDT/.
->
-> We already don't allow 64-bit LDT code segments.  Also, it is unclear to
-> me how 32-bit LDT segments have a huge attack surface, given that there
-> will realistically always be a 32-bit *GDT* segment present.
+On Fri, 25 Jul 2014, David Howells wrote:
 
-I really did mean GDT :)  Setting the 32-bit code segment to "not
-present" (and using seccomp to block modify_ldt) prevents any attempt
-to exploit bugs in the sysenter and cstar code.  It also might prevent
-exploiting CPU bugs, although I've never heard of a relevant CPU bug
-in this area.
+> Hi James,
+> 
+> Here's a fixup for the problem that Stephen spotted.
+> 
+> David
+> ---
+> The following changes since commit 633706a2ee81637be37b6bc02c5336950cc163b5:
+> 
+>   Merge branch 'keys-fixes' into keys-next (2014-07-22 21:55:45 +0100)
+> 
+> are available in the git repository at:
+> 
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/keys-next-20140725
+> 
+> for you to fetch changes up to 8f3438ccea149647ad1849651d1e14c7b8b85e63:
+> 
+>   PKCS#7: Missing inclusion of linux/err.h (2014-07-25 11:33:53 +0100)
 
-If I actually tried to implement this (which wouldn't be part of the
-initial implementation), I'd split out the unusual things in
-__switch_to and friends to a slow path that's only used if weird
-settings are present (e.g. this, TSC restrictions, etc).  But
-twiddling the present bit on a GDT entry is very fast, I assume --
-it's just memory, and I don't think that any flush is needed.
+Thanks, pulled.
 
-Also, if I implement this, I will curse Xen.  I might even go so far
-as to disable the feature entirely if there's a paravirt GDT.
 
-Hmm.  A separate flag to turn int $0x80 into GPF could have some value, too.
+-- 
+James Morris
+<jmorris@namei.org>
 
---Andy
