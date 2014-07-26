@@ -1,46 +1,124 @@
-From: James Morris <jmorris@namei.org>
-Subject: Re: [GIT PULL] Keyrings: PKCS#7 fixup
-Date: Sat, 26 Jul 2014 10:26:27 +1000 (EST)
-Message-ID: <alpine.LRH.2.11.1407261026160.7832@namei.org>
-References: <22574.1406291448@warthog.procyon.org.uk>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 1/2] arm64 aes: fix encryption of unaligned data
+Date: Sat, 26 Jul 2014 15:13:26 +0200
+Message-ID: <CAKv+Gu-mdv0E5oSLz3x87Qn6sEO1-=B3Uk-mnJee7YGUWY4cnQ@mail.gmail.com>
+References: <alpine.LRH.2.02.1407251937110.11227@file01.intranet.prod.int.rdu2.redhat.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: sfr@canb.auug.org.au, Mimi Zohar <zohar@linux.vnet.ibm.com>,
-	mimi.e.zohar@gmail.com, Dmitry Kasatkin <d.kasatkin@samsung.com>,
-	vgoyal@redhat.com, keyrings@linux-nfs.org,
-	linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: David Howells <dhowells@redhat.com>
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <22574.1406291448@warthog.procyon.org.uk>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Nicolas Pitre <nico@linaro.org>,
+	"Alasdair G. Kergon" <agk@redhat.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	dm-devel@redhat.com
+To: Mikulas Patocka <mpatocka@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Russell King - ARM Linux <linux@arm.linux.org.uk>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-la0-f46.google.com ([209.85.215.46]:34997 "EHLO
+	mail-la0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751252AbaGZNN2 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 26 Jul 2014 09:13:28 -0400
+Received: by mail-la0-f46.google.com with SMTP id b8so3988850lan.33
+        for <linux-crypto@vger.kernel.org>; Sat, 26 Jul 2014 06:13:26 -0700 (PDT)
+In-Reply-To: <alpine.LRH.2.02.1407251937110.11227@file01.intranet.prod.int.rdu2.redhat.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 25 Jul 2014, David Howells wrote:
+On 26 July 2014 01:40, Mikulas Patocka <mpatocka@redhat.com> wrote:
+> cryptsetup fails on arm64 when using kernel encryption via AF_ALG socket.
+> See https://bugzilla.redhat.com/show_bug.cgi?id=1122937
+>
+> The bug is caused by incorrect handling of unaligned data in
+> arch/arm64/crypto/aes-glue.c. Cryptsetup creates a buffer that is aligned
+> on 8 bytes, but not on 16 bytes. It opens AF_ALG socket and uses the
+> socket to encrypt data in the buffer. The arm64 crypto accelerator causes
+> data corruption or crashes in the scatterwalk_pagedone.
+>
+> This patch fixes the bug by passing the residue bytes that were not
+> processed as the last parameter to blkcipher_walk_done.
+>
+> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+>
 
-> Hi James,
-> 
-> Here's a fixup for the problem that Stephen spotted.
-> 
-> David
-> ---
-> The following changes since commit 633706a2ee81637be37b6bc02c5336950cc163b5:
-> 
->   Merge branch 'keys-fixes' into keys-next (2014-07-22 21:55:45 +0100)
-> 
-> are available in the git repository at:
-> 
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/keys-next-20140725
-> 
-> for you to fetch changes up to 8f3438ccea149647ad1849651d1e14c7b8b85e63:
-> 
->   PKCS#7: Missing inclusion of linux/err.h (2014-07-25 11:33:53 +0100)
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Thanks, pulled.
+Thanks for the patch. This correctly fixes a thinko on my part
+regarding the guarantees offered by the blkcipher API. Unfortunately,
+this wasn't caught by the tcrypt test suite, so I will propose some
+patches later to address cases like this.
+
+BTW using kernel crypto with AF_ALG is fairly pointless when using
+crypto instructions instead of crypto accelerator peripherals, should
+we change anything on the kernel side so we don't expose these
+drivers?
+
+@Catalin: this is a bug fix for the code that was merged this cycle. I
+would recommend to merge this for 3.16, but if not, could you please
+add a cc stable? Or ack it and perhaps Herbert can take both? (There
+is a similar patch for ARM as well)
+
+Regards,
+Ard.
 
 
--- 
-James Morris
-<jmorris@namei.org>
 
+> Index: linux-3.16.0-0.rc6.git1.1.fc21.aarch64/arch/arm64/crypto/aes-glue.c
+> ===================================================================
+> --- linux-3.16.0-0.rc6.git1.1.fc21.aarch64.orig/arch/arm64/crypto/aes-glue.c
+> +++ linux-3.16.0-0.rc6.git1.1.fc21.aarch64/arch/arm64/crypto/aes-glue.c
+> @@ -106,7 +106,7 @@ static int ecb_encrypt(struct blkcipher_
+>         for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
+>                 aes_ecb_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+>                                 (u8 *)ctx->key_enc, rounds, blocks, first);
+> -               err = blkcipher_walk_done(desc, &walk, 0);
+> +               err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
+>         }
+>         kernel_neon_end();
+>         return err;
+> @@ -128,7 +128,7 @@ static int ecb_decrypt(struct blkcipher_
+>         for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
+>                 aes_ecb_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+>                                 (u8 *)ctx->key_dec, rounds, blocks, first);
+> -               err = blkcipher_walk_done(desc, &walk, 0);
+> +               err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
+>         }
+>         kernel_neon_end();
+>         return err;
+> @@ -151,7 +151,7 @@ static int cbc_encrypt(struct blkcipher_
+>                 aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+>                                 (u8 *)ctx->key_enc, rounds, blocks, walk.iv,
+>                                 first);
+> -               err = blkcipher_walk_done(desc, &walk, 0);
+> +               err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
+>         }
+>         kernel_neon_end();
+>         return err;
+> @@ -174,7 +174,7 @@ static int cbc_decrypt(struct blkcipher_
+>                 aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+>                                 (u8 *)ctx->key_dec, rounds, blocks, walk.iv,
+>                                 first);
+> -               err = blkcipher_walk_done(desc, &walk, 0);
+> +               err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
+>         }
+>         kernel_neon_end();
+>         return err;
+> @@ -243,7 +243,7 @@ static int xts_encrypt(struct blkcipher_
+>                 aes_xts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+>                                 (u8 *)ctx->key1.key_enc, rounds, blocks,
+>                                 (u8 *)ctx->key2.key_enc, walk.iv, first);
+> -               err = blkcipher_walk_done(desc, &walk, 0);
+> +               err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
+>         }
+>         kernel_neon_end();
+>
+> @@ -267,7 +267,7 @@ static int xts_decrypt(struct blkcipher_
+>                 aes_xts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+>                                 (u8 *)ctx->key1.key_dec, rounds, blocks,
+>                                 (u8 *)ctx->key2.key_enc, walk.iv, first);
+> -               err = blkcipher_walk_done(desc, &walk, 0);
+> +               err = blkcipher_walk_done(desc, &walk, walk.nbytes % AES_BLOCK_SIZE);
+>         }
+>         kernel_neon_end();
+>
