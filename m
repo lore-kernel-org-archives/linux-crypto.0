@@ -1,7 +1,7 @@
 From: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
-Subject: [PATCH] crypto: crypto_user.c:  Cleaning up missing null-terminate in conjunction with strncpy
-Date: Sat, 26 Jul 2014 16:15:25 +0200
-Message-ID: <1406384125-2093-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
+Subject: [PATCH] crypto: pcompress.c:  Cleaning up missing null-terminate in conjunction with strncpy
+Date: Sat, 26 Jul 2014 16:16:56 +0200
+Message-ID: <1406384216-2186-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
 Cc: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -14,53 +14,21 @@ Replacing strncpy with strlcpy to avoid strings that lacks null terminate.
 
 Signed-off-by: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
 ---
- crypto/crypto_user.c |   12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ crypto/pcompress.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index e2a34fe..09b465e 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -77,7 +77,7 @@ static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
+diff --git a/crypto/pcompress.c b/crypto/pcompress.c
+index 7140fe7..f114720 100644
+--- a/crypto/pcompress.c
++++ b/crypto/pcompress.c
+@@ -53,7 +53,7 @@ static int crypto_pcomp_report(struct sk_buff *skb, struct crypto_alg *alg)
  {
- 	struct crypto_report_cipher rcipher;
+ 	struct crypto_report_comp rpcomp;
  
--	strncpy(rcipher.type, "cipher", sizeof(rcipher.type));
-+	strlcpy(rcipher.type, "cipher", sizeof(rcipher.type));
- 
- 	rcipher.blocksize = alg->cra_blocksize;
- 	rcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
-@@ -96,7 +96,7 @@ static int crypto_report_comp(struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct crypto_report_comp rcomp;
- 
--	strncpy(rcomp.type, "compression", sizeof(rcomp.type));
-+	strlcpy(rcomp.type, "compression", sizeof(rcomp.type));
+-	strncpy(rpcomp.type, "pcomp", sizeof(rpcomp.type));
++	strlcpy(rpcomp.type, "pcomp", sizeof(rpcomp.type));
  	if (nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
- 		    sizeof(struct crypto_report_comp), &rcomp))
+ 		    sizeof(struct crypto_report_comp), &rpcomp))
  		goto nla_put_failure;
-@@ -109,10 +109,10 @@ nla_put_failure:
- static int crypto_report_one(struct crypto_alg *alg,
- 			     struct crypto_user_alg *ualg, struct sk_buff *skb)
- {
--	strncpy(ualg->cru_name, alg->cra_name, sizeof(ualg->cru_name));
--	strncpy(ualg->cru_driver_name, alg->cra_driver_name,
-+	strlcpy(ualg->cru_name, alg->cra_name, sizeof(ualg->cru_name));
-+	strlcpy(ualg->cru_driver_name, alg->cra_driver_name,
- 		sizeof(ualg->cru_driver_name));
--	strncpy(ualg->cru_module_name, module_name(alg->cra_module),
-+	strlcpy(ualg->cru_module_name, module_name(alg->cra_module),
- 		sizeof(ualg->cru_module_name));
- 
- 	ualg->cru_type = 0;
-@@ -125,7 +125,7 @@ static int crypto_report_one(struct crypto_alg *alg,
- 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
- 		struct crypto_report_larval rl;
- 
--		strncpy(rl.type, "larval", sizeof(rl.type));
-+		strlcpy(rl.type, "larval", sizeof(rl.type));
- 		if (nla_put(skb, CRYPTOCFGA_REPORT_LARVAL,
- 			    sizeof(struct crypto_report_larval), &rl))
- 			goto nla_put_failure;
 -- 
 1.7.10.4
