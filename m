@@ -1,73 +1,48 @@
-From: David Drysdale <drysdale-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
-Subject: Re: General flags to turn things off (getrandom, pid lookup, etc)
-Date: Sun, 27 Jul 2014 13:26:11 +0100
-Message-ID: <CAHse=S-UoSgLoV4nwv3rbTHZjdVWAy44AAXLVoZ7N4kynZwGJA@mail.gmail.com>
-References: <CALCETrWGvBfrX1W5XaFgJZhKHLf+oac9YrwPR3ppK=deQtu5hA@mail.gmail.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v4 3/3] crypto: Add Allwinner Security System crypto
+ accelerator
+Date: Sun, 27 Jul 2014 22:52:54 +0800
+Message-ID: <20140727145254.GA2932@gondor.apana.org.au>
+References: <1405169953-13695-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1405169953-13695-4-git-send-email-clabbe.montjoie@gmail.com>
+ <20140724060054.GA6545@gondor.apana.org.au>
+ <53D0E857.8000405@gmail.com>
+ <20140724133823.GA9638@gondor.apana.org.au>
+ <53D3B4B6.3000100@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "Eric W. Biederman" <ebiederm-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>,
-	Julien Tinnes <jln-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>,
-	Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	Paolo Bonzini <pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	LSM List <linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-	Paul Moore <paul-r2n+y4ga6xFZroRs9YW3xA@public.gmane.org>,
-	James Morris <james.l.morris-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-	Linux API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Meredydd Luff <meredydd-zPN50pYk8eUaUu29zAJCuw@public.gmane.org>,
-	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>,
-	"Theodore Ts'o" <tytso-3s7WtUTddSA@public.gmane.org>,
-	Henrique de Moraes Holschuh <hmh-N3TV7GIv+o9fyO9Q7EP/yw@public.gmane.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org, maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CALCETrWGvBfrX1W5XaFgJZhKHLf+oac9YrwPR3ppK=deQtu5hA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <53D3B4B6.3000100-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Jul 25, 2014 at 7:30 PM, Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org> wrote:
-> [new thread because this sort of combines two threads]
+On Sat, Jul 26, 2014 at 04:01:26PM +0200, Corentin LABBE wrote:
 >
-> There is recent interest in having a way to turn generally-available
-> kernel features off.  Maybe we should add a good one so we can stop
-> bikeshedding and avoid proliferating dumb interfaces.
->
-> Things that might want to be turn-off-able include:
->  - getrandom with GRND_RANDOM [from the getrandom threads]
->  - Any lookup of a non-self pid [from the capsicum thread]
->  - Any lookup of a pid outside the caller thread group [capsicum]
->  - Various architectural things (personal wishlist), e.g.:
->     - RDTSC and userspace HPET access
->     - CPUID?
->     - 32-bit GDT code segments [huge attack surface]
->     - 64-bit GDT code segments [probably pointless]
->
-> I would propose a new syscall for this:
->
-> long restrict_userspace(int mode, int type, int value, int flags);
->
-> mode is RESTRICT_SET, RESTRICT_GET, or RESTRICT_LOCK.
->
-> type is RESTRICT_GRND_RANDOM, RESTRICT_PID_SCOPE, RESTRICT_X86_TIMING, etc.
->
-> Value is zero if RESTRICT_GET.  Otherwise value is the desired value,
-> generally 0 or 1.  For RESTRICT_PID_SCOPE, value would be
-> RESTRICT_PID_SCOPE_ANY, RESTRICT_PID_SCOPE_THREADGROUP, or
-> RESTRICT_PID_SCOPE_SELF.
->
-> flags must be zero.  Someday, someone will propose a thread-sync flag.
+> Even if it is undocumented, the hardware seems to support it.
+> Since crypto_ahash_ctx is for a tfm, does ahash_request_ctx is the good place to store data ?
+> (after a call to crypto_ahash_set_reqsize in cra_init)
 
-Today, me: proposed :-)
+Yes any hash state-related data should go into the request context.
 
-> restrict_userspace requires either no_new_privs or CAP_SYS_ADMIN in
-> the current user namespace.
->
-> Thoughts?
->
-> --Andy
->
-> --
-> Andy Lutomirski
-> AMA Capital Management, LLC
+> I have also seen export/import function, does I need to use it ?
+
+Absolutely.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
