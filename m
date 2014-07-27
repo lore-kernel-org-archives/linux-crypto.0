@@ -1,29 +1,33 @@
 From: Mark D Rustad <mrustad@gmail.com>
-Subject: Re: [PATCH] crypto: rng.c:  Cleaning up missing null-terminate in conjunction with strncpy
-Date: Sat, 26 Jul 2014 19:35:22 -0700
-Message-ID: <B1C69CE0-CA18-4853-B4EB-15B0D0F107E7@gmail.com>
-References: <1406384308-2269-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
+Subject: Re: [PATCH] crypto: crypto_user.c:  Cleaning up missing null-terminate in conjunction with strncpy
+Date: Sat, 26 Jul 2014 21:17:50 -0700
+Message-ID: <35BFF3B8-DE0F-4201-8C7B-80AE49409209@gmail.com>
+References: <1406384125-2093-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Content-Type: multipart/signed; boundary="Apple-Mail=_713D8B29-4C80-44BD-BC84-E5FBF798FF3D"; protocol="application/pgp-signature"; micalg=pgp-sha1
-Cc: Neil Horman <nhorman@tuxdriver.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: multipart/signed; boundary="Apple-Mail=_5B345BDC-4070-4C84-87F0-29E89E8F63D0"; protocol="application/pgp-signature"; micalg=pgp-sha1
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1406384308-2269-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pd0-f170.google.com ([209.85.192.170]:40646 "EHLO
+	mail-pd0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750718AbaG0ERz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 27 Jul 2014 00:17:55 -0400
+In-Reply-To: <1406384125-2093-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
---Apple-Mail=_713D8B29-4C80-44BD-BC84-E5FBF798FF3D
+--Apple-Mail=_5B345BDC-4070-4C84-87F0-29E89E8F63D0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
 	charset=us-ascii
 
 Rickard,
 
-On Jul 26, 2014, at 7:18 AM, Rickard Strandqvist =
+On Jul 26, 2014, at 7:15 AM, Rickard Strandqvist =
 <rickard_strandqvist@spectrumdigital.se> wrote:
 
 > Replacing strncpy with strlcpy to avoid strings that lacks null =
@@ -32,39 +36,78 @@ terminate.
 > Signed-off-by: Rickard Strandqvist =
 <rickard_strandqvist@spectrumdigital.se>
 > ---
-> crypto/rng.c |    2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> crypto/crypto_user.c |   12 ++++++------
+> 1 file changed, 6 insertions(+), 6 deletions(-)
 >=20
-> diff --git a/crypto/rng.c b/crypto/rng.c
-> index e0a25c2..c3d4fb3 100644
-> --- a/crypto/rng.c
-> +++ b/crypto/rng.c
-> @@ -65,7 +65,7 @@ static int crypto_rng_report(struct sk_buff *skb, =
+> diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+> index e2a34fe..09b465e 100644
+> --- a/crypto/crypto_user.c
+> +++ b/crypto/crypto_user.c
+> @@ -77,7 +77,7 @@ static int crypto_report_cipher(struct sk_buff *skb, =
 struct crypto_alg *alg)
 > {
-> 	struct crypto_report_rng rrng;
+> 	struct crypto_report_cipher rcipher;
 >=20
-> -	strncpy(rrng.type, "rng", sizeof(rrng.type));
-> +	strlcpy(rrng.type, "rng", sizeof(rrng.type));
+> -	strncpy(rcipher.type, "cipher", sizeof(rcipher.type));
+> +	strlcpy(rcipher.type, "cipher", sizeof(rcipher.type));
 >=20
-> 	rrng.seedsize =3D alg->cra_rng.seedsize;
+> 	rcipher.blocksize =3D alg->cra_blocksize;
+> 	rcipher.min_keysize =3D alg->cra_cipher.cia_min_keysize;
 
-Not to pick on this patch in particular, but you need to be careful =
-about changing strncpy to strlcpy. Although strlcpy ensures termination, =
-it does not prevent information leakage - strncpy ensures that the =
-entire destination buffer is written. When leakage is a concern, it is =
-better to use strncpy and then to store a zero in the last location of =
-the buffer to ensure termination.
+This patch is an example of what I mentioned in my previous message. I =
+figured I should go back and take a look at more of the patches. It =
+looks to me like all of the changes in this patch create information =
+leaks, because strlcpy only copies to the terminator, leaving the rest =
+of the destination area in an otherwise uninitialized stack area alone. =
+That structure is then copied whole into an skb and sent as a netlink =
+message.
 
-These "simple" transformations can be risky - and many of these do not =
-represent any sort of problem when the source is smaller than the =
-destination. I hope information leakage is being considered.
+That will leak kernel information into userspace.
+
+All of these patches need to be considered in regard to information =
+leakage.
+
+> @@ -96,7 +96,7 @@ static int crypto_report_comp(struct sk_buff *skb, =
+struct crypto_alg *alg)
+> {
+> 	struct crypto_report_comp rcomp;
+>=20
+> -	strncpy(rcomp.type, "compression", sizeof(rcomp.type));
+> +	strlcpy(rcomp.type, "compression", sizeof(rcomp.type));
+> 	if (nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
+> 		    sizeof(struct crypto_report_comp), &rcomp))
+> 		goto nla_put_failure;
+> @@ -109,10 +109,10 @@ nla_put_failure:
+> static int crypto_report_one(struct crypto_alg *alg,
+> 			     struct crypto_user_alg *ualg, struct =
+sk_buff *skb)
+> {
+> -	strncpy(ualg->cru_name, alg->cra_name, sizeof(ualg->cru_name));
+> -	strncpy(ualg->cru_driver_name, alg->cra_driver_name,
+> +	strlcpy(ualg->cru_name, alg->cra_name, sizeof(ualg->cru_name));
+> +	strlcpy(ualg->cru_driver_name, alg->cra_driver_name,
+> 		sizeof(ualg->cru_driver_name));
+> -	strncpy(ualg->cru_module_name, module_name(alg->cra_module),
+> +	strlcpy(ualg->cru_module_name, module_name(alg->cra_module),
+> 		sizeof(ualg->cru_module_name));
+>=20
+> 	ualg->cru_type =3D 0;
+> @@ -125,7 +125,7 @@ static int crypto_report_one(struct crypto_alg =
+*alg,
+> 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
+> 		struct crypto_report_larval rl;
+>=20
+> -		strncpy(rl.type, "larval", sizeof(rl.type));
+> +		strlcpy(rl.type, "larval", sizeof(rl.type));
+> 		if (nla_put(skb, CRYPTOCFGA_REPORT_LARVAL,
+> 			    sizeof(struct crypto_report_larval), &rl))
+> 			goto nla_put_failure;
 
 --=20
 Mark Rustad, MRustad@gmail.com
 
 
---Apple-Mail=_713D8B29-4C80-44BD-BC84-E5FBF798FF3D
+--Apple-Mail=_5B345BDC-4070-4C84-87F0-29E89E8F63D0
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
 	filename=signature.asc
@@ -75,19 +118,19 @@ Content-Description: Message signed with OpenPGP using GPGMail
 -----BEGIN PGP SIGNATURE-----
 Comment: GPGTools - http://gpgtools.org
 
-iQIcBAEBAgAGBQJT1GVqAAoJEDwO/+eO4+5urRYQALOCuZdPLRuvOZyVkEkzqLOE
-/IxV048SqzYO71GSnyD0WlVkrNZ3z9SzeuaTJOjRr4Z5jeWK29c2GlEzfE2JUtt1
-goQYbvRBU3aQ/tCT460Y3XRDwiiXhsQoyIemOcoXz1IsvKidffMvYIjGamBdWeKY
-znjC1Ipw/jXeWHjSvnQdPh2hLA656XLrwX2vKLWsOhALPneTAGWzn4MjyposMsjc
-u245P8z1SY92RbwQi+PktG9/VaA2fMsfIaHj99hXoigx+sNE6EmzoISUsnNp1F1W
-wq0ZSrC9c+XDqxL7ivsHDtBq4u8ciCQKeTUuU85CuaCUoI/vSVKvUaEfVaesU/lL
-rmhd40NJLQHn3WqLcTy2PlqfKClA0QFhhKB1y7CoW7FdJ4mk3XaAc6PIyrtVsesq
-NKJMeeBdTQxczfvGPZUUtYsjXPf8qvkBMWJxgVnyKaCSVAxp0tVlpag4egd9t4ZT
-3ZswTenZ0/yRTIDcr/05KZiMAPwyKz/aMOzwFkWSpBIJIVwBe8mxBpKxjtZW3dYX
-AOwxDHSaWC2wqxaeX6RWryu47GH6mV6Xf+QMss7A2+1mV/RpfT7bMeYHZ+3VteCl
-JKdWTslEaYnntKaKGf3iQ9302shmntgRKYqmwPYmhKZeNVEzSRvn/8TL9Z0Gaey3
-5Z91eQjdsvxOV2YQkxNs
-=WCx+
+iQIcBAEBAgAGBQJT1H1vAAoJEDwO/+eO4+5uYZQQAKdLyYKUL1zLeW6BNlXUOtjT
+DlNXd1vDltd1Yx4SKDelu9NNOdVMzdDzlNv26LilqursGhKE5Fe3YKAGCyNMaa4W
+rbuQhNnKiuuLLXn63Nhh/tYCR073rV7X1M7HlKGjZ5W32t3TFIGXv4wary3OVakW
+8rc0Tq+vpm7k2A3ig/uGd5Kp2ANWLw4LMIMh7TOdtoG3QuqRDXsFNImGa/LhZQx1
+QP2C/cTTFOWpvAWYGAk4PIKhSMKhZ1HDTPhwbZpuuUTpIYw2OsqvpitO76E87mCh
+97r3RfsrqiJavvTAsIVf/Y+RPrh3hkDIFGd1PxO0S7jDLa4F1Fd++9l2+2i7UCSS
+tljfapb3uLqvG+aJFWj8MGZuzKzi8vfkUEcGt9dvhNB2zw765yX2lMfxRdIfKyas
+E1O3oU8Rk/8mVfw2eDUY+g7mRu/ENZjiJDD6uOgqB5KULvCqI2BRA5lqDw88KLu0
++f12R550zXBJeYmC0x++IVJ0NO/roFhfE5vVTVCwN4/bHmClV9Y9I96NUV4B31ai
+QYz7Du1Z7lUrvHuerLYAen0niB22yJfAdww5MLSVQk7qCvWx4V67WC/rqUmzfTvk
+KUJs6lHW/yCl9SkA6SypEmeKWYuzKxFluPP5qLKiEvdSkOvOrW/vEV5TfG43iQbX
+5fpy8TZbkxhMews+DGyt
+=QUjg
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_713D8B29-4C80-44BD-BC84-E5FBF798FF3D--
+--Apple-Mail=_5B345BDC-4070-4C84-87F0-29E89E8F63D0--
