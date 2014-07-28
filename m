@@ -1,44 +1,29 @@
-From: weiyj_lk@163.com
-Subject: [PATCH -next] PKCS#7: fix sparse non static symbol warning
-Date: Mon, 28 Jul 2014 21:17:12 +0800
-Message-ID: <1406553432-29676-1-git-send-email-weiyj_lk@163.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Wei Yongjun <yongjun_wei@trendmicro.com.cn>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Howells <dhowells@redhat.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>
+From: Muran Hrun <muuhuu@gmail.com>
+Subject: DMA support for mv_cesa
+Date: Mon, 28 Jul 2014 15:24:43 +0200
+Message-ID: <CADP6xpuU1V0byRQDp7+=VB6Ao3uL-YxjwYd6YK+KWc51fJVDsg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from m12-14.163.com ([220.181.12.14]:47837 "EHLO m12-14.163.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752209AbaG1NRm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Jul 2014 09:17:42 -0400
+Received: from mail-vc0-f196.google.com ([209.85.220.196]:48521 "EHLO
+	mail-vc0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751365AbaG1NYo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Jul 2014 09:24:44 -0400
+Received: by mail-vc0-f196.google.com with SMTP id le20so885910vcb.7
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Jul 2014 06:24:43 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Hi,
 
-Fixes the following sparse warnings:
+What is the status of DMA support for mv_cesa? I tried applying the patches at
+git://nwl.cc/~n0-1/linux.git (cesa-dma branch)
+on kernel 3.15.6 but the kernel just crashed on my DNS-320, when
+accessing an encrypted volume. (Kernel 3.5rc2 in the respository did
+not boot at all)
 
-crypto/asymmetric_keys/pkcs7_key_type.c:73:17: warning:
- symbol 'key_type_pkcs7' was not declared. Should it be static?
+Is DMA support for mv_cesa still developed?
 
-Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
----
- crypto/asymmetric_keys/pkcs7_key_type.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/asymmetric_keys/pkcs7_key_type.c b/crypto/asymmetric_keys/pkcs7_key_type.c
-index 8605ff6..9c60e9c 100644
---- a/crypto/asymmetric_keys/pkcs7_key_type.c
-+++ b/crypto/asymmetric_keys/pkcs7_key_type.c
-@@ -70,7 +70,7 @@ error:
-  * user defined keys take an arbitrary string as the description and an
-  * arbitrary blob of data as the payload
-  */
--struct key_type key_type_pkcs7 = {
-+static struct key_type key_type_pkcs7 = {
- 	.name			= "pkcs7_test",
- 	.def_lookup_type	= KEYRING_SEARCH_LOOKUP_DIRECT,
- 	.preparse		= pkcs7_preparse,
+Thanks
