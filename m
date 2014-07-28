@@ -1,77 +1,44 @@
-From: pramod.gurav.etc@gmail.com
-Subject: [PATCH] crypto: atmel-tdes: Switch to managed version of kzalloc
-Date: Mon, 28 Jul 2014 17:46:33 +0530
-Message-ID: <1406549793-26935-1-git-send-email-pramod.gurav@smartplayin.com>
-Cc: Pramod Gurav <pramod.gurav@smartplayin.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Grant Likely <grant.likely@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>
-To: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+From: weiyj_lk@163.com
+Subject: [PATCH -next] PKCS#7: fix sparse non static symbol warning
+Date: Mon, 28 Jul 2014 21:17:12 +0800
+Message-ID: <1406553432-29676-1-git-send-email-weiyj_lk@163.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Wei Yongjun <yongjun_wei@trendmicro.com.cn>,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	David Howells <dhowells@redhat.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f54.google.com ([209.85.220.54]:44861 "EHLO
-	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752946AbaG1MND (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Jul 2014 08:13:03 -0400
+Received: from m12-14.163.com ([220.181.12.14]:47837 "EHLO m12-14.163.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752209AbaG1NRm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Jul 2014 09:17:42 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Pramod Gurav <pramod.gurav@smartplayin.com>
+From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 
-This patch switches data allocation from kzalloc to devm_kzalloc.
-It also removes some kfree() on data that was earlier allocated
-using devm_kzalloc() from probe as well as remove funtions.
+Fixes the following sparse warnings:
 
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Grant Likely <grant.likely@linaro.org>
-CC: Rob Herring <robh+dt@kernel.org>
+crypto/asymmetric_keys/pkcs7_key_type.c:73:17: warning:
+ symbol 'key_type_pkcs7' was not declared. Should it be static?
 
-Signed-off-by: Pramod Gurav <pramod.gurav@smartplayin.com>
+Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 ---
- drivers/crypto/atmel-tdes.c |    8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ crypto/asymmetric_keys/pkcs7_key_type.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 6cde5b5..d3a9041 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -1337,7 +1337,6 @@ static struct crypto_platform_data *atmel_tdes_of_init(struct platform_device *p
- 					GFP_KERNEL);
- 	if (!pdata->dma_slave) {
- 		dev_err(&pdev->dev, "could not allocate memory for dma_slave\n");
--		devm_kfree(&pdev->dev, pdata);
- 		return ERR_PTR(-ENOMEM);
- 	}
- 
-@@ -1359,7 +1358,7 @@ static int atmel_tdes_probe(struct platform_device *pdev)
- 	unsigned long tdes_phys_size;
- 	int err;
- 
--	tdes_dd = kzalloc(sizeof(struct atmel_tdes_dev), GFP_KERNEL);
-+	tdes_dd = devm_kmalloc(&pdev->dev, sizeof(*tdes_dd), GFP_KERNEL);
- 	if (tdes_dd == NULL) {
- 		dev_err(dev, "unable to alloc data struct.\n");
- 		err = -ENOMEM;
-@@ -1483,8 +1482,6 @@ tdes_irq_err:
- res_err:
- 	tasklet_kill(&tdes_dd->done_task);
- 	tasklet_kill(&tdes_dd->queue_task);
--	kfree(tdes_dd);
--	tdes_dd = NULL;
- tdes_dd_err:
- 	dev_err(dev, "initialization failed.\n");
- 
-@@ -1519,9 +1516,6 @@ static int atmel_tdes_remove(struct platform_device *pdev)
- 	if (tdes_dd->irq >= 0)
- 		free_irq(tdes_dd->irq, tdes_dd);
- 
--	kfree(tdes_dd);
--	tdes_dd = NULL;
--
- 	return 0;
- }
- 
--- 
-1.7.9.5
+diff --git a/crypto/asymmetric_keys/pkcs7_key_type.c b/crypto/asymmetric_keys/pkcs7_key_type.c
+index 8605ff6..9c60e9c 100644
+--- a/crypto/asymmetric_keys/pkcs7_key_type.c
++++ b/crypto/asymmetric_keys/pkcs7_key_type.c
+@@ -70,7 +70,7 @@ error:
+  * user defined keys take an arbitrary string as the description and an
+  * arbitrary blob of data as the payload
+  */
+-struct key_type key_type_pkcs7 = {
++static struct key_type key_type_pkcs7 = {
+ 	.name			= "pkcs7_test",
+ 	.def_lookup_type	= KEYRING_SEARCH_LOOKUP_DIRECT,
+ 	.preparse		= pkcs7_preparse,
