@@ -1,34 +1,45 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH -next] PKCS#7: fix sparse non static symbol warning
-Date: Mon, 28 Jul 2014 14:57:48 +0100
-Message-ID: <2892.1406555868@warthog.procyon.org.uk>
-References: <1406553432-29676-1-git-send-email-weiyj_lk@163.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/2] arm64 aes: fix encryption of unaligned data
+Date: Mon, 28 Jul 2014 22:02:19 +0800
+Message-ID: <20140728140219.GA11859@gondor.apana.org.au>
+References: <alpine.LRH.2.02.1407251937110.11227@file01.intranet.prod.int.rdu2.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Wei Yongjun <yongjun_wei@trendmicro.com.cn>,
-	linux-crypto@vger.kernel.org
-To: weiyj_lk@163.com
+Content-Type: text/plain; charset=us-ascii
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andy Polyakov <appro@openssl.org>,
+	Nicolas Pitre <nico@linaro.org>,
+	"Alasdair G. Kergon" <agk@redhat.com>,
+	linux-crypto@vger.kernel.org, dm-devel@redhat.com
+To: Mikulas Patocka <mpatocka@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:26528 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750752AbaG1N6I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Jul 2014 09:58:08 -0400
-In-Reply-To: <1406553432-29676-1-git-send-email-weiyj_lk@163.com>
-Content-ID: <2891.1406555868.1@warthog.procyon.org.uk>
+Received: from helcar.apana.org.au ([209.40.204.226]:50337 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751175AbaG1OCc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 28 Jul 2014 10:02:32 -0400
+Content-Disposition: inline
+In-Reply-To: <alpine.LRH.2.02.1407251937110.11227@file01.intranet.prod.int.rdu2.redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-weiyj_lk@163.com wrote:
+On Fri, Jul 25, 2014 at 07:40:20PM -0400, Mikulas Patocka wrote:
+> cryptsetup fails on arm64 when using kernel encryption via AF_ALG socket.
+> See https://bugzilla.redhat.com/show_bug.cgi?id=1122937
+> 
+> The bug is caused by incorrect handling of unaligned data in
+> arch/arm64/crypto/aes-glue.c. Cryptsetup creates a buffer that is aligned
+> on 8 bytes, but not on 16 bytes. It opens AF_ALG socket and uses the
+> socket to encrypt data in the buffer. The arm64 crypto accelerator causes
+> data corruption or crashes in the scatterwalk_pagedone.
+> 
+> This patch fixes the bug by passing the residue bytes that were not
+> processed as the last parameter to blkcipher_walk_done.
+> 
+> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
 
-> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
-> 
-> Fixes the following sparse warnings:
-> 
-> crypto/asymmetric_keys/pkcs7_key_type.c:73:17: warning:
->  symbol 'key_type_pkcs7' was not declared. Should it be static?
-> 
-> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
-
-Applied.
+Both patches applied to crypto.  Thanks for catching this!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
