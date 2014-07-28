@@ -1,58 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.16
-Date: Mon, 28 Jul 2014 22:05:07 +0800
-Message-ID: <20140728140507.GA11926@gondor.apana.org.au>
-References: <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
- <20140101061016.GA22579@gondor.apana.org.au>
- <20140203125944.GA31446@gondor.apana.org.au>
- <20140710090314.GA15729@gondor.apana.org.au>
- <20140718105717.GA18087@gondor.apana.org.au>
+From: Jason Cooper <jason@lakedaemon.net>
+Subject: Re: DMA support for mv_cesa
+Date: Mon, 28 Jul 2014 10:17:57 -0400
+Message-ID: <20140728141757.GR23220@titan.lakedaemon.net>
+References: <CADP6xpuU1V0byRQDp7+=VB6Ao3uL-YxjwYd6YK+KWc51fJVDsg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@googlemail.com>
+To: Muran Hrun <muuhuu@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Ezequiel Garcia <ezequiel.garcia@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:34717 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752140AbaG1OFP (ORCPT
+Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:24391 "EHLO
+	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751478AbaG1OSH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 28 Jul 2014 10:05:15 -0400
+	Mon, 28 Jul 2014 10:18:07 -0400
 Content-Disposition: inline
-In-Reply-To: <20140718105717.GA18087@gondor.apana.org.au>
+In-Reply-To: <CADP6xpuU1V0byRQDp7+=VB6Ao3uL-YxjwYd6YK+KWc51fJVDsg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Muran,
 
-This push fixes a regression on ARM where odd-sized blocks supplied
-to AES may cause crashes.
++ free-electron's, mvebu maintainers
 
-Please pull from
+On Mon, Jul 28, 2014 at 03:24:43PM +0200, Muran Hrun wrote:
+> What is the status of DMA support for mv_cesa? I tried applying the patches at
+> git://nwl.cc/~n0-1/linux.git (cesa-dma branch)
+> on kernel 3.15.6 but the kernel just crashed on my DNS-320, when
+> accessing an encrypted volume. (Kernel 3.5rc2 in the respository did
+> not boot at all)
+> 
+> Is DMA support for mv_cesa still developed?
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+thx,
 
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Mikulas Patocka (2):
-      crypto: arm64-aes - fix encryption of unaligned data
-      crypto: arm-aes - fix encryption of unaligned data
-
- arch/arm/crypto/aesbs-glue.c |   10 +++++-----
- arch/arm64/crypto/aes-glue.c |   12 ++++++------
- 2 files changed, 11 insertions(+), 11 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jason.
