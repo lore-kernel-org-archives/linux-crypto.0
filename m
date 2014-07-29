@@ -1,651 +1,951 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: [PATCH 1/2] crypto: add support for TLS 1.0 record encryption
-Date: Tue, 29 Jul 2014 12:32:32 +0300
-Message-ID: <1406626353-23309-2-git-send-email-cristian.stoica@freescale.com>
-References: <1406626353-23309-1-git-send-email-cristian.stoica@freescale.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] [v3] crypto: sha512: add ARM NEON implementation
+Date: Tue, 29 Jul 2014 14:35:42 +0200
+Message-ID: <CAKv+Gu8R3oOgLohf+tCmuGEny7PSBd6HYgysEJtOrW-XWE9mMA@mail.gmail.com>
+References: <20140630163928.1362.41900.stgit@localhost6.localdomain6>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <davem@davemloft.net>, <linux-kernel@vger.kernel.org>,
-	Cristian Stoica <cristian.stoica@freescale.com>
-To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Russell King <linux@arm.linux.org.uk>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"David S. Miller" <davem@davemloft.net>
+To: Jussi Kivilinna <jussi.kivilinna@iki.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2lp0209.outbound.protection.outlook.com ([207.46.163.209]:33300
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752685AbaG2Jd7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 29 Jul 2014 05:33:59 -0400
-In-Reply-To: <1406626353-23309-1-git-send-email-cristian.stoica@freescale.com>
+Received: from mail-la0-f51.google.com ([209.85.215.51]:43301 "EHLO
+	mail-la0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751146AbaG2Mfo convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Jul 2014 08:35:44 -0400
+Received: by mail-la0-f51.google.com with SMTP id pn19so1139563lab.38
+        for <linux-crypto@vger.kernel.org>; Tue, 29 Jul 2014 05:35:42 -0700 (PDT)
+In-Reply-To: <20140630163928.1362.41900.stgit@localhost6.localdomain6>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds kernel support for encryption/decryption of TLS 1.0
-records using block ciphers. Implementation is similar to authenc in
-the sense that the base algorithms (AES, SHA1) are combined in a
-template to produce TLS encapsulation frames. The composite algorithm
-will be called "tls10(hmac(<digest>),cbc(<cipher>))". The cipher and
-hmac keys are wrapped in the same format used by authenc.c
+On 30 June 2014 18:39, Jussi Kivilinna <jussi.kivilinna@iki.fi> wrote:
+> This patch adds ARM NEON assembly implementation of SHA-512 and SHA-3=
+84
+> algorithms.
+>
+> tcrypt benchmark results on Cortex-A8, sha512-generic vs sha512-neon-=
+asm:
+>
+> block-size      bytes/update    old-vs-new
+> 16              16              2.99x
+> 64              16              2.67x
+> 64              64              3.00x
+> 256             16              2.64x
+> 256             64              3.06x
+> 256             256             3.33x
+> 1024            16              2.53x
+> 1024            256             3.39x
+> 1024            1024            3.52x
+> 2048            16              2.50x
+> 2048            256             3.41x
+> 2048            1024            3.54x
+> 2048            2048            3.57x
+> 4096            16              2.49x
+> 4096            256             3.42x
+> 4096            1024            3.56x
+> 4096            4096            3.59x
+> 8192            16              2.48x
+> 8192            256             3.42x
+> 8192            1024            3.56x
+> 8192            4096            3.60x
+> 8192            8192            3.60x
+>
+> Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+>
+> ---
+>
+> Changes in v2:
+>  - Use ENTRY/ENDPROC
+>  - Don't provide Thumb2 version
+>
+> v3:
+>  - Changelog moved below '---'
 
-Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
----
- crypto/Kconfig           |  20 ++
- crypto/Makefile          |   1 +
- crypto/authenc.c         |   5 +-
- crypto/tls.c             | 528 +++++++++++++++++++++++++++++++++++++++++++++++
- include/crypto/authenc.h |   3 +
- 5 files changed, 555 insertions(+), 2 deletions(-)
- create mode 100644 crypto/tls.c
+Hi Jussi,
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 6345c47..54cc843 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -212,6 +212,26 @@ config CRYPTO_SEQIV
- 	  This IV generator generates an IV based on a sequence number by
- 	  xoring it with a salt.  This algorithm is mainly useful for CTR
- 
-+config CRYPTO_TLS
-+	tristate "TLS support"
-+	select CRYPTO_AUTHENC
-+	select CRYPTO_AEAD
-+	select CRYPTO_BLKCIPHER
-+	select CRYPTO_MANAGER
-+	select CRYPTO_HASH
-+	help
-+	  Support for TLS record encryption and decryption
-+
-+	  This module adds support for encryption/decryption of TLS frames
-+	  using blockcipher algorithms. The resulting algorithm is called
-+	  "tls10(hmac(<digest>),cbc(<cipher>))".
-+
-+	  By default, the generic base algorithms are used (e.g. aes-generic,
-+	  sha1-generic), but hardware accelerated versions will be used
-+	  automatically if available.
-+	  User-space applications (OpenSSL, GnuTLS) can offload TLS operations
-+	  through AF_ALG or cryptodev interfaces
-+
- comment "Block modes"
- 
- config CRYPTO_CBC
-diff --git a/crypto/Makefile b/crypto/Makefile
-index cfa57b3..16088d1 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -85,6 +85,7 @@ obj-$(CONFIG_CRYPTO_CRC32C) += crc32c_generic.o
- obj-$(CONFIG_CRYPTO_CRC32) += crc32.o
- obj-$(CONFIG_CRYPTO_CRCT10DIF) += crct10dif_common.o crct10dif_generic.o
- obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
-+obj-$(CONFIG_CRYPTO_TLS) += tls.o
- obj-$(CONFIG_CRYPTO_LZO) += lzo.o
- obj-$(CONFIG_CRYPTO_LZ4) += lz4.o
- obj-$(CONFIG_CRYPTO_LZ4HC) += lz4hc.o
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index e122355..7f6c65d 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -82,8 +82,8 @@ int crypto_authenc_extractkeys(struct crypto_authenc_keys *keys, const u8 *key,
- }
- EXPORT_SYMBOL_GPL(crypto_authenc_extractkeys);
- 
--static int crypto_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
--				 unsigned int keylen)
-+int crypto_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
-+			  unsigned int keylen)
- {
- 	struct crypto_authenc_ctx *ctx = crypto_aead_ctx(authenc);
- 	struct crypto_ahash *auth = ctx->auth;
-@@ -118,6 +118,7 @@ badkey:
- 	crypto_aead_set_flags(authenc, CRYPTO_TFM_RES_BAD_KEY_LEN);
- 	goto out;
- }
-+EXPORT_SYMBOL_GPL(crypto_authenc_setkey);
- 
- static void authenc_geniv_ahash_update_done(struct crypto_async_request *areq,
- 					    int err)
-diff --git a/crypto/tls.c b/crypto/tls.c
-new file mode 100644
-index 0000000..b6aedcd
---- /dev/null
-+++ b/crypto/tls.c
-@@ -0,0 +1,528 @@
-+/*
-+ * Copyright 2014 Freescale Semiconductor, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ */
-+
-+#include <crypto/aead.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/internal/skcipher.h>
-+#include <crypto/authenc.h>
-+#include <crypto/scatterwalk.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+
-+struct tls_instance_ctx {
-+	struct crypto_ahash_spawn auth;
-+	struct crypto_skcipher_spawn enc;
-+};
-+
-+struct crypto_tls_ctx {
-+	unsigned int reqoff;
-+	struct crypto_ahash *auth;
-+	struct crypto_ablkcipher *enc;
-+};
-+
-+struct tls_request_ctx {
-+	/*
-+	 * cryptlen holds the payload length in the case of encryption or
-+	 * payload_len + icv_len + padding_len in case of decryption
-+	 */
-+	unsigned int cryptlen;
-+	/* working space for partial results */
-+	struct scatterlist icv[2];
-+	struct scatterlist cipher[2];
-+	char tail[];
-+};
-+
-+struct async_op {
-+	struct completion completion;
-+	int err;
-+};
-+
-+static void tls_async_op_done(struct crypto_async_request *req, int err)
-+{
-+	struct async_op *areq = req->data;
-+
-+	if (err == -EINPROGRESS)
-+		return;
-+
-+	areq->err = err;
-+	complete(&areq->completion);
-+}
-+
-+/**
-+ * crypto_tls_genicv - Calculate hmac digest for a TLS record
-+ * @hash:	(output) buffer to save the digest into
-+ * @src:	(input) scatterlist with the payload data
-+ * @srclen:	(input) size of the payload data
-+ * @req:	(input) aead request (with pointers to associated data)
-+ **/
-+static int crypto_tls_genicv(u8 *hash, struct scatterlist *src,
-+			     unsigned int srclen, struct aead_request *req)
-+{
-+	struct crypto_aead *tls = crypto_aead_reqtfm(req);
-+	struct crypto_tls_ctx *ctx = crypto_aead_ctx(tls);
-+	struct tls_request_ctx *treq_ctx = aead_request_ctx(req);
-+	struct scatterlist *assoc = req->assoc;
-+	struct scatterlist *icv = treq_ctx->icv;
-+	struct async_op ahash_op;
-+	struct ahash_request *ahreq = (void *)(treq_ctx->tail + ctx->reqoff);
-+	unsigned int flags = CRYPTO_TFM_REQ_MAY_SLEEP;
-+	int err = -EBADMSG;
-+
-+	/*
-+	 * Bail out as we have only two maneuvering scatterlists in icv. Check
-+	 * also if the request assoc len matches the scatterlist len
-+	 */
-+	if (!req->assoclen || !sg_is_last(assoc) ||
-+	    req->assoclen != assoc->length)
-+		return err;
-+
-+	/*
-+	 * Prepend associated data to the source scatterlist. If the source is
-+	 * empty, use directly the associated data scatterlist
-+	 */
-+	if (srclen) {
-+		sg_init_table(icv, 2);
-+		sg_set_page(icv, sg_page(assoc), assoc->length, assoc->offset);
-+		scatterwalk_sg_chain(icv, 2, src);
-+	} else {
-+		icv = assoc;
-+	}
-+	srclen += assoc->length;
-+
-+	init_completion(&ahash_op.completion);
-+
-+	/* the hash transform to be executed comes from the original request */
-+	ahash_request_set_tfm(ahreq, ctx->auth);
-+	/* prepare the hash request with input data and result pointer */
-+	ahash_request_set_crypt(ahreq, icv, hash, srclen);
-+	/* set the notifier for when the async hash function returns */
-+	ahash_request_set_callback(ahreq, aead_request_flags(req) & flags,
-+				   tls_async_op_done, &ahash_op);
-+
-+	/* Calculate the digest on the given data. The result is put in hash */
-+	err = crypto_ahash_digest(ahreq);
-+	if (err == -EINPROGRESS) {
-+		err = wait_for_completion_interruptible(&ahash_op.completion);
-+		if (!err)
-+			err = ahash_op.err;
-+	}
-+
-+	return err;
-+}
-+
-+/**
-+ * crypto_tls_gen_padicv - Calculate and pad hmac digest for a TLS record
-+ * @hash:	(output) buffer to save the digest and padding into
-+ * @phashlen:	(output) the size of digest + padding
-+ * @req:	(input) aead request
-+ **/
-+static int crypto_tls_gen_padicv(u8 *hash, unsigned int *phashlen,
-+				 struct aead_request *req)
-+{
-+	struct crypto_aead *tls = crypto_aead_reqtfm(req);
-+	unsigned int hash_size = crypto_aead_authsize(tls);
-+	unsigned int block_size = crypto_aead_blocksize(tls);
-+	unsigned int srclen = req->cryptlen + hash_size;
-+	unsigned int padlen;
-+	int err;
-+
-+	err = crypto_tls_genicv(hash, req->src, req->cryptlen, req);
-+	if (err)
-+		goto out;
-+
-+	/* add padding after digest */
-+	padlen = block_size - (srclen % block_size);
-+	memset(hash + hash_size, padlen - 1, padlen);
-+
-+	*phashlen = hash_size + padlen;
-+out:
-+	return err;
-+}
-+
-+static int crypto_tls_encrypt(struct aead_request *req)
-+{
-+	struct crypto_aead *tls = crypto_aead_reqtfm(req);
-+	struct crypto_tls_ctx *ctx = crypto_aead_ctx(tls);
-+	struct tls_request_ctx *treq_ctx = aead_request_ctx(req);
-+
-+	unsigned int cryptlen, phashlen;
-+	struct scatterlist *cipher = treq_ctx->cipher;
-+	struct scatterlist *sg, *src_last = NULL;
-+	int err;
-+	/*
-+	 * The hash and the cipher are applied at different times and their
-+	 * requests can use the same memory space without interference
-+	 */
-+	struct ablkcipher_request *abreq = (void *)(treq_ctx->tail +
-+						    ctx->reqoff);
-+	/*
-+	 * The hash result is saved at the beginning of the tls request and is
-+	 * aligned as required by the hash transform. Enough space was
-+	 * allocated in crypto_tls_init_tfm to accomodate the difference. The
-+	 * requests themselves start later at treq_ctx->tail + ctx->reqoff so
-+	 * the result is not overwritten by the second (cipher) request
-+	 */
-+	u8 *hash = treq_ctx->tail;
-+
-+	hash = (u8 *)ALIGN((unsigned long)hash +
-+			   crypto_ahash_alignmask(ctx->auth),
-+			   crypto_ahash_alignmask(ctx->auth) + 1);
-+
-+	/*
-+	 * STEP 1: create ICV together with necessary padding
-+	 */
-+	err = crypto_tls_gen_padicv(hash, &phashlen, req);
-+	if (err)
-+		return err;
-+
-+	/*
-+	 * STEP 2: Hash and padding are combined with the payload
-+	 * depending on the form it arrives. Scatter tables must have at least
-+	 * one page of data before chaining with another table and can't have
-+	 * an empty data page. The following code addresses these requirements.
-+	 *
-+	 * For same-destination, hash is copied directly after the
-+	 * payload since the buffers must have enough space for encryption.
-+	 * For different destination there are several casess to check.
-+	 * If the payload is empty, only the hash is encrypted, otherwise the
-+	 * payload scatterlist is merged with the hash. A special merging case
-+	 * is when the payload has only one page of data. In that case the
-+	 * payload page is moved to another scatterlist and prepared there for
-+	 * encryption.
-+	 */
-+
-+	if (req->src == req->dst) {
-+		scatterwalk_map_and_copy(hash, req->src, req->cryptlen,
-+					 phashlen, 1);
-+	} else {
-+		if (req->cryptlen) {
-+			sg_init_table(cipher, 2);
-+			sg_set_buf(cipher + 1, hash, phashlen);
-+			if (sg_is_last(req->src)) {
-+				sg_set_page(cipher, sg_page(req->src),
-+					req->src->length, req->src->offset);
-+				req->src = cipher;
-+			} else {
-+				for (sg = req->src; sg; sg = sg_next(sg))
-+					src_last = sg;
-+				sg_set_page(cipher, sg_page(src_last),
-+					src_last->length, src_last->offset);
-+				scatterwalk_sg_chain(src_last, 1, cipher);
-+			}
-+		} else {
-+			sg_init_one(req->src, hash, phashlen);
-+		}
-+	}
-+
-+	/*
-+	 * STEP 3: encrypt the frame and return the result
-+	 */
-+	cryptlen = req->cryptlen + phashlen;
-+	ablkcipher_request_set_tfm(abreq, ctx->enc);
-+	ablkcipher_request_set_crypt(abreq, req->src, req->dst, cryptlen,
-+				     req->iv);
-+	/* set the callback for encryption request termination */
-+	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
-+					req->base.complete, req->base.data);
-+	/*
-+	 * Apply the cipher transform. The result will be in req->dst when the
-+	 * asynchronuous call terminates
-+	 */
-+	err = crypto_ablkcipher_encrypt(abreq);
-+
-+	return err;
-+}
-+
-+static int crypto_tls_decrypt(struct aead_request *req)
-+{
-+	struct crypto_aead *tls = crypto_aead_reqtfm(req);
-+	struct crypto_tls_ctx *ctx = crypto_aead_ctx(tls);
-+	struct tls_request_ctx *treq_ctx = aead_request_ctx(req);
-+	struct scatterlist *assoc = req->assoc;
-+	unsigned int cryptlen = req->cryptlen;
-+	unsigned int hash_size = crypto_aead_authsize(tls);
-+	unsigned int block_size = crypto_aead_blocksize(tls);
-+	struct ablkcipher_request *abreq = (void *)(treq_ctx->tail +
-+						    ctx->reqoff);
-+	u8 padding[255]; /* padding can be 0-255 bytes */
-+	u8 pad_size;
-+	u16 *len_field;
-+	u8 *ihash, *hash = treq_ctx->tail;
-+
-+	int paderr = 0;
-+	int err = -EINVAL;
-+	int i;
-+	struct async_op ciph_op;
-+
-+	/*
-+	 * Rule out bad packets. The input packet length must be at least one
-+	 * byte more than the hash_size
-+	 */
-+	if (cryptlen <= hash_size || cryptlen % block_size)
-+		goto out;
-+
-+	/*
-+	 * Step 1 - Decrypt the source
-+	 */
-+	init_completion(&ciph_op.completion);
-+
-+	ablkcipher_request_set_tfm(abreq, ctx->enc);
-+	ablkcipher_request_set_callback(abreq, aead_request_flags(req),
-+					tls_async_op_done, &ciph_op);
-+	ablkcipher_request_set_crypt(abreq, req->src, req->dst, cryptlen,
-+				     req->iv);
-+	err = crypto_ablkcipher_decrypt(abreq);
-+	if (err == -EINPROGRESS) {
-+		err = wait_for_completion_interruptible(&ciph_op.completion);
-+		if (!err)
-+			err = ciph_op.err;
-+	}
-+	if (err)
-+		goto out;
-+
-+	/*
-+	 * Step 2 - Verify padding
-+	 * Retrieve the last byte of the payload; this is the padding size
-+	 */
-+	cryptlen -= 1;
-+	scatterwalk_map_and_copy(&pad_size, req->dst, cryptlen, 1, 0);
-+
-+	/* RFC recommendation to defend against timing attacks is to continue
-+	 * with hash calculation even if the padding is incorrect */
-+	if (cryptlen < pad_size + hash_size) {
-+		pad_size = 0;
-+		paderr = -EBADMSG;
-+	}
-+	cryptlen -= pad_size;
-+	scatterwalk_map_and_copy(padding, req->dst, cryptlen, pad_size, 0);
-+
-+	/* Padding content must be equal with pad_size. We verify it all */
-+	for (i = 0; i < pad_size; i++)
-+		if (padding[i] != pad_size)
-+			paderr = -EBADMSG;
-+
-+	/*
-+	 * Step 3 - Verify hash
-+	 * Align the digest result as required by the hash transform. Enough
-+	 * space was allocated in crypto_tls_init_tfm
-+	 */
-+	hash = (u8 *)ALIGN((unsigned long)hash +
-+			   crypto_ahash_alignmask(ctx->auth),
-+			   crypto_ahash_alignmask(ctx->auth) + 1);
-+	/*
-+	 * Two bytes at the end of the associated data make the length field.
-+	 * It must be updated with the length of the cleartext message before
-+	 * the hash is calculated.
-+	 */
-+	len_field = sg_virt(assoc) + assoc->length - 2;
-+	cryptlen -= hash_size;
-+	*len_field = htons(cryptlen);
-+
-+	/* This is the hash from the decrypted packet. Save it for later */
-+	ihash = hash + hash_size;
-+	scatterwalk_map_and_copy(ihash, req->dst, cryptlen, hash_size, 0);
-+
-+	/* Now compute and compare our ICV with the one from the packet */
-+	err = crypto_tls_genicv(hash, req->dst, cryptlen, req);
-+	if (!err)
-+		err = crypto_memneq(hash, ihash, hash_size) ? -EBADMSG : 0;
-+
-+	/* return the first found error */
-+	if (paderr)
-+		err = paderr;
-+
-+out:
-+	aead_request_complete(req, err);
-+	return err;
-+}
-+
-+static int crypto_tls_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-+	struct tls_instance_ctx *ictx = crypto_instance_ctx(inst);
-+	struct crypto_tls_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_ahash *auth;
-+	struct crypto_ablkcipher *enc;
-+	int err;
-+
-+	auth = crypto_spawn_ahash(&ictx->auth);
-+	if (IS_ERR(auth))
-+		return PTR_ERR(auth);
-+
-+	enc = crypto_spawn_skcipher(&ictx->enc);
-+	err = PTR_ERR(enc);
-+	if (IS_ERR(enc))
-+		goto err_free_ahash;
-+
-+	ctx->auth = auth;
-+	ctx->enc = enc;
-+	/*
-+	 * Allow enough space for two digests. The two digests will be compared
-+	 * during the decryption phase. One will come from the decrypted packet
-+	 * and the other will be calculated. For encryption, one digest is
-+	 * padded (up to a cipher blocksize) and chained with the payload
-+	 */
-+	ctx->reqoff = ALIGN(crypto_ahash_digestsize(auth) +
-+			    crypto_ahash_alignmask(auth),
-+			    crypto_ahash_alignmask(auth) + 1) +
-+		      max(crypto_ahash_digestsize(auth),
-+			  crypto_ablkcipher_blocksize(enc));
-+
-+	tfm->crt_aead.reqsize = sizeof(struct tls_request_ctx) + ctx->reqoff +
-+		max_t(unsigned int,
-+		      crypto_ahash_reqsize(auth) +
-+		      sizeof(struct ahash_request),
-+		      crypto_ablkcipher_reqsize(enc) +
-+		      sizeof(struct ablkcipher_request));
-+
-+	return 0;
-+
-+err_free_ahash:
-+	crypto_free_ahash(auth);
-+	return err;
-+}
-+
-+static void crypto_tls_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_tls_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto_free_ahash(ctx->auth);
-+	crypto_free_ablkcipher(ctx->enc);
-+}
-+
-+static struct crypto_instance *crypto_tls_alloc(struct rtattr **tb)
-+{
-+	struct crypto_attr_type *algt;
-+	struct crypto_instance *inst;
-+	struct hash_alg_common *auth;
-+	struct crypto_alg *auth_base;
-+	struct crypto_alg *enc;
-+	struct tls_instance_ctx *ctx;
-+	const char *enc_name;
-+	int err;
-+
-+	algt = crypto_get_attr_type(tb);
-+	err = PTR_ERR(algt);
-+	if (IS_ERR(algt))
-+		return ERR_PTR(err);
-+
-+	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & algt->mask)
-+		return ERR_PTR(-EINVAL);
-+
-+	auth = ahash_attr_alg(tb[1], CRYPTO_ALG_TYPE_HASH,
-+			      CRYPTO_ALG_TYPE_AHASH_MASK);
-+	if (IS_ERR(auth))
-+		return ERR_CAST(auth);
-+
-+	auth_base = &auth->base;
-+
-+	enc_name = crypto_attr_alg_name(tb[2]);
-+	err = PTR_ERR(enc_name);
-+	if (IS_ERR(enc_name))
-+		goto out_put_auth;
-+
-+	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
-+	err = -ENOMEM;
-+	if (!inst)
-+		goto out_put_auth;
-+
-+	ctx = crypto_instance_ctx(inst);
-+
-+	err = crypto_init_ahash_spawn(&ctx->auth, auth, inst);
-+	if (err)
-+		goto err_free_inst;
-+
-+	crypto_set_skcipher_spawn(&ctx->enc, inst);
-+	err = crypto_grab_skcipher(&ctx->enc, enc_name, 0,
-+				   crypto_requires_sync(algt->type,
-+							algt->mask));
-+	if (err)
-+		goto err_drop_auth;
-+
-+	enc = crypto_skcipher_spawn_alg(&ctx->enc);
-+
-+	err = -ENAMETOOLONG;
-+	if (snprintf(inst->alg.cra_name, CRYPTO_MAX_ALG_NAME,
-+		     "tls10(%s,%s)", auth_base->cra_name, enc->cra_name) >=
-+	    CRYPTO_MAX_ALG_NAME)
-+		goto err_drop_enc;
-+
-+	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-+		     "tls10(%s,%s)", auth_base->cra_driver_name,
-+		     enc->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
-+		goto err_drop_enc;
-+
-+	inst->alg.cra_flags = CRYPTO_ALG_TYPE_AEAD;
-+	inst->alg.cra_flags |= enc->cra_flags & CRYPTO_ALG_ASYNC;
-+	/* priority calculation is taken from authenc.c */
-+	inst->alg.cra_priority = enc->cra_priority * 10 +
-+				 auth_base->cra_priority;
-+	inst->alg.cra_blocksize = enc->cra_blocksize;
-+	inst->alg.cra_alignmask = auth_base->cra_alignmask | enc->cra_alignmask;
-+	inst->alg.cra_type = &crypto_aead_type;
-+
-+	inst->alg.cra_aead.ivsize = enc->cra_ablkcipher.ivsize;
-+	inst->alg.cra_aead.maxauthsize = auth->digestsize;
-+
-+	inst->alg.cra_ctxsize = sizeof(struct crypto_tls_ctx);
-+
-+	inst->alg.cra_init = crypto_tls_init_tfm;
-+	inst->alg.cra_exit = crypto_tls_exit_tfm;
-+
-+	inst->alg.cra_aead.setkey = crypto_authenc_setkey;
-+	inst->alg.cra_aead.encrypt = crypto_tls_encrypt;
-+	inst->alg.cra_aead.decrypt = crypto_tls_decrypt;
-+
-+out:
-+	crypto_mod_put(auth_base);
-+	return inst;
-+
-+err_drop_enc:
-+	crypto_drop_skcipher(&ctx->enc);
-+err_drop_auth:
-+	crypto_drop_ahash(&ctx->auth);
-+err_free_inst:
-+	kfree(inst);
-+out_put_auth:
-+	inst = ERR_PTR(err);
-+	goto out;
-+}
-+
-+static void crypto_tls_free(struct crypto_instance *inst)
-+{
-+	struct tls_instance_ctx *ctx = crypto_instance_ctx(inst);
-+
-+	crypto_drop_skcipher(&ctx->enc);
-+	crypto_drop_ahash(&ctx->auth);
-+	kfree(inst);
-+}
-+
-+static struct crypto_template crypto_tls10_tmpl = {
-+	.name = "tls10",
-+	.alloc = crypto_tls_alloc,
-+	.free = crypto_tls_free,
-+	.module = THIS_MODULE,
-+};
-+
-+static int __init crypto_tls_module_init(void)
-+{
-+	return crypto_register_template(&crypto_tls10_tmpl);
-+}
-+
-+static void __exit crypto_tls_module_exit(void)
-+{
-+	crypto_unregister_template(&crypto_tls10_tmpl);
-+}
-+
-+module_init(crypto_tls_module_init);
-+module_exit(crypto_tls_module_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("TLS record encryption");
-diff --git a/include/crypto/authenc.h b/include/crypto/authenc.h
-index 6775059..ef90468 100644
---- a/include/crypto/authenc.h
-+++ b/include/crypto/authenc.h
-@@ -34,4 +34,7 @@ struct crypto_authenc_keys {
- int crypto_authenc_extractkeys(struct crypto_authenc_keys *keys, const u8 *key,
- 			       unsigned int keylen);
- 
-+int crypto_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
-+			  unsigned int keylen);
-+
- #endif	/* _CRYPTO_AUTHENC_H */
--- 
-1.8.3.1
+What is the status of these patches?
+Have you sent them to Russell's patch tracker?
+
+--=20
+Ard.
+
+
+> ---
+>  arch/arm/crypto/Makefile            |    2
+>  arch/arm/crypto/sha512-armv7-neon.S |  455 +++++++++++++++++++++++++=
+++++++++++
+>  arch/arm/crypto/sha512_neon_glue.c  |  305 +++++++++++++++++++++++
+>  crypto/Kconfig                      |   15 +
+>  4 files changed, 777 insertions(+)
+>  create mode 100644 arch/arm/crypto/sha512-armv7-neon.S
+>  create mode 100644 arch/arm/crypto/sha512_neon_glue.c
+>
+> diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+> index 374956d..b48fa34 100644
+> --- a/arch/arm/crypto/Makefile
+> +++ b/arch/arm/crypto/Makefile
+> @@ -6,11 +6,13 @@ obj-$(CONFIG_CRYPTO_AES_ARM) +=3D aes-arm.o
+>  obj-$(CONFIG_CRYPTO_AES_ARM_BS) +=3D aes-arm-bs.o
+>  obj-$(CONFIG_CRYPTO_SHA1_ARM) +=3D sha1-arm.o
+>  obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) +=3D sha1-arm-neon.o
+> +obj-$(CONFIG_CRYPTO_SHA512_ARM_NEON) +=3D sha512-arm-neon.o
+>
+>  aes-arm-y      :=3D aes-armv4.o aes_glue.o
+>  aes-arm-bs-y   :=3D aesbs-core.o aesbs-glue.o
+>  sha1-arm-y     :=3D sha1-armv4-large.o sha1_glue.o
+>  sha1-arm-neon-y        :=3D sha1-armv7-neon.o sha1_neon_glue.o
+> +sha512-arm-neon-y :=3D sha512-armv7-neon.o sha512_neon_glue.o
+>
+>  quiet_cmd_perl =3D PERL    $@
+>        cmd_perl =3D $(PERL) $(<) > $(@)
+> diff --git a/arch/arm/crypto/sha512-armv7-neon.S b/arch/arm/crypto/sh=
+a512-armv7-neon.S
+> new file mode 100644
+> index 0000000..fe99472
+> --- /dev/null
+> +++ b/arch/arm/crypto/sha512-armv7-neon.S
+> @@ -0,0 +1,455 @@
+> +/* sha512-armv7-neon.S  -  ARM/NEON assembly implementation of SHA-5=
+12 transform
+> + *
+> + * Copyright =C2=A9 2013-2014 Jussi Kivilinna <jussi.kivilinna@iki.f=
+i>
+> + *
+> + * This program is free software; you can redistribute it and/or mod=
+ify it
+> + * under the terms of the GNU General Public License as published by=
+ the Free
+> + * Software Foundation; either version 2 of the License, or (at your=
+ option)
+> + * any later version.
+> + */
+> +
+> +#include <linux/linkage.h>
+> +
+> +
+> +.syntax unified
+> +.code   32
+> +.fpu neon
+> +
+> +.text
+> +
+> +/* structure of SHA512_CONTEXT */
+> +#define hd_a 0
+> +#define hd_b ((hd_a) + 8)
+> +#define hd_c ((hd_b) + 8)
+> +#define hd_d ((hd_c) + 8)
+> +#define hd_e ((hd_d) + 8)
+> +#define hd_f ((hd_e) + 8)
+> +#define hd_g ((hd_f) + 8)
+> +
+> +/* register macros */
+> +#define RK %r2
+> +
+> +#define RA d0
+> +#define RB d1
+> +#define RC d2
+> +#define RD d3
+> +#define RE d4
+> +#define RF d5
+> +#define RG d6
+> +#define RH d7
+> +
+> +#define RT0 d8
+> +#define RT1 d9
+> +#define RT2 d10
+> +#define RT3 d11
+> +#define RT4 d12
+> +#define RT5 d13
+> +#define RT6 d14
+> +#define RT7 d15
+> +
+> +#define RT01q q4
+> +#define RT23q q5
+> +#define RT45q q6
+> +#define RT67q q7
+> +
+> +#define RW0 d16
+> +#define RW1 d17
+> +#define RW2 d18
+> +#define RW3 d19
+> +#define RW4 d20
+> +#define RW5 d21
+> +#define RW6 d22
+> +#define RW7 d23
+> +#define RW8 d24
+> +#define RW9 d25
+> +#define RW10 d26
+> +#define RW11 d27
+> +#define RW12 d28
+> +#define RW13 d29
+> +#define RW14 d30
+> +#define RW15 d31
+> +
+> +#define RW01q q8
+> +#define RW23q q9
+> +#define RW45q q10
+> +#define RW67q q11
+> +#define RW89q q12
+> +#define RW1011q q13
+> +#define RW1213q q14
+> +#define RW1415q q15
+> +
+> +/*******************************************************************=
+****
+> + * ARM assembly implementation of sha512 transform
+> + *******************************************************************=
+****/
+> +#define rounds2_0_63(ra, rb, rc, rd, re, rf, rg, rh, rw0, rw1, rw01q=
+, rw2, \
+> +                     rw23q, rw1415q, rw9, rw10, interleave_op, arg1)=
+ \
+> +       /* t1 =3D h + Sum1 (e) + Ch (e, f, g) + k[t] + w[t]; */ \
+> +       vshr.u64 RT2, re, #14; \
+> +       vshl.u64 RT3, re, #64 - 14; \
+> +       interleave_op(arg1); \
+> +       vshr.u64 RT4, re, #18; \
+> +       vshl.u64 RT5, re, #64 - 18; \
+> +       vld1.64 {RT0}, [RK]!; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vshr.u64 RT4, re, #41; \
+> +       vshl.u64 RT5, re, #64 - 41; \
+> +       vadd.u64 RT0, RT0, rw0; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vmov.64 RT7, re; \
+> +       veor.64 RT1, RT2, RT3; \
+> +       vbsl.64 RT7, rf, rg; \
+> +       \
+> +       vadd.u64 RT1, RT1, rh; \
+> +       vshr.u64 RT2, ra, #28; \
+> +       vshl.u64 RT3, ra, #64 - 28; \
+> +       vadd.u64 RT1, RT1, RT0; \
+> +       vshr.u64 RT4, ra, #34; \
+> +       vshl.u64 RT5, ra, #64 - 34; \
+> +       vadd.u64 RT1, RT1, RT7; \
+> +       \
+> +       /* h =3D Sum0 (a) + Maj (a, b, c); */ \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vshr.u64 RT4, ra, #39; \
+> +       vshl.u64 RT5, ra, #64 - 39; \
+> +       veor.64 RT0, ra, rb; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vbsl.64 RT0, rc, rb; \
+> +       vadd.u64 rd, rd, RT1; /* d+=3Dt1; */ \
+> +       veor.64 rh, RT2, RT3; \
+> +       \
+> +       /* t1 =3D g + Sum1 (d) + Ch (d, e, f) + k[t] + w[t]; */ \
+> +       vshr.u64 RT2, rd, #14; \
+> +       vshl.u64 RT3, rd, #64 - 14; \
+> +       vadd.u64 rh, rh, RT0; \
+> +       vshr.u64 RT4, rd, #18; \
+> +       vshl.u64 RT5, rd, #64 - 18; \
+> +       vadd.u64 rh, rh, RT1; /* h+=3Dt1; */ \
+> +       vld1.64 {RT0}, [RK]!; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vshr.u64 RT4, rd, #41; \
+> +       vshl.u64 RT5, rd, #64 - 41; \
+> +       vadd.u64 RT0, RT0, rw1; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vmov.64 RT7, rd; \
+> +       veor.64 RT1, RT2, RT3; \
+> +       vbsl.64 RT7, re, rf; \
+> +       \
+> +       vadd.u64 RT1, RT1, rg; \
+> +       vshr.u64 RT2, rh, #28; \
+> +       vshl.u64 RT3, rh, #64 - 28; \
+> +       vadd.u64 RT1, RT1, RT0; \
+> +       vshr.u64 RT4, rh, #34; \
+> +       vshl.u64 RT5, rh, #64 - 34; \
+> +       vadd.u64 RT1, RT1, RT7; \
+> +       \
+> +       /* g =3D Sum0 (h) + Maj (h, a, b); */ \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vshr.u64 RT4, rh, #39; \
+> +       vshl.u64 RT5, rh, #64 - 39; \
+> +       veor.64 RT0, rh, ra; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vbsl.64 RT0, rb, ra; \
+> +       vadd.u64 rc, rc, RT1; /* c+=3Dt1; */ \
+> +       veor.64 rg, RT2, RT3; \
+> +       \
+> +       /* w[0] +=3D S1 (w[14]) + w[9] + S0 (w[1]); */ \
+> +       /* w[1] +=3D S1 (w[15]) + w[10] + S0 (w[2]); */ \
+> +       \
+> +       /**** S0(w[1:2]) */ \
+> +       \
+> +       /* w[0:1] +=3D w[9:10] */ \
+> +       /* RT23q =3D rw1:rw2 */ \
+> +       vext.u64 RT23q, rw01q, rw23q, #1; \
+> +       vadd.u64 rw0, rw9; \
+> +       vadd.u64 rg, rg, RT0; \
+> +       vadd.u64 rw1, rw10;\
+> +       vadd.u64 rg, rg, RT1; /* g+=3Dt1; */ \
+> +       \
+> +       vshr.u64 RT45q, RT23q, #1; \
+> +       vshl.u64 RT67q, RT23q, #64 - 1; \
+> +       vshr.u64 RT01q, RT23q, #8; \
+> +       veor.u64 RT45q, RT45q, RT67q; \
+> +       vshl.u64 RT67q, RT23q, #64 - 8; \
+> +       veor.u64 RT45q, RT45q, RT01q; \
+> +       vshr.u64 RT01q, RT23q, #7; \
+> +       veor.u64 RT45q, RT45q, RT67q; \
+> +       \
+> +       /**** S1(w[14:15]) */ \
+> +       vshr.u64 RT23q, rw1415q, #6; \
+> +       veor.u64 RT01q, RT01q, RT45q; \
+> +       vshr.u64 RT45q, rw1415q, #19; \
+> +       vshl.u64 RT67q, rw1415q, #64 - 19; \
+> +       veor.u64 RT23q, RT23q, RT45q; \
+> +       vshr.u64 RT45q, rw1415q, #61; \
+> +       veor.u64 RT23q, RT23q, RT67q; \
+> +       vshl.u64 RT67q, rw1415q, #64 - 61; \
+> +       veor.u64 RT23q, RT23q, RT45q; \
+> +       vadd.u64 rw01q, RT01q; /* w[0:1] +=3D S(w[1:2]) */ \
+> +       veor.u64 RT01q, RT23q, RT67q;
+> +#define vadd_RT01q(rw01q) \
+> +       /* w[0:1] +=3D S(w[14:15]) */ \
+> +       vadd.u64 rw01q, RT01q;
+> +
+> +#define dummy(_) /*_*/
+> +
+> +#define rounds2_64_79(ra, rb, rc, rd, re, rf, rg, rh, rw0, rw1, \
+> +                     interleave_op1, arg1, interleave_op2, arg2) \
+> +       /* t1 =3D h + Sum1 (e) + Ch (e, f, g) + k[t] + w[t]; */ \
+> +       vshr.u64 RT2, re, #14; \
+> +       vshl.u64 RT3, re, #64 - 14; \
+> +       interleave_op1(arg1); \
+> +       vshr.u64 RT4, re, #18; \
+> +       vshl.u64 RT5, re, #64 - 18; \
+> +       interleave_op2(arg2); \
+> +       vld1.64 {RT0}, [RK]!; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vshr.u64 RT4, re, #41; \
+> +       vshl.u64 RT5, re, #64 - 41; \
+> +       vadd.u64 RT0, RT0, rw0; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vmov.64 RT7, re; \
+> +       veor.64 RT1, RT2, RT3; \
+> +       vbsl.64 RT7, rf, rg; \
+> +       \
+> +       vadd.u64 RT1, RT1, rh; \
+> +       vshr.u64 RT2, ra, #28; \
+> +       vshl.u64 RT3, ra, #64 - 28; \
+> +       vadd.u64 RT1, RT1, RT0; \
+> +       vshr.u64 RT4, ra, #34; \
+> +       vshl.u64 RT5, ra, #64 - 34; \
+> +       vadd.u64 RT1, RT1, RT7; \
+> +       \
+> +       /* h =3D Sum0 (a) + Maj (a, b, c); */ \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vshr.u64 RT4, ra, #39; \
+> +       vshl.u64 RT5, ra, #64 - 39; \
+> +       veor.64 RT0, ra, rb; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vbsl.64 RT0, rc, rb; \
+> +       vadd.u64 rd, rd, RT1; /* d+=3Dt1; */ \
+> +       veor.64 rh, RT2, RT3; \
+> +       \
+> +       /* t1 =3D g + Sum1 (d) + Ch (d, e, f) + k[t] + w[t]; */ \
+> +       vshr.u64 RT2, rd, #14; \
+> +       vshl.u64 RT3, rd, #64 - 14; \
+> +       vadd.u64 rh, rh, RT0; \
+> +       vshr.u64 RT4, rd, #18; \
+> +       vshl.u64 RT5, rd, #64 - 18; \
+> +       vadd.u64 rh, rh, RT1; /* h+=3Dt1; */ \
+> +       vld1.64 {RT0}, [RK]!; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vshr.u64 RT4, rd, #41; \
+> +       vshl.u64 RT5, rd, #64 - 41; \
+> +       vadd.u64 RT0, RT0, rw1; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vmov.64 RT7, rd; \
+> +       veor.64 RT1, RT2, RT3; \
+> +       vbsl.64 RT7, re, rf; \
+> +       \
+> +       vadd.u64 RT1, RT1, rg; \
+> +       vshr.u64 RT2, rh, #28; \
+> +       vshl.u64 RT3, rh, #64 - 28; \
+> +       vadd.u64 RT1, RT1, RT0; \
+> +       vshr.u64 RT4, rh, #34; \
+> +       vshl.u64 RT5, rh, #64 - 34; \
+> +       vadd.u64 RT1, RT1, RT7; \
+> +       \
+> +       /* g =3D Sum0 (h) + Maj (h, a, b); */ \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vshr.u64 RT4, rh, #39; \
+> +       vshl.u64 RT5, rh, #64 - 39; \
+> +       veor.64 RT0, rh, ra; \
+> +       veor.64 RT23q, RT23q, RT45q; \
+> +       vbsl.64 RT0, rb, ra; \
+> +       vadd.u64 rc, rc, RT1; /* c+=3Dt1; */ \
+> +       veor.64 rg, RT2, RT3;
+> +#define vadd_rg_RT0(rg) \
+> +       vadd.u64 rg, rg, RT0;
+> +#define vadd_rg_RT1(rg) \
+> +       vadd.u64 rg, rg, RT1; /* g+=3Dt1; */
+> +
+> +.align 3
+> +ENTRY(sha512_transform_neon)
+> +       /* Input:
+> +        *      %r0: SHA512_CONTEXT
+> +        *      %r1: data
+> +        *      %r2: u64 k[] constants
+> +        *      %r3: nblks
+> +        */
+> +       push {%lr};
+> +
+> +       mov %lr, #0;
+> +
+> +       /* Load context to d0-d7 */
+> +       vld1.64 {RA-RD}, [%r0]!;
+> +       vld1.64 {RE-RH}, [%r0];
+> +       sub %r0, #(4*8);
+> +
+> +       /* Load input to w[16], d16-d31 */
+> +       /* NOTE: Assumes that on ARMv7 unaligned accesses are always =
+allowed. */
+> +       vld1.64 {RW0-RW3}, [%r1]!;
+> +       vld1.64 {RW4-RW7}, [%r1]!;
+> +       vld1.64 {RW8-RW11}, [%r1]!;
+> +       vld1.64 {RW12-RW15}, [%r1]!;
+> +#ifdef __ARMEL__
+> +       /* byteswap */
+> +       vrev64.8 RW01q, RW01q;
+> +       vrev64.8 RW23q, RW23q;
+> +       vrev64.8 RW45q, RW45q;
+> +       vrev64.8 RW67q, RW67q;
+> +       vrev64.8 RW89q, RW89q;
+> +       vrev64.8 RW1011q, RW1011q;
+> +       vrev64.8 RW1213q, RW1213q;
+> +       vrev64.8 RW1415q, RW1415q;
+> +#endif
+> +
+> +       /* EABI says that d8-d15 must be preserved by callee. */
+> +       /*vpush {RT0-RT7};*/
+> +
+> +.Loop:
+> +       rounds2_0_63(RA, RB, RC, RD, RE, RF, RG, RH, RW0, RW1, RW01q,=
+ RW2,
+> +                    RW23q, RW1415q, RW9, RW10, dummy, _);
+> +       b .Lenter_rounds;
+> +
+> +.Loop_rounds:
+> +       rounds2_0_63(RA, RB, RC, RD, RE, RF, RG, RH, RW0, RW1, RW01q,=
+ RW2,
+> +                    RW23q, RW1415q, RW9, RW10, vadd_RT01q, RW1415q);
+> +.Lenter_rounds:
+> +       rounds2_0_63(RG, RH, RA, RB, RC, RD, RE, RF, RW2, RW3, RW23q,=
+ RW4,
+> +                    RW45q, RW01q, RW11, RW12, vadd_RT01q, RW01q);
+> +       rounds2_0_63(RE, RF, RG, RH, RA, RB, RC, RD, RW4, RW5, RW45q,=
+ RW6,
+> +                    RW67q, RW23q, RW13, RW14, vadd_RT01q, RW23q);
+> +       rounds2_0_63(RC, RD, RE, RF, RG, RH, RA, RB, RW6, RW7, RW67q,=
+ RW8,
+> +                    RW89q, RW45q, RW15, RW0, vadd_RT01q, RW45q);
+> +       rounds2_0_63(RA, RB, RC, RD, RE, RF, RG, RH, RW8, RW9, RW89q,=
+ RW10,
+> +                    RW1011q, RW67q, RW1, RW2, vadd_RT01q, RW67q);
+> +       rounds2_0_63(RG, RH, RA, RB, RC, RD, RE, RF, RW10, RW11, RW10=
+11q, RW12,
+> +                    RW1213q, RW89q, RW3, RW4, vadd_RT01q, RW89q);
+> +       add %lr, #16;
+> +       rounds2_0_63(RE, RF, RG, RH, RA, RB, RC, RD, RW12, RW13, RW12=
+13q, RW14,
+> +                    RW1415q, RW1011q, RW5, RW6, vadd_RT01q, RW1011q)=
+;
+> +       cmp %lr, #64;
+> +       rounds2_0_63(RC, RD, RE, RF, RG, RH, RA, RB, RW14, RW15, RW14=
+15q, RW0,
+> +                    RW01q, RW1213q, RW7, RW8, vadd_RT01q, RW1213q);
+> +       bne .Loop_rounds;
+> +
+> +       subs %r3, #1;
+> +
+> +       rounds2_64_79(RA, RB, RC, RD, RE, RF, RG, RH, RW0, RW1,
+> +                     vadd_RT01q, RW1415q, dummy, _);
+> +       rounds2_64_79(RG, RH, RA, RB, RC, RD, RE, RF, RW2, RW3,
+> +                     vadd_rg_RT0, RG, vadd_rg_RT1, RG);
+> +       beq .Lhandle_tail;
+> +       vld1.64 {RW0-RW3}, [%r1]!;
+> +       rounds2_64_79(RE, RF, RG, RH, RA, RB, RC, RD, RW4, RW5,
+> +                     vadd_rg_RT0, RE, vadd_rg_RT1, RE);
+> +       rounds2_64_79(RC, RD, RE, RF, RG, RH, RA, RB, RW6, RW7,
+> +                     vadd_rg_RT0, RC, vadd_rg_RT1, RC);
+> +#ifdef __ARMEL__
+> +       vrev64.8 RW01q, RW01q;
+> +       vrev64.8 RW23q, RW23q;
+> +#endif
+> +       vld1.64 {RW4-RW7}, [%r1]!;
+> +       rounds2_64_79(RA, RB, RC, RD, RE, RF, RG, RH, RW8, RW9,
+> +                     vadd_rg_RT0, RA, vadd_rg_RT1, RA);
+> +       rounds2_64_79(RG, RH, RA, RB, RC, RD, RE, RF, RW10, RW11,
+> +                     vadd_rg_RT0, RG, vadd_rg_RT1, RG);
+> +#ifdef __ARMEL__
+> +       vrev64.8 RW45q, RW45q;
+> +       vrev64.8 RW67q, RW67q;
+> +#endif
+> +       vld1.64 {RW8-RW11}, [%r1]!;
+> +       rounds2_64_79(RE, RF, RG, RH, RA, RB, RC, RD, RW12, RW13,
+> +                     vadd_rg_RT0, RE, vadd_rg_RT1, RE);
+> +       rounds2_64_79(RC, RD, RE, RF, RG, RH, RA, RB, RW14, RW15,
+> +                     vadd_rg_RT0, RC, vadd_rg_RT1, RC);
+> +#ifdef __ARMEL__
+> +       vrev64.8 RW89q, RW89q;
+> +       vrev64.8 RW1011q, RW1011q;
+> +#endif
+> +       vld1.64 {RW12-RW15}, [%r1]!;
+> +       vadd_rg_RT0(RA);
+> +       vadd_rg_RT1(RA);
+> +
+> +       /* Load context */
+> +       vld1.64 {RT0-RT3}, [%r0]!;
+> +       vld1.64 {RT4-RT7}, [%r0];
+> +       sub %r0, #(4*8);
+> +
+> +#ifdef __ARMEL__
+> +       vrev64.8 RW1213q, RW1213q;
+> +       vrev64.8 RW1415q, RW1415q;
+> +#endif
+> +
+> +       vadd.u64 RA, RT0;
+> +       vadd.u64 RB, RT1;
+> +       vadd.u64 RC, RT2;
+> +       vadd.u64 RD, RT3;
+> +       vadd.u64 RE, RT4;
+> +       vadd.u64 RF, RT5;
+> +       vadd.u64 RG, RT6;
+> +       vadd.u64 RH, RT7;
+> +
+> +       /* Store the first half of context */
+> +       vst1.64 {RA-RD}, [%r0]!;
+> +       sub RK, $(8*80);
+> +       vst1.64 {RE-RH}, [%r0]; /* Store the last half of context */
+> +       mov %lr, #0;
+> +       sub %r0, #(4*8);
+> +
+> +       b .Loop;
+> +
+> +.Lhandle_tail:
+> +       rounds2_64_79(RE, RF, RG, RH, RA, RB, RC, RD, RW4, RW5,
+> +                     vadd_rg_RT0, RE, vadd_rg_RT1, RE);
+> +       rounds2_64_79(RC, RD, RE, RF, RG, RH, RA, RB, RW6, RW7,
+> +                     vadd_rg_RT0, RC, vadd_rg_RT1, RC);
+> +       rounds2_64_79(RA, RB, RC, RD, RE, RF, RG, RH, RW8, RW9,
+> +                     vadd_rg_RT0, RA, vadd_rg_RT1, RA);
+> +       rounds2_64_79(RG, RH, RA, RB, RC, RD, RE, RF, RW10, RW11,
+> +                     vadd_rg_RT0, RG, vadd_rg_RT1, RG);
+> +       rounds2_64_79(RE, RF, RG, RH, RA, RB, RC, RD, RW12, RW13,
+> +                     vadd_rg_RT0, RE, vadd_rg_RT1, RE);
+> +       rounds2_64_79(RC, RD, RE, RF, RG, RH, RA, RB, RW14, RW15,
+> +                     vadd_rg_RT0, RC, vadd_rg_RT1, RC);
+> +
+> +       /* Load context to d16-d23 */
+> +       vld1.64 {RW0-RW3}, [%r0]!;
+> +       vadd_rg_RT0(RA);
+> +       vld1.64 {RW4-RW7}, [%r0];
+> +       vadd_rg_RT1(RA);
+> +       sub %r0, #(4*8);
+> +
+> +       vadd.u64 RA, RW0;
+> +       vadd.u64 RB, RW1;
+> +       vadd.u64 RC, RW2;
+> +       vadd.u64 RD, RW3;
+> +       vadd.u64 RE, RW4;
+> +       vadd.u64 RF, RW5;
+> +       vadd.u64 RG, RW6;
+> +       vadd.u64 RH, RW7;
+> +
+> +       /* Store the first half of context */
+> +       vst1.64 {RA-RD}, [%r0]!;
+> +
+> +       /* Clear used registers */
+> +       /* d16-d31 */
+> +       veor.u64 RW01q, RW01q;
+> +       veor.u64 RW23q, RW23q;
+> +       veor.u64 RW45q, RW45q;
+> +       veor.u64 RW67q, RW67q;
+> +       vst1.64 {RE-RH}, [%r0]; /* Store the last half of context */
+> +       veor.u64 RW89q, RW89q;
+> +       veor.u64 RW1011q, RW1011q;
+> +       veor.u64 RW1213q, RW1213q;
+> +       veor.u64 RW1415q, RW1415q;
+> +       /* d8-d15 */
+> +       /*vpop {RT0-RT7};*/
+> +       /* d0-d7 (q0-q3) */
+> +       veor.u64 %q0, %q0;
+> +       veor.u64 %q1, %q1;
+> +       veor.u64 %q2, %q2;
+> +       veor.u64 %q3, %q3;
+> +
+> +       pop {%pc};
+> +ENDPROC(sha512_transform_neon)
+> diff --git a/arch/arm/crypto/sha512_neon_glue.c b/arch/arm/crypto/sha=
+512_neon_glue.c
+> new file mode 100644
+> index 0000000..0d2758f
+> --- /dev/null
+> +++ b/arch/arm/crypto/sha512_neon_glue.c
+> @@ -0,0 +1,305 @@
+> +/*
+> + * Glue code for the SHA512 Secure Hash Algorithm assembly implement=
+ation
+> + * using NEON instructions.
+> + *
+> + * Copyright =C2=A9 2014 Jussi Kivilinna <jussi.kivilinna@iki.fi>
+> + *
+> + * This file is based on sha512_ssse3_glue.c:
+> + *   Copyright (C) 2013 Intel Corporation
+> + *   Author: Tim Chen <tim.c.chen@linux.intel.com>
+> + *
+> + * This program is free software; you can redistribute it and/or mod=
+ify it
+> + * under the terms of the GNU General Public License as published by=
+ the Free
+> + * Software Foundation; either version 2 of the License, or (at your=
+ option)
+> + * any later version.
+> + *
+> + */
+> +
+> +#include <crypto/internal/hash.h>
+> +#include <linux/init.h>
+> +#include <linux/module.h>
+> +#include <linux/mm.h>
+> +#include <linux/cryptohash.h>
+> +#include <linux/types.h>
+> +#include <linux/string.h>
+> +#include <crypto/sha.h>
+> +#include <asm/byteorder.h>
+> +#include <asm/simd.h>
+> +#include <asm/neon.h>
+> +
+> +
+> +static const u64 sha512_k[] =3D {
+> +       0x428a2f98d728ae22ULL, 0x7137449123ef65cdULL,
+> +       0xb5c0fbcfec4d3b2fULL, 0xe9b5dba58189dbbcULL,
+> +       0x3956c25bf348b538ULL, 0x59f111f1b605d019ULL,
+> +       0x923f82a4af194f9bULL, 0xab1c5ed5da6d8118ULL,
+> +       0xd807aa98a3030242ULL, 0x12835b0145706fbeULL,
+> +       0x243185be4ee4b28cULL, 0x550c7dc3d5ffb4e2ULL,
+> +       0x72be5d74f27b896fULL, 0x80deb1fe3b1696b1ULL,
+> +       0x9bdc06a725c71235ULL, 0xc19bf174cf692694ULL,
+> +       0xe49b69c19ef14ad2ULL, 0xefbe4786384f25e3ULL,
+> +       0x0fc19dc68b8cd5b5ULL, 0x240ca1cc77ac9c65ULL,
+> +       0x2de92c6f592b0275ULL, 0x4a7484aa6ea6e483ULL,
+> +       0x5cb0a9dcbd41fbd4ULL, 0x76f988da831153b5ULL,
+> +       0x983e5152ee66dfabULL, 0xa831c66d2db43210ULL,
+> +       0xb00327c898fb213fULL, 0xbf597fc7beef0ee4ULL,
+> +       0xc6e00bf33da88fc2ULL, 0xd5a79147930aa725ULL,
+> +       0x06ca6351e003826fULL, 0x142929670a0e6e70ULL,
+> +       0x27b70a8546d22ffcULL, 0x2e1b21385c26c926ULL,
+> +       0x4d2c6dfc5ac42aedULL, 0x53380d139d95b3dfULL,
+> +       0x650a73548baf63deULL, 0x766a0abb3c77b2a8ULL,
+> +       0x81c2c92e47edaee6ULL, 0x92722c851482353bULL,
+> +       0xa2bfe8a14cf10364ULL, 0xa81a664bbc423001ULL,
+> +       0xc24b8b70d0f89791ULL, 0xc76c51a30654be30ULL,
+> +       0xd192e819d6ef5218ULL, 0xd69906245565a910ULL,
+> +       0xf40e35855771202aULL, 0x106aa07032bbd1b8ULL,
+> +       0x19a4c116b8d2d0c8ULL, 0x1e376c085141ab53ULL,
+> +       0x2748774cdf8eeb99ULL, 0x34b0bcb5e19b48a8ULL,
+> +       0x391c0cb3c5c95a63ULL, 0x4ed8aa4ae3418acbULL,
+> +       0x5b9cca4f7763e373ULL, 0x682e6ff3d6b2b8a3ULL,
+> +       0x748f82ee5defb2fcULL, 0x78a5636f43172f60ULL,
+> +       0x84c87814a1f0ab72ULL, 0x8cc702081a6439ecULL,
+> +       0x90befffa23631e28ULL, 0xa4506cebde82bde9ULL,
+> +       0xbef9a3f7b2c67915ULL, 0xc67178f2e372532bULL,
+> +       0xca273eceea26619cULL, 0xd186b8c721c0c207ULL,
+> +       0xeada7dd6cde0eb1eULL, 0xf57d4f7fee6ed178ULL,
+> +       0x06f067aa72176fbaULL, 0x0a637dc5a2c898a6ULL,
+> +       0x113f9804bef90daeULL, 0x1b710b35131c471bULL,
+> +       0x28db77f523047d84ULL, 0x32caab7b40c72493ULL,
+> +       0x3c9ebe0a15c9bebcULL, 0x431d67c49c100d4cULL,
+> +       0x4cc5d4becb3e42b6ULL, 0x597f299cfc657e2aULL,
+> +       0x5fcb6fab3ad6faecULL, 0x6c44198c4a475817ULL
+> +};
+> +
+> +
+> +asmlinkage void sha512_transform_neon(u64 *digest, const void *data,
+> +                                     const u64 k[], unsigned int num=
+_blks);
+> +
+> +
+> +static int sha512_neon_init(struct shash_desc *desc)
+> +{
+> +       struct sha512_state *sctx =3D shash_desc_ctx(desc);
+> +
+> +       sctx->state[0] =3D SHA512_H0;
+> +       sctx->state[1] =3D SHA512_H1;
+> +       sctx->state[2] =3D SHA512_H2;
+> +       sctx->state[3] =3D SHA512_H3;
+> +       sctx->state[4] =3D SHA512_H4;
+> +       sctx->state[5] =3D SHA512_H5;
+> +       sctx->state[6] =3D SHA512_H6;
+> +       sctx->state[7] =3D SHA512_H7;
+> +       sctx->count[0] =3D sctx->count[1] =3D 0;
+> +
+> +       return 0;
+> +}
+> +
+> +static int __sha512_neon_update(struct shash_desc *desc, const u8 *d=
+ata,
+> +                               unsigned int len, unsigned int partia=
+l)
+> +{
+> +       struct sha512_state *sctx =3D shash_desc_ctx(desc);
+> +       unsigned int done =3D 0;
+> +
+> +       sctx->count[0] +=3D len;
+> +       if (sctx->count[0] < len)
+> +               sctx->count[1]++;
+> +
+> +       if (partial) {
+> +               done =3D SHA512_BLOCK_SIZE - partial;
+> +               memcpy(sctx->buf + partial, data, done);
+> +               sha512_transform_neon(sctx->state, sctx->buf, sha512_=
+k, 1);
+> +       }
+> +
+> +       if (len - done >=3D SHA512_BLOCK_SIZE) {
+> +               const unsigned int rounds =3D (len - done) / SHA512_B=
+LOCK_SIZE;
+> +
+> +               sha512_transform_neon(sctx->state, data + done, sha51=
+2_k,
+> +                                     rounds);
+> +
+> +               done +=3D rounds * SHA512_BLOCK_SIZE;
+> +       }
+> +
+> +       memcpy(sctx->buf, data + done, len - done);
+> +
+> +       return 0;
+> +}
+> +
+> +static int sha512_neon_update(struct shash_desc *desc, const u8 *dat=
+a,
+> +                            unsigned int len)
+> +{
+> +       struct sha512_state *sctx =3D shash_desc_ctx(desc);
+> +       unsigned int partial =3D sctx->count[0] % SHA512_BLOCK_SIZE;
+> +       int res;
+> +
+> +       /* Handle the fast case right here */
+> +       if (partial + len < SHA512_BLOCK_SIZE) {
+> +               sctx->count[0] +=3D len;
+> +               if (sctx->count[0] < len)
+> +                       sctx->count[1]++;
+> +               memcpy(sctx->buf + partial, data, len);
+> +
+> +               return 0;
+> +       }
+> +
+> +       if (!may_use_simd()) {
+> +               res =3D crypto_sha512_update(desc, data, len);
+> +       } else {
+> +               kernel_neon_begin();
+> +               res =3D __sha512_neon_update(desc, data, len, partial=
+);
+> +               kernel_neon_end();
+> +       }
+> +
+> +       return res;
+> +}
+> +
+> +
+> +/* Add padding and return the message digest. */
+> +static int sha512_neon_final(struct shash_desc *desc, u8 *out)
+> +{
+> +       struct sha512_state *sctx =3D shash_desc_ctx(desc);
+> +       unsigned int i, index, padlen;
+> +       __be64 *dst =3D (__be64 *)out;
+> +       __be64 bits[2];
+> +       static const u8 padding[SHA512_BLOCK_SIZE] =3D { 0x80, };
+> +
+> +       /* save number of bits */
+> +       bits[1] =3D cpu_to_be64(sctx->count[0] << 3);
+> +       bits[0] =3D cpu_to_be64(sctx->count[1] << 3 | sctx->count[0] =
+>> 61);
+> +
+> +       /* Pad out to 112 mod 128 and append length */
+> +       index =3D sctx->count[0] & 0x7f;
+> +       padlen =3D (index < 112) ? (112 - index) : ((128+112) - index=
+);
+> +
+> +       if (!may_use_simd()) {
+> +               crypto_sha512_update(desc, padding, padlen);
+> +               crypto_sha512_update(desc, (const u8 *)&bits, sizeof(=
+bits));
+> +       } else {
+> +               kernel_neon_begin();
+> +               /* We need to fill a whole block for __sha512_neon_up=
+date() */
+> +               if (padlen <=3D 112) {
+> +                       sctx->count[0] +=3D padlen;
+> +                       if (sctx->count[0] < padlen)
+> +                               sctx->count[1]++;
+> +                       memcpy(sctx->buf + index, padding, padlen);
+> +               } else {
+> +                       __sha512_neon_update(desc, padding, padlen, i=
+ndex);
+> +               }
+> +               __sha512_neon_update(desc, (const u8 *)&bits,
+> +                                       sizeof(bits), 112);
+> +               kernel_neon_end();
+> +       }
+> +
+> +       /* Store state in digest */
+> +       for (i =3D 0; i < 8; i++)
+> +               dst[i] =3D cpu_to_be64(sctx->state[i]);
+> +
+> +       /* Wipe context */
+> +       memset(sctx, 0, sizeof(*sctx));
+> +
+> +       return 0;
+> +}
+> +
+> +static int sha512_neon_export(struct shash_desc *desc, void *out)
+> +{
+> +       struct sha512_state *sctx =3D shash_desc_ctx(desc);
+> +
+> +       memcpy(out, sctx, sizeof(*sctx));
+> +
+> +       return 0;
+> +}
+> +
+> +static int sha512_neon_import(struct shash_desc *desc, const void *i=
+n)
+> +{
+> +       struct sha512_state *sctx =3D shash_desc_ctx(desc);
+> +
+> +       memcpy(sctx, in, sizeof(*sctx));
+> +
+> +       return 0;
+> +}
+> +
+> +static int sha384_neon_init(struct shash_desc *desc)
+> +{
+> +       struct sha512_state *sctx =3D shash_desc_ctx(desc);
+> +
+> +       sctx->state[0] =3D SHA384_H0;
+> +       sctx->state[1] =3D SHA384_H1;
+> +       sctx->state[2] =3D SHA384_H2;
+> +       sctx->state[3] =3D SHA384_H3;
+> +       sctx->state[4] =3D SHA384_H4;
+> +       sctx->state[5] =3D SHA384_H5;
+> +       sctx->state[6] =3D SHA384_H6;
+> +       sctx->state[7] =3D SHA384_H7;
+> +
+> +       sctx->count[0] =3D sctx->count[1] =3D 0;
+> +
+> +       return 0;
+> +}
+> +
+> +static int sha384_neon_final(struct shash_desc *desc, u8 *hash)
+> +{
+> +       u8 D[SHA512_DIGEST_SIZE];
+> +
+> +       sha512_neon_final(desc, D);
+> +
+> +       memcpy(hash, D, SHA384_DIGEST_SIZE);
+> +       memset(D, 0, SHA512_DIGEST_SIZE);
+> +
+> +       return 0;
+> +}
+> +
+> +static struct shash_alg algs[] =3D { {
+> +       .digestsize     =3D       SHA512_DIGEST_SIZE,
+> +       .init           =3D       sha512_neon_init,
+> +       .update         =3D       sha512_neon_update,
+> +       .final          =3D       sha512_neon_final,
+> +       .export         =3D       sha512_neon_export,
+> +       .import         =3D       sha512_neon_import,
+> +       .descsize       =3D       sizeof(struct sha512_state),
+> +       .statesize      =3D       sizeof(struct sha512_state),
+> +       .base           =3D       {
+> +               .cra_name       =3D       "sha512",
+> +               .cra_driver_name =3D      "sha512-neon",
+> +               .cra_priority   =3D       250,
+> +               .cra_flags      =3D       CRYPTO_ALG_TYPE_SHASH,
+> +               .cra_blocksize  =3D       SHA512_BLOCK_SIZE,
+> +               .cra_module     =3D       THIS_MODULE,
+> +       }
+> +},  {
+> +       .digestsize     =3D       SHA384_DIGEST_SIZE,
+> +       .init           =3D       sha384_neon_init,
+> +       .update         =3D       sha512_neon_update,
+> +       .final          =3D       sha384_neon_final,
+> +       .export         =3D       sha512_neon_export,
+> +       .import         =3D       sha512_neon_import,
+> +       .descsize       =3D       sizeof(struct sha512_state),
+> +       .statesize      =3D       sizeof(struct sha512_state),
+> +       .base           =3D       {
+> +               .cra_name       =3D       "sha384",
+> +               .cra_driver_name =3D      "sha384-neon",
+> +               .cra_priority   =3D       250,
+> +               .cra_flags      =3D       CRYPTO_ALG_TYPE_SHASH,
+> +               .cra_blocksize  =3D       SHA384_BLOCK_SIZE,
+> +               .cra_module     =3D       THIS_MODULE,
+> +       }
+> +} };
+> +
+> +static int __init sha512_neon_mod_init(void)
+> +{
+> +       if (!cpu_has_neon())
+> +               return -ENODEV;
+> +
+> +       return crypto_register_shashes(algs, ARRAY_SIZE(algs));
+> +}
+> +
+> +static void __exit sha512_neon_mod_fini(void)
+> +{
+> +       crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
+> +}
+> +
+> +module_init(sha512_neon_mod_init);
+> +module_exit(sha512_neon_mod_fini);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("SHA512 Secure Hash Algorithm, NEON accelerated")=
+;
+> +
+> +MODULE_ALIAS("sha512");
+> +MODULE_ALIAS("sha384");
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 66d7ce1..9ec69e2 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -600,6 +600,21 @@ config CRYPTO_SHA512_SPARC64
+>           SHA-512 secure hash standard (DFIPS 180-2) implemented
+>           using sparc64 crypto instructions, when available.
+>
+> +config CRYPTO_SHA512_ARM_NEON
+> +       tristate "SHA384 and SHA512 digest algorithm (ARM NEON)"
+> +       depends on ARM && KERNEL_MODE_NEON && !CPU_BIG_ENDIAN
+> +       select CRYPTO_SHA512
+> +       select CRYPTO_HASH
+> +       help
+> +         SHA-512 secure hash standard (DFIPS 180-2) implemented
+> +         using ARM NEON instructions, when available.
+> +
+> +         This version of SHA implements a 512 bit hash with 256 bits=
+ of
+> +         security against collision attacks.
+> +
+> +         This code also includes SHA-384, a 384 bit hash with 192 bi=
+ts
+> +         of security against collision attacks.
+> +
+>  config CRYPTO_TGR192
+>         tristate "Tiger digest algorithms"
+>         select CRYPTO_HASH
+>
