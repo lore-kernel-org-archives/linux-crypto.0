@@ -1,51 +1,63 @@
-From: Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH] crypto: properly label AF_ALG socket
-Date: Tue, 29 Jul 2014 20:41:09 +0200
-Message-ID: <1406659269-8346-1-git-send-email-gmazyland@gmail.com>
-References: <20140728150958.23156.75132.stgit@localhost>
-Cc: selinux@tycho.nsa.gov, pmoore@redhat.com,
-	Milan Broz <gmazyland@gmail.com>, stable@vger.kernel.org
-To: linux-crypto@vger.kernel.org
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20140728150958.23156.75132.stgit@localhost>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Jarod Wilson <jarod@redhat.com>
+Subject: [PATCH] crypto/testmgr: add missing spaces to drbg error strings
+Date: Tue, 29 Jul 2014 15:47:56 -0400
+Message-ID: <1406663276-25549-1-git-send-email-jarod@redhat.com>
+Cc: Jarod Wilson <jarod@redhat.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:19026 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751397AbaG2TuJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 29 Jul 2014 15:50:09 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Th AF_ALG socket was missing a security label (e.g. SELinux)
-which means that socket was in "unlabeled" state.
+There are a few missing spaces in the error text strings for
+drbg_cavs_test, trivial fix.
 
-This was recently demonstrated in the cryptsetup package
-(cryptsetup v1.6.5 and later.)
-See https://bugzilla.redhat.com/show_bug.cgi?id=1115120
-
-This patch clones the sock's label from the parent sock
-and resolves the issue (similar to AF_BLUETOOTH protocol family).
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Milan Broz <gmazyland@gmail.com>
+CC: Stephan Mueller <smueller@chronox.de>
+CC: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "David S. Miller" <davem@davemloft.net>
+CC: linux-crypto@vger.kernel.org
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
 ---
- crypto/af_alg.c | 2 ++
- 1 file changed, 2 insertions(+)
+ crypto/testmgr.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 966f893..6a3ad80 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -21,6 +21,7 @@
- #include <linux/module.h>
- #include <linux/net.h>
- #include <linux/rwsem.h>
-+#include <linux/security.h>
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 81818b9..ac2b631 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1778,7 +1778,7 @@ static int drbg_cavs_test(struct drbg_testvec *test, int pr,
  
- struct alg_type_list {
- 	const struct af_alg_type *type;
-@@ -243,6 +244,7 @@ int af_alg_accept(struct sock *sk, struct socket *newsock)
- 
- 	sock_init_data(newsock, sk2);
- 	sock_graft(sk2, newsock);
-+	security_sk_clone(sk, sk2);
- 
- 	err = type->accept(ask->private, sk2);
- 	if (err) {
+ 	drng = crypto_alloc_rng(driver, type, mask);
+ 	if (IS_ERR(drng)) {
+-		printk(KERN_ERR "alg: drbg: could not allocate DRNG handle for"
++		printk(KERN_ERR "alg: drbg: could not allocate DRNG handle for "
+ 		       "%s\n", driver);
+ 		kzfree(buf);
+ 		return -ENOMEM;
+@@ -1803,7 +1803,7 @@ static int drbg_cavs_test(struct drbg_testvec *test, int pr,
+ 			buf, test->expectedlen, &addtl);
+ 	}
+ 	if (ret <= 0) {
+-		printk(KERN_ERR "alg: drbg: could not obtain random data for"
++		printk(KERN_ERR "alg: drbg: could not obtain random data for "
+ 		       "driver %s\n", driver);
+ 		goto outbuf;
+ 	}
+@@ -1818,7 +1818,7 @@ static int drbg_cavs_test(struct drbg_testvec *test, int pr,
+ 			buf, test->expectedlen, &addtl);
+ 	}
+ 	if (ret <= 0) {
+-		printk(KERN_ERR "alg: drbg: could not obtain random data for"
++		printk(KERN_ERR "alg: drbg: could not obtain random data for "
+ 		       "driver %s\n", driver);
+ 		goto outbuf;
+ 	}
 -- 
-2.0.1
+1.8.3.1
