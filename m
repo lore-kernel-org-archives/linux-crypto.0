@@ -1,84 +1,46 @@
-From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v5 2/7] crypto: SHA1 multibuffer crypto hash
- infrastructure
-Date: Wed, 30 Jul 2014 12:01:35 +0200
-Message-ID: <20140730100135.GF19379@twins.programming.kicks-ass.net>
-References: <cover.1406033477.git.tim.c.chen@linux.intel.com>
- <1406066972.2970.804.camel@schen9-DESK>
- <20140725070800.GS3935@laptop>
- <1406305521.2970.851.camel@schen9-DESK>
- <1406672905.2970.940.camel@schen9-DESK>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH -v4] random: introduce getrandom(2) system call
+Date: Wed, 30 Jul 2014 14:26:20 +0200
+Message-ID: <20140730122620.GC13965@amd.pavel.ucw.cz>
+References: <1405718127-30042-1-git-send-email-tytso@mit.edu>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Np7vk93lNrw824dh"
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	"David S.Miller" <davem@davemloft.net>,
-	Ingo Molnar <mingo@kernel.org>,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>,
-	James Guilford <james.guilford@intel.com>,
-	Wajdi Feghali <wajdi.k.feghali@intel.com>,
-	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Tadeusz Struk <tadeusz.struk@intel.com>, tkhai@yandex.ru,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:43851 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751855AbaG3KCA (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Jul 2014 06:02:00 -0400
-Content-Disposition: inline
-In-Reply-To: <1406672905.2970.940.camel@schen9-DESK>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
-
-
---Np7vk93lNrw824dh
 Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
+	linux-crypto@vger.kernel.org, beck@openbsd.org,
+	deraadt@cvs.openbsd.org
+To: Theodore Ts'o <tytso@mit.edu>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1405718127-30042-1-git-send-email-tytso@mit.edu>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Jul 29, 2014 at 03:28:25PM -0700, Tim Chen wrote:
-> Peter,
->=20
-> Is my explanation adequate or you still have objection to the implementat=
-ion?  I'm
-> trying to decide here whether to extend our batch processing by
-> the crypto daemon (prolong our busy period)=20
-> based on whether there are other tasks to run.  Pre-emption and
-> resuming the crypto daemon is okay. Even if there's a pre-emption and
-> context switch in between, we can still do extended processing if
-> there's nothing else to run. Otherwise the cpu will go idle.=20
+Hi!
 
-I suppose.. I still don't really like it but what the heck.
+> The rationale of this system call is to provide resiliance against
+> file descriptor exhaustion attacks, where the attacker consumes all
+> available file descriptors, forcing the use of the fallback code where
+> /dev/[u]random is not available.  Since the fallback code is often not
+> well-tested, it is better to eliminate this potential failure mode
+> entirely.
 
-That single_task_running thing is hard to use and a weird interface so
-lets hope people don't find more 'creative' users for it.
+I'm not sure I understand the rationale; if someone can eat all your
+file descriptors, he can make you stop working. So you can just stop
+working when you can't open /dev/urandom, no?
 
+Fallback code is probably very bad idea to use...
 
+> The other feature provided by this new system call is the ability to
+> request randomness from the /dev/urandom entropy pool, but to block
+> until at least 128 bits of entropy has been accumulated in the
+> /dev/urandom entropy pool.  Historically, the emphasis in the
+> /dev/urandom development has been to ensure that urandom pool is
+> initialized as quickly as possible after system boot, and preferably
+> before the init scripts start execution.
 
---Np7vk93lNrw824dh
-Content-Type: application/pgp-signature
+Sounds like ioctl() for /dev/urandom for this behaviour would be nice?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJT2MJ/AAoJEHZH4aRLwOS61nkQAIz1gqbe+ZU7yU5FayjLIq3Y
-pWk3CVoPDOJwi3vnfsn0Pt6KN41UD5nMAl2XL2INHN//HQEVOtYGcHjd4J3tgw4+
-cp2cEr/jhttHZf5L/7EDOdp8vkyvjEGOEUp1qp7I6FKmv7L/1yhoFFHvJMBUwUV4
-26QQh5JgWowYVF39TfUoFO5iGC7TB6gI4D7T5G5/QXsmXPcdR8pma/Xj+tnMwZkP
-Ll8TUi9aOJP6sBSUbTO8x6d7cvE1WVtUslMQMqh0qXvoVOPDkFvoLZewRVLtuy6W
-bioRNHIuelGhXfMGMOeSHhDD5m3qFYgmTSaV7nMqea3j4p1JNYmSUGe7heJwLOwP
-17oudas83EQgk1cQ4Yc4+m2li5YevYH2FqtiOK0MyPkPQqKgxQo2WjJ0q420Lt5n
-dBJW5x/L3bYyiuD3NvXHhdSwDXTN5Dz9DKKyQ+tekFjDHNnei78WUvD7GEu9c7s0
-uyX8kN859Hwgc1d9SvvuyJGi0+tUUJv4kYSXNKqyqh2ldaVv+1HYIIZ3y6TzIWeN
-8r8YwjfqArcKkSO8vN28JiP03Bj9D8boISnz6iYLD1ZpM6l4+Cw3bzcnE4Kh0pdN
-neMgO7a19FgZi+VF1v4Nn84usGCGnzFJLCVJyRS0jg8zFDW8le+7rc8pru23AYe4
-ZCMJVUS9qTY2Sl+xNo9i
-=DSS6
------END PGP SIGNATURE-----
-
---Np7vk93lNrw824dh--
+									Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
