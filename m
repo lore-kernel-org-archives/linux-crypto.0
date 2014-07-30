@@ -1,37 +1,75 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto/testmgr: add missing spaces to drbg error strings
-Date: Wed, 30 Jul 2014 20:24:11 +0200
-Message-ID: <4722634.TRQ80mFtKb@tauon>
-References: <1406663276-25549-1-git-send-email-jarod@redhat.com>
+From: ebiederm@xmission.com (Eric W. Biederman)
+Subject: Re: General flags to turn things off (getrandom, pid lookup, etc)
+Date: Wed, 30 Jul 2014 11:41:41 -0700
+Message-ID: <87r412g04a.fsf@x220.int.ebiederm.org>
+References: <CALCETrWGvBfrX1W5XaFgJZhKHLf+oac9YrwPR3ppK=deQtu5hA@mail.gmail.com>
+	<20140727210617.GY6725@thunk.org>
+	<CALCETrXfzOZEC3mOKkm3_GvitvkEu4kAa3LowRv-fjHnzrQnBg@mail.gmail.com>
+	<87oawa740c.fsf@x220.int.ebiederm.org>
+	<20140730153713.736881f0@alan.etchedpixels.co.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Jarod Wilson <jarod@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1406663276-25549-1-git-send-email-jarod@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: Andy Lutomirski <luto@amacapital.net>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	linux-crypto@vger.kernel.org,
+	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
+	"linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	James Morris <james.l.morris@oracle.com>,
+	LSM List <linux-security-module@vger.kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Linux API <linux-api@vger.kernel.org>,
+	Julien Tinnes <jln@google.com>,
+	"Theodore Ts'o" <tytso@mit.edu>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Paul Moore <paul@paul-moore.com>,
+	David Drysdale <drysdale@google.com>,
+	Kees Cook <keescook@chromium.org>,
+	Meredydd Luff <meredydd@senatehouse.org>,
+	Christoph Hellwig <hch@infradead.org>
+To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from out02.mta.xmission.com ([166.70.13.232]:33835 "EHLO
+	out02.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752501AbaG3Spi (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 30 Jul 2014 14:45:38 -0400
+In-Reply-To: <20140730153713.736881f0@alan.etchedpixels.co.uk> (One Thousand
+	Gnomes's message of "Wed, 30 Jul 2014 15:37:12 +0100")
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 29. Juli 2014, 15:47:56 schrieb Jarod Wilson:
+One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk> writes:
 
-Hi Jarod,
-
->There are a few missing spaces in the error text strings for
->drbg_cavs_test, trivial fix.
-
-Thanks a lot.
+>> Andy you seem to be arguing here for two system calls.
+>> get_urandom() and get_random().
+>> 
+>> Where get_urandom only blocks if there is not enough starting entropy,
+>> and get_random(GRND_RANDOM) blocks if there is currently not enough
+>> entropy.
+>> 
+>> That would allow -ENOSYS to be the right return value and it would
+>> simply things for everyone.
 >
->CC: Stephan Mueller <smueller@chronox.de>
->CC: Herbert Xu <herbert@gondor.apana.org.au>
->CC: "David S. Miller" <davem@davemloft.net>
->CC: linux-crypto@vger.kernel.org
->Signed-off-by: Jarod Wilson <jarod@redhat.com>
+> So you replace the "no file handle" special case with the "unsupported or
+> disabled syscall" special case, which is even harder to test.
+>
+> Interfaces have failure modes. People who can't deal with that shouldn't
+> be writing code that does anything important in languages which don't
+> handle it for them.
 
-Acked-by: Stephan Mueller <smueller@chronox.de>
+Perhaps I misread the earlier conversation but it what I have read of
+this discussion people want to disable some of get_random() modes with
+seccomp.  Today get_random does not have any failure codes define except
+-ENOSYS.
 
-Ciao
-Stephan
+get_random(0) succeeding and get_random(GRND_RANDOM) returning -ENOSYS
+has every chance of causing applications to legitimately assume the
+get_random system call is not available in any mode.
+
+So the code either needs a defined error code for bad flags (-EINVAL) or
+we need to split the syscall in two.  Now that I think about it having
+the seccomp filter return -EINVAL if it doesn't like the parameter is
+better that splitting a syscall.  Presumably that is what
+get_random(UNSUPPORTED_FLAG) returns.
+
+Eric
