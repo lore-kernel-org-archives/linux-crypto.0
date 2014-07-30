@@ -1,44 +1,67 @@
 From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH -v4] random: introduce getrandom(2) system call
-Date: Wed, 30 Jul 2014 14:26:20 +0200
-Message-ID: <20140730122620.GC13965@amd.pavel.ucw.cz>
-References: <1405718127-30042-1-git-send-email-tytso@mit.edu>
+Subject: Re: [PATCH, RFC] random: introduce getrandom(2) system call
+Date: Wed, 30 Jul 2014 14:50:41 +0200
+Message-ID: <20140730125041.GD13965@amd.pavel.ucw.cz>
+References: <20140723115253.9808.qmail@ns.horizon.com>
+ <1406117416.4473.144770005.5B5ED8C2@webmail.messagingengine.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-api@vger.kernel.org,
-	linux-crypto@vger.kernel.org, beck@openbsd.org,
-	deraadt@cvs.openbsd.org
-To: Theodore Ts'o <tytso@mit.edu>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: George Spelvin <linux@horizon.com>, tytso@mit.edu,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:43424 "EHLO
+	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752929AbaG3Mun (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 30 Jul 2014 08:50:43 -0400
 Content-Disposition: inline
-In-Reply-To: <1405718127-30042-1-git-send-email-tytso@mit.edu>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1406117416.4473.144770005.5B5ED8C2@webmail.messagingengine.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
+On Wed 2014-07-23 14:10:16, Hannes Frederic Sowa wrote:
+> 
+> 
+> On Wed, Jul 23, 2014, at 13:52, George Spelvin wrote:
+> > I keep wishing for a more general solution.  For example, some way to
+> > have a "spare" extra fd that could be accessed with a special O_NOFAIL
+> > flag.
+> > 
+> > That would allow any number of library functions to not fail, such as
+> > logging from nasty corner cases.
+> > 
+> > But you'd have to provide one per thread, and block non-fatal signals
+> > while it was open, so you don't get reentrancy problems.  Ick.
+> > 
+> > 
+> > This overly-specialized system call (and worse yet, a blocking
+> > system call that you can't put into a poll() loop) just feels ugly
+> > to me.  Is it *absolutely* necessary?
+> 
+> One point that often came up besides fd exhaustion is missing
+> /dev/u?random device nodes in chroot environments.
 
-> The rationale of this system call is to provide resiliance against
-> file descriptor exhaustion attacks, where the attacker consumes all
-> available file descriptors, forcing the use of the fallback code where
-> /dev/[u]random is not available.  Since the fallback code is often not
-> well-tested, it is better to eliminate this potential failure mode
-> entirely.
+>From the maillist discussion, it seems you sometimes _want_
+/dev/random not to be present.
 
-I'm not sure I understand the rationale; if someone can eat all your
-file descriptors, he can make you stop working. So you can just stop
-working when you can't open /dev/urandom, no?
+For example you want to trace exactly the same path through malware
+every time.
 
-Fallback code is probably very bad idea to use...
+> > For example, how about simply making getentropy() a library function that
+> > aborts if it can't open /dev/urandom?  If you're suffering fd exhaustion,
+> > you're being DoSed already.
+> 
+> Maybe applications want to mitigate fd exhaustion.
 
-> The other feature provided by this new system call is the ability to
-> request randomness from the /dev/urandom entropy pool, but to block
-> until at least 128 bits of entropy has been accumulated in the
-> /dev/urandom entropy pool.  Historically, the emphasis in the
-> /dev/urandom development has been to ensure that urandom pool is
-> initialized as quickly as possible after system boot, and preferably
-> before the init scripts start execution.
+Dunno. Will we add special read_passwd() syscall that reads just
+/etc/passwd, to allow uid<->name resolution without available FDs?
 
-Sounds like ioctl() for /dev/urandom for this behaviour would be nice?
+I like the library function suggestion, this should not need a new
+syscall.
+
+And btw -- compatibility with getentropy() is _not_ going to be easy,
+if they have different blocking / partial read / signals policy.
 
 									Pavel
 -- 
