@@ -1,75 +1,131 @@
-From: ebiederm@xmission.com (Eric W. Biederman)
-Subject: Re: General flags to turn things off (getrandom, pid lookup, etc)
-Date: Wed, 30 Jul 2014 11:41:41 -0700
-Message-ID: <87r412g04a.fsf@x220.int.ebiederm.org>
-References: <CALCETrWGvBfrX1W5XaFgJZhKHLf+oac9YrwPR3ppK=deQtu5hA@mail.gmail.com>
-	<20140727210617.GY6725@thunk.org>
-	<CALCETrXfzOZEC3mOKkm3_GvitvkEu4kAa3LowRv-fjHnzrQnBg@mail.gmail.com>
-	<87oawa740c.fsf@x220.int.ebiederm.org>
-	<20140730153713.736881f0@alan.etchedpixels.co.uk>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: [PATCH] crypto: ccp - Do not sign extend input data to CCP
+Date: Wed, 30 Jul 2014 15:41:32 -0500
+Message-ID: <20140730204132.11748.11340.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Andy Lutomirski <luto@amacapital.net>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-crypto@vger.kernel.org,
-	Henrique de Moraes Holschuh <hmh@hmh.eng.br>,
-	"linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	James Morris <james.l.morris@oracle.com>,
-	LSM List <linux-security-module@vger.kernel.org>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Linux API <linux-api@vger.kernel.org>,
-	Julien Tinnes <jln@google.com>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Paul Moore <paul@paul-moore.com>,
-	David Drysdale <drysdale@google.com>,
-	Kees Cook <keescook@chromium.org>,
-	Meredydd Luff <meredydd@senatehouse.org>,
-	Christoph Hellwig <hch@infradead.org>
-To: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out02.mta.xmission.com ([166.70.13.232]:33835 "EHLO
-	out02.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752501AbaG3Spi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Jul 2014 14:45:38 -0400
-In-Reply-To: <20140730153713.736881f0@alan.etchedpixels.co.uk> (One Thousand
-	Gnomes's message of "Wed, 30 Jul 2014 15:37:12 +0100")
+Received: from mail-bn1lp0145.outbound.protection.outlook.com ([207.46.163.145]:1964
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750831AbaG3Ulo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 30 Jul 2014 16:41:44 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk> writes:
+The CCP hardware interprets all numbers as unsigned numbers, therefore
+sign extending input data is not valid.  Modify the function calls
+for RSA and ECC to not perform sign extending.
 
->> Andy you seem to be arguing here for two system calls.
->> get_urandom() and get_random().
->> 
->> Where get_urandom only blocks if there is not enough starting entropy,
->> and get_random(GRND_RANDOM) blocks if there is currently not enough
->> entropy.
->> 
->> That would allow -ENOSYS to be the right return value and it would
->> simply things for everyone.
->
-> So you replace the "no file handle" special case with the "unsupported or
-> disabled syscall" special case, which is even harder to test.
->
-> Interfaces have failure modes. People who can't deal with that shouldn't
-> be writing code that does anything important in languages which don't
-> handle it for them.
+This patch is based on the cryptodev-2.6 kernel tree.
 
-Perhaps I misread the earlier conversation but it what I have read of
-this discussion people want to disable some of get_random() modes with
-seccomp.  Today get_random does not have any failure codes define except
--ENOSYS.
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
+ drivers/crypto/ccp/ccp-ops.c |   26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-get_random(0) succeeding and get_random(GRND_RANDOM) returning -ENOSYS
-has every chance of causing applications to legitimately assume the
-get_random system call is not available in any mode.
-
-So the code either needs a defined error code for bad flags (-EINVAL) or
-we need to split the syscall in two.  Now that I think about it having
-the seccomp filter return -EINVAL if it doesn't like the parameter is
-better that splitting a syscall.  Presumably that is what
-get_random(UNSUPPORTED_FLAG) returns.
-
-Eric
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index 9ae006d..8729364 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -1606,7 +1606,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		goto e_ksb;
+ 
+ 	ccp_reverse_set_dm_area(&exp, rsa->exp, rsa->exp_len, CCP_KSB_BYTES,
+-				true);
++				false);
+ 	ret = ccp_copy_to_ksb(cmd_q, &exp, op.jobid, op.ksb_key,
+ 			      CCP_PASSTHRU_BYTESWAP_NOOP);
+ 	if (ret) {
+@@ -1623,10 +1623,10 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		goto e_exp;
+ 
+ 	ccp_reverse_set_dm_area(&src, rsa->mod, rsa->mod_len, CCP_KSB_BYTES,
+-				true);
++				false);
+ 	src.address += o_len;	/* Adjust the address for the copy operation */
+ 	ccp_reverse_set_dm_area(&src, rsa->src, rsa->src_len, CCP_KSB_BYTES,
+-				true);
++				false);
+ 	src.address -= o_len;	/* Reset the address to original value */
+ 
+ 	/* Prepare the output area for the operation */
+@@ -1841,20 +1841,20 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 
+ 	/* Copy the ECC modulus */
+ 	ccp_reverse_set_dm_area(&src, ecc->mod, ecc->mod_len,
+-				CCP_ECC_OPERAND_SIZE, true);
++				CCP_ECC_OPERAND_SIZE, false);
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 	/* Copy the first operand */
+ 	ccp_reverse_set_dm_area(&src, ecc->u.mm.operand_1,
+ 				ecc->u.mm.operand_1_len,
+-				CCP_ECC_OPERAND_SIZE, true);
++				CCP_ECC_OPERAND_SIZE, false);
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 	if (ecc->function != CCP_ECC_FUNCTION_MINV_384BIT) {
+ 		/* Copy the second operand */
+ 		ccp_reverse_set_dm_area(&src, ecc->u.mm.operand_2,
+ 					ecc->u.mm.operand_2_len,
+-					CCP_ECC_OPERAND_SIZE, true);
++					CCP_ECC_OPERAND_SIZE, false);
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+ 	}
+ 
+@@ -1960,17 +1960,17 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 
+ 	/* Copy the ECC modulus */
+ 	ccp_reverse_set_dm_area(&src, ecc->mod, ecc->mod_len,
+-				CCP_ECC_OPERAND_SIZE, true);
++				CCP_ECC_OPERAND_SIZE, false);
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 	/* Copy the first point X and Y coordinate */
+ 	ccp_reverse_set_dm_area(&src, ecc->u.pm.point_1.x,
+ 				ecc->u.pm.point_1.x_len,
+-				CCP_ECC_OPERAND_SIZE, true);
++				CCP_ECC_OPERAND_SIZE, false);
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 	ccp_reverse_set_dm_area(&src, ecc->u.pm.point_1.y,
+ 				ecc->u.pm.point_1.y_len,
+-				CCP_ECC_OPERAND_SIZE, true);
++				CCP_ECC_OPERAND_SIZE, false);
+ 	src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 	/* Set the first point Z coordianate to 1 */
+@@ -1981,11 +1981,11 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		/* Copy the second point X and Y coordinate */
+ 		ccp_reverse_set_dm_area(&src, ecc->u.pm.point_2.x,
+ 					ecc->u.pm.point_2.x_len,
+-					CCP_ECC_OPERAND_SIZE, true);
++					CCP_ECC_OPERAND_SIZE, false);
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+ 		ccp_reverse_set_dm_area(&src, ecc->u.pm.point_2.y,
+ 					ecc->u.pm.point_2.y_len,
+-					CCP_ECC_OPERAND_SIZE, true);
++					CCP_ECC_OPERAND_SIZE, false);
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 		/* Set the second point Z coordianate to 1 */
+@@ -1995,14 +1995,14 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		/* Copy the Domain "a" parameter */
+ 		ccp_reverse_set_dm_area(&src, ecc->u.pm.domain_a,
+ 					ecc->u.pm.domain_a_len,
+-					CCP_ECC_OPERAND_SIZE, true);
++					CCP_ECC_OPERAND_SIZE, false);
+ 		src.address += CCP_ECC_OPERAND_SIZE;
+ 
+ 		if (ecc->function == CCP_ECC_FUNCTION_PMUL_384BIT) {
+ 			/* Copy the scalar value */
+ 			ccp_reverse_set_dm_area(&src, ecc->u.pm.scalar,
+ 						ecc->u.pm.scalar_len,
+-						CCP_ECC_OPERAND_SIZE, true);
++						CCP_ECC_OPERAND_SIZE, false);
+ 			src.address += CCP_ECC_OPERAND_SIZE;
+ 		}
+ 	}
