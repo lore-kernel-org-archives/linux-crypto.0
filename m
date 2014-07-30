@@ -1,131 +1,144 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH] crypto: ccp - Do not sign extend input data to CCP
-Date: Wed, 30 Jul 2014 15:41:32 -0500
-Message-ID: <20140730204132.11748.11340.stgit@tlendack-t1.amdoffice.net>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: Re: [PATCH] x86, crypto: Check if gas supports CRC32
+Date: Wed, 30 Jul 2014 23:19:37 +0200
+Message-ID: <20140730211937.GA14864@jig.fritz.box>
+References: <20140730164701.GA19604@pd.tnic>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: x86-ml <x86@kernel.org>, linux-crypto@vger.kernel.org,
+	lkml <linux-kernel@vger.kernel.org>
+To: Borislav Petkov <bp@alien8.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0145.outbound.protection.outlook.com ([207.46.163.145]:1964
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750831AbaG3Ulo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Jul 2014 16:41:44 -0400
+Received: from mail-wg0-f50.google.com ([74.125.82.50]:35512 "EHLO
+	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751309AbaG3VTt (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 30 Jul 2014 17:19:49 -0400
+Content-Disposition: inline
+In-Reply-To: <20140730164701.GA19604@pd.tnic>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The CCP hardware interprets all numbers as unsigned numbers, therefore
-sign extending input data is not valid.  Modify the function calls
-for RSA and ECC to not perform sign extending.
+On Wed, Jul 30, 2014 at 06:47:01PM +0200, Borislav Petkov wrote:
+> Building current kernel with some old toolchain (gcc 4.1.2 and gas 2.17)
+> chokes with:
+> 
+> arch/x86/crypto/crc32c-pcl-intel-asm_64.S: Assembler messages:
+> arch/x86/crypto/crc32c-pcl-intel-asm_64.S:128: Error: no such instruction: `crc32b %bl,%r8d'
+> arch/x86/crypto/crc32c-pcl-intel-asm_64.S:204: Error: no such instruction: `crc32q -i*8(%rcx),%r8'
+> ...
+> 
+> due to the fact that gas doesn't know the CRC32 instruction. Check that
+> before building.
+> 
+> Cc: linux-crypto@vger.kernel.org
+> Signed-off-by: Borislav Petkov <bp@suse.de>
+> ---
+> 
+> So this is one possibility to address this. Code already
+> has the ifdeffery around crc_pcl() which is implemented in
+> crc32c-pcl-intel-asm_64.S so we can piggyback on that and not build that
+> file if gas doesn't know CRC32.
+> 
+> If no CRC32 support, it still builds fine silently, however it would be
+> better to probably say that due to old toolchain, kernel doesn't include
+> fast CRC32 stuff in crc32c-intel.ko.
+> 
+> Hmmm.
+> 
+> 
+>  arch/x86/crypto/Makefile            |  8 +++++++-
+>  arch/x86/crypto/crc32c-intel_glue.c |  7 ++++---
+>  scripts/gas-can-do-crc32.sh         | 12 ++++++++++++
+>  3 files changed, 23 insertions(+), 4 deletions(-)
+>  create mode 100755 scripts/gas-can-do-crc32.sh
+> 
+> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+> index 61d6e281898b..707bf7ecb903 100644
+> --- a/arch/x86/crypto/Makefile
+> +++ b/arch/x86/crypto/Makefile
+> @@ -83,7 +83,13 @@ ifeq ($(avx2_supported),yes)
+>  sha1-ssse3-y += sha1_avx2_x86_64_asm.o
+>  endif
+>  crc32c-intel-y := crc32c-intel_glue.o
+> -crc32c-intel-$(CONFIG_64BIT) += crc32c-pcl-intel-asm_64.o
+> +
+> +gas_can_crc32 := $(srctree)/scripts/gas-can-do-crc32.sh
+> +CONFIG_GAS_SUPPORTS_CRC32=$(shell $(CONFIG_SHELL) $(gas_can_crc32) $(AS))
+> +
 
-This patch is based on the cryptodev-2.6 kernel tree.
+This looks too complicated. We do have as-instr for exactly those kind
+of tests. And, in fact, looking at arch/x86/Makefile we already have one
+for crc32:
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
----
- drivers/crypto/ccp/ccp-ops.c |   26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+  asinstr += $(call as-instr,crc32l %eax$(comma)%eax,-DCONFIG_AS_CRC32=1)
 
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index 9ae006d..8729364 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -1606,7 +1606,7 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		goto e_ksb;
- 
- 	ccp_reverse_set_dm_area(&exp, rsa->exp, rsa->exp_len, CCP_KSB_BYTES,
--				true);
-+				false);
- 	ret = ccp_copy_to_ksb(cmd_q, &exp, op.jobid, op.ksb_key,
- 			      CCP_PASSTHRU_BYTESWAP_NOOP);
- 	if (ret) {
-@@ -1623,10 +1623,10 @@ static int ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		goto e_exp;
- 
- 	ccp_reverse_set_dm_area(&src, rsa->mod, rsa->mod_len, CCP_KSB_BYTES,
--				true);
-+				false);
- 	src.address += o_len;	/* Adjust the address for the copy operation */
- 	ccp_reverse_set_dm_area(&src, rsa->src, rsa->src_len, CCP_KSB_BYTES,
--				true);
-+				false);
- 	src.address -= o_len;	/* Reset the address to original value */
- 
- 	/* Prepare the output area for the operation */
-@@ -1841,20 +1841,20 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 
- 	/* Copy the ECC modulus */
- 	ccp_reverse_set_dm_area(&src, ecc->mod, ecc->mod_len,
--				CCP_ECC_OPERAND_SIZE, true);
-+				CCP_ECC_OPERAND_SIZE, false);
- 	src.address += CCP_ECC_OPERAND_SIZE;
- 
- 	/* Copy the first operand */
- 	ccp_reverse_set_dm_area(&src, ecc->u.mm.operand_1,
- 				ecc->u.mm.operand_1_len,
--				CCP_ECC_OPERAND_SIZE, true);
-+				CCP_ECC_OPERAND_SIZE, false);
- 	src.address += CCP_ECC_OPERAND_SIZE;
- 
- 	if (ecc->function != CCP_ECC_FUNCTION_MINV_384BIT) {
- 		/* Copy the second operand */
- 		ccp_reverse_set_dm_area(&src, ecc->u.mm.operand_2,
- 					ecc->u.mm.operand_2_len,
--					CCP_ECC_OPERAND_SIZE, true);
-+					CCP_ECC_OPERAND_SIZE, false);
- 		src.address += CCP_ECC_OPERAND_SIZE;
- 	}
- 
-@@ -1960,17 +1960,17 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 
- 	/* Copy the ECC modulus */
- 	ccp_reverse_set_dm_area(&src, ecc->mod, ecc->mod_len,
--				CCP_ECC_OPERAND_SIZE, true);
-+				CCP_ECC_OPERAND_SIZE, false);
- 	src.address += CCP_ECC_OPERAND_SIZE;
- 
- 	/* Copy the first point X and Y coordinate */
- 	ccp_reverse_set_dm_area(&src, ecc->u.pm.point_1.x,
- 				ecc->u.pm.point_1.x_len,
--				CCP_ECC_OPERAND_SIZE, true);
-+				CCP_ECC_OPERAND_SIZE, false);
- 	src.address += CCP_ECC_OPERAND_SIZE;
- 	ccp_reverse_set_dm_area(&src, ecc->u.pm.point_1.y,
- 				ecc->u.pm.point_1.y_len,
--				CCP_ECC_OPERAND_SIZE, true);
-+				CCP_ECC_OPERAND_SIZE, false);
- 	src.address += CCP_ECC_OPERAND_SIZE;
- 
- 	/* Set the first point Z coordianate to 1 */
-@@ -1981,11 +1981,11 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		/* Copy the second point X and Y coordinate */
- 		ccp_reverse_set_dm_area(&src, ecc->u.pm.point_2.x,
- 					ecc->u.pm.point_2.x_len,
--					CCP_ECC_OPERAND_SIZE, true);
-+					CCP_ECC_OPERAND_SIZE, false);
- 		src.address += CCP_ECC_OPERAND_SIZE;
- 		ccp_reverse_set_dm_area(&src, ecc->u.pm.point_2.y,
- 					ecc->u.pm.point_2.y_len,
--					CCP_ECC_OPERAND_SIZE, true);
-+					CCP_ECC_OPERAND_SIZE, false);
- 		src.address += CCP_ECC_OPERAND_SIZE;
- 
- 		/* Set the second point Z coordianate to 1 */
-@@ -1995,14 +1995,14 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
- 		/* Copy the Domain "a" parameter */
- 		ccp_reverse_set_dm_area(&src, ecc->u.pm.domain_a,
- 					ecc->u.pm.domain_a_len,
--					CCP_ECC_OPERAND_SIZE, true);
-+					CCP_ECC_OPERAND_SIZE, false);
- 		src.address += CCP_ECC_OPERAND_SIZE;
- 
- 		if (ecc->function == CCP_ECC_FUNCTION_PMUL_384BIT) {
- 			/* Copy the scalar value */
- 			ccp_reverse_set_dm_area(&src, ecc->u.pm.scalar,
- 						ecc->u.pm.scalar_len,
--						CCP_ECC_OPERAND_SIZE, true);
-+						CCP_ECC_OPERAND_SIZE, false);
- 			src.address += CCP_ECC_OPERAND_SIZE;
- 		}
- 	}
+So you can just used CONFIG_AS_CRC32 for your tests and drop the shell
+script.
+
+> +ifdef CONFIG_64BIT
+> +crc32c-intel-$(CONFIG_GAS_SUPPORTS_CRC32) += crc32c-pcl-intel-asm_64.o
+> +endif
+
+s/CONFIG_GAS_SUPPORTS_CRC32/CONFIG_AS_CRC32/ here and for all further
+uses.
+
+>  crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
+>  sha256-ssse3-y := sha256-ssse3-asm.o sha256-avx-asm.o sha256-avx2-asm.o sha256_ssse3_glue.o
+>  sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_ssse3_glue.o
+> diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
+> index 6812ad98355c..4ce8e2db2984 100644
+> --- a/arch/x86/crypto/crc32c-intel_glue.c
+> +++ b/arch/x86/crypto/crc32c-intel_glue.c
+> @@ -46,7 +46,7 @@
+>  #define REX_PRE
+>  #endif
+>  
+> -#ifdef CONFIG_X86_64
+> +#if defined(CONFIG_X86_64) && defined(CONFIG_GAS_SUPPORTS_CRC32)
+>  /*
+>   * use carryless multiply version of crc32c when buffer
+>   * size is >= 512 (when eager fpu is enabled) or
+> @@ -181,7 +181,7 @@ static int crc32c_intel_cra_init(struct crypto_tfm *tfm)
+>  	return 0;
+>  }
+>  
+> -#ifdef CONFIG_X86_64
+> +#if defined(CONFIG_X86_64) && defined(CONFIG_GAS_SUPPORTS_CRC32)
+>  static int crc32c_pcl_intel_update(struct shash_desc *desc, const u8 *data,
+>  			       unsigned int len)
+>  {
+> @@ -257,7 +257,8 @@ static int __init crc32c_intel_mod_init(void)
+>  {
+>  	if (!x86_match_cpu(crc32c_cpu_id))
+>  		return -ENODEV;
+> -#ifdef CONFIG_X86_64
+> +
+> +#if defined(CONFIG_X86_64) && defined(CONFIG_GAS_SUPPORTS_CRC32)
+>  	if (cpu_has_pclmulqdq) {
+>  		alg.update = crc32c_pcl_intel_update;
+>  		alg.finup = crc32c_pcl_intel_finup;
+> diff --git a/scripts/gas-can-do-crc32.sh b/scripts/gas-can-do-crc32.sh
+> new file mode 100755
+> index 000000000000..88ff476bd3cc
+> --- /dev/null
+> +++ b/scripts/gas-can-do-crc32.sh
+> @@ -0,0 +1,12 @@
+> +#!/bin/sh
+> +
+> +TMP=$(mktemp)
+> +
+> +echo "crc32 %rax,%rbx" | $* --warn - -o $TMP 2>/dev/null
+> +if [ "$?" -eq "0" ]; then
+> +	echo y
+> +else
+> +	echo n
+> +fi
+> +
+> +rm -f $TMP
+> -- 
+> 2.0.0
+> 
+
+Regards,
+Mathias
