@@ -1,50 +1,53 @@
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] x86, crypto: Check if gas supports CRC32
-Date: Thu, 31 Jul 2014 00:11:27 +0200
-Message-ID: <20140730221127.GF10213@pd.tnic>
-References: <20140730164701.GA19604@pd.tnic>
- <20140730211937.GA14864@jig.fritz.box>
- <20140730212814.GA15010@jig.fritz.box>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH -v4] random: introduce getrandom(2) system call
+Date: Thu, 31 Jul 2014 00:18:19 +0200
+Message-ID: <20140730221819.GB18189@amd.pavel.ucw.cz>
+References: <1405718127-30042-1-git-send-email-tytso@mit.edu>
+ <20140730122620.GC13965@amd.pavel.ucw.cz>
+ <CAComcpMnAdOk=Hs8Dtc7VZeJDHnpKQtzZ_=_67tqCeYU3pdJ_Q@mail.gmail.com>
+ <1406731254.26034.4.camel@thorin>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: x86-ml <x86@kernel.org>, linux-crypto@vger.kernel.org,
-	lkml <linux-kernel@vger.kernel.org>
-To: Mathias Krause <minipli@googlemail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Bob Beck <beck@openbsd.org>, Theodore Ts'o <tytso@mit.edu>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-api@vger.kernel.org,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	Theo de Raadt <deraadt@cvs.openbsd.org>
+To: Bernd Petrovitsch <bernd@petrovitsch.priv.at>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:53077 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752331AbaG3WLe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 30 Jul 2014 18:11:34 -0400
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:58306 "EHLO
+	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752033AbaG3WSW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 30 Jul 2014 18:18:22 -0400
 Content-Disposition: inline
-In-Reply-To: <20140730212814.GA15010@jig.fritz.box>
+In-Reply-To: <1406731254.26034.4.camel@thorin>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jul 30, 2014 at 11:28:14PM +0200, Mathias Krause wrote:
-> Gah, CONFIG_AS_CRC32 gets defined as a preprocessor symbol only so
-> cannot be used in makefiles. So crc32c-pcl-intel-asm_64.S needs a
-> "#ifdef CONFIG_AS_CRC32" guard and still be compiled for CONFIG_64BIT,
-> as it is now. It'll be an empty object for older binutils versions not
-> supporting the crc32 instruction.
+On Wed 2014-07-30 16:40:52, Bernd Petrovitsch wrote:
+> On Mit, 2014-07-30 at 07:56 -0600, Bob Beck wrote:
+> > Pavel. I have bit 'ol enterprise daemon running with established file
+> > descriptors serving thousands of connections
+> > which periodically require entropy.  Now I run out of descriptors. I
+> > can't establish new connections. but I should
+> > now halt all the other ones that require entropy?  I should raise
+> > SIGKILL on my process serving these thousands
+> > of connetions?  I don't think so.
+> 
+> If that long-running daemon periodically needs something from a device,
+> one would better keep the fd for that open the whole time. Saves some
+> CPU cycles and latency too BTW.
 
-Yeah, that makes it all even simpler, thanks!
+Agreed.
 
-We're still b0rked though:
+On the other hand, keeping a fd open is quite tricky for a
+library. But better solution might be to make that easier.
 
-arch/x86/crypto/crct10dif-pcl-asm_64.S: Assembler messages:
-arch/x86/crypto/crct10dif-pcl-asm_64.S:147: Error: no such instruction: `pclmulqdq $0x0,%xmm10,%xmm0'
-arch/x86/crypto/crct10dif-pcl-asm_64.S:148: Error: no such instruction: `pclmulqdq $0x11,%xmm10,%xmm8'
-arch/x86/crypto/crct10dif-pcl-asm_64.S:149: Error: no such instruction: `pclmulqdq $0x0,%xmm10,%xmm1'
-...
+open( , O_IM_A_LIBRARY_GIVE_ME_ONE_OF_THREE_RESERVED_FDS) might be one
+solution. Actually, one reserved fd should be enough.
 
-and need checking for more instructions. I'll play with this more
-tomorrow.
-
-Good night :-)
-
+									Pavel
 -- 
-Regards/Gruss,
-    Boris.
-
-Sent from a fat crate under my desk. Formatting is fine.
---
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
