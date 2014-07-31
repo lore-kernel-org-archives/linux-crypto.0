@@ -1,7 +1,7 @@
 From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: [PATCH v6 2/6] crypto: multibuffer crypto infrastructure
-Date: Thu, 31 Jul 2014 10:29:51 -0700
-Message-ID: <1406827791.2970.949.camel@schen9-DESK>
+Subject: [PATCH v6 6/6] crypto: SHA1 multibuffer job manager and glue code
+Date: Thu, 31 Jul 2014 10:30:03 -0700
+Message-ID: <1406827803.2970.953.camel@schen9-DESK>
 References: <cover.1406798062.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -25,936 +25,998 @@ In-Reply-To: <cover.1406798062.git.tim.c.chen@linux.intel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch introduces the multi-buffer crypto daemon which is responsible
-for submitting crypto jobs in a work queue to the responsible multi-buffer
-crypto algorithm.  The idea of the multi-buffer algorihtm is to put
-data streams from multiple jobs in a wide (AVX2) register and then
-take advantage of SIMD instructions to do crypto computation on several
-buffers simultaneously.
+This patch introduces the multi-buffer job manager which is responsible
+for submitting scatter-gather buffers from several SHA1 jobs to the
+multi-buffer algorithm.  It also contains the flush routine to that's
+called by the crypto daemon to complete the job when no new jobs arrive
+before the deadline of maximum latency of a SHA1 crypto job.
 
-The multi-buffer crypto daemon is also responsbile for flushing the
-remaining buffers to complete the computation if no new buffers arrive
-for a while.
+The SHA1 multi-buffer crypto algorithm is defined and initialized in
+this patch.
 
 Signed-off-by: Tim Chen <tim.c.chen@linux.intel.com>
 ---
- crypto/Kconfig                 |  30 ++
- crypto/Makefile                |   1 +
- crypto/mcryptd.c               | 705 +++++++++++++++++++++++++++++++++++++++++
- include/crypto/internal/hash.h |   9 +
- include/crypto/mcryptd.h       | 112 +++++++
- 5 files changed, 857 insertions(+)
- create mode 100644 crypto/mcryptd.c
- create mode 100644 include/crypto/mcryptd.h
+ arch/x86/crypto/Makefile         |   2 +
+ arch/x86/crypto/sha-mb/Makefile  |  11 +
+ arch/x86/crypto/sha-mb/sha1_mb.c | 935 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 948 insertions(+)
+ create mode 100644 arch/x86/crypto/sha-mb/Makefile
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb.c
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index ce4012a..5d3c711 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -157,6 +157,20 @@ config CRYPTO_CRYPTD
- 	  converts an arbitrary synchronous software crypto algorithm
- 	  into an asynchronous algorithm that executes in a kernel thread.
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 61d6e28..1189267 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -25,6 +25,7 @@ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
  
-+config CRYPTO_MCRYPTD
-+	tristate "Software async multi-buffer crypto daemon"
-+	select CRYPTO_BLKCIPHER
-+	select CRYPTO_HASH
-+	select CRYPTO_MANAGER
-+	select CRYPTO_WORKQUEUE
-+	help
-+	  This is a generic software asynchronous crypto daemon that
-+	  provides the kernel thread to assist multi-buffer crypto
-+	  algorithms for submitting jobs and flushing jobs in multi-buffer
-+	  crypto algorithms.  Multi-buffer crypto algorithms are executed
-+	  in the context of this kernel thread and drivers can post
-+	  their crypto request asyncrhously and process by this daemon.
+ obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
+ obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
++obj-$(CONFIG_CRYPTO_SHA1_MB) += sha-mb/
+ obj-$(CONFIG_CRYPTO_CRC32_PCLMUL) += crc32-pclmul.o
+ obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
+ obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha512-ssse3.o
+@@ -88,3 +89,4 @@ crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
+ sha256-ssse3-y := sha256-ssse3-asm.o sha256-avx-asm.o sha256-avx2-asm.o sha256_ssse3_glue.o
+ sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_ssse3_glue.o
+ crct10dif-pclmul-y := crct10dif-pcl-asm_64.o crct10dif-pclmul_glue.o
 +
- config CRYPTO_AUTHENC
- 	tristate "Authenc support"
- 	select CRYPTO_AEAD
-@@ -547,6 +561,22 @@ config CRYPTO_SHA1_PPC
- 	  This is the powerpc hardware accelerated implementation of the
- 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2).
- 
-+config CRYPTO_SHA1_MB
-+	tristate "SHA1 digest algorithm (x86_64 Multi-Buffer, Experimental)"
-+	depends on X86 && 64BIT
-+	select CRYPTO_SHA1
-+	select CRYPTO_HASH
-+	select CRYPTO_MCRYPTD
-+	help
-+	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
-+	  using multi-buffer technique.  This algorithm computes on
-+	  multiple data lanes concurrently with SIMD instructions for
-+	  better throughput.  It should not be enabled by default but
-+	  used when there is significant amount of work to keep the keep
-+	  the data lanes filled to get performance benefit.  If the data
-+	  lanes remain unfilled, a flush operation will be initiated to
-+	  process the crypto jobs, adding a slight latency.
-+
- config CRYPTO_SHA256
- 	tristate "SHA224 and SHA256 digest algorithm"
- 	select CRYPTO_HASH
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 38e64231..27dbbad 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -60,6 +60,7 @@ obj-$(CONFIG_CRYPTO_GCM) += gcm.o
- obj-$(CONFIG_CRYPTO_CCM) += ccm.o
- obj-$(CONFIG_CRYPTO_PCRYPT) += pcrypt.o
- obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
-+obj-$(CONFIG_CRYPTO_MCRYPTD) += mcryptd.o
- obj-$(CONFIG_CRYPTO_DES) += des_generic.o
- obj-$(CONFIG_CRYPTO_FCRYPT) += fcrypt.o
- obj-$(CONFIG_CRYPTO_BLOWFISH) += blowfish_generic.o
-diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
+diff --git a/arch/x86/crypto/sha-mb/Makefile b/arch/x86/crypto/sha-mb/Makefile
 new file mode 100644
-index 0000000..dbc20d1
+index 0000000..2f87563
 --- /dev/null
-+++ b/crypto/mcryptd.c
-@@ -0,0 +1,705 @@
++++ b/arch/x86/crypto/sha-mb/Makefile
+@@ -0,0 +1,11 @@
++#
++# Arch-specific CryptoAPI modules.
++#
++
++avx2_supported := $(call as-instr,vpgatherdd %ymm0$(comma)(%eax$(comma)%ymm1\
++                                $(comma)4)$(comma)%ymm2,yes,no)
++ifeq ($(avx2_supported),yes)
++	obj-$(CONFIG_CRYPTO_SHA1_MB) += sha1-mb.o
++	sha1-mb-y := sha1_mb.o sha1_mb_mgr_flush_avx2.o \
++	     sha1_mb_mgr_init_avx2.o sha1_mb_mgr_submit_avx2.o sha1_x8_avx2.o
++endif
+diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
+new file mode 100644
+index 0000000..e27ff31
+--- /dev/null
++++ b/arch/x86/crypto/sha-mb/sha1_mb.c
+@@ -0,0 +1,935 @@
 +/*
-+ * Software multibuffer async crypto daemon.
++ * Multi buffer SHA1 algorithm Glue Code
 + *
-+ * Copyright (c) 2014 Tim Chen <tim.c.chen@linux.intel.com>
++ * This file is provided under a dual BSD/GPLv2 license.  When using or
++ * redistributing this file, you may do so under either license.
 + *
-+ * Adapted from crypto daemon.
++ * GPL LICENSE SUMMARY
 + *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
++ *  Copyright(c) 2014 Intel Corporation.
 + *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of version 2 of the GNU General Public License as
++ *  published by the Free Software Foundation.
++ *
++ *  This program is distributed in the hope that it will be useful, but
++ *  WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  General Public License for more details.
++ *
++ *  Contact Information:
++ *	Tim Chen <tim.c.chen@linux.intel.com>
++ *
++ *  BSD LICENSE
++ *
++ *  Copyright(c) 2014 Intel Corporation.
++ *
++ *  Redistribution and use in source and binary forms, with or without
++ *  modification, are permitted provided that the following conditions
++ *  are met:
++ *
++ *    * Redistributions of source code must retain the above copyright
++ *      notice, this list of conditions and the following disclaimer.
++ *    * Redistributions in binary form must reproduce the above copyright
++ *      notice, this list of conditions and the following disclaimer in
++ *      the documentation and/or other materials provided with the
++ *      distribution.
++ *    * Neither the name of Intel Corporation nor the names of its
++ *      contributors may be used to endorse or promote products derived
++ *      from this software without specific prior written permission.
++ *
++ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++ *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++ *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++ *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++ *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 + */
 +
-+#include <crypto/algapi.h>
++#define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
++
 +#include <crypto/internal/hash.h>
-+#include <crypto/internal/aead.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/mm.h>
++#include <linux/cryptohash.h>
++#include <linux/types.h>
++#include <linux/list.h>
++#include <crypto/scatterwalk.h>
++#include <crypto/sha.h>
 +#include <crypto/mcryptd.h>
 +#include <crypto/crypto_wq.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/list.h>
-+#include <linux/module.h>
-+#include <linux/scatterlist.h>
-+#include <linux/sched.h>
-+#include <linux/slab.h>
++#include <asm/byteorder.h>
++#include <asm/i387.h>
++#include <asm/xcr.h>
++#include <asm/xsave.h>
 +#include <linux/hardirq.h>
++#include <asm/fpu-internal.h>
++#include "sha_mb_ctx.h"
 +
-+#define MCRYPTD_MAX_CPU_QLEN 100
-+#define MCRYPTD_BATCH 9
++#define FLUSH_INTERVAL 1000 /* in usec */
 +
-+static void *mcryptd_alloc_instance(struct crypto_alg *alg, unsigned int head,
-+				   unsigned int tail);
++struct mcryptd_alg_state sha1_mb_alg_state;
 +
-+struct mcryptd_flush_list {
-+	struct list_head list;
-+	struct mutex lock;
++struct sha1_mb_ctx {
++	struct mcryptd_ahash *mcryptd_tfm;
 +};
 +
-+struct mcryptd_flush_list __percpu *mcryptd_flist;
-+
-+struct hashd_instance_ctx {
-+	struct crypto_shash_spawn spawn;
-+	struct mcryptd_queue *queue;
-+};
-+
-+static void mcryptd_queue_worker(struct work_struct *work);
-+
-+void mcryptd_arm_flusher(struct mcryptd_alg_cstate *cstate, unsigned long delay)
++static inline struct mcryptd_hash_request_ctx *cast_hash_to_mcryptd_ctx(struct sha1_hash_ctx *hash_ctx)
 +{
-+	struct mcryptd_flush_list *flist;
++	struct shash_desc *desc;
 +
-+	if (!cstate->flusher_engaged) {
-+		/* put the flusher on the flush list */
-+		flist = per_cpu_ptr(mcryptd_flist, smp_processor_id());
-+		mutex_lock(&flist->lock);
-+		list_add_tail(&cstate->flush_list, &flist->list);
-+		cstate->flusher_engaged = true;
-+		cstate->next_flush = jiffies + delay;
-+		queue_delayed_work_on(smp_processor_id(), kcrypto_wq,
-+			&cstate->flush, delay);
-+		mutex_unlock(&flist->lock);
-+	}
-+}
-+EXPORT_SYMBOL(mcryptd_arm_flusher);
-+
-+static int mcryptd_init_queue(struct mcryptd_queue *queue,
-+			     unsigned int max_cpu_qlen)
-+{
-+	int cpu;
-+	struct mcryptd_cpu_queue *cpu_queue;
-+
-+	queue->cpu_queue = alloc_percpu(struct mcryptd_cpu_queue);
-+	pr_debug("mqueue:%p mcryptd_cpu_queue %p\n", queue, queue->cpu_queue);
-+	if (!queue->cpu_queue)
-+		return -ENOMEM;
-+	for_each_possible_cpu(cpu) {
-+		cpu_queue = per_cpu_ptr(queue->cpu_queue, cpu);
-+		pr_debug("cpu_queue #%d %p\n", cpu, queue->cpu_queue);
-+		crypto_init_queue(&cpu_queue->queue, max_cpu_qlen);
-+		INIT_WORK(&cpu_queue->work, mcryptd_queue_worker);
-+	}
-+	return 0;
++	desc = container_of((void *) hash_ctx, struct shash_desc, __ctx);
++	return container_of(desc, struct mcryptd_hash_request_ctx, desc);
 +}
 +
-+static void mcryptd_fini_queue(struct mcryptd_queue *queue)
++static inline struct ahash_request *cast_mcryptd_ctx_to_req(struct mcryptd_hash_request_ctx *ctx)
 +{
-+	int cpu;
-+	struct mcryptd_cpu_queue *cpu_queue;
-+
-+	for_each_possible_cpu(cpu) {
-+		cpu_queue = per_cpu_ptr(queue->cpu_queue, cpu);
-+		BUG_ON(cpu_queue->queue.qlen);
-+	}
-+	free_percpu(queue->cpu_queue);
++	return container_of((void *) ctx, struct ahash_request, __ctx);
 +}
 +
-+static int mcryptd_enqueue_request(struct mcryptd_queue *queue,
-+				  struct crypto_async_request *request,
-+				  struct mcryptd_hash_request_ctx *rctx)
++static void req_ctx_init(struct mcryptd_hash_request_ctx *rctx,
++				struct shash_desc *desc)
 +{
-+	int cpu, err;
-+	struct mcryptd_cpu_queue *cpu_queue;
-+
-+	cpu = get_cpu();
-+	cpu_queue = this_cpu_ptr(queue->cpu_queue);
-+	rctx->tag.cpu = cpu;
-+
-+	err = crypto_enqueue_request(&cpu_queue->queue, request);
-+	pr_debug("enqueue request: cpu %d cpu_queue %p request %p\n",
-+		 cpu, cpu_queue, request);
-+	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
-+	put_cpu();
-+
-+	return err;
++	rctx->flag = HASH_UPDATE;
 +}
 +
-+/*
-+ * Try to opportunisticlly flush the partially completed jobs if
-+ * crypto daemon is the only task running.
-+ */
-+static void mcryptd_opportunistic_flush(void)
-+{
-+	struct mcryptd_flush_list *flist;
-+	struct mcryptd_alg_cstate *cstate;
++asmlinkage void (*sha1_job_mgr_init)(struct sha1_mb_mgr *state);
++asmlinkage struct job_sha1* (*sha1_job_mgr_submit)(struct sha1_mb_mgr *state,
++							  struct job_sha1 *job);
++asmlinkage struct job_sha1* (*sha1_job_mgr_flush)(struct sha1_mb_mgr *state);
++asmlinkage struct job_sha1* (*sha1_job_mgr_get_comp_job)(struct sha1_mb_mgr *state);
 +
-+	flist = per_cpu_ptr(mcryptd_flist, smp_processor_id());
-+	while (single_task_running()) {
-+		mutex_lock(&flist->lock);
-+		if (list_empty(&flist->list)) {
-+			mutex_unlock(&flist->lock);
-+			return;
++inline void sha1_init_digest(uint32_t *digest)
++{
++	static const uint32_t initial_digest[SHA1_DIGEST_LENGTH] = {SHA1_H0,
++					SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 };
++	memcpy(digest, initial_digest, sizeof(initial_digest));
++}
++
++inline uint32_t sha1_pad(uint8_t padblock[SHA1_BLOCK_SIZE * 2],
++			 uint32_t total_len)
++{
++	uint32_t i = total_len & (SHA1_BLOCK_SIZE - 1);
++
++	memset(&padblock[i], 0, SHA1_BLOCK_SIZE);
++	padblock[i] = 0x80;
++
++	i += ((SHA1_BLOCK_SIZE - 1) &
++	      (0 - (total_len + SHA1_PADLENGTHFIELD_SIZE + 1)))
++	     + 1 + SHA1_PADLENGTHFIELD_SIZE;
++
++#if SHA1_PADLENGTHFIELD_SIZE == 16
++	*((uint64_t *) &padblock[i - 16]) = 0;
++#endif
++
++	*((uint64_t *) &padblock[i - 8]) = cpu_to_be64(total_len << 3);
++
++	/* Number of extra blocks to hash */
++	return i >> SHA1_LOG2_BLOCK_SIZE;
++}
++
++static struct sha1_hash_ctx *sha1_ctx_mgr_resubmit(struct sha1_ctx_mgr *mgr, struct sha1_hash_ctx *ctx)
++{
++	while (ctx) {
++		if (ctx->status & HASH_CTX_STS_COMPLETE) {
++			/* Clear PROCESSING bit */
++			ctx->status = HASH_CTX_STS_COMPLETE;
++			return ctx;
 +		}
-+		cstate = list_entry(flist->list.next,
-+				struct mcryptd_alg_cstate, flush_list);
-+		if (!cstate->flusher_engaged) {
-+			mutex_unlock(&flist->lock);
-+			return;
++
++		/*
++		 * If the extra blocks are empty, begin hashing what remains
++		 * in the user's buffer.
++		 */
++		if (ctx->partial_block_buffer_length == 0 &&
++		    ctx->incoming_buffer_length) {
++
++			const void *buffer = ctx->incoming_buffer;
++			uint32_t len = ctx->incoming_buffer_length;
++			uint32_t copy_len;
++
++			/*
++			 * Only entire blocks can be hashed.
++			 * Copy remainder to extra blocks buffer.
++			 */
++			copy_len = len & (SHA1_BLOCK_SIZE-1);
++
++			if (copy_len) {
++				len -= copy_len;
++				memcpy(ctx->partial_block_buffer,
++				       ((const char *) buffer + len),
++				       copy_len);
++				ctx->partial_block_buffer_length = copy_len;
++			}
++
++			ctx->incoming_buffer_length = 0;
++
++			/* len should be a multiple of the block size now */
++			assert((len % SHA1_BLOCK_SIZE) == 0);
++
++			/* Set len to the number of blocks to be hashed */
++			len >>= SHA1_LOG2_BLOCK_SIZE;
++
++			if (len) {
++
++				ctx->job.buffer = (uint8_t *) buffer;
++				ctx->job.len = len;
++				ctx = (struct sha1_hash_ctx *) sha1_job_mgr_submit(&mgr->mgr,
++										  &ctx->job);
++				continue;
++			}
 +		}
-+		list_del(&cstate->flush_list);
-+		cstate->flusher_engaged = false;
-+		mutex_unlock(&flist->lock);
-+		cstate->alg_state->flusher(cstate);
++
++		/*
++		 * If the extra blocks are not empty, then we are
++		 * either on the last block(s) or we need more
++		 * user input before continuing.
++		 */
++		if (ctx->status & HASH_CTX_STS_LAST) {
++
++			uint8_t *buf = ctx->partial_block_buffer;
++			uint32_t n_extra_blocks = sha1_pad(buf, ctx->total_length);
++
++			ctx->status = (HASH_CTX_STS_PROCESSING |
++				       HASH_CTX_STS_COMPLETE);
++			ctx->job.buffer = buf;
++			ctx->job.len = (uint32_t) n_extra_blocks;
++			ctx = (struct sha1_hash_ctx *) sha1_job_mgr_submit(&mgr->mgr, &ctx->job);
++			continue;
++		}
++
++		if (ctx)
++			ctx->status = HASH_CTX_STS_IDLE;
++		return ctx;
 +	}
++
++	return NULL;
 +}
 +
-+/*
-+ * Called in workqueue context, do one real cryption work (via
-+ * req->complete) and reschedule itself if there are more work to
-+ * do.
-+ */
-+static void mcryptd_queue_worker(struct work_struct *work)
++struct sha1_hash_ctx *sha1_ctx_mgr_get_comp_ctx(struct sha1_ctx_mgr *mgr)
 +{
-+	struct mcryptd_cpu_queue *cpu_queue;
-+	struct crypto_async_request *req, *backlog;
-+	int i;
++	/*
++	 * If get_comp_job returns NULL, there are no jobs complete.
++	 * If get_comp_job returns a job, verify that it is safe to return to the user.
++	 * If it is not ready, resubmit the job to finish processing.
++	 * If sha1_ctx_mgr_resubmit returned a job, it is ready to be returned.
++	 * Otherwise, all jobs currently being managed by the hash_ctx_mgr still need processing.
++	 */
++	struct sha1_hash_ctx *ctx;
++
++	ctx = (struct sha1_hash_ctx *) sha1_job_mgr_get_comp_job(&mgr->mgr);
++	return sha1_ctx_mgr_resubmit(mgr, ctx);
++}
++
++void sha1_ctx_mgr_init(struct sha1_ctx_mgr *mgr)
++{
++	sha1_job_mgr_init(&mgr->mgr);
++}
++
++struct sha1_hash_ctx *sha1_ctx_mgr_submit(struct sha1_ctx_mgr *mgr,
++					  struct sha1_hash_ctx *ctx,
++					  const void *buffer,
++					  uint32_t len,
++					  int flags)
++{
++	if (flags & (~HASH_ENTIRE)) {
++		/* User should not pass anything other than FIRST, UPDATE, or LAST */
++		ctx->error = HASH_CTX_ERROR_INVALID_FLAGS;
++		return ctx;
++	}
++
++	if (ctx->status & HASH_CTX_STS_PROCESSING) {
++		/* Cannot submit to a currently processing job. */
++		ctx->error = HASH_CTX_ERROR_ALREADY_PROCESSING;
++		return ctx;
++	}
++
++	if ((ctx->status & HASH_CTX_STS_COMPLETE) && !(flags & HASH_FIRST)) {
++		/* Cannot update a finished job. */
++		ctx->error = HASH_CTX_ERROR_ALREADY_COMPLETED;
++		return ctx;
++	}
++
++
++	if (flags & HASH_FIRST) {
++		/* Init digest */
++		sha1_init_digest(ctx->job.result_digest);
++
++		/* Reset byte counter */
++		ctx->total_length = 0;
++
++		/* Clear extra blocks */
++		ctx->partial_block_buffer_length = 0;
++	}
++
++	/* If we made it here, there were no errors during this call to submit */
++	ctx->error = HASH_CTX_ERROR_NONE;
++
++	/* Store buffer ptr info from user */
++	ctx->incoming_buffer = buffer;
++	ctx->incoming_buffer_length = len;
++
++	/* Store the user's request flags and mark this ctx as currently being processed. */
++	ctx->status = (flags & HASH_LAST) ?
++			(HASH_CTX_STS_PROCESSING | HASH_CTX_STS_LAST) :
++			HASH_CTX_STS_PROCESSING;
++
++	/* Advance byte counter */
++	ctx->total_length += len;
 +
 +	/*
-+	 * Need to loop through more than once for multi-buffer to
-+	 * be effective.
++	 * If there is anything currently buffered in the extra blocks,
++	 * append to it until it contains a whole block.
++	 * Or if the user's buffer contains less than a whole block,
++	 * append as much as possible to the extra block.
 +	 */
++	if ((ctx->partial_block_buffer_length) | (len < SHA1_BLOCK_SIZE)) {
++		/* Compute how many bytes to copy from user buffer into extra block */
++		uint32_t copy_len = SHA1_BLOCK_SIZE - ctx->partial_block_buffer_length;
++		if (len < copy_len)
++			copy_len = len;
 +
-+	cpu_queue = container_of(work, struct mcryptd_cpu_queue, work);
-+	i = 0;
-+	while (i < MCRYPTD_BATCH || single_task_running()) {
-+		/*
-+		 * preempt_disable/enable is used to prevent
-+		 * being preempted by mcryptd_enqueue_request()
-+		 */
-+		local_bh_disable();
-+		preempt_disable();
-+		backlog = crypto_get_backlog(&cpu_queue->queue);
-+		req = crypto_dequeue_request(&cpu_queue->queue);
-+		preempt_enable();
-+		local_bh_enable();
++		if (copy_len) {
++			/* Copy and update relevant pointers and counters */
++			memcpy(&ctx->partial_block_buffer[ctx->partial_block_buffer_length],
++				buffer, copy_len);
 +
-+		if (!req) {
-+			mcryptd_opportunistic_flush();
-+			return;
++			ctx->partial_block_buffer_length += copy_len;
++			ctx->incoming_buffer = (const void *)((const char *)buffer + copy_len);
++			ctx->incoming_buffer_length = len - copy_len;
 +		}
 +
-+		if (backlog)
-+			backlog->complete(backlog, -EINPROGRESS);
-+		req->complete(req, 0);
-+		if (!cpu_queue->queue.qlen)
-+			return;
-+		++i;
++		/* The extra block should never contain more than 1 block here */
++		assert(ctx->partial_block_buffer_length <= SHA1_BLOCK_SIZE);
++
++		/* If the extra block buffer contains exactly 1 block, it can be hashed. */
++		if (ctx->partial_block_buffer_length >= SHA1_BLOCK_SIZE) {
++			ctx->partial_block_buffer_length = 0;
++
++			ctx->job.buffer = ctx->partial_block_buffer;
++			ctx->job.len = 1;
++			ctx = (struct sha1_hash_ctx *) sha1_job_mgr_submit(&mgr->mgr, &ctx->job);
++		}
 +	}
-+	if (cpu_queue->queue.qlen)
-+		queue_work(kcrypto_wq, &cpu_queue->work);
++
++	return sha1_ctx_mgr_resubmit(mgr, ctx);
 +}
 +
-+void mcryptd_flusher(struct work_struct *__work)
++struct sha1_hash_ctx *sha1_ctx_mgr_flush(struct sha1_ctx_mgr *mgr)
 +{
-+	struct	mcryptd_alg_cstate	*alg_cpu_state;
-+	struct	mcryptd_alg_state	*alg_state;
-+	struct	mcryptd_flush_list	*flist;
-+	int	cpu;
++	struct sha1_hash_ctx *ctx;
 +
-+	cpu = smp_processor_id();
-+	alg_cpu_state = container_of(to_delayed_work(__work),
-+				     struct mcryptd_alg_cstate, flush);
-+	alg_state = alg_cpu_state->alg_state;
-+	if (alg_cpu_state->cpu != cpu)
-+		pr_debug("mcryptd error: work on cpu %d, should be cpu %d\n",
-+				cpu, alg_cpu_state->cpu);
++	while (1) {
++		ctx = (struct sha1_hash_ctx *) sha1_job_mgr_flush(&mgr->mgr);
 +
-+	if (alg_cpu_state->flusher_engaged) {
-+		flist = per_cpu_ptr(mcryptd_flist, cpu);
-+		mutex_lock(&flist->lock);
-+		list_del(&alg_cpu_state->flush_list);
-+		alg_cpu_state->flusher_engaged = false;
-+		mutex_unlock(&flist->lock);
-+		alg_state->flusher(alg_cpu_state);
++		/* If flush returned 0, there are no more jobs in flight. */
++		if (!ctx)
++			return NULL;
++
++		/*
++		 * If flush returned a job, resubmit the job to finish processing.
++		 */
++		ctx = sha1_ctx_mgr_resubmit(mgr, ctx);
++
++		/*
++		 * If sha1_ctx_mgr_resubmit returned a job, it is ready to be returned.
++		 * Otherwise, all jobs currently being managed by the sha1_ctx_mgr
++		 * still need processing. Loop.
++		 */
++		if (ctx)
++			return ctx;
 +	}
 +}
-+EXPORT_SYMBOL_GPL(mcryptd_flusher);
 +
-+static inline struct mcryptd_queue *mcryptd_get_queue(struct crypto_tfm *tfm)
++static int sha1_mb_init(struct shash_desc *desc)
 +{
-+	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-+	struct mcryptd_instance_ctx *ictx = crypto_instance_ctx(inst);
++	struct sha1_hash_ctx *sctx = shash_desc_ctx(desc);
 +
-+	return ictx->queue;
-+}
++	hash_ctx_init(sctx);
++	sctx->job.result_digest[0] = SHA1_H0;
++	sctx->job.result_digest[1] = SHA1_H1;
++	sctx->job.result_digest[2] = SHA1_H2;
++	sctx->job.result_digest[3] = SHA1_H3;
++	sctx->job.result_digest[4] = SHA1_H4;
++	sctx->total_length = 0;
++	sctx->partial_block_buffer_length = 0;
++	sctx->status = HASH_CTX_STS_IDLE;
 +
-+static void *mcryptd_alloc_instance(struct crypto_alg *alg, unsigned int head,
-+				   unsigned int tail)
-+{
-+	char *p;
-+	struct crypto_instance *inst;
-+	int err;
-+
-+	p = kzalloc(head + sizeof(*inst) + tail, GFP_KERNEL);
-+	if (!p)
-+		return ERR_PTR(-ENOMEM);
-+
-+	inst = (void *)(p + head);
-+
-+	err = -ENAMETOOLONG;
-+	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-+		    "mcryptd(%s)", alg->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
-+		goto out_free_inst;
-+
-+	memcpy(inst->alg.cra_name, alg->cra_name, CRYPTO_MAX_ALG_NAME);
-+
-+	inst->alg.cra_priority = alg->cra_priority + 50;
-+	inst->alg.cra_blocksize = alg->cra_blocksize;
-+	inst->alg.cra_alignmask = alg->cra_alignmask;
-+
-+out:
-+	return p;
-+
-+out_free_inst:
-+	kfree(p);
-+	p = ERR_PTR(err);
-+	goto out;
-+}
-+
-+static int mcryptd_hash_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-+	struct hashd_instance_ctx *ictx = crypto_instance_ctx(inst);
-+	struct crypto_shash_spawn *spawn = &ictx->spawn;
-+	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_shash *hash;
-+
-+	hash = crypto_spawn_shash(spawn);
-+	if (IS_ERR(hash))
-+		return PTR_ERR(hash);
-+
-+	ctx->child = hash;
-+	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
-+				 sizeof(struct mcryptd_hash_request_ctx) +
-+				 crypto_shash_descsize(hash));
 +	return 0;
 +}
 +
-+static void mcryptd_hash_exit_tfm(struct crypto_tfm *tfm)
++static int sha1_mb_set_results(struct mcryptd_hash_request_ctx *rctx)
 +{
-+	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(tfm);
++	int	i;
++	struct	sha1_hash_ctx *sctx = shash_desc_ctx(&rctx->desc);
++	__be32	*dst = (__be32 *) rctx->out;
 +
-+	crypto_free_shash(ctx->child);
++	for (i = 0; i < 5; ++i)
++		dst[i] = cpu_to_be32(sctx->job.result_digest[i]);
++
++	return 0;
 +}
 +
-+static int mcryptd_hash_setkey(struct crypto_ahash *parent,
-+				   const u8 *key, unsigned int keylen)
++static int sha_finish_walk(struct mcryptd_hash_request_ctx **ret_rctx,
++			struct mcryptd_alg_cstate *cstate, bool flush)
 +{
-+	struct mcryptd_hash_ctx *ctx   = crypto_ahash_ctx(parent);
-+	struct crypto_shash *child = ctx->child;
-+	int err;
++	int	flag = HASH_UPDATE;
++	int	nbytes, err = 0;
++	struct mcryptd_hash_request_ctx *rctx = *ret_rctx;
++	struct sha1_hash_ctx *sha_ctx;
 +
-+	crypto_shash_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_shash_set_flags(child, crypto_ahash_get_flags(parent) &
-+				      CRYPTO_TFM_REQ_MASK);
-+	err = crypto_shash_setkey(child, key, keylen);
-+	crypto_ahash_set_flags(parent, crypto_shash_get_flags(child) &
-+				       CRYPTO_TFM_RES_MASK);
++	/* more work ? */
++	while (!(rctx->flag & HASH_DONE)) {
++		nbytes = crypto_ahash_walk_done(&rctx->walk, 0);
++		if (nbytes < 0) {
++			err = nbytes;
++			goto out;
++		}
++		/* check if the walk is done */
++		if (crypto_ahash_walk_last(&rctx->walk)) {
++			rctx->flag |= HASH_DONE;
++			if (rctx->flag & HASH_FINAL)
++				flag |= HASH_LAST;
++
++		}
++		sha_ctx = (struct sha1_hash_ctx *) shash_desc_ctx(&rctx->desc);
++		kernel_fpu_begin();
++		sha_ctx = sha1_ctx_mgr_submit(cstate->mgr, sha_ctx, rctx->walk.data, nbytes, flag);
++		if (!sha_ctx) {
++			if (flush)
++				sha_ctx = sha1_ctx_mgr_flush(cstate->mgr);
++		}
++		kernel_fpu_end();
++		if (sha_ctx)
++			rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		else {
++			rctx = NULL;
++			goto out;
++		}
++	}
++
++	/* copy the results */
++	if (rctx->flag & HASH_FINAL)
++		sha1_mb_set_results(rctx);
++
++out:
++	*ret_rctx = rctx;
 +	return err;
 +}
 +
-+static int mcryptd_hash_enqueue(struct ahash_request *req,
-+				crypto_completion_t complete)
++static int sha_complete_job(struct mcryptd_hash_request_ctx *rctx,
++			    struct mcryptd_alg_cstate *cstate,
++			    int err)
 +{
++	struct ahash_request *req = cast_mcryptd_ctx_to_req(rctx);
++	struct sha1_hash_ctx *sha_ctx;
++	struct mcryptd_hash_request_ctx *req_ctx;
 +	int ret;
 +
-+	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct mcryptd_queue *queue =
-+		mcryptd_get_queue(crypto_ahash_tfm(tfm));
++	/* remove from work list */
++	spin_lock(&cstate->work_lock);
++	list_del(&rctx->waiter);
++	spin_unlock(&cstate->work_lock);
 +
-+	rctx->complete = req->base.complete;
-+	req->base.complete = complete;
++	if (irqs_disabled())
++		rctx->complete(&req->base, err);
++	else {
++		local_bh_disable();
++		rctx->complete(&req->base, err);
++		local_bh_enable();
++	}
 +
-+	ret = mcryptd_enqueue_request(queue, &req->base, rctx);
++	/* check to see if there are other jobs that are done */
++	sha_ctx = sha1_ctx_mgr_get_comp_ctx(cstate->mgr);
++	while (sha_ctx) {
++		req_ctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		ret = sha_finish_walk(&req_ctx, cstate, false);
++		if (req_ctx) {
++			spin_lock(&cstate->work_lock);
++			list_del(&req_ctx->waiter);
++			spin_unlock(&cstate->work_lock);
 +
++			req = cast_mcryptd_ctx_to_req(req_ctx);
++			if (irqs_disabled())
++				rctx->complete(&req->base, ret);
++			else {
++				local_bh_disable();
++				rctx->complete(&req->base, ret);
++				local_bh_enable();
++			}
++		}
++		sha_ctx = sha1_ctx_mgr_get_comp_ctx(cstate->mgr);
++	}
++
++	return 0;
++}
++
++static void sha1_mb_add_list(struct mcryptd_hash_request_ctx *rctx,
++			     struct mcryptd_alg_cstate *cstate)
++{
++	unsigned long next_flush;
++	unsigned long delay = usecs_to_jiffies(FLUSH_INTERVAL);
++
++	/* initialize tag */
++	rctx->tag.arrival = jiffies;    /* tag the arrival time */
++	rctx->tag.seq_num = cstate->next_seq_num++;
++	next_flush = rctx->tag.arrival + delay;
++	rctx->tag.expire = next_flush;
++
++	spin_lock(&cstate->work_lock);
++	list_add_tail(&rctx->waiter, &cstate->work_list);
++	spin_unlock(&cstate->work_lock);
++
++	mcryptd_arm_flusher(cstate, delay);
++}
++
++static int sha1_mb_update(struct shash_desc *desc, const u8 *data,
++			  unsigned int len)
++{
++	struct mcryptd_hash_request_ctx *rctx =
++			container_of(desc, struct mcryptd_hash_request_ctx, desc);
++	struct mcryptd_alg_cstate *cstate =
++				this_cpu_ptr(sha1_mb_alg_state.alg_cstate);
++
++	struct ahash_request *req = cast_mcryptd_ctx_to_req(rctx);
++	struct sha1_hash_ctx *sha_ctx;
++	int ret = 0, nbytes;
++
++
++	/* sanity check */
++	if (rctx->tag.cpu != smp_processor_id()) {
++		pr_err("mcryptd error: cpu clash\n");
++		goto done;
++	}
++
++	/* need to init context */
++	req_ctx_init(rctx, desc);
++
++	nbytes = crypto_ahash_walk_first(req, &rctx->walk);
++
++	if (nbytes < 0) {
++		ret = nbytes;
++		goto done;
++	}
++
++	if (crypto_ahash_walk_last(&rctx->walk))
++		rctx->flag |= HASH_DONE;
++
++	/* submit */
++	sha_ctx = (struct sha1_hash_ctx *) shash_desc_ctx(desc);
++	sha1_mb_add_list(rctx, cstate);
++	kernel_fpu_begin();
++	sha_ctx = sha1_ctx_mgr_submit(cstate->mgr, sha_ctx, rctx->walk.data, nbytes, HASH_UPDATE);
++	kernel_fpu_end();
++
++	/* check if anything is returned */
++	if (!sha_ctx)
++		return -EINPROGRESS;
++
++	if (sha_ctx->error) {
++		ret = sha_ctx->error;
++		rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		goto done;
++	}
++
++	rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++	ret = sha_finish_walk(&rctx, cstate, false);
++
++	if (!rctx)
++		return -EINPROGRESS;
++done:
++	sha_complete_job(rctx, cstate, ret);
 +	return ret;
 +}
 +
-+static void mcryptd_hash_init(struct crypto_async_request *req_async, int err)
++static int sha1_mb_finup(struct shash_desc *desc, const u8 *data,
++			     unsigned int len, u8 *out)
 +{
-+	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(req_async->tfm);
-+	struct crypto_shash *child = ctx->child;
-+	struct ahash_request *req = ahash_request_cast(req_async);
-+	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
-+	struct shash_desc *desc = &rctx->desc;
++	struct mcryptd_hash_request_ctx *rctx =
++			container_of(desc, struct mcryptd_hash_request_ctx, desc);
++	struct mcryptd_alg_cstate *cstate =
++				this_cpu_ptr(sha1_mb_alg_state.alg_cstate);
 +
-+	if (unlikely(err == -EINPROGRESS))
-+		goto out;
++	struct ahash_request *req = cast_mcryptd_ctx_to_req(rctx);
++	struct sha1_hash_ctx *sha_ctx;
++	int ret = 0, flag = HASH_UPDATE, nbytes;
 +
-+	desc->tfm = child;
-+	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;
-+
-+	err = crypto_shash_init(desc);
-+
-+	req->base.complete = rctx->complete;
-+
-+out:
-+	local_bh_disable();
-+	rctx->complete(&req->base, err);
-+	local_bh_enable();
-+}
-+
-+static int mcryptd_hash_init_enqueue(struct ahash_request *req)
-+{
-+	return mcryptd_hash_enqueue(req, mcryptd_hash_init);
-+}
-+
-+static void mcryptd_hash_update(struct crypto_async_request *req_async, int err)
-+{
-+	struct ahash_request *req = ahash_request_cast(req_async);
-+	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
-+
-+	if (unlikely(err == -EINPROGRESS))
-+		goto out;
-+
-+	err = shash_ahash_mcryptd_update(req, &rctx->desc);
-+	if (err) {
-+		req->base.complete = rctx->complete;
-+		goto out;
++	/* sanity check */
++	if (rctx->tag.cpu != smp_processor_id()) {
++		pr_err("mcryptd error: cpu clash\n");
++		goto done;
 +	}
 +
-+	return;
-+out:
-+	local_bh_disable();
-+	rctx->complete(&req->base, err);
-+	local_bh_enable();
-+}
++	/* need to init context */
++	req_ctx_init(rctx, desc);
 +
-+static int mcryptd_hash_update_enqueue(struct ahash_request *req)
-+{
-+	return mcryptd_hash_enqueue(req, mcryptd_hash_update);
-+}
++	nbytes = crypto_ahash_walk_first(req, &rctx->walk);
 +
-+static void mcryptd_hash_final(struct crypto_async_request *req_async, int err)
-+{
-+	struct ahash_request *req = ahash_request_cast(req_async);
-+	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
-+
-+	if (unlikely(err == -EINPROGRESS))
-+		goto out;
-+
-+	err = shash_ahash_mcryptd_final(req, &rctx->desc);
-+	if (err) {
-+		req->base.complete = rctx->complete;
-+		goto out;
++	if (nbytes < 0) {
++		ret = nbytes;
++		goto done;
 +	}
 +
-+	return;
-+out:
-+	local_bh_disable();
-+	rctx->complete(&req->base, err);
-+	local_bh_enable();
-+}
++	if (crypto_ahash_walk_last(&rctx->walk)) {
++		rctx->flag |= HASH_DONE;
++		flag = HASH_LAST;
++	}
++	rctx->out = out;
 +
-+static int mcryptd_hash_final_enqueue(struct ahash_request *req)
-+{
-+	return mcryptd_hash_enqueue(req, mcryptd_hash_final);
-+}
++	/* submit */
++	rctx->flag |= HASH_FINAL;
++	sha_ctx = (struct sha1_hash_ctx *) shash_desc_ctx(desc);
++	sha1_mb_add_list(rctx, cstate);
 +
-+static void mcryptd_hash_finup(struct crypto_async_request *req_async, int err)
-+{
-+	struct ahash_request *req = ahash_request_cast(req_async);
-+	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++	kernel_fpu_begin();
++	sha_ctx = sha1_ctx_mgr_submit(cstate->mgr, sha_ctx, rctx->walk.data, nbytes, flag);
++	kernel_fpu_end();
 +
-+	if (unlikely(err == -EINPROGRESS))
-+		goto out;
++	/* check if anything is returned */
++	if (!sha_ctx)
++		return -EINPROGRESS;
 +
-+	err = shash_ahash_mcryptd_finup(req, &rctx->desc);
-+
-+	if (err) {
-+		req->base.complete = rctx->complete;
-+		goto out;
++	if (sha_ctx->error) {
++		ret = sha_ctx->error;
++		goto done;
 +	}
 +
-+	return;
-+out:
-+	local_bh_disable();
-+	rctx->complete(&req->base, err);
-+	local_bh_enable();
++	rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++	ret = sha_finish_walk(&rctx, cstate, false);
++	if (!rctx)
++		return -EINPROGRESS;
++done:
++	sha_complete_job(rctx, cstate, ret);
++	return ret;
 +}
 +
-+static int mcryptd_hash_finup_enqueue(struct ahash_request *req)
++static int sha1_mb_final(struct shash_desc *desc, u8 *out)
 +{
-+	return mcryptd_hash_enqueue(req, mcryptd_hash_finup);
-+}
++	struct mcryptd_hash_request_ctx *rctx =
++			container_of(desc, struct mcryptd_hash_request_ctx, desc);
++	struct mcryptd_alg_cstate *cstate =
++				this_cpu_ptr(sha1_mb_alg_state.alg_cstate);
 +
-+static void mcryptd_hash_digest(struct crypto_async_request *req_async, int err)
-+{
-+	struct mcryptd_hash_ctx *ctx = crypto_tfm_ctx(req_async->tfm);
-+	struct crypto_shash *child = ctx->child;
-+	struct ahash_request *req = ahash_request_cast(req_async);
-+	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
-+	struct shash_desc *desc = &rctx->desc;
++	struct sha1_hash_ctx *sha_ctx;
++	int ret = 0;
++	u8 data;
 +
-+	if (unlikely(err == -EINPROGRESS))
-+		goto out;
-+
-+	desc->tfm = child;
-+	desc->flags = CRYPTO_TFM_REQ_MAY_SLEEP;  /* check this again */
-+
-+	err = shash_ahash_mcryptd_digest(req, desc);
-+
-+	if (err) {
-+		req->base.complete = rctx->complete;
-+		goto out;
++	/* sanity check */
++	if (rctx->tag.cpu != smp_processor_id()) {
++		pr_err("mcryptd error: cpu clash\n");
++		goto done;
 +	}
 +
-+	return;
-+out:
-+	local_bh_disable();
-+	rctx->complete(&req->base, err);
-+	local_bh_enable();
-+}
++	/* need to init context */
++	req_ctx_init(rctx, desc);
 +
-+static int mcryptd_hash_digest_enqueue(struct ahash_request *req)
-+{
-+	return mcryptd_hash_enqueue(req, mcryptd_hash_digest);
-+}
++	rctx->out = out;
++	rctx->flag |= HASH_DONE | HASH_FINAL;
 +
-+static int mcryptd_hash_export(struct ahash_request *req, void *out)
-+{
-+	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
++	sha_ctx = (struct sha1_hash_ctx *) shash_desc_ctx(desc);
++	/* flag HASH_FINAL and 0 data size */
++	sha1_mb_add_list(rctx, cstate);
++	kernel_fpu_begin();
++	sha_ctx = sha1_ctx_mgr_submit(cstate->mgr, sha_ctx, &data, 0, HASH_LAST);
++	kernel_fpu_end();
 +
-+	return crypto_shash_export(&rctx->desc, out);
-+}
++	/* check if anything is returned */
++	if (!sha_ctx)
++		return -EINPROGRESS;
 +
-+static int mcryptd_hash_import(struct ahash_request *req, const void *in)
-+{
-+	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
-+
-+	return crypto_shash_import(&rctx->desc, in);
-+}
-+
-+static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
-+			      struct mcryptd_queue *queue)
-+{
-+	struct hashd_instance_ctx *ctx;
-+	struct ahash_instance *inst;
-+	struct shash_alg *salg;
-+	struct crypto_alg *alg;
-+	int err;
-+
-+	salg = shash_attr_alg(tb[1], 0, 0);
-+	if (IS_ERR(salg))
-+		return PTR_ERR(salg);
-+
-+	alg = &salg->base;
-+	pr_debug("crypto: mcryptd hash alg: %s\n", alg->cra_name);
-+	inst = mcryptd_alloc_instance(alg, ahash_instance_headroom(),
-+					sizeof(*ctx));
-+	err = PTR_ERR(inst);
-+	if (IS_ERR(inst))
-+		goto out_put_alg;
-+
-+	ctx = ahash_instance_ctx(inst);
-+	ctx->queue = queue;
-+
-+	err = crypto_init_shash_spawn(&ctx->spawn, salg,
-+				      ahash_crypto_instance(inst));
-+	if (err)
-+		goto out_free_inst;
-+
-+	inst->alg.halg.base.cra_flags = CRYPTO_ALG_ASYNC;
-+
-+	inst->alg.halg.digestsize = salg->digestsize;
-+	inst->alg.halg.base.cra_ctxsize = sizeof(struct mcryptd_hash_ctx);
-+
-+	inst->alg.halg.base.cra_init = mcryptd_hash_init_tfm;
-+	inst->alg.halg.base.cra_exit = mcryptd_hash_exit_tfm;
-+
-+	inst->alg.init   = mcryptd_hash_init_enqueue;
-+	inst->alg.update = mcryptd_hash_update_enqueue;
-+	inst->alg.final  = mcryptd_hash_final_enqueue;
-+	inst->alg.finup  = mcryptd_hash_finup_enqueue;
-+	inst->alg.export = mcryptd_hash_export;
-+	inst->alg.import = mcryptd_hash_import;
-+	inst->alg.setkey = mcryptd_hash_setkey;
-+	inst->alg.digest = mcryptd_hash_digest_enqueue;
-+
-+	err = ahash_register_instance(tmpl, inst);
-+	if (err) {
-+		crypto_drop_shash(&ctx->spawn);
-+out_free_inst:
-+		kfree(inst);
++	if (sha_ctx->error) {
++		ret = sha_ctx->error;
++		rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		goto done;
 +	}
 +
-+out_put_alg:
-+	crypto_mod_put(alg);
-+	return err;
++	rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++	ret = sha_finish_walk(&rctx, cstate, false);
++	if (!rctx)
++		return -EINPROGRESS;
++done:
++	sha_complete_job(rctx, cstate, ret);
++	return ret;
 +}
 +
-+static struct mcryptd_queue mqueue;
-+
-+static int mcryptd_create(struct crypto_template *tmpl, struct rtattr **tb)
++static int sha1_mb_export(struct shash_desc *desc, void *out)
 +{
-+	struct crypto_attr_type *algt;
++	struct sha1_hash_ctx *sctx = shash_desc_ctx(desc);
 +
-+	algt = crypto_get_attr_type(tb);
-+	if (IS_ERR(algt))
-+		return PTR_ERR(algt);
++	memcpy(out, sctx, sizeof(*sctx));
 +
-+	switch (algt->type & algt->mask & CRYPTO_ALG_TYPE_MASK) {
-+	case CRYPTO_ALG_TYPE_DIGEST:
-+		return mcryptd_create_hash(tmpl, tb, &mqueue);
-+	break;
-+	}
-+
-+	return -EINVAL;
++	return 0;
 +}
 +
-+static void mcryptd_free(struct crypto_instance *inst)
++static int sha1_mb_import(struct shash_desc *desc, const void *in)
 +{
-+	struct mcryptd_instance_ctx *ctx = crypto_instance_ctx(inst);
-+	struct hashd_instance_ctx *hctx = crypto_instance_ctx(inst);
++	struct sha1_hash_ctx *sctx = shash_desc_ctx(desc);
 +
-+	switch (inst->alg.cra_flags & CRYPTO_ALG_TYPE_MASK) {
-+	case CRYPTO_ALG_TYPE_AHASH:
-+		crypto_drop_shash(&hctx->spawn);
-+		kfree(ahash_instance(inst));
-+		return;
-+	default:
-+		crypto_drop_spawn(&ctx->spawn);
-+		kfree(inst);
-+	}
++	memcpy(sctx, in, sizeof(*sctx));
++
++	return 0;
 +}
 +
-+static struct crypto_template mcryptd_tmpl = {
-+	.name = "mcryptd",
-+	.create = mcryptd_create,
-+	.free = mcryptd_free,
-+	.module = THIS_MODULE,
++
++static struct shash_alg sha1_mb_shash_alg = {
++	.digestsize	=	SHA1_DIGEST_SIZE,
++	.init		=	sha1_mb_init,
++	.update		=	sha1_mb_update,
++	.final		=	sha1_mb_final,
++	.finup		=	sha1_mb_finup,
++	.export		=	sha1_mb_export,
++	.import		=	sha1_mb_import,
++	.descsize	=	sizeof(struct sha1_hash_ctx),
++	.statesize	=	sizeof(struct sha1_hash_ctx),
++	.base		=	{
++		.cra_name	 = "__sha1-mb",
++		.cra_driver_name = "__intel_sha1-mb",
++		.cra_priority	 = 100,
++		/*
++		 * use ASYNC flag as some buffers in multi-buffer
++		 * algo may not have completed before hashing thread sleep
++		 */
++		.cra_flags	 = CRYPTO_ALG_TYPE_SHASH | CRYPTO_ALG_ASYNC,
++		.cra_blocksize	 = SHA1_BLOCK_SIZE,
++		.cra_module	 = THIS_MODULE,
++		.cra_list	 = LIST_HEAD_INIT(sha1_mb_shash_alg.base.cra_list),
++	}
 +};
 +
-+struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
-+					u32 type, u32 mask)
++static int sha1_mb_async_init(struct ahash_request *req)
 +{
-+	char mcryptd_alg_name[CRYPTO_MAX_ALG_NAME];
-+	struct crypto_ahash *tfm;
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha1_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
 +
-+	if (snprintf(mcryptd_alg_name, CRYPTO_MAX_ALG_NAME,
-+		     "mcryptd(%s)", alg_name) >= CRYPTO_MAX_ALG_NAME)
-+		return ERR_PTR(-EINVAL);
-+	tfm = crypto_alloc_ahash(mcryptd_alg_name, type, mask);
-+	if (IS_ERR(tfm))
-+		return ERR_CAST(tfm);
-+	if (tfm->base.__crt_alg->cra_module != THIS_MODULE) {
-+		crypto_free_ahash(tfm);
-+		return ERR_PTR(-EINVAL);
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_init(mcryptd_req);
++}
++
++static int sha1_mb_async_update(struct ahash_request *req)
++{
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha1_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_update(mcryptd_req);
++}
++
++static int sha1_mb_async_finup(struct ahash_request *req)
++{
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha1_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_finup(mcryptd_req);
++}
++
++static int sha1_mb_async_final(struct ahash_request *req)
++{
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha1_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_final(mcryptd_req);
++}
++
++int sha1_mb_async_digest(struct ahash_request *req)
++{
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	struct sha1_mb_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct ahash_request *mcryptd_req = ahash_request_ctx(req);
++	struct mcryptd_ahash *mcryptd_tfm = ctx->mcryptd_tfm;
++
++	memcpy(mcryptd_req, req, sizeof(*req));
++	ahash_request_set_tfm(mcryptd_req, &mcryptd_tfm->base);
++	return crypto_ahash_digest(mcryptd_req);
++}
++
++static int sha1_mb_async_init_tfm(struct crypto_tfm *tfm)
++{
++	struct mcryptd_ahash *mcryptd_tfm;
++	struct sha1_mb_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct mcryptd_hash_ctx *mctx;
++
++	mcryptd_tfm = mcryptd_alloc_ahash("__intel_sha1-mb", 0, 0);
++	if (IS_ERR(mcryptd_tfm))
++		return PTR_ERR(mcryptd_tfm);
++	mctx = crypto_ahash_ctx(&mcryptd_tfm->base);
++	mctx->alg_state = &sha1_mb_alg_state;
++	ctx->mcryptd_tfm = mcryptd_tfm;
++	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++				 sizeof(struct ahash_request) +
++				 crypto_ahash_reqsize(&mcryptd_tfm->base));
++
++	return 0;
++}
++
++static void sha1_mb_async_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct sha1_mb_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	mcryptd_free_ahash(ctx->mcryptd_tfm);
++}
++
++static struct ahash_alg sha1_mb_async_alg = {
++	.init           = sha1_mb_async_init,
++	.update         = sha1_mb_async_update,
++	.final          = sha1_mb_async_final,
++	.finup          = sha1_mb_async_finup,
++	.digest         = sha1_mb_async_digest,
++	.halg = {
++		.digestsize     = SHA1_DIGEST_SIZE,
++		.base = {
++			.cra_name               = "sha1",
++			.cra_driver_name        = "sha1_mb",
++			.cra_priority           = 200,
++			.cra_flags              = CRYPTO_ALG_TYPE_AHASH | CRYPTO_ALG_ASYNC,
++			.cra_blocksize          = SHA1_BLOCK_SIZE,
++			.cra_type               = &crypto_ahash_type,
++			.cra_module             = THIS_MODULE,
++			.cra_list               = LIST_HEAD_INIT(sha1_mb_async_alg.halg.base.cra_list),
++			.cra_init               = sha1_mb_async_init_tfm,
++			.cra_exit               = sha1_mb_async_exit_tfm,
++			.cra_ctxsize		= sizeof(struct sha1_mb_ctx),
++			.cra_alignmask		= 0,
++		},
++	},
++};
++
++unsigned long sha1_mb_flusher(struct mcryptd_alg_cstate *cstate)
++{
++	struct mcryptd_hash_request_ctx *rctx;
++	unsigned long cur_time;
++	unsigned long next_flush = 0;
++	struct sha1_hash_ctx *sha_ctx;
++
++
++	cur_time = jiffies;
++
++	while (!list_empty(&cstate->work_list)) {
++		rctx = list_entry(cstate->work_list.next,
++				struct mcryptd_hash_request_ctx, waiter);
++		if time_before(cur_time, rctx->tag.expire)
++			break;
++		kernel_fpu_begin();
++		sha_ctx = (struct sha1_hash_ctx *) sha1_ctx_mgr_flush(cstate->mgr);
++		kernel_fpu_end();
++		if (!sha_ctx) {
++			pr_err("sha1_mb error: nothing got flushed for non-empty list\n");
++			break;
++		}
++		rctx = cast_hash_to_mcryptd_ctx(sha_ctx);
++		sha_finish_walk(&rctx, cstate, true);
++		sha_complete_job(rctx, cstate, 0);
 +	}
 +
-+	return __mcryptd_ahash_cast(tfm);
++	if (!list_empty(&cstate->work_list)) {
++		rctx = list_entry(cstate->work_list.next,
++				struct mcryptd_hash_request_ctx, waiter);
++		/* get the hash context and then flush time */
++		next_flush = rctx->tag.expire;
++		mcryptd_arm_flusher(cstate, get_delay(next_flush));
++	}
++	return next_flush;
 +}
-+EXPORT_SYMBOL_GPL(mcryptd_alloc_ahash);
 +
-+int shash_ahash_mcryptd_digest(struct ahash_request *req,
-+			       struct shash_desc *desc)
++static int __init sha1_mb_mod_init(void)
 +{
++
++	int cpu;
 +	int err;
++	struct mcryptd_alg_cstate *cpu_state;
 +
-+	err = crypto_shash_init(desc) ?:
-+	      shash_ahash_mcryptd_finup(req, desc);
++	/* check for dependent cpu features */
++	if (!boot_cpu_has(X86_FEATURE_AVX2) ||
++	    !boot_cpu_has(X86_FEATURE_BMI2))
++		return -ENODEV;
 +
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_digest);
++	/* initialize multibuffer structures */
++	sha1_mb_alg_state.alg_cstate = alloc_percpu(struct mcryptd_alg_cstate);
 +
-+int shash_ahash_mcryptd_update(struct ahash_request *req,
-+			       struct shash_desc *desc)
-+{
-+	struct crypto_shash *tfm = desc->tfm;
-+	struct shash_alg *shash = crypto_shash_alg(tfm);
++	sha1_job_mgr_init = sha1_mb_mgr_init_avx2;
++	sha1_job_mgr_submit = sha1_mb_mgr_submit_avx2;
++	sha1_job_mgr_flush = sha1_mb_mgr_flush_avx2;
++	sha1_job_mgr_get_comp_job = sha1_mb_mgr_get_comp_job_avx2;
 +
-+	/* alignment is to be done by multi-buffer crypto algorithm if needed */
-+
-+	return shash->update(desc, NULL, 0);
-+}
-+EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_update);
-+
-+int shash_ahash_mcryptd_finup(struct ahash_request *req,
-+			      struct shash_desc *desc)
-+{
-+	struct crypto_shash *tfm = desc->tfm;
-+	struct shash_alg *shash = crypto_shash_alg(tfm);
-+
-+	/* alignment is to be done by multi-buffer crypto algorithm if needed */
-+
-+	return shash->finup(desc, NULL, 0, req->result);
-+}
-+EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_finup);
-+
-+int shash_ahash_mcryptd_final(struct ahash_request *req,
-+			      struct shash_desc *desc)
-+{
-+	struct crypto_shash *tfm = desc->tfm;
-+	struct shash_alg *shash = crypto_shash_alg(tfm);
-+
-+	/* alignment is to be done by multi-buffer crypto algorithm if needed */
-+
-+	return shash->final(desc, req->result);
-+}
-+EXPORT_SYMBOL_GPL(shash_ahash_mcryptd_final);
-+
-+struct crypto_shash *mcryptd_ahash_child(struct mcryptd_ahash *tfm)
-+{
-+	struct mcryptd_hash_ctx *ctx = crypto_ahash_ctx(&tfm->base);
-+
-+	return ctx->child;
-+}
-+EXPORT_SYMBOL_GPL(mcryptd_ahash_child);
-+
-+struct shash_desc *mcryptd_shash_desc(struct ahash_request *req)
-+{
-+	struct mcryptd_hash_request_ctx *rctx = ahash_request_ctx(req);
-+	return &rctx->desc;
-+}
-+EXPORT_SYMBOL_GPL(mcryptd_shash_desc);
-+
-+void mcryptd_free_ahash(struct mcryptd_ahash *tfm)
-+{
-+	crypto_free_ahash(&tfm->base);
-+}
-+EXPORT_SYMBOL_GPL(mcryptd_free_ahash);
-+
-+
-+static int __init mcryptd_init(void)
-+{
-+	int err, cpu;
-+	struct mcryptd_flush_list *flist;
-+
-+	mcryptd_flist = alloc_percpu(struct mcryptd_flush_list);
++	if (!sha1_mb_alg_state.alg_cstate)
++		return -ENOMEM;
 +	for_each_possible_cpu(cpu) {
-+		flist = per_cpu_ptr(mcryptd_flist, cpu);
-+		INIT_LIST_HEAD(&flist->list);
-+		mutex_init(&flist->lock);
++		cpu_state = per_cpu_ptr(sha1_mb_alg_state.alg_cstate, cpu);
++		cpu_state->next_flush = 0;
++		cpu_state->next_seq_num = 0;
++		cpu_state->flusher_engaged = false;
++		INIT_DELAYED_WORK(&cpu_state->flush, mcryptd_flusher);
++		cpu_state->cpu = cpu;
++		cpu_state->alg_state = &sha1_mb_alg_state;
++		cpu_state->mgr = (struct sha1_ctx_mgr *) kzalloc(sizeof(struct sha1_ctx_mgr), GFP_KERNEL);
++		if (!cpu_state->mgr)
++			goto err2;
++		sha1_ctx_mgr_init(cpu_state->mgr);
++		INIT_LIST_HEAD(&cpu_state->work_list);
++		spin_lock_init(&cpu_state->work_lock);
 +	}
++	sha1_mb_alg_state.flusher = &sha1_mb_flusher;
 +
-+	err = mcryptd_init_queue(&mqueue, MCRYPTD_MAX_CPU_QLEN);
-+	if (err) {
-+		free_percpu(mcryptd_flist);
-+		return err;
++	err = crypto_register_shash(&sha1_mb_shash_alg);
++	if (err)
++		goto err2;
++	err = crypto_register_ahash(&sha1_mb_async_alg);
++	if (err)
++		goto err1;
++
++
++	return 0;
++err1:
++	crypto_unregister_shash(&sha1_mb_shash_alg);
++err2:
++	for_each_possible_cpu(cpu) {
++		cpu_state = per_cpu_ptr(sha1_mb_alg_state.alg_cstate, cpu);
++		kfree(cpu_state->mgr);
 +	}
-+
-+	err = crypto_register_template(&mcryptd_tmpl);
-+	if (err) {
-+		mcryptd_fini_queue(&mqueue);
-+		free_percpu(mcryptd_flist);
-+	}
-+
-+	return err;
++	free_percpu(sha1_mb_alg_state.alg_cstate);
++	return -ENODEV;
 +}
 +
-+static void __exit mcryptd_exit(void)
++static void __exit sha1_mb_mod_fini(void)
 +{
-+	mcryptd_fini_queue(&mqueue);
-+	crypto_unregister_template(&mcryptd_tmpl);
-+	free_percpu(mcryptd_flist);
++	int cpu;
++	struct mcryptd_alg_cstate *cpu_state;
++
++	crypto_unregister_ahash(&sha1_mb_async_alg);
++	crypto_unregister_shash(&sha1_mb_shash_alg);
++	for_each_possible_cpu(cpu) {
++		cpu_state = per_cpu_ptr(sha1_mb_alg_state.alg_cstate, cpu);
++		kfree(cpu_state->mgr);
++	}
++	free_percpu(sha1_mb_alg_state.alg_cstate);
 +}
 +
-+subsys_initcall(mcryptd_init);
-+module_exit(mcryptd_exit);
++module_init(sha1_mb_mod_init);
++module_exit(sha1_mb_mod_fini);
 +
 +MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Software async multibuffer crypto daemon");
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 9b6f32a..3b4af1d 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -117,6 +117,15 @@ int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc);
- int shash_ahash_finup(struct ahash_request *req, struct shash_desc *desc);
- int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc);
- 
-+int shash_ahash_mcryptd_update(struct ahash_request *req,
-+			       struct shash_desc *desc);
-+int shash_ahash_mcryptd_final(struct ahash_request *req,
-+			      struct shash_desc *desc);
-+int shash_ahash_mcryptd_finup(struct ahash_request *req,
-+			      struct shash_desc *desc);
-+int shash_ahash_mcryptd_digest(struct ahash_request *req,
-+			       struct shash_desc *desc);
++MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm, multi buffer accelerated");
 +
- int crypto_init_shash_ops_async(struct crypto_tfm *tfm);
- 
- static inline void *crypto_ahash_ctx(struct crypto_ahash *tfm)
-diff --git a/include/crypto/mcryptd.h b/include/crypto/mcryptd.h
-new file mode 100644
-index 0000000..c23ee1f
---- /dev/null
-+++ b/include/crypto/mcryptd.h
-@@ -0,0 +1,112 @@
-+/*
-+ * Software async multibuffer crypto daemon headers
-+ *
-+ *    Author:
-+ *             Tim Chen <tim.c.chen@linux.intel.com>
-+ *
-+ *    Copyright (c) 2014, Intel Corporation.
-+ */
-+
-+#ifndef _CRYPTO_MCRYPT_H
-+#define _CRYPTO_MCRYPT_H
-+
-+#include <linux/crypto.h>
-+#include <linux/kernel.h>
-+#include <crypto/hash.h>
-+
-+struct mcryptd_ahash {
-+	struct crypto_ahash base;
-+};
-+
-+static inline struct mcryptd_ahash *__mcryptd_ahash_cast(
-+	struct crypto_ahash *tfm)
-+{
-+	return (struct mcryptd_ahash *)tfm;
-+}
-+
-+struct mcryptd_cpu_queue {
-+	struct crypto_queue queue;
-+	struct work_struct work;
-+};
-+
-+struct mcryptd_queue {
-+	struct mcryptd_cpu_queue __percpu *cpu_queue;
-+};
-+
-+struct mcryptd_instance_ctx {
-+	struct crypto_spawn spawn;
-+	struct mcryptd_queue *queue;
-+};
-+
-+struct mcryptd_hash_ctx {
-+	struct crypto_shash *child;
-+	struct mcryptd_alg_state *alg_state;
-+};
-+
-+struct mcryptd_tag {
-+	/* seq number of request */
-+	unsigned seq_num;
-+	/* arrival time of request */
-+	unsigned long arrival;
-+	unsigned long expire;
-+	int	cpu;
-+};
-+
-+struct mcryptd_hash_request_ctx {
-+	struct list_head waiter;
-+	crypto_completion_t complete;
-+	struct mcryptd_tag tag;
-+	struct crypto_hash_walk walk;
-+	u8 *out;
-+	int flag;
-+	struct shash_desc desc;
-+};
-+
-+struct mcryptd_ahash *mcryptd_alloc_ahash(const char *alg_name,
-+					u32 type, u32 mask);
-+struct crypto_shash *mcryptd_ahash_child(struct mcryptd_ahash *tfm);
-+struct shash_desc *mcryptd_shash_desc(struct ahash_request *req);
-+void mcryptd_free_ahash(struct mcryptd_ahash *tfm);
-+void mcryptd_flusher(struct work_struct *work);
-+
-+enum mcryptd_req_type {
-+	MCRYPTD_NONE,
-+	MCRYPTD_UPDATE,
-+	MCRYPTD_FINUP,
-+	MCRYPTD_DIGEST,
-+	MCRYPTD_FINAL
-+};
-+
-+struct mcryptd_alg_cstate {
-+	unsigned long next_flush;
-+	unsigned next_seq_num;
-+	bool	flusher_engaged;
-+	struct  delayed_work flush;
-+	int	cpu;
-+	struct  mcryptd_alg_state *alg_state;
-+	void	*mgr;
-+	spinlock_t work_lock;
-+	struct list_head work_list;
-+	struct list_head flush_list;
-+};
-+
-+struct mcryptd_alg_state {
-+	struct mcryptd_alg_cstate __percpu *alg_cstate;
-+	unsigned long (*flusher)(struct mcryptd_alg_cstate *cstate);
-+};
-+
-+/* return delay in jiffies from current time */
-+static inline unsigned long get_delay(unsigned long t)
-+{
-+	long delay;
-+
-+	delay = (long) t - (long) jiffies;
-+	if (delay <= 0)
-+		return 0;
-+	else
-+		return (unsigned long) delay;
-+}
-+
-+void mcryptd_arm_flusher(struct mcryptd_alg_cstate *cstate, unsigned long delay);
-+
-+#endif
++MODULE_ALIAS("sha1");
 -- 
 1.7.11.7
