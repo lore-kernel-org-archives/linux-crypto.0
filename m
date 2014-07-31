@@ -1,72 +1,94 @@
-From: Bernd Petrovitsch <bernd@petrovitsch.priv.at>
-Subject: Re: [PATCH -v4] random: introduce getrandom(2) system call
-Date: Thu, 31 Jul 2014 10:06:37 +0200
-Message-ID: <1406794012.26034.14.camel@thorin>
-References: <1405718127-30042-1-git-send-email-tytso@mit.edu>
-	 <20140730122620.GC13965@amd.pavel.ucw.cz>
-	 <CAComcpMnAdOk=Hs8Dtc7VZeJDHnpKQtzZ_=_67tqCeYU3pdJ_Q@mail.gmail.com>
-	 <1406731254.26034.4.camel@thorin> <20140730221819.GB18189@amd.pavel.ucw.cz>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: re: PKCS#7: Verify internal certificate chain
+Date: Thu, 31 Jul 2014 12:30:51 +0300
+Message-ID: <20140731093051.GE30276@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Bob Beck <beck@openbsd.org>, "Theodore Ts'o" <tytso@mit.edu>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-api@vger.kernel.org,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	Theo de Raadt <deraadt@cvs.openbsd.org>
-To: Pavel Machek <pavel@ucw.cz>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: dhowells@redhat.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from esgaroth.petrovitsch.at ([78.47.184.11]:5519 "EHLO
-	esgaroth.tuxoid.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932103AbaGaIHN (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:49574 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932277AbaGaJbk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 Jul 2014 04:07:13 -0400
-In-Reply-To: <20140730221819.GB18189@amd.pavel.ucw.cz>
+	Thu, 31 Jul 2014 05:31:40 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Don, 2014-07-31 at 00:18 +0200, Pavel Machek wrote:
-> On Wed 2014-07-30 16:40:52, Bernd Petrovitsch wrote:
-> > On Mit, 2014-07-30 at 07:56 -0600, Bob Beck wrote:
-> > > Pavel. I have bit 'ol enterprise daemon running with established file
-> > > descriptors serving thousands of connections
-> > > which periodically require entropy.  Now I run out of descriptors. I
-> > > can't establish new connections. but I should
-> > > now halt all the other ones that require entropy?  I should raise
-> > > SIGKILL on my process serving these thousands
-> > > of connetions?  I don't think so.
-> > 
-> > If that long-running daemon periodically needs something from a device,
-> > one would better keep the fd for that open the whole time. Saves some
-> > CPU cycles and latency too BTW.
-> 
-> Agreed.
-> 
-> On the other hand, keeping a fd open is quite tricky for a
-> library. But better solution might be to make that easier.
+Hello David Howells,
 
-Yes, in a (full-fledged, standalone) library seems at least tricky (also
-referring to some off-list mails here: think about fork() - which could
-be inside system() or popen() or similar). 
+This is a semi-automatic email about new static checker warnings.
 
-But as part of the *application* (where one has control over fork()
-etc.), this should be somewhat less risky. Yes, that doesn't really help
-libssl;-)
+The patch 8c76d79393cc: "PKCS#7: Verify internal certificate chain" 
+from Jul 1, 2014, leads to the following Smatch complaint:
 
-Hehe, we (Unix!) have (had) gettimeofday(), time() and similar sys-calls
-since ages and no one proposed to make devices for them and get rid of
-the system-calls.
+crypto/asymmetric_keys/pkcs7_verify.c:200 pkcs7_verify_sig_chain()
+	 error: we previously assumed 'x509->issuer' could be null (see line 193)
 
-> open( , O_IM_A_LIBRARY_GIVE_ME_ONE_OF_THREE_RESERVED_FDS) might be one
-> solution. Actually, one reserved fd should be enough.
+crypto/asymmetric_keys/pkcs7_verify.c
+   192	
+   193			if (x509->issuer)
+                            ^^^^^^^^^^^^
+Check.
 
-Well, this can also be DoSed and the proposal aims to make that
-impossible (and where does this reserved count against? process-limits,
-kernel-wide limit?).
+   194				pr_debug("- issuer %s\n", x509->issuer);
+   195			if (x509->authority)
+   196				pr_debug("- authkeyid %s\n", x509->authority);
+   197	
+   198			if (!x509->authority ||
+   199			    (x509->subject &&
+   200			     strcmp(x509->subject, x509->issuer) == 0)) {
+                                                   ^^^^^^^^^^^^
+Unchecked dereference.  But maybe a non-NULL ->subject implies ->issuer
+is non-NULL?
 
-	Bernd
--- 
-"I dislike type abstraction if it has no real reason. And saving
-on typing is not a good reason - if your typing speed is the main
-issue when you're coding, you're doing something seriously wrong."
-    - Linus Torvalds
+   201				/* If there's no authority certificate specified, then
+   202				 * the certificate must be self-signed and is the root
+   203                           * of the chain.  Likewise if the cert is its own
+   204                           * authority.
+   205                           */
+   206                          pr_debug("- no auth?\n");
+   207                          if (x509->raw_subject_size != x509->raw_issuer_size ||
+   208                              memcmp(x509->raw_subject, x509->raw_issuer,
+   209                                     x509->raw_issuer_size) != 0)
+   210                                  return 0;
+   211  
+   212                          ret = x509_check_signature(x509->pub, x509);
+   213                          if (ret < 0)
+   214                                  return ret;
+   215                          x509->signer = x509;
+   216                          pr_debug("- self-signed\n");
+   217                          return 0;
+   218                  }
+   219  
+   220                  /* Look through the X.509 certificates in the PKCS#7 message's
+   221                   * list to see if the next one is there.
+   222                   */
+   223                  pr_debug("- want %s\n", x509->authority);
+   224                  for (p = pkcs7->certs; p; p = p->next) {
+   225                          pr_debug("- cmp [%u] %s\n", p->index, p->fingerprint);
+   226                          if (p->raw_subject_size == x509->raw_issuer_size &&
+   227                              strcmp(p->fingerprint, x509->authority) == 0 &&
+   228                              memcmp(p->raw_subject, x509->raw_issuer,
+   229                                     x509->raw_issuer_size) == 0)
+   230                                  goto found_issuer;
+   231                  }
+   232  
+   233                  /* We didn't find the root of this chain */
+   234                  pr_debug("- top\n");
+   235                  return 0;
+   236  
+   237          found_issuer:
+   238                  pr_debug("- issuer %s\n", p->subject);
+                                    ^^^^^^
+Also this looks like it should be "subject" instead of "issuer" but
+maybe they are the same?
+
+   239                  if (p->seen) {
+   240                          pr_warn("Sig %u: X.509 chain contains loop\n",
+   241                                  sinfo->index);
+
+
+regards,
+dan carpenter
