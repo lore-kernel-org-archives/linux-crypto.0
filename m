@@ -1,49 +1,190 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: PKCS#7: Verify internal certificate chain
-Date: Thu, 31 Jul 2014 15:04:34 +0100
-Message-ID: <9951.1406815474@warthog.procyon.org.uk>
-References: <20140731093051.GE30276@mwanda>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: [PATCH v6 0/6] crypto: SHA1 multibuffer implementation
+Date: Thu, 31 Jul 2014 10:29:44 -0700
+Message-ID: <1406827784.2970.947.camel@schen9-DESK>
+References: <cover.1406798062.git.tim.c.chen@linux.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Chandramouli Narayanan <mouli@linux.intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Tadeusz Struk <tadeusz.struk@intel.com>, tkhai@yandex.ru,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38032 "EHLO mx1.redhat.com"
+Received: from mga02.intel.com ([134.134.136.20]:25373 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750768AbaGaOEk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 31 Jul 2014 10:04:40 -0400
-In-Reply-To: <20140731093051.GE30276@mwanda>
-Content-ID: <9950.1406815474.1@warthog.procyon.org.uk>
+	id S1750973AbaGaR3s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 31 Jul 2014 13:29:48 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Dan Carpenter <dan.carpenter@oracle.com> wrote:
+Herbert,
 
->    193			if (x509->issuer)
->                             ^^^^^^^^^^^^
-> Check.
-> 
->    194				pr_debug("- issuer %s\n", x509->issuer);
+I've updated the patches from v5 with the multi-buffer infrastructure
+patch contained within the same patch and some patch subject=20
+and comments clean up per Peter's feedback.
+=20
+Please note also that a separate bug fix to the crypto scatter gather l=
+ist walk
+for the null string needs to be incorporated, which I encountered durin=
+g
+my testing: http://marc.info/?l=3Dlinux-crypto-vger&m=3D140503429412699=
+&w=3D2
 
-Actually, x509->subject and x509->issuer are mandatory in the ASN.1 definition
-and point to empty strings if there's no name material we can use, so the
-check is superfluous.
+In this patch series, we introduce the multi-buffer crypto algorithm on
+x86_64 and apply it to SHA1 hash computation.  The multi-buffer techniq=
+ue
+takes advantage of the 8 data lanes in the AVX2 registers and allows
+computation to be performed on data from multiple jobs in parallel.
+This allows us to parallelize computations when data inter-dependency i=
+n
+a single crypto job prevents us to fully parallelize our computations.
+The algorithm can be extended to other hashing and encryption schemes
+in the future.
 
->    199			    (x509->subject &&
+On multi-buffer SHA1 computation with AVX2, we saw throughput increase
+up to 2.2x over the existing x86_64 single buffer AVX2 algorithm.
 
-This check too.
+The multi-buffer crypto algorithm is described in the following paper:
+Processing Multiple Buffers in Parallel to Increase Performance on
+Intel=C2=AE Architecture Processors
+http://www.intel.com/content/www/us/en/communications/communications-ia=
+-multi-buffer-paper.html
 
-However, I probably should check that x509->subject is not an empty string.
+The outline of the algorithm is sketched below:
+Any driver requesting the crypto service will place an async crypto
+request on the workqueue.  The multi-buffer crypto daemon will pull
+request from work queue and put each request in an empty data lane
+for multi-buffer crypto computation.  When all the empty lanes are
+filled, computation will commence on the jobs in parallel and the job
+with the shortest remaining buffer will get completed and be returned.
+To prevent prolonged stall when there is no new jobs arriving, we will
+opportunitsticlly flush partially completed crypto jobs after a maximum
+allowable delay, or we have exhausted crypto jobs in queue, and the cpu
+does not have other tasks and cpu will become idle otherwise.
 
->    238                  pr_debug("- issuer %s\n", p->subject);
->                                     ^^^^^^
-> Also this looks like it should be "subject" instead of "issuer" but
-> maybe they are the same?
+To accommodate the fragmented nature of scatter-gather, we will keep
+submitting the next scatter-buffer fragment for a job for multi-buffer
+computation until a job is completed and no more buffer fragments remai=
+n.
+At that time we will pull a new job to fill the now empty data slot.
+We call a get_completed_job function to check whether there are other
+jobs that have been completed when we job when we have no new job arriv=
+al
+to prevent extraneous delay in returning any completed jobs.
 
-This is the subject attribute of issuing certificate (that p points to), not
-the issuing attribute of the subject certificate (that x509 points to).
+The multi-buffer algorithm should be used for cases where crypto jobs
+submissions are at a reasonable high rate.  For low crypto job submissi=
+on
+rate, this algorithm will not be beneficial. The reason is at low rate,
+we do not fill out the data lanes before flushing the jobs instead of
+processing them with all the data lanes full.  We will miss the benefit
+of parallel computation, and adding delay to the processing of the cryp=
+to
+job at the same time.  Some tuning of the maximum latency parameter may
+be needed to get the best performance.
 
-Note this is a debugging line.  x509->issuer was printed by a pr_debug()
-several lines above.
+Note that the tcrypt SHA1 speed test, we wait for a previous job to
+be completed before submitting a new job.  Hence this is not a valid
+test for multi-buffer algorithm as it requires multiple outstanding job=
+s
+submitted to fill the all data lanes to be effective (i.e. 8 outstandin=
+g
+jobs for the AVX2 case).
 
-David
+=46eedbacks and testings will be most welcomed.
+
+Tim Chen
+
+Change log:
+
+v6
+1. Merge opportunitistic flush patch into the infrastructure patch
+2. Code comments clean up
+3. Reword patch titles=20
+
+v5
+1. Flush the job from the crypto daemon if the crypto daemon has no
+other jobs to process and no other tasks are running on the cpu.
+2. Change implementation of the idle flush so we do not hook into
+the idle notifier.=20
+https://lkml.org/lkml/2014/7/22/746
+
+v4
+1. Move the early flush of jobs when cpu becomes idle to crypto thread.
+2. Move shash_ahash_mcryptd_digest to mcryptd.c=20
+http://www.gossamer-threads.com/lists/linux/kernel/1964734
+
+v3
+1. Add notifier to multi-buffer algorithm to flush job when the cpu
+goes to idle to take advantage of available cpu cycles.=20
+2. Clean up of error messages.
+http://marc.info/?l=3Dlinux-crypto-vger&m=3D140252063401632&w=3D2
+
+v2
+1. Change the sha1 crypto walk to use the new crypto_ahash_walk
+interface for proper kmap.
+2. Drop the hack that map buffer in crypto_hash_walk without kmap_atomi=
+c
+as the new crypto_ahash_walk interface is merged.
+3. Reorganize some
+of the mcryptd hash interface code from ahash.c to mcryptd.c
+http://marc.info/?l=3Dlinux-crypto-vger&m=3D140088627927559&w=3D2
+
+v1
+refer to: http://www.spinics.net/lists/linux-crypto/msg10993.html
+
+
+Tim Chen (6):
+  sched: Add function single_task_running to let a task check if it is
+    the only task running on a cpu
+  crypto: multibuffer crypto infrastructure
+  crypto: SHA1 multibuffer algorithm data structures
+  crypto: SHA1 multibuffer submit and flush routines for AVX2
+  crypto: SHA1 multibuffer crypto computation (x8 AVX2)
+  crypto: SHA1 multibuffer job manager and glue code
+
+ arch/x86/crypto/Makefile                         |   2 +
+ arch/x86/crypto/sha-mb/Makefile                  |  11 +
+ arch/x86/crypto/sha-mb/sha1_mb.c                 | 935 +++++++++++++++=
+++++++++
+ arch/x86/crypto/sha-mb/sha1_mb_mgr_datastruct.S  | 287 +++++++
+ arch/x86/crypto/sha-mb/sha1_mb_mgr_flush_avx2.S  | 327 ++++++++
+ arch/x86/crypto/sha-mb/sha1_mb_mgr_init_avx2.c   |  64 ++
+ arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S | 228 ++++++
+ arch/x86/crypto/sha-mb/sha1_x8_avx2.S            | 472 ++++++++++++
+ arch/x86/crypto/sha-mb/sha_mb_ctx.h              | 136 ++++
+ arch/x86/crypto/sha-mb/sha_mb_mgr.h              | 110 +++
+ crypto/Kconfig                                   |  30 +
+ crypto/Makefile                                  |   1 +
+ crypto/mcryptd.c                                 | 705 +++++++++++++++=
+++
+ include/crypto/internal/hash.h                   |   9 +
+ include/crypto/mcryptd.h                         | 112 +++
+ include/linux/sched.h                            |   1 +
+ kernel/sched/core.c                              |  12 +
+ 17 files changed, 3442 insertions(+)
+ create mode 100644 arch/x86/crypto/sha-mb/Makefile
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb.c
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_datastruct.S
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_flush_avx2.S
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_init_avx2.c
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S
+ create mode 100644 arch/x86/crypto/sha-mb/sha1_x8_avx2.S
+ create mode 100644 arch/x86/crypto/sha-mb/sha_mb_ctx.h
+ create mode 100644 arch/x86/crypto/sha-mb/sha_mb_mgr.h
+ create mode 100644 crypto/mcryptd.c
+ create mode 100644 include/crypto/mcryptd.h
+
+--=20
+1.7.11.7
