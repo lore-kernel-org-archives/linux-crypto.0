@@ -1,35 +1,56 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: properly label AF_ALG socket
-Date: Thu, 31 Jul 2014 21:55:59 +0800
-Message-ID: <20140731135559.GA5777@gondor.apana.org.au>
-References: <20140728150958.23156.75132.stgit@localhost>
- <1406659269-8346-1-git-send-email-gmazyland@gmail.com>
+Subject: Crypto Fixes for 3.16
+Date: Thu, 31 Jul 2014 21:59:08 +0800
+Message-ID: <20140731135908.GA5834@gondor.apana.org.au>
+References: <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20140710090314.GA15729@gondor.apana.org.au>
+ <20140718105717.GA18087@gondor.apana.org.au>
+ <20140728140507.GA11926@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, selinux@tycho.nsa.gov,
-	pmoore@redhat.com, stable@vger.kernel.org
-To: Milan Broz <gmazyland@gmail.com>
-Return-path: <stable-owner@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:54669 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751489AbaGaN7R (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 31 Jul 2014 09:59:17 -0400
 Content-Disposition: inline
-In-Reply-To: <1406659269-8346-1-git-send-email-gmazyland@gmail.com>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20140728140507.GA11926@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jul 29, 2014 at 06:41:09PM +0000, Milan Broz wrote:
-> Th AF_ALG socket was missing a security label (e.g. SELinux)
-> which means that socket was in "unlabeled" state.
-> 
-> This was recently demonstrated in the cryptsetup package
-> (cryptsetup v1.6.5 and later.)
-> See https://bugzilla.redhat.com/show_bug.cgi?id=1115120
-> 
-> This patch clones the sock's label from the parent sock
-> and resolves the issue (similar to AF_BLUETOOTH protocol family).
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Milan Broz <gmazyland@gmail.com>
+Hi Linus:
 
-Applied to crypto.  Thanks.
+This push adds missing SELinux labeling to AF_ALG sockets which
+apparently causes SELinux (or at least the SELinux people) to
+misbehave :)
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Milan Broz (1):
+      crypto: af_alg - properly label AF_ALG socket
+
+ crypto/af_alg.c |    2 ++
+ 1 file changed, 2 insertions(+)
+ 
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
