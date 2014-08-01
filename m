@@ -1,39 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: use chunks smaller than algo block size in chunk
- tests
-Date: Fri, 1 Aug 2014 22:40:16 +0800
-Message-ID: <20140801144016.GC15005@gondor.apana.org.au>
-References: <1406481530-21035-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: atmel-sha: Switch to managed version of kzalloc
+Date: Fri, 1 Aug 2014 22:40:29 +0800
+Message-ID: <20140801144029.GD15005@gondor.apana.org.au>
+References: <1406549756-26876-1-git-send-email-pramod.gurav@smartplayin.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, mpatocka@redhat.com,
-	catalin.marinas@arm.com, linux@arm.linux.org.uk
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Pramod Gurav <pramod.gurav@smartplayin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@atmel.com>
+To: pramod.gurav.etc@gmail.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:52207 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:57894 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754433AbaHAOkV (ORCPT
+	with ESMTP id S1751911AbaHAOkf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 Aug 2014 10:40:21 -0400
+	Fri, 1 Aug 2014 10:40:35 -0400
 Content-Disposition: inline
-In-Reply-To: <1406481530-21035-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <1406549756-26876-1-git-send-email-pramod.gurav@smartplayin.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jul 27, 2014 at 07:18:50PM +0200, Ard Biesheuvel wrote:
-> This patch updates many of the chunked tcrypt test cases so that not all of the
-> chunks are an exact multiple of the block size. This should help uncover cases
-> where the residue passed to blkcipher_walk_done() is incorrect.
+On Mon, Jul 28, 2014 at 05:45:56PM +0530, pramod.gurav.etc@gmail.com wrote:
+> From: Pramod Gurav <pramod.gurav@smartplayin.com>
 > 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
+> This patch switches data allocation from kzalloc to devm_kzalloc.
+> It also removed some kfree() on data that was earlier allocated
+> using devm_kzalloc().
 > 
-> Herbert,
+> CC: Herbert Xu <herbert@gondor.apana.org.au>
+> CC: "David S. Miller" <davem@davemloft.net>
+> CC: Grant Likely <grant.likely@linaro.org>
+> CC: Rob Herring <robh+dt@kernel.org>
+> CC: Nicolas Ferre <nicolas.ferre@atmel.com>
 > 
-> After this change, the ARM and arm64 bugs regarding blkcipher_walk_done() are
-> identified by tcrypt mode=10
+> Signed-off-by: Pramod Gurav <pramod.gurav@smartplayin.com>
 
-Patch applied.  Thanks Ard!
+Both patches applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
