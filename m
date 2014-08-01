@@ -1,35 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [net-next] crypto: Resolve shadow warnings
-Date: Fri, 1 Aug 2014 22:39:41 +0800
-Message-ID: <20140801143940.GA15005@gondor.apana.org.au>
-References: <1406282018-23393-1-git-send-email-jeffrey.t.kirsher@intel.com>
+Subject: Re: [PATCH 00/10] crypto: qat: Checkpatch and other cleanups plus
+ SKU1
+Date: Fri, 1 Aug 2014 22:39:53 +0800
+Message-ID: <20140801143953.GB15005@gondor.apana.org.au>
+References: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, Mark Rustad <mark.d.rustad@intel.com>,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	nhorman@redhat.com, sassmann@redhat.com
-To: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+Cc: davem@davemloft.net, bruce.w.allan@intel.com, bo.cui@intel.com,
+	pingchao.yang@intel.com, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:57513 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:36106 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754707AbaHAOju (ORCPT
+	with ESMTP id S1754324AbaHAOj7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 Aug 2014 10:39:50 -0400
+	Fri, 1 Aug 2014 10:39:59 -0400
 Content-Disposition: inline
-In-Reply-To: <1406282018-23393-1-git-send-email-jeffrey.t.kirsher@intel.com>
+In-Reply-To: <20140725225410.24909.56360.stgit@gitlad.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jul 25, 2014 at 02:53:38AM -0700, Jeff Kirsher wrote:
-> From: Mark Rustad <mark.d.rustad@intel.com>
+On Fri, Jul 25, 2014 at 03:55:03PM -0700, Tadeusz Struk wrote:
+> issue.
 > 
-> Change formal parameters to not clash with global names to
-> eliminate many W=2 warnings.
-> 
-> Signed-off-by: Mark Rustad <mark.d.rustad@intel.com>
-> Signed-off-by: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
+> Hi,
+> Minor cleanups for the qat driver.
+> The last patch fixes SKU1 device startup issue.
+> Rest of the patches clean up new checkpatch issues plus some minor
+> and cosmetic updates.
 
-Patch applied.  Thanks Jeff.
+All applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
