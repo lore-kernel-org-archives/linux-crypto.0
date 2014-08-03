@@ -1,83 +1,263 @@
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: Re: [PATCH 1/2] crypto: add support for TLS 1.0 record encryption
-Date: Fri, 1 Aug 2014 07:44:23 -0700
-Message-ID: <CALCETrX3r2shBVTCR=WEmXNV+L=Qk7+ZxKYamWZ4EjVLgqU5kg@mail.gmail.com>
-References: <1406626353-23309-1-git-send-email-cristian.stoica@freescale.com>
- <1406626353-23309-2-git-send-email-cristian.stoica@freescale.com>
- <53DAA097.90005@amacapital.net> <53DB58A8.3070600@freescale.com>
+From: Ming Liu <liu.ming50@gmail.com>
+Subject: Re: HELP: IPsec reordering issue
+Date: Sun, 03 Aug 2014 17:57:06 +0800
+Message-ID: <53DE0772.2090106@gmail.com>
+References: <53D9B2EE.5040002@gmail.com> <20140731062321.GA2957@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Cristian Stoica <cristian.stoica@freescale.com>
+Content-Type: multipart/mixed;
+ boundary="------------060405050203030105000606"
+Cc: steffen.klassert@secunet.com, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	Xue Ying <ying.xue@windriver.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-la0-f43.google.com ([209.85.215.43]:36585 "EHLO
-	mail-la0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750851AbaHAOoq (ORCPT
+Received: from mail-pd0-f182.google.com ([209.85.192.182]:51039 "EHLO
+	mail-pd0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752398AbaHCJ5Z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 Aug 2014 10:44:46 -0400
-Received: by mail-la0-f43.google.com with SMTP id hr17so3335532lab.16
-        for <linux-crypto@vger.kernel.org>; Fri, 01 Aug 2014 07:44:45 -0700 (PDT)
-In-Reply-To: <53DB58A8.3070600@freescale.com>
+	Sun, 3 Aug 2014 05:57:25 -0400
+In-Reply-To: <20140731062321.GA2957@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Aug 1, 2014 at 2:06 AM, Cristian Stoica
-<cristian.stoica@freescale.com> wrote:
-> Hi Andy
+This is a multi-part message in MIME format.
+--------------060405050203030105000606
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 07/31/2014 02:23 PM, Herbert Xu wrote:
+> On Thu, Jul 31, 2014 at 11:07:26AM +0800, Ming Liu wrote:
+>> And we've figure out a patch as the attached, the basic idea is just
+>> queue the packets if "irq_fpu_usable()" is not usable or if there
+>> are already few packets queued for decryption. Else decrypt the
+>> packets.
+> Yes your description makes sense and I will review your patch
+> for inclusion.
+Hi, Herbert:
+
+Please review this attached patch instead, the original one has a 
+problem causing the kernel crash.
+
+the best,
+thank you
 >
-> On 31.07.2014 23:01, Andy Lutomirski wrote:
->> On 07/29/2014 02:32 AM, Cristian Stoica wrote:
-> ...
+> Thanks,
 
->>> +static int crypto_tls_decrypt(struct aead_request *req)
->>> +{
 
->>> +    /*
->>> +     * Step 2 - Verify padding
->>> +     * Retrieve the last byte of the payload; this is the padding size
->>> +     */
->>> +    cryptlen -= 1;
->>> +    scatterwalk_map_and_copy(&pad_size, req->dst, cryptlen, 1, 0);
->>> +
->>> +    /* RFC recommendation to defend against timing attacks is to continue
->>> +     * with hash calculation even if the padding is incorrect */
->>> +    if (cryptlen < pad_size + hash_size) {
->>> +            pad_size = 0;
->>> +            paderr = -EBADMSG;
+--------------060405050203030105000606
+Content-Type: text/x-diff;
+ name="0001-crypto-aesni-intel-avoid-encrypt-decrypt-re-ordering.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename*0="0001-crypto-aesni-intel-avoid-encrypt-decrypt-re-ordering.pa";
+ filename*1="tch"
 
-If this happens, then pad_size == 0.
+>From 0b3113eb2e690c3899382360f89281d6a64e8f3a Mon Sep 17 00:00:00 2001
+From: Ming Liu <ming.liu@windriver.com>
+Date: Sun, 3 Aug 2014 16:23:39 +0800
+Subject: [PATCH] crypto: aesni-intel- avoid encrypt/decrypt re-ordering with
+ debug
 
->>> +    }
+So far, the encrypt/decrypt are asynchronously processed in softirq and
+cryptd which would result in a implicit order of data, therefore leads
+IPSec stack also out of order while encapsulating/decapsulating packets.
 
-else pad_size is likely to be nonzero.
+Fix by letting encrypt/decrypt are processed only in one context for a
+particular period.
+---
+ arch/x86/crypto/aesni-intel_glue.c | 32 ++++++++++++----------
+ crypto/cryptd.c                    | 55 ++++++++++++++++++++++++++++++++++++--
+ include/crypto/cryptd.h            |  3 ++-
+ 3 files changed, 73 insertions(+), 17 deletions(-)
 
->>> +    cryptlen -= pad_size;
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 49c552c..1f66d6e 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -341,20 +341,22 @@ static int ablk_encrypt(struct ablkcipher_request *req)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct async_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct crypto_tfm *req_tfm = crypto_ablkcipher_tfm(
++		crypto_ablkcipher_crt(&ctx->cryptd_tfm->base)->base);
+ 
+-	if (!irq_fpu_usable()) {
+-		struct ablkcipher_request *cryptd_req =
+-			ablkcipher_request_ctx(req);
+-		memcpy(cryptd_req, req, sizeof(*req));
+-		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
+-		return crypto_ablkcipher_encrypt(cryptd_req);
+-	} else {
++	if (irq_fpu_usable() && !cryptd_get_encrypt_nums(req_tfm)) {
+ 		struct blkcipher_desc desc;
+ 		desc.tfm = cryptd_ablkcipher_child(ctx->cryptd_tfm);
+ 		desc.info = req->info;
+ 		desc.flags = 0;
+ 		return crypto_blkcipher_crt(desc.tfm)->encrypt(
+ 			&desc, req->dst, req->src, req->nbytes);
++	} else {
++		struct ablkcipher_request *cryptd_req =
++			ablkcipher_request_ctx(req);
++		memcpy(cryptd_req, req, sizeof(*req));
++		cryptd_req->base.tfm = req_tfm;
++		return crypto_ablkcipher_encrypt(cryptd_req);
+ 	}
+ }
+ 
+@@ -362,20 +364,22 @@ static int ablk_decrypt(struct ablkcipher_request *req)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct async_aes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct crypto_tfm *req_tfm = crypto_ablkcipher_tfm(
++		crypto_ablkcipher_crt(&ctx->cryptd_tfm->base)->base);
+ 
+-	if (!irq_fpu_usable()) {
+-		struct ablkcipher_request *cryptd_req =
+-			ablkcipher_request_ctx(req);
+-		memcpy(cryptd_req, req, sizeof(*req));
+-		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
+-		return crypto_ablkcipher_decrypt(cryptd_req);
+-	} else {
++	if (irq_fpu_usable() && !cryptd_get_decrypt_nums(req_tfm)) {
+ 		struct blkcipher_desc desc;
+ 		desc.tfm = cryptd_ablkcipher_child(ctx->cryptd_tfm);
+ 		desc.info = req->info;
+ 		desc.flags = 0;
+ 		return crypto_blkcipher_crt(desc.tfm)->decrypt(
+ 			&desc, req->dst, req->src, req->nbytes);
++	} else {
++		struct ablkcipher_request *cryptd_req =
++			ablkcipher_request_ctx(req);
++		memcpy(cryptd_req, req, sizeof(*req));
++		cryptd_req->base.tfm = req_tfm;
++		return crypto_ablkcipher_decrypt(cryptd_req);
+ 	}
+ }
+ 
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index 6e24164..6710395 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -28,6 +28,8 @@
+ struct cryptd_cpu_queue {
+ 	struct crypto_queue queue;
+ 	struct work_struct work;
++	unsigned int encrypt_nums;
++	unsigned int decrypt_nums;
+ };
+ 
+ struct cryptd_queue {
+@@ -62,6 +64,8 @@ struct cryptd_hash_request_ctx {
+ };
+ 
+ static void cryptd_queue_worker(struct work_struct *work);
++static void cryptd_blkcipher_encrypt(struct crypto_async_request *req, int err);
++static void cryptd_blkcipher_decrypt(struct crypto_async_request *req, int err);
+ 
+ static int cryptd_init_queue(struct cryptd_queue *queue,
+ 			     unsigned int max_cpu_qlen)
+@@ -75,6 +79,8 @@ static int cryptd_init_queue(struct cryptd_queue *queue,
+ 	for_each_possible_cpu(cpu) {
+ 		cpu_queue = per_cpu_ptr(queue->cpu_queue, cpu);
+ 		crypto_init_queue(&cpu_queue->queue, max_cpu_qlen);
++		cpu_queue->encrypt_nums = 0;
++		cpu_queue->decrypt_nums = 0;
+ 		INIT_WORK(&cpu_queue->work, cryptd_queue_worker);
+ 	}
+ 	return 0;
+@@ -101,6 +107,10 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
+ 	cpu = get_cpu();
+ 	cpu_queue = this_cpu_ptr(queue->cpu_queue);
+ 	err = crypto_enqueue_request(&cpu_queue->queue, request);
++	if ((err != -EBUSY) && (request->complete == cryptd_blkcipher_encrypt))
++		cpu_queue->encrypt_nums++;
++	if ((err != -EBUSY) && (request->complete == cryptd_blkcipher_decrypt))
++		cpu_queue->decrypt_nums++;
+ 	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
+ 	put_cpu();
+ 
+@@ -171,10 +181,14 @@ static void cryptd_blkcipher_crypt(struct ablkcipher_request *req,
+ 						struct scatterlist *src,
+ 						unsigned int len))
+ {
+-	struct cryptd_blkcipher_request_ctx *rctx;
++	struct cryptd_blkcipher_request_ctx *rctx = ablkcipher_request_ctx(req);
++	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct blkcipher_desc desc;
++	struct cryptd_queue *queue;
++	struct cryptd_cpu_queue *cpu_queue;
++	crypto_completion_t complete = req->base.complete;
+ 
+-	rctx = ablkcipher_request_ctx(req);
++	queue = cryptd_get_queue(crypto_ablkcipher_tfm(tfm));
+ 
+ 	if (unlikely(err == -EINPROGRESS))
+ 		goto out;
+@@ -190,6 +204,13 @@ static void cryptd_blkcipher_crypt(struct ablkcipher_request *req,
+ out:
+ 	local_bh_disable();
+ 	rctx->complete(&req->base, err);
++	preempt_disable();
++	cpu_queue = this_cpu_ptr(queue->cpu_queue);
++	if ((complete == cryptd_blkcipher_encrypt) && cpu_queue->encrypt_nums)
++		cpu_queue->encrypt_nums--;
++	if ((complete == cryptd_blkcipher_decrypt) && cpu_queue->decrypt_nums)
++		cpu_queue->decrypt_nums--;
++	preempt_enable();
+ 	local_bh_enable();
+ }
+ 
+@@ -729,6 +750,36 @@ void cryptd_free_ahash(struct cryptd_ahash *tfm)
+ }
+ EXPORT_SYMBOL_GPL(cryptd_free_ahash);
+ 
++unsigned int cryptd_get_encrypt_nums(struct crypto_tfm *tfm)
++{
++	struct cryptd_queue *queue = cryptd_get_queue(tfm);
++	struct cryptd_cpu_queue *cpu_queue;
++	unsigned int nums;
++
++	preempt_disable();
++	cpu_queue = this_cpu_ptr(queue->cpu_queue);
++	nums = cpu_queue->encrypt_nums;
++	preempt_enable();
++
++	return nums;
++}
++EXPORT_SYMBOL_GPL(cryptd_get_encrypt_nums);
++
++unsigned int cryptd_get_decrypt_nums(struct crypto_tfm *tfm)
++{
++	struct cryptd_queue *queue = cryptd_get_queue(tfm);
++	struct cryptd_cpu_queue *cpu_queue;
++	unsigned int nums;
++
++	preempt_disable();
++	cpu_queue = this_cpu_ptr(queue->cpu_queue);
++	nums = cpu_queue->decrypt_nums;
++	preempt_enable();
++
++	return nums;
++}
++EXPORT_SYMBOL_GPL(cryptd_get_decrypt_nums);
++
+ static int __init cryptd_init(void)
+ {
+ 	int err;
+diff --git a/include/crypto/cryptd.h b/include/crypto/cryptd.h
+index 1c96b25..cacc717 100644
+--- a/include/crypto/cryptd.h
++++ b/include/crypto/cryptd.h
+@@ -41,5 +41,6 @@ struct cryptd_ahash *cryptd_alloc_ahash(const char *alg_name,
+ struct crypto_shash *cryptd_ahash_child(struct cryptd_ahash *tfm);
+ struct shash_desc *cryptd_shash_desc(struct ahash_request *req);
+ void cryptd_free_ahash(struct cryptd_ahash *tfm);
+-
++unsigned int cryptd_get_encrypt_nums(struct crypto_tfm *tfm);
++unsigned int cryptd_get_decrypt_nums(struct crypto_tfm *tfm);
+ #endif
+-- 
+1.8.5.2.233.g932f7e4
 
-So now cryptlen depends on the result of the decryption, which means
-that this part is not constant time:
 
->>> +
->>> +    /* Now compute and compare our ICV with the one from the packet */
->>> +    err = crypto_tls_genicv(hash, req->dst, cryptlen, req);
->>> +    if (!err)
->>> +            err = crypto_memneq(hash, ihash, hash_size) ? -EBADMSG : 0;
->>
->> This looks like it's vulnerable to the Lucky 13 attack.
->
-> Digest is always calculated and in this particular case memneq should
-> help with some of the timing leaks. ICV calculation is expected to pass
-> and any failures should be only for internal reasons. There are maybe
-> some other problems that I've never thought of. Did you have something
-> else in mind when you mentioned this attack?
->
-> Cristian S.
-
-If I understand it correctly, the issue is that cryptlen depends on
-the padding.  I added some notes inline above.  See here, too:
-
-https://www.imperialviolet.org/2013/02/04/luckythirteen.html
-
---Andy
+--------------060405050203030105000606--
