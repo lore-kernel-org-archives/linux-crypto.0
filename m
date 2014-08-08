@@ -1,162 +1,32 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2] ARM: crypto: enable NEON SHA-1 for big endian
-Date: Tue,  5 Aug 2014 22:34:52 +0200
-Message-ID: <1407270892-20902-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux@arm.linux.org.uk,
-	jussi.kivilinna@iki.fi
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:58182 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753590AbaHEUfE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 Aug 2014 16:35:04 -0400
-Received: by mail-wi0-f174.google.com with SMTP id d1so7621878wiv.13
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Aug 2014 13:35:00 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH] crypto: testmgr.c: white space fix-ups on test_aead
+Date: Fri, 8 Aug 2014 12:22:44 +0300
+Message-ID: <53E496E4.9070207@freescale.com>
+References: <1406542283-11995-1-git-send-email-cristian.stoica@freescale.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+To: Cristian Stoica <cristian.stoica@freescale.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1406542283-11995-1-git-send-email-cristian.stoica@freescale.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This tweaks the SHA-1 NEON code slightly so it works correctly under big endian,
-and removes the Kconfig condition preventing it from being selected if
-CONFIG_CPU_BIG_ENDIAN is set.
+On 7/28/2014 1:11 PM, Cristian Stoica wrote:
+> This patch inverts two if conditions and allows removal of one
+> tab-stop in their code-blocks. Only white-space clean-up follows.
+> 
+> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+> ---
+>  crypto/testmgr.c | 498 +++++++++++++++++++++++++++----------------------------
+>  1 file changed, 242 insertions(+), 256 deletions(-)
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
+This increases readability and reduces number of lines, not to mention
+cyclomatic complexity.
 
-I accidentally submitted the version below to the patch system (#8125/1) rather
-than the version I had posted to LAKML for review.
+While here, could you do this also for other places, like __test_hash?
 
-The difference between the two versions is that the first one just changed some
-vld1.32 calls into vld1.8 calls, resulting in the data being byte swapped twice
-after being read from memory: once by vld1.8 and once by the subsequent vrev32.8
-instruction.
-
-Instead, this version retains the vld1.32 calls and makes the vrev32.8 calls
-conditional on !CPU_BIG_ENDIAN. As the vrev32.8 instruction did an implicit move
-as well, some register names had to be reshuffled to avoid having to move values
-between registers instead.
-
-Both versions pass the tcrypt built-in test suite for SHA1, in both big-endian
-and little-endian modes.
-
- arch/arm/crypto/sha1-armv7-neon.S | 39 ++++++++++++++++++++++-----------------
- crypto/Kconfig                    |  2 +-
- 2 files changed, 23 insertions(+), 18 deletions(-)
-
-diff --git a/arch/arm/crypto/sha1-armv7-neon.S b/arch/arm/crypto/sha1-armv7-neon.S
-index 50013c0e2864..dcd01f3f0bb0 100644
---- a/arch/arm/crypto/sha1-armv7-neon.S
-+++ b/arch/arm/crypto/sha1-armv7-neon.S
-@@ -9,7 +9,7 @@
-  */
- 
- #include <linux/linkage.h>
--
-+#include <asm/assembler.h>
- 
- .syntax unified
- .code   32
-@@ -61,13 +61,13 @@
- #define RT3 r12
- 
- #define W0 q0
--#define W1 q1
-+#define W1 q7
- #define W2 q2
- #define W3 q3
- #define W4 q4
--#define W5 q5
--#define W6 q6
--#define W7 q7
-+#define W5 q6
-+#define W6 q5
-+#define W7 q1
- 
- #define tmp0 q8
- #define tmp1 q9
-@@ -79,6 +79,11 @@
- #define qK3 q14
- #define qK4 q15
- 
-+#ifdef CONFIG_CPU_BIG_ENDIAN
-+#define ARM_LE(code...)
-+#else
-+#define ARM_LE(code...)		code
-+#endif
- 
- /* Round function macros. */
- 
-@@ -150,45 +155,45 @@
- #define W_PRECALC_00_15() \
- 	add       RWK, sp, #(WK_offs(0));			\
- 	\
--	vld1.32   {tmp0, tmp1}, [RDATA]!;			\
--	vrev32.8  W0, tmp0;		/* big => little */	\
--	vld1.32   {tmp2, tmp3}, [RDATA]!;			\
-+	vld1.32   {W0, W7}, [RDATA]!;				\
-+ ARM_LE(vrev32.8  W0, W0;	)	/* big => little */	\
-+	vld1.32   {W6, W5}, [RDATA]!;				\
- 	vadd.u32  tmp0, W0, curK;				\
--	vrev32.8  W7, tmp1;		/* big => little */	\
--	vrev32.8  W6, tmp2;		/* big => little */	\
-+ ARM_LE(vrev32.8  W7, W7;	)	/* big => little */	\
-+ ARM_LE(vrev32.8  W6, W6;	)	/* big => little */	\
- 	vadd.u32  tmp1, W7, curK;				\
--	vrev32.8  W5, tmp3;		/* big => little */	\
-+ ARM_LE(vrev32.8  W5, W5;	)	/* big => little */	\
- 	vadd.u32  tmp2, W6, curK;				\
- 	vst1.32   {tmp0, tmp1}, [RWK]!;				\
- 	vadd.u32  tmp3, W5, curK;				\
- 	vst1.32   {tmp2, tmp3}, [RWK];				\
- 
- #define WPRECALC_00_15_0(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
--	vld1.32   {tmp0, tmp1}, [RDATA]!;			\
-+	vld1.32   {W0, W7}, [RDATA]!;				\
- 
- #define WPRECALC_00_15_1(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
- 	add       RWK, sp, #(WK_offs(0));			\
- 
- #define WPRECALC_00_15_2(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
--	vrev32.8  W0, tmp0;		/* big => little */	\
-+ ARM_LE(vrev32.8  W0, W0;	)	/* big => little */	\
- 
- #define WPRECALC_00_15_3(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
--	vld1.32   {tmp2, tmp3}, [RDATA]!;			\
-+	vld1.32   {W6, W5}, [RDATA]!;				\
- 
- #define WPRECALC_00_15_4(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
- 	vadd.u32  tmp0, W0, curK;				\
- 
- #define WPRECALC_00_15_5(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
--	vrev32.8  W7, tmp1;		/* big => little */	\
-+ ARM_LE(vrev32.8  W7, W7;	)	/* big => little */	\
- 
- #define WPRECALC_00_15_6(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
--	vrev32.8  W6, tmp2;		/* big => little */	\
-+ ARM_LE(vrev32.8  W6, W6;	)	/* big => little */	\
- 
- #define WPRECALC_00_15_7(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
- 	vadd.u32  tmp1, W7, curK;				\
- 
- #define WPRECALC_00_15_8(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
--	vrev32.8  W5, tmp3;		/* big => little */	\
-+ ARM_LE(vrev32.8  W5, W5;	)	/* big => little */	\
- 
- #define WPRECALC_00_15_9(i,W,W_m04,W_m08,W_m12,W_m16,W_m20,W_m24,W_m28) \
- 	vadd.u32  tmp2, W6, curK;				\
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 749b1e05c490..deef2a4b6559 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -542,7 +542,7 @@ config CRYPTO_SHA1_ARM
- 
- config CRYPTO_SHA1_ARM_NEON
- 	tristate "SHA1 digest algorithm (ARM NEON)"
--	depends on ARM && KERNEL_MODE_NEON && !CPU_BIG_ENDIAN
-+	depends on ARM && KERNEL_MODE_NEON
- 	select CRYPTO_SHA1_ARM
- 	select CRYPTO_SHA1
- 	select CRYPTO_HASH
--- 
-1.8.3.2
+Thanks,
+Horia
