@@ -1,42 +1,24 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: HELP: IPsec reordering issue
-Date: Thu, 14 Aug 2014 16:47:40 +0800
-Message-ID: <20140814084740.GA30846@gondor.apana.org.au>
-References: <53D9B2EE.5040002@gmail.com>
- <20140731062321.GA2957@gondor.apana.org.au>
- <53DE0772.2090106@gmail.com>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: caamhash.c fixes
+Date: Thu, 14 Aug 2014 13:51:55 +0300
+Message-ID: <1408013517-15526-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: steffen.klassert@secunet.com, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	Xue Ying <ying.xue@windriver.com>
-To: Ming Liu <liu.ming50@gmail.com>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<davem@davemloft.net>
+To: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:42162 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751861AbaHNIrw (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Aug 2014 04:47:52 -0400
-Content-Disposition: inline
-In-Reply-To: <53DE0772.2090106@gmail.com>
+Received: from mail-bn1blp0188.outbound.protection.outlook.com ([207.46.163.188]:46675
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752916AbaHNKwu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 14 Aug 2014 06:52:50 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Aug 03, 2014 at 05:57:06PM +0800, Ming Liu wrote:
-> 
-> Please review this attached patch instead, the original one has a
-> problem causing the kernel crash.
+This is a set of two independent fixes for caamhash driver
 
-Thanks for the patch.  I think it would better to enforce ordering
-for all operations rather than treat encryptions separately from
-decryptions.  We could conceivably have more complex operations made
-up from both encryptions and decryptions that could then get
-out-of-order.
 
-It would also make the code simpler.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+drivers/crypto/caam/caamhash.c   | 28 +++++++++++++++++-----------
+drivers/crypto/caam/sg_sw_sec4.h | 54 ------------------------------------------------------
+2 files changed, 17 insertions(+), 65 deletions(-)
