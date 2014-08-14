@@ -1,7 +1,7 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH v2 10/12] crypto: caam - refactor descriptor creation
-Date: Thu, 14 Aug 2014 15:54:32 +0300
-Message-ID: <1408020874-2211-11-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH v2 12/12] crypto: caam - add Run Time Library (RTA) docbook
+Date: Thu, 14 Aug 2014 15:54:34 +0300
+Message-ID: <1408020874-2211-13-git-send-email-horia.geanta@freescale.com>
 References: <1408020874-2211-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -11,1016 +11,729 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Alexandru Porosanu <alexandru.porosanu@freescale.com>,
 	Vakul Garg <vakul@freescale.com>,
 	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	"Horia Geanta" <horia.geanta@freescale.com>
+	"Horia Geanta" <horia.geanta@freescale.com>,
+	Randy Dunlap <rdunlap@infradead.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0139.outbound.protection.outlook.com ([207.46.163.139]:27887
+Received: from mail-bn1blp0189.outbound.protection.outlook.com ([207.46.163.189]:26400
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754677AbaHNM4M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Aug 2014 08:56:12 -0400
+	id S1754381AbaHNM4S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 14 Aug 2014 08:56:18 -0400
 In-Reply-To: <1408020874-2211-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Refactor descriptor creation in caamalg and caamhash, i.e.
-create whole descriptors in the same place / function.
-This makes the code more comprehensible and easier to maintain.
+Add SGML template for generating RTA docbook.
+Source code is in drivers/crypto/caam/flib
 
+Cc: Randy Dunlap <rdunlap@infradead.org>
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- drivers/crypto/caam/caamalg.c  | 244 +++++++++++++++------------
- drivers/crypto/caam/caamhash.c | 368 ++++++++++++++---------------------------
- 2 files changed, 262 insertions(+), 350 deletions(-)
+ Documentation/DocBook/Makefile         |   3 +-
+ Documentation/DocBook/rta-api.tmpl     | 261 ++++++++++++++++++++++
+ Documentation/DocBook/rta/.gitignore   |   1 +
+ Documentation/DocBook/rta/Makefile     |   5 +
+ Documentation/DocBook/rta/rta_arch.svg | 381 +++++++++++++++++++++++++++++++++
+ 5 files changed, 650 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/DocBook/rta-api.tmpl
+ create mode 100644 Documentation/DocBook/rta/.gitignore
+ create mode 100644 Documentation/DocBook/rta/Makefile
+ create mode 100644 Documentation/DocBook/rta/rta_arch.svg
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index cd1ba573c633..9090fc8c04e0 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -94,57 +94,6 @@
- static struct list_head alg_list;
- static const bool ps = (sizeof(dma_addr_t) == sizeof(u64));
+diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
+index bec06659e0eb..f2917495db49 100644
+--- a/Documentation/DocBook/Makefile
++++ b/Documentation/DocBook/Makefile
+@@ -15,7 +15,7 @@ DOCBOOKS := z8530book.xml device-drivers.xml \
+ 	    80211.xml debugobjects.xml sh.xml regulator.xml \
+ 	    alsa-driver-api.xml writing-an-alsa-driver.xml \
+ 	    tracepoint.xml drm.xml media_api.xml w1.xml \
+-	    writing_musb_glue_layer.xml
++	    writing_musb_glue_layer.xml rta-api.xml
  
--/* Set DK bit in class 1 operation if shared */
--static inline void append_dec_op1(struct program *p, u32 type)
--{
--	LABEL(jump_cmd);
--	REFERENCE(pjump_cmd);
--	LABEL(uncond_jump_cmd);
--	REFERENCE(puncond_jump_cmd);
--
--	/* DK bit is valid only for AES */
--	if ((type & OP_ALG_ALGSEL_MASK) != OP_ALG_ALGSEL_AES) {
--		ALG_OPERATION(p, type & OP_ALG_ALGSEL_MASK,
--			      type & OP_ALG_AAI_MASK, OP_ALG_AS_INITFINAL,
--			      ICV_CHECK_DISABLE, DIR_DEC);
--		return;
--	}
--
--	pjump_cmd = JUMP(p, jump_cmd, LOCAL_JUMP, ALL_TRUE, SHRD);
--	ALG_OPERATION(p, type & OP_ALG_ALGSEL_MASK, type & OP_ALG_AAI_MASK,
--		      OP_ALG_AS_INITFINAL, ICV_CHECK_DISABLE, DIR_DEC);
--	puncond_jump_cmd = JUMP(p, uncond_jump_cmd, LOCAL_JUMP, ALL_TRUE, 0);
--	SET_LABEL(p, jump_cmd);
--	ALG_OPERATION(p, type & OP_ALG_ALGSEL_MASK,
--		      (type & OP_ALG_AAI_MASK) | OP_ALG_AAI_DK,
--		      OP_ALG_AS_INITFINAL, ICV_CHECK_DISABLE, DIR_DEC);
--	SET_LABEL(p, uncond_jump_cmd);
--
--	PATCH_JUMP(p, pjump_cmd, jump_cmd);
--	PATCH_JUMP(p, puncond_jump_cmd, uncond_jump_cmd);
--}
--
--/*
-- * For aead encrypt and decrypt, read iv for both classes
-- */
--static inline void aead_append_ld_iv(struct program *p, u32 ivsize)
--{
--	SEQLOAD(p, CONTEXT1, 0, ivsize, 0);
--	MOVE(p, CONTEXT1, 0, IFIFOAB2, 0, ivsize, IMMED);
--}
--
--/*
-- * For ablkcipher encrypt and decrypt, read from req->src and
-- * write to req->dst
-- */
--static inline void ablkcipher_append_src_dst(struct program *p)
--{
--	MATHB(p, SEQINSZ, ADD, MATH0, VSEQOUTSZ, 4, 0);
--	MATHB(p, SEQINSZ, ADD, MATH0, VSEQINSZ, 4, 0);
--	SEQFIFOLOAD(p, MSG1, 0, VLF | LAST1);
--	SEQFIFOSTORE(p, MSG, 0, 0, VLF);
--}
--
- /*
-  * If all data, including src (with assoc and iv) or dst (with iv only) are
-  * contiguous
-@@ -173,39 +122,6 @@ struct caam_ctx {
- 	unsigned int authsize;
- };
+ include Documentation/DocBook/media/Makefile
  
--static void append_key_aead(struct program *p, struct caam_ctx *ctx,
--			    int keys_fit_inline)
--{
--	if (keys_fit_inline) {
--		KEY(p, MDHA_SPLIT_KEY, ENC, (uintptr_t)ctx->key,
--		    ctx->split_key_len, IMMED | COPY);
--		KEY(p, KEY1, 0, (uintptr_t)(ctx->key + ctx->split_key_pad_len),
--		    ctx->enckeylen, IMMED | COPY);
--	} else {
--		KEY(p, MDHA_SPLIT_KEY, ENC, ctx->key_dma, ctx->split_key_len,
--		    0);
--		KEY(p, KEY1, 0, ctx->key_dma + ctx->split_key_pad_len,
--		    ctx->enckeylen, 0);
--	}
--}
--
--static void init_sh_desc_key_aead(struct program *p, struct caam_ctx *ctx,
--				  int keys_fit_inline)
--{
--	LABEL(key_jump_cmd);
--	REFERENCE(pkey_jump_cmd);
--
--	SHR_HDR(p, SHR_SERIAL, 1, 0);
--
--	/* Skip if already shared */
--	pkey_jump_cmd = JUMP(p, key_jump_cmd, LOCAL_JUMP, ALL_TRUE, SHRD);
--
--	append_key_aead(p, ctx, keys_fit_inline);
--
--	SET_LABEL(p, key_jump_cmd);
--	PATCH_JUMP(p, pkey_jump_cmd, key_jump_cmd);
--}
--
- static int aead_null_set_sh_desc(struct crypto_aead *aead)
- {
- 	struct aead_tfm *tfm = &aead->base.crt_aead;
-@@ -419,6 +335,12 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	struct program prg;
- 	struct program *p = &prg;
- 	unsigned desc_bytes;
-+	LABEL(skip_key_load);
-+	REFERENCE(pskip_key_load);
-+	LABEL(set_dk);
-+	REFERENCE(pset_dk);
-+	LABEL(skip_dk);
-+	REFERENCE(pskip_dk);
+@@ -53,6 +53,7 @@ htmldocs: $(HTML)
+ 	$(call build_main_index)
+ 	$(call build_images)
+ 	$(call install_media_images)
++	$(call install_rta_images)
  
- 	if (!ctx->authsize)
- 		return 0;
-@@ -442,7 +364,24 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	if (ps)
- 		PROGRAM_SET_36BIT_ADDR(p);
- 
--	init_sh_desc_key_aead(p, ctx, keys_fit_inline);
-+	SHR_HDR(p, SHR_SERIAL, 1, 0);
+ MAN := $(patsubst %.xml, %.9, $(BOOKS))
+ mandocs: $(MAN)
+diff --git a/Documentation/DocBook/rta-api.tmpl b/Documentation/DocBook/rta-api.tmpl
+new file mode 100644
+index 000000000000..90c5c5a8d9a7
+--- /dev/null
++++ b/Documentation/DocBook/rta-api.tmpl
+@@ -0,0 +1,261 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
++        "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" []>
 +
-+	/* Skip key loading if already shared */
-+	pskip_key_load = JUMP(p, skip_key_load, LOCAL_JUMP, ALL_TRUE, SHRD);
++<book id="RTAapi">
++ <bookinfo>
++  <title>Writing descriptors for Freescale CAAM using RTA library</title>
++  <authorgroup>
++   <author>
++    <firstname>Horia</firstname>
++    <surname>Geanta</surname>
++    <affiliation>
++     <address><email>horia.geanta@freescale.com</email></address>
++    </affiliation>
++   </author>
++  </authorgroup>
 +
-+	if (keys_fit_inline) {
-+		KEY(p, MDHA_SPLIT_KEY, ENC, (uintptr_t)ctx->key,
-+		    ctx->split_key_len, IMMED | COPY);
-+		KEY(p, KEY1, 0, (uintptr_t)(ctx->key + ctx->split_key_pad_len),
-+		    ctx->enckeylen, IMMED | COPY);
-+	} else {
-+		KEY(p, MDHA_SPLIT_KEY, ENC, ctx->key_dma, ctx->split_key_len,
-+		    0);
-+		KEY(p, KEY1, 0, ctx->key_dma + ctx->split_key_pad_len,
-+		    ctx->enckeylen, 0);
-+	}
++  <copyright>
++   <year>2008-2014</year>
++   <holder>Freescale Semiconductor</holder>
++  </copyright>
 +
-+	SET_LABEL(p, skip_key_load);
- 
- 	/* Class 2 operation */
- 	ALG_OPERATION(p, ctx->class2_alg_type & OP_ALG_ALGSEL_MASK,
-@@ -460,7 +399,10 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 
- 	/* read assoc before reading payload */
- 	SEQFIFOLOAD(p, MSG2, 0 , VLF);
--	aead_append_ld_iv(p, tfm->ivsize);
++  <legalnotice>
++   <para>
++     This documentation is free software; you can redistribute
++     it and/or modify it under the terms of the GNU General Public
++     License as published by the Free Software Foundation; either
++     version 2 of the License, or (at your option) any later
++     version.
++   </para>
 +
-+	/* read iv for both classes */
-+	SEQLOAD(p, CONTEXT1, 0, tfm->ivsize, 0);
-+	MOVE(p, CONTEXT1, 0, IFIFOAB2, 0, tfm->ivsize, IMMED);
- 
- 	/* Class 1 operation */
- 	ALG_OPERATION(p, ctx->class1_alg_type & OP_ALG_ALGSEL_MASK,
-@@ -478,6 +420,8 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	/* Write ICV */
- 	SEQSTORE(p, CONTEXT2, 0, ctx->authsize, 0);
- 
-+	PATCH_JUMP(p, pskip_key_load, skip_key_load);
++   <para>
++     This program is distributed in the hope that it will be
++     useful, but WITHOUT ANY WARRANTY; without even the implied
++     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
++     See the GNU General Public License for more details.
++   </para>
 +
- 	PROGRAM_FINALIZE(p);
- 
- 	desc_bytes = DESC_BYTES(desc);
-@@ -508,7 +452,25 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	if (ps)
- 		PROGRAM_SET_36BIT_ADDR(p);
- 
--	init_sh_desc_key_aead(p, ctx, keys_fit_inline);
-+	/* aead_decrypt shared descriptor */
-+	SHR_HDR(p, SHR_SERIAL, 1, 0);
++   <para>
++     For more details see the file COPYING in the source
++     distribution of Linux.
++   </para>
++  </legalnotice>
++ </bookinfo>
 +
-+	/* Skip key loading if already shared */
-+	pskip_key_load = JUMP(p, skip_key_load, LOCAL_JUMP, ALL_TRUE, SHRD);
++<toc></toc>
 +
-+	if (keys_fit_inline) {
-+		KEY(p, MDHA_SPLIT_KEY, ENC, (uintptr_t)ctx->key,
-+		    ctx->split_key_len, IMMED | COPY);
-+		KEY(p, KEY1, 0, (uintptr_t)(ctx->key + ctx->split_key_pad_len),
-+		    ctx->enckeylen, IMMED | COPY);
-+	} else {
-+		KEY(p, MDHA_SPLIT_KEY, ENC, ctx->key_dma, ctx->split_key_len,
-+		    0);
-+		KEY(p, KEY1, 0, ctx->key_dma + ctx->split_key_pad_len,
-+		    ctx->enckeylen, 0);
-+	}
++  <chapter id="intro">
++    <title>Introduction</title>
++    <sect1>
++      <title>About</title>
++!Pdrivers/crypto/caam/flib/rta.h About
++!Pdrivers/crypto/caam/flib/rta.h Usage
++      <mediaobject>
++        <imageobject>
++          <imagedata fileref="rta_arch.svg" format="SVG" align="CENTER"/>
++        </imageobject>
++        <caption><para>RTA Integration Overview</para></caption>
++      </mediaobject>
++    </sect1>
++    <sect1>
++      <title>Using RTA</title>
++      <para>
++        RTA can be used in an application just by including the following header file:
++	#include flib/rta.h
++      </para>
++      <para>
++        The files in drivers/crypto/caam/desc directory contain several
++	real-world descriptors written with RTA. You can use them as-is or adapt
++	them to your needs.
++      </para>
++      <para>
++        RTA routines take as first parameter a pointer to a "struct program"
++        variable. It contains several housekeeping information that are used
++        during descriptor creation.
++      </para>
++      <para>
++        RTA creates the descriptors and saves them in buffers. It is the user's
++	job to allocate memory for these buffers before passing them to RTA
++	program initialization call.
++      </para>
++      <para>
++        A RTA program must start with a call to PROGRAM_CNTXT_INIT and end with
++	PROGRAM_FINALIZE. PROGRAM_CNTXT_INIT will initialze the members of
++	'program' structure with user information (pointer to user's buffer, and
++	the SEC subversion). The PROGRAM_FINALIZE call checks the descriptor's
++	validity.
++      </para>
++      <para>
++        The program length is limited to the size of buffer descriptor which
++	can be maximum 64 words (256 bytes). However, a JUMP command can cause
++	loading and execution of another Job Descriptor; this allows for much
++	larger programs to be created.
++      </para>
++    </sect1>
++    <sect1>
++      <title>RTA components</title>
++      <para>
++        The content of the package is split mainly in two components:
++	<itemizedlist mark='opencircle'>
++	  <listitem>
++	    <para>descriptor builder API (drivers/crypto/caam/flib/rta.h)</para>
++	  </listitem>
++	  <listitem>
++	    <para>
++	      ready to use RTA descriptors
++	      (drivers/crypto/caam/flib/desc/*.h)
++	    </para>
++	  </listitem>
++	</itemizedlist>
++      </para>
++      <para>
++        These are the main building blocks of descriptors:
++	<itemizedlist mark='opencircle'>
++	  <listitem>
++	    <para>buffer management: init &amp; finalize</para>
++	  </listitem>
++	  <listitem>
++	    <para>SEC commands: MOVE, LOAD, FIFO_LOAD etc.</para>
++	  </listitem>
++	  <listitem>
++	    <para>descriptor labels (e.g. used as JUMP destinations)</para>
++	  </listitem>
++	  <listitem>
++	    <para>
++	      utility commands: (e.g. PATCH_* commands that update labels and
++	      references)
++	    </para>
++	  </listitem>
++	</itemizedlist>
++      </para>
++      <para>
++        In some cases, descriptor fields can't all be set when the commands are
++	inserted. These fields must be updated in a similar fashion to what the
++	linking process does with a binary file. RTA uses PATCH_* commands to
++	get relevant information and PROGRAM_FINALIZE to complete the
++	"code relocation".
++      </para>
++      <para>
++        If there is a need for descriptors larger than 64 words, their function
++	can be split into several smaller ones. In such case the smaller
++	descriptors are correlated and updated using PATCH_*_NON_LOCAL commands.
++	These calls must appear after all the descriptors are finalized and not
++	before as in a single descriptor case (the reason being that only then
++	references to all descriptors are available).
++      </para>
++    </sect1>
++  </chapter>
 +
-+	SET_LABEL(p, skip_key_load);
- 
- 	/* Class 2 operation */
- 	ALG_OPERATION(p, ctx->class2_alg_type & OP_ALG_ALGSEL_MASK,
-@@ -525,9 +487,28 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	/* read assoc before reading payload */
- 	SEQFIFOLOAD(p, MSG2, 0 , VLF);
- 
--	aead_append_ld_iv(p, tfm->ivsize);
--
--	append_dec_op1(p, ctx->class1_alg_type);
-+	/* read iv for both classes */
-+	SEQLOAD(p, CONTEXT1, 0, tfm->ivsize, 0);
-+	MOVE(p, CONTEXT1, 0, IFIFOAB2, 0, tfm->ivsize, IMMED);
++  <chapter id="apiref">
++    <title>RTA API reference</title>
++    <sect1>
++      <title>Descriptor Buffer Management Routines</title>
++!Pdrivers/crypto/caam/flib/rta.h Descriptor Buffer Management Routines
++!Fdrivers/crypto/caam/flib/rta/sec_run_time_asm.h rta_sec_era
++!Fdrivers/crypto/caam/flib/rta/sec_run_time_asm.h USER_SEC_ERA
++!Fdrivers/crypto/caam/flib/rta/sec_run_time_asm.h INTL_SEC_ERA
++!Fdrivers/crypto/caam/flib/rta.h PROGRAM_CNTXT_INIT
++!Fdrivers/crypto/caam/flib/rta.h PROGRAM_FINALIZE
++!Fdrivers/crypto/caam/flib/rta.h PROGRAM_SET_36BIT_ADDR
++!Fdrivers/crypto/caam/flib/rta.h PROGRAM_SET_BSWAP
++!Fdrivers/crypto/caam/flib/rta.h WORD
++!Fdrivers/crypto/caam/flib/rta.h DWORD
++!Fdrivers/crypto/caam/flib/rta.h COPY_DATA
++!Fdrivers/crypto/caam/flib/rta.h DESC_LEN
++!Fdrivers/crypto/caam/flib/rta.h DESC_BYTES
++!Fdrivers/crypto/caam/flib/rta/sec_run_time_asm.h program
++    </sect1>
++    <sect1>
++      <title>SEC Commands Routines</title>
++!Pdrivers/crypto/caam/flib/rta.h SEC Commands Routines
++!Fdrivers/crypto/caam/flib/rta/sec_run_time_asm.h rta_share_type
++!Fdrivers/crypto/caam/flib/rta.h SHR_HDR
++!Fdrivers/crypto/caam/flib/rta.h JOB_HDR
++!Fdrivers/crypto/caam/flib/rta.h JOB_HDR_EXT
++!Fdrivers/crypto/caam/flib/rta.h MOVE
++!Fdrivers/crypto/caam/flib/rta.h MOVEB
++!Fdrivers/crypto/caam/flib/rta.h MOVEDW
++!Fdrivers/crypto/caam/flib/rta.h FIFOLOAD
++!Fdrivers/crypto/caam/flib/rta.h SEQFIFOLOAD
++!Fdrivers/crypto/caam/flib/rta.h FIFOSTORE
++!Fdrivers/crypto/caam/flib/rta.h SEQFIFOSTORE
++!Fdrivers/crypto/caam/flib/rta.h KEY
++!Fdrivers/crypto/caam/flib/rta.h SEQINPTR
++!Fdrivers/crypto/caam/flib/rta.h SEQOUTPTR
++!Fdrivers/crypto/caam/flib/rta.h ALG_OPERATION
++!Fdrivers/crypto/caam/flib/rta.h PROTOCOL
++!Fdrivers/crypto/caam/flib/rta.h PKHA_OPERATION
++!Fdrivers/crypto/caam/flib/rta/sec_run_time_asm.h rta_jump_cond
++!Fdrivers/crypto/caam/flib/rta/sec_run_time_asm.h rta_jump_type
++!Fdrivers/crypto/caam/flib/rta.h JUMP
++!Fdrivers/crypto/caam/flib/rta.h JUMP_INC
++!Fdrivers/crypto/caam/flib/rta.h JUMP_DEC
++!Fdrivers/crypto/caam/flib/rta.h LOAD
++!Fdrivers/crypto/caam/flib/rta.h SEQLOAD
++!Fdrivers/crypto/caam/flib/rta.h STORE
++!Fdrivers/crypto/caam/flib/rta.h SEQSTORE
++!Fdrivers/crypto/caam/flib/rta.h MATHB
++!Fdrivers/crypto/caam/flib/rta.h MATHI
++!Fdrivers/crypto/caam/flib/rta.h MATHU
++!Fdrivers/crypto/caam/flib/rta.h SIGNATURE
++!Fdrivers/crypto/caam/flib/rta.h NFIFOADD
++    </sect1>
++    <sect1>
++      <title>Self Referential Code Management Routines</title>
++!Pdrivers/crypto/caam/flib/rta.h Self Referential Code Management Routines
++!Fdrivers/crypto/caam/flib/rta.h REFERENCE
++!Fdrivers/crypto/caam/flib/rta.h LABEL
++!Fdrivers/crypto/caam/flib/rta.h SET_LABEL
++!Fdrivers/crypto/caam/flib/rta.h PATCH_JUMP
++!Fdrivers/crypto/caam/flib/rta.h PATCH_JUMP_NON_LOCAL
++!Fdrivers/crypto/caam/flib/rta.h PATCH_MOVE
++!Fdrivers/crypto/caam/flib/rta.h PATCH_MOVE_NON_LOCAL
++!Fdrivers/crypto/caam/flib/rta.h PATCH_LOAD
++!Fdrivers/crypto/caam/flib/rta.h PATCH_STORE
++!Fdrivers/crypto/caam/flib/rta.h PATCH_STORE_NON_LOCAL
++!Fdrivers/crypto/caam/flib/rta.h PATCH_RAW
++!Fdrivers/crypto/caam/flib/rta.h PATCH_RAW_NON_LOCAL
++    </sect1>
++  </chapter>
 +
-+	/* Set DK bit in class 1 operation if shared (AES only) */
-+	if ((ctx->class1_alg_type & OP_ALG_ALGSEL_MASK) == OP_ALG_ALGSEL_AES) {
-+		pset_dk = JUMP(p, set_dk, LOCAL_JUMP, ALL_TRUE, SHRD);
-+		ALG_OPERATION(p, ctx->class1_alg_type & OP_ALG_ALGSEL_MASK,
-+			      ctx->class1_alg_type & OP_ALG_AAI_MASK,
-+			      OP_ALG_AS_INITFINAL, ICV_CHECK_DISABLE, DIR_DEC);
-+		pskip_dk = JUMP(p, skip_dk, LOCAL_JUMP, ALL_TRUE, 0);
-+		SET_LABEL(p, set_dk);
-+		ALG_OPERATION(p, ctx->class1_alg_type & OP_ALG_ALGSEL_MASK,
-+			      (ctx->class1_alg_type & OP_ALG_AAI_MASK) |
-+			       OP_ALG_AAI_DK, OP_ALG_AS_INITFINAL,
-+			      ICV_CHECK_DISABLE, DIR_DEC);
-+		SET_LABEL(p, skip_dk);
-+	} else {
-+		ALG_OPERATION(p, ctx->class1_alg_type & OP_ALG_ALGSEL_MASK,
-+			      ctx->class1_alg_type & OP_ALG_AAI_MASK,
-+			      OP_ALG_AS_INITFINAL, ICV_CHECK_DISABLE, DIR_DEC);
-+	}
- 
- 	/* Read and write cryptlen bytes */
- 	MATHB(p, ZERO, ADD, MATH2, VSEQINSZ, CAAM_CMD_SZ, 0);
-@@ -540,6 +521,10 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	/* Load ICV */
- 	SEQFIFOLOAD(p, ICV2, ctx->authsize, LAST2);
- 
-+	PATCH_JUMP(p, pskip_key_load, skip_key_load);
-+	PATCH_JUMP(p, pset_dk, set_dk);
-+	PATCH_JUMP(p, pskip_dk, skip_dk);
++  <chapter id="descapi">
++    <title>RTA descriptors library</title>
++    <sect1>
++      <title>Shared Descriptor Example Routines</title>
++        <sect2>
++          <title>Algorithms - Shared Descriptor Constructors</title>
++!Pdrivers/crypto/caam/flib/desc/algo.h Algorithms - Shared Descriptor Constructors
++!Fdrivers/crypto/caam/flib/desc/algo.h cnstr_shdsc_cbc_blkcipher
++        </sect2>
++        <sect2>
++          <title>IPsec Shared Descriptor Constructors</title>
++!Pdrivers/crypto/caam/flib/desc/ipsec.h IPsec Shared Descriptor Constructors
++!Fdrivers/crypto/caam/flib/desc/ipsec.h cnstr_shdsc_aead_encap
++!Fdrivers/crypto/caam/flib/desc/ipsec.h cnstr_shdsc_aead_givencap
++!Fdrivers/crypto/caam/flib/desc/ipsec.h cnstr_shdsc_aead_decap
++!Fdrivers/crypto/caam/flib/desc/ipsec.h cnstr_shdsc_aead_null_encap
++!Fdrivers/crypto/caam/flib/desc/ipsec.h cnstr_shdsc_aead_null_decap
++        </sect2>
++    </sect1>
++    <sect1>
++      <title>Job Descriptor Example Routines</title>
++!Pdrivers/crypto/caam/flib/desc/jobdesc.h Job Descriptor Constructors
++!Fdrivers/crypto/caam/flib/desc/jobdesc.h cnstr_jobdesc_mdsplitkey
++    </sect1>
++    <sect1>
++      <title>Auxiliary Data Structures</title>
++!Pdrivers/crypto/caam/flib/desc/common.h Shared Descriptor Constructors - shared structures
++!Fdrivers/crypto/caam/flib/desc/common.h alginfo
++!Fdrivers/crypto/caam/flib/desc/common.h protcmd
++    </sect1>
++    <sect1>
++      <title>Auxiliary Defines</title>
++!Fdrivers/crypto/caam/flib/desc/ipsec.h DESC_AEAD_ENC_LEN
++!Fdrivers/crypto/caam/flib/desc/ipsec.h DESC_AEAD_GIVENC_LEN
++!Fdrivers/crypto/caam/flib/desc/ipsec.h DESC_AEAD_DEC_LEN
++!Fdrivers/crypto/caam/flib/desc/ipsec.h DESC_AEAD_NULL_ENC_LEN
++!Fdrivers/crypto/caam/flib/desc/ipsec.h DESC_AEAD_NULL_DEC_LEN
++    </sect1>
++  </chapter>
++</book>
+diff --git a/Documentation/DocBook/rta/.gitignore b/Documentation/DocBook/rta/.gitignore
+new file mode 100644
+index 000000000000..e461c585fde8
+--- /dev/null
++++ b/Documentation/DocBook/rta/.gitignore
+@@ -0,0 +1 @@
++!*.svg
+diff --git a/Documentation/DocBook/rta/Makefile b/Documentation/DocBook/rta/Makefile
+new file mode 100644
+index 000000000000..58981e3ae3ef
+--- /dev/null
++++ b/Documentation/DocBook/rta/Makefile
+@@ -0,0 +1,5 @@
++RTA_OBJ_DIR=$(objtree)/Documentation/DocBook/
++RTA_SRC_DIR=$(srctree)/Documentation/DocBook/rta
 +
- 	PROGRAM_FINALIZE(p);
- 
- 	desc_bytes = DESC_BYTES(desc);
-@@ -570,7 +555,25 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	if (ps)
- 		PROGRAM_SET_36BIT_ADDR(p);
- 
--	init_sh_desc_key_aead(p, ctx, keys_fit_inline);
-+	SHR_HDR(p, SHR_SERIAL, 1, 0);
++install_rta_images = \
++        $(Q)cp $(RTA_SRC_DIR)/*.svg $(RTA_OBJ_DIR)/rta_api
+diff --git a/Documentation/DocBook/rta/rta_arch.svg b/Documentation/DocBook/rta/rta_arch.svg
+new file mode 100644
+index 000000000000..d816eed04852
+--- /dev/null
++++ b/Documentation/DocBook/rta/rta_arch.svg
+@@ -0,0 +1,381 @@
++<?xml version="1.0" encoding="UTF-8" standalone="no"?>
++<!-- Created with Inkscape (http://www.inkscape.org/) -->
 +
-+	/* Skip key loading if already shared */
-+	pskip_key_load = JUMP(p, skip_key_load, LOCAL_JUMP, ALL_TRUE, SHRD);
-+
-+	if (keys_fit_inline) {
-+		KEY(p, MDHA_SPLIT_KEY, ENC, (uintptr_t)ctx->key,
-+		    ctx->split_key_len, IMMED | COPY);
-+		KEY(p, KEY1, 0,
-+		    (uintptr_t)(ctx->key + ctx->split_key_pad_len),
-+		    ctx->enckeylen, IMMED | COPY);
-+	} else {
-+		KEY(p, MDHA_SPLIT_KEY, ENC, ctx->key_dma, ctx->split_key_len,
-+		    0);
-+		KEY(p, KEY1, 0, ctx->key_dma + ctx->split_key_pad_len,
-+		    ctx->enckeylen, 0);
-+	}
-+
-+	SET_LABEL(p, skip_key_load);
- 
- 	/* Generate IV */
- 	geniv = NFIFOENTRY_STYPE_PAD | NFIFOENTRY_DEST_DECO |
-@@ -625,6 +628,8 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	/* Write ICV */
- 	SEQSTORE(p, CONTEXT2, 0, ctx->authsize, 0);
- 
-+	PATCH_JUMP(p, pskip_key_load, skip_key_load);
-+
- 	PROGRAM_FINALIZE(p);
- 
- 	desc_bytes = DESC_BYTES(desc);
-@@ -735,8 +740,12 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 	struct program prg;
- 	struct program *p = &prg;
- 	unsigned desc_bytes;
--	LABEL(key_jump_cmd);
--	REFERENCE(pkey_jump_cmd);
-+	LABEL(skip_key_load);
-+	REFERENCE(pskip_key_load);
-+	LABEL(set_dk);
-+	REFERENCE(pset_dk);
-+	LABEL(skip_dk);
-+	REFERENCE(pskip_dk);
- 
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "key in @"__stringify(__LINE__)": ",
-@@ -759,13 +768,14 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 		PROGRAM_SET_36BIT_ADDR(p);
- 
- 	SHR_HDR(p, SHR_SERIAL, 1, 0);
--	/* Skip if already shared */
--	pkey_jump_cmd = JUMP(p, key_jump_cmd, LOCAL_JUMP, ALL_TRUE, SHRD);
-+
-+	/* Skip key loading if already shared */
-+	pskip_key_load = JUMP(p, skip_key_load, LOCAL_JUMP, ALL_TRUE, SHRD);
- 
- 	/* Load class1 key only */
- 	KEY(p, KEY1, 0, (uintptr_t)ctx->key, ctx->enckeylen, IMMED | COPY);
- 
--	SET_LABEL(p, key_jump_cmd);
-+	SET_LABEL(p, skip_key_load);
- 
- 	/* Load IV */
- 	SEQLOAD(p, CONTEXT1, 0, tfm->ivsize, 0);
-@@ -776,9 +786,12 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 		      OP_ALG_AS_INITFINAL, ICV_CHECK_DISABLE, DIR_ENC);
- 
- 	/* Perform operation */
--	ablkcipher_append_src_dst(p);
-+	MATHB(p, SEQINSZ, ADD, MATH0, VSEQOUTSZ, 4, 0);
-+	MATHB(p, SEQINSZ, ADD, MATH0, VSEQINSZ, 4, 0);
-+	SEQFIFOLOAD(p, MSG1, 0, VLF | LAST1);
-+	SEQFIFOSTORE(p, MSG, 0, 0, VLF);
- 
--	PATCH_JUMP(p, pkey_jump_cmd, key_jump_cmd);
-+	PATCH_JUMP(p, pskip_key_load, skip_key_load);
- 
- 	PROGRAM_FINALIZE(p);
- 
-@@ -803,24 +816,45 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 
- 	SHR_HDR(p, SHR_SERIAL, 1, 0);
- 
--	/* Skip if already shared */
--	pkey_jump_cmd = JUMP(p, key_jump_cmd, LOCAL_JUMP, ALL_TRUE, SHRD);
-+	/* Skip key loading if already shared */
-+	pskip_key_load = JUMP(p, skip_key_load, LOCAL_JUMP, ALL_TRUE, SHRD);
- 
- 	/* Load class1 key only */
- 	KEY(p, KEY1, 0, (uintptr_t)ctx->key, ctx->enckeylen, IMMED | COPY);
- 
--	SET_LABEL(p, key_jump_cmd);
-+	SET_LABEL(p, skip_key_load);
- 
- 	/* load IV */
- 	SEQLOAD(p, CONTEXT1, 0, tfm->ivsize, 0);
- 
--	/* Choose operation */
--	append_dec_op1(p, ctx->class1_alg_type);
-+	/* Set DK bit in class 1 operation if shared (AES only) */
-+	if ((ctx->class1_alg_type & OP_ALG_ALGSEL_MASK) == OP_ALG_ALGSEL_AES) {
-+		pset_dk = JUMP(p, set_dk, LOCAL_JUMP, ALL_TRUE, SHRD);
-+		ALG_OPERATION(p, ctx->class1_alg_type & OP_ALG_ALGSEL_MASK,
-+			      ctx->class1_alg_type & OP_ALG_AAI_MASK,
-+			      OP_ALG_AS_INITFINAL, ICV_CHECK_DISABLE, DIR_DEC);
-+		pskip_dk = JUMP(p, skip_dk, LOCAL_JUMP, ALL_TRUE, 0);
-+		SET_LABEL(p, set_dk);
-+		ALG_OPERATION(p, ctx->class1_alg_type & OP_ALG_ALGSEL_MASK,
-+			      (ctx->class1_alg_type & OP_ALG_AAI_MASK) |
-+			       OP_ALG_AAI_DK, OP_ALG_AS_INITFINAL,
-+			      ICV_CHECK_DISABLE, DIR_DEC);
-+		SET_LABEL(p, skip_dk);
-+	} else {
-+		ALG_OPERATION(p, ctx->class1_alg_type & OP_ALG_ALGSEL_MASK,
-+			      ctx->class1_alg_type & OP_ALG_AAI_MASK,
-+			      OP_ALG_AS_INITFINAL, ICV_CHECK_DISABLE, DIR_DEC);
-+	}
- 
- 	/* Perform operation */
--	ablkcipher_append_src_dst(p);
-+	MATHB(p, SEQINSZ, ADD, MATH0, VSEQOUTSZ, 4, 0);
-+	MATHB(p, SEQINSZ, ADD, MATH0, VSEQINSZ, 4, 0);
-+	SEQFIFOLOAD(p, MSG1, 0, VLF | LAST1);
-+	SEQFIFOSTORE(p, MSG, 0, 0, VLF);
- 
--	PATCH_JUMP(p, pkey_jump_cmd, key_jump_cmd);
-+	PATCH_JUMP(p, pskip_key_load, skip_key_load);
-+	PATCH_JUMP(p, pset_dk, set_dk);
-+	PATCH_JUMP(p, pskip_dk, skip_dk);
- 
- 	PROGRAM_FINALIZE(p);
- 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 529e3ca92406..0e5d7ef33ff8 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -137,36 +137,6 @@ struct caam_hash_state {
- 
- /* Common job descriptor seq in/out ptr routines */
- 
--/* Map state->caam_ctx, and append seq_out_ptr command that points to it */
--static inline int map_seq_out_ptr_ctx(struct program *p, struct device *jrdev,
--				      struct caam_hash_state *state,
--				      int ctx_len)
--{
--	state->ctx_dma = dma_map_single(jrdev, state->caam_ctx,
--					ctx_len, DMA_FROM_DEVICE);
--	if (dma_mapping_error(jrdev, state->ctx_dma)) {
--		dev_err(jrdev, "unable to map ctx\n");
--		return -ENOMEM;
--	}
--
--	SEQOUTPTR(p, state->ctx_dma, ctx_len, EXT);
--
--	return 0;
--}
--
--/* Map req->result, and append seq_out_ptr command that points to it */
--static inline dma_addr_t map_seq_out_ptr_result(struct program *p,
--						struct device *jrdev,
--						u8 *result, int digestsize)
--{
--	dma_addr_t dst_dma;
--
--	dst_dma = dma_map_single(jrdev, result, digestsize, DMA_FROM_DEVICE);
--	SEQOUTPTR(p, dst_dma, digestsize, EXT);
--
--	return dst_dma;
--}
--
- /* Map current buffer in state and put it in link table */
- static inline dma_addr_t buf_map_to_sec4_sg(struct device *jrdev,
- 					    struct sec4_sg_entry *sec4_sg,
-@@ -225,64 +195,46 @@ static inline int ctx_map_to_sec4_sg(u32 *desc, struct device *jrdev,
- 	return 0;
- }
- 
--/* Common shared descriptor commands */
--static inline void append_key_ahash(struct program *p,
--				    struct caam_hash_ctx *ctx)
-+/*
-+ * For ahash update, final and finup (import_ctx = true)
-+ *     import context, read and write to seqout
-+ * For ahash firsts and digest (import_ctx = false)
-+ *     read and write to seqout
-+ */
-+static inline void ahash_gen_sh_desc(u32 *desc, u32 state, int digestsize,
-+				     struct caam_hash_ctx *ctx, bool import_ctx)
- {
--	KEY(p, MDHA_SPLIT_KEY, ENC, (uintptr_t)ctx->key,
--	    ctx->split_key_len, IMMED | COPY);
--}
-+	u32 op = ctx->alg_type;
-+	struct program prg;
-+	struct program *p = &prg;
-+	LABEL(skip_key_load);
-+	REFERENCE(pskip_key_load);
- 
--/* Append key if it has been set */
--static inline void init_sh_desc_key_ahash(struct program *p,
--					  struct caam_hash_ctx *ctx)
--{
--	LABEL(key_jump_cmd);
--	REFERENCE(pkey_jump_cmd);
-+	PROGRAM_CNTXT_INIT(p, desc, 0);
-+	if (ps)
-+		PROGRAM_SET_36BIT_ADDR(p);
- 
- 	SHR_HDR(p, SHR_SERIAL, 1, 0);
- 
--	if (ctx->split_key_len) {
--		/* Skip if already shared */
--		pkey_jump_cmd = JUMP(p, key_jump_cmd, LOCAL_JUMP, ALL_TRUE,
--				     SHRD);
-+	/* Append key if it has been set; ahash update excluded */
-+	if ((state != OP_ALG_AS_UPDATE) && (ctx->split_key_len)) {
-+		/* Skip key loading if already shared */
-+		pskip_key_load = JUMP(p, skip_key_load, LOCAL_JUMP, ALL_TRUE,
-+				      SHRD);
- 
--		append_key_ahash(p, ctx);
-+		KEY(p, MDHA_SPLIT_KEY, ENC, (uintptr_t)ctx->key,
-+		    ctx->split_key_len, IMMED | COPY);
- 
--		SET_LABEL(p, key_jump_cmd);
-+		SET_LABEL(p, skip_key_load);
- 
--		PATCH_JUMP(p, pkey_jump_cmd, key_jump_cmd);
--	}
--}
-+		PATCH_JUMP(p, pskip_key_load, skip_key_load);
- 
--/*
-- * For ahash read data from seqin following state->caam_ctx,
-- * and write resulting class2 context to seqout, which may be state->caam_ctx
-- * or req->result
-- */
--static inline void ahash_append_load_str(struct program *p, int digestsize)
--{
--	/* Calculate remaining bytes to read */
--	MATHB(p, SEQINSZ, ADD, MATH0, VSEQINSZ, CAAM_CMD_SZ, 0);
--
--	/* Read remaining bytes */
--	SEQFIFOLOAD(p, MSG2, 0, VLF | LAST2);
--
--	/* Store class2 context bytes */
--	SEQSTORE(p, CONTEXT2, 0, digestsize, 0);
--}
--
--/*
-- * For ahash update, final and finup, import context, read and write to seqout
-- */
--static inline void ahash_ctx_data_to_out(struct program *p, u32 op, u32 state,
--					 int digestsize,
--					 struct caam_hash_ctx *ctx)
--{
--	init_sh_desc_key_ahash(p, ctx);
-+		op |= OP_ALG_AAI_HMAC_PRECOMP;
-+	}
- 
--	/* Import context from software */
--	SEQLOAD(p, CONTEXT2, 0, ctx->ctx_len, 0);
-+	/* If needed, import context from software */
-+	if (import_ctx)
-+		SEQLOAD(p, CONTEXT2, 0, ctx->ctx_len, 0);
- 
- 	/* Class 2 operation */
- 	ALG_OPERATION(p, op & OP_ALG_ALGSEL_MASK, op & OP_ALG_AAI_MASK, state,
-@@ -290,24 +242,15 @@ static inline void ahash_ctx_data_to_out(struct program *p, u32 op, u32 state,
- 
- 	/*
- 	 * Load from buf and/or src and write to req->result or state->context
-+	 * Calculate remaining bytes to read
- 	 */
--	ahash_append_load_str(p, digestsize);
--}
--
--/* For ahash firsts and digest, read and write to seqout */
--static inline void ahash_data_to_out(struct program *p, u32 op, u32 state,
--				     int digestsize, struct caam_hash_ctx *ctx)
--{
--	init_sh_desc_key_ahash(p, ctx);
--
--	/* Class 2 operation */
--	ALG_OPERATION(p, op & OP_ALG_ALGSEL_MASK, op & OP_ALG_AAI_MASK, state,
--		      ICV_CHECK_DISABLE, DIR_ENC);
-+	MATHB(p, SEQINSZ, ADD, MATH0, VSEQINSZ, CAAM_CMD_SZ, 0);
-+	/* Read remaining bytes */
-+	SEQFIFOLOAD(p, MSG2, 0, VLF | LAST2);
-+	/* Store class2 context bytes */
-+	SEQSTORE(p, CONTEXT2, 0, digestsize, 0);
- 
--	/*
--	 * Load from buf and/or src and write to req->result or state->context
--	 */
--	ahash_append_load_str(p, digestsize);
-+	PROGRAM_FINALIZE(p);
- }
- 
- static int ahash_set_sh_desc(struct crypto_ahash *ahash)
-@@ -315,35 +258,11 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	int digestsize = crypto_ahash_digestsize(ahash);
- 	struct device *jrdev = ctx->jrdev;
--	u32 have_key = 0;
- 	u32 *desc;
--	struct program prg;
--	struct program *p = &prg;
--
--	if (ctx->split_key_len)
--		have_key = OP_ALG_AAI_HMAC_PRECOMP;
- 
- 	/* ahash_update shared descriptor */
- 	desc = ctx->sh_desc_update;
--	PROGRAM_CNTXT_INIT(p, desc, 0);
--	if (ps)
--		PROGRAM_SET_36BIT_ADDR(p);
--
--	SHR_HDR(p, SHR_SERIAL, 1, 0);
--
--	/* Import context from software */
--	SEQLOAD(p, CONTEXT2, 0, ctx->ctx_len, 0);
--
--	/* Class 2 operation */
--	ALG_OPERATION(p, ctx->alg_type & OP_ALG_ALGSEL_MASK,
--		      ctx->alg_type & OP_ALG_AAI_MASK, OP_ALG_AS_UPDATE,
--		      ICV_CHECK_DISABLE, DIR_ENC);
--
--	/* Load data and write to result or context */
--	ahash_append_load_str(p, ctx->ctx_len);
--
--	PROGRAM_FINALIZE(p);
--
-+	ahash_gen_sh_desc(desc, OP_ALG_AS_UPDATE, ctx->ctx_len, ctx, true);
- 	ctx->sh_desc_update_dma = dma_map_single(jrdev, desc, DESC_BYTES(desc),
- 						 DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, ctx->sh_desc_update_dma)) {
-@@ -358,15 +277,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- 
- 	/* ahash_update_first shared descriptor */
- 	desc = ctx->sh_desc_update_first;
--	PROGRAM_CNTXT_INIT(p, desc, 0);
--	if (ps)
--		PROGRAM_SET_36BIT_ADDR(p);
--
--	ahash_data_to_out(p, have_key | ctx->alg_type, OP_ALG_AS_INIT,
--			  ctx->ctx_len, ctx);
--
--	PROGRAM_FINALIZE(p);
--
-+	ahash_gen_sh_desc(desc,  OP_ALG_AS_INIT, ctx->ctx_len, ctx, false);
- 	ctx->sh_desc_update_first_dma = dma_map_single(jrdev, desc,
- 						       DESC_BYTES(desc),
- 						       DMA_TO_DEVICE);
-@@ -382,15 +293,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- 
- 	/* ahash_final shared descriptor */
- 	desc = ctx->sh_desc_fin;
--	PROGRAM_CNTXT_INIT(p, desc, 0);
--	if (ps)
--		PROGRAM_SET_36BIT_ADDR(p);
--
--	ahash_ctx_data_to_out(p, have_key | ctx->alg_type, OP_ALG_AS_FINALIZE,
--			      digestsize, ctx);
--
--	PROGRAM_FINALIZE(p);
--
-+	ahash_gen_sh_desc(desc, OP_ALG_AS_FINALIZE, digestsize, ctx, true);
- 	ctx->sh_desc_fin_dma = dma_map_single(jrdev, desc, DESC_BYTES(desc),
- 					      DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, ctx->sh_desc_fin_dma)) {
-@@ -404,15 +307,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- 
- 	/* ahash_finup shared descriptor */
- 	desc = ctx->sh_desc_finup;
--	PROGRAM_CNTXT_INIT(p, desc, 0);
--	if (ps)
--		PROGRAM_SET_36BIT_ADDR(p);
--
--	ahash_ctx_data_to_out(p, have_key | ctx->alg_type, OP_ALG_AS_FINALIZE,
--			      digestsize, ctx);
--
--	PROGRAM_FINALIZE(p);
--
-+	ahash_gen_sh_desc(desc, OP_ALG_AS_FINALIZE, digestsize, ctx, true);
- 	ctx->sh_desc_finup_dma = dma_map_single(jrdev, desc, DESC_BYTES(desc),
- 						DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, ctx->sh_desc_finup_dma)) {
-@@ -426,15 +321,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
- 
- 	/* ahash_digest shared descriptor */
- 	desc = ctx->sh_desc_digest;
--	PROGRAM_CNTXT_INIT(p, desc, 0);
--	if (ps)
--		PROGRAM_SET_36BIT_ADDR(p);
--
--	ahash_data_to_out(p, have_key | ctx->alg_type, OP_ALG_AS_INITFINAL,
--			  digestsize, ctx);
--
--	PROGRAM_FINALIZE(p);
--
-+	ahash_gen_sh_desc(desc, OP_ALG_AS_INITFINAL, digestsize, ctx, false);
- 	ctx->sh_desc_digest_dma = dma_map_single(jrdev, desc, DESC_BYTES(desc),
- 						 DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, ctx->sh_desc_digest_dma)) {
-@@ -891,7 +778,6 @@ static int ahash_update_ctx(struct ahash_request *req)
- 		SEQINPTR(p, edesc->sec4_sg_dma, ctx->ctx_len + to_hash,
- 			 SGF | EXT);
- 		SEQOUTPTR(p, state->ctx_dma, ctx->ctx_len, EXT);
--
- 		PROGRAM_FINALIZE(p);
- 
- #ifdef DEBUG
-@@ -956,17 +842,17 @@ static int ahash_final_ctx(struct ahash_request *req)
- 		return -ENOMEM;
- 	}
- 
--	sh_len = DESC_LEN(sh_desc);
- 	desc = edesc->hw_desc;
--	PROGRAM_CNTXT_INIT(p, desc, sh_len);
--	if (ps)
--		PROGRAM_SET_36BIT_ADDR(p);
--
--	JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
--
- 	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 			 DESC_JOB_IO_LEN;
-+	edesc->dst_dma = dma_map_single(jrdev, req->result, digestsize,
-+					DMA_FROM_DEVICE);
-+	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
-+		dev_err(jrdev, "unable to map dst\n");
-+		return -ENOMEM;
-+	}
-+
- 	edesc->src_nents = 0;
- 
- 	ret = ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
-@@ -979,6 +865,12 @@ static int ahash_final_ctx(struct ahash_request *req)
- 						last_buflen);
- 	(edesc->sec4_sg + sec4_sg_bytes - 1)->len |= SEC4_SG_LEN_FIN;
- 
-+	sh_len = DESC_LEN(sh_desc);
-+	PROGRAM_CNTXT_INIT(p, desc, sh_len);
-+	if (ps)
-+		PROGRAM_SET_36BIT_ADDR(p);
-+	JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
-+
- 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
-@@ -987,14 +879,7 @@ static int ahash_final_ctx(struct ahash_request *req)
- 	}
- 
- 	SEQINPTR(p, edesc->sec4_sg_dma, ctx->ctx_len + buflen, SGF | EXT);
--
--	edesc->dst_dma = map_seq_out_ptr_result(p, jrdev, req->result,
--						digestsize);
--	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
--		dev_err(jrdev, "unable to map dst\n");
--		return -ENOMEM;
--	}
--
-+	SEQOUTPTR(p, edesc->dst_dma, digestsize, EXT);
- 	PROGRAM_FINALIZE(p);
- 
- #ifdef DEBUG
-@@ -1050,19 +935,18 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 		return -ENOMEM;
- 	}
- 
--	sh_len = DESC_LEN(sh_desc);
- 	desc = edesc->hw_desc;
--	PROGRAM_CNTXT_INIT(p, desc, sh_len);
--	if (ps)
--		PROGRAM_SET_36BIT_ADDR(p);
--
--	JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
--
- 	edesc->src_nents = src_nents;
- 	edesc->chained = chained;
- 	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 			 DESC_JOB_IO_LEN;
-+	edesc->dst_dma = dma_map_single(jrdev, req->result, digestsize,
-+					DMA_FROM_DEVICE);
-+	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
-+		dev_err(jrdev, "unable to map dst\n");
-+		return -ENOMEM;
-+	}
- 
- 	ret = ctx_map_to_sec4_sg(desc, jrdev, state, ctx->ctx_len,
- 				 edesc->sec4_sg, DMA_TO_DEVICE);
-@@ -1076,6 +960,12 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	src_map_to_sec4_sg(jrdev, req->src, src_nents, edesc->sec4_sg +
- 			   sec4_sg_src_index, chained);
- 
-+	sh_len = DESC_LEN(sh_desc);
-+	PROGRAM_CNTXT_INIT(p, desc, sh_len);
-+	if (ps)
-+		PROGRAM_SET_36BIT_ADDR(p);
-+	JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
-+
- 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
-@@ -1085,14 +975,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 
- 	SEQINPTR(p, edesc->sec4_sg_dma, ctx->ctx_len + buflen + req->nbytes,
- 		 SGF | EXT);
--
--	edesc->dst_dma = map_seq_out_ptr_result(p, jrdev, req->result,
--						digestsize);
--	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
--		dev_err(jrdev, "unable to map dst\n");
--		return -ENOMEM;
--	}
--
-+	SEQOUTPTR(p, edesc->dst_dma, digestsize, EXT);
- 	PROGRAM_FINALIZE(p);
- 
- #ifdef DEBUG
-@@ -1146,17 +1029,16 @@ static int ahash_digest(struct ahash_request *req)
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 			  DESC_JOB_IO_LEN;
- 	edesc->sec4_sg_bytes = sec4_sg_bytes;
-+	edesc->dst_dma = dma_map_single(jrdev, req->result, digestsize,
-+					DMA_FROM_DEVICE);
-+	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
-+		dev_err(jrdev, "unable to map dst\n");
-+		return -ENOMEM;
-+	}
-+
- 	edesc->src_nents = src_nents;
- 	edesc->chained = chained;
--
--	sh_len = DESC_LEN(sh_desc);
- 	desc = edesc->hw_desc;
--	PROGRAM_CNTXT_INIT(p, desc, sh_len);
--	if (ps)
--		PROGRAM_SET_36BIT_ADDR(p);
--
--	JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
--
- 	if (src_nents) {
- 		sg_to_sec4_sg_last(req->src, src_nents, edesc->sec4_sg, 0);
- 		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-@@ -1170,15 +1052,14 @@ static int ahash_digest(struct ahash_request *req)
- 	} else {
- 		src_dma = sg_dma_address(req->src);
- 	}
--	SEQINPTR(p, src_dma, req->nbytes, options);
--
--	edesc->dst_dma = map_seq_out_ptr_result(p, jrdev, req->result,
--						digestsize);
--	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
--		dev_err(jrdev, "unable to map dst\n");
--		return -ENOMEM;
--	}
- 
-+	sh_len = DESC_LEN(sh_desc);
-+	PROGRAM_CNTXT_INIT(p, desc, sh_len);
-+	if (ps)
-+		PROGRAM_SET_36BIT_ADDR(p);
-+	JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
-+	SEQINPTR(p, src_dma, req->nbytes, options);
-+	SEQOUTPTR(p, edesc->dst_dma, digestsize, EXT);
- 	PROGRAM_FINALIZE(p);
- 
- #ifdef DEBUG
-@@ -1225,33 +1106,30 @@ static int ahash_final_no_ctx(struct ahash_request *req)
- 		return -ENOMEM;
- 	}
- 
--	sh_len = DESC_LEN(sh_desc);
-+	edesc->src_nents = 0;
- 	desc = edesc->hw_desc;
--	PROGRAM_CNTXT_INIT(p, desc, sh_len);
--	if (ps)
--		PROGRAM_SET_36BIT_ADDR(p);
--
--	JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
--
- 	state->buf_dma = dma_map_single(jrdev, buf, buflen, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, state->buf_dma)) {
- 		dev_err(jrdev, "unable to map src\n");
- 		return -ENOMEM;
- 	}
- 
--	SEQINPTR(p, state->buf_dma, buflen, EXT);
--
--	edesc->dst_dma = map_seq_out_ptr_result(p, jrdev, req->result,
--						digestsize);
-+	edesc->dst_dma = dma_map_single(jrdev, req->result, digestsize,
-+					DMA_FROM_DEVICE);
- 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
- 		dev_err(jrdev, "unable to map dst\n");
- 		return -ENOMEM;
- 	}
- 
-+	sh_len = DESC_LEN(sh_desc);
-+	PROGRAM_CNTXT_INIT(p, desc, sh_len);
-+	if (ps)
-+		PROGRAM_SET_36BIT_ADDR(p);
-+	JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
-+	SEQINPTR(p, state->buf_dma, buflen, EXT);
-+	SEQOUTPTR(p, edesc->dst_dma, digestsize, EXT);
- 	PROGRAM_FINALIZE(p);
- 
--	edesc->src_nents = 0;
--
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, desc, DESC_BYTES(desc), 1);
-@@ -1314,6 +1192,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 			return -ENOMEM;
- 		}
- 
-+		desc = edesc->hw_desc;
- 		edesc->src_nents = src_nents;
- 		edesc->chained = chained;
- 		edesc->sec4_sg_bytes = sec4_sg_bytes;
-@@ -1331,12 +1210,17 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 			state->current_buf = !state->current_buf;
- 		}
- 
-+		state->ctx_dma = dma_map_single(jrdev, state->caam_ctx,
-+						ctx->ctx_len, DMA_FROM_DEVICE);
-+		if (dma_mapping_error(jrdev, state->ctx_dma)) {
-+			dev_err(jrdev, "unable to map ctx\n");
-+			return -ENOMEM;
-+		}
-+
- 		sh_len = DESC_LEN(sh_desc);
--		desc = edesc->hw_desc;
- 		PROGRAM_CNTXT_INIT(p, desc, sh_len);
- 		if (ps)
- 			PROGRAM_SET_36BIT_ADDR(p);
--
- 		JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
- 
- 		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-@@ -1348,11 +1232,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 		}
- 
- 		SEQINPTR(p, edesc->sec4_sg_dma, to_hash, SGF | EXT);
--
--		ret = map_seq_out_ptr_ctx(p, jrdev, state, ctx->ctx_len);
--		if (ret)
--			return ret;
--
-+		SEQOUTPTR(p, state->ctx_dma, ctx->ctx_len, EXT);
- 		PROGRAM_FINALIZE(p);
- 
- #ifdef DEBUG
-@@ -1425,19 +1305,18 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 		return -ENOMEM;
- 	}
- 
--	sh_len = DESC_LEN(sh_desc);
- 	desc = edesc->hw_desc;
--	PROGRAM_CNTXT_INIT(p, desc, sh_len);
--	if (ps)
--		PROGRAM_SET_36BIT_ADDR(p);
--
--	JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
--
- 	edesc->src_nents = src_nents;
- 	edesc->chained = chained;
- 	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 			 DESC_JOB_IO_LEN;
-+	edesc->dst_dma = dma_map_single(jrdev, req->result, digestsize,
-+					DMA_FROM_DEVICE);
-+	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
-+		dev_err(jrdev, "unable to map dst\n");
-+		return -ENOMEM;
-+	}
- 
- 	state->buf_dma = try_buf_map_to_sec4_sg(jrdev, edesc->sec4_sg, buf,
- 						state->buf_dma, buflen,
-@@ -1446,6 +1325,12 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 	src_map_to_sec4_sg(jrdev, req->src, src_nents, edesc->sec4_sg + 1,
- 			   chained);
- 
-+	sh_len = DESC_LEN(sh_desc);
-+	PROGRAM_CNTXT_INIT(p, desc, sh_len);
-+	if (ps)
-+		PROGRAM_SET_36BIT_ADDR(p);
-+	JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
-+
- 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
-@@ -1454,14 +1339,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 	}
- 
- 	SEQINPTR(p, edesc->sec4_sg_dma, buflen + req->nbytes, SGF | EXT);
--
--	edesc->dst_dma = map_seq_out_ptr_result(p, jrdev, req->result,
--						digestsize);
--	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
--		dev_err(jrdev, "unable to map dst\n");
--		return -ENOMEM;
--	}
--
-+	SEQOUTPTR(p, edesc->dst_dma, digestsize, EXT);
- 	PROGRAM_FINALIZE(p);
- 
- #ifdef DEBUG
-@@ -1528,12 +1406,19 @@ static int ahash_update_first(struct ahash_request *req)
- 			return -ENOMEM;
- 		}
- 
-+		desc = edesc->hw_desc;
- 		edesc->src_nents = src_nents;
- 		edesc->chained = chained;
- 		edesc->sec4_sg_bytes = sec4_sg_bytes;
- 		edesc->sec4_sg = (void *)edesc + sizeof(struct ahash_edesc) +
- 				 DESC_JOB_IO_LEN;
- 		edesc->dst_dma = 0;
-+		state->ctx_dma = dma_map_single(jrdev, state->caam_ctx,
-+						ctx->ctx_len, DMA_FROM_DEVICE);
-+		if (dma_mapping_error(jrdev, state->ctx_dma)) {
-+			dev_err(jrdev, "unable to map ctx\n");
-+			return -ENOMEM;
-+		}
- 
- 		if (src_nents) {
- 			sg_to_sec4_sg_last(req->src, src_nents,
-@@ -1556,19 +1441,12 @@ static int ahash_update_first(struct ahash_request *req)
- 			sg_copy_part(next_buf, req->src, to_hash, req->nbytes);
- 
- 		sh_len = DESC_LEN(sh_desc);
--		desc = edesc->hw_desc;
- 		PROGRAM_CNTXT_INIT(p, desc, sh_len);
- 		if (ps)
- 			PROGRAM_SET_36BIT_ADDR(p);
--
- 		JOB_HDR(p, SHR_DEFER, sh_len, ptr, REO | SHR);
--
- 		SEQINPTR(p, src_dma, to_hash, options);
--
--		ret = map_seq_out_ptr_ctx(p, jrdev, state, ctx->ctx_len);
--		if (ret)
--			return ret;
--
-+		SEQOUTPTR(p, state->ctx_dma, ctx->ctx_len, EXT);
- 		PROGRAM_FINALIZE(p);
- 
- #ifdef DEBUG
++<svg
++   xmlns:dc="http://purl.org/dc/elements/1.1/"
++   xmlns:cc="http://creativecommons.org/ns#"
++   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
++   xmlns:svg="http://www.w3.org/2000/svg"
++   xmlns="http://www.w3.org/2000/svg"
++   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
++   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
++   width="644.09448819"
++   height="652.3622047"
++   id="svg2"
++   version="1.1"
++   inkscape:version="0.48.2 r9819"
++   sodipodi:docname="rta_arch.svg"
++   inkscape:export-filename="Z:\repos\sdk-devel\flib\sec\rta\doc\images\rta_arch.png"
++   inkscape:export-xdpi="90"
++   inkscape:export-ydpi="90">
++  <title
++     id="title3950">RTA Integration Overview</title>
++  <defs
++     id="defs4">
++    <marker
++       inkscape:stockid="Arrow2Lend"
++       orient="auto"
++       refY="0.0"
++       refX="0.0"
++       id="Arrow2Lend"
++       style="overflow:visible;">
++      <path
++         id="path4157"
++         style="font-size:12.0;fill-rule:evenodd;stroke-width:0.62500000;stroke-linejoin:round;"
++         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
++         transform="scale(1.1) rotate(180) translate(1,0)" />
++    </marker>
++    <marker
++       inkscape:stockid="Arrow1Lend"
++       orient="auto"
++       refY="0.0"
++       refX="0.0"
++       id="Arrow1Lend"
++       style="overflow:visible;">
++      <path
++         id="path4139"
++         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
++         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none;"
++         transform="scale(0.8) rotate(180) translate(12.5,0)" />
++    </marker>
++  </defs>
++  <sodipodi:namedview
++     id="base"
++     pagecolor="#ffffff"
++     bordercolor="#666666"
++     borderopacity="1.0"
++     inkscape:pageopacity="0.0"
++     inkscape:pageshadow="2"
++     inkscape:zoom="0.98994949"
++     inkscape:cx="338.47626"
++     inkscape:cy="723.66809"
++     inkscape:document-units="px"
++     inkscape:current-layer="layer1"
++     showgrid="false"
++     inkscape:window-width="1440"
++     inkscape:window-height="878"
++     inkscape:window-x="-8"
++     inkscape:window-y="-8"
++     inkscape:window-maximized="1" />
++  <metadata
++     id="metadata7">
++    <rdf:RDF>
++      <cc:Work
++         rdf:about="">
++        <dc:format>image/svg+xml</dc:format>
++        <dc:type
++           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
++        <dc:title>RTA Integration Overview</dc:title>
++      </cc:Work>
++    </rdf:RDF>
++  </metadata>
++  <g
++     inkscape:label="Layer 1"
++     inkscape:groupmode="layer"
++     id="layer1"
++     style="display:inline">
++    <rect
++       style="fill:#e5ffe5;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.94082779;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.9408278, 1.8816556;stroke-dashoffset:0"
++       id="rect2985"
++       width="533.80353"
++       height="200.01016"
++       x="82.832512"
++       y="49.280708"
++       ry="19.1929" />
++    <rect
++       style="fill:#99ffcc;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1, 2;stroke-dashoffset:0"
++       id="rect3767"
++       width="101.01525"
++       height="53.538086"
++       x="243.44676"
++       y="73.524353"
++       ry="19.1929" />
++    <rect
++       style="fill:#99ffcc;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.81756771;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.81756773, 1.63513546;stroke-dashoffset:0"
++       id="rect3767-1"
++       width="101.01525"
++       height="35.785767"
++       x="243.44678"
++       y="159.89241"
++       ry="12.82886" />
++    <rect
++       style="fill:#ff66ff;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.81756771;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.81756773, 1.63513546;stroke-dashoffset:0"
++       id="rect3767-1-8"
++       width="101.01525"
++       height="35.785767"
++       x="490.93414"
++       y="81.895447"
++       ry="12.82886" />
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
++       x="529.31989"
++       y="103.82895"
++       id="text3832"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan3834"
++         x="529.31989"
++         y="103.82895">RTA</tspan></text>
++    <rect
++       style="fill:#ffffcc;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.76365763;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.76365765, 1.5273153;stroke-dashoffset:0"
++       id="rect2985-5"
++       width="533.80353"
++       height="131.77383"
++       x="81.600868"
++       y="287.67673"
++       ry="12.644968" />
++    <rect
++       style="fill:#ff66ff;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.81756771;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.81756773, 1.63513546;stroke-dashoffset:0"
++       id="rect3767-1-8-1"
++       width="101.01525"
++       height="35.785767"
++       x="463.66003"
++       y="373.82953"
++       ry="12.82886" />
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
++       x="500.61041"
++       y="395.72299"
++       id="text3832-5"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan3834-2"
++         x="500.61041"
++         y="395.72299">RTA</tspan></text>
++    <rect
++       style="fill:#ccecff;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.76365763;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.76365765, 1.5273153;stroke-dashoffset:0"
++       id="rect2985-5-7"
++       width="533.80353"
++       height="131.77383"
++       x="80.590714"
++       y="460.18579"
++       ry="12.644968" />
++    <rect
++       style="fill:#99ccff;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.30565068;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.30565068, 0.61130137;stroke-dashoffset:0"
++       id="rect2985-5-6"
++       width="203.08368"
++       height="55.48671"
++       x="248.03383"
++       y="519.5426"
++       ry="5.3244843" />
++    <flowRoot
++       xml:space="preserve"
++       id="flowRoot4061"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"><flowRegion
++         id="flowRegion4063"><rect
++           id="rect4065"
++           width="45.456863"
++           height="17.172594"
++           x="139.40105"
++           y="685.67682" /></flowRegion><flowPara
++         id="flowPara4067" /></flowRoot>    <path
++       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-end:url(#Arrow2Lend)"
++       d="M 344.46201,100.19032 490.93414,99.891405"
++       id="path4131"
++       inkscape:connector-type="polyline"
++       inkscape:connector-curvature="0"
++       inkscape:connection-start="#rect3767"
++       inkscape:connection-start-point="d4"
++       inkscape:connection-end="#rect3767-1-8"
++       inkscape:connection-end-point="d4" />
++    <path
++       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
++       d="m 293.95439,127.06244 1e-5,32.82997"
++       id="path4763"
++       inkscape:connector-type="polyline"
++       inkscape:connector-curvature="0"
++       inkscape:connection-start="#rect3767"
++       inkscape:connection-start-point="d4"
++       inkscape:connection-end="#rect3767-1"
++       inkscape:connection-end-point="d4" />
++    <path
++       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
++       d="m 440.96319,335.95105 49.7186,37.87848"
++       id="path5135"
++       inkscape:connector-type="polyline"
++       inkscape:connector-curvature="0"
++       inkscape:connection-start="#rect4101"
++       inkscape:connection-start-point="d4"
++       inkscape:connection-end="#rect3767-1-8-1"
++       inkscape:connection-end-point="d4" />
++    <path
++       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
++       d="m 292.94424,193.73252 25.25381,338.4011"
++       id="path3067"
++       inkscape:connector-curvature="0" />
++    <path
++       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
++       d="m 212.13204,394.75287 94.95433,137.38075"
++       id="path3069"
++       inkscape:connector-curvature="0" />
++    <path
++       style="fill:none;stroke:#000000;stroke-width:1.004;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend);stroke-miterlimit:4;stroke-dasharray:none"
++       d="m 273.75134,378.59043 189.28009,13.13199"
++       id="path3071"
++       inkscape:connector-curvature="0" />
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
++       x="103.62045"
++       y="71.464035"
++       id="text3832-1"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan3834-7"
++         x="103.62045"
++         y="71.464035">User space</tspan></text>
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
++       x="99.680267"
++       y="313.51968"
++       id="text3832-1-4"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan3834-7-0"
++         x="99.680267"
++         y="313.51968">Kernel space</tspan></text>
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
++       x="96.269417"
++       y="482.21518"
++       id="text3832-1-4-8"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan3834-7-0-8"
++         x="96.269417"
++         y="482.21518">Platform hardware</tspan></text>
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
++       x="294.0625"
++       y="94.316589"
++       id="text3832-1-2"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan3834-7-4"
++         x="294.0625"
++         y="94.316589">Crypto</tspan><tspan
++         sodipodi:role="line"
++         x="294.0625"
++         y="111.81659"
++         id="tspan3138">application</tspan></text>
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
++       x="295.19696"
++       y="182.62668"
++       id="text3832-1-2-5"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         x="295.19696"
++         y="182.62668"
++         id="tspan3138-1">QBMAN</tspan></text>
++  </g>
++  <g
++     inkscape:groupmode="layer"
++     id="layer2"
++     inkscape:label="Layer 2"
++     style="display:inline">
++    <rect
++       style="fill:#ccecff;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.10832807;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.10832807, 0.21665614;stroke-dashoffset:0;display:inline"
++       id="rect2985-5-7-3"
++       width="46.55518"
++       height="30.403757"
++       x="292.39508"
++       y="532.58911"
++       ry="2.9175332" />
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
++       x="308.09653"
++       y="552.33661"
++       id="text4015"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan4017"
++         x="308.09653"
++         y="552.33661">QI</tspan></text>
++    <rect
++       style="fill:#ccecff;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.10832807;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.10832807, 0.21665614;stroke-dashoffset:0;display:inline"
++       id="rect2985-5-7-3-2"
++       width="46.55518"
++       height="30.403757"
++       x="384.82404"
++       y="533.09424"
++       ry="2.9175332" />
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
++       x="397.49506"
++       y="551.8316"
++       id="text4015-2"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan4017-1"
++         x="397.49506"
++         y="551.8316">JRI</tspan></text>
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
++       x="254.55844"
++       y="535.16406"
++       id="text4069"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan4071"
++         x="254.55844"
++         y="535.16406">SEC</tspan></text>
++    <rect
++       style="fill:#ffcc00;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.80089962;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.8008996, 1.6017992;stroke-dashoffset:0"
++       id="rect4101"
++       width="112.12693"
++       height="31.101717"
++       x="348.50262"
++       y="304.84933"
++       ry="3.415338" />
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
++       x="369.71585"
++       y="325.0524"
++       id="text4103"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan4105"
++         x="369.71585"
++         y="325.0524">SEC Driver</tspan></text>
++    <rect
++       style="fill:#ffcc00;fill-opacity:1;fill-rule:nonzero;stroke:#ff0000;stroke-width:0.80738008;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.80738011, 1.61476021;stroke-dashoffset:0;display:inline"
++       id="rect4101-5"
++       width="111.56696"
++       height="31.765713"
++       x="162.08232"
++       y="362.38086"
++       ry="3.4882529" />
++    <text
++       xml:space="preserve"
++       style="font-size:14px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
++       x="177.28172"
++       y="383.64117"
++       id="text4103-7"
++       sodipodi:linespacing="125%"><tspan
++         sodipodi:role="line"
++         id="tspan4105-6"
++         x="177.28172"
++         y="383.64117">SEC QI Driver</tspan></text>
++  </g>
++</svg>
 -- 
 1.8.3.1
