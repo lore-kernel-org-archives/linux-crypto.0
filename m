@@ -1,201 +1,159 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: [PATCH 1/2] crypto: caamhash.c: remove duplicated sg copy functions
-Date: Thu, 14 Aug 2014 13:51:56 +0300
-Message-ID: <1408013517-15526-2-git-send-email-cristian.stoica@freescale.com>
-References: <1408013517-15526-1-git-send-email-cristian.stoica@freescale.com>
+From: Horia Geanta <horia.geanta@freescale.com>
+Subject: [PATCH v2 00/12] crypto: caam - Add RTA descriptor creation library
+Date: Thu, 14 Aug 2014 15:54:22 +0300
+Message-ID: <1408020874-2211-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
-Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<davem@davemloft.net>
-To: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1408013517-15526-1-git-send-email-cristian.stoica@freescale.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Carmen Iorga <carmen.iorga@freescale.com>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	Alexandru Porosanu <alexandru.porosanu@freescale.com>,
+	Vakul Garg <vakul@freescale.com>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>,
+	"Horia Geanta" <horia.geanta@freescale.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	<linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from dns-bn1lp0143.outbound.protection.outlook.com ([207.46.163.143]:10505
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752368AbaHNMzl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 14 Aug 2014 08:55:41 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Replace equivalent (and partially incorrect) scatter-gather functions
-with ones from crypto-API.
+Hi,
 
-The replacement is motivated by page-faults in sg_copy_part triggered
-by successive calls to crypto_hash_update. The following fault appears
-after calling crypto_ahash_update twice, first with 13 and then
-with 285 bytes:
+This patch set adds Run Time Assembler (RTA) SEC descriptor library.
+RTA is a replacement for incumbent "inline append".
 
-Unable to handle kernel paging request for data at address 0x00000008
-Faulting instruction address: 0xf9bf9a8c
-Oops: Kernel access of bad area, sig: 11 [#1]
-SMP NR_CPUS=8 CoreNet Generic
-Modules linked in: tcrypt(+) caamhash caam_jr caam tls
-CPU: 6 PID: 1497 Comm: cryptomgr_test Not tainted
-3.12.19-rt30-QorIQ-SDK-V1.6+g9fda9f2 #75
-task: e9308530 ti: e700e000 task.ti: e700e000
-NIP: f9bf9a8c LR: f9bfcf28 CTR: c0019ea0
-REGS: e700fb80 TRAP: 0300   Not tainted
-(3.12.19-rt30-QorIQ-SDK-V1.6+g9fda9f2)
-MSR: 00029002 <CE,EE,ME>  CR: 44f92024  XER: 20000000
-DEAR: 00000008, ESR: 00000000
+The library is intended to be a single code base for SEC descriptors creation
+for all Freescale products. This comes with a series of advantages, such as
+library being maintained / kept up-to-date with latest platforms, i.e. SEC
+functionalities (for e.g. SEC incarnations present in Layerscape LS1 and LS2).
 
-GPR00: f9bfcf28 e700fc30 e9308530 e70b1e55 00000000 ffffffdd e70b1e54 0bebf888
-GPR08: 902c7ef5 c0e771e2 00000002 00000888 c0019ea0 00000000 00000000 c07a4154
-GPR16: c08d0000 e91a8f9c 00000001 e98fb400 00000100 e9c83028 e70b1e08 e70b1d48
-GPR24: e992ce10 e70b1dc8 f9bfe4f4 e70b1e55 ffffffdd e70b1ce0 00000000 00000000
-NIP [f9bf9a8c] sg_copy+0x1c/0x100 [caamhash]
-LR [f9bfcf28] ahash_update_no_ctx+0x628/0x660 [caamhash]
-Call Trace:
-[e700fc30] [f9bf9c50] sg_copy_part+0xe0/0x160 [caamhash] (unreliable)
-[e700fc50] [f9bfcf28] ahash_update_no_ctx+0x628/0x660 [caamhash]
-[e700fcb0] [f954e19c] crypto_tls_genicv+0x13c/0x300 [tls]
-[e700fd10] [f954e65c] crypto_tls_encrypt+0x5c/0x260 [tls]
-[e700fd40] [c02250ec] __test_aead.constprop.9+0x2bc/0xb70
-[e700fe40] [c02259f0] alg_test_aead+0x50/0xc0
-[e700fe60] [c02241e4] alg_test+0x114/0x2e0
-[e700fee0] [c022276c] cryptomgr_test+0x4c/0x60
-[e700fef0] [c004f658] kthread+0x98/0xa0
-[e700ff40] [c000fd04] ret_from_kernel_thread+0x5c/0x64
---- Exception: 0 at   (null)
-    LR =   (null)
-Instruction dump:
-bba10014 7c0803a6 38210020 480042b0 60000000 9421ffe0 7c0802a6 bf410008
-7c9f2378 90010024 7cbc2b78 7c7b1b78 <83c40008> 7f9e2840 40dc00d0
-7fddf378
----[ end trace a4a18a1094a0306c ]---
+RTA detects options in SEC descriptors that are not supported
+by a SEC HW revision ("Era") and reports this back.
+Say a descriptor uses Sequence Out Pointer (SOP) option for the SEQINPTR
+command, which is supported starting from SEC Era 5. If the descriptor would
+be built on a P4080R3 platform (which has SEC Era 4), RTA would report
+"SEQ IN PTR: Flag(s) not supported by SEC Era 4".
+This is extremely useful and saves a lot of time wasted on debugging.
+SEC HW detects only *some* of these problems, leaving user wonder what causes
+a "DECO Watchdog Timeout". And when it prints something more useful, sometimes
+it does not point to the exact opcode.
 
-Cc: <stable@vger.kernel.org> # 3.13+
-Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
----
- drivers/crypto/caam/caamhash.c   | 22 ++++++++++------
- drivers/crypto/caam/sg_sw_sec4.h | 54 ----------------------------------------
- 2 files changed, 14 insertions(+), 62 deletions(-)
+Below is a summary of the patch set.
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index b464d03..061f3fb 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -836,8 +836,9 @@ static int ahash_update_ctx(struct ahash_request *req)
- 					   edesc->sec4_sg + sec4_sg_src_index,
- 					   chained);
- 			if (*next_buflen) {
--				sg_copy_part(next_buf, req->src, to_hash -
--					     *buflen, req->nbytes);
-+				scatterwalk_map_and_copy(next_buf, req->src,
-+							 to_hash - *buflen,
-+							 *next_buflen, 0);
- 				state->current_buf = !state->current_buf;
- 			}
- 		} else {
-@@ -878,7 +879,8 @@ static int ahash_update_ctx(struct ahash_request *req)
- 			kfree(edesc);
- 		}
- 	} else if (*next_buflen) {
--		sg_copy(buf + *buflen, req->src, req->nbytes);
-+		scatterwalk_map_and_copy(buf + *buflen, req->src, 0,
-+					 req->nbytes, 0);
- 		*buflen = *next_buflen;
- 		*next_buflen = last_buflen;
- 	}
-@@ -1262,8 +1264,9 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 		src_map_to_sec4_sg(jrdev, req->src, src_nents,
- 				   edesc->sec4_sg + 1, chained);
- 		if (*next_buflen) {
--			sg_copy_part(next_buf, req->src, to_hash - *buflen,
--				    req->nbytes);
-+			scatterwalk_map_and_copy(next_buf, req->src,
-+						 to_hash - *buflen,
-+						 *next_buflen, 0);
- 			state->current_buf = !state->current_buf;
- 		}
- 
-@@ -1304,7 +1307,8 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 			kfree(edesc);
- 		}
- 	} else if (*next_buflen) {
--		sg_copy(buf + *buflen, req->src, req->nbytes);
-+		scatterwalk_map_and_copy(buf + *buflen, req->src, 0,
-+					 req->nbytes, 0);
- 		*buflen = *next_buflen;
- 		*next_buflen = 0;
- 	}
-@@ -1476,7 +1480,8 @@ static int ahash_update_first(struct ahash_request *req)
- 		}
- 
- 		if (*next_buflen)
--			sg_copy_part(next_buf, req->src, to_hash, req->nbytes);
-+			scatterwalk_map_and_copy(next_buf, req->src, to_hash,
-+						 *next_buflen, 0);
- 
- 		sh_len = desc_len(sh_desc);
- 		desc = edesc->hw_desc;
-@@ -1511,7 +1516,8 @@ static int ahash_update_first(struct ahash_request *req)
- 		state->update = ahash_update_no_ctx;
- 		state->finup = ahash_finup_no_ctx;
- 		state->final = ahash_final_no_ctx;
--		sg_copy(next_buf, req->src, req->nbytes);
-+		scatterwalk_map_and_copy(next_buf, req->src, 0,
-+					 req->nbytes, 0);
- 	}
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "next buf@"__stringify(__LINE__)": ",
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index b12ff85..ce28a56 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -116,57 +116,3 @@ static int dma_unmap_sg_chained(struct device *dev, struct scatterlist *sg,
- 	}
- 	return nents;
- }
--
--/* Map SG page in kernel virtual address space and copy */
--static inline void sg_map_copy(u8 *dest, struct scatterlist *sg,
--			       int len, int offset)
--{
--	u8 *mapped_addr;
--
--	/*
--	 * Page here can be user-space pinned using get_user_pages
--	 * Same must be kmapped before use and kunmapped subsequently
--	 */
--	mapped_addr = kmap_atomic(sg_page(sg));
--	memcpy(dest, mapped_addr + offset, len);
--	kunmap_atomic(mapped_addr);
--}
--
--/* Copy from len bytes of sg to dest, starting from beginning */
--static inline void sg_copy(u8 *dest, struct scatterlist *sg, unsigned int len)
--{
--	struct scatterlist *current_sg = sg;
--	int cpy_index = 0, next_cpy_index = current_sg->length;
--
--	while (next_cpy_index < len) {
--		sg_map_copy(dest + cpy_index, current_sg, current_sg->length,
--			    current_sg->offset);
--		current_sg = scatterwalk_sg_next(current_sg);
--		cpy_index = next_cpy_index;
--		next_cpy_index += current_sg->length;
--	}
--	if (cpy_index < len)
--		sg_map_copy(dest + cpy_index, current_sg, len-cpy_index,
--			    current_sg->offset);
--}
--
--/* Copy sg data, from to_skip to end, to dest */
--static inline void sg_copy_part(u8 *dest, struct scatterlist *sg,
--				      int to_skip, unsigned int end)
--{
--	struct scatterlist *current_sg = sg;
--	int sg_index, cpy_index, offset;
--
--	sg_index = current_sg->length;
--	while (sg_index <= to_skip) {
--		current_sg = scatterwalk_sg_next(current_sg);
--		sg_index += current_sg->length;
--	}
--	cpy_index = sg_index - to_skip;
--	offset = current_sg->offset + current_sg->length - cpy_index;
--	sg_map_copy(dest, current_sg, cpy_index, offset);
--	if (end - sg_index) {
--		current_sg = scatterwalk_sg_next(current_sg);
--		sg_copy(dest + cpy_index, current_sg, end - sg_index);
--	}
--}
+Patches 01-04 are fixes, clean-ups.
+
+Patches 05-07 add the RTA library in 3 steps, to overcome
+patch size limitations.
+Patch 07 replaces desc.h with a new version from RTA. However, at this stage,
+RTA is still not being used.
+
+Patch 08 rewrites "inline append" descriptors using RTA.
+Descriptors (hex dumps) were tested to be bit-exact,
+with a few exceptions (see commit message).
+
+Patch 09 removes "inline append" files.
+
+Patch 10 refactors code that generates the descriptors,
+in order to:
+-make code more comprehensible and maintainable
+-prepare for changes in patch 11
+
+Patch 11 moves some of the descriptors that could be used
+in other places from caamalg.c into RTA library files.
+
+Patch 12 adds support for generating kernel-doc for RTA.
+It depends on upstream (torvalds/linux.git) commit
+cbb4d3e6510b99522719c5ef0cd0482886a324c0
+("scripts/kernel-doc: handle object-like macros")
+
+Thanks,
+Horia
+
+Horia Geanta (12):
+  crypto: caam - completely remove error propagation handling
+  crypto: caam - desc.h fixes
+  crypto: caam - code cleanup
+  crypto: caam - move sec4_sg_entry to sg_sw_sec4.h
+  crypto: caam - add Run Time Library (RTA) - part 1
+  crypto: caam - add Run Time Library (RTA) - part 2
+  crypto: caam - add Run Time Library (RTA) - part 3
+  crypto: caam - use RTA instead of inline append
+  crypto: caam - completely remove inline append
+  crypto: caam - refactor descriptor creation
+  crypto: caam - move caamalg shared descs in RTA library
+  crypto: caam - add Run Time Library (RTA) docbook
+
+ Documentation/DocBook/Makefile                     |    3 +-
+ Documentation/DocBook/rta-api.tmpl                 |  271 ++++
+ Documentation/DocBook/rta/.gitignore               |    1 +
+ Documentation/DocBook/rta/Makefile                 |    5 +
+ Documentation/DocBook/rta/rta_arch.svg             |  381 ++++++
+ drivers/crypto/caam/Makefile                       |    4 +-
+ drivers/crypto/caam/caamalg.c                      |  799 ++++--------
+ drivers/crypto/caam/caamhash.c                     |  536 ++++----
+ drivers/crypto/caam/caamrng.c                      |   48 +-
+ drivers/crypto/caam/compat.h                       |    1 +
+ drivers/crypto/caam/ctrl.c                         |   91 +-
+ drivers/crypto/caam/ctrl.h                         |    2 +-
+ drivers/crypto/caam/desc_constr.h                  |  388 ------
+ drivers/crypto/caam/error.c                        |    7 +-
+ drivers/crypto/caam/{ => flib}/desc.h              | 1335 +++++++++++++++++---
+ drivers/crypto/caam/flib/desc/algo.h               |   88 ++
+ drivers/crypto/caam/flib/desc/common.h             |  151 +++
+ drivers/crypto/caam/flib/desc/ipsec.h              |  550 ++++++++
+ drivers/crypto/caam/flib/desc/jobdesc.h            |   57 +
+ drivers/crypto/caam/flib/rta.h                     |  980 ++++++++++++++
+ drivers/crypto/caam/flib/rta/fifo_load_store_cmd.h |  303 +++++
+ drivers/crypto/caam/flib/rta/header_cmd.h          |  209 +++
+ drivers/crypto/caam/flib/rta/jump_cmd.h            |  168 +++
+ drivers/crypto/caam/flib/rta/key_cmd.h             |  183 +++
+ drivers/crypto/caam/flib/rta/load_cmd.h            |  297 +++++
+ drivers/crypto/caam/flib/rta/math_cmd.h            |  362 ++++++
+ drivers/crypto/caam/flib/rta/move_cmd.h            |  401 ++++++
+ drivers/crypto/caam/flib/rta/nfifo_cmd.h           |  157 +++
+ drivers/crypto/caam/flib/rta/operation_cmd.h       |  545 ++++++++
+ drivers/crypto/caam/flib/rta/protocol_cmd.h        |  595 +++++++++
+ drivers/crypto/caam/flib/rta/sec_run_time_asm.h    |  672 ++++++++++
+ drivers/crypto/caam/flib/rta/seq_in_out_ptr_cmd.h  |  168 +++
+ drivers/crypto/caam/flib/rta/signature_cmd.h       |   36 +
+ drivers/crypto/caam/flib/rta/store_cmd.h           |  145 +++
+ drivers/crypto/caam/jr.c                           |    6 +-
+ drivers/crypto/caam/key_gen.c                      |   35 +-
+ drivers/crypto/caam/key_gen.h                      |    5 +-
+ drivers/crypto/caam/pdb.h                          |  402 ------
+ drivers/crypto/caam/sg_sw_sec4.h                   |   12 +-
+ 39 files changed, 8438 insertions(+), 1961 deletions(-)
+ create mode 100644 Documentation/DocBook/rta-api.tmpl
+ create mode 100644 Documentation/DocBook/rta/.gitignore
+ create mode 100644 Documentation/DocBook/rta/Makefile
+ create mode 100644 Documentation/DocBook/rta/rta_arch.svg
+ delete mode 100644 drivers/crypto/caam/desc_constr.h
+ rename drivers/crypto/caam/{ => flib}/desc.h (54%)
+ create mode 100644 drivers/crypto/caam/flib/desc/algo.h
+ create mode 100644 drivers/crypto/caam/flib/desc/common.h
+ create mode 100644 drivers/crypto/caam/flib/desc/ipsec.h
+ create mode 100644 drivers/crypto/caam/flib/desc/jobdesc.h
+ create mode 100644 drivers/crypto/caam/flib/rta.h
+ create mode 100644 drivers/crypto/caam/flib/rta/fifo_load_store_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/header_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/jump_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/key_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/load_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/math_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/move_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/nfifo_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/operation_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/protocol_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/sec_run_time_asm.h
+ create mode 100644 drivers/crypto/caam/flib/rta/seq_in_out_ptr_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/signature_cmd.h
+ create mode 100644 drivers/crypto/caam/flib/rta/store_cmd.h
+ delete mode 100644 drivers/crypto/caam/pdb.h
+
 -- 
 1.8.3.1
