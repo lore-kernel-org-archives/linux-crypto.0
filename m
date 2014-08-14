@@ -1,24 +1,44 @@
 From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: caamhash.c fixes
-Date: Thu, 14 Aug 2014 13:51:55 +0300
-Message-ID: <1408013517-15526-1-git-send-email-cristian.stoica@freescale.com>
+Subject: [PATCH 2/2] crypto: caamhash.c: fix addressing of struct member
+Date: Thu, 14 Aug 2014 13:51:57 +0300
+Message-ID: <1408013517-15526-3-git-send-email-cristian.stoica@freescale.com>
+References: <1408013517-15526-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<davem@davemloft.net>
 To: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1blp0188.outbound.protection.outlook.com ([207.46.163.188]:46675
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752916AbaHNKwu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Aug 2014 06:52:50 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1408013517-15526-1-git-send-email-cristian.stoica@freescale.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This is a set of two independent fixes for caamhash driver
+buf_0 and buf_1 in caam_hash_state are not next to each other.
+Accessing buf_1 is incorrect from &buf_0 with an offset of only
+size_of(buf_0). The same issue is also with buflen_0 and buflen_1
 
+Cc: <stable@vger.kernel.org> # 3.13+
+Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+---
+ drivers/crypto/caam/caamhash.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-drivers/crypto/caam/caamhash.c   | 28 +++++++++++++++++-----------
-drivers/crypto/caam/sg_sw_sec4.h | 54 ------------------------------------------------------
-2 files changed, 17 insertions(+), 65 deletions(-)
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 061f3fb..f347ab7 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1417,9 +1417,9 @@ static int ahash_update_first(struct ahash_request *req)
+ 	struct device *jrdev = ctx->jrdev;
+ 	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
+-	u8 *next_buf = state->buf_0 + state->current_buf *
+-		       CAAM_MAX_HASH_BLOCK_SIZE;
+-	int *next_buflen = &state->buflen_0 + state->current_buf;
++	u8 *next_buf = state->current_buf ? state->buf_1 : state->buf_0;
++	int *next_buflen = state->current_buf ?
++		&state->buflen_1 : &state->buflen_0;
+ 	int to_hash;
+ 	u32 *sh_desc = ctx->sh_desc_update_first, *desc;
+ 	dma_addr_t ptr = ctx->sh_desc_update_first_dma;
+-- 
+1.8.3.1
