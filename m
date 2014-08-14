@@ -1,7 +1,7 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH v2 04/12] crypto: caam - move sec4_sg_entry to sg_sw_sec4.h
-Date: Thu, 14 Aug 2014 15:54:26 +0300
-Message-ID: <1408020874-2211-5-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH v2 09/12] crypto: caam - completely remove inline append
+Date: Thu, 14 Aug 2014 15:54:31 +0300
+Message-ID: <1408020874-2211-10-git-send-email-horia.geanta@freescale.com>
 References: <1408020874-2211-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -15,66 +15,827 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0139.outbound.protection.outlook.com ([207.46.163.139]:7512
+Received: from mail-bn1lp0142.outbound.protection.outlook.com ([207.46.163.142]:17031
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754520AbaHNM4B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Aug 2014 08:56:01 -0400
+	id S1754732AbaHNM4H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 14 Aug 2014 08:56:07 -0400
 In-Reply-To: <1408020874-2211-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-sec4_sg_entry structure is used only by helper functions in sg_sw_sec4.h.
-Since SEC HW S/G entries are to be manipulated only indirectly, via these
-functions, move sec4_sg_entry to the corresponding header.
+desc_constr.h no longer has users, being replaced by RTA,
+so get rid of it.
+
+pdb.h is removed since its structures are not currently used.
+Future protocol descriptors will add these when needed
+in flib/desc/ directory.
 
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- drivers/crypto/caam/desc.h       | 10 ----------
- drivers/crypto/caam/sg_sw_sec4.h | 10 +++++++++-
- 2 files changed, 9 insertions(+), 11 deletions(-)
+ drivers/crypto/caam/desc_constr.h | 384 ------------------------------------
+ drivers/crypto/caam/pdb.h         | 402 --------------------------------------
+ 2 files changed, 786 deletions(-)
+ delete mode 100644 drivers/crypto/caam/desc_constr.h
+ delete mode 100644 drivers/crypto/caam/pdb.h
 
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index f891a67c4786..eb8b870d03a9 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -8,16 +8,6 @@
- #ifndef DESC_H
- #define DESC_H
- 
--struct sec4_sg_entry {
--	u64 ptr;
--#define SEC4_SG_LEN_FIN 0x40000000
--#define SEC4_SG_LEN_EXT 0x80000000
--	u32 len;
--	u8 reserved;
--	u8 buf_pool_id;
--	u16 offset;
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+deleted file mode 100644
+index c344fbce1c67..000000000000
+--- a/drivers/crypto/caam/desc_constr.h
++++ /dev/null
+@@ -1,384 +0,0 @@
+-/*
+- * caam descriptor construction helper functions
+- *
+- * Copyright 2008-2012 Freescale Semiconductor, Inc.
+- */
+-
+-#include "flib/desc.h"
+-
+-#define IMMEDIATE (1 << 23)
+-
+-#ifdef DEBUG
+-#define PRINT_POS do { printk(KERN_DEBUG "%02d: %s\n", desc_len(desc),\
+-			      &__func__[sizeof("append")]); } while (0)
+-#else
+-#define PRINT_POS
+-#endif
+-
+-#define SET_OK_NO_PROP_ERRORS (IMMEDIATE | LDST_CLASS_DECO | \
+-			       LDST_SRCDST_WORD_DECOCTRL | \
+-			       (LDOFF_CHG_SHARE_OK_NO_PROP << \
+-				LDST_OFFSET_SHIFT))
+-#define DISABLE_AUTO_INFO_FIFO (IMMEDIATE | LDST_CLASS_DECO | \
+-				LDST_SRCDST_WORD_DECOCTRL | \
+-				(LDOFF_DISABLE_AUTO_NFIFO << LDST_OFFSET_SHIFT))
+-#define ENABLE_AUTO_INFO_FIFO (IMMEDIATE | LDST_CLASS_DECO | \
+-			       LDST_SRCDST_WORD_DECOCTRL | \
+-			       (LDOFF_ENABLE_AUTO_NFIFO << LDST_OFFSET_SHIFT))
+-
+-static inline int desc_len(u32 *desc)
+-{
+-	return *desc & HDR_DESCLEN_MASK;
+-}
+-
+-static inline int desc_bytes(void *desc)
+-{
+-	return desc_len(desc) * CAAM_CMD_SZ;
+-}
+-
+-static inline u32 *desc_end(u32 *desc)
+-{
+-	return desc + desc_len(desc);
+-}
+-
+-static inline void *sh_desc_pdb(u32 *desc)
+-{
+-	return desc + 1;
+-}
+-
+-static inline void init_desc(u32 *desc, u32 options)
+-{
+-	*desc = (options | HDR_ONE) + 1;
+-}
+-
+-static inline void init_sh_desc(u32 *desc, u32 options)
+-{
+-	PRINT_POS;
+-	init_desc(desc, CMD_SHARED_DESC_HDR | options);
+-}
+-
+-static inline void init_sh_desc_pdb(u32 *desc, u32 options, size_t pdb_bytes)
+-{
+-	u32 pdb_len = (pdb_bytes + CAAM_CMD_SZ - 1) / CAAM_CMD_SZ;
+-
+-	init_sh_desc(desc, (((pdb_len + 1) << HDR_START_IDX_SHIFT) + pdb_len) |
+-		     options);
+-}
+-
+-static inline void init_job_desc(u32 *desc, u32 options)
+-{
+-	init_desc(desc, CMD_DESC_HDR | options);
+-}
+-
+-static inline void append_ptr(u32 *desc, dma_addr_t ptr)
+-{
+-	dma_addr_t *offset = (dma_addr_t *)desc_end(desc);
+-
+-	*offset = ptr;
+-
+-	(*desc) += CAAM_PTR_SZ / CAAM_CMD_SZ;
+-}
+-
+-static inline void init_job_desc_shared(u32 *desc, dma_addr_t ptr, int len,
+-					u32 options)
+-{
+-	PRINT_POS;
+-	init_job_desc(desc, HDR_SHARED | options |
+-		      (len << HDR_START_IDX_SHIFT));
+-	append_ptr(desc, ptr);
+-}
+-
+-static inline void append_data(u32 *desc, void *data, int len)
+-{
+-	u32 *offset = desc_end(desc);
+-
+-	if (len) /* avoid sparse warning: memcpy with byte count of 0 */
+-		memcpy(offset, data, len);
+-
+-	(*desc) += (len + CAAM_CMD_SZ - 1) / CAAM_CMD_SZ;
+-}
+-
+-static inline void append_cmd(u32 *desc, u32 command)
+-{
+-	u32 *cmd = desc_end(desc);
+-
+-	*cmd = command;
+-
+-	(*desc)++;
+-}
+-
+-#define append_u32 append_cmd
+-
+-static inline void append_u64(u32 *desc, u64 data)
+-{
+-	u32 *offset = desc_end(desc);
+-
+-	*offset = upper_32_bits(data);
+-	*(++offset) = lower_32_bits(data);
+-
+-	(*desc) += 2;
+-}
+-
+-/* Write command without affecting header, and return pointer to next word */
+-static inline u32 *write_cmd(u32 *desc, u32 command)
+-{
+-	*desc = command;
+-
+-	return desc + 1;
+-}
+-
+-static inline void append_cmd_ptr(u32 *desc, dma_addr_t ptr, int len,
+-				  u32 command)
+-{
+-	append_cmd(desc, command | len);
+-	append_ptr(desc, ptr);
+-}
+-
+-/* Write length after pointer, rather than inside command */
+-static inline void append_cmd_ptr_extlen(u32 *desc, dma_addr_t ptr,
+-					 unsigned int len, u32 command)
+-{
+-	append_cmd(desc, command);
+-	if (!(command & (SQIN_RTO | SQIN_PRE)))
+-		append_ptr(desc, ptr);
+-	append_cmd(desc, len);
+-}
+-
+-static inline void append_cmd_data(u32 *desc, void *data, int len,
+-				   u32 command)
+-{
+-	append_cmd(desc, command | IMMEDIATE | len);
+-	append_data(desc, data, len);
+-}
+-
+-#define APPEND_CMD_RET(cmd, op) \
+-static inline u32 *append_##cmd(u32 *desc, u32 options) \
+-{ \
+-	u32 *cmd = desc_end(desc); \
+-	PRINT_POS; \
+-	append_cmd(desc, CMD_##op | options); \
+-	return cmd; \
+-}
+-APPEND_CMD_RET(jump, JUMP)
+-APPEND_CMD_RET(move, MOVE)
+-
+-static inline void set_jump_tgt_here(u32 *desc, u32 *jump_cmd)
+-{
+-	*jump_cmd = *jump_cmd | (desc_len(desc) - (jump_cmd - desc));
+-}
+-
+-static inline void set_move_tgt_here(u32 *desc, u32 *move_cmd)
+-{
+-	*move_cmd &= ~MOVE_OFFSET_MASK;
+-	*move_cmd = *move_cmd | ((desc_len(desc) << (MOVE_OFFSET_SHIFT + 2)) &
+-				 MOVE_OFFSET_MASK);
+-}
+-
+-#define APPEND_CMD(cmd, op) \
+-static inline void append_##cmd(u32 *desc, u32 options) \
+-{ \
+-	PRINT_POS; \
+-	append_cmd(desc, CMD_##op | options); \
+-}
+-APPEND_CMD(operation, OPERATION)
+-
+-#define APPEND_CMD_LEN(cmd, op) \
+-static inline void append_##cmd(u32 *desc, unsigned int len, u32 options) \
+-{ \
+-	PRINT_POS; \
+-	append_cmd(desc, CMD_##op | len | options); \
+-}
+-APPEND_CMD_LEN(seq_store, SEQ_STORE)
+-APPEND_CMD_LEN(seq_fifo_load, SEQ_FIFO_LOAD)
+-APPEND_CMD_LEN(seq_fifo_store, SEQ_FIFO_STORE)
+-
+-#define APPEND_CMD_PTR(cmd, op) \
+-static inline void append_##cmd(u32 *desc, dma_addr_t ptr, unsigned int len, \
+-				u32 options) \
+-{ \
+-	PRINT_POS; \
+-	append_cmd_ptr(desc, ptr, len, CMD_##op | options); \
+-}
+-APPEND_CMD_PTR(key, KEY)
+-APPEND_CMD_PTR(load, LOAD)
+-APPEND_CMD_PTR(fifo_load, FIFO_LOAD)
+-APPEND_CMD_PTR(fifo_store, FIFO_STORE)
+-
+-static inline void append_store(u32 *desc, dma_addr_t ptr, unsigned int len,
+-				u32 options)
+-{
+-	u32 cmd_src;
+-
+-	cmd_src = options & LDST_SRCDST_MASK;
+-
+-	append_cmd(desc, CMD_STORE | options | len);
+-
+-	/* The following options do not require pointer */
+-	if (!(cmd_src == LDST_SRCDST_WORD_DESCBUF_SHARED ||
+-	      cmd_src == LDST_SRCDST_WORD_DESCBUF_JOB    ||
+-	      cmd_src == LDST_SRCDST_WORD_DESCBUF_JOB_WE ||
+-	      cmd_src == LDST_SRCDST_WORD_DESCBUF_SHARED_WE))
+-		append_ptr(desc, ptr);
+-}
+-
+-#define APPEND_SEQ_PTR_INTLEN(cmd, op) \
+-static inline void append_seq_##cmd##_ptr_intlen(u32 *desc, dma_addr_t ptr, \
+-						 unsigned int len, \
+-						 u32 options) \
+-{ \
+-	PRINT_POS; \
+-	if (options & (SQIN_RTO | SQIN_PRE)) \
+-		append_cmd(desc, CMD_SEQ_##op##_PTR | len | options); \
+-	else \
+-		append_cmd_ptr(desc, ptr, len, CMD_SEQ_##op##_PTR | options); \
+-}
+-APPEND_SEQ_PTR_INTLEN(in, IN)
+-APPEND_SEQ_PTR_INTLEN(out, OUT)
+-
+-#define APPEND_CMD_PTR_TO_IMM(cmd, op) \
+-static inline void append_##cmd##_as_imm(u32 *desc, void *data, \
+-					 unsigned int len, u32 options) \
+-{ \
+-	PRINT_POS; \
+-	append_cmd_data(desc, data, len, CMD_##op | options); \
+-}
+-APPEND_CMD_PTR_TO_IMM(load, LOAD);
+-APPEND_CMD_PTR_TO_IMM(fifo_load, FIFO_LOAD);
+-
+-#define APPEND_CMD_PTR_EXTLEN(cmd, op) \
+-static inline void append_##cmd##_extlen(u32 *desc, dma_addr_t ptr, \
+-					 unsigned int len, u32 options) \
+-{ \
+-	PRINT_POS; \
+-	append_cmd_ptr_extlen(desc, ptr, len, CMD_##op | SQIN_EXT | options); \
+-}
+-APPEND_CMD_PTR_EXTLEN(seq_in_ptr, SEQ_IN_PTR)
+-APPEND_CMD_PTR_EXTLEN(seq_out_ptr, SEQ_OUT_PTR)
+-
+-/*
+- * Determine whether to store length internally or externally depending on
+- * the size of its type
+- */
+-#define APPEND_CMD_PTR_LEN(cmd, op, type) \
+-static inline void append_##cmd(u32 *desc, dma_addr_t ptr, \
+-				type len, u32 options) \
+-{ \
+-	PRINT_POS; \
+-	if (sizeof(type) > sizeof(u16)) \
+-		append_##cmd##_extlen(desc, ptr, len, options); \
+-	else \
+-		append_##cmd##_intlen(desc, ptr, len, options); \
+-}
+-APPEND_CMD_PTR_LEN(seq_in_ptr, SEQ_IN_PTR, u32)
+-APPEND_CMD_PTR_LEN(seq_out_ptr, SEQ_OUT_PTR, u32)
+-
+-/*
+- * 2nd variant for commands whose specified immediate length differs
+- * from length of immediate data provided, e.g., split keys
+- */
+-#define APPEND_CMD_PTR_TO_IMM2(cmd, op) \
+-static inline void append_##cmd##_as_imm(u32 *desc, void *data, \
+-					 unsigned int data_len, \
+-					 unsigned int len, u32 options) \
+-{ \
+-	PRINT_POS; \
+-	append_cmd(desc, CMD_##op | IMMEDIATE | len | options); \
+-	append_data(desc, data, data_len); \
+-}
+-APPEND_CMD_PTR_TO_IMM2(key, KEY);
+-
+-#define APPEND_CMD_RAW_IMM(cmd, op, type) \
+-static inline void append_##cmd##_imm_##type(u32 *desc, type immediate, \
+-					     u32 options) \
+-{ \
+-	PRINT_POS; \
+-	append_cmd(desc, CMD_##op | IMMEDIATE | options | sizeof(type)); \
+-	append_cmd(desc, immediate); \
+-}
+-APPEND_CMD_RAW_IMM(load, LOAD, u32);
+-
+-/*
+- * Append math command. Only the last part of destination and source need to
+- * be specified
+- */
+-#define APPEND_MATH(op, desc, dest, src_0, src_1, len) \
+-append_cmd(desc, CMD_MATH | MATH_FUN_##op | MATH_DEST_##dest | \
+-	MATH_SRC0_##src_0 | MATH_SRC1_##src_1 | (u32)len);
+-
+-#define append_math_add(desc, dest, src0, src1, len) \
+-	APPEND_MATH(ADD, desc, dest, src0, src1, len)
+-#define append_math_sub(desc, dest, src0, src1, len) \
+-	APPEND_MATH(SUB, desc, dest, src0, src1, len)
+-#define append_math_add_c(desc, dest, src0, src1, len) \
+-	APPEND_MATH(ADDC, desc, dest, src0, src1, len)
+-#define append_math_sub_b(desc, dest, src0, src1, len) \
+-	APPEND_MATH(SUBB, desc, dest, src0, src1, len)
+-#define append_math_and(desc, dest, src0, src1, len) \
+-	APPEND_MATH(AND, desc, dest, src0, src1, len)
+-#define append_math_or(desc, dest, src0, src1, len) \
+-	APPEND_MATH(OR, desc, dest, src0, src1, len)
+-#define append_math_xor(desc, dest, src0, src1, len) \
+-	APPEND_MATH(XOR, desc, dest, src0, src1, len)
+-#define append_math_lshift(desc, dest, src0, src1, len) \
+-	APPEND_MATH(LSHIFT, desc, dest, src0, src1, len)
+-#define append_math_rshift(desc, dest, src0, src1, len) \
+-	APPEND_MATH(RSHIFT, desc, dest, src0, src1, len)
+-#define append_math_ldshift(desc, dest, src0, src1, len) \
+-	APPEND_MATH(SHLD, desc, dest, src0, src1, len)
+-
+-/* Exactly one source is IMM. Data is passed in as u32 value */
+-#define APPEND_MATH_IMM_u32(op, desc, dest, src_0, src_1, data) \
+-do { \
+-	APPEND_MATH(op, desc, dest, src_0, src_1, CAAM_CMD_SZ); \
+-	append_cmd(desc, data); \
+-} while (0)
+-
+-#define append_math_add_imm_u32(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u32(ADD, desc, dest, src0, src1, data)
+-#define append_math_sub_imm_u32(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u32(SUB, desc, dest, src0, src1, data)
+-#define append_math_add_c_imm_u32(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u32(ADDC, desc, dest, src0, src1, data)
+-#define append_math_sub_b_imm_u32(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u32(SUBB, desc, dest, src0, src1, data)
+-#define append_math_and_imm_u32(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u32(AND, desc, dest, src0, src1, data)
+-#define append_math_or_imm_u32(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u32(OR, desc, dest, src0, src1, data)
+-#define append_math_xor_imm_u32(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u32(XOR, desc, dest, src0, src1, data)
+-#define append_math_lshift_imm_u32(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u32(LSHIFT, desc, dest, src0, src1, data)
+-#define append_math_rshift_imm_u32(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u32(RSHIFT, desc, dest, src0, src1, data)
+-
+-/* Exactly one source is IMM. Data is passed in as u64 value */
+-#define APPEND_MATH_IMM_u64(op, desc, dest, src_0, src_1, data) \
+-do { \
+-	u32 upper = (data >> 16) >> 16; \
+-	APPEND_MATH(op, desc, dest, src_0, src_1, CAAM_CMD_SZ * 2 | \
+-		    (upper ? 0 : MATH_IFB)); \
+-	if (upper) \
+-		append_u64(desc, data); \
+-	else \
+-		append_u32(desc, data); \
+-} while (0)
+-
+-#define append_math_add_imm_u64(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u64(ADD, desc, dest, src0, src1, data)
+-#define append_math_sub_imm_u64(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u64(SUB, desc, dest, src0, src1, data)
+-#define append_math_add_c_imm_u64(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u64(ADDC, desc, dest, src0, src1, data)
+-#define append_math_sub_b_imm_u64(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u64(SUBB, desc, dest, src0, src1, data)
+-#define append_math_and_imm_u64(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u64(AND, desc, dest, src0, src1, data)
+-#define append_math_or_imm_u64(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u64(OR, desc, dest, src0, src1, data)
+-#define append_math_xor_imm_u64(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u64(XOR, desc, dest, src0, src1, data)
+-#define append_math_lshift_imm_u64(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u64(LSHIFT, desc, dest, src0, src1, data)
+-#define append_math_rshift_imm_u64(desc, dest, src0, src1, data) \
+-	APPEND_MATH_IMM_u64(RSHIFT, desc, dest, src0, src1, data)
+diff --git a/drivers/crypto/caam/pdb.h b/drivers/crypto/caam/pdb.h
+deleted file mode 100644
+index 3a87c0cf879a..000000000000
+--- a/drivers/crypto/caam/pdb.h
++++ /dev/null
+@@ -1,402 +0,0 @@
+-/*
+- * CAAM Protocol Data Block (PDB) definition header file
+- *
+- * Copyright 2008-2012 Freescale Semiconductor, Inc.
+- *
+- */
+-
+-#ifndef CAAM_PDB_H
+-#define CAAM_PDB_H
+-
+-/*
+- * PDB- IPSec ESP Header Modification Options
+- */
+-#define PDBHMO_ESP_DECAP_SHIFT	12
+-#define PDBHMO_ESP_ENCAP_SHIFT	4
+-/*
+- * Encap and Decap - Decrement TTL (Hop Limit) - Based on the value of the
+- * Options Byte IP version (IPvsn) field:
+- * if IPv4, decrement the inner IP header TTL field (byte 8);
+- * if IPv6 decrement the inner IP header Hop Limit field (byte 7).
+-*/
+-#define PDBHMO_ESP_DECAP_DEC_TTL	(0x02 << PDBHMO_ESP_DECAP_SHIFT)
+-#define PDBHMO_ESP_ENCAP_DEC_TTL	(0x02 << PDBHMO_ESP_ENCAP_SHIFT)
+-/*
+- * Decap - DiffServ Copy - Copy the IPv4 TOS or IPv6 Traffic Class byte
+- * from the outer IP header to the inner IP header.
+- */
+-#define PDBHMO_ESP_DIFFSERV		(0x01 << PDBHMO_ESP_DECAP_SHIFT)
+-/*
+- * Encap- Copy DF bit -if an IPv4 tunnel mode outer IP header is coming from
+- * the PDB, copy the DF bit from the inner IP header to the outer IP header.
+- */
+-#define PDBHMO_ESP_DFBIT		(0x04 << PDBHMO_ESP_ENCAP_SHIFT)
+-
+-/*
+- * PDB - IPSec ESP Encap/Decap Options
+- */
+-#define PDBOPTS_ESP_ARSNONE	0x00 /* no antireplay window */
+-#define PDBOPTS_ESP_ARS32	0x40 /* 32-entry antireplay window */
+-#define PDBOPTS_ESP_ARS64	0xc0 /* 64-entry antireplay window */
+-#define PDBOPTS_ESP_IVSRC	0x20 /* IV comes from internal random gen */
+-#define PDBOPTS_ESP_ESN		0x10 /* extended sequence included */
+-#define PDBOPTS_ESP_OUTFMT	0x08 /* output only decapsulation (decap) */
+-#define PDBOPTS_ESP_IPHDRSRC	0x08 /* IP header comes from PDB (encap) */
+-#define PDBOPTS_ESP_INCIPHDR	0x04 /* Prepend IP header to output frame */
+-#define PDBOPTS_ESP_IPVSN	0x02 /* process IPv6 header */
+-#define PDBOPTS_ESP_AOFL	0x04 /* adjust out frame len (decap, SEC>=5.3)*/
+-#define PDBOPTS_ESP_TUNNEL	0x01 /* tunnel mode next-header byte */
+-#define PDBOPTS_ESP_IPV6	0x02 /* ip header version is V6 */
+-#define PDBOPTS_ESP_DIFFSERV	0x40 /* copy TOS/TC from inner iphdr */
+-#define PDBOPTS_ESP_UPDATE_CSUM 0x80 /* encap-update ip header checksum */
+-#define PDBOPTS_ESP_VERIFY_CSUM 0x20 /* decap-validate ip header checksum */
+-
+-/*
+- * General IPSec encap/decap PDB definitions
+- */
+-struct ipsec_encap_cbc {
+-	u32 iv[4];
 -};
 -
- /* Max size of any CAAM descriptor in 32-bit words, inclusive of header */
- #define MAX_CAAM_DESCSIZE	64
- 
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index a6e5b94756d4..e6fa2c226b8f 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -5,7 +5,15 @@
-  *
-  */
- 
--struct sec4_sg_entry;
-+struct sec4_sg_entry {
-+	u64 ptr;
-+#define SEC4_SG_LEN_FIN 0x40000000
-+#define SEC4_SG_LEN_EXT 0x80000000
-+	u32 len;
-+	u8 reserved;
-+	u8 buf_pool_id;
-+	u16 offset;
-+};
- 
- /*
-  * convert single dma address to h/w link table format
+-struct ipsec_encap_ctr {
+-	u32 ctr_nonce;
+-	u32 ctr_initial;
+-	u32 iv[2];
+-};
+-
+-struct ipsec_encap_ccm {
+-	u32 salt; /* lower 24 bits */
+-	u8 b0_flags;
+-	u8 ctr_flags;
+-	u16 ctr_initial;
+-	u32 iv[2];
+-};
+-
+-struct ipsec_encap_gcm {
+-	u32 salt; /* lower 24 bits */
+-	u32 rsvd1;
+-	u32 iv[2];
+-};
+-
+-struct ipsec_encap_pdb {
+-	u8 hmo_rsvd;
+-	u8 ip_nh;
+-	u8 ip_nh_offset;
+-	u8 options;
+-	u32 seq_num_ext_hi;
+-	u32 seq_num;
+-	union {
+-		struct ipsec_encap_cbc cbc;
+-		struct ipsec_encap_ctr ctr;
+-		struct ipsec_encap_ccm ccm;
+-		struct ipsec_encap_gcm gcm;
+-	};
+-	u32 spi;
+-	u16 rsvd1;
+-	u16 ip_hdr_len;
+-	u32 ip_hdr[0]; /* optional IP Header content */
+-};
+-
+-struct ipsec_decap_cbc {
+-	u32 rsvd[2];
+-};
+-
+-struct ipsec_decap_ctr {
+-	u32 salt;
+-	u32 ctr_initial;
+-};
+-
+-struct ipsec_decap_ccm {
+-	u32 salt;
+-	u8 iv_flags;
+-	u8 ctr_flags;
+-	u16 ctr_initial;
+-};
+-
+-struct ipsec_decap_gcm {
+-	u32 salt;
+-	u32 resvd;
+-};
+-
+-struct ipsec_decap_pdb {
+-	u16 hmo_ip_hdr_len;
+-	u8 ip_nh_offset;
+-	u8 options;
+-	union {
+-		struct ipsec_decap_cbc cbc;
+-		struct ipsec_decap_ctr ctr;
+-		struct ipsec_decap_ccm ccm;
+-		struct ipsec_decap_gcm gcm;
+-	};
+-	u32 seq_num_ext_hi;
+-	u32 seq_num;
+-	u32 anti_replay[2];
+-	u32 end_index[0];
+-};
+-
+-/*
+- * IPSec ESP Datapath Protocol Override Register (DPOVRD)
+- */
+-struct ipsec_deco_dpovrd {
+-#define IPSEC_ENCAP_DECO_DPOVRD_USE 0x80
+-	u8 ovrd_ecn;
+-	u8 ip_hdr_len;
+-	u8 nh_offset;
+-	u8 next_header; /* reserved if decap */
+-};
+-
+-/*
+- * IEEE 802.11i WiFi Protocol Data Block
+- */
+-#define WIFI_PDBOPTS_FCS	0x01
+-#define WIFI_PDBOPTS_AR		0x40
+-
+-struct wifi_encap_pdb {
+-	u16 mac_hdr_len;
+-	u8 rsvd;
+-	u8 options;
+-	u8 iv_flags;
+-	u8 pri;
+-	u16 pn1;
+-	u32 pn2;
+-	u16 frm_ctrl_mask;
+-	u16 seq_ctrl_mask;
+-	u8 rsvd1[2];
+-	u8 cnst;
+-	u8 key_id;
+-	u8 ctr_flags;
+-	u8 rsvd2;
+-	u16 ctr_init;
+-};
+-
+-struct wifi_decap_pdb {
+-	u16 mac_hdr_len;
+-	u8 rsvd;
+-	u8 options;
+-	u8 iv_flags;
+-	u8 pri;
+-	u16 pn1;
+-	u32 pn2;
+-	u16 frm_ctrl_mask;
+-	u16 seq_ctrl_mask;
+-	u8 rsvd1[4];
+-	u8 ctr_flags;
+-	u8 rsvd2;
+-	u16 ctr_init;
+-};
+-
+-/*
+- * IEEE 802.16 WiMAX Protocol Data Block
+- */
+-#define WIMAX_PDBOPTS_FCS	0x01
+-#define WIMAX_PDBOPTS_AR	0x40 /* decap only */
+-
+-struct wimax_encap_pdb {
+-	u8 rsvd[3];
+-	u8 options;
+-	u32 nonce;
+-	u8 b0_flags;
+-	u8 ctr_flags;
+-	u16 ctr_init;
+-	/* begin DECO writeback region */
+-	u32 pn;
+-	/* end DECO writeback region */
+-};
+-
+-struct wimax_decap_pdb {
+-	u8 rsvd[3];
+-	u8 options;
+-	u32 nonce;
+-	u8 iv_flags;
+-	u8 ctr_flags;
+-	u16 ctr_init;
+-	/* begin DECO writeback region */
+-	u32 pn;
+-	u8 rsvd1[2];
+-	u16 antireplay_len;
+-	u64 antireplay_scorecard;
+-	/* end DECO writeback region */
+-};
+-
+-/*
+- * IEEE 801.AE MacSEC Protocol Data Block
+- */
+-#define MACSEC_PDBOPTS_FCS	0x01
+-#define MACSEC_PDBOPTS_AR	0x40 /* used in decap only */
+-
+-struct macsec_encap_pdb {
+-	u16 aad_len;
+-	u8 rsvd;
+-	u8 options;
+-	u64 sci;
+-	u16 ethertype;
+-	u8 tci_an;
+-	u8 rsvd1;
+-	/* begin DECO writeback region */
+-	u32 pn;
+-	/* end DECO writeback region */
+-};
+-
+-struct macsec_decap_pdb {
+-	u16 aad_len;
+-	u8 rsvd;
+-	u8 options;
+-	u64 sci;
+-	u8 rsvd1[3];
+-	/* begin DECO writeback region */
+-	u8 antireplay_len;
+-	u32 pn;
+-	u64 antireplay_scorecard;
+-	/* end DECO writeback region */
+-};
+-
+-/*
+- * SSL/TLS/DTLS Protocol Data Blocks
+- */
+-
+-#define TLS_PDBOPTS_ARS32	0x40
+-#define TLS_PDBOPTS_ARS64	0xc0
+-#define TLS_PDBOPTS_OUTFMT	0x08
+-#define TLS_PDBOPTS_IV_WRTBK	0x02 /* 1.1/1.2/DTLS only */
+-#define TLS_PDBOPTS_EXP_RND_IV	0x01 /* 1.1/1.2/DTLS only */
+-
+-struct tls_block_encap_pdb {
+-	u8 type;
+-	u8 version[2];
+-	u8 options;
+-	u64 seq_num;
+-	u32 iv[4];
+-};
+-
+-struct tls_stream_encap_pdb {
+-	u8 type;
+-	u8 version[2];
+-	u8 options;
+-	u64 seq_num;
+-	u8 i;
+-	u8 j;
+-	u8 rsvd1[2];
+-};
+-
+-struct dtls_block_encap_pdb {
+-	u8 type;
+-	u8 version[2];
+-	u8 options;
+-	u16 epoch;
+-	u16 seq_num[3];
+-	u32 iv[4];
+-};
+-
+-struct tls_block_decap_pdb {
+-	u8 rsvd[3];
+-	u8 options;
+-	u64 seq_num;
+-	u32 iv[4];
+-};
+-
+-struct tls_stream_decap_pdb {
+-	u8 rsvd[3];
+-	u8 options;
+-	u64 seq_num;
+-	u8 i;
+-	u8 j;
+-	u8 rsvd1[2];
+-};
+-
+-struct dtls_block_decap_pdb {
+-	u8 rsvd[3];
+-	u8 options;
+-	u16 epoch;
+-	u16 seq_num[3];
+-	u32 iv[4];
+-	u64 antireplay_scorecard;
+-};
+-
+-/*
+- * SRTP Protocol Data Blocks
+- */
+-#define SRTP_PDBOPTS_MKI	0x08
+-#define SRTP_PDBOPTS_AR		0x40
+-
+-struct srtp_encap_pdb {
+-	u8 x_len;
+-	u8 mki_len;
+-	u8 n_tag;
+-	u8 options;
+-	u32 cnst0;
+-	u8 rsvd[2];
+-	u16 cnst1;
+-	u16 salt[7];
+-	u16 cnst2;
+-	u32 rsvd1;
+-	u32 roc;
+-	u32 opt_mki;
+-};
+-
+-struct srtp_decap_pdb {
+-	u8 x_len;
+-	u8 mki_len;
+-	u8 n_tag;
+-	u8 options;
+-	u32 cnst0;
+-	u8 rsvd[2];
+-	u16 cnst1;
+-	u16 salt[7];
+-	u16 cnst2;
+-	u16 rsvd1;
+-	u16 seq_num;
+-	u32 roc;
+-	u64 antireplay_scorecard;
+-};
+-
+-/*
+- * DSA/ECDSA Protocol Data Blocks
+- * Two of these exist: DSA-SIGN, and DSA-VERIFY. They are similar
+- * except for the treatment of "w" for verify, "s" for sign,
+- * and the placement of "a,b".
+- */
+-#define DSA_PDB_SGF_SHIFT	24
+-#define DSA_PDB_SGF_MASK	(0xff << DSA_PDB_SGF_SHIFT)
+-#define DSA_PDB_SGF_Q		(0x80 << DSA_PDB_SGF_SHIFT)
+-#define DSA_PDB_SGF_R		(0x40 << DSA_PDB_SGF_SHIFT)
+-#define DSA_PDB_SGF_G		(0x20 << DSA_PDB_SGF_SHIFT)
+-#define DSA_PDB_SGF_W		(0x10 << DSA_PDB_SGF_SHIFT)
+-#define DSA_PDB_SGF_S		(0x10 << DSA_PDB_SGF_SHIFT)
+-#define DSA_PDB_SGF_F		(0x08 << DSA_PDB_SGF_SHIFT)
+-#define DSA_PDB_SGF_C		(0x04 << DSA_PDB_SGF_SHIFT)
+-#define DSA_PDB_SGF_D		(0x02 << DSA_PDB_SGF_SHIFT)
+-#define DSA_PDB_SGF_AB_SIGN	(0x02 << DSA_PDB_SGF_SHIFT)
+-#define DSA_PDB_SGF_AB_VERIFY	(0x01 << DSA_PDB_SGF_SHIFT)
+-
+-#define DSA_PDB_L_SHIFT		7
+-#define DSA_PDB_L_MASK		(0x3ff << DSA_PDB_L_SHIFT)
+-
+-#define DSA_PDB_N_MASK		0x7f
+-
+-struct dsa_sign_pdb {
+-	u32 sgf_ln; /* Use DSA_PDB_ defintions per above */
+-	u8 *q;
+-	u8 *r;
+-	u8 *g;	/* or Gx,y */
+-	u8 *s;
+-	u8 *f;
+-	u8 *c;
+-	u8 *d;
+-	u8 *ab; /* ECC only */
+-	u8 *u;
+-};
+-
+-struct dsa_verify_pdb {
+-	u32 sgf_ln;
+-	u8 *q;
+-	u8 *r;
+-	u8 *g;	/* or Gx,y */
+-	u8 *w; /* or Wx,y */
+-	u8 *f;
+-	u8 *c;
+-	u8 *d;
+-	u8 *tmp; /* temporary data block */
+-	u8 *ab; /* only used if ECC processing */
+-};
+-
+-#endif
 -- 
 1.8.3.1
