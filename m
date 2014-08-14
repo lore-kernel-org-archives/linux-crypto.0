@@ -1,7 +1,7 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH v2 06/12] crypto: caam - add Run Time Library (RTA) - part 2
-Date: Thu, 14 Aug 2014 15:54:28 +0300
-Message-ID: <1408020874-2211-7-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH v2 07/12] crypto: caam - add Run Time Library (RTA) - part 3
+Date: Thu, 14 Aug 2014 15:54:29 +0300
+Message-ID: <1408020874-2211-8-git-send-email-horia.geanta@freescale.com>
 References: <1408020874-2211-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -15,2292 +15,2195 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1lp0142.outbound.protection.outlook.com ([207.46.163.142]:32681
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-by2lp0240.outbound.protection.outlook.com ([207.46.163.240]:7099
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754655AbaHNM4C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 Aug 2014 08:56:02 -0400
+	id S1754381AbaHNM4E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 14 Aug 2014 08:56:04 -0400
 In-Reply-To: <1408020874-2211-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add headers defining the RTA API.
+Replace desc.h with a newer version from RTA.
+While here, add also PROTOCOL command support
+(not added in part 2 due to patch size limitations).
 
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 Signed-off-by: Carmen Iorga <carmen.iorga@freescale.com>
 ---
- drivers/crypto/caam/flib/rta.h                  | 980 ++++++++++++++++++++++++
- drivers/crypto/caam/flib/rta/protocol_cmd.h     | 595 ++++++++++++++
- drivers/crypto/caam/flib/rta/sec_run_time_asm.h | 672 ++++++++++++++++
- 3 files changed, 2247 insertions(+)
- create mode 100644 drivers/crypto/caam/flib/rta.h
- create mode 100644 drivers/crypto/caam/flib/rta/protocol_cmd.h
- create mode 100644 drivers/crypto/caam/flib/rta/sec_run_time_asm.h
+ drivers/crypto/caam/Makefile            |    4 +-
+ drivers/crypto/caam/compat.h            |    1 +
+ drivers/crypto/caam/desc_constr.h       |    6 +-
+ drivers/crypto/caam/error.c             |    2 +-
+ drivers/crypto/caam/{ => flib}/desc.h   | 1317 ++++++++++++++++++++++++++-----
+ drivers/crypto/caam/flib/desc/common.h  |  151 ++++
+ drivers/crypto/caam/flib/desc/jobdesc.h |   57 ++
+ drivers/crypto/caam/jr.c                |    2 +-
+ 8 files changed, 1340 insertions(+), 200 deletions(-)
+ rename drivers/crypto/caam/{ => flib}/desc.h (54%)
+ create mode 100644 drivers/crypto/caam/flib/desc/common.h
+ create mode 100644 drivers/crypto/caam/flib/desc/jobdesc.h
 
-diff --git a/drivers/crypto/caam/flib/rta.h b/drivers/crypto/caam/flib/rta.h
-new file mode 100644
-index 000000000000..831163fca3bd
---- /dev/null
-+++ b/drivers/crypto/caam/flib/rta.h
-@@ -0,0 +1,980 @@
-+/* Copyright 2008-2013 Freescale Semiconductor, Inc. */
-+
-+#ifndef __RTA_RTA_H__
-+#define __RTA_RTA_H__
-+
-+#include "rta/sec_run_time_asm.h"
-+#include "rta/fifo_load_store_cmd.h"
-+#include "rta/header_cmd.h"
-+#include "rta/jump_cmd.h"
-+#include "rta/key_cmd.h"
-+#include "rta/load_cmd.h"
-+#include "rta/math_cmd.h"
-+#include "rta/move_cmd.h"
-+#include "rta/nfifo_cmd.h"
-+#include "rta/operation_cmd.h"
-+#include "rta/protocol_cmd.h"
-+#include "rta/seq_in_out_ptr_cmd.h"
-+#include "rta/signature_cmd.h"
-+#include "rta/store_cmd.h"
-+
-+/**
-+ * DOC: About
-+ *
-+ * RTA (Runtime Assembler) Library is an easy and flexible runtime method for
-+ * writing SEC descriptors. It implements a thin abstraction layer above
-+ * SEC commands set; the resulting code is compact and similar to a
-+ * descriptor sequence.
-+ *
-+ * RTA library improves comprehension of the SEC code, adds flexibility for
-+ * writing complex descriptors and keeps the code lightweight. Should be used
-+ * by whom needs to encode descriptors at runtime, with comprehensible flow
-+ * control in descriptor.
-+ */
-+
-+/**
-+ * DOC: Usage
-+ *
-+ * RTA is used in kernel space by the SEC / CAAM (Cryptographic Acceleration and
-+ * Assurance Module) kernel module (drivers/crypto/caam) and SEC / CAAM QI
-+ * kernel module (Freescale QorIQ SDK).
-+ *
-+ * RTA is used in user space by USDPAA - User Space DataPath Acceleration
-+ * Architecture (Freescale QorIQ SDK).
-+ */
-+
-+/**
-+ * DOC: Descriptor Buffer Management Routines
-+ *
-+ * Contains details of RTA descriptor buffer management and SEC Era
-+ * management routines.
-+ */
-+
-+/**
-+ * PROGRAM_CNTXT_INIT - must be called before any descriptor run-time assembly
-+ *                      call type field carry info i.e. whether descriptor is
-+ *                      shared or job descriptor.
-+ * @program: pointer to struct program
-+ * @buffer: input buffer where the descriptor will be placed (uint32_t *)
-+ * @offset: offset in input buffer from where the data will be written
-+ *          (unsigned)
-+ */
-+#define PROGRAM_CNTXT_INIT(program, buffer, offset) \
-+	rta_program_cntxt_init(program, buffer, offset)
-+
-+/**
-+ * PROGRAM_FINALIZE - must be called to mark completion of RTA call.
-+ * @program: pointer to struct program
-+ *
-+ * Return: total size of the descriptor in words (unsigned).
-+ */
-+#define PROGRAM_FINALIZE(program) rta_program_finalize(program)
-+
-+/**
-+ * PROGRAM_SET_36BIT_ADDR - must be called to set pointer size to 36 bits
-+ * @program: pointer to struct program
-+ *
-+ * Return: current size of the descriptor in words (unsigned).
-+ */
-+#define PROGRAM_SET_36BIT_ADDR(program) rta_program_set_36bit_addr(program)
-+
-+/**
-+ * PROGRAM_SET_BSWAP - must be called to enable byte swapping
-+ * @program: pointer to struct program
-+ *
-+ * Byte swapping on a 4-byte boundary will be performed at the end - when
-+ * calling PROGRAM_FINALIZE().
-+ *
-+ * Return: current size of the descriptor in words (unsigned).
-+ */
-+#define PROGRAM_SET_BSWAP(program) rta_program_set_bswap(program)
-+
-+/**
-+ * WORD - must be called to insert in descriptor buffer a 32bit value
-+ * @program: pointer to struct program
-+ * @val: input value to be written in descriptor buffer (uint32_t)
-+ *
-+ * Return: the descriptor buffer offset where this command is inserted
-+ * (unsigned).
-+ */
-+#define WORD(program, val) rta_word(program, val)
-+
-+/**
-+ * DWORD - must be called to insert in descriptor buffer a 64bit value
-+ * @program: pointer to struct program
-+ * @val: input value to be written in descriptor buffer (uint64_t)
-+ *
-+ * Return: the descriptor buffer offset where this command is inserted
-+ * (unsigned).
-+ */
-+#define DWORD(program, val) rta_dword(program, val)
-+
-+/**
-+ * COPY_DATA - must be called to insert in descriptor buffer data larger than
-+ *             64bits.
-+ * @program: pointer to struct program
-+ * @data: input data to be written in descriptor buffer (uint8_t *)
-+ * @len: length of input data (unsigned)
-+ *
-+ * Return: the descriptor buffer offset where this command is inserted
-+ * (unsigned).
-+ */
-+#define COPY_DATA(program, data, len) rta_copy_data(program, (data), (len))
-+
-+/**
-+ * DESC_LEN -  determines job / shared descriptor buffer length (in words)
-+ * @buffer: descriptor buffer (uint32_t *)
-+ *
-+ * Return: descriptor buffer length in words (unsigned).
-+ */
-+#define DESC_LEN(buffer) rta_desc_len(buffer)
-+
-+/**
-+ * DESC_BYTES - determines job / shared descriptor buffer length (in bytes)
-+ * @buffer: descriptor buffer (uint32_t *)
-+ *
-+ * Return: descriptor buffer length in bytes (unsigned).
-+ */
-+#define DESC_BYTES(buffer) rta_desc_bytes(buffer)
-+
-+/*
-+ * SEC HW block revision.
-+ *
-+ * This *must not be confused with SEC version*:
-+ * - SEC HW block revision format is "v"
-+ * - SEC revision format is "x.y"
-+ */
-+extern enum rta_sec_era rta_sec_era;
-+
-+/**
-+ * rta_set_sec_era - Set SEC Era HW block revision for which the RTA library
-+ *                   will generate the descriptors.
-+ * @era: SEC Era (enum rta_sec_era)
-+ *
-+ * Return: 0 if the ERA was set successfully, -1 otherwise (int)
-+ *
-+ * Warning 1: Must be called *only once*, *before* using any other RTA API
-+ * routine.
-+ *
-+ * Warning 2: *Not thread safe*.
-+ */
-+static inline int rta_set_sec_era(enum rta_sec_era era)
-+{
-+	if (era > MAX_SEC_ERA) {
-+		rta_sec_era = DEFAULT_SEC_ERA;
-+		pr_err("Unsupported SEC ERA. Defaulting to ERA %d\n",
-+		       DEFAULT_SEC_ERA + 1);
-+		return -1;
-+	}
-+
-+	rta_sec_era = era;
-+	return 0;
-+}
-+
-+/**
-+ * rta_get_sec_era - Get SEC Era HW block revision for which the RTA library
-+ *                   will generate the descriptors.
-+ *
-+ * Return: SEC Era (unsigned).
-+ */
-+static inline unsigned rta_get_sec_era(void)
-+{
-+	 return rta_sec_era;
-+}
-+
-+/**
-+ * DOC: SEC Commands Routines
-+ *
-+ * Contains details of RTA wrapper routines over SEC engine commands.
-+ */
-+
-+/**
-+ * SHR_HDR - Configures Shared Descriptor HEADER command
-+ * @program: pointer to struct program
-+ * @share: descriptor share state (enum rta_share_type)
-+ * @start_idx: index in descriptor buffer where the execution of the shared
-+ *             descriptor should start (@c unsigned).
-+ * @flags: operational flags: RIF, DNR, CIF, SC, PD
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define SHR_HDR(program, share, start_idx, flags) \
-+	rta_shr_header(program, share, start_idx, flags)
-+
-+/**
-+ * JOB_HDR - Configures JOB Descriptor HEADER command
-+ * @program: pointer to struct program
-+ * @share: descriptor share state (enum rta_share_type)
-+ * @start_idx: index in descriptor buffer where the execution of the job
-+ *             descriptor should start (unsigned). In case SHR bit is present
-+ *             in flags, this will be the shared descriptor length.
-+ * @share_desc: pointer to shared descriptor, in case SHR bit is set (uint64_t)
-+ * @flags: operational flags: RSMS, DNR, TD, MTD, REO, SHR
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define JOB_HDR(program, share, start_idx, share_desc, flags) \
-+	rta_job_header(program, share, start_idx, share_desc, flags, 0)
-+
-+/**
-+ * JOB_HDR_EXT - Configures JOB Descriptor HEADER command
-+ * @program: pointer to struct program
-+ * @share: descriptor share state (enum rta_share_type)
-+ * @start_idx: index in descriptor buffer where the execution of the job
-+ *             descriptor should start (unsigned). In case SHR bit is present
-+ *             in flags, this will be the shared descriptor length.
-+ * @share_desc: pointer to shared descriptor, in case SHR bit is set (uint64_t)
-+ * @flags: operational flags: RSMS, DNR, TD, MTD, REO, SHR
-+ * @ext_flags: extended header flags: DSV (DECO Select Valid), DECO Id (limited
-+ *             by DSEL_MASK).
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define JOB_HDR_EXT(program, share, start_idx, share_desc, flags, ext_flags) \
-+	rta_job_header(program, share, start_idx, share_desc, flags | EXT, \
-+		       ext_flags)
-+
-+/**
-+ * MOVE - Configures MOVE and MOVE_LEN commands
-+ * @program: pointer to struct program
-+ * @src: internal source of data that will be moved: CONTEXT1, CONTEXT2, OFIFO,
-+ *       DESCBUF, MATH0-MATH3, IFIFOABD, IFIFOAB1, IFIFOAB2, AB1, AB2, ABD.
-+ * @src_offset: offset in source data (uint16_t)
-+ * @dst: internal destination of data that will be moved: CONTEXT1, CONTEXT2,
-+ *       OFIFO, DESCBUF, MATH0-MATH3, IFIFOAB1, IFIFOAB2, IFIFO, PKA, KEY1,
-+ *       KEY2, ALTSOURCE.
-+ * @dst_offset: offset in destination data (uint16_t)
-+ * @length: size of data to be moved: for MOVE must be specified as immediate
-+ *          value and IMMED flag must be set; for MOVE_LEN must be specified
-+ *          using MATH0-MATH3.
-+ * @opt: operational flags: WAITCOMP, FLUSH1, FLUSH2, LAST1, LAST2, SIZE_WORD,
-+ *       SIZE_BYTE, SIZE_DWORD, IMMED (not valid for MOVE_LEN).
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define MOVE(program, src, src_offset, dst, dst_offset, length, opt) \
-+	rta_move(program, __MOVE, src, src_offset, dst, dst_offset, length, opt)
-+
-+/**
-+ * MOVEB - Configures MOVEB command
-+ * @program: pointer to struct program
-+ * @src: internal source of data that will be moved: CONTEXT1, CONTEXT2, OFIFO,
-+ *       DESCBUF, MATH0-MATH3, IFIFOABD, IFIFOAB1, IFIFOAB2, AB1, AB2, ABD.
-+ * @src_offset: offset in source data (uint16_t)
-+ * @dst: internal destination of data that will be moved: CONTEXT1, CONTEXT2,
-+ *       OFIFO, DESCBUF, MATH0-MATH3, IFIFOAB1, IFIFOAB2, IFIFO, PKA, KEY1,
-+ *       KEY2, ALTSOURCE.
-+ * @dst_offset: offset in destination data (uint16_t)
-+ * @length: size of data to be moved: for MOVE must be specified as immediate
-+ *          value and IMMED flag must be set; for MOVE_LEN must be specified
-+ *          using MATH0-MATH3.
-+ * @opt: operational flags: WAITCOMP, FLUSH1, FLUSH2, LAST1, LAST2, SIZE_WORD,
-+ *       SIZE_BYTE, SIZE_DWORD, IMMED (not valid for MOVE_LEN).
-+ *
-+ * Identical with MOVE command if byte swapping not enabled; else - when src/dst
-+ * is descriptor buffer or MATH registers, data type is byte array when MOVE
-+ * data type is 4-byte array and vice versa.
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define MOVEB(program, src, src_offset, dst, dst_offset, length, opt) \
-+	rta_move(program, __MOVEB, src, src_offset, dst, dst_offset, length, \
-+		 opt)
-+
-+/**
-+ * MOVEDW - Configures MOVEDW command
-+ * @program: pointer to struct program
-+ * @src: internal source of data that will be moved: CONTEXT1, CONTEXT2, OFIFO,
-+ *       DESCBUF, MATH0-MATH3, IFIFOABD, IFIFOAB1, IFIFOAB2, AB1, AB2, ABD.
-+ * @src_offset: offset in source data (uint16_t)
-+ * @dst: internal destination of data that will be moved: CONTEXT1, CONTEXT2,
-+ *       OFIFO, DESCBUF, MATH0-MATH3, IFIFOAB1, IFIFOAB2, IFIFO, PKA, KEY1,
-+ *       KEY2, ALTSOURCE.
-+ * @dst_offset: offset in destination data (uint16_t)
-+ * @length: size of data to be moved: for MOVE must be specified as immediate
-+ *          value and IMMED flag must be set; for MOVE_LEN must be specified
-+ *          using MATH0-MATH3.
-+ * @opt: operational flags: WAITCOMP, FLUSH1, FLUSH2, LAST1, LAST2, SIZE_WORD,
-+ *       SIZE_BYTE, SIZE_DWORD, IMMED (not valid for MOVE_LEN).
-+ *
-+ * Identical with MOVE command, with the following differences: data type is
-+ * 8-byte array; word swapping is performed when SEC is programmed in little
-+ * endian mode.
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define MOVEDW(program, src, src_offset, dst, dst_offset, length, opt) \
-+	rta_move(program, __MOVEDW, src, src_offset, dst, dst_offset, length, \
-+		 opt)
-+
-+/**
-+ * FIFOLOAD - Configures FIFOLOAD command to load message data, PKHA data, IV,
-+ *            ICV, AAD and bit length message data into Input Data FIFO.
-+ * @program: pointer to struct program
-+ * @data: input data type to store: PKHA registers, IFIFO, MSG1, MSG2,
-+ *        MSGOUTSNOOP, MSGINSNOOP, IV1, IV2, AAD1, ICV1, ICV2, BIT_DATA, SKIP.
-+ * @src: pointer or actual data in case of immediate load; IMMED, COPY and DCOPY
-+ *       flags indicate action taken (inline imm data, inline ptr, inline from
-+ *       ptr).
-+ * @length: number of bytes to load (uint32_t)
-+ * @flags: operational flags: SGF, IMMED, EXT, CLASS1, CLASS2, BOTH, FLUSH1,
-+ *         LAST1, LAST2, COPY, DCOPY.
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define FIFOLOAD(program, data, src, length, flags) \
-+	rta_fifo_load(program, data, src, length, flags)
-+
-+/**
-+ * SEQFIFOLOAD - Configures SEQ FIFOLOAD command to load message data, PKHA
-+ *               data, IV, ICV, AAD and bit length message data into Input Data
-+ *               FIFO.
-+ * @program: pointer to struct program
-+ * @data: input data type to store: PKHA registers, IFIFO, MSG1, MSG2,
-+ *        MSGOUTSNOOP, MSGINSNOOP, IV1, IV2, AAD1, ICV1, ICV2, BIT_DATA, SKIP.
-+ * @length: number of bytes to load; can be set to 0 for SEQ command w/ VLF set
-+ *          (uint32_t).
-+ * @flags: operational flags: VLF, CLASS1, CLASS2, BOTH, FLUSH1, LAST1, LAST2,
-+ *         AIDF.
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define SEQFIFOLOAD(program, data, length, flags) \
-+	rta_fifo_load(program, data, NONE, length, flags|SEQ)
-+
-+/**
-+ * FIFOSTORE - Configures FIFOSTORE command, to move data from Output Data FIFO
-+ *             to external memory via DMA.
-+ * @program: pointer to struct program
-+ * @data: output data type to store: PKHA registers, IFIFO, OFIFO, RNG,
-+ *        RNGOFIFO, AFHA_SBOX, MDHA_SPLIT_KEY, MSG, KEY1, KEY2, SKIP.
-+ * @encrypt_flags: store data encryption mode: EKT, TK
-+ * @dst: pointer to store location (uint64_t)
-+ * @length: number of bytes to load (uint32_t)
-+ * @flags: operational flags: SGF, CONT, EXT, CLASS1, CLASS2, BOTH
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define FIFOSTORE(program, data, encrypt_flags, dst, length, flags) \
-+	rta_fifo_store(program, data, encrypt_flags, dst, length, flags)
-+
-+/**
-+ * SEQFIFOSTORE - Configures SEQ FIFOSTORE command, to move data from Output
-+ *                Data FIFO to external memory via DMA.
-+ * @program: pointer to struct program
-+ * @data: output data type to store: PKHA registers, IFIFO, OFIFO, RNG,
-+ *        RNGOFIFO, AFHA_SBOX, MDHA_SPLIT_KEY, MSG, KEY1, KEY2, METADATA, SKIP.
-+ * @encrypt_flags: store data encryption mode: EKT, TK
-+ * @length: number of bytes to load; can be set to 0 for SEQ command w/ VLF set
-+ *          (uint32_t).
-+ * @flags: operational flags: VLF, CONT, EXT, CLASS1, CLASS2, BOTH
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define SEQFIFOSTORE(program, data, encrypt_flags, length, flags) \
-+	rta_fifo_store(program, data, encrypt_flags, 0, length, flags|SEQ)
-+
-+/**
-+ * KEY - Configures KEY and SEQ KEY commands
-+ * @program: pointer to struct program
-+ * @key_dst: key store location: KEY1, KEY2, PKE, AFHA_SBOX, MDHA_SPLIT_KEY
-+ * @encrypt_flags: key encryption mode: ENC, EKT, TK, NWB, PTS
-+ * @src: pointer or actual data in case of immediate load (uint64_t); IMMED,
-+ *       COPY and DCOPY flags indicate action taken (inline imm data,
-+ *       inline ptr, inline from ptr).
-+ * @length: number of bytes to load; can be set to 0 for SEQ command w/ VLF set
-+ *          (uint32_t).
-+ * @flags: operational flags: for KEY: SGF, IMMED, COPY, DCOPY; for SEQKEY: SEQ,
-+ *         VLF, AIDF.
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define KEY(program, key_dst, encrypt_flags, src, length, flags) \
-+	rta_key(program, key_dst, encrypt_flags, src, length, flags)
-+
-+/**
-+ * SEQINPTR - Configures SEQ IN PTR command
-+ * @program: pointer to struct program
-+ * @src: starting address for Input Sequence (uint64_t)
-+ * @length: number of bytes in (or to be added to) Input Sequence (uint32_t)
-+ * @flags: operational flags: RBS, INL, SGF, PRE, EXT, RTO, RJD, SOP (when PRE,
-+ *         RTO or SOP are set, @src parameter must be 0).
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define SEQINPTR(program, src, length, flags) \
-+	rta_seq_in_ptr(program, src, length, flags)
-+
-+/**
-+ * SEQOUTPTR - Configures SEQ OUT PTR command
-+ * @program: pointer to struct program
-+ * @dst: starting address for Output Sequence (uint64_t)
-+ * @length: number of bytes in (or to be added to) Output Sequence (uint32_t)
-+ * @flags: operational flags: SGF, PRE, EXT, RTO, RST, EWS (when PRE or RTO are
-+ *         set, @dst parameter must be 0).
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define SEQOUTPTR(program, dst, length, flags) \
-+	rta_seq_out_ptr(program, dst, length, flags)
-+
-+/**
-+ * ALG_OPERATION - Configures ALGORITHM OPERATION command
-+ * @program: pointer to struct program
-+ * @cipher_alg: algorithm to be used
-+ * @aai: Additional Algorithm Information; contains mode information that is
-+ *       associated with the algorithm (check desc.h for specific values).
-+ * @algo_state: algorithm state; defines the state of the algorithm that is
-+ *              being executed (check desc.h file for specific values).
-+ * @icv_check: ICV checking; selects whether the algorithm should check
-+ *             calculated ICV with known ICV: ICV_CHECK_ENABLE,
-+ *             ICV_CHECK_DISABLE.
-+ * @enc: selects between encryption and decryption: DIR_ENC, DIR_DEC
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define ALG_OPERATION(program, cipher_alg, aai, algo_state, icv_check, enc) \
-+	rta_operation(program, cipher_alg, aai, algo_state, icv_check, enc)
-+
-+/**
-+ * PROTOCOL - Configures PROTOCOL OPERATION command
-+ * @program: pointer to struct program
-+ * @optype: operation type: OP_TYPE_UNI_PROTOCOL / OP_TYPE_DECAP_PROTOCOL /
-+ *          OP_TYPE_ENCAP_PROTOCOL.
-+ * @protid: protocol identifier value (check desc.h file for specific values)
-+ * @protoinfo: protocol dependent value (check desc.h file for specific values)
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define PROTOCOL(program, optype, protid, protoinfo) \
-+	rta_proto_operation(program, optype, protid, protoinfo)
-+
-+/**
-+ * PKHA_OPERATION - Configures PKHA OPERATION command
-+ * @program: pointer to struct program
-+ * @op_pkha: PKHA operation; indicates the modular arithmetic function to
-+ *           execute (check desc.h file for specific values).
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define PKHA_OPERATION(program, op_pkha)   rta_pkha_operation(program, op_pkha)
-+
-+/**
-+ * JUMP - Configures JUMP command
-+ * @program: pointer to struct program
-+ * @addr: local offset for local jumps or address pointer for non-local jumps;
-+ *        IMM or PTR macros must be used to indicate type.
-+ * @jump_type: type of action taken by jump (enum rta_jump_type)
-+ * @test_type: defines how jump conditions are evaluated (enum rta_jump_cond)
-+ * @cond: jump conditions: operational flags - DONE1, DONE2, BOTH; various
-+ *        sharing and wait conditions (JSL = 1) - NIFP, NIP, NOP, NCP, CALM,
-+ *        SELF, SHARED, JQP; Math and PKHA status conditions (JSL = 0) - Z, N,
-+ *        NV, C, PK0, PK1, PKP.
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define JUMP(program, addr, jump_type, test_type, cond) \
-+	rta_jump(program, addr, jump_type, test_type, cond, NONE)
-+
-+/**
-+ * JUMP_INC - Configures JUMP_INC command
-+ * @program: pointer to struct program
-+ * @addr: local offset; IMM or PTR macros must be used to indicate type
-+ * @test_type: defines how jump conditions are evaluated (enum rta_jump_cond)
-+ * @cond: jump conditions: Math status conditions (JSL = 0): Z, N, NV, C
-+ * @src_dst: register to increment / decrement: MATH0-MATH3, DPOVRD, SEQINSZ,
-+ *           SEQOUTSZ, VSEQINSZ, VSEQOUTSZ.
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define JUMP_INC(program, addr, test_type, cond, src_dst) \
-+	rta_jump(program, addr, LOCAL_JUMP_INC, test_type, cond, src_dst)
-+
-+/**
-+ * JUMP_DEC - Configures JUMP_DEC command
-+ * @program: pointer to struct program
-+ * @addr: local offset; IMM or PTR macros must be used to indicate type
-+ * @test_type: defines how jump conditions are evaluated (enum rta_jump_cond)
-+ * @cond: jump conditions: Math status conditions (JSL = 0): Z, N, NV, C
-+ * @src_dst: register to increment / decrement: MATH0-MATH3, DPOVRD, SEQINSZ,
-+ *           SEQOUTSZ, VSEQINSZ, VSEQOUTSZ.
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define JUMP_DEC(program, addr, test_type, cond, src_dst) \
-+	rta_jump(program, addr, LOCAL_JUMP_DEC, test_type, cond, src_dst)
-+
-+/**
-+ * LOAD - Configures LOAD command to load data registers from descriptor or from
-+ *        a memory location.
-+ * @program: pointer to struct program
-+ * @addr: immediate value or pointer to the data to be loaded; IMMED, COPY and
-+ *        DCOPY flags indicate action taken (inline imm data, inline ptr, inline
-+ *        from ptr).
-+ * @dst: destination register (uint64_t)
-+ * @offset: start point to write data in destination register (uint32_t)
-+ * @length: number of bytes to load (uint32_t)
-+ * @flags: operational flags: VLF, IMMED, COPY, DCOPY
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define LOAD(program, addr, dst, offset, length, flags) \
-+	rta_load(program, addr, dst, offset, length, flags)
-+
-+/**
-+ * SEQLOAD - Configures SEQ LOAD command to load data registers from descriptor
-+ *           or from a memory location.
-+ * @program: pointer to struct program
-+ * @dst: destination register (uint64_t)
-+ * @offset: start point to write data in destination register (uint32_t)
-+ * @length: number of bytes to load (uint32_t)
-+ * @flags: operational flags: SGF
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define SEQLOAD(program, dst, offset, length, flags) \
-+	rta_load(program, NONE, dst, offset, length, flags|SEQ)
-+
-+/**
-+ * STORE - Configures STORE command to read data from registers and write them
-+ *         to a memory location.
-+ * @program: pointer to struct program
-+ * @src: immediate value or source register for data to be stored: KEY1SZ,
-+ *       KEY2SZ, DJQDA, MODE1, MODE2, DJQCTRL, DATA1SZ, DATA2SZ, DSTAT, ICV1SZ,
-+ *       ICV2SZ, DPID, CCTRL, ICTRL, CLRW, CSTAT, MATH0-MATH3, PKHA registers,
-+ *       CONTEXT1, CONTEXT2, DESCBUF, JOBDESCBUF, SHAREDESCBUF. In case of
-+ *       immediate value, IMMED, COPY and DCOPY flags indicate action taken
-+ *       (inline imm data, inline ptr, inline from ptr).
-+ * @offset: start point for reading from source register (uint16_t)
-+ * @dst: pointer to store location (uint64_t)
-+ * @length: number of bytes to store (uint32_t)
-+ * @flags: operational flags: VLF, IMMED, COPY, DCOPY
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define STORE(program, src, offset, dst, length, flags) \
-+	rta_store(program, src, offset, dst, length, flags)
-+
-+/**
-+ * SEQSTORE - Configures SEQ STORE command to read data from registers and write
-+ *            them to a memory location.
-+ * @program: pointer to struct program
-+ * @src: immediate value or source register for data to be stored: KEY1SZ,
-+ *       KEY2SZ, DJQDA, MODE1, MODE2, DJQCTRL, DATA1SZ, DATA2SZ, DSTAT, ICV1SZ,
-+ *       ICV2SZ, DPID, CCTRL, ICTRL, CLRW, CSTAT, MATH0-MATH3, PKHA registers,
-+ *       CONTEXT1, CONTEXT2, DESCBUF, JOBDESCBUF, SHAREDESCBUF. In case of
-+ *       immediate value, IMMED, COPY and DCOPY flags indicate action taken
-+ *       (inline imm data, inline ptr, inline from ptr).
-+ * @offset: start point for reading from source register (uint16_t)
-+ * @length: number of bytes to store (uint32_t)
-+ * @flags: operational flags: SGF, IMMED, COPY, DCOPY
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define SEQSTORE(program, src, offset, length, flags) \
-+	rta_store(program, src, offset, NONE, length, flags|SEQ)
-+
-+/**
-+ * MATHB - Configures MATHB command to perform binary operations
-+ * @program: pointer to struct program
-+ * @operand1: first operand: MATH0-MATH3, DPOVRD, SEQINSZ, SEQOUTSZ, VSEQINSZ,
-+ *            VSEQOUTSZ, ZERO, ONE, NONE, Immediate value. IMMED must be used to
-+ *            indicate immediate value.
-+ * @operator: function to be performed: ADD, ADDC, SUB, SUBB, OR, AND, XOR,
-+ *            LSHIFT, RSHIFT, SHLD.
-+ * @operand2: second operand: MATH0-MATH3, DPOVRD, VSEQINSZ, VSEQOUTSZ, ABD,
-+ *            OFIFO, JOBSRC, ZERO, ONE, Immediate value. IMMED2 must be used to
-+ *            indicate immediate value.
-+ * @result: destination for the result: MATH0-MATH3, DPOVRD, SEQINSZ, SEQOUTSZ,
-+ *          NONE, VSEQINSZ, VSEQOUTSZ.
-+ * @length: length in bytes of the operation and the immediate value, if there
-+ *          is one (int).
-+ * @opt: operational flags: IFB, NFU, STL, SWP, IMMED, IMMED2
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define MATHB(program, operand1, operator, operand2, result, length, opt) \
-+	rta_math(program, operand1, MATH_FUN_##operator, operand2, result, \
-+		 length, opt)
-+
-+/**
-+ * MATHI - Configures MATHI command to perform binary operations
-+ * @program: pointer to struct program
-+ * @operand: if !SSEL: MATH0-MATH3, DPOVRD, SEQINSZ, SEQOUTSZ, VSEQINSZ,
-+ *           VSEQOUTSZ, ZERO, ONE.
-+ *           if SSEL: MATH0-MATH3, DPOVRD, VSEQINSZ, VSEQOUTSZ, ABD, OFIFO,
-+ *           JOBSRC, ZERO, ONE.
-+ * @operator: function to be performed: ADD, ADDC, SUB, SUBB, OR, AND, XOR,
-+ *            LSHIFT, RSHIFT, FBYT (for !SSEL only).
-+ * @imm: Immediate value (uint8_t). IMMED must be used to indicate immediate
-+ *       value.
-+ * @result: destination for the result: MATH0-MATH3, DPOVRD, SEQINSZ, SEQOUTSZ,
-+ *          NONE, VSEQINSZ, VSEQOUTSZ.
-+ * @length: length in bytes of the operation and the immediate value, if there
-+ *          is one (int). @imm is left-extended with zeros if needed.
-+ * @opt: operational flags: NFU, SSEL, SWP, IMMED
-+ *
-+ * If !SSEL, @operand <@operator> @imm -> @result
-+ * If SSEL, @imm <@operator> @operand -> @result
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define MATHI(program, operand, operator, imm, result, length, opt) \
-+	rta_mathi(program, operand, MATH_FUN_##operator, imm, result, length, \
-+		  opt)
-+
-+/**
-+ * MATHU - Configures MATHU command to perform unary operations
-+ * @program: pointer to struct program
-+ * @operand1: operand: MATH0-MATH3, DPOVRD, SEQINSZ, SEQOUTSZ, VSEQINSZ,
-+ *            VSEQOUTSZ, ZERO, ONE, NONE, Immediate value. IMMED must be used to
-+ *            indicate immediate value.
-+ * @operator: function to be performed: ZBYT, BSWAP
-+ * @result: destination for the result: MATH0-MATH3, DPOVRD, SEQINSZ, SEQOUTSZ,
-+ *          NONE, VSEQINSZ, VSEQOUTSZ.
-+ * @length: length in bytes of the operation and the immediate value, if there
-+ *          is one (int).
-+ * @opt: operational flags: NFU, STL, SWP, IMMED
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define MATHU(program, operand1, operator, result, length, opt) \
-+	rta_math(program, operand1, MATH_FUN_##operator, NONE, result, length, \
-+		 opt)
-+
-+/**
-+ * SIGNATURE - Configures SIGNATURE command
-+ * @program: pointer to struct program
-+ * @sign_type: signature type: SIGN_TYPE_FINAL, SIGN_TYPE_FINAL_RESTORE,
-+ *             SIGN_TYPE_FINAL_NONZERO, SIGN_TYPE_IMM_2, SIGN_TYPE_IMM_3,
-+ *             SIGN_TYPE_IMM_4.
-+ *
-+ * After SIGNATURE command, DWORD or WORD must be used to insert signature in
-+ * descriptor buffer.
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define SIGNATURE(program, sign_type)   rta_signature(program, sign_type)
-+
-+/**
-+ * NFIFOADD - Configures NFIFO command, a shortcut of RTA Load command to write
-+ *            to iNfo FIFO.
-+ * @program: pointer to struct program
-+ * @src: source for the input data in Alignment Block:IFIFO, OFIFO, PAD,
-+ *       MSGOUTSNOOP, ALTSOURCE, OFIFO_SYNC, MSGOUTSNOOP_ALT.
-+ * @data: type of data that is going through the Input Data FIFO: MSG, MSG1,
-+ *        MSG2, IV1, IV2, ICV1, ICV2, SAD1, AAD1, AAD2, AFHA_SBOX, SKIP,
-+ *        PKHA registers, AB1, AB2, ABD.
-+ * @length: length of the data copied in FIFO registers (uint32_t)
-+ * @flags: select options between:
-+ *         -operational flags: LAST1, LAST2, FLUSH1, FLUSH2, OC, BP
-+ *         -when PAD is selected as source: BM, PR, PS
-+ *         -padding type: <em>PAD_ZERO, PAD_NONZERO, PAD_INCREMENT, PAD_RANDOM,
-+ *          PAD_ZERO_N1, PAD_NONZERO_0, PAD_N1, PAD_NONZERO_N
-+ *
-+ * Return: On success, descriptor buffer offset where this command is inserted.
-+ *         On error, a negative error code; first error program counter will
-+ *         point to offset in descriptor buffer where the instruction should
-+ *         have been written.
-+ */
-+#define NFIFOADD(program, src, data, length, flags) \
-+	rta_nfifo_load(program, src, data, length, flags)
-+
-+/**
-+ * DOC: Self Referential Code Management Routines
-+ *
-+ * Contains details of RTA self referential code routines.
-+ */
-+
-+/**
-+ * REFERENCE - initialize a variable used for storing an index inside a
-+ *             descriptor buffer.
-+ * @ref: reference to a descriptor buffer's index where an update is required
-+ *       with a value that will be known latter in the program flow.
-+ */
-+#define REFERENCE(ref)    int ref = -1
-+
-+/**
-+ * LABEL - initialize a variable used for storing an index inside a descriptor
-+ *         buffer.
-+ * @label: label stores the value with what should be updated the REFERENCE line
-+ *         in the descriptor buffer.
-+ */
-+#define LABEL(label)      unsigned label = 0
-+
-+/**
-+ * SET_LABEL - set a LABEL value
-+ * @program: pointer to struct program
-+ * @label: value that will be inserted in a line previously written in the
-+ *         descriptor buffer.
-+ */
-+#define SET_LABEL(program, label)  label = rta_set_label(program)
-+
-+/**
-+ * PATCH_JUMP - Auxiliary command to resolve self referential code
-+ * @program: buffer to be updated (struct program *)
-+ * @line: position in descriptor buffer where the update will be done; this
-+ *        value is previously retained in program flow using a reference near
-+ *        the sequence to be modified.
-+ * @new_ref: updated value that will be inserted in descriptor buffer at the
-+ *           specified line; this value is previously obtained using SET_LABEL
-+ *           macro near the line that will be used as reference (unsigned). For
-+ *           JUMP command, the value represents the offset field (in words).
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_JUMP(program, line, new_ref) \
-+	rta_patch_jmp(program, line, new_ref, false)
-+
-+/**
-+ * PATCH_JUMP_NON_LOCAL - Auxiliary command to resolve referential code between
-+ *                        two program buffers.
-+ * @src_program: buffer to be updated (struct program *)
-+ * @line: position in source descriptor buffer where the update will be done;
-+ *        this value is previously retained in program flow using a reference
-+ *        near the sequence to be modified.
-+ * @new_ref: updated value that will be inserted in descriptor buffer at the
-+ *           specified line; this value is previously obtained using SET_LABEL
-+ *           macro near the line that will be used as reference (unsigned). For
-+ *           JUMP command, the value represents the offset field (in words).
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_JUMP_NON_LOCAL(src_program, line, new_ref) \
-+	rta_patch_jmp(src_program, line, new_ref, true)
-+
-+/**
-+ * PATCH_MOVE - Auxiliary command to resolve self referential code
-+ * @program: buffer to be updated (struct program *)
-+ * @line: position in descriptor buffer where the update will be done; this
-+ *        value is previously retained in program flow using a reference near
-+ *        the sequence to be modified.
-+ * @new_ref: updated value that will be inserted in descriptor buffer at the
-+ *           specified line; this value is previously obtained using SET_LABEL
-+ *           macro near the line that will be used as reference (unsigned). For
-+ *           MOVE command, the value represents the offset field (in words).
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_MOVE(program, line, new_ref) \
-+	rta_patch_move(program, line, new_ref, false)
-+
-+/**
-+ * PATCH_MOVE_NON_LOCAL - Auxiliary command to resolve referential code between
-+ *                        two program buffers.
-+ * @src_program: buffer to be updated (struct program *)
-+ * @line: position in source descriptor buffer where the update will be done;
-+ *        this value is previously retained in program flow using a reference
-+ *        near the sequence to be modified.
-+ * @new_ref: updated value that will be inserted in source descriptor buffer at
-+ *           the specified line; this value is previously obtained using
-+ *           SET_LABEL macro near the line that will be used as reference
-+ *           (unsigned). For MOVE command, the value represents the offset
-+ *           field (in words).
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_MOVE_NON_LOCAL(src_program, line, new_ref) \
-+	rta_patch_move(src_program, line, new_ref, true)
-+
-+/**
-+ * PATCH_LOAD - Auxiliary command to resolve self referential code
-+ * @program: buffer to be updated (struct program *)
-+ * @line: position in descriptor buffer where the update will be done; this
-+ *        value is previously retained in program flow using a reference near
-+ *        the sequence to be modified.
-+ * @new_ref: updated value that will be inserted in descriptor buffer at the
-+ *           specified line; this value is previously obtained using SET_LABEL
-+ *           macro near the line that will be used as reference (unsigned). For
-+ *           LOAD command, the value represents the offset field (in words).
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_LOAD(program, line, new_ref) \
-+	rta_patch_load(program, line, new_ref)
-+
-+/**
-+ * PATCH_STORE - Auxiliary command to resolve self referential code
-+ * @program: buffer to be updated (struct program *)
-+ * @line: position in descriptor buffer where the update will be done; this
-+ *        value is previously retained in program flow using a reference near
-+ *        the sequence to be modified.
-+ * @new_ref: updated value that will be inserted in descriptor buffer at the
-+ *           specified line; this value is previously obtained using SET_LABEL
-+ *           macro near the line that will be used as reference (unsigned). For
-+ *           STORE command, the value represents the offset field (in words).
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_STORE(program, line, new_ref) \
-+	rta_patch_store(program, line, new_ref, false)
-+
-+/**
-+ * PATCH_STORE_NON_LOCAL - Auxiliary command to resolve referential code between
-+ *                         two program buffers.
-+ * @src_program: buffer to be updated (struct program *)
-+ * @line: position in source descriptor buffer where the update will be done;
-+ *        this value is previously retained in program flow using a reference
-+ *        near the sequence to be modified.
-+ * @new_ref: updated value that will be inserted in source descriptor buffer at
-+ *           the specified line; this value is previously obtained using
-+ *           SET_LABEL macro near the line that will be used as reference
-+ *           (unsigned). For STORE command, the value represents the offset
-+ *           field (in words).
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_STORE_NON_LOCAL(src_program, line, new_ref) \
-+	rta_patch_store(src_program, line, new_ref, true)
-+
-+/**
-+ * PATCH_HDR - Auxiliary command to resolve self referential code
-+ * @program: buffer to be updated (struct program *)
-+ * @line: position in descriptor buffer where the update will be done; this
-+ *        value is previously retained in program flow using a reference near
-+ *        the sequence to be modified.
-+ * @new_ref: updated value that will be inserted in descriptor buffer at the
-+ *           specified line; this value is previously obtained using SET_LABEL
-+ *           macro near the line that will be used as reference (unsigned). For
-+ *           HEADER command, the value represents the start index field.
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_HDR(program, line, new_ref) \
-+	rta_patch_header(program, line, new_ref, false)
-+
-+/**
-+ * PATCH_HDR_NON_LOCAL - Auxiliary command to resolve referential code between
-+ *                       two program buffers.
-+ * @src_program: buffer to be updated (struct program *)
-+ * @line: position in source descriptor buffer where the update will be done;
-+ *        this value is previously retained in program flow using a reference
-+ *        near the sequence to be modified.
-+ * @new_ref: updated value that will be inserted in source descriptor buffer at
-+ *           the specified line; this value is previously obtained using
-+ *           SET_LABEL macro near the line that will be used as reference
-+ *           (unsigned). For HEADER command, the value represents the start
-+ *           index field.
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_HDR_NON_LOCAL(src_program, line, new_ref) \
-+	rta_patch_header(src_program, line, new_ref, true)
-+
-+/**
-+ * PATCH_RAW - Auxiliary command to resolve self referential code
-+ * @program: buffer to be updated (struct program *)
-+ * @line: position in descriptor buffer where the update will be done; this
-+ *        value is previously retained in program flow using a reference near
-+ *        the sequence to be modified.
-+ * @mask: mask to be used for applying the new value (unsigned). The mask
-+ *        selects which bits from the provided @new_val are taken into
-+ *        consideration when overwriting the existing value.
-+ * @new_val: updated value that will be masked using the provided mask value
-+ *           and inserted in descriptor buffer at the specified line.
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_RAW(program, line, mask, new_val) \
-+	rta_patch_raw(program, line, mask, new_val, false)
-+
-+/**
-+ * PATCH_RAW_NON_LOCAL - Auxiliary command to resolve referential code between
-+ *                       two program buffers.
-+ * @src_program: buffer to be updated (struct program *)
-+ * @line: position in source descriptor buffer where the update will be done;
-+ *        this value is previously retained in program flow using a reference
-+ *        near the sequence to be modified.
-+ * @mask: mask to be used for applying the new value (unsigned). The mask
-+ *        selects which bits from the provided @new_val are taken into
-+ *        consideration when overwriting the existing value.
-+ * @new_val: updated value that will be masked using the provided mask value
-+ *           and inserted in descriptor buffer at the specified line.
-+ *
-+ * Return: 0 in case of success, a negative error code if it fails
-+ */
-+#define PATCH_RAW_NON_LOCAL(src_program, line, mask, new_val) \
-+	rta_patch_raw(src_program, line, mask, new_val, true)
-+
-+#endif /* __RTA_RTA_H__ */
-diff --git a/drivers/crypto/caam/flib/rta/protocol_cmd.h b/drivers/crypto/caam/flib/rta/protocol_cmd.h
-new file mode 100644
-index 000000000000..38f544adde74
---- /dev/null
-+++ b/drivers/crypto/caam/flib/rta/protocol_cmd.h
-@@ -0,0 +1,595 @@
-+/* Copyright 2008-2013 Freescale Semiconductor, Inc. */
-+
-+#ifndef __RTA_PROTOCOL_CMD_H__
-+#define __RTA_PROTOCOL_CMD_H__
-+
-+extern enum rta_sec_era rta_sec_era;
-+
-+static inline int __rta_ssl_proto(uint16_t protoinfo)
-+{
-+	switch (protoinfo) {
-+	case OP_PCL_SSL30_RC4_40_MD5_2:
-+	case OP_PCL_SSL30_RC4_128_MD5_2:
-+	case OP_PCL_SSL30_RC4_128_SHA_5:
-+	case OP_PCL_SSL30_RC4_40_MD5_3:
-+	case OP_PCL_SSL30_RC4_128_MD5_3:
-+	case OP_PCL_SSL30_RC4_128_SHA:
-+	case OP_PCL_SSL30_RC4_128_MD5:
-+	case OP_PCL_SSL30_RC4_40_SHA:
-+	case OP_PCL_SSL30_RC4_40_MD5:
-+	case OP_PCL_SSL30_RC4_128_SHA_2:
-+	case OP_PCL_SSL30_RC4_128_SHA_3:
-+	case OP_PCL_SSL30_RC4_128_SHA_4:
-+	case OP_PCL_SSL30_RC4_128_SHA_6:
-+	case OP_PCL_SSL30_RC4_128_SHA_7:
-+	case OP_PCL_SSL30_RC4_128_SHA_8:
-+	case OP_PCL_SSL30_RC4_128_SHA_9:
-+	case OP_PCL_SSL30_RC4_128_SHA_10:
-+	case OP_PCL_TLS_ECDHE_PSK_RC4_128_SHA:
-+		if (rta_sec_era == RTA_SEC_ERA_7)
-+			return -EINVAL;
-+		/* fall through if not Era 7 */
-+	case OP_PCL_SSL30_DES40_CBC_SHA:
-+	case OP_PCL_SSL30_DES_CBC_SHA_2:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_5:
-+	case OP_PCL_SSL30_DES40_CBC_SHA_2:
-+	case OP_PCL_SSL30_DES_CBC_SHA_3:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_6:
-+	case OP_PCL_SSL30_DES40_CBC_SHA_3:
-+	case OP_PCL_SSL30_DES_CBC_SHA_4:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_7:
-+	case OP_PCL_SSL30_DES40_CBC_SHA_4:
-+	case OP_PCL_SSL30_DES_CBC_SHA_5:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_8:
-+	case OP_PCL_SSL30_DES40_CBC_SHA_5:
-+	case OP_PCL_SSL30_DES_CBC_SHA_6:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_9:
-+	case OP_PCL_SSL30_DES40_CBC_SHA_6:
-+	case OP_PCL_SSL30_DES_CBC_SHA_7:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_10:
-+	case OP_PCL_SSL30_DES_CBC_SHA:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA:
-+	case OP_PCL_SSL30_DES_CBC_MD5:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_MD5:
-+	case OP_PCL_SSL30_DES40_CBC_SHA_7:
-+	case OP_PCL_SSL30_DES40_CBC_MD5:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_2:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_3:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_4:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_5:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_6:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_2:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_3:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_4:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_5:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_6:
-+	case OP_PCL_TLS12_AES_128_CBC_SHA256_2:
-+	case OP_PCL_TLS12_AES_128_CBC_SHA256_3:
-+	case OP_PCL_TLS12_AES_128_CBC_SHA256_4:
-+	case OP_PCL_TLS12_AES_128_CBC_SHA256_5:
-+	case OP_PCL_TLS12_AES_256_CBC_SHA256_2:
-+	case OP_PCL_TLS12_AES_256_CBC_SHA256_3:
-+	case OP_PCL_TLS12_AES_256_CBC_SHA256_4:
-+	case OP_PCL_TLS12_AES_256_CBC_SHA256_5:
-+	case OP_PCL_TLS12_AES_128_CBC_SHA256_6:
-+	case OP_PCL_TLS12_AES_256_CBC_SHA256_6:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_2:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_7:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_7:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_3:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_8:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_8:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_4:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_9:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_9:
-+	case OP_PCL_SSL30_AES_128_GCM_SHA256_1:
-+	case OP_PCL_SSL30_AES_256_GCM_SHA384_1:
-+	case OP_PCL_SSL30_AES_128_GCM_SHA256_2:
-+	case OP_PCL_SSL30_AES_256_GCM_SHA384_2:
-+	case OP_PCL_SSL30_AES_128_GCM_SHA256_3:
-+	case OP_PCL_SSL30_AES_256_GCM_SHA384_3:
-+	case OP_PCL_SSL30_AES_128_GCM_SHA256_4:
-+	case OP_PCL_SSL30_AES_256_GCM_SHA384_4:
-+	case OP_PCL_SSL30_AES_128_GCM_SHA256_5:
-+	case OP_PCL_SSL30_AES_256_GCM_SHA384_5:
-+	case OP_PCL_SSL30_AES_128_GCM_SHA256_6:
-+	case OP_PCL_TLS_DH_ANON_AES_256_GCM_SHA384:
-+	case OP_PCL_TLS_PSK_AES_128_GCM_SHA256:
-+	case OP_PCL_TLS_PSK_AES_256_GCM_SHA384:
-+	case OP_PCL_TLS_DHE_PSK_AES_128_GCM_SHA256:
-+	case OP_PCL_TLS_DHE_PSK_AES_256_GCM_SHA384:
-+	case OP_PCL_TLS_RSA_PSK_AES_128_GCM_SHA256:
-+	case OP_PCL_TLS_RSA_PSK_AES_256_GCM_SHA384:
-+	case OP_PCL_TLS_PSK_AES_128_CBC_SHA256:
-+	case OP_PCL_TLS_PSK_AES_256_CBC_SHA384:
-+	case OP_PCL_TLS_DHE_PSK_AES_128_CBC_SHA256:
-+	case OP_PCL_TLS_DHE_PSK_AES_256_CBC_SHA384:
-+	case OP_PCL_TLS_RSA_PSK_AES_128_CBC_SHA256:
-+	case OP_PCL_TLS_RSA_PSK_AES_256_CBC_SHA384:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_11:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_10:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_10:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_12:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_11:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_11:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_12:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_13:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_12:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_14:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_13:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_13:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_15:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_14:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_14:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_16:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_17:
-+	case OP_PCL_SSL30_3DES_EDE_CBC_SHA_18:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_15:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_16:
-+	case OP_PCL_SSL30_AES_128_CBC_SHA_17:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_15:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_16:
-+	case OP_PCL_SSL30_AES_256_CBC_SHA_17:
-+	case OP_PCL_TLS_ECDHE_ECDSA_AES_128_CBC_SHA256:
-+	case OP_PCL_TLS_ECDHE_ECDSA_AES_256_CBC_SHA384:
-+	case OP_PCL_TLS_ECDH_ECDSA_AES_128_CBC_SHA256:
-+	case OP_PCL_TLS_ECDH_ECDSA_AES_256_CBC_SHA384:
-+	case OP_PCL_TLS_ECDHE_RSA_AES_128_CBC_SHA256:
-+	case OP_PCL_TLS_ECDHE_RSA_AES_256_CBC_SHA384:
-+	case OP_PCL_TLS_ECDH_RSA_AES_128_CBC_SHA256:
-+	case OP_PCL_TLS_ECDH_RSA_AES_256_CBC_SHA384:
-+	case OP_PCL_TLS_ECDHE_ECDSA_AES_128_GCM_SHA256:
-+	case OP_PCL_TLS_ECDHE_ECDSA_AES_256_GCM_SHA384:
-+	case OP_PCL_TLS_ECDH_ECDSA_AES_128_GCM_SHA256:
-+	case OP_PCL_TLS_ECDH_ECDSA_AES_256_GCM_SHA384:
-+	case OP_PCL_TLS_ECDHE_RSA_AES_128_GCM_SHA256:
-+	case OP_PCL_TLS_ECDHE_RSA_AES_256_GCM_SHA384:
-+	case OP_PCL_TLS_ECDH_RSA_AES_128_GCM_SHA256:
-+	case OP_PCL_TLS_ECDH_RSA_AES_256_GCM_SHA384:
-+	case OP_PCL_TLS_ECDHE_PSK_3DES_EDE_CBC_SHA:
-+	case OP_PCL_TLS_ECDHE_PSK_AES_128_CBC_SHA:
-+	case OP_PCL_TLS_ECDHE_PSK_AES_256_CBC_SHA:
-+	case OP_PCL_TLS_ECDHE_PSK_AES_128_CBC_SHA256:
-+	case OP_PCL_TLS_ECDHE_PSK_AES_256_CBC_SHA384:
-+	case OP_PCL_TLS12_3DES_EDE_CBC_MD5:
-+	case OP_PCL_TLS12_3DES_EDE_CBC_SHA160:
-+	case OP_PCL_TLS12_3DES_EDE_CBC_SHA224:
-+	case OP_PCL_TLS12_3DES_EDE_CBC_SHA256:
-+	case OP_PCL_TLS12_3DES_EDE_CBC_SHA384:
-+	case OP_PCL_TLS12_3DES_EDE_CBC_SHA512:
-+	case OP_PCL_TLS12_AES_128_CBC_SHA160:
-+	case OP_PCL_TLS12_AES_128_CBC_SHA224:
-+	case OP_PCL_TLS12_AES_128_CBC_SHA256:
-+	case OP_PCL_TLS12_AES_128_CBC_SHA384:
-+	case OP_PCL_TLS12_AES_128_CBC_SHA512:
-+	case OP_PCL_TLS12_AES_192_CBC_SHA160:
-+	case OP_PCL_TLS12_AES_192_CBC_SHA224:
-+	case OP_PCL_TLS12_AES_192_CBC_SHA256:
-+	case OP_PCL_TLS12_AES_192_CBC_SHA512:
-+	case OP_PCL_TLS12_AES_256_CBC_SHA160:
-+	case OP_PCL_TLS12_AES_256_CBC_SHA224:
-+	case OP_PCL_TLS12_AES_256_CBC_SHA256:
-+	case OP_PCL_TLS12_AES_256_CBC_SHA384:
-+	case OP_PCL_TLS12_AES_256_CBC_SHA512:
-+	case OP_PCL_TLS_PVT_AES_192_CBC_SHA160:
-+	case OP_PCL_TLS_PVT_AES_192_CBC_SHA384:
-+	case OP_PCL_TLS_PVT_AES_192_CBC_SHA224:
-+	case OP_PCL_TLS_PVT_AES_192_CBC_SHA512:
-+	case OP_PCL_TLS_PVT_AES_192_CBC_SHA256:
-+	case OP_PCL_TLS_PVT_MASTER_SECRET_PRF_FE:
-+	case OP_PCL_TLS_PVT_MASTER_SECRET_PRF_FF:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static inline int __rta_ike_proto(uint16_t protoinfo)
-+{
-+	switch (protoinfo) {
-+	case OP_PCL_IKE_HMAC_MD5:
-+	case OP_PCL_IKE_HMAC_SHA1:
-+	case OP_PCL_IKE_HMAC_AES128_CBC:
-+	case OP_PCL_IKE_HMAC_SHA256:
-+	case OP_PCL_IKE_HMAC_SHA384:
-+	case OP_PCL_IKE_HMAC_SHA512:
-+	case OP_PCL_IKE_HMAC_AES128_CMAC:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static inline int __rta_ipsec_proto(uint16_t protoinfo)
-+{
-+	uint16_t proto_cls1 = protoinfo & OP_PCL_IPSEC_CIPHER_MASK;
-+	uint16_t proto_cls2 = protoinfo & OP_PCL_IPSEC_AUTH_MASK;
-+
-+	switch (proto_cls1) {
-+	case OP_PCL_IPSEC_NULL:
-+	case OP_PCL_IPSEC_AES_NULL_WITH_GMAC:
-+		if (rta_sec_era < RTA_SEC_ERA_2)
-+			return -EINVAL;
-+		break;
-+	case OP_PCL_IPSEC_AES_CCM8:
-+	case OP_PCL_IPSEC_AES_CCM12:
-+	case OP_PCL_IPSEC_AES_CCM16:
-+	case OP_PCL_IPSEC_AES_GCM8:
-+	case OP_PCL_IPSEC_AES_GCM12:
-+		if (proto_cls2 == OP_PCL_IPSEC_HMAC_NULL)
-+			return 0;
-+		/* no break */
-+	case OP_PCL_IPSEC_DES_IV64:
-+	case OP_PCL_IPSEC_DES:
-+	case OP_PCL_IPSEC_3DES:
-+	case OP_PCL_IPSEC_AES_CBC:
-+	case OP_PCL_IPSEC_AES_CTR:
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (proto_cls2) {
-+	case OP_PCL_IPSEC_HMAC_MD5_96:
-+	case OP_PCL_IPSEC_HMAC_SHA1_96:
-+	case OP_PCL_IPSEC_AES_XCBC_MAC_96:
-+	case OP_PCL_IPSEC_HMAC_MD5_128:
-+	case OP_PCL_IPSEC_HMAC_SHA1_160:
-+	case OP_PCL_IPSEC_AES_CMAC_96:
-+	case OP_PCL_IPSEC_HMAC_SHA2_256_128:
-+	case OP_PCL_IPSEC_HMAC_SHA2_384_192:
-+	case OP_PCL_IPSEC_HMAC_SHA2_512_256:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static inline int __rta_srtp_proto(uint16_t protoinfo)
-+{
-+	uint16_t proto_cls1 = protoinfo & OP_PCL_SRTP_CIPHER_MASK;
-+	uint16_t proto_cls2 = protoinfo & OP_PCL_SRTP_AUTH_MASK;
-+
-+	switch (proto_cls1) {
-+	case OP_PCL_SRTP_AES_CTR:
-+		switch (proto_cls2) {
-+		case OP_PCL_SRTP_HMAC_SHA1_160:
-+			return 0;
-+		}
-+		/* no break */
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static inline int __rta_macsec_proto(uint16_t protoinfo)
-+{
-+	switch (protoinfo) {
-+	case OP_PCL_MACSEC:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static inline int __rta_wifi_proto(uint16_t protoinfo)
-+{
-+	switch (protoinfo) {
-+	case OP_PCL_WIFI:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static inline int __rta_wimax_proto(uint16_t protoinfo)
-+{
-+	switch (protoinfo) {
-+	case OP_PCL_WIMAX_OFDM:
-+	case OP_PCL_WIMAX_OFDMA:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+/* Allowed blob proto flags for each SEC Era */
-+static const uint32_t proto_blob_flags[] = {
-+	OP_PCL_BLOB_FORMAT_MASK | OP_PCL_BLOB_BLACK,
-+	OP_PCL_BLOB_FORMAT_MASK | OP_PCL_BLOB_BLACK | OP_PCL_BLOB_TKEK |
-+		OP_PCL_BLOB_EKT | OP_PCL_BLOB_REG_MASK,
-+	OP_PCL_BLOB_FORMAT_MASK | OP_PCL_BLOB_BLACK | OP_PCL_BLOB_TKEK |
-+		OP_PCL_BLOB_EKT | OP_PCL_BLOB_REG_MASK,
-+	OP_PCL_BLOB_FORMAT_MASK | OP_PCL_BLOB_BLACK | OP_PCL_BLOB_TKEK |
-+		OP_PCL_BLOB_EKT | OP_PCL_BLOB_REG_MASK | OP_PCL_BLOB_SEC_MEM,
-+	OP_PCL_BLOB_FORMAT_MASK | OP_PCL_BLOB_BLACK | OP_PCL_BLOB_TKEK |
-+		OP_PCL_BLOB_EKT | OP_PCL_BLOB_REG_MASK | OP_PCL_BLOB_SEC_MEM
-+};
-+
-+static inline int __rta_blob_proto(uint16_t protoinfo)
-+{
-+	if (protoinfo & ~proto_blob_flags[rta_sec_era])
-+		return -EINVAL;
-+
-+	switch (protoinfo & OP_PCL_BLOB_FORMAT_MASK) {
-+	case OP_PCL_BLOB_FORMAT_NORMAL:
-+	case OP_PCL_BLOB_FORMAT_MASTER_VER:
-+	case OP_PCL_BLOB_FORMAT_TEST:
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (protoinfo & OP_PCL_BLOB_REG_MASK) {
-+	case OP_PCL_BLOB_AFHA_SBOX:
-+		if (rta_sec_era < RTA_SEC_ERA_3)
-+			return -EINVAL;
-+		/* no break */
-+	case OP_PCL_BLOB_REG_MEMORY:
-+	case OP_PCL_BLOB_REG_KEY1:
-+	case OP_PCL_BLOB_REG_KEY2:
-+	case OP_PCL_BLOB_REG_SPLIT:
-+	case OP_PCL_BLOB_REG_PKE:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static inline int __rta_dlc_proto(uint16_t protoinfo)
-+{
-+	if ((rta_sec_era < RTA_SEC_ERA_2) &&
-+	    (protoinfo & (OP_PCL_PKPROT_DSA_MSG | OP_PCL_PKPROT_HASH_MASK |
-+	     OP_PCL_PKPROT_EKT_Z | OP_PCL_PKPROT_DECRYPT_Z |
-+	     OP_PCL_PKPROT_DECRYPT_PRI)))
-+		return -EINVAL;
-+
-+	switch (protoinfo & OP_PCL_PKPROT_HASH_MASK) {
-+	case OP_PCL_PKPROT_HASH_MD5:
-+	case OP_PCL_PKPROT_HASH_SHA1:
-+	case OP_PCL_PKPROT_HASH_SHA224:
-+	case OP_PCL_PKPROT_HASH_SHA256:
-+	case OP_PCL_PKPROT_HASH_SHA384:
-+	case OP_PCL_PKPROT_HASH_SHA512:
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static inline int __rta_rsa_enc_proto(uint16_t protoinfo)
-+{
-+	switch (protoinfo & OP_PCL_RSAPROT_OP_MASK) {
-+	case OP_PCL_RSAPROT_OP_ENC_F_IN:
-+		if ((protoinfo & OP_PCL_RSAPROT_FFF_MASK) !=
-+		    OP_PCL_RSAPROT_FFF_RED)
-+			return -EINVAL;
-+		break;
-+	case OP_PCL_RSAPROT_OP_ENC_F_OUT:
-+		switch (protoinfo & OP_PCL_RSAPROT_FFF_MASK) {
-+		case OP_PCL_RSAPROT_FFF_RED:
-+		case OP_PCL_RSAPROT_FFF_ENC:
-+		case OP_PCL_RSAPROT_FFF_EKT:
-+		case OP_PCL_RSAPROT_FFF_TK_ENC:
-+		case OP_PCL_RSAPROT_FFF_TK_EKT:
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static inline int __rta_rsa_dec_proto(uint16_t protoinfo)
-+{
-+	switch (protoinfo & OP_PCL_RSAPROT_OP_MASK) {
-+	case OP_PCL_RSAPROT_OP_DEC_ND:
-+	case OP_PCL_RSAPROT_OP_DEC_PQD:
-+	case OP_PCL_RSAPROT_OP_DEC_PQDPDQC:
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (protoinfo & OP_PCL_RSAPROT_PPP_MASK) {
-+	case OP_PCL_RSAPROT_PPP_RED:
-+	case OP_PCL_RSAPROT_PPP_ENC:
-+	case OP_PCL_RSAPROT_PPP_EKT:
-+	case OP_PCL_RSAPROT_PPP_TK_ENC:
-+	case OP_PCL_RSAPROT_PPP_TK_EKT:
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	if (protoinfo & OP_PCL_RSAPROT_FMT_PKCSV15)
-+		switch (protoinfo & OP_PCL_RSAPROT_FFF_MASK) {
-+		case OP_PCL_RSAPROT_FFF_RED:
-+		case OP_PCL_RSAPROT_FFF_ENC:
-+		case OP_PCL_RSAPROT_FFF_EKT:
-+		case OP_PCL_RSAPROT_FFF_TK_ENC:
-+		case OP_PCL_RSAPROT_FFF_TK_EKT:
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+
-+	return 0;
-+}
-+
-+static inline int __rta_3g_dcrc_proto(uint16_t protoinfo)
-+{
-+	if (rta_sec_era == RTA_SEC_ERA_7)
-+		return -EINVAL;
-+
-+	switch (protoinfo) {
-+	case OP_PCL_3G_DCRC_CRC7:
-+	case OP_PCL_3G_DCRC_CRC11:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static inline int __rta_3g_rlc_proto(uint16_t protoinfo)
-+{
-+	if (rta_sec_era == RTA_SEC_ERA_7)
-+		return -EINVAL;
-+
-+	switch (protoinfo) {
-+	case OP_PCL_3G_RLC_NULL:
-+	case OP_PCL_3G_RLC_KASUMI:
-+	case OP_PCL_3G_RLC_SNOW:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static inline int __rta_lte_pdcp_proto(uint16_t protoinfo)
-+{
-+	if (rta_sec_era == RTA_SEC_ERA_7)
-+		return -EINVAL;
-+
-+	switch (protoinfo) {
-+	case OP_PCL_LTE_ZUC:
-+		if (rta_sec_era < RTA_SEC_ERA_5)
-+			break;
-+	case OP_PCL_LTE_NULL:
-+	case OP_PCL_LTE_SNOW:
-+	case OP_PCL_LTE_AES:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static inline int __rta_lte_pdcp_mixed_proto(uint16_t protoinfo)
-+{
-+	switch (protoinfo & OP_PCL_LTE_MIXED_AUTH_MASK) {
-+	case OP_PCL_LTE_MIXED_AUTH_NULL:
-+	case OP_PCL_LTE_MIXED_AUTH_SNOW:
-+	case OP_PCL_LTE_MIXED_AUTH_AES:
-+	case OP_PCL_LTE_MIXED_AUTH_ZUC:
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (protoinfo & OP_PCL_LTE_MIXED_ENC_MASK) {
-+	case OP_PCL_LTE_MIXED_ENC_NULL:
-+	case OP_PCL_LTE_MIXED_ENC_SNOW:
-+	case OP_PCL_LTE_MIXED_ENC_AES:
-+	case OP_PCL_LTE_MIXED_ENC_ZUC:
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+struct proto_map {
-+	uint32_t optype;
-+	uint32_t protid;
-+	int (*protoinfo_func)(uint16_t);
-+};
-+
-+static const struct proto_map proto_table[] = {
-+/*1*/	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_SSL30_PRF,	 __rta_ssl_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_TLS10_PRF,	 __rta_ssl_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_TLS11_PRF,	 __rta_ssl_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_TLS12_PRF,	 __rta_ssl_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_DTLS10_PRF,	 __rta_ssl_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_IKEV1_PRF,	 __rta_ike_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_IKEV2_PRF,	 __rta_ike_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_PUBLICKEYPAIR, __rta_dlc_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_DSASIGN,	 __rta_dlc_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_DSAVERIFY,	 __rta_dlc_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_IPSEC,         __rta_ipsec_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_SRTP,	         __rta_srtp_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_SSL30,	 __rta_ssl_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_TLS10,	 __rta_ssl_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_TLS11,	 __rta_ssl_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_TLS12,	 __rta_ssl_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_DTLS10,	 __rta_ssl_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_MACSEC,        __rta_macsec_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_WIFI,          __rta_wifi_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_WIMAX,         __rta_wimax_proto},
-+/*21*/	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_BLOB,          __rta_blob_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_DIFFIEHELLMAN, __rta_dlc_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_RSAENCRYPT,	 __rta_rsa_enc_proto},
-+	{OP_TYPE_UNI_PROTOCOL,   OP_PCLID_RSADECRYPT,	 __rta_rsa_dec_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_3G_DCRC,       __rta_3g_dcrc_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_3G_RLC_PDU,    __rta_3g_rlc_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_3G_RLC_SDU,    __rta_3g_rlc_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_LTE_PDCP_USER, __rta_lte_pdcp_proto},
-+/*29*/	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_LTE_PDCP_CTRL, __rta_lte_pdcp_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_PUBLICKEYPAIR, __rta_dlc_proto},
-+/*31*/	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_DSASIGN,	 __rta_dlc_proto},
-+/*32*/	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_LTE_PDCP_CTRL_MIXED,
-+	 __rta_lte_pdcp_mixed_proto},
-+	{OP_TYPE_DECAP_PROTOCOL, OP_PCLID_IPSEC_NEW,     __rta_ipsec_proto},
-+};
-+
-+/*
-+ * Allowed OPERATION protocols for each SEC Era.
-+ * Values represent the number of entries from proto_table[] that are supported.
-+ */
-+static const unsigned proto_table_sz[] = {21, 29, 29, 29, 29, 29, 31, 33};
-+
-+static inline int rta_proto_operation(struct program *program, uint32_t optype,
-+				      uint32_t protid, uint16_t protoinfo)
-+{
-+	uint32_t opcode = CMD_OPERATION;
-+	unsigned i, found = 0;
-+	uint32_t optype_tmp = optype;
-+	unsigned start_pc = program->current_pc;
-+	int ret = -EINVAL;
-+
-+	for (i = 0; i < proto_table_sz[rta_sec_era]; i++) {
-+		/* clear last bit in optype to match also decap proto */
-+		optype_tmp &= (uint32_t)~(1 << OP_TYPE_SHIFT);
-+		if (optype_tmp == proto_table[i].optype) {
-+			if (proto_table[i].protid == protid) {
-+				/* nothing else to verify */
-+				if (proto_table[i].protoinfo_func == NULL) {
-+					found = 1;
-+					break;
-+				}
-+				/* check protoinfo */
-+				ret = (*proto_table[i].protoinfo_func)
-+						(protoinfo);
-+				if (ret < 0) {
-+					pr_err("PROTO_DESC: Bad PROTO Type. SEC Program Line: %d\n",
-+					       program->current_pc);
-+					goto err;
-+				}
-+				found = 1;
-+				break;
-+			}
-+		}
-+	}
-+	if (!found) {
-+		pr_err("PROTO_DESC: Operation Type Mismatch. SEC Program Line: %d\n",
-+		       program->current_pc);
-+		goto err;
-+	}
-+
-+	__rta_out32(program, opcode | optype | protid | protoinfo);
-+	program->current_instruction++;
-+	return (int)start_pc;
-+
-+ err:
-+	program->first_error_pc = start_pc;
-+	program->current_instruction++;
-+	return ret;
-+}
-+
-+#endif /* __RTA_PROTOCOL_CMD_H__ */
-diff --git a/drivers/crypto/caam/flib/rta/sec_run_time_asm.h b/drivers/crypto/caam/flib/rta/sec_run_time_asm.h
-new file mode 100644
-index 000000000000..d2870ddd922f
---- /dev/null
-+++ b/drivers/crypto/caam/flib/rta/sec_run_time_asm.h
-@@ -0,0 +1,672 @@
-+/* Copyright 2008-2013 Freescale Semiconductor, Inc. */
-+
-+#ifndef __RTA_SEC_RUN_TIME_ASM_H__
-+#define __RTA_SEC_RUN_TIME_ASM_H__
-+
+diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
+index 550758a333e7..10a97a8a8391 100644
+--- a/drivers/crypto/caam/Makefile
++++ b/drivers/crypto/caam/Makefile
+@@ -2,9 +2,11 @@
+ # Makefile for the CAAM backend and dependent components
+ #
+ ifeq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_DEBUG), y)
+-	EXTRA_CFLAGS := -DDEBUG
++	ccflags-y := -DDEBUG
+ endif
+ 
++ccflags-y += -I$(src)
++
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM) += caam.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_JR) += caam_jr.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
+diff --git a/drivers/crypto/caam/compat.h b/drivers/crypto/caam/compat.h
+index f227922cea38..8fe0f6993ab0 100644
+--- a/drivers/crypto/caam/compat.h
++++ b/drivers/crypto/caam/compat.h
+@@ -23,6 +23,7 @@
+ #include <linux/types.h>
+ #include <linux/debugfs.h>
+ #include <linux/circ_buf.h>
++#include <linux/bitops.h>
+ #include <net/xfrm.h>
+ 
+ #include <crypto/algapi.h>
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+index 7eec20bb3849..c344fbce1c67 100644
+--- a/drivers/crypto/caam/desc_constr.h
++++ b/drivers/crypto/caam/desc_constr.h
+@@ -4,13 +4,9 @@
+  * Copyright 2008-2012 Freescale Semiconductor, Inc.
+  */
+ 
+-#include "desc.h"
 +#include "flib/desc.h"
-+
+ 
+ #define IMMEDIATE (1 << 23)
+-#define CAAM_CMD_SZ sizeof(u32)
+-#define CAAM_PTR_SZ sizeof(dma_addr_t)
+-#define CAAM_DESC_BYTES_MAX (CAAM_CMD_SZ * MAX_CAAM_DESCSIZE)
+-#define DESC_JOB_IO_LEN (CAAM_CMD_SZ * 5 + CAAM_PTR_SZ * 3)
+ 
+ #ifdef DEBUG
+ #define PRINT_POS do { printk(KERN_DEBUG "%02d: %s\n", desc_len(desc),\
+diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
+index 7d6ed4722345..5daa9cd4109a 100644
+--- a/drivers/crypto/caam/error.c
++++ b/drivers/crypto/caam/error.c
+@@ -7,7 +7,7 @@
+ #include "compat.h"
+ #include "regs.h"
+ #include "intern.h"
+-#include "desc.h"
++#include "flib/desc.h"
+ #include "jr.h"
+ #include "error.h"
+ 
+diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/flib/desc.h
+similarity index 54%
+rename from drivers/crypto/caam/desc.h
+rename to drivers/crypto/caam/flib/desc.h
+index eb8b870d03a9..9e669627af47 100644
+--- a/drivers/crypto/caam/desc.h
++++ b/drivers/crypto/caam/flib/desc.h
+@@ -1,16 +1,26 @@
+ /*
+- * CAAM descriptor composition header
+- * Definitions to support CAAM descriptor instruction generation
++ * SEC descriptor composition header.
++ * Definitions to support SEC descriptor instruction generation
+  *
+- * Copyright 2008-2011 Freescale Semiconductor, Inc.
++ * Copyright 2008-2013 Freescale Semiconductor, Inc.
+  */
+ 
+-#ifndef DESC_H
+-#define DESC_H
++#ifndef __RTA_DESC_H__
++#define __RTA_DESC_H__
+ 
+-/* Max size of any CAAM descriptor in 32-bit words, inclusive of header */
 +/* flib/compat.h is not delivered in kernel */
 +#ifndef __KERNEL__
 +#include "flib/compat.h"
 +#endif
 +
-+/**
-+ * enum rta_sec_era - SEC HW block revisions supported by the RTA library
-+ * @RTA_SEC_ERA_1: SEC Era 1
-+ * @RTA_SEC_ERA_2: SEC Era 2
-+ * @RTA_SEC_ERA_3: SEC Era 3
-+ * @RTA_SEC_ERA_4: SEC Era 4
-+ * @RTA_SEC_ERA_5: SEC Era 5
-+ * @RTA_SEC_ERA_6: SEC Era 6
-+ * @RTA_SEC_ERA_7: SEC Era 7
-+ * @RTA_SEC_ERA_8: SEC Era 8
-+ * @MAX_SEC_ERA: maximum SEC HW block revision supported by RTA library
++/* Max size of any SEC descriptor in 32-bit words, inclusive of header */
+ #define MAX_CAAM_DESCSIZE	64
+ 
++#define CAAM_CMD_SZ sizeof(uint32_t)
++#define CAAM_PTR_SZ sizeof(dma_addr_t)
++#define CAAM_DESC_BYTES_MAX (CAAM_CMD_SZ * MAX_CAAM_DESCSIZE)
++#define DESC_JOB_IO_LEN (CAAM_CMD_SZ * 5 + CAAM_PTR_SZ * 3)
++
+ /* Block size of any entity covered/uncovered with a KEK/TKEK */
+ #define KEK_BLOCKSIZE		16
+ 
+@@ -19,7 +29,7 @@
+  * inside a descriptor command word.
+  */
+ #define CMD_SHIFT		27
+-#define CMD_MASK		0xf8000000
++#define CMD_MASK		(0x1f << CMD_SHIFT)
+ 
+ #define CMD_KEY			(0x00 << CMD_SHIFT)
+ #define CMD_SEQ_KEY		(0x01 << CMD_SHIFT)
+@@ -27,20 +37,23 @@
+ #define CMD_SEQ_LOAD		(0x03 << CMD_SHIFT)
+ #define CMD_FIFO_LOAD		(0x04 << CMD_SHIFT)
+ #define CMD_SEQ_FIFO_LOAD	(0x05 << CMD_SHIFT)
++#define CMD_MOVEDW		(0x06 << CMD_SHIFT)
++#define CMD_MOVEB		(0x07 << CMD_SHIFT)
+ #define CMD_STORE		(0x0a << CMD_SHIFT)
+ #define CMD_SEQ_STORE		(0x0b << CMD_SHIFT)
+ #define CMD_FIFO_STORE		(0x0c << CMD_SHIFT)
+ #define CMD_SEQ_FIFO_STORE	(0x0d << CMD_SHIFT)
+ #define CMD_MOVE_LEN		(0x0e << CMD_SHIFT)
+ #define CMD_MOVE		(0x0f << CMD_SHIFT)
+-#define CMD_OPERATION		(0x10 << CMD_SHIFT)
+-#define CMD_SIGNATURE		(0x12 << CMD_SHIFT)
+-#define CMD_JUMP		(0x14 << CMD_SHIFT)
+-#define CMD_MATH		(0x15 << CMD_SHIFT)
+-#define CMD_DESC_HDR		(0x16 << CMD_SHIFT)
+-#define CMD_SHARED_DESC_HDR	(0x17 << CMD_SHIFT)
+-#define CMD_SEQ_IN_PTR		(0x1e << CMD_SHIFT)
+-#define CMD_SEQ_OUT_PTR		(0x1f << CMD_SHIFT)
++#define CMD_OPERATION		((uint32_t)(0x10 << CMD_SHIFT))
++#define CMD_SIGNATURE		((uint32_t)(0x12 << CMD_SHIFT))
++#define CMD_JUMP		((uint32_t)(0x14 << CMD_SHIFT))
++#define CMD_MATH		((uint32_t)(0x15 << CMD_SHIFT))
++#define CMD_DESC_HDR		((uint32_t)(0x16 << CMD_SHIFT))
++#define CMD_SHARED_DESC_HDR	((uint32_t)(0x17 << CMD_SHIFT))
++#define CMD_MATHI               ((uint32_t)(0x1d << CMD_SHIFT))
++#define CMD_SEQ_IN_PTR		((uint32_t)(0x1e << CMD_SHIFT))
++#define CMD_SEQ_OUT_PTR		((uint32_t)(0x1f << CMD_SHIFT))
+ 
+ /* General-purpose class selector for all commands */
+ #define CLASS_SHIFT		25
+@@ -51,23 +64,47 @@
+ #define CLASS_2			(0x02 << CLASS_SHIFT)
+ #define CLASS_BOTH		(0x03 << CLASS_SHIFT)
+ 
++/* ICV Check bits for Algo Operation command */
++#define ICV_CHECK_DISABLE	0
++#define ICV_CHECK_ENABLE	1
++
++
++/* Encap Mode check bits for Algo Operation command */
++#define DIR_ENC			1
++#define DIR_DEC			0
++
+ /*
+  * Descriptor header command constructs
+  * Covers shared, job, and trusted descriptor headers
+  */
+ 
+ /*
+- * Do Not Run - marks a descriptor inexecutable if there was
++ * Extended Job Descriptor Header
 + */
-+enum rta_sec_era {
-+	RTA_SEC_ERA_1,
-+	RTA_SEC_ERA_2,
-+	RTA_SEC_ERA_3,
-+	RTA_SEC_ERA_4,
-+	RTA_SEC_ERA_5,
-+	RTA_SEC_ERA_6,
-+	RTA_SEC_ERA_7,
-+	RTA_SEC_ERA_8,
-+	MAX_SEC_ERA = RTA_SEC_ERA_8
-+};
++#define HDR_EXT			BIT(24)
 +
-+/**
-+ * DEFAULT_SEC_ERA - the default value for the SEC era in case the user provides
-+ * an unsupported value.
++/*
++ * Read input frame as soon as possible (SHR HDR)
 + */
-+#define DEFAULT_SEC_ERA	MAX_SEC_ERA
++#define HDR_RIF			BIT(25)
 +
-+/**
-+ * USER_SEC_ERA - translates the SEC Era from internal to user representation.
-+ * @sec_era: SEC Era in internal (library) representation
++/*
++ * Require SEQ LIODN to be the Same  (JOB HDR)
 + */
-+#define USER_SEC_ERA(sec_era)	(sec_era + 1)
++#define HDR_RSLS		BIT(25)
 +
-+/**
-+ * INTL_SEC_ERA - translates the SEC Era from user representation to internal.
-+ * @sec_era: SEC Era in user representation
++/*
++ * Do Not Run - marks a descriptor not executable if there was
+  * a preceding error somewhere
+  */
+-#define HDR_DNR			0x01000000
++#define HDR_DNR			BIT(24)
+ 
+ /*
+  * ONE - should always be set. Combination of ONE (always
+  * set) and ZRO (always clear) forms an endianness sanity check
+  */
+-#define HDR_ONE			0x00800000
+-#define HDR_ZRO			0x00008000
++#define HDR_ONE			BIT(23)
++#define HDR_ZRO			BIT(15)
+ 
+ /* Start Index or SharedDesc Length */
+ #define HDR_START_IDX_SHIFT	16
+@@ -80,25 +117,34 @@
+ #define HDR_DESCLEN_MASK	0x7f
+ 
+ /* This is a TrustedDesc (if not SharedDesc) */
+-#define HDR_TRUSTED		0x00004000
++#define HDR_TRUSTED		BIT(14)
+ 
+ /* Make into TrustedDesc (if not SharedDesc) */
+-#define HDR_MAKE_TRUSTED	0x00002000
++#define HDR_MAKE_TRUSTED	BIT(13)
++
++/* Clear Input FiFO (if SharedDesc) */
++#define HDR_CLEAR_IFIFO		BIT(13)
+ 
+ /* Save context if self-shared (if SharedDesc) */
+-#define HDR_SAVECTX		0x00001000
++#define HDR_SAVECTX		BIT(12)
+ 
+ /* Next item points to SharedDesc */
+-#define HDR_SHARED		0x00001000
++#define HDR_SHARED		BIT(12)
+ 
+ /*
+  * Reverse Execution Order - execute JobDesc first, then
+  * execute SharedDesc (normally SharedDesc goes first).
+  */
+-#define HDR_REVERSE		0x00000800
++#define HDR_REVERSE		BIT(11)
++
++/* Propagate DNR property to SharedDesc */
++#define HDR_PROP_DNR		BIT(11)
+ 
+-/* Propogate DNR property to SharedDesc */
+-#define HDR_PROP_DNR		0x00000800
++/* DECO Select Valid */
++#define HDR_EXT_DSEL_VALID	BIT(7)
++
++/* Fake trusted descriptor */
++#define HDR_EXT_FTD		BIT(8)
+ 
+ /* JobDesc/SharedDesc share property */
+ #define HDR_SD_SHARE_SHIFT	8
+@@ -121,40 +167,53 @@
+  */
+ 
+ /* Key Destination Class: 01 = Class 1, 02 - Class 2 */
+-#define KEY_DEST_CLASS_SHIFT	25	/* use CLASS_1 or CLASS_2 */
++#define KEY_DEST_CLASS_SHIFT	25
+ #define KEY_DEST_CLASS_MASK	(0x03 << KEY_DEST_CLASS_SHIFT)
++#define KEY_DEST_CLASS1		(1 << KEY_DEST_CLASS_SHIFT)
++#define KEY_DEST_CLASS2		(2 << KEY_DEST_CLASS_SHIFT)
+ 
+ /* Scatter-Gather Table/Variable Length Field */
+-#define KEY_SGF			0x01000000
+-#define KEY_VLF			0x01000000
++#define KEY_SGF			BIT(24)
++#define KEY_VLF			BIT(24)
+ 
+ /* Immediate - Key follows command in the descriptor */
+-#define KEY_IMM			0x00800000
++#define KEY_IMM			BIT(23)
++
++/*
++ * Already in Input Data FIFO - the Input Data Sequence is not read, since it is
++ * already in the Input Data FIFO.
 + */
-+#define INTL_SEC_ERA(sec_era)	(sec_era - 1)
++#define KEY_AIDF		BIT(23)
+ 
+ /*
+  * Encrypted - Key is encrypted either with the KEK, or
+- * with the TDKEK if TK is set
++ * with the TDKEK if this descriptor is trusted
+  */
+-#define KEY_ENC			0x00400000
++#define KEY_ENC			BIT(22)
+ 
+ /*
+  * No Write Back - Do not allow key to be FIFO STOREd
+  */
+-#define KEY_NWB			0x00200000
++#define KEY_NWB			BIT(21)
+ 
+ /*
+  * Enhanced Encryption of Key
+  */
+-#define KEY_EKT			0x00100000
++#define KEY_EKT			BIT(20)
+ 
+ /*
+  * Encrypted with Trusted Key
+  */
+-#define KEY_TK			0x00008000
++#define KEY_TK			BIT(15)
 +
-+/**
-+ * enum rta_jump_type - Types of action taken by JUMP command
-+ * @LOCAL_JUMP: conditional jump to an offset within the descriptor buffer
-+ * @FAR_JUMP: conditional jump to a location outside the descriptor buffer,
-+ *            indicated by the POINTER field after the JUMP command.
-+ * @HALT: conditional halt - stop the execution of the current descriptor and
-+ *        writes PKHA / Math condition bits as status / error code.
-+ * @HALT_STATUS: conditional halt with user-specified status - stop the
-+ *               execution of the current descriptor and writes the value of
-+ *               "LOCAL OFFSET" JUMP field as status / error code.
-+ * @GOSUB: conditional subroutine call - similar to @LOCAL_JUMP, but also saves
-+ *         return address in the Return Address register; subroutine calls
-+ *         cannot be nested.
-+ * @RETURN: conditional subroutine return - similar to @LOCAL_JUMP, but the
-+ *          offset is taken from the Return Address register.
-+ * @LOCAL_JUMP_INC: similar to @LOCAL_JUMP, but increment the register specified
-+ *                  in "SRC_DST" JUMP field before evaluating the jump
-+ *                  condition.
-+ * @LOCAL_JUMP_DEC: similar to @LOCAL_JUMP, but decrement the register specified
-+ *                  in "SRC_DST" JUMP field before evaluating the jump
-+ *                  condition.
++/*
++ * Plaintext Store
 + */
-+enum rta_jump_type {
-+	LOCAL_JUMP,
-+	FAR_JUMP,
-+	HALT,
-+	HALT_STATUS,
-+	GOSUB,
-+	RETURN,
-+	LOCAL_JUMP_INC,
-+	LOCAL_JUMP_DEC
-+};
++#define KEY_PTS			BIT(14)
+ 
+ /*
+  * KDEST - Key Destination: 0 - class key register,
+- * 1 - PKHA 'e', 2 - AFHA Sbox, 3 - MDHA split-key
++ * 1 - PKHA 'e', 2 - AFHA Sbox, 3 - MDHA split key
+  */
+ #define KEY_DEST_SHIFT		16
+ #define KEY_DEST_MASK		(0x03 << KEY_DEST_SHIFT)
+@@ -183,13 +242,13 @@
+ #define LDST_CLASS_DECO		(0x03 << LDST_CLASS_SHIFT)
+ 
+ /* Scatter-Gather Table/Variable Length Field */
+-#define LDST_SGF		0x01000000
+-#define LDST_VLF		LDST_SGF
++#define LDST_SGF		BIT(24)
++#define LDST_VLF		BIT(24)
+ 
+ /* Immediate - Key follows this command in descriptor */
+ #define LDST_IMM_MASK		1
+ #define LDST_IMM_SHIFT		23
+-#define LDST_IMM		(LDST_IMM_MASK << LDST_IMM_SHIFT)
++#define LDST_IMM		BIT(23)
+ 
+ /* SRC/DST - Destination for LOAD, Source for STORE */
+ #define LDST_SRCDST_SHIFT	16
+@@ -201,9 +260,13 @@
+ #define LDST_SRCDST_BYTE_OUTFIFO	(0x7e << LDST_SRCDST_SHIFT)
+ 
+ #define LDST_SRCDST_WORD_MODE_REG	(0x00 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_DECO_JQCTRL	(0x00 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_KEYSZ_REG	(0x01 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_DECO_JQDAR	(0x01 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DATASZ_REG	(0x02 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_DECO_STAT	(0x02 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_ICVSZ_REG	(0x03 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_PID		(0x04 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_CHACTRL	(0x06 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DECOCTRL	(0x06 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_IRQCTRL	(0x07 << LDST_SRCDST_SHIFT)
+@@ -218,15 +281,26 @@
+ #define LDST_SRCDST_WORD_CLASS1_IV_SZ	(0x0c << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_ALTDS_CLASS1	(0x0f << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_PKHA_A_SZ	(0x10 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_GTR		(0x10 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_PKHA_B_SZ	(0x11 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_PKHA_N_SZ	(0x12 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_PKHA_E_SZ	(0x13 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_CLASS_CTX	(0x20 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_STR		(0x20 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DESCBUF	(0x40 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DESCBUF_JOB	(0x41 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DESCBUF_SHARED	(0x42 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DESCBUF_JOB_WE	(0x45 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_DESCBUF_SHARED_WE (0x46 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_INFO_FIFO_SZL	(0x70 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_INFO_FIFO_SZM	(0x71 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_INFO_FIFO_L	(0x72 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_INFO_FIFO_M	(0x73 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_SZL		(0x74 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_SZM		(0x75 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_IFNSR		(0x76 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_WORD_OFNSR		(0x77 << LDST_SRCDST_SHIFT)
++#define LDST_SRCDST_BYTE_ALTSOURCE	(0x78 << LDST_SRCDST_SHIFT)
+ #define LDST_SRCDST_WORD_INFO_FIFO	(0x7a << LDST_SRCDST_SHIFT)
+ 
+ /* Offset in source/destination */
+@@ -241,8 +315,8 @@
+ #define LDOFF_CHG_SHARE_OK_PROP		(0x2 << LDOFF_CHG_SHARE_SHIFT)
+ #define LDOFF_CHG_SHARE_OK_NO_PROP	(0x3 << LDOFF_CHG_SHARE_SHIFT)
+ 
+-#define LDOFF_ENABLE_AUTO_NFIFO		(1 << 2)
+-#define LDOFF_DISABLE_AUTO_NFIFO	(1 << 3)
++#define LDOFF_ENABLE_AUTO_NFIFO		BIT(2)
++#define LDOFF_DISABLE_AUTO_NFIFO	BIT(3)
+ 
+ #define LDOFF_CHG_NONSEQLIODN_SHIFT	4
+ #define LDOFF_CHG_NONSEQLIODN_MASK	(0x3 << LDOFF_CHG_NONSEQLIODN_SHIFT)
+@@ -256,19 +330,94 @@
+ #define LDOFF_CHG_SEQLIODN_NON_SEQ	(0x2 << LDOFF_CHG_SEQLIODN_SHIFT)
+ #define LDOFF_CHG_SEQLIODN_TRUSTED	(0x3 << LDOFF_CHG_SEQLIODN_SHIFT)
+ 
+-/* Data length in bytes	*/
++/* Data length in bytes */
+ #define LDST_LEN_SHIFT		0
+ #define LDST_LEN_MASK		(0xff << LDST_LEN_SHIFT)
+ 
+ /* Special Length definitions when dst=deco-ctrl */
+-#define LDLEN_ENABLE_OSL_COUNT		(1 << 7)
+-#define LDLEN_RST_CHA_OFIFO_PTR		(1 << 6)
+-#define LDLEN_RST_OFIFO			(1 << 5)
+-#define LDLEN_SET_OFIFO_OFF_VALID	(1 << 4)
+-#define LDLEN_SET_OFIFO_OFF_RSVD	(1 << 3)
++#define LDLEN_ENABLE_OSL_COUNT		BIT(7)
++#define LDLEN_RST_CHA_OFIFO_PTR		BIT(6)
++#define LDLEN_RST_OFIFO			BIT(5)
++#define LDLEN_SET_OFIFO_OFF_VALID	BIT(4)
++#define LDLEN_SET_OFIFO_OFF_RSVD	BIT(3)
+ #define LDLEN_SET_OFIFO_OFFSET_SHIFT	0
+ #define LDLEN_SET_OFIFO_OFFSET_MASK	(3 << LDLEN_SET_OFIFO_OFFSET_SHIFT)
+ 
++/* CCB Clear Written Register bits */
++#define CLRW_CLR_C1MODE              BIT(0)
++#define CLRW_CLR_C1DATAS             BIT(2)
++#define CLRW_CLR_C1ICV               BIT(3)
++#define CLRW_CLR_C1CTX               BIT(5)
++#define CLRW_CLR_C1KEY               BIT(6)
++#define CLRW_CLR_PK_A                BIT(12)
++#define CLRW_CLR_PK_B                BIT(13)
++#define CLRW_CLR_PK_N                BIT(14)
++#define CLRW_CLR_PK_E                BIT(15)
++#define CLRW_CLR_C2MODE              BIT(16)
++#define CLRW_CLR_C2KEYS              BIT(17)
++#define CLRW_CLR_C2DATAS             BIT(18)
++#define CLRW_CLR_C2CTX               BIT(21)
++#define CLRW_CLR_C2KEY               BIT(22)
++#define CLRW_RESET_CLS2_DONE         BIT(26) /* era 4 */
++#define CLRW_RESET_CLS1_DONE         BIT(27) /* era 4 */
++#define CLRW_RESET_CLS2_CHA          BIT(28) /* era 4 */
++#define CLRW_RESET_CLS1_CHA          BIT(29) /* era 4 */
++#define CLRW_RESET_OFIFO             BIT(30) /* era 3 */
++#define CLRW_RESET_IFIFO_DFIFO       BIT(31) /* era 3 */
 +
-+/**
-+ * enum rta_jump_cond - How test conditions are evaluated by JUMP command
-+ * @ALL_TRUE: perform action if ALL selected conditions are true
-+ * @ALL_FALSE: perform action if ALL selected conditions are false
-+ * @ANY_TRUE: perform action if ANY of the selected conditions is true
-+ * @ANY_FALSE: perform action if ANY of the selected conditions is false
++/* CHA Control Register bits */
++#define CCTRL_RESET_CHA_ALL          BIT(0)
++#define CCTRL_RESET_CHA_AESA         BIT(1)
++#define CCTRL_RESET_CHA_DESA         BIT(2)
++#define CCTRL_RESET_CHA_AFHA         BIT(3)
++#define CCTRL_RESET_CHA_KFHA         BIT(4)
++#define CCTRL_RESET_CHA_SF8A         BIT(5)
++#define CCTRL_RESET_CHA_PKHA         BIT(6)
++#define CCTRL_RESET_CHA_MDHA         BIT(7)
++#define CCTRL_RESET_CHA_CRCA         BIT(8)
++#define CCTRL_RESET_CHA_RNG          BIT(9)
++#define CCTRL_RESET_CHA_SF9A         BIT(10)
++#define CCTRL_RESET_CHA_ZUCE         BIT(11)
++#define CCTRL_RESET_CHA_ZUCA         BIT(12)
++#define CCTRL_UNLOAD_PK_A0           BIT(16)
++#define CCTRL_UNLOAD_PK_A1           BIT(17)
++#define CCTRL_UNLOAD_PK_A2           BIT(18)
++#define CCTRL_UNLOAD_PK_A3           BIT(19)
++#define CCTRL_UNLOAD_PK_B0           BIT(20)
++#define CCTRL_UNLOAD_PK_B1           BIT(21)
++#define CCTRL_UNLOAD_PK_B2           BIT(22)
++#define CCTRL_UNLOAD_PK_B3           BIT(23)
++#define CCTRL_UNLOAD_PK_N            BIT(24)
++#define CCTRL_UNLOAD_PK_A            BIT(26)
++#define CCTRL_UNLOAD_PK_B            BIT(27)
++#define CCTRL_UNLOAD_SBOX            BIT(28)
++
++/* IRQ Control Register (CxCIRQ) bits */
++#define CIRQ_ADI	BIT(1)
++#define CIRQ_DDI	BIT(2)
++#define CIRQ_RCDI	BIT(3)
++#define CIRQ_KDI	BIT(4)
++#define CIRQ_S8DI	BIT(5)
++#define CIRQ_PDI	BIT(6)
++#define CIRQ_MDI	BIT(7)
++#define CIRQ_CDI	BIT(8)
++#define CIRQ_RNDI	BIT(9)
++#define CIRQ_S9DI	BIT(10)
++#define CIRQ_ZEDI	BIT(11) /* valid for Era 5 or higher */
++#define CIRQ_ZADI	BIT(12) /* valid for Era 5 or higher */
++#define CIRQ_AEI	BIT(17)
++#define CIRQ_DEI	BIT(18)
++#define CIRQ_RCEI	BIT(19)
++#define CIRQ_KEI	BIT(20)
++#define CIRQ_S8EI	BIT(21)
++#define CIRQ_PEI	BIT(22)
++#define CIRQ_MEI	BIT(23)
++#define CIRQ_CEI	BIT(24)
++#define CIRQ_RNEI	BIT(25)
++#define CIRQ_S9EI	BIT(26)
++#define CIRQ_ZEEI	BIT(27) /* valid for Era 5 or higher */
++#define CIRQ_ZAEI	BIT(28) /* valid for Era 5 or higher */
++
+ /*
+  * FIFO_LOAD/FIFO_STORE/SEQ_FIFO_LOAD/SEQ_FIFO_STORE
+  * Command Constructs
+@@ -291,6 +440,7 @@
+ #define FIFOST_CLASS_NORMAL	(0x00 << FIFOST_CLASS_SHIFT)
+ #define FIFOST_CLASS_CLASS1KEY	(0x01 << FIFOST_CLASS_SHIFT)
+ #define FIFOST_CLASS_CLASS2KEY	(0x02 << FIFOST_CLASS_SHIFT)
++#define FIFOST_CLASS_BOTH	(0x03 << FIFOST_CLASS_SHIFT)
+ 
+ /*
+  * Scatter-Gather Table/Variable Length Field
+@@ -300,17 +450,27 @@
+ #define FIFOLDST_SGF_SHIFT	24
+ #define FIFOLDST_SGF_MASK	(1 << FIFOLDST_SGF_SHIFT)
+ #define FIFOLDST_VLF_MASK	(1 << FIFOLDST_SGF_SHIFT)
+-#define FIFOLDST_SGF		(1 << FIFOLDST_SGF_SHIFT)
+-#define FIFOLDST_VLF		(1 << FIFOLDST_SGF_SHIFT)
++#define FIFOLDST_SGF		BIT(24)
++#define FIFOLDST_VLF		BIT(24)
+ 
+-/* Immediate - Data follows command in descriptor */
++/*
++ * Immediate - Data follows command in descriptor
++ * AIDF - Already in Input Data FIFO
 + */
-+enum rta_jump_cond {
-+	ALL_TRUE,
-+	ALL_FALSE,
-+	ANY_TRUE,
-+	ANY_FALSE
-+};
+ #define FIFOLD_IMM_SHIFT	23
+ #define FIFOLD_IMM_MASK		(1 << FIFOLD_IMM_SHIFT)
+-#define FIFOLD_IMM		(1 << FIFOLD_IMM_SHIFT)
++#define FIFOLD_AIDF_MASK	(1 << FIFOLD_IMM_SHIFT)
++#define FIFOLD_IMM		BIT(23)
++#define FIFOLD_AIDF		BIT(23)
 +
-+/**
-+ * enum rta_share_type - Types of sharing for JOB_HDR and SHR_HDR commands
-+ * @SHR_NEVER: nothing is shared; descriptors can execute in parallel (i.e. no
-+ *             dependencies are allowed between them).
-+ * @SHR_WAIT: shared descriptor and keys are shared once the descriptor sets
-+ *            "OK to share" in DECO Control Register (DCTRL).
-+ * @SHR_SERIAL: shared descriptor and keys are shared once the descriptor has
-+ *              completed.
-+ * @SHR_ALWAYS: shared descriptor is shared anytime after the descriptor is
-+ *              loaded.
-+ * @SHR_DEFER: valid only for JOB_HDR; sharing type is the one specified
-+ *             in the shared descriptor associated with the job descriptor.
++#define FIFOST_IMM_SHIFT	23
++#define FIFOST_IMM_MASK		(1 << FIFOST_IMM_SHIFT)
++#define FIFOST_IMM		BIT(23)
+ 
+ /* Continue - Not the last FIFO store to come */
+ #define FIFOST_CONT_SHIFT	23
+ #define FIFOST_CONT_MASK	(1 << FIFOST_CONT_SHIFT)
++#define FIFOST_CONT		BIT(23)
+ 
+ /*
+  * Extended Length - use 32-bit extended length that
+@@ -318,7 +478,7 @@
+  */
+ #define FIFOLDST_EXT_SHIFT	22
+ #define FIFOLDST_EXT_MASK	(1 << FIFOLDST_EXT_SHIFT)
+-#define FIFOLDST_EXT		(1 << FIFOLDST_EXT_SHIFT)
++#define FIFOLDST_EXT		BIT(22)
+ 
+ /* Input data type.*/
+ #define FIFOLD_TYPE_SHIFT	16
+@@ -360,7 +520,7 @@
+ #define FIFOLD_TYPE_LAST2FLUSH1 (0x05 << FIFOLD_TYPE_SHIFT)
+ #define FIFOLD_TYPE_LASTBOTH	(0x06 << FIFOLD_TYPE_SHIFT)
+ #define FIFOLD_TYPE_LASTBOTHFL	(0x07 << FIFOLD_TYPE_SHIFT)
+-#define FIFOLD_TYPE_NOINFOFIFO	(0x0F << FIFOLD_TYPE_SHIFT)
++#define FIFOLD_TYPE_NOINFOFIFO	(0x0f << FIFOLD_TYPE_SHIFT)
+ 
+ #define FIFOLDST_LEN_MASK	0xffff
+ #define FIFOLDST_EXT_LEN_MASK	0xffffffff
+@@ -393,6 +553,7 @@
+ #define FIFOST_TYPE_MESSAGE_DATA (0x30 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_RNGSTORE	 (0x34 << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_RNGFIFO	 (0x35 << FIFOST_TYPE_SHIFT)
++#define FIFOST_TYPE_METADATA	 (0x3e << FIFOST_TYPE_SHIFT)
+ #define FIFOST_TYPE_SKIP	 (0x3f << FIFOST_TYPE_SHIFT)
+ 
+ /*
+@@ -412,7 +573,7 @@
+ 
+ /* ProtocolID selectors - PROTID */
+ #define OP_PCLID_SHIFT		16
+-#define OP_PCLID_MASK		(0xff << 16)
++#define OP_PCLID_MASK		(0xff << OP_PCLID_SHIFT)
+ 
+ /* Assuming OP_TYPE = OP_TYPE_UNI_PROTOCOL */
+ #define OP_PCLID_IKEV1_PRF	(0x01 << OP_PCLID_SHIFT)
+@@ -420,13 +581,14 @@
+ #define OP_PCLID_SSL30_PRF	(0x08 << OP_PCLID_SHIFT)
+ #define OP_PCLID_TLS10_PRF	(0x09 << OP_PCLID_SHIFT)
+ #define OP_PCLID_TLS11_PRF	(0x0a << OP_PCLID_SHIFT)
++#define OP_PCLID_TLS12_PRF	(0x0b << OP_PCLID_SHIFT)
+ #define OP_PCLID_DTLS10_PRF	(0x0c << OP_PCLID_SHIFT)
+-#define OP_PCLID_PRF		(0x06 << OP_PCLID_SHIFT)
+-#define OP_PCLID_BLOB		(0x0d << OP_PCLID_SHIFT)
+-#define OP_PCLID_SECRETKEY	(0x11 << OP_PCLID_SHIFT)
+ #define OP_PCLID_PUBLICKEYPAIR	(0x14 << OP_PCLID_SHIFT)
+ #define OP_PCLID_DSASIGN	(0x15 << OP_PCLID_SHIFT)
+ #define OP_PCLID_DSAVERIFY	(0x16 << OP_PCLID_SHIFT)
++#define OP_PCLID_DIFFIEHELLMAN	(0x17 << OP_PCLID_SHIFT)
++#define OP_PCLID_RSAENCRYPT	(0x18 << OP_PCLID_SHIFT)
++#define OP_PCLID_RSADECRYPT	(0x19 << OP_PCLID_SHIFT)
+ 
+ /* Assuming OP_TYPE = OP_TYPE_DECAP_PROTOCOL/ENCAP_PROTOCOL */
+ #define OP_PCLID_IPSEC		(0x01 << OP_PCLID_SHIFT)
+@@ -438,7 +600,15 @@
+ #define OP_PCLID_TLS10		(0x09 << OP_PCLID_SHIFT)
+ #define OP_PCLID_TLS11		(0x0a << OP_PCLID_SHIFT)
+ #define OP_PCLID_TLS12		(0x0b << OP_PCLID_SHIFT)
+-#define OP_PCLID_DTLS		(0x0c << OP_PCLID_SHIFT)
++#define OP_PCLID_DTLS10		(0x0c << OP_PCLID_SHIFT)
++#define OP_PCLID_BLOB		(0x0d << OP_PCLID_SHIFT)
++#define OP_PCLID_IPSEC_NEW	(0x11 << OP_PCLID_SHIFT)
++#define OP_PCLID_3G_DCRC	(0x31 << OP_PCLID_SHIFT)
++#define OP_PCLID_3G_RLC_PDU	(0x32 << OP_PCLID_SHIFT)
++#define OP_PCLID_3G_RLC_SDU	(0x33 << OP_PCLID_SHIFT)
++#define OP_PCLID_LTE_PDCP_USER	(0x42 << OP_PCLID_SHIFT)
++#define OP_PCLID_LTE_PDCP_CTRL	(0x43 << OP_PCLID_SHIFT)
++#define OP_PCLID_LTE_PDCP_CTRL_MIXED	(0x44 << OP_PCLID_SHIFT)
+ 
+ /*
+  * ProtocolInfo selectors
+@@ -452,6 +622,7 @@
+ #define OP_PCL_IPSEC_DES_IV64			 0x0100
+ #define OP_PCL_IPSEC_DES			 0x0200
+ #define OP_PCL_IPSEC_3DES			 0x0300
++#define OP_PCL_IPSEC_NULL			 0x0B00
+ #define OP_PCL_IPSEC_AES_CBC			 0x0c00
+ #define OP_PCL_IPSEC_AES_CTR			 0x0d00
+ #define OP_PCL_IPSEC_AES_XTS			 0x1600
+@@ -461,6 +632,7 @@
+ #define OP_PCL_IPSEC_AES_GCM8			 0x1200
+ #define OP_PCL_IPSEC_AES_GCM12			 0x1300
+ #define OP_PCL_IPSEC_AES_GCM16			 0x1400
++#define OP_PCL_IPSEC_AES_NULL_WITH_GMAC		 0x1500
+ 
+ #define OP_PCL_IPSEC_HMAC_NULL			 0x0000
+ #define OP_PCL_IPSEC_HMAC_MD5_96		 0x0001
+@@ -468,6 +640,7 @@
+ #define OP_PCL_IPSEC_AES_XCBC_MAC_96		 0x0005
+ #define OP_PCL_IPSEC_HMAC_MD5_128		 0x0006
+ #define OP_PCL_IPSEC_HMAC_SHA1_160		 0x0007
++#define OP_PCL_IPSEC_AES_CMAC_96		 0x0008
+ #define OP_PCL_IPSEC_HMAC_SHA2_256_128		 0x000c
+ #define OP_PCL_IPSEC_HMAC_SHA2_384_192		 0x000d
+ #define OP_PCL_IPSEC_HMAC_SHA2_512_256		 0x000e
+@@ -517,6 +690,32 @@
+ #define OP_PCL_SSL30_AES_256_CBC_SHA_16		 0xc021
+ #define OP_PCL_SSL30_AES_256_CBC_SHA_17		 0xc022
+ 
++#define OP_PCL_SSL30_AES_128_GCM_SHA256_1	 0x009C
++#define OP_PCL_SSL30_AES_256_GCM_SHA384_1	 0x009D
++#define OP_PCL_SSL30_AES_128_GCM_SHA256_2	 0x009E
++#define OP_PCL_SSL30_AES_256_GCM_SHA384_2	 0x009F
++#define OP_PCL_SSL30_AES_128_GCM_SHA256_3	 0x00A0
++#define OP_PCL_SSL30_AES_256_GCM_SHA384_3	 0x00A1
++#define OP_PCL_SSL30_AES_128_GCM_SHA256_4	 0x00A2
++#define OP_PCL_SSL30_AES_256_GCM_SHA384_4	 0x00A3
++#define OP_PCL_SSL30_AES_128_GCM_SHA256_5	 0x00A4
++#define OP_PCL_SSL30_AES_256_GCM_SHA384_5	 0x00A5
++#define OP_PCL_SSL30_AES_128_GCM_SHA256_6	 0x00A6
++
++#define OP_PCL_TLS_DH_ANON_AES_256_GCM_SHA384	 0x00A7
++#define OP_PCL_TLS_PSK_AES_128_GCM_SHA256	 0x00A8
++#define OP_PCL_TLS_PSK_AES_256_GCM_SHA384	 0x00A9
++#define OP_PCL_TLS_DHE_PSK_AES_128_GCM_SHA256	 0x00AA
++#define OP_PCL_TLS_DHE_PSK_AES_256_GCM_SHA384	 0x00AB
++#define OP_PCL_TLS_RSA_PSK_AES_128_GCM_SHA256	 0x00AC
++#define OP_PCL_TLS_RSA_PSK_AES_256_GCM_SHA384	 0x00AD
++#define OP_PCL_TLS_PSK_AES_128_CBC_SHA256	 0x00AE
++#define OP_PCL_TLS_PSK_AES_256_CBC_SHA384	 0x00AF
++#define OP_PCL_TLS_DHE_PSK_AES_128_CBC_SHA256	 0x00B2
++#define OP_PCL_TLS_DHE_PSK_AES_256_CBC_SHA384	 0x00B3
++#define OP_PCL_TLS_RSA_PSK_AES_128_CBC_SHA256	 0x00B6
++#define OP_PCL_TLS_RSA_PSK_AES_256_CBC_SHA384	 0x00B7
++
+ #define OP_PCL_SSL30_3DES_EDE_CBC_MD5		 0x0023
+ 
+ #define OP_PCL_SSL30_3DES_EDE_CBC_SHA		 0x001f
+@@ -617,6 +816,29 @@
+ #define OP_PCL_TLS10_AES_256_CBC_SHA_16		 0xc021
+ #define OP_PCL_TLS10_AES_256_CBC_SHA_17		 0xc022
+ 
++#define OP_PCL_TLS_ECDHE_ECDSA_AES_128_CBC_SHA256  0xC023
++#define OP_PCL_TLS_ECDHE_ECDSA_AES_256_CBC_SHA384  0xC024
++#define OP_PCL_TLS_ECDH_ECDSA_AES_128_CBC_SHA256   0xC025
++#define OP_PCL_TLS_ECDH_ECDSA_AES_256_CBC_SHA384   0xC026
++#define OP_PCL_TLS_ECDHE_RSA_AES_128_CBC_SHA256	   0xC027
++#define OP_PCL_TLS_ECDHE_RSA_AES_256_CBC_SHA384	   0xC028
++#define OP_PCL_TLS_ECDH_RSA_AES_128_CBC_SHA256	   0xC029
++#define OP_PCL_TLS_ECDH_RSA_AES_256_CBC_SHA384	   0xC02A
++#define OP_PCL_TLS_ECDHE_ECDSA_AES_128_GCM_SHA256  0xC02B
++#define OP_PCL_TLS_ECDHE_ECDSA_AES_256_GCM_SHA384  0xC02C
++#define OP_PCL_TLS_ECDH_ECDSA_AES_128_GCM_SHA256   0xC02D
++#define OP_PCL_TLS_ECDH_ECDSA_AES_256_GCM_SHA384   0xC02E
++#define OP_PCL_TLS_ECDHE_RSA_AES_128_GCM_SHA256	   0xC02F
++#define OP_PCL_TLS_ECDHE_RSA_AES_256_GCM_SHA384	   0xC030
++#define OP_PCL_TLS_ECDH_RSA_AES_128_GCM_SHA256	   0xC031
++#define OP_PCL_TLS_ECDH_RSA_AES_256_GCM_SHA384	   0xC032
++#define OP_PCL_TLS_ECDHE_PSK_RC4_128_SHA	   0xC033
++#define OP_PCL_TLS_ECDHE_PSK_3DES_EDE_CBC_SHA	   0xC034
++#define OP_PCL_TLS_ECDHE_PSK_AES_128_CBC_SHA	   0xC035
++#define OP_PCL_TLS_ECDHE_PSK_AES_256_CBC_SHA	   0xC036
++#define OP_PCL_TLS_ECDHE_PSK_AES_128_CBC_SHA256	   0xC037
++#define OP_PCL_TLS_ECDHE_PSK_AES_256_CBC_SHA384	   0xC038
++
+ /* #define OP_PCL_TLS10_3DES_EDE_CBC_MD5	0x0023 */
+ 
+ #define OP_PCL_TLS10_3DES_EDE_CBC_SHA		 0x001f
+@@ -702,6 +924,13 @@
+ #define OP_PCL_TLS10_AES_256_CBC_SHA384		 0xff63
+ #define OP_PCL_TLS10_AES_256_CBC_SHA512		 0xff65
+ 
++#define OP_PCL_TLS_PVT_AES_192_CBC_SHA160	 0xff90
++#define OP_PCL_TLS_PVT_AES_192_CBC_SHA384	 0xff93
++#define OP_PCL_TLS_PVT_AES_192_CBC_SHA224	 0xff94
++#define OP_PCL_TLS_PVT_AES_192_CBC_SHA512	 0xff95
++#define OP_PCL_TLS_PVT_AES_192_CBC_SHA256	 0xff96
++#define OP_PCL_TLS_PVT_MASTER_SECRET_PRF_FE	 0xfffe
++#define OP_PCL_TLS_PVT_MASTER_SECRET_PRF_FF	 0xffff
+ 
+ 
+ /* For TLS 1.1 - OP_PCLID_TLS11 */
+@@ -1043,7 +1272,6 @@
+ #define OP_PCL_DTLS_DES_CBC_SHA_6		 0x0015
+ #define OP_PCL_DTLS_DES_CBC_SHA_7		 0x001a
+ 
+-
+ #define OP_PCL_DTLS_3DES_EDE_CBC_MD5		 0xff23
+ #define OP_PCL_DTLS_3DES_EDE_CBC_SHA160		 0xff30
+ #define OP_PCL_DTLS_3DES_EDE_CBC_SHA224		 0xff34
+@@ -1076,17 +1304,126 @@
+ /* MacSec protinfos */
+ #define OP_PCL_MACSEC				 0x0001
+ 
++/* 3G DCRC protinfos */
++#define OP_PCL_3G_DCRC_CRC7			 0x0710
++#define OP_PCL_3G_DCRC_CRC11			 0x0B10
++
++/* 3G RLC protinfos */
++#define OP_PCL_3G_RLC_NULL			 0x0000
++#define OP_PCL_3G_RLC_KASUMI			 0x0001
++#define OP_PCL_3G_RLC_SNOW			 0x0002
++
++/* LTE protinfos */
++#define OP_PCL_LTE_NULL				 0x0000
++#define OP_PCL_LTE_SNOW				 0x0001
++#define OP_PCL_LTE_AES				 0x0002
++#define OP_PCL_LTE_ZUC				 0x0003
++
++/* LTE mixed protinfos */
++#define OP_PCL_LTE_MIXED_AUTH_SHIFT	0
++#define OP_PCL_LTE_MIXED_AUTH_MASK	(3 << OP_PCL_LTE_MIXED_AUTH_SHIFT)
++#define OP_PCL_LTE_MIXED_ENC_SHIFT	8
++#define OP_PCL_LTE_MIXED_ENC_MASK	(3 < OP_PCL_LTE_MIXED_ENC_SHIFT)
++#define OP_PCL_LTE_MIXED_AUTH_NULL	(OP_PCL_LTE_NULL << \
++					 OP_PCL_LTE_MIXED_AUTH_SHIFT)
++#define OP_PCL_LTE_MIXED_AUTH_SNOW	(OP_PCL_LTE_SNOW << \
++					 OP_PCL_LTE_MIXED_AUTH_SHIFT)
++#define OP_PCL_LTE_MIXED_AUTH_AES	(OP_PCL_LTE_AES << \
++					 OP_PCL_LTE_MIXED_AUTH_SHIFT)
++#define OP_PCL_LTE_MIXED_AUTH_ZUC	(OP_PCL_LTE_ZUC << \
++					 OP_PCL_LTE_MIXED_AUTH_SHIFT)
++#define OP_PCL_LTE_MIXED_ENC_NULL	(OP_PCL_LTE_NULL << \
++					 OP_PCL_LTE_MIXED_ENC_SHIFT)
++#define OP_PCL_LTE_MIXED_ENC_SNOW	(OP_PCL_LTE_SNOW << \
++					 OP_PCL_LTE_MIXED_ENC_SHIFT)
++#define OP_PCL_LTE_MIXED_ENC_AES	(OP_PCL_LTE_AES << \
++					 OP_PCL_LTE_MIXED_ENC_SHIFT)
++#define OP_PCL_LTE_MIXED_ENC_ZUC	(OP_PCL_LTE_ZUC << \
++					 OP_PCL_LTE_MIXED_ENC_SHIFT)
++
++/* PKI unidirectional protocol protinfo bits */
++#define OP_PCL_PKPROT_DSA_MSG		BIT(10)
++#define OP_PCL_PKPROT_HASH_SHIFT	7
++#define OP_PCL_PKPROT_HASH_MASK		(7 << OP_PCL_PKPROT_HASH_SHIFT)
++#define OP_PCL_PKPROT_HASH_MD5		(0 << OP_PCL_PKPROT_HASH_SHIFT)
++#define OP_PCL_PKPROT_HASH_SHA1		(1 << OP_PCL_PKPROT_HASH_SHIFT)
++#define OP_PCL_PKPROT_HASH_SHA224	(2 << OP_PCL_PKPROT_HASH_SHIFT)
++#define OP_PCL_PKPROT_HASH_SHA256	(3 << OP_PCL_PKPROT_HASH_SHIFT)
++#define OP_PCL_PKPROT_HASH_SHA384	(4 << OP_PCL_PKPROT_HASH_SHIFT)
++#define OP_PCL_PKPROT_HASH_SHA512	(5 << OP_PCL_PKPROT_HASH_SHIFT)
++#define OP_PCL_PKPROT_EKT_Z		BIT(6)
++#define OP_PCL_PKPROT_DECRYPT_Z		BIT(5)
++#define OP_PCL_PKPROT_EKT_PRI		BIT(4)
++#define OP_PCL_PKPROT_TEST		BIT(3)
++#define OP_PCL_PKPROT_DECRYPT_PRI	BIT(2)
++#define OP_PCL_PKPROT_ECC		BIT(1)
++#define OP_PCL_PKPROT_F2M		BIT(0)
++
++/* Blob protinfos */
++#define OP_PCL_BLOB_TKEK_SHIFT		9
++#define OP_PCL_BLOB_TKEK		BIT(9)
++#define OP_PCL_BLOB_EKT_SHIFT		8
++#define OP_PCL_BLOB_EKT			BIT(8)
++#define OP_PCL_BLOB_REG_SHIFT		4
++#define OP_PCL_BLOB_REG_MASK		(0xF << OP_PCL_BLOB_REG_SHIFT)
++#define OP_PCL_BLOB_REG_MEMORY		(0x0 << OP_PCL_BLOB_REG_SHIFT)
++#define OP_PCL_BLOB_REG_KEY1		(0x1 << OP_PCL_BLOB_REG_SHIFT)
++#define OP_PCL_BLOB_REG_KEY2		(0x3 << OP_PCL_BLOB_REG_SHIFT)
++#define OP_PCL_BLOB_AFHA_SBOX		(0x5 << OP_PCL_BLOB_REG_SHIFT)
++#define OP_PCL_BLOB_REG_SPLIT		(0x7 << OP_PCL_BLOB_REG_SHIFT)
++#define OP_PCL_BLOB_REG_PKE		(0x9 << OP_PCL_BLOB_REG_SHIFT)
++#define OP_PCL_BLOB_SEC_MEM_SHIFT	3
++#define OP_PCL_BLOB_SEC_MEM		BIT(3)
++#define OP_PCL_BLOB_BLACK		BIT(2)
++#define OP_PCL_BLOB_FORMAT_SHIFT	0
++#define OP_PCL_BLOB_FORMAT_MASK		0x3
++#define OP_PCL_BLOB_FORMAT_NORMAL	0
++#define OP_PCL_BLOB_FORMAT_MASTER_VER	2
++#define OP_PCL_BLOB_FORMAT_TEST		3
++
++/* IKE / IKEv2 protinfos */
++#define OP_PCL_IKE_HMAC_MD5		0x0100
++#define OP_PCL_IKE_HMAC_SHA1		0x0200
++#define OP_PCL_IKE_HMAC_AES128_CBC	0x0400
++#define OP_PCL_IKE_HMAC_SHA256		0x0500
++#define OP_PCL_IKE_HMAC_SHA384		0x0600
++#define OP_PCL_IKE_HMAC_SHA512		0x0700
++#define OP_PCL_IKE_HMAC_AES128_CMAC	0x0800
++
+ /* PKI unidirectional protocol protinfo bits */
+-#define OP_PCL_PKPROT_TEST			 0x0008
+-#define OP_PCL_PKPROT_DECRYPT			 0x0004
+-#define OP_PCL_PKPROT_ECC			 0x0002
+-#define OP_PCL_PKPROT_F2M			 0x0001
++#define OP_PCL_PKPROT_TEST		BIT(3)
++#define OP_PCL_PKPROT_DECRYPT		BIT(2)
++#define OP_PCL_PKPROT_ECC		BIT(1)
++#define OP_PCL_PKPROT_F2M		BIT(0)
++
++/* RSA Protinfo */
++#define OP_PCL_RSAPROT_OP_MASK		3
++#define OP_PCL_RSAPROT_OP_ENC_F_IN	0
++#define OP_PCL_RSAPROT_OP_ENC_F_OUT	1
++#define OP_PCL_RSAPROT_OP_DEC_ND	0
++#define OP_PCL_RSAPROT_OP_DEC_PQD	1
++#define OP_PCL_RSAPROT_OP_DEC_PQDPDQC	2
++#define OP_PCL_RSAPROT_FFF_SHIFT	4
++#define OP_PCL_RSAPROT_FFF_MASK		(7 << OP_PCL_RSAPROT_FFF_SHIFT)
++#define OP_PCL_RSAPROT_FFF_RED		(0 << OP_PCL_RSAPROT_FFF_SHIFT)
++#define OP_PCL_RSAPROT_FFF_ENC		(1 << OP_PCL_RSAPROT_FFF_SHIFT)
++#define OP_PCL_RSAPROT_FFF_TK_ENC	(5 << OP_PCL_RSAPROT_FFF_SHIFT)
++#define OP_PCL_RSAPROT_FFF_EKT		(3 << OP_PCL_RSAPROT_FFF_SHIFT)
++#define OP_PCL_RSAPROT_FFF_TK_EKT	(7 << OP_PCL_RSAPROT_FFF_SHIFT)
++#define OP_PCL_RSAPROT_PPP_SHIFT	8
++#define OP_PCL_RSAPROT_PPP_MASK		(7 << OP_PCL_RSAPROT_PPP_SHIFT)
++#define OP_PCL_RSAPROT_PPP_RED		(0 << OP_PCL_RSAPROT_PPP_SHIFT)
++#define OP_PCL_RSAPROT_PPP_ENC		(1 << OP_PCL_RSAPROT_PPP_SHIFT)
++#define OP_PCL_RSAPROT_PPP_TK_ENC	(5 << OP_PCL_RSAPROT_PPP_SHIFT)
++#define OP_PCL_RSAPROT_PPP_EKT		(3 << OP_PCL_RSAPROT_PPP_SHIFT)
++#define OP_PCL_RSAPROT_PPP_TK_EKT	(7 << OP_PCL_RSAPROT_PPP_SHIFT)
++#define OP_PCL_RSAPROT_FMT_PKCSV15	BIT(12)
+ 
+ /* For non-protocol/alg-only op commands */
+ #define OP_ALG_TYPE_SHIFT	24
+ #define OP_ALG_TYPE_MASK	(0x7 << OP_ALG_TYPE_SHIFT)
+-#define OP_ALG_TYPE_CLASS1	(2 << OP_ALG_TYPE_SHIFT)
+-#define OP_ALG_TYPE_CLASS2	(4 << OP_ALG_TYPE_SHIFT)
++#define OP_ALG_TYPE_CLASS1	(0x2 << OP_ALG_TYPE_SHIFT)
++#define OP_ALG_TYPE_CLASS2	(0x4 << OP_ALG_TYPE_SHIFT)
+ 
+ #define OP_ALG_ALGSEL_SHIFT	16
+ #define OP_ALG_ALGSEL_MASK	(0xff << OP_ALG_ALGSEL_SHIFT)
+@@ -1102,16 +1439,19 @@
+ #define OP_ALG_ALGSEL_SHA384	(0x44 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_SHA512	(0x45 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_RNG	(0x50 << OP_ALG_ALGSEL_SHIFT)
+-#define OP_ALG_ALGSEL_SNOW	(0x60 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_SNOW_F8	(0x60 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_KASUMI	(0x70 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_CRC	(0x90 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_SNOW_F9	(0xA0 << OP_ALG_ALGSEL_SHIFT)
++#define OP_ALG_ALGSEL_ZUCE	(0xB0 << OP_ALG_ALGSEL_SHIFT)
++#define OP_ALG_ALGSEL_ZUCA	(0xC0 << OP_ALG_ALGSEL_SHIFT)
+ 
+ #define OP_ALG_AAI_SHIFT	4
+-#define OP_ALG_AAI_MASK		(0x1ff << OP_ALG_AAI_SHIFT)
++#define OP_ALG_AAI_MASK		(0x3ff << OP_ALG_AAI_SHIFT)
+ 
+-/* blockcipher AAI set */
++/* block cipher AAI set */
++#define OP_ALG_AESA_MODE_MASK	(0xF0 << OP_ALG_AAI_SHIFT)
++#define OP_ALG_AAI_CTR		(0x00 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_CTR_MOD128	(0x00 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_CTR_MOD8	(0x01 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_CTR_MOD16	(0x02 << OP_ALG_AAI_SHIFT)
+@@ -1139,17 +1479,24 @@
+ #define OP_ALG_AAI_GCM		(0x90 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_CBC_XCBCMAC	(0xa0 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_CTR_XCBCMAC	(0xb0 << OP_ALG_AAI_SHIFT)
++#define OP_ALG_AAI_CBC_CMAC	(0xc0 << OP_ALG_AAI_SHIFT)
++#define OP_ALG_AAI_CTR_CMAC_LTE (0xd0 << OP_ALG_AAI_SHIFT)
++#define OP_ALG_AAI_CTR_CMAC	(0xe0 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_CHECKODD	(0x80 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_DK		(0x100 << OP_ALG_AAI_SHIFT)
++#define OP_ALG_AAI_C2K		(0x200 << OP_ALG_AAI_SHIFT)
+ 
+ /* randomizer AAI set */
++#define OP_ALG_RNG_MODE_MASK	(0x30 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_RNG		(0x00 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_RNG_NZB	(0x10 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_RNG_OBP	(0x20 << OP_ALG_AAI_SHIFT)
+ 
+ /* RNG4 AAI set */
+-#define OP_ALG_AAI_RNG4_SH_0	(0x00 << OP_ALG_AAI_SHIFT)
+-#define OP_ALG_AAI_RNG4_SH_1	(0x01 << OP_ALG_AAI_SHIFT)
++#define OP_ALG_AAI_RNG4_SH_SHIFT OP_ALG_AAI_SHIFT
++#define OP_ALG_AAI_RNG4_SH_MASK	(0x03 << OP_ALG_AAI_RNG4_SH_SHIFT)
++#define OP_ALG_AAI_RNG4_SH_0	(0x00 << OP_ALG_AAI_RNG4_SH_SHIFT)
++#define OP_ALG_AAI_RNG4_SH_1	(0x01 << OP_ALG_AAI_RNG4_SH_SHIFT)
+ #define OP_ALG_AAI_RNG4_PS	(0x40 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_RNG4_AI	(0x80 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_RNG4_SK	(0x100 << OP_ALG_AAI_SHIFT)
+@@ -1161,14 +1508,16 @@
+ #define OP_ALG_AAI_HMAC_PRECOMP	(0x04 << OP_ALG_AAI_SHIFT)
+ 
+ /* CRC AAI set*/
++#define OP_ALG_CRC_POLY_MASK	(0x07 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_802		(0x01 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_3385		(0x02 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_CUST_POLY	(0x04 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_DIS		(0x10 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_DOS		(0x20 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_DOC		(0x40 << OP_ALG_AAI_SHIFT)
++#define OP_ALG_AAI_IVZ		(0x80 << OP_ALG_AAI_SHIFT)
+ 
+-/* Kasumi/SNOW AAI set */
++/* Kasumi/SNOW/ZUC AAI set */
+ #define OP_ALG_AAI_F8		(0xc0 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_F9		(0xc8 << OP_ALG_AAI_SHIFT)
+ #define OP_ALG_AAI_GSM		(0x10 << OP_ALG_AAI_SHIFT)
+@@ -1183,123 +1532,646 @@
+ 
+ #define OP_ALG_ICV_SHIFT	1
+ #define OP_ALG_ICV_MASK		(1 << OP_ALG_ICV_SHIFT)
+-#define OP_ALG_ICV_OFF		(0 << OP_ALG_ICV_SHIFT)
+-#define OP_ALG_ICV_ON		(1 << OP_ALG_ICV_SHIFT)
++#define OP_ALG_ICV_OFF		0
++#define OP_ALG_ICV_ON		BIT(1)
+ 
+ #define OP_ALG_DIR_SHIFT	0
+ #define OP_ALG_DIR_MASK		1
+ #define OP_ALG_DECRYPT		0
+-#define OP_ALG_ENCRYPT		1
++#define OP_ALG_ENCRYPT		BIT(0)
+ 
+ /* PKHA algorithm type set */
+-#define OP_ALG_PK		0x00800000
+-#define OP_ALG_PK_FUN_MASK	0x3f /* clrmem, modmath, or cpymem */
++#define OP_ALG_PK			0x00800000
++#define OP_ALG_PK_FUN_MASK		0x3f /* clrmem, modmath, or cpymem */
+ 
+ /* PKHA mode clear memory functions */
+-#define OP_ALG_PKMODE_A_RAM	0x80000
+-#define OP_ALG_PKMODE_B_RAM	0x40000
+-#define OP_ALG_PKMODE_E_RAM	0x20000
+-#define OP_ALG_PKMODE_N_RAM	0x10000
+-#define OP_ALG_PKMODE_CLEARMEM	0x00001
++#define OP_ALG_PKMODE_A_RAM		BIT(19)
++#define OP_ALG_PKMODE_B_RAM		BIT(18)
++#define OP_ALG_PKMODE_E_RAM		BIT(17)
++#define OP_ALG_PKMODE_N_RAM		BIT(16)
++#define OP_ALG_PKMODE_CLEARMEM		BIT(0)
++
++/* PKHA mode clear memory functions */
++#define OP_ALG_PKMODE_CLEARMEM_ALL	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_A_RAM | \
++					 OP_ALG_PKMODE_B_RAM | \
++					 OP_ALG_PKMODE_N_RAM | \
++					 OP_ALG_PKMODE_E_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_ABE	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_A_RAM | \
++					 OP_ALG_PKMODE_B_RAM | \
++					 OP_ALG_PKMODE_E_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_ABN	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_A_RAM | \
++					 OP_ALG_PKMODE_B_RAM | \
++					 OP_ALG_PKMODE_N_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_AB	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_A_RAM | \
++					 OP_ALG_PKMODE_B_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_AEN	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_A_RAM | \
++					 OP_ALG_PKMODE_E_RAM | \
++					 OP_ALG_PKMODE_N_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_AE	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_A_RAM | \
++					 OP_ALG_PKMODE_E_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_AN	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_A_RAM | \
++					 OP_ALG_PKMODE_N_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_A	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_A_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_BEN	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_B_RAM | \
++					 OP_ALG_PKMODE_E_RAM | \
++					 OP_ALG_PKMODE_N_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_BE	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_B_RAM | \
++					 OP_ALG_PKMODE_E_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_BN	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_B_RAM | \
++					 OP_ALG_PKMODE_N_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_B	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_B_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_EN	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_E_RAM | \
++					 OP_ALG_PKMODE_N_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_E	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_E_RAM)
++#define OP_ALG_PKMODE_CLEARMEM_N	(OP_ALG_PKMODE_CLEARMEM | \
++					 OP_ALG_PKMODE_N_RAM)
+ 
+ /* PKHA mode modular-arithmetic functions */
+-#define OP_ALG_PKMODE_MOD_IN_MONTY	0x80000
+-#define OP_ALG_PKMODE_MOD_OUT_MONTY	0x40000
+-#define OP_ALG_PKMODE_MOD_F2M		0x20000
+-#define OP_ALG_PKMODE_MOD_R2_IN		0x10000
+-#define OP_ALG_PKMODE_PRJECTV		0x00800
+-#define OP_ALG_PKMODE_TIME_EQ		0x400
+-#define OP_ALG_PKMODE_OUT_B		0x000
+-#define OP_ALG_PKMODE_OUT_A		0x100
+-#define OP_ALG_PKMODE_MOD_ADD		0x002
+-#define OP_ALG_PKMODE_MOD_SUB_AB	0x003
+-#define OP_ALG_PKMODE_MOD_SUB_BA	0x004
+-#define OP_ALG_PKMODE_MOD_MULT		0x005
+-#define OP_ALG_PKMODE_MOD_EXPO		0x006
+-#define OP_ALG_PKMODE_MOD_REDUCT	0x007
+-#define OP_ALG_PKMODE_MOD_INV		0x008
+-#define OP_ALG_PKMODE_MOD_ECC_ADD	0x009
+-#define OP_ALG_PKMODE_MOD_ECC_DBL	0x00a
+-#define OP_ALG_PKMODE_MOD_ECC_MULT	0x00b
+-#define OP_ALG_PKMODE_MOD_MONT_CNST	0x00c
+-#define OP_ALG_PKMODE_MOD_CRT_CNST	0x00d
+-#define OP_ALG_PKMODE_MOD_GCD		0x00e
+-#define OP_ALG_PKMODE_MOD_PRIMALITY	0x00f
++#define OP_ALG_PKMODE_MOD_IN_MONTY   BIT(19)
++#define OP_ALG_PKMODE_MOD_OUT_MONTY  BIT(18)
++#define OP_ALG_PKMODE_MOD_F2M	     BIT(17)
++#define OP_ALG_PKMODE_MOD_R2_IN	     BIT(16)
++#define OP_ALG_PKMODE_PRJECTV	     BIT(11)
++#define OP_ALG_PKMODE_TIME_EQ	     BIT(10)
++
++#define OP_ALG_PKMODE_OUT_B	     0x000
++#define OP_ALG_PKMODE_OUT_A	     0x100
++
++/*
++ * PKHA mode modular-arithmetic integer functions
++ * Can be ORed with OP_ALG_PKMODE_OUT_A to change destination from B
 + */
-+enum rta_share_type {
-+	SHR_NEVER,
-+	SHR_WAIT,
-+	SHR_SERIAL,
-+	SHR_ALWAYS,
-+	SHR_DEFER
-+};
++#define OP_ALG_PKMODE_MOD_ADD	     0x002
++#define OP_ALG_PKMODE_MOD_SUB_AB     0x003
++#define OP_ALG_PKMODE_MOD_SUB_BA     0x004
++#define OP_ALG_PKMODE_MOD_MULT	     0x005
++#define OP_ALG_PKMODE_MOD_MULT_IM    (0x005 | OP_ALG_PKMODE_MOD_IN_MONTY)
++#define OP_ALG_PKMODE_MOD_MULT_IM_OM (0x005 | OP_ALG_PKMODE_MOD_IN_MONTY \
++					    | OP_ALG_PKMODE_MOD_OUT_MONTY)
++#define OP_ALG_PKMODE_MOD_EXPO	     0x006
++#define OP_ALG_PKMODE_MOD_EXPO_TEQ   (0x006 | OP_ALG_PKMODE_TIME_EQ)
++#define OP_ALG_PKMODE_MOD_EXPO_IM    (0x006 | OP_ALG_PKMODE_MOD_IN_MONTY)
++#define OP_ALG_PKMODE_MOD_EXPO_IM_TEQ (0x006 | OP_ALG_PKMODE_MOD_IN_MONTY \
++					    | OP_ALG_PKMODE_TIME_EQ)
++#define OP_ALG_PKMODE_MOD_REDUCT     0x007
++#define OP_ALG_PKMODE_MOD_INV	     0x008
++#define OP_ALG_PKMODE_MOD_ECC_ADD    0x009
++#define OP_ALG_PKMODE_MOD_ECC_DBL    0x00a
++#define OP_ALG_PKMODE_MOD_ECC_MULT   0x00b
++#define OP_ALG_PKMODE_MOD_MONT_CNST  0x00c
++#define OP_ALG_PKMODE_MOD_CRT_CNST   0x00d
++#define OP_ALG_PKMODE_MOD_GCD	     0x00e
++#define OP_ALG_PKMODE_MOD_PRIMALITY  0x00f
++#define OP_ALG_PKMODE_MOD_SML_EXP    0x016
 +
-+/* Registers definitions */
-+enum rta_regs {
-+	/* CCB Registers */
-+	CONTEXT1 = 1,
-+	CONTEXT2,
-+	KEY1,
-+	KEY2,
-+	KEY1SZ,
-+	KEY2SZ,
-+	ICV1SZ,
-+	ICV2SZ,
-+	DATA1SZ,
-+	DATA2SZ,
-+	ALTDS1,
-+	IV1SZ,
-+	AAD1SZ,
-+	MODE1,
-+	MODE2,
-+	CCTRL,
-+	DCTRL,
-+	ICTRL,
-+	CLRW,
-+	CSTAT,
-+	IFIFO,
-+	NFIFO,
-+	OFIFO,
-+	PKASZ,
-+	PKBSZ,
-+	PKNSZ,
-+	PKESZ,
-+	/* DECO Registers */
-+	MATH0,
-+	MATH1,
-+	MATH2,
-+	MATH3,
-+	DESCBUF,
-+	JOBDESCBUF,
-+	SHAREDESCBUF,
-+	DPOVRD,
-+	DJQDA,
-+	DSTAT,
-+	DPID,
-+	DJQCTRL,
-+	ALTSOURCE,
-+	SEQINSZ,
-+	SEQOUTSZ,
-+	VSEQINSZ,
-+	VSEQOUTSZ,
-+	/* PKHA Registers */
-+	PKA,
-+	PKN,
-+	PKA0,
-+	PKA1,
-+	PKA2,
-+	PKA3,
-+	PKB,
-+	PKB0,
-+	PKB1,
-+	PKB2,
-+	PKB3,
-+	PKE,
-+	/* Pseudo registers */
-+	AB1,
-+	AB2,
-+	ABD,
-+	IFIFOABD,
-+	IFIFOAB1,
-+	IFIFOAB2,
-+	AFHA_SBOX,
-+	MDHA_SPLIT_KEY,
-+	JOBSRC,
-+	ZERO,
-+	ONE,
-+	AAD1,
-+	IV1,
-+	IV2,
-+	MSG1,
-+	MSG2,
-+	MSG,
-+	MSGOUTSNOOP,
-+	MSGINSNOOP,
-+	ICV1,
-+	ICV2,
-+	SKIP,
-+	NONE,
-+	RNGOFIFO,
-+	RNG,
-+	IDFNS,
-+	ODFNS,
-+	NFIFOSZ,
-+	SZ,
-+	PAD,
-+	SAD1,
-+	AAD2,
-+	BIT_DATA,
-+	NFIFO_SZL,
-+	NFIFO_SZM,
-+	NFIFO_L,
-+	NFIFO_M,
-+	SZL,
-+	SZM,
-+	JOBDESCBUF_EFF,
-+	SHAREDESCBUF_EFF,
-+	METADATA,
-+	GTR,
-+	STR,
-+	OFIFO_SYNC,
-+	MSGOUTSNOOP_ALT
-+};
++/*
++ * PKHA mode modular-arithmetic F2m functions
++ * Can be ORed with OP_ALG_PKMODE_OUT_A to change destination from B
++ */
++#define OP_ALG_PKMODE_F2M_ADD	     (0x002 | OP_ALG_PKMODE_MOD_F2M)
++#define OP_ALG_PKMODE_F2M_MUL	     (0x005 | OP_ALG_PKMODE_MOD_F2M)
++#define OP_ALG_PKMODE_F2M_MUL_IM     (0x005 | OP_ALG_PKMODE_MOD_F2M \
++					    | OP_ALG_PKMODE_MOD_IN_MONTY)
++#define OP_ALG_PKMODE_F2M_MUL_IM_OM  (0x005 | OP_ALG_PKMODE_MOD_F2M \
++					    | OP_ALG_PKMODE_MOD_IN_MONTY \
++					    | OP_ALG_PKMODE_MOD_OUT_MONTY)
++#define OP_ALG_PKMODE_F2M_EXP	     (0x006 | OP_ALG_PKMODE_MOD_F2M)
++#define OP_ALG_PKMODE_F2M_EXP_TEQ    (0x006 | OP_ALG_PKMODE_MOD_F2M \
++					    | OP_ALG_PKMODE_TIME_EQ)
++#define OP_ALG_PKMODE_F2M_AMODN	     (0x007 | OP_ALG_PKMODE_MOD_F2M)
++#define OP_ALG_PKMODE_F2M_INV	     (0x008 | OP_ALG_PKMODE_MOD_F2M)
++#define OP_ALG_PKMODE_F2M_R2	     (0x00c | OP_ALG_PKMODE_MOD_F2M)
++#define OP_ALG_PKMODE_F2M_GCD	     (0x00e | OP_ALG_PKMODE_MOD_F2M)
++#define OP_ALG_PKMODE_F2M_SML_EXP    (0x016 | OP_ALG_PKMODE_MOD_F2M)
 +
-+/* Command flags */
-+#define FLUSH1          BIT(0)
-+#define LAST1           BIT(1)
-+#define LAST2           BIT(2)
-+#define IMMED           BIT(3)
-+#define SGF             BIT(4)
-+#define VLF             BIT(5)
-+#define EXT             BIT(6)
-+#define CONT            BIT(7)
-+#define SEQ             BIT(8)
-+#define AIDF		BIT(9)
-+#define FLUSH2          BIT(10)
-+#define CLASS1          BIT(11)
-+#define CLASS2          BIT(12)
-+#define BOTH            BIT(13)
++/*
++ * PKHA mode ECC Integer arithmetic functions
++ * Can be ORed with OP_ALG_PKMODE_OUT_A to change destination from B
++ */
++#define OP_ALG_PKMODE_ECC_MOD_ADD    0x009
++#define OP_ALG_PKMODE_ECC_MOD_ADD_IM_OM_PROJ \
++				     (0x009 | OP_ALG_PKMODE_MOD_IN_MONTY \
++					    | OP_ALG_PKMODE_MOD_OUT_MONTY \
++					    | OP_ALG_PKMODE_PRJECTV)
++#define OP_ALG_PKMODE_ECC_MOD_DBL    0x00a
++#define OP_ALG_PKMODE_ECC_MOD_DBL_IM_OM_PROJ \
++				     (0x00a | OP_ALG_PKMODE_MOD_IN_MONTY \
++					    | OP_ALG_PKMODE_MOD_OUT_MONTY \
++					    | OP_ALG_PKMODE_PRJECTV)
++#define OP_ALG_PKMODE_ECC_MOD_MUL    0x00b
++#define OP_ALG_PKMODE_ECC_MOD_MUL_TEQ (0x00b | OP_ALG_PKMODE_TIME_EQ)
++#define OP_ALG_PKMODE_ECC_MOD_MUL_R2  (0x00b | OP_ALG_PKMODE_MOD_R2_IN)
++#define OP_ALG_PKMODE_ECC_MOD_MUL_R2_TEQ \
++				     (0x00b | OP_ALG_PKMODE_MOD_R2_IN \
++					    | OP_ALG_PKMODE_TIME_EQ)
++#define OP_ALG_PKMODE_ECC_MOD_MUL_R2_PROJ \
++				     (0x00b | OP_ALG_PKMODE_MOD_R2_IN \
++					    | OP_ALG_PKMODE_PRJECTV)
++#define OP_ALG_PKMODE_ECC_MOD_MUL_R2_PROJ_TEQ \
++				     (0x00b | OP_ALG_PKMODE_MOD_R2_IN \
++					    | OP_ALG_PKMODE_PRJECTV \
++					    | OP_ALG_PKMODE_TIME_EQ)
++
++/*
++ * PKHA mode ECC F2m arithmetic functions
++ * Can be ORed with OP_ALG_PKMODE_OUT_A to change destination from B
++ */
++#define OP_ALG_PKMODE_ECC_F2M_ADD    (0x009 | OP_ALG_PKMODE_MOD_F2M)
++#define OP_ALG_PKMODE_ECC_F2M_ADD_IM_OM_PROJ \
++				     (0x009 | OP_ALG_PKMODE_MOD_F2M \
++					    | OP_ALG_PKMODE_MOD_IN_MONTY \
++					    | OP_ALG_PKMODE_MOD_OUT_MONTY \
++					    | OP_ALG_PKMODE_PRJECTV)
++#define OP_ALG_PKMODE_ECC_F2M_DBL    (0x00a | OP_ALG_PKMODE_MOD_F2M)
++#define OP_ALG_PKMODE_ECC_F2M_DBL_IM_OM_PROJ \
++				     (0x00a | OP_ALG_PKMODE_MOD_F2M \
++					    | OP_ALG_PKMODE_MOD_IN_MONTY \
++					    | OP_ALG_PKMODE_MOD_OUT_MONTY \
++					    | OP_ALG_PKMODE_PRJECTV)
++#define OP_ALG_PKMODE_ECC_F2M_MUL    (0x00b | OP_ALG_PKMODE_MOD_F2M)
++#define OP_ALG_PKMODE_ECC_F2M_MUL_TEQ \
++				     (0x00b | OP_ALG_PKMODE_MOD_F2M \
++					    | OP_ALG_PKMODE_TIME_EQ)
++#define OP_ALG_PKMODE_ECC_F2M_MUL_R2 \
++				     (0x00b | OP_ALG_PKMODE_MOD_F2M \
++					    | OP_ALG_PKMODE_MOD_R2_IN)
++#define OP_ALG_PKMODE_ECC_F2M_MUL_R2_TEQ \
++				     (0x00b | OP_ALG_PKMODE_MOD_F2M \
++					    | OP_ALG_PKMODE_MOD_R2_IN \
++					    | OP_ALG_PKMODE_TIME_EQ)
++#define OP_ALG_PKMODE_ECC_F2M_MUL_R2_PROJ \
++				     (0x00b | OP_ALG_PKMODE_MOD_F2M \
++					    | OP_ALG_PKMODE_MOD_R2_IN \
++					    | OP_ALG_PKMODE_PRJECTV)
++#define OP_ALG_PKMODE_ECC_F2M_MUL_R2_PROJ_TEQ \
++				     (0x00b | OP_ALG_PKMODE_MOD_F2M \
++					    | OP_ALG_PKMODE_MOD_R2_IN \
++					    | OP_ALG_PKMODE_PRJECTV \
++					    | OP_ALG_PKMODE_TIME_EQ)
+ 
+ /* PKHA mode copy-memory functions */
+-#define OP_ALG_PKMODE_SRC_REG_SHIFT	17
+-#define OP_ALG_PKMODE_SRC_REG_MASK	(7 << OP_ALG_PKMODE_SRC_REG_SHIFT)
+-#define OP_ALG_PKMODE_DST_REG_SHIFT	10
+-#define OP_ALG_PKMODE_DST_REG_MASK	(7 << OP_ALG_PKMODE_DST_REG_SHIFT)
+-#define OP_ALG_PKMODE_SRC_SEG_SHIFT	8
+-#define OP_ALG_PKMODE_SRC_SEG_MASK	(3 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
+-#define OP_ALG_PKMODE_DST_SEG_SHIFT	6
+-#define OP_ALG_PKMODE_DST_SEG_MASK	(3 << OP_ALG_PKMODE_DST_SEG_SHIFT)
+-
+-#define OP_ALG_PKMODE_SRC_REG_A		(0 << OP_ALG_PKMODE_SRC_REG_SHIFT)
+-#define OP_ALG_PKMODE_SRC_REG_B		(1 << OP_ALG_PKMODE_SRC_REG_SHIFT)
+-#define OP_ALG_PKMODE_SRC_REG_N		(3 << OP_ALG_PKMODE_SRC_REG_SHIFT)
+-#define OP_ALG_PKMODE_DST_REG_A		(0 << OP_ALG_PKMODE_DST_REG_SHIFT)
+-#define OP_ALG_PKMODE_DST_REG_B		(1 << OP_ALG_PKMODE_DST_REG_SHIFT)
+-#define OP_ALG_PKMODE_DST_REG_E		(2 << OP_ALG_PKMODE_DST_REG_SHIFT)
+-#define OP_ALG_PKMODE_DST_REG_N		(3 << OP_ALG_PKMODE_DST_REG_SHIFT)
+-#define OP_ALG_PKMODE_SRC_SEG_0		(0 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
+-#define OP_ALG_PKMODE_SRC_SEG_1		(1 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
+-#define OP_ALG_PKMODE_SRC_SEG_2		(2 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
+-#define OP_ALG_PKMODE_SRC_SEG_3		(3 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
+-#define OP_ALG_PKMODE_DST_SEG_0		(0 << OP_ALG_PKMODE_DST_SEG_SHIFT)
+-#define OP_ALG_PKMODE_DST_SEG_1		(1 << OP_ALG_PKMODE_DST_SEG_SHIFT)
+-#define OP_ALG_PKMODE_DST_SEG_2		(2 << OP_ALG_PKMODE_DST_SEG_SHIFT)
+-#define OP_ALG_PKMODE_DST_SEG_3		(3 << OP_ALG_PKMODE_DST_SEG_SHIFT)
+-#define OP_ALG_PKMODE_CPYMEM_N_SZ	0x80
+-#define OP_ALG_PKMODE_CPYMEM_SRC_SZ	0x81
++#define OP_ALG_PKMODE_SRC_REG_SHIFT  17
++#define OP_ALG_PKMODE_SRC_REG_MASK   (7 << OP_ALG_PKMODE_SRC_REG_SHIFT)
++#define OP_ALG_PKMODE_DST_REG_SHIFT  10
++#define OP_ALG_PKMODE_DST_REG_MASK   (7 << OP_ALG_PKMODE_DST_REG_SHIFT)
++#define OP_ALG_PKMODE_SRC_SEG_SHIFT  8
++#define OP_ALG_PKMODE_SRC_SEG_MASK   (3 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
++#define OP_ALG_PKMODE_DST_SEG_SHIFT  6
++#define OP_ALG_PKMODE_DST_SEG_MASK   (3 << OP_ALG_PKMODE_DST_SEG_SHIFT)
++
++#define OP_ALG_PKMODE_SRC_REG_A	     (0 << OP_ALG_PKMODE_SRC_REG_SHIFT)
++#define OP_ALG_PKMODE_SRC_REG_B	     (1 << OP_ALG_PKMODE_SRC_REG_SHIFT)
++#define OP_ALG_PKMODE_SRC_REG_N	     (3 << OP_ALG_PKMODE_SRC_REG_SHIFT)
++#define OP_ALG_PKMODE_DST_REG_A	     (0 << OP_ALG_PKMODE_DST_REG_SHIFT)
++#define OP_ALG_PKMODE_DST_REG_B	     (1 << OP_ALG_PKMODE_DST_REG_SHIFT)
++#define OP_ALG_PKMODE_DST_REG_E	     (2 << OP_ALG_PKMODE_DST_REG_SHIFT)
++#define OP_ALG_PKMODE_DST_REG_N	     (3 << OP_ALG_PKMODE_DST_REG_SHIFT)
++#define OP_ALG_PKMODE_SRC_SEG_0	     (0 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
++#define OP_ALG_PKMODE_SRC_SEG_1	     (1 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
++#define OP_ALG_PKMODE_SRC_SEG_2	     (2 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
++#define OP_ALG_PKMODE_SRC_SEG_3	     (3 << OP_ALG_PKMODE_SRC_SEG_SHIFT)
++#define OP_ALG_PKMODE_DST_SEG_0	     (0 << OP_ALG_PKMODE_DST_SEG_SHIFT)
++#define OP_ALG_PKMODE_DST_SEG_1	     (1 << OP_ALG_PKMODE_DST_SEG_SHIFT)
++#define OP_ALG_PKMODE_DST_SEG_2	     (2 << OP_ALG_PKMODE_DST_SEG_SHIFT)
++#define OP_ALG_PKMODE_DST_SEG_3	     (3 << OP_ALG_PKMODE_DST_SEG_SHIFT)
++
++/* PKHA mode copy-memory functions - amount based on N SIZE */
++#define OP_ALG_PKMODE_COPY_NSZ		0x10
++#define OP_ALG_PKMODE_COPY_NSZ_A0_B0	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_NSZ_A0_B1	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_NSZ_A0_B2	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_NSZ_A0_B3	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_NSZ_A1_B0	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_NSZ_A1_B1	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_NSZ_A1_B2	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_NSZ_A1_B3	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_NSZ_A2_B0	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_NSZ_A2_B1	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_NSZ_A2_B2	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_NSZ_A2_B3	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_NSZ_A3_B0	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_NSZ_A3_B1	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_NSZ_A3_B2	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_NSZ_A3_B3	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_NSZ_B0_A0	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_NSZ_B0_A1	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_NSZ_B0_A2	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_NSZ_B0_A3	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_NSZ_B1_A0	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_NSZ_B1_A1	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_NSZ_B1_A2	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_NSZ_B1_A3	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_NSZ_B2_A0	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_NSZ_B2_A1	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_NSZ_B2_A2	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_NSZ_B2_A3	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_NSZ_B3_A0	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_NSZ_B3_A1	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_NSZ_B3_A2	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_NSZ_B3_A3	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_NSZ_A_B	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_NSZ_A_E	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_E)
++#define OP_ALG_PKMODE_COPY_NSZ_A_N	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_N)
++#define OP_ALG_PKMODE_COPY_NSZ_B_A	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_NSZ_B_E	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_E)
++#define OP_ALG_PKMODE_COPY_NSZ_B_N	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_N)
++#define OP_ALG_PKMODE_COPY_NSZ_N_A	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_N | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_NSZ_N_B	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_N | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_NSZ_N_E	(OP_ALG_PKMODE_COPY_NSZ | \
++					 OP_ALG_PKMODE_SRC_REG_N | \
++					 OP_ALG_PKMODE_DST_REG_E)
++
++/* PKHA mode copy-memory functions - amount based on SRC SIZE */
++#define OP_ALG_PKMODE_COPY_SSZ		0x11
++#define OP_ALG_PKMODE_COPY_SSZ_A0_B0	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_SSZ_A0_B1	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_SSZ_A0_B2	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_SSZ_A0_B3	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_SSZ_A1_B0	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_SSZ_A1_B1	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_SSZ_A1_B2	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_SSZ_A1_B3	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_SSZ_A2_B0	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_SSZ_A2_B1	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_SSZ_A2_B2	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_SSZ_A2_B3	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_SSZ_A3_B0	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_SSZ_A3_B1	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_SSZ_A3_B2	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_SSZ_A3_B3	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_B | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_SSZ_B0_A0	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_SSZ_B0_A1	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_SSZ_B0_A2	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_SSZ_B0_A3	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_SSZ_B1_A0	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_SSZ_B1_A1	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_SSZ_B1_A2	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_SSZ_B1_A3	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_1 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_SSZ_B2_A0	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_SSZ_B2_A1	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_SSZ_B2_A2	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_SSZ_B2_A3	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_2 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_SSZ_B3_A0	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_SSZ_B3_A1	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_1)
++#define OP_ALG_PKMODE_COPY_SSZ_B3_A2	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_2)
++#define OP_ALG_PKMODE_COPY_SSZ_B3_A3	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_SRC_SEG_3 | \
++					 OP_ALG_PKMODE_DST_REG_A | \
++					 OP_ALG_PKMODE_DST_SEG_3)
++
++#define OP_ALG_PKMODE_COPY_SSZ_A_B	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_SSZ_A_E	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_E)
++#define OP_ALG_PKMODE_COPY_SSZ_A_N	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_A | \
++					 OP_ALG_PKMODE_DST_REG_N)
++#define OP_ALG_PKMODE_COPY_SSZ_B_A	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_SSZ_B_E	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_E)
++#define OP_ALG_PKMODE_COPY_SSZ_B_N	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_B | \
++					 OP_ALG_PKMODE_DST_REG_N)
++#define OP_ALG_PKMODE_COPY_SSZ_N_A	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_N | \
++					 OP_ALG_PKMODE_DST_REG_A)
++#define OP_ALG_PKMODE_COPY_SSZ_N_B	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_N | \
++					 OP_ALG_PKMODE_DST_REG_B)
++#define OP_ALG_PKMODE_COPY_SSZ_N_E	(OP_ALG_PKMODE_COPY_SSZ | \
++					 OP_ALG_PKMODE_SRC_REG_N | \
++					 OP_ALG_PKMODE_DST_REG_E)
+ 
+ /*
+  * SEQ_IN_PTR Command Constructs
+  */
+ 
+ /* Release Buffers */
+-#define SQIN_RBS	0x04000000
++#define SQIN_RBS	BIT(26)
+ 
+ /* Sequence pointer is really a descriptor */
+-#define SQIN_INL	0x02000000
++#define SQIN_INL	BIT(25)
+ 
+ /* Sequence pointer is a scatter-gather table */
+-#define SQIN_SGF	0x01000000
++#define SQIN_SGF	BIT(24)
+ 
+ /* Appends to a previous pointer */
+-#define SQIN_PRE	0x00800000
++#define SQIN_PRE	BIT(23)
+ 
+ /* Use extended length following pointer */
+-#define SQIN_EXT	0x00400000
++#define SQIN_EXT	BIT(22)
+ 
+ /* Restore sequence with pointer/length */
+-#define SQIN_RTO	0x00200000
++#define SQIN_RTO	BIT(21)
+ 
+ /* Replace job descriptor */
+-#define SQIN_RJD	0x00100000
++#define SQIN_RJD	BIT(20)
+ 
+-#define SQIN_LEN_SHIFT		 0
+-#define SQIN_LEN_MASK		(0xffff << SQIN_LEN_SHIFT)
++/* Sequence Out Pointer - start a new input sequence using output sequence */
++#define SQIN_SOP	BIT(19)
++
++#define SQIN_LEN_SHIFT	0
++#define SQIN_LEN_MASK	(0xffff << SQIN_LEN_SHIFT)
+ 
+ /*
+  * SEQ_OUT_PTR Command Constructs
+  */
+ 
+ /* Sequence pointer is a scatter-gather table */
+-#define SQOUT_SGF	0x01000000
++#define SQOUT_SGF	BIT(24)
+ 
+ /* Appends to a previous pointer */
+-#define SQOUT_PRE	SQIN_PRE
++#define SQOUT_PRE	BIT(23)
+ 
+ /* Restore sequence with pointer/length */
+-#define SQOUT_RTO	 SQIN_RTO
++#define SQOUT_RTO	BIT(21)
++
++/*
++ * Ignore length field, add current output frame length back to SOL register.
++ * Reset tracking length of bytes written to output frame.
++ * Must be used together with SQOUT_RTO.
++ */
++#define SQOUT_RST	BIT(20)
++
++/* Allow "write safe" transactions for this Output Sequence */
++#define SQOUT_EWS	BIT(19)
+ 
+ /* Use extended length following pointer */
+-#define SQOUT_EXT	0x00400000
++#define SQOUT_EXT	BIT(22)
+ 
+-#define SQOUT_LEN_SHIFT		0
+-#define SQOUT_LEN_MASK		(0xffff << SQOUT_LEN_SHIFT)
++#define SQOUT_LEN_SHIFT	0
++#define SQOUT_LEN_MASK	(0xffff << SQOUT_LEN_SHIFT)
+ 
+ 
+ /*
+@@ -1328,7 +2200,7 @@
+ 
+ #define MOVE_WAITCOMP_SHIFT	24
+ #define MOVE_WAITCOMP_MASK	(1 << MOVE_WAITCOMP_SHIFT)
+-#define MOVE_WAITCOMP		(1 << MOVE_WAITCOMP_SHIFT)
++#define MOVE_WAITCOMP		BIT(24)
+ 
+ #define MOVE_SRC_SHIFT		20
+ #define MOVE_SRC_MASK		(0x0f << MOVE_SRC_SHIFT)
+@@ -1342,6 +2214,7 @@
+ #define MOVE_SRC_MATH3		(0x07 << MOVE_SRC_SHIFT)
+ #define MOVE_SRC_INFIFO		(0x08 << MOVE_SRC_SHIFT)
+ #define MOVE_SRC_INFIFO_CL	(0x09 << MOVE_SRC_SHIFT)
++#define MOVE_SRC_INFIFO_NO_NFIFO (0x0a << MOVE_SRC_SHIFT)
+ 
+ #define MOVE_DEST_SHIFT		16
+ #define MOVE_DEST_MASK		(0x0f << MOVE_DEST_SHIFT)
+@@ -1355,10 +2228,11 @@
+ #define MOVE_DEST_MATH3		(0x07 << MOVE_DEST_SHIFT)
+ #define MOVE_DEST_CLASS1INFIFO	(0x08 << MOVE_DEST_SHIFT)
+ #define MOVE_DEST_CLASS2INFIFO	(0x09 << MOVE_DEST_SHIFT)
+-#define MOVE_DEST_INFIFO_NOINFO (0x0a << MOVE_DEST_SHIFT)
++#define MOVE_DEST_INFIFO	(0x0a << MOVE_DEST_SHIFT)
+ #define MOVE_DEST_PK_A		(0x0c << MOVE_DEST_SHIFT)
+ #define MOVE_DEST_CLASS1KEY	(0x0d << MOVE_DEST_SHIFT)
+ #define MOVE_DEST_CLASS2KEY	(0x0e << MOVE_DEST_SHIFT)
++#define MOVE_DEST_ALTSOURCE	(0x0f << MOVE_DEST_SHIFT)
+ 
+ #define MOVE_OFFSET_SHIFT	8
+ #define MOVE_OFFSET_MASK	(0xff << MOVE_OFFSET_SHIFT)
+@@ -1368,6 +2242,16 @@
+ 
+ #define MOVELEN_MRSEL_SHIFT	0
+ #define MOVELEN_MRSEL_MASK	(0x3 << MOVE_LEN_SHIFT)
++#define MOVELEN_MRSEL_MATH0	(0 << MOVELEN_MRSEL_SHIFT)
++#define MOVELEN_MRSEL_MATH1	(1 << MOVELEN_MRSEL_SHIFT)
++#define MOVELEN_MRSEL_MATH2	(2 << MOVELEN_MRSEL_SHIFT)
++#define MOVELEN_MRSEL_MATH3	(3 << MOVELEN_MRSEL_SHIFT)
++
++#define MOVELEN_SIZE_SHIFT	6
++#define MOVELEN_SIZE_MASK	(0x3 << MOVELEN_SIZE_SHIFT)
++#define MOVELEN_SIZE_WORD	(0x01 << MOVELEN_SIZE_SHIFT)
++#define MOVELEN_SIZE_BYTE	(0x02 << MOVELEN_SIZE_SHIFT)
++#define MOVELEN_SIZE_DWORD	(0x03 << MOVELEN_SIZE_SHIFT)
+ 
+ /*
+  * MATH Command Constructs
+@@ -1375,15 +2259,24 @@
+ 
+ #define MATH_IFB_SHIFT		26
+ #define MATH_IFB_MASK		(1 << MATH_IFB_SHIFT)
+-#define MATH_IFB		(1 << MATH_IFB_SHIFT)
++#define MATH_IFB		BIT(26)
+ 
+ #define MATH_NFU_SHIFT		25
+ #define MATH_NFU_MASK		(1 << MATH_NFU_SHIFT)
+-#define MATH_NFU		(1 << MATH_NFU_SHIFT)
++#define MATH_NFU		BIT(25)
+ 
++/* STL for MATH, SSEL for MATHI */
+ #define MATH_STL_SHIFT		24
+ #define MATH_STL_MASK		(1 << MATH_STL_SHIFT)
+-#define MATH_STL		(1 << MATH_STL_SHIFT)
++#define MATH_STL		BIT(24)
++
++#define MATH_SSEL_SHIFT		24
++#define MATH_SSEL_MASK		(1 << MATH_SSEL_SHIFT)
++#define MATH_SSEL		BIT(24)
++
++#define MATH_SWP_SHIFT		0
++#define MATH_SWP_MASK		(1 << MATH_SWP_SHIFT)
++#define MATH_SWP		BIT(0)
+ 
+ /* Function selectors */
+ #define MATH_FUN_SHIFT		20
+@@ -1398,7 +2291,9 @@
+ #define MATH_FUN_LSHIFT		(0x07 << MATH_FUN_SHIFT)
+ #define MATH_FUN_RSHIFT		(0x08 << MATH_FUN_SHIFT)
+ #define MATH_FUN_SHLD		(0x09 << MATH_FUN_SHIFT)
+-#define MATH_FUN_ZBYT		(0x0a << MATH_FUN_SHIFT)
++#define MATH_FUN_ZBYT		(0x0a << MATH_FUN_SHIFT) /* ZBYT is for MATH */
++#define MATH_FUN_FBYT		(0x0a << MATH_FUN_SHIFT) /* FBYT is for MATHI */
++#define MATH_FUN_BSWAP		(0x0b << MATH_FUN_SHIFT)
+ 
+ /* Source 0 selectors */
+ #define MATH_SRC0_SHIFT		16
+@@ -1414,33 +2309,45 @@
+ #define MATH_SRC0_VARSEQINLEN	(0x0a << MATH_SRC0_SHIFT)
+ #define MATH_SRC0_VARSEQOUTLEN	(0x0b << MATH_SRC0_SHIFT)
+ #define MATH_SRC0_ZERO		(0x0c << MATH_SRC0_SHIFT)
++#define MATH_SRC0_ONE		(0x0f << MATH_SRC0_SHIFT)
+ 
+ /* Source 1 selectors */
+ #define MATH_SRC1_SHIFT		12
++#define MATHI_SRC1_SHIFT	16
+ #define MATH_SRC1_MASK		(0x0f << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_REG0		(0x00 << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_REG1		(0x01 << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_REG2		(0x02 << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_REG3		(0x03 << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_IMM		(0x04 << MATH_SRC1_SHIFT)
+-#define MATH_SRC1_DPOVRD	(0x07 << MATH_SRC0_SHIFT)
++#define MATH_SRC1_DPOVRD	(0x07 << MATH_SRC1_SHIFT)
++#define MATH_SRC1_VARSEQINLEN	(0x08 << MATH_SRC1_SHIFT)
++#define MATH_SRC1_VARSEQOUTLEN	(0x09 << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_INFIFO	(0x0a << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_OUTFIFO	(0x0b << MATH_SRC1_SHIFT)
+ #define MATH_SRC1_ONE		(0x0c << MATH_SRC1_SHIFT)
++#define MATH_SRC1_JOBSOURCE	(0x0d << MATH_SRC1_SHIFT)
++#define MATH_SRC1_ZERO		(0x0f << MATH_SRC1_SHIFT)
+ 
+ /* Destination selectors */
+ #define MATH_DEST_SHIFT		8
++#define MATHI_DEST_SHIFT	12
+ #define MATH_DEST_MASK		(0x0f << MATH_DEST_SHIFT)
+ #define MATH_DEST_REG0		(0x00 << MATH_DEST_SHIFT)
+ #define MATH_DEST_REG1		(0x01 << MATH_DEST_SHIFT)
+ #define MATH_DEST_REG2		(0x02 << MATH_DEST_SHIFT)
+ #define MATH_DEST_REG3		(0x03 << MATH_DEST_SHIFT)
++#define MATH_DEST_DPOVRD	(0x07 << MATH_DEST_SHIFT)
+ #define MATH_DEST_SEQINLEN	(0x08 << MATH_DEST_SHIFT)
+ #define MATH_DEST_SEQOUTLEN	(0x09 << MATH_DEST_SHIFT)
+ #define MATH_DEST_VARSEQINLEN	(0x0a << MATH_DEST_SHIFT)
+ #define MATH_DEST_VARSEQOUTLEN	(0x0b << MATH_DEST_SHIFT)
+ #define MATH_DEST_NONE		(0x0f << MATH_DEST_SHIFT)
+ 
++/* MATHI Immediate value */
++#define MATHI_IMM_SHIFT		4
++#define MATHI_IMM_MASK		(0xff << MATHI_IMM_SHIFT)
++
+ /* Length selectors */
+ #define MATH_LEN_SHIFT		0
+ #define MATH_LEN_MASK		(0x0f << MATH_LEN_SHIFT)
+@@ -1462,14 +2369,18 @@
+ 
+ #define JUMP_JSL_SHIFT		24
+ #define JUMP_JSL_MASK		(1 << JUMP_JSL_SHIFT)
+-#define JUMP_JSL		(1 << JUMP_JSL_SHIFT)
++#define JUMP_JSL		BIT(24)
+ 
+-#define JUMP_TYPE_SHIFT		22
+-#define JUMP_TYPE_MASK		(0x03 << JUMP_TYPE_SHIFT)
++#define JUMP_TYPE_SHIFT		20
++#define JUMP_TYPE_MASK		(0x0f << JUMP_TYPE_SHIFT)
+ #define JUMP_TYPE_LOCAL		(0x00 << JUMP_TYPE_SHIFT)
+-#define JUMP_TYPE_NONLOCAL	(0x01 << JUMP_TYPE_SHIFT)
+-#define JUMP_TYPE_HALT		(0x02 << JUMP_TYPE_SHIFT)
+-#define JUMP_TYPE_HALT_USER	(0x03 << JUMP_TYPE_SHIFT)
++#define JUMP_TYPE_LOCAL_INC	(0x01 << JUMP_TYPE_SHIFT)
++#define JUMP_TYPE_GOSUB		(0x02 << JUMP_TYPE_SHIFT)
++#define JUMP_TYPE_LOCAL_DEC	(0x03 << JUMP_TYPE_SHIFT)
++#define JUMP_TYPE_NONLOCAL	(0x04 << JUMP_TYPE_SHIFT)
++#define JUMP_TYPE_RETURN	(0x06 << JUMP_TYPE_SHIFT)
++#define JUMP_TYPE_HALT		(0x08 << JUMP_TYPE_SHIFT)
++#define JUMP_TYPE_HALT_USER	(0x0c << JUMP_TYPE_SHIFT)
+ 
+ #define JUMP_TEST_SHIFT		16
+ #define JUMP_TEST_MASK		(0x03 << JUMP_TEST_SHIFT)
+@@ -1480,23 +2391,36 @@
+ 
+ /* Condition codes. JSL bit is factored in */
+ #define JUMP_COND_SHIFT		8
+-#define JUMP_COND_MASK		(0x100ff << JUMP_COND_SHIFT)
+-#define JUMP_COND_PK_0		(0x80 << JUMP_COND_SHIFT)
+-#define JUMP_COND_PK_GCD_1	(0x40 << JUMP_COND_SHIFT)
+-#define JUMP_COND_PK_PRIME	(0x20 << JUMP_COND_SHIFT)
+-#define JUMP_COND_MATH_N	(0x08 << JUMP_COND_SHIFT)
+-#define JUMP_COND_MATH_Z	(0x04 << JUMP_COND_SHIFT)
+-#define JUMP_COND_MATH_C	(0x02 << JUMP_COND_SHIFT)
+-#define JUMP_COND_MATH_NV	(0x01 << JUMP_COND_SHIFT)
+-
+-#define JUMP_COND_JRP		((0x80 << JUMP_COND_SHIFT) | JUMP_JSL)
+-#define JUMP_COND_SHRD		((0x40 << JUMP_COND_SHIFT) | JUMP_JSL)
+-#define JUMP_COND_SELF		((0x20 << JUMP_COND_SHIFT) | JUMP_JSL)
+-#define JUMP_COND_CALM		((0x10 << JUMP_COND_SHIFT) | JUMP_JSL)
+-#define JUMP_COND_NIP		((0x08 << JUMP_COND_SHIFT) | JUMP_JSL)
+-#define JUMP_COND_NIFP		((0x04 << JUMP_COND_SHIFT) | JUMP_JSL)
+-#define JUMP_COND_NOP		((0x02 << JUMP_COND_SHIFT) | JUMP_JSL)
+-#define JUMP_COND_NCP		((0x01 << JUMP_COND_SHIFT) | JUMP_JSL)
++#define JUMP_COND_MASK		((0xff << JUMP_COND_SHIFT) | JUMP_JSL)
++#define JUMP_COND_PK_0		BIT(15)
++#define JUMP_COND_PK_GCD_1	BIT(14)
++#define JUMP_COND_PK_PRIME	BIT(13)
++#define JUMP_COND_MATH_N	BIT(11)
++#define JUMP_COND_MATH_Z	BIT(10)
++#define JUMP_COND_MATH_C	BIT(9)
++#define JUMP_COND_MATH_NV	BIT(8)
++
++#define JUMP_COND_JQP		(BIT(15) | JUMP_JSL)
++#define JUMP_COND_SHRD		(BIT(14) | JUMP_JSL)
++#define JUMP_COND_SELF		(BIT(13) | JUMP_JSL)
++#define JUMP_COND_CALM		(BIT(12) | JUMP_JSL)
++#define JUMP_COND_NIP		(BIT(11) | JUMP_JSL)
++#define JUMP_COND_NIFP		(BIT(10) | JUMP_JSL)
++#define JUMP_COND_NOP		(BIT(9) | JUMP_JSL)
++#define JUMP_COND_NCP		(BIT(8) | JUMP_JSL)
++
++/* Source / destination selectors */
++#define JUMP_SRC_DST_SHIFT		12
++#define JUMP_SRC_DST_MASK		(0x0f << JUMP_SRC_DST_SHIFT)
++#define JUMP_SRC_DST_MATH0		(0x00 << JUMP_SRC_DST_SHIFT)
++#define JUMP_SRC_DST_MATH1		(0x01 << JUMP_SRC_DST_SHIFT)
++#define JUMP_SRC_DST_MATH2		(0x02 << JUMP_SRC_DST_SHIFT)
++#define JUMP_SRC_DST_MATH3		(0x03 << JUMP_SRC_DST_SHIFT)
++#define JUMP_SRC_DST_DPOVRD		(0x07 << JUMP_SRC_DST_SHIFT)
++#define JUMP_SRC_DST_SEQINLEN		(0x08 << JUMP_SRC_DST_SHIFT)
++#define JUMP_SRC_DST_SEQOUTLEN		(0x09 << JUMP_SRC_DST_SHIFT)
++#define JUMP_SRC_DST_VARSEQINLEN	(0x0a << JUMP_SRC_DST_SHIFT)
++#define JUMP_SRC_DST_VARSEQOUTLEN	(0x0b << JUMP_SRC_DST_SHIFT)
+ 
+ #define JUMP_OFFSET_SHIFT	0
+ #define JUMP_OFFSET_MASK	(0xff << JUMP_OFFSET_SHIFT)
+@@ -1507,27 +2431,27 @@
+  *
+  */
+ #define NFIFOENTRY_DEST_SHIFT	30
+-#define NFIFOENTRY_DEST_MASK	(3 << NFIFOENTRY_DEST_SHIFT)
++#define NFIFOENTRY_DEST_MASK	((uint32_t)(3 << NFIFOENTRY_DEST_SHIFT))
+ #define NFIFOENTRY_DEST_DECO	(0 << NFIFOENTRY_DEST_SHIFT)
+ #define NFIFOENTRY_DEST_CLASS1	(1 << NFIFOENTRY_DEST_SHIFT)
+-#define NFIFOENTRY_DEST_CLASS2	(2 << NFIFOENTRY_DEST_SHIFT)
+-#define NFIFOENTRY_DEST_BOTH	(3 << NFIFOENTRY_DEST_SHIFT)
++#define NFIFOENTRY_DEST_CLASS2	((uint32_t)(2 << NFIFOENTRY_DEST_SHIFT))
++#define NFIFOENTRY_DEST_BOTH	((uint32_t)(3 << NFIFOENTRY_DEST_SHIFT))
+ 
+ #define NFIFOENTRY_LC2_SHIFT	29
+ #define NFIFOENTRY_LC2_MASK	(1 << NFIFOENTRY_LC2_SHIFT)
+-#define NFIFOENTRY_LC2		(1 << NFIFOENTRY_LC2_SHIFT)
++#define NFIFOENTRY_LC2		BIT(29)
+ 
+ #define NFIFOENTRY_LC1_SHIFT	28
+ #define NFIFOENTRY_LC1_MASK	(1 << NFIFOENTRY_LC1_SHIFT)
+-#define NFIFOENTRY_LC1		(1 << NFIFOENTRY_LC1_SHIFT)
++#define NFIFOENTRY_LC1		BIT(28)
+ 
+ #define NFIFOENTRY_FC2_SHIFT	27
+ #define NFIFOENTRY_FC2_MASK	(1 << NFIFOENTRY_FC2_SHIFT)
+-#define NFIFOENTRY_FC2		(1 << NFIFOENTRY_FC2_SHIFT)
++#define NFIFOENTRY_FC2		BIT(27)
+ 
+ #define NFIFOENTRY_FC1_SHIFT	26
+ #define NFIFOENTRY_FC1_MASK	(1 << NFIFOENTRY_FC1_SHIFT)
+-#define NFIFOENTRY_FC1		(1 << NFIFOENTRY_FC1_SHIFT)
++#define NFIFOENTRY_FC1		BIT(26)
+ 
+ #define NFIFOENTRY_STYPE_SHIFT	24
+ #define NFIFOENTRY_STYPE_MASK	(3 << NFIFOENTRY_STYPE_SHIFT)
+@@ -1535,6 +2459,12 @@
+ #define NFIFOENTRY_STYPE_OFIFO	(1 << NFIFOENTRY_STYPE_SHIFT)
+ #define NFIFOENTRY_STYPE_PAD	(2 << NFIFOENTRY_STYPE_SHIFT)
+ #define NFIFOENTRY_STYPE_SNOOP	(3 << NFIFOENTRY_STYPE_SHIFT)
++#define NFIFOENTRY_STYPE_ALTSOURCE ((0 << NFIFOENTRY_STYPE_SHIFT) \
++					| NFIFOENTRY_AST)
++#define NFIFOENTRY_STYPE_OFIFO_SYNC ((1 << NFIFOENTRY_STYPE_SHIFT) \
++					| NFIFOENTRY_AST)
++#define NFIFOENTRY_STYPE_SNOOP_ALT ((3 << NFIFOENTRY_STYPE_SHIFT) \
++					| NFIFOENTRY_AST)
+ 
+ #define NFIFOENTRY_DTYPE_SHIFT	20
+ #define NFIFOENTRY_DTYPE_MASK	(0xF << NFIFOENTRY_DTYPE_SHIFT)
+@@ -1560,10 +2490,9 @@
+ #define NFIFOENTRY_DTYPE_PK_A	(0xC << NFIFOENTRY_DTYPE_SHIFT)
+ #define NFIFOENTRY_DTYPE_PK_B	(0xD << NFIFOENTRY_DTYPE_SHIFT)
+ 
+-
+ #define NFIFOENTRY_BND_SHIFT	19
+ #define NFIFOENTRY_BND_MASK	(1 << NFIFOENTRY_BND_SHIFT)
+-#define NFIFOENTRY_BND		(1 << NFIFOENTRY_BND_SHIFT)
++#define NFIFOENTRY_BND		BIT(19)
+ 
+ #define NFIFOENTRY_PTYPE_SHIFT	16
+ #define NFIFOENTRY_PTYPE_MASK	(0x7 << NFIFOENTRY_PTYPE_SHIFT)
+@@ -1579,19 +2508,23 @@
+ 
+ #define NFIFOENTRY_OC_SHIFT	15
+ #define NFIFOENTRY_OC_MASK	(1 << NFIFOENTRY_OC_SHIFT)
+-#define NFIFOENTRY_OC		(1 << NFIFOENTRY_OC_SHIFT)
++#define NFIFOENTRY_OC		BIT(15)
++
++#define NFIFOENTRY_PR_SHIFT	15
++#define NFIFOENTRY_PR_MASK	(1 << NFIFOENTRY_PR_SHIFT)
++#define NFIFOENTRY_PR		BIT(15)
+ 
+ #define NFIFOENTRY_AST_SHIFT	14
+-#define NFIFOENTRY_AST_MASK	(1 << NFIFOENTRY_OC_SHIFT)
+-#define NFIFOENTRY_AST		(1 << NFIFOENTRY_OC_SHIFT)
++#define NFIFOENTRY_AST_MASK	(1 << NFIFOENTRY_AST_SHIFT)
++#define NFIFOENTRY_AST		BIT(14)
+ 
+ #define NFIFOENTRY_BM_SHIFT	11
+ #define NFIFOENTRY_BM_MASK	(1 << NFIFOENTRY_BM_SHIFT)
+-#define NFIFOENTRY_BM		(1 << NFIFOENTRY_BM_SHIFT)
++#define NFIFOENTRY_BM		BIT(11)
+ 
+ #define NFIFOENTRY_PS_SHIFT	10
+ #define NFIFOENTRY_PS_MASK	(1 << NFIFOENTRY_PS_SHIFT)
+-#define NFIFOENTRY_PS		(1 << NFIFOENTRY_PS_SHIFT)
++#define NFIFOENTRY_PS		BIT(10)
+ 
+ #define NFIFOENTRY_DLEN_SHIFT	0
+ #define NFIFOENTRY_DLEN_MASK	(0xFFF << NFIFOENTRY_DLEN_SHIFT)
+@@ -1600,12 +2533,12 @@
+ #define NFIFOENTRY_PLEN_MASK	(0xFF << NFIFOENTRY_PLEN_SHIFT)
+ 
+ /* Append Load Immediate Command */
+-#define FD_CMD_APPEND_LOAD_IMMEDIATE			0x80000000
++#define FD_CMD_APPEND_LOAD_IMMEDIATE			BIT(31)
+ 
+ /* Set SEQ LIODN equal to the Non-SEQ LIODN for the job */
+-#define FD_CMD_SET_SEQ_LIODN_EQUAL_NONSEQ_LIODN		0x40000000
++#define FD_CMD_SET_SEQ_LIODN_EQUAL_NONSEQ_LIODN		BIT(30)
+ 
+ /* Frame Descriptor Command for Replacement Job Descriptor */
+-#define FD_CMD_REPLACE_JOB_DESC				0x20000000
++#define FD_CMD_REPLACE_JOB_DESC				BIT(29)
+ 
+-#endif /* DESC_H */
++#endif /* __RTA_DESC_H__ */
+diff --git a/drivers/crypto/caam/flib/desc/common.h b/drivers/crypto/caam/flib/desc/common.h
+new file mode 100644
+index 000000000000..1c69cbfb6173
+--- /dev/null
++++ b/drivers/crypto/caam/flib/desc/common.h
+@@ -0,0 +1,151 @@
++/* Copyright 2008-2013 Freescale Semiconductor, Inc. */
++
++#ifndef __DESC_COMMON_H__
++#define __DESC_COMMON_H__
++
++#include "flib/rta.h"
 +
 +/**
-+ * DCOPY - (AIOP only) command param is pointer to external memory
++ * DOC: Shared Descriptor Constructors - shared structures
 + *
-+ * CDMA must be used to transfer the key via DMA into Workspace Area.
-+ * Valid only in combination with IMMED flag.
++ * Data structures shared between algorithm, protocol implementations.
 + */
-+#define DCOPY		BIT(30)
-+
-+#define COPY		BIT(31) /*command param is pointer (not immediate)
-+				  valid only in combination when IMMED */
-+
-+#define __COPY_MASK	(COPY | DCOPY)
-+
-+/* SEQ IN/OUT PTR Command specific flags */
-+#define RBS             BIT(16)
-+#define INL             BIT(17)
-+#define PRE             BIT(18)
-+#define RTO             BIT(19)
-+#define RJD             BIT(20)
-+#define SOP		BIT(21)
-+#define RST		BIT(22)
-+#define EWS		BIT(23)
-+
-+#define ENC             BIT(14)	/* Encrypted Key */
-+#define EKT             BIT(15)	/* AES CCM Encryption (default is
-+				 * AES ECB Encryption) */
-+#define TK              BIT(16)	/* Trusted Descriptor Key (default is
-+				 * Job Descriptor Key) */
-+#define NWB             BIT(17)	/* No Write Back Key */
-+#define PTS             BIT(18)	/* Plaintext Store */
-+
-+/* HEADER Command specific flags */
-+#define RIF             BIT(16)
-+#define DNR             BIT(17)
-+#define CIF             BIT(18)
-+#define PD              BIT(19)
-+#define RSMS            BIT(20)
-+#define TD              BIT(21)
-+#define MTD             BIT(22)
-+#define REO             BIT(23)
-+#define SHR             BIT(24)
-+#define SC		BIT(25)
-+/* Extended HEADER specific flags */
-+#define DSV		BIT(7)
-+#define DSEL_MASK	0x00000007	/* DECO Select */
-+#define FTD		BIT(8)
-+
-+/* JUMP Command specific flags */
-+#define NIFP            BIT(20)
-+#define NIP             BIT(21)
-+#define NOP             BIT(22)
-+#define NCP             BIT(23)
-+#define CALM            BIT(24)
-+
-+#define MATH_Z          BIT(25)
-+#define MATH_N          BIT(26)
-+#define MATH_NV         BIT(27)
-+#define MATH_C          BIT(28)
-+#define PK_0            BIT(29)
-+#define PK_GCD_1        BIT(30)
-+#define PK_PRIME        BIT(31)
-+#define SELF            BIT(0)
-+#define SHRD            BIT(1)
-+#define JQP             BIT(2)
-+
-+/* NFIFOADD specific flags */
-+#define PAD_ZERO        BIT(16)
-+#define PAD_NONZERO     BIT(17)
-+#define PAD_INCREMENT   BIT(18)
-+#define PAD_RANDOM      BIT(19)
-+#define PAD_ZERO_N1     BIT(20)
-+#define PAD_NONZERO_0   BIT(21)
-+#define PAD_N1          BIT(23)
-+#define PAD_NONZERO_N   BIT(24)
-+#define OC              BIT(25)
-+#define BM              BIT(26)
-+#define PR              BIT(27)
-+#define PS              BIT(28)
-+#define BP              BIT(29)
-+
-+/* MOVE Command specific flags */
-+#define WAITCOMP        BIT(16)
-+#define SIZE_WORD	BIT(17)
-+#define SIZE_BYTE	BIT(18)
-+#define SIZE_DWORD	BIT(19)
-+
-+/* MATH command specific flags */
-+#define IFB         MATH_IFB
-+#define NFU         MATH_NFU
-+#define STL         MATH_STL
-+#define SSEL        MATH_SSEL
-+#define SWP         MATH_SWP
-+#define IMMED2      BIT(31)
 +
 +/**
-+ * struct program - descriptor buffer management structure
-+ * @current_pc:	current offset in descriptor
-+ * @current_instruction: current instruction in descriptor
-+ * @first_error_pc: offset of the first error in descriptor
-+ * @start_pc: start offset in descriptor buffer
-+ * @buffer: buffer carrying descriptor
-+ * @shrhdr: shared descriptor header
-+ * @jobhdr: job descriptor header
-+ * @ps: pointer fields size; if ps is true, pointers will be 36bits in
-+ *      length; if ps is false, pointers will be 32bits in length
-+ * @bswap: if true, perform byte swap on a 4-byte boundary
++ * enum rta_data_type - Indicates how is the data provided and how to include it
++ *                      in the descriptor.
++ * @RTA_DATA_PTR: Data is in memory and accessed by reference; data address is a
++ *               physical (bus) address.
++ * @RTA_DATA_IMM: Data is inlined in descriptor and accessed as immediate data;
++ *               data address is a virtual address.
++ * @RTA_DATA_IMM_DMA: (AIOP only) Data is inlined in descriptor and accessed as
++ *                   immediate data; data address is a physical (bus) address
++ *                   in external memory and CDMA is programmed to transfer the
++ *                   data into descriptor buffer being built in Workspace Area.
 + */
-+struct program {
-+	unsigned current_pc;
-+	unsigned current_instruction;
-+	unsigned first_error_pc;
-+	unsigned start_pc;
-+	uint32_t *buffer;
-+	uint32_t *shrhdr;
-+	uint32_t *jobhdr;
-+	bool ps;
-+	bool bswap;
++enum rta_data_type {
++	RTA_DATA_PTR = 1,
++	RTA_DATA_IMM,
++	RTA_DATA_IMM_DMA
 +};
 +
-+static inline void rta_program_cntxt_init(struct program *program,
-+					 uint32_t *buffer, unsigned offset)
++/**
++ * struct alginfo - Container for algorithm details
++ * @algtype: algorithm selector; for valid values, see documentation of the
++ *           functions where it is used.
++ * @keylen: length of the provided algorithm key, in bytes
++ * @key: address where algorithm key resides; virtual address if key_type is
++ *       RTA_DATA_IMM, physical (bus) address if key_type is RTA_DATA_PTR or
++ *       RTA_DATA_IMM_DMA.
++ * @key_enc_flags: key encryption flags; see encrypt_flags parameter of KEY
++ *                 command for valid values.
++ * @key_type: enum rta_data_type
++ */
++struct alginfo {
++	uint32_t algtype;
++	uint32_t keylen;
++	uint64_t key;
++	uint32_t key_enc_flags;
++	enum rta_data_type key_type;
++};
++
++static inline uint32_t inline_flags(enum rta_data_type data_type)
 +{
-+	program->current_pc = 0;
-+	program->current_instruction = 0;
-+	program->first_error_pc = 0;
-+	program->start_pc = offset;
-+	program->buffer = buffer;
-+	program->shrhdr = NULL;
-+	program->jobhdr = NULL;
-+	program->ps = false;
-+	program->bswap = false;
-+}
-+
-+static inline void __rta__desc_bswap(uint32_t *buff, unsigned buff_len)
-+{
-+	unsigned i;
-+
-+	for (i = 0; i < buff_len; i++)
-+		buff[i] = swab32(buff[i]);
-+}
-+
-+static inline unsigned rta_program_finalize(struct program *program)
-+{
-+	/* Descriptor is not allowed to go beyond 64 words size */
-+	if (program->current_pc > MAX_CAAM_DESCSIZE)
-+		pr_err("Descriptor Size exceeded max limit of 64 words\n");
-+
-+	/* Descriptor is erroneous */
-+	if (program->first_error_pc)
-+		pr_err("Descriptor creation error\n");
-+
-+	/* Update descriptor length in shared and job descriptor headers */
-+	if (program->shrhdr != NULL) {
-+		*program->shrhdr |= program->current_pc;
-+		if (program->bswap)
-+			__rta__desc_bswap(program->shrhdr, program->current_pc);
-+	} else if (program->jobhdr != NULL) {
-+		*program->jobhdr |= program->current_pc;
-+		if (program->bswap)
-+			__rta__desc_bswap(program->jobhdr, program->current_pc);
-+	}
-+
-+	return program->current_pc;
-+}
-+
-+static inline unsigned rta_program_set_36bit_addr(struct program *program)
-+{
-+	program->ps = true;
-+	return program->current_pc;
-+}
-+
-+static inline unsigned rta_program_set_bswap(struct program *program)
-+{
-+	program->bswap = true;
-+	return program->current_pc;
-+}
-+
-+static inline void __rta_out32(struct program *program, uint32_t val)
-+{
-+	program->buffer[program->current_pc] = val;
-+	program->current_pc++;
-+}
-+
-+static inline void __rta_out64(struct program *program, bool is_ext,
-+			       uint64_t val)
-+{
-+	if (is_ext)
-+		__rta_out32(program, upper_32_bits(val));
-+
-+	__rta_out32(program, lower_32_bits(val));
-+}
-+
-+static inline unsigned rta_word(struct program *program, uint32_t val)
-+{
-+	unsigned start_pc = program->current_pc;
-+
-+	__rta_out32(program, val);
-+
-+	return start_pc;
-+}
-+
-+static inline unsigned rta_dword(struct program *program, uint64_t val)
-+{
-+	unsigned start_pc = program->current_pc;
-+
-+	__rta_out64(program, true, val);
-+
-+	return start_pc;
-+}
-+
-+static inline unsigned rta_copy_data(struct program *program, uint8_t *data,
-+				     unsigned length)
-+{
-+	unsigned i;
-+	unsigned start_pc = program->current_pc;
-+	uint8_t *tmp = (uint8_t *)&program->buffer[program->current_pc];
-+
-+	for (i = 0; i < length; i++)
-+		*tmp++ = data[i];
-+	program->current_pc += (length + 3) / 4;
-+
-+	return start_pc;
-+}
-+
-+#if defined(__EWL__) && defined(AIOP)
-+static inline void __rta_dma_data(void *ws_dst, uint64_t ext_address,
-+				  uint16_t size)
-+{ cdma_read(ws_dst, ext_address, size); }
-+#else
-+static inline void __rta_dma_data(void *ws_dst, uint64_t ext_address,
-+				  uint16_t size)
-+{ pr_warn("RTA: DCOPY not supported, DMA will be skipped\n"); }
-+#endif /* defined(__EWL__) && defined(AIOP) */
-+
-+static inline void __rta_inline_data(struct program *program, uint64_t data,
-+				     uint32_t copy_data, uint32_t length)
-+{
-+	if (!copy_data) {
-+		__rta_out64(program, length > 4, data);
-+	} else if (copy_data & COPY) {
-+		uint8_t *tmp = (uint8_t *)&program->buffer[program->current_pc];
-+		uint32_t i;
-+
-+		for (i = 0; i < length; i++)
-+			*tmp++ = ((uint8_t *)(uintptr_t)data)[i];
-+		program->current_pc += ((length + 3) / 4);
-+	} else if (copy_data & DCOPY) {
-+		__rta_dma_data(&program->buffer[program->current_pc], data,
-+			       (uint16_t)length);
-+		program->current_pc += ((length + 3) / 4);
-+	}
-+}
-+
-+static inline unsigned rta_desc_len(uint32_t *buffer)
-+{
-+	if ((*buffer & CMD_MASK) == CMD_DESC_HDR)
-+		return *buffer & HDR_DESCLEN_MASK;
-+	else
-+		return *buffer & HDR_DESCLEN_SHR_MASK;
-+}
-+
-+static inline unsigned rta_desc_bytes(uint32_t *buffer)
-+{
-+	return (unsigned)(rta_desc_len(buffer) * CAAM_CMD_SZ);
-+}
-+
-+static inline unsigned rta_set_label(struct program *program)
-+{
-+	return program->current_pc + program->start_pc;
-+}
-+
-+static inline int rta_patch_move(struct program *program, int line,
-+				 unsigned new_ref, bool check_swap)
-+{
-+	uint32_t opcode;
-+	bool bswap = check_swap && program->bswap;
-+
-+	if (line < 0)
-+		return -EINVAL;
-+
-+	opcode = bswap ? swab32(program->buffer[line]) : program->buffer[line];
-+
-+	opcode &= (uint32_t)~MOVE_OFFSET_MASK;
-+	opcode |= (new_ref << (MOVE_OFFSET_SHIFT + 2)) & MOVE_OFFSET_MASK;
-+	program->buffer[line] = bswap ? swab32(opcode) : opcode;
-+
-+	return 0;
-+}
-+
-+static inline int rta_patch_jmp(struct program *program, int line,
-+				unsigned new_ref, bool check_swap)
-+{
-+	uint32_t opcode;
-+	bool bswap = check_swap && program->bswap;
-+
-+	if (line < 0)
-+		return -EINVAL;
-+
-+	opcode = bswap ? swab32(program->buffer[line]) : program->buffer[line];
-+
-+	opcode &= (uint32_t)~JUMP_OFFSET_MASK;
-+	opcode |= (new_ref - (line + program->start_pc)) & JUMP_OFFSET_MASK;
-+	program->buffer[line] = bswap ? swab32(opcode) : opcode;
-+
-+	return 0;
-+}
-+
-+static inline int rta_patch_header(struct program *program, int line,
-+				   unsigned new_ref, bool check_swap)
-+{
-+	uint32_t opcode;
-+	bool bswap = check_swap && program->bswap;
-+
-+	if (line < 0)
-+		return -EINVAL;
-+
-+	opcode = bswap ? swab32(program->buffer[line]) : program->buffer[line];
-+
-+	opcode &= (uint32_t)~HDR_START_IDX_MASK;
-+	opcode |= (new_ref << HDR_START_IDX_SHIFT) & HDR_START_IDX_MASK;
-+	program->buffer[line] = bswap ? swab32(opcode) : opcode;
-+
-+	return 0;
-+}
-+
-+static inline int rta_patch_load(struct program *program, int line,
-+				 unsigned new_ref)
-+{
-+	uint32_t opcode;
-+
-+	if (line < 0)
-+		return -EINVAL;
-+
-+	opcode = program->buffer[line] & (uint32_t)~LDST_OFFSET_MASK;
-+
-+	if (opcode & (LDST_SRCDST_WORD_DESCBUF | LDST_CLASS_DECO))
-+		opcode |= (new_ref << LDST_OFFSET_SHIFT) & LDST_OFFSET_MASK;
-+	else
-+		opcode |= (new_ref << (LDST_OFFSET_SHIFT + 2)) &
-+			  LDST_OFFSET_MASK;
-+
-+	program->buffer[line] = opcode;
-+
-+	return 0;
-+}
-+
-+static inline int rta_patch_store(struct program *program, int line,
-+				  unsigned new_ref, bool check_swap)
-+{
-+	uint32_t opcode;
-+	bool bswap = check_swap && program->bswap;
-+
-+	if (line < 0)
-+		return -EINVAL;
-+
-+	opcode = bswap ? swab32(program->buffer[line]) : program->buffer[line];
-+
-+	opcode &= (uint32_t)~LDST_OFFSET_MASK;
-+
-+	switch (opcode & LDST_SRCDST_MASK) {
-+	case LDST_SRCDST_WORD_DESCBUF:
-+	case LDST_SRCDST_WORD_DESCBUF_JOB:
-+	case LDST_SRCDST_WORD_DESCBUF_SHARED:
-+	case LDST_SRCDST_WORD_DESCBUF_JOB_WE:
-+	case LDST_SRCDST_WORD_DESCBUF_SHARED_WE:
-+		opcode |= ((new_ref) << LDST_OFFSET_SHIFT) & LDST_OFFSET_MASK;
-+		break;
++	switch (data_type) {
++	case RTA_DATA_PTR:
++		return 0;
++	case RTA_DATA_IMM:
++		return IMMED | COPY;
++	case RTA_DATA_IMM_DMA:
++		return IMMED | DCOPY;
 +	default:
-+		opcode |= (new_ref << (LDST_OFFSET_SHIFT + 2)) &
-+			  LDST_OFFSET_MASK;
++		/* warn and default to RTA_DATA_PTR */
++		pr_warn("RTA: defaulting to RTA_DATA_PTR parameter type\n");
++		return 0;
 +	}
-+
-+	program->buffer[line] = bswap ? swab32(opcode) : opcode;
-+
-+	return 0;
 +}
 +
-+static inline int rta_patch_raw(struct program *program, int line,
-+				unsigned mask, unsigned new_val,
-+				bool check_swap)
++#define INLINE_KEY(alginfo)	inline_flags(alginfo->key_type)
++
++/**
++ * rta_inline_query() - Provide indications on which data items can be inlined
++ *                      and which shall be referenced in a shared descriptor.
++ * @sd_base_len: Shared descriptor base length - bytes consumed by the commands,
++ *               excluding the data items to be inlined (or corresponding
++ *               pointer if an item is not inlined). Each cnstr_* function that
++ *               generates descriptors should have a define mentioning
++ *               corresponding length.
++ * @jd_len: Maximum length of the job descriptor(s) that will be used
++ *          together with the shared descriptor.
++ * @data_len: Array of lengths of the data items trying to be inlined
++ * @inl_mask: 32bit mask with bit x = 1 if data item x can be inlined, 0
++ *            otherwise.
++ * @count: Number of data items (size of @data_len array); must be <= 32
++ *
++ * Return: 0 if data can be inlined / referenced, negative value if not. If 0,
++ *         check @inl_mask for details.
++ */
++static inline int rta_inline_query(unsigned sd_base_len, unsigned jd_len,
++				   unsigned *data_len, uint32_t *inl_mask,
++				   unsigned count)
 +{
-+	uint32_t opcode;
-+	bool bswap = check_swap && program->bswap;
-+
-+	if (line < 0)
-+		return -EINVAL;
-+
-+	opcode = bswap ? swab32(program->buffer[line]) : program->buffer[line];
-+
-+	opcode &= (uint32_t)~mask;
-+	opcode |= new_val & mask;
-+	program->buffer[line] = bswap ? swab32(opcode) : opcode;
-+
-+	return 0;
-+}
-+
-+static inline int __rta_map_opcode(uint32_t name,
-+				  const uint32_t (*map_table)[2],
-+				  unsigned num_of_entries, uint32_t *val)
-+{
++	int rem_bytes = (int)(CAAM_DESC_BYTES_MAX - sd_base_len - jd_len);
 +	unsigned i;
 +
-+	for (i = 0; i < num_of_entries; i++)
-+		if (map_table[i][0] == name) {
-+			*val = map_table[i][1];
-+			return 0;
++	*inl_mask = 0;
++	for (i = 0; (i < count) && (rem_bytes > 0); i++) {
++		if (rem_bytes - data_len[i] -
++		     (count - i - 1) * CAAM_PTR_SZ >= 0) {
++			rem_bytes -= data_len[i];
++			*inl_mask |= (1 << i);
++		} else {
++			rem_bytes -= CAAM_PTR_SZ;
 +		}
-+
-+	return -EINVAL;
-+}
-+
-+static inline void __rta_map_flags(uint32_t flags,
-+				   const uint32_t (*flags_table)[2],
-+				   unsigned num_of_entries, uint32_t *opcode)
-+{
-+	unsigned i;
-+
-+	for (i = 0; i < num_of_entries; i++) {
-+		if (flags_table[i][0] & flags)
-+			*opcode |= flags_table[i][1];
 +	}
++
++	return (rem_bytes >= 0) ? 0 : -1;
 +}
 +
-+#endif /* __RTA_SEC_RUN_TIME_ASM_H__ */
++/**
++ * struct protcmd - Container for Protocol Operation Command fields
++ * @optype: command type
++ * @protid: protocol Identifier
++ * @protinfo: protocol Information
++ */
++struct protcmd {
++	uint32_t optype;
++	uint32_t protid;
++	uint16_t protinfo;
++};
++
++/**
++ * split_key_len - Compute MDHA split key length for a given algorithm
++ * @hash: Hashing algorithm selection, one of OP_ALG_ALGSEL_* - MD5, SHA1,
++ *        SHA224, SHA384, SHA512.
++ *
++ * Return: MDHA split key length
++ */
++static inline uint32_t split_key_len(uint32_t hash)
++{
++	/* Sizes for MDHA pads (*not* keys): MD5, SHA1, 224, 256, 384, 512 */
++	static const uint8_t mdpadlen[] = { 16, 20, 32, 32, 64, 64 };
++	uint32_t idx;
++
++	idx = (hash & OP_ALG_ALGSEL_SUBMASK) >> OP_ALG_ALGSEL_SHIFT;
++
++	return (uint32_t)(mdpadlen[idx] * 2);
++}
++
++/**
++ * split_key_pad_len - Compute MDHA split key pad length for a given algorithm
++ * @hash: Hashing algorithm selection, one of OP_ALG_ALGSEL_* - MD5, SHA1,
++ *        SHA224, SHA384, SHA512.
++ *
++ * Return: MDHA split key pad length
++ */
++static inline uint32_t split_key_pad_len(uint32_t hash)
++{
++	return ALIGN(split_key_len(hash), 16);
++}
++
++#endif /* __DESC_COMMON_H__ */
+diff --git a/drivers/crypto/caam/flib/desc/jobdesc.h b/drivers/crypto/caam/flib/desc/jobdesc.h
+new file mode 100644
+index 000000000000..27ec739adba7
+--- /dev/null
++++ b/drivers/crypto/caam/flib/desc/jobdesc.h
+@@ -0,0 +1,57 @@
++/* Copyright 2008-2013 Freescale Semiconductor, Inc. */
++
++#ifndef __DESC_JOBDESC_H__
++#define __DESC_JOBDESC_H__
++
++#include "flib/rta.h"
++#include "common.h"
++
++/**
++ * DOC: Job Descriptor Constructors
++ *
++ * Job descriptors for certain tasks, like generating MDHA split keys.
++ */
++
++/**
++ * cnstr_jobdesc_mdsplitkey - Generate an MDHA split key
++ * @descbuf: pointer to buffer to hold constructed descriptor
++ * @ps: if 36/40bit addressing is desired, this parameter must be true
++ * @alg_key: pointer to HMAC key to generate ipad/opad from
++ * @keylen: HMAC key length
++ * @cipher: HMAC algorithm selection, one of OP_ALG_ALGSEL_*
++ *     The algorithm determines key size (bytes):
++ *     -  OP_ALG_ALGSEL_MD5    - 16
++ *     -  OP_ALG_ALGSEL_SHA1   - 20
++ *     -  OP_ALG_ALGSEL_SHA224 - 28
++ *     -  OP_ALG_ALGSEL_SHA256 - 32
++ *     -  OP_ALG_ALGSEL_SHA384 - 48
++ *     -  OP_ALG_ALGSEL_SHA512 - 64
++ * @padbuf: pointer to buffer to store generated ipad/opad
++ *
++ * Split keys are IPAD/OPAD pairs. For details, refer to MDHA Split Keys chapter
++ * in SEC Reference Manual.
++ *
++ * Return: size of descriptor written in words
++ */
++
++static inline int cnstr_jobdesc_mdsplitkey(uint32_t *descbuf, bool ps,
++					   uint64_t alg_key, uint8_t keylen,
++					   uint32_t cipher, uint64_t padbuf)
++{
++	struct program prg;
++	struct program *p = &prg;
++
++	PROGRAM_CNTXT_INIT(p, descbuf, 0);
++	if (ps)
++		PROGRAM_SET_36BIT_ADDR(p);
++	JOB_HDR(p, SHR_NEVER, 1, 0, 0);
++	KEY(p, KEY2, 0, alg_key, keylen, 0);
++	ALG_OPERATION(p, cipher, OP_ALG_AAI_HMAC, OP_ALG_AS_INIT,
++		      ICV_CHECK_DISABLE, DIR_DEC);
++	FIFOLOAD(p, MSG2, 0, 0, LAST2 | IMMED | COPY);
++	JUMP(p, 1, LOCAL_JUMP, ALL_TRUE, CLASS2);
++	FIFOSTORE(p, MDHA_SPLIT_KEY, 0, padbuf, split_key_len(cipher), 0);
++	return PROGRAM_FINALIZE(p);
++}
++
++#endif /* __DESC_JOBDESC_H__ */
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index ec3652d62e93..01d434e20ca4 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -11,7 +11,7 @@
+ #include "compat.h"
+ #include "regs.h"
+ #include "jr.h"
+-#include "desc.h"
++#include "flib/desc.h"
+ #include "intern.h"
+ 
+ struct jr_driver_data {
 -- 
 1.8.3.1
