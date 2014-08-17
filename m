@@ -1,58 +1,40 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH v2 00/12] crypto: caam - Add RTA descriptor creation
- library
-Date: Sat, 16 Aug 2014 06:16:55 -0500
-Message-ID: <20140816061655.d2fa481b47f701f2f2bd8552@freescale.com>
-References: <1408020874-2211-1-git-send-email-horia.geanta@freescale.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 8/8] DRBG: remove unnecessary sanity check for shadow state
+Date: Sun, 17 Aug 2014 17:41:38 +0200
+Message-ID: <2900796.YflQD55GTj@myon.chronox.de>
+References: <7044529.FG2KhbPc9P@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	<linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Carmen Iorga <carmen.iorga@freescale.com>,
-	Alexandru Porosanu <alexandru.porosanu@freescale.com>,
-	Vakul Garg <vakul@freescale.com>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>
-To: Horia Geanta <horia.geanta@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [207.46.163.212] ([207.46.163.212]:50297 "EHLO
-	na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751319AbaHPLYN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 16 Aug 2014 07:24:13 -0400
-In-Reply-To: <1408020874-2211-1-git-send-email-horia.geanta@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <7044529.FG2KhbPc9P@myon.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, 14 Aug 2014 15:54:22 +0300
-Horia Geanta <horia.geanta@freescale.com> wrote:
+During creation of the DRBG shadow state, it is ensured that the DRBG
+state structure is already allocated. Thus, a sanity check for verifying
+that the structure is allocated is removed.
 
-> This patch set adds Run Time Assembler (RTA) SEC descriptor library.
-> RTA is a replacement for incumbent "inline append".
-> 
-> The library is intended to be a single code base for SEC descriptors creation
-> for all Freescale products. This comes with a series of advantages, such as
-> library being maintained / kept up-to-date with latest platforms, i.e. SEC
-> functionalities (for e.g. SEC incarnations present in Layerscape LS1 and LS2).
-> 
-> RTA detects options in SEC descriptors that are not supported
-> by a SEC HW revision ("Era") and reports this back.
-> Say a descriptor uses Sequence Out Pointer (SOP) option for the SEQINPTR
-> command, which is supported starting from SEC Era 5. If the descriptor would
-> be built on a P4080R3 platform (which has SEC Era 4), RTA would report
-> "SEQ IN PTR: Flag(s) not supported by SEC Era 4".
-> This is extremely useful and saves a lot of time wasted on debugging.
-> SEC HW detects only *some* of these problems, leaving user wonder what causes
-> a "DECO Watchdog Timeout". And when it prints something more useful, sometimes
-> it does not point to the exact opcode.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/drbg.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-again, RTA just adds bloat to the kernel driver - the kernel driver
-is supposed to generate the appropriate descriptor for its target
-running SEC version no matter what, not "report back" what is/is not
-supported.  This is a flaw at the RTA design level, as far as the
-kernel driver is concerned.
-
-Thanks,
-
-Kim
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index a556180..f009939 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1155,9 +1155,6 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 	int ret = -ENOMEM;
+ 	unsigned int sb_size = 0;
+ 
+-	if (!drbg)
+-		return -EINVAL;
+-
+ 	drbg->V = kmalloc(drbg_statelen(drbg), GFP_KERNEL);
+ 	if (!drbg->V)
+ 		goto err;
+-- 
+1.9.3
