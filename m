@@ -1,74 +1,86 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Kernel crypto API: cryptoperf performance measurement
-Date: Sun, 17 Aug 2014 17:55:51 +0200
-Message-ID: <56334718.JSiBY74glM@myon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-crypto@vger.kernel.org
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: [PATCH 1/2] crypto: sahara - add support for i.MX53
+Date: Mon, 18 Aug 2014 15:13:38 +0200
+Message-ID: <1408367619-3436-1-git-send-email-s.trumtrar@pengutronix.de>
+Cc: linux-crypto@vger.kernel.org,
+	Steffen Trumtrar <s.trumtrar@pengutronix.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:51238 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750765AbaHQPzz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 17 Aug 2014 11:55:55 -0400
-Received: from myon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S2DD> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sun, 17 Aug 2014 17:55:52 +0200
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:43339 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750765AbaHRNNx (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 Aug 2014 09:13:53 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+The Sahara on the i.MX53 is of version 4. Add support for probing the
+device.
 
-during playing around with the kernel crypto API, I implemented a performance 
-measurement tool kit for the various kernel crypto API cipher types. The 
-cryptoperf tool kit is provided in [1].
-
-Comments are welcome.
-
-In general, the results are as expected, i.e. the assembler implementations 
-are faster than the pure C implementations. However, there are curious results 
-which probably should be checked by the maintainers of the respective ciphers 
-(hoping that my tool works correctly ;-) ):
-
-ablkcipher
-----------
-
-- cryptd is slower by factor 10 across the board
-
-blkcipher
----------
-
-- Blowfish x86_64 assembler together with the generic C block chaining modes 
-is significantly slower than Blowfish implemented in generic C
-
-- Blowfish x86_64 assembler in ECB is significantly slower than generic C 
-Blowfish ECB
-
-- Serpent assembler implementations are not significantly faster than generic 
-C implementations
-
-- AES-NI ECB, LRW, CTR is significantly slower than AES i586 assembler.
-
-- AES-NI ECB, LRW, CTR is not significantly faster than AES generic C
-
-rng
+Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 ---
+ .../devicetree/bindings/crypto/fsl-imx-sahara.txt       |  2 +-
+ drivers/crypto/sahara.c                                 | 17 ++++++++++++++---
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
-- The ANSI X9.31 RNG seems to work massively faster than the underlying AES 
-cipher (by about a factor of 5). I am unsure about the cause of this.
-
-
-Caveat
-------
-
-Please note that there is one small error which I am unsure how to fix it as 
-documented in the TODO file.
-
-[1] http://www.chronox.de/cryptoperf.html
-
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.txt b/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.txt
+index 5c65ecc..e8a35c7 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.txt
++++ b/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.txt
+@@ -1,5 +1,5 @@
+ Freescale SAHARA Cryptographic Accelerator included in some i.MX chips.
+-Currently only i.MX27 is supported.
++Currently only i.MX27 and i.MX53 are supported.
+ 
+ Required properties:
+ - compatible : Should be "fsl,<soc>-sahara"
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index 164e1ec..85df5b5 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -24,10 +24,12 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
++#include <linux/of_device.h>
+ #include <linux/platform_device.h>
+ 
+ #define SAHARA_NAME "sahara"
+ #define SAHARA_VERSION_3	3
++#define SAHARA_VERSION_4	4
+ #define SAHARA_TIMEOUT_MS	1000
+ #define SAHARA_MAX_HW_DESC	2
+ #define SAHARA_MAX_HW_LINK	20
+@@ -860,6 +862,7 @@ static struct platform_device_id sahara_platform_ids[] = {
+ MODULE_DEVICE_TABLE(platform, sahara_platform_ids);
+ 
+ static struct of_device_id sahara_dt_ids[] = {
++	{ .compatible = "fsl,imx53-sahara" },
+ 	{ .compatible = "fsl,imx27-sahara" },
+ 	{ /* sentinel */ }
+ };
+@@ -971,10 +974,18 @@ static int sahara_probe(struct platform_device *pdev)
+ 	clk_prepare_enable(dev->clk_ahb);
+ 
+ 	version = sahara_read(dev, SAHARA_REG_VERSION);
+-	if (version != SAHARA_VERSION_3) {
++	if (of_device_is_compatible(pdev->dev.of_node, "fsl,imx27-sahara")) {
++		if (version != SAHARA_VERSION_3)
++			err = -ENODEV;
++	} else if (of_device_is_compatible(pdev->dev.of_node,
++			"fsl,imx53-sahara")) {
++		if (((version >> 8) & 0xff) != SAHARA_VERSION_4)
++			err = -ENODEV;
++		version = (version >> 8) & 0xff;
++	}
++	if (err == -ENODEV) {
+ 		dev_err(&pdev->dev, "SAHARA version %d not supported\n",
+-			version);
+-		err = -ENODEV;
++				version);
+ 		goto err_algs;
+ 	}
+ 
 -- 
-Ciao
-Stephan
+2.1.0.rc1
