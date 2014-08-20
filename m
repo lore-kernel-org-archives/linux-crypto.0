@@ -1,132 +1,74 @@
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH v2 12/12] crypto: caam - add Run Time Library (RTA) docbook
-Date: Tue, 19 Aug 2014 13:54:50 -0700
-Message-ID: <53F3B99A.2020002@infradead.org>
-References: <1408020874-2211-1-git-send-email-horia.geanta@freescale.com> <1408020874-2211-13-git-send-email-horia.geanta@freescale.com>
+From: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Subject: Re: Kernel crypto API: cryptoperf performance measurement
+Date: Wed, 20 Aug 2014 16:25:59 +0300
+Message-ID: <53F4A1E7.8090504@iki.fi>
+References: <56334718.JSiBY74glM@myon.chronox.de> <53F2FA10.2000300@iki.fi> <1477690.toHy6ei3xC@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Carmen Iorga <carmen.iorga@freescale.com>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Alexandru Porosanu <alexandru.porosanu@freescale.com>,
-	Vakul Garg <vakul@freescale.com>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>
-To: Horia Geanta <horia.geanta@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:42074 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750809AbaHSUy5 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 Aug 2014 16:54:57 -0400
-In-Reply-To: <1408020874-2211-13-git-send-email-horia.geanta@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1477690.toHy6ei3xC@myon.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 08/14/14 05:54, Horia Geanta wrote:
-> Add SGML template for generating RTA docbook.
-> Source code is in drivers/crypto/caam/flib
+Hello,
+
+On 2014-08-19 21:23, Stephan Mueller wrote:
+> Am Dienstag, 19. August 2014, 10:17:36 schrieb Jussi Kivilinna:
 > 
-> Cc: Randy Dunlap <rdunlap@infradead.org>
-> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
-> ---
->  Documentation/DocBook/Makefile         |   3 +-
->  Documentation/DocBook/rta-api.tmpl     | 261 ++++++++++++++++++++++
->  Documentation/DocBook/rta/.gitignore   |   1 +
->  Documentation/DocBook/rta/Makefile     |   5 +
->  Documentation/DocBook/rta/rta_arch.svg | 381 +++++++++++++++++++++++++++++++++
->  5 files changed, 650 insertions(+), 1 deletion(-)
->  create mode 100644 Documentation/DocBook/rta-api.tmpl
->  create mode 100644 Documentation/DocBook/rta/.gitignore
->  create mode 100644 Documentation/DocBook/rta/Makefile
->  create mode 100644 Documentation/DocBook/rta/rta_arch.svg
+> Hi Jussi,
+> 
+>> Hello,
+>>
+>> On 2014-08-17 18:55, Stephan Mueller wrote:
+>>> Hi,
+>>>
+>>> during playing around with the kernel crypto API, I implemented a
+>>> performance measurement tool kit for the various kernel crypto API cipher
+>>> types. The cryptoperf tool kit is provided in [1].
+>>>
+>>> Comments are welcome.
+>>
+>> Your results are quite slow compared to, for example "cryptsetup
+>> benchmark", which uses kernel crypto from userspace.
+>>
+>> With Intel i5-2450M (turbo enabled), I get:
+>>
+>> #  Algorithm | Key |  Encryption |  Decryption
+>>      aes-cbc   128b   524,0 MiB/s  11909,1 MiB/s
+>>  serpent-cbc   128b    60,9 MiB/s   219,4 MiB/s
+>>  twofish-cbc   128b   143,4 MiB/s   240,3 MiB/s
+>>      aes-cbc   256b   330,4 MiB/s  1242,8 MiB/s
+>>  serpent-cbc   256b    66,1 MiB/s   220,3 MiB/s
+>>  twofish-cbc   256b   143,5 MiB/s   221,8 MiB/s
+>>      aes-xts   256b  1268,7 MiB/s  4193,0 MiB/s
+>>  serpent-xts   256b   234,8 MiB/s   224,6 MiB/s
+>>  twofish-xts   256b   253,5 MiB/s   254,7 MiB/s
+>>      aes-xts   512b  2535,0 MiB/s  2945,0 MiB/s
+>>  serpent-xts   512b   274,2 MiB/s   242,3 MiB/s
+>>  twofish-xts   512b   250,0 MiB/s   245,8 MiB/s
+> 
+> One to four GB per second for XTS? 12 GB per second for AES CBC? Somehow that 
+> does not sound right.
 
-> diff --git a/Documentation/DocBook/rta-api.tmpl b/Documentation/DocBook/rta-api.tmpl
-> new file mode 100644
-> index 000000000000..90c5c5a8d9a7
-> --- /dev/null
-> +++ b/Documentation/DocBook/rta-api.tmpl
-> @@ -0,0 +1,261 @@
-> +<?xml version="1.0" encoding="UTF-8"?>
-> +<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-> +        "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" []>
-> +
-> +<book id="RTAapi">
-> + <bookinfo>
-> +  <title>Writing descriptors for Freescale CAAM using RTA library</title>
-> +  <authorgroup>
-> +   <author>
-> +    <firstname>Horia</firstname>
-> +    <surname>Geanta</surname>
-> +    <affiliation>
-> +     <address><email>horia.geanta@freescale.com</email></address>
-> +    </affiliation>
-> +   </author>
-> +  </authorgroup>
-> +
-> +  <copyright>
-> +   <year>2008-2014</year>
-> +   <holder>Freescale Semiconductor</holder>
-> +  </copyright>
-...
-> +  <chapter id="intro">
-> +    <title>Introduction</title>
-> +    <sect1>
-> +      <title>About</title>
-> +!Pdrivers/crypto/caam/flib/rta.h About
-> +!Pdrivers/crypto/caam/flib/rta.h Usage
-> +      <mediaobject>
-> +        <imageobject>
-> +          <imagedata fileref="rta_arch.svg" format="SVG" align="CENTER"/>
-> +        </imageobject>
-> +        <caption><para>RTA Integration Overview</para></caption>
-> +      </mediaobject>
-> +    </sect1>
-> +    <sect1>
-> +      <title>Using RTA</title>
-> +      <para>
-> +        RTA can be used in an application just by including the following header file:
-> +	#include flib/rta.h
+Agreed, those do not look correct... I wonder what happened there. On
+new run, I got more sane results:
 
-Needs quotation marks or angle brackets?
+#  Algorithm | Key |  Encryption |  Decryption
+     aes-cbc   128b   139,1 MiB/s  1713,6 MiB/s
+ serpent-cbc   128b    62,2 MiB/s   232,9 MiB/s
+ twofish-cbc   128b   116,3 MiB/s   243,7 MiB/s
+     aes-cbc   256b   375,1 MiB/s  1159,4 MiB/s
+ serpent-cbc   256b    62,1 MiB/s   214,9 MiB/s
+ twofish-cbc   256b   139,3 MiB/s   217,5 MiB/s
+     aes-xts   256b  1296,4 MiB/s  1272,5 MiB/s
+ serpent-xts   256b   283,3 MiB/s   275,6 MiB/s
+ twofish-xts   256b   294,8 MiB/s   299,3 MiB/s
+     aes-xts   512b   984,3 MiB/s   991,1 MiB/s
+ serpent-xts   512b   227,7 MiB/s   220,6 MiB/s
+ twofish-xts   512b   220,6 MiB/s   220,2 MiB/s
 
-> +      </para>
-> +      <para>
-> +        The files in drivers/crypto/caam/desc directory contain several
-> +	real-world descriptors written with RTA. You can use them as-is or adapt
-> +	them to your needs.
-> +      </para>
-> +      <para>
-> +        RTA routines take as first parameter a pointer to a "struct program"
-> +        variable. It contains several housekeeping information that are used
-
-       drop:                     several         &      change:        is
-
-> +        during descriptor creation.
-> +      </para>
-> +      <para>
-> +        RTA creates the descriptors and saves them in buffers. It is the user's
-> +	job to allocate memory for these buffers before passing them to RTA
-> +	program initialization call.
-> +      </para>
-> +      <para>
-> +        A RTA program must start with a call to PROGRAM_CNTXT_INIT and end with
-
-           An
-
-> +	PROGRAM_FINALIZE. PROGRAM_CNTXT_INIT will initialze the members of
-
-                                                  initialize
-
-> +	'program' structure with user information (pointer to user's buffer, and
-> +	the SEC subversion). The PROGRAM_FINALIZE call checks the descriptor's
-> +	validity.
-> +      </para>
-
-[snip]
-
-
--- 
-~Randy
+-Jussi
