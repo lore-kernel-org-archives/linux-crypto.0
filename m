@@ -1,8 +1,7 @@
 From: KOVACS Krisztian <hidden@sch.bme.hu>
-Subject: [PATCH 2/2] crypto: testmgr - add test for lz4 and lz4hc
-Date: Fri, 22 Aug 2014 10:44:36 +0200
-Message-ID: <1408697076-20272-2-git-send-email-hidden@sch.bme.hu>
-References: <1408697076-20272-1-git-send-email-hidden@sch.bme.hu>
+Subject: [PATCH 1/2] crypto: lz4,lz4hc - fix decompression
+Date: Fri, 22 Aug 2014 10:44:35 +0200
+Message-ID: <1408697076-20272-1-git-send-email-hidden@sch.bme.hu>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -12,138 +11,56 @@ To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
 Received: from max.sch.bme.hu ([152.66.208.194]:27273 "EHLO max.sch.bme.hu"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752413AbaHVIuZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 Aug 2014 04:50:25 -0400
-In-Reply-To: <1408697076-20272-1-git-send-email-hidden@sch.bme.hu>
+	id S1754425AbaHVIu1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 22 Aug 2014 04:50:27 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds a simple test vector for the lz4 and lz4hc compression
-algorithms.
+The lz4 library has two functions for decompression, with slightly
+different signatures and behaviour. The lz4_decompress_crypto() function
+seemed to be using the one that assumes that the decompressed length is
+known in advance.
+
+This patch switches to the other decompression function and makes sure
+that the length of the decompressed output is properly returned to the
+caller.
+
+The same issue was present in the lz4hc algorithm.
+
+Coincidentally, this change also makes very basic lz4 and lz4hc
+compression tests in testmgr pass.
 
 Signed-off-by: KOVACS Krisztian <hidden@sch.bme.hu>
 ---
- crypto/testmgr.c | 32 +++++++++++++++++++++++++++
- crypto/testmgr.h | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 98 insertions(+)
+ crypto/lz4.c   | 2 +-
+ crypto/lz4hc.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index ac2b631..3e0b4ce 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3213,6 +3213,38 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			}
- 		}
- 	}, {
-+		.alg = "lz4",
-+		.test = alg_test_comp,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.comp = {
-+				.comp = {
-+					.vecs = lz4_comp_tv_template,
-+					.count = LZ4_COMP_TEST_VECTORS
-+				},
-+				.decomp = {
-+					.vecs = lz4_decomp_tv_template,
-+					.count = LZ4_DECOMP_TEST_VECTORS
-+				}
-+			}
-+		}
-+	}, {
-+		.alg = "lz4hc",
-+		.test = alg_test_comp,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.comp = {
-+				.comp = {
-+					.vecs = lz4hc_comp_tv_template,
-+					.count = LZ4HC_COMP_TEST_VECTORS
-+				},
-+				.decomp = {
-+					.vecs = lz4hc_decomp_tv_template,
-+					.count = LZ4HC_DECOMP_TEST_VECTORS
-+				}
-+			}
-+		}
-+	}, {
- 		.alg = "lzo",
- 		.test = alg_test_comp,
- 		.fips_allowed = 1,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 6597203..62e2485 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -29473,4 +29473,70 @@ static struct hash_testvec bfin_crc_tv_template[] = {
+diff --git a/crypto/lz4.c b/crypto/lz4.c
+index 4586dd1..34d072b 100644
+--- a/crypto/lz4.c
++++ b/crypto/lz4.c
+@@ -68,7 +68,7 @@ static int lz4_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ 	size_t tmp_len = *dlen;
+ 	size_t __slen = slen;
  
- };
+-	err = lz4_decompress(src, &__slen, dst, tmp_len);
++	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
+ 	if (err < 0)
+ 		return -EINVAL;
  
-+#define LZ4_COMP_TEST_VECTORS 1
-+#define LZ4_DECOMP_TEST_VECTORS 1
-+
-+static struct comp_testvec lz4_comp_tv_template[] = {
-+	{
-+		.inlen	= 70,
-+		.outlen	= 45,
-+		.input	= "Join us now and share the software "
-+			  "Join us now and share the software ",
-+		.output = "\xf0\x10\x4a\x6f\x69\x6e\x20\x75"
-+			  "\x73\x20\x6e\x6f\x77\x20\x61\x6e"
-+			  "\x64\x20\x73\x68\x61\x72\x65\x20"
-+			  "\x74\x68\x65\x20\x73\x6f\x66\x74"
-+			  "\x77\x0d\x00\x0f\x23\x00\x0b\x50"
-+			  "\x77\x61\x72\x65\x20",
-+	},
-+};
-+
-+static struct comp_testvec lz4_decomp_tv_template[] = {
-+	{
-+		.inlen	= 45,
-+		.outlen	= 70,
-+		.input  = "\xf0\x10\x4a\x6f\x69\x6e\x20\x75"
-+			  "\x73\x20\x6e\x6f\x77\x20\x61\x6e"
-+			  "\x64\x20\x73\x68\x61\x72\x65\x20"
-+			  "\x74\x68\x65\x20\x73\x6f\x66\x74"
-+			  "\x77\x0d\x00\x0f\x23\x00\x0b\x50"
-+			  "\x77\x61\x72\x65\x20",
-+		.output	= "Join us now and share the software "
-+			  "Join us now and share the software ",
-+	},
-+};
-+
-+#define LZ4HC_COMP_TEST_VECTORS 1
-+#define LZ4HC_DECOMP_TEST_VECTORS 1
-+
-+static struct comp_testvec lz4hc_comp_tv_template[] = {
-+	{
-+		.inlen	= 70,
-+		.outlen	= 45,
-+		.input	= "Join us now and share the software "
-+			  "Join us now and share the software ",
-+		.output = "\xf0\x10\x4a\x6f\x69\x6e\x20\x75"
-+			  "\x73\x20\x6e\x6f\x77\x20\x61\x6e"
-+			  "\x64\x20\x73\x68\x61\x72\x65\x20"
-+			  "\x74\x68\x65\x20\x73\x6f\x66\x74"
-+			  "\x77\x0d\x00\x0f\x23\x00\x0b\x50"
-+			  "\x77\x61\x72\x65\x20",
-+	},
-+};
-+
-+static struct comp_testvec lz4hc_decomp_tv_template[] = {
-+	{
-+		.inlen	= 45,
-+		.outlen	= 70,
-+		.input  = "\xf0\x10\x4a\x6f\x69\x6e\x20\x75"
-+			  "\x73\x20\x6e\x6f\x77\x20\x61\x6e"
-+			  "\x64\x20\x73\x68\x61\x72\x65\x20"
-+			  "\x74\x68\x65\x20\x73\x6f\x66\x74"
-+			  "\x77\x0d\x00\x0f\x23\x00\x0b\x50"
-+			  "\x77\x61\x72\x65\x20",
-+		.output	= "Join us now and share the software "
-+			  "Join us now and share the software ",
-+	},
-+};
-+
- #endif	/* _CRYPTO_TESTMGR_H */
+diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
+index 151ba31..9218b3f 100644
+--- a/crypto/lz4hc.c
++++ b/crypto/lz4hc.c
+@@ -68,7 +68,7 @@ static int lz4hc_decompress_crypto(struct crypto_tfm *tfm, const u8 *src,
+ 	size_t tmp_len = *dlen;
+ 	size_t __slen = slen;
+ 
+-	err = lz4_decompress(src, &__slen, dst, tmp_len);
++	err = lz4_decompress_unknownoutputsize(src, __slen, dst, &tmp_len);
+ 	if (err < 0)
+ 		return -EINVAL;
+ 
 -- 
 2.1.0
