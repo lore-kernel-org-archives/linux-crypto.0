@@ -1,72 +1,40 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] arm64/crypto: remove redundant update of data
-Date: Mon, 25 Aug 2014 09:04:27 +0200
-Message-ID: <CAKv+Gu8GjSi4r2hCbnhQ2rDFJaO_PH3=JmfKKTsELDqCuf_cLw@mail.gmail.com>
-References: <1408912715-9719-1-git-send-email-colin.king@canonical.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/2] Add TLS record layer encryption module
+Date: Mon, 25 Aug 2014 17:44:03 +0800
+Message-ID: <20140825094403.GA27102@gondor.apana.org.au>
+References: <1406626353-23309-1-git-send-email-cristian.stoica@freescale.com>
+ <53DAA031.30405@amacapital.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will.deacon@arm.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Colin King <colin.king@canonical.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Cristian Stoica <cristian.stoica@freescale.com>,
+	linux-crypto@vger.kernel.org, davem@davemloft.net,
+	linux-kernel@vger.kernel.org
+To: Andy Lutomirski <luto@amacapital.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-la0-f42.google.com ([209.85.215.42]:40891 "EHLO
-	mail-la0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752755AbaHYHE3 (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:37968 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751222AbaHYJoW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Aug 2014 03:04:29 -0400
-Received: by mail-la0-f42.google.com with SMTP id pv20so12429350lab.15
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Aug 2014 00:04:27 -0700 (PDT)
-In-Reply-To: <1408912715-9719-1-git-send-email-colin.king@canonical.com>
+	Mon, 25 Aug 2014 05:44:22 -0400
+Content-Disposition: inline
+In-Reply-To: <53DAA031.30405@amacapital.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 24 August 2014 22:38, Colin King <colin.king@canonical.com> wrote:
-> From: Colin Ian King <colin.king@canonical.com>
->
-> Originally found by cppcheck:
->
-> [arch/arm64/crypto/sha2-ce-glue.c:153]: (warning) Assignment of
->   function parameter has no effect outside the function. Did you
->   forget dereferencing it?
->
-> Updating data by blocks * SHA256_BLOCK_SIZE at the end of
-> ha2_finup is redundant code and can be removed.
->
+On Thu, Jul 31, 2014 at 12:59:45PM -0700, Andy Lutomirski wrote:
+> 
+> What is this used for?  AF_ALG?  I find it hard to believe that the
+> kernel will ever want to use this internally.
 
-^^^ typo here
+There have been discussions over the years regarding implementing
+TLS/SSL in the kernel so it is not inconceivable that it might
+happen one day.
 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Of course I don't think this is the motivation behind this patch
+set.
 
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-
-> ---
->  arch/arm64/crypto/sha2-ce-glue.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
-> index c294e67..ae67e88 100644
-> --- a/arch/arm64/crypto/sha2-ce-glue.c
-> +++ b/arch/arm64/crypto/sha2-ce-glue.c
-> @@ -150,7 +150,6 @@ static void sha2_finup(struct shash_desc *desc, const u8 *data,
->         kernel_neon_begin_partial(28);
->         sha2_ce_transform(blocks, data, sctx->state, NULL, len);
->         kernel_neon_end();
-> -       data += blocks * SHA256_BLOCK_SIZE;
->  }
->
->  static int sha224_finup(struct shash_desc *desc, const u8 *data,
-> --
-> 2.1.0
->
->
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
