@@ -1,46 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/8] DRBG: efficiency patches
-Date: Mon, 25 Aug 2014 20:42:19 +0800
-Message-ID: <20140825124218.GH28815@gondor.apana.org.au>
-References: <7044529.FG2KhbPc9P@myon.chronox.de>
+Subject: Re: [PATCH v6 0/6] crypto: SHA1 multibuffer implementation
+Date: Mon, 25 Aug 2014 20:41:11 +0800
+Message-ID: <20140825124111.GC28815@gondor.apana.org.au>
+References: <cover.1406798062.git.tim.c.chen@linux.intel.com>
+ <1406827784.2970.947.camel@schen9-DESK>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:33001 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751626AbaHYMmX (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Aug 2014 08:42:23 -0400
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	"David S.Miller" <davem@davemloft.net>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@kernel.org>,
+	Chandramouli Narayanan <mouli@linux.intel.com>,
+	Vinodh Gopal <vinodh.gopal@intel.com>,
+	James Guilford <james.guilford@intel.com>,
+	Wajdi Feghali <wajdi.k.feghali@intel.com>,
+	Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Tadeusz Struk <tadeusz.struk@intel.com>, tkhai@yandex.ru,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Tim Chen <tim.c.chen@linux.intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <7044529.FG2KhbPc9P@myon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1406827784.2970.947.camel@schen9-DESK>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Aug 17, 2014 at 05:37:04PM +0200, Stephan Mueller wrote:
-> Hi,
+On Thu, Jul 31, 2014 at 10:29:44AM -0700, Tim Chen wrote:
+> Herbert,
 > 
-> The following patch set contains random fixes to increase the efficiency of
-> the DRBG. Changes include the removal of unneeded memset(0) and sanity
-> checks. All changes do not weaken the implementation as only code is
-> removed that is clearly covered by other code paths.
-> 
-> In addition, the cpu_to_be kernel function together with a type cast is
-> used to convert an integer into its string representation. This patch
-> increases the speed of the DRBG by 10%.
-> 
-> Stephan Mueller (8):
->   DRBG: replace int2byte with cpu_to_be
->   DRBG: kzfree does not need a check for NULL pointer
->   DRBG: remove superflowous checks
->   DRBG: remove superflowous memset(0)
->   DRBG: use kmalloc instead of kzalloc for V and C
->   DRBG: remove unnecessary sanity checks
->   DRBG: remove configuration of fixed values
->   DRBG: remove unnecessary sanity check for shadow state
+> I've updated the patches from v5 with the multi-buffer infrastructure
+> patch contained within the same patch and some patch subject 
+> and comments clean up per Peter's feedback.
 
-All applied.  Thanks!
+All applied.  Thanks Tim!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
