@@ -1,40 +1,42 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] Add TLS record layer encryption module
-Date: Mon, 25 Aug 2014 17:44:03 +0800
-Message-ID: <20140825094403.GA27102@gondor.apana.org.au>
-References: <1406626353-23309-1-git-send-email-cristian.stoica@freescale.com>
- <53DAA031.30405@amacapital.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Cristian Stoica <cristian.stoica@freescale.com>,
-	linux-crypto@vger.kernel.org, davem@davemloft.net,
-	linux-kernel@vger.kernel.org
-To: Andy Lutomirski <luto@amacapital.net>
+From: Ondrej Kozina <okozina@redhat.com>
+Subject: [PATCH] avoid excessive use of socket buffer in skcipher
+Date: Mon, 25 Aug 2014 11:48:05 +0200
+Message-ID: <1408960085-11583-2-git-send-email-okozina@redhat.com>
+References: <1408960085-11583-1-git-send-email-okozina@redhat.com>
+Cc: herbert@gondor.apana.org.au, gmazyland@gmail.com
+To: okozina@redhat.com, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:37968 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751222AbaHYJoW (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Aug 2014 05:44:22 -0400
-Content-Disposition: inline
-In-Reply-To: <53DAA031.30405@amacapital.net>
+Received: from mx1.redhat.com ([209.132.183.28]:21029 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751767AbaHYJsV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 Aug 2014 05:48:21 -0400
+In-Reply-To: <1408960085-11583-1-git-send-email-okozina@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jul 31, 2014 at 12:59:45PM -0700, Andy Lutomirski wrote:
-> 
-> What is this used for?  AF_ALG?  I find it hard to believe that the
-> kernel will ever want to use this internally.
+On archs with PAGE_SIZE >= 64 KiB the function skcipher_alloc_sgl()
+fails with -ENOMEM no matter what user space actually requested.
+This is caused by the fact sock_kmalloc call inside the function tried
+to allocate more memory than allowed by the default kernel socket buffer
+size (kernel param net.core.optmem_max).
 
-There have been discussions over the years regarding implementing
-TLS/SSL in the kernel so it is not inconceivable that it might
-happen one day.
+Signed-off-by: Ondrej Kozina <okozina@redhat.com>
+---
+ crypto/algif_skcipher.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Of course I don't think this is the motivation behind this patch
-set.
-
-Cheers,
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index a19c027..83187f4 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -49,7 +49,7 @@ struct skcipher_ctx {
+ 	struct ablkcipher_request req;
+ };
+ 
+-#define MAX_SGL_ENTS ((PAGE_SIZE - sizeof(struct skcipher_sg_list)) / \
++#define MAX_SGL_ENTS ((4096 - sizeof(struct skcipher_sg_list)) / \
+ 		      sizeof(struct scatterlist) - 1)
+ 
+ static inline int skcipher_sndbuf(struct sock *sk)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.3
