@@ -1,33 +1,50 @@
-From: Shuai Xiao <shuai.xiao@ruckuswireless.com>
-Subject: Linux-crypto: Do we have AES-CBC implementation using Intel SSSE3?
-Date: Mon, 25 Aug 2014 19:27:39 +0000
-Message-ID: <c75f3a957c2041618753b94316a88bc7@DM2PR0801MB555.namprd08.prod.outlook.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] DRBG: fix sparse warning for cpu_to_be[32|64]
+Date: Tue, 26 Aug 2014 09:32:24 +0200
+Message-ID: <1803846.LZmvEct3qr@myon.chronox.de>
+References: <53fc2da5.AS8xtJ0DprRMVjVq%fengguang.wu@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1blp0184.outbound.protection.outlook.com ([207.46.163.184]:19342
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752351AbaHYT1m convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 Aug 2014 15:27:42 -0400
-Content-Language: en-US
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Transfer-Encoding: 7Bit
+Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild-all@01.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <53fc2da5.AS8xtJ0DprRMVjVq%fengguang.wu@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
-   I want to find a AES-CBC implementation using Intel SSSE3, because the CPU I works with have no AES-NI. I have to use SSSE3 to get better performance. There is a module in Openssl using SSSE3 to implement AES. According Openssl's test result, there are +28%/64% improvement between regular assembly code and SSSE3 assembly code.
+The sparse tool complained that the cpu_to_be[32|64] functions return
+__be[32|64] instead of __u32 or __u64. The patch replaces the __u32 and
+__u64 with __be32 and __be64.
 
-  But I can't find a implementation which available in kernel space and fit in Linux crypto API. Anyone have some info about this?
+Reported-by: kbuild test robot <fengguang.wu@intel.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/drbg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-  And I noticed that Linux-crypto are using SSSE3 to implement sha1,sha256,sha512, why not for AES?
-
-  Here is the info for SSSE3 AES implementation, http://shiftleft.org/papers/vector_aes/  and  http://crypto.stanford.edu/vpaes/.
-or you can read the Openssl code in Openssl\crypto\aes\asm\vpaes-x86.pl
-
-   Thank you for your time!
-
-Regards
-Shuai
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 9fd239f..39ed918 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -277,7 +277,7 @@ static bool drbg_fips_continuous_test(struct drbg_state *drbg,
+ static inline void drbg_cpu_to_be32(__u32 val, unsigned char *buf)
+ {
+ 	struct s {
+-		__u32 conv;
++		__be32 conv;
+ 	};
+ 	struct s *conversion = (struct s *) buf;
+ 
+@@ -989,7 +989,7 @@ static int drbg_hash_generate(struct drbg_state *drbg,
+ 	int ret = 0;
+ 	union {
+ 		unsigned char req[8];
+-		__u64 req_int;
++		__be64 req_int;
+ 	} u;
+ 	unsigned char prefix = DRBG_PREFIX3;
+ 	struct drbg_string data1, data2;
+-- 
+1.9.3
