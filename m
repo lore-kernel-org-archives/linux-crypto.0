@@ -1,35 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] DRBG: fix sparse warning for cpu_to_be[32|64]
-Date: Tue, 26 Aug 2014 15:34:01 +0800
-Message-ID: <20140826073401.GA3962@gondor.apana.org.au>
-References: <53fc2da5.AS8xtJ0DprRMVjVq%fengguang.wu@intel.com>
- <1803846.LZmvEct3qr@myon.chronox.de>
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: linux-next: Tree for Aug 26 (drbg)
+Date: Tue, 26 Aug 2014 12:03:31 -0700
+Message-ID: <53FCDA03.3050504@infradead.org>
+References: <20140826173452.7cc5445c@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild-all@01.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:35050 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752889AbaHZHeL (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 Aug 2014 03:34:11 -0400
-Content-Disposition: inline
-In-Reply-To: <1803846.LZmvEct3qr@myon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
+	Stephan Mueller <smueller@chronox.de>
+To: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20140826173452.7cc5445c@canb.auug.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Aug 26, 2014 at 09:32:24AM +0200, Stephan Mueller wrote:
-> The sparse tool complained that the cpu_to_be[32|64] functions return
-> __be[32|64] instead of __u32 or __u64. The patch replaces the __u32 and
-> __u64 with __be32 and __be64.
+On 08/26/14 00:34, Stephen Rothwell wrote:
+> Hi all,
 > 
-> Reported-by: kbuild test robot <fengguang.wu@intel.com>
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Changes since 20140825:
+> 
+> The net tree gained a build failure for which I reverted a commit.
+> 
+> The mfd tree still had its build failure so I used the version from
+> next-20140822.
+> 
 
-Patch applied.  Thanks.
+on i386:
+
+../include/crypto/drbg.h:157:2: warning: left shift count >= width of type [enabled by default]
+../include/crypto/drbg.h:163:2: warning: left shift count >= width of type [enabled by default]
+
+I guess that someone has already seen this but I haven't noticed any reports
+of it.
+
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+~Randy
