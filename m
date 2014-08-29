@@ -1,44 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: qat - Use pci_enable_msix_exact() instead of
- pci_enable_msix()
-Date: Fri, 29 Aug 2014 21:48:26 +0800
-Message-ID: <20140829134826.GB9971@gondor.apana.org.au>
-References: <1408433524-11487-1-git-send-email-agordeev@redhat.com>
+Subject: Re: [PATCH 1/2] crypto: lz4,lz4hc - fix decompression
+Date: Fri, 29 Aug 2014 21:48:45 +0800
+Message-ID: <20140829134845.GC9971@gondor.apana.org.au>
+References: <1408697076-20272-1-git-send-email-hidden@sch.bme.hu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	"David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
-	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org
-To: Alexander Gordeev <agordeev@redhat.com>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: KOVACS Krisztian <hidden@sch.bme.hu>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:38283 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:55590 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753030AbaH2Nsh (ORCPT
+	with ESMTP id S1753030AbaH2Nsu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 Aug 2014 09:48:37 -0400
+	Fri, 29 Aug 2014 09:48:50 -0400
 Content-Disposition: inline
-In-Reply-To: <1408433524-11487-1-git-send-email-agordeev@redhat.com>
+In-Reply-To: <1408697076-20272-1-git-send-email-hidden@sch.bme.hu>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Aug 19, 2014 at 09:32:04AM +0200, Alexander Gordeev wrote:
-> As result of deprecation of MSI-X/MSI enablement functions
-> pci_enable_msix() and pci_enable_msi_block() all drivers
-> using these two interfaces need to be updated to use the
-> new pci_enable_msi_range()  or pci_enable_msi_exact()
-> and pci_enable_msix_range() or pci_enable_msix_exact()
-> interfaces.
+On Fri, Aug 22, 2014 at 10:44:35AM +0200, KOVACS Krisztian wrote:
+> The lz4 library has two functions for decompression, with slightly
+> different signatures and behaviour. The lz4_decompress_crypto() function
+> seemed to be using the one that assumes that the decompressed length is
+> known in advance.
 > 
-> Cc: Tadeusz Struk <tadeusz.struk@intel.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: qat-linux@intel.com
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-pci@vger.kernel.org
-> Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+> This patch switches to the other decompression function and makes sure
+> that the length of the decompressed output is properly returned to the
+> caller.
+> 
+> The same issue was present in the lz4hc algorithm.
+> 
+> Coincidentally, this change also makes very basic lz4 and lz4hc
+> compression tests in testmgr pass.
+> 
+> Signed-off-by: KOVACS Krisztian <hidden@sch.bme.hu>
 
-Applied.
+Both patches applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
