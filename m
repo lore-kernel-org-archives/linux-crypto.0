@@ -1,35 +1,36 @@
 From: Ondrej Kozina <okozina@redhat.com>
 Subject: Re: [PATCH] avoid excessive use of socket buffer in skcipher
-Date: Mon, 01 Sep 2014 17:22:43 +0200
-Message-ID: <54048F43.4090301@redhat.com>
-References: <1408960194-11726-1-git-send-email-okozina@redhat.com> <1408960194-11726-2-git-send-email-okozina@redhat.com>
+Date: Mon, 01 Sep 2014 17:42:08 +0200
+Message-ID: <540493D0.9010306@redhat.com>
+References: <1408960194-11726-1-git-send-email-okozina@redhat.com> <1408960194-11726-2-git-send-email-okozina@redhat.com> <54048F43.4090301@redhat.com>
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
- boundary="------------090405040708080209030203"
+ boundary="------------060709000607090503060803"
 Cc: herbert@gondor.apana.org.au, gmazyland@gmail.com
 To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:43050 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:13430 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751665AbaIAPWx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Sep 2014 11:22:53 -0400
-In-Reply-To: <1408960194-11726-2-git-send-email-okozina@redhat.com>
+	id S1751665AbaIAPmR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 1 Sep 2014 11:42:17 -0400
+In-Reply-To: <54048F43.4090301@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 This is a multi-part message in MIME format.
---------------090405040708080209030203
+--------------060709000607090503060803
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Attaching simple reproducer.
+On 09/01/2014 05:22 PM, Ondrej Kozina wrote:
+> Attaching simple reproducer.
+
+Sigh. Mondays... Sending fixed reproducer. Excuse my mistake.
 
 Kind regards
 Ondrej
 
-
-
---------------090405040708080209030203
+--------------060709000607090503060803
 Content-Type: text/x-csrc;
  name="reproducer_ppc64.c"
 Content-Transfer-Encoding: 7bit
@@ -161,7 +162,7 @@ int main(void)
 		err = errno;
 		perror("sendmsg()");
 
-		if (err == -ENOMEM) {
+		if (err == ENOMEM) {
 			printf("the kernel has a bug in a skcipher.\n");
 			r = 0;
 		}
@@ -184,4 +185,4 @@ out:
 	return r;
 }
 
---------------090405040708080209030203--
+--------------060709000607090503060803--
