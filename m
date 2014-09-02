@@ -1,45 +1,68 @@
-From: Behan Webster <behanw@converseincode.com>
-Subject: Re: [PATCH RFC 5/6] apparmor: LLVMLinux: Remove VLAIS
-Date: Tue, 02 Sep 2014 16:26:22 -0700
-Message-ID: <5406521E.9090006@converseincode.com>
-References: <1409697153-7006-1-git-send-email-behanw@converseincode.com> <1409697153-7006-6-git-send-email-behanw@converseincode.com> <54064FD1.6060900@canonical.com>
+From: =?ISO-8859-1?Q?Jan-Simon_M=F6ller?= <dl9pf@gmx.de>
+Subject: Re: [PATCH RFC 0/6] LLVMLinux: Patches to enable the
+	kernel to be compiled with clang/LLVM
+Date: Wed, 03 Sep 2014 01:04:15 +0200
+Message-ID: <4f99918c-77da-4a2b-9757-a397aaf7b0d4@email.android.com>
+References: <1409697153-7006-1-git-send-email-behanw@converseincode.com>
+	<05DCB0B8-AA7C-495F-B8E6-0803052DD273@holtmann.org>
+Reply-To: device-mapper development <dm-devel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: akpm@linux-foundation.org, james.l.morris@oracle.com,
-	linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-security-module@vger.kernel.org, neilb@suse.de,
-	serge@hallyn.com, torvalds@linux-foundation.org,
-	=?UTF-8?B?Vmluw61jaXVzIFRpbnRp?= <viniciustinti@gmail.com>,
-	=?UTF-8?B?SmFuLVNpbW9uIE3DtmxsZXI=?= <dl9pf@gmx.de>,
-	Mark Charlebois <charlebm@gmail.com>
-To: John Johansen <john.johansen@canonical.com>, agk@redhat.com,
-	clm@fb.com, davem@davemloft.net, dm-devel@redhat.com,
-	fabf@skynet.be, herbert@gondor.apana.org.au, jbacik@fb.com,
-	snitzer@redhat.com
-Return-path: <linux-security-module-owner@vger.kernel.org>
-In-Reply-To: <54064FD1.6060900@canonical.com>
-Sender: linux-security-module-owner@vger.kernel.org
+Content-Type: multipart/mixed; boundary="===============3412699199527121603=="
+Cc: linux-raid@vger.kernel.org, john.johansen@canonical.com,
+        Herbert Xu <herbert@gondor.apana.org.au>, snitzer@redhat.com,
+        linux-security-module@vger.kernel.org, jbacik@fb.com,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Fabian Frederick <fabf@skynet.be>, clm@fb.com, dm-devel@redhat.com,
+        linux-btrfs@vger.kernel.org, james.l.morris@oracle.com,
+        Andrew Morton <akpm@linux-foundation.org>, serge@hallyn.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alasdair Kergon <agk@redhat.com>, linux-crypto@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>, behanw@converseincode.com
+Return-path: <dm-devel-bounces@redhat.com>
+In-Reply-To: <05DCB0B8-AA7C-495F-B8E6-0803052DD273@holtmann.org>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/dm-devel>
+List-Post: <mailto:dm-devel@redhat.com>
+List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
+	<mailto:dm-devel-request@redhat.com?subject=subscribe>
+Sender: dm-devel-bounces@redhat.com
+Errors-To: dm-devel-bounces@redhat.com
 List-Id: linux-crypto.vger.kernel.org
 
-On 09/02/14 16:16, John Johansen wrote:
->
-> I'm fine with this, do you want me to pull it into my tree for our next push
-> or do you want this all to go together as a set?
->
-> Acked-by: John Johansen <john.johansen@canonical.com>
-I'm more than happy for individual maintainers to pull relevant patches 
-into their trees for the next merge window.
+--===============3412699199527121603==
+Content-Type: multipart/alternative;
+	boundary="----TP44NQV41JQWL2QJALAE6ICYA77HFH"
+Content-Transfer-Encoding: 7bit
 
-They were presented as a RFC patch set purely to get consensus as a 
-group since its the same change across the board.
+------TP44NQV41JQWL2QJALAE6ICYA77HFH
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Happy to push your patch to you now.
+Same deal there, too!
 
-Behan
+Best,
+JS
+------TP44NQV41JQWL2QJALAE6ICYA77HFH
+Content-Type: text/html;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Behan Webster
-behanw@converseincode.com
+Same deal there, too!<br>
+<br>
+Best,<br>
+JS
+------TP44NQV41JQWL2QJALAE6ICYA77HFH--
 
+
+--===============3412699199527121603==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+
+--===============3412699199527121603==--
