@@ -1,7 +1,7 @@
 From: behanw@converseincode.com
-Subject: [PATCH RFC 4/6] crypto: LLVMLinux: Remove VLAIS usage from crypto/testmgr.c
-Date: Tue,  2 Sep 2014 15:32:31 -0700
-Message-ID: <1409697153-7006-5-git-send-email-behanw@converseincode.com>
+Subject: [PATCH RFC 3/6] crypto: LLVMLinux: Remove VLAIS usage from libcrc32c.c
+Date: Tue,  2 Sep 2014 15:32:30 -0700
+Message-ID: <1409697153-7006-4-git-send-email-behanw@converseincode.com>
 References: <1409697153-7006-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -16,9 +16,9 @@ Cc: akpm@linux-foundation.org, james.l.morris@oracle.com,
 To: agk@redhat.com, clm@fb.com, davem@davemloft.net,
 	dm-devel@redhat.com, fabf@skynet.be, herbert@gondor.apana.org.au,
 	jbacik@fb.com, snitzer@redhat.com
-Return-path: <linux-btrfs-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1409697153-7006-1-git-send-email-behanw@converseincode.com>
-Sender: linux-btrfs-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
@@ -49,44 +49,42 @@ Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 Signed-off-by: Behan Webster <behanw@converseincode.com>
 Cc: pageexec@freemail.hu
 ---
- crypto/testmgr.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ lib/libcrc32c.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index ac2b631..f4bf5c2 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1714,16 +1714,16 @@ static int alg_test_crc32c(const struct alg_tes=
-t_desc *desc,
- 	}
+diff --git a/lib/libcrc32c.c b/lib/libcrc32c.c
+index b3131f5..03f2cf3 100644
+--- a/lib/libcrc32c.c
++++ b/lib/libcrc32c.c
+@@ -41,20 +41,20 @@ static struct crypto_shash *tfm;
 =20
- 	do {
--		struct {
--			struct shash_desc shash;
--			char ctx[crypto_shash_descsize(tfm)];
--		} sdesc;
-+		char sdesc[sizeof(struct shash_desc)
-+			+ crypto_shash_descsize(tfm)] CRYPTO_MINALIGN_ATTR;
-+		struct shash_desc *shash =3D (struct shash_desc *)sdesc;
-+		u32 *ctx =3D (u32 *)shash_desc_ctx(shash);
+ u32 crc32c(u32 crc, const void *address, unsigned int length)
+ {
+-	struct {
+-		struct shash_desc shash;
+-		char ctx[crypto_shash_descsize(tfm)];
+-	} desc;
++	char desc[sizeof(struct shash_desc)
++		+ crypto_shash_descsize(tfm)] CRYPTO_MINALIGN_ATTR;
++	struct shash_desc *shash =3D (struct shash_desc *)desc;
++	u32 *ctx =3D (u32 *)shash_desc_ctx(shash);
+ 	int err;
 =20
--		sdesc.shash.tfm =3D tfm;
--		sdesc.shash.flags =3D 0;
-+		shash->tfm =3D tfm;
-+		shash->flags =3D 0;
+-	desc.shash.tfm =3D tfm;
+-	desc.shash.flags =3D 0;
+-	*(u32 *)desc.ctx =3D crc;
++	shash->tfm =3D tfm;
++	shash->flags =3D 0;
++	*ctx =3D crc;
 =20
--		*(u32 *)sdesc.ctx =3D le32_to_cpu(420553207);
--		err =3D crypto_shash_final(&sdesc.shash, (u8 *)&val);
-+		*ctx =3D le32_to_cpu(420553207);
-+		err =3D crypto_shash_final(shash, (u8 *)&val);
- 		if (err) {
- 			printk(KERN_ERR "alg: crc32c: Operation failed for "
- 			       "%s: %d\n", driver, err);
+-	err =3D crypto_shash_update(&desc.shash, address, length);
++	err =3D crypto_shash_update(shash, address, length);
+ 	BUG_ON(err);
+=20
+-	return *(u32 *)desc.ctx;
++	return *ctx;
+ }
+=20
+ EXPORT_SYMBOL(crc32c);
 --=20
 1.9.1
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-btrfs" =
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
