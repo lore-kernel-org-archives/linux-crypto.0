@@ -1,7 +1,7 @@
 From: behanw@converseincode.com
-Subject: [PATCH RFC 3/6] crypto: LLVMLinux: Remove VLAIS usage from libcrc32c.c
-Date: Tue,  2 Sep 2014 15:32:30 -0700
-Message-ID: <1409697153-7006-4-git-send-email-behanw@converseincode.com>
+Subject: [PATCH RFC 2/6] crypto: LLVMLinux: Remove VLAIS usage from crypto/hmac.c
+Date: Tue,  2 Sep 2014 15:32:29 -0700
+Message-ID: <1409697153-7006-3-git-send-email-behanw@converseincode.com>
 References: <1409697153-7006-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -16,9 +16,9 @@ Cc: akpm@linux-foundation.org, james.l.morris@oracle.com,
 To: agk@redhat.com, clm@fb.com, davem@davemloft.net,
 	dm-devel@redhat.com, fabf@skynet.be, herbert@gondor.apana.org.au,
 	jbacik@fb.com, snitzer@redhat.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-btrfs-owner@vger.kernel.org>
 In-Reply-To: <1409697153-7006-1-git-send-email-behanw@converseincode.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-btrfs-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
@@ -49,42 +49,65 @@ Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 Signed-off-by: Behan Webster <behanw@converseincode.com>
 Cc: pageexec@freemail.hu
 ---
- lib/libcrc32c.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ crypto/hmac.c | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/lib/libcrc32c.c b/lib/libcrc32c.c
-index b3131f5..03f2cf3 100644
---- a/lib/libcrc32c.c
-+++ b/lib/libcrc32c.c
-@@ -41,20 +41,20 @@ static struct crypto_shash *tfm;
-=20
- u32 crc32c(u32 crc, const void *address, unsigned int length)
- {
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 8d9544c..00ce204 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -52,20 +52,19 @@ static int hmac_setkey(struct crypto_shash *parent,
+ 	struct hmac_ctx *ctx =3D align_ptr(opad + ss,
+ 					 crypto_tfm_ctx_alignment());
+ 	struct crypto_shash *hash =3D ctx->hash;
 -	struct {
 -		struct shash_desc shash;
--		char ctx[crypto_shash_descsize(tfm)];
+-		char ctx[crypto_shash_descsize(hash)];
 -	} desc;
 +	char desc[sizeof(struct shash_desc)
-+		+ crypto_shash_descsize(tfm)] CRYPTO_MINALIGN_ATTR;
++		+ crypto_shash_descsize(hash)] CRYPTO_MINALIGN_ATTR;
 +	struct shash_desc *shash =3D (struct shash_desc *)desc;
-+	u32 *ctx =3D (u32 *)shash_desc_ctx(shash);
- 	int err;
+ 	unsigned int i;
 =20
--	desc.shash.tfm =3D tfm;
--	desc.shash.flags =3D 0;
--	*(u32 *)desc.ctx =3D crc;
-+	shash->tfm =3D tfm;
-+	shash->flags =3D 0;
-+	*ctx =3D crc;
+-	desc.shash.tfm =3D hash;
+-	desc.shash.flags =3D crypto_shash_get_flags(parent) &
+-			    CRYPTO_TFM_REQ_MAY_SLEEP;
++	shash->tfm =3D hash;
++	shash->flags =3D crypto_shash_get_flags(parent)
++		& CRYPTO_TFM_REQ_MAY_SLEEP;
 =20
--	err =3D crypto_shash_update(&desc.shash, address, length);
-+	err =3D crypto_shash_update(shash, address, length);
- 	BUG_ON(err);
+ 	if (keylen > bs) {
+ 		int err;
 =20
--	return *(u32 *)desc.ctx;
-+	return *ctx;
+-		err =3D crypto_shash_digest(&desc.shash, inkey, keylen, ipad);
++		err =3D crypto_shash_digest(shash, inkey, keylen, ipad);
+ 		if (err)
+ 			return err;
+=20
+@@ -81,12 +80,12 @@ static int hmac_setkey(struct crypto_shash *parent,
+ 		opad[i] ^=3D 0x5c;
+ 	}
+=20
+-	return crypto_shash_init(&desc.shash) ?:
+-	       crypto_shash_update(&desc.shash, ipad, bs) ?:
+-	       crypto_shash_export(&desc.shash, ipad) ?:
+-	       crypto_shash_init(&desc.shash) ?:
+-	       crypto_shash_update(&desc.shash, opad, bs) ?:
+-	       crypto_shash_export(&desc.shash, opad);
++	return crypto_shash_init(shash) ?:
++	       crypto_shash_update(shash, ipad, bs) ?:
++	       crypto_shash_export(shash, ipad) ?:
++	       crypto_shash_init(shash) ?:
++	       crypto_shash_update(shash, opad, bs) ?:
++	       crypto_shash_export(shash, opad);
  }
 =20
- EXPORT_SYMBOL(crc32c);
+ static int hmac_export(struct shash_desc *pdesc, void *out)
 --=20
 1.9.1
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-btrfs" =
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
