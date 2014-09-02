@@ -1,7 +1,7 @@
 From: behanw@converseincode.com
-Subject: [PATCH RFC 1/6] crypto, dm: LLVMLinux: Remove VLAIS usage from dm-crypt
-Date: Tue,  2 Sep 2014 15:32:28 -0700
-Message-ID: <1409697153-7006-2-git-send-email-behanw@converseincode.com>
+Subject: [PATCH RFC 5/6] apparmor: LLVMLinux: Remove VLAIS
+Date: Tue,  2 Sep 2014 15:32:32 -0700
+Message-ID: <1409697153-7006-6-git-send-email-behanw@converseincode.com>
 References: <1409697153-7006-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -11,25 +11,33 @@ Cc: akpm@linux-foundation.org, james.l.morris@oracle.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-raid@vger.kernel.org, linux-security-module@vger.kernel.org,
 	neilb@suse.de, serge@hallyn.com, torvalds@linux-foundation.org,
+	=?UTF-8?q?Vin=C3=ADcius=20Tinti?= <viniciustinti@gmail.com>,
 	=?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>,
-	Behan Webster <behanw@converseincode.com>, pageexec@freemail.hu
+	Behan Webster <behanw@converseincode.com>,
+	Mark Charlebois <charlebm@gmail.com>
 To: agk@redhat.com, clm@fb.com, davem@davemloft.net,
 	dm-devel@redhat.com, fabf@skynet.be, herbert@gondor.apana.org.au,
 	jbacik@fb.com, snitzer@redhat.com
-Return-path: <linux-btrfs-owner@vger.kernel.org>
+Return-path: <linux-security-module-owner@vger.kernel.org>
 In-Reply-To: <1409697153-7006-1-git-send-email-behanw@converseincode.com>
-Sender: linux-btrfs-owner@vger.kernel.org
+Sender: linux-security-module-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-=46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
+=46rom: Vin=C3=ADcius Tinti <viniciustinti@gmail.com>
 
-The use of variable length arrays in structs (VLAIS) in the Linux Kerne=
-l code
-precludes the use of compilers which don't implement VLAIS (for instanc=
-e the
-Clang compiler). This patch instead allocates the appropriate amount of=
- memory
-using an char array.
+Replaced the use of a Variable Length Array In Struct (VLAIS) with a C9=
+9
+compliant equivalent. This is the original VLAIS struct.
+
+struct {
+	struct shash_desc shash;
+	char ctx[crypto_shash_descsize(apparmor_tfm)];
+} desc;
+
+This patch instead allocates the appropriate amount of memory using an
+char array.
+
+The new code can be compiled with both gcc and clang.
 
 struct shash_desc contains a flexible array member member ctx declared =
 with
@@ -47,114 +55,63 @@ CRYPTO_MINALIGN_ATTR.
 
 Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 Signed-off-by: Behan Webster <behanw@converseincode.com>
-Cc: pageexec@freemail.hu
+Signed-off-by: Vin=C3=ADcius Tinti <viniciustinti@gmail.com>
+Signed-off-by: Mark Charlebois <charlebm@gmail.com>
 ---
- drivers/md/dm-crypt.c | 38 ++++++++++++++++++--------------------
- 1 file changed, 18 insertions(+), 20 deletions(-)
+ security/apparmor/crypto.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index cd15e08..4d940d3 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -526,29 +526,28 @@ static int crypt_iv_lmk_one(struct crypt_config *=
-cc, u8 *iv,
- 			    u8 *data)
+diff --git a/security/apparmor/crypto.c b/security/apparmor/crypto.c
+index 532471d..62b32e7 100644
+--- a/security/apparmor/crypto.c
++++ b/security/apparmor/crypto.c
+@@ -32,10 +32,9 @@ unsigned int aa_hash_size(void)
+ int aa_calc_profile_hash(struct aa_profile *profile, u32 version, void=
+ *start,
+ 			 size_t len)
  {
- 	struct iv_lmk_private *lmk =3D &cc->iv_gen_private.lmk;
 -	struct {
--		struct shash_desc desc;
--		char ctx[crypto_shash_descsize(lmk->hash_tfm)];
--	} sdesc;
-+	char sdesc[sizeof(struct shash_desc)
-+		+ crypto_shash_descsize(lmk->hash_tfm)] CRYPTO_MINALIGN_ATTR;
-+	struct shash_desc *desc =3D (struct shash_desc *)sdesc;
- 	struct md5_state md5state;
- 	__le32 buf[4];
- 	int i, r;
+-		struct shash_desc shash;
+-		char ctx[crypto_shash_descsize(apparmor_tfm)];
+-	} desc;
++	char desc[sizeof(struct shash_desc)
++		+ crypto_shash_descsize(apparmor_tfm)] CRYPTO_MINALIGN_ATTR;
++	struct shash_desc *shash =3D (struct shash_desc *)desc;
+ 	int error =3D -ENOMEM;
+ 	u32 le32_version =3D cpu_to_le32(version);
 =20
--	sdesc.desc.tfm =3D lmk->hash_tfm;
--	sdesc.desc.flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
-+	desc->tfm =3D lmk->hash_tfm;
-+	desc->flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
+@@ -46,19 +45,19 @@ int aa_calc_profile_hash(struct aa_profile *profile=
+, u32 version, void *start,
+ 	if (!profile->hash)
+ 		goto fail;
 =20
--	r =3D crypto_shash_init(&sdesc.desc);
-+	r =3D crypto_shash_init(desc);
- 	if (r)
- 		return r;
+-	desc.shash.tfm =3D apparmor_tfm;
+-	desc.shash.flags =3D 0;
++	shash->tfm =3D apparmor_tfm;
++	shash->flags =3D 0;
 =20
- 	if (lmk->seed) {
--		r =3D crypto_shash_update(&sdesc.desc, lmk->seed, LMK_SEED_SIZE);
-+		r =3D crypto_shash_update(desc, lmk->seed, LMK_SEED_SIZE);
- 		if (r)
- 			return r;
- 	}
+-	error =3D crypto_shash_init(&desc.shash);
++	error =3D crypto_shash_init(shash);
+ 	if (error)
+ 		goto fail;
+-	error =3D crypto_shash_update(&desc.shash, (u8 *) &le32_version, 4);
++	error =3D crypto_shash_update(shash, (u8 *) &le32_version, 4);
+ 	if (error)
+ 		goto fail;
+-	error =3D crypto_shash_update(&desc.shash, (u8 *) start, len);
++	error =3D crypto_shash_update(shash, (u8 *) start, len);
+ 	if (error)
+ 		goto fail;
+-	error =3D crypto_shash_final(&desc.shash, profile->hash);
++	error =3D crypto_shash_final(shash, profile->hash);
+ 	if (error)
+ 		goto fail;
 =20
- 	/* Sector is always 512B, block size 16, add data of blocks 1-31 */
--	r =3D crypto_shash_update(&sdesc.desc, data + 16, 16 * 31);
-+	r =3D crypto_shash_update(desc, data + 16, 16 * 31);
- 	if (r)
- 		return r;
-=20
-@@ -557,12 +556,12 @@ static int crypt_iv_lmk_one(struct crypt_config *=
-cc, u8 *iv,
- 	buf[1] =3D cpu_to_le32((((u64)dmreq->iv_sector >> 32) & 0x00FFFFFF) |=
- 0x80000000);
- 	buf[2] =3D cpu_to_le32(4024);
- 	buf[3] =3D 0;
--	r =3D crypto_shash_update(&sdesc.desc, (u8 *)buf, sizeof(buf));
-+	r =3D crypto_shash_update(desc, (u8 *)buf, sizeof(buf));
- 	if (r)
- 		return r;
-=20
- 	/* No MD5 padding here */
--	r =3D crypto_shash_export(&sdesc.desc, &md5state);
-+	r =3D crypto_shash_export(desc, &md5state);
- 	if (r)
- 		return r;
-=20
-@@ -679,10 +678,9 @@ static int crypt_iv_tcw_whitening(struct crypt_con=
-fig *cc,
- 	struct iv_tcw_private *tcw =3D &cc->iv_gen_private.tcw;
- 	u64 sector =3D cpu_to_le64((u64)dmreq->iv_sector);
- 	u8 buf[TCW_WHITENING_SIZE];
--	struct {
--		struct shash_desc desc;
--		char ctx[crypto_shash_descsize(tcw->crc32_tfm)];
--	} sdesc;
-+	char sdesc[sizeof(struct shash_desc)
-+		+ crypto_shash_descsize(tcw->crc32_tfm)] CRYPTO_MINALIGN_ATTR;
-+	struct shash_desc *desc =3D (struct shash_desc *)sdesc;
- 	int i, r;
-=20
- 	/* xor whitening with sector number */
-@@ -691,16 +689,16 @@ static int crypt_iv_tcw_whitening(struct crypt_co=
-nfig *cc,
- 	crypto_xor(&buf[8], (u8 *)&sector, 8);
-=20
- 	/* calculate crc32 for every 32bit part and xor it */
--	sdesc.desc.tfm =3D tcw->crc32_tfm;
--	sdesc.desc.flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
-+	desc->tfm =3D tcw->crc32_tfm;
-+	desc->flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
- 	for (i =3D 0; i < 4; i++) {
--		r =3D crypto_shash_init(&sdesc.desc);
-+		r =3D crypto_shash_init(desc);
- 		if (r)
- 			goto out;
--		r =3D crypto_shash_update(&sdesc.desc, &buf[i * 4], 4);
-+		r =3D crypto_shash_update(desc, &buf[i * 4], 4);
- 		if (r)
- 			goto out;
--		r =3D crypto_shash_final(&sdesc.desc, &buf[i * 4]);
-+		r =3D crypto_shash_final(desc, &buf[i * 4]);
- 		if (r)
- 			goto out;
- 	}
 --=20
 1.9.1
 
 --
-To unsubscribe from this list: send the line "unsubscribe linux-btrfs" =
-in
+To unsubscribe from this list: send the line "unsubscribe linux-securit=
+y-module" in
 the body of a message to majordomo@vger.kernel.org
 More majordomo info at  http://vger.kernel.org/majordomo-info.html
