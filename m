@@ -1,31 +1,24 @@
 From: Jiri Slaby <jslaby@suse.cz>
-Subject: [PATCH 3.12 42/56] crypto: ux500 - make interrupt mode plausible
-Date: Wed,  3 Sep 2014 11:27:01 +0200
-Message-ID: <7a1b0c7591f6bb6a2d08eea93c20abaff2961d06.1409735865.git.jslaby@suse.cz>
-References: <b4839e6cd4a236a81725e422b2e05c26fe36048a.1409735865.git.jslaby@suse.cz>
-Cc: linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	linux-crypto@vger.kernel.org,
+Subject: [patch added to the 3.12 stable tree] crypto: ux500 - make interrupt mode plausible
+Date: Wed,  3 Sep 2014 10:56:16 +0200
+Message-ID: <1409734590-28423-42-git-send-email-jslaby@suse.cz>
+References: <1409734590-28423-1-git-send-email-jslaby@suse.cz>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
 	Fabio Baltieri <fabio.baltieri@linaro.org>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Jiri Slaby <jslaby@suse.cz>
 To: stable@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ip4-83-240-67-251.cust.nbox.cz ([83.240.67.251]:56824 "EHLO
-	ip4-83-240-18-248.cust.nbox.cz" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1756151AbaICJ10 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Sep 2014 05:27:26 -0400
-In-Reply-To: <b4839e6cd4a236a81725e422b2e05c26fe36048a.1409735865.git.jslaby@suse.cz>
-In-Reply-To: <cover.1409735865.git.jslaby@suse.cz>
-References: <cover.1409735865.git.jslaby@suse.cz>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <1409734590-28423-1-git-send-email-jslaby@suse.cz>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-3.12-stable review patch.  If anyone has any objections, please let me know.
+This patch has been added to the 3.12 stable tree. If you have any
+objections, please let us know.
 
 ===============
 
