@@ -1,8 +1,8 @@
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 3.16 054/125] crypto: ux500 - make interrupt mode plausible
-Date: Wed,  3 Sep 2014 15:06:51 -0700
-Message-ID: <20140903220625.263803089@linuxfoundation.org>
-References: <20140903220623.649748296@linuxfoundation.org>
+Subject: [PATCH 3.14 38/88] crypto: ux500 - make interrupt mode plausible
+Date: Wed,  3 Sep 2014 15:05:12 -0700
+Message-ID: <20140903220517.106225423@linuxfoundation.org>
+References: <20140903220515.958924632@linuxfoundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -14,11 +14,11 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"David S. Miller" <davem@davemloft.net>
 To: linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20140903220623.649748296@linuxfoundation.org>
+In-Reply-To: <20140903220515.958924632@linuxfoundation.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-3.16-stable review patch.  If anyone has any objections, please let me know.
+3.14-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
