@@ -1,107 +1,86 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH] crypto: ccp - Check for CCP before registering crypto algs
-Date: Fri, 5 Sep 2014 10:31:09 -0500
-Message-ID: <20140905153109.14637.12600.stgit@tlendack-t1.amdoffice.net>
+From: behanw@converseincode.com
+Subject: [PATCH] crypto: LLVMLinux: Remove VLAIS from crypto/ccp/ccp-crypto-sha.c
+Date: Fri,  5 Sep 2014 15:59:04 -0700
+Message-ID: <1409957944-30173-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: <lkml14@scotdoyle.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0140.outbound.protection.outlook.com ([65.55.169.140]:31821
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753373AbaIEPbq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Sep 2014 11:31:46 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.lendacky@amd.com,
+	=?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>,
+	Behan Webster <behanw@converseincode.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-If the ccp is built as a built-in module, then ccp-crypto (whether
-built as a module or a built-in module) will be able to load and
-it will register its crypto algorithms.  If the system does not have
-a CCP this will result in -ENODEV being returned whenever a command
-is attempted to be queued by the registered crypto algorithms.
+=46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 
-Add an API, ccp_present(), that checks for the presence of a CCP
-on the system.  The ccp-crypto module can use this to determine if it
-should register it's crypto alogorithms.
+Replaced the use of a Variable Length Array In Struct (VLAIS) with a C9=
+9
+compliant equivalent. This patch allocates the appropriate amount of me=
+mory
+using an char array.
 
-Reported-by: Scot Doyle <lkml14@scotdoyle.com>
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+The new code can be compiled with both gcc and clang.
+
+struct shash_desc contains a flexible array member member ctx declared =
+with
+CRYPTO_MINALIGN_ATTR, so sizeof(struct shash_desc) aligns the beginning
+of the array declared after struct shash_desc with long long.
+
+No trailing padding is required because it is not a struct type that ca=
+n
+be used in an array.
+
+The CRYPTO_MINALIGN_ATTR is required so that desc is aligned with long =
+long
+as would be the case for a struct containing a member with
+CRYPTO_MINALIGN_ATTR.
+
+Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
+Signed-off-by: Behan Webster <behanw@converseincode.com>
 ---
- drivers/crypto/ccp/ccp-crypto-main.c |    4 ++++
- drivers/crypto/ccp/ccp-dev.c         |   14 ++++++++++++++
- include/linux/ccp.h                  |   12 ++++++++++++
- 3 files changed, 30 insertions(+)
+ drivers/crypto/ccp/ccp-crypto-sha.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
-index 20dc848..4d4e016 100644
---- a/drivers/crypto/ccp/ccp-crypto-main.c
-+++ b/drivers/crypto/ccp/ccp-crypto-main.c
-@@ -367,6 +367,10 @@ static int ccp_crypto_init(void)
+diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/c=
+cp-crypto-sha.c
+index 873f234..29f9fda 100644
+--- a/drivers/crypto/ccp/ccp-crypto-sha.c
++++ b/drivers/crypto/ccp/ccp-crypto-sha.c
+@@ -198,10 +198,11 @@ static int ccp_sha_setkey(struct crypto_ahash *tf=
+m, const u8 *key,
  {
- 	int ret;
- 
-+	ret = ccp_present();
-+	if (ret)
-+		return ret;
+ 	struct ccp_ctx *ctx =3D crypto_tfm_ctx(crypto_ahash_tfm(tfm));
+ 	struct crypto_shash *shash =3D ctx->u.sha.hmac_tfm;
+-	struct {
+-		struct shash_desc sdesc;
+-		char ctx[crypto_shash_descsize(shash)];
+-	} desc;
 +
- 	spin_lock_init(&req_queue_lock);
- 	INIT_LIST_HEAD(&req_queue.cmds);
- 	req_queue.backlog = &req_queue.cmds;
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index a7d1106..c6e6171 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -55,6 +55,20 @@ static inline void ccp_del_device(struct ccp_device *ccp)
- }
- 
- /**
-+ * ccp_present - check if a CCP device is present
-+ *
-+ * Returns zero if a CCP device is present, -ENODEV otherwise.
-+ */
-+int ccp_present(void)
-+{
-+	if (ccp_get_device())
-+		return 0;
++	char desc[sizeof(struct shash_desc) +
++		crypto_shash_descsize(shash)] CRYPTO_MINALIGN_ATTR;
++	struct shash_desc *sdesc =3D (struct shash_desc *)desc;
 +
-+	return -ENODEV;
-+}
-+EXPORT_SYMBOL_GPL(ccp_present);
-+
-+/**
-  * ccp_enqueue_cmd - queue an operation for processing by the CCP
-  *
-  * @cmd: ccp_cmd struct to be processed
-diff --git a/include/linux/ccp.h b/include/linux/ccp.h
-index ebcc9d1..7f43703 100644
---- a/include/linux/ccp.h
-+++ b/include/linux/ccp.h
-@@ -27,6 +27,13 @@ struct ccp_cmd;
- 	defined(CONFIG_CRYPTO_DEV_CCP_DD_MODULE)
- 
- /**
-+ * ccp_present - check if a CCP device is present
-+ *
-+ * Returns zero if a CCP device is present, -ENODEV otherwise.
-+ */
-+int ccp_present(void);
-+
-+/**
-  * ccp_enqueue_cmd - queue an operation for processing by the CCP
-  *
-  * @cmd: ccp_cmd struct to be processed
-@@ -53,6 +60,11 @@ int ccp_enqueue_cmd(struct ccp_cmd *cmd);
- 
- #else /* CONFIG_CRYPTO_DEV_CCP_DD is not enabled */
- 
-+static inline int ccp_present(void)
-+{
-+	return -ENODEV;
-+}
-+
- static inline int ccp_enqueue_cmd(struct ccp_cmd *cmd)
- {
- 	return -ENODEV;
+ 	unsigned int block_size =3D crypto_shash_blocksize(shash);
+ 	unsigned int digest_size =3D crypto_shash_digestsize(shash);
+ 	int i, ret;
+@@ -216,11 +217,11 @@ static int ccp_sha_setkey(struct crypto_ahash *tf=
+m, const u8 *key,
+=20
+ 	if (key_len > block_size) {
+ 		/* Must hash the input key */
+-		desc.sdesc.tfm =3D shash;
+-		desc.sdesc.flags =3D crypto_ahash_get_flags(tfm) &
++		sdesc->tfm =3D shash;
++		sdesc->flags =3D crypto_ahash_get_flags(tfm) &
+ 			CRYPTO_TFM_REQ_MAY_SLEEP;
+=20
+-		ret =3D crypto_shash_digest(&desc.sdesc, key, key_len,
++		ret =3D crypto_shash_digest(sdesc, key, key_len,
+ 					  ctx->u.sha.key);
+ 		if (ret) {
+ 			crypto_ahash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+--=20
+1.9.1
