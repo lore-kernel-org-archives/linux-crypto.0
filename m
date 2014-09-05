@@ -1,7 +1,7 @@
 From: behanw@converseincode.com
-Subject: [PATCH v2] crypto: LLVMLinux: Remove VLAIS usage from crypto/hmac.c
-Date: Fri,  5 Sep 2014 16:02:43 -0700
-Message-ID: <1409958163-3730-1-git-send-email-behanw@converseincode.com>
+Subject: [PATCH v2] crypto: LLVMLinux: Remove VLAIS usage from crypto/testmgr.c
+Date: Fri,  5 Sep 2014 16:06:47 -0700
+Message-ID: <1409958407-9173-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
@@ -10,9 +10,16 @@ Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	=?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>,
 	Behan Webster <behanw@converseincode.com>, pageexec@freemail.hu
 To: davem@davemloft.net, herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f44.google.com ([209.85.220.44]:48140 "EHLO
+	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752924AbaIEXG4 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Sep 2014 19:06:56 -0400
+Received: by mail-pa0-f44.google.com with SMTP id rd3so22953214pab.17
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Sep 2014 16:06:56 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 =46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 
@@ -42,59 +49,38 @@ Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 Signed-off-by: Behan Webster <behanw@converseincode.com>
 Cc: pageexec@freemail.hu
 ---
- crypto/hmac.c | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ crypto/testmgr.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/crypto/hmac.c b/crypto/hmac.c
-index 8d9544c..f2da806 100644
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -52,20 +52,19 @@ static int hmac_setkey(struct crypto_shash *parent,
- 	struct hmac_ctx *ctx =3D align_ptr(opad + ss,
- 					 crypto_tfm_ctx_alignment());
- 	struct crypto_shash *hash =3D ctx->hash;
--	struct {
--		struct shash_desc shash;
--		char ctx[crypto_shash_descsize(hash)];
--	} desc;
-+	char desc[sizeof(struct shash_desc) +
-+		crypto_shash_descsize(hash)] CRYPTO_MINALIGN_ATTR;
-+	struct shash_desc *shash =3D (struct shash_desc *)desc;
- 	unsigned int i;
-=20
--	desc.shash.tfm =3D hash;
--	desc.shash.flags =3D crypto_shash_get_flags(parent) &
--			    CRYPTO_TFM_REQ_MAY_SLEEP;
-+	shash->tfm =3D hash;
-+	shash->flags =3D crypto_shash_get_flags(parent)
-+		& CRYPTO_TFM_REQ_MAY_SLEEP;
-=20
- 	if (keylen > bs) {
- 		int err;
-=20
--		err =3D crypto_shash_digest(&desc.shash, inkey, keylen, ipad);
-+		err =3D crypto_shash_digest(shash, inkey, keylen, ipad);
- 		if (err)
- 			return err;
-=20
-@@ -81,12 +80,12 @@ static int hmac_setkey(struct crypto_shash *parent,
- 		opad[i] ^=3D 0x5c;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index ac2b631..34f5a32 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1714,16 +1714,16 @@ static int alg_test_crc32c(const struct alg_tes=
+t_desc *desc,
  	}
 =20
--	return crypto_shash_init(&desc.shash) ?:
--	       crypto_shash_update(&desc.shash, ipad, bs) ?:
--	       crypto_shash_export(&desc.shash, ipad) ?:
--	       crypto_shash_init(&desc.shash) ?:
--	       crypto_shash_update(&desc.shash, opad, bs) ?:
--	       crypto_shash_export(&desc.shash, opad);
-+	return crypto_shash_init(shash) ?:
-+	       crypto_shash_update(shash, ipad, bs) ?:
-+	       crypto_shash_export(shash, ipad) ?:
-+	       crypto_shash_init(shash) ?:
-+	       crypto_shash_update(shash, opad, bs) ?:
-+	       crypto_shash_export(shash, opad);
- }
+ 	do {
+-		struct {
+-			struct shash_desc shash;
+-			char ctx[crypto_shash_descsize(tfm)];
+-		} sdesc;
++		char sdesc[sizeof(struct shash_desc) +
++			crypto_shash_descsize(tfm)] CRYPTO_MINALIGN_ATTR;
++		struct shash_desc *shash =3D (struct shash_desc *)sdesc;
++		u32 *ctx =3D (u32 *)shash_desc_ctx(shash);
 =20
- static int hmac_export(struct shash_desc *pdesc, void *out)
+-		sdesc.shash.tfm =3D tfm;
+-		sdesc.shash.flags =3D 0;
++		shash->tfm =3D tfm;
++		shash->flags =3D 0;
+=20
+-		*(u32 *)sdesc.ctx =3D le32_to_cpu(420553207);
+-		err =3D crypto_shash_final(&sdesc.shash, (u8 *)&val);
++		*ctx =3D le32_to_cpu(420553207);
++		err =3D crypto_shash_final(shash, (u8 *)&val);
+ 		if (err) {
+ 			printk(KERN_ERR "alg: crc32c: Operation failed for "
+ 			       "%s: %d\n", driver, err);
 --=20
 1.9.1
