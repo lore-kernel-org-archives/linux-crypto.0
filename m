@@ -1,86 +1,116 @@
-From: behanw@converseincode.com
-Subject: [PATCH v2] crypto: LLVMLinux: Remove VLAIS usage from crypto/testmgr.c
-Date: Fri,  5 Sep 2014 16:06:47 -0700
-Message-ID: <1409958407-9173-1-git-send-email-behanw@converseincode.com>
+From: Scot Doyle <lkml14@scotdoyle.com>
+Subject: Re: [PATCH] crypto: ccp - Check for CCP before registering crypto
+ algs
+Date: Fri, 5 Sep 2014 23:49:38 +0000 (UTC)
+Message-ID: <alpine.LNX.2.11.1409052327320.570@localhost.localdomain>
+References: <20140905153109.14637.12600.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	torvalds@linux-foundation.org,
-	=?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>,
-	Behan Webster <behanw@converseincode.com>, pageexec@freemail.hu
-To: davem@davemloft.net, herbert@gondor.apana.org.au
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: linux-crypto@vger.kernel.org
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+	herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f44.google.com ([209.85.220.44]:48140 "EHLO
-	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752924AbaIEXG4 (ORCPT
+Received: from mx1.scotdoyle.com ([23.226.141.211]:44437 "EHLO
+	mx1.scotdoyle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751110AbaIEXxG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Sep 2014 19:06:56 -0400
-Received: by mail-pa0-f44.google.com with SMTP id rd3so22953214pab.17
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Sep 2014 16:06:56 -0700 (PDT)
+	Fri, 5 Sep 2014 19:53:06 -0400
+In-Reply-To: <20140905153109.14637.12600.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-=46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 
-The use of variable length arrays in structs (VLAIS) in the Linux Kerne=
-l code
-precludes the use of compilers which don't implement VLAIS (for instanc=
-e the
-Clang compiler). This patch instead allocates the appropriate amount of=
- memory
-using an char array.
+On Fri, 5 Sep 2014, Tom Lendacky wrote:
 
-struct shash_desc contains a flexible array member member ctx declared =
-with
-CRYPTO_MINALIGN_ATTR, so sizeof(struct shash_desc) aligns the beginning
-of the array declared after struct shash_desc with long long.
+> If the ccp is built as a built-in module, then ccp-crypto (whether
+> built as a module or a built-in module) will be able to load and
+> it will register its crypto algorithms.  If the system does not have
+> a CCP this will result in -ENODEV being returned whenever a command
+> is attempted to be queued by the registered crypto algorithms.
+>
+> Add an API, ccp_present(), that checks for the presence of a CCP
+> on the system.  The ccp-crypto module can use this to determine if it
+> should register it's crypto alogorithms.
+>
+> Reported-by: Scot Doyle <lkml14@scotdoyle.com>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+> drivers/crypto/ccp/ccp-crypto-main.c |    4 ++++
+> drivers/crypto/ccp/ccp-dev.c         |   14 ++++++++++++++
+> include/linux/ccp.h                  |   12 ++++++++++++
+> 3 files changed, 30 insertions(+)
+>
+> diff --git a/drivers/crypto/ccp/ccp-crypto-main.c b/drivers/crypto/ccp/ccp-crypto-main.c
+> index 20dc848..4d4e016 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-main.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-main.c
+> @@ -367,6 +367,10 @@ static int ccp_crypto_init(void)
+> {
+> 	int ret;
+>
+> +	ret = ccp_present();
+> +	if (ret)
+> +		return ret;
+> +
+> 	spin_lock_init(&req_queue_lock);
+> 	INIT_LIST_HEAD(&req_queue.cmds);
+> 	req_queue.backlog = &req_queue.cmds;
+> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
+> index a7d1106..c6e6171 100644
+> --- a/drivers/crypto/ccp/ccp-dev.c
+> +++ b/drivers/crypto/ccp/ccp-dev.c
+> @@ -55,6 +55,20 @@ static inline void ccp_del_device(struct ccp_device *ccp)
+> }
+>
+> /**
+> + * ccp_present - check if a CCP device is present
+> + *
+> + * Returns zero if a CCP device is present, -ENODEV otherwise.
+> + */
+> +int ccp_present(void)
+> +{
+> +	if (ccp_get_device())
+> +		return 0;
+> +
+> +	return -ENODEV;
+> +}
+> +EXPORT_SYMBOL_GPL(ccp_present);
+> +
+> +/**
+>  * ccp_enqueue_cmd - queue an operation for processing by the CCP
+>  *
+>  * @cmd: ccp_cmd struct to be processed
+> diff --git a/include/linux/ccp.h b/include/linux/ccp.h
+> index ebcc9d1..7f43703 100644
+> --- a/include/linux/ccp.h
+> +++ b/include/linux/ccp.h
+> @@ -27,6 +27,13 @@ struct ccp_cmd;
+> 	defined(CONFIG_CRYPTO_DEV_CCP_DD_MODULE)
+>
+> /**
+> + * ccp_present - check if a CCP device is present
+> + *
+> + * Returns zero if a CCP device is present, -ENODEV otherwise.
+> + */
+> +int ccp_present(void);
+> +
+> +/**
+>  * ccp_enqueue_cmd - queue an operation for processing by the CCP
+>  *
+>  * @cmd: ccp_cmd struct to be processed
+> @@ -53,6 +60,11 @@ int ccp_enqueue_cmd(struct ccp_cmd *cmd);
+>
+> #else /* CONFIG_CRYPTO_DEV_CCP_DD is not enabled */
+>
+> +static inline int ccp_present(void)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+> static inline int ccp_enqueue_cmd(struct ccp_cmd *cmd)
+> {
+> 	return -ENODEV;
 
-No trailing padding is required because it is not a struct type that ca=
-n
-be used in an array.
+Thanks Tom!
 
-The CRYPTO_MINALIGN_ATTR is required so that desc is aligned with long =
-long
-as would be the case for a struct containing a member with
-CRYPTO_MINALIGN_ATTR.
-
-Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
-Signed-off-by: Behan Webster <behanw@converseincode.com>
-Cc: pageexec@freemail.hu
----
- crypto/testmgr.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index ac2b631..34f5a32 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1714,16 +1714,16 @@ static int alg_test_crc32c(const struct alg_tes=
-t_desc *desc,
- 	}
-=20
- 	do {
--		struct {
--			struct shash_desc shash;
--			char ctx[crypto_shash_descsize(tfm)];
--		} sdesc;
-+		char sdesc[sizeof(struct shash_desc) +
-+			crypto_shash_descsize(tfm)] CRYPTO_MINALIGN_ATTR;
-+		struct shash_desc *shash =3D (struct shash_desc *)sdesc;
-+		u32 *ctx =3D (u32 *)shash_desc_ctx(shash);
-=20
--		sdesc.shash.tfm =3D tfm;
--		sdesc.shash.flags =3D 0;
-+		shash->tfm =3D tfm;
-+		shash->flags =3D 0;
-=20
--		*(u32 *)sdesc.ctx =3D le32_to_cpu(420553207);
--		err =3D crypto_shash_final(&sdesc.shash, (u8 *)&val);
-+		*ctx =3D le32_to_cpu(420553207);
-+		err =3D crypto_shash_final(shash, (u8 *)&val);
- 		if (err) {
- 			printk(KERN_ERR "alg: crc32c: Operation failed for "
- 			       "%s: %d\n", driver, err);
---=20
-1.9.1
+Tested-by: Scot Doyle <lkml14@scotdoyle.com>
