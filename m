@@ -1,181 +1,97 @@
-From: Helmut Schaa <helmut.schaa@googlemail.com>
-Subject: [PATCH] crypto: talitos: Avoid excessive loops in softirq context
-Date: Wed, 10 Sep 2014 10:34:47 +0200
-Message-ID: <1410338087-5317-1-git-send-email-helmut.schaa@googlemail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	Helmut Schaa <helmut.schaa@googlemail.com>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qg0-f54.google.com ([209.85.192.54]:43141 "EHLO
-	mail-qg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751490AbaIJIxZ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Sep 2014 04:53:25 -0400
-Received: by mail-qg0-f54.google.com with SMTP id z60so3283191qgd.13
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Sep 2014 01:53:24 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Matt <jackdachef@gmail.com>
+Subject: Re: slab kmalloc guard patch uncovers potential issue with crypto,
+ triggered by cryptomgr_test
+Date: Wed, 10 Sep 2014 16:41:13 +0200
+Message-ID: <CAG-aW05QCTd+0Gq7RfYto5RXY50icvTgrqJXrhm+f_tc7e4qsw@mail.gmail.com>
+References: <CAG-aW05r2B-3JM8P4JrXYb5rMSt=HFkdhXAi=bkSfPn4xjcuHg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-crypto@vger.kernel.org,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Linux Kernel <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <CAG-aW05r2B-3JM8P4JrXYb5rMSt=HFkdhXAi=bkSfPn4xjcuHg@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The talitos driver can cause starvation of other softirqs and as such
-it can also cause rcu stalls like:
+On Wed, Sep 10, 2014 at 4:35 PM, Matt <jackdachef@gmail.com> wrote:
+> Hi Herbert,
+> Hi David,
+>
+> (added maintainers according to https://www.kernel.org/doc/linux/MAINTAINERS)
+>
+> Hi crypto ML,
+>
+>
+> running a kernel with Mikulas Patocka's kmalloc guard patch for slab
+> the following message appears during boot:
+>
+> [    1.439704] AVX2 version of gcm_enc/dec engaged.
+> [    1.444420] alg: No test for __gcm-aes-aesni (__driver-gcm-aes-aesni)
+> [    1.449029] kmalloc: red zone damaged, pointer ffff8807fa48bcc0,
+> real_size 192, size 160, red zone ffff8807fa4fccc0
+> [    1.449033] CPU: 1 PID: 127 Comm: cryptomgr_test Not tainted 3.16.2-test+ #1
+> [    1.449034] Hardware name: ASUS All Series/P9D WS, BIOS 1804 04/17/2014
+> [    1.449036]  0000000000000000 ffffffff829ef90e ffff8807fa48bcc0
+> ffffffff8218c799
+> [    1.449039]  ffff8807fa48bcc0 ffffffff82186d9f ffff8807fa48bcc0
+> ffffffff824a22aa
+> [    1.449042]  ffffffffffffffff 0000000000000069 000000000000008a
+> ffffffff824a18c3
+> [    1.449044] Call Trace:
+> [    1.449048]  [<ffffffff829ef90e>] ? dump_stack+0x4a/0x75
+> [    1.449052]  [<ffffffff8218c799>] ? ksize+0x9/0x30
+> [    1.449054]  [<ffffffff82186d9f>] ? kzfree+0xf/0x30
+> [    1.449057]  [<ffffffff824a22aa>] ? alg_test_hash+0x4a/0x90
+> [    1.449059]  [<ffffffff824a18c3>] ? alg_test+0x113/0x2b0
+> [    1.449062]  [<ffffffff8249e4d0>] ? crypto_unregister_pcomp+0x10/0x10
+> [    1.449064]  [<ffffffff8249e508>] ? cryptomgr_test+0x38/0x40
+> [    1.449066]  [<ffffffff820e864a>] ? kthread+0xca/0xe0
+> [    1.449068]  [<ffffffff820e8580>] ? kthread_create_on_node+0x180/0x180
+> [    1.449071]  [<ffffffff829f752c>] ? ret_from_fork+0x7c/0xb0
+> [    1.449072]  [<ffffffff820e8580>] ? kthread_create_on_node+0x180/0x180
+> [    1.449074] kmalloc: red zone damaged, pointer ffff8807fa48bcc0,
+> real_size 192, size 160, red zone ffff8807fa4fccc0
+> [    1.449077] CPU: 1 PID: 127 Comm: cryptomgr_test Not tainted 3.16.2-test+ #1
+> [    1.449078] Hardware name: ASUS All Series/P9D WS, BIOS 1804 04/17/2014
+> [    1.449079]  0000000000000000 ffffffff829ef90e ffff8807fa48bcc0
+> ffffffff821b5d7f
+> [    1.449082]  ffff8807fa48bcc0 0000000000000000 ffffffff82ac18b8
+> ffff8807fa48bc00
+> [    1.449084]  0000000000000000 ffff8807fa48bc40 ffffffff824a22aa
+> ffffffffffffffff
+> [    1.449087] Call Trace:
+> [    1.449088]  [<ffffffff829ef90e>] ? dump_stack+0x4a/0x75
+> [    1.449091]  [<ffffffff821b5d7f>] ? kfree+0x1f/0x1d0
+> [    1.449093]  [<ffffffff824a22aa>] ? alg_test_hash+0x4a/0x90
+> [    1.449095]  [<ffffffff824a18c3>] ? alg_test+0x113/0x2b0
+> [    1.449097]  [<ffffffff8249e4d0>] ? crypto_unregister_pcomp+0x10/0x10
+> [    1.449099]  [<ffffffff8249e508>] ? cryptomgr_test+0x38/0x40
+> [    1.449101]  [<ffffffff820e864a>] ? kthread+0xca/0xe0
+> [    1.449102]  [<ffffffff820e8580>] ? kthread_create_on_node+0x180/0x180
+> [    1.449104]  [<ffffffff829f752c>] ? ret_from_fork+0x7c/0xb0
+> [    1.449106]  [<ffffffff820e8580>] ? kthread_create_on_node+0x180/0x180
+> [    1.449138] sha1_ssse3: Using AVX2 optimized SHA-1 implementation
+> [    1.449182] alg: No test for crc32 (crc32-pclmul)
+> [    1.449188] sha256_ssse3: Using AVX2 optimized SHA-256 implementation
+> [    1.449262] sha512_ssse3: Using AVX2 optimized SHA-512 implementation
+>
+> link to the patch: http://marc.info/?l=linux-kernel&m=140995770121230&w=2
+>
+>
+> The kernel this appears on only has 2 reiserfs fixes, BFQ, BFS and
+> this patch added on top:
+> https://github.com/kernelOfTruth/linux/commits/linux-3.16.2-test
+>
+>
+> Kernel config is attached
+>
+>
+> Kind Regards
+>
+> Matt
 
-INFO: rcu_sched self-detected stall on CPU { 1}  (t=15001 jiffies g=6799 c=6798 q=728)
-INFO: rcu_sched detected stalls on CPUs/tasks: { 1} (detected by 0, t=15002 jiffies, g=6799, c=6798, q=728)
-Task dump for CPU 1:
-ovs-vswitchd    R running      0  3225      1 0x00000004
-Call Trace:
-[c68879a0] [00000002] 0x2 (unreliable)
-[c6887a60] [00000000]   (null)
-CPU: 1 PID: 3225 Comm: ovs-vswitchd Tainted: G        W    3.10.36 #2
-Call Trace:
-[effe9900] [c0006b08] show_stack+0x44/0x15c (unreliable)
-[effe9940] [c0072eb0] rcu_check_callbacks+0x21c/0x668
-[effe99a0] [c0030f48] update_process_times+0x44/0x70
-[effe99c0] [c005fdac] tick_sched_timer+0x2d4/0x314
-[effe9a00] [c00466f4] __run_hrtimer.isra.29+0x54/0xf8
-[effe9a20] [c0047110] hrtimer_interrupt+0x1a4/0x3bc
-[effe9aa0] [c000827c] timer_interrupt+0x15c/0x1a4
-[effe9ad0] [c000d470] ret_from_except+0x0/0x18
- --- Exception: 901 at memcpy+0x1c/0x9c
-LR = pskb_expand_head+0x94/0x298
-[effe9b90] [c02260c0] pskb_expand_head+0x68/0x298 (unreliable)
-[effe9bc0] [f159d20c] 0xf159d20c
-[effe9bd0] [c02344f4] dev_hard_start_xmit+0x2b8/0x454
-[effe9c00] [c024d330] sch_direct_xmit+0x70/0x1e8
-[effe9c20] [c0234914] dev_queue_xmit+0x284/0x4fc
-[effe9c50] [c02cf3b0] vlan_dev_hard_start_xmit+0xa8/0x178
-[effe9c60] [c02344f4] dev_hard_start_xmit+0x2b8/0x454
-[effe9c90] [c0234a64] dev_queue_xmit+0x3d4/0x4fc
-[effe9cc0] [f14cb2c4] ovs_netdev_get_name+0xac/0x404 [openvswitch]
-[effe9ce0] [f14c9698] ovs_vport_send+0x28/0xe8 [openvswitch]
-[effe9d00] [f14c0000] 0xf14c0000
-[effe9d10] [f14c0b84] 0xf14c0b84
-[effe9d90] [f14c0c74] ovs_execute_actions+0xa4/0x1270 [openvswitch]
-[effe9dc0] [f14c3a30] ovs_dp_process_received_packet+0xd0/0x11c [openvswitch]
-[effe9e70] [f14ca3f0] ovs_vport_deferred_free+0xc98/0xd78 [openvswitch]
-[effe9e80] [c02344f4] dev_hard_start_xmit+0x2b8/0x454
-[effe9eb0] [c0234a64] dev_queue_xmit+0x3d4/0x4fc
-[effe9ee0] [c0266924] ip_finish_output+0x450/0x4b4
-[effe9f10] [f13a8920] talitos_submit+0x2d8/0x3f1c [talitos]
-[effe9f60] [f13a8aa4] talitos_submit+0x45c/0x3f1c [talitos]
-[effe9f70] [c002aa9c] tasklet_action+0xe4/0x178
-[effe9fa0] [c002ac18] __do_softirq+0xe8/0x1ac
-[effe9ff0] [c000b974] call_do_softirq+0x14/0x24
-[c6887ee0] [c0004498] do_softirq+0x84/0xc4
-[c6887f00] [c002ae2c] irq_exit+0x64/0x7c
-[c6887f10] [c0004268] do_IRQ+0x12c/0x154
-[c6887f40] [c000d470] ret_from_except+0x0/0x18
 
-Work around this by processing a maximum amount of 16 finished requests
-and rescheduling the done-tasklet if any work is left.
-
-This allows other softirqs to run.
-
-Signed-off-by: Helmut Schaa <helmut.schaa@googlemail.com>
----
- drivers/crypto/talitos.c | 35 +++++++++++++++++++++++------------
- 1 file changed, 23 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 624b8be..e0f03da 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -244,17 +244,18 @@ EXPORT_SYMBOL(talitos_submit);
- /*
-  * process what was done, notify callback of error if not
-  */
--static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
-+static int flush_channel(struct device *dev, int ch, int error, int reset_ch)
- {
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	struct talitos_request *request, saved_req;
- 	unsigned long flags;
- 	int tail, status;
-+	int cnt = 16;
- 
- 	spin_lock_irqsave(&priv->chan[ch].tail_lock, flags);
- 
- 	tail = priv->chan[ch].tail;
--	while (priv->chan[ch].fifo[tail].desc) {
-+	while (priv->chan[ch].fifo[tail].desc && (--cnt > 0)) {
- 		request = &priv->chan[ch].fifo[tail];
- 
- 		/* descriptors with their done bits set don't get the error */
-@@ -291,36 +292,46 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
- 				   status);
- 		/* channel may resume processing in single desc error case */
- 		if (error && !reset_ch && status == error)
--			return;
-+			return 0;
- 		spin_lock_irqsave(&priv->chan[ch].tail_lock, flags);
- 		tail = priv->chan[ch].tail;
- 	}
- 
- 	spin_unlock_irqrestore(&priv->chan[ch].tail_lock, flags);
-+
-+	if (cnt == 0)
-+		return 1; /* Need to reschedule */
-+	return 0;
- }
- 
- /*
-  * process completed requests for channels that have done status
-  */
--#define DEF_TALITOS_DONE(name, ch_done_mask)				\
-+#define DEF_TALITOS_DONE(name, ch_done_mask, tlet)				\
- static void talitos_done_##name(unsigned long data)			\
- {									\
- 	struct device *dev = (struct device *)data;			\
- 	struct talitos_private *priv = dev_get_drvdata(dev);		\
- 	unsigned long flags;						\
-+	int resched = 0;						\
- 									\
- 	if (ch_done_mask & 1)						\
--		flush_channel(dev, 0, 0, 0);				\
-+		resched += flush_channel(dev, 0, 0, 0);			\
- 	if (priv->num_channels == 1)					\
- 		goto out;						\
- 	if (ch_done_mask & (1 << 2))					\
--		flush_channel(dev, 1, 0, 0);				\
-+		resched += flush_channel(dev, 1, 0, 0);			\
- 	if (ch_done_mask & (1 << 4))					\
--		flush_channel(dev, 2, 0, 0);				\
-+		resched += flush_channel(dev, 2, 0, 0);			\
- 	if (ch_done_mask & (1 << 6))					\
--		flush_channel(dev, 3, 0, 0);				\
-+		resched += flush_channel(dev, 3, 0, 0);			\
- 									\
- out:									\
-+	if (resched) {							\
-+		tasklet_schedule(&priv->done_task[tlet]);		\
-+		return;							\
-+	}								\
-+									\
- 	/* At this point, all completed channels have been processed */	\
- 	/* Unmask done interrupts for channels completed later on. */	\
- 	spin_lock_irqsave(&priv->reg_lock, flags);			\
-@@ -328,9 +339,9 @@ out:									\
- 	setbits32(priv->reg + TALITOS_IMR_LO, TALITOS_IMR_LO_INIT);	\
- 	spin_unlock_irqrestore(&priv->reg_lock, flags);			\
- }
--DEF_TALITOS_DONE(4ch, TALITOS_ISR_4CHDONE)
--DEF_TALITOS_DONE(ch0_2, TALITOS_ISR_CH_0_2_DONE)
--DEF_TALITOS_DONE(ch1_3, TALITOS_ISR_CH_1_3_DONE)
-+DEF_TALITOS_DONE(4ch, TALITOS_ISR_4CHDONE, 0)
-+DEF_TALITOS_DONE(ch0_2, TALITOS_ISR_CH_0_2_DONE, 0)
-+DEF_TALITOS_DONE(ch1_3, TALITOS_ISR_CH_1_3_DONE, 1)
- 
- /*
-  * locate current (offending) descriptor
-@@ -489,7 +500,7 @@ static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
- 		if (v_lo & TALITOS_CCPSR_LO_SRL)
- 			dev_err(dev, "scatter return/length error\n");
- 
--		flush_channel(dev, ch, error, reset_ch);
-+		while (flush_channel(dev, ch, error, reset_ch));
- 
- 		if (reset_ch) {
- 			reset_channel(dev, ch);
--- 
-1.8.4.5
+Adding the main Linux Kernel Mailing List for good measure
