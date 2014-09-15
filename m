@@ -1,11 +1,12 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH v3 11/12] security, crypto: LLVMLinux: Remove VLAIS from ima_crypto.c
-Date: Mon, 15 Sep 2014 07:21:46 -0700
-Message-ID: <CA+55aFx8FN2Rq+d3v9rsDbTyX3hwm6TvudvZrL5wgf7fX3aQjA@mail.gmail.com>
-References: <1410766234-1634-1-git-send-email-behanw@converseincode.com>
-	<1410766234-1634-12-git-send-email-behanw@converseincode.com>
+From: Behan Webster <behanw@converseincode.com>
+Subject: Re: [PATCH v3 11/12] security, crypto: LLVMLinux: Remove VLAIS from
+ ima_crypto.c
+Date: Mon, 15 Sep 2014 07:25:16 -0700
+Message-ID: <5416F6CC.3050203@converseincode.com>
+References: <1410766234-1634-1-git-send-email-behanw@converseincode.com>	<1410766234-1634-12-git-send-email-behanw@converseincode.com> <CA+55aFx8FN2Rq+d3v9rsDbTyX3hwm6TvudvZrL5wgf7fX3aQjA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Cc: Alasdair G Kergon <agk@redhat.com>, Chris Mason <clm@fb.com>,
 	David Miller <davem@davemloft.net>,
 	"dm-devel@redhat.com" <dm-devel@redhat.com>,
@@ -24,21 +25,27 @@ Cc: Alasdair G Kergon <agk@redhat.com>, Chris Mason <clm@fb.com>,
 	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
 	LSM List <linux-security-module@vger.kernel.org>,
 	Neil Brown <neilb@suse.de>, qat-lin
-To: Behan Webster <behanw@converseincode.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1410766234-1634-12-git-send-email-behanw@converseincode.com>
+In-Reply-To: <CA+55aFx8FN2Rq+d3v9rsDbTyX3hwm6TvudvZrL5wgf7fX3aQjA@mail.gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 15, 2014 at 12:30 AM,  <behanw@converseincode.com> wrote:
-> From: Behan Webster <behanw@converseincode.com>
+On 09/15/14 07:21, Linus Torvalds wrote:
+> On Mon, Sep 15, 2014 at 12:30 AM,  <behanw@converseincode.com> wrote:
+>> From: Behan Webster <behanw@converseincode.com>
+>>
+>> Replaced the use of a Variable Length Array In Struct (VLAIS) with a C99
+>> compliant equivalent. This patch allocates the appropriate amount of memory
+>> using a char array using the SHASH_DESC_ON_STACK macro.
+> You only made the first case use SHASH_DESC_ON_STACK, the two other
+> cases you left in the ugly format. Was that just an oversight, or was
+> there some reason for it?
 >
-> Replaced the use of a Variable Length Array In Struct (VLAIS) with a C99
-> compliant equivalent. This patch allocates the appropriate amount of memory
-> using a char array using the SHASH_DESC_ON_STACK macro.
+Oversight. Will Fix.
 
-You only made the first case use SHASH_DESC_ON_STACK, the two other
-cases you left in the ugly format. Was that just an oversight, or was
-there some reason for it?
+Behan
 
-             Linus
+-- 
+Behan Webster
+behanw@converseincode.com
