@@ -1,7 +1,7 @@
 From: behanw@converseincode.com
-Subject: [PATCH v3 07/12] crypto: LLVMLinux: Remove VLAIS from crypto/.../qat_algs.c
-Date: Mon, 15 Sep 2014 00:30:29 -0700
-Message-ID: <1410766234-1634-8-git-send-email-behanw@converseincode.com>
+Subject: [PATCH v3 08/12] crypto, dm: LLVMLinux: Remove VLAIS usage from dm-crypt
+Date: Mon, 15 Sep 2014 00:30:30 -0700
+Message-ID: <1410766234-1634-9-git-send-email-behanw@converseincode.com>
 References: <1410766234-1634-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -16,16 +16,25 @@ Cc: akpm@linux-foundation.org, bruce.w.allan@intel.com,
 	neilb@suse.de, qat-linux@intel.com, serge@hallyn.com,
 	thomas.lendacky@amd.com, zohar@linux.vnet.ibm.com,
 	torvalds@linux-foundation.org,
-	Behan Webster <behanw@converseincode.com>
+	=?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>,
+	Behan Webster <behanw@converseincode.com>,
+	pageexec@freemail.hu, gmazyland@gmail.com
 To: agk@redhat.com, clm@fb.com, davem@davemloft.net,
 	dm-devel@redhat.com, fabf@skynet.be, herbert@gondor.apana.org.au,
 	jbacik@fb.com, snitzer@redhat.com, tadeusz.struk@intel.com
-Return-path: <linux-security-module-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pd0-f177.google.com ([209.85.192.177]:55694 "EHLO
+	mail-pd0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753442AbaIOHbr (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Sep 2014 03:31:47 -0400
+Received: by mail-pd0-f177.google.com with SMTP id y10so5635848pdj.36
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Sep 2014 00:31:47 -0700 (PDT)
 In-Reply-To: <1410766234-1634-1-git-send-email-behanw@converseincode.com>
-Sender: linux-security-module-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-=46rom: Behan Webster <behanw@converseincode.com>
+=46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 
 Replaced the use of a Variable Length Array In Struct (VLAIS) with a C9=
 9
@@ -35,130 +44,109 @@ using a char array using the SHASH_DESC_ON_STACK macro.
 
 The new code can be compiled with both gcc and clang.
 
+Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 Signed-off-by: Behan Webster <behanw@converseincode.com>
-Reviewed-by: Mark Charlebois <charlebm@gmail.com>
-Reviewed-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
+Cc: pageexec@freemail.hu
+Cc: gmazyland@gmail.com
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- drivers/crypto/qat/qat_common/qat_algs.c | 31 ++++++++++++++----------=
--------
- 1 file changed, 14 insertions(+), 17 deletions(-)
+ drivers/md/dm-crypt.c | 34 ++++++++++++++--------------------
+ 1 file changed, 14 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/=
-qat/qat_common/qat_algs.c
-index 59df488..9cabadd 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -152,10 +152,7 @@ static int qat_alg_do_precomputes(struct icp_qat_h=
-w_auth_algo_blk *hash,
- 				  const uint8_t *auth_key,
- 				  unsigned int auth_keylen, uint8_t *auth_state)
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index cd15e08..fc93b93 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -526,29 +526,26 @@ static int crypt_iv_lmk_one(struct crypt_config *=
+cc, u8 *iv,
+ 			    u8 *data)
  {
+ 	struct iv_lmk_private *lmk =3D &cc->iv_gen_private.lmk;
 -	struct {
--		struct shash_desc shash;
--		char ctx[crypto_shash_descsize(ctx->hash_tfm)];
--	} desc;
-+	SHASH_DESC_ON_STACK(shash, ctx->hash_tfm);
- 	struct sha1_state sha1;
- 	struct sha256_state sha256;
- 	struct sha512_state sha512;
-@@ -167,12 +164,12 @@ static int qat_alg_do_precomputes(struct icp_qat_=
-hw_auth_algo_blk *hash,
- 	__be64 *hash512_state_out;
- 	int i, offset;
+-		struct shash_desc desc;
+-		char ctx[crypto_shash_descsize(lmk->hash_tfm)];
+-	} sdesc;
++	SHASH_DESC_ON_STACK(desc, lmk->hash_tfm);
+ 	struct md5_state md5state;
+ 	__le32 buf[4];
+ 	int i, r;
 =20
--	desc.shash.tfm =3D ctx->hash_tfm;
--	desc.shash.flags =3D 0x0;
-+	shash->tfm =3D ctx->hash_tfm;
-+	shash->flags =3D 0x0;
+-	sdesc.desc.tfm =3D lmk->hash_tfm;
+-	sdesc.desc.flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
++	desc->tfm =3D lmk->hash_tfm;
++	desc->flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
 =20
- 	if (auth_keylen > block_size) {
- 		char buff[SHA512_BLOCK_SIZE];
--		int ret =3D crypto_shash_digest(&desc.shash, auth_key,
-+		int ret =3D crypto_shash_digest(shash, auth_key,
- 					      auth_keylen, buff);
- 		if (ret)
- 			return ret;
-@@ -195,10 +192,10 @@ static int qat_alg_do_precomputes(struct icp_qat_=
-hw_auth_algo_blk *hash,
- 		*opad_ptr ^=3D 0x5C;
+-	r =3D crypto_shash_init(&sdesc.desc);
++	r =3D crypto_shash_init(desc);
+ 	if (r)
+ 		return r;
+=20
+ 	if (lmk->seed) {
+-		r =3D crypto_shash_update(&sdesc.desc, lmk->seed, LMK_SEED_SIZE);
++		r =3D crypto_shash_update(desc, lmk->seed, LMK_SEED_SIZE);
+ 		if (r)
+ 			return r;
  	}
 =20
--	if (crypto_shash_init(&desc.shash))
-+	if (crypto_shash_init(shash))
- 		return -EFAULT;
+ 	/* Sector is always 512B, block size 16, add data of blocks 1-31 */
+-	r =3D crypto_shash_update(&sdesc.desc, data + 16, 16 * 31);
++	r =3D crypto_shash_update(desc, data + 16, 16 * 31);
+ 	if (r)
+ 		return r;
 =20
--	if (crypto_shash_update(&desc.shash, ipad, block_size))
-+	if (crypto_shash_update(shash, ipad, block_size))
- 		return -EFAULT;
+@@ -557,12 +554,12 @@ static int crypt_iv_lmk_one(struct crypt_config *=
+cc, u8 *iv,
+ 	buf[1] =3D cpu_to_le32((((u64)dmreq->iv_sector >> 32) & 0x00FFFFFF) |=
+ 0x80000000);
+ 	buf[2] =3D cpu_to_le32(4024);
+ 	buf[3] =3D 0;
+-	r =3D crypto_shash_update(&sdesc.desc, (u8 *)buf, sizeof(buf));
++	r =3D crypto_shash_update(desc, (u8 *)buf, sizeof(buf));
+ 	if (r)
+ 		return r;
 =20
- 	hash_state_out =3D (__be32 *)hash->sha.state1;
-@@ -206,19 +203,19 @@ static int qat_alg_do_precomputes(struct icp_qat_=
-hw_auth_algo_blk *hash,
+ 	/* No MD5 padding here */
+-	r =3D crypto_shash_export(&sdesc.desc, &md5state);
++	r =3D crypto_shash_export(desc, &md5state);
+ 	if (r)
+ 		return r;
 =20
- 	switch (ctx->qat_hash_alg) {
- 	case ICP_QAT_HW_AUTH_ALGO_SHA1:
--		if (crypto_shash_export(&desc.shash, &sha1))
-+		if (crypto_shash_export(shash, &sha1))
- 			return -EFAULT;
- 		for (i =3D 0; i < digest_size >> 2; i++, hash_state_out++)
- 			*hash_state_out =3D cpu_to_be32(*(sha1.state + i));
- 		break;
- 	case ICP_QAT_HW_AUTH_ALGO_SHA256:
--		if (crypto_shash_export(&desc.shash, &sha256))
-+		if (crypto_shash_export(shash, &sha256))
- 			return -EFAULT;
- 		for (i =3D 0; i < digest_size >> 2; i++, hash_state_out++)
- 			*hash_state_out =3D cpu_to_be32(*(sha256.state + i));
- 		break;
- 	case ICP_QAT_HW_AUTH_ALGO_SHA512:
--		if (crypto_shash_export(&desc.shash, &sha512))
-+		if (crypto_shash_export(shash, &sha512))
- 			return -EFAULT;
- 		for (i =3D 0; i < digest_size >> 3; i++, hash512_state_out++)
- 			*hash512_state_out =3D cpu_to_be64(*(sha512.state + i));
-@@ -227,10 +224,10 @@ static int qat_alg_do_precomputes(struct icp_qat_=
-hw_auth_algo_blk *hash,
- 		return -EFAULT;
+@@ -679,10 +676,7 @@ static int crypt_iv_tcw_whitening(struct crypt_con=
+fig *cc,
+ 	struct iv_tcw_private *tcw =3D &cc->iv_gen_private.tcw;
+ 	u64 sector =3D cpu_to_le64((u64)dmreq->iv_sector);
+ 	u8 buf[TCW_WHITENING_SIZE];
+-	struct {
+-		struct shash_desc desc;
+-		char ctx[crypto_shash_descsize(tcw->crc32_tfm)];
+-	} sdesc;
++	SHASH_DESC_ON_STACK(desc, tcw->crc32_tfm);
+ 	int i, r;
+=20
+ 	/* xor whitening with sector number */
+@@ -691,16 +685,16 @@ static int crypt_iv_tcw_whitening(struct crypt_co=
+nfig *cc,
+ 	crypto_xor(&buf[8], (u8 *)&sector, 8);
+=20
+ 	/* calculate crc32 for every 32bit part and xor it */
+-	sdesc.desc.tfm =3D tcw->crc32_tfm;
+-	sdesc.desc.flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
++	desc->tfm =3D tcw->crc32_tfm;
++	desc->flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
+ 	for (i =3D 0; i < 4; i++) {
+-		r =3D crypto_shash_init(&sdesc.desc);
++		r =3D crypto_shash_init(desc);
+ 		if (r)
+ 			goto out;
+-		r =3D crypto_shash_update(&sdesc.desc, &buf[i * 4], 4);
++		r =3D crypto_shash_update(desc, &buf[i * 4], 4);
+ 		if (r)
+ 			goto out;
+-		r =3D crypto_shash_final(&sdesc.desc, &buf[i * 4]);
++		r =3D crypto_shash_final(desc, &buf[i * 4]);
+ 		if (r)
+ 			goto out;
  	}
-=20
--	if (crypto_shash_init(&desc.shash))
-+	if (crypto_shash_init(shash))
- 		return -EFAULT;
-=20
--	if (crypto_shash_update(&desc.shash, opad, block_size))
-+	if (crypto_shash_update(shash, opad, block_size))
- 		return -EFAULT;
-=20
- 	offset =3D round_up(qat_get_inter_state_size(ctx->qat_hash_alg), 8);
-@@ -239,19 +236,19 @@ static int qat_alg_do_precomputes(struct icp_qat_=
-hw_auth_algo_blk *hash,
-=20
- 	switch (ctx->qat_hash_alg) {
- 	case ICP_QAT_HW_AUTH_ALGO_SHA1:
--		if (crypto_shash_export(&desc.shash, &sha1))
-+		if (crypto_shash_export(shash, &sha1))
- 			return -EFAULT;
- 		for (i =3D 0; i < digest_size >> 2; i++, hash_state_out++)
- 			*hash_state_out =3D cpu_to_be32(*(sha1.state + i));
- 		break;
- 	case ICP_QAT_HW_AUTH_ALGO_SHA256:
--		if (crypto_shash_export(&desc.shash, &sha256))
-+		if (crypto_shash_export(shash, &sha256))
- 			return -EFAULT;
- 		for (i =3D 0; i < digest_size >> 2; i++, hash_state_out++)
- 			*hash_state_out =3D cpu_to_be32(*(sha256.state + i));
- 		break;
- 	case ICP_QAT_HW_AUTH_ALGO_SHA512:
--		if (crypto_shash_export(&desc.shash, &sha512))
-+		if (crypto_shash_export(shash, &sha512))
- 			return -EFAULT;
- 		for (i =3D 0; i < digest_size >> 3; i++, hash512_state_out++)
- 			*hash512_state_out =3D cpu_to_be64(*(sha512.state + i));
 --=20
 1.9.1
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-securit=
-y-module" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
