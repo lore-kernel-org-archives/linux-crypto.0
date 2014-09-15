@@ -1,50 +1,26 @@
 From: Kamal Mostafa <kamal@canonical.com>
-Subject: [3.13.y.z extended stable] Patch "crypto: ux500 - make interrupt mode plausible" has been added to staging queue
-Date: Mon, 15 Sep 2014 15:07:32 -0700
-Message-ID: <1410818852-3320-1-git-send-email-kamal@canonical.com>
-Cc: linux-crypto@vger.kernel.org,
+Subject: [PATCH 3.13 056/187] crypto: ux500 - make interrupt mode plausible
+Date: Mon, 15 Sep 2014 15:07:46 -0700
+Message-ID: <1410818997-9432-57-git-send-email-kamal@canonical.com>
+References: <1410818997-9432-1-git-send-email-kamal@canonical.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
 	Fabio Baltieri <fabio.baltieri@linaro.org>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Kamal Mostafa <kamal@canonical.com>,
+	Kamal Mostafa <kamal@canonical.com>
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
 	kernel-team@lists.ubuntu.com
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:49789 "EHLO
-	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754564AbaIOWHi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Sep 2014 18:07:38 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1410818997-9432-1-git-send-email-kamal@canonical.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This is a note to let you know that I have just added a patch titled
+3.13.11.7 -stable review patch.  If anyone has any objections, please let me know.
 
-    crypto: ux500 - make interrupt mode plausible
+------------------
 
-to the linux-3.13.y-queue branch of the 3.13.y.z extended stable tree 
-which can be found at:
-
- http://kernel.ubuntu.com/git?p=ubuntu/linux.git;a=shortlog;h=refs/heads/linux-3.13.y-queue
-
-This patch is scheduled to be released in version 3.13.11.7.
-
-If you, or anyone else, feels it should not be added to this tree, please 
-reply to this email.
-
-For more information about the 3.13.y.z tree, see
-https://wiki.ubuntu.com/Kernel/Dev/ExtendedStable
-
-Thanks.
--Kamal
-
-------
-
->From da0a425f527432abe5d2a6428bb47f96d596f376 Mon Sep 17 00:00:00 2001
 From: Arnd Bergmann <arnd@arndb.de>
-Date: Thu, 26 Jun 2014 13:43:02 +0200
-Subject: crypto: ux500 - make interrupt mode plausible
 
 commit e1f8859ee265fc89bd21b4dca79e8e983a044892 upstream.
 
@@ -111,7 +87,7 @@ index a999f53..92105f3 100644
 -	int i;
 +	int count;
  	struct cryp_device_data *device_data;
-
+ 
  	if (param == NULL) {
 @@ -215,12 +215,11 @@ static irqreturn_t cryp_interrupt_handler(int irq, void *param)
  	if (cryp_pending_irq_src(device_data,
@@ -128,7 +104,7 @@ index a999f53..92105f3 100644
 +			readsl(&device_data->base->dout, ctx->outdata, count);
 +			ctx->outdata += count;
 +			ctx->outlen -= count;
-
+ 
  			if (ctx->outlen == 0) {
  				cryp_disable_irq_src(device_data,
 @@ -230,12 +229,12 @@ static irqreturn_t cryp_interrupt_handler(int irq, void *param)
@@ -147,8 +123,8 @@ index a999f53..92105f3 100644
 +
 +			ctx->indata += count;
 +			ctx->datalen -= count;
-
+ 
  			if (ctx->datalen == 0)
  				cryp_disable_irq_src(device_data,
---
+-- 
 1.9.1
