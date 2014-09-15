@@ -1,7 +1,7 @@
 From: behanw@converseincode.com
-Subject: [PATCH v3 11/12] security, crypto: LLVMLinux: Remove VLAIS from ima_crypto.c
-Date: Mon, 15 Sep 2014 00:30:33 -0700
-Message-ID: <1410766234-1634-12-git-send-email-behanw@converseincode.com>
+Subject: [PATCH v3 09/12] crypto: LLVMLinux: Remove VLAIS usage from crypto/hmac.c
+Date: Mon, 15 Sep 2014 00:30:31 -0700
+Message-ID: <1410766234-1634-10-git-send-email-behanw@converseincode.com>
 References: <1410766234-1634-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -16,16 +16,24 @@ Cc: akpm@linux-foundation.org, bruce.w.allan@intel.com,
 	neilb@suse.de, qat-linux@intel.com, serge@hallyn.com,
 	thomas.lendacky@amd.com, zohar@linux.vnet.ibm.com,
 	torvalds@linux-foundation.org,
-	Behan Webster <behanw@converseincode.com>, tglx@linutronix.de
+	=?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>,
+	Behan Webster <behanw@converseincode.com>, pageexec@freemail.hu
 To: agk@redhat.com, clm@fb.com, davem@davemloft.net,
 	dm-devel@redhat.com, fabf@skynet.be, herbert@gondor.apana.org.au,
 	jbacik@fb.com, snitzer@redhat.com, tadeusz.struk@intel.com
-Return-path: <linux-raid-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f46.google.com ([209.85.220.46]:36119 "EHLO
+	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753451AbaIOHbu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Sep 2014 03:31:50 -0400
+Received: by mail-pa0-f46.google.com with SMTP id kq14so5769616pab.33
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Sep 2014 00:31:50 -0700 (PDT)
 In-Reply-To: <1410766234-1634-1-git-send-email-behanw@converseincode.com>
-Sender: linux-raid-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-=46rom: Behan Webster <behanw@converseincode.com>
+=46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 
 Replaced the use of a Variable Length Array In Struct (VLAIS) with a C9=
 9
@@ -35,158 +43,61 @@ using a char array using the SHASH_DESC_ON_STACK macro.
 
 The new code can be compiled with both gcc and clang.
 
+Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 Signed-off-by: Behan Webster <behanw@converseincode.com>
-Reviewed-by: Mark Charlebois <charlebm@gmail.com>
-Reviewed-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
-Cc: tglx@linutronix.de
+Cc: pageexec@freemail.hu
 ---
- security/integrity/ima/ima_crypto.c | 51 +++++++++++++++++------------=
---------
- 1 file changed, 23 insertions(+), 28 deletions(-)
+ crypto/hmac.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity/i=
-ma/ima_crypto.c
-index 0bd7328..bb55737 100644
---- a/security/integrity/ima/ima_crypto.c
-+++ b/security/integrity/ima/ima_crypto.c
-@@ -380,17 +380,14 @@ static int ima_calc_file_hash_tfm(struct file *fi=
-le,
- 	loff_t i_size, offset =3D 0;
- 	char *rbuf;
- 	int rc, read =3D 0;
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 8d9544c..e392219 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -52,20 +52,17 @@ static int hmac_setkey(struct crypto_shash *parent,
+ 	struct hmac_ctx *ctx =3D align_ptr(opad + ss,
+ 					 crypto_tfm_ctx_alignment());
+ 	struct crypto_shash *hash =3D ctx->hash;
 -	struct {
 -		struct shash_desc shash;
--		char ctx[crypto_shash_descsize(tfm)];
+-		char ctx[crypto_shash_descsize(hash)];
 -	} desc;
-+	SHASH_DESC_ON_STACK(shash, tfm);
++	SHASH_DESC_ON_STACK(shash, hash);
+ 	unsigned int i;
 =20
--	desc.shash.tfm =3D tfm;
--	desc.shash.flags =3D 0;
-+	shash->tfm =3D tfm;
-+	shash->flags =3D 0;
+-	desc.shash.tfm =3D hash;
+-	desc.shash.flags =3D crypto_shash_get_flags(parent) &
+-			    CRYPTO_TFM_REQ_MAY_SLEEP;
++	shash->tfm =3D hash;
++	shash->flags =3D crypto_shash_get_flags(parent)
++		& CRYPTO_TFM_REQ_MAY_SLEEP;
 =20
- 	hash->length =3D crypto_shash_digestsize(tfm);
+ 	if (keylen > bs) {
+ 		int err;
 =20
--	rc =3D crypto_shash_init(&desc.shash);
-+	rc =3D crypto_shash_init(shash);
- 	if (rc !=3D 0)
- 		return rc;
+-		err =3D crypto_shash_digest(&desc.shash, inkey, keylen, ipad);
++		err =3D crypto_shash_digest(shash, inkey, keylen, ipad);
+ 		if (err)
+ 			return err;
 =20
-@@ -420,7 +417,7 @@ static int ima_calc_file_hash_tfm(struct file *file=
-,
- 			break;
- 		offset +=3D rbuf_len;
-=20
--		rc =3D crypto_shash_update(&desc.shash, rbuf, rbuf_len);
-+		rc =3D crypto_shash_update(shash, rbuf, rbuf_len);
- 		if (rc)
- 			break;
- 	}
-@@ -429,7 +426,7 @@ static int ima_calc_file_hash_tfm(struct file *file=
-,
- 	kfree(rbuf);
- out:
- 	if (!rc)
--		rc =3D crypto_shash_final(&desc.shash, hash->digest);
-+		rc =3D crypto_shash_final(shash, hash->digest);
- 	return rc;
- }
-=20
-@@ -487,18 +484,17 @@ static int ima_calc_field_array_hash_tfm(struct i=
-ma_field_data *field_data,
- 					 struct ima_digest_data *hash,
- 					 struct crypto_shash *tfm)
- {
--	struct {
--		struct shash_desc shash;
--		char ctx[crypto_shash_descsize(tfm)];
--	} desc;
-+	char desc[sizeof(struct shash_desc) +
-+		crypto_shash_descsize(tfm)] CRYPTO_MINALIGN_ATTR;
-+	struct shash_desc *shash =3D (struct shash_desc *)desc;
- 	int rc, i;
-=20
--	desc.shash.tfm =3D tfm;
--	desc.shash.flags =3D 0;
-+	shash->tfm =3D tfm;
-+	shash->flags =3D 0;
-=20
- 	hash->length =3D crypto_shash_digestsize(tfm);
-=20
--	rc =3D crypto_shash_init(&desc.shash);
-+	rc =3D crypto_shash_init(shash);
- 	if (rc !=3D 0)
- 		return rc;
-=20
-@@ -508,7 +504,7 @@ static int ima_calc_field_array_hash_tfm(struct ima=
-_field_data *field_data,
- 		u32 datalen =3D field_data[i].len;
-=20
- 		if (strcmp(td->name, IMA_TEMPLATE_IMA_NAME) !=3D 0) {
--			rc =3D crypto_shash_update(&desc.shash,
-+			rc =3D crypto_shash_update(shash,
- 						(const u8 *) &field_data[i].len,
- 						sizeof(field_data[i].len));
- 			if (rc)
-@@ -518,13 +514,13 @@ static int ima_calc_field_array_hash_tfm(struct i=
-ma_field_data *field_data,
- 			data_to_hash =3D buffer;
- 			datalen =3D IMA_EVENT_NAME_LEN_MAX + 1;
- 		}
--		rc =3D crypto_shash_update(&desc.shash, data_to_hash, datalen);
-+		rc =3D crypto_shash_update(shash, data_to_hash, datalen);
- 		if (rc)
- 			break;
+@@ -81,12 +78,12 @@ static int hmac_setkey(struct crypto_shash *parent,
+ 		opad[i] ^=3D 0x5c;
  	}
 =20
- 	if (!rc)
--		rc =3D crypto_shash_final(&desc.shash, hash->digest);
-+		rc =3D crypto_shash_final(shash, hash->digest);
-=20
- 	return rc;
- }
-@@ -565,15 +561,14 @@ static int __init ima_calc_boot_aggregate_tfm(cha=
-r *digest,
- {
- 	u8 pcr_i[TPM_DIGEST_SIZE];
- 	int rc, i;
--	struct {
--		struct shash_desc shash;
--		char ctx[crypto_shash_descsize(tfm)];
--	} desc;
-+	char desc[sizeof(struct shash_desc) +
-+		crypto_shash_descsize(tfm)] CRYPTO_MINALIGN_ATTR;
-+	struct shash_desc *shash =3D (struct shash_desc *)desc;
-=20
--	desc.shash.tfm =3D tfm;
--	desc.shash.flags =3D 0;
-+	shash->tfm =3D tfm;
-+	shash->flags =3D 0;
-=20
--	rc =3D crypto_shash_init(&desc.shash);
-+	rc =3D crypto_shash_init(shash);
- 	if (rc !=3D 0)
- 		return rc;
-=20
-@@ -581,10 +576,10 @@ static int __init ima_calc_boot_aggregate_tfm(cha=
-r *digest,
- 	for (i =3D TPM_PCR0; i < TPM_PCR8; i++) {
- 		ima_pcrread(i, pcr_i);
- 		/* now accumulate with current aggregate */
--		rc =3D crypto_shash_update(&desc.shash, pcr_i, TPM_DIGEST_SIZE);
-+		rc =3D crypto_shash_update(shash, pcr_i, TPM_DIGEST_SIZE);
- 	}
- 	if (!rc)
--		crypto_shash_final(&desc.shash, digest);
-+		crypto_shash_final(shash, digest);
- 	return rc;
+-	return crypto_shash_init(&desc.shash) ?:
+-	       crypto_shash_update(&desc.shash, ipad, bs) ?:
+-	       crypto_shash_export(&desc.shash, ipad) ?:
+-	       crypto_shash_init(&desc.shash) ?:
+-	       crypto_shash_update(&desc.shash, opad, bs) ?:
+-	       crypto_shash_export(&desc.shash, opad);
++	return crypto_shash_init(shash) ?:
++	       crypto_shash_update(shash, ipad, bs) ?:
++	       crypto_shash_export(shash, ipad) ?:
++	       crypto_shash_init(shash) ?:
++	       crypto_shash_update(shash, opad, bs) ?:
++	       crypto_shash_export(shash, opad);
  }
 =20
+ static int hmac_export(struct shash_desc *pdesc, void *out)
 --=20
 1.9.1
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-raid" i=
-n
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
