@@ -1,43 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - Dynamic allocation of addresses for
- various memory blocks in CAAM.
-Date: Mon, 15 Sep 2014 19:46:44 +0800
-Message-ID: <20140915114643.GA4923@gondor.apana.org.au>
-References: <1409563844-5477-1-git-send-email-b44382@freescale.com>
+Subject: Re: [PATCH] crypto: ccp - Check for CCP before registering crypto
+ algs
+Date: Mon, 15 Sep 2014 19:47:09 +0800
+Message-ID: <20140915114709.GB4923@gondor.apana.org.au>
+References: <20140905153109.14637.12600.stgit@tlendack-t1.amdoffice.net>
+ <alpine.LNX.2.11.1409052327320.570@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, vakul@freescale.com,
-	davem@davemloft.net, alexandru.porosanu@freescale.com,
-	horia.geanta@freescale.com, kim.phillips@freescale.com,
-	dan.carpenter@oracle.com, linux-kernel@vger.kernel.org,
-	Ruchika Gupta <r66431@freescale.com>
-To: Nitesh Narayan Lal <b44382@freescale.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, davem@davemloft.net,
+	linux-crypto@vger.kernel.org
+To: Scot Doyle <lkml14@scotdoyle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:45301 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:38036 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753533AbaIOLq6 (ORCPT
+	with ESMTP id S1753931AbaIOLrU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Sep 2014 07:46:58 -0400
+	Mon, 15 Sep 2014 07:47:20 -0400
 Content-Disposition: inline
-In-Reply-To: <1409563844-5477-1-git-send-email-b44382@freescale.com>
+In-Reply-To: <alpine.LNX.2.11.1409052327320.570@localhost.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Sep 01, 2014 at 03:00:44PM +0530, Nitesh Narayan Lal wrote:
-> CAAM's memory is broken into following address blocks:
-> Block           Included Registers
-> 0               General Registers
-> 1-4             Job ring registers
-> 6               RTIC registers
-> 7               QI registers
-> 8               DECO and CCB
+On Fri, Sep 05, 2014 at 11:49:38PM +0000, Scot Doyle wrote:
 > 
-> Size of the above stated blocks varies in various platforms. The block size can be 4K or 64K.
-> The block size can be dynamically determined by reading CTPR register in CAAM.
-> This patch initializes the block addresses dynamically based on the value read from this register.
+> On Fri, 5 Sep 2014, Tom Lendacky wrote:
 > 
-> Signed-off-by: Ruchika Gupta <r66431@freescale.com>
-> Signed-off-by: Nitesh Narayan Lal <b44382@freescale.com>
+> > If the ccp is built as a built-in module, then ccp-crypto (whether
+> > built as a module or a built-in module) will be able to load and
+> > it will register its crypto algorithms.  If the system does not have
+> > a CCP this will result in -ENODEV being returned whenever a command
+> > is attempted to be queued by the registered crypto algorithms.
+> >
+> > Add an API, ccp_present(), that checks for the presence of a CCP
+> > on the system.  The ccp-crypto module can use this to determine if it
+> > should register it's crypto alogorithms.
+> >
+> > Reported-by: Scot Doyle <lkml14@scotdoyle.com>
+> > Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> Tested-by: Scot Doyle <lkml14@scotdoyle.com>
 
 Patch applied.  Thanks!
 -- 
