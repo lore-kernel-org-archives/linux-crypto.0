@@ -1,46 +1,34 @@
-From: Nikos Mavrogiannopoulos <nmav@gnutls.org>
-Subject: Re: RFC possible changes for Linux random device
-Date: Tue, 16 Sep 2014 20:03:41 +0200
-Message-ID: <1410890621.3666.0.camel@nomad.lan>
-References: <CACXcFmnWUOBO-_MhMKUEY1xB1Tk4fSUrvfkmwCQicJSELqa8XA@mail.gmail.com>
+From: Romain Francoise <romain@orebokech.com>
+Subject: Re: v3.17-rc5: alg: skcipher: Test 4 failed on encryption for ctr-aes-aesni
+Date: Tue, 16 Sep 2014 22:01:07 +0200
+Message-ID: <87fvfr2v3w.fsf@kima.orebokech.com>
+References: <87sijti8kh.fsf@kima.orebokech.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Sandy Harris <sandyinchina@gmail.com>
+Content-Type: text/plain
+Cc: herbert@gondor.apana.org.au,
+	Chandramouli Narayanan <mouli@linux.intel.com>,
+	Mathias Krause <minipli@googlemail.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:58144 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754250AbaIPSDo (ORCPT
+Received: from stringer.orebokech.com ([212.83.175.182]:48637 "EHLO
+	stringer.orebokech.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751817AbaIPUBI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Sep 2014 14:03:44 -0400
-Received: by mail-wi0-f171.google.com with SMTP id bs8so6854347wib.4
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Sep 2014 11:03:43 -0700 (PDT)
-In-Reply-To: <CACXcFmnWUOBO-_MhMKUEY1xB1Tk4fSUrvfkmwCQicJSELqa8XA@mail.gmail.com>
+	Tue, 16 Sep 2014 16:01:08 -0400
+In-Reply-To: <87sijti8kh.fsf@kima.orebokech.com> (Romain Francoise's message
+	of "Mon, 15 Sep 2014 10:36:46 +0200")
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2014-09-15 at 20:40 -0400, Sandy Harris wrote:
+On Mon, Sep 15, 2014 at 10:36:46AM +0200, Romain Francoise wrote:
+> I upgraded from v3.16 to v3.17-rc5 and the ctr-aes-aesni encryption test
+> fails, which makes my IPsec tunnels unhappy (see trace below). Before I
+> start bisecting (2cddcc7df8fd3 is probably my first guess), is this
+> already known?
 
-> I have some experimental code to replace parts of random.c It is not
-> finished but far enough along to seek comment. It does compile with
-> either gcc or clang, run and produce reasonable-looking results but is
-> not well-tested. splint(1) complains about parts of it, but do not
-> think it is indicating any real problems.
-> 
-> I change nothing on the input side; the entropy collection and
-> estimation parts of existing code are untouched. The hashing and
-> output routines, though, are completely replaced, and much of the
-> initialisation code is modified.
-> It uses the 128-bit hash from AES-GCM instead of 160-bit SHA-1.
-> Changing the hash allows other changes. One design goal was improved
-> decoupling so that heavy use of /dev/urandom does not deplete the
-> entropy pool for /dev/random. Another was simpler mixing in of
-> additional data in various places.
+> Sep 15 08:07:56 silenus kernel: [   35.137145] alg: skcipher: Test 4 failed on encryption for ctr-aes-aesni [...]
 
-Hello,
- What are the advantages of this change? It was not clear from the
-original thread.
-
-regards,
-Nikos
+Update: reverting 2cddcc7df8 ("crypto: aes - AES CTR x86_64 "by8" AVX
+optimization") fixes this. This machine is Sandy Bridge (Core i7-2600),
+and the problem doesn't seem to occur with the exact same kernel image
+on Ivy Bridge (Xeon E3-1240v2).
