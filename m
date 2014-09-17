@@ -1,34 +1,58 @@
-From: Romain Francoise <romain@orebokech.com>
-Subject: Re: v3.17-rc5: alg: skcipher: Test 4 failed on encryption for ctr-aes-aesni
-Date: Tue, 16 Sep 2014 22:01:07 +0200
-Message-ID: <87fvfr2v3w.fsf@kima.orebokech.com>
-References: <87sijti8kh.fsf@kima.orebokech.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v3 01/12] crypto: LLVMLinux: Add macro to remove use of
+ VLAIS in crypto code
+Date: Wed, 17 Sep 2014 17:22:12 +0800
+Message-ID: <20140917092212.GA1213@gondor.apana.org.au>
+References: <1410766234-1634-1-git-send-email-behanw@converseincode.com>
+ <1410766234-1634-2-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: herbert@gondor.apana.org.au,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	Mathias Krause <minipli@googlemail.com>
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from stringer.orebokech.com ([212.83.175.182]:48637 "EHLO
-	stringer.orebokech.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751817AbaIPUBI (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Sep 2014 16:01:08 -0400
-In-Reply-To: <87sijti8kh.fsf@kima.orebokech.com> (Romain Francoise's message
-	of "Mon, 15 Sep 2014 10:36:46 +0200")
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: agk@redhat.com, clm@fb.com, davem@davemloft.net,
+	dm-devel@redhat.com, fabf@skynet.be, jbacik@fb.com,
+	snitzer@redhat.com, tadeusz.struk@intel.com,
+	akpm@linux-foundation.org, bruce.w.allan@intel.com,
+	d.kasatkin@samsung.com, james.l.morris@oracle.com,
+	john.griffin@intel.com, linux-btrfs@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-ima-devel@lists.sourceforge.net,
+	linux-ima-user@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org, linux-security-module@vger.kernel.org,
+	neilb@suse.de, qat-linux@intel.com, serge@hallyn.com,
+	thomas.lendacky@amd.com, zohar@linux.vnet.ibm.com,
+	torvalds@linux-foundation.org
+To: behanw@converseincode.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1410766234-1634-2-git-send-email-behanw@converseincode.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Sep 15, 2014 at 10:36:46AM +0200, Romain Francoise wrote:
-> I upgraded from v3.16 to v3.17-rc5 and the ctr-aes-aesni encryption test
-> fails, which makes my IPsec tunnels unhappy (see trace below). Before I
-> start bisecting (2cddcc7df8fd3 is probably my first guess), is this
-> already known?
+On Mon, Sep 15, 2014 at 12:30:23AM -0700, behanw@converseincode.com wrote:
+> From: Behan Webster <behanw@converseincode.com>
+> 
+> Add a macro which replaces the use of a Variable Length Array In Struct (VLAIS)
+> with a C99 compliant equivalent. This macro instead allocates the appropriate
+> amount of memory using an char array.
+> 
+> The new code can be compiled with both gcc and clang.
+> 
+> struct shash_desc contains a flexible array member member ctx declared with
+> CRYPTO_MINALIGN_ATTR, so sizeof(struct shash_desc) aligns the beginning
+> of the array declared after struct shash_desc with long long.
+> 
+> No trailing padding is required because it is not a struct type that can
+> be used in an array.
+> 
+> The CRYPTO_MINALIGN_ATTR is required so that desc is aligned with long long
+> as would be the case for a struct containing a member with
+> CRYPTO_MINALIGN_ATTR.
+> 
+> Signed-off-by: Behan Webster <behanw@converseincode.com>
 
-> Sep 15 08:07:56 silenus kernel: [   35.137145] alg: skcipher: Test 4 failed on encryption for ctr-aes-aesni [...]
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Update: reverting 2cddcc7df8 ("crypto: aes - AES CTR x86_64 "by8" AVX
-optimization") fixes this. This machine is Sandy Bridge (Core i7-2600),
-and the problem doesn't seem to occur with the exact same kernel image
-on Ivy Bridge (Xeon E3-1240v2).
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
