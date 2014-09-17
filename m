@@ -1,46 +1,76 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: v3.17-rc5: alg: skcipher: Test 4 failed on encryption for
- ctr-aes-aesni
-Date: Wed, 17 Sep 2014 19:29:11 +0800
-Message-ID: <20140917112911.GA2129@gondor.apana.org.au>
-References: <87sijti8kh.fsf@kima.orebokech.com>
- <87fvfr2v3w.fsf@kima.orebokech.com>
+Subject: Re: [PATCH v3 01/12] crypto: LLVMLinux: Add macro to remove use of
+ VLAIS in crypto code
+Date: Wed, 17 Sep 2014 19:30:35 +0800
+Message-ID: <20140917113035.GB2129@gondor.apana.org.au>
+References: <1410766234-1634-1-git-send-email-behanw@converseincode.com>
+ <1410766234-1634-2-git-send-email-behanw@converseincode.com>
+ <20140917092212.GA1213@gondor.apana.org.au>
+ <54196D5C.6040104@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	Mathias Krause <minipli@googlemail.com>
-To: Romain Francoise <romain@orebokech.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:56997 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753107AbaIQL3S (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Sep 2014 07:29:18 -0400
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: behanw@converseincode.com, agk@redhat.com, clm@fb.com,
+	davem@davemloft.net, dm-devel@redhat.com, fabf@skynet.be,
+	jbacik@fb.com, snitzer@redhat.com, tadeusz.struk@intel.com,
+	akpm@linux-foundation.org, bruce.w.allan@intel.com,
+	james.l.morris@oracle.com, john.griffin@intel.com,
+	linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-ima-devel@lists.sourceforge.net,
+	linux-ima-user@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org, linux-security-module@vger.kernel.org,
+	neilb@suse.de, qat-linux@intel.com, serge@hallyn.com,
+	thomas.lendacky@amd.com, zohar@linux.vnet.ibm.com,
+	torvalds@linux-foundation.org
+To: Dmitry Kasatkin <d.kasatkin@samsung.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <87fvfr2v3w.fsf@kima.orebokech.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <54196D5C.6040104@samsung.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Sep 16, 2014 at 10:01:07PM +0200, Romain Francoise wrote:
-> On Mon, Sep 15, 2014 at 10:36:46AM +0200, Romain Francoise wrote:
-> > I upgraded from v3.16 to v3.17-rc5 and the ctr-aes-aesni encryption test
-> > fails, which makes my IPsec tunnels unhappy (see trace below). Before I
-> > start bisecting (2cddcc7df8fd3 is probably my first guess), is this
-> > already known?
-> 
-> > Sep 15 08:07:56 silenus kernel: [   35.137145] alg: skcipher: Test 4 failed on encryption for ctr-aes-aesni [...]
-> 
-> Update: reverting 2cddcc7df8 ("crypto: aes - AES CTR x86_64 "by8" AVX
-> optimization") fixes this. This machine is Sandy Bridge (Core i7-2600),
-> and the problem doesn't seem to occur with the exact same kernel image
-> on Ivy Bridge (Xeon E3-1240v2).
+On Wed, Sep 17, 2014 at 02:15:40PM +0300, Dmitry Kasatkin wrote:
+> On 17/09/14 12:22, Herbert Xu wrote:
+> > On Mon, Sep 15, 2014 at 12:30:23AM -0700, behanw@converseincode.com=
+ wrote:
+> >> From: Behan Webster <behanw@converseincode.com>
+> >>
+> >> Add a macro which replaces the use of a Variable Length Array In S=
+truct (VLAIS)
+> >> with a C99 compliant equivalent. This macro instead allocates the =
+appropriate
+> >> amount of memory using an char array.
+> >>
+> >> The new code can be compiled with both gcc and clang.
+> >>
+> >> struct shash_desc contains a flexible array member member ctx decl=
+ared with
+> >> CRYPTO_MINALIGN_ATTR, so sizeof(struct shash_desc) aligns the begi=
+nning
+> >> of the array declared after struct shash_desc with long long.
+> >>
+> >> No trailing padding is required because it is not a struct type th=
+at can
+> >> be used in an array.
+> >>
+> >> The CRYPTO_MINALIGN_ATTR is required so that desc is aligned with =
+long long
+> >> as would be the case for a struct containing a member with
+> >> CRYPTO_MINALIGN_ATTR.
+> >>
+> >> Signed-off-by: Behan Webster <behanw@converseincode.com>
+> > Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> >
+> > Thanks,
+>=20
+> Just in case.
+> I would still follow advice from "Micha=C5=82 Miros=C5=82aw" to use s=
+hash##__desc[]
 
-Thanks for bisecting.  If we can't fix this quickly then we should
-just revert it for now.
+Oh yes of course.  My ack is more about the approach.
 
 Cheers,
--- 
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
