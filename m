@@ -1,44 +1,55 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: Re: v3.17-rc5: alg: skcipher: Test 4 failed on encryption for ctr-aes-aesni
-Date: Wed, 17 Sep 2014 22:17:02 +0200
-Message-ID: <CA+rthh9P7EKi7ShwSuXqYFoeXx2R87sA1=MTZ-WaAw9WF-k+2w@mail.gmail.com>
-References: <87sijti8kh.fsf@kima.orebokech.com>
-	<87fvfr2v3w.fsf@kima.orebokech.com>
-	<CA+rthh9cO5WsThL4SwO-1Avxhp4RDvvGQZQtYpQULa2oEg0NYw@mail.gmail.com>
+From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
+Subject: tcrypt rfc4309 ccm test keys size issue
+Date: Thu, 18 Sep 2014 15:43:02 -0300
+Message-ID: <20140918184302.GA19143@bluepex.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Chandramouli Narayanan <mouli@linux.intel.com>
-To: Romain Francoise <romain@orebokech.com>
+Content-Type: text/plain; charset=utf-8
+Cc: mhcerri@linux.vnet.ibm.com
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-la0-f43.google.com ([209.85.215.43]:43198 "EHLO
-	mail-la0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756207AbaIQURE (ORCPT
+Received: from e24smtp05.br.ibm.com ([32.104.18.26]:53992 "EHLO
+	e24smtp05.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932352AbaIRSnI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Sep 2014 16:17:04 -0400
-Received: by mail-la0-f43.google.com with SMTP id gi9so2616175lab.16
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Sep 2014 13:17:02 -0700 (PDT)
-In-Reply-To: <CA+rthh9cO5WsThL4SwO-1Avxhp4RDvvGQZQtYpQULa2oEg0NYw@mail.gmail.com>
+	Thu, 18 Sep 2014 14:43:08 -0400
+Received: from /spool/local
+	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
+	Thu, 18 Sep 2014 15:43:06 -0300
+Received: from d24relay02.br.ibm.com (d24relay02.br.ibm.com [9.13.184.26])
+	by d24dlp01.br.ibm.com (Postfix) with ESMTP id AB3873520059
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2014 14:42:56 -0400 (EDT)
+Received: from d24av04.br.ibm.com (d24av04.br.ibm.com [9.8.31.97])
+	by d24relay02.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id s8IIft9a30408846
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2014 15:41:55 -0300
+Received: from d24av04.br.ibm.com (localhost [127.0.0.1])
+	by d24av04.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id s8IIh3qR029377
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Sep 2014 15:43:03 -0300
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 17 September 2014 22:10, Mathias Krause <minipli@googlemail.com> wrote:
-> On 16 September 2014 22:01, Romain Francoise <romain@orebokech.com> wrote:
->> On Mon, Sep 15, 2014 at 10:36:46AM +0200, Romain Francoise wrote:
->>> I upgraded from v3.16 to v3.17-rc5 and the ctr-aes-aesni encryption test
->>> fails, which makes my IPsec tunnels unhappy (see trace below). Before I
->>> start bisecting (2cddcc7df8fd3 is probably my first guess), is this
->>> already known?
->>
->>> Sep 15 08:07:56 silenus kernel: [   35.137145] alg: skcipher: Test 4 failed on encryption for ctr-aes-aesni [...]
->
-> I do not get the above message on a SandyBridge i7-2620M, even though
-> the module makes use of the "by8" variant on my system, too:
->
+Hi,
 
-Never mind! Playing a little with crconf to instantiate 'ctr(aes)' and
-I can see the failing test now too.
+I'm facing an issue running tcrypt with  rfc4309-aes-ccm.
+My hardware and drive only implements support to key size 128, what is
+specify in the documentation (http://tools.ietf.org/html/rfc4309) as a
+'MUST' support, but does not support the other sizes. However tcrypt
+tests
+not only 128, but also 192 and 256bits size, which in ietf documentation
+are 'MAY' also support.
 
-Thanks,
-Mathias
+The issue is if I run my machines with FIPS enable it won't work
+at all, since tcrypt will try to the other key sizes and so fails making
+my system crash in  a kernel panic.
+
+I wondering if this tcrypt to 192 and 256 are correct since it's not
+a 'MUST' support size. Either if have any option to disable tcrypt to
+test with this other key sizes. And once more, since they are not a must
+support, what is the history about this test?
+
+A workround for us in the moment is to disable ccm in FIPs mode.
+
+
+Best regards,
+Leonidas.)
