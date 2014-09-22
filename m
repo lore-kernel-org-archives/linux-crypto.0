@@ -1,88 +1,56 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: Re: v3.17-rc5: alg: skcipher: Test 4 failed on encryption for ctr-aes-aesni
-Date: Mon, 22 Sep 2014 00:28:29 +0200
-Message-ID: <CA+rthh-oZQhT0eAney-T0jkSTxB51-qRWofi7omfCcD5J0-9gQ@mail.gmail.com>
-References: <87sijti8kh.fsf@kima.orebokech.com>
-	<87fvfr2v3w.fsf@kima.orebokech.com>
-	<20140917112911.GA2129@gondor.apana.org.au>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH] crypto: ccp - Check for CCP before registering crypto
+ algs
+Date: Mon, 22 Sep 2014 10:07:39 -0500
+Message-ID: <54203B3B.70307@amd.com>
+References: <20140905153109.14637.12600.stgit@tlendack-t1.amdoffice.net>
+ <alpine.LNX.2.11.1409052327320.570@localhost.localdomain>
+ <20140915114709.GB4923@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Romain Francoise <romain@orebokech.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Chandramouli Narayanan <mouli@linux.intel.com>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
-	James Guilford <james.guilford@intel.com>,
-	Sean Gulley <sean.m.gulley@intel.com>
+	Scot Doyle <lkml14@scotdoyle.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:45296 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751446AbaIUW2b (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 21 Sep 2014 18:28:31 -0400
-Received: by mail-wi0-f182.google.com with SMTP id d1so1957750wiv.9
-        for <linux-crypto@vger.kernel.org>; Sun, 21 Sep 2014 15:28:29 -0700 (PDT)
-In-Reply-To: <20140917112911.GA2129@gondor.apana.org.au>
+Received: from mail-bl2on0144.outbound.protection.outlook.com ([65.55.169.144]:16169
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1754300AbaIVPHu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 22 Sep 2014 11:07:50 -0400
+In-Reply-To: <20140915114709.GB4923@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 17 September 2014 13:29, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Tue, Sep 16, 2014 at 10:01:07PM +0200, Romain Francoise wrote:
->> On Mon, Sep 15, 2014 at 10:36:46AM +0200, Romain Francoise wrote:
->> > I upgraded from v3.16 to v3.17-rc5 and the ctr-aes-aesni encryption test
->> > fails, which makes my IPsec tunnels unhappy (see trace below). Before I
->> > start bisecting (2cddcc7df8fd3 is probably my first guess), is this
->> > already known?
+On 09/15/2014 06:47 AM, Herbert Xu wrote:
+> On Fri, Sep 05, 2014 at 11:49:38PM +0000, Scot Doyle wrote:
 >>
->> > Sep 15 08:07:56 silenus kernel: [   35.137145] alg: skcipher: Test 4 failed on encryption for ctr-aes-aesni [...]
+>> On Fri, 5 Sep 2014, Tom Lendacky wrote:
 >>
->> Update: reverting 2cddcc7df8 ("crypto: aes - AES CTR x86_64 "by8" AVX
->> optimization") fixes this. This machine is Sandy Bridge (Core i7-2600),
->> and the problem doesn't seem to occur with the exact same kernel image
->> on Ivy Bridge (Xeon E3-1240v2).
+>>> If the ccp is built as a built-in module, then ccp-crypto (whether
+>>> built as a module or a built-in module) will be able to load and
+>>> it will register its crypto algorithms.  If the system does not have
+>>> a CCP this will result in -ENODEV being returned whenever a command
+>>> is attempted to be queued by the registered crypto algorithms.
+>>>
+>>> Add an API, ccp_present(), that checks for the presence of a CCP
+>>> on the system.  The ccp-crypto module can use this to determine if it
+>>> should register it's crypto alogorithms.
+>>>
+>>> Reported-by: Scot Doyle <lkml14@scotdoyle.com>
+>>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>>
+>> Tested-by: Scot Doyle <lkml14@scotdoyle.com>
 >
-> Thanks for bisecting.  If we can't fix this quickly then we should
-> just revert it for now.
+> Patch applied.  Thanks!
 >
 
-[Adding James and Sean as they're stated as "contact information"]
+Hi Herbert,
 
-I compared the implementation against the original code from Intel
-referenced in the source file and found a few differences. But even
-after removing those, the code still generates the same error. So if
-Chandramouli does not come up with something, we should revert it, as
-the reference implementation from Intel is a) either wrong or b) used
-wrongly in the Linux kernel.
+Can you push this patch into the 3.17 release?
 
-What might be worth noting, the failing test uses an IV value of
-"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFD",
-or, in other words, a counter value that'll wrap after processing
-three blocks. The Crypto++ implementation explicitly states, it can
-handle the wrap around (see [1]). Dumping the IV before and after the
-cryptomgr tests shows, the "by8" implementation only handles the lower
-32 bit as a counter. Looking at RFC 3686, it defines the "counter
-block" as a 128 bit combination of nonce, IV and a 32 bit counter
-value. It also defines the initial value of the counter part (1) and
-how it should be incremented (increment the whole counter block, i.e.
-the 128 bit value). However, it also states that the maximum number
-blocks per packet are (2^32)-1. So, according to the RFC, the wrap
-around cannot happen -- not even for the 32 bit part of the counter
-block. However the other aesni-backed implementation does handle the
-wrap around just fine. It does so by doing the increment on a integer
-register so it can use the carry flag to detect the wrap around.
-Changing the "by8" variant would be straight forward, but I fear
-performance implications... :/
+Also, it should probably go into to the stable releases.  Is this
+something that you request or should I take care of that?
 
-Looking back at the test vector, even if it might be inappropriate for
-IPsec, it is still valid for AES-CTR in the general case. So IMHO the
-"by8" implementation is wrong and should be fixed -- or reverted, for
-that matter.
-
-James, Sean: Have you observed any interoperability problems with the
-Intel reference implementation for the AVX by8 variant of AES-CTR?
-Especially, have you tested the code for wrapping counter values?
-
-
-Regards,
-Mathias
-
-[1] http://www.cryptopp.com/wiki/CTR_Mode
+Thanks,
+Tom
