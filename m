@@ -1,56 +1,84 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH] crypto: ccp - Check for CCP before registering crypto
- algs
-Date: Mon, 22 Sep 2014 10:07:39 -0500
-Message-ID: <54203B3B.70307@amd.com>
-References: <20140905153109.14637.12600.stgit@tlendack-t1.amdoffice.net>
- <alpine.LNX.2.11.1409052327320.570@localhost.localdomain>
- <20140915114709.GB4923@gondor.apana.org.au>
+From: behanw@converseincode.com
+Subject: [PATCH v4 00/12] LLVMLinux: Patches to enable the kernel to be compiled with clang/LLVM
+Date: Mon, 22 Sep 2014 21:42:05 -0700
+Message-ID: <1411447337-22362-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Scot Doyle <lkml14@scotdoyle.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0144.outbound.protection.outlook.com ([65.55.169.144]:16169
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754300AbaIVPHu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 22 Sep 2014 11:07:50 -0400
-In-Reply-To: <20140915114709.GB4923@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: akpm@linux-foundation.org, bruce.w.allan@intel.com,
+	d.kasatkin@samsung.com, james.l.morris@oracle.com,
+	john.griffin@intel.com, linux-btrfs@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-ima-devel@lists.sourceforge.net,
+	linux-ima-user@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org, linux-security-module@vger.kernel.org,
+	neilb@suse.de, qat-linux@intel.com, serge@hallyn.com,
+	thomas.lendacky@amd.com, zohar@linux.vnet.ibm.com,
+	torvalds@linux-foundation.org,
+	Behan Webster <behanw@converseincode.com>
+To: agk@redhat.com, clm@fb.com, davem@davemloft.net,
+	dm-devel@redhat.com, fabf@skynet.be, herbert@gondor.apana.org.au,
+	jbacik@fb.com, snitzer@redhat.com, tadeusz.struk@intel.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 09/15/2014 06:47 AM, Herbert Xu wrote:
-> On Fri, Sep 05, 2014 at 11:49:38PM +0000, Scot Doyle wrote:
->>
->> On Fri, 5 Sep 2014, Tom Lendacky wrote:
->>
->>> If the ccp is built as a built-in module, then ccp-crypto (whether
->>> built as a module or a built-in module) will be able to load and
->>> it will register its crypto algorithms.  If the system does not have
->>> a CCP this will result in -ENODEV being returned whenever a command
->>> is attempted to be queued by the registered crypto algorithms.
->>>
->>> Add an API, ccp_present(), that checks for the presence of a CCP
->>> on the system.  The ccp-crypto module can use this to determine if it
->>> should register it's crypto alogorithms.
->>>
->>> Reported-by: Scot Doyle <lkml14@scotdoyle.com>
->>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->>
->> Tested-by: Scot Doyle <lkml14@scotdoyle.com>
->
-> Patch applied.  Thanks!
->
+=46rom: Behan Webster <behanw@converseincode.com>
 
-Hi Herbert,
+Replaced the use of a Variable Length Array In Struct (VLAIS) with a C9=
+9
+compliant equivalent. These patches allocate the appropriate amount of =
+memory
+using a char array using the SHASH_DESC_ON_STACK macro.
 
-Can you push this patch into the 3.17 release?
+There are places in the kernel whose maintainers have previously taken =
+our
+patches to remove VLAIS from their crypto code. Once this patch set is =
+accepted
+into mainline, I'll go back and resubmit patches to these maintainers t=
+o use
+this new macro so the same approach is used consistently in all places =
+in the
+kernel.
 
-Also, it should probably go into to the stable releases.  Is this
-something that you request or should I take care of that?
+The LLVMLinux project aims to fully build the Linux kernel using both g=
+cc and
+clang (the C front end for the LLVM compiler infrastructure project).=20
 
-Thanks,
-Tom
+
+Behan Webster (6):
+  crypto: LLVMLinux: Add macro to remove use of VLAIS in crypto code
+  crypto: LLVMLinux: Remove VLAIS from crypto/mv_cesa.c
+  crypto: LLVMLinux: Remove VLAIS from crypto/n2_core.c
+  crypto: LLVMLinux: Remove VLAIS from crypto/omap_sham.c
+  crypto: LLVMLinux: Remove VLAIS from crypto/.../qat_algs.c
+  security, crypto: LLVMLinux: Remove VLAIS from ima_crypto.c
+
+Jan-Simon M=C3=B6ller (5):
+  crypto: LLVMLinux: Remove VLAIS from crypto/ccp/ccp-crypto-sha.c
+  crypto, dm: LLVMLinux: Remove VLAIS usage from dm-crypt
+  crypto: LLVMLinux: Remove VLAIS usage from crypto/hmac.c
+  crypto: LLVMLinux: Remove VLAIS usage from libcrc32c.c
+  crypto: LLVMLinux: Remove VLAIS usage from crypto/testmgr.c
+
+Vin=C3=ADcius Tinti (1):
+  btrfs: LLVMLinux: Remove VLAIS
+
+ crypto/hmac.c                            | 25 ++++++++---------
+ crypto/testmgr.c                         | 14 ++++------
+ drivers/crypto/ccp/ccp-crypto-sha.c      | 13 ++++-----
+ drivers/crypto/mv_cesa.c                 | 41 ++++++++++++------------=
+----
+ drivers/crypto/n2_core.c                 | 11 +++-----
+ drivers/crypto/omap-sham.c               | 28 ++++++++-----------
+ drivers/crypto/qat/qat_common/qat_algs.c | 31 ++++++++++-----------
+ drivers/md/dm-crypt.c                    | 34 ++++++++++-------------
+ fs/btrfs/hash.c                          | 16 +++++------
+ include/crypto/hash.h                    |  5 ++++
+ lib/libcrc32c.c                          | 16 +++++------
+ security/integrity/ima/ima_crypto.c      | 47 +++++++++++++-----------=
+--------
+ 12 files changed, 122 insertions(+), 159 deletions(-)
+
+--=20
+1.9.1
