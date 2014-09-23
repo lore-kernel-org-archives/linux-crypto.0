@@ -1,195 +1,74 @@
-From: Dmitry Kasatkin <d.kasatkin@samsung.com>
-Subject: Re: [PATCH v4 11/12] security,
- crypto: LLVMLinux: Remove VLAIS from ima_crypto.c
-Date: Tue, 23 Sep 2014 11:55:10 +0300
-Message-ID: <5421356E.10401@samsung.com>
-References: <1411447337-22362-1-git-send-email-behanw@converseincode.com>
- <1411447337-22362-12-git-send-email-behanw@converseincode.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: akpm@linux-foundation.org, bruce.w.allan@intel.com,
-	james.l.morris@oracle.com, john.griffin@intel.com,
-	linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-ima-devel@lists.sourceforge.net,
-	linux-ima-user@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org, linux-security-module@vger.kernel.org,
-	neilb@suse.de, qat-linux@intel.com, serge@hallyn.com,
-	thomas.lendacky@amd.com, zohar@linux.vnet.ibm.com,
-	torvalds@linux-foundation.org, tglx@linutronix.de
-To: behanw@converseincode.com, agk@redhat.com, clm@fb.com,
-	davem@davemloft.net, dm-devel@redhat.com, fabf@skynet.be,
-	herbert@gondor.apana.org.au, jbacik@fb.com, snitzer@redhat.com,
-	tadeusz.struk@intel.com
-Return-path: <linux-btrfs-owner@vger.kernel.org>
-In-reply-to: <1411447337-22362-12-git-send-email-behanw@converseincode.com>
-Sender: linux-btrfs-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH] crypto: aesni - disable "by8" AVX CTR optimization
+Date: Tue, 23 Sep 2014 22:31:07 +0200
+Message-ID: <1411504267-10170-1-git-send-email-minipli@googlemail.com>
+References: <20140917112911.GA2129@gondor.apana.org.au>
+Cc: Romain Francoise <romain@orebokech.com>,
+	linux-crypto@vger.kernel.org,
+	Mathias Krause <minipli@googlemail.com>,
+	Chandramouli Narayanan <mouli@linux.intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wg0-f49.google.com ([74.125.82.49]:54545 "EHLO
+	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932189AbaIWUcX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Sep 2014 16:32:23 -0400
+Received: by mail-wg0-f49.google.com with SMTP id x12so5152052wgg.32
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Sep 2014 13:32:21 -0700 (PDT)
+In-Reply-To: <20140917112911.GA2129@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 23/09/14 07:42, behanw@converseincode.com wrote:
-> From: Behan Webster <behanw@converseincode.com>
->
-> Replaced the use of a Variable Length Array In Struct (VLAIS) with a =
-C99
-> compliant equivalent. This patch allocates the appropriate amount of =
-memory
-> using a char array using the SHASH_DESC_ON_STACK macro.
->
-> The new code can be compiled with both gcc and clang.
->
-> Signed-off-by: Behan Webster <behanw@converseincode.com>
-> Reviewed-by: Mark Charlebois <charlebm@gmail.com>
-> Reviewed-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: tglx@linutronix.de
+The "by8" implementation introduced in commit 22cddcc7df8f ("crypto: aes
+- AES CTR x86_64 "by8" AVX optimization") is failing crypto tests as it
+handles counter block overflows differently. It only accounts the right
+most 32 bit as a counter -- not the whole block as all other
+implementations do. This makes it fail the cryptomgr test #4 that
+specifically tests this corner case.
 
-Looks good. Thanks.
+As we're quite late in the release cycle, just disable the "by8" variant
+for now.
 
-Acked-by: Dmitry Kasatkin <d.kasatkin@samsung.com>
+Reported-by: Romain Francoise <romain@orebokech.com>
+Signed-off-by: Mathias Krause <minipli@googlemail.com>
+Cc: Chandramouli Narayanan <mouli@linux.intel.com>
 
+---
+I'll try to create a real fix next week but I can't promise much. If
+Linus releases v3.17 early, as he has mentioned in his -rc6
+announcement, we should hot fix this by just disabling the "by8"
+variant. The real fix would add the necessary counter block handling to
+the asm code and revert this commit afterwards. Reverting the whole code
+is not necessary, imho.
 
-> ---
->  security/integrity/ima/ima_crypto.c | 47 +++++++++++++++------------=
-----------
->  1 file changed, 19 insertions(+), 28 deletions(-)
->
-> diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity=
-/ima/ima_crypto.c
-> index 0bd7328..e35f5d9 100644
-> --- a/security/integrity/ima/ima_crypto.c
-> +++ b/security/integrity/ima/ima_crypto.c
-> @@ -380,17 +380,14 @@ static int ima_calc_file_hash_tfm(struct file *=
-file,
->  	loff_t i_size, offset =3D 0;
->  	char *rbuf;
->  	int rc, read =3D 0;
-> -	struct {
-> -		struct shash_desc shash;
-> -		char ctx[crypto_shash_descsize(tfm)];
-> -	} desc;
-> +	SHASH_DESC_ON_STACK(shash, tfm);
-> =20
-> -	desc.shash.tfm =3D tfm;
-> -	desc.shash.flags =3D 0;
-> +	shash->tfm =3D tfm;
-> +	shash->flags =3D 0;
-> =20
->  	hash->length =3D crypto_shash_digestsize(tfm);
-> =20
-> -	rc =3D crypto_shash_init(&desc.shash);
-> +	rc =3D crypto_shash_init(shash);
->  	if (rc !=3D 0)
->  		return rc;
-> =20
-> @@ -420,7 +417,7 @@ static int ima_calc_file_hash_tfm(struct file *fi=
-le,
->  			break;
->  		offset +=3D rbuf_len;
-> =20
-> -		rc =3D crypto_shash_update(&desc.shash, rbuf, rbuf_len);
-> +		rc =3D crypto_shash_update(shash, rbuf, rbuf_len);
->  		if (rc)
->  			break;
->  	}
-> @@ -429,7 +426,7 @@ static int ima_calc_file_hash_tfm(struct file *fi=
-le,
->  	kfree(rbuf);
->  out:
->  	if (!rc)
-> -		rc =3D crypto_shash_final(&desc.shash, hash->digest);
-> +		rc =3D crypto_shash_final(shash, hash->digest);
->  	return rc;
->  }
-> =20
-> @@ -487,18 +484,15 @@ static int ima_calc_field_array_hash_tfm(struct=
- ima_field_data *field_data,
->  					 struct ima_digest_data *hash,
->  					 struct crypto_shash *tfm)
->  {
-> -	struct {
-> -		struct shash_desc shash;
-> -		char ctx[crypto_shash_descsize(tfm)];
-> -	} desc;
-> +	SHASH_DESC_ON_STACK(shash, tfm);
->  	int rc, i;
-> =20
-> -	desc.shash.tfm =3D tfm;
-> -	desc.shash.flags =3D 0;
-> +	shash->tfm =3D tfm;
-> +	shash->flags =3D 0;
-> =20
->  	hash->length =3D crypto_shash_digestsize(tfm);
-> =20
-> -	rc =3D crypto_shash_init(&desc.shash);
-> +	rc =3D crypto_shash_init(shash);
->  	if (rc !=3D 0)
->  		return rc;
-> =20
-> @@ -508,7 +502,7 @@ static int ima_calc_field_array_hash_tfm(struct i=
-ma_field_data *field_data,
->  		u32 datalen =3D field_data[i].len;
-> =20
->  		if (strcmp(td->name, IMA_TEMPLATE_IMA_NAME) !=3D 0) {
-> -			rc =3D crypto_shash_update(&desc.shash,
-> +			rc =3D crypto_shash_update(shash,
->  						(const u8 *) &field_data[i].len,
->  						sizeof(field_data[i].len));
->  			if (rc)
-> @@ -518,13 +512,13 @@ static int ima_calc_field_array_hash_tfm(struct=
- ima_field_data *field_data,
->  			data_to_hash =3D buffer;
->  			datalen =3D IMA_EVENT_NAME_LEN_MAX + 1;
->  		}
-> -		rc =3D crypto_shash_update(&desc.shash, data_to_hash, datalen);
-> +		rc =3D crypto_shash_update(shash, data_to_hash, datalen);
->  		if (rc)
->  			break;
->  	}
-> =20
->  	if (!rc)
-> -		rc =3D crypto_shash_final(&desc.shash, hash->digest);
-> +		rc =3D crypto_shash_final(shash, hash->digest);
-> =20
->  	return rc;
->  }
-> @@ -565,15 +559,12 @@ static int __init ima_calc_boot_aggregate_tfm(c=
-har *digest,
->  {
->  	u8 pcr_i[TPM_DIGEST_SIZE];
->  	int rc, i;
-> -	struct {
-> -		struct shash_desc shash;
-> -		char ctx[crypto_shash_descsize(tfm)];
-> -	} desc;
-> +	SHASH_DESC_ON_STACK(shash, tfm);
-> =20
-> -	desc.shash.tfm =3D tfm;
-> -	desc.shash.flags =3D 0;
-> +	shash->tfm =3D tfm;
-> +	shash->flags =3D 0;
-> =20
-> -	rc =3D crypto_shash_init(&desc.shash);
-> +	rc =3D crypto_shash_init(shash);
->  	if (rc !=3D 0)
->  		return rc;
-> =20
-> @@ -581,10 +572,10 @@ static int __init ima_calc_boot_aggregate_tfm(c=
-har *digest,
->  	for (i =3D TPM_PCR0; i < TPM_PCR8; i++) {
->  		ima_pcrread(i, pcr_i);
->  		/* now accumulate with current aggregate */
-> -		rc =3D crypto_shash_update(&desc.shash, pcr_i, TPM_DIGEST_SIZE);
-> +		rc =3D crypto_shash_update(shash, pcr_i, TPM_DIGEST_SIZE);
->  	}
->  	if (!rc)
-> -		crypto_shash_final(&desc.shash, digest);
-> +		crypto_shash_final(shash, digest);
->  	return rc;
->  }
-> =20
+Would that be okay for you, Herbert?
+---
+ arch/x86/crypto/aesni-intel_glue.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-btrfs" =
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 888950f29fd9..a7ccd57f19e4 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -481,7 +481,7 @@ static void ctr_crypt_final(struct crypto_aes_ctx *ctx,
+ 	crypto_inc(ctrblk, AES_BLOCK_SIZE);
+ }
+ 
+-#ifdef CONFIG_AS_AVX
++#if 0	/* temporary disabled due to failing crypto tests */
+ static void aesni_ctr_enc_avx_tfm(struct crypto_aes_ctx *ctx, u8 *out,
+ 			      const u8 *in, unsigned int len, u8 *iv)
+ {
+@@ -1522,7 +1522,7 @@ static int __init aesni_init(void)
+ 		aesni_gcm_dec_tfm = aesni_gcm_dec;
+ 	}
+ 	aesni_ctr_enc_tfm = aesni_ctr_enc;
+-#ifdef CONFIG_AS_AVX
++#if 0	/* temporary disabled due to failing crypto tests */
+ 	if (cpu_has_avx) {
+ 		/* optimize performance of ctr mode encryption transform */
+ 		aesni_ctr_enc_tfm = aesni_ctr_enc_avx_tfm;
+-- 
+1.7.10.4
