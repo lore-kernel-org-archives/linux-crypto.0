@@ -1,7 +1,7 @@
 From: behanw@converseincode.com
-Subject: [PATCH v4 01/12] crypto: LLVMLinux: Add macro to remove use of VLAIS in crypto code
-Date: Mon, 22 Sep 2014 21:42:06 -0700
-Message-ID: <1411447337-22362-2-git-send-email-behanw@converseincode.com>
+Subject: [PATCH v4 04/12] crypto: LLVMLinux: Remove VLAIS from crypto/mv_cesa.c
+Date: Mon, 22 Sep 2014 21:42:09 -0700
+Message-ID: <1411447337-22362-5-git-send-email-behanw@converseincode.com>
 References: <1411447337-22362-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -16,73 +16,123 @@ Cc: akpm@linux-foundation.org, bruce.w.allan@intel.com,
 	neilb@suse.de, qat-linux@intel.com, serge@hallyn.com,
 	thomas.lendacky@amd.com, zohar@linux.vnet.ibm.com,
 	torvalds@linux-foundation.org,
-	Behan Webster <behanw@converseincode.com>,
-	=?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirqus@gmail.com>
+	Behan Webster <behanw@converseincode.com>
 To: agk@redhat.com, clm@fb.com, davem@davemloft.net,
 	dm-devel@redhat.com, fabf@skynet.be, herbert@gondor.apana.org.au,
 	jbacik@fb.com, snitzer@redhat.com, tadeusz.struk@intel.com
-Return-path: <linux-btrfs-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1411447337-22362-1-git-send-email-behanw@converseincode.com>
-Sender: linux-btrfs-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 =46rom: Behan Webster <behanw@converseincode.com>
 
-Add a macro which replaces the use of a Variable Length Array In Struct=
- (VLAIS)
-with a C99 compliant equivalent. This macro instead allocates the appro=
-priate
-amount of memory using an char array.
+Replaced the use of a Variable Length Array In Struct (VLAIS) with a C9=
+9
+compliant equivalent. This patch allocates the appropriate amount of me=
+mory
+using a char array using the SHASH_DESC_ON_STACK macro.
 
 The new code can be compiled with both gcc and clang.
 
-struct shash_desc contains a flexible array member member ctx declared =
-with
-CRYPTO_MINALIGN_ATTR, so sizeof(struct shash_desc) aligns the beginning
-of the array declared after struct shash_desc with long long.
-
-No trailing padding is required because it is not a struct type that ca=
-n
-be used in an array.
-
-The CRYPTO_MINALIGN_ATTR is required so that desc is aligned with long =
-long
-as would be the case for a struct containing a member with
-CRYPTO_MINALIGN_ATTR.
-
-If you want to get to the ctx at the end of the shash_desc as before yo=
-u can do
-so using shash_desc_ctx(shash)
-
 Signed-off-by: Behan Webster <behanw@converseincode.com>
 Reviewed-by: Mark Charlebois <charlebm@gmail.com>
+Reviewed-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Micha=C5=82 Miros=C5=82aw <mirqus@gmail.com>
 ---
- include/crypto/hash.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/crypto/mv_cesa.c | 41 ++++++++++++++++++----------------------=
+-
+ 1 file changed, 18 insertions(+), 23 deletions(-)
 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index a391955..74b13ec 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -58,6 +58,11 @@ struct shash_desc {
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
- };
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index 29d0ee5..032c72c 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -402,26 +402,23 @@ static int mv_hash_final_fallback(struct ahash_re=
+quest *req)
+ {
+ 	const struct mv_tfm_hash_ctx *tfm_ctx =3D crypto_tfm_ctx(req->base.tf=
+m);
+ 	struct mv_req_hash_ctx *req_ctx =3D ahash_request_ctx(req);
+-	struct {
+-		struct shash_desc shash;
+-		char ctx[crypto_shash_descsize(tfm_ctx->fallback)];
+-	} desc;
++	SHASH_DESC_ON_STACK(shash, tfm_ctx->fallback);
+ 	int rc;
 =20
-+#define SHASH_DESC_ON_STACK(shash, ctx)				  \
-+	char __##shash##_desc[sizeof(struct shash_desc) +	  \
-+		crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
-+	struct shash_desc *shash =3D (struct shash_desc *)__##shash##_desc
+-	desc.shash.tfm =3D tfm_ctx->fallback;
+-	desc.shash.flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
++	shash->tfm =3D tfm_ctx->fallback;
++	shash->flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
+ 	if (unlikely(req_ctx->first_hash)) {
+-		crypto_shash_init(&desc.shash);
+-		crypto_shash_update(&desc.shash, req_ctx->buffer,
++		crypto_shash_init(shash);
++		crypto_shash_update(shash, req_ctx->buffer,
+ 				    req_ctx->extra_bytes);
+ 	} else {
+ 		/* only SHA1 for now....
+ 		 */
+-		rc =3D mv_hash_import_sha1_ctx(req_ctx, &desc.shash);
++		rc =3D mv_hash_import_sha1_ctx(req_ctx, shash);
+ 		if (rc)
+ 			goto out;
+ 	}
+-	rc =3D crypto_shash_final(&desc.shash, req->result);
++	rc =3D crypto_shash_final(shash, req->result);
+ out:
+ 	return rc;
+ }
+@@ -794,23 +791,21 @@ static int mv_hash_setkey(struct crypto_ahash *tf=
+m, const u8 * key,
+ 	ss =3D crypto_shash_statesize(ctx->base_hash);
+=20
+ 	{
+-		struct {
+-			struct shash_desc shash;
+-			char ctx[crypto_shash_descsize(ctx->base_hash)];
+-		} desc;
++		SHASH_DESC_ON_STACK(shash, ctx->base_hash);
 +
- struct shash_alg {
- 	int (*init)(struct shash_desc *desc);
- 	int (*update)(struct shash_desc *desc, const u8 *data,
+ 		unsigned int i;
+ 		char ipad[ss];
+ 		char opad[ss];
+=20
+-		desc.shash.tfm =3D ctx->base_hash;
+-		desc.shash.flags =3D crypto_shash_get_flags(ctx->base_hash) &
++		shash->tfm =3D ctx->base_hash;
++		shash->flags =3D crypto_shash_get_flags(ctx->base_hash) &
+ 		    CRYPTO_TFM_REQ_MAY_SLEEP;
+=20
+ 		if (keylen > bs) {
+ 			int err;
+=20
+ 			err =3D
+-			    crypto_shash_digest(&desc.shash, key, keylen, ipad);
++			    crypto_shash_digest(shash, key, keylen, ipad);
+ 			if (err)
+ 				return err;
+=20
+@@ -826,12 +821,12 @@ static int mv_hash_setkey(struct crypto_ahash *tf=
+m, const u8 * key,
+ 			opad[i] ^=3D 0x5c;
+ 		}
+=20
+-		rc =3D crypto_shash_init(&desc.shash) ? :
+-		    crypto_shash_update(&desc.shash, ipad, bs) ? :
+-		    crypto_shash_export(&desc.shash, ipad) ? :
+-		    crypto_shash_init(&desc.shash) ? :
+-		    crypto_shash_update(&desc.shash, opad, bs) ? :
+-		    crypto_shash_export(&desc.shash, opad);
++		rc =3D crypto_shash_init(shash) ? :
++		    crypto_shash_update(shash, ipad, bs) ? :
++		    crypto_shash_export(shash, ipad) ? :
++		    crypto_shash_init(shash) ? :
++		    crypto_shash_update(shash, opad, bs) ? :
++		    crypto_shash_export(shash, opad);
+=20
+ 		if (rc =3D=3D 0)
+ 			mv_hash_init_ivs(ctx, ipad, opad);
 --=20
 1.9.1
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-btrfs" =
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
