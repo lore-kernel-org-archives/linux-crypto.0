@@ -1,7 +1,7 @@
 From: behanw@converseincode.com
-Subject: [PATCH v4 04/12] crypto: LLVMLinux: Remove VLAIS from crypto/mv_cesa.c
-Date: Mon, 22 Sep 2014 21:42:09 -0700
-Message-ID: <1411447337-22362-5-git-send-email-behanw@converseincode.com>
+Subject: [PATCH v4 10/12] crypto: LLVMLinux: Remove VLAIS usage from libcrc32c.c
+Date: Mon, 22 Sep 2014 21:42:15 -0700
+Message-ID: <1411447337-22362-11-git-send-email-behanw@converseincode.com>
 References: <1411447337-22362-1-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -16,16 +16,24 @@ Cc: akpm@linux-foundation.org, bruce.w.allan@intel.com,
 	neilb@suse.de, qat-linux@intel.com, serge@hallyn.com,
 	thomas.lendacky@amd.com, zohar@linux.vnet.ibm.com,
 	torvalds@linux-foundation.org,
-	Behan Webster <behanw@converseincode.com>
+	=?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>,
+	Behan Webster <behanw@converseincode.com>, pageexec@freemail.hu
 To: agk@redhat.com, clm@fb.com, davem@davemloft.net,
 	dm-devel@redhat.com, fabf@skynet.be, herbert@gondor.apana.org.au,
 	jbacik@fb.com, snitzer@redhat.com, tadeusz.struk@intel.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pd0-f174.google.com ([209.85.192.174]:34243 "EHLO
+	mail-pd0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753839AbaIWEnN (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Sep 2014 00:43:13 -0400
+Received: by mail-pd0-f174.google.com with SMTP id g10so5250866pdj.33
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Sep 2014 21:43:12 -0700 (PDT)
 In-Reply-To: <1411447337-22362-1-git-send-email-behanw@converseincode.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-=46rom: Behan Webster <behanw@converseincode.com>
+=46rom: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 
 Replaced the use of a Variable Length Array In Struct (VLAIS) with a C9=
 9
@@ -35,104 +43,47 @@ using a char array using the SHASH_DESC_ON_STACK macro.
 
 The new code can be compiled with both gcc and clang.
 
+Signed-off-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 Signed-off-by: Behan Webster <behanw@converseincode.com>
 Reviewed-by: Mark Charlebois <charlebm@gmail.com>
-Reviewed-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
 Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: pageexec@freemail.hu
+Cc: "David S. Miller" <davem@davemloft.net>
 ---
- drivers/crypto/mv_cesa.c | 41 ++++++++++++++++++----------------------=
--
- 1 file changed, 18 insertions(+), 23 deletions(-)
+ lib/libcrc32c.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index 29d0ee5..032c72c 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -402,26 +402,23 @@ static int mv_hash_final_fallback(struct ahash_re=
-quest *req)
+diff --git a/lib/libcrc32c.c b/lib/libcrc32c.c
+index b3131f5..6a08ce7 100644
+--- a/lib/libcrc32c.c
++++ b/lib/libcrc32c.c
+@@ -41,20 +41,18 @@ static struct crypto_shash *tfm;
+=20
+ u32 crc32c(u32 crc, const void *address, unsigned int length)
  {
- 	const struct mv_tfm_hash_ctx *tfm_ctx =3D crypto_tfm_ctx(req->base.tf=
-m);
- 	struct mv_req_hash_ctx *req_ctx =3D ahash_request_ctx(req);
 -	struct {
 -		struct shash_desc shash;
--		char ctx[crypto_shash_descsize(tfm_ctx->fallback)];
+-		char ctx[crypto_shash_descsize(tfm)];
 -	} desc;
-+	SHASH_DESC_ON_STACK(shash, tfm_ctx->fallback);
- 	int rc;
++	SHASH_DESC_ON_STACK(shash, tfm);
++	u32 *ctx =3D (u32 *)shash_desc_ctx(shash);
+ 	int err;
 =20
--	desc.shash.tfm =3D tfm_ctx->fallback;
--	desc.shash.flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
-+	shash->tfm =3D tfm_ctx->fallback;
-+	shash->flags =3D CRYPTO_TFM_REQ_MAY_SLEEP;
- 	if (unlikely(req_ctx->first_hash)) {
--		crypto_shash_init(&desc.shash);
--		crypto_shash_update(&desc.shash, req_ctx->buffer,
-+		crypto_shash_init(shash);
-+		crypto_shash_update(shash, req_ctx->buffer,
- 				    req_ctx->extra_bytes);
- 	} else {
- 		/* only SHA1 for now....
- 		 */
--		rc =3D mv_hash_import_sha1_ctx(req_ctx, &desc.shash);
-+		rc =3D mv_hash_import_sha1_ctx(req_ctx, shash);
- 		if (rc)
- 			goto out;
- 	}
--	rc =3D crypto_shash_final(&desc.shash, req->result);
-+	rc =3D crypto_shash_final(shash, req->result);
- out:
- 	return rc;
+-	desc.shash.tfm =3D tfm;
+-	desc.shash.flags =3D 0;
+-	*(u32 *)desc.ctx =3D crc;
++	shash->tfm =3D tfm;
++	shash->flags =3D 0;
++	*ctx =3D crc;
+=20
+-	err =3D crypto_shash_update(&desc.shash, address, length);
++	err =3D crypto_shash_update(shash, address, length);
+ 	BUG_ON(err);
+=20
+-	return *(u32 *)desc.ctx;
++	return *ctx;
  }
-@@ -794,23 +791,21 @@ static int mv_hash_setkey(struct crypto_ahash *tf=
-m, const u8 * key,
- 	ss =3D crypto_shash_statesize(ctx->base_hash);
 =20
- 	{
--		struct {
--			struct shash_desc shash;
--			char ctx[crypto_shash_descsize(ctx->base_hash)];
--		} desc;
-+		SHASH_DESC_ON_STACK(shash, ctx->base_hash);
-+
- 		unsigned int i;
- 		char ipad[ss];
- 		char opad[ss];
-=20
--		desc.shash.tfm =3D ctx->base_hash;
--		desc.shash.flags =3D crypto_shash_get_flags(ctx->base_hash) &
-+		shash->tfm =3D ctx->base_hash;
-+		shash->flags =3D crypto_shash_get_flags(ctx->base_hash) &
- 		    CRYPTO_TFM_REQ_MAY_SLEEP;
-=20
- 		if (keylen > bs) {
- 			int err;
-=20
- 			err =3D
--			    crypto_shash_digest(&desc.shash, key, keylen, ipad);
-+			    crypto_shash_digest(shash, key, keylen, ipad);
- 			if (err)
- 				return err;
-=20
-@@ -826,12 +821,12 @@ static int mv_hash_setkey(struct crypto_ahash *tf=
-m, const u8 * key,
- 			opad[i] ^=3D 0x5c;
- 		}
-=20
--		rc =3D crypto_shash_init(&desc.shash) ? :
--		    crypto_shash_update(&desc.shash, ipad, bs) ? :
--		    crypto_shash_export(&desc.shash, ipad) ? :
--		    crypto_shash_init(&desc.shash) ? :
--		    crypto_shash_update(&desc.shash, opad, bs) ? :
--		    crypto_shash_export(&desc.shash, opad);
-+		rc =3D crypto_shash_init(shash) ? :
-+		    crypto_shash_update(shash, ipad, bs) ? :
-+		    crypto_shash_export(shash, ipad) ? :
-+		    crypto_shash_init(shash) ? :
-+		    crypto_shash_update(shash, opad, bs) ? :
-+		    crypto_shash_export(shash, opad);
-=20
- 		if (rc =3D=3D 0)
- 			mv_hash_init_ivs(ctx, ipad, opad);
+ EXPORT_SYMBOL(crc32c);
 --=20
 1.9.1
