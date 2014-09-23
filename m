@@ -1,101 +1,195 @@
-From: behanw@converseincode.com
-Subject: [PATCH v4 08/12] crypto,
-	dm: LLVMLinux: Remove VLAIS usage from dm-crypt
-Date: Mon, 22 Sep 2014 21:42:13 -0700
-Message-ID: <1411447337-22362-9-git-send-email-behanw@converseincode.com>
+From: Dmitry Kasatkin <d.kasatkin@samsung.com>
+Subject: Re: [PATCH v4 11/12] security,
+ crypto: LLVMLinux: Remove VLAIS from ima_crypto.c
+Date: Tue, 23 Sep 2014 11:55:10 +0300
+Message-ID: <5421356E.10401@samsung.com>
 References: <1411447337-22362-1-git-send-email-behanw@converseincode.com>
-Reply-To: device-mapper development <dm-devel@redhat.com>
+ <1411447337-22362-12-git-send-email-behanw@converseincode.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: john.griffin@intel.com, Behan Webster <behanw@converseincode.com>,
-        linux-ima-devel@lists.sourceforge.net, qat-linux@intel.com,
-        pageexec@freemail.hu, zohar@linux.vnet.ibm.com, gmazyland@gmail.com,
-        serge@hallyn.com, thomas.lendacky@amd.com,
-        linux-ima-user@lists.sourceforge.net, d.kasatkin@samsung.com,
-        linux-raid@vger.kernel.org, james.l.morris@oracle.com,
-        bruce.w.allan@intel.com, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org,
-        =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>,
-        akpm@linux-foundation.org, torvalds@linux-foundation.org,
-        linux-btrfs@vger.kernel.org
-To: agk@redhat.com, clm@fb.com, davem@davemloft.net, dm-devel@redhat.com,
-        fabf@skynet.be, herbert@gondor.apana.org.au, jbacik@fb.com,
-        snitzer@redhat.com, tadeusz.struk@intel.com
-Return-path: <dm-devel-bounces@redhat.com>
-In-Reply-To: <1411447337-22362-1-git-send-email-behanw@converseincode.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/dm-devel>
-List-Post: <mailto:dm-devel@redhat.com>
-List-Help: <mailto:dm-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/dm-devel>,
-	<mailto:dm-devel-request@redhat.com?subject=subscribe>
-Sender: dm-devel-bounces@redhat.com
-Errors-To: dm-devel-bounces@redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: akpm@linux-foundation.org, bruce.w.allan@intel.com,
+	james.l.morris@oracle.com, john.griffin@intel.com,
+	linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-ima-devel@lists.sourceforge.net,
+	linux-ima-user@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+	linux-raid@vger.kernel.org, linux-security-module@vger.kernel.org,
+	neilb@suse.de, qat-linux@intel.com, serge@hallyn.com,
+	thomas.lendacky@amd.com, zohar@linux.vnet.ibm.com,
+	torvalds@linux-foundation.org, tglx@linutronix.de
+To: behanw@converseincode.com, agk@redhat.com, clm@fb.com,
+	davem@davemloft.net, dm-devel@redhat.com, fabf@skynet.be,
+	herbert@gondor.apana.org.au, jbacik@fb.com, snitzer@redhat.com,
+	tadeusz.struk@intel.com
+Return-path: <linux-btrfs-owner@vger.kernel.org>
+In-reply-to: <1411447337-22362-12-git-send-email-behanw@converseincode.com>
+Sender: linux-btrfs-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-RnJvbTogSmFuLVNpbW9uIE3DtmxsZXIgPGRsOXBmQGdteC5kZT4KClJlcGxhY2VkIHRoZSB1c2Ug
-b2YgYSBWYXJpYWJsZSBMZW5ndGggQXJyYXkgSW4gU3RydWN0IChWTEFJUykgd2l0aCBhIEM5OQpj
-b21wbGlhbnQgZXF1aXZhbGVudC4gVGhpcyBwYXRjaCBhbGxvY2F0ZXMgdGhlIGFwcHJvcHJpYXRl
-IGFtb3VudCBvZiBtZW1vcnkKdXNpbmcgYSBjaGFyIGFycmF5IHVzaW5nIHRoZSBTSEFTSF9ERVND
-X09OX1NUQUNLIG1hY3JvLgoKVGhlIG5ldyBjb2RlIGNhbiBiZSBjb21waWxlZCB3aXRoIGJvdGgg
-Z2NjIGFuZCBjbGFuZy4KClNpZ25lZC1vZmYtYnk6IEphbi1TaW1vbiBNw7ZsbGVyIDxkbDlwZkBn
-bXguZGU+ClNpZ25lZC1vZmYtYnk6IEJlaGFuIFdlYnN0ZXIgPGJlaGFud0Bjb252ZXJzZWluY29k
-ZS5jb20+ClJldmlld2VkLWJ5OiBNYXJrIENoYXJsZWJvaXMgPGNoYXJsZWJtQGdtYWlsLmNvbT4K
-QWNrZWQtYnk6IEhlcmJlcnQgWHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT4KQ2M6IHBh
-Z2VleGVjQGZyZWVtYWlsLmh1CkNjOiBnbWF6eWxhbmRAZ21haWwuY29tCkNjOiAiRGF2aWQgUy4g
-TWlsbGVyIiA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD4KLS0tCiBkcml2ZXJzL21kL2RtLWNyeXB0LmMg
-fCAzNCArKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwg
-MTQgaW5zZXJ0aW9ucygrKSwgMjAgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9t
-ZC9kbS1jcnlwdC5jIGIvZHJpdmVycy9tZC9kbS1jcnlwdC5jCmluZGV4IGNkMTVlMDguLmZjOTNi
-OTMgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbWQvZG0tY3J5cHQuYworKysgYi9kcml2ZXJzL21kL2Rt
-LWNyeXB0LmMKQEAgLTUyNiwyOSArNTI2LDI2IEBAIHN0YXRpYyBpbnQgY3J5cHRfaXZfbG1rX29u
-ZShzdHJ1Y3QgY3J5cHRfY29uZmlnICpjYywgdTggKml2LAogCQkJICAgIHU4ICpkYXRhKQogewog
-CXN0cnVjdCBpdl9sbWtfcHJpdmF0ZSAqbG1rID0gJmNjLT5pdl9nZW5fcHJpdmF0ZS5sbWs7Ci0J
-c3RydWN0IHsKLQkJc3RydWN0IHNoYXNoX2Rlc2MgZGVzYzsKLQkJY2hhciBjdHhbY3J5cHRvX3No
-YXNoX2Rlc2NzaXplKGxtay0+aGFzaF90Zm0pXTsKLQl9IHNkZXNjOworCVNIQVNIX0RFU0NfT05f
-U1RBQ0soZGVzYywgbG1rLT5oYXNoX3RmbSk7CiAJc3RydWN0IG1kNV9zdGF0ZSBtZDVzdGF0ZTsK
-IAlfX2xlMzIgYnVmWzRdOwogCWludCBpLCByOwogCi0Jc2Rlc2MuZGVzYy50Zm0gPSBsbWstPmhh
-c2hfdGZtOwotCXNkZXNjLmRlc2MuZmxhZ3MgPSBDUllQVE9fVEZNX1JFUV9NQVlfU0xFRVA7CisJ
-ZGVzYy0+dGZtID0gbG1rLT5oYXNoX3RmbTsKKwlkZXNjLT5mbGFncyA9IENSWVBUT19URk1fUkVR
-X01BWV9TTEVFUDsKIAotCXIgPSBjcnlwdG9fc2hhc2hfaW5pdCgmc2Rlc2MuZGVzYyk7CisJciA9
-IGNyeXB0b19zaGFzaF9pbml0KGRlc2MpOwogCWlmIChyKQogCQlyZXR1cm4gcjsKIAogCWlmIChs
-bWstPnNlZWQpIHsKLQkJciA9IGNyeXB0b19zaGFzaF91cGRhdGUoJnNkZXNjLmRlc2MsIGxtay0+
-c2VlZCwgTE1LX1NFRURfU0laRSk7CisJCXIgPSBjcnlwdG9fc2hhc2hfdXBkYXRlKGRlc2MsIGxt
-ay0+c2VlZCwgTE1LX1NFRURfU0laRSk7CiAJCWlmIChyKQogCQkJcmV0dXJuIHI7CiAJfQogCiAJ
-LyogU2VjdG9yIGlzIGFsd2F5cyA1MTJCLCBibG9jayBzaXplIDE2LCBhZGQgZGF0YSBvZiBibG9j
-a3MgMS0zMSAqLwotCXIgPSBjcnlwdG9fc2hhc2hfdXBkYXRlKCZzZGVzYy5kZXNjLCBkYXRhICsg
-MTYsIDE2ICogMzEpOworCXIgPSBjcnlwdG9fc2hhc2hfdXBkYXRlKGRlc2MsIGRhdGEgKyAxNiwg
-MTYgKiAzMSk7CiAJaWYgKHIpCiAJCXJldHVybiByOwogCkBAIC01NTcsMTIgKzU1NCwxMiBAQCBz
-dGF0aWMgaW50IGNyeXB0X2l2X2xta19vbmUoc3RydWN0IGNyeXB0X2NvbmZpZyAqY2MsIHU4ICpp
-diwKIAlidWZbMV0gPSBjcHVfdG9fbGUzMigoKCh1NjQpZG1yZXEtPml2X3NlY3RvciA+PiAzMikg
-JiAweDAwRkZGRkZGKSB8IDB4ODAwMDAwMDApOwogCWJ1ZlsyXSA9IGNwdV90b19sZTMyKDQwMjQp
-OwogCWJ1ZlszXSA9IDA7Ci0JciA9IGNyeXB0b19zaGFzaF91cGRhdGUoJnNkZXNjLmRlc2MsICh1
-OCAqKWJ1Ziwgc2l6ZW9mKGJ1ZikpOworCXIgPSBjcnlwdG9fc2hhc2hfdXBkYXRlKGRlc2MsICh1
-OCAqKWJ1Ziwgc2l6ZW9mKGJ1ZikpOwogCWlmIChyKQogCQlyZXR1cm4gcjsKIAogCS8qIE5vIE1E
-NSBwYWRkaW5nIGhlcmUgKi8KLQlyID0gY3J5cHRvX3NoYXNoX2V4cG9ydCgmc2Rlc2MuZGVzYywg
-Jm1kNXN0YXRlKTsKKwlyID0gY3J5cHRvX3NoYXNoX2V4cG9ydChkZXNjLCAmbWQ1c3RhdGUpOwog
-CWlmIChyKQogCQlyZXR1cm4gcjsKIApAQCAtNjc5LDEwICs2NzYsNyBAQCBzdGF0aWMgaW50IGNy
-eXB0X2l2X3Rjd193aGl0ZW5pbmcoc3RydWN0IGNyeXB0X2NvbmZpZyAqY2MsCiAJc3RydWN0IGl2
-X3Rjd19wcml2YXRlICp0Y3cgPSAmY2MtPml2X2dlbl9wcml2YXRlLnRjdzsKIAl1NjQgc2VjdG9y
-ID0gY3B1X3RvX2xlNjQoKHU2NClkbXJlcS0+aXZfc2VjdG9yKTsKIAl1OCBidWZbVENXX1dISVRF
-TklOR19TSVpFXTsKLQlzdHJ1Y3QgewotCQlzdHJ1Y3Qgc2hhc2hfZGVzYyBkZXNjOwotCQljaGFy
-IGN0eFtjcnlwdG9fc2hhc2hfZGVzY3NpemUodGN3LT5jcmMzMl90Zm0pXTsKLQl9IHNkZXNjOwor
-CVNIQVNIX0RFU0NfT05fU1RBQ0soZGVzYywgdGN3LT5jcmMzMl90Zm0pOwogCWludCBpLCByOwog
-CiAJLyogeG9yIHdoaXRlbmluZyB3aXRoIHNlY3RvciBudW1iZXIgKi8KQEAgLTY5MSwxNiArNjg1
-LDE2IEBAIHN0YXRpYyBpbnQgY3J5cHRfaXZfdGN3X3doaXRlbmluZyhzdHJ1Y3QgY3J5cHRfY29u
-ZmlnICpjYywKIAljcnlwdG9feG9yKCZidWZbOF0sICh1OCAqKSZzZWN0b3IsIDgpOwogCiAJLyog
-Y2FsY3VsYXRlIGNyYzMyIGZvciBldmVyeSAzMmJpdCBwYXJ0IGFuZCB4b3IgaXQgKi8KLQlzZGVz
-Yy5kZXNjLnRmbSA9IHRjdy0+Y3JjMzJfdGZtOwotCXNkZXNjLmRlc2MuZmxhZ3MgPSBDUllQVE9f
-VEZNX1JFUV9NQVlfU0xFRVA7CisJZGVzYy0+dGZtID0gdGN3LT5jcmMzMl90Zm07CisJZGVzYy0+
-ZmxhZ3MgPSBDUllQVE9fVEZNX1JFUV9NQVlfU0xFRVA7CiAJZm9yIChpID0gMDsgaSA8IDQ7IGkr
-KykgewotCQlyID0gY3J5cHRvX3NoYXNoX2luaXQoJnNkZXNjLmRlc2MpOworCQlyID0gY3J5cHRv
-X3NoYXNoX2luaXQoZGVzYyk7CiAJCWlmIChyKQogCQkJZ290byBvdXQ7Ci0JCXIgPSBjcnlwdG9f
-c2hhc2hfdXBkYXRlKCZzZGVzYy5kZXNjLCAmYnVmW2kgKiA0XSwgNCk7CisJCXIgPSBjcnlwdG9f
-c2hhc2hfdXBkYXRlKGRlc2MsICZidWZbaSAqIDRdLCA0KTsKIAkJaWYgKHIpCiAJCQlnb3RvIG91
-dDsKLQkJciA9IGNyeXB0b19zaGFzaF9maW5hbCgmc2Rlc2MuZGVzYywgJmJ1ZltpICogNF0pOwor
-CQlyID0gY3J5cHRvX3NoYXNoX2ZpbmFsKGRlc2MsICZidWZbaSAqIDRdKTsKIAkJaWYgKHIpCiAJ
-CQlnb3RvIG91dDsKIAl9Ci0tIAoxLjkuMQoKLS0KZG0tZGV2ZWwgbWFpbGluZyBsaXN0CmRtLWRl
-dmVsQHJlZGhhdC5jb20KaHR0cHM6Ly93d3cucmVkaGF0LmNvbS9tYWlsbWFuL2xpc3RpbmZvL2Rt
-LWRldmVs
+On 23/09/14 07:42, behanw@converseincode.com wrote:
+> From: Behan Webster <behanw@converseincode.com>
+>
+> Replaced the use of a Variable Length Array In Struct (VLAIS) with a =
+C99
+> compliant equivalent. This patch allocates the appropriate amount of =
+memory
+> using a char array using the SHASH_DESC_ON_STACK macro.
+>
+> The new code can be compiled with both gcc and clang.
+>
+> Signed-off-by: Behan Webster <behanw@converseincode.com>
+> Reviewed-by: Mark Charlebois <charlebm@gmail.com>
+> Reviewed-by: Jan-Simon M=C3=B6ller <dl9pf@gmx.de>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: tglx@linutronix.de
+
+Looks good. Thanks.
+
+Acked-by: Dmitry Kasatkin <d.kasatkin@samsung.com>
+
+
+> ---
+>  security/integrity/ima/ima_crypto.c | 47 +++++++++++++++------------=
+----------
+>  1 file changed, 19 insertions(+), 28 deletions(-)
+>
+> diff --git a/security/integrity/ima/ima_crypto.c b/security/integrity=
+/ima/ima_crypto.c
+> index 0bd7328..e35f5d9 100644
+> --- a/security/integrity/ima/ima_crypto.c
+> +++ b/security/integrity/ima/ima_crypto.c
+> @@ -380,17 +380,14 @@ static int ima_calc_file_hash_tfm(struct file *=
+file,
+>  	loff_t i_size, offset =3D 0;
+>  	char *rbuf;
+>  	int rc, read =3D 0;
+> -	struct {
+> -		struct shash_desc shash;
+> -		char ctx[crypto_shash_descsize(tfm)];
+> -	} desc;
+> +	SHASH_DESC_ON_STACK(shash, tfm);
+> =20
+> -	desc.shash.tfm =3D tfm;
+> -	desc.shash.flags =3D 0;
+> +	shash->tfm =3D tfm;
+> +	shash->flags =3D 0;
+> =20
+>  	hash->length =3D crypto_shash_digestsize(tfm);
+> =20
+> -	rc =3D crypto_shash_init(&desc.shash);
+> +	rc =3D crypto_shash_init(shash);
+>  	if (rc !=3D 0)
+>  		return rc;
+> =20
+> @@ -420,7 +417,7 @@ static int ima_calc_file_hash_tfm(struct file *fi=
+le,
+>  			break;
+>  		offset +=3D rbuf_len;
+> =20
+> -		rc =3D crypto_shash_update(&desc.shash, rbuf, rbuf_len);
+> +		rc =3D crypto_shash_update(shash, rbuf, rbuf_len);
+>  		if (rc)
+>  			break;
+>  	}
+> @@ -429,7 +426,7 @@ static int ima_calc_file_hash_tfm(struct file *fi=
+le,
+>  	kfree(rbuf);
+>  out:
+>  	if (!rc)
+> -		rc =3D crypto_shash_final(&desc.shash, hash->digest);
+> +		rc =3D crypto_shash_final(shash, hash->digest);
+>  	return rc;
+>  }
+> =20
+> @@ -487,18 +484,15 @@ static int ima_calc_field_array_hash_tfm(struct=
+ ima_field_data *field_data,
+>  					 struct ima_digest_data *hash,
+>  					 struct crypto_shash *tfm)
+>  {
+> -	struct {
+> -		struct shash_desc shash;
+> -		char ctx[crypto_shash_descsize(tfm)];
+> -	} desc;
+> +	SHASH_DESC_ON_STACK(shash, tfm);
+>  	int rc, i;
+> =20
+> -	desc.shash.tfm =3D tfm;
+> -	desc.shash.flags =3D 0;
+> +	shash->tfm =3D tfm;
+> +	shash->flags =3D 0;
+> =20
+>  	hash->length =3D crypto_shash_digestsize(tfm);
+> =20
+> -	rc =3D crypto_shash_init(&desc.shash);
+> +	rc =3D crypto_shash_init(shash);
+>  	if (rc !=3D 0)
+>  		return rc;
+> =20
+> @@ -508,7 +502,7 @@ static int ima_calc_field_array_hash_tfm(struct i=
+ma_field_data *field_data,
+>  		u32 datalen =3D field_data[i].len;
+> =20
+>  		if (strcmp(td->name, IMA_TEMPLATE_IMA_NAME) !=3D 0) {
+> -			rc =3D crypto_shash_update(&desc.shash,
+> +			rc =3D crypto_shash_update(shash,
+>  						(const u8 *) &field_data[i].len,
+>  						sizeof(field_data[i].len));
+>  			if (rc)
+> @@ -518,13 +512,13 @@ static int ima_calc_field_array_hash_tfm(struct=
+ ima_field_data *field_data,
+>  			data_to_hash =3D buffer;
+>  			datalen =3D IMA_EVENT_NAME_LEN_MAX + 1;
+>  		}
+> -		rc =3D crypto_shash_update(&desc.shash, data_to_hash, datalen);
+> +		rc =3D crypto_shash_update(shash, data_to_hash, datalen);
+>  		if (rc)
+>  			break;
+>  	}
+> =20
+>  	if (!rc)
+> -		rc =3D crypto_shash_final(&desc.shash, hash->digest);
+> +		rc =3D crypto_shash_final(shash, hash->digest);
+> =20
+>  	return rc;
+>  }
+> @@ -565,15 +559,12 @@ static int __init ima_calc_boot_aggregate_tfm(c=
+har *digest,
+>  {
+>  	u8 pcr_i[TPM_DIGEST_SIZE];
+>  	int rc, i;
+> -	struct {
+> -		struct shash_desc shash;
+> -		char ctx[crypto_shash_descsize(tfm)];
+> -	} desc;
+> +	SHASH_DESC_ON_STACK(shash, tfm);
+> =20
+> -	desc.shash.tfm =3D tfm;
+> -	desc.shash.flags =3D 0;
+> +	shash->tfm =3D tfm;
+> +	shash->flags =3D 0;
+> =20
+> -	rc =3D crypto_shash_init(&desc.shash);
+> +	rc =3D crypto_shash_init(shash);
+>  	if (rc !=3D 0)
+>  		return rc;
+> =20
+> @@ -581,10 +572,10 @@ static int __init ima_calc_boot_aggregate_tfm(c=
+har *digest,
+>  	for (i =3D TPM_PCR0; i < TPM_PCR8; i++) {
+>  		ima_pcrread(i, pcr_i);
+>  		/* now accumulate with current aggregate */
+> -		rc =3D crypto_shash_update(&desc.shash, pcr_i, TPM_DIGEST_SIZE);
+> +		rc =3D crypto_shash_update(shash, pcr_i, TPM_DIGEST_SIZE);
+>  	}
+>  	if (!rc)
+> -		crypto_shash_final(&desc.shash, digest);
+> +		crypto_shash_final(shash, digest);
+>  	return rc;
+>  }
+> =20
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-btrfs" =
+in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
