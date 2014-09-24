@@ -1,59 +1,73 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp - Check for CCP before registering crypto
- algs
-Date: Wed, 24 Sep 2014 14:22:37 +0800
-Message-ID: <20140924062237.GA28656@gondor.apana.org.au>
-References: <20140905153109.14637.12600.stgit@tlendack-t1.amdoffice.net>
- <alpine.LNX.2.11.1409052327320.570@localhost.localdomain>
- <20140915114709.GB4923@gondor.apana.org.au>
- <54203B3B.70307@amd.com>
+Subject: Crypto Fixes for 3.17
+Date: Wed, 24 Sep 2014 21:27:20 +0800
+Message-ID: <20140924132720.GA31661@gondor.apana.org.au>
+References: <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20140710090314.GA15729@gondor.apana.org.au>
+ <20140915113506.GA4736@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Scot Doyle <lkml14@scotdoyle.com>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-To: Tom Lendacky <thomas.lendacky@amd.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:51267 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:52845 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750806AbaIXGWt (ORCPT
+	with ESMTP id S1750974AbaIXN1a (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Sep 2014 02:22:49 -0400
+	Wed, 24 Sep 2014 09:27:30 -0400
 Content-Disposition: inline
-In-Reply-To: <54203B3B.70307@amd.com>
+In-Reply-To: <20140915113506.GA4736@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Sep 22, 2014 at 10:07:39AM -0500, Tom Lendacky wrote:
-> On 09/15/2014 06:47 AM, Herbert Xu wrote:
-> >On Fri, Sep 05, 2014 at 11:49:38PM +0000, Scot Doyle wrote:
-> >>
-> >>On Fri, 5 Sep 2014, Tom Lendacky wrote:
-> >>
-> >>>If the ccp is built as a built-in module, then ccp-crypto (whether
-> >>>built as a module or a built-in module) will be able to load and
-> >>>it will register its crypto algorithms.  If the system does not have
-> >>>a CCP this will result in -ENODEV being returned whenever a command
-> >>>is attempted to be queued by the registered crypto algorithms.
-> >>>
-> >>>Add an API, ccp_present(), that checks for the presence of a CCP
-> >>>on the system.  The ccp-crypto module can use this to determine if it
-> >>>should register it's crypto alogorithms.
-> >>>
-> >>>Reported-by: Scot Doyle <lkml14@scotdoyle.com>
-> >>>Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> >>
-> >>Tested-by: Scot Doyle <lkml14@scotdoyle.com>
-> >
-> >Patch applied.  Thanks!
-> >
-> 
-> Hi Herbert,
-> 
-> Can you push this patch into the 3.17 release?
+Hi Linus:
 
-Thanks for the note, I've moved the patch to the crypto tree.
+This push fixes three issues:
 
-Cheers,
+* If ccp is loaded on a machine without ccp, it will incorrectly
+activate causing all requests to fail.  Fixed by preventing ccp
+from loading if hardware isn't available.
+
+* Not all IRQs were enabled for the qat driver, leading to potential
+stalls when it is used.
+
+* Disabled buggy AVX CTR implementation in aesni.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Mathias Krause (1):
+      crypto: aesni - disable "by8" AVX CTR optimization
+
+Tadeusz Struk (1):
+      crypto: qat - Enable all 32 IRQs
+
+Tom Lendacky (1):
+      crypto: ccp - Check for CCP before registering crypto algs
+
+ arch/x86/crypto/aesni-intel_glue.c                     |    4 ++--
+ drivers/crypto/ccp/ccp-crypto-main.c                   |    4 ++++
+ drivers/crypto/ccp/ccp-dev.c                           |   14 ++++++++++++++
+ drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    2 +-
+ include/linux/ccp.h                                    |   12 ++++++++++++
+ 5 files changed, 33 insertions(+), 3 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
