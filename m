@@ -1,7 +1,7 @@
 From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH 2/3] crypto: aesni - remove unused defines in "by8" variant
-Date: Sun, 28 Sep 2014 22:24:00 +0200
-Message-ID: <1411935841-11294-3-git-send-email-minipli@googlemail.com>
+Subject: [PATCH 3/3] Revert "crypto: aesni - disable "by8" AVX CTR optimization"
+Date: Sun, 28 Sep 2014 22:24:01 +0200
+Message-ID: <1411935841-11294-4-git-send-email-minipli@googlemail.com>
 References: <1411935841-11294-1-git-send-email-minipli@googlemail.com>
 Cc: Chandramouli Narayanan <mouli@linux.intel.com>,
 	linux-crypto@vger.kernel.org,
@@ -9,40 +9,48 @@ Cc: Chandramouli Narayanan <mouli@linux.intel.com>,
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:57438 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753470AbaI1UY0 (ORCPT
+Received: from mail-wg0-f49.google.com ([74.125.82.49]:53206 "EHLO
+	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753493AbaI1UY2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 28 Sep 2014 16:24:26 -0400
-Received: by mail-wi0-f178.google.com with SMTP id ho1so738238wib.17
-        for <linux-crypto@vger.kernel.org>; Sun, 28 Sep 2014 13:24:25 -0700 (PDT)
+	Sun, 28 Sep 2014 16:24:28 -0400
+Received: by mail-wg0-f49.google.com with SMTP id x12so12197008wgg.20
+        for <linux-crypto@vger.kernel.org>; Sun, 28 Sep 2014 13:24:27 -0700 (PDT)
 In-Reply-To: <1411935841-11294-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The defines for xkey3, xkey6 and xkey9 are not used in the code. They're
-probably left overs from merging the three source files for 128, 192 and
-256 bit AES. They can safely be removed.
+This reverts commit 7da4b29d496b1389d3a29b55d3668efecaa08ebd.
+
+Now, that the issue is fixed, we can re-enable the code.
 
 Signed-off-by: Mathias Krause <minipli@googlemail.com>
 Cc: Chandramouli Narayanan <mouli@linux.intel.com>
 ---
- arch/x86/crypto/aes_ctrby8_avx-x86_64.S |    3 ---
- 1 file changed, 3 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
-index a029bc744244..2df2a0298f5a 100644
---- a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
-+++ b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
-@@ -79,9 +79,6 @@
- #define xcounter	%xmm8
- #define xbyteswap	%xmm9
- #define xkey0		%xmm10
--#define xkey3		%xmm11
--#define xkey6		%xmm12
--#define xkey9		%xmm13
- #define xkey4		%xmm11
- #define xkey8		%xmm12
- #define xkey12		%xmm13
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index a7ccd57f19e4..888950f29fd9 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -481,7 +481,7 @@ static void ctr_crypt_final(struct crypto_aes_ctx *ctx,
+ 	crypto_inc(ctrblk, AES_BLOCK_SIZE);
+ }
+ 
+-#if 0	/* temporary disabled due to failing crypto tests */
++#ifdef CONFIG_AS_AVX
+ static void aesni_ctr_enc_avx_tfm(struct crypto_aes_ctx *ctx, u8 *out,
+ 			      const u8 *in, unsigned int len, u8 *iv)
+ {
+@@ -1522,7 +1522,7 @@ static int __init aesni_init(void)
+ 		aesni_gcm_dec_tfm = aesni_gcm_dec;
+ 	}
+ 	aesni_ctr_enc_tfm = aesni_ctr_enc;
+-#if 0	/* temporary disabled due to failing crypto tests */
++#ifdef CONFIG_AS_AVX
+ 	if (cpu_has_avx) {
+ 		/* optimize performance of ctr mode encryption transform */
+ 		aesni_ctr_enc_tfm = aesni_ctr_enc_avx_tfm;
 -- 
 1.7.10.4
