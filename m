@@ -1,92 +1,53 @@
-From: Daniel Borkmann <dborkman@redhat.com>
-Subject: Re: [PATCH v2] crypto: memzero_explicit - make sure to clear out
- sensitive data
-Date: Thu, 25 Sep 2014 22:23:40 +0200
-Message-ID: <542479CC.1080602@redhat.com>
-References: <1410125018-27277-1-git-send-email-dborkman@redhat.com> <20140915115239.GA5057@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	hannes@stressinduktion.org, linux-crypto@vger.kernel.org,
-	gmazyland@gmail.com, Julia Lawall <julia.lawall@lip6.fr>
-To: tytso@mit.edu
+From: Mathias Krause <minipli@googlemail.com>
+Subject: [PATCH 0/3] crypto: aesni - fix and re-enable "by8" CTR variant
+Date: Sun, 28 Sep 2014 22:23:58 +0200
+Message-ID: <1411935841-11294-1-git-send-email-minipli@googlemail.com>
+Cc: Chandramouli Narayanan <mouli@linux.intel.com>,
+	linux-crypto@vger.kernel.org,
+	Mathias Krause <minipli@googlemail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42924 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750843AbaIYUYB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 25 Sep 2014 16:24:01 -0400
-In-Reply-To: <20140915115239.GA5057@gondor.apana.org.au>
+Received: from mail-we0-f181.google.com ([74.125.82.181]:62804 "EHLO
+	mail-we0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751632AbaI1UYX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 28 Sep 2014 16:24:23 -0400
+Received: by mail-we0-f181.google.com with SMTP id u57so427855wes.26
+        for <linux-crypto@vger.kernel.org>; Sun, 28 Sep 2014 13:24:22 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Ted,
+This series fixes the counter overflow handling of the "by8" CTR variant
+which lead to failing cryptomgr tests and, in turn, disabling this
+optimization with commit 7da4b29d496b.
 
-On 09/15/2014 01:52 PM, Herbert Xu wrote:
-> On Sun, Sep 07, 2014 at 11:23:38PM +0200, Daniel Borkmann wrote:
->> Recently, in commit 13aa93c70e71 ("random: add and use memzero_explicit()
->> for clearing data"), we have found that GCC may optimize some memset()
->> cases away when it detects a stack variable is not being used anymore
->> and going out of scope. This can happen, for example, in cases when we
->> are clearing out sensitive information such as keying material or any
->> e.g. intermediate results from crypto computations, etc.
->>
->> With the help of Coccinelle, we can figure out and fix such occurences
->> in the crypto subsytem as well. Julia Lawall provided the following
->> Coccinelle program:
->>
->>    @@
->>    type T;
->>    identifier x;
->>    @@
->>
->>    T x;
->>    ... when exists
->>        when any
->>    -memset
->>    +memzero_explicit
->>       (&x,
->>    -0,
->>       ...)
->>    ... when != x
->>        when strict
->>
->>    @@
->>    type T;
->>    identifier x;
->>    @@
->>
->>    T x[...];
->>    ... when exists
->>        when any
->>    -memset
->>    +memzero_explicit
->>       (x,
->>    -0,
->>       ...)
->>    ... when != x
->>        when strict
->>
->> Therefore, make use of the drop-in replacement memzero_explicit() for
->> exactly such cases instead of using memset().
->>
->> Signed-off-by: Daniel Borkmann <dborkman@redhat.com>
->> Cc: Julia Lawall <julia.lawall@lip6.fr>
->> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->> Cc: Theodore Ts'o <tytso@mit.edu>
->> Cc: Hannes Frederic Sowa <hannes@stressinduktion.org>
->
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> Thanks,
+Patch 1 fixes the bug, patch 2 removes some unused defines (left overs
+from the unification of the initial source files) and patch 3 re-enables
+the code.
 
-Sorry for the noise, but given Herbert acked the patch and in the random
-tree the infrastructure is at current present to fix this security issue,
-could you take it through random tree as originally proposed between the
-"---" and diffstat line of this patch [1]?
+The fix was tested by me, doing tcrypt and dm-crypt tests. It was also
+tested by Romain who initially reported the issue.
 
-Thanks a lot,
+The patches should go on top of crypto-2.6.git.
 
-Daniel
+In case this doesn't get merged for v3.17, patches 1 and 3 may be cc'ed
+to stable to propagate the fix.
 
-  [1] http://www.spinics.net/lists/linux-crypto/msg11965.html
+Please apply!
+
+Thanks,
+Mathias
+
+
+Mathias Krause (3):
+  crypto: aesni - fix counter overflow handling in "by8" variant
+  crypto: aesni - remove unused defines in "by8" variant
+  Revert "crypto: aesni - disable "by8" AVX CTR optimization"
+
+ arch/x86/crypto/aes_ctrby8_avx-x86_64.S |   20 +++++++++++++++-----
+ arch/x86/crypto/aesni-intel_glue.c      |    4 ++--
+ 2 files changed, 17 insertions(+), 7 deletions(-)
+
+-- 
+1.7.10.4
