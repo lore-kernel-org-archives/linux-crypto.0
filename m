@@ -1,93 +1,98 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: [PATCH 1/3] crypto: aesni - fix counter overflow handling in "by8" variant
-Date: Sun, 28 Sep 2014 22:23:59 +0200
-Message-ID: <1411935841-11294-2-git-send-email-minipli@googlemail.com>
-References: <1411935841-11294-1-git-send-email-minipli@googlemail.com>
-Cc: Chandramouli Narayanan <mouli@linux.intel.com>,
-	linux-crypto@vger.kernel.org,
-	Mathias Krause <minipli@googlemail.com>,
-	Romain Francoise <romain@orebokech.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
+From: David Miller <davem@davemloft.net>
+Subject: inconsistent handling of unaligned hash inputs
+Date: Wed, 01 Oct 2014 01:10:34 -0400 (EDT)
+Message-ID: <20141001.011034.1533102319982018632.davem@davemloft.net>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: bpicco@meloft.net, bob.picco@oracle.com, sparclinux@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f169.google.com ([74.125.82.169]:42217 "EHLO
-	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751632AbaI1UYY (ORCPT
+Received: from shards.monkeyblade.net ([149.20.54.216]:54420 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750750AbaJAFKi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 28 Sep 2014 16:24:24 -0400
-Received: by mail-we0-f169.google.com with SMTP id k48so12024423wev.0
-        for <linux-crypto@vger.kernel.org>; Sun, 28 Sep 2014 13:24:23 -0700 (PDT)
-In-Reply-To: <1411935841-11294-1-git-send-email-minipli@googlemail.com>
+	Wed, 1 Oct 2014 01:10:38 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The "by8" CTR AVX implementation fails to propperly handle counter
-overflows. That was the reason it got disabled in commit 7da4b29d496b
-("crypto: aesni - disable "by8" AVX CTR optimization").
 
-Fix the overflow handling by incrementing the counter block as a double
-quad word, i.e. a 128 bit, and testing for overflows afterwards. We need
-to use VPTEST to do so as VPADD* does not set the flags itself and
-silently drops the carry bit.
+Bob Picco sent me a bootup trace showing that we've started to get
+unaligned accesses when the generic sha256 is tested on sparc64.  I
+believe this is introduced by:
 
-As this change adds branches to the hot path, minor performance
-regressions  might be a side effect. But, OTOH, we now have a conforming
-implementation -- the preferable goal.
+commit 950e4e1c1b334c4975b91106f23fd343be3eb7a0
+Author: Jussi Kivilinna <jussi.kivilinna@iki.fi>
+Date:   Sat Apr 12 15:35:29 2014 +0300
 
-A tcrypt test on a SandyBridge system (i7-2620M) showed almost identical
-numbers for the old and this version with differences within the noise
-range. A dm-crypt test with the fixed version gave even slightly better
-results for this version. So the performance impact might not be as big
-as expected.
+    crypto: testmgr - add empty and large test vectors for SHA-1, SHA-224, SHA-256, SHA-384 and SHA-512
 
-Tested-by: Romain Francoise <romain@orebokech.com>
-Signed-off-by: Mathias Krause <minipli@googlemail.com>
-Cc: Chandramouli Narayanan <mouli@linux.intel.com>
----
- arch/x86/crypto/aes_ctrby8_avx-x86_64.S |   17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+That change looks perfectly correct, it's just adding new legitimate
+tests to run, but when I went to look to see how unaligned inputs are
+handled I see:
 
-diff --git a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
-index f091f122ed24..a029bc744244 100644
---- a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
-+++ b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
-@@ -108,6 +108,10 @@
+1) SHA1 uses get_unaligned_be32()
+2) SHA256/SHA224 uses direct u32 derefencing
+3) SHA384/SHA512 likewise
+4) MD5 always operates on the md5 context's mctx->block which is
+   u32 aligned.
+
+The sparc64 assembler that uses the chip's crypto instructions doesn't
+have this problem because we have two code paths, one for aligned
+data and one for unaligned data, in each routine.
+
+Anyways, I suspect that we need to use get_unaligned_be{32,64}() in
+generic SHA256 and SHA512.
+
+The following seems to fix things for me:
+
+====================
+crypto: Handle unaligned input data in generic sha256 and sha512.
+
+Like SHA1, use get_unaligned_be*() on the raw input data.
+
+Reported-by: Bob Picco <bob.picco@oracle.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+
+diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
+index 5433667..0bb5583 100644
+--- a/crypto/sha256_generic.c
++++ b/crypto/sha256_generic.c
+@@ -24,6 +24,7 @@
+ #include <linux/types.h>
+ #include <crypto/sha.h>
+ #include <asm/byteorder.h>
++#include <asm/unaligned.h>
  
- byteswap_const:
- 	.octa 0x000102030405060708090A0B0C0D0E0F
-+ddq_low_msk:
-+	.octa 0x0000000000000000FFFFFFFFFFFFFFFF
-+ddq_high_add_1:
-+	.octa 0x00000000000000010000000000000000
- ddq_add_1:
- 	.octa 0x00000000000000000000000000000001
- ddq_add_2:
-@@ -169,7 +173,12 @@ ddq_add_8:
- 	.rept (by - 1)
- 		club DDQ_DATA, i
- 		club XDATA, i
--		vpaddd	var_ddq_add(%rip), xcounter, var_xdata
-+		vpaddq	var_ddq_add(%rip), xcounter, var_xdata
-+		vptest	ddq_low_msk(%rip), var_xdata
-+		jnz 1f
-+		vpaddq	ddq_high_add_1(%rip), var_xdata, var_xdata
-+		vpaddq	ddq_high_add_1(%rip), xcounter, xcounter
-+		1:
- 		vpshufb	xbyteswap, var_xdata, var_xdata
- 		.set i, (i +1)
- 	.endr
-@@ -178,7 +187,11 @@ ddq_add_8:
+ static inline u32 Ch(u32 x, u32 y, u32 z)
+ {
+@@ -42,7 +43,7 @@ static inline u32 Maj(u32 x, u32 y, u32 z)
  
- 	vpxor	xkey0, xdata0, xdata0
- 	club DDQ_DATA, by
--	vpaddd	var_ddq_add(%rip), xcounter, xcounter
-+	vpaddq	var_ddq_add(%rip), xcounter, xcounter
-+	vptest	ddq_low_msk(%rip), xcounter
-+	jnz	1f
-+	vpaddq	ddq_high_add_1(%rip), xcounter, xcounter
-+	1:
+ static inline void LOAD_OP(int I, u32 *W, const u8 *input)
+ {
+-	W[I] = __be32_to_cpu( ((__be32*)(input))[I] );
++	W[I] = get_unaligned_be32((__u32 *)input + I);
+ }
  
- 	.set i, 1
- 	.rept (by - 1)
--- 
-1.7.10.4
+ static inline void BLEND_OP(int I, u32 *W)
+diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
+index 6ed124f..6dde57d 100644
+--- a/crypto/sha512_generic.c
++++ b/crypto/sha512_generic.c
+@@ -20,6 +20,7 @@
+ #include <crypto/sha.h>
+ #include <linux/percpu.h>
+ #include <asm/byteorder.h>
++#include <asm/unaligned.h>
+ 
+ static inline u64 Ch(u64 x, u64 y, u64 z)
+ {
+@@ -68,7 +69,7 @@ static const u64 sha512_K[80] = {
+ 
+ static inline void LOAD_OP(int I, u64 *W, const u8 *input)
+ {
+-	W[I] = __be64_to_cpu( ((__be64*)(input))[I] );
++	W[I] = get_unaligned_be64((__u64 *)input + I);
+ }
+ 
+ static inline void BLEND_OP(int I, u64 *W)
