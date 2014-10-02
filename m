@@ -1,48 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/3] crypto: aesni - fix and re-enable "by8" CTR variant
-Date: Thu, 2 Oct 2014 15:15:12 +0800
-Message-ID: <20141002071512.GB26145@gondor.apana.org.au>
-References: <1411935841-11294-1-git-send-email-minipli@googlemail.com>
+Subject: Re: inconsistent handling of unaligned hash inputs
+Date: Thu, 2 Oct 2014 15:15:32 +0800
+Message-ID: <20141002071532.GA26288@gondor.apana.org.au>
+References: <20141002003353.GA23780@gondor.apana.org.au>
+ <20141001.180614.1843735881125772362.davem@davemloft.net>
+ <CAA-+O6EDQP1x_5Wzr_K66xUBRNrFMroYEhGTKPH1ViX=5uzNRA@mail.gmail.com>
+ <20141001.223557.1385169137486165396.davem@davemloft.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Chandramouli Narayanan <mouli@linux.intel.com>,
-	linux-crypto@vger.kernel.org
-To: Mathias Krause <minipli@googlemail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48560 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750987AbaJBHPY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Oct 2014 03:15:24 -0400
+Cc: bob.picco@oracle.com, linux-crypto@vger.kernel.org,
+	sparclinux@vger.kernel.org, bpicco@meloft.net
+To: David Miller <davem@davemloft.net>
+Return-path: <sparclinux-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1411935841-11294-1-git-send-email-minipli@googlemail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20141001.223557.1385169137486165396.davem@davemloft.net>
+Sender: sparclinux-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Sun, Sep 28, 2014 at 10:23:58PM +0200, Mathias Krause wrote:
-> This series fixes the counter overflow handling of the "by8" CTR variant
-> which lead to failing cryptomgr tests and, in turn, disabling this
-> optimization with commit 7da4b29d496b.
-> 
-> Patch 1 fixes the bug, patch 2 removes some unused defines (left overs
-> from the unification of the initial source files) and patch 3 re-enables
-> the code.
-> 
-> The fix was tested by me, doing tcrypt and dm-crypt tests. It was also
-> tested by Romain who initially reported the issue.
-> 
-> The patches should go on top of crypto-2.6.git.
-> 
-> In case this doesn't get merged for v3.17, patches 1 and 3 may be cc'ed
-> to stable to propagate the fix.
-> 
-> Please apply!
+On Wed, Oct 01, 2014 at 10:35:57PM -0400, David Miller wrote:
+>
+> Therefore, for now, it's probably best to use my patch, and use
+> get_unaligned_*() consistently throughout the sha* implementations.
 
-All applied.  Thanks!
-
-I'll hold off on the stable propagation until this is in the tree
-and has been tested for a while first.
+OK I've applied your patch to cryptodev.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
