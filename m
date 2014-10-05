@@ -1,29 +1,31 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: inconsistent handling of unaligned hash inputs
-Date: Thu, 2 Oct 2014 15:15:32 +0800
-Message-ID: <20141002071532.GA26288@gondor.apana.org.au>
-References: <20141002003353.GA23780@gondor.apana.org.au>
- <20141001.180614.1843735881125772362.davem@davemloft.net>
- <CAA-+O6EDQP1x_5Wzr_K66xUBRNrFMroYEhGTKPH1ViX=5uzNRA@mail.gmail.com>
- <20141001.223557.1385169137486165396.davem@davemloft.net>
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: memset() in crypto code?
+Date: Sat, 4 Oct 2014 23:09:40 -0400
+Message-ID: <CACXcFmkQSZrQHqmcauAvpyexkjL5YpNKa-O0Or1VMuU4hawzkA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: bob.picco@oracle.com, linux-crypto@vger.kernel.org,
-	sparclinux@vger.kernel.org, bpicco@meloft.net
-To: David Miller <davem@davemloft.net>
-Return-path: <sparclinux-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20141001.223557.1385169137486165396.davem@davemloft.net>
-Sender: sparclinux-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ig0-f179.google.com ([209.85.213.179]:64268 "EHLO
+	mail-ig0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751010AbaJEDJl (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 4 Oct 2014 23:09:41 -0400
+Received: by mail-ig0-f179.google.com with SMTP id h18so1173655igc.6
+        for <linux-crypto@vger.kernel.org>; Sat, 04 Oct 2014 20:09:40 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Oct 01, 2014 at 10:35:57PM -0400, David Miller wrote:
->
-> Therefore, for now, it's probably best to use my patch, and use
-> get_unaligned_*() consistently throughout the sha* implementations.
+There was recently a patch to the random driver to replace memset()
+because, according to the submitter, gcc sometimes optimises memset()
+away which might leave data unnecessarily exposed. The solution
+suggested was a function called memzero_explicit(). There was a fair
+bit of discussion and the patch was accepted.
 
-OK I've applied your patch to cryptodev.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+In the crypto directory of the kernel source I have:
+
+$ grep memset *.c | wc -l
+133
+$
+
+I strongly suspect some of these should be fixed.
