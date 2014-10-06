@@ -1,39 +1,34 @@
-From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Subject: [PATCH v2 0/2] crypto: sahara - SHA1/256 support
-Date: Mon,  6 Oct 2014 16:43:43 +0200
-Message-ID: <1412606625-828-1-git-send-email-s.trumtrar@pengutronix.de>
-Cc: linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-	Steffen Trumtrar <s.trumtrar@pengutronix.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:50237 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752800AbaJFOoS (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 6 Oct 2014 10:44:18 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Masanari Iida <standby24x7@gmail.com>
+Subject: [PATCH] crypto: Remove unnecessary KERN_INFO from testmgr.c
+Date: Tue,  7 Oct 2014 00:37:54 +0900
+Message-ID: <1412609874-22311-1-git-send-email-standby24x7@gmail.com>
+Cc: Masanari Iida <standby24x7@gmail.com>
+To: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi!
+This patch remove unncessary KERN_INFO from pr_info within testmgr.c
 
-This series adds support for the SAHARA crypto module on i.MX53 in 1/2
-and than adds support for SHA1/256 in 2/2.
+Signed-off-by: Masanari Iida <standby24x7@gmail.com>
+---
+ crypto/testmgr.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Changes since last version:
-	- save the hash state in the sahara request struct
-	- fixed the hash remainder calculation
-
-Regards,
-Steffen
-
-Steffen Trumtrar (2):
-  crypto: sahara - add support for i.MX53
-  crypto: sahara - add support for SHA1/256
-
- .../devicetree/bindings/crypto/fsl-imx-sahara.txt  |   2 +-
- drivers/crypto/sahara.c                            | 706 ++++++++++++++++++++-
- 2 files changed, 684 insertions(+), 24 deletions(-)
-
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 9459dfd..9d57e3f 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3710,8 +3710,7 @@ test_done:
+ 		panic("%s: %s alg self test failed in fips mode!\n", driver, alg);
+ 
+ 	if (fips_enabled && !rc)
+-		pr_info(KERN_INFO "alg: self-tests for %s (%s) passed\n",
+-			driver, alg);
++		pr_info("alg: self-tests for %s (%s) passed\n", driver, alg);
+ 
+ 	return rc;
+ 
 -- 
-2.1.0
+2.1.1.273.g97b8860
