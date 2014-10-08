@@ -1,47 +1,42 @@
-From: Prarit Bhargava <prarit@redhat.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
 Subject: Re: [PATCH 2/2] crypto: qat - Enforce valid numa configuration.
-Date: Wed, 08 Oct 2014 15:01:26 -0400
-Message-ID: <54358A06.2080605@redhat.com>
-References: <20141008173750.13714.49713.stgit@tstruk-mobl1> <20141008173853.13714.47458.stgit@tstruk-mobl1> <54357B02.8080008@redhat.com> <54357E5B.2090401@intel.com> <54358400.5060405@redhat.com> <54358918.7030808@intel.com>
+Date: Wed, 08 Oct 2014 12:25:58 -0700
+Message-ID: <54358FC6.8060500@intel.com>
+References: <20141008173750.13714.49713.stgit@tstruk-mobl1> <20141008173853.13714.47458.stgit@tstruk-mobl1> <54357B02.8080008@redhat.com> <54357E5B.2090401@intel.com> <54358400.5060405@redhat.com> <54358918.7030808@intel.com> <54358A06.2080605@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Cc: herbert@gondor.apana.org.au, bruce.w.allan@intel.com,
 	qat-linux@intel.com, john.griffin@intel.com,
 	linux-crypto@vger.kernel.org, naleksan@redhat.com,
 	davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+To: Prarit Bhargava <prarit@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:12583 "EHLO mx1.redhat.com"
+Received: from mga01.intel.com ([192.55.52.88]:56304 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752504AbaJHTBj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Oct 2014 15:01:39 -0400
-In-Reply-To: <54358918.7030808@intel.com>
+	id S1754642AbaJHT1y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Oct 2014 15:27:54 -0400
+In-Reply-To: <54358A06.2080605@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On 10/08/2014 12:01 PM, Prarit Bhargava wrote:
+> No that isn't correct.  dev_to_node() will return the node the device is
+> connected to.
 
+include/linux/device.h:
 
-On 10/08/2014 02:57 PM, Tadeusz Struk wrote:
-> On 10/08/2014 11:35 AM, Prarit Bhargava wrote:
->>> But then how do I know which node I'm physically connected to?
->> The pci_dev maps to the bus which maps to a numa node.  The pci_dev's numa value
->> is copied directly from the bus (or busses depending on how deep it is).
->>
->> I'd argue (strongly) that the pci_dev's numa ID better be correct o/w that is a
->> FW bug (and a bad one at that these days).
->>
->> dev_to_node() should return the correct value.
-> 
-> I'm not saying that the dev_to_node() returns incorrect value. It will
-> always return the closest numa node for the given device.
+static inline int dev_to_node(struct device *dev)
+{
+  return dev->numa_node;
+}
 
-No that isn't correct.  dev_to_node() will return the node the device is
-connected to.
+struct device {
+.....
+  int numa_node; /* NUMA node this device is close to */
+...
+};
 
-> What we want to enforce is that the closest numa node is the node that
-> the device is physically connected to. In case if the closest numa node
-> is the remote node we don't want to use this accelerator.
-> 
-
-P.
+In case when there are two nodes and only node 0 has memory,
+dev->numa_node will be 0 even though the device will be connected to the
+pci root port of node 1.
