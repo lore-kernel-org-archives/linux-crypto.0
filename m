@@ -1,36 +1,40 @@
-From: Daniel Borkmann <dborkman@redhat.com>
-Subject: Re: memset() in crypto code?
-Date: Wed, 08 Oct 2014 09:18:09 +0200
-Message-ID: <5434E531.10603@redhat.com>
-References: <CACXcFmkQSZrQHqmcauAvpyexkjL5YpNKa-O0Or1VMuU4hawzkA@mail.gmail.com> <20141006174403.GB14468@titan.lakedaemon.net> <CACXcFmmNfgtHjwX7kJP8EKR01AMi-yujTZ55oTghJ7+J-eSzDA@mail.gmail.com> <5432E72A.3070309@redhat.com> <CACXcFmkhZSkT1_K07_bM-MREFENVvrwDrhOtQ=1XQuK-jy3WXQ@mail.gmail.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] crypto, qat, use generic numa functions
+Date: Wed, 08 Oct 2014 08:50:46 -0700
+Message-ID: <54355D56.8040908@intel.com>
+References: <1412727129-14467-1-git-send-email-prarit@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org
-To: Sandy Harris <sandyinchina@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Bruce Allan <bruce.w.allan@intel.com>,
+	John Griffin <john.griffin@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org
+To: Prarit Bhargava <prarit@redhat.com>, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44188 "EHLO mx1.redhat.com"
+Received: from mga03.intel.com ([134.134.136.65]:47716 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751191AbaJHHSO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Oct 2014 03:18:14 -0400
-In-Reply-To: <CACXcFmkhZSkT1_K07_bM-MREFENVvrwDrhOtQ=1XQuK-jy3WXQ@mail.gmail.com>
+	id S1751125AbaJHPwp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 8 Oct 2014 11:52:45 -0400
+In-Reply-To: <1412727129-14467-1-git-send-email-prarit@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 10/08/2014 04:30 AM, Sandy Harris wrote:
-> I have started a thread about this on the gcc help mailing list
-> https://gcc.gnu.org/ml/gcc-help/2014-10/msg00047.html
+Hi Prarit,
+On 10/07/2014 05:12 PM, Prarit Bhargava wrote:
+> The method in which the qat code determines the numa node for memory
+> allocations is a bit clunky.  On 2 socket, single node systems it is
+> possible that adf_get_dev_node_id() returns node 1, even though node 1
+> doesn't exist.
+> 
+> This code transitions the qat code to the generic numa functions.
+> Changing adf_get_dev_node_id() to a simple call to dev_get_node() results
+> in a change to the adf_accel_dev struct as well.
 
-Great, perhaps you want to pass a patch proposal to gcc folks?
-
-> We might consider replacinging memzero_explicit with memset_s() since
-> that is in the C!! standard, albeit I think as optional. IBM, Apple,
-> NetBSD, ... have that.
-> https://mail-index.netbsd.org/tech-userlevel/2012/02/24/msg006125.html
-
-The patch you point to for NetBSD does nothing else what memzero_explicit()
-or bzero_explicit() variants already internally do, only that they're
-discussing about whether to adopt it or not in their user space libc ...
-
-Cheers,
-Daniel
+The problem with that is we don't want to use any valid numa node, but
+the node we are connected to or we don't want to use the accelerator at
+all. Otherwise, when the first valid numa node happens to be the remote
+node the dma transactions we be slow and instead of accelerating we will
+slow things down.
+A patch that enforces this is on it's way.
