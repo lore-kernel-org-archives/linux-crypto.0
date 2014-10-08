@@ -1,194 +1,206 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Update for 3.18
-Date: Tue, 7 Oct 2014 21:18:26 +0800
-Message-ID: <20141007131826.GA29688@gondor.apana.org.au>
-References: <20120106041250.GA7759@gondor.apana.org.au>
- <20121004095357.GA11777@gondor.apana.org.au>
- <20121214103156.GA5840@gondor.apana.org.au>
- <20130223023331.GA11002@gondor.apana.org.au>
- <20130907035544.GA22658@gondor.apana.org.au>
- <20131107080131.GA32307@gondor.apana.org.au>
- <20140123115319.GA20602@gondor.apana.org.au>
- <20140401100001.GA12386@gondor.apana.org.au>
- <20140605062336.GA14440@gondor.apana.org.au>
- <20140804130339.GA1178@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Peter Zijlstra <peterz@infradead.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
+From: Prarit Bhargava <prarit@redhat.com>
+Subject: [PATCH] crypto, qat, use generic numa functions
+Date: Tue,  7 Oct 2014 20:12:09 -0400
+Message-ID: <1412727129-14467-1-git-send-email-prarit@redhat.com>
+Cc: Prarit Bhargava <prarit@redhat.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	Bruce Allan <bruce.w.allan@intel.com>,
+	John Griffin <john.griffin@intel.com>, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org
+To: linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60696 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751795AbaJGNTR (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Oct 2014 09:19:17 -0400
-Content-Disposition: inline
-In-Reply-To: <20140804130339.GA1178@gondor.apana.org.au>
+Received: from mx1.redhat.com ([209.132.183.28]:33000 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755286AbaJHAMZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 7 Oct 2014 20:12:25 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+While testing, the following panic was seen:
 
-Here is the crypto update for 3.18:
+IP: [<ffffffff8115b8d7>] __alloc_pages_nodemask+0x97/0x420
+PGD 0
+Oops: 0000 [#1] SMP
+Modules linked in: aesni_intel ptp lrw qat_dh895xcc(+) intel_qat pps_core i2c_algo_bit authenc gf128mul iTCO_wdt ioatdma glue_helper sb_edac i2c_i801 ablk_helper serio_raw iTCO_vendor_support pcspkr edac_core shpchp i2c_core cryptd dca lpc_ich mfd_core wmi xfs libcrc32c sd_mod crc_t10dif crct10dif_common ahci libahci libata dm_mirror dm_region_hash dm_log dm_mod
+CPU: 0 PID: 1235 Comm: systemd-udevd Not tainted 3.10.0-165.el7.x86_64 #1
+Hardware name: Intel Corporation SandyBridge Platform/To be filled by O.E.M., BIOS CCFRCLC0.019.1308201516 08/20/2013
+task: ffff88006d068000 ti: ffff88006ca0c000 task.ti: ffff88006ca0c000
+RIP: 0010:[<ffffffff8115b8d7>]  [<ffffffff8115b8d7>] __alloc_pages_nodemask+0x97/0x420
+RSP: 0018:ffff88006ca0f928  EFLAGS: 00010246
+RAX: 0000000000002000 RBX: 0000000000000000 RCX: ffff88006ca0ffd8
+RDX: 0000000000000000 RSI: 0000000000000002 RDI: 00000000002052d0
+RBP: ffff88006ca0f9c8 R08: 0000000000000008 R09: 0000000000000002
+R10: 0000000000000068 R11: ffffffffffffffc4 R12: 00000000002052d0
+R13: 0000000000000000 R14: 0000000000000002 R15: 0000000000000000
+FS:  00007f999a6f9880(0000) GS:ffff880076a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000002008 CR3: 000000006c916000 CR4: 00000000001407f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Stack:
+ ffff88007ac07700 ffff88006ca0f940 ffffffff811a43d9 ffff88006ca0fa00
+ ffffffff811a4a0a ffff88007ac00e30 ffff88007ac00e10 ffff880076a17
+ 0000000000000000 ffff880000000002 0000000000002000 00000001000080d0
+Call Trace:
+ [<ffffffff811a43d9>] ? discard_slab+0x39/0x50
+ [<ffffffff811a4a0a>] ? deactivate_slab+0x35a/0x3c0
+ [<ffffffff811a3521>] new_slab+0x91/0x300
+ [<ffffffff815ee9ed>] __slab_alloc+0x2bb/0x482
+ [<ffffffff8101b923>] ? native_sched_clock+0x13/0x80
+ [<ffffffff8101b999>] ? sched_clock+0x9/0x10
+ [<ffffffffa01b8177>] ? adf_probe+0xb7/0x5a0 [qat_dh895xcc]
+ [<ffffffff812cce6f>] ? idr_get_empty_slot+0x16f/0x3c0
+ [<ffffffff812cce6f>] ? idr_get_empty_slot+0x16f/0x3c0
+ [<ffffffff811a690b>] kmem_cache_alloc_node_trace+0x9b/0x220
+ [<ffffffffa01b8177>] adf_probe+0xb7/0x5a0 [qat_dh895xcc]
+ [<ffffffff81237bd2>] ? sysfs_addrm_finish+0x42/0xe0
+ [<ffffffff812379b1>] ? __sysfs_add_one+0x61/0x100
+ [<ffffffff812fee25>] local_pci_probe+0x45/0xa0
+ [<ffffffff81300295>] ? pci_match_device+0xc5/0xd0
+ [<ffffffff813003d9>] pci_device_probe+0xf9/0x150
+ [<ffffffff813caee7>] driver_probe_device+0x87/0x390
+ [<ffffffff813cb2c3>] __driver_attach+0x93/0xa0
+ [<ffffffff813cb230>] ? __device_attach+0x40/0x40
+ [<ffffffff813c8c73>] bus_for_each_dev+0x73/0xc0
+ [<ffffffff813ca93e>] driver_attach+0x1e/0x20
+ [<ffffffff813ca490>] bus_add_driver+0x200/0x2d0
+ [<ffffffff813cb944>] driver_register+0x64/0xf0
+ [<ffffffff812ffe95>] __pci_register_driver+0xa5/0xc0
+ [<ffffffffa01be000>] ? 0xffffffffa01bdfff
+ [<ffffffffa01be03a>] adfdrv_init+0x3a/0x1000 [qat_dh895xcc]
+ [<ffffffff810020b8>] do_one_initcall+0xb8/0x230
+ [<ffffffff810da32a>] load_module+0x131a/0x1b20
+ [<ffffffff812ee3e0>] ? ddebug_proc_write+0xf0/0xf0
+ [<ffffffff810d68c3>] ? copy_module_from_fd.isra.43+0x53/0x150
+ [<ffffffff810dace6>] SyS_finit_module+0xa6/0xd0
+ [<ffffffff81601a69>] system_call_fastpath+0x16/0x1b
+Code: c1 eb 02 c1 e8 13 83 e3 02 83 e0 01 09 c3 44 23 25 cf 22 8a 00 48 c7 45 c0 00 00 00 00 41 f6 c4 10 0f 85 55 02 00 00 48 8b 45 b0 <48> 83 78 08 00 0f 84 a3 01 00 00 0f 1f 44 00 00 48 8b 45 b0 44
 
-* Add multibuffer infrastructure:
- . Add single_task_running scheduler helper, OKed by Peter on lkml.
-* Add SHA1 multibuffer implementation for AVX2.
-* Reenable "by8" AVX CTR optimisation after fixing counter overflow.
-* Add APM X-Gene SoC RNG support.
-* SHA256/SHA512 now handles unaligned input correctly.
-* Set lz4 decompressed length correctly.
-* Fix algif socket buffer allocation failure for 64K page machines.
-* Misc fixes.
+The method in which the qat code determines the numa node for memory
+allocations is a bit clunky.  On 2 socket, single node systems it is
+possible that adf_get_dev_node_id() returns node 1, even though node 1
+doesn't exist.
 
+This code transitions the qat code to the generic numa functions.
+Changing adf_get_dev_node_id() to a simple call to dev_get_node() results
+in a change to the adf_accel_dev struct as well.  In addition to that
+change, qat_crypto_get_instance_node() must check for "any node" as a
+valid numa_node value.
 
-Please pull from
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Bruce Allan <bruce.w.allan@intel.com>
+Cc: Prarit Bhargava <prarit@redhat.com>
+Cc: John Griffin <john.griffin@intel.com>
+Cc: qat-linux@intel.com
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Prarit Bhargava <prarit@redhat.com>
+---
+ drivers/crypto/qat/qat_common/adf_accel_devices.h |    2 +-
+ drivers/crypto/qat/qat_common/qat_algs.c          |    7 +------
+ drivers/crypto/qat/qat_common/qat_crypto.c        |    4 +++-
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c         |   19 ++-----------------
+ 4 files changed, 7 insertions(+), 25 deletions(-)
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Alex Porosanu (3):
-      crypto: caam - disable RNG oscillator maximum frequency check
-      crypto: caam - change starting entropy delay value
-      crypto: caam - enable raw data instead of von Neumann data
-
-Alexander Gordeev (1):
-      crypto: qat - Use pci_enable_msix_exact() instead of pci_enable_msix()
-
-Cristian Stoica (7):
-      crypto: testmgr - white space fix-ups on test_aead
-      crypto: testmgr - white space removal on __test_hash
-      crypto: testmgr - white space removal on __test_skcipher
-      crypto: testmgr - delay execution of set-up code
-      crypto: testmgr - remove unused function argument
-      crypto: caam - remove duplicated sg copy functions
-      crypto: caam - fix addressing of struct member
-
-David S. Miller (1):
-      crypto: sha - Handle unaligned input data in generic sha256 and sha512.
-
-Feng Kan (3):
-      hwrng: xgene - add support for APM X-Gene SoC RNG support
-      Documentation: rng: Add X-Gene SoC RNG driver documentation
-      arm64: dts: add random number generator dts node to APM X-Gene platform.
-
-Fengguang Wu (2):
-      crypto: mcryptd - mcryptd_flist can be static
-      crypto: sha-mb - sha1_mb_alg_state can be static
-
-Herbert Xu (2):
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
-
-KOVACS Krisztian (2):
-      crypto: lz4,lz4hc - fix decompression
-      crypto: testmgr - add test for lz4 and lz4hc
-
-Mathias Krause (3):
-      crypto: aesni - fix counter overflow handling in "by8" variant
-      crypto: aesni - remove unused defines in "by8" variant
-      Revert "crypto: aesni - disable "by8" AVX CTR optimization"
-
-Nitesh Narayan Lal (1):
-      crypto: caam - Dynamic allocation of addresses for various memory blocks in CAAM.
-
-Ondrej Kozina (1):
-      crypto: algif - avoid excessive use of socket buffer in skcipher
-
-Rasmus Villemoes (1):
-      crypto: mv_cesa - Add missing #define
-
-Stephan Mueller (10):
-      crypto: drbg - replace int2byte with cpu_to_be
-      crypto: drbg - kzfree does not need a check for NULL pointer
-      crypto: drbg - remove superflowous checks
-      crypto: drbg - remove superflowous memset(0)
-      crypto: drbg - use kmalloc instead of kzalloc for V and C
-      crypto: drbg - remove unnecessary sanity checks
-      crypto: drbg - remove configuration of fixed values
-      crypto: drbg - remove unnecessary sanity check for shadow state
-      crypto: drbg - fix sparse warning for cpu_to_be[32|64]
-      crypto: drbg - fix maximum value checks on 32 bit systems
-
-Sudip Mukherjee (1):
-      hwrng: printk replacement
-
-Tadeusz Struk (2):
-      crypto: qat - Fix typo in name of tasklet_struct
-      crypto: qat - Removed unneeded partial state
-
-Ted Percival (1):
-      crypto: mcryptd - Fix typos in CRYPTO_MCRYPTD description
-
-Tim Chen (7):
-      crypto: hash - initialize entry len for null input in crypto hash sg list walk
-      sched: Add function single_task_running to let a task check if it is the only task running on a cpu
-      crypto: sha-mb - multibuffer crypto infrastructure
-      crypto: sha-mb - SHA1 multibuffer algorithm data structures
-      crypto: sha-mb - SHA1 multibuffer submit and flush routines for AVX2
-      crypto: sha-mb - SHA1 multibuffer crypto computation (x8 AVX2)
-      crypto: sha-mb - SHA1 multibuffer job manager and glue code
-
-Wei Yongjun (1):
-      crypto: qat - Fix return value check in adf_chr_drv_create()
-
- Documentation/devicetree/bindings/rng/apm,rng.txt  |   17 +
- arch/arm64/boot/dts/apm-storm.dtsi                 |   21 +
- arch/x86/crypto/Makefile                           |    1 +
- arch/x86/crypto/aes_ctrby8_avx-x86_64.S            |   20 +-
- arch/x86/crypto/aesni-intel_glue.c                 |    4 +-
- arch/x86/crypto/sha-mb/Makefile                    |   11 +
- arch/x86/crypto/sha-mb/sha1_mb.c                   |  935 +++++++++++++++++++
- arch/x86/crypto/sha-mb/sha1_mb_mgr_datastruct.S    |  287 ++++++
- arch/x86/crypto/sha-mb/sha1_mb_mgr_flush_avx2.S    |  327 +++++++
- arch/x86/crypto/sha-mb/sha1_mb_mgr_init_avx2.c     |   64 ++
- arch/x86/crypto/sha-mb/sha1_mb_mgr_submit_avx2.S   |  228 +++++
- arch/x86/crypto/sha-mb/sha1_x8_avx2.S              |  472 ++++++++++
- arch/x86/crypto/sha-mb/sha_mb_ctx.h                |  136 +++
- arch/x86/crypto/sha-mb/sha_mb_mgr.h                |  110 +++
- crypto/Kconfig                                     |   30 +
- crypto/Makefile                                    |    1 +
- crypto/ahash.c                                     |   12 +-
- crypto/algif_skcipher.c                            |    2 +-
- crypto/drbg.c                                      |  130 +--
- crypto/lz4.c                                       |    2 +-
- crypto/lz4hc.c                                     |    2 +-
- crypto/mcryptd.c                                   |  705 ++++++++++++++
- crypto/sha256_generic.c                            |    3 +-
- crypto/sha512_generic.c                            |    3 +-
- crypto/testmgr.c                                   |  966 ++++++++++----------
- crypto/testmgr.h                                   |   66 ++
- drivers/char/hw_random/Kconfig                     |   13 +
- drivers/char/hw_random/Makefile                    |    1 +
- drivers/char/hw_random/amd-rng.c                   |    4 +-
- drivers/char/hw_random/geode-rng.c                 |    4 +-
- drivers/char/hw_random/intel-rng.c                 |   13 +-
- drivers/char/hw_random/pasemi-rng.c                |    2 +-
- drivers/char/hw_random/pseries-rng.c               |    2 +-
- drivers/char/hw_random/via-rng.c                   |    8 +-
- drivers/char/hw_random/xgene-rng.c                 |  423 +++++++++
- drivers/crypto/caam/caamhash.c                     |   28 +-
- drivers/crypto/caam/ctrl.c                         |  138 ++-
- drivers/crypto/caam/intern.h                       |    9 +-
- drivers/crypto/caam/regs.h                         |   51 +-
- drivers/crypto/caam/sg_sw_sec4.h                   |   54 --
- drivers/crypto/mv_cesa.h                           |    1 +
- drivers/crypto/qat/qat_common/adf_ctl_drv.c        |    2 +-
- .../crypto/qat/qat_common/adf_transport_internal.h |    2 +-
- drivers/crypto/qat/qat_common/qat_algs.c           |   66 +-
- drivers/crypto/qat/qat_dh895xcc/adf_isr.c          |   14 +-
- include/crypto/drbg.h                              |   19 +-
- include/crypto/internal/hash.h                     |    9 +
- include/crypto/mcryptd.h                           |  112 +++
- include/linux/sched.h                              |    1 +
- kernel/sched/core.c                                |   12 +
- 50 files changed, 4706 insertions(+), 837 deletions(-)
-
-Thanks,
+diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+index 9282381..025f52f 100644
+--- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+@@ -199,7 +199,7 @@ struct adf_accel_dev {
+ 	struct list_head list;
+ 	struct module *owner;
+ 	uint8_t accel_id;
+-	uint8_t numa_node;
++	int numa_node;
+ 	struct adf_accel_pci accel_pci_dev;
+ } __packed;
+ #endif
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index 59df488..d887074 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -127,11 +127,6 @@ struct qat_alg_session_ctx {
+ 	spinlock_t lock;	/* protects qat_alg_session_ctx struct */
+ };
+ 
+-static int get_current_node(void)
+-{
+-	return cpu_data(current_thread_info()->cpu).phys_proc_id;
+-}
+-
+ static int qat_get_inter_state_size(enum icp_qat_hw_auth_algo qat_hash_alg)
+ {
+ 	switch (qat_hash_alg) {
+@@ -522,7 +517,7 @@ static int qat_alg_setkey(struct crypto_aead *tfm, const uint8_t *key,
+ 		       sizeof(struct icp_qat_fw_la_bulk_req));
+ 	} else {
+ 		/* new key */
+-		int node = get_current_node();
++		int node = cpu_to_node(smp_processor_id());
+ 		struct qat_crypto_instance *inst =
+ 				qat_crypto_get_instance_node(node);
+ 		if (!inst) {
+diff --git a/drivers/crypto/qat/qat_common/qat_crypto.c b/drivers/crypto/qat/qat_common/qat_crypto.c
+index 0d59bcb..c2260d8 100644
+--- a/drivers/crypto/qat/qat_common/qat_crypto.c
++++ b/drivers/crypto/qat/qat_common/qat_crypto.c
+@@ -109,7 +109,9 @@ struct qat_crypto_instance *qat_crypto_get_instance_node(int node)
+ 
+ 	list_for_each(itr, adf_devmgr_get_head()) {
+ 		accel_dev = list_entry(itr, struct adf_accel_dev, list);
+-		if (accel_dev->numa_node == node && adf_dev_started(accel_dev))
++		if (((accel_dev->numa_node == NUMA_NO_NODE) ||
++		     (accel_dev->numa_node == node)) &&
++		    adf_dev_started(accel_dev))
+ 			break;
+ 		accel_dev = NULL;
+ 	}
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+index 0d0435a..41bf86b 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+@@ -119,21 +119,6 @@ static void adf_cleanup_accel(struct adf_accel_dev *accel_dev)
+ 	kfree(accel_dev);
+ }
+ 
+-static uint8_t adf_get_dev_node_id(struct pci_dev *pdev)
+-{
+-	unsigned int bus_per_cpu = 0;
+-	struct cpuinfo_x86 *c = &cpu_data(num_online_cpus() - 1);
+-
+-	if (!c->phys_proc_id)
+-		return 0;
+-
+-	bus_per_cpu = 256 / (c->phys_proc_id + 1);
+-
+-	if (bus_per_cpu != 0)
+-		return pdev->bus->number / bus_per_cpu;
+-	return 0;
+-}
+-
+ static int qat_dev_start(struct adf_accel_dev *accel_dev)
+ {
+ 	int cpus = num_online_cpus();
+@@ -235,7 +220,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	void __iomem *pmisc_bar_addr = NULL;
+ 	char name[ADF_DEVICE_NAME_LENGTH];
+ 	unsigned int i, bar_nr;
+-	uint8_t node;
++	int node;
+ 	int ret;
+ 
+ 	switch (ent->device) {
+@@ -246,7 +231,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		return -ENODEV;
+ 	}
+ 
+-	node = adf_get_dev_node_id(pdev);
++	node = dev_to_node(&pdev->dev);
+ 	accel_dev = kzalloc_node(sizeof(*accel_dev), GFP_KERNEL, node);
+ 	if (!accel_dev)
+ 		return -ENOMEM;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.9.3
