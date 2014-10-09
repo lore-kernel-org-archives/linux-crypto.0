@@ -1,56 +1,549 @@
-From: Prarit Bhargava <prarit@redhat.com>
-Subject: Re: [PATCH 2/2] crypto: qat - Enforce valid numa configuration.
-Date: Thu, 09 Oct 2014 07:23:02 -0400
-Message-ID: <54367016.3070709@redhat.com>
-References: <20141008173750.13714.49713.stgit@tstruk-mobl1> <20141008173853.13714.47458.stgit@tstruk-mobl1> <54357B02.8080008@redhat.com> <54357E5B.2090401@intel.com> <54358400.5060405@redhat.com> <54358918.7030808@intel.com> <54358A06.2080605@redhat.com> <54358FC6.8060500@intel.com>
+From: Tudor Ambarus <tudor.ambarus@freescale.com>
+Subject: [PATCH 2/2] crypto: caam - add support for rfc4106(gcm(aes))
+Date: Thu, 9 Oct 2014 17:54:10 +0300
+Message-ID: <1412866450-22587-2-git-send-email-tudor.ambarus@freescale.com>
+References: <1412866450-22587-1-git-send-email-tudor.ambarus@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, bruce.w.allan@intel.com,
-	qat-linux@intel.com, john.griffin@intel.com,
-	linux-crypto@vger.kernel.org, naleksan@redhat.com,
-	davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain
+Cc: <herbert@gondor.apana.org.au>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34840 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751137AbaJILXX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Oct 2014 07:23:23 -0400
-In-Reply-To: <54358FC6.8060500@intel.com>
+Received: from mail-bn1bon0119.outbound.protection.outlook.com ([157.56.111.119]:13264
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1757407AbaJIP0i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 9 Oct 2014 11:26:38 -0400
+In-Reply-To: <1412866450-22587-1-git-send-email-tudor.ambarus@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[sorry ... accidentally hit reply instead of reply all ... resending to everyone]
+Add Advanced Encryption Standard (AES) in Galois/Counter Mode (GCM)
+as an IPsec Encapsulating Security Payload (ESP) mechanism
+to provide confidentiality and data origin authentication.
 
-On 10/08/2014 03:25 PM, Tadeusz Struk wrote:
-> On 10/08/2014 12:01 PM, Prarit Bhargava wrote:
->> No that isn't correct.  dev_to_node() will return the node the device is
->> connected to.
->
-> include/linux/device.h:
->
-> static inline int dev_to_node(struct device *dev)
-> {
->   return dev->numa_node;
-> }
->
-> struct device {
-> .....
->   int numa_node; /* NUMA node this device is close to */
-> ...
+Signed-off-by: Tudor Ambarus <tudor.ambarus@freescale.com>
+---
+ drivers/crypto/caam/caamalg.c | 430 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 416 insertions(+), 14 deletions(-)
 
-That's just bad english.  The numa node value (for pci devices) is
-read from the ACPI tables on the system and represents the node that
-the pci_dev is connected to.
-
-> };
->
-> In case when there are two nodes and only node 0 has memory,
-> dev->numa_node will be 0 even though the device will be connected to the
-> pci root port of node 1.
-
-Your calculation completely falls apart and returns incorrect values when
-cpu hotplug is used or if there are multi-socket nodes (as was the case
-on the system that panicked), or if one uses the new cluster-on-die mode.
-
-P.
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 6178e95..9ae5080 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -78,6 +78,11 @@
+ #define DESC_GCM_ENC_LEN		(DESC_GCM_BASE + 23 * CAAM_CMD_SZ)
+ #define DESC_GCM_DEC_LEN		(DESC_GCM_BASE + 19 * CAAM_CMD_SZ)
+ 
++#define DESC_RFC4106_BASE		(3 * CAAM_CMD_SZ)
++#define DESC_RFC4106_ENC_LEN		(DESC_RFC4106_BASE + 15 * CAAM_CMD_SZ)
++#define DESC_RFC4106_DEC_LEN		(DESC_RFC4106_BASE + 14 * CAAM_CMD_SZ)
++#define DESC_RFC4106_GIVENC_LEN		(DESC_RFC4106_BASE + 21 * CAAM_CMD_SZ)
++
+ #define DESC_ABLKCIPHER_BASE		(3 * CAAM_CMD_SZ)
+ #define DESC_ABLKCIPHER_ENC_LEN		(DESC_ABLKCIPHER_BASE + \
+ 					 20 * CAAM_CMD_SZ)
+@@ -863,6 +868,294 @@ static int gcm_setauthsize(struct crypto_aead *authenc, unsigned int authsize)
+ 	return 0;
+ }
+ 
++static int rfc4106_set_sh_desc(struct crypto_aead *aead)
++{
++	struct aead_tfm *tfm = &aead->base.crt_aead;
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	struct device *jrdev = ctx->jrdev;
++	bool key_fit_inline = false;
++	u32 *key_jump_cmd, *move_cmd, *write_iv_cmd;
++	u32 *desc;
++	u32 geniv;
++
++	if (!ctx->enckeylen || !ctx->authsize)
++		return 0;
++
++	/*
++	 * RFC4106 encrypt shared descriptor
++	 * Job Descriptor and Shared Descriptor
++	 * must fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (DESC_RFC4106_ENC_LEN + DESC_JOB_IO_LEN +
++	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
++		key_fit_inline = true;
++
++	desc = ctx->sh_desc_enc;
++
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
++
++	/* Skip key loading if it is loaded due to sharing */
++	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
++				   JUMP_COND_SHRD);
++	if (key_fit_inline)
++		append_key_as_imm(desc, (void *)ctx->key, ctx->enckeylen,
++				  ctx->enckeylen, CLASS_1 | KEY_DEST_CLASS_REG);
++	else
++		append_key(desc, ctx->key_dma, ctx->enckeylen,
++			   CLASS_1 | KEY_DEST_CLASS_REG);
++	set_jump_tgt_here(desc, key_jump_cmd);
++
++	/* Class 1 operation */
++	append_operation(desc, ctx->class1_alg_type |
++			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
++
++	/* cryptlen = seqoutlen - authsize */
++	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
++	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
++
++	/* assoclen + cryptlen = seqinlen - ivsize */
++	append_math_sub_imm_u32(desc, REG2, SEQINLEN, IMM, tfm->ivsize);
++
++	/* assoclen = (assoclen + cryptlen) - cryptlen */
++	append_math_sub(desc, VARSEQINLEN, REG2, REG3, CAAM_CMD_SZ);
++
++	/* Read Salt */
++	append_fifo_load_as_imm(desc, (void *)(ctx->key + ctx->enckeylen),
++				4, FIFOLD_CLASS_CLASS1 | FIFOLD_TYPE_IV);
++	/* Read AES-GCM-ESP IV */
++	append_seq_fifo_load(desc, tfm->ivsize, FIFOLD_CLASS_CLASS1 |
++			     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
++
++	/* Read assoc data */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
++			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
++
++	/* Will read cryptlen bytes */
++	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
++
++	/* Write encrypted data */
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
++
++	/* Read payload data */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
++			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST1);
++
++	/* Write ICV */
++	append_seq_store(desc, ctx->authsize, LDST_CLASS_1_CCB |
++			 LDST_SRCDST_BYTE_CONTEXT);
++
++	ctx->sh_desc_enc_dma = dma_map_single(jrdev, desc,
++					      desc_bytes(desc),
++					      DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, ctx->sh_desc_enc_dma)) {
++		dev_err(jrdev, "unable to map shared descriptor\n");
++		return -ENOMEM;
++	}
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "rfc4106 enc shdesc@"__stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
++		       desc_bytes(desc), 1);
++#endif
++
++	/*
++	 * Job Descriptor and Shared Descriptors
++	 * must all fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (DESC_RFC4106_DEC_LEN + DESC_JOB_IO_LEN +
++	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
++		key_fit_inline = true;
++
++	desc = ctx->sh_desc_dec;
++
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
++
++	/* Skip key loading if it is loaded due to sharing */
++	key_jump_cmd = append_jump(desc, JUMP_JSL |
++				   JUMP_TEST_ALL | JUMP_COND_SHRD);
++	if (key_fit_inline)
++		append_key_as_imm(desc, (void *)ctx->key, ctx->enckeylen,
++				  ctx->enckeylen, CLASS_1 | KEY_DEST_CLASS_REG);
++	else
++		append_key(desc, ctx->key_dma, ctx->enckeylen,
++			   CLASS_1 | KEY_DEST_CLASS_REG);
++	set_jump_tgt_here(desc, key_jump_cmd);
++
++	/* Class 1 operation */
++	append_operation(desc, ctx->class1_alg_type |
++			 OP_ALG_AS_INITFINAL | OP_ALG_DECRYPT | OP_ALG_ICV_ON);
++
++	/* assoclen + cryptlen = seqinlen - ivsize - icvsize */
++	append_math_sub_imm_u32(desc, REG3, SEQINLEN, IMM,
++				ctx->authsize + tfm->ivsize);
++
++	/* assoclen = (assoclen + cryptlen) - cryptlen */
++	append_math_sub(desc, REG2, SEQOUTLEN, REG0, CAAM_CMD_SZ);
++	append_math_sub(desc, VARSEQINLEN, REG3, REG2, CAAM_CMD_SZ);
++
++	/* Will write cryptlen bytes */
++	append_math_sub(desc, VARSEQOUTLEN, SEQOUTLEN, REG0, CAAM_CMD_SZ);
++
++	/* Read Salt */
++	append_fifo_load_as_imm(desc, (void *)(ctx->key + ctx->enckeylen),
++				4, FIFOLD_CLASS_CLASS1 | FIFOLD_TYPE_IV);
++	/* Read AES-GCM-ESP IV */
++	append_seq_fifo_load(desc, tfm->ivsize, FIFOLD_CLASS_CLASS1 |
++			     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
++
++	/* Read assoc data */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
++			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
++
++	/* Will read cryptlen bytes */
++	append_math_add(desc, VARSEQINLEN, ZERO, REG2, CAAM_CMD_SZ);
++
++	/* Store payload data */
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
++
++	/* Read encrypted data */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
++			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_FLUSH1);
++
++	/* Read ICV */
++	append_seq_fifo_load(desc, ctx->authsize, FIFOLD_CLASS_CLASS1 |
++			     FIFOLD_TYPE_ICV | FIFOLD_TYPE_LAST1);
++
++	ctx->sh_desc_dec_dma = dma_map_single(jrdev, desc,
++					      desc_bytes(desc),
++					      DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, ctx->sh_desc_dec_dma)) {
++		dev_err(jrdev, "unable to map shared descriptor\n");
++		return -ENOMEM;
++	}
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "rfc4106 dec shdesc@"__stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
++		       desc_bytes(desc), 1);
++#endif
++
++	/*
++	 * Job Descriptor and Shared Descriptors
++	 * must all fit into the 64-word Descriptor h/w Buffer
++	 */
++	if (DESC_RFC4106_GIVENC_LEN + DESC_JOB_IO_LEN +
++	    ctx->split_key_pad_len + ctx->enckeylen <=
++	    CAAM_DESC_BYTES_MAX)
++		key_fit_inline = true;
++
++	/* rfc4106_givencrypt shared descriptor */
++	desc = ctx->sh_desc_givenc;
++
++	init_sh_desc(desc, HDR_SHARE_SERIAL);
++
++	/* Skip key loading if it is loaded due to sharing */
++	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
++				   JUMP_COND_SHRD);
++	if (key_fit_inline)
++		append_key_as_imm(desc, (void *)ctx->key, ctx->enckeylen,
++				  ctx->enckeylen, CLASS_1 | KEY_DEST_CLASS_REG);
++	else
++		append_key(desc, ctx->key_dma, ctx->enckeylen,
++			   CLASS_1 | KEY_DEST_CLASS_REG);
++	set_jump_tgt_here(desc, key_jump_cmd);
++
++	/* Generate IV */
++	geniv = NFIFOENTRY_STYPE_PAD | NFIFOENTRY_DEST_DECO |
++		NFIFOENTRY_DTYPE_MSG | NFIFOENTRY_LC1 |
++		NFIFOENTRY_PTYPE_RND | (tfm->ivsize << NFIFOENTRY_DLEN_SHIFT);
++	append_load_imm_u32(desc, geniv, LDST_CLASS_IND_CCB |
++			    LDST_SRCDST_WORD_INFO_FIFO | LDST_IMM);
++	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
++	move_cmd = append_move(desc, MOVE_SRC_INFIFO | MOVE_DEST_DESCBUF |
++			       (tfm->ivsize << MOVE_LEN_SHIFT));
++	append_cmd(desc, CMD_LOAD | ENABLE_AUTO_INFO_FIFO);
++
++	/* Copy generated IV to OFIFO */
++	write_iv_cmd = append_move(desc, MOVE_SRC_DESCBUF | MOVE_DEST_OUTFIFO |
++				   (tfm->ivsize << MOVE_LEN_SHIFT));
++
++	/* Class 1 operation */
++	append_operation(desc, ctx->class1_alg_type |
++			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
++
++	/* ivsize + cryptlen = seqoutlen - authsize */
++	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
++
++	/* assoclen = seqinlen - (ivsize + cryptlen) */
++	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
++
++	/* Will write ivsize + cryptlen */
++	append_math_add(desc, VARSEQOUTLEN, REG3, REG0, CAAM_CMD_SZ);
++
++	/* Read Salt and generated IV */
++	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | FIFOLD_TYPE_IV |
++		   FIFOLD_TYPE_FLUSH1 | IMMEDIATE | 12);
++	/* Append Salt */
++	append_data(desc, (void *)(ctx->key + ctx->enckeylen), 4);
++	set_move_tgt_here(desc, move_cmd);
++	set_move_tgt_here(desc, write_iv_cmd);
++	/* Blank commands. Will be overwritten by generated IV. */
++	append_cmd(desc, 0x00000000);
++	append_cmd(desc, 0x00000000);
++	/* End of blank commands */
++
++	/* No need to reload iv */
++	append_seq_fifo_load(desc, tfm->ivsize, FIFOLD_CLASS_SKIP);
++
++	/* Read assoc data */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
++			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
++
++	/* Will read cryptlen */
++	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
++
++	/* Store generated IV and encrypted data */
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
++
++	/* Read payload data */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
++			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST1);
++
++	/* Write ICV */
++	append_seq_store(desc, ctx->authsize, LDST_CLASS_1_CCB |
++			 LDST_SRCDST_BYTE_CONTEXT);
++
++	ctx->sh_desc_givenc_dma = dma_map_single(jrdev, desc,
++						 desc_bytes(desc),
++						 DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, ctx->sh_desc_givenc_dma)) {
++		dev_err(jrdev, "unable to map shared descriptor\n");
++		return -ENOMEM;
++	}
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR,
++		       "rfc4106 givenc shdesc@"__stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
++		       desc_bytes(desc), 1);
++#endif
++
++	return 0;
++}
++
++static int rfc4106_setauthsize(struct crypto_aead *authenc,
++			       unsigned int authsize)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
++
++	switch (authsize) {
++	case 8:
++	case 12:
++	case 16:
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	ctx->authsize = authsize;
++	rfc4106_set_sh_desc(authenc);
++
++	return 0;
++}
++
+ static u32 gen_split_aead_key(struct caam_ctx *ctx, const u8 *key_in,
+ 			      u32 authkeylen)
+ {
+@@ -966,6 +1259,44 @@ static int gcm_setkey(struct crypto_aead *aead,
+ 	return ret;
+ }
+ 
++static int rfc4106_setkey(struct crypto_aead *aead,
++			  const u8 *key, unsigned int keylen)
++{
++	struct caam_ctx *ctx = crypto_aead_ctx(aead);
++	struct device *jrdev = ctx->jrdev;
++	int ret = 0;
++
++	/*
++	 * The last four bytes of the key material are used as the salt value
++	 * in the nonce. Update the AES key length.
++	 */
++	if (keylen < 4)
++		return -EINVAL;
++	keylen -= 4;
++
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "key in @"__stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
++#endif
++
++	memcpy(ctx->key, key, keylen);
++	ctx->key_dma = dma_map_single(jrdev, ctx->key, keylen,
++				      DMA_TO_DEVICE);
++	if (dma_mapping_error(jrdev, ctx->key_dma)) {
++		dev_err(jrdev, "unable to map key i/o memory\n");
++		return -ENOMEM;
++	}
++	ctx->enckeylen = keylen;
++
++	ret = rfc4106_set_sh_desc(aead);
++	if (ret) {
++		dma_unmap_single(jrdev, ctx->key_dma, ctx->enckeylen,
++				 DMA_TO_DEVICE);
++	}
++
++	return ret;
++}
++
+ static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
+ 			     const u8 *key, unsigned int keylen)
+ {
+@@ -1427,6 +1758,7 @@ static void init_aead_giv_job(u32 *sh_desc, dma_addr_t ptr,
+ 	u32 out_options = 0, in_options;
+ 	dma_addr_t dst_dma, src_dma;
+ 	int len, sec4_sg_index = 0;
++	bool is_gcm = false;
+ 
+ #ifdef DEBUG
+ 	debug("assoclen %d cryptlen %d authsize %d\n",
+@@ -1458,12 +1790,18 @@ static void init_aead_giv_job(u32 *sh_desc, dma_addr_t ptr,
+ 	append_seq_in_ptr(desc, src_dma, req->assoclen + ivsize + req->cryptlen,
+ 			  in_options);
+ 
++	if (((ctx->class1_alg_type & OP_ALG_ALGSEL_MASK) ==
++	      OP_ALG_ALGSEL_AES) &&
++	    ((ctx->class1_alg_type & OP_ALG_AAI_MASK) == OP_ALG_AAI_GCM))
++		is_gcm = true;
++
+ 	if (contig & GIV_DST_CONTIG) {
+ 		dst_dma = edesc->iv_dma;
+ 	} else {
+ 		if (likely(req->src == req->dst)) {
+ 			dst_dma = src_dma + sizeof(struct sec4_sg_entry) *
+-				  edesc->assoc_nents;
++				  (edesc->assoc_nents +
++				   (is_gcm ? 1 + edesc->src_nents : 0));
+ 			out_options = LDST_SGF;
+ 		} else {
+ 			dst_dma = edesc->sec4_sg_dma +
+@@ -1782,6 +2120,7 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
+ 	int ivsize = crypto_aead_ivsize(aead);
+ 	bool assoc_chained = false, src_chained = false, dst_chained = false;
+ 	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
++	bool is_gcm = false;
+ 
+ 	assoc_nents = sg_count(req->assoc, req->assoclen, &assoc_chained);
+ 	src_nents = sg_count(req->src, req->cryptlen, &src_chained);
+@@ -1808,16 +2147,33 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+ 
+-	/* Check if data are contiguous */
+-	if (assoc_nents || sg_dma_address(req->assoc) + req->assoclen !=
+-	    iv_dma || src_nents || iv_dma + ivsize != sg_dma_address(req->src))
+-		contig &= ~GIV_SRC_CONTIG;
++	if (((ctx->class1_alg_type & OP_ALG_ALGSEL_MASK) ==
++	      OP_ALG_ALGSEL_AES) &&
++	    ((ctx->class1_alg_type & OP_ALG_AAI_MASK) == OP_ALG_AAI_GCM))
++		is_gcm = true;
++
++	/*
++	 * Check if data are contiguous.
++	 * GCM expected input sequence: IV, AAD, text
++	 * All other - expected input sequence: AAD, IV, text
++	 */
++
++	if (is_gcm) {
++		if (assoc_nents || iv_dma + ivsize !=
++		    sg_dma_address(req->assoc) || src_nents ||
++		    sg_dma_address(req->assoc) + req->assoclen !=
++		    sg_dma_address(req->src))
++			contig &= ~GIV_SRC_CONTIG;
++	} else {
++		if (assoc_nents ||
++		    sg_dma_address(req->assoc) + req->assoclen != iv_dma ||
++		    src_nents || iv_dma + ivsize != sg_dma_address(req->src))
++			contig &= ~GIV_SRC_CONTIG;
++	}
++
+ 	if (dst_nents || iv_dma + ivsize != sg_dma_address(req->dst))
+ 		contig &= ~GIV_DST_CONTIG;
+-	if (unlikely(req->src != req->dst)) {
+-		dst_nents = dst_nents ? : 1;
+-		sec4_sg_len += 1;
+-	}
++
+ 	if (!(contig & GIV_SRC_CONTIG)) {
+ 		assoc_nents = assoc_nents ? : 1;
+ 		src_nents = src_nents ? : 1;
+@@ -1825,7 +2181,18 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
+ 		if (likely(req->src == req->dst))
+ 			contig &= ~GIV_DST_CONTIG;
+ 	}
+-	sec4_sg_len += dst_nents;
++
++	/*
++	 * Add new sg entries for GCM output sequence.
++	 * Expected output sequence: IV, encrypted text.
++	 */
++	if (is_gcm && req->src == req->dst && !(contig & GIV_DST_CONTIG))
++		sec4_sg_len += 1 + src_nents;
++
++	if (unlikely(req->src != req->dst)) {
++		dst_nents = dst_nents ? : 1;
++		sec4_sg_len += 1 + dst_nents;
++	}
+ 
+ 	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
+ 
+@@ -1851,18 +2218,36 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
+ 
+ 	sec4_sg_index = 0;
+ 	if (!(contig & GIV_SRC_CONTIG)) {
+-		sg_to_sec4_sg(req->assoc, assoc_nents,
+-			      edesc->sec4_sg +
+-			      sec4_sg_index, 0);
+-		sec4_sg_index += assoc_nents;
++		if (!is_gcm) {
++			sg_to_sec4_sg(req->assoc, assoc_nents,
++				      edesc->sec4_sg + sec4_sg_index, 0);
++			sec4_sg_index += assoc_nents;
++		}
++
+ 		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
+ 				   iv_dma, ivsize, 0);
+ 		sec4_sg_index += 1;
++
++		if (is_gcm) {
++			sg_to_sec4_sg(req->assoc, assoc_nents,
++				      edesc->sec4_sg + sec4_sg_index, 0);
++			sec4_sg_index += assoc_nents;
++		}
++
+ 		sg_to_sec4_sg_last(req->src, src_nents,
+ 				   edesc->sec4_sg +
+ 				   sec4_sg_index, 0);
+ 		sec4_sg_index += src_nents;
+ 	}
++
++	if (is_gcm && req->src == req->dst && !(contig & GIV_DST_CONTIG)) {
++		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
++				   iv_dma, ivsize, 0);
++		sec4_sg_index += 1;
++		sg_to_sec4_sg_last(req->src, src_nents,
++				   edesc->sec4_sg + sec4_sg_index, 0);
++	}
++
+ 	if (unlikely(req->src != req->dst && !(contig & GIV_DST_CONTIG))) {
+ 		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
+ 				   iv_dma, ivsize, 0);
+@@ -2601,6 +2986,23 @@ static struct caam_alg_template driver_algs[] = {
+ 				   OP_ALG_AAI_HMAC_PRECOMP,
+ 		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
+ 	},
++	{
++		.name = "rfc4106(gcm(aes))",
++		.driver_name = "rfc4106-gcm-aes-caam",
++		.blocksize = 1,
++		.type = CRYPTO_ALG_TYPE_AEAD,
++		.template_aead = {
++			.setkey = rfc4106_setkey,
++			.setauthsize = rfc4106_setauthsize,
++			.encrypt = aead_encrypt,
++			.decrypt = aead_decrypt,
++			.givencrypt = aead_givencrypt,
++			.geniv = "<built-in>",
++			.ivsize = 8,
++			.maxauthsize = 16,
++			},
++		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
++	},
+ 	/* Galois Counter Mode */
+ 	{
+ 		.name = "gcm(aes)",
+-- 
+1.8.3.1
