@@ -1,51 +1,89 @@
 From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH 1/2] crypto: caam - add support for gcm(aes)
-Date: Thu, 9 Oct 2014 19:43:17 -0500
-Message-ID: <20141009194317.3e0f2a73a15c540cc901c9f5@freescale.com>
+Subject: Re: [PATCH 2/2] crypto: caam - add support for rfc4106(gcm(aes))
+Date: Thu, 9 Oct 2014 19:43:58 -0500
+Message-ID: <20141009194358.dd99e22634005c93f462274d@freescale.com>
 References: <1412866450-22587-1-git-send-email-tudor.ambarus@freescale.com>
+	<1412866450-22587-2-git-send-email-tudor.ambarus@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 Cc: <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>
 To: Tudor Ambarus <tudor.ambarus@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0133.outbound.protection.outlook.com ([157.56.111.133]:16464
+Received: from mail-bn1bon0144.outbound.protection.outlook.com ([157.56.111.144]:26986
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750918AbaJJAsc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Oct 2014 20:48:32 -0400
-In-Reply-To: <1412866450-22587-1-git-send-email-tudor.ambarus@freescale.com>
+	id S1750979AbaJJAtO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 9 Oct 2014 20:49:14 -0400
+In-Reply-To: <1412866450-22587-2-git-send-email-tudor.ambarus@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 9 Oct 2014 17:54:09 +0300
+On Thu, 9 Oct 2014 17:54:10 +0300
 Tudor Ambarus <tudor.ambarus@freescale.com> wrote:
+
+> +static int rfc4106_set_sh_desc(struct crypto_aead *aead)
+...
+> +	/*
+> +	 * Job Descriptor and Shared Descriptors
+> +	 * must all fit into the 64-word Descriptor h/w Buffer
+> +	 */
+> +	if (DESC_RFC4106_DEC_LEN + DESC_JOB_IO_LEN +
+> +	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
+> +		key_fit_inline = true;
+
+we need to reset encrypt descriptor's keys_fit_inline setting to
+false before doing this.
+
+Also, the singular of "keys_fit_inline" is "key_fits_inline", but
+I'd prefer we not gratuitously rename the variable from the rest of
+the driver's keys_fit_inline for consistency's sake, thanks.
 
 > +	/*
 > +	 * Job Descriptor and Shared Descriptors
 > +	 * must all fit into the 64-word Descriptor h/w Buffer
 > +	 */
-> +	if (DESC_GCM_DEC_LEN + DESC_JOB_IO_LEN +
-> +	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
-> +		keys_fit_inline = true;
+> +	if (DESC_RFC4106_GIVENC_LEN + DESC_JOB_IO_LEN +
+> +	    ctx->split_key_pad_len + ctx->enckeylen <=
+> +	    CAAM_DESC_BYTES_MAX)
+> +		key_fit_inline = true;
 
-we need to reset the encrypt descriptor's keys_fit_inline setting to
-false before re-evaluating for decrypt.
+we need to reset the variable here too.
 
-> +	/* Galois Counter Mode */
+> +static int rfc4106_setauthsize(struct crypto_aead *authenc,
+> +			       unsigned int authsize)
+> +{
+> +	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
+> +
+> +	switch (authsize) {
+> +	case 8:
+> +	case 12:
+> +	case 16:
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+
+the h/w can handle more authsizes than that, so we
+shouldn't be blocking it from doing so here.
+
+> @@ -2601,6 +2986,23 @@ static struct caam_alg_template driver_algs[] = {
+>  				   OP_ALG_AAI_HMAC_PRECOMP,
+>  		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
+>  	},
 > +	{
-> +		.name = "gcm(aes)",
-> +		.driver_name = "gcm-aes-caam",
+> +		.name = "rfc4106(gcm(aes))",
+> +		.driver_name = "rfc4106-gcm-aes-caam",
 > +		.blocksize = 1,
 > +		.type = CRYPTO_ALG_TYPE_AEAD,
 > +		.template_aead = {
-> +			.setkey = gcm_setkey,
-> +			.setauthsize = gcm_setauthsize,
+> +			.setkey = rfc4106_setkey,
+> +			.setauthsize = rfc4106_setauthsize,
 > +			.encrypt = aead_encrypt,
 > +			.decrypt = aead_decrypt,
-> +			.givencrypt = NULL,
+> +			.givencrypt = aead_givencrypt,
 > +			.geniv = "<built-in>",
-> +			.ivsize = 12,
+> +			.ivsize = 8,
 > +			.maxauthsize = 16,
 
 AES_BLOCK_SIZE
