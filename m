@@ -1,108 +1,53 @@
-From: "tudor.ambarus@freescale.com" <tudor.ambarus@freescale.com>
-Subject: RE: [PATCH 2/2] crypto: caam - add support for rfc4106(gcm(aes))
-Date: Fri, 10 Oct 2014 10:10:55 +0000
-Message-ID: <d162838411ed444f82f75bb211653b5a@DM2PR0301MB0720.namprd03.prod.outlook.com>
-References: <1412866450-22587-1-git-send-email-tudor.ambarus@freescale.com>
-	<1412866450-22587-2-git-send-email-tudor.ambarus@freescale.com>
- <20141009194358.dd99e22634005c93f462274d@freescale.com>
+From: Prarit Bhargava <prarit@redhat.com>
+Subject: Re: [PATCH 2/2] crypto: qat - Enforce valid numa configuration.
+Date: Fri, 10 Oct 2014 07:23:53 -0400
+Message-ID: <5437C1C9.7050505@redhat.com>
+References: <20141008173750.13714.49713.stgit@tstruk-mobl1> <20141008173853.13714.47458.stgit@tstruk-mobl1> <54357B02.8080008@redhat.com> <54357E5B.2090401@intel.com> <54358400.5060405@redhat.com> <54358918.7030808@intel.com> <54358A06.2080605@redhat.com> <54358FC6.8060500@intel.com> <54367016.3070709@redhat.com> <5436B459.4090503@intel.com> <5436C6BA.2020404@redhat.com> <5436E818.5030809@intel.com> <54370163.6040305@redhat.com> <5437165E.6030008@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-To: Kim Phillips <Kim.Phillips@freescale.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, bruce.w.allan@intel.com,
+	qat-linux@intel.com, john.griffin@intel.com,
+	linux-crypto@vger.kernel.org, naleksan@redhat.com,
+	davem@davemloft.net
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0119.outbound.protection.outlook.com ([207.46.100.119]:16317
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753538AbaJJKK6 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 10 Oct 2014 06:10:58 -0400
-In-Reply-To: <20141009194358.dd99e22634005c93f462274d@freescale.com>
-Content-Language: en-US
+Received: from mx1.redhat.com ([209.132.183.28]:7820 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751474AbaJJLYD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 10 Oct 2014 07:24:03 -0400
+In-Reply-To: <5437165E.6030008@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
-On Thu, 9 Oct 2014 17:54:10 +0300
-Tudor Ambarus <tudor.ambarus@freescale.com> wrote:
 
-> +static int rfc4106_set_sh_desc(struct crypto_aead *aead)
-...
-> +	/*
-> +	 * Job Descriptor and Shared Descriptors
-> +	 * must all fit into the 64-word Descriptor h/w Buffer
-> +	 */
-> +	if (DESC_RFC4106_DEC_LEN + DESC_JOB_IO_LEN +
-> +	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
-> +		key_fit_inline = true;
+On 10/09/2014 07:12 PM, Tadeusz Struk wrote:
+> On 10/09/2014 02:42 PM, Prarit Bhargava wrote:
+>>>> I don't think cpu hotplug matters here. This is one (probe) time
+>>>> determination if the configuration is optimal or not and if it makes
+>>>> sense to use this accelerator or not.
+>> It absolutely matters.  num_online_cpus() *changes* depending on the # of cpus.
+> 
+> Sure, but I still think that we are safe here.
+> 
 
-we need to reset encrypt descriptor's keys_fit_inline setting to
-false before doing this.
+No, you're not.  Dropping a single CPU changes num_online_cpus(), which results in
 
-Also, the singular of "keys_fit_inline" is "key_fits_inline", but
-I'd prefer we not gratuitously rename the variable from the rest of
-the driver's keys_fit_inline for consistency's sake, thanks.
-[TA] Agreed.
+static uint8_t adf_get_dev_node_id(struct pci_dev *pdev)
+{
+        unsigned int bus_per_cpu = 0;
+        struct cpuinfo_x86 *c = &cpu_data(num_online_cpus() - 1);  <<< this
+being different.
 
-> +	/*
-> +	 * Job Descriptor and Shared Descriptors
-> +	 * must all fit into the 64-word Descriptor h/w Buffer
-> +	 */
-> +	if (DESC_RFC4106_GIVENC_LEN + DESC_JOB_IO_LEN +
-> +	    ctx->split_key_pad_len + ctx->enckeylen <=
-> +	    CAAM_DESC_BYTES_MAX)
-> +		key_fit_inline = true;
+        if (!c->phys_proc_id)
+                return 0;
 
-we need to reset the variable here too.
-[TA] Agreed.
+        bus_per_cpu = 256 / (c->phys_proc_id + 1);  <<< this being different
 
-> +static int rfc4106_setauthsize(struct crypto_aead *authenc,
-> +			       unsigned int authsize)
-> +{
-> +	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
-> +
-> +	switch (authsize) {
-> +	case 8:
-> +	case 12:
-> +	case 16:
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
+        if (bus_per_cpu != 0)
+                return pdev->bus->number / bus_per_cpu; <<< and this being different
+        return 0;
+}
 
-the h/w can handle more authsizes than that, so we
-shouldn't be blocking it from doing so here.
-
-[TA] rfc4106 says that "Implementations MUST support a full-length 16-octet ICV, and MAY support 8 or 12 octet ICVs, and MUST NOT support other ICV lengths."
-Do we want to support other ICV lengths?
-
-> @@ -2601,6 +2986,23 @@ static struct caam_alg_template driver_algs[] = {
->  				   OP_ALG_AAI_HMAC_PRECOMP,
->  		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
->  	},
-> +	{
-> +		.name = "rfc4106(gcm(aes))",
-> +		.driver_name = "rfc4106-gcm-aes-caam",
-> +		.blocksize = 1,
-> +		.type = CRYPTO_ALG_TYPE_AEAD,
-> +		.template_aead = {
-> +			.setkey = rfc4106_setkey,
-> +			.setauthsize = rfc4106_setauthsize,
-> +			.encrypt = aead_encrypt,
-> +			.decrypt = aead_decrypt,
-> +			.givencrypt = aead_givencrypt,
-> +			.geniv = "<built-in>",
-> +			.ivsize = 8,
-> +			.maxauthsize = 16,
-
-AES_BLOCK_SIZE
-
-[TA] I don't think we should change the blocksize value to AES_BLOCK_SIZE.
-
-Thank you,
-Tudor
-
-Thanks,
-
-Kim
+P.
