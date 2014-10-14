@@ -1,32 +1,42 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH] Crypto: gf128mul : fixed a parentheses coding style
- issue
-Date: Mon, 13 Oct 2014 13:56:54 -0700
-Message-ID: <1413233814.1287.30.camel@joe-AO725>
-References: <1413146950-932-1-git-send-email-mike.linux@btinternet.com>
-	 <1413154885.22149.49.camel@joe-AO725> <543C3229.2090205@btinternet.com>
-	 <1413231356.1287.18.camel@joe-AO725> <543C3BA8.2060709@btinternet.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH v2 1/2] crypto: qat - Prevent dma mapping zero length assoc
+ data
+Date: Mon, 13 Oct 2014 18:24:26 -0700
+Message-ID: <20141014012426.742.51263.stgit@tstruk-mobl1>
+References: <20141014012251.742.5500.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Michael Roocroft <mike.linux@btinternet.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <543C3BA8.2060709@btinternet.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: prarit@redhat.com, bruce.w.allan@intel.com, qat-linux@intel.com,
+	naleksan@redhat.com, linux-crypto@vger.kernel.org,
+	davem@davemloft.net
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:38033 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753837AbaJNB0a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 13 Oct 2014 21:26:30 -0400
+In-Reply-To: <20141014012251.742.5500.stgit@tstruk-mobl1>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2014-10-13 at 21:52 +0100, Michael Roocroft wrote:
-> I fully intend to making more meaningful contributions
-> when my confidence in writing C is better than it is at the moment. I'll concentrate
-> on making any changes to staging whilst I learn and get to grips with git, and
-> continue to look through the rest of the kernel tree as a learning exercise.
+Do not attempt to dma map associated data if it is zero length.
 
-Sounds like a good plan to me.  welcome btw.
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ drivers/crypto/qat/qat_common/qat_algs.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
-> by looking and not doing anything i'll never learn anything.
-
-True words... 
-
-cheers, Joe
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index 3e26fa2..bd4bd27 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -608,6 +608,8 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 		goto err;
+ 
+ 	for_each_sg(assoc, sg, assoc_n, i) {
++		if (!sg->length)
++			continue;
+ 		bufl->bufers[bufs].addr = dma_map_single(dev,
+ 							 sg_virt(sg),
+ 							 sg->length,
