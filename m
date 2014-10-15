@@ -1,39 +1,54 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] kernel crypto API interface specification
-Date: Tue, 14 Oct 2014 22:00:37 +0200
-Message-ID: <2178720.yAoRcDWDgu@myon.chronox.de>
-References: <7502136.9BkWHTZ0th@myon.chronox.de>
+From: Nikolay Aleksandrov <nikolay@redhat.com>
+Subject: Re: [PATCH v2 0/2] crypto: qat - Fix for invalid dma mapping and
+ numa
+Date: Wed, 15 Oct 2014 12:35:43 +0200
+Message-ID: <543E4DFF.9000101@redhat.com>
+References: <20141014012251.742.5500.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <7502136.9BkWHTZ0th@myon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: prarit@redhat.com, bruce.w.allan@intel.com, qat-linux@intel.com,
+	naleksan@redhat.com, linux-crypto@vger.kernel.org,
+	davem@davemloft.net
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
+	herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:10485 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751257AbaJOKfy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 15 Oct 2014 06:35:54 -0400
+In-Reply-To: <20141014012251.742.5500.stgit@tstruk-mobl1>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 14. Oktober 2014, 21:46:50 schrieb Stephan Mueller:
+On 14/10/14 03:24, Tadeusz Struk wrote:
+> Hi,
+> These two patches fix invalid (zero length) dma mapping and
+> enforce numa configuration for maximum performance.
+>
+> Change log:
+> v2 - Removed numa node calculation based bus number and use predefined
+> functions instead.
+>
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> ---
+>
+> Tadeusz Struk (2):
+>        crypto: qat - Prevent dma mapping zero length assoc data
+>        crypto: qat - Enforce valid numa configuration
+>
+>
+>   drivers/crypto/qat/qat_common/adf_accel_devices.h |    3 +-
+>   drivers/crypto/qat/qat_common/adf_transport.c     |   12 +++++---
+>   drivers/crypto/qat/qat_common/qat_algs.c          |    7 +++--
+>   drivers/crypto/qat/qat_common/qat_crypto.c        |    8 +++--
+>   drivers/crypto/qat/qat_dh895xcc/adf_admin.c       |    2 +
+>   drivers/crypto/qat/qat_dh895xcc/adf_drv.c         |   32 ++++++++-------------
+>   drivers/crypto/qat/qat_dh895xcc/adf_isr.c         |    2 +
+>   7 files changed, 32 insertions(+), 34 deletions(-)
+>
 
-Hi,
+I just gave a quick run of these patches and they seem to fix the NUMA issue and 
+the 0 length warnings.
 
-> The update adds a complete interface documentation of the kernel crypto
-> API. All cipher types supported by the kernel crypto API are documented.
-> 
-> In addition, kernel and user space example code is provided. The sample
-> code covers synchronous and asynchronous cipher operation, random
-> number generation and performing hashing as well as encryption and
-> decryption in user space.
-
-I was not sure whether to cover the explanation of the API in a separate 
-document or whether to add the function documentation to 
-include/linux/crypto.h.
-
-With the first attempt of the documentation, I applied the least invasive 
-approach. If it is requested, I would modify the patch such that appropriate 
-source code comments to the functions in the header file are added.
-
--- 
-Ciao
-Stephan
+Tested-by: Nikolay Aleksandrov <nikolay@redhat.com>
