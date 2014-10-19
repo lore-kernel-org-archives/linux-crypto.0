@@ -1,79 +1,93 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH] kernel crypto API interface specification
-Date: Thu, 16 Oct 2014 13:42:45 -0400
-Message-ID: <20141016174245.GL17447@titan.lakedaemon.net>
-References: <7502136.9BkWHTZ0th@myon.chronox.de>
- <20141016132501.GI17447@titan.lakedaemon.net>
- <20141016150604.GK17447@titan.lakedaemon.net>
- <2081738.uvS0jMPrv1@myon.chronox.de>
+From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v5] crypto: Add Allwinner Security System crypto accelerator
+Date: Sun, 19 Oct 2014 16:16:18 +0200
+Message-ID: <1413728182-13569-1-git-send-email-clabbe.montjoie@gmail.com>
+Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Grant Likely <grant.likely@secretlab.ca>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:29086 "EHLO
-	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751472AbaJPRmx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Oct 2014 13:42:53 -0400
-Content-Disposition: inline
-In-Reply-To: <2081738.uvS0jMPrv1@myon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org,
+	mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
+	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
+	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
+	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
+	crope-X3B1VOXEql0@public.gmane.org
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBOUPR6RAKGQEJDYBVNI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Oct 16, 2014 at 06:50:58PM +0200, Stephan Mueller wrote:
-> Am Donnerstag, 16. Oktober 2014, 11:06:05 schrieb Jason Cooper:
-> 
-> Hi Jason,
-> 
-> > On Thu, Oct 16, 2014 at 09:25:01AM -0400, Jason Cooper wrote:
-> > > + Grant, Geert,
-> > > 
-> > > Stephan has created some great example code for both the kernel crypto
-> > > API and the userspace crypto API.  As examples tend to bitrot, I was
-> > > wondering if the code could serve as test code.  Then it would have a
-> > > triple role: API regression testing, crypto test suite, and reference
-> > > implementation.
-> > > 
-> > > Original patch is here:
-> > >   https://lkml.kernel.org/r/7502136.9BkWHTZ0th@myon.chronox.de
-> > > 
-> > > On Thu, Oct 16, 2014 at 09:19:08AM +0200, Stephan Mueller wrote:
-> > > > Am Mittwoch, 15. Oktober 2014, 13:58:00 schrieb Jason Cooper:
-> > > > > On Tue, Oct 14, 2014 at 09:46:50PM +0200, Stephan Mueller wrote:
-> > ...
-> > 
-> > > > > Perhaps the userspace API example should be a separate file with this
-> > > > > text at the top?  Seems odd having it at the end.  Also, if you copied
-> > > > > it from cryptsetup, is the copyright info correct?
-> > > > 
-> > > > I did not copy it from cryptsetup. I only used it as a basis, especially
-> > > > with the data structure handling in _kcapi_cipher_crypt. But you are
-> > > > right, I changed the license for the user space by taking the
-> > > > cryptsetup license.> 
-> > > Ok.  It looks like Geert and Grant took part in the kernel test
-> > > unconference, so I'm adding them to the Cc.  I hope they can give us
-> > > some pointers as to where we could hook in this code.  Then we can
-> > > simply refer to it from the userspace API document.
-> > 
-> > tools/testing/selftests/crypto would be a good location for the example
-> > code in the next version of this patch.  Make sure to take a look at
-> > tools/testing/selftests/README.txt.
-> 
-> Well, I have written a FIPS 140-2 CAVS test harness covering all ciphers NIST 
-> is interested. Maybe this can go there?
+Hello
 
-Assuming you own the code and are willing to license it under and
-compatible license, then yes.  I would keep it a separate test from
-other crypto tests, though.
+This is the driver for the Security System included in Allwinner SoC A20.
+The Security System (SS for short) is a hardware cryptographic accelerator that support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+It could be found on others Allwinner SoC: 
+- A10s, A33 and A31 diagram speak about it with precisions (AES/DES/3DES/Md5/SHA1/PRNG)
+- A10 and A13 manual give the same datasheet for SS than A20
+- A23 speak about a security system but without precisions
+- A80 datasheet speak about a security system with more functions (SHA224/SHA256/RSA/CRC) but without precisions
+But I do not have access on any of those hardware, tests are welcome.
 
-There may be some push back wrt it being FIPS 140-2.  But I think it's
-worth considering.
+This driver currently supports:
+- MD5 and SHA1 hash algorithms
+- AES block cipher in CBC mode with 128/196/256bits keys.
+- DES and 3DES block cipher in CBC mode
+The driver exposes all those algorithms through the kernel cryptographic API.
 
-thx,
+The driver support only CPU driven (aka poll mode) transfer mode since the DMA engine of the A20 does not have a mainline driver yet.
 
-Jason.
+Changes since v4:
+- Rework all mutex path
+- Use ahash_request_ctx() in hash functions
+- Major rework of hash functions for solving mutex problems
+- Split sunxi_req_ctx in two since ciphers now use struct sunxi_tfm_ctx
+- Hash functions now test FIFO space register
+
+Changes since v3:
+- Remove all algorithms options from Kconfig, so now only one module is used
+- Add the sunxi_ss_cipher function to unify mode calculation
+- Remove the sunxi_cipher_exit empty function
+- Add some missing mutex_unlock()
+- Drop PRNG support, I wait for more comment on its results before re-enabling it.
+
+Changes since v2:
+- Fix Makefile and Kconfig for static kernel.
+
+Changes since v1:
+- annotate ss->base as __iomem
+- regroup all mutex in the ss_ctx structure
+- splited driver in 7 modules (core md5 sha1 aes des 3des prng) in sunxi-ss directory
+- use dev_exit_p() for .remove
+- added missing CRYPTO_BLKCIPHER dep in Kconfig
+- use ahash instead of shash
+- use ablkcipher instead of blkcipher
+- use crypto_rng_ctx instead of crypto_tfm_ctx
+- set seed as an u32
+- drop useless comment decoration
+- drop useless debug
+- ss_ctx is now a static pointer and whole structure being allocated
+- fix the platform_get_resource/devm_ioremap_resource pattern
+- invert getting die id and configuring clock
+- set clock value as a const unsigned long
+- add MODULE_ALIAS
+- use define names more consistency (SS_xxx)
+- fix PRNG errors
+- respell SS to Security System in DT documentation
