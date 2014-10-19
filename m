@@ -1,8 +1,8 @@
 From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v5 1/4] ARM: sun7i: dt: Add Security System to
- A20 SoC DTS
-Date: Sun, 19 Oct 2014 16:16:19 +0200
-Message-ID: <1413728182-13569-2-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v5 3/4] MAINTAINERS: Add myself as maintainer of
+ Allwinner Security System
+Date: Sun, 19 Oct 2014 16:16:21 +0200
+Message-ID: <1413728182-13569-4-git-send-email-clabbe.montjoie@gmail.com>
 References: <1413728182-13569-1-git-send-email-clabbe.montjoie@gmail.com>
 Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
@@ -28,7 +28,7 @@ To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
 	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
 	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
 	crope-X3B1VOXEql0@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBPMPR6RAKGQEZPWJTFY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBQMPR6RAKGQEKQY43AY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 In-Reply-To: <1413728182-13569-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
@@ -39,35 +39,27 @@ List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39
  <http://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-The Security System is a hardware cryptographic accelerator that support
-AES/MD5/SHA1/DES/3DES/PRNG algorithms.
-It could be found on many Allwinner SoC.
-
-This patch enable the Security System on the Allwinner A20 SoC Device-tree.
-
 Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- arch/arm/boot/dts/sun7i-a20.dtsi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm/boot/dts/sun7i-a20.dtsi b/arch/arm/boot/dts/sun7i-a20.dtsi
-index 82097c9..ebcdc76 100644
---- a/arch/arm/boot/dts/sun7i-a20.dtsi
-+++ b/arch/arm/boot/dts/sun7i-a20.dtsi
-@@ -577,6 +577,14 @@
- 			status = "disabled";
- 		};
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 33c0d43..8ee4ac0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10425,6 +10425,12 @@ L:	linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org
+ S:	Maintained
+ F:	mm/zswap.c
  
-+		crypto: crypto-engine@01c15000 {
-+			compatible = "allwinner,sun7i-a20-crypto";
-+			reg = <0x01c15000 0x1000>;
-+			interrupts = <0 86 4>;
-+			clocks = <&ahb_gates 5>, <&ss_clk>;
-+			clock-names = "ahb", "mod";
-+		};
++ALLWINNER SECURITY SYSTEM
++M:	Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
++L:	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
++S:	Maintained
++F:	drivers/crypto/sunxi-ss/
 +
- 		spi2: spi@01c17000 {
- 			compatible = "allwinner,sun4i-a10-spi";
- 			reg = <0x01c17000 0x1000>;
+ THE REST
+ M:	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+ L:	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 -- 
 2.0.4
