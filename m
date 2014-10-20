@@ -1,107 +1,72 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: 3.17 regression; alg: skcipher: Chunk test 1 failed on encryption
- at page 0 for ecb-aes-padlock
-Date: Mon, 20 Oct 2014 09:59:26 +0200
-Message-ID: <CAKv+Gu9UwbUHd0X7=vTJ6ebj4pcGjQKZMAWCjaNcS0AFk+7tZg@mail.gmail.com>
-References: <20141020071454.GA4084@cucamonga.audible.transient.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Jamie Heilman <jamie@audible.transient.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f173.google.com ([209.85.217.173]:34954 "EHLO
-	mail-lb0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752621AbaJTH73 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Oct 2014 03:59:29 -0400
-Received: by mail-lb0-f173.google.com with SMTP id 10so3381783lbg.4
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Oct 2014 00:59:27 -0700 (PDT)
-In-Reply-To: <20141020071454.GA4084@cucamonga.audible.transient.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Koen Kooi <koen-QLwJDigV5abLmq1fohREcCpxlwaOVQ5f@public.gmane.org>
+Subject: Re: [PATCH v5 2/4] ARM: sunxi: dt: Add DT bindings
+ documentation for SUNXI Security System
+Date: Mon, 20 Oct 2014 14:02:59 +0200
+Message-ID: <EC763015-19F7-4F25-8694-B1F6798E3B7B@dominion.thruhere.net>
+References: <1413728182-13569-1-git-send-email-clabbe.montjoie@gmail.com> <1413728182-13569-3-git-send-email-clabbe.montjoie@gmail.com>
+Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+ pawel.moll-5wv7dgnIgG8@public.gmane.org,
+ mark.rutland-5wv7dgnIgG8@public.gmane.org,
+ ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
+ galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+ Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+ "linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org King" <linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org>,
+ herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+ Miller Miller <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+ Grant Likely <grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>,
+ akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+ gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
+ joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
+ mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
+ crope-X3B1VOXEql0@public.gmane.org,
+ devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+ linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+Return-path: <linux-sunxi+bncBCB73UESRQKBB57TSORAKGQE35ERXWA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+In-Reply-To: <1413728182-13569-3-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On 20 October 2014 09:14, Jamie Heilman <jamie@audible.transient.net> wrote:
-> I get this new failure w/3.17.0 on my system with a VIA Esther
-> processor:
->
-> alg: skcipher: Chunk test 1 failed on encryption at page 0 for ecb-aes-padlock
-> 00000000: 71 73 f7 db 24 93 21 6d 61 1e bb 63 42 79 db 64
-> 00000010: 6f 82 c0 ca a3 9b fa 0b d9 08 c7 4a 90 ae 8f 5f
-> 00000020: 5e 06 f0 5f 31 51 18 37 45 d7 ca 3a fd 6c 3f e1
-> 00000030: dd 8d 22 65 2b 00 50 ce ba 28 67 d7 ce 0e 0d ea
-> 00000040: 78 69 7f ae 8f 8b 69 37 75 e0 dc 96 e0 b7 f4 09
-> 00000050: cb 6d a2 fb da af 09 f8 81 82 27 fa 45 9c 29 a4
-> 00000060: 22 8b 78 69 5b 46 f9 39 1b cc f9 1d 09 eb bc 5c
-> 00000070: 41 72 51 97 1d 07 49 a0 1b 8e 65 4b b2 6a 12 03
-> 00000080: 6a 60 95 ac bd ac 1a 64 de 5a a5 f0 83 2f cb ca
-> 00000090: 22 74 a6 6c 9b 73 ce 3f e1 8b 22 17 59 0c 47 89
-> 000000a0: 33 a1 d6 47 03 19 4f a8 67 69 f0 5b f0 20 ad 06
-> 000000b0: 27 81 92 d8 c5 ba 98 12 be 24 b5 2f 75 02 c2 ad
-> 000000c0: 12 2f 07 32 ee 39 af 64 05 8f b3 d4 eb 1b 46 6e
-> 000000d0: d9 21 f9 c4 b7 c9 45 68 b4 a1 74 9f 82 47 eb cc
-> 000000e0: bd 0a 14 95 0f 8b a8 2f 4b 1b a7 bf 82 a6 43 0c
-> 000000f0: b9 39 4a a8 10 6f 50 7b 25 fb 26 81 e0 2f f0 96
-> 00000100: 8d 8b ac 92 0f f6 ed 64 63 29 4c 8e 18 13 c5 bf
-> 00000110: fc a0 d9 bf 7c 3a 0e 29 6f d1 6c 6f a5 da bf b1
-> 00000120: 30 ea 44 2d c3 8f 16 e1 66 fa a3 21 3e fc 13 ca
-> 00000130: f0 f6 f0 59 bd 8f 38 50 31 cb 69 3f 96 15 d6 f5
-> 00000140: ae ff f6 aa 41 85 4c 10 58 e3 f9 44 e6 28 da 9a
-> 00000150: dc 6a 80 34 73 97 1b c5 ca 26 16 77 0e 60 ab 89
-> 00000160: 0f 04 27 bd ce 3e 71 b4 a0 d7 22 7e db eb 24 70
-> 00000170: 42 71 51 78 70 b3 e0 3d 84 8e 8d 7b d0 6d ea 92
-> 00000180: 11 08 42 4f e5 ad 26 92 d2 00 ae a8 e3 4b 37 47
-> 00000190: 22 c1 95 c1 63 7f cb 03 f3 e3 d7 9d 60 c7 bc ea
-> 000001a0: 35 a2 fd 45 52 39 13 6f c1 53 f3 53 df 33 84 d7
-> 000001b0: d2 c8 37 b0 75 e3 41 46 b3 c7 83 2e 8a bb a4 e5
-> 000001c0: 7f 3c fd 8b eb ea 63 bd b7 46 e7 bf 09 9c 0d 0f
-> 000001d0: 33 84 aa 1c 8d 29 b4 ac 4f ad e6 89
->
-> I've bisected this to 3b9b8fe0ade1ee84ee4058261d2e39a1f283704b so ...
-> perhaps intended in terms of uncovering problems.  Seems to have
-> identified something in my case at any rate.
->
-> Attached is my full 3.17.0 dmesg, kernel config, and /proc/crypto contents
-> (the only difference between 3.16 and 3.17 for the latter being the
-> selftest value for ecb-aes-padlock which used to be "passed" with 3.16
-> and earlier.)
->
-> Let me know if you need anything else.
->
 
-Interesting. I don't have access to the hardware, but I found
-something interesting in the driver related to the prefetch size
-(ecb_fetch_bytes) of ECB versus CBC (Note that the CBC selftest
-passes)
-So perhaps this might solve the bug, could you please test it?
+> Op 19 okt. 2014, om 16:16 heeft LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> het volgende geschreven:
+> 
+> This patch adds documentation for Device-Tree bindings for the Security System cryptographic accelerator driver.
+> 
+> Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+> Documentation/devicetree/bindings/crypto/sunxi-ss.txt | 9 +++++++++
+> 1 file changed, 9 insertions(+)
+> create mode 100644 Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/sunxi-ss.txt b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+> new file mode 100644
+> index 0000000..a566803
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+> @@ -0,0 +1,9 @@
+> +* Allwinner Security System found on A20 SoC
+> +
+> +Required properties:
+> +- compatible : Should be "allwinner,sun7i-a20-crypto".
+> +- reg: Should contain the Security System register location and length.
+> +- interrupts: Should contain the IRQ line for the Security System.
+> +- clocks : A phandle to the functional clock node of the Security System module
+> +- clock-names : Name of the functional clock, should be "ahb" and "mod".
 
-diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
-index 633ba945e153..2834f0b23713 100644
---- a/drivers/crypto/padlock-aes.c
-+++ b/drivers/crypto/padlock-aes.c
-@@ -351,7 +351,7 @@ static int ecb_aes_encrypt(struct blkcipher_desc *desc,
-        padlock_reset_key(&ctx->cword.encrypt);
+It would be nice to have a copy/paste ready example node in here, like Boris did in "[PATCH v6 2/2] mtd: nand: add sunxi NFC dt bindings doc".
 
-        blkcipher_walk_init(&walk, dst, src, nbytes);
--       err = blkcipher_walk_virt(desc, &walk);
-+       err = blkcipher_walk_virt_block(desc, &walk, ecb_fetch_bytes);
+regards,
 
-        ts_state = irq_ts_save();
-        while ((nbytes = walk.nbytes)) {
-@@ -380,7 +380,7 @@ static int ecb_aes_decrypt(struct blkcipher_desc *desc,
-        padlock_reset_key(&ctx->cword.decrypt);
-
-        blkcipher_walk_init(&walk, dst, src, nbytes);
--       err = blkcipher_walk_virt(desc, &walk);
-+       err = blkcipher_walk_virt_block(desc, &walk, ecb_fetch_bytes);
-
-        ts_state = irq_ts_save();
-        while ((nbytes = walk.nbytes)) {
-
-It will basically instruct the crypto layer not to pass fewer than 2
-blocks at a time until there is really no other way, i.e., until the
-input is exhausted.
-
--- 
-Ard.
+Koen
