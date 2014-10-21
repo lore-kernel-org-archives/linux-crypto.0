@@ -1,250 +1,67 @@
-From: Vladimir Zapolskiy <vz-ChpfBGZJDbMAvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v5 4/4] crypto: Add Allwinner Security
- System crypto accelerator
-Date: Tue, 21 Oct 2014 20:27:52 +0300
-Message-ID: <54469798.90001@mleia.com>
-References: <1413728182-13569-1-git-send-email-clabbe.montjoie@gmail.com> <1413728182-13569-5-git-send-email-clabbe.montjoie@gmail.com> <54459AA5.2030705@mleia.com> <54468902.1040802@gmail.com>
-Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: qat - Move BAR definitions to device specific module
+Date: Tue, 21 Oct 2014 11:01:06 -0700
+Message-ID: <20141021180106.21289.79724.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
- ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
- maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
- herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
- grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
- gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org, mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
- crope-X3B1VOXEql0@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
- linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
- linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-sunxi+bncBCAMRWGQV4CRBHVPTKRAKGQEMYXB2MA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <54468902.1040802-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <http://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <http://groups.google.com/group/linux-sunxi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	qat-linux@intel.com
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga02.intel.com ([134.134.136.20]:32275 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751561AbaJUSa2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 21 Oct 2014 14:30:28 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Corentin,
+Move PCI BARs definitions to device specific module where it belongs.
 
-On 21.10.2014 19:25, Corentin LABBE wrote:
-> On 10/21/14 01:28, Vladimir Zapolskiy wrote:
->> Hello LABBE,
->>
->> On 19.10.2014 17:16, LABBE Corentin wrote:
->>> Add support for the Security System included in Allwinner SoC A20.
->>> The Security System is a hardware cryptographic accelerator that support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
->>>
-> []
->>> +
->>> +	/* If we have only one SG, we can use kmap_atomic */
->>> +	if (sg_next(in_sg) == NULL && sg_next(out_sg) == NULL)
->>> +		return sunxi_ss_aes_poll_atomic(areq);
->>
->> for clarity it might be better to move all "mutex_unlock(&ss->lock)"
->> calls from sunxi_ss_aes_poll_atomic() body right to here.
->>
-> 
-> Ok
-> I have moved all mutex_unlock/writel(0, SS_CTL) at the end of function, it is cleaner now.
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ drivers/crypto/qat/qat_common/adf_accel_devices.h  |    2 --
+ drivers/crypto/qat/qat_common/qat_hal.c            |    3 ++-
+ .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    2 ++
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
-please check that sunxi_ss_aes_poll_atomic() has no more mutex_unlock()
-calls inside it.
-
-With best wishes,
-Vladimir
-
->>> +
->>> +};
->>> +
->>> +static int sunxi_ss_probe(struct platform_device *pdev)
->>> +{
->>> +	struct resource *res;
->>> +	u32 v;
->>> +	int err;
->>> +	unsigned long cr;
->>> +	const unsigned long cr_ahb = 24 * 1000 * 1000;
->>> +	const unsigned long cr_mod = 150 * 1000 * 1000;
->>> +
->>> +	if (!pdev->dev.of_node)
->>> +		return -ENODEV;
->>> +
->>> +	ss = devm_kzalloc(&pdev->dev, sizeof(*ss), GFP_KERNEL);
->>> +	if (ss == NULL)
->>> +		return -ENOMEM;
->>
->> Why do you dynamically allocate memory for "struct sunxi_ss_ctx *ss"?
->> Since you have a single global pointer, it makes sense to declare
->> "struct sunxi_ss_ctx ss" statically instead.
->>
->> And even a better solution is to remove a single global pointer.
-> 
-> All other crypto driver I have read use a global structure and it made things easy.
-> Thanks to M. Ripard that pointed to me the talitos driver that solve the global device pointer by using alg template and container_of().
-> 
-> But since I think there will never 2 Security System at the same time on the same SoC, I do not know if it is worth the cost to add more complexity just to remove a pointer.
-> 
->>
->>> +
->>> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
->>> +	ss->base = devm_ioremap_resource(&pdev->dev, res);
->>> +	if (IS_ERR(ss->base)) {
->>> +		dev_err(&pdev->dev, "Cannot request MMIO\n");
->>> +		return PTR_ERR(ss->base);
->>> +	}
->>> +
->>> +	ss->ssclk = devm_clk_get(&pdev->dev, "mod");
->>> +	if (IS_ERR(ss->ssclk)) {
->>> +		err = PTR_ERR(ss->ssclk);
->>> +		dev_err(&pdev->dev, "Cannot get SS clock err=%d\n", err);
->>> +		return err;
->>> +	}
->>> +	dev_dbg(&pdev->dev, "clock ss acquired\n");
->>> +
->>> +	ss->busclk = devm_clk_get(&pdev->dev, "ahb");
->>> +	if (IS_ERR(ss->busclk)) {
->>> +		err = PTR_ERR(ss->busclk);
->>> +		dev_err(&pdev->dev, "Cannot get AHB SS clock err=%d\n", err);
->>> +		return err;
->>> +	}
->>> +	dev_dbg(&pdev->dev, "clock ahb_ss acquired\n");
->>> +
->>> +	/* Enable both clocks */
->>> +	err = clk_prepare_enable(ss->busclk);
->>> +	if (err != 0) {
->>> +		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
->>> +		return err;
->>> +	}
->>> +	err = clk_prepare_enable(ss->ssclk);
->>> +	if (err != 0) {
->>> +		dev_err(&pdev->dev, "Cannot prepare_enable ssclk\n");
->>> +		clk_disable_unprepare(ss->busclk);
->>
->> goto somewhere to the end of the function?
-> 
-> OK
-> 
->>
->>> +		return err;
->>> +	}
->>> +
->>> +	/*
->>> +	 * Check that clock have the correct rates gived in the datasheet
->>> +	 * Try to set the clock to the maximum allowed
->>> +	 */
->>> +	err = clk_set_rate(ss->ssclk, cr_mod);
->>> +	if (err != 0) {
->>> +		dev_err(&pdev->dev, "Cannot set clock rate to ssclk\n");
->>> +		clk_disable_unprepare(ss->ssclk);
->>> +		clk_disable_unprepare(ss->busclk);
->>
->> goto "error_md5"?
-> 
-> Ok
-> 
->>
->>> +		return err;
->>> +	}
->>> +
->>> +	cr = clk_get_rate(ss->busclk);
->>> +	if (cr >= cr_ahb)
->>> +		dev_dbg(&pdev->dev, "Clock bus %lu (%lu MHz) (must be >= %lu)\n",
->>> +				cr, cr / 1000000, cr_ahb);
->>> +	else
->>> +		dev_warn(&pdev->dev, "Clock bus %lu (%lu MHz) (must be >= %lu)\n",
->>> +				cr, cr / 1000000, cr_ahb);
->>
->> See next comment.
->>
->>> +	cr = clk_get_rate(ss->ssclk);
->>> +	if (cr <= cr_mod)
->>> +		if (cr < cr_mod)
->>> +			dev_info(&pdev->dev, "Clock ss %lu (%lu MHz) (must be <= %lu)\n",
->>> +					cr, cr / 1000000, cr_mod);
->>> +		else
->>> +			dev_dbg(&pdev->dev, "Clock ss %lu (%lu MHz) (must be <= %lu)\n",
->>> +					cr, cr / 1000000, cr_mod);
->>> +	else
->>> +		dev_warn(&pdev->dev, "Clock ss is at %lu (%lu MHz) (must be <= %lu)\n",
->>> +				cr, cr / 1000000, cr_mod);
->>
->> The management of kernel log levels looks pretty strange. As far as I
->> understand there is no error on any clock rate, I'd recommend to keep
->> only one information message.
->>
-> 
-> If clock rate are below the recommended value, the only impact I found was bad performance.
-> So it explain the warn and no error. (yes the info must be warn, ...fixed)
-> 
-> But I will put comment for explain that.
-> 
->>> +	/*
->>> +	 * Datasheet named it "Die Bonding ID"
->>> +	 * I expect to be a sort of Security System Revision number.
->>> +	 * Since the A80 seems to have an other version of SS
->>> +	 * this info could be useful
->>> +	 */
->>> +	writel(SS_ENABLED, ss->base + SS_CTL);
->>> +	v = readl(ss->base + SS_CTL);
->>> +	v >>= 16;
->>> +	v &= 0x07;
->>> +	dev_info(&pdev->dev, "Die ID %d\n", v);
->>> +	writel(0, ss->base + SS_CTL);
->>> +
->>> +	ss->dev = &pdev->dev;
->>> +
->>> +	mutex_init(&ss->lock);
->>> +	mutex_init(&ss->bufin_lock);
->>> +	mutex_init(&ss->bufout_lock);
->>> +
->>> +	err = crypto_register_ahash(&sunxi_md5_alg);
->>> +	if (err)
->>> +		goto error_md5;
->>> +	err = crypto_register_ahash(&sunxi_sha1_alg);
->>> +	if (err)
->>> +		goto error_sha1;
->>> +	err = crypto_register_algs(sunxi_cipher_algs,
->>> +			ARRAY_SIZE(sunxi_cipher_algs));
->>> +	if (err)
->>> +		goto error_ciphers;
->>> +
->>> +	return 0;
->>> +error_ciphers:
->>> +	crypto_unregister_ahash(&sunxi_sha1_alg);
->>> +error_sha1:
->>> +	crypto_unregister_ahash(&sunxi_md5_alg);
->>> +error_md5:
->>> +	clk_disable_unprepare(ss->ssclk);
->>> +	clk_disable_unprepare(ss->busclk);
->>> +	return err;
->>> +}
->>> +
->>> +static int __exit sunxi_ss_remove(struct platform_device *pdev)
->>> +{
->>> +	if (!pdev->dev.of_node)
->>> +		return 0;
->>
->> Redundant check.
->>
-> 
-> Ok
-> 
->>
->>
->> --
->> With best wishes,
->> Vladimir
->>
-> 
-> Thanks for the review
-> 
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+index fe7b3f0..2ed4256 100644
+--- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+@@ -56,8 +56,6 @@
+ #define PCI_VENDOR_ID_INTEL 0x8086
+ #define ADF_DH895XCC_DEVICE_NAME "dh895xcc"
+ #define ADF_DH895XCC_PCI_DEVICE_ID 0x435
+-#define ADF_DH895XCC_PMISC_BAR 1
+-#define ADF_DH895XCC_ETR_BAR 2
+ #define ADF_PCI_MAX_BARS 3
+ #define ADF_DEVICE_NAME_LENGTH 32
+ #define ADF_ETR_MAX_RINGS_PER_BANK 16
+diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
+index 9b8a315..b818c19 100644
+--- a/drivers/crypto/qat/qat_common/qat_hal.c
++++ b/drivers/crypto/qat/qat_common/qat_hal.c
+@@ -679,7 +679,8 @@ int qat_hal_init(struct adf_accel_dev *accel_dev)
+ 	struct icp_qat_fw_loader_handle *handle;
+ 	struct adf_accel_pci *pci_info = &accel_dev->accel_pci_dev;
+ 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
+-	struct adf_bar *bar = &pci_info->pci_bars[ADF_DH895XCC_PMISC_BAR];
++	struct adf_bar *bar =
++			&pci_info->pci_bars[hw_data->get_misc_bar_id(hw_data)];
+ 
+ 	handle = kzalloc(sizeof(*handle), GFP_KERNEL);
+ 	if (!handle)
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+index 65dd1ff..01e0be2 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
+@@ -48,6 +48,8 @@
+ #define ADF_DH895x_HW_DATA_H_
+ 
+ /* PCIe configuration space */
++#define ADF_DH895XCC_PMISC_BAR 1
++#define ADF_DH895XCC_ETR_BAR 2
+ #define ADF_DH895XCC_RX_RINGS_OFFSET 8
+ #define ADF_DH895XCC_TX_RINGS_MASK 0xFF
+ #define ADF_DH895XCC_FUSECTL_OFFSET 0x40
