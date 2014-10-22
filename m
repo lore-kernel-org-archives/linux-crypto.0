@@ -1,39 +1,302 @@
-From: Bruce Allan <bruce.w.allan@intel.com>
-Subject: [cryptodev PATCH] qat: misspelling typo - "reseting" should be
-	"resetting"
-Date: Tue, 21 Oct 2014 16:09:56 -0700
-Message-ID: <20141021230956.13965.60435.stgit@gitlad.jf.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] arm64/crypto: use crypto instructions for generating AES key schedule
+Date: Wed, 22 Oct 2014 09:15:32 +0200
+Message-ID: <1413962132-19882-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: jussi.kivilinna@iki.fi, Andrew.Wafaa@arm.com,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	herbert@gondor.apana.org.au, will.deacon@arm.com,
+	catalin.marinas@arm.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:29364 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755469AbaJUXKG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 21 Oct 2014 19:10:06 -0400
-Received: from gitlad.jf.intel.com (gitlad.jf.intel.com [127.0.0.1])
-	by gitlad.jf.intel.com (8.14.2/8.14.2) with ESMTP id s9LN9ukD013994
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Oct 2014 16:09:56 -0700
+Received: from mail-wg0-f43.google.com ([74.125.82.43]:50139 "EHLO
+	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750769AbaJVHPm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Oct 2014 03:15:42 -0400
+Received: by mail-wg0-f43.google.com with SMTP id m15so3019128wgh.2
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Oct 2014 00:15:40 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
+This patch implements the AES key schedule generation using ARMv8
+Crypto Instructions. It replaces the table based C implementation
+in aes_generic.ko, which means we can drop the dependency on that
+module.
+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
+ arch/arm64/crypto/Kconfig           |   5 +-
+ arch/arm64/crypto/aes-ce-ccm-glue.c |   4 +-
+ arch/arm64/crypto/aes-ce-cipher.c   | 112 +++++++++++++++++++++++++++++++++++-
+ arch/arm64/crypto/aes-ce-setkey.h   |   5 ++
+ arch/arm64/crypto/aes-glue.c        |  18 ++++--
+ 5 files changed, 133 insertions(+), 11 deletions(-)
+ create mode 100644 arch/arm64/crypto/aes-ce-setkey.h
 
- drivers/crypto/qat/qat_common/adf_aer.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/qat/qat_common/adf_aer.c b/drivers/crypto/qat/qat_common/adf_aer.c
-index c29d4c3..10ce4a2 100644
---- a/drivers/crypto/qat/qat_common/adf_aer.c
-+++ b/drivers/crypto/qat/qat_common/adf_aer.c
-@@ -90,7 +90,7 @@ static void adf_dev_restore(struct adf_accel_dev *accel_dev)
- 	uint16_t ppdstat = 0, bridge_ctl = 0;
- 	int pending = 0;
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index 5562652c5316..a38b02ce5f9a 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -27,20 +27,19 @@ config CRYPTO_AES_ARM64_CE
+ 	tristate "AES core cipher using ARMv8 Crypto Extensions"
+ 	depends on ARM64 && KERNEL_MODE_NEON
+ 	select CRYPTO_ALGAPI
+-	select CRYPTO_AES
  
--	pr_info("QAT: Reseting device qat_dev%d\n", accel_dev->accel_id);
-+	pr_info("QAT: Resetting device qat_dev%d\n", accel_dev->accel_id);
- 	pci_read_config_word(pdev, PPDSTAT_OFFSET, &ppdstat);
- 	pending = ppdstat & PCI_EXP_DEVSTA_TRPND;
- 	if (pending) {
+ config CRYPTO_AES_ARM64_CE_CCM
+ 	tristate "AES in CCM mode using ARMv8 Crypto Extensions"
+ 	depends on ARM64 && KERNEL_MODE_NEON
+ 	select CRYPTO_ALGAPI
+-	select CRYPTO_AES
++	select CRYPTO_AES_ARM64_CE
+ 	select CRYPTO_AEAD
+ 
+ config CRYPTO_AES_ARM64_CE_BLK
+ 	tristate "AES in ECB/CBC/CTR/XTS modes using ARMv8 Crypto Extensions"
+ 	depends on ARM64 && KERNEL_MODE_NEON
+ 	select CRYPTO_BLKCIPHER
+-	select CRYPTO_AES
++	select CRYPTO_AES_ARM64_CE
+ 	select CRYPTO_ABLK_HELPER
+ 
+ config CRYPTO_AES_ARM64_NEON_BLK
+diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+index 9e6cdde9b43d..0ac73b838fa3 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-glue.c
++++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+@@ -16,6 +16,8 @@
+ #include <linux/crypto.h>
+ #include <linux/module.h>
+ 
++#include "aes-ce-setkey.h"
++
+ static int num_rounds(struct crypto_aes_ctx *ctx)
+ {
+ 	/*
+@@ -48,7 +50,7 @@ static int ccm_setkey(struct crypto_aead *tfm, const u8 *in_key,
+ 	struct crypto_aes_ctx *ctx = crypto_aead_ctx(tfm);
+ 	int ret;
+ 
+-	ret = crypto_aes_expand_key(ctx, in_key, key_len);
++	ret = ce_aes_expandkey(ctx, in_key, key_len);
+ 	if (!ret)
+ 		return 0;
+ 
+diff --git a/arch/arm64/crypto/aes-ce-cipher.c b/arch/arm64/crypto/aes-ce-cipher.c
+index 2075e1acae6b..4207c83389d3 100644
+--- a/arch/arm64/crypto/aes-ce-cipher.c
++++ b/arch/arm64/crypto/aes-ce-cipher.c
+@@ -14,6 +14,8 @@
+ #include <linux/crypto.h>
+ #include <linux/module.h>
+ 
++#include "aes-ce-setkey.h"
++
+ MODULE_DESCRIPTION("Synchronous AES cipher using ARMv8 Crypto Extensions");
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+ MODULE_LICENSE("GPL v2");
+@@ -124,6 +126,114 @@ static void aes_cipher_decrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
+ 	kernel_neon_end();
+ }
+ 
++/*
++ * aes_sub() - use the aese instruction to perform the AES sbox substitution
++ *             on each byte in 'input'
++ */
++static u32 aes_sub(u32 input)
++{
++	u32 ret;
++
++	__asm__("dup	v1.4s, %w[in]		;"
++		"movi	v0.16b, #0		;"
++		"aese	v0.16b, v1.16b		;"
++		"umov	%w[out], v0.4s[0]	;"
++
++	:	[out]	"=r"(ret)
++	:	[in]	"r"(input)
++	:		"v0","v1");
++
++	return ret;
++}
++
++int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
++		     unsigned int key_len)
++{
++	/*
++	 * The AES key schedule round constants
++	 */
++	static u8 const rcon[] = {
++		0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36,
++	};
++
++	u32 kwords = key_len / sizeof(u32);
++	struct aes_block *key_enc, *key_dec;
++	int i, j;
++
++	if (key_len != AES_KEYSIZE_128 &&
++	    key_len != AES_KEYSIZE_192 &&
++	    key_len != AES_KEYSIZE_256)
++		return -EINVAL;
++
++	memcpy(ctx->key_enc, in_key, key_len);
++	ctx->key_length = key_len;
++
++	kernel_neon_begin_partial(2);
++	for (i = 0; i < sizeof(rcon); i++) {
++		u32 *rki = ctx->key_enc + (i * kwords);
++		u32 *rko = rki + kwords;
++
++		rko[0] = ror32(aes_sub(rki[kwords - 1]), 8) ^ rcon[i] ^ rki[0];
++		rko[1] = rko[0] ^ rki[1];
++		rko[2] = rko[1] ^ rki[2];
++		rko[3] = rko[2] ^ rki[3];
++
++		if (key_len == AES_KEYSIZE_192) {
++			if (i >= 7)
++				break;
++			rko[4] = rko[3] ^ rki[4];
++			rko[5] = rko[4] ^ rki[5];
++		} else if (key_len == AES_KEYSIZE_256) {
++			if (i >= 6)
++				break;
++			rko[4] = aes_sub(rko[3]) ^ rki[4];
++			rko[5] = rko[4] ^ rki[5];
++			rko[6] = rko[5] ^ rki[6];
++			rko[7] = rko[6] ^ rki[7];
++		}
++	}
++
++	/*
++	 * Generate the decryption keys for the Inverse Equivalent Cipher.
++	 * This involves reversing the order of the round keys, and applying
++	 * the Inverse Mix Columns transformation on all but the first and
++	 * the last one.
++	 */
++	key_enc = (struct aes_block *)ctx->key_enc;
++	key_dec = (struct aes_block *)ctx->key_dec;
++	j = num_rounds(ctx);
++
++	key_dec[0] = key_enc[j];
++	for (i = 1, j--; j > 0; i++, j--)
++		__asm__("ld1	{v0.16b}, %[in]		;"
++			"aesimc	v1.16b, v0.16b		;"
++			"st1	{v1.16b}, %[out]	;"
++
++		:	[out]	"=Q"(key_dec[i])
++		:	[in]	"Q"(key_enc[j])
++		:		"v0","v1");
++	key_dec[i] = key_enc[0];
++
++	kernel_neon_end();
++	return 0;
++}
++EXPORT_SYMBOL(ce_aes_expandkey);
++
++int ce_aes_setkey(struct crypto_tfm *tfm, const u8 *in_key, 
++		  unsigned int key_len)
++{
++	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	int ret;
++
++	ret = ce_aes_expandkey(ctx, in_key, key_len);
++	if (!ret)
++		return 0;
++
++	tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
++	return -EINVAL;
++}
++EXPORT_SYMBOL(ce_aes_setkey);
++
+ static struct crypto_alg aes_alg = {
+ 	.cra_name		= "aes",
+ 	.cra_driver_name	= "aes-ce",
+@@ -135,7 +245,7 @@ static struct crypto_alg aes_alg = {
+ 	.cra_cipher = {
+ 		.cia_min_keysize	= AES_MIN_KEY_SIZE,
+ 		.cia_max_keysize	= AES_MAX_KEY_SIZE,
+-		.cia_setkey		= crypto_aes_set_key,
++		.cia_setkey		= ce_aes_setkey,
+ 		.cia_encrypt		= aes_cipher_encrypt,
+ 		.cia_decrypt		= aes_cipher_decrypt
+ 	}
+diff --git a/arch/arm64/crypto/aes-ce-setkey.h b/arch/arm64/crypto/aes-ce-setkey.h
+new file mode 100644
+index 000000000000..9d61e98ae347
+--- /dev/null
++++ b/arch/arm64/crypto/aes-ce-setkey.h
+@@ -0,0 +1,5 @@
++
++int ce_aes_setkey(struct crypto_tfm *tfm, const u8 *in_key, 
++		  unsigned int key_len);
++int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
++		     unsigned int key_len);
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index 79cd911ef88c..801aae32841f 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -16,9 +16,13 @@
+ #include <linux/module.h>
+ #include <linux/cpufeature.h>
+ 
++#include "aes-ce-setkey.h"
++
+ #ifdef USE_V8_CRYPTO_EXTENSIONS
+ #define MODE			"ce"
+ #define PRIO			300
++#define aes_setkey		ce_aes_setkey
++#define aes_expandkey		ce_aes_expandkey
+ #define aes_ecb_encrypt		ce_aes_ecb_encrypt
+ #define aes_ecb_decrypt		ce_aes_ecb_decrypt
+ #define aes_cbc_encrypt		ce_aes_cbc_encrypt
+@@ -30,6 +34,8 @@ MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 Crypto Extensions");
+ #else
+ #define MODE			"neon"
+ #define PRIO			200
++#define aes_setkey		crypto_aes_set_key
++#define aes_expandkey		crypto_aes_expand_key
+ #define aes_ecb_encrypt		neon_aes_ecb_encrypt
+ #define aes_ecb_decrypt		neon_aes_ecb_decrypt
+ #define aes_cbc_encrypt		neon_aes_cbc_encrypt
+@@ -79,10 +85,10 @@ static int xts_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 	struct crypto_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	int ret;
+ 
+-	ret = crypto_aes_expand_key(&ctx->key1, in_key, key_len / 2);
++	ret = aes_expandkey(&ctx->key1, in_key, key_len / 2);
+ 	if (!ret)
+-		ret = crypto_aes_expand_key(&ctx->key2, &in_key[key_len / 2],
+-					    key_len / 2);
++		ret = aes_expandkey(&ctx->key2, &in_key[key_len / 2],
++				    key_len / 2);
+ 	if (!ret)
+ 		return 0;
+ 
+@@ -288,7 +294,7 @@ static struct crypto_alg aes_algs[] = { {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+ 		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= crypto_aes_set_key,
++		.setkey		= aes_setkey,
+ 		.encrypt	= ecb_encrypt,
+ 		.decrypt	= ecb_decrypt,
+ 	},
+@@ -306,7 +312,7 @@ static struct crypto_alg aes_algs[] = { {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+ 		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= crypto_aes_set_key,
++		.setkey		= aes_setkey,
+ 		.encrypt	= cbc_encrypt,
+ 		.decrypt	= cbc_decrypt,
+ 	},
+@@ -324,7 +330,7 @@ static struct crypto_alg aes_algs[] = { {
+ 		.min_keysize	= AES_MIN_KEY_SIZE,
+ 		.max_keysize	= AES_MAX_KEY_SIZE,
+ 		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= crypto_aes_set_key,
++		.setkey		= aes_setkey,
+ 		.encrypt	= ctr_encrypt,
+ 		.decrypt	= ctr_encrypt,
+ 	},
+-- 
+1.8.3.2
