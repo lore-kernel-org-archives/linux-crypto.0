@@ -1,67 +1,41 @@
-From: Maxime Ripard <maxime.ripard@free-electrons.com>
-Subject: [PATCH v3 01/59] crypto: ux500: Use dmaengine_terminate_all API
-Date: Wed, 22 Oct 2014 17:43:15 +0200
-Message-ID: <1413992653-21963-2-git-send-email-maxime.ripard@free-electrons.com>
-References: <1413992653-21963-1-git-send-email-maxime.ripard@free-electrons.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	=?UTF-8?q?Antoine=20T=C3=A9nart?= <antoine@free-electrons.com>,
-	lars@metafoo.de, Russell King <linux@arm.linux.org.uk>,
-	Maxime Ripard <maxime.ripard@free-electrons.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: dmaengine@vger.kernel.org, Vinod Koul <vinod.koul@intel.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH] arm64/crypto: use crypto instructions for generating AES
+ key schedule
+Date: Wed, 22 Oct 2014 17:25:49 +0100
+Message-ID: <20141022162548.GH15370@e104818-lin.cambridge.arm.com>
+References: <1413962132-19882-1-git-send-email-ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	Will Deacon <Will.Deacon@arm.com>,
+	"jussi.kivilinna@iki.fi" <jussi.kivilinna@iki.fi>,
+	Andrew Wafaa <Andrew.Wafaa@arm.com>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:53894 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753037AbaJVPpF (ORCPT
+Received: from foss-mx-na.foss.arm.com ([217.140.108.86]:47202 "EHLO
+	foss-mx-na.foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754471AbaJVQ0A (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Oct 2014 11:45:05 -0400
-In-Reply-To: <1413992653-21963-1-git-send-email-maxime.ripard@free-electrons.com>
+	Wed, 22 Oct 2014 12:26:00 -0400
+Content-Disposition: inline
+In-Reply-To: <1413962132-19882-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-We are removing the dmaengine_device_control API, that shouldn't even have been
-exposed in the first place. Change the callers to use the proper API.
+On Wed, Oct 22, 2014 at 08:15:32AM +0100, Ard Biesheuvel wrote:
+> This patch implements the AES key schedule generation using ARMv8
+> Crypto Instructions. It replaces the table based C implementation
+> in aes_generic.ko, which means we can drop the dependency on that
+> module.
 
-Signed-off-by: Maxime Ripard <maxime.ripard@free-electrons.com>
----
- drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
- drivers/crypto/ux500/hash/hash_core.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+I don't really understand the AES stuff but there's something else I
+noticed: if you build a kernel with the crypto stuff and run it on an
+implementation that does not have the crypto extensions, there does not
+seem to be any check for not using these algorithms (or falling back to
+the generic implementation). Does the kernel end up with undef faults?
 
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index 92105f3dc8e0..75bd0f1e9a94 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -606,12 +606,12 @@ static void cryp_dma_done(struct cryp_ctx *ctx)
- 	dev_dbg(ctx->device->dev, "[%s]: ", __func__);
- 
- 	chan = ctx->device->dma.chan_mem2cryp;
--	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
-+	dmaengine_terminate_all(chan);
- 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_src,
- 		     ctx->device->dma.sg_src_len, DMA_TO_DEVICE);
- 
- 	chan = ctx->device->dma.chan_cryp2mem;
--	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
-+	dmaengine_terminate_all(chan);
- 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_dst,
- 		     ctx->device->dma.sg_dst_len, DMA_FROM_DEVICE);
- }
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 1c73f4fbc252..48bdc5df7b3b 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -202,7 +202,7 @@ static void hash_dma_done(struct hash_ctx *ctx)
- 	struct dma_chan *chan;
- 
- 	chan = ctx->device->dma.chan_mem2hash;
--	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
-+	dmaengine_terminate_all(chan);
- 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg,
- 		     ctx->device->dma.sg_len, DMA_TO_DEVICE);
- }
 -- 
-2.1.1
+Catalin
