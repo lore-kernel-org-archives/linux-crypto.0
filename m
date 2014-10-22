@@ -1,25 +1,33 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v5 4/4] crypto: Add Allwinner Security System crypto accelerator
+Subject: Re: [PATCH v5 4/4] crypto: Add Allwinner Security System crypto
+ accelerator
 Date: Wed, 22 Oct 2014 11:00:45 +0200
-Message-ID: <2751026.4HEPlZfN7W__35568.7971147292$1413968544$gmane$org@wuerfel>
-References: <1413728182-13569-1-git-send-email-clabbe.montjoie@gmail.com> <1413728182-13569-5-git-send-email-clabbe.montjoie@gmail.com>
+Message-ID: <2751026.4HEPlZfN7W__2940.28764260492$1413968562$gmane$org@wuerfel>
+References: <1413728182-13569-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1413728182-13569-5-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: LABBE Corentin <clabbe.montjoie@gmail.com>, robh+dt@kernel.org,
-	pawel.moll@arm.com, mark.rutland@arm.com,
-	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
-	maxime.ripard@free-electrons.com, linux@arm.linux.org.uk,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	grant.likely@linaro.org, akpm@linux-foundation.org,
-	gregkh@linuxfoundation.org, joe@perches.com,
-	mchehab@osg.samsung.com, crope@iki.fi, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
-	linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Cc: mark.rutland@arm.com, crope@iki.fi, linux@arm.linux.org.uk,
+ herbert@gondor.apana.org.au, pawel.moll@arm.com, ijc+devicetree@hellion.org.uk,
+ gregkh@linuxfoundation.org, linux-sunxi@googlegroups.com,
+ mchehab@osg.samsung.com, linux-kernel@vger.kernel.org,
+ akpm@linux-foundation.org, joe@perches.com, devicetree@vger.kernel.org,
+ robh+dt@kernel.org, LABBE Corentin <clabbe.montjoie@gmail.com>,
+ linux-crypto@vger.kernel.org, galak@codeaurora.org, grant.likely@linaro.org,
+ maxime.ripard@free-electrons.com, davem@davemloft.net
 To: linux-arm-kernel@lists.infradead.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 In-Reply-To: <1413728182-13569-5-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
 On Sunday 19 October 2014 16:16:22 LABBE Corentin wrote:
