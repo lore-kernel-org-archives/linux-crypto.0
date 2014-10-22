@@ -1,87 +1,67 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v5 4/4] crypto: Add Allwinner Security System crypto
- accelerator
-Date: Wed, 22 Oct 2014 11:00:45 +0200
-Message-ID: <2751026.4HEPlZfN7W__2940.28764260492$1413968562$gmane$org@wuerfel>
-References: <1413728182-13569-1-git-send-email-clabbe.montjoie@gmail.com>
- <1413728182-13569-5-git-send-email-clabbe.montjoie@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: mark.rutland@arm.com, crope@iki.fi, linux@arm.linux.org.uk,
- herbert@gondor.apana.org.au, pawel.moll@arm.com, ijc+devicetree@hellion.org.uk,
- gregkh@linuxfoundation.org, linux-sunxi@googlegroups.com,
- mchehab@osg.samsung.com, linux-kernel@vger.kernel.org,
- akpm@linux-foundation.org, joe@perches.com, devicetree@vger.kernel.org,
- robh+dt@kernel.org, LABBE Corentin <clabbe.montjoie@gmail.com>,
- linux-crypto@vger.kernel.org, galak@codeaurora.org, grant.likely@linaro.org,
- maxime.ripard@free-electrons.com, davem@davemloft.net
-To: linux-arm-kernel@lists.infradead.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1413728182-13569-5-git-send-email-clabbe.montjoie@gmail.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+From: Maxime Ripard <maxime.ripard@free-electrons.com>
+Subject: [PATCH v3 01/59] crypto: ux500: Use dmaengine_terminate_all API
+Date: Wed, 22 Oct 2014 17:43:15 +0200
+Message-ID: <1413992653-21963-2-git-send-email-maxime.ripard@free-electrons.com>
+References: <1413992653-21963-1-git-send-email-maxime.ripard@free-electrons.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	=?UTF-8?q?Antoine=20T=C3=A9nart?= <antoine@free-electrons.com>,
+	lars@metafoo.de, Russell King <linux@arm.linux.org.uk>,
+	Maxime Ripard <maxime.ripard@free-electrons.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+To: dmaengine@vger.kernel.org, Vinod Koul <vinod.koul@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from down.free-electrons.com ([37.187.137.238]:53894 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753037AbaJVPpF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Oct 2014 11:45:05 -0400
+In-Reply-To: <1413992653-21963-1-git-send-email-maxime.ripard@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sunday 19 October 2014 16:16:22 LABBE Corentin wrote:
-> Add support for the Security System included in Allwinner SoC A20.
-> The Security System is a hardware cryptographic accelerator that support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
-> 
-> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+We are removing the dmaengine_device_control API, that shouldn't even have been
+exposed in the first place. Change the callers to use the proper API.
 
-Please wrap lines in the changelog after about 70 characters.
+Signed-off-by: Maxime Ripard <maxime.ripard@free-electrons.com>
+---
+ drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
+ drivers/crypto/ux500/hash/hash_core.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-> --- /dev/null
-> +++ b/drivers/crypto/sunxi-ss/sunxi-ss-cipher.c
-> @@ -0,0 +1,489 @@
-
-> +#include "sunxi-ss.h"
-> +
-> +extern struct sunxi_ss_ctx *ss;
-
-'extern' declarations belong into header files, not .c files. It would
-be even better to avoid this completely and carry the pointer to the
-context in an object that gets passed around. In general we want drivers
-to be written in a way that allows having multiple instances of the
-device, which the global pointer prevents.
-
-> +
-> +	src32 = (u32 *)src_addr;
-> +	dst32 = (u32 *)dst_addr;
-
-
-You appear to be missing '__iomem' annotations for the mmio pointers.
-Please always run your code through the 'sparse' checker using 'make C=1'
-to catch and fix this and other erros.
-
-> +	ileft = areq->nbytes / 4;
-> +	oleft = areq->nbytes / 4;
-> +	i = 0;
-> +	do {
-> +		if (ileft > 0 && rx_cnt > 0) {
-> +			todo = min(rx_cnt, ileft);
-> +			ileft -= todo;
-> +			do {
-> +				writel_relaxed(*src32++,
-> +						ss->base +
-> +						SS_RXFIFO);
-> +				todo--;
-> +			} while (todo > 0);
-> +		}
-
-This looks like it should be using writesl() instead of the 
-writel_relaxed() loop. That should not only be faster but it will
-also change the byte ordering if you are running a big-endian
-kernel.
-
-Since this is a FIFO register, the ordering that writesl uses
-is likely the correct one.
-
-	Arnd
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index 92105f3dc8e0..75bd0f1e9a94 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -606,12 +606,12 @@ static void cryp_dma_done(struct cryp_ctx *ctx)
+ 	dev_dbg(ctx->device->dev, "[%s]: ", __func__);
+ 
+ 	chan = ctx->device->dma.chan_mem2cryp;
+-	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
++	dmaengine_terminate_all(chan);
+ 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_src,
+ 		     ctx->device->dma.sg_src_len, DMA_TO_DEVICE);
+ 
+ 	chan = ctx->device->dma.chan_cryp2mem;
+-	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
++	dmaengine_terminate_all(chan);
+ 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg_dst,
+ 		     ctx->device->dma.sg_dst_len, DMA_FROM_DEVICE);
+ }
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 1c73f4fbc252..48bdc5df7b3b 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -202,7 +202,7 @@ static void hash_dma_done(struct hash_ctx *ctx)
+ 	struct dma_chan *chan;
+ 
+ 	chan = ctx->device->dma.chan_mem2hash;
+-	dmaengine_device_control(chan, DMA_TERMINATE_ALL, 0);
++	dmaengine_terminate_all(chan);
+ 	dma_unmap_sg(chan->device->dev, ctx->device->dma.sg,
+ 		     ctx->device->dma.sg_len, DMA_TO_DEVICE);
+ }
+-- 
+2.1.1
