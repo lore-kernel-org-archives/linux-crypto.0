@@ -1,44 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC] tcp md5 use of alloc_percpu
-Date: Fri, 24 Oct 2014 17:33:15 +0800
-Message-ID: <20141024093315.GA18290@gondor.apana.org.au>
-References: <5448383A.4090908@gmail.com>
+Subject: Re: [PATCH v2 2/2] crypto: sahara - add support for SHA1/256
+Date: Fri, 24 Oct 2014 21:41:27 +0800
+Message-ID: <20141024134127.GA19583@gondor.apana.org.au>
+References: <1412606625-828-1-git-send-email-s.trumtrar@pengutronix.de>
+ <1412606625-828-3-git-send-email-s.trumtrar@pengutronix.de>
+ <20141007020201.GA27094@gondor.apana.org.au>
+ <20141007064705.GB16666@pengutronix.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: eric.dumazet@gmail.com, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Crestez Dan Leonard <cdleonard@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, kernel@pengutronix.de
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:57698 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:56343 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751391AbaJXJdT (ORCPT
+	with ESMTP id S1756522AbaJXNle (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Oct 2014 05:33:19 -0400
+	Fri, 24 Oct 2014 09:41:34 -0400
 Content-Disposition: inline
-In-Reply-To: <5448383A.4090908@gmail.com>
+In-Reply-To: <20141007064705.GB16666@pengutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Crestez Dan Leonard <cdleonard@gmail.com> wrote:
+On Tue, Oct 07, 2014 at 08:47:05AM +0200, Steffen Trumtrar wrote:
 >
->> Yep, but the sg stuff does not allow for stack variables. Because of
->> possible offloading and DMA, I dont know...
-> A stack buffer is used in tcp_md5_hash_header to add a tcphdr to the 
-> hash. A quick grep for sg_init_one find a couple of additional instances 
-> of what looks like doing crypto on small stack buffers:
+> > This is still wrong since the context needs to be stored in the
+> > request.  Otherwise multiple requests will corrupt each other's
+> > state.
+> > 
+> 
+> :-( Okay.
+> 
+> What would I have to do to test if it works correctly?
+> 
+> I tested this with AF_ALG from userspace and opened two file descriptors
+> and wrote to them in turns. Wouldn't that produce multiple requests?
 
-First of all crypto_hash_update is obsolete, don't use it in any
-new code.  Thanks for reminding me to get rid of existing users.
+It should if you're not finalising the result.  Can you show me
+your test program?
 
-You should either use crypto_shash_update for small data, e.g., headers
-or crypto_ahash_update for large data such as whole packets.
-
-If you use shash then you may allocate your buffer on the stack.  With
-ahash stack memory is not allowed.
-
-I hope this clears things up for you.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
