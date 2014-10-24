@@ -1,42 +1,52 @@
-From: Tudor Ambarus <tudor.ambarus@freescale.com>
-Subject: [PATCH] caam: caamalg - fix output sequence contiguity check
-Date: Thu, 23 Oct 2014 16:54:43 +0300
-Message-ID: <1414072483-4118-1-git-send-email-tudor.ambarus@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <herbert@gondor.apana.org.au>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0142.outbound.protection.outlook.com ([65.55.169.142]:44717
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751879AbaJWNzZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Oct 2014 09:55:25 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH resending] splice: sendfile() at once fails for big files
+Date: Fri, 24 Oct 2014 07:35:02 +0200 (CEST)
+Message-ID: <20141024053503.0F8E91A655B@localhost.localdomain>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Alexander Viro <viro@zeniv.linux.org.uk>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch fixes the assumption that output sequence is not contiguous
-when input sequence is not contiguous and in-place encryption is done.
-Output sequence does not need to be contiguous with associated data.
+When big files (over 64kbytes) are sent with sendfile(), they are sent by blocks
+of 64kbytes. In that case, the target must be informed that the current block is
+not the last one, otherwise it might take wrong actions.
+The issue was observed while sending a file to an AF_ALG socket for hashing. The
+hash was reset at each 64k block.
+This patch adds SPLICE_F_MORE to the flags when more data is pending.
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@freescale.com>
----
- drivers/crypto/caam/caamalg.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index a80ea85..922a3f5 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1530,7 +1530,8 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
- 		assoc_nents = assoc_nents ? : 1;
- 		src_nents = src_nents ? : 1;
- 		sec4_sg_len += assoc_nents + 1 + src_nents;
--		if (likely(req->src == req->dst))
-+		if (req->src == req->dst &&
-+		    (src_nents || iv_dma + ivsize != sg_dma_address(req->src)))
- 			contig &= ~GIV_DST_CONTIG;
- 	}
- 	sec4_sg_len += dst_nents;
--- 
-1.8.3.1
+Index: b/fs/splice.c
+===================================================================
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -1171,7 +1171,7 @@
+ 	long ret, bytes;
+ 	umode_t i_mode;
+ 	size_t len;
+-	int i, flags;
++	int i, flags, more;
+ 
+ 	/*
+ 	 * We require the input being a regular file, as we don't want to
+@@ -1214,6 +1214,7 @@
+ 	 * Don't block on output, we have to drain the direct pipe.
+ 	 */
+ 	sd->flags &= ~SPLICE_F_NONBLOCK;
++	more = sd->flags & SPLICE_F_MORE;
+ 
+ 	while (len) {
+ 		size_t read_len;
+@@ -1226,6 +1227,10 @@
+ 		read_len = ret;
+ 		sd->total_len = read_len;
+ 
++		if (read_len < len)
++			sd->flags |= SPLICE_F_MORE;
++		else if (!more)
++			sd->flags &= ~SPLICE_F_MORE;
+ 		/*
+ 		 * NOTE: nonblocking mode only applies to the input. We
+ 		 * must not do the output in nonblocking mode as then we
