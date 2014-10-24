@@ -1,52 +1,45 @@
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH resending] splice: sendfile() at once fails for big files
-Date: Fri, 24 Oct 2014 07:35:02 +0200 (CEST)
-Message-ID: <20141024053503.0F8E91A655B@localhost.localdomain>
-Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC] tcp md5 use of alloc_percpu
+Date: Fri, 24 Oct 2014 17:33:15 +0800
+Message-ID: <20141024093315.GA18290@gondor.apana.org.au>
+References: <5448383A.4090908@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: eric.dumazet@gmail.com, netdev@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: Alexander Viro <viro@zeniv.linux.org.uk>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Crestez Dan Leonard <cdleonard@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:57698 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751391AbaJXJdT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Oct 2014 05:33:19 -0400
+Content-Disposition: inline
+In-Reply-To: <5448383A.4090908@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-When big files (over 64kbytes) are sent with sendfile(), they are sent by blocks
-of 64kbytes. In that case, the target must be informed that the current block is
-not the last one, otherwise it might take wrong actions.
-The issue was observed while sending a file to an AF_ALG socket for hashing. The
-hash was reset at each 64k block.
-This patch adds SPLICE_F_MORE to the flags when more data is pending.
+Crestez Dan Leonard <cdleonard@gmail.com> wrote:
+>
+>> Yep, but the sg stuff does not allow for stack variables. Because of
+>> possible offloading and DMA, I dont know...
+> A stack buffer is used in tcp_md5_hash_header to add a tcphdr to the 
+> hash. A quick grep for sg_init_one find a couple of additional instances 
+> of what looks like doing crypto on small stack buffers:
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+First of all crypto_hash_update is obsolete, don't use it in any
+new code.  Thanks for reminding me to get rid of existing users.
 
-Index: b/fs/splice.c
-===================================================================
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -1171,7 +1171,7 @@
- 	long ret, bytes;
- 	umode_t i_mode;
- 	size_t len;
--	int i, flags;
-+	int i, flags, more;
- 
- 	/*
- 	 * We require the input being a regular file, as we don't want to
-@@ -1214,6 +1214,7 @@
- 	 * Don't block on output, we have to drain the direct pipe.
- 	 */
- 	sd->flags &= ~SPLICE_F_NONBLOCK;
-+	more = sd->flags & SPLICE_F_MORE;
- 
- 	while (len) {
- 		size_t read_len;
-@@ -1226,6 +1227,10 @@
- 		read_len = ret;
- 		sd->total_len = read_len;
- 
-+		if (read_len < len)
-+			sd->flags |= SPLICE_F_MORE;
-+		else if (!more)
-+			sd->flags &= ~SPLICE_F_MORE;
- 		/*
- 		 * NOTE: nonblocking mode only applies to the input. We
- 		 * must not do the output in nonblocking mode as then we
+You should either use crypto_shash_update for small data, e.g., headers
+or crypto_ahash_update for large data such as whole packets.
+
+If you use shash then you may allocate your buffer on the stack.  With
+ahash stack memory is not allowed.
+
+I hope this clears things up for you.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
