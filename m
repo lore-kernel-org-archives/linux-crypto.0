@@ -1,8 +1,7 @@
 From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
-Subject: [PATCH 2/9] Moving NX-AES-CCM to be processed logic and sg_list
- bounds
-Date: Tue, 28 Oct 2014 15:44:30 -0200
-Message-ID: <20141028174427.GA16919@bluepex.com>
+Subject: [PATCH 3/9] Moving limit and bound logic in CTR and fix IV vector
+Date: Tue, 28 Oct 2014 15:45:49 -0200
+Message-ID: <20141028174546.GA17168@bluepex.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Cc: linux-kernel@vger.kernel.org,
@@ -11,10 +10,19 @@ Cc: linux-kernel@vger.kernel.org,
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e24smtp05.br.ibm.com ([32.104.18.26]:55652 "EHLO
+	e24smtp05.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750873AbaJ1Rp4 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 28 Oct 2014 13:45:56 -0400
+Received: from /spool/local
+	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
+	Tue, 28 Oct 2014 15:45:54 -0200
 Content-Disposition: inline
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 The previous limits were estimated locally in a single step
 basead on bound values, however it was not correct since
@@ -22,167 +30,55 @@ when given certain scatterlist the function nx_build_sg_lists
 was consuming more sg entries than allocated causing a
 memory corruption and crashes.
 
-This patch removes the old logic and replaces it into nx_sg_build_lists in
-order to build a correct nx_sg list using the correct sg_max limit and
-bounds.
+- This patch removes the old logic and replaces it into nx_sg_build_lists 
+in order to build a correct nx_sg list using the correct sg_max limit 
+and bounds.
+
+IV vector was not set correctly to zero causing ctr crash in tcrypt tests.
+
+- Fixed setting IV vector  bits to zero.
 
 Signed-off-by: Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
 ---
- drivers/crypto/nx/nx-aes-ccm.c |   61 +++++++++++++++++----------------------
- 1 files changed, 27 insertions(+), 34 deletions(-)
+ drivers/crypto/nx/nx-aes-ctr.c |   13 +++----------
+ 1 files changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-ccm.c b/drivers/crypto/nx/nx-aes-ccm.c
-index 5ecd4c2..67f8081 100644
---- a/drivers/crypto/nx/nx-aes-ccm.c
-+++ b/drivers/crypto/nx/nx-aes-ccm.c
-@@ -181,6 +181,7 @@ static int generate_pat(u8                   *iv,
- 	unsigned int iauth_len = 0;
- 	u8 tmp[16], *b1 = NULL, *b0 = NULL, *result = NULL;
+diff --git a/drivers/crypto/nx/nx-aes-ctr.c b/drivers/crypto/nx/nx-aes-ctr.c
+index a37d009..2617cd4 100644
+--- a/drivers/crypto/nx/nx-aes-ctr.c
++++ b/drivers/crypto/nx/nx-aes-ctr.c
+@@ -90,22 +90,14 @@ static int ctr_aes_nx_crypt(struct blkcipher_desc *desc,
+ 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
+ 	unsigned long irq_flags;
+ 	unsigned int processed = 0, to_process;
+-	u32 max_sg_len;
  	int rc;
-+	unsigned int max_sg_len;
- 
- 	/* zero the ctr value */
- 	memset(iv + 15 - iv[0], 0, iv[0] + 1);
-@@ -248,10 +249,19 @@ static int generate_pat(u8                   *iv,
- 	if (!req->assoclen) {
- 		return rc;
- 	} else if (req->assoclen <= 14) {
--		nx_insg = nx_build_sg_list(nx_insg, b1, 16, nx_ctx->ap->sglen);
--		nx_outsg = nx_build_sg_list(nx_outsg, tmp, 16,
-+		unsigned int len = 16;
-+
-+		nx_insg = nx_build_sg_list(nx_insg, b1, &len, nx_ctx->ap->sglen);
-+
-+		if (len != 16)
-+			return -EINVAL;
-+
-+		nx_outsg = nx_build_sg_list(nx_outsg, tmp, &len,
- 					    nx_ctx->ap->sglen);
- 
-+		if (len != 16)
-+			return -EINVAL;
-+
- 		/* inlen should be negative, indicating to phyp that its a
- 		 * pointer to an sg list */
- 		nx_ctx->op.inlen = (nx_ctx->in_sg - nx_insg) *
-@@ -273,21 +283,24 @@ static int generate_pat(u8                   *iv,
- 		atomic64_add(req->assoclen, &(nx_ctx->stats->aes_bytes));
- 
- 	} else {
--		u32 max_sg_len;
- 		unsigned int processed = 0, to_process;
- 
--		/* page_limit: number of sg entries that fit on one page */
--		max_sg_len = min_t(u32,
--				   nx_driver.of.max_sg_len/sizeof(struct nx_sg),
--				   nx_ctx->ap->sglen);
--
- 		processed += iauth_len;
- 
-+		/* page_limit: number of sg entries that fit on one page */
-+		max_sg_len = min_t(u64, nx_ctx->ap->sglen,
-+				nx_driver.of.max_sg_len/sizeof(struct nx_sg));
-+		max_sg_len = min_t(u64, max_sg_len,
-+				nx_ctx->ap->databytelen/NX_PAGE_SIZE);
-+
- 		do {
- 			to_process = min_t(u32, req->assoclen - processed,
- 					   nx_ctx->ap->databytelen);
--			to_process = min_t(u64, to_process,
--					   NX_PAGE_SIZE * (max_sg_len - 1));
-+
-+			nx_insg = nx_walk_and_build(nx_ctx->in_sg,
-+						    nx_ctx->ap->sglen,
-+						    req->assoc, processed,
-+						    &to_process);
- 
- 			if ((to_process + processed) < req->assoclen) {
- 				NX_CPB_FDM(nx_ctx->csbcpb_aead) |=
-@@ -297,10 +310,6 @@ static int generate_pat(u8                   *iv,
- 					~NX_FDM_INTERMEDIATE;
- 			}
- 
--			nx_insg = nx_walk_and_build(nx_ctx->in_sg,
--						    nx_ctx->ap->sglen,
--						    req->assoc, processed,
--						    to_process);
- 
- 			nx_ctx->op_aead.inlen = (nx_ctx->in_sg - nx_insg) *
- 						sizeof(struct nx_sg);
-@@ -343,7 +352,6 @@ static int ccm_nx_decrypt(struct aead_request   *req,
- 	struct nx_ccm_priv *priv = &nx_ctx->priv.ccm;
- 	unsigned long irq_flags;
- 	unsigned int processed = 0, to_process;
--	u32 max_sg_len;
- 	int rc = -1;
  
  	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
-@@ -360,19 +368,12 @@ static int ccm_nx_decrypt(struct aead_request   *req,
- 	if (rc)
- 		goto out;
  
--	/* page_limit: number of sg entries that fit on one page */
 -	max_sg_len = min_t(u32, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
 -			   nx_ctx->ap->sglen);
 -
  	do {
- 
- 		/* to_process: the AES_BLOCK_SIZE data chunk to process in this
- 		 * update. This value is bound by sg list limits.
- 		 */
 -		to_process = min_t(u64, nbytes - processed,
 -				   nx_ctx->ap->databytelen);
 -		to_process = min_t(u64, to_process,
 -				   NX_PAGE_SIZE * (max_sg_len - 1));
+-		to_process = to_process & ~(AES_BLOCK_SIZE - 1);
 +		to_process = nbytes - processed;
  
- 		if ((to_process + processed) < nbytes)
- 			NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
-@@ -382,7 +383,7 @@ static int ccm_nx_decrypt(struct aead_request   *req,
- 		NX_CPB_FDM(nx_ctx->csbcpb) &= ~NX_FDM_ENDE_ENCRYPT;
- 
- 		rc = nx_build_sg_lists(nx_ctx, desc, req->dst, req->src,
--					to_process, processed,
-+					&to_process, processed,
- 					csbcpb->cpb.aes_ccm.iv_or_ctr);
+-		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, to_process,
++		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, &to_process,
+ 				       processed, csbcpb->cpb.aes_ctr.iv);
  		if (rc)
  			goto out;
-@@ -427,7 +428,6 @@ static int ccm_nx_encrypt(struct aead_request   *req,
- 	unsigned int authsize = crypto_aead_authsize(crypto_aead_reqtfm(req));
- 	unsigned long irq_flags;
- 	unsigned int processed = 0, to_process;
--	u32 max_sg_len;
- 	int rc = -1;
+@@ -143,6 +135,7 @@ static int ctr3686_aes_nx_crypt(struct blkcipher_desc *desc,
  
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
-@@ -437,18 +437,11 @@ static int ccm_nx_encrypt(struct aead_request   *req,
- 	if (rc)
- 		goto out;
+ 	memcpy(iv + CTR_RFC3686_NONCE_SIZE,
+ 	       desc->info, CTR_RFC3686_IV_SIZE);
++	iv[12] = iv[13] = iv[14] = 0;
+ 	iv[15] = 1;
  
--	/* page_limit: number of sg entries that fit on one page */
--	max_sg_len = min_t(u32, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
--			   nx_ctx->ap->sglen);
--
- 	do {
- 		/* to process: the AES_BLOCK_SIZE data chunk to process in this
- 		 * update. This value is bound by sg list limits.
- 		 */
--		to_process = min_t(u64, nbytes - processed,
--				   nx_ctx->ap->databytelen);
--		to_process = min_t(u64, to_process,
--				   NX_PAGE_SIZE * (max_sg_len - 1));
-+		to_process = nbytes - processed;
- 
- 		if ((to_process + processed) < nbytes)
- 			NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
-@@ -458,7 +451,7 @@ static int ccm_nx_encrypt(struct aead_request   *req,
- 		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
- 
- 		rc = nx_build_sg_lists(nx_ctx, desc, req->dst, req->src,
--					to_process, processed,
-+					&to_process, processed,
- 				       csbcpb->cpb.aes_ccm.iv_or_ctr);
- 		if (rc)
- 			goto out;
+ 	desc->info = nx_ctx->priv.ctr.iv;
 -- 
 1.7.1
