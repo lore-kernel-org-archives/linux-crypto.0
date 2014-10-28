@@ -1,7 +1,7 @@
 From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
-Subject: [PATCH 0/9] NX crypto driver fixes
-Date: Tue, 28 Oct 2014 15:40:09 -0200
-Message-ID: <20141028174006.GA15893@bluepex.com>
+Subject: [PATCH 1/9] Moving NX-AES-CBC to be processed logic
+Date: Tue, 28 Oct 2014 15:42:46 -0200
+Message-ID: <20141028174243.GA16436@bluepex.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Cc: linux-kernel@vger.kernel.org,
@@ -10,48 +10,59 @@ Cc: linux-kernel@vger.kernel.org,
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp02.br.ibm.com ([32.104.18.86]:57576 "EHLO
-	e24smtp02.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750855AbaJ1RkR (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Oct 2014 13:40:17 -0400
-Received: from /spool/local
-	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
-	Tue, 28 Oct 2014 15:40:15 -0200
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch set fixes the follow issues in  NX crypto driver:
+The previous limits were estimated locally in a single step
+basead on bound values, however it was not correct since
+when given certain scatterlist the function nx_build_sg_lists
+was consuming more sg entries than allocated causing a
+memory corruption and crashes.
 
-  - Bound limit issue that causes a memory crash
-  - SHA concurrence issue
-  - IV vector fix with the correct bit order
-  - NX CCM does not support keys larger than 128 causing
-  crashes in fips mode.
+This patch removes the old logic and replaces it into nx_sg_build_lists 
+in order to build a correct nx_sg list using the correct sg_max limit 
+and bounds.
 
+Signed-off-by: Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
+---
+ drivers/crypto/nx/nx-aes-cbc.c |   12 ++----------
+ 1 files changed, 2 insertions(+), 10 deletions(-)
 
-Leonidas S. Barbosa (9):
-  Moving NX-AES-CBC to be process logic
-  Moving NX-AES-CCM to be process logic and sg_list bounds
-  Moving limit and bound logic in CTR and fix IV vector
-  Moving NX-AES-ECB to be processed logic
-  Moving NX-AES-GCM to be processed logic
-  Moving NX-AES-XCBC to be processed logic
-  Fix SHA concurrence issue and sg limit bounds
-  Fixing the limit number of bytes to be processed
-  Disable ccm and ccm4309 in fips mod
-
- drivers/crypto/nx/nx-aes-cbc.c  |   12 +--
- drivers/crypto/nx/nx-aes-ccm.c  |   61 +++++------
- drivers/crypto/nx/nx-aes-ctr.c  |   13 +--
- drivers/crypto/nx/nx-aes-ecb.c  |   12 +--
- drivers/crypto/nx/nx-aes-gcm.c  |   66 +++++++-----
- drivers/crypto/nx/nx-aes-xcbc.c |   81 +++++++++++---
- drivers/crypto/nx/nx-sha256.c   |  208 ++++++++++++++++++-------------------
- drivers/crypto/nx/nx-sha512.c   |  222 ++++++++++++++++++---------------------
- drivers/crypto/nx/nx.c          |  159 +++++++++++++++++++++++-----
- drivers/crypto/nx/nx.h          |    8 +-
- 10 files changed, 469 insertions(+), 373 deletions(-)
+diff --git a/drivers/crypto/nx/nx-aes-cbc.c b/drivers/crypto/nx/nx-aes-cbc.c
+index cc00b52..a066cc3 100644
+--- a/drivers/crypto/nx/nx-aes-cbc.c
++++ b/drivers/crypto/nx/nx-aes-cbc.c
+@@ -72,27 +72,19 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
+ 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
+ 	unsigned long irq_flags;
+ 	unsigned int processed = 0, to_process;
+-	u32 max_sg_len;
+ 	int rc;
+ 
+ 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
+ 
+-	max_sg_len = min_t(u32, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
+-			   nx_ctx->ap->sglen);
+-
+ 	if (enc)
+ 		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
+ 	else
+ 		NX_CPB_FDM(csbcpb) &= ~NX_FDM_ENDE_ENCRYPT;
+ 
+ 	do {
+-		to_process = min_t(u64, nbytes - processed,
+-				   nx_ctx->ap->databytelen);
+-		to_process = min_t(u64, to_process,
+-				   NX_PAGE_SIZE * (max_sg_len - 1));
+-		to_process = to_process & ~(AES_BLOCK_SIZE - 1);
++		to_process = nbytes - processed;
+ 
+-		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, to_process,
++		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, &to_process,
+ 				       processed, csbcpb->cpb.aes_cbc.iv);
+ 		if (rc)
+ 			goto out;
+-- 
+1.7.1
