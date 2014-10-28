@@ -1,7 +1,7 @@
 From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
-Subject: [PATCH 3/9] Moving limit and bound logic in CTR and fix IV vector
-Date: Tue, 28 Oct 2014 15:45:49 -0200
-Message-ID: <20141028174546.GA17168@bluepex.com>
+Subject: [PATCH 4/9] Moving NX-AES-ECB to be processed logic
+Date: Tue, 28 Oct 2014 15:46:49 -0200
+Message-ID: <20141028174647.GA17416@bluepex.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Cc: linux-kernel@vger.kernel.org,
@@ -11,15 +11,15 @@ To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp05.br.ibm.com ([32.104.18.26]:55652 "EHLO
+Received: from e24smtp05.br.ibm.com ([32.104.18.26]:55982 "EHLO
 	e24smtp05.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750873AbaJ1Rp4 (ORCPT
+	with ESMTP id S1751634AbaJ1Rqy (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Oct 2014 13:45:56 -0400
+	Tue, 28 Oct 2014 13:46:54 -0400
 Received: from /spool/local
 	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
 	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
-	Tue, 28 Oct 2014 15:45:54 -0200
+	Tue, 28 Oct 2014 15:46:53 -0200
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -30,24 +30,20 @@ when given certain scatterlist the function nx_build_sg_lists
 was consuming more sg entries than allocated causing a
 memory corruption and crashes.
 
-- This patch removes the old logic and replaces it into nx_sg_build_lists 
+This patch removes the old logic and replaces it into nx_sg_build_lists 
 in order to build a correct nx_sg list using the correct sg_max limit 
 and bounds.
 
-IV vector was not set correctly to zero causing ctr crash in tcrypt tests.
-
-- Fixed setting IV vector  bits to zero.
-
 Signed-off-by: Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
 ---
- drivers/crypto/nx/nx-aes-ctr.c |   13 +++----------
- 1 files changed, 3 insertions(+), 10 deletions(-)
+ drivers/crypto/nx/nx-aes-ecb.c |   12 ++----------
+ 1 files changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-ctr.c b/drivers/crypto/nx/nx-aes-ctr.c
-index a37d009..2617cd4 100644
---- a/drivers/crypto/nx/nx-aes-ctr.c
-+++ b/drivers/crypto/nx/nx-aes-ctr.c
-@@ -90,22 +90,14 @@ static int ctr_aes_nx_crypt(struct blkcipher_desc *desc,
+diff --git a/drivers/crypto/nx/nx-aes-ecb.c b/drivers/crypto/nx/nx-aes-ecb.c
+index 85a8d23..cfdde8b 100644
+--- a/drivers/crypto/nx/nx-aes-ecb.c
++++ b/drivers/crypto/nx/nx-aes-ecb.c
+@@ -72,27 +72,19 @@ static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
  	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
  	unsigned long irq_flags;
  	unsigned int processed = 0, to_process;
@@ -59,6 +55,11 @@ index a37d009..2617cd4 100644
 -	max_sg_len = min_t(u32, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
 -			   nx_ctx->ap->sglen);
 -
+ 	if (enc)
+ 		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
+ 	else
+ 		NX_CPB_FDM(csbcpb) &= ~NX_FDM_ENDE_ENCRYPT;
+ 
  	do {
 -		to_process = min_t(u64, nbytes - processed,
 -				   nx_ctx->ap->databytelen);
@@ -69,16 +70,8 @@ index a37d009..2617cd4 100644
  
 -		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, to_process,
 +		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, &to_process,
- 				       processed, csbcpb->cpb.aes_ctr.iv);
+ 				processed, NULL);
  		if (rc)
  			goto out;
-@@ -143,6 +135,7 @@ static int ctr3686_aes_nx_crypt(struct blkcipher_desc *desc,
- 
- 	memcpy(iv + CTR_RFC3686_NONCE_SIZE,
- 	       desc->info, CTR_RFC3686_IV_SIZE);
-+	iv[12] = iv[13] = iv[14] = 0;
- 	iv[15] = 1;
- 
- 	desc->info = nx_ctx->priv.ctr.iv;
 -- 
 1.7.1
