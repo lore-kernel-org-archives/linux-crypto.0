@@ -1,7 +1,8 @@
 From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
-Subject: [PATCH 1/9] Moving NX-AES-CBC to be processed logic
-Date: Tue, 28 Oct 2014 15:42:46 -0200
-Message-ID: <20141028174243.GA16436@bluepex.com>
+Subject: [PATCH 2/9] Moving NX-AES-CCM to be processed logic and sg_list
+ bounds
+Date: Tue, 28 Oct 2014 15:44:30 -0200
+Message-ID: <20141028174427.GA16919@bluepex.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Cc: linux-kernel@vger.kernel.org,
@@ -21,47 +22,166 @@ when given certain scatterlist the function nx_build_sg_lists
 was consuming more sg entries than allocated causing a
 memory corruption and crashes.
 
-This patch removes the old logic and replaces it into nx_sg_build_lists 
-in order to build a correct nx_sg list using the correct sg_max limit 
-and bounds.
+This patch removes the old logic and replaces it into nx_sg_build_lists in
+order to build a correct nx_sg list using the correct sg_max limit and
+bounds.
 
 Signed-off-by: Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
 ---
- drivers/crypto/nx/nx-aes-cbc.c |   12 ++----------
- 1 files changed, 2 insertions(+), 10 deletions(-)
+ drivers/crypto/nx/nx-aes-ccm.c |   61 +++++++++++++++++----------------------
+ 1 files changed, 27 insertions(+), 34 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-cbc.c b/drivers/crypto/nx/nx-aes-cbc.c
-index cc00b52..a066cc3 100644
---- a/drivers/crypto/nx/nx-aes-cbc.c
-+++ b/drivers/crypto/nx/nx-aes-cbc.c
-@@ -72,27 +72,19 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
- 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
+diff --git a/drivers/crypto/nx/nx-aes-ccm.c b/drivers/crypto/nx/nx-aes-ccm.c
+index 5ecd4c2..67f8081 100644
+--- a/drivers/crypto/nx/nx-aes-ccm.c
++++ b/drivers/crypto/nx/nx-aes-ccm.c
+@@ -181,6 +181,7 @@ static int generate_pat(u8                   *iv,
+ 	unsigned int iauth_len = 0;
+ 	u8 tmp[16], *b1 = NULL, *b0 = NULL, *result = NULL;
+ 	int rc;
++	unsigned int max_sg_len;
+ 
+ 	/* zero the ctr value */
+ 	memset(iv + 15 - iv[0], 0, iv[0] + 1);
+@@ -248,10 +249,19 @@ static int generate_pat(u8                   *iv,
+ 	if (!req->assoclen) {
+ 		return rc;
+ 	} else if (req->assoclen <= 14) {
+-		nx_insg = nx_build_sg_list(nx_insg, b1, 16, nx_ctx->ap->sglen);
+-		nx_outsg = nx_build_sg_list(nx_outsg, tmp, 16,
++		unsigned int len = 16;
++
++		nx_insg = nx_build_sg_list(nx_insg, b1, &len, nx_ctx->ap->sglen);
++
++		if (len != 16)
++			return -EINVAL;
++
++		nx_outsg = nx_build_sg_list(nx_outsg, tmp, &len,
+ 					    nx_ctx->ap->sglen);
+ 
++		if (len != 16)
++			return -EINVAL;
++
+ 		/* inlen should be negative, indicating to phyp that its a
+ 		 * pointer to an sg list */
+ 		nx_ctx->op.inlen = (nx_ctx->in_sg - nx_insg) *
+@@ -273,21 +283,24 @@ static int generate_pat(u8                   *iv,
+ 		atomic64_add(req->assoclen, &(nx_ctx->stats->aes_bytes));
+ 
+ 	} else {
+-		u32 max_sg_len;
+ 		unsigned int processed = 0, to_process;
+ 
+-		/* page_limit: number of sg entries that fit on one page */
+-		max_sg_len = min_t(u32,
+-				   nx_driver.of.max_sg_len/sizeof(struct nx_sg),
+-				   nx_ctx->ap->sglen);
+-
+ 		processed += iauth_len;
+ 
++		/* page_limit: number of sg entries that fit on one page */
++		max_sg_len = min_t(u64, nx_ctx->ap->sglen,
++				nx_driver.of.max_sg_len/sizeof(struct nx_sg));
++		max_sg_len = min_t(u64, max_sg_len,
++				nx_ctx->ap->databytelen/NX_PAGE_SIZE);
++
+ 		do {
+ 			to_process = min_t(u32, req->assoclen - processed,
+ 					   nx_ctx->ap->databytelen);
+-			to_process = min_t(u64, to_process,
+-					   NX_PAGE_SIZE * (max_sg_len - 1));
++
++			nx_insg = nx_walk_and_build(nx_ctx->in_sg,
++						    nx_ctx->ap->sglen,
++						    req->assoc, processed,
++						    &to_process);
+ 
+ 			if ((to_process + processed) < req->assoclen) {
+ 				NX_CPB_FDM(nx_ctx->csbcpb_aead) |=
+@@ -297,10 +310,6 @@ static int generate_pat(u8                   *iv,
+ 					~NX_FDM_INTERMEDIATE;
+ 			}
+ 
+-			nx_insg = nx_walk_and_build(nx_ctx->in_sg,
+-						    nx_ctx->ap->sglen,
+-						    req->assoc, processed,
+-						    to_process);
+ 
+ 			nx_ctx->op_aead.inlen = (nx_ctx->in_sg - nx_insg) *
+ 						sizeof(struct nx_sg);
+@@ -343,7 +352,6 @@ static int ccm_nx_decrypt(struct aead_request   *req,
+ 	struct nx_ccm_priv *priv = &nx_ctx->priv.ccm;
  	unsigned long irq_flags;
  	unsigned int processed = 0, to_process;
 -	u32 max_sg_len;
- 	int rc;
+ 	int rc = -1;
  
  	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
+@@ -360,19 +368,12 @@ static int ccm_nx_decrypt(struct aead_request   *req,
+ 	if (rc)
+ 		goto out;
  
+-	/* page_limit: number of sg entries that fit on one page */
 -	max_sg_len = min_t(u32, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
 -			   nx_ctx->ap->sglen);
 -
- 	if (enc)
- 		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
- 	else
- 		NX_CPB_FDM(csbcpb) &= ~NX_FDM_ENDE_ENCRYPT;
- 
  	do {
+ 
+ 		/* to_process: the AES_BLOCK_SIZE data chunk to process in this
+ 		 * update. This value is bound by sg list limits.
+ 		 */
 -		to_process = min_t(u64, nbytes - processed,
 -				   nx_ctx->ap->databytelen);
 -		to_process = min_t(u64, to_process,
 -				   NX_PAGE_SIZE * (max_sg_len - 1));
--		to_process = to_process & ~(AES_BLOCK_SIZE - 1);
 +		to_process = nbytes - processed;
  
--		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, to_process,
-+		rc = nx_build_sg_lists(nx_ctx, desc, dst, src, &to_process,
- 				       processed, csbcpb->cpb.aes_cbc.iv);
+ 		if ((to_process + processed) < nbytes)
+ 			NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
+@@ -382,7 +383,7 @@ static int ccm_nx_decrypt(struct aead_request   *req,
+ 		NX_CPB_FDM(nx_ctx->csbcpb) &= ~NX_FDM_ENDE_ENCRYPT;
+ 
+ 		rc = nx_build_sg_lists(nx_ctx, desc, req->dst, req->src,
+-					to_process, processed,
++					&to_process, processed,
+ 					csbcpb->cpb.aes_ccm.iv_or_ctr);
+ 		if (rc)
+ 			goto out;
+@@ -427,7 +428,6 @@ static int ccm_nx_encrypt(struct aead_request   *req,
+ 	unsigned int authsize = crypto_aead_authsize(crypto_aead_reqtfm(req));
+ 	unsigned long irq_flags;
+ 	unsigned int processed = 0, to_process;
+-	u32 max_sg_len;
+ 	int rc = -1;
+ 
+ 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
+@@ -437,18 +437,11 @@ static int ccm_nx_encrypt(struct aead_request   *req,
+ 	if (rc)
+ 		goto out;
+ 
+-	/* page_limit: number of sg entries that fit on one page */
+-	max_sg_len = min_t(u32, nx_driver.of.max_sg_len/sizeof(struct nx_sg),
+-			   nx_ctx->ap->sglen);
+-
+ 	do {
+ 		/* to process: the AES_BLOCK_SIZE data chunk to process in this
+ 		 * update. This value is bound by sg list limits.
+ 		 */
+-		to_process = min_t(u64, nbytes - processed,
+-				   nx_ctx->ap->databytelen);
+-		to_process = min_t(u64, to_process,
+-				   NX_PAGE_SIZE * (max_sg_len - 1));
++		to_process = nbytes - processed;
+ 
+ 		if ((to_process + processed) < nbytes)
+ 			NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
+@@ -458,7 +451,7 @@ static int ccm_nx_encrypt(struct aead_request   *req,
+ 		NX_CPB_FDM(csbcpb) |= NX_FDM_ENDE_ENCRYPT;
+ 
+ 		rc = nx_build_sg_lists(nx_ctx, desc, req->dst, req->src,
+-					to_process, processed,
++					&to_process, processed,
+ 				       csbcpb->cpb.aes_ccm.iv_or_ctr);
  		if (rc)
  			goto out;
 -- 
