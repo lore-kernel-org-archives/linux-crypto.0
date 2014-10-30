@@ -1,104 +1,95 @@
-From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
-Subject: [PATCH 9/9] Disable ccm and ccm4309 in fips mod
-Date: Tue, 28 Oct 2014 15:51:54 -0200
-Message-ID: <20141028175146.GA18467@bluepex.com>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: [PATCH] crypto: caam: fix missing dma unmap on error path
+Date: Thu, 30 Oct 2014 14:40:22 +0200
+Message-ID: <1414672822-5067-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: linux-kernel@vger.kernel.org,
-	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
-	Fionnuala Gunter <fin@linux.vnet.ibm.com>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp02.br.ibm.com ([32.104.18.86]:60968 "EHLO
-	e24smtp02.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751565AbaJ1Rv7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Oct 2014 13:51:59 -0400
-Received: from /spool/local
-	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
-	Tue, 28 Oct 2014 15:51:58 -0200
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: <linux-kernel@vger.kernel.org>,
+	Cristian Stoica <cristian.stoica@freescale.com>,
+	<stable@vger.kernel.org>
+To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+	<davem@davemloft.net>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-NX CCM has not support to keys larger than 128 neither our hardware.
-In cases where a system is running in fips mode enabled a tcrypt test will
-crash the system in a kernel panic call.
-This patch disable, for now, CCM's algorithms in fips mode to avoid this.
+If dma mapping for dma_addr_out fails, the descriptor memory is freed
+but the previous dma mapping for dma_addr_in remains.
+This patch resolves the missing dma unmap and groups resource
+allocations at function start.
 
-Signed-off-by: Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
+Cc: <stable@vger.kernel.org> # 3.13+
+Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
 ---
- drivers/crypto/nx/nx.c |   32 ++++++++++++++++++++++----------
- 1 files changed, 22 insertions(+), 10 deletions(-)
+ drivers/crypto/caam/key_gen.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
-index aa8c38d..a32239c 100644
---- a/drivers/crypto/nx/nx.c
-+++ b/drivers/crypto/nx/nx.c
-@@ -35,6 +35,7 @@
- #include <linux/of.h>
- #include <asm/hvcall.h>
- #include <asm/vio.h>
-+#include <linux/fips.h>
+diff --git a/drivers/crypto/caam/key_gen.c b/drivers/crypto/caam/key_gen.c
+index 871703c..e1eaf4f 100644
+--- a/drivers/crypto/caam/key_gen.c
++++ b/drivers/crypto/caam/key_gen.c
+@@ -48,23 +48,29 @@ int gen_split_key(struct device *jrdev, u8 *key_out, int split_key_len,
+ 	u32 *desc;
+ 	struct split_key_result result;
+ 	dma_addr_t dma_addr_in, dma_addr_out;
+-	int ret = 0;
++	int ret = -ENOMEM;
  
- #include "nx_csbcpb.h"
- #include "nx.h"
-@@ -566,13 +567,15 @@ static int nx_register_algs(void)
- 	if (rc)
- 		goto out_unreg_gcm;
+ 	desc = kmalloc(CAAM_CMD_SZ * 6 + CAAM_PTR_SZ * 2, GFP_KERNEL | GFP_DMA);
+ 	if (!desc) {
+ 		dev_err(jrdev, "unable to allocate key input memory\n");
+-		return -ENOMEM;
++		return ret;
+ 	}
  
--	rc = crypto_register_alg(&nx_ccm_aes_alg);
--	if (rc)
--		goto out_unreg_gcm4106;
-+	if (!fips_enabled) {
-+		rc = crypto_register_alg(&nx_ccm_aes_alg);
-+		if (rc)
-+			goto out_unreg_gcm4106;
- 
--	rc = crypto_register_alg(&nx_ccm4309_aes_alg);
--	if (rc)
--		goto out_unreg_ccm;
-+		rc = crypto_register_alg(&nx_ccm4309_aes_alg);
-+		if (rc)
-+			goto out_unreg_ccm;
+-	init_job_desc(desc, 0);
+-
+ 	dma_addr_in = dma_map_single(jrdev, (void *)key_in, keylen,
+ 				     DMA_TO_DEVICE);
+ 	if (dma_mapping_error(jrdev, dma_addr_in)) {
+ 		dev_err(jrdev, "unable to map key input memory\n");
+-		kfree(desc);
+-		return -ENOMEM;
++		goto out_free;
+ 	}
++
++	dma_addr_out = dma_map_single(jrdev, key_out, split_key_pad_len,
++				      DMA_FROM_DEVICE);
++	if (dma_mapping_error(jrdev, dma_addr_out)) {
++		dev_err(jrdev, "unable to map key output memory\n");
++		goto out_unmap_in;
 +	}
++
++	init_job_desc(desc, 0);
+ 	append_key(desc, dma_addr_in, keylen, CLASS_2 | KEY_DEST_CLASS_REG);
  
- 	rc = crypto_register_shash(&nx_shash_sha256_alg);
- 	if (rc)
-@@ -593,9 +596,11 @@ out_unreg_s512:
- out_unreg_s256:
- 	crypto_unregister_shash(&nx_shash_sha256_alg);
- out_unreg_ccm4309:
--	crypto_unregister_alg(&nx_ccm4309_aes_alg);
-+	if (!fips_enabled)
-+		crypto_unregister_alg(&nx_ccm4309_aes_alg);
- out_unreg_ccm:
--	crypto_unregister_alg(&nx_ccm_aes_alg);
-+	if (fips_enabled)
-+		crypto_unregister_alg(&nx_ccm_aes_alg);
- out_unreg_gcm4106:
- 	crypto_unregister_alg(&nx_gcm4106_aes_alg);
- out_unreg_gcm:
-@@ -746,8 +751,15 @@ static int nx_remove(struct vio_dev *viodev)
- 	if (nx_driver.of.status == NX_OKAY) {
- 		NX_DEBUGFS_FINI(&nx_driver);
+ 	/* Sets MDHA up into an HMAC-INIT */
+@@ -81,13 +87,6 @@ int gen_split_key(struct device *jrdev, u8 *key_out, int split_key_len,
+ 	 * FIFO_STORE with the explicit split-key content store
+ 	 * (0x26 output type)
+ 	 */
+-	dma_addr_out = dma_map_single(jrdev, key_out, split_key_pad_len,
+-				      DMA_FROM_DEVICE);
+-	if (dma_mapping_error(jrdev, dma_addr_out)) {
+-		dev_err(jrdev, "unable to map key output memory\n");
+-		kfree(desc);
+-		return -ENOMEM;
+-	}
+ 	append_fifo_store(desc, dma_addr_out, split_key_len,
+ 			  LDST_CLASS_2_CCB | FIFOST_TYPE_SPLIT_KEK);
  
--		crypto_unregister_alg(&nx_ccm_aes_alg);
--		crypto_unregister_alg(&nx_ccm4309_aes_alg);
-+		/* CCM algorithm has not support to keys larger than 128
-+		 * however tcrypt test uses key larger than. If a system
-+		 * runs with fips enabled it'll crash. For now we need to
-+		 * disable this two algorithms in fips mode.
-+		 */
-+		if (!fips_enabled) {
-+			crypto_unregister_alg(&nx_ccm_aes_alg);
-+			crypto_unregister_alg(&nx_ccm4309_aes_alg);
-+		}
- 		crypto_unregister_alg(&nx_gcm_aes_alg);
- 		crypto_unregister_alg(&nx_gcm4106_aes_alg);
- 		crypto_unregister_alg(&nx_ctr_aes_alg);
+@@ -115,10 +114,10 @@ int gen_split_key(struct device *jrdev, u8 *key_out, int split_key_len,
+ 
+ 	dma_unmap_single(jrdev, dma_addr_out, split_key_pad_len,
+ 			 DMA_FROM_DEVICE);
++out_unmap_in:
+ 	dma_unmap_single(jrdev, dma_addr_in, keylen, DMA_TO_DEVICE);
+-
++out_free:
+ 	kfree(desc);
+-
+ 	return ret;
+ }
+ EXPORT_SYMBOL(gen_split_key);
 -- 
-1.7.1
+1.8.3.1
