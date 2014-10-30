@@ -1,528 +1,114 @@
-From: Tudor Ambarus <tudor.ambarus@freescale.com>
-Subject: [PATCH] crypto: caam - add support for rfc4543(gcm(aes))
-Date: Thu, 30 Oct 2014 18:55:07 +0200
-Message-ID: <1414688107-8196-1-git-send-email-tudor.ambarus@freescale.com>
-References: <1414686811-6527-1-git-send-email-tudor.ambarus@freescale.com>
+From: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Subject: Re: [PATCH v5 4/4] crypto: Add Allwinner Security
+ System crypto accelerator
+Date: Thu, 30 Oct 2014 18:19:33 +0100
+Message-ID: <20141030171933.GR21251@lukather>
+References: <1413728182-13569-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1413728182-13569-5-git-send-email-clabbe.montjoie@gmail.com>
+ <20141021191149.GQ21108@lukather>
+ <544A9FEA.6020304@gmail.com>
+Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <herbert@gondor.apana.org.au>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0114.outbound.protection.outlook.com ([157.56.110.114]:42048
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1758190AbaJ3Qz7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Oct 2014 12:55:59 -0400
-In-Reply-To: <1414686811-6527-1-git-send-email-tudor.ambarus@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wxNrNKeE/ptr8Zbn"
+Cc: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
+	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org, mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, crope-X3B1VOXEql0@public.gmane.org,
+	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-sunxi+bncBD2ZNBF5VYJRBRHGZGRAKGQEFCLA4QY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <544A9FEA.6020304-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-Add AES-GMAC as an IPSec ESP mechanism to provide
-data origin authentication, but not confidentiality.
-This method is referred as ENCR_NULL_AUTH_AES_GMAC.
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@freescale.com>
----
-removed a blank line introduced in aead_encrypt function.
+--wxNrNKeE/ptr8Zbn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- drivers/crypto/caam/caamalg.c | 458 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 457 insertions(+), 1 deletion(-)
+On Fri, Oct 24, 2014 at 08:52:26PM +0200, Corentin LABBE wrote:
+> On 10/21/14 21:11, Maxime Ripard wrote:
+> > Hi Corentin,
+> >=20
+> > Thanks for resending it.
+> >=20
+> > On Sun, Oct 19, 2014 at 04:16:22PM +0200, LABBE Corentin wrote:
+> >> Add support for the Security System included in Allwinner SoC A20.
+> >> The Security System is a hardware cryptographic accelerator that suppo=
+rt AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+> >>
+> >> Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >> ---
+> >>  drivers/crypto/Kconfig                    |  17 ++
+> >> +static int sunxi_ss_aes_poll_atomic(struct ablkcipher_request *areq)
+> >> +{
+> >> +	u32 spaces;
+> >> +	struct scatterlist *in_sg =3D areq->src;
+> >> +	struct scatterlist *out_sg =3D areq->dst;
+> >> +	void *src_addr;
+> >> +	void *dst_addr;
+> >> +	unsigned int ileft =3D areq->nbytes;
+> >> +	unsigned int oleft =3D areq->nbytes;
+> >> +	unsigned int todo;
+> >> +	u32 *src32;
+> >> +	u32 *dst32;
+> >> +	u32 rx_cnt =3D 32;
+> >> +	u32 tx_cnt =3D 0;
+> >> +	int i;
+> >> +
+> >> +	src_addr =3D kmap_atomic(sg_page(in_sg)) + in_sg->offset;
+> >=20
+> > Where does this scatter_list is coming from? Can it even be allocated
+> > in highmem?
+> >=20
+>=20
+> With AF_ALG and cryptodev, the SG is in highmem. Verified with some
+> PageHighMem().
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index c17154c..50c526c 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -83,13 +83,18 @@
- #define DESC_RFC4106_DEC_LEN		(DESC_RFC4106_BASE + 14 * CAAM_CMD_SZ)
- #define DESC_RFC4106_GIVENC_LEN		(DESC_RFC4106_BASE + 21 * CAAM_CMD_SZ)
- 
-+#define DESC_RFC4543_BASE		(3 * CAAM_CMD_SZ)
-+#define DESC_RFC4543_ENC_LEN		(DESC_RFC4543_BASE + 25 * CAAM_CMD_SZ)
-+#define DESC_RFC4543_DEC_LEN		(DESC_RFC4543_BASE + 27 * CAAM_CMD_SZ)
-+#define DESC_RFC4543_GIVENC_LEN		(DESC_RFC4543_BASE + 30 * CAAM_CMD_SZ)
-+
- #define DESC_ABLKCIPHER_BASE		(3 * CAAM_CMD_SZ)
- #define DESC_ABLKCIPHER_ENC_LEN		(DESC_ABLKCIPHER_BASE + \
- 					 20 * CAAM_CMD_SZ)
- #define DESC_ABLKCIPHER_DEC_LEN		(DESC_ABLKCIPHER_BASE + \
- 					 15 * CAAM_CMD_SZ)
- 
--#define DESC_MAX_USED_BYTES		(DESC_AEAD_GIVENC_LEN + \
-+#define DESC_MAX_USED_BYTES		(DESC_RFC4543_GIVENC_LEN + \
- 					 CAAM_MAX_KEY_SIZE)
- #define DESC_MAX_USED_LEN		(DESC_MAX_USED_BYTES / CAAM_CMD_SZ)
- 
-@@ -1150,6 +1155,401 @@ static int rfc4106_setauthsize(struct crypto_aead *authenc,
- 	return 0;
- }
- 
-+static int rfc4543_set_sh_desc(struct crypto_aead *aead)
-+{
-+	struct aead_tfm *tfm = &aead->base.crt_aead;
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	bool keys_fit_inline = false;
-+	u32 *key_jump_cmd, *write_iv_cmd, *write_aad_cmd;
-+	u32 *read_move_cmd, *write_move_cmd;
-+	u32 *desc;
-+	u32 geniv;
-+
-+	if (!ctx->enckeylen || !ctx->authsize)
-+		return 0;
-+
-+	/*
-+	 * RFC4543 encrypt shared descriptor
-+	 * Job Descriptor and Shared Descriptor
-+	 * must fit into the 64-word Descriptor h/w Buffer
-+	 */
-+	if (DESC_RFC4543_ENC_LEN + DESC_JOB_IO_LEN +
-+	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
-+		keys_fit_inline = true;
-+
-+	desc = ctx->sh_desc_enc;
-+
-+	init_sh_desc(desc, HDR_SHARE_SERIAL);
-+
-+	/* Skip key loading if it is loaded due to sharing */
-+	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
-+				   JUMP_COND_SHRD);
-+	if (keys_fit_inline)
-+		append_key_as_imm(desc, (void *)ctx->key, ctx->enckeylen,
-+				  ctx->enckeylen, CLASS_1 | KEY_DEST_CLASS_REG);
-+	else
-+		append_key(desc, ctx->key_dma, ctx->enckeylen,
-+			   CLASS_1 | KEY_DEST_CLASS_REG);
-+	set_jump_tgt_here(desc, key_jump_cmd);
-+
-+	/* Class 1 operation */
-+	append_operation(desc, ctx->class1_alg_type |
-+			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
-+
-+	/* Load AES-GMAC ESP IV into Math1 register */
-+	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_WORD_DECO_MATH1 |
-+		   LDST_CLASS_DECO | tfm->ivsize);
-+
-+	/* Wait the DMA transaction to finish */
-+	append_jump(desc, JUMP_TEST_ALL | JUMP_COND_CALM |
-+		    (1 << JUMP_OFFSET_SHIFT));
-+
-+	/* Overwrite blank immediate AES-GMAC ESP IV data */
-+	write_iv_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
-+				   (tfm->ivsize << MOVE_LEN_SHIFT));
-+
-+	/* Overwrite blank immediate AAD data */
-+	write_aad_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
-+				    (tfm->ivsize << MOVE_LEN_SHIFT));
-+
-+	/* cryptlen = seqoutlen - authsize */
-+	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
-+
-+	/* assoclen = (seqinlen - ivsize) - cryptlen */
-+	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
-+
-+	/* Read Salt and AES-GMAC ESP IV */
-+	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
-+		   FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 | (4 + tfm->ivsize));
-+	/* Append Salt */
-+	append_data(desc, (void *)(ctx->key + ctx->enckeylen), 4);
-+	set_move_tgt_here(desc, write_iv_cmd);
-+	/* Blank commands. Will be overwritten by AES-GMAC ESP IV. */
-+	append_cmd(desc, 0x00000000);
-+	append_cmd(desc, 0x00000000);
-+	/* End of blank commands */
-+
-+	/* Read assoc data */
-+	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
-+			     FIFOLD_TYPE_AAD);
-+
-+	/* Will read cryptlen bytes */
-+	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
-+
-+	/* Will write cryptlen bytes */
-+	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
-+
-+	/*
-+	 * MOVE_LEN opcode is not available in all SEC HW revisions,
-+	 * thus need to do some magic, i.e. self-patch the descriptor
-+	 * buffer.
-+	 */
-+	read_move_cmd = append_move(desc, MOVE_SRC_DESCBUF | MOVE_DEST_MATH3 |
-+				    (0x6 << MOVE_LEN_SHIFT));
-+	write_move_cmd = append_move(desc, MOVE_SRC_MATH3 | MOVE_DEST_DESCBUF |
-+				     (0x8 << MOVE_LEN_SHIFT));
-+
-+	/* Authenticate AES-GMAC ESP IV  */
-+	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
-+		   FIFOLD_TYPE_AAD | tfm->ivsize);
-+	set_move_tgt_here(desc, write_aad_cmd);
-+	/* Blank commands. Will be overwritten by AES-GMAC ESP IV. */
-+	append_cmd(desc, 0x00000000);
-+	append_cmd(desc, 0x00000000);
-+	/* End of blank commands */
-+
-+	/* Read and write cryptlen bytes */
-+	aead_append_src_dst(desc, FIFOLD_TYPE_AAD);
-+
-+	set_move_tgt_here(desc, read_move_cmd);
-+	set_move_tgt_here(desc, write_move_cmd);
-+	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
-+	/* Move payload data to OFIFO */
-+	append_move(desc, MOVE_SRC_INFIFO_CL | MOVE_DEST_OUTFIFO);
-+
-+	/* Write ICV */
-+	append_seq_store(desc, ctx->authsize, LDST_CLASS_1_CCB |
-+			 LDST_SRCDST_BYTE_CONTEXT);
-+
-+	ctx->sh_desc_enc_dma = dma_map_single(jrdev, desc,
-+					      desc_bytes(desc),
-+					      DMA_TO_DEVICE);
-+	if (dma_mapping_error(jrdev, ctx->sh_desc_enc_dma)) {
-+		dev_err(jrdev, "unable to map shared descriptor\n");
-+		return -ENOMEM;
-+	}
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "rfc4543 enc shdesc@"__stringify(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
-+		       desc_bytes(desc), 1);
-+#endif
-+
-+	/*
-+	 * Job Descriptor and Shared Descriptors
-+	 * must all fit into the 64-word Descriptor h/w Buffer
-+	 */
-+	keys_fit_inline = false;
-+	if (DESC_RFC4543_DEC_LEN + DESC_JOB_IO_LEN +
-+	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
-+		keys_fit_inline = true;
-+
-+	desc = ctx->sh_desc_dec;
-+
-+	init_sh_desc(desc, HDR_SHARE_SERIAL);
-+
-+	/* Skip key loading if it is loaded due to sharing */
-+	key_jump_cmd = append_jump(desc, JUMP_JSL |
-+				   JUMP_TEST_ALL | JUMP_COND_SHRD);
-+	if (keys_fit_inline)
-+		append_key_as_imm(desc, (void *)ctx->key, ctx->enckeylen,
-+				  ctx->enckeylen, CLASS_1 | KEY_DEST_CLASS_REG);
-+	else
-+		append_key(desc, ctx->key_dma, ctx->enckeylen,
-+			   CLASS_1 | KEY_DEST_CLASS_REG);
-+	set_jump_tgt_here(desc, key_jump_cmd);
-+
-+	/* Class 1 operation */
-+	append_operation(desc, ctx->class1_alg_type |
-+			 OP_ALG_AS_INITFINAL | OP_ALG_DECRYPT | OP_ALG_ICV_ON);
-+
-+	/* Load AES-GMAC ESP IV into Math1 register */
-+	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_WORD_DECO_MATH1 |
-+		   LDST_CLASS_DECO | tfm->ivsize);
-+
-+	/* Wait the DMA transaction to finish */
-+	append_jump(desc, JUMP_TEST_ALL | JUMP_COND_CALM |
-+		    (1 << JUMP_OFFSET_SHIFT));
-+
-+	/* assoclen + cryptlen = (seqinlen - ivsize) - icvsize */
-+	append_math_sub_imm_u32(desc, REG3, SEQINLEN, IMM, ctx->authsize);
-+
-+	/* Overwrite blank immediate AES-GMAC ESP IV data */
-+	write_iv_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
-+				   (tfm->ivsize << MOVE_LEN_SHIFT));
-+
-+	/* Overwrite blank immediate AAD data */
-+	write_aad_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
-+				    (tfm->ivsize << MOVE_LEN_SHIFT));
-+
-+	/* assoclen = (assoclen + cryptlen) - cryptlen */
-+	append_math_sub(desc, REG2, SEQOUTLEN, REG0, CAAM_CMD_SZ);
-+	append_math_sub(desc, VARSEQINLEN, REG3, REG2, CAAM_CMD_SZ);
-+
-+	/*
-+	 * MOVE_LEN opcode is not available in all SEC HW revisions,
-+	 * thus need to do some magic, i.e. self-patch the descriptor
-+	 * buffer.
-+	 */
-+	read_move_cmd = append_move(desc, MOVE_SRC_DESCBUF | MOVE_DEST_MATH3 |
-+				    (0x6 << MOVE_LEN_SHIFT));
-+	write_move_cmd = append_move(desc, MOVE_SRC_MATH3 | MOVE_DEST_DESCBUF |
-+				     (0x8 << MOVE_LEN_SHIFT));
-+
-+	/* Read Salt and AES-GMAC ESP IV */
-+	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
-+		   FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 | (4 + tfm->ivsize));
-+	/* Append Salt */
-+	append_data(desc, (void *)(ctx->key + ctx->enckeylen), 4);
-+	set_move_tgt_here(desc, write_iv_cmd);
-+	/* Blank commands. Will be overwritten by AES-GMAC ESP IV. */
-+	append_cmd(desc, 0x00000000);
-+	append_cmd(desc, 0x00000000);
-+	/* End of blank commands */
-+
-+	/* Read assoc data */
-+	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
-+			     FIFOLD_TYPE_AAD);
-+
-+	/* Will read cryptlen bytes */
-+	append_math_add(desc, VARSEQINLEN, ZERO, REG2, CAAM_CMD_SZ);
-+
-+	/* Will write cryptlen bytes */
-+	append_math_add(desc, VARSEQOUTLEN, ZERO, REG2, CAAM_CMD_SZ);
-+
-+	/* Authenticate AES-GMAC ESP IV  */
-+	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
-+		   FIFOLD_TYPE_AAD | tfm->ivsize);
-+	set_move_tgt_here(desc, write_aad_cmd);
-+	/* Blank commands. Will be overwritten by AES-GMAC ESP IV. */
-+	append_cmd(desc, 0x00000000);
-+	append_cmd(desc, 0x00000000);
-+	/* End of blank commands */
-+
-+	/* Store payload data */
-+	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
-+
-+	/* In-snoop cryptlen data */
-+	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_BOTH | FIFOLDST_VLF |
-+			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_LAST2FLUSH1);
-+
-+	set_move_tgt_here(desc, read_move_cmd);
-+	set_move_tgt_here(desc, write_move_cmd);
-+	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
-+	/* Move payload data to OFIFO */
-+	append_move(desc, MOVE_SRC_INFIFO_CL | MOVE_DEST_OUTFIFO);
-+	append_cmd(desc, CMD_LOAD | ENABLE_AUTO_INFO_FIFO);
-+
-+	/* Read ICV */
-+	append_seq_fifo_load(desc, ctx->authsize, FIFOLD_CLASS_CLASS1 |
-+			     FIFOLD_TYPE_ICV | FIFOLD_TYPE_LAST1);
-+
-+	ctx->sh_desc_dec_dma = dma_map_single(jrdev, desc,
-+					      desc_bytes(desc),
-+					      DMA_TO_DEVICE);
-+	if (dma_mapping_error(jrdev, ctx->sh_desc_dec_dma)) {
-+		dev_err(jrdev, "unable to map shared descriptor\n");
-+		return -ENOMEM;
-+	}
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "rfc4543 dec shdesc@"__stringify(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
-+		       desc_bytes(desc), 1);
-+#endif
-+
-+	/*
-+	 * Job Descriptor and Shared Descriptors
-+	 * must all fit into the 64-word Descriptor h/w Buffer
-+	 */
-+	keys_fit_inline = false;
-+	if (DESC_RFC4543_GIVENC_LEN + DESC_JOB_IO_LEN +
-+	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
-+		keys_fit_inline = true;
-+
-+	/* rfc4543_givencrypt shared descriptor */
-+	desc = ctx->sh_desc_givenc;
-+
-+	init_sh_desc(desc, HDR_SHARE_SERIAL);
-+
-+	/* Skip key loading if it is loaded due to sharing */
-+	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
-+				   JUMP_COND_SHRD);
-+	if (keys_fit_inline)
-+		append_key_as_imm(desc, (void *)ctx->key, ctx->enckeylen,
-+				  ctx->enckeylen, CLASS_1 | KEY_DEST_CLASS_REG);
-+	else
-+		append_key(desc, ctx->key_dma, ctx->enckeylen,
-+			   CLASS_1 | KEY_DEST_CLASS_REG);
-+	set_jump_tgt_here(desc, key_jump_cmd);
-+
-+	/* Generate IV */
-+	geniv = NFIFOENTRY_STYPE_PAD | NFIFOENTRY_DEST_DECO |
-+		NFIFOENTRY_DTYPE_MSG | NFIFOENTRY_LC1 |
-+		NFIFOENTRY_PTYPE_RND | (tfm->ivsize << NFIFOENTRY_DLEN_SHIFT);
-+	append_load_imm_u32(desc, geniv, LDST_CLASS_IND_CCB |
-+			    LDST_SRCDST_WORD_INFO_FIFO | LDST_IMM);
-+	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
-+	/* Move generated IV to Math1 register */
-+	append_move(desc, MOVE_SRC_INFIFO | MOVE_DEST_MATH1 |
-+		    (tfm->ivsize << MOVE_LEN_SHIFT));
-+	append_cmd(desc, CMD_LOAD | ENABLE_AUTO_INFO_FIFO);
-+
-+	/* Overwrite blank immediate AES-GMAC IV data */
-+	write_iv_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
-+				   (tfm->ivsize << MOVE_LEN_SHIFT));
-+
-+	/* Overwrite blank immediate AAD data */
-+	write_aad_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
-+				    (tfm->ivsize << MOVE_LEN_SHIFT));
-+
-+	/* Copy generated IV to OFIFO */
-+	append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_OUTFIFO |
-+		    (tfm->ivsize << MOVE_LEN_SHIFT));
-+
-+	/* Class 1 operation */
-+	append_operation(desc, ctx->class1_alg_type |
-+			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
-+
-+	/* ivsize + cryptlen = seqoutlen - authsize */
-+	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
-+
-+	/* assoclen = seqinlen - (ivsize + cryptlen) */
-+	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
-+
-+	/* Will write ivsize + cryptlen */
-+	append_math_add(desc, VARSEQOUTLEN, REG3, REG0, CAAM_CMD_SZ);
-+
-+	/*
-+	 * MOVE_LEN opcode is not available in all SEC HW revisions,
-+	 * thus need to do some magic, i.e. self-patch the descriptor
-+	 * buffer.
-+	 */
-+	read_move_cmd = append_move(desc, MOVE_SRC_DESCBUF | MOVE_DEST_MATH3 |
-+				    (0x6 << MOVE_LEN_SHIFT));
-+	write_move_cmd = append_move(desc, MOVE_SRC_MATH3 | MOVE_DEST_DESCBUF |
-+				     (0x8 << MOVE_LEN_SHIFT));
-+
-+	/* Read Salt and AES-GMAC generated IV */
-+	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
-+		   FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 | (4 + tfm->ivsize));
-+	/* Append Salt */
-+	append_data(desc, (void *)(ctx->key + ctx->enckeylen), 4);
-+	set_move_tgt_here(desc, write_iv_cmd);
-+	/* Blank commands. Will be overwritten by AES-GMAC generated IV. */
-+	append_cmd(desc, 0x00000000);
-+	append_cmd(desc, 0x00000000);
-+	/* End of blank commands */
-+
-+	/* No need to reload iv */
-+	append_seq_fifo_load(desc, tfm->ivsize, FIFOLD_CLASS_SKIP);
-+
-+	/* Read assoc data */
-+	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
-+			     FIFOLD_TYPE_AAD);
-+
-+	/* Will read cryptlen */
-+	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
-+
-+	/* Authenticate AES-GMAC IV  */
-+	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
-+		   FIFOLD_TYPE_AAD | tfm->ivsize);
-+	set_move_tgt_here(desc, write_aad_cmd);
-+	/* Blank commands. Will be overwritten by AES-GMAC IV. */
-+	append_cmd(desc, 0x00000000);
-+	append_cmd(desc, 0x00000000);
-+	/* End of blank commands */
-+
-+	/* Read and write cryptlen bytes */
-+	aead_append_src_dst(desc, FIFOLD_TYPE_AAD);
-+
-+	set_move_tgt_here(desc, read_move_cmd);
-+	set_move_tgt_here(desc, write_move_cmd);
-+	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
-+	/* Move payload data to OFIFO */
-+	append_move(desc, MOVE_SRC_INFIFO_CL | MOVE_DEST_OUTFIFO);
-+
-+	/* Write ICV */
-+	append_seq_store(desc, ctx->authsize, LDST_CLASS_1_CCB |
-+			 LDST_SRCDST_BYTE_CONTEXT);
-+
-+	ctx->sh_desc_givenc_dma = dma_map_single(jrdev, desc,
-+						 desc_bytes(desc),
-+						 DMA_TO_DEVICE);
-+	if (dma_mapping_error(jrdev, ctx->sh_desc_givenc_dma)) {
-+		dev_err(jrdev, "unable to map shared descriptor\n");
-+		return -ENOMEM;
-+	}
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR,
-+		       "rfc4543 givenc shdesc@"__stringify(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
-+		       desc_bytes(desc), 1);
-+#endif
-+
-+	return 0;
-+}
-+
-+static int rfc4543_setauthsize(struct crypto_aead *authenc,
-+			       unsigned int authsize)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
-+
-+	ctx->authsize = authsize;
-+	rfc4543_set_sh_desc(authenc);
-+
-+	return 0;
-+}
-+
- static u32 gen_split_aead_key(struct caam_ctx *ctx, const u8 *key_in,
- 			      u32 authkeylen)
- {
-@@ -1292,6 +1692,45 @@ static int rfc4106_setkey(struct crypto_aead *aead,
- 	return ret;
- }
- 
-+static int rfc4543_setkey(struct crypto_aead *aead,
-+			  const u8 *key, unsigned int keylen)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	int ret = 0;
-+
-+	if (keylen < 4)
-+		return -EINVAL;
-+
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "key in @"__stringify(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
-+#endif
-+
-+	memcpy(ctx->key, key, keylen);
-+
-+	/*
-+	 * The last four bytes of the key material are used as the salt value
-+	 * in the nonce. Update the AES key length.
-+	 */
-+	ctx->enckeylen = keylen - 4;
-+
-+	ctx->key_dma = dma_map_single(jrdev, ctx->key, ctx->enckeylen,
-+				      DMA_TO_DEVICE);
-+	if (dma_mapping_error(jrdev, ctx->key_dma)) {
-+		dev_err(jrdev, "unable to map key i/o memory\n");
-+		return -ENOMEM;
-+	}
-+
-+	ret = rfc4543_set_sh_desc(aead);
-+	if (ret) {
-+		dma_unmap_single(jrdev, ctx->key_dma, ctx->enckeylen,
-+				 DMA_TO_DEVICE);
-+	}
-+
-+	return ret;
-+}
-+
- static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
- 			     const u8 *key, unsigned int keylen)
- {
-@@ -3010,6 +3449,23 @@ static struct caam_alg_template driver_algs[] = {
- 			},
- 		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
- 	},
-+	{
-+		.name = "rfc4543(gcm(aes))",
-+		.driver_name = "rfc4543-gcm-aes-caam",
-+		.blocksize = 1,
-+		.type = CRYPTO_ALG_TYPE_AEAD,
-+		.template_aead = {
-+			.setkey = rfc4543_setkey,
-+			.setauthsize = rfc4543_setauthsize,
-+			.encrypt = aead_encrypt,
-+			.decrypt = aead_decrypt,
-+			.givencrypt = aead_givencrypt,
-+			.geniv = "<built-in>",
-+			.ivsize = 8,
-+			.maxauthsize = AES_BLOCK_SIZE,
-+			},
-+		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
-+	},
- 	/* Galois Counter Mode */
- 	{
- 		.name = "gcm(aes)",
--- 
-1.8.3.1
+Then fix AF_ALG and cryptodev, because all of the other drivers might
+be affected.
+
+Thanks!
+Maxime
+
+--=20
+Maxime Ripard, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
+
+--wxNrNKeE/ptr8Zbn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJUUnMlAAoJEBx+YmzsjxAgL04P/3wLU5wri3bag19jOZt/ZcaX
+y8p8EO0EGheG0mogxwjuVDmTW31RyYstrkgOivMAGy6WRabHSE0Lv0OcZsvplkxH
+ivx07+9ZNE5A+LjIy6P8slgp64AAuzdtCh0cb4EUAQmN7G3O544qL20H3poK95Gi
+xuFxoGatMz43WNDYA6Hhh+h7lX3VbIo8Qt8+ccHyttw7jdIld+gmadd27L/ySDx9
+rJKhQuxuh9OB7k7BplujlZCf0TXKAAmBmRm17qzI+pA2SUMoKR/U70X1qoOqhj4y
+jfis4Dd2UCGW+u0SWnx1+WrJKF4YbAapkeviO+dFZ4E+5C1kI+/JWPcAmnobCYXU
+41b9KA3aNecnbeMuxUS4xNFdD+GFzPXIhwRN9DyEgRdZbR2f/IArlcyIiUbN2uIJ
+d10g/KNL+V8vMISHJlEVdWjoMf3CtWIbl/6CJ3gZgUdGhkHjWicdATYdbBvYa739
+N6LAWS2gEvh5jhSqey4pGuEotril3LeZsEVjB0pQy362IEsctPaH0IysXZgppfO7
+a0neWUaQZemjXvp1PFLAhSBNUFLC2jT1b/sunS2T7Z3zQkdTzPzd5rHjtRMEB6qN
+1h4Z5ujd3gsuMUAAn82Wf8N3C7AIg9KMu9CubjOdf+9z920E/n74n93LBT7KFw1n
+yKV0dorV+2ex/2fNBxtT
+=C1Uz
+-----END PGP SIGNATURE-----
+
+--wxNrNKeE/ptr8Zbn--
