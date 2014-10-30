@@ -1,17 +1,19 @@
 From: Tudor Ambarus <tudor.ambarus@freescale.com>
 Subject: [PATCH] crypto: caam - add support for rfc4543(gcm(aes))
-Date: Thu, 30 Oct 2014 18:33:31 +0200
-Message-ID: <1414686811-6527-1-git-send-email-tudor.ambarus@freescale.com>
+Date: Thu, 30 Oct 2014 18:55:07 +0200
+Message-ID: <1414688107-8196-1-git-send-email-tudor.ambarus@freescale.com>
+References: <1414686811-6527-1-git-send-email-tudor.ambarus@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <herbert@gondor.apana.org.au>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0146.outbound.protection.outlook.com ([65.55.169.146]:22448
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+Received: from mail-bn1on0114.outbound.protection.outlook.com ([157.56.110.114]:42048
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1758867AbaJ3Qe1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Oct 2014 12:34:27 -0400
+	id S1758190AbaJ3Qz7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Oct 2014 12:55:59 -0400
+In-Reply-To: <1414686811-6527-1-git-send-email-tudor.ambarus@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -21,11 +23,13 @@ This method is referred as ENCR_NULL_AUTH_AES_GMAC.
 
 Signed-off-by: Tudor Ambarus <tudor.ambarus@freescale.com>
 ---
- drivers/crypto/caam/caamalg.c | 459 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 458 insertions(+), 1 deletion(-)
+removed a blank line introduced in aead_encrypt function.
+
+ drivers/crypto/caam/caamalg.c | 458 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 457 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index c17154c..02b417f 100644
+index c17154c..50c526c 100644
 --- a/drivers/crypto/caam/caamalg.c
 +++ b/drivers/crypto/caam/caamalg.c
 @@ -83,13 +83,18 @@
@@ -496,15 +500,7 @@ index c17154c..02b417f 100644
  static int ablkcipher_setkey(struct crypto_ablkcipher *ablkcipher,
  			     const u8 *key, unsigned int keylen)
  {
-@@ -2045,6 +2484,7 @@ static int aead_encrypt(struct aead_request *req)
- 	/* Create and submit job descriptor */
- 	init_aead_job(ctx->sh_desc_enc, ctx->sh_desc_enc_dma, edesc, req,
- 		      all_contig, true);
-+
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "aead jobdesc@"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, edesc->hw_desc,
-@@ -3010,6 +3450,23 @@ static struct caam_alg_template driver_algs[] = {
+@@ -3010,6 +3449,23 @@ static struct caam_alg_template driver_algs[] = {
  			},
  		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
  	},
