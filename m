@@ -1,51 +1,49 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH] kernel crypto API interface specification
-Date: Fri, 31 Oct 2014 04:01:04 +0100
-Message-ID: <201410310401.04278.marex@denx.de>
-References: <7502136.9BkWHTZ0th@myon.chronox.de> <20141016131007.GA11517@gondor.apana.org.au>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v5 4/4] crypto: Add Allwinner Security System crypto
+ accelerator
+Date: Fri, 31 Oct 2014 15:20:30 +0800
+Message-ID: <20141031072030.GA7563@gondor.apana.org.au>
+References: <1413728182-13569-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1413728182-13569-5-git-send-email-clabbe.montjoie@gmail.com>
+ <20141021191149.GQ21108@lukather>
+ <544A9FEA.6020304@gmail.com>
+ <20141030171933.GR21251@lukather>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Stephan Mueller <smueller@chronox.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:44200 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752065AbaJaDJI (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Oct 2014 23:09:08 -0400
-In-Reply-To: <20141016131007.GA11517@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
+	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, crope-X3B1VOXEql0@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20141030171933.GR21251@lukather>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thursday, October 16, 2014 at 03:10:07 PM, Herbert Xu wrote:
-> On Tue, Oct 14, 2014 at 09:46:50PM +0200, Stephan Mueller wrote:
-> > The update adds a complete interface documentation of the kernel crypto
-> > API. All cipher types supported by the kernel crypto API are documented.
-> > 
-> > In addition, kernel and user space example code is provided. The sample
-> > code covers synchronous and asynchronous cipher operation, random
-> > number generation and performing hashing as well as encryption and
-> > decryption in user space.
-> > 
-> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+On Thu, Oct 30, 2014 at 06:19:33PM +0100, Maxime Ripard wrote:
+>
+> > With AF_ALG and cryptodev, the SG is in highmem. Verified with some
+> > PageHighMem().
 > 
-> Thanks for the patch Stephan!
-> 
-> Marek Vasut <marex@denx.de> has also been working on a set of
-> documentation for the crypto API so he might have some comments
-> on this.
+> Then fix AF_ALG and cryptodev, because all of the other drivers might
+> be affected.
 
-Sorry for the late reply, thanks for keeping me in the loop.
+No it's the driver that needs to be fixed.  Of course if there
+are enough drivers it may be worthwhile adding either copying or
+a software fallback for highmem requests.
 
-I can share the last state of the document I wrote. Currently,
-it is not possible for me to keep up with my workload and do
-anything else, so that's all I can do.
-
-Apologies.
-
-Best regards,
-Marek Vasut
+Cheers,
+-- 
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
