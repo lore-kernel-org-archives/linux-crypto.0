@@ -1,58 +1,78 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] kernel crypto API interface specification
-Date: Fri, 31 Oct 2014 14:46:41 +0100
-Message-ID: <12522104.5yU5SNjzIg@tachyon.chronox.de>
-References: <7502136.9BkWHTZ0th@myon.chronox.de> <20141031072353.GC7563@gondor.apana.org.au> <201410311009.52713.marex@denx.de>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: [PATCH] crypto: caam: fix error reporting
+Date: Fri, 31 Oct 2014 18:57:33 +0200
+Message-ID: <1414774653-3583-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Marek Vasut <marex@denx.de>
+Content-Type: text/plain
+Cc: <linux-kernel@vger.kernel.org>, <horia.geanta@freescale.com>,
+	<marex@denx.de>, Cristian Stoica <cristian.stoica@freescale.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54160 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759725AbaJaNqs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 31 Oct 2014 09:46:48 -0400
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S470F> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Fri, 31 Oct 2014 14:46:43 +0100
-In-Reply-To: <201410311009.52713.marex@denx.de>
+Received: from mail-bl2on0125.outbound.protection.outlook.com ([65.55.169.125]:11834
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751485AbaJaROk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 31 Oct 2014 13:14:40 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 31. Oktober 2014, 10:09:52 schrieb Marek Vasut:
+The error code returned by hardware is four bits wide with an expected
+zero MSB. A hardware error condition where the error code can get between
+0x8 and 0xf will trigger an out of bound array access on the error
+message table.
+This patch fixes the invalid array access following such an error and
+reports the condition.
 
-Hi Marek,
+Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+---
+ drivers/crypto/caam/error.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
-> On Friday, October 31, 2014 at 08:23:53 AM, Herbert Xu wrote:
-> > On Fri, Oct 31, 2014 at 04:01:04AM +0100, Marek Vasut wrote:
-> > > I can share the last state of the document I wrote. Currently,
-> > > it is not possible for me to keep up with my workload and do
-> > > anything else, so that's all I can do.
-> > 
-> > Posting your latest revision would be great.
-> 
-> Please see below, mine is much less complete than Stephan's though
-> and likely contains some bugs.
-
-Thank you for sharing.
-
-I am in the last innings to complete a new patch set. I will see to merge your 
-documentation with mine.
-
-The upcoming patchset will cover the following changes:
-
-- split out the user space interface documentation (and fix a bug -- I forgot 
-a memset(0) in there)
-
-- keep the "high-level" description in a document in Documentation/crypto/
-
-- put the API function documentation into the header files (I hope that is ok 
-that I touch these files to add comments)
-
+diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
+index 6531054..c4483ad 100644
+--- a/drivers/crypto/caam/error.c
++++ b/drivers/crypto/caam/error.c
+@@ -213,7 +213,7 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
+ 		void (*report_ssed)(struct device *jrdev, const u32 status,
+ 				    const char *error);
+ 		const char *error;
+-	} status_src[] = {
++	} status_src[16] = {
+ 		{ NULL, "No error" },
+ 		{ NULL, NULL },
+ 		{ report_ccb_status, "CCB" },
+@@ -222,18 +222,23 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
+ 		{ NULL, NULL },
+ 		{ report_jr_status, "Job Ring" },
+ 		{ report_cond_code_status, "Condition Code" },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
+ 	};
+ 	u32 ssrc = status >> JRSTA_SSRC_SHIFT;
+ 	const char *error = status_src[ssrc].error;
+ 
+-	/*
+-	 * If there is no further error handling function, just
+-	 * print the error code, error string and exit. Otherwise
+-	 * call the handler function.
+-	 */
+-	if (!status_src[ssrc].report_ssed)
+-		dev_err(jrdev, "%08x: %s: \n", status, status_src[ssrc].error);
+-	else
++	if (status_src[ssrc].report_ssed)
+ 		status_src[ssrc].report_ssed(jrdev, status, error);
++	else if (error)
++		dev_err(jrdev, "%d: %s\n", ssrc, error);
++	else
++		dev_err(jrdev, "%d: unknown error code\n", ssrc);
+ }
+ EXPORT_SYMBOL(caam_jr_strstatus);
 -- 
-Ciao
-Stephan
+1.8.3.1
