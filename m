@@ -1,89 +1,106 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: Re: [PATCH] crypto: caam: fix error reporting
-Date: Mon, 3 Nov 2014 11:18:36 +0200
-Message-ID: <5457486C.3030205@freescale.com>
-References: <1414774653-3583-1-git-send-email-cristian.stoica@freescale.com>
- <20141031132209.5abced3ca9f55649d0bd6007@freescale.com>
+From: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Subject: Re: [PATCH v5 4/4] crypto: Add Allwinner Security
+ System crypto accelerator
+Date: Mon, 3 Nov 2014 10:34:46 +0100
+Message-ID: <20141103093446.GG11263@lukather>
+References: <1413728182-13569-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1413728182-13569-5-git-send-email-clabbe.montjoie@gmail.com>
+ <20141021191149.GQ21108@lukather>
+ <544A9FEA.6020304@gmail.com>
+ <20141030171933.GR21251@lukather>
+ <20141031072030.GA7563@gondor.apana.org.au>
+ <20141031081323.GS21251@lukather>
+ <20141031081803.GA8012@gondor.apana.org.au>
+ <20141031095706.GA8054@lukather>
+ <20141031100522.GA8655@gondor.apana.org.au>
+Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<horia.geanta@freescale.com>, <marex@denx.de>
-To: Kim Phillips <kim.phillips@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0135.outbound.protection.outlook.com ([157.56.110.135]:14256
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751541AbaKCJeZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Nov 2014 04:34:25 -0500
-In-Reply-To: <20141031132209.5abced3ca9f55649d0bd6007@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
-
-Hi Kim,
-
-On 10/31/2014 08:22 PM, Kim Phillips wrote:
-> On Fri, 31 Oct 2014 18:57:33 +0200
-> Cristian Stoica <cristian.stoica@freescale.com> wrote:
-> 
-> If this issue was brought up by h/w, the appropriate new error codes
-> should be being introduced.
-
-If you have the new error codes please send them to me and I'll make an
-update.
-
-> Otherwise, I'm assuming it was brought up by a static code analyser,
-> which technically could be ignored, but...
-
-Actually, our static code analyzer did not see this one.
-
->> -	/*
->> -	 * If there is no further error handling function, just
->> -	 * print the error code, error string and exit. Otherwise
->> -	 * call the handler function.
->> -	 */
-> 
-> why remove the comment?  It's still valid.
-
-The comment was disagreeing with the new code, so I just removed it.
-
->> -	if (!status_src[ssrc].report_ssed)
->> -		dev_err(jrdev, "%08x: %s: \n", status, status_src[ssrc].error);
->> -	else
->> +	if (status_src[ssrc].report_ssed)
->>  		status_src[ssrc].report_ssed(jrdev, status, error);
->> +	else if (error)
->> +		dev_err(jrdev, "%d: %s\n", ssrc, error);
->> +	else
->> +		dev_err(jrdev, "%d: unknown error code\n", ssrc);
-> 
-> This is simpler:
-> 
-> diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
-> index 6531054..6f4a148 100644
-> --- a/drivers/crypto/caam/error.c
-> +++ b/drivers/crypto/caam/error.c
-> @@ -224,7 +224,12 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
->                 { report_cond_code_status, "Condition Code" },
->         };
->         u32 ssrc = status >> JRSTA_SSRC_SHIFT;
-> -       const char *error = status_src[ssrc].error;
-> +       const char *error;
-> +
-> +       if (ssrc >= ARRAY_SIZE(status_src)) {
-> +               dev_err(jrdev, "unknown error status source %d\n", ssrc);
-> +               return;
-> +       }
-
-It is indeed simpler but does it consider also the missing error codes
-at index 1 and 5? Just checking for an upper bound is not enough.
-
-On the other hand, if the error field is only three bits wide instead of
-four as stated by the documentation, a better fix means using a three
-bit mask instead of reporting an invalid error code.
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="UTZ8bGhNySVQ9LYl"
+Cc: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
+	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, crope-X3B1VOXEql0@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-sunxi+bncBD2ZNBF5VYJRBR4Y3WRAKGQEOVYCCTA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20141031100522.GA8655-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
 
-Thanks for review,
+--UTZ8bGhNySVQ9LYl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Cristian S.
+On Fri, Oct 31, 2014 at 06:05:22PM +0800, Herbert Xu wrote:
+> On Fri, Oct 31, 2014 at 10:57:06AM +0100, Maxime Ripard wrote:
+> >
+> > On a 3.18-rc2 kernel:
+> >=20
+> > $ git grep kmap -- crypto/
+> > crypto/ahash.c:                         walk->data =3D kmap(walk->pg);
+> > crypto/ahash.c:                         walk->data =3D kmap_atomic(walk=
+->pg);
+> > crypto/async_tx/async_memcpy.c:         dest_buf =3D kmap_atomic(dest) =
++ dest_offset;
+> > crypto/async_tx/async_memcpy.c:         src_buf =3D kmap_atomic(src) + =
+src_offset;
+> > crypto/scatterwalk.c:                   return kmap_atomic(scatterwalk_=
+page(walk)) +
+> > crypto/shash.c:                         data =3D kmap_atomic(sg_page(sg=
+));
+> > crypto/shash.c:                         data =3D kmap_atomic(sg_page(sg=
+));
+> >=20
+> > None of the drivers are.
+>=20
+> What do you mean? It's precisely because the page can be in highmem
+> that we are mapping it.  If it's not in highmem it'll be a noop.
+
+What I mean is that since you are saying that drivers should do the
+kmap themselves, then *all* of the drivers are broken if they are not
+using it. And all of them are missing this kmap.
+
+Maxime
+
+--=20
+Maxime Ripard, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
+
+--UTZ8bGhNySVQ9LYl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJUV0w2AAoJEBx+YmzsjxAg/zUP/RYiTHvBw1aa+/lHomPgAEs0
+OQVMt3GAKLK72eym+H4kee7Xkx4X+dA7JhArMKSsm6w7NnTFn/SeUqcAzEhn6eKh
+GpKkjgfwDDwfBvM9ayeimQuKsPmBTHLCuQVmehcD3c9WzTTaWIMHekbN0cztRUM0
+WfKmrOiclBuBYWHyQr22ZuXptSN95RdAqpG4VNUSl47zQztaJEg1iO5Rb6JbVug9
+7FheB4BnXtlok95X1IfP58i0rAiqFzX1LaTa7nhUo14GZ1EnQH+aVRg00q2PtwBy
+kWFYn2wWY4SD4dG/TrSeJVfwt4pari2wkjDaS6iSdHK/xpDXh9yZQlsh3NSxsfUy
+010tvNr45DYPlpRFzPHrhm952AXjbHwJgKnMgrt1zDtFTBBt9jOd4xKMpsX6v3on
+0VtzSSjaZD2Ro6bFan/l4/Co0d0G/NNqqt9swxdMw80Zfy6hVs75Lr5KlOD8Oyey
+HZUi9CAhloqbM+q+4tNfTMxYufcLjpYPPLRrXSNZOE7BaZuidW8Q8qqDUElE16ys
+Lq72scAikcsveNGt2uTdfwr9Jgx15BN+TQRL2Lr4Tf/bxxp5O2TSIRf7uQrbZB5J
+Y1QWwDweprX3ry3+l/yHqu0FxGO8bFv+oqONl3GpD+xYGrgs0iakM7oQwLIOV7eM
+Zc/q99AwyNzJ0LXg2XeO
+=8cj2
+-----END PGP SIGNATURE-----
+
+--UTZ8bGhNySVQ9LYl--
