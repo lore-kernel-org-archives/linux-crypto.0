@@ -1,8 +1,8 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH v2 01/11] crypto: Documentation - crypto API high level
  spec
-Date: Mon, 3 Nov 2014 22:43:37 +0800
-Message-ID: <20141103144337.GA31659@gondor.apana.org.au>
+Date: Mon, 3 Nov 2014 22:49:25 +0800
+Message-ID: <20141103144925.GA31688@gondor.apana.org.au>
 References: <6375771.bx7QqLJLuR@tachyon.chronox.de>
  <4163724.RCMDlx8dmE@tachyon.chronox.de>
  <20141103083439.635f5cb6@lwn.net>
@@ -18,30 +18,38 @@ Cc: Jonathan Corbet <corbet@lwn.net>,
 	Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
 	linux-crypto@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:36147 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751908AbaKCOtn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 3 Nov 2014 09:49:43 -0500
 Content-Disposition: inline
 In-Reply-To: <4303532.NGaUQ44sQJ@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 On Mon, Nov 03, 2014 at 03:18:29PM +0100, Stephan Mueller wrote:
 >
-> > > + * CRYPTO_ALG_TYPE_CIPHER	Raw block cipher
-> > > + * CRYPTO_ALG_TYPE_COMPRESS	Compression
-> > > + * CRYPTO_ALG_TYPE_AEAD		Authenticated Encryption with 
-> Associated Data
-> > > (MAC) + * CRYPTO_ALG_TYPE_BLKCIPHER	Synchronous multi-block cipher
-> > > + * CRYPTO_ALG_TYPE_ABLKCIPHER	Asynchronous multi-block cipher
-> > > + * CRYPTO_ALG_TYPE_GIVCIPHER
+> > > + * CRYPTO_ALG_TYPE_DIGEST	Raw message digest
+> > > + * CRYPTO_ALG_TYPE_HASH		Alias for CRYPTO_ALG_TYPE_DIGEST
+> > > + * CRYPTO_ALG_TYPE_SHASH	Synchronous multi-block hash
+> > > + * CRYPTO_ALG_TYPE_AHASH	Asynchronous multi-block hash
+> > > + * CRYPTO_ALG_TYPE_RNG		Random Number Generation
+> > > + * CRYPTO_ALG_TYPE_PCOMPRESS
 > > 
-> > What's this one?
+> > What's that last one?
 > 
-> I would like to ask Herbert what that is -- I looked around in the code and I 
-> am not sure what that flag shall indicate.
+> Same here.
 
-givcipher is an ablkcipher packed together with an IV generator.
+pcompress is an enhanced version of compress allowing for piece-meal
+compression/decompression rather than having to shove everything in
+all at once.
 
-Cheers,
+Eventually pcompress should replace the compress interface once
+everything is converted across.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
