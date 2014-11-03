@@ -1,305 +1,99 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2] arm64/crypto: use crypto instructions to generate AES key schedule
-Date: Mon,  3 Nov 2014 17:50:01 +0100
-Message-ID: <1415033401-4722-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	herbert@gondor.apana.org.au, will.deacon@arm.com,
-	catalin.marinas@arm.com, jussi.kivilinna@iki.fi
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f45.google.com ([74.125.82.45]:59092 "EHLO
-	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752446AbaKCQuL (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 3 Nov 2014 11:50:11 -0500
-Received: by mail-wg0-f45.google.com with SMTP id x12so11645535wgg.18
-        for <linux-crypto@vger.kernel.org>; Mon, 03 Nov 2014 08:50:09 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] crypto: caam: fix error reporting
+Date: Mon, 3 Nov 2014 13:47:16 -0600
+Message-ID: <20141103134716.775acd39d6334c6f8aeca151@freescale.com>
+References: <1414774653-3583-1-git-send-email-cristian.stoica@freescale.com>
+	<20141031132209.5abced3ca9f55649d0bd6007@freescale.com>
+	<5457486C.3030205@freescale.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<horia.geanta@freescale.com>, <marex@denx.de>
+To: Cristian Stoica <cristian.stoica@freescale.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <5457486C.3030205@freescale.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch implements the AES key schedule generation using ARMv8
-Crypto Instructions. It replaces the table based C implementation
-in aes_generic.ko, which means we can drop the dependency on that
-module.
+On Mon, 3 Nov 2014 11:18:36 +0200
+Cristian Stoica <cristian.stoica@freescale.com> wrote:
 
-Tested-by: Steve Capper <steve.capper@linaro.org>
-Acked-by: Steve Capper <steve.capper@linaro.org>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
-v2: grammar/whitespace fixes, acked/tested-by added
+> On 10/31/2014 08:22 PM, Kim Phillips wrote:
+> > On Fri, 31 Oct 2014 18:57:33 +0200
+> > Cristian Stoica <cristian.stoica@freescale.com> wrote:
+> > 
+> > If this issue was brought up by h/w, the appropriate new error codes
+> > should be being introduced.
+> 
+> If you have the new error codes please send them to me and I'll make an
+> update.
 
- arch/arm64/crypto/Kconfig           |   5 +-
- arch/arm64/crypto/aes-ce-ccm-glue.c |   4 +-
- arch/arm64/crypto/aes-ce-cipher.c   | 112 +++++++++++++++++++++++++++++++++++-
- arch/arm64/crypto/aes-ce-setkey.h   |   5 ++
- arch/arm64/crypto/aes-glue.c        |  18 ++++--
- 5 files changed, 133 insertions(+), 11 deletions(-)
- create mode 100644 arch/arm64/crypto/aes-ce-setkey.h
+I was mainly inquiring as to the motive of the patch.  fwiw, I don't
+see error codes with the most significant bit set in the latest
+documentation (which is available from STC).
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index 5562652c5316..a38b02ce5f9a 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -27,20 +27,19 @@ config CRYPTO_AES_ARM64_CE
- 	tristate "AES core cipher using ARMv8 Crypto Extensions"
- 	depends on ARM64 && KERNEL_MODE_NEON
- 	select CRYPTO_ALGAPI
--	select CRYPTO_AES
- 
- config CRYPTO_AES_ARM64_CE_CCM
- 	tristate "AES in CCM mode using ARMv8 Crypto Extensions"
- 	depends on ARM64 && KERNEL_MODE_NEON
- 	select CRYPTO_ALGAPI
--	select CRYPTO_AES
-+	select CRYPTO_AES_ARM64_CE
- 	select CRYPTO_AEAD
- 
- config CRYPTO_AES_ARM64_CE_BLK
- 	tristate "AES in ECB/CBC/CTR/XTS modes using ARMv8 Crypto Extensions"
- 	depends on ARM64 && KERNEL_MODE_NEON
- 	select CRYPTO_BLKCIPHER
--	select CRYPTO_AES
-+	select CRYPTO_AES_ARM64_CE
- 	select CRYPTO_ABLK_HELPER
- 
- config CRYPTO_AES_ARM64_NEON_BLK
-diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
-index 9e6cdde9b43d..0ac73b838fa3 100644
---- a/arch/arm64/crypto/aes-ce-ccm-glue.c
-+++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
-@@ -16,6 +16,8 @@
- #include <linux/crypto.h>
- #include <linux/module.h>
- 
-+#include "aes-ce-setkey.h"
-+
- static int num_rounds(struct crypto_aes_ctx *ctx)
- {
- 	/*
-@@ -48,7 +50,7 @@ static int ccm_setkey(struct crypto_aead *tfm, const u8 *in_key,
- 	struct crypto_aes_ctx *ctx = crypto_aead_ctx(tfm);
- 	int ret;
- 
--	ret = crypto_aes_expand_key(ctx, in_key, key_len);
-+	ret = ce_aes_expandkey(ctx, in_key, key_len);
- 	if (!ret)
- 		return 0;
- 
-diff --git a/arch/arm64/crypto/aes-ce-cipher.c b/arch/arm64/crypto/aes-ce-cipher.c
-index 2075e1acae6b..7f96e8af6a5a 100644
---- a/arch/arm64/crypto/aes-ce-cipher.c
-+++ b/arch/arm64/crypto/aes-ce-cipher.c
-@@ -14,6 +14,8 @@
- #include <linux/crypto.h>
- #include <linux/module.h>
- 
-+#include "aes-ce-setkey.h"
-+
- MODULE_DESCRIPTION("Synchronous AES cipher using ARMv8 Crypto Extensions");
- MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
- MODULE_LICENSE("GPL v2");
-@@ -124,6 +126,114 @@ static void aes_cipher_decrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
- 	kernel_neon_end();
- }
- 
-+/*
-+ * aes_sub() - use the aese instruction to perform the AES sbox substitution
-+ *             on each byte in 'input'
-+ */
-+static u32 aes_sub(u32 input)
-+{
-+	u32 ret;
-+
-+	__asm__("dup	v1.4s, %w[in]		;"
-+		"movi	v0.16b, #0		;"
-+		"aese	v0.16b, v1.16b		;"
-+		"umov	%w[out], v0.4s[0]	;"
-+
-+	:	[out]	"=r"(ret)
-+	:	[in]	"r"(input)
-+	:		"v0","v1");
-+
-+	return ret;
-+}
-+
-+int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
-+		     unsigned int key_len)
-+{
-+	/*
-+	 * The AES key schedule round constants
-+	 */
-+	static u8 const rcon[] = {
-+		0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36,
-+	};
-+
-+	u32 kwords = key_len / sizeof(u32);
-+	struct aes_block *key_enc, *key_dec;
-+	int i, j;
-+
-+	if (key_len != AES_KEYSIZE_128 &&
-+	    key_len != AES_KEYSIZE_192 &&
-+	    key_len != AES_KEYSIZE_256)
-+		return -EINVAL;
-+
-+	memcpy(ctx->key_enc, in_key, key_len);
-+	ctx->key_length = key_len;
-+
-+	kernel_neon_begin_partial(2);
-+	for (i = 0; i < sizeof(rcon); i++) {
-+		u32 *rki = ctx->key_enc + (i * kwords);
-+		u32 *rko = rki + kwords;
-+
-+		rko[0] = ror32(aes_sub(rki[kwords - 1]), 8) ^ rcon[i] ^ rki[0];
-+		rko[1] = rko[0] ^ rki[1];
-+		rko[2] = rko[1] ^ rki[2];
-+		rko[3] = rko[2] ^ rki[3];
-+
-+		if (key_len == AES_KEYSIZE_192) {
-+			if (i >= 7)
-+				break;
-+			rko[4] = rko[3] ^ rki[4];
-+			rko[5] = rko[4] ^ rki[5];
-+		} else if (key_len == AES_KEYSIZE_256) {
-+			if (i >= 6)
-+				break;
-+			rko[4] = aes_sub(rko[3]) ^ rki[4];
-+			rko[5] = rko[4] ^ rki[5];
-+			rko[6] = rko[5] ^ rki[6];
-+			rko[7] = rko[6] ^ rki[7];
-+		}
-+	}
-+
-+	/*
-+	 * Generate the decryption keys for the Equivalent Inverse Cipher.
-+	 * This involves reversing the order of the round keys, and applying
-+	 * the Inverse Mix Columns transformation on all but the first and
-+	 * the last one.
-+	 */
-+	key_enc = (struct aes_block *)ctx->key_enc;
-+	key_dec = (struct aes_block *)ctx->key_dec;
-+	j = num_rounds(ctx);
-+
-+	key_dec[0] = key_enc[j];
-+	for (i = 1, j--; j > 0; i++, j--)
-+		__asm__("ld1	{v0.16b}, %[in]		;"
-+			"aesimc	v1.16b, v0.16b		;"
-+			"st1	{v1.16b}, %[out]	;"
-+
-+		:	[out]	"=Q"(key_dec[i])
-+		:	[in]	"Q"(key_enc[j])
-+		:		"v0","v1");
-+	key_dec[i] = key_enc[0];
-+
-+	kernel_neon_end();
-+	return 0;
-+}
-+EXPORT_SYMBOL(ce_aes_expandkey);
-+
-+int ce_aes_setkey(struct crypto_tfm *tfm, const u8 *in_key,
-+		  unsigned int key_len)
-+{
-+	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-+	int ret;
-+
-+	ret = ce_aes_expandkey(ctx, in_key, key_len);
-+	if (!ret)
-+		return 0;
-+
-+	tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-+	return -EINVAL;
-+}
-+EXPORT_SYMBOL(ce_aes_setkey);
-+
- static struct crypto_alg aes_alg = {
- 	.cra_name		= "aes",
- 	.cra_driver_name	= "aes-ce",
-@@ -135,7 +245,7 @@ static struct crypto_alg aes_alg = {
- 	.cra_cipher = {
- 		.cia_min_keysize	= AES_MIN_KEY_SIZE,
- 		.cia_max_keysize	= AES_MAX_KEY_SIZE,
--		.cia_setkey		= crypto_aes_set_key,
-+		.cia_setkey		= ce_aes_setkey,
- 		.cia_encrypt		= aes_cipher_encrypt,
- 		.cia_decrypt		= aes_cipher_decrypt
- 	}
-diff --git a/arch/arm64/crypto/aes-ce-setkey.h b/arch/arm64/crypto/aes-ce-setkey.h
-new file mode 100644
-index 000000000000..f08a6471d034
---- /dev/null
-+++ b/arch/arm64/crypto/aes-ce-setkey.h
-@@ -0,0 +1,5 @@
-+
-+int ce_aes_setkey(struct crypto_tfm *tfm, const u8 *in_key,
-+		  unsigned int key_len);
-+int ce_aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
-+		     unsigned int key_len);
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 79cd911ef88c..801aae32841f 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -16,9 +16,13 @@
- #include <linux/module.h>
- #include <linux/cpufeature.h>
- 
-+#include "aes-ce-setkey.h"
-+
- #ifdef USE_V8_CRYPTO_EXTENSIONS
- #define MODE			"ce"
- #define PRIO			300
-+#define aes_setkey		ce_aes_setkey
-+#define aes_expandkey		ce_aes_expandkey
- #define aes_ecb_encrypt		ce_aes_ecb_encrypt
- #define aes_ecb_decrypt		ce_aes_ecb_decrypt
- #define aes_cbc_encrypt		ce_aes_cbc_encrypt
-@@ -30,6 +34,8 @@ MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 Crypto Extensions");
- #else
- #define MODE			"neon"
- #define PRIO			200
-+#define aes_setkey		crypto_aes_set_key
-+#define aes_expandkey		crypto_aes_expand_key
- #define aes_ecb_encrypt		neon_aes_ecb_encrypt
- #define aes_ecb_decrypt		neon_aes_ecb_decrypt
- #define aes_cbc_encrypt		neon_aes_cbc_encrypt
-@@ -79,10 +85,10 @@ static int xts_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 	struct crypto_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
- 	int ret;
- 
--	ret = crypto_aes_expand_key(&ctx->key1, in_key, key_len / 2);
-+	ret = aes_expandkey(&ctx->key1, in_key, key_len / 2);
- 	if (!ret)
--		ret = crypto_aes_expand_key(&ctx->key2, &in_key[key_len / 2],
--					    key_len / 2);
-+		ret = aes_expandkey(&ctx->key2, &in_key[key_len / 2],
-+				    key_len / 2);
- 	if (!ret)
- 		return 0;
- 
-@@ -288,7 +294,7 @@ static struct crypto_alg aes_algs[] = { {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
- 		.ivsize		= AES_BLOCK_SIZE,
--		.setkey		= crypto_aes_set_key,
-+		.setkey		= aes_setkey,
- 		.encrypt	= ecb_encrypt,
- 		.decrypt	= ecb_decrypt,
- 	},
-@@ -306,7 +312,7 @@ static struct crypto_alg aes_algs[] = { {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
- 		.ivsize		= AES_BLOCK_SIZE,
--		.setkey		= crypto_aes_set_key,
-+		.setkey		= aes_setkey,
- 		.encrypt	= cbc_encrypt,
- 		.decrypt	= cbc_decrypt,
- 	},
-@@ -324,7 +330,7 @@ static struct crypto_alg aes_algs[] = { {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
- 		.ivsize		= AES_BLOCK_SIZE,
--		.setkey		= crypto_aes_set_key,
-+		.setkey		= aes_setkey,
- 		.encrypt	= ctr_encrypt,
- 		.decrypt	= ctr_encrypt,
- 	},
--- 
-1.8.3.2
+> > Otherwise, I'm assuming it was brought up by a static code analyser,
+> > which technically could be ignored, but...
+> 
+> Actually, our static code analyzer did not see this one.
+
+ok, so the patch technically isn't fixing anything broken, then.
+
+> >> -	/*
+> >> -	 * If there is no further error handling function, just
+> >> -	 * print the error code, error string and exit. Otherwise
+> >> -	 * call the handler function.
+> >> -	 */
+> > 
+> > why remove the comment?  It's still valid.
+> 
+> The comment was disagreeing with the new code, so I just removed it.
+
+the new code just added a new condition, which doesn't invalidate
+the comment.  And simply removing the comment as opposed to amending
+it is a bit overkill.
+
+> >> -	if (!status_src[ssrc].report_ssed)
+> >> -		dev_err(jrdev, "%08x: %s: \n", status, status_src[ssrc].error);
+> >> -	else
+> >> +	if (status_src[ssrc].report_ssed)
+> >>  		status_src[ssrc].report_ssed(jrdev, status, error);
+> >> +	else if (error)
+> >> +		dev_err(jrdev, "%d: %s\n", ssrc, error);
+> >> +	else
+> >> +		dev_err(jrdev, "%d: unknown error code\n", ssrc);
+> > 
+> > This is simpler:
+> > 
+> > diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
+> > index 6531054..6f4a148 100644
+> > --- a/drivers/crypto/caam/error.c
+> > +++ b/drivers/crypto/caam/error.c
+> > @@ -224,7 +224,12 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
+> >                 { report_cond_code_status, "Condition Code" },
+> >         };
+> >         u32 ssrc = status >> JRSTA_SSRC_SHIFT;
+> > -       const char *error = status_src[ssrc].error;
+> > +       const char *error;
+> > +
+> > +       if (ssrc >= ARRAY_SIZE(status_src)) {
+> > +               dev_err(jrdev, "unknown error status source %d\n", ssrc);
+> > +               return;
+> > +       }
+> 
+> It is indeed simpler but does it consider also the missing error codes
+> at index 1 and 5? Just checking for an upper bound is not enough.
+
+no, the existing code already handles that.  Note that newer
+documentation fills the 1 and 5 slots, too.
+
+> On the other hand, if the error field is only three bits wide instead of
+> four as stated by the documentation, a better fix means using a three
+> bit mask instead of reporting an invalid error code.
+
+true, but then we'd introduce a direct discrepancy with the
+documentation, and thus h/w.
+
+Kim
