@@ -1,84 +1,84 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: drbg - add MODULE_ALIAS for all DRBG types
-Date: Tue, 04 Nov 2014 03:08:09 +0100
-Message-ID: <6130984.PGBGVNdX6r@tachyon.chronox.de>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] crypto: caam: fix error reporting
+Date: Tue, 4 Nov 2014 10:57:31 -0600
+Message-ID: <20141104105731.ccb0eedea154b9bb6ed195b3@freescale.com>
+References: <1414774653-3583-1-git-send-email-cristian.stoica@freescale.com>
+	<20141031132209.5abced3ca9f55649d0bd6007@freescale.com>
+	<5457486C.3030205@freescale.com>
+	<20141103134716.775acd39d6334c6f8aeca151@freescale.com>
+	<54589515.2010903@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<horia.geanta@freescale.com>, <marex@denx.de>
+To: Cristian Stoica <cristian.stoica@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54283 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753829AbaKDOUs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Nov 2014 09:20:48 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S50C4> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Tue, 4 Nov 2014 15:20:44 +0100
+Received: from mail-bn1bn0102.outbound.protection.outlook.com ([157.56.110.102]:6624
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751292AbaKDRDI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 4 Nov 2014 12:03:08 -0500
+In-Reply-To: <54589515.2010903@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The kernel module drbg.ko is currently not loaded automatically when a
-DRBG is requested by a consumer. This is due to missing MODULE_ALIAS
-flags for each of the implemented DRBG types.
+On Tue, 4 Nov 2014 10:57:57 +0200
+Cristian Stoica <cristian.stoica@freescale.com> wrote:
 
-This patch adds aliases for each of the 22 defined DRBGs.
+> Hi Kim,
+> 
+> >> Actually, our static code analyzer did not see this one.
+> > 
+> > ok, so the patch technically isn't fixing anything broken, then.
+> 
+> Are you saying the code isn't broken _because_ a static tool analyser
+> did not see anything wrong here?
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+no: I'm saying there was no symptom - something I'd expect to gather
+from the original commit message.
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 8c0a742..9fb38a5 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -291,6 +291,13 @@ static inline void drbg_cpu_to_be32(__u32 val, unsigned char *buf)
- 
- #ifdef CONFIG_CRYPTO_DRBG_CTR
- #define CRYPTO_DRBG_CTR_STRING "CTR "
-+MODULE_ALIAS("drbg_pr_ctr_aes256");
-+MODULE_ALIAS("drbg_nopr_ctr_aes256");
-+MODULE_ALIAS("drbg_pr_ctr_aes192");
-+MODULE_ALIAS("drbg_nopr_ctr_aes192");
-+MODULE_ALIAS("drbg_pr_ctr_aes128");
-+MODULE_ALIAS("drbg_nopr_ctr_aes128");
-+
- static int drbg_kcapi_sym(struct drbg_state *drbg, const unsigned char *key,
- 			  unsigned char *outval, const struct drbg_string *in);
- static int drbg_init_sym_kernel(struct drbg_state *drbg);
-@@ -651,6 +658,15 @@ static int drbg_fini_hash_kernel(struct drbg_state *drbg);
- 
- #ifdef CONFIG_CRYPTO_DRBG_HMAC
- #define CRYPTO_DRBG_HMAC_STRING "HMAC "
-+MODULE_ALIAS("drbg_pr_hmac_sha512");
-+MODULE_ALIAS("drbg_nopr_hmac_sha512");
-+MODULE_ALIAS("drbg_pr_hmac_sha384");
-+MODULE_ALIAS("drbg_nopr_hmac_sha384");
-+MODULE_ALIAS("drbg_pr_hmac_sha256");
-+MODULE_ALIAS("drbg_nopr_hmac_sha256");
-+MODULE_ALIAS("drbg_pr_hmac_sha1");
-+MODULE_ALIAS("drbg_nopr_hmac_sha1");
-+
- /* update function of HMAC DRBG as defined in 10.1.2.2 */
- static int drbg_hmac_update(struct drbg_state *drbg, struct list_head *seed,
- 			    int reseed)
-@@ -762,6 +778,15 @@ static struct drbg_state_ops drbg_hmac_ops = {
- 
- #ifdef CONFIG_CRYPTO_DRBG_HASH
- #define CRYPTO_DRBG_HASH_STRING "HASH "
-+MODULE_ALIAS("drbg_pr_sha512");
-+MODULE_ALIAS("drbg_nopr_sha512");
-+MODULE_ALIAS("drbg_pr_sha384");
-+MODULE_ALIAS("drbg_nopr_sha384");
-+MODULE_ALIAS("drbg_pr_sha256");
-+MODULE_ALIAS("drbg_nopr_sha256");
-+MODULE_ALIAS("drbg_pr_sha1");
-+MODULE_ALIAS("drbg_nopr_sha1");
-+
- /*
-  * Increment buffer
-  *
--- 
-2.1.0
+> > the new code just added a new condition, which doesn't invalidate
+> > the comment.  And simply removing the comment as opposed to amending
+> > it is a bit overkill.
+> 
+> You are partially right, but will the staggering lack of comments in the
+> caam driver be fixed by duplicating a cascade of three ifs into english?
+
+well, given that preamble, it would be better than removing the
+existing two :), but the simpler version makes it a moot point.
+
+> >> It is indeed simpler but does it consider also the missing error codes
+> >> at index 1 and 5? Just checking for an upper bound is not enough.
+> >
+> > no, the existing code already handles that.  Note that newer
+> > documentation fills the 1 and 5 slots, too.
+> 
+> If you have the new error codes please send them to me for an update.
+
+surely you have access to the documentation, if not, let me know.
+
+> >> On the other hand, if the error field is only three bits wide instead of
+> >> four as stated by the documentation, a better fix means using a three
+> >> bit mask instead of reporting an invalid error code.
+> > 
+> > true, but then we'd introduce a direct discrepancy with the
+> > documentation, and thus h/w.
+> 
+> You basically ask me to agree that if there are no _documented_ error
+> codes between 0x8 and 0xf then I should trust that they will never come
+> up on a 4 bit field.
+
+they may, depending on future revs of the h/w, but that's not what
+this patch is about.
+
+> Do you want me to drop the patch and pretend there is nothing to see?
+
+no, fixing potential bugs preemptively is fine; I'd just like to
+know that's the case: it wasn't clear from the original commit
+message whether the problem occurred on a new h/w revision, in which
+case I'd have like to have seen the driver updated with support for
+the new error codes.
+
+Kim
