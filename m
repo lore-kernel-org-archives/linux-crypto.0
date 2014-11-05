@@ -1,84 +1,84 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH] crypto: caam: fix error reporting
-Date: Tue, 4 Nov 2014 10:57:31 -0600
-Message-ID: <20141104105731.ccb0eedea154b9bb6ed195b3@freescale.com>
-References: <1414774653-3583-1-git-send-email-cristian.stoica@freescale.com>
-	<20141031132209.5abced3ca9f55649d0bd6007@freescale.com>
-	<5457486C.3030205@freescale.com>
-	<20141103134716.775acd39d6334c6f8aeca151@freescale.com>
-	<54589515.2010903@freescale.com>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: [PATCH v2] crypto: caam: fix error reporting
+Date: Wed, 5 Nov 2014 11:21:24 +0200
+Message-ID: <1415179284-19791-1-git-send-email-cristian.stoica@freescale.com>
+References: <20141104105731.ccb0eedea154b9bb6ed195b3@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<horia.geanta@freescale.com>, <marex@denx.de>
-To: Cristian Stoica <cristian.stoica@freescale.com>
+Content-Type: text/plain
+Cc: <linux-kernel@vger.kernel.org>, <horia.geanta@freescale.com>,
+	<marex@denx.de>, Cristian Stoica <cristian.stoica@freescale.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>, <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bn0102.outbound.protection.outlook.com ([157.56.110.102]:6624
+Received: from mail-bn1on0148.outbound.protection.outlook.com ([157.56.110.148]:27904
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751292AbaKDRDI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 4 Nov 2014 12:03:08 -0500
-In-Reply-To: <54589515.2010903@freescale.com>
+	id S1753936AbaKEJW4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Nov 2014 04:22:56 -0500
+In-Reply-To: <20141104105731.ccb0eedea154b9bb6ed195b3@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 4 Nov 2014 10:57:57 +0200
-Cristian Stoica <cristian.stoica@freescale.com> wrote:
+The error code returned by hardware is four bits wide with an expected
+zero MSB. A hardware error condition where the error code can get between
+0x8 and 0xf will trigger an out of bound array access on the error
+message table.
+This patch fixes the invalid array access following such an error and
+reports the condition.
 
-> Hi Kim,
-> 
-> >> Actually, our static code analyzer did not see this one.
-> > 
-> > ok, so the patch technically isn't fixing anything broken, then.
-> 
-> Are you saying the code isn't broken _because_ a static tool analyser
-> did not see anything wrong here?
+Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+---
+ drivers/crypto/caam/error.c | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
-no: I'm saying there was no symptom - something I'd expect to gather
-from the original commit message.
-
-> > the new code just added a new condition, which doesn't invalidate
-> > the comment.  And simply removing the comment as opposed to amending
-> > it is a bit overkill.
-> 
-> You are partially right, but will the staggering lack of comments in the
-> caam driver be fixed by duplicating a cascade of three ifs into english?
-
-well, given that preamble, it would be better than removing the
-existing two :), but the simpler version makes it a moot point.
-
-> >> It is indeed simpler but does it consider also the missing error codes
-> >> at index 1 and 5? Just checking for an upper bound is not enough.
-> >
-> > no, the existing code already handles that.  Note that newer
-> > documentation fills the 1 and 5 slots, too.
-> 
-> If you have the new error codes please send them to me for an update.
-
-surely you have access to the documentation, if not, let me know.
-
-> >> On the other hand, if the error field is only three bits wide instead of
-> >> four as stated by the documentation, a better fix means using a three
-> >> bit mask instead of reporting an invalid error code.
-> > 
-> > true, but then we'd introduce a direct discrepancy with the
-> > documentation, and thus h/w.
-> 
-> You basically ask me to agree that if there are no _documented_ error
-> codes between 0x8 and 0xf then I should trust that they will never come
-> up on a 4 bit field.
-
-they may, depending on future revs of the h/w, but that's not what
-this patch is about.
-
-> Do you want me to drop the patch and pretend there is nothing to see?
-
-no, fixing potential bugs preemptively is fine; I'd just like to
-know that's the case: it wasn't clear from the original commit
-message whether the problem occurred on a new h/w revision, in which
-case I'd have like to have seen the driver updated with support for
-the new error codes.
-
-Kim
+diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
+index 6531054..66d73bf 100644
+--- a/drivers/crypto/caam/error.c
++++ b/drivers/crypto/caam/error.c
+@@ -213,27 +213,36 @@ void caam_jr_strstatus(struct device *jrdev, u32 status)
+ 		void (*report_ssed)(struct device *jrdev, const u32 status,
+ 				    const char *error);
+ 		const char *error;
+-	} status_src[] = {
++	} status_src[16] = {
+ 		{ NULL, "No error" },
+ 		{ NULL, NULL },
+ 		{ report_ccb_status, "CCB" },
+ 		{ report_jump_status, "Jump" },
+ 		{ report_deco_status, "DECO" },
+-		{ NULL, NULL },
++		{ NULL, "Queue Manager Interface" },
+ 		{ report_jr_status, "Job Ring" },
+ 		{ report_cond_code_status, "Condition Code" },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
++		{ NULL, NULL },
+ 	};
+ 	u32 ssrc = status >> JRSTA_SSRC_SHIFT;
+ 	const char *error = status_src[ssrc].error;
+ 
+ 	/*
+-	 * If there is no further error handling function, just
+-	 * print the error code, error string and exit. Otherwise
+-	 * call the handler function.
++	 * If there is an error handling function, call it to report the error.
++	 * Otherwise print the error source name.
+ 	 */
+-	if (!status_src[ssrc].report_ssed)
+-		dev_err(jrdev, "%08x: %s: \n", status, status_src[ssrc].error);
+-	else
++	if (status_src[ssrc].report_ssed)
+ 		status_src[ssrc].report_ssed(jrdev, status, error);
++	else if (error)
++		dev_err(jrdev, "%d: %s\n", ssrc, error);
++	else
++		dev_err(jrdev, "%d: unknown error source\n", ssrc);
+ }
+ EXPORT_SYMBOL(caam_jr_strstatus);
+-- 
+1.8.3.1
