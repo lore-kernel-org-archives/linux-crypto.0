@@ -1,40 +1,47 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: Re: [PATCH] crypto: caam: fix error reporting
-Date: Wed, 5 Nov 2014 11:27:37 +0200
-Message-ID: <5459ED89.2080109@freescale.com>
-References: <1414774653-3583-1-git-send-email-cristian.stoica@freescale.com>
-	<20141031132209.5abced3ca9f55649d0bd6007@freescale.com>
-	<5457486C.3030205@freescale.com>
-	<20141103134716.775acd39d6334c6f8aeca151@freescale.com>
-	<54589515.2010903@freescale.com>
- <20141104105731.ccb0eedea154b9bb6ed195b3@freescale.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH v2] crypto: caam: fix error reporting
+Date: Wed, 5 Nov 2014 10:43:32 -0600
+Message-ID: <20141105104332.bdc904792193d714bd9d4951@freescale.com>
+References: <20141104105731.ccb0eedea154b9bb6ed195b3@freescale.com>
+	<1415179284-19791-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<horia.geanta@freescale.com>, <marex@denx.de>
-To: Kim Phillips <kim.phillips@freescale.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20141104105731.ccb0eedea154b9bb6ed195b3@freescale.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+To: Cristian Stoica <cristian.stoica@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-by2on0109.outbound.protection.outlook.com ([207.46.100.109]:22269
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751805AbaKEQsv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 5 Nov 2014 11:48:51 -0500
+In-Reply-To: <1415179284-19791-1-git-send-email-cristian.stoica@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Kim,
+On Wed, 5 Nov 2014 11:21:24 +0200
+Cristian Stoica <cristian.stoica@freescale.com> wrote:
 
-On 11/04/2014 06:57 PM, Kim Phillips wrote:
-> On Tue, 4 Nov 2014 10:57:57 +0200
-> Cristian Stoica <cristian.stoica@freescale.com> wrote:
-
->> Do you want me to drop the patch and pretend there is nothing to see?
+> The error code returned by hardware is four bits wide with an expected
+> zero MSB. A hardware error condition where the error code can get between
+> 0x8 and 0xf will trigger an out of bound array access on the error
+> message table.
+> This patch fixes the invalid array access following such an error and
+> reports the condition.
 > 
-> no, fixing potential bugs preemptively is fine; I'd just like to
-> know that's the case: it wasn't clear from the original commit
-> message whether the problem occurred on a new h/w revision, in which
-> case I'd have like to have seen the driver updated with support for
-> the new error codes.
+> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+> ---
 
-This is a preemptive fix. I did not see a problem in the field with any
-hardware, recent or old.
+no v2 change info?  All I noticed is the additional string for
+"queue manager interface", which, without its implementation fn,
+intoduces an inconsistency wrt NULL checking, so this comment:
 
-Cristian S.
+http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg12105.html
+
+still applies.
+
+Thanks,
+
+Kim
