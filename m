@@ -1,66 +1,43 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: Re: [PATCH v2] crypto: caam: fix error reporting
-Date: Thu, 6 Nov 2014 10:01:08 +0200
-Message-ID: <545B2AC4.3090505@freescale.com>
-References: <20141104105731.ccb0eedea154b9bb6ed195b3@freescale.com>
-	<1415179284-19791-1-git-send-email-cristian.stoica@freescale.com>
- <20141105104332.bdc904792193d714bd9d4951@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: Kim Phillips <kim.phillips@freescale.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<horia.geanta@freescale.com>, <marex@denx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0148.outbound.protection.outlook.com ([157.56.111.148]:23785
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750980AbaKFIBU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Nov 2014 03:01:20 -0500
-In-Reply-To: <20141105104332.bdc904792193d714bd9d4951@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Subject: [PATCH] crypto: ux500/cryp: Silence compiler warning for !CONFIG_PM
+Date: Thu,  6 Nov 2014 14:27:35 +0100
+Message-ID: <1415280455-14056-1-git-send-email-ulf.hansson@linaro.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Kim, Herbert,
+The system PM functions were unused when CONFIG_PM is unset. Let's move
+them inside CONFIG_PM_SLEEP to silence the compiler warning.
 
+Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
+---
+ drivers/crypto/ux500/cryp/cryp_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On 11/05/2014 06:43 PM, Kim Phillips wrote:
-> On Wed, 5 Nov 2014 11:21:24 +0200
-> Cristian Stoica <cristian.stoica@freescale.com> wrote:
-> 
->> The error code returned by hardware is four bits wide with an expected
->> zero MSB. A hardware error condition where the error code can get between
->> 0x8 and 0xf will trigger an out of bound array access on the error
->> message table.
->> This patch fixes the invalid array access following such an error and
->> reports the condition.
->>
->> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
->> ---
-
-> no v2 change info?  All I noticed is the additional string for
-> "queue manager interface", which, without its implementation fn,
-
-Yes. Thanks for review. That and the updated comment.
-
-> intoduces an inconsistency wrt NULL checking, so this comment:
-
-No. There is no inconsistency in the handling. Please be more specific.
-
-> 
-> http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg12105.html
->
-> still applies.
-
-Which comment? You refer to a whole email. My rebutal still applies
-though and I think your version is inferior wrt handling the issue.
-
-Feel free to send a competing patch for review though.
-
-Herbert, consider that without a fix one way or another, there is a
-potential kernel attack vector through the error reporting function of
-the caam driver.
-
-
-Cristian S.
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index 92105f3..83811aa 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -1688,6 +1688,7 @@ static void ux500_cryp_shutdown(struct platform_device *pdev)
+ 
+ }
+ 
++#ifdef CONFIG_PM_SLEEP
+ static int ux500_cryp_suspend(struct device *dev)
+ {
+ 	int ret;
+@@ -1768,6 +1769,7 @@ static int ux500_cryp_resume(struct device *dev)
+ 
+ 	return ret;
+ }
++#endif
+ 
+ static SIMPLE_DEV_PM_OPS(ux500_cryp_pm, ux500_cryp_suspend, ux500_cryp_resume);
+ 
+-- 
+1.9.1
