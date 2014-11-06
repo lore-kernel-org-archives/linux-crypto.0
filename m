@@ -1,32 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam - add support for rfc4543(gcm(aes))
-Date: Thu, 6 Nov 2014 23:17:14 +0800
-Message-ID: <20141106151714.GE4544@gondor.apana.org.au>
-References: <1414686811-6527-1-git-send-email-tudor.ambarus@freescale.com>
- <1414688107-8196-1-git-send-email-tudor.ambarus@freescale.com>
+Subject: Re: [PATCH 1/4] crypto: caam - add support for ctr(aes)
+Date: Thu, 6 Nov 2014 23:17:23 +0800
+Message-ID: <20141106151723.GF4544@gondor.apana.org.au>
+References: <1414752338-5711-1-git-send-email-catalin.vasile@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Tudor Ambarus <tudor.ambarus@freescale.com>
+To: Catalin Vasile <catalin.vasile@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:36135 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:43890 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752369AbaKFPRR (ORCPT
+	with ESMTP id S1751870AbaKFPR0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Nov 2014 10:17:17 -0500
+	Thu, 6 Nov 2014 10:17:26 -0500
 Content-Disposition: inline
-In-Reply-To: <1414688107-8196-1-git-send-email-tudor.ambarus@freescale.com>
+In-Reply-To: <1414752338-5711-1-git-send-email-catalin.vasile@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 30, 2014 at 06:55:07PM +0200, Tudor Ambarus wrote:
-> Add AES-GMAC as an IPSec ESP mechanism to provide
-> data origin authentication, but not confidentiality.
-> This method is referred as ENCR_NULL_AUTH_AES_GMAC.
+On Fri, Oct 31, 2014 at 12:45:35PM +0200, Catalin Vasile wrote:
+> Add support for AES working in Counter Mode
 > 
-> Signed-off-by: Tudor Ambarus <tudor.ambarus@freescale.com>
+> Signed-off-by: Catalin Vasile <catalin.vasile@freescale.com>
 
-Applied.
+All applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
