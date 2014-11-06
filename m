@@ -1,36 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: caam: fix missing dma unmap on error path
-Date: Thu, 6 Nov 2014 23:13:08 +0800
-Message-ID: <20141106151308.GA4446@gondor.apana.org.au>
-References: <1414672822-5067-1-git-send-email-cristian.stoica@freescale.com>
+Subject: Re: [PATCH] aesni-intel_glue.c: remove unnecessary #define
+Date: Thu, 6 Nov 2014 23:16:29 +0800
+Message-ID: <20141106151629.GA4544@gondor.apana.org.au>
+References: <1413884132-9776-1-git-send-email-valentinrothberg@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-To: Cristian Stoica <cristian.stoica@freescale.com>
+Cc: davem@davemloft.net, tglx@linutronix.de,
+	linux-crypto@vger.kernel.org
+To: Valentin Rothberg <valentinrothberg@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:56956 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:34666 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750915AbaKFPNR (ORCPT
+	with ESMTP id S1751436AbaKFPQh (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 6 Nov 2014 10:13:17 -0500
+	Thu, 6 Nov 2014 10:16:37 -0500
 Content-Disposition: inline
-In-Reply-To: <1414672822-5067-1-git-send-email-cristian.stoica@freescale.com>
+In-Reply-To: <1413884132-9776-1-git-send-email-valentinrothberg@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Oct 30, 2014 at 02:40:22PM +0200, Cristian Stoica wrote:
-> If dma mapping for dma_addr_out fails, the descriptor memory is freed
-> but the previous dma mapping for dma_addr_in remains.
-> This patch resolves the missing dma unmap and groups resource
-> allocations at function start.
+On Tue, Oct 21, 2014 at 11:35:32AM +0200, Valentin Rothberg wrote:
+> The CPP identifier 'HAS_PCBC' is defined when the Kconfig
+> option CRYPTO_PCBC is set as 'y' or 'm', and is further
+> used in two ifdef blocks to conditionally compile source
+> code. This indirection hides the actual Kconfig dependency
+> and complicates readability. Moreover, it's inconsistent
+> with the rest of the ifdef blocks in the file, which
+> directly reference Kconfig options.
 > 
-> Cc: <stable@vger.kernel.org> # 3.13+
-> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+> This patch removes 'HAS_PCBC' and replaces its occurrences
+> with the actual dependency on 'CRYPTO_PCBC' being set as
+> 'y' or 'm'.
+> 
+> Signed-off-by: Valentin Rothberg <valentinrothberg@gmail.com>
 
-Patch applied to crypto.
-
-Thanks,
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
