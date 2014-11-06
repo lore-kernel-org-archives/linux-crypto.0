@@ -1,32 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/9] NX crypto driver fixes
-Date: Thu, 6 Nov 2014 23:17:04 +0800
-Message-ID: <20141106151704.GD4544@gondor.apana.org.au>
-References: <20141028174006.GA15893@bluepex.com>
+Subject: Re: [PATCH] crypto: caam - add support for rfc4543(gcm(aes))
+Date: Thu, 6 Nov 2014 23:17:14 +0800
+Message-ID: <20141106151714.GE4544@gondor.apana.org.au>
+References: <1414686811-6527-1-git-send-email-tudor.ambarus@freescale.com>
+ <1414688107-8196-1-git-send-email-tudor.ambarus@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org,
-	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
-	Fionnuala Gunter <fin@linux.vnet.ibm.com>
-To: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Tudor Ambarus <tudor.ambarus@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:36135 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752369AbaKFPRR (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 6 Nov 2014 10:17:17 -0500
 Content-Disposition: inline
-In-Reply-To: <20141028174006.GA15893@bluepex.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1414688107-8196-1-git-send-email-tudor.ambarus@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Oct 28, 2014 at 03:40:09PM -0200, Leonidas S. Barbosa wrote:
-> This patch set fixes the follow issues in  NX crypto driver:
+On Thu, Oct 30, 2014 at 06:55:07PM +0200, Tudor Ambarus wrote:
+> Add AES-GMAC as an IPSec ESP mechanism to provide
+> data origin authentication, but not confidentiality.
+> This method is referred as ENCR_NULL_AUTH_AES_GMAC.
 > 
->   - Bound limit issue that causes a memory crash
->   - SHA concurrence issue
->   - IV vector fix with the correct bit order
->   - NX CCM does not support keys larger than 128 causing
->   crashes in fips mode.
+> Signed-off-by: Tudor Ambarus <tudor.ambarus@freescale.com>
 
-All applied except the last patch.
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
