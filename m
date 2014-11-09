@@ -1,48 +1,47 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: libkcapi: First release of kernel crypto API userspace library
-Date: Sun, 09 Nov 2014 02:18:28 +0100
-Message-ID: <1800633.p8UcYzvYGX@tachyon.chronox.de>
+From: Jason Cooper <jason@lakedaemon.net>
+Subject: Re: [PATCH v2 01/11] crypto: Documentation - crypto API high level
+ spec
+Date: Sat, 8 Nov 2014 21:54:20 -0500
+Message-ID: <20141109025420.GN3698@titan.lakedaemon.net>
+References: <6375771.bx7QqLJLuR@tachyon.chronox.de>
+ <4163724.RCMDlx8dmE@tachyon.chronox.de>
+ <20141103083439.635f5cb6@lwn.net>
+ <4303532.NGaUQ44sQJ@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	cryptography@metzdowd.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54295 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751020AbaKIBSf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 8 Nov 2014 20:18:35 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S5F0C> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sun, 9 Nov 2014 02:18:31 +0100
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Marek Vasut <marex@denx.de>,
+	Grant Likely <grant.likely@secretlab.ca>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <4303532.NGaUQ44sQJ@tachyon.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+Stephan,
 
-The Linux kernel exports a Netlink interface of type AF_ALG to allow user
-space to utilize the kernel crypto API.
+On Mon, Nov 03, 2014 at 03:18:29PM +0100, Stephan Mueller wrote:
+> Am Montag, 3. November 2014, 08:34:39 schrieb Jonathan Corbet:
+> > These are all useful.  But I wonder if it would be worth the effort to turn
+> > this inti a proper docbook document that automatically has everything
+> > together in one place?
+> 
+> How do you suggest that is done? The API comments in the header file follow 
+> the Doxygen style. Note, Jason Cooper raised the concern that an API 
+> documentation separate from the code will surely deviate from the code 
+> relatively fast (although I do not really fear that as the kernel crypto API 
+> seems to be quite stable over the last years).
 
-libkcapi uses this Netlink interface and exports easy to use APIs so that
-a developer does not need to consider the low-level Netlink interface 
-handling. Its first release is available at [1].
+Agreed.  My primary concern was adding it in such a way which
+facilitates maintenance and keeping it in sync with the code.  But as
+you say, the crypto API doesn't change much.
 
-The library does not implement any cipher algorithms. All consumer requests
-are sent to the kernel for processing. Results from the kernel crypto API
-are returned to the consumer via the library API.
+thx,
 
-The kernel interface and therefore this library can be used by unprivileged
-processes. As the library is small, it may even be included directly into a 
-consuming application instead of using it as a shared library.
-
-The library together with the kernel allows the use of symmetric ciphers as 
-well as message digests and keyed message digests. Patches are prepared for 
-submission to LKML to allow AEAD ciphers and RNGs to be used from userspace.
-
-[1] http://www.chronox.de/libkcapi.html
-
--- 
-Ciao
-Stephan
+Jason.
