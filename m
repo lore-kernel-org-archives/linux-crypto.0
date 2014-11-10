@@ -1,33 +1,34 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Asynchronous usage of PCOMPRESS
-Date: Mon, 10 Nov 2014 12:16:51 -0600
-Message-ID: <54610113.3040200@amd.com>
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: crypto: algif - avoid excessive use of socket buffer in skcipher
+Date: Tue, 11 Nov 2014 07:11:32 +0900
+Message-ID: <20141110221132.GD20647@kroah.com>
+References: <5460987C.9030007@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	<linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0116.outbound.protection.outlook.com ([157.56.110.116]:17608
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751264AbaKJSvs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Nov 2014 13:51:48 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: stable@vger.kernel.org, herbert@gondor.apana.org.au,
+	gmazyland@gmail.com, linux-crypto@vger.kernel.org
+To: Ondrej Kozina <okozina@redhat.com>
+Return-path: <stable-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <5460987C.9030007@redhat.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
+On Mon, Nov 10, 2014 at 11:50:36AM +0100, Ondrej Kozina wrote:
+> Hello,
+> 
+> could you please add this patch (already landed in 3.18-rc1) to following
+> stable kernels:
+> 
+> 3.17.x, 3.14.x, 3.12.x, 3.4.x, 3.2.x?
+> 
+> The bugfix allows usage of crypto API socket on archs with PAGE_SIZE >= 32
+> KiB (I have a typo in original changelog).
+> 
+> Some background for the bug (with reproducer and report from users)
+> - http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg11787.html
+> - http://bugzilla.redhat.com/show_bug.cgi?id=1160289
 
-Is the PCOMPRESS algorithm supposed to support asynchronous
-implementations? In other words, are callers expected to handle the
--EINPROGRESS or -EAGAIN return codes that can be returned by an
-asynchronous implementation?
+Now applied to .17, .14, and .10-stable kernels, thanks.
 
-Or is it assumed that if the CRYPTO_ALG_ASYNC flag is not set then the
-code path must be synchronous?  If that's the case, should the pcompress
-support be updated to look for synchronous implementations if the
-CRYPTO_ALG_ASYNC flag isn't set or should asynchronous implementations
-provide a synchronous fallback?
-
-Thanks,
-Tom
+greg k-h
