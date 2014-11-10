@@ -1,54 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: algif_skcipher: check for IV size superfluous?
-Date: Mon, 10 Nov 2014 22:00:02 +0800
-Message-ID: <20141110140002.GC8578@gondor.apana.org.au>
-References: <8150359.mtACJVFlUb@tachyon.chronox.de>
+Subject: Re: crypto: zeroization of sensitive data in af_alg
+Date: Mon, 10 Nov 2014 22:05:18 +0800
+Message-ID: <20141110140518.GD8578@gondor.apana.org.au>
+References: <1979092.odOtqL46qU@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:33728 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752541AbaKJOFX (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 10 Nov 2014 09:05:23 -0500
 Content-Disposition: inline
-In-Reply-To: <8150359.mtACJVFlUb@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1979092.odOtqL46qU@tachyon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Nov 08, 2014 at 01:32:30AM +0100, Stephan Mueller wrote:
-> Hi Herbert,
+On Sun, Nov 09, 2014 at 11:33:52PM +0100, Stephan Mueller wrote:
 > 
-> I am in the process to extend algif_skcipher to support AEAD ciphers as well. 
-> The code already works but I want to run final tests before releasing it.
-> 
-> In the course of the development I stumbled over the following code:
-> 
-> static int skcipher_sendmsg(struct kiocb *unused, struct socket *sock,
-> 			    struct msghdr *msg, size_t size)
-> {
-> ...
-> 		if (con.iv && con.iv->ivlen != ivsize)
-> 			return -EINVAL;
-> 
-> This code effectively requires that any user space code trying to use a cipher 
-> must provide an IV that is equal to the blocksize of the cipher.
-> 
-> I am wondering why this check is there or whether we can remove that.
-> 
-> When using the kernel crypto API inside the kernel, there is no such 
-> enforcement. One can take shorter IVs which are implicitly padded with 
-> trailing zeros.
+> while working on the AF_ALG interface, I saw no active zeroizations of memory 
+> that may hold sensitive data that is maintained outside the kernel crypto API 
+> cipher handles. I think the following memory segments fall under that 
+> category:
 
-The kernel requires you to provide an IV that's exactly the size
-required by the algorithm.  As otherwise the API would need to
-specify an explicit IV size per request.
+Are you talking about temporary data that we generate as part of
+the processing? If so they should be zeroed by the entity that
+generates them.
  
-> However, if we conclude that the check should remain, then I am wondering 
-> whether we have to move it to the various _setiv functions of the kernel 
-> crypto API instead of leaving it in the skcipher interface. 
+> However, I am failing to find the right spot to add a zeroization for the 
+> latter one, i.e. the code that handles the pages send in by the user or the 
+> pages that are returned by the crypto API. Initially I thought 
+> skcipher_pull_sgl is a good spot for the symmetric ciphers as it evicts the 
+> used pages out of the scope of the kernel crypto API. I added a 
+> clear_page(sg_page(sg+1)) as well as memset(sg_page(sg+1), 0, plen) right 
+> before the put_page call. All that I got in return was a BUG() from the memory 
+> management layer.
 
-The kernel interface does not have an explicit IV size in the
-request.  Therefore there is no way for us to check.
+I don't think I understand what exactly you're trying to zero.
+Can you give an example?
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
