@@ -1,75 +1,66 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.18
-Date: Mon, 10 Nov 2014 16:57:28 +0800
-Message-ID: <20141110085728.GA6685@gondor.apana.org.au>
-References: <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
- <20140101061016.GA22579@gondor.apana.org.au>
- <20140203125944.GA31446@gondor.apana.org.au>
- <20140710090314.GA15729@gondor.apana.org.au>
- <20140915113506.GA4736@gondor.apana.org.au>
- <20140924132720.GA31661@gondor.apana.org.au>
+From: Ondrej Kozina <okozina@redhat.com>
+Subject: crypto: algif - avoid excessive use of socket buffer in skcipher
+Date: Mon, 10 Nov 2014 11:50:36 +0100
+Message-ID: <5460987C.9030007@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, gmazyland@gmail.com,
+	linux-crypto@vger.kernel.org
+To: stable@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:56099 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751590AbaKJI5i (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Nov 2014 03:57:38 -0500
-Content-Disposition: inline
-In-Reply-To: <20140924132720.GA31661@gondor.apana.org.au>
+Received: from mx1.redhat.com ([209.132.183.28]:54599 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752797AbaKJKus (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 10 Nov 2014 05:50:48 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Hello,
 
-This push fixes these issues:
+could you please add this patch (already landed in 3.18-rc1) to 
+following stable kernels:
 
-* Stack corruption in pseries hwrng driver.
-* Missing DMA unmap in caam crypto driver.
-* NUMA crash in qat crypto driver.
-* Buggy mapping of zero-length associated data in qat crypto driver.
+3.17.x, 3.14.x, 3.12.x, 3.4.x, 3.2.x?
 
-Please pull from
+The bugfix allows usage of crypto API socket on archs with PAGE_SIZE >= 
+32 KiB (I have a typo in original changelog).
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+Some background for the bug (with reproducer and report from users)
+- http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg11787.html
+- http://bugzilla.redhat.com/show_bug.cgi?id=1160289
 
-or
+Thank you
+Ondrej
 
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+-------------------
 
+Upstream commit e2cffb5f493a8b431dc87124388ea59b79f0bccb
+Author: Ondrej Kozina <okozina@redhat.com>
+Date:   Mon Aug 25 11:49:54 2014 +0200
 
-Cristian Stoica (1):
-      crypto: caam - fix missing dma unmap on error path
+     crypto: algif - avoid excessive use of socket buffer in skcipher
 
-Greg Kurz (1):
-      hwrng: pseries - port to new read API and fix stack corruption
+     On archs with PAGE_SIZE >= 64 KiB the function skcipher_alloc_sgl()
+     fails with -ENOMEM no matter what user space actually requested.
+     This is caused by the fact sock_kmalloc call inside the function tried
+     to allocate more memory than allowed by the default kernel socket 
+buffer
+     size (kernel param net.core.optmem_max).
 
-Tadeusz Struk (2):
-      crypto: qat - Prevent dma mapping zero length assoc data
-      crypto: qat - Enforce valid numa configuration
+     Signed-off-by: Ondrej Kozina <okozina@redhat.com>
+     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
- drivers/char/hw_random/pseries-rng.c              |   11 ++++---
- drivers/crypto/caam/key_gen.c                     |   29 +++++++++----------
- drivers/crypto/qat/qat_common/adf_accel_devices.h |    3 +-
- drivers/crypto/qat/qat_common/adf_transport.c     |   12 ++++----
- drivers/crypto/qat/qat_common/qat_algs.c          |    7 +++--
- drivers/crypto/qat/qat_common/qat_crypto.c        |    8 ++++--
- drivers/crypto/qat/qat_dh895xcc/adf_admin.c       |    2 +-
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c         |   32 ++++++++-------------
- drivers/crypto/qat/qat_dh895xcc/adf_isr.c         |    2 +-
- 9 files changed, 53 insertions(+), 53 deletions(-)
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index a19c027..83187f4 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -49,7 +49,7 @@ struct skcipher_ctx {
+  	struct ablkcipher_request req;
+  };
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-#define MAX_SGL_ENTS ((PAGE_SIZE - sizeof(struct skcipher_sg_list)) / \
++#define MAX_SGL_ENTS ((4096 - sizeof(struct skcipher_sg_list)) / \
+  		      sizeof(struct scatterlist) - 1)
+
+  static inline int skcipher_sndbuf(struct sock *sk)
