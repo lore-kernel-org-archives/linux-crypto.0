@@ -1,67 +1,75 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: crypto: zeroization of sensitive data in af_alg
-Date: Sun, 09 Nov 2014 23:33:52 +0100
-Message-ID: <1979092.odOtqL46qU@tachyon.chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 3.18
+Date: Mon, 10 Nov 2014 16:57:28 +0800
+Message-ID: <20141110085728.GA6685@gondor.apana.org.au>
+References: <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20140710090314.GA15729@gondor.apana.org.au>
+ <20140915113506.GA4736@gondor.apana.org.au>
+ <20140924132720.GA31661@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54310 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751837AbaKJHxO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Nov 2014 02:53:14 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S609B> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Mon, 10 Nov 2014 08:53:12 +0100
+Received: from helcar.apana.org.au ([209.40.204.226]:56099 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751590AbaKJI5i (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 10 Nov 2014 03:57:38 -0500
+Content-Disposition: inline
+In-Reply-To: <20140924132720.GA31661@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Hi Linus:
 
-while working on the AF_ALG interface, I saw no active zeroizations of memory 
-that may hold sensitive data that is maintained outside the kernel crypto API 
-cipher handles. I think the following memory segments fall under that 
-category:
+This push fixes these issues:
 
-	* message digest
+* Stack corruption in pseries hwrng driver.
+* Missing DMA unmap in caam crypto driver.
+* NUMA crash in qat crypto driver.
+* Buggy mapping of zero-length associated data in qat crypto driver.
 
-	* IV
+Please pull from
 
-	* plaintext / ciphertext handed in by consumer
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-	* ciphertext / plaintext that is send back to the consumer
+or
 
-May I ask whether such zeroizations are present? At least I did not find it. 
-If we conclude that there is a need for adding such zeroizations, I checked 
-the code for the appropriate locations:
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-I think I found the location for the first one: hash_sock_destruct that should 
-be enhanced with a memset(0) of ctx->result. I have a patch ready which is 
-tested and works.
 
-For the IV, I think I found the spot as well: skcipher_sock_destruct. This 
-function should be enhanced with a memset(0) of ctx->iv. Again, I have a patch 
-ready which is tested and works.
+Cristian Stoica (1):
+      crypto: caam - fix missing dma unmap on error path
 
-However, I am failing to find the right spot to add a zeroization for the 
-latter one, i.e. the code that handles the pages send in by the user or the 
-pages that are returned by the crypto API. Initially I thought 
-skcipher_pull_sgl is a good spot for the symmetric ciphers as it evicts the 
-used pages out of the scope of the kernel crypto API. I added a 
-clear_page(sg_page(sg+1)) as well as memset(sg_page(sg+1), 0, plen) right 
-before the put_page call. All that I got in return was a BUG() from the memory 
-management layer.
+Greg Kurz (1):
+      hwrng: pseries - port to new read API and fix stack corruption
 
-Then I tried the same in af_alg_free_sg() as this function is used by 
-algif_hash.c -- with the same result.
+Tadeusz Struk (2):
+      crypto: qat - Prevent dma mapping zero length assoc data
+      crypto: qat - Enforce valid numa configuration
 
-That makes me wonder: where should such a zeroization call be added?
+ drivers/char/hw_random/pseries-rng.c              |   11 ++++---
+ drivers/crypto/caam/key_gen.c                     |   29 +++++++++----------
+ drivers/crypto/qat/qat_common/adf_accel_devices.h |    3 +-
+ drivers/crypto/qat/qat_common/adf_transport.c     |   12 ++++----
+ drivers/crypto/qat/qat_common/qat_algs.c          |    7 +++--
+ drivers/crypto/qat/qat_common/qat_crypto.c        |    8 ++++--
+ drivers/crypto/qat/qat_dh895xcc/adf_admin.c       |    2 +-
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c         |   32 ++++++++-------------
+ drivers/crypto/qat/qat_dh895xcc/adf_isr.c         |    2 +-
+ 9 files changed, 53 insertions(+), 53 deletions(-)
 
-Thanks
-
+Thanks,
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
