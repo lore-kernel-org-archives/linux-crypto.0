@@ -1,66 +1,69 @@
-From: Ondrej Kozina <okozina@redhat.com>
-Subject: crypto: algif - avoid excessive use of socket buffer in skcipher
-Date: Mon, 10 Nov 2014 11:50:36 +0100
-Message-ID: <5460987C.9030007@redhat.com>
+From: James Hartley <james.hartley@imgtec.com>
+Subject: [PATCH 2/2] Documentation: crypto: Add DT binding info for the img hw hash accelerator
+Date: Mon, 10 Nov 2014 12:10:55 +0000
+Message-ID: <1415621455-10468-3-git-send-email-james.hartley@imgtec.com>
+References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, gmazyland@gmail.com,
-	linux-crypto@vger.kernel.org
-To: stable@vger.kernel.org
+Content-Type: text/plain
+Cc: <devicetree@vger.kernel.org>, <pawel.moll@arm.com>,
+	<mark.rutland@arm.com>, <ijc+devicetree@hellion.org.uk>,
+	<galak@codeaurora.org>, <abrestic@chromium.org>,
+	<ezequiel.garcia@imgtec.com>,
+	James Hartley <james.hartley@imgtec.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<grant.likely@linaro.org>, <robh+dt@kernel.org>,
+	<akpm@linux-foundation.org>, <gregkh@linuxfoundation.org>,
+	<joe@perches.com>, <mchehab@osg.samsung.com>, <crope@iki.fi>,
+	<jg1.han@samsung.com>, <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54599 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752797AbaKJKus (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 10 Nov 2014 05:50:48 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:18079 "EHLO
+	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752577AbaKJMLh (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 10 Nov 2014 07:11:37 -0500
+In-Reply-To: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+Signed-off-by: James Hartley <james.hartley@imgtec.com>
+---
+ .../devicetree/bindings/crypto/img-hash.txt        |   28 ++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/img-hash.txt
 
-could you please add this patch (already landed in 3.18-rc1) to 
-following stable kernels:
-
-3.17.x, 3.14.x, 3.12.x, 3.4.x, 3.2.x?
-
-The bugfix allows usage of crypto API socket on archs with PAGE_SIZE >= 
-32 KiB (I have a typo in original changelog).
-
-Some background for the bug (with reproducer and report from users)
-- http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg11787.html
-- http://bugzilla.redhat.com/show_bug.cgi?id=1160289
-
-Thank you
-Ondrej
-
--------------------
-
-Upstream commit e2cffb5f493a8b431dc87124388ea59b79f0bccb
-Author: Ondrej Kozina <okozina@redhat.com>
-Date:   Mon Aug 25 11:49:54 2014 +0200
-
-     crypto: algif - avoid excessive use of socket buffer in skcipher
-
-     On archs with PAGE_SIZE >= 64 KiB the function skcipher_alloc_sgl()
-     fails with -ENOMEM no matter what user space actually requested.
-     This is caused by the fact sock_kmalloc call inside the function tried
-     to allocate more memory than allowed by the default kernel socket 
-buffer
-     size (kernel param net.core.optmem_max).
-
-     Signed-off-by: Ondrej Kozina <okozina@redhat.com>
-     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index a19c027..83187f4 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -49,7 +49,7 @@ struct skcipher_ctx {
-  	struct ablkcipher_request req;
-  };
-
--#define MAX_SGL_ENTS ((PAGE_SIZE - sizeof(struct skcipher_sg_list)) / \
-+#define MAX_SGL_ENTS ((4096 - sizeof(struct skcipher_sg_list)) / \
-  		      sizeof(struct scatterlist) - 1)
-
-  static inline int skcipher_sndbuf(struct sock *sk)
+diff --git a/Documentation/devicetree/bindings/crypto/img-hash.txt b/Documentation/devicetree/bindings/crypto/img-hash.txt
+new file mode 100644
+index 0000000..94d789c
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/img-hash.txt
+@@ -0,0 +1,28 @@
++* Imagination Technologies Ltd. Hash Accelerator
++
++The hash accelerator provides hardware hashing acceleration for
++SHA1, SHA224, SHA256 and MD5 hashes
++
++Required properties:
++
++- compatible : "img,img-hash-accelerator-rev1"
++- reg : Offset and length of the register set for the module, and the DMA port
++- interrupts : The designated IRQ line for the hashing module.
++- dmas : DMA specifier as per Documentation/devicetree/bindings/dma/dma.txt
++- dma-names : Should be "tx"
++- bus-addr : The bus address for the input data for hashing block
++- clocks : Clock specifier
++- clock-names : "hash_clk" Used to clock data through the accelerator
++
++Example:
++
++	hash: hash@18149600 {
++	compatible = "img,img-hash-accelerator-rev1";
++		reg = <0x18149600 0x100, 0x18101100 0x4>;
++		interrupts = <59 4 2>;
++		dmas = <&dma 8 0xffffffff>;
++		dma-names = "tx";
++		bus-addr = <0x18101100>;
++		clocks = <&hash_clk>;
++		clock-names = "hash_clk";
++	};
+-- 
+1.7.9.5
