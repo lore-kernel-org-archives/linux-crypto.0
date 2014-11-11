@@ -1,11 +1,16 @@
-From: Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>
-Subject: Re: [PATCH 1/2] crypto: Add Imagination Technologies hw hash accelerator
-Date: Tue, 11 Nov 2014 17:12:24 +0200
-Message-ID: <54622758.7050907@mentor.com>
-References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com> <1415621455-10468-2-git-send-email-james.hartley@imgtec.com> <5460D540.6070205@mentor.com> <72BC0C8BD7BB6F45988A99382E5FBAE54433BAC5@hhmail02.hh.imgtec.org>
+From: James Hartley <James.Hartley@imgtec.com>
+Subject: RE: [PATCH 1/2] crypto: Add Imagination Technologies hw hash
+ accelerator
+Date: Tue, 11 Nov 2014 15:28:25 +0000
+Message-ID: <72BC0C8BD7BB6F45988A99382E5FBAE54433BBAA@hhmail02.hh.imgtec.org>
+References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com>
+ <1415621455-10468-2-git-send-email-james.hartley@imgtec.com>
+ <5460D540.6070205@mentor.com>
+ <72BC0C8BD7BB6F45988A99382E5FBAE54433BAC5@hhmail02.hh.imgtec.org>
+ <54622758.7050907@mentor.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
 	"davem@davemloft.net" <davem@davemloft.net>,
 	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
@@ -21,103 +26,85 @@ Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
 	"galak@codeaurora.org" <galak@codeaurora.org>,
 	"abrestic@chromium.org" <abrestic@chromium.org>,
 	Ezequiel Garcia <Ezequiel.Garcia@imgtec.com>
-To: James Hartley <James.Hartley@imgtec.com>,
+To: Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>,
 	"grant.likely@linaro.org" <grant.likely@linaro.org>,
 	"robh+dt@kernel.org" <robh+dt@kernel.org>,
 	"akpm@linux-foundation.org" <akpm@linux-foundation.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from relay1.mentorg.com ([192.94.38.131]:57608 "EHLO
-	relay1.mentorg.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750980AbaKKPMd (ORCPT
+Received: from mailapp01.imgtec.com ([195.59.15.196]:50355 "EHLO
+	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751787AbaKKP23 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Nov 2014 10:12:33 -0500
-In-Reply-To: <72BC0C8BD7BB6F45988A99382E5FBAE54433BAC5@hhmail02.hh.imgtec.org>
+	Tue, 11 Nov 2014 10:28:29 -0500
+In-Reply-To: <54622758.7050907@mentor.com>
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi James,
-
-On 11.11.2014 16:59, James Hartley wrote:
-> Hi Vladimir, thanks for the review! 
-> 
->> -----Original Message-----
->> From: Vladimir Zapolskiy [mailto:vladimir_zapolskiy@mentor.com]
->> Sent: 10 November 2014 15:10
->> To: James Hartley; herbert@gondor.apana.org.au; davem@davemloft.net;
->> grant.likely@linaro.org; robh+dt@kernel.org; akpm@linux-foundation.org;
->> gregkh@linuxfoundation.org; joe@perches.com;
->> mchehab@osg.samsung.com; crope@iki.fi; jg1.han@samsung.com; linux-
->> crypto@vger.kernel.org
->> Cc: devicetree@vger.kernel.org; pawel.moll@arm.com;
->> mark.rutland@arm.com; ijc+devicetree@hellion.org.uk;
->> galak@codeaurora.org; abrestic@chromium.org; Ezequiel Garcia
->> Subject: Re: [PATCH 1/2] crypto: Add Imagination Technologies hw hash
->> accelerator
->>
->> Hello James,
->>
->> On 10.11.2014 14:10, James Hartley wrote:
->>> This adds support for the Imagination Technologies hash accelerator
->>> that provides hardware acceleration for
->>> SHA1 SHA224 SHA256 and MD5 Hashes.
->>>
->>> Signed-off-by: James Hartley <james.hartley@imgtec.com>
->>> ---
->>
-
-[snip]
-
->>> +
->>> +	return 0;
->>> +
->>> +err_algs:
->>> +	spin_lock(&img_hash.lock);
->>> +	list_del(&hdev->list);
->>> +	spin_unlock(&img_hash.lock);
->>> +	dma_release_channel(hdev->dma_lch);
->>> +err_dma:
->>> +	iounmap(hdev->io_base);
->>
->> Mixing of devm_* resource initialization and commodity resource release
->> leads to double decrement of clock usage count reference.
-> 
-> Ok, changed to devm_iounmap
-> 
-
-just one small comment, please double check, but most probably you don't
-need to call devm_iounmap() explicitly on error path.
-
-[snip]
-
-> 
->>
->>> +
->>> +static int img_hash_remove(struct platform_device *pdev) {
->>> +	static struct img_hash_dev *hdev;
->>> +
->>> +	hdev = platform_get_drvdata(pdev);
->>> +	if (!hdev)
->>> +		return -ENODEV;
->>> +	spin_lock(&img_hash.lock);
->>> +	list_del(&hdev->list);
->>> +	spin_unlock(&img_hash.lock);
->>> +
->>> +	img_unregister_algs(hdev);
->>> +
->>> +	tasklet_kill(&hdev->done_task);
->>> +	tasklet_kill(&hdev->dma_task);
->>> +	img_hash_dma_cleanup(hdev);
->>> +
->>> +	iounmap(hdev->io_base);
->>
->> Same as above, devres iounmap() is good enough.
-> 
-> Done
-> 
-
-Same as above, I suppose you can simply remove iounmap() call without
-adding explicit devm_iounmap().
-
---
-With best wishes,
-Vladimir
+SGkgVmxhZGltaXINCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51
+eC1jcnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtY3J5cHRvLQ0KPiBv
+d25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBWbGFkaW1pciBaYXBvbHNraXkNCj4g
+U2VudDogMTEgTm92ZW1iZXIgMjAxNCAxNToxMg0KPiBUbzogSmFtZXMgSGFydGxleTsgZ3JhbnQu
+bGlrZWx5QGxpbmFyby5vcmc7IHJvYmgrZHRAa2VybmVsLm9yZzsNCj4gYWtwbUBsaW51eC1mb3Vu
+ZGF0aW9uLm9yZw0KPiBDYzogaGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1OyBkYXZlbUBkYXZl
+bWxvZnQubmV0Ow0KPiBncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZzsgam9lQHBlcmNoZXMuY29t
+Ow0KPiBtY2hlaGFiQG9zZy5zYW1zdW5nLmNvbTsgY3JvcGVAaWtpLmZpOyBqZzEuaGFuQHNhbXN1
+bmcuY29tOyBsaW51eC0NCj4gY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgZGV2aWNldHJlZUB2Z2Vy
+Lmtlcm5lbC5vcmc7DQo+IHBhd2VsLm1vbGxAYXJtLmNvbTsgbWFyay5ydXRsYW5kQGFybS5jb207
+DQo+IGlqYytkZXZpY2V0cmVlQGhlbGxpb24ub3JnLnVrOyBnYWxha0Bjb2RlYXVyb3JhLm9yZzsN
+Cj4gYWJyZXN0aWNAY2hyb21pdW0ub3JnOyBFemVxdWllbCBHYXJjaWENCj4gU3ViamVjdDogUmU6
+IFtQQVRDSCAxLzJdIGNyeXB0bzogQWRkIEltYWdpbmF0aW9uIFRlY2hub2xvZ2llcyBodyBoYXNo
+DQo+IGFjY2VsZXJhdG9yDQo+IA0KPiBIaSBKYW1lcywNCj4gDQo+IE9uIDExLjExLjIwMTQgMTY6
+NTksIEphbWVzIEhhcnRsZXkgd3JvdGU6DQo+ID4gSGkgVmxhZGltaXIsIHRoYW5rcyBmb3IgdGhl
+IHJldmlldyENCj4gPg0KPiA+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+PiBGcm9t
+OiBWbGFkaW1pciBaYXBvbHNraXkgW21haWx0bzp2bGFkaW1pcl96YXBvbHNraXlAbWVudG9yLmNv
+bV0NCj4gPj4gU2VudDogMTAgTm92ZW1iZXIgMjAxNCAxNToxMA0KPiA+PiBUbzogSmFtZXMgSGFy
+dGxleTsgaGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1Ow0KPiBkYXZlbUBkYXZlbWxvZnQubmV0
+Ow0KPiA+PiBncmFudC5saWtlbHlAbGluYXJvLm9yZzsgcm9iaCtkdEBrZXJuZWwub3JnOw0KPiA+
+PiBha3BtQGxpbnV4LWZvdW5kYXRpb24ub3JnOyBncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZzsN
+Cj4gPj4gam9lQHBlcmNoZXMuY29tOyBtY2hlaGFiQG9zZy5zYW1zdW5nLmNvbTsgY3JvcGVAaWtp
+LmZpOw0KPiA+PiBqZzEuaGFuQHNhbXN1bmcuY29tOyBsaW51eC0gY3J5cHRvQHZnZXIua2VybmVs
+Lm9yZw0KPiA+PiBDYzogZGV2aWNldHJlZUB2Z2VyLmtlcm5lbC5vcmc7IHBhd2VsLm1vbGxAYXJt
+LmNvbTsNCj4gPj4gbWFyay5ydXRsYW5kQGFybS5jb207IGlqYytkZXZpY2V0cmVlQGhlbGxpb24u
+b3JnLnVrOw0KPiA+PiBnYWxha0Bjb2RlYXVyb3JhLm9yZzsgYWJyZXN0aWNAY2hyb21pdW0ub3Jn
+OyBFemVxdWllbCBHYXJjaWENCj4gPj4gU3ViamVjdDogUmU6IFtQQVRDSCAxLzJdIGNyeXB0bzog
+QWRkIEltYWdpbmF0aW9uIFRlY2hub2xvZ2llcyBodyBoYXNoDQo+ID4+IGFjY2VsZXJhdG9yDQo+
+ID4+DQo+ID4+IEhlbGxvIEphbWVzLA0KPiA+Pg0KPiA+PiBPbiAxMC4xMS4yMDE0IDE0OjEwLCBK
+YW1lcyBIYXJ0bGV5IHdyb3RlOg0KPiA+Pj4gVGhpcyBhZGRzIHN1cHBvcnQgZm9yIHRoZSBJbWFn
+aW5hdGlvbiBUZWNobm9sb2dpZXMgaGFzaCBhY2NlbGVyYXRvcg0KPiA+Pj4gdGhhdCBwcm92aWRl
+cyBoYXJkd2FyZSBhY2NlbGVyYXRpb24gZm9yDQo+ID4+PiBTSEExIFNIQTIyNCBTSEEyNTYgYW5k
+IE1ENSBIYXNoZXMuDQo+ID4+Pg0KPiA+Pj4gU2lnbmVkLW9mZi1ieTogSmFtZXMgSGFydGxleSA8
+amFtZXMuaGFydGxleUBpbWd0ZWMuY29tPg0KPiA+Pj4gLS0tDQo+ID4+DQo+IA0KPiBbc25pcF0N
+Cj4gDQo+ID4+PiArDQo+ID4+PiArCXJldHVybiAwOw0KPiA+Pj4gKw0KPiA+Pj4gK2Vycl9hbGdz
+Og0KPiA+Pj4gKwlzcGluX2xvY2soJmltZ19oYXNoLmxvY2spOw0KPiA+Pj4gKwlsaXN0X2RlbCgm
+aGRldi0+bGlzdCk7DQo+ID4+PiArCXNwaW5fdW5sb2NrKCZpbWdfaGFzaC5sb2NrKTsNCj4gPj4+
+ICsJZG1hX3JlbGVhc2VfY2hhbm5lbChoZGV2LT5kbWFfbGNoKTsNCj4gPj4+ICtlcnJfZG1hOg0K
+PiA+Pj4gKwlpb3VubWFwKGhkZXYtPmlvX2Jhc2UpOw0KPiA+Pg0KPiA+PiBNaXhpbmcgb2YgZGV2
+bV8qIHJlc291cmNlIGluaXRpYWxpemF0aW9uIGFuZCBjb21tb2RpdHkgcmVzb3VyY2UNCj4gPj4g
+cmVsZWFzZSBsZWFkcyB0byBkb3VibGUgZGVjcmVtZW50IG9mIGNsb2NrIHVzYWdlIGNvdW50IHJl
+ZmVyZW5jZS4NCj4gPg0KPiA+IE9rLCBjaGFuZ2VkIHRvIGRldm1faW91bm1hcA0KPiA+DQo+IA0K
+PiBqdXN0IG9uZSBzbWFsbCBjb21tZW50LCBwbGVhc2UgZG91YmxlIGNoZWNrLCBidXQgbW9zdCBw
+cm9iYWJseSB5b3UgZG9uJ3QNCj4gbmVlZCB0byBjYWxsIGRldm1faW91bm1hcCgpIGV4cGxpY2l0
+bHkgb24gZXJyb3IgcGF0aC4NCg0KWWVzIHlvdSBhcmUgcmlnaHQsIEkgd2lsbCByZW1vdmUgdGhl
+bQ0KDQo+IA0KPiBbc25pcF0NCj4gDQo+ID4NCj4gPj4NCj4gPj4+ICsNCj4gPj4+ICtzdGF0aWMg
+aW50IGltZ19oYXNoX3JlbW92ZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KSB7DQo+ID4+
+PiArCXN0YXRpYyBzdHJ1Y3QgaW1nX2hhc2hfZGV2ICpoZGV2Ow0KPiA+Pj4gKw0KPiA+Pj4gKwlo
+ZGV2ID0gcGxhdGZvcm1fZ2V0X2RydmRhdGEocGRldik7DQo+ID4+PiArCWlmICghaGRldikNCj4g
+Pj4+ICsJCXJldHVybiAtRU5PREVWOw0KPiA+Pj4gKwlzcGluX2xvY2soJmltZ19oYXNoLmxvY2sp
+Ow0KPiA+Pj4gKwlsaXN0X2RlbCgmaGRldi0+bGlzdCk7DQo+ID4+PiArCXNwaW5fdW5sb2NrKCZp
+bWdfaGFzaC5sb2NrKTsNCj4gPj4+ICsNCj4gPj4+ICsJaW1nX3VucmVnaXN0ZXJfYWxncyhoZGV2
+KTsNCj4gPj4+ICsNCj4gPj4+ICsJdGFza2xldF9raWxsKCZoZGV2LT5kb25lX3Rhc2spOw0KPiA+
+Pj4gKwl0YXNrbGV0X2tpbGwoJmhkZXYtPmRtYV90YXNrKTsNCj4gPj4+ICsJaW1nX2hhc2hfZG1h
+X2NsZWFudXAoaGRldik7DQo+ID4+PiArDQo+ID4+PiArCWlvdW5tYXAoaGRldi0+aW9fYmFzZSk7
+DQo+ID4+DQo+ID4+IFNhbWUgYXMgYWJvdmUsIGRldnJlcyBpb3VubWFwKCkgaXMgZ29vZCBlbm91
+Z2guDQo+ID4NCj4gPiBEb25lDQo+ID4NCj4gDQo+IFNhbWUgYXMgYWJvdmUsIEkgc3VwcG9zZSB5
+b3UgY2FuIHNpbXBseSByZW1vdmUgaW91bm1hcCgpIGNhbGwgd2l0aG91dA0KPiBhZGRpbmcgZXhw
+bGljaXQgZGV2bV9pb3VubWFwKCkuDQoNCkFzIGFib3ZlLg0KDQo+IA0KPiAtLQ0KPiBXaXRoIGJl
+c3Qgd2lzaGVzLA0KPiBWbGFkaW1pcg0KPiAtLQ0KPiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMg
+bGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtY3J5cHRvIiBpbiB0aGUNCj4g
+Ym9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZyBNb3JlIG1ham9y
+ZG9tbyBpbmZvIGF0DQo+IGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRt
+bA0KDQoNClRoYW5rcyBhZ2FpbiBmb3IgdGhlIHF1aWNrIHJldmlldy4gIEknbGwgcG9zdCBhIFYy
+IHBhdGNoc2V0IHdoZW4gSSd2ZSBmaWd1cmVkIG91dA0Kd2hhdCBJIGNhbiBkbyBhYm91dCB0aGUg
+ZXJyb3IgaGFuZGxpbmcgeW91IG1lbnRpb25lZCBwcmV2aW91c2x5Lg0KDQpUaGFua3MNCkphbWVz
+DQo=
