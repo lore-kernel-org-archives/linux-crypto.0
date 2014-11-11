@@ -1,32 +1,80 @@
 From: Daniel Borkmann <dborkman@redhat.com>
-Subject: Re: crypto: zeroization of sensitive data in af_alg
-Date: Tue, 11 Nov 2014 10:19:20 +0100
-Message-ID: <5461D498.1000502@redhat.com>
-References: <1979092.odOtqL46qU@tachyon.chronox.de> <CACXcFmmp=SMisc0p-Fx=M3myXE0E-kH3zN6NGrODeVzQrXUdFA@mail.gmail.com> <3021915.VU7Ypy9It6@tachyon.chronox.de>
+Subject: Re: [PATCH 1/2] crypto: AF_ALG - zeroize message digest buffer
+Date: Tue, 11 Nov 2014 10:34:18 +0100
+Message-ID: <5461D81A.40801@redhat.com>
+References: <1503070.D5VR9iy8Cm@tachyon.chronox.de> <2491424.h8JBGRc3Yx@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Sandy Harris <sandyinchina@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"'Sandy Harris'" <sandyinchina@gmail.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:39080 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:51150 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751544AbaKKJTi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Nov 2014 04:19:38 -0500
-In-Reply-To: <3021915.VU7Ypy9It6@tachyon.chronox.de>
+	id S1751956AbaKKJeb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 11 Nov 2014 04:34:31 -0500
+In-Reply-To: <2491424.h8JBGRc3Yx@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 11/11/2014 05:16 AM, Stephan Mueller wrote:
-...
-> That is a good idea.
+Hi Stephan,
+
+On 11/11/2014 05:37 AM, Stephan Mueller wrote:
+> Zeroize the buffer holding the message digest calculated for the
+> consumer before the buffer is released by the hash AF_ALG interface
+> handler.
 >
-> Herbert: I can prepare a patch that uses memzero_explicit. However, your
-> current tree does not yet implement that function as it was added to Linus'
-> tree after you pulled from it.
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> ---
+>   crypto/algif_hash.c | 2 ++
+>   1 file changed, 2 insertions(+)
+>
+> diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+> index 8502462..f75db4c 100644
+> --- a/crypto/algif_hash.c
+> +++ b/crypto/algif_hash.c
+> @@ -258,6 +258,8 @@ static void hash_sock_destruct(struct sock *sk)
+>   	struct alg_sock *ask = alg_sk(sk);
+>   	struct hash_ctx *ctx = ask->private;
+>
+> +	memzero_explicit(ctx->result,
+> +		     crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req)));
+>   	sock_kfree_s(sk, ctx->result,
 
-Yep, Ted took it [1] on top of the random driver fix as discussed.
+Perhaps something like this (alternatively kzfree() would work, too) ...
 
-   [1] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=7185ad2672a7d50bc384de0e38d90b75d99f3d82
+static void __sock_kfree_s(struct sock *sk, void *mem, int size,
+			   bool clear_mem)
+{
+	if (WARN_ON_ONCE(!mem))
+		return;
+	if (clear_mem)
+		memzero_explicit(mem, size);
+	kfree(mem);
+	atomic_sub(size, &sk->sk_omem_alloc);
+}
+
+void sock_kfree_s(struct sock *sk, void *mem, int size)
+{
+	__sock_kfree_s(sk, mem, size, false);
+}
+EXPORT_SYMBOL(sock_kfree_s);
+
+void sock_kzfree_s(struct sock *sk, void *mem, int size)
+{
+	__sock_kfree_s(sk, mem, size, true);
+}
+EXPORT_SYMBOL(sock_kzfree_s);
+
+... so you could then just use it as drop-in in various places:
+
+sock_kzfree_s(sk, ctx->result, ...);
+
+>   		     crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req)));
+>   	sock_kfree_s(sk, ctx, ctx->len);
+>
+
+Thanks,
+Daniel
