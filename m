@@ -1,80 +1,63 @@
-From: Daniel Borkmann <dborkman@redhat.com>
-Subject: Re: [PATCH 1/2] crypto: AF_ALG - zeroize message digest buffer
-Date: Tue, 11 Nov 2014 10:34:18 +0100
-Message-ID: <5461D81A.40801@redhat.com>
-References: <1503070.D5VR9iy8Cm@tachyon.chronox.de> <2491424.h8JBGRc3Yx@tachyon.chronox.de>
+From: Catalin Vasile <catalin.vasile@freescale.com>
+Subject: [PATCH] crypto: caam - add support for givencrypt cbc(des) and cbc(des3_ede)
+Date: Tue, 11 Nov 2014 16:18:13 +0200
+Message-ID: <1415715493-15992-1-git-send-email-catalin.vasile@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"'Sandy Harris'" <sandyinchina@gmail.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain
+Cc: <herbert@gondor.apana.org.au>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51150 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751956AbaKKJeb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Nov 2014 04:34:31 -0500
-In-Reply-To: <2491424.h8JBGRc3Yx@tachyon.chronox.de>
+Received: from mail-bn1on0146.outbound.protection.outlook.com ([157.56.110.146]:32860
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751506AbaKKOTf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 11 Nov 2014 09:19:35 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Stephan,
+Merge DES Cipher Block Chaining mode (CBC) and Triple DES Cipher Block
+Chaining mode (CBC) algorithms from ablkcipher to givencrypt.
 
-On 11/11/2014 05:37 AM, Stephan Mueller wrote:
-> Zeroize the buffer holding the message digest calculated for the
-> consumer before the buffer is released by the hash AF_ALG interface
-> handler.
->
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> ---
->   crypto/algif_hash.c | 2 ++
->   1 file changed, 2 insertions(+)
->
-> diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-> index 8502462..f75db4c 100644
-> --- a/crypto/algif_hash.c
-> +++ b/crypto/algif_hash.c
-> @@ -258,6 +258,8 @@ static void hash_sock_destruct(struct sock *sk)
->   	struct alg_sock *ask = alg_sk(sk);
->   	struct hash_ctx *ctx = ask->private;
->
-> +	memzero_explicit(ctx->result,
-> +		     crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req)));
->   	sock_kfree_s(sk, ctx->result,
+Signed-off-by: Catalin Vasile <catalin.vasile@freescale.com>
+---
+ drivers/crypto/caam/caamalg.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Perhaps something like this (alternatively kzfree() would work, too) ...
-
-static void __sock_kfree_s(struct sock *sk, void *mem, int size,
-			   bool clear_mem)
-{
-	if (WARN_ON_ONCE(!mem))
-		return;
-	if (clear_mem)
-		memzero_explicit(mem, size);
-	kfree(mem);
-	atomic_sub(size, &sk->sk_omem_alloc);
-}
-
-void sock_kfree_s(struct sock *sk, void *mem, int size)
-{
-	__sock_kfree_s(sk, mem, size, false);
-}
-EXPORT_SYMBOL(sock_kfree_s);
-
-void sock_kzfree_s(struct sock *sk, void *mem, int size)
-{
-	__sock_kfree_s(sk, mem, size, true);
-}
-EXPORT_SYMBOL(sock_kzfree_s);
-
-... so you could then just use it as drop-in in various places:
-
-sock_kzfree_s(sk, ctx->result, ...);
-
->   		     crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req)));
->   	sock_kfree_s(sk, ctx, ctx->len);
->
-
-Thanks,
-Daniel
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 44b306b..3187400 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -4057,12 +4057,13 @@ static struct caam_alg_template driver_algs[] = {
+ 		.name = "cbc(des3_ede)",
+ 		.driver_name = "cbc-3des-caam",
+ 		.blocksize = DES3_EDE_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
++		.type = CRYPTO_ALG_TYPE_GIVCIPHER,
+ 		.template_ablkcipher = {
+ 			.setkey = ablkcipher_setkey,
+ 			.encrypt = ablkcipher_encrypt,
+ 			.decrypt = ablkcipher_decrypt,
+-			.geniv = "eseqiv",
++			.givencrypt = ablkcipher_givencrypt,
++			.geniv = "<built-in>",
+ 			.min_keysize = DES3_EDE_KEY_SIZE,
+ 			.max_keysize = DES3_EDE_KEY_SIZE,
+ 			.ivsize = DES3_EDE_BLOCK_SIZE,
+@@ -4073,12 +4074,13 @@ static struct caam_alg_template driver_algs[] = {
+ 		.name = "cbc(des)",
+ 		.driver_name = "cbc-des-caam",
+ 		.blocksize = DES_BLOCK_SIZE,
+-		.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
++		.type = CRYPTO_ALG_TYPE_GIVCIPHER,
+ 		.template_ablkcipher = {
+ 			.setkey = ablkcipher_setkey,
+ 			.encrypt = ablkcipher_encrypt,
+ 			.decrypt = ablkcipher_decrypt,
+-			.geniv = "eseqiv",
++			.givencrypt = ablkcipher_givencrypt,
++			.geniv = "<built-in>",
+ 			.min_keysize = DES_KEY_SIZE,
+ 			.max_keysize = DES_KEY_SIZE,
+ 			.ivsize = DES_BLOCK_SIZE,
+-- 
+1.8.3.1
