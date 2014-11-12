@@ -1,256 +1,257 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 7/8] crypto: AF_ALG: add random number generator support
-Date: Wed, 12 Nov 2014 08:05:48 +0100
-Message-ID: <1914037.Wy7EiDNG7B@tachyon.chronox.de>
-References: <4738444.A2vZX1nNCo@tachyon.chronox.de>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH] crypto: aesni-intel - avoid IPsec re-ordering
+Date: Wed, 12 Nov 2014 09:41:38 +0100
+Message-ID: <20141112084138.GL6390@secunet.com>
+References: <1415771371-30774-1-git-send-email-ming.liu@windriver.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: ABI/API <linux-api@vger.kernel.org>, linux-crypto@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4738444.A2vZX1nNCo@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<ying.xue@windriver.com>, <linux-crypto@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+To: Ming Liu <ming.liu@windriver.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([195.81.216.161]:59820 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751102AbaKLIlq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 12 Nov 2014 03:41:46 -0500
+Content-Disposition: inline
+In-Reply-To: <1415771371-30774-1-git-send-email-ming.liu@windriver.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds the random number generator support for AF_ALG.
+On Wed, Nov 12, 2014 at 01:49:31PM +0800, Ming Liu wrote:
+> So far, the encryption/decryption are asynchronously processed in
+> softirq and cryptd which would result in a implicit order of data,
+> therefore leads IPSec stack also out of order while encapsulating
+> or decapsulating packets.
+> 
+> Consider the following scenario:
+> 
+>              DECRYPTION INBOUND
+>                       |
+>                       |
+>              +-----Packet A
+>              |        |
+>              |        |
+>              |     Packet B
+>              |        |
+>     (cryptd) |        | (software interrupts)
+>              |      ......
+>              |        |
+>              |        |
+>              |     Packet B(decrypted)
+>              |        |
+>              |        |
+>              +---> Packet A(decrypted)
+>                       |
+>                       |
+>              DECRYPTION OUTBOUND
+> 
+> Add cryptd_flush_queue function fixing it by being called from softirq
+> to flush all previous queued elements before processing a new one. To
+> prevent cryptd_flush_queue() being accessed from software interrupts,
+> local_bh_disable/enable needs to be relocated in several places.
+> 
+> Signed-off-by: Ming Liu <ming.liu@windriver.com>
+> ---
+> I was told that I need resend this patch with git, so here it is:
+> 
+> I've figured out a new patch for this issue reported by me previously,
+> the basic idea is adding a cryptd_flush_queue function fixing it by
+> being called from softirq to flush all previous queued elements
+> before processing a new one, and it works very well so far per my test.
 
-A random number generator's purpose is to generate data without
-requiring the caller to provide any data. Therefore, the AF_ALG
-interface handler for RNGs only implements a callback handler for
-recvmsg.
+I doubt that this approach can work. The cryptd encrypt/decrypt functions
+assume to be called from a workqueue worker, they can't be called from
+atomic context.
 
-The following parameters provided with a recvmsg are processed by the
-RNG callback handler:
+Can't we just use cryptd unconditionally to fix this reordering problem?
 
-	* sock - to resolve the RNG context data structure accessing the
-	  RNG instance private to the socket
+> 
+>  crypto/ablk_helper.c    |  10 ++++-
+>  crypto/cryptd.c         | 107 ++++++++++++++++++++++++++++++++++++++++--------
+>  include/crypto/cryptd.h |  13 ++++++
+>  3 files changed, 111 insertions(+), 19 deletions(-)
+> 
+> diff --git a/crypto/ablk_helper.c b/crypto/ablk_helper.c
+> index ffe7278..600a70f 100644
+> --- a/crypto/ablk_helper.c
+> +++ b/crypto/ablk_helper.c
+> @@ -70,16 +70,19 @@ int ablk_encrypt(struct ablkcipher_request *req)
+>  {
+>  	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+>  	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+> +	struct crypto_tfm *req_tfm = crypto_ablkcipher_tfm(
+> +		crypto_ablkcipher_crt(&ctx->cryptd_tfm->base)->base);
+>  
+>  	if (!may_use_simd()) {
+>  		struct ablkcipher_request *cryptd_req =
+>  			ablkcipher_request_ctx(req);
+>  
+>  		*cryptd_req = *req;
+> -		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
+> +		cryptd_req->base.tfm = req_tfm;
+>  
+>  		return crypto_ablkcipher_encrypt(cryptd_req);
+>  	} else {
+> +		cryptd_flush_queue(req_tfm, CRYPTD_ENCRYPT);
 
-	* len - this parameter allows userspace callers to specify how
-	  many random bytes the RNG shall produce and return. As the
-	  kernel context for the RNG allocates a buffer of 128 bytes to
-	  store random numbers before copying them to userspace, the len
-	  parameter is checked that it is not larger than 128. If a
-	  caller wants more random numbers, a new request for recvmsg
-	  shall be made.
+Where is CRYPTD_ENCRYPT defined?
+This does not even compile when applied to the cryptodev tree.
 
-The size of 128 bytes is chose because of the following considerations:
+>  		return __ablk_encrypt(req);
+>  	}
+>  }
+> @@ -89,13 +92,15 @@ int ablk_decrypt(struct ablkcipher_request *req)
+>  {
+>  	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+>  	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+> +	struct crypto_tfm *req_tfm = crypto_ablkcipher_tfm(
+> +		crypto_ablkcipher_crt(&ctx->cryptd_tfm->base)->base);
+>  
+>  	if (!may_use_simd()) {
+>  		struct ablkcipher_request *cryptd_req =
+>  			ablkcipher_request_ctx(req);
+>  
+>  		*cryptd_req = *req;
+> -		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
+> +		cryptd_req->base.tfm = req_tfm;
+>  
+>  		return crypto_ablkcipher_decrypt(cryptd_req);
+>  	} else {
+> @@ -105,6 +110,7 @@ int ablk_decrypt(struct ablkcipher_request *req)
+>  		desc.info = req->info;
+>  		desc.flags = 0;
+>  
+> +		cryptd_flush_queue(req_tfm, CRYPTD_DECRYPT);
 
-	* to increase the memory footprint of the kernel too much (note,
-	  that would be 128 bytes per open socket)
+Same here.
 
-	* 128 is divisible by any typical cryptographic block size an
-	  RNG may have
+>  		return crypto_blkcipher_crt(desc.tfm)->decrypt(
+>  			&desc, req->dst, req->src, req->nbytes);
+>  	}
+> diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+> index e592c90..0b387a1 100644
+> --- a/crypto/cryptd.c
+> +++ b/crypto/cryptd.c
+> @@ -119,11 +119,13 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
+>  	int cpu, err;
+>  	struct cryptd_cpu_queue *cpu_queue;
+>  
+> +	local_bh_disable();
+>  	cpu = get_cpu();
+>  	cpu_queue = this_cpu_ptr(queue->cpu_queue);
+>  	err = crypto_enqueue_request(&cpu_queue->queue, request);
+>  	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
+>  	put_cpu();
+> +	local_bh_enable();
+>  
+>  	return err;
+>  }
+> @@ -147,11 +149,9 @@ static void cryptd_queue_worker(struct work_struct *work)
+>  	preempt_disable();
+>  	backlog = crypto_get_backlog(&cpu_queue->queue);
+>  	req = crypto_dequeue_request(&cpu_queue->queue);
+> -	preempt_enable();
+> -	local_bh_enable();
 
-	* A request for random numbers typically only shall supply small
-	  amount of data like for keys or IVs that should only require
-	  one invocation of the recvmsg function.
+Everything below the local_bh_enable() should not run in atomic context
+as the subsequent functions may set the CRYPTO_TFM_REQ_MAY_SLEEP flag.
 
-Note, during instantiation of the RNG, the code checks whether the RNG
-implementation requires seeding. If so, the RNG is seeded with output
-from get_random_bytes.
+>  
+>  	if (!req)
+> -		return;
+> +		goto out;
+>  
+>  	if (backlog)
+>  		backlog->complete(backlog, -EINPROGRESS);
+> @@ -159,6 +159,9 @@ static void cryptd_queue_worker(struct work_struct *work)
+>  
+>  	if (cpu_queue->queue.qlen)
+>  		queue_work(kcrypto_wq, &cpu_queue->work);
+> +out:
+> +	preempt_enable();
+> +	local_bh_enable();
+>  }
 
-A fully working example using all aspects of the RNG interface is
-provided at http://www.chronox.de/libkcapi.html
+...
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/algif_rng.c | 186 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 186 insertions(+)
- create mode 100644 crypto/algif_rng.c
+>  
+> +void cryptd_flush_queue(struct crypto_tfm *tfm, cryptd_type_t type)
+> +{
+> +	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
+> +	struct cryptd_instance_ctx *ictx = crypto_instance_ctx(inst);
+> +	struct cryptd_queue *cryptd_queue = ictx->queue;
+> +	struct cryptd_cpu_queue *cpu_queue;
+> +	struct crypto_queue *queue;
+> +	struct crypto_async_request *req, *tmp, *backlog;
+> +	crypto_completion_t complete;
+> +	int cpu;
+> +	unsigned int len;
+> +
+> +	switch (type) {
+> +	case CRYPTD_BLKCIPHER_ENCRYPT:
+> +		complete = cryptd_blkcipher_encrypt;
+> +		break;
+> +	case CRYPTD_BLKCIPHER_DECRYPT:
+> +		complete = cryptd_blkcipher_decrypt;
+> +		break;
+> +	case CRYPTD_HASH_INIT:
+> +		complete = cryptd_hash_init;
+> +		break;
+> +	case CRYPTD_HASH_UPDATE:
+> +		complete = cryptd_hash_update;
+> +		break;
+> +	case CRYPTD_HASH_FINAL:
+> +		complete = cryptd_hash_final;
+> +		break;
+> +	case CRYPTD_HASH_FINUP:
+> +		complete = cryptd_hash_finup;
+> +		break;
+> +	case CRYPTD_HASH_DIGEST:
+> +		complete = cryptd_hash_digest;
+> +		break;
+> +	case CRYPTD_AEAD_ENCRYPT:
+> +		complete = cryptd_aead_encrypt;
+> +		break;
+> +	case CRYPTD_AEAD_DECRYPT:
+> +		complete = cryptd_aead_decrypt;
+> +		break;
+> +	default:
+> +		complete = NULL;
+> +	}
+> +
+> +	if (complete == NULL)
+> +		return;
+> +
+> +	local_bh_disable();
+> +	cpu = get_cpu();
+> +	cpu_queue = this_cpu_ptr(cryptd_queue->cpu_queue);
+> +	queue = &cpu_queue->queue;
+> +	len = queue->qlen;
+> +
+> +	if (!len)
+> +		goto out;
+> +
+> +	list_for_each_entry_safe(req, tmp, &queue->list, list) {
+> +		if (req->complete == complete) {
+> +			queue->qlen--;
+> +
+> +			if (queue->backlog != &queue->list) {
+> +				backlog = container_of(queue->backlog,
+> +					struct crypto_async_request, list);
+> +				queue->backlog = queue->backlog->next;
+> +			} else
+> +				backlog = NULL;
+> +
+> +			list_del(&req->list);
+> +
+> +			if (backlog)
+> +				backlog->complete(backlog, -EINPROGRESS);
+> +			req->complete(req, 0);
 
-diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
-new file mode 100644
-index 0000000..d1904d7
---- /dev/null
-+++ b/crypto/algif_rng.c
-@@ -0,0 +1,186 @@
-+/*
-+ * algif_rng: User-space interface for random number generators
-+ *
-+ * This file provides the user-space API for random number generators.
-+ *
-+ * Copyright (C) 2014, Stephan Mueller <smueller@chronox.de>
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, and the entire permission notice in its entirety,
-+ *    including the disclaimer of warranties.
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in the
-+ *    documentation and/or other materials provided with the distribution.
-+ * 3. The name of the author may not be used to endorse or promote
-+ *    products derived from this software without specific prior
-+ *    written permission.
-+ *
-+ * ALTERNATIVELY, this product may be distributed under the terms of
-+ * the GNU General Public License, in which case the provisions of the GPL2 are
-+ * required INSTEAD OF the above restrictions.  (This clause is
-+ * necessary due to a potential bad interaction between the GPL and
-+ * the restrictions contained in a BSD-style copyright.)
-+ *
-+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
-+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
-+ * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
-+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-+ * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
-+ * DAMAGE.
-+ */
-+
-+#include <linux/module.h>
-+#include <crypto/rng.h>
-+#include <linux/random.h>
-+#include <crypto/if_alg.h>
-+#include <linux/net.h>
-+#include <net/sock.h>
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-+MODULE_DESCRIPTION("User-space interface for random number generators");
-+
-+struct rng_ctx {
-+#define MAXSIZE 128
-+	u8 result[MAXSIZE];
-+	unsigned int len;
-+	struct crypto_rng *drng;
-+};
-+
-+static int rng_recvmsg(struct kiocb *unused, struct socket *sock,
-+		       struct msghdr *msg, size_t len, int flags)
-+{
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct rng_ctx *ctx = ask->private;
-+	int err = -EFAULT;
-+
-+	if (0 == len)
-+		return 0;
-+	if (MAXSIZE < len)
-+		len = MAXSIZE;
-+
-+	lock_sock(sk);
-+	len = crypto_rng_get_bytes(ctx->drng, ctx->result, len);
-+	if (0 > len)
-+		goto unlock;
-+
-+	err = memcpy_toiovec(msg->msg_iov, ctx->result, len);
-+	memset(ctx->result, 0, err);
-+
-+unlock:
-+	release_sock(sk);
-+
-+	return err ? err : len;
-+}
-+
-+static struct proto_ops algif_rng_ops = {
-+	.family		=	PF_ALG,
-+
-+	.connect	=	sock_no_connect,
-+	.socketpair	=	sock_no_socketpair,
-+	.getname	=	sock_no_getname,
-+	.ioctl		=	sock_no_ioctl,
-+	.listen		=	sock_no_listen,
-+	.shutdown	=	sock_no_shutdown,
-+	.getsockopt	=	sock_no_getsockopt,
-+	.mmap		=	sock_no_mmap,
-+	.bind		=	sock_no_bind,
-+	.accept		=	sock_no_accept,
-+	.setsockopt	=	sock_no_setsockopt,
-+	.poll		=	sock_no_poll,
-+	.sendmsg	=	sock_no_sendmsg,
-+	.sendpage	=	sock_no_sendpage,
-+
-+	.release	=	af_alg_release,
-+	.recvmsg	=	rng_recvmsg,
-+};
-+
-+static void *rng_bind(const char *name, u32 type, u32 mask)
-+{
-+	return crypto_alloc_rng(name, type, mask);
-+}
-+
-+static void rng_release(void *private)
-+{
-+	crypto_free_rng(private);
-+}
-+
-+static void rng_sock_destruct(struct sock *sk)
-+{
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct rng_ctx *ctx = ask->private;
-+
-+	memset(ctx->result, 0, MAXSIZE);
-+	sock_kfree_s(sk, ctx, ctx->len);
-+	af_alg_release_parent(sk);
-+}
-+
-+static int rng_accept_parent(void *private, struct sock *sk)
-+{
-+	struct rng_ctx *ctx;
-+	struct alg_sock *ask = alg_sk(sk);
-+	unsigned int len = sizeof(*ctx);
-+	int seedsize = crypto_rng_seedsize(private);
-+	int ret = -ENOMEM;
-+
-+	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
-+	if (!ctx)
-+		return -ENOMEM;
-+	memset(ctx->result, 0, MAXSIZE);
-+
-+	ctx->len = len;
-+
-+	if (seedsize) {
-+		u8 *buf = kmalloc(seedsize, GFP_KERNEL);
-+		if (!buf)
-+			goto err;
-+		get_random_bytes(buf, seedsize);
-+		ret = crypto_rng_reset(private, buf, len);
-+		kzfree(buf);
-+		if (ret)
-+			goto err;
-+	}
-+
-+	ctx->drng = private;
-+	ask->private = ctx;
-+	sk->sk_destruct = rng_sock_destruct;
-+
-+	return 0;
-+
-+err:
-+	sock_kfree_s(sk, ctx, len);
-+	return ret;
-+}
-+
-+static const struct af_alg_type algif_type_rng = {
-+	.bind		=	rng_bind,
-+	.release	=	rng_release,
-+	.accept		=	rng_accept_parent,
-+	.ops		=	&algif_rng_ops,
-+	.name		=	"rng",
-+	.owner		=	THIS_MODULE
-+};
-+
-+static int __init rng_init(void)
-+{
-+	return af_alg_register_type(&algif_type_rng);
-+}
-+
-+void __exit rng_exit(void)
-+{
-+	int err = af_alg_unregister_type(&algif_type_rng);
-+	BUG_ON(err);
-+}
-+
-+module_init(rng_init);
-+module_exit(rng_exit);
--- 
-2.1.0
+Same here, the complete function can not run in atomic context.
+
+Also, this can not ensure that the request is finalized.
+Subsequent algorithms may run asynchronously too, so this
+does not fix the reordering problem completely.
