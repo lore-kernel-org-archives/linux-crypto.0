@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 11/13] crypto: Documentation - BLKCIPHER API documentation
-Date: Wed, 12 Nov 2014 05:29:36 +0100
-Message-ID: <6409592.Z4CGXIjJk1@tachyon.chronox.de>
+Subject: [PATCH v3 07/13] crypto: Documentation - SHASH API documentation
+Date: Wed, 12 Nov 2014 05:27:16 +0100
+Message-ID: <1532314.JEsKM3iTVa@tachyon.chronox.de>
 References: <1800066.efQ8hkST4U@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -20,298 +20,246 @@ In-Reply-To: <1800066.efQ8hkST4U@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The API function calls exported by the kernel crypto API for
-synchronous block ciphers to be used by consumers are documented.
+The API function calls exported by the kernel crypto API for SHASHes
+to be used by consumers are documented.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- include/linux/crypto.h | 188 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 188 insertions(+)
+ include/crypto/hash.h | 164 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 164 insertions(+)
 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 4704e71..c9ebe45 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -1565,6 +1565,36 @@ static inline void aead_request_set_assoc(struct aead_request *req,
- 	req->assoclen = assoclen;
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index b2c193a..3d66e8b 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -583,6 +583,33 @@ static inline void ahash_request_set_crypt(struct ahash_request *req,
+ 	req->result = result;
  }
  
 +/**
-+ * DOC: Synchronous Block Cipher API
++ * DOC: Synchronous Message Digest API
 + *
-+ * The synchronous block cipher API is used with the ciphers of type
-+ * CRYPTO_ALG_TYPE_BLKCIPHER (listed as type "blkcipher" in /proc/crypto)
++ * The synchronous message digest API is used with the ciphers of type
++ * CRYPTO_ALG_TYPE_SHASH (listed as type "shash" in /proc/crypto)
 + *
-+ * Synchronous calls, have a context in the tfm. But since a single tfm can be
-+ * used in multiple calls and in parallel, this info should not be changeable
-+ * (unless a lock is used). This applies, for example, to the symmetric key.
-+ * However, the IV is changeable, so there is an iv field in blkcipher_tfm
-+ * structure for synchronous blkcipher api. So, its the only state info that can
-+ * be kept for synchronous calls without using a big lock across a tfm.
++ * The message digest API is able to maintain state information for the
++ * caller.
 + *
-+ * The block cipher API allows the use of a complete cipher, i.e. a cipher
-+ * consisting of a template (a block chaining mode) and a single block cipher
-+ * primitive (e.g. AES).
-+ *
-+ * The plaintext data buffer and the ciphertext data buffer are pointed to
-+ * by using scatter/gather lists. The cipher operation is performed
-+ * on all segments of the provided scatter/gather lists.
-+ *
-+ * The kernel crypto API supports a cipher operation "in-place" which means that
-+ * the caller may provide the same scatter/gather list for the plaintext and
-+ * cipher text. After the completion of the cipher operation, the plaintext
-+ * data is replaced with the ciphertext data in case of an encryption and vice
-+ * versa for a decryption. The caller must ensure that the scatter/gather lists
-+ * for the output data point to sufficiently large buffers, i.e. multiples of
-+ * the block size of the cipher.
++ * The synchronous message digest API can store user-related context in in its
++ * shash_desc request data structure.
 + */
 +
- static inline struct crypto_blkcipher *__crypto_blkcipher_cast(
- 	struct crypto_tfm *tfm)
- {
-@@ -1578,6 +1608,20 @@ static inline struct crypto_blkcipher *crypto_blkcipher_cast(
- 	return __crypto_blkcipher_cast(tfm);
- }
- 
 +/**
-+ * crypto_alloc_blkcipher() - allocate synchronous block cipher handle
++ * crypto_alloc_shash() - allocate message digest handle
 + * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
-+ *	      blkcipher cipher
++ *	      message digest cipher
 + * @type: specifies the type of the cipher
 + * @mask: specifies the mask for the cipher
 + *
-+ * Allocate a cipher handle for a block cipher. The returned struct
-+ * crypto_blkcipher is the cipher handle that is required for any subsequent
-+ * API invocation for that block cipher.
++ * Allocate a cipher handle for a message digest. The returned &struct
++ * crypto_shash is the cipher handle that is required for any subsequent
++ * API invocation for that message digest.
 + *
 + * Return: allocated cipher handle in case of success; IS_ERR() is true in case
 + *	   of an error, PTR_ERR() returns the error code.
 + */
- static inline struct crypto_blkcipher *crypto_alloc_blkcipher(
- 	const char *alg_name, u32 type, u32 mask)
- {
-@@ -1594,11 +1638,25 @@ static inline struct crypto_tfm *crypto_blkcipher_tfm(
+ struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type,
+ 					u32 mask);
+ 
+@@ -591,6 +618,10 @@ static inline struct crypto_tfm *crypto_shash_tfm(struct crypto_shash *tfm)
  	return &tfm->base;
  }
  
 +/**
-+ * crypto_free_blkcipher() - zeroize and free the block cipher handle
++ * crypto_free_shash() - zeroize and free the message digest handle
 + * @tfm: cipher handle to be freed
 + */
- static inline void crypto_free_blkcipher(struct crypto_blkcipher *tfm)
+ static inline void crypto_free_shash(struct crypto_shash *tfm)
  {
- 	crypto_free_tfm(crypto_blkcipher_tfm(tfm));
+ 	crypto_destroy_tfm(tfm, crypto_shash_tfm(tfm));
+@@ -602,6 +633,15 @@ static inline unsigned int crypto_shash_alignmask(
+ 	return crypto_tfm_alg_alignmask(crypto_shash_tfm(tfm));
  }
  
 +/**
-+ * crypto_has_blkcipher() - Search for the availability of a block cipher
-+ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
-+ *	      block cipher
-+ * @type: specifies the type of the cipher
-+ * @mask: specifies the mask for the cipher
-+ *
-+ * Return: true when the block cipher is known to the kernel crypto API; false
-+ *	   otherwise
-+ */
- static inline int crypto_has_blkcipher(const char *alg_name, u32 type, u32 mask)
- {
- 	type &= ~CRYPTO_ALG_TYPE_MASK;
-@@ -1608,6 +1666,12 @@ static inline int crypto_has_blkcipher(const char *alg_name, u32 type, u32 mask)
- 	return crypto_has_alg(alg_name, type, mask);
- }
- 
-+/**
-+ * crypto_blkcipher_name() - return the name / cra_name from the cipher handle
++ * crypto_shash_blocksize() - obtain block size for cipher
 + * @tfm: cipher handle
 + *
-+ * Return: The character string holding the name of the cipher
-+ */
- static inline const char *crypto_blkcipher_name(struct crypto_blkcipher *tfm)
- {
- 	return crypto_tfm_alg_name(crypto_blkcipher_tfm(tfm));
-@@ -1625,11 +1689,30 @@ static inline struct blkcipher_alg *crypto_blkcipher_alg(
- 	return &crypto_blkcipher_tfm(tfm)->__crt_alg->cra_blkcipher;
- }
- 
-+/**
-+ * crypto_blkcipher_ivsize() - obtain IV size
-+ * @tfm: cipher handle
-+ *
-+ * The size of the IV for the block cipher referenced by the cipher handle is
-+ * returned. This IV size may be zero if the cipher does not need an IV.
-+ *
-+ * Return: IV size in bytes
-+ */
- static inline unsigned int crypto_blkcipher_ivsize(struct crypto_blkcipher *tfm)
- {
- 	return crypto_blkcipher_alg(tfm)->ivsize;
- }
- 
-+/**
-+ * crypto_blkcipher_blocksize() - obtain block size of cipher
-+ * @tfm: cipher handle
-+ *
-+ * The block size for the block cipher referenced with the cipher handle is
-+ * returned. The caller may use that information to allocate appropriate
-+ * memory for the data returned by the encryption or decryption operation.
++ * The block size for the message digest cipher referenced with the cipher
++ * handle is returned.
 + *
 + * Return: block size of cipher
 + */
- static inline unsigned int crypto_blkcipher_blocksize(
- 	struct crypto_blkcipher *tfm)
+ static inline unsigned int crypto_shash_blocksize(struct crypto_shash *tfm)
  {
-@@ -1659,6 +1742,22 @@ static inline void crypto_blkcipher_clear_flags(struct crypto_blkcipher *tfm,
- 	crypto_tfm_clear_flags(crypto_blkcipher_tfm(tfm), flags);
+ 	return crypto_tfm_alg_blocksize(crypto_shash_tfm(tfm));
+@@ -617,6 +657,15 @@ static inline struct shash_alg *crypto_shash_alg(struct crypto_shash *tfm)
+ 	return __crypto_shash_alg(crypto_shash_tfm(tfm)->__crt_alg);
  }
  
 +/**
-+ * crypto_blkcipher_setkey() - set key for cipher
++ * crypto_shash_digestsize() - obtain message digest size
++ * @tfm: cipher handle
++ *
++ * The size for the message digest created by the message digest cipher
++ * referenced with the cipher handle is returned.
++ *
++ * Return: digest size of cipher
++ */
+ static inline unsigned int crypto_shash_digestsize(struct crypto_shash *tfm)
+ {
+ 	return crypto_shash_alg(tfm)->digestsize;
+@@ -642,6 +691,21 @@ static inline void crypto_shash_clear_flags(struct crypto_shash *tfm, u32 flags)
+ 	crypto_tfm_clear_flags(crypto_shash_tfm(tfm), flags);
+ }
+ 
++/**
++ * crypto_shash_descsize() - obtain the operational state size
++ * @tfm: cipher handle
++ *
++ * The size of the operational state the cipher needs during operation is
++ * returned for the hash referenced with the cipher handle. This size is
++ * required to calculate the memory requirements to allow the caller allocating
++ * sufficient memory for operational state.
++ *
++ * The operational state is defined with struct shash_desc where the size of
++ * that data structure is to be calculated as
++ * sizeof(struct shash_desc) + crypto_shash_descsize(alg)
++ *
++ * Return: size of the operational state
++ */
+ static inline unsigned int crypto_shash_descsize(struct crypto_shash *tfm)
+ {
+ 	return tfm->descsize;
+@@ -652,29 +716,129 @@ static inline void *shash_desc_ctx(struct shash_desc *desc)
+ 	return desc->__ctx;
+ }
+ 
++/**
++ * crypto_shash_setkey() - set key for message digest
 + * @tfm: cipher handle
 + * @key: buffer holding the key
 + * @keylen: length of the key in bytes
 + *
-+ * The caller provided key is set for the block cipher referenced by the cipher
-+ * handle.
-+ *
-+ * Note, the key length determines the cipher type. Many block ciphers implement
-+ * different cipher modes depending on the key size, such as AES-128 vs AES-192
-+ * vs. AES-256. When providing a 16 byte key for an AES cipher handle, AES-128
-+ * is performed.
++ * The caller provided key is set for the keyed message digest cipher. The
++ * cipher handle must point to a keyed message digest cipher in order for this
++ * function to succeed.
 + *
 + * Return: 0 if the setting of the key was successful; < 0 if an error occurred
 + */
- static inline int crypto_blkcipher_setkey(struct crypto_blkcipher *tfm,
- 					  const u8 *key, unsigned int keylen)
+ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key,
+ 			unsigned int keylen);
++
++/**
++ * crypto_shash_digest() - calculate message digest for buffer
++ * @desc: see crypto_shash_final()
++ * @data: see crypto_shash_update()
++ * @len: see crypto_shash_update()
++ * @out: see crypto_shash_final()
++ *
++ * This function is a "short-hand" for the function calls of crypto_shash_init,
++ * crypto_shash_update and crypto_shash_final. The parameters have the same
++ * meaning as discussed for those separate three functions.
++ *
++ * Return: 0 if the message digest creation was successful; < 0 if an error
++ *	   occurred
++ */
+ int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len, u8 *out);
+ 
++/**
++ * crypto_shash_export() - extract operational state for message digest
++ * @desc: reference to the operational state handle whose state is exported
++ * @out: output buffer of sufficient size that can hold the hash state
++ *
++ * This function exports the hash state of the operational state handle into the
++ * caller-allocated output buffer out which must have sufficient size (e.g. by
++ * calling crypto_shash_descsize).
++ *
++ * Return: 0 if the export creation was successful; < 0 if an error occurred
++ */
+ static inline int crypto_shash_export(struct shash_desc *desc, void *out)
  {
-@@ -1666,6 +1765,24 @@ static inline int crypto_blkcipher_setkey(struct crypto_blkcipher *tfm,
- 						 key, keylen);
+ 	return crypto_shash_alg(desc->tfm)->export(desc, out);
  }
  
 +/**
-+ * crypto_blkcipher_encrypt() - encrypt plaintext
-+ * @desc: reference to the block cipher handle with meta data
-+ * @dst: scatter/gather list that is filled by the cipher operation with the
-+ *	ciphertext
-+ * @src: scatter/gather list that holds the plaintext
-+ * @nbytes: number of bytes of the plaintext to encrypt.
++ * crypto_shash_import() - import operational state
++ * @desc: reference to the operational state handle the state imported into
++ * @in: buffer holding the state
 + *
-+ * Encrypt plaintext data using the IV set by the caller with a preceding
-+ * call of crypto_blkcipher_set_iv.
++ * This function imports the hash state into the operational state handle from
++ * the input buffer. That buffer should have been generated with the
++ * crypto_ahash_export function.
 + *
-+ * The blkcipher_desc data structure must be filled by the caller and can
-+ * reside on the stack. The caller must fill desc as follows: desc.tfm is filled
-+ * with the block cipher handle; desc.flags is filled with either
-+ * CRYPTO_TFM_REQ_MAY_SLEEP or 0.
-+ *
-+ * Return: 0 if the cipher operation was successful; < 0 if an error occurred
++ * Return: 0 if the import was successful; < 0 if an error occurred
 + */
- static inline int crypto_blkcipher_encrypt(struct blkcipher_desc *desc,
- 					   struct scatterlist *dst,
- 					   struct scatterlist *src,
-@@ -1675,6 +1792,25 @@ static inline int crypto_blkcipher_encrypt(struct blkcipher_desc *desc,
- 	return crypto_blkcipher_crt(desc->tfm)->encrypt(desc, dst, src, nbytes);
- }
- 
-+/**
-+ * crypto_blkcipher_encrypt_iv() - encrypt plaintext with dedicated IV
-+ * @desc: reference to the block cipher handle with meta data
-+ * @dst: scatter/gather list that is filled by the cipher operation with the
-+ *	ciphertext
-+ * @src: scatter/gather list that holds the plaintext
-+ * @nbytes: number of bytes of the plaintext to encrypt.
-+ *
-+ * Encrypt plaintext data with the use of an IV that is solely used for this
-+ * cipher operation. Any previously set IV is not used.
-+ *
-+ * The blkcipher_desc data structure must be filled by the caller and can
-+ * reside on the stack. The caller must fill desc as follows: desc.tfm is filled
-+ * with the block cipher handle; desc.info is filled with the IV to be used for
-+ * the current operation; desc.flags is filled with either
-+ * CRYPTO_TFM_REQ_MAY_SLEEP or 0.
-+ *
-+ * Return: 0 if the cipher operation was successful; < 0 if an error occurred
-+ */
- static inline int crypto_blkcipher_encrypt_iv(struct blkcipher_desc *desc,
- 					      struct scatterlist *dst,
- 					      struct scatterlist *src,
-@@ -1683,6 +1819,23 @@ static inline int crypto_blkcipher_encrypt_iv(struct blkcipher_desc *desc,
- 	return crypto_blkcipher_crt(desc->tfm)->encrypt(desc, dst, src, nbytes);
- }
- 
-+/**
-+ * crypto_blkcipher_decrypt() - decrypt ciphertext
-+ * @desc: reference to the block cipher handle with meta data
-+ * @dst: scatter/gather list that is filled by the cipher operation with the
-+ *	plaintext
-+ * @src: scatter/gather list that holds the ciphertext
-+ * @nbytes: number of bytes of the ciphertext to decrypt.
-+ *
-+ * Decrypt ciphertext data using the IV set by the caller with a preceding
-+ * call of crypto_blkcipher_set_iv.
-+ *
-+ * The blkcipher_desc data structure must be filled by the caller as documented
-+ * for the crypto_blkcipher_encrypt call above.
-+ *
-+ * Return: 0 if the cipher operation was successful; < 0 if an error occurred
-+ *
-+ */
- static inline int crypto_blkcipher_decrypt(struct blkcipher_desc *desc,
- 					   struct scatterlist *dst,
- 					   struct scatterlist *src,
-@@ -1692,6 +1845,22 @@ static inline int crypto_blkcipher_decrypt(struct blkcipher_desc *desc,
- 	return crypto_blkcipher_crt(desc->tfm)->decrypt(desc, dst, src, nbytes);
- }
- 
-+/**
-+ * crypto_blkcipher_decrypt_iv() - decrypt ciphertext with dedicated IV
-+ * @desc: reference to the block cipher handle with meta data
-+ * @dst: scatter/gather list that is filled by the cipher operation with the
-+ *	plaintext
-+ * @src: scatter/gather list that holds the ciphertext
-+ * @nbytes: number of bytes of the ciphertext to decrypt.
-+ *
-+ * Decrypt ciphertext data with the use of an IV that is solely used for this
-+ * cipher operation. Any previously set IV is not used.
-+ *
-+ * The blkcipher_desc data structure must be filled by the caller as documented
-+ * for the crypto_blkcipher_encrypt_iv call above.
-+ *
-+ * Return: 0 if the cipher operation was successful; < 0 if an error occurred
-+ */
- static inline int crypto_blkcipher_decrypt_iv(struct blkcipher_desc *desc,
- 					      struct scatterlist *dst,
- 					      struct scatterlist *src,
-@@ -1700,12 +1869,31 @@ static inline int crypto_blkcipher_decrypt_iv(struct blkcipher_desc *desc,
- 	return crypto_blkcipher_crt(desc->tfm)->decrypt(desc, dst, src, nbytes);
- }
- 
-+/**
-+ * crypto_blkcipher_set_iv() - set IV for cipher
-+ * @tfm: cipher handle
-+ * @src: buffer holding the IV
-+ * @len: length of the IV in bytes
-+ *
-+ * The caller provided IV is set for the block cipher referenced by the cipher
-+ * handle.
-+ */
- static inline void crypto_blkcipher_set_iv(struct crypto_blkcipher *tfm,
- 					   const u8 *src, unsigned int len)
+ static inline int crypto_shash_import(struct shash_desc *desc, const void *in)
  {
- 	memcpy(crypto_blkcipher_crt(tfm)->iv, src, len);
+ 	return crypto_shash_alg(desc->tfm)->import(desc, in);
  }
  
 +/**
-+ * crypto_blkcipher_get_iv() - obtain IV from cipher
-+ * @tfm: cipher handle
-+ * @dst: buffer filled with the IV
-+ * @len: length of the buffer dst
++ * crypto_shash_init() - (re)initialize message digest
++ * @desc: operational state handle that is already filled
 + *
-+ * The caller can obtain the IV set for the block cipher referenced by the
-+ * cipher handle and store it into the user-provided buffer. If the buffer
-+ * has an insufficient space, the IV is truncated to fit the buffer.
++ * The call (re-)initializes the message digest referenced by the
++ * operational state handle. Any potentially existing state created by
++ * previous operations is discarded.
++ *
++ * Return: 0 if the message digest initialization was successful; < 0 if an
++ *	   error occurred
 + */
- static inline void crypto_blkcipher_get_iv(struct crypto_blkcipher *tfm,
- 					   u8 *dst, unsigned int len)
+ static inline int crypto_shash_init(struct shash_desc *desc)
  {
+ 	return crypto_shash_alg(desc->tfm)->init(desc);
+ }
+ 
++/**
++ * crypto_shash_update() - add data to message digest for processing
++ * @desc: operational state handle that is already initialized
++ * @data: input data to be added to the message digest
++ * @len: length of the input data
++ *
++ * Updates the message digest state of the operational state handle.
++ *
++ * Return: 0 if the message digest update was successful; < 0 if an error
++ *	   occurred
++ */
+ int crypto_shash_update(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len);
++
++/**
++ * crypto_shash_final() - calculate message digest
++ * @desc: operational state handle that is already filled with data
++ * @out: output buffer filled with the message digest
++ *
++ * Finalize the message digest operation and create the message digest
++ * based on all data added to the cipher handle. The message digest is placed
++ * into the output buffer. The caller must ensure that the output buffer is
++ * large enough by using crypto_shash_digestsize.
++ *
++ * Return: 0 if the message digest creation was successful; < 0 if an error
++ *	   occurred
++ */
+ int crypto_shash_final(struct shash_desc *desc, u8 *out);
++
++/**
++ * crypto_shash_finup() - calculate message digest of buffer
++ * @desc: see crypto_shash_final()
++ * @data: see crypto_shash_update()
++ * @len: see crypto_shash_update()
++ * @out: see crypto_shash_final()
++ *
++ * This function is a "short-hand" for the function calls of
++ * crypto_shash_update and crypto_shash_final. The parameters have the same
++ * meaning as discussed for those separate functions.
++ *
++ * Return: 0 if the message digest creation was successful; < 0 if an error
++ *	   occurred
++ */
+ int crypto_shash_finup(struct shash_desc *desc, const u8 *data,
+ 		       unsigned int len, u8 *out);
+ 
 -- 
 2.1.0
