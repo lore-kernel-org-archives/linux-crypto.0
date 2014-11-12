@@ -1,152 +1,349 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 05/13] crypto: Documentation - hash data structures
-Date: Wed, 12 Nov 2014 05:26:03 +0100
-Message-ID: <4953641.UTgIXoZCd4@tachyon.chronox.de>
-References: <1800066.efQ8hkST4U@tachyon.chronox.de>
+From: Ming Liu <ming.liu@windriver.com>
+Subject: [PATCH] crypto: aesni-intel - avoid IPsec re-ordering
+Date: Wed, 12 Nov 2014 13:49:31 +0800
+Message-ID: <1415771371-30774-1-git-send-email-ming.liu@windriver.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Marek Vasut <marex@denx.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jason Cooper <cryptography@lakedaemon.net>,
-	Grant Likely <grant.likely@secretlab.ca>,
-	'Geert Uytterhoeven' <geert@linux-m68k.org>,
-	"Joy M. Latten" <jmlatten@linux.vnet.ibm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1800066.efQ8hkST4U@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <davem@davemloft.net>, <ying.xue@windriver.com>,
+	<linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>
+To: <herbert@gondor.apana.org.au>, <steffen.klassert@secunet.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.windriver.com ([147.11.1.11]:36063 "EHLO
+	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751760AbaKLFtr (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 12 Nov 2014 00:49:47 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The hash data structures needed to be filled in by cipher developers are
-documented.
+So far, the encryption/decryption are asynchronously processed in
+softirq and cryptd which would result in a implicit order of data,
+therefore leads IPSec stack also out of order while encapsulating
+or decapsulating packets.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Consider the following scenario:
+
+             DECRYPTION INBOUND
+                      |
+                      |
+             +-----Packet A
+             |        |
+             |        |
+             |     Packet B
+             |        |
+    (cryptd) |        | (software interrupts)
+             |      ......
+             |        |
+             |        |
+             |     Packet B(decrypted)
+             |        |
+             |        |
+             +---> Packet A(decrypted)
+                      |
+                      |
+             DECRYPTION OUTBOUND
+
+Add cryptd_flush_queue function fixing it by being called from softirq
+to flush all previous queued elements before processing a new one. To
+prevent cryptd_flush_queue() being accessed from software interrupts,
+local_bh_disable/enable needs to be relocated in several places.
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
 ---
- include/crypto/hash.h | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+I was told that I need resend this patch with git, so here it is:
 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 74b13ec..bf458fc 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -17,6 +17,28 @@
+I've figured out a new patch for this issue reported by me previously,
+the basic idea is adding a cryptd_flush_queue function fixing it by
+being called from softirq to flush all previous queued elements
+before processing a new one, and it works very well so far per my test.
+
+ crypto/ablk_helper.c    |  10 ++++-
+ crypto/cryptd.c         | 107 ++++++++++++++++++++++++++++++++++++++++--------
+ include/crypto/cryptd.h |  13 ++++++
+ 3 files changed, 111 insertions(+), 19 deletions(-)
+
+diff --git a/crypto/ablk_helper.c b/crypto/ablk_helper.c
+index ffe7278..600a70f 100644
+--- a/crypto/ablk_helper.c
++++ b/crypto/ablk_helper.c
+@@ -70,16 +70,19 @@ int ablk_encrypt(struct ablkcipher_request *req)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct crypto_tfm *req_tfm = crypto_ablkcipher_tfm(
++		crypto_ablkcipher_crt(&ctx->cryptd_tfm->base)->base);
  
- struct crypto_ahash;
+ 	if (!may_use_simd()) {
+ 		struct ablkcipher_request *cryptd_req =
+ 			ablkcipher_request_ctx(req);
  
-+/**
-+ * DOC: Message Digest Algorithm Definitions
-+ *
-+ * These data structures define modular message digest algorithm
-+ * implementations, managed via crypto_register_ahash(),
-+ * crypto_register_shash(), crypto_unregister_ahash() and
-+ * crypto_unregister_shash().
-+ */
+ 		*cryptd_req = *req;
+-		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
++		cryptd_req->base.tfm = req_tfm;
+ 
+ 		return crypto_ablkcipher_encrypt(cryptd_req);
+ 	} else {
++		cryptd_flush_queue(req_tfm, CRYPTD_ENCRYPT);
+ 		return __ablk_encrypt(req);
+ 	}
+ }
+@@ -89,13 +92,15 @@ int ablk_decrypt(struct ablkcipher_request *req)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct crypto_tfm *req_tfm = crypto_ablkcipher_tfm(
++		crypto_ablkcipher_crt(&ctx->cryptd_tfm->base)->base);
+ 
+ 	if (!may_use_simd()) {
+ 		struct ablkcipher_request *cryptd_req =
+ 			ablkcipher_request_ctx(req);
+ 
+ 		*cryptd_req = *req;
+-		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
++		cryptd_req->base.tfm = req_tfm;
+ 
+ 		return crypto_ablkcipher_decrypt(cryptd_req);
+ 	} else {
+@@ -105,6 +110,7 @@ int ablk_decrypt(struct ablkcipher_request *req)
+ 		desc.info = req->info;
+ 		desc.flags = 0;
+ 
++		cryptd_flush_queue(req_tfm, CRYPTD_DECRYPT);
+ 		return crypto_blkcipher_crt(desc.tfm)->decrypt(
+ 			&desc, req->dst, req->src, req->nbytes);
+ 	}
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index e592c90..0b387a1 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -119,11 +119,13 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
+ 	int cpu, err;
+ 	struct cryptd_cpu_queue *cpu_queue;
+ 
++	local_bh_disable();
+ 	cpu = get_cpu();
+ 	cpu_queue = this_cpu_ptr(queue->cpu_queue);
+ 	err = crypto_enqueue_request(&cpu_queue->queue, request);
+ 	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
+ 	put_cpu();
++	local_bh_enable();
+ 
+ 	return err;
+ }
+@@ -147,11 +149,9 @@ static void cryptd_queue_worker(struct work_struct *work)
+ 	preempt_disable();
+ 	backlog = crypto_get_backlog(&cpu_queue->queue);
+ 	req = crypto_dequeue_request(&cpu_queue->queue);
+-	preempt_enable();
+-	local_bh_enable();
+ 
+ 	if (!req)
+-		return;
++		goto out;
+ 
+ 	if (backlog)
+ 		backlog->complete(backlog, -EINPROGRESS);
+@@ -159,6 +159,9 @@ static void cryptd_queue_worker(struct work_struct *work)
+ 
+ 	if (cpu_queue->queue.qlen)
+ 		queue_work(kcrypto_wq, &cpu_queue->work);
++out:
++	preempt_enable();
++	local_bh_enable();
+ }
+ 
+ static inline struct cryptd_queue *cryptd_get_queue(struct crypto_tfm *tfm)
+@@ -209,9 +212,7 @@ static void cryptd_blkcipher_crypt(struct ablkcipher_request *req,
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static void cryptd_blkcipher_encrypt(struct crypto_async_request *req, int err)
+@@ -446,9 +447,7 @@ static void cryptd_hash_init(struct crypto_async_request *req_async, int err)
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static int cryptd_hash_init_enqueue(struct ahash_request *req)
+@@ -471,9 +470,7 @@ static void cryptd_hash_update(struct crypto_async_request *req_async, int err)
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static int cryptd_hash_update_enqueue(struct ahash_request *req)
+@@ -494,9 +491,7 @@ static void cryptd_hash_final(struct crypto_async_request *req_async, int err)
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static int cryptd_hash_final_enqueue(struct ahash_request *req)
+@@ -517,9 +512,7 @@ static void cryptd_hash_finup(struct crypto_async_request *req_async, int err)
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static int cryptd_hash_finup_enqueue(struct ahash_request *req)
+@@ -546,9 +539,7 @@ static void cryptd_hash_digest(struct crypto_async_request *req_async, int err)
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static int cryptd_hash_digest_enqueue(struct ahash_request *req)
+@@ -641,9 +632,7 @@ static void cryptd_aead_crypt(struct aead_request *req,
+ 	err = crypt( req );
+ 	req->base.complete = rctx->complete;
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static void cryptd_aead_encrypt(struct crypto_async_request *areq, int err)
+@@ -895,6 +884,90 @@ void cryptd_free_ahash(struct cryptd_ahash *tfm)
+ }
+ EXPORT_SYMBOL_GPL(cryptd_free_ahash);
+ 
++void cryptd_flush_queue(struct crypto_tfm *tfm, cryptd_type_t type)
++{
++	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
++	struct cryptd_instance_ctx *ictx = crypto_instance_ctx(inst);
++	struct cryptd_queue *cryptd_queue = ictx->queue;
++	struct cryptd_cpu_queue *cpu_queue;
++	struct crypto_queue *queue;
++	struct crypto_async_request *req, *tmp, *backlog;
++	crypto_completion_t complete;
++	int cpu;
++	unsigned int len;
 +
-+/**
-+ * struct hash_alg_common - define properties of message digest
-+ * @digestsize: Size of the result of the transformation. A buffer of this size
-+ *	        must be available to the @final and @finup calls, so they can
-+ *	        store the resulting hash into it. For various predefined sizes,
-+ *	        search include/crypto/ using
-+ *	        git grep _DIGEST_SIZE include/crypto.
-+ * @statesize: Size of the block for partial state of the transformation. A
-+ *	       buffer of this size must be passed to the @export function as it
-+ *	       will save the partial state of the transformation into it. On the
-+ *	       other side, the @import function will load the state from a
-+ *	       buffer of this size as well.
-+ */
- struct hash_alg_common {
- 	unsigned int digestsize;
- 	unsigned int statesize;
-@@ -37,6 +59,62 @@ struct ahash_request {
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
++	switch (type) {
++	case CRYPTD_BLKCIPHER_ENCRYPT:
++		complete = cryptd_blkcipher_encrypt;
++		break;
++	case CRYPTD_BLKCIPHER_DECRYPT:
++		complete = cryptd_blkcipher_decrypt;
++		break;
++	case CRYPTD_HASH_INIT:
++		complete = cryptd_hash_init;
++		break;
++	case CRYPTD_HASH_UPDATE:
++		complete = cryptd_hash_update;
++		break;
++	case CRYPTD_HASH_FINAL:
++		complete = cryptd_hash_final;
++		break;
++	case CRYPTD_HASH_FINUP:
++		complete = cryptd_hash_finup;
++		break;
++	case CRYPTD_HASH_DIGEST:
++		complete = cryptd_hash_digest;
++		break;
++	case CRYPTD_AEAD_ENCRYPT:
++		complete = cryptd_aead_encrypt;
++		break;
++	case CRYPTD_AEAD_DECRYPT:
++		complete = cryptd_aead_decrypt;
++		break;
++	default:
++		complete = NULL;
++	}
++
++	if (complete == NULL)
++		return;
++
++	local_bh_disable();
++	cpu = get_cpu();
++	cpu_queue = this_cpu_ptr(cryptd_queue->cpu_queue);
++	queue = &cpu_queue->queue;
++	len = queue->qlen;
++
++	if (!len)
++		goto out;
++
++	list_for_each_entry_safe(req, tmp, &queue->list, list) {
++		if (req->complete == complete) {
++			queue->qlen--;
++
++			if (queue->backlog != &queue->list) {
++				backlog = container_of(queue->backlog,
++					struct crypto_async_request, list);
++				queue->backlog = queue->backlog->next;
++			} else
++				backlog = NULL;
++
++			list_del(&req->list);
++
++			if (backlog)
++				backlog->complete(backlog, -EINPROGRESS);
++			req->complete(req, 0);
++		}
++
++		if (--len == 0)
++			goto out;
++	}
++
++out:
++	put_cpu();
++	local_bh_enable();
++}
++EXPORT_SYMBOL_GPL(cryptd_flush_queue);
++
+ struct cryptd_aead *cryptd_alloc_aead(const char *alg_name,
+ 						  u32 type, u32 mask)
+ {
+diff --git a/include/crypto/cryptd.h b/include/crypto/cryptd.h
+index ba98918..a63a296 100644
+--- a/include/crypto/cryptd.h
++++ b/include/crypto/cryptd.h
+@@ -16,6 +16,18 @@
+ #include <linux/kernel.h>
+ #include <crypto/hash.h>
+ 
++typedef enum {
++	CRYPTD_BLKCIPHER_ENCRYPT,
++	CRYPTD_BLKCIPHER_DECRYPT,
++	CRYPTD_HASH_INIT,
++	CRYPTD_HASH_UPDATE,
++	CRYPTD_HASH_FINAL,
++	CRYPTD_HASH_FINUP,
++	CRYPTD_HASH_DIGEST,
++	CRYPTD_AEAD_ENCRYPT,
++	CRYPTD_AEAD_DECRYPT,
++} cryptd_type_t;
++
+ struct cryptd_ablkcipher {
+ 	struct crypto_ablkcipher base;
  };
+@@ -48,6 +60,7 @@ struct cryptd_ahash *cryptd_alloc_ahash(const char *alg_name,
+ struct crypto_shash *cryptd_ahash_child(struct cryptd_ahash *tfm);
+ struct shash_desc *cryptd_shash_desc(struct ahash_request *req);
+ void cryptd_free_ahash(struct cryptd_ahash *tfm);
++void cryptd_flush_queue(struct crypto_tfm *tfm, cryptd_type_t type);
  
-+/**
-+ * struct ahash_alg - asynchronous message digest definition
-+ * @init: Initialize the transformation context. Intended only to initialize the
-+ *	  state of the HASH transformation at the begining. This shall fill in
-+ *	  the internal structures used during the entire duration of the whole
-+ *	  transformation. No data processing happens at this point.
-+ * @update: Push a chunk of data into the driver for transformation. This
-+ *	   function actually pushes blocks of data from upper layers into the
-+ *	   driver, which then passes those to the hardware as seen fit. This
-+ *	   function must not finalize the HASH transformation by calculating the
-+ *	   final message digest as this only adds more data into the
-+ *	   transformation. This function shall not modify the transformation
-+ *	   context, as this function may be called in parallel with the same
-+ *	   transformation object. Data processing can happen synchronously
-+ *	   [SHASH] or asynchronously [AHASH] at this point.
-+ * @final: Retrieve result from the driver. This function finalizes the
-+ *	   transformation and retrieves the resulting hash from the driver and
-+ *	   pushes it back to upper layers. No data processing happens at this
-+ *	   point.
-+ * @finup: Combination of @update and @final. This function is effectively a
-+ *	   combination of @update and @final calls issued in sequence. As some
-+ *	   hardware cannot do @update and @final separately, this callback was
-+ *	   added to allow such hardware to be used at least by IPsec. Data
-+ *	   processing can happen synchronously [SHASH] or asynchronously [AHASH]
-+ *	   at this point.
-+ * @digest: Combination of @init and @update and @final. This function
-+ *	    effectively behaves as the entire chain of operations, @init,
-+ *	    @update and @final issued in sequence. Just like @finup, this was
-+ *	    added for hardware which cannot do even the @finup, but can only do
-+ *	    the whole transformation in one run. Data processing can happen
-+ *	    synchronously [SHASH] or asynchronously [AHASH] at this point.
-+ * @setkey: Set optional key used by the hashing algorithm. Intended to push
-+ *	    optional key used by the hashing algorithm from upper layers into
-+ *	    the driver. This function can store the key in the transformation
-+ *	    context or can outright program it into the hardware. In the former
-+ *	    case, one must be careful to program the key into the hardware at
-+ *	    appropriate time and one must be careful that .setkey() can be
-+ *	    called multiple times during the existence of the transformation
-+ *	    object. Not  all hashing algorithms do implement this function as it
-+ *	    is only needed for keyed message digests. SHAx/MDx/CRCx do NOT
-+ *	    implement this function. HMAC(MDx)/HMAC(SHAx)/CMAC(AES) do implement
-+ *	    this function. This function must be called before any other of the
-+ *	    @init, @update, @final, @finup, @digest is called. No data
-+ *	    processing happens at this point.
-+ * @export: Export partial state of the transformation. This function dumps the
-+ *	    entire state of the ongoing transformation into a provided block of
-+ *	    data so it can be @import 'ed back later on. This is useful in case
-+ *	    you want to save partial result of the transformation after
-+ *	    processing certain amount of data and reload this partial result
-+ *	    multiple times later on for multiple re-use. No data processing
-+ *	    happens at this point.
-+ * @import: Import partial state of the transformation. This function loads the
-+ *	    entire state of the ongoing transformation from a provided block of
-+ *	    data so the transformation can continue from this point onward. No
-+ *	    data processing happens at this point.
-+ */
- struct ahash_alg {
- 	int (*init)(struct ahash_request *req);
- 	int (*update)(struct ahash_request *req);
-@@ -63,6 +141,23 @@ struct shash_desc {
- 		crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
- 	struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
- 
-+/**
-+ * struct shash_alg - synchronous message digest definition
-+ * @init: see struct ahash_alg
-+ * @update: see struct ahash_alg
-+ * @final: see struct ahash_alg
-+ * @finup: see struct ahash_alg
-+ * @digest: see struct ahash_alg
-+ * @export: see struct ahash_alg
-+ * @import: see struct ahash_alg
-+ * @setkey: see struct ahash_alg
-+ * @digestsize: see struct ahash_alg
-+ * @statesize: see struct ahash_alg
-+ * @dedcsize: Size of the operational state for the message digest. This state
-+ * 	      size is the memory size that needs to be allocated for
-+ *	      shash_desc.__ctx
-+ * @base: internally used
-+ */
- struct shash_alg {
- 	int (*init)(struct shash_desc *desc);
- 	int (*update)(struct shash_desc *desc, const u8 *data,
+ struct cryptd_aead {
+ 	struct crypto_aead base;
 -- 
-2.1.0
+1.8.4.1
