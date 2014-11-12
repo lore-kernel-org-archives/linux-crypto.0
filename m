@@ -1,110 +1,391 @@
-From: James Hartley <James.Hartley@imgtec.com>
-Subject: RE: [PATCH 1/2] crypto: Add Imagination Technologies hw hash
- accelerator
-Date: Tue, 11 Nov 2014 15:28:25 +0000
-Message-ID: <72BC0C8BD7BB6F45988A99382E5FBAE54433BBAA@hhmail02.hh.imgtec.org>
-References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com>
- <1415621455-10468-2-git-send-email-james.hartley@imgtec.com>
- <5460D540.6070205@mentor.com>
- <72BC0C8BD7BB6F45988A99382E5FBAE54433BAC5@hhmail02.hh.imgtec.org>
- <54622758.7050907@mentor.com>
+From: Ming Liu <ming.liu@windriver.com>
+Subject: Re: HELP: IPsec reordering issue
+Date: Wed, 12 Nov 2014 11:29:44 +0800
+Message-ID: <5462D428.7060008@windriver.com>
+References: <53D9B2EE.5040002@gmail.com> <20140731062321.GA2957@gondor.apana.org.au> <53DE0772.2090106@gmail.com> <20140814084740.GA30846@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"joe@perches.com" <joe@perches.com>,
-	"mchehab@osg.samsung.com" <mchehab@osg.samsung.com>,
-	"crope@iki.fi" <crope@iki.fi>,
-	"jg1.han@samsung.com" <jg1.han@samsung.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"pawel.moll@arm.com" <pawel.moll@arm.com>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>,
-	"ijc+devicetree@hellion.org.uk" <ijc+devicetree@hellion.org.uk>,
-	"galak@codeaurora.org" <galak@codeaurora.org>,
-	"abrestic@chromium.org" <abrestic@chromium.org>,
-	Ezequiel Garcia <Ezequiel.Garcia@imgtec.com>
-To: Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>,
-	"grant.likely@linaro.org" <grant.likely@linaro.org>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>
+Content-Type: multipart/mixed;
+	boundary="------------070903090500000905060908"
+Cc: <steffen.klassert@secunet.com>, <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
+	Xue Ying <ying.xue@windriver.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:50355 "EHLO
-	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751787AbaKKP23 (ORCPT
+Received: from mail1.windriver.com ([147.11.146.13]:35933 "EHLO
+	mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752087AbaKLDaB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 11 Nov 2014 10:28:29 -0500
-In-Reply-To: <54622758.7050907@mentor.com>
-Content-Language: en-US
+	Tue, 11 Nov 2014 22:30:01 -0500
+In-Reply-To: <20140814084740.GA30846@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgVmxhZGltaXINCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51
-eC1jcnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtY3J5cHRvLQ0KPiBv
-d25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFsZiBPZiBWbGFkaW1pciBaYXBvbHNraXkNCj4g
-U2VudDogMTEgTm92ZW1iZXIgMjAxNCAxNToxMg0KPiBUbzogSmFtZXMgSGFydGxleTsgZ3JhbnQu
-bGlrZWx5QGxpbmFyby5vcmc7IHJvYmgrZHRAa2VybmVsLm9yZzsNCj4gYWtwbUBsaW51eC1mb3Vu
-ZGF0aW9uLm9yZw0KPiBDYzogaGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1OyBkYXZlbUBkYXZl
-bWxvZnQubmV0Ow0KPiBncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZzsgam9lQHBlcmNoZXMuY29t
-Ow0KPiBtY2hlaGFiQG9zZy5zYW1zdW5nLmNvbTsgY3JvcGVAaWtpLmZpOyBqZzEuaGFuQHNhbXN1
-bmcuY29tOyBsaW51eC0NCj4gY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgZGV2aWNldHJlZUB2Z2Vy
-Lmtlcm5lbC5vcmc7DQo+IHBhd2VsLm1vbGxAYXJtLmNvbTsgbWFyay5ydXRsYW5kQGFybS5jb207
-DQo+IGlqYytkZXZpY2V0cmVlQGhlbGxpb24ub3JnLnVrOyBnYWxha0Bjb2RlYXVyb3JhLm9yZzsN
-Cj4gYWJyZXN0aWNAY2hyb21pdW0ub3JnOyBFemVxdWllbCBHYXJjaWENCj4gU3ViamVjdDogUmU6
-IFtQQVRDSCAxLzJdIGNyeXB0bzogQWRkIEltYWdpbmF0aW9uIFRlY2hub2xvZ2llcyBodyBoYXNo
-DQo+IGFjY2VsZXJhdG9yDQo+IA0KPiBIaSBKYW1lcywNCj4gDQo+IE9uIDExLjExLjIwMTQgMTY6
-NTksIEphbWVzIEhhcnRsZXkgd3JvdGU6DQo+ID4gSGkgVmxhZGltaXIsIHRoYW5rcyBmb3IgdGhl
-IHJldmlldyENCj4gPg0KPiA+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+PiBGcm9t
-OiBWbGFkaW1pciBaYXBvbHNraXkgW21haWx0bzp2bGFkaW1pcl96YXBvbHNraXlAbWVudG9yLmNv
-bV0NCj4gPj4gU2VudDogMTAgTm92ZW1iZXIgMjAxNCAxNToxMA0KPiA+PiBUbzogSmFtZXMgSGFy
-dGxleTsgaGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1Ow0KPiBkYXZlbUBkYXZlbWxvZnQubmV0
-Ow0KPiA+PiBncmFudC5saWtlbHlAbGluYXJvLm9yZzsgcm9iaCtkdEBrZXJuZWwub3JnOw0KPiA+
-PiBha3BtQGxpbnV4LWZvdW5kYXRpb24ub3JnOyBncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZzsN
-Cj4gPj4gam9lQHBlcmNoZXMuY29tOyBtY2hlaGFiQG9zZy5zYW1zdW5nLmNvbTsgY3JvcGVAaWtp
-LmZpOw0KPiA+PiBqZzEuaGFuQHNhbXN1bmcuY29tOyBsaW51eC0gY3J5cHRvQHZnZXIua2VybmVs
-Lm9yZw0KPiA+PiBDYzogZGV2aWNldHJlZUB2Z2VyLmtlcm5lbC5vcmc7IHBhd2VsLm1vbGxAYXJt
-LmNvbTsNCj4gPj4gbWFyay5ydXRsYW5kQGFybS5jb207IGlqYytkZXZpY2V0cmVlQGhlbGxpb24u
-b3JnLnVrOw0KPiA+PiBnYWxha0Bjb2RlYXVyb3JhLm9yZzsgYWJyZXN0aWNAY2hyb21pdW0ub3Jn
-OyBFemVxdWllbCBHYXJjaWENCj4gPj4gU3ViamVjdDogUmU6IFtQQVRDSCAxLzJdIGNyeXB0bzog
-QWRkIEltYWdpbmF0aW9uIFRlY2hub2xvZ2llcyBodyBoYXNoDQo+ID4+IGFjY2VsZXJhdG9yDQo+
-ID4+DQo+ID4+IEhlbGxvIEphbWVzLA0KPiA+Pg0KPiA+PiBPbiAxMC4xMS4yMDE0IDE0OjEwLCBK
-YW1lcyBIYXJ0bGV5IHdyb3RlOg0KPiA+Pj4gVGhpcyBhZGRzIHN1cHBvcnQgZm9yIHRoZSBJbWFn
-aW5hdGlvbiBUZWNobm9sb2dpZXMgaGFzaCBhY2NlbGVyYXRvcg0KPiA+Pj4gdGhhdCBwcm92aWRl
-cyBoYXJkd2FyZSBhY2NlbGVyYXRpb24gZm9yDQo+ID4+PiBTSEExIFNIQTIyNCBTSEEyNTYgYW5k
-IE1ENSBIYXNoZXMuDQo+ID4+Pg0KPiA+Pj4gU2lnbmVkLW9mZi1ieTogSmFtZXMgSGFydGxleSA8
-amFtZXMuaGFydGxleUBpbWd0ZWMuY29tPg0KPiA+Pj4gLS0tDQo+ID4+DQo+IA0KPiBbc25pcF0N
-Cj4gDQo+ID4+PiArDQo+ID4+PiArCXJldHVybiAwOw0KPiA+Pj4gKw0KPiA+Pj4gK2Vycl9hbGdz
-Og0KPiA+Pj4gKwlzcGluX2xvY2soJmltZ19oYXNoLmxvY2spOw0KPiA+Pj4gKwlsaXN0X2RlbCgm
-aGRldi0+bGlzdCk7DQo+ID4+PiArCXNwaW5fdW5sb2NrKCZpbWdfaGFzaC5sb2NrKTsNCj4gPj4+
-ICsJZG1hX3JlbGVhc2VfY2hhbm5lbChoZGV2LT5kbWFfbGNoKTsNCj4gPj4+ICtlcnJfZG1hOg0K
-PiA+Pj4gKwlpb3VubWFwKGhkZXYtPmlvX2Jhc2UpOw0KPiA+Pg0KPiA+PiBNaXhpbmcgb2YgZGV2
-bV8qIHJlc291cmNlIGluaXRpYWxpemF0aW9uIGFuZCBjb21tb2RpdHkgcmVzb3VyY2UNCj4gPj4g
-cmVsZWFzZSBsZWFkcyB0byBkb3VibGUgZGVjcmVtZW50IG9mIGNsb2NrIHVzYWdlIGNvdW50IHJl
-ZmVyZW5jZS4NCj4gPg0KPiA+IE9rLCBjaGFuZ2VkIHRvIGRldm1faW91bm1hcA0KPiA+DQo+IA0K
-PiBqdXN0IG9uZSBzbWFsbCBjb21tZW50LCBwbGVhc2UgZG91YmxlIGNoZWNrLCBidXQgbW9zdCBw
-cm9iYWJseSB5b3UgZG9uJ3QNCj4gbmVlZCB0byBjYWxsIGRldm1faW91bm1hcCgpIGV4cGxpY2l0
-bHkgb24gZXJyb3IgcGF0aC4NCg0KWWVzIHlvdSBhcmUgcmlnaHQsIEkgd2lsbCByZW1vdmUgdGhl
-bQ0KDQo+IA0KPiBbc25pcF0NCj4gDQo+ID4NCj4gPj4NCj4gPj4+ICsNCj4gPj4+ICtzdGF0aWMg
-aW50IGltZ19oYXNoX3JlbW92ZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KSB7DQo+ID4+
-PiArCXN0YXRpYyBzdHJ1Y3QgaW1nX2hhc2hfZGV2ICpoZGV2Ow0KPiA+Pj4gKw0KPiA+Pj4gKwlo
-ZGV2ID0gcGxhdGZvcm1fZ2V0X2RydmRhdGEocGRldik7DQo+ID4+PiArCWlmICghaGRldikNCj4g
-Pj4+ICsJCXJldHVybiAtRU5PREVWOw0KPiA+Pj4gKwlzcGluX2xvY2soJmltZ19oYXNoLmxvY2sp
-Ow0KPiA+Pj4gKwlsaXN0X2RlbCgmaGRldi0+bGlzdCk7DQo+ID4+PiArCXNwaW5fdW5sb2NrKCZp
-bWdfaGFzaC5sb2NrKTsNCj4gPj4+ICsNCj4gPj4+ICsJaW1nX3VucmVnaXN0ZXJfYWxncyhoZGV2
-KTsNCj4gPj4+ICsNCj4gPj4+ICsJdGFza2xldF9raWxsKCZoZGV2LT5kb25lX3Rhc2spOw0KPiA+
-Pj4gKwl0YXNrbGV0X2tpbGwoJmhkZXYtPmRtYV90YXNrKTsNCj4gPj4+ICsJaW1nX2hhc2hfZG1h
-X2NsZWFudXAoaGRldik7DQo+ID4+PiArDQo+ID4+PiArCWlvdW5tYXAoaGRldi0+aW9fYmFzZSk7
-DQo+ID4+DQo+ID4+IFNhbWUgYXMgYWJvdmUsIGRldnJlcyBpb3VubWFwKCkgaXMgZ29vZCBlbm91
-Z2guDQo+ID4NCj4gPiBEb25lDQo+ID4NCj4gDQo+IFNhbWUgYXMgYWJvdmUsIEkgc3VwcG9zZSB5
-b3UgY2FuIHNpbXBseSByZW1vdmUgaW91bm1hcCgpIGNhbGwgd2l0aG91dA0KPiBhZGRpbmcgZXhw
-bGljaXQgZGV2bV9pb3VubWFwKCkuDQoNCkFzIGFib3ZlLg0KDQo+IA0KPiAtLQ0KPiBXaXRoIGJl
-c3Qgd2lzaGVzLA0KPiBWbGFkaW1pcg0KPiAtLQ0KPiBUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMg
-bGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtY3J5cHRvIiBpbiB0aGUNCj4g
-Ym9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZyBNb3JlIG1ham9y
-ZG9tbyBpbmZvIGF0DQo+IGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRt
-bA0KDQoNClRoYW5rcyBhZ2FpbiBmb3IgdGhlIHF1aWNrIHJldmlldy4gIEknbGwgcG9zdCBhIFYy
-IHBhdGNoc2V0IHdoZW4gSSd2ZSBmaWd1cmVkIG91dA0Kd2hhdCBJIGNhbiBkbyBhYm91dCB0aGUg
-ZXJyb3IgaGFuZGxpbmcgeW91IG1lbnRpb25lZCBwcmV2aW91c2x5Lg0KDQpUaGFua3MNCkphbWVz
-DQo=
+--------------070903090500000905060908
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Hi, Herbert:
+
+I've figured out a new patch for this issue reported by me previously, 
+the basic idea is adding a cryptd_flush_queue function fixing it by 
+being called from softirq to flush all previous queued elements before 
+processing a new one, and it works very well so far per my test,  would 
+you please review it?
+
+the best,
+thank you
+
+On 08/14/2014 04:47 PM, Herbert Xu wrote:
+> On Sun, Aug 03, 2014 at 05:57:06PM +0800, Ming Liu wrote:
+>> Please review this attached patch instead, the original one has a
+>> problem causing the kernel crash.
+> Thanks for the patch.  I think it would better to enforce ordering
+> for all operations rather than treat encryptions separately from
+> decryptions.  We could conceivably have more complex operations made
+> up from both encryptions and decryptions that could then get
+> out-of-order.
+>
+> It would also make the code simpler.
+>
+> Cheers,
+
+
+--------------070903090500000905060908
+Content-Type: text/x-patch;
+	name="0001-crypto-aesni-intel-avoid-IPsec-re-ordering.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="0001-crypto-aesni-intel-avoid-IPsec-re-ordering.patch"
+
+>From 5e00cd925755015d4057ded1b24fd994e507a21e Mon Sep 17 00:00:00 2001
+From: Ming Liu <ming.liu@windriver.com>
+Date: Wed, 12 Nov 2014 11:11:57 +0800
+Subject: [PATCH] crypto: aesni-intel - avoid IPsec re-ordering
+
+So far, the encryption/decryption are asynchronously processed in
+softirq and cryptd which would result in a implicit order of data,
+therefore leads IPSec stack also out of order while encapsulating
+or decapsulating packets.
+
+Consider the following scenario:
+
+             DECRYPTION INBOUND
+                      |
+                      |
+             +-----Packet A
+             |        |
+             |        |
+             |     Packet B
+             |        |
+    (cryptd) |        | (software interrupts)
+             |      ......
+             |        |
+             |        |
+             |     Packet B(decrypted)
+             |        |
+             |        |
+             +---> Packet A(decrypted)
+                      |
+                      |
+             DECRYPTION OUTBOUND
+
+Add cryptd_flush_queue function fixing it by being called from softirq
+to flush all previous queued elements before processing a new one. To
+prevent cryptd_flush_queue() being accessed from software interrupts,
+local_bh_disable/enable needs to be relocated in several places.
+
+Signed-off-by: Ming Liu <ming.liu@windriver.com>
+---
+ crypto/ablk_helper.c    |  10 ++++-
+ crypto/cryptd.c         | 107 ++++++++++++++++++++++++++++++++++++++++--------
+ include/crypto/cryptd.h |  13 ++++++
+ 3 files changed, 111 insertions(+), 19 deletions(-)
+
+diff --git a/crypto/ablk_helper.c b/crypto/ablk_helper.c
+index ffe7278..600a70f 100644
+--- a/crypto/ablk_helper.c
++++ b/crypto/ablk_helper.c
+@@ -70,16 +70,19 @@ int ablk_encrypt(struct ablkcipher_request *req)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct crypto_tfm *req_tfm = crypto_ablkcipher_tfm(
++		crypto_ablkcipher_crt(&ctx->cryptd_tfm->base)->base);
+ 
+ 	if (!may_use_simd()) {
+ 		struct ablkcipher_request *cryptd_req =
+ 			ablkcipher_request_ctx(req);
+ 
+ 		*cryptd_req = *req;
+-		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
++		cryptd_req->base.tfm = req_tfm;
+ 
+ 		return crypto_ablkcipher_encrypt(cryptd_req);
+ 	} else {
++		cryptd_flush_queue(req_tfm, CRYPTD_ENCRYPT);
+ 		return __ablk_encrypt(req);
+ 	}
+ }
+@@ -89,13 +92,15 @@ int ablk_decrypt(struct ablkcipher_request *req)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct async_helper_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct crypto_tfm *req_tfm = crypto_ablkcipher_tfm(
++		crypto_ablkcipher_crt(&ctx->cryptd_tfm->base)->base);
+ 
+ 	if (!may_use_simd()) {
+ 		struct ablkcipher_request *cryptd_req =
+ 			ablkcipher_request_ctx(req);
+ 
+ 		*cryptd_req = *req;
+-		ablkcipher_request_set_tfm(cryptd_req, &ctx->cryptd_tfm->base);
++		cryptd_req->base.tfm = req_tfm;
+ 
+ 		return crypto_ablkcipher_decrypt(cryptd_req);
+ 	} else {
+@@ -105,6 +110,7 @@ int ablk_decrypt(struct ablkcipher_request *req)
+ 		desc.info = req->info;
+ 		desc.flags = 0;
+ 
++		cryptd_flush_queue(req_tfm, CRYPTD_DECRYPT);
+ 		return crypto_blkcipher_crt(desc.tfm)->decrypt(
+ 			&desc, req->dst, req->src, req->nbytes);
+ 	}
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index e592c90..0b387a1 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -119,11 +119,13 @@ static int cryptd_enqueue_request(struct cryptd_queue *queue,
+ 	int cpu, err;
+ 	struct cryptd_cpu_queue *cpu_queue;
+ 
++	local_bh_disable();
+ 	cpu = get_cpu();
+ 	cpu_queue = this_cpu_ptr(queue->cpu_queue);
+ 	err = crypto_enqueue_request(&cpu_queue->queue, request);
+ 	queue_work_on(cpu, kcrypto_wq, &cpu_queue->work);
+ 	put_cpu();
++	local_bh_enable();
+ 
+ 	return err;
+ }
+@@ -147,11 +149,9 @@ static void cryptd_queue_worker(struct work_struct *work)
+ 	preempt_disable();
+ 	backlog = crypto_get_backlog(&cpu_queue->queue);
+ 	req = crypto_dequeue_request(&cpu_queue->queue);
+-	preempt_enable();
+-	local_bh_enable();
+ 
+ 	if (!req)
+-		return;
++		goto out;
+ 
+ 	if (backlog)
+ 		backlog->complete(backlog, -EINPROGRESS);
+@@ -159,6 +159,9 @@ static void cryptd_queue_worker(struct work_struct *work)
+ 
+ 	if (cpu_queue->queue.qlen)
+ 		queue_work(kcrypto_wq, &cpu_queue->work);
++out:
++	preempt_enable();
++	local_bh_enable();
+ }
+ 
+ static inline struct cryptd_queue *cryptd_get_queue(struct crypto_tfm *tfm)
+@@ -209,9 +212,7 @@ static void cryptd_blkcipher_crypt(struct ablkcipher_request *req,
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static void cryptd_blkcipher_encrypt(struct crypto_async_request *req, int err)
+@@ -446,9 +447,7 @@ static void cryptd_hash_init(struct crypto_async_request *req_async, int err)
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static int cryptd_hash_init_enqueue(struct ahash_request *req)
+@@ -471,9 +470,7 @@ static void cryptd_hash_update(struct crypto_async_request *req_async, int err)
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static int cryptd_hash_update_enqueue(struct ahash_request *req)
+@@ -494,9 +491,7 @@ static void cryptd_hash_final(struct crypto_async_request *req_async, int err)
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static int cryptd_hash_final_enqueue(struct ahash_request *req)
+@@ -517,9 +512,7 @@ static void cryptd_hash_finup(struct crypto_async_request *req_async, int err)
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static int cryptd_hash_finup_enqueue(struct ahash_request *req)
+@@ -546,9 +539,7 @@ static void cryptd_hash_digest(struct crypto_async_request *req_async, int err)
+ 	req->base.complete = rctx->complete;
+ 
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static int cryptd_hash_digest_enqueue(struct ahash_request *req)
+@@ -641,9 +632,7 @@ static void cryptd_aead_crypt(struct aead_request *req,
+ 	err = crypt( req );
+ 	req->base.complete = rctx->complete;
+ out:
+-	local_bh_disable();
+ 	rctx->complete(&req->base, err);
+-	local_bh_enable();
+ }
+ 
+ static void cryptd_aead_encrypt(struct crypto_async_request *areq, int err)
+@@ -895,6 +884,90 @@ void cryptd_free_ahash(struct cryptd_ahash *tfm)
+ }
+ EXPORT_SYMBOL_GPL(cryptd_free_ahash);
+ 
++void cryptd_flush_queue(struct crypto_tfm *tfm, cryptd_type_t type)
++{
++	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
++	struct cryptd_instance_ctx *ictx = crypto_instance_ctx(inst);
++	struct cryptd_queue *cryptd_queue = ictx->queue;
++	struct cryptd_cpu_queue *cpu_queue;
++	struct crypto_queue *queue;
++	struct crypto_async_request *req, *tmp, *backlog;
++	crypto_completion_t complete;
++	int cpu;
++	unsigned int len;
++
++	switch (type) {
++	case CRYPTD_BLKCIPHER_ENCRYPT:
++		complete = cryptd_blkcipher_encrypt;
++		break;
++	case CRYPTD_BLKCIPHER_DECRYPT:
++		complete = cryptd_blkcipher_decrypt;
++		break;
++	case CRYPTD_HASH_INIT:
++		complete = cryptd_hash_init;
++		break;
++	case CRYPTD_HASH_UPDATE:
++		complete = cryptd_hash_update;
++		break;
++	case CRYPTD_HASH_FINAL:
++		complete = cryptd_hash_final;
++		break;
++	case CRYPTD_HASH_FINUP:
++		complete = cryptd_hash_finup;
++		break;
++	case CRYPTD_HASH_DIGEST:
++		complete = cryptd_hash_digest;
++		break;
++	case CRYPTD_AEAD_ENCRYPT:
++		complete = cryptd_aead_encrypt;
++		break;
++	case CRYPTD_AEAD_DECRYPT:
++		complete = cryptd_aead_decrypt;
++		break;
++	default:
++		complete = NULL;
++	}
++
++	if (complete == NULL)
++		return;
++
++	local_bh_disable();
++	cpu = get_cpu();
++	cpu_queue = this_cpu_ptr(cryptd_queue->cpu_queue);
++	queue = &cpu_queue->queue;
++	len = queue->qlen;
++
++	if (!len)
++		goto out;
++
++	list_for_each_entry_safe(req, tmp, &queue->list, list) {
++		if (req->complete == complete) {
++			queue->qlen--;
++
++			if (queue->backlog != &queue->list) {
++				backlog = container_of(queue->backlog,
++					struct crypto_async_request, list);
++				queue->backlog = queue->backlog->next;
++			} else
++				backlog = NULL;
++
++			list_del(&req->list);
++
++			if (backlog)
++				backlog->complete(backlog, -EINPROGRESS);
++			req->complete(req, 0);
++		}
++
++		if (--len == 0)
++			goto out;
++	}
++
++out:
++	put_cpu();
++	local_bh_enable();
++}
++EXPORT_SYMBOL_GPL(cryptd_flush_queue);
++
+ struct cryptd_aead *cryptd_alloc_aead(const char *alg_name,
+ 						  u32 type, u32 mask)
+ {
+diff --git a/include/crypto/cryptd.h b/include/crypto/cryptd.h
+index ba98918..a63a296 100644
+--- a/include/crypto/cryptd.h
++++ b/include/crypto/cryptd.h
+@@ -16,6 +16,18 @@
+ #include <linux/kernel.h>
+ #include <crypto/hash.h>
+ 
++typedef enum {
++	CRYPTD_BLKCIPHER_ENCRYPT,
++	CRYPTD_BLKCIPHER_DECRYPT,
++	CRYPTD_HASH_INIT,
++	CRYPTD_HASH_UPDATE,
++	CRYPTD_HASH_FINAL,
++	CRYPTD_HASH_FINUP,
++	CRYPTD_HASH_DIGEST,
++	CRYPTD_AEAD_ENCRYPT,
++	CRYPTD_AEAD_DECRYPT,
++} cryptd_type_t;
++
+ struct cryptd_ablkcipher {
+ 	struct crypto_ablkcipher base;
+ };
+@@ -48,6 +60,7 @@ struct cryptd_ahash *cryptd_alloc_ahash(const char *alg_name,
+ struct crypto_shash *cryptd_ahash_child(struct cryptd_ahash *tfm);
+ struct shash_desc *cryptd_shash_desc(struct ahash_request *req);
+ void cryptd_free_ahash(struct cryptd_ahash *tfm);
++void cryptd_flush_queue(struct crypto_tfm *tfm, cryptd_type_t type);
+ 
+ struct cryptd_aead {
+ 	struct crypto_aead base;
+-- 
+1.8.4.1
+
+
+--------------070903090500000905060908--
