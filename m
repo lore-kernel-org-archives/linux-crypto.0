@@ -1,96 +1,51 @@
 From: Pranith Kumar <bobby.prani@gmail.com>
-Subject: [RFC PATCH 00/16] Replace smp_read_barrier_depends() with lockless_derefrence()
-Date: Thu, 13 Nov 2014 14:24:06 -0500
-Message-ID: <1415906662-4576-1-git-send-email-bobby.prani@gmail.com>
+Subject: [PATCH 01/16] crypto: caam - Remove unnecessary smp_read_barrier_depends()
+Date: Thu, 13 Nov 2014 14:24:07 -0500
+Message-ID: <1415906662-4576-2-git-send-email-bobby.prani@gmail.com>
+References: <1415906662-4576-1-git-send-email-bobby.prani@gmail.com>
 Cc: paulmck@linux.vnet.ibm.com
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Cristian Stoica <cristian.stoica@freescale.com>,
 	Horia Geanta <horia.geanta@freescale.com>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>,
 	Michael Neuling <mikey@neuling.org>,
+	Kim Phillips <kim.phillips@freescale.com>,
 	Wolfram Sang <wsa@the-dreams.de>,
+	Cristian Stoica <cristian.stoica@freescale.com>,
 	linux-crypto@vger.kernel.org (open list:CRYPTO API),
-	linux-kernel@vger.kernel.org (open list),
-	Vinod Koul <vinod.koul@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	=?UTF-8?q?Manuel=20Sch=C3=B6lling?= <manuel.schoelling@gmx.de>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Rashika <rashika.kheria@gmail.com>,
-	dmaengine@vger.kernel.org (open list:DMA GENERIC OFFLO...),
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	devel@linuxdriverproject.org (open list:Hyp
-Return-path: <owner-linux-mm@kvack.org>
-Sender: owner-linux-mm@kvack.org
+	linux-kernel@vger.kernel.org (open list)
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1415906662-4576-1-git-send-email-bobby.prani@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
 Recently lockless_dereference() was added which can be used in place of
-hard-coding smp_read_barrier_depends(). 
+hard-coding smp_read_barrier_depends(). The following PATCH makes the change.
 
-http://lkml.iu.edu/hypermail/linux/kernel/1410.3/04561.html
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+---
+ drivers/crypto/caam/jr.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-The following series tries to do this.
-
-There are still some hard-coded locations which I was not sure how to replace
-with. I will send in separate patches/questions regarding them.
-
-Pranith Kumar (16):
-  crypto: caam - Remove unnecessary smp_read_barrier_depends()
-  doc: memory-barriers.txt: Document use of lockless_dereference()
-  drivers: dma: Replace smp_read_barrier_depends() with
-    lockless_dereference()
-  dcache: Replace smp_read_barrier_depends() with lockless_dereference()
-  overlayfs: Replace smp_read_barrier_depends() with
-    lockless_dereference()
-  assoc_array: Replace smp_read_barrier_depends() with
-    lockless_dereference()
-  hyperv: Replace smp_read_barrier_depends() with lockless_dereference()
-  rcupdate: Replace smp_read_barrier_depends() with
-    lockless_dereference()
-  percpu: Replace smp_read_barrier_depends() with lockless_dereference()
-  perf: Replace smp_read_barrier_depends() with lockless_dereference()
-  seccomp: Replace smp_read_barrier_depends() with
-    lockless_dereference()
-  task_work: Replace smp_read_barrier_depends() with
-    lockless_dereference()
-  ksm: Replace smp_read_barrier_depends() with lockless_dereference()
-  slab: Replace smp_read_barrier_depends() with lockless_dereference()
-  netfilter: Replace smp_read_barrier_depends() with
-    lockless_dereference()
-  rxrpc: Replace smp_read_barrier_depends() with lockless_dereference()
-
- Documentation/memory-barriers.txt |  2 +-
- drivers/crypto/caam/jr.c          |  3 ---
- drivers/dma/ioat/dma_v2.c         |  3 +--
- drivers/dma/ioat/dma_v3.c         |  3 +--
- fs/dcache.c                       |  7 ++-----
- fs/overlayfs/super.c              |  4 +---
- include/linux/assoc_array_priv.h  | 11 +++++++----
- include/linux/hyperv.h            |  9 ++++-----
- include/linux/percpu-refcount.h   |  4 +---
- include/linux/rcupdate.h          | 10 +++++-----
- kernel/events/core.c              |  3 +--
- kernel/events/uprobes.c           |  8 ++++----
- kernel/seccomp.c                  |  7 +++----
- kernel/task_work.c                |  3 +--
- lib/assoc_array.c                 |  7 -------
- mm/ksm.c                          |  7 +++----
- mm/slab.h                         |  6 +++---
- net/ipv4/netfilter/arp_tables.c   |  3 +--
- net/ipv4/netfilter/ip_tables.c    |  3 +--
- net/ipv6/netfilter/ip6_tables.c   |  3 +--
- net/rxrpc/ar-ack.c                | 22 +++++++++-------------
- security/keys/keyring.c           |  6 ------
- 22 files changed, 50 insertions(+), 84 deletions(-)
-
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index bae20d8..9b3ef1bc 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -181,8 +181,6 @@ static void caam_jr_dequeue(unsigned long devarg)
+ 		for (i = 0; CIRC_CNT(head, tail + i, JOBR_DEPTH) >= 1; i++) {
+ 			sw_idx = (tail + i) & (JOBR_DEPTH - 1);
+ 
+-			smp_read_barrier_depends();
+-
+ 			if (jrp->outring[hw_idx].desc ==
+ 			    jrp->entinfo[sw_idx].desc_addr_dma)
+ 				break; /* found */
+@@ -218,7 +216,6 @@ static void caam_jr_dequeue(unsigned long devarg)
+ 		if (sw_idx == tail) {
+ 			do {
+ 				tail = (tail + 1) & (JOBR_DEPTH - 1);
+-				smp_read_barrier_depends();
+ 			} while (CIRC_CNT(head, tail, JOBR_DEPTH) >= 1 &&
+ 				 jrp->entinfo[tail].desc_addr_dma == 0);
+ 
 -- 
 1.9.1
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
