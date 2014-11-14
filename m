@@ -1,64 +1,79 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: Documentation - document uncovered member variables
-Date: Fri, 14 Nov 2014 05:26:21 +0100
-Message-ID: <1910451.sH207F56nk@tachyon.chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: simd: Allow simd use in kernel threads with softirqs disabled
+Date: Fri, 14 Nov 2014 23:43:15 +0800
+Message-ID: <20141114154315.GA15771@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Ming Liu <ming.liu@windriver.com>
+To: "H. Peter Anvin" <hpa@linux.intel.com>,
+	Suresh Siddha <sbsiddha@gmail.com>,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54546 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934409AbaKNE1p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Nov 2014 23:27:45 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S7119> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Fri, 14 Nov 2014 05:27:40 +0100
+Received: from helcar.apana.org.au ([209.40.204.226]:60992 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965015AbaKNPn2 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 14 Nov 2014 10:43:28 -0500
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix documentation typo for shash_alg->descsize.
+While working on the cryptd request reordering problem, I noticed
+an anomaly where kernel threads are normally allowed to use simd
+per may_use_simd, but as soon as you disable softirqs, they suddenly
+lose that ability for no good reason.
 
-Add documentation for initially uncovered member variables.
+The problem is that in_interrupt does not distinguish between
+softirq processing and simply having softirqs disabled.  This
+patch creates a new helper in_serving_interrupt which makes that
+distinction.  It then uses this in all current implementations
+of may_use_simd.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- include/crypto/hash.h | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 3d66e8b..98abda9 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -38,6 +38,10 @@ struct crypto_ahash;
-  *	       will save the partial state of the transformation into it. On the
-  *	       other side, the @import function will load the state from a
-  *	       buffer of this size as well.
-+ * @base: Start of data structure of cipher algorithm. The common data
-+ *	  structure of crypto_alg contains information common to all ciphers.
-+ *	  The hash_alg_common data structure now adds the hash-specific
-+ *	  information.
+diff --git a/arch/x86/kernel/i387.c b/arch/x86/kernel/i387.c
+index a9a4229..6cdaa852 100644
+--- a/arch/x86/kernel/i387.c
++++ b/arch/x86/kernel/i387.c
+@@ -63,7 +63,7 @@ static inline bool interrupted_user_mode(void)
   */
- struct hash_alg_common {
- 	unsigned int digestsize;
-@@ -114,6 +118,7 @@ struct ahash_request {
-  *	    entire state of the ongoing transformation from a provided block of
-  *	    data so the transformation can continue from this point onward. No
-  *	    data processing happens at this point.
-+ * @halg: see struct hash_alg_common
+ bool irq_fpu_usable(void)
+ {
+-	return !in_interrupt() ||
++	return !in_serving_interrupt() ||
+ 		interrupted_user_mode() ||
+ 		interrupted_kernel_fpu_idle();
+ }
+diff --git a/include/asm-generic/simd.h b/include/asm-generic/simd.h
+index f57eb7b..74e0b05 100644
+--- a/include/asm-generic/simd.h
++++ b/include/asm-generic/simd.h
+@@ -10,5 +10,5 @@
   */
- struct ahash_alg {
- 	int (*init)(struct ahash_request *req);
-@@ -153,7 +158,7 @@ struct shash_desc {
-  * @setkey: see struct ahash_alg
-  * @digestsize: see struct ahash_alg
-  * @statesize: see struct ahash_alg
-- * @dedcsize: Size of the operational state for the message digest. This state
-+ * @descsize: Size of the operational state for the message digest. This state
-  * 	      size is the memory size that needs to be allocated for
-  *	      shash_desc.__ctx
-  * @base: internally used
+ static __must_check inline bool may_use_simd(void)
+ {
+-	return !in_interrupt();
++	return !in_serving_interrupt();
+ }
+diff --git a/include/linux/preempt_mask.h b/include/linux/preempt_mask.h
+index dbeec4d..18f3b46 100644
+--- a/include/linux/preempt_mask.h
++++ b/include/linux/preempt_mask.h
+@@ -65,6 +65,8 @@
+ #define in_softirq()		(softirq_count())
+ #define in_interrupt()		(irq_count())
+ #define in_serving_softirq()	(softirq_count() & SOFTIRQ_OFFSET)
++#define in_serving_interrupt()	(irq_count() & (HARDIRQ_MASK | \
++						SOFTIRQ_OFFSET | NMI_MASK))
+ 
+ /*
+  * Are we in NMI context?
+
+Thanks,
 -- 
-2.1.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
