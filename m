@@ -1,1236 +1,1249 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH] crypto: prefix module autoloading with "crypto-"
-Date: Fri, 14 Nov 2014 13:34:59 -0800
-Message-ID: <20141114213459.GA3832@www.outflux.net>
+From: Andrew Bresticker <abrestic@chromium.org>
+Subject: Re: [PATCH 1/2] crypto: Add Imagination Technologies hw hash accelerator
+Date: Fri, 14 Nov 2014 15:59:02 -0800
+Message-ID: <CAL1qeaGN9q_WHP2YJ3fY3r11v0pitcmwbjam5dRzeZhHCp7c8g@mail.gmail.com>
+References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com>
+	<1415621455-10468-2-git-send-email-james.hartley@imgtec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=UTF-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+	Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	joe@perches.com, mchehab@osg.samsung.com,
+	Antti Palosaari <crope@iki.fi>, jg1.han@samsung.com,
 	linux-crypto@vger.kernel.org,
-	Mathias Krause <minipli@googlemail.com>
-To: linux-kernel@vger.kernel.org
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	Ezequiel Garcia <ezequiel.garcia@imgtec.com>
+To: James Hartley <james.hartley@imgtec.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smtp.outflux.net ([198.145.64.163]:34184 "EHLO smtp.outflux.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1161861AbaKNVfI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Nov 2014 16:35:08 -0500
-Content-Disposition: inline
+Received: from mail-vc0-f177.google.com ([209.85.220.177]:41867 "EHLO
+	mail-vc0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754715AbaKNX7E (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 14 Nov 2014 18:59:04 -0500
+Received: by mail-vc0-f177.google.com with SMTP id ij19so4174380vcb.36
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Nov 2014 15:59:02 -0800 (PST)
+In-Reply-To: <1415621455-10468-2-git-send-email-james.hartley@imgtec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This prefixes all crypto module loading with "crypto-" so we never run
-the risk of exposing module auto-loading to userspace via a crypto API,
-as demonstrated by Mathias Krause:
+Hi James,
 
-https://lkml.org/lkml/2013/3/4/70
+On Mon, Nov 10, 2014 at 4:10 AM, James Hartley <james.hartley@imgtec.com> wrote:
+> This adds support for the Imagination Technologies hash
+> accelerator that provides hardware acceleration for
+> SHA1 SHA224 SHA256 and MD5 Hashes.
+>
+> Signed-off-by: James Hartley <james.hartley@imgtec.com>
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- arch/arm/crypto/aes_glue.c                  | 4 ++--
- arch/arm/crypto/sha1_glue.c                 | 2 +-
- arch/arm/crypto/sha1_neon_glue.c            | 2 +-
- arch/arm/crypto/sha512_neon_glue.c          | 4 ++--
- arch/arm64/crypto/aes-ce-ccm-glue.c         | 2 +-
- arch/arm64/crypto/aes-glue.c                | 8 ++++----
- arch/powerpc/crypto/sha1.c                  | 2 +-
- arch/s390/crypto/aes_s390.c                 | 2 +-
- arch/s390/crypto/des_s390.c                 | 4 ++--
- arch/s390/crypto/ghash_s390.c               | 2 +-
- arch/s390/crypto/sha1_s390.c                | 2 +-
- arch/s390/crypto/sha256_s390.c              | 4 ++--
- arch/s390/crypto/sha512_s390.c              | 4 ++--
- arch/sparc/crypto/aes_glue.c                | 2 +-
- arch/sparc/crypto/camellia_glue.c           | 2 +-
- arch/sparc/crypto/crc32c_glue.c             | 2 +-
- arch/sparc/crypto/des_glue.c                | 2 +-
- arch/sparc/crypto/md5_glue.c                | 2 +-
- arch/sparc/crypto/sha1_glue.c               | 2 +-
- arch/sparc/crypto/sha256_glue.c             | 4 ++--
- arch/sparc/crypto/sha512_glue.c             | 4 ++--
- arch/x86/crypto/aes_glue.c                  | 4 ++--
- arch/x86/crypto/aesni-intel_glue.c          | 2 +-
- arch/x86/crypto/blowfish_glue.c             | 4 ++--
- arch/x86/crypto/camellia_aesni_avx2_glue.c  | 4 ++--
- arch/x86/crypto/camellia_aesni_avx_glue.c   | 4 ++--
- arch/x86/crypto/camellia_glue.c             | 4 ++--
- arch/x86/crypto/cast5_avx_glue.c            | 2 +-
- arch/x86/crypto/cast6_avx_glue.c            | 2 +-
- arch/x86/crypto/crc32-pclmul_glue.c         | 4 ++--
- arch/x86/crypto/crc32c-intel_glue.c         | 4 ++--
- arch/x86/crypto/crct10dif-pclmul_glue.c     | 4 ++--
- arch/x86/crypto/des3_ede_glue.c             | 8 ++++----
- arch/x86/crypto/ghash-clmulni-intel_glue.c  | 2 +-
- arch/x86/crypto/salsa20_glue.c              | 4 ++--
- arch/x86/crypto/serpent_avx2_glue.c         | 4 ++--
- arch/x86/crypto/serpent_avx_glue.c          | 2 +-
- arch/x86/crypto/serpent_sse2_glue.c         | 2 +-
- arch/x86/crypto/sha1_ssse3_glue.c           | 2 +-
- arch/x86/crypto/sha256_ssse3_glue.c         | 4 ++--
- arch/x86/crypto/sha512_ssse3_glue.c         | 4 ++--
- arch/x86/crypto/twofish_avx_glue.c          | 2 +-
- arch/x86/crypto/twofish_glue.c              | 4 ++--
- arch/x86/crypto/twofish_glue_3way.c         | 4 ++--
- crypto/842.c                                | 1 +
- crypto/aes_generic.c                        | 2 +-
- crypto/ansi_cprng.c                         | 2 +-
- crypto/anubis.c                             | 1 +
- crypto/api.c                                | 4 ++--
- crypto/arc4.c                               | 1 +
- crypto/blowfish_generic.c                   | 2 +-
- crypto/camellia_generic.c                   | 2 +-
- crypto/cast5_generic.c                      | 2 +-
- crypto/cast6_generic.c                      | 2 +-
- crypto/ccm.c                                | 4 ++--
- crypto/crc32.c                              | 1 +
- crypto/crc32c_generic.c                     | 2 +-
- crypto/crct10dif_generic.c                  | 2 +-
- crypto/crypto_null.c                        | 6 +++---
- crypto/ctr.c                                | 2 +-
- crypto/deflate.c                            | 2 +-
- crypto/des_generic.c                        | 2 +-
- crypto/fcrypt.c                             | 1 +
- crypto/gcm.c                                | 6 +++---
- crypto/ghash-generic.c                      | 2 +-
- crypto/khazad.c                             | 1 +
- crypto/krng.c                               | 2 +-
- crypto/lz4.c                                | 1 +
- crypto/lz4hc.c                              | 1 +
- crypto/lzo.c                                | 1 +
- crypto/md4.c                                | 2 +-
- crypto/md5.c                                | 1 +
- crypto/michael_mic.c                        | 1 +
- crypto/rmd128.c                             | 1 +
- crypto/rmd160.c                             | 1 +
- crypto/rmd256.c                             | 1 +
- crypto/rmd320.c                             | 1 +
- crypto/salsa20_generic.c                    | 2 +-
- crypto/seed.c                               | 1 +
- crypto/serpent_generic.c                    | 4 ++--
- crypto/sha1_generic.c                       | 2 +-
- crypto/sha256_generic.c                     | 4 ++--
- crypto/sha512_generic.c                     | 4 ++--
- crypto/tea.c                                | 4 ++--
- crypto/tgr192.c                             | 4 ++--
- crypto/twofish_generic.c                    | 2 +-
- crypto/wp512.c                              | 4 ++--
- crypto/zlib.c                               | 1 +
- drivers/crypto/padlock-aes.c                | 2 +-
- drivers/crypto/padlock-sha.c                | 8 ++++----
- drivers/crypto/qat/qat_common/adf_ctl_drv.c | 2 +-
- drivers/crypto/ux500/cryp/cryp_core.c       | 4 ++--
- drivers/crypto/ux500/hash/hash_core.c       | 8 ++++----
- drivers/s390/crypto/ap_bus.c                | 2 +-
- include/linux/crypto.h                      | 7 +++++++
- 95 files changed, 147 insertions(+), 123 deletions(-)
+It's going to take me a little longer to get through the crypto API
+parts of the driver, but here are some initial comments.
 
-diff --git a/arch/arm/crypto/aes_glue.c b/arch/arm/crypto/aes_glue.c
-index 3003fa1f6fb4..0409b8f89782 100644
---- a/arch/arm/crypto/aes_glue.c
-+++ b/arch/arm/crypto/aes_glue.c
-@@ -93,6 +93,6 @@ module_exit(aes_fini);
- 
- MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm (ASM)");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("aes");
--MODULE_ALIAS("aes-asm");
-+MODULE_ALIAS_CRYPTO("aes");
-+MODULE_ALIAS_CRYPTO("aes-asm");
- MODULE_AUTHOR("David McCullough <ucdevel@gmail.com>");
-diff --git a/arch/arm/crypto/sha1_glue.c b/arch/arm/crypto/sha1_glue.c
-index 84f2a756588b..e31b0440c613 100644
---- a/arch/arm/crypto/sha1_glue.c
-+++ b/arch/arm/crypto/sha1_glue.c
-@@ -171,5 +171,5 @@ module_exit(sha1_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm (ARM)");
--MODULE_ALIAS("sha1");
-+MODULE_ALIAS_CRYPTO("sha1");
- MODULE_AUTHOR("David McCullough <ucdevel@gmail.com>");
-diff --git a/arch/arm/crypto/sha1_neon_glue.c b/arch/arm/crypto/sha1_neon_glue.c
-index 6f1b411b1d55..0b0083757d47 100644
---- a/arch/arm/crypto/sha1_neon_glue.c
-+++ b/arch/arm/crypto/sha1_neon_glue.c
-@@ -194,4 +194,4 @@ module_exit(sha1_neon_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm, NEON accelerated");
--MODULE_ALIAS("sha1");
-+MODULE_ALIAS_CRYPTO("sha1");
-diff --git a/arch/arm/crypto/sha512_neon_glue.c b/arch/arm/crypto/sha512_neon_glue.c
-index 0d2758ff5e12..f3452c66059d 100644
---- a/arch/arm/crypto/sha512_neon_glue.c
-+++ b/arch/arm/crypto/sha512_neon_glue.c
-@@ -301,5 +301,5 @@ module_exit(sha512_neon_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA512 Secure Hash Algorithm, NEON accelerated");
- 
--MODULE_ALIAS("sha512");
--MODULE_ALIAS("sha384");
-+MODULE_ALIAS_CRYPTO("sha512");
-+MODULE_ALIAS_CRYPTO("sha384");
-diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
-index 9e6cdde9b43d..0156a268e163 100644
---- a/arch/arm64/crypto/aes-ce-ccm-glue.c
-+++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
-@@ -294,4 +294,4 @@ module_exit(aes_mod_exit);
- MODULE_DESCRIPTION("Synchronous AES in CCM mode using ARMv8 Crypto Extensions");
- MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
- MODULE_LICENSE("GPL v2");
--MODULE_ALIAS("ccm(aes)");
-+MODULE_ALIAS_CRYPTO("ccm(aes)");
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index 79cd911ef88c..5f63a791b2fb 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -38,10 +38,10 @@ MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 Crypto Extensions");
- #define aes_xts_encrypt		neon_aes_xts_encrypt
- #define aes_xts_decrypt		neon_aes_xts_decrypt
- MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 NEON");
--MODULE_ALIAS("ecb(aes)");
--MODULE_ALIAS("cbc(aes)");
--MODULE_ALIAS("ctr(aes)");
--MODULE_ALIAS("xts(aes)");
-+MODULE_ALIAS_CRYPTO("ecb(aes)");
-+MODULE_ALIAS_CRYPTO("cbc(aes)");
-+MODULE_ALIAS_CRYPTO("ctr(aes)");
-+MODULE_ALIAS_CRYPTO("xts(aes)");
- #endif
- 
- MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
-diff --git a/arch/powerpc/crypto/sha1.c b/arch/powerpc/crypto/sha1.c
-index f9e8b9491efc..0f88c7b41119 100644
---- a/arch/powerpc/crypto/sha1.c
-+++ b/arch/powerpc/crypto/sha1.c
-@@ -154,4 +154,4 @@ module_exit(sha1_powerpc_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm");
- 
--MODULE_ALIAS("sha1-powerpc");
-+MODULE_ALIAS_CRYPTO("sha1-powerpc");
-diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-index 23223cd63e54..1f272b24fc0b 100644
---- a/arch/s390/crypto/aes_s390.c
-+++ b/arch/s390/crypto/aes_s390.c
-@@ -979,7 +979,7 @@ static void __exit aes_s390_fini(void)
- module_init(aes_s390_init);
- module_exit(aes_s390_fini);
- 
--MODULE_ALIAS("aes-all");
-+MODULE_ALIAS_CRYPTO("aes-all");
- 
- MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm");
- MODULE_LICENSE("GPL");
-diff --git a/arch/s390/crypto/des_s390.c b/arch/s390/crypto/des_s390.c
-index 7acb77f7ef1a..9e05cc453a40 100644
---- a/arch/s390/crypto/des_s390.c
-+++ b/arch/s390/crypto/des_s390.c
-@@ -619,8 +619,8 @@ static void __exit des_s390_exit(void)
- module_init(des_s390_init);
- module_exit(des_s390_exit);
- 
--MODULE_ALIAS("des");
--MODULE_ALIAS("des3_ede");
-+MODULE_ALIAS_CRYPTO("des");
-+MODULE_ALIAS_CRYPTO("des3_ede");
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("DES & Triple DES EDE Cipher Algorithms");
-diff --git a/arch/s390/crypto/ghash_s390.c b/arch/s390/crypto/ghash_s390.c
-index d43485d142e9..7940dc90e80b 100644
---- a/arch/s390/crypto/ghash_s390.c
-+++ b/arch/s390/crypto/ghash_s390.c
-@@ -160,7 +160,7 @@ static void __exit ghash_mod_exit(void)
- module_init(ghash_mod_init);
- module_exit(ghash_mod_exit);
- 
--MODULE_ALIAS("ghash");
-+MODULE_ALIAS_CRYPTO("ghash");
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("GHASH Message Digest Algorithm, s390 implementation");
-diff --git a/arch/s390/crypto/sha1_s390.c b/arch/s390/crypto/sha1_s390.c
-index a1b3a9dc9d8a..5b2bee323694 100644
---- a/arch/s390/crypto/sha1_s390.c
-+++ b/arch/s390/crypto/sha1_s390.c
-@@ -103,6 +103,6 @@ static void __exit sha1_s390_fini(void)
- module_init(sha1_s390_init);
- module_exit(sha1_s390_fini);
- 
--MODULE_ALIAS("sha1");
-+MODULE_ALIAS_CRYPTO("sha1");
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm");
-diff --git a/arch/s390/crypto/sha256_s390.c b/arch/s390/crypto/sha256_s390.c
-index 9b853809a492..b74ff158108c 100644
---- a/arch/s390/crypto/sha256_s390.c
-+++ b/arch/s390/crypto/sha256_s390.c
-@@ -143,7 +143,7 @@ static void __exit sha256_s390_fini(void)
- module_init(sha256_s390_init);
- module_exit(sha256_s390_fini);
- 
--MODULE_ALIAS("sha256");
--MODULE_ALIAS("sha224");
-+MODULE_ALIAS_CRYPTO("sha256");
-+MODULE_ALIAS_CRYPTO("sha224");
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA256 and SHA224 Secure Hash Algorithm");
-diff --git a/arch/s390/crypto/sha512_s390.c b/arch/s390/crypto/sha512_s390.c
-index 32a81383b69c..0c36989ba182 100644
---- a/arch/s390/crypto/sha512_s390.c
-+++ b/arch/s390/crypto/sha512_s390.c
-@@ -86,7 +86,7 @@ static struct shash_alg sha512_alg = {
- 	}
- };
- 
--MODULE_ALIAS("sha512");
-+MODULE_ALIAS_CRYPTO("sha512");
- 
- static int sha384_init(struct shash_desc *desc)
- {
-@@ -126,7 +126,7 @@ static struct shash_alg sha384_alg = {
- 	}
- };
- 
--MODULE_ALIAS("sha384");
-+MODULE_ALIAS_CRYPTO("sha384");
- 
- static int __init init(void)
- {
-diff --git a/arch/sparc/crypto/aes_glue.c b/arch/sparc/crypto/aes_glue.c
-index df922f52d76d..705408766ab0 100644
---- a/arch/sparc/crypto/aes_glue.c
-+++ b/arch/sparc/crypto/aes_glue.c
-@@ -499,6 +499,6 @@ module_exit(aes_sparc64_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("AES Secure Hash Algorithm, sparc64 aes opcode accelerated");
- 
--MODULE_ALIAS("aes");
-+MODULE_ALIAS_CRYPTO("aes");
- 
- #include "crop_devid.c"
-diff --git a/arch/sparc/crypto/camellia_glue.c b/arch/sparc/crypto/camellia_glue.c
-index 888f6260b4ec..641f55cb61c3 100644
---- a/arch/sparc/crypto/camellia_glue.c
-+++ b/arch/sparc/crypto/camellia_glue.c
-@@ -322,6 +322,6 @@ module_exit(camellia_sparc64_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Camellia Cipher Algorithm, sparc64 camellia opcode accelerated");
- 
--MODULE_ALIAS("aes");
-+MODULE_ALIAS_CRYPTO("aes");
- 
- #include "crop_devid.c"
-diff --git a/arch/sparc/crypto/crc32c_glue.c b/arch/sparc/crypto/crc32c_glue.c
-index 5162fad912ce..d1064e46efe8 100644
---- a/arch/sparc/crypto/crc32c_glue.c
-+++ b/arch/sparc/crypto/crc32c_glue.c
-@@ -176,6 +176,6 @@ module_exit(crc32c_sparc64_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("CRC32c (Castagnoli), sparc64 crc32c opcode accelerated");
- 
--MODULE_ALIAS("crc32c");
-+MODULE_ALIAS_CRYPTO("crc32c");
- 
- #include "crop_devid.c"
-diff --git a/arch/sparc/crypto/des_glue.c b/arch/sparc/crypto/des_glue.c
-index 3065bc61f9d3..d11500972994 100644
---- a/arch/sparc/crypto/des_glue.c
-+++ b/arch/sparc/crypto/des_glue.c
-@@ -532,6 +532,6 @@ module_exit(des_sparc64_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("DES & Triple DES EDE Cipher Algorithms, sparc64 des opcode accelerated");
- 
--MODULE_ALIAS("des");
-+MODULE_ALIAS_CRYPTO("des");
- 
- #include "crop_devid.c"
-diff --git a/arch/sparc/crypto/md5_glue.c b/arch/sparc/crypto/md5_glue.c
-index 09a9ea1dfb69..64c7ff5f72a9 100644
---- a/arch/sparc/crypto/md5_glue.c
-+++ b/arch/sparc/crypto/md5_glue.c
-@@ -185,6 +185,6 @@ module_exit(md5_sparc64_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("MD5 Secure Hash Algorithm, sparc64 md5 opcode accelerated");
- 
--MODULE_ALIAS("md5");
-+MODULE_ALIAS_CRYPTO("md5");
- 
- #include "crop_devid.c"
-diff --git a/arch/sparc/crypto/sha1_glue.c b/arch/sparc/crypto/sha1_glue.c
-index 6cd5f29e1e0d..1b3e47accc74 100644
---- a/arch/sparc/crypto/sha1_glue.c
-+++ b/arch/sparc/crypto/sha1_glue.c
-@@ -180,6 +180,6 @@ module_exit(sha1_sparc64_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm, sparc64 sha1 opcode accelerated");
- 
--MODULE_ALIAS("sha1");
-+MODULE_ALIAS_CRYPTO("sha1");
- 
- #include "crop_devid.c"
-diff --git a/arch/sparc/crypto/sha256_glue.c b/arch/sparc/crypto/sha256_glue.c
-index 04f555ab2680..41f27cca2a22 100644
---- a/arch/sparc/crypto/sha256_glue.c
-+++ b/arch/sparc/crypto/sha256_glue.c
-@@ -237,7 +237,7 @@ module_exit(sha256_sparc64_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA-224 and SHA-256 Secure Hash Algorithm, sparc64 sha256 opcode accelerated");
- 
--MODULE_ALIAS("sha224");
--MODULE_ALIAS("sha256");
-+MODULE_ALIAS_CRYPTO("sha224");
-+MODULE_ALIAS_CRYPTO("sha256");
- 
- #include "crop_devid.c"
-diff --git a/arch/sparc/crypto/sha512_glue.c b/arch/sparc/crypto/sha512_glue.c
-index f04d1994d19a..9fff88541b8c 100644
---- a/arch/sparc/crypto/sha512_glue.c
-+++ b/arch/sparc/crypto/sha512_glue.c
-@@ -222,7 +222,7 @@ module_exit(sha512_sparc64_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA-384 and SHA-512 Secure Hash Algorithm, sparc64 sha512 opcode accelerated");
- 
--MODULE_ALIAS("sha384");
--MODULE_ALIAS("sha512");
-+MODULE_ALIAS_CRYPTO("sha384");
-+MODULE_ALIAS_CRYPTO("sha512");
- 
- #include "crop_devid.c"
-diff --git a/arch/x86/crypto/aes_glue.c b/arch/x86/crypto/aes_glue.c
-index aafe8ce0d65d..e26984f7ab8d 100644
---- a/arch/x86/crypto/aes_glue.c
-+++ b/arch/x86/crypto/aes_glue.c
-@@ -66,5 +66,5 @@ module_exit(aes_fini);
- 
- MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm, asm optimized");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("aes");
--MODULE_ALIAS("aes-asm");
-+MODULE_ALIAS_CRYPTO("aes");
-+MODULE_ALIAS_CRYPTO("aes-asm");
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 888950f29fd9..70fece226d17 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1550,4 +1550,4 @@ module_exit(aesni_exit);
- 
- MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm, Intel AES-NI instructions optimized");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("aes");
-+MODULE_ALIAS_CRYPTO("aes");
-diff --git a/arch/x86/crypto/blowfish_glue.c b/arch/x86/crypto/blowfish_glue.c
-index 8af519ed73d1..17c05531dfd1 100644
---- a/arch/x86/crypto/blowfish_glue.c
-+++ b/arch/x86/crypto/blowfish_glue.c
-@@ -478,5 +478,5 @@ module_exit(fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Blowfish Cipher Algorithm, asm optimized");
--MODULE_ALIAS("blowfish");
--MODULE_ALIAS("blowfish-asm");
-+MODULE_ALIAS_CRYPTO("blowfish");
-+MODULE_ALIAS_CRYPTO("blowfish-asm");
-diff --git a/arch/x86/crypto/camellia_aesni_avx2_glue.c b/arch/x86/crypto/camellia_aesni_avx2_glue.c
-index 4209a76fcdaa..9a07fafe3831 100644
---- a/arch/x86/crypto/camellia_aesni_avx2_glue.c
-+++ b/arch/x86/crypto/camellia_aesni_avx2_glue.c
-@@ -582,5 +582,5 @@ module_exit(camellia_aesni_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Camellia Cipher Algorithm, AES-NI/AVX2 optimized");
--MODULE_ALIAS("camellia");
--MODULE_ALIAS("camellia-asm");
-+MODULE_ALIAS_CRYPTO("camellia");
-+MODULE_ALIAS_CRYPTO("camellia-asm");
-diff --git a/arch/x86/crypto/camellia_aesni_avx_glue.c b/arch/x86/crypto/camellia_aesni_avx_glue.c
-index 87a041a10f4a..ed38d959add6 100644
---- a/arch/x86/crypto/camellia_aesni_avx_glue.c
-+++ b/arch/x86/crypto/camellia_aesni_avx_glue.c
-@@ -574,5 +574,5 @@ module_exit(camellia_aesni_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Camellia Cipher Algorithm, AES-NI/AVX optimized");
--MODULE_ALIAS("camellia");
--MODULE_ALIAS("camellia-asm");
-+MODULE_ALIAS_CRYPTO("camellia");
-+MODULE_ALIAS_CRYPTO("camellia-asm");
-diff --git a/arch/x86/crypto/camellia_glue.c b/arch/x86/crypto/camellia_glue.c
-index c171dcbf192d..5c8b6266a394 100644
---- a/arch/x86/crypto/camellia_glue.c
-+++ b/arch/x86/crypto/camellia_glue.c
-@@ -1725,5 +1725,5 @@ module_exit(fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Camellia Cipher Algorithm, asm optimized");
--MODULE_ALIAS("camellia");
--MODULE_ALIAS("camellia-asm");
-+MODULE_ALIAS_CRYPTO("camellia");
-+MODULE_ALIAS_CRYPTO("camellia-asm");
-diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
-index e57e20ab5e0b..60ada677a928 100644
---- a/arch/x86/crypto/cast5_avx_glue.c
-+++ b/arch/x86/crypto/cast5_avx_glue.c
-@@ -491,4 +491,4 @@ module_exit(cast5_exit);
- 
- MODULE_DESCRIPTION("Cast5 Cipher Algorithm, AVX optimized");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("cast5");
-+MODULE_ALIAS_CRYPTO("cast5");
-diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
-index 09f3677393e4..0160f68a57ff 100644
---- a/arch/x86/crypto/cast6_avx_glue.c
-+++ b/arch/x86/crypto/cast6_avx_glue.c
-@@ -611,4 +611,4 @@ module_exit(cast6_exit);
- 
- MODULE_DESCRIPTION("Cast6 Cipher Algorithm, AVX optimized");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("cast6");
-+MODULE_ALIAS_CRYPTO("cast6");
-diff --git a/arch/x86/crypto/crc32-pclmul_glue.c b/arch/x86/crypto/crc32-pclmul_glue.c
-index 9d014a74ef96..1937fc1d8763 100644
---- a/arch/x86/crypto/crc32-pclmul_glue.c
-+++ b/arch/x86/crypto/crc32-pclmul_glue.c
-@@ -197,5 +197,5 @@ module_exit(crc32_pclmul_mod_fini);
- MODULE_AUTHOR("Alexander Boyko <alexander_boyko@xyratex.com>");
- MODULE_LICENSE("GPL");
- 
--MODULE_ALIAS("crc32");
--MODULE_ALIAS("crc32-pclmul");
-+MODULE_ALIAS_CRYPTO("crc32");
-+MODULE_ALIAS_CRYPTO("crc32-pclmul");
-diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
-index 6812ad98355c..28640c3d6af7 100644
---- a/arch/x86/crypto/crc32c-intel_glue.c
-+++ b/arch/x86/crypto/crc32c-intel_glue.c
-@@ -280,5 +280,5 @@ MODULE_AUTHOR("Austin Zhang <austin.zhang@intel.com>, Kent Liu <kent.liu@intel.c
- MODULE_DESCRIPTION("CRC32c (Castagnoli) optimization using Intel Hardware.");
- MODULE_LICENSE("GPL");
- 
--MODULE_ALIAS("crc32c");
--MODULE_ALIAS("crc32c-intel");
-+MODULE_ALIAS_CRYPTO("crc32c");
-+MODULE_ALIAS_CRYPTO("crc32c-intel");
-diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c b/arch/x86/crypto/crct10dif-pclmul_glue.c
-index 7845d7fd54c0..b6c67bf30fdf 100644
---- a/arch/x86/crypto/crct10dif-pclmul_glue.c
-+++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
-@@ -147,5 +147,5 @@ MODULE_AUTHOR("Tim Chen <tim.c.chen@linux.intel.com>");
- MODULE_DESCRIPTION("T10 DIF CRC calculation accelerated with PCLMULQDQ.");
- MODULE_LICENSE("GPL");
- 
--MODULE_ALIAS("crct10dif");
--MODULE_ALIAS("crct10dif-pclmul");
-+MODULE_ALIAS_CRYPTO("crct10dif");
-+MODULE_ALIAS_CRYPTO("crct10dif-pclmul");
-diff --git a/arch/x86/crypto/des3_ede_glue.c b/arch/x86/crypto/des3_ede_glue.c
-index 0e9c0668fe4e..38a14f818ef1 100644
---- a/arch/x86/crypto/des3_ede_glue.c
-+++ b/arch/x86/crypto/des3_ede_glue.c
-@@ -502,8 +502,8 @@ module_exit(des3_ede_x86_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Triple DES EDE Cipher Algorithm, asm optimized");
--MODULE_ALIAS("des3_ede");
--MODULE_ALIAS("des3_ede-asm");
--MODULE_ALIAS("des");
--MODULE_ALIAS("des-asm");
-+MODULE_ALIAS_CRYPTO("des3_ede");
-+MODULE_ALIAS_CRYPTO("des3_ede-asm");
-+MODULE_ALIAS_CRYPTO("des");
-+MODULE_ALIAS_CRYPTO("des-asm");
- MODULE_AUTHOR("Jussi Kivilinna <jussi.kivilinna@iki.fi>");
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-index 88bb7ba8b175..8253d85aa165 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-+++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-@@ -341,4 +341,4 @@ module_exit(ghash_pclmulqdqni_mod_exit);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("GHASH Message Digest Algorithm, "
- 		   "acclerated by PCLMULQDQ-NI");
--MODULE_ALIAS("ghash");
-+MODULE_ALIAS_CRYPTO("ghash");
-diff --git a/arch/x86/crypto/salsa20_glue.c b/arch/x86/crypto/salsa20_glue.c
-index 5e8e67739bb5..399a29d067d6 100644
---- a/arch/x86/crypto/salsa20_glue.c
-+++ b/arch/x86/crypto/salsa20_glue.c
-@@ -119,5 +119,5 @@ module_exit(fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION ("Salsa20 stream cipher algorithm (optimized assembly version)");
--MODULE_ALIAS("salsa20");
--MODULE_ALIAS("salsa20-asm");
-+MODULE_ALIAS_CRYPTO("salsa20");
-+MODULE_ALIAS_CRYPTO("salsa20-asm");
-diff --git a/arch/x86/crypto/serpent_avx2_glue.c b/arch/x86/crypto/serpent_avx2_glue.c
-index 2fae489b1524..437e47a4d302 100644
---- a/arch/x86/crypto/serpent_avx2_glue.c
-+++ b/arch/x86/crypto/serpent_avx2_glue.c
-@@ -558,5 +558,5 @@ module_exit(fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Serpent Cipher Algorithm, AVX2 optimized");
--MODULE_ALIAS("serpent");
--MODULE_ALIAS("serpent-asm");
-+MODULE_ALIAS_CRYPTO("serpent");
-+MODULE_ALIAS_CRYPTO("serpent-asm");
-diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
-index ff4870870972..7e217398b4eb 100644
---- a/arch/x86/crypto/serpent_avx_glue.c
-+++ b/arch/x86/crypto/serpent_avx_glue.c
-@@ -617,4 +617,4 @@ module_exit(serpent_exit);
- 
- MODULE_DESCRIPTION("Serpent Cipher Algorithm, AVX optimized");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("serpent");
-+MODULE_ALIAS_CRYPTO("serpent");
-diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
-index 8c95f8637306..bf025adaea01 100644
---- a/arch/x86/crypto/serpent_sse2_glue.c
-+++ b/arch/x86/crypto/serpent_sse2_glue.c
-@@ -618,4 +618,4 @@ module_exit(serpent_sse2_exit);
- 
- MODULE_DESCRIPTION("Serpent Cipher Algorithm, SSE2 optimized");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("serpent");
-+MODULE_ALIAS_CRYPTO("serpent");
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index 74d16ef707c7..6c20fe04a738 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -278,4 +278,4 @@ module_exit(sha1_ssse3_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm, Supplemental SSE3 accelerated");
- 
--MODULE_ALIAS("sha1");
-+MODULE_ALIAS_CRYPTO("sha1");
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index f248546da1ca..4dc100d82902 100644
---- a/arch/x86/crypto/sha256_ssse3_glue.c
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -318,5 +318,5 @@ module_exit(sha256_ssse3_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA256 Secure Hash Algorithm, Supplemental SSE3 accelerated");
- 
--MODULE_ALIAS("sha256");
--MODULE_ALIAS("sha224");
-+MODULE_ALIAS_CRYPTO("sha256");
-+MODULE_ALIAS_CRYPTO("sha224");
-diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 8626b03e83b7..26a5898a6f26 100644
---- a/arch/x86/crypto/sha512_ssse3_glue.c
-+++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -326,5 +326,5 @@ module_exit(sha512_ssse3_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA512 Secure Hash Algorithm, Supplemental SSE3 accelerated");
- 
--MODULE_ALIAS("sha512");
--MODULE_ALIAS("sha384");
-+MODULE_ALIAS_CRYPTO("sha512");
-+MODULE_ALIAS_CRYPTO("sha384");
-diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
-index 4e3c665be129..1ac531ea9bcc 100644
---- a/arch/x86/crypto/twofish_avx_glue.c
-+++ b/arch/x86/crypto/twofish_avx_glue.c
-@@ -579,4 +579,4 @@ module_exit(twofish_exit);
- 
- MODULE_DESCRIPTION("Twofish Cipher Algorithm, AVX optimized");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("twofish");
-+MODULE_ALIAS_CRYPTO("twofish");
-diff --git a/arch/x86/crypto/twofish_glue.c b/arch/x86/crypto/twofish_glue.c
-index 0a5202303501..77e06c2da83d 100644
---- a/arch/x86/crypto/twofish_glue.c
-+++ b/arch/x86/crypto/twofish_glue.c
-@@ -96,5 +96,5 @@ module_exit(fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION ("Twofish Cipher Algorithm, asm optimized");
--MODULE_ALIAS("twofish");
--MODULE_ALIAS("twofish-asm");
-+MODULE_ALIAS_CRYPTO("twofish");
-+MODULE_ALIAS_CRYPTO("twofish-asm");
-diff --git a/arch/x86/crypto/twofish_glue_3way.c b/arch/x86/crypto/twofish_glue_3way.c
-index 13e63b3e1dfb..56d8a08ee479 100644
---- a/arch/x86/crypto/twofish_glue_3way.c
-+++ b/arch/x86/crypto/twofish_glue_3way.c
-@@ -495,5 +495,5 @@ module_exit(fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Twofish Cipher Algorithm, 3-way parallel asm optimized");
--MODULE_ALIAS("twofish");
--MODULE_ALIAS("twofish-asm");
-+MODULE_ALIAS_CRYPTO("twofish");
-+MODULE_ALIAS_CRYPTO("twofish-asm");
-diff --git a/crypto/842.c b/crypto/842.c
-index 65c7a89cfa09..b48f4f108c47 100644
---- a/crypto/842.c
-+++ b/crypto/842.c
-@@ -180,3 +180,4 @@ module_exit(nx842_mod_exit);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("842 Compression Algorithm");
-+MODULE_ALIAS_CRYPTO("842");
-diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-index fd0d6b454975..9b3c54c1cbe8 100644
---- a/crypto/aes_generic.c
-+++ b/crypto/aes_generic.c
-@@ -1474,4 +1474,4 @@ module_exit(aes_fini);
- 
- MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm");
- MODULE_LICENSE("Dual BSD/GPL");
--MODULE_ALIAS("aes");
-+MODULE_ALIAS_CRYPTO("aes");
-diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index 666f1962a160..b4485a108389 100644
---- a/crypto/ansi_cprng.c
-+++ b/crypto/ansi_cprng.c
-@@ -476,4 +476,4 @@ module_param(dbg, int, 0);
- MODULE_PARM_DESC(dbg, "Boolean to enable debugging (0/1 == off/on)");
- module_init(prng_mod_init);
- module_exit(prng_mod_fini);
--MODULE_ALIAS("stdrng");
-+MODULE_ALIAS_CRYPTO("stdrng");
-diff --git a/crypto/anubis.c b/crypto/anubis.c
-index 008c8a4fb67c..4bb187c2a902 100644
---- a/crypto/anubis.c
-+++ b/crypto/anubis.c
-@@ -704,3 +704,4 @@ module_exit(anubis_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Anubis Cryptographic Algorithm");
-+MODULE_ALIAS_CRYPTO("anubis");
-diff --git a/crypto/api.c b/crypto/api.c
-index a2b39c5f3649..2a81e98a0021 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -216,11 +216,11 @@ struct crypto_alg *crypto_larval_lookup(const char *name, u32 type, u32 mask)
- 
- 	alg = crypto_alg_lookup(name, type, mask);
- 	if (!alg) {
--		request_module("%s", name);
-+		request_module("crypto-%s", name);
- 
- 		if (!((type ^ CRYPTO_ALG_NEED_FALLBACK) & mask &
- 		      CRYPTO_ALG_NEED_FALLBACK))
--			request_module("%s-all", name);
-+			request_module("crypto-%s-all", name);
- 
- 		alg = crypto_alg_lookup(name, type, mask);
- 	}
-diff --git a/crypto/arc4.c b/crypto/arc4.c
-index 5a772c3657d5..f1a81925558f 100644
---- a/crypto/arc4.c
-+++ b/crypto/arc4.c
-@@ -166,3 +166,4 @@ module_exit(arc4_exit);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("ARC4 Cipher Algorithm");
- MODULE_AUTHOR("Jon Oberheide <jon@oberheide.org>");
-+MODULE_ALIAS_CRYPTO("arc4");
-diff --git a/crypto/blowfish_generic.c b/crypto/blowfish_generic.c
-index 8baf5447d35b..7bd71f02d0dd 100644
---- a/crypto/blowfish_generic.c
-+++ b/crypto/blowfish_generic.c
-@@ -138,4 +138,4 @@ module_exit(blowfish_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Blowfish Cipher Algorithm");
--MODULE_ALIAS("blowfish");
-+MODULE_ALIAS_CRYPTO("blowfish");
-diff --git a/crypto/camellia_generic.c b/crypto/camellia_generic.c
-index 26bcd7a2d6b4..1b74c5a3e891 100644
---- a/crypto/camellia_generic.c
-+++ b/crypto/camellia_generic.c
-@@ -1098,4 +1098,4 @@ module_exit(camellia_fini);
- 
- MODULE_DESCRIPTION("Camellia Cipher Algorithm");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("camellia");
-+MODULE_ALIAS_CRYPTO("camellia");
-diff --git a/crypto/cast5_generic.c b/crypto/cast5_generic.c
-index 5558f630a0eb..84c86db67ec7 100644
---- a/crypto/cast5_generic.c
-+++ b/crypto/cast5_generic.c
-@@ -549,4 +549,4 @@ module_exit(cast5_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Cast5 Cipher Algorithm");
--MODULE_ALIAS("cast5");
-+MODULE_ALIAS_CRYPTO("cast5");
-diff --git a/crypto/cast6_generic.c b/crypto/cast6_generic.c
-index de732528a430..f408f0bd8de2 100644
---- a/crypto/cast6_generic.c
-+++ b/crypto/cast6_generic.c
-@@ -291,4 +291,4 @@ module_exit(cast6_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Cast6 Cipher Algorithm");
--MODULE_ALIAS("cast6");
-+MODULE_ALIAS_CRYPTO("cast6");
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 1df84217f7c9..647575b41281 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -879,5 +879,5 @@ module_exit(crypto_ccm_module_exit);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Counter with CBC MAC");
--MODULE_ALIAS("ccm_base");
--MODULE_ALIAS("rfc4309");
-+MODULE_ALIAS_CRYPTO("ccm_base");
-+MODULE_ALIAS_CRYPTO("rfc4309");
-diff --git a/crypto/crc32.c b/crypto/crc32.c
-index 9d1c41569898..187ded28cb0b 100644
---- a/crypto/crc32.c
-+++ b/crypto/crc32.c
-@@ -156,3 +156,4 @@ module_exit(crc32_mod_fini);
- MODULE_AUTHOR("Alexander Boyko <alexander_boyko@xyratex.com>");
- MODULE_DESCRIPTION("CRC32 calculations wrapper for lib/crc32");
- MODULE_LICENSE("GPL");
-+MODULE_ALIAS_CRYPTO("crc32");
-diff --git a/crypto/crc32c_generic.c b/crypto/crc32c_generic.c
-index d9c7beba8e50..2a062025749d 100644
---- a/crypto/crc32c_generic.c
-+++ b/crypto/crc32c_generic.c
-@@ -170,5 +170,5 @@ module_exit(crc32c_mod_fini);
- MODULE_AUTHOR("Clay Haapala <chaapala@cisco.com>");
- MODULE_DESCRIPTION("CRC32c (Castagnoli) calculations wrapper for lib/crc32c");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("crc32c");
-+MODULE_ALIAS_CRYPTO("crc32c");
- MODULE_SOFTDEP("pre: crc32c");
-diff --git a/crypto/crct10dif_generic.c b/crypto/crct10dif_generic.c
-index 877e7114ec5c..08bb4f504520 100644
---- a/crypto/crct10dif_generic.c
-+++ b/crypto/crct10dif_generic.c
-@@ -124,4 +124,4 @@ module_exit(crct10dif_mod_fini);
- MODULE_AUTHOR("Tim Chen <tim.c.chen@linux.intel.com>");
- MODULE_DESCRIPTION("T10 DIF CRC calculation.");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("crct10dif");
-+MODULE_ALIAS_CRYPTO("crct10dif");
-diff --git a/crypto/crypto_null.c b/crypto/crypto_null.c
-index 1dc54bb95a87..a20319132e33 100644
---- a/crypto/crypto_null.c
-+++ b/crypto/crypto_null.c
-@@ -145,9 +145,9 @@ static struct crypto_alg null_algs[3] = { {
- 	.coa_decompress		=	null_compress } }
- } };
- 
--MODULE_ALIAS("compress_null");
--MODULE_ALIAS("digest_null");
--MODULE_ALIAS("cipher_null");
-+MODULE_ALIAS_CRYPTO("compress_null");
-+MODULE_ALIAS_CRYPTO("digest_null");
-+MODULE_ALIAS_CRYPTO("cipher_null");
- 
- static int __init crypto_null_mod_init(void)
- {
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index f2b94f27bb2c..3d81ff7e6b48 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -466,4 +466,4 @@ module_exit(crypto_ctr_module_exit);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("CTR Counter block mode");
--MODULE_ALIAS("rfc3686");
-+MODULE_ALIAS_CRYPTO("rfc3686");
-diff --git a/crypto/deflate.c b/crypto/deflate.c
-index b57d70eb156b..95d8d37c5021 100644
---- a/crypto/deflate.c
-+++ b/crypto/deflate.c
-@@ -222,4 +222,4 @@ module_exit(deflate_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Deflate Compression Algorithm for IPCOMP");
- MODULE_AUTHOR("James Morris <jmorris@intercode.com.au>");
--
-+MODULE_ALIAS_CRYPTO("deflate");
-diff --git a/crypto/des_generic.c b/crypto/des_generic.c
-index 298d464ab7d2..42912948776b 100644
---- a/crypto/des_generic.c
-+++ b/crypto/des_generic.c
-@@ -983,7 +983,7 @@ static struct crypto_alg des_algs[2] = { {
- 	.cia_decrypt		=	des3_ede_decrypt } }
- } };
- 
--MODULE_ALIAS("des3_ede");
-+MODULE_ALIAS_CRYPTO("des3_ede");
- 
- static int __init des_generic_mod_init(void)
- {
-diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
-index 021d7fec6bc8..77286ea28865 100644
---- a/crypto/fcrypt.c
-+++ b/crypto/fcrypt.c
-@@ -420,3 +420,4 @@ module_exit(fcrypt_mod_fini);
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_DESCRIPTION("FCrypt Cipher Algorithm");
- MODULE_AUTHOR("David Howells <dhowells@redhat.com>");
-+MODULE_ALIAS_CRYPTO("fcrypt");
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index 276cdac567b6..aefb74a3f522 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -1441,6 +1441,6 @@ module_exit(crypto_gcm_module_exit);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Galois/Counter Mode");
- MODULE_AUTHOR("Mikko Herranen <mh1@iki.fi>");
--MODULE_ALIAS("gcm_base");
--MODULE_ALIAS("rfc4106");
--MODULE_ALIAS("rfc4543");
-+MODULE_ALIAS_CRYPTO("gcm_base");
-+MODULE_ALIAS_CRYPTO("rfc4106");
-+MODULE_ALIAS_CRYPTO("rfc4543");
-diff --git a/crypto/ghash-generic.c b/crypto/ghash-generic.c
-index 9d3f0c69a86f..4e97fae9666f 100644
---- a/crypto/ghash-generic.c
-+++ b/crypto/ghash-generic.c
-@@ -172,4 +172,4 @@ module_exit(ghash_mod_exit);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("GHASH Message Digest Algorithm");
--MODULE_ALIAS("ghash");
-+MODULE_ALIAS_CRYPTO("ghash");
-diff --git a/crypto/khazad.c b/crypto/khazad.c
-index 60e7cd66facc..873eb5ded6d7 100644
---- a/crypto/khazad.c
-+++ b/crypto/khazad.c
-@@ -880,3 +880,4 @@ module_exit(khazad_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Khazad Cryptographic Algorithm");
-+MODULE_ALIAS_CRYPTO("khazad");
-diff --git a/crypto/krng.c b/crypto/krng.c
-index a2d2b72fc135..67c88b331210 100644
---- a/crypto/krng.c
-+++ b/crypto/krng.c
-@@ -62,4 +62,4 @@ module_exit(krng_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Kernel Random Number Generator");
--MODULE_ALIAS("stdrng");
-+MODULE_ALIAS_CRYPTO("stdrng");
-diff --git a/crypto/lz4.c b/crypto/lz4.c
-index 34d072b72a73..aefbceaf3104 100644
---- a/crypto/lz4.c
-+++ b/crypto/lz4.c
-@@ -104,3 +104,4 @@ module_exit(lz4_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("LZ4 Compression Algorithm");
-+MODULE_ALIAS_CRYPTO("lz4");
-diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
-index 9218b3fed5e3..a1d3b5bd3d85 100644
---- a/crypto/lz4hc.c
-+++ b/crypto/lz4hc.c
-@@ -104,3 +104,4 @@ module_exit(lz4hc_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("LZ4HC Compression Algorithm");
-+MODULE_ALIAS_CRYPTO("lz4hc");
-diff --git a/crypto/lzo.c b/crypto/lzo.c
-index a8ff2f778dc4..4b3e92525dac 100644
---- a/crypto/lzo.c
-+++ b/crypto/lzo.c
-@@ -107,3 +107,4 @@ module_exit(lzo_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("LZO Compression Algorithm");
-+MODULE_ALIAS_CRYPTO("lzo");
-diff --git a/crypto/md4.c b/crypto/md4.c
-index 0477a6a01d58..3515af425cc9 100644
---- a/crypto/md4.c
-+++ b/crypto/md4.c
-@@ -255,4 +255,4 @@ module_exit(md4_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("MD4 Message Digest Algorithm");
--
-+MODULE_ALIAS_CRYPTO("md4");
-diff --git a/crypto/md5.c b/crypto/md5.c
-index 7febeaab923b..36f5e5b103f3 100644
---- a/crypto/md5.c
-+++ b/crypto/md5.c
-@@ -168,3 +168,4 @@ module_exit(md5_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("MD5 Message Digest Algorithm");
-+MODULE_ALIAS_CRYPTO("md5");
-diff --git a/crypto/michael_mic.c b/crypto/michael_mic.c
-index 079b761bc70d..46195e0d0f4d 100644
---- a/crypto/michael_mic.c
-+++ b/crypto/michael_mic.c
-@@ -184,3 +184,4 @@ module_exit(michael_mic_exit);
- MODULE_LICENSE("GPL v2");
- MODULE_DESCRIPTION("Michael MIC");
- MODULE_AUTHOR("Jouni Malinen <j@w1.fi>");
-+MODULE_ALIAS_CRYPTO("michael_mic");
-diff --git a/crypto/rmd128.c b/crypto/rmd128.c
-index 8a0f68b7f257..049486ede938 100644
---- a/crypto/rmd128.c
-+++ b/crypto/rmd128.c
-@@ -327,3 +327,4 @@ module_exit(rmd128_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
- MODULE_DESCRIPTION("RIPEMD-128 Message Digest");
-+MODULE_ALIAS_CRYPTO("rmd128");
-diff --git a/crypto/rmd160.c b/crypto/rmd160.c
-index 525d7bb752cf..de585e51d455 100644
---- a/crypto/rmd160.c
-+++ b/crypto/rmd160.c
-@@ -371,3 +371,4 @@ module_exit(rmd160_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
- MODULE_DESCRIPTION("RIPEMD-160 Message Digest");
-+MODULE_ALIAS_CRYPTO("rmd160");
-diff --git a/crypto/rmd256.c b/crypto/rmd256.c
-index 69293d9b56e0..4ec02a754e09 100644
---- a/crypto/rmd256.c
-+++ b/crypto/rmd256.c
-@@ -346,3 +346,4 @@ module_exit(rmd256_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
- MODULE_DESCRIPTION("RIPEMD-256 Message Digest");
-+MODULE_ALIAS_CRYPTO("rmd256");
-diff --git a/crypto/rmd320.c b/crypto/rmd320.c
-index 09f97dfdfbba..770f2cb369f8 100644
---- a/crypto/rmd320.c
-+++ b/crypto/rmd320.c
-@@ -395,3 +395,4 @@ module_exit(rmd320_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Adrian-Ken Rueegsegger <ken@codelabs.ch>");
- MODULE_DESCRIPTION("RIPEMD-320 Message Digest");
-+MODULE_ALIAS_CRYPTO("rmd320");
-diff --git a/crypto/salsa20_generic.c b/crypto/salsa20_generic.c
-index 9a4770c02284..3d0f9df30ac9 100644
---- a/crypto/salsa20_generic.c
-+++ b/crypto/salsa20_generic.c
-@@ -248,4 +248,4 @@ module_exit(salsa20_generic_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION ("Salsa20 stream cipher algorithm");
--MODULE_ALIAS("salsa20");
-+MODULE_ALIAS_CRYPTO("salsa20");
-diff --git a/crypto/seed.c b/crypto/seed.c
-index 9c904d6d2151..c6ba8438be43 100644
---- a/crypto/seed.c
-+++ b/crypto/seed.c
-@@ -476,3 +476,4 @@ module_exit(seed_fini);
- MODULE_DESCRIPTION("SEED Cipher Algorithm");
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Hye-Shik Chang <perky@FreeBSD.org>, Kim Hyun <hkim@kisa.or.kr>");
-+MODULE_ALIAS_CRYPTO("seed");
-diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
-index 7ddbd7e88859..a53b5e2af335 100644
---- a/crypto/serpent_generic.c
-+++ b/crypto/serpent_generic.c
-@@ -665,5 +665,5 @@ module_exit(serpent_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Serpent and tnepres (kerneli compatible serpent reversed) Cipher Algorithm");
- MODULE_AUTHOR("Dag Arne Osvik <osvik@ii.uib.no>");
--MODULE_ALIAS("tnepres");
--MODULE_ALIAS("serpent");
-+MODULE_ALIAS_CRYPTO("tnepres");
-+MODULE_ALIAS_CRYPTO("serpent");
-diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
-index 7bb047432782..039e58cfa155 100644
---- a/crypto/sha1_generic.c
-+++ b/crypto/sha1_generic.c
-@@ -153,4 +153,4 @@ module_exit(sha1_generic_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm");
- 
--MODULE_ALIAS("sha1");
-+MODULE_ALIAS_CRYPTO("sha1");
-diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
-index 65e7b76b057f..5eb21b120033 100644
---- a/crypto/sha256_generic.c
-+++ b/crypto/sha256_generic.c
-@@ -384,5 +384,5 @@ module_exit(sha256_generic_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA-224 and SHA-256 Secure Hash Algorithm");
- 
--MODULE_ALIAS("sha224");
--MODULE_ALIAS("sha256");
-+MODULE_ALIAS_CRYPTO("sha224");
-+MODULE_ALIAS_CRYPTO("sha256");
-diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
-index 95db67197cd9..8d0b19ed4f4b 100644
---- a/crypto/sha512_generic.c
-+++ b/crypto/sha512_generic.c
-@@ -288,5 +288,5 @@ module_exit(sha512_generic_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("SHA-512 and SHA-384 Secure Hash Algorithms");
- 
--MODULE_ALIAS("sha384");
--MODULE_ALIAS("sha512");
-+MODULE_ALIAS_CRYPTO("sha384");
-+MODULE_ALIAS_CRYPTO("sha512");
-diff --git a/crypto/tea.c b/crypto/tea.c
-index 0a572323ee4a..495be2d0077d 100644
---- a/crypto/tea.c
-+++ b/crypto/tea.c
-@@ -270,8 +270,8 @@ static void __exit tea_mod_fini(void)
- 	crypto_unregister_algs(tea_algs, ARRAY_SIZE(tea_algs));
- }
- 
--MODULE_ALIAS("xtea");
--MODULE_ALIAS("xeta");
-+MODULE_ALIAS_CRYPTO("xtea");
-+MODULE_ALIAS_CRYPTO("xeta");
- 
- module_init(tea_mod_init);
- module_exit(tea_mod_fini);
-diff --git a/crypto/tgr192.c b/crypto/tgr192.c
-index 3c7af0d1ff7a..6e5651c66cf8 100644
---- a/crypto/tgr192.c
-+++ b/crypto/tgr192.c
-@@ -676,8 +676,8 @@ static void __exit tgr192_mod_fini(void)
- 	crypto_unregister_shashes(tgr_algs, ARRAY_SIZE(tgr_algs));
- }
- 
--MODULE_ALIAS("tgr160");
--MODULE_ALIAS("tgr128");
-+MODULE_ALIAS_CRYPTO("tgr160");
-+MODULE_ALIAS_CRYPTO("tgr128");
- 
- module_init(tgr192_mod_init);
- module_exit(tgr192_mod_fini);
-diff --git a/crypto/twofish_generic.c b/crypto/twofish_generic.c
-index 2d5000552d0f..523ad8c4e359 100644
---- a/crypto/twofish_generic.c
-+++ b/crypto/twofish_generic.c
-@@ -211,4 +211,4 @@ module_exit(twofish_mod_fini);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION ("Twofish Cipher Algorithm");
--MODULE_ALIAS("twofish");
-+MODULE_ALIAS_CRYPTO("twofish");
-diff --git a/crypto/wp512.c b/crypto/wp512.c
-index ec64e7762fbb..0de42eb3d040 100644
---- a/crypto/wp512.c
-+++ b/crypto/wp512.c
-@@ -1167,8 +1167,8 @@ static void __exit wp512_mod_fini(void)
- 	crypto_unregister_shashes(wp_algs, ARRAY_SIZE(wp_algs));
- }
- 
--MODULE_ALIAS("wp384");
--MODULE_ALIAS("wp256");
-+MODULE_ALIAS_CRYPTO("wp384");
-+MODULE_ALIAS_CRYPTO("wp256");
- 
- module_init(wp512_mod_init);
- module_exit(wp512_mod_fini);
-diff --git a/crypto/zlib.c b/crypto/zlib.c
-index c9ee681d57fd..0eefa9d237ac 100644
---- a/crypto/zlib.c
-+++ b/crypto/zlib.c
-@@ -378,3 +378,4 @@ module_exit(zlib_mod_fini);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Zlib Compression Algorithm");
- MODULE_AUTHOR("Sony Corporation");
-+MODULE_ALIAS_CRYPTO("zlib");
-diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
-index 633ba945e153..c178ed8c3908 100644
---- a/drivers/crypto/padlock-aes.c
-+++ b/drivers/crypto/padlock-aes.c
-@@ -563,4 +563,4 @@ MODULE_DESCRIPTION("VIA PadLock AES algorithm support");
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Michal Ludvig");
- 
--MODULE_ALIAS("aes");
-+MODULE_ALIAS_CRYPTO("aes");
-diff --git a/drivers/crypto/padlock-sha.c b/drivers/crypto/padlock-sha.c
-index bace885634f2..95f7d27ce491 100644
---- a/drivers/crypto/padlock-sha.c
-+++ b/drivers/crypto/padlock-sha.c
-@@ -593,7 +593,7 @@ MODULE_DESCRIPTION("VIA PadLock SHA1/SHA256 algorithms support.");
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Michal Ludvig");
- 
--MODULE_ALIAS("sha1-all");
--MODULE_ALIAS("sha256-all");
--MODULE_ALIAS("sha1-padlock");
--MODULE_ALIAS("sha256-padlock");
-+MODULE_ALIAS_CRYPTO("sha1-all");
-+MODULE_ALIAS_CRYPTO("sha256-all");
-+MODULE_ALIAS_CRYPTO("sha1-padlock");
-+MODULE_ALIAS_CRYPTO("sha256-padlock");
-diff --git a/drivers/crypto/qat/qat_common/adf_ctl_drv.c b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-index 244d73378f0e..ad4b354b44fd 100644
---- a/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-+++ b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
-@@ -487,4 +487,4 @@ module_exit(adf_unregister_ctl_device_driver);
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_AUTHOR("Intel");
- MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
--MODULE_ALIAS("intel_qat");
-+MODULE_ALIAS_CRYPTO("intel_qat");
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index 92105f3dc8e0..e4cea7c45142 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -1810,7 +1810,7 @@ module_exit(ux500_cryp_mod_fini);
- module_param(cryp_mode, int, 0);
- 
- MODULE_DESCRIPTION("Driver for ST-Ericsson UX500 CRYP crypto engine.");
--MODULE_ALIAS("aes-all");
--MODULE_ALIAS("des-all");
-+MODULE_ALIAS_CRYPTO("aes-all");
-+MODULE_ALIAS_CRYPTO("des-all");
- 
- MODULE_LICENSE("GPL");
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 1c73f4fbc252..8e5e0187506f 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -1995,7 +1995,7 @@ module_exit(ux500_hash_mod_fini);
- MODULE_DESCRIPTION("Driver for ST-Ericsson UX500 HASH engine.");
- MODULE_LICENSE("GPL");
- 
--MODULE_ALIAS("sha1-all");
--MODULE_ALIAS("sha256-all");
--MODULE_ALIAS("hmac-sha1-all");
--MODULE_ALIAS("hmac-sha256-all");
-+MODULE_ALIAS_CRYPTO("sha1-all");
-+MODULE_ALIAS_CRYPTO("sha256-all");
-+MODULE_ALIAS_CRYPTO("hmac-sha1-all");
-+MODULE_ALIAS_CRYPTO("hmac-sha256-all");
-diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
-index 99485415dcc2..a058df192c42 100644
---- a/drivers/s390/crypto/ap_bus.c
-+++ b/drivers/s390/crypto/ap_bus.c
-@@ -71,7 +71,7 @@ MODULE_AUTHOR("IBM Corporation");
- MODULE_DESCRIPTION("Adjunct Processor Bus driver, " \
- 		   "Copyright IBM Corp. 2006, 2012");
- MODULE_LICENSE("GPL");
--MODULE_ALIAS("z90crypt");
-+MODULE_ALIAS_CRYPTO("z90crypt");
- 
- /*
-  * Module parameter
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index d45e949699ea..d14230f6e977 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -26,6 +26,13 @@
- #include <linux/uaccess.h>
- 
- /*
-+ * Autoloaded crypto modules should only use a prefixed name to avoid allowing
-+ * arbitrary modules to be loaded.
-+ */
-+#define MODULE_ALIAS_CRYPTO(name)	\
-+		MODULE_ALIAS("crypto-" name)
-+
-+/*
-  * Algorithm masks and types.
-  */
- #define CRYPTO_ALG_TYPE_MASK		0x0000000f
--- 
-1.9.1
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 2fb0fdf..4b931eb 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -436,4 +436,17 @@ config CRYPTO_DEV_QCE
+>           hardware. To compile this driver as a module, choose M here. The
+>           module will be called qcrypto.
+>
+> +config CRYPTO_DEV_IMGTEC_HASH
+> +        tristate "Imagination Technologies hardware hash accelerator"
 
+Is there no meaningful depends-on here?  There's no MACH_PISTACHIO
+yet, but perhaps MIPS for now?  Also, {readl,writel}_relaxed aren't
+available on all architectures.
 
--- 
-Kees Cook
-Chrome OS Security
+> +        select CRYPTO_ALG_API
+> +        select CRYPTO_MD5
+> +        select CRYPTO_SHA1
+> +        select CRYPTO_SHA224
+> +        select CRYPTO_SHA256
+> +        select CRYPTO_HASH
+> +        help
+> +          This driver interfaces with the Imagination Technologies
+> +          hardware hash accelerator. Supporting MD5/SHA1/SHA224/SHA256
+> +          hashing algorithms.
+> +
+>  endif # CRYPTO_HW
+
+> diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+> new file mode 100644
+> index 0000000..e58c81a
+> --- /dev/null
+> +++ b/drivers/crypto/img-hash.c
+
+> @@ -0,0 +1,1048 @@
+> +/*
+> +* Copyright (c) 2014 Imagination Technologies
+> +* Author:  Will Thomas
+> +*
+> +* This program is free software; you can redistribute it and/or modify
+> +* it under the terms of the GNU General Public License version 2 as published
+> +* by the Free Software Foundation.
+> +*
+> +*      Interface structure taken from omap-sham driver
+> +*/
+
+Comment style is incorrect here, the *s in multi-line comments should
+be aligned.
+
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/clk.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/io.h>
+> +#include <linux/scatterlist.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/of_device.h>
+> +#include <crypto/sha.h>
+> +#include <crypto/md5.h>
+> +#include <crypto/internal/hash.h>
+
+#includes should be sorted in alphabetical order, with a newline
+separating the linux/ and crypto/ includes.
+
+> +#define MD5_BLOCK_SIZE                 64
+
+There's already MD5_HMAC_BLOCK_SIZE #define'd in crypto/md5.h.
+
+> +#define CR_RESET                       0
+> +#define CR_RESET_SET                   1
+> +#define CR_RESET_UNSET                 0
+> +
+> +#define CR_MESSAGE_LENGTH_H            0x4
+> +#define CR_MESSAGE_LENGTH_L            0x8
+> +
+> +#define        CR_CONTROL                      0xc
+> +#define CR_CONTROL_BYTE_ORDER_3210     0
+> +#define CR_CONTROL_BYTE_ORDER_0123     1
+> +#define CR_CONTROL_BYTE_ORDER_2310     2
+> +#define CR_CONTROL_BYTE_ORDER_1032     3
+> +#define CR_CONTROL_ALGO_MD5    0
+> +#define CR_CONTROL_ALGO_SHA1   1
+> +#define CR_CONTROL_ALGO_SHA224 2
+> +#define CR_CONTROL_ALGO_SHA256 3
+> +
+> +#define CR_INTSTAT                     0x10
+> +#define CR_INTENAB                     0x14
+> +#define CR_INTCLEAR                    0x18
+> +#define CR_INT_RESULTS_AVAILABLE       (1<<0)
+> +#define CR_INT_NEW_RESULTS_SET         (1<<1)
+> +#define CR_INT_RESULT_READ_ERR         (1<<2)
+> +#define CR_INT_MESSAGE_WRITE_ERROR     (1<<3)
+> +#define CR_INT_STATUS                  (1<<8)
+
+Use the BIT() macro for single-bit fields like this.
+
+> +#define CR_RESULT_QUEUE                0x1c
+> +#define CR_RSD0                                0x40
+> +#define CR_CORE_REV                    0x50
+> +#define CR_CORE_DES1           0x60
+> +#define CR_CORE_DES2           0x70
+> +
+> +#define DRIVER_FLAGS_BUSY              BIT(0)
+> +#define DRIVER_FLAGS_FINAL             BIT(1)
+> +#define DRIVER_FLAGS_DMA_ACTIVE                BIT(2)
+> +#define DRIVER_FLAGS_OUTPUT_READY      BIT(3)
+> +#define DRIVER_FLAGS_INIT              BIT(4)
+> +#define DRIVER_FLAGS_CPU               BIT(5)
+> +#define DRIVER_FLAGS_DMA_READY         BIT(6)
+> +#define DRIVER_FLAGS_ERROR             BIT(7)
+> +#define DRIVER_FLAGS_SG                        BIT(8)
+> +#define DRIVER_FLAGS_FINUP             BIT(9)
+> +#define DRIVER_FLAGS_SHA1              BIT(18)
+> +#define DRIVER_FLAGS_SHA224            BIT(19)
+> +#define DRIVER_FLAGS_SHA256            BIT(20)
+> +#define DRIVER_FLAGS_MD5               BIT(21)
+> +
+> +#define OP_UPDATE                      1
+> +#define OP_FINAL                       2
+> +
+> +#define IMG_HASH_QUEUE_LENGTH          20
+> +#define IMG_HASH_DMA_THRESHOLD         64
+> +#ifdef __LITTLE_ENDIAN
+> +#define IMG_HASH_BYTE_ORDER            (CR_CONTROL_BYTE_ORDER_3210)
+> +#else
+> +#define IMG_HASH_BYTE_ORDER            (CR_CONTROL_BYTE_ORDER_0123)
+> +#endif
+> +
+> +struct img_hash_dev;
+> +
+> +struct img_hash_request_ctx {
+> +       struct img_hash_dev     *hdev;
+> +       u8 digest[SHA256_DIGEST_SIZE] __aligned(sizeof(u32));
+> +       unsigned long           flags;
+> +       size_t                  digsize;
+> +
+> +       dma_addr_t              dma_addr;
+> +       size_t                  dma_ct;
+> +
+> +       /* sg root*/
+
+nit: put a space between 'root' and '*/'.
+
+> +       struct scatterlist      *sgfirst;
+> +       /* walk state */
+> +       struct scatterlist      *sg;
+> +       size_t                  nents;
+> +       size_t                  offset;
+> +       unsigned int            total;
+> +       size_t                  sent;
+> +
+> +       unsigned long           op;
+> +
+> +       size_t                  bufcnt;
+> +       u8 buffer[0] __aligned(sizeof(u32));
+> +};
+> +
+> +struct img_hash_ctx {
+> +       struct img_hash_dev     *hdev;
+> +       unsigned long           flags;
+> +       struct crypto_shash     *fallback;
+> +};
+> +
+> +struct img_hash_dev {
+> +       struct list_head        list;
+> +/*     phys_addr_t             phys_base;*/
+
+Is this not needed anymore?
+
+> +       struct device           *dev;
+> +       struct clk              *iclk;
+> +       int                     irq;
+> +       void __iomem            *io_base;
+> +
+> +       phys_addr_t             bus_addr;
+> +       void __iomem            *cpu_addr;
+> +
+> +       spinlock_t              lock;
+> +       int                     err;
+> +       struct tasklet_struct   done_task;
+> +       struct tasklet_struct   dma_task;
+> +
+> +       unsigned long           flags;
+> +       struct crypto_queue     queue;
+> +       struct ahash_request    *req;
+> +
+> +       struct dma_chan         *dma_lch;
+> +       struct dma_slave_config dma_conf;
+
+Do we really need to keep around the DMA config?  It's only used in
+img_hash_dma_init() - dmaengine_slave_config() makes a deep copy of
+this structure.
+
+> +};
+> +
+> +struct img_hash_drv {
+> +       struct list_head dev_list;
+> +       spinlock_t lock;
+> +};
+> +
+> +static struct img_hash_drv img_hash = {
+> +       .dev_list = LIST_HEAD_INIT(img_hash.dev_list),
+> +       .lock = __SPIN_LOCK_UNLOCKED(img_hash.lock),
+> +};
+
+It looks like the only purpose of this list is to get the
+corresponding struct img_hash_dev in img_hash_init().  If there's
+never going to be multiple instances within an SoC, perhaps you could
+just use a global?  Otherwise, you could do something like the
+qualcomm driver, see drivers/crypto/qce/sha.c.  It looks like there is
+some precedent for this device list though...
+
+> +static inline u32 img_hash_read(struct img_hash_dev *hdev, u32 offset)
+> +{
+> +       return readl_relaxed(hdev->io_base + offset);
+> +}
+> +
+> +static inline void img_hash_write(struct img_hash_dev *hdev,
+> +                                               u32 offset, u32 value)
+> +{
+> +       writel_relaxed(value, hdev->io_base + offset);
+> +}
+
+Is this IP present on Meta SoCs?  If so, you may want to use vanilla
+readl/writel instead, as the relaxed variants aren't defined for Meta.
+
+> +static inline u32 img_hash_result_queue(struct img_hash_dev *hdev)
+
+Maybe call this "img_hash_read_result_queue" to make it more obvious
+as to what it's doing?
+
+> +{
+> +       return be32_to_cpu(img_hash_read(hdev, CR_RESULT_QUEUE));
+> +}
+> +
+> +static void img_hash_write_ctrl(struct img_hash_dev *hdev, int dma)
+
+This could have a more obvious name as well, maybe img_hash_start or
+img_hash_enable?
+
+Also, use bool instead of int for boolean flags like "dma" here.
+
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
+> +       u32 cr = IMG_HASH_BYTE_ORDER << 8;
+
+This shift should be #define'd.
+
+> +
+> +       if (ctx->flags & DRIVER_FLAGS_MD5)
+> +               cr |= CR_CONTROL_ALGO_MD5;
+> +       else if (ctx->flags & DRIVER_FLAGS_SHA1)
+> +               cr |= CR_CONTROL_ALGO_SHA1;
+> +       else if (ctx->flags & DRIVER_FLAGS_SHA224)
+> +               cr |= CR_CONTROL_ALGO_SHA224;
+> +       else if (ctx->flags & DRIVER_FLAGS_SHA256)
+> +               cr |= CR_CONTROL_ALGO_SHA256;
+> +       dev_dbg(hdev->dev, "Starting hash process\n");
+> +       img_hash_write(hdev, CR_CONTROL, cr);
+> +
+> +       /*
+> +        * The hardware block requires two cycles between writing the control
+> +        * register and writing the first word of data in non DMA mode, to
+> +        * ensure the first data write is not grouped in burst with the control
+> +        * register write a read is issued to 'flush' the bus.
+> +        */
+> +       if (!dma)
+> +               img_hash_read(hdev, CR_CONTROL);
+> +}
+> +
+> +static int img_hash_xmit_cpu(struct img_hash_dev *hdev, const u8 *buf,
+> +                               size_t length, int final)
+> +{
+> +       int count, len32;
+
+These should both be unsigned.
+
+> +       const u32 *buffer = (const u32 *)buf;
+> +
+> +       dev_dbg(hdev->dev, "xmit_cpu:  length: %u\n", length);
+> +
+> +       if (final)
+> +               hdev->flags |= DRIVER_FLAGS_FINAL;
+> +
+> +       hdev->flags |= DRIVER_FLAGS_CPU;
+> +
+> +       len32 = DIV_ROUND_UP(length, sizeof(u32));
+> +       for (count = 0; count < len32; count++)
+> +               writel_relaxed(buffer[count], hdev->cpu_addr);
+> +
+> +       return -EINPROGRESS;
+> +}
+> +
+> +static int img_hash_update_cpu(struct img_hash_dev *hdev)
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
+> +       int bufcnt;
+
+unsigned
+
+> +
+> +       ctx->bufcnt = sg_copy_to_buffer(hdev->req->src, sg_nents(ctx->sg),
+> +                               ctx->buffer, hdev->req->nbytes);
+> +
+> +       ctx->total = hdev->req->nbytes;
+> +       bufcnt = hdev->req->nbytes;
+> +       ctx->bufcnt = 0;
+> +
+> +       img_hash_write_ctrl(hdev, 0);
+> +
+> +       return img_hash_xmit_cpu(hdev, ctx->buffer, bufcnt, 1);
+> +}
+> +
+> +static int img_hash_copy_ready_hash(struct ahash_request *req)
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(req);
+> +
+> +       if (!req->result)
+> +               return -EINVAL;
+> +
+> +       memcpy(req->result, ctx->digest, ctx->digsize);
+> +
+> +       return 0;
+> +}
+> +
+> +static int img_hash_finish(struct ahash_request *req)
+> +{
+> +       return img_hash_copy_ready_hash(req);
+> +}
+
+Why is img_hash_copy_ready_hash() separate from img_hash_finish()?
+
+> +static void img_hash_copy_hash(struct ahash_request *req)
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(req);
+> +       u32 *hash = (u32 *) ctx->digest;
+> +       int i;
+> +
+> +       for (i = (ctx->digsize / sizeof(u32)) - 1; i >= 0; i--)
+> +               hash[i] = img_hash_result_queue(ctx->hdev);
+> +}
+> +
+> +static void img_hash_finish_req(struct ahash_request *req, int err)
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(req);
+> +       struct img_hash_dev *hdev =  ctx->hdev;
+> +
+> +       if (!err) {
+> +               img_hash_copy_hash(req);
+> +               if (DRIVER_FLAGS_FINAL & hdev->flags)
+> +                       err = img_hash_finish(req);
+> +       } else {
+> +               ctx->flags |= DRIVER_FLAGS_ERROR;
+> +       }
+> +
+> +       hdev->flags &= ~(DRIVER_FLAGS_DMA_READY | DRIVER_FLAGS_OUTPUT_READY |
+> +               DRIVER_FLAGS_CPU | DRIVER_FLAGS_BUSY | DRIVER_FLAGS_FINAL);
+> +
+> +       clk_disable_unprepare(hdev->iclk);
+> +
+> +       if (req->base.complete)
+> +               req->base.complete(&req->base, err);
+> +
+> +       tasklet_schedule(&hdev->done_task);
+> +}
+> +
+> +static void img_hash_dma_callback(void *data)
+> +{
+> +       struct img_hash_dev *hdev = (struct img_hash_dev *) data;
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
+> +
+> +       if (ctx->bufcnt) {
+> +               img_hash_xmit_cpu(hdev, ctx->buffer, ctx->bufcnt, 0);
+> +               ctx->bufcnt = 0;
+> +       }
+> +       if (ctx->sg)
+> +               tasklet_schedule(&hdev->dma_task);
+> +}
+> +
+> +static int img_hash_update_dma(struct img_hash_dev *hdev)
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
+> +
+> +       img_hash_write_ctrl(hdev, 1);
+> +
+> +       pr_debug("xmit dma size: %d\n", ctx->total);
+
+For driver related messages, please use the equivalent dev_*() functions.
+
+> +
+> +       if (ctx->flags & DRIVER_FLAGS_FINUP && !ctx->total)
+> +               hdev->flags |= DRIVER_FLAGS_FINAL;
+> +
+> +       hdev->flags |= DRIVER_FLAGS_DMA_ACTIVE | DRIVER_FLAGS_FINAL;
+> +
+> +       tasklet_schedule(&hdev->dma_task);
+> +
+> +       return -EINPROGRESS;
+> +
+
+Extra newline.
+
+> +}
+> +
+> +static int img_hash_update_req(struct img_hash_dev *hdev)
+> +{
+> +       struct ahash_request *req = hdev->req;
+> +       int err = 0;
+> +
+> +       if (req->nbytes < IMG_HASH_DMA_THRESHOLD)
+> +               err = img_hash_update_cpu(hdev);
+> +       else
+> +               err = img_hash_update_dma(hdev);
+> +
+> +       return err;
+> +}
+> +
+> +static int img_hash_final_req(struct img_hash_dev *hdev)
+> +{
+> +       struct ahash_request *req = hdev->req;
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(req);
+> +       int err = 0;
+> +       int count = ctx->bufcnt;
+> +
+> +       ctx->bufcnt = 0;
+> +
+> +       if (req->nbytes  >= IMG_HASH_DMA_THRESHOLD) {
+> +               ctx->bufcnt = 0;
+> +               err = img_hash_update_dma(hdev);
+> +       } else {
+> +               err = img_hash_xmit_cpu(hdev, ctx->buffer, count, 1);
+> +       }
+> +
+> +       return err;
+> +}
+> +
+> +static int img_hash_hw_init(struct img_hash_dev *hdev)
+> +{
+> +       unsigned long long nbits;
+> +       u32 u, l;
+> +
+> +       clk_prepare_enable(hdev->iclk);
+> +
+> +       img_hash_write(hdev, CR_RESET, CR_RESET_SET);
+> +       img_hash_write(hdev, CR_RESET, CR_RESET_UNSET);
+> +       img_hash_write(hdev, CR_INTENAB, CR_INT_NEW_RESULTS_SET);
+> +
+> +       nbits = (hdev->req->nbytes << 3);
+> +       u = nbits >> 32;
+> +       l = nbits;
+> +       img_hash_write(hdev, CR_MESSAGE_LENGTH_H, u);
+> +       img_hash_write(hdev, CR_MESSAGE_LENGTH_L, l);
+> +
+> +       if (!(DRIVER_FLAGS_INIT & hdev->flags)) {
+> +               hdev->flags |= DRIVER_FLAGS_INIT;
+> +               hdev->err = 0;
+> +       }
+> +       pr_debug("hw initialized, nbits: %llx\n", nbits);
+> +       return 0;
+> +}
+> +
+> +static int img_hash_init(struct ahash_request *req)
+> +{
+> +       struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+> +       struct img_hash_ctx *tctx = crypto_ahash_ctx(tfm);
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(req);
+> +       struct img_hash_dev *hdev = NULL;
+> +       struct img_hash_dev *tmp;
+> +
+> +       spin_lock_bh(&img_hash.lock);
+> +       if (!tctx->hdev) {
+> +               list_for_each_entry(tmp, &img_hash.dev_list, list) {
+> +                       hdev = tmp;
+> +                       break;
+> +               }
+> +               tctx->hdev = hdev;
+> +
+> +       } else {
+> +               hdev = tctx->hdev;
+> +       }
+> +
+> +       spin_unlock_bh(&img_hash.lock);
+> +       ctx->hdev = hdev;
+> +       ctx->flags = 0;
+> +       ctx->digsize = crypto_ahash_digestsize(tfm);
+> +
+> +       switch (ctx->digsize) {
+> +       case SHA1_DIGEST_SIZE:
+> +               ctx->flags |= DRIVER_FLAGS_SHA1;
+> +               break;
+> +       case SHA256_DIGEST_SIZE:
+> +               ctx->flags |= DRIVER_FLAGS_SHA256;
+> +               break;
+> +       case SHA224_DIGEST_SIZE:
+> +               ctx->flags |= DRIVER_FLAGS_SHA224;
+> +               break;
+> +       case MD5_DIGEST_SIZE:
+> +               ctx->flags |= DRIVER_FLAGS_MD5;
+> +               break;
+> +       default:
+> +               return -EINVAL;
+> +       }
+> +
+> +       ctx->bufcnt = 0;
+> +       ctx->offset = 0;
+> +       ctx->sent = 0;
+> +       return 0;
+> +
+> +}
+> +
+> +static int img_hash_handle_queue(struct img_hash_dev *hdev,
+> +                               struct ahash_request *req)
+> +{
+> +       struct crypto_async_request *async_req, *backlog;
+> +       struct img_hash_request_ctx *ctx;
+> +       unsigned long flags;
+> +       int err = 0, res = 0;
+> +
+> +       spin_lock_irqsave(&hdev->lock, flags);
+> +
+> +       if (req)
+> +               res = ahash_enqueue_request(&hdev->queue, req);
+> +
+> +       if (DRIVER_FLAGS_BUSY & hdev->flags) {
+> +               spin_unlock_irqrestore(&hdev->lock, flags);
+> +               return res;
+> +       }
+> +
+> +       backlog = crypto_get_backlog(&hdev->queue);
+> +       async_req = crypto_dequeue_request(&hdev->queue);
+> +       if (async_req)
+> +               hdev->flags |= DRIVER_FLAGS_BUSY;
+> +
+> +       spin_unlock_irqrestore(&hdev->lock, flags);
+> +
+> +       if (!async_req)
+> +               return res;
+> +
+> +       if (backlog)
+> +               backlog->complete(backlog, -EINPROGRESS);
+> +
+> +       req = ahash_request_cast(async_req);
+> +       hdev->req = req;
+> +       ctx = ahash_request_ctx(req);
+> +
+> +       dev_info(hdev->dev, "handling new req, op: %lu, nbytes: %d\n",
+> +                                               ctx->op, req->nbytes);
+> +
+> +       err = img_hash_hw_init(hdev);
+> +
+> +       if (err)
+> +               goto err1;
+> +
+> +       if (ctx->op == OP_UPDATE) {
+> +               err = img_hash_update_req(hdev);
+> +               if (err != -EINPROGRESS && (ctx->flags & DRIVER_FLAGS_FINUP))
+> +                       /* update does not call final so must here */
+> +                       err = img_hash_final_req(hdev);
+> +       } else if (ctx->op == OP_FINAL) {
+> +               err = img_hash_final_req(hdev);
+> +       }
+> +
+> +err1:
+> +       if (err != -EINPROGRESS)
+> +               /* done_task will not finish so do it here */
+> +               img_hash_finish_req(req, err);
+> +
+> +       return res;
+> +}
+> +
+> +static int img_hash_enqueue(struct ahash_request *req, unsigned int op)
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(req);
+> +       struct img_hash_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
+> +       struct img_hash_dev *hdev = tctx->hdev;
+> +
+> +       ctx->op = op;
+> +
+> +       return img_hash_handle_queue(hdev, req);
+> +}
+> +
+> +static int img_hash_update(struct ahash_request *req)
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(req);
+> +
+> +       ctx->total = req->nbytes;
+> +       ctx->sg = req->src;
+> +       ctx->sgfirst = req->src;
+> +       ctx->nents = sg_nents(ctx->sg);
+> +
+> +       if (ctx->flags & DRIVER_FLAGS_FINUP) {
+> +               if (ctx->total < IMG_HASH_DMA_THRESHOLD)
+> +                       ctx->flags |= DRIVER_FLAGS_CPU;
+> +       }
+> +       return img_hash_enqueue(req, OP_UPDATE);
+> +}
+> +
+> +static int img_hash_final(struct ahash_request *req)
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(req);
+> +
+> +       ctx->flags |= DRIVER_FLAGS_FINUP;
+> +
+> +       if (ctx->flags & DRIVER_FLAGS_ERROR)
+> +               return 0;
+> +
+> +       if (ctx->bufcnt)
+> +               return img_hash_enqueue(req, OP_FINAL);
+> +
+> +       return img_hash_finish(req);
+> +}
+> +
+> +static int img_hash_finup(struct ahash_request *req)
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(req);
+> +       int err1, err2;
+> +
+> +       ctx->flags |= DRIVER_FLAGS_FINUP;
+> +
+> +       err1 = img_hash_update(req);
+> +       if (err1 == -EINPROGRESS || err1 == -EBUSY)
+> +               return err1;
+> +       err2 = img_hash_final(req);
+> +       return err1 ?: err2;
+> +}
+> +
+> +static int img_hash_digest(struct ahash_request *req)
+> +{
+> +       return img_hash_init(req) ?: img_hash_finup(req);
+> +}
+> +
+> +static int img_cra_hash_init_alg(struct crypto_tfm *tfm,
+> +                                       const char *base_alg_name)
+> +{
+> +       struct img_hash_ctx *ctx = crypto_tfm_ctx(tfm);
+> +       const char *alg_name = crypto_tfm_alg_name(tfm);
+> +       int err = -ENOMEM;
+> +
+> +       ctx->fallback = crypto_alloc_shash(alg_name, 0,
+> +                                               CRYPTO_ALG_NEED_FALLBACK);
+> +       if (IS_ERR(ctx->fallback)) {
+> +               pr_err("Could not load fallback driver.\n");
+> +               err = PTR_ERR(ctx->fallback);
+> +               goto err;
+> +       }
+> +       crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
+> +                                       sizeof(struct img_hash_request_ctx) +
+> +                                       IMG_HASH_DMA_THRESHOLD);
+> +
+> +       return 0;
+> +
+> +err:
+> +       return err;
+> +}
+> +
+> +static int img_cra_sha1_init(struct crypto_tfm *tfm)
+> +{
+> +       return img_cra_hash_init_alg(tfm, "sha1");
+> +}
+> +
+> +static int img_cra_sha224_init(struct crypto_tfm *tfm)
+> +{
+> +       return img_cra_hash_init_alg(tfm, "sha224");
+> +}
+> +
+> +static int img_cra_sha256_init(struct crypto_tfm *tfm)
+> +{
+> +       return img_cra_hash_init_alg(tfm, "sha256");
+> +}
+> +
+> +static int img_cra_md5_init(struct crypto_tfm *tfm)
+> +{
+> +       return img_cra_hash_init_alg(tfm, "md5");
+> +}
+> +
+> +static void img_hash_cra_exit(struct crypto_tfm *tfm)
+> +{
+> +       struct img_hash_ctx *tctx = crypto_tfm_ctx(tfm);
+> +
+> +       crypto_free_shash(tctx->fallback);
+> +}
+> +
+> +static irqreturn_t img_irq_handler(int irq, void *dev_id)
+> +{
+> +       struct img_hash_dev *hdev = dev_id;
+> +       u32 reg;
+> +
+> +       reg = img_hash_read(hdev, CR_INTSTAT);
+> +       img_hash_write(hdev, CR_INTCLEAR, reg);
+> +
+> +       if (reg & CR_INT_NEW_RESULTS_SET) {
+> +               dev_dbg(hdev->dev, "IRQ CR_INT_NEW_RESULTS_SET\n");
+> +               if (DRIVER_FLAGS_BUSY & hdev->flags) {
+> +                       hdev->flags |= DRIVER_FLAGS_OUTPUT_READY;
+> +                       if (!(DRIVER_FLAGS_CPU & hdev->flags))
+> +                               hdev->flags |= DRIVER_FLAGS_DMA_READY;
+> +                       tasklet_schedule(&hdev->done_task);
+> +               } else {
+> +                       dev_warn(hdev->dev,
+> +                               "HASH interrupt when no active requests.\n");
+> +               }
+> +
+
+Extra newline.
+
+> +       } else if (reg & CR_INT_RESULTS_AVAILABLE) {
+> +               dev_warn(hdev->dev, "IRQ CR_INT_RESULTS_AVAILABLE\n");
+> +       } else if (reg & CR_INT_RESULT_READ_ERR) {
+> +               dev_warn(hdev->dev, "IRQ CR_INT_RESULT_READ_ERR\n");
+> +       } else if (reg & CR_INT_MESSAGE_WRITE_ERROR) {
+> +               dev_warn(hdev->dev, "IRQ CR_INT_MESSAGE_WRITE_ERROR\n");
+
+Are the above three unexpected?  If so, the dev_warn() message would
+be more helpful if it indicated that.
+
+> +       }
+> +       return IRQ_HANDLED;
+> +}
+> +
+> +static struct ahash_alg img_algs[] = {
+> +       {
+> +       .init = img_hash_init,
+
+Indentation is off here.  Members of the struct should be indented one
+level from the open brace.
+
+> +       .update = img_hash_update,
+> +       .final = img_hash_final,
+> +       .finup = img_hash_finup,
+> +       .digest = img_hash_digest,
+> +       .halg = {
+> +               .digestsize = MD5_DIGEST_SIZE,
+> +               .base = {
+> +                       .cra_name = "md5",
+> +                               .cra_driver_name = "img-md5",
+> +                               .cra_priority = 301,
+> +                       .cra_flags =
+> +                       CRYPTO_ALG_ASYNC |
+> +                       CRYPTO_ALG_NEED_FALLBACK,
+> +                       .cra_blocksize = MD5_BLOCK_SIZE,
+> +                       .cra_ctxsize = sizeof(struct img_hash_ctx),
+> +                       .cra_init = img_cra_md5_init,
+> +                       .cra_exit = img_hash_cra_exit,
+> +                       .cra_module = THIS_MODULE,
+> +                       }
+> +               }
+> +       },
+> +       {
+> +       .init = img_hash_init,
+> +       .update = img_hash_update,
+> +       .final = img_hash_final,
+> +       .finup = img_hash_finup,
+> +       .digest = img_hash_digest,
+> +       .halg = {
+> +               .digestsize = SHA1_DIGEST_SIZE,
+> +               .base = {
+> +                       .cra_name = "sha1",
+> +                       .cra_driver_name = "img-sha1",
+> +                       .cra_priority = 3000,
+> +                       .cra_flags =
+> +                       CRYPTO_ALG_ASYNC |
+> +                       CRYPTO_ALG_NEED_FALLBACK,
+> +                       .cra_blocksize = SHA1_BLOCK_SIZE,
+> +                       .cra_ctxsize = sizeof(struct img_hash_ctx),
+> +                       .cra_init = img_cra_sha1_init,
+> +                       .cra_exit = img_hash_cra_exit,
+> +                       .cra_module = THIS_MODULE,
+> +                       }
+> +               }
+> +       },
+> +       {
+> +       .init = img_hash_init,
+> +       .update = img_hash_update,
+> +       .final = img_hash_final,
+> +       .finup = img_hash_finup,
+> +       .digest = img_hash_digest,
+> +       .halg = {
+> +               .digestsize = SHA224_DIGEST_SIZE,
+> +               .base = {
+> +                       .cra_name = "sha224",
+> +                       .cra_driver_name = "img-sha224",
+> +                       .cra_priority = 3000,
+> +                       .cra_flags =
+> +                       CRYPTO_ALG_ASYNC |
+> +                       CRYPTO_ALG_NEED_FALLBACK,
+> +                       .cra_blocksize = SHA224_BLOCK_SIZE,
+> +                       .cra_ctxsize = sizeof(struct img_hash_ctx),
+> +                       .cra_init = img_cra_sha224_init,
+> +                       .cra_exit = img_hash_cra_exit,
+> +                       .cra_module = THIS_MODULE,
+> +                       }
+> +               }
+> +       },
+> +       {
+> +       .init = img_hash_init,
+> +       .update = img_hash_update,
+> +       .final = img_hash_final,
+> +       .finup = img_hash_finup,
+> +       .digest = img_hash_digest,
+> +       .halg = {
+> +               .digestsize = SHA256_DIGEST_SIZE,
+> +               .base = {
+> +                       .cra_name = "sha256",
+> +                       .cra_driver_name = "img-sha256",
+> +                       .cra_priority = 301,
+> +                       .cra_flags =
+> +                       CRYPTO_ALG_ASYNC |
+> +                       CRYPTO_ALG_NEED_FALLBACK,
+> +                       .cra_blocksize = SHA256_BLOCK_SIZE,
+> +                       .cra_ctxsize = sizeof(struct img_hash_ctx),
+> +                       .cra_init = img_cra_sha256_init,
+> +                       .cra_exit = img_hash_cra_exit,
+> +                       .cra_module = THIS_MODULE,
+> +                       }
+> +               }
+> +       }
+> +};
+> +
+> +static int img_register_algs(struct img_hash_dev *hdev)
+> +{
+> +       int i, err;
+> +
+> +       for (i = 0; i < ARRAY_SIZE(img_algs); i++) {
+> +               err = crypto_register_ahash(&img_algs[i]);
+> +               if (err)
+> +                       goto err_reg;
+> +       }
+> +       return 0;
+> +
+> +err_reg:
+> +       for (; i--; )
+> +               crypto_unregister_ahash(&img_algs[i]);
+> +
+> +       return err;
+> +}
+> +
+> +static int img_unregister_algs(struct img_hash_dev *hdev)
+> +{
+> +       int i;
+> +
+> +       for (i = 0; i < ARRAY_SIZE(img_algs); i++)
+> +               crypto_unregister_ahash(&img_algs[i]);
+> +       return 0;
+> +}
+> +
+> +static int img_hash_update_dma_stop(struct img_hash_dev *hdev)
+> +{
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
+> +
+> +       if (ctx->flags & DRIVER_FLAGS_SG)
+> +               dma_unmap_sg(hdev->dev, ctx->sg, ctx->dma_ct, DMA_TO_DEVICE);
+> +
+> +       return 0;
+> +}
+> +
+> +static void img_hash_done_task(unsigned long data)
+> +{
+> +       struct img_hash_dev *hdev = (struct img_hash_dev *) data;
+> +       int err = 0;
+> +
+> +       if (!(DRIVER_FLAGS_BUSY & hdev->flags)) {
+> +               img_hash_handle_queue(hdev, NULL);
+> +               return;
+> +       }
+> +
+> +       if (DRIVER_FLAGS_CPU & hdev->flags) {
+> +               if (DRIVER_FLAGS_OUTPUT_READY & hdev->flags) {
+> +                       hdev->flags &= ~DRIVER_FLAGS_OUTPUT_READY;
+> +                       goto finish;
+> +               }
+> +       } else if (DRIVER_FLAGS_DMA_READY & hdev->flags) {
+> +               if (DRIVER_FLAGS_DMA_ACTIVE & hdev->flags) {
+> +                       hdev->flags &= ~DRIVER_FLAGS_DMA_ACTIVE;
+> +                       img_hash_update_dma_stop(hdev);
+> +                       if (hdev->err) {
+> +                               err = hdev->err;
+> +                               goto finish;
+> +                       }
+> +               }
+> +               if (DRIVER_FLAGS_OUTPUT_READY & hdev->flags) {
+> +                       hdev->flags &= ~(DRIVER_FLAGS_DMA_READY |
+> +                                       DRIVER_FLAGS_OUTPUT_READY);
+> +                       goto finish;
+> +               }
+> +       }
+> +       return;
+> +
+> +finish:
+> +       img_hash_finish_req(hdev->req, err);
+> +}
+> +
+> +static void img_hash_xmit_dma(struct img_hash_dev *hdev, struct scatterlist *sg)
+> +{
+> +       struct dma_async_tx_descriptor *desc;
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
+> +
+> +       ctx->dma_ct = dma_map_sg(hdev->dev, sg, 1, DMA_MEM_TO_DEV);
+> +       if (ctx->dma_ct == 0) {
+> +               dev_err(hdev->dev, "Invalid DMA sg\n");
+> +               hdev->err = -EINVAL;
+> +               return;
+> +       }
+> +
+> +       desc = dmaengine_prep_slave_sg(hdev->dma_lch,
+> +                                       sg,
+> +                                       ctx->dma_ct,
+> +                                       DMA_MEM_TO_DEV,
+> +                                       DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
+> +       if (!desc) {
+> +               dev_err(hdev->dev, "Null DMA descriptor\n");
+> +               hdev->err = -EINVAL;
+> +               return;
+> +       }
+> +       desc->callback = img_hash_dma_callback;
+> +       desc->callback_param = hdev;
+> +       dmaengine_submit(desc);
+> +       dma_async_issue_pending(hdev->dma_lch);
+> +}
+> +
+> +static void img_hash_dma_task(unsigned long d)
+> +{
+> +       struct img_hash_dev *hdev = (struct img_hash_dev *) d;
+> +       struct img_hash_request_ctx *ctx = ahash_request_ctx(hdev->req);
+> +       char *addr;
+
+u8 *?
+
+> +       size_t nbytes, bleft, bsend, len, tbc;
+> +       struct scatterlist tsg;
+> +
+> +       if (!ctx->sg)
+> +               return;
+> +       if (!hdev)
+> +               pr_err("invalid ptr for hash device");
+
+This shouldn't be possible.
+
+> +
+> +       addr = sg_virt(ctx->sg);
+> +       nbytes = ctx->sg->length - ctx->offset;
+> +       bleft = nbytes % 4;
+> +       bsend = (nbytes / 4);
+> +
+> +
+
+Extra newline.
+
+> +       if (bsend) {
+> +               sg_init_one(&tsg, addr + ctx->offset, bsend * 4);
+> +               img_hash_xmit_dma(hdev, &tsg);
+> +               ctx->sent += bsend * 4;
+> +       }
+> +
+> +       if (bleft) {
+> +               ctx->bufcnt = sg_pcopy_to_buffer(ctx->sgfirst, ctx->nents,
+> +                                       ctx->buffer, bleft, ctx->sent);
+> +               tbc = 0;
+> +               ctx->sg = sg_next(ctx->sg);
+> +               while (ctx->sg && (ctx->bufcnt < 4)) {
+> +                       len = ctx->sg->length;
+> +                       if (likely(len > (4 - ctx->bufcnt)))
+> +                               len = 4 - ctx->bufcnt;
+> +                       tbc = sg_pcopy_to_buffer(ctx->sgfirst, ctx->nents,
+> +                                       ctx->buffer + ctx->bufcnt, len,
+> +                                       ctx->sent + ctx->bufcnt);
+> +                       ctx->bufcnt += tbc;
+> +                       if (tbc >= ctx->sg->length) {
+> +                               ctx->sg = sg_next(ctx->sg);
+> +                               tbc = 0;
+> +                       }
+> +               }
+> +
+> +               ctx->sent += ctx->bufcnt;
+> +               ctx->offset = tbc;
+> +
+> +               if (!bsend)
+> +                       img_hash_dma_callback(hdev);
+
+The chunk above deserves a comment.  It's really not obvious as to
+what's going on here or why it's necessary.  It looks like it's meant
+to deal with extra bytes if the size is not a multiple of 4, but I'm
+not sure why we can't just DMA those bytes as well - it's not like
+we're capable of transmitting less than 32-bits with xmit_cpu either.
+
+> +       } else {
+> +               ctx->offset = 0;
+> +               ctx->sg = sg_next(ctx->sg);
+> +
+> +       }
+> +}
+
+The placement of the above 4 functions is strange.  I would expect to
+see them near their non-DMA counterparts.
+
+> +static int img_hash_dma_init(struct img_hash_dev *hdev)
+> +{
+> +       int err = -EINVAL;
+> +
+> +       hdev->dma_lch = dma_request_slave_channel(hdev->dev, "tx");
+> +       if (!hdev->dma_lch) {
+> +               dev_err(hdev->dev, "Couldn't aquire a slave DMA channel.\n");
+> +               return -EBUSY;
+> +       }
+> +       hdev->dma_conf.direction = DMA_MEM_TO_DEV;
+> +       hdev->dma_conf.dst_addr = hdev->bus_addr;
+> +       hdev->dma_conf.dst_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
+> +       hdev->dma_conf.dst_maxburst = 16;
+> +       hdev->dma_conf.device_fc = false;
+> +
+> +       err = dmaengine_slave_config(hdev->dma_lch,  &hdev->dma_conf);
+> +       if (err) {
+> +               dev_err(hdev->dev, "Couldn't configure DMA slave.\n");
+> +               return err;
+> +       }
+> +       return 0;
+> +}
+> +
+> +static const struct of_device_id img_hash_match[] = {
+> +       { .compatible = "img,img-hash-accelerator-rev1" },
+> +       {}
+> +};
+> +MODULE_DEVICE_TABLE(of, img_hash_match)
+> +
+> +static int img_hash_probe(struct platform_device *pdev)
+> +{
+> +       struct img_hash_dev *hdev;
+> +       struct device *dev = &pdev->dev;
+> +       struct resource *hash_res;
+> +       int err;
+> +
+> +       hdev = devm_kzalloc(dev, sizeof(*hdev), GFP_KERNEL);
+> +       if (hdev == NULL) {
+> +               err = -ENOMEM;
+> +               goto sha_dev_err;
+
+You can probably just return here.  The driver core will print an
+error whenever a probe() fails.
+
+> +       }
+> +       spin_lock_init(&hdev->lock);
+> +
+> +       hdev->dev = dev;
+> +
+> +       platform_set_drvdata(pdev, hdev);
+> +
+> +       INIT_LIST_HEAD(&hdev->list);
+> +
+> +       tasklet_init(&hdev->done_task, img_hash_done_task,
+> +               (unsigned long) hdev);
+> +       tasklet_init(&hdev->dma_task, img_hash_dma_task,
+> +               (unsigned long) hdev);
+> +
+> +       crypto_init_queue(&hdev->queue, IMG_HASH_QUEUE_LENGTH);
+> +
+> +       hash_res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> +       if (!hash_res) {
+> +               dev_err(dev, "no MEM resource info\n");
+> +               err = -ENODEV;
+> +               goto res_err;
+> +       }
+
+No need for the error check here.  devm_ioremap_resource() will handle
+a NULL resource.
+
+> +       hdev->io_base = devm_ioremap_resource(dev, hash_res);
+> +       if (!hdev->io_base) {
+
+devm_ioremap_resource() returns an ERR_PTR() on error, not NULL.
+
+> +               dev_err(dev, "can't ioremap\n");
+> +               err = -ENOMEM;
+> +               goto hash_io_err;
+> +       }
+> +
+> +       hash_res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+> +       if (!hash_res) {
+> +               dev_err(dev, "no MEM resource info\n");
+> +               err = -ENODEV;
+> +               goto res_err;
+> +       }
+> +       hdev->bus_addr = hash_res->start;
+> +       hdev->cpu_addr = devm_ioremap_resource(dev, hash_res);
+
+Need to check return value.
+
+> +       hdev->irq = platform_get_irq(pdev, 0);
+> +       if (hdev->irq < 0) {
+> +               dev_err(dev, "no IRQ resource info\n");
+> +               err = hdev->irq;
+> +               goto res_err;
+> +       }
+> +
+> +       err = devm_request_irq(dev, hdev->irq, img_irq_handler, 0,
+> +                       "img-hash-accelerator-rev1", hdev);
+
+You could use dev_name(dev).
+
+> +       if (err) {
+> +               dev_err(dev, "unable to request img-hash-accelerator irq\n");
+> +               goto res_err;
+> +       }
+> +       dev_info(dev, "using IRQ channel %d\n", hdev->irq);
+
+dev_info() is a bit much.  Maybe just remove it or make it dev_dbg().
+
+> +
+> +       hdev->iclk = devm_clk_get(&pdev->dev, "hash_clk");
+> +       if (IS_ERR(hdev->iclk)) {
+> +               dev_err(dev, "clock initialization failed.\n");
+> +               err = PTR_ERR(hdev->iclk);
+> +               goto clk_err;
+> +       }
+> +
+> +       err = img_hash_dma_init(hdev);
+> +       if (err)
+> +               goto err_dma;
+> +
+> +       dev_info(dev, "using %s for DMA transfers\n",
+> +                       dma_chan_name(hdev->dma_lch));
+
+Ditto.
+
+> +
+> +       spin_lock(&img_hash.lock);
+> +       list_add_tail(&hdev->list, &img_hash.dev_list);
+> +       spin_unlock(&img_hash.lock);
+> +
+> +       err = img_register_algs(hdev);
+> +       if (err)
+> +               goto err_algs;
+> +       dev_info(dev, "data bus: 0x%x;\tsize:0x%x\n", hdev->bus_addr, 0x4);
+> +       dev_info(dev, "Img MD5/SHA1/SHA224/SHA256 Hardware accelerator initialized\n");
+> +
+> +       return 0;
+> +
+> +err_algs:
+> +       spin_lock(&img_hash.lock);
+> +       list_del(&hdev->list);
+> +       spin_unlock(&img_hash.lock);
+> +       dma_release_channel(hdev->dma_lch);
+> +err_dma:
+> +       iounmap(hdev->io_base);
+
+I think Vladimir mentioned this, but resources allocated with the
+devres API usually do not need to be explicitly freed, and if they do,
+they should be done with the corresponding devm_* free function.
+
+> +hash_io_err:
+> +       clk_put(hdev->iclk);
+> +clk_err:
+> +res_err:
+> +       tasklet_kill(&hdev->done_task);
+> +sha_dev_err:
+> +       dev_err(dev, "initialization failed.\n");
+> +       return err;
+> +}
+> +
+> +static void img_hash_dma_cleanup(struct img_hash_dev *hdev)
+> +{
+> +       dma_release_channel(hdev->dma_lch);
+> +}
+> +
+> +static int img_hash_remove(struct platform_device *pdev)
+> +{
+> +       static struct img_hash_dev *hdev;
+> +
+> +       hdev = platform_get_drvdata(pdev);
+> +       if (!hdev)
+> +               return -ENODEV;
+
+This shouldn't be possible.
+
+> +       spin_lock(&img_hash.lock);
+> +       list_del(&hdev->list);
+> +       spin_unlock(&img_hash.lock);
+> +
+> +       img_unregister_algs(hdev);
+> +
+> +       tasklet_kill(&hdev->done_task);
+> +       tasklet_kill(&hdev->dma_task);
+> +       img_hash_dma_cleanup(hdev);
+> +
+> +       iounmap(hdev->io_base);
+> +       return 0;
+> +}
+> +
+> +static struct platform_driver img_hash_driver = {
+> +       .probe          = img_hash_probe,
+> +       .remove         = img_hash_remove,
+> +       .driver         = {
+> +               .name   = "img-hash-accelerator-rev1",
+> +               .of_match_table = of_match_ptr(img_hash_match),
+> +       }
+> +};
+> +module_platform_driver(img_hash_driver);
+> +
+> +MODULE_LICENSE("GPL v2");
+> +MODULE_DESCRIPTION("Imgtec SHA1/224/256 & MD5 hw accelerator driver");
+> +MODULE_AUTHOR("Will Thomas.");
+> +
+
+Extra newline.
