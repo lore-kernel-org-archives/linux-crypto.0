@@ -1,48 +1,64 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RFC 4/4] crypto: qat - Add new algif interface for
- userspace
-Date: Fri, 14 Nov 2014 09:29:26 +0800
-Message-ID: <20141114012926.GA10823@gondor.apana.org.au>
-References: <20141106195931.13328.90501.stgit@tstruk-mobl1>
- <20141106195953.13328.77022.stgit@tstruk-mobl1>
- <20141107025607.GA9474@gondor.apana.org.au>
- <545C3FDB.4010106@intel.com>
- <20141107040531.GA9865@gondor.apana.org.au>
- <545C5786.4030205@intel.com>
- <20141107053105.GA17825@gondor.apana.org.au>
- <545D2200.2020107@intel.com>
- <20141114011911.GA10647@gondor.apana.org.au>
- <54655A09.9000800@intel.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] crypto: Documentation - document uncovered member variables
+Date: Fri, 14 Nov 2014 05:26:21 +0100
+Message-ID: <1910451.sH207F56nk@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60762 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933754AbaKNB32 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 13 Nov 2014 20:29:28 -0500
-Content-Disposition: inline
-In-Reply-To: <54655A09.9000800@intel.com>
+Received: from mail.eperm.de ([89.247.134.16]:54546 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S934409AbaKNE1p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 13 Nov 2014 23:27:45 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S7119> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Fri, 14 Nov 2014 05:27:40 +0100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 13, 2014 at 05:25:29PM -0800, Tadeusz Struk wrote:
-> Hi Herbert,
-> On 11/13/2014 05:19 PM, Herbert Xu wrote:
-> >> > This way I can get much higher throughput than with algif_skcipher.
-> > Yes that's a worthy optimisation.  See if you can change the
-> > current implementation (without changing the interface) to achieve
-> > this.
-> Ok, I'll have a look. What about the asymmetric algorithms?
+Fix documentation typo for shash_alg->descsize.
 
-I will be taking a look at them but it'll be a while before I
-get some free time to do so.
+Add documentation for initially uncovered member variables.
 
-Cheers,
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ include/crypto/hash.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 3d66e8b..98abda9 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -38,6 +38,10 @@ struct crypto_ahash;
+  *	       will save the partial state of the transformation into it. On the
+  *	       other side, the @import function will load the state from a
+  *	       buffer of this size as well.
++ * @base: Start of data structure of cipher algorithm. The common data
++ *	  structure of crypto_alg contains information common to all ciphers.
++ *	  The hash_alg_common data structure now adds the hash-specific
++ *	  information.
+  */
+ struct hash_alg_common {
+ 	unsigned int digestsize;
+@@ -114,6 +118,7 @@ struct ahash_request {
+  *	    entire state of the ongoing transformation from a provided block of
+  *	    data so the transformation can continue from this point onward. No
+  *	    data processing happens at this point.
++ * @halg: see struct hash_alg_common
+  */
+ struct ahash_alg {
+ 	int (*init)(struct ahash_request *req);
+@@ -153,7 +158,7 @@ struct shash_desc {
+  * @setkey: see struct ahash_alg
+  * @digestsize: see struct ahash_alg
+  * @statesize: see struct ahash_alg
+- * @dedcsize: Size of the operational state for the message digest. This state
++ * @descsize: Size of the operational state for the message digest. This state
+  * 	      size is the memory size that needs to be allocated for
+  *	      shash_desc.__ctx
+  * @base: internally used
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.1.0
