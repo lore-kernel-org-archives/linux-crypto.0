@@ -1,52 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: simd: Allow simd use in kernel threads with softirqs disabled
-Date: Sat, 15 Nov 2014 10:28:32 +0800
-Message-ID: <20141115022832.GA18950@gondor.apana.org.au>
-References: <20141114154315.GA15771@gondor.apana.org.au>
- <CAKv+Gu8gB-WwM81iDuFsd+Nh8tR3D1H53pAf5w1p1botE8uWHQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: aesni-intel - avoid IPsec re-ordering
+Date: Sat, 15 Nov 2014 11:15:50 +0800
+Message-ID: <20141115031549.GA19208@gondor.apana.org.au>
+References: <1415771371-30774-1-git-send-email-ming.liu@windriver.com>
+ <20141112084138.GL6390@secunet.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "H. Peter Anvin" <hpa@linux.intel.com>,
-	Suresh Siddha <sbsiddha@gmail.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Ming Liu <ming.liu@windriver.com>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Ming Liu <ming.liu@windriver.com>, davem@davemloft.net,
+	ying.xue@windriver.com, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:35788 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:45736 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751719AbaKOC3T (ORCPT
+	with ESMTP id S934166AbaKODP7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Nov 2014 21:29:19 -0500
+	Fri, 14 Nov 2014 22:15:59 -0500
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8gB-WwM81iDuFsd+Nh8tR3D1H53pAf5w1p1botE8uWHQ@mail.gmail.com>
+In-Reply-To: <20141112084138.GL6390@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 14, 2014 at 05:17:05PM +0100, Ard Biesheuvel wrote:
-> On 14 November 2014 16:43, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > While working on the cryptd request reordering problem, I noticed
-> > an anomaly where kernel threads are normally allowed to use simd
-> > per may_use_simd, but as soon as you disable softirqs, they suddenly
-> > lose that ability for no good reason.
-> >
-> > The problem is that in_interrupt does not distinguish between
-> > softirq processing and simply having softirqs disabled.  This
-> > patch creates a new helper in_serving_interrupt which makes that
-> > distinction.  It then uses this in all current implementations
-> > of may_use_simd.
-> >
-> 
-> Isn't that a much more widespread problem if in_interrupt() yields
-> true while no interrupt is being served?
+On Wed, Nov 12, 2014 at 09:41:38AM +0100, Steffen Klassert wrote:
+>
+> Everything below the local_bh_enable() should not run in atomic context
+> as the subsequent functions may set the CRYPTO_TFM_REQ_MAY_SLEEP flag.
 
-Good point.  Other users of in_interrupt() are just as likely to
-really want the in_serving version.  However, the safe option is
-to leave them unchanged until we audit each single one.
+Actually I'm thinking of doing exactly that (disabling softirq in
+cryptd) to fix the reordering problem.
 
-If it turns out that all users of in_interrupt() decay into
-in_serving_interrupt() then we could remove in_interrupt().
+Most threads do not use the FPU/SIMD so cryptd is only ever needed
+when we have a user-space app that touches the FPU/SIMD which then
+gets an interrupt to perform crypto in softirq.  So forcing cryptd
+on everyone just because some apps touch the FPU/SIMD is a non-
+starter.
+
+The most straightforward solution is to always defer to cryptd once
+it gets started.  This is bad because if a rarely used app that
+touches FPU/SIMD runs then we'll end up stuck in cryptd long after
+the app goes away.
+
+So what I'm thinking of is to have the softirq path forcibly regain
+control from cryptd where possible.  This is tricky because cryptd
+might be in the middle of processing a request.  So that's why I'd
+like to disable softirqs while we're processing a request.
 
 Cheers,
 -- 
