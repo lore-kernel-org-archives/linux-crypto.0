@@ -1,12 +1,14 @@
-From: Corentin LABBE <clabbe.montjoie@gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [PATCH 1/2] crypto: Add Imagination Technologies hw hash accelerator
-Date: Sat, 15 Nov 2014 08:55:58 +0100
-Message-ID: <5467070E.5040104@gmail.com>
-References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com>	<1415621455-10468-2-git-send-email-james.hartley@imgtec.com> <CAL1qeaGN9q_WHP2YJ3fY3r11v0pitcmwbjam5dRzeZhHCp7c8g@mail.gmail.com>
+Date: Sat, 15 Nov 2014 12:08:30 +0100
+Message-ID: <2542656.2ocf2Vp6rc@wuerfel>
+References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com> <1415621455-10468-2-git-send-email-james.hartley@imgtec.com> <CAL1qeaGN9q_WHP2YJ3fY3r11v0pitcmwbjam5dRzeZhHCp7c8g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: davem@davemloft.net, Grant Likely <grant.likely@linaro.org>,
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: James Hartley <james.hartley@imgtec.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+	Grant Likely <grant.likely@linaro.org>,
 	Rob Herring <robh+dt@kernel.org>,
 	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -18,61 +20,36 @@ Cc: davem@davemloft.net, Grant Likely <grant.likely@linaro.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Ian Campbell <ijc+devicetree@hellion.org.uk>,
 	Kumar Gala <galak@codeaurora.org>,
-	Ezequiel Garcia <ezequiel.garcia@imgtec.com>,
-	linux-crypto@vger.kernel.org
-To: Andrew Bresticker <abrestic@chromium.org>,
-	James Hartley <james.hartley@imgtec.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+	Ezequiel Garcia <ezequiel.garcia@imgtec.com>
+To: Andrew Bresticker <abrestic@chromium.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:33345 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751273AbaKOH4D (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.130]:52261 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752401AbaKOLJA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 15 Nov 2014 02:56:03 -0500
+	Sat, 15 Nov 2014 06:09:00 -0500
 In-Reply-To: <CAL1qeaGN9q_WHP2YJ3fY3r11v0pitcmwbjam5dRzeZhHCp7c8g@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Le 15/11/2014 00:59, Andrew Bresticker a =C3=A9crit :
-> Hi James,
->=20
->> +
->> +struct img_hash_drv {
->> +       struct list_head dev_list;
->> +       spinlock_t lock;
->> +};
->> +
->> +static struct img_hash_drv img_hash =3D {
->> +       .dev_list =3D LIST_HEAD_INIT(img_hash.dev_list),
->> +       .lock =3D __SPIN_LOCK_UNLOCKED(img_hash.lock),
->> +};
->=20
-> It looks like the only purpose of this list is to get the
-> corresponding struct img_hash_dev in img_hash_init().  If there's
-> never going to be multiple instances within an SoC, perhaps you could
-> just use a global?  Otherwise, you could do something like the
-> qualcomm driver, see drivers/crypto/qce/sha.c.  It looks like there i=
-s
-> some precedent for this device list though...
->=20
+On Friday 14 November 2014 15:59:02 Andrew Bresticker wrote:
+> > diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> > index 2fb0fdf..4b931eb 100644
+> > --- a/drivers/crypto/Kconfig
+> > +++ b/drivers/crypto/Kconfig
+> > @@ -436,4 +436,17 @@ config CRYPTO_DEV_QCE
+> >           hardware. To compile this driver as a module, choose M here. The
+> >           module will be called qcrypto.
+> >
+> > +config CRYPTO_DEV_IMGTEC_HASH
+> > +        tristate "Imagination Technologies hardware hash accelerator"
+> 
+> Is there no meaningful depends-on here?  There's no MACH_PISTACHIO
+> yet, but perhaps MIPS for now?  Also, {readl,writel}_relaxed aren't
+> available on all architectures.
+> 
 
-I don't understand, you propose to use a global, something that lots of=
- people want to be removed in my driver.
-It is not better than this global list.
+I've queued up support for {readl,writel}_relaxed on all architectures
+for 3.19, based on a series from Will Deacon.
 
-I have the fealing that there no good way to get a pointer to a driver =
-structure inside the cryptoAPI.
-What to you think about adding a void *data in struct crypto_alg
-
-Before registering an alg you could do:
-mv_aes_alg_ecb.data =3D myprivatedriverdata;
-ret =3D crypto_register_alg(&mv_aes_alg_ecb);
-
-and then get it via
-struct crypto_priv *cp =3D req->base.tfm->__crt_alg->data;
-(a function will be better than that)
-
-So what is the recommended way to get driver structure inside the crypt=
-oAPI function (init/udpate/final)?
-
-Regards
+	Arnd
