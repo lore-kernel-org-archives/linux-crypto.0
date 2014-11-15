@@ -1,52 +1,78 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: aesni-intel - avoid IPsec re-ordering
-Date: Sat, 15 Nov 2014 11:15:50 +0800
-Message-ID: <20141115031549.GA19208@gondor.apana.org.au>
-References: <1415771371-30774-1-git-send-email-ming.liu@windriver.com>
- <20141112084138.GL6390@secunet.com>
+From: Corentin LABBE <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH 1/2] crypto: Add Imagination Technologies hw hash accelerator
+Date: Sat, 15 Nov 2014 08:55:58 +0100
+Message-ID: <5467070E.5040104@gmail.com>
+References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com>	<1415621455-10468-2-git-send-email-james.hartley@imgtec.com> <CAL1qeaGN9q_WHP2YJ3fY3r11v0pitcmwbjam5dRzeZhHCp7c8g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Ming Liu <ming.liu@windriver.com>, davem@davemloft.net,
-	ying.xue@windriver.com, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: davem@davemloft.net, Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	joe@perches.com, mchehab@osg.samsung.com,
+	Antti Palosaari <crope@iki.fi>, jg1.han@samsung.com,
+	linux-crypto@vger.kernel.org,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	Ezequiel Garcia <ezequiel.garcia@imgtec.com>,
+	linux-crypto@vger.kernel.org
+To: Andrew Bresticker <abrestic@chromium.org>,
+	James Hartley <james.hartley@imgtec.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:45736 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934166AbaKODP7 (ORCPT
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:33345 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751273AbaKOH4D (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 14 Nov 2014 22:15:59 -0500
-Content-Disposition: inline
-In-Reply-To: <20141112084138.GL6390@secunet.com>
+	Sat, 15 Nov 2014 02:56:03 -0500
+In-Reply-To: <CAL1qeaGN9q_WHP2YJ3fY3r11v0pitcmwbjam5dRzeZhHCp7c8g@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 12, 2014 at 09:41:38AM +0100, Steffen Klassert wrote:
->
-> Everything below the local_bh_enable() should not run in atomic context
-> as the subsequent functions may set the CRYPTO_TFM_REQ_MAY_SLEEP flag.
+Le 15/11/2014 00:59, Andrew Bresticker a =C3=A9crit :
+> Hi James,
+>=20
+>> +
+>> +struct img_hash_drv {
+>> +       struct list_head dev_list;
+>> +       spinlock_t lock;
+>> +};
+>> +
+>> +static struct img_hash_drv img_hash =3D {
+>> +       .dev_list =3D LIST_HEAD_INIT(img_hash.dev_list),
+>> +       .lock =3D __SPIN_LOCK_UNLOCKED(img_hash.lock),
+>> +};
+>=20
+> It looks like the only purpose of this list is to get the
+> corresponding struct img_hash_dev in img_hash_init().  If there's
+> never going to be multiple instances within an SoC, perhaps you could
+> just use a global?  Otherwise, you could do something like the
+> qualcomm driver, see drivers/crypto/qce/sha.c.  It looks like there i=
+s
+> some precedent for this device list though...
+>=20
 
-Actually I'm thinking of doing exactly that (disabling softirq in
-cryptd) to fix the reordering problem.
+I don't understand, you propose to use a global, something that lots of=
+ people want to be removed in my driver.
+It is not better than this global list.
 
-Most threads do not use the FPU/SIMD so cryptd is only ever needed
-when we have a user-space app that touches the FPU/SIMD which then
-gets an interrupt to perform crypto in softirq.  So forcing cryptd
-on everyone just because some apps touch the FPU/SIMD is a non-
-starter.
+I have the fealing that there no good way to get a pointer to a driver =
+structure inside the cryptoAPI.
+What to you think about adding a void *data in struct crypto_alg
 
-The most straightforward solution is to always defer to cryptd once
-it gets started.  This is bad because if a rarely used app that
-touches FPU/SIMD runs then we'll end up stuck in cryptd long after
-the app goes away.
+Before registering an alg you could do:
+mv_aes_alg_ecb.data =3D myprivatedriverdata;
+ret =3D crypto_register_alg(&mv_aes_alg_ecb);
 
-So what I'm thinking of is to have the softirq path forcibly regain
-control from cryptd where possible.  This is tricky because cryptd
-might be in the middle of processing a request.  So that's why I'd
-like to disable softirqs while we're processing a request.
+and then get it via
+struct crypto_priv *cp =3D req->base.tfm->__crt_alg->data;
+(a function will be better than that)
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+So what is the recommended way to get driver structure inside the crypt=
+oAPI function (init/udpate/final)?
+
+Regards
