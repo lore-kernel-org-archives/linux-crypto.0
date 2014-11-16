@@ -1,55 +1,114 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 1/2] crypto: Add Imagination Technologies hw hash accelerator
-Date: Sat, 15 Nov 2014 12:08:30 +0100
-Message-ID: <2542656.2ocf2Vp6rc@wuerfel>
-References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com> <1415621455-10468-2-git-send-email-james.hartley@imgtec.com> <CAL1qeaGN9q_WHP2YJ3fY3r11v0pitcmwbjam5dRzeZhHCp7c8g@mail.gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2 09/10] crypto: AF_ALG: user space interface for hash info
+Date: Sun, 16 Nov 2014 03:28:52 +0100
+Message-ID: <1907032.lnybFlp3cC@tachyon.chronox.de>
+References: <5365136.g8vbXlhRyC@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: James Hartley <james.hartley@imgtec.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-	Grant Likely <grant.likely@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	joe@perches.com, mchehab@osg.samsung.com,
-	Antti Palosaari <crope@iki.fi>, jg1.han@samsung.com,
-	linux-crypto@vger.kernel.org,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Ezequiel Garcia <ezequiel.garcia@imgtec.com>
-To: Andrew Bresticker <abrestic@chromium.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.130]:52261 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752401AbaKOLJA (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 15 Nov 2014 06:09:00 -0500
-In-Reply-To: <CAL1qeaGN9q_WHP2YJ3fY3r11v0pitcmwbjam5dRzeZhHCp7c8g@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Daniel Borkmann <dborkman@redhat.com>, quentin.gouchet@gmail.com,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, ABI/API <linux-api@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <5365136.g8vbXlhRyC@tachyon.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Friday 14 November 2014 15:59:02 Andrew Bresticker wrote:
-> > diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> > index 2fb0fdf..4b931eb 100644
-> > --- a/drivers/crypto/Kconfig
-> > +++ b/drivers/crypto/Kconfig
-> > @@ -436,4 +436,17 @@ config CRYPTO_DEV_QCE
-> >           hardware. To compile this driver as a module, choose M here. The
-> >           module will be called qcrypto.
-> >
-> > +config CRYPTO_DEV_IMGTEC_HASH
-> > +        tristate "Imagination Technologies hardware hash accelerator"
-> 
-> Is there no meaningful depends-on here?  There's no MACH_PISTACHIO
-> yet, but perhaps MIPS for now?  Also, {readl,writel}_relaxed aren't
-> available on all architectures.
-> 
+The AF_ALG interface allows normal cipher (hash, encrypt, decrypt).
+However, it does not allow user space to obtain the following generic
+information about the currently active hash:
 
-I've queued up support for {readl,writel}_relaxed on all architectures
-for 3.19, based on a series from Will Deacon.
+	* digestsize
 
-	Arnd
+The patch adds a getsockopt interface for the hash ciphers to
+answer such information requests from user space.
+
+The kernel crypto API function calls are used to obtain the real data.
+As all data are simple integer values, the getsockopt handler function
+uses put_user() to return the integer value to user space in the
+*optval parameter of getsockopt.
+
+A fully working example using the digestsize interface is provided at
+http://www.chronox.de/libkcapi.html
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/algif_hash.c         | 35 ++++++++++++++++++++++++++++++++++-
+ include/uapi/linux/if_alg.h |  1 +
+ 2 files changed, 35 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index f75db4c..68ae34c 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -216,6 +216,39 @@ static int hash_accept(struct socket *sock, struct socket *newsock, int flags)
+ 	return err;
+ }
+ 
++static int hash_getsockopt(struct socket *sock, int level, int optname,
++			   char __user *optval, int __user *optlen)
++{
++	struct sock *sk = sock->sk;
++	struct alg_sock *ask = alg_sk(sk);
++	struct hash_ctx *ctx = ask->private;
++	const struct af_alg_type *type;
++	int len = 0;
++	int err = -EOPNOTSUPP;
++
++	lock_sock(sk);
++	type = ask->type;
++
++	if (level != SOL_ALG || !type)
++		goto unlock;
++
++	switch (optname) {
++	case ALG_GET_DIGESTSIZE:
++		len = crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req));
++		err = 0;
++		break;
++	default:
++		break;
++	}
++
++unlock:
++	release_sock(sk);
++	if (err >= 0)
++		err = put_user(len, optlen);
++
++	return err;
++}
++
+ static struct proto_ops algif_hash_ops = {
+ 	.family		=	PF_ALG,
+ 
+@@ -225,7 +258,6 @@ static struct proto_ops algif_hash_ops = {
+ 	.ioctl		=	sock_no_ioctl,
+ 	.listen		=	sock_no_listen,
+ 	.shutdown	=	sock_no_shutdown,
+-	.getsockopt	=	sock_no_getsockopt,
+ 	.mmap		=	sock_no_mmap,
+ 	.bind		=	sock_no_bind,
+ 	.setsockopt	=	sock_no_setsockopt,
+@@ -236,6 +268,7 @@ static struct proto_ops algif_hash_ops = {
+ 	.sendpage	=	hash_sendpage,
+ 	.recvmsg	=	hash_recvmsg,
+ 	.accept		=	hash_accept,
++	.getsockopt	=	hash_getsockopt,
+ };
+ 
+ static void *hash_bind(const char *name, u32 type, u32 mask)
+diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
+index b8fb714..3759d3c 100644
+--- a/include/uapi/linux/if_alg.h
++++ b/include/uapi/linux/if_alg.h
+@@ -44,6 +44,7 @@ struct af_alg_aead_assoc {
+ #define ALG_GET_BLOCKSIZE		1
+ #define ALG_GET_IVSIZE			2
+ #define ALG_GET_AEAD_AUTHSIZE		3
++#define ALG_GET_DIGESTSIZE		4
+ 
+ /* Operations */
+ #define ALG_OP_DECRYPT			0
+-- 
+2.1.0
