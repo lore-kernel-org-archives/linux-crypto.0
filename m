@@ -1,160 +1,101 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 10/10] crypto: AF_ALG: document the user space interface
-Date: Sun, 16 Nov 2014 03:29:31 +0100
-Message-ID: <1857073.eyqAXtMAM7@tachyon.chronox.de>
-References: <5365136.g8vbXlhRyC@tachyon.chronox.de>
+From: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Subject: Re: [PATCH v5 4/4] crypto: Add Allwinner Security
+ System crypto accelerator
+Date: Sun, 16 Nov 2014 18:13:14 +0100
+Message-ID: <20141116171314.GN6414@lukather>
+References: <20141030171933.GR21251@lukather>
+ <20141031072030.GA7563@gondor.apana.org.au>
+ <20141031081323.GS21251@lukather>
+ <20141031081803.GA8012@gondor.apana.org.au>
+ <20141031095706.GA8054@lukather>
+ <20141031100522.GA8655@gondor.apana.org.au>
+ <20141103093446.GG11263@lukather>
+ <20141103103528.GA30154@gondor.apana.org.au>
+ <20141106142633.GK2989@lukather>
+ <20141106143217.GA3636@gondor.apana.org.au>
+Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman@redhat.com>, quentin.gouchet@gmail.com,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, ABI/API <linux-api@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5365136.g8vbXlhRyC@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="m+utxuhC6KVTvgNz"
+Cc: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	grant.likely-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
+	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, crope-X3B1VOXEql0@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-sunxi+bncBD2ZNBF5VYJRBF5XUORQKGQEKGBTT7I-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20141106143217.GA3636-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-The extension of the user space interface documentation covers all
-aspects of the patchset, including:
 
-	* AEAD cipher interface
+--m+utxuhC6KVTvgNz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-	* RNG cipher interface
+On Thu, Nov 06, 2014 at 10:32:18PM +0800, Herbert Xu wrote:
+> On Thu, Nov 06, 2014 at 03:26:33PM +0100, Maxime Ripard wrote:
+> >=20
+> > But you still haven't explain why the driver, while it doesn't handle
+> > the user space buffer at any time, should be worried that the data the
+> > framework has given him are actually mapped.
+>=20
+> Encryption is used by IPsec and SKBs can be allocated in highmem.
+> algif also exposes all ciphers to user-space memory which can also
+> be in highmem.
 
-	* getsockopt interface
+Ok. We keep going in circles here.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- Documentation/crypto/crypto-API-userspace.txt | 95 ++++++++++++++++++++++++++-
- 1 file changed, 93 insertions(+), 2 deletions(-)
+I know that algif handles userspace memory that can be in
+highmem. What I don't get, is that just like a *driver* doesn't have
+to call copy_from_user, why would it need to call kmap...
 
-diff --git a/Documentation/crypto/crypto-API-userspace.txt b/Documentation/crypto/crypto-API-userspace.txt
-index ac619cd..5090b05 100644
---- a/Documentation/crypto/crypto-API-userspace.txt
-+++ b/Documentation/crypto/crypto-API-userspace.txt
-@@ -30,8 +30,9 @@ ciphers are accessible:
- 
- 	* Symmetric ciphers
- 
--Note, AEAD ciphers are currently not supported via the symmetric cipher
--interface.
-+	* AEAD ciphers
-+
-+	* Random number generators
- 
- The interface is provided via Netlink using the type AF_ALG. In addition, the
- setsockopt option type is SOL_ALG. In case the user space header files do not
-@@ -85,6 +86,7 @@ If a consumer on the other hand wants to maintain the plaintext and the
- ciphertext in different memory locations, all a consumer needs to do is to
- provide different memory pointers for the encryption and decryption operation.
- 
-+
- Message digest API
- ==================
- 
-@@ -169,6 +171,69 @@ as large as to hold all blocks of the encrypted or decrypted data. If the output
- data size is smaller, only as many blocks are returned that fit into that
- output buffer size.
- 
-+
-+AEAD cipher API
-+===============
-+
-+The operation is identical to the symmetric cipher API. However, an AEAD
-+cipher requires additional information, such as the authentication tag and
-+the associated data. This data is to be supplied in addition to the normal
-+symmetric cipher data like key and IV discussed for the symmetric ciphers.
-+
-+During initialization, the struct sockaddr data structure must be filled as
-+follows:
-+
-+struct sockaddr_alg sa = {
-+	.salg_family = AF_ALG,
-+	.salg_type = "aead", /* this selects the AEAD cipher */
-+	.salg_name = "gcm(aes)" /* this is the cipher name */
-+};
-+
-+The discussion about the sendmsg given for the symmetric cipher applies for
-+the AEAD interface as well. In addition to the plaintext / ciphertext data and
-+the IV, the following data must be supplied with the cmsghdr data structure:
-+
-+	* The AEAD authentication tag size is set with the flag
-+	  ALG_SET_AEAD_AUTHSIZE. The integer value of the authentication tag
-+	  size must be provided in the data field of the cmsghdr structure.
-+
-+	* The AEAD associated data is set with the flag ALG_SET_AEAD_ASSOC.
-+	  The data is set the same way as for the IV by supplying the associated
-+	  data in the data field of the cmsghdr structure.
-+
-+The authentication tag itself, however, is handled in a different way to comply
-+with the specifics of the kernel crypto API and to avoid copying the
-+authentication tag around in memory. The authentication tag is added to the
-+memory that immediately follows the ciphertext.
-+
-+	* When performing an encryption operation, the resulting ciphertext
-+	  buffer will hold the tag as follows: ciphertext || tag.  The consumer
-+	  must ensure that the ciphertext buffer is large enough to hold the
-+	  ciphertext together with the tag of the size set by the consumer using
-+	  the ALG_SET_AEAD_AUTHSIZE cmsghdr flag as discussed above.
-+
-+	* When performing a decryption operation, the initial ciphertext buffer
-+	  must hold the tag as follows: ciphertext || tag. The resulting
-+	  plaintext has the same size as the ciphertext.
-+
-+Note: Authentication errors during decryption are marked with a failing
-+read/recv system call whose errno is set to EBADMSG.
-+
-+
-+Random number generator API
-+===========================
-+
-+Compared to the symmetric ciphers, the random number generator API is simple:
-+it only supports the system calls of read/recv.
-+
-+The consumer must observe the returned size of the read/recv system calls and
-+potentially make subsequent calls if the returned length of random numbers is
-+smaller than the expected length.
-+
-+When initializing a random number generator instance, the AF_ALG interface
-+handler ensures that it is appropriately seeded.
-+
-+
- Setsockopt interface
- ====================
- 
-@@ -190,6 +255,32 @@ optname:
- 
- 		- the hash cipher type (keyed message digests)
- 
-+
-+Getsockopt interface
-+====================
-+
-+To allow consumers to obtain information about the allocated cipher, the
-+following getsockopt calls with the optval set to the listed flags are provided.
-+
-+The getsockopt system call must be invoked with the file descriptor of the open
-+cipher (i.e. the file descriptor returned by the accept system call).
-+
-+	* ALG_GET_BLOCKSIZE -- Return the block size of the cipher in the
-+	  optlen field of getsockopt. This call is only applicable to
-+	  symmetric and AEAD ciphers.
-+
-+	* ALG_GET_IVSIZE -- Return the IV size of the cipher in the optlen field
-+	  of getsockopt. This call is only applicable to symmetric and AEAD
-+	  ciphers.
-+
-+	* ALG_GET_AEAD_AUTHSIZE -- Return the maximum supported authentication
-+	  tag size in the optlen field of getsockopt. This call is only
-+	  applicable to AEAD ciphers.
-+
-+	* ALG_GET_DIGESTSIZE -- Return the digest size in the optlen field of
-+	  getsockopt. This call is only applicable to message digests.
-+
-+
- User space API example
- ======================
- 
--- 
-2.1.0
+That's something that should be in the framework itself, not the
+driver. And the argument that most drivers use DMA seems like a broken
+assumption.
+
+But hey, you're the one that will maintain this mess, so I guess you
+have the final word.
+
+Maxime
+
+--=20
+Maxime Ripard, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
+
+--m+utxuhC6KVTvgNz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIbBAEBAgAGBQJUaNsqAAoJEBx+YmzsjxAg9vgP+IU8hDK3gJJOytYQo3W3a15a
+uhIELk8oJwM13juoNz2ZofzzuuO1ZKyy3vxMl+qnFdcsJvz3eAkMmLF/0D0HXlwC
+ORafGw/BIzF9zoUSl99SliSaPsshtbKGS0itpiswbXpvfkFotnDuSwFckVCbhN/K
+ez/Jc/uH6LsviGOEzpTa506ISXwpAxE+QpG7e/bcUDxUN66j0Xhz7e9eGhMSQXGu
+z494yGS75QB6K1aI/ckaWTZFMhQJCF/5eOCbV/nwG3942xHx5LzB7m6bvo4wKEMR
+G10q7FA+SwkKqSdCn+nw7k67Zyt5LWnHk58IdyUUUgoeLYmkdGO5t/kkMtfRA8Ou
+lBFR0qDJvNn0x/Xh7szkVqKOeXH/jArk4HHBkJ2frH1HYdIbVwzZk+Zfk/ckm4dX
+75JigGIJvMYVDA9+k6Xy+C3yYgPDp9PJYqcqaXQHWxGGIkk9zqPz8qTPKz0NPCX+
+IMV19Hb/wlfbTcnNewFqsYwo6wMU+v18odZYkzfEpbywwfpRztHV0NOdCACGa6W3
+8ciE+ctUXlulfqAVrSkUPvHQYpsZTaEueVhJI89yiBG9kJTe770dultEH7DjVyRW
+ZwpXZglNMhZU2C5o5NOZyMIVOmeGbVSQPTnIFTbPeaem3KyYA43YLH4jt3TVAr19
+AxGnRmvnanGdskF7UX4=
+=tuhn
+-----END PGP SIGNATURE-----
+
+--m+utxuhC6KVTvgNz--
