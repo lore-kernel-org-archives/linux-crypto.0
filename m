@@ -1,43 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: prefix module autoloading with "crypto-"
-Date: Mon, 17 Nov 2014 23:09:26 +0800
-Message-ID: <20141117150926.GA1968@gondor.apana.org.au>
-References: <20141114213459.GA3832@www.outflux.net>
+Subject: Re: [PATCH] crypto: Documentation - document uncovered member
+ variables
+Date: Mon, 17 Nov 2014 23:10:40 +0800
+Message-ID: <20141117151040.GA2040@gondor.apana.org.au>
+References: <1910451.sH207F56nk@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Mathias Krause <minipli@googlemail.com>
-To: Kees Cook <keescook@chromium.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:47642 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752602AbaKQPKp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 17 Nov 2014 10:10:45 -0500
 Content-Disposition: inline
-In-Reply-To: <20141114213459.GA3832@www.outflux.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1910451.sH207F56nk@tachyon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 14, 2014 at 01:34:59PM -0800, Kees Cook wrote:
-> This prefixes all crypto module loading with "crypto-" so we never ru=
-n
-> the risk of exposing module auto-loading to userspace via a crypto AP=
-I,
-> as demonstrated by Mathias Krause:
->=20
-> https://lkml.org/lkml/2013/3/4/70
->=20
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+On Fri, Nov 14, 2014 at 05:26:21AM +0100, Stephan Mueller wrote:
+> Fix documentation typo for shash_alg->descsize.
+> 
+> Add documentation for initially uncovered member variables.
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-Sorry but this doesn't build for me:
-
-  CC [M]  drivers/crypto/qat/qat_common/adf_ctl_drv.o
-drivers/crypto/qat/qat_common/adf_ctl_drv.c:490:21: error: expected dec=
-laration specifiers or =E2=80=98...=E2=80=99 before string constant
-make[3]: *** [drivers/crypto/qat/qat_common/adf_ctl_drv.o] Error 1
-make[2]: *** [drivers/crypto/qat/qat_common] Error 2
-make[1]: *** [drivers/crypto/qat] Error 2
-make[1]: *** Waiting for unfinished jobs....
-
-Thanks,
---=20
+Patch applied.
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
