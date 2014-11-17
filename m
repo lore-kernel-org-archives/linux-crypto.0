@@ -1,41 +1,50 @@
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v2 0/2] crypto: qat - Fix for invalid dma mapping and numa
-Date: Mon, 17 Nov 2014 10:33:51 -0800
-Message-ID: <20141117183351.GA12343@kroah.com>
-References: <20141014012251.742.5500.stgit@tstruk-mobl1>
- <543E4DFF.9000101@redhat.com>
- <543E59B9.6060804@redhat.com>
- <20141024144521.GA20889@gondor.apana.org.au>
- <546A178C.6070908@intel.com>
- <20141117165916.GA5744@kroah.com>
- <546A2E62.3020401@intel.com>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: Re: [PATCH] crypto: prefix module autoloading with "crypto-"
+Date: Mon, 17 Nov 2014 19:38:21 +0100
+Message-ID: <CA+rthh_yfMhmAGvJDpQwnpL6hKJvuZdeDsu4rJuvUQx_irRYZw@mail.gmail.com>
+References: <20141114213459.GA3832@www.outflux.net>
+	<20141117150926.GA1968@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Prarit Bhargava <prarit@redhat.com>,
-	Nikolay Aleksandrov <nikolay@redhat.com>,
-	bruce.w.allan@intel.com, qat-linux@intel.com, naleksan@redhat.com,
-	linux-crypto@vger.kernel.org, davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Kees Cook <keescook@chromium.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:49796 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752411AbaKQSdw (ORCPT
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:59305 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752419AbaKQSiX convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 17 Nov 2014 13:33:52 -0500
-Content-Disposition: inline
-In-Reply-To: <546A2E62.3020401@intel.com>
+	Mon, 17 Nov 2014 13:38:23 -0500
+In-Reply-To: <20141117150926.GA1968@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Nov 17, 2014 at 09:20:34AM -0800, Tadeusz Struk wrote:
-> On 11/17/2014 08:59 AM, Greg KH wrote:
-> > Because it showed up in Linus's tree _after_ 3.17.3-rc1 was released?
-> > How can I go back in time?
-> 
-> I thought it was already possible, no? :)
-> So will it be in 3.17.4?
+On 17 November 2014 16:09, Herbert Xu <herbert@gondor.apana.org.au> wro=
+te:
+> On Fri, Nov 14, 2014 at 01:34:59PM -0800, Kees Cook wrote:
+>> This prefixes all crypto module loading with "crypto-" so we never r=
+un
+>> the risk of exposing module auto-loading to userspace via a crypto A=
+PI,
+>> as demonstrated by Mathias Krause:
+>>
+>> https://lkml.org/lkml/2013/3/4/70
+>>
+>> Signed-off-by: Kees Cook <keescook@chromium.org>
+>
+> Sorry but this doesn't build for me:
+>
+>   CC [M]  drivers/crypto/qat/qat_common/adf_ctl_drv.o
+> drivers/crypto/qat/qat_common/adf_ctl_drv.c:490:21: error: expected d=
+eclaration specifiers or =E2=80=98...=E2=80=99 before string constant
+> make[3]: *** [drivers/crypto/qat/qat_common/adf_ctl_drv.o] Error 1
+> make[2]: *** [drivers/crypto/qat/qat_common] Error 2
+> make[1]: *** [drivers/crypto/qat] Error 2
+> make[1]: *** Waiting for unfinished jobs....
 
-Possibly, if I get around to it, relax please...
+Looks like drivers/crypto/qat/qat_common/adf_ctl_drv.c is missing
+'#include <linux/crypto.h>'.
 
-greg "burried in patches" k-h
+Mathias
