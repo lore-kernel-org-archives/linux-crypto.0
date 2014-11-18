@@ -1,81 +1,47 @@
-From: James Hartley <James.Hartley@imgtec.com>
-Subject: RE: [PATCH 2/2] Documentation: crypto: Add DT binding info for the
- img hw hash accelerator
-Date: Tue, 18 Nov 2014 18:33:29 +0000
-Message-ID: <72BC0C8BD7BB6F45988A99382E5FBAE5443427AE@hhmail02.hh.imgtec.org>
-References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com>
-	<1415621455-10468-3-git-send-email-james.hartley@imgtec.com>
- <CAL1qeaEp_K2JYXBu1hvFuiJ6Ps3jBoLRtmvw1F7FPKHwKDjXmg@mail.gmail.com>
+From: James Hartley <james.hartley@imgtec.com>
+Subject: [PATCH V2 0/2] crypto: Add support for the IMG hash accelerator
+Date: Tue, 18 Nov 2014 20:48:45 +0000
+Message-ID: <1416343727-2178-1-git-send-email-james.hartley@imgtec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	Grant Likely <grant.likely@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"joe@perches.com" <joe@perches.com>,
-	"mchehab@osg.samsung.com" <mchehab@osg.samsung.com>,
-	"crope@iki.fi" <crope@iki.fi>,
-	"jg1.han@samsung.com" <jg1.han@samsung.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	"Ezequiel Garcia" <Ezequiel.Garcia@imgtec.com>
-To: Andrew Bresticker <abrestic@chromium.org>
+Content-Type: text/plain
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<grant.likely@linaro.org>, <robh+dt@kernel.org>,
+	<gregkh@linuxfoundation.org>, <linux-crypto@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <pawel.moll@arm.com>,
+	<mark.rutland@arm.com>, <ijc+devicetree@hellion.org.uk>,
+	<galak@codeaurora.org>, <Ezequiel.Garcia@imgtec.com>,
+	<abrestic@chromium.org>, <james.hartley@imgtec.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:47573 "EHLO
+Received: from mailapp01.imgtec.com ([195.59.15.196]:8021 "EHLO
 	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753576AbaKRSdd (ORCPT
+	with ESMTP id S1755058AbaKRUss (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 18 Nov 2014 13:33:33 -0500
-In-Reply-To: <CAL1qeaEp_K2JYXBu1hvFuiJ6Ps3jBoLRtmvw1F7FPKHwKDjXmg@mail.gmail.com>
-Content-Language: en-US
+	Tue, 18 Nov 2014 15:48:48 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgQW5kcmV3DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogYWJyZXN0
-aWNAZ29vZ2xlLmNvbSBbbWFpbHRvOmFicmVzdGljQGdvb2dsZS5jb21dIE9uIEJlaGFsZiBPZg0K
-PiBBbmRyZXcgQnJlc3RpY2tlcg0KPiBTZW50OiAxMCBOb3ZlbWJlciAyMDE0IDE3OjMwDQo+IFRv
-OiBKYW1lcyBIYXJ0bGV5DQo+IENjOiBoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU7IGRhdmVt
-QGRhdmVtbG9mdC5uZXQ7IEdyYW50IExpa2VseTsgUm9iDQo+IEhlcnJpbmc7IGFrcG1AbGludXgt
-Zm91bmRhdGlvbi5vcmc7IEdyZWcgS3JvYWgtSGFydG1hbjsNCj4gam9lQHBlcmNoZXMuY29tOyBt
-Y2hlaGFiQG9zZy5zYW1zdW5nLmNvbTsgY3JvcGVAaWtpLmZpOw0KPiBqZzEuaGFuQHNhbXN1bmcu
-Y29tOyBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOw0KPiBkZXZpY2V0cmVlQHZnZXIua2Vy
-bmVsLm9yZzsgUGF3ZWwgTW9sbDsgTWFyayBSdXRsYW5kOyBJYW4gQ2FtcGJlbGw7IEt1bWFyDQo+
-IEdhbGE7IEV6ZXF1aWVsIEdhcmNpYQ0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDIvMl0gRG9jdW1l
-bnRhdGlvbjogY3J5cHRvOiBBZGQgRFQgYmluZGluZyBpbmZvIGZvciB0aGUNCj4gaW1nIGh3IGhh
-c2ggYWNjZWxlcmF0b3INCj4gDQo+IEhpIEphbWVzLA0KPiANCj4gT24gTW9uLCBOb3YgMTAsIDIw
-MTQgYXQgNDoxMCBBTSwgSmFtZXMgSGFydGxleQ0KPiA8amFtZXMuaGFydGxleUBpbWd0ZWMuY29t
-PiB3cm90ZToNCj4gPiBTaWduZWQtb2ZmLWJ5OiBKYW1lcyBIYXJ0bGV5IDxqYW1lcy5oYXJ0bGV5
-QGltZ3RlYy5jb20+DQo+IA0KPiBBIGJyaWVmIGNvbW1pdCBtZXNzYWdlIGRlc2NyaWJpbmcgdGhl
-IGhhcmR3YXJlIGFuZCB3aGVyZSBpdCdzIGZvdW5kIHdvdWxkDQo+IGJlIG5pY2UuDQo+IA0KPiA+
-IGRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvY3J5cHRvL2lt
-Zy1oYXNoLnR4dA0KPiA+IGIvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL2NyeXB0
-by9pbWctaGFzaC50eHQNCj4gDQo+ID4gQEAgLTAsMCArMSwyOCBAQA0KPiA+ICsqIEltYWdpbmF0
-aW9uIFRlY2hub2xvZ2llcyBMdGQuIEhhc2ggQWNjZWxlcmF0b3INCj4gPiArDQo+ID4gK1RoZSBo
-YXNoIGFjY2VsZXJhdG9yIHByb3ZpZGVzIGhhcmR3YXJlIGhhc2hpbmcgYWNjZWxlcmF0aW9uIGZv
-ciBTSEExLA0KPiA+ICtTSEEyMjQsIFNIQTI1NiBhbmQgTUQ1IGhhc2hlcw0KPiA+ICsNCj4gPiAr
-UmVxdWlyZWQgcHJvcGVydGllczoNCj4gPiArDQo+ID4gKy0gY29tcGF0aWJsZSA6ICJpbWcsaW1n
-LWhhc2gtYWNjZWxlcmF0b3ItcmV2MSINCj4gDQo+IEkga25vdyBJIG1lbnRpb25lZCBpbiB0aGUg
-aW50ZXJuYWwgcmV2aWV3IHRoYXQgaXQgd291bGQgYmUgZ29vZCB0byBoYXZlDQo+IHNvbWUgc29y
-dCBvZiB2ZXJzaW9uIGluZGljYXRvciwgYnV0IGl0IGxvb2tzIGxpa2UgZnJvbSB0aGUgVFJNIHRo
-YXQgdGhlIHZlcnNpb24NCj4gaXMgcHJvYmFibGUgKENSX0hBU0hfQ09SRV9SRVYpLiAgSWYgd2Ug
-ZXhwZWN0IHByb2JpbmcgZm9yIHRoZSByZXZpc2lvbg0KPiBudW1iZXIgdG8gYmUgc3VmZmljaWVu
-dCwgdGhlbiBwZXJoYXBzICJyZXYxIiBjYW4gYmUgZHJvcHBlZD8gIEFsc28sIHRoZQ0KPiBzZWNv
-bmQgImltZyIgaXMgcmVkdW5kYW50Lg0KDQpZZXMgdGhlIGNvcmUgSUQgYW5kIHZlcnNpb25zIGFy
-ZSBhdmFpbGFibGUsIHNvIEknbGwgZHJvcCByZXYtMSwgYW5kIHJlbW92ZSB0aGUgc2Vjb25kIGlt
-Zy4NCg0KPiANCj4gPiArLSByZWcgOiBPZmZzZXQgYW5kIGxlbmd0aCBvZiB0aGUgcmVnaXN0ZXIg
-c2V0IGZvciB0aGUgbW9kdWxlLCBhbmQgdGhlDQo+ID4gK0RNQSBwb3J0DQo+ID4gKy0gaW50ZXJy
-dXB0cyA6IFRoZSBkZXNpZ25hdGVkIElSUSBsaW5lIGZvciB0aGUgaGFzaGluZyBtb2R1bGUuDQo+
-ID4gKy0gZG1hcyA6IERNQSBzcGVjaWZpZXIgYXMgcGVyDQo+ID4gK0RvY3VtZW50YXRpb24vZGV2
-aWNldHJlZS9iaW5kaW5ncy9kbWEvZG1hLnR4dA0KPiA+ICstIGRtYS1uYW1lcyA6IFNob3VsZCBi
-ZSAidHgiDQo+ID4gKy0gYnVzLWFkZHIgOiBUaGUgYnVzIGFkZHJlc3MgZm9yIHRoZSBpbnB1dCBk
-YXRhIGZvciBoYXNoaW5nIGJsb2NrDQo+IA0KPiBJIHRoaW5rIHRoaXMgY2FuIGJlIGRyb3BwZWQu
-ICBUaGlzIGlzIHRoZSBzYW1lIGFzIHRoZSBzZWNvbmQgInJlZyINCj4gZW50cnkgYWJvdmUsIGlz
-IGl0IG5vdD8NCg0KWWVzLCB0aGF0IHNob3VsZCBub3QgaGF2ZSBtYWRlIGl0IHRocm91Z2ggdG8g
-dGhlIHBhdGNoIC0gaXQgd2lsbCBiZSByZW1vdmVkLg0KDQpUaGFua3MsDQpKYW1lcy4NCg0K
+This adds support for the Imagination Technologies hash
+accelerator which provides hardware acceleration for
+SHA1 SHA244 SHA256 and MD5 hashes.
+
+Changes from V1:
+	* Addressed review comments from Andrew Bresticker and 
+	  Vladimir Zapolskiy
+	* rebased to current linux-next
+
+James Hartley (2):
+  crypto: Add Imagination Technologies hw hash accelerator
+  Documentation: crypto: Add DT binding info for the img hw hash
+    accelerator
+
+ .../devicetree/bindings/crypto/img-hash.txt        |   26 +
+ MAINTAINERS                                        |    5 +
+ drivers/crypto/Kconfig                             |   14 +
+ drivers/crypto/Makefile                            |    1 +
+ drivers/crypto/img-hash.c                          | 1061 ++++++++++++++++++++
+ 5 files changed, 1108 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/img-hash.txt
+ create mode 100644 drivers/crypto/img-hash.c
+
+-- 
+1.7.9.5
