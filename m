@@ -1,139 +1,51 @@
-From: Konstantin Khlebnikov <koct9i@gmail.com>
-Subject: Re: [PATCH 1/2 v2] scripts/coccinelle: catch freeing cryptographic
- structures via kfree
-Date: Wed, 19 Nov 2014 19:06:55 +0400
-Message-ID: <CALYGNiOiErex4-WfqfCKHuZAMoA6SPvQVHjAx0imeeB6bzcbNQ@mail.gmail.com>
-References: <20141117151420.10739.16342.stgit@buzz>
-	<20141118114920.13498.73584.stgit@buzz>
-	<alpine.DEB.2.10.1411191040020.2363@hadrien>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Konstantin Khlebnikov <k.khlebnikov@samsung.com>,
-	kexec@lists.infradead.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Michal Marek <mmarek@suse.cz>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Gilles Muller <Gilles.Muller@lip6.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
-	linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Julia Lawall <julia.lawall@lip6.fr>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: [PATCH RESEND 0/4] ARM: at91: remove at91sam9g45/9m10 legacy board support
+Date: Wed, 19 Nov 2014 17:07:54 +0100
+Message-ID: <1416413278-10197-1-git-send-email-boris.brezillon@free-electrons.com>
+Cc: Nicolas Ferre <nicolas.ferre@atmel.com>,
+	Jean-Christophe Plagniol-Villard <plagnioj@jcrosoft.com>,
+	Alexandre Belloni <alexandre.belloni@free-electrons.com>,
+	Andrew Victor <linux@maxim.org.za>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	Boris Brezillon <boris.brezillon@free-electrons.com>
+To: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:48104 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753808AbaKSPG4 (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:39877 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S932380AbaKSQID (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Nov 2014 10:06:56 -0500
-In-Reply-To: <alpine.DEB.2.10.1411191040020.2363@hadrien>
+	Wed, 19 Nov 2014 11:08:03 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 19, 2014 at 12:41 PM, Julia Lawall <julia.lawall@lip6.fr> wrote:
->> +// Comments: There are false positives in crypto/ where they are
->> actually freed.
->
-> I didn't really understand this comment.  I ran the semantic patch and got
-> around 10 results, but it wasn't clear to me how to see which were false
-> positives.
+Hello,
 
-I mean false positives in code inside directory crypto/ where this
-subsystem lives.
+This series adds DT support for the TRNG (True Random Generator) block and
+adds missing trng nodes to dtsi files.
 
-./arch/x86/crypto/fpu.c:143:1-6: WARNING: invalid free of
-crypto_alloc_* allocated data
-./crypto/algapi.c:846:1-6: WARNING: invalid free of crypto_alloc_*
-allocated data
-./crypto/lrw.c:378:1-6: WARNING: invalid free of crypto_alloc_* allocated data
-./crypto/ecb.c:163:1-6: WARNING: invalid free of crypto_alloc_* allocated data
-./crypto/ctr.c:242:1-6: WARNING: invalid free of crypto_alloc_* allocated data
-./crypto/ctr.c:419:1-6: WARNING: invalid free of crypto_alloc_* allocated data
-./crypto/ctr.c:428:1-6: WARNING: invalid free of crypto_alloc_* allocated data
-./crypto/pcbc.c:273:1-6: WARNING: invalid free of crypto_alloc_* allocated data
-./crypto/cts.c:329:1-6: WARNING: invalid free of crypto_alloc_* allocated data
-./crypto/cbc.c:267:1-6: WARNING: invalid free of crypto_alloc_* allocated data
-./crypto/xts.c:340:1-6: WARNING: invalid free of crypto_alloc_* allocated data
+Best Regards,
 
-This is kfree calls on error paths in constructors or in destructors
-which actually frees memory when crypto_free_* is called.
+Boris
 
->
-> I would suggest to extend the rule a little bit to include information
-> about where the allocation call is:
 
-Not sure if this is necessary. This part of crypto-api is simple.
+Boris Brezillon (4):
+  hwrng: atmel: use clk_prepapre_enable/_disable_unprepare
+  hwrng: atmel: add DT support
+  hwrng: atmel: Add TRNG DT binding doc
+  ARM: at91/dt: add trng node
 
->
-> ///
-> /// Structures allocated by crypto_alloc_* must be freed using crypto_free_*.
-> /// This finds freeing them by kfree.
-> ///
-> // Confidence: Moderate
-> // Copyright: (C) 2014 Konstantin Khlebnikov,  GPLv2.
-> // Comments: There are false positives in crypto/ where they are actually freed.
-> // Keywords: crypto, kfree
-> // Options: --no-includes --include-headers
->
-> virtual org
-> virtual report
-> virtual context
->
-> @r depends on context || org || report@
-> expression x;
-> position p1;
-> @@
->
-> (
->  x = crypto_alloc_base@p1(...)
-> |
->  x = crypto_alloc_cipher@p1(...)
-> |
->  x = crypto_alloc_ablkcipher@p1(...)
-> |
->  x = crypto_alloc_aead@p1(...)
-> |
->  x = crypto_alloc_instance@p1(...)
-> |
->  x = crypto_alloc_instance2@p1(...)
-> |
->  x = crypto_alloc_comp@p1(...)
-> |
->  x = crypto_alloc_pcomp@p1(...)
-> |
->  x = crypto_alloc_hash@p1(...)
-> |
->  x = crypto_alloc_ahash@p1(...)
-> |
->  x = crypto_alloc_shash@p1(...)
-> |
->  x = crypto_alloc_rng@p1(...)
-> )
->
-> @pb@
-> expression r.x;
-> position p;
-> @@
->
-> * kfree@p(x)
->
-> @script:python depends on org@
-> p << pb.p;
-> p1 << r.p1;
-> @@
->
-> msg="WARNING: invalid free of crypto_alloc_* allocated data"
-> coccilib.org.print_todo(p[0], msg)
-> coccilib.org.print_link(p1[0], "allocation")
->
-> @script:python depends on report@
-> p << pb.p;
-> p1 << r.p1;
-> @@
->
-> msg="WARNING: invalid free of crypto_alloc_* allocated data, allocated on line %s" % (p1[0].line)
-> coccilib.report.print_report(p[0], msg)
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+ Documentation/devicetree/bindings/hwrng/atmel-trng.txt | 16 ++++++++++++++++
+ arch/arm/boot/dts/at91sam9g45.dtsi                     |  7 +++++++
+ drivers/char/hw_random/Kconfig                         |  2 +-
+ drivers/char/hw_random/atmel-rng.c                     | 15 +++++++++++----
+ 4 files changed, 35 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/hwrng/atmel-trng.txt
+
+-- 
+1.9.1
