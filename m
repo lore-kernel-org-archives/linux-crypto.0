@@ -1,51 +1,61 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH RESEND 0/4] ARM: at91: remove at91sam9g45/9m10 legacy board support
-Date: Wed, 19 Nov 2014 17:07:54 +0100
-Message-ID: <1416413278-10197-1-git-send-email-boris.brezillon@free-electrons.com>
-Cc: Nicolas Ferre <nicolas.ferre@atmel.com>,
-	Jean-Christophe Plagniol-Villard <plagnioj@jcrosoft.com>,
-	Alexandre Belloni <alexandre.belloni@free-electrons.com>,
-	Andrew Victor <linux@maxim.org.za>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	Boris Brezillon <boris.brezillon@free-electrons.com>
-To: Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:39877 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932380AbaKSQID (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Nov 2014 11:08:03 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Subject: [PATCH RESEND 3/4] hwrng: atmel: Add TRNG DT binding doc
+Date: Wed, 19 Nov 2014 17:07:57 +0100
+Message-ID: <1416413278-10197-4-git-send-email-boris.brezillon@free-electrons.com>
+References: <1416413278-10197-1-git-send-email-boris.brezillon@free-electrons.com>
+Cc: Nicolas Ferre <nicolas.ferre-AIFe0yeh4nAAvxtiuMwx3w@public.gmane.org>,
+	Jean-Christophe Plagniol-Villard <plagnioj-sclMFOaUSTBWk0Htik3J/w@public.gmane.org>,
+	Alexandre Belloni <alexandre.belloni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Andrew Victor <linux-PelNFVqkFnVyf+4FbqDuWQ@public.gmane.org>,
+	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
+	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
+	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+To: Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1416413278-10197-1-git-send-email-boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+Document DT bindings of Atmel's TRNG (True Random Number Generator) IP.
 
-This series adds DT support for the TRNG (True Random Generator) block and
-adds missing trng nodes to dtsi files.
-
-Best Regards,
-
-Boris
-
-
-Boris Brezillon (4):
-  hwrng: atmel: use clk_prepapre_enable/_disable_unprepare
-  hwrng: atmel: add DT support
-  hwrng: atmel: Add TRNG DT binding doc
-  ARM: at91/dt: add trng node
-
+Signed-off-by: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Acked-by: Nicolas Ferre <nicolas.ferre-AIFe0yeh4nAAvxtiuMwx3w@public.gmane.org>
+---
  Documentation/devicetree/bindings/hwrng/atmel-trng.txt | 16 ++++++++++++++++
- arch/arm/boot/dts/at91sam9g45.dtsi                     |  7 +++++++
- drivers/char/hw_random/Kconfig                         |  2 +-
- drivers/char/hw_random/atmel-rng.c                     | 15 +++++++++++----
- 4 files changed, 35 insertions(+), 5 deletions(-)
+ 1 file changed, 16 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/hwrng/atmel-trng.txt
 
+diff --git a/Documentation/devicetree/bindings/hwrng/atmel-trng.txt b/Documentation/devicetree/bindings/hwrng/atmel-trng.txt
+new file mode 100644
+index 0000000..4ac5aaa
+--- /dev/null
++++ b/Documentation/devicetree/bindings/hwrng/atmel-trng.txt
+@@ -0,0 +1,16 @@
++Atmel TRNG (True Random Number Generator) block
++
++Required properties:
++- compatible : Should be "atmel,at91sam9g45-trng"
++- reg : Offset and length of the register set of this block
++- interrupts : the interrupt number for the TRNG block
++- clocks: should contain the TRNG clk source
++
++Example:
++
++trng@fffcc000 {
++	compatible = "atmel,at91sam9g45-trng";
++	reg = <0xfffcc000 0x4000>;
++	interrupts = <6 IRQ_TYPE_LEVEL_HIGH 0>;
++	clocks = <&trng_clk>;
++};
 -- 
 1.9.1
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
