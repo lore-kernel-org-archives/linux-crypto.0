@@ -1,7 +1,7 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH RESEND 1/4] hwrng: atmel: use clk_prepapre_enable/_disable_unprepare
-Date: Wed, 19 Nov 2014 17:07:55 +0100
-Message-ID: <1416413278-10197-2-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH RESEND 4/4] ARM: at91/dt: add trng node
+Date: Wed, 19 Nov 2014 17:07:58 +0100
+Message-ID: <1416413278-10197-5-git-send-email-boris.brezillon@free-electrons.com>
 References: <1416413278-10197-1-git-send-email-boris.brezillon@free-electrons.com>
 Cc: Nicolas Ferre <nicolas.ferre@atmel.com>,
 	Jean-Christophe Plagniol-Villard <plagnioj@jcrosoft.com>,
@@ -17,64 +17,43 @@ Cc: Nicolas Ferre <nicolas.ferre@atmel.com>,
 To: Matt Mackall <mpm@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:39893 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:39931 "EHLO
 	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932383AbaKSQID (ORCPT
+	with ESMTP id S932387AbaKSQIF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Nov 2014 11:08:03 -0500
+	Wed, 19 Nov 2014 11:08:05 -0500
 In-Reply-To: <1416413278-10197-1-git-send-email-boris.brezillon@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use clk_prepare_enable/_disable_unprepare instead of clk_enable/disable
-to work properly with the CCF.
+Add a DT node for the TRNG (True Random Number Generator) block.
+
+Keep this block enabled as it does not depend on any external connection,
+and thus should be available on all boards.
 
 Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-Acked-by: Peter Korsgaard <peter@korsgaard.com>
 Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
 ---
- drivers/char/hw_random/atmel-rng.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/arm/boot/dts/at91sam9g45.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
-index 851bc7e..644ec48 100644
---- a/drivers/char/hw_random/atmel-rng.c
-+++ b/drivers/char/hw_random/atmel-rng.c
-@@ -67,7 +67,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
- 	if (IS_ERR(trng->clk))
- 		return PTR_ERR(trng->clk);
+diff --git a/arch/arm/boot/dts/at91sam9g45.dtsi b/arch/arm/boot/dts/at91sam9g45.dtsi
+index 932a669..790c890 100644
+--- a/arch/arm/boot/dts/at91sam9g45.dtsi
++++ b/arch/arm/boot/dts/at91sam9g45.dtsi
+@@ -934,6 +934,13 @@
+ 				status = "disabled";
+ 			};
  
--	ret = clk_enable(trng->clk);
-+	ret = clk_prepare_enable(trng->clk);
- 	if (ret)
- 		return ret;
- 
-@@ -95,7 +95,7 @@ static int atmel_trng_remove(struct platform_device *pdev)
- 	hwrng_unregister(&trng->rng);
- 
- 	writel(TRNG_KEY, trng->base + TRNG_CR);
--	clk_disable(trng->clk);
-+	clk_disable_unprepare(trng->clk);
- 
- 	return 0;
- }
-@@ -105,7 +105,7 @@ static int atmel_trng_suspend(struct device *dev)
- {
- 	struct atmel_trng *trng = dev_get_drvdata(dev);
- 
--	clk_disable(trng->clk);
-+	clk_disable_unprepare(trng->clk);
- 
- 	return 0;
- }
-@@ -114,7 +114,7 @@ static int atmel_trng_resume(struct device *dev)
- {
- 	struct atmel_trng *trng = dev_get_drvdata(dev);
- 
--	return clk_enable(trng->clk);
-+	return clk_prepare_enable(trng->clk);
- }
- 
- static const struct dev_pm_ops atmel_trng_pm_ops = {
++			trng@fffcc000 {
++				compatible = "atmel,at91sam9g45-trng";
++				reg = <0xfffcc000 0x4000>;
++				interrupts = <6 IRQ_TYPE_LEVEL_HIGH 0>;
++				clocks = <&trng_clk>;
++			};
++
+ 			i2c0: i2c@fff84000 {
+ 				compatible = "atmel,at91sam9g10-i2c";
+ 				reg = <0xfff84000 0x100>;
 -- 
 1.9.1
