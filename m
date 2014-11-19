@@ -1,106 +1,56 @@
-From: Julia Lawall <julia.lawall@lip6.fr>
-Subject: Re: [PATCH 1/2 v2] scripts/coccinelle: catch freeing cryptographic
- structures via kfree
-Date: Wed, 19 Nov 2014 10:41:37 +0100 (CET)
-Message-ID: <alpine.DEB.2.10.1411191040020.2363@hadrien>
-References: <20141117151420.10739.16342.stgit@buzz> <20141118114920.13498.73584.stgit@buzz>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: Fix a typo in ahash.c
+Date: Wed, 19 Nov 2014 20:40:21 +0800
+Message-ID: <20141119124021.GA21828@gondor.apana.org.au>
+References: <CABV2FHjqGTBWjNqT6g=v2nW1rXg4oGNrYvbAZUXxpE_Wn_UvUA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: kexec@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Eric Biederman <ebiederm@xmission.com>,
-	Michal Marek <mmarek@suse.cz>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Gilles Muller <Gilles.Muller@lip6.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
-	Julia Lawall <Julia.Lawall@lip6.fr>,
-	linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Konstantin Khlebnikov <k.khlebnikov@samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, trivial@kernel.org,
+	clabbe.montjoie@gmail.com
+To: Terence Eden <terence.eden@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:55828 "EHLO
-	mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751211AbaKSJlz (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:38258 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750960AbaKSMk1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Nov 2014 04:41:55 -0500
-In-Reply-To: <20141118114920.13498.73584.stgit@buzz>
+	Wed, 19 Nov 2014 07:40:27 -0500
+Content-Disposition: inline
+In-Reply-To: <CABV2FHjqGTBWjNqT6g=v2nW1rXg4oGNrYvbAZUXxpE_Wn_UvUA@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> +// Comments: There are false positives in crypto/ where they are
-> actually freed.
+On Mon, Nov 17, 2014 at 06:52:40PM +0000, Terence Eden wrote:
+> From: Terence Eden <terence.eden@gmail.com>
+> 
+> "its" == "something belong to it". "it's" == "it is", "it has", "it
+> was", etc. Sorry - just bugged me as I was reading the code.
+> (Resubmitting - hopefully correctly!)
+> 
+> Signed-off-by: Terence Eden <terence.eden@gmail.com>
+> ---
+>  crypto/ahash.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/crypto/ahash.c b/crypto/ahash.c
+> index f6a36a5..ffbcda3 100644
+> --- a/crypto/ahash.c
+> +++ b/crypto/ahash.c
+> @@ -271,7 +271,7 @@ static int ahash_save_req(struct ahash_request
+> *req, crypto_completion_t cplt)
+>      /*
+>       * WARNING: We do not backup req->priv here! The req->priv
+>       *          is for internal use of the Crypto API and the
+> -     *          user must _NOT_ _EVER_ depend on it's content!
+> +     *          user must _NOT_ _EVER_ depend on its content!
 
-I didn't really understand this comment.  I ran the semantic patch and got
-around 10 results, but it wasn't clear to me how to see which were false
-positives.
+Sorry but your patch does not apply because you've mangled tabs
+into spaces.  Please try to apply the patch that you receive via
+the list yourself to ensure that you're sending something that
+can be applied.
 
-I would suggest to extend the rule a little bit to include information
-about where the allocation call is:
-
-///
-/// Structures allocated by crypto_alloc_* must be freed using crypto_free_*.
-/// This finds freeing them by kfree.
-///
-// Confidence: Moderate
-// Copyright: (C) 2014 Konstantin Khlebnikov,  GPLv2.
-// Comments: There are false positives in crypto/ where they are actually freed.
-// Keywords: crypto, kfree
-// Options: --no-includes --include-headers
-
-virtual org
-virtual report
-virtual context
-
-@r depends on context || org || report@
-expression x;
-position p1;
-@@
-
-(
- x = crypto_alloc_base@p1(...)
-|
- x = crypto_alloc_cipher@p1(...)
-|
- x = crypto_alloc_ablkcipher@p1(...)
-|
- x = crypto_alloc_aead@p1(...)
-|
- x = crypto_alloc_instance@p1(...)
-|
- x = crypto_alloc_instance2@p1(...)
-|
- x = crypto_alloc_comp@p1(...)
-|
- x = crypto_alloc_pcomp@p1(...)
-|
- x = crypto_alloc_hash@p1(...)
-|
- x = crypto_alloc_ahash@p1(...)
-|
- x = crypto_alloc_shash@p1(...)
-|
- x = crypto_alloc_rng@p1(...)
-)
-
-@pb@
-expression r.x;
-position p;
-@@
-
-* kfree@p(x)
-
-@script:python depends on org@
-p << pb.p;
-p1 << r.p1;
-@@
-
-msg="WARNING: invalid free of crypto_alloc_* allocated data"
-coccilib.org.print_todo(p[0], msg)
-coccilib.org.print_link(p1[0], "allocation")
-
-@script:python depends on report@
-p << pb.p;
-p1 << r.p1;
-@@
-
-msg="WARNING: invalid free of crypto_alloc_* allocated data, allocated on line %s" % (p1[0].line)
-coccilib.report.print_report(p[0], msg)
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
