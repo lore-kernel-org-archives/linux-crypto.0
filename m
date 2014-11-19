@@ -1,57 +1,84 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v2 01/10] crypto: AF_ALG: add user space interface for
- AEAD
-Date: Wed, 19 Nov 2014 14:45:49 +0800
-Message-ID: <20141119064549.GA19918@gondor.apana.org.au>
-References: <5365136.g8vbXlhRyC@tachyon.chronox.de>
- <2398701.sGeMzIcHaz@tachyon.chronox.de>
- <20141119042704.GA19258@gondor.apana.org.au>
- <12318471.ucMNmAKX0e@tachyon.chronox.de>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Subject: [PATCH 1/1] crypto-drbg: Deletion of unnecessary checks before the
+ function call "kzfree"
+Date: Wed, 19 Nov 2014 10:20:32 +0100
+Message-ID: <546C60E0.1070903@users.sourceforge.net>
+References: <5307CAA2.8060406@users.sourceforge.net> <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6> <530A086E.8010901@users.sourceforge.net> <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6> <530A72AA.3000601@users.sourceforge.net> <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6> <530B5FB6.6010207@users.sourceforge.net> <alpine.DEB.2.10.1402241710370.2074@hadrien> <530C5E18.1020800@users.sourceforge.net> <alpine.DEB.2.10.1402251014170.2080@hadrien> <530CD2C4.4050903@users.sourceforge.net> <alpine.DEB.2.10.1402251840450.7035@hadrien> <530CF8FF.8080600@users.sourceforge.net> <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6> <530DD06F.4090703@users.sourceforge.net> <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6> <5317A59D.4@users.so
+ urceforge.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ABI/API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <12318471.ucMNmAKX0e-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	kernel-janitors@vger.kernel.org,
+	Julia Lawall <julia.lawall@lip6.fr>
+To: "David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <5317A59D.4@users.sourceforge.net>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Nov 19, 2014 at 07:30:52AM +0100, Stephan Mueller wrote:
-> 
-> - these AD scatterlist chunks cannot be released after a normal encryption 
-> operation. The associated data must be available for multiple operations. So, 
-> while plaintext data is still flowing in, we need to keep operating with the 
-> same AD.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Wed, 19 Nov 2014 10:11:04 +0100
 
-We don't start an AEAD operation until the entire input has been
-received.  Unlike ciphers you cannot process AEAD requests as you
-go.
+The kzfree() function tests whether its argument is NULL and then
+returns immediately. Thus the test around the call is not needed.
 
-So there is no need to special-case AD chunks since you will have
-everything at your disposal before you can feed the request to the
-crypto API.
+This issue was detected by using the Coccinelle software.
 
-> Thus I am wondering how the rather static nature of the AD can fit with the 
-> dynamic nature of the plaintext given the current implementation on how 
-> plaintext is handled in the kernel.
-> 
-> To me, AD in league with an IV considering its rather static nature. Having 
-> said that, the IV is also not transported via the plaintext interface, but via 
-> a setsockopt. Shouldn't the AD be handled the same way?
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+ crypto/drbg.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-AD is not like an IV at all.  An IV is a fixed-size (and small)
-input while AD can be of any length.
-
-Think about how this is used in real life.  For IPsec AD is the part
-of the packet that we don't encrypt.  So there is nothing fundamentally
-different between AD and the plain-text that we do encrypt except
-that you don't encrypt it :)
-
-Cheers,
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index a53ee09..b6f22d4 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1151,8 +1151,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 	drbg->reseed_ctr = 1;
+ 
+ out:
+-	if (entropy)
+-		kzfree(entropy);
++	kzfree(entropy);
+ 	return ret;
+ }
+ 
+@@ -1161,19 +1160,15 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+ {
+ 	if (!drbg)
+ 		return;
+-	if (drbg->V)
+-		kzfree(drbg->V);
++	kzfree(drbg->V);
+ 	drbg->V = NULL;
+-	if (drbg->C)
+-		kzfree(drbg->C);
++	kzfree(drbg->C);
+ 	drbg->C = NULL;
+-	if (drbg->scratchpad)
+-		kzfree(drbg->scratchpad);
++	kzfree(drbg->scratchpad);
+ 	drbg->scratchpad = NULL;
+ 	drbg->reseed_ctr = 0;
+ #ifdef CONFIG_CRYPTO_FIPS
+-	if (drbg->prev)
+-		kzfree(drbg->prev);
++	kzfree(drbg->prev);
+ 	drbg->prev = NULL;
+ 	drbg->fips_primed = false;
+ #endif
+@@ -1293,8 +1288,7 @@ static int drbg_make_shadow(struct drbg_state *drbg, struct drbg_state **shadow)
+ 	return 0;
+ 
+ err:
+-	if (tmp)
+-		kzfree(tmp);
++	kzfree(tmp);
+ 	return ret;
+ }
+ 
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.1.3
