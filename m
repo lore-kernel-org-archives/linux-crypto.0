@@ -1,61 +1,80 @@
-From: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Subject: [PATCH RESEND 3/4] hwrng: atmel: Add TRNG DT binding doc
-Date: Wed, 19 Nov 2014 17:07:57 +0100
-Message-ID: <1416413278-10197-4-git-send-email-boris.brezillon@free-electrons.com>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: [PATCH RESEND 1/4] hwrng: atmel: use clk_prepapre_enable/_disable_unprepare
+Date: Wed, 19 Nov 2014 17:07:55 +0100
+Message-ID: <1416413278-10197-2-git-send-email-boris.brezillon@free-electrons.com>
 References: <1416413278-10197-1-git-send-email-boris.brezillon@free-electrons.com>
-Cc: Nicolas Ferre <nicolas.ferre-AIFe0yeh4nAAvxtiuMwx3w@public.gmane.org>,
-	Jean-Christophe Plagniol-Villard <plagnioj-sclMFOaUSTBWk0Htik3J/w@public.gmane.org>,
-	Alexandre Belloni <alexandre.belloni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Andrew Victor <linux-PelNFVqkFnVyf+4FbqDuWQ@public.gmane.org>,
-	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
-	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
-	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-To: Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1416413278-10197-1-git-send-email-boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Nicolas Ferre <nicolas.ferre@atmel.com>,
+	Jean-Christophe Plagniol-Villard <plagnioj@jcrosoft.com>,
+	Alexandre Belloni <alexandre.belloni@free-electrons.com>,
+	Andrew Victor <linux@maxim.org.za>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	Boris Brezillon <boris.brezillon@free-electrons.com>
+To: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from down.free-electrons.com ([37.187.137.238]:39893 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S932383AbaKSQID (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 Nov 2014 11:08:03 -0500
+In-Reply-To: <1416413278-10197-1-git-send-email-boris.brezillon@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Document DT bindings of Atmel's TRNG (True Random Number Generator) IP.
+Use clk_prepare_enable/_disable_unprepare instead of clk_enable/disable
+to work properly with the CCF.
 
-Signed-off-by: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Acked-by: Nicolas Ferre <nicolas.ferre-AIFe0yeh4nAAvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+Acked-by: Peter Korsgaard <peter@korsgaard.com>
+Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
 ---
- Documentation/devicetree/bindings/hwrng/atmel-trng.txt | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/hwrng/atmel-trng.txt
+ drivers/char/hw_random/atmel-rng.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/hwrng/atmel-trng.txt b/Documentation/devicetree/bindings/hwrng/atmel-trng.txt
-new file mode 100644
-index 0000000..4ac5aaa
---- /dev/null
-+++ b/Documentation/devicetree/bindings/hwrng/atmel-trng.txt
-@@ -0,0 +1,16 @@
-+Atmel TRNG (True Random Number Generator) block
-+
-+Required properties:
-+- compatible : Should be "atmel,at91sam9g45-trng"
-+- reg : Offset and length of the register set of this block
-+- interrupts : the interrupt number for the TRNG block
-+- clocks: should contain the TRNG clk source
-+
-+Example:
-+
-+trng@fffcc000 {
-+	compatible = "atmel,at91sam9g45-trng";
-+	reg = <0xfffcc000 0x4000>;
-+	interrupts = <6 IRQ_TYPE_LEVEL_HIGH 0>;
-+	clocks = <&trng_clk>;
-+};
+diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+index 851bc7e..644ec48 100644
+--- a/drivers/char/hw_random/atmel-rng.c
++++ b/drivers/char/hw_random/atmel-rng.c
+@@ -67,7 +67,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
+ 	if (IS_ERR(trng->clk))
+ 		return PTR_ERR(trng->clk);
+ 
+-	ret = clk_enable(trng->clk);
++	ret = clk_prepare_enable(trng->clk);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -95,7 +95,7 @@ static int atmel_trng_remove(struct platform_device *pdev)
+ 	hwrng_unregister(&trng->rng);
+ 
+ 	writel(TRNG_KEY, trng->base + TRNG_CR);
+-	clk_disable(trng->clk);
++	clk_disable_unprepare(trng->clk);
+ 
+ 	return 0;
+ }
+@@ -105,7 +105,7 @@ static int atmel_trng_suspend(struct device *dev)
+ {
+ 	struct atmel_trng *trng = dev_get_drvdata(dev);
+ 
+-	clk_disable(trng->clk);
++	clk_disable_unprepare(trng->clk);
+ 
+ 	return 0;
+ }
+@@ -114,7 +114,7 @@ static int atmel_trng_resume(struct device *dev)
+ {
+ 	struct atmel_trng *trng = dev_get_drvdata(dev);
+ 
+-	return clk_enable(trng->clk);
++	return clk_prepare_enable(trng->clk);
+ }
+ 
+ static const struct dev_pm_ops atmel_trng_pm_ops = {
 -- 
 1.9.1
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
