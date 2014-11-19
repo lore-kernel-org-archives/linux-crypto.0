@@ -1,38 +1,47 @@
-From: James Hartley <james.hartley@imgtec.com>
-Subject: RE: [PATCH V2 0/2] crypto: Add support for the IMG hash accelerator
-Date: Wed, 19 Nov 2014 17:46:12 +0000
-Message-ID: <546CD764.1030309@imgtec.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Content-Transfer-Encoding: 7bit
-To: <linux-crypto@vger.kernel.org>
+From: Johannes Berg <johannes@sipsolutions.net>
+Subject: [PATCH] bfin_crc: don't include linux/unaligned/access_ok.h
+Date: Wed, 19 Nov 2014 21:16:04 +0100
+Message-ID: <1416428164-9874-1-git-send-email-johannes@sipsolutions.net>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Johannes Berg <johannes.berg@intel.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:16820 "EHLO
-	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753829AbaKSRqB (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Nov 2014 12:46:01 -0500
-Received: from KLMAIL01.kl.imgtec.org (unknown [192.168.5.35])
-	by Websense Email Security Gateway with ESMTPS id 75F159AA33D74
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Nov 2014 17:45:55 +0000 (GMT)
+Received: from s3.sipsolutions.net ([5.9.151.49]:40845 "EHLO sipsolutions.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755958AbaKSUQO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 Nov 2014 15:16:14 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi All,
+From: Johannes Berg <johannes.berg@intel.com>
 
-Apologies for this approach, but although my email replies seem to get 
-through to the mailing list, my patches dont (although they do appear to 
-land on the device tree list).
+This is a specific implementation, <asm/unaligned.h> is the
+multiplexer that has the arch-specific knowledge of which
+of the implementations needs to be used, so include that.
 
-I'm sure Herbert will have received it in his inbox, but for anyone else 
-who might want to comment on the patchset, you can access it here:
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+---
+ drivers/crypto/bfin_crc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-http://www.spinics.net/lists/devicetree/msg58647.html
-
-Or let me know and I'll email it directly to you.
-
-I have contacted the vger mailing list maintainer, but he does not have 
-time to investigate this problem.
-
-Thanks,
-James.
+diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
+index b099e33cb073..e96eddc0e0b3 100644
+--- a/drivers/crypto/bfin_crc.c
++++ b/drivers/crypto/bfin_crc.c
+@@ -21,13 +21,13 @@
+ #include <linux/scatterlist.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/delay.h>
+-#include <linux/unaligned/access_ok.h>
+ #include <linux/crypto.h>
+ #include <linux/cryptohash.h>
+ #include <crypto/scatterwalk.h>
+ #include <crypto/algapi.h>
+ #include <crypto/hash.h>
+ #include <crypto/internal/hash.h>
++#include <asm/unaligned.h>
+ 
+ #include <asm/dma.h>
+ #include <asm/portmux.h>
+-- 
+2.1.1
