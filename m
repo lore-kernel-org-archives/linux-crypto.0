@@ -1,84 +1,106 @@
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH 1/1] crypto-drbg: Deletion of unnecessary checks before the
- function call "kzfree"
-Date: Wed, 19 Nov 2014 10:20:32 +0100
-Message-ID: <546C60E0.1070903@users.sourceforge.net>
-References: <5307CAA2.8060406@users.sourceforge.net> <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6> <530A086E.8010901@users.sourceforge.net> <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6> <530A72AA.3000601@users.sourceforge.net> <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6> <530B5FB6.6010207@users.sourceforge.net> <alpine.DEB.2.10.1402241710370.2074@hadrien> <530C5E18.1020800@users.sourceforge.net> <alpine.DEB.2.10.1402251014170.2080@hadrien> <530CD2C4.4050903@users.sourceforge.net> <alpine.DEB.2.10.1402251840450.7035@hadrien> <530CF8FF.8080600@users.sourceforge.net> <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6> <530DD06F.4090703@users.sourceforge.net> <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6> <5317A59D.4@users.so
- urceforge.net>
+From: Julia Lawall <julia.lawall@lip6.fr>
+Subject: Re: [PATCH 1/2 v2] scripts/coccinelle: catch freeing cryptographic
+ structures via kfree
+Date: Wed, 19 Nov 2014 10:41:37 +0100 (CET)
+Message-ID: <alpine.DEB.2.10.1411191040020.2363@hadrien>
+References: <20141117151420.10739.16342.stgit@buzz> <20141118114920.13498.73584.stgit@buzz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	kernel-janitors@vger.kernel.org,
-	Julia Lawall <julia.lawall@lip6.fr>
-To: "David S. Miller" <davem@davemloft.net>,
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: kexec@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Eric Biederman <ebiederm@xmission.com>,
+	Michal Marek <mmarek@suse.cz>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5317A59D.4@users.sourceforge.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Gilles Muller <Gilles.Muller@lip6.fr>,
+	Nicolas Palix <nicolas.palix@imag.fr>,
+	Julia Lawall <Julia.Lawall@lip6.fr>,
+	linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Konstantin Khlebnikov <k.khlebnikov@samsung.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:55828 "EHLO
+	mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751211AbaKSJlz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 19 Nov 2014 04:41:55 -0500
+In-Reply-To: <20141118114920.13498.73584.stgit@buzz>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Wed, 19 Nov 2014 10:11:04 +0100
+> +// Comments: There are false positives in crypto/ where they are
+> actually freed.
 
-The kzfree() function tests whether its argument is NULL and then
-returns immediately. Thus the test around the call is not needed.
+I didn't really understand this comment.  I ran the semantic patch and got
+around 10 results, but it wasn't clear to me how to see which were false
+positives.
 
-This issue was detected by using the Coccinelle software.
+I would suggest to extend the rule a little bit to include information
+about where the allocation call is:
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
----
- crypto/drbg.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+///
+/// Structures allocated by crypto_alloc_* must be freed using crypto_free_*.
+/// This finds freeing them by kfree.
+///
+// Confidence: Moderate
+// Copyright: (C) 2014 Konstantin Khlebnikov,  GPLv2.
+// Comments: There are false positives in crypto/ where they are actually freed.
+// Keywords: crypto, kfree
+// Options: --no-includes --include-headers
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index a53ee09..b6f22d4 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1151,8 +1151,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 	drbg->reseed_ctr = 1;
- 
- out:
--	if (entropy)
--		kzfree(entropy);
-+	kzfree(entropy);
- 	return ret;
- }
- 
-@@ -1161,19 +1160,15 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
- {
- 	if (!drbg)
- 		return;
--	if (drbg->V)
--		kzfree(drbg->V);
-+	kzfree(drbg->V);
- 	drbg->V = NULL;
--	if (drbg->C)
--		kzfree(drbg->C);
-+	kzfree(drbg->C);
- 	drbg->C = NULL;
--	if (drbg->scratchpad)
--		kzfree(drbg->scratchpad);
-+	kzfree(drbg->scratchpad);
- 	drbg->scratchpad = NULL;
- 	drbg->reseed_ctr = 0;
- #ifdef CONFIG_CRYPTO_FIPS
--	if (drbg->prev)
--		kzfree(drbg->prev);
-+	kzfree(drbg->prev);
- 	drbg->prev = NULL;
- 	drbg->fips_primed = false;
- #endif
-@@ -1293,8 +1288,7 @@ static int drbg_make_shadow(struct drbg_state *drbg, struct drbg_state **shadow)
- 	return 0;
- 
- err:
--	if (tmp)
--		kzfree(tmp);
-+	kzfree(tmp);
- 	return ret;
- }
- 
--- 
-2.1.3
+virtual org
+virtual report
+virtual context
+
+@r depends on context || org || report@
+expression x;
+position p1;
+@@
+
+(
+ x = crypto_alloc_base@p1(...)
+|
+ x = crypto_alloc_cipher@p1(...)
+|
+ x = crypto_alloc_ablkcipher@p1(...)
+|
+ x = crypto_alloc_aead@p1(...)
+|
+ x = crypto_alloc_instance@p1(...)
+|
+ x = crypto_alloc_instance2@p1(...)
+|
+ x = crypto_alloc_comp@p1(...)
+|
+ x = crypto_alloc_pcomp@p1(...)
+|
+ x = crypto_alloc_hash@p1(...)
+|
+ x = crypto_alloc_ahash@p1(...)
+|
+ x = crypto_alloc_shash@p1(...)
+|
+ x = crypto_alloc_rng@p1(...)
+)
+
+@pb@
+expression r.x;
+position p;
+@@
+
+* kfree@p(x)
+
+@script:python depends on org@
+p << pb.p;
+p1 << r.p1;
+@@
+
+msg="WARNING: invalid free of crypto_alloc_* allocated data"
+coccilib.org.print_todo(p[0], msg)
+coccilib.org.print_link(p1[0], "allocation")
+
+@script:python depends on report@
+p << pb.p;
+p1 << r.p1;
+@@
+
+msg="WARNING: invalid free of crypto_alloc_* allocated data, allocated on line %s" % (p1[0].line)
+coccilib.report.print_report(p[0], msg)
