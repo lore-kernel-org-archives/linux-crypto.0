@@ -1,37 +1,71 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: crypto: user - Allow get request with empty driver name
-Date: Thu, 20 Nov 2014 21:40:29 +0800
-Message-ID: <20141120134029.GA31411@gondor.apana.org.au>
-References: <5365136.g8vbXlhRyC@tachyon.chronox.de>
- <20141120044650.GA28691@gondor.apana.org.au>
- <1706209.Hbu17X87TM@tachyon.chronox.de>
- <2283056.kKnMJs7Bfg@tachyon.chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH V2 1/2] crypto: Add Imagination Technologies hw hash
+ accelerator
+Date: Thu, 20 Nov 2014 22:22:10 +0800
+Message-ID: <20141120142210.GA31745@gondor.apana.org.au>
+References: <1416343727-2178-1-git-send-email-james.hartley@imgtec.com>
+ <1416343727-2178-2-git-send-email-james.hartley@imgtec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Steffen Klassert <steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org>,
-	Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ABI/API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: davem@davemloft.net, grant.likely@linaro.org, robh+dt@kernel.org,
+	gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, pawel.moll@arm.com,
+	mark.rutland@arm.com, ijc+devicetree@hellion.org.uk,
+	galak@codeaurora.org, Ezequiel.Garcia@imgtec.com,
+	abrestic@chromium.org
+To: James Hartley <james.hartley@imgtec.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:49638 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755835AbaKTOWg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Nov 2014 09:22:36 -0500
 Content-Disposition: inline
-In-Reply-To: <2283056.kKnMJs7Bfg-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1416343727-2178-2-git-send-email-james.hartley@imgtec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 20, 2014 at 02:10:00PM +0100, Stephan Mueller wrote:
+On Tue, Nov 18, 2014 at 08:48:46PM +0000, James Hartley wrote:
 >
-> What about the following
-> 
-> if (p->cru_driver_name[0]
-> 	alg = crypto_alg_match(p, 1);
-> else
-> 	alg = crypto_alg_match(p, 0);
+> +struct img_hash_request_ctx {
+> +	struct img_hash_dev	*hdev;
+> +	u8 digest[SHA256_DIGEST_SIZE] __aligned(sizeof(u32));
+> +	unsigned long		flags;
+> +	size_t			digsize;
+> +
+> +	dma_addr_t		dma_addr;
+> +	size_t			dma_ct;
+> +
+> +	/* sg root */
+> +	struct scatterlist	*sgfirst;
+> +	/* walk state */
+> +	struct scatterlist	*sg;
+> +	size_t			nents;
+> +	size_t			offset;
+> +	unsigned int		total;
+> +	size_t			sent;
+> +
+> +	unsigned long		op;
+> +
+> +	size_t			bufcnt;
+> +	u8 buffer[0] __aligned(sizeof(u32));
+> +};
 
-If cru_driver_name is not empty then exact will never be used, no?
+Unfortunately this is not consistent with our API since you're
+not storing the non-final hash state in the request context.
+
+It appears that you're finalising every request.  That means
+you can only implement finup and digest.  With finup you'll
+also need to be able to import a non-final hash state.  If the
+hardware cannot do that then you can only implement digest.
+
+Everything else would have to be done by a fallback driver.
+
+So the question is can you obtain the non-final hash state from
+the hardware and then reinsert it for the next operation?
 
 Cheers,
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
