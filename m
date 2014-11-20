@@ -1,29 +1,61 @@
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: Re: crypto-drbg: Deletion of unnecessary checks before the function
- call "kzfree"
-Date: Thu, 20 Nov 2014 17:00:37 +0100
-Message-ID: <546E1025.3050801@users.sourceforge.net>
-References: <530C5E18.1020800@users.sourceforge.net> <alpine.DEB.2.10.1402251014170.2080@hadrien> <530CD2C4.4050903@users.sourceforge.net> <alpine.DEB.2.10.1402251840450.7035@hadrien> <530CF8FF.8080600@users.sourceforge.net> <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6> <530DD06F.4090703@users.sourceforge.net> <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6> <5317A59D.4@users.sourceforge.net> <546C60E0.1070903@users.sourceforge.net> <20141120143932.GA31996@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: crypto: user - Allow get request with empty driver name
+Date: Thu, 20 Nov 2014 17:08:42 +0100
+Message-ID: <6655976.jRkjMUZ19x@tachyon.chronox.de>
+References: <5365136.g8vbXlhRyC@tachyon.chronox.de> <2283056.kKnMJs7Bfg@tachyon.chronox.de> <20141120134029.GA31411@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	kernel-janitors@vger.kernel.org,
-	Julia Lawall <julia.lawall@lip6.fr>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Daniel Borkmann <dborkman@redhat.com>,
+	quentin.gouchet@gmail.com, LKML <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, ABI/API <linux-api@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-In-Reply-To: <20141120143932.GA31996@gondor.apana.org.au>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:54705 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756195AbaKTQIs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Nov 2014 11:08:48 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S84AA> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Thu, 20 Nov 2014 17:08:44 +0100
+In-Reply-To: <20141120134029.GA31411@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-> Sorry but you're too late as someone else has already fixed this :)
+Am Donnerstag, 20. November 2014, 21:40:29 schrieb Herbert Xu:
 
-Thanks for your feedback.
+Hi Herbert,
 
-https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/crypto/drbg.c?id=46f64f6ef978dc1f36ebaa50ed79c7c8386711ee
+> On Thu, Nov 20, 2014 at 02:10:00PM +0100, Stephan Mueller wrote:
+> > What about the following
+> > 
+> > if (p->cru_driver_name[0]
 
-Regards,
-Markus
+If the driver name is not empty
+> > 
+> > 	alg = crypto_alg_match(p, 1);
 
+Do an exact match using the driver name
+> > 
+> > else
+> > 
+> > 	alg = crypto_alg_match(p, 0);
+
+Otherise use the generic name for a fuzzy match.
+> 
+> If cru_driver_name is not empty then exact will never be used, no?
+
+If the code suggestion does not follow my words outlined above, I want my 
+words to be considered ;-)
+
+Yet, I am unsure where the code deviates from my words.
+
+> 
+> Cheers,
+
+
+-- 
+Ciao
+Stephan
