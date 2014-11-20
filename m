@@ -1,62 +1,52 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: crypto: user - Allow get request with empty driver name
-Date: Thu, 20 Nov 2014 08:11:42 +0100
-Message-ID: <20141120071141.GS6390@secunet.com>
-References: <5365136.g8vbXlhRyC@tachyon.chronox.de>
- <1886827.KUDIsNtfuk@tachyon.chronox.de>
- <20141120041824.GA28612@gondor.apana.org.au>
- <3538055.XH2t7HNEVj@tachyon.chronox.de>
- <20141120044650.GA28691@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: aesni-intel - avoid IPsec re-ordering
+Date: Thu, 20 Nov 2014 08:26:51 +0100
+Message-ID: <20141120072650.GT6390@secunet.com>
+References: <1415771371-30774-1-git-send-email-ming.liu@windriver.com>
+ <20141112084138.GL6390@secunet.com>
+ <20141115031549.GA19208@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Cc: Stephan Mueller <smueller@chronox.de>,
-	Daniel Borkmann <dborkman@redhat.com>,
-	<quentin.gouchet@gmail.com>, LKML <linux-kernel@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, ABI/API <linux-api@vger.kernel.org>
+Cc: Ming Liu <ming.liu@windriver.com>, <davem@davemloft.net>,
+	<ying.xue@windriver.com>, <linux-crypto@vger.kernel.org>,
+	<netdev@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([195.81.216.161]:36867 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750775AbaKTH1C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Nov 2014 02:27:02 -0500
 Content-Disposition: inline
-In-Reply-To: <20141120044650.GA28691@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20141115031549.GA19208@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Nov 20, 2014 at 12:46:50PM +0800, Herbert Xu wrote:
-> On Thu, Nov 20, 2014 at 05:23:23AM +0100, Stephan Mueller wrote:
-> > 
-> > Here is the code:
-> > 
-> > static int crypto_report(struct sk_buff *in_skb, struct nlmsghdr *in_nlh,
-> > 			 struct nlattr **attrs)
-> > {
-> > ...
-> > 	if (!p->cru_driver_name[0])
-> > 		return -EINVAL;
+On Sat, Nov 15, 2014 at 11:15:50AM +0800, Herbert Xu wrote:
+> On Wed, Nov 12, 2014 at 09:41:38AM +0100, Steffen Klassert wrote:
+> >
+> > Everything below the local_bh_enable() should not run in atomic context
+> > as the subsequent functions may set the CRYPTO_TFM_REQ_MAY_SLEEP flag.
 > 
-> OK let's fix this.
+> Actually I'm thinking of doing exactly that (disabling softirq in
+> cryptd) to fix the reordering problem.
 > 
-> crypto: user - Allow get request with empty driver name
->     
-> Currently all get requests with an empty driver name fail with
-> EINVAL.  Since most users actually want to supply an empty driver
-> name this patch removes this check.
+> Most threads do not use the FPU/SIMD so cryptd is only ever needed
+> when we have a user-space app that touches the FPU/SIMD which then
+> gets an interrupt to perform crypto in softirq.  So forcing cryptd
+> on everyone just because some apps touch the FPU/SIMD is a non-
+> starter.
 > 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> The most straightforward solution is to always defer to cryptd once
+> it gets started.  This is bad because if a rarely used app that
+> touches FPU/SIMD runs then we'll end up stuck in cryptd long after
+> the app goes away.
 > 
-> diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-> index e2a34fe..0bb30ac 100644
-> --- a/crypto/crypto_user.c
-> +++ b/crypto/crypto_user.c
-> @@ -201,10 +201,7 @@ static int crypto_report(struct sk_buff *in_skb, struct nlmsghdr *in_nlh,
->  	if (!null_terminated(p->cru_name) || !null_terminated(p->cru_driver_name))
->  		return -EINVAL;
->  
-> -	if (!p->cru_driver_name[0])
-> -		return -EINVAL;
-> -
-> -	alg = crypto_alg_match(p, 1);
-> +	alg = crypto_alg_match(p, 0);
+> So what I'm thinking of is to have the softirq path forcibly regain
+> control from cryptd where possible.  This is tricky because cryptd
+> might be in the middle of processing a request.  So that's why I'd
+> like to disable softirqs while we're processing a request.
+> 
 
-I think this is not sufficient, crypto_alg_match() will now return the first
-algorithm in crypto_alg_list that matches cra_name. We would need to extend
-crypto_alg_match() to return the algorithm with the highest priority in that
-case.
+What about to use a fallback algorithm that does not need to touch
+FPU/SIMD in such cases? We would not need cryptd at all and it would
+keep the requests in the right order because we don't defer them.
