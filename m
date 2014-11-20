@@ -1,50 +1,29 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH RESEND v2 0/4] hwrng: atmel: add DT support
-Date: Thu, 20 Nov 2014 22:43:49 +0800
-Message-ID: <20141120144349.GC32061@gondor.apana.org.au>
-References: <cover.1416475860.git.nicolas.ferre@atmel.com>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Subject: Re: crypto-drbg: Deletion of unnecessary checks before the function
+ call "kzfree"
+Date: Thu, 20 Nov 2014 17:00:37 +0100
+Message-ID: <546E1025.3050801@users.sourceforge.net>
+References: <530C5E18.1020800@users.sourceforge.net> <alpine.DEB.2.10.1402251014170.2080@hadrien> <530CD2C4.4050903@users.sourceforge.net> <alpine.DEB.2.10.1402251840450.7035@hadrien> <530CF8FF.8080600@users.sourceforge.net> <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6> <530DD06F.4090703@users.sourceforge.net> <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6> <5317A59D.4@users.sourceforge.net> <546C60E0.1070903@users.sourceforge.net> <20141120143932.GA31996@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org,
-	Boris BREZILLON <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Alexandre Belloni <alexandre.belloni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Jean-Christophe PLAGNIOL-VILLARD <plagnioj-sclMFOaUSTBWk0Htik3J/w@public.gmane.org>,
-	robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	peter-+2lRwdCCLRT2eFz/2MeuCQ@public.gmane.org
-To: Nicolas Ferre <nicolas.ferre-AIFe0yeh4nAAvxtiuMwx3w@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <cover.1416475860.git.nicolas.ferre-AIFe0yeh4nAAvxtiuMwx3w@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	kernel-janitors@vger.kernel.org,
+	Julia Lawall <julia.lawall@lip6.fr>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
+In-Reply-To: <20141120143932.GA31996@gondor.apana.org.au>
+Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Nov 20, 2014 at 10:43:21AM +0100, Nicolas Ferre wrote:
-> This is the patch series that Boris sent yesterday. I've just collected
-> "Acked-by" tags and resend it with updated cover letter.
-> 
-> This series adds DT support for the TRNG (True Random Generator) block and adds
-> missing trng nodes to at91sam9g45 dtsi files.
-> 
-> Herbert,
-> As you said that you can take this series, here is the latest vertion ready for you to
-> pick it up. Thanks for your help.
-> 
-> Bye,
-> 
-> Boris Brezillon (4):
->   hwrng: atmel: use clk_prepapre_enable/_disable_unprepare
->   hwrng: atmel: add DT support
->   hwrng: atmel: Add TRNG DT binding doc
->   ARM: at91/dt: add trng node to at91sam9g45
+> Sorry but you're too late as someone else has already fixed this :)
 
-All applied.  Thanks!
--- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Thanks for your feedback.
+
+https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/crypto/drbg.c?id=46f64f6ef978dc1f36ebaa50ed79c7c8386711ee
+
+Regards,
+Markus
+
