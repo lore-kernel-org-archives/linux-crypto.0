@@ -1,46 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/1] crypto-drbg: Deletion of unnecessary checks before
- the function call "kzfree"
-Date: Thu, 20 Nov 2014 22:39:32 +0800
-Message-ID: <20141120143932.GA31996@gondor.apana.org.au>
-References: <530C5E18.1020800@users.sourceforge.net>
- <alpine.DEB.2.10.1402251014170.2080@hadrien>
- <530CD2C4.4050903@users.sourceforge.net>
- <alpine.DEB.2.10.1402251840450.7035@hadrien>
- <530CF8FF.8080600@users.sourceforge.net>
- <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
- <530DD06F.4090703@users.sourceforge.net>
- <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
- <5317A59D.4@users.sourceforge.net>
- <546C60E0.1070903@users.sourceforge.net>
+Subject: Re: [PATCH] arm64: crypto: Add ARM64 CRC32 hw accelerated module
+Date: Thu, 20 Nov 2014 22:43:15 +0800
+Message-ID: <20141120144315.GA32061@gondor.apana.org.au>
+References: <1416417577-27495-1-git-send-email-yazen.ghannam@linaro.org>
+ <CA+dbMpuXC58d_CPYfzYEOjKkP04ZgcxBj6qtfxFfDJK95BxD3Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	kernel-janitors@vger.kernel.org,
-	Julia Lawall <julia.lawall@lip6.fr>
-To: SF Markus Elfring <elfring@users.sourceforge.net>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+To: Yazen Ghannam <yazen.ghannam@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:52984 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757000AbaKTOnU (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 20 Nov 2014 09:43:20 -0500
 Content-Disposition: inline
-In-Reply-To: <546C60E0.1070903@users.sourceforge.net>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <CA+dbMpuXC58d_CPYfzYEOjKkP04ZgcxBj6qtfxFfDJK95BxD3Q@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Nov 19, 2014 at 10:20:32AM +0100, SF Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Wed, 19 Nov 2014 10:11:04 +0100
+On Thu, Nov 20, 2014 at 07:42:23AM -0600, Yazen Ghannam wrote:
+> +linux-arm-kernel@lists.infradead.org
 > 
-> The kzfree() function tests whether its argument is NULL and then
-> returns immediately. Thus the test around the call is not needed.
+> On Wed, Nov 19, 2014 at 11:19 AM, Yazen Ghannam <yazen.ghannam@linaro.org>
+> wrote:
 > 
-> This issue was detected by using the Coccinelle software.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> > This module registers a crc32 algorithm and a crc32c algorithm
+> > that use the optional CRC32 and CRC32C instructions in ARMv8.
+> >
+> > Tested on AMD Seattle.
+> >
+> > Improvement compared to crc32c-generic algorithm:
+> > TCRYPT CRC32C speed test shows ~450% speedup.
+> > Simple dd write tests to btrfs filesystem show ~30% speedup.
+> >
+> > Signed-off-by: Yazen Ghannam <yazen.ghannam@linaro.org>
+> > Acked-by: Steve Capper <steve.capper@linaro.org>
+> > Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Sorry but you're too late as someone else has already fixed this :)
-
-Thanks,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
