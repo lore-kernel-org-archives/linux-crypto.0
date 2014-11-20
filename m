@@ -1,51 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RESEND 0/4] ARM: at91: remove at91sam9g45/9m10 legacy
- board support
-Date: Thu, 20 Nov 2014 12:05:55 +0800
-Message-ID: <20141120040555.GA28420@gondor.apana.org.au>
-References: <1416413278-10197-1-git-send-email-boris.brezillon@free-electrons.com>
- <546CC233.6090605@atmel.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v2 02/10] crypto: AF_ALG: user space interface for cipher
+ info
+Date: Thu, 20 Nov 2014 12:07:48 +0800
+Message-ID: <20141120040748.GB28420@gondor.apana.org.au>
+References: <5365136.g8vbXlhRyC@tachyon.chronox.de>
+ <2688209.3bGZus2TD9@tachyon.chronox.de>
+ <20141118140822.GB12100@gondor.apana.org.au>
+ <16101836.sTaxopCThb@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Matt Mackall <mpm@selenic.com>,
-	Jean-Christophe Plagniol-Villard <plagnioj@jcrosoft.com>,
-	Alexandre Belloni <alexandre.belloni@free-electrons.com>,
-	Andrew Victor <linux@maxim.org.za>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Nicolas Ferre <nicolas.ferre@atmel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:52758 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756121AbaKTEGj (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 19 Nov 2014 23:06:39 -0500
+Cc: Steffen Klassert <steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org>,
+	Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ABI/API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <546CC233.6090605@atmel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <16101836.sTaxopCThb-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Nov 19, 2014 at 05:15:47PM +0100, Nicolas Ferre wrote:
-> On 19/11/2014 17:07, Boris Brezillon :
-> > Hello,
-> > 
-> > This series adds DT support for the TRNG (True Random Generator) block and
-> > adds missing trng nodes to dtsi files.
-> 
-> Nitpicking: subject of this cover letter seems not good ;-)
-> 
-> Herbert, do you think you can take this series yourself or do I have to
-> take it?
+On Thu, Nov 20, 2014 at 05:03:24AM +0100, Stephan Mueller wrote:
+>
+> crypto_user cannot be applied to the currently active cipher that one has open 
+> with AF_ALG. For getting information, one has to call crypto_user with the 
+> cra_driver_name of a cipher. (Why is that limitation, btw (see crypto_report 
+> and the use of cru_driver_name?)
 
-Sure I can take this.
+It doesn't matter because every implementation must supply exactly
+the same parameters as the reference implementation or it's buggy.
+IOW block size, IV size, supported key sizes etc. are intrinsic
+properties of the algorithm and not the implementation.
 
 Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
