@@ -1,62 +1,38 @@
-From: Mathias Krause <minipli@googlemail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH v3] crypto: prefix module autoloading with "crypto-"
-Date: Fri, 21 Nov 2014 09:31:15 +0100
-Message-ID: <CA+rthh-AkVT4FmBXMiKYL8863eReYyE5g6+8wDEUiOnNevt_OQ@mail.gmail.com>
+Date: Fri, 21 Nov 2014 17:01:08 +0800
+Message-ID: <20141121090108.GA5984@gondor.apana.org.au>
 References: <20141121010553.GA5959@www.outflux.net>
+ <CA+rthh-AkVT4FmBXMiKYL8863eReYyE5g6+8wDEUiOnNevt_OQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Kees Cook <keescook@chromium.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
+To: Mathias Krause <minipli@googlemail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:45836 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757523AbaKUIbS (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:39390 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752478AbaKUJBU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Nov 2014 03:31:18 -0500
-In-Reply-To: <20141121010553.GA5959@www.outflux.net>
+	Fri, 21 Nov 2014 04:01:20 -0500
+Content-Disposition: inline
+In-Reply-To: <CA+rthh-AkVT4FmBXMiKYL8863eReYyE5g6+8wDEUiOnNevt_OQ@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 21 November 2014 02:05, Kees Cook <keescook@chromium.org> wrote:
-> This prefixes all crypto module loading with "crypto-" so we never run
-> the risk of exposing module auto-loading to userspace via a crypto API,
-> as demonstrated by Mathias Krause:
+On Fri, Nov 21, 2014 at 09:31:15AM +0100, Mathias Krause wrote:
 >
-> https://lkml.org/lkml/2013/3/4/70
->
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
-> [...]
+> The last modlog call does not contain the "crypto-" prefix, therefore
+> happily loads the vfat module.
+> I guess crypto templates are handled special?
 
-Looks good so far, but unfortunately does not solve the problem
-completely (af_alg_mod from the link above):
+Yes templates are loaded in crypto_lookup_template so a small change
+there (assuming this patch didn't change it) plus a few more aliases
+to the template files should suffice.
 
-bbox:~# cat /sbin/modlog
-#!/bin/sh
-exec 1>/tmp/modlog.$$
-echo "CMD: $0 $*"
-echo "ENV: "
-env
-exec /sbin/modprobe "$@"
-bbox:~# echo /sbin/modlog > /proc/sys/kernel/modprobe
-bbox:~# lsmod | grep fat
-bbox:~# af_alg_mod 'vfat(blowfish)'
-bbox:~# grep CMD /tmp/modlog.*
-/tmp/modlog.257:CMD: /sbin/modlog -q -- net-pf-38
-/tmp/modlog.261:CMD: /sbin/modlog -q -- algif-hash
-/tmp/modlog.265:CMD: /sbin/modlog -q -- crypto-vfat(blowfish)
-/tmp/modlog.268:CMD: /sbin/modlog -q -- crypto-vfat(blowfish)-all
-/tmp/modlog.272:CMD: /sbin/modlog -q -- vfat
-bbox:~# lsmod | grep fat
-vfat                   17135  0
-fat                    61984  1 vfat
-bbox:~#
-
-The last modlog call does not contain the "crypto-" prefix, therefore
-happily loads the vfat module.
-I guess crypto templates are handled special?
-
-Regards,
-Mathias
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
