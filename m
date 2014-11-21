@@ -1,88 +1,142 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: crypto: user - Allow get request with empty driver name
-Date: Fri, 21 Nov 2014 05:40:15 +0100
-Message-ID: <3188989.JiqkGaskPP@tachyon.chronox.de>
-References: <5365136.g8vbXlhRyC@tachyon.chronox.de> <20141120044650.GA28691@gondor.apana.org.au> <1706209.Hbu17X87TM@tachyon.chronox.de>
+Subject: [PATCH v3 7/7] crypto: AF_ALG: document the user space interface
+Date: Fri, 21 Nov 2014 06:34:12 +0100
+Message-ID: <1981402.FQkbiEN1F6@tachyon.chronox.de>
+References: <4088013.2O8zCP0xXa@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Daniel Borkmann <dborkman@redhat.com>,
-	quentin.gouchet@gmail.com, LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, ABI/API <linux-api@vger.kernel.org>
+Cc: Daniel Borkmann <dborkman@redhat.com>,
+	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54717 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:54727 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757141AbaKUEkV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 20 Nov 2014 23:40:21 -0500
+	id S1750763AbaKUFmj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 21 Nov 2014 00:42:39 -0500
 Received: from tachyon.chronox.de
 	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S861A> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Fri, 21 Nov 2014 05:40:17 +0100
-In-Reply-To: <1706209.Hbu17X87TM@tachyon.chronox.de>
+	id <S863A> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Fri, 21 Nov 2014 06:42:35 +0100
+In-Reply-To: <4088013.2O8zCP0xXa@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 20. November 2014, 14:02:21 schrieb Stephan Mueller:
+The extension of the user space interface documentation covers all
+aspects of the patchset, including:
 
-Hi Stephan,
+        * AEAD cipher interface
 
-> Am Donnerstag, 20. November 2014, 12:46:50 schrieb Herbert Xu:
-> 
-> Hi Herbert,
-> 
-> > On Thu, Nov 20, 2014 at 05:23:23AM +0100, Stephan Mueller wrote:
-> > > Here is the code:
-> > > 
-> > > static int crypto_report(struct sk_buff *in_skb, struct nlmsghdr
-> > > *in_nlh,
-> > > 
-> > > 			 struct nlattr **attrs)
-> > > 
-> > > {
-> > > ...
-> > > 
-> > > 	if (!p->cru_driver_name[0])
-> > > 	
-> > > 		return -EINVAL;
-> > 
-> > OK let's fix this.
-> > 
-> > crypto: user - Allow get request with empty driver name
-> > 
-> > Currently all get requests with an empty driver name fail with
-> > EINVAL.  Since most users actually want to supply an empty driver
-> > name this patch removes this check.
-> > 
-> > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> Acked-by: Stephan Mueller <smueller@chronox.de>
-> 
-> > diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-> > index e2a34fe..0bb30ac 100644
-> > --- a/crypto/crypto_user.c
-> > +++ b/crypto/crypto_user.c
-> > @@ -201,10 +201,7 @@ static int crypto_report(struct sk_buff *in_skb,
-> > struct nlmsghdr *in_nlh, if (!null_terminated(p->cru_name) ||
-> > !null_terminated(p->cru_driver_name)) return -EINVAL;
-> > 
-> > -	if (!p->cru_driver_name[0])
-> > -		return -EINVAL;
-> > -
-> > -	alg = crypto_alg_match(p, 1);
-> > +	alg = crypto_alg_match(p, 0);
+        * RNG cipher interface
 
-Btw: I tested that patch and it works as expected.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ Documentation/crypto/crypto-API-userspace.txt | 70 ++++++++++++++++++++++++++-
+ 1 file changed, 68 insertions(+), 2 deletions(-)
 
-> > 
-> >  	if (!alg)
-> >  	
-> >  		return -ENOENT;
-> > 
-> > Cheers,
-
-
+diff --git a/Documentation/crypto/crypto-API-userspace.txt b/Documentation/crypto/crypto-API-userspace.txt
+index ac619cd..0646034 100644
+--- a/Documentation/crypto/crypto-API-userspace.txt
++++ b/Documentation/crypto/crypto-API-userspace.txt
+@@ -30,8 +30,9 @@ ciphers are accessible:
+ 
+ 	* Symmetric ciphers
+ 
+-Note, AEAD ciphers are currently not supported via the symmetric cipher
+-interface.
++	* AEAD ciphers
++
++	* Random number generators
+ 
+ The interface is provided via Netlink using the type AF_ALG. In addition, the
+ setsockopt option type is SOL_ALG. In case the user space header files do not
+@@ -85,6 +86,7 @@ If a consumer on the other hand wants to maintain the plaintext and the
+ ciphertext in different memory locations, all a consumer needs to do is to
+ provide different memory pointers for the encryption and decryption operation.
+ 
++
+ Message digest API
+ ==================
+ 
+@@ -169,6 +171,69 @@ as large as to hold all blocks of the encrypted or decrypted data. If the output
+ data size is smaller, only as many blocks are returned that fit into that
+ output buffer size.
+ 
++
++AEAD cipher API
++===============
++
++The operation is identical to the symmetric cipher API. However, an AEAD
++cipher requires additional information, such as the authentication tag and
++the associated data. This data is to be supplied in addition to the normal
++symmetric cipher data like key and IV discussed for the symmetric ciphers.
++
++During initialization, the struct sockaddr data structure must be filled as
++follows:
++
++struct sockaddr_alg sa = {
++	.salg_family = AF_ALG,
++	.salg_type = "aead", /* this selects the AEAD cipher */
++	.salg_name = "gcm(aes)" /* this is the cipher name */
++};
++
++The discussion about the sendmsg given for the symmetric cipher applies for
++the AEAD interface as well. In addition to the plaintext / ciphertext data and
++the IV, the following data must be supplied with the cmsghdr data structure:
++
++	* The AEAD authentication tag size is set with the flag
++	  ALG_SET_AEAD_AUTHSIZE. The integer value of the authentication tag
++	  size must be provided in the data field of the cmsghdr structure.
++
++	* The AEAD associated data is set with the flag ALG_SET_AEAD_ASSOC.
++	  The data is set the same way as for the IV by supplying the associated
++	  data in the data field of the cmsghdr structure.
++
++The authentication tag itself, however, is handled in a different way to comply
++with the specifics of the kernel crypto API and to avoid copying the
++authentication tag around in memory. The authentication tag is added to the
++memory that immediately follows the ciphertext.
++
++	* When performing an encryption operation, the resulting ciphertext
++	  buffer will hold the tag as follows: ciphertext || tag.  The consumer
++	  must ensure that the ciphertext buffer is large enough to hold the
++	  ciphertext together with the tag of the size set by the consumer using
++	  the ALG_SET_AEAD_AUTHSIZE cmsghdr flag as discussed above.
++
++	* When performing a decryption operation, the initial ciphertext buffer
++	  must hold the tag as follows: ciphertext || tag. The resulting
++	  plaintext has the same size as the ciphertext.
++
++Note: Authentication errors during decryption are marked with a failing
++read/recv system call whose errno is set to EBADMSG.
++
++
++Random number generator API
++===========================
++
++Compared to the symmetric ciphers, the random number generator API is simple:
++it only supports the system calls of read/recv.
++
++The consumer must observe the returned size of the read/recv system calls and
++potentially make subsequent calls if the returned length of random numbers is
++smaller than the expected length.
++
++When initializing a random number generator instance, the AF_ALG interface
++handler ensures that it is appropriately seeded.
++
++
+ Setsockopt interface
+ ====================
+ 
+@@ -190,6 +255,7 @@ optname:
+ 
+ 		- the hash cipher type (keyed message digests)
+ 
++
+ User space API example
+ ======================
+ 
 -- 
-Ciao
-Stephan
+2.1.0
