@@ -1,64 +1,59 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] crypto: algif - Mark sgl end at the end of data.
-Date: Fri, 21 Nov 2014 09:14:06 -0800
-Message-ID: <20141121171406.1147.31491.stgit@tstruk-mobl1>
+Subject: [PATCH] crytpo: qat - Fix 64 bytes requests
+Date: Fri, 21 Nov 2014 09:25:57 -0800
+Message-ID: <20141121172557.1399.1849.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	qat-linux@intel.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:53378 "EHLO mga01.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:33138 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755368AbaKURRH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Nov 2014 12:17:07 -0500
+	id S1751596AbaKUR2w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 21 Nov 2014 12:28:52 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-algif_skcipher sends 127 sgl buffers for encryption regardless of how many
-buffers acctually have data to process, where the few first with valid len
-and the rest with zero len. This is not very eficient and may cause problems
-when algs do something like this without checking the buff lenght:
-for_each_sg(sgl, sg, sg_nents, i)
-	sg_virt(sg)
-
-This patch marks the last one with data as the last one to process.
-Also removed some unneeded code.
+Fix invalid inflights calculation for 64 bytes requests.
 
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- crypto/algif_skcipher.c |    6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ .../qat/qat_common/adf_transport_access_macros.h   |    9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 85e3bdb..e393c71 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -359,8 +359,6 @@ static int skcipher_sendmsg(struct kiocb *unused, struct socket *sock,
- 	err = 0;
+diff --git a/drivers/crypto/qat/qat_common/adf_transport_access_macros.h b/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
+index 91d88d6..160c9a3 100644
+--- a/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
++++ b/drivers/crypto/qat/qat_common/adf_transport_access_macros.h
+@@ -83,14 +83,14 @@
+ #define ADF_MAX_RING_SIZE ADF_RING_SIZE_4M
+ #define ADF_DEFAULT_RING_SIZE ADF_RING_SIZE_16K
  
- 	ctx->more = msg->msg_flags & MSG_MORE;
--	if (!ctx->more && !list_empty(&ctx->tsgl))
--		sgl = list_entry(ctx->tsgl.prev, struct skcipher_sg_list, list);
+-/* Valid internal msg size values internal */
++/* Valid internal msg size values */
+ #define ADF_MSG_SIZE_32 0x01
+ #define ADF_MSG_SIZE_64 0x02
+ #define ADF_MSG_SIZE_128 0x04
+ #define ADF_MIN_MSG_SIZE ADF_MSG_SIZE_32
+ #define ADF_MAX_MSG_SIZE ADF_MSG_SIZE_128
  
- unlock:
- 	skcipher_data_wakeup(sk);
-@@ -408,9 +406,6 @@ static ssize_t skcipher_sendpage(struct socket *sock, struct page *page,
- 
- done:
- 	ctx->more = flags & MSG_MORE;
--	if (!ctx->more && !list_empty(&ctx->tsgl))
--		sgl = list_entry(ctx->tsgl.prev, struct skcipher_sg_list, list);
--
- unlock:
- 	skcipher_data_wakeup(sk);
- 	release_sock(sk);
-@@ -469,6 +464,7 @@ static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
- 			if (!used)
- 				goto free;
- 
-+			sg_mark_end(&sg[sgl->cur - 1]);
- 			ablkcipher_request_set_crypt(&ctx->req, sg,
- 						     ctx->rsgl.sg, used,
- 						     ctx->iv);
+-/* Size to bytes conversion macros for ring and msg values */
++/* Size to bytes conversion macros for ring and msg size values */
+ #define ADF_MSG_SIZE_TO_BYTES(SIZE) (SIZE << 5)
+ #define ADF_BYTES_TO_MSG_SIZE(SIZE) (SIZE >> 5)
+ #define ADF_SIZE_TO_RING_SIZE_IN_BYTES(SIZE) ((1 << (SIZE - 1)) << 7)
+@@ -100,8 +100,11 @@
+ #define ADF_RING_SIZE_BYTES_MIN(SIZE) ((SIZE < ADF_RING_SIZE_4K) ? \
+ 				ADF_RING_SIZE_4K : SIZE)
+ #define ADF_RING_SIZE_MODULO(SIZE) (SIZE + 0x6)
++#define ADF_SIZE_TO_POW(SIZE) ((((SIZE & 0x4) >> 1) | ((SIZE & 0x4) >> 2) | \
++				SIZE) & ~0x4)
++/* Max outstanding requests */
+ #define ADF_MAX_INFLIGHTS(RING_SIZE, MSG_SIZE) \
+-	((((1 << (RING_SIZE - 1)) << 4) >> MSG_SIZE) - 1)
++	((((1 << (RING_SIZE - 1)) << 3) >> ADF_SIZE_TO_POW(MSG_SIZE)) - 1)
+ #define BUILD_RING_CONFIG(size)	\
+ 	((ADF_RING_NEAR_WATERMARK_0 << ADF_RING_CONFIG_NEAR_FULL_WM) \
+ 	| (ADF_RING_NEAR_WATERMARK_0 << ADF_RING_CONFIG_NEAR_EMPTY_WM) \
