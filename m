@@ -1,38 +1,76 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3] crypto: prefix module autoloading with "crypto-"
-Date: Fri, 21 Nov 2014 17:01:08 +0800
-Message-ID: <20141121090108.GA5984@gondor.apana.org.au>
-References: <20141121010553.GA5959@www.outflux.net>
- <CA+rthh-AkVT4FmBXMiKYL8863eReYyE5g6+8wDEUiOnNevt_OQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Kees Cook <keescook@chromium.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Mathias Krause <minipli@googlemail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:39390 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752478AbaKUJBU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 21 Nov 2014 04:01:20 -0500
-Content-Disposition: inline
-In-Reply-To: <CA+rthh-AkVT4FmBXMiKYL8863eReYyE5g6+8wDEUiOnNevt_OQ@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Pranith Kumar <bobby.prani@gmail.com>
+Subject: [PATCH v2 0/9] Replace smp_read_barrier_depends() with lockless_derefrence()
+Date: Fri, 21 Nov 2014 10:05:54 -0500
+Message-ID: <1416582363-20661-1-git-send-email-bobby.prani@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Cristian Stoica <cristian.stoica@freescale.com>,
+	Horia Geanta <horia.geanta@freescale.com>,
+	Ruchika Gupta <ruchika.gupta@freescale.com>,
+	Michael Neuling <mikey@neuling.org>,
+	Wolfram Sang <wsa@the-dreams.de>,
+	linux-crypto@vger.kernel.org (open list:CRYPTO API),
+	linux-kernel@vger.kernel.org (open list),
+	Vinod Koul <vinod.koul@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+	Kyungmin Park <kyungmin.park@samsung.com>,
+	=?UTF-8?q?Manuel=20Sch=C3=B6lling?= <manuel.schoelling@gmx.de>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Rashika <rashika.kheria@gmail.com>,
+	dmaengine@vger.kernel.org (open list:DMA GENERIC OFFLO...),
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	devel@linuxdriverproject.org (open list:Hyp
+Return-path: <owner-linux-mm@kvack.org>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 21, 2014 at 09:31:15AM +0100, Mathias Krause wrote:
->
-> The last modlog call does not contain the "crypto-" prefix, therefore
-> happily loads the vfat module.
-> I guess crypto templates are handled special?
+Recently lockless_dereference() was added which can be used in place of
+hard-coding smp_read_barrier_depends(). 
 
-Yes templates are loaded in crypto_lookup_template so a small change
-there (assuming this patch didn't change it) plus a few more aliases
-to the template files should suffice.
+http://lkml.iu.edu/hypermail/linux/kernel/1410.3/04561.html
 
-Cheers,
+The following series tries to do this.
+
+There are still some hard-coded locations which I was not sure how to replace
+with. I will send in separate patches/questions regarding them.
+
+Pranith Kumar (9):
+  doc: memory-barriers.txt: Document use of lockless_dereference()
+  drivers: dma: Replace smp_read_barrier_depends() with
+    lockless_dereference()
+  dcache: Replace smp_read_barrier_depends() with lockless_dereference()
+  hyperv: Replace smp_read_barrier_depends() with lockless_dereference()
+  percpu: Replace smp_read_barrier_depends() with lockless_dereference()
+  perf: Replace smp_read_barrier_depends() with lockless_dereference()
+  seccomp: Replace smp_read_barrier_depends() with
+    lockless_dereference()
+  task_work: Replace smp_read_barrier_depends() with
+    lockless_dereference()
+  netfilter: Replace smp_read_barrier_depends() with
+    lockless_dereference()
+
+ Documentation/memory-barriers.txt | 4 ++--
+ drivers/dma/ioat/dma_v2.c         | 3 +--
+ drivers/dma/ioat/dma_v3.c         | 3 +--
+ fs/dcache.c                       | 7 ++-----
+ include/linux/hyperv.h            | 9 ++++-----
+ include/linux/percpu-refcount.h   | 4 +---
+ kernel/events/core.c              | 3 +--
+ kernel/events/uprobes.c           | 8 ++++----
+ kernel/seccomp.c                  | 7 +++----
+ kernel/task_work.c                | 3 +--
+ net/ipv4/netfilter/arp_tables.c   | 3 +--
+ net/ipv4/netfilter/ip_tables.c    | 3 +--
+ net/ipv6/netfilter/ip6_tables.c   | 3 +--
+ 13 files changed, 23 insertions(+), 37 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
