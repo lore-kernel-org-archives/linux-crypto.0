@@ -1,49 +1,58 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [patch] crypto: sha-mb - remove a bogus NULL check
-Date: Mon, 24 Nov 2014 09:47:34 -0800
-Message-ID: <1416851254.18250.14.camel@schen9-desk2.jf.intel.com>
-References: <20141122183628.GD6994@mwanda>
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH] crypto: include crypto- module prefix in template
+Date: Mon, 24 Nov 2014 11:17:42 -0800
+Message-ID: <20141124191742.GA13783@www.outflux.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-	Fengguang Wu <fengguang.wu@intel.com>,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
-In-Reply-To: <20141122183628.GD6994@mwanda>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Mathias Krause <minipli@googlemail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from smtp.outflux.net ([198.145.64.163]:58661 "EHLO smtp.outflux.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750940AbaKXTRu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 24 Nov 2014 14:17:50 -0500
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, 2014-11-22 at 21:36 +0300, Dan Carpenter wrote:
-> This can't be NULL and we dereferenced it earlier.  Smatch used to
-> ignore these things where the pointer was obviously non-NULL but I've
-> found that sometimes the intention was to check something else so we
-> were maybe missing bugs.
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> 
-> diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
-> index 99eefd8..a225a5ca 100644
-> --- a/arch/x86/crypto/sha-mb/sha1_mb.c
-> +++ b/arch/x86/crypto/sha-mb/sha1_mb.c
-> @@ -204,8 +204,7 @@ static struct sha1_hash_ctx *sha1_ctx_mgr_resubmit(struct sha1_ctx_mgr *mgr, str
->  			continue;
->  		}
->  
-> -		if (ctx)
-> -			ctx->status = HASH_CTX_STS_IDLE;
-> +		ctx->status = HASH_CTX_STS_IDLE;
->  		return ctx;
->  	}
->  
+This adds the module loading prefix "crypto-" to the template lookup
+as well.
 
-Agree.  This NULL pointer check is not necessary.
+For example, attempting to load 'vfat(blowfish)' via AF_ALG now correctly
+includes the "crypto-" prefix at every level, correctly rejecting "vfat":
 
-Acked-by: Tim Chen <tim.c.chen@linux.intel.com>
+	net-pf-38
+	algif-hash
+	crypto-vfat(blowfish)
+	crypto-vfat(blowfish)-all
+	crypto-vfat
+
+Reported-by: Mathias Krause <minipli@googlemail.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ crypto/algapi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index e8d3a7dca8c4..71a8143e23b1 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -509,8 +509,8 @@ static struct crypto_template *__crypto_lookup_template(const char *name)
+ 
+ struct crypto_template *crypto_lookup_template(const char *name)
+ {
+-	return try_then_request_module(__crypto_lookup_template(name), "%s",
+-				       name);
++	return try_then_request_module(__crypto_lookup_template(name),
++				       "crypto-%s", name);
+ }
+ EXPORT_SYMBOL_GPL(crypto_lookup_template);
+ 
+-- 
+1.9.1
 
 
+-- 
+Kees Cook
+Chrome OS Security
