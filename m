@@ -1,107 +1,129 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v3 5/7] crypto: AF_ALG: add random number generator support
-Date: Mon, 24 Nov 2014 16:08:51 +0100
-Message-ID: <1924093.6oedGBDXii@tauon>
-References: <4088013.2O8zCP0xXa@tachyon.chronox.de> <2490914.nzfN9gyyGH@tachyon.chronox.de> <20141124143150.GC31469@gondor.apana.org.au>
+From: Nickolaus Woodruff <nickolauswoodruff@gmail.com>
+Subject: [PATCH] crypto: drbg: use memzero_explicit() for clearing sensitive
+ data
+Date: Mon, 24 Nov 2014 10:21:16 -0500
+Message-ID: <20141124152116.GA31106@nick-ThinkPad-T430s>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman@redhat.com>,
-	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
-	lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54804 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752037AbaKXPIz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Nov 2014 10:08:55 -0500
-Received: from tauon.localnet
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S8CB5> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Mon, 24 Nov 2014 16:08:51 +0100
-In-Reply-To: <20141124143150.GC31469@gondor.apana.org.au>
+Received: from mail-qg0-f52.google.com ([209.85.192.52]:62892 "EHLO
+	mail-qg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751215AbaKXPVT (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 24 Nov 2014 10:21:19 -0500
+Received: by mail-qg0-f52.google.com with SMTP id a108so6941149qge.11
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Nov 2014 07:21:19 -0800 (PST)
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 24. November 2014, 22:31:50 schrieb Herbert Xu:
+Compiler dead store optimization can sometimes remove final calls
+to memset() used to clear sensitive data at the end of a function.
+Replace trailing memset() calls with memzero_explicit() to
+preclude unwanted removal.
 
-Hi Herbert,
+Signed-off-by: Nickolaus Woodruff <nickolauswoodruff@gmail.com>
+---
+ crypto/drbg.c         | 22 +++++++++++-----------
+ include/crypto/drbg.h |  1 +
+ 2 files changed, 12 insertions(+), 11 deletions(-)
 
->On Fri, Nov 21, 2014 at 06:32:52AM +0100, Stephan Mueller wrote:
->> This patch adds the random number generator support for AF_ALG.
->> 
->> A random number generator's purpose is to generate data without
->> requiring the caller to provide any data. Therefore, the AF_ALG
->> interface handler for RNGs only implements a callback handler for
->> recvmsg.
->> 
->> The following parameters provided with a recvmsg are processed by the
->> 
->> RNG callback handler:
->>         * sock - to resolve the RNG context data structure accessing
->>         the
->>         
->>           RNG instance private to the socket
->>         
->>         * len - this parameter allows userspace callers to specify
->>         how
->>         
->>           many random bytes the RNG shall produce and return. As the
->>           kernel context for the RNG allocates a buffer of 128 bytes
->>           to
->>           store random numbers before copying them to userspace, the
->>           len
->>           parameter is checked that it is not larger than 128. If a
->>           caller wants more random numbers, a new request for recvmsg
->>           shall be made.
->> 
->> The size of 128 bytes is chose because of the following 
-considerations:
->>         * to increase the memory footprint of the kernel too much
->>         (note,
->>         
->>           that would be 128 bytes per open socket)
->>         
->>         * 128 is divisible by any typical cryptographic block size an
->>         
->>           RNG may have
->>         
->>         * A request for random numbers typically only shall supply
->>         small
->>         
->>           amount of data like for keys or IVs that should only
->>           require
->>           one invocation of the recvmsg function.
->> 
->> Note, during instantiation of the RNG, the code checks whether the
->> RNG
->> implementation requires seeding. If so, the RNG is seeded with output
->> from get_random_bytes.
->> 
->> A fully working example using all aspects of the RNG interface is
->> provided at http://www.chronox.de/libkcapi.html
->> 
->> Signed-off-by: Stephan Mueller <smueller@chronox.de>
->
->Sorry but who is going to use this and for what purpose?
->
->Every other algif interface exports real hardware features that
->cannot otherwise be accessed from user-space.  All crypto RNGs
->are by definition software-only, so what is the point of this?
-
-
-My idea is twofold: The software-RNGs currently available (X9.31 and 
-DRBG) use other ciphers as backends. Therefore, they can be considered 
-as transforms on top of these backend ciphers. Now, if these backend 
-ciphers are available in kernel mode only, currently only these in-
-kernel RNGs can use the hardware.
-
-With the consideration of AEAD, all ciphers supported by the kernel 
-crypto API are available to user space. That means, there is no need for 
-an additional crypto library in user space in addition to provide 
-hardware access. The RNG part is there to complement the case for not 
-needing an additional crypto lib in user space.
-
-Ciao
-Stephan
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 54cfd48..c6258ca 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -522,9 +522,9 @@ static int drbg_ctr_df(struct drbg_state *drbg,
+ 	ret = 0;
+ 
+ out:
+-	memset(iv, 0, drbg_blocklen(drbg));
+-	memset(temp, 0, drbg_statelen(drbg));
+-	memset(pad, 0, drbg_blocklen(drbg));
++	memzero_explicit(iv, drbg_blocklen(drbg));
++	memzero_explicit(temp, drbg_statelen(drbg));
++	memzero_explicit(pad, drbg_blocklen(drbg));
+ 	return ret;
+ }
+ 
+@@ -599,9 +599,9 @@ static int drbg_ctr_update(struct drbg_state *drbg, struct list_head *seed,
+ 	ret = 0;
+ 
+ out:
+-	memset(temp, 0, drbg_statelen(drbg) + drbg_blocklen(drbg));
++	memzero_explicit(temp, drbg_statelen(drbg) + drbg_blocklen(drbg));
+ 	if (2 != reseed)
+-		memset(df_data, 0, drbg_statelen(drbg));
++		memzero_explicit(df_data, drbg_statelen(drbg));
+ 	return ret;
+ }
+ 
+@@ -660,7 +660,7 @@ static int drbg_ctr_generate(struct drbg_state *drbg,
+ 		len = ret;
+ 
+ out:
+-	memset(drbg->scratchpad, 0, drbg_blocklen(drbg));
++	memzero_explicit(drbg->scratchpad, drbg_blocklen(drbg));
+ 	return len;
+ }
+ 
+@@ -848,7 +848,7 @@ static int drbg_hash_df(struct drbg_state *drbg,
+ 	}
+ 
+ out:
+-	memset(tmp, 0, drbg_blocklen(drbg));
++	memzero_explicit(tmp, drbg_blocklen(drbg));
+ 	return ret;
+ }
+ 
+@@ -892,7 +892,7 @@ static int drbg_hash_update(struct drbg_state *drbg, struct list_head *seed,
+ 	ret = drbg_hash_df(drbg, drbg->C, drbg_statelen(drbg), &datalist2);
+ 
+ out:
+-	memset(drbg->scratchpad, 0, drbg_statelen(drbg));
++	memzero_explicit(drbg->scratchpad, drbg_statelen(drbg));
+ 	return ret;
+ }
+ 
+@@ -927,7 +927,7 @@ static int drbg_hash_process_addtl(struct drbg_state *drbg,
+ 		     drbg->scratchpad, drbg_blocklen(drbg));
+ 
+ out:
+-	memset(drbg->scratchpad, 0, drbg_blocklen(drbg));
++	memzero_explicit(drbg->scratchpad, drbg_blocklen(drbg));
+ 	return ret;
+ }
+ 
+@@ -975,7 +975,7 @@ static int drbg_hash_hashgen(struct drbg_state *drbg,
+ 	}
+ 
+ out:
+-	memset(drbg->scratchpad, 0,
++	memzero_explicit(drbg->scratchpad,
+ 	       (drbg_statelen(drbg) + drbg_blocklen(drbg)));
+ 	return len;
+ }
+@@ -1024,7 +1024,7 @@ static int drbg_hash_generate(struct drbg_state *drbg,
+ 	drbg_add_buf(drbg->V, drbg_statelen(drbg), u.req, 8);
+ 
+ out:
+-	memset(drbg->scratchpad, 0, drbg_blocklen(drbg));
++	memzero_explicit(drbg->scratchpad, drbg_blocklen(drbg));
+ 	return len;
+ }
+ 
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 5186f75..13471a2 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -45,6 +45,7 @@
+ #include <crypto/hash.h>
+ #include <linux/module.h>
+ #include <linux/crypto.h>
++#include <linux/string.h>
+ #include <linux/slab.h>
+ #include <crypto/internal/rng.h>
+ #include <crypto/rng.h>
+-- 
+1.9.1
