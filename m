@@ -1,76 +1,51 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 5/7] crypto: AF_ALG: add random number generator
- support
-Date: Mon, 24 Nov 2014 22:31:50 +0800
-Message-ID: <20141124143150.GC31469@gondor.apana.org.au>
-References: <4088013.2O8zCP0xXa@tachyon.chronox.de>
- <2490914.nzfN9gyyGH@tachyon.chronox.de>
+Subject: Re: [PATCH 1/2] crypto: Add Imagination Technologies hw hash
+ accelerator
+Date: Mon, 24 Nov 2014 22:39:17 +0800
+Message-ID: <20141124143916.GA31808@gondor.apana.org.au>
+References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com>
+ <1415621455-10468-2-git-send-email-james.hartley@imgtec.com>
+ <CAL1qeaGN9q_WHP2YJ3fY3r11v0pitcmwbjam5dRzeZhHCp7c8g@mail.gmail.com>
+ <5467070E.5040104@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Daniel Borkmann <dborkman@redhat.com>,
-	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
-	lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Cc: Andrew Bresticker <abrestic@chromium.org>,
+	James Hartley <james.hartley@imgtec.com>, davem@davemloft.net,
+	Grant Likely <grant.likely@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	joe@perches.com, mchehab@osg.samsung.com,
+	Antti Palosaari <crope@iki.fi>, jg1.han@samsung.com,
+	linux-crypto@vger.kernel.org,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	Ezequiel Garcia <ezequiel.garcia@imgtec.com>
+To: Corentin LABBE <clabbe.montjoie@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:46964 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:60948 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751839AbaKXOb6 (ORCPT
+	with ESMTP id S1753358AbaKXOj4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Nov 2014 09:31:58 -0500
+	Mon, 24 Nov 2014 09:39:56 -0500
 Content-Disposition: inline
-In-Reply-To: <2490914.nzfN9gyyGH@tachyon.chronox.de>
+In-Reply-To: <5467070E.5040104@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 21, 2014 at 06:32:52AM +0100, Stephan Mueller wrote:
-> This patch adds the random number generator support for AF_ALG.
+On Sat, Nov 15, 2014 at 08:55:58AM +0100, Corentin LABBE wrote:
+>
+> and then get it via
+> struct crypto_priv *cp = req->base.tfm->__crt_alg->data;
+> (a function will be better than that)
 > 
-> A random number generator's purpose is to generate data without
-> requiring the caller to provide any data. Therefore, the AF_ALG
-> interface handler for RNGs only implements a callback handler for
-> recvmsg.
-> 
-> The following parameters provided with a recvmsg are processed by the
-> RNG callback handler:
-> 
->         * sock - to resolve the RNG context data structure accessing the
->           RNG instance private to the socket
-> 
->         * len - this parameter allows userspace callers to specify how
->           many random bytes the RNG shall produce and return. As the
->           kernel context for the RNG allocates a buffer of 128 bytes to
->           store random numbers before copying them to userspace, the len
->           parameter is checked that it is not larger than 128. If a
->           caller wants more random numbers, a new request for recvmsg
->           shall be made.
-> 
-> The size of 128 bytes is chose because of the following considerations:
-> 
->         * to increase the memory footprint of the kernel too much (note,
->           that would be 128 bytes per open socket)
-> 
->         * 128 is divisible by any typical cryptographic block size an
->           RNG may have
-> 
->         * A request for random numbers typically only shall supply small
->           amount of data like for keys or IVs that should only require
->           one invocation of the recvmsg function.
-> 
-> Note, during instantiation of the RNG, the code checks whether the RNG
-> implementation requires seeding. If so, the RNG is seeded with output
-> from get_random_bytes.
-> 
-> A fully working example using all aspects of the RNG interface is
-> provided at http://www.chronox.de/libkcapi.html
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> So what is the recommended way to get driver structure inside the cryptoAPI function (init/udpate/final)?
 
-Sorry but who is going to use this and for what purpose?
-
-Every other algif interface exports real hardware features that
-cannot otherwise be accessed from user-space.  All crypto RNGs
-are by definition software-only, so what is the point of this?
+Have a look at talitos which deals with this by embedding crypto_alg
+within its own data structure.
 
 Cheers,
 -- 
