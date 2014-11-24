@@ -1,56 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH crypto-next] crypto: algif - add and use sock_kzfree_s()
- instead of memzero_explicit()
-Date: Mon, 24 Nov 2014 22:05:59 +0800
-Message-ID: <20141124140559.GA31373@gondor.apana.org.au>
-References: <1416413591-30146-1-git-send-email-dborkman@redhat.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v3 1/7] crypto: AF_ALG: add user space interface for AEAD
+Date: Mon, 24 Nov 2014 22:26:39 +0800
+Message-ID: <20141124142639.GA31469@gondor.apana.org.au>
+References: <4088013.2O8zCP0xXa@tachyon.chronox.de>
+ <5694690.RURGUoE58b@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: smueller@chronox.de, linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: Daniel Borkmann <dborkman@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:36286 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752679AbaKXOGJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Nov 2014 09:06:09 -0500
+Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	lkml - Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1416413591-30146-1-git-send-email-dborkman@redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <5694690.RURGUoE58b-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Nov 19, 2014 at 05:13:11PM +0100, Daniel Borkmann wrote:
-> Commit e1bd95bf7c25 ("crypto: algif - zeroize IV buffer") and
-> 2a6af25befd0 ("crypto: algif - zeroize message digest buffer")
-> added memzero_explicit() calls on buffers that are later on
-> passed back to sock_kfree_s().
-> 
-> This is a discussed follow-up that, instead, extends the sock
-> API and adds sock_kzfree_s(), which internally uses kzfree()
-> instead of kfree() for passing the buffers back to slab.
-> 
-> Having sock_kzfree_s() allows to keep the changes more minimal
-> by just having a drop-in replacement instead of adding
-> memzero_explicit() calls everywhere before sock_kfree_s().
-> 
-> In kzfree(), the compiler is not allowed to optimize the memset()
-> away and thus there's no need for memzero_explicit(). Both,
-> sock_kfree_s() and sock_kzfree_s() are wrappers for
-> __sock_kfree_s() and call into kfree() resp. kzfree(); here,
-> __sock_kfree_s() needs to be explicitly inlined as we want the
-> compiler to optimize the call and condition away and thus it
-> produces e.g. on x86_64 the _same_ assembler output for
-> sock_kfree_s() before and after, and thus also allows for
-> avoiding code duplication.
-> 
-> Cc: David S. Miller <davem@davemloft.net>
-> Signed-off-by: Daniel Borkmann <dborkman@redhat.com>
+On Fri, Nov 21, 2014 at 06:30:18AM +0100, Stephan Mueller wrote:
+>
+> @@ -421,6 +421,18 @@ int af_alg_cmsg_send(struct msghdr *msg, struct af_alg_control *con)
+>  			con->op = *(u32 *)CMSG_DATA(cmsg);
+>  			break;
+>  
+> +		case ALG_SET_AEAD_AUTHSIZE:
+> +			if (cmsg->cmsg_len < CMSG_LEN(sizeof(u32)))
+> +				return -EINVAL;
+> +			con->aead_authsize = *(u32 *)CMSG_DATA(cmsg);
+> +			break;
 
-Dave, any comment on this patch?
+This is a tfm attribute so it should go into setsockopt.
 
-Thanks,
+Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
