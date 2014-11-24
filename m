@@ -1,53 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: Add Imagination Technologies hw hash
- accelerator
-Date: Mon, 24 Nov 2014 22:39:17 +0800
-Message-ID: <20141124143916.GA31808@gondor.apana.org.au>
-References: <1415621455-10468-1-git-send-email-james.hartley@imgtec.com>
- <1415621455-10468-2-git-send-email-james.hartley@imgtec.com>
- <CAL1qeaGN9q_WHP2YJ3fY3r11v0pitcmwbjam5dRzeZhHCp7c8g@mail.gmail.com>
- <5467070E.5040104@gmail.com>
+Subject: Re: [PATCH v3] crypto: prefix module autoloading with "crypto-"
+Date: Mon, 24 Nov 2014 22:47:35 +0800
+Message-ID: <20141124144734.GA31900@gondor.apana.org.au>
+References: <20141121010553.GA5959@www.outflux.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Bresticker <abrestic@chromium.org>,
-	James Hartley <james.hartley@imgtec.com>, davem@davemloft.net,
-	Grant Likely <grant.likely@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	joe@perches.com, mchehab@osg.samsung.com,
-	Antti Palosaari <crope@iki.fi>, jg1.han@samsung.com,
-	linux-crypto@vger.kernel.org,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	Ezequiel Garcia <ezequiel.garcia@imgtec.com>
-To: Corentin LABBE <clabbe.montjoie@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Mathias Krause <minipli@googlemail.com>
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60948 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:59320 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753358AbaKXOj4 (ORCPT
+	with ESMTP id S1751005AbaKXOrk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 24 Nov 2014 09:39:56 -0500
+	Mon, 24 Nov 2014 09:47:40 -0500
 Content-Disposition: inline
-In-Reply-To: <5467070E.5040104@gmail.com>
+In-Reply-To: <20141121010553.GA5959@www.outflux.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Nov 15, 2014 at 08:55:58AM +0100, Corentin LABBE wrote:
->
-> and then get it via
-> struct crypto_priv *cp = req->base.tfm->__crt_alg->data;
-> (a function will be better than that)
+On Thu, Nov 20, 2014 at 05:05:53PM -0800, Kees Cook wrote:
+> This prefixes all crypto module loading with "crypto-" so we never run
+> the risk of exposing module auto-loading to userspace via a crypto API,
+> as demonstrated by Mathias Krause:
 > 
-> So what is the recommended way to get driver structure inside the cryptoAPI function (init/udpate/final)?
+> https://lkml.org/lkml/2013/3/4/70
+> 
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Have a look at talitos which deals with this by embedding crypto_alg
-within its own data structure.
+Patch applied.
 
-Cheers,
+For the template issue please create a patch on top of this.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
