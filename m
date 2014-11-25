@@ -1,33 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [patch] crypto: sha-mb - remove a bogus NULL check
-Date: Tue, 25 Nov 2014 22:56:01 +0800
-Message-ID: <20141125145601.GC8541@gondor.apana.org.au>
-References: <20141122183628.GD6994@mwanda>
+Subject: Re: [PATCH v3 4/7] crypto: AF_ALG: add AEAD support
+Date: Tue, 25 Nov 2014 22:58:50 +0800
+Message-ID: <20141125145850.GD8541@gondor.apana.org.au>
+References: <4088013.2O8zCP0xXa@tachyon.chronox.de>
+ <2175035.5IWBGpA0Ko@tachyon.chronox.de>
+ <20141124142945.GB31469@gondor.apana.org.au>
+ <5492722.Cc6uZ9OM2L@tauon>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Fengguang Wu <fengguang.wu@intel.com>,
-	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <kernel-janitors-owner@vger.kernel.org>
+Cc: Daniel Borkmann <dborkman@redhat.com>,
+	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:34133 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751012AbaKYO64 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Nov 2014 09:58:56 -0500
 Content-Disposition: inline
-In-Reply-To: <20141122183628.GD6994@mwanda>
-Sender: kernel-janitors-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <5492722.Cc6uZ9OM2L@tauon>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, Nov 22, 2014 at 09:36:28PM +0300, Dan Carpenter wrote:
-> This can't be NULL and we dereferenced it earlier.  Smatch used to
-> ignore these things where the pointer was obviously non-NULL but I've
-> found that sometimes the intention was to check something else so we
-> were maybe missing bugs.
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+On Mon, Nov 24, 2014 at 03:58:34PM +0100, Stephan Mueller wrote:
+> Ok. But in the code you see that skcipher is a 100% subset of AEAD. For 
+> AEAD, all we need to do in addition to normal symmetric ciphers is to 
+> select the AEAD kernel crypto API calls, to locate and use the AD and to 
+> ensure we have the right memory size to process the tag.
 
-Patch applied.  Thanks!
+There is still one fundamental difference between AEAD and ciphers.
+Namely that ciphers can operate as you go while AEAD requests must
+be done in one lot.  So that should make the AEAD code simpler vs.
+ciphers.
+
+I think the best course of action for now is to start with sharing
+no code and then chop bits off as we see fit.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
