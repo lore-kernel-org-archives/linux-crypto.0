@@ -1,46 +1,40 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v3 4/7] crypto: AF_ALG: add AEAD support
-Date: Tue, 25 Nov 2014 16:08:35 +0100
-Message-ID: <3914952.bO8PzptSEc@tauon>
-References: <4088013.2O8zCP0xXa@tachyon.chronox.de> <5492722.Cc6uZ9OM2L@tauon> <20141125145850.GD8541@gondor.apana.org.au>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] crypto: algif - Mark sgl end at the end of data.
+Date: Tue, 25 Nov 2014 07:53:39 -0800
+Message-ID: <5474A603.4040705@intel.com>
+References: <20141121171406.1147.31491.stgit@tstruk-mobl1> <20141125144245.GA8278@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	lkml - Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20141125145850.GD8541-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
-
-Am Dienstag, 25. November 2014, 22:58:50 schrieb Herbert Xu:
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga03.intel.com ([134.134.136.65]:31558 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750782AbaKYP4t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Nov 2014 10:56:49 -0500
+In-Reply-To: <20141125144245.GA8278@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 Hi Herbert,
+On 11/25/2014 06:42 AM, Herbert Xu wrote:
+> Please put these clean-ups in a separate patch.
+Ok, will do.
 
->On Mon, Nov 24, 2014 at 03:58:34PM +0100, Stephan Mueller wrote:
->> Ok. But in the code you see that skcipher is a 100% subset of AEAD.
->> For AEAD, all we need to do in addition to normal symmetric ciphers
->> is to select the AEAD kernel crypto API calls, to locate and use the
->> AD and to ensure we have the right memory size to process the tag.
->
->There is still one fundamental difference between AEAD and ciphers.
->Namely that ciphers can operate as you go while AEAD requests must
->be done in one lot.  So that should make the AEAD code simpler vs.
->ciphers.
+> 
+>> > @@ -469,6 +464,7 @@ static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
+>> >  			if (!used)
+>> >  				goto free;
+>> >  
+>> > +			sg_mark_end(&sg[sgl->cur - 1]);
+> I don't think this will work as if we only partially use up the
+> SGs and MSG_MORE is set then bad things will happen to the next
+> send call on the socket.
 
-Yes, that is a key difference.
->
->I think the best course of action for now is to start with sharing
->no code and then chop bits off as we see fit.
-
-Ok, I will create a new patch set with a separate algif_aead.c. I guess 
-the entire sgl handling logic will be gone in AEAD.
->
->Cheers,
-
-
-Ciao
-Stephan
+Yes, I see now. I assumed that the user would want to read the same len
+that was first sent and thus the skcipher_pull_sgl() would clean the
+whole ctx->tsgl and then skcipher_alloc_sgl() would create a new one.
+I'll see if something else can be done to mark the end of data.
+Thanks,
+Tadeusz
