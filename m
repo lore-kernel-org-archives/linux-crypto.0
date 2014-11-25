@@ -1,99 +1,63 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: drbg - use MODULE_ALIAS_CRYPTO
-Date: Tue, 25 Nov 2014 09:28:43 +0100
-Message-ID: <1959971.EZA1ZTEOoi@tachyon.chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: algif - Mark sgl end at the end of data.
+Date: Tue, 25 Nov 2014 22:42:45 +0800
+Message-ID: <20141125144245.GA8278@gondor.apana.org.au>
+References: <20141121171406.1147.31491.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54818 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750765AbaKYI2s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Nov 2014 03:28:48 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S8F46> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Tue, 25 Nov 2014 09:28:44 +0100
+Received: from helcar.apana.org.au ([209.40.204.226]:59683 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750931AbaKYOmw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 25 Nov 2014 09:42:52 -0500
+Content-Disposition: inline
+In-Reply-To: <20141121171406.1147.31491.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use the crypto- prefix for the DRBG implementations.
+On Fri, Nov 21, 2014 at 09:14:06AM -0800, Tadeusz Struk wrote:
+>
+> diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+> index 85e3bdb..e393c71 100644
+> --- a/crypto/algif_skcipher.c
+> +++ b/crypto/algif_skcipher.c
+> @@ -359,8 +359,6 @@ static int skcipher_sendmsg(struct kiocb *unused, struct socket *sock,
+>  	err = 0;
+>  
+>  	ctx->more = msg->msg_flags & MSG_MORE;
+> -	if (!ctx->more && !list_empty(&ctx->tsgl))
+> -		sgl = list_entry(ctx->tsgl.prev, struct skcipher_sg_list, list);
+>  
+>  unlock:
+>  	skcipher_data_wakeup(sk);
+> @@ -408,9 +406,6 @@ static ssize_t skcipher_sendpage(struct socket *sock, struct page *page,
+>  
+>  done:
+>  	ctx->more = flags & MSG_MORE;
+> -	if (!ctx->more && !list_empty(&ctx->tsgl))
+> -		sgl = list_entry(ctx->tsgl.prev, struct skcipher_sg_list, list);
+> -
+>  unlock:
+>  	skcipher_data_wakeup(sk);
+>  	release_sock(sk);
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c | 44 ++++++++++++++++++++++----------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
+Please put these clean-ups in a separate patch.
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 9fb38a5..c90e3cf 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -291,12 +291,12 @@ static inline void drbg_cpu_to_be32(__u32 val, unsigned char *buf)
- 
- #ifdef CONFIG_CRYPTO_DRBG_CTR
- #define CRYPTO_DRBG_CTR_STRING "CTR "
--MODULE_ALIAS("drbg_pr_ctr_aes256");
--MODULE_ALIAS("drbg_nopr_ctr_aes256");
--MODULE_ALIAS("drbg_pr_ctr_aes192");
--MODULE_ALIAS("drbg_nopr_ctr_aes192");
--MODULE_ALIAS("drbg_pr_ctr_aes128");
--MODULE_ALIAS("drbg_nopr_ctr_aes128");
-+MODULE_ALIAS_CRYPTO("drbg_pr_ctr_aes256");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_ctr_aes256");
-+MODULE_ALIAS_CRYPTO("drbg_pr_ctr_aes192");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_ctr_aes192");
-+MODULE_ALIAS_CRYPTO("drbg_pr_ctr_aes128");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_ctr_aes128");
- 
- static int drbg_kcapi_sym(struct drbg_state *drbg, const unsigned char *key,
- 			  unsigned char *outval, const struct drbg_string *in);
-@@ -658,14 +658,14 @@ static int drbg_fini_hash_kernel(struct drbg_state *drbg);
- 
- #ifdef CONFIG_CRYPTO_DRBG_HMAC
- #define CRYPTO_DRBG_HMAC_STRING "HMAC "
--MODULE_ALIAS("drbg_pr_hmac_sha512");
--MODULE_ALIAS("drbg_nopr_hmac_sha512");
--MODULE_ALIAS("drbg_pr_hmac_sha384");
--MODULE_ALIAS("drbg_nopr_hmac_sha384");
--MODULE_ALIAS("drbg_pr_hmac_sha256");
--MODULE_ALIAS("drbg_nopr_hmac_sha256");
--MODULE_ALIAS("drbg_pr_hmac_sha1");
--MODULE_ALIAS("drbg_nopr_hmac_sha1");
-+MODULE_ALIAS_CRYPTO("drbg_pr_hmac_sha512");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_hmac_sha512");
-+MODULE_ALIAS_CRYPTO("drbg_pr_hmac_sha384");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_hmac_sha384");
-+MODULE_ALIAS_CRYPTO("drbg_pr_hmac_sha256");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_hmac_sha256");
-+MODULE_ALIAS_CRYPTO("drbg_pr_hmac_sha1");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_hmac_sha1");
- 
- /* update function of HMAC DRBG as defined in 10.1.2.2 */
- static int drbg_hmac_update(struct drbg_state *drbg, struct list_head *seed,
-@@ -778,14 +778,14 @@ static struct drbg_state_ops drbg_hmac_ops = {
- 
- #ifdef CONFIG_CRYPTO_DRBG_HASH
- #define CRYPTO_DRBG_HASH_STRING "HASH "
--MODULE_ALIAS("drbg_pr_sha512");
--MODULE_ALIAS("drbg_nopr_sha512");
--MODULE_ALIAS("drbg_pr_sha384");
--MODULE_ALIAS("drbg_nopr_sha384");
--MODULE_ALIAS("drbg_pr_sha256");
--MODULE_ALIAS("drbg_nopr_sha256");
--MODULE_ALIAS("drbg_pr_sha1");
--MODULE_ALIAS("drbg_nopr_sha1");
-+MODULE_ALIAS_CRYPTO("drbg_pr_sha512");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_sha512");
-+MODULE_ALIAS_CRYPTO("drbg_pr_sha384");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_sha384");
-+MODULE_ALIAS_CRYPTO("drbg_pr_sha256");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_sha256");
-+MODULE_ALIAS_CRYPTO("drbg_pr_sha1");
-+MODULE_ALIAS_CRYPTO("drbg_nopr_sha1");
- 
- /*
-  * Increment buffer
+> @@ -469,6 +464,7 @@ static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
+>  			if (!used)
+>  				goto free;
+>  
+> +			sg_mark_end(&sg[sgl->cur - 1]);
+
+I don't think this will work as if we only partially use up the
+SGs and MSG_MORE is set then bad things will happen to the next
+send call on the socket.
+
+Cheers,
 -- 
-2.1.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
