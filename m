@@ -1,28 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crytpo: qat - Fix 64 bytes requests
-Date: Tue, 25 Nov 2014 22:55:45 +0800
-Message-ID: <20141125145545.GB8541@gondor.apana.org.au>
-References: <20141121172557.1399.1849.stgit@tstruk-mobl1>
+Subject: Re: [patch] crypto: sha-mb - remove a bogus NULL check
+Date: Tue, 25 Nov 2014 22:56:01 +0800
+Message-ID: <20141125145601.GC8541@gondor.apana.org.au>
+References: <20141122183628.GD6994@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:41480 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751329AbaKYOzs (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 25 Nov 2014 09:55:48 -0500
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Fengguang Wu <fengguang.wu@intel.com>,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20141121172557.1399.1849.stgit@tstruk-mobl1>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20141122183628.GD6994@mwanda>
+Sender: kernel-janitors-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Nov 21, 2014 at 09:25:57AM -0800, Tadeusz Struk wrote:
-> Fix invalid inflights calculation for 64 bytes requests.
+On Sat, Nov 22, 2014 at 09:36:28PM +0300, Dan Carpenter wrote:
+> This can't be NULL and we dereferenced it earlier.  Smatch used to
+> ignore these things where the pointer was obviously non-NULL but I've
+> found that sometimes the intention was to check something else so we
+> were maybe missing bugs.
 > 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
 Patch applied.  Thanks!
 -- 
