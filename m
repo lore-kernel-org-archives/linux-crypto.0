@@ -1,44 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] arm64: crypto: Add ARM64 CRC32 hw accelerated module
-Date: Wed, 26 Nov 2014 20:00:03 +0800
-Message-ID: <20141126120003.GA16236@gondor.apana.org.au>
-References: <1416417577-27495-1-git-send-email-yazen.ghannam@linaro.org>
- <CA+dbMptnfYf0QgKqXWkv4N7_YzJvnoKcvOUY5asPX4x9yEApLg@mail.gmail.com>
- <CAKv+Gu9-ZqkNxEMcdbna4jYDvNmtwEr0Yf57Wv=usURZBvC3BQ@mail.gmail.com>
- <CA+dbMpt=xV2fBxb75JZUuDnpub4LCLZfHBLSkQX55t9Ov+6j_g@mail.gmail.com>
+Subject: Re: [PATCH] crypto: drbg: use memzero_explicit() for clearing
+ sensitive data
+Date: Wed, 26 Nov 2014 20:03:36 +0800
+Message-ID: <20141126120336.GA16375@gondor.apana.org.au>
+References: <20141124152116.GA31106@nick-ThinkPad-T430s>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-To: Yazen Ghannam <yazen.ghannam@linaro.org>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Nickolaus Woodruff <nickolauswoodruff@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:33848 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:50102 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750895AbaKZMAN (ORCPT
+	with ESMTP id S1750846AbaKZMDk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 26 Nov 2014 07:00:13 -0500
+	Wed, 26 Nov 2014 07:03:40 -0500
 Content-Disposition: inline
-In-Reply-To: <CA+dbMpt=xV2fBxb75JZUuDnpub4LCLZfHBLSkQX55t9Ov+6j_g@mail.gmail.com>
+In-Reply-To: <20141124152116.GA31106@nick-ThinkPad-T430s>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Nov 25, 2014 at 10:50:12AM -0600, Yazen Ghannam wrote:
-> Herbert,
-> 
-> I have a couple of questions.
-> 
-> 1) To which release has the patch been applied? We're just curious for
-> tracking purposes.
+On Mon, Nov 24, 2014 at 10:21:16AM -0500, Nickolaus Woodruff wrote:
+> diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+> index 5186f75..13471a2 100644
+> --- a/include/crypto/drbg.h
+> +++ b/include/crypto/drbg.h
+> @@ -45,6 +45,7 @@
+>  #include <crypto/hash.h>
+>  #include <linux/module.h>
+>  #include <linux/crypto.h>
+> +#include <linux/string.h>
 
-3.19
-
-> 2) I'd like to apply Ard's suggestion. Do you prefer a second version
-> of this patch or a separate fixup patch?
-
-Please make your patches against the cryptodev tree.
+Why are you adding the inclusion to drbg.h? This file is for
+users of drbg.  Please add it to drbg.c instead.
 
 Thanks,
 -- 
