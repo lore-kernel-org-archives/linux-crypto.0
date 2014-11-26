@@ -1,25 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: user - add MODULE_ALIAS
-Date: Wed, 26 Nov 2014 20:10:11 +0800
-Message-ID: <20141126121011.GA16424@gondor.apana.org.au>
-References: <2012632.fnfABE5hEY@tachyon.chronox.de>
+Subject: Re: [PATCH v3] crypto: include crypto- module prefix in template
+Date: Wed, 26 Nov 2014 20:10:24 +0800
+Message-ID: <20141126121024.GB16424@gondor.apana.org.au>
+References: <20141125003238.GA17207@www.outflux.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-kernel@vger.kernel.org,
-	linux-crypto <linux-crypto@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Mathias Krause <minipli@googlemail.com>
+To: Kees Cook <keescook@chromium.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <2012632.fnfABE5hEY@tachyon.chronox.de>
+In-Reply-To: <20141125003238.GA17207@www.outflux.net>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Nov 24, 2014 at 05:12:45PM +0100, Stephan Mueller wrote:
-> To allow automatic loading of the crypto_user kernel module, the netlink
-> MODULE_ALIAS is added.
+On Mon, Nov 24, 2014 at 04:32:38PM -0800, Kees Cook wrote:
+> This adds the module loading prefix "crypto-" to the template lookup
+> as well.
 > 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> For example, attempting to load 'vfat(blowfish)' via AF_ALG now correctly
+> includes the "crypto-" prefix at every level, correctly rejecting "vfat":
+> 
+> 	net-pf-38
+> 	algif-hash
+> 	crypto-vfat(blowfish)
+> 	crypto-vfat(blowfish)-all
+> 	crypto-vfat
+> 
+> Reported-by: Mathias Krause <minipli@googlemail.com>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Acked-by: Mathias Krause <minipli@googlemail.com>
 
 Applied.
 -- 
