@@ -1,63 +1,51 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] crypto: algif - Mark sgl end at the end of data
-Date: Fri, 28 Nov 2014 10:40:36 -0800
-Message-ID: <20141128184036.11421.36028.stgit@tstruk-mobl1>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
-To: herbert@gondor.apana.org.au
+From: "George Spelvin" <linux@horizon.com>
+Subject: Is ansi_cprng.c supposed to be an implmentation of X9.31?
+Date: 28 Nov 2014 18:23:51 -0500
+Message-ID: <20141128232351.27607.qmail@ns.horizon.com>
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au, jarod@redhat.com,
+	nhorman@tuxdriver.com, stephan.mueller@atsec.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:19122 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751215AbaK1Snt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Nov 2014 13:43:49 -0500
+Received: from ns.horizon.com ([71.41.210.147]:52665 "HELO ns.horizon.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1751465AbaK1XbO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 28 Nov 2014 18:31:14 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
-algif_skcipher sends 127 sgl buffers for encryption regardless of how
-many buffers acctually have data to process, where the few first with
-valid len and the rest with zero len. This is not very eficient and may cause
-problems when algs do something like this without checking the buff
-lenght:
-for_each_sg(sgl, sg, sg_nents, i)
-	sg_virt(sg)
-This patch marks the last one with data as the last one to process.
+I've been trying to understand the crypto layer, and it's a bit of a
+struggle because I'm trying to learn how it's supposed to work by
+reading the code, and I keep finding code I want to fix.
 
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- crypto/algif_skcipher.c |    6 ++++++
- 1 file changed, 6 insertions(+)
+ansi_cprng.c is the current itch I'm eager to scratch.
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index f80e652..46a0758 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -441,6 +441,8 @@ static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
- 		char __user *from = iov->iov_base;
- 
- 		while (seglen) {
-+			int nents;
-+
- 			sgl = list_first_entry(&ctx->tsgl,
- 					       struct skcipher_sg_list, list);
- 			sg = sgl->sg;
-@@ -468,6 +470,9 @@ static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
- 			if (!used)
- 				goto free;
- 
-+			nents = sg_nents(ctx->rsgl.sg);
-+			sg_mark_end(&sg[nents - 1]);
-+
- 			ablkcipher_request_set_crypt(&ctx->req, sg,
- 						     ctx->rsgl.sg, used,
- 						     ctx->iv);
-@@ -477,6 +482,7 @@ static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
- 					crypto_ablkcipher_encrypt(&ctx->req) :
- 					crypto_ablkcipher_decrypt(&ctx->req),
- 				&ctx->completion);
-+			sg_unmark_end(&sg[nents - 1]);
- 
- free:
- 			af_alg_free_sg(&ctx->rsgl);
+Other than enough implementation stupidities to make me scream
+(particularly the "rand_data_valid" variable name which is actually a
+count of INvalid data, and  keeping 5 blocks of state, including sensitive
+previous output, when only 3 are needed), one thing I can't help noticing
+is that this is definitely NOT conformant with the X9.17/X9.31 spec.
+
+That's because the spec requires a timestamp for each output block
+to provide additional entropy, and a counter won't cut it.
+
+I'm fixing the obvious things, but on this point, I have two choices:
+
+1. Add some comments clarifying that the "Based on" part of the header
+   is anything but a claim of compliance; those specs are for an RNG,
+   while this is a PRNG.  And probably delete all the FIPS stuff, as
+   there's no spec to claim compliance with.  Or
+2. Fix the code to use random_get_entropy() and jiffies for the
+   DT seed vector.
+
+In the latter case, I'd have to leave the current deterministic code as
+an option for self-testing, but I'd drop the recommended seedsize
+to DEFAULT_PRNG_KSZ + DEFAULT_BLK_SZ (one key and one IV), and have
+an internal flag indicating whether to use an incrementing DT vector
+or generate it fresh.
+
+If some code (like the current self-test code) provides an extra
+DEFAULT_BLK_SZ of seed material, it would go into determinsitic mode,
+but if it's missing, DT would be generated dynamically.
+
+But that's a question of design intent, and I can't intuit that from the
+code.  Can someome enlighten me as to which option is preferred?
