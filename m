@@ -1,51 +1,57 @@
 From: "George Spelvin" <linux@horizon.com>
-Subject: Is ansi_cprng.c supposed to be an implmentation of X9.31?
-Date: 28 Nov 2014 18:23:51 -0500
-Message-ID: <20141128232351.27607.qmail@ns.horizon.com>
-Cc: linux-crypto@vger.kernel.org
+Subject: Is ansi_cprng.c supposed to implement X9.17/X9.31's RNG?
+Date: 28 Nov 2014 21:43:45 -0500
+Message-ID: <20141129024345.8122.qmail@ns.horizon.com>
+Cc: linux@horizon.com, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au, jarod@redhat.com,
-	nhorman@tuxdriver.com, stephan.mueller@atsec.com
+	nhorman@tuxdriver.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:52665 "HELO ns.horizon.com"
+Received: from ns.horizon.com ([71.41.210.147]:27683 "HELO ns.horizon.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751465AbaK1XbO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 28 Nov 2014 18:31:14 -0500
+	id S1750866AbaK2Cnr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 28 Nov 2014 21:43:47 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I've been trying to understand the crypto layer, and it's a bit of a
-struggle because I'm trying to learn how it's supposed to work by
-reading the code, and I keep finding code I want to fix.
+I'm trying to understand the Linux crypto layer, and a lot of
+the code I read for guidance I instead end up wanting to fix.
 
-ansi_cprng.c is the current itch I'm eager to scratch.
+My current itch to scratch is crypto/ansi_cprng.c.
 
-Other than enough implementation stupidities to make me scream
-(particularly the "rand_data_valid" variable name which is actually a
-count of INvalid data, and  keeping 5 blocks of state, including sensitive
-previous output, when only 3 are needed), one thing I can't help noticing
-is that this is definitely NOT conformant with the X9.17/X9.31 spec.
+There is a lot of questionable code I'll submit patches for, particularly:
 
-That's because the spec requires a timestamp for each output block
-to provide additional entropy, and a counter won't cut it.
+- The "rand_data_valid" variable, which is actually the amount of
+  INvalid data in ctx->rand_data[].  (I'm renaming it to rand_data_pos.)
+- The ctx->I and ctx->last_rand_data buffers, which are completely
+  unnecessary (and in the latter case, violate anti-backtracking).
+- The fact that cprng_init() calls reset_prng_context() with NULL
+  key and V inputs, and the latter has special-case code to handle
+  that, when cprng_init() sets PRNG_NEED_RESET, so can just omit
+  the call entirely.
 
-I'm fixing the obvious things, but on this point, I have two choices:
+But there's one thing that I can't figure out, and that is whether
+the code is meant to be an implementation of the ANSI X9.17/X9.31 RNG.
 
-1. Add some comments clarifying that the "Based on" part of the header
-   is anything but a claim of compliance; those specs are for an RNG,
-   while this is a PRNG.  And probably delete all the FIPS stuff, as
-   there's no spec to claim compliance with.  Or
-2. Fix the code to use random_get_entropy() and jiffies for the
-   DT seed vector.
+It's currently definitely not, because the spec requires periodic input
+of a timestamp with some seed entropy, while the code just uses
+an incrementing counter.
 
-In the latter case, I'd have to leave the current deterministic code as
-an option for self-testing, but I'd drop the recommended seedsize
-to DEFAULT_PRNG_KSZ + DEFAULT_BLK_SZ (one key and one IV), and have
-an internal flag indicating whether to use an incrementing DT vector
-or generate it fresh.
+So I have two paths available:
 
-If some code (like the current self-test code) provides an extra
-DEFAULT_BLK_SZ of seed material, it would go into determinsitic mode,
-but if it's missing, DT would be generated dynamically.
+1. Clarify in comments that, although "Based on" X9.31 Appendix A.2.4,
+   this is very much NOT an implementation thereof.  This is a fully
+   deterministic PRNG, while the spec is for an RNG.
+2. Alternativelt, change the code to actually use high-resolution
+   timestamps for seed material.
 
-But that's a question of design intent, and I can't intuit that from the
-code.  Can someome enlighten me as to which option is preferred?
+In the latter case, I'd use jiffies and random_get_entropy, and provide
+a compatible deterministic option for self-testing.  I'd drop the
+recommended seedsize to DEFAULT_PRNG_KSZ + DEFAULT_BLK_SZ, but keep the
+current implementation's support for an optional starting DT value.
+
+If it isn't provided (the default), the code would generate it fresh
+on each call to _get_more_prng_bytes, rather than the current default
+to zero.
+
+My problem is I don't know which option is intended.  Is it guaranteed that
+CRYPTO_ALG_TYPE_RNG is deterministic?
