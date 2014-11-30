@@ -1,14 +1,15 @@
 From: Julia Lawall <Julia.Lawall@lip6.fr>
-Subject: [PATCH 3/8 v2] crypto: replace memset by memzero_explicit
-Date: Sun, 30 Nov 2014 18:03:44 +0100
-Message-ID: <1417367029-32762-4-git-send-email-Julia.Lawall@lip6.fr>
+Subject: [PATCH 6/8 v2] crypto: replace memset by memzero_explicit
+Date: Sun, 30 Nov 2014 18:03:47 +0100
+Message-ID: <1417367029-32762-7-git-send-email-Julia.Lawall@lip6.fr>
 References: <1417367029-32762-1-git-send-email-Julia.Lawall@lip6.fr>
 Cc: kernel-janitors@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Paul Mackerras <paulus@samba.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1417367029-32762-1-git-send-email-Julia.Lawall@lip6.fr>
@@ -53,33 +54,19 @@ cryptodev tree.
 
 v2: fixed email address
 
- arch/x86/crypto/sha256_ssse3_glue.c |    2 +-
- arch/x86/crypto/sha512_ssse3_glue.c |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/powerpc/crypto/sha1.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 26a5898..0b6af26 100644
---- a/arch/x86/crypto/sha512_ssse3_glue.c
-+++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -219,7 +219,7 @@ static int sha384_ssse3_final(struct shash_desc *desc, u8 *hash)
- 	sha512_ssse3_final(desc, D);
+diff --git a/arch/powerpc/crypto/sha1.c b/arch/powerpc/crypto/sha1.c
+index 0f88c7b..d3feba5 100644
+--- a/arch/powerpc/crypto/sha1.c
++++ b/arch/powerpc/crypto/sha1.c
+@@ -66,7 +66,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+ 			src = data + done;
+ 		} while (done + 63 < len);
  
- 	memcpy(hash, D, SHA384_DIGEST_SIZE);
--	memset(D, 0, SHA512_DIGEST_SIZE);
-+	memzero_explicit(D, SHA512_DIGEST_SIZE);
- 
- 	return 0;
- }
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index 4dc100d..8fad72f 100644
---- a/arch/x86/crypto/sha256_ssse3_glue.c
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -211,7 +211,7 @@ static int sha224_ssse3_final(struct shash_desc *desc, u8 *hash)
- 	sha256_ssse3_final(desc, D);
- 
- 	memcpy(hash, D, SHA224_DIGEST_SIZE);
--	memset(D, 0, SHA256_DIGEST_SIZE);
-+	memzero_explicit(D, SHA256_DIGEST_SIZE);
- 
- 	return 0;
- }
+-		memset(temp, 0, sizeof(temp));
++		memzero_explicit(temp, sizeof(temp));
+ 		partial = 0;
+ 	}
+ 	memcpy(sctx->buffer + partial, src, len - done);
