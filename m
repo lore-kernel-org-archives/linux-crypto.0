@@ -1,40 +1,48 @@
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 6/8 v2] crypto: replace memset by memzero_explicit
-Date: Mon, 01 Dec 2014 11:58:17 +1100
-Message-ID: <1417395497.16178.0.camel@concordia>
-References: <1417367029-32762-1-git-send-email-Julia.Lawall@lip6.fr>
-	 <1417367029-32762-7-git-send-email-Julia.Lawall@lip6.fr>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
-	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-To: Julia Lawall <Julia.Lawall@lip6.fr>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1417367029-32762-7-git-send-email-Julia.Lawall@lip6.fr>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: [PATCH v4 0/4] crypto: sahara - SHA support
+Date: Mon,  1 Dec 2014 13:26:30 +0100
+Message-ID: <1417436794-7804-1-git-send-email-s.trumtrar@pengutronix.de>
+Cc: linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+	Steffen Trumtrar <s.trumtrar@pengutronix.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:37786 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753044AbaLAM0s (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 1 Dec 2014 07:26:48 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, 2014-11-30 at 18:03 +0100, Julia Lawall wrote:
-> From: Julia Lawall <Julia.Lawall@lip6.fr>
-> 
-> Memset on a local variable may be removed when it is called just before the
-> variable goes out of scope.  Using memzero_explicit defeats this
-> optimization.  A simplified version of the semantic patch that makes this
-> 
-> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
-> 
-> ---
-> Daniel Borkmann suggested that these patches could go through Herbert Xu's
-> cryptodev tree.
+Hi!
 
-That's fine by me:
+This series adds support for
+	- i.MX53 support
+	- SHA1/256
+to the SAHARA driver.
 
-Acked-by: Michael Ellerman <mpe@ellerman.id.au>
+- Version 4 is a major overhaul of the previous versions.
+  The tasklet/watchdog implementation of the driver is replaced by a kthread
+  and completions. This makes sure, that only one request is queued into
+  the device and makes sure that the requests from user-space processes are
+  correctly enqueued into the queue. This means, that the queue is responsible
+  for sequentializing accesses from userspace.
 
-cheers
+- The request is now saved into the sahara_sha_reqctx
+
+Regards,
+Steffen
+
+Steffen Trumtrar (4):
+  crypto: sahara - fix spinlock initialization
+  crypto: sahara - add support for i.MX53
+  crypto: sahara - replace tasklets with kthread
+  crypto: sahara - add support for SHA1/256
+
+ .../devicetree/bindings/crypto/fsl-imx-sahara.txt  |   2 +-
+ drivers/crypto/sahara.c                            | 794 ++++++++++++++++++---
+ 2 files changed, 704 insertions(+), 92 deletions(-)
+
+-- 
+2.1.3
