@@ -1,39 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: algif - Mark sgl end at the end of data
-Date: Tue, 2 Dec 2014 22:33:30 +0800
-Message-ID: <20141202143330.GA26049@gondor.apana.org.au>
-References: <20141128184036.11421.36028.stgit@tstruk-mobl1>
- <20141201144026.GA18008@gondor.apana.org.au>
- <547C80F5.6000006@intel.com>
- <20141201150010.GA18277@gondor.apana.org.au>
- <547C8324.4000801@intel.com>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: [PATCH 02/17] crypto: ansi_cprng - Eliminate ctx->last_rand_data
+Date: Tue, 2 Dec 2014 09:46:57 -0500
+Message-ID: <20141202144657.GD3388@hmsreliant.think-freely.org>
+References: <20141202083314.17647.qmail@ns.horizon.com>
+ <20141202083550.17918.qmail@ns.horizon.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	smueller@chronox.de
+To: George Spelvin <linux@horizon.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:36001 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751424AbaLBOdg (ORCPT
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:41913 "EHLO
+	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753888AbaLBOrE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Dec 2014 09:33:36 -0500
+	Tue, 2 Dec 2014 09:47:04 -0500
 Content-Disposition: inline
-In-Reply-To: <547C8324.4000801@intel.com>
+In-Reply-To: <20141202083550.17918.qmail@ns.horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 01, 2014 at 07:03:00AM -0800, Tadeusz Struk wrote:
+On Tue, Dec 02, 2014 at 03:35:50AM -0500, George Spelvin wrote:
+> It's simply not necessary.
 > 
-> Ok, I can look at the data, but do you think the idea with marking the
-> end of data in TX sgl is worthwhile or should I just forget about it.
-> Another question is - is an sgl with lots of empty buffers a valid input
-> from an algorithm implementation point of view?
+> Signed-off-by: George Spelvin <linux@horizon.com>
+NACK
 
-I think marking the end is useful.  How about doing the marking
-and unmarking whenever sgl->cur is updated?
+The assumption that its not needed is incorrect.  In fips mode its explicitly
+needed to validate that the rng isn't reproducing identical random data.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Neil
