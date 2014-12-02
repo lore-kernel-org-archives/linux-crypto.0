@@ -1,46 +1,61 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: algif_skcipher - initialize upon init request
-Date: Tue, 2 Dec 2014 22:57:47 +0800
-Message-ID: <20141202145747.GA26301@gondor.apana.org.au>
-References: <2770903.h32OWUVXRy@tachyon.chronox.de>
+Subject: Re: [PATCH 2/8 v2] sparc64: replace memset by memzero_explicit
+Date: Tue, 2 Dec 2014 22:58:11 +0800
+Message-ID: <20141202145811.GB26301@gondor.apana.org.au>
+References: <1417367029-32762-1-git-send-email-Julia.Lawall@lip6.fr>
+ <1417367029-32762-3-git-send-email-Julia.Lawall@lip6.fr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
+Cc: kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Julia Lawall <Julia.Lawall@lip6.fr>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:49542 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:34915 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751205AbaLBO5w (ORCPT
+	with ESMTP id S932172AbaLBO6W (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Dec 2014 09:57:52 -0500
+	Tue, 2 Dec 2014 09:58:22 -0500
 Content-Disposition: inline
-In-Reply-To: <2770903.h32OWUVXRy@tachyon.chronox.de>
+In-Reply-To: <1417367029-32762-3-git-send-email-Julia.Lawall@lip6.fr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Nov 30, 2014 at 10:55:26AM +0100, Stephan Mueller wrote:
-> When using the algif_skcipher, the following call sequence causess a
-> re-initialization:
+On Sun, Nov 30, 2014 at 06:03:43PM +0100, Julia Lawall wrote:
+> From: Julia Lawall <Julia.Lawall@lip6.fr>
 > 
-> 1. sendmsg with ALG_SET_OP and iov == NULL, iovlen == 0 (i.e
-> initializing the cipher, but not sending data)
+> Memset on a local variable may be removed when it is called just before the
+> variable goes out of scope.  Using memzero_explicit defeats this
+> optimization.  A simplified version of the semantic patch that makes this
+> change is as follows: (http://coccinelle.lip6.fr/)
 > 
-> 2. sendmsg with msg->msg-controllen == 0 and iov != NULL (using the initalized
-> cipher handle by sending data)
+> // <smpl>
+> @@
+> identifier x;
+> type T;
+> @@
 > 
-> In step 2, the cipher operation type (encryption or decryption) is reset
-> to always decryption, because the local variable of enc is put into
-> ctx->enc as ctx->user is still zero.
+> {
+> ... when any
+> T x[...];
+> ... when any
+>     when exists
+> - memset
+> + memzero_explicit
+>   (x,
+> -0,
+>   ...)
+> ... when != x
+>     when strict
+> }
+> // </smpl>
 > 
-> The same applies when all send data is processed and ctx->used falls to
-> zero followed by user space to send new data.
+> This change was suggested by Daniel Borkmann <dborkman@redhat.com>
 > 
-> This patch changes the behavior to only reset the cipher operation type
-> (and the IV) if such configuration request is received.
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
 
-Patch applied.
+Applied patches 2, 3, 6, 7.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
