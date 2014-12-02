@@ -1,111 +1,87 @@
 From: "George Spelvin" <linux@horizon.com>
-Subject: [PATCH 08/17] crypto: ansi_cprng - Require non-null key & V in reset_prng_context
-Date: 2 Dec 2014 03:46:17 -0500
-Message-ID: <20141202084617.18608.qmail@ns.horizon.com>
+Subject: [PATCH 09/17] crypto: ansi_cprng - Clean up some variable types
+Date: 2 Dec 2014 03:50:51 -0500
+Message-ID: <20141202085051.18958.qmail@ns.horizon.com>
 References: <20141202083314.17647.qmail@ns.horizon.com>
 Cc: linux-crypto@vger.kernel.org, linux@horizon.com,
 	smueller@chronox.de
 To: herbert@gondor.apana.org.au, nhorman@tuxdriver.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:39243 "HELO ns.horizon.com"
+Received: from ns.horizon.com ([71.41.210.147]:36490 "HELO ns.horizon.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1750991AbaLBIqS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Dec 2014 03:46:18 -0500
+	id S1750891AbaLBIux (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 2 Dec 2014 03:50:53 -0500
 In-Reply-To: <20141202083314.17647.qmail@ns.horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The PRNG_NEED_RESET flag forces a call to reset_prng_context(), so there's
-no need to include one in cprng_init() at all.  That allows considerable
-simplification of reset_prng_context().
+Add a few const annotations, use unsigned bytes consistently, and
+make do_cont_test a bool.
 
 Signed-off-by: George Spelvin <linux@horizon.com>
 ---
- crypto/ansi_cprng.c | 34 ++++++++--------------------------
- 1 file changed, 8 insertions(+), 26 deletions(-)
-
-I'm worried someone may seriously object to leaving part of the
-context uninitialized, but it definitely simplifies the code.
-I'm quite interested in comments.
+ crypto/ansi_cprng.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index f40f54cd..dff27a7a 100644
+index dff27a7a..6723a561 100644
 --- a/crypto/ansi_cprng.c
 +++ b/crypto/ansi_cprng.c
-@@ -22,10 +22,8 @@
+@@ -82,7 +82,7 @@ static void xor_block(unsigned char const *in, unsigned char *out)
+  * Returns DEFAULT_BLK_SZ bytes of random data per call
+  * returns 0 if generation succeeded, <0 if something went wrong
+  */
+-static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
++static int _get_more_prng_bytes(struct prng_context *ctx, bool cont_test)
+ {
+ 	int i;
+ 	unsigned char tmp[DEFAULT_BLK_SZ];
+@@ -176,8 +176,8 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ }
  
- #include "internal.h"
+ /* Our exported functions */
+-static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
+-				int do_cont_test)
++static int get_prng_bytes(unsigned char *buf, unsigned int nbytes,
++				struct prng_context *ctx, bool do_cont_test)
+ {
+ 	unsigned char *ptr = buf;
+ 	unsigned int byte_count = (unsigned int)nbytes;
+@@ -312,7 +312,7 @@ static int cprng_get_random(struct crypto_rng *tfm, u8 *rdata,
+ {
+ 	struct prng_context *prng = crypto_rng_ctx(tfm);
  
--#define DEFAULT_PRNG_KEY "0123456789abcdef"
- #define DEFAULT_PRNG_KSZ 16
- #define DEFAULT_BLK_SZ 16
--#define DEFAULT_V_SEED "zaybxcwdveuftgsh"
+-	return get_prng_bytes(rdata, dlen, prng, 0);
++	return get_prng_bytes(rdata, dlen, prng, false);
+ }
  
  /*
-  * Flags for the prng_context flags field
-@@ -254,24 +252,15 @@ static void free_prng_context(struct prng_context *ctx)
- }
- 
- static int reset_prng_context(struct prng_context *ctx,
--			      unsigned char *key, size_t klen,
--			      unsigned char *V, unsigned char *DT)
-+			      unsigned char const *key, size_t klen,
-+			      unsigned char const *V, unsigned char const *DT)
+@@ -324,8 +324,8 @@ static int cprng_get_random(struct crypto_rng *tfm, u8 *rdata,
+ static int cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
  {
- 	int ret;
--	unsigned char *prng_key;
+ 	struct prng_context *prng = crypto_rng_ctx(tfm);
+-	u8 *key = seed + DEFAULT_BLK_SZ;
+-	u8 *dt = NULL;
++	u8 const *key = seed + DEFAULT_BLK_SZ;
++	u8 const *dt = NULL;
  
- 	spin_lock_bh(&ctx->prng_lock);
- 	ctx->flags |= PRNG_NEED_RESET;
+ 	if (slen < DEFAULT_PRNG_KSZ + DEFAULT_BLK_SZ)
+ 		return -EINVAL;
+@@ -346,13 +346,13 @@ static int fips_cprng_get_random(struct crypto_rng *tfm, u8 *rdata,
+ {
+ 	struct prng_context *prng = crypto_rng_ctx(tfm);
  
--	prng_key = (key != NULL) ? key : (unsigned char *)DEFAULT_PRNG_KEY;
--
--	if (!key)
--		klen = DEFAULT_PRNG_KSZ;
--
--	if (V)
--		memcpy(ctx->V, V, DEFAULT_BLK_SZ);
--	else
--		memcpy(ctx->V, DEFAULT_V_SEED, DEFAULT_BLK_SZ);
-+	memcpy(ctx->V, V, DEFAULT_BLK_SZ);
- 
- 	if (DT)
- 		memcpy(ctx->DT, DT, DEFAULT_BLK_SZ);
-@@ -282,16 +271,13 @@ static int reset_prng_context(struct prng_context *ctx,
- 
- 	ctx->rand_read_pos = DEFAULT_BLK_SZ;	/* Force immediate refill */
- 
--	ret = crypto_cipher_setkey(ctx->tfm, prng_key, klen);
-+	ret = crypto_cipher_setkey(ctx->tfm, key, klen);
- 	if (ret) {
- 		dbgprint(KERN_CRIT "PRNG: setkey() failed flags=%x\n",
- 			crypto_cipher_get_flags(ctx->tfm));
--		goto out;
-+	} else {
-+		ctx->flags &= ~PRNG_NEED_RESET;
- 	}
--
--	ret = 0;
--	ctx->flags &= ~PRNG_NEED_RESET;
--out:
- 	spin_unlock_bh(&ctx->prng_lock);
- 	return ret;
+-	return get_prng_bytes(rdata, dlen, prng, 1);
++	return get_prng_bytes(rdata, dlen, prng, true);
  }
-@@ -308,13 +294,9 @@ static int cprng_init(struct crypto_tfm *tfm)
- 		return PTR_ERR(ctx->tfm);
- 	}
  
--	if (reset_prng_context(ctx, NULL, DEFAULT_PRNG_KSZ, NULL, NULL) < 0)
--		return -EINVAL;
--
- 	/*
--	 * after allocation, we should always force the user to reset
--	 * so they don't inadvertently use the insecure default values
--	 * without specifying them intentially
-+	 * After allocation, we always force the user to reset, which
-+	 * completes initialization of the context.
- 	 */
- 	ctx->flags |= PRNG_NEED_RESET;
- 	return 0;
+ static int fips_cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
+ {
+ 	u8 rdata[DEFAULT_BLK_SZ];
+-	u8 *key = seed + DEFAULT_BLK_SZ;
++	u8 const *key = seed + DEFAULT_BLK_SZ;
+ 	int rc;
+ 
+ 	struct prng_context *prng = crypto_rng_ctx(tfm);
 -- 
 2.1.3
