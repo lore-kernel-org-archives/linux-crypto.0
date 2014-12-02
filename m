@@ -1,50 +1,108 @@
 From: "George Spelvin" <linux@horizon.com>
-Subject: [PATCH 14/17] crypto: ansi_cprng - If DT is omitted, don't buffer old output
-Date: 2 Dec 2014 03:58:03 -0500
-Message-ID: <20141202085803.19513.qmail@ns.horizon.com>
+Subject: [PATCH 15/17] crypto: testmgr - Teach test_cprng to handle non-default seed sizes
+Date: 2 Dec 2014 03:59:34 -0500
+Message-ID: <20141202085934.19592.qmail@ns.horizon.com>
 References: <20141202083314.17647.qmail@ns.horizon.com>
 Cc: linux-crypto@vger.kernel.org, linux@horizon.com,
 	smueller@chronox.de
 To: herbert@gondor.apana.org.au, nhorman@tuxdriver.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:41683 "HELO ns.horizon.com"
+Received: from ns.horizon.com ([71.41.210.147]:42456 "HELO ns.horizon.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751454AbaLBI6E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Dec 2014 03:58:04 -0500
+	id S1752013AbaLBI7f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 2 Dec 2014 03:59:35 -0500
 In-Reply-To: <20141202083314.17647.qmail@ns.horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is a separate patch so it may be considered separately.
-I think it's in the spirit of the original ANSI specs, but opinions
-are solicited.
+crypto_rng_seedsize() isn't necessarily enough.
+
+Also (while we're at it), dynamically allocate the result (in the
+same buffer) as well.
 
 Signed-off-by: George Spelvin <linux@horizon.com>
 ---
- crypto/ansi_cprng.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ crypto/testmgr.c | 27 +++++++++++++++++++++------
+ 1 file changed, 21 insertions(+), 6 deletions(-)
 
-I'm really not sure what people will think of this.
+Much of this gets undone in the next patch, but I wanted to show the idea.
 
-diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index c2c285f3..4ed7c0cf 100644
---- a/crypto/ansi_cprng.c
-+++ b/crypto/ansi_cprng.c
-@@ -213,6 +213,15 @@ static int get_prng_bytes(unsigned char *buf, unsigned int nbytes,
- 	len = nbytes - pos;
- 	memcpy(buf + pos, ctx->rand_data.bytes + read_pos, len);
- 	read_pos += len;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 29a0cbdd..b81e593d 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1449,9 +1449,19 @@ static int test_cprng(struct crypto_rng *tfm, struct cprng_testvec *template,
+ 	const char *algo = crypto_tfm_alg_driver_name(crypto_rng_tfm(tfm));
+ 	int err = 0, i, j, seedsize;
+ 	u8 *seed;
+-	char result[32];
+ 
+-	seedsize = crypto_rng_seedsize(tfm);
 +	/*
-+	 * If not in deterministic mode, never buffer old entropy;
-+	 * re-seed on each read request.  This is in the spirit of the
-+	 * specifications, which are themselves not clear on the subject
-+	 * of multiple requests for output over a period of time.
++	 * How big a seed + result buffer do we need?  Note that some
++	 * tests use a non-default seed size, so crypto_rng_seedsize(tfm)
++	 * isn't necessarily enough.
 +	 */
-+	if (!(ctx->flags & PRNG_DETERMINISTIC))
-+		read_pos = DEFAULT_BLK_SZ;
++	seedsize = 0;
++	for (i = 0; i < tcount; i++) {
++		j = template[i].vlen + template[i].klen +
++		    template[i].dtlen + template[i].rlen;
++		if (j > seedsize)
++			seedsize = j;
++	}
+ 
+ 	seed = kmalloc(seedsize, GFP_KERNEL);
+ 	if (!seed) {
+@@ -1461,13 +1471,16 @@ static int test_cprng(struct crypto_rng *tfm, struct cprng_testvec *template,
+ 	}
+ 
+ 	for (i = 0; i < tcount; i++) {
+-		memset(result, 0, 32);
+ 
+ 		memcpy(seed, template[i].v, template[i].vlen);
+ 		memcpy(seed + template[i].vlen, template[i].key,
+ 		       template[i].klen);
+ 		memcpy(seed + template[i].vlen + template[i].klen,
+ 		       template[i].dt, template[i].dtlen);
++		seedsize = template[i].vlen + template[i].klen +
++		           template[i].dtlen +
 +
- 	memzero_explicit(ctx->rand_data.bytes, read_pos);
- 	ctx->rand_read_pos = read_pos;
- 	err = nbytes;
++		memset(seed+seedsize, 0, template[i].rlen);
+ 
+ 		err = crypto_rng_reset(tfm, seed, seedsize);
+ 		if (err) {
+@@ -1477,7 +1490,7 @@ static int test_cprng(struct crypto_rng *tfm, struct cprng_testvec *template,
+ 		}
+ 
+ 		for (j = 0; j < template[i].loops; j++) {
+-			err = crypto_rng_get_bytes(tfm, result,
++			err = crypto_rng_get_bytes(tfm, seed + seedsize,
+ 						   template[i].rlen);
+ 			if (err != template[i].rlen) {
+ 				printk(KERN_ERR "alg: cprng: Failed to obtain "
+@@ -1488,12 +1501,12 @@ static int test_cprng(struct crypto_rng *tfm, struct cprng_testvec *template,
+ 			}
+ 		}
+ 
+-		err = memcmp(result, template[i].result,
++		err = memcmp(seed + seedsize, template[i].result,
+ 			     template[i].rlen);
+ 		if (err) {
+ 			printk(KERN_ERR "alg: cprng: Test %d failed for %s\n",
+ 			       i, algo);
+-			hexdump(result, template[i].rlen);
++			hexdump(seed + seedsize, template[i].rlen);
+ 			err = -EINVAL;
+ 			goto out;
+ 		}
+@@ -1722,6 +1735,8 @@ static int alg_test_cprng(const struct alg_test_desc *desc, const char *driver,
+ 
+ 	crypto_free_rng(rng);
+ 
++printk("alg_test_cprng: testing %s: err %d\n", driver, err);
++
+ 	return err;
+ }
+ 
 -- 
 2.1.3
