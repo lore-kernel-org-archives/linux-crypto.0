@@ -1,113 +1,121 @@
 From: "George Spelvin" <linux@horizon.com>
-Subject: [PATCH 01/17] crypto: ansi_cprng - Rename rand_data_valid more sensibly
-Date: 2 Dec 2014 03:34:41 -0500
-Message-ID: <20141202083441.17772.qmail@ns.horizon.com>
+Subject: [PATCH 02/17] crypto: ansi_cprng - Eliminate ctx->last_rand_data
+Date: 2 Dec 2014 03:35:50 -0500
+Message-ID: <20141202083550.17918.qmail@ns.horizon.com>
 References: <20141202083314.17647.qmail@ns.horizon.com>
 Cc: linux-crypto@vger.kernel.org, linux@horizon.com,
 	smueller@chronox.de
 To: herbert@gondor.apana.org.au, nhorman@tuxdriver.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:24376 "HELO ns.horizon.com"
+Received: from ns.horizon.com ([71.41.210.147]:29887 "HELO ns.horizon.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751035AbaLBIen (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Dec 2014 03:34:43 -0500
+	id S1750931AbaLBIfw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 2 Dec 2014 03:35:52 -0500
 In-Reply-To: <20141202083314.17647.qmail@ns.horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It's more like rand_data_invalid (data which has already been output),
-so it's a pretty bad misnomer.  But rand_data_pos is even better.
+It's simply not necessary.
 
 Signed-off-by: George Spelvin <linux@horizon.com>
 ---
- crypto/ansi_cprng.c | 25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+ crypto/ansi_cprng.c | 28 +++++++++++-----------------
+ 1 file changed, 11 insertions(+), 17 deletions(-)
 
 diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index 97fe3110..c9e1684b 100644
+index c9e1684b..c0a27288 100644
 --- a/crypto/ansi_cprng.c
 +++ b/crypto/ansi_cprng.c
-@@ -50,7 +50,7 @@ struct prng_context {
+@@ -46,7 +46,6 @@
+ struct prng_context {
+ 	spinlock_t prng_lock;
+ 	unsigned char rand_data[DEFAULT_BLK_SZ];
+-	unsigned char last_rand_data[DEFAULT_BLK_SZ];
  	unsigned char DT[DEFAULT_BLK_SZ];
  	unsigned char I[DEFAULT_BLK_SZ];
  	unsigned char V[DEFAULT_BLK_SZ];
--	u32 rand_data_valid;
-+	u32 rand_read_pos;	/* Offset into rand_data[] */
- 	struct crypto_cipher *tfm;
- 	u32 flags;
- };
-@@ -174,7 +174,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
- 	}
+@@ -89,8 +88,6 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ {
+ 	int i;
+ 	unsigned char tmp[DEFAULT_BLK_SZ];
+-	unsigned char *output = NULL;
+-
  
- 	dbgprint("Returning new block for context %p\n", ctx);
--	ctx->rand_data_valid = 0;
-+	ctx->rand_read_pos = 0;
- 
- 	hexdump("Output DT: ", ctx->DT, DEFAULT_BLK_SZ);
- 	hexdump("Output I: ", ctx->I, DEFAULT_BLK_SZ);
-@@ -217,7 +217,7 @@ static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
- 
- 
- remainder:
--	if (ctx->rand_data_valid == DEFAULT_BLK_SZ) {
-+	if (ctx->rand_read_pos == DEFAULT_BLK_SZ) {
- 		if (_get_more_prng_bytes(ctx, do_cont_test) < 0) {
- 			memset(buf, 0, nbytes);
- 			err = -EINVAL;
-@@ -230,12 +230,9 @@ remainder:
+ 	dbgprint(KERN_CRIT "Calling _get_more_prng_bytes for context %p\n",
+ 		ctx);
+@@ -103,6 +100,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 	 * This algorithm is a 3 stage state machine
  	 */
- 	if (byte_count < DEFAULT_BLK_SZ) {
- empty_rbuf:
--		while (ctx->rand_data_valid < DEFAULT_BLK_SZ) {
--			*ptr = ctx->rand_data[ctx->rand_data_valid];
--			ptr++;
--			byte_count--;
--			ctx->rand_data_valid++;
--			if (byte_count == 0)
-+		while (ctx->rand_read_pos < DEFAULT_BLK_SZ) {
-+			*ptr++ = ctx->rand_data[ctx->rand_read_pos++];
-+			if (--byte_count == 0)
- 				goto done;
- 		}
- 	}
-@@ -244,17 +241,17 @@ empty_rbuf:
- 	 * Now copy whole blocks
- 	 */
- 	for (; byte_count >= DEFAULT_BLK_SZ; byte_count -= DEFAULT_BLK_SZ) {
--		if (ctx->rand_data_valid == DEFAULT_BLK_SZ) {
-+		if (ctx->rand_read_pos == DEFAULT_BLK_SZ) {
- 			if (_get_more_prng_bytes(ctx, do_cont_test) < 0) {
- 				memset(buf, 0, nbytes);
- 				err = -EINVAL;
- 				goto done;
+ 	for (i = 0; i < 3; i++) {
++		unsigned char *output;
+ 
+ 		switch (i) {
+ 		case 0:
+@@ -115,23 +113,23 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 			hexdump("tmp stage 0: ", tmp, DEFAULT_BLK_SZ);
+ 			break;
+ 		case 1:
+-
+ 			/*
+-			 * Next xor I with our secret vector V
+-			 * encrypt that result to obtain our
+-			 * pseudo random data which we output
++			 * Next xor I with our secret vector V.
++			 * Encrypt that result to obtain our pseudo random
++			 * data which we output.  It is kept temporarily
++			 * in (no longer used) V until we have done the
++			 * anti-repetition compare.
+ 			 */
+ 			xor_vectors(ctx->I, ctx->V, tmp, DEFAULT_BLK_SZ);
+ 			hexdump("tmp stage 1: ", tmp, DEFAULT_BLK_SZ);
+-			output = ctx->rand_data;
++			output = ctx->V;
+ 			break;
+ 		case 2:
+ 			/*
+ 			 * First check that we didn't produce the same
+-			 * random data that we did last time around through this
++			 * random data that we did last time around.
+ 			 */
+-			if (!memcmp(ctx->rand_data, ctx->last_rand_data,
+-					DEFAULT_BLK_SZ)) {
++			if (!memcmp(ctx->V, ctx->rand_data, DEFAULT_BLK_SZ)) {
+ 				if (cont_test) {
+ 					panic("cprng %p Failed repetition check!\n",
+ 						ctx);
+@@ -144,15 +142,13 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 				ctx->flags |= PRNG_NEED_RESET;
+ 				return -EINVAL;
  			}
- 		}
--		if (ctx->rand_data_valid > 0)
-+		if (ctx->rand_read_pos > 0)
- 			goto empty_rbuf;
- 		memcpy(ptr, ctx->rand_data, DEFAULT_BLK_SZ);
--		ctx->rand_data_valid += DEFAULT_BLK_SZ;
-+		ctx->rand_read_pos += DEFAULT_BLK_SZ;
- 		ptr += DEFAULT_BLK_SZ;
+-			memcpy(ctx->last_rand_data, ctx->rand_data,
+-				DEFAULT_BLK_SZ);
++			memcpy(ctx->rand_data, ctx->V, DEFAULT_BLK_SZ);
+ 
+ 			/*
+ 			 * Lastly xor the random data with I
+ 			 * and encrypt that to obtain a new secret vector V
+ 			 */
+-			xor_vectors(ctx->rand_data, ctx->I, tmp,
+-				DEFAULT_BLK_SZ);
++			xor_vectors(ctx->I, ctx->V, tmp, DEFAULT_BLK_SZ);
+ 			output = ctx->V;
+ 			hexdump("tmp stage 2: ", tmp, DEFAULT_BLK_SZ);
+ 			break;
+@@ -161,7 +157,6 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 
+ 		/* do the encryption */
+ 		crypto_cipher_encrypt_one(ctx->tfm, output, tmp);
+-
  	}
  
-@@ -304,7 +301,7 @@ static int reset_prng_context(struct prng_context *ctx,
+ 	/*
+@@ -299,7 +294,6 @@ static int reset_prng_context(struct prng_context *ctx,
+ 		memset(ctx->DT, 0, DEFAULT_BLK_SZ);
+ 
  	memset(ctx->rand_data, 0, DEFAULT_BLK_SZ);
- 	memset(ctx->last_rand_data, 0, DEFAULT_BLK_SZ);
+-	memset(ctx->last_rand_data, 0, DEFAULT_BLK_SZ);
  
--	ctx->rand_data_valid = DEFAULT_BLK_SZ;
-+	ctx->rand_read_pos = DEFAULT_BLK_SZ;	/* Force immediate refill */
+ 	ctx->rand_read_pos = DEFAULT_BLK_SZ;	/* Force immediate refill */
  
- 	ret = crypto_cipher_setkey(ctx->tfm, prng_key, klen);
- 	if (ret) {
-@@ -413,7 +410,7 @@ static int fips_cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
- 
- 	/* this primes our continuity test */
- 	rc = get_prng_bytes(rdata, DEFAULT_BLK_SZ, prng, 0);
--	prng->rand_data_valid = DEFAULT_BLK_SZ;
-+	prng->rand_read_pos = DEFAULT_BLK_SZ;
- 
- out:
- 	return rc;
 -- 
 2.1.3
