@@ -1,79 +1,113 @@
 From: "George Spelvin" <linux@horizon.com>
-Subject: [PATCH 00/17] Multiple changes to crypto/ansi_cprng.c
-Date: 2 Dec 2014 03:33:14 -0500
-Message-ID: <20141202083314.17647.qmail@ns.horizon.com>
-References: <20141129175928.GC15743@localhost.localdomain>
-Cc: linux@horizon.com, linux-crypto@vger.kernel.org,
+Subject: [PATCH 01/17] crypto: ansi_cprng - Rename rand_data_valid more sensibly
+Date: 2 Dec 2014 03:34:41 -0500
+Message-ID: <20141202083441.17772.qmail@ns.horizon.com>
+References: <20141202083314.17647.qmail@ns.horizon.com>
+Cc: linux-crypto@vger.kernel.org, linux@horizon.com,
 	smueller@chronox.de
 To: herbert@gondor.apana.org.au, nhorman@tuxdriver.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:21213 "HELO ns.horizon.com"
+Received: from ns.horizon.com ([71.41.210.147]:24376 "HELO ns.horizon.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751091AbaLBIdQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Dec 2014 03:33:16 -0500
-In-Reply-To: <20141129175928.GC15743@localhost.localdomain>
+	id S1751035AbaLBIen (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 2 Dec 2014 03:34:43 -0500
+In-Reply-To: <20141202083314.17647.qmail@ns.horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thank you all for your hospitality to my amateurish efforts.
+It's more like rand_data_invalid (data which has already been output),
+so it's a pretty bad misnomer.  But rand_data_pos is even better.
 
-Given that this all started with me reading the code in an attempt to
-understand it, it is likely that some of the "problems" I address are
-actually misunderstandings on my part.  If all I get from this patch series
-is some enlightenment, that's okay.
+Signed-off-by: George Spelvin <linux@horizon.com>
+---
+ crypto/ansi_cprng.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-It's even more likely that some parts contain the germ of a good idea,
-but will need considerable rework to be acceptable.  I look forward
-to that too.
-
-Expecting that much more work will be needed, I've run the testmgr.h
-test vectors on this code, but haven't desk-checked it as thoroughly as
-security-sensitive code should be before final acceptance.  If the ideas
-pass muster, I'll double-check the implementatoin details.
-
-Really, I'm just trying to understand the code.  Patches are just
-a very specific way of talking about it.
-
-Here's an overview of the series.  It's a lot of code cleanup, and
-a bit of semantic change.
-
-[01/17] crypto: ansi_cprng - Rename rand_data_valid more sensibly
-	I find it confusing, so I rename it to rand_data_pos
-[02/17] crypto: ansi_cprng - Eliminate ctx->last_rand_data
-	Shrink the context structure.
-[03/17] crypto: ansi_cprng - Eliminate ctx->I
-	Shrink it some more.
-[04/17] crypto: ansi_cprng - simplify xor_vectors() to xor_block()
-	We don't need a size parameter.
-[05/17] crypto: ansi_cprng - Add const annotations to hexdump()
-	I like const.
-[06/17] crypto: ansi_cprng - Eliminate unused PRNG_FIXED_SIZE flag
-	It's dead code ACAICT.
-[07/17] crypto: ansi_cprng - Shrink rand_read_pos & flags
-	A little more context shrinking.
-[08/17] crypto: ansi_cprng - Require non-null key & V in reset_prng_context
-	Sue to the PRNG_NEED_RESET flag, cprng_init() doesn't need to call
-	reset_prng_context) directly.
-[09/17] crypto: ansi_cprng - Clean up some variable types
-	Try to be more consistent about signed vs. unsigned.
-[10/17] crypto: ansi_cprng - simplify get_prng_bytes
-	Code shrink & simplification.
-[11/17] crypto: ansi_cprng - unroll _get_more_prng_bytes
-	Slight object code size savings, and definite readability improvement.
-[12/17] crypto: ansi_cprng - Create a "block buffer" data type
-	union { u8 bytes[16]; u32 ints[4]; u64 longs[2]; }, sort of.
-[13/17] crypto: ansi_cprng - If DT is not provided, use a fresh timestamp
-	This is the big semantic change.  I'm rather proud of the use
-	of get_random_int() as a timestamp, but feedback is definitely
-	solicited!
-[14/17] crypto: ansi_cprng - If DT is omitted, don't buffer old output
-	Not sure if this is desirable or not.
-[15/17] crypto: testmgr - Teach test_cprng to handle non-default seed sizes
-	I consider this a latent bug that patch 17 sould expose.
-[16/17] crypto: testmgr - Merge seed arrays in struct cprng_testvec
-	I think this is a better way of solving the preceding problem,
-	but it's more intrusive.  All the consts I add are not a critical
-	part of the patch, but an example of what I'd like to do to the
-	rest of the code.
-[17/17] crypto: ansi_cprng - Shrink default seed size
-	This makes (some amount of) true entropy the default.
+diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
+index 97fe3110..c9e1684b 100644
+--- a/crypto/ansi_cprng.c
++++ b/crypto/ansi_cprng.c
+@@ -50,7 +50,7 @@ struct prng_context {
+ 	unsigned char DT[DEFAULT_BLK_SZ];
+ 	unsigned char I[DEFAULT_BLK_SZ];
+ 	unsigned char V[DEFAULT_BLK_SZ];
+-	u32 rand_data_valid;
++	u32 rand_read_pos;	/* Offset into rand_data[] */
+ 	struct crypto_cipher *tfm;
+ 	u32 flags;
+ };
+@@ -174,7 +174,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 	}
+ 
+ 	dbgprint("Returning new block for context %p\n", ctx);
+-	ctx->rand_data_valid = 0;
++	ctx->rand_read_pos = 0;
+ 
+ 	hexdump("Output DT: ", ctx->DT, DEFAULT_BLK_SZ);
+ 	hexdump("Output I: ", ctx->I, DEFAULT_BLK_SZ);
+@@ -217,7 +217,7 @@ static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
+ 
+ 
+ remainder:
+-	if (ctx->rand_data_valid == DEFAULT_BLK_SZ) {
++	if (ctx->rand_read_pos == DEFAULT_BLK_SZ) {
+ 		if (_get_more_prng_bytes(ctx, do_cont_test) < 0) {
+ 			memset(buf, 0, nbytes);
+ 			err = -EINVAL;
+@@ -230,12 +230,9 @@ remainder:
+ 	 */
+ 	if (byte_count < DEFAULT_BLK_SZ) {
+ empty_rbuf:
+-		while (ctx->rand_data_valid < DEFAULT_BLK_SZ) {
+-			*ptr = ctx->rand_data[ctx->rand_data_valid];
+-			ptr++;
+-			byte_count--;
+-			ctx->rand_data_valid++;
+-			if (byte_count == 0)
++		while (ctx->rand_read_pos < DEFAULT_BLK_SZ) {
++			*ptr++ = ctx->rand_data[ctx->rand_read_pos++];
++			if (--byte_count == 0)
+ 				goto done;
+ 		}
+ 	}
+@@ -244,17 +241,17 @@ empty_rbuf:
+ 	 * Now copy whole blocks
+ 	 */
+ 	for (; byte_count >= DEFAULT_BLK_SZ; byte_count -= DEFAULT_BLK_SZ) {
+-		if (ctx->rand_data_valid == DEFAULT_BLK_SZ) {
++		if (ctx->rand_read_pos == DEFAULT_BLK_SZ) {
+ 			if (_get_more_prng_bytes(ctx, do_cont_test) < 0) {
+ 				memset(buf, 0, nbytes);
+ 				err = -EINVAL;
+ 				goto done;
+ 			}
+ 		}
+-		if (ctx->rand_data_valid > 0)
++		if (ctx->rand_read_pos > 0)
+ 			goto empty_rbuf;
+ 		memcpy(ptr, ctx->rand_data, DEFAULT_BLK_SZ);
+-		ctx->rand_data_valid += DEFAULT_BLK_SZ;
++		ctx->rand_read_pos += DEFAULT_BLK_SZ;
+ 		ptr += DEFAULT_BLK_SZ;
+ 	}
+ 
+@@ -304,7 +301,7 @@ static int reset_prng_context(struct prng_context *ctx,
+ 	memset(ctx->rand_data, 0, DEFAULT_BLK_SZ);
+ 	memset(ctx->last_rand_data, 0, DEFAULT_BLK_SZ);
+ 
+-	ctx->rand_data_valid = DEFAULT_BLK_SZ;
++	ctx->rand_read_pos = DEFAULT_BLK_SZ;	/* Force immediate refill */
+ 
+ 	ret = crypto_cipher_setkey(ctx->tfm, prng_key, klen);
+ 	if (ret) {
+@@ -413,7 +410,7 @@ static int fips_cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
+ 
+ 	/* this primes our continuity test */
+ 	rc = get_prng_bytes(rdata, DEFAULT_BLK_SZ, prng, 0);
+-	prng->rand_data_valid = DEFAULT_BLK_SZ;
++	prng->rand_read_pos = DEFAULT_BLK_SZ;
+ 
+ out:
+ 	return rc;
+-- 
+2.1.3
