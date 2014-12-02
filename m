@@ -1,35 +1,47 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH 03/17] crypto: ansi_cprng - Eliminate ctx->I
-Date: Tue, 2 Dec 2014 09:52:49 -0500
-Message-ID: <20141202145249.GE3388@hmsreliant.think-freely.org>
-References: <20141202083314.17647.qmail@ns.horizon.com>
- <20141202083707.17996.qmail@ns.horizon.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: algif_skcipher - initialize upon init request
+Date: Tue, 2 Dec 2014 22:57:47 +0800
+Message-ID: <20141202145747.GA26301@gondor.apana.org.au>
+References: <2770903.h32OWUVXRy@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	smueller@chronox.de
-To: George Spelvin <linux@horizon.com>
+Cc: linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:42014 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751263AbaLBOwx (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:49542 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751205AbaLBO5w (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Dec 2014 09:52:53 -0500
+	Tue, 2 Dec 2014 09:57:52 -0500
 Content-Disposition: inline
-In-Reply-To: <20141202083707.17996.qmail@ns.horizon.com>
+In-Reply-To: <2770903.h32OWUVXRy@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 02, 2014 at 03:37:07AM -0500, George Spelvin wrote:
-> It's also not necessary.  We do have to change some debugging
-> output.
+On Sun, Nov 30, 2014 at 10:55:26AM +0100, Stephan Mueller wrote:
+> When using the algif_skcipher, the following call sequence causess a
+> re-initialization:
 > 
-> Signed-off-by: George Spelvin <linux@horizon.com>
-> ---
->  crypto/ansi_cprng.c | 39 ++++++++++++++++++++-------------------
->  1 file changed, 20 insertions(+), 19 deletions(-)
+> 1. sendmsg with ALG_SET_OP and iov == NULL, iovlen == 0 (i.e
+> initializing the cipher, but not sending data)
 > 
-I'm only ok with removing I if you can continue to be able to output it.  given
-that I is listed as part of the test sequences that NIST provides, I'd like to
-be able to compare the values.
-Neil
+> 2. sendmsg with msg->msg-controllen == 0 and iov != NULL (using the initalized
+> cipher handle by sending data)
+> 
+> In step 2, the cipher operation type (encryption or decryption) is reset
+> to always decryption, because the local variable of enc is put into
+> ctx->enc as ctx->user is still zero.
+> 
+> The same applies when all send data is processed and ctx->used falls to
+> zero followed by user space to send new data.
+> 
+> This patch changes the behavior to only reset the cipher operation type
+> (and the IV) if such configuration request is received.
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+
+Patch applied.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
