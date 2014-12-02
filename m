@@ -1,56 +1,26 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH 07/17] crypto: ansi_cprng - Shrink rand_read_pos & flags
-Date: Tue, 2 Dec 2014 09:59:11 -0500
-Message-ID: <20141202145911.GF3388@hmsreliant.think-freely.org>
-References: <20141202083314.17647.qmail@ns.horizon.com>
- <20141202084313.18411.qmail@ns.horizon.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] crypto: algif - Mark sgl end at the end of data
+Date: Tue, 02 Dec 2014 07:06:40 -0800
+Message-ID: <547DD580.4030900@intel.com>
+References: <20141128184036.11421.36028.stgit@tstruk-mobl1> <20141201144026.GA18008@gondor.apana.org.au> <547C80F5.6000006@intel.com> <20141201150010.GA18277@gondor.apana.org.au> <547C8324.4000801@intel.com> <20141202143330.GA26049@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	smueller@chronox.de
-To: George Spelvin <linux@horizon.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:42157 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932252AbaLBO7Q (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Dec 2014 09:59:16 -0500
-Content-Disposition: inline
-In-Reply-To: <20141202084313.18411.qmail@ns.horizon.com>
+Received: from mga09.intel.com ([134.134.136.24]:24888 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753178AbaLBPJm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 2 Dec 2014 10:09:42 -0500
+In-Reply-To: <20141202143330.GA26049@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 02, 2014 at 03:43:13AM -0500, George Spelvin wrote:
-> rand_read_pos is never more than 16, while there's only 1 flag
-> bit allocated, so we can shrink the context a little.
-> 
-> Signed-off-by: George Spelvin <linux@horizon.com>
-> ---
->  crypto/ansi_cprng.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> They're also reordered to avoid alignment holes.
-> 
-> diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-> index 93ed00f6..f40f54cd 100644
-> --- a/crypto/ansi_cprng.c
-> +++ b/crypto/ansi_cprng.c
-> @@ -51,9 +51,9 @@ struct prng_context {
->  	unsigned char rand_data[DEFAULT_BLK_SZ];
->  	unsigned char DT[DEFAULT_BLK_SZ];
->  	unsigned char V[DEFAULT_BLK_SZ];
-> -	u32 rand_read_pos;	/* Offset into rand_data[] */
-> +	unsigned char rand_read_pos;	/* Offset into rand_data[] */
-u8 please.  Also, not sure if this helps much, as I think the padding will just
-get you back to word alignment on each of these.
+Hi,
+On 12/02/2014 06:33 AM, Herbert Xu wrote:
+> I think marking the end is useful.  How about doing the marking
+> and unmarking whenever sgl->cur is updated?
 
-> +	unsigned char flags;
->  	struct crypto_cipher *tfm;
-> -	u32 flags;
->  };
->  
->  static int dbg;
-> -- 
-> 2.1.3
-> 
-> 
+I have a v2 ready where I mark it based on the actual data.
+Thanks
