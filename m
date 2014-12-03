@@ -1,53 +1,95 @@
 From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH 03/17] crypto: ansi_cprng - Eliminate ctx->I
-Date: Wed, 3 Dec 2014 06:08:29 -0500
-Message-ID: <20141203110829.GA23296@hmsreliant.think-freely.org>
-References: <20141202145249.GE3388@hmsreliant.think-freely.org>
- <20141202200338.13255.qmail@ns.horizon.com>
+Subject: Re: [PATCH 07/17] crypto: ansi_cprng - Shrink rand_read_pos & flags
+Date: Wed, 3 Dec 2014 06:11:40 -0500
+Message-ID: <20141203111140.GB23296@hmsreliant.think-freely.org>
+References: <20141202145911.GF3388@hmsreliant.think-freely.org>
+ <20141202202817.15802.qmail@ns.horizon.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
 	smueller@chronox.de
 To: George Spelvin <linux@horizon.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:34455 "EHLO
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:34494 "EHLO
 	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750840AbaLCLIm (ORCPT
+	with ESMTP id S1751244AbaLCLLw (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Dec 2014 06:08:42 -0500
+	Wed, 3 Dec 2014 06:11:52 -0500
 Content-Disposition: inline
-In-Reply-To: <20141202200338.13255.qmail@ns.horizon.com>
+In-Reply-To: <20141202202817.15802.qmail@ns.horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 02, 2014 at 03:03:38PM -0500, George Spelvin wrote:
-> > I'm only ok with removing I if you can continue to be able to output it.
-> > given that I is listed as part of the test sequences that NIST provides,
-> > I'd like to be able to compare the values.
+On Tue, Dec 02, 2014 at 03:28:17PM -0500, George Spelvin wrote:
+> >> --- a/crypto/ansi_cprng.c
+> >> +++ b/crypto/ansi_cprng.c
+> >> @@ -51,9 +51,9 @@ struct prng_context {
+> >>  	unsigned char rand_data[DEFAULT_BLK_SZ];
+> >>  	unsigned char DT[DEFAULT_BLK_SZ];
+> >>  	unsigned char V[DEFAULT_BLK_SZ];
+> >> -	u32 rand_read_pos;	/* Offset into rand_data[] */
+> >> +	unsigned char rand_read_pos;	/* Offset into rand_data[] */
 > 
-> I can do that easily, but I can't print the *input* I, which
-> is the result of encrypting the previous DT, as it's thrown
-> away earlier.
+> > u8 please.  Also, not sure if this helps much, as I think the padding
+> > will just get you back to word alignment on each of these.
 > 
-> You'd have to look further back in the debug messages to find it.
+> I noticed the "unsigned char" vs "u8" issue, but didn't make the change
+> as I didn't think the readailility improvement was worth the code churn.
 > 
-> Is changing the format of the debug messages okay?  I'd like the debug
-> messages to describe the code, but I don't know if you have something
-> that parses the current output.
-> 
-I'm fine with changing the output, as I don't think anything particularly relies
-on the format, but I cant' speak for others
-Neil
+You just sent a 17 patch series of clean up and were worried about code churn
+converting an unsigned char to a u8?
 
+
+> But I'd be happy to clean that up, too!
 > 
-> The test output I see on p. 33 of
-> http://csrc.nist.gov/groups/STM/cavp/documents/rng/RNGVS.pdf
-> doesn't include I.  Can you point me to a sample that includes I?
+> Should I convert all the buffers and function prototypes, or is there
+> some criterion for distinguishing which gets which?   (E.g. buffers are
+> "unsigned char" but control variables are "u8".)
 > 
-> It might be best to more significantly  rework the debug messages to
-> resemble the NIST test vectors.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+If you want to sure.  u8 probably makes more sense for the buffers here as our
+intent is to treat them as an array of byte values.
+
+> And actually, you do win.  spinlock_t is 16 bits on x86,
+> and the buffers are all 16 bytes.   (80 bytes before my earlier
+> patches, 48 bytes after.)
+> 
+> So the the structure goes from:
+> 
+> 32-bit		64-bit		Variable
+> Offset	Size	Offset	Size
+>  0	2	 0	2	spinlock_t prng_lock
+>  2	16	 2	16	unsigned char rand_data[16]
+> 18	16	18	16	unsigned char DT[16]
+> 34	16	34	16	unsigned char V[16]
+> 50	2	50	2	(alignemnt)
+> 52	4	52	4	u32 rand_read_pos
+> 56	4	56	8	struct crypto_cipher *tfm
+> 60	4	64	4	u32 flags
+> 		68	4	(alignment)
+> 64		72		(structure size)
+> 
+> to
+> 
+> 32-bit		64-bit		Variable
+> Offset	Size	Offset	Size
+> 34	16	34	16	unsigned char V[16]
+> 50	1	50	1	u8 rand_read_pos
+> 51	1	51	1	u8 flags
+> 		52	4	(alignment)
+> 52	4	56	8	struct crypto_cipher *tfm
+> 56		64		(structure size)
+> 
+> You still get 4 bytes of alignment padding on x86-64, but given that
+> the structure has 60 bytes of payload, that's the minimum possible.
+> 
+> You save 6 bytes of variables and 2 bytes of padding on both
+> 32- and 64-bit systems, for a total of 8 bytes, and that's enough
+> to knock you into a smaller slab object bin on 64-bit.
+> 
+> 
+> I forget where I read the terminology, but the most efficient
+> wat to pack a structure is in an "organ pipe" configuraiton where
+> the biggest (in terms of *alignment*) members are on the outside
+> and the structre and the smaller elements are on the inside.
+> Putting a 32-bit "flags" after a 64-bit pointer violates that.
 > 
