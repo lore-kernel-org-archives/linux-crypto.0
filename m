@@ -1,258 +1,164 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v4 4/5] crypto: AF_ALG: add random number generator support
-Date: Wed, 03 Dec 2014 20:59:01 +0100
-Message-ID: <1480776.TeURZV8VLa@tachyon.chronox.de>
-References: <2105559.EmODblLYuY@tachyon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman@redhat.com>,
-	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
-	'LKML' <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2105559.EmODblLYuY@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: "George Spelvin" <linux@horizon.com>
+Subject: Re: [PATCH 00/17] Multiple changes to crypto/ansi_cprng.c
+Date: 3 Dec 2014 15:27:53 -0500
+Message-ID: <20141203202753.7691.qmail@ns.horizon.com>
+References: <20141203111311.GC23296@hmsreliant.think-freely.org>
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	smueller@chronox.de
+To: linux@horizon.com, nhorman@tuxdriver.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ns.horizon.com ([71.41.210.147]:48167 "HELO ns.horizon.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1751482AbaLCU1z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Dec 2014 15:27:55 -0500
+In-Reply-To: <20141203111311.GC23296@hmsreliant.think-freely.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds the random number generator support for AF_ALG.
+> So, generally speaking I'm ok with most of this I think,
 
-A random number generator's purpose is to generate data without
-requiring the caller to provide any data. Therefore, the AF_ALG
-interface handler for RNGs only implements a callback handler for
-recvmsg.
+One open issue... I thought you had said that the non-determinsitic
+version was not in the current X9.31 and I had the impression that it
+wasn't wanted.  I've got reorganized patch series that gets rid of that
+and just tweaks the comments.
 
-The following parameters provided with a recvmsg are processed by the
-RNG callback handler:
+I'm happy to put it back, of course.  Or just hold off until Herbert
+chimes in with an opinion.
 
-	* sock - to resolve the RNG context data structure accessing the
-	  RNG instance private to the socket
+As an example of the reorganization, now the comment for patch 4 in the
+series is a bit clearer:
 
-	* len - this parameter allows userspace callers to specify how
-	  many random bytes the RNG shall produce and return. As the
-	  kernel context for the RNG allocates a buffer of 128 bytes to
-	  store random numbers before copying them to userspace, the len
-	  parameter is checked that it is not larger than 128. If a
-	  caller wants more random numbers, a new request for recvmsg
-	  shall be made.
+    crypto: ansi_cprng - Eliminate ctx->I and ctx->last_rand_data
+    
+    Careful use of the other available buffers avoids the need for
+    these, shrinking the context by 32 bytes.
+    
+    Neither the debug output nor the FIPS-required anti-repetition check
+    are changed in the slightest.
 
-The size of 128 bytes is chose because of the following considerations:
+(That's because I change the debug output in patches 2 and 3, to make
+this more-sensitive patch easier to review.)
 
-	* to increase the memory footprint of the kernel too much (note,
-	  that would be 128 bytes per open socket)
+> but before it goes anywhere, it really needs to pass the NIST and FIPS
+> test vectors.  Can you do that please and post the results?
 
-	* 128 is divisible by any typical cryptographic block size an
-	  RNG may have
+It of course passes the ones in testmgr.h, and I can add the others from
+http://csrc.nist.gov/groups/STM/cavp/documents/rng/RNGVS.pdf
+and
+http://csrc.nist.gov/groups/STM/cavp/documents/rng/rngtestvectors.zip
 
-	* A request for random numbers typically only shall supply small
-	  amount of data like for keys or IVs that should only require
-	  one invocation of the recvmsg function.
+I didn't know there were separate FIPS test vectors for this PRNG;
+can you give me a clue where to find them?
 
-Note, during instantiation of the RNG, the code checks whether the RNG
-implementation requires seeding. If so, the RNG is seeded with output
-from get_random_bytes.
 
-A fully working example using all aspects of the RNG interface is
-provided at http://www.chronox.de/libkcapi.html
+I'm also not sure what "the results" look like.  As I mentioned previously,
+I have been unable to figure out how to make the tcrypt code print anything
+in the event of a successful test, so its output is the empty string.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/algif_rng.c | 186 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 186 insertions(+)
- create mode 100644 crypto/algif_rng.c
+I am using my own version which prints "cprng: Test %d passed", and
+I can turn debugging on, but the 10000-round MCT produces an annoying
+amount of output in that case.
 
-diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
-new file mode 100644
-index 0000000..fc25869
---- /dev/null
-+++ b/crypto/algif_rng.c
-@@ -0,0 +1,186 @@
-+/*
-+ * algif_rng: User-space interface for random number generators
-+ *
-+ * This file provides the user-space API for random number generators.
-+ *
-+ * Copyright (C) 2014, Stephan Mueller <smueller@chronox.de>
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, and the entire permission notice in its entirety,
-+ *    including the disclaimer of warranties.
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in the
-+ *    documentation and/or other materials provided with the distribution.
-+ * 3. The name of the author may not be used to endorse or promote
-+ *    products derived from this software without specific prior
-+ *    written permission.
-+ *
-+ * ALTERNATIVELY, this product may be distributed under the terms of
-+ * the GNU General Public License, in which case the provisions of the GPL2
-+ * are required INSTEAD OF the above restrictions.  (This clause is
-+ * necessary due to a potential bad interaction between the GPL and
-+ * the restrictions contained in a BSD-style copyright.)
-+ *
-+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
-+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
-+ * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
-+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-+ * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
-+ * DAMAGE.
-+ */
-+
-+#include <linux/module.h>
-+#include <crypto/rng.h>
-+#include <linux/random.h>
-+#include <crypto/if_alg.h>
-+#include <linux/net.h>
-+#include <net/sock.h>
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-+MODULE_DESCRIPTION("User-space interface for random number generators");
-+
-+struct rng_ctx {
-+#define MAXSIZE 128
-+	u8 result[MAXSIZE];
-+	unsigned int len;
-+	struct crypto_rng *drng;
-+};
-+
-+static int rng_recvmsg(struct kiocb *unused, struct socket *sock,
-+		       struct msghdr *msg, size_t len, int flags)
-+{
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct rng_ctx *ctx = ask->private;
-+	int err = -EFAULT;
-+
-+	if (len == 0)
-+		return 0;
-+	if (len > MAXSIZE)
-+		len = MAXSIZE;
-+
-+	lock_sock(sk);
-+	len = crypto_rng_get_bytes(ctx->drng, ctx->result, len);
-+	if (len < 0)
-+		goto unlock;
-+
-+	err = memcpy_toiovec(msg->msg_iov, ctx->result, len);
-+	memzero_explicit(ctx->result, len);
-+
-+unlock:
-+	release_sock(sk);
-+
-+	return err ? err : len;
-+}
-+
-+static struct proto_ops algif_rng_ops = {
-+	.family		=	PF_ALG,
-+
-+	.connect	=	sock_no_connect,
-+	.socketpair	=	sock_no_socketpair,
-+	.getname	=	sock_no_getname,
-+	.ioctl		=	sock_no_ioctl,
-+	.listen		=	sock_no_listen,
-+	.shutdown	=	sock_no_shutdown,
-+	.getsockopt	=	sock_no_getsockopt,
-+	.mmap		=	sock_no_mmap,
-+	.bind		=	sock_no_bind,
-+	.accept		=	sock_no_accept,
-+	.setsockopt	=	sock_no_setsockopt,
-+	.poll		=	sock_no_poll,
-+	.sendmsg	=	sock_no_sendmsg,
-+	.sendpage	=	sock_no_sendpage,
-+
-+	.release	=	af_alg_release,
-+	.recvmsg	=	rng_recvmsg,
-+};
-+
-+static void *rng_bind(const char *name, u32 type, u32 mask)
-+{
-+	return crypto_alloc_rng(name, type, mask);
-+}
-+
-+static void rng_release(void *private)
-+{
-+	crypto_free_rng(private);
-+}
-+
-+static void rng_sock_destruct(struct sock *sk)
-+{
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct rng_ctx *ctx = ask->private;
-+
-+	memzero_explicit(ctx->result, sizeof(ctx->result));
-+	sock_kfree_s(sk, ctx, ctx->len);
-+	af_alg_release_parent(sk);
-+}
-+
-+static int rng_accept_parent(void *private, struct sock *sk)
-+{
-+	struct rng_ctx *ctx;
-+	struct alg_sock *ask = alg_sk(sk);
-+	unsigned int len = sizeof(*ctx);
-+	int seedsize = crypto_rng_seedsize(private);
-+	int ret = -ENOMEM;
-+
-+	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
-+	if (!ctx)
-+		return -ENOMEM;
-+	memset(ctx->result, 0, sizeof(ctx->result));
-+
-+	ctx->len = len;
-+
-+	if (seedsize) {
-+		u8 *buf = kmalloc(seedsize, GFP_KERNEL);
-+		if (!buf)
-+			goto err;
-+		get_random_bytes(buf, seedsize);
-+		ret = crypto_rng_reset(private, buf, len);
-+		kzfree(buf);
-+		if (ret)
-+			goto err;
-+	}
-+
-+	ctx->drng = private;
-+	ask->private = ctx;
-+	sk->sk_destruct = rng_sock_destruct;
-+
-+	return 0;
-+
-+err:
-+	sock_kfree_s(sk, ctx, len);
-+	return ret;
-+}
-+
-+static const struct af_alg_type algif_type_rng = {
-+	.bind		=	rng_bind,
-+	.release	=	rng_release,
-+	.accept		=	rng_accept_parent,
-+	.ops		=	&algif_rng_ops,
-+	.name		=	"rng",
-+	.owner		=	THIS_MODULE
-+};
-+
-+static int __init rng_init(void)
-+{
-+	return af_alg_register_type(&algif_type_rng);
-+}
-+
-+void __exit rng_exit(void)
-+{
-+	int err = af_alg_unregister_type(&algif_type_rng);
-+	BUG_ON(err);
-+}
-+
-+module_init(rng_init);
-+module_exit(rng_exit);
--- 
-2.1.0
+(Note to self: teach test_cprng to test odd-sized reads, since that was
+a previous bug source and I'm touching that code some more.)
+
+> I'm fine with changing the output, as I don't think anything
+> particularly relies on the format, but I can't speak for others.
+
+The current debug output for the first 5 testmgr.h tests (the 6th is
+omitted) is follows, but obviously things get reconfirmed right at
+the end.
+
+getting 16 random bytes for context ffff88042ce41b18
+Calling _get_more_prng_bytes for context ffff88042ce41b18
+DT = e6b3be782a23fa62d71d4afbb0e922f9
+V = 80000000000000000000000000000000
+I = 92640cf08d302f2550ea3d73d1985385
+V^I = 12640cf08d302f2550ea3d73d1985385
+R = 59531ed13bb0c05584796685c12f7641
+R^I = cb371221b680ef70d4935bf610b725c4
+V' = 2ac489ad47640b6d86380229e769adc3
+DT' = e6b3be782a23fa62d71d4afbb0e922fa
+Returning new block for context ffff88042ce41b18
+returning 16 from get_prng_bytes in context ffff88042ce41b18
+cprng: Test 0 passed
+getting 16 random bytes for context ffff88042ce41b18
+Calling _get_more_prng_bytes for context ffff88042ce41b18
+DT = e6b3be782a23fa62d71d4afbb0e922fa
+V = c0000000000000000000000000000000
+I = b30a8cba1c4cd3a14af7d9db9488f5f0
+V^I = 730a8cba1c4cd3a14af7d9db9488f5f0
+R = 7c222cf4ca8fa24c1c9cb641a9f3220d
+R^I = cf28a04ed6c371ed566b6f9a3d7bd7fd
+V' = fcbd61e7c51dd167624c56cb97b4c66d
+DT' = e6b3be782a23fa62d71d4afbb0e922fb
+Returning new block for context ffff88042ce41b18
+returning 16 from get_prng_bytes in context ffff88042ce41b18
+cprng: Test 1 passed
+getting 16 random bytes for context ffff88042ce41b18
+Calling _get_more_prng_bytes for context ffff88042ce41b18
+DT = e6b3be782a23fa62d71d4afbb0e922fb
+V = e0000000000000000000000000000000
+I = d761699cc3de4a90234c62eec2479cd9
+V^I = 3761699cc3de4a90234c62eec2479cd9
+R = 8aaa003966675be529142881a94d4ec7
+R^I = 5dcb69a5a5b911750a584a6f6b0ad21e
+V' = ef2c1fbf609a68f8fe5110636bf4bf6a
+DT' = e6b3be782a23fa62d71d4afbb0e922fc
+Returning new block for context ffff88042ce41b18
+returning 16 from get_prng_bytes in context ffff88042ce41b18
+cprng: Test 2 passed
+getting 16 random bytes for context ffff88042ce41b18
+Calling _get_more_prng_bytes for context ffff88042ce41b18
+DT = e6b3be782a23fa62d71d4afbb0e922fc
+V = f0000000000000000000000000000000
+I = 048ecb25943e8c31d614cd8a23f13f84
+V^I = f48ecb25943e8c31d614cd8a23f13f84
+R = 88dda456302423e5f69da57e7b95c73a
+R^I = 8c536f73a41aafd4208968f45864f8be
+V' = 48893b71bce400b65e21ba378a0ad570
+DT' = e6b3be782a23fa62d71d4afbb0e922fd
+Returning new block for context ffff88042ce41b18
+returning 16 from get_prng_bytes in context ffff88042ce41b18
+cprng: Test 3 passed
+getting 16 random bytes for context ffff88042ce41b18
+Calling _get_more_prng_bytes for context ffff88042ce41b18
+DT = e6b3be782a23fa62d71d4afbb0e922fd
+V = f8000000000000000000000000000000
+I = 3a6a1754bdf6f844e53662990cadc492
+V^I = c26a1754bdf6f844e53662990cadc492
+R = 052592466179d2cb78c40b140a5a9ac8
+R^I = 3f4f8512dc8f2a8f9df2698d06f75e5a
+V' = ac4b23c4fb1e85098d9927afa617ad88
+DT' = e6b3be782a23fa62d71d4afbb0e922fe
+Returning new block for context ffff88042ce41b18
+returning 16 from get_prng_bytes in context ffff88042ce41b18
+cprng: Test 4 passed
+self_test: err 0
+prng_mod_init: err 0
+
+
+>> I noticed the "unsigned char" vs "u8" issue, but didn't make the change
+>> as I didn't think the readailility improvement was worth the code churn.
+
+> You just sent a 17 patch series of clean up and were worried about code churn
+> converting an unsigned char to a u8?
+
+Yes, it does sound funny like that, but I meant that I have no trouble
+reading the types as synonyms, so the improvement is very small, and it's
+the ratio.
+
+More simply, "I noticed, but it didn't make me itch enough."
+
+Once I got deep enough into it, perhaps I should have re-evaluated.
+
+>> Should I convert all the buffers and function prototypes,
+
+> If you want to sure.  u8 probably makes more sense for the buffers here as our
+> intent is to treat them as an array of byte values.
+
+I had a look at <linux/crypto.h>, which uses u8 for everything, so I've
+already changed everything to that.
+
+
+Thank you for your time and effort looking at this!
