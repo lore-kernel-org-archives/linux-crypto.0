@@ -1,52 +1,69 @@
-From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Subject: Re: [PATCH v4 0/4] crypto: sahara - SHA support
-Date: Wed, 3 Dec 2014 17:03:35 +0100
-Message-ID: <20141203160335.GA4652@pengutronix.de>
-References: <1417436794-7804-1-git-send-email-s.trumtrar@pengutronix.de>
- <20141203143415.GA11336@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v4 5/5] crypto: AF_ALG: enable RNG interface compilation
+Date: Wed, 03 Dec 2014 20:59:42 +0100
+Message-ID: <7561421.KGaFO6qYAU@tachyon.chronox.de>
+References: <2105559.EmODblLYuY@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, kernel@pengutronix.de
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Daniel Borkmann <dborkman@redhat.com>,
+	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	'LKML' <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:49398 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751923AbaLCQDl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Dec 2014 11:03:41 -0500
-Content-Disposition: inline
-In-Reply-To: <20141203143415.GA11336@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:54872 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752205AbaLCUHp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Dec 2014 15:07:45 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <SA9A8> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Wed, 3 Dec 2014 21:07:42 +0100
+In-Reply-To: <2105559.EmODblLYuY@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 03, 2014 at 10:34:16PM +0800, Herbert Xu wrote:
-> On Mon, Dec 01, 2014 at 01:26:30PM +0100, Steffen Trumtrar wrote:
-> > Hi!
-> > 
-> > This series adds support for
-> > 	- i.MX53 support
-> > 	- SHA1/256
-> > to the SAHARA driver.
-> > 
-> > - Version 4 is a major overhaul of the previous versions.
-> >   The tasklet/watchdog implementation of the driver is replaced by a kthread
-> >   and completions. This makes sure, that only one request is queued into
-> >   the device and makes sure that the requests from user-space processes are
-> >   correctly enqueued into the queue. This means, that the queue is responsible
-> >   for sequentializing accesses from userspace.
-> > 
-> > - The request is now saved into the sahara_sha_reqctx
-> 
-> All applied to cryptodev.  Nice work Steffen, thanks!
+Enable compilation of the RNG AF_ALG support and provide a Kconfig
+option to compile the RNG AF_ALG support.
 
-\o/
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/Kconfig  | 9 +++++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
 
-Thanks,
-Steffen
-
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 0b2affc..8e968dc 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1514,6 +1514,15 @@ config CRYPTO_USER_API_AEAD
+ 	  This option enables the user-spaces interface for AEAD
+ 	  cipher algorithms.
+ 
++config CRYPTO_USER_API_RNG
++	tristate "User-space interface for random number generator algorithms"
++	depends on NET
++	select CRYPTO_RNG
++	select CRYPTO_USER_API
++	help
++	  This option enables the user-spaces interface for random
++	  number generator algorithms.
++
+ config CRYPTO_HASH_INFO
+ 	bool
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 593fd3c..c109df5 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -100,6 +100,7 @@ obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
++obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
+ 
+ #
+ # generic algorithms and the async_tx api
 -- 
-Pengutronix e.K.                           |                             |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.1.0
