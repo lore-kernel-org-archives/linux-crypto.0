@@ -1,57 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: algif - Mark sgl end at the end of data
-Date: Wed, 3 Dec 2014 22:26:59 +0800
-Message-ID: <20141203142659.GA11236@gondor.apana.org.au>
-References: <20141202150750.32521.20584.stgit@tstruk-mobl1>
+Subject: Re: [PATCH v4 0/4] crypto: sahara - SHA support
+Date: Wed, 3 Dec 2014 22:34:16 +0800
+Message-ID: <20141203143415.GA11336@gondor.apana.org.au>
+References: <1417436794-7804-1-git-send-email-s.trumtrar@pengutronix.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, kernel@pengutronix.de
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:51030 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:36226 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752720AbaLCO1G (ORCPT
+	with ESMTP id S1753212AbaLCOeU (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Dec 2014 09:27:06 -0500
+	Wed, 3 Dec 2014 09:34:20 -0500
 Content-Disposition: inline
-In-Reply-To: <20141202150750.32521.20584.stgit@tstruk-mobl1>
+In-Reply-To: <1417436794-7804-1-git-send-email-s.trumtrar@pengutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 02, 2014 at 07:07:50AM -0800, Tadeusz Struk wrote:
-> Hi,
-> algif_skcipher sends 127 sgl buffers for encryption regardless of how
-> many buffers acctually have data to process, where the few first with
-> valid len and the rest with zero len. This is not very eficient and may cause
-> problems when algs do something like this without checking the buff
-> lenght:
-> for_each_sg(sgl, sg, sg_nents, i)
-> 	sg_virt(sg)
-> This patch marks the last one with data as the last one to process.
+On Mon, Dec 01, 2014 at 01:26:30PM +0100, Steffen Trumtrar wrote:
+> Hi!
 > 
-> Changes:
-> v2 - use data len to find the last buffer instead of nents in RX list.
+> This series adds support for
+> 	- i.MX53 support
+> 	- SHA1/256
+> to the SAHARA driver.
 > 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-> ---
->  crypto/algif_skcipher.c |   22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
+> - Version 4 is a major overhaul of the previous versions.
+>   The tasklet/watchdog implementation of the driver is replaced by a kthread
+>   and completions. This makes sure, that only one request is queued into
+>   the device and makes sure that the requests from user-space processes are
+>   correctly enqueued into the queue. This means, that the queue is responsible
+>   for sequentializing accesses from userspace.
 > 
-> diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-> index f2a88a7..cde507f 100644
-> --- a/crypto/algif_skcipher.c
-> +++ b/crypto/algif_skcipher.c
-> @@ -414,6 +414,23 @@ unlock:
->  	return err ?: size;
->  }
->  
-> +static int skcipher_get_nents_with_data(struct scatterlist *sg, int len)
-> +{
+> - The request is now saved into the sahara_sha_reqctx
 
-This is way too complicated.  Why not just do it every time we add
-data and modify sgl->cur?
-
-Cheers,
+All applied to cryptodev.  Nice work Steffen, thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
