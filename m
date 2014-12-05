@@ -1,99 +1,69 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v4 2/5] crypto: AF_ALG: add AEAD support
-Date: Fri, 05 Dec 2014 22:51:51 +0100
-Message-ID: <45756810.oFuGYtKPb9@tachyon.chronox.de>
-References: <2105559.EmODblLYuY@tachyon.chronox.de> <4875720.jRoMDtjHB4@tachyon.chronox.de> <20141205154606.GA30180@gondor.apana.org.au>
+From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: Re: [PATCH v4 4/5] crypto: AF_ALG: add random number generator support
+Date: Fri, 05 Dec 2014 23:02:59 +0100
+Message-ID: <7181491.MIJ5ay4MmI@tachyon.chronox.de>
+References: <2105559.EmODblLYuY@tachyon.chronox.de> <1480776.TeURZV8VLa@tachyon.chronox.de> <20141205155359.GA30224@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman@redhat.com>,
-	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
-	'LKML' <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:54922 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751338AbaLEVvz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Dec 2014 16:51:55 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <SB0A0> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Fri, 5 Dec 2014 22:51:51 +0100
-In-Reply-To: <20141205154606.GA30180@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20141205155359.GA30224-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 5. Dezember 2014, 23:46:06 schrieb Herbert Xu:
+Am Freitag, 5. Dezember 2014, 23:53:59 schrieb Herbert Xu:
 
 Hi Herbert,
 
-> On Wed, Dec 03, 2014 at 08:57:24PM +0100, Stephan Mueller wrote:
-> > +	if (ctx->merge) {
-> > +		sg = sgl->sg + sgl->cur - 1;
-> > +		len = min_t(unsigned long, len,
-> > +			    PAGE_SIZE - sg->offset - sg->length);
+> On Wed, Dec 03, 2014 at 08:59:01PM +0100, Stephan Mueller wrote:
+> > +static int rng_recvmsg(struct kiocb *unused, struct socket *sock,
+> > +		       struct msghdr *msg, size_t len, int flags)
+> > +{
+> > +	struct sock *sk = sock->sk;
+> > +	struct alg_sock *ask = alg_sk(sk);
+> > +	struct rng_ctx *ctx = ask->private;
+> > +	int err = -EFAULT;
 > > +
-> > +		err = memcpy_fromiovec(page_address(sg_page(sg)) +
-> > +				       sg->offset + sg->length,
-> > +				       msg->msg_iov, len);
-> > +		if (err)
-> > +			goto unlock;
+> > +	if (len == 0)
+> > +		return 0;
+> > +	if (len > MAXSIZE)
+> > +		len = MAXSIZE;
 > > +
-> > +		sg->length += len;
-> > +		ctx->merge = (sg->offset + sg->length) & (PAGE_SIZE - 1);
-> > +
-> > +		ctx->used += len;
-> > +		copied += len;
-> > +		size -= len;
-> > +	}
+> > +	lock_sock(sk);
 > 
-> Any reason why you got rid of the outer loop here? This will cause
-> short writes I think.
+> This lock simply protects ctx->result.  Since you're using a
+> tiny buffer why not just put it on the stack?
 
-You are absolutely right. I removed it as I do not have the multiple sgl 
-entries. But now as you mentioned it, I still need it if size > 
-aead_sndbuf(sk).
+When I developed the DRBG code, I got comments that 128 byte variables shall 
+not be on the stack in kernel code.
 
-This will be fixed in the next installment.
+But if you agree that I can put a 128 byte variable on the stack, I will see 
+it done.
+
 > 
-> > +static struct proto_ops algif_aead_ops = {
-> > +	.family		=	PF_ALG,
-> > +
-> > +	.connect	=	sock_no_connect,
-> > +	.socketpair	=	sock_no_socketpair,
-> > +	.getname	=	sock_no_getname,
-> > +	.ioctl		=	sock_no_ioctl,
-> > +	.listen		=	sock_no_listen,
-> > +	.shutdown	=	sock_no_shutdown,
-> > +	.getsockopt	=	sock_no_getsockopt,
-> > +	.mmap		=	sock_no_mmap,
-> > +	.bind		=	sock_no_bind,
-> > +	.accept		=	sock_no_accept,
-> > +
-> > +	.release	=	af_alg_release,
-> > +	.sendmsg	=	aead_sendmsg,
-> > +	.sendpage	=	aead_sendpage,
-> > +	.recvmsg	=	aead_recvmsg,
-> > +	.poll		=	aead_poll,
-> > +	.setsockopt	=	aead_setsockopt,
+> > +		u8 *buf = kmalloc(seedsize, GFP_KERNEL);
+> > +		if (!buf)
+> > +			goto err;
+> > +		get_random_bytes(buf, seedsize);
+> > +		ret = crypto_rng_reset(private, buf, len);
 > 
-> No it should go into the parent setsockopt.  Perhaps add a setsockopt
-> to af_alg_type in order to keep this out of the generic code.
+> I think you should leave the seeding and the seed to the user.
+> Perhaps do it through setsockopt (on the parent socket).
 
-I was thinking about that for quite a while. My thought for the current 
-approach was that the actual cipher operation happens in the child FD (i.e. 
-after accept). AAD is delivered to that FD. Therefore, I thought that the size 
-of the AAD can be specific to that operational FD.
+Sure. But please note that the seeding happens only when seedsize > 0. Such 
+seeding therefore is not performed for krng, and the DRBG because both seed 
+automatically.
 
-If we move it to the parent setsockopt, all child FDs have the same AAD size. 
-If you think that this is the right course of action, I can surely implement 
-that.
+Therefore, may I propose the following: We offer a setsockopt for (re)seeding. 
+For all RNGs with seedsize > 0, we return EAGAIN for recvmsg until a 
+setsockopt for at least seedsize is provided. That would imply that krng and 
+DRBG would be usable without seeding from user space.
 
-Would you please be so kind and help me understand when some operations are 
-intended for the parent FD and when for the child FD?
-
-Thanks
 -- 
 Ciao
 Stephan
