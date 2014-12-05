@@ -1,62 +1,77 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH] staging: crypto: fixed style error in ahash.c
-Date: Fri, 5 Dec 2014 08:54:40 -0500
-Message-ID: <20141205135440.GD22670@titan.lakedaemon.net>
-References: <1417758294-22850-1-git-send-email-Joshua@cybercrimetech.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v4 2/5] crypto: AF_ALG: add AEAD support
+Date: Fri, 5 Dec 2014 23:46:06 +0800
+Message-ID: <20141205154606.GA30180@gondor.apana.org.au>
+References: <2105559.EmODblLYuY@tachyon.chronox.de>
+ <4875720.jRoMDtjHB4@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: "Joshua I. James" <joshua@cybercrimetech.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Daniel Borkmann <dborkman@redhat.com>,
+	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	'LKML' <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:25033 "EHLO
-	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751184AbaLENyn (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:34899 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750903AbaLEPqS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Dec 2014 08:54:43 -0500
+	Fri, 5 Dec 2014 10:46:18 -0500
 Content-Disposition: inline
-In-Reply-To: <1417758294-22850-1-git-send-email-Joshua@cybercrimetech.com>
+In-Reply-To: <4875720.jRoMDtjHB4@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 05, 2014 at 02:44:54PM +0900, Joshua I. James wrote:
-> From: "Joshua I. James" <joshua@cybercrimetech.com>
-> 
-> Fixed style error identified by checkpatch.
-> 
-> WARNING: Missing a blank line after declarations
-> +               unsigned int unaligned = alignmask + 1 - (offset & alignmask);
-> +               if (nbytes > unaligned)
-> 
-> Signed-off-by: Joshua I. James <joshua@cybercrimetech.com>
-> ---
->  crypto/ahash.c | 1 +
->  1 file changed, 1 insertion(+)
-
-Same comment as the third patch.
-
-thx,
-
-Jason.
-
-> 
-> diff --git a/crypto/ahash.c b/crypto/ahash.c
-> index f6a36a5..dd28906 100644
-> --- a/crypto/ahash.c
-> +++ b/crypto/ahash.c
-> @@ -55,6 +55,7 @@ static int hash_walk_next(struct crypto_hash_walk *walk)
->  
->  	if (offset & alignmask) {
->  		unsigned int unaligned = alignmask + 1 - (offset & alignmask);
+On Wed, Dec 03, 2014 at 08:57:24PM +0100, Stephan Mueller wrote:
+>
+> +	if (ctx->merge) {
+> +		sg = sgl->sg + sgl->cur - 1;
+> +		len = min_t(unsigned long, len,
+> +			    PAGE_SIZE - sg->offset - sg->length);
 > +
->  		if (nbytes > unaligned)
->  			nbytes = unaligned;
->  	}
-> -- 
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+> +		err = memcpy_fromiovec(page_address(sg_page(sg)) +
+> +				       sg->offset + sg->length,
+> +				       msg->msg_iov, len);
+> +		if (err)
+> +			goto unlock;
+> +
+> +		sg->length += len;
+> +		ctx->merge = (sg->offset + sg->length) & (PAGE_SIZE - 1);
+> +
+> +		ctx->used += len;
+> +		copied += len;
+> +		size -= len;
+> +	}
+
+Any reason why you got rid of the outer loop here? This will cause
+short writes I think.
+
+> +static struct proto_ops algif_aead_ops = {
+> +	.family		=	PF_ALG,
+> +
+> +	.connect	=	sock_no_connect,
+> +	.socketpair	=	sock_no_socketpair,
+> +	.getname	=	sock_no_getname,
+> +	.ioctl		=	sock_no_ioctl,
+> +	.listen		=	sock_no_listen,
+> +	.shutdown	=	sock_no_shutdown,
+> +	.getsockopt	=	sock_no_getsockopt,
+> +	.mmap		=	sock_no_mmap,
+> +	.bind		=	sock_no_bind,
+> +	.accept		=	sock_no_accept,
+> +
+> +	.release	=	af_alg_release,
+> +	.sendmsg	=	aead_sendmsg,
+> +	.sendpage	=	aead_sendpage,
+> +	.recvmsg	=	aead_recvmsg,
+> +	.poll		=	aead_poll,
+> +	.setsockopt	=	aead_setsockopt,
+
+No it should go into the parent setsockopt.  Perhaps add a setsockopt
+to af_alg_type in order to keep this out of the generic code.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
