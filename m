@@ -1,36 +1,54 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v4 1/5] crypto: AF_ALG: add user space interface for AEAD
-Date: Sat, 6 Dec 2014 00:01:47 +0800
-Message-ID: <20141205160147.GA30388@gondor.apana.org.au>
-References: <2105559.EmODblLYuY@tachyon.chronox.de>
- <4746255.Vltg6sM4x3@tachyon.chronox.de>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH v2 0/2] crypto: qat - Fix for invalid dma mapping and
+ numa
+Date: Fri, 05 Dec 2014 10:34:33 -0800
+Message-ID: <5481FAB9.3000901@intel.com>
+References: <20141014012251.742.5500.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <4746255.Vltg6sM4x3-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:60931 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751164AbaLESkh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Dec 2014 13:40:37 -0500
+In-Reply-To: <20141014012251.742.5500.stgit@tstruk-mobl1>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 03, 2014 at 08:55:42PM +0100, Stephan Mueller wrote:
-> AEAD requires the caller to specify the following information separate
-> from the data stream. This information allows the AEAD interface handler
-> to identify the AAD, ciphertext/plaintext and the authentication tag:
+On 10/13/2014 06:24 PM, Tadeusz Struk wrote:
+> Hi,
+> These two patches fix invalid (zero length) dma mapping and
+> enforce numa configuration for maximum performance.
 > 
->         * Associated authentication data of arbitrary length and
->           length
+> Change log:
+> v2 - Removed numa node calculation based bus number and use predefined
+> functions instead.
 > 
->         * Length of authentication tag for encryption
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> ---
 > 
-> Signed-off-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+> Tadeusz Struk (2):
+>       crypto: qat - Prevent dma mapping zero length assoc data
+>       crypto: qat - Enforce valid numa configuration
+> 
+> 
+>  drivers/crypto/qat/qat_common/adf_accel_devices.h |    3 +-
+>  drivers/crypto/qat/qat_common/adf_transport.c     |   12 +++++---
+>  drivers/crypto/qat/qat_common/qat_algs.c          |    7 +++--
+>  drivers/crypto/qat/qat_common/qat_crypto.c        |    8 +++--
+>  drivers/crypto/qat/qat_dh895xcc/adf_admin.c       |    2 +
+>  drivers/crypto/qat/qat_dh895xcc/adf_drv.c         |   32 ++++++++-------------
+>  drivers/crypto/qat/qat_dh895xcc/adf_isr.c         |    2 +
+>  7 files changed, 32 insertions(+), 34 deletions(-)
+> 
 
-Patch applied.
--- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+Hi Herbert,
+Looks like these two are not in cryptodev-2.6 yet.
+Do you plan to merge it sometime soon or should I generate incremental
+patches based on crypto-2.6 instead of cryptodev-2.6
+Thanks,
+Tadeusz
