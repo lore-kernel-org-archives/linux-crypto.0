@@ -1,54 +1,64 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v2 0/2] crypto: qat - Fix for invalid dma mapping and
- numa
-Date: Fri, 05 Dec 2014 10:34:33 -0800
-Message-ID: <5481FAB9.3000901@intel.com>
-References: <20141014012251.742.5500.stgit@tstruk-mobl1>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [RESEND][PATCH] crypto: drbg - panic on continuous self test error
+Date: Fri, 05 Dec 2014 22:40:21 +0100
+Message-ID: <1565261.ENnvzOKNx0@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:60931 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751164AbaLESkh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Dec 2014 13:40:37 -0500
-In-Reply-To: <20141014012251.742.5500.stgit@tstruk-mobl1>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: 'LKML' <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 10/13/2014 06:24 PM, Tadeusz Struk wrote:
-> Hi,
-> These two patches fix invalid (zero length) dma mapping and
-> enforce numa configuration for maximum performance.
-> 
-> Change log:
-> v2 - Removed numa node calculation based bus number and use predefined
-> functions instead.
-> 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-> ---
-> 
-> Tadeusz Struk (2):
->       crypto: qat - Prevent dma mapping zero length assoc data
->       crypto: qat - Enforce valid numa configuration
-> 
-> 
->  drivers/crypto/qat/qat_common/adf_accel_devices.h |    3 +-
->  drivers/crypto/qat/qat_common/adf_transport.c     |   12 +++++---
->  drivers/crypto/qat/qat_common/qat_algs.c          |    7 +++--
->  drivers/crypto/qat/qat_common/qat_crypto.c        |    8 +++--
->  drivers/crypto/qat/qat_dh895xcc/adf_admin.c       |    2 +
->  drivers/crypto/qat/qat_dh895xcc/adf_drv.c         |   32 ++++++++-------------
->  drivers/crypto/qat/qat_dh895xcc/adf_isr.c         |    2 +
->  7 files changed, 32 insertions(+), 34 deletions(-)
-> 
+This patch adds a panic if the FIPS 140-2 self test error failed.
+Note, that entire code is only executed with fips_enabled (i.e. when the
+kernel is booted with fips=1. It is therefore not executed for 99.9% of
+all user base.
 
+As mathematically such failure cannot occur, this panic should never be
+triggered. But to comply with NISTs current requirements, an endless
+loop must be replaced with the panic.
 
-Hi Herbert,
-Looks like these two are not in cryptodev-2.6 yet.
-Do you plan to merge it sometime soon or should I generate incremental
-patches based on crypto-2.6 instead of cryptodev-2.6
-Thanks,
-Tadeusz
+When the new version of FIPS 140 will be released, this entire
+continuous self test function will be ripped out as it will not be
+needed any more.
+
+This patch is functionally equivalent as implemented in ansi_cprng.c and drivers/char/random.c.
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/drbg.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
+
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 9fb38a5..2c46d5e 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -222,15 +222,6 @@ static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
+  * function. Thus, the function implicitly knows the size of the
+  * buffer.
+  *
+- * The FIPS test can be called in an endless loop until it returns
+- * true. Although the code looks like a potential for a deadlock, it
+- * is not the case, because returning a false cannot mathematically
+- * occur (except once when a reseed took place and the updated state
+- * would is now set up such that the generation of new value returns
+- * an identical one -- this is most unlikely and would happen only once).
+- * Thus, if this function repeatedly returns false and thus would cause
+- * a deadlock, the integrity of the entire kernel is lost.
+- *
+  * @drbg DRBG handle
+  * @buf output buffer of random data to be checked
+  *
+@@ -257,6 +248,8 @@ static bool drbg_fips_continuous_test(struct drbg_state *drbg,
+ 		return false;
+ 	}
+ 	ret = memcmp(drbg->prev, buf, drbg_blocklen(drbg));
++	if (!ret)
++		panic("DRBG continuous self test failed\n");
+ 	memcpy(drbg->prev, buf, drbg_blocklen(drbg));
+ 	/* the test shall pass when the two compared values are not equal */
+ 	return ret != 0;
+-- 
+2.1.0
