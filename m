@@ -1,34 +1,72 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v4 2/5] crypto: AF_ALG: add AEAD support
-Date: Sun, 7 Dec 2014 07:28:23 +0800
-Message-ID: <20141206232823.GB6409@gondor.apana.org.au>
-References: <2105559.EmODblLYuY@tachyon.chronox.de>
- <4875720.jRoMDtjHB4@tachyon.chronox.de>
- <20141205154606.GA30180@gondor.apana.org.au>
- <45756810.oFuGYtKPb9@tachyon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <45756810.oFuGYtKPb9-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: George Spelvin <linux@horizon.com>
+Subject: [PATCH v2 02/25] crypto: ansi_cprng - Additional _get_more_prng_bytes cleanup
+Date: Sun,  7 Dec 2014 07:26:10 -0500
+Message-ID: <0adc66f32b0eb34ba267d7173f8ee4b732294a5e.1417951990.git.linux@horizon.com>
+References: <cover.1417951990.git.linux@horizon.com>
+Cc: smueller@chronox.de, herbert@gondor.apana.org.au, linux@horizon.com
+To: nhorman@tuxdriver.com, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ns.horizon.com ([71.41.210.147]:29037 "HELO ns.horizon.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1753083AbaLGM0x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 7 Dec 2014 07:26:53 -0500
+In-Reply-To: <cover.1417951990.git.linux@horizon.com>
+In-Reply-To: <cover.1417951990.git.linux@horizon.com>
+References: <cover.1417951990.git.linux@horizon.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 05, 2014 at 10:51:51PM +0100, Stephan Mueller wrote:
->
-> Would you please be so kind and help me understand when some operations are 
-> intended for the parent FD and when for the child FD?
+The local variable "output" is no longer required.
 
-If it changes the tfm it goes in the parent FD otherwise it's the
-child FD.
+Signed-off-by: George Spelvin <linux@horizon.com>
+---
+ crypto/ansi_cprng.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-Cheers,
+diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
+index ce315bf7..143e0cfa 100644
+--- a/crypto/ansi_cprng.c
++++ b/crypto/ansi_cprng.c
+@@ -89,8 +89,6 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ {
+ 	int i;
+ 	unsigned char tmp[DEFAULT_BLK_SZ];
+-	unsigned char *output = NULL;
+-
+ 
+ 	dbgprint(KERN_CRIT "Calling _get_more_prng_bytes for context %p\n",
+ 		ctx);
+@@ -104,9 +102,8 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 	 * This gives us an intermediate value I
+ 	 */
+ 	memcpy(tmp, ctx->DT, DEFAULT_BLK_SZ);
+-	output = ctx->I;
+ 	hexdump("tmp stage 0: ", tmp, DEFAULT_BLK_SZ);
+-	crypto_cipher_encrypt_one(ctx->tfm, output, tmp);
++	crypto_cipher_encrypt_one(ctx->tfm, ctx->I, tmp);
+ 
+ 	/*
+ 	 * Next xor I with our secret vector V
+@@ -115,8 +112,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 	 */
+ 	xor_vectors(ctx->I, ctx->V, tmp, DEFAULT_BLK_SZ);
+ 	hexdump("tmp stage 1: ", tmp, DEFAULT_BLK_SZ);
+-	output = ctx->rand_data;
+-	crypto_cipher_encrypt_one(ctx->tfm, output, tmp);
++	crypto_cipher_encrypt_one(ctx->tfm, ctx->rand_data, tmp);
+ 
+ 	/*
+ 	 * First check that we didn't produce the same
+@@ -139,9 +135,8 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 	 * and encrypt that to obtain a new secret vector V
+ 	 */
+ 	xor_vectors(ctx->rand_data, ctx->I, tmp, DEFAULT_BLK_SZ);
+-	output = ctx->V;
+ 	hexdump("tmp stage 2: ", tmp, DEFAULT_BLK_SZ);
+-	crypto_cipher_encrypt_one(ctx->tfm, output, tmp);
++	crypto_cipher_encrypt_one(ctx->tfm, ctx->V, tmp);
+ 
+ 	/*
+ 	 * Now update our DT value
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.1.3
