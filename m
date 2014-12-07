@@ -1,77 +1,97 @@
 From: George Spelvin <linux@horizon.com>
-Subject: [PATCH v2 06/25] crypto: ansi_cprng - Make cont_test a bool
-Date: Sun,  7 Dec 2014 07:26:14 -0500
-Message-ID: <ce162d7f0ec81077828c7b2a56208730812eee91.1417951990.git.linux@horizon.com>
+Subject: [PATCH v2 10/25] crypto: ansi_cprng - Use u8 data types consistently internally
+Date: Sun,  7 Dec 2014 07:26:18 -0500
+Message-ID: <6f2794a61216aa69c5f4c0dafc6fafae48bd7874.1417951990.git.linux@horizon.com>
 References: <cover.1417951990.git.linux@horizon.com>
 Cc: smueller@chronox.de, herbert@gondor.apana.org.au, linux@horizon.com
 To: nhorman@tuxdriver.com, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:19437 "HELO ns.horizon.com"
+Received: from ns.horizon.com ([71.41.210.147]:13740 "HELO ns.horizon.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1753157AbaLGM1A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 7 Dec 2014 07:27:00 -0500
+	id S1753175AbaLGM1D (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 7 Dec 2014 07:27:03 -0500
 In-Reply-To: <cover.1417951990.git.linux@horizon.com>
 In-Reply-To: <cover.1417951990.git.linux@horizon.com>
 References: <cover.1417951990.git.linux@horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This makes no difference to the generated code, but I like to use bool
-where appropriate for documentation.
+Yes, they're equivalent to "unsigned char", but let's stick with what
+the crypto API uses externally.
 
 Signed-off-by: George Spelvin <linux@horizon.com>
 ---
- crypto/ansi_cprng.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ crypto/ansi_cprng.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
 diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index 2edac42e..730e0857 100644
+index d4106e54..74ec151e 100644
 --- a/crypto/ansi_cprng.c
 +++ b/crypto/ansi_cprng.c
-@@ -79,7 +79,7 @@ static void xor_vectors(unsigned char *in1, unsigned char *in2,
-  * Returns DEFAULT_BLK_SZ bytes of random data per call
-  * returns 0 if generation succeeded, <0 if something went wrong
-  */
--static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
-+static int _get_more_prng_bytes(struct prng_context *ctx, bool cont_test)
+@@ -43,15 +43,15 @@ struct prng_context {
+ 	spinlock_t prng_lock;
+ 	u8 flags;
+ 	u8 rand_data_valid;
+-	unsigned char rand_data[DEFAULT_BLK_SZ];
+-	unsigned char DT[DEFAULT_BLK_SZ];
+-	unsigned char V[DEFAULT_BLK_SZ];
++	u8 rand_data[DEFAULT_BLK_SZ];
++	u8 DT[DEFAULT_BLK_SZ];
++	u8 V[DEFAULT_BLK_SZ];
+ 	struct crypto_cipher *tfm;
+ };
+ 
+ static int dbg;
+ 
+-static void hexdump(char const *note, const unsigned char buf[DEFAULT_BLK_SZ])
++static void hexdump(char const *note, const u8 buf[DEFAULT_BLK_SZ])
+ {
+ 	if (dbg) {
+ 		printk(KERN_CRIT "%s = %" __stringify(DEFAULT_BLK_SZ) "phN",
+@@ -64,8 +64,8 @@ if (dbg)\
+ 	printk(format, ##args);\
+ } while (0)
+ 
+-static void xor_vectors(unsigned char *in1, unsigned char *in2,
+-			unsigned char *out, unsigned int size)
++static void xor_vectors(const u8 *in1, const u8 *in2,
++			u8 *out, unsigned int size)
  {
  	int i;
- 	unsigned char tmp[DEFAULT_BLK_SZ];
-@@ -155,7 +155,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, int cont_test)
+ 
+@@ -80,7 +80,7 @@ static void xor_vectors(unsigned char *in1, unsigned char *in2,
+ static int _get_more_prng_bytes(struct prng_context *ctx, bool cont_test)
+ {
+ 	int i;
+-	unsigned char tmp[DEFAULT_BLK_SZ];
++	u8 tmp[DEFAULT_BLK_SZ];
+ 
+ 	dbgprint(KERN_CRIT "Calling _get_more_prng_bytes for context %p\n",
+ 		ctx);
+@@ -152,10 +152,10 @@ static int _get_more_prng_bytes(struct prng_context *ctx, bool cont_test)
+ }
  
  /* Our exported functions */
- static int get_prng_bytes(char *buf, size_t nbytes, struct prng_context *ctx,
--				int do_cont_test)
-+				bool do_cont_test)
+-static int get_prng_bytes(char *buf, unsigned int nbytes,
++static int get_prng_bytes(u8 *buf, unsigned int nbytes,
+ 			  struct prng_context *ctx, bool do_cont_test)
  {
- 	unsigned char *ptr = buf;
- 	unsigned int byte_count = (unsigned int)nbytes;
-@@ -322,7 +322,7 @@ static int cprng_get_random(struct crypto_rng *tfm, u8 *rdata,
- {
- 	struct prng_context *prng = crypto_rng_ctx(tfm);
+-	unsigned char *ptr = buf;
++	u8 *ptr = buf;
+ 	unsigned int byte_count = nbytes;
+ 	int err;
  
--	return get_prng_bytes(rdata, dlen, prng, 0);
-+	return get_prng_bytes(rdata, dlen, prng, false);
+@@ -243,9 +243,8 @@ static void free_prng_context(struct prng_context *ctx)
+ 	crypto_free_cipher(ctx->tfm);
  }
  
- /*
-@@ -356,7 +356,7 @@ static int fips_cprng_get_random(struct crypto_rng *tfm, u8 *rdata,
+-static int reset_prng_context(struct prng_context *ctx,
+-			      unsigned char *key, unsigned int klen,
+-			      unsigned char *V, unsigned char *DT)
++static int reset_prng_context(struct prng_context *ctx, const u8 *key,
++			      unsigned int klen, const u8 *V, const u8 *DT)
  {
- 	struct prng_context *prng = crypto_rng_ctx(tfm);
+ 	int ret;
  
--	return get_prng_bytes(rdata, dlen, prng, 1);
-+	return get_prng_bytes(rdata, dlen, prng, true);
- }
- 
- static int fips_cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
-@@ -380,7 +380,7 @@ static int fips_cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
- 		goto out;
- 
- 	/* this primes our continuity test */
--	rc = get_prng_bytes(rdata, DEFAULT_BLK_SZ, prng, 0);
-+	rc = get_prng_bytes(rdata, DEFAULT_BLK_SZ, prng, false);
- 	prng->rand_data_valid = DEFAULT_BLK_SZ;
- 
- out:
 -- 
 2.1.3
