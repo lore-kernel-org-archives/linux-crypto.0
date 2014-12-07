@@ -1,59 +1,69 @@
-From: George Spelvin <linux@horizon.com>
-Subject: [PATCH v2 11/25] crypto: ansi_cprng - Eliminate unused PRNG_FIXED_SIZE flag
-Date: Sun,  7 Dec 2014 07:26:19 -0500
-Message-ID: <3b88d963e7feb8e2ea0a0cc6588b90b422f1896e.1417951990.git.linux@horizon.com>
-References: <cover.1417951990.git.linux@horizon.com>
-Cc: smueller@chronox.de, herbert@gondor.apana.org.au, linux@horizon.com
-To: nhorman@tuxdriver.com, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:11414 "HELO ns.horizon.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1753214AbaLGM1H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 7 Dec 2014 07:27:07 -0500
-In-Reply-To: <cover.1417951990.git.linux@horizon.com>
-In-Reply-To: <cover.1417951990.git.linux@horizon.com>
-References: <cover.1417951990.git.linux@horizon.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: Re: [PATCH v4 2/5] crypto: AF_ALG: add AEAD support
+Date: Sun, 07 Dec 2014 13:56:18 +0100
+Message-ID: <7942347.xfhvIblSTf@tachyon.chronox.de>
+References: <2105559.EmODblLYuY@tachyon.chronox.de> <4875720.jRoMDtjHB4@tachyon.chronox.de> <20141205154606.GA30180@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20141205154606.GA30180-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-There's no way to set it, so it's dead code.
+Am Freitag, 5. Dezember 2014, 23:46:06 schrieb Herbert Xu:
 
-Signed-off-by: George Spelvin <linux@horizon.com>
----
- crypto/ansi_cprng.c | 14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
+Hi Herbert,
 
-diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index 74ec151e..f6a1e987 100644
---- a/crypto/ansi_cprng.c
-+++ b/crypto/ansi_cprng.c
-@@ -30,8 +30,7 @@
-  * Flags for the prng_context flags field
-  */
- 
--#define PRNG_FIXED_SIZE 0x1
--#define PRNG_NEED_RESET 0x2
-+#define PRNG_NEED_RESET 0x1
- 
- /*
-  * Note: DT is our counter value
-@@ -166,17 +165,6 @@ static int get_prng_bytes(u8 *buf, unsigned int nbytes,
- 	if (ctx->flags & PRNG_NEED_RESET)
- 		goto done;
- 
--	/*
--	 * If the FIXED_SIZE flag is on, only return whole blocks of
--	 * pseudo random data
--	 */
--	err = -EINVAL;
--	if (ctx->flags & PRNG_FIXED_SIZE) {
--		if (nbytes < DEFAULT_BLK_SZ)
--			goto done;
--		byte_count = DEFAULT_BLK_SZ;
--	}
--
- 	err = byte_count;
- 
- 	dbgprint(KERN_CRIT "getting %d random bytes for context %p\n",
+> > +static struct proto_ops algif_aead_ops = {
+> > +	.family		=	PF_ALG,
+> > +
+> > +	.connect	=	sock_no_connect,
+> > +	.socketpair	=	sock_no_socketpair,
+> > +	.getname	=	sock_no_getname,
+> > +	.ioctl		=	sock_no_ioctl,
+> > +	.listen		=	sock_no_listen,
+> > +	.shutdown	=	sock_no_shutdown,
+> > +	.getsockopt	=	sock_no_getsockopt,
+> > +	.mmap		=	sock_no_mmap,
+> > +	.bind		=	sock_no_bind,
+> > +	.accept		=	sock_no_accept,
+> > +
+> > +	.release	=	af_alg_release,
+> > +	.sendmsg	=	aead_sendmsg,
+> > +	.sendpage	=	aead_sendpage,
+> > +	.recvmsg	=	aead_recvmsg,
+> > +	.poll		=	aead_poll,
+> > +	.setsockopt	=	aead_setsockopt,
+> 
+> No it should go into the parent setsockopt.  Perhaps add a setsockopt
+> to af_alg_type in order to keep this out of the generic code.
+
+What about adding a setauthsize to af_alg_type that is called from the parent 
+setsockopt? I would like to keep all user space interfaces as close together 
+as possible. With a new setsockopt callback, I fear that user space interface 
+handling may be scattered around.
+
+Currently I am simply thinking about the following:
+
+partent setsockopt:
+
+        case ALG_SET_AEAD_AUTHSIZE:
+                if (sock->state == SS_CONNECTED)
+                        goto unlock;
+                if (!type->setauthsize)
+                        goto unlock;
+                err = type->setauthsize(ask->private, optlen);
+
+af_alg_type:
+
+int (*setauthsize)(void *private, unsigned int authsize);
+
 -- 
-2.1.3
+Ciao
+Stephan
