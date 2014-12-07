@@ -1,69 +1,78 @@
 From: George Spelvin <linux@horizon.com>
-Subject: [PATCH v2 20/25] crypto: ansi_cprng - simplify xor_vectors() to xor_block()
-Date: Sun,  7 Dec 2014 07:26:28 -0500
-Message-ID: <8aa0c562a25d97770212f3e71f21d50a9177dc2d.1417951990.git.linux@horizon.com>
+Subject: [PATCH v2 21/25] crypto: ansi_cprng - Rename rand_data_valid more sensibly
+Date: Sun,  7 Dec 2014 07:26:29 -0500
+Message-ID: <85e415e299a11429a58d3585e0198f591222cd19.1417951990.git.linux@horizon.com>
 References: <cover.1417951990.git.linux@horizon.com>
 Cc: smueller@chronox.de, herbert@gondor.apana.org.au, linux@horizon.com
 To: nhorman@tuxdriver.com, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:27220 "HELO ns.horizon.com"
+Received: from ns.horizon.com ([71.41.210.147]:25089 "HELO ns.horizon.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1753195AbaLGM1G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 7 Dec 2014 07:27:06 -0500
+	id S1753173AbaLGM1H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 7 Dec 2014 07:27:07 -0500
 In-Reply-To: <cover.1417951990.git.linux@horizon.com>
 In-Reply-To: <cover.1417951990.git.linux@horizon.com>
 References: <cover.1417951990.git.linux@horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-It doesn't need a second input or a length parameter.
+Since it counts the number of bytes in rand_data which have been output,
+and are no longer available for output, it's hardly a count of
+"valid" bytes.  rand_data_pos is more appropriate.
 
 Signed-off-by: George Spelvin <linux@horizon.com>
 ---
- crypto/ansi_cprng.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ crypto/ansi_cprng.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index a8cf98a5..f345b575 100644
+index f345b575..f3e280c4 100644
 --- a/crypto/ansi_cprng.c
 +++ b/crypto/ansi_cprng.c
-@@ -63,15 +63,14 @@ if (dbg)\
- 	printk(format, ##args);\
- } while (0)
+@@ -41,7 +41,7 @@
+ struct prng_context {
+ 	spinlock_t prng_lock;
+ 	u8 flags;
+-	u8 rand_data_valid;
++	u8 rand_read_pos;
+ 	u8 rand_data[DEFAULT_BLK_SZ];
+ 	u8 DT[DEFAULT_BLK_SZ];
+ 	u8 V[DEFAULT_BLK_SZ];
+@@ -165,7 +165,7 @@ static int get_prng_bytes(u8 *buf, unsigned int nbytes,
+ 	if (ctx->flags & PRNG_NEED_RESET)
+ 		goto done;
  
--static void xor_vectors(const u8 *in1, const u8 *in2,
--			u8 *out, unsigned int size)
-+static void xor_block(const u8 in[DEFAULT_BLK_SZ], u8 out[DEFAULT_BLK_SZ])
- {
- 	int i;
+-	read_pos = ctx->rand_data_valid;
++	read_pos = ctx->rand_read_pos;
+ 	if (byte_count > DEFAULT_BLK_SZ - read_pos) {
+ 		/* Leading partial block */
+ 		unsigned int avail = DEFAULT_BLK_SZ - read_pos;
+@@ -191,7 +191,7 @@ static int get_prng_bytes(u8 *buf, unsigned int nbytes,
  
--	for (i = 0; i < size; i++)
--		out[i] = in1[i] ^ in2[i];
--
-+	for (i = 0; i < DEFAULT_BLK_SZ; i++)
-+		out[i] ^= in[i];
- }
-+
- /*
-  * Returns DEFAULT_BLK_SZ bytes of random data per call
-  * returns 0 if generation succeeded, <0 if something went wrong
-@@ -100,7 +99,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, bool cont_test)
- 	 * keep that output in ctx->V for the moment; we need the
- 	 * previous rand_data for ons more thing.
- 	 */
--	xor_vectors(tmp, ctx->V, ctx->V, DEFAULT_BLK_SZ);
-+	xor_block(tmp, ctx->V);
- 	hexdump("V^I", ctx->V);
- 	crypto_cipher_encrypt_one(ctx->tfm, ctx->V, ctx->V);
- 	hexdump("R", ctx->V);
-@@ -128,7 +127,7 @@ static int _get_more_prng_bytes(struct prng_context *ctx, bool cont_test)
- 	 * Lastly xor the random data with I and encrypt that to obtain
- 	 * a new secret vector V.
- 	 */
--	xor_vectors(tmp, ctx->V, ctx->V, DEFAULT_BLK_SZ);
-+	xor_block(tmp, ctx->V);
- 	hexdump("R^I", ctx->V);
- 	memzero_explicit(tmp, DEFAULT_BLK_SZ);
- 	crypto_cipher_encrypt_one(ctx->tfm, ctx->V, ctx->V);
+ 	/* The final partial block; read_pos + byte_count <= DEFAULT_BLK_SZ */
+ 	memcpy(ptr, ctx->rand_data + read_pos, byte_count);
+-	ctx->rand_data_valid = read_pos + byte_count;
++	ctx->rand_read_pos = read_pos + byte_count;
+ 	err = nbytes;
+ 
+ done:
+@@ -213,7 +213,7 @@ static int reset_prng_context(struct prng_context *ctx, const u8 *key,
+ 
+ 	spin_lock_bh(&ctx->prng_lock);
+ 	ctx->flags |= PRNG_NEED_RESET;
+-	ctx->rand_data_valid = DEFAULT_BLK_SZ;
++	ctx->rand_read_pos = DEFAULT_BLK_SZ;
+ 
+ 	memset(ctx->rand_data, 0, DEFAULT_BLK_SZ);
+ 
+@@ -324,7 +324,7 @@ static int fips_cprng_reset(struct crypto_rng *tfm, const u8 *seed,
+ 
+ 	/* this primes our continuity test */
+ 	rc = _get_more_prng_bytes(prng, false);
+-	prng->rand_data_valid = DEFAULT_BLK_SZ;
++	prng->rand_read_pos = DEFAULT_BLK_SZ;
+ 
+ out:
+ 	return rc;
 -- 
 2.1.3
