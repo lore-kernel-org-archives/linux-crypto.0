@@ -1,89 +1,78 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v5 1/8] crypto: AF_ALG: add user space interface for AEAD
-Date: Mon, 08 Dec 2014 07:50:36 +0100
-Message-ID: <26757433.nY9erqHdir@tachyon.chronox.de>
-References: <56740432.V2v4gLHrzS@tachyon.chronox.de> <2166020.BKWmrnVj2j@tachyon.chronox.de>
+From: Amos Kong <akong@redhat.com>
+Subject: [PATCH v5 REPOST 0/6] fix hw_random stuck
+Date: Mon,  8 Dec 2014 16:50:34 +0800
+Message-ID: <1418028640-4891-1-git-send-email-akong@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman@redhat.com>,
-	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
-	'LKML' <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2166020.BKWmrnVj2j@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, m@bues.ch,
+	mpm@selenic.com, amit.shah@redhat.com
+To: linux-crypto@vger.kernel.org
+Return-path: <virtualization-bounces@lists.linux-foundation.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/virtualization/>
+List-Post: <mailto:virtualization@lists.linux-foundation.org>
+List-Help: <mailto:virtualization-request@lists.linux-foundation.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/virtualization>,
+	<mailto:virtualization-request@lists.linux-foundation.org?subject=subscribe>
+Sender: virtualization-bounces@lists.linux-foundation.org
+Errors-To: virtualization-bounces@lists.linux-foundation.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Sonntag, 7. Dezember 2014, 23:21:09 schrieb Stephan Mueller:
+When I hotunplug a busy virtio-rng device or try to access
+hwrng attributes in non-smp guest, it gets stuck.
 
-Hi Herbert,
+My hotplug tests:
 
-FYI: you mentioned that you applied that patch already. However, I do not see 
-it in the cryptodev-2.6 tree. Therefore I resent it. In case it was applied, 
-please disregard this patch.
+| test 0:
+|   hotunplug rng device from qemu monitor
+|
+| test 1:
+|   guest) # dd if=/dev/hwrng of=/dev/null &
+|   hotunplug rng device from qemu monitor
+|
+| test 2:
+|   guest) # dd if=/dev/random of=/dev/null &
+|   hotunplug rng device from qemu monitor
+|
+| test 4:
+|   guest) # dd if=/dev/hwrng of=/dev/null &
+|   cat /sys/devices/virtual/misc/hw_random/rng_*
+|
+| test 5:
+|   guest) # dd if=/dev/hwrng of=/dev/null
+|   cancel dd process after 10 seconds
+|   guest) # dd if=/dev/hwrng of=/dev/null &
+|   hotunplug rng device from qemu monitor
+|
+| test 6:
+|   use a fifo as rng backend, execute test 0 ~ 5 with no input of fifo
 
-> AEAD requires the caller to specify the following information separate
-> from the data stream. This information allows the AEAD interface handler
-> to identify the AAD, ciphertext/plaintext and the authentication tag:
-> 
->         * Associated authentication data of arbitrary length and
->           length
-> 
->         * Length of authentication tag for encryption
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> ---
->  crypto/af_alg.c             | 6 ++++++
->  include/crypto/if_alg.h     | 1 +
->  include/uapi/linux/if_alg.h | 2 ++
->  3 files changed, 9 insertions(+)
-> 
-> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-> index 6a3ad80..68ff113 100644
-> --- a/crypto/af_alg.c
-> +++ b/crypto/af_alg.c
-> @@ -421,6 +421,12 @@ int af_alg_cmsg_send(struct msghdr *msg, struct
-> af_alg_control *con) con->op = *(u32 *)CMSG_DATA(cmsg);
->  			break;
-> 
-> +		case ALG_SET_AEAD_ASSOCLEN:
-> +			if (cmsg->cmsg_len < CMSG_LEN(sizeof(u32)))
-> +				return -EINVAL;
-> +			con->aead_assoclen = *(u32 *)CMSG_DATA(cmsg);
-> +			break;
-> +
->  		default:
->  			return -EINVAL;
->  		}
-> diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-> index d61c111..cd62bf4 100644
-> --- a/include/crypto/if_alg.h
-> +++ b/include/crypto/if_alg.h
-> @@ -42,6 +42,7 @@ struct af_alg_completion {
->  struct af_alg_control {
->  	struct af_alg_iv *iv;
->  	int op;
-> +	unsigned int aead_assoclen;
->  };
-> 
->  struct af_alg_type {
-> diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
-> index 0f9acce..f2acd2f 100644
-> --- a/include/uapi/linux/if_alg.h
-> +++ b/include/uapi/linux/if_alg.h
-> @@ -32,6 +32,8 @@ struct af_alg_iv {
->  #define ALG_SET_KEY			1
->  #define ALG_SET_IV			2
->  #define ALG_SET_OP			3
-> +#define ALG_SET_AEAD_ASSOCLEN		4
-> +#define ALG_SET_AEAD_AUTHSIZE		5
-> 
->  /* Operations */
->  #define ALG_OP_DECRYPT			0
+V5: reset cleanup_done flag, drop redundant init of reference count, use
+    compiler barrier to prevent recording.
+V4: update patch 4 to fix corrupt, decrease last reference for triggering
+    the cleanup, fix unregister race pointed by Herbert
+V3: initialize kref to 1
+V2: added patch 2 to fix a deadlock, update current patch 3 to fix reference
+    counting issue
 
+Amos Kong (1):
+  hw_random: move some code out mutex_lock for avoiding underlying
+    deadlock
+
+Rusty Russell (5):
+  hw_random: place mutex around read functions and buffers.
+  hw_random: use reference counts on each struct hwrng.
+  hw_random: fix unregister race.
+  hw_random: don't double-check old_rng.
+  hw_random: don't init list element we're about to add to list.
+
+ drivers/char/hw_random/core.c | 173 ++++++++++++++++++++++++++++++------------
+ include/linux/hw_random.h     |   3 +
+ 2 files changed, 126 insertions(+), 50 deletions(-)
 
 -- 
-Ciao
-Stephan
+1.9.3
