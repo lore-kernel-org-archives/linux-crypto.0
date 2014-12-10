@@ -1,51 +1,61 @@
-From: "George Spelvin" <linux@horizon.com>
-Subject: Re: [PATCH v2 25/25] crypto: ansi_cprng - If non-deterministic, don't buffer old output
-Date: 8 Dec 2014 15:34:36 -0500
-Message-ID: <20141208203436.32204.qmail@ns.horizon.com>
-References: <20141208180755.GA4238@hmsreliant.think-freely.org>
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	smueller@chronox.de
-To: linux@horizon.com, nhorman@tuxdriver.com
+From: Asaf Vertz <asaf.vertz@tandemg.com>
+Subject: [PATCH] crypto: ux500: fix checkpatch errors
+Date: Wed, 10 Dec 2014 14:55:10 +0200
+Message-ID: <20141210125510.GA1904@ubuntu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, asaf.vertz@tandemg.com, arnd@arndb.de,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ns.horizon.com ([71.41.210.147]:42283 "HELO ns.horizon.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1752432AbaLHUeh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Dec 2014 15:34:37 -0500
-In-Reply-To: <20141208180755.GA4238@hmsreliant.think-freely.org>
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:45875 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753582AbaLJMzQ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 10 Dec 2014 07:55:16 -0500
+Received: by mail-wg0-f51.google.com with SMTP id x12so3532113wgg.10
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Dec 2014 04:55:14 -0800 (PST)
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> Not your motivations, just the posting mechanics.  If you just want to
-> discuss a patch, and aren't yet proposing it for inclusion, you should
-> put RFC in the prefix of every patch header.
+Fixed a coding style error, code indent should use tabs where possible 
 
-I understand the principle, and I should have on those patches (mea
-culpa), but really *all* patch postings are for comment; I think of RFC
-as "comment only; please don't apply this".
+Signed-off-by: Asaf Vertz <asaf.vertz@tandemg.com>
+---
+ drivers/crypto/ux500/cryp/cryp_core.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
-But it wasn't marked RFC, so that's why I posted a note downgrading
-it when I realized I messed it up.  The note was basically "oh, shit,
-I introduced a bug at the last minute; thankfully that was the most RFC
-of the entire series, so nobody's likely to have merged it."
-
-But it certainly is the case that for any significant patch series,
-I really don't expect v1 to get merged as-is.
-
-I'm serious about the changes, and it wouldn't have been a problem if
-you had applied v1, but it would have surprised me.  Realistically,
-I expect a couple of rounds of discussion and tweaking of the specific
-form of the changes before people agree it's ready to go in.
-
-And I think that's the case here; I adjusted a lot of details based on
-feedback, but at a high level nothing changed; v2 makes the same changes
-that v1 did.
-
-> Not particularly opposed to the idea, I just know that several use cases
-> rely on deterministic behavior for those entities that share the secret
-> information, so I need to be sure that the deterministic behavior remains
-> and is the default.
-
-Right, because it's advertised as a PRNG.  Thinking about it, would
-a separate crypto_alg with a different seedsize be a better solution
-than obscure rules about seed size?  And something in the cra_flags
-to indicate it's nondeterminsitic?
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index 92105f3..b189e1d 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -479,13 +479,13 @@ static void cryp_dma_setup_channel(struct cryp_device_data *device_data,
+ 		.dst_addr = device_data->phybase + CRYP_DMA_TX_FIFO,
+ 		.dst_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
+ 		.dst_maxburst = 4,
+-        };
++	};
+ 	struct dma_slave_config cryp2mem = {
+ 		.direction = DMA_DEV_TO_MEM,
+ 		.src_addr = device_data->phybase + CRYP_DMA_RX_FIFO,
+ 		.src_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
+ 		.src_maxburst = 4,
+-        };
++	};
+ 
+ 	dma_cap_zero(device_data->dma.mask);
+ 	dma_cap_set(DMA_SLAVE, device_data->dma.mask);
+@@ -1772,8 +1772,8 @@ static int ux500_cryp_resume(struct device *dev)
+ static SIMPLE_DEV_PM_OPS(ux500_cryp_pm, ux500_cryp_suspend, ux500_cryp_resume);
+ 
+ static const struct of_device_id ux500_cryp_match[] = {
+-        { .compatible = "stericsson,ux500-cryp" },
+-        { },
++	{ .compatible = "stericsson,ux500-cryp" },
++	{ },
+ };
+ 
+ static struct platform_driver cryp_driver = {
+-- 
+1.7.0.4
