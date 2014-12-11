@@ -1,61 +1,223 @@
-From: Asaf Vertz <asaf.vertz@tandemg.com>
-Subject: [PATCH] crypto: ux500: fix checkpatch errors
-Date: Wed, 10 Dec 2014 14:55:10 +0200
-Message-ID: <20141210125510.GA1904@ubuntu>
+From: James Yonan <james@openvpn.net>
+Subject: Re: [PATCH] crypto: aesni - disable "by8" AVX CTR optimization
+Date: Thu, 11 Dec 2014 01:52:40 -0700
+Message-ID: <54895B58.8030200@openvpn.net>
+References: <20140917112911.GA2129@gondor.apana.org.au> <1411504267-10170-1-git-send-email-minipli@googlemail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, asaf.vertz@tandemg.com, arnd@arndb.de,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: multipart/mixed;
+ boundary="------------030906000702070500090107"
+Cc: Romain Francoise <romain@orebokech.com>,
+	linux-crypto@vger.kernel.org,
+	Chandramouli Narayanan <mouli@linux.intel.com>
+To: Mathias Krause <minipli@googlemail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f51.google.com ([74.125.82.51]:45875 "EHLO
-	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753582AbaLJMzQ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Dec 2014 07:55:16 -0500
-Received: by mail-wg0-f51.google.com with SMTP id x12so3532113wgg.10
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Dec 2014 04:55:14 -0800 (PST)
-Content-Disposition: inline
+Received: from mail.yonan.net ([54.244.116.145]:49258 "EHLO mail.yonan.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932634AbaLKI5z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Dec 2014 03:57:55 -0500
+In-Reply-To: <1411504267-10170-1-git-send-email-minipli@googlemail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fixed a coding style error, code indent should use tabs where possible 
+This is a multi-part message in MIME format.
+--------------030906000702070500090107
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Asaf Vertz <asaf.vertz@tandemg.com>
----
- drivers/crypto/ux500/cryp/cryp_core.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+I'm seeing some anomalous results with the "by8" AVX CTR optimization in 
+3.18.
 
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index 92105f3..b189e1d 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -479,13 +479,13 @@ static void cryp_dma_setup_channel(struct cryp_device_data *device_data,
- 		.dst_addr = device_data->phybase + CRYP_DMA_TX_FIFO,
- 		.dst_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
- 		.dst_maxburst = 4,
--        };
-+	};
- 	struct dma_slave_config cryp2mem = {
- 		.direction = DMA_DEV_TO_MEM,
- 		.src_addr = device_data->phybase + CRYP_DMA_RX_FIFO,
- 		.src_addr_width = DMA_SLAVE_BUSWIDTH_2_BYTES,
- 		.src_maxburst = 4,
--        };
-+	};
- 
- 	dma_cap_zero(device_data->dma.mask);
- 	dma_cap_set(DMA_SLAVE, device_data->dma.mask);
-@@ -1772,8 +1772,8 @@ static int ux500_cryp_resume(struct device *dev)
- static SIMPLE_DEV_PM_OPS(ux500_cryp_pm, ux500_cryp_suspend, ux500_cryp_resume);
- 
- static const struct of_device_id ux500_cryp_match[] = {
--        { .compatible = "stericsson,ux500-cryp" },
--        { },
-+	{ .compatible = "stericsson,ux500-cryp" },
-+	{ },
- };
- 
- static struct platform_driver cryp_driver = {
--- 
-1.7.0.4
+In particular, crypto_aead_encrypt appears to produce different 
+ciphertext from the same plaintext depending on whether or not the 
+optimization is enabled.
+
+See the attached patch to tcrypt that demonstrates the discrepancy.
+
+James
+
+On 23/09/2014 14:31, Mathias Krause wrote:
+> The "by8" implementation introduced in commit 22cddcc7df8f ("crypto: aes
+> - AES CTR x86_64 "by8" AVX optimization") is failing crypto tests as it
+> handles counter block overflows differently. It only accounts the right
+> most 32 bit as a counter -- not the whole block as all other
+> implementations do. This makes it fail the cryptomgr test #4 that
+> specifically tests this corner case.
+>
+> As we're quite late in the release cycle, just disable the "by8" variant
+> for now.
+>
+> Reported-by: Romain Francoise <romain@orebokech.com>
+> Signed-off-by: Mathias Krause <minipli@googlemail.com>
+> Cc: Chandramouli Narayanan <mouli@linux.intel.com>
+>
+> ---
+> I'll try to create a real fix next week but I can't promise much. If
+> Linus releases v3.17 early, as he has mentioned in his -rc6
+> announcement, we should hot fix this by just disabling the "by8"
+> variant. The real fix would add the necessary counter block handling to
+> the asm code and revert this commit afterwards. Reverting the whole code
+> is not necessary, imho.
+>
+> Would that be okay for you, Herbert?
+> ---
+>   arch/x86/crypto/aesni-intel_glue.c |    4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+> index 888950f29fd9..a7ccd57f19e4 100644
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -481,7 +481,7 @@ static void ctr_crypt_final(struct crypto_aes_ctx *ctx,
+>   	crypto_inc(ctrblk, AES_BLOCK_SIZE);
+>   }
+>
+> -#ifdef CONFIG_AS_AVX
+> +#if 0	/* temporary disabled due to failing crypto tests */
+>   static void aesni_ctr_enc_avx_tfm(struct crypto_aes_ctx *ctx, u8 *out,
+>   			      const u8 *in, unsigned int len, u8 *iv)
+>   {
+> @@ -1522,7 +1522,7 @@ static int __init aesni_init(void)
+>   		aesni_gcm_dec_tfm = aesni_gcm_dec;
+>   	}
+>   	aesni_ctr_enc_tfm = aesni_ctr_enc;
+> -#ifdef CONFIG_AS_AVX
+> +#if 0	/* temporary disabled due to failing crypto tests */
+>   	if (cpu_has_avx) {
+>   		/* optimize performance of ctr mode encryption transform */
+>   		aesni_ctr_enc_tfm = aesni_ctr_enc_avx_tfm;
+>
+
+--------------030906000702070500090107
+Content-Type: text/plain; charset=UTF-8; x-mac-type="0"; x-mac-creator="0";
+ name="tcrypt.diff"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="tcrypt.diff"
+
+VGhpcyBpcyBhIHN0YW5kYXJkIDMuMTgga2VybmVsIHdpdGggImJ5OCIgQVZYIENUUiBvcHRp
+bWl6YXRpb24gaW4gcGxhY2UuClByb2Nlc3NvciBpcyBJbnRlbChSKSBYZW9uKFIpIENQVSBF
+My0xMjIwIFYyIEAgMy4xMEdIei4KClJ1biB0Y3J5cHQgbW9kZT02MDAgdXNpbmcgYXR0YWNo
+ZWQgcGF0Y2ggdG8gdGNyeXB0LiAgVGhlIGlucHV0IHBsYWludGV4dAppcyAxMjggYnl0ZXMg
+b2YgMHhGRi4KClsgICAgNi44NTk1NzldIHRlc3RfYWVhZF9lbmNyeXB0X2NvbnNpc3RlbmN5
+IGFsZz1nY20oYWVzKSBzdWNjZWVkZWQsIGhhc2g9MHg1MmZjMmRkMwpbICAgIDYuODYwNjgy
+XSBLZXk6ClsgICAgNi44NjA5MTRdICAgMDAwMDAwMDA6IDU1IDU1IDU1IDU1IDU1IDU1IDU1
+IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1ClsgICAgNi44NjE2NzFdIEluaXRpYWwgSVY6
+ClsgICAgNi44NjE5NjFdICAgMDAwMDAwMDA6IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwClsgICAgNi44NjI3MjVdIEZpbmFsIElWOgpbICAgIDYu
+ODYzMDAwXSAgIDAwMDAwMDAwOiAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAw
+MCAwMCAwMCAwMCAwYQpbICAgIDYuODYzODI3XSBBRDoKWyAgICA2Ljg2NDA3N10gICAwMDAw
+MDAwMDogYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQK
+WyAgICA2Ljg2NDgzMV0gQ2lwaGVydGV4dDoKWyAgICA2Ljg2NTExNl0gICAwMDAwMDAwMDog
+OWQgNDkgMGUgYWYgNjUgMTcgYTMgMmEgMWYgZWYgMDUgMjcgZDkgYWYgNWUgNmUKWyAgICA2
+Ljg2NTg3MV0gICAwMDAwMDAxMDogOWQgMmIgZmMgZmEgYmUgNjYgMTQgMzUgZjQgYjUgODIg
+OWQgZWUgYzIgYmUgYTgKWyAgICA2Ljg2NjY5NV0gICAwMDAwMDAyMDogNmUgOGYgYWYgZTAg
+ZjUgMjYgNzkgZjkgNmYgZWQgOTEgMTUgYzMgMjYgMzAgMDYKWyAgICA2Ljg2NzQ2M10gICAw
+MDAwMDAzMDogYjMgYjEgY2MgNzAgMGEgYjcgNzMgNmUgZjMgOGMgOTYgZjAgMjYgYWIgMTMg
+Y2EKWyAgICA2Ljg2ODI2OF0gICAwMDAwMDA0MDogYTkgNGEgNWYgZTYgMWYgYTggZmEgZTUg
+NzEgZjcgYTYgNWIgNzMgOTMgNDAgOTQKWyAgICA2Ljg2OTA0MF0gICAwMDAwMDA1MDogZjEg
+ODIgNWUgMDggNWMgODUgMDIgMDIgOGMgNmYgNGIgOTMgZjggMTAgMWEgZjEKWyAgICA2Ljg2
+OTgxMF0gICAwMDAwMDA2MDogYzkgNWUgMjMgMGMgYmMgYWQgMGYgMzMgNmEgZTcgZGEgZjMg
+NzEgYjcgYmUgMTIKWyAgICA2Ljg3MDU3NV0gICAwMDAwMDA3MDogYjEgYTAgODMgOTQgNjAg
+OGQgNzAgY2EgNDMgZmYgZDAgZTkgNjEgMTcgNTYgNmUKWyAgICA2Ljg3MTM4Nl0gQXV0aCBU
+YWc6ClsgICAgNi44NzE2NTldICAgMDAwMDAwMDA6IGFhIGZlIDRlIGNlIDNiIDEyIDU5IDFk
+IDA2IDkzIGZiIDM3IDI2IDFhIGJiIGJkCgpOZXh0LCByZW1vdmUgdGhlIG9wdGltaXphdGlv
+biBjb2RlOiAicm1tb2QgYWVzbmlfaW50ZWwiLgoKUnVuIHRjcnlwdCBhZ2FpbiBhbmQgdGhl
+IHJlc3VsdHMgYXJlIGRpZmZlcmVudDoKClsgICAgNy4xNzMxNDVdIHRlc3RfYWVhZF9lbmNy
+eXB0X2NvbnNpc3RlbmN5IGFsZz1nY20oYWVzKSBzdWNjZWVkZWQsIGhhc2g9MHhhZDQ0ODdm
+OApbICAgIDcuMTc0MDI2XSBLZXk6ClsgICAgNy4xNzQyNTJdICAgMDAwMDAwMDA6IDU1IDU1
+IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1ClsgICAgNy4xNzUw
+NjhdIEluaXRpYWwgSVY6ClsgICAgNy4xNzUzODBdICAgMDAwMDAwMDA6IDAwIDAwIDAwIDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwClsgICAgNy4xNzYyMzddIEZp
+bmFsIElWOgpbICAgIDcuMTc2NTIwXSAgIDAwMDAwMDAwOiAwMCAwMCAwMCAwMCAwMCAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwYQpbICAgIDcuMTc3MzYwXSBBRDoKWyAgICA3
+LjE3NzU4Nl0gICAwMDAwMDAwMDogYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQg
+YWQgYWQgYWQgYWQgYWQKWyAgICA3LjE3ODQwNV0gQ2lwaGVydGV4dDoKWyAgICA3LjE3ODcy
+MV0gICAwMDAwMDAwMDogMTYgM2QgY2UgYWEgOTQgYzUgNDEgZWYgNGYgZjggMzggOTggYjMg
+ZWMgMGIgNjgKWyAgICA3LjE3OTUyNl0gICAwMDAwMDAxMDogMjkgYzEgYjYgMTIgMTAgNDYg
+M2EgZjggNzcgMjIgZDQgZGYgZGEgZmQgOTUgZmMKWyAgICA3LjE4MDM5Nl0gICAwMDAwMDAy
+MDogM2EgMTUgYjUgZTMgMDEgZTYgZDkgOWYgZWEgMjYgYWUgZWQgOTggNjMgNmUgNjIKWyAg
+ICA3LjE4MTE4OV0gICAwMDAwMDAzMDogMGMgY2EgZGMgNWIgNjUgOTggZjUgMjkgZjUgZTQg
+ZDggM2EgMmUgZWEgNmMgMzkKWyAgICA3LjE4MTk4NF0gICAwMDAwMDA0MDogN2QgZGYgNjcg
+NjYgY2UgNjkgNmQgNzQgZjQgZTAgZTMgZGYgZmYgOTMgMWEgOWEKWyAgICA3LjE4Mjc2OF0g
+ICAwMDAwMDA1MDogNWEgYTAgY2IgYWYgN2IgZGQgZTkgYmIgZGQgNmEgZGYgYTUgNTcgYjkg
+MWQgNTYKWyAgICA3LjE4MzYwNF0gICAwMDAwMDA2MDogZjYgMjEgY2YgNDUgN2QgODIgYmIg
+ZWMgYTQgNTkgNDIgNGIgOGEgNDYgMzQgMWQKWyAgICA3LjE4NDYxM10gICAwMDAwMDA3MDog
+MTggODUgNzcgMDkgYjcgODEgNGYgZTIgOTIgZmMgODQgOTUgNmUgM2YgOTQgNzUKWyAgICA3
+LjE4NTQwN10gQXV0aCBUYWc6ClsgICAgNy4xODU2OTVdICAgMDAwMDAwMDA6IGRlIDdhIDM0
+IDU2IDM0IDVhIDAyIDE5IDJhIDk3IGU3IGJiIDcwIGQwIDIwIDg5CgpXaGljaCB2ZXJzaW9u
+IGlzIGNvcnJlY3Q/ICBUaGUgbGF0dGVyIHZlcnNpb24KKHdpdGhvdXQgdGhlIG9wdGltaXph
+dGlvbikgbWF0Y2hlcyB0aGUgcmVzdWx0cwpwcm9kdWNlZCBieSBwcmV2aW91cyBrZXJuZWwg
+dmVyc2lvbnMgYW5kIG1hdGNoZXMKdXAgd2l0aCBQb2xhclNTTCBhcyB3ZWxsLgoKCmRpZmYg
+LS1naXQgYS90Y3J5cHQuYyBiL3RjcnlwdC5jCmluZGV4IDg5MDQ0OWUuLjlkZDdiYzkgMTAw
+NjQ0Ci0tLSBhL3RjcnlwdC5jCisrKyBiL3RjcnlwdC5jCkBAIC0zMyw2ICszMyw3IEBACiAj
+aW5jbHVkZSA8bGludXgvamlmZmllcy5oPgogI2luY2x1ZGUgPGxpbnV4L3RpbWV4Lmg+CiAj
+aW5jbHVkZSA8bGludXgvaW50ZXJydXB0Lmg+CisjaW5jbHVkZSA8bGludXgvamhhc2guaD4K
+ICNpbmNsdWRlICJ0Y3J5cHQuaCIKICNpbmNsdWRlICJpbnRlcm5hbC5oIgogCkBAIC0yNjUs
+NiArMjY2LDEwOSBAQCBzdGF0aWMgdm9pZCBzZ19pbml0X2FlYWQoc3RydWN0IHNjYXR0ZXJs
+aXN0ICpzZywgY2hhciAqeGJ1ZltYQlVGU0laRV0sCiAJfQogfQogCitzdGF0aWMgdm9pZCB0
+ZXN0X2FlYWRfZW5jcnlwdF9jb25zaXN0ZW5jeShjb25zdCBjaGFyICphbGdvLCB1bnNpZ25l
+ZCBpbnQgc2VjcywgdW5zaWduZWQgaW50IGtleWxlbikKK3sKKwljb25zdCB1bnNpZ25lZCBp
+bnQgZGF0YV9zaXplID0gMTI4OworCWNvbnN0IHVuc2lnbmVkIGludCBhZF9zaXplID0gMTY7
+CisJY29uc3QgdW5zaWduZWQgaW50IGF1dGhfdGFnX3NpemUgPSAxNjsKKwljb25zdCB1bnNp
+Z25lZCBpbnQgZGF0YV9mcmFncyA9IDE7CisKKwljb25zdCB1bnNpZ25lZCBpbnQgZGF0YV9z
+Z19iYXNlID0gMTsKKwljb25zdCB1bnNpZ25lZCBpbnQgbmZyYWdzID0gZGF0YV9mcmFncyAr
+IDI7CisKKwl1bnNpZ25lZCBjaGFyICpkYXRhID0gTlVMTDsKKwlzdHJ1Y3Qgc2NhdHRlcmxp
+c3QgKnNnID0gTlVMTDsKKwlzdHJ1Y3QgY3J5cHRvX2FlYWQgKnRmbSA9IE5VTEw7CisJc3Ry
+dWN0IGFlYWRfcmVxdWVzdCAqcmVxID0gTlVMTDsKKwl1bnNpZ25lZCBjaGFyIGtleVtrZXls
+ZW5dOworCXVuc2lnbmVkIGNoYXIgYXV0aF90YWdbYXV0aF90YWdfc2l6ZV07CisJdW5zaWdu
+ZWQgY2hhciBhZFthZF9zaXplXTsKKwl1bnNpZ25lZCBjaGFyIG9yaWdfaXZbMTZdOworCXVu
+c2lnbmVkIGNoYXIgaXZbMTZdOworCXVuc2lnbmVkIGludCBoYXNoOworCWludCBlcnI7CisK
+KwlkYXRhID0ga21hbGxvYyhkYXRhX3NpemUsIEdGUF9LRVJORUwpOworCXNnID0ga3phbGxv
+YyhzaXplb2Yoc3RydWN0IHNjYXR0ZXJsaXN0KSAqIG5mcmFncywgR0ZQX0tFUk5FTCk7CisJ
+aWYgKCFkYXRhIHx8ICFzZykgeworCQlwcmludGsoImttYWxsb2MgZmFpbGVkXG4iKTsKKwkJ
+Z290byBkb25lOworCX0KKwlzZ19pbml0X3RhYmxlKHNnLCBuZnJhZ3MpOworCXNnX3NldF9i
+dWYoc2csIGFkLCBhZF9zaXplKTsKKwlzZ19zZXRfYnVmKCZzZ1tkYXRhX2ZyYWdzICsgMV0s
+IGF1dGhfdGFnLCBhdXRoX3RhZ19zaXplKTsKKworCXNnX3NldF9idWYoJnNnW2RhdGFfc2df
+YmFzZSswXSwgZGF0YSwgZGF0YV9zaXplKTsKKworCXRmbSA9IGNyeXB0b19hbGxvY19hZWFk
+KGFsZ28sIDAsIDApOworCWlmIChJU19FUlIodGZtKSkgeworCQlwcmludGsoImNyeXB0b19h
+bGxvY19hZWFkIGZhaWxlZCwgZXJyPSVsZFxuIiwgUFRSX0VSUih0Zm0pKTsKKwkJdGZtID0g
+TlVMTDsKKwkJZ290byBkb25lOworCX0KKworCW1lbXNldChrZXksIDB4NTUsIGtleWxlbik7
+CisJZXJyID0gY3J5cHRvX2FlYWRfc2V0a2V5KHRmbSwga2V5LCBrZXlsZW4pOworCWlmIChl
+cnIgPCAwKSB7CisJCXByaW50aygiY3J5cHRvX2FlYWRfc2V0a2V5IGZhaWxlZCwgZXJyPSVk
+XG4iLCBlcnIpOworCQlnb3RvIGRvbmU7CisJfQorCisJZXJyID0gY3J5cHRvX2FlYWRfc2V0
+YXV0aHNpemUodGZtLCBhdXRoX3RhZ19zaXplKTsKKwlpZiAoZXJyIDwgMCkgeworCQlwcmlu
+dGsoImNyeXB0b19hZWFkX3NldGF1dGhzaXplIGZhaWxlZCwgZXJyPSVkXG4iLCBlcnIpOwor
+CQlnb3RvIGRvbmU7CisJfQorCisJcmVxID0gYWVhZF9yZXF1ZXN0X2FsbG9jKHRmbSwgR0ZQ
+X0tFUk5FTCk7CisJaWYgKCFyZXEpIHsKKwkJcHJpbnRrKCJhZWFkX3JlcXVlc3RfYWxsb2Mg
+ZmFpbGVkXG4iKTsKKwkJZ290byBkb25lOworCX0KKworCW1lbXNldChhZCwgMHhBRCwgYWRf
+c2l6ZSk7CisJbWVtc2V0KGRhdGEsIDB4RkYsIGRhdGFfc2l6ZSk7CisJbWVtc2V0KGl2LCAw
+LCBzaXplb2YoaXYpKTsKKwltZW1jcHkob3JpZ19pdiwgaXYsIHNpemVvZihvcmlnX2l2KSk7
+CisJbWVtc2V0KGF1dGhfdGFnLCAwLCBhdXRoX3RhZ19zaXplKTsKKworCS8qIGVuY3J5cHQg
+Ki8KKwlhZWFkX3JlcXVlc3Rfc2V0X2NyeXB0KHJlcSwgJnNnW2RhdGFfc2dfYmFzZV0sICZz
+Z1tkYXRhX3NnX2Jhc2VdLAorCQkJICAgICAgIGRhdGFfc2l6ZSwKKwkJCSAgICAgICBpdik7
+CisJYWVhZF9yZXF1ZXN0X3NldF9hc3NvYyhyZXEsIHNnLCBhZF9zaXplKTsKKwllcnIgPSBj
+cnlwdG9fYWVhZF9lbmNyeXB0KHJlcSk7CisJaWYgKGVyciA8IDApIHsKKwkJcHJpbnRrKCJj
+cnlwdG9fYWVhZF9lbmNyeXB0IGZhaWxlZCBlcnI9JWRcbiIsIGVycik7CisJCWdvdG8gZG9u
+ZTsKKwl9CisKKwkvKiBoYXNoIHRoZSBjaXBoZXJ0ZXh0ICovCisJaGFzaCA9IGpoYXNoKGRh
+dGEsIGRhdGFfc2l6ZSwgMCk7CisKKwlwcmludGsoInRlc3RfYWVhZF9lbmNyeXB0X2NvbnNp
+c3RlbmN5IGFsZz0lcyBzdWNjZWVkZWQsIGhhc2g9MHgleFxuIiwgYWxnbywgaGFzaCk7CQor
+CXByaW50aygiS2V5OlxuIik7CisJcHJpbnRfaGV4X2R1bXAoS0VSTl9JTkZPLCAiICAiLCBE
+VU1QX1BSRUZJWF9PRkZTRVQsIDE2LCAxLCBrZXksIGtleWxlbiwgMCk7CisJcHJpbnRrKCJJ
+bml0aWFsIElWOlxuIik7CisJcHJpbnRfaGV4X2R1bXAoS0VSTl9JTkZPLCAiICAiLCBEVU1Q
+X1BSRUZJWF9PRkZTRVQsIDE2LCAxLCBvcmlnX2l2LCBzaXplb2Yob3JpZ19pdiksIDApOwor
+CXByaW50aygiRmluYWwgSVY6XG4iKTsKKwlwcmludF9oZXhfZHVtcChLRVJOX0lORk8sICIg
+ICIsIERVTVBfUFJFRklYX09GRlNFVCwgMTYsIDEsIGl2LCBzaXplb2YoaXYpLCAwKTsKKwlw
+cmludGsoIkFEOlxuIik7CisJcHJpbnRfaGV4X2R1bXAoS0VSTl9JTkZPLCAiICAiLCBEVU1Q
+X1BSRUZJWF9PRkZTRVQsIDE2LCAxLCBhZCwgYWRfc2l6ZSwgMCk7CisJcHJpbnRrKCJDaXBo
+ZXJ0ZXh0OlxuIik7CisJcHJpbnRfaGV4X2R1bXAoS0VSTl9JTkZPLCAiICAiLCBEVU1QX1BS
+RUZJWF9PRkZTRVQsIDE2LCAxLCBkYXRhLCBkYXRhX3NpemUsIDApOworCXByaW50aygiQXV0
+aCBUYWc6XG4iKTsKKwlwcmludF9oZXhfZHVtcChLRVJOX0lORk8sICIgICIsIERVTVBfUFJF
+RklYX09GRlNFVCwgMTYsIDEsIGF1dGhfdGFnLCBhdXRoX3RhZ19zaXplLCAwKTsKKworZG9u
+ZToKKwlpZiAocmVxKQorCQlhZWFkX3JlcXVlc3RfZnJlZShyZXEpOworCWlmICh0Zm0pCisJ
+CWNyeXB0b19mcmVlX2FlYWQodGZtKTsKKwlrZnJlZShkYXRhKTsKKwlrZnJlZShzZyk7Cit9
+CisKIHN0YXRpYyB2b2lkIHRlc3RfYWVhZF9zcGVlZChjb25zdCBjaGFyICphbGdvLCBpbnQg
+ZW5jLCB1bnNpZ25lZCBpbnQgc2VjcywKIAkJCSAgICBzdHJ1Y3QgYWVhZF9zcGVlZF90ZW1w
+bGF0ZSAqdGVtcGxhdGUsCiAJCQkgICAgdW5zaWduZWQgaW50IHRjb3VudCwgdTggYXV0aHNp
+emUsCkBAIC0yMTE5LDYgKzIyMjMsMTAgQEAgc3RhdGljIGludCBkb190ZXN0KGludCBtKQog
+CQkJCSAgIHNwZWVkX3RlbXBsYXRlXzhfMzIpOwogCQlicmVhazsKIAorCWNhc2UgNjAwOgor
+CQl0ZXN0X2FlYWRfZW5jcnlwdF9jb25zaXN0ZW5jeSgiZ2NtKGFlcykiLCBzZWMsIDE2KTsK
+KwkJYnJlYWs7CisKIAljYXNlIDEwMDA6CiAJCXRlc3RfYXZhaWxhYmxlKCk7CiAJCWJyZWFr
+Owo=
+--------------030906000702070500090107--
