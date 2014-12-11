@@ -1,223 +1,350 @@
-From: James Yonan <james@openvpn.net>
-Subject: Re: [PATCH] crypto: aesni - disable "by8" AVX CTR optimization
-Date: Thu, 11 Dec 2014 01:52:40 -0700
-Message-ID: <54895B58.8030200@openvpn.net>
-References: <20140917112911.GA2129@gondor.apana.org.au> <1411504267-10170-1-git-send-email-minipli@googlemail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Update for 3.19
+Date: Thu, 11 Dec 2014 23:51:20 +1100
+Message-ID: <20141211125119.GA12380@gondor.apana.org.au>
+References: <20121004095357.GA11777@gondor.apana.org.au>
+ <20121214103156.GA5840@gondor.apana.org.au>
+ <20130223023331.GA11002@gondor.apana.org.au>
+ <20130907035544.GA22658@gondor.apana.org.au>
+ <20131107080131.GA32307@gondor.apana.org.au>
+ <20140123115319.GA20602@gondor.apana.org.au>
+ <20140401100001.GA12386@gondor.apana.org.au>
+ <20140605062336.GA14440@gondor.apana.org.au>
+ <20140804130339.GA1178@gondor.apana.org.au>
+ <20141007131826.GA29688@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------030906000702070500090107"
-Cc: Romain Francoise <romain@orebokech.com>,
-	linux-crypto@vger.kernel.org,
-	Chandramouli Narayanan <mouli@linux.intel.com>
-To: Mathias Krause <minipli@googlemail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset=us-ascii
+Cc: Peter Zijlstra <peterz@infradead.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.yonan.net ([54.244.116.145]:49258 "EHLO mail.yonan.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932634AbaLKI5z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Dec 2014 03:57:55 -0500
-In-Reply-To: <1411504267-10170-1-git-send-email-minipli@googlemail.com>
+Received: from helcar.apana.org.au ([209.40.204.226]:41143 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755107AbaLKMvc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Dec 2014 07:51:32 -0500
+Content-Disposition: inline
+In-Reply-To: <20141007131826.GA29688@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------030906000702070500090107
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Linus:
 
-I'm seeing some anomalous results with the "by8" AVX CTR optimization in 
-3.18.
+Here is the crypto update for 3.19:
 
-In particular, crypto_aead_encrypt appears to produce different 
-ciphertext from the same plaintext depending on whether or not the 
-optimization is enabled.
+* The crypto API is now documented :)
+* Disallow arbitrary module loading through crypto API.
+* Allow get request with empty driver name through crypto_user.
+* Allow speed testing of arbitrary hash functions.
+* Add caam support for ctr(aes), gcm(aes) and their derivatives.
+* nx now supports concurrent hashing properly.
+* Add sahara support for SHA1/256.
+* Add ARM64 version of CRC32.
+* Misc fixes.
 
-See the attached patch to tcrypt that demonstrates the discrepancy.
 
-James
+Please pull from
 
-On 23/09/2014 14:31, Mathias Krause wrote:
-> The "by8" implementation introduced in commit 22cddcc7df8f ("crypto: aes
-> - AES CTR x86_64 "by8" AVX optimization") is failing crypto tests as it
-> handles counter block overflows differently. It only accounts the right
-> most 32 bit as a counter -- not the whole block as all other
-> implementations do. This makes it fail the cryptomgr test #4 that
-> specifically tests this corner case.
->
-> As we're quite late in the release cycle, just disable the "by8" variant
-> for now.
->
-> Reported-by: Romain Francoise <romain@orebokech.com>
-> Signed-off-by: Mathias Krause <minipli@googlemail.com>
-> Cc: Chandramouli Narayanan <mouli@linux.intel.com>
->
-> ---
-> I'll try to create a real fix next week but I can't promise much. If
-> Linus releases v3.17 early, as he has mentioned in his -rc6
-> announcement, we should hot fix this by just disabling the "by8"
-> variant. The real fix would add the necessary counter block handling to
-> the asm code and revert this commit afterwards. Reverting the whole code
-> is not necessary, imho.
->
-> Would that be okay for you, Herbert?
-> ---
->   arch/x86/crypto/aesni-intel_glue.c |    4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-> index 888950f29fd9..a7ccd57f19e4 100644
-> --- a/arch/x86/crypto/aesni-intel_glue.c
-> +++ b/arch/x86/crypto/aesni-intel_glue.c
-> @@ -481,7 +481,7 @@ static void ctr_crypt_final(struct crypto_aes_ctx *ctx,
->   	crypto_inc(ctrblk, AES_BLOCK_SIZE);
->   }
->
-> -#ifdef CONFIG_AS_AVX
-> +#if 0	/* temporary disabled due to failing crypto tests */
->   static void aesni_ctr_enc_avx_tfm(struct crypto_aes_ctx *ctx, u8 *out,
->   			      const u8 *in, unsigned int len, u8 *iv)
->   {
-> @@ -1522,7 +1522,7 @@ static int __init aesni_init(void)
->   		aesni_gcm_dec_tfm = aesni_gcm_dec;
->   	}
->   	aesni_ctr_enc_tfm = aesni_ctr_enc;
-> -#ifdef CONFIG_AS_AVX
-> +#if 0	/* temporary disabled due to failing crypto tests */
->   	if (cpu_has_avx) {
->   		/* optimize performance of ctr mode encryption transform */
->   		aesni_ctr_enc_tfm = aesni_ctr_enc_avx_tfm;
->
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
---------------030906000702070500090107
-Content-Type: text/plain; charset=UTF-8; x-mac-type="0"; x-mac-creator="0";
- name="tcrypt.diff"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="tcrypt.diff"
+ 
+Boris Brezillon (4):
+      hwrng: atmel - use clk_prepapre_enable/_disable_unprepare
+      hwrng: atmel - add DT support
+      hwrng: atmel - Add TRNG DT binding doc
+      ARM: at91/dt: add trng node to at91sam9g45
 
-VGhpcyBpcyBhIHN0YW5kYXJkIDMuMTgga2VybmVsIHdpdGggImJ5OCIgQVZYIENUUiBvcHRp
-bWl6YXRpb24gaW4gcGxhY2UuClByb2Nlc3NvciBpcyBJbnRlbChSKSBYZW9uKFIpIENQVSBF
-My0xMjIwIFYyIEAgMy4xMEdIei4KClJ1biB0Y3J5cHQgbW9kZT02MDAgdXNpbmcgYXR0YWNo
-ZWQgcGF0Y2ggdG8gdGNyeXB0LiAgVGhlIGlucHV0IHBsYWludGV4dAppcyAxMjggYnl0ZXMg
-b2YgMHhGRi4KClsgICAgNi44NTk1NzldIHRlc3RfYWVhZF9lbmNyeXB0X2NvbnNpc3RlbmN5
-IGFsZz1nY20oYWVzKSBzdWNjZWVkZWQsIGhhc2g9MHg1MmZjMmRkMwpbICAgIDYuODYwNjgy
-XSBLZXk6ClsgICAgNi44NjA5MTRdICAgMDAwMDAwMDA6IDU1IDU1IDU1IDU1IDU1IDU1IDU1
-IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1ClsgICAgNi44NjE2NzFdIEluaXRpYWwgSVY6
-ClsgICAgNi44NjE5NjFdICAgMDAwMDAwMDA6IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAw
-IDAwIDAwIDAwIDAwIDAwIDAwIDAwClsgICAgNi44NjI3MjVdIEZpbmFsIElWOgpbICAgIDYu
-ODYzMDAwXSAgIDAwMDAwMDAwOiAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAw
-MCAwMCAwMCAwMCAwYQpbICAgIDYuODYzODI3XSBBRDoKWyAgICA2Ljg2NDA3N10gICAwMDAw
-MDAwMDogYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQK
-WyAgICA2Ljg2NDgzMV0gQ2lwaGVydGV4dDoKWyAgICA2Ljg2NTExNl0gICAwMDAwMDAwMDog
-OWQgNDkgMGUgYWYgNjUgMTcgYTMgMmEgMWYgZWYgMDUgMjcgZDkgYWYgNWUgNmUKWyAgICA2
-Ljg2NTg3MV0gICAwMDAwMDAxMDogOWQgMmIgZmMgZmEgYmUgNjYgMTQgMzUgZjQgYjUgODIg
-OWQgZWUgYzIgYmUgYTgKWyAgICA2Ljg2NjY5NV0gICAwMDAwMDAyMDogNmUgOGYgYWYgZTAg
-ZjUgMjYgNzkgZjkgNmYgZWQgOTEgMTUgYzMgMjYgMzAgMDYKWyAgICA2Ljg2NzQ2M10gICAw
-MDAwMDAzMDogYjMgYjEgY2MgNzAgMGEgYjcgNzMgNmUgZjMgOGMgOTYgZjAgMjYgYWIgMTMg
-Y2EKWyAgICA2Ljg2ODI2OF0gICAwMDAwMDA0MDogYTkgNGEgNWYgZTYgMWYgYTggZmEgZTUg
-NzEgZjcgYTYgNWIgNzMgOTMgNDAgOTQKWyAgICA2Ljg2OTA0MF0gICAwMDAwMDA1MDogZjEg
-ODIgNWUgMDggNWMgODUgMDIgMDIgOGMgNmYgNGIgOTMgZjggMTAgMWEgZjEKWyAgICA2Ljg2
-OTgxMF0gICAwMDAwMDA2MDogYzkgNWUgMjMgMGMgYmMgYWQgMGYgMzMgNmEgZTcgZGEgZjMg
-NzEgYjcgYmUgMTIKWyAgICA2Ljg3MDU3NV0gICAwMDAwMDA3MDogYjEgYTAgODMgOTQgNjAg
-OGQgNzAgY2EgNDMgZmYgZDAgZTkgNjEgMTcgNTYgNmUKWyAgICA2Ljg3MTM4Nl0gQXV0aCBU
-YWc6ClsgICAgNi44NzE2NTldICAgMDAwMDAwMDA6IGFhIGZlIDRlIGNlIDNiIDEyIDU5IDFk
-IDA2IDkzIGZiIDM3IDI2IDFhIGJiIGJkCgpOZXh0LCByZW1vdmUgdGhlIG9wdGltaXphdGlv
-biBjb2RlOiAicm1tb2QgYWVzbmlfaW50ZWwiLgoKUnVuIHRjcnlwdCBhZ2FpbiBhbmQgdGhl
-IHJlc3VsdHMgYXJlIGRpZmZlcmVudDoKClsgICAgNy4xNzMxNDVdIHRlc3RfYWVhZF9lbmNy
-eXB0X2NvbnNpc3RlbmN5IGFsZz1nY20oYWVzKSBzdWNjZWVkZWQsIGhhc2g9MHhhZDQ0ODdm
-OApbICAgIDcuMTc0MDI2XSBLZXk6ClsgICAgNy4xNzQyNTJdICAgMDAwMDAwMDA6IDU1IDU1
-IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1IDU1ClsgICAgNy4xNzUw
-NjhdIEluaXRpYWwgSVY6ClsgICAgNy4xNzUzODBdICAgMDAwMDAwMDA6IDAwIDAwIDAwIDAw
-IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwClsgICAgNy4xNzYyMzddIEZp
-bmFsIElWOgpbICAgIDcuMTc2NTIwXSAgIDAwMDAwMDAwOiAwMCAwMCAwMCAwMCAwMCAwMCAw
-MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwYQpbICAgIDcuMTc3MzYwXSBBRDoKWyAgICA3
-LjE3NzU4Nl0gICAwMDAwMDAwMDogYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQgYWQg
-YWQgYWQgYWQgYWQgYWQKWyAgICA3LjE3ODQwNV0gQ2lwaGVydGV4dDoKWyAgICA3LjE3ODcy
-MV0gICAwMDAwMDAwMDogMTYgM2QgY2UgYWEgOTQgYzUgNDEgZWYgNGYgZjggMzggOTggYjMg
-ZWMgMGIgNjgKWyAgICA3LjE3OTUyNl0gICAwMDAwMDAxMDogMjkgYzEgYjYgMTIgMTAgNDYg
-M2EgZjggNzcgMjIgZDQgZGYgZGEgZmQgOTUgZmMKWyAgICA3LjE4MDM5Nl0gICAwMDAwMDAy
-MDogM2EgMTUgYjUgZTMgMDEgZTYgZDkgOWYgZWEgMjYgYWUgZWQgOTggNjMgNmUgNjIKWyAg
-ICA3LjE4MTE4OV0gICAwMDAwMDAzMDogMGMgY2EgZGMgNWIgNjUgOTggZjUgMjkgZjUgZTQg
-ZDggM2EgMmUgZWEgNmMgMzkKWyAgICA3LjE4MTk4NF0gICAwMDAwMDA0MDogN2QgZGYgNjcg
-NjYgY2UgNjkgNmQgNzQgZjQgZTAgZTMgZGYgZmYgOTMgMWEgOWEKWyAgICA3LjE4Mjc2OF0g
-ICAwMDAwMDA1MDogNWEgYTAgY2IgYWYgN2IgZGQgZTkgYmIgZGQgNmEgZGYgYTUgNTcgYjkg
-MWQgNTYKWyAgICA3LjE4MzYwNF0gICAwMDAwMDA2MDogZjYgMjEgY2YgNDUgN2QgODIgYmIg
-ZWMgYTQgNTkgNDIgNGIgOGEgNDYgMzQgMWQKWyAgICA3LjE4NDYxM10gICAwMDAwMDA3MDog
-MTggODUgNzcgMDkgYjcgODEgNGYgZTIgOTIgZmMgODQgOTUgNmUgM2YgOTQgNzUKWyAgICA3
-LjE4NTQwN10gQXV0aCBUYWc6ClsgICAgNy4xODU2OTVdICAgMDAwMDAwMDA6IGRlIDdhIDM0
-IDU2IDM0IDVhIDAyIDE5IDJhIDk3IGU3IGJiIDcwIGQwIDIwIDg5CgpXaGljaCB2ZXJzaW9u
-IGlzIGNvcnJlY3Q/ICBUaGUgbGF0dGVyIHZlcnNpb24KKHdpdGhvdXQgdGhlIG9wdGltaXph
-dGlvbikgbWF0Y2hlcyB0aGUgcmVzdWx0cwpwcm9kdWNlZCBieSBwcmV2aW91cyBrZXJuZWwg
-dmVyc2lvbnMgYW5kIG1hdGNoZXMKdXAgd2l0aCBQb2xhclNTTCBhcyB3ZWxsLgoKCmRpZmYg
-LS1naXQgYS90Y3J5cHQuYyBiL3RjcnlwdC5jCmluZGV4IDg5MDQ0OWUuLjlkZDdiYzkgMTAw
-NjQ0Ci0tLSBhL3RjcnlwdC5jCisrKyBiL3RjcnlwdC5jCkBAIC0zMyw2ICszMyw3IEBACiAj
-aW5jbHVkZSA8bGludXgvamlmZmllcy5oPgogI2luY2x1ZGUgPGxpbnV4L3RpbWV4Lmg+CiAj
-aW5jbHVkZSA8bGludXgvaW50ZXJydXB0Lmg+CisjaW5jbHVkZSA8bGludXgvamhhc2guaD4K
-ICNpbmNsdWRlICJ0Y3J5cHQuaCIKICNpbmNsdWRlICJpbnRlcm5hbC5oIgogCkBAIC0yNjUs
-NiArMjY2LDEwOSBAQCBzdGF0aWMgdm9pZCBzZ19pbml0X2FlYWQoc3RydWN0IHNjYXR0ZXJs
-aXN0ICpzZywgY2hhciAqeGJ1ZltYQlVGU0laRV0sCiAJfQogfQogCitzdGF0aWMgdm9pZCB0
-ZXN0X2FlYWRfZW5jcnlwdF9jb25zaXN0ZW5jeShjb25zdCBjaGFyICphbGdvLCB1bnNpZ25l
-ZCBpbnQgc2VjcywgdW5zaWduZWQgaW50IGtleWxlbikKK3sKKwljb25zdCB1bnNpZ25lZCBp
-bnQgZGF0YV9zaXplID0gMTI4OworCWNvbnN0IHVuc2lnbmVkIGludCBhZF9zaXplID0gMTY7
-CisJY29uc3QgdW5zaWduZWQgaW50IGF1dGhfdGFnX3NpemUgPSAxNjsKKwljb25zdCB1bnNp
-Z25lZCBpbnQgZGF0YV9mcmFncyA9IDE7CisKKwljb25zdCB1bnNpZ25lZCBpbnQgZGF0YV9z
-Z19iYXNlID0gMTsKKwljb25zdCB1bnNpZ25lZCBpbnQgbmZyYWdzID0gZGF0YV9mcmFncyAr
-IDI7CisKKwl1bnNpZ25lZCBjaGFyICpkYXRhID0gTlVMTDsKKwlzdHJ1Y3Qgc2NhdHRlcmxp
-c3QgKnNnID0gTlVMTDsKKwlzdHJ1Y3QgY3J5cHRvX2FlYWQgKnRmbSA9IE5VTEw7CisJc3Ry
-dWN0IGFlYWRfcmVxdWVzdCAqcmVxID0gTlVMTDsKKwl1bnNpZ25lZCBjaGFyIGtleVtrZXls
-ZW5dOworCXVuc2lnbmVkIGNoYXIgYXV0aF90YWdbYXV0aF90YWdfc2l6ZV07CisJdW5zaWdu
-ZWQgY2hhciBhZFthZF9zaXplXTsKKwl1bnNpZ25lZCBjaGFyIG9yaWdfaXZbMTZdOworCXVu
-c2lnbmVkIGNoYXIgaXZbMTZdOworCXVuc2lnbmVkIGludCBoYXNoOworCWludCBlcnI7CisK
-KwlkYXRhID0ga21hbGxvYyhkYXRhX3NpemUsIEdGUF9LRVJORUwpOworCXNnID0ga3phbGxv
-YyhzaXplb2Yoc3RydWN0IHNjYXR0ZXJsaXN0KSAqIG5mcmFncywgR0ZQX0tFUk5FTCk7CisJ
-aWYgKCFkYXRhIHx8ICFzZykgeworCQlwcmludGsoImttYWxsb2MgZmFpbGVkXG4iKTsKKwkJ
-Z290byBkb25lOworCX0KKwlzZ19pbml0X3RhYmxlKHNnLCBuZnJhZ3MpOworCXNnX3NldF9i
-dWYoc2csIGFkLCBhZF9zaXplKTsKKwlzZ19zZXRfYnVmKCZzZ1tkYXRhX2ZyYWdzICsgMV0s
-IGF1dGhfdGFnLCBhdXRoX3RhZ19zaXplKTsKKworCXNnX3NldF9idWYoJnNnW2RhdGFfc2df
-YmFzZSswXSwgZGF0YSwgZGF0YV9zaXplKTsKKworCXRmbSA9IGNyeXB0b19hbGxvY19hZWFk
-KGFsZ28sIDAsIDApOworCWlmIChJU19FUlIodGZtKSkgeworCQlwcmludGsoImNyeXB0b19h
-bGxvY19hZWFkIGZhaWxlZCwgZXJyPSVsZFxuIiwgUFRSX0VSUih0Zm0pKTsKKwkJdGZtID0g
-TlVMTDsKKwkJZ290byBkb25lOworCX0KKworCW1lbXNldChrZXksIDB4NTUsIGtleWxlbik7
-CisJZXJyID0gY3J5cHRvX2FlYWRfc2V0a2V5KHRmbSwga2V5LCBrZXlsZW4pOworCWlmIChl
-cnIgPCAwKSB7CisJCXByaW50aygiY3J5cHRvX2FlYWRfc2V0a2V5IGZhaWxlZCwgZXJyPSVk
-XG4iLCBlcnIpOworCQlnb3RvIGRvbmU7CisJfQorCisJZXJyID0gY3J5cHRvX2FlYWRfc2V0
-YXV0aHNpemUodGZtLCBhdXRoX3RhZ19zaXplKTsKKwlpZiAoZXJyIDwgMCkgeworCQlwcmlu
-dGsoImNyeXB0b19hZWFkX3NldGF1dGhzaXplIGZhaWxlZCwgZXJyPSVkXG4iLCBlcnIpOwor
-CQlnb3RvIGRvbmU7CisJfQorCisJcmVxID0gYWVhZF9yZXF1ZXN0X2FsbG9jKHRmbSwgR0ZQ
-X0tFUk5FTCk7CisJaWYgKCFyZXEpIHsKKwkJcHJpbnRrKCJhZWFkX3JlcXVlc3RfYWxsb2Mg
-ZmFpbGVkXG4iKTsKKwkJZ290byBkb25lOworCX0KKworCW1lbXNldChhZCwgMHhBRCwgYWRf
-c2l6ZSk7CisJbWVtc2V0KGRhdGEsIDB4RkYsIGRhdGFfc2l6ZSk7CisJbWVtc2V0KGl2LCAw
-LCBzaXplb2YoaXYpKTsKKwltZW1jcHkob3JpZ19pdiwgaXYsIHNpemVvZihvcmlnX2l2KSk7
-CisJbWVtc2V0KGF1dGhfdGFnLCAwLCBhdXRoX3RhZ19zaXplKTsKKworCS8qIGVuY3J5cHQg
-Ki8KKwlhZWFkX3JlcXVlc3Rfc2V0X2NyeXB0KHJlcSwgJnNnW2RhdGFfc2dfYmFzZV0sICZz
-Z1tkYXRhX3NnX2Jhc2VdLAorCQkJICAgICAgIGRhdGFfc2l6ZSwKKwkJCSAgICAgICBpdik7
-CisJYWVhZF9yZXF1ZXN0X3NldF9hc3NvYyhyZXEsIHNnLCBhZF9zaXplKTsKKwllcnIgPSBj
-cnlwdG9fYWVhZF9lbmNyeXB0KHJlcSk7CisJaWYgKGVyciA8IDApIHsKKwkJcHJpbnRrKCJj
-cnlwdG9fYWVhZF9lbmNyeXB0IGZhaWxlZCBlcnI9JWRcbiIsIGVycik7CisJCWdvdG8gZG9u
-ZTsKKwl9CisKKwkvKiBoYXNoIHRoZSBjaXBoZXJ0ZXh0ICovCisJaGFzaCA9IGpoYXNoKGRh
-dGEsIGRhdGFfc2l6ZSwgMCk7CisKKwlwcmludGsoInRlc3RfYWVhZF9lbmNyeXB0X2NvbnNp
-c3RlbmN5IGFsZz0lcyBzdWNjZWVkZWQsIGhhc2g9MHgleFxuIiwgYWxnbywgaGFzaCk7CQor
-CXByaW50aygiS2V5OlxuIik7CisJcHJpbnRfaGV4X2R1bXAoS0VSTl9JTkZPLCAiICAiLCBE
-VU1QX1BSRUZJWF9PRkZTRVQsIDE2LCAxLCBrZXksIGtleWxlbiwgMCk7CisJcHJpbnRrKCJJ
-bml0aWFsIElWOlxuIik7CisJcHJpbnRfaGV4X2R1bXAoS0VSTl9JTkZPLCAiICAiLCBEVU1Q
-X1BSRUZJWF9PRkZTRVQsIDE2LCAxLCBvcmlnX2l2LCBzaXplb2Yob3JpZ19pdiksIDApOwor
-CXByaW50aygiRmluYWwgSVY6XG4iKTsKKwlwcmludF9oZXhfZHVtcChLRVJOX0lORk8sICIg
-ICIsIERVTVBfUFJFRklYX09GRlNFVCwgMTYsIDEsIGl2LCBzaXplb2YoaXYpLCAwKTsKKwlw
-cmludGsoIkFEOlxuIik7CisJcHJpbnRfaGV4X2R1bXAoS0VSTl9JTkZPLCAiICAiLCBEVU1Q
-X1BSRUZJWF9PRkZTRVQsIDE2LCAxLCBhZCwgYWRfc2l6ZSwgMCk7CisJcHJpbnRrKCJDaXBo
-ZXJ0ZXh0OlxuIik7CisJcHJpbnRfaGV4X2R1bXAoS0VSTl9JTkZPLCAiICAiLCBEVU1QX1BS
-RUZJWF9PRkZTRVQsIDE2LCAxLCBkYXRhLCBkYXRhX3NpemUsIDApOworCXByaW50aygiQXV0
-aCBUYWc6XG4iKTsKKwlwcmludF9oZXhfZHVtcChLRVJOX0lORk8sICIgICIsIERVTVBfUFJF
-RklYX09GRlNFVCwgMTYsIDEsIGF1dGhfdGFnLCBhdXRoX3RhZ19zaXplLCAwKTsKKworZG9u
-ZToKKwlpZiAocmVxKQorCQlhZWFkX3JlcXVlc3RfZnJlZShyZXEpOworCWlmICh0Zm0pCisJ
-CWNyeXB0b19mcmVlX2FlYWQodGZtKTsKKwlrZnJlZShkYXRhKTsKKwlrZnJlZShzZyk7Cit9
-CisKIHN0YXRpYyB2b2lkIHRlc3RfYWVhZF9zcGVlZChjb25zdCBjaGFyICphbGdvLCBpbnQg
-ZW5jLCB1bnNpZ25lZCBpbnQgc2VjcywKIAkJCSAgICBzdHJ1Y3QgYWVhZF9zcGVlZF90ZW1w
-bGF0ZSAqdGVtcGxhdGUsCiAJCQkgICAgdW5zaWduZWQgaW50IHRjb3VudCwgdTggYXV0aHNp
-emUsCkBAIC0yMTE5LDYgKzIyMjMsMTAgQEAgc3RhdGljIGludCBkb190ZXN0KGludCBtKQog
-CQkJCSAgIHNwZWVkX3RlbXBsYXRlXzhfMzIpOwogCQlicmVhazsKIAorCWNhc2UgNjAwOgor
-CQl0ZXN0X2FlYWRfZW5jcnlwdF9jb25zaXN0ZW5jeSgiZ2NtKGFlcykiLCBzZWMsIDE2KTsK
-KwkJYnJlYWs7CisKIAljYXNlIDEwMDA6CiAJCXRlc3RfYXZhaWxhYmxlKCk7CiAJCWJyZWFr
-Owo=
---------------030906000702070500090107--
+Bruce Allan (4):
+      crypto: qat - fix bad unlock balance
+      crypto: qat - cleanup coccicheck warning - NULL check before freeing functions
+      crypto: qat - cleanup unnecessary break checkpatch warning
+      crypto: qat - misspelling typo - "reseting" should be "resetting"
+
+Catalin Vasile (5):
+      crypto: caam - add support for ctr(aes)
+      crypto: caam - add support for rfc3686(ctr(aes))
+      crypto: caam - add support for rfc3686 with authenc md5, sha1 and sha2
+      crypto: caam - add support for givencrypt cbc(aes) and rfc3686(ctr(aes))
+      crypto: caam - add support for givencrypt cbc(des) and cbc(des3_ede)
+
+Cristian Stoica (1):
+      crypto: caam - fix error reporting
+
+Dan Carpenter (1):
+      crypto: sha-mb - remove a bogus NULL check
+
+Daniel Borkmann (1):
+      crypto: algif - add and use sock_kzfree_s() instead of memzero_explicit()
+
+Herbert Xu (4):
+      Merge git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux
+      crypto: user - Allow get request with empty driver name
+      crypto: algif_skcipher - Fixed blocking recvmsg
+      crypto: tcrypt - Allow speed testing of arbitrary hash functions
+
+Johannes Berg (1):
+      crypto: bfin_crc - don't include linux/unaligned/access_ok.h
+
+Julia Lawall (4):
+      crypto: sparc - replace memset by memzero_explicit
+      crypto: sha - replace memset by memzero_explicit
+      crypto: powerpc - replace memset by memzero_explicit
+      crypto: arm - replace memset by memzero_explicit
+
+Kees Cook (2):
+      crypto: prefix module autoloading with "crypto-"
+      crypto: include crypto- module prefix in template
+
+Leonidas S. Barbosa (8):
+      crypto: nx - Moving NX-AES-CBC to be processed logic
+      crypto: nx - Moving NX-AES-CCM to be processed logic and sg_list bounds
+      crypto: nx - Moving limit and bound logic in CTR and fix IV vector
+      crypto: nx - Moving NX-AES-ECB to be processed logic
+      crypto: nx - Moving NX-AES-GCM to be processed logic
+      crypto: nx - Moving NX-AES-XCBC to be processed logic
+      crypto: nx - Fix SHA concurrence issue and sg limit bounds
+      crypto: nx - Fixing the limit number of bytes to be processed
+
+Masanari Iida (1):
+      crypto: testmgr - Remove unnecessary KERN_INFO from testmgr.c
+
+Nickolaus Woodruff (1):
+      crypto: drbg - use memzero_explicit() for clearing sensitive data
+
+Pranith Kumar (1):
+      crypto: caam - Remove unnecessary smp_read_barrier_depends()
+
+Rickard Strandqvist (1):
+      hwrng: core - Changed from using strncat to strlcat
+
+Steffen Trumtrar (4):
+      crypto: sahara - fix spinlock initialization
+      crypto: sahara - add support for i.MX53
+      crypto: sahara - replace tasklets with kthread
+      crypto: sahara - add support for SHA1/256
+
+Stephan Mueller (22):
+      crypto: drbg - use crypto_inc
+      crypto: drbg - add MODULE_ALIAS for all DRBG types
+      crypto: algif - zeroize message digest buffer
+      crypto: algif - zeroize IV buffer
+      crypto: doc - crypto API high level spec
+      crypto: doc - compile crypto API spec
+      crypto: doc - userspace interface spec
+      crypto: doc - RNG API documentation
+      crypto: doc - hash data structures
+      crypto: doc - AHASH API documentation
+      crypto: doc - SHASH API documentation
+      crypto: doc - cipher data structures
+      crypto: doc - ABLKCIPHER API documentation
+      crypto: doc - AEAD API documentation
+      crypto: doc - BLKCIPHER API documentation
+      crypto: doc - CIPHER API documentation
+      crypto: doc - HASH API documentation
+      crypto: doc - document uncovered member variables
+      crypto: user - add MODULE_ALIAS
+      crypto: drbg - use MODULE_ALIAS_CRYPTO
+      crypto: algif_skcipher - initialize upon init request
+      crypto: af_alg - add user space interface for AEAD
+
+Struk, Tadeusz (3):
+      crypto: qat - Use memzero_explicit
+      crytpo: qat - Fix 64 bytes requests
+      crypto: algif_skcipher - removed unneeded code
+
+Tadeusz Struk (2):
+      crypto: qat - Move BAR definitions to device specific module
+      crypto: qat - fix problem with coalescing enable logic
+
+Tudor Ambarus (4):
+      crypto: caam - add support for gcm(aes)
+      crypto: caam - add support for rfc4106(gcm(aes))
+      crypto: caam - fix output sequence contiguity check
+      crypto: caam - add support for rfc4543(gcm(aes))
+
+Ulf Hansson (2):
+      crypto: ux500/cryp - Silence compiler warning for !CONFIG_PM
+      crypto: ux500/hash - Silence compiler warning for !CONFIG_PM
+
+Valentin Rothberg (1):
+      crypto: aesni - remove unnecessary #define
+
+Yazen Ghannam (1):
+      crypto: crc32 - Add ARM64 CRC32 hw accelerated module
+
+ Documentation/DocBook/Makefile                     |    2 +-
+ Documentation/DocBook/crypto-API.tmpl              | 1253 ++++++++++
+ Documentation/crypto/crypto-API-userspace.txt      |  205 ++
+ .../devicetree/bindings/crypto/fsl-imx-sahara.txt  |    2 +-
+ .../devicetree/bindings/hwrng/atmel-trng.txt       |   16 +
+ arch/arm/boot/dts/at91sam9g45.dtsi                 |    7 +
+ arch/arm/crypto/aes_glue.c                         |    4 +-
+ arch/arm/crypto/sha1_glue.c                        |    2 +-
+ arch/arm/crypto/sha1_neon_glue.c                   |    2 +-
+ arch/arm/crypto/sha512_neon_glue.c                 |    6 +-
+ arch/arm64/crypto/Kconfig                          |    4 +
+ arch/arm64/crypto/Makefile                         |    4 +
+ arch/arm64/crypto/aes-ce-ccm-glue.c                |    2 +-
+ arch/arm64/crypto/aes-glue.c                       |    8 +-
+ arch/arm64/crypto/crc32-arm64.c                    |  274 +++
+ arch/powerpc/crypto/sha1.c                         |    4 +-
+ arch/s390/crypto/aes_s390.c                        |    2 +-
+ arch/s390/crypto/des_s390.c                        |    4 +-
+ arch/s390/crypto/ghash_s390.c                      |    2 +-
+ arch/s390/crypto/sha1_s390.c                       |    2 +-
+ arch/s390/crypto/sha256_s390.c                     |    4 +-
+ arch/s390/crypto/sha512_s390.c                     |    4 +-
+ arch/sparc/crypto/aes_glue.c                       |    2 +-
+ arch/sparc/crypto/camellia_glue.c                  |    2 +-
+ arch/sparc/crypto/crc32c_glue.c                    |    2 +-
+ arch/sparc/crypto/des_glue.c                       |    2 +-
+ arch/sparc/crypto/md5_glue.c                       |    2 +-
+ arch/sparc/crypto/sha1_glue.c                      |    2 +-
+ arch/sparc/crypto/sha256_glue.c                    |    6 +-
+ arch/sparc/crypto/sha512_glue.c                    |    6 +-
+ arch/x86/crypto/aes_glue.c                         |    4 +-
+ arch/x86/crypto/aesni-intel_glue.c                 |   10 +-
+ arch/x86/crypto/blowfish_glue.c                    |    4 +-
+ arch/x86/crypto/camellia_aesni_avx2_glue.c         |    4 +-
+ arch/x86/crypto/camellia_aesni_avx_glue.c          |    4 +-
+ arch/x86/crypto/camellia_glue.c                    |    4 +-
+ arch/x86/crypto/cast5_avx_glue.c                   |    2 +-
+ arch/x86/crypto/cast6_avx_glue.c                   |    2 +-
+ arch/x86/crypto/crc32-pclmul_glue.c                |    4 +-
+ arch/x86/crypto/crc32c-intel_glue.c                |    4 +-
+ arch/x86/crypto/crct10dif-pclmul_glue.c            |    4 +-
+ arch/x86/crypto/des3_ede_glue.c                    |    8 +-
+ arch/x86/crypto/fpu.c                              |    3 +
+ arch/x86/crypto/ghash-clmulni-intel_glue.c         |    2 +-
+ arch/x86/crypto/salsa20_glue.c                     |    4 +-
+ arch/x86/crypto/serpent_avx2_glue.c                |    4 +-
+ arch/x86/crypto/serpent_avx_glue.c                 |    2 +-
+ arch/x86/crypto/serpent_sse2_glue.c                |    2 +-
+ arch/x86/crypto/sha-mb/sha1_mb.c                   |    3 +-
+ arch/x86/crypto/sha1_ssse3_glue.c                  |    2 +-
+ arch/x86/crypto/sha256_ssse3_glue.c                |    6 +-
+ arch/x86/crypto/sha512_ssse3_glue.c                |    6 +-
+ arch/x86/crypto/twofish_avx_glue.c                 |    2 +-
+ arch/x86/crypto/twofish_glue.c                     |    4 +-
+ arch/x86/crypto/twofish_glue_3way.c                |    4 +-
+ crypto/842.c                                       |    1 +
+ crypto/aes_generic.c                               |    2 +-
+ crypto/af_alg.c                                    |    6 +
+ crypto/algapi.c                                    |    4 +-
+ crypto/algif_hash.c                                |    4 +-
+ crypto/algif_skcipher.c                            |   15 +-
+ crypto/ansi_cprng.c                                |    2 +-
+ crypto/anubis.c                                    |    1 +
+ crypto/api.c                                       |    4 +-
+ crypto/arc4.c                                      |    1 +
+ crypto/authenc.c                                   |    1 +
+ crypto/authencesn.c                                |    1 +
+ crypto/blowfish_generic.c                          |    2 +-
+ crypto/camellia_generic.c                          |    2 +-
+ crypto/cast5_generic.c                             |    2 +-
+ crypto/cast6_generic.c                             |    2 +-
+ crypto/cbc.c                                       |    1 +
+ crypto/ccm.c                                       |    5 +-
+ crypto/chainiv.c                                   |    1 +
+ crypto/cmac.c                                      |    1 +
+ crypto/crc32.c                                     |    1 +
+ crypto/crc32c_generic.c                            |    2 +-
+ crypto/crct10dif_generic.c                         |    2 +-
+ crypto/cryptd.c                                    |    1 +
+ crypto/crypto_null.c                               |    6 +-
+ crypto/crypto_user.c                               |    6 +-
+ crypto/ctr.c                                       |    3 +-
+ crypto/cts.c                                       |    1 +
+ crypto/deflate.c                                   |    2 +-
+ crypto/des_generic.c                               |    2 +-
+ crypto/drbg.c                                      |  127 +-
+ crypto/ecb.c                                       |    1 +
+ crypto/eseqiv.c                                    |    1 +
+ crypto/fcrypt.c                                    |    1 +
+ crypto/gcm.c                                       |    7 +-
+ crypto/ghash-generic.c                             |    2 +-
+ crypto/hmac.c                                      |    1 +
+ crypto/khazad.c                                    |    1 +
+ crypto/krng.c                                      |    2 +-
+ crypto/lrw.c                                       |    1 +
+ crypto/lz4.c                                       |    1 +
+ crypto/lz4hc.c                                     |    1 +
+ crypto/lzo.c                                       |    1 +
+ crypto/mcryptd.c                                   |    1 +
+ crypto/md4.c                                       |    2 +-
+ crypto/md5.c                                       |    1 +
+ crypto/michael_mic.c                               |    1 +
+ crypto/pcbc.c                                      |    1 +
+ crypto/pcrypt.c                                    |    1 +
+ crypto/rmd128.c                                    |    1 +
+ crypto/rmd160.c                                    |    1 +
+ crypto/rmd256.c                                    |    1 +
+ crypto/rmd320.c                                    |    1 +
+ crypto/salsa20_generic.c                           |    2 +-
+ crypto/seed.c                                      |    1 +
+ crypto/seqiv.c                                     |    1 +
+ crypto/serpent_generic.c                           |    4 +-
+ crypto/sha1_generic.c                              |    2 +-
+ crypto/sha256_generic.c                            |    4 +-
+ crypto/sha512_generic.c                            |    4 +-
+ crypto/tcrypt.c                                    |   32 +-
+ crypto/tea.c                                       |    4 +-
+ crypto/testmgr.c                                   |    3 +-
+ crypto/tgr192.c                                    |    4 +-
+ crypto/twofish_generic.c                           |    2 +-
+ crypto/vmac.c                                      |    1 +
+ crypto/wp512.c                                     |    4 +-
+ crypto/xcbc.c                                      |    1 +
+ crypto/xts.c                                       |    1 +
+ crypto/zlib.c                                      |    1 +
+ drivers/char/hw_random/Kconfig                     |    2 +-
+ drivers/char/hw_random/atmel-rng.c                 |   15 +-
+ drivers/char/hw_random/core.c                      |   12 +-
+ drivers/crypto/bfin_crc.c                          |    2 +-
+ drivers/crypto/caam/caamalg.c                      | 2412 +++++++++++++++++---
+ drivers/crypto/caam/compat.h                       |    1 +
+ drivers/crypto/caam/desc_constr.h                  |    2 +
+ drivers/crypto/caam/error.c                        |   25 +-
+ drivers/crypto/caam/jr.c                           |    3 -
+ drivers/crypto/nx/nx-aes-cbc.c                     |   12 +-
+ drivers/crypto/nx/nx-aes-ccm.c                     |   61 +-
+ drivers/crypto/nx/nx-aes-ctr.c                     |   13 +-
+ drivers/crypto/nx/nx-aes-ecb.c                     |   12 +-
+ drivers/crypto/nx/nx-aes-gcm.c                     |   66 +-
+ drivers/crypto/nx/nx-aes-xcbc.c                    |   81 +-
+ drivers/crypto/nx/nx-sha256.c                      |  208 +-
+ drivers/crypto/nx/nx-sha512.c                      |  222 +-
+ drivers/crypto/nx/nx.c                             |  127 +-
+ drivers/crypto/nx/nx.h                             |    8 +-
+ drivers/crypto/padlock-aes.c                       |    2 +-
+ drivers/crypto/padlock-sha.c                       |    8 +-
+ drivers/crypto/qat/qat_common/adf_accel_devices.h  |    2 -
+ drivers/crypto/qat/qat_common/adf_aer.c            |    2 +-
+ drivers/crypto/qat/qat_common/adf_ctl_drv.c        |    3 +-
+ drivers/crypto/qat/qat_common/adf_dev_mgr.c        |    6 +-
+ drivers/crypto/qat/qat_common/adf_transport.c      |   15 +-
+ .../qat/qat_common/adf_transport_access_macros.h   |    9 +-
+ drivers/crypto/qat/qat_common/qat_algs.c           |   37 +-
+ drivers/crypto/qat/qat_common/qat_hal.c            |    3 +-
+ .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    2 +
+ drivers/crypto/qat/qat_dh895xcc/adf_isr.c          |   12 +-
+ drivers/crypto/sahara.c                            |  794 ++++++-
+ drivers/crypto/ux500/cryp/cryp_core.c              |    6 +-
+ drivers/crypto/ux500/hash/hash_core.c              |   10 +-
+ drivers/s390/crypto/ap_bus.c                       |    3 +-
+ include/crypto/hash.h                              |  492 ++++
+ include/crypto/if_alg.h                            |    1 +
+ include/crypto/rng.h                               |   80 +
+ include/linux/crypto.h                             | 1112 ++++++++-
+ include/net/sock.h                                 |    1 +
+ include/uapi/linux/if_alg.h                        |    2 +
+ net/core/sock.c                                    |   24 +-
+ 167 files changed, 7090 insertions(+), 1068 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
