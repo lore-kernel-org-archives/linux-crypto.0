@@ -1,350 +1,140 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Update for 3.19
-Date: Fri, 12 Dec 2014 22:54:18 +1100
-Message-ID: <20141212115416.GA22692@gondor.apana.org.au>
-References: <20121214103156.GA5840@gondor.apana.org.au>
- <20130223023331.GA11002@gondor.apana.org.au>
- <20130907035544.GA22658@gondor.apana.org.au>
- <20131107080131.GA32307@gondor.apana.org.au>
- <20140123115319.GA20602@gondor.apana.org.au>
- <20140401100001.GA12386@gondor.apana.org.au>
- <20140605062336.GA14440@gondor.apana.org.au>
- <20140804130339.GA1178@gondor.apana.org.au>
- <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v2 13/25] crypto: Add appropriate consts to RNG API
+Date: Sun, 14 Dec 2014 12:39:47 +0100
+Message-ID: <10282004.9BfpQk0Rcv@tachyon.chronox.de>
+References: <cover.1417951990.git.linux@horizon.com> <622c0b1320fe555f0ce97f4c342a0877f14d63b6.1417951990.git.linux@horizon.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: nhorman@tuxdriver.com, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au
+To: George Spelvin <linux@horizon.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:42156 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S966281AbaLLLyb (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Dec 2014 06:54:31 -0500
-Content-Disposition: inline
-In-Reply-To: <20141211125119.GA12380@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:55032 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751242AbaLNLj5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 14 Dec 2014 06:39:57 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <SC345> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Sun, 14 Dec 2014 12:39:47 +0100
+In-Reply-To: <622c0b1320fe555f0ce97f4c342a0877f14d63b6.1417951990.git.linux@horizon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Am Sonntag, 7. Dezember 2014, 07:26:21 schrieb George Spelvin:
 
-Here is a resend of the crypto update for 3.19 since I accidentally
-pushed out an old tree instead of the current crypto tree.
+Hi George,
 
-* The crypto API is now documented :)
-* Disallow arbitrary module loading through crypto API.
-* Allow get request with empty driver name through crypto_user.
-* Allow speed testing of arbitrary hash functions.
-* Add caam support for ctr(aes), gcm(aes) and their derivatives.
-* nx now supports concurrent hashing properly.
-* Add sahara support for SHA1/256.
-* Add ARM64 version of CRC32.
-* Misc fixes.
+> Signed-off-by: George Spelvin <linux@horizon.com>
+> ---
+>  crypto/ansi_cprng.c    | 11 ++++++-----
+>  crypto/krng.c          |  2 +-
+>  crypto/rng.c           |  3 ++-
+>  include/crypto/rng.h   |  2 +-
+>  include/linux/crypto.h |  6 ++++--
+>  5 files changed, 14 insertions(+), 10 deletions(-)
+
+Please update the drbg too.
+> 
+> diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
+> index 249b944f..c1c81266 100644
+> --- a/crypto/ansi_cprng.c
+> +++ b/crypto/ansi_cprng.c
+> @@ -299,11 +299,11 @@ static int cprng_get_random(struct crypto_rng *tfm, u8
+> *rdata, *  V and KEY are required during reset, and DT is optional,
+> detected *  as being present by testing the length of the seed
+>   */
+> -static int cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
+> +static int cprng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned
+> int slen) {
+>  	struct prng_context *prng = crypto_rng_ctx(tfm);
+> -	u8 *key = seed + DEFAULT_BLK_SZ;
+> -	u8 *dt = NULL;
+> +	const u8 *key = seed + DEFAULT_BLK_SZ;
+> +	const u8 *dt = NULL;
+> 
+>  	if (slen < DEFAULT_PRNG_KSZ + DEFAULT_BLK_SZ)
+>  		return -EINVAL;
+> @@ -327,9 +327,10 @@ static int fips_cprng_get_random(struct crypto_rng
+> *tfm, u8 *rdata, return get_prng_bytes(rdata, dlen, prng, true);
+>  }
+> 
+> -static int fips_cprng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int
+> slen) +static int fips_cprng_reset(struct crypto_rng *tfm, const u8 *seed,
+> +			    unsigned int slen)
+>  {
+> -	u8 *key = seed + DEFAULT_BLK_SZ;
+> +	const u8 *key = seed + DEFAULT_BLK_SZ;
+>  	int rc;
+> 
+>  	struct prng_context *prng = crypto_rng_ctx(tfm);
+> diff --git a/crypto/krng.c b/crypto/krng.c
+> index a2d2b72f..007ea7e3 100644
+> --- a/crypto/krng.c
+> +++ b/crypto/krng.c
+> @@ -22,7 +22,7 @@ static int krng_get_random(struct crypto_rng *tfm, u8
+> *rdata, unsigned int dlen) return 0;
+>  }
+> 
+> -static int krng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
+> +static int krng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int
+> slen) {
+>  	return 0;
+>  }
+> diff --git a/crypto/rng.c b/crypto/rng.c
+> index e0a25c24..9e3a6efd 100644
+> --- a/crypto/rng.c
+> +++ b/crypto/rng.c
+> @@ -29,7 +29,8 @@ struct crypto_rng *crypto_default_rng;
+>  EXPORT_SYMBOL_GPL(crypto_default_rng);
+>  static int crypto_default_rng_refcnt;
+> 
+> -static int rngapi_reset(struct crypto_rng *tfm, u8 *seed, unsigned int
+> slen) +static int rngapi_reset(struct crypto_rng *tfm, const u8 *seed,
+> +			unsigned int slen)
+>  {
+>  	u8 *buf = NULL;
+>  	int err;
+> diff --git a/include/crypto/rng.h b/include/crypto/rng.h
+> index c93f9b91..9659300a 100644
+> --- a/include/crypto/rng.h
+> +++ b/include/crypto/rng.h
+> @@ -62,7 +62,7 @@ static inline int crypto_rng_get_bytes(struct crypto_rng
+> *tfm, }
+> 
+>  static inline int crypto_rng_reset(struct crypto_rng *tfm,
+> -				   u8 *seed, unsigned int slen)
+> +				   const u8 *seed, unsigned int slen)
+>  {
+>  	return crypto_rng_crt(tfm)->rng_reset(tfm, seed, slen);
+>  }
+> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> index d45e9496..8aa6350b 100644
+> --- a/include/linux/crypto.h
+> +++ b/include/linux/crypto.h
+> @@ -264,7 +264,8 @@ struct compress_alg {
+>  struct rng_alg {
+>  	int (*rng_make_random)(struct crypto_rng *tfm, u8 *rdata,
+>  			       unsigned int dlen);
+> -	int (*rng_reset)(struct crypto_rng *tfm, u8 *seed, unsigned int slen);
+> +	int (*rng_reset)(struct crypto_rng *tfm, const u8 *seed,
+> +			       unsigned int slen);
+> 
+>  	unsigned int seedsize;
+>  };
+> @@ -399,7 +400,8 @@ struct compress_tfm {
+>  struct rng_tfm {
+>  	int (*rng_gen_random)(struct crypto_rng *tfm, u8 *rdata,
+>  			      unsigned int dlen);
+> -	int (*rng_reset)(struct crypto_rng *tfm, u8 *seed, unsigned int slen);
+> +	int (*rng_reset)(struct crypto_rng *tfm, const u8 *seed,
+> +			 unsigned int slen);
+>  };
+> 
+>  #define crt_ablkcipher	crt_u.ablkcipher
 
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Boris Brezillon (4):
-      hwrng: atmel - use clk_prepapre_enable/_disable_unprepare
-      hwrng: atmel - add DT support
-      hwrng: atmel - Add TRNG DT binding doc
-      ARM: at91/dt: add trng node to at91sam9g45
-
-Bruce Allan (4):
-      crypto: qat - fix bad unlock balance
-      crypto: qat - cleanup coccicheck warning - NULL check before freeing functions
-      crypto: qat - cleanup unnecessary break checkpatch warning
-      crypto: qat - misspelling typo - "reseting" should be "resetting"
-
-Catalin Vasile (5):
-      crypto: caam - add support for ctr(aes)
-      crypto: caam - add support for rfc3686(ctr(aes))
-      crypto: caam - add support for rfc3686 with authenc md5, sha1 and sha2
-      crypto: caam - add support for givencrypt cbc(aes) and rfc3686(ctr(aes))
-      crypto: caam - add support for givencrypt cbc(des) and cbc(des3_ede)
-
-Cristian Stoica (1):
-      crypto: caam - fix error reporting
-
-Dan Carpenter (1):
-      crypto: sha-mb - remove a bogus NULL check
-
-Daniel Borkmann (1):
-      crypto: algif - add and use sock_kzfree_s() instead of memzero_explicit()
-
-Herbert Xu (4):
-      Merge git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux
-      crypto: user - Allow get request with empty driver name
-      crypto: algif_skcipher - Fixed blocking recvmsg
-      crypto: tcrypt - Allow speed testing of arbitrary hash functions
-
-Johannes Berg (1):
-      crypto: bfin_crc - don't include linux/unaligned/access_ok.h
-
-Julia Lawall (4):
-      crypto: sparc - replace memset by memzero_explicit
-      crypto: sha - replace memset by memzero_explicit
-      crypto: powerpc - replace memset by memzero_explicit
-      crypto: arm - replace memset by memzero_explicit
-
-Kees Cook (2):
-      crypto: prefix module autoloading with "crypto-"
-      crypto: include crypto- module prefix in template
-
-Leonidas S. Barbosa (8):
-      crypto: nx - Moving NX-AES-CBC to be processed logic
-      crypto: nx - Moving NX-AES-CCM to be processed logic and sg_list bounds
-      crypto: nx - Moving limit and bound logic in CTR and fix IV vector
-      crypto: nx - Moving NX-AES-ECB to be processed logic
-      crypto: nx - Moving NX-AES-GCM to be processed logic
-      crypto: nx - Moving NX-AES-XCBC to be processed logic
-      crypto: nx - Fix SHA concurrence issue and sg limit bounds
-      crypto: nx - Fixing the limit number of bytes to be processed
-
-Masanari Iida (1):
-      crypto: testmgr - Remove unnecessary KERN_INFO from testmgr.c
-
-Nickolaus Woodruff (1):
-      crypto: drbg - use memzero_explicit() for clearing sensitive data
-
-Pranith Kumar (1):
-      crypto: caam - Remove unnecessary smp_read_barrier_depends()
-
-Rickard Strandqvist (1):
-      hwrng: core - Changed from using strncat to strlcat
-
-Steffen Trumtrar (4):
-      crypto: sahara - fix spinlock initialization
-      crypto: sahara - add support for i.MX53
-      crypto: sahara - replace tasklets with kthread
-      crypto: sahara - add support for SHA1/256
-
-Stephan Mueller (22):
-      crypto: drbg - use crypto_inc
-      crypto: drbg - add MODULE_ALIAS for all DRBG types
-      crypto: algif - zeroize message digest buffer
-      crypto: algif - zeroize IV buffer
-      crypto: doc - crypto API high level spec
-      crypto: doc - compile crypto API spec
-      crypto: doc - userspace interface spec
-      crypto: doc - RNG API documentation
-      crypto: doc - hash data structures
-      crypto: doc - AHASH API documentation
-      crypto: doc - SHASH API documentation
-      crypto: doc - cipher data structures
-      crypto: doc - ABLKCIPHER API documentation
-      crypto: doc - AEAD API documentation
-      crypto: doc - BLKCIPHER API documentation
-      crypto: doc - CIPHER API documentation
-      crypto: doc - HASH API documentation
-      crypto: doc - document uncovered member variables
-      crypto: user - add MODULE_ALIAS
-      crypto: drbg - use MODULE_ALIAS_CRYPTO
-      crypto: algif_skcipher - initialize upon init request
-      crypto: af_alg - add user space interface for AEAD
-
-Struk, Tadeusz (3):
-      crypto: qat - Use memzero_explicit
-      crytpo: qat - Fix 64 bytes requests
-      crypto: algif_skcipher - removed unneeded code
-
-Tadeusz Struk (2):
-      crypto: qat - Move BAR definitions to device specific module
-      crypto: qat - fix problem with coalescing enable logic
-
-Tudor Ambarus (4):
-      crypto: caam - add support for gcm(aes)
-      crypto: caam - add support for rfc4106(gcm(aes))
-      crypto: caam - fix output sequence contiguity check
-      crypto: caam - add support for rfc4543(gcm(aes))
-
-Ulf Hansson (2):
-      crypto: ux500/cryp - Silence compiler warning for !CONFIG_PM
-      crypto: ux500/hash - Silence compiler warning for !CONFIG_PM
-
-Valentin Rothberg (1):
-      crypto: aesni - remove unnecessary #define
-
-Yazen Ghannam (1):
-      crypto: crc32 - Add ARM64 CRC32 hw accelerated module
-
- Documentation/DocBook/Makefile                     |    2 +-
- Documentation/DocBook/crypto-API.tmpl              | 1253 ++++++++++
- Documentation/crypto/crypto-API-userspace.txt      |  205 ++
- .../devicetree/bindings/crypto/fsl-imx-sahara.txt  |    2 +-
- .../devicetree/bindings/hwrng/atmel-trng.txt       |   16 +
- arch/arm/boot/dts/at91sam9g45.dtsi                 |    7 +
- arch/arm/crypto/aes_glue.c                         |    4 +-
- arch/arm/crypto/sha1_glue.c                        |    2 +-
- arch/arm/crypto/sha1_neon_glue.c                   |    2 +-
- arch/arm/crypto/sha512_neon_glue.c                 |    6 +-
- arch/arm64/crypto/Kconfig                          |    4 +
- arch/arm64/crypto/Makefile                         |    4 +
- arch/arm64/crypto/aes-ce-ccm-glue.c                |    2 +-
- arch/arm64/crypto/aes-glue.c                       |    8 +-
- arch/arm64/crypto/crc32-arm64.c                    |  274 +++
- arch/powerpc/crypto/sha1.c                         |    4 +-
- arch/s390/crypto/aes_s390.c                        |    2 +-
- arch/s390/crypto/des_s390.c                        |    4 +-
- arch/s390/crypto/ghash_s390.c                      |    2 +-
- arch/s390/crypto/sha1_s390.c                       |    2 +-
- arch/s390/crypto/sha256_s390.c                     |    4 +-
- arch/s390/crypto/sha512_s390.c                     |    4 +-
- arch/sparc/crypto/aes_glue.c                       |    2 +-
- arch/sparc/crypto/camellia_glue.c                  |    2 +-
- arch/sparc/crypto/crc32c_glue.c                    |    2 +-
- arch/sparc/crypto/des_glue.c                       |    2 +-
- arch/sparc/crypto/md5_glue.c                       |    2 +-
- arch/sparc/crypto/sha1_glue.c                      |    2 +-
- arch/sparc/crypto/sha256_glue.c                    |    6 +-
- arch/sparc/crypto/sha512_glue.c                    |    6 +-
- arch/x86/crypto/aes_glue.c                         |    4 +-
- arch/x86/crypto/aesni-intel_glue.c                 |   10 +-
- arch/x86/crypto/blowfish_glue.c                    |    4 +-
- arch/x86/crypto/camellia_aesni_avx2_glue.c         |    4 +-
- arch/x86/crypto/camellia_aesni_avx_glue.c          |    4 +-
- arch/x86/crypto/camellia_glue.c                    |    4 +-
- arch/x86/crypto/cast5_avx_glue.c                   |    2 +-
- arch/x86/crypto/cast6_avx_glue.c                   |    2 +-
- arch/x86/crypto/crc32-pclmul_glue.c                |    4 +-
- arch/x86/crypto/crc32c-intel_glue.c                |    4 +-
- arch/x86/crypto/crct10dif-pclmul_glue.c            |    4 +-
- arch/x86/crypto/des3_ede_glue.c                    |    8 +-
- arch/x86/crypto/fpu.c                              |    3 +
- arch/x86/crypto/ghash-clmulni-intel_glue.c         |    2 +-
- arch/x86/crypto/salsa20_glue.c                     |    4 +-
- arch/x86/crypto/serpent_avx2_glue.c                |    4 +-
- arch/x86/crypto/serpent_avx_glue.c                 |    2 +-
- arch/x86/crypto/serpent_sse2_glue.c                |    2 +-
- arch/x86/crypto/sha-mb/sha1_mb.c                   |    3 +-
- arch/x86/crypto/sha1_ssse3_glue.c                  |    2 +-
- arch/x86/crypto/sha256_ssse3_glue.c                |    6 +-
- arch/x86/crypto/sha512_ssse3_glue.c                |    6 +-
- arch/x86/crypto/twofish_avx_glue.c                 |    2 +-
- arch/x86/crypto/twofish_glue.c                     |    4 +-
- arch/x86/crypto/twofish_glue_3way.c                |    4 +-
- crypto/842.c                                       |    1 +
- crypto/aes_generic.c                               |    2 +-
- crypto/af_alg.c                                    |    6 +
- crypto/algapi.c                                    |    4 +-
- crypto/algif_hash.c                                |    4 +-
- crypto/algif_skcipher.c                            |   15 +-
- crypto/ansi_cprng.c                                |    2 +-
- crypto/anubis.c                                    |    1 +
- crypto/api.c                                       |    4 +-
- crypto/arc4.c                                      |    1 +
- crypto/authenc.c                                   |    1 +
- crypto/authencesn.c                                |    1 +
- crypto/blowfish_generic.c                          |    2 +-
- crypto/camellia_generic.c                          |    2 +-
- crypto/cast5_generic.c                             |    2 +-
- crypto/cast6_generic.c                             |    2 +-
- crypto/cbc.c                                       |    1 +
- crypto/ccm.c                                       |    5 +-
- crypto/chainiv.c                                   |    1 +
- crypto/cmac.c                                      |    1 +
- crypto/crc32.c                                     |    1 +
- crypto/crc32c_generic.c                            |    2 +-
- crypto/crct10dif_generic.c                         |    2 +-
- crypto/cryptd.c                                    |    1 +
- crypto/crypto_null.c                               |    6 +-
- crypto/crypto_user.c                               |    6 +-
- crypto/ctr.c                                       |    3 +-
- crypto/cts.c                                       |    1 +
- crypto/deflate.c                                   |    2 +-
- crypto/des_generic.c                               |    2 +-
- crypto/drbg.c                                      |  127 +-
- crypto/ecb.c                                       |    1 +
- crypto/eseqiv.c                                    |    1 +
- crypto/fcrypt.c                                    |    1 +
- crypto/gcm.c                                       |    7 +-
- crypto/ghash-generic.c                             |    2 +-
- crypto/hmac.c                                      |    1 +
- crypto/khazad.c                                    |    1 +
- crypto/krng.c                                      |    2 +-
- crypto/lrw.c                                       |    1 +
- crypto/lz4.c                                       |    1 +
- crypto/lz4hc.c                                     |    1 +
- crypto/lzo.c                                       |    1 +
- crypto/mcryptd.c                                   |    1 +
- crypto/md4.c                                       |    2 +-
- crypto/md5.c                                       |    1 +
- crypto/michael_mic.c                               |    1 +
- crypto/pcbc.c                                      |    1 +
- crypto/pcrypt.c                                    |    1 +
- crypto/rmd128.c                                    |    1 +
- crypto/rmd160.c                                    |    1 +
- crypto/rmd256.c                                    |    1 +
- crypto/rmd320.c                                    |    1 +
- crypto/salsa20_generic.c                           |    2 +-
- crypto/seed.c                                      |    1 +
- crypto/seqiv.c                                     |    1 +
- crypto/serpent_generic.c                           |    4 +-
- crypto/sha1_generic.c                              |    2 +-
- crypto/sha256_generic.c                            |    4 +-
- crypto/sha512_generic.c                            |    4 +-
- crypto/tcrypt.c                                    |   32 +-
- crypto/tea.c                                       |    4 +-
- crypto/testmgr.c                                   |    3 +-
- crypto/tgr192.c                                    |    4 +-
- crypto/twofish_generic.c                           |    2 +-
- crypto/vmac.c                                      |    1 +
- crypto/wp512.c                                     |    4 +-
- crypto/xcbc.c                                      |    1 +
- crypto/xts.c                                       |    1 +
- crypto/zlib.c                                      |    1 +
- drivers/char/hw_random/Kconfig                     |    2 +-
- drivers/char/hw_random/atmel-rng.c                 |   15 +-
- drivers/char/hw_random/core.c                      |   12 +-
- drivers/crypto/bfin_crc.c                          |    2 +-
- drivers/crypto/caam/caamalg.c                      | 2412 +++++++++++++++++---
- drivers/crypto/caam/compat.h                       |    1 +
- drivers/crypto/caam/desc_constr.h                  |    2 +
- drivers/crypto/caam/error.c                        |   25 +-
- drivers/crypto/caam/jr.c                           |    3 -
- drivers/crypto/nx/nx-aes-cbc.c                     |   12 +-
- drivers/crypto/nx/nx-aes-ccm.c                     |   61 +-
- drivers/crypto/nx/nx-aes-ctr.c                     |   13 +-
- drivers/crypto/nx/nx-aes-ecb.c                     |   12 +-
- drivers/crypto/nx/nx-aes-gcm.c                     |   66 +-
- drivers/crypto/nx/nx-aes-xcbc.c                    |   81 +-
- drivers/crypto/nx/nx-sha256.c                      |  208 +-
- drivers/crypto/nx/nx-sha512.c                      |  222 +-
- drivers/crypto/nx/nx.c                             |  127 +-
- drivers/crypto/nx/nx.h                             |    8 +-
- drivers/crypto/padlock-aes.c                       |    2 +-
- drivers/crypto/padlock-sha.c                       |    8 +-
- drivers/crypto/qat/qat_common/adf_accel_devices.h  |    2 -
- drivers/crypto/qat/qat_common/adf_aer.c            |    2 +-
- drivers/crypto/qat/qat_common/adf_ctl_drv.c        |    3 +-
- drivers/crypto/qat/qat_common/adf_dev_mgr.c        |    6 +-
- drivers/crypto/qat/qat_common/adf_transport.c      |   15 +-
- .../qat/qat_common/adf_transport_access_macros.h   |    9 +-
- drivers/crypto/qat/qat_common/qat_algs.c           |   37 +-
- drivers/crypto/qat/qat_common/qat_hal.c            |    3 +-
- .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |    2 +
- drivers/crypto/qat/qat_dh895xcc/adf_isr.c          |   12 +-
- drivers/crypto/sahara.c                            |  794 ++++++-
- drivers/crypto/ux500/cryp/cryp_core.c              |    6 +-
- drivers/crypto/ux500/hash/hash_core.c              |   10 +-
- drivers/s390/crypto/ap_bus.c                       |    3 +-
- include/crypto/hash.h                              |  492 ++++
- include/crypto/if_alg.h                            |    1 +
- include/crypto/rng.h                               |   80 +
- include/linux/crypto.h                             | 1112 ++++++++-
- include/net/sock.h                                 |    1 +
- include/uapi/linux/if_alg.h                        |    2 +
- net/core/sock.c                                    |   24 +-
- 167 files changed, 7090 insertions(+), 1068 deletions(-)
-
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
