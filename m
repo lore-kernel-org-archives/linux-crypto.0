@@ -1,49 +1,56 @@
-From: leroy christophe <christophe.leroy@c-s.fr>
-Subject: Re: algif_hash: splice of data > 2**16
-Date: Thu, 18 Dec 2014 13:22:20 +0100
-Message-ID: <5492C6FC.50005@c-s.fr>
-References: <8707521.TbV00HIEUx@tauon>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto <linux-crypto@vger.kernel.org>,
-	'LKML' <linux-kernel@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <8707521.TbV00HIEUx@tauon>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH resending] splice: sendfile() at once fails for big files
+Date: Thu, 18 Dec 2014 13:29:06 +0100 (CET)
+Message-ID: <20141218122906.6A11F1A5E0F@localhost.localdomain>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Alexander Viro <viro@zeniv.linux.org.uk>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from pegase1.c-s.fr ([93.17.236.30]:10116 "EHLO mailhub1.si.c-s.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751944AbaLRM3I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 18 Dec 2014 07:29:08 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Le 18/12/2014 13:15, Stephan Mueller a =E9crit :
-> Hi Herbert,
->
-> While testing the vmsplice/splice interface of algif_hash I was made
-> aware of the problem that data blobs larger than 16 pages do not seem=
- to
-> be hashed properly.
->
-> For testing, a file is mmap()ed and handed to vmsplice / splice. If t=
-he
-> file is smaller than 2**16, the interface returns the proper hash.
-> However, when the file is larger, only the first 2**16 bytes seem to =
-be
-> used.
->
-> When adding printk's to hash_sendpage, I see that this function is
-> invoked exactly 16 times where the first 15 invocations have the
-> MSG_MORE flag set and the last invocation does not have MSG_MORE.
->
->
-Hi Stephan,
+When big files (over 64kbytes) are sent with sendfile(), they are sent by blocks
+of 64kbytes. In that case, the target must be informed that the current block is
+not the last one, otherwise it might take wrong actions.
+The issue was observed while sending a file to an AF_ALG socket for hashing. The
+hash was reset at each 64k block.
+This patch adds SPLICE_F_MORE to the flags when more data is pending.
 
-I have already noticed the same issue and proposed a patch, but I never=
-=20
-got any feedback and it has never been merged, allthought I pinged it a=
-=20
-few times.
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
-See https://lkml.org/lkml/2014/4/18/276
-
-Christophe
+Index: b/fs/splice.c
+===================================================================
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -1171,7 +1171,7 @@
+ 	long ret, bytes;
+ 	umode_t i_mode;
+ 	size_t len;
+-	int i, flags;
++	int i, flags, more;
+ 
+ 	/*
+ 	 * We require the input being a regular file, as we don't want to
+@@ -1214,6 +1214,7 @@
+ 	 * Don't block on output, we have to drain the direct pipe.
+ 	 */
+ 	sd->flags &= ~SPLICE_F_NONBLOCK;
++	more = sd->flags & SPLICE_F_MORE;
+ 
+ 	while (len) {
+ 		size_t read_len;
+@@ -1226,6 +1227,10 @@
+ 		read_len = ret;
+ 		sd->total_len = read_len;
+ 
++		if (read_len < len)
++			sd->flags |= SPLICE_F_MORE;
++		else if (!more)
++			sd->flags &= ~SPLICE_F_MORE;
+ 		/*
+ 		 * NOTE: nonblocking mode only applies to the input. We
+ 		 * must not do the output in nonblocking mode as then we
