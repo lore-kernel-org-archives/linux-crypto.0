@@ -1,82 +1,61 @@
-From: James Yonan <james@openvpn.net>
-Subject: Re: [PATCH] crypto: aesni - disable "by8" AVX CTR optimization
-Date: Tue, 16 Dec 2014 14:49:51 -0700
-Message-ID: <5490A8FF.2040906@openvpn.net>
-References: <20140917112911.GA2129@gondor.apana.org.au>	<1411504267-10170-1-git-send-email-minipli@googlemail.com>	<54895B58.8030200@openvpn.net> <CA+rthh-WGeRFTd3-_p+6QQoFFXpyC71f1_-P0BW6p=v8h5K7pA@mail.gmail.com> <548F35D0.1020503@openvpn.net>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: algif_hash: splice of data > 2**16
+Date: Thu, 18 Dec 2014 13:15:28 +0100
+Message-ID: <8707521.TbV00HIEUx@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Romain Francoise <romain@orebokech.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Mathias Krause <minipli@googlemail.com>,
-	Chandramouli Narayanan <mouli@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.yonan.net ([54.244.116.145]:53702 "EHLO mail.yonan.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751076AbaLPVtx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Dec 2014 16:49:53 -0500
-In-Reply-To: <548F35D0.1020503@openvpn.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto <linux-crypto@vger.kernel.org>,
+	'LKML' <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 15/12/2014 12:26, James Yonan wrote:
-> Mathias,
->
->>> I'm seeing some anomalous results with the "by8" AVX CTR optimization in
->>> 3.18.
->>
->> the patch you're replying to actually *disabled* the "by8" variant for
->> v3.17 as it had another bug related to wrong counter handling in GCM.
->> The fix for that particular issue only made it to v3.18, so the code
->> got re-enabled only for v3.18. But it looks like that there's yet
->> another bug :/
->
-> Right, I should have clarified that I initially suspected the "by8"
-> variant was to blame because your patch that disables it resolves the
-> discrepancy.
->
->>> In particular, crypto_aead_encrypt appears to produce different
->>> ciphertext
->>> from the same plaintext depending on whether or not the optimization is
->>> enabled.
->>>
->>> See the attached patch to tcrypt that demonstrates the discrepancy.
->>
->> I can reproduce your observations, so I can confirm the difference,
->> when using the "by8" variant compared to other AES implementations.
->> When applying this very patch (commit 7da4b29d496b ("crypto: aesni -
->> disable "by8" AVX CTR optimization")) -- the patch that disables the
->> "by8" variant -- on top of v3.18 the discrepancies are gone. So the
->> behavior is bound to the "by8" optimization, only.
->
-> Right -- this is exactly what I'm seeing as well.
->
->> As it was Chandramouli, who contributed the code, maybe he has a clue
->> what's wrong here. Chandramouli?
->
-> A few more observations:
->
-> * Encryption produces bad ciphertext only when the size of plaintext
-> exceeds a certain threshold.  In test_aead_encrypt_consistency in the
-> tcrypt patch, I found that data_size must be >= 128 to produce bad
-> ciphertext.
->
-> * Encrypting then decrypting data always gets back to the original
-> plaintext, no matter what the size.
->
-> * The bad ciphertext from encryption is only evident when the same
-> encrypt operation is performed on a different AES implementation and the
-> ciphertexts are compared.
->
-> * When the encrypt operation produces bad ciphertext, the generated auth
-> tag is actually correct, so another AES implementation that decrypts the
-> ciphertext will end up with corrupted plaintext that succeeds
-> authentication.
+Hi Herbert,
 
-Another interesting observation:
+While testing the vmsplice/splice interface of algif_hash I was made 
+aware of the problem that data blobs larger than 16 pages do not seem to 
+be hashed properly.
 
-* bug only occurs when key size is 128 bits, not 192 or 256.
+For testing, a file is mmap()ed and handed to vmsplice / splice. If the 
+file is smaller than 2**16, the interface returns the proper hash. 
+However, when the file is larger, only the first 2**16 bytes seem to be 
+used.
 
-James
+When adding printk's to hash_sendpage, I see that this function is 
+invoked exactly 16 times where the first 15 invocations have the 
+MSG_MORE flag set and the last invocation does not have MSG_MORE.
+
+To invoke the vmsplice/splice interface, I use my current implementation 
+of libkcapi available at [1]. That library uses the following calls:
+
+vmsplice(handle->pipes[1], iov, iovlen, SPLICE_F_GIFT);
+splice(handle->pipes[0], NULL, handle->opfd, NULL, inlen, 0);
+read(handle->opfd, out, outlen);
+
+The return code of splice() is always 65536 irrespectively of the 
+following variations:
+
+- have one iovec pointing to the entire buffer of the mmap()ed file
+
+- have multiple iovecs with all pointing to at most 2**16 bytes
+
+- invoke splice/read multiple times with at most 2**16 bytes
+
+My guess of the problem is that the maximum buffer size for the pipe is 
+16 pages. These 16 pages are filled with the repeated invocation of 
+hash_sendpage.
+
+Is there a specific way of how the splice interface is to be called so 
+that the pages are released? Or is there a need to change hash_sendpage 
+such that after the af_alg_wait_for_completion call, some form of 
+"releasing/putting" of the used page needs to be added?
+
+Note, hashing the large mmap()ed file with one iovec using the sendmsg() 
+interface works flawlessly.
+
+[1] http://www.chronox.de/libkcapi.html
+
+Thanks
+Stephan
