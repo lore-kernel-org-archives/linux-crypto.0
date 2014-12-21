@@ -1,7 +1,7 @@
 From: Aaro Koskinen <aaro.koskinen@iki.fi>
-Subject: [PATCH 3/5] MIPS: OCTEON: reintroduce crypto features check
-Date: Sun, 21 Dec 2014 22:54:00 +0200
-Message-ID: <1419195242-546-4-git-send-email-aaro.koskinen@iki.fi>
+Subject: [PATCH 4/5] MIPS: OCTEON: crypto: add MD5 module
+Date: Sun, 21 Dec 2014 22:54:01 +0200
+Message-ID: <1419195242-546-5-git-send-email-aaro.koskinen@iki.fi>
 References: <1419195242-546-1-git-send-email-aaro.koskinen@iki.fi>
 Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -15,74 +15,260 @@ In-Reply-To: <1419195242-546-1-git-send-email-aaro.koskinen@iki.fi>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Reintroduce run-time check for crypto features. The old one was deleted
-because it was unreliable, now decide the crypto availability on early
-boot when the model string is constructed.
+Add OCTEON MD5 module.
 
 Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
 ---
- arch/mips/cavium-octeon/executive/octeon-model.c |  6 ++++++
- arch/mips/include/asm/octeon/octeon-feature.h    | 17 +++++++++++++++--
- 2 files changed, 21 insertions(+), 2 deletions(-)
+ arch/mips/cavium-octeon/crypto/Makefile        |   2 +
+ arch/mips/cavium-octeon/crypto/octeon-crypto.h |   2 +
+ arch/mips/cavium-octeon/crypto/octeon-md5.c    | 216 +++++++++++++++++++++++++
+ 3 files changed, 220 insertions(+)
+ create mode 100644 arch/mips/cavium-octeon/crypto/octeon-md5.c
 
-diff --git a/arch/mips/cavium-octeon/executive/octeon-model.c b/arch/mips/cavium-octeon/executive/octeon-model.c
-index e15b049..b2104bd 100644
---- a/arch/mips/cavium-octeon/executive/octeon-model.c
-+++ b/arch/mips/cavium-octeon/executive/octeon-model.c
-@@ -27,6 +27,9 @@
+diff --git a/arch/mips/cavium-octeon/crypto/Makefile b/arch/mips/cavium-octeon/crypto/Makefile
+index 739b803..a74f76d 100644
+--- a/arch/mips/cavium-octeon/crypto/Makefile
++++ b/arch/mips/cavium-octeon/crypto/Makefile
+@@ -3,3 +3,5 @@
+ #
  
- #include <asm/octeon/octeon.h>
- 
-+enum octeon_feature_bits __octeon_feature_bits __read_mostly;
-+EXPORT_SYMBOL_GPL(__octeon_feature_bits);
+ obj-y += octeon-crypto.o
 +
- /**
-  * Read a byte of fuse data
-  * @byte_addr:	 address to read
-@@ -103,6 +106,9 @@ static const char *__init octeon_model_get_string_buffer(uint32_t chip_id,
- 	else
- 		suffix = "NSP";
++obj-$(CONFIG_CRYPTO_MD5_OCTEON) += octeon-md5.o
+diff --git a/arch/mips/cavium-octeon/crypto/octeon-crypto.h b/arch/mips/cavium-octeon/crypto/octeon-crypto.h
+index 3f65bc6..e2a4aec 100644
+--- a/arch/mips/cavium-octeon/crypto/octeon-crypto.h
++++ b/arch/mips/cavium-octeon/crypto/octeon-crypto.h
+@@ -14,6 +14,8 @@
+ #include <linux/sched.h>
+ #include <asm/mipsregs.h>
  
-+	if (!fus_dat2.s.nocrypto)
-+		__octeon_feature_bits |= OCTEON_HAS_CRYPTO;
++#define OCTEON_CR_OPCODE_PRIORITY 300
 +
- 	/*
- 	 * Assume pass number is encoded using <5:3><2:0>. Exceptions
- 	 * will be fixed later.
-diff --git a/arch/mips/include/asm/octeon/octeon-feature.h b/arch/mips/include/asm/octeon/octeon-feature.h
-index c4fe81f..8ebd3f57 100644
---- a/arch/mips/include/asm/octeon/octeon-feature.h
-+++ b/arch/mips/include/asm/octeon/octeon-feature.h
-@@ -46,8 +46,6 @@ enum octeon_feature {
- 	OCTEON_FEATURE_SAAD,
- 	/* Does this Octeon support the ZIP offload engine? */
- 	OCTEON_FEATURE_ZIP,
--	/* Does this Octeon support crypto acceleration using COP2? */
--	OCTEON_FEATURE_CRYPTO,
- 	OCTEON_FEATURE_DORM_CRYPTO,
- 	/* Does this Octeon support PCI express? */
- 	OCTEON_FEATURE_PCIE,
-@@ -86,6 +84,21 @@ enum octeon_feature {
- 	OCTEON_MAX_FEATURE
- };
- 
-+enum octeon_feature_bits {
-+	OCTEON_HAS_CRYPTO = 0x0001,	/* Crypto acceleration using COP2 */
-+};
-+extern enum octeon_feature_bits __octeon_feature_bits;
-+
-+/**
-+ * octeon_has_crypto() - Check if this OCTEON has crypto acceleration support.
+ extern unsigned long octeon_crypto_enable(struct octeon_cop2_state *state);
+ extern void octeon_crypto_disable(struct octeon_cop2_state *state,
+ 				  unsigned long flags);
+diff --git a/arch/mips/cavium-octeon/crypto/octeon-md5.c b/arch/mips/cavium-octeon/crypto/octeon-md5.c
+new file mode 100644
+index 0000000..b909881
+--- /dev/null
++++ b/arch/mips/cavium-octeon/crypto/octeon-md5.c
+@@ -0,0 +1,216 @@
++/*
++ * Cryptographic API.
 + *
-+ * Returns: Non-zero if the feature exists. Zero if the feature does not exist.
++ * MD5 Message Digest Algorithm (RFC1321).
++ *
++ * Adapted for OCTEON by Aaro Koskinen <aaro.koskinen@iki.fi>.
++ *
++ * Based on crypto/md5.c, which is:
++ *
++ * Derived from cryptoapi implementation, originally based on the
++ * public domain implementation written by Colin Plumb in 1993.
++ *
++ * Copyright (c) Cryptoapi developers.
++ * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
 + */
-+static inline int octeon_has_crypto(void)
++
++#include <crypto/md5.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/string.h>
++#include <asm/byteorder.h>
++#include <linux/cryptohash.h>
++#include <asm/octeon/octeon.h>
++#include <crypto/internal/hash.h>
++
++#include "octeon-crypto.h"
++
++/*
++ * We pass everything as 64-bit. OCTEON can handle misaligned data.
++ */
++
++static void octeon_md5_store_hash(struct md5_state *ctx)
 +{
-+	return __octeon_feature_bits & OCTEON_HAS_CRYPTO;
++	u64 *hash = (u64 *)ctx->hash;
++
++	write_octeon_64bit_hash_dword(hash[0], 0);
++	write_octeon_64bit_hash_dword(hash[1], 1);
 +}
 +
- /**
-  * Determine if the current Octeon supports a specific feature. These
-  * checks have been optimized to be fairly quick, but they should still
++static void octeon_md5_read_hash(struct md5_state *ctx)
++{
++	u64 *hash = (u64 *)ctx->hash;
++
++	hash[0] = read_octeon_64bit_hash_dword(0);
++	hash[1] = read_octeon_64bit_hash_dword(1);
++}
++
++static void octeon_md5_transform(const void *_block)
++{
++	const u64 *block = _block;
++
++	write_octeon_64bit_block_dword(block[0], 0);
++	write_octeon_64bit_block_dword(block[1], 1);
++	write_octeon_64bit_block_dword(block[2], 2);
++	write_octeon_64bit_block_dword(block[3], 3);
++	write_octeon_64bit_block_dword(block[4], 4);
++	write_octeon_64bit_block_dword(block[5], 5);
++	write_octeon_64bit_block_dword(block[6], 6);
++	octeon_md5_start(block[7]);
++}
++
++static int octeon_md5_init(struct shash_desc *desc)
++{
++	struct md5_state *mctx = shash_desc_ctx(desc);
++
++	mctx->hash[0] = cpu_to_le32(0x67452301);
++	mctx->hash[1] = cpu_to_le32(0xefcdab89);
++	mctx->hash[2] = cpu_to_le32(0x98badcfe);
++	mctx->hash[3] = cpu_to_le32(0x10325476);
++	mctx->byte_count = 0;
++
++	return 0;
++}
++
++static int octeon_md5_update(struct shash_desc *desc, const u8 *data,
++			     unsigned int len)
++{
++	struct md5_state *mctx = shash_desc_ctx(desc);
++	const u32 avail = sizeof(mctx->block) - (mctx->byte_count & 0x3f);
++	struct octeon_cop2_state state;
++	unsigned long flags;
++
++	mctx->byte_count += len;
++
++	if (avail > len) {
++		memcpy((char *)mctx->block + (sizeof(mctx->block) - avail),
++		       data, len);
++		return 0;
++	}
++
++	memcpy((char *)mctx->block + (sizeof(mctx->block) - avail), data,
++	       avail);
++
++	local_bh_disable();
++	preempt_disable();
++	flags = octeon_crypto_enable(&state);
++	octeon_md5_store_hash(mctx);
++
++	octeon_md5_transform(mctx->block);
++	data += avail;
++	len -= avail;
++
++	while (len >= sizeof(mctx->block)) {
++		octeon_md5_transform(data);
++		data += sizeof(mctx->block);
++		len -= sizeof(mctx->block);
++	}
++
++	octeon_md5_read_hash(mctx);
++	octeon_crypto_disable(&state, flags);
++	preempt_enable();
++	local_bh_enable();
++
++	memcpy(mctx->block, data, len);
++
++	return 0;
++}
++
++static int octeon_md5_final(struct shash_desc *desc, u8 *out)
++{
++	struct md5_state *mctx = shash_desc_ctx(desc);
++	const unsigned int offset = mctx->byte_count & 0x3f;
++	char *p = (char *)mctx->block + offset;
++	int padding = 56 - (offset + 1);
++	struct octeon_cop2_state state;
++	unsigned long flags;
++
++	*p++ = 0x80;
++
++	local_bh_disable();
++	preempt_disable();
++	flags = octeon_crypto_enable(&state);
++	octeon_md5_store_hash(mctx);
++
++	if (padding < 0) {
++		memset(p, 0x00, padding + sizeof(u64));
++		octeon_md5_transform(mctx->block);
++		p = (char *)mctx->block;
++		padding = 56;
++	}
++
++	memset(p, 0, padding);
++	mctx->block[14] = cpu_to_le32(mctx->byte_count << 3);
++	mctx->block[15] = cpu_to_le32(mctx->byte_count >> 29);
++	octeon_md5_transform(mctx->block);
++
++	octeon_md5_read_hash(mctx);
++	octeon_crypto_disable(&state, flags);
++	preempt_enable();
++	local_bh_enable();
++
++	memcpy(out, mctx->hash, sizeof(mctx->hash));
++	memset(mctx, 0, sizeof(*mctx));
++
++	return 0;
++}
++
++static int octeon_md5_export(struct shash_desc *desc, void *out)
++{
++	struct md5_state *ctx = shash_desc_ctx(desc);
++
++	memcpy(out, ctx, sizeof(*ctx));
++	return 0;
++}
++
++static int octeon_md5_import(struct shash_desc *desc, const void *in)
++{
++	struct md5_state *ctx = shash_desc_ctx(desc);
++
++	memcpy(ctx, in, sizeof(*ctx));
++	return 0;
++}
++
++static struct shash_alg alg = {
++	.digestsize	=	MD5_DIGEST_SIZE,
++	.init		=	octeon_md5_init,
++	.update		=	octeon_md5_update,
++	.final		=	octeon_md5_final,
++	.export		=	octeon_md5_export,
++	.import		=	octeon_md5_import,
++	.descsize	=	sizeof(struct md5_state),
++	.statesize	=	sizeof(struct md5_state),
++	.base		=	{
++		.cra_name	=	"md5",
++		.cra_driver_name=	"octeon-md5",
++		.cra_priority	=	OCTEON_CR_OPCODE_PRIORITY,
++		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=	MD5_HMAC_BLOCK_SIZE,
++		.cra_module	=	THIS_MODULE,
++	}
++};
++
++static int __init md5_mod_init(void)
++{
++	if (!octeon_has_crypto())
++		return -ENOTSUPP;
++	return crypto_register_shash(&alg);
++}
++
++static void __exit md5_mod_fini(void)
++{
++	crypto_unregister_shash(&alg);
++}
++
++module_init(md5_mod_init);
++module_exit(md5_mod_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("MD5 Message Digest Algorithm (OCTEON)");
++MODULE_AUTHOR("Aaro Koskinen <aaro.koskinen@iki.fi>");
 -- 
 2.2.0
