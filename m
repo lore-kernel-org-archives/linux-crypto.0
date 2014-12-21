@@ -1,7 +1,7 @@
 From: Aaro Koskinen <aaro.koskinen@iki.fi>
-Subject: [PATCH 2/5] MIPS: OCTEON: crypto: add instruction definitions for MD5
-Date: Sun, 21 Dec 2014 22:53:59 +0200
-Message-ID: <1419195242-546-3-git-send-email-aaro.koskinen@iki.fi>
+Subject: [PATCH 3/5] MIPS: OCTEON: reintroduce crypto features check
+Date: Sun, 21 Dec 2014 22:54:00 +0200
+Message-ID: <1419195242-546-4-git-send-email-aaro.koskinen@iki.fi>
 References: <1419195242-546-1-git-send-email-aaro.koskinen@iki.fi>
 Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -15,88 +15,74 @@ In-Reply-To: <1419195242-546-1-git-send-email-aaro.koskinen@iki.fi>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add instruction definitions for MD5. Based on information extracted
-from EdgeRouter Pro GPL source tarball.
+Reintroduce run-time check for crypto features. The old one was deleted
+because it was unreliable, now decide the crypto availability on early
+boot when the model string is constructed.
 
 Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
 ---
- arch/mips/cavium-octeon/crypto/octeon-crypto.h | 56 ++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ arch/mips/cavium-octeon/executive/octeon-model.c |  6 ++++++
+ arch/mips/include/asm/octeon/octeon-feature.h    | 17 +++++++++++++++--
+ 2 files changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/arch/mips/cavium-octeon/crypto/octeon-crypto.h b/arch/mips/cavium-octeon/crypto/octeon-crypto.h
-index 5ca86d4..3f65bc6 100644
---- a/arch/mips/cavium-octeon/crypto/octeon-crypto.h
-+++ b/arch/mips/cavium-octeon/crypto/octeon-crypto.h
-@@ -4,14 +4,70 @@
-  * for more details.
-  *
-  * Copyright (C) 2012-2013 Cavium Inc., All Rights Reserved.
+diff --git a/arch/mips/cavium-octeon/executive/octeon-model.c b/arch/mips/cavium-octeon/executive/octeon-model.c
+index e15b049..b2104bd 100644
+--- a/arch/mips/cavium-octeon/executive/octeon-model.c
++++ b/arch/mips/cavium-octeon/executive/octeon-model.c
+@@ -27,6 +27,9 @@
+ 
+ #include <asm/octeon/octeon.h>
+ 
++enum octeon_feature_bits __octeon_feature_bits __read_mostly;
++EXPORT_SYMBOL_GPL(__octeon_feature_bits);
++
+ /**
+  * Read a byte of fuse data
+  * @byte_addr:	 address to read
+@@ -103,6 +106,9 @@ static const char *__init octeon_model_get_string_buffer(uint32_t chip_id,
+ 	else
+ 		suffix = "NSP";
+ 
++	if (!fus_dat2.s.nocrypto)
++		__octeon_feature_bits |= OCTEON_HAS_CRYPTO;
++
+ 	/*
+ 	 * Assume pass number is encoded using <5:3><2:0>. Exceptions
+ 	 * will be fixed later.
+diff --git a/arch/mips/include/asm/octeon/octeon-feature.h b/arch/mips/include/asm/octeon/octeon-feature.h
+index c4fe81f..8ebd3f57 100644
+--- a/arch/mips/include/asm/octeon/octeon-feature.h
++++ b/arch/mips/include/asm/octeon/octeon-feature.h
+@@ -46,8 +46,6 @@ enum octeon_feature {
+ 	OCTEON_FEATURE_SAAD,
+ 	/* Does this Octeon support the ZIP offload engine? */
+ 	OCTEON_FEATURE_ZIP,
+-	/* Does this Octeon support crypto acceleration using COP2? */
+-	OCTEON_FEATURE_CRYPTO,
+ 	OCTEON_FEATURE_DORM_CRYPTO,
+ 	/* Does this Octeon support PCI express? */
+ 	OCTEON_FEATURE_PCIE,
+@@ -86,6 +84,21 @@ enum octeon_feature {
+ 	OCTEON_MAX_FEATURE
+ };
+ 
++enum octeon_feature_bits {
++	OCTEON_HAS_CRYPTO = 0x0001,	/* Crypto acceleration using COP2 */
++};
++extern enum octeon_feature_bits __octeon_feature_bits;
++
++/**
++ * octeon_has_crypto() - Check if this OCTEON has crypto acceleration support.
 + *
-+ * MD5 instruction definitions added by Aaro Koskinen <aaro.koskinen@iki.fi>.
-+ *
-  */
- #ifndef __LINUX_OCTEON_CRYPTO_H
- #define __LINUX_OCTEON_CRYPTO_H
- 
- #include <linux/sched.h>
-+#include <asm/mipsregs.h>
- 
- extern unsigned long octeon_crypto_enable(struct octeon_cop2_state *state);
- extern void octeon_crypto_disable(struct octeon_cop2_state *state,
- 				  unsigned long flags);
- 
-+/*
-+ * Macros needed to implement MD5:
++ * Returns: Non-zero if the feature exists. Zero if the feature does not exist.
 + */
++static inline int octeon_has_crypto(void)
++{
++	return __octeon_feature_bits & OCTEON_HAS_CRYPTO;
++}
 +
-+/*
-+ * The index can be 0-1.
-+ */
-+#define write_octeon_64bit_hash_dword(value, index)	\
-+do {							\
-+	__asm__ __volatile__ (				\
-+	"dmtc2 %[rt],0x0048+" STR(index)		\
-+	:						\
-+	: [rt] "d" (value));				\
-+} while (0)
-+
-+/*
-+ * The index can be 0-1.
-+ */
-+#define read_octeon_64bit_hash_dword(index)		\
-+({							\
-+	u64 __value;					\
-+							\
-+	__asm__ __volatile__ (				\
-+	"dmfc2 %[rt],0x0048+" STR(index)		\
-+	: [rt] "=d" (__value)				\
-+	: );						\
-+							\
-+	__value;					\
-+})
-+
-+/*
-+ * The index can be 0-6.
-+ */
-+#define write_octeon_64bit_block_dword(value, index)	\
-+do {							\
-+	__asm__ __volatile__ (				\
-+	"dmtc2 %[rt],0x0040+" STR(index)		\
-+	:						\
-+	: [rt] "d" (value));				\
-+} while (0)
-+
-+/*
-+ * The value is the final block dword (64-bit).
-+ */
-+#define octeon_md5_start(value)				\
-+do {							\
-+	__asm__ __volatile__ (				\
-+	"dmtc2 %[rt],0x4047"				\
-+	:						\
-+	: [rt] "d" (value));				\
-+} while (0)
-+
- #endif /* __LINUX_OCTEON_CRYPTO_H */
+ /**
+  * Determine if the current Octeon supports a specific feature. These
+  * checks have been optimized to be fairly quick, but they should still
 -- 
 2.2.0
