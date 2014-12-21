@@ -1,70 +1,80 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: algif_hash: splice of data > 2**16
-Date: Sat, 20 Dec 2014 07:37:55 +0100
-Message-ID: <3364866.GGZiChayfE@tachyon.chronox.de>
-References: <8707521.TbV00HIEUx@tauon> <5492C6FC.50005@c-s.fr>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto <linux-crypto@vger.kernel.org>,
-	'LKML' <linux-kernel@vger.kernel.org>
-To: leroy christophe <christophe.leroy@c-s.fr>
+From: Aaro Koskinen <aaro.koskinen@iki.fi>
+Subject: [PATCH 0/5] MIPS/crypto: MD5 for OCTEON
+Date: Sun, 21 Dec 2014 22:53:57 +0200
+Message-ID: <1419195242-546-1-git-send-email-aaro.koskinen@iki.fi>
+Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Ralf Baechle <ralf@linux-mips.org>,
+	David Daney <david.daney@cavium.com>,
+	linux-crypto@vger.kernel.org, linux-mips@linux-mips.org,
+	linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:55092 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751192AbaLTGiB convert rfc822-to-8bit (ORCPT
+Received: from filtteri2.pp.htv.fi ([213.243.153.185]:59523 "EHLO
+	filtteri2.pp.htv.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752043AbaLUUyQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 20 Dec 2014 01:38:01 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <SD189> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sat, 20 Dec 2014 07:37:56 +0100
-In-Reply-To: <5492C6FC.50005@c-s.fr>
+	Sun, 21 Dec 2014 15:54:16 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 18. Dezember 2014, 13:22:20 schrieb leroy christophe:
+Hi,
 
-Hi Christophe,
+This adds accelerated MD5 cryptoapi module for OCTEON.
 
-> Le 18/12/2014 13:15, Stephan Mueller a =E9crit :
-> > Hi Herbert,
-> >=20
-> > While testing the vmsplice/splice interface of algif_hash I was mad=
-e
-> > aware of the problem that data blobs larger than 16 pages do not se=
-em to
-> > be hashed properly.
-> >=20
-> > For testing, a file is mmap()ed and handed to vmsplice / splice. If=
- the
-> > file is smaller than 2**16, the interface returns the proper hash.
-> > However, when the file is larger, only the first 2**16 bytes seem t=
-o be
-> > used.
-> >=20
-> > When adding printk's to hash_sendpage, I see that this function is
-> > invoked exactly 16 times where the first 15 invocations have the
-> > MSG_MORE flag set and the last invocation does not have MSG_MORE.
->=20
-> Hi Stephan,
->=20
-> I have already noticed the same issue and proposed a patch, but I nev=
-er
-> got any feedback and it has never been merged, allthought I pinged it=
- a
-> few times.
->=20
-> See https://lkml.org/lkml/2014/4/18/276
+Tested with 3.19-rc1 on EdgeRouter Lite (OCTEON+) and EdgeRouter Pro
+(OCTEON2) by running selftest, tcrypt and also by sending TCP MD5SIG
+traffic between OCTEON <-> X86 box.
 
-After testing, this patch does not work for me. The operation still sto=
-ps=20
-after 16 pages.
->=20
-> Christophe
+Below figures show the improvement on ER Lite compared to md5-generic
+(calculated from output of tcrypt mode=402).
 
+test  0 (   16 byte blocks,   16 bytes per update,   1 updates): 1.20x faster
+test  1 (   64 byte blocks,   16 bytes per update,   4 updates): 1.17x faster
+test  2 (   64 byte blocks,   64 bytes per update,   1 updates): 1.30x faster
+test  3 (  256 byte blocks,   16 bytes per update,  16 updates): 1.14x faster
+test  4 (  256 byte blocks,   64 bytes per update,   4 updates): 1.29x faster
+test  5 (  256 byte blocks,  256 bytes per update,   1 updates): 1.84x faster
+test  6 ( 1024 byte blocks,   16 bytes per update,  64 updates): 1.13x faster
+test  7 ( 1024 byte blocks,  256 bytes per update,   4 updates): 2.01x faster
+test  8 ( 1024 byte blocks, 1024 bytes per update,   1 updates): 2.49x faster
+test  9 ( 2048 byte blocks,   16 bytes per update, 128 updates): 1.13x faster
+test 10 ( 2048 byte blocks,  256 bytes per update,   8 updates): 2.05x faster
+test 11 ( 2048 byte blocks, 1024 bytes per update,   2 updates): 2.57x faster
+test 12 ( 2048 byte blocks, 2048 bytes per update,   1 updates): 2.71x faster
+test 13 ( 4096 byte blocks,   16 bytes per update, 256 updates): 1.15x faster
+test 14 ( 4096 byte blocks,  256 bytes per update,  16 updates): 2.08x faster
+test 15 ( 4096 byte blocks, 1024 bytes per update,   4 updates): 2.63x faster
+test 16 ( 4096 byte blocks, 4096 bytes per update,   1 updates): 2.83x faster
+test 17 ( 8192 byte blocks,   16 bytes per update, 512 updates): 1.13x faster
+test 18 ( 8192 byte blocks,  256 bytes per update,  32 updates): 2.09x faster
+test 19 ( 8192 byte blocks, 1024 bytes per update,   8 updates): 2.66x faster
+test 20 ( 8192 byte blocks, 4096 bytes per update,   2 updates): 2.87x faster
+test 21 ( 8192 byte blocks, 8192 bytes per update,   1 updates): 2.87x faster
 
---=20
-Ciao
-Stephan
+A.
+
+Aaro Koskinen (5):
+  MIPS: OCTEON: add crypto helper functions
+  MIPS: OCTEON: crypto: add instruction definitions for MD5
+  MIPS: OCTEON: reintroduce crypto features check
+  MIPS: OCTEON: crypto: add MD5 module
+  crypto: enable OCTEON MD5 module selection
+
+ arch/mips/cavium-octeon/Makefile                 |   1 +
+ arch/mips/cavium-octeon/crypto/Makefile          |   7 +
+ arch/mips/cavium-octeon/crypto/octeon-crypto.c   |  66 +++++++
+ arch/mips/cavium-octeon/crypto/octeon-crypto.h   |  75 ++++++++
+ arch/mips/cavium-octeon/crypto/octeon-md5.c      | 216 +++++++++++++++++++++++
+ arch/mips/cavium-octeon/executive/octeon-model.c |   6 +
+ arch/mips/include/asm/octeon/octeon-feature.h    |  17 +-
+ arch/mips/include/asm/octeon/octeon.h            |   5 -
+ crypto/Kconfig                                   |   9 +
+ 9 files changed, 395 insertions(+), 7 deletions(-)
+ create mode 100644 arch/mips/cavium-octeon/crypto/Makefile
+ create mode 100644 arch/mips/cavium-octeon/crypto/octeon-crypto.c
+ create mode 100644 arch/mips/cavium-octeon/crypto/octeon-crypto.h
+ create mode 100644 arch/mips/cavium-octeon/crypto/octeon-md5.c
+
+-- 
+2.2.0
