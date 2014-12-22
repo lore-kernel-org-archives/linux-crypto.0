@@ -1,41 +1,48 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v5 5/8] crypto: AF_ALG: add user space interface for RNG
-Date: Mon, 22 Dec 2014 22:27:30 +1100
-Message-ID: <20141222112730.GB19532@gondor.apana.org.au>
-References: <56740432.V2v4gLHrzS@tachyon.chronox.de>
- <3380968.kTQNpvjKFa@tachyon.chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: af_alg: fix backlog handling
+Date: Mon, 22 Dec 2014 22:55:29 +1100
+Message-ID: <20141222115529.GC19532@gondor.apana.org.au>
+References: <1418992568-1275-1-git-send-email-rabin.vincent@axis.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Rabin Vincent <rabinv@axis.com>
+To: Rabin Vincent <rabin.vincent@axis.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:44923 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754457AbaLVLzg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 22 Dec 2014 06:55:36 -0500
 Content-Disposition: inline
-In-Reply-To: <3380968.kTQNpvjKFa-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1418992568-1275-1-git-send-email-rabin.vincent@axis.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Dec 07, 2014 at 11:23:48PM +0100, Stephan Mueller wrote:
-> Allow user space to seed / reset the RNG via a setsockopt.
+On Fri, Dec 19, 2014 at 01:36:08PM +0100, Rabin Vincent wrote:
+> If a request is backlogged, it's complete() handler will get called
+> twice: once with -EINPROGRESS, and once with the final error code.
 > 
-> This patch reuses alg_setkey to copy data into the kernel. The
-> alg_setkey is now used for two mechanisms: setkey and seeding.
-> The function is extended by the providing the function pointer
-> to the function handling the copied data.
+> af_alg's complete handler, unlike other users, does not handle the
+> -EINPROGRESS but instead always completes the completion that recvmsg()
+> is waiting on.  This can lead to a return to user space while the
+> request is still pending in the driver.  If userspace closes the sockets
+> before the requests are handled by the driver, this will lead to
+> use-after-frees (and potential crashes) in the kernel due to the tfm
+> having been freed.
 > 
-> As the alg_setkey is now usable for more than just setkey, it is renamed
-> to alg_setop.
+> The crashes can be easily reproduced (for example) by reducing the max
+> queue length in cryptod.c and running the following (from
+> http://www.chronox.de/libkcapi.html) on AES-NI capable hardware:
+> 
+>  $ while true; do kcapi -x 1 -e -c '__ecb-aes-aesni' \
+>     -k 00000000000000000000000000000000 \
+>     -p 00000000000000000000000000000000 >/dev/null & done
+> 
+> Signed-off-by: Rabin Vincent <rabin.vincent@axis.com>
 
-Just call it setkey, there is no harm in treating the seed as a key
-is there?
-
-In fact we should have done this from the very start.
-crypto_rng_reset should be renamed crypto_rng_setkey.
-
-Cheers,
+Patch applied to crypto.  Thanks!
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
