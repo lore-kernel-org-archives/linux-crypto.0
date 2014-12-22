@@ -1,54 +1,53 @@
-From: Aaro Koskinen <aaro.koskinen@iki.fi>
-Subject: [PATCH 5/5] crypto: enable OCTEON MD5 module selection
-Date: Sun, 21 Dec 2014 22:54:02 +0200
-Message-ID: <1419195242-546-6-git-send-email-aaro.koskinen@iki.fi>
-References: <1419195242-546-1-git-send-email-aaro.koskinen@iki.fi>
-Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        David Daney <david.daney@cavium.com>,
-        linux-crypto@vger.kernel.org, linux-mips@linux-mips.org,
-        linux-kernel@vger.kernel.org
-Return-path: <linux-mips-bounce@linux-mips.org>
-In-Reply-To: <1419195242-546-1-git-send-email-aaro.koskinen@iki.fi>
-Sender: linux-mips-bounce@linux-mips.org
-Errors-to: linux-mips-bounce@linux-mips.org
-List-help: <mailto:ecartis@linux-mips.org?Subject=help>
-List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
-List-software: Ecartis version 1.0.0
-List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
-List-owner: <mailto:ralf@linux-mips.org>
-List-post: <mailto:linux-mips@linux-mips.org>
-List-archive: <http://www.linux-mips.org/archives/linux-mips/>
-List-Id: linux-crypto.vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v5 3/8] crypto: AF_ALG: add AEAD support
+Date: Mon, 22 Dec 2014 22:23:41 +1100
+Message-ID: <20141222112341.GA19532@gondor.apana.org.au>
+References: <56740432.V2v4gLHrzS@tachyon.chronox.de>
+ <3151022.sz5v21Vqeg@tachyon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Daniel Borkmann <dborkman@redhat.com>,
+	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	'LKML' <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:45055 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751173AbaLVLXw (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 22 Dec 2014 06:23:52 -0500
+Content-Disposition: inline
+In-Reply-To: <3151022.sz5v21Vqeg@tachyon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Enable user to select OCTEON MD5 module.
+On Sun, Dec 07, 2014 at 11:22:30PM +0100, Stephan Mueller wrote:
+>
+> +static inline bool aead_sufficient_data(struct aead_ctx *ctx)
+> +{
+> +	unsigned as = crypto_aead_authsize(crypto_aead_reqtfm(&ctx->aead_req));
+> +
+> +	return (ctx->used >= (ctx->aead_assoclen + ctx->enc ? : as ));
 
-Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
----
- crypto/Kconfig | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Is this supposed to be
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 87bbc9c..1618468 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -427,6 +427,15 @@ config CRYPTO_MD5
- 	help
- 	  MD5 message digest algorithm (RFC1321).
- 
-+config CRYPTO_MD5_OCTEON
-+	tristate "MD5 digest algorithm (OCTEON)"
-+	depends on CPU_CAVIUM_OCTEON
-+	select CRYPTO_MD5
-+	select CRYPTO_HASH
-+	help
-+	  MD5 message digest algorithm (RFC1321) implemented
-+	  using OCTEON crypto instructions, when available.
-+
- config CRYPTO_MD5_SPARC64
- 	tristate "MD5 digest algorithm (SPARC64)"
- 	depends on SPARC64
+	return (ctx->used >= (ctx->aead_assoclen + (ctx->enc ?: as)));
+
+> +static int aead_recvmsg(struct kiocb *unused, struct socket *sock,
+> +			    struct msghdr *msg, size_t ignored, int flags)
+> +{
+
+...
+
+> +	err = -ENOMEM;
+> +	if (!aead_sufficient_data(ctx))
+> +		goto unlock;
+
+You should just block if there is insufficient input.
+
+Cheers,
 -- 
-2.2.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
