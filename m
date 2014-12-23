@@ -1,80 +1,61 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 2/5] hwrng: core - Fix current_rng init/cleanup race yet again
-Date: Tue, 23 Dec 2014 16:40:18 +1100
-Message-ID: <E1Y3ICg-0007cq-Kj@gondolin.me.apana.org.au>
-References: <20141223053909.GA28001@gondor.apana.org.au>
-To: Fengguang Wu <fengguang.wu@intel.com>,
-	Rusty Russell <rusty@rustcorp.com.au>, LKP <lkp@01.org>,
-	linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Amos Kong <akong@redhat.com>, m@bues.ch, mpm@selenic.com,
-	amit.shah@redhat.com
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v5 3/8] crypto: AF_ALG: add AEAD support
+Date: Tue, 23 Dec 2014 09:14:43 +0100
+Message-ID: <101382546.xjTjAHLGAb@tachyon.chronox.de>
+References: <56740432.V2v4gLHrzS@tachyon.chronox.de> <3151022.sz5v21Vqeg@tachyon.chronox.de> <20141222112341.GA19532@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Daniel Borkmann <dborkman@redhat.com>,
+	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	'LKML' <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20141222112341.GA19532@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The kref solution is still buggy because we were only focusing
-on the register/unregister race.  The same race affects the
-setting of current_rng through sysfs.
+Am Montag, 22. Dezember 2014, 22:23:41 schrieb Herbert Xu:
 
-This patch fixes it by using kref_get_unless_zero.
+Hi Herbert,
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+> On Sun, Dec 07, 2014 at 11:22:30PM +0100, Stephan Mueller wrote:
+> > +static inline bool aead_sufficient_data(struct aead_ctx *ctx)
+> > +{
+> > +	unsigned as = crypto_aead_authsize(crypto_aead_reqtfm(&ctx-
+>aead_req));
+> > +
+> > +	return (ctx->used >= (ctx->aead_assoclen + ctx->enc ? : as ));
+> 
+> Is this supposed to be
+> 
+> 	return (ctx->used >= (ctx->aead_assoclen + (ctx->enc ?: as)));
 
- drivers/char/hw_random/core.c |   14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+Thanks, will be fixed in the next iteration
+> 
+> > +static int aead_recvmsg(struct kiocb *unused, struct socket *sock,
+> > +			    struct msghdr *msg, size_t ignored, int flags)
+> > +{
+> 
+> ...
+> 
+> > +	err = -ENOMEM;
+> > +	if (!aead_sufficient_data(ctx))
+> > +		goto unlock;
+> 
+> You should just block if there is insufficient input.
+> 
+I do not concur here due to the following:
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 3dba2cf..42827fd 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -105,7 +105,6 @@ static inline void cleanup_rng(struct kref *kref)
- static void set_current_rng(struct hwrng *rng)
- {
- 	BUG_ON(!mutex_is_locked(&rng_mutex));
--	kref_get(&rng->ref);
- 	current_rng = rng;
- }
- 
-@@ -150,6 +149,9 @@ static void put_rng(struct hwrng *rng)
- 
- static inline int hwrng_init(struct hwrng *rng)
- {
-+	if (kref_get_unless_zero(&rng->ref))
-+		goto skip_init;
-+
- 	if (rng->init) {
- 		int ret;
- 
-@@ -157,6 +159,11 @@ static inline int hwrng_init(struct hwrng *rng)
- 		if (ret)
- 			return ret;
- 	}
-+
-+	kref_init(&rng->ref);
-+	reinit_completion(&rng->cleanup_done);
-+
-+skip_init:
- 	add_early_randomness(rng);
- 
- 	current_quality = rng->quality ? : default_quality;
-@@ -467,6 +474,9 @@ int hwrng_register(struct hwrng *rng)
- 			goto out_unlock;
- 	}
- 
-+	init_completion(&rng->cleanup_done);
-+	complete(&rng->cleanup_done);
-+
- 	old_rng = current_rng;
- 	err = 0;
- 	if (!old_rng) {
-@@ -494,8 +504,6 @@ int hwrng_register(struct hwrng *rng)
- 		add_early_randomness(rng);
- 	}
- 
--	init_completion(&rng->cleanup_done);
--
- out_unlock:
- 	mutex_unlock(&rng_mutex);
- out:
+- the check aead_readable() immediately before this check implements the 
+blocking if we do not have sufficient data *and* more data is to be expected
+
+- this very check for aead_sufficient_data() comes into play if the caller 
+does not have more data (i.e. ctx->more is zero). In this case, more data is 
+not to be expected and we cannot wait as this would be a deadlock in user 
+space.
+
+-- 
+Ciao
+Stephan
