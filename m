@@ -1,48 +1,43 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v5 5/8] crypto: AF_ALG: add user space interface for RNG
-Date: Tue, 23 Dec 2014 09:27:40 +0100
-Message-ID: <1708286.gWpYI6yUk0@tachyon.chronox.de>
-References: <56740432.V2v4gLHrzS@tachyon.chronox.de> <3380968.kTQNpvjKFa@tachyon.chronox.de> <20141222112730.GB19532@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] crypto: AF_ALG: zeroize key data
+Date: Tue, 23 Dec 2014 09:34:03 +0100
+Message-ID: <4092638.L73RGXcGnC@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20141222112730.GB19532-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: 'LKML' <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:51006 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755104AbaLWIeH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Dec 2014 03:34:07 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <SD610> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Tue, 23 Dec 2014 09:34:04 +0100
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 22. Dezember 2014, 22:27:30 schrieb Herbert Xu:
+alg_setkey should zeroize the sensitive data after use.
 
-Hi Herbert,
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/af_alg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> On Sun, Dec 07, 2014 at 11:23:48PM +0100, Stephan Mueller wrote:
-> > Allow user space to seed / reset the RNG via a setsockopt.
-> > 
-> > This patch reuses alg_setkey to copy data into the kernel. The
-> > alg_setkey is now used for two mechanisms: setkey and seeding.
-> > The function is extended by the providing the function pointer
-> > to the function handling the copied data.
-> > 
-> > As the alg_setkey is now usable for more than just setkey, it is renamed
-> > to alg_setop.
-> 
-> Just call it setkey, there is no harm in treating the seed as a key
-> is there?
-> 
-> In fact we should have done this from the very start.
-> crypto_rng_reset should be renamed crypto_rng_setkey.
-
-Ok, that means I will drop this patch entirely and wire up the reseeding 
-function in algif_rng.c with setkey.
-> 
-> Cheers,
-
-
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index a8ff3c4..76d739d 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -188,7 +188,7 @@ static int alg_setkey(struct sock *sk, char __user *ukey,
+ 	err = type->setkey(ask->private, key, keylen);
+ 
+ out:
+-	sock_kfree_s(sk, key, keylen);
++	sock_kzfree_s(sk, key, keylen);
+ 
+ 	return err;
+ }
 -- 
-Ciao
-Stephan
+2.1.0
