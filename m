@@ -1,43 +1,41 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: AF_ALG: zeroize key data
-Date: Tue, 23 Dec 2014 09:34:03 +0100
-Message-ID: <4092638.L73RGXcGnC@tachyon.chronox.de>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v5 3/8] crypto: AF_ALG: add AEAD support
+Date: Tue, 23 Dec 2014 22:56:26 +1100
+Message-ID: <20141223115626.GA31450@gondor.apana.org.au>
+References: <56740432.V2v4gLHrzS@tachyon.chronox.de>
+ <3151022.sz5v21Vqeg@tachyon.chronox.de>
+ <20141222112341.GA19532@gondor.apana.org.au>
+ <101382546.xjTjAHLGAb@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: 'LKML' <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: 'Herbert Xu' <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:51006 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755104AbaLWIeH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Dec 2014 03:34:07 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <SD610> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Tue, 23 Dec 2014 09:34:04 +0100
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <101382546.xjTjAHLGAb-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-alg_setkey should zeroize the sensitive data after use.
+On Tue, Dec 23, 2014 at 09:14:43AM +0100, Stephan Mueller wrote:
+>
+> - the check aead_readable() immediately before this check implements the 
+> blocking if we do not have sufficient data *and* more data is to be expected
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/af_alg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Good point.
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index a8ff3c4..76d739d 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -188,7 +188,7 @@ static int alg_setkey(struct sock *sk, char __user *ukey,
- 	err = type->setkey(ask->private, key, keylen);
- 
- out:
--	sock_kfree_s(sk, key, keylen);
-+	sock_kzfree_s(sk, key, keylen);
- 
- 	return err;
- }
+In fact AEAD is rather awkward because you need to do everything
+in one go.  Perhaps we could adapt our kernel interface to allow
+partial AEAD operations?
+
+I want to be very careful before we pin down our user-space
+interface since that's something that we cannot easily change
+while the kernel interface can be modified at any time.
+
+Thanks,
 -- 
-2.1.0
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
