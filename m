@@ -1,31 +1,39 @@
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Using separate initcall level for crypto subsystem
-Date: Mon, 22 Dec 2014 10:46:47 -0800
-Message-ID: <EB9C4333-B282-4D94-9713-C986F1B7E931@holtmann.org>
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [0/5] hwrng: Fix kref warning and underlying bugs
+Date: Tue, 23 Dec 2014 16:39:09 +1100
+Message-ID: <20141223053909.GA28001@gondor.apana.org.au>
+References: <20141223030956.GA26839@wfg-t540p.sh.intel.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-crypto@vger.kernel.org
+Cc: Rusty Russell <rusty@rustcorp.com.au>, LKP <lkp@01.org>,
+	linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Amos Kong <akong@redhat.com>, m@bues.ch, mpm@selenic.com,
+	amit.shah@redhat.com
+To: Fengguang Wu <fengguang.wu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:59985 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754322AbaLVSqz convert rfc822-to-8bit (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:56646 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751276AbaLWFj0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 22 Dec 2014 13:46:55 -0500
+	Tue, 23 Dec 2014 00:39:26 -0500
+Content-Disposition: inline
+In-Reply-To: <20141223030956.GA26839@wfg-t540p.sh.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+On Mon, Dec 22, 2014 at 07:09:56PM -0800, Fengguang Wu wrote:
+> Greetings,
+> 
+> 0day kernel testing robot got the below dmesg and the first bad commit is
 
-we wanted to add some crypto selftests to the Bluetooth subsystem that checks our usage of the crypto handling we use for Bluetooth Low Energy Legacy Pairing and Secure Connections.
+Sigh, looks like more work is needed on this.
 
-Since the Crypto subsystem and Bluetooth subsystem both use subsys_initcall that goes horrible wrong when running it built-in. So I wonder if it would make sense to introduce a crypto_initcall that comes before the subsys_initcall.
+Here is a series of patches that should fix this along with the
+underlying issue exposed by it and some other related problems.
 
-Any thoughts on this?
-
-Regards
-
-Marcel
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
