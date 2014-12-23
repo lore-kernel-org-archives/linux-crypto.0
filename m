@@ -1,102 +1,65 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v5 3/8] crypto: AF_ALG: add AEAD support
-Date: Tue, 23 Dec 2014 15:52:27 +0100
-Message-ID: <4537021.IXSvIIgcH4@tachyon.chronox.de>
-References: <56740432.V2v4gLHrzS@tachyon.chronox.de> <101382546.xjTjAHLGAb@tachyon.chronox.de> <20141223115626.GA31450@gondor.apana.org.au>
+From: leroy christophe <christophe.leroy@c-s.fr>
+Subject: Re: algif_hash: splice of data > 2**16
+Date: Tue, 23 Dec 2014 18:16:01 +0100
+Message-ID: <5499A351.2010300@c-s.fr>
+References: <8707521.TbV00HIEUx@tauon> <5492C6FC.50005@c-s.fr> <3364866.GGZiChayfE@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20141223115626.GA31450-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
-
-Am Dienstag, 23. Dezember 2014, 22:56:26 schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Tue, Dec 23, 2014 at 09:14:43AM +0100, Stephan Mueller wrote:
-> > - the check aead_readable() immediately before this check implements the
-> > blocking if we do not have sufficient data *and* more data is to be
-> > expected
-> Good point.
-> 
-> In fact AEAD is rather awkward because you need to do everything
-> in one go.  Perhaps we could adapt our kernel interface to allow
-> partial AEAD operations?
+Content-Type: text/plain; charset=windows-1252;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	'LKML' <linux-kernel@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from pegase1.c-s.fr ([93.17.236.30]:31698 "EHLO mailhub1.si.c-s.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751369AbaLWRQL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Dec 2014 12:16:11 -0500
+In-Reply-To: <3364866.GGZiChayfE@tachyon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 
-I am not sure what you are referring to. The invocation does not need to be in 
-one go. You can have arbitrary number of sendmsg calls. But all input data 
-needs to be supplied before you call recvmsg.
+Le 20/12/2014 07:37, Stephan Mueller a =E9crit :
+> Am Donnerstag, 18. Dezember 2014, 13:22:20 schrieb leroy christophe:
+>
+> Hi Christophe,
+>
+>> Le 18/12/2014 13:15, Stephan Mueller a =E9crit :
+>>> Hi Herbert,
+>>>
+>>> While testing the vmsplice/splice interface of algif_hash I was mad=
+e
+>>> aware of the problem that data blobs larger than 16 pages do not se=
+em to
+>>> be hashed properly.
+>>>
+>>> For testing, a file is mmap()ed and handed to vmsplice / splice. If=
+ the
+>>> file is smaller than 2**16, the interface returns the proper hash.
+>>> However, when the file is larger, only the first 2**16 bytes seem t=
+o be
+>>> used.
+>>>
+>>> When adding printk's to hash_sendpage, I see that this function is
+>>> invoked exactly 16 times where the first 15 invocations have the
+>>> MSG_MORE flag set and the last invocation does not have MSG_MORE.
+>> Hi Stephan,
+>>
+>> I have already noticed the same issue and proposed a patch, but I ne=
+ver
+>> got any feedback and it has never been merged, allthought I pinged i=
+t a
+>> few times.
+>>
+>> See https://lkml.org/lkml/2014/4/18/276
+> After testing, this patch does not work for me. The operation still s=
+tops
+> after 16 pages.
+Yes, it looks like the function I fixed is exclusively used by=20
+sendfile() system call.
+So there is probably the same kind of fix to be done in another functio=
+n.
 
-Please see my test code that implements the following call sequence using the 
-libkcapi wrapper API calls where I dissect the data to be sent to the kernel 
-for testing purposes:
-
-if (cavs_test->enc) {
-                /* send assoc with init call */
-                ret = kcapi_aead_stream_init_enc(&handle, &iov, 1);
-                if (0 > ret) {
-                        printf("Initialization of cipher buffer failed\n");
-                        goto out;
-                }
-                /* send plaintext with last call */
-                iov.iov_base = cavs_test->pt;
-                iov.iov_len = cavs_test->ptlen;
-                ret = kcapi_aead_stream_update_last(&handle, &iov, 1);
-                if (0 > ret) {
-                        printf("Sending last update buffer failed\n");
-                        goto out;
-                }
-                ret = kcapi_aead_stream_op(&handle, &outiov, 1);
-        } else {
-                /* send assoc with init call */
-                ret = kcapi_aead_stream_init_dec(&handle, &iov, 1);
-                if (0 > ret) {
-                        printf("Initialization of cipher buffer failed\n");
-                        goto out;
-                }
-                /* send plaintext with intermediary call */
-                iov.iov_base = cavs_test->ct;
-                iov.iov_len = cavs_test->ctlen;
-                ret = kcapi_aead_stream_update(&handle, &iov, 1);
-                if (0 > ret) {
-                        printf("Sending update buffer failed\n");
-                        goto out;
-                }
-                /* send tag with last send call */
-                iov.iov_base = cavs_test->tag;
-                iov.iov_len = cavs_test->taglen;
-                ret = kcapi_aead_stream_update_last(&handle, &iov, 1);
-                if (0 > ret) {
-                        printf("Sending last update buffer failed\n");
-                        goto out;
-                }
-                ret = kcapi_aead_stream_op(&handle, &outiov, 1);
-        }
-
-Every call to kcapi_aead_stream_init_dec / kcapi_aead_stream_update / 
-kcapi_aead_stream_update_last invokes one sendmsg syscall.
-
-In essence, kcapi_aead_stream_update can be invoked with every byte you want 
-to add to the message stream. This "stream" API of libkcapi is logially 
-equivalent to the init/update/final of message digests.
-> 
-> I want to be very careful before we pin down our user-space
-> interface since that's something that we cannot easily change
-> while the kernel interface can be modified at any time.
-
-I am fully with you and try to patiently present solutions.
-> 
-> Thanks,
-
-
--- 
-Ciao
-Stephan
+Christophe
