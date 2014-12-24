@@ -1,65 +1,98 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v5 3/8] crypto: AF_ALG: add AEAD support
-Date: Wed, 24 Dec 2014 09:54:33 +0100
-Message-ID: <2159528.zCJB0y2Cap@tachyon.chronox.de>
-References: <56740432.V2v4gLHrzS@tachyon.chronox.de> <4537021.IXSvIIgcH4@tachyon.chronox.de> <20141223202401.GA2474@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: algif_hash: splice of data > 2**16
+Date: Wed, 24 Dec 2014 10:03:13 +0100
+Message-ID: <11733044.fQnf94a6to@tachyon.chronox.de>
+References: <8707521.TbV00HIEUx@tauon> <3364866.GGZiChayfE@tachyon.chronox.de> <5499A351.2010300@c-s.fr>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20141223202401.GA2474-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	'LKML' <linux-kernel@vger.kernel.org>
+To: leroy christophe <christophe.leroy@c-s.fr>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:51025 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751336AbaLXJDQ convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 24 Dec 2014 04:03:16 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <SD827> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Wed, 24 Dec 2014 10:03:13 +0100
+In-Reply-To: <5499A351.2010300@c-s.fr>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 24. Dezember 2014, 07:24:01 schrieb Herbert Xu:
+Am Dienstag, 23. Dezember 2014, 18:16:01 schrieb leroy christophe:
 
-Hi Herbert,
+Hi leroy,
 
-> On Tue, Dec 23, 2014 at 03:52:27PM +0100, Stephan Mueller wrote:
-> > Am Dienstag, 23. Dezember 2014, 22:56:26 schrieb Herbert Xu:
-> > > In fact AEAD is rather awkward because you need to do everything
-> > > in one go.  Perhaps we could adapt our kernel interface to allow
-> > > partial AEAD operations?
-> > 
-> > I am not sure what you are referring to. The invocation does not need to
-> > be in one go. You can have arbitrary number of sendmsg calls. But all
-> > input data needs to be supplied before you call recvmsg.
-> 
-> What I mean is that unlike skcipher we cannot precede until we
-> have the complete input.  So you cannot begin recvmsg until all
-> input has been sent.
+> Le 20/12/2014 07:37, Stephan Mueller a =E9crit :
+> > Am Donnerstag, 18. Dezember 2014, 13:22:20 schrieb leroy christophe=
+:
+> >=20
+> > Hi Christophe,
+> >=20
+> >> Le 18/12/2014 13:15, Stephan Mueller a =E9crit :
+> >>> Hi Herbert,
+> >>>=20
+> >>> While testing the vmsplice/splice interface of algif_hash I was m=
+ade
+> >>> aware of the problem that data blobs larger than 16 pages do not =
+seem to
+> >>> be hashed properly.
+> >>>=20
+> >>> For testing, a file is mmap()ed and handed to vmsplice / splice. =
+If the
+> >>> file is smaller than 2**16, the interface returns the proper hash=
+=2E
+> >>> However, when the file is larger, only the first 2**16 bytes seem=
+ to be
+> >>> used.
+> >>>=20
+> >>> When adding printk's to hash_sendpage, I see that this function i=
+s
+> >>> invoked exactly 16 times where the first 15 invocations have the
+> >>> MSG_MORE flag set and the last invocation does not have MSG_MORE.
+> >>=20
+> >> Hi Stephan,
+> >>=20
+> >> I have already noticed the same issue and proposed a patch, but I =
+never
+> >> got any feedback and it has never been merged, allthought I pinged=
+ it a
+> >> few times.
+> >>=20
+> >> See https://lkml.org/lkml/2014/4/18/276
+> >=20
+> > After testing, this patch does not work for me. The operation still=
+ stops
+> > after 16 pages.
+>=20
+> Yes, it looks like the function I fixed is exclusively used by
+> sendfile() system call.
+> So there is probably the same kind of fix to be done in another funct=
+ion.
 
-That is right, but isn't that the nature of AEAD ciphers in general? Even if 
-you are in the kernel, you need to have all scatter lists together for one 
-invocation of the AEAD cipher.
+I do not believe that is the case. IMHO the blocking issue is found in =
+the=20
+following code:
 
-In case of a threaded application, the recvmsg does not start until all data 
-is in, marked with the missing MSG_MORE -- see aead_readable.
+splice_from_pipe_feed walks the pipe->nrbufs. And vmsplice_to_pipe defi=
+nes the=20
+maximum number of nrbufs as PIPE_DEF_BUFFERS -- which is 16. As subsequ=
+ent=20
+functions allocate memory based on PIPE_DEF_BUFFERS, there is no trivia=
+l way=20
+to increase the number of pages to be processed.
 
-All we can do is allow the user to use multiple system calls to collect all 
-data before the AEAD operation takes place.
+Thus I see that the vmsplice/splice combo can at most operate on a chun=
+k of 16=20
+pages. Thus, you have to segment your input buffer into chunks of that =
+size=20
+and invoke the vmsplice/splice syscalls for each segment.
 
-Or do you see another way on how to invoke the AEAD operation in a different 
-manner?
-
-The only item that I see that could be made better is the output side: 
-currently the code allows only one and exactly one iovec to point to the 
-output buffer. I would like to allow multiple iovec buffers that are filled 
-with the output of one invocation of the AEAD operation. However, to avoid 
-making a kernel-internal scratch buffer, I would need to somehow link the 
-kernel-internal scatter lists with the iovec buffers. That only works when 
-walking the iovec lists first and call af_alg_make_sg with every iovec entry 
-and create the kernel-internal scatterlist representation. That is followed by 
-the AEAD operation on the scatterlist.
-
-If we agree on walking the iovec list first, then the question arises how many 
-iovec list entries we allow at max. Is 16 entries a sensible value?
-
--- 
+--=20
 Ciao
 Stephan
