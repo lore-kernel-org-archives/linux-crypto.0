@@ -1,75 +1,40 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Subject: Re: [PATCH v5 3/8] crypto: AF_ALG: add AEAD support
-Date: Thu, 25 Dec 2014 09:59:41 +0100
-Message-ID: <4303878.9KB6gYbbHH@tachyon.chronox.de>
-References: <56740432.V2v4gLHrzS@tachyon.chronox.de> <20141223202401.GA2474@gondor.apana.org.au> <2159528.zCJB0y2Cap@tachyon.chronox.de>
+Date: Fri, 26 Dec 2014 07:28:31 +1100
+Message-ID: <20141225202830.GA18794@gondor.apana.org.au>
+References: <56740432.V2v4gLHrzS@tachyon.chronox.de>
+ <4537021.IXSvIIgcH4@tachyon.chronox.de>
+ <20141223202401.GA2474@gondor.apana.org.au>
+ <2159528.zCJB0y2Cap@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
 	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
 Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
 In-Reply-To: <2159528.zCJB0y2Cap-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
 Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 24. Dezember 2014, 09:54:33 schrieb Stephan Mueller:
-
-Hi Stephan,
-
-> Am Mittwoch, 24. Dezember 2014, 07:24:01 schrieb Herbert Xu:
+On Wed, Dec 24, 2014 at 09:54:33AM +0100, Stephan Mueller wrote:
 > 
-> Hi Herbert,
-> 
-> > On Tue, Dec 23, 2014 at 03:52:27PM +0100, Stephan Mueller wrote:
-> > > Am Dienstag, 23. Dezember 2014, 22:56:26 schrieb Herbert Xu:
-> > > > In fact AEAD is rather awkward because you need to do everything
-> > > > in one go.  Perhaps we could adapt our kernel interface to allow
-> > > > partial AEAD operations?
-> > > 
-> > > I am not sure what you are referring to. The invocation does not need to
-> > > be in one go. You can have arbitrary number of sendmsg calls. But all
-> > > input data needs to be supplied before you call recvmsg.
-> > 
-> > What I mean is that unlike skcipher we cannot precede until we
-> > have the complete input.  So you cannot begin recvmsg until all
-> > input has been sent.
-> 
-> That is right, but isn't that the nature of AEAD ciphers in general? Even if
-> you are in the kernel, you need to have all scatter lists together for one
+> That is right, but isn't that the nature of AEAD ciphers in general? Even if 
+> you are in the kernel, you need to have all scatter lists together for one 
 > invocation of the AEAD cipher.
-> 
-> In case of a threaded application, the recvmsg does not start until all data
-> is in, marked with the missing MSG_MORE -- see aead_readable.
-> 
-> All we can do is allow the user to use multiple system calls to collect all
-> data before the AEAD operation takes place.
-> 
-> Or do you see another way on how to invoke the AEAD operation in a different
-> manner?
-> 
-> The only item that I see that could be made better is the output side:
-> currently the code allows only one and exactly one iovec to point to the
-> output buffer. I would like to allow multiple iovec buffers that are filled
-> with the output of one invocation of the AEAD operation. However, to avoid
-> making a kernel-internal scratch buffer, I would need to somehow link the
-> kernel-internal scatter lists with the iovec buffers. That only works when
-> walking the iovec lists first and call af_alg_make_sg with every iovec entry
-> and create the kernel-internal scatterlist representation. That is followed
-> by the AEAD operation on the scatterlist.
-> 
-> If we agree on walking the iovec list first, then the question arises how
-> many iovec list entries we allow at max. Is 16 entries a sensible value?
 
-I would be now ready with a new release of the AEAD and RNG interface patches 
-against the current code base (including the iov_iter update). Though, I would 
-like to get your answer regarding your concerns.
+It's actually only the nature of certain algorithms like CCM which
+requires the total length to start the operation.  Most AEAD
+algorithms can be implemented in a way that allows piecemeal
+operation.  However, as the only users of AEAD is IPsec, it's
+probably not worth adding more complexity for now.
 
-Thanks.
+So let's proceed with your current solution.
 
+Thanks,
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
