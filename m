@@ -1,40 +1,61 @@
-From: Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Using separate initcall level for crypto subsystem
-Date: Mon, 29 Dec 2014 21:03:00 -0800
-Message-ID: <8E00673E-2A44-4DE4-8709-CBDADB6ADFB8@holtmann.org>
-References: <EB9C4333-B282-4D94-9713-C986F1B7E931@holtmann.org> <20141223211716.GB3051@gondor.apana.org.au>
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Johan Hedberg <johan.hedberg@gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v6 1/4] crypto: AF_ALG: add AEAD support
+Date: Tue, 30 Dec 2014 22:03:33 +0100
+Message-ID: <2836726.omC5yx5ZyR@tachyon.chronox.de>
+References: <5682082.ffPqvQlSqN@tachyon.chronox.de> <29582980.qoHS2EjmLy@tachyon.chronox.de> <20141229173340.GA15790@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Daniel Borkmann <dborkman@redhat.com>,
+	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	'LKML' <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:45735 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751459AbaL3FDG convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Dec 2014 00:03:06 -0500
-In-Reply-To: <20141223211716.GB3051@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:51094 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751373AbaL3VDx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 30 Dec 2014 16:03:53 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <SDE24> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Tue, 30 Dec 2014 22:03:33 +0100
+In-Reply-To: <20141229173340.GA15790@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Am Dienstag, 30. Dezember 2014, 04:33:41 schrieb Herbert Xu:
+
 Hi Herbert,
 
->> we wanted to add some crypto selftests to the Bluetooth subsystem that checks our usage of the crypto handling we use for Bluetooth Low Energy Legacy Pairing and Secure Connections.
->> 
->> Since the Crypto subsystem and Bluetooth subsystem both use subsys_initcall that goes horrible wrong when running it built-in. So I wonder if it would make sense to introduce a crypto_initcall that comes before the subsys_initcall.
->> 
->> Any thoughts on this?
 > 
-> If it's just for self-tests would it be possible for them to be
-> done after system boot-up?
+> > > PS we should add a length check for missing/partial auth tags
+> > > to crypto_aead_decrypt.  We can then remove such checks from
+> > > individual implementations.
+> > 
+> > I agree in full here. Shall I create such a patch together with the AEAD
+> > AF_ALG interface, or can we merge the AEAD without that patch now and
+> > create a separate patch later?
+> 
+> We should at least add a check in crypto_aead_decrypt first so as
+> to guarantee nothing slips through.
 
-we can easily run them later on. However when the Bluetooth subsystem is built as module, then I would prefer to have the module loading fail in case one of the selftest fails. I can hack around this with a lot of ifdef config magic. If we would have all crypto, cipher etc. modules as crypto_initcall, then I would have to add nothing extra on my side. It would reduce the ifdef config magic on our side a lot.
+I have prepared a patch for this which I will release shortly. IMHO that patch 
+should not have any significant performance penalty. I will also remove the 
+respective check from the algif_aead implementation.
 
-My personal take is that the crypto subsystem has become such a basic feature that it might make sense to ensure that all pieces (including ciphers) are loaded before we initialize any other subsystem.
+In addition, I would suggest to add a similar check for the encryption 
+operation to verify that the ciphertext buffer is at least as large as the 
+blocks needed for plaintext plus the memory needed for the auth tag (note, my 
+first attempts working with AEAD lead to days of debugging of kernel crashers 
+as I did not understand I had too little memory allocated for the ciphertext 
+buffer). However, such check needs to traverse all plaintext scatterlist 
+entries which may have a noticeable performance hit.
 
-Regards
+Do you see the need for such check? If yes, do you see a way to avoid 
+traversing all plaintext scatterlist entries?
 
-Marcel
+Thanks
+-- 
+Ciao
+Stephan
