@@ -1,51 +1,51 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v6 1/4] crypto: AF_ALG: add AEAD support
-Date: Tue, 30 Dec 2014 04:33:41 +1100
-Message-ID: <20141229173340.GA15790@gondor.apana.org.au>
-References: <5682082.ffPqvQlSqN@tachyon.chronox.de>
- <5002301.TQO37u96dE@tachyon.chronox.de>
- <20141229103319.GB13334@gondor.apana.org.au>
- <29582980.qoHS2EjmLy@tachyon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <29582980.qoHS2EjmLy-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Vinson Lee <vlee@twopensource.com>
+Subject: [PATCH] crypto: sha-mb - Add avx2_supported check.
+Date: Mon, 29 Dec 2014 16:20:39 -0800
+Message-ID: <1419898842-9447-1-git-send-email-vlee@twopensource.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, Vinson Lee <vlee@twitter.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Dec 29, 2014 at 04:05:40PM +0100, Stephan Mueller wrote:
->
-> This would mean that the check must stay in recvmsg as only here we know that 
-> the caller wants data to be processed.
+From: Vinson Lee <vlee@twitter.com>
 
-On the send side you would do the check when MSG_MORE is unset.
-On the receive side you should stop waiting only when ctx->more
-is false and the send-side check succeeded.
+This patch fixes this allyesconfig target build error with older
+binutils.
 
-Perhaps rename ctx->more to ctx->done and then you can use it
-to indicate to the receive side that we're ready and have valid
-data for it.  The receive side can then simply wait for ctx->done
-to become true.
+  LD      arch/x86/crypto/built-in.o
+ld: arch/x86/crypto/sha-mb/built-in.o: No such file: No such file or directory
 
-> > PS we should add a length check for missing/partial auth tags
-> > to crypto_aead_decrypt.  We can then remove such checks from
-> > individual implementations.
-> 
-> I agree in full here. Shall I create such a patch together with the AEAD 
-> AF_ALG interface, or can we merge the AEAD without that patch now and create a 
-> separate patch later?
+Cc: stable@vger.kernel.org # 3.18+
+Signed-off-by: Vinson Lee <vlee@twitter.com>
+---
+ arch/x86/crypto/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-We should at least add a check in crypto_aead_decrypt first so as
-to guarantee nothing slips through.
-
-Thanks,
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index fd0f848..5a4a089 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -26,7 +26,6 @@ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
+ 
+ obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
+ obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
+-obj-$(CONFIG_CRYPTO_SHA1_MB) += sha-mb/
+ obj-$(CONFIG_CRYPTO_CRC32_PCLMUL) += crc32-pclmul.o
+ obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
+ obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha512-ssse3.o
+@@ -46,6 +45,7 @@ endif
+ ifeq ($(avx2_supported),yes)
+ 	obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64) += camellia-aesni-avx2.o
+ 	obj-$(CONFIG_CRYPTO_SERPENT_AVX2_X86_64) += serpent-avx2.o
++	obj-$(CONFIG_CRYPTO_SHA1_MB) += sha-mb/
+ endif
+ 
+ aes-i586-y := aes-i586-asm_32.o aes_glue.o
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.1
