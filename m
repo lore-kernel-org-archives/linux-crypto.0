@@ -1,61 +1,74 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v6 1/4] crypto: AF_ALG: add AEAD support
-Date: Tue, 30 Dec 2014 22:03:33 +0100
-Message-ID: <2836726.omC5yx5ZyR@tachyon.chronox.de>
-References: <5682082.ffPqvQlSqN@tachyon.chronox.de> <29582980.qoHS2EjmLy@tachyon.chronox.de> <20141229173340.GA15790@gondor.apana.org.au>
+Subject: [PATCH] crypto: AEAD: add check for presence of auth tag
+Date: Tue, 30 Dec 2014 22:16:03 +0100
+Message-ID: <15957213.Wu7Np8vQse@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman@redhat.com>,
-	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
-	'LKML' <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: 'LKML' <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:51094 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:51098 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751373AbaL3VDx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Dec 2014 16:03:53 -0500
+	id S1751321AbaL3VQJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 30 Dec 2014 16:16:09 -0500
 Received: from tachyon.chronox.de
 	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <SDE24> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Tue, 30 Dec 2014 22:03:33 +0100
-In-Reply-To: <20141229173340.GA15790@gondor.apana.org.au>
+	id <SDE2A> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Tue, 30 Dec 2014 22:16:04 +0100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 30. Dezember 2014, 04:33:41 schrieb Herbert Xu:
+The AEAD decryption operation requires the authentication tag to be
+present as part of the cipher text buffer. The added check verifies that
+the caller provides a cipher text buffer with at least the
+authentication tag.
 
-Hi Herbert,
+As the cipher text is provided as a scatterlist, loop through the
+scatterlist until we know we have sufficient cipher text bytes to invoke
+the AEAD decryption operation.
 
-> 
-> > > PS we should add a length check for missing/partial auth tags
-> > > to crypto_aead_decrypt.  We can then remove such checks from
-> > > individual implementations.
-> > 
-> > I agree in full here. Shall I create such a patch together with the AEAD
-> > AF_ALG interface, or can we merge the AEAD without that patch now and
-> > create a separate patch later?
-> 
-> We should at least add a check in crypto_aead_decrypt first so as
-> to guarantee nothing slips through.
+As the authentication tag is typically smaller or equal to one block of
+the cipher (except for authenc operations), it is expected that the
+while loop iterating through the scatterlist is traversed not more than
+once. Thus, the speed penalty should be marginal.
 
-I have prepared a patch for this which I will release shortly. IMHO that patch 
-should not have any significant performance penalty. I will also remove the 
-respective check from the algif_aead implementation.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ include/linux/crypto.h | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-In addition, I would suggest to add a similar check for the encryption 
-operation to verify that the ciphertext buffer is at least as large as the 
-blocks needed for plaintext plus the memory needed for the auth tag (note, my 
-first attempts working with AEAD lead to days of debugging of kernel crashers 
-as I did not understand I had too little memory allocated for the ciphertext 
-buffer). However, such check needs to traverse all plaintext scatterlist 
-entries which may have a noticeable performance hit.
-
-Do you see the need for such check? If yes, do you see a way to avoid 
-traversing all plaintext scatterlist entries?
-
-Thanks
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 9c8776d..badc53b 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -24,6 +24,7 @@
+ #include <linux/slab.h>
+ #include <linux/string.h>
+ #include <linux/uaccess.h>
++#include <linux/scatterlist.h>
+ 
+ /*
+  * Autoloaded crypto modules should only use a prefixed name to avoid allowing
+@@ -1412,7 +1413,18 @@ static inline int crypto_aead_encrypt(struct aead_request *req)
+  */
+ static inline int crypto_aead_decrypt(struct aead_request *req)
+ {
+-	return crypto_aead_crt(crypto_aead_reqtfm(req))->decrypt(req);
++	struct scatterlist *sg = req->src;
++	unsigned int size = 0;
++
++	/* ensure that the ciphertext at least contains the auth tag */
++	while (sg) {
++		size += sg->length;
++		if (crypto_aead_authsize(crypto_aead_reqtfm(req)) <= size)
++			return crypto_aead_crt(
++				crypto_aead_reqtfm(req))->decrypt(req);
++		sg = sg_next(sg);
++	}
++	return -EINVAL;
+ }
+ 
+ /**
 -- 
-Ciao
-Stephan
+2.1.0
