@@ -1,74 +1,108 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v6 1/4] crypto: AF_ALG: add AEAD support
-Date: Tue, 30 Dec 2014 22:30:28 +0100
-Message-ID: <2502404.xd4K6Vrf3P@tachyon.chronox.de>
-References: <5682082.ffPqvQlSqN@tachyon.chronox.de> <29582980.qoHS2EjmLy@tachyon.chronox.de> <20141229173340.GA15790@gondor.apana.org.au>
+From: Mathias Krause <minipli@googlemail.com>
+Subject: Re: [PATCH] crypto: aesni - disable "by8" AVX CTR optimization
+Date: Tue, 30 Dec 2014 22:29:39 +0100
+Message-ID: <CA+rthh8CuCWn92SMLqCgWZp5jvgrZxvXsNkOacRTJshCvWEdnw@mail.gmail.com>
+References: <20140917112911.GA2129@gondor.apana.org.au>
+	<1411504267-10170-1-git-send-email-minipli@googlemail.com>
+	<54895B58.8030200@openvpn.net>
+	<CA+rthh-WGeRFTd3-_p+6QQoFFXpyC71f1_-P0BW6p=v8h5K7pA@mail.gmail.com>
+	<548F35D0.1020503@openvpn.net>
+	<5490A8FF.2040906@openvpn.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman@redhat.com>,
-	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
-	'LKML' <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: Chandramouli Narayanan <mouli@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Romain Francoise <romain@orebokech.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: James Yonan <james@openvpn.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:51104 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751531AbaL3Vac (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Dec 2014 16:30:32 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <SDE2F> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Tue, 30 Dec 2014 22:30:28 +0100
-In-Reply-To: <20141229173340.GA15790@gondor.apana.org.au>
+Received: from mail-we0-f171.google.com ([74.125.82.171]:53820 "EHLO
+	mail-we0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751779AbaL3Vhn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 30 Dec 2014 16:37:43 -0500
+Received: by mail-we0-f171.google.com with SMTP id u56so1598760wes.30
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Dec 2014 13:37:42 -0800 (PST)
+In-Reply-To: <5490A8FF.2040906@openvpn.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 30. Dezember 2014, 04:33:41 schrieb Herbert Xu:
+On 16 December 2014 at 22:49, James Yonan <james@openvpn.net> wrote:
+> On 15/12/2014 12:26, James Yonan wrote:
+>>
+>> Mathias,
+>>
+>>>> I'm seeing some anomalous results with the "by8" AVX CTR optimization in
+>>>> 3.18.
+>>>
+>>>
+>>> the patch you're replying to actually *disabled* the "by8" variant for
+>>> v3.17 as it had another bug related to wrong counter handling in GCM.
+>>> The fix for that particular issue only made it to v3.18, so the code
+>>> got re-enabled only for v3.18. But it looks like that there's yet
+>>> another bug :/
+>>
+>>
+>> Right, I should have clarified that I initially suspected the "by8"
+>> variant was to blame because your patch that disables it resolves the
+>> discrepancy.
+>>
+>>>> In particular, crypto_aead_encrypt appears to produce different
+>>>> ciphertext
+>>>> from the same plaintext depending on whether or not the optimization is
+>>>> enabled.
+>>>>
+>>>> See the attached patch to tcrypt that demonstrates the discrepancy.
+>>>
+>>>
+>>> I can reproduce your observations, so I can confirm the difference,
+>>> when using the "by8" variant compared to other AES implementations.
+>>> When applying this very patch (commit 7da4b29d496b ("crypto: aesni -
+>>> disable "by8" AVX CTR optimization")) -- the patch that disables the
+>>> "by8" variant -- on top of v3.18 the discrepancies are gone. So the
+>>> behavior is bound to the "by8" optimization, only.
+>>
+>>
+>> Right -- this is exactly what I'm seeing as well.
+>>
+>>> As it was Chandramouli, who contributed the code, maybe he has a clue
+>>> what's wrong here. Chandramouli?
+>>
+>>
+>> A few more observations:
+>>
+>> * Encryption produces bad ciphertext only when the size of plaintext
+>> exceeds a certain threshold.  In test_aead_encrypt_consistency in the
+>> tcrypt patch, I found that data_size must be >= 128 to produce bad
+>> ciphertext.
+>>
+>> * Encrypting then decrypting data always gets back to the original
+>> plaintext, no matter what the size.
+>>
+>> * The bad ciphertext from encryption is only evident when the same
+>> encrypt operation is performed on a different AES implementation and the
+>> ciphertexts are compared.
+>>
+>> * When the encrypt operation produces bad ciphertext, the generated auth
+>> tag is actually correct, so another AES implementation that decrypts the
+>> ciphertext will end up with corrupted plaintext that succeeds
+>> authentication.
 
-Hi Herbert,
+Hi James,
 
-> On Mon, Dec 29, 2014 at 04:05:40PM +0100, Stephan Mueller wrote:
-> > This would mean that the check must stay in recvmsg as only here we know
-> > that the caller wants data to be processed.
-> 
-> On the send side you would do the check when MSG_MORE is unset.
-> On the receive side you should stop waiting only when ctx->more
-> is false and the send-side check succeeded.
-> 
-> Perhaps rename ctx->more to ctx->done and then you can use it
-> to indicate to the receive side that we're ready and have valid
-> data for it.  The receive side can then simply wait for ctx->done
-> to become true.
+I gave it a shot since Chandramouli does not seem to respond... :(
 
-I followed your advise and changed the sleep to wait for !ctx->more. Together 
-with the patch suggested below that was just released, I removed aead_readable 
-and aead_sufficient_data.
+>
+> Another interesting observation:
+>
+> * bug only occurs when key size is 128 bits, not 192 or 256.
 
-Though, I did not rename ctx->more to ctx->done due to the following:
-
-- other AF_ALG implementations use ctx->more -- to aid code reviewers, I want 
-to keep the logic as close together as possible
-
-- I do not want to negate the check for MSG_MORE -- at least for me, negating 
-flags always twists my mind when reading code.
-
-The patch will come shortly after I tested all thoroughly.
-> 
-> > > PS we should add a length check for missing/partial auth tags
-> > > to crypto_aead_decrypt.  We can then remove such checks from
-> > > individual implementations.
-> > 
-> > I agree in full here. Shall I create such a patch together with the AEAD
-> > AF_ALG interface, or can we merge the AEAD without that patch now and
-> > create a separate patch later?
-> 
-> We should at least add a check in crypto_aead_decrypt first so as
-> to guarantee nothing slips through.
-> 
-> Thanks,
+Thank you for your exhaustive analysis. The data size >= 128 bytes and
+a key size of 128 were the key bits to this puzzle. The code is plain
+wrong for 128 bit keys.
+I'll send a patch soon.
 
 
--- 
-Ciao
-Stephan
+Regards,
+Mathias
