@@ -1,56 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 3.19
-Date: Wed, 31 Dec 2014 14:32:17 +1100
-Message-ID: <20141231033217.GA27261@gondor.apana.org.au>
-References: <20110328071322.GA6569@gondor.apana.org.au>
- <20110629235153.GA16559@gondor.apana.org.au>
- <20120126024342.GA12492@gondor.apana.org.au>
- <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
- <20140101061016.GA22579@gondor.apana.org.au>
- <20140203125944.GA31446@gondor.apana.org.au>
+From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: Re: [PATCH v6 4/4] crypto: AF_ALG: enable RNG interface compilation
+Date: Wed, 31 Dec 2014 08:57:36 +0100
+Message-ID: <18935950.yYgBXEvjNf@tachyon.chronox.de>
+References: <5682082.ffPqvQlSqN@tachyon.chronox.de> <1531939.gTKbxagG6Z@tachyon.chronox.de> <20141229104158.GB13699@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:37053 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751957AbaLaDc3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 30 Dec 2014 22:32:29 -0500
-Content-Disposition: inline
-In-Reply-To: <20140203125944.GA31446@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20141229104158.GB13699-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+Am Montag, 29. Dezember 2014, 21:41:58 schrieb Herbert Xu:
 
-This push fixes a use-after-free crash in the user-space crypto
-API.
+Hi Herbert,
 
-Please pull from
+> On Thu, Dec 25, 2014 at 11:00:39PM +0100, Stephan Mueller wrote:
+> > Enable compilation of the RNG AF_ALG support and provide a Kconfig
+> > option to compile the RNG AF_ALG support.
+> > 
+> > Signed-off-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+> 
+> Patch applied.
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+May I ask you to push the change so that I can create an AEAD Makefile/Kconfig 
+patch that applies cleanly?
 
 
-Rabin Vincent (1):
-      crypto: af_alg - fix backlog handling
-
- crypto/af_alg.c |    3 +++
- 1 file changed, 3 insertions(+)
-
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
