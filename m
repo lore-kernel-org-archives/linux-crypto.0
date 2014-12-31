@@ -1,37 +1,41 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v6 4/4] crypto: AF_ALG: enable RNG interface compilation
-Date: Wed, 31 Dec 2014 08:57:36 +0100
-Message-ID: <18935950.yYgBXEvjNf@tachyon.chronox.de>
-References: <5682082.ffPqvQlSqN@tachyon.chronox.de> <1531939.gTKbxagG6Z@tachyon.chronox.de> <20141229104158.GB13699@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Using separate initcall level for crypto subsystem
+Date: Thu, 1 Jan 2015 03:17:16 +1100
+Message-ID: <20141231161716.GA30540@gondor.apana.org.au>
+References: <EB9C4333-B282-4D94-9713-C986F1B7E931@holtmann.org>
+ <20141223211716.GB3051@gondor.apana.org.au>
+ <8E00673E-2A44-4DE4-8709-CBDADB6ADFB8@holtmann.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20141229104158.GB13699-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:60507 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751032AbaLaQRW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 31 Dec 2014 11:17:22 -0500
+Content-Disposition: inline
+In-Reply-To: <8E00673E-2A44-4DE4-8709-CBDADB6ADFB8@holtmann.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 29. Dezember 2014, 21:41:58 schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Thu, Dec 25, 2014 at 11:00:39PM +0100, Stephan Mueller wrote:
-> > Enable compilation of the RNG AF_ALG support and provide a Kconfig
-> > option to compile the RNG AF_ALG support.
-> > 
-> > Signed-off-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+On Mon, Dec 29, 2014 at 09:03:00PM -0800, Marcel Holtmann wrote:
+>
+> we can easily run them later on. However when the Bluetooth subsystem is built as module, then I would prefer to have the module loading fail in case one of the selftest fails. I can hack around this with a lot of ifdef config magic. If we would have all crypto, cipher etc. modules as crypto_initcall, then I would have to add nothing extra on my side. It would reduce the ifdef config magic on our side a lot.
 > 
-> Patch applied.
+> My personal take is that the crypto subsystem has become such a basic feature that it might make sense to ensure that all pieces (including ciphers) are loaded before we initialize any other subsystem.
 
-May I ask you to push the change so that I can create an AEAD Makefile/Kconfig 
-patch that applies cleanly?
+I don't think moving the crypto initcalls up is the answer because
+moving the subsystem itself isn't enough if you actually want to
+use crypto algorithms.
 
+You'd need to move the algorithms too which would be a nightmare.
 
+Cheers,
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
