@@ -1,41 +1,64 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Using separate initcall level for crypto subsystem
-Date: Thu, 1 Jan 2015 03:17:16 +1100
-Message-ID: <20141231161716.GA30540@gondor.apana.org.au>
-References: <EB9C4333-B282-4D94-9713-C986F1B7E931@holtmann.org>
- <20141223211716.GB3051@gondor.apana.org.au>
- <8E00673E-2A44-4DE4-8709-CBDADB6ADFB8@holtmann.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
+Subject: [PATCH] crypto: amcc: crypto4xx_sa.c:  Remove unused function
+Date: Thu,  1 Jan 2015 16:13:47 +0100
+Message-ID: <1420125228-26679-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
+Cc: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60507 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751032AbaLaQRW (ORCPT
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:34206 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751180AbbAAPRQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 31 Dec 2014 11:17:22 -0500
-Content-Disposition: inline
-In-Reply-To: <8E00673E-2A44-4DE4-8709-CBDADB6ADFB8@holtmann.org>
+	Thu, 1 Jan 2015 10:17:16 -0500
+Received: by mail-wg0-f44.google.com with SMTP id b13so23374438wgh.31
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Jan 2015 07:17:14 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 29, 2014 at 09:03:00PM -0800, Marcel Holtmann wrote:
->
-> we can easily run them later on. However when the Bluetooth subsystem is built as module, then I would prefer to have the module loading fail in case one of the selftest fails. I can hack around this with a lot of ifdef config magic. If we would have all crypto, cipher etc. modules as crypto_initcall, then I would have to add nothing extra on my side. It would reduce the ifdef config magic on our side a lot.
-> 
-> My personal take is that the crypto subsystem has become such a basic feature that it might make sense to ensure that all pieces (including ciphers) are loaded before we initialize any other subsystem.
+Remove the function get_dynamic_sa_offset_iv_field() that is not used anywhere.
 
-I don't think moving the crypto initcalls up is the answer because
-moving the subsystem itself isn't enough if you actually want to
-use crypto algorithms.
+This was partially found by using a static code analysis program called cppcheck.
 
-You'd need to move the algorithms too which would be a nightmare.
+Signed-off-by: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
+---
+ drivers/crypto/amcc/crypto4xx_sa.c |   23 -----------------------
+ 1 file changed, 23 deletions(-)
 
-Cheers,
+diff --git a/drivers/crypto/amcc/crypto4xx_sa.c b/drivers/crypto/amcc/crypto4xx_sa.c
+index de8a7a4..69182e2 100644
+--- a/drivers/crypto/amcc/crypto4xx_sa.c
++++ b/drivers/crypto/amcc/crypto4xx_sa.c
+@@ -34,29 +34,6 @@
+ #include "crypto4xx_sa.h"
+ #include "crypto4xx_core.h"
+ 
+-u32 get_dynamic_sa_offset_iv_field(struct crypto4xx_ctx *ctx)
+-{
+-	u32 offset;
+-	union dynamic_sa_contents cts;
+-
+-	if (ctx->direction == DIR_INBOUND)
+-		cts.w = ((struct dynamic_sa_ctl *)(ctx->sa_in))->sa_contents;
+-	else
+-		cts.w = ((struct dynamic_sa_ctl *)(ctx->sa_out))->sa_contents;
+-	offset = cts.bf.key_size
+-		+ cts.bf.inner_size
+-		+ cts.bf.outer_size
+-		+ cts.bf.spi
+-		+ cts.bf.seq_num0
+-		+ cts.bf.seq_num1
+-		+ cts.bf.seq_num_mask0
+-		+ cts.bf.seq_num_mask1
+-		+ cts.bf.seq_num_mask2
+-		+ cts.bf.seq_num_mask3;
+-
+-	return sizeof(struct dynamic_sa_ctl) + offset * 4;
+-}
+-
+ u32 get_dynamic_sa_offset_state_ptr_field(struct crypto4xx_ctx *ctx)
+ {
+ 	u32 offset;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.10.4
