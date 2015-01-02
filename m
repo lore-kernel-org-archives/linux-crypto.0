@@ -1,39 +1,128 @@
-From: Masanari Iida <standby24x7@gmail.com>
-Subject: [PATCH] crypto: Remove unnecessary KERN_ERR in bfin_crc.c
-Date: Fri,  2 Jan 2015 12:40:46 +0900
-Message-ID: <1420170046-10269-1-git-send-email-standby24x7@gmail.com>
-Cc: akpm@linux-foundation.org, joe@perches.com,
-	Masanari Iida <standby24x7@gmail.com>
-To: linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-	davem@davemloft.net, linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f169.google.com ([209.85.192.169]:63505 "EHLO
-	mail-pd0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751522AbbABDk6 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 1 Jan 2015 22:40:58 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: [PATCH v7 0/2] crypto: AF_ALG: add AEAD and RNG support
+Date: Fri, 02 Jan 2015 15:40:51 +0100
+Message-ID: <6964260.mNa1jtPz7Z@tachyon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	ABI/API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: 'Herbert Xu' <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-This patch removes unnecessary KERN_ERR from bfin_crypto_crc_mod_init().
+Hi,
 
-Signed-off-by: Masanari Iida <standby24x7@gmail.com>
----
- drivers/crypto/bfin_crc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This patch set adds AEAD and RNG support to the AF_ALG interface
+exported by the kernel crypto API. By extending AF_ALG with AEAD and RNG
+support, all cipher types the kernel crypto API allows access to are
+now accessible from userspace.
 
-diff --git a/drivers/crypto/bfin_crc.c b/drivers/crypto/bfin_crc.c
-index 9ae149b..33cf9eb 100644
---- a/drivers/crypto/bfin_crc.c
-+++ b/drivers/crypto/bfin_crc.c
-@@ -744,7 +744,7 @@ static int __init bfin_crypto_crc_mod_init(void)
- 
- 	ret = platform_driver_register(&bfin_crypto_crc_driver);
- 	if (ret) {
--		pr_info(KERN_ERR "unable to register driver\n");
-+		pr_err("unable to register driver\n");
- 		return ret;
- 	}
- 
+Both, AEAD and RNG implementations are stand-alone and do not depend
+other AF_ALG interfaces (like hash or skcipher).
+
+The AEAD implementation uses the same approach as provided with
+skcipher by offering the following interfaces:
+
+	* sendmsg and recvmsg interfaces allowing multiple
+	  invocations supporting a threaded user space. To support
+	  multi-threaded user space, kernel-side buffering
+	  is implemented similarly to skcipher.
+
+	* splice / vmsplice interfaces allowing a zero-copy
+	  invocation
+
+The RNG interface only implements the recvmsg interface as
+zero-copy is not applicable.
+
+The new AEAD and RNG interfaces are fully tested with the test application
+provided at [1]. That test application exercises all newly added user space
+interfaces. The testing covers:
+
+	* use of the sendmsg/recvmsg interface
+
+	* use of the splice / vmsplice interface
+
+	* invocation of all AF_ALG types (aead, rng, skcipher, hash)
+
+	* using all types of operation (encryption, decryption, keyed MD,
+	  MD, random numbers, AEAD decryption with positive and negative
+	  authentication verification)
+
+	* stress testing by running all tests for 30 minutes in an
+	  endless loop
+
+	* test execution on 64 bit and 32 bit
+
+[1] http://www.chronox.de/libkcapi.html
+
+Changes v2:
+* rebase to current cryptodev-2.6 tree
+* use memzero_explicit to zeroize AEAD associated data
+* use sizeof for determining length of AEAD associated data
+* update algif_rng.c covering all suggestions from Daniel Borkmann
+  <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+* addition of patch 9: add digestsize interface for hashes
+* addition of patch to update documentation covering the userspace interface
+* change numbers of getsockopt options: separate them from sendmsg interface
+  definitions
+
+Changes v3:
+* remove getsockopt interface
+* AEAD: associated data is set prepended to the plain/ciphertext
+* AEAD: allowing arbitrary associated data lengths
+* remove setkey patch as protection was already in the existing code
+
+Changes v4:
+* stand-alone implementation of AEAD
+* testing of all interfaces offered by AEAD
+* stress testing of AEAD and RNG
+
+Changes v5:
+* AEAD: add outer while(size) loop in aead_sendmsg to ensure all data is
+  copied into the kernel (reporter Herbert Xu)
+* AEAD: aead_sendmsg bug fix: change size -= len; to size -= plen;
+* AF_ALG / AEAD: add aead_setauthsize and associated extension to
+  struct af_alg_type as well as alg_setsockopt (reporter Herbert Xu)
+* RNG: rng_recvmsg: use 128 byte stack variable for output of RNG instead
+  of ctx->result (reporter Herbert Xu)
+* RNG / AF_ALG: allow user space to seed RNG via setsockopt
+* RNG: rng_recvmsg bug fix: use genlen as result variable for
+  crypto_rng_get_bytes as previously no negative errors were obtained
+* AF_ALG: alg_setop: zeroize buffer before free
+
+Changes v6:
+* AEAD/RNG: port to 3.19-rc1 with the iov_iter handling
+* RNG: use the setkey interface to obtain the seed and drop the patch adding
+  a separate reseeding interface
+* extract the zeroization patch for alg_setkey into a stand-alone patch
+  submission
+* fix bug in aead_sufficient_data (reporter Herbert Xu)
+* testing of all interfaces with test application provided with libkcapi version
+  0.6.2
+
+Changes v7:
+* AEAD: aead_recvmsg: change error code from ENOMEM to EINVAL
+* AEAD: drop aead_readable/aead_sufficient_data and only use ctx->more to decide
+  whether the read side shall become active. This change requires that the
+  patch for crypto_aead_decrypt ensuring that the ciphertext contains the
+  authentication tag was added -- see https://lkml.org/lkml/2014/12/30/200.
+  Otherwise, user space can trigger a kernel crash.
+* RNG: patch dropped as it was applied
+* AEAD: port Kconfig/Makefile patch forward to current code base
+
+Stephan Mueller (2):
+  crypto: AF_ALG: add AEAD support
+  crypto: AF_ALG: enable AEAD interface compilation
+
+ crypto/Kconfig      |   9 +
+ crypto/Makefile     |   1 +
+ crypto/algif_aead.c | 631 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 641 insertions(+)
+ create mode 100644 crypto/algif_aead.c
+
 -- 
-2.2.1.62.g3f15098
+2.1.0
