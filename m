@@ -1,56 +1,39 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH] Use memzero_explicit to clear local buffers
-Date: Mon, 5 Jan 2015 10:36:37 +1100
-Message-ID: <20150104233637.GA20757@gondor.apana.org.au>
-References: <1420394744-20268-1-git-send-email-me@mortis.eu>
- <20150104213538.GA19906@gondor.apana.org.au>
- <20150104224909.GB4806@salidar.dom.custoft.eu>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: drbg: use memzero_explicit() for clearing
+ sensitive data
+Date: Mon, 5 Jan 2015 10:45:29 +1100
+Message-ID: <20150104234529.GA20989@gondor.apana.org.au>
+References: <20141126184057.GA8235@nick-ThinkPad-T430s>
+ <20141127143302.GB25101@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
-	Ingo Molnar <mingo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>,
-	"maintainer:X86 ARCHITECTURE..." <x86-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Rahul Bedarkar <rahulbedarkar89-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Thomas Pugliese <thomas.pugliese-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Randy Dunlap <rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Julia Lawall <Julia.Lawall-L2FTfq7BK8M@public.gmane.org>,
-	"open list:CRYPTO API" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"open list:CERTIFIED WIRELES..." <linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"open list:COMMON INTERNET F..." <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"moderated list:COMMON INTERNET F..."
-	<samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Giel van Schijndel <me-sZ9Uef1cvPWHXe+LvDLADg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org
+To: Nickolaus Woodruff <nickolauswoodruff@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:55650 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753125AbbADXpe (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 4 Jan 2015 18:45:34 -0500
 Content-Disposition: inline
-In-Reply-To: <20150104224909.GB4806-zsKMh+JvXepbNiWYSlF1AbANlwIBtoSN@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20141127143302.GB25101@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 04, 2015 at 11:49:09PM +0100, Giel van Schijndel wrote:
->
-> > sctx does not point to stack memory so this is bogus.
+On Thu, Nov 27, 2014 at 10:33:02PM +0800, Herbert Xu wrote:
+> On Wed, Nov 26, 2014 at 01:40:57PM -0500, Nickolaus Woodruff wrote:
+> > Compiler dead store optimization can sometimes remove final calls
+> > to memset() used to clear sensitive data at the end of a function.
+> > Replace trailing memset() calls with memzero_explicit() to
+> > preclude unwanted removal.
 > > 
-> > Only stack memory cleared just before it goes out of scope needs
-> > memzero_explicit.
+> > Signed-off-by: Nickolaus Woodruff <nickolauswoodruff@gmail.com>
 > 
-> Is that because the compiler can't safely optimize memset(0) away for a
-> variable with greater-than-local scope?
+> Patch applied.  Thanks!
 
-Exactly.  memzero_explicit is not a marker for sensitive data.
-Its only purpose is to prevent the compiler from optimising away
-zeroing that occurs at the end of a scope.
-
-Daniel, we should add a comment so that people stop sending bogus
-patches with memzero_explicit.
-
-Cheers,
+Actually I'm reverting this because the patch was bogus.  None
+of the data zeroed are on the stack.
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
