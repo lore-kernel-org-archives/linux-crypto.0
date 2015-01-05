@@ -1,48 +1,33 @@
-From: Asaf Vertz <asaf.vertz@tandemg.com>
-Subject: [PATCH] crypto: omap-des: fix BUG_ON condition
-Date: Mon, 5 Jan 2015 10:23:10 +0200
-Message-ID: <20150105082310.GA19423@ubuntu>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: GCM aesni and 192/256-bit keys
+Date: Mon, 5 Jan 2015 21:06:44 +1100
+Message-ID: <20150105100644.GA24595@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au, davem@davemloft.net
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:39283 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751628AbbAEIbb (ORCPT
+Received: from helcar.apana.org.au ([209.40.204.226]:41325 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751273AbbAEKGu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 5 Jan 2015 03:31:31 -0500
-Received: by mail-wi0-f176.google.com with SMTP id ex7so2759161wid.9
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Jan 2015 00:31:29 -0800 (PST)
+	Mon, 5 Jan 2015 05:06:50 -0500
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-dd->total is unsigned so it won't do any good to check for negative value after subtracting
-instead of that we should check if the subtracted value is bigger than him
+Hi Tadeusz:
 
-This was partially found by using a static code analysis program called cppcheck.
+It appears that the GCM aesni implementation does not support
+192/256-bit keys.  This is not allowed as accelerated drivers
+must support everything supported by the software implementation.
 
-Signed-off-by: Asaf Vertz <asaf.vertz@tandemg.com>
----
- drivers/crypto/omap-des.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+Could we add 192/256-bit support to it please? If for some reason
+this cannot be done then at least implement a software fallback
+so that it continues to work.
 
-diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-index e350f5b..0b8dcf5 100644
---- a/drivers/crypto/omap-des.c
-+++ b/drivers/crypto/omap-des.c
-@@ -965,9 +965,9 @@ static irqreturn_t omap_des_irq(int irq, void *dev_id)
- 			}
- 		}
- 
--		dd->total -= DES_BLOCK_SIZE;
-+		BUG_ON(dd->total < DES_BLOCK_SIZE);
- 
--		BUG_ON(dd->total < 0);
-+		dd->total -= DES_BLOCK_SIZE;
- 
- 		/* Clear IRQ status */
- 		status &= ~DES_REG_IRQ_DATA_OUT;
+Thanks,
 -- 
-1.7.0.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
