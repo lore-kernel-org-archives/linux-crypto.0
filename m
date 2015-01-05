@@ -1,63 +1,46 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v7 1/2] crypto: AF_ALG: add AEAD support
-Date: Mon, 05 Jan 2015 12:14:24 +0100
-Message-ID: <4229997.MZP3tP9eGb@tachyon.chronox.de>
-References: <6964260.mNa1jtPz7Z@tachyon.chronox.de> <6798882.ly1QjqTYep@tachyon.chronox.de> <20150105105105.GA25517@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2] crypto: AEAD: add check for presence of auth tag
+Date: Mon, 05 Jan 2015 12:21:45 +0100
+Message-ID: <2529951.NL2CVhi6xs@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	ABI/API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20150105105105.GA25517-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:59386 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753036AbbAELVv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 5 Jan 2015 06:21:51 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <SE20D> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Mon, 5 Jan 2015 12:21:48 +0100
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 5. Januar 2015, 21:51:06 schrieb Herbert Xu:
+The AEAD decryption operation requires the authentication tag to be
+present as part of the cipher text buffer. The added check verifies that
+the caller provides a cipher text with at least the authentication tag.
 
-Hi Herbert,
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ include/linux/crypto.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> On Mon, Jan 05, 2015 at 11:46:50AM +0100, Stephan Mueller wrote:
-> > The need for that check lies in aead_recvmsg:
-> >         /*
-> >         
-> >          * first chunk of input is AD -- one scatterlist entry is one
-> >          page,
-> >          * and we process only one scatterlist, the maximum size of AD is
-> >          * one page
-> >          */
-> >         
-> >         sg_init_table(&assoc, 1);
-> >         sg_set_page(&assoc, sg_page(sg), ctx->aead_assoclen, sg->offset);
-> >         aead_request_set_assoc(&ctx->aead_req, &assoc,
-> >         ctx->aead_assoclen);
-> > 
-> > There you see that I only create an sg table with one entry for the AD. If
-> > we would allow an arbitrary AD size, I would see the need of a for loop
-> > in addition to the one directly beneath this AD scatterlist setting: one
-> > for identifying how many sg entries I need to allocate and one for the
-> > actual assignment.
-> > 
-> > As I felt that one page should be sufficient for the AD, I wanted to avoid
-> > the extra overhead for another for loop.
-> 
-> Please remove the limit as otherwise we would never be able to
-> add support for this in a future kernel as appliations won't be
-> able to rely on it.
-> 
-> There is no such limit in the kernel interface and we shouldn't
-> be adding one here.
-
-One question: are you aware of an existing mechanism to split one scatterlist 
-into two at a given offset?
-
-> 
-> Cheers,
-
-
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 9c8776d..9099834 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -1412,6 +1412,9 @@ static inline int crypto_aead_encrypt(struct aead_request *req)
+  */
+ static inline int crypto_aead_decrypt(struct aead_request *req)
+ {
++	if (req->cryptlen < crypto_aead_authsize(crypto_aead_reqtfm(req)))
++		return -EINVAL;
++
+ 	return crypto_aead_crt(crypto_aead_reqtfm(req))->decrypt(req);
+ }
+ 
 -- 
-Ciao
-Stephan
+2.1.0
