@@ -1,46 +1,36 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2] crypto: AEAD: add check for presence of auth tag
-Date: Mon, 05 Jan 2015 12:21:45 +0100
-Message-ID: <2529951.NL2CVhi6xs@tachyon.chronox.de>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: crypto: qat - Fix incorrect uses of memzero_explicit
+Date: Mon, 05 Jan 2015 09:49:05 -0800
+Message-ID: <54AACE91.7070904@intel.com>
+References: <20150105054813.GA23110@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: 'Herbert Xu' <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: qat-linux <qat-linux@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59386 "EHLO mail.eperm.de"
+Received: from mga02.intel.com ([134.134.136.20]:37417 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753036AbbAELVv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 5 Jan 2015 06:21:51 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <SE20D> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Mon, 5 Jan 2015 12:21:48 +0100
+	id S1753121AbbAERwU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 5 Jan 2015 12:52:20 -0500
+In-Reply-To: <20150105054813.GA23110@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The AEAD decryption operation requires the authentication tag to be
-present as part of the cipher text buffer. The added check verifies that
-the caller provides a cipher text with at least the authentication tag.
+On 01/04/2015 09:48 PM, Herbert Xu wrote:
+> memzero_explicit should only be used on stack variables that get
+> zapped just before they go out of scope.
+> 
+> This patch replaces all unnecessary uses of memzero_explicit with
+> memset, removes two memzero_explicit calls altogether as the tfm
+> context comes pre-zeroed, and adds a missing memzero_explicit of
+> the stack variable buff in qat_alg_do_precomputes.  The memzeros
+> on ipad/opad + digest_size/auth_keylen are also removed as the
+> entire auth_state is already zeroed on entry.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- include/linux/crypto.h | 3 +++
- 1 file changed, 3 insertions(+)
+Hi Herbert,
+Except the bad indentation in lines 1176 & 1183 :) this looks ok to me.
+Thanks.
 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 9c8776d..9099834 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -1412,6 +1412,9 @@ static inline int crypto_aead_encrypt(struct aead_request *req)
-  */
- static inline int crypto_aead_decrypt(struct aead_request *req)
- {
-+	if (req->cryptlen < crypto_aead_authsize(crypto_aead_reqtfm(req)))
-+		return -EINVAL;
-+
- 	return crypto_aead_crt(crypto_aead_reqtfm(req))->decrypt(req);
- }
- 
--- 
-2.1.0
+Acked-by: Tadeusz Struk <tadeusz.struk@intel.com>
