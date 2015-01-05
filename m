@@ -1,42 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: AEAD: add check for presence of auth tag
-Date: Mon, 5 Jan 2015 21:19:01 +1100
-Message-ID: <20150105101901.GA24736@gondor.apana.org.au>
-References: <15957213.Wu7Np8vQse@tachyon.chronox.de>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v7 1/2] crypto: AF_ALG: add AEAD support
+Date: Mon, 5 Jan 2015 21:31:59 +1100
+Message-ID: <20150105103159.GA24878@gondor.apana.org.au>
+References: <6964260.mNa1jtPz7Z@tachyon.chronox.de>
+ <1609020.xcc11L81HZ@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: 'LKML' <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:44815 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753292AbbAEKTJ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 5 Jan 2015 05:19:09 -0500
+Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	ABI/API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <15957213.Wu7Np8vQse@tachyon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1609020.xcc11L81HZ-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Dec 30, 2014 at 10:16:03PM +0100, Stephan Mueller wrote:
-> The AEAD decryption operation requires the authentication tag to be
-> present as part of the cipher text buffer. The added check verifies that
-> the caller provides a cipher text buffer with at least the
-> authentication tag.
-> 
-> As the cipher text is provided as a scatterlist, loop through the
-> scatterlist until we know we have sufficient cipher text bytes to invoke
-> the AEAD decryption operation.
+On Fri, Jan 02, 2015 at 03:41:33PM +0100, Stephan Mueller wrote:
+>
+> +		if (!con.aead_assoclen)
+> +			return -EINVAL;
 
-There is no need to vet the scatterlist.  For kernel users it's
-up to them to ensure that the length is valid with respect to the
-sg list.
+AD being zero should be fine.
 
-For the user-space interface obviously you should ensure that a
-valid length is supplied.
+> +		/* aead_recvmsg limits the maximum AD size to one page */
+> +		if (con.aead_assoclen > PAGE_SIZE)
+> +			return -E2BIG;
+
+I don't see any need to limit the size of the AD.
 
 Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
