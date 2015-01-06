@@ -1,53 +1,46 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH] Use memzero_explicit to clear local buffers
-Date: Wed, 7 Jan 2015 07:54:54 +1100
-Message-ID: <20150106205454.GA22067@gondor.apana.org.au>
-References: <1420394744-20268-1-git-send-email-me@mortis.eu>
- <20150104213538.GA19906@gondor.apana.org.au>
- <20150104224909.GB4806@salidar.dom.custoft.eu>
- <20150104233637.GA20757@gondor.apana.org.au>
- <20150106194226.GM4806@salidar.dom.custoft.eu>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: GCM aesni and 192/256-bit keys
+Date: Wed, 7 Jan 2015 10:18:41 +1100
+Message-ID: <20150106231841.GA23651@gondor.apana.org.au>
+References: <20150105100644.GA24595@gondor.apana.org.au>
+ <54AACF27.6090300@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>,
-	Ingo Molnar <mingo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"H. Peter Anvin" <hpa-YMNOUZJC4hwAvxtiuMwx3w@public.gmane.org>,
-	"maintainer:X86 ARCHITECTURE..." <x86-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Rahul Bedarkar <rahulbedarkar89-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Thomas Pugliese <thomas.pugliese-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Randy Dunlap <rdunlap-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Julia Lawall <Julia.Lawall-L2FTfq7BK8M@public.gmane.org>,
-	"open list:CRYPTO API" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"open list:CERTIFIED WIRELES..." <linux-usb-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"open list:COMMON INTERNET F..." <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"moderated list:COMMON INTERNET F..."
-	<samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Giel van Schijndel <me-sZ9Uef1cvPWHXe+LvDLADg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:51201 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750818AbbAFXSp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 6 Jan 2015 18:18:45 -0500
 Content-Disposition: inline
-In-Reply-To: <20150106194226.GM4806-zsKMh+JvXepbNiWYSlF1AbANlwIBtoSN@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <54AACF27.6090300@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 06, 2015 at 08:42:26PM +0100, Giel van Schijndel wrote:
-> 
-> Question: are you sure the compiler won't optimize the call to memset(0)
-> way if it's immediately followed by kfree()?
+On Mon, Jan 05, 2015 at 09:51:35AM -0800, Tadeusz Struk wrote:
+> On 01/05/2015 02:06 AM, Herbert Xu wrote:
+> > 
+> > It appears that the GCM aesni implementation does not support
+> > 192/256-bit keys.  This is not allowed as accelerated drivers
+> > must support everything supported by the software implementation.
+> > 
+> > Could we add 192/256-bit support to it please? If for some reason
+> > this cannot be done then at least implement a software fallback
+> > so that it continues to work.
 
-Yes it won't be optimised away.  However, you could use kzfree.
+> Yes, you are right. I'll look into it.
 
-> Another actually does change a stack-allocated buffer, I'll split that
-> one off right away.
+While you're at it, can you please run some speed tests to show
+that this is actually faster than the generic gcm on top of
+ctr-aes-aesni and ghash-clmulni?
 
-OK.
+If it isn't any faster (it really shouldn't be as far as I can
+see) then we can just kill it.
 
-Thanks,
+Thanks!
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
