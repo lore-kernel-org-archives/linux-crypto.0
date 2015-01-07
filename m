@@ -1,62 +1,61 @@
-From: Heiko Carstens <heiko.carstens@de.ibm.com>
-Subject: Re: [PATCH] s390: crypto: aes_s390: Remove 'const' to avoid compiler
- warnings
-Date: Wed, 7 Jan 2015 09:24:14 +0100
-Message-ID: <20150107082414.GA4365@osiris>
-References: <54A56002.3000301@sunrus.com.cn>
+From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: [PATCH v8 2/2] crypto: AF_ALG: enable AEAD interface compilation
+Date: Wed, 07 Jan 2015 16:52:07 +0100
+Message-ID: <36429266.hrOKJSv1Ob@tachyon.chronox.de>
+References: <33040723.pAXIT3fl8h@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	schwidefsky@de.ibm.com, linux390@de.ibm.com,
-	linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: Chen Gang <gang.chen@sunrus.com.cn>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e06smtp15.uk.ibm.com ([195.75.94.111]:42232 "EHLO
-	e06smtp15.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751784AbbAGIYZ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 7 Jan 2015 03:24:25 -0500
-Received: from /spool/local
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
-	Wed, 7 Jan 2015 08:24:23 -0000
-Content-Disposition: inline
-In-Reply-To: <54A56002.3000301@sunrus.com.cn>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: 'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: 'Herbert Xu' <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <33040723.pAXIT3fl8h-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 01, 2015 at 10:56:02PM +0800, Chen Gang wrote:
-> In aes_encrypt() and aes_decrypt(), need let 'sctx->key' be modified,
-> so remove 'const' for it. The related warnings:
-...
-> 
-> Signed-off-by: Chen Gang <gang.chen.5i5j@gmail.com>
-> ---
->  arch/s390/crypto/aes_s390.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-> index 1f272b2..5566ce8 100644
-> --- a/arch/s390/crypto/aes_s390.c
-> +++ b/arch/s390/crypto/aes_s390.c
-> @@ -134,7 +134,7 @@ static int aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> 
->  static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->  {
-> -	const struct s390_aes_ctx *sctx = crypto_tfm_ctx(tfm);
-> +	struct s390_aes_ctx *sctx = crypto_tfm_ctx(tfm);
-> 
->  	if (unlikely(need_fallback(sctx->key_len))) {
->  		crypto_cipher_encrypt_one(sctx->fallback.cip, out, in);
-> @@ -159,7 +159,7 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-> 
->  static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->  {
-> -	const struct s390_aes_ctx *sctx = crypto_tfm_ctx(tfm);
-> +	struct s390_aes_ctx *sctx = crypto_tfm_ctx(tfm);
-> 
->  	if (unlikely(need_fallback(sctx->key_len))) {
->  		crypto_cipher_decrypt_one(sctx->fallback.cip, out, in);
+Enable compilation of the AEAD AF_ALG support and provide a Kconfig
+option to compile the AEAD AF_ALG support.
 
-Applied, thanks.
+Signed-off-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+---
+ crypto/Kconfig  | 9 +++++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
+
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 50f4da4..41a3fc5 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1523,6 +1523,15 @@ config CRYPTO_USER_API_RNG
+ 	  This option enables the user-spaces interface for random
+ 	  number generator algorithms.
+ 
++config CRYPTO_USER_API_AEAD
++	tristate "User-space interface for AEAD cipher algorithms"
++	depends on NET
++	select CRYPTO_AEAD
++	select CRYPTO_USER_API
++	help
++	  This option enables the user-spaces interface for AEAD
++	  cipher algorithms.
++
+ config CRYPTO_HASH_INFO
+ 	bool
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index ba19465..97b7d3a 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -100,6 +100,7 @@ obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
++obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
+ 
+ #
+ # generic algorithms and the async_tx api
+-- 
+2.1.0
