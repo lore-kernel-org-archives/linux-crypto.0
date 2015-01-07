@@ -1,45 +1,60 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: GCM aesni and 192/256-bit keys
-Date: Wed, 7 Jan 2015 10:18:41 +1100
-Message-ID: <20150106231841.GA23651@gondor.apana.org.au>
-References: <20150105100644.GA24595@gondor.apana.org.au>
- <54AACF27.6090300@intel.com>
+Subject: Crypto Fixes for 3.19
+Date: Wed, 7 Jan 2015 13:17:37 +1100
+Message-ID: <20150107021737.GA25043@gondor.apana.org.au>
+References: <20110629235153.GA16559@gondor.apana.org.au>
+ <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20141231033217.GA27261@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:51201 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:60742 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750818AbbAFXSp (ORCPT
+	with ESMTP id S1757645AbbAGCRq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Jan 2015 18:18:45 -0500
+	Tue, 6 Jan 2015 21:17:46 -0500
 Content-Disposition: inline
-In-Reply-To: <54AACF27.6090300@intel.com>
+In-Reply-To: <20141231033217.GA27261@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 05, 2015 at 09:51:35AM -0800, Tadeusz Struk wrote:
-> On 01/05/2015 02:06 AM, Herbert Xu wrote:
-> > 
-> > It appears that the GCM aesni implementation does not support
-> > 192/256-bit keys.  This is not allowed as accelerated drivers
-> > must support everything supported by the software implementation.
-> > 
-> > Could we add 192/256-bit support to it please? If for some reason
-> > this cannot be done then at least implement a software fallback
-> > so that it continues to work.
+Hi Linus:
 
-> Yes, you are right. I'll look into it.
+This push fixes a build problem with sha-mb with old toolchains
+and an implementation bug in the ctr(aes)/by8 branch of aesni-intel
+that's enabled when AVX is available.
 
-While you're at it, can you please run some speed tests to show
-that this is actually faster than the generic gcm on top of
-ctr-aes-aesni and ghash-clmulni?
+Please pull from
 
-If it isn't any faster (it really shouldn't be as far as I can
-see) then we can just kill it.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Thanks!
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+ 
+Mathias Krause (1):
+      crypto: aesni - fix "by8" variant for 128 bit keys
+
+Vinson Lee (1):
+      crypto: sha-mb - Add avx2_supported check.
+
+ arch/x86/crypto/Makefile                |    2 +-
+ arch/x86/crypto/aes_ctrby8_avx-x86_64.S |   46 +++++++++++++++++++++++--------
+ 2 files changed, 36 insertions(+), 12 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
