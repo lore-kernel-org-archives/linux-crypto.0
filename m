@@ -1,45 +1,62 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Using separate initcall level for crypto subsystem
-Date: Wed, 7 Jan 2015 14:15:35 +1100
-Message-ID: <20150107031535.GA25465@gondor.apana.org.au>
-References: <EB9C4333-B282-4D94-9713-C986F1B7E931@holtmann.org>
- <20141223211716.GB3051@gondor.apana.org.au>
- <8E00673E-2A44-4DE4-8709-CBDADB6ADFB8@holtmann.org>
- <20141231161716.GA30540@gondor.apana.org.au>
- <F6435F09-4F45-4C8E-BB48-E7FB13643CC1@holtmann.org>
+From: Heiko Carstens <heiko.carstens@de.ibm.com>
+Subject: Re: [PATCH] s390: crypto: aes_s390: Remove 'const' to avoid compiler
+ warnings
+Date: Wed, 7 Jan 2015 09:24:14 +0100
+Message-ID: <20150107082414.GA4365@osiris>
+References: <54A56002.3000301@sunrus.com.cn>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	schwidefsky@de.ibm.com, linux390@de.ibm.com,
+	linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Chen Gang <gang.chen@sunrus.com.cn>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:34582 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754105AbbAGDQP (ORCPT
+Received: from e06smtp15.uk.ibm.com ([195.75.94.111]:42232 "EHLO
+	e06smtp15.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751784AbbAGIYZ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 6 Jan 2015 22:16:15 -0500
+	Wed, 7 Jan 2015 03:24:25 -0500
+Received: from /spool/local
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
+	Wed, 7 Jan 2015 08:24:23 -0000
 Content-Disposition: inline
-In-Reply-To: <F6435F09-4F45-4C8E-BB48-E7FB13643CC1@holtmann.org>
+In-Reply-To: <54A56002.3000301@sunrus.com.cn>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 06, 2015 at 06:30:36PM -0800, Marcel Holtmann wrote:
->
-> that is indeed true. All the crypto algorithm need to be moved as well. I considered that already since I had debugged the initcall order with a kernel without modules.
-
-If there were a real user then I would consider it.  I'm definitely
-not adding this much complexity just for a self-test.
-
-> Actually I was thinking to convert the algorithms to a newly introduced module_crypto_alg() and module_crypto_shash() helpers.
+On Thu, Jan 01, 2015 at 10:56:02PM +0800, Chen Gang wrote:
+> In aes_encrypt() and aes_decrypt(), need let 'sctx->key' be modified,
+> so remove 'const' for it. The related warnings:
+...
 > 
-> This would be similar to module_usb_driver() and module_pci_driver(). And then changing the initcall level would be trivial. The module_init/module_exit is just all the same boilerplate anyway and we could get rid of it this way.
+> Signed-off-by: Chen Gang <gang.chen.5i5j@gmail.com>
+> ---
+>  arch/s390/crypto/aes_s390.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
+> index 1f272b2..5566ce8 100644
+> --- a/arch/s390/crypto/aes_s390.c
+> +++ b/arch/s390/crypto/aes_s390.c
+> @@ -134,7 +134,7 @@ static int aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+> 
+>  static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+>  {
+> -	const struct s390_aes_ctx *sctx = crypto_tfm_ctx(tfm);
+> +	struct s390_aes_ctx *sctx = crypto_tfm_ctx(tfm);
+> 
+>  	if (unlikely(need_fallback(sctx->key_len))) {
+>  		crypto_cipher_encrypt_one(sctx->fallback.cip, out, in);
+> @@ -159,7 +159,7 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+> 
+>  static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+>  {
+> -	const struct s390_aes_ctx *sctx = crypto_tfm_ctx(tfm);
+> +	struct s390_aes_ctx *sctx = crypto_tfm_ctx(tfm);
+> 
+>  	if (unlikely(need_fallback(sctx->key_len))) {
+>  		crypto_cipher_decrypt_one(sctx->fallback.cip, out, in);
 
-I'm OK with this though if it turns out to reduce the amount of
-code.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Applied, thanks.
