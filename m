@@ -1,26 +1,24 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: omap-des: fix BUG_ON condition
-Date: Thu, 8 Jan 2015 21:48:28 +1100
-Message-ID: <20150108104827.GA8374@gondor.apana.org.au>
-References: <20150105082310.GA19423@ubuntu>
+Subject: Re: [PATCH v2] crypto: AEAD: add check for presence of auth tag
+Date: Thu, 8 Jan 2015 21:48:52 +1100
+Message-ID: <20150108104852.GB8374@gondor.apana.org.au>
+References: <2529951.NL2CVhi6xs@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Asaf Vertz <asaf.vertz@tandemg.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150105082310.GA19423@ubuntu>
+In-Reply-To: <2529951.NL2CVhi6xs@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jan 05, 2015 at 10:23:10AM +0200, Asaf Vertz wrote:
-> dd->total is unsigned so it won't do any good to check for negative value after subtracting
-> instead of that we should check if the subtracted value is bigger than him
+On Mon, Jan 05, 2015 at 12:21:45PM +0100, Stephan Mueller wrote:
+> The AEAD decryption operation requires the authentication tag to be
+> present as part of the cipher text buffer. The added check verifies that
+> the caller provides a cipher text with at least the authentication tag.
 > 
-> This was partially found by using a static code analysis program called cppcheck.
-> 
-> Signed-off-by: Asaf Vertz <asaf.vertz@tandemg.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
 Applied.
 -- 
