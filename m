@@ -1,24 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: AEAD: add check for presence of auth tag
-Date: Thu, 8 Jan 2015 21:48:52 +1100
-Message-ID: <20150108104852.GB8374@gondor.apana.org.au>
-References: <2529951.NL2CVhi6xs@tachyon.chronox.de>
+Subject: Re: [PATCH] lib: memzero_explicit: add comment for its usage
+Date: Thu, 8 Jan 2015 21:49:02 +1100
+Message-ID: <20150108104901.GC8374@gondor.apana.org.au>
+References: <1420500465-6522-1-git-send-email-dborkman@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Daniel Borkmann <dborkman@redhat.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:41833 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756292AbbAHKtF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 8 Jan 2015 05:49:05 -0500
 Content-Disposition: inline
-In-Reply-To: <2529951.NL2CVhi6xs@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1420500465-6522-1-git-send-email-dborkman@redhat.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 05, 2015 at 12:21:45PM +0100, Stephan Mueller wrote:
-> The AEAD decryption operation requires the authentication tag to be
-> present as part of the cipher text buffer. The added check verifies that
-> the caller provides a cipher text with at least the authentication tag.
+On Tue, Jan 06, 2015 at 12:27:45AM +0100, Daniel Borkmann wrote:
+> Lets improve the comment to add a note on when to use memzero_explicit()
+> for those not digging through the git logs. We don't want people to
+> pollute places with memzero_explicit() where it's not really necessary.
 > 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Reference: https://lkml.org/lkml/2015/1/4/190
+> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Daniel Borkmann <dborkman@redhat.com>
 
 Applied.
 -- 
