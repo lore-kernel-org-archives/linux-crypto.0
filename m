@@ -1,104 +1,163 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v8 1/2] crypto: AF_ALG: add AEAD support
-Date: Fri, 09 Jan 2015 04:30:45 +0100
-Message-ID: <1639027.yRSjDuRfFC@tachyon.chronox.de>
-References: <33040723.pAXIT3fl8h@tachyon.chronox.de> <6260799.4x68Msg3Li@tachyon.chronox.de> <20150108110931.GA8568@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: 'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20150108110931.GA8568-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+From: Rabin Vincent <rabin.vincent@axis.com>
+Subject: [PATCH] crypto: don't use interruptible wait in tests
+Date: Fri,  9 Jan 2015 16:25:28 +0100
+Message-ID: <1420817129-28903-1-git-send-email-rabin.vincent@axis.com>
+Cc: linux-crypto@vger.kernel.org, Rabin Vincent <rabinv@axis.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from bes.se.axis.com ([195.60.68.10]:48827 "EHLO bes.se.axis.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932302AbbAIPZp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 9 Jan 2015 10:25:45 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 8. Januar 2015, 22:09:31 schrieb Herbert Xu:
+tcrypt/testmgr uses wait_for_completion_interruptible() everywhere when
+it waits for a request to be completed.  If it's interrupted, then the
+test is aborted and the request is freed.
 
-Hi Herbert,
+However, if any of these calls actually do get interrupted, the result
+will likely be a kernel crash, when the driver handles the now-freed
+request.  Use wait_for_completion() instead.
 
-> On Wed, Jan 07, 2015 at 04:51:38PM +0100, Stephan Mueller wrote:
-> > +		if (!aead_writable(sk)) {
-> > +			/*
-> > +			 * If there is more data to be expected, but we cannot
-> > +			 * write more data, forcefully define that we do not
-> > +			 * expect more data to invoke the AEAD operation. This
-> > +			 * prevents a deadlock in user space.
-> > +			 */
-> > +			ctx->more = 0;
-> 
-> We should return EMSGSIZE here.  Also we should clear out the
-> existing data so that the socket may be reused again.
+Signed-off-by: Rabin Vincent <rabin.vincent@axis.com>
+---
+ crypto/tcrypt.c  |   10 ++++------
+ crypto/testmgr.c |   50 ++++++++++++++++++++++----------------------------
+ 2 files changed, 26 insertions(+), 34 deletions(-)
 
-Is this really wise considering that we want to support a threaded caller? For 
-example, one thread sends data and another reads data. For some reason, the 
-reading thread is throttled or slower than the sender. Now, with the current 
-solution, the sender is put on hold (i.e. throttled) until the reader can 
-catch up. I.e. we have an automated synchronization between sender/receiver.
-
-Thus, when we remove the wait here and return an error, the sender will be 
-shut down and there is no synchronization of the reader/writer any more.
-
-Note, the same applies to the very similar code in aead_sendpage too.
-> 
-> > +	ctx->more = msg->msg_flags & MSG_MORE;
-> > +	if (!ctx->more && !aead_sufficient_data(ctx))
-> > +		err = -EINVAL;
-> 
-> Ditto, we should discard the data that's queued up.  Also perhaps
-> use EBADMSG instead of EINVAL.
-
-Agreed that we should clear out the buffer. I will provide that in the next 
-release for both, the sendmsg and sendpage implementations.
-
-However, I am not sure whether using EBADMSG is a good idea. The error of 
-EBADMSG in the kernel crypto API is only used for integrity errors of AEAD 
-ciphers. But our error case here has nothing to do with the integrity error.
-
-I would be fine with any other error number -- EMSGSIZE as you suggested 
-above?
-> 
-> > +	/*
-> > +	 * Require exactly one IOV block as the AEAD operation is a one shot
-> > +	 * due to the authentication tag.
-> > +	 */
-> > +	if (msg->msg_iter.nr_segs != 1)
-> > +		return -ENOMSG;
-> 
-> Why does the receive buffer have to be contiguous?
-
-I thought for quite some time about how we can use multiple iovecs. But I 
-found no satisfactory solution. The solution I see is described below.
-
-If we consider the skcipher implementation, the code iterates over the iovecs 
-as the outermost loop. In each loop iteration the cipher operation is 
-triggered.
-
-Now in case of AEAD, all provided data the kernel received has to be operated 
-on with exactly one cipher invocation. Looking at skcipher, that would mean 
-that we only perform one loop iteration, i.e. processing exactly one iovec.
-
-A possible solution would be that I use an array of struct af_alg_sgl and 
-iterate over that array for each iovec. Something like the following:
-
-struct aead_ctx {
-...
-	struct af_alg_sgl rsgl[ALG_MAX_PAGES];
-
-for(i = 0; i < ALG_MAX_PAGES; i++) {
-	af_alg_make_sg(rsgl[i], iov[i])
-	scatterwalk_sg_chain(rsgl[i-1].sg rsgl[i]);
-}
-
-But my concern is that with the array of rsgl we occupy a sizable amount of 
-memory as af_alg_sgl again defines arrays of entries.
-
-Do you think whether such approach makes sense? If yes, which limit to the 
-number of rsgl should we apply -- is ALG_MAX_PAGES good?
-
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 1d864e9..0043495 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -764,10 +764,9 @@ static inline int do_one_ahash_op(struct ahash_request *req, int ret)
+ 	if (ret == -EINPROGRESS || ret == -EBUSY) {
+ 		struct tcrypt_result *tr = req->base.data;
+ 
+-		ret = wait_for_completion_interruptible(&tr->completion);
+-		if (!ret)
+-			ret = tr->err;
++		wait_for_completion(&tr->completion);
+ 		reinit_completion(&tr->completion);
++		ret = tr->err;
+ 	}
+ 	return ret;
+ }
+@@ -993,10 +992,9 @@ static inline int do_one_acipher_op(struct ablkcipher_request *req, int ret)
+ 	if (ret == -EINPROGRESS || ret == -EBUSY) {
+ 		struct tcrypt_result *tr = req->base.data;
+ 
+-		ret = wait_for_completion_interruptible(&tr->completion);
+-		if (!ret)
+-			ret = tr->err;
++		wait_for_completion(&tr->completion);
+ 		reinit_completion(&tr->completion);
++		ret = tr->err;
+ 	}
+ 
+ 	return ret;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 037368d..235b1ff 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -181,10 +181,9 @@ static void testmgr_free_buf(char *buf[XBUFSIZE])
+ static int wait_async_op(struct tcrypt_result *tr, int ret)
+ {
+ 	if (ret == -EINPROGRESS || ret == -EBUSY) {
+-		ret = wait_for_completion_interruptible(&tr->completion);
+-		if (!ret)
+-			ret = tr->err;
++		wait_for_completion(&tr->completion);
+ 		reinit_completion(&tr->completion);
++		ret = tr->err;
+ 	}
+ 	return ret;
+ }
+@@ -353,12 +352,11 @@ static int __test_hash(struct crypto_ahash *tfm, struct hash_testvec *template,
+ 			break;
+ 		case -EINPROGRESS:
+ 		case -EBUSY:
+-			ret = wait_for_completion_interruptible(
+-				&tresult.completion);
+-			if (!ret && !(ret = tresult.err)) {
+-				reinit_completion(&tresult.completion);
++			wait_for_completion(&tresult.completion);
++			reinit_completion(&tresult.completion);
++			ret = tresult.err;
++			if (!ret)
+ 				break;
+-			}
+ 			/* fall through */
+ 		default:
+ 			printk(KERN_ERR "alg: hash: digest failed "
+@@ -569,12 +567,11 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 			break;
+ 		case -EINPROGRESS:
+ 		case -EBUSY:
+-			ret = wait_for_completion_interruptible(
+-				&result.completion);
+-			if (!ret && !(ret = result.err)) {
+-				reinit_completion(&result.completion);
++			wait_for_completion(&result.completion);
++			reinit_completion(&result.completion);
++			ret = result.err;
++			if (!ret)
+ 				break;
+-			}
+ 		case -EBADMSG:
+ 			if (template[i].novrfy)
+ 				/* verification failure was expected */
+@@ -720,12 +717,11 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 			break;
+ 		case -EINPROGRESS:
+ 		case -EBUSY:
+-			ret = wait_for_completion_interruptible(
+-				&result.completion);
+-			if (!ret && !(ret = result.err)) {
+-				reinit_completion(&result.completion);
++			wait_for_completion(&result.completion);
++			reinit_completion(&result.completion);
++			ret = result.err;
++			if (!ret)
+ 				break;
+-			}
+ 		case -EBADMSG:
+ 			if (template[i].novrfy)
+ 				/* verification failure was expected */
+@@ -1002,12 +998,11 @@ static int __test_skcipher(struct crypto_ablkcipher *tfm, int enc,
+ 			break;
+ 		case -EINPROGRESS:
+ 		case -EBUSY:
+-			ret = wait_for_completion_interruptible(
+-				&result.completion);
+-			if (!ret && !((ret = result.err))) {
+-				reinit_completion(&result.completion);
++			wait_for_completion(&result.completion);
++			reinit_completion(&result.completion);
++			ret = result.err;
++			if (!ret)
+ 				break;
+-			}
+ 			/* fall through */
+ 		default:
+ 			pr_err("alg: skcipher%s: %s failed on test %d for %s: ret=%d\n",
+@@ -1097,12 +1092,11 @@ static int __test_skcipher(struct crypto_ablkcipher *tfm, int enc,
+ 			break;
+ 		case -EINPROGRESS:
+ 		case -EBUSY:
+-			ret = wait_for_completion_interruptible(
+-					&result.completion);
+-			if (!ret && !((ret = result.err))) {
+-				reinit_completion(&result.completion);
++			wait_for_completion(&result.completion);
++			reinit_completion(&result.completion);
++			ret = result.err;
++			if (!ret)
+ 				break;
+-			}
+ 			/* fall through */
+ 		default:
+ 			pr_err("alg: skcipher%s: %s failed on chunk test %d for %s: ret=%d\n",
 -- 
-Ciao
-Stephan
+1.7.10.4
