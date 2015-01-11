@@ -1,43 +1,61 @@
-From: Bruce Allan <bruce.w.allan@intel.com>
-Subject: [PATCH] crypto: qat - adf_ae_stop() is never called
-Date: Fri, 09 Jan 2015 11:55:09 -0800
-Message-ID: <20150109195509.28205.49333.stgit@gitlad.jf.intel.com>
+From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: [PATCH v9 2/2] crypto: AF_ALG: enable AEAD interface compilation
+Date: Sun, 11 Jan 2015 04:46:28 +0100
+Message-ID: <10606386.qlbgldSs02@tachyon.chronox.de>
+References: <41794881.9gBey4al6X@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:46617 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751790AbbAITzB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 9 Jan 2015 14:55:01 -0500
-Received: from gitlad.jf.intel.com (gitlad.jf.intel.com [127.0.0.1])
-	by gitlad.jf.intel.com (8.14.2/8.14.2) with ESMTP id t09Jt9Do028271
-	for <linux-crypto@vger.kernel.org>; Fri, 9 Jan 2015 11:55:09 -0800
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: 'Herbert Xu' <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <41794881.9gBey4al6X-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-In adf_dev_stop(), adf_ae_stop() is never called because adf_dev_started()
-will always return false since the ADF_STATUS_STARTED bit is cleared
-earlier in the function.
+Enable compilation of the AEAD AF_ALG support and provide a Kconfig
+option to compile the AEAD AF_ALG support.
 
-Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
-Acked-by: Tadeusz Struk <tadeusz.struk@intel.com>
+Signed-off-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
 ---
+ crypto/Kconfig  | 9 +++++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
 
- drivers/crypto/qat/qat_common/adf_init.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
-index edbf85a..8f0ca49 100644
---- a/drivers/crypto/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/qat/qat_common/adf_init.c
-@@ -319,7 +319,7 @@ int adf_dev_stop(struct adf_accel_dev *accel_dev)
- 	if (wait)
- 		msleep(100);
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 50f4da4..41a3fc5 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1523,6 +1523,15 @@ config CRYPTO_USER_API_RNG
+ 	  This option enables the user-spaces interface for random
+ 	  number generator algorithms.
  
--	if (adf_dev_started(accel_dev)) {
-+	if (test_bit(ADF_STATUS_AE_STARTED, &accel_dev->status)) {
- 		if (adf_ae_stop(accel_dev))
- 			pr_err("QAT: failed to stop AE\n");
- 		else
++config CRYPTO_USER_API_AEAD
++	tristate "User-space interface for AEAD cipher algorithms"
++	depends on NET
++	select CRYPTO_AEAD
++	select CRYPTO_USER_API
++	help
++	  This option enables the user-spaces interface for AEAD
++	  cipher algorithms.
++
+ config CRYPTO_HASH_INFO
+ 	bool
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index ba19465..97b7d3a 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -100,6 +100,7 @@ obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
++obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
+ 
+ #
+ # generic algorithms and the async_tx api
+-- 
+2.1.0
