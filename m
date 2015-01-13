@@ -1,65 +1,53 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: Crypto: Add support for 192 & 256 bit keys to AESNI RFC4106 -
  resubmission
-Date: Mon, 12 Jan 2015 10:26:49 -0800
-Message-ID: <1421087209.2399.14.camel@schen9-desk2.jf.intel.com>
+Date: Tue, 13 Jan 2015 22:27:10 +1100
+Message-ID: <20150113112710.GA6129@gondor.apana.org.au>
 References: <Pine.WNT.4.64.1501112342160.7768@Fly3>
-	 <20150112060651.GA9726@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Timothy McCaffrey <timcaffrey420@gmail.com>,
-	linux-crypto@vger.kernel.org, Timothy.McCaffrey@Unisys.com,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Vinodh Gopal <vinodh.gopal@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, tim.c.chen@linux.intel.com,
+	Timothy.McCaffrey@Unisys.com
+To: Timothy McCaffrey <timcaffrey420@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:3924 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753529AbbALS1H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 12 Jan 2015 13:27:07 -0500
-In-Reply-To: <20150112060651.GA9726@gondor.apana.org.au>
+Received: from helcar.apana.org.au ([209.40.204.226]:56577 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752157AbbAML1Q (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 13 Jan 2015 06:27:16 -0500
+Content-Disposition: inline
+In-Reply-To: <Pine.WNT.4.64.1501112342160.7768@Fly3>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2015-01-12 at 17:06 +1100, Herbert Xu wrote:
-> On Sun, Jan 11, 2015 at 11:48:08PM -0500, Timothy McCaffrey wrote:
-> >
-> > This patch has been tested with Sandy Bridge and Haswell processors.  With 128
-> > bit keys and input buffers > 512 bytes a slight performance degradation was
-> > noticed (~1%).  For input buffers of less than 512 bytes there was no
-> > performance impact.  Compared to 128 bit keys, 256 bit key size performance
-> > is approx. .5 cycles per byte slower on Sandy Bridge, and .37 cycles per 
-> > byte slower on Haswell (vs. SSE code).
-> 
-> Thanks Tim!
-> 
-> While I think your patch should definitely be applied to the
-> current GCM implementation, longer term I'd like to see some
-> justification why we're adding these optimisations in the form
-> of gcm-aesni rather than ghash-avx and ctr-aesni.
-> 
-> Is there any reason why these optimisations can't be added to
-> the standalone ghash or ctr(aes)? Or for that matter is there
-> some fundamental synergy that I'm not seeing that you would only
-> get by putting these into gcm-aesni?
+On Sun, Jan 11, 2015 at 11:48:08PM -0500, Timothy McCaffrey wrote:
+>
+> I created this diff from a git clone of crypto-2.6.git.
 
-Herbert,
+Sorry, but your patch doesn't apply against either crypto or
+cryptodev.  I get
 
-To quote Vinod who wrote the original gcm-aesni code, the reason to
-combine the ghash and ctr(aes) is as follow:
+$ git apply ~/p
+/home/gondolin/herbert/p:48: trailing whitespace.
+* movaps (move aligned packed single) or integer use movdqa (move double quad 
+/home/gondolin/herbert/p:194: trailing whitespace.
+        PSHUFB_XMM         %xmm14, %xmm\index 
+/home/gondolin/herbert/p:210: space before tab in indent.
+        PSHUFB_XMM  %xmm14, \XMM1        # perform a 16 byte swap
+/home/gondolin/herbert/p:277: space before tab in indent.
+        PSHUFB_XMM %xmm14, \XMM1 # perform a 16 byte swap
+/home/gondolin/herbert/p:419: space before tab in indent.
+        PSHUFB_XMM %xmm14, \XMM3        # perform a 16 byte swap
+fatal: corrupt patch at line 704
+$
 
-"AES-GCM gets a lot of performance due to a fine-grained stitching of
-AES with GHASH. Depending on the uarch, a majority of the GHASH
-computation can be hidden within the AES."
+Please check the patch and resubmit.  You can see exactly what
+I tried to apply at
 
-Adding Vinod also to this mail thread.
+	https://patchwork.kernel.org/patch/5608031/
 
-Tim
-
-> 
-> If the answers are no and no, then I'd like to see all these
-> optimisations migrated over to ghash and ctr(aes) and then we
-> can simply remove gcm-aesni.
-> 
-> Cheers,
+Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
