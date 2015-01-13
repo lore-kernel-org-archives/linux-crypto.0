@@ -1,311 +1,725 @@
-From: Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH 1/6] crypto: add missing crypto module aliases
-Date: Tue, 13 Jan 2015 07:36:34 -0800
-Message-ID: <CAGXu5jJ96kAj788ou+_b17auZ4OLBAPbibVK7FWWei66Fpc1yw@mail.gmail.com>
-References: <1420996667-31693-1-git-send-email-minipli@googlemail.com>
-	<1420996667-31693-2-git-send-email-minipli@googlemail.com>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: Re: Crypto: Add support for 192 & 256 bit keys to AESNI RFC4106 -
+ resubmission
+Date: Tue, 13 Jan 2015 13:16:43 -0500
+Message-ID: <20150113181641.GA54532@redhat.com>
+References: <Pine.WNT.4.64.1501112342160.7768@Fly3>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto <linux-crypto@vger.kernel.org>
-To: Mathias Krause <minipli@googlemail.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	tim.c.chen@linux.intel.com, Timothy.McCaffrey@Unisys.com
+To: Timothy McCaffrey <timcaffrey420@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f47.google.com ([209.85.218.47]:56972 "EHLO
-	mail-oi0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752699AbbAMPge (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Jan 2015 10:36:34 -0500
-Received: by mail-oi0-f47.google.com with SMTP id z81so2825097oif.6
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Jan 2015 07:36:34 -0800 (PST)
-In-Reply-To: <1420996667-31693-2-git-send-email-minipli@googlemail.com>
+Received: from mx1.redhat.com ([209.132.183.28]:39231 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750848AbbAMSR4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 13 Jan 2015 13:17:56 -0500
+Content-Disposition: inline
+In-Reply-To: <Pine.WNT.4.64.1501112342160.7768@Fly3>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 11, 2015 at 9:17 AM, Mathias Krause <minipli@googlemail.com> wrote:
-> Commit 5d26a105b5a7 ("crypto: prefix module autoloading with "crypto-"")
-> changed the automatic module loading when requesting crypto algorithms
-> to prefix all module requests with "crypto-". This requires all crypto
-> modules to have a crypto specific module alias even if their file name
-> would otherwise match the requested crypto algorithm.
->
-> Even though commit 5d26a105b5a7 added those aliases for a vast amount of
-> modules, it was missing a few. Add the required MODULE_ALIAS_CRYPTO
-> annotations to those files to make them get loaded automatically, again.
-> This fixes, e.g., requesting 'ecb(blowfish-generic)', which used to work
-> with kernels v3.18 and below.
->
-> Also change MODULE_ALIAS() lines to MODULE_ALIAS_CRYPTO(). The former
-> won't work for crypto modules any more.
->
-> Fixes: 5d26a105b5a7 ("crypto: prefix module autoloading with "crypto-"")
-> Cc: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Mathias Krause <minipli@googlemail.com>
+On Sun, Jan 11, 2015 at 11:48:08PM -0500, Timothy McCaffrey wrote:
+> These patches fix the RFC4106 implementation in the aesni-intel module so it
+> supports 192 & 256 bit keys.
+> 
+> Since the AVX support that was added to this module also only supports 128 bit keys,
+> and this patch only affects the SSE implementation, changes were also made to
+> use the SSE version if key sizes other than 128 are specified.
+> 
+> RFC4106 specifies that 192 & 256 bit keys must be supported (section 8.4).
+> 
+> Also, this should fix Strongswan issue 341 where the aesni module needs to be
+> unloaded if 256 bit keys are used:
+> 
+> http://wiki.strongswan.org/issues/341
+> 
+> This patch has been tested with Sandy Bridge and Haswell processors.  With 128
+> bit keys and input buffers > 512 bytes a slight performance degradation was
+> noticed (~1%).  For input buffers of less than 512 bytes there was no
+> performance impact.  Compared to 128 bit keys, 256 bit key size performance
+> is approx. .5 cycles per byte slower on Sandy Bridge, and .37 cycles per 
+> byte slower on Haswell (vs. SSE code).
+> 
+> This patch has also been tested with StrongSwan IPSec connections where it
+> worked correctly.
+> 
+> I created this diff from a git clone of crypto-2.6.git.
+> 
+> Any questions, please feel free to contact me.
+> 
+> Signed off by: timothy.mccaffrey@unisys.com
 
-Ah, perfect! Thanks for finding the missing ones!
+Here's an unborked version that applies cleanly to linus' master right
+now. Somehow, tons of extra spaces made their way into the original
+(re-)submission, I just stripped them out (and fixed up a few extra
+trailing spaces and spaces before tabs).
 
-Acked-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
 
--Kees
+---
 
-> ---
->  arch/powerpc/crypto/sha1.c       |    1 +
->  arch/x86/crypto/sha-mb/sha1_mb.c |    2 +-
->  crypto/aes_generic.c             |    1 +
->  crypto/ansi_cprng.c              |    1 +
->  crypto/blowfish_generic.c        |    1 +
->  crypto/camellia_generic.c        |    1 +
->  crypto/cast5_generic.c           |    1 +
->  crypto/cast6_generic.c           |    1 +
->  crypto/crc32c_generic.c          |    1 +
->  crypto/crct10dif_generic.c       |    1 +
->  crypto/des_generic.c             |    7 ++++---
->  crypto/ghash-generic.c           |    1 +
->  crypto/krng.c                    |    1 +
->  crypto/salsa20_generic.c         |    1 +
->  crypto/serpent_generic.c         |    1 +
->  crypto/sha1_generic.c            |    1 +
->  crypto/sha256_generic.c          |    2 ++
->  crypto/sha512_generic.c          |    2 ++
->  crypto/tea.c                     |    1 +
->  crypto/tgr192.c                  |    1 +
->  crypto/twofish_generic.c         |    1 +
->  crypto/wp512.c                   |    1 +
->  22 files changed, 27 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/powerpc/crypto/sha1.c b/arch/powerpc/crypto/sha1.c
-> index d3feba5a275f..c154cebc1041 100644
-> --- a/arch/powerpc/crypto/sha1.c
-> +++ b/arch/powerpc/crypto/sha1.c
-> @@ -154,4 +154,5 @@ module_exit(sha1_powerpc_mod_fini);
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm");
->
-> +MODULE_ALIAS_CRYPTO("sha1");
->  MODULE_ALIAS_CRYPTO("sha1-powerpc");
-> diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
-> index a225a5ca1037..fd9f6b035b16 100644
-> --- a/arch/x86/crypto/sha-mb/sha1_mb.c
-> +++ b/arch/x86/crypto/sha-mb/sha1_mb.c
-> @@ -931,4 +931,4 @@ module_exit(sha1_mb_mod_fini);
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm, multi buffer accelerated");
->
-> -MODULE_ALIAS("sha1");
-> +MODULE_ALIAS_CRYPTO("sha1");
-> diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-> index 9b3c54c1cbe8..3dd101144a58 100644
-> --- a/crypto/aes_generic.c
-> +++ b/crypto/aes_generic.c
-> @@ -1475,3 +1475,4 @@ module_exit(aes_fini);
->  MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm");
->  MODULE_LICENSE("Dual BSD/GPL");
->  MODULE_ALIAS_CRYPTO("aes");
-> +MODULE_ALIAS_CRYPTO("aes-generic");
-> diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-> index b4485a108389..6f5bebc9bf01 100644
-> --- a/crypto/ansi_cprng.c
-> +++ b/crypto/ansi_cprng.c
-> @@ -477,3 +477,4 @@ MODULE_PARM_DESC(dbg, "Boolean to enable debugging (0/1 == off/on)");
->  module_init(prng_mod_init);
->  module_exit(prng_mod_fini);
->  MODULE_ALIAS_CRYPTO("stdrng");
-> +MODULE_ALIAS_CRYPTO("ansi_cprng");
-> diff --git a/crypto/blowfish_generic.c b/crypto/blowfish_generic.c
-> index 7bd71f02d0dd..87b392a77a93 100644
-> --- a/crypto/blowfish_generic.c
-> +++ b/crypto/blowfish_generic.c
-> @@ -139,3 +139,4 @@ module_exit(blowfish_mod_fini);
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("Blowfish Cipher Algorithm");
->  MODULE_ALIAS_CRYPTO("blowfish");
-> +MODULE_ALIAS_CRYPTO("blowfish-generic");
-> diff --git a/crypto/camellia_generic.c b/crypto/camellia_generic.c
-> index 1b74c5a3e891..a02286bf319e 100644
-> --- a/crypto/camellia_generic.c
-> +++ b/crypto/camellia_generic.c
-> @@ -1099,3 +1099,4 @@ module_exit(camellia_fini);
->  MODULE_DESCRIPTION("Camellia Cipher Algorithm");
->  MODULE_LICENSE("GPL");
->  MODULE_ALIAS_CRYPTO("camellia");
-> +MODULE_ALIAS_CRYPTO("camellia-generic");
-> diff --git a/crypto/cast5_generic.c b/crypto/cast5_generic.c
-> index 84c86db67ec7..df5c72629383 100644
-> --- a/crypto/cast5_generic.c
-> +++ b/crypto/cast5_generic.c
-> @@ -550,3 +550,4 @@ module_exit(cast5_mod_fini);
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("Cast5 Cipher Algorithm");
->  MODULE_ALIAS_CRYPTO("cast5");
-> +MODULE_ALIAS_CRYPTO("cast5-generic");
-> diff --git a/crypto/cast6_generic.c b/crypto/cast6_generic.c
-> index f408f0bd8de2..058c8d755d03 100644
-> --- a/crypto/cast6_generic.c
-> +++ b/crypto/cast6_generic.c
-> @@ -292,3 +292,4 @@ module_exit(cast6_mod_fini);
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("Cast6 Cipher Algorithm");
->  MODULE_ALIAS_CRYPTO("cast6");
-> +MODULE_ALIAS_CRYPTO("cast6-generic");
-> diff --git a/crypto/crc32c_generic.c b/crypto/crc32c_generic.c
-> index 2a062025749d..06f1b60f02b2 100644
-> --- a/crypto/crc32c_generic.c
-> +++ b/crypto/crc32c_generic.c
-> @@ -171,4 +171,5 @@ MODULE_AUTHOR("Clay Haapala <chaapala@cisco.com>");
->  MODULE_DESCRIPTION("CRC32c (Castagnoli) calculations wrapper for lib/crc32c");
->  MODULE_LICENSE("GPL");
->  MODULE_ALIAS_CRYPTO("crc32c");
-> +MODULE_ALIAS_CRYPTO("crc32c-generic");
->  MODULE_SOFTDEP("pre: crc32c");
-> diff --git a/crypto/crct10dif_generic.c b/crypto/crct10dif_generic.c
-> index 08bb4f504520..c1229614c7e3 100644
-> --- a/crypto/crct10dif_generic.c
-> +++ b/crypto/crct10dif_generic.c
-> @@ -125,3 +125,4 @@ MODULE_AUTHOR("Tim Chen <tim.c.chen@linux.intel.com>");
->  MODULE_DESCRIPTION("T10 DIF CRC calculation.");
->  MODULE_LICENSE("GPL");
->  MODULE_ALIAS_CRYPTO("crct10dif");
-> +MODULE_ALIAS_CRYPTO("crct10dif-generic");
-> diff --git a/crypto/des_generic.c b/crypto/des_generic.c
-> index 42912948776b..a71720544d11 100644
-> --- a/crypto/des_generic.c
-> +++ b/crypto/des_generic.c
-> @@ -983,8 +983,6 @@ static struct crypto_alg des_algs[2] = { {
->         .cia_decrypt            =       des3_ede_decrypt } }
->  } };
->
-> -MODULE_ALIAS_CRYPTO("des3_ede");
-> -
->  static int __init des_generic_mod_init(void)
->  {
->         return crypto_register_algs(des_algs, ARRAY_SIZE(des_algs));
-> @@ -1001,4 +999,7 @@ module_exit(des_generic_mod_fini);
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("DES & Triple DES EDE Cipher Algorithms");
->  MODULE_AUTHOR("Dag Arne Osvik <da@osvik.no>");
-> -MODULE_ALIAS("des");
-> +MODULE_ALIAS_CRYPTO("des");
-> +MODULE_ALIAS_CRYPTO("des-generic");
-> +MODULE_ALIAS_CRYPTO("des3_ede");
-> +MODULE_ALIAS_CRYPTO("des3_ede-generic");
-> diff --git a/crypto/ghash-generic.c b/crypto/ghash-generic.c
-> index 4e97fae9666f..bac70995e064 100644
-> --- a/crypto/ghash-generic.c
-> +++ b/crypto/ghash-generic.c
-> @@ -173,3 +173,4 @@ module_exit(ghash_mod_exit);
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("GHASH Message Digest Algorithm");
->  MODULE_ALIAS_CRYPTO("ghash");
-> +MODULE_ALIAS_CRYPTO("ghash-generic");
-> diff --git a/crypto/krng.c b/crypto/krng.c
-> index 67c88b331210..0224841b6579 100644
-> --- a/crypto/krng.c
-> +++ b/crypto/krng.c
-> @@ -63,3 +63,4 @@ module_exit(krng_mod_fini);
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("Kernel Random Number Generator");
->  MODULE_ALIAS_CRYPTO("stdrng");
-> +MODULE_ALIAS_CRYPTO("krng");
-> diff --git a/crypto/salsa20_generic.c b/crypto/salsa20_generic.c
-> index 3d0f9df30ac9..f550b5d94630 100644
-> --- a/crypto/salsa20_generic.c
-> +++ b/crypto/salsa20_generic.c
-> @@ -249,3 +249,4 @@ module_exit(salsa20_generic_mod_fini);
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION ("Salsa20 stream cipher algorithm");
->  MODULE_ALIAS_CRYPTO("salsa20");
-> +MODULE_ALIAS_CRYPTO("salsa20-generic");
-> diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
-> index a53b5e2af335..94970a794975 100644
-> --- a/crypto/serpent_generic.c
-> +++ b/crypto/serpent_generic.c
-> @@ -667,3 +667,4 @@ MODULE_DESCRIPTION("Serpent and tnepres (kerneli compatible serpent reversed) Ci
->  MODULE_AUTHOR("Dag Arne Osvik <osvik@ii.uib.no>");
->  MODULE_ALIAS_CRYPTO("tnepres");
->  MODULE_ALIAS_CRYPTO("serpent");
-> +MODULE_ALIAS_CRYPTO("serpent-generic");
-> diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
-> index 039e58cfa155..a3e50c37eb6f 100644
-> --- a/crypto/sha1_generic.c
-> +++ b/crypto/sha1_generic.c
-> @@ -154,3 +154,4 @@ MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm");
->
->  MODULE_ALIAS_CRYPTO("sha1");
-> +MODULE_ALIAS_CRYPTO("sha1-generic");
-> diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
-> index 5eb21b120033..b001ff5c2efc 100644
-> --- a/crypto/sha256_generic.c
-> +++ b/crypto/sha256_generic.c
-> @@ -385,4 +385,6 @@ MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("SHA-224 and SHA-256 Secure Hash Algorithm");
->
->  MODULE_ALIAS_CRYPTO("sha224");
-> +MODULE_ALIAS_CRYPTO("sha224-generic");
->  MODULE_ALIAS_CRYPTO("sha256");
-> +MODULE_ALIAS_CRYPTO("sha256-generic");
-> diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
-> index 8d0b19ed4f4b..1c3c3767e079 100644
-> --- a/crypto/sha512_generic.c
-> +++ b/crypto/sha512_generic.c
-> @@ -289,4 +289,6 @@ MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("SHA-512 and SHA-384 Secure Hash Algorithms");
->
->  MODULE_ALIAS_CRYPTO("sha384");
-> +MODULE_ALIAS_CRYPTO("sha384-generic");
->  MODULE_ALIAS_CRYPTO("sha512");
-> +MODULE_ALIAS_CRYPTO("sha512-generic");
-> diff --git a/crypto/tea.c b/crypto/tea.c
-> index 495be2d0077d..b70b441c7d1e 100644
-> --- a/crypto/tea.c
-> +++ b/crypto/tea.c
-> @@ -270,6 +270,7 @@ static void __exit tea_mod_fini(void)
->         crypto_unregister_algs(tea_algs, ARRAY_SIZE(tea_algs));
->  }
->
-> +MODULE_ALIAS_CRYPTO("tea");
->  MODULE_ALIAS_CRYPTO("xtea");
->  MODULE_ALIAS_CRYPTO("xeta");
->
-> diff --git a/crypto/tgr192.c b/crypto/tgr192.c
-> index 6e5651c66cf8..321bc6ff2a9d 100644
-> --- a/crypto/tgr192.c
-> +++ b/crypto/tgr192.c
-> @@ -676,6 +676,7 @@ static void __exit tgr192_mod_fini(void)
->         crypto_unregister_shashes(tgr_algs, ARRAY_SIZE(tgr_algs));
->  }
->
-> +MODULE_ALIAS_CRYPTO("tgr192");
->  MODULE_ALIAS_CRYPTO("tgr160");
->  MODULE_ALIAS_CRYPTO("tgr128");
->
-> diff --git a/crypto/twofish_generic.c b/crypto/twofish_generic.c
-> index 523ad8c4e359..ebf7a3efb572 100644
-> --- a/crypto/twofish_generic.c
-> +++ b/crypto/twofish_generic.c
-> @@ -212,3 +212,4 @@ module_exit(twofish_mod_fini);
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION ("Twofish Cipher Algorithm");
->  MODULE_ALIAS_CRYPTO("twofish");
-> +MODULE_ALIAS_CRYPTO("twofish-generic");
-> diff --git a/crypto/wp512.c b/crypto/wp512.c
-> index 0de42eb3d040..7ee5a043a988 100644
-> --- a/crypto/wp512.c
-> +++ b/crypto/wp512.c
-> @@ -1167,6 +1167,7 @@ static void __exit wp512_mod_fini(void)
->         crypto_unregister_shashes(wp_algs, ARRAY_SIZE(wp_algs));
->  }
->
-> +MODULE_ALIAS_CRYPTO("wp512");
->  MODULE_ALIAS_CRYPTO("wp384");
->  MODULE_ALIAS_CRYPTO("wp256");
->
-> --
-> 1.7.10.4
->
-
-
+diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
+index 477e9d7..6bd2c6c 100644
+--- a/arch/x86/crypto/aesni-intel_asm.S
++++ b/arch/x86/crypto/aesni-intel_asm.S
+@@ -32,12 +32,23 @@
+ #include <linux/linkage.h>
+ #include <asm/inst.h>
+ 
++/*
++ * The following macros are used to move an (un)aligned 16 byte value to/from
++ * an XMM register.  This can done for either FP or integer values, for FP use
++ * movaps (move aligned packed single) or integer use movdqa (move double quad
++ * aligned).  It doesn't make a performance difference which instruction is used
++ * since Nehalem (original Core i7) was released.  However, the movaps is a byte
++ * shorter, so that is the one we'll use for now. (same for unaligned).
++ */
++#define MOVADQ	movaps
++#define MOVUDQ	movups
++
+ #ifdef __x86_64__
++
+ .data
+ .align 16
+ .Lgf128mul_x_ble_mask:
+ 	.octa 0x00000000000000010000000000000087
+-
+ POLY:   .octa 0xC2000000000000000000000000000001
+ TWOONE: .octa 0x00000001000000000000000000000001
+ 
+@@ -89,6 +100,7 @@ enc:        .octa 0x2
+ #define arg8 STACK_OFFSET+16(%r14)
+ #define arg9 STACK_OFFSET+24(%r14)
+ #define arg10 STACK_OFFSET+32(%r14)
++#define keysize 2*15*16(%arg1)
+ #endif
+ 
+ 
+@@ -213,10 +225,12 @@ enc:        .octa 0x2
+ 
+ .macro INITIAL_BLOCKS_DEC num_initial_blocks TMP1 TMP2 TMP3 TMP4 TMP5 XMM0 XMM1 \
+ XMM2 XMM3 XMM4 XMMDst TMP6 TMP7 i i_seq operation
++        MOVADQ     SHUF_MASK(%rip), %xmm14
+ 	mov	   arg7, %r10           # %r10 = AAD
+ 	mov	   arg8, %r12           # %r12 = aadLen
+ 	mov	   %r12, %r11
+ 	pxor	   %xmm\i, %xmm\i
++
+ _get_AAD_loop\num_initial_blocks\operation:
+ 	movd	   (%r10), \TMP1
+ 	pslldq	   $12, \TMP1
+@@ -225,16 +239,18 @@ _get_AAD_loop\num_initial_blocks\operation:
+ 	add	   $4, %r10
+ 	sub	   $4, %r12
+ 	jne	   _get_AAD_loop\num_initial_blocks\operation
++
+ 	cmp	   $16, %r11
+ 	je	   _get_AAD_loop2_done\num_initial_blocks\operation
++
+ 	mov	   $16, %r12
+ _get_AAD_loop2\num_initial_blocks\operation:
+ 	psrldq	   $4, %xmm\i
+ 	sub	   $4, %r12
+ 	cmp	   %r11, %r12
+ 	jne	   _get_AAD_loop2\num_initial_blocks\operation
++
+ _get_AAD_loop2_done\num_initial_blocks\operation:
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM   %xmm14, %xmm\i # byte-reflect the AAD data
+ 
+ 	xor	   %r11, %r11 # initialise the data pointer offset as zero
+@@ -243,59 +259,34 @@ _get_AAD_loop2_done\num_initial_blocks\operation:
+ 
+ 	mov	   %arg5, %rax                      # %rax = *Y0
+ 	movdqu	   (%rax), \XMM0                    # XMM0 = Y0
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM   %xmm14, \XMM0
+ 
+ .if (\i == 5) || (\i == 6) || (\i == 7)
++	MOVADQ		ONE(%RIP),\TMP1
++	MOVADQ		(%arg1),\TMP2
+ .irpc index, \i_seq
+-	paddd	   ONE(%rip), \XMM0                 # INCR Y0
++	paddd	   \TMP1, \XMM0                 # INCR Y0
+ 	movdqa	   \XMM0, %xmm\index
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM   %xmm14, %xmm\index      # perform a 16 byte swap
+-
+-.endr
+-.irpc index, \i_seq
+-	pxor	   16*0(%arg1), %xmm\index
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x10(%rdi), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 1
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x20(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x30(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x40(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x50(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x60(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
++	pxor	   \TMP2, %xmm\index
+ .endr
+-.irpc index, \i_seq
+-	movaps 0x70(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x80(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x90(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
++	lea	0x10(%arg1),%r10
++	mov	keysize,%eax
++	shr	$2,%eax				# 128->4, 192->6, 256->8
++	add	$5,%eax			      # 128->9, 192->11, 256->13
++
++aes_loop_initial_dec\num_initial_blocks:
++	MOVADQ	(%r10),\TMP1
++.irpc	index, \i_seq
++	AESENC	\TMP1, %xmm\index
+ .endr
++	add	$16,%r10
++	sub	$1,%eax
++	jnz	aes_loop_initial_dec\num_initial_blocks
++
++	MOVADQ	(%r10), \TMP1
+ .irpc index, \i_seq
+-	movaps 0xa0(%arg1), \TMP1
+-	AESENCLAST \TMP1, %xmm\index         # Round 10
++	AESENCLAST \TMP1, %xmm\index         # Last Round
+ .endr
+ .irpc index, \i_seq
+ 	movdqu	   (%arg3 , %r11, 1), \TMP1
+@@ -305,10 +296,8 @@ _get_AAD_loop2_done\num_initial_blocks\operation:
+ 	add	   $16, %r11
+ 
+ 	movdqa     \TMP1, %xmm\index
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM	   %xmm14, %xmm\index
+-
+-		# prepare plaintext/ciphertext for GHASH computation
++                # prepare plaintext/ciphertext for GHASH computation
+ .endr
+ .endif
+ 	GHASH_MUL  %xmm\i, \TMP3, \TMP1, \TMP2, \TMP4, \TMP5, \XMM1
+@@ -338,30 +327,28 @@ _get_AAD_loop2_done\num_initial_blocks\operation:
+ * Precomputations for HashKey parallel with encryption of first 4 blocks.
+ * Haskey_i_k holds XORed values of the low and high parts of the Haskey_i
+ */
+-	paddd	   ONE(%rip), \XMM0              # INCR Y0
+-	movdqa	   \XMM0, \XMM1
+-        movdqa     SHUF_MASK(%rip), %xmm14
++	MOVADQ	   ONE(%rip), \TMP1
++	paddd	   \TMP1, \XMM0              # INCR Y0
++	MOVADQ	   \XMM0, \XMM1
+ 	PSHUFB_XMM  %xmm14, \XMM1        # perform a 16 byte swap
+ 
+-	paddd	   ONE(%rip), \XMM0              # INCR Y0
+-	movdqa	   \XMM0, \XMM2
+-        movdqa     SHUF_MASK(%rip), %xmm14
++	paddd	   \TMP1, \XMM0              # INCR Y0
++	MOVADQ	   \XMM0, \XMM2
+ 	PSHUFB_XMM  %xmm14, \XMM2        # perform a 16 byte swap
+ 
+-	paddd	   ONE(%rip), \XMM0              # INCR Y0
+-	movdqa	   \XMM0, \XMM3
+-        movdqa     SHUF_MASK(%rip), %xmm14
++	paddd	   \TMP1, \XMM0              # INCR Y0
++	MOVADQ	   \XMM0, \XMM3
+ 	PSHUFB_XMM %xmm14, \XMM3        # perform a 16 byte swap
+ 
+-	paddd	   ONE(%rip), \XMM0              # INCR Y0
+-	movdqa	   \XMM0, \XMM4
+-        movdqa     SHUF_MASK(%rip), %xmm14
++	paddd	   \TMP1, \XMM0              # INCR Y0
++	MOVADQ	   \XMM0, \XMM4
+ 	PSHUFB_XMM %xmm14, \XMM4        # perform a 16 byte swap
+ 
+-	pxor	   16*0(%arg1), \XMM1
+-	pxor	   16*0(%arg1), \XMM2
+-	pxor	   16*0(%arg1), \XMM3
+-	pxor	   16*0(%arg1), \XMM4
++	MOVADQ	   0(%arg1),\TMP1
++	pxor	   \TMP1, \XMM1
++	pxor	   \TMP1, \XMM2
++	pxor	   \TMP1, \XMM3
++	pxor	   \TMP1, \XMM4
+ 	movdqa	   \TMP3, \TMP5
+ 	pshufd	   $78, \TMP3, \TMP1
+ 	pxor	   \TMP3, \TMP1
+@@ -399,7 +386,23 @@ _get_AAD_loop2_done\num_initial_blocks\operation:
+ 	pshufd	   $78, \TMP5, \TMP1
+ 	pxor	   \TMP5, \TMP1
+ 	movdqa	   \TMP1, HashKey_4_k(%rsp)
+-	movaps 0xa0(%arg1), \TMP2
++	lea	   0xa0(%arg1),%r10
++	mov	   keysize,%eax
++	shr	   $2,%eax			# 128->4, 192->6, 256->8
++	sub	   $4,%eax			# 128->0, 192->2, 256->4
++	jz	   aes_loop_pre_dec_done\num_initial_blocks
++
++aes_loop_pre_dec\num_initial_blocks:
++	MOVADQ	   (%r10),\TMP2
++.irpc	index, 1234
++	AESENC	   \TMP2, %xmm\index
++.endr
++	add	   $16,%r10
++	sub	   $1,%eax
++	jnz	   aes_loop_pre_dec\num_initial_blocks
++
++aes_loop_pre_dec_done\num_initial_blocks:
++	MOVADQ	   (%r10), \TMP2
+ 	AESENCLAST \TMP2, \XMM1
+ 	AESENCLAST \TMP2, \XMM2
+ 	AESENCLAST \TMP2, \XMM3
+@@ -421,15 +424,11 @@ _get_AAD_loop2_done\num_initial_blocks\operation:
+ 	movdqu	   \XMM4, 16*3(%arg2 , %r11 , 1)
+ 	movdqa     \TMP1, \XMM4
+ 	add	   $64, %r11
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM %xmm14, \XMM1 # perform a 16 byte swap
+ 	pxor	   \XMMDst, \XMM1
+ # combine GHASHed value with the corresponding ciphertext
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM %xmm14, \XMM2 # perform a 16 byte swap
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM %xmm14, \XMM3 # perform a 16 byte swap
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM %xmm14, \XMM4 # perform a 16 byte swap
+ 
+ _initial_blocks_done\num_initial_blocks\operation:
+@@ -451,6 +450,7 @@ _initial_blocks_done\num_initial_blocks\operation:
+ 
+ .macro INITIAL_BLOCKS_ENC num_initial_blocks TMP1 TMP2 TMP3 TMP4 TMP5 XMM0 XMM1 \
+ XMM2 XMM3 XMM4 XMMDst TMP6 TMP7 i i_seq operation
++        MOVADQ     SHUF_MASK(%rip), %xmm14
+ 	mov	   arg7, %r10           # %r10 = AAD
+ 	mov	   arg8, %r12           # %r12 = aadLen
+ 	mov	   %r12, %r11
+@@ -472,7 +472,6 @@ _get_AAD_loop2\num_initial_blocks\operation:
+ 	cmp	   %r11, %r12
+ 	jne	   _get_AAD_loop2\num_initial_blocks\operation
+ _get_AAD_loop2_done\num_initial_blocks\operation:
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM   %xmm14, %xmm\i # byte-reflect the AAD data
+ 
+ 	xor	   %r11, %r11 # initialise the data pointer offset as zero
+@@ -481,59 +480,35 @@ _get_AAD_loop2_done\num_initial_blocks\operation:
+ 
+ 	mov	   %arg5, %rax                      # %rax = *Y0
+ 	movdqu	   (%rax), \XMM0                    # XMM0 = Y0
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM   %xmm14, \XMM0
+ 
+ .if (\i == 5) || (\i == 6) || (\i == 7)
+-.irpc index, \i_seq
+-	paddd	   ONE(%rip), \XMM0                 # INCR Y0
+-	movdqa	   \XMM0, %xmm\index
+-        movdqa     SHUF_MASK(%rip), %xmm14
+-	PSHUFB_XMM   %xmm14, %xmm\index      # perform a 16 byte swap
+ 
+-.endr
+-.irpc index, \i_seq
+-	pxor	   16*0(%arg1), %xmm\index
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x10(%rdi), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 1
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x20(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
++	MOVADQ		ONE(%RIP),\TMP1
++	MOVADQ		0(%arg1),\TMP2
+ .irpc index, \i_seq
+-	movaps 0x30(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
++	paddd		\TMP1, \XMM0                 # INCR Y0
++	MOVADQ		\XMM0, %xmm\index
++	PSHUFB_XMM	%xmm14, %xmm\index      # perform a 16 byte swap
++	pxor		\TMP2, %xmm\index
+ .endr
+-.irpc index, \i_seq
+-	movaps 0x40(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x50(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x60(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x70(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x80(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
+-.endr
+-.irpc index, \i_seq
+-	movaps 0x90(%arg1), \TMP1
+-	AESENC     \TMP1, %xmm\index          # Round 2
++	lea	0x10(%arg1),%r10
++	mov	keysize,%eax
++	shr	$2,%eax				# 128->4, 192->6, 256->8
++	add	$5,%eax			      # 128->9, 192->11, 256->13
++
++aes_loop_initial_enc\num_initial_blocks:
++	MOVADQ	(%r10),\TMP1
++.irpc	index, \i_seq
++	AESENC	\TMP1, %xmm\index
+ .endr
++	add	$16,%r10
++	sub	$1,%eax
++	jnz	aes_loop_initial_enc\num_initial_blocks
++
++	MOVADQ	(%r10), \TMP1
+ .irpc index, \i_seq
+-	movaps 0xa0(%arg1), \TMP1
+-	AESENCLAST \TMP1, %xmm\index         # Round 10
++	AESENCLAST \TMP1, %xmm\index         # Last Round
+ .endr
+ .irpc index, \i_seq
+ 	movdqu	   (%arg3 , %r11, 1), \TMP1
+@@ -541,8 +516,6 @@ _get_AAD_loop2_done\num_initial_blocks\operation:
+ 	movdqu	   %xmm\index, (%arg2 , %r11, 1)
+ 	# write back plaintext/ciphertext for num_initial_blocks
+ 	add	   $16, %r11
+-
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM	   %xmm14, %xmm\index
+ 
+ 		# prepare plaintext/ciphertext for GHASH computation
+@@ -575,30 +548,28 @@ _get_AAD_loop2_done\num_initial_blocks\operation:
+ * Precomputations for HashKey parallel with encryption of first 4 blocks.
+ * Haskey_i_k holds XORed values of the low and high parts of the Haskey_i
+ */
+-	paddd	   ONE(%rip), \XMM0              # INCR Y0
+-	movdqa	   \XMM0, \XMM1
+-        movdqa     SHUF_MASK(%rip), %xmm14
++	MOVADQ	   ONE(%RIP),\TMP1
++	paddd	   \TMP1, \XMM0              # INCR Y0
++	MOVADQ	   \XMM0, \XMM1
+ 	PSHUFB_XMM  %xmm14, \XMM1        # perform a 16 byte swap
+ 
+-	paddd	   ONE(%rip), \XMM0              # INCR Y0
+-	movdqa	   \XMM0, \XMM2
+-        movdqa     SHUF_MASK(%rip), %xmm14
++	paddd	   \TMP1, \XMM0              # INCR Y0
++	MOVADQ	   \XMM0, \XMM2
+ 	PSHUFB_XMM  %xmm14, \XMM2        # perform a 16 byte swap
+ 
+-	paddd	   ONE(%rip), \XMM0              # INCR Y0
+-	movdqa	   \XMM0, \XMM3
+-        movdqa     SHUF_MASK(%rip), %xmm14
++	paddd	   \TMP1, \XMM0              # INCR Y0
++	MOVADQ	   \XMM0, \XMM3
+ 	PSHUFB_XMM %xmm14, \XMM3        # perform a 16 byte swap
+ 
+-	paddd	   ONE(%rip), \XMM0              # INCR Y0
+-	movdqa	   \XMM0, \XMM4
+-        movdqa     SHUF_MASK(%rip), %xmm14
++	paddd	   \TMP1, \XMM0              # INCR Y0
++	MOVADQ	   \XMM0, \XMM4
+ 	PSHUFB_XMM %xmm14, \XMM4        # perform a 16 byte swap
+ 
+-	pxor	   16*0(%arg1), \XMM1
+-	pxor	   16*0(%arg1), \XMM2
+-	pxor	   16*0(%arg1), \XMM3
+-	pxor	   16*0(%arg1), \XMM4
++	MOVADQ	   0(%arg1),\TMP1
++	pxor	   \TMP1, \XMM1
++	pxor	   \TMP1, \XMM2
++	pxor	   \TMP1, \XMM3
++	pxor	   \TMP1, \XMM4
+ 	movdqa	   \TMP3, \TMP5
+ 	pshufd	   $78, \TMP3, \TMP1
+ 	pxor	   \TMP3, \TMP1
+@@ -636,7 +607,23 @@ _get_AAD_loop2_done\num_initial_blocks\operation:
+ 	pshufd	   $78, \TMP5, \TMP1
+ 	pxor	   \TMP5, \TMP1
+ 	movdqa	   \TMP1, HashKey_4_k(%rsp)
+-	movaps 0xa0(%arg1), \TMP2
++	lea	   0xa0(%arg1),%r10
++	mov	   keysize,%eax
++	shr	   $2,%eax			# 128->4, 192->6, 256->8
++	sub	   $4,%eax			# 128->0, 192->2, 256->4
++	jz	   aes_loop_pre_enc_done\num_initial_blocks
++
++aes_loop_pre_enc\num_initial_blocks:
++	MOVADQ	   (%r10),\TMP2
++.irpc	index, 1234
++	AESENC	   \TMP2, %xmm\index
++.endr
++	add	   $16,%r10
++	sub	   $1,%eax
++	jnz	   aes_loop_pre_enc\num_initial_blocks
++
++aes_loop_pre_enc_done\num_initial_blocks:
++	MOVADQ	   (%r10), \TMP2
+ 	AESENCLAST \TMP2, \XMM1
+ 	AESENCLAST \TMP2, \XMM2
+ 	AESENCLAST \TMP2, \XMM3
+@@ -655,15 +642,11 @@ _get_AAD_loop2_done\num_initial_blocks\operation:
+ 	movdqu     \XMM4, 16*3(%arg2 , %r11 , 1)
+ 
+ 	add	   $64, %r11
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM %xmm14, \XMM1 # perform a 16 byte swap
+ 	pxor	   \XMMDst, \XMM1
+ # combine GHASHed value with the corresponding ciphertext
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM %xmm14, \XMM2 # perform a 16 byte swap
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM %xmm14, \XMM3 # perform a 16 byte swap
+-        movdqa     SHUF_MASK(%rip), %xmm14
+ 	PSHUFB_XMM %xmm14, \XMM4 # perform a 16 byte swap
+ 
+ _initial_blocks_done\num_initial_blocks\operation:
+@@ -794,7 +777,23 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
+ 	AESENC	  \TMP3, \XMM3
+ 	AESENC	  \TMP3, \XMM4
+ 	PCLMULQDQ 0x00, \TMP5, \XMM8          # XMM8 = a0*b0
+-	movaps 0xa0(%arg1), \TMP3
++	lea	  0xa0(%arg1),%r10
++	mov	  keysize,%eax
++	shr	  $2,%eax			# 128->4, 192->6, 256->8
++	sub	  $4,%eax			# 128->0, 192->2, 256->4
++	jz	  aes_loop_par_enc_done
++
++aes_loop_par_enc:
++	MOVADQ	  (%r10),\TMP3
++.irpc	index, 1234
++	AESENC	  \TMP3, %xmm\index
++.endr
++	add	  $16,%r10
++	sub	  $1,%eax
++	jnz	  aes_loop_par_enc
++
++aes_loop_par_enc_done:
++	MOVADQ	  (%r10), \TMP3
+ 	AESENCLAST \TMP3, \XMM1           # Round 10
+ 	AESENCLAST \TMP3, \XMM2
+ 	AESENCLAST \TMP3, \XMM3
+@@ -986,8 +985,24 @@ TMP6 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 operation
+ 	AESENC	  \TMP3, \XMM3
+ 	AESENC	  \TMP3, \XMM4
+ 	PCLMULQDQ 0x00, \TMP5, \XMM8          # XMM8 = a0*b0
+-	movaps 0xa0(%arg1), \TMP3
+-	AESENCLAST \TMP3, \XMM1           # Round 10
++	lea	  0xa0(%arg1),%r10
++	mov	  keysize,%eax
++	shr	  $2,%eax		        # 128->4, 192->6, 256->8
++	sub	  $4,%eax			# 128->0, 192->2, 256->4
++	jz	  aes_loop_par_dec_done
++
++aes_loop_par_dec:
++	MOVADQ	  (%r10),\TMP3
++.irpc	index, 1234
++	AESENC	  \TMP3, %xmm\index
++.endr
++	add	  $16,%r10
++	sub	  $1,%eax
++	jnz	  aes_loop_par_dec
++
++aes_loop_par_dec_done:
++	MOVADQ	  (%r10), \TMP3
++	AESENCLAST \TMP3, \XMM1           # last round
+ 	AESENCLAST \TMP3, \XMM2
+ 	AESENCLAST \TMP3, \XMM3
+ 	AESENCLAST \TMP3, \XMM4
+@@ -1155,33 +1170,29 @@ TMP7 XMM1 XMM2 XMM3 XMM4 XMMDst
+ 	pxor      \TMP6, \XMMDst            # reduced result is in XMMDst
+ .endm
+ 
+-/* Encryption of a single block done*/
+-.macro ENCRYPT_SINGLE_BLOCK XMM0 TMP1
+ 
+-	pxor	(%arg1), \XMM0
+-        movaps 16(%arg1), \TMP1
+-	AESENC	\TMP1, \XMM0
+-        movaps 32(%arg1), \TMP1
+-	AESENC	\TMP1, \XMM0
+-        movaps 48(%arg1), \TMP1
+-	AESENC	\TMP1, \XMM0
+-        movaps 64(%arg1), \TMP1
+-	AESENC	\TMP1, \XMM0
+-        movaps 80(%arg1), \TMP1
+-	AESENC	\TMP1, \XMM0
+-        movaps 96(%arg1), \TMP1
+-	AESENC	\TMP1, \XMM0
+-        movaps 112(%arg1), \TMP1
+-	AESENC	\TMP1, \XMM0
+-        movaps 128(%arg1), \TMP1
+-	AESENC	\TMP1, \XMM0
+-        movaps 144(%arg1), \TMP1
+-	AESENC	\TMP1, \XMM0
+-        movaps 160(%arg1), \TMP1
+-	AESENCLAST	\TMP1, \XMM0
+-.endm
++/* Encryption of a single block
++* uses eax & r10
++*/
+ 
++.macro ENCRYPT_SINGLE_BLOCK XMM0 TMP1
+ 
++	pxor		(%arg1), \XMM0
++	mov		keysize,%eax
++	shr		$2,%eax			# 128->4, 192->6, 256->8
++	add		$5,%eax			# 128->9, 192->11, 256->13
++	lea		16(%arg1), %r10	  # get first expanded key address
++
++_esb_loop_\@:
++	MOVADQ		(%r10),\TMP1
++	AESENC		\TMP1,\XMM0
++	add		$16,%r10
++	sub		$1,%eax
++	jnz		_esb_loop_\@
++
++	MOVADQ		(%r10),\TMP1
++	AESENCLAST	\TMP1,\XMM0
++.endm
+ /*****************************************************************************
+ * void aesni_gcm_dec(void *aes_ctx,    // AES Key schedule. Starts on a 16 byte boundary.
+ *                   u8 *out,           // Plaintext output. Encrypt in-place is allowed.
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index ae855f4..947c6bf 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -43,6 +43,7 @@
+ #include <asm/crypto/glue_helper.h>
+ #endif
+ 
++
+ /* This data is stored at the end of the crypto_tfm struct.
+  * It's a type of per "session" data storage location.
+  * This needs to be 16 byte aligned.
+@@ -182,7 +183,8 @@ static void aesni_gcm_enc_avx(void *ctx, u8 *out,
+ 			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
+ 			u8 *auth_tag, unsigned long auth_tag_len)
+ {
+-	if (plaintext_len < AVX_GEN2_OPTSIZE) {
++        struct crypto_aes_ctx *aes_ctx = (struct crypto_aes_ctx*)ctx;
++	if ((plaintext_len < AVX_GEN2_OPTSIZE) || (aes_ctx-> key_length != AES_KEYSIZE_128)){
+ 		aesni_gcm_enc(ctx, out, in, plaintext_len, iv, hash_subkey, aad,
+ 				aad_len, auth_tag, auth_tag_len);
+ 	} else {
+@@ -197,7 +199,8 @@ static void aesni_gcm_dec_avx(void *ctx, u8 *out,
+ 			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
+ 			u8 *auth_tag, unsigned long auth_tag_len)
+ {
+-	if (ciphertext_len < AVX_GEN2_OPTSIZE) {
++        struct crypto_aes_ctx *aes_ctx = (struct crypto_aes_ctx*)ctx;
++	if ((ciphertext_len < AVX_GEN2_OPTSIZE) || (aes_ctx-> key_length != AES_KEYSIZE_128)) {
+ 		aesni_gcm_dec(ctx, out, in, ciphertext_len, iv, hash_subkey, aad,
+ 				aad_len, auth_tag, auth_tag_len);
+ 	} else {
+@@ -231,7 +234,8 @@ static void aesni_gcm_enc_avx2(void *ctx, u8 *out,
+ 			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
+ 			u8 *auth_tag, unsigned long auth_tag_len)
+ {
+-	if (plaintext_len < AVX_GEN2_OPTSIZE) {
++       struct crypto_aes_ctx *aes_ctx = (struct crypto_aes_ctx*)ctx;
++	if ((plaintext_len < AVX_GEN2_OPTSIZE) || (aes_ctx-> key_length != AES_KEYSIZE_128)) {
+ 		aesni_gcm_enc(ctx, out, in, plaintext_len, iv, hash_subkey, aad,
+ 				aad_len, auth_tag, auth_tag_len);
+ 	} else if (plaintext_len < AVX_GEN4_OPTSIZE) {
+@@ -250,7 +254,8 @@ static void aesni_gcm_dec_avx2(void *ctx, u8 *out,
+ 			u8 *hash_subkey, const u8 *aad, unsigned long aad_len,
+ 			u8 *auth_tag, unsigned long auth_tag_len)
+ {
+-	if (ciphertext_len < AVX_GEN2_OPTSIZE) {
++       struct crypto_aes_ctx *aes_ctx = (struct crypto_aes_ctx*)ctx;
++	if ((ciphertext_len < AVX_GEN2_OPTSIZE) || (aes_ctx-> key_length != AES_KEYSIZE_128)) {
+ 		aesni_gcm_dec(ctx, out, in, ciphertext_len, iv, hash_subkey,
+ 				aad, aad_len, auth_tag, auth_tag_len);
+ 	} else if (ciphertext_len < AVX_GEN4_OPTSIZE) {
+@@ -511,7 +516,7 @@ static int ctr_crypt(struct blkcipher_desc *desc,
+ 	kernel_fpu_begin();
+ 	while ((nbytes = walk.nbytes) >= AES_BLOCK_SIZE) {
+ 		aesni_ctr_enc_tfm(ctx, walk.dst.virt.addr, walk.src.virt.addr,
+-				  nbytes & AES_BLOCK_MASK, walk.iv);
++			              nbytes & AES_BLOCK_MASK, walk.iv);
+ 		nbytes &= AES_BLOCK_SIZE - 1;
+ 		err = blkcipher_walk_done(desc, &walk, nbytes);
+ 	}
+@@ -902,7 +907,8 @@ static int rfc4106_set_key(struct crypto_aead *parent, const u8 *key,
+ 	}
+ 	/*Account for 4 byte nonce at the end.*/
+ 	key_len -= 4;
+-	if (key_len != AES_KEYSIZE_128) {
++	if (key_len != AES_KEYSIZE_128 && key_len != AES_KEYSIZE_192 &&
++	    key_len != AES_KEYSIZE_256) {
+ 		crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 		return -EINVAL;
+ 	}
+@@ -1013,6 +1019,7 @@ static int __driver_rfc4106_encrypt(struct aead_request *req)
+ 	__be32 counter = cpu_to_be32(1);
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(tfm);
++	u32 key_len = ctx->aes_key_expanded.key_length;
+ 	void *aes_ctx = &(ctx->aes_key_expanded);
+ 	unsigned long auth_tag_len = crypto_aead_authsize(tfm);
+ 	u8 iv_tab[16+AESNI_ALIGN];
+@@ -1027,6 +1034,13 @@ static int __driver_rfc4106_encrypt(struct aead_request *req)
+ 	/* to 8 or 12 bytes */
+ 	if (unlikely(req->assoclen != 8 && req->assoclen != 12))
+ 		return -EINVAL;
++	if (unlikely(auth_tag_len != 8 && auth_tag_len != 12 && auth_tag_len != 16))
++	        return -EINVAL;
++	if (unlikely(key_len != AES_KEYSIZE_128 &&
++	             key_len != AES_KEYSIZE_192 &&
++	             key_len != AES_KEYSIZE_256))
++	        return -EINVAL;
++
+ 	/* IV below built */
+ 	for (i = 0; i < 4; i++)
+ 		*(iv+i) = ctx->nonce[i];
+@@ -1091,6 +1105,7 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
+ 	int retval = 0;
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(tfm);
++	u32 key_len = ctx->aes_key_expanded.key_length;
+ 	void *aes_ctx = &(ctx->aes_key_expanded);
+ 	unsigned long auth_tag_len = crypto_aead_authsize(tfm);
+ 	u8 iv_and_authTag[32+AESNI_ALIGN];
+@@ -1104,6 +1119,13 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
+ 	if (unlikely((req->cryptlen < auth_tag_len) ||
+ 		(req->assoclen != 8 && req->assoclen != 12)))
+ 		return -EINVAL;
++	if (unlikely(auth_tag_len != 8 && auth_tag_len != 12 && auth_tag_len != 16))
++	        return -EINVAL;
++	if (unlikely(key_len != AES_KEYSIZE_128 &&
++	             key_len != AES_KEYSIZE_192 &&
++	             key_len != AES_KEYSIZE_256))
++	        return -EINVAL;
++
+ 	/* Assuming we are supporting rfc4106 64-bit extended */
+ 	/* sequence numbers We need to have the AAD length */
+ 	/* equal to 8 or 12 bytes */
 
 -- 
-Kees Cook
-Chrome OS Security
+Jarod Wilson
+jarod@redhat.com
