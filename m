@@ -1,41 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/6] crypto: module alias fixes
-Date: Tue, 13 Jan 2015 22:32:54 +1100
-Message-ID: <20150113113254.GB6677@gondor.apana.org.au>
-References: <1420996667-31693-1-git-send-email-minipli@googlemail.com>
+Subject: Re: crypto: qat - fix device reset flow
+Date: Tue, 13 Jan 2015 22:33:31 +1100
+Message-ID: <20150113113331.GA6764@gondor.apana.org.au>
+References: <20150109195457.28205.23092.stgit@gitlad.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: Mathias Krause <minipli@googlemail.com>
+Cc: linux-crypto@vger.kernel.org
+To: "Allan, Bruce W" <bruce.w.allan@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:37081 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:59574 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751569AbbAMLdC (ORCPT
+	with ESMTP id S1752307AbbAMLdi (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Jan 2015 06:33:02 -0500
+	Tue, 13 Jan 2015 06:33:38 -0500
 Content-Disposition: inline
-In-Reply-To: <1420996667-31693-1-git-send-email-minipli@googlemail.com>
+In-Reply-To: <20150109195457.28205.23092.stgit@gitlad.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 11, 2015 at 06:17:41PM +0100, Mathias Krause wrote:
-> Hi Herbert,
-> 
-> this series is a follow up to commit 5d26a105b5a7 ("crypto: prefix
-> module autoloading with "crypto-""). In patch 1 it adds the required
-> MODULE_ALIAS_CRYPTO annotation where needed to bring back automatic
-> crypto module loading. Namely, modules that have a file name matching
-> the cipher they implement still need the MODULE_ALIAS_CRYPTO()
-> annotation. Otherwise they won't get loaded.
-> 
-> Patches 2 to 6 fix bogus module descriptions or aliases with the
-> exception of patch 4 which adds a missing crypto module alias.
-> 
-> At least patch 1 should go to crypto-2.6 to not regress the crypto API
-> for v3.19 in regard to automatic module loading.
+On Fri, Jan 09, 2015 at 11:54:58AM -0800, Allan, Bruce W wrote:
+> When the device needs a reset, e.g. when an uncorrectable PCIe AER event
+> occurs, various services/data structures need to be cleaned up, the
+> hardware reset and the services/data structures initialized and started.
+> The code to perform the cleanup and initialization was not performed when
+> a device reset was done.
 
-Patch 1 applied to crypto and the rest to cryptodev.  Thanks a lot!
+All five qat patches applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
