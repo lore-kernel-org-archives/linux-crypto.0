@@ -1,69 +1,47 @@
-From: Neil Horman <nhorman-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org>
-Subject: Re: [PATCH v10 0/2] crypto: AF_ALG: add AEAD and RNG support
-Date: Wed, 14 Jan 2015 12:26:32 -0500
-Message-ID: <20150114172632.GB24512@localhost.localdomain>
-References: <5489736.JvWhZNrmuD@tachyon.chronox.de>
- <20150114094631.GB15294@localhost.localdomain>
- <20150114110011.GA18099@gondor.apana.org.au>
- <5006702.rWOQQ5L1VO@tachyon.chronox.de>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] crypto: algif - change algif_skcipher to be asynchronous
+Date: Wed, 14 Jan 2015 09:36:57 -0800
+Message-ID: <54B6A939.4070207@intel.com>
+References: <20150113202823.32244.45456.stgit@tstruk-mobl1> <20150114053805.GA15204@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	ABI/API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <5006702.rWOQQ5L1VO-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	qat-linux@intel.com, linux-api@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:2132 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754521AbbANRkS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 Jan 2015 12:40:18 -0500
+In-Reply-To: <20150114053805.GA15204@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 14, 2015 at 04:31:44PM +0100, Stephan Mueller wrote:
-> Am Mittwoch, 14. Januar 2015, 22:00:11 schrieb Herbert Xu:
+Hi Herbert,
+On 01/13/2015 09:38 PM, Herbert Xu wrote:
+> What you want is AIO so we should try to use that interface rather
+> than creating some funky crypto-specific interface.
 > 
-> Hi Herbert,
+> Dave, the AIO hooks in net/socket.c is currently simply pointing
+> to the sync implementation.  What are you thoughts on allowing
+> socket implementations to supply these hooks?
 > 
-> > On Wed, Jan 14, 2015 at 04:46:31AM -0500, Neil Horman wrote:
-> > > On Wed, Jan 14, 2015 at 04:52:29AM +0100, Stephan Mueller wrote:
-> > > > Hi,
-> > > > 
-> > > > This patch set adds AEAD and RNG support to the AF_ALG interface
-> > > > exported by the kernel crypto API. By extending AF_ALG with AEAD and RNG
-> > > > support, all cipher types the kernel crypto API allows access to are
-> > > > now accessible from userspace.
-> > > > 
-> > > >  crypto/Kconfig      |   9 +
-> > > >  crypto/Makefile     |   1 +
-> > > >  crypto/algif_aead.c | 680
-> > > >  ++++++++++++++++++++++++++++++++++++++++++++++++++++ 3 files changed,
-> > > >  690 insertions(+)
-> > > >  create mode 100644 crypto/algif_aead.c
-> > > 
-> > > Where are the RNG bits?
-> > 
-> > They've already been merged.
-> 
-> Please also see my change log for v7:
-> ...
-> * RNG: patch dropped as it was applied
-> ...
-> 
-> To ensure consistency, I did not change the intro part of my description.
-Ah, thanks for the clarification
-Acked-by: Neil Horman <nhorman-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org>
+> The algif interface can then use these hooks to implement AIO
+> which is useful for maximising the hardware performance without
+> resorting to loads of threads.
 
-> 
-> > 
-> > Cheers,
-> 
-> 
-> -- 
-> Ciao
-> Stephan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+But then would you like to extend AIO interface to take the IV and
+something that would indicate the encrypt/decrypt operation on
+aio_write()? Also as far as I can see AIO doesn't support splice()
+operation for zero copy, which is the main thing here.
+
+>From the other hand it shouldn't be a problem to add crypto specific
+stuff to include/uapi/linux/if_alg.h, because it is all about crypto
+anyway, is it not?
+
+If you have a better way how to indicate that data processing should
+start on the last page in sendpage() instead of ALG_OP_IN_PLACE I would
+be happy to use it.
+Thanks,
+Tadeusz
