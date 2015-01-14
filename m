@@ -1,53 +1,38 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v10 0/2] crypto: AF_ALG: add AEAD and RNG support
-Date: Wed, 14 Jan 2015 22:00:11 +1100
-Message-ID: <20150114110011.GA18099@gondor.apana.org.au>
-References: <5489736.JvWhZNrmuD@tachyon.chronox.de>
- <20150114094631.GB15294@localhost.localdomain>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH -next] crypto: algif_rng - fix sparse non static symbol
+ warning
+Date: Wed, 14 Jan 2015 22:00:40 +1100
+Message-ID: <20150114110040.GB18099@gondor.apana.org.au>
+References: <1421198081-16766-1-git-send-email-weiyj_lk@163.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>,
-	Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	ABI/API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Neil Horman <nhorman-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Wei Yongjun <yongjun_wei@trendmicro.com.cn>,
+	linux-crypto@vger.kernel.org
+To: weiyj_lk@163.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:44124 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751318AbbANLAy (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 Jan 2015 06:00:54 -0500
 Content-Disposition: inline
-In-Reply-To: <20150114094631.GB15294-bi+AKbBUZKY6gyzm1THtWbp2dZbC/Bob@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1421198081-16766-1-git-send-email-weiyj_lk@163.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 14, 2015 at 04:46:31AM -0500, Neil Horman wrote:
-> On Wed, Jan 14, 2015 at 04:52:29AM +0100, Stephan Mueller wrote:
-> > Hi,
-> > 
-> > This patch set adds AEAD and RNG support to the AF_ALG interface
-> > exported by the kernel crypto API. By extending AF_ALG with AEAD and RNG
-> > support, all cipher types the kernel crypto API allows access to are
-> > now accessible from userspace.
-> > 
-> >  crypto/Kconfig      |   9 +
-> >  crypto/Makefile     |   1 +
-> >  crypto/algif_aead.c | 680 ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 690 insertions(+)
-> >  create mode 100644 crypto/algif_aead.c
-> > 
-> > -- 
-> > 2.1.0
-> > 
-> > 
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> > 
-> Where are the RNG bits?
+On Wed, Jan 14, 2015 at 09:14:41AM +0800, weiyj_lk@163.com wrote:
+> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+> 
+> Fixes the following sparse warnings:
+> 
+> crypto/algif_rng.c:185:13: warning:
+>  symbol 'rng_exit' was not declared. Should it be static?
+> 
+> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 
-They've already been merged.
-
-Cheers,
+Applied.
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
