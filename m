@@ -1,47 +1,42 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH] crypto: algif - change algif_skcipher to be asynchronous
-Date: Wed, 14 Jan 2015 09:36:57 -0800
-Message-ID: <54B6A939.4070207@intel.com>
-References: <20150113202823.32244.45456.stgit@tstruk-mobl1> <20150114053805.GA15204@gondor.apana.org.au>
+Subject: [PATCH] crypto: qat - don't need qat_auth_state struct
+Date: Wed, 14 Jan 2015 10:27:35 -0800
+Message-ID: <20150114182735.5482.89743.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com, linux-api@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	qat-linux@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:2132 "EHLO mga14.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:40831 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754521AbbANRkS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jan 2015 12:40:18 -0500
-In-Reply-To: <20150114053805.GA15204@gondor.apana.org.au>
+	id S1753186AbbANSa4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 Jan 2015 13:30:56 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
-On 01/13/2015 09:38 PM, Herbert Xu wrote:
-> What you want is AIO so we should try to use that interface rather
-> than creating some funky crypto-specific interface.
-> 
-> Dave, the AIO hooks in net/socket.c is currently simply pointing
-> to the sync implementation.  What are you thoughts on allowing
-> socket implementations to supply these hooks?
-> 
-> The algif interface can then use these hooks to implement AIO
-> which is useful for maximising the hardware performance without
-> resorting to loads of threads.
+We don't need the qat_auth_state structure anymore.
 
-But then would you like to extend AIO interface to take the IV and
-something that would indicate the encrypt/decrypt operation on
-aio_write()? Also as far as I can see AIO doesn't support splice()
-operation for zero copy, which is the main thing here.
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ drivers/crypto/qat/qat_common/qat_algs.c |    6 ------
+ 1 file changed, 6 deletions(-)
 
->From the other hand it shouldn't be a problem to add crypto specific
-stuff to include/uapi/linux/if_alg.h, because it is all about crypto
-anyway, is it not?
-
-If you have a better way how to indicate that data processing should
-start on the last page in sendpage() instead of ALG_OP_IN_PLACE I would
-be happy to use it.
-Thanks,
-Tadeusz
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index e2c4b25..1dc5b0a 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -102,12 +102,6 @@ struct qat_alg_cd {
+ 	};
+ } __aligned(64);
+ 
+-#define MAX_AUTH_STATE_SIZE sizeof(struct icp_qat_hw_auth_algo_blk)
+-
+-struct qat_auth_state {
+-	uint8_t data[MAX_AUTH_STATE_SIZE + 64];
+-} __aligned(64);
+-
+ struct qat_alg_aead_ctx {
+ 	struct qat_alg_cd *enc_cd;
+ 	struct qat_alg_cd *dec_cd;
