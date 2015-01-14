@@ -1,61 +1,61 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH -next] crypto: algif_rng - fix sparse non static symbol warning
-Date: Wed, 14 Jan 2015 04:11:14 +0100
-Message-ID: <2495791.u1JdGytR9n@tachyon.chronox.de>
-References: <1421198081-16766-1-git-send-email-weiyj_lk@163.com>
+From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: [PATCH v10 2/2] crypto: AF_ALG: enable AEAD interface compilation
+Date: Wed, 14 Jan 2015 04:53:43 +0100
+Message-ID: <1957342.M3tYxT7ugI@tachyon.chronox.de>
+References: <5489736.JvWhZNrmuD@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Wei Yongjun <yongjun_wei@trendmicro.com.cn>,
-	linux-crypto@vger.kernel.org
-To: weiyj_lk@163.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59474 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751490AbbANDL2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Jan 2015 22:11:28 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <SFF03> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Wed, 14 Jan 2015 04:11:19 +0100
-In-Reply-To: <1421198081-16766-1-git-send-email-weiyj_lk@163.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	ABI/API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: 'Herbert Xu' <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <5489736.JvWhZNrmuD-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Mittwoch, 14. Januar 2015, 09:14:41 schrieb weiyj_lk@163.com:
+Enable compilation of the AEAD AF_ALG support and provide a Kconfig
+option to compile the AEAD AF_ALG support.
 
-Hi,
+Signed-off-by: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+---
+ crypto/Kconfig  | 9 +++++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
 
-> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
-> 
-> Fixes the following sparse warnings:
-> 
-> crypto/algif_rng.c:185:13: warning:
->  symbol 'rng_exit' was not declared. Should it be static?
-> 
-> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
-
-Acked-by: Stephan Mueller <smueller@chronox.de>
-> ---
->  crypto/algif_rng.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
-> index 91c06f5..67f612c 100644
-> --- a/crypto/algif_rng.c
-> +++ b/crypto/algif_rng.c
-> @@ -182,7 +182,7 @@ static int __init rng_init(void)
->  	return af_alg_register_type(&algif_type_rng);
->  }
-> 
-> -void __exit rng_exit(void)
-> +static void __exit rng_exit(void)
->  {
->  	int err = af_alg_unregister_type(&algif_type_rng);
->  	BUG_ON(err);
-
-
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 50f4da4..41a3fc5 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1523,6 +1523,15 @@ config CRYPTO_USER_API_RNG
+ 	  This option enables the user-spaces interface for random
+ 	  number generator algorithms.
+ 
++config CRYPTO_USER_API_AEAD
++	tristate "User-space interface for AEAD cipher algorithms"
++	depends on NET
++	select CRYPTO_AEAD
++	select CRYPTO_USER_API
++	help
++	  This option enables the user-spaces interface for AEAD
++	  cipher algorithms.
++
+ config CRYPTO_HASH_INFO
+ 	bool
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index ba19465..97b7d3a 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -100,6 +100,7 @@ obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
++obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
+ 
+ #
+ # generic algorithms and the async_tx api
 -- 
-Ciao
-Stephan
+2.1.0
