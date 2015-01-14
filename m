@@ -1,58 +1,44 @@
-From: Neil Horman <nhorman@tuxdriver.com>
-Subject: Re: [PATCH -next] crypto: algif_rng - fix sparse non static symbol
- warning
-Date: Wed, 14 Jan 2015 04:43:51 -0500
-Message-ID: <20150114094351.GA15294@localhost.localdomain>
-References: <1421198081-16766-1-git-send-email-weiyj_lk@163.com>
+From: Neil Horman <nhorman-2XuSBdqkA4R54TAoqtyWWQ@public.gmane.org>
+Subject: Re: [PATCH v10 0/2] crypto: AF_ALG: add AEAD and RNG support
+Date: Wed, 14 Jan 2015 04:46:31 -0500
+Message-ID: <20150114094631.GB15294@localhost.localdomain>
+References: <5489736.JvWhZNrmuD@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>,
-	Wei Yongjun <yongjun_wei@trendmicro.com.cn>,
-	linux-crypto@vger.kernel.org
-To: weiyj_lk@163.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:59046 "EHLO
-	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752909AbbANJoV (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jan 2015 04:44:21 -0500
+Cc: 'Herbert Xu' <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	ABI/API <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1421198081-16766-1-git-send-email-weiyj_lk@163.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <5489736.JvWhZNrmuD-PJstQz4BMNNP20K/wil9xYQuADTiUCJX@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 14, 2015 at 09:14:41AM +0800, weiyj_lk@163.com wrote:
-> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+On Wed, Jan 14, 2015 at 04:52:29AM +0100, Stephan Mueller wrote:
+> Hi,
 > 
-> Fixes the following sparse warnings:
+> This patch set adds AEAD and RNG support to the AF_ALG interface
+> exported by the kernel crypto API. By extending AF_ALG with AEAD and RNG
+> support, all cipher types the kernel crypto API allows access to are
+> now accessible from userspace.
 > 
-> crypto/algif_rng.c:185:13: warning:
->  symbol 'rng_exit' was not declared. Should it be static?
+>  crypto/Kconfig      |   9 +
+>  crypto/Makefile     |   1 +
+>  crypto/algif_aead.c | 680 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 690 insertions(+)
+>  create mode 100644 crypto/algif_aead.c
 > 
-> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
-Acked-by: Neil Horman <nhorman@tuxdriver.com>
-
-> ---
->  crypto/algif_rng.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> -- 
+> 2.1.0
 > 
-> diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
-> index 91c06f5..67f612c 100644
-> --- a/crypto/algif_rng.c
-> +++ b/crypto/algif_rng.c
-> @@ -182,7 +182,7 @@ static int __init rng_init(void)
->  	return af_alg_register_type(&algif_type_rng);
->  }
->  
-> -void __exit rng_exit(void)
-> +static void __exit rng_exit(void)
->  {
->  	int err = af_alg_unregister_type(&algif_type_rng);
->  	BUG_ON(err);
 > 
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
+Where are the RNG bits?
+Neil
