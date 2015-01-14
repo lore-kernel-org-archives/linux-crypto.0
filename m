@@ -1,82 +1,65 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto: Add support for 192 & 256 bit keys to AESNI RFC4106 -
- resubmission
-Date: Wed, 14 Jan 2015 22:00:58 +1100
-Message-ID: <20150114110058.GC18099@gondor.apana.org.au>
-References: <Pine.WNT.4.64.1501112342160.7768@Fly3>
- <20150113181641.GA54532@redhat.com>
- <4feca6bd058743cfa500f16394f50ff7@US-EXCH13-4.na.uis.unisys.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v10 0/2] crypto: AF_ALG: add AEAD and RNG support
+Date: Wed, 14 Jan 2015 16:31:44 +0100
+Message-ID: <5006702.rWOQQ5L1VO@tachyon.chronox.de>
+References: <5489736.JvWhZNrmuD@tachyon.chronox.de> <20150114094631.GB15294@localhost.localdomain> <20150114110011.GA18099@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jarod Wilson <jarod@redhat.com>,
-	Timothy McCaffrey <timcaffrey420@gmail.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"tim.c.chen@linux.intel.com" <tim.c.chen@linux.intel.com>
-To: "McCaffrey, Timothy M" <Timothy.McCaffrey@unisys.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Neil Horman <nhorman@tuxdriver.com>,
+	Daniel Borkmann <dborkman@redhat.com>,
+	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	'LKML' <linux-kernel@vger.kernel.org>,
+	ABI/API <linux-api@vger.kernel.org>, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:56577 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751318AbbANLBF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jan 2015 06:01:05 -0500
-Content-Disposition: inline
-In-Reply-To: <4feca6bd058743cfa500f16394f50ff7@US-EXCH13-4.na.uis.unisys.com>
+Received: from mail.eperm.de ([89.247.134.16]:59504 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751434AbbANPbw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 14 Jan 2015 10:31:52 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S10187> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Wed, 14 Jan 2015 16:31:48 +0100
+In-Reply-To: <20150114110011.GA18099@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 13, 2015 at 06:19:35PM +0000, McCaffrey, Timothy M wrote:
-> > -----Original Message-----
-> > From: Jarod Wilson [mailto:jarod@redhat.com]
-> > Sent: Tuesday, January 13, 2015 1:17 PM
-> > 
-> > On Sun, Jan 11, 2015 at 11:48:08PM -0500, Timothy McCaffrey wrote:
-> > > These patches fix the RFC4106 implementation in the aesni-intel module so
-> > it
-> > > supports 192 & 256 bit keys.
-> > >
-> > > Since the AVX support that was added to this module also only supports
-> > 128 bit keys,
-> > > and this patch only affects the SSE implementation, changes were also
-> > made to
-> > > use the SSE version if key sizes other than 128 are specified.
-> > >
-> > > RFC4106 specifies that 192 & 256 bit keys must be supported (section 8.4).
-> > >
-> > > Also, this should fix Strongswan issue 341 where the aesni module needs to
-> > be
-> > > unloaded if 256 bit keys are used:
-> > >
-> > > http://wiki.strongswan.org/issues/341
-> > >
-> > > This patch has been tested with Sandy Bridge and Haswell processors.  With
-> > 128
-> > > bit keys and input buffers > 512 bytes a slight performance degradation
-> > was
-> > > noticed (~1%).  For input buffers of less than 512 bytes there was no
-> > > performance impact.  Compared to 128 bit keys, 256 bit key size
-> > performance
-> > > is approx. .5 cycles per byte slower on Sandy Bridge, and .37 cycles per
-> > > byte slower on Haswell (vs. SSE code).
-> > >
-> > > This patch has also been tested with StrongSwan IPSec connections where
-> > it
-> > > worked correctly.
-> > >
-> > > I created this diff from a git clone of crypto-2.6.git.
-> > >
-> > > Any questions, please feel free to contact me.
-> > >
-> > > Signed off by: timothy.mccaffrey@unisys.com
-> > 
-> > Here's an unborked version that applies cleanly to linus' master right
-> > now. Somehow, tons of extra spaces made their way into the original
-> > (re-)submission, I just stripped them out (and fixed up a few extra
-> > trailing spaces and spaces before tabs).
-> > 
-> > Signed-off-by: Jarod Wilson <jarod@redhat.com>
+Am Mittwoch, 14. Januar 2015, 22:00:11 schrieb Herbert Xu:
 
-Patch applied.  Thanks!
+Hi Herbert,
+
+> On Wed, Jan 14, 2015 at 04:46:31AM -0500, Neil Horman wrote:
+> > On Wed, Jan 14, 2015 at 04:52:29AM +0100, Stephan Mueller wrote:
+> > > Hi,
+> > > 
+> > > This patch set adds AEAD and RNG support to the AF_ALG interface
+> > > exported by the kernel crypto API. By extending AF_ALG with AEAD and RNG
+> > > support, all cipher types the kernel crypto API allows access to are
+> > > now accessible from userspace.
+> > > 
+> > >  crypto/Kconfig      |   9 +
+> > >  crypto/Makefile     |   1 +
+> > >  crypto/algif_aead.c | 680
+> > >  ++++++++++++++++++++++++++++++++++++++++++++++++++++ 3 files changed,
+> > >  690 insertions(+)
+> > >  create mode 100644 crypto/algif_aead.c
+> > 
+> > Where are the RNG bits?
+> 
+> They've already been merged.
+
+Please also see my change log for v7:
+...
+* RNG: patch dropped as it was applied
+...
+
+To ensure consistency, I did not change the intro part of my description.
+
+> 
+> Cheers,
+
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
