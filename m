@@ -1,59 +1,58 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: algif - change algif_skcipher to be asynchronous
-Date: Wed, 14 Jan 2015 16:38:05 +1100
-Message-ID: <20150114053805.GA15204@gondor.apana.org.au>
-References: <20150113202823.32244.45456.stgit@tstruk-mobl1>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: [PATCH -next] crypto: algif_rng - fix sparse non static symbol
+ warning
+Date: Wed, 14 Jan 2015 04:43:51 -0500
+Message-ID: <20150114094351.GA15294@localhost.localdomain>
+References: <1421198081-16766-1-git-send-email-weiyj_lk@163.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com, linux-api@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Stephan Mueller <smueller@chronox.de>,
+	Wei Yongjun <yongjun_wei@trendmicro.com.cn>,
+	linux-crypto@vger.kernel.org
+To: weiyj_lk@163.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48943 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750715AbbANFiP (ORCPT
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:59046 "EHLO
+	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752909AbbANJoV (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 14 Jan 2015 00:38:15 -0500
+	Wed, 14 Jan 2015 04:44:21 -0500
 Content-Disposition: inline
-In-Reply-To: <20150113202823.32244.45456.stgit@tstruk-mobl1>
+In-Reply-To: <1421198081-16766-1-git-send-email-weiyj_lk@163.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 13, 2015 at 12:28:23PM -0800, Tadeusz Struk wrote:
-> The way the algif_skcipher works currently is that on sendmsg/sendpage it
-> builds an sgl for the input data and then on read/recvmsg it sends the job
-> for encryption putting the user to sleep till the data is processed.
-> This way it can only handle one job at a given time.
-> This patch changes it to be asynchronous.
-> The idea is to allow enqueue multiple jobs to get most of available crypto HW
-> accelerators and then read when the data is processed without blocking.
-> To allow that both the input and output sgl need to be know at sendmsg/sendpage
-> or the operation needs to happen "in place" in the input sgl. The approach here
-> is to use the "in place" operation and process the data in the sgl provided in
-> sendmsg. To allow that new user visible flags are introduced:
-> ALG_SET_OP_TYPE
-> ALG_OP_OUTOF_PLACE
-> ALG_OP_IN_PLACE
-> By default the operation type is ALG_OP_OUTOF_PLACE, which works the same way as
-> without the change and allows existing application working without any update.
+On Wed, Jan 14, 2015 at 09:14:41AM +0800, weiyj_lk@163.com wrote:
+> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 > 
-> Using the test application from https://lkml.org/lkml/2011/8/28/87 with small
-> modification to support in place operation, and reading after every 16th
-> sendmsg these are the results:
+> Fixes the following sparse warnings:
+> 
+> crypto/algif_rng.c:185:13: warning:
+>  symbol 'rng_exit' was not declared. Should it be static?
+> 
+> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Acked-by: Neil Horman <nhorman@tuxdriver.com>
 
-What you want is AIO so we should try to use that interface rather
-than creating some funky crypto-specific interface.
-
-Dave, the AIO hooks in net/socket.c is currently simply pointing
-to the sync implementation.  What are you thoughts on allowing
-socket implementations to supply these hooks?
-
-The algif interface can then use these hooks to implement AIO
-which is useful for maximising the hardware performance without
-resorting to loads of threads.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> ---
+>  crypto/algif_rng.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
+> index 91c06f5..67f612c 100644
+> --- a/crypto/algif_rng.c
+> +++ b/crypto/algif_rng.c
+> @@ -182,7 +182,7 @@ static int __init rng_init(void)
+>  	return af_alg_register_type(&algif_type_rng);
+>  }
+>  
+> -void __exit rng_exit(void)
+> +static void __exit rng_exit(void)
+>  {
+>  	int err = af_alg_unregister_type(&algif_type_rng);
+>  	BUG_ON(err);
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
