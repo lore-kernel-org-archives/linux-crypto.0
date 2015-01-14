@@ -1,35 +1,43 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: crypto: qat - Ensure ipad and opad are zeroed
-Date: Tue, 13 Jan 2015 15:20:51 -0800
-Message-ID: <54B5A853.3030304@intel.com>
-References: <20150113202753.32216.26250.stgit@tstruk-mobl1> <20150113212515.GA11562@gondor.apana.org.au> <54B59A86.10803@intel.com> <20150113224756.GA12432@gondor.apana.org.au> <54B5A25C.9070007@intel.com> <20150113230703.GA12608@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+From: weiyj_lk@163.com
+Subject: [PATCH -next] crypto: algif_rng - fix sparse non static symbol warning
+Date: Wed, 14 Jan 2015 09:14:41 +0800
+Message-ID: <1421198081-16766-1-git-send-email-weiyj_lk@163.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Wei Yongjun <yongjun_wei@trendmicro.com.cn>,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:49405 "EHLO mga03.intel.com"
+Received: from m12-12.163.com ([220.181.12.12]:58749 "EHLO m12-12.163.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751145AbbAMXYM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 13 Jan 2015 18:24:12 -0500
-In-Reply-To: <20150113230703.GA12608@gondor.apana.org.au>
+	id S1751409AbbANBPQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 13 Jan 2015 20:15:16 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/13/2015 03:07 PM, Herbert Xu wrote:
-> The patch ad511e260a27b8e35d273cc0ecfe5a8ff9543181 (crypto: qat -
-> Fix incorrect uses of memzero_explicit) broke hashing because the
-> code was in fact overwriting the qat_auth_state variable.
-> 
-> In fact there is no reason for the variable to exist anyway since
-> all we are using it for is to store ipad and opad.  So we could
-> simply create ipad and opad directly and avoid this whole mess.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 
-Ok that looks better. Thanks. I think we should also remove the
-definition of struct qat_auth_state in line 107 and the #def above.
-Regards,
-Tadeusz
+Fixes the following sparse warnings:
+
+crypto/algif_rng.c:185:13: warning:
+ symbol 'rng_exit' was not declared. Should it be static?
+
+Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+---
+ crypto/algif_rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
+index 91c06f5..67f612c 100644
+--- a/crypto/algif_rng.c
++++ b/crypto/algif_rng.c
+@@ -182,7 +182,7 @@ static int __init rng_init(void)
+ 	return af_alg_register_type(&algif_type_rng);
+ }
+ 
+-void __exit rng_exit(void)
++static void __exit rng_exit(void)
+ {
+ 	int err = af_alg_unregister_type(&algif_type_rng);
+ 	BUG_ON(err);
