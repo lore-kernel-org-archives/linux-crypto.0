@@ -1,51 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: algif - change algif_skcipher to be asynchronous
-Date: Fri, 16 Jan 2015 13:00:52 +1100
-Message-ID: <20150116020052.GB5851@gondor.apana.org.au>
-References: <20150113202823.32244.45456.stgit@tstruk-mobl1>
- <20150114053805.GA15204@gondor.apana.org.au>
- <54B6A939.4070207@intel.com>
+Subject: crypto: cts - Remove bogus use of seqiv
+Date: Fri, 16 Jan 2015 18:09:21 +1100
+Message-ID: <20150116070921.GA8992@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com, linux-api@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+To: Kevin Coffman <kwc@citi.umich.edu>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <zenczykowski@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:34476 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:42530 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754322AbbAPCBC (ORCPT
+	with ESMTP id S1751667AbbAPHJ1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 15 Jan 2015 21:01:02 -0500
+	Fri, 16 Jan 2015 02:09:27 -0500
 Content-Disposition: inline
-In-Reply-To: <54B6A939.4070207@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 14, 2015 at 09:36:57AM -0800, Tadeusz Struk wrote:
-> 
-> But then would you like to extend AIO interface to take the IV and
-> something that would indicate the encrypt/decrypt operation on
-> aio_write()? Also as far as I can see AIO doesn't support splice()
+The seqiv generator is completely inappropriate for cts as it's
+designed for IPsec algorithms.  Since cts users do not actually
+use the IV generator we can just fall back to the default.
+ 
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Any metadata such as the IV can still go through the existing
-sendmsg interface, just as you would do a sendmsg before a sendfile
-to set things up.
-
-> operation for zero copy, which is the main thing here.
-
-The AIO interface itself can accomodate zero-copy.  It's just that
-we currently don't have any support for it in the network socket
-API.
-
-> >From the other hand it shouldn't be a problem to add crypto specific
-> stuff to include/uapi/linux/if_alg.h, because it is all about crypto
-> anyway, is it not?
-
-Yes but you're violating the meaning of sendpage().  The latter
-is not crypto-specific so you shouldn't be adding things that
-prevent future optimisations to it.
-
-Cheers,
+diff --git a/crypto/cts.c b/crypto/cts.c
+index bd94058..6a8089c 100644
+--- a/crypto/cts.c
++++ b/crypto/cts.c
+@@ -307,8 +307,6 @@ static struct crypto_instance *crypto_cts_alloc(struct rtattr **tb)
+ 	inst->alg.cra_blkcipher.min_keysize = alg->cra_blkcipher.min_keysize;
+ 	inst->alg.cra_blkcipher.max_keysize = alg->cra_blkcipher.max_keysize;
+ 
+-	inst->alg.cra_blkcipher.geniv = "seqiv";
+-
+ 	inst->alg.cra_ctxsize = sizeof(struct crypto_cts_ctx);
+ 
+ 	inst->alg.cra_init = crypto_cts_init_tfm;
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
