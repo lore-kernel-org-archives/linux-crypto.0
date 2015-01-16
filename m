@@ -1,9 +1,10 @@
-From: "Michael S. Tsirkin" <mst@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] virtio_rng: drop extra empty line
-Date: Fri, 16 Jan 2015 09:16:00 +0200
-Message-ID: <20150116071600.GA12274@redhat.com>
+Date: Fri, 16 Jan 2015 18:17:00 +1100
+Message-ID: <20150116071700.GA9119@gondor.apana.org.au>
 References: <1421322638-21320-1-git-send-email-mst@redhat.com>
  <20150115232109.GA5626@gondor.apana.org.au>
+ <20150116071600.GA12274@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
@@ -11,50 +12,27 @@ Cc: linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
 	Amit Shah <amit.shah@redhat.com>, Amos Kong <akong@redhat.com>,
 	Sasha Levin <sasha.levin@oracle.com>,
 	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51569 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751423AbbAPHQQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Jan 2015 02:16:16 -0500
+Received: from helcar.apana.org.au ([209.40.204.226]:59994 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751991AbbAPHRO (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 16 Jan 2015 02:17:14 -0500
 Content-Disposition: inline
-In-Reply-To: <20150115232109.GA5626@gondor.apana.org.au>
+In-Reply-To: <20150116071600.GA12274@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 16, 2015 at 10:21:09AM +1100, Herbert Xu wrote:
-> On Thu, Jan 15, 2015 at 01:50:42PM +0200, Michael S. Tsirkin wrote:
-> > makes code look a bit prettier.
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> 
-> Please resend this patch with a cc to linux-crypto@vger.kernel.org.
-> 
-> Thanks!
+On Fri, Jan 16, 2015 at 09:16:00AM +0200, Michael S. Tsirkin wrote:
+>
+> So let's add this to maintainers?
+> Will you ack something like below?
 
-So let's add this to maintainers?
-Will you ack something like below?
+Sure I'll add that.
 
---->
-
-
-MAINTAINERS: add linux-crypto to hw random
-
-hw random is crypto-related, Cc the linux-crypto list
-on patches.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3589d67..4d54f2e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4403,6 +4403,7 @@ F:	include/linux/hwmon*.h
- HARDWARE RANDOM NUMBER GENERATOR CORE
- M:	Matt Mackall <mpm@selenic.com>
- M:	Herbert Xu <herbert@gondor.apana.org.au>
-+L:	linux-crypto@vger.kernel.org
- S:	Odd fixes
- F:	Documentation/hw_random.txt
- F:	drivers/char/hw_random/
+Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
