@@ -1,75 +1,71 @@
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>
-Subject: Re: crypto: seqiv - Ensure that IV size is at least 8 bytes
-Date: Fri, 16 Jan 2015 08:53:03 -0800
-Message-ID: <CAHo-OoxgX1hP27jESZbJsO+8QicCtO_nAg7idunDqVkvWb9vow@mail.gmail.com>
-References: <20150116085120.GA9863@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Intel GCM: __driver-gcm-aes-aesni setkey missing
+Date: Sat, 17 Jan 2015 19:23:42 +0100
+Message-ID: <1976848.LqsUs5V3zD@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	'LKML' <linux-kernel@vger.kernel.org>
+To: tadeusz.struk@intel.com, aidan.o.mahony@intel.com,
+	gabriele.paoloni@intel.com, adrian.hoban@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f179.google.com ([209.85.217.179]:60274 "EHLO
-	mail-lb0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755293AbbAPQxF convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 16 Jan 2015 11:53:05 -0500
-Received: by mail-lb0-f179.google.com with SMTP id z11so19423289lbi.10
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Jan 2015 08:53:04 -0800 (PST)
-In-Reply-To: <20150116085120.GA9863@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:59518 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751562AbbAQSXu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 17 Jan 2015 13:23:50 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S10997> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Sat, 17 Jan 2015 19:23:45 +0100
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 16, 2015 at 12:51 AM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> Since seqiv is designed for IPsec we need to be able to accomodate
-> the whole IPsec sequence number in order to ensure the uniqueness
-> of the IV.
->
-> This patch forbids any algorithm with an IV size of less than 8
-> from using it.  This should have no impact on existing users since
-> they all have an IV size of 8.
->
-> Reported-by: Maciej =C5=BBenczykowski <zenczykowski@gmail.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/crypto/seqiv.c b/crypto/seqiv.c
-> index 9daa854c..b7bb9a2 100644
-> --- a/crypto/seqiv.c
-> +++ b/crypto/seqiv.c
-> @@ -267,6 +267,12 @@ static struct crypto_instance *seqiv_ablkcipher_=
-alloc(struct rtattr **tb)
->         if (IS_ERR(inst))
->                 goto out;
->
-> +       if (inst->alg.cra_ablkcipher.ivsize < sizeof(u64)) {
-> +               skcipher_geniv_free(inst);
-> +               inst =3D ERR_PTR(-EINVAL);
-> +               goto out;
-> +       }
-> +
->         inst->alg.cra_ablkcipher.givencrypt =3D seqiv_givencrypt_firs=
-t;
->
->         inst->alg.cra_init =3D seqiv_init;
-> @@ -287,6 +293,12 @@ static struct crypto_instance *seqiv_aead_alloc(=
-struct rtattr **tb)
->         if (IS_ERR(inst))
->                 goto out;
->
-> +       if (inst->alg.cra_aead.ivsize < sizeof(u64)) {
-> +               aead_geniv_free(inst);
-> +               inst =3D ERR_PTR(-EINVAL);
-> +               goto out;
-> +       }
-> +
->         inst->alg.cra_aead.givencrypt =3D seqiv_aead_givencrypt_first=
-;
->
->         inst->alg.cra_init =3D seqiv_aead_init;
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi Gabriele, Adrian, Tadeusz, Aidan,
 
-Acked-by: Maciej =C5=BBenczykowski <zenczykowski@gmail.com>
+during testing of my algif_aead patch with the different GCM implementations I 
+am able to trigger a kernel crash from user space using __driver-gcm-aes-
+aesni.
+
+As I hope that algif_aead is going to be included, unprivileged userspace 
+would then reliably crash the kernel -- with the current kernel code, 
+userspace has no interface to trigger the issue.
+
+Looking into the kernel code I think I see where the issue is. The crash 
+happens when setkey is invoked. The kernel crypto API defines setkey as the 
+following:
+
+static inline int crypto_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+                                     unsigned int keylen)
+{
+        struct aead_tfm *crt = crypto_aead_crt(tfm);
+
+        return crt->setkey(crt->base, key, keylen);
+}
+
+This means that the kernel crypto API expects that ciphers always implement a 
+setkey callback.
+
+However, __driver-gcm-aes-aesni does not implement a setkey:
+
+                .aead = {
+                        .encrypt        = __driver_rfc4106_encrypt,
+                        .decrypt        = __driver_rfc4106_decrypt,
+                },
+
+As I am not sure what the purpose of __driver-gcm-aes-aesni is (only a backend 
+for RFC4106 GCM or a regular cipher), I did not yet create a patch. IMHO there 
+are two solutions:
+
+- either create a valid setkey callback so that a key is set
+
+- or create a noop setkey that returns -EOPNOTSUPP which effectively disables 
+that cipher for regular consumption.
+
+Note, if it is only a backend for the RFC4106 implementation, may I ask why 
+__driver-gcm-aes-aesni is implemented as a separate cipher that is registered 
+with the kernel crypto API?
+
+-- 
+Ciao
+Stephan
