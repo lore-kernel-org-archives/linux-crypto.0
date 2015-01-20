@@ -1,52 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] virtio_rng: drop extra empty line
-Date: Tue, 20 Jan 2015 14:47:35 +1100
-Message-ID: <20150120034735.GA11274@gondor.apana.org.au>
-References: <1421322638-21320-1-git-send-email-mst@redhat.com>
- <20150115232109.GA5626@gondor.apana.org.au>
- <20150116071600.GA12274@redhat.com>
+Subject: Re: [PATCH] crypto: Documentation: remove colons in comments
+Date: Tue, 20 Jan 2015 14:47:50 +1100
+Message-ID: <20150120034750.GB11274@gondor.apana.org.au>
+References: <4431066.AhB5zCO9nr@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-	Rusty Russell <rusty@rustcorp.com.au>,
-	Amit Shah <amit.shah@redhat.com>, Amos Kong <akong@redhat.com>,
-	Sasha Levin <sasha.levin@oracle.com>,
-	linux-crypto@vger.kernel.org
-To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:55821 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:35878 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751617AbbATDru (ORCPT
+	with ESMTP id S1752425AbbATDry (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Jan 2015 22:47:50 -0500
+	Mon, 19 Jan 2015 22:47:54 -0500
 Content-Disposition: inline
-In-Reply-To: <20150116071600.GA12274@redhat.com>
+In-Reply-To: <4431066.AhB5zCO9nr@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 16, 2015 at 09:16:00AM +0200, Michael S. Tsirkin wrote:
-> On Fri, Jan 16, 2015 at 10:21:09AM +1100, Herbert Xu wrote:
-> > On Thu, Jan 15, 2015 at 01:50:42PM +0200, Michael S. Tsirkin wrote:
-> > > makes code look a bit prettier.
-> > > 
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > Please resend this patch with a cc to linux-crypto@vger.kernel.org.
-> > 
-> > Thanks!
+On Mon, Jan 19, 2015 at 12:13:39AM +0100, Stephan Mueller wrote:
+> As documented in Documentation/kernel-doc-nano-HOWTO.txt lines
+> terminated with a colon are treated as headings.
 > 
-> So let's add this to maintainers?
-> Will you ack something like below?
+> The current layout of the documentation when compiling the kernel
+> crypto API DocBook documentation is messed up by by treating some lines
+> as headings. The patch removes colons from comments that shall not be
+> treated as headings.
 > 
-> --->
-> 
-> 
-> MAINTAINERS: add linux-crypto to hw random
-> 
-> hw random is crypto-related, Cc the linux-crypto list
-> on patches.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
 Applied.
 -- 
