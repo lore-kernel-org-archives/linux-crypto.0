@@ -1,65 +1,75 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: [PATCH] crypto: testmgr: notify expected failures on aead tests
-Date: Mon, 19 Jan 2015 15:54:24 +0200
-Message-ID: <1421675664-26107-1-git-send-email-cristian.stoica@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 3.19
+Date: Tue, 20 Jan 2015 11:52:55 +1100
+Message-ID: <20150120005255.GA9746@gondor.apana.org.au>
+References: <20120126024342.GA12492@gondor.apana.org.au>
+ <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20141231033217.GA27261@gondor.apana.org.au>
+ <20150107021737.GA25043@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <horia.geanta@freescale.com>, <tudor.ambarus@freescale.com>,
-	"Cristian Stoica" <cristian.stoica@freescale.com>
-To: <davem@davemloft.net>, <herbert@gondor.apana.org.au>,
-	<linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0133.outbound.protection.outlook.com ([157.56.111.133]:64288
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751403AbbASPZu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Jan 2015 10:25:50 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20150107021737.GA25043@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Some hardware drivers (e.g. caamalg) log failed operations reported by
-hw to assist in debugging. However, these messages are confusing when they
-are the result of a testmgr test that is expected to fail.
+Hi Linus:
 
-This patch puts the driver messages in their testing context and helps the
-user classify them as harmless.
+This push fixes a regression that arose from the change to add
+a crypto prefix to module names which was done to prevent the
+loading of arbitrary modules through the Crypto API.  In particular,
+a number of modules were missing the crypto prefix which meant
+that they could no longer be autoloaded.
 
-Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
----
- crypto/testmgr.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Please pull from
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 235b1ff..ec19e98 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -573,9 +573,11 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
- 			if (!ret)
- 				break;
- 		case -EBADMSG:
--			if (template[i].novrfy)
--				/* verification failure was expected */
-+			if (template[i].novrfy) {
-+				pr_info("aead%s: expected %s failure on test %d for %s: ret=-EBADMSG\n",
-+					d, e, j, algo);
- 				continue;
-+			}
- 			/* fall through */
- 		default:
- 			pr_err("alg: aead%s: %s failed on test %d for %s: ret=%d\n",
-@@ -723,9 +725,11 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
- 			if (!ret)
- 				break;
- 		case -EBADMSG:
--			if (template[i].novrfy)
--				/* verification failure was expected */
-+			if (template[i].novrfy) {
-+				pr_info("aead%s: expected %s failure on test %d for %s: ret=-EBADMSG\n",
-+					d, e, j, algo);
- 				continue;
-+			}
- 			/* fall through */
- 		default:
- 			pr_err("alg: aead%s: %s failed on chunk test %d for %s: ret=%d\n",
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Mathias Krause (1):
+      crypto: add missing crypto module aliases
+
+ arch/powerpc/crypto/sha1.c       |    1 +
+ arch/x86/crypto/sha-mb/sha1_mb.c |    2 +-
+ crypto/aes_generic.c             |    1 +
+ crypto/ansi_cprng.c              |    1 +
+ crypto/blowfish_generic.c        |    1 +
+ crypto/camellia_generic.c        |    1 +
+ crypto/cast5_generic.c           |    1 +
+ crypto/cast6_generic.c           |    1 +
+ crypto/crc32c_generic.c          |    1 +
+ crypto/crct10dif_generic.c       |    1 +
+ crypto/des_generic.c             |    7 ++++---
+ crypto/ghash-generic.c           |    1 +
+ crypto/krng.c                    |    1 +
+ crypto/salsa20_generic.c         |    1 +
+ crypto/serpent_generic.c         |    1 +
+ crypto/sha1_generic.c            |    1 +
+ crypto/sha256_generic.c          |    2 ++
+ crypto/sha512_generic.c          |    2 ++
+ crypto/tea.c                     |    1 +
+ crypto/tgr192.c                  |    1 +
+ crypto/twofish_generic.c         |    1 +
+ crypto/wp512.c                   |    1 +
+ 22 files changed, 27 insertions(+), 4 deletions(-)
+
+Thanks,
 -- 
-2.2.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
