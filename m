@@ -1,52 +1,31 @@
-From: Christophe Jaillet <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH] crypto: atmel: Free memory in error path
-Date: Tue, 20 Jan 2015 08:15:52 +0100
-Message-ID: <1421738152-30462-1-git-send-email-christophe.jaillet@wanadoo.fr>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe Jaillet <christophe.jaillet@wanadoo.fr>
-To: herbert@gondor.apana.org.au, davem@davemloft.net
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: Re: [PATCH] crypto: testmgr: notify expected failures on aead tests
+Date: Tue, 20 Jan 2015 09:58:58 +0200
+Message-ID: <54BE0AC2.4020607@freescale.com>
+References: <1421675664-26107-1-git-send-email-cristian.stoica@freescale.com>
+ <20150120033549.GA10814@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+	<horia.geanta@freescale.com>, <tudor.ambarus@freescale.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-by2on0148.outbound.protection.outlook.com ([207.46.100.148]:7935
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750722AbbATH7F (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Jan 2015 02:59:05 -0500
+In-Reply-To: <20150120033549.GA10814@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-If only one of the 2 __get_free_pages fails, then there is a memory leak.
+On 01/20/2015 05:35 AM, Herbert Xu wrote:
+> No, I'm not going to create spam in everybody's dmesg just so that
+> you can make sense of the spam coming from one driver.
 
-Signed-off-by: Christophe Jaillet <christophe.jaillet@wanadoo.fr>
----
- drivers/crypto/atmel-aes.c  | 2 +-
- drivers/crypto/atmel-tdes.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Indeed, I found that it makes things far worse for the rest of the
+drivers and the clarity improvement is questionable.
+It was a bad idea.
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 53d1c33..6597aac 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -673,9 +673,9 @@ err_map_out:
- 	dma_unmap_single(dd->dev, dd->dma_addr_in, dd->buflen,
- 		DMA_TO_DEVICE);
- err_map_in:
-+err_alloc:
- 	free_page((unsigned long)dd->buf_out);
- 	free_page((unsigned long)dd->buf_in);
--err_alloc:
- 	if (err)
- 		pr_err("error: %d\n", err);
- 	return err;
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 5e7c896..258772d 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -376,9 +376,9 @@ err_map_out:
- 	dma_unmap_single(dd->dev, dd->dma_addr_in, dd->buflen,
- 		DMA_TO_DEVICE);
- err_map_in:
-+err_alloc:
- 	free_page((unsigned long)dd->buf_out);
- 	free_page((unsigned long)dd->buf_in);
--err_alloc:
- 	if (err)
- 		pr_err("error: %d\n", err);
- 	return err;
--- 
-2.1.0
+Cristian S.
