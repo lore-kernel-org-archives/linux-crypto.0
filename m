@@ -1,40 +1,38 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: testmgr: notify expected failures on aead tests
-Date: Tue, 20 Jan 2015 14:35:49 +1100
-Message-ID: <20150120033549.GA10814@gondor.apana.org.au>
-References: <1421675664-26107-1-git-send-email-cristian.stoica@freescale.com>
+Subject: Re: [PATCH] crypto: aesni: add setkey for driver-gcm-aes-aesni
+Date: Tue, 20 Jan 2015 14:37:05 +1100
+Message-ID: <20150120033704.GB10814@gondor.apana.org.au>
+References: <2587101.YvN0IxRmOH@tachyon.chronox.de>
+ <20150120031704.GB10475@gondor.apana.org.au>
+ <1490816.1NddvTAE2F@tauon>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	horia.geanta@freescale.com, tudor.ambarus@freescale.com
-To: Cristian Stoica <cristian.stoica@freescale.com>
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+	linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48968 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:33844 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752932AbbATDfx (ORCPT
+	with ESMTP id S1752489AbbATDhM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 19 Jan 2015 22:35:53 -0500
+	Mon, 19 Jan 2015 22:37:12 -0500
 Content-Disposition: inline
-In-Reply-To: <1421675664-26107-1-git-send-email-cristian.stoica@freescale.com>
+In-Reply-To: <1490816.1NddvTAE2F@tauon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 19, 2015 at 03:54:24PM +0200, Cristian Stoica wrote:
-> Some hardware drivers (e.g. caamalg) log failed operations reported by
-> hw to assist in debugging. However, these messages are confusing when they
-> are the result of a testmgr test that is expected to fail.
-> 
-> This patch puts the driver messages in their testing context and helps the
-> user classify them as harmless.
-> 
-> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+On Tue, Jan 20, 2015 at 04:35:41AM +0100, Stephan Mueller wrote:
+>
+> This in turn would then turn the __driver implementation into a full GCM 
+> implementation. That would mean that we should rename it from __driver 
+> into gcm(aes) / gcm-aesni. 
 
-No, I'm not going to create spam in everybody's dmesg just so that
-you can make sense of the spam coming from one driver.
+No you shouldn't because it'll fail in interrupt context where
+you cannot use those special instructions.
 
-If it doesn't make sense on its own then it probably shouldn't be
-emitting them.  Verification failures are normal events, e.g., you
-can get them via packet corruption.
+The whole point of this setup is to use accelerated instructions
+where possible, and otherwise fall back to a separate thread
+where we can do so safely.
 
 Cheers,
 -- 
