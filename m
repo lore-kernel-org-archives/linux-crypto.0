@@ -1,7 +1,8 @@
 From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: [PATCH 1/2] crypto: caam: remove dead code
-Date: Wed, 21 Jan 2015 11:53:30 +0200
-Message-ID: <1421834011-29565-1-git-send-email-cristian.stoica@freescale.com>
+Subject: [PATCH 2/2] crypto: caam: remove unused local variable
+Date: Wed, 21 Jan 2015 11:53:31 +0200
+Message-ID: <1421834011-29565-2-git-send-email-cristian.stoica@freescale.com>
+References: <1421834011-29565-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <horia.geanta@freescale.com>, <tudor.ambarus@freescale.com>,
@@ -10,70 +11,47 @@ Cc: <horia.geanta@freescale.com>, <tudor.ambarus@freescale.com>,
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0146.outbound.protection.outlook.com ([157.56.110.146]:10944
+Received: from mail-bn1bon0147.outbound.protection.outlook.com ([157.56.111.147]:9632
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750938AbbAUJxz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Jan 2015 04:53:55 -0500
+	id S1752336AbbAUJx6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Jan 2015 04:53:58 -0500
+In-Reply-To: <1421834011-29565-1-git-send-email-cristian.stoica@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-- assoc_nents and src_nents are never zero when all_contig is false
-- iv_contig is zero on the else branch
-
 Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
-Reviewed-by: Richard Schmitt <richard.schmitt@freescale.com>
 ---
- drivers/crypto/caam/caamalg.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ drivers/crypto/caam/ctrl.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 3187400..29071a1 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -2532,7 +2532,7 @@ static void init_ablkcipher_job(u32 *sh_desc, dma_addr_t ptr,
- 		in_options = 0;
- 	} else {
- 		src_dma = edesc->sec4_sg_dma;
--		sec4_sg_index += (iv_contig ? 0 : 1) + edesc->src_nents;
-+		sec4_sg_index += edesc->src_nents + 1;
- 		in_options = LDST_SGF;
- 	}
- 	append_seq_in_ptr(desc, src_dma, req->nbytes + ivsize, in_options);
-@@ -2714,10 +2714,10 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 	if (!all_contig) {
- 		if (!is_gcm) {
- 			sg_to_sec4_sg(req->assoc,
--				      (assoc_nents ? : 1),
-+				      assoc_nents,
- 				      edesc->sec4_sg +
- 				      sec4_sg_index, 0);
--			sec4_sg_index += assoc_nents ? : 1;
-+			sec4_sg_index += assoc_nents;
- 		}
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 70f1e6f..efba4cc 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -175,13 +175,10 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
+ {
+ 	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctrldev);
+ 	struct caam_ctrl __iomem *ctrl;
+-	struct rng4tst __iomem *r4tst;
+ 	u32 *desc, status, rdsta_val;
+ 	int ret = 0, sh_idx;
  
- 		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
-@@ -2726,17 +2726,17 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 
- 		if (is_gcm) {
- 			sg_to_sec4_sg(req->assoc,
--				      (assoc_nents ? : 1),
-+				      assoc_nents,
- 				      edesc->sec4_sg +
- 				      sec4_sg_index, 0);
--			sec4_sg_index += assoc_nents ? : 1;
-+			sec4_sg_index += assoc_nents;
- 		}
- 
- 		sg_to_sec4_sg_last(req->src,
--				   (src_nents ? : 1),
-+				   src_nents,
- 				   edesc->sec4_sg +
- 				   sec4_sg_index, 0);
--		sec4_sg_index += src_nents ? : 1;
-+		sec4_sg_index += src_nents;
- 	}
- 	if (dst_nents) {
- 		sg_to_sec4_sg_last(req->dst, dst_nents,
+ 	ctrl = (struct caam_ctrl __iomem *)ctrlpriv->ctrl;
+-	r4tst = &ctrl->r4tst[0];
+-
+ 	desc = kmalloc(CAAM_CMD_SZ * 7, GFP_KERNEL);
+ 	if (!desc)
+ 		return -ENOMEM;
+@@ -209,8 +206,7 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
+ 		 * without any error (HW optimizations for later
+ 		 * CAAM eras), then try again.
+ 		 */
+-		rdsta_val =
+-			rd_reg32(&ctrl->r4tst[0].rdsta) & RDSTA_IFMASK;
++		rdsta_val = rd_reg32(&ctrl->r4tst[0].rdsta) & RDSTA_IFMASK;
+ 		if (status || !(rdsta_val & (1 << sh_idx)))
+ 			ret = -EAGAIN;
+ 		if (ret)
 -- 
 2.2.0
