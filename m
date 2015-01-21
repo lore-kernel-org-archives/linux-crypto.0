@@ -1,46 +1,79 @@
 From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: Re: [PATCH] crypto: caam - don't emit ICV check failures to dmesg
-Date: Wed, 21 Jan 2015 10:57:32 +0200
-Message-ID: <54BF69FC.9040607@freescale.com>
-References: <1414686811-6527-1-git-send-email-tudor.ambarus@freescale.com>
-	<1414688107-8196-1-git-send-email-tudor.ambarus@freescale.com>
-	<20141106151714.GE4544@gondor.apana.org.au>
-	<20141204182245.f352ea22dc61ea6f65d85c62@freescale.com>
-	<20141211193018.2465016d545334a76c0f4bab@freescale.com>
- <20150120124310.ba1dd7a6454f65255c1ed713@freescale.com>
+Subject: [PATCH 1/2] crypto: caam: remove dead code
+Date: Wed, 21 Jan 2015 11:53:30 +0200
+Message-ID: <1421834011-29565-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Cc: Tudor Ambarus <tudor.ambarus@freescale.com>,
-	<linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Marek Vasut <marex@denx.de>,
-	Horia Geanta <horia.geanta@freescale.com>,
-	<linux-kernel@vger.kernel.org>
-To: Kim Phillips <kim.phillips@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain
+Cc: <horia.geanta@freescale.com>, <tudor.ambarus@freescale.com>,
+	<alexandru.porosanu@freescale.com>,
+	Cristian Stoica <cristian.stoica@freescale.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0121.outbound.protection.outlook.com ([65.55.169.121]:52304
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+Received: from mail-bn1on0146.outbound.protection.outlook.com ([157.56.110.146]:10944
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751974AbbAUJMp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 21 Jan 2015 04:12:45 -0500
-In-Reply-To: <20150120124310.ba1dd7a6454f65255c1ed713@freescale.com>
+	id S1750938AbbAUJxz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Jan 2015 04:53:55 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Kim,
+- assoc_nents and src_nents are never zero when all_contig is false
+- iv_contig is zero on the else branch
 
-On 01/20/2015 08:43 PM, Kim Phillips wrote:
-> ICV check failures are part of normal operation;
-> leave user notification up to the higher levels,
-> as is done in s/w algorithm implementations.
-> 
+Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+Reviewed-by: Richard Schmitt <richard.schmitt@freescale.com>
+---
+ drivers/crypto/caam/caamalg.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Tested on P4080DS.
-
-Tested-by: Cristian Stoica <cristian.stoica@freescale.com>
-
-
-Thanks,
-Cristian S.
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 3187400..29071a1 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -2532,7 +2532,7 @@ static void init_ablkcipher_job(u32 *sh_desc, dma_addr_t ptr,
+ 		in_options = 0;
+ 	} else {
+ 		src_dma = edesc->sec4_sg_dma;
+-		sec4_sg_index += (iv_contig ? 0 : 1) + edesc->src_nents;
++		sec4_sg_index += edesc->src_nents + 1;
+ 		in_options = LDST_SGF;
+ 	}
+ 	append_seq_in_ptr(desc, src_dma, req->nbytes + ivsize, in_options);
+@@ -2714,10 +2714,10 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 	if (!all_contig) {
+ 		if (!is_gcm) {
+ 			sg_to_sec4_sg(req->assoc,
+-				      (assoc_nents ? : 1),
++				      assoc_nents,
+ 				      edesc->sec4_sg +
+ 				      sec4_sg_index, 0);
+-			sec4_sg_index += assoc_nents ? : 1;
++			sec4_sg_index += assoc_nents;
+ 		}
+ 
+ 		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
+@@ -2726,17 +2726,17 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 
+ 		if (is_gcm) {
+ 			sg_to_sec4_sg(req->assoc,
+-				      (assoc_nents ? : 1),
++				      assoc_nents,
+ 				      edesc->sec4_sg +
+ 				      sec4_sg_index, 0);
+-			sec4_sg_index += assoc_nents ? : 1;
++			sec4_sg_index += assoc_nents;
+ 		}
+ 
+ 		sg_to_sec4_sg_last(req->src,
+-				   (src_nents ? : 1),
++				   src_nents,
+ 				   edesc->sec4_sg +
+ 				   sec4_sg_index, 0);
+-		sec4_sg_index += src_nents ? : 1;
++		sec4_sg_index += src_nents;
+ 	}
+ 	if (dst_nents) {
+ 		sg_to_sec4_sg_last(req->dst, dst_nents,
+-- 
+2.2.0
