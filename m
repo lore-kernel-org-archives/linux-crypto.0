@@ -1,40 +1,70 @@
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH] crypto: Documentation: remove colons in comments
-Date: Tue, 20 Jan 2015 16:28:30 -0800
-Message-ID: <54BEF2AE.7050007@infradead.org>
-References: <4431066.AhB5zCO9nr@tachyon.chronox.de> <20150120034750.GB11274@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v11 2/2] crypto: AF_ALG: enable AEAD interface compilation
+Date: Wed, 21 Jan 2015 02:19:51 +0100
+Message-ID: <5805716.khylUgqcIe@tachyon.chronox.de>
+References: <1923793.K38mGRD6eo@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Daniel Borkmann <dborkman@redhat.com>,
+	'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	'LKML' <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+	Neil Horman <nhorman@tuxdriver.com>
+To: 'Herbert Xu' <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:54938 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752075AbbAUA2b (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Jan 2015 19:28:31 -0500
-In-Reply-To: <20150120034750.GB11274@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:59565 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751602AbbAUBUQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 20 Jan 2015 20:20:16 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S11230> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Wed, 21 Jan 2015 02:20:11 +0100
+In-Reply-To: <1923793.K38mGRD6eo@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/19/15 19:47, Herbert Xu wrote:
-> On Mon, Jan 19, 2015 at 12:13:39AM +0100, Stephan Mueller wrote:
->> As documented in Documentation/kernel-doc-nano-HOWTO.txt lines
->> terminated with a colon are treated as headings.
->>
->> The current layout of the documentation when compiling the kernel
->> crypto API DocBook documentation is messed up by by treating some lines
->> as headings. The patch removes colons from comments that shall not be
->> treated as headings.
->>
->> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> 
-> Applied.
-> 
+Enable compilation of the AEAD AF_ALG support and provide a Kconfig
+option to compile the AEAD AF_ALG support.
 
-Ack. Thanks.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/Kconfig  | 9 +++++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
 
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 50f4da4..41a3fc5 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1523,6 +1523,15 @@ config CRYPTO_USER_API_RNG
+ 	  This option enables the user-spaces interface for random
+ 	  number generator algorithms.
+ 
++config CRYPTO_USER_API_AEAD
++	tristate "User-space interface for AEAD cipher algorithms"
++	depends on NET
++	select CRYPTO_AEAD
++	select CRYPTO_USER_API
++	help
++	  This option enables the user-spaces interface for AEAD
++	  cipher algorithms.
++
+ config CRYPTO_HASH_INFO
+ 	bool
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index ba19465..97b7d3a 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -100,6 +100,7 @@ obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
++obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
+ 
+ #
+ # generic algorithms and the async_tx api
 -- 
-~Randy
+2.1.0
