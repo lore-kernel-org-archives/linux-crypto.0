@@ -1,51 +1,46 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: aesni: add setkey for driver-gcm-aes-aesni
-Date: Wed, 21 Jan 2015 02:25:18 +0100
-Message-ID: <40625395.stBBYbAQtz@tachyon.chronox.de>
-References: <2587101.YvN0IxRmOH@tachyon.chronox.de> <20150120031704.GB10475@gondor.apana.org.au>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: Re: [PATCH] crypto: caam - don't emit ICV check failures to dmesg
+Date: Wed, 21 Jan 2015 10:57:32 +0200
+Message-ID: <54BF69FC.9040607@freescale.com>
+References: <1414686811-6527-1-git-send-email-tudor.ambarus@freescale.com>
+	<1414688107-8196-1-git-send-email-tudor.ambarus@freescale.com>
+	<20141106151714.GE4544@gondor.apana.org.au>
+	<20141204182245.f352ea22dc61ea6f65d85c62@freescale.com>
+	<20141211193018.2465016d545334a76c0f4bab@freescale.com>
+ <20150120124310.ba1dd7a6454f65255c1ed713@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: Tudor Ambarus <tudor.ambarus@freescale.com>,
+	<linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Marek Vasut <marex@denx.de>,
+	Horia Geanta <horia.geanta@freescale.com>,
+	<linux-kernel@vger.kernel.org>
+To: Kim Phillips <kim.phillips@freescale.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:59585 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752836AbbAUBZX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 20 Jan 2015 20:25:23 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S11237> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Wed, 21 Jan 2015 02:25:20 +0100
-In-Reply-To: <20150120031704.GB10475@gondor.apana.org.au>
+Received: from mail-bl2on0121.outbound.protection.outlook.com ([65.55.169.121]:52304
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751974AbbAUJMp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 21 Jan 2015 04:12:45 -0500
+In-Reply-To: <20150120124310.ba1dd7a6454f65255c1ed713@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 20. Januar 2015, 14:17:04 schrieb Herbert Xu:
+Hi Kim,
 
-Hi Tadeusz,
-
-> On Sun, Jan 18, 2015 at 11:56:03PM +0100, Stephan Mueller wrote:
-> > The cipher registered as __driver-gcm-aes-aesni is never intended
-> > to be used directly by any caller. Instead it is a service mechanism to
-> > rfc4106-gcm-aesni.
-> > 
-> > The kernel crypto API unconditionally calls the registered setkey
-> > function. In case a caller erroneously uses __driver-gcm-aes-aesni a
-> > call to crypto_aead_setkey will cause a NULL pointer dereference without
-> > this patch.
-> > 
-> > CC: Tadeusz Struk <tadeusz.struk@intel.com>
-> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+On 01/20/2015 08:43 PM, Kim Phillips wrote:
+> ICV check failures are part of normal operation;
+> leave user notification up to the higher levels,
+> as is done in s/w algorithm implementations.
 > 
-> Rather than adding a bogus setkey function, please fix this mess
-> properly by moving the top-level setkey function into the __driver
-> one where it should be.  Compare with how we handle it in the
-> ablk_helper which is pretty much the same thing.
 
-Tadeusz, are you working on that update or shall I have a look?
+Tested on P4080DS.
 
--- 
-Ciao
-Stephan
+Tested-by: Cristian Stoica <cristian.stoica@freescale.com>
+
+
+Thanks,
+Cristian S.
