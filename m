@@ -1,90 +1,31 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: [PATCH 2/2] crypto: caam: fix resource clean-up on error path for caam_jr_init
-Date: Thu, 22 Jan 2015 16:00:49 +0200
-Message-ID: <1421935249-27549-2-git-send-email-cristian.stoica@freescale.com>
-References: <1421935249-27549-1-git-send-email-cristian.stoica@freescale.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH] crypto: aesni: add setkey for driver-gcm-aes-aesni
+Date: Thu, 22 Jan 2015 10:23:57 -0800
+Message-ID: <54C1403D.1010608@intel.com>
+References: <2587101.YvN0IxRmOH@tachyon.chronox.de> <20150120031704.GB10475@gondor.apana.org.au> <40625395.stBBYbAQtz@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <kim.phillips@freescale.com>, <horia.geanta@freescale.com>,
-	"Cristian Stoica" <cristian.stoica@freescale.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0117.outbound.protection.outlook.com ([65.55.169.117]:22064
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751704AbbAVOBJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 Jan 2015 09:01:09 -0500
-In-Reply-To: <1421935249-27549-1-git-send-email-cristian.stoica@freescale.com>
+Received: from mga01.intel.com ([192.55.52.88]:28299 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752707AbbAVS12 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 22 Jan 2015 13:27:28 -0500
+In-Reply-To: <40625395.stBBYbAQtz@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
----
- drivers/crypto/caam/jr.c | 31 ++++++++++++++++++++++---------
- 1 file changed, 22 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index bce2959..b8b5d47 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -384,28 +384,28 @@ static int caam_jr_init(struct device *dev)
- 	if (error) {
- 		dev_err(dev, "can't connect JobR %d interrupt (%d)\n",
- 			jrp->ridx, jrp->irq);
--		return -EINVAL;
-+		goto out_kill_deq;
- 	}
- 
- 	error = caam_reset_hw_jr(dev);
- 	if (error)
--		return error;
-+		goto out_free_irq;
- 
-+	error = -ENOMEM;
- 	jrp->inpring = dma_alloc_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
- 					  &inpbusaddr, GFP_KERNEL);
-+	if (!jrp->inpring)
-+		goto out_free_irq;
- 
- 	jrp->outring = dma_alloc_coherent(dev, sizeof(struct jr_outentry) *
- 					  JOBR_DEPTH, &outbusaddr, GFP_KERNEL);
-+	if (!jrp->outring)
-+		goto out_free_inpring;
- 
- 	jrp->entinfo = kzalloc(sizeof(struct caam_jrentry_info) * JOBR_DEPTH,
- 			       GFP_KERNEL);
--
--	if ((jrp->inpring == NULL) || (jrp->outring == NULL) ||
--	    (jrp->entinfo == NULL)) {
--		dev_err(dev, "can't allocate job rings for %d\n",
--			jrp->ridx);
--		return -ENOMEM;
--	}
-+	if (!jrp->entinfo)
-+		goto out_free_outring;
- 
- 	for (i = 0; i < JOBR_DEPTH; i++)
- 		jrp->entinfo[i].desc_addr_dma = !0;
-@@ -432,6 +432,19 @@ static int caam_jr_init(struct device *dev)
- 		  (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
- 
- 	return 0;
-+
-+out_free_outring:
-+	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
-+			  jrp->outring, outbusaddr);
-+out_free_inpring:
-+	dma_free_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
-+			  jrp->inpring, inpbusaddr);
-+	dev_err(dev, "can't allocate job rings for %d\n", jrp->ridx);
-+out_free_irq:
-+	free_irq(jrp->irq, dev);
-+out_kill_deq:
-+	tasklet_kill(&jrp->irqtask);
-+	return error;
- }
- 
- 
--- 
-2.2.0
+On 01/20/2015 05:25 PM, Stephan Mueller wrote:
+>> Rather than adding a bogus setkey function, please fix this mess
+>> properly by moving the top-level setkey function into the __driver
+>> one where it should be.  Compare with how we handle it in the
+>> ablk_helper which is pretty much the same thing.
+> 
+> Tadeusz, are you working on that update or shall I have a look?
+> 
+Hi,
+No, I thought that the agreement was that we don't want to allow user
+space to use these helpers directly, right? Am I missing something?
