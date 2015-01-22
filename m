@@ -1,27 +1,32 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] crypto: aesni: add setkey for driver-gcm-aes-aesni
-Date: Thu, 22 Jan 2015 13:55:13 -0800
-Message-ID: <54C171C1.1070000@intel.com>
-References: <2587101.YvN0IxRmOH@tachyon.chronox.de> <40625395.stBBYbAQtz@tachyon.chronox.de> <54C1403D.1010608@intel.com> <1876694.bQrN48MF7q@tauon>
+Date: Fri, 23 Jan 2015 09:23:03 +1100
+Message-ID: <20150122222302.GA10895@gondor.apana.org.au>
+References: <2587101.YvN0IxRmOH@tachyon.chronox.de>
+ <20150120031704.GB10475@gondor.apana.org.au>
+ <40625395.stBBYbAQtz@tachyon.chronox.de>
+ <54C1403D.1010608@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan Mueller <smueller@chronox.de>,
 	linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:65400 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752135AbbAVV7J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 22 Jan 2015 16:59:09 -0500
-In-Reply-To: <1876694.bQrN48MF7q@tauon>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <54C1403D.1010608@intel.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 01/22/2015 01:20 PM, Stephan Mueller wrote:
-> That would be correct. But if I understood Herbert correctly, he is 
-> creating a patch that disables these service ciphers for general usage.
+On Thu, Jan 22, 2015 at 10:23:57AM -0800, Tadeusz Struk wrote:
+>
+> No, I thought that the agreement was that we don't want to allow user
+> space to use these helpers directly, right? Am I missing something?
 
-Yes, and this should also implicitly fix the problem with user space.
-Thanks,
-Tadeusz
+Yes but we should also fix this so that it's a proper aead
+algorithm.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
