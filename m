@@ -1,55 +1,126 @@
-From: Stephan Mueller <smueller@atsec.com>
-Subject: Re: [PATCH] crypto/testmgr: mark rfc4106(gcm(aes)) as fips_allowed
-Date: Fri, 23 Jan 2015 20:58:18 +0100
-Message-ID: <47404663.9NCU8GY7rF@tauon>
-References: <1422034935-25537-1-git-send-email-jarod@redhat.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: aesni - make driver-gcm-aes-aesni helper a proper
+ aead alg
+Date: Fri, 23 Jan 2015 14:33:57 -0800
+Message-ID: <20150123223357.15316.72597.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To: Jarod Wilson <jarod@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1422034935-25537-1-git-send-email-jarod@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: smueller@chronox.de, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga14.intel.com ([192.55.52.115]:64588 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750960AbbAWWhZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 23 Jan 2015 17:37:25 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 23. Januar 2015, 12:42:15 schrieb Jarod Wilson:
+Changed the __driver-gcm-aes-aesni to be a proper aead algorithm.
 
-Hi Jarod,
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ arch/x86/crypto/aesni-intel_glue.c |   53 ++++++++++++++++++++++++++----------
+ 1 file changed, 39 insertions(+), 14 deletions(-)
 
->This gcm variant is popular for ipsec use, and there are folks who
->would like to use it while in fips mode. Mark it with fips_allowed=1
->to facilitate that.
-
-Acked-by: Stephan Mueller <smueller@atsec.com>
-
-For the records: this change is ok as the RFC4106 "wrapper" only 
-massages the input data like IV or keys without changing the 
-cryptographic logic of GCM. As the basic cipher is not changed allowing 
-RFC4106 is harmless with respect to FIPS 140-2 to use and apply this 
-RFC4106 wrapper. This implies that the RFC4106 wrapper can be used in 
-FIPS mode.
->
->CC: LKML <linux-kernel@vger.kernel.org>
->CC: Stephan Mueller <smueller@atsec.com>
->Signed-off-by: Jarod Wilson <jarod@redhat.com>
->---
-> crypto/testmgr.c | 1 +
-> 1 file changed, 1 insertion(+)
->
->diff --git a/crypto/testmgr.c b/crypto/testmgr.c
->index 235b1ff..758d028 100644
->--- a/crypto/testmgr.c
->+++ b/crypto/testmgr.c
->@@ -3293,6 +3293,7 @@ static const struct alg_test_desc
->alg_test_descs[] = { }, {
-> 		.alg = "rfc4106(gcm(aes))",
-> 		.test = alg_test_aead,
->+		.fips_allowed = 1,
-> 		.suite = {
-> 			.aead = {
-> 				.enc = {
-
-
-Ciao
-Stephan
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 947c6bf..5544ad9 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -890,15 +890,12 @@ out_free_ablkcipher:
+ 	return ret;
+ }
+ 
+-static int rfc4106_set_key(struct crypto_aead *parent, const u8 *key,
+-						   unsigned int key_len)
++static int common_rfc4106_set_key(struct crypto_aead *aead, const u8 *key,
++				  unsigned int key_len)
+ {
+ 	int ret = 0;
+-	struct crypto_tfm *tfm = crypto_aead_tfm(parent);
+-	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(parent);
+-	struct crypto_aead *cryptd_child = cryptd_aead_child(ctx->cryptd_tfm);
+-	struct aesni_rfc4106_gcm_ctx *child_ctx =
+-                                 aesni_rfc4106_gcm_ctx_get(cryptd_child);
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
++	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(aead);
+ 	u8 *new_key_align, *new_key_mem = NULL;
+ 
+ 	if (key_len < 4) {
+@@ -943,20 +940,29 @@ static int rfc4106_set_key(struct crypto_aead *parent, const u8 *key,
+ 		goto exit;
+ 	}
+ 	ret = rfc4106_set_hash_subkey(ctx->hash_subkey, key, key_len);
+-	memcpy(child_ctx, ctx, sizeof(*ctx));
+ exit:
+ 	kfree(new_key_mem);
+ 	return ret;
+ }
+ 
+-/* This is the Integrity Check Value (aka the authentication tag length and can
+- * be 8, 12 or 16 bytes long. */
+-static int rfc4106_set_authsize(struct crypto_aead *parent,
+-				unsigned int authsize)
++static int rfc4106_set_key(struct crypto_aead *parent, const u8 *key,
++			   unsigned int key_len)
+ {
+ 	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(parent);
+ 	struct crypto_aead *cryptd_child = cryptd_aead_child(ctx->cryptd_tfm);
++	struct aesni_rfc4106_gcm_ctx *child_ctx =
++		aesni_rfc4106_gcm_ctx_get(cryptd_child);
++	int ret;
+ 
++	ret = common_rfc4106_set_key(parent, key, key_len);
++	if (!ret)
++		memcpy(child_ctx, ctx, sizeof(*ctx));
++	return ret;
++}
++
++static int common_rfc4106_set_authsize(struct crypto_aead *aead,
++				       unsigned int authsize)
++{
+ 	switch (authsize) {
+ 	case 8:
+ 	case 12:
+@@ -965,11 +971,26 @@ static int rfc4106_set_authsize(struct crypto_aead *parent,
+ 	default:
+ 		return -EINVAL;
+ 	}
+-	crypto_aead_crt(parent)->authsize = authsize;
+-	crypto_aead_crt(cryptd_child)->authsize = authsize;
++	crypto_aead_crt(aead)->authsize = authsize;
+ 	return 0;
+ }
+ 
++/* This is the Integrity Check Value (aka the authentication tag length and can
++ * be 8, 12 or 16 bytes long. */
++static int rfc4106_set_authsize(struct crypto_aead *parent,
++				unsigned int authsize)
++{
++	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(parent);
++	struct crypto_aead *cryptd_child = cryptd_aead_child(ctx->cryptd_tfm);
++	int ret;
++
++	ret = common_rfc4106_set_authsize(parent, authsize);
++	if (!ret)
++		ret = common_rfc4106_set_authsize(cryptd_child, authsize);
++
++	return ret;
++}
++
+ static int rfc4106_encrypt(struct aead_request *req)
+ {
+ 	int ret;
+@@ -1366,8 +1387,12 @@ static struct crypto_alg aesni_algs[] = { {
+ 	.cra_module		= THIS_MODULE,
+ 	.cra_u = {
+ 		.aead = {
++			.setkey		= common_rfc4106_set_key,
++			.setauthsize	= common_rfc4106_set_authsize,
+ 			.encrypt	= __driver_rfc4106_encrypt,
+ 			.decrypt	= __driver_rfc4106_decrypt,
++			.ivsize		= 8,
++			.maxauthsize	= 16,
+ 		},
+ 	},
+ }, {
