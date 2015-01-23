@@ -1,48 +1,41 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH] crypto: ccp: terminate ccp_support array with empty element
-Date: Fri, 23 Jan 2015 09:11:45 -0600
-Message-ID: <54C264B1.5090508@amd.com>
-References: <1421852791-29679-1-git-send-email-a.ryabinin@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-To: Andrey Ryabinin <a.ryabinin@samsung.com>,
-	<linux-kernel@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"open list:AMD CRYPTOGRAPHIC..." <linux-crypto@vger.kernel.org>
+From: Jarod Wilson <jarod@redhat.com>
+Subject: [PATCH] crypto/testmgr: mark rfc4106(gcm(aes)) as fips_allowed
+Date: Fri, 23 Jan 2015 12:42:15 -0500
+Message-ID: <1422034935-25537-1-git-send-email-jarod@redhat.com>
+Cc: Jarod Wilson <jarod@redhat.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Stephan Mueller <smueller@atsec.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0140.outbound.protection.outlook.com ([157.56.111.140]:16716
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752593AbbAWPML (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 23 Jan 2015 10:12:11 -0500
-In-Reply-To: <1421852791-29679-1-git-send-email-a.ryabinin@samsung.com>
+Received: from mx1.redhat.com ([209.132.183.28]:60928 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751349AbbAWRm2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 23 Jan 2015 12:42:28 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 01/21/2015 09:06 AM, Andrey Ryabinin wrote:
-> x86_match_cpu() expects array of x86_cpu_ids terminated
-> with empty element.
->
-> Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
+This gcm variant is popular for ipsec use, and there are folks who would
+like to use it while in fips mode. Mark it with fips_allowed=1 to
+facilitate that.
 
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+CC: LKML <linux-kernel@vger.kernel.org>
+CC: Stephan Mueller <smueller@atsec.com>
+Signed-off-by: Jarod Wilson <jarod@redhat.com>
+---
+ crypto/testmgr.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> ---
->   drivers/crypto/ccp/ccp-dev.c | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-> index c6e6171..ca29c12 100644
-> --- a/drivers/crypto/ccp/ccp-dev.c
-> +++ b/drivers/crypto/ccp/ccp-dev.c
-> @@ -583,6 +583,7 @@ bool ccp_queues_suspended(struct ccp_device *ccp)
->   #ifdef CONFIG_X86
->   static const struct x86_cpu_id ccp_support[] = {
->   	{ X86_VENDOR_AMD, 22, },
-> +	{ },
->   };
->   #endif
->
->
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 235b1ff..758d028 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3293,6 +3293,7 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		.alg = "rfc4106(gcm(aes))",
+ 		.test = alg_test_aead,
++		.fips_allowed = 1,
+ 		.suite = {
+ 			.aead = {
+ 				.enc = {
+-- 
+1.8.3.1
