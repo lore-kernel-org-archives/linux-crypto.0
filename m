@@ -1,138 +1,153 @@
-From: Markus Stockhausen <stockhausen@collogia.de>
-Subject: [PATCH v1 3/3] SHA256 for PPC/SPE - kernel config
-Date: Sat, 24 Jan 2015 22:11:09 +0100
-Message-ID: <05ae52fa-9955-48d5-9368-597413353cf1@EXCHANGE.collogia.de>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: aesni - make driver-gcm-aes-aesni helper a proper aead alg
+Date: Sun, 25 Jan 2015 09:58:10 +0100
+Message-ID: <10088845.8jngjDYA43@tachyon.chronox.de>
+References: <20150123223357.15316.72597.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="----=_NextPartTM-000-b6b36a79-fe48-447e-a00b-6d09291cb3d6"
-Cc: linuxppc-dev@lists.ozlabs.org
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:60114 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752564AbbAYI6O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 25 Jan 2015 03:58:14 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S11DBA> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Sun, 25 Jan 2015 09:58:10 +0100
+In-Reply-To: <20150123223357.15316.72597.stgit@tstruk-mobl1>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
+
+Am Freitag, 23. Januar 2015, 14:33:57 schrieb Tadeusz Struk:
+
+Hi Tadeusz,
+
+> Changed the __driver-gcm-aes-aesni to be a proper aead algorithm.
+> 
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> ---
+>  arch/x86/crypto/aesni-intel_glue.c |   53
+> ++++++++++++++++++++++++++---------- 1 file changed, 39 insertions(+), 14
+> deletions(-)
+> 
+> diff --git a/arch/x86/crypto/aesni-intel_glue.c
+> b/arch/x86/crypto/aesni-intel_glue.c index 947c6bf..5544ad9 100644
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -890,15 +890,12 @@ out_free_ablkcipher:
+>  	return ret;
+>  }
+> 
+> -static int rfc4106_set_key(struct crypto_aead *parent, const u8 *key,
+> -						   unsigned int key_len)
+> +static int common_rfc4106_set_key(struct crypto_aead *aead, const u8 *key,
+> +				  unsigned int key_len)
+>  {
+>  	int ret = 0;
+> -	struct crypto_tfm *tfm = crypto_aead_tfm(parent);
+> -	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(parent);
+> -	struct crypto_aead *cryptd_child = cryptd_aead_child(ctx->cryptd_tfm);
+> -	struct aesni_rfc4106_gcm_ctx *child_ctx =
+> -                                 aesni_rfc4106_gcm_ctx_get(cryptd_child);
+> +	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
+> +	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(aead);
+>  	u8 *new_key_align, *new_key_mem = NULL;
+> 
+>  	if (key_len < 4) {
+> @@ -943,20 +940,29 @@ static int rfc4106_set_key(struct crypto_aead *parent,
+> const u8 *key, goto exit;
+>  	}
+>  	ret = rfc4106_set_hash_subkey(ctx->hash_subkey, key, key_len);
+> -	memcpy(child_ctx, ctx, sizeof(*ctx));
+>  exit:
+>  	kfree(new_key_mem);
+>  	return ret;
+>  }
+> 
+> -/* This is the Integrity Check Value (aka the authentication tag length and
+> can - * be 8, 12 or 16 bytes long. */
+> -static int rfc4106_set_authsize(struct crypto_aead *parent,
+> -				unsigned int authsize)
+> +static int rfc4106_set_key(struct crypto_aead *parent, const u8 *key,
+> +			   unsigned int key_len)
+>  {
+>  	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(parent);
+>  	struct crypto_aead *cryptd_child = cryptd_aead_child(ctx->cryptd_tfm);
+> +	struct aesni_rfc4106_gcm_ctx *child_ctx =
+> +		aesni_rfc4106_gcm_ctx_get(cryptd_child);
+> +	int ret;
+> 
+> +	ret = common_rfc4106_set_key(parent, key, key_len);
+
+Shouldn't that one be crypto_aead_setkey, i.e using the regular crypto API 
+instead of internal calls?
+
+> +	if (!ret)
+> +		memcpy(child_ctx, ctx, sizeof(*ctx));
+> +	return ret;
+> +}
+> +
+> +static int common_rfc4106_set_authsize(struct crypto_aead *aead,
+> +				       unsigned int authsize)
+> +{
+>  	switch (authsize) {
+>  	case 8:
+>  	case 12:
+> @@ -965,11 +971,26 @@ static int rfc4106_set_authsize(struct crypto_aead
+> *parent, default:
+>  		return -EINVAL;
+>  	}
+> -	crypto_aead_crt(parent)->authsize = authsize;
+> -	crypto_aead_crt(cryptd_child)->authsize = authsize;
+> +	crypto_aead_crt(aead)->authsize = authsize;
+>  	return 0;
+>  }
+> 
+> +/* This is the Integrity Check Value (aka the authentication tag length and
+> can + * be 8, 12 or 16 bytes long. */
+> +static int rfc4106_set_authsize(struct crypto_aead *parent,
+> +				unsigned int authsize)
+> +{
+> +	struct aesni_rfc4106_gcm_ctx *ctx = aesni_rfc4106_gcm_ctx_get(parent);
+> +	struct crypto_aead *cryptd_child = cryptd_aead_child(ctx->cryptd_tfm);
+> +	int ret;
+> +
+> +	ret = common_rfc4106_set_authsize(parent, authsize);
+
+Same here, shouldn't that one be crypto_aead_setauthsize?
+
+> +	if (!ret)
+> +		ret = common_rfc4106_set_authsize(cryptd_child, authsize);
+> +
+> +	return ret;
+> +}
+> +
+>  static int rfc4106_encrypt(struct aead_request *req)
+>  {
+>  	int ret;
+> @@ -1366,8 +1387,12 @@ static struct crypto_alg aesni_algs[] = { {
+>  	.cra_module		= THIS_MODULE,
+>  	.cra_u = {
+>  		.aead = {
+> +			.setkey		= common_rfc4106_set_key,
+> +			.setauthsize	= common_rfc4106_set_authsize,
+>  			.encrypt	= __driver_rfc4106_encrypt,
+>  			.decrypt	= __driver_rfc4106_decrypt,
+> +			.ivsize		= 8,
+> +			.maxauthsize	= 16,
+>  		},
+>  	},
+>  }, {
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
-This is a multi-part message in MIME format.
-
-------=_NextPartTM-000-b6b36a79-fe48-447e-a00b-6d09291cb3d6
-Content-Type: text/plain
-
-[PATCH v1 3/3] SHA256 for PPC/SPE - kernel config
-
-Integrate the module into the kernel config tree.
-
-Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
-
-diff --git a/arch/powerpc/crypto/Makefile b/arch/powerpc/crypto/Makefile
-index 2926fb9..a07e763 100644
---- a/arch/powerpc/crypto/Makefile
-+++ b/arch/powerpc/crypto/Makefile
-@@ -5,5 +5,7 @@
- #
- 
- obj-$(CONFIG_CRYPTO_SHA1_PPC) += sha1-powerpc.o
-+obj-$(CONFIG_CRYPTO_SHA256_PPC_SPE) += sha256-ppc-spe.o
- 
- sha1-powerpc-y := sha1-powerpc-asm.o sha1.o
-+sha256-ppc-spe-y := sha256-spe-asm.o sha256_spe_glue.o
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 87bbc9c..86d35be 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -601,6 +601,15 @@ config CRYPTO_SHA256
- 	  This code also includes SHA-224, a 224 bit hash with 112 bits
- 	  of security against collision attacks.
- 
-+config CRYPTO_SHA256_PPC_SPE
-+	tristate "SHA224 and SHA256 digest algorithm (PPC SPE)"
-+	depends on PPC && SPE
-+	select CRYPTO_SHA256
-+	select CRYPTO_HASH
-+	help
-+	  SHA224 and SHA256 secure hash standard (DFIPS 180-2)
-+	  implemented using powerpc SPE SIMD instruction set.
-+
- config CRYPTO_SHA256_SPARC64
- 	tristate "SHA224 and SHA256 digest algorithm (SPARC64)"
- 	depends on SPARC64
-
-------=_NextPartTM-000-b6b36a79-fe48-447e-a00b-6d09291cb3d6
-Content-Type: text/plain;
-	name="InterScan_Disclaimer.txt"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="InterScan_Disclaimer.txt"
-
-****************************************************************************
-Diese E-Mail enthält vertrauliche und/oder rechtlich geschützte
-Informationen. Wenn Sie nicht der richtige Adressat sind oder diese E-Mail
-irrtümlich erhalten haben, informieren Sie bitte sofort den Absender und
-vernichten Sie diese Mail. Das unerlaubte Kopieren sowie die unbefugte
-Weitergabe dieser Mail ist nicht gestattet.
-
-Über das Internet versandte E-Mails können unter fremden Namen erstellt oder
-manipuliert werden. Deshalb ist diese als E-Mail verschickte Nachricht keine
-rechtsverbindliche Willenserklärung.
-
-Collogia
-Unternehmensberatung AG
-Ubierring 11
-D-50678 Köln
-
-Vorstand:
-Kadir Akin
-Dr. Michael Höhnerbach
-
-Vorsitzender des Aufsichtsrates:
-Hans Kristian Langva
-
-Registergericht: Amtsgericht Köln
-Registernummer: HRB 52 497
-
-This e-mail may contain confidential and/or privileged information. If you
-are not the intended recipient (or have received this e-mail in error)
-please notify the sender immediately and destroy this e-mail. Any
-unauthorized copying, disclosure or distribution of the material in this
-e-mail is strictly forbidden.
-
-e-mails sent over the internet may have been written under a wrong name or
-been manipulated. That is why this message sent as an e-mail is not a
-legally binding declaration of intention.
-
-Collogia
-Unternehmensberatung AG
-Ubierring 11
-D-50678 Köln
-
-executive board:
-Kadir Akin
-Dr. Michael Höhnerbach
-
-President of the supervisory board:
-Hans Kristian Langva
-
-Registry office: district court Cologne
-Register number: HRB 52 497
-
-****************************************************************************
-
-------=_NextPartTM-000-b6b36a79-fe48-447e-a00b-6d09291cb3d6
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Content-Disposition: inline
-
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXhwcGMt
-ZGV2IG1haWxpbmcgbGlzdApMaW51eHBwYy1kZXZAbGlzdHMub3psYWJzLm9yZwpodHRwczovL2xp
-c3RzLm96bGFicy5vcmcvbGlzdGluZm8vbGludXhwcGMtZGV2
-
-------=_NextPartTM-000-b6b36a79-fe48-447e-a00b-6d09291cb3d6--
+-- 
+Ciao
+Stephan
