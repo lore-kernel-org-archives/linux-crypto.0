@@ -1,33 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: ccp: terminate ccp_support array with empty
- element
-Date: Mon, 26 Jan 2015 13:56:10 +1100
-Message-ID: <20150126025610.GF19796@gondor.apana.org.au>
-References: <1421852791-29679-1-git-send-email-a.ryabinin@samsung.com>
- <54C264B1.5090508@amd.com>
+Subject: Re: [PATCH 1/2] crypto: caam: pair irq map and dispose in the same
+ function
+Date: Mon, 26 Jan 2015 13:56:25 +1100
+Message-ID: <20150126025624.GG19796@gondor.apana.org.au>
+References: <1421935249-27549-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Andrey Ryabinin <a.ryabinin@samsung.com>,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	"open list:AMD CRYPTOGRAPHIC..." <linux-crypto@vger.kernel.org>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	kim.phillips@freescale.com, horia.geanta@freescale.com
+To: Cristian Stoica <cristian.stoica@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.apana.org.au ([209.40.204.226]:39035 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753071AbbAZC42 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 25 Jan 2015 21:56:28 -0500
 Content-Disposition: inline
-In-Reply-To: <54C264B1.5090508@amd.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1421935249-27549-1-git-send-email-cristian.stoica@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 23, 2015 at 09:11:45AM -0600, Tom Lendacky wrote:
-> On 01/21/2015 09:06 AM, Andrey Ryabinin wrote:
-> >x86_match_cpu() expects array of x86_cpu_ids terminated
-> >with empty element.
-> >
-> >Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
+On Thu, Jan 22, 2015 at 04:00:48PM +0200, Cristian Stoica wrote:
+> irq_dispose_mapping is not called on all error paths from caam_jr_init.
+> This takes care of several clean-up issues by performing resource
+> clean-up and allocation at the same level.
 > 
-> Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
 
-Applied.
+Both patches applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
