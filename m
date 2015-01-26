@@ -1,34 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: caam: pair irq map and dispose in the same
- function
-Date: Mon, 26 Jan 2015 13:56:25 +1100
-Message-ID: <20150126025624.GG19796@gondor.apana.org.au>
-References: <1421935249-27549-1-git-send-email-cristian.stoica@freescale.com>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH] crypto: algif - change algif_skcipher to be asynchronous
+Date: Mon, 26 Jan 2015 13:57:44 +1100
+Message-ID: <20150126025744.GH19796@gondor.apana.org.au>
+References: <20150113202823.32244.45456.stgit@tstruk-mobl1>
+ <20150114053805.GA15204@gondor.apana.org.au>
+ <54B6A939.4070207@intel.com>
+ <20150116020052.GB5851@gondor.apana.org.au>
+ <54C2CDF8.3000406@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	kim.phillips@freescale.com, horia.geanta@freescale.com
-To: Cristian Stoica <cristian.stoica@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:39035 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753071AbbAZC42 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 25 Jan 2015 21:56:28 -0500
+Cc: davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	qat-linux-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Tadeusz Struk <tadeusz.struk-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1421935249-27549-1-git-send-email-cristian.stoica@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <54C2CDF8.3000406-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jan 22, 2015 at 04:00:48PM +0200, Cristian Stoica wrote:
-> irq_dispose_mapping is not called on all error paths from caam_jr_init.
-> This takes care of several clean-up issues by performing resource
-> clean-up and allocation at the same level.
-> 
-> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+On Fri, Jan 23, 2015 at 02:40:56PM -0800, Tadeusz Struk wrote:
+>
+> Ok, It looks to me that we *do* have all we need to implement zero copy
+> and AIO with algif_skcipher. The only thing we need to do is to add
+> support for it in skcipher_recvmsg(). I think no change is required in
+> neither skcipher_sendmsg(), skcipher_sendpage(), nor the if_alg interface.
+> Then to start using the interface asynchronously an application will
+> need to call aio_read() or lio_listio() instead of read(), but if
+> someone will use read(), then it will still work in the same
+> (synchronous) way as it is today.
+> How does this sound to you, Herbert?
 
-Both patches applied.
+It sounds good but let's see the code first :)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
