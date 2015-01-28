@@ -1,67 +1,92 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: [PATCH] crypto: tcrypt: fix buflen reminder calculation
-Date: Tue, 27 Jan 2015 11:54:27 +0200
-Message-ID: <1422352467-1849-1-git-send-email-cristian.stoica@freescale.com>
+From: James Hartley <james.hartley@imgtec.com>
+Subject: Re: [PATCH V2 1/2] crypto: Add Imagination Technologies hw hash accelerator
+Date: Wed, 28 Jan 2015 00:29:29 +0000
+Message-ID: <54C82D69.9070200@imgtec.com>
+References: <54C826EC.8050103@imgtec.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <davem@davemloft.net>,
-	Cristian Stoica <cristian.stoica@freescale.com>
-To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Transfer-Encoding: 7bit
+To: James Hartley <james.hartley@imgtec.com>,
+	<herbert@gondor.apana.org.au>,
+	Andrew Bresticker <abrestic@chromium.org>,
+	Ezequiel Garcia <Ezequiel.Garcia@imgtec.com>,
+	<linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0128.outbound.protection.outlook.com ([207.46.100.128]:16353
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1757716AbbA0Jyo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 Jan 2015 04:54:44 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:1870 "EHLO
+	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758776AbbA1A2p (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 27 Jan 2015 19:28:45 -0500
+In-Reply-To: <54C826EC.8050103@imgtec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-- This fixes the intent of the code to limit the last scatterlist to
-  either a full PAGE or a fraction of it, depending on the number of
-  pages needed by buflen and the available space advertised by XBUFLEN.
+On 01/28/15 00:01, James Hartley wrote:
+>
+> > > +struct img_hash_request_ctx {
+> > > +    struct img_hash_dev    *hdev;
+> > > +    u8 digest[SHA256_DIGEST_SIZE] __aligned(sizeof(u32));
+> > > +    unsigned long        flags;
+> > > +    size_t            digsize;
+> > > +
+> > > +    dma_addr_t        dma_addr;
+> > > +    size_t            dma_ct;
+> > > +
+> > > +    /* sg root */
+> > > +    struct scatterlist    *sgfirst;
+> > > +    /* walk state */
+> > > +    struct scatterlist    *sg;
+> > > +    size_t            nents;
+> > > +    size_t            offset;
+> > > +    unsigned int        total;
+> > > +    size_t            sent;
+> > > +
+> > > +    unsigned long        op;
+> > > +
+> > > +    size_t            bufcnt;
+> > > +    u8 buffer[0] __aligned(sizeof(u32)); };
+> >
+> > Unfortunately this is not consistent with our API since you're not 
+> storing the
+> > non-final hash state in the request context.
+> >
+> > It appears that you're finalising every request.  That means you can 
+> only
+> > implement finup and digest.  With finup you'll also need to be able 
+> to import
+> > a non-final hash state.  If the hardware cannot do that then you can 
+> only
+> > implement digest.
+> >
+> > Everything else would have to be done by a fallback driver.
+> >
+> > So the question is can you obtain the non-final hash state from the 
+> hardware
+> > and then reinsert it for the next operation?
+>
+> I've looked into this and unfortunately the hardware cannot do that.  
+> I'll spend some
+> time looking into what this means (I'm not the author of the driver, 
+> so will need to
+> become a bit more familiar with it).
+>
+Hi Herbert,
 
-  The original code always sets the last scatterlist to a fraction of a
-  PAGE because the first 'if' is never executed.
+Firstly apologies that there have been quite a few weeks since we last 
+discussed this driver!
 
-- Rearrange the second part of the code to remove the conditional from
-  the loop
+I understand that because the HW does not support an initial hash state, 
+I can only implement digest, and not init, update and final. You 
+mentioned that I would have to do everything else using a fallback 
+driver - but I'm not clear on:
 
-Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
----
- crypto/tcrypt.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+- If it is mandatory to impement a fallback driver (because the 
+potential users of the framework would not know only digest is supported?)
+- or can I just remove the support for init update and final?
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 0043495..2b2486a 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -250,19 +250,19 @@ static void sg_init_aead(struct scatterlist *sg, char *xbuf[XBUFSIZE],
- 	int np = (buflen + PAGE_SIZE - 1)/PAGE_SIZE;
- 	int k, rem;
- 
--	np = (np > XBUFSIZE) ? XBUFSIZE : np;
--	rem = buflen % PAGE_SIZE;
- 	if (np > XBUFSIZE) {
- 		rem = PAGE_SIZE;
- 		np = XBUFSIZE;
-+	} else {
-+		rem = buflen % PAGE_SIZE;
- 	}
-+
- 	sg_init_table(sg, np);
--	for (k = 0; k < np; ++k) {
--		if (k == (np-1))
--			sg_set_buf(&sg[k], xbuf[k], rem);
--		else
--			sg_set_buf(&sg[k], xbuf[k], PAGE_SIZE);
--	}
-+	np--;
-+	for (k = 0; k < np; k++)
-+		sg_set_buf(&sg[k], xbuf[k], PAGE_SIZE);
-+
-+	sg_set_buf(&sg[k], xbuf[k], rem);
- }
- 
- static void test_aead_speed(const char *algo, int enc, unsigned int secs,
--- 
-2.2.0
+If I need to implement fallback drivers, would the Niagra2 SPU driver be 
+a good reference 
+http://lxr.free-electrons.com/source/drivers/crypto/n2_core.c ?
+
+Thanks,
+James
