@@ -1,43 +1,58 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH V2 1/2] crypto: Add Imagination Technologies hw hash
- accelerator
-Date: Wed, 28 Jan 2015 11:56:40 +1100
-Message-ID: <20150128005640.GA12143@gondor.apana.org.au>
-References: <54C826EC.8050103@imgtec.com>
- <54C82D69.9070200@imgtec.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] MPILIB: avoid assembler warning
+Date: Wed, 28 Jan 2015 17:24:36 +0100
+Message-ID: <16372019.BFlLRod3Eu@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Bresticker <abrestic@chromium.org>,
-	Ezequiel Garcia <Ezequiel.Garcia@imgtec.com>,
-	linux-crypto@vger.kernel.org
-To: James Hartley <james.hartley@imgtec.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:44340 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755011AbbA1A4u (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 27 Jan 2015 19:56:50 -0500
-Content-Disposition: inline
-In-Reply-To: <54C82D69.9070200@imgtec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+To: Dmitry Kasatkin <dmitry.kasatkin@intel.com>,
+ David Howells <dhowells@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jan 28, 2015 at 12:29:29AM +0000, James Hartley wrote:
-> 
-> - If it is mandatory to impement a fallback driver (because the
-> potential users of the framework would not know only digest is
-> supported?)
+A wrapper around the umull assembly instruction might reuse
+the input register as an output, which is undefined on
+some ARM machines, as pointed out by this assembler warning:
 
-Yes it is mandatory.
- 
-> If I need to implement fallback drivers, would the Niagra2 SPU
-> driver be a good reference
-> http://lxr.free-electrons.com/source/drivers/crypto/n2_core.c ?
+  CC      lib/mpi/generic_mpih-mul1.o
+/tmp/ccxJuxIy.s: Assembler messages:
+/tmp/ccxJuxIy.s:53: rdhi, rdlo and rm must all be different
+  CC      lib/mpi/generic_mpih-mul2.o
+/tmp/ccI0scAD.s: Assembler messages:
+/tmp/ccI0scAD.s:53: rdhi, rdlo and rm must all be different
+  CC      lib/mpi/generic_mpih-mul3.o
+/tmp/ccMvVQcp.s: Assembler messages:
+/tmp/ccMvVQcp.s:53: rdhi, rdlo and rm must all be different
 
-Yes it's a good example.
+This changes the constraints to force different registers to
+be used as output.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Signed-off-by: Arnd Bergmann <arnd@arnd.de>
+---
+Not sure who would be the best person to pick this patch up.
+
+diff --git a/lib/mpi/longlong.h b/lib/mpi/longlong.h
+index aac511417ad1..c4dbdb506174 100644
+--- a/lib/mpi/longlong.h
++++ b/lib/mpi/longlong.h
+@@ -216,7 +216,7 @@ extern UDItype __udiv_qrnnd(UDItype *, UDItype, UDItype, UDItype);
+ 	__asm__ ("%@ Inlined umul_ppmm\n" \
+ 		"umull %r1, %r0, %r2, %r3" \
+ 	: "=&r" ((USItype)(xh)), \
+-			"=r" ((USItype)(xl)) \
++			"=&r" ((USItype)(xl)) \
+ 	: "r" ((USItype)(a)), \
+ 			"r" ((USItype)(b)) \
+ 	: "r0", "r1")
