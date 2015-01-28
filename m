@@ -1,71 +1,44 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: [PATCH] crypto: tcrypt: do not allocate iv on stack for aead speed tests
-Date: Wed, 28 Jan 2015 13:07:32 +0200
-Message-ID: <1422443252-6396-1-git-send-email-cristian.stoica@freescale.com>
+From: James Hartley <james.hartley@imgtec.com>
+Subject: Re: [PATCH V2 1/2] crypto: Add Imagination Technologies hw hash accelerator
+Date: Wed, 28 Jan 2015 19:19:09 +0000
+Message-ID: <54C9362D.1050409@imgtec.com>
+References: <54C826EC.8050103@imgtec.com> <54C82D69.9070200@imgtec.com> <20150128005640.GA12143@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <davem@davemloft.net>,
-	Cristian Stoica <cristian.stoica@freescale.com>
-To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Andrew Bresticker <abrestic@chromium.org>,
+	Ezequiel Garcia <Ezequiel.Garcia@imgtec.com>,
+	<linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0148.outbound.protection.outlook.com ([207.46.100.148]:47233
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753188AbbA1UkE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 28 Jan 2015 15:40:04 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:43399 "EHLO
+	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754991AbbA2DE0 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 28 Jan 2015 22:04:26 -0500
+In-Reply-To: <20150128005640.GA12143@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-See also: 9bac019dad8098a77cce555d929f678e22111783
 
-Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
----
- crypto/tcrypt.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+On 01/28/15 00:56, Herbert Xu wrote:
+> On Wed, Jan 28, 2015 at 12:29:29AM +0000, James Hartley wrote:
+>> - If it is mandatory to impement a fallback driver (because the
+>> potential users of the framework would not know only digest is
+>> supported?)
+> Yes it is mandatory.
+>   
+>> If I need to implement fallback drivers, would the Niagra2 SPU
+>> driver be a good reference
+>> http://lxr.free-electrons.com/source/drivers/crypto/n2_core.c ?
+> Yes it's a good example.
+>
+> Cheers,
+Great, I'll prepare a new patchset.  For the previous patches I did some 
+basic testing using the built in crypto manager tests, but these all 
+pass without the fallback implemented - is there another more 
+appropriate set of tests that you would recommend I use to verify that 
+my implementation is correct?
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 2b2486a..4b9e23f 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -280,16 +280,20 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 	struct scatterlist *sgout;
- 	const char *e;
- 	void *assoc;
--	char iv[MAX_IVLEN];
-+	char *iv;
- 	char *xbuf[XBUFSIZE];
- 	char *xoutbuf[XBUFSIZE];
- 	char *axbuf[XBUFSIZE];
- 	unsigned int *b_size;
- 	unsigned int iv_len;
- 
-+	iv = kzalloc(MAX_IVLEN, GFP_KERNEL);
-+	if (!iv)
-+		return;
-+
- 	if (aad_size >= PAGE_SIZE) {
- 		pr_err("associate data length (%u) too big\n", aad_size);
--		return;
-+		goto out_noxbuf;
- 	}
- 
- 	if (enc == ENCRYPT)
-@@ -355,7 +359,7 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 
- 			iv_len = crypto_aead_ivsize(tfm);
- 			if (iv_len)
--				memset(&iv, 0xff, iv_len);
-+				memset(iv, 0xff, iv_len);
- 
- 			crypto_aead_clear_flags(tfm, ~0);
- 			printk(KERN_INFO "test %u (%d bit key, %d byte blocks): ",
-@@ -408,6 +412,7 @@ out_nooutbuf:
- out_noaxbuf:
- 	testmgr_free_buf(xbuf);
- out_noxbuf:
-+	kfree(iv);
- 	return;
- }
- 
--- 
-2.2.0
+Thanks,
+James
