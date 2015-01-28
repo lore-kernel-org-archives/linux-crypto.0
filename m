@@ -1,16 +1,19 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] MPILIB: avoid assembler warning
-Date: Wed, 28 Jan 2015 17:24:36 +0100
-Message-ID: <16372019.BFlLRod3Eu@wuerfel>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH] MPILIB: avoid assembler warning
+Date: Wed, 28 Jan 2015 16:42:27 +0000
+Message-ID: <9572.1422463347@warthog.procyon.org.uk>
+References: <16372019.BFlLRod3Eu@wuerfel>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-To: Dmitry Kasatkin <dmitry.kasatkin@intel.com>,
- David Howells <dhowells@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
+ dhowells@redhat.com, Dmitry Kasatkin <dmitry.kasatkin@intel.com>,
+ linux-crypto@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+ "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <16372019.BFlLRod3Eu@wuerfel>
+Content-ID: <9571.1422463347.1@warthog.procyon.org.uk>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -22,37 +25,11 @@ Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
 Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-A wrapper around the umull assembly instruction might reuse
-the input register as an output, which is undefined on
-some ARM machines, as pointed out by this assembler warning:
+Arnd Bergmann <arnd@arndb.de> wrote:
 
-  CC      lib/mpi/generic_mpih-mul1.o
-/tmp/ccxJuxIy.s: Assembler messages:
-/tmp/ccxJuxIy.s:53: rdhi, rdlo and rm must all be different
-  CC      lib/mpi/generic_mpih-mul2.o
-/tmp/ccI0scAD.s: Assembler messages:
-/tmp/ccI0scAD.s:53: rdhi, rdlo and rm must all be different
-  CC      lib/mpi/generic_mpih-mul3.o
-/tmp/ccMvVQcp.s: Assembler messages:
-/tmp/ccMvVQcp.s:53: rdhi, rdlo and rm must all be different
+> Not sure who would be the best person to pick this patch up.
 
-This changes the constraints to force different registers to
-be used as output.
+I can pick it up, but I wonder if the MPI asm bits should be distributed to
+asm/mpilib.h headers rather than being in the lib/ directory.
 
-Signed-off-by: Arnd Bergmann <arnd@arnd.de>
----
-Not sure who would be the best person to pick this patch up.
-
-diff --git a/lib/mpi/longlong.h b/lib/mpi/longlong.h
-index aac511417ad1..c4dbdb506174 100644
---- a/lib/mpi/longlong.h
-+++ b/lib/mpi/longlong.h
-@@ -216,7 +216,7 @@ extern UDItype __udiv_qrnnd(UDItype *, UDItype, UDItype, UDItype);
- 	__asm__ ("%@ Inlined umul_ppmm\n" \
- 		"umull %r1, %r0, %r2, %r3" \
- 	: "=&r" ((USItype)(xh)), \
--			"=r" ((USItype)(xl)) \
-+			"=&r" ((USItype)(xl)) \
- 	: "r" ((USItype)(a)), \
- 			"r" ((USItype)(b)) \
- 	: "r0", "r1")
+David
