@@ -1,35 +1,57 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH] MPILIB: avoid assembler warning
-Date: Wed, 28 Jan 2015 16:42:27 +0000
-Message-ID: <9572.1422463347@warthog.procyon.org.uk>
-References: <16372019.BFlLRod3Eu@wuerfel>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: [PATCH] crypto: testmgr: limit IV copy length in aead tests
+Date: Wed, 28 Jan 2015 11:03:05 +0200
+Message-ID: <1422435785-31259-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
- dhowells@redhat.com, Dmitry Kasatkin <dmitry.kasatkin@intel.com>,
- linux-crypto@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
- "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <16372019.BFlLRod3Eu@wuerfel>
-Content-ID: <9571.1422463347.1@warthog.procyon.org.uk>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: <davem@davemloft.net>,
+	Cristian Stoica <cristian.stoica@freescale.com>
+To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn1bon0143.outbound.protection.outlook.com ([157.56.111.143]:64934
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1756518AbbA1UgE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 28 Jan 2015 15:36:04 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Arnd Bergmann <arnd@arndb.de> wrote:
+The working copy of IV is the same size as the transformation's IV.
+It is not necessary to copy more than that from the template since
+iv_len is usually less than MAX_IVLEN and the rest of the copied data
+is garbage.
 
-> Not sure who would be the best person to pick this patch up.
+Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+---
+ crypto/testmgr.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-I can pick it up, but I wonder if the MPI asm bits should be distributed to
-asm/mpilib.h headers rather than being in the lib/ directory.
-
-David
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 758d028..f4ed6d4 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -429,7 +429,7 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 	struct scatterlist *sgout;
+ 	const char *e, *d;
+ 	struct tcrypt_result result;
+-	unsigned int authsize;
++	unsigned int authsize, iv_len;
+ 	void *input;
+ 	void *output;
+ 	void *assoc;
+@@ -500,10 +500,11 @@ static int __test_aead(struct crypto_aead *tfm, int enc,
+ 
+ 		memcpy(input, template[i].input, template[i].ilen);
+ 		memcpy(assoc, template[i].assoc, template[i].alen);
++		iv_len = crypto_aead_ivsize(tfm);
+ 		if (template[i].iv)
+-			memcpy(iv, template[i].iv, MAX_IVLEN);
++			memcpy(iv, template[i].iv, iv_len);
+ 		else
+-			memset(iv, 0, MAX_IVLEN);
++			memset(iv, 0, iv_len);
+ 
+ 		crypto_aead_clear_flags(tfm, ~0);
+ 		if (template[i].wk)
+-- 
+2.2.0
