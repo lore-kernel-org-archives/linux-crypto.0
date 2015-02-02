@@ -1,66 +1,70 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 0/3] crypto: algif - change algif_skcipher to be asynchronous
-Date: Sun, 01 Feb 2015 19:31:06 +0100
-Message-ID: <1653087.XMGL7JlhQx@tachyon.chronox.de>
-References: <20150129231338.25156.65450.stgit@tstruk-mobl1>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, davem@davemloft.net, qat-linux@intel.com,
-	linux-kernel@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+From: zibo zhao <chinabull@gmail.com>
+Subject: [PATCH] crypto: make public_key_subtype data structure read only
+Date: Sun,  1 Feb 2015 21:52:11 -0500
+Message-ID: <1422845531-23895-1-git-send-email-chinabull@gmail.com>
+Cc: zibo zhao <chinabull@gmail.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60190 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753456AbbBASbL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 1 Feb 2015 13:31:11 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S136BF> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sun, 1 Feb 2015 19:31:07 +0100
-In-Reply-To: <20150129231338.25156.65450.stgit@tstruk-mobl1>
+Received: from mail-ig0-f173.google.com ([209.85.213.173]:64753 "EHLO
+	mail-ig0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751481AbbBBCwg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 1 Feb 2015 21:52:36 -0500
+Received: by mail-ig0-f173.google.com with SMTP id a13so15138265igq.0
+        for <linux-crypto@vger.kernel.org>; Sun, 01 Feb 2015 18:52:35 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 29. Januar 2015, 15:13:39 schrieb Tadeusz Struk:
+During the attempt to disable the kernel module signing
+verification in some android kernel, I came across that
+the public_key_subtype in asymmetric_keys/public_key.c
+which has following declarations:
+struct asymmetric_key_subtype public_key_subtype = {
+...
+        .describe               = public_key_describe,
+        .destroy                = public_key_destroy,
+        .verify_signature       = public_key_verify_signature_2,
+};
 
-Hi Tadeusz,
+As long as I have root access and /dev/mem access available,
+it seems to be quite easy to have kernel module signing
+verification workarounded by just simply assign the address
+of public_key_describe() to the .verify_signature data member.
 
-> The way the algif_skcipher works currently is that on sendmsg/sendpage it
-> builds an sgl for the input data and then on read/recvmsg it sends the job
-> for encryption putting the user to sleep till the data is processed.
-> This way it can only handle one job at a given time.
-> To be able to fuly utilize the potential of existing crypto hardware
-> accelerators it is required to submit multiple jobs in asynchronously.
-> First patch enables asynchronous read and write on socket.
-> Second patch enables af_alg sgl to be linked.
-> Third patch implement asynch read for skcipher.
+This could be avoided by adding const to the data structure to
+make all the data members ready only.
 
-Do you have a code fragment on how to test that patch? I would like to see 
-whether I can test that with my libkcapi.
-> 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-> ---
-> Tadeusz Struk (3):
->       net: socket: enable async read and write
->       crypto: af_alg - Allow to link sgl
->       crypto: algif - change algif_skcipher to be asynchronous
-> 
-> 
->  crypto/af_alg.c         |   16 ++
->  crypto/algif_skcipher.c |  315
-> ++++++++++++++++++++++++++++++++++++++++++++++- include/crypto/if_alg.h |  
->  4 -
->  include/net/sock.h      |    2
->  net/socket.c            |   48 ++++++-
->  5 files changed, 364 insertions(+), 21 deletions(-)
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: zibo zhao <chinabull@gmail.com>
+---
+ crypto/asymmetric_keys/public_key.c | 2 +-
+ crypto/asymmetric_keys/public_key.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 2f6e4fb..bf921b8 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -118,7 +118,7 @@ static int public_key_verify_signature_2(const struct key *key,
+ /*
+  * Public key algorithm asymmetric key subtype
+  */
+-struct asymmetric_key_subtype public_key_subtype = {
++const struct asymmetric_key_subtype public_key_subtype = {
+ 	.owner			= THIS_MODULE,
+ 	.name			= "public_key",
+ 	.name_len		= sizeof("public_key") - 1,
+diff --git a/crypto/asymmetric_keys/public_key.h b/crypto/asymmetric_keys/public_key.h
+index 5c37a22..751f5c3 100644
+--- a/crypto/asymmetric_keys/public_key.h
++++ b/crypto/asymmetric_keys/public_key.h
+@@ -13,7 +13,7 @@
+ 
+ #include <crypto/public_key.h>
+ 
+-extern struct asymmetric_key_subtype public_key_subtype;
++extern const struct asymmetric_key_subtype public_key_subtype;
+ 
+ /*
+  * Public key algorithm definition.
 -- 
-Ciao
-Stephan
+1.9.1
