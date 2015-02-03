@@ -1,9 +1,7 @@
 From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v1 3/5] crypto: ccp - Use dma_set_mask_and_coherent to set
- DMA mask
-Date: Tue, 3 Feb 2015 13:07:17 -0600
-Message-ID: <20150203190717.15045.89640.stgit@tlendack-t1.amdoffice.net>
-References: <20150203190659.15045.21329.stgit@tlendack-t1.amdoffice.net>
+Subject: [PATCH v1 0/5] crypto: ccp - CCP driver updates 2015-01-28
+Date: Tue, 3 Feb 2015 13:06:59 -0600
+Message-ID: <20150203190659.15045.21329.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -11,38 +9,51 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	David Miller <davem@davemloft.net>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bn0109.outbound.protection.outlook.com ([157.56.110.109]:38731
+Received: from mail-bn1on0145.outbound.protection.outlook.com ([157.56.110.145]:55104
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S965959AbbBCTW6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 Feb 2015 14:22:58 -0500
-In-Reply-To: <20150203190659.15045.21329.stgit@tlendack-t1.amdoffice.net>
+	id S965948AbbBCTlW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 Feb 2015 14:41:22 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Replace the setting of the DMA masks with the dma_set_mask_and_coherent
-function call.
+For some reason this series never reached the mailing list... resending.
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+The following series of patches includes functional updates to the
+driver as well as some trivial changes.
+
+- Fix checks/warnings from checkpatch
+- Update how the CCP is built (Kconfig and Makefile)
+- Use dma_set_mask_and_coherent to set the DMA mask
+- Use devm_ calls where appropriate
+- Add ACPI support
+  
+This patch series is based on cryptodev-2.6.
+
 ---
- drivers/crypto/ccp/ccp-platform.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-platform.c b/drivers/crypto/ccp/ccp-platform.c
-index 9e09c50..04265a3 100644
---- a/drivers/crypto/ccp/ccp-platform.c
-+++ b/drivers/crypto/ccp/ccp-platform.c
-@@ -109,8 +109,11 @@ static int ccp_platform_probe(struct platform_device *pdev)
- 
- 	if (!dev->dma_mask)
- 		dev->dma_mask = &dev->coherent_dma_mask;
--	*(dev->dma_mask) = DMA_BIT_MASK(48);
--	dev->coherent_dma_mask = DMA_BIT_MASK(48);
-+	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
-+	if (ret) {
-+		dev_err(dev, "dma_set_mask_and_coherent failed (%d)\n", ret);
-+		goto e_free;
-+	}
- 
- 	if (of_property_read_bool(dev->of_node, "dma-coherent"))
- 		ccp->axcache = CACHE_WB_NO_ALLOC;
+Tom Lendacky (5):
+      crypto: ccp - Updates for checkpatch warnings/errors
+      crypto: ccp - Update CCP build support
+      crypto: ccp - Use dma_set_mask_and_coherent to set DMA mask
+      crypto: ccp - Convert calls to their devm_ counterparts
+      crypto: ccp - Add ACPI support
+
+
+ drivers/crypto/Kconfig                   |    2 -
+ drivers/crypto/ccp/Makefile              |    9 +-
+ drivers/crypto/ccp/ccp-crypto-aes-cmac.c |   12 ++-
+ drivers/crypto/ccp/ccp-crypto-aes-xts.c  |    4 -
+ drivers/crypto/ccp/ccp-crypto-aes.c      |    3 -
+ drivers/crypto/ccp/ccp-crypto-main.c     |    5 +
+ drivers/crypto/ccp/ccp-crypto-sha.c      |   12 ++-
+ drivers/crypto/ccp/ccp-crypto.h          |    3 -
+ drivers/crypto/ccp/ccp-dev.c             |    7 +-
+ drivers/crypto/ccp/ccp-dev.h             |   12 +--
+ drivers/crypto/ccp/ccp-ops.c             |   24 +++---
+ drivers/crypto/ccp/ccp-pci.c             |   21 ++----
+ drivers/crypto/ccp/ccp-platform.c        |  111 ++++++++++++++++++++++++++----
+ 13 files changed, 143 insertions(+), 82 deletions(-)
+
+-- 
+Tom Lendacky
