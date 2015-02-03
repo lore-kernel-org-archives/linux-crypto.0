@@ -1,67 +1,43 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 0/3] crypto: algif - change algif_skcipher to be asynchronous
-Date: Mon, 02 Feb 2015 17:40:07 +0100
-Message-ID: <17805101.rkttaZiZYV@tauon>
-References: <20150129231338.25156.65450.stgit@tstruk-mobl1> <1653087.XMGL7JlhQx@tachyon.chronox.de> <54CF91A6.2020100@intel.com>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: [PATCH] crypto: tcrypt speed: fix filter for aead algorithms
+Date: Tue, 3 Feb 2015 15:59:48 +0200
+Message-ID: <1422971988-21517-1-git-send-email-cristian.stoica@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, davem@davemloft.net, qat-linux@intel.com,
-	linux-kernel@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain
+Cc: <davem@davemloft.net>,
+	Cristian Stoica <cristian.stoica@freescale.com>
+To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60203 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932417AbbBBQl7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Feb 2015 11:41:59 -0500
-Received: from tauon.localnet
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S13957> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Mon, 2 Feb 2015 17:41:54 +0100
-In-Reply-To: <54CF91A6.2020100@intel.com>
+Received: from mail-bn1bbn0109.outbound.protection.outlook.com ([157.56.111.109]:64306
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S964781AbbBCOA0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 Feb 2015 09:00:26 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 2. Februar 2015, 07:03:02 schrieb Tadeusz Struk:
+test_aead_speed is written for sync algorithms without specifically
+requiring them. The effect is that an async algorithm may be used without
+setting up the request callback, this leading to a kernel panic.
 
-Hi Tadeusz,
+Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+---
+ crypto/tcrypt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
->On 02/01/2015 10:31 AM, Stephan Mueller wrote:
->> Hi Tadeusz,
->> 
->>> > The way the algif_skcipher works currently is that on
->>> > sendmsg/sendpage it builds an sgl for the input data and then on
->>> > read/recvmsg it sends the job for encryption putting the user to
->>> > sleep till the data is processed. This way it can only handle one
->>> > job at a given time.
->>> > To be able to fuly utilize the potential of existing crypto
->>> > hardware
->>> > accelerators it is required to submit multiple jobs in
->>> > asynchronously.
->>> > First patch enables asynchronous read and write on socket.
->>> > Second patch enables af_alg sgl to be linked.
->>> > Third patch implement asynch read for skcipher.
->> 
->> Do you have a code fragment on how to test that patch? I would like
->> to see whether I can test that with my libkcapi.
->
->Hi Stephan,
->This is what I'm using.
-
-Thanks for the listing.
-
-Are you aware of the speed tester that I added to libkcapi? See [1] 
-subdir speed-test/
-
-If you want to play with it, all you need to do is to add your 
-init/encryption/fini code into cryptoperf-skcipher.c.
-
-The key is that cp_ablkcipher_enc_test/cp_ablkcipher_dec_test performs 
-only the encryption/decryption operation (setkey, etc is done in the 
-init call). The speed measuring is done only over that function.
-
-[1] http://www.chronox.de/libkcapi.html
-
-Ciao
-Stephan
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 4b9e23f..5dc5a25 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -314,7 +314,8 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
+ 	asg = &sg[8];
+ 	sgout = &asg[8];
+ 
+-	tfm = crypto_alloc_aead(algo, 0, 0);
++	/* This test is not for ASYNC algorithms */
++	tfm = crypto_alloc_aead(algo, 0, CRYPTO_ALG_ASYNC);
+ 
+ 	if (IS_ERR(tfm)) {
+ 		pr_err("alg: aead: Failed to load transform for %s: %ld\n", algo,
+-- 
+2.0.5
