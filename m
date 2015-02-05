@@ -1,247 +1,108 @@
-From: "Marcelo H. Cerri" <mhcerri@linux.vnet.ibm.com>
-Subject: [PATCH 5/7] Adding GHASH routines for VMX module
-Date: Thu, 5 Feb 2015 15:20:25 -0200
-Message-ID: <20150205172022.GA14894@bluepex.com>
-Reply-To: leosilva@linux.vnet.ibm.com
+From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
+Subject: [PATCH 7/7] Enabling VMX module for PPC64
+Date: Thu, 5 Feb 2015 15:21:29 -0200
+Message-ID: <20150205172126.GA15218@bluepex.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Cc: leosilva@linux.vnet.ibm.com
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from e24smtp04.br.ibm.com ([32.104.18.25]:57477 "EHLO
+	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757837AbbBERVe (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Feb 2015 12:21:34 -0500
+Received: from /spool/local
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
+	Thu, 5 Feb 2015 15:21:33 -0200
 Content-Disposition: inline
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds GHASH routines to VMX module in order to
-make use of VMX cryptographic acceleration instructions
-on Power 8 CPU.
+This patch enables VMX module in PPC64.
 
 Signed-off-by: Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
 ---
- drivers/crypto/vmx/ghash.c | 214 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 214 insertions(+)
- create mode 100644 drivers/crypto/vmx/ghash.c
+ drivers/crypto/Kconfig      | 12 ++++++++++++
+ drivers/crypto/Makefile     |  1 +
+ drivers/crypto/vmx/Kconfig  |  9 +++++++++
+ drivers/crypto/vmx/Makefile | 21 +++++++++++++++++++++
+ 4 files changed, 43 insertions(+)
+ create mode 100644 drivers/crypto/vmx/Kconfig
+ create mode 100644 drivers/crypto/vmx/Makefile
 
-diff --git a/drivers/crypto/vmx/ghash.c b/drivers/crypto/vmx/ghash.c
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 2fb0fdf..979cbff 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -436,4 +436,16 @@ config CRYPTO_DEV_QCE
+ 	  hardware. To compile this driver as a module, choose M here. The
+ 	  module will be called qcrypto.
+ 
++config CRYPTO_DEV_VMX
++	bool "Support for VMX cryptographic acceleration instructions"
++	depends on PPC64
++	default n
++	help
++	  Support for VMX cryptographic acceleration instructions.
++
++if CRYPTO_DEV_VMX
++	source "drivers/crypto/vmx/Kconfig"
++endif
++
+ endif # CRYPTO_HW
++
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 3924f93..20a7127 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -25,3 +25,4 @@ obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
+ obj-$(CONFIG_CRYPTO_DEV_UX500) += ux500/
+ obj-$(CONFIG_CRYPTO_DEV_QAT) += qat/
+ obj-$(CONFIG_CRYPTO_DEV_QCE) += qce/
++obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
+diff --git a/drivers/crypto/vmx/Kconfig b/drivers/crypto/vmx/Kconfig
 new file mode 100644
-index 0000000..d0ffe27
+index 0000000..6728864
 --- /dev/null
-+++ b/drivers/crypto/vmx/ghash.c
-@@ -0,0 +1,214 @@
-+/**
-+ * GHASH routines supporting VMX instructions on the Power 8
-+ *
-+ * Copyright (C) 2015 International Business Machines Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; version 2 only.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-+ *
-+ * Author: Marcelo Henrique Cerri <mhcerri@br.ibm.com>
-+ */
++++ b/drivers/crypto/vmx/Kconfig
+@@ -0,0 +1,9 @@
++config CRYPTO_DEV_VMX_ENCRYPT
++	tristate "Encryption acceleration support on P8 CPU"
++	depends on PPC64
++	default y
++	help 
++	  Support for VMX cryptographic acceleration instructions on Power8 CPU.
++	  This module supports acceleration for AES and GHASH in hardware. If you
++	  choose 'M' here, this module will be called vmx-crypto.
++	  
+diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
+new file mode 100644
+index 0000000..8898ce6
+--- /dev/null
++++ b/drivers/crypto/vmx/Makefile
+@@ -0,0 +1,21 @@
++obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
++vmx-crypto-objs := vmx.o aesp8-ppc.o ghashp8-ppc.o aes.o aes_cbc.o aes_ctr.o ghash.o
 +
-+#include <linux/types.h>
-+#include <linux/err.h>
-+#include <linux/crypto.h>
-+#include <linux/delay.h>
-+#include <linux/hardirq.h>
-+#include <asm/switch_to.h>
-+#include <crypto/aes.h>
-+#include <crypto/scatterwalk.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/b128ops.h>
++ifeq ($(CONFIG_PPC64),y)
++ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
++TARGET := linux-ppc64le
++else
++TARGET := linux-pcc64
++endif
++endif
 +
-+#define IN_INTERRUPT in_interrupt()
++quiet_cmd_perl = PERL $@
++      cmd_perl = $(PERL) $(<) $(TARGET) > $(@)
 +
-+#define GHASH_BLOCK_SIZE (16)
-+#define GHASH_DIGEST_SIZE (16)
-+#define GHASH_KEY_LEN (16)
++$(src)/aesp8-ppc.S: $(src)/aesp8-ppc.pl
++	$(call cmd,perl)
++  
++$(src)/ghashp8-ppc.S: $(src)/ghashp8-ppc.pl
++	$(call cmd,perl)
 +
-+void gcm_init_p8(u128 htable[16], const u64 Xi[2]);
-+void gcm_gmult_p8(u64 Xi[2], const u128 htable[16]);
-+void gcm_ghash_p8(u64 Xi[2], const u128 htable[16],
-+        const u8 *in,size_t len);
-+
-+struct p8_ghash_ctx {
-+    u128 htable[16];
-+    struct crypto_shash *fallback;
-+};
-+
-+struct p8_ghash_desc_ctx {
-+    u64 shash[2];
-+    u8 buffer[GHASH_DIGEST_SIZE];
-+    int bytes;
-+    struct shash_desc fallback_desc;
-+};
-+
-+static int p8_ghash_init_tfm(struct crypto_tfm *tfm)
-+{
-+    const char *alg;
-+    struct crypto_shash *fallback;
-+    struct crypto_shash *shash_tfm = __crypto_shash_cast(tfm);
-+    struct p8_ghash_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+    if (!(alg = crypto_tfm_alg_name(tfm))) {
-+        printk(KERN_ERR "Failed to get algorithm name.\n");
-+        return -ENOENT;
-+    }
-+
-+    fallback = crypto_alloc_shash(alg, 0 ,CRYPTO_ALG_NEED_FALLBACK);
-+    if (IS_ERR(fallback)) {
-+        printk(KERN_ERR "Failed to allocate transformation for '%s': %ld\n",
-+                alg, PTR_ERR(fallback));
-+        return PTR_ERR(fallback);
-+    }
-+    printk(KERN_INFO "Using '%s' as fallback implementation.\n",
-+            crypto_tfm_alg_driver_name(crypto_shash_tfm(fallback)));
-+
-+    crypto_shash_set_flags(fallback,
-+            crypto_shash_get_flags((struct crypto_shash *) tfm));
-+    ctx->fallback = fallback;
-+
-+    shash_tfm->descsize = sizeof(struct p8_ghash_desc_ctx)
-+        + crypto_shash_descsize(fallback);
-+
-+    return 0;
-+}
-+
-+static void p8_ghash_exit_tfm(struct crypto_tfm *tfm)
-+{
-+    struct p8_ghash_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+    if (ctx->fallback) {
-+        crypto_free_shash(ctx->fallback);
-+        ctx->fallback = NULL;
-+    }
-+}
-+
-+static int p8_ghash_init(struct shash_desc *desc)
-+{
-+    struct p8_ghash_ctx *ctx = crypto_tfm_ctx(crypto_shash_tfm(desc->tfm));
-+    struct p8_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
-+
-+    dctx->bytes = 0;
-+    memset(dctx->shash, 0, GHASH_DIGEST_SIZE);
-+    dctx->fallback_desc.tfm = ctx->fallback;
-+    dctx->fallback_desc.flags = desc->flags;
-+    return crypto_shash_init(&dctx->fallback_desc);
-+}
-+
-+static int p8_ghash_setkey(struct crypto_shash *tfm, const u8 *key,
-+    unsigned int keylen)
-+{
-+    struct p8_ghash_ctx *ctx = crypto_tfm_ctx(crypto_shash_tfm(tfm));
-+
-+    if (keylen != GHASH_KEY_LEN)
-+        return -EINVAL;
-+
-+    pagefault_disable();
-+    enable_kernel_altivec();
-+    enable_kernel_fp();
-+    gcm_init_p8(ctx->htable, (const u64 *) key);
-+    pagefault_enable();
-+    return crypto_shash_setkey(ctx->fallback, key, keylen);
-+}
-+
-+static int p8_ghash_update(struct shash_desc *desc,
-+        const u8 *src, unsigned int srclen)
-+{
-+    unsigned int len;
-+    struct p8_ghash_ctx *ctx = crypto_tfm_ctx(crypto_shash_tfm(desc->tfm));
-+    struct p8_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
-+
-+    if (IN_INTERRUPT) {
-+        return crypto_shash_update(&dctx->fallback_desc, src, srclen);
-+    } else {
-+        if (dctx->bytes) {
-+            if (dctx->bytes + srclen < GHASH_DIGEST_SIZE) {
-+                memcpy(dctx->buffer + dctx->bytes, src, srclen);
-+                dctx->bytes += srclen;
-+                return 0;
-+            }
-+            memcpy(dctx->buffer + dctx->bytes, src,
-+                    GHASH_DIGEST_SIZE - dctx->bytes);
-+            pagefault_disable();
-+            enable_kernel_altivec();
-+            enable_kernel_fp();
-+            gcm_ghash_p8(dctx->shash, ctx->htable, dctx->buffer,
-+                    GHASH_DIGEST_SIZE);
-+            pagefault_enable();
-+            src += GHASH_DIGEST_SIZE - dctx->bytes;
-+            srclen -= GHASH_DIGEST_SIZE - dctx->bytes;
-+            dctx->bytes = 0;
-+        }
-+        len = srclen & ~(GHASH_DIGEST_SIZE - 1);
-+        if (len) {
-+            pagefault_disable();
-+            enable_kernel_altivec();
-+            enable_kernel_fp();
-+            gcm_ghash_p8(dctx->shash, ctx->htable, src, len);
-+            pagefault_enable();
-+            src += len;
-+            srclen -= len;
-+        }
-+        if (srclen) {
-+            memcpy(dctx->buffer, src, srclen);
-+            dctx->bytes = srclen;
-+        }
-+        return 0;
-+    }
-+}
-+
-+static int p8_ghash_final(struct shash_desc *desc, u8 *out)
-+{
-+    int i;
-+    struct p8_ghash_ctx *ctx = crypto_tfm_ctx(crypto_shash_tfm(desc->tfm));
-+    struct p8_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
-+
-+    if (IN_INTERRUPT) {
-+        return crypto_shash_final(&dctx->fallback_desc, out);
-+    } else {
-+        if (dctx->bytes) {
-+            for (i = dctx->bytes; i < GHASH_DIGEST_SIZE; i++)
-+                dctx->buffer[i] = 0;
-+            pagefault_disable();
-+            enable_kernel_altivec();
-+            enable_kernel_fp();
-+            gcm_ghash_p8(dctx->shash, ctx->htable, dctx->buffer,
-+                    GHASH_DIGEST_SIZE);
-+            pagefault_enable();
-+            dctx->bytes = 0;
-+        }
-+        memcpy(out, dctx->shash, GHASH_DIGEST_SIZE);
-+        return 0;
-+    }
-+}
-+
-+struct shash_alg p8_ghash_alg = {
-+    .digestsize = GHASH_DIGEST_SIZE,
-+    .init       = p8_ghash_init,
-+    .update     = p8_ghash_update,
-+    .final      = p8_ghash_final,
-+    .setkey     = p8_ghash_setkey,
-+    .descsize   = sizeof(struct p8_ghash_desc_ctx),
-+    .base       = {
-+        .cra_name = "ghash",
-+        .cra_driver_name = "p8_ghash",
-+        .cra_priority = 1000,
-+        .cra_flags = CRYPTO_ALG_TYPE_SHASH | CRYPTO_ALG_NEED_FALLBACK,
-+        .cra_blocksize = GHASH_BLOCK_SIZE,
-+        .cra_ctxsize = sizeof(struct p8_ghash_ctx),
-+        .cra_module = THIS_MODULE,
-+        .cra_init = p8_ghash_init_tfm,
-+        .cra_exit = p8_ghash_exit_tfm,
-+    },
-+};
++.PRECIOUS: $(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S
 -- 
 2.1.0
