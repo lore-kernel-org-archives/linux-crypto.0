@@ -1,74 +1,129 @@
-From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
-Subject: [PATCHv2 0/7] Add VMX module for PPC64
-Date: Fri, 6 Feb 2015 14:54:55 -0200
-Message-ID: <20150206165452.GA21740@bluepex.com>
+From: "Marcelo H. Cerri" <mhcerri@linux.vnet.ibm.com>
+Subject: [PATCHv2 1/7] Adding VMX module for Power 8
+Date: Fri, 6 Feb 2015 14:56:50 -0200
+Message-ID: <20150206165647.GA23354@bluepex.com>
+Reply-To: leosilva@linux.vnet.ibm.com
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
+Cc: leosilva@linux.vnet.ibm.com
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp04.br.ibm.com ([32.104.18.25]:50846 "EHLO
-	e24smtp04.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752924AbbBFQzE (ORCPT
+Received: from e24smtp05.br.ibm.com ([32.104.18.26]:59646 "EHLO
+	e24smtp05.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752809AbbBFQ4z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Feb 2015 11:55:04 -0500
+	Fri, 6 Feb 2015 11:56:55 -0500
 Received: from /spool/local
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
-	Fri, 6 Feb 2015 14:55:00 -0200
+	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <mhcerri@linux.vnet.ibm.com>;
+	Fri, 6 Feb 2015 14:56:53 -0200
 Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-VMX cryptographic acceleration instructions were added to the POWER8
-CPU. These instructions implement portions of AES and GHASH in hardware.
+This patch adds routines supporting VMX instructions on the
+Power 8.
 
-This patch set adds a new module for PPC64, vmx, that support
-cryptographic routines such as AES and GHASH on hardware. In order to
-access VMX instructions on Power 8 CPU this module uses scripts
-implemented in colaboration with OpenSSL.
-
-Changelog[v2]
-1. Patch style fixes 
-2. Redo unecessary conditions on drivers/crypto/Kconfig
-and vmx/Makefile in previous [Patch 7/7]
-
-Leonidas S. Barbosa (2):
-  Add support for VMS instructions by ASM
-  Enabling VMX module for PPC64
-
-Marcelo H. Cerri (5):
-  Adding VMX module for Power 8
-  Adding AES routines for VMX module
-  Adding CBC routines for VMX module
-  Adding CTR routines for VMX module
-  Adding GHASH routines for VMX module
-
- drivers/crypto/Kconfig            |    9 +
- drivers/crypto/Makefile           |    1 +
- drivers/crypto/vmx/Kconfig        |    8 +
- drivers/crypto/vmx/Makefile       |   19 +
- drivers/crypto/vmx/aes.c          |  139 +++
- drivers/crypto/vmx/aes_cbc.c      |  184 ++++
- drivers/crypto/vmx/aes_ctr.c      |  167 ++++
- drivers/crypto/vmx/aesp8-ppc.h    |   20 +
- drivers/crypto/vmx/aesp8-ppc.pl   | 1940 +++++++++++++++++++++++++++++++++++++
- drivers/crypto/vmx/ghash.c        |  214 ++++
- drivers/crypto/vmx/ghashp8-ppc.pl |  234 +++++
- drivers/crypto/vmx/ppc-xlate.pl   |  226 +++++
- drivers/crypto/vmx/vmx.c          |   88 ++
- 13 files changed, 3249 insertions(+)
- create mode 100644 drivers/crypto/vmx/Kconfig
- create mode 100644 drivers/crypto/vmx/Makefile
- create mode 100644 drivers/crypto/vmx/aes.c
- create mode 100644 drivers/crypto/vmx/aes_cbc.c
- create mode 100644 drivers/crypto/vmx/aes_ctr.c
- create mode 100644 drivers/crypto/vmx/aesp8-ppc.h
- create mode 100755 drivers/crypto/vmx/aesp8-ppc.pl
- create mode 100644 drivers/crypto/vmx/ghash.c
- create mode 100755 drivers/crypto/vmx/ghashp8-ppc.pl
- create mode 100755 drivers/crypto/vmx/ppc-xlate.pl
+Signed-off-by: Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
+---
+ drivers/crypto/vmx/vmx.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
  create mode 100644 drivers/crypto/vmx/vmx.c
 
+diff --git a/drivers/crypto/vmx/vmx.c b/drivers/crypto/vmx/vmx.c
+new file mode 100644
+index 0000000..44d8d5c
+--- /dev/null
++++ b/drivers/crypto/vmx/vmx.c
+@@ -0,0 +1,88 @@
++/**
++ * Routines supporting VMX instructions on the Power 8
++ *
++ * Copyright (C) 2015 International Business Machines Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; version 2 only.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ *
++ * Author: Marcelo Henrique Cerri <mhcerri@br.ibm.com>
++ */
++
++#include <linux/module.h>
++#include <linux/moduleparam.h>
++#include <linux/types.h>
++#include <linux/err.h>
++#include <linux/crypto.h>
++#include <asm/cputable.h>
++#include <crypto/internal/hash.h>
++
++extern struct shash_alg p8_ghash_alg;
++extern struct crypto_alg p8_aes_alg;
++extern struct crypto_alg p8_aes_cbc_alg;
++extern struct crypto_alg p8_aes_ctr_alg;
++static struct crypto_alg *algs[] = {
++    &p8_aes_alg,
++    &p8_aes_cbc_alg,
++    &p8_aes_ctr_alg,
++    NULL,
++};
++
++int __init p8_init(void)
++{
++    int ret = 0;
++    struct crypto_alg **alg_it;
++
++    if (!(cur_cpu_spec->cpu_user_features2 & PPC_FEATURE2_VEC_CRYPTO))
++        return -ENODEV;
++
++    for (alg_it = algs; *alg_it; alg_it++) {
++        ret = crypto_register_alg(*alg_it);
++        printk(KERN_INFO "crypto_register_alg '%s' = %d\n",
++                (*alg_it)->cra_name, ret);
++        if (ret) {
++            for (alg_it--; alg_it >= algs; alg_it--)
++                crypto_unregister_alg(*alg_it);
++            break;
++        }
++    }
++    if (ret)
++        return ret;
++
++    ret = crypto_register_shash(&p8_ghash_alg);
++    if (ret) {
++        for (alg_it = algs; *alg_it; alg_it++)
++            crypto_unregister_alg(*alg_it);
++    }
++    return ret;
++}
++
++void __exit p8_exit(void)
++{
++    struct crypto_alg **alg_it;
++
++    for (alg_it = algs; *alg_it; alg_it++) {
++        printk(KERN_INFO "Removing '%s'\n", (*alg_it)->cra_name);
++        crypto_unregister_alg(*alg_it);
++    }
++    crypto_unregister_shash(&p8_ghash_alg);
++}
++
++module_init(p8_init);
++module_exit(p8_exit);
++
++MODULE_AUTHOR("Marcelo Cerri<mhcerri@br.ibm.com>");
++MODULE_DESCRIPTION("IBM VMX cryptogaphic acceleration instructions support on Power 8");
++MODULE_LICENSE("GPL");
++MODULE_VERSION("1.0.0");
++
 -- 
 2.1.0
