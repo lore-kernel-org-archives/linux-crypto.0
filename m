@@ -1,16 +1,16 @@
 From: Nicholas Mc Guire <hofrat@osadl.org>
-Subject: [PATCH 2/2 RFC] crypto: sahara: pass on error condition
-Date: Sat,  7 Feb 2015 06:17:26 -0500
-Message-ID: <1423307846-25580-1-git-send-email-hofrat@osadl.org>
+Subject: [PATCH RFC v2] crypto: sahara: pass on error condition
+Date: Sat,  7 Feb 2015 06:27:45 -0500
+Message-ID: <1423308465-28222-1-git-send-email-hofrat@osadl.org>
 Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Nicholas Mc Guire <hofrat@osadl.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www.osadl.org ([62.245.132.105]:41269 "EHLO www.osadl.org"
+Received: from www.osadl.org ([62.245.132.105]:41534 "EHLO www.osadl.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755300AbbBGLVg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 7 Feb 2015 06:21:36 -0500
+	id S1755352AbbBGLcD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 7 Feb 2015 06:32:03 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -20,6 +20,10 @@ the -EINVAL so it is visible in sahara_queue_manage().
 
 Signed-off-by: Nicholas Mc Guire <hofrat@osadl.org>
 ---
+
+v2: cut&past error - the condition is not if (!ret) but if (ret) as
+    sahara_hw_descriptor_create() will return 0 on success and -EINVAL
+    in all failure paths.
 
 Patch was only compile tested with imx_v4_v5_defconfig
 CONFIG_CRYPTO_HW=y, CONFIG_CRYPTO_DEV_SAHARA=m
@@ -37,7 +41,7 @@ index 0c790be..a9eeb8b 100644
  	reinit_completion(&dev->dma_completion);
  
  	ret = sahara_hw_descriptor_create(dev);
-+	if (!ret)
++	if (ret)
 +		return -EINVAL;
  
  	timeout = wait_for_completion_timeout(&dev->dma_completion,
