@@ -1,47 +1,26 @@
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: [PATCH v3 12/18] crypto: switch af_alg_make_sg() to iov_iter
-Date: Mon, 9 Feb 2015 17:30:31 +0000
-Message-ID: <20150209173031.GA29656@ZenIV.linux.org.uk>
-References: <20150204063730.GG29656@ZenIV.linux.org.uk>
- <1423032009-18367-12-git-send-email-viro@ZenIV.linux.org.uk>
- <1830853.QH0ahQU9zL@tachyon.chronox.de>
+From: Jari Ruusu <jariruusu@users.sourceforge.net>
+Subject: Announce loop-AES-v3.7c file/swap crypto package
+Date: Tue, 10 Feb 2015 10:07:51 +0200
+Message-ID: <CACMCwJ+RCNB1PKwATPBzv73wdLQRinZ56GXYVcW7hz9PE8G=7g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Miller <davem@davemloft.net>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:49263 "EHLO
-	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932308AbbBIRad (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Feb 2015 12:30:33 -0500
-Content-Disposition: inline
-In-Reply-To: <1830853.QH0ahQU9zL@tachyon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Feb 09, 2015 at 02:59:40PM +0100, Stephan Mueller wrote:
-> Am Mittwoch, 4. Februar 2015, 06:40:03 schrieb Al Viro:
-> 
-> Hi Al,
-> 
-> > From: Al Viro <viro@zeniv.linux.org.uk>
-> > 
-> > With that, all ->sendmsg() instances are converted to iov_iter primitives
-> > and are agnostic wrt the kind of iov_iter they are working with.
-> > So's the last remaining ->recvmsg() instance that wasn't kind-agnostic yet.
-> > All ->sendmsg() and ->recvmsg() advance ->msg_iter by the amount actually
-> > copied and none of them modifies the underlying iovec, etc.
-> 
-> After testing this patch with the test application by simply executing 
-> [1]/test/test.sh, the hash and skcipher interface invocation hang in kernel 
-> space. Though, I am not sure where the problem is.
-> 
-> For individual invocations of the tests, you may look into [1]/test/kcapi-
-> main.c in the comments above cavs_sym or cavs_hash.
-> 
-> [1] http://www.chronox.de/libkcapi.html
+loop-AES changes since previous release:
+- Makefile changed so that alternative makes can be used. Fix from
+  Alon Bar-Lev.
+- Worked around vanished #define on 3.19 kernel.
 
-Very interesting; I'll try to reproduce it once I get some sleep (up since
-yesterday, and it's past noon here ;-/)
+bzip2 compressed tarball is here:
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7c.tar.bz2
+    md5sum 73f1ffbe9108d24e70abc9f06ff3bbc0
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7c.tar.bz2.sign
+
+-- 
+Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
