@@ -1,53 +1,42 @@
 From: Markus Stockhausen <stockhausen@collogia.de>
-Subject: [PATCH v1 3/7] AES for PPC/SPE - assembler core
-Date: Mon, 16 Feb 2015 13:45:46 +0100
-Message-ID: <fc94dece-918d-401a-8f09-e7ae886677ee@EXCHANGE.collogia.de>
+Subject: [PATCH v1 5/7] AES for PPC/SPE - ECB/CBC/CTR/XTS modes
+Date: Mon, 16 Feb 2015 13:45:57 +0100
+Message-ID: <a464bb87-268c-4711-8269-d67104dc3982@EXCHANGE.collogia.de>
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_NextPartTM-000-f66f1564-a564-43ff-9750-94f1242f71ed"
+	boundary="----=_NextPartTM-000-d86d9f6d-6845-4371-9775-f2c2ceb73173"
 Cc: <linuxppc-dev@lists.ozlabs.org>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailrelay.collogia.de ([194.8.207.98]:7411 "HELO
+Received: from mailrelay.collogia.de ([194.8.207.98]:7428 "HELO
 	mailrelay.collogia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1755274AbbBPMps (ORCPT
+	with SMTP id S1755274AbbBPMp7 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Feb 2015 07:45:48 -0500
+	Mon, 16 Feb 2015 07:45:59 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
 This is a multi-part message in MIME format.
 
-------=_NextPartTM-000-f66f1564-a564-43ff-9750-94f1242f71ed
+------=_NextPartTM-000-d86d9f6d-6845-4371-9775-f2c2ceb73173
 Content-Type: text/plain
 
-[PATCH v1 3/7] AES for PPC/SPE - assembler core
+[PATCH v1 5/7] AES for PPC/SPE - ECB/CBC/CTR/XTS modes
 
-The assembler AES encryption and decryption core routines.
-Implemented & optimized for big endian. Nevertheless they
-work on little endian too.
-
-For most efficient reuse in (higher level) block cipher 
-routines they are implemented as "fast" call modules without 
-any stack handling or register saving. The caller must 
-take care of that part. 
+The assembler block cipher module that controls the core
+AES functions.
 
 Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
 
-diff --git a/arch/powerpc/crypto/aes-spe-core.S b/arch/powerpc/crypto/aes-spe-core.S
+diff --git a/arch/powerpc/crypto/aes-spe-modes.S b/arch/powerpc/crypto/aes-spe-modes.S
 new file mode 100644
-index 0000000..5dc6bce
+index 0000000..1141841
 --- /dev/null
-+++ b/arch/powerpc/crypto/aes-spe-core.S
-@@ -0,0 +1,351 @@
++++ b/arch/powerpc/crypto/aes-spe-modes.S
+@@ -0,0 +1,630 @@
 +/*
-+ * Fast AES implementation for SPE instruction set (PPC)
-+ *
-+ * This code makes use of the SPE SIMD instruction set as defined in
-+ * http://cache.freescale.com/files/32bit/doc/ref_manual/SPEPIM.pdf
-+ * Implementation is based on optimization guide notes from
-+ * http://cache.freescale.com/files/32bit/doc/app_note/AN2665.pdf
++ * AES modes (ECB/CBC/CTR/XTS) for PPC AES implementation
 + *
 + * Copyright (c) 2015 Markus Stockhausen <stockhausen@collogia.de>
 + *
@@ -61,339 +50,623 @@ index 0000000..5dc6bce
 +#include <asm/ppc_asm.h>
 +#include "aes-spe-regs.h"
 +
-+#define	EAD(in, bpos) \
-+	rlwimi		rT0,in,28-((bpos+3)%4)*8,20,27;
++#ifdef __BIG_ENDIAN__			/* Macros for big endian builds	*/
 +
-+#define DAD(in, bpos) \
-+	rlwimi		rT1,in,24-((bpos+3)%4)*8,24,31;
++#define LOAD_DATA(reg, off) \
++	lwz		reg,off(rSP);	/* load with offset		*/
++#define SAVE_DATA(reg, off) \
++	stw		reg,off(rDP);	/* save with offset		*/
++#define NEXT_BLOCK \
++	addi		rSP,rSP,16;	/* increment pointers per bloc	*/ \
++	addi		rDP,rDP,16;
++#define LOAD_IV(reg, off) \
++	lwz		reg,off(rIP);	/* IV loading with offset	*/
++#define SAVE_IV(reg, off) \
++	stw		reg,off(rIP);	/* IV saving with offset	*/
++#define START_IV			/* nothing to reset		*/
++#define CBC_DEC 16			/* CBC decrement per block	*/
++#define CTR_DEC 1			/* CTR decrement one byte	*/
 +
-+#define LWH(out, off) \
-+	evlwwsplat	out,off(rT0);	/* load word high		*/
++#else					/* Macros for little endian	*/
 +
-+#define LWL(out, off) \
-+	lwz		out,off(rT0);	/* load word low		*/
++#define LOAD_DATA(reg, off) \
++	lwbrx		reg,0,rSP;	/* load reversed		*/ \
++	addi		rSP,rSP,4;	/* and increment pointer	*/
++#define SAVE_DATA(reg, off) \
++	stwbrx		reg,0,rDP; 	/* save reversed		*/ \
++	addi		rDP,rDP,4;	/* and increment pointer	*/
++#define NEXT_BLOCK			/* nothing todo			*/
++#define LOAD_IV(reg, off) \
++	lwbrx		reg,0,rIP; 	/* load reversed		*/ \
++	addi		rIP,rIP,4;	/* and increment pointer	*/
++#define SAVE_IV(reg, off) \
++	stwbrx		reg,0,rIP;	/* load reversed		*/ \
++	addi		rIP,rIP,4;	/* and increment pointer	*/
++#define START_IV \
++	subi		rIP,rIP,16;	/* must reset pointer		*/
++#define CBC_DEC 32			/* 2 blocks because of incs	*/
++#define CTR_DEC 17			/* 1 block because of incs	*/
 +
-+#define LBZ(out, tab, off) \
-+	lbz		out,off(tab);	/* load byte			*/
++#endif
 +
-+#define LAH(out, in, bpos, off) \
-+	EAD(in, bpos)			/* calc addr + load word high	*/ \
-+	LWH(out, off)
++#define SAVE_0_REGS
++#define LOAD_0_REGS
 +
-+#define LAL(out, in, bpos, off) \
-+	EAD(in, bpos)			/* calc addr + load word low	*/ \
-+	LWL(out, off)
++#define SAVE_4_REGS \
++	stw		rI0,96(r1);	/* save 32 bit registers	*/ \
++	stw		rI1,100(r1);					   \
++	stw		rI2,104(r1);					   \
++	stw		rI3,108(r1);
 +
-+#define LAE(out, in, bpos) \
-+	EAD(in, bpos)			/* calc addr + load enc byte	*/ \
-+	LBZ(out, rT0, 8)
++#define LOAD_4_REGS \
++	lwz		rI0,96(r1);	/* restore 32 bit registers	*/ \
++	lwz		rI1,100(r1);					   \
++	lwz		rI2,104(r1);					   \
++	lwz		rI3,108(r1);
 +
-+#define LBE(out) \
-+	LBZ(out, rT0, 8)		/* load enc byte		*/
++#define SAVE_8_REGS \
++	SAVE_4_REGS							   \
++	stw		rG0,112(r1);	/* save 32 bit registers	*/ \
++	stw		rG1,116(r1);					   \
++	stw		rG2,120(r1);					   \
++	stw		rG3,124(r1);
 +
-+#define LAD(out, in, bpos) \
-+	DAD(in, bpos)			/* calc addr + load dec byte	*/ \
-+	LBZ(out, rT1, 0)
++#define LOAD_8_REGS \
++	LOAD_4_REGS							   \
++	lwz		rG0,112(r1);	/* restore 32 bit registers	*/ \
++	lwz		rG1,116(r1);					   \
++	lwz		rG2,120(r1);					   \
++	lwz		rG3,124(r1);
 +
-+#define LBD(out) \
-+	LBZ(out, rT1, 0)
++#define INITIALIZE_CRYPT(tab,nr32bitregs) \
++	mflr		r0;						   \
++	stwu		r1,-160(r1);	/* create stack frame		*/ \
++	lis		rT0,tab@h;	/* en-/decryption table pointer	*/ \
++	stw		r0,8(r1);	/* save link register		*/ \
++	ori		rT0,rT0,tab@l;					   \
++	evstdw		r14,16(r1);					   \
++	mr		rKS,rKP;					   \
++	evstdw		r15,24(r1);	/* We must save non volatile	*/ \
++	evstdw		r16,32(r1);	/* registers. Take the chance	*/ \
++	evstdw		r17,40(r1);	/* and save the SPE part too	*/ \
++	evstdw		r18,48(r1);					   \
++	evstdw		r19,56(r1);					   \
++	evstdw		r20,64(r1);					   \
++	evstdw		r21,72(r1);					   \
++	evstdw		r22,80(r1);					   \
++	evstdw		r23,88(r1);					   \
++	SAVE_##nr32bitregs##_REGS
++
++#define FINALIZE_CRYPT(nr32bitregs) \
++	lwz		r0,8(r1);					   \
++	evldw		r14,16(r1);	/* restore SPE registers	*/ \
++	evldw		r15,24(r1);					   \
++	evldw		r16,32(r1);					   \
++	evldw		r17,40(r1);					   \
++	evldw		r18,48(r1);					   \
++	evldw		r19,56(r1);					   \
++	evldw		r20,64(r1);					   \
++	evldw		r21,72(r1);					   \
++	evldw		r22,80(r1);					   \
++	evldw		r23,88(r1);					   \
++	LOAD_##nr32bitregs##_REGS					   \
++	mtlr		r0;		/* restore link register	*/ \
++	xor		r0,r0,r0;					   \
++	stw		r0,16(r1);	/* delete sensitive data	*/ \
++	stw		r0,24(r1);	/* that we might have pushed	*/ \
++	stw		r0,32(r1);	/* from other context that runs	*/ \
++	stw		r0,40(r1);	/* the same code		*/ \
++	stw		r0,48(r1);					   \
++	stw		r0,56(r1);					   \
++	stw		r0,64(r1);					   \
++	stw		r0,72(r1);					   \
++	stw		r0,80(r1);					   \
++	stw		r0,88(r1);					   \
++	addi		r1,r1,160;	/* cleanup stack frame		*/
++
++#define ENDIAN_SWAP(t0, t1, s0, s1) \
++	rotrwi		t0,s0,8;	/* swap endianness for 2 GPRs	*/ \
++	rotrwi		t1,s1,8;					   \
++	rlwimi		t0,s0,8,8,15;					   \
++	rlwimi		t1,s1,8,8,15;					   \
++	rlwimi		t0,s0,8,24,31;					   \
++	rlwimi		t1,s1,8,24,31;
++
++#define GF128_MUL(d0, d1, d2, d3, t0) \
++	li		t0,0x87;	/* multiplication in GF128	*/ \
++	cmpwi		d3,-1;						   \
++	iselgt		t0,0,t0;					   \
++	rlwimi		d3,d2,0,0,0;	/* propagate "carry" bits	*/ \
++	rotlwi		d3,d3,1;					   \
++	rlwimi		d2,d1,0,0,0;					   \
++	rotlwi		d2,d2,1;					   \
++	rlwimi		d1,d0,0,0,0;					   \
++	slwi		d0,d0,1;	/* shift left 128 bit		*/ \
++	rotlwi		d1,d1,1;					   \
++	xor		d0,d0,t0;
++
++#define START_KEY(d0, d1, d2, d3) \
++	lwz		rW0,0(rKP);					   \
++	mtctr		rRR;						   \
++	lwz		rW1,4(rKP);					   \
++	lwz		rW2,8(rKP);					   \
++	lwz		rW3,12(rKP);					   \
++	xor		rD0,d0,rW0;					   \
++	xor		rD1,d1,rW1;					   \
++	xor		rD2,d2,rW2;					   \
++	xor		rD3,d3,rW3;
 +
 +/*
-+ * ppc_encrypt_block: The central encryption function for a single 16 bytes
-+ * block. It does no stack handling or register saving to support fast calls
-+ * via bl/blr. It expects that caller has pre-xored input data with first
-+ * 4 words of encryption key into rD0-rD3. Pointer/counter registers must
-+ * have also been set up before (rT0, rKP, CTR). Output is stored in rD0-rD3
-+ * and rW0-rW3 and caller must execute a final xor on the ouput registers.
-+ * All working registers rD0-rD3 & rW0-rW7 are overwritten during processing.
++ * ppc_encrypt_aes(u8 *out, const u8 *in, u32 *key_enc,
++ *		   u32 rounds)
++ *
++ * called from glue layer to encrypt a single 16 byte block
++ * round values are AES128 = 4, AES192 = 5, AES256 = 6
 + *
 + */
-+_GLOBAL(ppc_encrypt_block)
-+	LAH(rW4, rD1, 2, 4)
-+	LAH(rW6, rD0, 3, 0)
-+	LAH(rW3, rD0, 1, 8)
-+ppc_encrypt_block_loop:
-+	LAH(rW0, rD3, 0, 12)
-+	LAL(rW0, rD0, 0, 12)
-+	LAH(rW1, rD1, 0, 12)
-+	LAH(rW2, rD2, 1, 8)
-+	LAL(rW2, rD3, 1, 8)
-+	LAL(rW3, rD1, 1, 8)
-+	LAL(rW4, rD2, 2, 4)
-+	LAL(rW6, rD1, 3, 0)
-+	LAH(rW5, rD3, 2, 4)
-+	LAL(rW5, rD0, 2, 4)
-+	LAH(rW7, rD2, 3, 0)
-+	evldw		rD1,16(rKP)
-+	EAD(rD3, 3)
-+	evxor		rW2,rW2,rW4
-+	LWL(rW7, 0)
-+	evxor		rW2,rW2,rW6
-+	EAD(rD2, 0)
-+	evxor		rD1,rD1,rW2
-+	LWL(rW1, 12)
-+	evxor		rD1,rD1,rW0
-+	evldw		rD3,24(rKP)
-+	evmergehi	rD0,rD0,rD1
-+	EAD(rD1, 2)
-+	evxor		rW3,rW3,rW5
-+	LWH(rW4, 4)
-+	evxor		rW3,rW3,rW7
-+	EAD(rD0, 3)
-+	evxor		rD3,rD3,rW3
-+	LWH(rW6, 0)
-+	evxor		rD3,rD3,rW1
-+	EAD(rD0, 1)
-+	evmergehi	rD2,rD2,rD3
-+	LWH(rW3, 8)
-+	LAH(rW0, rD3, 0, 12)
-+	LAL(rW0, rD0, 0, 12)
-+	LAH(rW1, rD1, 0, 12)
-+	LAH(rW2, rD2, 1, 8)
-+	LAL(rW2, rD3, 1, 8)
-+	LAL(rW3, rD1, 1, 8)
-+	LAL(rW4, rD2, 2, 4)
-+	LAL(rW6, rD1, 3, 0)
-+	LAH(rW5, rD3, 2, 4)
-+	LAL(rW5, rD0, 2, 4)
-+	LAH(rW7, rD2, 3, 0)
-+	evldw		rD1,32(rKP)
-+	EAD(rD3, 3)
-+	evxor		rW2,rW2,rW4
-+	LWL(rW7, 0)
-+	evxor		rW2,rW2,rW6
-+	EAD(rD2, 0)
-+	evxor		rD1,rD1,rW2
-+	LWL(rW1, 12)
-+	evxor		rD1,rD1,rW0
-+	evldw		rD3,40(rKP)
-+	evmergehi	rD0,rD0,rD1
-+	EAD(rD1, 2)
-+	evxor		rW3,rW3,rW5
-+	LWH(rW4, 4)
-+	evxor		rW3,rW3,rW7
-+	EAD(rD0, 3)
-+	evxor		rD3,rD3,rW3
-+	LWH(rW6, 0)
-+	evxor		rD3,rD3,rW1
-+	EAD(rD0, 1)
-+	evmergehi	rD2,rD2,rD3
-+	LWH(rW3, 8)
-+	addi		rKP,rKP,32
-+	bdnz		ppc_encrypt_block_loop
-+	LAH(rW0, rD3, 0, 12)
-+	LAL(rW0, rD0, 0, 12)
-+	LAH(rW1, rD1, 0, 12)
-+	LAH(rW2, rD2, 1, 8)
-+	LAL(rW2, rD3, 1, 8)
-+	LAL(rW3, rD1, 1, 8)
-+	LAL(rW4, rD2, 2, 4)
-+	LAH(rW5, rD3, 2, 4)
-+	LAL(rW6, rD1, 3, 0)
-+	LAL(rW5, rD0, 2, 4)
-+	LAH(rW7, rD2, 3, 0)
-+	evldw		rD1,16(rKP)
-+	EAD(rD3, 3)
-+	evxor		rW2,rW2,rW4
-+	LWL(rW7, 0)
-+	evxor		rW2,rW2,rW6
-+	EAD(rD2, 0)
-+	evxor		rD1,rD1,rW2
-+	LWL(rW1, 12)
-+	evxor		rD1,rD1,rW0
-+	evldw		rD3,24(rKP)
-+	evmergehi	rD0,rD0,rD1
-+	EAD(rD1, 0)
-+	evxor		rW3,rW3,rW5
-+	LBE(rW2)
-+	evxor		rW3,rW3,rW7
-+	EAD(rD0, 1)
-+	evxor		rD3,rD3,rW3
-+	LBE(rW6)
-+	evxor		rD3,rD3,rW1
-+	EAD(rD0, 0)
-+	evmergehi	rD2,rD2,rD3
-+	LBE(rW1)
-+	LAE(rW0, rD3, 0)
-+	LAE(rW1, rD0, 0)
-+	LAE(rW4, rD2, 1)
-+	LAE(rW5, rD3, 1)
-+	LAE(rW3, rD2, 0)
-+	LAE(rW7, rD1, 1)
-+	rlwimi		rW0,rW4,8,16,23
-+	rlwimi		rW1,rW5,8,16,23
-+	LAE(rW4, rD1, 2)
-+	LAE(rW5, rD2, 2)
-+	rlwimi		rW2,rW6,8,16,23
-+	rlwimi		rW3,rW7,8,16,23
-+	LAE(rW6, rD3, 2)
-+	LAE(rW7, rD0, 2)
-+	rlwimi		rW0,rW4,16,8,15
-+	rlwimi		rW1,rW5,16,8,15
-+	LAE(rW4, rD0, 3)
-+	LAE(rW5, rD1, 3)
-+	rlwimi		rW2,rW6,16,8,15
-+	lwz		rD0,32(rKP)
-+	rlwimi		rW3,rW7,16,8,15
-+	lwz		rD1,36(rKP)
-+	LAE(rW6, rD2, 3)
-+	LAE(rW7, rD3, 3)
-+	rlwimi		rW0,rW4,24,0,7
-+	lwz		rD2,40(rKP)
-+	rlwimi		rW1,rW5,24,0,7
-+	lwz		rD3,44(rKP)
-+	rlwimi		rW2,rW6,24,0,7
-+	rlwimi		rW3,rW7,24,0,7
++_GLOBAL(ppc_encrypt_aes)
++	INITIALIZE_CRYPT(PPC_AES_4K_ENCTAB, 0)
++	LOAD_DATA(rD0, 0)
++	LOAD_DATA(rD1, 4)
++	LOAD_DATA(rD2, 8)
++	LOAD_DATA(rD3, 12)
++	START_KEY(rD0, rD1, rD2, rD3)
++	bl		ppc_encrypt_block
++	xor		rD0,rD0,rW0
++	SAVE_DATA(rD0, 0)
++	xor		rD1,rD1,rW1
++	SAVE_DATA(rD1, 4)
++	xor		rD2,rD2,rW2
++	SAVE_DATA(rD2, 8)
++	xor		rD3,rD3,rW3
++	SAVE_DATA(rD3, 12)
++	FINALIZE_CRYPT(0)
 +	blr
 +
 +/*
-+ * ppc_decrypt_block: The central decryption function for a single 16 bytes
-+ * block. It does no stack handling or register saving to support fast calls
-+ * via bl/blr. It expects that caller has pre-xored input data with first
-+ * 4 words of encryption key into rD0-rD3. Pointer/counter registers must
-+ * have also been set up before (rT0, rKP, CTR). Output is stored in rD0-rD3
-+ * and rW0-rW3 and caller must execute a final xor on the ouput registers.
-+ * All working registers rD0-rD3 & rW0-rW7 are overwritten during processing.
++ * ppc_decrypt_aes(u8 *out, const u8 *in, u32 *key_dec,
++ *		   u32 rounds)
++ *
++ * called from glue layer to decrypt a single 16 byte block
++ * round values are AES128 = 4, AES192 = 5, AES256 = 6
 + *
 + */
-+_GLOBAL(ppc_decrypt_block)
-+	LAH(rW0, rD1, 0, 12)
-+	LAH(rW6, rD0, 3, 0)
-+	LAH(rW3, rD0, 1, 8)
-+ppc_decrypt_block_loop:
-+	LAH(rW1, rD3, 0, 12)
-+	LAL(rW0, rD2, 0, 12)
-+	LAH(rW2, rD2, 1, 8)
-+	LAL(rW2, rD3, 1, 8)
-+	LAH(rW4, rD3, 2, 4)
-+	LAL(rW4, rD0, 2, 4)
-+	LAL(rW6, rD1, 3, 0)
-+	LAH(rW5, rD1, 2, 4)
-+	LAH(rW7, rD2, 3, 0)
-+	LAL(rW7, rD3, 3, 0)
-+	LAL(rW3, rD1, 1, 8)
-+	evldw		rD1,16(rKP)
-+	EAD(rD0, 0)
-+	evxor		rW4,rW4,rW6
-+	LWL(rW1, 12)
-+	evxor		rW0,rW0,rW4
-+	EAD(rD2, 2)
-+	evxor		rW0,rW0,rW2
-+	LWL(rW5, 4)
-+	evxor		rD1,rD1,rW0
-+	evldw		rD3,24(rKP)
-+	evmergehi	rD0,rD0,rD1
-+	EAD(rD1, 0)
-+	evxor		rW3,rW3,rW7
-+	LWH(rW0, 12)
-+	evxor		rW3,rW3,rW1
-+	EAD(rD0, 3)
-+	evxor		rD3,rD3,rW3
-+	LWH(rW6, 0)
-+	evxor		rD3,rD3,rW5
-+	EAD(rD0, 1)
-+	evmergehi	rD2,rD2,rD3
-+	LWH(rW3, 8)
-+	LAH(rW1, rD3, 0, 12)
-+	LAL(rW0, rD2, 0, 12)
-+	LAH(rW2, rD2, 1, 8)
-+	LAL(rW2, rD3, 1, 8)
-+	LAH(rW4, rD3, 2, 4)
-+	LAL(rW4, rD0, 2, 4)
-+	LAL(rW6, rD1, 3, 0)
-+	LAH(rW5, rD1, 2, 4)
-+	LAH(rW7, rD2, 3, 0)
-+	LAL(rW7, rD3, 3, 0)
-+	LAL(rW3, rD1, 1, 8)
-+	evldw		 rD1,32(rKP)
-+	EAD(rD0, 0)
-+	evxor		rW4,rW4,rW6
-+	LWL(rW1, 12)
-+	evxor		rW0,rW0,rW4
-+	EAD(rD2, 2)
-+	evxor		rW0,rW0,rW2
-+	LWL(rW5, 4)
-+	evxor		rD1,rD1,rW0
-+	evldw		rD3,40(rKP)
-+	evmergehi	rD0,rD0,rD1
-+	EAD(rD1, 0)
-+	evxor		rW3,rW3,rW7
-+	LWH(rW0, 12)
-+	evxor		rW3,rW3,rW1
-+	EAD(rD0, 3)
-+	evxor		rD3,rD3,rW3
-+	LWH(rW6, 0)
-+	evxor		rD3,rD3,rW5
-+	EAD(rD0, 1)
-+	evmergehi	rD2,rD2,rD3
-+	LWH(rW3, 8)
-+	addi		rKP,rKP,32
-+	bdnz		ppc_decrypt_block_loop
-+	LAH(rW1, rD3, 0, 12)
-+	LAL(rW0, rD2, 0, 12)
-+	LAH(rW2, rD2, 1, 8)
-+	LAL(rW2, rD3, 1, 8)
-+	LAH(rW4, rD3, 2, 4)
-+	LAL(rW4, rD0, 2, 4)
-+	LAL(rW6, rD1, 3, 0)
-+	LAH(rW5, rD1, 2, 4)
-+	LAH(rW7, rD2, 3, 0)
-+	LAL(rW7, rD3, 3, 0)
-+	LAL(rW3, rD1, 1, 8)
-+	evldw		 rD1,16(rKP)
-+	EAD(rD0, 0)
-+	evxor		rW4,rW4,rW6
-+	LWL(rW1, 12)
-+	evxor		rW0,rW0,rW4
-+	EAD(rD2, 2)
-+	evxor		rW0,rW0,rW2
-+	LWL(rW5, 4)
-+	evxor		rD1,rD1,rW0
-+	evldw		rD3,24(rKP)
-+	evmergehi	rD0,rD0,rD1
-+	DAD(rD1, 0)
-+	evxor		rW3,rW3,rW7
-+	LBD(rW0)
-+	evxor		rW3,rW3,rW1
-+	DAD(rD0, 1)
-+	evxor		rD3,rD3,rW3
-+	LBD(rW6)
-+	evxor		rD3,rD3,rW5
-+	DAD(rD0, 0)
-+	evmergehi	rD2,rD2,rD3
-+	LBD(rW3)
-+	LAD(rW2, rD3, 0)
-+	LAD(rW1, rD2, 0)
-+	LAD(rW4, rD2, 1)
-+	LAD(rW5, rD3, 1)
-+	LAD(rW7, rD1, 1)
-+	rlwimi		rW0,rW4,8,16,23
-+	rlwimi		rW1,rW5,8,16,23
-+	LAD(rW4, rD3, 2)
-+	LAD(rW5, rD0, 2)
-+	rlwimi		rW2,rW6,8,16,23
-+	rlwimi		rW3,rW7,8,16,23
-+	LAD(rW6, rD1, 2)
-+	LAD(rW7, rD2, 2)
-+	rlwimi		rW0,rW4,16,8,15
-+	rlwimi		rW1,rW5,16,8,15
-+	LAD(rW4, rD0, 3)
-+	LAD(rW5, rD1, 3)
-+	rlwimi		rW2,rW6,16,8,15
-+	lwz		rD0,32(rKP)
-+	rlwimi		rW3,rW7,16,8,15
-+	lwz		rD1,36(rKP)
-+	LAD(rW6, rD2, 3)
-+	LAD(rW7, rD3, 3)
-+	rlwimi		rW0,rW4,24,0,7
-+	lwz		rD2,40(rKP)
-+	rlwimi		rW1,rW5,24,0,7
-+	lwz		rD3,44(rKP)
-+	rlwimi		rW2,rW6,24,0,7
-+	rlwimi		rW3,rW7,24,0,7
++_GLOBAL(ppc_decrypt_aes)
++	INITIALIZE_CRYPT(PPC_AES_4K_DECTAB,0)
++	LOAD_DATA(rD0, 0)
++	addi		rT1,rT0,4096
++	LOAD_DATA(rD1, 4)
++	LOAD_DATA(rD2, 8)
++	LOAD_DATA(rD3, 12)
++	START_KEY(rD0, rD1, rD2, rD3)
++	bl		ppc_decrypt_block
++	xor		rD0,rD0,rW0
++	SAVE_DATA(rD0, 0)
++	xor		rD1,rD1,rW1
++	SAVE_DATA(rD1, 4)
++	xor		rD2,rD2,rW2
++	SAVE_DATA(rD2, 8)
++	xor		rD3,rD3,rW3
++	SAVE_DATA(rD3, 12)
++	FINALIZE_CRYPT(0)
++	blr
++
++/*
++ * ppc_encrypt_ecb(u8 *out, const u8 *in, u32 *key_enc,
++ *		   u32 rounds, u32 bytes);
++ *
++ * called from glue layer to encrypt multiple blocks via ECB
++ * Bytes must be larger or equal 16 and only whole blocks are
++ * processed. round values are AES128 = 4, AES192 = 5 and
++ * AES256 = 6
++ *
++ */
++_GLOBAL(ppc_encrypt_ecb)
++	INITIALIZE_CRYPT(PPC_AES_4K_ENCTAB, 0)
++ppc_encrypt_ecb_loop:
++	LOAD_DATA(rD0, 0)
++	mr		rKP,rKS
++	LOAD_DATA(rD1, 4)
++	subi		rLN,rLN,16
++	LOAD_DATA(rD2, 8)
++	cmpwi		rLN,15
++	LOAD_DATA(rD3, 12)
++	START_KEY(rD0, rD1, rD2, rD3)
++	bl		ppc_encrypt_block
++	xor		rD0,rD0,rW0
++	SAVE_DATA(rD0, 0)
++	xor		rD1,rD1,rW1
++	SAVE_DATA(rD1, 4)
++	xor		rD2,rD2,rW2
++	SAVE_DATA(rD2, 8)
++	xor		rD3,rD3,rW3
++	SAVE_DATA(rD3, 12)
++	NEXT_BLOCK
++	bt		gt,ppc_encrypt_ecb_loop
++	FINALIZE_CRYPT(0)
++	blr
++
++/*
++ * ppc_decrypt_ecb(u8 *out, const u8 *in, u32 *key_dec,
++ *		   u32 rounds, u32 bytes);
++ *
++ * called from glue layer to decrypt multiple blocks via ECB
++ * Bytes must be larger or equal 16 and only whole blocks are
++ * processed. round values are AES128 = 4, AES192 = 5 and
++ * AES256 = 6
++ *
++ */
++_GLOBAL(ppc_decrypt_ecb)
++	INITIALIZE_CRYPT(PPC_AES_4K_DECTAB, 0)
++	addi		rT1,rT0,4096
++ppc_decrypt_ecb_loop:
++	LOAD_DATA(rD0, 0)
++	mr		rKP,rKS
++	LOAD_DATA(rD1, 4)
++	subi		rLN,rLN,16
++	LOAD_DATA(rD2, 8)
++	cmpwi		rLN,15
++	LOAD_DATA(rD3, 12)
++	START_KEY(rD0, rD1, rD2, rD3)
++	bl		ppc_decrypt_block
++	xor		rD0,rD0,rW0
++	SAVE_DATA(rD0, 0)
++	xor		rD1,rD1,rW1
++	SAVE_DATA(rD1, 4)
++	xor		rD2,rD2,rW2
++	SAVE_DATA(rD2, 8)
++	xor		rD3,rD3,rW3
++	SAVE_DATA(rD3, 12)
++	NEXT_BLOCK
++	bt		gt,ppc_decrypt_ecb_loop
++	FINALIZE_CRYPT(0)
++	blr
++
++/*
++ * ppc_encrypt_cbc(u8 *out, const u8 *in, u32 *key_enc,
++ *		   32 rounds, u32 bytes, u8 *iv);
++ *
++ * called from glue layer to encrypt multiple blocks via CBC
++ * Bytes must be larger or equal 16 and only whole blocks are
++ * processed. round values are AES128 = 4, AES192 = 5 and
++ * AES256 = 6
++ *
++ */
++_GLOBAL(ppc_encrypt_cbc)
++	INITIALIZE_CRYPT(PPC_AES_4K_ENCTAB, 4)
++	LOAD_IV(rI0, 0)
++	LOAD_IV(rI1, 4)
++	LOAD_IV(rI2, 8)
++	LOAD_IV(rI3, 12)
++ppc_encrypt_cbc_loop:
++	LOAD_DATA(rD0, 0)
++	mr		rKP,rKS
++	LOAD_DATA(rD1, 4)
++	subi		rLN,rLN,16
++	LOAD_DATA(rD2, 8)
++	cmpwi		rLN,15
++	LOAD_DATA(rD3, 12)
++	xor		rD0,rD0,rI0
++	xor		rD1,rD1,rI1
++	xor		rD2,rD2,rI2
++	xor		rD3,rD3,rI3
++	START_KEY(rD0, rD1, rD2, rD3)
++	bl		ppc_encrypt_block
++	xor		rI0,rD0,rW0
++	SAVE_DATA(rI0, 0)
++	xor		rI1,rD1,rW1
++	SAVE_DATA(rI1, 4)
++	xor		rI2,rD2,rW2
++	SAVE_DATA(rI2, 8)
++	xor		rI3,rD3,rW3
++	SAVE_DATA(rI3, 12)
++	NEXT_BLOCK
++	bt		gt,ppc_encrypt_cbc_loop
++	START_IV
++	SAVE_IV(rI0, 0)
++	SAVE_IV(rI1, 4)
++	SAVE_IV(rI2, 8)
++	SAVE_IV(rI3, 12)
++	FINALIZE_CRYPT(4)
++	blr
++
++/*
++ * ppc_decrypt_cbc(u8 *out, const u8 *in, u32 *key_dec,
++ *		   u32 rounds, u32 bytes, u8 *iv);
++ *
++ * called from glue layer to decrypt multiple blocks via CBC
++ * round values are AES128 = 4, AES192 = 5, AES256 = 6
++ *
++ */
++_GLOBAL(ppc_decrypt_cbc)
++	INITIALIZE_CRYPT(PPC_AES_4K_DECTAB, 4)
++	li		rT1,15
++	LOAD_IV(rI0, 0)
++	andc		rLN,rLN,rT1
++	LOAD_IV(rI1, 4)
++	subi		rLN,rLN,16
++	LOAD_IV(rI2, 8)
++	add		rSP,rSP,rLN	/* reverse processing		*/
++	LOAD_IV(rI3, 12)
++	add		rDP,rDP,rLN
++	LOAD_DATA(rD0, 0)
++	addi		rT1,rT0,4096
++	LOAD_DATA(rD1, 4)
++	LOAD_DATA(rD2, 8)
++	LOAD_DATA(rD3, 12)
++	START_IV
++	SAVE_IV(rD0, 0)
++	SAVE_IV(rD1, 4)
++	SAVE_IV(rD2, 8)
++	cmpwi		rLN,16
++	SAVE_IV(rD3, 12)
++	bt		lt,ppc_decrypt_cbc_end
++ppc_decrypt_cbc_loop:
++	mr		rKP,rKS
++	START_KEY(rD0, rD1, rD2, rD3)
++	bl		ppc_decrypt_block
++	subi		rLN,rLN,16
++	subi		rSP,rSP,CBC_DEC
++	xor		rW0,rD0,rW0
++	LOAD_DATA(rD0, 0)
++	xor		rW1,rD1,rW1
++	LOAD_DATA(rD1, 4)
++	xor		rW2,rD2,rW2
++	LOAD_DATA(rD2, 8)
++	xor		rW3,rD3,rW3
++	LOAD_DATA(rD3, 12)
++	xor		rW0,rW0,rD0
++	SAVE_DATA(rW0, 0)
++	xor		rW1,rW1,rD1
++	SAVE_DATA(rW1, 4)
++	xor		rW2,rW2,rD2
++	SAVE_DATA(rW2, 8)
++	xor		rW3,rW3,rD3
++	SAVE_DATA(rW3, 12)
++	cmpwi		rLN,15
++	subi		rDP,rDP,CBC_DEC
++	bt		gt,ppc_decrypt_cbc_loop
++ppc_decrypt_cbc_end:
++	mr		rKP,rKS
++	START_KEY(rD0, rD1, rD2, rD3)
++	bl		ppc_decrypt_block
++	xor		rW0,rW0,rD0
++	xor		rW1,rW1,rD1
++	xor		rW2,rW2,rD2
++	xor		rW3,rW3,rD3
++	xor		rW0,rW0,rI0	/* decrypt with initial IV	*/
++	SAVE_DATA(rW0, 0)
++	xor		rW1,rW1,rI1
++	SAVE_DATA(rW1, 4)
++	xor		rW2,rW2,rI2
++	SAVE_DATA(rW2, 8)
++	xor		rW3,rW3,rI3
++	SAVE_DATA(rW3, 12)
++	FINALIZE_CRYPT(4)
++	blr
++
++/*
++ * ppc_crypt_ctr(u8 *out, const u8 *in, u32 *key_enc,
++ *		 u32 rounds, u32 bytes, u8 *iv);
++ *
++ * called from glue layer to encrypt/decrypt multiple blocks
++ * via CTR. Number of bytes does not need to be a multiple of
++ * 16. Round values are AES128 = 4, AES192 = 5, AES256 = 6
++ *
++ */
++_GLOBAL(ppc_crypt_ctr)
++	INITIALIZE_CRYPT(PPC_AES_4K_ENCTAB, 4)
++	LOAD_IV(rI0, 0)
++	LOAD_IV(rI1, 4)
++	LOAD_IV(rI2, 8)
++	cmpwi		rLN,16
++	LOAD_IV(rI3, 12)
++	START_IV
++	bt		lt,ppc_crypt_ctr_partial
++ppc_crypt_ctr_loop:
++	mr		rKP,rKS
++	START_KEY(rI0, rI1, rI2, rI3)
++	bl		ppc_encrypt_block
++	xor		rW0,rD0,rW0
++	xor		rW1,rD1,rW1
++	xor		rW2,rD2,rW2
++	xor		rW3,rD3,rW3
++	LOAD_DATA(rD0, 0)
++	subi		rLN,rLN,16
++	LOAD_DATA(rD1, 4)
++	LOAD_DATA(rD2, 8)
++	LOAD_DATA(rD3, 12)
++	xor		rD0,rD0,rW0
++	SAVE_DATA(rD0, 0)
++	xor		rD1,rD1,rW1
++	SAVE_DATA(rD1, 4)
++	xor		rD2,rD2,rW2
++	SAVE_DATA(rD2, 8)
++	xor		rD3,rD3,rW3
++	SAVE_DATA(rD3, 12)
++	addic		rI3,rI3,1	/* increase counter			*/
++	addze		rI2,rI2
++	addze		rI1,rI1
++	addze		rI0,rI0
++	NEXT_BLOCK
++	cmpwi		rLN,15
++	bt		gt,ppc_crypt_ctr_loop
++ppc_crypt_ctr_partial:
++	cmpwi		rLN,0
++	bt		eq,ppc_crypt_ctr_end
++	mr		rKP,rKS
++	START_KEY(rI0, rI1, rI2, rI3)
++	bl		ppc_encrypt_block
++	xor		rW0,rD0,rW0
++	SAVE_IV(rW0, 0)
++	xor		rW1,rD1,rW1
++	SAVE_IV(rW1, 4)
++	xor		rW2,rD2,rW2
++	SAVE_IV(rW2, 8)
++	xor		rW3,rD3,rW3
++	SAVE_IV(rW3, 12)
++	mtctr		rLN
++	subi		rIP,rIP,CTR_DEC
++	subi		rSP,rSP,1
++	subi		rDP,rDP,1
++ppc_crypt_ctr_xorbyte:
++	lbzu		rW4,1(rIP)	/* bytewise xor for partial block	*/
++	lbzu		rW5,1(rSP)
++	xor		rW4,rW4,rW5
++	stbu		rW4,1(rDP)
++	bdnz		ppc_crypt_ctr_xorbyte
++	subf		rIP,rLN,rIP
++	addi		rIP,rIP,1
++	addic		rI3,rI3,1
++	addze		rI2,rI2
++	addze		rI1,rI1
++	addze		rI0,rI0
++ppc_crypt_ctr_end:
++	SAVE_IV(rI0, 0)
++	SAVE_IV(rI1, 4)
++	SAVE_IV(rI2, 8)
++	SAVE_IV(rI3, 12)
++	FINALIZE_CRYPT(4)
++	blr
++
++/*
++ * ppc_encrypt_xts(u8 *out, const u8 *in, u32 *key_enc,
++ *		   u32 rounds, u32 bytes, u8 *iv, u32 *key_twk);
++ *
++ * called from glue layer to encrypt multiple blocks via XTS
++ * If key_twk is given, the initial IV encryption will be
++ * processed too. Round values are AES128 = 4, AES192 = 5,
++ * AES256 = 6
++ *
++ */
++_GLOBAL(ppc_encrypt_xts)
++	INITIALIZE_CRYPT(PPC_AES_4K_ENCTAB, 8)
++	LOAD_IV(rI0, 0)
++	LOAD_IV(rI1, 4)
++	LOAD_IV(rI2, 8)
++	cmpwi		rKT,0
++	LOAD_IV(rI3, 12)
++	bt		eq,ppc_encrypt_xts_notweak
++	mr		rKP,rKT
++	START_KEY(rI0, rI1, rI2, rI3)
++	bl		ppc_encrypt_block
++	xor		rI0,rD0,rW0
++	xor		rI1,rD1,rW1
++	xor		rI2,rD2,rW2
++	xor		rI3,rD3,rW3
++ppc_encrypt_xts_notweak:
++	ENDIAN_SWAP(rG0, rG1, rI0, rI1)
++	ENDIAN_SWAP(rG2, rG3, rI2, rI3)
++ppc_encrypt_xts_loop:
++	LOAD_DATA(rD0, 0)
++	mr		rKP,rKS
++	LOAD_DATA(rD1, 4)
++	subi		rLN,rLN,16
++	LOAD_DATA(rD2, 8)
++	LOAD_DATA(rD3, 12)
++	xor		rD0,rD0,rI0
++	xor		rD1,rD1,rI1
++	xor		rD2,rD2,rI2
++	xor		rD3,rD3,rI3
++	START_KEY(rD0, rD1, rD2, rD3)
++	bl		ppc_encrypt_block
++	xor		rD0,rD0,rW0
++	xor		rD1,rD1,rW1
++	xor		rD2,rD2,rW2
++	xor		rD3,rD3,rW3
++	xor		rD0,rD0,rI0
++	SAVE_DATA(rD0, 0)
++	xor		rD1,rD1,rI1
++	SAVE_DATA(rD1, 4)
++	xor		rD2,rD2,rI2
++	SAVE_DATA(rD2, 8)
++	xor		rD3,rD3,rI3
++	SAVE_DATA(rD3, 12)
++	GF128_MUL(rG0, rG1, rG2, rG3, rW0)
++	ENDIAN_SWAP(rI0, rI1, rG0, rG1)
++	ENDIAN_SWAP(rI2, rI3, rG2, rG3)
++	cmpwi		rLN,0
++	NEXT_BLOCK
++	bt		gt,ppc_encrypt_xts_loop
++	START_IV
++	SAVE_IV(rI0, 0)
++	SAVE_IV(rI1, 4)
++	SAVE_IV(rI2, 8)
++	SAVE_IV(rI3, 12)
++	FINALIZE_CRYPT(8)
++	blr
++
++/*
++ * ppc_decrypt_xts(u8 *out, const u8 *in, u32 *key_dec,
++ *		   u32 rounds, u32 blocks, u8 *iv, u32 *key_twk);
++ *
++ * called from glue layer to decrypt multiple blocks via XTS
++ * If key_twk is given, the initial IV encryption will be
++ * processed too. Round values are AES128 = 4, AES192 = 5,
++ * AES256 = 6
++ *
++ */
++_GLOBAL(ppc_decrypt_xts)
++	INITIALIZE_CRYPT(PPC_AES_4K_DECTAB, 8)
++	LOAD_IV(rI0, 0)
++	addi		rT1,rT0,4096
++	LOAD_IV(rI1, 4)
++	LOAD_IV(rI2, 8)
++	cmpwi		rKT,0
++	LOAD_IV(rI3, 12)
++	bt		eq,ppc_decrypt_xts_notweak
++	subi		rT0,rT0,4096
++	mr		rKP,rKT
++	START_KEY(rI0, rI1, rI2, rI3)
++	bl		ppc_encrypt_block
++	xor		rI0,rD0,rW0
++	xor		rI1,rD1,rW1
++	xor		rI2,rD2,rW2
++	xor		rI3,rD3,rW3
++	addi		rT0,rT0,4096
++ppc_decrypt_xts_notweak:
++	ENDIAN_SWAP(rG0, rG1, rI0, rI1)
++	ENDIAN_SWAP(rG2, rG3, rI2, rI3)
++ppc_decrypt_xts_loop:
++	LOAD_DATA(rD0, 0)
++	mr		rKP,rKS
++	LOAD_DATA(rD1, 4)
++	subi		rLN,rLN,16
++	LOAD_DATA(rD2, 8)
++	LOAD_DATA(rD3, 12)
++	xor		rD0,rD0,rI0
++	xor		rD1,rD1,rI1
++	xor		rD2,rD2,rI2
++	xor		rD3,rD3,rI3
++	START_KEY(rD0, rD1, rD2, rD3)
++	bl		ppc_decrypt_block
++	xor		rD0,rD0,rW0
++	xor		rD1,rD1,rW1
++	xor		rD2,rD2,rW2
++	xor		rD3,rD3,rW3
++	xor		rD0,rD0,rI0
++	SAVE_DATA(rD0, 0)
++	xor		rD1,rD1,rI1
++	SAVE_DATA(rD1, 4)
++	xor		rD2,rD2,rI2
++	SAVE_DATA(rD2, 8)
++	xor		rD3,rD3,rI3
++	SAVE_DATA(rD3, 12)
++	GF128_MUL(rG0, rG1, rG2, rG3, rW0)
++	ENDIAN_SWAP(rI0, rI1, rG0, rG1)
++	ENDIAN_SWAP(rI2, rI3, rG2, rG3)
++	cmpwi		rLN,0
++	NEXT_BLOCK
++	bt		gt,ppc_decrypt_xts_loop
++	START_IV
++	SAVE_IV(rI0, 0)
++	SAVE_IV(rI1, 4)
++	SAVE_IV(rI2, 8)
++	SAVE_IV(rI3, 12)
++	FINALIZE_CRYPT(8)
 +	blr
 
-------=_NextPartTM-000-f66f1564-a564-43ff-9750-94f1242f71ed
+------=_NextPartTM-000-d86d9f6d-6845-4371-9775-f2c2ceb73173
 Content-Type: text/plain;
 	name="InterScan_Disclaimer.txt"
 Content-Transfer-Encoding: 7bit
@@ -453,4 +726,4 @@ Register number: HRB 52 497
 
 ****************************************************************************
 
-------=_NextPartTM-000-f66f1564-a564-43ff-9750-94f1242f71ed--
+------=_NextPartTM-000-d86d9f6d-6845-4371-9775-f2c2ceb73173--
