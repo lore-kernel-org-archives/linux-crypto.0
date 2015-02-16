@@ -1,53 +1,32 @@
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH v1 2/7] AES for PPC/SPE - aes tables
-Date: Mon, 16 Feb 2015 14:19:50 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6D1CAE46B2@AcuExch.aculab.com>
-References: <cfb098e9-69ae-47ff-afa7-08c922accd31@EXCHANGE.collogia.de>
+From: Segher Boessenkool <segher@kernel.crashing.org>
+Subject: Re: [PATCH v1 2/7] AES for PPC/SPE - aes tables
+Date: Mon, 16 Feb 2015 08:37:06 -0600
+Message-ID: <20150216143706.GA3609@gate.crashing.org>
+References: <cfb098e9-69ae-47ff-afa7-08c922accd31@EXCHANGE.collogia.de> <063D6719AE5E284EB5DD2968C1650D6D1CAE46B2@AcuExch.aculab.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-To: 'Markus Stockhausen' <stockhausen@collogia.de>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <cfb098e9-69ae-47ff-afa7-08c922accd31@EXCHANGE.collogia.de>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "'Markus Stockhausen'" <stockhausen@collogia.de>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+To: David Laight <David.Laight@ACULAB.COM>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from gate.crashing.org ([63.228.1.57]:34514 "EHLO gate.crashing.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752877AbbBPOiu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 Feb 2015 09:38:50 -0500
+Content-Disposition: inline
+In-Reply-To: <063D6719AE5E284EB5DD2968C1650D6D1CAE46B2@AcuExch.aculab.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-RnJvbTogIE1hcmt1cyBTdG9ja2hhdXNlbgo+IDRLIEFFUyB0YWJsZXMgZm9yIGJpZyBlbmRpYW4K
-CkkgY2FuJ3QgaGVscCBmZWVsaW5nIHRoYXQgeW91IGNvdWxkIGdpdmUgbW9yZSBpbmZvcm1hdGlv
-biBhYm91dCBob3cgdGhlCnZhbHVlcyBhcmUgZ2VuZXJhdGVkLgoKLi4uCj4gKyAqIFRoZXNlIGJp
-ZyBlbmRpYW4gQUVTIGVuY3J5cHRpb24vZGVjcnlwdGlvbiB0YWJsZXMgYXJlIGRlc2lnbmVkIHRv
-IGJlIHNpbXBseQo+ICsgKiBhY2Nlc3NlZCBieSBhIGNvbWJpbmF0aW9uIG9mIHJsd2ltaS9sd3og
-aW5zdHJ1Y3Rpb25zIHdpdGggYSBtaW5pbXVtCj4gKyAqIG9mIHRhYmxlIHJlZ2lzdGVycyAodXN1
-YWxseSBvbmx5IG9uZSByZXF1aXJlZCkuIFRodXMgdGhleSBhcmUgYWxpZ25lZCB0bwo+ICsgKiA0
-Sy4gVGhlIGxvY2FsaXR5IG9mIHJvdGF0ZWQgdmFsdWVzIGlzIGRlcml2ZWQgZnJvbSB0aGUgcmVk
-dWNlZCBvZmZzZXRzIHRoYXQKPiArICogYXJlIGF2YWlsYWJsZSBpbiB0aGUgU1BFIGxvYWQgaW5z
-dHJ1Y3Rpb25zLiBFLmcuIGV2bGR3LCBldmx3d3NwbGF0LCAuLi4KPiArICoKPiArICovCj4gKy5k
-YXRhCj4gKy5hbGlnbiAxMgo+ICsuZ2xvYmwgUFBDX0FFU180S19FTkNUQUIKPiArUFBDX0FFU180
-S19FTkNUQUI6Cj4gKwkubG9uZyAweGM2NjM2M2E1LDB4YTVjNjYzNjMsMHg2M2E1YzY2MywweDYz
-NjNhNWM2CgpUaGVzZSBzZWVtIHRvIGJlIGJ5dGUgcm90YXRlcyAoYWxsIGRvd24gdGhlIHRhYmxl
-KS4KSWYgc28gdGhlbiB1c2UgYSBDUFAgZGVmaW5lIHRvIGdlbmVyYXRlIHRoZSByb3RhdGVkIHZh
-bHVlcy4KCkknZCBsaWtlIHRvIHNlZSBhIHJlZmVyZW5jZSB0byB3aGVyZSB0aGUgdmFsdWVzIHRo
-ZW1zZWx2ZXMgY29tZSBmcm9tLgoKPiArCS5sb25nIDB4Zjg3YzdjODQsMHg4NGY4N2M3YywweDdj
-ODRmODdjLDB4N2M3Yzg0ZjgKLi4uCj4gKwkubG9uZyAweDZkYmJiYmQ2LDB4ZDY2ZGJiYmIsMHhi
-YmQ2NmRiYiwweGJiYmJkNjZkCj4gKwkubG9uZyAweDJjMTYxNjNhLDB4M2EyYzE2MTYsMHgxNjNh
-MmMxNiwweDE2MTYzYTJjCj4gKy5nbG9ibCBQUENfQUVTXzRLX0RFQ1RBQgo+ICtQUENfQUVTXzRL
-X0RFQ1RBQjoKPiArCS5sb25nIDB4NTFmNGE3NTAsMHg1MDUxZjRhNywweGE3NTA1MWY0LDB4ZjRh
-NzUwNTEKLi4uCj4gKwkubG9uZyAweGQwYjg1NzQyLDB4NDJkMGI4NTcsMHg1NzQyZDBiOCwweGI4
-NTc0MmQwCgpTb21lIGV4cGxhbmF0aW9uIG9mIHRoaXMgdGhpcmQgZGF0YXNldCBpcyBhbHNvIG5l
-ZWRlZC4KCj4gKwkuYnl0ZSAweDUyLCAweDA5LCAweDZhLCAweGQ1LCAweDMwLCAweDM2LCAweGE1
-LCAweDM4Ci4uLgo+ICsJLmJ5dGUgMHhlMSwgMHg2OSwgMHgxNCwgMHg2MywgMHg1NSwgMHgyMSwg
-MHgwYywgMHg3ZAoKCURhdmlkCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fXwpMaW51eHBwYy1kZXYgbWFpbGluZyBsaXN0CkxpbnV4cHBjLWRldkBsaXN0cy5v
-emxhYnMub3JnCmh0dHBzOi8vbGlzdHMub3psYWJzLm9yZy9saXN0aW5mby9saW51eHBwYy1kZXY=
+On Mon, Feb 16, 2015 at 02:19:50PM +0000, David Laight wrote:
+> From:  Markus Stockhausen
+> > 4K AES tables for big endian
+> 
+> I can't help feeling that you could give more information about how the
+> values are generated.
+
+... and an explanation of why this does not open you up to a timing attack?
+
+
+Segher
