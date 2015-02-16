@@ -1,125 +1,53 @@
-From: Markus Stockhausen <stockhausen@collogia.de>
-Subject: [PATCH v1 7/7] AES for PPC/SPE - kernel config
-Date: Mon, 16 Feb 2015 13:46:07 +0100
-Message-ID: <8ca3c648-da51-4fb5-943e-1e7374cf9099@EXCHANGE.collogia.de>
+From: David Laight <David.Laight@ACULAB.COM>
+Subject: RE: [PATCH v1 2/7] AES for PPC/SPE - aes tables
+Date: Mon, 16 Feb 2015 14:19:50 +0000
+Message-ID: <063D6719AE5E284EB5DD2968C1650D6D1CAE46B2@AcuExch.aculab.com>
+References: <cfb098e9-69ae-47ff-afa7-08c922accd31@EXCHANGE.collogia.de>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_NextPartTM-000-f60a4b84-64ac-4883-9b03-77f269fbd727"
-Cc: <linuxppc-dev@lists.ozlabs.org>
-To: <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailrelay.collogia.de ([194.8.207.98]:7445 "HELO
-	mailrelay.collogia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1755394AbbBPMqK (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Feb 2015 07:46:10 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+To: 'Markus Stockhausen' <stockhausen@collogia.de>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <cfb098e9-69ae-47ff-afa7-08c922accd31@EXCHANGE.collogia.de>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-
-This is a multi-part message in MIME format.
-
-------=_NextPartTM-000-f60a4b84-64ac-4883-9b03-77f269fbd727
-Content-Type: text/plain
-
-[PATCH v1 7/7] AES for PPC/SPE - kernel config
-
-Integrate the module into the kernel configuration
-
-Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
-
-diff --git a/arch/powerpc/crypto/Makefile b/arch/powerpc/crypto/Makefile
-index a07e763..1698fb9 100644
---- a/arch/powerpc/crypto/Makefile
-+++ b/arch/powerpc/crypto/Makefile
-@@ -4,8 +4,10 @@
- # Arch-specific CryptoAPI modules.
- #
- 
-+obj-$(CONFIG_CRYPTO_AES_PPC_SPE) += aes-ppc-spe.o
- obj-$(CONFIG_CRYPTO_SHA1_PPC) += sha1-powerpc.o
- obj-$(CONFIG_CRYPTO_SHA256_PPC_SPE) += sha256-ppc-spe.o
- 
-+aes-ppc-spe-y := aes-spe-core.o aes-spe-keys.o aes-tab-4k.o aes-spe-modes.o aes_spe_glue.o
- sha1-powerpc-y := sha1-powerpc-asm.o sha1.o
- sha256-ppc-spe-y := sha256-spe-asm.o sha256_spe_glue.o
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 86d35be..87dc274 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -857,6 +857,13 @@ config CRYPTO_AES_ARM_BS
- 	  This implementation does not rely on any lookup tables so it is
- 	  believed to be invulnerable to cache timing attacks.
- 
-+config CRYPTO_AES_PPC_SPE
-+	tristate "AES cipher algorithms (PPC SPE)"
-+	depends on PPC && SPE
-+	help
-+	  AES cipher algorithms (FIPS-197). Additionally the acceleration
-+	  for popular block cipher modes ECB, CBC, CTR and XTS is supported.
-+
- config CRYPTO_ANUBIS
- 	tristate "Anubis cipher algorithm"
- 	select CRYPTO_ALGAPI
-
-------=_NextPartTM-000-f60a4b84-64ac-4883-9b03-77f269fbd727
-Content-Type: text/plain;
-	name="InterScan_Disclaimer.txt"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="InterScan_Disclaimer.txt"
-
-****************************************************************************
-Diese E-Mail enthält vertrauliche und/oder rechtlich geschützte
-Informationen. Wenn Sie nicht der richtige Adressat sind oder diese E-Mail
-irrtümlich erhalten haben, informieren Sie bitte sofort den Absender und
-vernichten Sie diese Mail. Das unerlaubte Kopieren sowie die unbefugte
-Weitergabe dieser Mail ist nicht gestattet.
-
-Über das Internet versandte E-Mails können unter fremden Namen erstellt oder
-manipuliert werden. Deshalb ist diese als E-Mail verschickte Nachricht keine
-rechtsverbindliche Willenserklärung.
-
-Collogia
-Unternehmensberatung AG
-Ubierring 11
-D-50678 Köln
-
-Vorstand:
-Kadir Akin
-Dr. Michael Höhnerbach
-
-Vorsitzender des Aufsichtsrates:
-Hans Kristian Langva
-
-Registergericht: Amtsgericht Köln
-Registernummer: HRB 52 497
-
-This e-mail may contain confidential and/or privileged information. If you
-are not the intended recipient (or have received this e-mail in error)
-please notify the sender immediately and destroy this e-mail. Any
-unauthorized copying, disclosure or distribution of the material in this
-e-mail is strictly forbidden.
-
-e-mails sent over the internet may have been written under a wrong name or
-been manipulated. That is why this message sent as an e-mail is not a
-legally binding declaration of intention.
-
-Collogia
-Unternehmensberatung AG
-Ubierring 11
-D-50678 Köln
-
-executive board:
-Kadir Akin
-Dr. Michael Höhnerbach
-
-President of the supervisory board:
-Hans Kristian Langva
-
-Registry office: district court Cologne
-Register number: HRB 52 497
-
-****************************************************************************
-
-------=_NextPartTM-000-f60a4b84-64ac-4883-9b03-77f269fbd727--
+RnJvbTogIE1hcmt1cyBTdG9ja2hhdXNlbgo+IDRLIEFFUyB0YWJsZXMgZm9yIGJpZyBlbmRpYW4K
+CkkgY2FuJ3QgaGVscCBmZWVsaW5nIHRoYXQgeW91IGNvdWxkIGdpdmUgbW9yZSBpbmZvcm1hdGlv
+biBhYm91dCBob3cgdGhlCnZhbHVlcyBhcmUgZ2VuZXJhdGVkLgoKLi4uCj4gKyAqIFRoZXNlIGJp
+ZyBlbmRpYW4gQUVTIGVuY3J5cHRpb24vZGVjcnlwdGlvbiB0YWJsZXMgYXJlIGRlc2lnbmVkIHRv
+IGJlIHNpbXBseQo+ICsgKiBhY2Nlc3NlZCBieSBhIGNvbWJpbmF0aW9uIG9mIHJsd2ltaS9sd3og
+aW5zdHJ1Y3Rpb25zIHdpdGggYSBtaW5pbXVtCj4gKyAqIG9mIHRhYmxlIHJlZ2lzdGVycyAodXN1
+YWxseSBvbmx5IG9uZSByZXF1aXJlZCkuIFRodXMgdGhleSBhcmUgYWxpZ25lZCB0bwo+ICsgKiA0
+Sy4gVGhlIGxvY2FsaXR5IG9mIHJvdGF0ZWQgdmFsdWVzIGlzIGRlcml2ZWQgZnJvbSB0aGUgcmVk
+dWNlZCBvZmZzZXRzIHRoYXQKPiArICogYXJlIGF2YWlsYWJsZSBpbiB0aGUgU1BFIGxvYWQgaW5z
+dHJ1Y3Rpb25zLiBFLmcuIGV2bGR3LCBldmx3d3NwbGF0LCAuLi4KPiArICoKPiArICovCj4gKy5k
+YXRhCj4gKy5hbGlnbiAxMgo+ICsuZ2xvYmwgUFBDX0FFU180S19FTkNUQUIKPiArUFBDX0FFU180
+S19FTkNUQUI6Cj4gKwkubG9uZyAweGM2NjM2M2E1LDB4YTVjNjYzNjMsMHg2M2E1YzY2MywweDYz
+NjNhNWM2CgpUaGVzZSBzZWVtIHRvIGJlIGJ5dGUgcm90YXRlcyAoYWxsIGRvd24gdGhlIHRhYmxl
+KS4KSWYgc28gdGhlbiB1c2UgYSBDUFAgZGVmaW5lIHRvIGdlbmVyYXRlIHRoZSByb3RhdGVkIHZh
+bHVlcy4KCkknZCBsaWtlIHRvIHNlZSBhIHJlZmVyZW5jZSB0byB3aGVyZSB0aGUgdmFsdWVzIHRo
+ZW1zZWx2ZXMgY29tZSBmcm9tLgoKPiArCS5sb25nIDB4Zjg3YzdjODQsMHg4NGY4N2M3YywweDdj
+ODRmODdjLDB4N2M3Yzg0ZjgKLi4uCj4gKwkubG9uZyAweDZkYmJiYmQ2LDB4ZDY2ZGJiYmIsMHhi
+YmQ2NmRiYiwweGJiYmJkNjZkCj4gKwkubG9uZyAweDJjMTYxNjNhLDB4M2EyYzE2MTYsMHgxNjNh
+MmMxNiwweDE2MTYzYTJjCj4gKy5nbG9ibCBQUENfQUVTXzRLX0RFQ1RBQgo+ICtQUENfQUVTXzRL
+X0RFQ1RBQjoKPiArCS5sb25nIDB4NTFmNGE3NTAsMHg1MDUxZjRhNywweGE3NTA1MWY0LDB4ZjRh
+NzUwNTEKLi4uCj4gKwkubG9uZyAweGQwYjg1NzQyLDB4NDJkMGI4NTcsMHg1NzQyZDBiOCwweGI4
+NTc0MmQwCgpTb21lIGV4cGxhbmF0aW9uIG9mIHRoaXMgdGhpcmQgZGF0YXNldCBpcyBhbHNvIG5l
+ZWRlZC4KCj4gKwkuYnl0ZSAweDUyLCAweDA5LCAweDZhLCAweGQ1LCAweDMwLCAweDM2LCAweGE1
+LCAweDM4Ci4uLgo+ICsJLmJ5dGUgMHhlMSwgMHg2OSwgMHgxNCwgMHg2MywgMHg1NSwgMHgyMSwg
+MHgwYywgMHg3ZAoKCURhdmlkCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXwpMaW51eHBwYy1kZXYgbWFpbGluZyBsaXN0CkxpbnV4cHBjLWRldkBsaXN0cy5v
+emxhYnMub3JnCmh0dHBzOi8vbGlzdHMub3psYWJzLm9yZy9saXN0aW5mby9saW51eHBwYy1kZXY=
