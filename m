@@ -1,12 +1,14 @@
 From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: [PATCH 0/4] hw_random: bcm63xx-rng: misc cleanups and reorg
-Date: Mon, 16 Feb 2015 18:09:12 -0800
-Message-ID: <1424138956-11563-1-git-send-email-f.fainelli@gmail.com>
+Subject: [PATCH 2/4] hw_random: bcm63xx-rng: move register definitions to driver
+Date: Mon, 16 Feb 2015 18:09:14 -0800
+Message-ID: <1424138956-11563-3-git-send-email-f.fainelli@gmail.com>
+References: <1424138956-11563-1-git-send-email-f.fainelli@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mpm@selenic.com, herbert@gondor.apana.org.au, wsa@the-dreams.de,
         cernekee@gmail.com, Florian Fainelli <f.fainelli@gmail.com>
 To: linux-mips@linux-mips.org
 Return-path: <linux-mips-bounce@linux-mips.org>
+In-Reply-To: <1424138956-11563-1-git-send-email-f.fainelli@gmail.com>
 Sender: linux-mips-bounce@linux-mips.org
 Errors-to: linux-mips-bounce@linux-mips.org
 List-help: <mailto:ecartis@linux-mips.org?Subject=help>
@@ -18,25 +20,36 @@ List-post: <mailto:linux-mips@linux-mips.org>
 List-archive: <http://www.linux-mips.org/archives/linux-mips/>
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+arch/mips/include/asm/mach-bcm63xx/bcm63xx_regs.h contains the register
+definitions for this random number generator block, incorporate these
+register definitions directly into the bcm63xx-rng driver so we do not
+rely on this header to be provided.
 
-This patchset prepares the driver to be built on non-MIPS bcm63xx architectures
-such as the ARM bcm63xx variants, thanks!
+Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+---
+ drivers/char/hw_random/bcm63xx-rng.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Although patch 3 touches a MIPS header file, there should be little to no
-conflicts there if all patches went through the hw_random tree (is there one?)
-
-Thanks!
-
-Florian Fainelli (4):
-  hw_random: bcm63xx-rng: drop bcm_{readl,writel} macros
-  hw_random: bcm63xx-rng: move register definitions to driver
-  MIPS: BCM63xx: remove RSET_RNG register definitions
-  hw_random: bcm63xx-rng: use devm_* helpers
-
- arch/mips/include/asm/mach-bcm63xx/bcm63xx_regs.h | 14 --------
- drivers/char/hw_random/bcm63xx-rng.c              | 43 +++++++++++------------
- 2 files changed, 21 insertions(+), 36 deletions(-)
-
+diff --git a/drivers/char/hw_random/bcm63xx-rng.c b/drivers/char/hw_random/bcm63xx-rng.c
+index ed9b28b35a39..c7f3af852599 100644
+--- a/drivers/char/hw_random/bcm63xx-rng.c
++++ b/drivers/char/hw_random/bcm63xx-rng.c
+@@ -13,7 +13,15 @@
+ #include <linux/platform_device.h>
+ #include <linux/hw_random.h>
+ 
+-#include <bcm63xx_regs.h>
++#define RNG_CTRL			0x00
++#define RNG_EN				(1 << 0)
++
++#define RNG_STAT			0x04
++#define RNG_AVAIL_MASK			(0xff000000)
++
++#define RNG_DATA			0x08
++#define RNG_THRES			0x0c
++#define RNG_MASK			0x10
+ 
+ struct bcm63xx_rng_priv {
+ 	struct clk *clk;
 -- 
 2.1.0
