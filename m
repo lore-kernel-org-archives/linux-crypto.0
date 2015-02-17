@@ -1,74 +1,50 @@
-From: Mathias Krause <minipli@googlemail.com>
-Subject: Re: [BISECTED] 4943ba16 ("include crypto- module prefix") breaks wifi
-Date: Tue, 17 Feb 2015 07:49:02 +0100
-Message-ID: <CA+rthh_mM0YjHq86znWh_4vA-KO3T2yrA+h+K2StyUbtAonSXQ@mail.gmail.com>
-References: <20150217030940.7890.qmail@ns.horizon.com>
+From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+Subject: Re: [PATCH 2/4] hw_random: bcm63xx-rng: move register definitions
+ to driver
+Date: Tue, 17 Feb 2015 14:35:20 +0300
+Message-ID: <54E32778.3060307@cogentembedded.com>
+References: <1424138956-11563-1-git-send-email-f.fainelli@gmail.com> <1424138956-11563-3-git-send-email-f.fainelli@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Kees Cook <keescook@chromium.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: George Spelvin <linux@horizon.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f43.google.com ([74.125.82.43]:41806 "EHLO
-	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751787AbbBQGtE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Feb 2015 01:49:04 -0500
-Received: by mail-wg0-f43.google.com with SMTP id z12so19723035wgg.2
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Feb 2015 22:49:02 -0800 (PST)
-In-Reply-To: <20150217030940.7890.qmail@ns.horizon.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mpm@selenic.com, herbert@gondor.apana.org.au, wsa@the-dreams.de,
+	cernekee@gmail.com
+To: Florian Fainelli <f.fainelli@gmail.com>, linux-mips@linux-mips.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1424138956-11563-3-git-send-email-f.fainelli@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 17 February 2015 at 04:09, George Spelvin <linux@horizon.com> wrote:
-> I discovered when (belatedly) testing 3.19-rc7 the other week that
-> my laptop wifi was broken and would no longer associate.
->
-> Apparently this is causing some necessary crypto algorithms to fail to
-> load, breaking my wifi.
->
-> Perhaps I'm displaying my ignorance of what's supposed to happen,
-> but shouldn't make install have installed some files with names like
-> /lib/modules/`uname r`/kernel/crypto/crypto-*.ko?
+Hello.
 
-No, the module names do not change. They just got another module alias
-with the "crypto-" prefix.
+On 2/17/2015 5:09 AM, Florian Fainelli wrote:
 
-> Or is it something only I'm hitting because I have a lot of common
-> crypto algorithms statically compiled into my kernel?
->
-> CONFIG_CRYPTO_CBC=y
-> CONFIG_CRYPTO_HMAC=y
-> CONFIG_CRYPTO_MD5=y
-> CONFIG_CRYPTO_SHA1=y
-> CONFIG_CRYPTO_AES=y
-> CONFIG_CRYPTO_AES_586=y
-> CONFIG_CRYPTO_ARC4=y
->
-> Trying this on kernel 4943ba16 produces instead an endless loop of:
->
-> wlan1: SME: Trying to authenticate with aa:bb:cc:dd:ee:ff (SSID='FOO' freq=24xx MHz)
-> wlan1: Trying to associate with aa:bb:cc:dd:ee:ff (SSID='FOO' freq=24xx MHz)
-> wlan1: Associated with aa:bb:cc:dd:ee:ff
-> wlan1: WPA: Failed to set PTK to the driver (alg=3 keylen=16 bssid=aa:bb:cc:dd:ee:ff)
-> wlan1: CTRL-EVENT-DISCONNECTED bssid=aa:bb:cc:dd:ee:ff reason=1
->
->
-> The kernel logs are not particularly informative.
->
-> They just go through the usual successful series, but end with
->
-> wlan1: RxAssocResp from aa:bb:cc:dd:ee:ff (capab=0x431 status=0 aid=1)
-> wlan1: associated
-> wlan1: deauthenticating from 11:bb:cc:dd:ee:ff by local choice (Reason: 1=UNSPECIFIED)
->
-> While successful connection ends before that last line.
+> arch/mips/include/asm/mach-bcm63xx/bcm63xx_regs.h contains the register
+> definitions for this random number generator block, incorporate these
+> register definitions directly into the bcm63xx-rng driver so we do not
+> rely on this header to be provided.
 
-Commit 4943ba16bbc2 was incomplete and could have caused regressions
-like the above. Those should have been fixed with commits 4943ba16bbc2
-+ 3e14dcf7cb80. However, those should be in v3.19-rc7 already, so I'm
-not much of a help here :(
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
+>   drivers/char/hw_random/bcm63xx-rng.c | 10 +++++++++-
+>   1 file changed, 9 insertions(+), 1 deletion(-)
 
+> diff --git a/drivers/char/hw_random/bcm63xx-rng.c b/drivers/char/hw_random/bcm63xx-rng.c
+> index ed9b28b35a39..c7f3af852599 100644
+> --- a/drivers/char/hw_random/bcm63xx-rng.c
+> +++ b/drivers/char/hw_random/bcm63xx-rng.c
+> @@ -13,7 +13,15 @@
+>   #include <linux/platform_device.h>
+>   #include <linux/hw_random.h>
+>
+> -#include <bcm63xx_regs.h>
+> +#define RNG_CTRL			0x00
+> +#define RNG_EN				(1 << 0)
+> +
+> +#define RNG_STAT			0x04
+> +#define RNG_AVAIL_MASK			(0xff000000)
 
-Mathias
+    Parens not needed here.
+
+WBR, Sergei
