@@ -1,7 +1,7 @@
 From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: [PATCH 2/4] hw_random: bcm63xx-rng: move register definitions to driver
-Date: Mon, 16 Feb 2015 18:09:14 -0800
-Message-ID: <1424138956-11563-3-git-send-email-f.fainelli@gmail.com>
+Subject: [PATCH 3/4] MIPS: BCM63xx: remove RSET_RNG register definitions
+Date: Mon, 16 Feb 2015 18:09:15 -0800
+Message-ID: <1424138956-11563-4-git-send-email-f.fainelli@gmail.com>
 References: <1424138956-11563-1-git-send-email-f.fainelli@gmail.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mpm@selenic.com, herbert@gondor.apana.org.au, wsa@the-dreams.de,
@@ -20,36 +20,40 @@ List-post: <mailto:linux-mips@linux-mips.org>
 List-archive: <http://www.linux-mips.org/archives/linux-mips/>
 List-Id: linux-crypto.vger.kernel.org
 
-arch/mips/include/asm/mach-bcm63xx/bcm63xx_regs.h contains the register
-definitions for this random number generator block, incorporate these
-register definitions directly into the bcm63xx-rng driver so we do not
-rely on this header to be provided.
+Now that these definitions have been moved to
+drivers/char/hw_random/bcm63xx-rng.c where they belong to make the
+driver standalone, we can safely remove these definitions from
+bcm63xx_regs.h.
 
 Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 ---
- drivers/char/hw_random/bcm63xx-rng.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ arch/mips/include/asm/mach-bcm63xx/bcm63xx_regs.h | 14 --------------
+ 1 file changed, 14 deletions(-)
 
-diff --git a/drivers/char/hw_random/bcm63xx-rng.c b/drivers/char/hw_random/bcm63xx-rng.c
-index ed9b28b35a39..c7f3af852599 100644
---- a/drivers/char/hw_random/bcm63xx-rng.c
-+++ b/drivers/char/hw_random/bcm63xx-rng.c
-@@ -13,7 +13,15 @@
- #include <linux/platform_device.h>
- #include <linux/hw_random.h>
+diff --git a/arch/mips/include/asm/mach-bcm63xx/bcm63xx_regs.h b/arch/mips/include/asm/mach-bcm63xx/bcm63xx_regs.h
+index 4794067cb5a7..5035f09c5427 100644
+--- a/arch/mips/include/asm/mach-bcm63xx/bcm63xx_regs.h
++++ b/arch/mips/include/asm/mach-bcm63xx/bcm63xx_regs.h
+@@ -1259,20 +1259,6 @@
+ #define M2M_DSTID_REG(x)		((x) * 0x40 + 0x18)
  
--#include <bcm63xx_regs.h>
-+#define RNG_CTRL			0x00
-+#define RNG_EN				(1 << 0)
-+
-+#define RNG_STAT			0x04
-+#define RNG_AVAIL_MASK			(0xff000000)
-+
-+#define RNG_DATA			0x08
-+#define RNG_THRES			0x0c
-+#define RNG_MASK			0x10
+ /*************************************************************************
+- * _REG relative to RSET_RNG
+- *************************************************************************/
+-
+-#define RNG_CTRL			0x00
+-#define RNG_EN				(1 << 0)
+-
+-#define RNG_STAT			0x04
+-#define RNG_AVAIL_MASK			(0xff000000)
+-
+-#define RNG_DATA			0x08
+-#define RNG_THRES			0x0c
+-#define RNG_MASK			0x10
+-
+-/*************************************************************************
+  * _REG relative to RSET_SPI
+  *************************************************************************/
  
- struct bcm63xx_rng_priv {
- 	struct clk *clk;
 -- 
 2.1.0
