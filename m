@@ -1,98 +1,70 @@
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: [PATCH 4/4] hw_random: bcm63xx-rng: use devm_* helpers
-Date: Mon, 16 Feb 2015 18:09:16 -0800
-Message-ID: <1424138956-11563-5-git-send-email-f.fainelli@gmail.com>
-References: <1424138956-11563-1-git-send-email-f.fainelli@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mpm@selenic.com, herbert@gondor.apana.org.au, wsa@the-dreams.de,
-	cernekee@gmail.com, Florian Fainelli <f.fainelli@gmail.com>
-To: linux-mips@linux-mips.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1424138956-11563-1-git-send-email-f.fainelli@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: "George Spelvin" <linux@horizon.com>
+Subject: [BISECTED] 4943ba16 ("include crypto- module prefix") breaks wifi
+Date: 16 Feb 2015 22:09:40 -0500
+Message-ID: <20150217030940.7890.qmail@ns.horizon.com>
+Cc: herbert@gondor.apana.org.au, linux@horizon.com,
+	minipli@googlemail.com
+To: keescook@chromium.org, linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ns.horizon.com ([71.41.210.147]:60495 "HELO ns.horizon.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1753168AbbBQDQX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 Feb 2015 22:16:23 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Simplify the driver's probe function and error handling by using the
-device managed allocators, while at it, drop the redundant "out of
-memory" messages since these are already printed by the allocator.
+I discovered when (belatedly) testing 3.19-rc7 the other week that
+my laptop wifi was broken and would no longer associate.
 
-Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
----
- drivers/char/hw_random/bcm63xx-rng.c | 20 ++++++--------------
- 1 file changed, 6 insertions(+), 14 deletions(-)
+I wasted a lot of time trying to bisect changes in net/wireless and
+net/drivers wireless before figuring out that it was sonewhere else in
+the kernel.  An unrestricted bisect quickly homed in on this commit.
 
-diff --git a/drivers/char/hw_random/bcm63xx-rng.c b/drivers/char/hw_random/bcm63xx-rng.c
-index c7f3af852599..27da00f68c8f 100644
---- a/drivers/char/hw_random/bcm63xx-rng.c
-+++ b/drivers/char/hw_random/bcm63xx-rng.c
-@@ -83,18 +83,16 @@ static int bcm63xx_rng_probe(struct platform_device *pdev)
- 		goto out;
- 	}
- 
--	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
-+	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
- 	if (!priv) {
--		dev_err(&pdev->dev, "no memory for private structure\n");
- 		ret = -ENOMEM;
- 		goto out;
- 	}
- 
--	rng = kzalloc(sizeof(*rng), GFP_KERNEL);
-+	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
- 	if (!rng) {
--		dev_err(&pdev->dev, "no memory for rng structure\n");
- 		ret = -ENOMEM;
--		goto out_free_priv;
-+		goto out;
- 	}
- 
- 	platform_set_drvdata(pdev, rng);
-@@ -109,7 +107,7 @@ static int bcm63xx_rng_probe(struct platform_device *pdev)
- 	if (IS_ERR(clk)) {
- 		dev_err(&pdev->dev, "no clock for device\n");
- 		ret = PTR_ERR(clk);
--		goto out_free_rng;
-+		goto out;
- 	}
- 
- 	priv->clk = clk;
-@@ -118,7 +116,7 @@ static int bcm63xx_rng_probe(struct platform_device *pdev)
- 					resource_size(r), pdev->name)) {
- 		dev_err(&pdev->dev, "request mem failed");
- 		ret = -ENOMEM;
--		goto out_free_rng;
-+		goto out;
- 	}
- 
- 	priv->regs = devm_ioremap_nocache(&pdev->dev, r->start,
-@@ -126,7 +124,7 @@ static int bcm63xx_rng_probe(struct platform_device *pdev)
- 	if (!priv->regs) {
- 		dev_err(&pdev->dev, "ioremap failed");
- 		ret = -ENOMEM;
--		goto out_free_rng;
-+		goto out;
- 	}
- 
- 	clk_enable(clk);
-@@ -143,10 +141,6 @@ static int bcm63xx_rng_probe(struct platform_device *pdev)
- 
- out_clk_disable:
- 	clk_disable(clk);
--out_free_rng:
--	kfree(rng);
--out_free_priv:
--	kfree(priv);
- out:
- 	return ret;
- }
-@@ -158,8 +152,6 @@ static int bcm63xx_rng_remove(struct platform_device *pdev)
- 
- 	hwrng_unregister(rng);
- 	clk_disable(priv->clk);
--	kfree(priv);
--	kfree(rng);
- 
- 	return 0;
- }
--- 
-2.1.0
+Apparently this is causing some necessary crypto algorithms to fail to
+load, breaking my wifi.
+
+Perhaps I'm displaying my ignorance of what's supposed to happen,
+but shouldn't make install have installed some files with names like
+/lib/modules/`uname r`/kernel/crypto/crypto-*.ko?
+
+Or is it something only I'm hitting because I have a lot of common
+crypto algorithms statically compiled into my kernel?
+
+CONFIG_CRYPTO_CBC=y
+CONFIG_CRYPTO_HMAC=y
+CONFIG_CRYPTO_MD5=y
+CONFIG_CRYPTO_SHA1=y
+CONFIG_CRYPTO_AES=y
+CONFIG_CRYPTO_AES_586=y
+CONFIG_CRYPTO_ARC4=y
+
+
+In more detail, when things are working,  (such as on commit 4943ba1^
+= 476c7fe2), wpa_supplicant logs:
+
+wlan1: SME: Trying to authenticate with aa:bb:cc:dd:ee:ff (SSID='FOO' freq=24xx MHz)
+wlan1: Trying to associate with aa:bb:cc:dd:ee:ff (SSID='FOO' freq=24xx MHz)
+wlan1: Associated with aa:bb:cc:dd:ee:ff
+wlan1: WPA: Key negotiation completed with aa:bb:cc:dd:ee:ff [PTK=CCMP GTK=CCMP]
+wlan1: CTRL-EVENT-CONNECTED - Connection to aa:bb:cc:dd:ee:ff completed (aith) [id=0 id_str=]
+
+Followed by group rekeying completed messages at 10 minute intervals.
+
+Trying this on kernel 4943ba16 produces instead an endless loop of:
+
+wlan1: SME: Trying to authenticate with aa:bb:cc:dd:ee:ff (SSID='FOO' freq=24xx MHz)
+wlan1: Trying to associate with aa:bb:cc:dd:ee:ff (SSID='FOO' freq=24xx MHz)
+wlan1: Associated with aa:bb:cc:dd:ee:ff
+wlan1: WPA: Failed to set PTK to the driver (alg=3 keylen=16 bssid=aa:bb:cc:dd:ee:ff)
+wlan1: CTRL-EVENT-DISCONNECTED bssid=aa:bb:cc:dd:ee:ff reason=1
+
+
+The kernel logs are not particularly informative.
+
+They just go through the usual successful series, but end with
+
+wlan1: RxAssocResp from aa:bb:cc:dd:ee:ff (capab=0x431 status=0 aid=1)
+wlan1: associated
+wlan1: deauthenticating from 11:bb:cc:dd:ee:ff by local choice (Reason: 1=UNSPECIFIED)
+
+While successful connection ends before that last line.
