@@ -1,91 +1,83 @@
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [ANNOUNCE] 3.18.7-rt1
-Date: Mon, 16 Feb 2015 19:13:36 +0100
-Message-ID: <20150216181336.GJ21649@linutronix.de>
-References: <20150216111822.GA21649@linutronix.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>, rostedt@goodmis.org,
-	John Kacur <jkacur@redhat.com>, 'NeilBrown <neilb@suse.de>,
-	'@linutronix.de, 'Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-rt-users <linux-rt-users@vger.kernel.org>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: [PATCH 1/4] hw_random: bcm63xx-rng: drop bcm_{readl,writel} macros
+Date: Mon, 16 Feb 2015 18:09:13 -0800
+Message-ID: <1424138956-11563-2-git-send-email-f.fainelli@gmail.com>
+References: <1424138956-11563-1-git-send-email-f.fainelli@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mpm@selenic.com, herbert@gondor.apana.org.au, wsa@the-dreams.de,
+	cernekee@gmail.com, Florian Fainelli <f.fainelli@gmail.com>
+To: linux-mips@linux-mips.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www.linutronix.de ([62.245.132.108]:39085 "EHLO
-	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753594AbbBPSNs (ORCPT
+Received: from mail-pd0-f177.google.com ([209.85.192.177]:35073 "EHLO
+	mail-pd0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755075AbbBQCJ3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Feb 2015 13:13:48 -0500
-Content-Disposition: inline
-In-Reply-To: <20150216111822.GA21649@linutronix.de>
+	Mon, 16 Feb 2015 21:09:29 -0500
+In-Reply-To: <1424138956-11563-1-git-send-email-f.fainelli@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-* Sebastian Andrzej Siewior | 2015-02-16 12:18:22 [+0100]:
+bcm_{readl,writel} macros expand to __raw_{readl,writel}, use these
+directly such that we do not rely on the platform to provide these for
+us. As a result, we no longer use bcm63xx_io.h, so remove that inclusion
+too.
 
->Known issues:
->
->      - xor / raid_pq
->        I had max latency jumping up to 67563us on one CPU while the next
->        lower max was 58us. I tracked it down to module's init code of
->        xor and raid_pq. Both disable preemption while measuring the
->        measuring the performance of the individual implementation.
+Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+---
+ drivers/char/hw_random/bcm63xx-rng.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-The patch at the bottom gets rid of it.
-
-How important is this preempt_disable() and how likely is that we could
-use precomputed priority lists of function instead this of this runtime
-check? XOR already prefers AVX based-xor if available and numbers/test
-at runtime could be removed.
-Is there a case where SSE worse on CPU X better than MMX and this is why
-we do it?
-
-diff --git a/crypto/xor.c b/crypto/xor.c
-index 35d6b3a..19e20f5 100644
---- a/crypto/xor.c
-+++ b/crypto/xor.c
-@@ -70,7 +70,7 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- 	tmpl->next = template_list;
- 	template_list = tmpl;
+diff --git a/drivers/char/hw_random/bcm63xx-rng.c b/drivers/char/hw_random/bcm63xx-rng.c
+index ba6a65ac023b..ed9b28b35a39 100644
+--- a/drivers/char/hw_random/bcm63xx-rng.c
++++ b/drivers/char/hw_random/bcm63xx-rng.c
+@@ -13,7 +13,6 @@
+ #include <linux/platform_device.h>
+ #include <linux/hw_random.h>
  
--	preempt_disable();
-+	preempt_disable_nort();
+-#include <bcm63xx_io.h>
+ #include <bcm63xx_regs.h>
  
- 	/*
- 	 * Count the number of XORs done during a whole jiffy, and use
-@@ -94,7 +94,7 @@ do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- 			max = count;
- 	}
+ struct bcm63xx_rng_priv {
+@@ -28,9 +27,9 @@ static int bcm63xx_rng_init(struct hwrng *rng)
+ 	struct bcm63xx_rng_priv *priv = to_rng_priv(rng);
+ 	u32 val;
  
--	preempt_enable();
-+	preempt_enable_nort();
+-	val = bcm_readl(priv->regs + RNG_CTRL);
++	val = __raw_readl(priv->regs + RNG_CTRL);
+ 	val |= RNG_EN;
+-	bcm_writel(val, priv->regs + RNG_CTRL);
++	__raw_writel(val, priv->regs + RNG_CTRL);
  
- 	speed = max * (HZ * BENCH_SIZE / 1024);
- 	tmpl->speed = speed;
-diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
-index 7d0e5cd..e9920d4 100644
---- a/lib/raid6/algos.c
-+++ b/lib/raid6/algos.c
-@@ -142,7 +142,7 @@ static inline const struct raid6_calls *raid6_choose_gen(
+ 	return 0;
+ }
+@@ -40,23 +39,23 @@ static void bcm63xx_rng_cleanup(struct hwrng *rng)
+ 	struct bcm63xx_rng_priv *priv = to_rng_priv(rng);
+ 	u32 val;
  
- 			perf = 0;
+-	val = bcm_readl(priv->regs + RNG_CTRL);
++	val = __raw_readl(priv->regs + RNG_CTRL);
+ 	val &= ~RNG_EN;
+-	bcm_writel(val, priv->regs + RNG_CTRL);
++	__raw_writel(val, priv->regs + RNG_CTRL);
+ }
  
--			preempt_disable();
-+			preempt_disable_nort();
- 			j0 = jiffies;
- 			while ((j1 = jiffies) == j0)
- 				cpu_relax();
-@@ -151,7 +151,7 @@ static inline const struct raid6_calls *raid6_choose_gen(
- 				(*algo)->gen_syndrome(disks, PAGE_SIZE, *dptrs);
- 				perf++;
- 			}
--			preempt_enable();
-+			preempt_enable_nort();
+ static int bcm63xx_rng_data_present(struct hwrng *rng, int wait)
+ {
+ 	struct bcm63xx_rng_priv *priv = to_rng_priv(rng);
  
- 			if (perf > bestperf) {
- 				bestperf = perf;
-
-
-Sebastian
+-	return bcm_readl(priv->regs + RNG_STAT) & RNG_AVAIL_MASK;
++	return __raw_readl(priv->regs + RNG_STAT) & RNG_AVAIL_MASK;
+ }
+ 
+ static int bcm63xx_rng_data_read(struct hwrng *rng, u32 *data)
+ {
+ 	struct bcm63xx_rng_priv *priv = to_rng_priv(rng);
+ 
+-	*data = bcm_readl(priv->regs + RNG_DATA);
++	*data = __raw_readl(priv->regs + RNG_DATA);
+ 
+ 	return 4;
+ }
+-- 
+2.1.0
