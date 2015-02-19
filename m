@@ -1,54 +1,62 @@
-From: sri sowj <srisowj4linux@gmail.com>
-Subject: Intermediate Hash states
-Date: Thu, 19 Feb 2015 21:48:30 +0530
-Message-ID: <CAHTT9VLHi6m8-NNS_MJ2cabNm2Eng18zs8iGqJudP1ANb-99Ww@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: linux-crypto@vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] arm64: crypto: increase AES interleave to 4x
+Date: Thu, 19 Feb 2015 17:25:16 +0000
+Message-ID: <1424366716-30439-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: steve.capper@linaro.org, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: will.deacon@arm.com, linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ob0-f172.google.com ([209.85.214.172]:33160 "EHLO
-	mail-ob0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752041AbbBSQSb (ORCPT
+Received: from mail-wg0-f54.google.com ([74.125.82.54]:64136 "EHLO
+	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752018AbbBSRZ1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 19 Feb 2015 11:18:31 -0500
-Received: by mail-ob0-f172.google.com with SMTP id nt9so16232246obb.3
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Feb 2015 08:18:30 -0800 (PST)
+	Thu, 19 Feb 2015 12:25:27 -0500
+Received: by mail-wg0-f54.google.com with SMTP id y19so8492627wgg.13
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Feb 2015 09:25:25 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi ,
+This patch increases the interleave factor for parallel AES modes
+to 4x. This improves performance on Cortex-A57 by ~35%. This is
+due to the 3-cycle latency of AES instructions on the A57's
+relatively deep pipeline (compared to Cortex-A53 where the AES
+instruction latency is only 2 cycles).
 
-I am trying to understand Hashing Algorithms implementation in linux kernel .
+At the same time, disable inline expansion of the core AES functions,
+as the performance benefit of this feature is negligible.
 
-I am really not sure on how to deal with following scenario.
+  Measured on AMD Seattle (using tcrypt.ko mode=500 sec=1):
 
-assume when App1 is in middle of
-execution(crypto_ahash_init/update/update...) ,App2 sends a request
-may be from another cpu in multi-core system to underlying crypto
-driver .
-Then essentially input1 has to save its  state(intermediate Hash) and
-serves App2 request.
+  Baseline (2x interleave, inline expansion)
+  ------------------------------------------
+  testing speed of async cbc(aes) (cbc-aes-ce) decryption
+  test 4 (128 bit key, 8192 byte blocks): 95545 operations in 1 seconds
+  test 14 (256 bit key, 8192 byte blocks): 68496 operations in 1 seconds
 
-App1 ---------> Linux kernel crypto driver
+  This patch (4x interleave, no inline expansion)
+  -----------------------------------------------
+  testing speed of async cbc(aes) (cbc-aes-ce) decryption
+  test 4 (128 bit key, 8192 byte blocks): 124735 operations in 1 seconds
+  test 14 (256 bit key, 8192 byte blocks): 92328 operations in 1 seconds
 
-       crypto_ahash_init(input1);
-        crypto_ahash_update(input1);
-       ..................
-       ..................
-        crypto_ahash_update(input1); // multple Hash requests
-       ..................
-       ..................
-    crypto_ahash_final()
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm64/crypto/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-
-App2 ---------> Linux kernel crypto driver
-
-        crypto_ahash_init(input2);
-        crypto_ahash_update(input2);
-
-
-Here in this scenario how to track,save and restore the Hash state for App1 ?
-
-BR,
-Srisowj
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index 5720608c50b1..abb79b3cfcfe 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -29,7 +29,7 @@ aes-ce-blk-y := aes-glue-ce.o aes-ce.o
+ obj-$(CONFIG_CRYPTO_AES_ARM64_NEON_BLK) += aes-neon-blk.o
+ aes-neon-blk-y := aes-glue-neon.o aes-neon.o
+ 
+-AFLAGS_aes-ce.o		:= -DINTERLEAVE=2 -DINTERLEAVE_INLINE
++AFLAGS_aes-ce.o		:= -DINTERLEAVE=4
+ AFLAGS_aes-neon.o	:= -DINTERLEAVE=4
+ 
+ CFLAGS_aes-glue-ce.o	:= -DUSE_V8_CRYPTO_EXTENSIONS
+-- 
+1.8.3.2
