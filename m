@@ -1,85 +1,54 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: GCM / seqiv and SP800-38D
-Date: Thu, 19 Feb 2015 07:56:48 +0100
-Message-ID: <5009281.r2g8PApWDK@tauon>
+From: sri sowj <srisowj4linux@gmail.com>
+Subject: Intermediate Hash states
+Date: Thu, 19 Feb 2015 21:48:30 +0530
+Message-ID: <CAHTT9VLHi6m8-NNS_MJ2cabNm2Eng18zs8iGqJudP1ANb-99Ww@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: 'Herbert Xu' <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60265 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751384AbbBSG47 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 19 Feb 2015 01:56:59 -0500
-Received: from tauon.localnet
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S162EA> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Thu, 19 Feb 2015 07:56:55 +0100
+Received: from mail-ob0-f172.google.com ([209.85.214.172]:33160 "EHLO
+	mail-ob0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752041AbbBSQSb (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 19 Feb 2015 11:18:31 -0500
+Received: by mail-ob0-f172.google.com with SMTP id nt9so16232246obb.3
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Feb 2015 08:18:30 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Hi ,
 
-After some research, we think that the current implementation of seqiv 
-as used for GCM does not comply with SP800-38D. Before I outline the 
-issue, please allow me to state my understanding of seqiv (to make sure 
-I really understand it :-) ).
+I am trying to understand Hashing Algorithms implementation in linux kernel .
 
-Seqiv works as a wrapper around the associated cipher (like GCM in our 
-case). If a caller wants to use the seqiv helper, the caller must use 
-the aead_givcrypt_set_* API calls. For example, esp_output does that.
+I am really not sure on how to deal with following scenario.
 
-If the API calls are invoked seqiv performs its work and then calls the 
-underlying cipher. The main work in seqiv is implemented in 
-seqiv_geniv(). This function creates the IV for GCM. Its logic can be 
-characterized as follows:
+assume when App1 is in middle of
+execution(crypto_ahash_init/update/update...) ,App2 sends a request
+may be from another cpu in multi-core system to underlying crypto
+driver .
+Then essentially input1 has to save its  state(intermediate Hash) and
+serves App2 request.
 
-1. get some salt value from an RNG during init time (ctx->salt)
+App1 ---------> Linux kernel crypto driver
 
-2. fill the IV with a sequence number provided by the caller (esp_output 
-provides the IPSec sequence number here)
+       crypto_ahash_init(input1);
+        crypto_ahash_update(input1);
+       ..................
+       ..................
+        crypto_ahash_update(input1); // multple Hash requests
+       ..................
+       ..................
+    crypto_ahash_final()
 
-3. left-pad the sequence number with zeros
 
-4. XOR the salt with the value from 3.
 
-In case of rfc4106(gcm(aes)), the IV is 96 bits. Thus, our constructed 
-IV looks like:
+App2 ---------> Linux kernel crypto driver
 
-- rightmost 64 bit is an XOR of the sequence number and the rightmost 64 
-bit of the random number
+        crypto_ahash_init(input2);
+        crypto_ahash_update(input2);
 
-- leftmost 32 bit is leftmost 32 bit of the random number
 
-If my understanding is correct, then this does not comply with 
-SP800-38D. Even after speaking with the mathematicians at NIST 
-controlling SP800-38D, they do not want to accept that solution.
+Here in this scenario how to track,save and restore the Hash state for App1 ?
 
-The particular problem is SP800-38D section 8.2.1 and 8.2.2 where one 
-can choose which of these two sections are implemented (either a full 
-deterministic generation of an IV or a full RNG-based generation with an 
-approved DRBG).
-
-The key issue the authors of SP800-38D want to protect against is that 
-there is no collision in the generation of an IV (for a given key). 
-
-What seqiv does is to use the output of a DRBG (in FIPS mode) or 
-/dev/urandom (in normal mode) and XOR it with a static value. The 
-"postprocessing" of the XORing is not allowed as it may introduce 
-potential collisions. I do not want to dive into math here, but if 
-needed, we can do some calculations.
-
-Thus, may I ask for a change in the GCM/seqiv combo? I think one of the 
-following solutions would be possible:
-
-- change seqiv to eliminate the XOR step (not sure whether we need to 
-generate a random number every time seq_geniv is invoked)
-
-- create a new IV handler (maybe call it simpleiv that may be a simple 
-counter or an LFSR or a frontend to an RNG)
-
-I would prefer the latter and wire up GCM with that "simpleiv".
-
-Ciao
-Stephan
+BR,
+Srisowj
