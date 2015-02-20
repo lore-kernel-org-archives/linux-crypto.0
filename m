@@ -1,75 +1,77 @@
-From: Martin Hicks <mort@bork.org>
-Subject: Re: [PATCH 0/5] crypto: talitos: Add crypto async queue handling
-Date: Fri, 20 Feb 2015 13:26:21 -0500
-Message-ID: <CAJUS3XmPLvU2cWBJV0dVzQErVumaS+dVj+WzOfBKuKwT0wL-Mg@mail.gmail.com>
-References: <1424449276-5288-1-git-send-email-mort@bork.org>
-	<CAJUS3XmnuUhgezxhBKeu2QLk-QqGVf3ZuwSycs_w=J3KC3BATg@mail.gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: Intermediate Hash states
+Date: Fri, 20 Feb 2015 20:37:29 +0100
+Message-ID: <3307166.8E51TTmzB6@tachyon.chronox.de>
+References: <CAHTT9VLHi6m8-NNS_MJ2cabNm2Eng18zs8iGqJudP1ANb-99Ww@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-	Martin Hicks <mort@bork.org>
-To: Kim Phillips <kim.phillips@freescale.com>,
-	Scott Wood <scottwood@freescale.com>,
-	Kumar Gala <galak@kernel.crashing.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: sri sowj <srisowj4linux@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f173.google.com ([209.85.223.173]:46841 "EHLO
-	mail-ie0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754195AbbBTS0V (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Feb 2015 13:26:21 -0500
-Received: by iecvy18 with SMTP id vy18so9769714iec.13
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Feb 2015 10:26:21 -0800 (PST)
-In-Reply-To: <CAJUS3XmnuUhgezxhBKeu2QLk-QqGVf3ZuwSycs_w=J3KC3BATg@mail.gmail.com>
+Received: from mail.eperm.de ([89.247.134.16]:60273 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754195AbbBTThg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 20 Feb 2015 14:37:36 -0500
+Received: from tachyon.chronox.de
+	by mail.eperm.de with [XMail 1.27 ESMTP Server]
+	id <S166E4> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
+	Fri, 20 Feb 2015 20:37:31 +0100
+In-Reply-To: <CAHTT9VLHi6m8-NNS_MJ2cabNm2Eng18zs8iGqJudP1ANb-99Ww@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Resending to linux-crypto in plain text.
-Sorry to everyone else for the duplication.
-mh
+Am Donnerstag, 19. Februar 2015, 21:48:30 schrieb sri sowj:
 
-On Fri, Feb 20, 2015 at 1:23 PM, Martin Hicks <mort@bork.org> wrote:
->
-> I've just noticed that performance is pretty terrible with maxcpus=1, so
-> I'll investigate that.
-> mh
->
-> On Fri, Feb 20, 2015 at 11:21 AM, Martin Hicks <mort@bork.org> wrote:
->>
->> I was testing dm-crypt performance with a Freescale P1022 board with
->> a recent kernel and was getting IO errors while doing testing with LUKS.
->> Investigation showed that all hardware FIFO slots were filling and
->> the driver was returning EAGAIN to the block layer, which is not an
->> expected response for an async crypto implementation.
->>
->> The following patch series adds a few small fixes, and reworks the
->> submission path to use the crypto_queue mechanism to handle the
->> request backlog.
->>
->>
->> Martin Hicks (5):
->>   crypto: talitos: Simplify per-channel initialization
->>   crypto: talitos: Remove MD5_BLOCK_SIZE
->>   crypto: talitos: Fix off-by-one and use all hardware slots
->>   crypto: talitos: Reorganize request submission data structures
->>   crypto: talitos: Add software backlog queue handling
->>
->>  drivers/crypto/talitos.c |  189
->> ++++++++++++++++++++++++----------------------
->>  drivers/crypto/talitos.h |   44 +++++++++--
->>  2 files changed, 137 insertions(+), 96 deletions(-)
->>
->> --
->> 1.7.10.4
->>
->
->
->
+Hi sri,
+
+> Hi ,
+> 
+> I am trying to understand Hashing Algorithms implementation in linux kernel
+> .
+> 
+> I am really not sure on how to deal with following scenario.
+> 
+> assume when App1 is in middle of
+> execution(crypto_ahash_init/update/update...) ,App2 sends a request
+> may be from another cpu in multi-core system to underlying crypto
+> driver .
+> Then essentially input1 has to save its  state(intermediate Hash) and
+> serves App2 request.
+> 
+> App1 ---------> Linux kernel crypto driver
+> 
+>        crypto_ahash_init(input1);
+>         crypto_ahash_update(input1);
+>        ..................
+>        ..................
+>         crypto_ahash_update(input1); // multple Hash requests
+>        ..................
+>        ..................
+>     crypto_ahash_final()
+> 
+> 
+> 
+> App2 ---------> Linux kernel crypto driver
+> 
+>         crypto_ahash_init(input2);
+>         crypto_ahash_update(input2);
+> 
+> 
+> Here in this scenario how to track,save and restore the Hash state for App1
+> ?
+
+The ahash (ablkcipher too) uses kernel threads. Those are scheduled like 
+normal processes, including the context switching.
+> 
+> BR,
+> Srisowj
 > --
-> Martin Hicks P.Eng.      |         mort@bork.org
-> Bork Consulting Inc.     |   +1 (613) 266-2296
-
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 -- 
-Martin Hicks P.Eng.      |         mort@bork.org
-Bork Consulting Inc.     |   +1 (613) 266-2296
+Ciao
+Stephan
