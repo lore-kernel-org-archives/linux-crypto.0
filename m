@@ -1,68 +1,130 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: communicating from the user space
-Date: Fri, 20 Feb 2015 21:58:41 +0100
-Message-ID: <1522393.KEIVXizgKy@tachyon.chronox.de>
-References: <CAHTT9VLmj8A7V5t+P9Zc02r5nyv37VMfa=QwPOuiMS9WFdXUxg@mail.gmail.com>
+From: Martin Hicks <mort@bork.org>
+Subject: Re: [PATCH 0/5] crypto: talitos: Add crypto async queue handling
+Date: Fri, 20 Feb 2015 13:23:28 -0500
+Message-ID: <CAJUS3XmnuUhgezxhBKeu2QLk-QqGVf3ZuwSycs_w=J3KC3BATg@mail.gmail.com>
+References: <1424449276-5288-1-git-send-email-mort@bork.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: sri sowj <srisowj4linux@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60277 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752384AbbBTU6o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Feb 2015 15:58:44 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S1670F> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Fri, 20 Feb 2015 21:58:42 +0100
-In-Reply-To: <CAHTT9VLmj8A7V5t+P9Zc02r5nyv37VMfa=QwPOuiMS9WFdXUxg@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: multipart/mixed; boundary="===============4383561884470245796=="
+Cc: Martin Hicks <mort@bork.org>, linuxppc-dev@lists.ozlabs.org,
+ linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>,
+ Scott Wood <scottwood@freescale.com>,
+ Kumar Gala <galak@kernel.crashing.org>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <1424449276-5288-1-git-send-email-mort@bork.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Am Samstag, 21. Februar 2015, 01:27:04 schrieb sri sowj:
+--===============4383561884470245796==
+Content-Type: multipart/alternative; boundary=047d7bdca5b629ab7b050f89263d
 
-Hi sri,
+--047d7bdca5b629ab7b050f89263d
+Content-Type: text/plain; charset=UTF-8
 
-> Hi ,
-> 
-> I want to interact with Crypto Hardware from user space using openssl
-> like libraries based applications through cryptodev-linux interface.
-> 
-> it looks like openssl comes with cryptodev-linux support(through
-> eng_cryptodev.c) .
-> When I downloaded openssl,eng_cryptodev.c file is available by default.
-> 
-> below link refers about eng_cryptodev.c for openssl support :
-> 
-> http://repo.or.cz/w/cryptodev-linux.git/commitdiff/56cc4e3b8b761cb34f928f4ee
-> e59755d1f0afc53
-> 
-> Note:looks like there are some additional changes done on
-> eng_cryptodev.c file available in updated openssl source code.
-> 
-> There seems to be some changes/patches  also available recently for
-> cryptodev-linux,below contains reference information.
-> 
-> http://rt.openssl.org/Ticket/Display.html?id=2770&user=guest&pass=guest
-> 
-> 
-> Please let me know if my understanding is incorrect .
+I've just noticed that performance is pretty terrible with maxcpus=1, so
+I'll investigate that.
+mh
 
-See AF_ALG and a generic user space library around it:
+On Fri, Feb 20, 2015 at 11:21 AM, Martin Hicks <mort@bork.org> wrote:
 
-http://www.chronox.de/libkcapi.html
-> 
-> 
-> BR,
-> Srisowj
+> I was testing dm-crypt performance with a Freescale P1022 board with
+> a recent kernel and was getting IO errors while doing testing with LUKS.
+> Investigation showed that all hardware FIFO slots were filling and
+> the driver was returning EAGAIN to the block layer, which is not an
+> expected response for an async crypto implementation.
+>
+> The following patch series adds a few small fixes, and reworks the
+> submission path to use the crypto_queue mechanism to handle the
+> request backlog.
+>
+>
+> Martin Hicks (5):
+>   crypto: talitos: Simplify per-channel initialization
+>   crypto: talitos: Remove MD5_BLOCK_SIZE
+>   crypto: talitos: Fix off-by-one and use all hardware slots
+>   crypto: talitos: Reorganize request submission data structures
+>   crypto: talitos: Add software backlog queue handling
+>
+>  drivers/crypto/talitos.c |  189
+> ++++++++++++++++++++++++----------------------
+>  drivers/crypto/talitos.h |   44 +++++++++--
+>  2 files changed, 137 insertions(+), 96 deletions(-)
+>
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.7.10.4
+>
+>
 
 
 -- 
-Ciao
-Stephan
+Martin Hicks P.Eng.      |         mort@bork.org
+Bork Consulting Inc.     |   +1 (613) 266-2296
+
+--047d7bdca5b629ab7b050f89263d
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div class=3D"gmail_extra"><br></div><div class=3D"gmail_e=
+xtra">I&#39;ve just noticed that performance is pretty terrible with maxcpu=
+s=3D1, so I&#39;ll investigate that.</div><div class=3D"gmail_extra">mh</di=
+v><div class=3D"gmail_extra"><br><div class=3D"gmail_quote">On Fri, Feb 20,=
+ 2015 at 11:21 AM, Martin Hicks <span dir=3D"ltr">&lt;<a href=3D"mailto:mor=
+t@bork.org" target=3D"_blank">mort@bork.org</a>&gt;</span> wrote:<br><block=
+quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
+ solid;padding-left:1ex">I was testing dm-crypt performance with a Freescal=
+e P1022 board with<br>
+a recent kernel and was getting IO errors while doing testing with LUKS.<br=
+>
+Investigation showed that all hardware FIFO slots were filling and<br>
+the driver was returning EAGAIN to the block layer, which is not an<br>
+expected response for an async crypto implementation.<br>
+<br>
+The following patch series adds a few small fixes, and reworks the<br>
+submission path to use the crypto_queue mechanism to handle the<br>
+request backlog.<br>
+<br>
+<br>
+Martin Hicks (5):<br>
+=C2=A0 crypto: talitos: Simplify per-channel initialization<br>
+=C2=A0 crypto: talitos: Remove MD5_BLOCK_SIZE<br>
+=C2=A0 crypto: talitos: Fix off-by-one and use all hardware slots<br>
+=C2=A0 crypto: talitos: Reorganize request submission data structures<br>
+=C2=A0 crypto: talitos: Add software backlog queue handling<br>
+<br>
+=C2=A0drivers/crypto/talitos.c |=C2=A0 189 ++++++++++++++++++++++++--------=
+--------------<br>
+=C2=A0drivers/crypto/talitos.h |=C2=A0 =C2=A044 +++++++++--<br>
+=C2=A02 files changed, 137 insertions(+), 96 deletions(-)<br>
+<span class=3D"HOEnZb"><font color=3D"#888888"><br>
+--<br>
+1.7.10.4<br>
+<br>
+</font></span></blockquote></div><br><br clear=3D"all"><div><br></div>-- <b=
+r><div class=3D"gmail_signature"><div dir=3D"ltr">Martin Hicks P.Eng. =C2=
+=A0=C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"mailto:mort@bork.=
+org" target=3D"_blank">mort@bork.org</a><br>Bork Consulting Inc. =C2=A0 =C2=
+=A0 | =C2=A0 +1 (613) 266-2296<div></div><div></div><div></div></div></div>
+</div></div>
+
+--047d7bdca5b629ab7b050f89263d--
+
+--===============4383561884470245796==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXhwcGMt
+ZGV2IG1haWxpbmcgbGlzdApMaW51eHBwYy1kZXZAbGlzdHMub3psYWJzLm9yZwpodHRwczovL2xp
+c3RzLm96bGFicy5vcmcvbGlzdGluZm8vbGludXhwcGMtZGV2
+
+--===============4383561884470245796==--
