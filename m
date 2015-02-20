@@ -1,44 +1,72 @@
 From: Martin Hicks <mort@bork.org>
-Subject: [PATCH 0/5] crypto: talitos: Add crypto async queue handling
-Date: Fri, 20 Feb 2015 11:21:11 -0500
-Message-ID: <1424449276-5288-1-git-send-email-mort@bork.org>
+Subject: [PATCH 1/5] crypto: talitos: Simplify per-channel initialization
+Date: Fri, 20 Feb 2015 11:21:12 -0500
+Message-ID: <1424449276-5288-2-git-send-email-mort@bork.org>
+References: <1424449276-5288-1-git-send-email-mort@bork.org>
 Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
 	Martin Hicks <mort@bork.org>
 To: Kim Phillips <kim.phillips@freescale.com>,
 	Scott Wood <scottwood@freescale.com>,
 	Kumar Gala <galak@kernel.crashing.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f169.google.com ([209.85.213.169]:36201 "EHLO
-	mail-ig0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752004AbbBTQVp (ORCPT
+Received: from mail-ie0-f170.google.com ([209.85.223.170]:33630 "EHLO
+	mail-ie0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753812AbbBTQVs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Feb 2015 11:21:45 -0500
-Received: by mail-ig0-f169.google.com with SMTP id hl2so8098501igb.0
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Feb 2015 08:21:45 -0800 (PST)
+	Fri, 20 Feb 2015 11:21:48 -0500
+Received: by iecar1 with SMTP id ar1so9043793iec.0
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Feb 2015 08:21:47 -0800 (PST)
+In-Reply-To: <1424449276-5288-1-git-send-email-mort@bork.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-I was testing dm-crypt performance with a Freescale P1022 board with 
-a recent kernel and was getting IO errors while doing testing with LUKS.
-Investigation showed that all hardware FIFO slots were filling and
-the driver was returning EAGAIN to the block layer, which is not an
-expected response for an async crypto implementation.
+There were multiple loops in a row, for each separate step of the
+initialization of the channels.  Simplify to a single loop.
 
-The following patch series adds a few small fixes, and reworks the
-submission path to use the crypto_queue mechanism to handle the
-request backlog.
+Signed-off-by: Martin Hicks <mort@bork.org>
+---
+ drivers/crypto/talitos.c |   11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-
-Martin Hicks (5):
-  crypto: talitos: Simplify per-channel initialization
-  crypto: talitos: Remove MD5_BLOCK_SIZE
-  crypto: talitos: Fix off-by-one and use all hardware slots
-  crypto: talitos: Reorganize request submission data structures
-  crypto: talitos: Add software backlog queue handling
-
- drivers/crypto/talitos.c |  189 ++++++++++++++++++++++++----------------------
- drivers/crypto/talitos.h |   44 +++++++++--
- 2 files changed, 137 insertions(+), 96 deletions(-)
-
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 067ec21..c49d977 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2706,20 +2706,16 @@ static int talitos_probe(struct platform_device *ofdev)
+ 		goto err_out;
+ 	}
+ 
++	priv->fifo_len = roundup_pow_of_two(priv->chfifo_len);
++
+ 	for (i = 0; i < priv->num_channels; i++) {
+ 		priv->chan[i].reg = priv->reg + TALITOS_CH_STRIDE * (i + 1);
+ 		if (!priv->irq[1] || !(i & 1))
+ 			priv->chan[i].reg += TALITOS_CH_BASE_OFFSET;
+-	}
+ 
+-	for (i = 0; i < priv->num_channels; i++) {
+ 		spin_lock_init(&priv->chan[i].head_lock);
+ 		spin_lock_init(&priv->chan[i].tail_lock);
+-	}
+ 
+-	priv->fifo_len = roundup_pow_of_two(priv->chfifo_len);
+-
+-	for (i = 0; i < priv->num_channels; i++) {
+ 		priv->chan[i].fifo = kzalloc(sizeof(struct talitos_request) *
+ 					     priv->fifo_len, GFP_KERNEL);
+ 		if (!priv->chan[i].fifo) {
+@@ -2727,11 +2723,10 @@ static int talitos_probe(struct platform_device *ofdev)
+ 			err = -ENOMEM;
+ 			goto err_out;
+ 		}
+-	}
+ 
+-	for (i = 0; i < priv->num_channels; i++)
+ 		atomic_set(&priv->chan[i].submit_count,
+ 			   -(priv->chfifo_len - 1));
++	}
+ 
+ 	dma_set_mask(dev, DMA_BIT_MASK(36));
+ 
 -- 
 1.7.10.4
