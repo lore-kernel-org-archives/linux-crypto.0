@@ -1,89 +1,74 @@
-From: sri sowj <srisowj4linux@gmail.com>
-Subject: Re: Intermediate Hash states
-Date: Fri, 20 Feb 2015 14:00:51 +0530
-Message-ID: <CAHTT9VLnhGqYz6vWzEfFCxw0L1=u1g-pa3B=8uLu0Pj=MQJthQ@mail.gmail.com>
-References: <12EF8D94C6F8734FB2FF37B9FBEDD1735F9E0366@EXCHANGE.collogia.de>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH] arm64: crypto: increase AES interleave to 4x
+Date: Fri, 20 Feb 2015 15:55:55 +0000
+Message-ID: <20150220155555.GM31692@arm.com>
+References: <1424366716-30439-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Markus Stockhausen <stockhausen@collogia.de>
+Content-Type: text/plain; charset=us-ascii
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"steve.capper@linaro.org" <steve.capper@linaro.org>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f52.google.com ([209.85.218.52]:37843 "EHLO
-	mail-oi0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751332AbbBTIaw (ORCPT
+Received: from foss.arm.com ([217.140.101.70]:57432 "EHLO
+	usa-sjc-mx-foss1.foss.arm.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1753893AbbBTPz5 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 20 Feb 2015 03:30:52 -0500
-Received: by mail-oi0-f52.google.com with SMTP id u20so1460700oif.11
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Feb 2015 00:30:51 -0800 (PST)
-In-Reply-To: <12EF8D94C6F8734FB2FF37B9FBEDD1735F9E0366@EXCHANGE.collogia.de>
+	Fri, 20 Feb 2015 10:55:57 -0500
+Content-Disposition: inline
+In-Reply-To: <1424366716-30439-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Markus,
+On Thu, Feb 19, 2015 at 05:25:16PM +0000, Ard Biesheuvel wrote:
+> This patch increases the interleave factor for parallel AES modes
+> to 4x. This improves performance on Cortex-A57 by ~35%. This is
+> due to the 3-cycle latency of AES instructions on the A57's
+> relatively deep pipeline (compared to Cortex-A53 where the AES
+> instruction latency is only 2 cycles).
+> 
+> At the same time, disable inline expansion of the core AES functions,
+> as the performance benefit of this feature is negligible.
+> 
+>   Measured on AMD Seattle (using tcrypt.ko mode=500 sec=1):
+> 
+>   Baseline (2x interleave, inline expansion)
+>   ------------------------------------------
+>   testing speed of async cbc(aes) (cbc-aes-ce) decryption
+>   test 4 (128 bit key, 8192 byte blocks): 95545 operations in 1 seconds
+>   test 14 (256 bit key, 8192 byte blocks): 68496 operations in 1 seconds
+> 
+>   This patch (4x interleave, no inline expansion)
+>   -----------------------------------------------
+>   testing speed of async cbc(aes) (cbc-aes-ce) decryption
+>   test 4 (128 bit key, 8192 byte blocks): 124735 operations in 1 seconds
+>   test 14 (256 bit key, 8192 byte blocks): 92328 operations in 1 seconds
 
-Thanks for the information provided .
+Fine by me. Shall I queue this via the arm64 tree?
 
- But I am still not really sure how does crypto driver keeps track of
-the context (intermediate Hash) ,when another application/thread sends
-a request ? I think export/import methods are used to export this
-intermediate hash to upper layers ,then to import the same when
-Needed.
+Will
 
-Please can you provide some inputs on the same may be with some open
-source references if possible.
-
-BR,
-& Srisowj
-
-On Thu, Feb 19, 2015 at 10:20 PM, Markus Stockhausen
-<stockhausen@collogia.de> wrote:
-> If I understand it correctly each requestor gets its own (multiple)
-> contexts. So no need to worry. It will use a different area to store
-> intermediate values.
->
-> Markus
->
-> Am 19.02.2015 17:18 schrieb sri sowj <srisowj4linux@gmail.com>:
->
-> Hi ,
->
-> I am trying to understand Hashing Algorithms implementation in linux kernel
-> .
->
-> I am really not sure on how to deal with following scenario.
->
-> assume when App1 is in middle of
-> execution(crypto_ahash_init/update/update...) ,App2 sends a request
-> may be from another cpu in multi-core system to underlying crypto
-> driver .
-> Then essentially input1 has to save its  state(intermediate Hash) and
-> serves App2 request.
->
-> App1 ---------> Linux kernel crypto driver
->
->        crypto_ahash_init(input1);
->         crypto_ahash_update(input1);
->        ..................
->        ..................
->         crypto_ahash_update(input1); // multple Hash requests
->        ..................
->        ..................
->     crypto_ahash_final()
->
->
->
-> App2 ---------> Linux kernel crypto driver
->
->         crypto_ahash_init(input2);
->         crypto_ahash_update(input2);
->
->
-> Here in this scenario how to track,save and restore the Hash state for App1
-> ?
->
-> BR,
-> Srisowj
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/arm64/crypto/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+> index 5720608c50b1..abb79b3cfcfe 100644
+> --- a/arch/arm64/crypto/Makefile
+> +++ b/arch/arm64/crypto/Makefile
+> @@ -29,7 +29,7 @@ aes-ce-blk-y := aes-glue-ce.o aes-ce.o
+>  obj-$(CONFIG_CRYPTO_AES_ARM64_NEON_BLK) += aes-neon-blk.o
+>  aes-neon-blk-y := aes-glue-neon.o aes-neon.o
+>  
+> -AFLAGS_aes-ce.o		:= -DINTERLEAVE=2 -DINTERLEAVE_INLINE
+> +AFLAGS_aes-ce.o		:= -DINTERLEAVE=4
+>  AFLAGS_aes-neon.o	:= -DINTERLEAVE=4
+>  
+>  CFLAGS_aes-glue-ce.o	:= -DUSE_V8_CRYPTO_EXTENSIONS
+> -- 
+> 1.8.3.2
+> 
+> 
