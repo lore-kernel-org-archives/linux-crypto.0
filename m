@@ -1,111 +1,160 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: communicating from the user space
-Date: Sat, 21 Feb 2015 08:01:32 +0100
-Message-ID: <1543956.4M98jElNTF@tachyon.chronox.de>
-References: <CAHTT9VLmj8A7V5t+P9Zc02r5nyv37VMfa=QwPOuiMS9WFdXUxg@mail.gmail.com> <1522393.KEIVXizgKy@tachyon.chronox.de> <CAHTT9VJhyHRMCsOZ+Unq7zTXNq7+iQpNvKCktPhDbZ_JA6vmsg@mail.gmail.com>
+From: Markus Stockhausen <stockhausen@collogia.de>
+Subject: [PATCH v2 0/7] AES for PPC/SPE
+Date: Sun, 22 Feb 2015 09:59:32 +0100
+Message-ID: <192d96a4-bc3b-4b5e-9fe4-485996341ede@EXCHANGE.collogia.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: sri sowj <srisowj4linux@gmail.com>
+Content-Type: multipart/mixed;
+	boundary="----=_NextPartTM-000-4c8d15d4-fd13-4621-af0b-01be93c120d3"
+Cc: <linuxppc-dev@lists.ozlabs.org>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:60279 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750746AbbBUHBm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 21 Feb 2015 02:01:42 -0500
-Received: from tachyon.chronox.de
-	by mail.eperm.de with [XMail 1.27 ESMTP Server]
-	id <S167A2> for <linux-crypto@vger.kernel.org> from <smueller@chronox.de>;
-	Sat, 21 Feb 2015 08:01:35 +0100
-In-Reply-To: <CAHTT9VJhyHRMCsOZ+Unq7zTXNq7+iQpNvKCktPhDbZ_JA6vmsg@mail.gmail.com>
+Received: from mailrelay.collogia.de ([194.8.207.98]:17946 "HELO
+	mailrelay.collogia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1751288AbbBVI7g (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 22 Feb 2015 03:59:36 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Samstag, 21. Februar 2015, 08:39:05 schrieb sri sowj:
 
-Hi sri,
+This is a multi-part message in MIME format.
 
-> Hi Stephen,
-> 
-> Thank you very much for the information provided.
-> 
-> I will try to explore more on AF_ALG , in between please can you also
-> provide information regarding below ?
-> #1: how openssl communicates to crypto h/w using PF_ALG
+------=_NextPartTM-000-4c8d15d4-fd13-4621-af0b-01be93c120d3
+Content-Type: text/plain
 
-Search the net, there is an engine available
+[PATCH v2 0/7] AES for PPC/SPE
 
-> #2: How man algorithms are supported?
+The following patches add support for 64bit accelerated AES
+calculation on PPC processors with SPE instruction set. Besides
+the AES core module it implements ECB/CBC/CTR/XTS as block
+ciphers. The implementation takes care of the following 
+constraints:
 
-All that the kernel crypto API supports
+- save SPE registers for interrupt context compatibility
+- disable preemption only for short intervals
+- endian independant
 
-> #3: are there any samples to get start with.
+Module passes tcrypt mode=10 tests. Synthethic AES speedup 
+factors from insmod tcrypt sec=3 mode=200 taken on e500v2 
+800 MHz (TP Link WDR4900) compared with the generic kernel 
+module.
 
-Maybe you look into libkcapi -- there are plenty of examples.
-> 
-> but if you can provide some info regarding cryptodev-linux from the
-> openssl prospect it will be more helpful.
+key bytes  ecb   ecb   cbc   cbc   ctr   ctr   xts   xts
+           enc   dec   enc   dec   enc   dec   enc   dec
+--- -----  ----  ----  ----  ----  ----  ----  ----  ----
+128    16  1.14  1.14  1.20  1.28  1.20  1.19  1.20  1.21
+128    64  1.35  1.36  1.48  1.51  1.50  1.50  1.41  1.41
+128   256  1.49  1.49  1.66  1.65  1.69  1.69  1.58  1.57
+128  1024  1.51  1.51  1.69  1.68  1.72  1.72  1.61  1.60
+128  8192  1.52  1.52  1.70  1.68  1.73  1.73  1.62  1.61
+192    16  1.14  1.15  1.22  1.28  1.21  1.21  1.22  1.23
+192    64  1.36  1.37  1.48  1.49  1.49  1.50  1.41  1.41
+192   256  1.48  1.48  1.63  1.63  1.65  1.65  1.56  1.55
+192  1024  1.50  1.50  1.65  1.64  1.68  1.68  1.59  1.58
+192  8192  1.52  1.52  1.67  1.66  1.68  1.68  1.60  1.59
+256    16  1.17  1.18  1.24  1.30  1.23  1.22  1.24  1.25
+256    64  1.37  1.37  1.47  1.50  1.49  1.49  1.42  1.41
+256   256  1.48  1.47  1.60  1.60  1.63  1.63  1.54  1.53
+256  1024  1.50  1.49  1.62  1.61  1.65  1.65  1.57  1.56
+256  8192  1.50  1.49  1.63  1.62  1.66  1.66  1.58  1.57
 
-cryptodev-linux is not merged into the kernel and it looks that it never will 
-considering the presence of AF_ALG
-> 
-> 
-> BR,
-> Srisowj
-> 
-> On Sat, Feb 21, 2015 at 2:28 AM, Stephan Mueller <smueller@chronox.de> 
-wrote:
-> > Am Samstag, 21. Februar 2015, 01:27:04 schrieb sri sowj:
-> > 
-> > Hi sri,
-> > 
-> >> Hi ,
-> >> 
-> >> I want to interact with Crypto Hardware from user space using openssl
-> >> like libraries based applications through cryptodev-linux interface.
-> >> 
-> >> it looks like openssl comes with cryptodev-linux support(through
-> >> eng_cryptodev.c) .
-> >> When I downloaded openssl,eng_cryptodev.c file is available by default.
-> >> 
-> >> below link refers about eng_cryptodev.c for openssl support :
-> >> 
-> >> http://repo.or.cz/w/cryptodev-linux.git/commitdiff/56cc4e3b8b761cb34f928f
-> >> 4ee e59755d1f0afc53
-> >> 
-> >> Note:looks like there are some additional changes done on
-> >> eng_cryptodev.c file available in updated openssl source code.
-> >> 
-> >> There seems to be some changes/patches  also available recently for
-> >> cryptodev-linux,below contains reference information.
-> >> 
-> >> http://rt.openssl.org/Ticket/Display.html?id=2770&user=guest&pass=guest
-> >> 
-> >> 
-> >> Please let me know if my understanding is incorrect .
-> > 
-> > See AF_ALG and a generic user space library around it:
-> > 
-> > http://www.chronox.de/libkcapi.html
-> > 
-> >> BR,
-> >> Srisowj
-> >> --
-> >> To unsubscribe from this list: send the line "unsubscribe linux-crypto"
-> >> in
-> >> the body of a message to majordomo@vger.kernel.org
-> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> > 
-> > --
-> > Ciao
-> > Stephan
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Additionally numbers from an iperf transfer benchmark. They
+include the AES optimized and the SHA256 optimized module.
 
+- Server : Xeon X3470 2.93GHz
+- Client : Core I5 2.4GHz Windows (Shrew VPN client)
+- Gateway: e500v2 800 MHz (TP Link WDR4900)
 
--- 
-Ciao
-Stephan
+AES256 generic / SHA256 generic modules:
+> iperf.exe -c a.b.c.d -t 60 -i 10
+------------------------------------------------------------
+Client connecting to a.b.c.d, TCP port 5001
+TCP window size: 63.0 KByte (default)
+------------------------------------------------------------
+[  3] local u.v.w.x port 50730 connected with a.b.c.d port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3]  0.0-10.0 sec  51.1 MBytes  42.9 Mbits/sec
+[  3] 10.0-20.0 sec  51.9 MBytes  43.5 Mbits/sec
+[  3] 20.0-30.0 sec  51.5 MBytes  43.2 Mbits/sec
+[  3] 30.0-40.0 sec  51.5 MBytes  43.2 Mbits/sec
+[  3] 40.0-50.0 sec  51.2 MBytes  43.0 Mbits/sec
+[  3] 50.0-60.0 sec  50.6 MBytes  42.5 Mbits/sec
+[  3]  0.0-60.0 sec   308 MBytes  43.0 Mbits/sec
+
+AES256 (this patch) / SHA256 (my last patch)
+> iperf.exe -c a.b.c.d -t 60 -i 10
+------------------------------------------------------------
+Client connecting to a.b.c.d, TCP port 5001
+TCP window size: 63.0 KByte (default)
+------------------------------------------------------------
+[  3] local u.v.w.x port 50730 connected with a.b.c.d port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3]  0.0-10.0 sec  69.6 MBytes  58.4 Mbits/sec
+[  3] 10.0-20.0 sec  69.1 MBytes  58.0 Mbits/sec
+[  3] 20.0-30.0 sec  69.2 MBytes  58.1 Mbits/sec
+[  3] 30.0-40.0 sec  67.1 MBytes  56.3 Mbits/sec
+[  3] 40.0-50.0 sec  67.6 MBytes  56.7 Mbits/sec
+[  3] 50.0-60.0 sec  65.9 MBytes  55.3 Mbits/sec
+[  3]  0.0-60.0 sec   409 MBytes  57.1 Mbits/sec
+
+------=_NextPartTM-000-4c8d15d4-fd13-4621-af0b-01be93c120d3
+Content-Type: text/plain;
+	name="InterScan_Disclaimer.txt"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="InterScan_Disclaimer.txt"
+
+****************************************************************************
+Diese E-Mail enthält vertrauliche und/oder rechtlich geschützte
+Informationen. Wenn Sie nicht der richtige Adressat sind oder diese E-Mail
+irrtümlich erhalten haben, informieren Sie bitte sofort den Absender und
+vernichten Sie diese Mail. Das unerlaubte Kopieren sowie die unbefugte
+Weitergabe dieser Mail ist nicht gestattet.
+
+Über das Internet versandte E-Mails können unter fremden Namen erstellt oder
+manipuliert werden. Deshalb ist diese als E-Mail verschickte Nachricht keine
+rechtsverbindliche Willenserklärung.
+
+Collogia
+Unternehmensberatung AG
+Ubierring 11
+D-50678 Köln
+
+Vorstand:
+Kadir Akin
+Dr. Michael Höhnerbach
+
+Vorsitzender des Aufsichtsrates:
+Hans Kristian Langva
+
+Registergericht: Amtsgericht Köln
+Registernummer: HRB 52 497
+
+This e-mail may contain confidential and/or privileged information. If you
+are not the intended recipient (or have received this e-mail in error)
+please notify the sender immediately and destroy this e-mail. Any
+unauthorized copying, disclosure or distribution of the material in this
+e-mail is strictly forbidden.
+
+e-mails sent over the internet may have been written under a wrong name or
+been manipulated. That is why this message sent as an e-mail is not a
+legally binding declaration of intention.
+
+Collogia
+Unternehmensberatung AG
+Ubierring 11
+D-50678 Köln
+
+executive board:
+Kadir Akin
+Dr. Michael Höhnerbach
+
+President of the supervisory board:
+Hans Kristian Langva
+
+Registry office: district court Cologne
+Register number: HRB 52 497
+
+****************************************************************************
+
+------=_NextPartTM-000-4c8d15d4-fd13-4621-af0b-01be93c120d3--
