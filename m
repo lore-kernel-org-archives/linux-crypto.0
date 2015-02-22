@@ -1,103 +1,83 @@
 From: Markus Stockhausen <stockhausen@collogia.de>
-Subject: [PATCH v2 0/7] AES for PPC/SPE
-Date: Sun, 22 Feb 2015 09:59:32 +0100
-Message-ID: <192d96a4-bc3b-4b5e-9fe4-485996341ede@EXCHANGE.collogia.de>
+Subject: [PATCH v2 1/7] AES for PPC/SPE - register defines
+Date: Sun, 22 Feb 2015 09:59:38 +0100
+Message-ID: <466c99e5-b9d2-4312-b8a4-f0233d9d3f3c@EXCHANGE.collogia.de>
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_NextPartTM-000-4c8d15d4-fd13-4621-af0b-01be93c120d3"
+	boundary="----=_NextPartTM-000-c92436c2-ad30-4fc5-a0e6-56215051a972"
 Cc: <linuxppc-dev@lists.ozlabs.org>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailrelay.collogia.de ([194.8.207.98]:17946 "HELO
+Received: from mailrelay.collogia.de ([194.8.207.98]:17950 "HELO
 	mailrelay.collogia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751288AbbBVI7g (ORCPT
+	with SMTP id S1751288AbbBVI7k (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 22 Feb 2015 03:59:36 -0500
+	Sun, 22 Feb 2015 03:59:40 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
 This is a multi-part message in MIME format.
 
-------=_NextPartTM-000-4c8d15d4-fd13-4621-af0b-01be93c120d3
+------=_NextPartTM-000-c92436c2-ad30-4fc5-a0e6-56215051a972
 Content-Type: text/plain
 
-[PATCH v2 0/7] AES for PPC/SPE
+[PATCH v2 1/7] AES for PPC/SPE - register defines
 
-The following patches add support for 64bit accelerated AES
-calculation on PPC processors with SPE instruction set. Besides
-the AES core module it implements ECB/CBC/CTR/XTS as block
-ciphers. The implementation takes care of the following 
-constraints:
+Define some register aliases for better readability.
 
-- save SPE registers for interrupt context compatibility
-- disable preemption only for short intervals
-- endian independant
+Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
 
-Module passes tcrypt mode=10 tests. Synthethic AES speedup 
-factors from insmod tcrypt sec=3 mode=200 taken on e500v2 
-800 MHz (TP Link WDR4900) compared with the generic kernel 
-module.
+diff --git a/arch/powerpc/crypto/aes-spe-regs.h b/arch/powerpc/crypto/aes-spe-regs.h
+new file mode 100644
+index 0000000..30d217b
+--- /dev/null
++++ b/arch/powerpc/crypto/aes-spe-regs.h
+@@ -0,0 +1,42 @@
++/*
++ * Common registers for PPC AES implementation
++ *
++ * Copyright (c) 2015 Markus Stockhausen <stockhausen@collogia.de>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++
++#define rKS r0	/* copy of en-/decryption key pointer			*/
++#define rDP r3	/* destination pointer					*/
++#define rSP r4	/* source pointer					*/
++#define rKP r5	/* pointer to en-/decryption key pointer		*/
++#define rRR r6	/* en-/decryption rounds				*/
++#define rLN r7	/* length of data to be processed			*/
++#define rIP r8	/* potiner to IV (CBC/CTR/XTS modes)			*/
++#define rKT r9	/* pointer to tweak key (XTS mode)			*/
++#define rT0 r11	/* pointers to en-/decrpytion tables			*/
++#define rT1 r10
++#define rD0 r9	/* data 						*/
++#define rD1 r14
++#define rD2 r12
++#define rD3 r15
++#define rW0 r16	/* working registers					*/
++#define rW1 r17
++#define rW2 r18
++#define rW3 r19
++#define rW4 r20
++#define rW5 r21
++#define rW6 r22
++#define rW7 r23
++#define rI0 r24	/* IV							*/
++#define rI1 r25
++#define rI2 r26
++#define rI3 r27
++#define rG0 r28	/* endian reversed tweak (XTS mode)			*/
++#define rG1 r29
++#define rG2 r30
++#define rG3 r31
 
-key bytes  ecb   ecb   cbc   cbc   ctr   ctr   xts   xts
-           enc   dec   enc   dec   enc   dec   enc   dec
---- -----  ----  ----  ----  ----  ----  ----  ----  ----
-128    16  1.14  1.14  1.20  1.28  1.20  1.19  1.20  1.21
-128    64  1.35  1.36  1.48  1.51  1.50  1.50  1.41  1.41
-128   256  1.49  1.49  1.66  1.65  1.69  1.69  1.58  1.57
-128  1024  1.51  1.51  1.69  1.68  1.72  1.72  1.61  1.60
-128  8192  1.52  1.52  1.70  1.68  1.73  1.73  1.62  1.61
-192    16  1.14  1.15  1.22  1.28  1.21  1.21  1.22  1.23
-192    64  1.36  1.37  1.48  1.49  1.49  1.50  1.41  1.41
-192   256  1.48  1.48  1.63  1.63  1.65  1.65  1.56  1.55
-192  1024  1.50  1.50  1.65  1.64  1.68  1.68  1.59  1.58
-192  8192  1.52  1.52  1.67  1.66  1.68  1.68  1.60  1.59
-256    16  1.17  1.18  1.24  1.30  1.23  1.22  1.24  1.25
-256    64  1.37  1.37  1.47  1.50  1.49  1.49  1.42  1.41
-256   256  1.48  1.47  1.60  1.60  1.63  1.63  1.54  1.53
-256  1024  1.50  1.49  1.62  1.61  1.65  1.65  1.57  1.56
-256  8192  1.50  1.49  1.63  1.62  1.66  1.66  1.58  1.57
-
-Additionally numbers from an iperf transfer benchmark. They
-include the AES optimized and the SHA256 optimized module.
-
-- Server : Xeon X3470 2.93GHz
-- Client : Core I5 2.4GHz Windows (Shrew VPN client)
-- Gateway: e500v2 800 MHz (TP Link WDR4900)
-
-AES256 generic / SHA256 generic modules:
-> iperf.exe -c a.b.c.d -t 60 -i 10
-------------------------------------------------------------
-Client connecting to a.b.c.d, TCP port 5001
-TCP window size: 63.0 KByte (default)
-------------------------------------------------------------
-[  3] local u.v.w.x port 50730 connected with a.b.c.d port 5001
-[ ID] Interval       Transfer     Bandwidth
-[  3]  0.0-10.0 sec  51.1 MBytes  42.9 Mbits/sec
-[  3] 10.0-20.0 sec  51.9 MBytes  43.5 Mbits/sec
-[  3] 20.0-30.0 sec  51.5 MBytes  43.2 Mbits/sec
-[  3] 30.0-40.0 sec  51.5 MBytes  43.2 Mbits/sec
-[  3] 40.0-50.0 sec  51.2 MBytes  43.0 Mbits/sec
-[  3] 50.0-60.0 sec  50.6 MBytes  42.5 Mbits/sec
-[  3]  0.0-60.0 sec   308 MBytes  43.0 Mbits/sec
-
-AES256 (this patch) / SHA256 (my last patch)
-> iperf.exe -c a.b.c.d -t 60 -i 10
-------------------------------------------------------------
-Client connecting to a.b.c.d, TCP port 5001
-TCP window size: 63.0 KByte (default)
-------------------------------------------------------------
-[  3] local u.v.w.x port 50730 connected with a.b.c.d port 5001
-[ ID] Interval       Transfer     Bandwidth
-[  3]  0.0-10.0 sec  69.6 MBytes  58.4 Mbits/sec
-[  3] 10.0-20.0 sec  69.1 MBytes  58.0 Mbits/sec
-[  3] 20.0-30.0 sec  69.2 MBytes  58.1 Mbits/sec
-[  3] 30.0-40.0 sec  67.1 MBytes  56.3 Mbits/sec
-[  3] 40.0-50.0 sec  67.6 MBytes  56.7 Mbits/sec
-[  3] 50.0-60.0 sec  65.9 MBytes  55.3 Mbits/sec
-[  3]  0.0-60.0 sec   409 MBytes  57.1 Mbits/sec
-
-------=_NextPartTM-000-4c8d15d4-fd13-4621-af0b-01be93c120d3
+------=_NextPartTM-000-c92436c2-ad30-4fc5-a0e6-56215051a972
 Content-Type: text/plain;
 	name="InterScan_Disclaimer.txt"
 Content-Transfer-Encoding: 7bit
@@ -157,4 +137,4 @@ Register number: HRB 52 497
 
 ****************************************************************************
 
-------=_NextPartTM-000-4c8d15d4-fd13-4621-af0b-01be93c120d3--
+------=_NextPartTM-000-c92436c2-ad30-4fc5-a0e6-56215051a972--
