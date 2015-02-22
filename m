@@ -1,134 +1,145 @@
-From: Markus Stockhausen <stockhausen@collogia.de>
-Subject: [PATCH v2 7/7] AES for PPC/SPE - kernel config
-Date: Sun, 22 Feb 2015 10:00:10 +0100
-Message-ID: <714284f3-3db3-4a04-a5f5-f1630114d8f5@EXCHANGE.collogia.de>
+From: sri sowj <srisowj4linux@gmail.com>
+Subject: Re: communicating from the user space
+Date: Sun, 22 Feb 2015 18:32:34 +0530
+Message-ID: <CAHTT9VKQ2nB92SgRsGYemgTO6tTDucKyOs-9uCQn9+vAweQwuQ@mail.gmail.com>
+References: <CAHTT9VLmj8A7V5t+P9Zc02r5nyv37VMfa=QwPOuiMS9WFdXUxg@mail.gmail.com>
+	<1522393.KEIVXizgKy@tachyon.chronox.de>
+	<CAHTT9VJhyHRMCsOZ+Unq7zTXNq7+iQpNvKCktPhDbZ_JA6vmsg@mail.gmail.com>
+	<1543956.4M98jElNTF@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_NextPartTM-000-0625d425-0948-4383-a9de-154cfa1ba2d2"
-Cc: <linuxppc-dev@lists.ozlabs.org>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailrelay.collogia.de ([194.8.207.98]:18014 "HELO
-	mailrelay.collogia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751744AbbBVJAM (ORCPT
+Received: from mail-pa0-f44.google.com ([209.85.220.44]:41934 "EHLO
+	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752149AbbBVNCf (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 22 Feb 2015 04:00:12 -0500
+	Sun, 22 Feb 2015 08:02:35 -0500
+Received: by padfb1 with SMTP id fb1so20518553pad.8
+        for <linux-crypto@vger.kernel.org>; Sun, 22 Feb 2015 05:02:35 -0800 (PST)
+In-Reply-To: <1543956.4M98jElNTF@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Hi Stephen,
 
-This is a multi-part message in MIME format.
+It was a great information with respective PF_ALG , I have explored a
+bit on openssl and algorithms prospect , Please let me know if
+anything to add to it.
 
-------=_NextPartTM-000-0625d425-0948-4383-a9de-154cfa1ba2d2
-Content-Type: text/plain
+openssl crypto engine:
 
-[PATCH v2 7/7] AES for PPC/SPE - kernel config
+below are the steps to enable openssl to communicate using pf/af_alg.
 
-Integrate the module into the kernel configuration
+#1:git clone http://src.carnivore.it/users/common/af_alg/
+#2:cd af_alg/
+#3:make
+#4:sudo cp libaf_alg.so /usr/lib/arm-linux-gnueabi/openssl-1.0.0/engines/
+#5:sudo chmod 644 /usr/lib/arm-linux-gnueabi/openssl-1.0.0/engines/libaf_alg.so
 
-v2 changes
-- better explanation of use case in help text
 
-Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
+Algorithms supported by pf/af_alg from user space to test:
 
-diff --git a/arch/powerpc/crypto/Makefile b/arch/powerpc/crypto/Makefile
-index a07e763..1698fb9 100644
---- a/arch/powerpc/crypto/Makefile
-+++ b/arch/powerpc/crypto/Makefile
-@@ -4,8 +4,10 @@
- # Arch-specific CryptoAPI modules.
- #
- 
-+obj-$(CONFIG_CRYPTO_AES_PPC_SPE) += aes-ppc-spe.o
- obj-$(CONFIG_CRYPTO_SHA1_PPC) += sha1-powerpc.o
- obj-$(CONFIG_CRYPTO_SHA256_PPC_SPE) += sha256-ppc-spe.o
- 
-+aes-ppc-spe-y := aes-spe-core.o aes-spe-keys.o aes-tab-4k.o aes-spe-modes.o aes_spe_glue.o
- sha1-powerpc-y := sha1-powerpc-asm.o sha1.o
- sha256-ppc-spe-y := sha256-spe-asm.o sha256_spe_glue.o
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 86d35be..f34d136 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -857,6 +857,19 @@ config CRYPTO_AES_ARM_BS
- 	  This implementation does not rely on any lookup tables so it is
- 	  believed to be invulnerable to cache timing attacks.
- 
-+config CRYPTO_AES_PPC_SPE
-+	tristate "AES cipher algorithms (PPC SPE)"
-+	depends on PPC && SPE
-+	help
-+	  AES cipher algorithms (FIPS-197). Additionally the acceleration
-+	  for popular block cipher modes ECB, CBC, CTR and XTS is supported.
-+	  This module should only be used for low power (router) devices
-+	  without hardware AES acceleration (e.g. caam crypto). It reduces the
-+	  size of the AES tables from 16KB to 8KB + 256 bytes and mitigates
-+	  timining attacks. Nevertheless it might be not as secure as other
-+	  architecture specific assembler implementations that work on 1KB
-+	  tables or 256 bytes S-boxes.
-+
- config CRYPTO_ANUBIS
- 	tristate "Anubis cipher algorithm"
- 	select CRYPTO_ALGAPI
+CIPHERS=aes-128-cbc aes-192-cbc aes-256-cbc des-cbc des-ede3-cbc
+DIGESTS=md4 md5 sha1 sha224 sha256 sha512
 
-------=_NextPartTM-000-0625d425-0948-4383-a9de-154cfa1ba2d2
-Content-Type: text/plain;
-	name="InterScan_Disclaimer.txt"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename="InterScan_Disclaimer.txt"
 
-****************************************************************************
-Diese E-Mail enthält vertrauliche und/oder rechtlich geschützte
-Informationen. Wenn Sie nicht der richtige Adressat sind oder diese E-Mail
-irrtümlich erhalten haben, informieren Sie bitte sofort den Absender und
-vernichten Sie diese Mail. Das unerlaubte Kopieren sowie die unbefugte
-Weitergabe dieser Mail ist nicht gestattet.
+Next step is ,I would like to see the support available to write and
+test more and more samples/test utilities between PF/AF_ALG and
+cryptodev .
 
-Über das Internet versandte E-Mails können unter fremden Namen erstellt oder
-manipuliert werden. Deshalb ist diese als E-Mail verschickte Nachricht keine
-rechtsverbindliche Willenserklärung.
+BR,
+SriSowj
 
-Collogia
-Unternehmensberatung AG
-Ubierring 11
-D-50678 Köln
 
-Vorstand:
-Kadir Akin
-Dr. Michael Höhnerbach
 
-Vorsitzender des Aufsichtsrates:
-Hans Kristian Langva
-
-Registergericht: Amtsgericht Köln
-Registernummer: HRB 52 497
-
-This e-mail may contain confidential and/or privileged information. If you
-are not the intended recipient (or have received this e-mail in error)
-please notify the sender immediately and destroy this e-mail. Any
-unauthorized copying, disclosure or distribution of the material in this
-e-mail is strictly forbidden.
-
-e-mails sent over the internet may have been written under a wrong name or
-been manipulated. That is why this message sent as an e-mail is not a
-legally binding declaration of intention.
-
-Collogia
-Unternehmensberatung AG
-Ubierring 11
-D-50678 Köln
-
-executive board:
-Kadir Akin
-Dr. Michael Höhnerbach
-
-President of the supervisory board:
-Hans Kristian Langva
-
-Registry office: district court Cologne
-Register number: HRB 52 497
-
-****************************************************************************
-
-------=_NextPartTM-000-0625d425-0948-4383-a9de-154cfa1ba2d2--
+On Sat, Feb 21, 2015 at 12:31 PM, Stephan Mueller <smueller@chronox.de> wrote:
+> Am Samstag, 21. Februar 2015, 08:39:05 schrieb sri sowj:
+>
+> Hi sri,
+>
+>> Hi Stephen,
+>>
+>> Thank you very much for the information provided.
+>>
+>> I will try to explore more on AF_ALG , in between please can you also
+>> provide information regarding below ?
+>> #1: how openssl communicates to crypto h/w using PF_ALG
+>
+> Search the net, there is an engine available
+>
+>> #2: How man algorithms are supported?
+>
+> All that the kernel crypto API supports
+>
+>> #3: are there any samples to get start with.
+>
+> Maybe you look into libkcapi -- there are plenty of examples.
+>>
+>> but if you can provide some info regarding cryptodev-linux from the
+>> openssl prospect it will be more helpful.
+>
+> cryptodev-linux is not merged into the kernel and it looks that it never will
+> considering the presence of AF_ALG
+>>
+>>
+>> BR,
+>> Srisowj
+>>
+>> On Sat, Feb 21, 2015 at 2:28 AM, Stephan Mueller <smueller@chronox.de>
+> wrote:
+>> > Am Samstag, 21. Februar 2015, 01:27:04 schrieb sri sowj:
+>> >
+>> > Hi sri,
+>> >
+>> >> Hi ,
+>> >>
+>> >> I want to interact with Crypto Hardware from user space using openssl
+>> >> like libraries based applications through cryptodev-linux interface.
+>> >>
+>> >> it looks like openssl comes with cryptodev-linux support(through
+>> >> eng_cryptodev.c) .
+>> >> When I downloaded openssl,eng_cryptodev.c file is available by default.
+>> >>
+>> >> below link refers about eng_cryptodev.c for openssl support :
+>> >>
+>> >> http://repo.or.cz/w/cryptodev-linux.git/commitdiff/56cc4e3b8b761cb34f928f
+>> >> 4ee e59755d1f0afc53
+>> >>
+>> >> Note:looks like there are some additional changes done on
+>> >> eng_cryptodev.c file available in updated openssl source code.
+>> >>
+>> >> There seems to be some changes/patches  also available recently for
+>> >> cryptodev-linux,below contains reference information.
+>> >>
+>> >> http://rt.openssl.org/Ticket/Display.html?id=2770&user=guest&pass=guest
+>> >>
+>> >>
+>> >> Please let me know if my understanding is incorrect .
+>> >
+>> > See AF_ALG and a generic user space library around it:
+>> >
+>> > http://www.chronox.de/libkcapi.html
+>> >
+>> >> BR,
+>> >> Srisowj
+>> >> --
+>> >> To unsubscribe from this list: send the line "unsubscribe linux-crypto"
+>> >> in
+>> >> the body of a message to majordomo@vger.kernel.org
+>> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> >
+>> > --
+>> > Ciao
+>> > Stephan
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> --
+> Ciao
+> Stephan
