@@ -1,42 +1,46 @@
 From: Markus Stockhausen <stockhausen@collogia.de>
-Subject: [PATCH v2 5/7] AES for PPC/SPE - ECB/CBC/CTR/XTS modes
-Date: Sun, 22 Feb 2015 10:00:00 +0100
-Message-ID: <50c14ebb-3c6b-4738-9be4-8f94141f4024@EXCHANGE.collogia.de>
+Subject: [PATCH v2 6/7] AES for PPC/SPE - glue code
+Date: Sun, 22 Feb 2015 10:00:05 +0100
+Message-ID: <069491e3-7e09-48f2-a0d6-254ba6ddf23c@EXCHANGE.collogia.de>
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_NextPartTM-000-e59b641c-302d-4b94-8aea-facf7f35fab7"
+	boundary="----=_NextPartTM-000-1bc11707-24c4-4c3e-aa55-5251b0ed453d"
 Cc: <linuxppc-dev@lists.ozlabs.org>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailrelay.collogia.de ([194.8.207.98]:17997 "HELO
+Received: from mailrelay.collogia.de ([194.8.207.98]:18004 "HELO
 	mailrelay.collogia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751744AbbBVJAC (ORCPT
+	with SMTP id S1751744AbbBVJAH (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 22 Feb 2015 04:00:02 -0500
+	Sun, 22 Feb 2015 04:00:07 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
 This is a multi-part message in MIME format.
 
-------=_NextPartTM-000-e59b641c-302d-4b94-8aea-facf7f35fab7
+------=_NextPartTM-000-1bc11707-24c4-4c3e-aa55-5251b0ed453d
 Content-Type: text/plain
 
-[PATCH v2 5/7] AES for PPC/SPE - ECB/CBC/CTR/XTS modes
+[PATCH v2 6/7] AES for PPC/SPE - glue code
 
-The assembler block cipher module that controls the core
-AES functions.
+Integrate the assembler modules into the kernel crypto
+framework. Take care to avoid long intervals of disabled
+preemption.
 
 Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
 
-diff --git a/arch/powerpc/crypto/aes-spe-modes.S b/arch/powerpc/crypto/aes-spe-modes.S
+diff --git a/arch/powerpc/crypto/aes_spe_glue.c b/arch/powerpc/crypto/aes_spe_glue.c
 new file mode 100644
-index 0000000..ad48032
+index 0000000..bd5e63f
 --- /dev/null
-+++ b/arch/powerpc/crypto/aes-spe-modes.S
-@@ -0,0 +1,630 @@
++++ b/arch/powerpc/crypto/aes_spe_glue.c
+@@ -0,0 +1,512 @@
 +/*
-+ * AES modes (ECB/CBC/CTR/XTS) for PPC AES implementation
++ * Glue code for AES implementation for SPE instructions (PPC)
++ *
++ * Based on generic implementation. The assembler module takes care
++ * about the SPE registers so it can run from interrupt context.
 + *
 + * Copyright (c) 2015 Markus Stockhausen <stockhausen@collogia.de>
 + *
@@ -47,626 +51,505 @@ index 0000000..ad48032
 + *
 + */
 +
-+#include <asm/ppc_asm.h>
-+#include "aes-spe-regs.h"
-+
-+#ifdef __BIG_ENDIAN__			/* Macros for big endian builds	*/
-+
-+#define LOAD_DATA(reg, off) \
-+	lwz		reg,off(rSP);	/* load with offset		*/
-+#define SAVE_DATA(reg, off) \
-+	stw		reg,off(rDP);	/* save with offset		*/
-+#define NEXT_BLOCK \
-+	addi		rSP,rSP,16;	/* increment pointers per bloc	*/ \
-+	addi		rDP,rDP,16;
-+#define LOAD_IV(reg, off) \
-+	lwz		reg,off(rIP);	/* IV loading with offset	*/
-+#define SAVE_IV(reg, off) \
-+	stw		reg,off(rIP);	/* IV saving with offset	*/
-+#define START_IV			/* nothing to reset		*/
-+#define CBC_DEC 16			/* CBC decrement per block	*/
-+#define CTR_DEC 1			/* CTR decrement one byte	*/
-+
-+#else					/* Macros for little endian	*/
-+
-+#define LOAD_DATA(reg, off) \
-+	lwbrx		reg,0,rSP;	/* load reversed		*/ \
-+	addi		rSP,rSP,4;	/* and increment pointer	*/
-+#define SAVE_DATA(reg, off) \
-+	stwbrx		reg,0,rDP;	/* save reversed		*/ \
-+	addi		rDP,rDP,4;	/* and increment pointer	*/
-+#define NEXT_BLOCK			/* nothing todo			*/
-+#define LOAD_IV(reg, off) \
-+	lwbrx		reg,0,rIP;	/* load reversed		*/ \
-+	addi		rIP,rIP,4;	/* and increment pointer	*/
-+#define SAVE_IV(reg, off) \
-+	stwbrx		reg,0,rIP;	/* load reversed		*/ \
-+	addi		rIP,rIP,4;	/* and increment pointer	*/
-+#define START_IV \
-+	subi		rIP,rIP,16;	/* must reset pointer		*/
-+#define CBC_DEC 32			/* 2 blocks because of incs	*/
-+#define CTR_DEC 17			/* 1 block because of incs	*/
-+
-+#endif
-+
-+#define SAVE_0_REGS
-+#define LOAD_0_REGS
-+
-+#define SAVE_4_REGS \
-+	stw		rI0,96(r1);	/* save 32 bit registers	*/ \
-+	stw		rI1,100(r1);					   \
-+	stw		rI2,104(r1);					   \
-+	stw		rI3,108(r1);
-+
-+#define LOAD_4_REGS \
-+	lwz		rI0,96(r1);	/* restore 32 bit registers	*/ \
-+	lwz		rI1,100(r1);					   \
-+	lwz		rI2,104(r1);					   \
-+	lwz		rI3,108(r1);
-+
-+#define SAVE_8_REGS \
-+	SAVE_4_REGS							   \
-+	stw		rG0,112(r1);	/* save 32 bit registers	*/ \
-+	stw		rG1,116(r1);					   \
-+	stw		rG2,120(r1);					   \
-+	stw		rG3,124(r1);
-+
-+#define LOAD_8_REGS \
-+	LOAD_4_REGS							   \
-+	lwz		rG0,112(r1);	/* restore 32 bit registers	*/ \
-+	lwz		rG1,116(r1);					   \
-+	lwz		rG2,120(r1);					   \
-+	lwz		rG3,124(r1);
-+
-+#define INITIALIZE_CRYPT(tab,nr32bitregs) \
-+	mflr		r0;						   \
-+	stwu		r1,-160(r1);	/* create stack frame		*/ \
-+	lis		rT0,tab@h;	/* en-/decryption table pointer	*/ \
-+	stw		r0,8(r1);	/* save link register		*/ \
-+	ori		rT0,rT0,tab@l;					   \
-+	evstdw		r14,16(r1);					   \
-+	mr		rKS,rKP;					   \
-+	evstdw		r15,24(r1);	/* We must save non volatile	*/ \
-+	evstdw		r16,32(r1);	/* registers. Take the chance	*/ \
-+	evstdw		r17,40(r1);	/* and save the SPE part too	*/ \
-+	evstdw		r18,48(r1);					   \
-+	evstdw		r19,56(r1);					   \
-+	evstdw		r20,64(r1);					   \
-+	evstdw		r21,72(r1);					   \
-+	evstdw		r22,80(r1);					   \
-+	evstdw		r23,88(r1);					   \
-+	SAVE_##nr32bitregs##_REGS
-+
-+#define FINALIZE_CRYPT(nr32bitregs) \
-+	lwz		r0,8(r1);					   \
-+	evldw		r14,16(r1);	/* restore SPE registers	*/ \
-+	evldw		r15,24(r1);					   \
-+	evldw		r16,32(r1);					   \
-+	evldw		r17,40(r1);					   \
-+	evldw		r18,48(r1);					   \
-+	evldw		r19,56(r1);					   \
-+	evldw		r20,64(r1);					   \
-+	evldw		r21,72(r1);					   \
-+	evldw		r22,80(r1);					   \
-+	evldw		r23,88(r1);					   \
-+	LOAD_##nr32bitregs##_REGS					   \
-+	mtlr		r0;		/* restore link register	*/ \
-+	xor		r0,r0,r0;					   \
-+	stw		r0,16(r1);	/* delete sensitive data	*/ \
-+	stw		r0,24(r1);	/* that we might have pushed	*/ \
-+	stw		r0,32(r1);	/* from other context that runs	*/ \
-+	stw		r0,40(r1);	/* the same code		*/ \
-+	stw		r0,48(r1);					   \
-+	stw		r0,56(r1);					   \
-+	stw		r0,64(r1);					   \
-+	stw		r0,72(r1);					   \
-+	stw		r0,80(r1);					   \
-+	stw		r0,88(r1);					   \
-+	addi		r1,r1,160;	/* cleanup stack frame		*/
-+
-+#define ENDIAN_SWAP(t0, t1, s0, s1) \
-+	rotrwi		t0,s0,8;	/* swap endianness for 2 GPRs	*/ \
-+	rotrwi		t1,s1,8;					   \
-+	rlwimi		t0,s0,8,8,15;					   \
-+	rlwimi		t1,s1,8,8,15;					   \
-+	rlwimi		t0,s0,8,24,31;					   \
-+	rlwimi		t1,s1,8,24,31;
-+
-+#define GF128_MUL(d0, d1, d2, d3, t0) \
-+	li		t0,0x87;	/* multiplication in GF128	*/ \
-+	cmpwi		d3,-1;						   \
-+	iselgt		t0,0,t0;					   \
-+	rlwimi		d3,d2,0,0,0;	/* propagate "carry" bits	*/ \
-+	rotlwi		d3,d3,1;					   \
-+	rlwimi		d2,d1,0,0,0;					   \
-+	rotlwi		d2,d2,1;					   \
-+	rlwimi		d1,d0,0,0,0;					   \
-+	slwi		d0,d0,1;	/* shift left 128 bit		*/ \
-+	rotlwi		d1,d1,1;					   \
-+	xor		d0,d0,t0;
-+
-+#define START_KEY(d0, d1, d2, d3) \
-+	lwz		rW0,0(rKP);					   \
-+	mtctr		rRR;						   \
-+	lwz		rW1,4(rKP);					   \
-+	lwz		rW2,8(rKP);					   \
-+	lwz		rW3,12(rKP);					   \
-+	xor		rD0,d0,rW0;					   \
-+	xor		rD1,d1,rW1;					   \
-+	xor		rD2,d2,rW2;					   \
-+	xor		rD3,d3,rW3;
++#include <crypto/aes.h>
++#include <linux/module.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/errno.h>
++#include <linux/crypto.h>
++#include <asm/byteorder.h>
++#include <asm/switch_to.h>
++#include <crypto/algapi.h>
 +
 +/*
-+ * ppc_encrypt_aes(u8 *out, const u8 *in, u32 *key_enc,
-+ *		   u32 rounds)
-+ *
-+ * called from glue layer to encrypt a single 16 byte block
-+ * round values are AES128 = 4, AES192 = 5, AES256 = 6
++ * MAX_BYTES defines the number of bytes that are allowed to be processed
++ * between preempt_disable() and preempt_enable(). e500 cores can issue two
++ * instructions per clock cycle using one 32/64 bit unit (SU1) and one 32
++ * bit unit (SU2). One of these can be a memory access that is executed via
++ * a single load and store unit (LSU). XTS-AES-256 takes ~780 operations per
++ * 16 byte block block or 25 cycles per byte. Thus 768 bytes of input data
++ * will need an estimated maximum of 20,000 cycles. Headroom for cache misses
++ * included. Even with the low end model clocked at 667 MHz this equals to a
++ * critical time window of less than 30us. The value has been choosen to
++ * process a 512 byte disk block in one or a large 1400 bytes IPsec network
++ * packet in two runs.
 + *
 + */
-+_GLOBAL(ppc_encrypt_aes)
-+	INITIALIZE_CRYPT(PPC_AES_4K_ENCTAB, 0)
-+	LOAD_DATA(rD0, 0)
-+	LOAD_DATA(rD1, 4)
-+	LOAD_DATA(rD2, 8)
-+	LOAD_DATA(rD3, 12)
-+	START_KEY(rD0, rD1, rD2, rD3)
-+	bl		ppc_encrypt_block
-+	xor		rD0,rD0,rW0
-+	SAVE_DATA(rD0, 0)
-+	xor		rD1,rD1,rW1
-+	SAVE_DATA(rD1, 4)
-+	xor		rD2,rD2,rW2
-+	SAVE_DATA(rD2, 8)
-+	xor		rD3,rD3,rW3
-+	SAVE_DATA(rD3, 12)
-+	FINALIZE_CRYPT(0)
-+	blr
++#define MAX_BYTES 768
++
++struct ppc_aes_ctx {
++	u32 key_enc[AES_MAX_KEYLENGTH_U32];
++	u32 key_dec[AES_MAX_KEYLENGTH_U32];
++	u32 rounds;
++};
++
++struct ppc_xts_ctx {
++	u32 key_enc[AES_MAX_KEYLENGTH_U32];
++	u32 key_dec[AES_MAX_KEYLENGTH_U32];
++	u32 key_twk[AES_MAX_KEYLENGTH_U32];
++	u32 rounds;
++};
++
++extern void ppc_encrypt_aes(u8 *out, const u8 *in, u32 *key_enc, u32 rounds);
++extern void ppc_decrypt_aes(u8 *out, const u8 *in, u32 *key_dec, u32 rounds);
++extern void ppc_encrypt_ecb(u8 *out, const u8 *in, u32 *key_enc, u32 rounds,
++			    u32 bytes);
++extern void ppc_decrypt_ecb(u8 *out, const u8 *in, u32 *key_dec, u32 rounds,
++			    u32 bytes);
++extern void ppc_encrypt_cbc(u8 *out, const u8 *in, u32 *key_enc, u32 rounds,
++			    u32 bytes, u8 *iv);
++extern void ppc_decrypt_cbc(u8 *out, const u8 *in, u32 *key_dec, u32 rounds,
++			    u32 bytes, u8 *iv);
++extern void ppc_crypt_ctr  (u8 *out, const u8 *in, u32 *key_enc, u32 rounds,
++			    u32 bytes, u8 *iv);
++extern void ppc_encrypt_xts(u8 *out, const u8 *in, u32 *key_enc, u32 rounds,
++			    u32 bytes, u8 *iv, u32 *key_twk);
++extern void ppc_decrypt_xts(u8 *out, const u8 *in, u32 *key_dec, u32 rounds,
++			    u32 bytes, u8 *iv, u32 *key_twk);
++
++extern void ppc_expand_key_128(u32 *key_enc, const u8 *key);
++extern void ppc_expand_key_192(u32 *key_enc, const u8 *key);
++extern void ppc_expand_key_256(u32 *key_enc, const u8 *key);
++
++extern void ppc_generate_decrypt_key(u32 *key_dec,u32 *key_enc,
++				     unsigned int key_len);
++
++static void spe_begin(void)
++{
++	/* disable preemption and save users SPE registers if required */
++	preempt_disable();
++	enable_kernel_spe();
++}
++
++static void spe_end(void)
++{
++	/* reenable preemption */
++	preempt_enable();
++}
++
++static int ppc_aes_setkey(struct crypto_tfm *tfm, const u8 *in_key,
++		unsigned int key_len)
++{
++	struct ppc_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	if (key_len != AES_KEYSIZE_128 &&
++	    key_len != AES_KEYSIZE_192 &&
++	    key_len != AES_KEYSIZE_256) {
++		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
++		return -EINVAL;
++	}
++
++	switch (key_len) {
++	case AES_KEYSIZE_128:
++		ctx->rounds = 4;
++		ppc_expand_key_128(ctx->key_enc, in_key);
++		break;
++	case AES_KEYSIZE_192:
++		ctx->rounds = 5;
++		ppc_expand_key_192(ctx->key_enc, in_key);
++		break;
++	case AES_KEYSIZE_256:
++		ctx->rounds = 6;
++		ppc_expand_key_256(ctx->key_enc, in_key);
++		break;
++	}
++
++	ppc_generate_decrypt_key(ctx->key_dec, ctx->key_enc, key_len);
++
++	return 0;
++}
++
++static int ppc_xts_setkey(struct crypto_tfm *tfm, const u8 *in_key,
++		   unsigned int key_len)
++{
++	struct ppc_xts_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	key_len >>= 1;
++
++	if (key_len != AES_KEYSIZE_128 &&
++	    key_len != AES_KEYSIZE_192 &&
++	    key_len != AES_KEYSIZE_256) {
++		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
++		return -EINVAL;
++	}
++
++	switch (key_len) {
++	case AES_KEYSIZE_128:
++		ctx->rounds = 4;
++		ppc_expand_key_128(ctx->key_enc, in_key);
++		ppc_expand_key_128(ctx->key_twk, in_key + AES_KEYSIZE_128);
++		break;
++	case AES_KEYSIZE_192:
++		ctx->rounds = 5;
++		ppc_expand_key_192(ctx->key_enc, in_key);
++		ppc_expand_key_192(ctx->key_twk, in_key + AES_KEYSIZE_192);
++		break;
++	case AES_KEYSIZE_256:
++		ctx->rounds = 6;
++		ppc_expand_key_256(ctx->key_enc, in_key);
++		ppc_expand_key_256(ctx->key_twk, in_key + AES_KEYSIZE_256);
++		break;
++	}
++
++	ppc_generate_decrypt_key(ctx->key_dec, ctx->key_enc, key_len);
++
++	return 0;
++}
++
++static void ppc_aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++{
++	struct ppc_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	spe_begin();
++	ppc_encrypt_aes(out, in, ctx->key_enc, ctx->rounds);
++	spe_end();
++}
++
++static void ppc_aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++{
++	struct ppc_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	spe_begin();
++	ppc_decrypt_aes(out, in, ctx->key_dec, ctx->rounds);
++	spe_end();
++}
++
++static int ppc_ecb_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++			   struct scatterlist *src, unsigned int nbytes)
++{
++	struct ppc_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	unsigned int ubytes;
++	int err;
++
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		ubytes = nbytes > MAX_BYTES ?
++			 nbytes - MAX_BYTES : nbytes & (AES_BLOCK_SIZE - 1);
++		nbytes -= ubytes;
++
++		spe_begin();
++		ppc_encrypt_ecb(walk.dst.virt.addr, walk.src.virt.addr,
++				ctx->key_enc, ctx->rounds, nbytes);
++		spe_end();
++
++		err = blkcipher_walk_done(desc, &walk, ubytes);
++	}
++
++	return err;
++}
++
++static int ppc_ecb_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++			   struct scatterlist *src, unsigned int nbytes)
++{
++	struct ppc_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	unsigned int ubytes;
++	int err;
++
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		ubytes = nbytes > MAX_BYTES ?
++			 nbytes - MAX_BYTES : nbytes & (AES_BLOCK_SIZE - 1);
++		nbytes -= ubytes;
++
++		spe_begin();
++		ppc_decrypt_ecb(walk.dst.virt.addr, walk.src.virt.addr,
++				ctx->key_dec, ctx->rounds, nbytes);
++		spe_end();
++
++		err = blkcipher_walk_done(desc, &walk, ubytes);
++	}
++
++	return err;
++}
++
++static int ppc_cbc_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++			   struct scatterlist *src, unsigned int nbytes)
++{
++	struct ppc_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	unsigned int ubytes;
++	int err;
++
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		ubytes = nbytes > MAX_BYTES ?
++			 nbytes - MAX_BYTES : nbytes & (AES_BLOCK_SIZE - 1);
++		nbytes -= ubytes;
++
++		spe_begin();
++		ppc_encrypt_cbc(walk.dst.virt.addr, walk.src.virt.addr,
++				ctx->key_enc, ctx->rounds, nbytes, walk.iv);
++		spe_end();
++
++		err = blkcipher_walk_done(desc, &walk, ubytes);
++	}
++
++	return err;
++}
++
++static int ppc_cbc_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++			   struct scatterlist *src, unsigned int nbytes)
++{
++	struct ppc_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	unsigned int ubytes;
++	int err;
++
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		ubytes = nbytes > MAX_BYTES ?
++			 nbytes - MAX_BYTES : nbytes & (AES_BLOCK_SIZE - 1);
++		nbytes -= ubytes;
++
++		spe_begin();
++		ppc_decrypt_cbc(walk.dst.virt.addr, walk.src.virt.addr,
++				ctx->key_dec, ctx->rounds, nbytes, walk.iv);
++		spe_end();
++
++		err = blkcipher_walk_done(desc, &walk, ubytes);
++	}
++
++	return err;
++}
++
++static int ppc_ctr_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++			 struct scatterlist *src, unsigned int nbytes)
++{
++	struct ppc_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	unsigned int pbytes, ubytes;
++	int err;
++
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt_block(desc, &walk, AES_BLOCK_SIZE);
++
++	while ((pbytes = walk.nbytes)) {
++		pbytes = pbytes > MAX_BYTES ? MAX_BYTES : pbytes;
++		pbytes = pbytes == nbytes ?
++			 nbytes : pbytes & ~(AES_BLOCK_SIZE - 1);
++		ubytes = walk.nbytes - pbytes;
++
++		spe_begin();
++		ppc_crypt_ctr(walk.dst.virt.addr, walk.src.virt.addr,
++			      ctx->key_enc, ctx->rounds, pbytes , walk.iv);
++		spe_end();
++
++		nbytes -= pbytes;
++		err = blkcipher_walk_done(desc, &walk, ubytes);
++	}
++
++	return err;
++}
++
++static int ppc_xts_encrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++			   struct scatterlist *src, unsigned int nbytes)
++{
++	struct ppc_xts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	unsigned int ubytes;
++	int err;
++	u32 *twk;
++
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++	twk = ctx->key_twk;
++
++	while ((nbytes = walk.nbytes)) {
++		ubytes = nbytes > MAX_BYTES ?
++			 nbytes - MAX_BYTES : nbytes & (AES_BLOCK_SIZE - 1);
++		nbytes -= ubytes;
++
++		spe_begin();
++		ppc_encrypt_xts(walk.dst.virt.addr, walk.src.virt.addr,
++				ctx->key_enc, ctx->rounds, nbytes, walk.iv, twk);
++		spe_end();
++
++		twk = NULL;
++		err = blkcipher_walk_done(desc, &walk, ubytes);
++	}
++
++	return err;
++}
++
++static int ppc_xts_decrypt(struct blkcipher_desc *desc, struct scatterlist *dst,
++			   struct scatterlist *src, unsigned int nbytes)
++{
++	struct ppc_xts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
++	struct blkcipher_walk walk;
++	unsigned int ubytes;
++	int err;
++	u32 *twk;
++
++	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	blkcipher_walk_init(&walk, dst, src, nbytes);
++	err = blkcipher_walk_virt(desc, &walk);
++	twk = ctx->key_twk;
++
++	while ((nbytes = walk.nbytes)) {
++		ubytes = nbytes > MAX_BYTES ?
++			 nbytes - MAX_BYTES : nbytes & (AES_BLOCK_SIZE - 1);
++		nbytes -= ubytes;
++
++		spe_begin();
++		ppc_decrypt_xts(walk.dst.virt.addr, walk.src.virt.addr,
++				ctx->key_dec, ctx->rounds, nbytes, walk.iv, twk);
++		spe_end();
++
++		twk = NULL;
++		err = blkcipher_walk_done(desc, &walk, ubytes);
++	}
++
++	return err;
++}
 +
 +/*
-+ * ppc_decrypt_aes(u8 *out, const u8 *in, u32 *key_dec,
-+ *		   u32 rounds)
-+ *
-+ * called from glue layer to decrypt a single 16 byte block
-+ * round values are AES128 = 4, AES192 = 5, AES256 = 6
++ * Algorithm definitions. Disabling alignment (cra_alignmask=0) was chosen
++ * because the e500 platform can handle unaligned reads/writes very efficently.
++ * This improves IPsec thoughput by another few percent. Additionally we assume
++ * that AES context is always aligned to at least 8 bytes because it is created
++ * with kmalloc() in the crypto infrastructure
 + *
 + */
-+_GLOBAL(ppc_decrypt_aes)
-+	INITIALIZE_CRYPT(PPC_AES_4K_DECTAB,0)
-+	LOAD_DATA(rD0, 0)
-+	addi		rT1,rT0,4096
-+	LOAD_DATA(rD1, 4)
-+	LOAD_DATA(rD2, 8)
-+	LOAD_DATA(rD3, 12)
-+	START_KEY(rD0, rD1, rD2, rD3)
-+	bl		ppc_decrypt_block
-+	xor		rD0,rD0,rW0
-+	SAVE_DATA(rD0, 0)
-+	xor		rD1,rD1,rW1
-+	SAVE_DATA(rD1, 4)
-+	xor		rD2,rD2,rW2
-+	SAVE_DATA(rD2, 8)
-+	xor		rD3,rD3,rW3
-+	SAVE_DATA(rD3, 12)
-+	FINALIZE_CRYPT(0)
-+	blr
++static struct crypto_alg aes_algs[] = { {
++	.cra_name		=	"aes",
++	.cra_driver_name	=	"aes-ppc-spe",
++	.cra_priority		=	300,
++	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize		=	AES_BLOCK_SIZE,
++	.cra_ctxsize		=	sizeof(struct ppc_aes_ctx),
++	.cra_alignmask		=	0,
++	.cra_module		=	THIS_MODULE,
++	.cra_u			=	{
++		.cipher = {
++			.cia_min_keysize	=	AES_MIN_KEY_SIZE,
++			.cia_max_keysize	=	AES_MAX_KEY_SIZE,
++			.cia_setkey		=	ppc_aes_setkey,
++			.cia_encrypt		=	ppc_aes_encrypt,
++			.cia_decrypt		=	ppc_aes_decrypt
++		}
++	}
++}, {
++	.cra_name		=	"ecb(aes)",
++	.cra_driver_name	=	"ecb-ppc-spe",
++	.cra_priority		=	300,
++	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		=	AES_BLOCK_SIZE,
++	.cra_ctxsize		=	sizeof(struct ppc_aes_ctx),
++	.cra_alignmask		=	0,
++	.cra_type		=	&crypto_blkcipher_type,
++	.cra_module		=	THIS_MODULE,
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize		=	AES_MIN_KEY_SIZE,
++			.max_keysize		=	AES_MAX_KEY_SIZE,
++			.ivsize			=	AES_BLOCK_SIZE,
++			.setkey			=	ppc_aes_setkey,
++			.encrypt		=	ppc_ecb_encrypt,
++			.decrypt		=	ppc_ecb_decrypt,
++		}
++	}
++}, {
++	.cra_name		=	"cbc(aes)",
++	.cra_driver_name	=	"cbc-ppc-spe",
++	.cra_priority		=	300,
++	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		=	AES_BLOCK_SIZE,
++	.cra_ctxsize		=	sizeof(struct ppc_aes_ctx),
++	.cra_alignmask		=	0,
++	.cra_type		=	&crypto_blkcipher_type,
++	.cra_module		=	THIS_MODULE,
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize		=	AES_MIN_KEY_SIZE,
++			.max_keysize		=	AES_MAX_KEY_SIZE,
++			.ivsize			=	AES_BLOCK_SIZE,
++			.setkey			=	ppc_aes_setkey,
++			.encrypt		=	ppc_cbc_encrypt,
++			.decrypt		=	ppc_cbc_decrypt,
++		}
++	}
++}, {
++	.cra_name		=	"ctr(aes)",
++	.cra_driver_name	=	"ctr-ppc-spe",
++	.cra_priority		=	300,
++	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		=	1,
++	.cra_ctxsize		=	sizeof(struct ppc_aes_ctx),
++	.cra_alignmask		=	0,
++	.cra_type		=	&crypto_blkcipher_type,
++	.cra_module		=	THIS_MODULE,
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize		=	AES_MIN_KEY_SIZE,
++			.max_keysize		=	AES_MAX_KEY_SIZE,
++			.ivsize			=	AES_BLOCK_SIZE,
++			.setkey			=	ppc_aes_setkey,
++			.encrypt		=	ppc_ctr_crypt,
++			.decrypt		=	ppc_ctr_crypt,
++		}
++	}
++}, {
++	.cra_name		=	"xts(aes)",
++	.cra_driver_name	=	"xts-ppc-spe",
++	.cra_priority		=	300,
++	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_blocksize		=	AES_BLOCK_SIZE,
++	.cra_ctxsize		=	sizeof(struct ppc_xts_ctx),
++	.cra_alignmask		=	0,
++	.cra_type		=	&crypto_blkcipher_type,
++	.cra_module		=	THIS_MODULE,
++	.cra_u = {
++		.blkcipher = {
++			.min_keysize		=	AES_MIN_KEY_SIZE * 2,
++			.max_keysize		=	AES_MAX_KEY_SIZE * 2,
++			.ivsize			=	AES_BLOCK_SIZE,
++			.setkey			=	ppc_xts_setkey,
++			.encrypt		=	ppc_xts_encrypt,
++			.decrypt		=	ppc_xts_decrypt,
++		}
++	}
++} };
 +
-+/*
-+ * ppc_encrypt_ecb(u8 *out, const u8 *in, u32 *key_enc,
-+ *		   u32 rounds, u32 bytes);
-+ *
-+ * called from glue layer to encrypt multiple blocks via ECB
-+ * Bytes must be larger or equal 16 and only whole blocks are
-+ * processed. round values are AES128 = 4, AES192 = 5 and
-+ * AES256 = 6
-+ *
-+ */
-+_GLOBAL(ppc_encrypt_ecb)
-+	INITIALIZE_CRYPT(PPC_AES_4K_ENCTAB, 0)
-+ppc_encrypt_ecb_loop:
-+	LOAD_DATA(rD0, 0)
-+	mr		rKP,rKS
-+	LOAD_DATA(rD1, 4)
-+	subi		rLN,rLN,16
-+	LOAD_DATA(rD2, 8)
-+	cmpwi		rLN,15
-+	LOAD_DATA(rD3, 12)
-+	START_KEY(rD0, rD1, rD2, rD3)
-+	bl		ppc_encrypt_block
-+	xor		rD0,rD0,rW0
-+	SAVE_DATA(rD0, 0)
-+	xor		rD1,rD1,rW1
-+	SAVE_DATA(rD1, 4)
-+	xor		rD2,rD2,rW2
-+	SAVE_DATA(rD2, 8)
-+	xor		rD3,rD3,rW3
-+	SAVE_DATA(rD3, 12)
-+	NEXT_BLOCK
-+	bt		gt,ppc_encrypt_ecb_loop
-+	FINALIZE_CRYPT(0)
-+	blr
++static int __init ppc_aes_mod_init(void)
++{
++	return crypto_register_algs(aes_algs, ARRAY_SIZE(aes_algs));
++}
 +
-+/*
-+ * ppc_decrypt_ecb(u8 *out, const u8 *in, u32 *key_dec,
-+ *		   u32 rounds, u32 bytes);
-+ *
-+ * called from glue layer to decrypt multiple blocks via ECB
-+ * Bytes must be larger or equal 16 and only whole blocks are
-+ * processed. round values are AES128 = 4, AES192 = 5 and
-+ * AES256 = 6
-+ *
-+ */
-+_GLOBAL(ppc_decrypt_ecb)
-+	INITIALIZE_CRYPT(PPC_AES_4K_DECTAB, 0)
-+	addi		rT1,rT0,4096
-+ppc_decrypt_ecb_loop:
-+	LOAD_DATA(rD0, 0)
-+	mr		rKP,rKS
-+	LOAD_DATA(rD1, 4)
-+	subi		rLN,rLN,16
-+	LOAD_DATA(rD2, 8)
-+	cmpwi		rLN,15
-+	LOAD_DATA(rD3, 12)
-+	START_KEY(rD0, rD1, rD2, rD3)
-+	bl		ppc_decrypt_block
-+	xor		rD0,rD0,rW0
-+	SAVE_DATA(rD0, 0)
-+	xor		rD1,rD1,rW1
-+	SAVE_DATA(rD1, 4)
-+	xor		rD2,rD2,rW2
-+	SAVE_DATA(rD2, 8)
-+	xor		rD3,rD3,rW3
-+	SAVE_DATA(rD3, 12)
-+	NEXT_BLOCK
-+	bt		gt,ppc_decrypt_ecb_loop
-+	FINALIZE_CRYPT(0)
-+	blr
++static void __exit ppc_aes_mod_fini(void)
++{
++	crypto_unregister_algs(aes_algs, ARRAY_SIZE(aes_algs));
++}
 +
-+/*
-+ * ppc_encrypt_cbc(u8 *out, const u8 *in, u32 *key_enc,
-+ *		   32 rounds, u32 bytes, u8 *iv);
-+ *
-+ * called from glue layer to encrypt multiple blocks via CBC
-+ * Bytes must be larger or equal 16 and only whole blocks are
-+ * processed. round values are AES128 = 4, AES192 = 5 and
-+ * AES256 = 6
-+ *
-+ */
-+_GLOBAL(ppc_encrypt_cbc)
-+	INITIALIZE_CRYPT(PPC_AES_4K_ENCTAB, 4)
-+	LOAD_IV(rI0, 0)
-+	LOAD_IV(rI1, 4)
-+	LOAD_IV(rI2, 8)
-+	LOAD_IV(rI3, 12)
-+ppc_encrypt_cbc_loop:
-+	LOAD_DATA(rD0, 0)
-+	mr		rKP,rKS
-+	LOAD_DATA(rD1, 4)
-+	subi		rLN,rLN,16
-+	LOAD_DATA(rD2, 8)
-+	cmpwi		rLN,15
-+	LOAD_DATA(rD3, 12)
-+	xor		rD0,rD0,rI0
-+	xor		rD1,rD1,rI1
-+	xor		rD2,rD2,rI2
-+	xor		rD3,rD3,rI3
-+	START_KEY(rD0, rD1, rD2, rD3)
-+	bl		ppc_encrypt_block
-+	xor		rI0,rD0,rW0
-+	SAVE_DATA(rI0, 0)
-+	xor		rI1,rD1,rW1
-+	SAVE_DATA(rI1, 4)
-+	xor		rI2,rD2,rW2
-+	SAVE_DATA(rI2, 8)
-+	xor		rI3,rD3,rW3
-+	SAVE_DATA(rI3, 12)
-+	NEXT_BLOCK
-+	bt		gt,ppc_encrypt_cbc_loop
-+	START_IV
-+	SAVE_IV(rI0, 0)
-+	SAVE_IV(rI1, 4)
-+	SAVE_IV(rI2, 8)
-+	SAVE_IV(rI3, 12)
-+	FINALIZE_CRYPT(4)
-+	blr
++module_init(ppc_aes_mod_init);
++module_exit(ppc_aes_mod_fini);
 +
-+/*
-+ * ppc_decrypt_cbc(u8 *out, const u8 *in, u32 *key_dec,
-+ *		   u32 rounds, u32 bytes, u8 *iv);
-+ *
-+ * called from glue layer to decrypt multiple blocks via CBC
-+ * round values are AES128 = 4, AES192 = 5, AES256 = 6
-+ *
-+ */
-+_GLOBAL(ppc_decrypt_cbc)
-+	INITIALIZE_CRYPT(PPC_AES_4K_DECTAB, 4)
-+	li		rT1,15
-+	LOAD_IV(rI0, 0)
-+	andc		rLN,rLN,rT1
-+	LOAD_IV(rI1, 4)
-+	subi		rLN,rLN,16
-+	LOAD_IV(rI2, 8)
-+	add		rSP,rSP,rLN	/* reverse processing		*/
-+	LOAD_IV(rI3, 12)
-+	add		rDP,rDP,rLN
-+	LOAD_DATA(rD0, 0)
-+	addi		rT1,rT0,4096
-+	LOAD_DATA(rD1, 4)
-+	LOAD_DATA(rD2, 8)
-+	LOAD_DATA(rD3, 12)
-+	START_IV
-+	SAVE_IV(rD0, 0)
-+	SAVE_IV(rD1, 4)
-+	SAVE_IV(rD2, 8)
-+	cmpwi		rLN,16
-+	SAVE_IV(rD3, 12)
-+	bt		lt,ppc_decrypt_cbc_end
-+ppc_decrypt_cbc_loop:
-+	mr		rKP,rKS
-+	START_KEY(rD0, rD1, rD2, rD3)
-+	bl		ppc_decrypt_block
-+	subi		rLN,rLN,16
-+	subi		rSP,rSP,CBC_DEC
-+	xor		rW0,rD0,rW0
-+	LOAD_DATA(rD0, 0)
-+	xor		rW1,rD1,rW1
-+	LOAD_DATA(rD1, 4)
-+	xor		rW2,rD2,rW2
-+	LOAD_DATA(rD2, 8)
-+	xor		rW3,rD3,rW3
-+	LOAD_DATA(rD3, 12)
-+	xor		rW0,rW0,rD0
-+	SAVE_DATA(rW0, 0)
-+	xor		rW1,rW1,rD1
-+	SAVE_DATA(rW1, 4)
-+	xor		rW2,rW2,rD2
-+	SAVE_DATA(rW2, 8)
-+	xor		rW3,rW3,rD3
-+	SAVE_DATA(rW3, 12)
-+	cmpwi		rLN,15
-+	subi		rDP,rDP,CBC_DEC
-+	bt		gt,ppc_decrypt_cbc_loop
-+ppc_decrypt_cbc_end:
-+	mr		rKP,rKS
-+	START_KEY(rD0, rD1, rD2, rD3)
-+	bl		ppc_decrypt_block
-+	xor		rW0,rW0,rD0
-+	xor		rW1,rW1,rD1
-+	xor		rW2,rW2,rD2
-+	xor		rW3,rW3,rD3
-+	xor		rW0,rW0,rI0	/* decrypt with initial IV	*/
-+	SAVE_DATA(rW0, 0)
-+	xor		rW1,rW1,rI1
-+	SAVE_DATA(rW1, 4)
-+	xor		rW2,rW2,rI2
-+	SAVE_DATA(rW2, 8)
-+	xor		rW3,rW3,rI3
-+	SAVE_DATA(rW3, 12)
-+	FINALIZE_CRYPT(4)
-+	blr
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS, SPE optimized");
 +
-+/*
-+ * ppc_crypt_ctr(u8 *out, const u8 *in, u32 *key_enc,
-+ *		 u32 rounds, u32 bytes, u8 *iv);
-+ *
-+ * called from glue layer to encrypt/decrypt multiple blocks
-+ * via CTR. Number of bytes does not need to be a multiple of
-+ * 16. Round values are AES128 = 4, AES192 = 5, AES256 = 6
-+ *
-+ */
-+_GLOBAL(ppc_crypt_ctr)
-+	INITIALIZE_CRYPT(PPC_AES_4K_ENCTAB, 4)
-+	LOAD_IV(rI0, 0)
-+	LOAD_IV(rI1, 4)
-+	LOAD_IV(rI2, 8)
-+	cmpwi		rLN,16
-+	LOAD_IV(rI3, 12)
-+	START_IV
-+	bt		lt,ppc_crypt_ctr_partial
-+ppc_crypt_ctr_loop:
-+	mr		rKP,rKS
-+	START_KEY(rI0, rI1, rI2, rI3)
-+	bl		ppc_encrypt_block
-+	xor		rW0,rD0,rW0
-+	xor		rW1,rD1,rW1
-+	xor		rW2,rD2,rW2
-+	xor		rW3,rD3,rW3
-+	LOAD_DATA(rD0, 0)
-+	subi		rLN,rLN,16
-+	LOAD_DATA(rD1, 4)
-+	LOAD_DATA(rD2, 8)
-+	LOAD_DATA(rD3, 12)
-+	xor		rD0,rD0,rW0
-+	SAVE_DATA(rD0, 0)
-+	xor		rD1,rD1,rW1
-+	SAVE_DATA(rD1, 4)
-+	xor		rD2,rD2,rW2
-+	SAVE_DATA(rD2, 8)
-+	xor		rD3,rD3,rW3
-+	SAVE_DATA(rD3, 12)
-+	addic		rI3,rI3,1	/* increase counter			*/
-+	addze		rI2,rI2
-+	addze		rI1,rI1
-+	addze		rI0,rI0
-+	NEXT_BLOCK
-+	cmpwi		rLN,15
-+	bt		gt,ppc_crypt_ctr_loop
-+ppc_crypt_ctr_partial:
-+	cmpwi		rLN,0
-+	bt		eq,ppc_crypt_ctr_end
-+	mr		rKP,rKS
-+	START_KEY(rI0, rI1, rI2, rI3)
-+	bl		ppc_encrypt_block
-+	xor		rW0,rD0,rW0
-+	SAVE_IV(rW0, 0)
-+	xor		rW1,rD1,rW1
-+	SAVE_IV(rW1, 4)
-+	xor		rW2,rD2,rW2
-+	SAVE_IV(rW2, 8)
-+	xor		rW3,rD3,rW3
-+	SAVE_IV(rW3, 12)
-+	mtctr		rLN
-+	subi		rIP,rIP,CTR_DEC
-+	subi		rSP,rSP,1
-+	subi		rDP,rDP,1
-+ppc_crypt_ctr_xorbyte:
-+	lbzu		rW4,1(rIP)	/* bytewise xor for partial block	*/
-+	lbzu		rW5,1(rSP)
-+	xor		rW4,rW4,rW5
-+	stbu		rW4,1(rDP)
-+	bdnz		ppc_crypt_ctr_xorbyte
-+	subf		rIP,rLN,rIP
-+	addi		rIP,rIP,1
-+	addic		rI3,rI3,1
-+	addze		rI2,rI2
-+	addze		rI1,rI1
-+	addze		rI0,rI0
-+ppc_crypt_ctr_end:
-+	SAVE_IV(rI0, 0)
-+	SAVE_IV(rI1, 4)
-+	SAVE_IV(rI2, 8)
-+	SAVE_IV(rI3, 12)
-+	FINALIZE_CRYPT(4)
-+	blr
-+
-+/*
-+ * ppc_encrypt_xts(u8 *out, const u8 *in, u32 *key_enc,
-+ *		   u32 rounds, u32 bytes, u8 *iv, u32 *key_twk);
-+ *
-+ * called from glue layer to encrypt multiple blocks via XTS
-+ * If key_twk is given, the initial IV encryption will be
-+ * processed too. Round values are AES128 = 4, AES192 = 5,
-+ * AES256 = 6
-+ *
-+ */
-+_GLOBAL(ppc_encrypt_xts)
-+	INITIALIZE_CRYPT(PPC_AES_4K_ENCTAB, 8)
-+	LOAD_IV(rI0, 0)
-+	LOAD_IV(rI1, 4)
-+	LOAD_IV(rI2, 8)
-+	cmpwi		rKT,0
-+	LOAD_IV(rI3, 12)
-+	bt		eq,ppc_encrypt_xts_notweak
-+	mr		rKP,rKT
-+	START_KEY(rI0, rI1, rI2, rI3)
-+	bl		ppc_encrypt_block
-+	xor		rI0,rD0,rW0
-+	xor		rI1,rD1,rW1
-+	xor		rI2,rD2,rW2
-+	xor		rI3,rD3,rW3
-+ppc_encrypt_xts_notweak:
-+	ENDIAN_SWAP(rG0, rG1, rI0, rI1)
-+	ENDIAN_SWAP(rG2, rG3, rI2, rI3)
-+ppc_encrypt_xts_loop:
-+	LOAD_DATA(rD0, 0)
-+	mr		rKP,rKS
-+	LOAD_DATA(rD1, 4)
-+	subi		rLN,rLN,16
-+	LOAD_DATA(rD2, 8)
-+	LOAD_DATA(rD3, 12)
-+	xor		rD0,rD0,rI0
-+	xor		rD1,rD1,rI1
-+	xor		rD2,rD2,rI2
-+	xor		rD3,rD3,rI3
-+	START_KEY(rD0, rD1, rD2, rD3)
-+	bl		ppc_encrypt_block
-+	xor		rD0,rD0,rW0
-+	xor		rD1,rD1,rW1
-+	xor		rD2,rD2,rW2
-+	xor		rD3,rD3,rW3
-+	xor		rD0,rD0,rI0
-+	SAVE_DATA(rD0, 0)
-+	xor		rD1,rD1,rI1
-+	SAVE_DATA(rD1, 4)
-+	xor		rD2,rD2,rI2
-+	SAVE_DATA(rD2, 8)
-+	xor		rD3,rD3,rI3
-+	SAVE_DATA(rD3, 12)
-+	GF128_MUL(rG0, rG1, rG2, rG3, rW0)
-+	ENDIAN_SWAP(rI0, rI1, rG0, rG1)
-+	ENDIAN_SWAP(rI2, rI3, rG2, rG3)
-+	cmpwi		rLN,0
-+	NEXT_BLOCK
-+	bt		gt,ppc_encrypt_xts_loop
-+	START_IV
-+	SAVE_IV(rI0, 0)
-+	SAVE_IV(rI1, 4)
-+	SAVE_IV(rI2, 8)
-+	SAVE_IV(rI3, 12)
-+	FINALIZE_CRYPT(8)
-+	blr
-+
-+/*
-+ * ppc_decrypt_xts(u8 *out, const u8 *in, u32 *key_dec,
-+ *		   u32 rounds, u32 blocks, u8 *iv, u32 *key_twk);
-+ *
-+ * called from glue layer to decrypt multiple blocks via XTS
-+ * If key_twk is given, the initial IV encryption will be
-+ * processed too. Round values are AES128 = 4, AES192 = 5,
-+ * AES256 = 6
-+ *
-+ */
-+_GLOBAL(ppc_decrypt_xts)
-+	INITIALIZE_CRYPT(PPC_AES_4K_DECTAB, 8)
-+	LOAD_IV(rI0, 0)
-+	addi		rT1,rT0,4096
-+	LOAD_IV(rI1, 4)
-+	LOAD_IV(rI2, 8)
-+	cmpwi		rKT,0
-+	LOAD_IV(rI3, 12)
-+	bt		eq,ppc_decrypt_xts_notweak
-+	subi		rT0,rT0,4096
-+	mr		rKP,rKT
-+	START_KEY(rI0, rI1, rI2, rI3)
-+	bl		ppc_encrypt_block
-+	xor		rI0,rD0,rW0
-+	xor		rI1,rD1,rW1
-+	xor		rI2,rD2,rW2
-+	xor		rI3,rD3,rW3
-+	addi		rT0,rT0,4096
-+ppc_decrypt_xts_notweak:
-+	ENDIAN_SWAP(rG0, rG1, rI0, rI1)
-+	ENDIAN_SWAP(rG2, rG3, rI2, rI3)
-+ppc_decrypt_xts_loop:
-+	LOAD_DATA(rD0, 0)
-+	mr		rKP,rKS
-+	LOAD_DATA(rD1, 4)
-+	subi		rLN,rLN,16
-+	LOAD_DATA(rD2, 8)
-+	LOAD_DATA(rD3, 12)
-+	xor		rD0,rD0,rI0
-+	xor		rD1,rD1,rI1
-+	xor		rD2,rD2,rI2
-+	xor		rD3,rD3,rI3
-+	START_KEY(rD0, rD1, rD2, rD3)
-+	bl		ppc_decrypt_block
-+	xor		rD0,rD0,rW0
-+	xor		rD1,rD1,rW1
-+	xor		rD2,rD2,rW2
-+	xor		rD3,rD3,rW3
-+	xor		rD0,rD0,rI0
-+	SAVE_DATA(rD0, 0)
-+	xor		rD1,rD1,rI1
-+	SAVE_DATA(rD1, 4)
-+	xor		rD2,rD2,rI2
-+	SAVE_DATA(rD2, 8)
-+	xor		rD3,rD3,rI3
-+	SAVE_DATA(rD3, 12)
-+	GF128_MUL(rG0, rG1, rG2, rG3, rW0)
-+	ENDIAN_SWAP(rI0, rI1, rG0, rG1)
-+	ENDIAN_SWAP(rI2, rI3, rG2, rG3)
-+	cmpwi		rLN,0
-+	NEXT_BLOCK
-+	bt		gt,ppc_decrypt_xts_loop
-+	START_IV
-+	SAVE_IV(rI0, 0)
-+	SAVE_IV(rI1, 4)
-+	SAVE_IV(rI2, 8)
-+	SAVE_IV(rI3, 12)
-+	FINALIZE_CRYPT(8)
-+	blr
++MODULE_ALIAS_CRYPTO("aes");
++MODULE_ALIAS_CRYPTO("ecb(aes)");
++MODULE_ALIAS_CRYPTO("cbc(aes)");
++MODULE_ALIAS_CRYPTO("ctr(aes)");
++MODULE_ALIAS_CRYPTO("xts(aes)");
++MODULE_ALIAS_CRYPTO("aes-ppc-spe");
 
-------=_NextPartTM-000-e59b641c-302d-4b94-8aea-facf7f35fab7
+------=_NextPartTM-000-1bc11707-24c4-4c3e-aa55-5251b0ed453d
 Content-Type: text/plain;
 	name="InterScan_Disclaimer.txt"
 Content-Transfer-Encoding: 7bit
@@ -726,4 +609,4 @@ Register number: HRB 52 497
 
 ****************************************************************************
 
-------=_NextPartTM-000-e59b641c-302d-4b94-8aea-facf7f35fab7--
+------=_NextPartTM-000-1bc11707-24c4-4c3e-aa55-5251b0ed453d--
