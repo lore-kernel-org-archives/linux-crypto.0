@@ -1,99 +1,88 @@
-From: Marcus Meissner <meissner@suse.de>
-Subject: Re: GCM / seqiv and SP800-38D
-Date: Mon, 23 Feb 2015 14:32:43 +0100
-Message-ID: <20150223133243.GB19890@suse.de>
+From: sri sowj <srisowj4linux@gmail.com>
+Subject: Re: communicating from the user space
+Date: Mon, 23 Feb 2015 21:17:31 +0530
+Message-ID: <CAHTT9VLy4zJd6D7g4eVvwZD1KTHkDDUA0ma=kVQVZ2FzD5bJGw@mail.gmail.com>
+References: <CAHTT9VLmj8A7V5t+P9Zc02r5nyv37VMfa=QwPOuiMS9WFdXUxg@mail.gmail.com>
+	<1543956.4M98jElNTF@tachyon.chronox.de>
+	<CAHTT9VKQ2nB92SgRsGYemgTO6tTDucKyOs-9uCQn9+vAweQwuQ@mail.gmail.com>
+	<1989293.ccvZM8v2KA@tachyon.chronox.de>
+	<1424640392.22199.3.camel@gnutls.org>
+	<CAHTT9VLJH4RFXBmGUeLSiiYjsvytb10NT+DyPeBkceVzuq3uRQ@mail.gmail.com>
+	<CAJU7zaL8r+vbhPY3NU-6tUKcFJS_vMHr2fVci+hAquXynBdP3g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Stephan Mueller <smueller@chronox.de>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56026 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751661AbbBWNcp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Feb 2015 08:32:45 -0500
-Received: from relay2.suse.de (charybdis-ext.suse.de [195.135.220.254])
-	by mx2.suse.de (Postfix) with ESMTP id D4C2CAC97
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Feb 2015 13:32:43 +0000 (UTC)
-Content-Disposition: inline
+Received: from mail-pa0-f51.google.com ([209.85.220.51]:46906 "EHLO
+	mail-pa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753054AbbBWPrc convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 23 Feb 2015 10:47:32 -0500
+Received: by pabkx10 with SMTP id kx10so28327586pab.13
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Feb 2015 07:47:31 -0800 (PST)
+In-Reply-To: <CAJU7zaL8r+vbhPY3NU-6tUKcFJS_vMHr2fVci+hAquXynBdP3g@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Hi Nikos,
 
-I had some offline discussion with Stephan and it seems to me
-at least that it is very hard to use the described "Deterministic"
-method under Linux while at the same time still keeping the
-uniqueness requirement to stay FIPS 140-2 certifiable.
+Thanks a lot for the information provided on openssl part for cryptodev=
+-linux.
 
+I have followed the steps mentioned in "
+https://github.com/cryptodev-linux/cryptodev-linux/blob/master/INSTALL
+"
 
-How about going full randomized IV generation on GCM?
+But When I executed " make check" command I got following error,please
+can you help me with this.
 
-For that I wonder if the givencrypt can ever be called with the same
-sequence number again so we would need to reproduce earlier randomness?
+cc  -I..    -c -o cipher_comp.o cipher_comp.c
+cc  -I..    -c -o openssl_wrapper.o openssl_wrapper.c
+openssl_wrapper.c: In function =E2=80=98openssl_hmac=E2=80=99:
+openssl_wrapper.c:136:5: error: invalid use of void expression
+openssl_wrapper.c:144:3: error: invalid use of void expression
+openssl_wrapper.c:152:3: error: invalid use of void expression
+make[1]: *** [openssl_wrapper.o] Error 1
+make[1]: Leaving directory `/home/srisowj/cryptodev/cryptodev-linux-1.6=
+/tests'
+make: *** [check] Error 2
 
-Ciao, Marcus
+BR,
+& Srisowj
 
-
-> Hi Herbert,
-> 
-> After some research, we think that the current implementation of seqiv 
-> as used for GCM does not comply with SP800-38D. Before I outline the 
-> issue, please allow me to state my understanding of seqiv (to make sure 
-> I really understand it :-) ).
-> 
-> Seqiv works as a wrapper around the associated cipher (like GCM in our 
-> case). If a caller wants to use the seqiv helper, the caller must use 
-> the aead_givcrypt_set_* API calls. For example, esp_output does that.
-> 
-> If the API calls are invoked seqiv performs its work and then calls the 
-> underlying cipher. The main work in seqiv is implemented in 
-> seqiv_geniv(). This function creates the IV for GCM. Its logic can be 
-> characterized as follows:
-> 
-> 1. get some salt value from an RNG during init time (ctx->salt)
-> 
-> 2. fill the IV with a sequence number provided by the caller (esp_output 
-> provides the IPSec sequence number here)
-> 
-> 3. left-pad the sequence number with zeros
-> 
-> 4. XOR the salt with the value from 3.
-> 
-> In case of rfc4106(gcm(aes)), the IV is 96 bits. Thus, our constructed 
-> IV looks like:
-> 
-> - rightmost 64 bit is an XOR of the sequence number and the rightmost 64 
-> bit of the random number
-> 
-> - leftmost 32 bit is leftmost 32 bit of the random number
-> 
-> If my understanding is correct, then this does not comply with 
-> SP800-38D. Even after speaking with the mathematicians at NIST 
-> controlling SP800-38D, they do not want to accept that solution.
-> 
-> The particular problem is SP800-38D section 8.2.1 and 8.2.2 where one 
-> can choose which of these two sections are implemented (either a full 
-> deterministic generation of an IV or a full RNG-based generation with an 
-> approved DRBG).
-> 
-> The key issue the authors of SP800-38D want to protect against is that 
-> there is no collision in the generation of an IV (for a given key). 
-> 
-> What seqiv does is to use the output of a DRBG (in FIPS mode) or 
-> /dev/urandom (in normal mode) and XOR it with a static value. The 
-> "postprocessing" of the XORing is not allowed as it may introduce 
-> potential collisions. I do not want to dive into math here, but if 
-> needed, we can do some calculations.
-> 
-> Thus, may I ask for a change in the GCM/seqiv combo? I think one of the 
-> following solutions would be possible:
-> 
-> - change seqiv to eliminate the XOR step (not sure whether we need to 
-> generate a random number every time seq_geniv is invoked)
-> 
-> - create a new IV handler (maybe call it simpleiv that may be a simple 
-> counter or an LFSR or a frontend to an RNG)
-> 
-> I would prefer the latter and wire up GCM with that "simpleiv".
-> 
-> Ciao
-> Stephan
+On Mon, Feb 23, 2015 at 1:57 PM, Nikos Mavrogiannopoulos
+<nmav@gnutls.org> wrote:
+> On Mon, Feb 23, 2015 at 5:06 AM, sri sowj <srisowj4linux@gmail.com> w=
+rote:
+>> Hi Nikos,
+>>
+>> Please can you let me know my understanding regarding openssl and
+>> crypto are correct?
+>> I have mentioned my understanding in my earlier posts,but let me
+>> mention it here again.
+>> I want to interact with Crypto Hardware from user space using openss=
+l
+>> like libraries based applications through cryptodev-linux interface.
+>> it looks like openssl comes with cryptodev-linux support(through
+>> eng_cryptodev.c) .
+>> When I downloaded openssl,eng_cryptodev.c file is available by defau=
+lt.
+>> below link refers about eng_cryptodev.c for openssl support :
+>> http://repo.or.cz/w/cryptodev-linux.git/commitdiff/56cc4e3b8b761cb34=
+f928f4eee59755d1f0afc53
+>
+> That's a very old link. Note that openssl's cryptodev support works
+> well for ciphers, but not for digests (hashes). So the best is to
+> compile without digest support, or use the patches in
+> https://github.com/openssl/openssl/pull/191
+>
+> The most current instructions are:
+> https://github.com/cryptodev-linux/cryptodev-linux/blob/master/INSTAL=
+L
+> and in https://github.com/cryptodev-linux/cryptodev-linux
+>
+> regards,
+> Nikos
