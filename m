@@ -1,138 +1,118 @@
-From: Johannes Ernst <johannes.ernst@gmail.com>
-Subject: Re: [dm-crypt] cryptsetup problem on Raspberry Pi 2 w 512bit key-size (works on Raspberry Pi 1, x86_64, 256bit)
-Date: Mon, 23 Feb 2015 15:02:15 -0800
-Message-ID: <4E1A4B12-1B94-4ECF-B2E8-BDAD1EE0C37C@gmail.com>
-References: <2E68FEAA-A69B-4E25-84F9-F30B2E7DFB69@gmail.com> <54E7B46D.8060805@tu-ilmenau.de> <E401AE9C-F988-4839-AC13-62D4FADD7290@gmail.com> <54E82B80.8000607@gmail.com> <EE112BA4-BDD8-4CB3-BD7B-BDA984D15089@gmail.com> <54EA39FA.7010408@gmail.com> <707C4FCB-0182-44E3-946A-19434F32BEAB@gmail.com> <54EB7977.70503@gmail.com>
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: Nokia N900: omap aes is broken
+Date: Tue, 24 Feb 2015 09:25:12 -0800
+Message-ID: <20150224172512.GC28244@atomide.com>
+References: <201502181321.03774@pali>
+ <201502182202.30272@pali>
+ <201502182227.55488@pali>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: dm-crypt@saout.de, Lars Winterfeld <lars.winterfeld@tu-ilmenau.de>,
-	linux-crypto@vger.kernel.org
-To: Milan Broz <gmazyland@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f178.google.com ([209.85.192.178]:38227 "EHLO
-	mail-pd0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751861AbbBWXCS convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Feb 2015 18:02:18 -0500
-Received: by pdbfp1 with SMTP id fp1so28752923pdb.5
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Feb 2015 15:02:17 -0800 (PST)
-In-Reply-To: <54EB7977.70503@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Nishanth Menon <nm@ti.com>, Felipe Balbi <balbi@ti.com>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Sebastian Reichel <sre@kernel.org>,
+	Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
+	linux-omap@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <201502182227.55488@pali>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-All in one place:
+* Pali Roh=C3=A1r <pali.rohar@gmail.com> [150218 16:03]:
+> On Wednesday 18 February 2015 22:02:30 Pali Roh=C3=A1r wrote:
+> > On Wednesday 18 February 2015 13:21:03 Pali Roh=C3=A1r wrote:
+> > > Hello,
+> > >=20
+> > > I tried to test OMAP AES driver on Nokia N900 with special
+> > > Nokia bootloader which enable L3 firewall for OMAP AES HW
+> > > support.
+> > >=20
+> > > I modified arch/arm/boot/dts/omap34xx-hs.dtsi file and
+> > > commented aes line which disable aes support in DT.
+> > >=20
+> > > Then I booted kernel and loaded omap-aes.ko module. And I
+> > > got this output in dmesg:
+> > >=20
+> > > [    0.222930] platform 480c5000.aes: Cannot lookup hwmod
+> > > 'aes' [   27.758148] omap-aes 480c5000.aes:
+> > > _od_fail_runtime_resume: FIXME: missing hwmod/omap_dev info
+> > > [   27.765960] omap-aes 480c5000.aes: omap_aes_probe: failed
+> > > to get_sync(-19)
+> > > [   29.257690] omap-aes 480c5000.aes: initialization failed.
+> > >=20
+> > > So it looks like some initialization data are missing for
+> > > Nokia N900 (omap3430 device).
+> > >=20
+> > > Can somebody look at it? I have patched 2.6.28 kernel were
+> > > omap aes support on this N900 device (with special
+> > > bootloader) is working.
+> > >=20
+> > > Maybe some other data are missing in DT or in hwmod?
+> >=20
+> > dma channels are missing in DT. I applied this patch:
+> >=20
+> > diff --git a/arch/arm/boot/dts/omap3.dtsi
+> > b/arch/arm/boot/dts/omap3.dtsi index 01b7111..473d460 100644
+> > --- a/arch/arm/boot/dts/omap3.dtsi
+> > +++ b/arch/arm/boot/dts/omap3.dtsi
+> > @@ -92,6 +92,8 @@
+> >  			ti,hwmods =3D "aes";
+> >  			reg =3D <0x480c5000 0x50>;
+> >  			interrupts =3D <0>;
+> > +			dmas =3D <&sdma 65 &sdma 66>;
+> > +			dma-names =3D "tx", "rx";
+> >  		};
+> >=20
+> >  		prm: prm@48306000 {
+> > @@ -550,6 +552,8 @@
+> >  			ti,hwmods =3D "sham";
+> >  			reg =3D <0x480c3000 0x64>;
+> >  			interrupts =3D <49>;
+> > +			dmas =3D <&sdma 96>;
+> > +			dma-names =3D "rx";
+> >  		};
+> >=20
+> >  		smartreflex_core: smartreflex@480cb000 {
+> >=20
+> >=20
+> > and omap-aes driver was successfully loaded. now it is in
+> > /proc/crypto
+> >=20
+> > I copied dma names and numbers from file
+> > arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
+>=20
+> And I also needed to apply this patch:
+>=20
+> diff --git a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c b/arch/arm/ma=
+ch-omap2/omap_hwmod_3xxx_data.c
+> index 11468ee..3281f30 100644
+> --- a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
+> +++ b/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
+> @@ -3938,8 +3938,9 @@ int __init omap3xxx_hwmod_init(void)
+>  	if (r < 0)
+>  		return r;
+> =20
+> -	/* Register GP-only hwmod links. */
+> -	if (h_gp && omap_type() =3D=3D OMAP2_DEVICE_TYPE_GP) {
+> +//	/* Register GP-only hwmod links. */
+> +//	if (h_gp && omap_type() =3D=3D OMAP2_DEVICE_TYPE_GP) {
+> +	if (h_gp) {
+>  		r =3D omap_hwmod_register_links(h_gp);
+>  		if (r < 0)
+>  			return r;
+>=20
+> aes hwmod is defined in GP-only hwmod...
 
-> dd if=3D/dev/zero of=3D./test.img count=3D8 bs=3D1M
+Doesn't this depend on the bootloader version of n900 to work?
 
-> cryptsetup --hash sha512 --key-size 512 -v luksFormat ./test.img
-Used password =E2=80=98asdf=E2=80=99 (no quotes)
+Regards,
 
-> cryptsetup open test.img test
-Enter passphrase for test.img:=20
-No key available with this passphrase.
-Enter passphrase for test.img:=20
-No key available with this passphrase.
-^C
-
-> cryptsetup luksDump test.img    =20
-LUKS header information for test.img
-
-Version:       	1
-Cipher name:   	aes
-Cipher mode:   	xts-plain64
-Hash spec:     	sha512
-Payload offset:	4096
-MK bits:       	512
-MK digest:     	a6 c0 8d f7 f8 db b0 95 77 b7 72 09 3f 8f 86 ff 6f 31 0=
-b a1=20
-MK salt:       	1c 9f 21 cf 2c 81 26 49 cc 36 a0 3a 6d 9e 49 a3=20
-               	43 3d a7 38 7d 12 86 5b 4e df f9 ac 38 1c a4 38=20
-MK iterations: 	1000
-UUID:          	d4a0b4ab-b15e-4faf-8504-7e01d88dd9de
-
-Key Slot 0: ENABLED
-	Iterations:         	4289
-	Salt:               	3c 8b 2e de 72 3f 17 5c 4c 3b d3 ca 5e 09 77 11=20
-	                      	69 10 1d 54 ab de c8 87 f9 fd 76 b5 e4 13 1e 04=
-=20
-	Key material offset:	8
-	AF stripes:            	4000
-Key Slot 1: DISABLED
-Key Slot 2: DISABLED
-Key Slot 3: DISABLED
-Key Slot 4: DISABLED
-Key Slot 5: DISABLED
-Key Slot 6: DISABLED
-Key Slot 7: DISABLED
-
-> cryptsetup open --debug test.img test
-# cryptsetup 1.6.6 processing "cryptsetup open --debug test.img test"
-# Running command open.
-# Locking memory.
-# Installing SIGINT/SIGTERM handler.
-# Unblocking interruption on signal.
-# Allocating crypt device test.img context.
-# Trying to open and read device test.img.
-# Initialising device-mapper backend library.
-# Trying to load LUKS1 crypt type from device test.img.
-# Crypto backend (gcrypt 1.6.2) initialized.
-# Detected kernel Linux 3.18.7-5-ARCH armv7l.
-# Reading LUKS header of size 1024 from device test.img
-# Key length 64, device size 16384 sectors, header size 4036 sectors.
-# Timeout set to 0 miliseconds.
-# Password retry count set to 3.
-# Password verification disabled.
-# Iteration time set to 1000 miliseconds.
-# Activating volume test [keyslot -1] using [none] passphrase.
-# dm version   OF   [16384] (*1)
-# dm versions   OF   [16384] (*1)
-# Detected dm-crypt version 1.13.0, dm-ioctl version 4.28.0.
-# Device-mapper backend running with UDEV support enabled.
-# dm status test  OF   [16384] (*1)
-# Interactive passphrase entry requested.
-Enter passphrase for test.img:=20
-# Trying to open key slot 0 [ACTIVE_LAST].
-# Reading key slot 0 area.
-# Using userspace crypto wrapper to access keyslot area.
-# Trying to open key slot 1 [INACTIVE].
-# Trying to open key slot 2 [INACTIVE].
-# Trying to open key slot 3 [INACTIVE].
-# Trying to open key slot 4 [INACTIVE].
-# Trying to open key slot 5 [INACTIVE].
-# Trying to open key slot 6 [INACTIVE].
-# Trying to open key slot 7 [INACTIVE].
-No key available with this passphrase.
-# Interactive passphrase entry requested.
-Enter passphrase for test.img:=20
-# Trying to open key slot 0 [ACTIVE_LAST].
-# Reading key slot 0 area.
-# Using userspace crypto wrapper to access keyslot area.
-Key slot 0 unlocked.
-# Allocating a free loop device.
-# Trying to open and read device /dev/loop5.
-# Calculated device size is 12288 sectors (RW), offset 4096.
-# DM-UUID is CRYPT-LUKS1-d4a0b4abb15e4faf85047e01d88dd9de-test
-# Udev cookie 0xd4d3a56 (semid 720898) created
-# Udev cookie 0xd4d3a56 (semid 720898) incremented to 1
-# Udev cookie 0xd4d3a56 (semid 720898) incremented to 2
-# Udev cookie 0xd4d3a56 (semid 720898) assigned to CREATE task(0) with =
-flags         (0x0)
-# dm create test CRYPT-LUKS1-d4a0b4abb15e4faf85047e01d88dd9de-test OF  =
- [16384] (*1)
-# dm reload test  OFW    [16384] (*1)
-# dm resume test  OFW    [16384] (*1)
-# test: Stacking NODE_ADD (253,9) 0:0 0600 [verify_udev]
-# test: Stacking NODE_READ_AHEAD 256 (flags=3D1)
-# Udev cookie 0xd4d3a56 (semid 720898) decremented to 1
-# Udev cookie 0xd4d3a56 (semid 720898) waiting for zero
-# Udev cookie 0xd4d3a56 (semid 720898) destroyed
-# test: Processing NODE_ADD (253,9) 0:0 0600 [verify_udev]
-# test: Processing NODE_READ_AHEAD 256 (flags=3D1)
-# test (253:9): read ahead is 256
-# test: retaining kernel read ahead of 256 (requested 256)
-# Releasing crypt device test.img context.
-# Releasing device-mapper backend.
-# Closed loop /dev/loop5 (test.img).
-# Unlocking memory.
-Command successful.
+Tony
+--
+To unsubscribe from this list: send the line "unsubscribe linux-omap" i=
+n
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
