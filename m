@@ -1,52 +1,75 @@
-From: sri sowj <srisowj4linux@gmail.com>
-Subject: multiple simultaneous crypto sessions from a crypto driver
-Date: Wed, 25 Feb 2015 09:33:33 +0530
-Message-ID: <CAHTT9VLOg6n+rpMCZLU4b2K_sTBT0NcAGsT2s3UPxCeaPyzqMQ@mail.gmail.com>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: Nokia N900: omap aes is broken
+Date: Wed, 25 Feb 2015 10:50:00 +0100
+Message-ID: <20150225095000.GB24627@amd>
+References: <201502181321.03774@pali>
+ <201502182227.55488@pali>
+ <20150224172512.GC28244@atomide.com>
+ <201502241838.44317@pali>
+ <20150224173734.GD28244@atomide.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f176.google.com ([209.85.192.176]:35856 "EHLO
-	mail-pd0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751444AbbBYEDd (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 24 Feb 2015 23:03:33 -0500
-Received: by pdjp10 with SMTP id p10so1875037pdj.3
-        for <linux-crypto@vger.kernel.org>; Tue, 24 Feb 2015 20:03:33 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+	Nishanth Menon <nm@ti.com>, Felipe Balbi <balbi@ti.com>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Sebastian Reichel <sre@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Tony Lindgren <tony@atomide.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20150224173734.GD28244@atomide.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi ,
+On Tue 2015-02-24 09:37:34, Tony Lindgren wrote:
+> * Pali Roh=E1r <pali.rohar@gmail.com> [150224 09:42]:
+> > On Tuesday 24 February 2015 18:25:12 Tony Lindgren wrote:
+> > > * Pali Roh=E1r <pali.rohar@gmail.com> [150218 16:03]:
+> > > > --- a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
+> > > > +++ b/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
+> > > > @@ -3938,8 +3938,9 @@ int __init omap3xxx_hwmod_init(void)
+> > > >=20
+> > > >  	if (r < 0)
+> > > >  =09
+> > > >  		return r;
+> > > >=20
+> > > > -	/* Register GP-only hwmod links. */
+> > > > -	if (h_gp && omap_type() =3D=3D OMAP2_DEVICE_TYPE_GP) {
+> > > > +//	/* Register GP-only hwmod links. */
+> > > > +//	if (h_gp && omap_type() =3D=3D OMAP2_DEVICE_TYPE_GP) {
+> > > > +	if (h_gp) {
+> > > >=20
+> > > >  		r =3D omap_hwmod_register_links(h_gp);
+> > > >  		if (r < 0)
+> > > >  	=09
+> > > >  			return r;
+> > > >=20
+> > > > aes hwmod is defined in GP-only hwmod...
+> > >=20
+> > > Doesn't this depend on the bootloader version of n900 to work?
+> > >=20
+> > > Regards,
+> > >=20
+> > > Tony
+> >=20
+> > Ok, it looks like second patch (omap_hwmod_3xxx_data.c) needs=20
+> > that aes-enabled bootloader.
+>=20
+> OK we need some runtime detection somehow for what's enabled..
+> =20
+> > But first patch (omap3.dtsi) is needed for proper definitions.=20
+> > Otherwise omap-aes driver will never work on DT systems.
+>=20
+> Yeah that one makes sense to me, I guess you'll do a proper
+> fix for that one.
 
-
-I am working on understanding crypt drivers in implemented in
-asynchronous mode.I am little ambiguous regarding following
-scenario,Please
-can some help me with this.
-
-
-#1: If two or more applications will send their requests (may be
-different seesions)  to crypto Hardware (may be scheduler ll decide
-which App should be allowed).
-In this scenario How Crypto Driver will maintain the Hashed
-data(Intermediate Hash) for future use i.e., when an application
-resumes back?
-Is it some thing needs to be handled from the crypto drivers or Linux
-Kernel crypto subsystem will take care?
-
-Note:This kind of scenarios even can be observed in IPSEC
-implementation Kernel like different requests for
-encryption/decryption to a crypto algorithm  from different sessions.
-
-#2: I referred link
-"http://www.mail-archive.com/linux-crypto%40vger.kernel.org/msg08177.html"
-
-What I understood is that single "tfm" should be able to serve the
-multiple/different requests at a time and intermediate hash per
-request has to be
-saved in the request context.Please can you let me know how is it
-possible in real-time ,please can some one help me with this kind of
-requirement in real-time?
-
-BR,
-Srisowj
+If this depends on bootloader... would command line parameter be right
+solution here?
+									Pavel
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses=
+/blog.html
