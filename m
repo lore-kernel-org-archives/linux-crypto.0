@@ -1,111 +1,45 @@
-From: Pali =?utf-8?q?Roh=C3=A1r?= <pali.rohar@gmail.com>
-Subject: Re: Nokia N900: omap aes is broken
-Date: Wed, 25 Feb 2015 11:18:22 +0100
-Message-ID: <201502251118.22991@pali>
-References: <201502181321.03774@pali> <20150224173734.GD28244@atomide.com> <20150225095000.GB24627@amd>
+From: David Laight <David.Laight@ACULAB.COM>
+Subject: RE: [PATCH v1 1/3] SHA1 for PPC/SPE - assembler
+Date: Wed, 25 Feb 2015 12:01:45 +0000
+Message-ID: <063D6719AE5E284EB5DD2968C1650D6D1CAEBB2D@AcuExch.aculab.com>
+References: <ce3e5ff2-5904-4e1c-bfa9-e37c9682f961@EXCHANGE.collogia.de>
 Mime-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart237481912.y5Hj0EVIFL";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Content-Transfer-Encoding: 7bit
-Cc: Tony Lindgren <tony@atomide.com>, Nishanth Menon <nm@ti.com>,
-	Felipe Balbi <balbi@ti.com>,
-	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Sebastian Reichel <sre@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Pavel Machek <pavel@ucw.cz>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f179.google.com ([74.125.82.179]:39126 "EHLO
-	mail-we0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752666AbbBYKS0 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 25 Feb 2015 05:18:26 -0500
-In-Reply-To: <20150225095000.GB24627@amd>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+To: 'Markus Stockhausen' <stockhausen@collogia.de>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <ce3e5ff2-5904-4e1c-bfa9-e37c9682f961@EXCHANGE.collogia.de>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
---nextPart237481912.y5Hj0EVIFL
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wednesday 25 February 2015 10:50:00 Pavel Machek wrote:
-> On Tue 2015-02-24 09:37:34, Tony Lindgren wrote:
-> > * Pali Roh=C3=A1r <pali.rohar@gmail.com> [150224 09:42]:
-> > > On Tuesday 24 February 2015 18:25:12 Tony Lindgren wrote:
-> > > > * Pali Roh=C3=A1r <pali.rohar@gmail.com> [150218 16:03]:
-> > > > > --- a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
-> > > > > +++ b/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
-> > > > > @@ -3938,8 +3938,9 @@ int __init
-> > > > > omap3xxx_hwmod_init(void)
-> > > > >=20
-> > > > >  	if (r < 0)
-> > > > >  =09
-> > > > >  		return r;
-> > > > >=20
-> > > > > -	/* Register GP-only hwmod links. */
-> > > > > -	if (h_gp && omap_type() =3D=3D OMAP2_DEVICE_TYPE_GP) {
-> > > > > +//	/* Register GP-only hwmod links. */
-> > > > > +//	if (h_gp && omap_type() =3D=3D OMAP2_DEVICE_TYPE_GP) {
-> > > > > +	if (h_gp) {
-> > > > >=20
-> > > > >  		r =3D omap_hwmod_register_links(h_gp);
-> > > > >  		if (r < 0)
-> > > > >  	=09
-> > > > >  			return r;
-> > > > >=20
-> > > > > aes hwmod is defined in GP-only hwmod...
-> > > >=20
-> > > > Doesn't this depend on the bootloader version of n900 to
-> > > > work?
-> > > >=20
-> > > > Regards,
-> > > >=20
-> > > > Tony
-> > >=20
-> > > Ok, it looks like second patch (omap_hwmod_3xxx_data.c)
-> > > needs that aes-enabled bootloader.
-> >=20
-> > OK we need some runtime detection somehow for what's
-> > enabled..
-> >=20
-> > > But first patch (omap3.dtsi) is needed for proper
-> > > definitions. Otherwise omap-aes driver will never work on
-> > > DT systems.
-> >=20
-> > Yeah that one makes sense to me, I guess you'll do a proper
-> > fix for that one.
->=20
-> If this depends on bootloader... would command line parameter
-> be right solution here?
-> 									Pavel
-
-Problem is that we need to disable AES in:
-
-* DT file
-* hwmod source code
-* ... and maybe on other places too ...
-
-So I think it make sense to check if AES is disabled in DT and=20
-add this check to other parts of kernel source code where needed.
-
-=2D-=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---nextPart237481912.y5Hj0EVIFL
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEABECAAYFAlTtoW4ACgkQi/DJPQPkQ1KfHwCdEzdmJZ9RtR3SmXNUopfZq0CD
-tAIAn1rz2bolw9HZS4nsNw5wGIf/tM/0
-=wUAW
------END PGP SIGNATURE-----
-
---nextPart237481912.y5Hj0EVIFL--
+RnJvbTogTWFya3VzIFN0b2NraGF1c2VuCj4gW1BBVENIIHYxIDEvM10gU0hBMSBmb3IgUFBDL1NQ
+RSAtIGFzc2VtYmxlcgo+IAo+IFRoaXMgaXMgdGhlIGFzc2VtYmxlciBjb2RlIGZvciBTSEExIGlt
+cGxlbWVudGF0aW9uIHdpdGgKPiB0aGUgU0lNRCBTUEUgaW5zdHJ1Y3Rpb24gc2V0LiBXaXRoIHRo
+ZSBlbmhhbmNlZCBpbnN0cnVjdGlvbgo+IHNldCB3ZSBjYW4gb3BlcmF0ZSBvbiAyIDMyIGJpdCB3
+b3JkcyBpbiBwYXJhbGxlbC4gVGhhdCBoZWxwcwo+IHJlZHVjaW5nIHRoZSB0aW1lIHRvIGNhbGN1
+bGF0ZSBXMTYtVzc5LiBGb3IgaW5jcmVhc2luZwo+IHBlcmZvcm1hbmNlIGV2ZW4gbW9yZSB0aGUg
+YXNzZW1ibGVyIGZ1bmN0aW9uIGNhbiBjb21wdXRlCj4gaGFzaGVzIGZvciBtb3JlIHRoYW4gb25l
+IDY0IGJ5dGUgaW5wdXQgYmxvY2suCj4gCj4gVGhlIHN0YXRlIG9mIHRoZSB1c2VkIFNQRSByZWdp
+c3RlcnMgaXMgcHJlc2VydmVkIHZpYSB0aGUKPiBzdGFjayBzbyB3ZSBjYW4gcnVuIGZyb20gaW50
+ZXJydXB0IGNvbnRleHQKCkRvZXMgdGhlIHBwYyB1c2UgdGhlIHNhbWUga2luZCBvZiBkZWxheWVk
+IHN0YXRlIHNhdmUgZm9yIHRoZSBTUEUKcmVzaXN0ZXJzIHRoYXQgeDg2IHVzZXMgKGF0IGxlYXN0
+IG9uIHRoZSBCU0RzKSBmb3IgaXRzIEZQIChldGMpIHJlZ3MuCgpUaGF0IHdvdWxkIG1lYW4gdGhh
+dCB0aGUgcmVnaXN0ZXJzIG1pZ2h0IGNvbnRhaW4gdmFsdWVzIGZvcgphIGRpZmZlcmVudCBwcm9j
+ZXNzLCBhbmQgdGhhdCB0aGUgY3B1IGNvdWxkIHJlY2VpdmUgYW4gSVBJCnJlcXVlc3RpbmcgdGhl
+eSBiZSB3cml0dGVuIHRvIHRoZSBwcm9jZXNzZXMgbm9ybWFsIHNhdmUgYXJlYQpzbyB0aGF0IHRo
+ZXkgY2FuIGJlIHJlbG9hZGVkIG9udG8gYSBkaWZmZXJlbnQgY3B1LgoKCURhdmlkCgpfX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eHBwYy1kZXYgbWFp
+bGluZyBsaXN0CkxpbnV4cHBjLWRldkBsaXN0cy5vemxhYnMub3JnCmh0dHBzOi8vbGlzdHMub3ps
+YWJzLm9yZy9saXN0aW5mby9saW51eHBwYy1kZXY=
