@@ -1,146 +1,59 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] ARM: crypto: update NEON AES module to latest OpenSSL version
-Date: Thu, 26 Feb 2015 07:22:05 +0000
-Message-ID: <1424935325-14437-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: nico@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: linux@arm.linux.org.uk, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f51.google.com ([74.125.82.51]:40617 "EHLO
-	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750768AbbBZHWN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 26 Feb 2015 02:22:13 -0500
-Received: by wghl18 with SMTP id l18so8219869wgh.7
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Feb 2015 23:22:12 -0800 (PST)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
+Subject: [PATCH 00/10] omap3 crypto fixes
+Date: Thu, 26 Feb 2015 14:49:50 +0100
+Message-ID: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Pavel Machek <pavel@ucw.cz>, Nishanth Menon <nm@ti.com>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Sebastian Reichel <sre@kernel.org>,
+	=?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
+To: =?UTF-8?q?Beno=C3=AEt=20Cousson?= <bcousson@baylibre.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Russell King <linux@arm.linux.org.uk>,
+	Paul Walmsley <paul@pwsan.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-This updates the bit sliced AES module to the latest version in the
-upstream OpenSSL repository (e620e5ae37bc). This is needed to fix a
-bug in the XTS decryption path, where data chunked in a certain way
-could trigger the ciphertext stealing code, which is not supposed to
-be active in the kernel build (The kernel implementation of XTS only
-supports round multiples of the AES block size of 16 bytes, whereas
-the conformant OpenSSL implementation of XTS supports inputs of
-arbitrary size by applying ciphertext stealing). This is fixed in
-the upstream version by adding the missing #ifndef XTS_CHAIN_TWEAK
-around the offending instructions.
+This patch series fix crypto support for omap3 devices which use DT.
 
-The upstream code also contains the change applied by Russell to
-build the code unconditionally, i.e., even if __LINUX_ARM_ARCH__ < 7,
-but implemented slightly differently.
+It enables AES and SHAM on N9/N950 and SHAM on N900. AES is still disab=
+led for N900.
 
-Fixes: e4e7f10bfc40 ("ARM: add support for bit sliced AES using NEON instructions")
-Reported-by: Adrian Kotelba <adrian.kotelba@gmail.com>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
+Pali Roh=C3=A1r (10):
+  ARM: OMAP2+: Return correct error values from device and hwmod
+  ARM: OMAP3: Fix crypto support for HS devices
+  crypto: omap-sham: Add support for omap3 devices
+  crypto: omap-sham: Check for return value from pm_runtime_get_sync
+  ARM: dts: omap3 hs: Remove timer12
+  ARM: dts: omap3: Add missing dmas for crypto
+  ARM: dts: n9/n950: Enable omap crypto support
+  ARM: dts: n900: Enable omap sham and include directly omap34xx.dtsi
+  ARM: dts: omap3-tao3530: Include directly omap34xx.dtsi
+  ARM: dts: Remove files omap34xx-hs.dtsi and omap36xx-hs.dtsi
 
-This was found using the tcrypt test code, to which I recently added additional
-chunking modes. However, XTS typically operates on pages or at least on sectors,
-so this bug is unlikely to affect anyone in real life.
+ arch/arm/boot/dts/omap3-n900.dts           |   16 +++++-
+ arch/arm/boot/dts/omap3-n950-n9.dtsi       |    2 +-
+ arch/arm/boot/dts/omap3-tao3530.dtsi       |   11 +++-
+ arch/arm/boot/dts/omap3.dtsi               |    4 ++
+ arch/arm/boot/dts/omap34xx-hs.dtsi         |   16 ------
+ arch/arm/boot/dts/omap36xx-hs.dtsi         |   16 ------
+ arch/arm/mach-omap2/omap_device.c          |   30 ++++++-----
+ arch/arm/mach-omap2/omap_hwmod.c           |   10 ++--
+ arch/arm/mach-omap2/omap_hwmod_3xxx_data.c |   79 ++++++++++++++++++++=
++++-----
+ drivers/crypto/omap-sham.c                 |   13 ++++-
+ 10 files changed, 131 insertions(+), 66 deletions(-)
+ delete mode 100644 arch/arm/boot/dts/omap34xx-hs.dtsi
+ delete mode 100644 arch/arm/boot/dts/omap36xx-hs.dtsi
 
-Still, please add cc stable when applying,
-
-Thanks,
-Ard.
-
-
- arch/arm/crypto/aesbs-core.S_shipped | 12 ++++++++----
- arch/arm/crypto/bsaes-armv7.pl       | 12 ++++++++----
- 2 files changed, 16 insertions(+), 8 deletions(-)
-
-diff --git a/arch/arm/crypto/aesbs-core.S_shipped b/arch/arm/crypto/aesbs-core.S_shipped
-index 71e5fc7cfb18..1d1800f71c5b 100644
---- a/arch/arm/crypto/aesbs-core.S_shipped
-+++ b/arch/arm/crypto/aesbs-core.S_shipped
-@@ -58,14 +58,18 @@
- # define VFP_ABI_FRAME	0
- # define BSAES_ASM_EXTENDED_KEY
- # define XTS_CHAIN_TWEAK
--# define __ARM_ARCH__	7
-+# define __ARM_ARCH__ __LINUX_ARM_ARCH__
-+# define __ARM_MAX_ARCH__ 7
- #endif
- 
- #ifdef __thumb__
- # define adrl adr
- #endif
- 
--#if __ARM_ARCH__>=7
-+#if __ARM_MAX_ARCH__>=7
-+.arch	armv7-a
-+.fpu	neon
-+
- .text
- .syntax	unified 	@ ARMv7-capable assembler is expected to handle this
- #ifdef __thumb2__
-@@ -74,8 +78,6 @@
- .code   32
- #endif
- 
--.fpu	neon
--
- .type	_bsaes_decrypt8,%function
- .align	4
- _bsaes_decrypt8:
-@@ -2095,9 +2097,11 @@ bsaes_xts_decrypt:
- 	vld1.8	{q8}, [r0]			@ initial tweak
- 	adr	r2, .Lxts_magic
- 
-+#ifndef	XTS_CHAIN_TWEAK
- 	tst	r9, #0xf			@ if not multiple of 16
- 	it	ne				@ Thumb2 thing, sanity check in ARM
- 	subne	r9, #0x10			@ subtract another 16 bytes
-+#endif
- 	subs	r9, #0x80
- 
- 	blo	.Lxts_dec_short
-diff --git a/arch/arm/crypto/bsaes-armv7.pl b/arch/arm/crypto/bsaes-armv7.pl
-index be068db960ee..a4d3856e7d24 100644
---- a/arch/arm/crypto/bsaes-armv7.pl
-+++ b/arch/arm/crypto/bsaes-armv7.pl
-@@ -701,14 +701,18 @@ $code.=<<___;
- # define VFP_ABI_FRAME	0
- # define BSAES_ASM_EXTENDED_KEY
- # define XTS_CHAIN_TWEAK
--# define __ARM_ARCH__	7
-+# define __ARM_ARCH__ __LINUX_ARM_ARCH__
-+# define __ARM_MAX_ARCH__ 7
- #endif
- 
- #ifdef __thumb__
- # define adrl adr
- #endif
- 
--#if __ARM_ARCH__>=7
-+#if __ARM_MAX_ARCH__>=7
-+.arch	armv7-a
-+.fpu	neon
-+
- .text
- .syntax	unified 	@ ARMv7-capable assembler is expected to handle this
- #ifdef __thumb2__
-@@ -717,8 +721,6 @@ $code.=<<___;
- .code   32
- #endif
- 
--.fpu	neon
--
- .type	_bsaes_decrypt8,%function
- .align	4
- _bsaes_decrypt8:
-@@ -2076,9 +2078,11 @@ bsaes_xts_decrypt:
- 	vld1.8	{@XMM[8]}, [r0]			@ initial tweak
- 	adr	$magic, .Lxts_magic
- 
-+#ifndef	XTS_CHAIN_TWEAK
- 	tst	$len, #0xf			@ if not multiple of 16
- 	it	ne				@ Thumb2 thing, sanity check in ARM
- 	subne	$len, #0x10			@ subtract another 16 bytes
-+#endif
- 	subs	$len, #0x80
- 
- 	blo	.Lxts_dec_short
--- 
-1.8.3.2
+--=20
+1.7.9.5
