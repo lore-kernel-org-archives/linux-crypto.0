@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
-Subject: [PATCH 07/10] ARM: dts: n9/n950: Enable omap crypto support
-Date: Thu, 26 Feb 2015 14:49:57 +0100
-Message-ID: <1424958600-18881-8-git-send-email-pali.rohar@gmail.com>
+Subject: [PATCH 05/10] ARM: dts: omap3 hs: Remove timer12
+Date: Thu, 26 Feb 2015 14:49:55 +0100
+Message-ID: <1424958600-18881-6-git-send-email-pali.rohar@gmail.com>
 References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -20,40 +20,48 @@ To: =?UTF-8?q?Beno=C3=AEt=20Cousson?= <bcousson@baylibre.com>,
 	Paul Walmsley <paul@pwsan.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-omap-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
-Sender: linux-omap-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Harmattan system on Nokia N9 and N950 devices uses omap crypto support.
-Bootloader on those devices is known that it enables HW crypto support.
-This patch just include omap36xx.dtsi directly, so aes and sham is enab=
-led.
+Device timer12 is automatically disabled on all HS devices via DTS prop=
+erty
+"ti,timer-secure" in file omap3.dtsi so it can be safely removed. We do=
+ not
+need to disable it on another place.
 
 Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
 ---
- arch/arm/boot/dts/omap3-n950-n9.dtsi |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/boot/dts/omap34xx-hs.dtsi |    4 ----
+ arch/arm/boot/dts/omap36xx-hs.dtsi |    4 ----
+ 2 files changed, 8 deletions(-)
 
-diff --git a/arch/arm/boot/dts/omap3-n950-n9.dtsi b/arch/arm/boot/dts/o=
-map3-n950-n9.dtsi
-index c41db94..800b379 100644
---- a/arch/arm/boot/dts/omap3-n950-n9.dtsi
-+++ b/arch/arm/boot/dts/omap3-n950-n9.dtsi
-@@ -8,7 +8,7 @@
-  * published by the Free Software Foundation.
-  */
-=20
--#include "omap36xx-hs.dtsi"
-+#include "omap36xx.dtsi"
-=20
- / {
- 	cpus {
+diff --git a/arch/arm/boot/dts/omap34xx-hs.dtsi b/arch/arm/boot/dts/oma=
+p34xx-hs.dtsi
+index 1ff6264..d4be302 100644
+--- a/arch/arm/boot/dts/omap34xx-hs.dtsi
++++ b/arch/arm/boot/dts/omap34xx-hs.dtsi
+@@ -10,7 +10,3 @@
+ &sham {
+ 	status =3D "disabled";
+ };
+-
+-&timer12 {
+-	status =3D "disabled";
+-};
+diff --git a/arch/arm/boot/dts/omap36xx-hs.dtsi b/arch/arm/boot/dts/oma=
+p36xx-hs.dtsi
+index 2c7febb..e93ff8d 100644
+--- a/arch/arm/boot/dts/omap36xx-hs.dtsi
++++ b/arch/arm/boot/dts/omap36xx-hs.dtsi
+@@ -10,7 +10,3 @@
+ &sham {
+ 	status =3D "disabled";
+ };
+-
+-&timer12 {
+-	status =3D "disabled";
+-};
 --=20
 1.7.9.5
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-omap" i=
-n
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
