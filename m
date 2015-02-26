@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
-Subject: [PATCH 05/10] ARM: dts: omap3 hs: Remove timer12
-Date: Thu, 26 Feb 2015 14:49:55 +0100
-Message-ID: <1424958600-18881-6-git-send-email-pali.rohar@gmail.com>
+Subject: [PATCH 02/10] ARM: OMAP3: Fix crypto support for HS devices
+Date: Thu, 26 Feb 2015 14:49:52 +0100
+Message-ID: <1424958600-18881-3-git-send-email-pali.rohar@gmail.com>
 References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -25,43 +25,165 @@ In-Reply-To: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Device timer12 is automatically disabled on all HS devices via DTS prop=
-erty
-"ti,timer-secure" in file omap3.dtsi so it can be safely removed. We do=
- not
-need to disable it on another place.
+Register crypto hwmod links only if they are not disabled in DT.
+If DT information is missing, enable them only for GP devices.
+
+Before this patch crypto hwmod links were always disabled for all HS de=
+vices
+and it was not possible to use omap-aes and omap-sham linux drivers.
 
 Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
 ---
- arch/arm/boot/dts/omap34xx-hs.dtsi |    4 ----
- arch/arm/boot/dts/omap36xx-hs.dtsi |    4 ----
- 2 files changed, 8 deletions(-)
+ arch/arm/mach-omap2/omap_hwmod_3xxx_data.c |   79 ++++++++++++++++++++=
++++-----
+ 1 file changed, 66 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm/boot/dts/omap34xx-hs.dtsi b/arch/arm/boot/dts/oma=
-p34xx-hs.dtsi
-index 1ff6264..d4be302 100644
---- a/arch/arm/boot/dts/omap34xx-hs.dtsi
-+++ b/arch/arm/boot/dts/omap34xx-hs.dtsi
-@@ -10,7 +10,3 @@
- &sham {
- 	status =3D "disabled";
+diff --git a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c b/arch/arm/mach=
+-omap2/omap_hwmod_3xxx_data.c
+index 4e8e93c..de13a06 100644
+--- a/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
++++ b/arch/arm/mach-omap2/omap_hwmod_3xxx_data.c
+@@ -3744,29 +3744,54 @@ static struct omap_hwmod_ocp_if *omap3xxx_hwmod=
+_ocp_ifs[] __initdata =3D {
+ /* GP-only hwmod links */
+ static struct omap_hwmod_ocp_if *omap34xx_gp_hwmod_ocp_ifs[] __initdat=
+a =3D {
+ 	&omap3xxx_l4_sec__timer12,
+-	&omap3xxx_l4_core__sham,
+-	&omap3xxx_l4_core__aes,
+ 	NULL
  };
--
--&timer12 {
--	status =3D "disabled";
--};
-diff --git a/arch/arm/boot/dts/omap36xx-hs.dtsi b/arch/arm/boot/dts/oma=
-p36xx-hs.dtsi
-index 2c7febb..e93ff8d 100644
---- a/arch/arm/boot/dts/omap36xx-hs.dtsi
-+++ b/arch/arm/boot/dts/omap36xx-hs.dtsi
-@@ -10,7 +10,3 @@
- &sham {
- 	status =3D "disabled";
+=20
+ static struct omap_hwmod_ocp_if *omap36xx_gp_hwmod_ocp_ifs[] __initdat=
+a =3D {
+ 	&omap3xxx_l4_sec__timer12,
+-	&omap3xxx_l4_core__sham,
+-	&omap3xxx_l4_core__aes,
+ 	NULL
  };
--
--&timer12 {
--	status =3D "disabled";
--};
+=20
+ static struct omap_hwmod_ocp_if *am35xx_gp_hwmod_ocp_ifs[] __initdata =
+=3D {
+ 	&omap3xxx_l4_sec__timer12,
+-	/*
+-	 * Apparently the SHA/MD5 and AES accelerator IP blocks are
+-	 * only present on some AM35xx chips, and no one knows which
+-	 * ones.  See
+-	 * http://www.spinics.net/lists/arm-kernel/msg215466.html So
+-	 * if you need these IP blocks on an AM35xx, try uncommenting
+-	 * the following lines.
+-	 */
++	NULL
++};
++
++/* crypto hwmod links */
++static struct omap_hwmod_ocp_if *omap34xx_sham_hwmod_ocp_ifs[] __initd=
+ata =3D {
++	&omap3xxx_l4_core__sham,
++	NULL
++};
++
++static struct omap_hwmod_ocp_if *omap34xx_aes_hwmod_ocp_ifs[] __initda=
+ta =3D {
++	&omap3xxx_l4_core__aes,
++	NULL
++};
++
++static struct omap_hwmod_ocp_if *omap36xx_sham_hwmod_ocp_ifs[] __initd=
+ata =3D {
++	&omap3xxx_l4_core__sham,
++	NULL
++};
++
++static struct omap_hwmod_ocp_if *omap36xx_aes_hwmod_ocp_ifs[] __initda=
+ta =3D {
++	&omap3xxx_l4_core__aes,
++	NULL
++};
++
++/*
++ * Apparently the SHA/MD5 and AES accelerator IP blocks are
++ * only present on some AM35xx chips, and no one knows which
++ * ones.  See
++ * http://www.spinics.net/lists/arm-kernel/msg215466.html So
++ * if you need these IP blocks on an AM35xx, try uncommenting
++ * the following lines.
++ */
++static struct omap_hwmod_ocp_if *am35xx_sham_hwmod_ocp_ifs[] __initdat=
+a =3D {
+ 	/* &omap3xxx_l4_core__sham, */
++	NULL
++};
++
++static struct omap_hwmod_ocp_if *am35xx_aes_hwmod_ocp_ifs[] __initdata=
+ =3D {
+ 	/* &omap3xxx_l4_core__aes, */
+ 	NULL
+ };
+@@ -3871,7 +3896,8 @@ static struct omap_hwmod_ocp_if *omap3xxx_dss_hwm=
+od_ocp_ifs[] __initdata =3D {
+ int __init omap3xxx_hwmod_init(void)
+ {
+ 	int r;
+-	struct omap_hwmod_ocp_if **h =3D NULL, **h_gp =3D NULL;
++	struct omap_hwmod_ocp_if **h =3D NULL, **h_gp =3D NULL, **h_sham =3D =
+NULL, **h_aes =3D NULL;
++	struct device_node *bus =3D NULL;
+ 	unsigned int rev;
+=20
+ 	omap_hwmod_init();
+@@ -3893,13 +3919,19 @@ int __init omap3xxx_hwmod_init(void)
+ 	    rev =3D=3D OMAP3430_REV_ES3_1 || rev =3D=3D OMAP3430_REV_ES3_1_2)=
+ {
+ 		h =3D omap34xx_hwmod_ocp_ifs;
+ 		h_gp =3D omap34xx_gp_hwmod_ocp_ifs;
++		h_sham =3D omap34xx_sham_hwmod_ocp_ifs;
++		h_aes =3D omap34xx_aes_hwmod_ocp_ifs;
+ 	} else if (rev =3D=3D AM35XX_REV_ES1_0 || rev =3D=3D AM35XX_REV_ES1_1=
+) {
+ 		h =3D am35xx_hwmod_ocp_ifs;
+ 		h_gp =3D am35xx_gp_hwmod_ocp_ifs;
++		h_sham =3D am35xx_sham_hwmod_ocp_ifs;
++		h_aes =3D am35xx_aes_hwmod_ocp_ifs;
+ 	} else if (rev =3D=3D OMAP3630_REV_ES1_0 || rev =3D=3D OMAP3630_REV_E=
+S1_1 ||
+ 		   rev =3D=3D OMAP3630_REV_ES1_2) {
+ 		h =3D omap36xx_hwmod_ocp_ifs;
+ 		h_gp =3D omap36xx_gp_hwmod_ocp_ifs;
++		h_sham =3D omap36xx_sham_hwmod_ocp_ifs;
++		h_aes =3D omap36xx_aes_hwmod_ocp_ifs;
+ 	} else {
+ 		WARN(1, "OMAP3 hwmod family init: unknown chip type\n");
+ 		return -EINVAL;
+@@ -3916,6 +3948,27 @@ int __init omap3xxx_hwmod_init(void)
+ 			return r;
+ 	}
+=20
++	/*
++	 * Register crypto hwmod links only if they are not disabled in DT.
++	 * If DT information is missing, enable them only for GP devices.
++	 */
++
++	if (of_have_populated_dt())
++		bus =3D of_find_node_by_name(NULL, "ocp");
++
++	if (h_sham && ((!bus && omap_type() =3D=3D OMAP2_DEVICE_TYPE_GP) ||
++	    (bus && of_device_is_available(of_find_node_by_name(bus, "sham"))=
+))) {
++		r =3D omap_hwmod_register_links(h_sham);
++		if (r < 0)
++			return r;
++	}
++
++	if (h_aes && ((!bus && omap_type() =3D=3D OMAP2_DEVICE_TYPE_GP) ||
++	    (bus && of_device_is_available(of_find_node_by_name(bus, "aes")))=
+)) {
++		r =3D omap_hwmod_register_links(h_aes);
++		if (r < 0)
++			return r;
++	}
+=20
+ 	/*
+ 	 * Register hwmod links specific to certain ES levels of a
 --=20
 1.7.9.5
