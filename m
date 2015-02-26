@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
-Subject: [PATCH 08/10] ARM: dts: n900: Enable omap sham and include directly omap34xx.dtsi
-Date: Thu, 26 Feb 2015 14:49:58 +0100
-Message-ID: <1424958600-18881-9-git-send-email-pali.rohar@gmail.com>
+Subject: [PATCH 10/10] ARM: dts: Remove files omap34xx-hs.dtsi and omap36xx-hs.dtsi
+Date: Thu, 26 Feb 2015 14:50:00 +0100
+Message-ID: <1424958600-18881-11-git-send-email-pali.rohar@gmail.com>
 References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -25,58 +25,55 @@ In-Reply-To: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch moves content of file omap34xx-hs.dtsi into omap3-n900.dts a=
-nd enable
-omap sham support (omap HW support for SHA + MD5). After testing both o=
-map hwmod
-and omap-sham.ko drivers it looks like signed Nokia X-Loader enable L3 =
-firewall
-for omap sham. There is no kernel crash with both official bootloader a=
-nd crypto
-enable bootloader. So we can safely enable sham code.
+These files are not used by any DTS file anymore.
 
 Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
 ---
- arch/arm/boot/dts/omap3-n900.dts |   16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ arch/arm/boot/dts/omap34xx-hs.dtsi |   12 ------------
+ arch/arm/boot/dts/omap36xx-hs.dtsi |   12 ------------
+ 2 files changed, 24 deletions(-)
+ delete mode 100644 arch/arm/boot/dts/omap34xx-hs.dtsi
+ delete mode 100644 arch/arm/boot/dts/omap36xx-hs.dtsi
 
-diff --git a/arch/arm/boot/dts/omap3-n900.dts b/arch/arm/boot/dts/omap3=
--n900.dts
-index d16aa9c..10d5305 100644
---- a/arch/arm/boot/dts/omap3-n900.dts
-+++ b/arch/arm/boot/dts/omap3-n900.dts
-@@ -9,9 +9,23 @@
-=20
- /dts-v1/;
-=20
--#include "omap34xx-hs.dtsi"
-+#include "omap34xx.dtsi"
- #include <dt-bindings/input/input.h>
-=20
-+/*
-+ * Default secure signed bootloader (Nokia X-Loader) does not enable L=
-3 firewall
-+ * for omap AES HW crypto support. When linux kernel try to access mem=
-ory of AES
-+ * blocks then kernel receive "Unhandled fault: external abort on non-=
-linefetch"
-+ * and crash. Until somebody fix omap-aes.c and omap_hwmod_3xxx_data.c=
- code (no
-+ * crash anymore) omap AES support will be disabled for all Nokia N900=
- devices.
-+ * There is "unofficial" version of bootloader which enables AES in L3=
- firewall
-+ * but it is not widely used and to prevent kernel crash rather AES is=
- disabled.
-+ * There is also no runtime detection code if AES is disabled in L3 fi=
-rewall...
-+ */
-+&aes {
-+	status =3D "disabled";
-+};
-+
- / {
- 	model =3D "Nokia N900";
- 	compatible =3D "nokia,omap3-n900", "ti,omap3430", "ti,omap3";
+diff --git a/arch/arm/boot/dts/omap34xx-hs.dtsi b/arch/arm/boot/dts/oma=
+p34xx-hs.dtsi
+deleted file mode 100644
+index d4be302..0000000
+--- a/arch/arm/boot/dts/omap34xx-hs.dtsi
++++ /dev/null
+@@ -1,12 +0,0 @@
+-/* Disabled modules for secure omaps */
+-
+-#include "omap34xx.dtsi"
+-
+-/* Secure omaps have some devices inaccessible depending on the firmwa=
+re */
+-&aes {
+-	status =3D "disabled";
+-};
+-
+-&sham {
+-	status =3D "disabled";
+-};
+diff --git a/arch/arm/boot/dts/omap36xx-hs.dtsi b/arch/arm/boot/dts/oma=
+p36xx-hs.dtsi
+deleted file mode 100644
+index e93ff8d..0000000
+--- a/arch/arm/boot/dts/omap36xx-hs.dtsi
++++ /dev/null
+@@ -1,12 +0,0 @@
+-/* Disabled modules for secure omaps */
+-
+-#include "omap36xx.dtsi"
+-
+-/* Secure omaps have some devices inaccessible depending on the firmwa=
+re */
+-&aes {
+-	status =3D "disabled";
+-};
+-
+-&sham {
+-	status =3D "disabled";
+-};
 --=20
 1.7.9.5
