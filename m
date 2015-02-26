@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
-Subject: [PATCH 06/10] ARM: dts: omap3: Add missing dmas for crypto
-Date: Thu, 26 Feb 2015 14:49:56 +0100
-Message-ID: <1424958600-18881-7-git-send-email-pali.rohar@gmail.com>
+Subject: [PATCH 03/10] crypto: omap-sham: Add support for omap3 devices
+Date: Thu, 26 Feb 2015 14:49:53 +0100
+Message-ID: <1424958600-18881-4-git-send-email-pali.rohar@gmail.com>
 References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -25,37 +25,29 @@ In-Reply-To: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch adds missing dma DTS definitions for omap aes and sham drive=
-rs.
-Without it kernel drivers do not work.
+omap3 support is same as omap2, just with different IO address (specifi=
+ed in DT)
 
 Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
 ---
- arch/arm/boot/dts/omap3.dtsi |    4 ++++
+ drivers/crypto/omap-sham.c |    4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm/boot/dts/omap3.dtsi b/arch/arm/boot/dts/omap3.dts=
-i
-index 60e6d6b..6e8b58f 100644
---- a/arch/arm/boot/dts/omap3.dtsi
-+++ b/arch/arm/boot/dts/omap3.dtsi
-@@ -92,6 +92,8 @@
- 			ti,hwmods =3D "aes";
- 			reg =3D <0x480c5000 0x50>;
- 			interrupts =3D <0>;
-+			dmas =3D <&sdma 65 &sdma 66>;
-+			dma-names =3D "tx", "rx";
- 		};
-=20
- 		prm: prm@48306000 {
-@@ -551,6 +553,8 @@
- 			ti,hwmods =3D "sham";
- 			reg =3D <0x480c3000 0x64>;
- 			interrupts =3D <49>;
-+			dmas =3D <&sdma 69>;
-+			dma-names =3D "rx";
- 		};
-=20
- 		smartreflex_core: smartreflex@480cb000 {
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index 3c76696..b20e374 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1792,6 +1792,10 @@ static const struct of_device_id omap_sham_of_ma=
+tch[] =3D {
+ 		.data		=3D &omap_sham_pdata_omap2,
+ 	},
+ 	{
++		.compatible	=3D "ti,omap3-sham",
++		.data		=3D &omap_sham_pdata_omap2,
++	},
++	{
+ 		.compatible	=3D "ti,omap4-sham",
+ 		.data		=3D &omap_sham_pdata_omap4,
+ 	},
 --=20
 1.7.9.5
