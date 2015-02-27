@@ -1,31 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: tcrypt speed: fix filter for aead algorithms
-Date: Fri, 27 Feb 2015 22:25:03 +1300
-Message-ID: <20150227092503.GA27831@gondor.apana.org.au>
-References: <1422971988-21517-1-git-send-email-cristian.stoica@freescale.com>
+Subject: Re: [PATCH v12 1/2] crypto: AF_ALG: add AEAD support
+Date: Fri, 27 Feb 2015 22:49:44 +1300
+Message-ID: <20150227094944.GA29071@gondor.apana.org.au>
+References: <1681008.mocmysOoQU@tachyon.chronox.de>
+ <2035690.30evPElJOm@tachyon.chronox.de>
+ <7821728.KTX1G67VgF@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
-To: Cristian Stoica <cristian.stoica@freescale.com>
+Cc: 'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	Daniel Borkmann <dborkman@redhat.com>,
+	'LKML' <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	'Linux API' <linux-api@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:35019 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:42021 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752199AbbB0JZN (ORCPT
+	with ESMTP id S1750716AbbB0Jty (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Feb 2015 04:25:13 -0500
+	Fri, 27 Feb 2015 04:49:54 -0500
 Content-Disposition: inline
-In-Reply-To: <1422971988-21517-1-git-send-email-cristian.stoica@freescale.com>
+In-Reply-To: <7821728.KTX1G67VgF@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Feb 03, 2015 at 03:59:48PM +0200, Cristian Stoica wrote:
-> test_aead_speed is written for sync algorithms without specifically
-> requiring them. The effect is that an async algorithm may be used without
-> setting up the request callback, this leading to a kernel panic.
+On Thu, Feb 05, 2015 at 04:10:58PM +0100, Stephan Mueller wrote:
+> Am Donnerstag, 29. Januar 2015, 21:24:45 schrieb Stephan Mueller:
 > 
-> Signed-off-by: Cristian Stoica <cristian.stoica@freescale.com>
+> Hi Herbert,
+> 
+> > This patch adds the AEAD support for AF_ALG.
+> > 
+> > The implementation is based on algif_skcipher, but contains heavy
+> > modifications to streamline the interface for AEAD uses.
+> > 
+> > To use AEAD, the user space consumer has to use the salg_type named
+> > "aead".
+> 
+> I just saw Al Viro's patch to use the iov_iter API in algif_skcipher.c. I 
+> looked at it but lacked documentation for using it properly. Now I have a 
+> template that I will incorporate into algif_aead.c
 
-Please fix it to test asynchronously instead.
+Please resubmit once you have done this.
 
 Thanks,
 -- 
