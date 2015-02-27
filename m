@@ -1,43 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [v2,1/3] crypto: ppc/sha256 - assembler
-Date: Fri, 27 Feb 2015 22:51:21 +1300
-Message-ID: <20150227095120.GA29140@gondor.apana.org.au>
-References: <fc802923-6dbf-4fba-b6fe-5af360ca48c4@EXCHANGE.collogia.de>
+Subject: Re: [PATCH v1 0/5] crypto: ccp - CCP driver updates 2015-01-28
+Date: Fri, 27 Feb 2015 22:51:45 +1300
+Message-ID: <20150227095145.GA29177@gondor.apana.org.au>
+References: <20150128224110.30751.93990.stgit@tlendack-t1.amdoffice.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-To: Markus Stockhausen <stockhausen@collogia.de>
+Cc: linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>
+To: Tom Lendacky <thomas.lendacky@amd.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:60625 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:39586 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752093AbbB0Jv0 (ORCPT
+	with ESMTP id S1751433AbbB0Jvt (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Feb 2015 04:51:26 -0500
+	Fri, 27 Feb 2015 04:51:49 -0500
 Content-Disposition: inline
-In-Reply-To: <fc802923-6dbf-4fba-b6fe-5af360ca48c4@EXCHANGE.collogia.de>
+In-Reply-To: <20150128224110.30751.93990.stgit@tlendack-t1.amdoffice.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 30, 2015 at 03:39:23PM +0100, Markus Stockhausen wrote:
-> This is the assembler code for SHA256 implementation with
-> the SIMD SPE instruction set. Although being only a 32 bit
-> architecture GPRs are extended to 64 bit presenting two
-> 32 bit values. With the enhanced instruction set we can
-> operate on them in parallel. That helps reducing the time
-> to calculate W16-W64. For increasing performance even more 
-> the assembler function can compute hashes for more than 
-> one 64 byte input block. That saves a lot of register
-> saving/restoring
+On Wed, Jan 28, 2015 at 04:41:10PM -0600, Tom Lendacky wrote:
+> The following series of patches includes functional updates to the
+> driver as well as some trivial changes.
 > 
-> The state of the used SPE registers is preserved via the 
-> stack so we can run from interrupt context. There might 
-> be the case that we interrupt ourselves and push sensitive 
-> data from another context onto our stack. Clear this area
-> in the stack afterwards to avoid information leakage.
-> 
-> The code is endian independant.
-> 
-> Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
+> - Fix checks/warnings from checkpatch
+> - Update how the CCP is built (Kconfig and Makefile)
+> - Use dma_set_mask_and_coherent to set the DMA mask
+> - Use devm_ calls where appropriate
+> - Add ACPI support
+>   
+> This patch series is based on cryptodev-2.6.
 
 All applied.  Thanks!
 -- 
