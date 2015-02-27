@@ -1,9 +1,11 @@
 From: Tony Lindgren <tony@atomide.com>
 Subject: Re: [PATCH 07/10] ARM: dts: n9/n950: Enable omap crypto support
-Date: Fri, 27 Feb 2015 07:43:20 -0800
-Message-ID: <20150227154319.GT11056@atomide.com>
+Date: Fri, 27 Feb 2015 08:10:04 -0800
+Message-ID: <20150227161004.GW11056@atomide.com>
 References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
  <1424958600-18881-8-git-send-email-pali.rohar@gmail.com>
+ <20150227154319.GT11056@atomide.com>
+ <201502271701.56059@pali>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
@@ -20,45 +22,33 @@ Cc: =?utf-8?Q?Beno=C3=AEt?= Cousson <bcousson@baylibre.com>,
 	Aaro Koskinen <aaro.koskinen@iki.fi>,
 	Sebastian Reichel <sre@kernel.org>
 To: Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-omap-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1424958600-18881-8-git-send-email-pali.rohar@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <201502271701.56059@pali>
+Sender: linux-omap-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Pali Roh=C3=A1r <pali.rohar@gmail.com> [150226 05:54]:
-> Harmattan system on Nokia N9 and N950 devices uses omap crypto suppor=
-t.
-> Bootloader on those devices is known that it enables HW crypto suppor=
-t.
-> This patch just include omap36xx.dtsi directly, so aes and sham is en=
-abled.
+* Pali Roh=C3=A1r <pali.rohar@gmail.com> [150227 08:05]:
+> On Friday 27 February 2015 16:43:20 Tony Lindgren wrote:
+> > * Pali Roh=C3=A1r <pali.rohar@gmail.com> [150226 05:54]:
+> > > Harmattan system on Nokia N9 and N950 devices uses omap
+> > > crypto support. Bootloader on those devices is known that
+> > > it enables HW crypto support. This patch just include
+> > > omap36xx.dtsi directly, so aes and sham is enabled.
+> >=20
+> > Let's also remove omap36xx-hs.dtsi with this patch if no other
+> > users.
+> >=20
+>=20
+> Removing both -hs files is done by last patch in this series.
 
-Let's also remove omap36xx-hs.dtsi with this patch if no other users.
+Yes just noticed thanks, no need to change.
 
 Regards,
 
 Tony
-=20
-> Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
-> ---
->  arch/arm/boot/dts/omap3-n950-n9.dtsi |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/arch/arm/boot/dts/omap3-n950-n9.dtsi b/arch/arm/boot/dts=
-/omap3-n950-n9.dtsi
-> index c41db94..800b379 100644
-> --- a/arch/arm/boot/dts/omap3-n950-n9.dtsi
-> +++ b/arch/arm/boot/dts/omap3-n950-n9.dtsi
-> @@ -8,7 +8,7 @@
->   * published by the Free Software Foundation.
->   */
-> =20
-> -#include "omap36xx-hs.dtsi"
-> +#include "omap36xx.dtsi"
-> =20
->  / {
->  	cpus {
-> --=20
-> 1.7.9.5
->=20
+--
+To unsubscribe from this list: send the line "unsubscribe linux-omap" i=
+n
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
