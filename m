@@ -1,56 +1,57 @@
-From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH v12 1/2] crypto: AF_ALG: add AEAD support
-Date: Fri, 27 Feb 2015 11:26:32 +0100
-Message-ID: <2021530.t7zNty0mPn@tauon>
-References: <1681008.mocmysOoQU@tachyon.chronox.de> <7821728.KTX1G67VgF@tachyon.chronox.de> <20150227094944.GA29071@gondor.apana.org.au>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: Re: [PATCH] crypto: tcrypt speed: fix filter for aead algorithms
+Date: Fri, 27 Feb 2015 13:14:20 +0200
+Message-ID: <54F0518C.1040801@freescale.com>
+References: <1422971988-21517-1-git-send-email-cristian.stoica@freescale.com>
+ <20150227092503.GA27831@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: 'Quentin Gouchet' <quentin.gouchet-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Daniel Borkmann <dborkman-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	'LKML' <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	'Linux API' <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20150227094944.GA29071-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
-
-Am Freitag, 27. Februar 2015, 22:49:44 schrieb Herbert Xu:
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>, <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-by2on0122.outbound.protection.outlook.com ([207.46.100.122]:58592
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753167AbbB0LO1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Feb 2015 06:14:27 -0500
+In-Reply-To: <20150227092503.GA27831@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 Hi Herbert,
 
->On Thu, Feb 05, 2015 at 04:10:58PM +0100, Stephan Mueller wrote:
->> Am Donnerstag, 29. Januar 2015, 21:24:45 schrieb Stephan Mueller:
->> 
->> Hi Herbert,
->> 
->> > This patch adds the AEAD support for AF_ALG.
->> > 
->> > The implementation is based on algif_skcipher, but contains heavy
->> > modifications to streamline the interface for AEAD uses.
->> > 
->> > To use AEAD, the user space consumer has to use the salg_type named
->> > "aead".
->> 
->> I just saw Al Viro's patch to use the iov_iter API in
->> algif_skcipher.c. I looked at it but lacked documentation for using
->> it properly. Now I have a template that I will incorporate into
->> algif_aead.c
->
->Please resubmit once you have done this.
+On 02/27/2015 11:25 AM, Herbert Xu wrote:
+> On Tue, Feb 03, 2015 at 03:59:48PM +0200, Cristian Stoica wrote:
+>> test_aead_speed is written for sync algorithms without specifically
+[...]
+> Please fix it to test asynchronously instead.
 
-I have done that, but as indicated with an email to Al, I cannot get his 
-patch for skcipher and hash to work. Similarly, my modification for the 
-AEAD does not work either. So, I do not see that Al's patch can be 
-merged as is.
+Thanks for review.
 
-Therefore, I have not submitted my patch as Al mentioned he wanted to 
-look into his patchset.
->
->Thanks,
+I think that a fix for async aead requires a different test function as
+is the case with test_cipher_speed/test_acipher_speed and also with
+test_hash_speed/test_ahash_speed.
 
+But I see a issue here with the current async tests:
 
-Ciao
-Stephan
+int test_acipher_cycles(...)
+{
+  for (i = 0; i < 8; i++) {
+    [...]
+    ret = do_one_acipher_op(req, crypto_ablkcipher_encrypt(req));
+    [...]
+  }
+}
+
+and in do_one_acipher_op we wait for completion of
+crypto_ablkcipher_encrypt:
+
+if (ret == -EINPROGRESS || ret == -EBUSY) {
+	struct tcrypt_result *tr = req->base.data;
+	ret = wait_for_completion_interruptible(&tr->completion);
+}
+
+Doesn't this defeat the purpose of async execution?
+
+Cristian S.
