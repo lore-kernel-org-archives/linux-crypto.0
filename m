@@ -1,90 +1,64 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH 2/2] crypto: talitos: Add AES-XTS Support
-Date: Fri, 27 Feb 2015 17:46:43 +0200
-Message-ID: <54F09163.5080007@freescale.com>
-References: <1424451610-5786-1-git-send-email-mort@bork.org>
- <1424451610-5786-3-git-send-email-mort@bork.org>
+From: Pali =?utf-8?q?Roh=C3=A1r?= <pali.rohar@gmail.com>
+Subject: Re: [PATCH 07/10] ARM: dts: n9/n950: Enable omap crypto support
+Date: Fri, 27 Feb 2015 17:01:55 +0100
+Message-ID: <201502271701.56059@pali>
+References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com> <1424958600-18881-8-git-send-email-pali.rohar@gmail.com> <20150227154319.GT11056@atomide.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: Martin Hicks <mort@bork.org>, Kim Phillips <kim.phillips@freescale.com>,
- Scott Wood <scottwood@freescale.com>, Kumar Gala <galak@kernel.crashing.org>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <1424451610-5786-3-git-send-email-mort@bork.org>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Content-Type: multipart/signed;
+  boundary="nextPart3567900.KJ299vtNQS";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
+Cc: =?utf-8?q?Beno=C3=AEt_Cousson?= <bcousson@baylibre.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Russell King <linux@arm.linux.org.uk>,
+	Paul Walmsley <paul@pwsan.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Pavel Machek <pavel@ucw.cz>, Nishanth Menon <nm@ti.com>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Sebastian Reichel <sre@kernel.org>
+To: Tony Lindgren <tony@atomide.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20150227154319.GT11056@atomide.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gMi8yMC8yMDE1IDc6MDAgUE0sIE1hcnRpbiBIaWNrcyB3cm90ZToKPiBUaGUgbmV3ZXIgdGFs
-aXRvcyBoYXJkd2FyZSBoYXMgc3VwcG9ydCBmb3IgQUVTIGluIFhUUyBtb2RlLgo+IAo+IFNpZ25l
-ZC1vZmYtYnk6IE1hcnRpbiBIaWNrcyA8bW9ydEBib3JrLm9yZz4KPiAtLS0KCmNoZWNrcGF0Y2gg
-Y29tcGxhaW5zIGFib3V0IGZvcm1hdHRpbmcsIHBsZWFzZSBjaGVjay4KCj4gIGRyaXZlcnMvY3J5
-cHRvL3RhbGl0b3MuYyB8ICAgMzMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCj4g
-IGRyaXZlcnMvY3J5cHRvL3RhbGl0b3MuaCB8ICAgIDEgKwo+ICAyIGZpbGVzIGNoYW5nZWQsIDM0
-IGluc2VydGlvbnMoKykKPiAKPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vdGFsaXRvcy5j
-IGIvZHJpdmVycy9jcnlwdG8vdGFsaXRvcy5jCj4gaW5kZXggNmIyYTE5YS4uMzhjYmRlMSAxMDA2
-NDQKPiAtLS0gYS9kcml2ZXJzL2NyeXB0by90YWxpdG9zLmMKPiArKysgYi9kcml2ZXJzL2NyeXB0
-by90YWxpdG9zLmMKPiBAQCAtNDAsOSArNDAsMTEgQEAKPiAgI2luY2x1ZGUgPGxpbnV4L3NwaW5s
-b2NrLmg+Cj4gICNpbmNsdWRlIDxsaW51eC9ydG5ldGxpbmsuaD4KPiAgI2luY2x1ZGUgPGxpbnV4
-L3NsYWIuaD4KPiArI2luY2x1ZGUgPGxpbnV4L2RldmljZS1tYXBwZXIuaD4KPiAgCj4gICNpbmNs
-dWRlIDxjcnlwdG8vYWxnYXBpLmg+Cj4gICNpbmNsdWRlIDxjcnlwdG8vYWVzLmg+Cj4gKyNpbmNs
-dWRlIDxjcnlwdG8veHRzLmg+Cj4gICNpbmNsdWRlIDxjcnlwdG8vZGVzLmg+Cj4gICNpbmNsdWRl
-IDxjcnlwdG8vc2hhLmg+Cj4gICNpbmNsdWRlIDxjcnlwdG8vbWQ1Lmg+Cj4gQEAgLTE0NjQsOSAr
-MTQ2NiwyMiBAQCBzdGF0aWMgc3RydWN0IHRhbGl0b3NfZWRlc2MgKmFibGtjaXBoZXJfZWRlc2Nf
-YWxsb2Moc3RydWN0IGFibGtjaXBoZXJfcmVxdWVzdCAqCj4gIAkJCQkJCSAgICBhcmVxLCBib29s
-IGVuY3J5cHQpCj4gIHsKPiAgCXN0cnVjdCBjcnlwdG9fYWJsa2NpcGhlciAqY2lwaGVyID0gY3J5
-cHRvX2FibGtjaXBoZXJfcmVxdGZtKGFyZXEpOwo+ICsJc3RydWN0IGNyeXB0b190Zm0gKnRmbSA9
-IChzdHJ1Y3QgY3J5cHRvX3RmbSAqKWNpcGhlcjsKPiAgCXN0cnVjdCB0YWxpdG9zX2N0eCAqY3R4
-ID0gY3J5cHRvX2FibGtjaXBoZXJfY3R4KGNpcGhlcik7Cj4gIAl1bnNpZ25lZCBpbnQgaXZzaXpl
-ID0gY3J5cHRvX2FibGtjaXBoZXJfaXZzaXplKGNpcGhlcik7Cj4gIAo+ICsJLyoKPiArCSAqIEFF
-Uy1YVFMgdXNlcyB0aGUgZmlyc3QgdHdvIEFFUyBDb250ZXh0IHJlZ2lzdGVycyBmb3I6Cj4gKwkg
-Kgo+ICsJICogICAgIFJlZ2lzdGVyIDE6ICAgU2VjdG9yIE51bWJlciAoTGl0dGxlIEVuZGlhbikK
-PiArCSAqICAgICBSZWdpc3RlciAyOiAgIFNlY3RvciBTaXplICAgKEJpZyBFbmRpYW4pCj4gKwkg
-Kgo+ICsJICogV2hlcmVhcyBBRVMtQ0JDIHVzZXMgcmVnaXN0ZXJzIDEvMiBhcyBhIDE2LWJ5dGUg
-SVYuCj4gKwkgKi8KPiArCWlmICghc3RyY21wKGNyeXB0b190Zm1fYWxnX25hbWUodGZtKSwieHRz
-KGFlcykiKSkKCkkgZ3Vlc3MgaXQgd291bGQgYmUgYmV0dGVyIHRvIHVzZSBjdHgtPmRlc2NfaGRy
-X3RlbXBsYXRlIGluc3RlYWQgb2YKc3RyaW5nIGNvbXBhcmlzb24uCgo+ICsJCS8qIEZpeGVkIHNp
-emVkIHNlY3RvciAqLwo+ICsJCSooKHU2NCAqKWFyZXEtPmluZm8gKyAxKSA9IGNwdV90b19iZTY0
-KCgxPDxTRUNUT1JfU0hJRlQpKTsKPiArCj4gIAlyZXR1cm4gdGFsaXRvc19lZGVzY19hbGxvYyhj
-dHgtPmRldiwgTlVMTCwgYXJlcS0+c3JjLCBhcmVxLT5kc3QsCj4gIAkJCQkgICBhcmVxLT5pbmZv
-LCAwLCBhcmVxLT5uYnl0ZXMsIDAsIGl2c2l6ZSwgMCwKPiAgCQkJCSAgIGFyZXEtPmJhc2UuZmxh
-Z3MsICZhcmVxLT5iYXNlLCBlbmNyeXB0KTsKPiBAQCAtMjE5Miw2ICsyMjA3LDI0IEBAIHN0YXRp
-YyBzdHJ1Y3QgdGFsaXRvc19hbGdfdGVtcGxhdGUgZHJpdmVyX2FsZ3NbXSA9IHsKPiAgCQkgICAg
-ICAgICAgICAgICAgICAgICBERVNDX0hEUl9NT0RFMF9ERVVfQ0JDIHwKPiAgCQkgICAgICAgICAg
-ICAgICAgICAgICBERVNDX0hEUl9NT0RFMF9ERVVfM0RFUywKPiAgCX0sCj4gKwl7CS50eXBlID0g
-Q1JZUFRPX0FMR19UWVBFX0FCTEtDSVBIRVIsCj4gKwkJLmFsZy5jcnlwdG8gPSB7Cj4gKwkJCS5j
-cmFfbmFtZSA9ICJ4dHMoYWVzKSIsCj4gKwkJCS5jcmFfZHJpdmVyX25hbWUgPSAieHRzLWFlcy10
-YWxpdG9zIiwKPiArCQkJLmNyYV9ibG9ja3NpemUgPSBYVFNfQkxPQ0tfU0laRSwKPiArCQkJLmNy
-YV9mbGFncyA9IENSWVBUT19BTEdfVFlQRV9BQkxLQ0lQSEVSIHwKPiArICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIENSWVBUT19BTEdfQVNZTkMsCj4gKwkJCS5jcmFfYWJsa2Np
-cGhlciA9IHsKPiArCQkJCS5taW5fa2V5c2l6ZSA9IEFFU19NSU5fS0VZX1NJWkUgKiAyLAo+ICsJ
-CQkJLm1heF9rZXlzaXplID0gQUVTX01BWF9LRVlfU0laRSAqIDIsCj4gKwkJCQkuaXZzaXplID0g
-WFRTX0JMT0NLX1NJWkUsCj4gKwkJCX0KPiArCQl9LAo+ICsJCS5kZXNjX2hkcl90ZW1wbGF0ZSA9
-IERFU0NfSERSX1RZUEVfQ09NTU9OX05PTlNOT09QX05PX0FGRVUgfAo+ICsJCQkJCURFU0NfSERS
-X1NFTDBfQUVTVSB8Cj4gKwkJCQkJREVTQ19IRFJfTU9ERTBfQUVTVV9YVFMsCj4gKwl9LAo+ICsK
-PiAgCS8qIEFIQVNIIGFsZ29yaXRobXMuICovCj4gIAl7CS50eXBlID0gQ1JZUFRPX0FMR19UWVBF
-X0FIQVNILAo+ICAJCS5hbGcuaGFzaCA9IHsKPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8v
-dGFsaXRvcy5oIGIvZHJpdmVycy9jcnlwdG8vdGFsaXRvcy5oCj4gaW5kZXggYTZmNzNlMi4uNzM1
-ZGE4MiAxMDA2NDQKPiAtLS0gYS9kcml2ZXJzL2NyeXB0by90YWxpdG9zLmgKPiArKysgYi9kcml2
-ZXJzL2NyeXB0by90YWxpdG9zLmgKPiBAQCAtMzE2LDYgKzMxNiw3IEBAIGV4dGVybiBpbnQgdGFs
-aXRvc19zdWJtaXQoc3RydWN0IGRldmljZSAqZGV2LCBpbnQgY2gsIHN0cnVjdCB0YWxpdG9zX2Vk
-ZXNjICplZGVzCj4gIC8qIHByaW1hcnkgZXhlY3V0aW9uIHVuaXQgbW9kZSAoTU9ERTApIGFuZCBk
-ZXJpdmF0aXZlcyAqLwo+ICAjZGVmaW5lCURFU0NfSERSX01PREUwX0VOQ1JZUFQJCWNwdV90b19i
-ZTMyKDB4MDAxMDAwMDApCj4gICNkZWZpbmUJREVTQ19IRFJfTU9ERTBfQUVTVV9DQkMJCWNwdV90
-b19iZTMyKDB4MDAyMDAwMDApCj4gKyNkZWZpbmUJREVTQ19IRFJfTU9ERTBfQUVTVV9YVFMJCWNw
-dV90b19iZTMyKDB4MDQyMDAwMDApCj4gICNkZWZpbmUJREVTQ19IRFJfTU9ERTBfREVVX0NCQwkJ
-Y3B1X3RvX2JlMzIoMHgwMDQwMDAwMCkKPiAgI2RlZmluZQlERVNDX0hEUl9NT0RFMF9ERVVfM0RF
-UwkJY3B1X3RvX2JlMzIoMHgwMDIwMDAwMCkKPiAgI2RlZmluZQlERVNDX0hEUl9NT0RFMF9NREVV
-X0NPTlQJY3B1X3RvX2JlMzIoMHgwODAwMDAwMCkKPiAKCgpfX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eHBwYy1kZXYgbWFpbGluZyBsaXN0CkxpbnV4
-cHBjLWRldkBsaXN0cy5vemxhYnMub3JnCmh0dHBzOi8vbGlzdHMub3psYWJzLm9yZy9saXN0aW5m
-by9saW51eHBwYy1kZXY=
+--nextPart3567900.KJ299vtNQS
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Friday 27 February 2015 16:43:20 Tony Lindgren wrote:
+> * Pali Roh=C3=A1r <pali.rohar@gmail.com> [150226 05:54]:
+> > Harmattan system on Nokia N9 and N950 devices uses omap
+> > crypto support. Bootloader on those devices is known that
+> > it enables HW crypto support. This patch just include
+> > omap36xx.dtsi directly, so aes and sham is enabled.
+>=20
+> Let's also remove omap36xx-hs.dtsi with this patch if no other
+> users.
+>=20
+
+Removing both -hs files is done by last patch in this series.
+
+=2D-=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
+
+--nextPart3567900.KJ299vtNQS
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEABECAAYFAlTwlPQACgkQi/DJPQPkQ1L9WwCgi5bGveyREntli9FX/OZjUauZ
+oDoAniRo/mlDpyOwfiptTJuL96NX/kFR
+=TnWn
+-----END PGP SIGNATURE-----
+
+--nextPart3567900.KJ299vtNQS--
