@@ -1,49 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v12 1/2] crypto: AF_ALG: add AEAD support
-Date: Fri, 27 Feb 2015 22:49:44 +1300
-Message-ID: <20150227094944.GA29071@gondor.apana.org.au>
-References: <1681008.mocmysOoQU@tachyon.chronox.de>
- <2035690.30evPElJOm@tachyon.chronox.de>
- <7821728.KTX1G67VgF@tachyon.chronox.de>
+Subject: Re: [v2,1/3] crypto: ppc/sha256 - assembler
+Date: Fri, 27 Feb 2015 22:51:21 +1300
+Message-ID: <20150227095120.GA29140@gondor.apana.org.au>
+References: <fc802923-6dbf-4fba-b6fe-5af360ca48c4@EXCHANGE.collogia.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: 'Quentin Gouchet' <quentin.gouchet@gmail.com>,
-	Daniel Borkmann <dborkman@redhat.com>,
-	'LKML' <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	'Linux API' <linux-api@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Markus Stockhausen <stockhausen@collogia.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:42021 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:60625 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750716AbbB0Jty (ORCPT
+	with ESMTP id S1752093AbbB0Jv0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Feb 2015 04:49:54 -0500
+	Fri, 27 Feb 2015 04:51:26 -0500
 Content-Disposition: inline
-In-Reply-To: <7821728.KTX1G67VgF@tachyon.chronox.de>
+In-Reply-To: <fc802923-6dbf-4fba-b6fe-5af360ca48c4@EXCHANGE.collogia.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 05, 2015 at 04:10:58PM +0100, Stephan Mueller wrote:
-> Am Donnerstag, 29. Januar 2015, 21:24:45 schrieb Stephan Mueller:
+On Fri, Jan 30, 2015 at 03:39:23PM +0100, Markus Stockhausen wrote:
+> This is the assembler code for SHA256 implementation with
+> the SIMD SPE instruction set. Although being only a 32 bit
+> architecture GPRs are extended to 64 bit presenting two
+> 32 bit values. With the enhanced instruction set we can
+> operate on them in parallel. That helps reducing the time
+> to calculate W16-W64. For increasing performance even more 
+> the assembler function can compute hashes for more than 
+> one 64 byte input block. That saves a lot of register
+> saving/restoring
 > 
-> Hi Herbert,
+> The state of the used SPE registers is preserved via the 
+> stack so we can run from interrupt context. There might 
+> be the case that we interrupt ourselves and push sensitive 
+> data from another context onto our stack. Clear this area
+> in the stack afterwards to avoid information leakage.
 > 
-> > This patch adds the AEAD support for AF_ALG.
-> > 
-> > The implementation is based on algif_skcipher, but contains heavy
-> > modifications to streamline the interface for AEAD uses.
-> > 
-> > To use AEAD, the user space consumer has to use the salg_type named
-> > "aead".
+> The code is endian independant.
 > 
-> I just saw Al Viro's patch to use the iov_iter API in algif_skcipher.c. I 
-> looked at it but lacked documentation for using it properly. Now I have a 
-> template that I will incorporate into algif_aead.c
+> Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
 
-Please resubmit once you have done this.
-
-Thanks,
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
