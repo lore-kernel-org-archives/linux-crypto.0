@@ -1,15 +1,13 @@
-From: Pali =?utf-8?q?Roh=C3=A1r?= <pali.rohar@gmail.com>
+From: Tony Lindgren <tony@atomide.com>
 Subject: Re: [PATCH 07/10] ARM: dts: n9/n950: Enable omap crypto support
-Date: Fri, 27 Feb 2015 17:01:55 +0100
-Message-ID: <201502271701.56059@pali>
-References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com> <1424958600-18881-8-git-send-email-pali.rohar@gmail.com> <20150227154319.GT11056@atomide.com>
+Date: Fri, 27 Feb 2015 07:43:20 -0800
+Message-ID: <20150227154319.GT11056@atomide.com>
+References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
+ <1424958600-18881-8-git-send-email-pali.rohar@gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart3567900.KJ299vtNQS";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Content-Transfer-Encoding: 7bit
-Cc: =?utf-8?q?Beno=C3=AEt_Cousson?= <bcousson@baylibre.com>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: =?utf-8?Q?Beno=C3=AEt?= Cousson <bcousson@baylibre.com>,
 	Rob Herring <robh+dt@kernel.org>,
 	Russell King <linux@arm.linux.org.uk>,
 	Paul Walmsley <paul@pwsan.com>,
@@ -21,44 +19,46 @@ Cc: =?utf-8?q?Beno=C3=AEt_Cousson?= <bcousson@baylibre.com>,
 	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
 	Aaro Koskinen <aaro.koskinen@iki.fi>,
 	Sebastian Reichel <sre@kernel.org>
-To: Tony Lindgren <tony@atomide.com>
+To: Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150227154319.GT11056@atomide.com>
+Content-Disposition: inline
+In-Reply-To: <1424958600-18881-8-git-send-email-pali.rohar@gmail.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
---nextPart3567900.KJ299vtNQS
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+* Pali Roh=C3=A1r <pali.rohar@gmail.com> [150226 05:54]:
+> Harmattan system on Nokia N9 and N950 devices uses omap crypto suppor=
+t.
+> Bootloader on those devices is known that it enables HW crypto suppor=
+t.
+> This patch just include omap36xx.dtsi directly, so aes and sham is en=
+abled.
 
-On Friday 27 February 2015 16:43:20 Tony Lindgren wrote:
-> * Pali Roh=C3=A1r <pali.rohar@gmail.com> [150226 05:54]:
-> > Harmattan system on Nokia N9 and N950 devices uses omap
-> > crypto support. Bootloader on those devices is known that
-> > it enables HW crypto support. This patch just include
-> > omap36xx.dtsi directly, so aes and sham is enabled.
+Let's also remove omap36xx-hs.dtsi with this patch if no other users.
+
+Regards,
+
+Tony
+=20
+> Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
+> ---
+>  arch/arm/boot/dts/omap3-n950-n9.dtsi |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> Let's also remove omap36xx-hs.dtsi with this patch if no other
-> users.
+> diff --git a/arch/arm/boot/dts/omap3-n950-n9.dtsi b/arch/arm/boot/dts=
+/omap3-n950-n9.dtsi
+> index c41db94..800b379 100644
+> --- a/arch/arm/boot/dts/omap3-n950-n9.dtsi
+> +++ b/arch/arm/boot/dts/omap3-n950-n9.dtsi
+> @@ -8,7 +8,7 @@
+>   * published by the Free Software Foundation.
+>   */
+> =20
+> -#include "omap36xx-hs.dtsi"
+> +#include "omap36xx.dtsi"
+> =20
+>  / {
+>  	cpus {
+> --=20
+> 1.7.9.5
 >=20
-
-Removing both -hs files is done by last patch in this series.
-
-=2D-=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---nextPart3567900.KJ299vtNQS
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEABECAAYFAlTwlPQACgkQi/DJPQPkQ1L9WwCgi5bGveyREntli9FX/OZjUauZ
-oDoAniRo/mlDpyOwfiptTJuL96NX/kFR
-=TnWn
------END PGP SIGNATURE-----
-
---nextPart3567900.KJ299vtNQS--
