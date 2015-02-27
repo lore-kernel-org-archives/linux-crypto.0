@@ -1,57 +1,29 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: Re: [PATCH] crypto: tcrypt speed: fix filter for aead algorithms
-Date: Fri, 27 Feb 2015 13:14:20 +0200
-Message-ID: <54F0518C.1040801@freescale.com>
-References: <1422971988-21517-1-git-send-email-cristian.stoica@freescale.com>
- <20150227092503.GA27831@gondor.apana.org.au>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH 2/5] crypto: talitos: Remove MD5_BLOCK_SIZE
+Date: Fri, 27 Feb 2015 13:03:40 +0200
+Message-ID: <54F04F0C.8070704@freescale.com>
+References: <1424449276-5288-1-git-send-email-mort@bork.org>
+ <1424449276-5288-3-git-send-email-mort@bork.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: <linux-crypto@vger.kernel.org>, <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: <linuxppc-dev@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>
+To: Martin Hicks <mort@bork.org>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	Scott Wood <scottwood@freescale.com>,
+	Kumar Gala <galak@kernel.crashing.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0122.outbound.protection.outlook.com ([207.46.100.122]:58592
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+Received: from mail-bl2on0123.outbound.protection.outlook.com ([65.55.169.123]:15024
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753167AbbB0LO1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Feb 2015 06:14:27 -0500
-In-Reply-To: <20150227092503.GA27831@gondor.apana.org.au>
+	id S1752147AbbB0Mhl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Feb 2015 07:37:41 -0500
+In-Reply-To: <1424449276-5288-3-git-send-email-mort@bork.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On 2/20/2015 6:21 PM, Martin Hicks wrote:
+> This is properly defined in the md5 header file.
+> ---
 
-On 02/27/2015 11:25 AM, Herbert Xu wrote:
-> On Tue, Feb 03, 2015 at 03:59:48PM +0200, Cristian Stoica wrote:
->> test_aead_speed is written for sync algorithms without specifically
-[...]
-> Please fix it to test asynchronously instead.
-
-Thanks for review.
-
-I think that a fix for async aead requires a different test function as
-is the case with test_cipher_speed/test_acipher_speed and also with
-test_hash_speed/test_ahash_speed.
-
-But I see a issue here with the current async tests:
-
-int test_acipher_cycles(...)
-{
-  for (i = 0; i < 8; i++) {
-    [...]
-    ret = do_one_acipher_op(req, crypto_ablkcipher_encrypt(req));
-    [...]
-  }
-}
-
-and in do_one_acipher_op we wait for completion of
-crypto_ablkcipher_encrypt:
-
-if (ret == -EINPROGRESS || ret == -EBUSY) {
-	struct tcrypt_result *tr = req->base.data;
-	ret = wait_for_completion_interruptible(&tr->completion);
-}
-
-Doesn't this defeat the purpose of async execution?
-
-Cristian S.
+Signed-off-by tag is missing.
