@@ -1,76 +1,65 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH 05/10] ARM: dts: omap3 hs: Remove timer12
-Date: Sat, 28 Feb 2015 17:54:23 +0100
-Message-ID: <20150228165423.GJ4978@amd>
-References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
- <1424958600-18881-6-git-send-email-pali.rohar@gmail.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v13 2/2] crypto: AF_ALG: enable AEAD interface compilation
+Date: Sat, 28 Feb 2015 20:50:40 +0100
+Message-ID: <2157361.KATYforRuK@tachyon.chronox.de>
+References: <2180298.gqj58NYuqx@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: =?iso-8859-1?Q?Beno=EEt?= Cousson <bcousson@baylibre.com>,
-	Tony Lindgren <tony@atomide.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Russell King <linux@arm.linux.org.uk>,
-	Paul Walmsley <paul@pwsan.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Nishanth Menon <nm@ti.com>,
-	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Sebastian Reichel <sre@kernel.org>
-To: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: 'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	Daniel Borkmann <dborkman@redhat.com>,
+	linux-api@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: 'Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:46978 "EHLO
-	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750829AbbB1Qya (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 28 Feb 2015 11:54:30 -0500
-Content-Disposition: inline
-In-Reply-To: <1424958600-18881-6-git-send-email-pali.rohar@gmail.com>
+Received: from mail.eperm.de ([89.247.134.16]:36241 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752126AbbB1TvF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 28 Feb 2015 14:51:05 -0500
+In-Reply-To: <2180298.gqj58NYuqx@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu 2015-02-26 14:49:55, Pali Roh=E1r wrote:
-> Device timer12 is automatically disabled on all HS devices via DTS pr=
-operty
-> "ti,timer-secure" in file omap3.dtsi so it can be safely removed. We =
-do not
-> need to disable it on another place.
+Enable compilation of the AEAD AF_ALG support and provide a Kconfig
+option to compile the AEAD AF_ALG support.
 
-Dunno. Theoretically, Linux is not the only user of dts... so even if
-linux handles ti,timer-secure as "don't use it", that may not be right
-for bootloaders etc.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/Kconfig  | 9 +++++++++
+ crypto/Makefile | 1 +
+ 2 files changed, 10 insertions(+)
 
-> diff --git a/arch/arm/boot/dts/omap34xx-hs.dtsi b/arch/arm/boot/dts/o=
-map34xx-hs.dtsi
-> index 1ff6264..d4be302 100644
-> --- a/arch/arm/boot/dts/omap34xx-hs.dtsi
-> +++ b/arch/arm/boot/dts/omap34xx-hs.dtsi
-> @@ -10,7 +10,3 @@
->  &sham {
->  	status =3D "disabled";
->  };
-> -
-> -&timer12 {
-> -	status =3D "disabled";
-> -};
-> diff --git a/arch/arm/boot/dts/omap36xx-hs.dtsi b/arch/arm/boot/dts/o=
-map36xx-hs.dtsi
-> index 2c7febb..e93ff8d 100644
-> --- a/arch/arm/boot/dts/omap36xx-hs.dtsi
-> +++ b/arch/arm/boot/dts/omap36xx-hs.dtsi
-> @@ -10,7 +10,3 @@
->  &sham {
->  	status =3D "disabled";
->  };
-> -
-> -&timer12 {
-> -	status =3D "disabled";
-> -};
-
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses=
-/blog.html
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 2ca8d15..f3d1c24 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1532,6 +1532,15 @@ config CRYPTO_USER_API_RNG
+ 	  This option enables the user-spaces interface for random
+ 	  number generator algorithms.
+ 
++config CRYPTO_USER_API_AEAD
++	tristate "User-space interface for AEAD cipher algorithms"
++	depends on NET
++	select CRYPTO_AEAD
++	select CRYPTO_USER_API
++	help
++	  This option enables the user-spaces interface for AEAD
++	  cipher algorithms.
++
+ config CRYPTO_HASH_INFO
+ 	bool
+ 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index ba19465..97b7d3a 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -100,6 +100,7 @@ obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+ obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
+ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
++obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
+ 
+ #
+ # generic algorithms and the async_tx api
+-- 
+2.1.0
