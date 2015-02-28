@@ -1,437 +1,130 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH RESEND 2/2] crypto: algif - change algif_skcipher to be
- asynchronous
-Date: Fri, 27 Feb 2015 11:35:49 -0800
-Message-ID: <20150227193549.10553.52267.stgit@tstruk-mobl1>
-References: <20150227193538.10553.6144.stgit@tstruk-mobl1>
+From: Milan Broz <gmazyland@gmail.com>
+Subject: Re: [dm-crypt] cryptsetup problem on Raspberry Pi 2 w 512bit key-size
+ (works on Raspberry Pi 1, x86_64, 256bit)
+Date: Sat, 28 Feb 2015 01:48:22 +0100
+Message-ID: <54F11056.7020206@gmail.com>
+References: <2E68FEAA-A69B-4E25-84F9-F30B2E7DFB69@gmail.com> <54E7B46D.8060805@tu-ilmenau.de> <E401AE9C-F988-4839-AC13-62D4FADD7290@gmail.com> <54E82B80.8000607@gmail.com> <EE112BA4-BDD8-4CB3-BD7B-BDA984D15089@gmail.com> <54EA39FA.7010408@gmail.com> <707C4FCB-0182-44E3-946A-19434F32BEAB@gmail.com> <54EB7977.70503@gmail.com> <4E1A4B12-1B94-4ECF-B2E8-BDAD1EE0C37C@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: dm-crypt@saout.de, Lars Winterfeld <lars.winterfeld@tu-ilmenau.de>,
+	linux-crypto@vger.kernel.org
+To: Johannes Ernst <johannes.ernst@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:54604 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752765AbbB0Tjj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 27 Feb 2015 14:39:39 -0500
-In-Reply-To: <20150227193538.10553.6144.stgit@tstruk-mobl1>
+Received: from mail-wg0-f45.google.com ([74.125.82.45]:39911 "EHLO
+	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752592AbbB1As2 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Feb 2015 19:48:28 -0500
+Received: by wggx12 with SMTP id x12so23447600wgg.6
+        for <linux-crypto@vger.kernel.org>; Fri, 27 Feb 2015 16:48:27 -0800 (PST)
+In-Reply-To: <4E1A4B12-1B94-4ECF-B2E8-BDAD1EE0C37C@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The way the algif_skcipher works currently is that on sendmsg/sendpage it
-builds an sgl for the input data and then on read/recvmsg it sends the job
-for encryption putting the user to sleep till the data is processed.
-This way it can only handle one job at a given time.
-This patch changes it to be asynchronous by adding AIO support.
+On 02/24/2015 12:02 AM, Johannes Ernst wrote:
+> All in one place:
+>=20
+>> dd if=3D/dev/zero of=3D./test.img count=3D8 bs=3D1M
+>=20
+>> cryptsetup --hash sha512 --key-size 512 -v luksFormat ./test.img
+> Used password =E2=80=98asdf=E2=80=99 (no quotes)
+>=20
+>> cryptsetup open test.img test
+> Enter passphrase for test.img:=20
+> No key available with this passphrase.
+> Enter passphrase for test.img:=20
+> No key available with this passphrase.
 
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
----
- crypto/algif_skcipher.c |  308 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 301 insertions(+), 7 deletions(-)
+I was able to reproduce it on Raspberry Pi2 B+ and indeed it is Neon co=
+de issue.
+I am using Raspian, where all cryptocode is compiled as modules:
 
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index 0c8a1e5..d035d10 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -19,6 +19,7 @@
- #include <linux/list.h>
- #include <linux/kernel.h>
- #include <linux/mm.h>
-+#include <linux/mempool.h>
- #include <linux/module.h>
- #include <linux/net.h>
- #include <net/sock.h>
-@@ -39,6 +40,9 @@ struct skcipher_ctx {
- 
- 	struct af_alg_completion completion;
- 
-+	struct kmem_cache *cache;
-+	mempool_t *pool;
-+	atomic_t inflight;
- 	unsigned used;
- 
- 	unsigned int len;
-@@ -49,9 +53,135 @@ struct skcipher_ctx {
- 	struct ablkcipher_request req;
- };
- 
-+struct skcipher_async_rsgl {
-+	struct af_alg_sgl sgl;
-+	struct list_head list;
-+};
-+
-+struct skcipher_async_req {
-+	struct kiocb *iocb;
-+	struct skcipher_async_rsgl first_sgl;
-+	struct list_head list;
-+	struct scatterlist *tsg;
-+	char iv[];
-+};
-+
-+#define GET_SREQ(areq, ctx) (struct skcipher_async_req *)((char *)areq + \
-+	crypto_ablkcipher_reqsize(crypto_ablkcipher_reqtfm(&ctx->req)))
-+
-+#define GET_REQ_SIZE(ctx) \
-+	crypto_ablkcipher_reqsize(crypto_ablkcipher_reqtfm(&ctx->req))
-+
-+#define GET_IV_SIZE(ctx) \
-+	crypto_ablkcipher_ivsize(crypto_ablkcipher_reqtfm(&ctx->req))
-+
- #define MAX_SGL_ENTS ((4096 - sizeof(struct skcipher_sg_list)) / \
- 		      sizeof(struct scatterlist) - 1)
- 
-+static void skcipher_free_async_sgls(struct skcipher_async_req *sreq)
-+{
-+	struct skcipher_async_rsgl *rsgl, *tmp;
-+	struct scatterlist *sgl;
-+	struct scatterlist *sg;
-+	int i, n;
-+
-+	list_for_each_entry_safe(rsgl, tmp, &sreq->list, list) {
-+		af_alg_free_sg(&rsgl->sgl);
-+		if (rsgl != &sreq->first_sgl)
-+			kfree(rsgl);
-+	}
-+	sgl = sreq->tsg;
-+	n = sg_nents(sgl);
-+	for_each_sg(sgl, sg, n, i)
-+		put_page(sg_page(sg));
-+
-+	kfree(sreq->tsg);
-+}
-+
-+static void skcipher_async_cb(struct crypto_async_request *req, int err)
-+{
-+	struct sock *sk = req->data;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct skcipher_ctx *ctx = ask->private;
-+	struct skcipher_async_req *sreq = GET_SREQ(req, ctx);
-+	struct kiocb *iocb = sreq->iocb;
-+
-+	atomic_dec(&ctx->inflight);
-+	skcipher_free_async_sgls(sreq);
-+	mempool_free(req, ctx->pool);
-+	aio_complete(iocb, err, err);
-+}
-+
-+static void skcipher_mempool_free(void *_req, void *_sk)
-+{
-+	struct sock *sk = _sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct skcipher_ctx *ctx = ask->private;
-+	struct kmem_cache *cache = ctx->cache;
-+
-+	kmem_cache_free(cache, _req);
-+}
-+
-+static void *skcipher_mempool_alloc(gfp_t gfp_mask, void *_sk)
-+{
-+	struct sock *sk = _sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct skcipher_ctx *ctx = ask->private;
-+	struct kmem_cache *cache = ctx->cache;
-+	struct ablkcipher_request *req;
-+
-+	req = kmem_cache_alloc(cache, gfp_mask);
-+	if (req) {
-+		ablkcipher_request_set_tfm(req,
-+					   crypto_ablkcipher_reqtfm(&ctx->req));
-+		ablkcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+						skcipher_async_cb, sk);
-+	}
-+	return req;
-+}
-+
-+static void skcipher_cache_constructor(void *v)
-+{
-+	memset(v, 0, sizeof(struct skcipher_async_req));
-+}
-+
-+static int skcipher_mempool_create(struct sock *sk)
-+{
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct skcipher_ctx *ctx = ask->private;
-+	unsigned int len = sizeof(struct skcipher_async_req) +
-+		GET_REQ_SIZE(ctx) + GET_IV_SIZE(ctx);
-+	char buf[32];
-+
-+	snprintf(buf, sizeof(buf), "skcipher_%p", ctx);
-+	ctx->cache = kmem_cache_create(buf, len, 0, SLAB_HWCACHE_ALIGN |
-+				       SLAB_TEMPORARY,
-+				       skcipher_cache_constructor);
-+	if (unlikely(!ctx->cache))
-+		return -ENOMEM;
-+
-+	ctx->pool = mempool_create(128, skcipher_mempool_alloc,
-+				   skcipher_mempool_free, sk);
-+
-+	if (unlikely(!ctx->pool)) {
-+		kmem_cache_destroy(ctx->cache);
-+		return -ENOMEM;
-+	}
-+	return 0;
-+}
-+
-+static void skcipher_mempool_destroy(struct skcipher_ctx *ctx)
-+{
-+	if (ctx->pool)
-+		mempool_destroy(ctx->pool);
-+
-+	if (ctx->cache)
-+		kmem_cache_destroy(ctx->cache);
-+
-+	ctx->cache = NULL;
-+	ctx->pool = NULL;
-+}
-+
- static inline int skcipher_sndbuf(struct sock *sk)
- {
- 	struct alg_sock *ask = alg_sk(sk);
-@@ -96,7 +226,7 @@ static int skcipher_alloc_sgl(struct sock *sk)
- 	return 0;
- }
- 
--static void skcipher_pull_sgl(struct sock *sk, int used)
-+static void skcipher_pull_sgl(struct sock *sk, int used, int put)
- {
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct skcipher_ctx *ctx = ask->private;
-@@ -123,8 +253,8 @@ static void skcipher_pull_sgl(struct sock *sk, int used)
- 
- 			if (sg[i].length)
- 				return;
--
--			put_page(sg_page(sg + i));
-+			if (put)
-+				put_page(sg_page(sg + i));
- 			sg_assign_page(sg + i, NULL);
- 		}
- 
-@@ -143,7 +273,7 @@ static void skcipher_free_sgl(struct sock *sk)
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct skcipher_ctx *ctx = ask->private;
- 
--	skcipher_pull_sgl(sk, ctx->used);
-+	skcipher_pull_sgl(sk, ctx->used, 1);
- }
- 
- static int skcipher_wait_for_wmem(struct sock *sk, unsigned flags)
-@@ -424,8 +554,144 @@ unlock:
- 	return err ?: size;
- }
- 
--static int skcipher_recvmsg(struct kiocb *unused, struct socket *sock,
--			    struct msghdr *msg, size_t ignored, int flags)
-+static int skcipher_all_sg_nents(struct skcipher_ctx *ctx)
-+{
-+	struct skcipher_sg_list *sgl;
-+	struct scatterlist *sg;
-+	int nents = 0;
-+
-+	list_for_each_entry(sgl, &ctx->tsgl, list) {
-+		sg = sgl->sg;
-+
-+		while (!sg->length)
-+			sg++;
-+
-+		nents += sg_nents(sg);
-+	}
-+	return nents;
-+}
-+
-+static int skcipher_recvmsg_async(struct kiocb *iocb, struct socket *sock,
-+				  struct msghdr *msg, int flags)
-+{
-+	struct sock *sk = sock->sk;
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct skcipher_ctx *ctx = ask->private;
-+	struct skcipher_sg_list *sgl;
-+	struct scatterlist *sg;
-+	struct skcipher_async_req *sreq;
-+	struct ablkcipher_request *req;
-+	struct skcipher_async_rsgl *last_rsgl = NULL;
-+	unsigned int len = 0, tx_nents = skcipher_all_sg_nents(ctx);
-+	int i = 0;
-+	int err = -ENOMEM;
-+
-+	lock_sock(sk);
-+	req = mempool_alloc(ctx->pool, GFP_KERNEL);
-+	if (unlikely(!req))
-+		goto unlock;
-+
-+	sreq = GET_SREQ(req, ctx);
-+	sreq->iocb = iocb;
-+	INIT_LIST_HEAD(&sreq->list);
-+	memcpy(sreq->iv, ctx->iv, GET_IV_SIZE(ctx));
-+	sreq->tsg = kcalloc(tx_nents, sizeof(*sg), GFP_KERNEL);
-+
-+	if (!sreq->tsg) {
-+		mempool_free(req, ctx->pool);
-+		goto unlock;
-+	}
-+	sg_init_table(sreq->tsg, tx_nents);
-+
-+	while (iov_iter_count(&msg->msg_iter)) {
-+		struct skcipher_async_rsgl *rsgl;
-+		unsigned long used;
-+
-+		if (!ctx->used) {
-+			err = skcipher_wait_for_data(sk, flags);
-+			if (err)
-+				goto free;
-+		}
-+		sgl = list_first_entry(&ctx->tsgl,
-+				       struct skcipher_sg_list, list);
-+		sg = sgl->sg;
-+
-+		while (!sg->length)
-+			sg++;
-+
-+		used = min_t(unsigned long, ctx->used,
-+			     iov_iter_count(&msg->msg_iter));
-+		used = min_t(unsigned long, used, sg->length);
-+
-+		if (i == tx_nents) {
-+			struct scatterlist *tmp;
-+			int x;
-+			/* Ran out of tx slots in async request
-+			 * need to expand */
-+			tmp = kcalloc(tx_nents * 2, sizeof(*tmp),
-+				      GFP_KERNEL);
-+			if (!tmp)
-+				goto free;
-+
-+			sg_init_table(tmp, tx_nents * 2);
-+			for (x = 0; x < tx_nents; x++)
-+				sg_set_page(&tmp[x], sg_page(&sreq->tsg[x]),
-+					    sreq->tsg[x].length,
-+					    sreq->tsg[x].offset);
-+			kfree(sreq->tsg);
-+			sreq->tsg = tmp;
-+			tx_nents *= 2;
-+		}
-+		/* Need to take over the tx sgl from ctx
-+		 * to the asynch req - these sgls will be freed later */
-+		sg_set_page(sreq->tsg + i++, sg_page(sg), sg->length,
-+			    sg->offset);
-+
-+		if (list_empty(&sreq->list)) {
-+			rsgl = &sreq->first_sgl;
-+			list_add_tail(&rsgl->list, &sreq->list);
-+		} else {
-+			rsgl = kzalloc(sizeof(*rsgl), GFP_KERNEL);
-+			if (!rsgl) {
-+				err = -ENOMEM;
-+				goto free;
-+			}
-+			list_add_tail(&rsgl->list, &sreq->list);
-+		}
-+
-+		used = af_alg_make_sg(&rsgl->sgl, &msg->msg_iter, used);
-+		err = used;
-+		if (used < 0)
-+			goto free;
-+		if (last_rsgl)
-+			af_alg_link_sg(&last_rsgl->sgl, &rsgl->sgl);
-+
-+		last_rsgl = rsgl;
-+		len += used;
-+		skcipher_pull_sgl(sk, used, 0);
-+		iov_iter_advance(&msg->msg_iter, used);
-+	}
-+
-+	ablkcipher_request_set_crypt(req, sreq->tsg, sreq->first_sgl.sgl.sg,
-+				     len, sreq->iv);
-+	err = ctx->enc ? crypto_ablkcipher_encrypt(req) :
-+			 crypto_ablkcipher_decrypt(req);
-+	if (err == -EINPROGRESS) {
-+		atomic_inc(&ctx->inflight);
-+		err = -EIOCBQUEUED;
-+		goto unlock;
-+	}
-+free:
-+	skcipher_free_async_sgls(sreq);
-+	mempool_free(req, ctx->pool);
-+unlock:
-+	skcipher_wmem_wakeup(sk);
-+	release_sock(sk);
-+	return err;
-+}
-+
-+static int skcipher_recvmsg_sync(struct socket *sock, struct msghdr *msg,
-+				 int flags)
- {
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
-@@ -484,7 +750,7 @@ free:
- 			goto unlock;
- 
- 		copied += used;
--		skcipher_pull_sgl(sk, used);
-+		skcipher_pull_sgl(sk, used, 1);
- 		iov_iter_advance(&msg->msg_iter, used);
- 	}
- 
-@@ -497,6 +763,13 @@ unlock:
- 	return copied ?: err;
- }
- 
-+static int skcipher_recvmsg(struct kiocb *iocb, struct socket *sock,
-+			    struct msghdr *msg, size_t ignored, int flags)
-+{
-+	return is_sync_kiocb(iocb) ?
-+		skcipher_recvmsg_sync(sock, msg, flags) :
-+		skcipher_recvmsg_async(iocb, sock, msg, flags);
-+}
- 
- static unsigned int skcipher_poll(struct file *file, struct socket *sock,
- 				  poll_table *wait)
-@@ -555,12 +828,26 @@ static int skcipher_setkey(void *private, const u8 *key, unsigned int keylen)
- 	return crypto_ablkcipher_setkey(private, key, keylen);
- }
- 
-+static void skcipher_wait(struct sock *sk)
-+{
-+	struct alg_sock *ask = alg_sk(sk);
-+	struct skcipher_ctx *ctx = ask->private;
-+	int ctr = 0;
-+
-+	while (atomic_read(&ctx->inflight) && ctr++ < 100)
-+		msleep(100);
-+}
-+
- static void skcipher_sock_destruct(struct sock *sk)
- {
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct skcipher_ctx *ctx = ask->private;
- 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(&ctx->req);
- 
-+	if (atomic_read(&ctx->inflight))
-+		skcipher_wait(sk);
-+
-+	skcipher_mempool_destroy(ctx);
- 	skcipher_free_sgl(sk);
- 	sock_kzfree_s(sk, ctx->iv, crypto_ablkcipher_ivsize(tfm));
- 	sock_kfree_s(sk, ctx, ctx->len);
-@@ -592,6 +879,7 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
- 	ctx->more = 0;
- 	ctx->merge = 0;
- 	ctx->enc = 0;
-+	atomic_set(&ctx->inflight, 0);
- 	af_alg_init_completion(&ctx->completion);
- 
- 	ask->private = ctx;
-@@ -600,6 +888,12 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
- 	ablkcipher_request_set_callback(&ctx->req, CRYPTO_TFM_REQ_MAY_BACKLOG,
- 					af_alg_complete, &ctx->completion);
- 
-+	if (skcipher_mempool_create(sk)) {
-+		sock_kzfree_s(sk, ctx->iv, crypto_ablkcipher_ivsize(private));
-+		sock_kfree_s(sk, ctx, ctx->len);
-+		return -ENOMEM;
-+	}
-+
- 	sk->sk_destruct = skcipher_sock_destruct;
- 
- 	return 0;
+Without ARM aes_arm_bs module it works:
+
+# echo xxx|src/cryptsetup open test.img --test-passphrase -v
+Key slot 0 unlocked.
+Command successful.
+
+# modprobe aes_arm_bs
+
+# echo xxx|src/cryptsetup open test.img --test-passphrase -v
+device-mapper: reload ioctl on  failed: No such file or directory
+=46ailed to setup dm-crypt key mapping for device test.img.
+Check that kernel supports aes-xts-plain64 cipher (check syslog for mor=
+e info).
+Command failed with code 5: Input/output error
+
+(Userspace crypto wrapper failed so code tries to use old dmcrypt tempo=
+rary device,
+errors above are not directly related to Neon issue.)
+
+And in dmesg module even failed test:
+
+[  318.445489] alg: skcipher: Chunk test 1 failed on decryption at page=
+ 0 for xts-aes-neonbs
+[  318.445515] 00000000: 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0=
+f
+[  318.445526] 00000010: 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1=
+f
+[  318.445534] 00000020: 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2=
+f
+[  318.445543] 00000030: 30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3=
+f
+[  318.445553] 00000040: 40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4=
+f
+[  318.445562] 00000050: 50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5=
+f
+[  318.445570] 00000060: 60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6=
+f
+[  318.445580] 00000070: 70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7=
+f
+[  318.445588] 00000080: 80 81 82 83 84 85 86 87 88 89 8a 8b 8c 8d 8e 8=
+f
+[  318.445597] 00000090: 90 91 92 93 94 95 96 97 98 99 9a 9b 9c 9d 9e 9=
+f
+[  318.445607] 000000a0: a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 aa ab ac ad ae a=
+f
+[  318.445616] 000000b0: b0 b1 b2 b3 b4 b5 b6 b7 b8 b9 ba bb bc bd be b=
+f
+[  318.445624] 000000c0: c0 c1 c2 c3 c4 c5 c6 c7 c8 c9 ca cb cc cd ce c=
+f
+[  318.445634] 000000d0: d0 d1 d2 d3 d4 d5 d6 d7 d8 d9 da db dc dd de d=
+f
+[  318.445643] 000000e0: e0 e1 e2 e3 e4 e5 e6 e7 e8 e9 ea eb ec ed ee e=
+f
+[  318.445651] 000000f0: f0 f1 f2 f3 f4 f5 f6 f7 f8 f9 fa fb fc fd fe f=
+f
+[  318.445661] 00000100: 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0=
+f
+[  318.445670] 00000110: 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1=
+f
+[  318.445678] 00000120: 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2=
+f
+[  318.445688] 00000130: 30 31 32 33 34 35 36 37 38 39 3a 3b 3c 3d 3e 3=
+f
+[  318.445697] 00000140: 40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4=
+f
+[  318.445705] 00000150: 50 51 52 53 54 55 56 57 58 59 5a 5b 5c 5d 5e 5=
+f
+[  318.445715] 00000160: 60 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6=
+f
+[  318.445723] 00000170: 70 71 72 73 74 75 76 77 78 79 7a 7b 7c 7d 7e 7=
+f
+[  318.445732] 00000180: 80 81 82 83 84 85 86 87 88 89 8a 8b 8c 8d 8e 8=
+f
+[  318.445742] 00000190: 90 91 92 93 94 95 96 97 98 99 9a 9b 9c 9d 9e 9=
+f
+[  318.445750] 000001a0: a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 aa ab ac ad ae a=
+f
+[  318.445759] 000001b0: b0 b1 b2 b3 b4 b5 b6 b7 b8 b9 ba bb bc bd be b=
+f
+[  318.445769] 000001c0: c0 c1 c2 c3 c4 c5 c6 c7 c8 c9 ca cb cc cd ce c=
+f
+[  318.445777] 000001d0: ab 1c bb 4c 15 50 be 97 f7 ab 40 66 19 3c 4c a=
+a
+[  318.445786] 000001e0: 5b 41 ef c3 ba 09 50 93 f2 c5 00 48
+
+Seems there is an issue with the Neon AES implementation...
+
+Milan
