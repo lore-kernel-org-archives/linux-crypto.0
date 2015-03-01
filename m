@@ -1,45 +1,46 @@
 From: Markus Stockhausen <stockhausen@collogia.de>
-Subject: [PATCH v1 1/3] crypto: powerpc/md5 - assembler
-Date: Sun, 1 Mar 2015 19:30:35 +0100
-Message-ID: <dfab72c4-908c-43ce-bb28-480afc0c9536@EXCHANGE.collogia.de>
+Subject: [PATCH v1 2/3] crypto: powerpc/md5 - glue
+Date: Sun, 1 Mar 2015 19:30:41 +0100
+Message-ID: <e51f0b43-7e75-4d33-b2fe-0ba7ef111f54@EXCHANGE.collogia.de>
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_NextPartTM-000-0bb15a63-1a35-4a9b-87d5-890f107962c0"
+	boundary="----=_NextPartTM-000-de8a0567-b0e3-48e2-9697-b468d1540729"
 Cc: <linuxppc-dev@lists.ozlabs.org>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailrelay.collogia.de ([194.8.207.98]:46681 "HELO
+Received: from mailrelay.collogia.de ([194.8.207.98]:46688 "HELO
 	mailrelay.collogia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1752173AbbCASak (ORCPT
+	with SMTP id S1752173AbbCASan (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 1 Mar 2015 13:30:40 -0500
+	Sun, 1 Mar 2015 13:30:43 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 
 This is a multi-part message in MIME format.
 
-------=_NextPartTM-000-0bb15a63-1a35-4a9b-87d5-890f107962c0
+------=_NextPartTM-000-de8a0567-b0e3-48e2-9697-b468d1540729
 Content-Type: text/plain
 
-[PATCH v1 1/3] crypto: powerpc/md5 - assembler
+[PATCH v1 2/3] crypto: powerpc/md5 - glue
 
-This is the assembler code for the MD5 implementation.
-Handling of algorithm constants has been slightly
-changed to reduce register usage and make better use
-of cores with multiple ALUs. Thus they are stored as
-delta values.
+Glue code for crypto infrastructure. Call the assembler
+code where required. Take a little care about small input 
+data. Kick out early for input chunks < 64 bytes and replace
+memset for context cleanup with simple loop. 
 
 Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
 
-diff --git a/arch/powerpc/crypto/md5-asm.S b/arch/powerpc/crypto/md5-asm.S
+diff --git a/arch/powerpc/crypto/md5_glue.c b/arch/powerpc/crypto/md5_glue.c
 new file mode 100644
-index 0000000..10cdf5b
+index 0000000..452fb4d
 --- /dev/null
-+++ b/arch/powerpc/crypto/md5-asm.S
-@@ -0,0 +1,243 @@
++++ b/arch/powerpc/crypto/md5_glue.c
+@@ -0,0 +1,165 @@
 +/*
-+ * Fast MD5 implementation for PPC
++ * Glue code for MD5 implementation for PPC assembler
++ *
++ * Based on generic implementation.
 + *
 + * Copyright (c) 2015 Markus Stockhausen <stockhausen@collogia.de>
 + *
@@ -49,240 +50,160 @@ index 0000000..10cdf5b
 + * any later version.
 + *
 + */
-+#include <asm/ppc_asm.h>
-+#include <asm/asm-offsets.h>
 +
-+#define rHP	r3
-+#define rWP	r4
++#include <crypto/internal/hash.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/mm.h>
++#include <linux/cryptohash.h>
++#include <linux/types.h>
++#include <crypto/md5.h>
++#include <asm/byteorder.h>
 +
-+#define rH0	r0
-+#define rH1	r6
-+#define rH2	r7
-+#define rH3	r5
++extern void ppc_md5_transform(u32 *state, const u8 *src, u32 blocks);
 +
-+#define rW00	r8
-+#define rW01	r9
-+#define rW02	r10
-+#define rW03	r11
-+#define rW04	r12
-+#define rW05	r14
-+#define rW06	r15
-+#define rW07	r16
-+#define rW08	r17
-+#define rW09	r18
-+#define rW10	r19
-+#define rW11	r20
-+#define rW12	r21
-+#define rW13	r22
-+#define rW14	r23
-+#define rW15	r24
++static inline void ppc_md5_clear_context(struct md5_state *sctx)
++{
++	int count = sizeof(struct md5_state) >> 2;
++	u32 *ptr = (u32 *)sctx;
 +
-+#define rT0	r25
-+#define rT1	r26
++	/* make sure we can clear the fast way */
++	BUILD_BUG_ON(sizeof(struct md5_state) % 4);
++	do { *ptr++ = 0; } while (--count);
++}
 +
-+#define INITIALIZE \
-+	PPC_STLU r1,-INT_FRAME_SIZE(r1); \
-+	SAVE_8GPRS(14, r1);		/* push registers onto stack	*/ \
-+	SAVE_4GPRS(22, r1);						   \
-+	SAVE_GPR(26, r1)
++static int ppc_md5_init(struct shash_desc *desc)
++{
++	struct md5_state *sctx = shash_desc_ctx(desc);
 +
-+#define FINALIZE \
-+	REST_8GPRS(14, r1);		/* pop registers from stack	*/ \
-+	REST_4GPRS(22, r1);						   \
-+	REST_GPR(26, r1);						   \
-+	addi	r1,r1,INT_FRAME_SIZE;
++	sctx->hash[0] = 0x67452301;
++	sctx->hash[1] = 0xefcdab89;
++	sctx->hash[2] = 0x98badcfe;
++	sctx->hash[3] =	0x10325476;
++	sctx->byte_count = 0;
 +
-+#ifdef __BIG_ENDIAN__
-+#define LOAD_DATA(reg, off) \
-+	lwbrx		reg,0,rWP;	/* load data			*/
-+#define INC_PTR \
-+	addi		rWP,rWP,4;	/* increment per word		*/
-+#define NEXT_BLOCK			/* nothing to do		*/
-+#else
-+#define LOAD_DATA(reg, off) \
-+	lwz		reg,off(rWP);	/* load data			*/
-+#define INC_PTR				/* nothing to do		*/
-+#define NEXT_BLOCK \
-+	addi		rWP,rWP,64;	/* increment per block		*/
-+#endif
++	return 0;
++}
 +
-+#define R_00_15(a, b, c, d, w0, w1, p, q, off, k0h, k0l, k1h, k1l) \
-+	LOAD_DATA(w0, off)		/*    W				*/ \
-+	and		rT0,b,c;	/* 1: f = b and c		*/ \
-+	INC_PTR				/*    ptr++			*/ \
-+	andc		rT1,d,b;	/* 1: f' = ~b and d		*/ \
-+	LOAD_DATA(w1, off+4)		/*    W				*/ \
-+	or		rT0,rT0,rT1;	/* 1: f = f or f'		*/ \
-+	addi		w0,w0,k0l;	/* 1: wk = w + k		*/ \
-+	add		a,a,rT0;	/* 1: a = a + f			*/ \
-+	addis		w0,w0,k0h;	/* 1: wk = w + k'		*/ \
-+	addis		w1,w1,k1h;	/* 2: wk = w + k		*/ \
-+	add		a,a,w0;		/* 1: a = a + wk		*/ \
-+	addi		w1,w1,k1l;	/* 2: wk = w + k'		*/ \
-+	rotrwi		a,a,p;		/* 1: a = a rotl x		*/ \
-+	add		d,d,w1;		/* 2: a = a + wk		*/ \
-+	add		a,a,b;		/* 1: a = a + b			*/ \
-+	and		rT0,a,b;	/* 2: f = b and c		*/ \
-+	andc		rT1,c,a;	/* 2: f' = ~b and d		*/ \
-+	or		rT0,rT0,rT1;	/* 2: f = f or f'		*/ \
-+	add		d,d,rT0;	/* 2: a = a + f			*/ \
-+	INC_PTR				/*    ptr++			*/ \
-+	rotrwi		d,d,q;		/* 2: a = a rotl x		*/ \
-+	add		d,d,a;		/* 2: a = a + b			*/
++static int ppc_md5_update(struct shash_desc *desc, const u8 *data,
++			unsigned int len)
++{
++	struct md5_state *sctx = shash_desc_ctx(desc);
++	const unsigned int offset = sctx->byte_count & 0x3f;
++	unsigned int avail = 64 - offset;
++	const u8 *src = data;
 +
-+#define R_16_31(a, b, c, d, w0, w1, p, q, k0h, k0l, k1h, k1l) \
-+	andc		rT0,c,d;	/* 1: f = c and ~d		*/ \
-+	and		rT1,b,d;	/* 1: f' = b and d		*/ \
-+	addi		w0,w0,k0l;	/* 1: wk = w + k		*/ \
-+	or		rT0,rT0,rT1;	/* 1: f = f or f'		*/ \
-+	addis		w0,w0,k0h;	/* 1: wk = w + k'		*/ \
-+	add		a,a,rT0;	/* 1: a = a + f			*/ \
-+	addi		w1,w1,k1l;	/* 2: wk = w + k		*/ \
-+	add		a,a,w0;		/* 1: a = a + wk		*/ \
-+	addis		w1,w1,k1h;	/* 2: wk = w + k'		*/ \
-+	andc		rT0,b,c;	/* 2: f = c and ~d		*/ \
-+	rotrwi		a,a,p;		/* 1: a = a rotl x		*/ \
-+	add		a,a,b;		/* 1: a = a + b			*/ \
-+	add		d,d,w1;		/* 2: a = a + wk		*/ \
-+	and		rT1,a,c;	/* 2: f' = b and d		*/ \
-+	or		rT0,rT0,rT1;	/* 2: f = f or f'		*/ \
-+	add		d,d,rT0;	/* 2: a = a + f			*/ \
-+	rotrwi		d,d,q;		/* 2: a = a rotl x		*/ \
-+	add		d,d,a;		/* 2: a = a +b			*/
++	sctx->byte_count += len;
 +
-+#define R_32_47(a, b, c, d, w0, w1, p, q, k0h, k0l, k1h, k1l) \
-+	xor		rT0,b,c;	/* 1: f' = b xor c		*/ \
-+	addi		w0,w0,k0l;	/* 1: wk = w + k		*/ \
-+	xor		rT1,rT0,d;	/* 1: f = f xor f'		*/ \
-+	addis		w0,w0,k0h;	/* 1: wk = w + k'		*/ \
-+	add		a,a,rT1;	/* 1: a = a + f			*/ \
-+	addi		w1,w1,k1l;	/* 2: wk = w + k		*/ \
-+	add		a,a,w0;		/* 1: a = a + wk		*/ \
-+	addis		w1,w1,k1h;	/* 2: wk = w + k'		*/ \
-+	rotrwi		a,a,p;		/* 1: a = a rotl x		*/ \
-+	add		d,d,w1;		/* 2: a = a + wk		*/ \
-+	add		a,a,b;		/* 1: a = a + b			*/ \
-+	xor		rT1,rT0,a;	/* 2: f = b xor f'		*/ \
-+	add		d,d,rT1;	/* 2: a = a + f			*/ \
-+	rotrwi		d,d,q;		/* 2: a = a rotl x		*/ \
-+	add		d,d,a;		/* 2: a = a + b			*/
++	if (avail > len) {
++		memcpy((char *)sctx->block + offset, src, len);
++		return 0;
++	}
 +
-+#define R_48_63(a, b, c, d, w0, w1, p, q, k0h, k0l, k1h, k1l) \
-+	addi		w0,w0,k0l;	/* 1: w = w + k			*/ \
-+	orc		rT0,b,d;	/* 1: f = b or ~d		*/ \
-+	addis		w0,w0,k0h;	/* 1: w = w + k'		*/ \
-+	xor		rT0,rT0,c;	/* 1: f = f xor c		*/ \
-+	add		a,a,w0;		/* 1: a = a + wk		*/ \
-+	addi		w1,w1,k1l;	/* 2: w = w + k			*/ \
-+	add		a,a,rT0;	/* 1: a = a + f			*/ \
-+	addis		w1,w1,k1h;	/* 2: w = w + k'		*/ \
-+	rotrwi		a,a,p;		/* 1: a = a rotl x		*/ \
-+	add		a,a,b;		/* 1: a = a + b			*/ \
-+	orc		rT0,a,c;	/* 2: f = b or ~d		*/ \
-+	add		d,d,w1;		/* 2: a = a + wk		*/ \
-+	xor		rT0,rT0,b;	/* 2: f = f xor c		*/ \
-+	add		d,d,rT0;	/* 2: a = a + f			*/ \
-+	rotrwi		d,d,q;		/* 2: a = a rotl x		*/ \
-+	add		d,d,a;		/* 2: a = a + b			*/
++	if (offset) {
++		memcpy((char *)sctx->block + offset, src, avail);
++		ppc_md5_transform(sctx->hash, (const u8 *)sctx->block, 1);
++		len -= avail;
++		src += avail;
++	}
 +
-+_GLOBAL(ppc_md5_transform)
-+	INITIALIZE
++	if (len > 63) {
++		ppc_md5_transform(sctx->hash, src, len >> 6);
++		src += len & ~0x3f;
++		len &= 0x3f;
++	}
 +
-+	mtctr		r5
-+	lwz		rH0,0(rHP)
-+	lwz		rH1,4(rHP)
-+	lwz		rH2,8(rHP)
-+	lwz		rH3,12(rHP)
++	memcpy((char *)sctx->block, src, len);
++	return 0;
++}
 +
-+ppc_md5_main:
-+	R_00_15(rH0, rH1, rH2, rH3, rW00, rW01, 25, 20, 0,
-+		0xd76b, -23432, 0xe8c8, -18602)
-+	R_00_15(rH2, rH3, rH0, rH1, rW02, rW03, 15, 10, 8,
-+		0x2420, 0x70db, 0xc1be, -12562)
-+	R_00_15(rH0, rH1, rH2, rH3, rW04, rW05, 25, 20, 16,
-+		0xf57c, 0x0faf, 0x4788, -14806)
-+	R_00_15(rH2, rH3, rH0, rH1, rW06, rW07, 15, 10, 24,
-+		0xa830, 0x4613, 0xfd47, -27391)
-+	R_00_15(rH0, rH1, rH2, rH3, rW08, rW09, 25, 20, 32,
-+		0x6981, -26408, 0x8b45,  -2129)
-+	R_00_15(rH2, rH3, rH0, rH1, rW10, rW11, 15, 10, 40,
-+		0xffff, 0x5bb1, 0x895d, -10306)
-+	R_00_15(rH0, rH1, rH2, rH3, rW12, rW13, 25, 20, 48,
-+		0x6b90, 0x1122, 0xfd98, 0x7193)
-+	R_00_15(rH2, rH3, rH0, rH1, rW14, rW15, 15, 10, 56,
-+		0xa679, 0x438e, 0x49b4, 0x0821)
++static int ppc_md5_final(struct shash_desc *desc, u8 *out)
++{
++	struct md5_state *sctx = shash_desc_ctx(desc);
++	const unsigned int offset = sctx->byte_count & 0x3f;
++	const u8 *src = (const u8 *)sctx->block;
++	u8 *p = (u8 *)src + offset;
++	int padlen = 55 - offset;
++	__le64 *pbits = (__le64 *)((char *)sctx->block + 56);
++	__le32 *dst = (__le32 *)out;
 +
-+	R_16_31(rH0, rH1, rH2, rH3, rW01, rW06, 27, 23,
-+		0x0d56, 0x6e0c, 0x1810, 0x6d2d)
-+	R_16_31(rH2, rH3, rH0, rH1, rW11, rW00, 18, 12,
-+		0x9d02, -32109, 0x124c, 0x2332)
-+	R_16_31(rH0, rH1, rH2, rH3, rW05, rW10, 27, 23,
-+		0x8ea7, 0x4a33, 0x0245, -18270)
-+	R_16_31(rH2, rH3, rH0, rH1, rW15, rW04, 18, 12,
-+		0x8eee,  -8608, 0xf258,  -5095)
-+	R_16_31(rH0, rH1, rH2, rH3, rW09, rW14, 27, 23,
-+		0x969d, -10697, 0x1cbe, -15288)
-+	R_16_31(rH2, rH3, rH0, rH1, rW03, rW08, 18, 12,
-+		0x3317, 0x3e99, 0xdbd9, 0x7c15)
-+	R_16_31(rH0, rH1, rH2, rH3, rW13, rW02, 27, 23,
-+		0xac4b, 0x7772, 0xd8cf, 0x331d)
-+	R_16_31(rH2, rH3, rH0, rH1, rW07, rW12, 18, 12,
-+		0x6a28, 0x6dd8, 0x219a, 0x3b68)
++	*p++ = 0x80;
 +
-+	R_32_47(rH0, rH1, rH2, rH3, rW05, rW08, 28, 21,
-+		0x29cb, 0x28e5, 0x4218,  -7788)
-+	R_32_47(rH2, rH3, rH0, rH1, rW11, rW14, 16,  9,
-+		0x473f, 0x06d1, 0x3aae, 0x3036)
-+	R_32_47(rH0, rH1, rH2, rH3, rW01, rW04, 28, 21,
-+		0xaea1, -15134, 0x640b, -11295)
-+	R_32_47(rH2, rH3, rH0, rH1, rW07, rW10, 16,  9,
-+		0x8f4c, 0x4887, 0xbc7c, -22499)
-+	R_32_47(rH0, rH1, rH2, rH3, rW13, rW00, 28, 21,
-+		0x7eb8, -27199, 0x00ea, 0x6050)
-+	R_32_47(rH2, rH3, rH0, rH1, rW03, rW06, 16,  9,
-+		0xe01a, 0x22fe, 0x4447, 0x69c5)
-+	R_32_47(rH0, rH1, rH2, rH3, rW09, rW12, 28, 21,
-+		0xb7f3, 0x0253, 0x59b1, 0x4d5b)
-+	R_32_47(rH2, rH3, rH0, rH1, rW15, rW02, 16,  9,
-+		0x4701, -27017, 0xc7bd, -19859)
++	if (padlen < 0) {
++		memset(p, 0x00, padlen + sizeof (u64));
++		ppc_md5_transform(sctx->hash, src, 1);
++		p = (char *)sctx->block;
++		padlen = 56;
++	}
 +
-+	R_48_63(rH0, rH1, rH2, rH3, rW00, rW07, 26, 22,
-+		0x0988,  -1462, 0x4c70, -19401)
-+	R_48_63(rH2, rH3, rH0, rH1, rW14, rW05, 17, 11,
-+		0xadaf,  -5221, 0xfc99, 0x66f7)
-+	R_48_63(rH0, rH1, rH2, rH3, rW12, rW03, 26, 22,
-+		0x7e80, -16418, 0xba1e, -25587)
-+	R_48_63(rH2, rH3, rH0, rH1, rW10, rW01, 17, 11,
-+		0x4130, 0x380d, 0xe0c5, 0x738d)
-+	lwz		rW00,0(rHP)
-+	R_48_63(rH0, rH1, rH2, rH3, rW08, rW15, 26, 22,
-+		0xe837, -30770, 0xde8a, 0x69e8)
-+	lwz		rW14,4(rHP)
-+	R_48_63(rH2, rH3, rH0, rH1, rW06, rW13, 17, 11,
-+		0x9e79, 0x260f, 0x256d, -27941)
-+	lwz		rW12,8(rHP)
-+	R_48_63(rH0, rH1, rH2, rH3, rW04, rW11, 26, 22,
-+		0xab75, -20775, 0x4f9e, -28397)
-+	lwz		rW10,12(rHP)
-+	R_48_63(rH2, rH3, rH0, rH1, rW02, rW09, 17, 11,
-+		0x662b, 0x7c56, 0x11b2, 0x0358)
++	memset(p, 0, padlen);
++	*pbits = cpu_to_le64(sctx->byte_count << 3);
++	ppc_md5_transform(sctx->hash, src, 1);
 +
-+	add		rH0,rH0,rW00
-+	stw		rH0,0(rHP)
-+	add		rH1,rH1,rW14
-+	stw		rH1,4(rHP)
-+	add		rH2,rH2,rW12
-+	stw		rH2,8(rHP)
-+	add		rH3,rH3,rW10
-+	stw		rH3,12(rHP)
-+	NEXT_BLOCK
++	dst[0] = cpu_to_le32(sctx->hash[0]);
++	dst[1] = cpu_to_le32(sctx->hash[1]);
++	dst[2] = cpu_to_le32(sctx->hash[2]);
++	dst[3] = cpu_to_le32(sctx->hash[3]);
 +
-+	bdnz		ppc_md5_main
++	ppc_md5_clear_context(sctx);
++	return 0;
++}
 +
-+	FINALIZE
-+	blr
++static int ppc_md5_export(struct shash_desc *desc, void *out)
++{
++	struct md5_state *sctx = shash_desc_ctx(desc);
++
++	memcpy(out, sctx, sizeof(*sctx));
++	return 0;
++}
++
++static int ppc_md5_import(struct shash_desc *desc, const void *in)
++{
++	struct md5_state *sctx = shash_desc_ctx(desc);
++
++	memcpy(sctx, in, sizeof(*sctx));
++	return 0;
++}
++
++static struct shash_alg alg = {
++	.digestsize	=	MD5_DIGEST_SIZE,
++	.init		=	ppc_md5_init,
++	.update		=	ppc_md5_update,
++	.final		=	ppc_md5_final,
++	.export		=	ppc_md5_export,
++	.import		=	ppc_md5_import,
++	.descsize	=	sizeof(struct md5_state),
++	.statesize	=	sizeof(struct md5_state),
++	.base		=	{
++		.cra_name	=	"md5",
++		.cra_driver_name=	"md5-ppc",
++		.cra_priority	=	200,
++		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=	MD5_HMAC_BLOCK_SIZE,
++		.cra_module	=	THIS_MODULE,
++	}
++};
++
++static int __init ppc_md5_mod_init(void)
++{
++	return crypto_register_shash(&alg);
++}
++
++static void __exit ppc_md5_mod_fini(void)
++{
++	crypto_unregister_shash(&alg);
++}
++
++module_init(ppc_md5_mod_init);
++module_exit(ppc_md5_mod_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("MD5 Secure Hash Algorithm, PPC assembler");
++
++MODULE_ALIAS_CRYPTO("md5");
++MODULE_ALIAS_CRYPTO("md5-ppc");
 
-------=_NextPartTM-000-0bb15a63-1a35-4a9b-87d5-890f107962c0
+------=_NextPartTM-000-de8a0567-b0e3-48e2-9697-b468d1540729
 Content-Type: text/plain;
 	name="InterScan_Disclaimer.txt"
 Content-Transfer-Encoding: 7bit
@@ -342,4 +263,4 @@ Register number: HRB 52 497
 
 ****************************************************************************
 
-------=_NextPartTM-000-0bb15a63-1a35-4a9b-87d5-890f107962c0--
+------=_NextPartTM-000-de8a0567-b0e3-48e2-9697-b468d1540729--
