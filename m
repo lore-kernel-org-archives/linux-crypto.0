@@ -1,10 +1,9 @@
 From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH 2/4] crypto: caam_rng: fix rng_unmap_ctx's DMA_UNMAP size
- problem
-Date: Mon, 2 Mar 2015 13:09:28 +0200
-Message-ID: <54F444E8.3030708@freescale.com>
+Subject: Re: [PATCH 3/4] crypto: caamhash: add two missed dma_mapping_error
+Date: Mon, 2 Mar 2015 13:53:48 +0200
+Message-ID: <54F44F4C.8050604@freescale.com>
 References: <1425103234-31129-1-git-send-email-yanjiang.jin@windriver.com>
- <1425103234-31129-2-git-send-email-yanjiang.jin@windriver.com>
+ <1425103234-31129-3-git-send-email-yanjiang.jin@windriver.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
@@ -15,81 +14,60 @@ Cc: <kim.phillips@freescale.com>, <ruchika.gupta@freescale.com>,
 To: <yanjiang.jin@windriver.com>, <herbert@gondor.apana.org.au>,
 	<davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0143.outbound.protection.outlook.com ([65.55.169.143]:51328
+Received: from mail-bl2on0115.outbound.protection.outlook.com ([65.55.169.115]:14800
 	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753885AbbCBLY5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Mar 2015 06:24:57 -0500
-In-Reply-To: <1425103234-31129-2-git-send-email-yanjiang.jin@windriver.com>
+	id S1751610AbbCBLyA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 2 Mar 2015 06:54:00 -0500
+In-Reply-To: <1425103234-31129-3-git-send-email-yanjiang.jin@windriver.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 On 2/28/2015 8:00 AM, yanjiang.jin@windriver.com wrote:
 > From: Yanjiang Jin <yanjiang.jin@windriver.com>
 > 
-> Fix rng_unmap_ctx's DMA_UNMAP size problem for caam_rng, else system would
-> report the below calltrace during kexec boot:
-> 
-> caam_jr ffe301000.jr: DMA-API: device driver frees DMA memory with different size [device address=0x000000007f080010] [map size=16 bytes] [unmap size=40 bytes]
-> ------------[ cut here ]------------
-> WARNING: at lib/dma-debug.c:887
-> Modules linked in:
-> CPU: 1 PID: 730 Comm: kexec Not tainted 3.10.62-ltsi-WR6.0.0.0_standard #188
-> task: c0000000f7cdaa80 ti: c0000000e5340000 task.ti: c0000000e5340000
-> NIP: c0000000004f5bc8 LR: c0000000004f5bc4 CTR: c0000000005f69b0
-> REGS: c0000000e53433c0 TRAP: 0700   Not tainted  (3.10.62-ltsi-WR6.0.0.0_standard)
-> MSR: 0000000080029000 <CE,EE,ME>  CR: 24088482  XER: 00000000
-> SOFTE: 0
-> 
-> GPR00: c0000000004f5bc4 c0000000e5343640 c0000000012af360 000000000000009f
-> GPR04: 0000000000000000 00000000000000a0 c000000000d02070 c000000015980660
-> GPR08: c000000000cff360 0000000000000000 0000000000000000 c0000000012da018
-> GPR12: 00000000000001e3 c000000001fff780 00000000100f0000 0000000000000001
-> GPR16: 0000000000000002 0000000000000000 0000000000000000 0000000000000000
-> GPR20: 0000000000000000 0000000000000000 ffffffffffffffff 0000000000000001
-> GPR24: 0000000000000001 0000000000000001 0000000000000000 0000000000000001
-> GPR28: c000000001556b90 c000000001565b80 c0000000e5343750 c0000000f9427480
-> NIP [c0000000004f5bc8] .check_unmap+0x538/0x9c0
-> LR [c0000000004f5bc4] .check_unmap+0x534/0x9c0
-> Call Trace:
-> [c0000000e5343640] [c0000000004f5bc4] .check_unmap+0x534/0x9c0 (unreliable)
-> [c0000000e53436e0] [c0000000004f60d4] .debug_dma_unmap_page+0x84/0xb0
-> [c0000000e5343810] [c00000000082f9d4] .caam_cleanup+0x1d4/0x240
-> [c0000000e53438a0] [c00000000056cc88] .hwrng_unregister+0xd8/0x1c0
-> [c0000000e5343930] [c00000000082fa74] .caam_rng_shutdown+0x34/0x60
-> [c0000000e53439a0] [c000000000817354] .caam_remove+0x54/0x420
-> [c0000000e5343a70] [c0000000005791ac] .platform_drv_shutdown+0x3c/0x60
-> [c0000000e5343af0] [c000000000573728] .device_shutdown+0x128/0x240
-> [c0000000e5343b90] [c0000000000880b4] .kernel_restart_prepare+0x54/0x70
-> [c0000000e5343c10] [c0000000000e5cac] .kernel_kexec+0x9c/0xd0
-> [c0000000e5343c90] [c000000000088404] .SyS_reboot+0x244/0x2d0
-> [c0000000e5343e30] [c000000000000718] syscall_exit+0x0/0x8c
-> Instruction dump:
-> 7c641b78 41de0410 e8a90050 2fa50000 419e0484 e8de0028 e8ff0030 3c62ff90
-> e91e0030 38638388 48546ed9 60000000 <0fe00000> 3c62ff8f 38637fc8 48546ec5
-> ---[ end trace e43fd1734d6600df ]---
+> Add two missed dma_mapping_error() after dma_map_single().
 > 
 > Signed-off-by: Yanjiang Jin <yanjiang.jin@windriver.com>
-
-Reviewed-by: Horia Geanta <horia.geanta@freescale.com>
-
 > ---
->  drivers/crypto/caam/caamrng.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/crypto/caam/caamhash.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-> index ae31e55..314f73d 100644
-> --- a/drivers/crypto/caam/caamrng.c
-> +++ b/drivers/crypto/caam/caamrng.c
-> @@ -90,8 +90,8 @@ static inline void rng_unmap_ctx(struct caam_rng_ctx *ctx)
->  	struct device *jrdev = ctx->jrdev;
+> diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+> index f347ab7..f6ad322 100644
+> --- a/drivers/crypto/caam/caamhash.c
+> +++ b/drivers/crypto/caam/caamhash.c
+> @@ -160,6 +160,10 @@ static inline dma_addr_t map_seq_out_ptr_result(u32 *desc, struct device *jrdev,
+>  	dma_addr_t dst_dma;
 >  
->  	if (ctx->sh_desc_dma)
-> -		dma_unmap_single(jrdev, ctx->sh_desc_dma, DESC_RNG_LEN,
-> -				 DMA_TO_DEVICE);
-> +		dma_unmap_single(jrdev, ctx->sh_desc_dma,
-> +				desc_bytes(ctx->sh_desc), DMA_TO_DEVICE);
->  	rng_unmap_buf(jrdev, &ctx->bufs[0]);
->  	rng_unmap_buf(jrdev, &ctx->bufs[1]);
->  }
+>  	dst_dma = dma_map_single(jrdev, result, digestsize, DMA_FROM_DEVICE);
+> +	if (dma_mapping_error(jrdev, dst_dma)) {
+> +		dev_err(jrdev, "unable to map dst dma\n");
+> +		return -ENOMEM;
+> +	}
+>  	append_seq_out_ptr(desc, dst_dma, digestsize, 0);
+>  
+>  	return dst_dma;
+
+Value returned by map_seq_out_ptr_result() - dst_dma - is always fed to
+dma_mapping_error().
+Note that using an invalid dst_dma in append_seq_out_ptr() doesn't break
+anything, so it's ok to check dst_dma later.
+
+> @@ -173,6 +177,10 @@ static inline dma_addr_t buf_map_to_sec4_sg(struct device *jrdev,
+>  	dma_addr_t buf_dma;
+>  
+>  	buf_dma = dma_map_single(jrdev, buf, buflen, DMA_TO_DEVICE);
+> +	if (dma_mapping_error(jrdev, buf_dma)) {
+> +		dev_err(jrdev, "unable to map buf dma\n");
+> +		return 0;
+> +	}
+>  	dma_to_sec4_sg_one(sec4_sg, buf_dma, buflen, 0);
+>  
+>  	return buf_dma;
 > 
+
+These functions are expected to return dma_addr_t, not an error code.
+If dma_mapping_error() is needed within their scope, the return type
+will have to change. And return value will need to be checked by their
+callers.
