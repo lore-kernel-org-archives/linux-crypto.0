@@ -1,46 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] ARM: crypto: update NEON AES module to latest OpenSSL
- version
-Date: Mon, 2 Mar 2015 23:19:18 +1300
-Message-ID: <20150302101918.GA23965@gondor.apana.org.au>
-References: <1424935325-14437-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [v1,1/3] crypto: powerpc/sha1 - assembler
+Date: Mon, 2 Mar 2015 23:25:59 +1300
+Message-ID: <20150302102559.GA24450@gondor.apana.org.au>
+References: <ce3e5ff2-5904-4e1c-bfa9-e37c9682f961@EXCHANGE.collogia.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux@arm.linux.org.uk, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, nico@linaro.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Markus Stockhausen <stockhausen@collogia.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:59307 "EHLO
+Received: from helcar.apana.org.au ([209.40.204.226]:53684 "EHLO
 	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751460AbbCBKTu (ORCPT
+	with ESMTP id S1751077AbbCBK0G (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Mar 2015 05:19:50 -0500
+	Mon, 2 Mar 2015 05:26:06 -0500
 Content-Disposition: inline
-In-Reply-To: <1424935325-14437-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <ce3e5ff2-5904-4e1c-bfa9-e37c9682f961@EXCHANGE.collogia.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Feb 26, 2015 at 07:22:05AM +0000, Ard Biesheuvel wrote:
-> This updates the bit sliced AES module to the latest version in the
-> upstream OpenSSL repository (e620e5ae37bc). This is needed to fix a
-> bug in the XTS decryption path, where data chunked in a certain way
-> could trigger the ciphertext stealing code, which is not supposed to
-> be active in the kernel build (The kernel implementation of XTS only
-> supports round multiples of the AES block size of 16 bytes, whereas
-> the conformant OpenSSL implementation of XTS supports inputs of
-> arbitrary size by applying ciphertext stealing). This is fixed in
-> the upstream version by adding the missing #ifndef XTS_CHAIN_TWEAK
-> around the offending instructions.
+On Tue, Feb 24, 2015 at 08:36:40PM +0100, Markus Stockhausen wrote:
+> This is the assembler code for SHA1 implementation with
+> the SIMD SPE instruction set. With the enhanced instruction 
+> set we can operate on 2 32 bit words in parallel. That helps 
+> reducing the time to calculate W16-W79. For increasing 
+> performance even more the assembler function can compute 
+> hashes for more than one 64 byte input block. 
 > 
-> The upstream code also contains the change applied by Russell to
-> build the code unconditionally, i.e., even if __LINUX_ARM_ARCH__ < 7,
-> but implemented slightly differently.
+> The state of the used SPE registers is preserved via the 
+> stack so we can run from interrupt context. There might 
+> be the case that we interrupt ourselves and push sensitive 
+> data from another context onto our stack. Clear this area
+> in the stack afterwards to avoid information leakage.
 > 
-> Fixes: e4e7f10bfc40 ("ARM: add support for bit sliced AES using NEON instructions")
-> Reported-by: Adrian Kotelba <adrian.kotelba@gmail.com>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> The code is endian independant.
+> 
+> Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
 
-Patch applied with cc to stable.
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
