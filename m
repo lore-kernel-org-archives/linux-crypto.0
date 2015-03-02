@@ -1,124 +1,184 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 2/2] crypto: drbg: remove superflowous memsets
-Date: Sun, 01 Mar 2015 20:40:17 +0100
-Message-ID: <1676054.DkmtgsCnh5@tachyon.chronox.de>
-References: <50904620.OAA2OAojed@tachyon.chronox.de>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] ARM: crypto: update NEON AES module to latest OpenSSL version
+Date: Mon, 2 Mar 2015 08:26:26 +0000
+Message-ID: <CAKv+Gu8rLm+imbhzcPxcHO9v7FZpU3q28sJk9Cg_eFr5_EbaLA@mail.gmail.com>
+References: <1424935325-14437-1-git-send-email-ard.biesheuvel@linaro.org>
+	<54F241A1.1060104@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: 'Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	Nicolas Pitre <nico@linaro.org>, dm-crypt <dm-crypt@saout.de>,
+	Johannes Ernst <johannes.ernst@gmail.com>
+To: Milan Broz <gmazyland@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:36245 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751141AbbCATkd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 1 Mar 2015 14:40:33 -0500
-In-Reply-To: <50904620.OAA2OAojed@tachyon.chronox.de>
+Received: from mail-ie0-f182.google.com ([209.85.223.182]:38419 "EHLO
+	mail-ie0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753776AbbCBI02 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 2 Mar 2015 03:26:28 -0500
+Received: by iecrd18 with SMTP id rd18so45888450iec.5
+        for <linux-crypto@vger.kernel.org>; Mon, 02 Mar 2015 00:26:27 -0800 (PST)
+In-Reply-To: <54F241A1.1060104@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The DRBG code contains memset(0) calls to initialize a varaible
-that are not necessary as the variable is always overwritten by
-the processing.
+On 28 February 2015 at 22:30, Milan Broz <gmazyland@gmail.com> wrote:
+> On 02/26/2015 08:22 AM, Ard Biesheuvel wrote:
+>> This updates the bit sliced AES module to the latest version in the
+>> upstream OpenSSL repository (e620e5ae37bc). This is needed to fix a
+>> bug in the XTS decryption path, where data chunked in a certain way
+>> could trigger the ciphertext stealing code, which is not supposed to
+>> be active in the kernel build (The kernel implementation of XTS only
+>> supports round multiples of the AES block size of 16 bytes, whereas
+>> the conformant OpenSSL implementation of XTS supports inputs of
+>> arbitrary size by applying ciphertext stealing). This is fixed in
+>> the upstream version by adding the missing #ifndef XTS_CHAIN_TWEAK
+>> around the offending instructions.
+>>
+>> The upstream code also contains the change applied by Russell to
+>> build the code unconditionally, i.e., even if __LINUX_ARM_ARCH__ < 7,
+>> but implemented slightly differently.
+>>
+>> Fixes: e4e7f10bfc40 ("ARM: add support for bit sliced AES using NEON instructions")
+>> Reported-by: Adrian Kotelba <adrian.kotelba@gmail.com>
+>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>> ---
+>>
+>> This was found using the tcrypt test code, to which I recently added additional
+>> chunking modes. However, XTS typically operates on pages or at least on sectors,
+>> so this bug is unlikely to affect anyone in real life.
+>>
+>> Still, please add cc stable when applying,
+>
+> Please apply it for stable.
+>
+> For me, this patch fixed bug reported here
+>   http://article.gmane.org/gmane.linux.kernel.device-mapper.dm-crypt/7966
+>   http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg13102.html
+>
+> Cryptsetup uses AF_ALG userspace crypto SKCIPHER interface and on
+> Raspberry Pi2 with Neon AES implementation it fails to unlock LUKS device
+> (if XTS and aes-arm-bs module is used).
+>
+> After applying this patch it works as expected.
+>
+> I did not have time to check it more in detail (we are always encrypting
+> the whole sector so this should not happen... but apparently it does.)
+>
+> Tested-by: Milan Broz <gmazyland@gmail.com>
+>
 
-This patch increases the CTR and Hash DRBGs by about 5%.
+OK, thanks for pointing that out, and for confirming that this fixes the issue.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c | 18 ------------------
- 1 file changed, 18 deletions(-)
+Actually, I did not consider the userspace use case, but it is not
+surprising that the data ends up being pushed into the crypto layer in
+odd size chunks.
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index c14274a..56c1d7e 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -308,9 +308,6 @@ static int drbg_ctr_bcc(struct drbg_state *drbg,
- 
- 	drbg_string_fill(&data, out, drbg_blocklen(drbg));
- 
--	/* 10.4.3 step 1 */
--	memset(out, 0, drbg_blocklen(drbg));
--
- 	/* 10.4.3 step 2 / 4 */
- 	list_for_each_entry(curr, in, list) {
- 		const unsigned char *pos = curr->buf;
-@@ -406,7 +403,6 @@ static int drbg_ctr_df(struct drbg_state *drbg,
- 
- 	memset(pad, 0, drbg_blocklen(drbg));
- 	memset(iv, 0, drbg_blocklen(drbg));
--	memset(temp, 0, drbg_statelen(drbg));
- 
- 	/* 10.4.2 step 1 is implicit as we work byte-wise */
- 
-@@ -523,7 +519,6 @@ static int drbg_ctr_update(struct drbg_state *drbg, struct list_head *seed,
- 	unsigned int len = 0;
- 	struct drbg_string cipherin;
- 
--	memset(temp, 0, drbg_statelen(drbg) + drbg_blocklen(drbg));
- 	if (3 > reseed)
- 		memset(df_data, 0, drbg_statelen(drbg));
- 
-@@ -585,8 +580,6 @@ static int drbg_ctr_generate(struct drbg_state *drbg,
- 	int ret = 0;
- 	struct drbg_string data;
- 
--	memset(drbg->scratchpad, 0, drbg_blocklen(drbg));
--
- 	/* 10.2.1.5.2 step 2 */
- 	if (addtl && !list_empty(addtl)) {
- 		ret = drbg_ctr_update(drbg, addtl, 2);
-@@ -761,7 +754,6 @@ static struct drbg_state_ops drbg_hmac_ops = {
- 	.generate	= drbg_hmac_generate,
- 	.crypto_init	= drbg_init_hash_kernel,
- 	.crypto_fini	= drbg_fini_hash_kernel,
--
- };
- #endif /* CONFIG_CRYPTO_DRBG_HMAC */
- 
-@@ -838,8 +830,6 @@ static int drbg_hash_df(struct drbg_state *drbg,
- 	unsigned char *tmp = drbg->scratchpad + drbg_statelen(drbg);
- 	struct drbg_string data;
- 
--	memset(tmp, 0, drbg_blocklen(drbg));
--
- 	/* 10.4.1 step 3 */
- 	input[0] = 1;
- 	drbg_cpu_to_be32((outlen * 8), &input[1]);
-@@ -879,7 +869,6 @@ static int drbg_hash_update(struct drbg_state *drbg, struct list_head *seed,
- 	unsigned char *V = drbg->scratchpad;
- 	unsigned char prefix = DRBG_PREFIX1;
- 
--	memset(drbg->scratchpad, 0, drbg_statelen(drbg));
- 	if (!seed)
- 		return -EINVAL;
- 
-@@ -921,9 +910,6 @@ static int drbg_hash_process_addtl(struct drbg_state *drbg,
- 	LIST_HEAD(datalist);
- 	unsigned char prefix = DRBG_PREFIX2;
- 
--	/* this is value w as per documentation */
--	memset(drbg->scratchpad, 0, drbg_blocklen(drbg));
--
- 	/* 10.1.1.4 step 2 */
- 	if (!addtl || list_empty(addtl))
- 		return 0;
-@@ -959,9 +945,6 @@ static int drbg_hash_hashgen(struct drbg_state *drbg,
- 	struct drbg_string data;
- 	LIST_HEAD(datalist);
- 
--	memset(src, 0, drbg_statelen(drbg));
--	memset(dst, 0, drbg_blocklen(drbg));
--
- 	/* 10.1.1.4 step hashgen 2 */
- 	memcpy(src, drbg->V, drbg_statelen(drbg));
- 
-@@ -1018,7 +1001,6 @@ static int drbg_hash_generate(struct drbg_state *drbg,
- 	len = drbg_hash_hashgen(drbg, buf, buflen);
- 
- 	/* this is the value H as documented in 10.1.1.4 */
--	memset(drbg->scratchpad, 0, drbg_blocklen(drbg));
- 	/* 10.1.1.4 step 4 */
- 	drbg_string_fill(&data1, &prefix, 1);
- 	list_add_tail(&data1.list, &datalist);
--- 
-2.1.0
+@Herbert: are you ok to take this as a bug fix for stable?
+
+Thanks,
+Ard.
+
+
+>>  arch/arm/crypto/aesbs-core.S_shipped | 12 ++++++++----
+>>  arch/arm/crypto/bsaes-armv7.pl       | 12 ++++++++----
+>>  2 files changed, 16 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/arch/arm/crypto/aesbs-core.S_shipped b/arch/arm/crypto/aesbs-core.S_shipped
+>> index 71e5fc7cfb18..1d1800f71c5b 100644
+>> --- a/arch/arm/crypto/aesbs-core.S_shipped
+>> +++ b/arch/arm/crypto/aesbs-core.S_shipped
+>> @@ -58,14 +58,18 @@
+>>  # define VFP_ABI_FRAME       0
+>>  # define BSAES_ASM_EXTENDED_KEY
+>>  # define XTS_CHAIN_TWEAK
+>> -# define __ARM_ARCH__        7
+>> +# define __ARM_ARCH__ __LINUX_ARM_ARCH__
+>> +# define __ARM_MAX_ARCH__ 7
+>>  #endif
+>>
+>>  #ifdef __thumb__
+>>  # define adrl adr
+>>  #endif
+>>
+>> -#if __ARM_ARCH__>=7
+>> +#if __ARM_MAX_ARCH__>=7
+>> +.arch        armv7-a
+>> +.fpu neon
+>> +
+>>  .text
+>>  .syntax      unified         @ ARMv7-capable assembler is expected to handle this
+>>  #ifdef __thumb2__
+>> @@ -74,8 +78,6 @@
+>>  .code   32
+>>  #endif
+>>
+>> -.fpu neon
+>> -
+>>  .type        _bsaes_decrypt8,%function
+>>  .align       4
+>>  _bsaes_decrypt8:
+>> @@ -2095,9 +2097,11 @@ bsaes_xts_decrypt:
+>>       vld1.8  {q8}, [r0]                      @ initial tweak
+>>       adr     r2, .Lxts_magic
+>>
+>> +#ifndef      XTS_CHAIN_TWEAK
+>>       tst     r9, #0xf                        @ if not multiple of 16
+>>       it      ne                              @ Thumb2 thing, sanity check in ARM
+>>       subne   r9, #0x10                       @ subtract another 16 bytes
+>> +#endif
+>>       subs    r9, #0x80
+>>
+>>       blo     .Lxts_dec_short
+>> diff --git a/arch/arm/crypto/bsaes-armv7.pl b/arch/arm/crypto/bsaes-armv7.pl
+>> index be068db960ee..a4d3856e7d24 100644
+>> --- a/arch/arm/crypto/bsaes-armv7.pl
+>> +++ b/arch/arm/crypto/bsaes-armv7.pl
+>> @@ -701,14 +701,18 @@ $code.=<<___;
+>>  # define VFP_ABI_FRAME       0
+>>  # define BSAES_ASM_EXTENDED_KEY
+>>  # define XTS_CHAIN_TWEAK
+>> -# define __ARM_ARCH__        7
+>> +# define __ARM_ARCH__ __LINUX_ARM_ARCH__
+>> +# define __ARM_MAX_ARCH__ 7
+>>  #endif
+>>
+>>  #ifdef __thumb__
+>>  # define adrl adr
+>>  #endif
+>>
+>> -#if __ARM_ARCH__>=7
+>> +#if __ARM_MAX_ARCH__>=7
+>> +.arch        armv7-a
+>> +.fpu neon
+>> +
+>>  .text
+>>  .syntax      unified         @ ARMv7-capable assembler is expected to handle this
+>>  #ifdef __thumb2__
+>> @@ -717,8 +721,6 @@ $code.=<<___;
+>>  .code   32
+>>  #endif
+>>
+>> -.fpu neon
+>> -
+>>  .type        _bsaes_decrypt8,%function
+>>  .align       4
+>>  _bsaes_decrypt8:
+>> @@ -2076,9 +2078,11 @@ bsaes_xts_decrypt:
+>>       vld1.8  {@XMM[8]}, [r0]                 @ initial tweak
+>>       adr     $magic, .Lxts_magic
+>>
+>> +#ifndef      XTS_CHAIN_TWEAK
+>>       tst     $len, #0xf                      @ if not multiple of 16
+>>       it      ne                              @ Thumb2 thing, sanity check in ARM
+>>       subne   $len, #0x10                     @ subtract another 16 bytes
+>> +#endif
+>>       subs    $len, #0x80
+>>
+>>       blo     .Lxts_dec_short
+>>
+>
