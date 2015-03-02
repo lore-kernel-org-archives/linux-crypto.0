@@ -1,43 +1,68 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [v1,1/3] crypto: powerpc/sha1 - assembler
-Date: Mon, 2 Mar 2015 23:25:59 +1300
-Message-ID: <20150302102559.GA24450@gondor.apana.org.au>
-References: <ce3e5ff2-5904-4e1c-bfa9-e37c9682f961@EXCHANGE.collogia.de>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH 1/4] crypto: caam: fix some compile warnings
+Date: Mon, 2 Mar 2015 13:08:51 +0200
+Message-ID: <54F444C3.6020505@freescale.com>
+References: <1425103234-31129-1-git-send-email-yanjiang.jin@windriver.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-To: Markus Stockhausen <stockhausen@collogia.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:53684 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751077AbbCBK0G (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Mar 2015 05:26:06 -0500
-Content-Disposition: inline
-In-Reply-To: <ce3e5ff2-5904-4e1c-bfa9-e37c9682f961@EXCHANGE.collogia.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: <kim.phillips@freescale.com>, <ruchika.gupta@freescale.com>,
+	<cristian.stoica@freescale.com>, <NiteshNarayanLal@freescale.com>,
+	<jinyanjiang@gmail.com>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>
+To: <yanjiang.jin@windriver.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1425103234-31129-1-git-send-email-yanjiang.jin@windriver.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Feb 24, 2015 at 08:36:40PM +0100, Markus Stockhausen wrote:
-> This is the assembler code for SHA1 implementation with
-> the SIMD SPE instruction set. With the enhanced instruction 
-> set we can operate on 2 32 bit words in parallel. That helps 
-> reducing the time to calculate W16-W79. For increasing 
-> performance even more the assembler function can compute 
-> hashes for more than one 64 byte input block. 
+On 2/28/2015 8:00 AM, yanjiang.jin@windriver.com wrote:
+> From: Yanjiang Jin <yanjiang.jin@windriver.com>
 > 
-> The state of the used SPE registers is preserved via the 
-> stack so we can run from interrupt context. There might 
-> be the case that we interrupt ourselves and push sensitive 
-> data from another context onto our stack. Clear this area
-> in the stack afterwards to avoid information leakage.
+> This commit is to avoid the below warnings:
 > 
-> The code is endian independant.
+> drivers/crypto/caam/sg_sw_sec4.h:88:12: warning:
+> 'dma_map_sg_chained' defined but not used [-Wunused-function]
+>  static int dma_map_sg_chained(struct device *dev, struct scatterlist *sg,
+>             ^
+> drivers/crypto/caam/sg_sw_sec4.h:104:12: warning:
+> 'dma_unmap_sg_chained' defined but not used [-Wunused-function]
+>  static int dma_unmap_sg_chained(struct device *dev,
+>             ^
 > 
-> Signed-off-by: Markus Stockhausen <stockhausen@collogia.de>
+> Signed-off-by: Yanjiang Jin <yanjiang.jin@windriver.com>
 
-All applied.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Reviewed-by: Horia Geanta <horia.geanta@freescale.com>
+
+> ---
+>  drivers/crypto/caam/sg_sw_sec4.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
+> index 3b91821..a6276eb 100644
+> --- a/drivers/crypto/caam/sg_sw_sec4.h
+> +++ b/drivers/crypto/caam/sg_sw_sec4.h
+> @@ -85,7 +85,7 @@ static inline int sg_count(struct scatterlist *sg_list, int nbytes,
+>  	return sg_nents;
+>  }
+>  
+> -static int dma_map_sg_chained(struct device *dev, struct scatterlist *sg,
+> +static inline int dma_map_sg_chained(struct device *dev, struct scatterlist *sg,
+>  			      unsigned int nents, enum dma_data_direction dir,
+>  			      bool chained)
+>  {
+> @@ -101,9 +101,9 @@ static int dma_map_sg_chained(struct device *dev, struct scatterlist *sg,
+>  	return nents;
+>  }
+>  
+> -static int dma_unmap_sg_chained(struct device *dev, struct scatterlist *sg,
+> -				unsigned int nents, enum dma_data_direction dir,
+> -				bool chained)
+> +static inline int dma_unmap_sg_chained(struct device *dev,
+> +				struct scatterlist *sg, unsigned int nents,
+> +				enum dma_data_direction dir, bool chained)
+>  {
+>  	if (unlikely(chained)) {
+>  		int i;
+> 
