@@ -1,106 +1,158 @@
-From: Milan Broz <gmazyland@gmail.com>
+From: Martin Hicks <mort@bork.org>
 Subject: Re: [PATCH 0/2] crypto: talitos: Add AES-XTS mode
-Date: Mon, 02 Mar 2015 15:37:28 +0100
-Message-ID: <54F475A8.6030105@gmail.com>
-References: <1424451610-5786-1-git-send-email-mort@bork.org> <54F464E4.8080204@freescale.com>
+Date: Mon, 2 Mar 2015 16:44:19 -0500
+Message-ID: <20150302214419.GA30523@darwin.bork.org>
+References: <1424451610-5786-1-git-send-email-mort@bork.org>
+ <54F464E4.8080204@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>,
-	Martin Hicks <mort@bork.org>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Scott Wood <scottwood@freescale.com>,
-	Kumar Gala <galak@kernel.crashing.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:38278 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755639AbbCBOhd (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Mar 2015 09:37:33 -0500
-Received: by wiwh11 with SMTP id h11so15345065wiw.3
-        for <linux-crypto@vger.kernel.org>; Mon, 02 Mar 2015 06:37:31 -0800 (PST)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Martin Hicks <mort@bork.org>,
+ linux-crypto@vger.kernel.org, Scott Wood <scottwood@freescale.com>,
+ linuxppc-dev@lists.ozlabs.org, Milan Broz <gmazyland@gmail.com>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Content-Disposition: inline
 In-Reply-To: <54F464E4.8080204@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On 03/02/2015 02:25 PM, Horia Geant=C4=83 wrote:
-> On 2/20/2015 7:00 PM, Martin Hicks wrote:
->> This adds the AES-XTS mode, supported by the Freescale SEC 3.3.2.
->>
->> One of the nice things about this hardware is that it knows how to d=
-eal
->> with encrypt/decrypt requests that are larger than sector size, but =
-that=20
->> also requires that that the sector size be passed into the crypto en=
-gine
->> as an XTS cipher context parameter.
->>
->> When a request is larger than the sector size the sector number is
->> incremented by the talitos engine and the tweak key is re-calculated
->> for the new sector.
->>
->> I've tested this with 256bit and 512bit keys (tweak and data keys of=
- 128bit
->> and 256bit) to ensure interoperability with the software AES-XTS
->> implementation.  All testing was done using dm-crypt/LUKS with
->> aes-xts-plain64.
->>
->> Is there a better solution that just hard coding the sector size to
->> (1<<SECTOR_SHIFT)?  Maybe dm-crypt should be modified to pass the
->> sector size along with the plain/plain64 IV to an XTS algorithm?
->=20
-> AFAICT, SW implementation of xts mode in kernel (crypto/xts.c) is not
-> aware of a sector size ("data unit size" in IEEE P1619 terminology):
-> There's a hidden assumption that all the data send to xts in one requ=
-est
-> belongs to a single sector. Even more, it's supposed that the first
-> 16-byte block in the request is "block 0" in the sector. These can be
-> seen from the way the tweak ("T") value is computed.
-> (Side note: there's no support of ciphertext stealing in crypto/xts.c=
- -
-> i.e. sector sizes must be a multiple of underlying block cipher size =
--
-> that is 16B.)
->=20
-> If dm-crypt would be modified to pass sector size somehow, all in-ker=
-nel
-> xts implementations would have to be made aware of the change.
-> I have nothing against this, but let's see what crypto maintainers ha=
-ve
-> to say...
->=20
-> BTW, there were some discussions back in 2013 wrt. being able to
-> configure / increase sector size, smth. crypto engines would benefit =
-from:
-> http://www.saout.de/pipermail/dm-crypt/2013-January/003125.html
-> (experimental patch)
-> http://www.saout.de/pipermail/dm-crypt/2013-March/003202.html
->=20
-> The experimental patch sends sector size as the req->nbytes - hidden
-> assumption: data size sent in an xts crypto request equals a sector.
-
-There was no follow-up but the idea is not yet abandoned :-)
-
-Dmcrypt will always use "sector" as a minimal unit
-(and I believe sectors will by always multiple of block size so
-no need for ciphertext stealing in XTS.)
-
-=46or now, dmcrypt always use 512 bytes sector size.
-
-If crypto API allows to encrypt more sectors in one run
-(handling IV internally) dmcrypt can be modified of course.
-
-But do not forget we can use another IV (not only sequential number)
-e.g. ESSIV with XTS as well (even if it doesn't make much sense, some p=
-eople
-are using it).
-
-Maybe the following question would be if the dmcrypt sector IV algorith=
-ms
-should moved into crypto API as well.
-(But because I misused dmcrypt IVs hooks for some additional operations
-for loopAES and old Truecrypt CBC mode, it is not so simple...)
-
-Milan
+T24gTW9uLCBNYXIgMDIsIDIwMTUgYXQgMDM6MjU6NTZQTSArMDIwMCwgSG9yaWEgR2VhbnTEgyB3
+cm90ZToKPiBPbiAyLzIwLzIwMTUgNzowMCBQTSwgTWFydGluIEhpY2tzIHdyb3RlOgo+ID4gVGhp
+cyBhZGRzIHRoZSBBRVMtWFRTIG1vZGUsIHN1cHBvcnRlZCBieSB0aGUgRnJlZXNjYWxlIFNFQyAz
+LjMuMi4KPiA+IAo+ID4gT25lIG9mIHRoZSBuaWNlIHRoaW5ncyBhYm91dCB0aGlzIGhhcmR3YXJl
+IGlzIHRoYXQgaXQga25vd3MgaG93IHRvIGRlYWwKPiA+IHdpdGggZW5jcnlwdC9kZWNyeXB0IHJl
+cXVlc3RzIHRoYXQgYXJlIGxhcmdlciB0aGFuIHNlY3RvciBzaXplLCBidXQgdGhhdCAKPiA+IGFs
+c28gcmVxdWlyZXMgdGhhdCB0aGF0IHRoZSBzZWN0b3Igc2l6ZSBiZSBwYXNzZWQgaW50byB0aGUg
+Y3J5cHRvIGVuZ2luZQo+ID4gYXMgYW4gWFRTIGNpcGhlciBjb250ZXh0IHBhcmFtZXRlci4KPiA+
+IAo+ID4gV2hlbiBhIHJlcXVlc3QgaXMgbGFyZ2VyIHRoYW4gdGhlIHNlY3RvciBzaXplIHRoZSBz
+ZWN0b3IgbnVtYmVyIGlzCj4gPiBpbmNyZW1lbnRlZCBieSB0aGUgdGFsaXRvcyBlbmdpbmUgYW5k
+IHRoZSB0d2VhayBrZXkgaXMgcmUtY2FsY3VsYXRlZAo+ID4gZm9yIHRoZSBuZXcgc2VjdG9yLgo+
+ID4gCj4gPiBJJ3ZlIHRlc3RlZCB0aGlzIHdpdGggMjU2Yml0IGFuZCA1MTJiaXQga2V5cyAodHdl
+YWsgYW5kIGRhdGEga2V5cyBvZiAxMjhiaXQKPiA+IGFuZCAyNTZiaXQpIHRvIGVuc3VyZSBpbnRl
+cm9wZXJhYmlsaXR5IHdpdGggdGhlIHNvZnR3YXJlIEFFUy1YVFMKPiA+IGltcGxlbWVudGF0aW9u
+LiAgQWxsIHRlc3Rpbmcgd2FzIGRvbmUgdXNpbmcgZG0tY3J5cHQvTFVLUyB3aXRoCj4gPiBhZXMt
+eHRzLXBsYWluNjQuCj4gPiAKPiA+IElzIHRoZXJlIGEgYmV0dGVyIHNvbHV0aW9uIHRoYXQganVz
+dCBoYXJkIGNvZGluZyB0aGUgc2VjdG9yIHNpemUgdG8KPiA+ICgxPDxTRUNUT1JfU0hJRlQpPyAg
+TWF5YmUgZG0tY3J5cHQgc2hvdWxkIGJlIG1vZGlmaWVkIHRvIHBhc3MgdGhlCj4gPiBzZWN0b3Ig
+c2l6ZSBhbG9uZyB3aXRoIHRoZSBwbGFpbi9wbGFpbjY0IElWIHRvIGFuIFhUUyBhbGdvcml0aG0/
+Cj4gCj4gQUZBSUNULCBTVyBpbXBsZW1lbnRhdGlvbiBvZiB4dHMgbW9kZSBpbiBrZXJuZWwgKGNy
+eXB0by94dHMuYykgaXMgbm90Cj4gYXdhcmUgb2YgYSBzZWN0b3Igc2l6ZSAoImRhdGEgdW5pdCBz
+aXplIiBpbiBJRUVFIFAxNjE5IHRlcm1pbm9sb2d5KToKPiBUaGVyZSdzIGEgaGlkZGVuIGFzc3Vt
+cHRpb24gdGhhdCBhbGwgdGhlIGRhdGEgc2VuZCB0byB4dHMgaW4gb25lIHJlcXVlc3QKPiBiZWxv
+bmdzIHRvIGEgc2luZ2xlIHNlY3Rvci4gRXZlbiBtb3JlLCBpdCdzIHN1cHBvc2VkIHRoYXQgdGhl
+IGZpcnN0Cj4gMTYtYnl0ZSBibG9jayBpbiB0aGUgcmVxdWVzdCBpcyAiYmxvY2sgMCIgaW4gdGhl
+IHNlY3Rvci4gVGhlc2UgY2FuIGJlCj4gc2VlbiBmcm9tIHRoZSB3YXkgdGhlIHR3ZWFrICgiVCIp
+IHZhbHVlIGlzIGNvbXB1dGVkLgo+IChTaWRlIG5vdGU6IHRoZXJlJ3Mgbm8gc3VwcG9ydCBvZiBj
+aXBoZXJ0ZXh0IHN0ZWFsaW5nIGluIGNyeXB0by94dHMuYyAtCj4gaS5lLiBzZWN0b3Igc2l6ZXMg
+bXVzdCBiZSBhIG11bHRpcGxlIG9mIHVuZGVybHlpbmcgYmxvY2sgY2lwaGVyIHNpemUgLQo+IHRo
+YXQgaXMgMTZCLikKPiAKPiBJZiBkbS1jcnlwdCB3b3VsZCBiZSBtb2RpZmllZCB0byBwYXNzIHNl
+Y3RvciBzaXplIHNvbWVob3csIGFsbCBpbi1rZXJuZWwKPiB4dHMgaW1wbGVtZW50YXRpb25zIHdv
+dWxkIGhhdmUgdG8gYmUgbWFkZSBhd2FyZSBvZiB0aGUgY2hhbmdlLgo+IEkgaGF2ZSBub3RoaW5n
+IGFnYWluc3QgdGhpcywgYnV0IGxldCdzIHNlZSB3aGF0IGNyeXB0byBtYWludGFpbmVycyBoYXZl
+Cj4gdG8gc2F5Li4uCgpSaWdodC4gIEFkZGl0aW9uYWxseSwgdGhlcmUgbWF5IGJlIHNvbWUgcmVx
+dWlyZW1lbnQgZm9yIHRoZSBlbmNyeXB0aW9uCmltcGxlbWVudGF0aW9uIHRvIGJyb2FkY2FzdCB0
+aGUgbWF4aW11bSBzaXplIHRoYXQgY2FuIGJlIGhhbmRsZWQgaW4gYSBzaW5nbGUKcmVxdWVzdC4g
+IEZvciBleGFtcGxlIFRhbGl0b3MgY291bGQgaGFuZGxlIFhUUyBlbmNyeXB0L2RlY3J5cHQgcmVx
+dWVzdHMgb2YKdXAgdG8gNjRrQiAocmVnYXJkbGVzcyBvZiB0aGUgYmxvY2sgZGV2aWNlJ3Mgc2Vj
+dG9yIHNpemUpLgoKPiBCVFcsIHRoZXJlIHdlcmUgc29tZSBkaXNjdXNzaW9ucyBiYWNrIGluIDIw
+MTMgd3J0LiBiZWluZyBhYmxlIHRvCj4gY29uZmlndXJlIC8gaW5jcmVhc2Ugc2VjdG9yIHNpemUs
+IHNtdGguIGNyeXB0byBlbmdpbmVzIHdvdWxkIGJlbmVmaXQgZnJvbToKPiBodHRwOi8vd3d3LnNh
+b3V0LmRlL3BpcGVybWFpbC9kbS1jcnlwdC8yMDEzLUphbnVhcnkvMDAzMTI1Lmh0bWwKPiAoZXhw
+ZXJpbWVudGFsIHBhdGNoKQo+IGh0dHA6Ly93d3cuc2FvdXQuZGUvcGlwZXJtYWlsL2RtLWNyeXB0
+LzIwMTMtTWFyY2gvMDAzMjAyLmh0bWwKPiAKPiBUaGUgZXhwZXJpbWVudGFsIHBhdGNoIHNlbmRz
+IHNlY3RvciBzaXplIGFzIHRoZSByZXEtPm5ieXRlcyAtIGhpZGRlbgo+IGFzc3VtcHRpb246IGRh
+dGEgc2l6ZSBzZW50IGluIGFuIHh0cyBjcnlwdG8gcmVxdWVzdCBlcXVhbHMgYSBzZWN0b3IuCgpJ
+IGZvdW5kIHRoaXMgbGFzdCB3ZWVrLCBhbmQgdXNlZCBpdCBhcyBhIHN0YXJ0aW5nIHBvaW50IGZv
+ciBzb21lIHRlc3RpbmcuICBJCm1vZGlmaWVkIGl0IHRvIGtlZXAgdGhlIHVuZGVybHlpbmcgc2Vj
+dG9yIHNpemUgb2YgdGhlIGRtLWNyeXB0IG1hcHBpbmcgYXMKNTEyYnl0ZSwgYnV0IGFsbG93ZWQg
+dGhlIGNvZGUgdG8gY29tYmluZSByZXF1ZXN0cyBpbiBJT3MgdXAgdG8gNGtCLiAgRG9pbmcKZ3Jl
+YXRlciByZXF1ZXN0IHNpemVzIHdvdWxkIHJlcXVpcmUgYWxsb2NhdGluZyBhZGRpdGlvbmFsIHBh
+Z2VzLi4uSSBwbGFuIHRvCmltcGxlbWVudCB0aGF0IHRvIHNlZSBob3cgbXVjaCBleHRyYSBwZXJm
+b3JtYW5jZSBjYW4gYmUgc3F1ZWV6ZWQgb3V0LgoKcGF0Y2ggYmVsb3cuLi4KCldpdGggcmVnYXJk
+cyB0byBwZXJmb3JtYW5jZSwgd2l0aCBteSBsb3ctcG93ZXJlZCBGcmVlc2NhbGUgUDEwMjIgYm9h
+cmQsIEkgc2VlCnBlcmZvcm1hbmNlIG51bWJlcnMgbGlrZSB0aGlzIG9uIGV4dDQsIGFzIG1lYXN1
+cmVkIGJ5IGJvbm5pZSsrLgoKCQkJV3JpdGUgKE1CL3MpCVJlYWQgKE1CL3MpClVuZW5jcnlwdGVk
+CQkxNDAJCTE3NgphZXMteHRzLXBsYWluNjQgNTEyYgkxMTMJCTExNQphZXMteHRzLXBsYWluNjQg
+NGtCCTcxCQk1NgoKVGhlIG1vcmUgZGV0YWlsZWQgYm9ubmllKysgb3V0cHV0IGlzIGhlcmU6Cmh0
+dHA6Ly93d3cuYm9yay5vcmcvfm1vcnQvZG0tY3J5cHQtZW5jLWJsa3NpemUuaHRtbAoKVGhlIGxh
+cmdlciBJTyBzaXplcyBpcyBhIGh1Z2Ugd2luIGZvciB0aGlzIGJvYXJkLgoKVGhlIHBhdGNoIEkn
+bSB1c2luZyB0byBzZW5kIElPcyB1cCB0byA0a0IgdG8gdGFsaXRvcyBmb2xsb3dzLgoKVGhhbmtz
+LAptaAoKCmRpZmYgLS1naXQgYS9kcml2ZXJzL21kL2RtLWNyeXB0LmMgYi9kcml2ZXJzL21kL2Rt
+LWNyeXB0LmMKaW5kZXggMDg5ODFiZS4uODhlOTViNSAxMDA2NDQKLS0tIGEvZHJpdmVycy9tZC9k
+bS1jcnlwdC5jCisrKyBiL2RyaXZlcnMvbWQvZG0tY3J5cHQuYwpAQCAtNDIsNiArNDIsNyBAQCBz
+dHJ1Y3QgY29udmVydF9jb250ZXh0IHsKIAlzdHJ1Y3QgYnZlY19pdGVyIGl0ZXJfb3V0OwogCXNl
+Y3Rvcl90IGNjX3NlY3RvcjsKIAlhdG9taWNfdCBjY19wZW5kaW5nOworCXVuc2lnbmVkIGludCBi
+bG9ja19zaXplOwogCXN0cnVjdCBhYmxrY2lwaGVyX3JlcXVlc3QgKnJlcTsKIH07CiAKQEAgLTE0
+Miw2ICsxNDMsOCBAQCBzdHJ1Y3QgY3J5cHRfY29uZmlnIHsKIAlzZWN0b3JfdCBpdl9vZmZzZXQ7
+CiAJdW5zaWduZWQgaW50IGl2X3NpemU7CiAKKwl1bnNpZ25lZCBpbnQgYmxvY2tfc2l6ZTsKKwog
+CS8qIEVTU0lWOiBzdHJ1Y3QgY3J5cHRvX2NpcGhlciAqZXNzaXZfdGZtICovCiAJdm9pZCAqaXZf
+cHJpdmF0ZTsKIAlzdHJ1Y3QgY3J5cHRvX2FibGtjaXBoZXIgKip0Zm1zOwpAQCAtODAxLDEwICs4
+MDQsMTcgQEAgc3RhdGljIHZvaWQgY3J5cHRfY29udmVydF9pbml0KHN0cnVjdCBjcnlwdF9jb25m
+aWcgKmNjLAogewogCWN0eC0+YmlvX2luID0gYmlvX2luOwogCWN0eC0+YmlvX291dCA9IGJpb19v
+dXQ7Ci0JaWYgKGJpb19pbikKKwljdHgtPmJsb2NrX3NpemUgPSAwOworCWlmIChiaW9faW4pIHsK
+IAkJY3R4LT5pdGVyX2luID0gYmlvX2luLT5iaV9pdGVyOwotCWlmIChiaW9fb3V0KQorCQljdHgt
+PmJsb2NrX3NpemUgPSBtYXgoY3R4LT5ibG9ja19zaXplLCBiaW9fY3VyX2J5dGVzKGJpb19pbikp
+OworCX0KKwlpZiAoYmlvX291dCkgewogCQljdHgtPml0ZXJfb3V0ID0gYmlvX291dC0+YmlfaXRl
+cjsKKwkJY3R4LT5ibG9ja19zaXplID0gbWF4KGN0eC0+YmxvY2tfc2l6ZSwgYmlvX2N1cl9ieXRl
+cyhiaW9fb3V0KSk7CisJfQorCWlmIChjdHgtPmJsb2NrX3NpemUgPiBjYy0+YmxvY2tfc2l6ZSkK
+KwkJY3R4LT5ibG9ja19zaXplID0gY2MtPmJsb2NrX3NpemU7CiAJY3R4LT5jY19zZWN0b3IgPSBz
+ZWN0b3IgKyBjYy0+aXZfb2Zmc2V0OwogCWluaXRfY29tcGxldGlvbigmY3R4LT5yZXN0YXJ0KTsK
+IH0KQEAgLTg0NCwxNSArODU0LDE1IEBAIHN0YXRpYyBpbnQgY3J5cHRfY29udmVydF9ibG9jayhz
+dHJ1Y3QgY3J5cHRfY29uZmlnICpjYywKIAlkbXJlcS0+aXZfc2VjdG9yID0gY3R4LT5jY19zZWN0
+b3I7CiAJZG1yZXEtPmN0eCA9IGN0eDsKIAlzZ19pbml0X3RhYmxlKCZkbXJlcS0+c2dfaW4sIDEp
+OwotCXNnX3NldF9wYWdlKCZkbXJlcS0+c2dfaW4sIGJ2X2luLmJ2X3BhZ2UsIDEgPDwgU0VDVE9S
+X1NISUZULAorCXNnX3NldF9wYWdlKCZkbXJlcS0+c2dfaW4sIGJ2X2luLmJ2X3BhZ2UsIGN0eC0+
+YmxvY2tfc2l6ZSwKIAkJICAgIGJ2X2luLmJ2X29mZnNldCk7CiAKIAlzZ19pbml0X3RhYmxlKCZk
+bXJlcS0+c2dfb3V0LCAxKTsKLQlzZ19zZXRfcGFnZSgmZG1yZXEtPnNnX291dCwgYnZfb3V0LmJ2
+X3BhZ2UsIDEgPDwgU0VDVE9SX1NISUZULAorCXNnX3NldF9wYWdlKCZkbXJlcS0+c2dfb3V0LCBi
+dl9vdXQuYnZfcGFnZSwgY3R4LT5ibG9ja19zaXplLAogCQkgICAgYnZfb3V0LmJ2X29mZnNldCk7
+CiAKLQliaW9fYWR2YW5jZV9pdGVyKGN0eC0+YmlvX2luLCAmY3R4LT5pdGVyX2luLCAxIDw8IFNF
+Q1RPUl9TSElGVCk7Ci0JYmlvX2FkdmFuY2VfaXRlcihjdHgtPmJpb19vdXQsICZjdHgtPml0ZXJf
+b3V0LCAxIDw8IFNFQ1RPUl9TSElGVCk7CisJYmlvX2FkdmFuY2VfaXRlcihjdHgtPmJpb19pbiwg
+JmN0eC0+aXRlcl9pbiwgY3R4LT5ibG9ja19zaXplKTsKKwliaW9fYWR2YW5jZV9pdGVyKGN0eC0+
+YmlvX291dCwgJmN0eC0+aXRlcl9vdXQsIGN0eC0+YmxvY2tfc2l6ZSk7CiAKIAlpZiAoY2MtPml2
+X2dlbl9vcHMpIHsKIAkJciA9IGNjLT5pdl9nZW5fb3BzLT5nZW5lcmF0b3IoY2MsIGl2LCBkbXJl
+cSk7CkBAIC04NjEsNyArODcxLDcgQEAgc3RhdGljIGludCBjcnlwdF9jb252ZXJ0X2Jsb2NrKHN0
+cnVjdCBjcnlwdF9jb25maWcgKmNjLAogCX0KIAogCWFibGtjaXBoZXJfcmVxdWVzdF9zZXRfY3J5
+cHQocmVxLCAmZG1yZXEtPnNnX2luLCAmZG1yZXEtPnNnX291dCwKLQkJCQkgICAgIDEgPDwgU0VD
+VE9SX1NISUZULCBpdik7CisJCQkJICAgICBjdHgtPmJsb2NrX3NpemUsIGl2KTsKIAogCWlmIChi
+aW9fZGF0YV9kaXIoY3R4LT5iaW9faW4pID09IFdSSVRFKQogCQlyID0gY3J5cHRvX2FibGtjaXBo
+ZXJfZW5jcnlwdChyZXEpOwpAQCAtOTI2LDEzICs5MzYsMTMgQEAgc3RhdGljIGludCBjcnlwdF9j
+b252ZXJ0KHN0cnVjdCBjcnlwdF9jb25maWcgKmNjLAogCQkJLyogZmFsbCB0aHJvdWdoKi8KIAkJ
+Y2FzZSAtRUlOUFJPR1JFU1M6CiAJCQljdHgtPnJlcSA9IE5VTEw7Ci0JCQljdHgtPmNjX3NlY3Rv
+cisrOworCQkJY3R4LT5jY19zZWN0b3IgKz0gY3R4LT5ibG9ja19zaXplIC8gKDE8PFNFQ1RPUl9T
+SElGVCk7CiAJCQljb250aW51ZTsKIAogCQkvKiBzeW5jICovCiAJCWNhc2UgMDoKIAkJCWF0b21p
+Y19kZWMoJmN0eC0+Y2NfcGVuZGluZyk7Ci0JCQljdHgtPmNjX3NlY3RvcisrOworCQkJY3R4LT5j
+Y19zZWN0b3IgKz0gY3R4LT5ibG9ja19zaXplIC8gKDE8PFNFQ1RPUl9TSElGVCk7CiAJCQljb25k
+X3Jlc2NoZWQoKTsKIAkJCWNvbnRpbnVlOwogCkBAIC0xODE0LDYgKzE4MjQsOSBAQCBzdGF0aWMg
+aW50IGNyeXB0X2N0cihzdHJ1Y3QgZG1fdGFyZ2V0ICp0aSwgdW5zaWduZWQgaW50IGFyZ2MsIGNo
+YXIgKiphcmd2KQogCQlnb3RvIGJhZDsKIAl9CiAKKwkvKiBQQUdFX1NJWkU/ICovCisJY2MtPmJs
+b2NrX3NpemUgPSA0MDk2OworCiAJdGktPm51bV9mbHVzaF9iaW9zID0gMTsKIAl0aS0+ZGlzY2Fy
+ZF96ZXJvZXNfZGF0YV91bnN1cHBvcnRlZCA9IHRydWU7CiAKQEAgLTE5NzQsOSArMTk4NywxNiBA
+QCBzdGF0aWMgaW50IGNyeXB0X2l0ZXJhdGVfZGV2aWNlcyhzdHJ1Y3QgZG1fdGFyZ2V0ICp0aSwK
+IAlyZXR1cm4gZm4odGksIGNjLT5kZXYsIGNjLT5zdGFydCwgdGktPmxlbiwgZGF0YSk7CiB9CiAK
+K3N0YXRpYyB2b2lkIGNyeXB0X2lvX2hpbnRzKHN0cnVjdCBkbV90YXJnZXQgKnRpLAorICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgc3RydWN0IHF1ZXVlX2xpbWl0cyAqbGltaXRzKQoreworCS8q
+IFBBR0VfU0laRT8gKi8KKwlibGtfbGltaXRzX2lvX21pbihsaW1pdHMsIDQwOTYpOworfQorCiBz
+dGF0aWMgc3RydWN0IHRhcmdldF90eXBlIGNyeXB0X3RhcmdldCA9IHsKIAkubmFtZSAgID0gImNy
+eXB0IiwKLQkudmVyc2lvbiA9IHsxLCAxMywgMH0sCisJLnZlcnNpb24gPSB7MSwgMTQsIDB9LAog
+CS5tb2R1bGUgPSBUSElTX01PRFVMRSwKIAkuY3RyICAgID0gY3J5cHRfY3RyLAogCS5kdHIgICAg
+PSBjcnlwdF9kdHIsCkBAIC0xOTg4LDYgKzIwMDgsNyBAQCBzdGF0aWMgc3RydWN0IHRhcmdldF90
+eXBlIGNyeXB0X3RhcmdldCA9IHsKIAkubWVzc2FnZSA9IGNyeXB0X21lc3NhZ2UsCiAJLm1lcmdl
+ICA9IGNyeXB0X21lcmdlLAogCS5pdGVyYXRlX2RldmljZXMgPSBjcnlwdF9pdGVyYXRlX2Rldmlj
+ZXMsCisJLmlvX2hpbnRzID0gY3J5cHRfaW9faGludHMsCiB9OwogCiBzdGF0aWMgaW50IF9faW5p
+dCBkbV9jcnlwdF9pbml0KHZvaWQpCgotLSAKTWFydGluIEhpY2tzIFAuRW5nLiAgICB8ICAgICAg
+bW9ydEBib3JrLm9yZwpCb3JrIENvbnN1bHRpbmcgSW5jLiAgIHwgICsxICg2MTMpIDI2Ni0yMjk2
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4cHBj
+LWRldiBtYWlsaW5nIGxpc3QKTGludXhwcGMtZGV2QGxpc3RzLm96bGFicy5vcmcKaHR0cHM6Ly9s
+aXN0cy5vemxhYnMub3JnL2xpc3RpbmZvL2xpbnV4cHBjLWRldg==
