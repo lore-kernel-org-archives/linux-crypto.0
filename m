@@ -1,104 +1,47 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 11/17] crypto: talitos - adaptation of talitos_submit() for
- SEC1
-Date: Sun, 15 Mar 2015 16:37:47 +0100
-Message-ID: <20150417142405.0DF451A242C@localhost.localdomain>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org
+Subject: [PATCH v3 01/17] crypto: talitos - Use zero entry to init descriptors
+ ptrs to zero
+Date: Tue, 3 Mar 2015 02:46:35 +0100
+Message-ID: <20150417142354.5AE601A242C@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
 To: Kim Phillips <kim.phillips@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David S Miller <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+ Herbert Xu <herbert@gondor.apana.org.au>, David S Miller <davem@davemloft.net>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
 List-Id: linux-crypto.vger.kernel.org
 
-SEC1 descriptor is a bit different to SEC2+ descriptor.
-talitos_submit() will have to copy hdr field into hdr1 field and
-send the descriptor starting at hdr1 up to next_desc.
-For SEC2, it remains unchanged and next_desc is just ignored.
-
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- drivers/crypto/talitos.c | 23 +++++++++++++++++++----
- drivers/crypto/talitos.h |  2 ++
- 2 files changed, 21 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 678b528..e6ea651 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -236,6 +236,7 @@ int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
- 	struct talitos_request *request;
- 	unsigned long flags;
- 	int head;
-+	bool is_sec1 = has_ftr_sec1(priv);
- 
- 	spin_lock_irqsave(&priv->chan[ch].head_lock, flags);
- 
-@@ -249,8 +250,17 @@ int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
- 	request = &priv->chan[ch].fifo[head];
- 
- 	/* map descriptor and save caller data */
--	request->dma_desc = dma_map_single(dev, desc, sizeof(*desc),
--					   DMA_BIDIRECTIONAL);
-+	if (is_sec1) {
-+		desc->hdr1 = desc->hdr;
-+		desc->next_desc = 0;
-+		request->dma_desc = dma_map_single(dev, &desc->hdr1,
-+						   TALITOS_DESC_SIZE,
-+						   DMA_BIDIRECTIONAL);
-+	} else {
-+		request->dma_desc = dma_map_single(dev, desc,
-+						   TALITOS_DESC_SIZE,
-+						   DMA_BIDIRECTIONAL);
-+	}
- 	request->callback = callback;
- 	request->context = context;
- 
-@@ -282,16 +292,21 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
- 	struct talitos_request *request, saved_req;
- 	unsigned long flags;
- 	int tail, status;
-+	bool is_sec1 = has_ftr_sec1(priv);
- 
- 	spin_lock_irqsave(&priv->chan[ch].tail_lock, flags);
- 
- 	tail = priv->chan[ch].tail;
- 	while (priv->chan[ch].fifo[tail].desc) {
-+		__be32 hdr;
-+
- 		request = &priv->chan[ch].fifo[tail];
- 
- 		/* descriptors with their done bits set don't get the error */
- 		rmb();
--		if ((request->desc->hdr & DESC_HDR_DONE) == DESC_HDR_DONE)
-+		hdr = is_sec1 ? request->desc->hdr1 : request->desc->hdr;
-+
-+		if ((hdr & DESC_HDR_DONE) == DESC_HDR_DONE)
- 			status = 0;
- 		else
- 			if (!error)
-@@ -300,7 +315,7 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
- 				status = error;
- 
- 		dma_unmap_single(dev, request->dma_desc,
--				 sizeof(struct talitos_desc),
-+				 TALITOS_DESC_SIZE,
- 				 DMA_BIDIRECTIONAL);
- 
- 		/* copy entries so we can call callback outside lock */
-diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos.h
-index b0bdb4e..f827c04 100644
---- a/drivers/crypto/talitos.h
-+++ b/drivers/crypto/talitos.h
-@@ -69,6 +69,8 @@ struct talitos_desc {
- 	__be32 next_desc;		/* next descriptor (SEC1) */
- };
- 
-+#define TALITOS_DESC_SIZE	(sizeof(struct talitos_desc) - sizeof(__be32))
-+
- /**
-  * talitos_request - descriptor submission request
-  * @desc: descriptor pointer (kernel virtual)
--- 
-2.1.0
+RG8gdXNlIHplcm9fZW50cnkgdmFsdWUgdG8gaW5pdCB0aGUgZGVzY3JpcHRvcnMgcHRycyB0byB6
+ZXJvIGluc3RlYWQgb2YKd3JpdGluZyAwIGluIGVhY2ggZmllbGQKClNpZ25lZC1vZmYtYnk6IENo
+cmlzdG9waGUgTGVyb3kgPGNocmlzdG9waGUubGVyb3lAYy1zLmZyPgotLS0KIGRyaXZlcnMvY3J5
+cHRvL3RhbGl0b3MuYyB8IDggKystLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMo
+KyksIDYgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vdGFsaXRvcy5j
+IGIvZHJpdmVycy9jcnlwdG8vdGFsaXRvcy5jCmluZGV4IDg1NzQxNGEuLjdiZjFiMmIgMTAwNjQ0
+Ci0tLSBhL2RyaXZlcnMvY3J5cHRvL3RhbGl0b3MuYworKysgYi9kcml2ZXJzL2NyeXB0by90YWxp
+dG9zLmMKQEAgLTEzNzMsOSArMTM3Myw3IEBAIHN0YXRpYyBpbnQgY29tbW9uX25vbnNub29wKHN0
+cnVjdCB0YWxpdG9zX2VkZXNjICplZGVzYywKIAlpbnQgc2dfY291bnQsIHJldDsKIAogCS8qIGZp
+cnN0IERXT1JEIGVtcHR5ICovCi0JZGVzYy0+cHRyWzBdLmxlbiA9IDA7Ci0JdG9fdGFsaXRvc19w
+dHIoJmRlc2MtPnB0clswXSwgMCk7Ci0JZGVzYy0+cHRyWzBdLmpfZXh0ZW50ID0gMDsKKwlkZXNj
+LT5wdHJbMF0gPSB6ZXJvX2VudHJ5OwogCiAJLyogY2lwaGVyIGl2ICovCiAJdG9fdGFsaXRvc19w
+dHIoJmRlc2MtPnB0clsxXSwgZWRlc2MtPml2X2RtYSk7CkBAIC0xNDQ1LDkgKzE0NDMsNyBAQCBz
+dGF0aWMgaW50IGNvbW1vbl9ub25zbm9vcChzdHJ1Y3QgdGFsaXRvc19lZGVzYyAqZWRlc2MsCiAJ
+CQkgICAgICAgRE1BX0ZST01fREVWSUNFKTsKIAogCS8qIGxhc3QgRFdPUkQgZW1wdHkgKi8KLQlk
+ZXNjLT5wdHJbNl0ubGVuID0gMDsKLQl0b190YWxpdG9zX3B0cigmZGVzYy0+cHRyWzZdLCAwKTsK
+LQlkZXNjLT5wdHJbNl0ual9leHRlbnQgPSAwOworCWRlc2MtPnB0cls2XSA9IHplcm9fZW50cnk7
+CiAKIAlyZXQgPSB0YWxpdG9zX3N1Ym1pdChkZXYsIGN0eC0+Y2gsIGRlc2MsIGNhbGxiYWNrLCBh
+cmVxKTsKIAlpZiAocmV0ICE9IC1FSU5QUk9HUkVTUykgewotLSAKMi4xLjAKCl9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4cHBjLWRldiBtYWlsaW5n
+IGxpc3QKTGludXhwcGMtZGV2QGxpc3RzLm96bGFicy5vcmcKaHR0cHM6Ly9saXN0cy5vemxhYnMu
+b3JnL2xpc3RpbmZvL2xpbnV4cHBjLWRldg==
