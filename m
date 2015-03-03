@@ -1,57 +1,52 @@
-From: Martin Hicks <mort@bork.org>
-Subject: Re: [PATCH 0/2] crypto: talitos: Add AES-XTS mode
-Date: Mon, 2 Mar 2015 17:09:24 -0500
-Message-ID: <20150302220923.GC30523@darwin.bork.org>
-References: <1424451610-5786-1-git-send-email-mort@bork.org>
- <54F464E4.8080204@freescale.com>
- <54F475A8.6030105@gmail.com>
+From: <yanjiang.jin@windriver.com>
+Subject: [PATCH 0/3] fix some CAAM warnings.
+Date: Tue, 3 Mar 2015 14:50:50 +0800
+Message-ID: <1425365453-19358-1-git-send-email-yanjiang.jin@windriver.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>,
-	Martin Hicks <mort@bork.org>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Scott Wood <scottwood@freescale.com>,
-	Kumar Gala <galak@kernel.crashing.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: Milan Broz <gmazyland@gmail.com>
+Content-Type: text/plain
+Cc: <kim.phillips@freescale.com>, <ruchika.gupta@freescale.com>,
+	<cristian.stoica@freescale.com>, <NiteshNarayanLal@freescale.com>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<jinyanjiang@gmail.com>
+To: <horia.geanta@freescale.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from darwin.bork.org ([65.49.60.145]:39315 "EHLO darwin.bork.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754122AbbCBWJY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 2 Mar 2015 17:09:24 -0500
-Content-Disposition: inline
-In-Reply-To: <54F475A8.6030105@gmail.com>
+Received: from mail.windriver.com ([147.11.1.11]:56799 "EHLO
+	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752498AbbCCGvJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 Mar 2015 01:51:09 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+From: Yanjiang Jin <yanjiang.jin@windriver.com>
 
-On Mon, Mar 02, 2015 at 03:37:28PM +0100, Milan Broz wrote:
-> 
-> If crypto API allows to encrypt more sectors in one run
-> (handling IV internally) dmcrypt can be modified of course.
-> 
-> But do not forget we can use another IV (not only sequential number)
-> e.g. ESSIV with XTS as well (even if it doesn't make much sense, some people
-> are using it).
+Hi,
 
-Interesting, I'd not considered using XTS with an IV other than plain/64.
-The talitos hardware would not support aes/xts in any mode other than
-plain/plain64 I don't think...Although perhaps you could push in an 8-byte
-IV and the hardware would interpret it as the sector #.
+This patch series  fix some CAAM compile and runtime warnings.
+The patches 0001 and 0002 are same as V1.
 
-> Maybe the following question would be if the dmcrypt sector IV algorithms
-> should moved into crypto API as well.
-> (But because I misused dmcrypt IVs hooks for some additional operations
-> for loopAES and old Truecrypt CBC mode, it is not so simple...)
+I have tested this on fsl-p5020ds board using upstream 4.0.0-rc1+ with the below configs:
 
-Speaking again with talitos in mind, there would be no advantage for this
-hardware.  Although larger requests are possible only a single IV can be
-provided per request, so for algorithms like AES-CBC and dm-crypt 512byte IOs
-are the only option (short of switching to 4kB block size).
+CONFIG_DMA_API_DEBUG=y
+# CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
 
-mh
+Change log:
+v2:
+
+Abandon the v1 patch 0003-crypto-caamhash-add-two-missed-dma_mapping_error.patch.
+Replace the v1 patch 0004-crypto-caamhash-replace-kmalloc-with-kzalloc.patch with the new
+patch 0003-crypto-caamhash-fix-uninitialized-edesc-sec4_sg_byte.patch.
+
+Yanjiang Jin (3):
+  crypto: caam: fix some compile warnings
+  crypto: caam_rng: fix rng_unmap_ctx's DMA_UNMAP size problem
+  crypto: caamhash: - fix uninitialized edesc->sec4_sg_bytes field
+
+ drivers/crypto/caam/caamhash.c   | 1 +
+ drivers/crypto/caam/caamrng.c    | 4 ++--
+ drivers/crypto/caam/sg_sw_sec4.h | 8 ++++----
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
 -- 
-Martin Hicks P.Eng.    |      mort@bork.org
-Bork Consulting Inc.   |  +1 (613) 266-2296
+1.9.1
