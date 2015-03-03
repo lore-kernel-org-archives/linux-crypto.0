@@ -1,46 +1,55 @@
-From: Martin Hicks <mort@bork.org>
-Subject: [PATCH v2 3/5] crypto: talitos: Fix off-by-one and use all hardware slots
-Date: Tue,  3 Mar 2015 08:21:35 -0500
-Message-ID: <1425388897-5434-4-git-send-email-mort@bork.org>
-References: <1425388897-5434-1-git-send-email-mort@bork.org>
-Cc: linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-	=?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@freescale.com>,
-	Martin Hicks <mort@bork.org>
-To: Kim Phillips <kim.phillips@freescale.com>,
-	Scott Wood <scottwood@freescale.com>,
-	Kumar Gala <galak@kernel.crashing.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f173.google.com ([209.85.213.173]:40574 "EHLO
-	mail-ig0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756061AbbCCNVw (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 Mar 2015 08:21:52 -0500
-Received: by igal13 with SMTP id l13so27201472iga.5
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Mar 2015 05:21:51 -0800 (PST)
-In-Reply-To: <1425388897-5434-1-git-send-email-mort@bork.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH 0/3] fix some CAAM warnings.
+Date: Tue, 3 Mar 2015 15:39:49 +0200
+Message-ID: <54F5B9A5.5080300@freescale.com>
+References: <1425365453-19358-1-git-send-email-yanjiang.jin@windriver.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: <kim.phillips@freescale.com>, <ruchika.gupta@freescale.com>,
+	<cristian.stoica@freescale.com>, <NiteshNarayanLal@freescale.com>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<jinyanjiang@gmail.com>
+To: <yanjiang.jin@windriver.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1425365453-19358-1-git-send-email-yanjiang.jin@windriver.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The submission count was off by one.
+On 3/3/2015 8:50 AM, yanjiang.jin@windriver.com wrote:
+> From: Yanjiang Jin <yanjiang.jin@windriver.com>
+> 
+> Hi,
+> 
+> This patch series  fix some CAAM compile and runtime warnings.
+> The patches 0001 and 0002 are same as V1.
+> 
+> I have tested this on fsl-p5020ds board using upstream 4.0.0-rc1+ with the below configs:
+> 
+> CONFIG_DMA_API_DEBUG=y
+> # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+> 
+> Change log:
+> v2:
+> 
+> Abandon the v1 patch 0003-crypto-caamhash-add-two-missed-dma_mapping_error.patch.
+> Replace the v1 patch 0004-crypto-caamhash-replace-kmalloc-with-kzalloc.patch with the new
+> patch 0003-crypto-caamhash-fix-uninitialized-edesc-sec4_sg_byte.patch.
+> 
+> Yanjiang Jin (3):
+>   crypto: caam: fix some compile warnings
+>   crypto: caam_rng: fix rng_unmap_ctx's DMA_UNMAP size problem
+>   crypto: caamhash: - fix uninitialized edesc->sec4_sg_bytes field
+> 
+>  drivers/crypto/caam/caamhash.c   | 1 +
+>  drivers/crypto/caam/caamrng.c    | 4 ++--
+>  drivers/crypto/caam/sg_sw_sec4.h | 8 ++++----
+>  3 files changed, 7 insertions(+), 6 deletions(-)
+> 
 
-Signed-off-by: Martin Hicks <mort@bork.org>
----
- drivers/crypto/talitos.c |    3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+For the series
+Reviewed-by: Horia Geanta <horia.geanta@freescale.com>
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 89cf4d5..7709805 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -2722,8 +2722,7 @@ static int talitos_probe(struct platform_device *ofdev)
- 			goto err_out;
- 		}
- 
--		atomic_set(&priv->chan[i].submit_count,
--			   -(priv->chfifo_len - 1));
-+		atomic_set(&priv->chan[i].submit_count, -priv->chfifo_len);
- 	}
- 
- 	dma_set_mask(dev, DMA_BIT_MASK(36));
--- 
-1.7.10.4
+Thanks!
+Horia
