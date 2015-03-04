@@ -1,64 +1,42 @@
-From: Cristian Stoica <cristian.stoica@freescale.com>
-Subject: Re: [PATCH 1/3] crypto: caam: fix some compile warnings
-Date: Wed, 4 Mar 2015 10:48:55 +0200
-Message-ID: <54F6C6F7.6020400@freescale.com>
-References: <1425365453-19358-1-git-send-email-yanjiang.jin@windriver.com>
-	<1425365453-19358-2-git-send-email-yanjiang.jin@windriver.com>
- <20150303125953.8585904680288a9734566b42@freescale.com>
- <54F66EA3.7080506@windriver.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v13 0/2] crypto: AF_ALG: add AEAD support
+Date: Wed, 04 Mar 2015 10:25:45 +0100
+Message-ID: <1581016.jkoGcLxvE9@tauon>
+References: <2180298.gqj58NYuqx@tachyon.chronox.de> <20150304091632.GB9195@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <horia.geanta@freescale.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <ruchika.gupta@freescale.com>,
-	<NiteshNarayanLal@freescale.com>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <jinyanjiang@gmail.com>
-To: yjin <yanjiang.jin@windriver.com>,
-	Kim Phillips <kim.phillips@freescale.com>
+Cc: 'Quentin Gouchet' <quentin.gouchet@gmail.com>,
+	Daniel Borkmann <dborkman@redhat.com>,
+	linux-api@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0101.outbound.protection.outlook.com ([207.46.100.101]:6538
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S932632AbbCDJWH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 Mar 2015 04:22:07 -0500
-In-Reply-To: <54F66EA3.7080506@windriver.com>
+Received: from mail.eperm.de ([89.247.134.16]:36517 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751208AbbCDJ3M convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 4 Mar 2015 04:29:12 -0500
+In-Reply-To: <20150304091632.GB9195@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Yanjiang,
+Am Mittwoch, 4. M=E4rz 2015, 22:16:32 schrieb Herbert Xu:
 
-On 03/04/2015 04:32 AM, yjin wrote:
->=20
-> On 2015=E5=B9=B403=E6=9C=8804=E6=97=A5 02:59, Kim Phillips wrote:
->> On Tue, 3 Mar 2015 14:50:51 +0800
->> <yanjiang.jin@windriver.com> wrote:
->>
->>> This commit is to avoid the below warnings:
->>>
->>> drivers/crypto/caam/sg_sw_sec4.h:88:12: warning:
->>> 'dma_map_sg_chained' defined but not used [-Wunused-function]
->>>   static int dma_map_sg_chained(struct device *dev, struct
->>> scatterlist *sg,
-[...]
->=20
-> We can find an example in Freescale SDK 1.6:
-> caampkc.c includes pkc_desc.h, pkc_desc.h includes sg_sw_sec4.h, but
-> caampkc.c doesn't call those functions.
+Hi Herbert,
 
-This one was fixed in sdk-1.7 with the following patch:
+>On Sat, Feb 28, 2015 at 08:49:22PM +0100, Stephan Mueller wrote:
+>> Hi,
+>>=20
+>> This patch set adds AEAD support to the AF_ALG interface
+>> exported by the kernel crypto API.
+>>=20
+>
+>All applied.  Thanks a lot for your hard work!
 
-diff --git a/drivers/crypto/caam/pkc_desc.h b/drivers/crypto/caam/pkc_d=
-esc.h
-index f73ad07..03013c2 100644
---- a/drivers/crypto/caam/pkc_desc.h
-+++ b/drivers/crypto/caam/pkc_desc.h
-@@ -20,7 +20,6 @@
- #include "desc_constr.h"
- #include "jr.h"
- #include "error.h"
--#include "sg_sw_sec4.h"
- #include <linux/crypto.h>
- #include "pdb.h"
+And thank you a lot for your patience with me! I am glad that it=20
+received such hard assessment as it is a user space interface.
 
 
-Cristian S.
+Ciao
+Stephan
