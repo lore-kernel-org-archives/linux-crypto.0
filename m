@@ -1,33 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] crypto: drbg: performance improvements
-Date: Wed, 4 Mar 2015 22:18:13 +1300
-Message-ID: <20150304091812.GD9195@gondor.apana.org.au>
-References: <50904620.OAA2OAojed@tachyon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <50904620.OAA2OAojed@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH trivial/resend 4/9] crypto: ux500: Update error message for dmaengine_prep_slave_sg() API
+Date: Wed,  4 Mar 2015 10:19:30 +0100
+Message-ID: <1425460770-9816-1-git-send-email-geert@linux-m68k.org>
+Cc: Geert Uytterhoeven <geert+renesas@glider.be>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from laurent.telenet-ops.be ([195.130.137.89]:60640 "EHLO
+	laurent.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759693AbbCDJTg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 4 Mar 2015 04:19:36 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Mar 01, 2015 at 08:38:12PM +0100, Stephan Mueller wrote:
-> Hi,
-> 
-> The following patches increase the performance of the CTR DRBG and Hash
-> DRBG.
-> 
-> The updates successfully pass the CAVS testing. for Hash DRBG and CTR
-> DRBG.
-> 
-> Stephan Mueller (2):
->   crypto: drbg: use single block cipher API
->   crypto: drbg: remove superflowous memsets
+From: Geert Uytterhoeven <geert+renesas@glider.be>
 
-All applied.
+Commit 7e933d3b1e25b250 ("crypto: ux500: use dmaengine_prep_slave_sg
+API") changed the code to use the new API, but forgot to update an error
+message.
+
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+---
+Resending trivial patches submitted in 2014.
+
+ drivers/crypto/ux500/hash/hash_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 187a8fd7eee7f5ec..5f5f360628fc443a 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -184,7 +184,7 @@ static int hash_set_dma_transfer(struct hash_ctx *ctx, struct scatterlist *sg,
+ 			direction, DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
+ 	if (!desc) {
+ 		dev_err(ctx->device->dev,
+-			"%s: device_prep_slave_sg() failed!\n", __func__);
++			"%s: dmaengine_prep_slave_sg() failed!\n", __func__);
+ 		return -EFAULT;
+ 	}
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
