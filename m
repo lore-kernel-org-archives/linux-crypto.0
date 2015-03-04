@@ -1,36 +1,65 @@
-From: Nicolae Rosia <nicolae.rosia@gmail.com>
-Subject: Re: IPSec hmac(sha256) truncation bits length
-Date: Wed, 4 Mar 2015 20:56:58 +0200
-Message-ID: <CAH=tA9FD2z2LAPU51yuhvM8-K_Ep6h09uk3+ZEk0kCROp7ahug@mail.gmail.com>
-References: <CAH=tA9Fnd6+gHsvjCv8oXqRVGLtdV9jr-KP1hxUGFg5orC5Qcw@mail.gmail.com>
-	<CAH=tA9GQ643vpmk=wJUC1fmpD6A87SU-onhweMp8aYrTu+qsTA@mail.gmail.com>
-	<20150304123834.c27417981d6ef63c0b310e11@freescale.com>
+From: Scott Branden <sbranden@broadcom.com>
+Subject: [PATCH v3 1/2] hwrng: iproc-rng200 - Add device tree bindings
+Date: Wed, 4 Mar 2015 12:42:13 -0800
+Message-ID: <1425501734-14025-2-git-send-email-sbranden@broadcom.com>
+References: <Scott Branden <sbranden@broadcom.com>
+ <1425501734-14025-1-git-send-email-sbranden@broadcom.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+Content-Type: text/plain
+Cc: Ray Jui <rjui@broadcom.com>,
+	Jonathan Richardson <jonathar@broadcom.com>,
+	Dmitry Torokhov <dtor@google.com>,
+	Anatol Pomazao <anatol@google.com>,
+	<devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	Scott Branden <sbranden@broadcom.com>
+To: <bcm-kernel-feedback-list@broadcom.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"Ian Campbell" <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>,
+	Matt Mackall <mpm@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	netdev@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>,
-	Andreas Steffen <andreas.steffen@strongswan.org>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20150304123834.c27417981d6ef63c0b310e11@freescale.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	Grant Likely <grant.likely@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-gw2-out.broadcom.com ([216.31.210.63]:35409 "EHLO
+	mail-gw2-out.broadcom.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750795AbbCDU6r (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 4 Mar 2015 15:58:47 -0500
+In-Reply-To: <1425501734-14025-1-git-send-email-sbranden@broadcom.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Thank you, Andreas and Kim.
+Documents the IPROC random number generator device tree bindings
+used in some Broadcom chipsets.
 
-Best regards,
-Nicolae Rosia
+Reviewed-by: Ray Jui <rjui@broadcom.com>
+Signed-off-by: Scott Branden <sbranden@broadcom.com>
+---
+ .../devicetree/bindings/hwrng/brcm,iproc-rng200.txt          | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/hwrng/brcm,iproc-rng200.txt
 
-On Wed, Mar 4, 2015 at 8:38 PM, Kim Phillips <kim.phillips@freescale.com> wrote:
-> On Wed, 4 Mar 2015 20:28:26 +0200
-> Nicolae Rosia <nicolae.rosia@gmail.com> wrote:
->
->> On Wed, Mar 4, 2015 at 7:13 PM, Nicolae Rosia <nicolae.rosia@gmail.com> wrote:
->> > I'm trying to understand why icv_truncbits is set to 96 for
->> > hmac(sha256) in xfrm_algo.c because
->> > RFC4868 [1] says that the truncation length for HMAC-SHA256 should be 128.
->
-> See http://comments.gmane.org/gmane.linux.kernel.cryptoapi/6767
->
-> Kim
+diff --git a/Documentation/devicetree/bindings/hwrng/brcm,iproc-rng200.txt b/Documentation/devicetree/bindings/hwrng/brcm,iproc-rng200.txt
+new file mode 100644
+index 0000000..e25a456
+--- /dev/null
++++ b/Documentation/devicetree/bindings/hwrng/brcm,iproc-rng200.txt
+@@ -0,0 +1,12 @@
++HWRNG support for the iproc-rng200 driver
++
++Required properties:
++- compatible : "brcm,iproc-rng200"
++- reg : base address and size of control register block
++
++Example:
++
++rng {
++        compatible = "brcm,iproc-rng200";
++        reg = <0x18032000 0x28>;
++};
+-- 
+2.3.0
