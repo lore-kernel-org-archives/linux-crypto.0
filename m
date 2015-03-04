@@ -1,45 +1,64 @@
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH trivial/resend 4/9] crypto: ux500: Update error message for dmaengine_prep_slave_sg() API
-Date: Wed,  4 Mar 2015 10:19:30 +0100
-Message-ID: <1425460770-9816-1-git-send-email-geert@linux-m68k.org>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-To: linux-crypto@vger.kernel.org
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: Re: [PATCH 1/3] crypto: caam: fix some compile warnings
+Date: Wed, 4 Mar 2015 10:48:55 +0200
+Message-ID: <54F6C6F7.6020400@freescale.com>
+References: <1425365453-19358-1-git-send-email-yanjiang.jin@windriver.com>
+	<1425365453-19358-2-git-send-email-yanjiang.jin@windriver.com>
+ <20150303125953.8585904680288a9734566b42@freescale.com>
+ <54F66EA3.7080506@windriver.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <horia.geanta@freescale.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <ruchika.gupta@freescale.com>,
+	<NiteshNarayanLal@freescale.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <jinyanjiang@gmail.com>
+To: yjin <yanjiang.jin@windriver.com>,
+	Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from laurent.telenet-ops.be ([195.130.137.89]:60640 "EHLO
-	laurent.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759693AbbCDJTg (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 4 Mar 2015 04:19:36 -0500
+Received: from mail-by2on0101.outbound.protection.outlook.com ([207.46.100.101]:6538
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S932632AbbCDJWH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 4 Mar 2015 04:22:07 -0500
+In-Reply-To: <54F66EA3.7080506@windriver.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Geert Uytterhoeven <geert+renesas@glider.be>
+Hi Yanjiang,
 
-Commit 7e933d3b1e25b250 ("crypto: ux500: use dmaengine_prep_slave_sg
-API") changed the code to use the new API, but forgot to update an error
-message.
+On 03/04/2015 04:32 AM, yjin wrote:
+>=20
+> On 2015=E5=B9=B403=E6=9C=8804=E6=97=A5 02:59, Kim Phillips wrote:
+>> On Tue, 3 Mar 2015 14:50:51 +0800
+>> <yanjiang.jin@windriver.com> wrote:
+>>
+>>> This commit is to avoid the below warnings:
+>>>
+>>> drivers/crypto/caam/sg_sw_sec4.h:88:12: warning:
+>>> 'dma_map_sg_chained' defined but not used [-Wunused-function]
+>>>   static int dma_map_sg_chained(struct device *dev, struct
+>>> scatterlist *sg,
+[...]
+>=20
+> We can find an example in Freescale SDK 1.6:
+> caampkc.c includes pkc_desc.h, pkc_desc.h includes sg_sw_sec4.h, but
+> caampkc.c doesn't call those functions.
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
----
-Resending trivial patches submitted in 2014.
+This one was fixed in sdk-1.7 with the following patch:
 
- drivers/crypto/ux500/hash/hash_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/drivers/crypto/caam/pkc_desc.h b/drivers/crypto/caam/pkc_d=
+esc.h
+index f73ad07..03013c2 100644
+--- a/drivers/crypto/caam/pkc_desc.h
++++ b/drivers/crypto/caam/pkc_desc.h
+@@ -20,7 +20,6 @@
+ #include "desc_constr.h"
+ #include "jr.h"
+ #include "error.h"
+-#include "sg_sw_sec4.h"
+ #include <linux/crypto.h>
+ #include "pdb.h"
 
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 187a8fd7eee7f5ec..5f5f360628fc443a 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -184,7 +184,7 @@ static int hash_set_dma_transfer(struct hash_ctx *ctx, struct scatterlist *sg,
- 			direction, DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
- 	if (!desc) {
- 		dev_err(ctx->device->dev,
--			"%s: device_prep_slave_sg() failed!\n", __func__);
-+			"%s: dmaengine_prep_slave_sg() failed!\n", __func__);
- 		return -EFAULT;
- 	}
- 
--- 
-1.9.1
+
+Cristian S.
