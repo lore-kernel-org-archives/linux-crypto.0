@@ -1,75 +1,68 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 09/17] crypto: talitos - Add a feature to tag SEC1
-Date: Sat, 14 Mar 2015 11:08:47 +0100
-Message-ID: <20150417142402.DC2BD1A242C@localhost.localdomain>
+Subject: [PATCH v3 15/17] crypto: talitos - SEC1 bugs on 0 data hash
+Date: Wed, 4 Mar 2015 02:18:01 +0100
+Message-ID: <20150417142409.4F7151A242C@localhost.localdomain>
 Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
 	linux-crypto@vger.kernel.org
 To: Kim Phillips <kim.phillips@freescale.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	David S Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:41700 "EHLO mailhub1.si.c-s.fr"
+Received: from pegase1.c-s.fr ([93.17.236.30]:41744 "EHLO mailhub1.si.c-s.fr"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S966119AbbDQOYF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Apr 2015 10:24:05 -0400
+	id S966150AbbDQOYL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 17 Apr 2015 10:24:11 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-We add a new feature in the features field, to mark compatible
-"fsl,sec1.0"
-We also define a helper function called has_ftr_sec1() to help
-functions quickly determine if they are running on SEC1 or SEC2+.
-When only SEC1 or SEC2 is compiled in, has_ftr_sec1() return
-trivial corresponding value. If both are compiled in, feature
-field is checked.
+SEC1 bugs on 0 data hash, so we submit an already padded block representing 0 data
 
 Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/crypto/talitos.c |  3 +++
- drivers/crypto/talitos.h | 17 +++++++++++++++++
- 2 files changed, 20 insertions(+)
+ drivers/crypto/talitos.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index bca6ded..db95023 100644
+index dddf4b3..f1406d7b 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -2709,6 +2709,9 @@ static int talitos_probe(struct platform_device *ofdev)
- 				  TALITOS_FTR_SHA224_HWINIT |
- 				  TALITOS_FTR_HMAC_OK;
+@@ -1797,6 +1797,27 @@ static void ahash_done(struct device *dev,
+ 	areq->base.complete(&areq->base, err);
+ }
  
-+	if (of_device_is_compatible(np, "fsl,sec1.0"))
-+		priv->features |= TALITOS_FTR_SEC1;
-+
- 	priv->chan = kzalloc(sizeof(struct talitos_channel) *
- 			     priv->num_channels, GFP_KERNEL);
- 	if (!priv->chan) {
-diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos.h
-index f078da1..b0bdb4e 100644
---- a/drivers/crypto/talitos.h
-+++ b/drivers/crypto/talitos.h
-@@ -156,6 +156,23 @@ extern int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
- #define TALITOS_FTR_HW_AUTH_CHECK 0x00000002
- #define TALITOS_FTR_SHA224_HWINIT 0x00000004
- #define TALITOS_FTR_HMAC_OK 0x00000008
-+#define TALITOS_FTR_SEC1 0x00000010
-+
 +/*
-+ * If both CONFIG_CRYPTO_DEV_TALITOS1 and CONFIG_CRYPTO_DEV_TALITOS2 are
-+ * defined, we check the features which are set according to the device tree.
-+ * Otherwise, we answer true or false directly
++ * SEC1 doesn't like hashing of 0 sized message, so we do the padding
++ * ourself and submit a padded block
 + */
-+static inline bool has_ftr_sec1(struct talitos_private *priv)
++void talitos_handle_buggy_hash(struct talitos_ctx *ctx,
++			       struct talitos_edesc *edesc,
++			       struct talitos_ptr *ptr)
 +{
-+#if defined(CONFIG_CRYPTO_DEV_TALITOS1) && defined(CONFIG_CRYPTO_DEV_TALITOS2)
-+	return priv->features & TALITOS_FTR_SEC1 ? true : false;
-+#elif defined(CONFIG_CRYPTO_DEV_TALITOS1)
-+	return true;
-+#else
-+	return false;
-+#endif
++	static u8 padded_hash[64] = {
++		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++	};
++
++	pr_err_once("Bug in SEC1, padding ourself\n");
++	edesc->desc.hdr &= ~DESC_HDR_MODE0_MDEU_PAD;
++	map_single_talitos_ptr(ctx->dev, ptr, sizeof(padded_hash),
++			       (char *)padded_hash, DMA_TO_DEVICE);
 +}
++
+ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 				struct ahash_request *areq, unsigned int length,
+ 				void (*callback) (struct device *dev,
+@@ -1857,6 +1878,9 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 	/* last DWORD empty */
+ 	desc->ptr[6] = zero_entry;
  
- /*
-  * TALITOS_xxx_LO addresses point to the low data bits (32-63) of the register
++	if (is_sec1 && from_talitos_ptr_len(&desc->ptr[3], true) == 0)
++		talitos_handle_buggy_hash(ctx, edesc, &desc->ptr[3]);
++
+ 	ret = talitos_submit(dev, ctx->ch, desc, callback, areq);
+ 	if (ret != -EINPROGRESS) {
+ 		common_nonsnoop_hash_unmap(dev, edesc, areq);
 -- 
 2.1.0
