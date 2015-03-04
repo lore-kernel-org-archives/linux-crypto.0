@@ -1,54 +1,76 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH v2 3/5] crypto: talitos: Fix off-by-one and use all
- hardware slots
-Date: Tue, 3 Mar 2015 18:35:31 -0600
-Message-ID: <20150303183531.312a8d332b1b776764a15a47@freescale.com>
-References: <1425388897-5434-1-git-send-email-mort@bork.org>
-	<1425388897-5434-4-git-send-email-mort@bork.org>
+From: yjin <yanjiang.jin@windriver.com>
+Subject: Re: [PATCH 1/3] crypto: caam: fix some compile warnings
+Date: Wed, 4 Mar 2015 10:32:03 +0800
+Message-ID: <54F66EA3.7080506@windriver.com>
+References: <1425365453-19358-1-git-send-email-yanjiang.jin@windriver.com>	<1425365453-19358-2-git-send-email-yanjiang.jin@windriver.com> <20150303125953.8585904680288a9734566b42@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: Scott Wood <scottwood@freescale.com>,
-	Kumar Gala <galak@kernel.crashing.org>,
-	<linuxppc-dev@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
-	Horia =?UTF-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>
-To: Martin Hicks <mort@bork.org>
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <horia.geanta@freescale.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <ruchika.gupta@freescale.com>,
+	<cristian.stoica@freescale.com>, <NiteshNarayanLal@freescale.com>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<jinyanjiang@gmail.com>
+To: Kim Phillips <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0147.outbound.protection.outlook.com ([157.56.110.147]:48843
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754161AbbCDAku (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 3 Mar 2015 19:40:50 -0500
-In-Reply-To: <1425388897-5434-4-git-send-email-mort@bork.org>
+Received: from mail.windriver.com ([147.11.1.11]:36469 "EHLO
+	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755221AbbCDCde (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 3 Mar 2015 21:33:34 -0500
+In-Reply-To: <20150303125953.8585904680288a9734566b42@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue,  3 Mar 2015 08:21:35 -0500
-Martin Hicks <mort@bork.org> wrote:
 
-> The submission count was off by one.
-> 
-> Signed-off-by: Martin Hicks <mort@bork.org>
-> ---
-sadly, this directly contradicts:
+On 2015=E5=B9=B403=E6=9C=8804=E6=97=A5 02:59, Kim Phillips wrote:
+> On Tue, 3 Mar 2015 14:50:51 +0800
+> <yanjiang.jin@windriver.com> wrote:
+>
+>> This commit is to avoid the below warnings:
+>>
+>> drivers/crypto/caam/sg_sw_sec4.h:88:12: warning:
+>> 'dma_map_sg_chained' defined but not used [-Wunused-function]
+>>   static int dma_map_sg_chained(struct device *dev, struct scatterli=
+st *sg,
+>>              ^
+>> drivers/crypto/caam/sg_sw_sec4.h:104:12: warning:
+>> 'dma_unmap_sg_chained' defined but not used [-Wunused-function]
+>>   static int dma_unmap_sg_chained(struct device *dev,
+>>              ^
+> I'm not seeing these warnings - both caamalg.c and caamhash.c use
+> those functions fine.
 
-commit 4b24ea971a93f5d0bec34bf7bfd0939f70cfaae6
-Author: Vishnu Suresh <Vishnu@freescale.com>
-Date:   Mon Oct 20 21:06:18 2008 +0800
+As you said, both caamalg.c and caamhash.c use those functions, so no=20
+warning reported.
 
-    crypto: talitos - Preempt overflow interrupts off-by-one fix
+But if a new file just wants to include "sg_sw_sec4.h", doesn't want to=
+=20
+use these functions, the above warnings will appear.
 
-My guess is your request submission pattern differs from that of
-Vishnu's (probably IPSec and/or tcrypt), or later h/w versions have
-gotten better about dealing with channel near-overflow conditions.
-Either way, I'd prefer we not do this: it might break others, and
-I'm guessing doesn't improve performance _that_ much?
+We can find an example in Freescale SDK 1.6:
+caampkc.c includes pkc_desc.h, pkc_desc.h includes sg_sw_sec4.h, but=20
+caampkc.c doesn't call those functions.
 
-If it does, we could risk it and restrict it to SEC versions 3.3 and
-above maybe?  Not sure what to do here exactly, barring digging up
-and old 2.x SEC and testing.
+Without my patch, every file which includes sg_sw_sec4.h must call thes=
+e=20
+two functions in the future, I don't think it is a good idea.
 
-Kim
-
-p.s. I checked, Vishnu isn't with Freescale anymore, so I can't
-cc him.
+Thanks!
+Yanjiang
+>
+>> -static int dma_map_sg_chained(struct device *dev, struct scatterlis=
+t *sg,
+>> +static inline int dma_map_sg_chained(struct device *dev, struct sca=
+tterlist *sg,
+>>   			      unsigned int nents, enum dma_data_direction dir,
+>>   			      bool chained)
+> not to mention this isn't how to fix a defined but not used warning:
+> marking the functions inline results in different compiler output.
+>
+> NACK from me.
+>
+> Kim
+>
+>
