@@ -1,57 +1,38 @@
-From: yjin <yanjiang.jin@windriver.com>
-Subject: Re: [PATCH 2/3] crypto: caam_rng: fix rng_unmap_ctx's DMA_UNMAP size
- problem
-Date: Thu, 5 Mar 2015 10:52:37 +0800
-Message-ID: <54F7C4F5.1040204@windriver.com>
-References: <1425365453-19358-1-git-send-email-yanjiang.jin@windriver.com>	<1425365453-19358-3-git-send-email-yanjiang.jin@windriver.com>	<20150303133120.6706da49d0f7188a8213fe36@freescale.com>	<54F69922.6080404@windriver.com> <20150304123623.324ab9594f04dd95c587b628@freescale.com>
+From: Cristian Stoica <cristian.stoica@freescale.com>
+Subject: Re: [PATCH 1/3] crypto: caam: fix some compile warnings
+Date: Thu, 5 Mar 2015 09:12:13 +0200
+Message-ID: <54F801CD.7040706@freescale.com>
+References: <1425365453-19358-1-git-send-email-yanjiang.jin@windriver.com>
+	<1425365453-19358-2-git-send-email-yanjiang.jin@windriver.com>
+	<20150303125953.8585904680288a9734566b42@freescale.com>
+	<54F66EA3.7080506@windriver.com>	<54F6909D.8040002@windriver.com>
+	<54F6CA60.5030905@freescale.com>
+ <20150304123419.7baecac7320d5b3483449dab@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <horia.geanta@freescale.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <ruchika.gupta@freescale.com>,
-	<cristian.stoica@freescale.com>, <NiteshNarayanLal@freescale.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<jinyanjiang@gmail.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Cc: <horia.geanta@freescale.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
 To: Kim Phillips <kim.phillips@freescale.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150304123623.324ab9594f04dd95c587b628@freescale.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn1on0113.outbound.protection.outlook.com ([157.56.110.113]:52147
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753924AbbCEHMW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Mar 2015 02:12:22 -0500
+In-Reply-To: <20150304123419.7baecac7320d5b3483449dab@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
+On 03/04/2015 08:34 PM, Kim Phillips wrote:
 
-On 2015=E5=B9=B403=E6=9C=8805=E6=97=A5 02:36, Kim Phillips wrote:
-> On Wed, 4 Mar 2015 13:33:22 +0800
-> yjin <yanjiang.jin@windriver.com> wrote:
->
->> On 2015=E5=B9=B403=E6=9C=8804=E6=97=A5 03:31, Kim Phillips wrote:
->>> On Tue, 3 Mar 2015 14:50:52 +0800
->>> <yanjiang.jin@windriver.com> wrote:
->>>
->>>> -		dma_unmap_single(jrdev, ctx->sh_desc_dma, DESC_RNG_LEN,
->>>> -				 DMA_TO_DEVICE);
->>>> +		dma_unmap_single(jrdev, ctx->sh_desc_dma,
->>>> +				desc_bytes(ctx->sh_desc), DMA_TO_DEVICE);
->>> alignment: the 'd' in desc_bytes should fall directly under the 'j'
->>> in jrdev.
->>>
->>> Also, DESC_RNG_LEN should be corrected to (4 * CAAM_CMD_SZ).
->> Hi Kim,
->>
->> I can't find the obvious limitation for the RNG descriptor length in
->> Freescale documents, could you point out it?
-> ?  rng_create_sh_desc() creates a fixed descriptor of exactly 4
-> command-lengths.
+> I don't see how, e.g., for one, dma_map_sg is I/O TLB
+> implementation-dependent.
 
-Hi Kim,
+I'll need some remedial classes on this topic, but for the moment I
+don't see how this matters for mapping sg chains. Can you share some
+pointers?
 
-Do you mean that the code itself limits the descriptor length? Not a=20
-hardware limitation.
-If so, I prefer to dma_unmap with desc_bytes(ctx->sh_desc) as my=20
-previous patch, and correct DESC_RNG_LEN to (4 * CAAM_CMD_SZ).
+Thanks,
 
-Thanks!
-Yanjiang
-
->
-> Kim
+Cristian S.
