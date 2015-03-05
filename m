@@ -1,54 +1,78 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH 03/17] crypto: talitos - Use zero entry to init descriptors ptrs to zero
-Date: Thu,  5 Mar 2015 17:46:06 +0100 (CET)
-Message-ID: <20150305164606.474EA1A241E@localhost.localdomain>
+Subject: [PATCH 02/17] crypto: talitos - Externalise specific SEC2 reset actions
+Date: Thu,  5 Mar 2015 17:46:05 +0100 (CET)
+Message-ID: <20150305164606.637E61A241D@localhost.localdomain>
 Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
 	linux-crypto@vger.kernel.org
 To: Kim Phillips <kim.phillips@freescale.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:48143 "EHLO mailhub1.si.c-s.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752215AbbCEQqN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Mar 2015 11:46:13 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Do use zero_entry value to init the descriptors ptrs to zero instead of
-writing 0 in each field
+During init and reset, some actions are different between SEC1 and SEC2
+This patch isolates them in small helper functions that we will be able
+to redefine for SEC1
 
 Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
 ---
- drivers/crypto/talitos.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ drivers/crypto/talitos.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index e3a2d75..b54c998 100644
+index ebbae8d..e3a2d75 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -1387,9 +1387,7 @@ static int common_nonsnoop(struct talitos_edesc *edesc,
- 	int sg_count, ret;
+@@ -88,9 +88,8 @@ static void unmap_single_talitos_ptr(struct device *dev,
+ 			 be16_to_cpu(talitos_ptr->len), dir);
+ }
  
- 	/* first DWORD empty */
--	desc->ptr[0].len = 0;
--	to_talitos_ptr(&desc->ptr[0], 0);
--	desc->ptr[0].j_extent = 0;
-+	desc->ptr[0] = zero_entry;
+-static int reset_channel(struct device *dev, int ch)
++static unsigned int do_reset_channel(struct talitos_private *priv, int ch)
+ {
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	unsigned int timeout = TALITOS_TIMEOUT;
  
- 	/* cipher iv */
- 	to_talitos_ptr(&desc->ptr[1], edesc->iv_dma);
-@@ -1459,9 +1457,7 @@ static int common_nonsnoop(struct talitos_edesc *edesc,
- 			       DMA_FROM_DEVICE);
+ 	setbits32(priv->chan[ch].reg + TALITOS_CCCR, TALITOS_CCCR_RESET);
+@@ -99,6 +98,14 @@ static int reset_channel(struct device *dev, int ch)
+ 	       && --timeout)
+ 		cpu_relax();
  
- 	/* last DWORD empty */
--	desc->ptr[6].len = 0;
--	to_talitos_ptr(&desc->ptr[6], 0);
--	desc->ptr[6].j_extent = 0;
-+	desc->ptr[6] = zero_entry;
++	return timeout;
++}
++
++static int reset_channel(struct device *dev, int ch)
++{
++	struct talitos_private *priv = dev_get_drvdata(dev);
++	unsigned int timeout = do_reset_channel(priv, ch);
++
+ 	if (timeout == 0) {
+ 		dev_err(dev, "failed to reset channel %d\n", ch);
+ 		return -EIO;
+@@ -144,6 +151,12 @@ static int reset_device(struct device *dev)
+ /*
+  * Reset and initialize the device
+  */
++static void do_init_device(struct talitos_private *priv)
++{
++	setbits32(priv->reg + TALITOS_IMR, TALITOS_IMR_INIT);
++	setbits32(priv->reg + TALITOS_IMR_LO, TALITOS_IMR_LO_INIT);
++}
++
+ static int init_device(struct device *dev)
+ {
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+@@ -171,8 +184,7 @@ static int init_device(struct device *dev)
+ 	}
  
- 	ret = talitos_submit(dev, ctx->ch, desc, callback, areq);
- 	if (ret != -EINPROGRESS) {
+ 	/* enable channel done and error interrupts */
+-	setbits32(priv->reg + TALITOS_IMR, TALITOS_IMR_INIT);
+-	setbits32(priv->reg + TALITOS_IMR_LO, TALITOS_IMR_LO_INIT);
++	do_init_device(priv);
+ 
+ 	/* disable integrity check error interrupts (use writeback instead) */
+ 	if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
 -- 
 2.1.0
