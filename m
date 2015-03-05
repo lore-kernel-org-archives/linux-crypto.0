@@ -1,7 +1,7 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH 02/17] crypto: talitos - Externalise specific SEC2 reset actions
-Date: Thu,  5 Mar 2015 17:46:05 +0100 (CET)
-Message-ID: <20150305164606.637E61A241D@localhost.localdomain>
+Subject: [PATCH 05/17] crypto: talitos - isolate scatter/gather handling for ahash
+Date: Thu,  5 Mar 2015 17:46:06 +0100 (CET)
+Message-ID: <20150305164606.A61CC1A2420@localhost.localdomain>
 Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
 	linux-crypto@vger.kernel.org
 To: Kim Phillips <kim.phillips@freescale.com>,
@@ -11,68 +11,69 @@ Return-path: <linux-kernel-owner@vger.kernel.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-During init and reset, some actions are different between SEC1 and SEC2
-This patch isolates them in small helper functions that we will be able
-to redefine for SEC1
+SEC1 doesn't support scatter/gather, therefore this part of the code will
+have to be implemented differently for SEC1, so we isolate it in a small
+helper function
 
 Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
 ---
- drivers/crypto/talitos.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ drivers/crypto/talitos.c | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index ebbae8d..e3a2d75 100644
+index 4db35a6..6766bcc 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -88,9 +88,8 @@ static void unmap_single_talitos_ptr(struct device *dev,
- 			 be16_to_cpu(talitos_ptr->len), dir);
+@@ -1709,6 +1709,23 @@ static int ahash_init_sha224_swinit(struct ahash_request *areq)
+ 	return 0;
  }
  
--static int reset_channel(struct device *dev, int ch)
-+static unsigned int do_reset_channel(struct talitos_private *priv, int ch)
- {
--	struct talitos_private *priv = dev_get_drvdata(dev);
- 	unsigned int timeout = TALITOS_TIMEOUT;
- 
- 	setbits32(priv->chan[ch].reg + TALITOS_CCCR, TALITOS_CCCR_RESET);
-@@ -99,6 +98,14 @@ static int reset_channel(struct device *dev, int ch)
- 	       && --timeout)
- 		cpu_relax();
- 
-+	return timeout;
++static void ahash_process_chain(struct scatterlist *src, int nbytes,
++				bool *chained,
++				struct talitos_ahash_req_ctx *req_ctx,
++				int nbytes_to_hash)
++{
++	if (req_ctx->nbuf) {
++		unsigned int nsg = (req_ctx->nbuf < nbytes_to_hash) ? 2 : 1;
++
++		sg_init_table(req_ctx->bufsl, nsg);
++		sg_set_buf(req_ctx->bufsl, req_ctx->buf, req_ctx->nbuf);
++		if (nsg > 1)
++			scatterwalk_sg_chain(req_ctx->bufsl, 2, src);
++		req_ctx->psrc = req_ctx->bufsl;
++	} else
++		req_ctx->psrc = src;
 +}
 +
-+static int reset_channel(struct device *dev, int ch)
-+{
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	unsigned int timeout = do_reset_channel(priv, ch);
-+
- 	if (timeout == 0) {
- 		dev_err(dev, "failed to reset channel %d\n", ch);
- 		return -EIO;
-@@ -144,6 +151,12 @@ static int reset_device(struct device *dev)
- /*
-  * Reset and initialize the device
-  */
-+static void do_init_device(struct talitos_private *priv)
-+{
-+	setbits32(priv->reg + TALITOS_IMR, TALITOS_IMR_INIT);
-+	setbits32(priv->reg + TALITOS_IMR_LO, TALITOS_IMR_LO_INIT);
-+}
-+
- static int init_device(struct device *dev)
+ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
  {
- 	struct talitos_private *priv = dev_get_drvdata(dev);
-@@ -171,8 +184,7 @@ static int init_device(struct device *dev)
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+@@ -1719,7 +1736,6 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
+ 			crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
+ 	unsigned int nbytes_to_hash;
+ 	unsigned int to_hash_later;
+-	unsigned int nsg;
+ 	bool chained;
+ 
+ 	if (!req_ctx->last && (nbytes + req_ctx->nbuf <= blocksize)) {
+@@ -1747,15 +1763,8 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
  	}
  
- 	/* enable channel done and error interrupts */
--	setbits32(priv->reg + TALITOS_IMR, TALITOS_IMR_INIT);
--	setbits32(priv->reg + TALITOS_IMR_LO, TALITOS_IMR_LO_INIT);
-+	do_init_device(priv);
+ 	/* Chain in any previously buffered data */
+-	if (req_ctx->nbuf) {
+-		nsg = (req_ctx->nbuf < nbytes_to_hash) ? 2 : 1;
+-		sg_init_table(req_ctx->bufsl, nsg);
+-		sg_set_buf(req_ctx->bufsl, req_ctx->buf, req_ctx->nbuf);
+-		if (nsg > 1)
+-			scatterwalk_sg_chain(req_ctx->bufsl, 2, areq->src);
+-		req_ctx->psrc = req_ctx->bufsl;
+-	} else
+-		req_ctx->psrc = areq->src;
++	ahash_process_chain(areq->src, nbytes, &chained, req_ctx,
++			    nbytes_to_hash);
  
- 	/* disable integrity check error interrupts (use writeback instead) */
- 	if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
+ 	if (to_hash_later) {
+ 		int nents = sg_count(areq->src, nbytes, &chained);
 -- 
 2.1.0
