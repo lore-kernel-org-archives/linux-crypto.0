@@ -1,53 +1,64 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH 14/17] crypto: talitos - Add a helper function to clear j_extent field
-Date: Thu,  5 Mar 2015 17:46:07 +0100 (CET)
-Message-ID: <20150305164607.33E4A1A2428@localhost.localdomain>
+Subject: [PATCH 0/17] crypto: talitos - Add support for SEC1
+Date: Thu,  5 Mar 2015 17:46:05 +0100 (CET)
+Message-ID: <20150305164605.E65D81A241C@localhost.localdomain>
 Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
 To: Kim Phillips <kim.phillips@freescale.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from pegase1.c-s.fr ([93.17.236.30]:48201 "EHLO mailhub1.si.c-s.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757831AbbCEQqW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Mar 2015 11:46:22 -0500
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-j_extent field is specific to SEC2 so we add a helper function to clear it
-so that SEC1 can redefine that function as nop
+The purpose of this set of patchs is to add to talitos crypto driver the
+support for the SEC1 version of the security engine, which is found in
+mpc885 and mpc8272 processors.
+
+The approach has been to split the driver in two main parts:
+* talitos.c and talitos.h contains parts that are common
+* talitos2.c and talitos2.h contains specificities of SEC2
+
+Then
+* talitos1.c and talitos1.h has been created with SEC1 specificities
+
+Patchset:
+[01/17] crypto: talitos - base address for Execution Units and macro for ISR masks
+[02/17] crypto: talitos - Externalise specific SEC2 reset actions
+[03/17] crypto: talitos - Use zero entry to init descriptors ptrs to zero
+[04/17] crypto: talitos - Refactor the sg in/out chain allocation
+[05/17] crypto: talitos - isolate scatter/gather handling for ahash
+[06/17] crypto: talitos - Add talitos2.c to isolate SEC2 specific functions
+[07/17] crypto: talitos - Split talitos.h into 2 parts
+[08/17] crypto: talitos - Deport SEC2 error handling
+[09/17] crypto: talitos - Move reset/init helpers into talitos2.h
+[10/17] crypto: talitos - Move interrupt related macros in talitos2.h
+[11/17] crypto: talitos - Move hash chain handling into talitos2.h
+[12/17] crypto: talitos - Define compatible in talitos2.h instead of talitos.c
+[13/17] crypto: talitos - move sg_count() helper into talitos.h
+[14/17] crypto: talitos - Add a helper function to clear j_extent field
+[15/17] crypto: talitos - Implementation of SEC1
+[16/17] crypto: talitos - SEC1 bugs on 0 data hash
+[17/17] crypto: talitos - Update DT bindings with SEC1
+
 Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
----
- drivers/crypto/talitos.c  | 2 +-
- drivers/crypto/talitos2.h | 5 +++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index fc30196..37d7746 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -628,7 +628,7 @@ static int common_nonsnoop(struct talitos_edesc *edesc,
- 	/* cipher iv */
- 	to_talitos_ptr(&desc->ptr[1], edesc->iv_dma);
- 	desc->ptr[1].len = cpu_to_be16(ivsize);
--	desc->ptr[1].j_extent = 0;
-+	to_talitos_ptr_extent_clear(&desc->ptr[1]);
- 
- 	/* cipher key */
- 	map_single_talitos_ptr(dev, &desc->ptr[2], ctx->keylen,
-diff --git a/drivers/crypto/talitos2.h b/drivers/crypto/talitos2.h
-index 7177088..6f98b12 100644
---- a/drivers/crypto/talitos2.h
-+++ b/drivers/crypto/talitos2.h
-@@ -90,6 +90,11 @@ static inline void to_talitos_ptr(struct talitos_ptr *ptr, dma_addr_t dma_addr)
- 	ptr->eptr = upper_32_bits(dma_addr);
- }
- 
-+static inline void to_talitos_ptr_extent_clear(struct talitos_ptr *ptr)
-+{
-+	ptr->j_extent = 0;
-+}
-+
- /*
-  * map virtual single (contiguous) pointer to h/w descriptor pointer
-  */
--- 
-2.1.0
+ .../devicetree/bindings/crypto/fsl-sec2.txt        |   5 +-
+ drivers/crypto/Kconfig                             |   8 +
+ drivers/crypto/Makefile                            |   2 +
+ drivers/crypto/talitos.c                           | 927 +--------------------
+ drivers/crypto/talitos.h                           | 185 ++--
+ drivers/crypto/talitos1.c                          | 197 +++++
+ drivers/crypto/talitos1.h                          | 343 ++++++++
+ drivers/crypto/talitos2.c                          | 696 ++++++++++++++++
+ drivers/crypto/talitos2.h                          | 335 ++++++++
+ 9 files changed, 1736 insertions(+), 962 deletions(-)
