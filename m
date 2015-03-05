@@ -1,133 +1,121 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH 01/17] crypto: talitos - base address for Execution Units and
- macro for ISR masks
-Date: Thu,  5 Mar 2015 17:46:05 +0100 (CET)
-Message-ID: <20150305164606.2815B1A2418@localhost.localdomain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
+Subject: [PATCH 11/17] crypto: talitos - Move hash chain handling into talitos2.h
+Date: Thu,  5 Mar 2015 17:46:06 +0100 (CET)
+Message-ID: <20150305164607.006801A2425@localhost.localdomain>
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org
 To: Kim Phillips <kim.phillips@freescale.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-U0VDMSBhbmQgU0VDMiBoYXZlIGRpZmZlcmVudCBFVSBiYXNlIGFkZHJlc3Nlcywgc28gZGVmaW5l
-IGJhc2UgYWRkcmVzc2VzCmFzICNkZWZpbmUKU0VDMSBhbmQgU0VDMiBoYXZlIGRpZmZlcmVudCBi
-aXQgbWFza3MgZm9yIElTUiByZWdpc3RlcnMsIHNvIGNyZWF0ZSBhCm1hY3JvIHRvIGRlZmluZSB0
-aGVtCgpTaWduZWQtb2ZmLWJ5OiBDaHJpc3RvcGhlIExlcm95IDxjaHJpc3RvcGhlLmxlcm95QGMt
-cy5mcj4KCi0tLQogZHJpdmVycy9jcnlwdG8vdGFsaXRvcy5oIHwgODUgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgNTMgaW5z
-ZXJ0aW9ucygrKSwgMzIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8v
-dGFsaXRvcy5oIGIvZHJpdmVycy9jcnlwdG8vdGFsaXRvcy5oCmluZGV4IDYxYTE0MDUuLjEwMmRj
-OTkgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvY3J5cHRvL3RhbGl0b3MuaAorKysgYi9kcml2ZXJzL2Ny
-eXB0by90YWxpdG9zLmgKQEAgLTE0OSw2ICsxNDksOCBAQCBleHRlcm4gaW50IHRhbGl0b3Nfc3Vi
-bWl0KHN0cnVjdCBkZXZpY2UgKmRldiwgaW50IGNoLCBzdHJ1Y3QgdGFsaXRvc19kZXNjICpkZXNj
-LAogICogVEFMSVRPU194eHhfTE8gYWRkcmVzc2VzIHBvaW50IHRvIHRoZSBsb3cgZGF0YSBiaXRz
-ICgzMi02Mykgb2YgdGhlIHJlZ2lzdGVyCiAgKi8KIAorI2RlZmluZSBJU1JfRk9STUFUKHgpCQkJ
-KCgoeCkgPDwgNCkgfCAoeCkpCisKIC8qIGdsb2JhbCByZWdpc3RlciBvZmZzZXQgYWRkcmVzc2Vz
-ICovCiAjZGVmaW5lIFRBTElUT1NfTUNSCQkJMHgxMDMwICAvKiBtYXN0ZXIgY29udHJvbCByZWdp
-c3RlciAqLwogI2RlZmluZSAgIFRBTElUT1NfTUNSX1JDQTAJCSgxIDw8IDE1KSAvKiByZW1hcCBj
-aGFubmVsIDAgKi8KQEAgLTE2MywxMiArMTY1LDEyIEBAIGV4dGVybiBpbnQgdGFsaXRvc19zdWJt
-aXQoc3RydWN0IGRldmljZSAqZGV2LCBpbnQgY2gsIHN0cnVjdCB0YWxpdG9zX2Rlc2MgKmRlc2Ms
-CiAjZGVmaW5lIFRBTElUT1NfSU1SX0xPCQkJMHgxMDBDCiAjZGVmaW5lICAgVEFMSVRPU19JTVJf
-TE9fSU5JVAkJMHgyMDAwMCAvKiBhbGxvdyBSTkdVIGVycm9yIElSUXMgKi8KICNkZWZpbmUgVEFM
-SVRPU19JU1IJCQkweDEwMTAgIC8qIGludGVycnVwdCBzdGF0dXMgcmVnaXN0ZXIgKi8KLSNkZWZp
-bmUgICBUQUxJVE9TX0lTUl80Q0hFUlIJCTB4YWEgICAgLyogNCBjaGFubmVsIGVycm9ycyBtYXNr
-ICovCi0jZGVmaW5lICAgVEFMSVRPU19JU1JfNENIRE9ORQkJMHg1NSAgICAvKiA0IGNoYW5uZWwg
-ZG9uZSBtYXNrICovCi0jZGVmaW5lICAgVEFMSVRPU19JU1JfQ0hfMF8yX0VSUgkweDIyICAgIC8q
-IGNoYW5uZWxzIDAsIDIgZXJyb3JzIG1hc2sgKi8KLSNkZWZpbmUgICBUQUxJVE9TX0lTUl9DSF8w
-XzJfRE9ORQkweDExICAgIC8qIGNoYW5uZWxzIDAsIDIgZG9uZSBtYXNrICovCi0jZGVmaW5lICAg
-VEFMSVRPU19JU1JfQ0hfMV8zX0VSUgkweDg4ICAgIC8qIGNoYW5uZWxzIDEsIDMgZXJyb3JzIG1h
-c2sgKi8KLSNkZWZpbmUgICBUQUxJVE9TX0lTUl9DSF8xXzNfRE9ORQkweDQ0ICAgIC8qIGNoYW5u
-ZWxzIDEsIDMgZG9uZSBtYXNrICovCisjZGVmaW5lICAgVEFMSVRPU19JU1JfNENIRVJSCQlJU1Jf
-Rk9STUFUKDB4YSkJLyogNCBjaCBlcnJvcnMgbWFzayAqLworI2RlZmluZSAgIFRBTElUT1NfSVNS
-XzRDSERPTkUJCUlTUl9GT1JNQVQoMHg1KQkvKiA0IGNoIGRvbmUgbWFzayAqLworI2RlZmluZSAg
-IFRBTElUT1NfSVNSX0NIXzBfMl9FUlIJSVNSX0ZPUk1BVCgweDIpCS8qIGNoIDAsIDIgZXJyIG1h
-c2sgKi8KKyNkZWZpbmUgICBUQUxJVE9TX0lTUl9DSF8wXzJfRE9ORQlJU1JfRk9STUFUKDB4MSkJ
-LyogY2ggMCwgMiBkb25lIG1hc2sgKi8KKyNkZWZpbmUgICBUQUxJVE9TX0lTUl9DSF8xXzNfRVJS
-CUlTUl9GT1JNQVQoMHg4KQkvKiBjaCAxLCAzIGVyciBtYXNrICovCisjZGVmaW5lICAgVEFMSVRP
-U19JU1JfQ0hfMV8zX0RPTkUJSVNSX0ZPUk1BVCgweDQpCS8qIGNoIDEsIDMgZG9uZSBtYXNrICov
-CiAjZGVmaW5lIFRBTElUT1NfSVNSX0xPCQkJMHgxMDE0CiAjZGVmaW5lIFRBTElUT1NfSUNSCQkJ
-MHgxMDE4ICAvKiBpbnRlcnJ1cHQgY2xlYXIgcmVnaXN0ZXIgKi8KICNkZWZpbmUgVEFMSVRPU19J
-Q1JfTE8JCQkweDEwMUMKQEAgLTIyNCwzNyArMjI2LDU2IEBAIGV4dGVybiBpbnQgdGFsaXRvc19z
-dWJtaXQoc3RydWN0IGRldmljZSAqZGV2LCBpbnQgY2gsIHN0cnVjdCB0YWxpdG9zX2Rlc2MgKmRl
-c2MsCiAjZGVmaW5lIFRBTElUT1NfU0NBVFRFUgkJCTB4ZTAKICNkZWZpbmUgVEFMSVRPU19TQ0FU
-VEVSX0xPCQkweGU0CiAKKy8qIGV4ZWN1dGlvbiB1bml0IHJlZ2lzdGVycyBiYXNlICovCisjZGVm
-aW5lIFRBTElUT1NfREVVCQkJMHgyMDAwCisjZGVmaW5lIFRBTElUT1NfQUVTVQkJCTB4NDAwMAor
-I2RlZmluZSBUQUxJVE9TX01ERVUJCQkweDYwMDAKKyNkZWZpbmUgVEFMSVRPU19BRkVVCQkJMHg4
-MDAwCisjZGVmaW5lIFRBTElUT1NfUk5HVQkJCTB4YTAwMAorI2RlZmluZSBUQUxJVE9TX1BLRVUJ
-CQkweGMwMDAKKyNkZWZpbmUgVEFMSVRPU19LRVUJCQkweGUwMDAKKyNkZWZpbmUgVEFMSVRPU19D
-UkNVCQkJMHhmMDAwCisKIC8qIGV4ZWN1dGlvbiB1bml0IGludGVycnVwdCBzdGF0dXMgcmVnaXN0
-ZXJzICovCi0jZGVmaW5lIFRBTElUT1NfREVVSVNSCQkJMHgyMDMwIC8qIERFUyB1bml0ICovCi0j
-ZGVmaW5lIFRBTElUT1NfREVVSVNSX0xPCQkweDIwMzQKLSNkZWZpbmUgVEFMSVRPU19BRVNVSVNS
-CQkJMHg0MDMwIC8qIEFFUyB1bml0ICovCi0jZGVmaW5lIFRBTElUT1NfQUVTVUlTUl9MTwkJMHg0
-MDM0Ci0jZGVmaW5lIFRBTElUT1NfTURFVUlTUgkJCTB4NjAzMCAvKiBtZXNzYWdlIGRpZ2VzdCB1
-bml0ICovCi0jZGVmaW5lIFRBTElUT1NfTURFVUlTUl9MTwkJMHg2MDM0Ci0jZGVmaW5lIFRBTElU
-T1NfTURFVUlDUgkJCTB4NjAzOCAvKiBpbnRlcnJ1cHQgY29udHJvbCAqLwotI2RlZmluZSBUQUxJ
-VE9TX01ERVVJQ1JfTE8JCTB4NjAzYworLyogREVTIHVuaXQgKi8KKyNkZWZpbmUgVEFMSVRPU19E
-RVVJU1IJCQkoVEFMSVRPU19ERVUgKyAweDMwKQorI2RlZmluZSBUQUxJVE9TX0RFVUlTUl9MTwkJ
-KFRBTElUT1NfREVVICsgMHgzNCkKKyNkZWZpbmUgVEFMSVRPU19ERVVJQ1IJCQkoVEFMSVRPU19E
-RVUgKyAweDM4KSAvKiBpbnQuIGNvbnRyb2wgKi8KKy8qIEFFUyB1bml0ICovCisjZGVmaW5lIFRB
-TElUT1NfQUVTVUlTUgkJCShUQUxJVE9TX0FFU1UgKyAweDMwKQorI2RlZmluZSBUQUxJVE9TX0FF
-U1VJU1JfTE8JCShUQUxJVE9TX0FFU1UgKyAweDM0KQorLyogbWVzc2FnZSBkaWdlc3QgdW5pdCAq
-LworI2RlZmluZSBUQUxJVE9TX01ERVVJU1IJCQkoVEFMSVRPU19NREVVICsgMHgzMCkKKyNkZWZp
-bmUgVEFMSVRPU19NREVVSVNSX0xPCQkoVEFMSVRPU19NREVVICsgMHgzNCkKKyNkZWZpbmUgVEFM
-SVRPU19NREVVSUNSCQkJKFRBTElUT1NfTURFVSArIDB4MzgpIC8qIGludC4gY29udHJvbCAqLwor
-I2RlZmluZSBUQUxJVE9TX01ERVVJQ1JfTE8JCShUQUxJVE9TX01ERVUgKyAweDNjKQogI2RlZmlu
-ZSAgIFRBTElUT1NfTURFVUlDUl9MT19JQ0UJMHg0MDAwIC8qIGludGVncml0eSBjaGVjayBJUlEg
-ZW5hYmxlICovCi0jZGVmaW5lIFRBTElUT1NfQUZFVUlTUgkJCTB4ODAzMCAvKiBhcmM0IHVuaXQg
-Ki8KLSNkZWZpbmUgVEFMSVRPU19BRkVVSVNSX0xPCQkweDgwMzQKLSNkZWZpbmUgVEFMSVRPU19S
-TkdVSVNSCQkJMHhhMDMwIC8qIHJhbmRvbSBudW1iZXIgdW5pdCAqLwotI2RlZmluZSBUQUxJVE9T
-X1JOR1VJU1JfTE8JCTB4YTAzNAotI2RlZmluZSBUQUxJVE9TX1JOR1VTUgkJCTB4YTAyOCAvKiBy
-bmcgc3RhdHVzICovCi0jZGVmaW5lIFRBTElUT1NfUk5HVVNSX0xPCQkweGEwMmMKKy8qIGFyYzQg
-dW5pdCAqLworI2RlZmluZSBUQUxJVE9TX0FGRVVJU1IJCQkoVEFMSVRPU19BRkVVICsgMHgzMCkK
-KyNkZWZpbmUgVEFMSVRPU19BRkVVSVNSX0xPCQkoVEFMSVRPU19BRkVVICsgMHgzNCkKKy8qIHJh
-bmRvbSBudW1iZXIgdW5pdCAqLworI2RlZmluZSBUQUxJVE9TX1JOR1VJU1IJCQkoVEFMSVRPU19S
-TkdVICsgMHgzMCkKKyNkZWZpbmUgVEFMSVRPU19STkdVSVNSX0xPCQkoVEFMSVRPU19STkdVICsg
-MHgzNCkKKyNkZWZpbmUgVEFMSVRPU19STkdVU1IJCQkoVEFMSVRPU19STkdVICsgMHgyOCkgLyog
-cm5nIHN0YXR1cyAqLworI2RlZmluZSBUQUxJVE9TX1JOR1VTUl9MTwkJKFRBTElUT1NfUk5HVSAr
-IDB4MmMpCiAjZGVmaW5lICAgVEFMSVRPU19STkdVU1JfTE9fUkQJCTB4MQkvKiByZXNldCBkb25l
-ICovCiAjZGVmaW5lICAgVEFMSVRPU19STkdVU1JfTE9fT0ZMCQkweGZmMDAwMC8qIG91dHB1dCBG
-SUZPIGxlbmd0aCAqLwotI2RlZmluZSBUQUxJVE9TX1JOR1VEU1IJCQkweGEwMTAJLyogZGF0YSBz
-aXplICovCi0jZGVmaW5lIFRBTElUT1NfUk5HVURTUl9MTwkJMHhhMDE0Ci0jZGVmaW5lIFRBTElU
-T1NfUk5HVV9GSUZPCQkweGE4MDAJLyogb3V0cHV0IEZJRk8gKi8KLSNkZWZpbmUgVEFMSVRPU19S
-TkdVX0ZJRk9fTE8JCTB4YTgwNAkvKiBvdXRwdXQgRklGTyAqLwotI2RlZmluZSBUQUxJVE9TX1JO
-R1VSQ1IJCQkweGEwMTgJLyogcmVzZXQgY29udHJvbCAqLwotI2RlZmluZSBUQUxJVE9TX1JOR1VS
-Q1JfTE8JCTB4YTAxYworI2RlZmluZSBUQUxJVE9TX1JOR1VEU1IJCQkoVEFMSVRPU19STkdVICsg
-MHgxMCkJLyogZGF0YSBzaXplICovCisjZGVmaW5lIFRBTElUT1NfUk5HVURTUl9MTwkJKFRBTElU
-T1NfUk5HVSArIDB4MTQpCisjZGVmaW5lIFRBTElUT1NfUk5HVV9GSUZPCQkoVEFMSVRPU19STkdV
-ICsgMHg4MDApIC8qIG91dHB1dCBGSUZPICovCisjZGVmaW5lIFRBTElUT1NfUk5HVV9GSUZPX0xP
-CQkoVEFMSVRPU19STkdVICsgMHg4MDQpIC8qIG91dHB1dCBGSUZPICovCisjZGVmaW5lIFRBTElU
-T1NfUk5HVVJDUgkJCShUQUxJVE9TX1JOR1UgKyAweDE4KSAvKiByZXNldCBjb250cm9sKi8KKyNk
-ZWZpbmUgVEFMSVRPU19STkdVUkNSX0xPCQkoVEFMSVRPU19STkdVICsgMHgxYykKICNkZWZpbmUg
-ICBUQUxJVE9TX1JOR1VSQ1JfTE9fU1IJCTB4MQkvKiBzb2Z0d2FyZSByZXNldCAqLwotI2RlZmlu
-ZSBUQUxJVE9TX1BLRVVJU1IJCQkweGMwMzAgLyogcHVibGljIGtleSB1bml0ICovCi0jZGVmaW5l
-IFRBTElUT1NfUEtFVUlTUl9MTwkJMHhjMDM0Ci0jZGVmaW5lIFRBTElUT1NfS0VVSVNSCQkJMHhl
-MDMwIC8qIGthc3VtaSB1bml0ICovCi0jZGVmaW5lIFRBTElUT1NfS0VVSVNSX0xPCQkweGUwMzQK
-LSNkZWZpbmUgVEFMSVRPU19DUkNVSVNSCQkJMHhmMDMwIC8qIGN5Y2xpYyByZWR1bmRhbmN5IGNo
-ZWNrIHVuaXQqLwotI2RlZmluZSBUQUxJVE9TX0NSQ1VJU1JfTE8JCTB4ZjAzNAorLyogcHVibGlj
-IGtleSB1bml0ICovCisjZGVmaW5lIFRBTElUT1NfUEtFVUlTUgkJCShUQUxJVE9TX1BLRVUgKyAw
-eDMwKQorI2RlZmluZSBUQUxJVE9TX1BLRVVJU1JfTE8JCShUQUxJVE9TX1BLRVUgKyAweDM0KQor
-Lyoga2FzdW1pIHVuaXQgKi8KKyNkZWZpbmUgVEFMSVRPU19LRVVJU1IJCQkoVEFMSVRPU19LRVUg
-KyAweDMwKQorI2RlZmluZSBUQUxJVE9TX0tFVUlTUl9MTwkJKFRBTElUT1NfS0VVICsgMHgzNCkK
-Ky8qIGN5Y2xpYyByZWR1bmRhbmN5IGNoZWNrIHVuaXQgKi8KKyNkZWZpbmUgVEFMSVRPU19DUkNV
-SVNSCQkJKFRBTElUT1NfQ1JDVSArIDB4MzApCisjZGVmaW5lIFRBTElUT1NfQ1JDVUlTUl9MTwkJ
-KFRBTElUT1NfQ1JDVSArIDB4MzQpCiAKICNkZWZpbmUgVEFMSVRPU19NREVVX0NPTlRFWFRfU0la
-RV9NRDVfU0hBMV9TSEEyNTYJMHgyOAogI2RlZmluZSBUQUxJVE9TX01ERVVfQ09OVEVYVF9TSVpF
-X1NIQTM4NF9TSEE1MTIJCTB4NDgKLS0gCjIuMS4wCgpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwpMaW51eHBwYy1kZXYgbWFpbGluZyBsaXN0CkxpbnV4cHBj
-LWRldkBsaXN0cy5vemxhYnMub3JnCmh0dHBzOi8vbGlzdHMub3psYWJzLm9yZy9saXN0aW5mby9s
-aW51eHBwYy1kZXY=
+Move hash chain handling into talitos2.h as only SEC2 has sg chaining capatibility
+
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+
+---
+ drivers/crypto/talitos.c  | 34 ----------------------------------
+ drivers/crypto/talitos2.h | 34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+), 34 deletions(-)
+
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 3190762..6c1f6f1 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -458,23 +458,6 @@ static void talitos_unregister_rng(struct device *dev)
+ 
+ #define MD5_BLOCK_SIZE    64
+ 
+-#define HASH_MAX_BLOCK_SIZE		SHA512_BLOCK_SIZE
+-#define TALITOS_MDEU_MAX_CONTEXT_SIZE	TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512
+-
+-struct talitos_ahash_req_ctx {
+-	u32 hw_context[TALITOS_MDEU_MAX_CONTEXT_SIZE / sizeof(u32)];
+-	unsigned int hw_context_size;
+-	u8 buf[HASH_MAX_BLOCK_SIZE];
+-	u8 bufnext[HASH_MAX_BLOCK_SIZE];
+-	unsigned int swinit;
+-	unsigned int first;
+-	unsigned int last;
+-	unsigned int to_hash_later;
+-	u64 nbuf;
+-	struct scatterlist bufsl[2];
+-	struct scatterlist *psrc;
+-};
+-
+ /*
+  * derive number of elements in scatterlist
+  */
+@@ -913,23 +896,6 @@ static int ahash_init_sha224_swinit(struct ahash_request *areq)
+ 	return 0;
+ }
+ 
+-static void ahash_process_chain(struct scatterlist *src, int nbytes,
+-				bool *chained,
+-				struct talitos_ahash_req_ctx *req_ctx,
+-				int nbytes_to_hash)
+-{
+-	if (req_ctx->nbuf) {
+-		unsigned int nsg = (req_ctx->nbuf < nbytes_to_hash) ? 2 : 1;
+-
+-		sg_init_table(req_ctx->bufsl, nsg);
+-		sg_set_buf(req_ctx->bufsl, req_ctx->buf, req_ctx->nbuf);
+-		if (nsg > 1)
+-			scatterwalk_sg_chain(req_ctx->bufsl, 2, src);
+-		req_ctx->psrc = req_ctx->bufsl;
+-	} else
+-		req_ctx->psrc = src;
+-}
+-
+ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+diff --git a/drivers/crypto/talitos2.h b/drivers/crypto/talitos2.h
+index 10c7313..7edc563 100644
+--- a/drivers/crypto/talitos2.h
++++ b/drivers/crypto/talitos2.h
+@@ -223,6 +223,40 @@ static inline void do_init_device(struct talitos_private *priv)
+ 	setbits32(priv->reg + TALITOS_IMR_LO, TALITOS_IMR_LO_INIT);
+ }
+ 
++#define HASH_MAX_BLOCK_SIZE		SHA512_BLOCK_SIZE
++#define TALITOS_MDEU_MAX_CONTEXT_SIZE	TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512
++
++struct talitos_ahash_req_ctx {
++	u32 hw_context[TALITOS_MDEU_MAX_CONTEXT_SIZE / sizeof(u32)];
++	unsigned int hw_context_size;
++	u8 buf[HASH_MAX_BLOCK_SIZE];
++	u8 bufnext[HASH_MAX_BLOCK_SIZE];
++	unsigned int swinit;
++	unsigned int first;
++	unsigned int last;
++	unsigned int to_hash_later;
++	u64 nbuf;
++	struct scatterlist bufsl[2];
++	struct scatterlist *psrc;
++};
++
++static inline void ahash_process_chain(struct scatterlist *src, int nbytes,
++				bool *chained,
++				struct talitos_ahash_req_ctx *req_ctx,
++				int nbytes_to_hash)
++{
++	if (req_ctx->nbuf) {
++		unsigned int nsg = (req_ctx->nbuf < nbytes_to_hash) ? 2 : 1;
++
++		sg_init_table(req_ctx->bufsl, nsg);
++		sg_set_buf(req_ctx->bufsl, req_ctx->buf, req_ctx->nbuf);
++		if (nsg > 1)
++			scatterwalk_sg_chain(req_ctx->bufsl, 2, src);
++		req_ctx->psrc = req_ctx->bufsl;
++	} else
++		req_ctx->psrc = src;
++}
++
+ #define DEF_TALITOS_DONE(name, ch_done_mask)				\
+ static void talitos_done_##name(unsigned long data)			\
+ {									\
+-- 
+2.1.0
