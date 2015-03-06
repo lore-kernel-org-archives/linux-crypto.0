@@ -1,30 +1,36 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH RESEND 2/2] crypto: algif - change algif_skcipher to be
  asynchronous
-Date: Fri, 06 Mar 2015 12:04:49 +0000
-Message-ID: <54F997E1.8050601@intel.com>
-References: <20150227193538.10553.6144.stgit@tstruk-mobl1> <20150227193549.10553.52267.stgit@tstruk-mobl1> <20150306114417.GA4949@gondor.apana.org.au>
+Date: Fri, 6 Mar 2015 23:09:56 +1100
+Message-ID: <20150306120956.GA5715@gondor.apana.org.au>
+References: <20150227193538.10553.6144.stgit@tstruk-mobl1>
+ <20150227193549.10553.52267.stgit@tstruk-mobl1>
+ <20150306114417.GA4949@gondor.apana.org.au>
+ <54F997E1.8050601@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
 	qat-linux@intel.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:42744 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752138AbbCFMIr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Mar 2015 07:08:47 -0500
-In-Reply-To: <20150306114417.GA4949@gondor.apana.org.au>
+Received: from helcar.apana.org.au ([209.40.204.226]:50103 "EHLO
+	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750817AbbCFMJ7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 6 Mar 2015 07:09:59 -0500
+Content-Disposition: inline
+In-Reply-To: <54F997E1.8050601@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/06/2015 11:44 AM, Herbert Xu wrote:
-> Are these separate caches really necessary? It looks like an
-> overkill.  What's wrong with just kmalloc?
+On Fri, Mar 06, 2015 at 12:04:49PM +0000, Tadeusz Struk wrote:
+> It helps to make it faster.
+> This way I can do some of the request setup beforehand and minimize overhead on the data path.
 
-Hi Herbert,
-It helps to make it faster.
-This way I can do some of the request setup beforehand and minimize overhead on the data path.
-Thanks,
-Tadeusz
+Do you have numbers to back this up?
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
