@@ -1,62 +1,89 @@
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v2 0/17] crypto: talitos - Add support for SEC1
-Date: Fri,  6 Mar 2015 17:43:45 +0100 (CET)
-Message-ID: <20150306164345.78A221A241C@localhost.localdomain>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Martin Hicks <mort@bork.org>
+Subject: Re: [PATCH 2/2] crypto: talitos: Add AES-XTS Support
+Date: Fri, 6 Mar 2015 11:49:43 -0500
+Message-ID: <CAJUS3XmfcJCiBMnsiXKpc=QXE-YxTQy67wZyAXgKjtY_DN0CDQ@mail.gmail.com>
+References: <1424451610-5786-1-git-send-email-mort@bork.org>
+	<1424451610-5786-3-git-send-email-mort@bork.org>
+	<20150305181615.493b173d43249548fae29203@freescale.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Scott Wood <scottwood@freescale.com>,
+	Kumar Gala <galak@kernel.crashing.org>,
+	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ie0-f175.google.com ([209.85.223.175]:41592 "EHLO
+	mail-ie0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756330AbbCFQto (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 6 Mar 2015 11:49:44 -0500
+Received: by iecrl12 with SMTP id rl12so4235056iec.8
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2015 08:49:43 -0800 (PST)
+In-Reply-To: <20150305181615.493b173d43249548fae29203@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The purpose of this set of patchs is to add to talitos crypto driver the
-support for the SEC1 version of the security engine, which is found in
-mpc885 and mpc8272 processors.
+On Thu, Mar 5, 2015 at 7:16 PM, Kim Phillips <kim.phillips@freescale.com> wrote:
+> On Fri, 20 Feb 2015 12:00:10 -0500
+> Martin Hicks <mort@bork.org> wrote:
+>
+>> The newer talitos hardware has support for AES in XTS mode.
+>
+> Assuming it's the same thing, AES-XCBC gets added with SEC v3.0
+> h/w.  Assuming hw_supports() doesn't already support this algorithm
 
-The approach has been to split the driver in two main parts:
-* talitos.c and talitos.h contains parts that are common
-* talitos2.c and talitos2.h contains specificities of SEC2
+AES-XCBC isn't the same thing as AES-XTS.
 
-Then
-* talitos1.c and talitos1.h has been created with SEC1 specificities
+> combination (technically via the mode bit), this needs to be
+> reflected in the patch so the driver doesn't think SEC 2.x devices
+> can do XTS, too.
 
-v2 applies cleanly on this afternoon's (06 March 2015) cryptodev-2.6 tree (commit c83d45d5)
+Right.  I hadn't looked into how exactly hw_supports() works.  It only
+indicates which execution units are present (in this case the AES
+unit).  I actually think XTS gets introduced in SEC v3.3.2.  I also
+have an MPC8379 (sec3.3) and it does not have XTS.
 
-Patchset:
-[01/17] crypto: talitos - base address for Execution Units and macro for ISR masks
-[02/17] crypto: talitos - Externalise specific SEC2 reset actions
-[03/17] crypto: talitos - Use zero entry to init descriptors ptrs to zero
-[04/17] crypto: talitos - Refactor the sg in/out chain allocation
-[05/17] crypto: talitos - isolate scatter/gather handling for ahash
-[06/17] crypto: talitos - Add talitos2.c to isolate SEC2 specific functions
-[07/17] crypto: talitos - Split talitos.h into 2 parts
-[08/17] crypto: talitos - Deport SEC2 error handling
-[09/17] crypto: talitos - Move reset/init helpers into talitos2.h
-[10/17] crypto: talitos - Move interrupt related macros in talitos2.h
-[11/17] crypto: talitos - Move hash chain handling into talitos2.h
-[12/17] crypto: talitos - Define compatible in talitos2.h instead of talitos.c
-[13/17] crypto: talitos - move sg_count() helper into talitos.h
-[14/17] crypto: talitos - Add a helper function to clear j_extent field
-[15/17] crypto: talitos - Implementation of SEC1
-[16/17] crypto: talitos - SEC1 bugs on 0 data hash
-[17/17] crypto: talitos - Update DT bindings with SEC1
+Can you look internally to find out in which hardware it was
+introduced?  Is there a SEC 3.3.1 that also has XTS?
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+I guess I just need a ->features flag to conditionally register the
+XTS algorithm for 3.3.x and newer.  Adding anything more complicated
+doesn't seem warranted at this time, although that could change if
+someone came along and needed to add a whole whack more of the AES
+modes that were introduced at various times in the different SEC
+revisions.
 
- .../devicetree/bindings/crypto/fsl-sec2.txt        |   5 +-
- drivers/crypto/Kconfig                             |   8 +
- drivers/crypto/Makefile                            |   2 +
- drivers/crypto/talitos.c                           | 927 +--------------------
- drivers/crypto/talitos.h                           | 183 ++--
- drivers/crypto/talitos1.c                          | 197 +++++
- drivers/crypto/talitos1.h                          | 343 ++++++++
- drivers/crypto/talitos2.c                          | 696 ++++++++++++++++
- drivers/crypto/talitos2.h                          | 335 ++++++++
- 9 files changed, 1734 insertions(+), 962 deletions(-)
+>
+>> +             .desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+>> +                                     DESC_HDR_SEL0_AESU |
+>> +                                     DESC_HDR_MODE0_AESU_XTS,
+>
+> ...
+>
+>>  /* primary execution unit mode (MODE0) and derivatives */
+>>  #define      DESC_HDR_MODE0_ENCRYPT          cpu_to_be32(0x00100000)
+>>  #define      DESC_HDR_MODE0_AESU_CBC         cpu_to_be32(0x00200000)
+>> +#define      DESC_HDR_MODE0_AESU_XTS         cpu_to_be32(0x04200000)
+>
+> I'd prefer these defines be kept as single bit definitions, and keep
+> their names from the manual.  An XTS-specific definition can be
+> composed from them either after this, or manually in the
+> desc_hdr_template assignment above.
+
+It doesn't look like there are divisible single-bit definitions for
+the MODE0 bits. The AES Cipher modes are composed of 5 bits called
+CipherMode, Extended CipherMode and Aux2.  Individually they don't
+seem to mean anything.  Unless you want something like:
+
+#define AES_MODE(cm, ecm, aux2)   cpu_to_be32(((ecm<<6) | (aux2<<5) |
+(cm<<1)) << 20)
+
+#define DESC_HDR_MODE0_AESU_CBC  AES_MODE(1, 0, 0)
+#define DESC_HDR_MODE0_AESU_XTS   AES_MODE(1, 1, 0)
+
+Thanks,
+mh
+
+-- 
+Martin Hicks P.Eng.      |         mort@bork.org
+Bork Consulting Inc.     |   +1 (613) 266-2296
