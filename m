@@ -1,7 +1,8 @@
 From: <yanjiang.jin@windriver.com>
-Subject: [V3 PATCH 0/2]  fix some CAAM warnings.
-Date: Fri, 6 Mar 2015 10:34:40 +0800
-Message-ID: <1425609282-16568-1-git-send-email-yanjiang.jin@windriver.com>
+Subject: [PATCH 2/2] crypto: caam_rng: fix rng_unmap_ctx's DMA_UNMAP size problem
+Date: Fri, 6 Mar 2015 10:34:42 +0800
+Message-ID: <1425609282-16568-3-git-send-email-yanjiang.jin@windriver.com>
+References: <1425609282-16568-1-git-send-email-yanjiang.jin@windriver.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <ruchika.gupta@freescale.com>, <cristian.stoica@freescale.com>,
@@ -9,44 +10,79 @@ Cc: <ruchika.gupta@freescale.com>, <cristian.stoica@freescale.com>,
 	<linux-kernel@vger.kernel.org>, <jinyanjiang@gmail.com>
 To: <horia.geanta@freescale.com>, <herbert@gondor.apana.org.au>,
 	<davem@davemloft.net>, <kim.phillips@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail1.windriver.com ([147.11.146.13]:62329 "EHLO
-	mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750728AbbCFCe4 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Mar 2015 21:34:56 -0500
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1425609282-16568-1-git-send-email-yanjiang.jin@windriver.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 From: Yanjiang Jin <yanjiang.jin@windriver.com>
 
-Hi,
+Fix rng_unmap_ctx's DMA_UNMAP size problem for caam_rng, else system would
+report the below calltrace during cleanup caam_rng.
+Since rng_create_sh_desc() creates a fixed descriptor of exactly 4
+command-lengths now, also update DESC_RNG_LEN to (4 * CAAM_CMD_SZ).
 
-This patch series fix some CAAM compile and runtime warnings.
+caam_jr ffe301000.jr: DMA-API: device driver frees DMA memory with different size [device address=0x000000007f080010] [map size=16 bytes] [unmap size=40 bytes]
+------------[ cut here ]------------
+WARNING: at lib/dma-debug.c:887
+Modules linked in:
+task: c0000000f7cdaa80 ti: c0000000e5340000 task.ti: c0000000e5340000
+NIP: c0000000004f5bc8 LR: c0000000004f5bc4 CTR: c0000000005f69b0
+REGS: c0000000e53433c0 TRAP: 0700   Not tainted
+MSR: 0000000080029000 <CE,EE,ME>  CR: 24088482  XER: 00000000
+SOFTE: 0
 
-I have tested this on fsl-p5020ds board using upstream 4.0.0-rc2 with the below configs:
+GPR00: c0000000004f5bc4 c0000000e5343640 c0000000012af360 000000000000009f
+GPR04: 0000000000000000 00000000000000a0 c000000000d02070 c000000015980660
+GPR08: c000000000cff360 0000000000000000 0000000000000000 c0000000012da018
+GPR12: 00000000000001e3 c000000001fff780 00000000100f0000 0000000000000001
+GPR16: 0000000000000002 0000000000000000 0000000000000000 0000000000000000
+GPR20: 0000000000000000 0000000000000000 ffffffffffffffff 0000000000000001
+GPR24: 0000000000000001 0000000000000001 0000000000000000 0000000000000001
+GPR28: c000000001556b90 c000000001565b80 c0000000e5343750 c0000000f9427480
+NIP [c0000000004f5bc8] .check_unmap+0x538/0x9c0
+LR [c0000000004f5bc4] .check_unmap+0x534/0x9c0
+Call Trace:
+[c0000000e5343640] [c0000000004f5bc4] .check_unmap+0x534/0x9c0 (unreliable)
+[c0000000e53436e0] [c0000000004f60d4] .debug_dma_unmap_page+0x84/0xb0
+[c0000000e5343810] [c00000000082f9d4] .caam_cleanup+0x1d4/0x240
+[c0000000e53438a0] [c00000000056cc88] .hwrng_unregister+0xd8/0x1c0
+Instruction dump:
+7c641b78 41de0410 e8a90050 2fa50000 419e0484 e8de0028 e8ff0030 3c62ff90
+e91e0030 38638388 48546ed9 60000000 <0fe00000> 3c62ff8f 38637fc8 48546ec5
+---[ end trace e43fd1734d6600df ]---
 
-CONFIG_DMA_API_DEBUG=y
-# CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-
-Change log:
-v3:
-
-0001-crypto-caamhash-fix-uninitialized-edesc-sec4_sg_byte.patch is same as before.
-
-For 0002-crypto-caam_rng-fix-rng_unmap_ctx-s-DMA_UNMAP-size-p.patch
+Signed-off-by: Yanjiang Jin <yanjiang.jin@windriver.com>
+---
 1. Fix an alignment issue;
 2. update DESC_RNG_LEN to (4 * CAAM_CMD_SZ).
 
-Abandon the v2 patch 0001-crypto-caam-fix-some-compile-warnings.patch.
+ drivers/crypto/caam/caamrng.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Yanjiang Jin (2):
-  crypto: caamhash: - fix uninitialized edesc->sec4_sg_bytes field
-  crypto: caam_rng: fix rng_unmap_ctx's DMA_UNMAP size problem
-
- drivers/crypto/caam/caamhash.c | 1 +
- drivers/crypto/caam/caamrng.c  | 6 +++---
- 2 files changed, 4 insertions(+), 3 deletions(-)
-
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index ae31e55..26a544b 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -52,7 +52,7 @@
+ 
+ /* length of descriptors */
+ #define DESC_JOB_O_LEN			(CAAM_CMD_SZ * 2 + CAAM_PTR_SZ * 2)
+-#define DESC_RNG_LEN			(10 * CAAM_CMD_SZ)
++#define DESC_RNG_LEN			(4 * CAAM_CMD_SZ)
+ 
+ /* Buffer, its dma address and lock */
+ struct buf_data {
+@@ -90,8 +90,8 @@ static inline void rng_unmap_ctx(struct caam_rng_ctx *ctx)
+ 	struct device *jrdev = ctx->jrdev;
+ 
+ 	if (ctx->sh_desc_dma)
+-		dma_unmap_single(jrdev, ctx->sh_desc_dma, DESC_RNG_LEN,
+-				 DMA_TO_DEVICE);
++		dma_unmap_single(jrdev, ctx->sh_desc_dma,
++				 desc_bytes(ctx->sh_desc), DMA_TO_DEVICE);
+ 	rng_unmap_buf(jrdev, &ctx->bufs[0]);
+ 	rng_unmap_buf(jrdev, &ctx->bufs[1]);
+ }
 -- 
 1.9.1
