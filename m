@@ -1,38 +1,30 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 2/5] crypto: talitos: Remove MD5_BLOCK_SIZE
-Date: Fri, 6 Mar 2015 23:02:22 +1100
-Message-ID: <20150306120222.GA5599@gondor.apana.org.au>
-References: <20150305180726.6ab76042f99af0eb62b64ed6@freescale.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH RESEND 2/2] crypto: algif - change algif_skcipher to be
+ asynchronous
+Date: Fri, 06 Mar 2015 12:04:49 +0000
+Message-ID: <54F997E1.8050601@intel.com>
+References: <20150227193538.10553.6144.stgit@tstruk-mobl1> <20150227193549.10553.52267.stgit@tstruk-mobl1> <20150306114417.GA4949@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: mort@bork.org, scottwood@freescale.com, galak@kernel.crashing.org,
-	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-	horia.geanta@freescale.com
-To: Kim Phillips <kim.phillips@freescale.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	qat-linux@intel.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:48558 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751812AbbCFMCd (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Mar 2015 07:02:33 -0500
-Content-Disposition: inline
-In-Reply-To: <20150305180726.6ab76042f99af0eb62b64ed6@freescale.com>
+Received: from mga03.intel.com ([134.134.136.65]:42744 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752138AbbCFMIr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 6 Mar 2015 07:08:47 -0500
+In-Reply-To: <20150306114417.GA4949@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Kim Phillips <kim.phillips@freescale.com> wrote:
-> On Tue,  3 Mar 2015 08:21:34 -0500
-> Martin Hicks <mort@bork.org> wrote:
-> 
->> This is properly defined in the md5 header file.
->> 
->> Signed-off-by: Martin Hicks <mort@bork.org>
->> ---
-> 
-> Acked-by: Kim Phillips <kim.phillips@freescale.com>
+On 03/06/2015 11:44 AM, Herbert Xu wrote:
+> Are these separate caches really necessary? It looks like an
+> overkill.  What's wrong with just kmalloc?
 
-Patches 1-2 applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi Herbert,
+It helps to make it faster.
+This way I can do some of the request setup beforehand and minimize overhead on the data path.
+Thanks,
+Tadeusz
