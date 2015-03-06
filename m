@@ -1,89 +1,71 @@
-From: Martin Hicks <mort@bork.org>
-Subject: Re: [PATCH 2/2] crypto: talitos: Add AES-XTS Support
-Date: Fri, 6 Mar 2015 11:49:43 -0500
-Message-ID: <CAJUS3XmfcJCiBMnsiXKpc=QXE-YxTQy67wZyAXgKjtY_DN0CDQ@mail.gmail.com>
-References: <1424451610-5786-1-git-send-email-mort@bork.org>
-	<1424451610-5786-3-git-send-email-mort@bork.org>
-	<20150305181615.493b173d43249548fae29203@freescale.com>
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: [PATCH 00/10] omap3 crypto fixes
+Date: Fri, 6 Mar 2015 10:36:32 -0800
+Message-ID: <20150306183631.GA13520@atomide.com>
+References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Scott Wood <scottwood@freescale.com>,
-	Kumar Gala <galak@kernel.crashing.org>,
-	linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f175.google.com ([209.85.223.175]:41592 "EHLO
-	mail-ie0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756330AbbCFQto (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Mar 2015 11:49:44 -0500
-Received: by iecrl12 with SMTP id rl12so4235056iec.8
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2015 08:49:43 -0800 (PST)
-In-Reply-To: <20150305181615.493b173d43249548fae29203@freescale.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: =?utf-8?Q?Beno=C3=AEt?= Cousson <bcousson@baylibre.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Russell King <linux@arm.linux.org.uk>,
+	Paul Walmsley <paul@pwsan.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Pavel Machek <pavel@ucw.cz>, Nishanth Menon <nm@ti.com>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Sebastian Reichel <sre@kernel.org>
+To: Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
+Sender: linux-omap-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 5, 2015 at 7:16 PM, Kim Phillips <kim.phillips@freescale.com> wrote:
-> On Fri, 20 Feb 2015 12:00:10 -0500
-> Martin Hicks <mort@bork.org> wrote:
->
->> The newer talitos hardware has support for AES in XTS mode.
->
-> Assuming it's the same thing, AES-XCBC gets added with SEC v3.0
-> h/w.  Assuming hw_supports() doesn't already support this algorithm
+* Pali Roh=C3=A1r <pali.rohar@gmail.com> [150226 05:54]:
+> This patch series fix crypto support for omap3 devices which use DT.
+>=20
+> It enables AES and SHAM on N9/N950 and SHAM on N900. AES is still dis=
+abled for N900.
+>=20
+> Pali Roh=C3=A1r (10):
+>   ARM: OMAP2+: Return correct error values from device and hwmod
+>   ARM: OMAP3: Fix crypto support for HS devices
+>   crypto: omap-sham: Add support for omap3 devices
+>   crypto: omap-sham: Check for return value from pm_runtime_get_sync
+>   ARM: dts: omap3 hs: Remove timer12
+>   ARM: dts: omap3: Add missing dmas for crypto
+>   ARM: dts: n9/n950: Enable omap crypto support
+>   ARM: dts: n900: Enable omap sham and include directly omap34xx.dtsi
+>   ARM: dts: omap3-tao3530: Include directly omap34xx.dtsi
+>   ARM: dts: Remove files omap34xx-hs.dtsi and omap36xx-hs.dtsi
+>=20
+>  arch/arm/boot/dts/omap3-n900.dts           |   16 +++++-
+>  arch/arm/boot/dts/omap3-n950-n9.dtsi       |    2 +-
+>  arch/arm/boot/dts/omap3-tao3530.dtsi       |   11 +++-
+>  arch/arm/boot/dts/omap3.dtsi               |    4 ++
+>  arch/arm/boot/dts/omap34xx-hs.dtsi         |   16 ------
+>  arch/arm/boot/dts/omap36xx-hs.dtsi         |   16 ------
+>  arch/arm/mach-omap2/omap_device.c          |   30 ++++++-----
+>  arch/arm/mach-omap2/omap_hwmod.c           |   10 ++--
+>  arch/arm/mach-omap2/omap_hwmod_3xxx_data.c |   79 ++++++++++++++++++=
++++++-----
+>  drivers/crypto/omap-sham.c                 |   13 ++++-
+>  10 files changed, 131 insertions(+), 66 deletions(-)
+>  delete mode 100644 arch/arm/boot/dts/omap34xx-hs.dtsi
+>  delete mode 100644 arch/arm/boot/dts/omap36xx-hs.dtsi
 
-AES-XCBC isn't the same thing as AES-XTS.
+Are there any fixes in this series that should go into
+v4.0-rc series, or can it all wait for v4.1?
 
-> combination (technically via the mode bit), this needs to be
-> reflected in the patch so the driver doesn't think SEC 2.x devices
-> can do XTS, too.
+Regards,
 
-Right.  I hadn't looked into how exactly hw_supports() works.  It only
-indicates which execution units are present (in this case the AES
-unit).  I actually think XTS gets introduced in SEC v3.3.2.  I also
-have an MPC8379 (sec3.3) and it does not have XTS.
-
-Can you look internally to find out in which hardware it was
-introduced?  Is there a SEC 3.3.1 that also has XTS?
-
-I guess I just need a ->features flag to conditionally register the
-XTS algorithm for 3.3.x and newer.  Adding anything more complicated
-doesn't seem warranted at this time, although that could change if
-someone came along and needed to add a whole whack more of the AES
-modes that were introduced at various times in the different SEC
-revisions.
-
->
->> +             .desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
->> +                                     DESC_HDR_SEL0_AESU |
->> +                                     DESC_HDR_MODE0_AESU_XTS,
->
-> ...
->
->>  /* primary execution unit mode (MODE0) and derivatives */
->>  #define      DESC_HDR_MODE0_ENCRYPT          cpu_to_be32(0x00100000)
->>  #define      DESC_HDR_MODE0_AESU_CBC         cpu_to_be32(0x00200000)
->> +#define      DESC_HDR_MODE0_AESU_XTS         cpu_to_be32(0x04200000)
->
-> I'd prefer these defines be kept as single bit definitions, and keep
-> their names from the manual.  An XTS-specific definition can be
-> composed from them either after this, or manually in the
-> desc_hdr_template assignment above.
-
-It doesn't look like there are divisible single-bit definitions for
-the MODE0 bits. The AES Cipher modes are composed of 5 bits called
-CipherMode, Extended CipherMode and Aux2.  Individually they don't
-seem to mean anything.  Unless you want something like:
-
-#define AES_MODE(cm, ecm, aux2)   cpu_to_be32(((ecm<<6) | (aux2<<5) |
-(cm<<1)) << 20)
-
-#define DESC_HDR_MODE0_AESU_CBC  AES_MODE(1, 0, 0)
-#define DESC_HDR_MODE0_AESU_XTS   AES_MODE(1, 1, 0)
-
-Thanks,
-mh
-
--- 
-Martin Hicks P.Eng.      |         mort@bork.org
-Bork Consulting Inc.     |   +1 (613) 266-2296
+Tony
+--
+To unsubscribe from this list: send the line "unsubscribe linux-omap" i=
+n
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
