@@ -1,7 +1,7 @@
 From: <yanjiang.jin@windriver.com>
-Subject: [PATCH 2/2] crypto: caam_rng: fix rng_unmap_ctx's DMA_UNMAP size problem
-Date: Fri, 6 Mar 2015 10:34:42 +0800
-Message-ID: <1425609282-16568-3-git-send-email-yanjiang.jin@windriver.com>
+Subject: [PATCH 1/2] crypto: caamhash: - fix uninitialized edesc->sec4_sg_bytes field
+Date: Fri, 6 Mar 2015 10:34:41 +0800
+Message-ID: <1425609282-16568-2-git-send-email-yanjiang.jin@windriver.com>
 References: <1425609282-16568-1-git-send-email-yanjiang.jin@windriver.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -17,72 +17,55 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Yanjiang Jin <yanjiang.jin@windriver.com>
 
-Fix rng_unmap_ctx's DMA_UNMAP size problem for caam_rng, else system would
-report the below calltrace during cleanup caam_rng.
-Since rng_create_sh_desc() creates a fixed descriptor of exactly 4
-command-lengths now, also update DESC_RNG_LEN to (4 * CAAM_CMD_SZ).
+sec4_sg_bytes not being properly initialized causes ahash_done
+to try to free unallocated DMA memory:
 
-caam_jr ffe301000.jr: DMA-API: device driver frees DMA memory with different size [device address=0x000000007f080010] [map size=16 bytes] [unmap size=40 bytes]
+caam_jr ffe301000.jr: DMA-API: device driver tries to free DMA memory it has not allocated [device address=0xdeadbeefdeadbeef] [size=3735928559 bytes]
 ------------[ cut here ]------------
-WARNING: at lib/dma-debug.c:887
+WARNING: at lib/dma-debug.c:1093
 Modules linked in:
-task: c0000000f7cdaa80 ti: c0000000e5340000 task.ti: c0000000e5340000
-NIP: c0000000004f5bc8 LR: c0000000004f5bc4 CTR: c0000000005f69b0
-REGS: c0000000e53433c0 TRAP: 0700   Not tainted
-MSR: 0000000080029000 <CE,EE,ME>  CR: 24088482  XER: 00000000
-SOFTE: 0
+CPU: 1 PID: 0 Comm: swapper/1 Not tainted 4.0.0-rc1+ #6
+task: e9598c00 ti: effca000 task.ti: e95a2000
+NIP: c04ef24c LR: c04ef24c CTR: c0549730
+REGS: effcbd40 TRAP: 0700   Not tainted  (4.0.0-rc1+)
+MSR: 00029002 <CE,EE,ME>  CR: 22008084  XER: 20000000
 
-GPR00: c0000000004f5bc4 c0000000e5343640 c0000000012af360 000000000000009f
-GPR04: 0000000000000000 00000000000000a0 c000000000d02070 c000000015980660
-GPR08: c000000000cff360 0000000000000000 0000000000000000 c0000000012da018
-GPR12: 00000000000001e3 c000000001fff780 00000000100f0000 0000000000000001
-GPR16: 0000000000000002 0000000000000000 0000000000000000 0000000000000000
-GPR20: 0000000000000000 0000000000000000 ffffffffffffffff 0000000000000001
-GPR24: 0000000000000001 0000000000000001 0000000000000000 0000000000000001
-GPR28: c000000001556b90 c000000001565b80 c0000000e5343750 c0000000f9427480
-NIP [c0000000004f5bc8] .check_unmap+0x538/0x9c0
-LR [c0000000004f5bc4] .check_unmap+0x534/0x9c0
+GPR00: c04ef24c effcbdf0 e9598c00 00000096 c08f7424 c00ab2b0 00000000 00000001
+GPR08: c0fe7510 effca000 00000000 000001c3 22008082 00000000 c1048e77 c1050000
+GPR16: c0c36700 493c0040 0000002c e690e4a0 c1054fb4 c18bac40 00029002 c18b0788
+GPR24: 00000014 e690e480 effcbe48 00000000 c0fde128 e6ffac10 deadbeef deadbeef
+NIP [c04ef24c] check_unmap+0x93c/0xb40
+LR [c04ef24c] check_unmap+0x93c/0xb40
 Call Trace:
-[c0000000e5343640] [c0000000004f5bc4] .check_unmap+0x534/0x9c0 (unreliable)
-[c0000000e53436e0] [c0000000004f60d4] .debug_dma_unmap_page+0x84/0xb0
-[c0000000e5343810] [c00000000082f9d4] .caam_cleanup+0x1d4/0x240
-[c0000000e53438a0] [c00000000056cc88] .hwrng_unregister+0xd8/0x1c0
-Instruction dump:
-7c641b78 41de0410 e8a90050 2fa50000 419e0484 e8de0028 e8ff0030 3c62ff90
-e91e0030 38638388 48546ed9 60000000 <0fe00000> 3c62ff8f 38637fc8 48546ec5
----[ end trace e43fd1734d6600df ]---
+[effcbdf0] [c04ef24c] check_unmap+0x93c/0xb40 (unreliable)
+[effcbe40] [c04ef4f4] debug_dma_unmap_page+0xa4/0xc0
+[effcbec0] [c070cda8] ahash_done+0x128/0x1a0
+[effcbef0] [c0700070] caam_jr_dequeue+0x1d0/0x290
+[effcbf40] [c0045f40] tasklet_action+0x110/0x1f0
+[effcbf80] [c0044bc8] __do_softirq+0x188/0x700
+[effcbfe0] [c00455d8] irq_exit+0x108/0x120
+[effcbff0] [c000f520] call_do_irq+0x24/0x3c
+[e95a3e20] [c00059b8] do_IRQ+0xc8/0x170
+[e95a3e50] [c0011bc8] ret_from_except+0x0/0x18
 
 Signed-off-by: Yanjiang Jin <yanjiang.jin@windriver.com>
 ---
-1. Fix an alignment issue;
-2. update DESC_RNG_LEN to (4 * CAAM_CMD_SZ).
+Same as v2.
 
- drivers/crypto/caam/caamrng.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/caam/caamhash.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index ae31e55..26a544b 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -52,7 +52,7 @@
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index f347ab7..ba0532e 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1172,6 +1172,7 @@ static int ahash_final_no_ctx(struct ahash_request *req)
+ 		return -ENOMEM;
+ 	}
  
- /* length of descriptors */
- #define DESC_JOB_O_LEN			(CAAM_CMD_SZ * 2 + CAAM_PTR_SZ * 2)
--#define DESC_RNG_LEN			(10 * CAAM_CMD_SZ)
-+#define DESC_RNG_LEN			(4 * CAAM_CMD_SZ)
- 
- /* Buffer, its dma address and lock */
- struct buf_data {
-@@ -90,8 +90,8 @@ static inline void rng_unmap_ctx(struct caam_rng_ctx *ctx)
- 	struct device *jrdev = ctx->jrdev;
- 
- 	if (ctx->sh_desc_dma)
--		dma_unmap_single(jrdev, ctx->sh_desc_dma, DESC_RNG_LEN,
--				 DMA_TO_DEVICE);
-+		dma_unmap_single(jrdev, ctx->sh_desc_dma,
-+				 desc_bytes(ctx->sh_desc), DMA_TO_DEVICE);
- 	rng_unmap_buf(jrdev, &ctx->bufs[0]);
- 	rng_unmap_buf(jrdev, &ctx->bufs[1]);
- }
++	edesc->sec4_sg_bytes = 0;
+ 	sh_len = desc_len(sh_desc);
+ 	desc = edesc->hw_desc;
+ 	init_job_desc_shared(desc, ptr, sh_len, HDR_SHARE_DEFER | HDR_REVERSE);
 -- 
 1.9.1
