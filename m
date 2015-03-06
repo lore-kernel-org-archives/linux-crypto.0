@@ -1,43 +1,52 @@
-From: Kim Phillips <kim.phillips@freescale.com>
-Subject: Re: [PATCH 1/3] crypto: caam: fix some compile warnings
-Date: Thu, 5 Mar 2015 18:38:14 -0600
-Message-ID: <20150305183814.a8d8254e8fd99750f846317c@freescale.com>
-References: <1425365453-19358-1-git-send-email-yanjiang.jin@windriver.com>
-	<1425365453-19358-2-git-send-email-yanjiang.jin@windriver.com>
-	<20150303125953.8585904680288a9734566b42@freescale.com>
-	<54F66EA3.7080506@windriver.com>	<54F6909D.8040002@windriver.com>
-	<54F6CA60.5030905@freescale.com>
-	<20150304123419.7baecac7320d5b3483449dab@freescale.com>
-	<54F801CD.7040706@freescale.com>
+From: <yanjiang.jin@windriver.com>
+Subject: [V3 PATCH 0/2]  fix some CAAM warnings.
+Date: Fri, 6 Mar 2015 10:34:40 +0800
+Message-ID: <1425609282-16568-1-git-send-email-yanjiang.jin@windriver.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-Cc: <horia.geanta@freescale.com>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-To: Cristian Stoica <cristian.stoica@freescale.com>
+Content-Type: text/plain
+Cc: <ruchika.gupta@freescale.com>, <cristian.stoica@freescale.com>,
+	<NiteshNarayanLal@freescale.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <jinyanjiang@gmail.com>
+To: <horia.geanta@freescale.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <kim.phillips@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0104.outbound.protection.outlook.com ([207.46.100.104]:42016
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752592AbbCFAnc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Mar 2015 19:43:32 -0500
-In-Reply-To: <54F801CD.7040706@freescale.com>
+Received: from mail1.windriver.com ([147.11.146.13]:62329 "EHLO
+	mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750728AbbCFCe4 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Mar 2015 21:34:56 -0500
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 5 Mar 2015 09:12:13 +0200
-Cristian Stoica <cristian.stoica@freescale.com> wrote:
+From: Yanjiang Jin <yanjiang.jin@windriver.com>
 
-> On 03/04/2015 08:34 PM, Kim Phillips wrote:
-> 
-> > I don't see how, e.g., for one, dma_map_sg is I/O TLB
-> > implementation-dependent.
-> 
-> I'll need some remedial classes on this topic, but for the moment I
-> don't see how this matters for mapping sg chains. Can you share some
-> pointers?
+Hi,
 
-I think it's better the driver not depend on whether the dma_map_sg
-implementation supports chains, but you're welcome to try...
+This patch series fix some CAAM compile and runtime warnings.
 
-Kim
+I have tested this on fsl-p5020ds board using upstream 4.0.0-rc2 with the below configs:
+
+CONFIG_DMA_API_DEBUG=y
+# CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+
+Change log:
+v3:
+
+0001-crypto-caamhash-fix-uninitialized-edesc-sec4_sg_byte.patch is same as before.
+
+For 0002-crypto-caam_rng-fix-rng_unmap_ctx-s-DMA_UNMAP-size-p.patch
+1. Fix an alignment issue;
+2. update DESC_RNG_LEN to (4 * CAAM_CMD_SZ).
+
+Abandon the v2 patch 0001-crypto-caam-fix-some-compile-warnings.patch.
+
+Yanjiang Jin (2):
+  crypto: caamhash: - fix uninitialized edesc->sec4_sg_bytes field
+  crypto: caam_rng: fix rng_unmap_ctx's DMA_UNMAP size problem
+
+ drivers/crypto/caam/caamhash.c | 1 +
+ drivers/crypto/caam/caamrng.c  | 6 +++---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+-- 
+1.9.1
