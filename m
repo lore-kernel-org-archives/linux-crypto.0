@@ -1,36 +1,55 @@
-From: Aaro Koskinen <aaro.koskinen@iki.fi>
-Subject: Re: [PATCH 00/10] omap3 crypto fixes
-Date: Sat, 7 Mar 2015 00:23:06 +0200
-Message-ID: <20150306222306.GB587@fuloong-minipc.musicnaut.iki.fi>
-References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
- <20150306183631.GA13520@atomide.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	=?iso-8859-1?Q?Beno=EEt?= Cousson <bcousson@baylibre.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Russell King <linux@arm.linux.org.uk>,
-	Paul Walmsley <paul@pwsan.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Pavel Machek <pavel@ucw.cz>, Nishanth Menon <nm@ti.com>,
-	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
-	Sebastian Reichel <sre@kernel.org>
-To: Tony Lindgren <tony@atomide.com>
+From: Feng Kan <fkan@apm.com>
+Subject: [PATCH] rng: xgene-rng: add ACPI support for APM X-Gene RNG unit
+Date: Fri,  6 Mar 2015 14:53:15 -0800
+Message-ID: <1425682395-17821-1-git-send-email-fkan@apm.com>
+Cc: Feng Kan <fkan@apm.com>
+To: patches@apm.com, mpm@selenic.com, herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150306183631.GA13520@atomide.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+This adds ACPI support for APM X-Gene RNG unit.
 
-On Fri, Mar 06, 2015 at 10:36:32AM -0800, Tony Lindgren wrote:
-> Are there any fixes in this series that should go into
-> v4.0-rc series, or can it all wait for v4.1?
+Signed-off-by: Feng Kan <fkan@apm.com>
+---
+ drivers/char/hw_random/xgene-rng.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-I think these all should wait for v4.1.
-
-A.
+diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/xgene-rng.c
+index 23caa05..c37cf75 100644
+--- a/drivers/char/hw_random/xgene-rng.c
++++ b/drivers/char/hw_random/xgene-rng.c
+@@ -21,6 +21,7 @@
+  *
+  */
+ 
++#include <linux/acpi.h>
+ #include <linux/clk.h>
+ #include <linux/delay.h>
+ #include <linux/hw_random.h>
+@@ -310,6 +311,14 @@ static int xgene_rng_init(struct hwrng *rng)
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_ACPI
++static const struct acpi_device_id xgene_rng_acpi_match[] = {
++	{ "APMC0D18", },
++	{ }
++};
++MODULE_DEVICE_TABLE(acpi, xgene_rng_acpi_match);
++#endif
++
+ static struct hwrng xgene_rng_func = {
+ 	.name		= "xgene-rng",
+ 	.init		= xgene_rng_init,
+@@ -415,6 +424,7 @@ static struct platform_driver xgene_rng_driver = {
+ 	.driver = {
+ 		.name		= "xgene-rng",
+ 		.of_match_table = xgene_rng_of_match,
++		.acpi_match_table = ACPI_PTR(xgene_rng_acpi_match),
+ 	},
+ };
+ 
+-- 
+1.9.1
