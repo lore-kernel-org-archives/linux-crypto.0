@@ -1,36 +1,28 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RESEND 2/2] crypto: algif - change algif_skcipher to be
- asynchronous
-Date: Fri, 6 Mar 2015 23:09:56 +1100
-Message-ID: <20150306120956.GA5715@gondor.apana.org.au>
-References: <20150227193538.10553.6144.stgit@tstruk-mobl1>
- <20150227193549.10553.52267.stgit@tstruk-mobl1>
- <20150306114417.GA4949@gondor.apana.org.au>
- <54F997E1.8050601@intel.com>
+From: Neil Horman <nhorman@tuxdriver.com>
+Subject: Re: [PATCH] crypto: RNGs must return 0 in success case
+Date: Fri, 6 Mar 2015 08:14:03 -0500
+Message-ID: <20150306131403.GB15626@hmsreliant.think-freely.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: linux-kernel@vger.kernel.org
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:50103 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750817AbbCFMJ7 (ORCPT
+Received: from charlotte.tuxdriver.com ([70.61.120.58]:56112 "EHLO
+	smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753857AbbCFNOS (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 6 Mar 2015 07:09:59 -0500
+	Fri, 6 Mar 2015 08:14:18 -0500
 Content-Disposition: inline
-In-Reply-To: <54F997E1.8050601@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Mar 06, 2015 at 12:04:49PM +0000, Tadeusz Struk wrote:
-> It helps to make it faster.
-> This way I can do some of the request setup beforehand and minimize overhead on the data path.
 
-Do you have numbers to back this up?
+>Change the RNGs to always return 0 in success case.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>This patch ensures that seqiv.c works with RNGs other than krng. seqiv
+>expects that any return code other than 0 is an error. Without the
+>patch, rfc4106(gcm(aes)) will not work when using a DRBG or an ANSI
+>X9.31 RNG.
+
+For the X9.31 bits:
+Acked-by: Neil Horman <nhorman@tuxdriver.com>
