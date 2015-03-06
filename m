@@ -1,55 +1,69 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/17] crypto: talitos - Add support for SEC1
-Date: Fri, 6 Mar 2015 11:28:31 +1100
-Message-ID: <20150306002831.GA30947@gondor.apana.org.au>
-References: <20150305164605.E65D81A241C@localhost.localdomain>
- <20150305182101.6db66e228f519476f0751c13@freescale.com>
+From: Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH 2/3] crypto: caam_rng: fix rng_unmap_ctx's DMA_UNMAP
+ size problem
+Date: Thu, 5 Mar 2015 18:28:14 -0600
+Message-ID: <20150305182814.4a34d15df2638da5f20d1d29@freescale.com>
+References: <1425365453-19358-1-git-send-email-yanjiang.jin@windriver.com>
+	<1425365453-19358-3-git-send-email-yanjiang.jin@windriver.com>
+	<20150303133120.6706da49d0f7188a8213fe36@freescale.com>
+	<54F69922.6080404@windriver.com>
+	<20150304123623.324ab9594f04dd95c587b628@freescale.com>
+	<54F7C4F5.1040204@windriver.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Christophe Leroy <christophe.leroy@c-s.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>,
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <horia.geanta@freescale.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <ruchika.gupta@freescale.com>,
+	<cristian.stoica@freescale.com>, <NiteshNarayanLal@freescale.com>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<jinyanjiang@gmail.com>
+To: yjin <yanjiang.jin@windriver.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.apana.org.au ([209.40.204.226]:47735 "EHLO
-	helcar.apana.org.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752379AbbCFA3L (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 5 Mar 2015 19:29:11 -0500
-Content-Disposition: inline
-In-Reply-To: <20150305182101.6db66e228f519476f0751c13@freescale.com>
+Received: from mail-by2on0101.outbound.protection.outlook.com ([207.46.100.101]:44896
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750868AbbCFAde (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 5 Mar 2015 19:33:34 -0500
+In-Reply-To: <54F7C4F5.1040204@windriver.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 05, 2015 at 06:21:01PM -0600, Kim Phillips wrote:
-> On Thu, 5 Mar 2015 17:46:05 +0100
-> Christophe Leroy <christophe.leroy@c-s.fr> wrote:
-> 
-> > [15/17] crypto: talitos - Implementation of SEC1
-> 
-> ...
-> 
-> > [16/17] crypto: talitos - SEC1 bugs on 0 data hash
-> > [17/17] crypto: talitos - Update DT bindings with SEC1
-> 
-> This patchseries doesn't apply, at least on top of Herbert's
-> cryptodev-2.6 tree, as of today:
-> 
-> Applying: crypto: talitos - Implementation of SEC1
-> error: patch failed: drivers/crypto/talitos.c:655
-> error: drivers/crypto/talitos.c: patch does not apply
+On Thu, 5 Mar 2015 10:52:37 +0800
+yjin <yanjiang.jin@windriver.com> wrote:
 
-Also the patches are coming in a random order.  Please send them
-one at a time to ensure proper ordering.
+> On 2015=E5=B9=B403=E6=9C=8805=E6=97=A5 02:36, Kim Phillips wrote:
+> > On Wed, 4 Mar 2015 13:33:22 +0800
+> > yjin <yanjiang.jin@windriver.com> wrote:
+> >
+> >> On 2015=E5=B9=B403=E6=9C=8804=E6=97=A5 03:31, Kim Phillips wrote:
+> >>> On Tue, 3 Mar 2015 14:50:52 +0800
+> >>> <yanjiang.jin@windriver.com> wrote:
+> >>>
+> >>>> -		dma_unmap_single(jrdev, ctx->sh_desc_dma, DESC_RNG_LEN,
+> >>>> -				 DMA_TO_DEVICE);
+> >>>> +		dma_unmap_single(jrdev, ctx->sh_desc_dma,
+> >>>> +				desc_bytes(ctx->sh_desc), DMA_TO_DEVICE);
+> >>> alignment: the 'd' in desc_bytes should fall directly under the '=
+j'
+> >>> in jrdev.
+> >>>
+> >>> Also, DESC_RNG_LEN should be corrected to (4 * CAAM_CMD_SZ).
+> >>
+> >> I can't find the obvious limitation for the RNG descriptor length =
+in
+> >> Freescale documents, could you point out it?
+> > ?  rng_create_sh_desc() creates a fixed descriptor of exactly 4
+> > command-lengths.
+>=20
+> Do you mean that the code itself limits the descriptor length? Not a=20
+> hardware limitation.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+the code writes descriptors such that they don't reach h/w
+limitations.
+
+> If so, I prefer to dma_unmap with desc_bytes(ctx->sh_desc) as my=20
+> previous patch, and correct DESC_RNG_LEN to (4 * CAAM_CMD_SZ).
+
+please.
+
+Kim
