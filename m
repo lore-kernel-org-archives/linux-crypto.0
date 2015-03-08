@@ -1,7 +1,7 @@
 From: Aaro Koskinen <aaro.koskinen@iki.fi>
-Subject: [PATCH 6/7] crypto: octeon - add SHA512 module
-Date: Sun,  8 Mar 2015 22:07:46 +0200
-Message-ID: <1425845267-14413-7-git-send-email-aaro.koskinen@iki.fi>
+Subject: [PATCH 4/7] crypto: octeon - add SHA1 module
+Date: Sun,  8 Mar 2015 22:07:44 +0200
+Message-ID: <1425845267-14413-5-git-send-email-aaro.koskinen@iki.fi>
 References: <1425845267-14413-1-git-send-email-aaro.koskinen@iki.fi>
 Cc: linux-mips@linux-mips.org, linux-kernel@vger.kernel.org,
 	Aaro Koskinen <aaro.koskinen@iki.fi>
@@ -13,47 +13,49 @@ In-Reply-To: <1425845267-14413-1-git-send-email-aaro.koskinen@iki.fi>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add OCTEON SHA512 module.
+Add OCTEON SHA1 module.
 
 Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
 ---
- arch/mips/cavium-octeon/crypto/Makefile        |   1 +
- arch/mips/cavium-octeon/crypto/octeon-sha512.c | 277 +++++++++++++++++++++++++
- 2 files changed, 278 insertions(+)
- create mode 100644 arch/mips/cavium-octeon/crypto/octeon-sha512.c
+ arch/mips/cavium-octeon/crypto/Makefile      |   3 +-
+ arch/mips/cavium-octeon/crypto/octeon-sha1.c | 241 +++++++++++++++++++++++++++
+ 2 files changed, 243 insertions(+), 1 deletion(-)
+ create mode 100644 arch/mips/cavium-octeon/crypto/octeon-sha1.c
 
 diff --git a/arch/mips/cavium-octeon/crypto/Makefile b/arch/mips/cavium-octeon/crypto/Makefile
-index 47806a5..f7aa9d5 100644
+index a74f76d..3f671d6 100644
 --- a/arch/mips/cavium-octeon/crypto/Makefile
 +++ b/arch/mips/cavium-octeon/crypto/Makefile
-@@ -7,3 +7,4 @@ obj-y += octeon-crypto.o
- obj-$(CONFIG_CRYPTO_MD5_OCTEON)		+= octeon-md5.o
- obj-$(CONFIG_CRYPTO_SHA1_OCTEON)	+= octeon-sha1.o
- obj-$(CONFIG_CRYPTO_SHA256_OCTEON)	+= octeon-sha256.o
-+obj-$(CONFIG_CRYPTO_SHA512_OCTEON)	+= octeon-sha512.o
-diff --git a/arch/mips/cavium-octeon/crypto/octeon-sha512.c b/arch/mips/cavium-octeon/crypto/octeon-sha512.c
+@@ -4,4 +4,5 @@
+ 
+ obj-y += octeon-crypto.o
+ 
+-obj-$(CONFIG_CRYPTO_MD5_OCTEON) += octeon-md5.o
++obj-$(CONFIG_CRYPTO_MD5_OCTEON)		+= octeon-md5.o
++obj-$(CONFIG_CRYPTO_SHA1_OCTEON)	+= octeon-sha1.o
+diff --git a/arch/mips/cavium-octeon/crypto/octeon-sha1.c b/arch/mips/cavium-octeon/crypto/octeon-sha1.c
 new file mode 100644
-index 0000000..d5fb3c6
+index 0000000..2b74b5b
 --- /dev/null
-+++ b/arch/mips/cavium-octeon/crypto/octeon-sha512.c
-@@ -0,0 +1,277 @@
++++ b/arch/mips/cavium-octeon/crypto/octeon-sha1.c
+@@ -0,0 +1,241 @@
 +/*
 + * Cryptographic API.
 + *
-+ * SHA-512 and SHA-384 Secure Hash Algorithm.
++ * SHA1 Secure Hash Algorithm.
 + *
 + * Adapted for OCTEON by Aaro Koskinen <aaro.koskinen@iki.fi>.
 + *
-+ * Based on crypto/sha512_generic.c, which is:
++ * Based on crypto/sha1_generic.c, which is:
 + *
-+ * Copyright (c) Jean-Luc Cooke <jlcooke@certainkey.com>
++ * Copyright (c) Alan Smithee.
 + * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
-+ * Copyright (c) 2003 Kyle McMartin <kyle@debian.org>
++ * Copyright (c) Jean-Francois Dive <jef@linuxbe.org>
 + *
 + * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2, or (at your option) any
-+ * later version.
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
 + */
 +
 +#include <linux/mm.h>
@@ -71,248 +73,212 @@ index 0000000..d5fb3c6
 + * We pass everything as 64-bit. OCTEON can handle misaligned data.
 + */
 +
-+static void octeon_sha512_store_hash(struct sha512_state *sctx)
++static void octeon_sha1_store_hash(struct sha1_state *sctx)
 +{
-+	write_octeon_64bit_hash_sha512(sctx->state[0], 0);
-+	write_octeon_64bit_hash_sha512(sctx->state[1], 1);
-+	write_octeon_64bit_hash_sha512(sctx->state[2], 2);
-+	write_octeon_64bit_hash_sha512(sctx->state[3], 3);
-+	write_octeon_64bit_hash_sha512(sctx->state[4], 4);
-+	write_octeon_64bit_hash_sha512(sctx->state[5], 5);
-+	write_octeon_64bit_hash_sha512(sctx->state[6], 6);
-+	write_octeon_64bit_hash_sha512(sctx->state[7], 7);
++	u64 *hash = (u64 *)sctx->state;
++	union {
++		u32 word[2];
++		u64 dword;
++	} hash_tail = { { sctx->state[4], } };
++
++	write_octeon_64bit_hash_dword(hash[0], 0);
++	write_octeon_64bit_hash_dword(hash[1], 1);
++	write_octeon_64bit_hash_dword(hash_tail.dword, 2);
++	memzero_explicit(&hash_tail.word[0], sizeof(hash_tail.word[0]));
 +}
 +
-+static void octeon_sha512_read_hash(struct sha512_state *sctx)
++static void octeon_sha1_read_hash(struct sha1_state *sctx)
 +{
-+	sctx->state[0] = read_octeon_64bit_hash_sha512(0);
-+	sctx->state[1] = read_octeon_64bit_hash_sha512(1);
-+	sctx->state[2] = read_octeon_64bit_hash_sha512(2);
-+	sctx->state[3] = read_octeon_64bit_hash_sha512(3);
-+	sctx->state[4] = read_octeon_64bit_hash_sha512(4);
-+	sctx->state[5] = read_octeon_64bit_hash_sha512(5);
-+	sctx->state[6] = read_octeon_64bit_hash_sha512(6);
-+	sctx->state[7] = read_octeon_64bit_hash_sha512(7);
++	u64 *hash = (u64 *)sctx->state;
++	union {
++		u32 word[2];
++		u64 dword;
++	} hash_tail;
++
++	hash[0]		= read_octeon_64bit_hash_dword(0);
++	hash[1]		= read_octeon_64bit_hash_dword(1);
++	hash_tail.dword	= read_octeon_64bit_hash_dword(2);
++	sctx->state[4]	= hash_tail.word[0];
++	memzero_explicit(&hash_tail.dword, sizeof(hash_tail.dword));
 +}
 +
-+static void octeon_sha512_transform(const void *_block)
++static void octeon_sha1_transform(const void *_block)
 +{
 +	const u64 *block = _block;
 +
-+	write_octeon_64bit_block_sha512(block[0], 0);
-+	write_octeon_64bit_block_sha512(block[1], 1);
-+	write_octeon_64bit_block_sha512(block[2], 2);
-+	write_octeon_64bit_block_sha512(block[3], 3);
-+	write_octeon_64bit_block_sha512(block[4], 4);
-+	write_octeon_64bit_block_sha512(block[5], 5);
-+	write_octeon_64bit_block_sha512(block[6], 6);
-+	write_octeon_64bit_block_sha512(block[7], 7);
-+	write_octeon_64bit_block_sha512(block[8], 8);
-+	write_octeon_64bit_block_sha512(block[9], 9);
-+	write_octeon_64bit_block_sha512(block[10], 10);
-+	write_octeon_64bit_block_sha512(block[11], 11);
-+	write_octeon_64bit_block_sha512(block[12], 12);
-+	write_octeon_64bit_block_sha512(block[13], 13);
-+	write_octeon_64bit_block_sha512(block[14], 14);
-+	octeon_sha512_start(block[15]);
++	write_octeon_64bit_block_dword(block[0], 0);
++	write_octeon_64bit_block_dword(block[1], 1);
++	write_octeon_64bit_block_dword(block[2], 2);
++	write_octeon_64bit_block_dword(block[3], 3);
++	write_octeon_64bit_block_dword(block[4], 4);
++	write_octeon_64bit_block_dword(block[5], 5);
++	write_octeon_64bit_block_dword(block[6], 6);
++	octeon_sha1_start(block[7]);
 +}
 +
-+static int octeon_sha512_init(struct shash_desc *desc)
++static int octeon_sha1_init(struct shash_desc *desc)
 +{
-+	struct sha512_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state *sctx = shash_desc_ctx(desc);
 +
-+	sctx->state[0] = SHA512_H0;
-+	sctx->state[1] = SHA512_H1;
-+	sctx->state[2] = SHA512_H2;
-+	sctx->state[3] = SHA512_H3;
-+	sctx->state[4] = SHA512_H4;
-+	sctx->state[5] = SHA512_H5;
-+	sctx->state[6] = SHA512_H6;
-+	sctx->state[7] = SHA512_H7;
-+	sctx->count[0] = sctx->count[1] = 0;
++	sctx->state[0] = SHA1_H0;
++	sctx->state[1] = SHA1_H1;
++	sctx->state[2] = SHA1_H2;
++	sctx->state[3] = SHA1_H3;
++	sctx->state[4] = SHA1_H4;
++	sctx->count = 0;
 +
 +	return 0;
 +}
 +
-+static int octeon_sha384_init(struct shash_desc *desc)
++static void __octeon_sha1_update(struct sha1_state *sctx, const u8 *data,
++				 unsigned int len)
 +{
-+	struct sha512_state *sctx = shash_desc_ctx(desc);
++	unsigned int partial;
++	unsigned int done;
++	const u8 *src;
 +
-+	sctx->state[0] = SHA384_H0;
-+	sctx->state[1] = SHA384_H1;
-+	sctx->state[2] = SHA384_H2;
-+	sctx->state[3] = SHA384_H3;
-+	sctx->state[4] = SHA384_H4;
-+	sctx->state[5] = SHA384_H5;
-+	sctx->state[6] = SHA384_H6;
-+	sctx->state[7] = SHA384_H7;
-+	sctx->count[0] = sctx->count[1] = 0;
++	partial = sctx->count % SHA1_BLOCK_SIZE;
++	sctx->count += len;
++	done = 0;
++	src = data;
 +
-+	return 0;
-+}
++	if ((partial + len) >= SHA1_BLOCK_SIZE) {
++		if (partial) {
++			done = -partial;
++			memcpy(sctx->buffer + partial, data,
++			       done + SHA1_BLOCK_SIZE);
++			src = sctx->buffer;
++		}
 +
-+static void __octeon_sha512_update(struct sha512_state *sctx, const u8 *data,
-+				   unsigned int len)
-+{
-+	unsigned int part_len;
-+	unsigned int index;
-+	unsigned int i;
++		do {
++			octeon_sha1_transform(src);
++			done += SHA1_BLOCK_SIZE;
++			src = data + done;
++		} while (done + SHA1_BLOCK_SIZE <= len);
 +
-+	/* Compute number of bytes mod 128. */
-+	index = sctx->count[0] % SHA512_BLOCK_SIZE;
-+
-+	/* Update number of bytes. */
-+	if ((sctx->count[0] += len) < len)
-+		sctx->count[1]++;
-+
-+	part_len = SHA512_BLOCK_SIZE - index;
-+
-+	/* Transform as many times as possible. */
-+	if (len >= part_len) {
-+		memcpy(&sctx->buf[index], data, part_len);
-+		octeon_sha512_transform(sctx->buf);
-+
-+		for (i = part_len; i + SHA512_BLOCK_SIZE <= len;
-+			i += SHA512_BLOCK_SIZE)
-+			octeon_sha512_transform(&data[i]);
-+
-+		index = 0;
-+	} else {
-+		i = 0;
++		partial = 0;
 +	}
-+
-+	/* Buffer remaining input. */
-+	memcpy(&sctx->buf[index], &data[i], len - i);
++	memcpy(sctx->buffer + partial, src, len - done);
 +}
 +
-+static int octeon_sha512_update(struct shash_desc *desc, const u8 *data,
-+				unsigned int len)
++static int octeon_sha1_update(struct shash_desc *desc, const u8 *data,
++			unsigned int len)
 +{
-+	struct sha512_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state *sctx = shash_desc_ctx(desc);
 +	struct octeon_cop2_state state;
 +	unsigned long flags;
 +
 +	/*
-+	 * Small updates never reach the crypto engine, so the generic sha512 is
++	 * Small updates never reach the crypto engine, so the generic sha1 is
 +	 * faster because of the heavyweight octeon_crypto_enable() /
 +	 * octeon_crypto_disable().
 +	 */
-+	if ((sctx->count[0] % SHA512_BLOCK_SIZE) + len < SHA512_BLOCK_SIZE)
-+		return crypto_sha512_update(desc, data, len);
++	if ((sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
++		return crypto_sha1_update(desc, data, len);
 +
 +	flags = octeon_crypto_enable(&state);
-+	octeon_sha512_store_hash(sctx);
++	octeon_sha1_store_hash(sctx);
 +
-+	__octeon_sha512_update(sctx, data, len);
++	__octeon_sha1_update(sctx, data, len);
 +
-+	octeon_sha512_read_hash(sctx);
++	octeon_sha1_read_hash(sctx);
 +	octeon_crypto_disable(&state, flags);
 +
 +	return 0;
 +}
 +
-+static int octeon_sha512_final(struct shash_desc *desc, u8 *hash)
++static int octeon_sha1_final(struct shash_desc *desc, u8 *out)
 +{
-+	struct sha512_state *sctx = shash_desc_ctx(desc);
-+	static u8 padding[128] = { 0x80, };
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	static const u8 padding[64] = { 0x80, };
 +	struct octeon_cop2_state state;
-+	__be64 *dst = (__be64 *)hash;
++	__be32 *dst = (__be32 *)out;
 +	unsigned int pad_len;
 +	unsigned long flags;
 +	unsigned int index;
-+	__be64 bits[2];
++	__be64 bits;
 +	int i;
 +
 +	/* Save number of bits. */
-+	bits[1] = cpu_to_be64(sctx->count[0] << 3);
-+	bits[0] = cpu_to_be64(sctx->count[1] << 3 | sctx->count[0] >> 61);
++	bits = cpu_to_be64(sctx->count << 3);
 +
-+	/* Pad out to 112 mod 128. */
-+	index = sctx->count[0] & 0x7f;
-+	pad_len = (index < 112) ? (112 - index) : ((128+112) - index);
++	/* Pad out to 56 mod 64. */
++	index = sctx->count & 0x3f;
++	pad_len = (index < 56) ? (56 - index) : ((64+56) - index);
 +
 +	flags = octeon_crypto_enable(&state);
-+	octeon_sha512_store_hash(sctx);
++	octeon_sha1_store_hash(sctx);
 +
-+	__octeon_sha512_update(sctx, padding, pad_len);
++	__octeon_sha1_update(sctx, padding, pad_len);
 +
 +	/* Append length (before padding). */
-+	__octeon_sha512_update(sctx, (const u8 *)bits, sizeof(bits));
++	__octeon_sha1_update(sctx, (const u8 *)&bits, sizeof(bits));
 +
-+	octeon_sha512_read_hash(sctx);
++	octeon_sha1_read_hash(sctx);
 +	octeon_crypto_disable(&state, flags);
 +
-+	/* Store state in digest. */
-+	for (i = 0; i < 8; i++)
-+		dst[i] = cpu_to_be64(sctx->state[i]);
++	/* Store state in digest */
++	for (i = 0; i < 5; i++)
++		dst[i] = cpu_to_be32(sctx->state[i]);
 +
 +	/* Zeroize sensitive information. */
-+	memset(sctx, 0, sizeof(struct sha512_state));
++	memset(sctx, 0, sizeof(*sctx));
 +
 +	return 0;
 +}
 +
-+static int octeon_sha384_final(struct shash_desc *desc, u8 *hash)
++static int octeon_sha1_export(struct shash_desc *desc, void *out)
 +{
-+	u8 D[64];
++	struct sha1_state *sctx = shash_desc_ctx(desc);
 +
-+	octeon_sha512_final(desc, D);
-+
-+	memcpy(hash, D, 48);
-+	memzero_explicit(D, 64);
-+
++	memcpy(out, sctx, sizeof(*sctx));
 +	return 0;
 +}
 +
-+static struct shash_alg octeon_sha512_algs[2] = { {
-+	.digestsize	=	SHA512_DIGEST_SIZE,
-+	.init		=	octeon_sha512_init,
-+	.update		=	octeon_sha512_update,
-+	.final		=	octeon_sha512_final,
-+	.descsize	=	sizeof(struct sha512_state),
-+	.base		=	{
-+		.cra_name	=	"sha512",
-+		.cra_driver_name=	"octeon-sha512",
-+		.cra_priority	=	OCTEON_CR_OPCODE_PRIORITY,
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA512_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
-+}, {
-+	.digestsize	=	SHA384_DIGEST_SIZE,
-+	.init		=	octeon_sha384_init,
-+	.update		=	octeon_sha512_update,
-+	.final		=	octeon_sha384_final,
-+	.descsize	=	sizeof(struct sha512_state),
-+	.base		=	{
-+		.cra_name	=	"sha384",
-+		.cra_driver_name=	"octeon-sha384",
-+		.cra_priority	=	OCTEON_CR_OPCODE_PRIORITY,
-+		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	=	SHA384_BLOCK_SIZE,
-+		.cra_module	=	THIS_MODULE,
-+	}
-+} };
++static int octeon_sha1_import(struct shash_desc *desc, const void *in)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
 +
-+static int __init octeon_sha512_mod_init(void)
++	memcpy(sctx, in, sizeof(*sctx));
++	return 0;
++}
++
++static struct shash_alg octeon_sha1_alg = {
++	.digestsize	=	SHA1_DIGEST_SIZE,
++	.init		=	octeon_sha1_init,
++	.update		=	octeon_sha1_update,
++	.final		=	octeon_sha1_final,
++	.export		=	octeon_sha1_export,
++	.import		=	octeon_sha1_import,
++	.descsize	=	sizeof(struct sha1_state),
++	.statesize	=	sizeof(struct sha1_state),
++	.base		=	{
++		.cra_name	=	"sha1",
++		.cra_driver_name=	"octeon-sha1",
++		.cra_priority	=	OCTEON_CR_OPCODE_PRIORITY,
++		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=	SHA1_BLOCK_SIZE,
++		.cra_module	=	THIS_MODULE,
++	}
++};
++
++static int __init octeon_sha1_mod_init(void)
 +{
 +	if (!octeon_has_crypto())
 +		return -ENOTSUPP;
-+	return crypto_register_shashes(octeon_sha512_algs,
-+				       ARRAY_SIZE(octeon_sha512_algs));
++	return crypto_register_shash(&octeon_sha1_alg);
 +}
 +
-+static void __exit octeon_sha512_mod_fini(void)
++static void __exit octeon_sha1_mod_fini(void)
 +{
-+	crypto_unregister_shashes(octeon_sha512_algs,
-+				  ARRAY_SIZE(octeon_sha512_algs));
++	crypto_unregister_shash(&octeon_sha1_alg);
 +}
 +
-+module_init(octeon_sha512_mod_init);
-+module_exit(octeon_sha512_mod_fini);
++module_init(octeon_sha1_mod_init);
++module_exit(octeon_sha1_mod_fini);
 +
 +MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("SHA-512 and SHA-384 Secure Hash Algorithms (OCTEON)");
++MODULE_DESCRIPTION("SHA1 Secure Hash Algorithm (OCTEON)");
 +MODULE_AUTHOR("Aaro Koskinen <aaro.koskinen@iki.fi>");
 -- 
 2.2.0
