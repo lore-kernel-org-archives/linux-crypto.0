@@ -1,50 +1,101 @@
-From: sri sowj <srisowj4linux@gmail.com>
-Subject: tcrypt.ko module usage
-Date: Sun, 8 Mar 2015 14:32:53 +0530
-Message-ID: <CAHTT9VK5+AEGv1nbi5des3coux=6cW1Qukr4Zzep0QzYj0XJCQ@mail.gmail.com>
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
+Subject: [PATCH v2] crypto: omap-sham: Check for return value from pm_runtime_get_sync
+Date: Sun,  8 Mar 2015 11:01:01 +0100
+Message-ID: <1425808861-17004-1-git-send-email-pali.rohar@gmail.com>
+References: <1424958600-18881-5-git-send-email-pali.rohar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Pavel Machek <pavel@ucw.cz>, Nishanth Menon <nm@ti.com>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Sebastian Reichel <sre@kernel.org>,
+	=?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
+To: =?UTF-8?q?Beno=C3=AEt=20Cousson?= <bcousson@baylibre.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Russell King <linux@arm.linux.org.uk>,
+	Paul Walmsley <paul@pwsan.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f170.google.com ([209.85.192.170]:38849 "EHLO
-	mail-pd0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751616AbbCHJCy (ORCPT
+Received: from mail-we0-f181.google.com ([74.125.82.181]:39490 "EHLO
+	mail-we0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751368AbbCHKBQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 8 Mar 2015 05:02:54 -0400
-Received: by pdbfl12 with SMTP id fl12so55991755pdb.5
-        for <linux-crypto@vger.kernel.org>; Sun, 08 Mar 2015 01:02:53 -0800 (PST)
+	Sun, 8 Mar 2015 06:01:16 -0400
+In-Reply-To: <1424958600-18881-5-git-send-email-pali.rohar@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-HI All,
+=46unction pm_runtime_get_sync could fail and we need to check return
+value to prevent kernel crash.
 
+Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
+---
+v2: Check return value for all pm_runtime_get_sync() calls
+---
+ drivers/crypto/omap-sham.c |   23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-As I understand tcrypt.ko module purpose is to test different crypto
-algorithm from the kenrel space. Please can some one help me with
-below queries to understand tcrypt use cases.
-
-#1:If one need to test crypto algorithms with under laying crypto
-Hardware engine  using tcrypto module ,is there any method or
-procedure needs to be followed to hook crypto hardware engine with
-tcrypt module?
-
-As per my understanding its very much straight forward,like if i need
-to test aes algorithm then it will be some thing like  "insmod
-tcrypt.ko mode = 10"
-
-#2: Is there any way to test tcrypt module for some scenarios like
-       2.a:concurrency scenario where multiple processes/threads try
-to send a request for same algorithm
-       2.b:multiple requests with a same tfm object
-       2.c:back logged message scenarios like multiple methods will be
-sent for processing while crypto engine is serving a request from same
-tfm object
-
-#3:Is there any significance with
-"CONFIG_CRYPTO_MANAGER_DISABLE_TESTS" Flag? ,Because when I disable
-this flags I observed that tcrypt module
-fails with a message like "Failed to load transform for cbc(aes): -2"
-
-
-BR,
-Srisowj
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index b20e374..c5df53d 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -362,7 +362,13 @@ static void omap_sham_copy_ready_hash(struct ahash=
+_request *req)
+=20
+ static int omap_sham_hw_init(struct omap_sham_dev *dd)
+ {
+-	pm_runtime_get_sync(dd->dev);
++	int err;
++
++	err =3D pm_runtime_get_sync(dd->dev);
++	if (err < 0) {
++		dev_err(dd->dev, "failed to get sync: %d\n", err);
++		return err;
++	}
+=20
+ 	if (!test_bit(FLAGS_INIT, &dd->flags)) {
+ 		set_bit(FLAGS_INIT, &dd->flags);
+@@ -1949,7 +1955,13 @@ static int omap_sham_probe(struct platform_devic=
+e *pdev)
+ 	dd->flags |=3D dd->pdata->flags;
+=20
+ 	pm_runtime_enable(dev);
+-	pm_runtime_get_sync(dev);
++
++	err =3D pm_runtime_get_sync(dev);
++	if (err < 0) {
++		dev_err(dev, "failed to get sync: %d\n", err);
++		goto err_pm;
++	}
++
+ 	rev =3D omap_sham_read(dd, SHA_REG_REV(dd));
+ 	pm_runtime_put_sync(&pdev->dev);
+=20
+@@ -1979,6 +1991,7 @@ err_algs:
+ 		for (j =3D dd->pdata->algs_info[i].registered - 1; j >=3D 0; j--)
+ 			crypto_unregister_ahash(
+ 					&dd->pdata->algs_info[i].algs_list[j]);
++err_pm:
+ 	pm_runtime_disable(dev);
+ 	if (dd->dma_lch)
+ 		dma_release_channel(dd->dma_lch);
+@@ -2021,7 +2034,11 @@ static int omap_sham_suspend(struct device *dev)
+=20
+ static int omap_sham_resume(struct device *dev)
+ {
+-	pm_runtime_get_sync(dev);
++	int err =3D pm_runtime_get_sync(dev);
++	if (err < 0) {
++		dev_err(dev, "failed to get sync: %d\n", err);
++		return err;
++	}
+ 	return 0;
+ }
+ #endif
+--=20
+1.7.9.5
