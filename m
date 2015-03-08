@@ -1,95 +1,329 @@
 From: Aaro Koskinen <aaro.koskinen@iki.fi>
-Subject: [PATCH 2/7] crypto: octeon - always disable preemption when using crypto engine
-Date: Sun,  8 Mar 2015 22:07:42 +0200
-Message-ID: <1425845267-14413-3-git-send-email-aaro.koskinen@iki.fi>
+Subject: [PATCH 5/7] crypto: octeon - add SHA256 module
+Date: Sun,  8 Mar 2015 22:07:45 +0200
+Message-ID: <1425845267-14413-6-git-send-email-aaro.koskinen@iki.fi>
 References: <1425845267-14413-1-git-send-email-aaro.koskinen@iki.fi>
 Cc: linux-mips@linux-mips.org, linux-kernel@vger.kernel.org,
-	Aaro Koskinen <aaro.koskinen@iki.fi>
+        Aaro Koskinen <aaro.koskinen@iki.fi>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from filtteri1.pp.htv.fi ([213.243.153.184]:57852 "EHLO
-	filtteri1.pp.htv.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751732AbbCHUIE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 8 Mar 2015 16:08:04 -0400
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Return-path: <linux-mips-bounce@linux-mips.org>
 In-Reply-To: <1425845267-14413-1-git-send-email-aaro.koskinen@iki.fi>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-mips-bounce@linux-mips.org
+Errors-to: linux-mips-bounce@linux-mips.org
+List-help: <mailto:ecartis@linux-mips.org?Subject=help>
+List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
+List-software: Ecartis version 1.0.0
+List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
+List-owner: <mailto:ralf@linux-mips.org>
+List-post: <mailto:linux-mips@linux-mips.org>
+List-archive: <http://www.linux-mips.org/archives/linux-mips/>
+List-Id: linux-crypto.vger.kernel.org
 
-Always disable preemption on behalf of the drivers when crypto engine
-is taken into use. This will simplify the usage.
+Add OCTEON SHA256 module.
 
 Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
 ---
- arch/mips/cavium-octeon/crypto/octeon-crypto.c | 4 +++-
- arch/mips/cavium-octeon/crypto/octeon-md5.c    | 4 ----
- 2 files changed, 3 insertions(+), 5 deletions(-)
+ arch/mips/cavium-octeon/crypto/Makefile        |   1 +
+ arch/mips/cavium-octeon/crypto/octeon-sha256.c | 280 +++++++++++++++++++++++++
+ 2 files changed, 281 insertions(+)
+ create mode 100644 arch/mips/cavium-octeon/crypto/octeon-sha256.c
 
-diff --git a/arch/mips/cavium-octeon/crypto/octeon-crypto.c b/arch/mips/cavium-octeon/crypto/octeon-crypto.c
-index 7c82ff4..f66bd1a 100644
---- a/arch/mips/cavium-octeon/crypto/octeon-crypto.c
-+++ b/arch/mips/cavium-octeon/crypto/octeon-crypto.c
-@@ -17,7 +17,7 @@
-  * crypto operations in calls to octeon_crypto_enable/disable in order to make
-  * sure the state of COP2 isn't corrupted if userspace is also performing
-  * hardware crypto operations. Allocate the state parameter on the stack.
-- * Preemption must be disabled to prevent context switches.
-+ * Returns with preemption disabled.
-  *
-  * @state: Pointer to state structure to store current COP2 state in.
-  *
-@@ -28,6 +28,7 @@ unsigned long octeon_crypto_enable(struct octeon_cop2_state *state)
- 	int status;
- 	unsigned long flags;
+diff --git a/arch/mips/cavium-octeon/crypto/Makefile b/arch/mips/cavium-octeon/crypto/Makefile
+index 3f671d6..47806a5 100644
+--- a/arch/mips/cavium-octeon/crypto/Makefile
++++ b/arch/mips/cavium-octeon/crypto/Makefile
+@@ -6,3 +6,4 @@ obj-y += octeon-crypto.o
  
-+	preempt_disable();
- 	local_irq_save(flags);
- 	status = read_c0_status();
- 	write_c0_status(status | ST0_CU2);
-@@ -62,5 +63,6 @@ void octeon_crypto_disable(struct octeon_cop2_state *state,
- 	else
- 		write_c0_status(read_c0_status() & ~ST0_CU2);
- 	local_irq_restore(flags);
-+	preempt_enable();
- }
- EXPORT_SYMBOL_GPL(octeon_crypto_disable);
-diff --git a/arch/mips/cavium-octeon/crypto/octeon-md5.c b/arch/mips/cavium-octeon/crypto/octeon-md5.c
-index 3dd8845..12dccdb 100644
---- a/arch/mips/cavium-octeon/crypto/octeon-md5.c
-+++ b/arch/mips/cavium-octeon/crypto/octeon-md5.c
-@@ -97,7 +97,6 @@ static int octeon_md5_update(struct shash_desc *desc, const u8 *data,
- 	memcpy((char *)mctx->block + (sizeof(mctx->block) - avail), data,
- 	       avail);
- 
--	preempt_disable();
- 	flags = octeon_crypto_enable(&state);
- 	octeon_md5_store_hash(mctx);
- 
-@@ -113,7 +112,6 @@ static int octeon_md5_update(struct shash_desc *desc, const u8 *data,
- 
- 	octeon_md5_read_hash(mctx);
- 	octeon_crypto_disable(&state, flags);
--	preempt_enable();
- 
- 	memcpy(mctx->block, data, len);
- 
-@@ -131,7 +129,6 @@ static int octeon_md5_final(struct shash_desc *desc, u8 *out)
- 
- 	*p++ = 0x80;
- 
--	preempt_disable();
- 	flags = octeon_crypto_enable(&state);
- 	octeon_md5_store_hash(mctx);
- 
-@@ -149,7 +146,6 @@ static int octeon_md5_final(struct shash_desc *desc, u8 *out)
- 
- 	octeon_md5_read_hash(mctx);
- 	octeon_crypto_disable(&state, flags);
--	preempt_enable();
- 
- 	memcpy(out, mctx->hash, sizeof(mctx->hash));
- 	memset(mctx, 0, sizeof(*mctx));
+ obj-$(CONFIG_CRYPTO_MD5_OCTEON)		+= octeon-md5.o
+ obj-$(CONFIG_CRYPTO_SHA1_OCTEON)	+= octeon-sha1.o
++obj-$(CONFIG_CRYPTO_SHA256_OCTEON)	+= octeon-sha256.o
+diff --git a/arch/mips/cavium-octeon/crypto/octeon-sha256.c b/arch/mips/cavium-octeon/crypto/octeon-sha256.c
+new file mode 100644
+index 0000000..97e96fe
+--- /dev/null
++++ b/arch/mips/cavium-octeon/crypto/octeon-sha256.c
+@@ -0,0 +1,280 @@
++/*
++ * Cryptographic API.
++ *
++ * SHA-224 and SHA-256 Secure Hash Algorithm.
++ *
++ * Adapted for OCTEON by Aaro Koskinen <aaro.koskinen@iki.fi>.
++ *
++ * Based on crypto/sha256_generic.c, which is:
++ *
++ * Copyright (c) Jean-Luc Cooke <jlcooke@certainkey.com>
++ * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>
++ * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
++ * SHA224 Support Copyright 2007 Intel Corporation <jonathan.lynch@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ */
++
++#include <linux/mm.h>
++#include <crypto/sha.h>
++#include <linux/init.h>
++#include <linux/types.h>
++#include <linux/module.h>
++#include <asm/byteorder.h>
++#include <asm/octeon/octeon.h>
++#include <crypto/internal/hash.h>
++
++#include "octeon-crypto.h"
++
++/*
++ * We pass everything as 64-bit. OCTEON can handle misaligned data.
++ */
++
++static void octeon_sha256_store_hash(struct sha256_state *sctx)
++{
++	u64 *hash = (u64 *)sctx->state;
++
++	write_octeon_64bit_hash_dword(hash[0], 0);
++	write_octeon_64bit_hash_dword(hash[1], 1);
++	write_octeon_64bit_hash_dword(hash[2], 2);
++	write_octeon_64bit_hash_dword(hash[3], 3);
++}
++
++static void octeon_sha256_read_hash(struct sha256_state *sctx)
++{
++	u64 *hash = (u64 *)sctx->state;
++
++	hash[0] = read_octeon_64bit_hash_dword(0);
++	hash[1] = read_octeon_64bit_hash_dword(1);
++	hash[2] = read_octeon_64bit_hash_dword(2);
++	hash[3] = read_octeon_64bit_hash_dword(3);
++}
++
++static void octeon_sha256_transform(const void *_block)
++{
++	const u64 *block = _block;
++
++	write_octeon_64bit_block_dword(block[0], 0);
++	write_octeon_64bit_block_dword(block[1], 1);
++	write_octeon_64bit_block_dword(block[2], 2);
++	write_octeon_64bit_block_dword(block[3], 3);
++	write_octeon_64bit_block_dword(block[4], 4);
++	write_octeon_64bit_block_dword(block[5], 5);
++	write_octeon_64bit_block_dword(block[6], 6);
++	octeon_sha256_start(block[7]);
++}
++
++static int octeon_sha224_init(struct shash_desc *desc)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++
++	sctx->state[0] = SHA224_H0;
++	sctx->state[1] = SHA224_H1;
++	sctx->state[2] = SHA224_H2;
++	sctx->state[3] = SHA224_H3;
++	sctx->state[4] = SHA224_H4;
++	sctx->state[5] = SHA224_H5;
++	sctx->state[6] = SHA224_H6;
++	sctx->state[7] = SHA224_H7;
++	sctx->count = 0;
++
++	return 0;
++}
++
++static int octeon_sha256_init(struct shash_desc *desc)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++
++	sctx->state[0] = SHA256_H0;
++	sctx->state[1] = SHA256_H1;
++	sctx->state[2] = SHA256_H2;
++	sctx->state[3] = SHA256_H3;
++	sctx->state[4] = SHA256_H4;
++	sctx->state[5] = SHA256_H5;
++	sctx->state[6] = SHA256_H6;
++	sctx->state[7] = SHA256_H7;
++	sctx->count = 0;
++
++	return 0;
++}
++
++static void __octeon_sha256_update(struct sha256_state *sctx, const u8 *data,
++				   unsigned int len)
++{
++	unsigned int partial;
++	unsigned int done;
++	const u8 *src;
++
++	partial = sctx->count % SHA256_BLOCK_SIZE;
++	sctx->count += len;
++	done = 0;
++	src = data;
++
++	if ((partial + len) >= SHA256_BLOCK_SIZE) {
++		if (partial) {
++			done = -partial;
++			memcpy(sctx->buf + partial, data,
++			       done + SHA256_BLOCK_SIZE);
++			src = sctx->buf;
++		}
++
++		do {
++			octeon_sha256_transform(src);
++			done += SHA256_BLOCK_SIZE;
++			src = data + done;
++		} while (done + SHA256_BLOCK_SIZE <= len);
++
++		partial = 0;
++	}
++	memcpy(sctx->buf + partial, src, len - done);
++}
++
++static int octeon_sha256_update(struct shash_desc *desc, const u8 *data,
++				unsigned int len)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++	struct octeon_cop2_state state;
++	unsigned long flags;
++
++	/*
++	 * Small updates never reach the crypto engine, so the generic sha256 is
++	 * faster because of the heavyweight octeon_crypto_enable() /
++	 * octeon_crypto_disable().
++	 */
++	if ((sctx->count % SHA256_BLOCK_SIZE) + len < SHA256_BLOCK_SIZE)
++		return crypto_sha256_update(desc, data, len);
++
++	flags = octeon_crypto_enable(&state);
++	octeon_sha256_store_hash(sctx);
++
++	__octeon_sha256_update(sctx, data, len);
++
++	octeon_sha256_read_hash(sctx);
++	octeon_crypto_disable(&state, flags);
++
++	return 0;
++}
++
++static int octeon_sha256_final(struct shash_desc *desc, u8 *out)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++	static const u8 padding[64] = { 0x80, };
++	struct octeon_cop2_state state;
++	__be32 *dst = (__be32 *)out;
++	unsigned int pad_len;
++	unsigned long flags;
++	unsigned int index;
++	__be64 bits;
++	int i;
++
++	/* Save number of bits. */
++	bits = cpu_to_be64(sctx->count << 3);
++
++	/* Pad out to 56 mod 64. */
++	index = sctx->count & 0x3f;
++	pad_len = (index < 56) ? (56 - index) : ((64+56) - index);
++
++	flags = octeon_crypto_enable(&state);
++	octeon_sha256_store_hash(sctx);
++
++	__octeon_sha256_update(sctx, padding, pad_len);
++
++	/* Append length (before padding). */
++	__octeon_sha256_update(sctx, (const u8 *)&bits, sizeof(bits));
++
++	octeon_sha256_read_hash(sctx);
++	octeon_crypto_disable(&state, flags);
++
++	/* Store state in digest */
++	for (i = 0; i < 8; i++)
++		dst[i] = cpu_to_be32(sctx->state[i]);
++
++	/* Zeroize sensitive information. */
++	memset(sctx, 0, sizeof(*sctx));
++
++	return 0;
++}
++
++static int octeon_sha224_final(struct shash_desc *desc, u8 *hash)
++{
++	u8 D[SHA256_DIGEST_SIZE];
++
++	octeon_sha256_final(desc, D);
++
++	memcpy(hash, D, SHA224_DIGEST_SIZE);
++	memzero_explicit(D, SHA256_DIGEST_SIZE);
++
++	return 0;
++}
++
++static int octeon_sha256_export(struct shash_desc *desc, void *out)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++
++	memcpy(out, sctx, sizeof(*sctx));
++	return 0;
++}
++
++static int octeon_sha256_import(struct shash_desc *desc, const void *in)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++
++	memcpy(sctx, in, sizeof(*sctx));
++	return 0;
++}
++
++static struct shash_alg octeon_sha256_algs[2] = { {
++	.digestsize	=	SHA256_DIGEST_SIZE,
++	.init		=	octeon_sha256_init,
++	.update		=	octeon_sha256_update,
++	.final		=	octeon_sha256_final,
++	.export		=	octeon_sha256_export,
++	.import		=	octeon_sha256_import,
++	.descsize	=	sizeof(struct sha256_state),
++	.statesize	=	sizeof(struct sha256_state),
++	.base		=	{
++		.cra_name	=	"sha256",
++		.cra_driver_name=	"octeon-sha256",
++		.cra_priority	=	OCTEON_CR_OPCODE_PRIORITY,
++		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=	SHA256_BLOCK_SIZE,
++		.cra_module	=	THIS_MODULE,
++	}
++}, {
++	.digestsize	=	SHA224_DIGEST_SIZE,
++	.init		=	octeon_sha224_init,
++	.update		=	octeon_sha256_update,
++	.final		=	octeon_sha224_final,
++	.descsize	=	sizeof(struct sha256_state),
++	.base		=	{
++		.cra_name	=	"sha224",
++		.cra_driver_name=	"octeon-sha224",
++		.cra_flags	=	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=	SHA224_BLOCK_SIZE,
++		.cra_module	=	THIS_MODULE,
++	}
++} };
++
++static int __init octeon_sha256_mod_init(void)
++{
++	if (!octeon_has_crypto())
++		return -ENOTSUPP;
++	return crypto_register_shashes(octeon_sha256_algs,
++				       ARRAY_SIZE(octeon_sha256_algs));
++}
++
++static void __exit octeon_sha256_mod_fini(void)
++{
++	crypto_unregister_shashes(octeon_sha256_algs,
++				  ARRAY_SIZE(octeon_sha256_algs));
++}
++
++module_init(octeon_sha256_mod_init);
++module_exit(octeon_sha256_mod_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("SHA-224 and SHA-256 Secure Hash Algorithm (OCTEON)");
++MODULE_AUTHOR("Aaro Koskinen <aaro.koskinen@iki.fi>");
 -- 
 2.2.0
