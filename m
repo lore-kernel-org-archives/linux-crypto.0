@@ -1,73 +1,58 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH RESEND 0/2] crypto: algif - change algif_skcipher to be asynchronous
-Date: Sun, 08 Mar 2015 12:20:47 +0100
-Message-ID: <2623212.v9KkTj4KSQ@tachyon.chronox.de>
-References: <20150227193538.10553.6144.stgit@tstruk-mobl1>
+From: Paul Walmsley <paul-DWxLp4Yu+b8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 00/10] omap3 crypto fixes
+Date: Sun, 8 Mar 2015 16:35:13 +0000 (UTC)
+Message-ID: <alpine.DEB.2.02.1503081633300.20994@utopia.booyaka.com>
+References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com> <20150306183631.GA13520@atomide.com> <20150306222306.GB587@fuloong-minipc.musicnaut.iki.fi> <201503081101.37452@pali>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, qat-linux@intel.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:45957 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751932AbbCHLVE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 8 Mar 2015 07:21:04 -0400
-In-Reply-To: <20150227193538.10553.6144.stgit@tstruk-mobl1>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: MULTIPART/MIXED; BOUNDARY="843723315-361176072-1425832513=:20994"
+Cc: Aaro Koskinen <aaro.koskinen-X3B1VOXEql0@public.gmane.org>,
+	Tony Lindgren <tony-4v6yS6AI5VpBDgjK7y7TUQ@public.gmane.org>,
+	=?ISO-8859-15?Q?Beno=EEt_Cousson?= <bcousson-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
+	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Russell King <linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>, Nishanth Menon <nm-l0cyMroinI0@public.gmane.org>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Sebastian Reichel <sre-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+To: =?ISO-8859-15?Q?Pali_Roh=E1r?= <pali.rohar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <201503081101.37452@pali>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 27. Februar 2015, 11:35:38 schrieb Tadeusz Struk:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Hi Tadeusz,
+--843723315-361176072-1425832513=:20994
+Content-Type: TEXT/PLAIN; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 
-> The way the algif_skcipher works currently is that on sendmsg/sendpage it
-> builds an sgl for the input data and then on read/recvmsg it sends the job
-> for encryption putting the user to sleep till the data is processed.
-> This way it can only handle one job at a given time.
-> To be able to fuly utilize the potential of existing crypto hardware
-> accelerators it is required to submit multiple jobs in asynchronously.
-> This series adds support for asynchronous operations for algif_skcipher.
-> First patch enables af_alg sgl to be linked.
-> Second patch implement asynch read for skcipher.
-> 
-> Resend with updates for 4.0
+On Sun, 8 Mar 2015, Pali Roh=C3=A1r wrote:
 
-As you may know, I am working on libkcapi [1] to cover the user space AF_ALG 
-interface and provide an easy-to use interface for applications.
+> On Friday 06 March 2015 23:23:06 Aaro Koskinen wrote:
+> > On Fri, Mar 06, 2015 at 10:36:32AM -0800, Tony Lindgren wrote:
+> > > Are there any fixes in this series that should go into
+> > > v4.0-rc series, or can it all wait for v4.1?
+> >=20
+> > I think these all should wait for v4.1.
+> >=20
+> > A.
+>=20
+> I would suggest to include at least patches 01, 04, 06. Probably=20
+> those could go to -stable tree... but this decision is up to you.
 
-I am now trying to cover your interface proposal there and also measure the 
-speed of it. What bothers me currently is the following: how would I be able 
-to detect whether the implemented support is available in the current kernel?
-
-For the different AF_ALG interfaces (like the recently added AEAD), I can 
-detect missing support at the time I call the socket() syscall. Thus, the 
-application knows right from the start whether we have the requested support.
-
-But for the AIO interface, how can I detect that at runtime at a time an 
-application can reasonably catch a missing support?
-
-[1] http://www.chronox.de/libkcapi.html
-> 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
-> ---
-> Tadeusz Struk (2):
->       crypto: af_alg - Allow to link sgl
->       crypto: algif - change algif_skcipher to be asynchronous
-> 
-> 
->  crypto/af_alg.c         |   18 ++-
->  crypto/algif_skcipher.c |  308
-> ++++++++++++++++++++++++++++++++++++++++++++++- include/crypto/if_alg.h |  
->  4 -
->  3 files changed, 317 insertions(+), 13 deletions(-)
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I'm not sure patch 1 is a fix.  As far as I know we haven't=20
+run into any issues with it on real hardware - only on QEMU - unless you=20
+know otherwise, Pali?  Are we sure that the QEMU model behavior matches=20
+the hardware?
 
 
--- 
-Ciao
-Stephan
+- Paul
+--843723315-361176072-1425832513=:20994--
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
