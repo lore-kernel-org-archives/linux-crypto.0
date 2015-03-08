@@ -1,58 +1,59 @@
-From: Paul Walmsley <paul-DWxLp4Yu+b8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 00/10] omap3 crypto fixes
-Date: Sun, 8 Mar 2015 16:35:13 +0000 (UTC)
-Message-ID: <alpine.DEB.2.02.1503081633300.20994@utopia.booyaka.com>
-References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com> <20150306183631.GA13520@atomide.com> <20150306222306.GB587@fuloong-minipc.musicnaut.iki.fi> <201503081101.37452@pali>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] crypto: AES-NI: fix memory usage in GCM decryption
+Date: Sun, 08 Mar 2015 19:49:58 +0100
+Message-ID: <22281096.OZkxDCz0xu@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="843723315-361176072-1425832513=:20994"
-Cc: Aaro Koskinen <aaro.koskinen-X3B1VOXEql0@public.gmane.org>,
-	Tony Lindgren <tony-4v6yS6AI5VpBDgjK7y7TUQ@public.gmane.org>,
-	=?ISO-8859-15?Q?Beno=EEt_Cousson?= <bcousson-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
-	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Russell King <linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>, Nishanth Menon <nm-l0cyMroinI0@public.gmane.org>,
-	Ivaylo Dimitrov <ivo.g.dimitrov.75-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Sebastian Reichel <sre-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-To: =?ISO-8859-15?Q?Pali_Roh=E1r?= <pali.rohar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <201503081101.37452@pali>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
+	'Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:45965 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752301AbbCHSuC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 8 Mar 2015 14:50:02 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+The RFC4106 GCM decryption operation tries to overwrite cryptlen memory
+in req->dst. As the destination buffer for decryption only needs to hold
+the plaintext memory but cryptlen references the input buffer holding
+(ciphertext || authentication tag), the assumption of the destination
+buffer length in RFC4106 GCM operation leads to a too large size.
 
---843723315-361176072-1425832513=:20994
-Content-Type: TEXT/PLAIN; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+This patch simply subtracts the authentication tag size from cryptlen.
+The kernel crypto API logic requires the caller to provide the
+length of (ciphertext || authentication tag) as cryptlen for the
+AEAD decryption operation. Thus, the cipher implementation must
+caculate the size of the plaintext output itself and cannot simply use
+cryptlen.
 
-On Sun, 8 Mar 2015, Pali Roh=C3=A1r wrote:
+Note, this fixes a kernel crash that can be triggered from user space
+via AF_ALG(aead)  without it (simply use the libkcapi test application
+from [1] and update it to use rfc4106-gcm-aes).
 
-> On Friday 06 March 2015 23:23:06 Aaro Koskinen wrote:
-> > On Fri, Mar 06, 2015 at 10:36:32AM -0800, Tony Lindgren wrote:
-> > > Are there any fixes in this series that should go into
-> > > v4.0-rc series, or can it all wait for v4.1?
-> >=20
-> > I think these all should wait for v4.1.
-> >=20
-> > A.
->=20
-> I would suggest to include at least patches 01, 04, 06. Probably=20
-> those could go to -stable tree... but this decision is up to you.
+[1] http://www.chronox.de/libkcapi.html
 
-I'm not sure patch 1 is a fix.  As far as I know we haven't=20
-run into any issues with it on real hardware - only on QEMU - unless you=20
-know otherwise, Pali?  Are we sure that the QEMU model behavior matches=20
-the hardware?
+CC: Tadeusz Struk <tadeusz.struk@intel.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ arch/x86/crypto/aesni-intel_glue.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-
-- Paul
---843723315-361176072-1425832513=:20994--
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 6893f49..8f7900e8 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -1160,7 +1160,8 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
+ 		scatterwalk_done(&src_sg_walk, 0, 0);
+ 		scatterwalk_done(&assoc_sg_walk, 0, 0);
+ 	} else {
+-		scatterwalk_map_and_copy(dst, req->dst, 0, req->cryptlen, 1);
++		scatterwalk_map_and_copy(dst, req->dst, 0,
++					 (req->cryptlen - auth_tag_len), 1);
+ 		kfree(src);
+ 	}
+ 	return retval;
+-- 
+2.1.0
