@@ -1,47 +1,43 @@
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH v2] crypto: omap-sham: Check for return value from
- pm_runtime_get_sync
-Date: Mon, 9 Mar 2015 21:52:58 +0100
-Message-ID: <20150309205259.GA11826@amd>
-References: <1424958600-18881-5-git-send-email-pali.rohar@gmail.com>
- <1425808861-17004-1-git-send-email-pali.rohar@gmail.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH v2 0/2] crypto: algif - change algif_skcipher to be
+ asynchronous
+Date: Mon, 09 Mar 2015 13:55:14 -0700
+Message-ID: <20150309205514.9648.701.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: =?iso-8859-1?Q?Beno=EEt?= Cousson <bcousson@baylibre.com>,
-	Tony Lindgren <tony@atomide.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Russell King <linux@arm.linux.org.uk>,
-	Paul Walmsley <paul@pwsan.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Nishanth Menon <nm@ti.com>,
-	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Sebastian Reichel <sre@kernel.org>
-To: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	qat-linux@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:36357 "EHLO
-	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754110AbbCIUxT (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Mar 2015 16:53:19 -0400
-Content-Disposition: inline
-In-Reply-To: <1425808861-17004-1-git-send-email-pali.rohar@gmail.com>
+Received: from mga14.intel.com ([192.55.52.115]:29281 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752337AbbCIU7L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Mar 2015 16:59:11 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun 2015-03-08 11:01:01, Pali Roh=E1r wrote:
-> Function pm_runtime_get_sync could fail and we need to check return
-> value to prevent kernel crash.
->=20
-> Signed-off-by: Pali Roh=E1r <pali.rohar@gmail.com>
+The way the algif_skcipher works currently is that on sendmsg/sendpage it
+builds an sgl for the input data and then on read/recvmsg it sends the job
+for encryption putting the user to sleep till the data is processed.
+This way it can only handle one job at a given time.
+To be able to fuly utilize the potential of existing crypto hardware
+accelerators it is required to submit multiple jobs in asynchronously.
+This series adds support for asynchronous operations for algif_skcipher.
+First patch enables af_alg sgl to be linked.
+Second patch implement asynch read for skcipher.
 
-Acked-by: Pavel Machek <pavel@ucw.cz>
+Changes in v2:
+ - Use kmalloc instead of caches
 
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses=
-/blog.html
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+Tadeusz Struk (2):
+      crypto: af_alg - Allow to link sgl
+      crypto: algif - change algif_skcipher to be asynchronous
+
+
+ crypto/af_alg.c         |   18 +++-
+ crypto/algif_skcipher.c |  233 ++++++++++++++++++++++++++++++++++++++++++++++-
+ include/crypto/if_alg.h |    4 +
+ 3 files changed, 242 insertions(+), 13 deletions(-)
