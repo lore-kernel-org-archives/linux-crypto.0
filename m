@@ -1,68 +1,52 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH 2/2] crypto: talitos: Add AES-XTS Support
-Date: Mon, 9 Mar 2015 11:22:31 +0200
-Message-ID: <54FD6657.9000703@freescale.com>
-References: <1424451610-5786-1-git-send-email-mort@bork.org>
-	<1424451610-5786-3-git-send-email-mort@bork.org>
-	<20150305181615.493b173d43249548fae29203@freescale.com>
-	<CAJUS3XmfcJCiBMnsiXKpc=QXE-YxTQy67wZyAXgKjtY_DN0CDQ@mail.gmail.com>
- <20150306191617.bbc38506ae2242dc20fdfee4@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [V3 PATCH 0/2]  fix some CAAM warnings.
+Date: Mon, 9 Mar 2015 21:07:31 +1100
+Message-ID: <20150309100731.GA4452@gondor.apana.org.au>
+References: <1425609282-16568-1-git-send-email-yanjiang.jin@windriver.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Scott Wood <scottwood@freescale.com>,
-	Kumar Gala <galak@kernel.crashing.org>,
-	<linuxppc-dev@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>
-To: Kim Phillips <kim.phillips@freescale.com>,
-	Martin Hicks <mort@bork.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: horia.geanta@freescale.com, davem@davemloft.net,
+	kim.phillips@freescale.com, ruchika.gupta@freescale.com,
+	cristian.stoica@freescale.com, NiteshNarayanLal@freescale.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	jinyanjiang@gmail.com
+To: yanjiang.jin@windriver.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0143.outbound.protection.outlook.com ([65.55.169.143]:29212
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753685AbbCIJWt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Mar 2015 05:22:49 -0400
-In-Reply-To: <20150306191617.bbc38506ae2242dc20fdfee4@freescale.com>
+Received: from ringil.hengli.com.au ([178.18.16.133]:34002 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753449AbbCIKHn (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Mar 2015 06:07:43 -0400
+Content-Disposition: inline
+In-Reply-To: <1425609282-16568-1-git-send-email-yanjiang.jin@windriver.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 3/7/2015 3:16 AM, Kim Phillips wrote:
-> On Fri, 6 Mar 2015 11:49:43 -0500
-> Martin Hicks <mort@bork.org> wrote:
+On Fri, Mar 06, 2015 at 10:34:40AM +0800, yanjiang.jin@windriver.com wrote:
+> From: Yanjiang Jin <yanjiang.jin@windriver.com>
 > 
->> On Thu, Mar 5, 2015 at 7:16 PM, Kim Phillips <kim.phillips@freescale.com> wrote:
->>> On Fri, 20 Feb 2015 12:00:10 -0500
->>> Martin Hicks <mort@bork.org> wrote:
->>>
->>>> The newer talitos hardware has support for AES in XTS mode.
->>>
->>> Assuming it's the same thing, AES-XCBC gets added with SEC v3.0
->>> h/w.  Assuming hw_supports() doesn't already support this algorithm
->>
->> AES-XCBC isn't the same thing as AES-XTS.
+> Hi,
 > 
-> Thanks.
+> This patch series fix some CAAM compile and runtime warnings.
 > 
->>> combination (technically via the mode bit), this needs to be
->>> reflected in the patch so the driver doesn't think SEC 2.x devices
->>> can do XTS, too.
->>
->> Right.  I hadn't looked into how exactly hw_supports() works.  It only
->> indicates which execution units are present (in this case the AES
->> unit).  I actually think XTS gets introduced in SEC v3.3.2.  I also
->> have an MPC8379 (sec3.3) and it does not have XTS.
->>
->> Can you look internally to find out in which hardware it was
->> introduced?  Is there a SEC 3.3.1 that also has XTS?
+> I have tested this on fsl-p5020ds board using upstream 4.0.0-rc2 with the below configs:
 > 
-> later MPC8315Es had a SEC v3.3.1, but AFAICT, it doesn't support
-> XTS, so, yes, it's likely v3.3.2 and above (if any).
+> CONFIG_DMA_API_DEBUG=y
+> # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+> 
+> Change log:
+> v3:
+> 
+> 0001-crypto-caamhash-fix-uninitialized-edesc-sec4_sg_byte.patch is same as before.
+> 
+> For 0002-crypto-caam_rng-fix-rng_unmap_ctx-s-DMA_UNMAP-size-p.patch
+> 1. Fix an alignment issue;
+> 2. update DESC_RNG_LEN to (4 * CAAM_CMD_SZ).
+> 
+> Abandon the v2 patch 0001-crypto-caam-fix-some-compile-warnings.patch.
 
-There's a public application note on freescale.com:
-"AN3645 - SEC 2x/3x Descriptor Programmer's Guide" (Rev.3/2010)
-
-"Table 4 - EUs Supported in Each SEC Version" summarizes which
-algorithms / modes are supported for every talitos version.
-Unfortunately this goes up to SEC 3.3.1.
-Since XTS doesn't show up, 3.3.2 would be the first supporting it.
-
-Horia
+All applied.  Thanks
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
