@@ -1,66 +1,47 @@
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: [PATCH] crypto: amcc: remove incorrect __init/__exit markups
-Date: Mon, 9 Mar 2015 13:35:39 -0700
-Message-ID: <20150309203539.GA11240@dtor-ws>
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH v2] crypto: omap-sham: Check for return value from
+ pm_runtime_get_sync
+Date: Mon, 9 Mar 2015 21:52:58 +0100
+Message-ID: <20150309205259.GA11826@amd>
+References: <1424958600-18881-5-git-send-email-pali.rohar@gmail.com>
+ <1425808861-17004-1-git-send-email-pali.rohar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: =?iso-8859-1?Q?Beno=EEt?= Cousson <bcousson@baylibre.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Russell King <linux@arm.linux.org.uk>,
+	Paul Walmsley <paul@pwsan.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Nishanth Menon <nm@ti.com>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Sebastian Reichel <sre@kernel.org>
+To: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f179.google.com ([209.85.223.179]:38578 "EHLO
-	mail-ie0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753107AbbCIUfn (ORCPT
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:36357 "EHLO
+	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754110AbbCIUxT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Mar 2015 16:35:43 -0400
+	Mon, 9 Mar 2015 16:53:19 -0400
 Content-Disposition: inline
+In-Reply-To: <1425808861-17004-1-git-send-email-pali.rohar@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Even if bus is not hot-pluggable, the devices can be bound and unbound
-from the driver via sysfs, so we should not be using __init/__exit
-annotations on probe() and remove() methods. The only exception is
-drivers registered with platform_driver_probe() which specifically
-disables sysfs bind/unbind attributes.
+On Sun 2015-03-08 11:01:01, Pali Roh=E1r wrote:
+> Function pm_runtime_get_sync could fail and we need to check return
+> value to prevent kernel crash.
+>=20
+> Signed-off-by: Pali Roh=E1r <pali.rohar@gmail.com>
 
-Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
----
- drivers/crypto/amcc/crypto4xx_core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Acked-by: Pavel Machek <pavel@ucw.cz>
 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index d02b771..3b28e8c 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -1155,7 +1155,7 @@ struct crypto4xx_alg_common crypto4xx_alg[] = {
- /**
-  * Module Initialization Routine
-  */
--static int __init crypto4xx_probe(struct platform_device *ofdev)
-+static int crypto4xx_probe(struct platform_device *ofdev)
- {
- 	int rc;
- 	struct resource res;
-@@ -1263,7 +1263,7 @@ err_alloc_dev:
- 	return rc;
- }
- 
--static int __exit crypto4xx_remove(struct platform_device *ofdev)
-+static int crypto4xx_remove(struct platform_device *ofdev)
- {
- 	struct device *dev = &ofdev->dev;
- 	struct crypto4xx_core_device *core_dev = dev_get_drvdata(dev);
-@@ -1291,7 +1291,7 @@ static struct platform_driver crypto4xx_driver = {
- 		.of_match_table = crypto4xx_match,
- 	},
- 	.probe		= crypto4xx_probe,
--	.remove		= __exit_p(crypto4xx_remove),
-+	.remove		= crypto4xx_remove,
- };
- 
- module_platform_driver(crypto4xx_driver);
--- 
-2.2.0.rc0.207.ga3a616c
-
-
--- 
-Dmitry
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses=
+/blog.html
