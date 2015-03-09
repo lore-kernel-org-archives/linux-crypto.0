@@ -1,98 +1,74 @@
-From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH] crypto: tcrypt - fix uninit sg entries in test_acipher_speed
-Date: Mon, 9 Mar 2015 16:14:58 +0200
-Message-ID: <1425910498-9174-1-git-send-email-horia.geanta@freescale.com>
+From: Martin Hicks <mort@bork.org>
+Subject: Re: [PATCH 0/2] crypto: talitos: Add AES-XTS mode
+Date: Mon, 9 Mar 2015 11:08:42 -0400
+Message-ID: <CAJUS3XkY0tbYqBbU5HR7NT63UPFi5DO6XWuymbZnQaJEA5kkBw@mail.gmail.com>
+References: <1424451610-5786-1-git-send-email-mort@bork.org>
+	<54F464E4.8080204@freescale.com>
+	<54F475A8.6030105@gmail.com>
+	<20150302220923.GC30523@darwin.bork.org>
+	<54F5D6D5.8070407@freescale.com>
+	<CAJUS3Xnw66Eu6tvGPpdcet6KLjhKM=ptj8NRaztAVr0h_r+LqQ@mail.gmail.com>
+	<54FD72E4.1060701@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Cristian Stoica <cristian.stoica@freescale.com>,
-	Kim Phillips <kim.phillips@freescale.com>
-To: <linux-crypto@vger.kernel.org>,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-crypto@vger.kernel.org, Scott Wood <scottwood@freescale.com>,
+	linuxppc-dev@lists.ozlabs.org, Milan Broz <gmazyland@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
+To: =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0115.outbound.protection.outlook.com ([65.55.169.115]:36208
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753546AbbCIOPQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Mar 2015 10:15:16 -0400
+Received: from mail-ie0-f170.google.com ([209.85.223.170]:39924 "EHLO
+	mail-ie0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753206AbbCIPIn convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Mar 2015 11:08:43 -0400
+Received: by iecat20 with SMTP id at20so50494241iec.6
+        for <linux-crypto@vger.kernel.org>; Mon, 09 Mar 2015 08:08:42 -0700 (PDT)
+In-Reply-To: <54FD72E4.1060701@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Commit 5be4d4c94b1f ("crypto: replace scatterwalk_sg_next with sg_next")
-did not consider the fact that scatterwalk_sg_next() was looking at
-sg entry length, while sg_next() looks at the "chained" sg bit.
+On Mon, Mar 9, 2015 at 6:16 AM, Horia Geant=C4=83 <horia.geanta@freesca=
+le.com> wrote:
+> On 3/3/2015 7:44 PM, Martin Hicks wrote:
+>> On Tue, Mar 3, 2015 at 10:44 AM, Horia Geant=C4=83
+>> <horia.geanta@freescale.com> wrote:
+>>>
+>>> For talitos, there are two cases:
+>>>
+>>> 1. request data size is <=3D data unit / sector size
+>>> talitos can handle any IV / tweak scheme
+>>>
+>>> 2. request data size > sector size
+>>> since talitos internally generates the IV for the next sector by
+>>> incrementing the previous IV, only IV schemes that allocate consecu=
+tive
+>>> IV to consecutive sectors will function correctly.
+>>>
+>>
+>> it's not clear to me that #1 is right.  I guess it could be, but the
+>> IV length would be limited to 8 bytes.
+>
+> Yes, there's a limitation in talitos wrt. XTS IV / tweak size - it's =
+up
+> to 8 bytes.
+> So I guess ESSIV won't work with talitos-xts, since the encrypted IV
+> output is 16 bytes.
+> But as previously said, ESSIV breaks the XTS standard requirement for
+> having a consecutive IV for consecutive blocks. ESSIV should really b=
+e
+> used only with disk-level encryption schemes that require an
+> unpredictable IV.
 
-This should have no effect in theory. However in practice, there are
-cases where the sg table is initialized to a number of entries and
-some of them are not properly configured. While scatterwalk_sg_next()
-would have returned NULL (since sg length = 0 and sg page_link = 0),
-sg_next() happily returns the next unconfigured sg entry.
+Ok.  I'll verify that the second half of the IV is zeroed.
 
-insmod tcrypt.ko mode=500 sec=1
+One last thing that I'm not sure of is what string to place in
+cra_ablkcipher.geniv field.   "eseqiv" seems wrong if plain/plain64
+are the IVs that XTS is designed for.
 
-testing speed of async cbc(aes) (cbc-aes-talitos) encryption
-test 0 (128 bit key, 16 byte blocks):
-Unable to handle kernel paging request for data at address 0x00000000
-Faulting instruction address: 0xc00d79e4
-Oops: Kernel access of bad area, sig: 11 [#1]
-SMP NR_CPUS=8 P1022 DS
-Modules linked in: tcrypt(+) talitos
-CPU: 0 PID: 2670 Comm: insmod Not tainted 4.0.0-rc1-QorIQ-SDK-V1.6+g904f1ca82209 #1
-task: e8de3200 ti: e70bc000 task.ti: e70bc000
-NIP: c00d79e4 LR: f92d223c CTR: c00d79c8
-REGS: e70bda00 TRAP: 0300   Not tainted  (4.0.0-rc1-QorIQ-SDK-V1.6+g904f1ca82209)
-MSR: 00029000 <CE,EE,ME>  CR: 84428f22  XER: 00000000
-DEAR: 00000000 ESR: 00000000
-GPR00: f92d223c e70bdab0 e8de3200 00000000 e70bdbb8 00000001 00000000 00000000
-GPR08: 00000000 00000000 c08b0380 27282010 c00d79c8 1003a634 00000000 e70bdf1c
-GPR16: e70bdef0 00000020 00000000 c08c0000 00000010 00000000 e70bdbb8 00000010
-GPR24: e976d3a8 00000010 00000000 e70bdbd8 e8961010 00000001 c086e560 00000000
-NIP [c00d79e4] page_address+0x1c/0x110
-LR [f92d223c] talitos_map_sg+0x130/0x184 [talitos]
-Call Trace:
-[e70bdab0] [00000010] 0x10 (unreliable)
-[e70bdad0] [f92d223c] talitos_map_sg+0x130/0x184 [talitos]
-[e70bdb00] [f92d30d8] common_nonsnoop.constprop.13+0xc0/0x304 [talitos]
-[e70bdb30] [f933fd90] test_acipher_speed+0x434/0x7dc [tcrypt]
-[e70bdcc0] [f934318c] do_test+0x2478/0x306c [tcrypt]
-[e70bdd80] [f11fe058] tcrypt_mod_init+0x58/0x100 [tcrypt]
-[e70bdda0] [c0002354] do_one_initcall+0x90/0x1f4
-[e70bde10] [c061fe00] do_init_module+0x60/0x1ac
-[e70bde30] [c00a79f0] load_module+0x185c/0x1f88
-[e70bdee0] [c00a82b0] SyS_finit_module+0x7c/0x98
-[e70bdf40] [c000e8b0] ret_from_syscall+0x0/0x3c
---- interrupt: c01 at 0xff1985c
-    LR = 0x10012df0
-Instruction dump:
-54ea402e 7d494b78 55292834 7c634a14 4e800020 9421ffe0 7c0802a6 3d40c08b
-394a0380 bf61000c 7c7f1b78 90010024 <81230000> 552917be 1d290320 7d295214
----[ end trace ff191e5b504b4671 ]---
+Thanks,
+mh
 
-Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
----
-
-This might affect other drivers, haven't checked.
-There might be other cases failing too.
-
-Please carrefuly review side effects of commit 5be4d4c94b1f.
-
- crypto/tcrypt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 4b9e23fa4204..1a2800107fc8 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1155,9 +1155,9 @@ static void test_acipher_speed(const char *algo, int enc, unsigned int secs,
- 				goto out_free_req;
- 			}
- 
--			sg_init_table(sg, TVMEMSIZE);
--
- 			k = *keysize + *b_size;
-+			sg_init_table(sg, DIV_ROUND_UP(k, PAGE_SIZE));
-+
- 			if (k > PAGE_SIZE) {
- 				sg_set_buf(sg, tvmem[0] + *keysize,
- 				   PAGE_SIZE - *keysize);
--- 
-1.8.3.1
+--=20
+Martin Hicks P.Eng.      |         mort@bork.org
+Bork Consulting Inc.     |   +1 (613) 266-2296
