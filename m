@@ -1,43 +1,51 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH RESEND 0/2] crypto: algif - change algif_skcipher to be
- asynchronous
-Date: Mon, 09 Mar 2015 15:10:46 +0000
-Message-ID: <54FDB7F6.10004@intel.com>
-References: <20150227193538.10553.6144.stgit@tstruk-mobl1> <2623212.v9KkTj4KSQ@tachyon.chronox.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, qat-linux@intel.com
-To: Stephan Mueller <smueller@chronox.de>
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Subject: [PATCH 1/4] hwrng: omap - remove incorrect __exit markups
+Date: Mon,  9 Mar 2015 10:36:35 -0700
+Message-ID: <1425922598-16538-1-git-send-email-dmitry.torokhov@gmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org, Deepak Saxena <dsaxena@plexity.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:62482 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932355AbbCIPOm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Mar 2015 11:14:42 -0400
-In-Reply-To: <2623212.v9KkTj4KSQ@tachyon.chronox.de>
+Received: from mail-ig0-f169.google.com ([209.85.213.169]:37850 "EHLO
+	mail-ig0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752449AbbCIRgx (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Mar 2015 13:36:53 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Stephan,
-On 03/08/2015 11:20 AM, Stephan Mueller wrote:
-> As you may know, I am working on libkcapi [1] to cover the user space AF_ALG 
-> interface and provide an easy-to use interface for applications.
-> 
-> I am now trying to cover your interface proposal there and also measure the 
-> speed of it. What bothers me currently is the following: how would I be able 
-> to detect whether the implemented support is available in the current kernel?
+Even if bus is not hot-pluggable, the devices can be unbound from the
+driver via sysfs, so we should not be using __exit annotations on
+remove() methods. The only exception is drivers registered with
+platform_driver_probe() which specifically disables sysfs bind/unbind
+attributes.
 
-You don't need to detect that. You can just use the new interface, and in the older
-kernels without AIO support in skcipher it will seamlessly fallback to the synchronous interface.
+Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+---
+ drivers/char/hw_random/omap-rng.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The only problem is that the socket layer didn't like asynch operations before commit
-06539d3071067ff146a9bffd1c801fa56d290909.
-The way it can be tackled for the older kernels is the distros will need update their kernels
-with the mentioned commit. They should do it anyway because it looks like that was a bug.
-
-One other thing to keep in mind is - to be able to see the benefit of AIO you need to use
-some encryption offload engine, where you can asynchronously offload multiple operations.
-With my dh895xxcc engine I see around 8x throughput improvement.
-Regards,
-Tadeusz
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index d14dcf7..7f3597d 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -408,7 +408,7 @@ err_ioremap:
+ 	return ret;
+ }
+ 
+-static int __exit omap_rng_remove(struct platform_device *pdev)
++static int omap_rng_remove(struct platform_device *pdev)
+ {
+ 	struct omap_rng_dev *priv = platform_get_drvdata(pdev);
+ 
+@@ -460,7 +460,7 @@ static struct platform_driver omap_rng_driver = {
+ 		.of_match_table = of_match_ptr(omap_rng_of_match),
+ 	},
+ 	.probe		= omap_rng_probe,
+-	.remove		= __exit_p(omap_rng_remove),
++	.remove		= omap_rng_remove,
+ };
+ 
+ module_platform_driver(omap_rng_driver);
+-- 
+2.2.0.rc0.207.ga3a616c
