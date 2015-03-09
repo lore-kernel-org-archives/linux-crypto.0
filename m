@@ -1,49 +1,98 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH v2 5/5] crypto: talitos: Add software backlog queue handling
-Date: Mon, 9 Mar 2015 14:08:27 +0200
-Message-ID: <54FD8D3B.5040409@freescale.com>
-References: <1425388897-5434-1-git-send-email-mort@bork.org>
- <1425388897-5434-6-git-send-email-mort@bork.org>
- <20150303182332.546523088b5891a776880c0f@freescale.com>
- <54F8235B.5080301@freescale.com> <20150306044821.GA1411@gondor.apana.org.au>
+From: Horia Geanta <horia.geanta@freescale.com>
+Subject: [PATCH] crypto: tcrypt - fix uninit sg entries in test_acipher_speed
+Date: Mon, 9 Mar 2015 16:14:58 +0200
+Message-ID: <1425910498-9174-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Kim Phillips <kim.phillips@freescale.com>,
-	Martin Hicks <mort@bork.org>,
-	Scott Wood <scottwood@freescale.com>,
-	Kumar Gala <galak@kernel.crashing.org>,
-	<linuxppc-dev@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain
+Cc: Cristian Stoica <cristian.stoica@freescale.com>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0134.outbound.protection.outlook.com ([65.55.169.134]:18249
+Received: from mail-bl2on0115.outbound.protection.outlook.com ([65.55.169.115]:36208
 	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751689AbbCIMIk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Mar 2015 08:08:40 -0400
-In-Reply-To: <20150306044821.GA1411@gondor.apana.org.au>
+	id S1753546AbbCIOPQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Mar 2015 10:15:16 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 3/6/2015 6:48 AM, Herbert Xu wrote:
-> On Thu, Mar 05, 2015 at 11:35:23AM +0200, Horia Geant=C4=83 wrote:
->>
->>> Only potential problem is getting the crypto API to set the GFP_DMA
->>> flag in the allocation request, but presumably a
->>> CRYPTO_TFM_REQ_DMA crt_flag can be made to handle that.
->>
->> Right. And this flag would apply only to request __ctx[].
->>
->> Herbert, would this be an acceptable addition to crypto API?
->=20
-> How would such a flag work?
+Commit 5be4d4c94b1f ("crypto: replace scatterwalk_sg_next with sg_next")
+did not consider the fact that scatterwalk_sg_next() was looking at
+sg entry length, while sg_next() looks at the "chained" sg bit.
 
-Hm, I thought that GFP_DMA memory could be allocated only for request
-private ctx. This is obviously not the case.
+This should have no effect in theory. However in practice, there are
+cases where the sg table is initialized to a number of entries and
+some of them are not properly configured. While scatterwalk_sg_next()
+would have returned NULL (since sg length = 0 and sg page_link = 0),
+sg_next() happily returns the next unconfigured sg entry.
 
-*_request_alloc(tfm, gfp) crypto API functions would do:
-if (crypto_tfm_get_flags(tfm) & CRYPTO_TFM_REQ_DMA)
-        gfp |=3D GFP_DMA;
+insmod tcrypt.ko mode=500 sec=1
 
-Thanks,
-Horia
+testing speed of async cbc(aes) (cbc-aes-talitos) encryption
+test 0 (128 bit key, 16 byte blocks):
+Unable to handle kernel paging request for data at address 0x00000000
+Faulting instruction address: 0xc00d79e4
+Oops: Kernel access of bad area, sig: 11 [#1]
+SMP NR_CPUS=8 P1022 DS
+Modules linked in: tcrypt(+) talitos
+CPU: 0 PID: 2670 Comm: insmod Not tainted 4.0.0-rc1-QorIQ-SDK-V1.6+g904f1ca82209 #1
+task: e8de3200 ti: e70bc000 task.ti: e70bc000
+NIP: c00d79e4 LR: f92d223c CTR: c00d79c8
+REGS: e70bda00 TRAP: 0300   Not tainted  (4.0.0-rc1-QorIQ-SDK-V1.6+g904f1ca82209)
+MSR: 00029000 <CE,EE,ME>  CR: 84428f22  XER: 00000000
+DEAR: 00000000 ESR: 00000000
+GPR00: f92d223c e70bdab0 e8de3200 00000000 e70bdbb8 00000001 00000000 00000000
+GPR08: 00000000 00000000 c08b0380 27282010 c00d79c8 1003a634 00000000 e70bdf1c
+GPR16: e70bdef0 00000020 00000000 c08c0000 00000010 00000000 e70bdbb8 00000010
+GPR24: e976d3a8 00000010 00000000 e70bdbd8 e8961010 00000001 c086e560 00000000
+NIP [c00d79e4] page_address+0x1c/0x110
+LR [f92d223c] talitos_map_sg+0x130/0x184 [talitos]
+Call Trace:
+[e70bdab0] [00000010] 0x10 (unreliable)
+[e70bdad0] [f92d223c] talitos_map_sg+0x130/0x184 [talitos]
+[e70bdb00] [f92d30d8] common_nonsnoop.constprop.13+0xc0/0x304 [talitos]
+[e70bdb30] [f933fd90] test_acipher_speed+0x434/0x7dc [tcrypt]
+[e70bdcc0] [f934318c] do_test+0x2478/0x306c [tcrypt]
+[e70bdd80] [f11fe058] tcrypt_mod_init+0x58/0x100 [tcrypt]
+[e70bdda0] [c0002354] do_one_initcall+0x90/0x1f4
+[e70bde10] [c061fe00] do_init_module+0x60/0x1ac
+[e70bde30] [c00a79f0] load_module+0x185c/0x1f88
+[e70bdee0] [c00a82b0] SyS_finit_module+0x7c/0x98
+[e70bdf40] [c000e8b0] ret_from_syscall+0x0/0x3c
+--- interrupt: c01 at 0xff1985c
+    LR = 0x10012df0
+Instruction dump:
+54ea402e 7d494b78 55292834 7c634a14 4e800020 9421ffe0 7c0802a6 3d40c08b
+394a0380 bf61000c 7c7f1b78 90010024 <81230000> 552917be 1d290320 7d295214
+---[ end trace ff191e5b504b4671 ]---
+
+Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+---
+
+This might affect other drivers, haven't checked.
+There might be other cases failing too.
+
+Please carrefuly review side effects of commit 5be4d4c94b1f.
+
+ crypto/tcrypt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 4b9e23fa4204..1a2800107fc8 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1155,9 +1155,9 @@ static void test_acipher_speed(const char *algo, int enc, unsigned int secs,
+ 				goto out_free_req;
+ 			}
+ 
+-			sg_init_table(sg, TVMEMSIZE);
+-
+ 			k = *keysize + *b_size;
++			sg_init_table(sg, DIV_ROUND_UP(k, PAGE_SIZE));
++
+ 			if (k > PAGE_SIZE) {
+ 				sg_set_buf(sg, tvmem[0] + *keysize,
+ 				   PAGE_SIZE - *keysize);
+-- 
+1.8.3.1
