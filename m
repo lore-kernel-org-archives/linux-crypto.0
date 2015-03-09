@@ -1,87 +1,373 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH 0/2] crypto: talitos: Add AES-XTS mode
-Date: Mon, 9 Mar 2015 12:16:04 +0200
-Message-ID: <54FD72E4.1060701@freescale.com>
-References: <1424451610-5786-1-git-send-email-mort@bork.org>
-	<54F464E4.8080204@freescale.com>	<54F475A8.6030105@gmail.com>
-	<20150302220923.GC30523@darwin.bork.org>	<54F5D6D5.8070407@freescale.com>
- <CAJUS3Xnw66Eu6tvGPpdcet6KLjhKM=ptj8NRaztAVr0h_r+LqQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Milan Broz <gmazyland@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	<linux-crypto@vger.kernel.org>,
-	Scott Wood <scottwood@freescale.com>,
-	<linuxppc-dev@lists.ozlabs.org>
-To: Martin Hicks <mort@bork.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 2/4] crypto/arm: add support for SHA1 using ARMv8 Crypto Instructions
+Date: Mon,  9 Mar 2015 11:22:20 +0100
+Message-ID: <1425896542-24946-2-git-send-email-ard.biesheuvel@linaro.org>
+References: <1425896542-24946-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: nico@linaro.org, will.deacon@arm.com,
+	Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: herbert@gondor.apana.org.au, jussi.kivilinna@iki.fi,
+	linux-crypto@vger.kernel.org, linux@arm.linux.org.uk,
+	linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0125.outbound.protection.outlook.com ([65.55.169.125]:21829
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753790AbbCIKQP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 9 Mar 2015 06:16:15 -0400
-In-Reply-To: <CAJUS3Xnw66Eu6tvGPpdcet6KLjhKM=ptj8NRaztAVr0h_r+LqQ@mail.gmail.com>
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:43112 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753736AbbCIKWi (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 9 Mar 2015 06:22:38 -0400
+Received: by wggx12 with SMTP id x12so16192578wgg.10
+        for <linux-crypto@vger.kernel.org>; Mon, 09 Mar 2015 03:22:36 -0700 (PDT)
+In-Reply-To: <1425896542-24946-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 3/3/2015 7:44 PM, Martin Hicks wrote:
-> On Tue, Mar 3, 2015 at 10:44 AM, Horia Geant=C4=83
-> <horia.geanta@freescale.com> wrote:
->> On 3/3/2015 12:09 AM, Martin Hicks wrote:
->>>
->>> On Mon, Mar 02, 2015 at 03:37:28PM +0100, Milan Broz wrote:
->>>>
->>>> If crypto API allows to encrypt more sectors in one run
->>>> (handling IV internally) dmcrypt can be modified of course.
->>>>
->>>> But do not forget we can use another IV (not only sequential numbe=
-r)
->>>> e.g. ESSIV with XTS as well (even if it doesn't make much sense, s=
-ome people
->>>> are using it).
->>>
->>> Interesting, I'd not considered using XTS with an IV other than pla=
-in/64.
->>> The talitos hardware would not support aes/xts in any mode other th=
-an
->>> plain/plain64 I don't think...Although perhaps you could push in an=
- 8-byte
->>> IV and the hardware would interpret it as the sector #.
->>>
->>
->> For talitos, there are two cases:
->>
->> 1. request data size is <=3D data unit / sector size
->> talitos can handle any IV / tweak scheme
->>
->> 2. request data size > sector size
->> since talitos internally generates the IV for the next sector by
->> incrementing the previous IV, only IV schemes that allocate consecut=
-ive
->> IV to consecutive sectors will function correctly.
->>
->=20
-> it's not clear to me that #1 is right.  I guess it could be, but the
-> IV length would be limited to 8 bytes.
+This implements the SHA1 secure hash algorithm using the AArch32
+versions of the ARMv8 Crypto Extensions for SHA1.
 
-Yes, there's a limitation in talitos wrt. XTS IV / tweak size - it's up
-to 8 bytes.
-So I guess ESSIV won't work with talitos-xts, since the encrypted IV
-output is 16 bytes.
-But as previously said, ESSIV breaks the XTS standard requirement for
-having a consecutive IV for consecutive blocks. ESSIV should really be
-used only with disk-level encryption schemes that require an
-unpredictable IV.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm/crypto/Kconfig        |  10 +++
+ arch/arm/crypto/Makefile       |   2 +
+ arch/arm/crypto/sha1-ce-core.S | 134 ++++++++++++++++++++++++++++++++++++
+ arch/arm/crypto/sha1-ce-glue.c | 150 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 296 insertions(+)
+ create mode 100644 arch/arm/crypto/sha1-ce-core.S
+ create mode 100644 arch/arm/crypto/sha1-ce-glue.c
 
->=20
-> This also points out that claiming that the XTS IV size is 16 bytes,
-> as my current patch does, could be problematic.  It's handy because
-> the first 8 bytes should contain a plain64 sector #, and the second
-> u64 can be used to encode the sector size but it would be a mistake
-> for someone to use the second 8 bytes for the rest of a 16byte IV.
-
-XTS IV *is* 16 bytes. The fact that xts-talitos can handle only 8 bytes
-is a problem indeed, but for plain and plain64 should not matter.
-
-Horia
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index 66fe82857e99..d7bc10beb8ac 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -27,6 +27,16 @@ config CRYPTO_SHA1_ARM_NEON
+ 	  using optimized ARM NEON assembly, when NEON instructions are
+ 	  available.
+ 
++config CRYPTO_SHA1_ARM_CE
++	tristate "SHA1 digest algorithm (ARM v8 Crypto Extensions)"
++	depends on KERNEL_MODE_NEON
++	select CRYPTO_SHA1_ARM
++	select CRYPTO_SHA1
++	select CRYPTO_HASH
++	help
++	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
++	  using special ARMv8 Crypto Extensions.
++
+ config CRYPTO_SHA512_ARM_NEON
+ 	tristate "SHA384 and SHA512 digest algorithm (ARM NEON)"
+ 	depends on KERNEL_MODE_NEON
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index b48fa341648d..d92d05ba646e 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -7,12 +7,14 @@ obj-$(CONFIG_CRYPTO_AES_ARM_BS) += aes-arm-bs.o
+ obj-$(CONFIG_CRYPTO_SHA1_ARM) += sha1-arm.o
+ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
+ obj-$(CONFIG_CRYPTO_SHA512_ARM_NEON) += sha512-arm-neon.o
++obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
+ 
+ aes-arm-y	:= aes-armv4.o aes_glue.o
+ aes-arm-bs-y	:= aesbs-core.o aesbs-glue.o
+ sha1-arm-y	:= sha1-armv4-large.o sha1_glue.o
+ sha1-arm-neon-y	:= sha1-armv7-neon.o sha1_neon_glue.o
+ sha512-arm-neon-y := sha512-armv7-neon.o sha512_neon_glue.o
++sha1-arm-ce-y	:= sha1-ce-core.o sha1-ce-glue.o
+ 
+ quiet_cmd_perl = PERL    $@
+       cmd_perl = $(PERL) $(<) > $(@)
+diff --git a/arch/arm/crypto/sha1-ce-core.S b/arch/arm/crypto/sha1-ce-core.S
+new file mode 100644
+index 000000000000..7542f10b2233
+--- /dev/null
++++ b/arch/arm/crypto/sha1-ce-core.S
+@@ -0,0 +1,134 @@
++/*
++ * sha1-ce-core.S - SHA-1 secure hash using ARMv8 Crypto Extensions
++ *
++ * Copyright (C) 2015 Linaro Ltd.
++ * Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/linkage.h>
++#include <asm/assembler.h>
++
++	.text
++	.fpu		crypto-neon-fp-armv8
++
++	k0		.req	q0
++	k1		.req	q1
++	k2		.req	q2
++	k3		.req	q3
++
++	ta0		.req	q4
++	ta1		.req	q5
++	tb0		.req	q5
++	tb1		.req	q4
++
++	dga		.req	q6
++	dgb		.req	q7
++	dgbs		.req	s28
++
++	dg0		.req	q12
++	dg1a0		.req	q13
++	dg1a1		.req	q14
++	dg1b0		.req	q14
++	dg1b1		.req	q13
++
++	.macro		add_only, op, ev, rc, s0, dg1
++	.ifnb		\s0
++	vadd.u32	tb\ev, q\s0, \rc
++	.endif
++	sha1h.32	dg1b\ev, dg0
++	.ifb		\dg1
++	sha1\op\().32	dg0, dg1a\ev, ta\ev
++	.else
++	sha1\op\().32	dg0, \dg1, ta\ev
++	.endif
++	.endm
++
++	.macro		add_update, op, ev, rc, s0, s1, s2, s3, dg1
++	sha1su0.32	q\s0, q\s1, q\s2
++	add_only	\op, \ev, \rc, \s1, \dg1
++	sha1su1.32	q\s0, q\s3
++	.endm
++
++	.align		6
++.Lsha1_rcon:
++	.word		0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999
++	.word		0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1
++	.word		0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc
++	.word		0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6
++
++	/*
++	 * void sha1_ce_transform(int blocks, u8 const *src, u32 *state,
++	 *			  u8 *head);
++	 */
++ENTRY(sha1_ce_transform)
++	/* load round constants */
++	adr		ip, .Lsha1_rcon
++	vld1.32		{k0-k1}, [ip]!
++	vld1.32		{k2-k3}, [ip]
++
++	/* load state */
++	vldm		r2, {dga}
++	vldr		dgbs, [r2, #16]
++
++	/* load partial input (if supplied) */
++	teq		r3, #0
++	beq		0f
++	vld1.8		{q8-q9}, [r3]!
++	vld1.8		{q10-q11}, [r3]
++	teq		r0, #0
++	b		1f
++
++	/* load input */
++0:	vld1.8		{q8-q9}, [r1]!
++	vld1.8		{q10-q11}, [r1]!
++	subs		r0, r0, #1
++
++1:
++#ifndef CONFIG_CPU_BIG_ENDIAN
++	vrev32.8	q8, q8
++	vrev32.8	q9, q9
++	vrev32.8	q10, q10
++	vrev32.8	q11, q11
++#endif
++
++	vadd.u32	ta0, q8, k0
++	vmov		dg0, dga
++
++	add_update	c, 0, k0,  8,  9, 10, 11, dgb
++	add_update	c, 1, k0,  9, 10, 11,  8
++	add_update	c, 0, k0, 10, 11,  8,  9
++	add_update	c, 1, k0, 11,  8,  9, 10
++	add_update	c, 0, k1,  8,  9, 10, 11
++
++	add_update	p, 1, k1,  9, 10, 11,  8
++	add_update	p, 0, k1, 10, 11,  8,  9
++	add_update	p, 1, k1, 11,  8,  9, 10
++	add_update	p, 0, k1,  8,  9, 10, 11
++	add_update	p, 1, k2,  9, 10, 11,  8
++
++	add_update	m, 0, k2, 10, 11,  8,  9
++	add_update	m, 1, k2, 11,  8,  9, 10
++	add_update	m, 0, k2,  8,  9, 10, 11
++	add_update	m, 1, k2,  9, 10, 11,  8
++	add_update	m, 0, k3, 10, 11,  8,  9
++
++	add_update	p, 1, k3, 11,  8,  9, 10
++	add_only	p, 0, k3,  9
++	add_only	p, 1, k3, 10
++	add_only	p, 0, k3, 11
++	add_only	p, 1
++
++	/* update state */
++	vadd.u32	dga, dga, dg0
++	vadd.u32	dgb, dgb, dg1a0
++	bne		0b
++
++	/* store new state */
++	vstm		r2, {dga}
++	vstr		dgbs, [r2, #16]
++	bx		lr
++ENDPROC(sha1_ce_transform)
+diff --git a/arch/arm/crypto/sha1-ce-glue.c b/arch/arm/crypto/sha1-ce-glue.c
+new file mode 100644
+index 000000000000..5f7cdd050a80
+--- /dev/null
++++ b/arch/arm/crypto/sha1-ce-glue.c
+@@ -0,0 +1,150 @@
++/*
++ * sha1-ce-glue.c - SHA-1 secure hash using ARMv8 Crypto Extensions
++ *
++ * Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <crypto/internal/hash.h>
++#include <crypto/sha.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++
++#include <asm/crypto/sha1.h>
++#include <asm/hwcap.h>
++#include <asm/neon.h>
++#include <asm/simd.h>
++#include <asm/unaligned.h>
++
++MODULE_DESCRIPTION("SHA1 secure hash using ARMv8 Crypto Extensions");
++MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
++MODULE_LICENSE("GPL v2");
++
++asmlinkage void sha1_ce_transform(int blocks, u8 const *src, u32 *state, 
++				  u8 *head);
++
++static int sha1_init(struct shash_desc *desc)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++
++	*sctx = (struct sha1_state){
++		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
++	};
++	return 0;
++}
++
++static int sha1_update(struct shash_desc *desc, const u8 *data,
++		       unsigned int len)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	unsigned int partial;
++
++	if (!may_use_simd())
++		return sha1_update_arm(desc, data, len);
++
++	partial = sctx->count % SHA1_BLOCK_SIZE;
++	sctx->count += len;
++
++	if ((partial + len) >= SHA1_BLOCK_SIZE) {
++		int blocks;
++
++		if (partial) {
++			int p = SHA1_BLOCK_SIZE - partial;
++
++			memcpy(sctx->buffer + partial, data, p);
++			data += p;
++			len -= p;
++		}
++
++		blocks = len / SHA1_BLOCK_SIZE;
++		len %= SHA1_BLOCK_SIZE;
++
++		kernel_neon_begin();
++		sha1_ce_transform(blocks, data, sctx->state,
++				  partial ? sctx->buffer : NULL);
++		kernel_neon_end();
++
++		data += blocks * SHA1_BLOCK_SIZE;
++		partial = 0;
++	}
++	if (len)
++		memcpy(sctx->buffer + partial, data, len);
++	return 0;
++}
++
++static int sha1_final(struct shash_desc *desc, u8 *out)
++{
++	static const u8 padding[SHA1_BLOCK_SIZE] = { 0x80, };
++
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	__be64 bits = cpu_to_be64(sctx->count << 3);
++	__be32 *dst = (__be32 *)out;
++	int i;
++
++	u32 padlen = SHA1_BLOCK_SIZE
++		     - ((sctx->count + sizeof(bits)) % SHA1_BLOCK_SIZE);
++
++	sha1_update(desc, padding, padlen);
++	sha1_update(desc, (const u8 *)&bits, sizeof(bits));
++
++	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(__be32); i++)
++		put_unaligned_be32(sctx->state[i], dst++);
++
++	*sctx = (struct sha1_state){};
++	return 0;
++}
++
++static int sha1_export(struct shash_desc *desc, void *out)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state *dst = out;
++
++	*dst = *sctx;
++	return 0;
++}
++
++static int sha1_import(struct shash_desc *desc, const void *in)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state const *src = in;
++
++	*sctx = *src;
++	return 0;
++}
++
++static struct shash_alg alg = {
++	.init			= sha1_init,
++	.update			= sha1_update,
++	.final			= sha1_final,
++	.export			= sha1_export,
++	.import			= sha1_import,
++	.descsize		= sizeof(struct sha1_state),
++	.digestsize		= SHA1_DIGEST_SIZE,
++	.statesize		= sizeof(struct sha1_state),
++	.base			= {
++		.cra_name		= "sha1",
++		.cra_driver_name	= "sha1-ce",
++		.cra_priority		= 200,
++		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize		= SHA1_BLOCK_SIZE,
++		.cra_module		= THIS_MODULE,
++	}
++};
++
++static int __init sha1_ce_mod_init(void)
++{
++	if (!(elf_hwcap2 & HWCAP2_SHA1))
++		return -ENODEV;
++	return crypto_register_shash(&alg);
++}
++
++static void __exit sha1_ce_mod_fini(void)
++{
++	crypto_unregister_shash(&alg);
++}
++
++module_init(sha1_ce_mod_init);
++module_exit(sha1_ce_mod_fini);
+-- 
+1.8.3.2
