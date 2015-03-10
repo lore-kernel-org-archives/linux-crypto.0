@@ -1,52 +1,45 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH V3 1/2] crypto: Add Imagination Technologies hw hash
- accelerator
-Date: Tue, 10 Mar 2015 20:37:07 +1100
-Message-ID: <20150310093707.GA17289@gondor.apana.org.au>
-References: <1425610707-9869-1-git-send-email-james.hartley@imgtec.com>
- <1425610707-9869-2-git-send-email-james.hartley@imgtec.com>
- <1582962.nmzkjGWQFm@tauon>
+Subject: Re: [PATCH] crypto: AES-NI: fix memory usage in GCM decryption
+Date: Tue, 10 Mar 2015 20:45:43 +1100
+Message-ID: <20150310094543.GA17358@gondor.apana.org.au>
+References: <22281096.OZkxDCz0xu@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: James Hartley <james.hartley@imgtec.com>, robh+dt@kernel.org,
-	pawel.moll@arm.com, mark.rutland@arm.com, galak@codeaurora.org,
-	andrew.bresticker@chromium.org, ezequiel.garcia@imgtec.com,
-	linux-crypto@vger.kernel.org
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:55928 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752482AbbCJJhn (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Mar 2015 05:37:43 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1582962.nmzkjGWQFm@tauon>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <22281096.OZkxDCz0xu@tachyon.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Mar 09, 2015 at 07:35:57AM +0100, Stephan Mueller wrote:
->
-> >+static struct ahash_alg img_algs[] = {
-> >+	{
-> >+		.init = img_hash_init,
-> >+		.update = img_hash_update,
-> >+		.final = img_hash_final,
-> >+		.finup = img_hash_finup,
-> >+		.digest = img_hash_digest,
-> >+		.halg = {
-> >+			.digestsize = MD5_DIGEST_SIZE,
-> >+			.base = {
-> >+				.cra_name = "md5",
-> >+				.cra_driver_name = "img-md5",
-> >+				.cra_priority = 301,
+On Sun, Mar 08, 2015 at 07:49:58PM +0100, Stephan Mueller wrote:
+> The RFC4106 GCM decryption operation tries to overwrite cryptlen memory
+> in req->dst. As the destination buffer for decryption only needs to hold
+> the plaintext memory but cryptlen references the input buffer holding
+> (ciphertext || authentication tag), the assumption of the destination
+> buffer length in RFC4106 GCM operation leads to a too large size.
 > 
-> Just curious: why do you use such odd priorities of 301 or 3000? IMHO, 
-> all you need is a priority of more than 100 to "beat" the generic C 
-> prios. Maybe you also need to beat the standard assembler 
-> implementations which are routinely at 200 for hashes. So, a prio of 300 
-> should suffice, should it not?
+> This patch simply subtracts the authentication tag size from cryptlen.
+> The kernel crypto API logic requires the caller to provide the
+> length of (ciphertext || authentication tag) as cryptlen for the
+> AEAD decryption operation. Thus, the cipher implementation must
+> caculate the size of the plaintext output itself and cannot simply use
+> cryptlen.
+> 
+> Note, this fixes a kernel crash that can be triggered from user space
+> via AF_ALG(aead)  without it (simply use the libkcapi test application
+> from [1] and update it to use rfc4106-gcm-aes).
+> 
+> [1] http://www.chronox.de/libkcapi.html
+> 
+> CC: Tadeusz Struk <tadeusz.struk@intel.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-James, can you answer Stephan's question please?
+Good catch.  However, I think the same confusion exists in the
+code that allocates src which may also trigger a crash.  So could
+you fix that as well?
 
 Thanks,
 -- 
