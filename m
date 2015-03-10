@@ -1,7 +1,7 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 5/5] crypto/arm: add support for GHASH using ARMv8 Crypto Extensions
-Date: Tue, 10 Mar 2015 09:47:48 +0100
-Message-ID: <1425977268-27835-6-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 3/5] crypto/arm: add support for SHA-224/256 using ARMv8 Crypto Extensions
+Date: Tue, 10 Mar 2015 09:47:46 +0100
+Message-ID: <1425977268-27835-4-git-send-email-ard.biesheuvel@linaro.org>
 References: <1425977268-27835-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: nico@linaro.org, will.deacon@arm.com,
 	Ard Biesheuvel <ard.biesheuvel@linaro.org>
@@ -9,494 +9,418 @@ To: herbert@gondor.apana.org.au, jussi.kivilinna@iki.fi,
 	linux-crypto@vger.kernel.org, linux@arm.linux.org.uk,
 	linux-arm-kernel@lists.infradead.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-we0-f177.google.com ([74.125.82.177]:45484 "EHLO
-	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752430AbbCJIsO (ORCPT
+Received: from mail-we0-f176.google.com ([74.125.82.176]:34280 "EHLO
+	mail-we0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752756AbbCJIsJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Mar 2015 04:48:14 -0400
-Received: by wesu56 with SMTP id u56so58967wes.12
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Mar 2015 01:48:13 -0700 (PDT)
+	Tue, 10 Mar 2015 04:48:09 -0400
+Received: by wesx3 with SMTP id x3so160032wes.1
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Mar 2015 01:48:08 -0700 (PDT)
 In-Reply-To: <1425977268-27835-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This implements the GHASH hash algorithm (as used by the GCM AEAD
-chaining mode) using the AArch32 version of the 64x64 to 128 bit
-polynomial multiplication instruction (vmull.p64) that is part of
-the ARMv8 Crypto Extensions.
+This implements the SHA-224/256 secure hash algorithm using the AArch32
+versions of the ARMv8 Crypto Extensions for SHA2.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/Kconfig         |  10 ++
- arch/arm/crypto/Makefile        |   2 +
- arch/arm/crypto/ghash-ce-core.S |  94 ++++++++++++
- arch/arm/crypto/ghash-ce-glue.c | 318 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 424 insertions(+)
- create mode 100644 arch/arm/crypto/ghash-ce-core.S
- create mode 100644 arch/arm/crypto/ghash-ce-glue.c
+ arch/arm/crypto/Kconfig        |   9 ++
+ arch/arm/crypto/Makefile       |   2 +
+ arch/arm/crypto/sha2-ce-core.S | 134 +++++++++++++++++++++++++++
+ arch/arm/crypto/sha2-ce-glue.c | 203 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 348 insertions(+)
+ create mode 100644 arch/arm/crypto/sha2-ce-core.S
+ create mode 100644 arch/arm/crypto/sha2-ce-glue.c
 
 diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 63588bdf3b5d..d63f319924d2 100644
+index d7bc10beb8ac..9c1478e55a40 100644
 --- a/arch/arm/crypto/Kconfig
 +++ b/arch/arm/crypto/Kconfig
-@@ -110,4 +110,14 @@ config CRYPTO_AES_ARM_CE
- 	  Use an implementation of AES in CBC, CTR and XTS modes that uses
- 	  ARMv8 Crypto Extensions
+@@ -37,6 +37,15 @@ config CRYPTO_SHA1_ARM_CE
+ 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
+ 	  using special ARMv8 Crypto Extensions.
  
-+config CRYPTO_GHASH_ARM_CE
-+	tristate "PMULL-accelerated GHASH using ARMv8 Crypto Extensions"
++config CRYPTO_SHA2_ARM_CE
++	tristate "SHA-224/256 digest algorithm (ARM v8 Crypto Extensions)"
 +	depends on KERNEL_MODE_NEON
++	select CRYPTO_SHA256
 +	select CRYPTO_HASH
-+	select CRYPTO_CRYPTD
 +	help
-+	  Use an implementation of GHASH (used by the GCM AEAD chaining mode)
-+	  that uses the 64x64 to 128 bit polynomial multiplication (vmull.p64)
-+	  that is part of the ARMv8 Crypto Extensions
++	  SHA-256 secure hash standard (DFIPS 180-2) implemented
++	  using special ARMv8 Crypto Extensions.
 +
- endif
+ config CRYPTO_SHA512_ARM_NEON
+ 	tristate "SHA384 and SHA512 digest algorithm (ARM NEON)"
+ 	depends on KERNEL_MODE_NEON
 diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
-index 2514c420e8d3..9a273bd7dffd 100644
+index d92d05ba646e..4ea9f96c2782 100644
 --- a/arch/arm/crypto/Makefile
 +++ b/arch/arm/crypto/Makefile
-@@ -10,6 +10,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
+@@ -8,6 +8,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM) += sha1-arm.o
+ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
  obj-$(CONFIG_CRYPTO_SHA512_ARM_NEON) += sha512-arm-neon.o
  obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
- obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
-+obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
++obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
  
  aes-arm-y	:= aes-armv4.o aes_glue.o
  aes-arm-bs-y	:= aesbs-core.o aesbs-glue.o
-@@ -19,6 +20,7 @@ sha512-arm-neon-y := sha512-armv7-neon.o sha512_neon_glue.o
+@@ -15,6 +16,7 @@ sha1-arm-y	:= sha1-armv4-large.o sha1_glue.o
+ sha1-arm-neon-y	:= sha1-armv7-neon.o sha1_neon_glue.o
+ sha512-arm-neon-y := sha512-armv7-neon.o sha512_neon_glue.o
  sha1-arm-ce-y	:= sha1-ce-core.o sha1-ce-glue.o
- sha2-arm-ce-y	:= sha2-ce-core.o sha2-ce-glue.o
- aes-arm-ce-y	:= aes-ce-core.o aes-ce-glue.o
-+ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o
++sha2-arm-ce-y	:= sha2-ce-core.o sha2-ce-glue.o
  
  quiet_cmd_perl = PERL    $@
        cmd_perl = $(PERL) $(<) > $(@)
-diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
+diff --git a/arch/arm/crypto/sha2-ce-core.S b/arch/arm/crypto/sha2-ce-core.S
 new file mode 100644
-index 000000000000..e643a15eadf2
+index 000000000000..96af09fe957b
 --- /dev/null
-+++ b/arch/arm/crypto/ghash-ce-core.S
-@@ -0,0 +1,94 @@
++++ b/arch/arm/crypto/sha2-ce-core.S
+@@ -0,0 +1,134 @@
 +/*
-+ * Accelerated GHASH implementation with ARMv8 vmull.p64 instructions.
++ * sha2-ce-core.S - SHA-224/256 secure hash using ARMv8 Crypto Extensions
 + *
-+ * Copyright (C) 2015 Linaro Ltd. <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2015 Linaro Ltd.
++ * Author: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 + *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2 as published
-+ * by the Free Software Foundation.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
 + */
 +
 +#include <linux/linkage.h>
 +#include <asm/assembler.h>
 +
-+	SHASH		.req	q0
-+	SHASH2		.req	q1
-+	T1		.req	q2
-+	T2		.req	q3
-+	MASK		.req	q4
-+	XL		.req	q5
-+	XM		.req	q6
-+	XH		.req	q7
-+	IN1		.req	q7
-+
-+	SHASH_L		.req	d0
-+	SHASH_H		.req	d1
-+	SHASH2_L	.req	d2
-+	T1_L		.req	d4
-+	MASK_L		.req	d8
-+	XL_L		.req	d10
-+	XL_H		.req	d11
-+	XM_L		.req	d12
-+	XM_H		.req	d13
-+	XH_L		.req	d14
-+
 +	.text
 +	.fpu		crypto-neon-fp-armv8
 +
-+	/*
-+	 * void pmull_ghash_update(int blocks, u64 dg[], const char *src,
-+	 *			   struct ghash_key const *k, const char *head)
-+	 */
-+ENTRY(pmull_ghash_update)
-+	vld1.8		{SHASH}, [r3]
-+	vld1.64		{XL}, [r1]
-+	vmov.i8		MASK, #0xe1
-+	vext.8		SHASH2, SHASH, SHASH, #8
-+	vshl.u64	MASK, MASK, #57
-+	veor		SHASH2, SHASH2, SHASH
++	k0		.req	q7
++	k1		.req	q8
++	rk		.req	r3
 +
-+	/* do the head block first, if supplied */
-+	ldr		ip, [sp]
-+	teq		ip, #0
++	ta0		.req	q9
++	ta1		.req	q10
++	tb0		.req	q10
++	tb1		.req	q9
++
++	dga		.req	q11
++	dgb		.req	q12
++
++	dg0		.req	q13
++	dg1		.req	q14
++	dg2		.req	q15
++
++	.macro		add_only, ev, s0
++	vmov		dg2, dg0
++	.ifnb		\s0
++	vld1.32		{k\ev}, [rk, :128]!
++	.endif
++	sha256h.32	dg0, dg1, tb\ev
++	sha256h2.32	dg1, dg2, tb\ev
++	.ifnb		\s0
++	vadd.u32	ta\ev, q\s0, k\ev
++	.endif
++	.endm
++
++	.macro		add_update, ev, s0, s1, s2, s3
++	sha256su0.32	q\s0, q\s1
++	add_only	\ev, \s1
++	sha256su1.32	q\s0, q\s2, q\s3
++	.endm
++
++	.align		6
++.Lsha256_rcon:
++	.word		0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5
++	.word		0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5
++	.word		0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3
++	.word		0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174
++	.word		0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc
++	.word		0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da
++	.word		0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7
++	.word		0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967
++	.word		0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13
++	.word		0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85
++	.word		0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3
++	.word		0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070
++	.word		0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5
++	.word		0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3
++	.word		0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208
++	.word		0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
++
++	/*
++	 * void sha2_ce_transform(int blocks, u8 const *src, u32 *state,
++	 *			  u8 *head);
++	 */
++ENTRY(sha2_ce_transform)
++	/* load state */
++	vld1.32		{dga-dgb}, [r2]
++
++	/* load partial input (if supplied) */
++	teq		r3, #0
 +	beq		0f
-+	vld1.64		{T1}, [ip]
++	vld1.32		{q0-q1}, [r3]!
++	vld1.32		{q2-q3}, [r3]
 +	teq		r0, #0
 +	b		1f
 +
-+0:	vld1.64		{T1}, [r2]!
++	/* load input */
++0:	vld1.32		{q0-q1}, [r1]!
++	vld1.32		{q2-q3}, [r1]!
 +	subs		r0, r0, #1
 +
-+1:	/* multiply XL by SHASH in GF(2^128) */
++1:
 +#ifndef CONFIG_CPU_BIG_ENDIAN
-+	vrev64.8	T1, T1
++	vrev32.8	q0, q0
++	vrev32.8	q1, q1
++	vrev32.8	q2, q2
++	vrev32.8	q3, q3
 +#endif
-+	vext.8		T2, XL, XL, #8
-+	vext.8		IN1, T1, T1, #8
-+	veor		T1, T1, T2
-+	veor		XL, XL, IN1
 +
-+	vmull.p64	XH, SHASH_H, XL_H		@ a1 * b1
-+	veor		T1, T1, XL
-+	vmull.p64	XL, SHASH_L, XL_L		@ a0 * b0
-+	vmull.p64	XM, SHASH2_L, T1_L		@ (a1 + a0)(b1 + b0)
++	/* load first round constant */
++	adr		rk, .Lsha256_rcon
++	vld1.32		{k0}, [rk, :128]!
 +
-+	vext.8		T1, XL, XH, #8
-+	veor		T2, XL, XH
-+	veor		XM, XM, T1
-+	veor		XM, XM, T2
-+	vmull.p64	T2, XL_L, MASK_L
++	vadd.u32	ta0, q0, k0
++	vmov		dg0, dga
++	vmov		dg1, dgb
 +
-+	vmov		XH_L, XM_H
-+	vmov		XM_H, XL_L
++	add_update	1, 0, 1, 2, 3
++	add_update	0, 1, 2, 3, 0
++	add_update	1, 2, 3, 0, 1
++	add_update	0, 3, 0, 1, 2
++	add_update	1, 0, 1, 2, 3
++	add_update	0, 1, 2, 3, 0
++	add_update	1, 2, 3, 0, 1
++	add_update	0, 3, 0, 1, 2
++	add_update	1, 0, 1, 2, 3
++	add_update	0, 1, 2, 3, 0
++	add_update	1, 2, 3, 0, 1
++	add_update	0, 3, 0, 1, 2
 +
-+	veor		XL, XM, T2
-+	vext.8		T2, XL, XL, #8
-+	vmull.p64	XL, XL_L, MASK_L
-+	veor		T2, T2, XH
-+	veor		XL, XL, T2
++	add_only	1, 1
++	add_only	0, 2
++	add_only	1, 3
++	add_only	0
 +
++	/* update state */
++	vadd.u32	dga, dga, dg0
++	vadd.u32	dgb, dgb, dg1
 +	bne		0b
 +
-+	vst1.64		{XL}, [r1]
++	/* store new state */
++	vst1.32		{dga-dgb}, [r2]
 +	bx		lr
-+ENDPROC(pmull_ghash_update)
-diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
++ENDPROC(sha2_ce_transform)
+diff --git a/arch/arm/crypto/sha2-ce-glue.c b/arch/arm/crypto/sha2-ce-glue.c
 new file mode 100644
-index 000000000000..8c959d128065
+index 000000000000..9ffe8ad27402
 --- /dev/null
-+++ b/arch/arm/crypto/ghash-ce-glue.c
-@@ -0,0 +1,318 @@
++++ b/arch/arm/crypto/sha2-ce-glue.c
+@@ -0,0 +1,203 @@
 +/*
-+ * Accelerated GHASH implementation with ARMv8 vmull.p64 instructions.
++ * sha2-ce-glue.c - SHA-224/SHA-256 using ARMv8 Crypto Extensions
 + *
-+ * Copyright (C) 2015 Linaro Ltd. <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2015 Linaro Ltd <ard.biesheuvel@linaro.org>
 + *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License version 2 as published
-+ * by the Free Software Foundation.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
 + */
 +
-+#include <asm/hwcap.h>
-+#include <asm/neon.h>
-+#include <asm/simd.h>
-+#include <asm/unaligned.h>
-+#include <crypto/cryptd.h>
 +#include <crypto/internal/hash.h>
-+#include <crypto/gf128mul.h>
++#include <crypto/sha.h>
 +#include <linux/crypto.h>
 +#include <linux/module.h>
 +
-+MODULE_DESCRIPTION("GHASH secure hash using ARMv8 Crypto Extensions");
++#include <asm/hwcap.h>
++#include <asm/simd.h>
++#include <asm/neon.h>
++#include <asm/unaligned.h>
++
++MODULE_DESCRIPTION("SHA-224/SHA-256 secure hash using ARMv8 Crypto Extensions");
 +MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
 +MODULE_LICENSE("GPL v2");
 +
-+#define GHASH_BLOCK_SIZE	16
-+#define GHASH_DIGEST_SIZE	16
++asmlinkage void sha2_ce_transform(int blocks, u8 const *src, u32 *state,
++				  u8 *head);
 +
-+struct ghash_key {
-+	u64	a;
-+	u64	b;
-+};
-+
-+struct ghash_desc_ctx {
-+	u64 digest[GHASH_DIGEST_SIZE/sizeof(u64)];
-+	u8 buf[GHASH_BLOCK_SIZE];
-+	u32 count;
-+};
-+
-+struct ghash_async_ctx {
-+	struct cryptd_ahash *cryptd_tfm;
-+};
-+
-+asmlinkage void pmull_ghash_update(int blocks, u64 dg[], const char *src,
-+				   struct ghash_key const *k, const char *head);
-+
-+static int ghash_init(struct shash_desc *desc)
++static int sha224_init(struct shash_desc *desc)
 +{
-+	struct ghash_desc_ctx *ctx = shash_desc_ctx(desc);
++	struct sha256_state *sctx = shash_desc_ctx(desc);
 +
-+	*ctx = (struct ghash_desc_ctx){};
++	*sctx = (struct sha256_state){
++		.state = {
++			SHA224_H0, SHA224_H1, SHA224_H2, SHA224_H3,
++			SHA224_H4, SHA224_H5, SHA224_H6, SHA224_H7,
++		}
++	};
 +	return 0;
 +}
 +
-+static int ghash_update(struct shash_desc *desc, const u8 *src,
-+			unsigned int len)
++static int sha256_init(struct shash_desc *desc)
 +{
-+	struct ghash_desc_ctx *ctx = shash_desc_ctx(desc);
-+	unsigned int partial = ctx->count % GHASH_BLOCK_SIZE;
++	struct sha256_state *sctx = shash_desc_ctx(desc);
 +
-+	ctx->count += len;
++	*sctx = (struct sha256_state){
++		.state = {
++			SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
++			SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7,
++		}
++	};
++	return 0;
++}
 +
-+	if ((partial + len) >= GHASH_BLOCK_SIZE) {
-+		struct ghash_key *key = crypto_shash_ctx(desc->tfm);
++static int sha2_update(struct shash_desc *desc, const u8 *data,
++		       unsigned int len)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++	unsigned int partial;
++
++	if (!may_use_simd())
++		return crypto_sha256_update(desc, data, len);
++
++	partial = sctx->count % SHA256_BLOCK_SIZE;
++	sctx->count += len;
++
++	if ((partial + len) >= SHA256_BLOCK_SIZE) {
 +		int blocks;
 +
 +		if (partial) {
-+			int p = GHASH_BLOCK_SIZE - partial;
++			int p = SHA256_BLOCK_SIZE - partial;
 +
-+			memcpy(ctx->buf + partial, src, p);
-+			src += p;
++			memcpy(sctx->buf + partial, data, p);
++			data += p;
 +			len -= p;
 +		}
 +
-+		blocks = len / GHASH_BLOCK_SIZE;
-+		len %= GHASH_BLOCK_SIZE;
++		blocks = len / SHA256_BLOCK_SIZE;
++		len %= SHA256_BLOCK_SIZE;
 +
 +		kernel_neon_begin();
-+		pmull_ghash_update(blocks, ctx->digest, src, key,
-+				   partial ? ctx->buf : NULL);
++		sha2_ce_transform(blocks, data, sctx->state,
++				  partial ? sctx->buf : NULL);
 +		kernel_neon_end();
-+		src += blocks * GHASH_BLOCK_SIZE;
++
++		data += blocks * SHA256_BLOCK_SIZE;
 +		partial = 0;
 +	}
 +	if (len)
-+		memcpy(ctx->buf + partial, src, len);
++		memcpy(sctx->buf + partial, data, len);
 +	return 0;
 +}
 +
-+static int ghash_final(struct shash_desc *desc, u8 *dst)
++static void sha2_final(struct shash_desc *desc)
 +{
-+	struct ghash_desc_ctx *ctx = shash_desc_ctx(desc);
-+	unsigned int partial = ctx->count % GHASH_BLOCK_SIZE;
++	static const u8 padding[SHA256_BLOCK_SIZE] = { 0x80, };
 +
-+	if (partial) {
-+		struct ghash_key *key = crypto_shash_ctx(desc->tfm);
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++	__be64 bits = cpu_to_be64(sctx->count << 3);
++	u32 padlen = SHA256_BLOCK_SIZE
++		     - ((sctx->count + sizeof(bits)) % SHA256_BLOCK_SIZE);
 +
-+		memset(ctx->buf + partial, 0, GHASH_BLOCK_SIZE - partial);
-+		kernel_neon_begin();
-+		pmull_ghash_update(1, ctx->digest, ctx->buf, key, NULL);
-+		kernel_neon_end();
-+	}
-+	put_unaligned_be64(ctx->digest[1], dst);
-+	put_unaligned_be64(ctx->digest[0], dst + 8);
-+
-+	*ctx = (struct ghash_desc_ctx){};
-+	return 0;
++	sha2_update(desc, padding, padlen);
++	sha2_update(desc, (const u8 *)&bits, sizeof(bits));
 +}
 +
-+static int ghash_setkey(struct crypto_shash *tfm,
-+			const u8 *inkey, unsigned int keylen)
++static int sha224_final(struct shash_desc *desc, u8 *out)
 +{
-+	struct ghash_key *key = crypto_shash_ctx(tfm);
-+	u64 a, b;
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++	__be32 *dst = (__be32 *)out;
++	int i;
 +
-+	if (keylen != GHASH_BLOCK_SIZE) {
-+		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
++	sha2_final(desc);
 +
-+	/* perform multiplication by 'x' in GF(2^128) */
-+	b = get_unaligned_be64(inkey);
-+	a = get_unaligned_be64(inkey + 8);
++	for (i = 0; i < SHA224_DIGEST_SIZE / sizeof(__be32); i++)
++		put_unaligned_be32(sctx->state[i], dst++);
 +
-+	key->a = (a << 1) | (b >> 63);
-+	key->b = (b << 1) | (a >> 63);
-+
-+	if (b >> 63)
-+		key->b ^= 0xc200000000000000UL;
-+
++	*sctx = (struct sha256_state){};
 +	return 0;
 +}
 +
-+static struct shash_alg ghash_alg = {
-+	.digestsize		= GHASH_DIGEST_SIZE,
-+	.init			= ghash_init,
-+	.update			= ghash_update,
-+	.final			= ghash_final,
-+	.setkey			= ghash_setkey,
-+	.descsize		= sizeof(struct ghash_desc_ctx),
++static int sha256_final(struct shash_desc *desc, u8 *out)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++	__be32 *dst = (__be32 *)out;
++	int i;
++
++	sha2_final(desc);
++
++	for (i = 0; i < SHA256_DIGEST_SIZE / sizeof(__be32); i++)
++		put_unaligned_be32(sctx->state[i], dst++);
++
++	*sctx = (struct sha256_state){};
++	return 0;
++}
++
++static int sha2_export(struct shash_desc *desc, void *out)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++	struct sha256_state *dst = out;
++
++	*dst = *sctx;
++	return 0;
++}
++
++static int sha2_import(struct shash_desc *desc, const void *in)
++{
++	struct sha256_state *sctx = shash_desc_ctx(desc);
++	struct sha256_state const *src = in;
++
++	*sctx = *src;
++	return 0;
++}
++
++static struct shash_alg algs[] = { {
++	.init			= sha224_init,
++	.update			= sha2_update,
++	.final			= sha224_final,
++	.export			= sha2_export,
++	.import			= sha2_import,
++	.descsize		= sizeof(struct sha256_state),
++	.digestsize		= SHA224_DIGEST_SIZE,
++	.statesize		= sizeof(struct sha256_state),
 +	.base			= {
-+		.cra_name	= "ghash",
-+		.cra_driver_name = "__driver-ghash-ce",
-+		.cra_priority	= 0,
-+		.cra_flags	= CRYPTO_ALG_TYPE_SHASH,
-+		.cra_blocksize	= GHASH_BLOCK_SIZE,
-+		.cra_ctxsize	= sizeof(struct ghash_key),
-+		.cra_module	= THIS_MODULE,
-+	},
-+};
-+
-+static int ghash_async_init(struct ahash_request *req)
-+{
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct ahash_request *cryptd_req = ahash_request_ctx(req);
-+	struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
-+
-+	if (!may_use_simd()) {
-+		memcpy(cryptd_req, req, sizeof(*req));
-+		ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
-+		return crypto_ahash_init(cryptd_req);
-+	} else {
-+		struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
-+		struct crypto_shash *child = cryptd_ahash_child(cryptd_tfm);
-+
-+		desc->tfm = child;
-+		desc->flags = req->base.flags;
-+		return crypto_shash_init(desc);
++		.cra_name		= "sha224",
++		.cra_driver_name	= "sha224-ce",
++		.cra_priority		= 200,
++		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize		= SHA256_BLOCK_SIZE,
++		.cra_module		= THIS_MODULE,
 +	}
-+}
-+
-+static int ghash_async_update(struct ahash_request *req)
-+{
-+	struct ahash_request *cryptd_req = ahash_request_ctx(req);
-+
-+	if (!may_use_simd()) {
-+		struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+		struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
-+		struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
-+
-+		memcpy(cryptd_req, req, sizeof(*req));
-+		ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
-+		return crypto_ahash_update(cryptd_req);
-+	} else {
-+		struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
-+		return shash_ahash_update(req, desc);
++}, {
++	.init			= sha256_init,
++	.update			= sha2_update,
++	.final			= sha256_final,
++	.export			= sha2_export,
++	.import			= sha2_import,
++	.descsize		= sizeof(struct sha256_state),
++	.digestsize		= SHA256_DIGEST_SIZE,
++	.statesize		= sizeof(struct sha256_state),
++	.base			= {
++		.cra_name		= "sha256",
++		.cra_driver_name	= "sha256-ce",
++		.cra_priority		= 200,
++		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize		= SHA256_BLOCK_SIZE,
++		.cra_module		= THIS_MODULE,
 +	}
-+}
++} };
 +
-+static int ghash_async_final(struct ahash_request *req)
++static int __init sha2_ce_mod_init(void)
 +{
-+	struct ahash_request *cryptd_req = ahash_request_ctx(req);
-+
-+	if (!may_use_simd()) {
-+		struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+		struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
-+		struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
-+
-+		memcpy(cryptd_req, req, sizeof(*req));
-+		ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
-+		return crypto_ahash_final(cryptd_req);
-+	} else {
-+		struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
-+		return crypto_shash_final(desc, req->result);
-+	}
-+}
-+
-+static int ghash_async_digest(struct ahash_request *req)
-+{
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct ahash_request *cryptd_req = ahash_request_ctx(req);
-+	struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
-+
-+	if (!may_use_simd()) {
-+		memcpy(cryptd_req, req, sizeof(*req));
-+		ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
-+		return crypto_ahash_digest(cryptd_req);
-+	} else {
-+		struct shash_desc *desc = cryptd_shash_desc(cryptd_req);
-+		struct crypto_shash *child = cryptd_ahash_child(cryptd_tfm);
-+
-+		desc->tfm = child;
-+		desc->flags = req->base.flags;
-+		return shash_ahash_digest(req, desc);
-+	}
-+}
-+
-+static int ghash_async_setkey(struct crypto_ahash *tfm, const u8 *key,
-+			      unsigned int keylen)
-+{
-+	struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct crypto_ahash *child = &ctx->cryptd_tfm->base;
-+	int err;
-+
-+	crypto_ahash_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_ahash_set_flags(child, crypto_ahash_get_flags(tfm)
-+			       & CRYPTO_TFM_REQ_MASK);
-+	err = crypto_ahash_setkey(child, key, keylen);
-+	crypto_ahash_set_flags(tfm, crypto_ahash_get_flags(child)
-+			       & CRYPTO_TFM_RES_MASK);
-+
-+	return err;
-+}
-+
-+static int ghash_async_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct cryptd_ahash *cryptd_tfm;
-+	struct ghash_async_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	cryptd_tfm = cryptd_alloc_ahash("__driver-ghash-ce", 0, 0);
-+	if (IS_ERR(cryptd_tfm))
-+		return PTR_ERR(cryptd_tfm);
-+	ctx->cryptd_tfm = cryptd_tfm;
-+	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
-+				 sizeof(struct ahash_request) +
-+				 crypto_ahash_reqsize(&cryptd_tfm->base));
-+
-+	return 0;
-+}
-+
-+static void ghash_async_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct ghash_async_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	cryptd_free_ahash(ctx->cryptd_tfm);
-+}
-+
-+static struct ahash_alg ghash_async_alg = {
-+	.init			= ghash_async_init,
-+	.update			= ghash_async_update,
-+	.final			= ghash_async_final,
-+	.setkey			= ghash_async_setkey,
-+	.digest			= ghash_async_digest,
-+	.halg.digestsize	= GHASH_DIGEST_SIZE,
-+	.halg.base		= {
-+		.cra_name	= "ghash",
-+		.cra_driver_name = "ghash-ce",
-+		.cra_priority	= 300,
-+		.cra_flags	= CRYPTO_ALG_TYPE_AHASH | CRYPTO_ALG_ASYNC,
-+		.cra_blocksize	= GHASH_BLOCK_SIZE,
-+		.cra_type	= &crypto_ahash_type,
-+		.cra_ctxsize	= sizeof(struct ghash_async_ctx),
-+		.cra_module	= THIS_MODULE,
-+		.cra_init	= ghash_async_init_tfm,
-+		.cra_exit	= ghash_async_exit_tfm,
-+	},
-+};
-+
-+static int __init ghash_ce_mod_init(void)
-+{
-+	int err;
-+
-+	if (!(elf_hwcap2 & HWCAP2_PMULL))
++	if (!(elf_hwcap2 & HWCAP2_SHA2))
 +		return -ENODEV;
-+
-+	err = crypto_register_shash(&ghash_alg);
-+	if (err)
-+		return err;
-+	err = crypto_register_ahash(&ghash_async_alg);
-+	if (err)
-+		goto err_shash;
-+
-+	return 0;
-+
-+err_shash:
-+	crypto_unregister_shash(&ghash_alg);
-+	return err;
++	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
 +}
 +
-+static void __exit ghash_ce_mod_exit(void)
++static void __exit sha2_ce_mod_fini(void)
 +{
-+	crypto_unregister_ahash(&ghash_async_alg);
-+	crypto_unregister_shash(&ghash_alg);
++	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
 +}
 +
-+module_init(ghash_ce_mod_init);
-+module_exit(ghash_ce_mod_exit);
++module_init(sha2_ce_mod_init);
++module_exit(sha2_ce_mod_fini);
 -- 
 1.8.3.2
