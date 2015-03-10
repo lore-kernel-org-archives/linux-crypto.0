@@ -1,47 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH V3 1/2] crypto: Add Imagination Technologies hw hash
- accelerator
-Date: Tue, 10 Mar 2015 20:55:37 +1100
-Message-ID: <20150310095537.GA17765@gondor.apana.org.au>
-References: <1425610707-9869-1-git-send-email-james.hartley@imgtec.com>
- <1425610707-9869-2-git-send-email-james.hartley@imgtec.com>
- <1582962.nmzkjGWQFm@tauon>
- <20150310093707.GA17289@gondor.apana.org.au>
- <72BC0C8BD7BB6F45988A99382E5FBAE54446310E@hhmail02.hh.imgtec.org>
+Subject: Re: [PATCH 0/7] crypto: OCTEON MD5 bugfix + SHA modules
+Date: Tue, 10 Mar 2015 20:58:07 +1100
+Message-ID: <20150310095807.GA17913@gondor.apana.org.au>
+References: <1425845267-14413-1-git-send-email-aaro.koskinen@iki.fi>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Stephan Mueller <smueller@chronox.de>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"pawel.moll@arm.com" <pawel.moll@arm.com>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>,
-	"galak@codeaurora.org" <galak@codeaurora.org>,
-	"Andrew Bresticker (abrestic@chromium.org)" <abrestic@chromium.org>,
-	Ezequiel Garcia <Ezequiel.Garcia@imgtec.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: James Hartley <James.Hartley@imgtec.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-mips@linux-mips.org,
+	linux-kernel@vger.kernel.org
+To: Aaro Koskinen <aaro.koskinen@iki.fi>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:43928 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:57194 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751635AbbCJJz5 (ORCPT
+	with ESMTP id S1751354AbbCJJ6W (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Mar 2015 05:55:57 -0400
+	Tue, 10 Mar 2015 05:58:22 -0400
 Content-Disposition: inline
-In-Reply-To: <72BC0C8BD7BB6F45988A99382E5FBAE54446310E@hhmail02.hh.imgtec.org>
+In-Reply-To: <1425845267-14413-1-git-send-email-aaro.koskinen@iki.fi>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 10, 2015 at 09:54:49AM +0000, James Hartley wrote:
->
-> > Hi Herbert, and Stephan,
-> > 
-> > The difficulty here is that the driver was written by a summer placement
-> > student who has since left the company, and despite searching our internal
-> > commit logs I'm unable to find any reason why 301 and 3000 are used.  I am
-> > happy to set them to 300 if that is a sensible figure to use.
+On Sun, Mar 08, 2015 at 10:07:40PM +0200, Aaro Koskinen wrote:
+> Hi,
+> 
+> The first patch is a bug fix for OCTEON MD5 aimed for 4.0-rc cycle.
 
-OK please resend the patches with that change James.
+Please send such bug fixes in a separate series in future.
+For this one in particular it does not appear to be critical
+enough to go in straight away so I have pushed it into cryptodev
+along with the rest.
 
-Thanks,
+> The remaining patches add SHA1/SHA256/SHA512 modules. I have tested
+> these on the following OCTEON boards and CPUs with 4.0-rc2:
+> 
+> 	D-Link DSR-1000N:	CN5010p1.1-500-SCP
+> 	EdgeRouter Lite:	CN5020p1.1-500-SCP
+> 	EdgeRouter Pro:		CN6120p1.1-1000-NSP
+> 
+> All selftests are passing. With tcrypt, I get the following numbers
+> on speed compared to the generic modules:
+
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
