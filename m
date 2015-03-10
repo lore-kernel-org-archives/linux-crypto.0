@@ -1,71 +1,74 @@
-From: James Hartley <James.Hartley@imgtec.com>
-Subject: RE: [PATCH V3 2/2] Documentation: crypto: Add DT binding info for
- the img hw hash accelerator
-Date: Tue, 10 Mar 2015 15:34:25 +0000
-Message-ID: <72BC0C8BD7BB6F45988A99382E5FBAE544463681@hhmail02.hh.imgtec.org>
+From: Andrew Bresticker <abrestic@chromium.org>
+Subject: Re: [PATCH V3 1/2] crypto: Add Imagination Technologies hw hash accelerator
+Date: Tue, 10 Mar 2015 11:02:26 -0700
+Message-ID: <CAL1qeaF+h-pEpWiC1h=RA8ei9i_wbw997WM-dPq-sfW_RjK7eg@mail.gmail.com>
 References: <1425610912-9930-1-git-send-email-james.hartley@imgtec.com>
-	<1425610912-9930-3-git-send-email-james.hartley@imgtec.com>
- <CAL1qeaHSkwTvL35yrQQD-5F37D3LKxS7zEg3vdPBfVQvznbYQQ@mail.gmail.com>
+	<1425610912-9930-2-git-send-email-james.hartley@imgtec.com>
+	<CAL1qeaEedjW7A8npCrmnOWByM6gOL2JA8c=Pa8Y9wOYnmz8NcA@mail.gmail.com>
+	<72BC0C8BD7BB6F45988A99382E5FBAE544463666@hhmail02.hh.imgtec.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Andrew Bresticker <abrestic@chromium.org>
+To: James Hartley <James.Hartley@imgtec.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:8846 "EHLO
-	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750981AbbCJPe2 (ORCPT
+Received: from mail-qg0-f47.google.com ([209.85.192.47]:41725 "EHLO
+	mail-qg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750976AbbCJSC1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 10 Mar 2015 11:34:28 -0400
-In-Reply-To: <CAL1qeaHSkwTvL35yrQQD-5F37D3LKxS7zEg3vdPBfVQvznbYQQ@mail.gmail.com>
-Content-Language: en-US
+	Tue, 10 Mar 2015 14:02:27 -0400
+Received: by qgea108 with SMTP id a108so3926457qge.8
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Mar 2015 11:02:26 -0700 (PDT)
+In-Reply-To: <72BC0C8BD7BB6F45988A99382E5FBAE544463666@hhmail02.hh.imgtec.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgQW5kcmV3DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogYWJyZXN0
-aWNAZ29vZ2xlLmNvbSBbbWFpbHRvOmFicmVzdGljQGdvb2dsZS5jb21dIE9uIEJlaGFsZiBPZg0K
-PiBBbmRyZXcgQnJlc3RpY2tlcg0KPiBTZW50OiAwNiBNYXJjaCAyMDE1IDIxOjUwDQo+IFRvOiBK
-YW1lcyBIYXJ0bGV5DQo+IENjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnDQo+IFN1Ympl
-Y3Q6IFJlOiBbUEFUQ0ggVjMgMi8yXSBEb2N1bWVudGF0aW9uOiBjcnlwdG86IEFkZCBEVCBiaW5k
-aW5nIGluZm8gZm9yDQo+IHRoZSBpbWcgaHcgaGFzaCBhY2NlbGVyYXRvcg0KPiANCj4gSGkgSmFt
-ZXMsDQo+IA0KPiBPbiBUaHUsIE1hciA1LCAyMDE1IGF0IDc6MDEgUE0sIEphbWVzIEhhcnRsZXkg
-PGphbWVzLmhhcnRsZXlAaW1ndGVjLmNvbT4NCj4gd3JvdGU6DQo+ID4gVGhpcyBhZGRzIHRoZSBi
-aW5kaW5nIGRvY3VtZW50YXRpb24gZm9yIHRoZSBJbWFnaW5hdGlvbiBUZWNobm9sb2dpZXMNCj4g
-PiBoYXNoIGFjY2VsZXJhdG9yIHRoYXQgcHJvdmlkZXMgaGFyZHdhcmUgYWNjZWxlcmF0aW9uIGZv
-cg0KPiA+IFNIQTEvU0hBMjI0L1NIQTI1Ni9NRDUgaGFzaGVzLiAgVGhpcyBoYXJkd2FyZSB3aWxs
-IGJlIHByZXNlbnQgaW4gdGhlDQo+ID4gdXBjb21pbmcgcGlzdGFjaGlvIFNvQy4NCj4gPg0KPiA+
-IFNpZ25lZC1vZmYtYnk6IEphbWVzIEhhcnRsZXkgPGphbWVzLmhhcnRsZXlAaW1ndGVjLmNvbT4N
-Cj4gDQo+ID4gZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9j
-cnlwdG8vaW1nLWhhc2gudHh0DQo+ID4gYi9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGlu
-Z3MvY3J5cHRvL2ltZy1oYXNoLnR4dA0KPiA+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+ID4gaW5k
-ZXggMDAwMDAwMC4uN2FkYzUxOQ0KPiA+IC0tLSAvZGV2L251bGwNCj4gPiArKysgYi9Eb2N1bWVu
-dGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvY3J5cHRvL2ltZy1oYXNoLnR4dA0KPiA+IEBAIC0w
-LDAgKzEsMjcgQEANCj4gPiArSW1hZ2luYXRpb24gVGVjaG5vbG9naWVzIGhhcmR3YXJlIGhhc2gg
-YWNjZWxlcmF0b3INCj4gPiArDQo+ID4gK1RoZSBoYXNoIGFjY2VsZXJhdG9yIHByb3ZpZGVzIGhh
-cmR3YXJlIGhhc2hpbmcgYWNjZWxlcmF0aW9uIGZvciBTSEExLA0KPiA+ICtTSEEyMjQsIFNIQTI1
-NiBhbmQgTUQ1IGhhc2hlcw0KPiA+ICsNCj4gPiArUmVxdWlyZWQgcHJvcGVydGllczoNCj4gPiAr
-DQo+ID4gKy0gY29tcGF0aWJsZSA6ICJpbWcsaGFzaC1hY2NlbGVyYXRvciINCj4gPiArLSByZWcg
-OiBPZmZzZXQgYW5kIGxlbmd0aCBvZiB0aGUgcmVnaXN0ZXIgc2V0IGZvciB0aGUgbW9kdWxlLCBh
-bmQgdGhlDQo+ID4gK0RNQSBwb3J0DQo+ID4gKy0gaW50ZXJydXB0cyA6IFRoZSBkZXNpZ25hdGVk
-IElSUSBsaW5lIGZvciB0aGUgaGFzaGluZyBtb2R1bGUuDQo+ID4gKy0gZG1hcyA6IERNQSBzcGVj
-aWZpZXIgYXMgcGVyDQo+ID4gK0RvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9kbWEv
-ZG1hLnR4dA0KPiA+ICstIGRtYS1uYW1lcyA6IFNob3VsZCBiZSAidHgiDQo+ID4gKy0gY2xvY2tz
-IDogQ2xvY2sgc3BlY2lmaWVycw0KPiA+ICstIGNsb2NrLW5hbWVzIDogImhhc2hfY2xrIiBVc2Vk
-IHRvIGNsb2NrIGRhdGEgdGhyb3VnaCB0aGUgYWNjZWxlcmF0b3INCj4gPiArICAgICAgICAgICAg
-ICAgImhhc2hfcmVnX2NsayIgVXNlZCB0byBjbG9jayB0aGUgaGFzaCBibG9jayByZWdpc3RlcnMN
-Cj4gDQo+IEZvciB0aGUgb3RoZXIgSU1HIGRyaXZlcnMgdGhhdCBoYXZlIGJlZW4gc3VibWl0dGVk
-LCB3ZSd2ZSBiZWVuICB1c2luZyAic3lzIg0KPiBhcyB0aGUgbmFtZSBmb3IgdGhlIHJlZ2lzdGVy
-IGdhdGUgY2xvY2suICBNYXliZSB3ZSBzaG91bGQgZG8gdGhhdCBoZXJlIHRvbyB0bw0KPiBiZSBj
-b25zaXN0ZW50Pw0KDQpZZXMsIGdvb2QgaWRlYQ0KDQo+IA0KPiA+ICtFeGFtcGxlOg0KPiA+ICsN
-Cj4gPiArICAgICAgIGhhc2g6IGhhc2hAMTgxNDk2MDAgew0KPiA+ICsgICAgICAgY29tcGF0aWJs
-ZSA9ICJpbWcsaGFzaC1hY2NlbGVyYXRvciI7DQo+ID4gKyAgICAgICAgICAgICAgIHJlZyA9IDww
-eDE4MTQ5NjAwIDB4MTAwLCAweDE4MTAxMTAwIDB4ND47DQo+ID4gKyAgICAgICAgICAgICAgIGlu
-dGVycnVwdHMgPSA8R0lDX1NIQVJFRCA1OSBJUlFfVFlQRV9MRVZFTF9ISUdIPjsNCj4gPiArICAg
-ICAgICAgICAgICAgZG1hcyA9IDwmZG1hIDggMHhmZmZmZmZmZj47DQo+ID4gKyAgICAgICAgICAg
-ICAgIGRtYS1uYW1lcyA9ICJ0eCI7DQo+ID4gKyAgICAgICAgICAgICAgIGNsb2NrcyA9IDwmY3Jf
-cGVyaXBoIFNZU19DTEtfSEFTSD4sIDwmY2xrX3BlcmlwaA0KPiBQRVJJUEhfQ0xLX1JPTT47DQo+
-ID4gKyAgICAgICAgICAgICAgIGNsb2NrLW5hbWVzID0gImhhc2hfY2xrLCBoYXNoX3JlZ19jbGsi
-Ow0KPiANCj4gSSB0aGluayB0aGVzZSBhcmUgZmxpcHBlZCAoYW5kIHlvdSdyZSBtaXNzaW5nIHNv
-bWUgcXVvdGF0aW9uIG1hcmtzKS4NCg0KRml4ZWQuIA0KDQo+IA0KPiBPdGhlcndpc2UgdGhpcyBs
-b29rcyBnb29kIHRvIG1lLg0KPiANCj4gLUFuZHJldw0KDQpUaGFua3MgZm9yIHRoZSByZXZpZXcs
-DQoNCkphbWVzDQo=
+Hi James,
+
+>> > +static irqreturn_t img_irq_handler(int irq, void *dev_id) {
+>> > +       struct img_hash_dev *hdev = dev_id;
+>> > +       u32 reg;
+>> > +
+>> > +       reg = img_hash_read(hdev, CR_INTSTAT);
+>> > +       img_hash_write(hdev, CR_INTCLEAR, reg);
+>> > +
+>> > +       if (reg & CR_INT_NEW_RESULTS_SET) {
+>> > +               dev_dbg(hdev->dev, "IRQ CR_INT_NEW_RESULTS_SET\n");
+>> > +               if (DRIVER_FLAGS_BUSY & hdev->flags) {
+>> > +                       hdev->flags |= DRIVER_FLAGS_OUTPUT_READY;
+>> > +                       if (!(DRIVER_FLAGS_CPU & hdev->flags))
+>> > +                               hdev->flags |= DRIVER_FLAGS_DMA_READY;
+>> > +                       tasklet_schedule(&hdev->done_task);
+>>
+>> Since this done_task only gets scheduled from here, why not make this a
+>> threaded IRQ handler and just do the work here instead of separating it
+>> between a hard IRQ handler and a tasklet?
+>
+> What is the advantage of doing that?  i.e is this simple case worth setting up an extra thread?
+
+I believe threaded IRQ handlers are now preferred to using a hard IRQ
+handler + tasklet when possible, partly because people tend to screw
+up tasklet usage.
+
+>> > +               err = PTR_ERR(hdev->io_base);
+>> > +               goto hash_io_err;
+>> > +       }
+>> > +
+>> > +       /* Write port (DMA or CPU) */
+>> > +       hash_res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+>> > +       if (!hash_res) {
+>> > +               dev_err(dev, "no write port resource info\n");
+>> > +               err = -ENODEV;
+>> > +               goto res_err;
+>> > +       }
+>> > +       hdev->bus_addr = hash_res->start;
+>>
+>> Maybe set this after devm_ioremap_resource() succeeds and avoid the extra
+>> error check?
+>
+> Not quite following you here - which check are you saying can be removed?
+
+You can remove the if (hash_res) check if you set hdev->bus_addr after
+devm_ioremap_resource().
+
+Thanks,
+Andrew
