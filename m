@@ -1,35 +1,37 @@
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: Re: [PATCH 2/4] hwrng: omap - remove #ifdefery around PM methods
-Date: Wed, 11 Mar 2015 14:08:56 -0700
-Message-ID: <20150311210856.GA8434@dtor-ws>
-References: <1425922598-16538-1-git-send-email-dmitry.torokhov@gmail.com>
- <1425922598-16538-2-git-send-email-dmitry.torokhov@gmail.com>
- <20150311105957.GA5351@gondor.apana.org.au>
- <20150311154407.GA37516@dtor-ws>
- <20150311210034.GA10537@gondor.apana.org.au>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH RFC 0/4] Add support for async socket operations
+Date: Wed, 11 Mar 2015 15:46:08 -0700
+Message-ID: <20150311224607.23777.2181.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Deepak Saxena <dsaxena@plexity.net>,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150311210034.GA10537@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-aio@kvack.org, herbert@gondor.apana.org.au,
+	netdev@vger.kernel.org, ying.xue@windriver.com, bcrl@kvack.org,
+	viro@ZenIV.linux.org.uk, linux-fsdevel@vger.kernel.org, hch@lst.de,
+	linux-crypto@vger.kernel.org
+To: davem@davemloft.net
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 12, 2015 at 08:00:35AM +1100, Herbert Xu wrote:
-> On Wed, Mar 11, 2015 at 08:44:07AM -0700, Dmitry Torokhov wrote:
-> > 
-> > SIMPLE_DEV_PM_OPS() produces an empty omap_rng_pm structure in case of
-> > !CONFIG_PM_SLEEP so neither omap_rng_suspend nor omap_rng_resume will
-> > end up being referenced.
-> 
-> OK, could you please resend this patch?
+After the iocb parameter has been removed from sendmsg() and recvmsg() ops
+the socket layer, and the network stack no longer support async operations.
+This patch set adds support for asynchronous operations on sockets back.
 
-Done.
+--
+Tadeusz Struk (4):
+      net: socket: add support for async operations
+      aio: prefer aio_op op over inter_op
+      crypto: af_alg - Allow to link sgl
+      crypto: algif - change algif_skcipher to be asynchronous
 
-Thanks!
+
+ crypto/af_alg.c         |   18 +++-
+ crypto/algif_skcipher.c |  224 ++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/aio.c                |    8 +-
+ include/crypto/if_alg.h |    4 +
+ include/linux/net.h     |    8 ++
+ net/socket.c            |   64 +++++++++++++
+ 6 files changed, 312 insertions(+), 14 deletions(-)
 
 -- 
-Dmitry
