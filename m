@@ -1,28 +1,35 @@
 From: David Miller <davem@davemloft.net>
 Subject: Re: net: Remove iocb argument from sendmsg and recvmsg
-Date: Wed, 11 Mar 2015 00:02:48 -0400 (EDT)
-Message-ID: <20150311.000248.417529352060472113.davem@davemloft.net>
+Date: Wed, 11 Mar 2015 00:06:07 -0400 (EDT)
+Message-ID: <20150311.000607.609650379851507833.davem@davemloft.net>
 References: <54FFAA5B.3080608@intel.com>
+	<54FFB3E9.50905@windriver.com>
 Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: ying.xue@windriver.com, herbert@gondor.apana.org.au, hch@lst.de,
+Cc: tadeusz.struk@intel.com, herbert@gondor.apana.org.au, hch@lst.de,
 	viro@ZenIV.linux.org.uk, netdev@vger.kernel.org,
 	linux-crypto@vger.kernel.org
-To: tadeusz.struk@intel.com
+To: ying.xue@windriver.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:37580 "EHLO
+Received: from shards.monkeyblade.net ([149.20.54.216]:37650 "EHLO
 	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750749AbbCKECx (ORCPT
+	with ESMTP id S1750939AbbCKEGJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Mar 2015 00:02:53 -0400
-In-Reply-To: <54FFAA5B.3080608@intel.com>
+	Wed, 11 Mar 2015 00:06:09 -0400
+In-Reply-To: <54FFB3E9.50905@windriver.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+From: Ying Xue <ying.xue@windriver.com>
+Date: Wed, 11 Mar 2015 11:18:01 +0800
 
-Because of the way you quoted the patch, it looked like a list posting
-looping back to the list again, because of the "List-ID: " email header.
+> Sorry, I did not realize the case when I created the commit. However, although I
+> don't understand its scenario, in my opinion, adding one redundant argument for
+> all sockets to satisfy the special case seems unreasonable for us.
 
-Therefore your posting was blocked and you'll have to resend your posting
-in a way such that this doesn't happen.
+And the AIO socket mechanism was buggy and references freed up stack
+objects.
+
+That whole set of problems would need to be addressed fully before
+we could even think of adding AIO support back to the socket layer.
