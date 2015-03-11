@@ -1,28 +1,28 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
+From: David Miller <davem@davemloft.net>
 Subject: Re: net: Remove iocb argument from sendmsg and recvmsg
-Date: Tue, 10 Mar 2015 20:25:29 -0700
-Message-ID: <54FFB5A9.5030008@intel.com>
-References: <54FFAA5B.3080608@intel.com> <54FFB3E9.50905@windriver.com>
+Date: Wed, 11 Mar 2015 00:02:48 -0400 (EDT)
+Message-ID: <20150311.000248.417529352060472113.davem@davemloft.net>
+References: <54FFAA5B.3080608@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: Christoph Hellwig <hch@lst.de>, Al Viro <viro@ZenIV.linux.org.uk>,
-	netdev@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Ying Xue <ying.xue@windriver.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <54FFB3E9.50905@windriver.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: ying.xue@windriver.com, herbert@gondor.apana.org.au, hch@lst.de,
+	viro@ZenIV.linux.org.uk, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: tadeusz.struk@intel.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from shards.monkeyblade.net ([149.20.54.216]:37580 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750749AbbCKECx (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 Mar 2015 00:02:53 -0400
+In-Reply-To: <54FFAA5B.3080608@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/10/2015 08:18 PM, Ying Xue wrote:
-> Sorry, I did not realize the case when I created the commit. However, although I
-> don't understand its scenario, in my opinion, adding one redundant argument for
-> all sockets to satisfy the special case seems unreasonable for us.
 
-In my opinion this is not about a single, special case, but rather about being able to support asynchronous operations on socket interface.
-It is important for AF_ALG since we have crypto HW accelerators, that people want to access from user space, but in the future there might be other use cases.
-Regards,
-Tadeusz
+Because of the way you quoted the patch, it looked like a list posting
+looping back to the list again, because of the "List-ID: " email header.
+
+Therefore your posting was blocked and you'll have to resend your posting
+in a way such that this doesn't happen.
