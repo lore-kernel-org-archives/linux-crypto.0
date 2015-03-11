@@ -1,42 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: linux-next: build warnings after merge of the crypto tree
-Date: Wed, 11 Mar 2015 13:05:56 +1100
-Message-ID: <20150311020556.GA1260@gondor.apana.org.au>
-References: <20150310164417.540c18a4@canb.auug.org.au>
- <20150310060328.GA14997@gondor.apana.org.au>
- <54FFA1BA.30009@intel.com>
+From: Ying Xue <ying.xue@windriver.com>
+Subject: Re: net: Remove iocb argument from sendmsg and recvmsg
+Date: Wed, 11 Mar 2015 11:18:01 +0800
+Message-ID: <54FFB3E9.50905@windriver.com>
+References: <54FFAA5B.3080608@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Stephan Mueller <smueller@chronox.de>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: Christoph Hellwig <hch@lst.de>, Al Viro <viro@ZenIV.linux.org.uk>,
+	<netdev@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-next-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <54FFA1BA.30009@intel.com>
-Sender: linux-next-owner@vger.kernel.org
+	Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <54FFAA5B.3080608@intel.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Mar 10, 2015 at 07:00:26PM -0700, Tadeusz Struk wrote:
-> On 03/09/2015 11:03 PM, Herbert Xu wrote:
-> > This is a bit of a bummer.  What happened is that net-next has
-> > killed the kiocb argument to sendmsg/recvmsg.  However, this
-> > change is obviously not part of the crypto tree and algif_aead
-> > only exists in the crypto tree.
-> > 
-> > So Stephen could you fix this by hand until one of them is merged
-> > upstream (just kill the first argument in aead_sendmsg/aead_recvmsg)?
+Sorry, I did not realize the case when I created the commit. However, although I
+don't understand its scenario, in my opinion, adding one redundant argument for
+all sockets to satisfy the special case seems unreasonable for us.
+
+Regards,
+Ying
+
+On 03/11/2015 10:37 AM, Tadeusz Struk wrote:
+> Hi,
+> After couple of attempts to implement an user space interface to crypto HW that would meet our performance requirements, and after discussion with Herbert, we have come to conclusion that using AF_ALG sockets and AIO interface is the way to go.
+> Unfortunately it looks like AIO operations will no longer be supported on sockets because of the commit 1b784140474e4fc94281a49e96c67d29df0efbde.
+> My question is why do we want to abandon AIO support in the socket layer? Is it not worth keeping it for scenarios like this?
+> Do we have any alternative?
+> The mentioned patch attached for your reference.
+> Regards,
+> Tadeusz
 > 
-> So does it mean that aio operations will not be supported on sockets?
-
-Indeed.  If you want to have this ability you'll need to take
-the discussion over to netdev.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
