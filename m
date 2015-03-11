@@ -1,85 +1,102 @@
-From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: Re: [PATCH 2/4] hwrng: omap - remove #ifdefery around PM methods
-Date: Wed, 11 Mar 2015 08:44:07 -0700
-Message-ID: <20150311154407.GA37516@dtor-ws>
-References: <1425922598-16538-1-git-send-email-dmitry.torokhov@gmail.com>
- <1425922598-16538-2-git-send-email-dmitry.torokhov@gmail.com>
- <20150311105957.GA5351@gondor.apana.org.au>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH 0/2] crypto: talitos: Add AES-XTS mode
+Date: Wed, 11 Mar 2015 17:48:33 +0200
+Message-ID: <550063D1.2070105@freescale.com>
+References: <1424451610-5786-1-git-send-email-mort@bork.org>
+	<54F464E4.8080204@freescale.com>	<54F475A8.6030105@gmail.com>
+	<20150302220923.GC30523@darwin.bork.org>	<54F5D6D5.8070407@freescale.com>
+	<CAJUS3Xnw66Eu6tvGPpdcet6KLjhKM=ptj8NRaztAVr0h_r+LqQ@mail.gmail.com>
+	<54FD72E4.1060701@freescale.com>
+ <CAJUS3XkY0tbYqBbU5HR7NT63UPFi5DO6XWuymbZnQaJEA5kkBw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Deepak Saxena <dsaxena@plexity.net>,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150311105957.GA5351@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <linux-crypto@vger.kernel.org>,
+	Scott Wood <scottwood@freescale.com>,
+	<linuxppc-dev@lists.ozlabs.org>, Milan Broz <gmazyland@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: Martin Hicks <mort@bork.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn1bon0119.outbound.protection.outlook.com ([157.56.111.119]:54912
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751395AbbCKPsz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 Mar 2015 11:48:55 -0400
+In-Reply-To: <CAJUS3XkY0tbYqBbU5HR7NT63UPFi5DO6XWuymbZnQaJEA5kkBw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On 3/9/2015 5:08 PM, Martin Hicks wrote:
+> On Mon, Mar 9, 2015 at 6:16 AM, Horia Geant=C4=83 <horia.geanta@frees=
+cale.com> wrote:
+>> On 3/3/2015 7:44 PM, Martin Hicks wrote:
+>>> On Tue, Mar 3, 2015 at 10:44 AM, Horia Geant=C4=83
+>>> <horia.geanta@freescale.com> wrote:
+>>>>
+>>>> For talitos, there are two cases:
+>>>>
+>>>> 1. request data size is <=3D data unit / sector size
+>>>> talitos can handle any IV / tweak scheme
+>>>>
+>>>> 2. request data size > sector size
+>>>> since talitos internally generates the IV for the next sector by
+>>>> incrementing the previous IV, only IV schemes that allocate consec=
+utive
+>>>> IV to consecutive sectors will function correctly.
+>>>>
+>>>
+>>> it's not clear to me that #1 is right.  I guess it could be, but th=
+e
+>>> IV length would be limited to 8 bytes.
+>>
+>> Yes, there's a limitation in talitos wrt. XTS IV / tweak size - it's=
+ up
+>> to 8 bytes.
+>> So I guess ESSIV won't work with talitos-xts, since the encrypted IV
+>> output is 16 bytes.
+>> But as previously said, ESSIV breaks the XTS standard requirement fo=
+r
+>> having a consecutive IV for consecutive blocks. ESSIV should really =
+be
+>> used only with disk-level encryption schemes that require an
+>> unpredictable IV.
+>=20
+> Ok.  I'll verify that the second half of the IV is zeroed.
+>=20
+> One last thing that I'm not sure of is what string to place in
+> cra_ablkcipher.geniv field.   "eseqiv" seems wrong if plain/plain64
+> are the IVs that XTS is designed for.
 
-On Wed, Mar 11, 2015 at 09:59:57PM +1100, Herbert Xu wrote:
-> On Mon, Mar 09, 2015 at 10:36:36AM -0700, Dmitry Torokhov wrote:
-> > Instead of using #ifdefs let's mark suspend and resume methods as
-> > __maybe_unused which will suppress compiler warnings about them being
-> > unused and provide better compile coverage. This will not increase image
-> > size.
-> > 
-> > Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> > ---
-> >  drivers/char/hw_random/omap-rng.c | 15 +++------------
-> >  1 file changed, 3 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-> > index 7f3597d..5c171b1 100644
-> > --- a/drivers/char/hw_random/omap-rng.c
-> > +++ b/drivers/char/hw_random/omap-rng.c
-> > @@ -422,9 +422,7 @@ static int omap_rng_remove(struct platform_device *pdev)
-> >  	return 0;
-> >  }
-> >  
-> > -#ifdef CONFIG_PM_SLEEP
-> > -
-> > -static int omap_rng_suspend(struct device *dev)
-> > +static int __maybe_unused omap_rng_suspend(struct device *dev)
-> >  {
-> >  	struct omap_rng_dev *priv = dev_get_drvdata(dev);
-> >  
-> > @@ -434,7 +432,7 @@ static int omap_rng_suspend(struct device *dev)
-> >  	return 0;
-> >  }
-> >  
-> > -static int omap_rng_resume(struct device *dev)
-> > +static int __maybe_unused omap_rng_resume(struct device *dev)
-> >  {
-> >  	struct omap_rng_dev *priv = dev_get_drvdata(dev);
-> >  
-> > @@ -445,18 +443,11 @@ static int omap_rng_resume(struct device *dev)
-> >  }
-> >  
-> >  static SIMPLE_DEV_PM_OPS(omap_rng_pm, omap_rng_suspend, omap_rng_resume);
-> > -#define	OMAP_RNG_PM	(&omap_rng_pm)
-> > -
-> > -#else
-> > -
-> > -#define	OMAP_RNG_PM	NULL
-> > -
-> > -#endif
-> >  
-> >  static struct platform_driver omap_rng_driver = {
-> >  	.driver = {
-> >  		.name		= "omap_rng",
-> > -		.pm		= OMAP_RNG_PM,
-> > +		.pm		= &omap_rng_pm,
-> 
-> This will cause omap_rng_suspend/omap_rng_resume to be referenced
-> always, thus rendering the __maybe_unused moot, no?
+Right. But since currently dm-crypt does not use .givencrypt and deals
+with IV generation by itself, we're safe.
+When dm-crypt IV generation will be moved to crypto, we'll have to
+revisit this.
 
-SIMPLE_DEV_PM_OPS() produces an empty omap_rng_pm structure in case of
-!CONFIG_PM_SLEEP so neither omap_rng_suspend nor omap_rng_resume will
-end up being referenced.
+While here: note that xts-talitos supports only two key lengths - 256
+and 512 bits. There are tcrypt speed tests that check also for 384-bit
+keys (which is out-of-spec, but still...), leading to a "Key Size Error=
+"
+- see below (KSE bit in AESU Interrupt Status Register is set)
 
-Thanks.
+testing speed of async xts(aes) (xts-aes-talitos) encryption
+[...]
+test 5 (384 bit key, 16 byte blocks):
+talitos ffe30000.crypto: CDPR is NULL, giving up search for offending
+descriptor
+talitos ffe30000.crypto: AESUISR 0x00000000_00000200
+talitos ffe30000.crypto: DESCBUF 0x64300011_00000000
+talitos ffe30000.crypto: DESCBUF 0x00000000_00000000
+talitos ffe30000.crypto: DESCBUF 0x00100000_00000000
+talitos ffe30000.crypto: DESCBUF 0x00300000_00000000
+talitos ffe30000.crypto: DESCBUF 0x00100000_00000000
+talitos ffe30000.crypto: DESCBUF 0x00100000_00000000
+talitos ffe30000.crypto: DESCBUF 0x00100000_00000000
+talitos ffe30000.crypto: DESCBUF 0x00000000_00000000
+encryption() failed flags=3D0
 
--- 
-Dmitry
+So for xts, driver must enforce 256/512 bit key lengths and return
+CRYPTO_TFM_RES_BAD_KEY_LEN in all other cases.
+Or a SW fallback could be used for the other cases, but I don't think
+it's worth the effort since these are non-standard.
+
+Horia
