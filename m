@@ -1,38 +1,35 @@
-From: Sasha Levin <sasha.levin@oracle.com>
-Subject: Re: [PATCH] mm: kill kmemcheck
-Date: Wed, 11 Mar 2015 09:39:33 -0400
-Message-ID: <55004595.7020304@oracle.com>
-References: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>	<20150311081909.552e2052@grimm.local.home>	<55003666.3020100@oracle.com> <20150311084034.04ce6801@grimm.local.home>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4] hwrng: omap - remove incorrect __exit markups
+Date: Thu, 12 Mar 2015 01:13:05 +1100
+Message-ID: <20150311141305.GB5713@gondor.apana.org.au>
+References: <1425922598-16538-1-git-send-email-dmitry.torokhov@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Steven Rostedt <rostedt@goodmis.org>
-Return-path: <linux-arch-owner@vger.kernel.org>
-In-Reply-To: <20150311084034.04ce6801@grimm.local.home>
-Sender: linux-arch-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, Deepak Saxena <dsaxena@plexity.net>,
+	linux-kernel@vger.kernel.org
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:53092 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753078AbbCKONJ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 Mar 2015 10:13:09 -0400
+Content-Disposition: inline
+In-Reply-To: <1425922598-16538-1-git-send-email-dmitry.torokhov@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/11/2015 08:40 AM, Steven Rostedt wrote:
-> On Wed, 11 Mar 2015 08:34:46 -0400
-> Sasha Levin <sasha.levin@oracle.com> wrote:
+On Mon, Mar 09, 2015 at 10:36:35AM -0700, Dmitry Torokhov wrote:
+> Even if bus is not hot-pluggable, the devices can be unbound from the
+> driver via sysfs, so we should not be using __exit annotations on
+> remove() methods. The only exception is drivers registered with
+> platform_driver_probe() which specifically disables sysfs bind/unbind
+> attributes.
 > 
->> > Fair enough. We knew there are existing kmemcheck users, but KASan should be
->> > superior both in performance and the scope of bugs it finds. It also shouldn't
->> > impose new limitations beyond requiring gcc 4.9.2+.
->> >
-> Ouch! OK, then I can't use it. I'm currently compiling with gcc 4.6.3.
-> 
-> It will be a while before I upgrade my build farm to something newer.
+> Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 
-Are you actually compiling new kernels with 4.6.3, or are you using older
-kernels as well?
-
-There's no real hurry to kill kmemcheck right now, but we do want to stop
-supporting that in favour of KASan.
-
-
-Thanks,
-Sasha
+Patches 1/3/4 applied.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
