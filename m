@@ -1,38 +1,40 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
 Subject: Re: net: Remove iocb argument from sendmsg and recvmsg
-Date: Wed, 11 Mar 2015 09:09:27 -0700
-Message-ID: <550068B7.8080403@intel.com>
-References: <54FFAA5B.3080608@intel.com> <20150311.000248.417529352060472113.davem@davemloft.net>
+Date: Wed, 11 Mar 2015 09:25:40 -0700
+Message-ID: <55006C84.6040406@intel.com>
+References: <54FFAA5B.3080608@intel.com>	<54FFB3E9.50905@windriver.com> <20150311.000607.609650379851507833.davem@davemloft.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: ying.xue@windriver.com, herbert@gondor.apana.org.au, hch@lst.de,
-	viro@ZenIV.linux.org.uk, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20150311.000248.417529352060472113.davem@davemloft.net>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: herbert@gondor.apana.org.au, hch@lst.de, viro@ZenIV.linux.org.uk,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: David Miller <davem@davemloft.net>, ying.xue@windriver.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:9551 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751448AbbCKQ2N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 11 Mar 2015 12:28:13 -0400
+In-Reply-To: <20150311.000607.609650379851507833.davem@davemloft.net>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/10/2015 09:02 PM, David Miller wrote:
+On 03/10/2015 09:06 PM, David Miller wrote:
+> From: Ying Xue <ying.xue@windriver.com>
+> Date: Wed, 11 Mar 2015 11:18:01 +0800
 > 
-> Because of the way you quoted the patch, it looked like a list posting
-> looping back to the list again, because of the "List-ID: " email header.
+>> Sorry, I did not realize the case when I created the commit. However, although I
+>> don't understand its scenario, in my opinion, adding one redundant argument for
+>> all sockets to satisfy the special case seems unreasonable for us.
 > 
-> Therefore your posting was blocked and you'll have to resend your posting
-> in a way such that this doesn't happen.
+> And the AIO socket mechanism was buggy and references freed up stack
+> objects.
 > 
-Oops, sorry, here it is.
+> That whole set of problems would need to be addressed fully before
+> we could even think of adding AIO support back to the socket layer.
+> 
 
-Hi,
-After couple of attempts to implement an user space interface to crypto HW that would meet our performance requirements, and after discussion with Herbert, we have come to conclusion that using AF_ALG sockets and AIO interface is the way to go.
-Unfortunately it looks like AIO operations will no longer be supported on sockets because of the commit 1b784140474e4fc94281a49e96c67d29df0efbde.
-My question is why do we want to abandon AIO support in the socket layer? Is it not worth keeping it for scenarios like this?
-Do we have any alternative?
-Here is the mentioned patch.
-
-https://patchwork.kernel.org/patch/5971491/
-
-Regards,
-Tadeusz
+Maybe we can add new sock_aio_read_iter() and sock_aio_write_iter() functions in socket.c, and set the 
+aio_read() and aio_write() ptrs to these in the socket_file_ops struct.
+Then we can add new async_sendmsg() and async_recvmsg() to struct proto_ops that will still take the struct kiocb.
+These new async_sendmsg() and async_recvmsg() functions will be called from the sock_aio_read_iter() and sock_aio_write_iter()?
+Do you want me to put a patch together?
