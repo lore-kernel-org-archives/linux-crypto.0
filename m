@@ -1,44 +1,82 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: AES-NI: fix memory usage in GCM decryption
-Date: Wed, 11 Mar 2015 20:10:16 +1100
-Message-ID: <20150311091016.GA7858@gondor.apana.org.au>
-References: <22281096.OZkxDCz0xu@tachyon.chronox.de>
- <20150310094543.GA17358@gondor.apana.org.au>
- <1521038.6EeQHtyvI4@tachyon.chronox.de>
+Subject: Re: [PATCH 2/4] hwrng: omap - remove #ifdefery around PM methods
+Date: Wed, 11 Mar 2015 21:59:57 +1100
+Message-ID: <20150311105957.GA5351@gondor.apana.org.au>
+References: <1425922598-16538-1-git-send-email-dmitry.torokhov@gmail.com>
+ <1425922598-16538-2-git-send-email-dmitry.torokhov@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Cc: linux-crypto@vger.kernel.org, Deepak Saxena <dsaxena@plexity.net>,
+	linux-kernel@vger.kernel.org
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:59601 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:58257 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752908AbbCKJKZ (ORCPT
+	with ESMTP id S1752012AbbCKLAK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Mar 2015 05:10:25 -0400
+	Wed, 11 Mar 2015 07:00:10 -0400
 Content-Disposition: inline
-In-Reply-To: <1521038.6EeQHtyvI4@tachyon.chronox.de>
+In-Reply-To: <1425922598-16538-2-git-send-email-dmitry.torokhov@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Mar 11, 2015 at 09:01:02AM +0100, Stephan Mueller wrote:
->
-> However, I think there is an error in the calculation of the AAD pointer 
-> offset. That offset is currently calculated as:
+On Mon, Mar 09, 2015 at 10:36:36AM -0700, Dmitry Torokhov wrote:
+> Instead of using #ifdefs let's mark suspend and resume methods as
+> __maybe_unused which will suppress compiler warnings about them being
+> unused and provide better compile coverage. This will not increase image
+> size.
 > 
-> assoc = (src + req->cryptlen + auth_tag_len);
+> Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> ---
+>  drivers/char/hw_random/omap-rng.c | 15 +++------------
+>  1 file changed, 3 insertions(+), 12 deletions(-)
 > 
-> But instead, it should be:
-> 
-> assoc = (src + req->cryptlen);
-> 
-> as our buffer is only cryptlen + assolen in size.
-> 
-> If you concur, I will write a patch and test it.
+> diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+> index 7f3597d..5c171b1 100644
+> --- a/drivers/char/hw_random/omap-rng.c
+> +++ b/drivers/char/hw_random/omap-rng.c
+> @@ -422,9 +422,7 @@ static int omap_rng_remove(struct platform_device *pdev)
+>  	return 0;
+>  }
+>  
+> -#ifdef CONFIG_PM_SLEEP
+> -
+> -static int omap_rng_suspend(struct device *dev)
+> +static int __maybe_unused omap_rng_suspend(struct device *dev)
+>  {
+>  	struct omap_rng_dev *priv = dev_get_drvdata(dev);
+>  
+> @@ -434,7 +432,7 @@ static int omap_rng_suspend(struct device *dev)
+>  	return 0;
+>  }
+>  
+> -static int omap_rng_resume(struct device *dev)
+> +static int __maybe_unused omap_rng_resume(struct device *dev)
+>  {
+>  	struct omap_rng_dev *priv = dev_get_drvdata(dev);
+>  
+> @@ -445,18 +443,11 @@ static int omap_rng_resume(struct device *dev)
+>  }
+>  
+>  static SIMPLE_DEV_PM_OPS(omap_rng_pm, omap_rng_suspend, omap_rng_resume);
+> -#define	OMAP_RNG_PM	(&omap_rng_pm)
+> -
+> -#else
+> -
+> -#define	OMAP_RNG_PM	NULL
+> -
+> -#endif
+>  
+>  static struct platform_driver omap_rng_driver = {
+>  	.driver = {
+>  		.name		= "omap_rng",
+> -		.pm		= OMAP_RNG_PM,
+> +		.pm		= &omap_rng_pm,
 
-Yes that's the problem I was referring to.
+This will cause omap_rng_suspend/omap_rng_resume to be referenced
+always, thus rendering the __maybe_unused moot, no?
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
