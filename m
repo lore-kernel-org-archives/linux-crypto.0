@@ -1,42 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: linux-next: Tree for Mar 11 (powerpc build failure due to vmx
- crypto code)
-Date: Thu, 12 Mar 2015 14:53:27 +1100
-Message-ID: <20150312035327.GA14659@gondor.apana.org.au>
-References: <20150311163558.6a09cfcc@canb.auug.org.au>
- <20150311154717.GA22169@roeck-us.net>
- <20150312012315.GA12660@gondor.apana.org.au>
- <5500FD4A.7050408@roeck-us.net>
- <20150312032829.GA13737@gondor.apana.org.au>
- <55010D44.7030900@roeck-us.net>
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH] mm: kill kmemcheck
+Date: Thu, 12 Mar 2015 14:49:52 +1100
+Message-ID: <1426132192.25936.7.camel@ellerman.id.au>
+References: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Guenter Roeck <linux@roeck-us.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:59163 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751223AbbCLDxe (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Mar 2015 23:53:34 -0400
-Content-Disposition: inline
-In-Reply-To: <55010D44.7030900@roeck-us.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Vladimir Davydov <vdavydov@parallels.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ "open list:SUPERH" <linux-sh@vger.kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
+ Jianyu Zhan <nasa4836@gmail.com>, Paul Mackerras <paulus@samba.org>,
+ Pavel Machek <pavel@ucw.cz>, Miklos Szeredi <mszeredi@suse.cz>,
+ Christoph Lameter <cl@linux.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ "open list:GENERIC INCLUDE/A..." <linux-arch@vger.kernel.org>,
+ Andi Kleen <ak@linux.intel.com>, Russell King <linux@arm.linux.org.uk>,
+ Jingoo Han <jg1.han@samsung.com>, James Morris <jmorris@namei.org>,
+ Chris Bainbridge <chris.bainbridge@gmail.com>, Antti Palosaari <crope@iki.fi>,
+ Mel Gorman <mgorman@suse.de>, Ritesh Harjani <ritesh.harjani@gmail.com>,
+ Shaohua Li <shli@kernel.org>, Alexander Duyck <alexander.h.duyck@intel.com>,
+ Wang Nan <wangnan0@huawei
+To: Sasha Levin <sasha.levin@oracle.com>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 11, 2015 at 08:51:32PM -0700, Guenter Roeck wrote:
->
-> Yes, this helps.
-> 
-> Feel free to add
-> 
-> Tested-by: Guenter Roeck <linux@roeck-us.net>
-
-Thanks for testing and the quick feedback.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+T24gV2VkLCAyMDE1LTAzLTExIGF0IDA3OjQzIC0wNDAwLCBTYXNoYSBMZXZpbiB3cm90ZToKPiBB
+cyBkaXNjdXNzZWQgb24gTFNGL01NLCBraWxsIGttZW1jaGVjay4KPiAKPiBLQVNhbiBpcyBhIHJl
+cGxhY2VtZW50IHRoYXQgaXMgYWJsZSB0byB3b3JrIHdpdGhvdXQgdGhlIGxpbWl0YXRpb24gb2YK
+PiBrbWVtY2hlY2sgKHNpbmdsZSBDUFUsIHNsb3cpLiBLQVNhbiBpcyBhbHJlYWR5IHVwc3RyZWFt
+Lgo+IAo+IFdlIGFyZSBhbHNvIG5vdCBhd2FyZSBvZiBhbnkgdXNlcnMgb2Yga21lbWNoZWNrIChv
+ciB1c2VycyB3aG8gZG9uJ3QgY29uc2lkZXIKPiBLQVNhbiBhcyBhIHN1aXRhYmxlIHJlcGxhY2Vt
+ZW50KS4KCkZyb20gRG9jdW1lbnRhdGlvbi9rYXNhbi50eHQ6CgogICAgdGhlcmVmb3JlIHlvdSB3
+aWxsIG5lZWQgYSBjZXJ0YWluIHZlcnNpb24gb2YgR0NDID4gNC45LjIKCkFGQUlLIGdjYyA0Ljku
+MyBoYXNuJ3QgYmVlbiByZWxlYXNlZCB5ZXQuIChPciBkb2VzIGl0IG1lYW4gPj0gNC45LjIgPykK
+CkNhbiB3ZSBwZXJoYXBzIHdhaXQgdW50aWwgdGhlcmUgaXMgYSByZWxlYXNlZCB2ZXJzaW9uIG9m
+IEdDQyB0aGF0IHN1cHBvcnRzCktBU2FuPyBBbmQgbWF5YmUgdGhlbiBhIHRvdWNoIGxvbmdlciBz
+byBmb2xrcyBjYW4gdGVzdCBpdCB3b3JrcyBvbiB0aGVpcgpwbGF0Zm9ybXM/CgpjaGVlcnMKCgpf
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eHBwYy1k
+ZXYgbWFpbGluZyBsaXN0CkxpbnV4cHBjLWRldkBsaXN0cy5vemxhYnMub3JnCmh0dHBzOi8vbGlz
+dHMub3psYWJzLm9yZy9saXN0aW5mby9saW51eHBwYy1kZXY=
