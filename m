@@ -1,72 +1,49 @@
-From: James Hartley <James.Hartley@imgtec.com>
-Subject: RE: [PATCH V3 1/2] crypto: Add Imagination Technologies hw hash
- accelerator
-Date: Thu, 12 Mar 2015 00:13:53 +0000
-Message-ID: <72BC0C8BD7BB6F45988A99382E5FBAE544464A96@hhmail02.hh.imgtec.org>
-References: <1425610912-9930-1-git-send-email-james.hartley@imgtec.com>
-	<1425610912-9930-2-git-send-email-james.hartley@imgtec.com>
-	<CAL1qeaEedjW7A8npCrmnOWByM6gOL2JA8c=Pa8Y9wOYnmz8NcA@mail.gmail.com>
-	<72BC0C8BD7BB6F45988A99382E5FBAE544463666@hhmail02.hh.imgtec.org>
- <CAL1qeaF+h-pEpWiC1h=RA8ei9i_wbw997WM-dPq-sfW_RjK7eg@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: linux-next: Tree for Mar 11 (powerpc build failure due to vmx
+ crypto code)
+Date: Thu, 12 Mar 2015 12:23:15 +1100
+Message-ID: <20150312012315.GA12660@gondor.apana.org.au>
+References: <20150311163558.6a09cfcc@canb.auug.org.au>
+ <20150311154717.GA22169@roeck-us.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Andrew Bresticker <abrestic@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Guenter Roeck <linux@roeck-us.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:10591 "EHLO
-	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750960AbbCLAN5 (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:40719 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751478AbbCLBX0 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Mar 2015 20:13:57 -0400
-In-Reply-To: <CAL1qeaF+h-pEpWiC1h=RA8ei9i_wbw997WM-dPq-sfW_RjK7eg@mail.gmail.com>
-Content-Language: en-US
+	Wed, 11 Mar 2015 21:23:26 -0400
+Content-Disposition: inline
+In-Reply-To: <20150311154717.GA22169@roeck-us.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgQW5kcmV3LCANCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBhYnJl
-c3RpY0Bnb29nbGUuY29tIFttYWlsdG86YWJyZXN0aWNAZ29vZ2xlLmNvbV0gT24gQmVoYWxmIE9m
-DQo+IEFuZHJldyBCcmVzdGlja2VyDQo+IFNlbnQ6IDEwIE1hcmNoIDIwMTUgMTg6MDINCj4gVG86
-IEphbWVzIEhhcnRsZXkNCj4gQ2M6IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmcNCj4gU3Vi
-amVjdDogUmU6IFtQQVRDSCBWMyAxLzJdIGNyeXB0bzogQWRkIEltYWdpbmF0aW9uIFRlY2hub2xv
-Z2llcyBodyBoYXNoDQo+IGFjY2VsZXJhdG9yDQo+IA0KPiBIaSBKYW1lcywNCj4gDQo+ID4+ID4g
-K3N0YXRpYyBpcnFyZXR1cm5fdCBpbWdfaXJxX2hhbmRsZXIoaW50IGlycSwgdm9pZCAqZGV2X2lk
-KSB7DQo+ID4+ID4gKyAgICAgICBzdHJ1Y3QgaW1nX2hhc2hfZGV2ICpoZGV2ID0gZGV2X2lkOw0K
-PiA+PiA+ICsgICAgICAgdTMyIHJlZzsNCj4gPj4gPiArDQo+ID4+ID4gKyAgICAgICByZWcgPSBp
-bWdfaGFzaF9yZWFkKGhkZXYsIENSX0lOVFNUQVQpOw0KPiA+PiA+ICsgICAgICAgaW1nX2hhc2hf
-d3JpdGUoaGRldiwgQ1JfSU5UQ0xFQVIsIHJlZyk7DQo+ID4+ID4gKw0KPiA+PiA+ICsgICAgICAg
-aWYgKHJlZyAmIENSX0lOVF9ORVdfUkVTVUxUU19TRVQpIHsNCj4gPj4gPiArICAgICAgICAgICAg
-ICAgZGV2X2RiZyhoZGV2LT5kZXYsICJJUlEgQ1JfSU5UX05FV19SRVNVTFRTX1NFVFxuIik7DQo+
-ID4+ID4gKyAgICAgICAgICAgICAgIGlmIChEUklWRVJfRkxBR1NfQlVTWSAmIGhkZXYtPmZsYWdz
-KSB7DQo+ID4+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgaGRldi0+ZmxhZ3MgfD0gRFJJVkVS
-X0ZMQUdTX09VVFBVVF9SRUFEWTsNCj4gPj4gPiArICAgICAgICAgICAgICAgICAgICAgICBpZiAo
-IShEUklWRVJfRkxBR1NfQ1BVICYgaGRldi0+ZmxhZ3MpKQ0KPiA+PiA+ICsgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgaGRldi0+ZmxhZ3MgfD0gRFJJVkVSX0ZMQUdTX0RNQV9SRUFEWTsN
-Cj4gPj4gPiArICAgICAgICAgICAgICAgICAgICAgICB0YXNrbGV0X3NjaGVkdWxlKCZoZGV2LT5k
-b25lX3Rhc2spOw0KPiA+Pg0KPiA+PiBTaW5jZSB0aGlzIGRvbmVfdGFzayBvbmx5IGdldHMgc2No
-ZWR1bGVkIGZyb20gaGVyZSwgd2h5IG5vdCBtYWtlIHRoaXMNCj4gPj4gYSB0aHJlYWRlZCBJUlEg
-aGFuZGxlciBhbmQganVzdCBkbyB0aGUgd29yayBoZXJlIGluc3RlYWQgb2YNCj4gPj4gc2VwYXJh
-dGluZyBpdCBiZXR3ZWVuIGEgaGFyZCBJUlEgaGFuZGxlciBhbmQgYSB0YXNrbGV0Pw0KPiA+DQo+
-ID4gV2hhdCBpcyB0aGUgYWR2YW50YWdlIG9mIGRvaW5nIHRoYXQ/ICBpLmUgaXMgdGhpcyBzaW1w
-bGUgY2FzZSB3b3J0aCBzZXR0aW5nIHVwDQo+IGFuIGV4dHJhIHRocmVhZD8NCj4gDQo+IEkgYmVs
-aWV2ZSB0aHJlYWRlZCBJUlEgaGFuZGxlcnMgYXJlIG5vdyBwcmVmZXJyZWQgdG8gdXNpbmcgYSBo
-YXJkIElSUQ0KPiBoYW5kbGVyICsgdGFza2xldCB3aGVuIHBvc3NpYmxlLCBwYXJ0bHkgYmVjYXVz
-ZSBwZW9wbGUgdGVuZCB0byBzY3JldyB1cA0KPiB0YXNrbGV0IHVzYWdlLg0KDQpGYWlyIGVub3Vn
-aCwgYnV0IEknZCBsaWtlIHRvIGxlYXZlIHRoaXMgYXMgYW4gZW5oYW5jZW1lbnQgZm9yIHdoZW4g
-SSBoYXZlIHNvbWUNCmV4dHJhIGJhbmR3aWR0aCBpZiBpdCdzIG5vdCBlc3NlbnRpYWwgKHNhbWUg
-Zm9yIHRoZSBydW50aW1lIFBNKS4gIA0KDQo+IA0KPiA+PiA+ICsgICAgICAgICAgICAgICBlcnIg
-PSBQVFJfRVJSKGhkZXYtPmlvX2Jhc2UpOw0KPiA+PiA+ICsgICAgICAgICAgICAgICBnb3RvIGhh
-c2hfaW9fZXJyOw0KPiA+PiA+ICsgICAgICAgfQ0KPiA+PiA+ICsNCj4gPj4gPiArICAgICAgIC8q
-IFdyaXRlIHBvcnQgKERNQSBvciBDUFUpICovDQo+ID4+ID4gKyAgICAgICBoYXNoX3JlcyA9IHBs
-YXRmb3JtX2dldF9yZXNvdXJjZShwZGV2LCBJT1JFU09VUkNFX01FTSwgMSk7DQo+ID4+ID4gKyAg
-ICAgICBpZiAoIWhhc2hfcmVzKSB7DQo+ID4+ID4gKyAgICAgICAgICAgICAgIGRldl9lcnIoZGV2
-LCAibm8gd3JpdGUgcG9ydCByZXNvdXJjZSBpbmZvXG4iKTsNCj4gPj4gPiArICAgICAgICAgICAg
-ICAgZXJyID0gLUVOT0RFVjsNCj4gPj4gPiArICAgICAgICAgICAgICAgZ290byByZXNfZXJyOw0K
-PiA+PiA+ICsgICAgICAgfQ0KPiA+PiA+ICsgICAgICAgaGRldi0+YnVzX2FkZHIgPSBoYXNoX3Jl
-cy0+c3RhcnQ7DQo+ID4+DQo+ID4+IE1heWJlIHNldCB0aGlzIGFmdGVyIGRldm1faW9yZW1hcF9y
-ZXNvdXJjZSgpIHN1Y2NlZWRzIGFuZCBhdm9pZCB0aGUNCj4gPj4gZXh0cmEgZXJyb3IgY2hlY2s/
-DQo+ID4NCj4gPiBOb3QgcXVpdGUgZm9sbG93aW5nIHlvdSBoZXJlIC0gd2hpY2ggY2hlY2sgYXJl
-IHlvdSBzYXlpbmcgY2FuIGJlIHJlbW92ZWQ/DQo+IA0KPiBZb3UgY2FuIHJlbW92ZSB0aGUgaWYg
-KGhhc2hfcmVzKSBjaGVjayBpZiB5b3Ugc2V0IGhkZXYtPmJ1c19hZGRyIGFmdGVyDQo+IGRldm1f
-aW9yZW1hcF9yZXNvdXJjZSgpLg0KDQpJIHNlZSB3aGF0IHlvdSBtZWFuIC0gZG9uZS4NCg0KPiAN
-Cj4gVGhhbmtzLA0KPiBBbmRyZXcNCg0KVGhhbmtzLCANCkphbWVzLg0K
+On Wed, Mar 11, 2015 at 08:47:17AM -0700, Guenter Roeck wrote:
+>
+> Building powerpc:allmodconfig:
+> 
+> ERROR: ".aes_p8_cbc_encrypt" [drivers/crypto/vmx/vmx-crypto.ko] undefined!
+> ERROR: ".aes_p8_set_encrypt_key" [drivers/crypto/vmx/vmx-crypto.ko] undefined!
+> ERROR: ".aes_p8_set_decrypt_key" [drivers/crypto/vmx/vmx-crypto.ko] undefined!
+> ERROR: ".gcm_init_p8" [drivers/crypto/vmx/vmx-crypto.ko] undefined!
+> ERROR: ".aes_p8_decrypt" [drivers/crypto/vmx/vmx-crypto.ko] undefined!
+> ERROR: ".aes_p8_encrypt" [drivers/crypto/vmx/vmx-crypto.ko] undefined!
+> ERROR: ".gcm_ghash_p8" [drivers/crypto/vmx/vmx-crypto.ko] undefined!
+> ERROR: ".aes_p8_ctr32_encrypt_blocks" [drivers/crypto/vmx/vmx-crypto.ko] undefined!
+> 
+> Those functions are called but don't seem to be defined anywhere.
+
+They are meant to be generated by the perl scripts in that directory.
+Can you take a look at why those perl scripts didn't run or didn't
+function correctly?
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
