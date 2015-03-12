@@ -1,56 +1,96 @@
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH] mm: kill kmemcheck
-Date: Thu, 12 Mar 2015 09:47:54 -0400
-Message-ID: <20150312094754.458606bb@gandalf.local.home>
-References: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
- <1426132192.25936.7.camel@ellerman.id.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Vladimir Davydov <vdavydov@parallels.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- "open list:SUPERH" <linux-sh@vger.kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
- Jianyu Zhan <nasa4836@gmail.com>, Paul Mackerras <paulus@samba.org>,
- Pavel Machek <pavel@ucw.cz>, Miklos Szeredi <mszeredi@suse.cz>,
- Christoph Lameter <cl@linux.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- "open list:GENERIC INCLUDE/A..." <linux-arch@vger.kernel.org>,
- Andi Kleen <ak@linux.intel.com>, Russell King <linux@arm.linux.org.uk>,
- Jingoo Han <jg1.han@samsung.com>, James Morris <jmorris@namei.org>,
- Chris Bainbridge <chris.bainbridge@gmail.com>, Antti Palosaari <crope@iki.fi>,
- Mel Gorman <mgorman@suse.de>, Ritesh Harjani <ritesh.harjani@gmail.com>,
- Shaohua Li <shli@kernel.org>, Alexander Duyck <alexander.h.duyck@intel.com>,
- Wang Nan <wangnan0@huawei
-To: Michael Ellerman <mpe@ellerman.id.au>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <1426132192.25936.7.camel@ellerman.id.au>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Subject: [PATCH 1/6] hwrng: add devm_* interfaces
+Date: Thu, 12 Mar 2015 14:00:02 -0700
+Message-ID: <1426194007-22182-2-git-send-email-dmitry.torokhov@gmail.com>
+References: <1426194007-22182-1-git-send-email-dmitry.torokhov@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1426194007-22182-1-git-send-email-dmitry.torokhov@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-T24gVGh1LCAxMiBNYXIgMjAxNSAxNDo0OTo1MiArMTEwMApNaWNoYWVsIEVsbGVybWFuIDxtcGVA
-ZWxsZXJtYW4uaWQuYXU+IHdyb3RlOgo+IAo+ID5Gcm9tIERvY3VtZW50YXRpb24va2FzYW4udHh0
-Ogo+IAo+ICAgICB0aGVyZWZvcmUgeW91IHdpbGwgbmVlZCBhIGNlcnRhaW4gdmVyc2lvbiBvZiBH
-Q0MgPiA0LjkuMgo+IAo+IEFGQUlLIGdjYyA0LjkuMyBoYXNuJ3QgYmVlbiByZWxlYXNlZCB5ZXQu
-IChPciBkb2VzIGl0IG1lYW4gPj0gNC45LjIgPykKCkl0IG1lYW5zIDQuOS4yLiBJIGFsc28gZmVl
-bCB0aGF0IHRoaXMgbWFrZXMgaXQgdG9vIHByZW1hdHVyZSB0byByZW1vdmUKa21lbWNoZWNrLCBh
-cyBub3QgZXZlcnlvbmUgKGluY2x1ZGluZyBteXNlbGYpIGhhcyB0aGUgbGF0ZXN0IGFuZApncmVh
-dGVzdCBnY2Mgb24gdGhlaXIgc3lzdGVtcy4KCj4gCj4gQ2FuIHdlIHBlcmhhcHMgd2FpdCB1bnRp
-bCB0aGVyZSBpcyBhIHJlbGVhc2VkIHZlcnNpb24gb2YgR0NDIHRoYXQgc3VwcG9ydHMKPiBLQVNh
-bj8gQW5kIG1heWJlIHRoZW4gYSB0b3VjaCBsb25nZXIgc28gZm9sa3MgY2FuIHRlc3QgaXQgd29y
-a3Mgb24gdGhlaXIKPiBwbGF0Zm9ybXM/Cj4gCgpOb3RlLCBJIHJlcGxpZWQgdG8gdGhpcyBjdXR0
-aW5nIG91dCB0aGUgQ2MncyB0byB0aGUgaW5kaXZpZHVhbHMgc28gdGhhdAppdCBjYW4gaGF2ZSBh
-IHdpZGVyIGF1ZGllbmNlISAoZmlndXJlIG91dCB3aGF0IEkgbWVhbiBieSB0aGF0KS4gWW91IGNh
-bgpzZWUgbXkgcmVwbHkgb24gTEtNTCAoaGludCwgeW91IHdvbnQgc2VlIHRoZSBvcmlnaW5hbCBl
-bWFpbCwgb3IgdGhpcwpjdXJyZW50IHRocmVhZCBmb3IgdGhhdCBtYXR0ZXIpLgoKLS0gU3RldmUK
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXhwcGMt
-ZGV2IG1haWxpbmcgbGlzdApMaW51eHBwYy1kZXZAbGlzdHMub3psYWJzLm9yZwpodHRwczovL2xp
-c3RzLm96bGFicy5vcmcvbGlzdGluZm8vbGludXhwcGMtZGV2
+This change adds devm_hwrng_register and devm_hwrng_unregister which
+use can simplify error unwinding and unbinding code paths in device
+drivers.
+
+Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+---
+ drivers/char/hw_random/core.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ include/linux/hw_random.h     |  4 ++++
+ 2 files changed, 46 insertions(+)
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 32a8a86..83161dd 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -536,6 +536,48 @@ void hwrng_unregister(struct hwrng *rng)
+ }
+ EXPORT_SYMBOL_GPL(hwrng_unregister);
+ 
++static void devm_hwrng_release(struct device *dev, void *res)
++{
++	hwrng_unregister(*(struct hwrng **)res);
++}
++
++static int devm_hwrng_match(struct device *dev, void *res, void *data)
++{
++	struct hwrng **r = res;
++
++	if (WARN_ON(!r || !*r))
++		return 0;
++
++	return *r == data;
++}
++
++int devm_hwrng_register(struct device *dev, struct hwrng *rng)
++{
++	struct hwrng **ptr;
++	int error;
++
++	ptr = devres_alloc(devm_hwrng_release, sizeof(*ptr), GFP_KERNEL);
++	if (!ptr)
++		return -ENOMEM;
++
++	error = hwrng_register(rng);
++	if (error) {
++		devres_free(ptr);
++		return error;
++	}
++
++	*ptr = rng;
++	devres_add(dev, ptr);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(devm_hwrng_register);
++
++void devm_hwrng_unregister(struct device *dev, struct hwrng *rng)
++{
++	devres_release(dev, devm_hwrng_release, devm_hwrng_match, rng);
++}
++EXPORT_SYMBOL_GPL(devm_hwrng_unregister);
++
+ static int __init hwrng_modinit(void)
+ {
+ 	return register_miscdev();
+diff --git a/include/linux/hw_random.h b/include/linux/hw_random.h
+index eb7b414..4f7d8f4 100644
+--- a/include/linux/hw_random.h
++++ b/include/linux/hw_random.h
+@@ -50,10 +50,14 @@ struct hwrng {
+ 	struct completion cleanup_done;
+ };
+ 
++struct device;
++
+ /** Register a new Hardware Random Number Generator driver. */
+ extern int hwrng_register(struct hwrng *rng);
++extern int devm_hwrng_register(struct device *dev, struct hwrng *rng);
+ /** Unregister a Hardware Random Number Generator driver. */
+ extern void hwrng_unregister(struct hwrng *rng);
++extern void devm_hwrng_unregister(struct device *dve, struct hwrng *rng);
+ /** Feed random bits into the pool. */
+ extern void add_hwgenerator_randomness(const char *buffer, size_t count, size_t entropy);
+ 
+-- 
+2.2.0.rc0.207.ga3a616c
