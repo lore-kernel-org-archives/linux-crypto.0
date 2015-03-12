@@ -1,66 +1,47 @@
-From: James Hartley <james.hartley@imgtec.com>
-Subject: [PATCH V4 2/2] Documentation: crypto: Add DT binding info for the img hw hash accelerator
-Date: Thu, 12 Mar 2015 02:06:52 +0000
-Message-ID: <1426126012-16061-3-git-send-email-james.hartley@imgtec.com>
-References: <1426126012-16061-1-git-send-email-james.hartley@imgtec.com>
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH] mm: kill kmemcheck
+Date: Thu, 12 Mar 2015 11:27:57 +1030
+Message-ID: <87egovxca2.fsf@rustcorp.com.au>
+References: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <devicetree@vger.kernel.org>, <ezequiel.garcia@imgtec.com>,
-	<linux-crypto@vger.kernel.org>, <james.hartley@imgtec.com>
-To: <herbert@gondor.apana.org.au>, <abrestic@chromium.org>,
-	<smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:45252 "EHLO
-	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750964AbbCLCHX (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 11 Mar 2015 22:07:23 -0400
-In-Reply-To: <1426126012-16061-1-git-send-email-james.hartley@imgtec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: , Vladimir Davydov <vdavydov@parallels.com>,
+	Sam Ravnborg <sam@rav>, Geert Uytterhoeven <geert+renesas@glider.be>,
+	"open list:SUPERH" <linux-sh@vger.kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will.deacon@arm.com>, Jianyu Zhan <nasa4836@gmail.com>,
+	Paul Mackerras <paulus@samba.org>, Pavel Machek <pavel@ucw.cz>,
+	Miklos Szeredi <mszeredi@suse.cz>, Christoph Lameter <cl@linux.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	"open list:GENERIC INCLUDE/A..." <linux-arch@vger.kernel.org>,
+	Andi Kleen <ak@linux.intel.com>,
+	Russell King <linux@arm.linux.org.uk>, Kukjin Kim <kgene@kernel.org>,
+	Jingoo Han <jg1.han@samsung.com>, James Morris <jmorris@namei.org>,
+	Chris Bainbridge <chris.bainbridge@gmail.com>,
+	Antti Palosaari <crope@iki.fi>, Mel Gorman <mgorman@suse.de>,
+	Ritesh Harjani <ritesh.harjani@gmail.com>,
+	Shaohua Li <shli@kernel.org>,
+	Alexander Du
+To: Sasha Levin <sasha.levin@oracle.com>, linux-kernel@vger.kernel.org
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-This adds the binding documentation for the Imagination Technologies hash
-accelerator that provides hardware acceleration for SHA1/SHA224/SHA256/MD5
-hashes.  This hardware will be present in the upcoming pistachio SoC.
-
-Signed-off-by: James Hartley <james.hartley@imgtec.com>
----
- .../devicetree/bindings/crypto/img-hash.txt        |   27 ++++++++++++++++++++
- 1 file changed, 27 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/img-hash.txt
-
-diff --git a/Documentation/devicetree/bindings/crypto/img-hash.txt b/Documentation/devicetree/bindings/crypto/img-hash.txt
-new file mode 100644
-index 0000000..91a3d75
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/img-hash.txt
-@@ -0,0 +1,27 @@
-+Imagination Technologies hardware hash accelerator
-+
-+The hash accelerator provides hardware hashing acceleration for
-+SHA1, SHA224, SHA256 and MD5 hashes
-+
-+Required properties:
-+
-+- compatible : "img,hash-accelerator"
-+- reg : Offset and length of the register set for the module, and the DMA port
-+- interrupts : The designated IRQ line for the hashing module.
-+- dmas : DMA specifier as per Documentation/devicetree/bindings/dma/dma.txt
-+- dma-names : Should be "tx"
-+- clocks : Clock specifiers
-+- clock-names : "sys" Used to clock the hash block registers
-+		"hash" Used to clock data through the accelerator
-+
-+Example:
-+
-+	hash: hash@18149600 {
-+	compatible = "img,hash-accelerator";
-+		reg = <0x18149600 0x100>, <0x18101100 0x4>;
-+		interrupts = <GIC_SHARED 59 IRQ_TYPE_LEVEL_HIGH>;
-+		dmas = <&dma 8 0xffffffff 0>;
-+		dma-names = "tx";
-+		clocks = <&cr_periph SYS_CLK_HASH>, <&clk_periph PERIPH_CLK_ROM>;
-+		clock-names = "sys", "hash";
-+	};
--- 
-1.7.9.5
+U2FzaGEgTGV2aW4gPHNhc2hhLmxldmluQG9yYWNsZS5jb20+IHdyaXRlczoKPiBBcyBkaXNjdXNz
+ZWQgb24gTFNGL01NLCBraWxsIGttZW1jaGVjay4KCkRhbW46IEkgbGl0ZXJhbGx5IGFkZGVkIENP
+TkZJR19LTUVNQ0hFQ0sgc3VwcG9ydCB0byB2aXJ0aW8geWVzdGVyZGF5IQoKV2lsbCB0cnkgS2Fz
+YW4gbm93LgoKVGhhbmtzIGZvciB0aGUgaGVhZHMtdXAsClJ1c3R5LgpfX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eHBwYy1kZXYgbWFpbGluZyBsaXN0
+CkxpbnV4cHBjLWRldkBsaXN0cy5vemxhYnMub3JnCmh0dHBzOi8vbGlzdHMub3psYWJzLm9yZy9s
+aXN0aW5mby9saW51eHBwYy1kZXY=
