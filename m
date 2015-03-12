@@ -1,58 +1,67 @@
-From: James Hartley <James.Hartley@imgtec.com>
-Subject: RE: [PATCH V4 1/2] crypto: Add Imagination Technologies hw hash
- accelerator
-Date: Thu, 12 Mar 2015 22:36:01 +0000
-Message-ID: <72BC0C8BD7BB6F45988A99382E5FBAE5444657D7@hhmail02.hh.imgtec.org>
-References: <1426126012-16061-1-git-send-email-james.hartley@imgtec.com>
-	<1426126012-16061-2-git-send-email-james.hartley@imgtec.com>
- <CAL1qeaHq+gDyjBbX-O7dgSfceMNf1nezb2_hMKWvo11RnWt-xA@mail.gmail.com>
+From: James Hartley <james.hartley@imgtec.com>
+Subject: [PATCH V5 0/2] crypto: Add Imagination Technologies hw hash accelerator
+Date: Thu, 12 Mar 2015 23:17:25 +0000
+Message-ID: <1426202247-6221-1-git-send-email-james.hartley@imgtec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"smueller@chronox.de" <smueller@chronox.de>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	Ezequiel Garcia <Ezequiel.Garcia@imgtec.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Andrew Bresticker <abrestic@chromium.org>
+Content-Type: text/plain
+Cc: <devicetree@vger.kernel.org>, <ezequiel.garcia@imgtec.com>,
+	<linux-crypto@vger.kernel.org>, <james.hartley@imgtec.com>
+To: <herbert@gondor.apana.org.au>, <abrestic@chromium.org>,
+	<smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:44117 "EHLO
+Received: from mailapp01.imgtec.com ([195.59.15.196]:47947 "EHLO
 	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751285AbbCLWgF (ORCPT
+	with ESMTP id S1751342AbbCLXRa (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Mar 2015 18:36:05 -0400
-In-Reply-To: <CAL1qeaHq+gDyjBbX-O7dgSfceMNf1nezb2_hMKWvo11RnWt-xA@mail.gmail.com>
-Content-Language: en-US
+	Thu, 12 Mar 2015 19:17:30 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgQW5kcmV3LCANCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBhYnJl
-c3RpY0Bnb29nbGUuY29tIFttYWlsdG86YWJyZXN0aWNAZ29vZ2xlLmNvbV0gT24gQmVoYWxmIE9m
-DQo+IEFuZHJldyBCcmVzdGlja2VyDQo+IFNlbnQ6IDEyIE1hcmNoIDIwMTUgMTg6NTcNCj4gVG86
-IEphbWVzIEhhcnRsZXkNCj4gQ2M6IEhlcmJlcnQgWHU7IHNtdWVsbGVyQGNocm9ub3guZGU7IGRl
-dmljZXRyZWVAdmdlci5rZXJuZWwub3JnOyBFemVxdWllbA0KPiBHYXJjaWE7IGxpbnV4LWNyeXB0
-b0B2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSCBWNCAxLzJdIGNyeXB0bzog
-QWRkIEltYWdpbmF0aW9uIFRlY2hub2xvZ2llcyBodyBoYXNoDQo+IGFjY2VsZXJhdG9yDQo+IA0K
-PiBIaSBKYW1lcywNCj4gDQo+IE9uIFdlZCwgTWFyIDExLCAyMDE1IGF0IDc6MDYgUE0sIEphbWVz
-IEhhcnRsZXkNCj4gPGphbWVzLmhhcnRsZXlAaW1ndGVjLmNvbT4gd3JvdGU6DQo+ID4gVGhpcyBh
-ZGRzIHN1cHBvcnQgZm9yIHRoZSBJbWFnaW5hdGlvbiBUZWNobm9sb2dpZXMgaGFzaCBhY2NlbGVy
-YXRvcg0KPiA+IHdoaWNoIHByb3ZpZGVzIGhhcmR3YXJlIGFjY2VsZXJhdGlvbiBmb3IgU0hBMSBT
-SEEyMjQgU0hBMjU2IGFuZCBNRDUNCj4gaGFzaGVzLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTog
-SmFtZXMgSGFydGxleSA8amFtZXMuaGFydGxleUBpbWd0ZWMuY29tPg0KPiANCj4gT25lIGNvbW1l
-bnQgYmVsb3csIG90aGVyd2lzZSB0aGlzIGxvb2tzIGZpbmUgdG8gbWUuDQo+IA0KPiA+IC0tLSAv
-ZGV2L251bGwNCj4gPiArKysgYi9kcml2ZXJzL2NyeXB0by9pbWctaGFzaC5jDQo+IA0KPiA+ICtz
-dGF0aWMgaW50IGltZ19oYXNoX2h3X2luaXQoc3RydWN0IGltZ19oYXNoX2RldiAqaGRldikgew0K
-PiA+ICsgICAgICAgdW5zaWduZWQgbG9uZyBsb25nIG5iaXRzOw0KPiA+ICsgICAgICAgdTMyIHUs
-IGw7DQo+ID4gKyAgICAgICBpbnQgcmV0Ow0KPiA+ICsNCj4gPiArICAgICAgIHJldCA9IGNsa19w
-cmVwYXJlX2VuYWJsZShoZGV2LT5oYXNoX2Nsayk7DQo+ID4gKyAgICAgICBpZiAocmV0KQ0KPiA+
-ICsgICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsNCj4gPiArICAgICAgIHJldCA9IGNs
-a19wcmVwYXJlX2VuYWJsZShoZGV2LT5zeXNfY2xrKTsNCj4gPiArICAgICAgIGlmIChyZXQpIHsN
-Cj4gPiArICAgICAgICAgICAgICAgY2xrX2Rpc2FibGVfdW5wcmVwYXJlKGhkZXYtPmhhc2hfY2xr
-KTsNCj4gPiArICAgICAgICAgICAgICAgcmV0dXJuIHJldDsNCj4gPiArICAgICAgIH0NCj4gDQo+
-IEkgdGhpbmsgeW91J2xsIHN0aWxsIGVuZCB1cCB3aXRoIGluZmxhdGVkIHByZXBhcmUvZW5hYmxl
-IGNvdW50cyBmb3IgdGhlc2UgY2xvY2tzDQo+IHNpbmNlIHRoaXMgZnVuY3Rpb24gbWF5IGdldCBj
-YWxsZWQgbXVsdGlwbGUgdGltZXMgYW5kIHRoZSBvbmx5DQo+IGNsa19kaXNhYmxlX3VucHJlcGFy
-ZSgpIGNhbGxzIGFyZSBpbiB0aGUgcmVtb3ZlKCkgcGF0aC4gIFBlcmhhcHMgaXQncyBiZXN0IHRv
-DQo+IGp1c3QgZW5hYmxlIHRoZSBjbG9ja3MgaW4gcHJvYmUoKSB1bnRpbCBydW50aW1lIFBNIHN1
-cHBvcnQgaXMgYWRkZWQ/DQoNClllcywgSSdsbCBkbyB0aGF0IGFuZCB1cGxvYWQgYSBWNSBzZXQu
-DQoNCj4gDQo+IFRoYW5rcywNCj4gQW5kcmV3DQoNClRoYW5rcw0KSmFtZXMuDQo=
+This adds support for the Imagination Technologies hash accelerator which 
+provides hardware acceleration for SHA1 SHA244 SHA256 and MD5 hashes.
+
+Tested on silicon, using testmgr.
+
+Changes from V4:
+	* Moved clk_prepare_enable for both clocks into the probe function to
+	  match the remove function, and avoid inflated prepare/enable counts.
+
+Changes from V3:
+	* Standardised the cra_priorities to 300, sufficient to be chosen
+	  ahead of software / assembly implementations.
+	* Addressed Andrew Bresticker's review comments, except for two items
+	  that I will leave for when I have some more bandwidth if possible as
+	  I don't think they are required:
+		->Runtime PM
+		->Threaded IRQ handler instead of a tasklet
+
+Changes from V2:
+	* This hardware does not support importing a partial hash state, 
+	  so the init, update, final and finup have been reworked to use
+	  a fallback driver; only digest remains as hardware accelerated.
+	* Simplified the driver as a result of the above rework
+
+Changes from V1:
+	* Addressed review comments from Andrew Bresticker and 
+	  Vladimir Zapolskiy
+	* rebased to current linux-next
+
+James Hartley (2):
+  This adds support for the Imagination Technologies hash accelerator
+    which     provides hardware acceleration for SHA1 SHA224 SHA256 and
+    MD5 hashes.
+  This adds the binding documentation for the Imagination Technologies
+    hash     accelerator that provides hardware acceleration for
+    SHA1/SHA224/SHA256/MD5     hashes.  This hardware will be present
+    in the upcoming pistachio SoC.
+
+ .../devicetree/bindings/crypto/img-hash.txt        |   27 +
+ drivers/crypto/Kconfig                             |   14 +
+ drivers/crypto/Makefile                            |    1 +
+ drivers/crypto/img-hash.c                          | 1030 ++++++++++++++++++++
+ 4 files changed, 1072 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/img-hash.txt
+ create mode 100644 drivers/crypto/img-hash.c
+
+-- 
+1.7.9.5
