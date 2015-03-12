@@ -1,51 +1,74 @@
-From: Pekka Enberg <penberg@iki.fi>
-Subject: Re: [PATCH] mm: kill kmemcheck
-Date: Thu, 12 Mar 2015 09:07:36 +0200
-Message-ID: <55013B38.6040100@iki.fi>
-References: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2] crypto: AES-NI - fix memory usage in GCM decryption
+Date: Thu, 12 Mar 2015 09:17:51 +0100
+Message-ID: <44569470.FQKUtYhtg6@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Cc: Vladimir Davydov <vdavydov@parallels.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- SUPERH <linux-sh@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will.deacon@arm.com>, Jianyu Zhan <nasa4836@gmail.com>,
- Paul Mackerras <paulus@samba.org>, Pavel Machek <pavel@ucw.cz>,
- Miklos Szeredi <mszeredi@suse.cz>, Christoph Lameter <cl@linux.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- "open list:GENERIC INCLUDE/A..." <linux-arch@vger.kernel.org>,
- Andi Kleen <ak@linux.intel.com>, Russell King <linux@arm.linux.org.uk>,
- Jingoo Han <jg1.han@samsung.com>, James Morris <jmorris@namei.org>,
- Chris Bainbridge <chris.bainbridge@gmail.com>, Antti Palosaari <crope@iki.fi>,
- Mel Gorman <mgorman@suse.de>, Ritesh Harjani <ritesh.harjani@gmail.com>,
- Shaohua Li <shli@kernel.org>, Alexander Duyck <alexander.h.duyck@intel.com>,
- Wang Nan <wangnan0@huawei.com>, Jiri
-To: Sasha Levin <sasha.levin@oracle.com>, linux-kernel@vger.kernel.org
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
+To: 'Herbert Xu <herbert@gondor.apana.org.au>, tadeusz.struk@intel.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:46483 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752591AbbCLIRy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 12 Mar 2015 04:17:54 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-SGkgU2FzaGEsCgpPbiAzLzExLzE1IDE6NDMgUE0sIFNhc2hhIExldmluIHdyb3RlOgo+IEFzIGRp
-c2N1c3NlZCBvbiBMU0YvTU0sIGtpbGwga21lbWNoZWNrLgo+Cj4gS0FTYW4gaXMgYSByZXBsYWNl
-bWVudCB0aGF0IGlzIGFibGUgdG8gd29yayB3aXRob3V0IHRoZSBsaW1pdGF0aW9uIG9mCj4ga21l
-bWNoZWNrIChzaW5nbGUgQ1BVLCBzbG93KS4gS0FTYW4gaXMgYWxyZWFkeSB1cHN0cmVhbS4KPgo+
-IFdlIGFyZSBhbHNvIG5vdCBhd2FyZSBvZiBhbnkgdXNlcnMgb2Yga21lbWNoZWNrIChvciB1c2Vy
-cyB3aG8gZG9uJ3QgY29uc2lkZXIKPiBLQVNhbiBhcyBhIHN1aXRhYmxlIHJlcGxhY2VtZW50KS4K
-Pgo+IEkndmUgYnVpbGQgdGVzdGVkIGl0IHVzaW5nIGFsbFt5ZXMsbm8sbW9kXWNvbmZpZyBhbmQg
-ZnV6emVkIGEgYml0IHdpdGggdGhpcwo+IHBhdGNoIGFwcGxpZWQsIGRpZG4ndCBub3RpY2UgYW55
-IGJhZCBiZWhhdmlvdXIuCj4KPiBTaWduZWQtb2ZmLWJ5OiBTYXNoYSBMZXZpbiA8c2FzaGEubGV2
-aW5Ab3JhY2xlLmNvbT4KCkNhbiB5b3UgZWxhYm9yYXRlIG9uIHdoYXQgZXhhY3RseSB3YXMgZGlz
-Y3Vzc2VkIGF0IExTRi9NTT8gUHJlZmVyYWJseSBpbiAKdGhlIGNvbW1pdCBsb2cuIDstKQoKLSBQ
-ZWtrYQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51
-eHBwYy1kZXYgbWFpbGluZyBsaXN0CkxpbnV4cHBjLWRldkBsaXN0cy5vemxhYnMub3JnCmh0dHBz
-Oi8vbGlzdHMub3psYWJzLm9yZy9saXN0aW5mby9saW51eHBwYy1kZXY=
+The kernel crypto API logic requires the caller to provide the
+length of (ciphertext || authentication tag) as cryptlen for the
+AEAD decryption operation. Thus, the cipher implementation must
+calculate the size of the plaintext output itself and cannot simply use
+cryptlen.
+
+The RFC4106 GCM decryption operation tries to overwrite cryptlen memory
+in req->dst. As the destination buffer for decryption only needs to hold
+the plaintext memory but cryptlen references the input buffer holding
+(ciphertext || authentication tag), the assumption of the destination
+buffer length in RFC4106 GCM operation leads to a too large size. This
+patch simply uses the already calculated plaintext size.
+
+In addition, this patch fixes the offset calculation of the AAD buffer
+pointer: as mentioned before, cryptlen already includes the size of the
+tag. Thus, the tag does not need to be added. With the addition, the AAD
+will be written beyond the already allocated buffer.
+
+Note, this fixes a kernel crash that can be triggered from user space
+via AF_ALG(aead) -- simply use the libkcapi test application
+from [1] and update it to use rfc4106-gcm-aes.
+
+Using [1], the changes were tested using CAVS vectors to demonstrate
+that the crypto operation still delivers the right results.
+
+[1] http://www.chronox.de/libkcapi.html
+
+CC: Tadeusz Struk <tadeusz.struk@intel.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ arch/x86/crypto/aesni-intel_glue.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 6893f49..d71eb9d 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -1135,7 +1135,7 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
+ 		src = kmalloc(req->cryptlen + req->assoclen, GFP_ATOMIC);
+ 		if (!src)
+ 			return -ENOMEM;
+-		assoc = (src + req->cryptlen + auth_tag_len);
++		assoc = (src + req->cryptlen);
+ 		scatterwalk_map_and_copy(src, req->src, 0, req->cryptlen, 0);
+ 		scatterwalk_map_and_copy(assoc, req->assoc, 0,
+ 			req->assoclen, 0);
+@@ -1160,7 +1160,7 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
+ 		scatterwalk_done(&src_sg_walk, 0, 0);
+ 		scatterwalk_done(&assoc_sg_walk, 0, 0);
+ 	} else {
+-		scatterwalk_map_and_copy(dst, req->dst, 0, req->cryptlen, 1);
++		scatterwalk_map_and_copy(dst, req->dst, 0, tempCipherLen, 1);
+ 		kfree(src);
+ 	}
+ 	return retval;
+-- 
+2.1.0
