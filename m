@@ -1,42 +1,51 @@
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: [PATCH RFC 2/4] aio: prefer aio_op op over iter_op
-Date: Thu, 12 Mar 2015 06:48:25 +0000
-Message-ID: <20150312064825.GL29656@ZenIV.linux.org.uk>
-References: <20150311224607.23777.2181.stgit@tstruk-mobl1>
- <20150311224618.23777.38330.stgit@tstruk-mobl1>
+From: Pekka Enberg <penberg@iki.fi>
+Subject: Re: [PATCH] mm: kill kmemcheck
+Date: Thu, 12 Mar 2015 09:07:36 +0200
+Message-ID: <55013B38.6040100@iki.fi>
+References: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-aio@kvack.org,
-	herbert@gondor.apana.org.au, netdev@vger.kernel.org,
-	ying.xue@windriver.com, bcrl@kvack.org,
-	linux-fsdevel@vger.kernel.org, hch@lst.de,
-	linux-crypto@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:39266 "EHLO
-	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750793AbbCLGsl (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Mar 2015 02:48:41 -0400
-Content-Disposition: inline
-In-Reply-To: <20150311224618.23777.38330.stgit@tstruk-mobl1>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
+Cc: Vladimir Davydov <vdavydov@parallels.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ SUPERH <linux-sh@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will.deacon@arm.com>, Jianyu Zhan <nasa4836@gmail.com>,
+ Paul Mackerras <paulus@samba.org>, Pavel Machek <pavel@ucw.cz>,
+ Miklos Szeredi <mszeredi@suse.cz>, Christoph Lameter <cl@linux.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ "open list:GENERIC INCLUDE/A..." <linux-arch@vger.kernel.org>,
+ Andi Kleen <ak@linux.intel.com>, Russell King <linux@arm.linux.org.uk>,
+ Jingoo Han <jg1.han@samsung.com>, James Morris <jmorris@namei.org>,
+ Chris Bainbridge <chris.bainbridge@gmail.com>, Antti Palosaari <crope@iki.fi>,
+ Mel Gorman <mgorman@suse.de>, Ritesh Harjani <ritesh.harjani@gmail.com>,
+ Shaohua Li <shli@kernel.org>, Alexander Duyck <alexander.h.duyck@intel.com>,
+ Wang Nan <wangnan0@huawei.com>, Jiri
+To: Sasha Levin <sasha.levin@oracle.com>, linux-kernel@vger.kernel.org
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 11, 2015 at 03:46:18PM -0700, Tadeusz Struk wrote:
-> AIO interface should prefer AIO operations over iter_op
-
-What the devil for?  read_iter and write_iter *ARE* aio operations, as much
-as soon to be removed aio_read and aio_write.  And yes, those are going to
-be removed very soon.
-
-Note that ->read_iter() and ->write_iter() are getting iocb pointer passed
-to them.  It's just that socket instances are not passing it along to
-->sendmsg/->recvmsg anymore.
-
-And why, in name of everything unholy, do your methods get redundant
-total_len argument?  It's iov_iter_count(&msg->msg_iter) (and in iov_iter-net
-I have an inline helper doing that - enough places open-coding that thing).
-If nothing else, ->sendmsg() and ->recvmsg() would benefit from removing
-that argument as well.  I have patches doing that, but iocb removal conflicts
-with them and they need to be rebased to current net/master...
+SGkgU2FzaGEsCgpPbiAzLzExLzE1IDE6NDMgUE0sIFNhc2hhIExldmluIHdyb3RlOgo+IEFzIGRp
+c2N1c3NlZCBvbiBMU0YvTU0sIGtpbGwga21lbWNoZWNrLgo+Cj4gS0FTYW4gaXMgYSByZXBsYWNl
+bWVudCB0aGF0IGlzIGFibGUgdG8gd29yayB3aXRob3V0IHRoZSBsaW1pdGF0aW9uIG9mCj4ga21l
+bWNoZWNrIChzaW5nbGUgQ1BVLCBzbG93KS4gS0FTYW4gaXMgYWxyZWFkeSB1cHN0cmVhbS4KPgo+
+IFdlIGFyZSBhbHNvIG5vdCBhd2FyZSBvZiBhbnkgdXNlcnMgb2Yga21lbWNoZWNrIChvciB1c2Vy
+cyB3aG8gZG9uJ3QgY29uc2lkZXIKPiBLQVNhbiBhcyBhIHN1aXRhYmxlIHJlcGxhY2VtZW50KS4K
+Pgo+IEkndmUgYnVpbGQgdGVzdGVkIGl0IHVzaW5nIGFsbFt5ZXMsbm8sbW9kXWNvbmZpZyBhbmQg
+ZnV6emVkIGEgYml0IHdpdGggdGhpcwo+IHBhdGNoIGFwcGxpZWQsIGRpZG4ndCBub3RpY2UgYW55
+IGJhZCBiZWhhdmlvdXIuCj4KPiBTaWduZWQtb2ZmLWJ5OiBTYXNoYSBMZXZpbiA8c2FzaGEubGV2
+aW5Ab3JhY2xlLmNvbT4KCkNhbiB5b3UgZWxhYm9yYXRlIG9uIHdoYXQgZXhhY3RseSB3YXMgZGlz
+Y3Vzc2VkIGF0IExTRi9NTT8gUHJlZmVyYWJseSBpbiAKdGhlIGNvbW1pdCBsb2cuIDstKQoKLSBQ
+ZWtrYQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51
+eHBwYy1kZXYgbWFpbGluZyBsaXN0CkxpbnV4cHBjLWRldkBsaXN0cy5vemxhYnMub3JnCmh0dHBz
+Oi8vbGlzdHMub3psYWJzLm9yZy9saXN0aW5mby9saW51eHBwYy1kZXY=
