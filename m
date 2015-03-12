@@ -1,74 +1,41 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2] crypto: AES-NI - fix memory usage in GCM decryption
-Date: Thu, 12 Mar 2015 09:17:51 +0100
-Message-ID: <44569470.FQKUtYhtg6@tachyon.chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 0/5] ARM: crypto: ARMv8 Crypto Extensions
+Date: Thu, 12 Mar 2015 21:19:49 +1100
+Message-ID: <20150312101949.GA18614@gondor.apana.org.au>
+References: <1425977268-27835-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
-To: 'Herbert Xu <herbert@gondor.apana.org.au>, tadeusz.struk@intel.com
+Content-Type: text/plain; charset=us-ascii
+Cc: jussi.kivilinna@iki.fi, linux-crypto@vger.kernel.org,
+	linux@arm.linux.org.uk, linux-arm-kernel@lists.infradead.org,
+	nico@linaro.org, will.deacon@arm.com
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:46483 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752591AbbCLIRy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Mar 2015 04:17:54 -0400
+Received: from ringil.hengli.com.au ([178.18.16.133]:49834 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752761AbbCLKT7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 12 Mar 2015 06:19:59 -0400
+Content-Disposition: inline
+In-Reply-To: <1425977268-27835-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The kernel crypto API logic requires the caller to provide the
-length of (ciphertext || authentication tag) as cryptlen for the
-AEAD decryption operation. Thus, the cipher implementation must
-calculate the size of the plaintext output itself and cannot simply use
-cryptlen.
+On Tue, Mar 10, 2015 at 09:47:43AM +0100, Ard Biesheuvel wrote:
+> This is v2 of the ARM crypto series I sent out yesterday, erroneously without
+> a cover letter.
+> 
+> Patch #1 moves all the ARM specific crypto options to arch/arm/crypto/Kconfig.
+> 
+> Patches #2 - #5 implement SHA1, SHA-224/256, AES-ECB/CBC/CTR/XTS and GHASH,
+> respectively.
+> 
+> Changes since v1:
+> - fixes for BE (currently still untested)
+> - added alignment hints where appropriate (e,g., [rX, :128])
+> - various minor tweaks
 
-The RFC4106 GCM decryption operation tries to overwrite cryptlen memory
-in req->dst. As the destination buffer for decryption only needs to hold
-the plaintext memory but cryptlen references the input buffer holding
-(ciphertext || authentication tag), the assumption of the destination
-buffer length in RFC4106 GCM operation leads to a too large size. This
-patch simply uses the already calculated plaintext size.
-
-In addition, this patch fixes the offset calculation of the AAD buffer
-pointer: as mentioned before, cryptlen already includes the size of the
-tag. Thus, the tag does not need to be added. With the addition, the AAD
-will be written beyond the already allocated buffer.
-
-Note, this fixes a kernel crash that can be triggered from user space
-via AF_ALG(aead) -- simply use the libkcapi test application
-from [1] and update it to use rfc4106-gcm-aes.
-
-Using [1], the changes were tested using CAVS vectors to demonstrate
-that the crypto operation still delivers the right results.
-
-[1] http://www.chronox.de/libkcapi.html
-
-CC: Tadeusz Struk <tadeusz.struk@intel.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- arch/x86/crypto/aesni-intel_glue.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 6893f49..d71eb9d 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1135,7 +1135,7 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
- 		src = kmalloc(req->cryptlen + req->assoclen, GFP_ATOMIC);
- 		if (!src)
- 			return -ENOMEM;
--		assoc = (src + req->cryptlen + auth_tag_len);
-+		assoc = (src + req->cryptlen);
- 		scatterwalk_map_and_copy(src, req->src, 0, req->cryptlen, 0);
- 		scatterwalk_map_and_copy(assoc, req->assoc, 0,
- 			req->assoclen, 0);
-@@ -1160,7 +1160,7 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
- 		scatterwalk_done(&src_sg_walk, 0, 0);
- 		scatterwalk_done(&assoc_sg_walk, 0, 0);
- 	} else {
--		scatterwalk_map_and_copy(dst, req->dst, 0, req->cryptlen, 1);
-+		scatterwalk_map_and_copy(dst, req->dst, 0, tempCipherLen, 1);
- 		kfree(src);
- 	}
- 	return retval;
+All applied.  Thanks!
 -- 
-2.1.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
