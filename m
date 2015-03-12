@@ -1,62 +1,46 @@
-From: Andrew Bresticker <abrestic@chromium.org>
-Subject: Re: [PATCH V4 1/2] crypto: Add Imagination Technologies hw hash accelerator
-Date: Thu, 12 Mar 2015 11:56:45 -0700
-Message-ID: <CAL1qeaHq+gDyjBbX-O7dgSfceMNf1nezb2_hMKWvo11RnWt-xA@mail.gmail.com>
-References: <1426126012-16061-1-git-send-email-james.hartley@imgtec.com>
-	<1426126012-16061-2-git-send-email-james.hartley@imgtec.com>
+From: Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH] mm: kill kmemcheck
+Date: Thu, 12 Mar 2015 09:00:15 -0400
+Message-ID: <20150312090015.656c2f9c@lwn.net>
+References: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
+ <55013B38.6040100@iki.fi>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, smueller@chronox.de,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	Ezequiel Garcia <ezequiel.garcia@imgtec.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: James Hartley <james.hartley@imgtec.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qc0-f169.google.com ([209.85.216.169]:37526 "EHLO
-	mail-qc0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751540AbbCLS4q (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Mar 2015 14:56:46 -0400
-Received: by qcxr5 with SMTP id r5so21073618qcx.4
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Mar 2015 11:56:45 -0700 (PDT)
-In-Reply-To: <1426126012-16061-2-git-send-email-james.hartley@imgtec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Vladimir Davydov <vdavydov@parallels.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ "open list:SUPERH" <linux-sh@vger.kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>,
+ Jianyu Zhan <nasa4836@gmail.com>, Paul Mackerras <paulus@samba.org>,
+ Pavel Machek <pavel@ucw.cz>, Miklos Szeredi <mszeredi@suse.cz>,
+ Christoph Lameter <cl@linux.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ "open list:GENERIC INCLUDE/A..." <linux-arch@vger.kernel.org>,
+ Andi Kleen <ak@linux.intel.com>, Russell King <linux@arm.linux.org.uk>,
+ Jingoo Han <jg1.han@samsung.com>, James Morris <jmorris@namei.org>,
+ Chris Bainbridge <chris.bainbridge@gmail.com>, Antti Palosaari <crope@iki.fi>,
+ Mel Gorman <mgorman@suse.de>, Ritesh Harjani <ritesh.harjani@gmail.com>,
+ Shaohua Li <shli@kernel.org>, Alexander Duyck <alexander.h.duyck@intel.com>,
+ Wang Nan <wangnan0@huawei
+To: Pekka Enberg <penberg@iki.fi>
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-Reply-To: <55013B38.6040100@iki.fi>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+List-Id: linux-crypto.vger.kernel.org
 
-Hi James,
-
-On Wed, Mar 11, 2015 at 7:06 PM, James Hartley <james.hartley@imgtec.com> wrote:
-> This adds support for the Imagination Technologies hash accelerator which
-> provides hardware acceleration for SHA1 SHA224 SHA256 and MD5 hashes.
->
-> Signed-off-by: James Hartley <james.hartley@imgtec.com>
-
-One comment below, otherwise this looks fine to me.
-
-> --- /dev/null
-> +++ b/drivers/crypto/img-hash.c
-
-> +static int img_hash_hw_init(struct img_hash_dev *hdev)
-> +{
-> +       unsigned long long nbits;
-> +       u32 u, l;
-> +       int ret;
-> +
-> +       ret = clk_prepare_enable(hdev->hash_clk);
-> +       if (ret)
-> +               return ret;
-> +
-> +       ret = clk_prepare_enable(hdev->sys_clk);
-> +       if (ret) {
-> +               clk_disable_unprepare(hdev->hash_clk);
-> +               return ret;
-> +       }
-
-I think you'll still end up with inflated prepare/enable counts for
-these clocks since this function may get called multiple times and the
-only clk_disable_unprepare() calls are in the remove() path.  Perhaps
-it's best to just enable the clocks in probe() until runtime PM
-support is added?
-
-Thanks,
-Andrew
+T24gVGh1LCAxMiBNYXIgMjAxNSAwOTowNzozNiArMDIwMApQZWtrYSBFbmJlcmcgPHBlbmJlcmdA
+aWtpLmZpPiB3cm90ZToKCj4gQ2FuIHlvdSBlbGFib3JhdGUgb24gd2hhdCBleGFjdGx5IHdhcyBk
+aXNjdXNzZWQgYXQgTFNGL01NPyBQcmVmZXJhYmx5IGluIAo+IHRoZSBjb21taXQgbG9nLiA7LSkK
+CkknbGwgaGF2ZSB0aGUgcmVwb3J0IGZyb20gdGhhdCBzZXNzaW9uIHVwLCBob3BlZnVsbHkgYnkg
+dGhlIGVuZCBvZiB0aGUKd2Vlay4KClRoYW5rcywKCmpvbgpfX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eHBwYy1kZXYgbWFpbGluZyBsaXN0CkxpbnV4
+cHBjLWRldkBsaXN0cy5vemxhYnMub3JnCmh0dHBzOi8vbGlzdHMub3psYWJzLm9yZy9saXN0aW5m
+by9saW51eHBwYy1kZXY=
