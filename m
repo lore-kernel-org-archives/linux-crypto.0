@@ -1,40 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/5] ARM: crypto: ARMv8 Crypto Extensions
-Date: Thu, 12 Mar 2015 21:19:49 +1100
-Message-ID: <20150312101949.GA18614@gondor.apana.org.au>
-References: <1425977268-27835-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [RESEND PATCH] hwrng: omap - remove #ifdefery around PM methods
+Date: Thu, 12 Mar 2015 21:20:14 +1100
+Message-ID: <20150312102014.GB18614@gondor.apana.org.au>
+References: <20150311210836.GA8253@dtor-ws>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: jussi.kivilinna@iki.fi, linux-crypto@vger.kernel.org,
-	linux@arm.linux.org.uk, linux-arm-kernel@lists.infradead.org,
-	nico@linaro.org, will.deacon@arm.com
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Deepak Saxena <dsaxena@plexity.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:49834 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:35676 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752761AbbCLKT7 (ORCPT
+	with ESMTP id S1751039AbbCLKUR (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 12 Mar 2015 06:19:59 -0400
+	Thu, 12 Mar 2015 06:20:17 -0400
 Content-Disposition: inline
-In-Reply-To: <1425977268-27835-1-git-send-email-ard.biesheuvel@linaro.org>
+In-Reply-To: <20150311210836.GA8253@dtor-ws>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 10, 2015 at 09:47:43AM +0100, Ard Biesheuvel wrote:
-> This is v2 of the ARM crypto series I sent out yesterday, erroneously without
-> a cover letter.
+On Wed, Mar 11, 2015 at 02:08:36PM -0700, Dmitry Torokhov wrote:
+> Instead of using #ifdefs let's mark suspend and resume methods as
+> __maybe_unused which will suppress compiler warnings about them being
+> unused and provide better compile coverage.
 > 
-> Patch #1 moves all the ARM specific crypto options to arch/arm/crypto/Kconfig.
+> Because SIMPLE_DEV_PM_OPS() produces an empty omap_rng_pm structure in
+> case of !CONFIG_PM_SLEEP neither omap_rng_suspend nor omap_rng_resume
+> will end up being referenced and the change will not result in
+> increasing image size.
 > 
-> Patches #2 - #5 implement SHA1, SHA-224/256, AES-ECB/CBC/CTR/XTS and GHASH,
-> respectively.
-> 
-> Changes since v1:
-> - fixes for BE (currently still untested)
-> - added alignment hints where appropriate (e,g., [rX, :128])
-> - various minor tweaks
+> Signed-off-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 
-All applied.  Thanks!
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
