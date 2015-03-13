@@ -1,56 +1,37 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 4/15] crypto: don't export static symbol
-Date: Fri, 13 Mar 2015 21:38:27 +1100
-Message-ID: <20150313103827.GB1757@gondor.apana.org.au>
-References: <1426092997-30605-1-git-send-email-Julia.Lawall@lip6.fr>
- <1426092997-30605-5-git-send-email-Julia.Lawall@lip6.fr>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH RESEND] crypto: algif_rng - zeroize buffer with random data
+Date: Fri, 13 Mar 2015 11:44:07 +0100
+Message-ID: <1488589.sO3PXAYh7F@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: kernel-janitors@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	daniel@iogearbox.net
-To: Julia Lawall <Julia.Lawall@lip6.fr>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:50751 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750963AbbCMKjD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Mar 2015 06:39:03 -0400
-Content-Disposition: inline
-In-Reply-To: <1426092997-30605-5-git-send-email-Julia.Lawall@lip6.fr>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, 'LKML' <linux-kernel@vger.kernel.org>
+To: 'Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 11, 2015 at 05:56:26PM +0100, Julia Lawall wrote:
-> From: Julia Lawall <Julia.Lawall@lip6.fr>
-> 
-> The semantic patch that fixes this problem is as follows:
-> (http://coccinelle.lip6.fr/)
-> 
-> // <smpl>
-> @r@
-> type T;
-> identifier f;
-> @@
-> 
-> static T f (...) { ... }
-> 
-> @@
-> identifier r.f;
-> declarer name EXPORT_SYMBOL_GPL;
-> @@
-> 
-> -EXPORT_SYMBOL_GPL(f);
-> // </smpl>
-> 
-> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+Due to the change to RNGs to always return zero in success case, the RNG
+interface must zeroize the buffer with the length provided by the
+caller.
 
-Applied.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/algif_rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
+index 67f612c..a346173 100644
+--- a/crypto/algif_rng.c
++++ b/crypto/algif_rng.c
+@@ -87,7 +87,7 @@ static int rng_recvmsg(struct kiocb *unused, struct socket *sock,
+ 		return genlen;
+ 
+ 	err = memcpy_to_msg(msg, result, len);
+-	memzero_explicit(result, genlen);
++	memzero_explicit(result, len);
+ 
+ 	return err ? err : len;
+ }
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.1.0
