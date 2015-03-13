@@ -1,56 +1,37 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: AES-NI - fix memory usage in GCM decryption
-Date: Fri, 13 Mar 2015 21:33:06 +1100
-Message-ID: <20150313103306.GA1559@gondor.apana.org.au>
-References: <44569470.FQKUtYhtg6@tachyon.chronox.de>
+Subject: Re: [PATCH] crypto: testmgr - fix RNG return code enforcement
+Date: Fri, 13 Mar 2015 21:38:20 +1100
+Message-ID: <20150313103820.GA1757@gondor.apana.org.au>
+References: <20150311121107.GY786@surtsey.monkey.lab>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: tadeusz.struk@intel.com, linux-crypto@vger.kernel.org,
-	'LKML' <linux-kernel@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
+Cc: linux-crypto@vger.kernel.org, Stephan Mueller <smueller@chronox.de>
+To: Alexander Bergmann <abergmann@suse.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:37954 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:44501 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751267AbbCMKdO (ORCPT
+	with ESMTP id S1750963AbbCMKi1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Mar 2015 06:33:14 -0400
+	Fri, 13 Mar 2015 06:38:27 -0400
 Content-Disposition: inline
-In-Reply-To: <44569470.FQKUtYhtg6@tachyon.chronox.de>
+In-Reply-To: <20150311121107.GY786@surtsey.monkey.lab>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 12, 2015 at 09:17:51AM +0100, Stephan Mueller wrote:
-> The kernel crypto API logic requires the caller to provide the
-> length of (ciphertext || authentication tag) as cryptlen for the
-> AEAD decryption operation. Thus, the cipher implementation must
-> calculate the size of the plaintext output itself and cannot simply use
-> cryptlen.
+On Wed, Mar 11, 2015 at 01:11:07PM +0100, Alexander Bergmann wrote:
+> From 0c7233769665f03e9f91342770dba7279f928c23 Mon Sep 17 00:00:00 2001
+> From: Stephan Mueller <smueller@chronox.de>
+> Date: Tue, 10 Mar 2015 17:00:36 +0100
+> Subject: [PATCH] crypto: testmgr - fix RNG return code enforcement
 > 
-> The RFC4106 GCM decryption operation tries to overwrite cryptlen memory
-> in req->dst. As the destination buffer for decryption only needs to hold
-> the plaintext memory but cryptlen references the input buffer holding
-> (ciphertext || authentication tag), the assumption of the destination
-> buffer length in RFC4106 GCM operation leads to a too large size. This
-> patch simply uses the already calculated plaintext size.
+> Due to the change to RNGs to always return zero in success case, the
+> invocation of the RNGs in the test manager must be updated as otherwise
+> the RNG self tests are not properly executed any more.
 > 
-> In addition, this patch fixes the offset calculation of the AAD buffer
-> pointer: as mentioned before, cryptlen already includes the size of the
-> tag. Thus, the tag does not need to be added. With the addition, the AAD
-> will be written beyond the already allocated buffer.
-> 
-> Note, this fixes a kernel crash that can be triggered from user space
-> via AF_ALG(aead) -- simply use the libkcapi test application
-> from [1] and update it to use rfc4106-gcm-aes.
-> 
-> Using [1], the changes were tested using CAVS vectors to demonstrate
-> that the crypto operation still delivers the right results.
-> 
-> [1] http://www.chronox.de/libkcapi.html
-> 
-> CC: Tadeusz Struk <tadeusz.struk@intel.com>
 > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> Signed-off-by: Alexander Bergmann <abergmann@suse.com>
 
-Patch applied.  Thanks!
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
