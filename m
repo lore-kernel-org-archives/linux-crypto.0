@@ -1,35 +1,53 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: testmgr - fix RNG return code enforcement
-Date: Fri, 13 Mar 2015 21:38:20 +1100
-Message-ID: <20150313103820.GA1757@gondor.apana.org.au>
-References: <20150311121107.GY786@surtsey.monkey.lab>
+Subject: Re: [PATCH 4/15] crypto: don't export static symbol
+Date: Fri, 13 Mar 2015 21:38:27 +1100
+Message-ID: <20150313103827.GB1757@gondor.apana.org.au>
+References: <1426092997-30605-1-git-send-email-Julia.Lawall@lip6.fr>
+ <1426092997-30605-5-git-send-email-Julia.Lawall@lip6.fr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, Stephan Mueller <smueller@chronox.de>
-To: Alexander Bergmann <abergmann@suse.com>
+Cc: kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	daniel@iogearbox.net
+To: Julia Lawall <Julia.Lawall@lip6.fr>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:44501 "EHLO
+Received: from ringil.hengli.com.au ([178.18.16.133]:50751 "EHLO
 	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750963AbbCMKi1 (ORCPT
+	with ESMTP id S1750963AbbCMKjD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Mar 2015 06:38:27 -0400
+	Fri, 13 Mar 2015 06:39:03 -0400
 Content-Disposition: inline
-In-Reply-To: <20150311121107.GY786@surtsey.monkey.lab>
+In-Reply-To: <1426092997-30605-5-git-send-email-Julia.Lawall@lip6.fr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Mar 11, 2015 at 01:11:07PM +0100, Alexander Bergmann wrote:
-> From 0c7233769665f03e9f91342770dba7279f928c23 Mon Sep 17 00:00:00 2001
-> From: Stephan Mueller <smueller@chronox.de>
-> Date: Tue, 10 Mar 2015 17:00:36 +0100
-> Subject: [PATCH] crypto: testmgr - fix RNG return code enforcement
+On Wed, Mar 11, 2015 at 05:56:26PM +0100, Julia Lawall wrote:
+> From: Julia Lawall <Julia.Lawall@lip6.fr>
 > 
-> Due to the change to RNGs to always return zero in success case, the
-> invocation of the RNGs in the test manager must be updated as otherwise
-> the RNG self tests are not properly executed any more.
+> The semantic patch that fixes this problem is as follows:
+> (http://coccinelle.lip6.fr/)
 > 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> Signed-off-by: Alexander Bergmann <abergmann@suse.com>
+> // <smpl>
+> @r@
+> type T;
+> identifier f;
+> @@
+> 
+> static T f (...) { ... }
+> 
+> @@
+> identifier r.f;
+> declarer name EXPORT_SYMBOL_GPL;
+> @@
+> 
+> -EXPORT_SYMBOL_GPL(f);
+> // </smpl>
+> 
+> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
 
 Applied.
 -- 
