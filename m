@@ -1,80 +1,87 @@
 From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH v2 1/4] crypto: add CRYPTO_TFM_REQ_DMA flag
-Date: Fri, 13 Mar 2015 19:37:40 +0200
-Message-ID: <1426268260-20824-1-git-send-email-horia.geanta@freescale.com>
+Subject: [PATCH v2 2/4] net: esp: check CRYPTO_TFM_REQ_DMA flag when allocating crypto request
+Date: Fri, 13 Mar 2015 19:38:11 +0200
+Message-ID: <1426268291-21507-1-git-send-email-horia.geanta@freescale.com>
+References: <1426268260-20824-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: Kim Phillips <kim.phillips@freescale.com>,
 	Horia Geanta <horia.geanta@freescale.com>
-To: <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+To: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0132.outbound.protection.outlook.com ([157.56.111.132]:37856
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-by2on0129.outbound.protection.outlook.com ([207.46.100.129]:5632
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752656AbbCMRhw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 13 Mar 2015 13:37:52 -0400
+	id S1751799AbbCMRiV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 13 Mar 2015 13:38:21 -0400
+In-Reply-To: <1426268260-20824-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The CRYPTO_TFM_REQ_DMA flag can be used by backend implementations to
-indicate to crypto API the need to allocate GFP_DMA memory
-for private contexts of the crypto requests.
+Some crypto backends might require the requests' private contexts
+to be allocated in DMA-able memory.
 
 Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 ---
- include/crypto/hash.h  | 4 ++++
- include/linux/crypto.h | 9 +++++++++
- 2 files changed, 13 insertions(+)
 
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 98abda9ed3aa..6e23b27862cd 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -507,6 +507,10 @@ static inline struct ahash_request *ahash_request_alloc(
+Depends on patch 1/4 (sent only on crypto list) that adds the
+CRYPTO_TFM_REQ_DMA flag.
+
+ net/ipv4/esp4.c | 7 ++++++-
+ net/ipv6/esp6.c | 7 ++++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 60173d4d3a0e..3e6ddece0cbe 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -38,6 +38,7 @@ static u32 esp4_get_mtu(struct xfrm_state *x, int mtu);
+ static void *esp_alloc_tmp(struct crypto_aead *aead, int nfrags, int seqhilen)
  {
- 	struct ahash_request *req;
+ 	unsigned int len;
++	gfp_t gfp = GFP_ATOMIC;
  
-+	if (crypto_ahash_reqsize(tfm) &&
-+	    (crypto_ahash_get_flags(tfm) & CRYPTO_TFM_REQ_DMA))
+ 	len = seqhilen;
+ 
+@@ -54,7 +55,11 @@ static void *esp_alloc_tmp(struct crypto_aead *aead, int nfrags, int seqhilen)
+ 
+ 	len += sizeof(struct scatterlist) * nfrags;
+ 
+-	return kmalloc(len, GFP_ATOMIC);
++	if (crypto_aead_reqsize(aead) &&
++	    (crypto_aead_get_flags(aead) & CRYPTO_TFM_REQ_DMA))
 +		gfp |= GFP_DMA;
 +
- 	req = kmalloc(sizeof(struct ahash_request) +
- 		      crypto_ahash_reqsize(tfm), gfp);
++	return kmalloc(len, gfp);
+ }
  
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index fb5ef16d6a12..64258c9198d5 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -103,6 +103,7 @@
- #define CRYPTO_TFM_REQ_WEAK_KEY		0x00000100
- #define CRYPTO_TFM_REQ_MAY_SLEEP	0x00000200
- #define CRYPTO_TFM_REQ_MAY_BACKLOG	0x00000400
-+#define CRYPTO_TFM_REQ_DMA		0x00000800
- #define CRYPTO_TFM_RES_WEAK_KEY		0x00100000
- #define CRYPTO_TFM_RES_BAD_KEY_LEN   	0x00200000
- #define CRYPTO_TFM_RES_BAD_KEY_SCHED 	0x00400000
-@@ -1108,6 +1109,10 @@ static inline struct ablkcipher_request *ablkcipher_request_alloc(
+ static inline __be32 *esp_tmp_seqhi(void *tmp)
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index e48f2c7c5c59..0d173eedad4e 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -65,6 +65,7 @@ static u32 esp6_get_mtu(struct xfrm_state *x, int mtu);
+ static void *esp_alloc_tmp(struct crypto_aead *aead, int nfrags, int seqihlen)
  {
- 	struct ablkcipher_request *req;
+ 	unsigned int len;
++	gfp_t gfp = GFP_ATOMIC;
  
-+	if (crypto_ablkcipher_reqsize(tfm) &&
-+	    (crypto_ablkcipher_get_flags(tfm) & CRYPTO_TFM_REQ_DMA))
+ 	len = seqihlen;
+ 
+@@ -81,7 +82,11 @@ static void *esp_alloc_tmp(struct crypto_aead *aead, int nfrags, int seqihlen)
+ 
+ 	len += sizeof(struct scatterlist) * nfrags;
+ 
+-	return kmalloc(len, GFP_ATOMIC);
++	if (crypto_aead_reqsize(aead) &&
++	    (crypto_aead_get_flags(aead) & CRYPTO_TFM_REQ_DMA))
 +		gfp |= GFP_DMA;
 +
- 	req = kmalloc(sizeof(struct ablkcipher_request) +
- 		      crypto_ablkcipher_reqsize(tfm), gfp);
++	return kmalloc(len, gfp);
+ }
  
-@@ -1471,6 +1476,10 @@ static inline struct aead_request *aead_request_alloc(struct crypto_aead *tfm,
- {
- 	struct aead_request *req;
- 
-+	if (crypto_aead_reqsize(tfm) &&
-+	    (crypto_aead_get_flags(tfm) & CRYPTO_TFM_REQ_DMA))
-+		gfp |= GFP_DMA;
-+
- 	req = kmalloc(sizeof(*req) + crypto_aead_reqsize(tfm), gfp);
- 
- 	if (likely(req))
+ static inline __be32 *esp_tmp_seqhi(void *tmp)
 -- 
 1.8.3.1
