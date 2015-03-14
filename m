@@ -1,35 +1,45 @@
-From: Ameen Ali <ameenali023@gmail.com>
-Subject: [PATCH 12/12] crypto/sha-mb/sha1_mb.c : Syntax error
-Date: Fri, 13 Mar 2015 23:38:21 +0200
-Message-ID: <1426282701-10516-1-git-send-email-ameenali023@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ameen Ali <ameenali023@gmail.com>
-To: tim.c.chen@linux.intel.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-	hpa@zytor.com, x86@kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH 2/4] net: esp: check CRYPTO_TFM_REQ_DMA flag when allocating
+ crypto request
+Date: Sat, 14 Mar 2015 14:16:37 +0200
+Message-ID: <550426A5.4090603@freescale.com>
+References: <1426266882-31626-1-git-send-email-horia.geanta@freescale.com>
+	<1426266922-31679-1-git-send-email-horia.geanta@freescale.com>
+ <20150313.154608.548532696978553073.davem@davemloft.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<kim.phillips@freescale.com>
+To: David Miller <davem@davemloft.net>, <herbert@gondor.apana.org.au>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20150313.154608.548532696978553073.davem@davemloft.net>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-fixing a syntax-error .
+On 3/13/2015 9:46 PM, David Miller wrote:
+> From: Horia Geanta <horia.geanta@freescale.com>
+> Date: Fri, 13 Mar 2015 19:15:22 +0200
+> 
+>> Some crypto backends might require the requests' private contexts
+>> to be allocated in DMA-able memory.
+>>
+>> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+> 
+> No way.
+> 
+> Upper layers should be absolutely not required to know about such
+> requirements.
+> 
+> Such details _must_ be hidden inside of the crypto layer and drivers
+> and not leak out into the users of the crypto interfaces.
 
-Signed-off-by : Ameen Ali <AmeenAli023@gmail.com>
----
- arch/x86/crypto/sha-mb/sha1_mb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If you look at patch 1/4:
+http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg13428.html
+that's what's done for {aead,ablkcipher,ahash}_request_alloc().
 
-diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
-index fd9f6b0..ec0b989 100644
---- a/arch/x86/crypto/sha-mb/sha1_mb.c
-+++ b/arch/x86/crypto/sha-mb/sha1_mb.c
-@@ -828,7 +828,7 @@ static unsigned long sha1_mb_flusher(struct mcryptd_alg_cstate *cstate)
- 	while (!list_empty(&cstate->work_list)) {
- 		rctx = list_entry(cstate->work_list.next,
- 				struct mcryptd_hash_request_ctx, waiter);
--		if time_before(cur_time, rctx->tag.expire)
-+		if (time_before(cur_time, rctx->tag.expire))
- 			break;
- 		kernel_fpu_begin();
- 		sha_ctx = (struct sha1_hash_ctx *) sha1_ctx_mgr_flush(cstate->mgr);
--- 
-2.1.0
+Thus users (upper layers) that allocate the crypto requests using the
+crypto API are unaware of the requirement.
+
+However, ESP is not using aead_request_alloc(). This breaks the
+interface and thus some crypto implementation details are not transparent.
