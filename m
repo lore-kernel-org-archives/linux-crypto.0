@@ -1,63 +1,44 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 03/17] crypto: talitos - talitos_ptr renamed ptr for more
- lisibility
-Date: Sat, 14 Mar 2015 11:14:40 +0100
-Message-ID: <20150417142356.797BC1A242C@localhost.localdomain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
+Subject: [PATCH v3 16/17] crypto: talitos - Add fsl,sec1.0 compatible
+Date: Sat, 14 Mar 2015 15:05:09 +0100
+Message-ID: <20150417142410.5D3801A242C@localhost.localdomain>
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org
 To: Kim Phillips <kim.phillips@freescale.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David S Miller <davem@davemloft.net>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David S Miller <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-TGludXggQ29keWluZ1N0eWxlIHJlY29tbWVuZHMgdG8gdXNlIHNob3J0IHZhcmlhYmxlcyBmb3Ig
-bG9jYWwKdmFyaWFibGVzLiBwdHIgaXMganVzdCBnb29kIGVub3VnaCBmb3IgdGhvc2UgMyBsaW5l
-cyBmdW5jdGlvbnMuCkl0IGhlbHBzIGtlZXAgc2luZ2xlIGxpbmVzIHNob3J0ZXIgdGhhbiA4MCBj
-aGFyYWN0ZXJzLgoKU2lnbmVkLW9mZi1ieTogQ2hyaXN0b3BoZSBMZXJveSA8Y2hyaXN0b3BoZS5s
-ZXJveUBjLXMuZnI+Ci0tLQogZHJpdmVycy9jcnlwdG8vdGFsaXRvcy5jIHwgMjAgKysrKysrKysr
-Ky0tLS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAxMCBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlv
-bnMoLSkKCmRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by90YWxpdG9zLmMgYi9kcml2ZXJzL2Ny
-eXB0by90YWxpdG9zLmMKaW5kZXggNWE3ZTM0NS4uZmNhMGFlZCAxMDA2NDQKLS0tIGEvZHJpdmVy
-cy9jcnlwdG8vdGFsaXRvcy5jCisrKyBiL2RyaXZlcnMvY3J5cHRvL3RhbGl0b3MuYwpAQCAtNTUs
-MzcgKzU1LDM3IEBACiAKICNpbmNsdWRlICJ0YWxpdG9zLmgiCiAKLXN0YXRpYyB2b2lkIHRvX3Rh
-bGl0b3NfcHRyKHN0cnVjdCB0YWxpdG9zX3B0ciAqdGFsaXRvc19wdHIsIGRtYV9hZGRyX3QgZG1h
-X2FkZHIpCitzdGF0aWMgdm9pZCB0b190YWxpdG9zX3B0cihzdHJ1Y3QgdGFsaXRvc19wdHIgKnB0
-ciwgZG1hX2FkZHJfdCBkbWFfYWRkcikKIHsKLQl0YWxpdG9zX3B0ci0+cHRyID0gY3B1X3RvX2Jl
-MzIobG93ZXJfMzJfYml0cyhkbWFfYWRkcikpOwotCXRhbGl0b3NfcHRyLT5lcHRyID0gdXBwZXJf
-MzJfYml0cyhkbWFfYWRkcik7CisJcHRyLT5wdHIgPSBjcHVfdG9fYmUzMihsb3dlcl8zMl9iaXRz
-KGRtYV9hZGRyKSk7CisJcHRyLT5lcHRyID0gdXBwZXJfMzJfYml0cyhkbWFfYWRkcik7CiB9CiAK
-IC8qCiAgKiBtYXAgdmlydHVhbCBzaW5nbGUgKGNvbnRpZ3VvdXMpIHBvaW50ZXIgdG8gaC93IGRl
-c2NyaXB0b3IgcG9pbnRlcgogICovCiBzdGF0aWMgdm9pZCBtYXBfc2luZ2xlX3RhbGl0b3NfcHRy
-KHN0cnVjdCBkZXZpY2UgKmRldiwKLQkJCQkgICBzdHJ1Y3QgdGFsaXRvc19wdHIgKnRhbGl0b3Nf
-cHRyLAorCQkJCSAgIHN0cnVjdCB0YWxpdG9zX3B0ciAqcHRyLAogCQkJCSAgIHVuc2lnbmVkIHNo
-b3J0IGxlbiwgdm9pZCAqZGF0YSwKIAkJCQkgICB1bnNpZ25lZCBjaGFyIGV4dGVudCwKIAkJCQkg
-ICBlbnVtIGRtYV9kYXRhX2RpcmVjdGlvbiBkaXIpCiB7CiAJZG1hX2FkZHJfdCBkbWFfYWRkciA9
-IGRtYV9tYXBfc2luZ2xlKGRldiwgZGF0YSwgbGVuLCBkaXIpOwogCi0JdGFsaXRvc19wdHItPmxl
-biA9IGNwdV90b19iZTE2KGxlbik7Ci0JdG9fdGFsaXRvc19wdHIodGFsaXRvc19wdHIsIGRtYV9h
-ZGRyKTsKLQl0YWxpdG9zX3B0ci0+al9leHRlbnQgPSBleHRlbnQ7CisJcHRyLT5sZW4gPSBjcHVf
-dG9fYmUxNihsZW4pOworCXRvX3RhbGl0b3NfcHRyKHB0ciwgZG1hX2FkZHIpOworCXB0ci0+al9l
-eHRlbnQgPSBleHRlbnQ7CiB9CiAKIC8qCiAgKiB1bm1hcCBidXMgc2luZ2xlIChjb250aWd1b3Vz
-KSBoL3cgZGVzY3JpcHRvciBwb2ludGVyCiAgKi8KIHN0YXRpYyB2b2lkIHVubWFwX3NpbmdsZV90
-YWxpdG9zX3B0cihzdHJ1Y3QgZGV2aWNlICpkZXYsCi0JCQkJICAgICBzdHJ1Y3QgdGFsaXRvc19w
-dHIgKnRhbGl0b3NfcHRyLAorCQkJCSAgICAgc3RydWN0IHRhbGl0b3NfcHRyICpwdHIsCiAJCQkJ
-ICAgICBlbnVtIGRtYV9kYXRhX2RpcmVjdGlvbiBkaXIpCiB7Ci0JZG1hX3VubWFwX3NpbmdsZShk
-ZXYsIGJlMzJfdG9fY3B1KHRhbGl0b3NfcHRyLT5wdHIpLAotCQkJIGJlMTZfdG9fY3B1KHRhbGl0
-b3NfcHRyLT5sZW4pLCBkaXIpOworCWRtYV91bm1hcF9zaW5nbGUoZGV2LCBiZTMyX3RvX2NwdShw
-dHItPnB0ciksCisJCQkgYmUxNl90b19jcHUocHRyLT5sZW4pLCBkaXIpOwogfQogCiBzdGF0aWMg
-aW50IHJlc2V0X2NoYW5uZWwoc3RydWN0IGRldmljZSAqZGV2LCBpbnQgY2gpCi0tIAoyLjEuMAoK
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18KTGludXhwcGMt
-ZGV2IG1haWxpbmcgbGlzdApMaW51eHBwYy1kZXZAbGlzdHMub3psYWJzLm9yZwpodHRwczovL2xp
-c3RzLm96bGFicy5vcmcvbGlzdGluZm8vbGludXhwcGMtZGV2
+We add a specific compatible for SEC1, to handle the differences
+between SEC1 and SEC2+
+
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ drivers/crypto/talitos.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index f1406d7b..c04074d 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -3086,9 +3086,16 @@ err_out:
+ }
+ 
+ static const struct of_device_id talitos_match[] = {
++#ifdef CONFIG_CRYPTO_DEV_TALITOS1
++	{
++		.compatible = "fsl,sec1.0",
++	},
++#endif
++#ifdef CONFIG_CRYPTO_DEV_TALITOS2
+ 	{
+ 		.compatible = "fsl,sec2.0",
+ 	},
++#endif
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, talitos_match);
+-- 
+2.1.0
