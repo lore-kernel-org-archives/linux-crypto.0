@@ -1,55 +1,75 @@
 From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 00/17] crypto: talitos - Add support for SEC1
-Date: Fri, 17 Apr 2015 15:47:30 +0200
-Message-ID: <20150417142353.76D561A242C@localhost.localdomain>
+Subject: [PATCH v3 09/17] crypto: talitos - Add a feature to tag SEC1
+Date: Sat, 14 Mar 2015 11:08:47 +0100
+Message-ID: <20150417142402.DC2BD1A242C@localhost.localdomain>
 Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
+	linux-crypto@vger.kernel.org
 To: Kim Phillips <kim.phillips@freescale.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	David S Miller <davem@davemloft.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from pegase1.c-s.fr ([93.17.236.30]:41700 "EHLO mailhub1.si.c-s.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S966119AbbDQOYF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 17 Apr 2015 10:24:05 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The purpose of this set of patchs is to add to talitos crypto driver
-the support for the SEC1 version of the security engine, which is
-found in mpc885 and mpc8272 processors.
+We add a new feature in the features field, to mark compatible
+"fsl,sec1.0"
+We also define a helper function called has_ftr_sec1() to help
+functions quickly determine if they are running on SEC1 or SEC2+.
+When only SEC1 or SEC2 is compiled in, has_ftr_sec1() return
+trivial corresponding value. If both are compiled in, feature
+field is checked.
 
-v3 is a complete rework of the patchset. Since a kernel can be built
-with support for both MPC82xx and MPC83xx at the same time, talitos
-driver shall support both SEC1 and SEC2+ at the same time.
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ drivers/crypto/talitos.c |  3 +++
+ drivers/crypto/talitos.h | 17 +++++++++++++++++
+ 2 files changed, 20 insertions(+)
 
-Based on cryptodev-2.6 tree
-
-Christophe Leroy (17):
-  crypto: talitos - Use zero entry to init descriptors ptrs to zero
-  crypto: talitos - Refactor the sg in/out chain allocation
-  crypto: talitos - talitos_ptr renamed ptr for more lisibility
-  crypto: talitos - Add a helper function to clear j_extent field
-  crypto: talitos - remove param 'extent' in map_single_talitos_ptr()
-  crypto: talitos - helper function for ptr len
-  crypto: talitos - enhanced talitos_desc struct for SEC1
-  crypto: talitos - add sub-choice in talitos CONFIG for SEC1
-  crypto: talitos - Add a feature to tag SEC1
-  crypto: talitos - fill in talitos descriptor iaw SEC1 or SEC2+
-  crypto: talitos - adaptation of talitos_submit() for SEC1
-  crypto: talitos - base address for Execution Units
-  crypto: talitos - adapt interrupts and reset functions to SEC1
-  crypto: talitos - implement scatter/gather copy for SEC1
-  crypto: talitos - SEC1 bugs on 0 data hash
-  crypto: talitos - Add fsl,sec1.0 compatible
-  crypto: talitos - Update DT bindings with SEC1
-
- .../devicetree/bindings/crypto/fsl-sec2.txt        |   6 +-
- drivers/crypto/Kconfig                             |  18 +
- drivers/crypto/talitos.c                           | 727 +++++++++++++++------
- drivers/crypto/talitos.h                           | 153 +++--
- 4 files changed, 644 insertions(+), 260 deletions(-)
-
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index bca6ded..db95023 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -2709,6 +2709,9 @@ static int talitos_probe(struct platform_device *ofdev)
+ 				  TALITOS_FTR_SHA224_HWINIT |
+ 				  TALITOS_FTR_HMAC_OK;
+ 
++	if (of_device_is_compatible(np, "fsl,sec1.0"))
++		priv->features |= TALITOS_FTR_SEC1;
++
+ 	priv->chan = kzalloc(sizeof(struct talitos_channel) *
+ 			     priv->num_channels, GFP_KERNEL);
+ 	if (!priv->chan) {
+diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos.h
+index f078da1..b0bdb4e 100644
+--- a/drivers/crypto/talitos.h
++++ b/drivers/crypto/talitos.h
+@@ -156,6 +156,23 @@ extern int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
+ #define TALITOS_FTR_HW_AUTH_CHECK 0x00000002
+ #define TALITOS_FTR_SHA224_HWINIT 0x00000004
+ #define TALITOS_FTR_HMAC_OK 0x00000008
++#define TALITOS_FTR_SEC1 0x00000010
++
++/*
++ * If both CONFIG_CRYPTO_DEV_TALITOS1 and CONFIG_CRYPTO_DEV_TALITOS2 are
++ * defined, we check the features which are set according to the device tree.
++ * Otherwise, we answer true or false directly
++ */
++static inline bool has_ftr_sec1(struct talitos_private *priv)
++{
++#if defined(CONFIG_CRYPTO_DEV_TALITOS1) && defined(CONFIG_CRYPTO_DEV_TALITOS2)
++	return priv->features & TALITOS_FTR_SEC1 ? true : false;
++#elif defined(CONFIG_CRYPTO_DEV_TALITOS1)
++	return true;
++#else
++	return false;
++#endif
++}
+ 
+ /*
+  * TALITOS_xxx_LO addresses point to the low data bits (32-63) of the register
 -- 
 2.1.0
