@@ -1,194 +1,60 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC PATCH] crypto: prevent helper ciphers from being allocated by users
-Date: Sun, 15 Mar 2015 12:49:09 +0100
-Message-ID: <19820211.DIXnfZpKhF@tachyon.chronox.de>
-References: <13986065.EbkBp8M36a@tachyon.chronox.de>
+From: Andre Wolokita <Andre.Wolokita@analog.com>
+Subject: [PATCH] omap-rng: Change RNG_CONFIG_REG to RNG_CONTROL_REG when checking and disabling TRNG
+Date: Mon, 16 Mar 2015 10:19:11 +1100
+Message-ID: <1426461551-14130-1-git-send-email-Andre.Wolokita@analog.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: 'Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain
+Cc: <linux-crypto@vger.kernel.org>,
+	Andre Wolokita <Andre.Wolokita@analog.com>
+To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:46692 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752675AbbCOLtO convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 15 Mar 2015 07:49:14 -0400
-In-Reply-To: <13986065.EbkBp8M36a@tachyon.chronox.de>
+Received: from mail-bn1bon0076.outbound.protection.outlook.com ([157.56.111.76]:55744
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751796AbbCOXU0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 15 Mar 2015 19:20:26 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 13. M=E4rz 2015, 22:09:21 schrieb Stephan Mueller:
+In omap4_rng_init(), a check of bit 10 of the RNG_CONFIG_REG is done to determine
+whether the RNG is running. This is suspicious firstly due to the use of
+RNG_CONTROL_ENABLE_TRNG_MASK and secondly because the same mask is written to
+RNG_CONTROL_REG after configuration of the FROs. Similar suspicious logic is
+repeated in omap4_rng_cleanup() when RNG_CONTROL_REG masked with
+RNG_CONTROL_ENABLE_TRNG_MASK is read, the same mask bit is cleared, and then
+written to RNG_CONFIG_REG. Unless the TRNG is enabled with one bit in RNG_CONTROL
+and disabled with another in RNG_CONFIG and these bits are mirrored in some way,
+I believe that the TRNG is not really shutting off.
 
-Hi Stephan,
+Apart from the strange logic, I have reason to suspect that the OMAP4 related
+code in this driver is driving an Inside Secure IP hardware RNG and strongly
+suspect that bit 10 of RNG_CONFIG_REG is one of the bits configuring the
+sampling rate of the FROs. This option is by default set to 0 and is not being
+set anywhere in omap-rng.c. Reading this bit during omap4_rng_init() will
+always return 0. It will remain 0 because ~(value of TRNG_MASK in control) will
+always be 0, because the TRNG is never shut off. This is of course presuming
+that the OMAP4 features the Inside Secure IP.
 
-> Hi,
->=20
-> Several hardware related cipher implementations are implemented as fo=
-llows:
-> a "helper" cipher implementation is registered with the kernel crypto=
- API.
->=20
-> Such helper ciphers are never intended to be called by normal users. =
-In some
-> cases, calling them via the normal crypto API may even cause failures
-> including kernel crashes. In a normal case, the "wrapping" ciphers th=
-at use
-> the helpers ensure that these helpers are invoked such that they cann=
-ot
-> cause any calamity.
->=20
-> Also, with kernel code, we can be reasonably sure that such helper ci=
-phers
-> are never called directly as the kernel code is under our control.
->=20
-> But I am getting very uneasy when the AF_ALG user space interface com=
-es into
-> play. With that, unprivileged users can call all ciphers registered w=
-ith
-> the crypto API, including these helper ciphers that are not intended =
-to be
-> called directly. That means, with AF_ALG user space may invoke these =
-helper
-> ciphers and may cause undefined states or side effects.
->=20
-> For example, without the commit 81e397d937a8e9f46f024a9f876cf14d8e2b4=
-5a7 the
-> AES-NI GCM implementation could be used to crash the kernel with the
-> AF_ALG(aead) interface. But without the patch, using the AES-NI GCM
-> implementation through the regular cipher types was no problem at all=
-=2E
->=20
-> To avoid any potential side effects with such helpers, I propose a ch=
-ange to
-> the kernel crypto API to prevent the helpers to be called directly. T=
-hese
-> helpers have the following properties:
->=20
-> - they are all marked with a cra_priority of 0 and can therefore be e=
-asily
-> identified
->=20
-> - they are never intended to be instantiated via the regular crypto_a=
-lloc_*
-> routines, but always via the crypto_*_spawn API. That API is separate=
- from
-> the regular allocation API of crypto_alloc_*
->=20
-> Therefore, a guard to prevent the instantiation of helper ciphers by =
-normal
-> users can be done by preventing successful instances of helper cipher=
-s in
-> crypto_alloc_*. To make life easy, I would recommend to simply use th=
-e
-> cra_priority as a flag that shall trigger an error in crypto_alloc_*.
->=20
-> The following code is tested and confirmed to work (i.e. preventing t=
-he use
-> of helper ciphers by callers, but allowing helper ciphers to be used =
-to
-> serve other ciphers). This patch searched for all invocations of
-> __crypto_alloc_tfm and added the check for cra_priority except in the
-> crypto_spawn_tfm call. Specifically, I tested __driver-gcm-aes-aesni =
-vs
-> rfc4106-gcm-aesni. In addition, I tested a large array of other ciphe=
-rs
-> where none were affected by the change.
->=20
-> diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-> index db201bca..2cd83ad 100644
-> --- a/crypto/ablkcipher.c
-> +++ b/crypto/ablkcipher.c
-> @@ -688,7 +688,7 @@ struct crypto_ablkcipher *crypto_alloc_ablkcipher=
-(const
-> char *alg_name,
->  			goto err;
->  		}
->=20
-> -		tfm =3D __crypto_alloc_tfm(alg, type, mask);
-> +		tfm =3D __crypto_alloc_tfm_safe(alg, type, mask);
->  		if (!IS_ERR(tfm))
->  			return __crypto_ablkcipher_cast(tfm);
->=20
-> diff --git a/crypto/aead.c b/crypto/aead.c
-> index 2222710..9ae3aa9 100644
-> --- a/crypto/aead.c
-> +++ b/crypto/aead.c
-> @@ -542,7 +542,7 @@ struct crypto_aead *crypto_alloc_aead(const char
-> *alg_name, u32 type, u32 mask)
->  			goto err;
->  		}
->=20
-> -		tfm =3D __crypto_alloc_tfm(alg, type, mask);
-> +		tfm =3D __crypto_alloc_tfm_safe(alg, type, mask);
->  		if (!IS_ERR(tfm))
->  			return __crypto_aead_cast(tfm);
->=20
-> diff --git a/crypto/api.c b/crypto/api.c
-> index 2a81e98..8b1bb2d 100644
-> --- a/crypto/api.c
-> +++ b/crypto/api.c
-> @@ -389,6 +389,27 @@ out:
->  }
->  EXPORT_SYMBOL_GPL(__crypto_alloc_tfm);
->=20
-> +struct crypto_tfm *__crypto_alloc_tfm_safe(struct crypto_alg *alg, u=
-32
-> type, +					   u32 mask)
-> +{
-> +	/*
-> +	 * Prevent all ciphers from being loaded which have a cra_priority
-> +	 * of 0. Those cipher implementations are helper ciphers and
-> +	 * are not intended for general consumption.
-> +	 *
-> +	 * The only exceptions are the compression algorithms which
-> +	 * have no priority.
-> +	 */
-> +	if (!alg->cra_priority &&
-> +	    ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) !=3D
-> +	      CRYPTO_ALG_TYPE_PCOMPRESS) &&
-> +	    ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) !=3D
-> +	      CRYPTO_ALG_TYPE_COMPRESS))
+I'm interested in knowing what the guys at TI think about this, as only they
+can confirm or deny the detailed structure of these registers.
 
-&& !(mask & CRYPTO_ALG_TESTED))
+Signed-off-by: Andre Wolokita <Andre.Wolokita@analog.com>
+---
+ drivers/char/hw_random/omap-rng.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-is missing here to allow ciphers to be self tested
-
-> +		return ERR_PTR(-ENOENT);
-> +
-> +	return __crypto_alloc_tfm(alg, type, mask);
-> +}
-> +EXPORT_SYMBOL_GPL(__crypto_alloc_tfm_safe);
->  /*
->   *	crypto_alloc_base - Locate algorithm and allocate transform
->   *	@alg_name: Name of algorithm
-> @@ -425,7 +446,7 @@ struct crypto_tfm *crypto_alloc_base(const char
-> *alg_name, u32 type, u32 mask)
->  			goto err;
->  		}
->=20
-> -		tfm =3D __crypto_alloc_tfm(alg, type, mask);
-> +		tfm =3D __crypto_alloc_tfm_safe(alg, type, mask);
->  		if (!IS_ERR(tfm))
->  			return tfm;
->=20
-> diff --git a/crypto/internal.h b/crypto/internal.h
-> index bd39bfc..8526a37 100644
-> --- a/crypto/internal.h
-> +++ b/crypto/internal.h
-> @@ -91,6 +91,8 @@ void crypto_remove_final(struct list_head *list);
->  void crypto_shoot_alg(struct crypto_alg *alg);
->  struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 ty=
-pe,
->  				      u32 mask);
-> +struct crypto_tfm *__crypto_alloc_tfm_safe(struct crypto_alg *alg, u=
-32
-> type, +					   u32 mask);
->  void *crypto_create_tfm(struct crypto_alg *alg,
->  			const struct crypto_type *frontend);
->  struct crypto_alg *crypto_find_alg(const char *alg_name,
-
-
---=20
-Ciao
-Stephan
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index ff74e5d..67151cb 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -262,7 +262,7 @@ static void omap4_rng_cleanup(struct omap_rng_dev *priv)
+ 
+ 	val = omap_rng_read(priv, RNG_CONTROL_REG);
+ 	val &= ~RNG_CONTROL_ENABLE_TRNG_MASK;
+-	omap_rng_write(priv, RNG_CONFIG_REG, val);
++	omap_rng_write(priv, RNG_CONTROL_REG, val);
+ }
+ 
+ static irqreturn_t omap4_rng_irq(int irq, void *dev_id)
+-- 
+1.7.9.5
