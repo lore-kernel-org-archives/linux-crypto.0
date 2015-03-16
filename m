@@ -1,7 +1,9 @@
 From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v6] crypto: Add Allwinner Security System crypto accelerator
-Date: Mon, 16 Mar 2015 20:01:18 +0100
-Message-ID: <1426532482-28830-1-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v6 2/4] ARM: sunxi: dt: Add DT bindings
+ documentation for SUNXI Security System
+Date: Mon, 16 Mar 2015 20:01:20 +0100
+Message-ID: <1426532482-28830-3-git-send-email-clabbe.montjoie@gmail.com>
+References: <1426532482-28830-1-git-send-email-clabbe.montjoie@gmail.com>
 Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -10,7 +12,8 @@ Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
 	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
+	LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
 	pawel.moll-5wv7dgnIgG8@public.gmane.org,
 	mark.rutland-5wv7dgnIgG8@public.gmane.org,
@@ -23,7 +26,8 @@ To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
 	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
 	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
 	arnd-r2nGTMty4D4@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBGWRTSUAKGQENCRFRGQ-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBHWRTSUAKGQEURHGVGA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+In-Reply-To: <1426532482-28830-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Archive: <http://groups.google.com/group/linux-sunxi
@@ -33,70 +37,28 @@ List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39
  <http://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-Hello
+This patch adds documentation for Device-Tree bindings for the Security System cryptographic accelerator driver.
 
-This is the driver for the Security System included in Allwinner SoC A20.
-The Security System (SS for short) is a hardware cryptographic accelerator that
-support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
-It could be found on others Allwinner SoC: 
-- A10s, A33 and A31 diagram speak about it with precisions (AES/DES/3DES/Md5/SHA1/PRNG)
-- A10 and A13 manual give the same datasheet for SS than A20
-- A23 speak about a security system but without precisions
-- A80 datasheet speak about a security system with more functions
-  (SHA224/SHA256/RSA/CRC) but without precisions
-  But I do not have access on any of those hardware, tests are welcome.
+Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ Documentation/devicetree/bindings/crypto/sunxi-ss.txt | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/sunxi-ss.txt
 
-  This driver currently supports:
-  - MD5 and SHA1 hash algorithms
-  - AES block cipher in CBC mode with 128/196/256bits keys.
-  - DES and 3DES block cipher in CBC mode
-  The driver exposes all those algorithms through the kernel cryptographic API.
-
-  The driver support only CPU driven (aka poll mode) transfer mode,
-  since the DMA engine of the A20 does not have a mainline driver yet.
-
-  Changes since v5:
-  - Hash functions now keep partial hash states in sunxi_ss structures
-  - Use of spinlock instead of mutex
-  - Remove the static sunxi_ss structures by using container of
-  - Add export/import functions
-  - replace lots of writel by writesl
-  - replace lots of readl by readsl
-
-  Changes since v4:
-  - Rework all mutex path
-  - Use ahash_request_ctx() in hash functions
-  - Major rework of hash functions for solving mutex problems
-  - Split sunxi_req_ctx in two since ciphers now use struct sunxi_tfm_ctx
-  - Hash functions now test FIFO space register
-
-  Changes since v3:
-  - Remove all algorithms options from Kconfig, so now only one module is used
-  - Add the sunxi_ss_cipher function to unify mode calculation
-  - Remove the sunxi_cipher_exit empty function
-  - Add some missing mutex_unlock()
-  - Drop PRNG support, I wait for more comment on its results before re-enabling it.
-
-  Changes since v2:
-  - Fix Makefile and Kconfig for static kernel.
-
-  Changes since v1:
-  - annotate ss->base as __iomem
-  - regroup all mutex in the ss_ctx structure
-  - splited driver in 7 modules (core md5 sha1 aes des 3des prng) in sunxi-ss directory
-  - use dev_exit_p() for .remove
-  - added missing CRYPTO_BLKCIPHER dep in Kconfig
-  - use ahash instead of shash
-  - use ablkcipher instead of blkcipher
-  - use crypto_rng_ctx instead of crypto_tfm_ctx
-  - set seed as an u32
-  - drop useless comment decoration
-  - drop useless debug
-  - ss_ctx is now a static pointer and whole structure being allocated
-  - fix the platform_get_resource/devm_ioremap_resource pattern
-  - invert getting die id and configuring clock
-  - set clock value as a const unsigned long
-  - add MODULE_ALIAS
-  - use define names more consistency (SS_xxx)
-  - fix PRNG errors
-  - respell SS to Security System in DT documentation
+diff --git a/Documentation/devicetree/bindings/crypto/sunxi-ss.txt b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+new file mode 100644
+index 0000000..a566803
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+@@ -0,0 +1,9 @@
++* Allwinner Security System found on A20 SoC
++
++Required properties:
++- compatible : Should be "allwinner,sun7i-a20-crypto".
++- reg: Should contain the Security System register location and length.
++- interrupts: Should contain the IRQ line for the Security System.
++- clocks : A phandle to the functional clock node of the Security System module
++- clock-names : Name of the functional clock, should be "ahb" and "mod".
++
+-- 
+2.0.5
