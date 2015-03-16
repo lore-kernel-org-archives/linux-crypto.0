@@ -1,71 +1,48 @@
-From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v6 1/4] ARM: sun7i: dt: Add Security System to
- A20 SoC DTS
-Date: Mon, 16 Mar 2015 20:01:19 +0100
-Message-ID: <1426532482-28830-2-git-send-email-clabbe.montjoie@gmail.com>
+From: Joe Perches <joe@perches.com>
+Subject: Re: [PATCH v6 3/4] MAINTAINERS: Add myself as maintainer of
+ Allwinner Security System
+Date: Mon, 16 Mar 2015 12:06:20 -0700
+Message-ID: <1426532780.23897.30.camel@perches.com>
 References: <1426532482-28830-1-git-send-email-clabbe.montjoie@gmail.com>
-Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+	 <1426532482-28830-4-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
-	LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	pawel.moll-5wv7dgnIgG8@public.gmane.org,
-	mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
-	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
-	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
-	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
-	arnd-r2nGTMty4D4@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBHGRTSUAKGQESWOIJCI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <1426532482-28830-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <http://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <http://groups.google.com/group/linux-sunxi/subscribe>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
+	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
+	maxime.ripard@free-electrons.com, linux@arm.linux.org.uk,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	akpm@linux-foundation.org, gregkh@linuxfoundation.org,
+	arnd@arndb.de, devicetree@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-sunxi@googlegroups.com
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <1426532482-28830-4-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-doc-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The Security System is a hardware cryptographic accelerator that support
-AES/MD5/SHA1/DES/3DES/PRNG algorithms.
-It could be found on many Allwinner SoC.
+On Mon, 2015-03-16 at 20:01 +0100, LABBE Corentin wrote:
+[]
+> diff --git a/MAINTAINERS b/MAINTAINERS
+[]
+> @@ -10923,6 +10923,12 @@ L:	linux-mm@kvack.org
+>  S:	Maintained
+>  F:	mm/zswap.c
+>  
+> +ALLWINNER SECURITY SYSTEM
+> +M:	Corentin Labbe <clabbe.montjoie@gmail.com>
+> +L:	linux-crypto@vger.kernel.org
+> +S:	Maintained
+> +F:	drivers/crypto/sunxi-ss/
 
-This patch enable the Security System on the Allwinner A20 SoC Device-tree.
+Use alphabetic ordering for new sections please.
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- arch/arm/boot/dts/sun7i-a20.dtsi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Please place this section between:
 
-diff --git a/arch/arm/boot/dts/sun7i-a20.dtsi b/arch/arm/boot/dts/sun7i-a20.dtsi
-index 3a8530b..8995bec 100644
---- a/arch/arm/boot/dts/sun7i-a20.dtsi
-+++ b/arch/arm/boot/dts/sun7i-a20.dtsi
-@@ -680,6 +680,14 @@
- 			status = "disabled";
- 		};
- 
-+		crypto: crypto-engine@01c15000 {
-+			compatible = "allwinner,sun7i-a20-crypto";
-+			reg = <0x01c15000 0x1000>;
-+			interrupts = <0 86 4>;
-+			clocks = <&ahb_gates 5>, <&ss_clk>;
-+			clock-names = "ahb", "mod";
-+		};
-+
- 		spi2: spi@01c17000 {
- 			compatible = "allwinner,sun4i-a10-spi";
- 			reg = <0x01c17000 0x1000>;
--- 
-2.0.5
+ALI1563 I2C DRIVER
+and
+ALPHA PORT
+
+
