@@ -1,47 +1,58 @@
-From: Paul Bolle <pebolle@tiscali.nl>
-Subject: Re: [PATCH 12/12] crypto/sha-mb/sha1_mb.c : Syntax error
-Date: Mon, 16 Mar 2015 12:28:23 +0100
-Message-ID: <1426505303.26437.40.camel@x220>
-References: <1426282701-10516-1-git-send-email-ameenali023@gmail.com>
-	 <20150316105048.GD793@gondor.apana.org.au>
+From: Martin Hicks <mort@bork.org>
+Subject: Re: [PATCH 4/4] crypto: talitos - add software backlog queue handling
+Date: Mon, 16 Mar 2015 08:58:08 -0400
+Message-ID: <CAJUS3Xk=_9kZsLS0CvQ-kbZwdiux8+w6P2x4PbJ4pS66GMgTSw@mail.gmail.com>
+References: <1426266882-31626-1-git-send-email-horia.geanta@freescale.com>
+	<1426266984-31823-1-git-send-email-horia.geanta@freescale.com>
+	<55032E6F.4010700@amd.com>
+	<55046CD3.5000500@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Ameen Ali <ameenali023@gmail.com>, tim.c.chen@linux.intel.com,
-	davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-	hpa@zytor.com, x86@kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Tom Lendacky <thomas.lendacky@amd.com>,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Kim Phillips <kim.phillips@freescale.com>
+To: =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from cpsmtpb-ews07.kpnxchange.com ([213.75.39.10]:53218 "EHLO
-	cpsmtpb-ews07.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752806AbbCPL20 (ORCPT
+Received: from mail-ie0-f169.google.com ([209.85.223.169]:33854 "EHLO
+	mail-ie0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753234AbbCPM6J convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Mar 2015 07:28:26 -0400
-In-Reply-To: <20150316105048.GD793@gondor.apana.org.au>
+	Mon, 16 Mar 2015 08:58:09 -0400
+Received: by iecsl2 with SMTP id sl2so168821760iec.1
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Mar 2015 05:58:08 -0700 (PDT)
+In-Reply-To: <55046CD3.5000500@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 2015-03-16 at 21:50 +1100, Herbert Xu wrote:
-> On Fri, Mar 13, 2015 at 11:38:21PM +0200, Ameen Ali wrote:
-> > fixing a syntax-error .
-> > 
-> > Signed-off-by : Ameen Ali <AmeenAli023@gmail.com>
-> 
-> Applied.
+On Sat, Mar 14, 2015 at 1:16 PM, Horia Geant=C4=83
+<horia.geanta@freescale.com> wrote:
+> On 3/13/2015 8:37 PM, Tom Lendacky wrote:
+>>> +
+>>> +            /* Try to backlog request (if allowed) */
+>>> +            return crypto_enqueue_request(&priv->chan[ch].queue, a=
+req);
+>>
+>> I'd remembered something about how hardware drivers should use their
+>> own list element for queuing, searched back and found this:
+>>
+>> http://marc.info/?l=3Dlinux-crypto-vger&m=3D137609769605139&w=3D2
+>
+> The crypto_async_request "list" field is used only for queuing using =
+the
+> crypto API functions - crypto_{enqueue,dequeue}_request.
+>
+> I am not sure I understand what is the problem.
+> Are crypto_{enqueue,dequeue}_request part of *internal* crypto API?
 
-The commit summary and the commit explanation are a bit misleading. This
-is not a syntax error: it actually compiles just fine with GCC 4.8. (I
-looked into that wondering whether this was stable material.) It's
-telling that the commit explanation doesn't contain a copy of the error
-message, which would have been very helpful if this really was a syntax
-error.
+I don't believe that the enqueue/dequeue functions are internal API.
+I based my code on the usage of other hardware offload drivers.  Their
+use is somewhat different because most of the other hardware can only
+handle a single request at a time.
 
-The old code apparently works because the preprocessor converts
-time_before() into time_after(). And the code generated for time_after()
-will in its turn be wrapped in parentheses. That is, this generates
-valid syntax by, well, accident. So this could as well be labeled a
-style fix. A fix for a rather serious style defect, but still.
+mh
 
-
-Paul Bolle
+--=20
+Martin Hicks P.Eng.      |         mort@bork.org
+Bork Consulting Inc.     |   +1 (613) 266-2296
