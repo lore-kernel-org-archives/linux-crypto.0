@@ -1,47 +1,34 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH v2 5/5] crypto: talitos: Add software backlog queue handling
-Date: Mon, 16 Mar 2015 12:02:51 +0200
-Message-ID: <5506AA4B.303@freescale.com>
-References: <1425388897-5434-1-git-send-email-mort@bork.org>
-	<1425388897-5434-6-git-send-email-mort@bork.org>
- <20150303182332.546523088b5891a776880c0f@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 0/6] Introduce devm_hwrng_register and convert a few
+ dirvers
+Date: Mon, 16 Mar 2015 21:49:34 +1100
+Message-ID: <20150316104933.GA793@gondor.apana.org.au>
+References: <1426194007-22182-1-git-send-email-dmitry.torokhov@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Scott Wood <scottwood@freescale.com>,
-	Kumar Gala <galak@kernel.crashing.org>,
-	<linuxppc-dev@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>
-To: Kim Phillips <kim.phillips@freescale.com>,
-	Martin Hicks <mort@bork.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0127.outbound.protection.outlook.com ([65.55.169.127]:15184
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751345AbbCPKDI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Mar 2015 06:03:08 -0400
-In-Reply-To: <20150303182332.546523088b5891a776880c0f@freescale.com>
+Received: from ringil.hengli.com.au ([178.18.16.133]:49945 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753545AbbCPKth (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 16 Mar 2015 06:49:37 -0400
+Content-Disposition: inline
+In-Reply-To: <1426194007-22182-1-git-send-email-dmitry.torokhov@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 3/4/2015 2:23 AM, Kim Phillips wrote:
-> Only potential problem is getting the crypto API to set the GFP_DMA
-> flag in the allocation request, but presumably a
-> CRYPTO_TFM_REQ_DMA crt_flag can be made to handle that.
+On Thu, Mar 12, 2015 at 02:00:01PM -0700, Dmitry Torokhov wrote:
+> A few drivers can benefit from devm-style interface for hwrng since it
+> is quite often the last thing that isn't automatically managed. Using
+> devm_hwrng_register() in such drivers allows get rid of manual error
+> unwinding and drivers' remove() methods.
+> 
+> I tested changes to iproc-rng200, the rest are compiled only.
 
-Seems there are quite a few places that do not use the
-{aead,ablkcipher_ahash}_request_alloc() API to allocate crypto requests.
-Among them, IPsec and dm-crypt.
-I've looked at the code and I don't think it can be converted to use
-crypto API.
-
-This means that the CRYPTO_TFM_REQ_DMA would be visible to all of these
-places. Some of the maintainers do not agree, as you've seen.
-
-An alternative would be for talitos to use the page allocator to get 1 /
-2 pages at probe time (4 channels x 32 entries/channel x 64B/descriptor
-= 8 kB), dma_map_page the area and manage it internally for talitos_desc
-hw descriptors.
-What do you think?
-
-Thanks,
-Horia
+All applied.  Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
