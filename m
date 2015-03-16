@@ -1,42 +1,25 @@
 From: Andre Wolokita <Andre.Wolokita@analog.com>
-Subject: [PATCH] omap-rng: Change RNG_CONFIG_REG to RNG_CONTROL_REG when checking and disabling TRNG
-Date: Mon, 16 Mar 2015 10:19:11 +1100
-Message-ID: <1426461551-14130-1-git-send-email-Andre.Wolokita@analog.com>
+Subject: [PATCH] omap-rng: Change RNG_CONFIG_REG to RNG_CONTROL_REG in init
+Date: Mon, 16 Mar 2015 12:54:50 +1100
+Message-ID: <1426470890-26653-1-git-send-email-Andre.Wolokita@analog.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-crypto@vger.kernel.org>,
 	Andre Wolokita <Andre.Wolokita@analog.com>
 To: <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0076.outbound.protection.outlook.com ([157.56.111.76]:55744
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+Received: from mail-bl2on0067.outbound.protection.outlook.com ([65.55.169.67]:19424
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751796AbbCOXU0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 15 Mar 2015 19:20:26 -0400
+	id S1751840AbbCPCKv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 15 Mar 2015 22:10:51 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In omap4_rng_init(), a check of bit 10 of the RNG_CONFIG_REG is done to determine
-whether the RNG is running. This is suspicious firstly due to the use of
-RNG_CONTROL_ENABLE_TRNG_MASK and secondly because the same mask is written to
-RNG_CONTROL_REG after configuration of the FROs. Similar suspicious logic is
-repeated in omap4_rng_cleanup() when RNG_CONTROL_REG masked with
-RNG_CONTROL_ENABLE_TRNG_MASK is read, the same mask bit is cleared, and then
-written to RNG_CONFIG_REG. Unless the TRNG is enabled with one bit in RNG_CONTROL
-and disabled with another in RNG_CONFIG and these bits are mirrored in some way,
-I believe that the TRNG is not really shutting off.
-
-Apart from the strange logic, I have reason to suspect that the OMAP4 related
-code in this driver is driving an Inside Secure IP hardware RNG and strongly
-suspect that bit 10 of RNG_CONFIG_REG is one of the bits configuring the
-sampling rate of the FROs. This option is by default set to 0 and is not being
-set anywhere in omap-rng.c. Reading this bit during omap4_rng_init() will
-always return 0. It will remain 0 because ~(value of TRNG_MASK in control) will
-always be 0, because the TRNG is never shut off. This is of course presuming
-that the OMAP4 features the Inside Secure IP.
-
-I'm interested in knowing what the guys at TI think about this, as only they
-can confirm or deny the detailed structure of these registers.
+omap4_rng_init() checks bit 10 of the RNG_CONFIG_REG to determine whether
+the RNG is already running before performing any initiliasation. This is not
+the correct register to check, as the enable bit is in RNG_CONFIG_CONTROL.
+Read from RNG_CONTROL_REG instead.
 
 Signed-off-by: Andre Wolokita <Andre.Wolokita@analog.com>
 ---
@@ -44,17 +27,17 @@ Signed-off-by: Andre Wolokita <Andre.Wolokita@analog.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
-index ff74e5d..67151cb 100644
+index d14dcf7..ff74e5d 100644
 --- a/drivers/char/hw_random/omap-rng.c
 +++ b/drivers/char/hw_random/omap-rng.c
-@@ -262,7 +262,7 @@ static void omap4_rng_cleanup(struct omap_rng_dev *priv)
+@@ -236,7 +236,7 @@ static int omap4_rng_init(struct omap_rng_dev *priv)
+ 	u32 val;
  
- 	val = omap_rng_read(priv, RNG_CONTROL_REG);
- 	val &= ~RNG_CONTROL_ENABLE_TRNG_MASK;
--	omap_rng_write(priv, RNG_CONFIG_REG, val);
-+	omap_rng_write(priv, RNG_CONTROL_REG, val);
- }
+ 	/* Return if RNG is already running. */
+-	if (omap_rng_read(priv, RNG_CONFIG_REG) & RNG_CONTROL_ENABLE_TRNG_MASK)
++	if (omap_rng_read(priv, RNG_CONTROL_REG) & RNG_CONTROL_ENABLE_TRNG_MASK)
+ 		return 0;
  
- static irqreturn_t omap4_rng_irq(int irq, void *dev_id)
+ 	val = RNG_CONFIG_MIN_REFIL_CYCLES << RNG_CONFIG_MIN_REFIL_CYCLES_SHIFT;
 -- 
 1.7.9.5
