@@ -1,107 +1,102 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH 0/2] crypto: talitos: Add AES-XTS mode
-Date: Mon, 16 Mar 2015 20:46:05 +0200
-Message-ID: <550724ED.1050003@freescale.com>
-References: <1424451610-5786-1-git-send-email-mort@bork.org>
-	<54F464E4.8080204@freescale.com>	<54F475A8.6030105@gmail.com>
-	<20150302220923.GC30523@darwin.bork.org>	<54F5D6D5.8070407@freescale.com>
-	<CAJUS3Xnw66Eu6tvGPpdcet6KLjhKM=ptj8NRaztAVr0h_r+LqQ@mail.gmail.com>
-	<54FD72E4.1060701@freescale.com>
-	<CAJUS3XkY0tbYqBbU5HR7NT63UPFi5DO6XWuymbZnQaJEA5kkBw@mail.gmail.com>
-	<550063D1.2070105@freescale.com>
- <CAJUS3Xmv3atWu=-ydYrSVe+5PON7SM22hoXDQ1_5_ULM_zKvbQ@mail.gmail.com>
+From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v6] crypto: Add Allwinner Security System crypto accelerator
+Date: Mon, 16 Mar 2015 20:01:18 +0100
+Message-ID: <1426532482-28830-1-git-send-email-clabbe.montjoie@gmail.com>
+Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <linux-crypto@vger.kernel.org>,
-	Scott Wood <scottwood@freescale.com>,
-	<linuxppc-dev@lists.ozlabs.org>, Milan Broz <gmazyland@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Kim Phillips <kim.phillips@freescale.com>
-To: Martin Hicks <mort@bork.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0140.outbound.protection.outlook.com ([157.56.111.140]:29911
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S934460AbbCPSqO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 16 Mar 2015 14:46:14 -0400
-In-Reply-To: <CAJUS3Xmv3atWu=-ydYrSVe+5PON7SM22hoXDQ1_5_ULM_zKvbQ@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org,
+	mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
+	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
+	arnd-r2nGTMty4D4@public.gmane.org
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBGWRTSUAKGQENCRFRGQ-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On 3/13/2015 4:08 PM, Martin Hicks wrote:
-> Hi Horia,
->=20
-> On Wed, Mar 11, 2015 at 11:48 AM, Horia Geant=C4=83
-> <horia.geanta@freescale.com> wrote:
->>
->> While here: note that xts-talitos supports only two key lengths - 25=
-6
->> and 512 bits. There are tcrypt speed tests that check also for 384-b=
-it
->> keys (which is out-of-spec, but still...), leading to a "Key Size Er=
-ror"
->> - see below (KSE bit in AESU Interrupt Status Register is set)
->=20
-> Ok.  I've limited the keysize to 32 or 64 bytes for AES-XTS in the
-> talitos driver.
->=20
-> This was my first experiments with the tcrypt module.  It also brough=
-t
-> up another issue related to the IV limitations of this hardware.  The
-> latest patch that I have returns an error when there is a non-zero
-> value in the second 8 bytes of the IV:
->=20
-> +       /*
-> +        * AES-XTS uses the first two AES Context registers for:
-> +        *
-> +        *     Register 1:   Sector Number (Little Endian)
-> +        *     Register 2:   Sector Size   (Big Endian)
-> +        *
-> +        * Whereas AES-CBC uses registers 1/2 as a 16-byte IV.
-> +        */
-> +       if ((ctx->desc_hdr_template &
-> +            (DESC_HDR_SEL0_MASK | DESC_HDR_MODE0_MASK)) =3D=3D
-> +            (DESC_HDR_SEL0_AESU | DESC_HDR_MODE0_AESU_XTS)) {
-> +               u64 *aesctx2 =3D (u64 *)areq->info + 1;
-> +
-> +               if (*aesctx2 !=3D 0) {
-> +                       dev_err(ctx->dev,
-> +                               "IV length limited to the first 8 byt=
-es.");
-> +                       return ERR_PTR(-EINVAL);
-> +               }
-> +
-> +               /* Fixed sized sector */
-> +               *aesctx2 =3D cpu_to_be64(1 << SECTOR_SHIFT);
-> +       }
->=20
->=20
-> This approach causes the tcrypt tests to fail because tcrypt sets all
-> 16 bytes of the IV to 0xff.  I think returning an error is the right
-> approach for the talitos module, but it would be nice if tcrypt still
-> worked.  Should tcrypt just set the IV bytes to 0 instead of 0xff?
-> Isn't one IV just as good as another?  I think adding exceptions to
-> the tcrypt code would be ugly, but maybe one should be made for XTS
-> since the standard dictates that the IV should be plain or plain64?
+Hello
 
-AFAICT xts-aes standard does not mandate for plain or plain64.
-The requirements are the following (below IV =3D tweak value, sector =3D
-data unit):
--IV size: 16 bytes
--IV format: little endian byte array
--IV values: non-negative; consecutive IV values for consecutive sectors
+This is the driver for the Security System included in Allwinner SoC A20.
+The Security System (SS for short) is a hardware cryptographic accelerator that
+support AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+It could be found on others Allwinner SoC: 
+- A10s, A33 and A31 diagram speak about it with precisions (AES/DES/3DES/Md5/SHA1/PRNG)
+- A10 and A13 manual give the same datasheet for SS than A20
+- A23 speak about a security system but without precisions
+- A80 datasheet speak about a security system with more functions
+  (SHA224/SHA256/RSA/CRC) but without precisions
+  But I do not have access on any of those hardware, tests are welcome.
 
-In practice, an 8-byte IV should be enough to represent the sector inde=
-x
-even for large capacity storage devices.
-However, dm-crypt has support for a user-provided iv_offset that is
-added to the sector index: IV =3D sector_index + iv_offset.
-While in most of the cases user would choose iv_offset =3D 0, in theory
-anything is possible.
+  This driver currently supports:
+  - MD5 and SHA1 hash algorithms
+  - AES block cipher in CBC mode with 128/196/256bits keys.
+  - DES and 3DES block cipher in CBC mode
+  The driver exposes all those algorithms through the kernel cryptographic API.
 
-IMHO the correct approach would be to use a fallback tfm that would
-handle all the requests with IVs > 8 bytes.
-We can take this off-list if you prefer.
+  The driver support only CPU driven (aka poll mode) transfer mode,
+  since the DMA engine of the A20 does not have a mainline driver yet.
 
-Horia
+  Changes since v5:
+  - Hash functions now keep partial hash states in sunxi_ss structures
+  - Use of spinlock instead of mutex
+  - Remove the static sunxi_ss structures by using container of
+  - Add export/import functions
+  - replace lots of writel by writesl
+  - replace lots of readl by readsl
+
+  Changes since v4:
+  - Rework all mutex path
+  - Use ahash_request_ctx() in hash functions
+  - Major rework of hash functions for solving mutex problems
+  - Split sunxi_req_ctx in two since ciphers now use struct sunxi_tfm_ctx
+  - Hash functions now test FIFO space register
+
+  Changes since v3:
+  - Remove all algorithms options from Kconfig, so now only one module is used
+  - Add the sunxi_ss_cipher function to unify mode calculation
+  - Remove the sunxi_cipher_exit empty function
+  - Add some missing mutex_unlock()
+  - Drop PRNG support, I wait for more comment on its results before re-enabling it.
+
+  Changes since v2:
+  - Fix Makefile and Kconfig for static kernel.
+
+  Changes since v1:
+  - annotate ss->base as __iomem
+  - regroup all mutex in the ss_ctx structure
+  - splited driver in 7 modules (core md5 sha1 aes des 3des prng) in sunxi-ss directory
+  - use dev_exit_p() for .remove
+  - added missing CRYPTO_BLKCIPHER dep in Kconfig
+  - use ahash instead of shash
+  - use ablkcipher instead of blkcipher
+  - use crypto_rng_ctx instead of crypto_tfm_ctx
+  - set seed as an u32
+  - drop useless comment decoration
+  - drop useless debug
+  - ss_ctx is now a static pointer and whole structure being allocated
+  - fix the platform_get_resource/devm_ioremap_resource pattern
+  - invert getting die id and configuring clock
+  - set clock value as a const unsigned long
+  - add MODULE_ALIAS
+  - use define names more consistency (SS_xxx)
+  - fix PRNG errors
+  - respell SS to Security System in DT documentation
