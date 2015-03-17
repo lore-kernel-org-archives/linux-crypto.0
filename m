@@ -1,86 +1,122 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH v2 5/5] crypto: talitos: Add software backlog queue
- handling
-Date: Tue, 17 Mar 2015 19:58:55 +0200
-Message-ID: <55086B5F.9080906@freescale.com>
-References: <1425388897-5434-1-git-send-email-mort@bork.org>
- <1425388897-5434-6-git-send-email-mort@bork.org>
- <20150303182332.546523088b5891a776880c0f@freescale.com>
- <5506AA4B.303@freescale.com>
- <20150316191935.81f89e0dafebbbe76ffcb0c0@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Scott Wood <scottwood@freescale.com>, Martin Hicks <mort@bork.org>,
- linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>, "David S. Miller"
- <davem@davemloft.net>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <20150316191935.81f89e0dafebbbe76ffcb0c0@freescale.com>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-List-Id: linux-crypto.vger.kernel.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] arm64/crypto: issue aese/aesmc instructions in pairs
+Date: Tue, 17 Mar 2015 19:05:13 +0100
+Message-ID: <1426615513-28587-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: will.deacon@arm.com, catalin.marinas@arm.com,
+	herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:38825 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753496AbbCQSFc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Mar 2015 14:05:32 -0400
+Received: by wifj2 with SMTP id j2so18021111wif.1
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Mar 2015 11:05:30 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-T24gMy8xNy8yMDE1IDI6MTkgQU0sIEtpbSBQaGlsbGlwcyB3cm90ZToKPiBPbiBNb24sIDE2IE1h
-ciAyMDE1IDEyOjAyOjUxICswMjAwCj4gSG9yaWEgR2VhbnTEgyA8aG9yaWEuZ2VhbnRhQGZyZWVz
-Y2FsZS5jb20+IHdyb3RlOgo+IAo+PiBPbiAzLzQvMjAxNSAyOjIzIEFNLCBLaW0gUGhpbGxpcHMg
-d3JvdGU6Cj4+PiBPbmx5IHBvdGVudGlhbCBwcm9ibGVtIGlzIGdldHRpbmcgdGhlIGNyeXB0byBB
-UEkgdG8gc2V0IHRoZSBHRlBfRE1BCj4+PiBmbGFnIGluIHRoZSBhbGxvY2F0aW9uIHJlcXVlc3Qs
-IGJ1dCBwcmVzdW1hYmx5IGEKPj4+IENSWVBUT19URk1fUkVRX0RNQSBjcnRfZmxhZyBjYW4gYmUg
-bWFkZSB0byBoYW5kbGUgdGhhdC4KPj4KPj4gU2VlbXMgdGhlcmUgYXJlIHF1aXRlIGEgZmV3IHBs
-YWNlcyB0aGF0IGRvIG5vdCB1c2UgdGhlCj4+IHthZWFkLGFibGtjaXBoZXJfYWhhc2h9X3JlcXVl
-c3RfYWxsb2MoKSBBUEkgdG8gYWxsb2NhdGUgY3J5cHRvIHJlcXVlc3RzLgo+PiBBbW9uZyB0aGVt
-LCBJUHNlYyBhbmQgZG0tY3J5cHQuCj4+IEkndmUgbG9va2VkIGF0IHRoZSBjb2RlIGFuZCBJIGRv
-bid0IHRoaW5rIGl0IGNhbiBiZSBjb252ZXJ0ZWQgdG8gdXNlCj4+IGNyeXB0byBBUEkuCj4gCj4g
-d2h5IG5vdD8KCkl0IHdvdWxkIGltcGx5IGhhdmluZyAyIG1lbW9yeSBhbGxvY2F0aW9ucywgb25l
-IGZvciBjcnlwdG8gcmVxdWVzdCBhbmQKdGhlIG90aGVyIGZvciB0aGUgcmVzdCBvZiB0aGUgZGF0
-YSBidW5kbGVkIHdpdGggdGhlIHJlcXVlc3QgKGZvciBJUHNlYwp0aGF0IHdvdWxkIGJlIEVTTiAr
-IHNwYWNlIGZvciBJViArIHNnIGVudHJpZXMgZm9yIGF1dGhlbnRpY2F0ZWQtb25seQpkYXRhIGFu
-ZCBza19idWZmIGV4dGVuc2lvbiwgaWYgbmVlZGVkKS4KClRyeWluZyB0byBoYXZlIGEgc2luZ2xl
-IGFsbG9jYXRpb24gYnkgbWFraW5nIEVTTiwgSVYgZXRjLiBwYXJ0IG9mIHRoZQpyZXF1ZXN0IHBy
-aXZhdGUgY29udGV4dCByZXF1aXJlcyBtb2RpZnlpbmcgdGZtLnJlcXNpemUgb24gdGhlIGZseS4K
-VGhpcyB3b24ndCB3b3JrIHdpdGhvdXQgYWRkaW5nIHNvbWUga2luZCBvZiBsb2NraW5nIGZvciB0
-aGUgdGZtLgoKPiAKPj4gVGhpcyBtZWFucyB0aGF0IHRoZSBDUllQVE9fVEZNX1JFUV9ETUEgd291
-bGQgYmUgdmlzaWJsZSB0byBhbGwgb2YgdGhlc2UKPj4gcGxhY2VzLiBTb21lIG9mIHRoZSBtYWlu
-dGFpbmVycyBkbyBub3QgYWdyZWUsIGFzIHlvdSd2ZSBzZWVuLgo+IAo+IHdvdWxkIG1vZGlmeWlu
-ZyB0aGUgY3J5cHRvIEFQSSB0byBlaXRoZXIgaGF2ZSBhIGRpZmZlcmVudAo+ICpfcmVxdWVzdF9h
-bGxvYygpIEFQSSwgYW5kL29yIGFkZGluZyBjYWxscyB0byBuZWdvdGlhdGUgdGhlIEdGUCBtYXNr
-Cj4gYmV0d2VlbiBjcnlwdG8gdXNlcnMgYW5kIGRyaXZlcnMsIGUuZy4sIGdldC9zZXRfZ2ZwX21h
-c2ssIHdvcms/CgpJIHRoaW5rIHdoYXQgRGF2ZU0gYXNrZWQgZm9yIHdhcyB0aGUgY2hhbmdlIHRv
-IGJlIHRyYW5zcGFyZW50LgoKQmVzaWRlcyBjb252ZXJ0aW5nIHRvICpfcmVxdWVzdF9hbGxvYygp
-LCBzZWVtcyB0aGF0IGFsbCBvdGhlciBvcHRpb25zCnJlcXVpcmUgc29tZSBleHRyYSBhd2FyZW5l
-c3MgZnJvbSB0aGUgdXNlci4KQ291bGQgeW91IGVsYWJvcmF0ZSBvbiB0aGUgaWRlYSBhYm92ZT8K
-Cj4gCj4+IEFuIGFsdGVybmF0aXZlIHdvdWxkIGJlIGZvciB0YWxpdG9zIHRvIHVzZSB0aGUgcGFn
-ZSBhbGxvY2F0b3IgdG8gZ2V0IDEgLwo+PiAyIHBhZ2VzIGF0IHByb2JlIHRpbWUgKDQgY2hhbm5l
-bHMgeCAzMiBlbnRyaWVzL2NoYW5uZWwgeCA2NEIvZGVzY3JpcHRvcgo+PiA9IDgga0IpLCBkbWFf
-bWFwX3BhZ2UgdGhlIGFyZWEgYW5kIG1hbmFnZSBpdCBpbnRlcm5hbGx5IGZvciB0YWxpdG9zX2Rl
-c2MKPj4gaHcgZGVzY3JpcHRvcnMuCj4+IFdoYXQgZG8geW91IHRoaW5rPwo+IAo+IFRoZXJlJ3Mg
-YSBjb21tZW50IGluIGVzcF9hbGxvY190bXAoKTogIlVzZSBzcGFyZSBzcGFjZSBpbiBza2IgZm9y
-Cj4gdGhpcyB3aGVyZSBwb3NzaWJsZSwiIHdoaWNoIGlzIGlkZWFsbHkgd2hlcmUgd2UnZCB3YW50
-IHRvIGJlIChlc3AuCgpPaywgSSdsbCBjaGVjayB0aGF0LiBCdXQgbm90ZSB0aGUgIndoZXJlIHBv
-c3NpYmxlIiAtIGZpbmRpbmcgcm9vbSBpbiB0aGUKc2tiIHRvIGF2b2lkIHRoZSBhbGxvY2F0aW9u
-IHdvbid0IGFsd2F5cyBiZSB0aGUgY2FzZSwgYW5kIHRoZW4gd2UncmUKYmFjayB0byBzcXVhcmUg
-b25lLgoKPiBiZWNhdXNlIHRoYXQgbWVtb3J5IGNvdWxkIGFscmVhZHkgYmUgRE1BLWFibGUpLiAg
-WW91ciBhYm92ZQo+IHN1Z2dlc3Rpb24gd291bGQgYmUgaW4gdGhlIG9wcG9zaXRlIGRpcmVjdGlv
-biBvZiB0aGF0LgoKVGhlIHByb3Bvc2FsOgotcmVtb3ZlcyBkbWEgKHVuKW1hcHBpbmcgb24gdGhl
-IGZhc3QgcGF0aAotYXZvaWRzIHJlcXVlc3RpbmcgZG1hIG1hcHBhYmxlIG1lbW9yeSBmb3IgbW9y
-ZSB0aGFuIGl0J3MgYWN0dWFsbHkKbmVlZGVkIChDUllQVE9fVEZNX1JFUV9ETUEgZm9yY2VzIGVu
-dGlyZSByZXF1ZXN0IHRvIGJlIG1hcHBhYmxlLCBub3QKb25seSBpdHMgcHJpdmF0ZSBjb250ZXh0
-KQotZm9yIGNhYW0gaXQgaGFzIHRoZSBhZGRlZCBiZW5lZml0IG9mIHNwZWVkaW5nIHRoZSBiZWxv
-dyBzZWFyY2ggZm9yIHRoZQpvZmZlbmRpbmcgZGVzY3JpcHRvciBpbiB0aGUgU1cgcmluZyBmcm9t
-IE8obikgdG8gTygxKToKZm9yIChpID0gMDsgQ0lSQ19DTlQoaGVhZCwgdGFpbCArIGksIEpPQlJf
-REVQVEgpID49IDE7IGkrKykgewoJc3dfaWR4ID0gKHRhaWwgKyBpKSAmIChKT0JSX0RFUFRIIC0g
-MSk7CgoJaWYgKGpycC0+b3V0cmluZ1tod19pZHhdLmRlc2MgPT0KCSAgICBqcnAtPmVudGluZm9b
-c3dfaWR4XS5kZXNjX2FkZHJfZG1hKQoJCWJyZWFrOyAvKiBmb3VuZCAqLwp9Cihkcml2ZXJzL2Ny
-eXB0by9jYWFtL2pyLmMgLSBjYWFtX2RlcXVldWUpCgpIb3JpYQoKCl9fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkxpbnV4cHBjLWRldiBtYWlsaW5nIGxpc3QK
-TGludXhwcGMtZGV2QGxpc3RzLm96bGFicy5vcmcKaHR0cHM6Ly9saXN0cy5vemxhYnMub3JnL2xp
-c3RpbmZvL2xpbnV4cHBjLWRldg==
+This changes the AES core transform implementations to issue aese/aesmc
+(and aesd/aesimc) in pairs. This enables a micro-architectural optimization
+in recent Cortex-A5x cores that improves performance by 50-90%.
+
+Measured performance in cycles per byte (Cortex-A57):
+
+                CBC enc         CBC dec         CTR
+  before        3.64            1.34            1.32
+  after         1.95            0.85            0.93
+
+Note that this results in a ~5% performance decrease for older cores.
+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+
+Will,
+
+This is the optimization you yourself mentioned to me about a year ago
+(or even longer perhaps?) Anyway, we have now been able to confirm it
+on a sample 'in the wild', (i.e., a Galaxy S6 phone)
+
+ arch/arm64/crypto/aes-ce-ccm-core.S | 12 ++++++------
+ arch/arm64/crypto/aes-ce.S          | 10 +++-------
+ 2 files changed, 9 insertions(+), 13 deletions(-)
+
+diff --git a/arch/arm64/crypto/aes-ce-ccm-core.S b/arch/arm64/crypto/aes-ce-ccm-core.S
+index 432e4841cd81..a2a7fbcacc14 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-core.S
++++ b/arch/arm64/crypto/aes-ce-ccm-core.S
+@@ -101,19 +101,19 @@ ENTRY(ce_aes_ccm_final)
+ 0:	mov	v4.16b, v3.16b
+ 1:	ld1	{v5.2d}, [x2], #16		/* load next round key */
+ 	aese	v0.16b, v4.16b
+-	aese	v1.16b, v4.16b
+ 	aesmc	v0.16b, v0.16b
++	aese	v1.16b, v4.16b
+ 	aesmc	v1.16b, v1.16b
+ 2:	ld1	{v3.2d}, [x2], #16		/* load next round key */
+ 	aese	v0.16b, v5.16b
+-	aese	v1.16b, v5.16b
+ 	aesmc	v0.16b, v0.16b
++	aese	v1.16b, v5.16b
+ 	aesmc	v1.16b, v1.16b
+ 3:	ld1	{v4.2d}, [x2], #16		/* load next round key */
+ 	subs	w3, w3, #3
+ 	aese	v0.16b, v3.16b
+-	aese	v1.16b, v3.16b
+ 	aesmc	v0.16b, v0.16b
++	aese	v1.16b, v3.16b
+ 	aesmc	v1.16b, v1.16b
+ 	bpl	1b
+ 	aese	v0.16b, v4.16b
+@@ -146,19 +146,19 @@ ENDPROC(ce_aes_ccm_final)
+ 	ld1	{v5.2d}, [x10], #16		/* load 2nd round key */
+ 2:	/* inner loop: 3 rounds, 2x interleaved */
+ 	aese	v0.16b, v4.16b
+-	aese	v1.16b, v4.16b
+ 	aesmc	v0.16b, v0.16b
++	aese	v1.16b, v4.16b
+ 	aesmc	v1.16b, v1.16b
+ 3:	ld1	{v3.2d}, [x10], #16		/* load next round key */
+ 	aese	v0.16b, v5.16b
+-	aese	v1.16b, v5.16b
+ 	aesmc	v0.16b, v0.16b
++	aese	v1.16b, v5.16b
+ 	aesmc	v1.16b, v1.16b
+ 4:	ld1	{v4.2d}, [x10], #16		/* load next round key */
+ 	subs	w7, w7, #3
+ 	aese	v0.16b, v3.16b
+-	aese	v1.16b, v3.16b
+ 	aesmc	v0.16b, v0.16b
++	aese	v1.16b, v3.16b
+ 	aesmc	v1.16b, v1.16b
+ 	ld1	{v5.2d}, [x10], #16		/* load next round key */
+ 	bpl	2b
+diff --git a/arch/arm64/crypto/aes-ce.S b/arch/arm64/crypto/aes-ce.S
+index 685a18f731eb..78f3cfe92c08 100644
+--- a/arch/arm64/crypto/aes-ce.S
++++ b/arch/arm64/crypto/aes-ce.S
+@@ -45,18 +45,14 @@
+ 
+ 	.macro		do_enc_Nx, de, mc, k, i0, i1, i2, i3
+ 	aes\de		\i0\().16b, \k\().16b
+-	.ifnb		\i1
+-	aes\de		\i1\().16b, \k\().16b
+-	.ifnb		\i3
+-	aes\de		\i2\().16b, \k\().16b
+-	aes\de		\i3\().16b, \k\().16b
+-	.endif
+-	.endif
+ 	aes\mc		\i0\().16b, \i0\().16b
+ 	.ifnb		\i1
++	aes\de		\i1\().16b, \k\().16b
+ 	aes\mc		\i1\().16b, \i1\().16b
+ 	.ifnb		\i3
++	aes\de		\i2\().16b, \k\().16b
+ 	aes\mc		\i2\().16b, \i2\().16b
++	aes\de		\i3\().16b, \k\().16b
+ 	aes\mc		\i3\().16b, \i3\().16b
+ 	.endif
+ 	.endif
+-- 
+1.8.3.2
