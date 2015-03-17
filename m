@@ -1,51 +1,58 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC PATCH] crypto: prevent helper ciphers from being allocated by users
-Date: Tue, 17 Mar 2015 15:59:48 +0100
-Message-ID: <3827420.CeUHuNxA9P@tauon>
-References: <13986065.EbkBp8M36a@tachyon.chronox.de> <1442292.caf3IdtESe@tauon> <20150317114552.GA12326@gondor.apana.org.au>
+From: Andy Polyakov <appro@openssl.org>
+Subject: Re: [PATCH] arm: crypto: Add NEON optimized SHA-256
+Date: Tue, 17 Mar 2015 16:09:40 +0100
+Message-ID: <550843B4.8080903@openssl.org>
+References: <20150316154835.GA31336@google.com>	<CAKv+Gu8+oQ13j61X6x70baJXOpEiM2L+vK=KgK1JG12sy5KMsg@mail.gmail.com>	<20150316162304.GA35408@google.com>
+ <CAKv+Gu8fmBYwfrMKRqhA5KhU1HNjMP1cLtpmgCmp78R4CUw3fg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:46699 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752493AbbCQO7w convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Mar 2015 10:59:52 -0400
-In-Reply-To: <20150317114552.GA12326@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Sami Tolvanen <samitolvanen@google.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <CAKv+Gu8fmBYwfrMKRqhA5KhU1HNjMP1cLtpmgCmp78R4CUw3fg@mail.gmail.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 17. M=E4rz 2015, 22:45:52 schrieb Herbert Xu:
+Hi,
 
-Hi Herbert,
+>>> Have you tested this code with the tcrypt.ko module?
+>>
+>> I have not, but I can look into it.
+>>
+>>> Did you talk to Andy about the license? I don't think this is
+>>> permissible for the kernel as-is.
+>>
+>> Unless I have misunderstood something, the license at the Cryptogams
+>> website includes an option to license the code under the GNU GPL.
+>>
+>> However, I can certainly contact Andy to clarify his intentions.
 
->On Tue, Mar 17, 2015 at 12:40:12PM +0100, Stephan Mueller wrote:
->> >How about adding a flag to all these internal algorithms and then
->> >change crypto_alg_mod_lookup to disable that flag by default?
->>=20
->> The issue with flags is the following: first we have to think about
->> whether we want a black list or white list approach. Your suggestion
->> implies a black list. Black lists for ensuring security is not good
->> IMHO as it has a tendency to miss cases. This especially applies to
->> this area where we have already an indicator for internal ciphers:
->> the prio is so low that it will never ever be selected based on the
->> name. Now, adding a flag means that we mark such an internal cipher
->> twice.
->
->Huh? Using prio is already a black list.
->
->In any case abusing the priority field like this is not acceptable,
->especially when the priority can be set from user-space.
+I have no problems with reusing assembly modules in kernel context. The
+whole idea behind cryptogams initiative was exactly to reuse code in
+different contexts. But I'd prefer if it's more of cooperative effort,
+when we help each other to improve code, test on and tune for more
+platforms single developer might have access to, cross-report problems,
+etc. For this reason I'd prefer if it can be arranged in way similar to
+bsaes-armv7 module, i.e. we work together on shared copy of module that
+generates assembly that can be then compiled for OpenSSL or kernel. Is
+it sensible? BTW, why stop at SHA256? There is SHA512 and NEON SHA1...
 
-I agree, I forgot about the priority being changable.
+As for practicalities. In order to spare brain capacity for list
+subscribers, it would probably be appropriate to work out details such
+as naming of entry points in smaller group and present result when it's
+ready to go and tests. I'll start by looking at Thumb-ification...
 
-I will prepare a proposal with a flag.
->
->Cheers,
-
-
-Ciao
-Stephan
+Cheers.
