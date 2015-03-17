@@ -1,58 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: linux-next: build failure after merge of the crypto tree
-Date: Tue, 17 Mar 2015 22:11:31 +1100
-Message-ID: <20150317111131.GA11471@gondor.apana.org.au>
-References: <20150317130104.548124c2@canb.auug.org.au>
+Subject: Re: [RFC PATCH] crypto: prevent helper ciphers from being allocated
+ by users
+Date: Tue, 17 Mar 2015 22:23:50 +1100
+Message-ID: <20150317112350.GA11671@gondor.apana.org.au>
+References: <13986065.EbkBp8M36a@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	James Hartley <james.hartley@imgtec.com>,
-	Andrew Bresticker <abrestic@chromium.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Return-path: <linux-next-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150317130104.548124c2@canb.auug.org.au>
-Sender: linux-next-owner@vger.kernel.org
+In-Reply-To: <13986065.EbkBp8M36a@tachyon.chronox.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Tue, Mar 17, 2015 at 01:01:04PM +1100, Stephen Rothwell wrote:
-> 
-> After merging the crypto tree, today's linux-next build (x86_64 allmodconfig)
-> failed like this:
-> 
-> drivers/crypto/img-hash.c: At top level:
-> drivers/crypto/img-hash.c:878:1: error: expected ',' or ';' before 'static'
->  static int img_hash_probe(struct platform_device *pdev)
->  ^
-> 
-> Caused by commit d358f1abbf71 ("crypto: img-hash - Add Imagination
-> Technologies hw hash accelerator").
+On Fri, Mar 13, 2015 at 10:09:21PM +0100, Stephan Mueller wrote:
+>  
+> +struct crypto_tfm *__crypto_alloc_tfm_safe(struct crypto_alg *alg, u32 type,
+> +					   u32 mask)
+> +{
+> +	/*
+> +	 * Prevent all ciphers from being loaded which have a cra_priority
+> +	 * of 0. Those cipher implementations are helper ciphers and
+> +	 * are not intended for general consumption.
+> +	 *
+> +	 * The only exceptions are the compression algorithms which
+> +	 * have no priority.
+> +	 */
+> +	if (!alg->cra_priority &&
+> +	    ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) !=
+> +	      CRYPTO_ALG_TYPE_PCOMPRESS) &&
+> +	    ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) !=
+> +	      CRYPTO_ALG_TYPE_COMPRESS))
+> +		return ERR_PTR(-ENOENT);
 
-Thanks for the report Stephen, I'll merge this patch to fix it.
+How about adding a flag to all these internal algorithms and then
+change crypto_alg_mod_lookup to disable that flag by default?
 
----8<---
-imghash: Add missing semicolon to fix build error
-    
-There is a missing semicolon after MODULE_DEVICE_TABLE.
-
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
-index 0274172..fec61fc 100644
---- a/drivers/crypto/img-hash.c
-+++ b/drivers/crypto/img-hash.c
-@@ -873,7 +873,7 @@ static const struct of_device_id img_hash_match[] = {
- 	{ .compatible = "img,hash-accelerator" },
- 	{}
- };
--MODULE_DEVICE_TABLE(of, img_hash_match)
-+MODULE_DEVICE_TABLE(of, img_hash_match);
- 
- static int img_hash_probe(struct platform_device *pdev)
- {
-
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
