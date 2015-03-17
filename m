@@ -1,64 +1,46 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [RFC PATCH] crypto: prevent helper ciphers from being allocated by users
-Date: Tue, 17 Mar 2015 12:40:12 +0100
-Message-ID: <1442292.caf3IdtESe@tauon>
-References: <13986065.EbkBp8M36a@tachyon.chronox.de> <20150317112350.GA11671@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RFC PATCH] crypto: prevent helper ciphers from being allocated
+ by users
+Date: Tue, 17 Mar 2015 22:45:52 +1100
+Message-ID: <20150317114552.GA12326@gondor.apana.org.au>
+References: <13986065.EbkBp8M36a@tachyon.chronox.de>
+ <20150317112350.GA11671@gondor.apana.org.au>
+ <1442292.caf3IdtESe@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:46696 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751895AbbCQLk4 convert rfc822-to-8bit (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:60387 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751225AbbCQLpz (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 17 Mar 2015 07:40:56 -0400
-In-Reply-To: <20150317112350.GA11671@gondor.apana.org.au>
+	Tue, 17 Mar 2015 07:45:55 -0400
+Content-Disposition: inline
+In-Reply-To: <1442292.caf3IdtESe@tauon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 17. M=E4rz 2015, 22:23:50 schrieb Herbert Xu:
-
-Hi Herbert,
-
->On Fri, Mar 13, 2015 at 10:09:21PM +0100, Stephan Mueller wrote:
->> +struct crypto_tfm *__crypto_alloc_tfm_safe(struct crypto_alg *alg,
->> u32 type, +					   u32 mask)
->> +{
->> +	/*
->> +	 * Prevent all ciphers from being loaded which have a=20
-cra_priority
->> +	 * of 0. Those cipher implementations are helper ciphers and
->> +	 * are not intended for general consumption.
->> +	 *
->> +	 * The only exceptions are the compression algorithms which
->> +	 * have no priority.
->> +	 */
->> +	if (!alg->cra_priority &&
->> +	    ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) !=3D
->> +	      CRYPTO_ALG_TYPE_PCOMPRESS) &&
->> +	    ((alg->cra_flags & CRYPTO_ALG_TYPE_MASK) !=3D
->> +	      CRYPTO_ALG_TYPE_COMPRESS))
->> +		return ERR_PTR(-ENOENT);
+On Tue, Mar 17, 2015 at 12:40:12PM +0100, Stephan Mueller wrote:
 >
->How about adding a flag to all these internal algorithms and then
->change crypto_alg_mod_lookup to disable that flag by default?
+> >How about adding a flag to all these internal algorithms and then
+> >change crypto_alg_mod_lookup to disable that flag by default?
+> 
+> The issue with flags is the following: first we have to think about 
+> whether we want a black list or white list approach. Your suggestion 
+> implies a black list. Black lists for ensuring security is not good IMHO 
+> as it has a tendency to miss cases. This especially applies to this area 
+> where we have already an indicator for internal ciphers: the prio is so 
+> low that it will never ever be selected based on the name. Now, adding a 
+> flag means that we mark such an internal cipher twice.
 
-The issue with flags is the following: first we have to think about=20
-whether we want a black list or white list approach. Your suggestion=20
-implies a black list. Black lists for ensuring security is not good IMH=
-O=20
-as it has a tendency to miss cases. This especially applies to this are=
-a=20
-where we have already an indicator for internal ciphers: the prio is so=
-=20
-low that it will never ever be selected based on the name. Now, adding =
-a=20
-flag means that we mark such an internal cipher twice.
+Huh? Using prio is already a black list.
 
-Therefore, I would not opt for such a flag (at least for a black list)=20
-and stay with the prio approach.
+In any case abusing the priority field like this is not acceptable,
+especially when the priority can be set from user-space.
 
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
