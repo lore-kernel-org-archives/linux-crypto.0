@@ -1,58 +1,87 @@
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH] mm: kill kmemcheck
-Date: Mon, 16 Mar 2015 22:33:18 -0400
-Message-ID: <20150316223318.02145751@grimm.local.home>
-References: <1426074547-21888-1-git-send-email-sasha.levin@oracle.com>
-	<20150311081909.552e2052@grimm.local.home>
-	<55003666.3020100@oracle.com>
-	<20150311084034.04ce6801@grimm.local.home>
-	<55004595.7020304@oracle.com>
-	<20150311102636.6b4110a8@gandalf.local.home>
-	<55005491.5080809@oracle.com>
-	<20150311105210.1855c95e@gandalf.local.home>
-	<550787E7.1030604@oracle.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] arm: crypto: Add NEON optimized SHA-256
+Date: Tue, 17 Mar 2015 07:56:02 +0100
+Message-ID: <CAKv+Gu8fmBYwfrMKRqhA5KhU1HNjMP1cLtpmgCmp78R4CUw3fg@mail.gmail.com>
+References: <20150316154835.GA31336@google.com>
+	<CAKv+Gu8+oQ13j61X6x70baJXOpEiM2L+vK=KgK1JG12sy5KMsg@mail.gmail.com>
+	<20150316162304.GA35408@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
- netdev@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org, Linus Torvalds
- <torvalds@linux-foundation.org>
-To: Sasha Levin <sasha.levin@oracle.com>
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <550787E7.1030604@oracle.com>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: Andy Polyakov <appro@openssl.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: Sami Tolvanen <samitolvanen@google.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ig0-f180.google.com ([209.85.213.180]:33754 "EHLO
+	mail-ig0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751292AbbCQG4D (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 17 Mar 2015 02:56:03 -0400
+Received: by ignm3 with SMTP id m3so47480893ign.0
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Mar 2015 23:56:02 -0700 (PDT)
+In-Reply-To: <20150316162304.GA35408@google.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 16 Mar 2015 21:48:23 -0400
-Sasha Levin <sasha.levin@oracle.com> wrote:
+On 16 March 2015 at 17:23, Sami Tolvanen <samitolvanen@google.com> wrote:
+> On Mon, Mar 16, 2015 at 05:08:03PM +0100, Ard Biesheuvel wrote:
+>> Have you tested this code with the tcrypt.ko module?
+>
+> I have not, but I can look into it.
+>
+>> Did you talk to Andy about the license? I don't think this is
+>> permissible for the kernel as-is.
+>
+> Unless I have misunderstood something, the license at the Cryptogams
+> website includes an option to license the code under the GNU GPL.
+>
+> However, I can certainly contact Andy to clarify his intentions.
+>
+>> This is broken on thumb-2, use adr instead
+>
+>> You can also implement SHA-224 using the same core transform, it's
+>> just some trivial glue code.
+>
+>> Could you please rebase this onto Herbert's cryptodev tree and move
+>> this to arch/arm/crypto/Kconfig?
+>
+> Thanks for the comments, I will submit a second version once we have
+> a clarification on the license.
+>
 
+I have tested your code with a Thumb2 kernel. With this patch folded,
+it builds and passes the tcrypt.ko test for me
 
-> Steven,
-> 
-> 
-> Since the only objection raised was the too-newiness of GCC 4.9.2/5.0, what
-> would you consider a good time-line for removal?
-> 
-> I haven't heard any "over my dead body" objections, so I guess that trying
-> to remove it while no distribution was shipping the compiler that would make
-> it possible was premature.
-> 
-> Although, on the other hand, I'd be happy if we can have a reasonable date
-> (that is before my kid goes to college), preferably even before the next
-> LSF/MM so that we could have a mission accomplished thingie with a round
-> of beers and commemorative t-shirts.
+--- a/arch/arm/crypto/sha256-armv7-neon.S
++++ b/arch/arm/crypto/sha256-armv7-neon.S
+@@ -10,7 +10,6 @@
+ #include <linux/linkage.h>
 
-Perhaps give it 2 years? With fair notice that it will soon be gone?
+ .text
+-.code   32
+ .fpu neon
 
-In 2 years I should be up to gcc 4.9 ;-)
+ .type  K256,%object
+@@ -44,15 +43,15 @@ ENTRY(sha256_transform_neon)
+         *      %r1: data
+         *      %r2: nblks
+         */
+-       sub     r3,pc,#8                @ sha256_transform_neon
+        add     r2,r1,r2,lsl#6  @ len to point at the end of inp
 
-I still need to test it out.
+        stmdb   sp!,{r4-r12,lr}
 
--- Steve
+        mov     r12,sp
+-       sub     sp,sp,#16*4+16          @ alloca
+-       sub     r14,r3,#256+32  @ K256
+-       bic     sp,sp,#15               @ align for 128-bit stores
++       sub     r14,sp,#16*4+16         @ alloca
++       bic     r14,r14,#15             @ align for 128-bit stores
++       mov     sp,r14
++       adr     r14,K256
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+        vld1.8          {q0},[r1]!
+        vld1.8          {q1},[r1]!
