@@ -1,122 +1,71 @@
-From: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Subject: Re: [PATCH -crypto] lib: memzero_explicit: use barrier instead of
- OPTIMIZER_HIDE_VAR
-Date: Wed, 18 Mar 2015 20:01:15 +0100
-Message-ID: <1426705275.2274412.242171333.7039FAC4@webmail.messagingengine.com>
-References: <9419c18a95e98ba92f1aad8fda7da51771fdccea.1426700375.git.daniel@iogearbox.net>
+From: mancha <mancha1@zoho.com>
+Subject: Re: [BUG/PATCH] kernel RNG and its secrets
+Date: Wed, 18 Mar 2015 19:09:05 +0000
+Message-ID: <20150318190905.GA25129@zoho.com>
+References: <20150318095345.GA12923@zoho.com>
+ <550972A7.9030100@iogearbox.net>
+ <1426691374.2212055.242060697.4DDF89CA@webmail.messagingengine.com>
+ <4937031.1sk5yglzr8@tauon>
+ <20150318171402.GB24195@zoho.com>
+ <5509BAC3.6090201@iogearbox.net>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, mancha security <mancha1@zoho.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	"Theodore Ts'o" <tytso@mit.edu>
-To: Daniel Borkmann <daniel@iogearbox.net>, herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:56807 "EHLO
-	out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932619AbbCRTBQ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Mar 2015 15:01:16 -0400
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 51F0A20B12
-	for <linux-crypto@vger.kernel.org>; Wed, 18 Mar 2015 15:01:13 -0400 (EDT)
-In-Reply-To: <9419c18a95e98ba92f1aad8fda7da51771fdccea.1426700375.git.daniel@iogearbox.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="MGYHOYXEY6WxJCY8"
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Hannes Frederic Sowa <hannes@stressinduktion.org>,
+	tytso@mit.edu, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	dborkman@redhat.com, cesarb@cesarb.eti.br
+To: Daniel Borkmann <daniel@iogearbox.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <5509BAC3.6090201@iogearbox.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 18, 2015, at 18:47, Daniel Borkmann wrote:
-> From: mancha security <mancha1@zoho.com>
-> 
-> OPTIMIZER_HIDE_VAR(), as defined when using gcc, is insufficient to
-> ensure protection from dead store optimization.
-> 
-> For the random driver and crypto drivers, calls are emitted ...
-> 
->   $ gdb vmlinux
->   (gdb) disassemble memzero_explicit
->   Dump of assembler code for function memzero_explicit:
->     0xffffffff813a18b0 <+0>:        push   %rbp
->     0xffffffff813a18b1 <+1>:        mov    %rsi,%rdx
->     0xffffffff813a18b4 <+4>:        xor    %esi,%esi
->     0xffffffff813a18b6 <+6>:        mov    %rsp,%rbp
->     0xffffffff813a18b9 <+9>:        callq  0xffffffff813a7120 <memset>
->     0xffffffff813a18be <+14>:       pop    %rbp
->     0xffffffff813a18bf <+15>:       retq
->   End of assembler dump.
-> 
->   (gdb) disassemble extract_entropy
->   [...]
->     0xffffffff814a5009 <+313>:      mov    %r12,%rdi
->     0xffffffff814a500c <+316>:      mov    $0xa,%esi
->     0xffffffff814a5011 <+321>:      callq  0xffffffff813a18b0
->     <memzero_explicit>
->     0xffffffff814a5016 <+326>:      mov    -0x48(%rbp),%rax
->   [...]
-> 
-> ... but in case in future we might use facilities such as LTO, then
-> OPTIMIZER_HIDE_VAR() is not sufficient to protect gcc from a possible
-> eviction of the memset(). We have to use a compiler barrier instead.
-> 
-> Minimal test example when we assume memzero_explicit() would *not* be
-> a call, but would have been *inlined* instead:
-> 
->   static inline void memzero_explicit(void *s, size_t count)
->   {
->     memset(s, 0, count);
->     <foo>
->   }
-> 
->   int main(void)
->   {
->     char buff[20];
-> 
->     snprintf(buff, sizeof(buff) - 1, "test");
->     printf("%s", buff);
-> 
->     memzero_explicit(buff, sizeof(buff));
->     return 0;
->   }
-> 
-> With <foo> := OPTIMIZER_HIDE_VAR():
-> 
->   (gdb) disassemble main
->   Dump of assembler code for function main:
->   [...]
->    0x0000000000400464 <+36>:       callq  0x400410 <printf@plt>
->    0x0000000000400469 <+41>:       xor    %eax,%eax
->    0x000000000040046b <+43>:       add    $0x28,%rsp
->    0x000000000040046f <+47>:       retq
->   End of assembler dump.
-> 
-> With <foo> := barrier():
-> 
->   (gdb) disassemble main
->   Dump of assembler code for function main:
->   [...]
->    0x0000000000400464 <+36>:       callq  0x400410 <printf@plt>
->    0x0000000000400469 <+41>:       movq   $0x0,(%rsp)
->    0x0000000000400471 <+49>:       movq   $0x0,0x8(%rsp)
->    0x000000000040047a <+58>:       movl   $0x0,0x10(%rsp)
->    0x0000000000400482 <+66>:       xor    %eax,%eax
->    0x0000000000400484 <+68>:       add    $0x28,%rsp
->    0x0000000000400488 <+72>:       retq
->   End of assembler dump.
-> 
-> As can be seen, movq, movq, movl are being emitted inlined
-> via memset().
-> 
-> Reference: http://thread.gmane.org/gmane.linux.kernel.cryptoapi/13764/
-> Fixes: d4c5efdb9777 ("random: add and use memzero_explicit() for clearing
-> data")
-> Cc: Hannes Frederic Sowa <hannes@stressinduktion.org>
-> Cc: Stephan Mueller <smueller@chronox.de>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Signed-off-by: mancha security <mancha1@zoho.com>
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> ---
->  Sending to Herbert as crypto/random are the main users.
->  Based against -crypto tree. Thanks!
 
-Acked-by: Hannes Frederic Sowa <hannes@stressinduktion.org>
+--MGYHOYXEY6WxJCY8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Still checking on how to realize the test. Thanks!
+On Wed, Mar 18, 2015 at 06:49:55PM +0100, Daniel Borkmann wrote:
+> On 03/18/2015 06:14 PM, mancha wrote:
+> ...
+> >Patch 0001 fixes the dead store issue in memzero_explicit().
+>=20
+> Thanks! I have issued the fix for the memzero bug to Herbert in
+> your authorship as discussed, also giving some more context.
+>=20
+> For the 2nd issue, lets wait for Cesar.
+>=20
+> Thanks again!
+
+Excellent!=20
+
+Cheers.
+
+--mancha
+
+--MGYHOYXEY6WxJCY8
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJVCc1RAAoJEB4VYy8JqhaDY9AP/2ruLd646gRu9ase7S8ziuew
+Q6t0FpWbuaJxAzjVwNgOZ6u9+gzG2SbcQ0OKSjGebzBAmddQhCkkT3XRzzN3J0Zc
+x7k0IpzjX6FkKIa54nbUkZ8uROREA+oUMNQ/1+8fwK9lKuJZJnLlvBjK7Yk0IUMt
+x5Hn3fh5j9qNukOzi1tXear9tXD5vu3OL5+bTSUrnXawcEGrOhR1Cse6+YRjzKCe
+kohb5p8pHg0AaNEUm7H2x7JRPZha/M12JFcd7pdiHPeqa5PpMAGR4Q8I3R1zNIy2
+U24In371t5TZufUFyiaTfXXe0Uy0S5U7wPJs/xnpcYwpN9lmCYDonDEg8fqa2mzu
+8tlO5V4hkPYQpeHCzImZDeyXIbmmfPiA1ZEcDbkczGcM2eRdWEQNSQ8kQZ8jQ/VW
+3J0hsZ8E0g8XZLdXgkcLx5R/qMH+54mFN71Num6DHNiPHiEZGIi6ssgfeiQkQOxP
+VpIVfSun2t4wiSoa8eqoSupUR6NJ80g7GTcSqRAlA45IEJMlT5DgrUPHXzagWUeu
+dOAH0q/T5xiNV9ZNdxk1JhKRvDaR2lnVF8QKoVx9ZklGHeW0jD7BnX8bZ/OyiXZQ
+3XQXqDBkU71JEZiRFR7/puoGA5ZmaX8+TLfbvifZ80/4jaobodUTTpP56Ey4zCTQ
+oaBu3xtC8Jiw/Tp0xJ9a
+=wmcJ
+-----END PGP SIGNATURE-----
+
+--MGYHOYXEY6WxJCY8--
