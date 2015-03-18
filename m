@@ -1,70 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.0
-Date: Wed, 18 Mar 2015 16:25:17 +1100
-Message-ID: <20150318052517.GA20347@gondor.apana.org.au>
-References: <20120823083242.GA23102@gondor.apana.org.au>
- <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
- <20140101061016.GA22579@gondor.apana.org.au>
- <20140203125944.GA31446@gondor.apana.org.au>
- <20141231033217.GA27261@gondor.apana.org.au>
- <20150107021737.GA25043@gondor.apana.org.au>
- <20150309051950.GA1526@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: Keith Packard <keithp@keithp.com>
+Subject: [PATCH] hwrng: core - allow perfect entropy from hardware devices
+Date: Wed, 18 Mar 2015 00:17:00 -0700
+Message-ID: <1426663020-10646-1-git-send-email-keithp@keithp.com>
+Cc: Keith Packard <keithp@keithp.com>, linux-crypto@vger.kernel.org
+To: Matt Mackall <mpm@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:40465 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751131AbbCRFZY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Mar 2015 01:25:24 -0400
-Content-Disposition: inline
-In-Reply-To: <20150309051950.GA1526@gondor.apana.org.au>
+Received: from home.keithp.com ([63.227.221.253]:46936 "EHLO elaine.keithp.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755237AbbCRH0Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Mar 2015 03:26:25 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+Hardware random number quality is measured from 0 (no entropy) to 1024
+(perfect entropy). Allow hardware devices to assert the full range by
+truncating the device-provided value at 1024 instead of 1023.
 
-On Mon, Mar 09, 2015 at 04:19:50PM +1100, Herbert Xu wrote:
-> 
-> This push fixes a bug in the ARM XTS implementation that can
-> cause failures to in decrypting encrypted disks.
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ drivers/char/hw_random/core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-For some reason this didn't get pulled so I'm resending it with
-another fix.
-
-The new fix is a memory overwrite bug that can cause a crash
-which can be triggered from userspace.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Ard Biesheuvel (1):
-      crypto: arm/aes update NEON AES module to latest OpenSSL version
-
-Stephan Mueller (1):
-      crypto: aesni - fix memory usage in GCM decryption
-
- arch/arm/crypto/aesbs-core.S_shipped |   12 ++++++++----
- arch/arm/crypto/bsaes-armv7.pl       |   12 ++++++++----
- arch/x86/crypto/aesni-intel_glue.c   |    4 ++--
- 3 files changed, 18 insertions(+), 10 deletions(-)
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 1500cfd..b726683 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -98,7 +98,8 @@ static inline int hwrng_init(struct hwrng *rng)
+ 	add_early_randomness(rng);
  
-Thanks,
+ 	current_quality = rng->quality ? : default_quality;
+-	current_quality &= 1023;
++	if (current_quality > 1024)
++		current_quality = 1024;
+ 
+ 	if (current_quality == 0 && hwrng_fill)
+ 		kthread_stop(hwrng_fill);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.1.4
