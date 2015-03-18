@@ -1,40 +1,39 @@
-From: Keith Packard <keithp@keithp.com>
-Subject: [PATCH] hwrng: core - allow perfect entropy from hardware devices
-Date: Wed, 18 Mar 2015 00:17:00 -0700
-Message-ID: <1426663020-10646-1-git-send-email-keithp@keithp.com>
-Cc: Keith Packard <keithp@keithp.com>, linux-crypto@vger.kernel.org
-To: Matt Mackall <mpm@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+From: Valentin Rothberg <valentinrothberg@gmail.com>
+Subject: crypto: img-hash - undefined Kconfig symbols
+Date: Wed, 18 Mar 2015 08:35:04 +0100
+Message-ID: <CAD3Xx4Kz0qT+=FKEy8N-rkubSrPAEhmXkTXk1H+-MGJ7BNiGqA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Paul Bolle <pebolle@tiscali.nl>,
+	Andreas Ruprecht <rupran@einserver.de>,
+	hengelein Stefan <stefan.hengelein@fau.de>
+To: james.hartley@imgtec.com, abrestic@chromium.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from home.keithp.com ([63.227.221.253]:46936 "EHLO elaine.keithp.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755237AbbCRH0Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Mar 2015 03:26:25 -0400
+Received: from mail-we0-f175.google.com ([74.125.82.175]:36070 "EHLO
+	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755172AbbCRHfg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Mar 2015 03:35:36 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hardware random number quality is measured from 0 (no entropy) to 1024
-(perfect entropy). Allow hardware devices to assert the full range by
-truncating the device-provided value at 1024 instead of 1023.
+Hi James,
 
-Signed-off-by: Keith Packard <keithp@keithp.com>
----
- drivers/char/hw_random/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+your commit d358f1abbf71 ("crypto: img-hash - Add Imagination
+Technologies hw hash accelerator") adds two selects on undefined
+Kconfig symbols, namely CRYPTO_ALG_API and CRYPTO_SHA224.
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 1500cfd..b726683 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -98,7 +98,8 @@ static inline int hwrng_init(struct hwrng *rng)
- 	add_early_randomness(rng);
- 
- 	current_quality = rng->quality ? : default_quality;
--	current_quality &= 1023;
-+	if (current_quality > 1024)
-+		current_quality = 1024;
- 
- 	if (current_quality == 0 && hwrng_fill)
- 		kthread_stop(hwrng_fill);
--- 
-2.1.4
+The first symbols looks like a typo since there is an option
+CRYPTO_ALGAPI defined in crypto/Kconfig.  However, I do not find a
+companion for CRYPTO_SHA224.  Is there a patch scheduled somewhere
+that adds this option?
+
+I detected your commit in today's Linux next tree by running
+./scripts/checkkconfigsymbols.py.  Git commit 92503ee4ada1
+("checkkconfigsymbols.py: make it Git aware") added the functionality
+to check Git commits and diff commits for such undefined symbols.
+
+Kind regards,
+ Valentin
