@@ -1,35 +1,25 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: img-hash - undefined Kconfig symbols
-Date: Thu, 19 Mar 2015 09:00:53 +1100
-Message-ID: <20150318220053.GA31827@gondor.apana.org.au>
-References: <CAD3Xx4Kz0qT+=FKEy8N-rkubSrPAEhmXkTXk1H+-MGJ7BNiGqA@mail.gmail.com>
- <CF4C1BA1-5E23-43CE-B66D-99E97AE44571@imgtec.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH v2 net-next 0/4] Add support for async socket operations
+Date: Wed, 18 Mar 2015 19:29:57 -0400 (EDT)
+Message-ID: <20150318.192957.910645505322376569.davem@davemloft.net>
+References: <20150316161508.16418.23674.stgit@tstruk-mobl1>
+	<5509E732.4050706@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Valentin Rothberg <valentinrothberg@gmail.com>,
-	"abrestic@chromium.org" <abrestic@chromium.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Paul Bolle <pebolle@tiscali.nl>,
-	Andreas Ruprecht <rupran@einserver.de>,
-	hengelein Stefan <stefan.hengelein@fau.de>
-To: James Hartley <James.Hartley@imgtec.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CF4C1BA1-5E23-43CE-B66D-99E97AE44571@imgtec.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-aio@kvack.org, herbert@gondor.apana.org.au,
+	netdev@vger.kernel.org, ying.xue@windriver.com, bcrl@kvack.org,
+	viro@ZenIV.linux.org.uk, linux-fsdevel@vger.kernel.org, hch@lst.de,
+	linux-crypto@vger.kernel.org
+To: tadeusz.struk@intel.com
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <5509E732.4050706@intel.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Mar 18, 2015 at 01:02:14PM +0000, James Hartley wrote:
->
-> Herbert: should I send you a patch to address the issues above, or resubmit the series with the fixes incorporated?
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Date: Wed, 18 Mar 2015 13:59:30 -0700
 
-James, your patch has already been merged so please send any
-fixes on top of the cryptodev tree.
+> What's your take on this patch set?
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I'm really busy so waiting for Al to give some feedback first.
