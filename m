@@ -1,78 +1,70 @@
-From: sri sowj <srisowj4linux@gmail.com>
-Subject: How to handle an error while processing crypto request (backlogged)
-Date: Wed, 18 Mar 2015 09:31:07 +0530
-Message-ID: <CAHTT9V+kthqrE5E0JSp_RiNwQPQsGm0FmJ_QEobpaEVu9SwtSA@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.0
+Date: Wed, 18 Mar 2015 16:25:17 +1100
+Message-ID: <20150318052517.GA20347@gondor.apana.org.au>
+References: <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20141231033217.GA27261@gondor.apana.org.au>
+ <20150107021737.GA25043@gondor.apana.org.au>
+ <20150309051950.GA1526@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-oi0-f44.google.com ([209.85.218.44]:33810 "EHLO
-	mail-oi0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750704AbbCREBI (ORCPT
+Received: from ringil.hengli.com.au ([178.18.16.133]:40465 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751131AbbCRFZY (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Mar 2015 00:01:08 -0400
-Received: by oier21 with SMTP id r21so26584374oie.1
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Mar 2015 21:01:07 -0700 (PDT)
+	Wed, 18 Mar 2015 01:25:24 -0400
+Content-Disposition: inline
+In-Reply-To: <20150309051950.GA1526@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi All,
+Hi Linus:
 
-I am not really clear how  to handle an error when processing
-backlogged messages.I did not get any document or references in this
-regard,It would be a great help if any suggestions are provided.
+On Mon, Mar 09, 2015 at 04:19:50PM +1100, Herbert Xu wrote:
+> 
+> This push fixes a bug in the ARM XTS implementation that can
+> cause failures to in decrypting encrypted disks.
 
-As per my understanding "Back Logged messages" Processing will be as below:
+For some reason this didn't get pulled so I'm resending it with
+another fix.
 
-Step #1:
-
-Let's say "M" is the message to be encrypted and its divided chunks M1 to M4.
-M=M1+M2+M3+M4. Now when feeding  M1 to M4 to crypto engine,when M1 is
-under processing [H(M10] ,M2,M3,M4 will be enqueued i.e., backlogged
-
-M4,M3,M2 ----> H(M1)
-
-Here H(M1) under processing, M2 - M4 request comes when M0 is under
-processing so M1-M4 are backlogged.
-
-Step #2:
-
-once the  M1 is processed Linux crypto driver has to be notified
-through either an interrupt or a call back
-to process remaining messages.This process will be repeating till it
-completes processing all backlogged
-messages M2,M3,M4.
-
-Now let us say when processing M2 if some errors comes like processing
-unit like DMA channel is stopped,
-then how to handle this error scenario.
-
-I have referred omap-aes.c from open source but its not really clear.
-
-static int omap_aes_handle_queue(struct omap_aes_dev *dd,
-                               struct ablkcipher_request *req)
-{
-
-///////////
-//////////
-
-                 err = omap_aes_crypt_dma_start(dd);
-         if (err) {
-                 /* aes_task will not finish it, so do it here */
-
-                 omap_aes_finish_req(dd, err);
-                //whatever compete call back is called not really sure
-what it is meant for?,may for re-initializing the request?
+The new fix is a memory overwrite bug that can cause a crash
+which can be triggered from userspace.
 
 
-                 tasklet_schedule(&dd->queue_task);
-                // Here it will call *_aes_handle_queue again ,but
-this messages already deleted while dequeuing,so how does it work?
-         }
+Please pull from
 
-         return ret; /* return ret, which is enqueue return value */
-}
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
 
-BR,
-Srisowj
+Ard Biesheuvel (1):
+      crypto: arm/aes update NEON AES module to latest OpenSSL version
+
+Stephan Mueller (1):
+      crypto: aesni - fix memory usage in GCM decryption
+
+ arch/arm/crypto/aesbs-core.S_shipped |   12 ++++++++----
+ arch/arm/crypto/bsaes-armv7.pl       |   12 ++++++++----
+ arch/x86/crypto/aesni-intel_glue.c   |    4 ++--
+ 3 files changed, 18 insertions(+), 10 deletions(-)
+ 
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
