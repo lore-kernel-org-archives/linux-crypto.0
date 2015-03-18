@@ -1,41 +1,127 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [BUG/PATCH] kernel RNG and its secrets
-Date: Wed, 18 Mar 2015 13:41:36 -0400
-Message-ID: <20150318174136.GD5663@thunk.org>
-References: <20150318095345.GA12923@zoho.com>
- <1712478.ujdQuuIYol@tauon>
- <1426681147.2164835.241982149.0C3DD661@webmail.messagingengine.com>
- <1867652.j97RWRfxn1@tauon>
- <550972A7.9030100@iogearbox.net>
- <1426691374.2212055.242060697.4DDF89CA@webmail.messagingengine.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
+From: Daniel Borkmann <daniel@iogearbox.net>
+Subject: [PATCH -crypto] lib: memzero_explicit: use barrier instead of OPTIMIZER_HIDE_VAR
+Date: Wed, 18 Mar 2015 18:47:25 +0100
+Message-ID: <9419c18a95e98ba92f1aad8fda7da51771fdccea.1426700375.git.daniel@iogearbox.net>
+Cc: linux-crypto@vger.kernel.org, mancha security <mancha1@zoho.com>,
+	Hannes Frederic Sowa <hannes@stressinduktion.org>,
 	Stephan Mueller <smueller@chronox.de>,
-	mancha <mancha1@zoho.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	dborkman@redhat.com
-To: Hannes Frederic Sowa <hannes@stressinduktion.org>
+	Theodore Ts'o <tytso@mit.edu>,
+	Daniel Borkmann <daniel@iogearbox.net>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:47485 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755319AbbCRRlm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 18 Mar 2015 13:41:42 -0400
-Content-Disposition: inline
-In-Reply-To: <1426691374.2212055.242060697.4DDF89CA@webmail.messagingengine.com>
+Received: from www62.your-server.de ([213.133.104.62]:60912 "EHLO
+	www62.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752007AbbCRRrc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Mar 2015 13:47:32 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Maybe we should add a kernel self-test that automatically checks
-whether or not memset_explicit() gets optimized away?  Otherwise we
-might not notice when gcc or how we implement barrier() or whatever
-else we end up using ends up changing.
+From: mancha security <mancha1@zoho.com>
 
-It shold be something that is really fast, so it might be a good idea
-to simply automatically run it as part of an __initcall()
-unconditionally.  We can debate where the __initcall() lives, but I'd
-prefer that it be run even if the crypto layer isn't configured for
-some reason.  Hopefully such an self-test is small enough that the
-kernel bloat people won't complain.  :-)
+OPTIMIZER_HIDE_VAR(), as defined when using gcc, is insufficient to
+ensure protection from dead store optimization.
 
-							 -Ted
+For the random driver and crypto drivers, calls are emitted ...
+
+  $ gdb vmlinux
+  (gdb) disassemble memzero_explicit
+  Dump of assembler code for function memzero_explicit:
+    0xffffffff813a18b0 <+0>:	push   %rbp
+    0xffffffff813a18b1 <+1>:	mov    %rsi,%rdx
+    0xffffffff813a18b4 <+4>:	xor    %esi,%esi
+    0xffffffff813a18b6 <+6>:	mov    %rsp,%rbp
+    0xffffffff813a18b9 <+9>:	callq  0xffffffff813a7120 <memset>
+    0xffffffff813a18be <+14>:	pop    %rbp
+    0xffffffff813a18bf <+15>:	retq
+  End of assembler dump.
+
+  (gdb) disassemble extract_entropy
+  [...]
+    0xffffffff814a5009 <+313>:	mov    %r12,%rdi
+    0xffffffff814a500c <+316>:	mov    $0xa,%esi
+    0xffffffff814a5011 <+321>:	callq  0xffffffff813a18b0 <memzero_explicit>
+    0xffffffff814a5016 <+326>:	mov    -0x48(%rbp),%rax
+  [...]
+
+... but in case in future we might use facilities such as LTO, then
+OPTIMIZER_HIDE_VAR() is not sufficient to protect gcc from a possible
+eviction of the memset(). We have to use a compiler barrier instead.
+
+Minimal test example when we assume memzero_explicit() would *not* be
+a call, but would have been *inlined* instead:
+
+  static inline void memzero_explicit(void *s, size_t count)
+  {
+    memset(s, 0, count);
+    <foo>
+  }
+
+  int main(void)
+  {
+    char buff[20];
+
+    snprintf(buff, sizeof(buff) - 1, "test");
+    printf("%s", buff);
+
+    memzero_explicit(buff, sizeof(buff));
+    return 0;
+  }
+
+With <foo> := OPTIMIZER_HIDE_VAR():
+
+  (gdb) disassemble main
+  Dump of assembler code for function main:
+  [...]
+   0x0000000000400464 <+36>:	callq  0x400410 <printf@plt>
+   0x0000000000400469 <+41>:	xor    %eax,%eax
+   0x000000000040046b <+43>:	add    $0x28,%rsp
+   0x000000000040046f <+47>:	retq
+  End of assembler dump.
+
+With <foo> := barrier():
+
+  (gdb) disassemble main
+  Dump of assembler code for function main:
+  [...]
+   0x0000000000400464 <+36>:	callq  0x400410 <printf@plt>
+   0x0000000000400469 <+41>:	movq   $0x0,(%rsp)
+   0x0000000000400471 <+49>:	movq   $0x0,0x8(%rsp)
+   0x000000000040047a <+58>:	movl   $0x0,0x10(%rsp)
+   0x0000000000400482 <+66>:	xor    %eax,%eax
+   0x0000000000400484 <+68>:	add    $0x28,%rsp
+   0x0000000000400488 <+72>:	retq
+  End of assembler dump.
+
+As can be seen, movq, movq, movl are being emitted inlined
+via memset().
+
+Reference: http://thread.gmane.org/gmane.linux.kernel.cryptoapi/13764/
+Fixes: d4c5efdb9777 ("random: add and use memzero_explicit() for clearing data")
+Cc: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Cc: Stephan Mueller <smueller@chronox.de>
+Cc: Theodore Ts'o <tytso@mit.edu>
+Signed-off-by: mancha security <mancha1@zoho.com>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+---
+ Sending to Herbert as crypto/random are the main users.
+ Based against -crypto tree. Thanks!
+
+ lib/string.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/string.c b/lib/string.c
+index ce81aae..a579201 100644
+--- a/lib/string.c
++++ b/lib/string.c
+@@ -607,7 +607,7 @@ EXPORT_SYMBOL(memset);
+ void memzero_explicit(void *s, size_t count)
+ {
+ 	memset(s, 0, count);
+-	OPTIMIZER_HIDE_VAR(s);
++	barrier();
+ }
+ EXPORT_SYMBOL(memzero_explicit);
+ 
+-- 
+1.9.3
