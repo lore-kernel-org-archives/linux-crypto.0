@@ -1,42 +1,122 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: Crypto Fixes for 4.0
-Date: Wed, 18 Mar 2015 11:12:44 -0700
-Message-ID: <CA+55aFwsoYA1TL416etgckndxqSEicp7Cdi-rfXwxUJoc_2MUA@mail.gmail.com>
-References: <20120823083242.GA23102@gondor.apana.org.au>
-	<20121109093005.GA25632@gondor.apana.org.au>
-	<20130328082841.GA7425@gondor.apana.org.au>
-	<20131203124129.GA12067@gondor.apana.org.au>
-	<20131209115705.GA1361@gondor.apana.org.au>
-	<20140101061016.GA22579@gondor.apana.org.au>
-	<20140203125944.GA31446@gondor.apana.org.au>
-	<20141231033217.GA27261@gondor.apana.org.au>
-	<20150107021737.GA25043@gondor.apana.org.au>
-	<20150309051950.GA1526@gondor.apana.org.au>
-	<20150318052517.GA20347@gondor.apana.org.au>
+From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Subject: Re: [PATCH -crypto] lib: memzero_explicit: use barrier instead of
+ OPTIMIZER_HIDE_VAR
+Date: Wed, 18 Mar 2015 20:01:15 +0100
+Message-ID: <1426705275.2274412.242171333.7039FAC4@webmail.messagingengine.com>
+References: <9419c18a95e98ba92f1aad8fda7da51771fdccea.1426700375.git.daniel@iogearbox.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150318052517.GA20347@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, mancha security <mancha1@zoho.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	"Theodore Ts'o" <tytso@mit.edu>
+To: Daniel Borkmann <daniel@iogearbox.net>, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:56807 "EHLO
+	out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932619AbbCRTBQ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 18 Mar 2015 15:01:16 -0400
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 51F0A20B12
+	for <linux-crypto@vger.kernel.org>; Wed, 18 Mar 2015 15:01:13 -0400 (EDT)
+In-Reply-To: <9419c18a95e98ba92f1aad8fda7da51771fdccea.1426700375.git.daniel@iogearbox.net>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 17, 2015 at 10:25 PM, Herbert Xu
-<herbert@gondor.apana.org.au> wrote:
-> Hi Linus:
->
-> On Mon, Mar 09, 2015 at 04:19:50PM +1100, Herbert Xu wrote:
->>
->> This push fixes a bug in the ARM XTS implementation that can
->> cause failures to in decrypting encrypted disks.
->
-> For some reason this didn't get pulled so I'm resending it with
-> another fix.
+On Wed, Mar 18, 2015, at 18:47, Daniel Borkmann wrote:
+> From: mancha security <mancha1@zoho.com>
+> 
+> OPTIMIZER_HIDE_VAR(), as defined when using gcc, is insufficient to
+> ensure protection from dead store optimization.
+> 
+> For the random driver and crypto drivers, calls are emitted ...
+> 
+>   $ gdb vmlinux
+>   (gdb) disassemble memzero_explicit
+>   Dump of assembler code for function memzero_explicit:
+>     0xffffffff813a18b0 <+0>:        push   %rbp
+>     0xffffffff813a18b1 <+1>:        mov    %rsi,%rdx
+>     0xffffffff813a18b4 <+4>:        xor    %esi,%esi
+>     0xffffffff813a18b6 <+6>:        mov    %rsp,%rbp
+>     0xffffffff813a18b9 <+9>:        callq  0xffffffff813a7120 <memset>
+>     0xffffffff813a18be <+14>:       pop    %rbp
+>     0xffffffff813a18bf <+15>:       retq
+>   End of assembler dump.
+> 
+>   (gdb) disassemble extract_entropy
+>   [...]
+>     0xffffffff814a5009 <+313>:      mov    %r12,%rdi
+>     0xffffffff814a500c <+316>:      mov    $0xa,%esi
+>     0xffffffff814a5011 <+321>:      callq  0xffffffff813a18b0
+>     <memzero_explicit>
+>     0xffffffff814a5016 <+326>:      mov    -0x48(%rbp),%rax
+>   [...]
+> 
+> ... but in case in future we might use facilities such as LTO, then
+> OPTIMIZER_HIDE_VAR() is not sufficient to protect gcc from a possible
+> eviction of the memset(). We have to use a compiler barrier instead.
+> 
+> Minimal test example when we assume memzero_explicit() would *not* be
+> a call, but would have been *inlined* instead:
+> 
+>   static inline void memzero_explicit(void *s, size_t count)
+>   {
+>     memset(s, 0, count);
+>     <foo>
+>   }
+> 
+>   int main(void)
+>   {
+>     char buff[20];
+> 
+>     snprintf(buff, sizeof(buff) - 1, "test");
+>     printf("%s", buff);
+> 
+>     memzero_explicit(buff, sizeof(buff));
+>     return 0;
+>   }
+> 
+> With <foo> := OPTIMIZER_HIDE_VAR():
+> 
+>   (gdb) disassemble main
+>   Dump of assembler code for function main:
+>   [...]
+>    0x0000000000400464 <+36>:       callq  0x400410 <printf@plt>
+>    0x0000000000400469 <+41>:       xor    %eax,%eax
+>    0x000000000040046b <+43>:       add    $0x28,%rsp
+>    0x000000000040046f <+47>:       retq
+>   End of assembler dump.
+> 
+> With <foo> := barrier():
+> 
+>   (gdb) disassemble main
+>   Dump of assembler code for function main:
+>   [...]
+>    0x0000000000400464 <+36>:       callq  0x400410 <printf@plt>
+>    0x0000000000400469 <+41>:       movq   $0x0,(%rsp)
+>    0x0000000000400471 <+49>:       movq   $0x0,0x8(%rsp)
+>    0x000000000040047a <+58>:       movl   $0x0,0x10(%rsp)
+>    0x0000000000400482 <+66>:       xor    %eax,%eax
+>    0x0000000000400484 <+68>:       add    $0x28,%rsp
+>    0x0000000000400488 <+72>:       retq
+>   End of assembler dump.
+> 
+> As can be seen, movq, movq, movl are being emitted inlined
+> via memset().
+> 
+> Reference: http://thread.gmane.org/gmane.linux.kernel.cryptoapi/13764/
+> Fixes: d4c5efdb9777 ("random: add and use memzero_explicit() for clearing
+> data")
+> Cc: Hannes Frederic Sowa <hannes@stressinduktion.org>
+> Cc: Stephan Mueller <smueller@chronox.de>
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Signed-off-by: mancha security <mancha1@zoho.com>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  Sending to Herbert as crypto/random are the main users.
+>  Based against -crypto tree. Thanks!
 
-Hmm. I never got your original email. Maybe it was in my spam folder
-and my spam scan never noticed..
+Acked-by: Hannes Frederic Sowa <hannes@stressinduktion.org>
 
-                        Linus
+Still checking on how to realize the test. Thanks!
