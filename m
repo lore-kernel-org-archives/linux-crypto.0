@@ -1,34 +1,35 @@
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: [PATCH v3 net-next 0/3] Add support for async socket operations
-Date: Thu, 19 Mar 2015 19:51:05 +0000
-Message-ID: <20150319195105.GS29656@ZenIV.linux.org.uk>
-References: <20150319193118.11500.10463.stgit@tstruk-mobl1>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH -crypto] lib: memzero_explicit: use barrier instead of
+ OPTIMIZER_HIDE_VAR
+Date: Fri, 20 Mar 2015 08:04:41 +1100
+Message-ID: <20150319210441.GA10752@gondor.apana.org.au>
+References: <9419c18a95e98ba92f1aad8fda7da51771fdccea.1426700375.git.daniel@iogearbox.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-aio@kvack.org,
-	herbert@gondor.apana.org.au, netdev@vger.kernel.org,
-	ying.xue@windriver.com, bcrl@kvack.org,
-	linux-fsdevel@vger.kernel.org, hch@lst.de,
-	linux-crypto@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, mancha security <mancha1@zoho.com>,
+	Hannes Frederic Sowa <hannes@stressinduktion.org>,
+	Stephan Mueller <smueller@chronox.de>,
+	Theodore Ts'o <tytso@mit.edu>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:36751 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750890AbbCSVEt (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 19 Mar 2015 17:04:49 -0400
 Content-Disposition: inline
-In-Reply-To: <20150319193118.11500.10463.stgit@tstruk-mobl1>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <9419c18a95e98ba92f1aad8fda7da51771fdccea.1426700375.git.daniel@iogearbox.net>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Mar 19, 2015 at 12:31:19PM -0700, Tadeusz Struk wrote:
-> After the iocb parameter has been removed from sendmsg() and recvmsg() ops
-> the socket layer, and the network stack no longer support async operations.
-> This patch set adds support for asynchronous operations on sockets back.
+On Wed, Mar 18, 2015 at 06:47:25PM +0100, Daniel Borkmann wrote:
+> From: mancha security <mancha1@zoho.com>
 > 
-> Changes in v3:
-> * As sugested by Al Viro instead of adding new functions aio_sendmsg
->   and aio_recvmsg, added a ptr to iocb into the kernel-side msghdr structure.
->   This way no change to aio.c is required.
-> 
-> Changes in v2:
-> * removed redundant total_size param from aio_sendmsg and aio_recvmsg functions
+> OPTIMIZER_HIDE_VAR(), as defined when using gcc, is insufficient to
+> ensure protection from dead store optimization.
 
-I think I can live with that.  Christoph, do you have any objections to
-that series?
+Patch applied.  Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
