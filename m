@@ -1,25 +1,41 @@
-From: Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v3 net-next 0/3] Add support for async socket operations
-Date: Fri, 20 Mar 2015 07:45:38 +0100
-Message-ID: <20150320064538.GA626@lst.de>
-References: <20150319193118.11500.10463.stgit@tstruk-mobl1> <20150319195105.GS29656@ZenIV.linux.org.uk>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch 1/2] crypto: img-hash - fix some compile warnings
+Date: Fri, 20 Mar 2015 17:21:12 +0300
+Message-ID: <20150320142112.GA5108@mwanda>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>, davem@davemloft.net,
-	linux-aio@kvack.org, herbert@gondor.apana.org.au,
-	netdev@vger.kernel.org, ying.xue@windriver.com, bcrl@kvack.org,
-	linux-fsdevel@vger.kernel.org, hch@lst.de,
-	linux-crypto@vger.kernel.org
-To: Al Viro <viro@ZenIV.linux.org.uk>
-Return-path: <netdev-owner@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	James Hartley <james.hartley@imgtec.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150319195105.GS29656@ZenIV.linux.org.uk>
-Sender: netdev-owner@vger.kernel.org
+Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Mar 19, 2015 at 07:51:05PM +0000, Al Viro wrote:
-> I think I can live with that.  Christoph, do you have any objections to
-> that series?
+GCC complains about that %u is the wrong format string for size_t and
+also that "ret" is unused.
 
-Patch 1 looks fine to me which is probably what you care for.  I didn't have
-time to look into the other two.
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index fec61fc..601ab35 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -192,7 +192,7 @@ static int img_hash_xmit_cpu(struct img_hash_dev *hdev, const u8 *buf,
+ 	u32 count, len32;
+ 	const u32 *buffer = (const u32 *)buf;
+ 
+-	dev_dbg(hdev->dev, "xmit_cpu:  length: %u bytes\n", length);
++	dev_dbg(hdev->dev, "xmit_cpu:  length: %zu bytes\n", length);
+ 
+ 	if (final)
+ 		hdev->flags |= DRIVER_FLAGS_FINAL;
+@@ -459,7 +459,6 @@ static int img_hash_hw_init(struct img_hash_dev *hdev)
+ {
+ 	unsigned long long nbits;
+ 	u32 u, l;
+-	int ret;
+ 
+ 	img_hash_write(hdev, CR_RESET, CR_RESET_SET);
+ 	img_hash_write(hdev, CR_RESET, CR_RESET_UNSET);
