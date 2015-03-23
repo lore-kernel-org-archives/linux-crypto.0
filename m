@@ -1,41 +1,39 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] crypto/arm: fix big-endian bug in ghash
-Date: Mon, 23 Mar 2015 21:33:09 +0100
-Message-ID: <1427142789-13960-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH v3 net-next 0/3] Add support for async socket operations
+Date: Mon, 23 Mar 2015 16:42:21 -0400 (EDT)
+Message-ID: <20150323.164221.1726829049738525120.davem@davemloft.net>
+References: <20150319193118.11500.10463.stgit@tstruk-mobl1>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: linux-aio@kvack.org, herbert@gondor.apana.org.au,
+	netdev@vger.kernel.org, ying.xue@windriver.com, bcrl@kvack.org,
+	viro@ZenIV.linux.org.uk, linux-fsdevel@vger.kernel.org, hch@lst.de,
+	linux-crypto@vger.kernel.org
+To: tadeusz.struk@intel.com
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:35392 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752603AbbCWUdQ (ORCPT
+Received: from shards.monkeyblade.net ([149.20.54.216]:58099 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752519AbbCWUm1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 23 Mar 2015 16:33:16 -0400
-Received: by wibdy8 with SMTP id dy8so57814741wib.0
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2015 13:33:14 -0700 (PDT)
+	Mon, 23 Mar 2015 16:42:27 -0400
+In-Reply-To: <20150319193118.11500.10463.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This fixes a bug in the new v8 Crypto Extensions GHASH code
-that only manifests itself in big-endian mode.
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Date: Thu, 19 Mar 2015 12:31:19 -0700
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/crypto/ghash-ce-core.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> After the iocb parameter has been removed from sendmsg() and recvmsg() ops
+> the socket layer, and the network stack no longer support async operations.
+> This patch set adds support for asynchronous operations on sockets back.
+> 
+> Changes in v3:
+> * As sugested by Al Viro instead of adding new functions aio_sendmsg
+>   and aio_recvmsg, added a ptr to iocb into the kernel-side msghdr structure.
+>   This way no change to aio.c is required.
+> 
+> Changes in v2:
+> * removed redundant total_size param from aio_sendmsg and aio_recvmsg functions
 
-diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
-index e643a15eadf2..f6ab8bcc9efe 100644
---- a/arch/arm/crypto/ghash-ce-core.S
-+++ b/arch/arm/crypto/ghash-ce-core.S
-@@ -40,7 +40,7 @@
- 	 *			   struct ghash_key const *k, const char *head)
- 	 */
- ENTRY(pmull_ghash_update)
--	vld1.8		{SHASH}, [r3]
-+	vld1.64		{SHASH}, [r3]
- 	vld1.64		{XL}, [r1]
- 	vmov.i8		MASK, #0xe1
- 	vext.8		SHASH2, SHASH, SHASH, #8
--- 
-1.8.3.2
+Series applied to net-next.
