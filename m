@@ -1,41 +1,31 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v3 net-next 0/3] Add support for async socket operations
-Date: Mon, 23 Mar 2015 14:13:21 -0700
-Message-ID: <551081F1.9090303@intel.com>
-References: <20150319193118.11500.10463.stgit@tstruk-mobl1> <20150323.164221.1726829049738525120.davem@davemloft.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto/arm: fix big-endian bug in ghash
+Date: Tue, 24 Mar 2015 22:27:25 +1100
+Message-ID: <20150324112725.GB11405@gondor.apana.org.au>
+References: <1427142789-13960-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: linux-aio@kvack.org, herbert@gondor.apana.org.au,
-	netdev@vger.kernel.org, ying.xue@windriver.com, bcrl@kvack.org,
-	viro@ZenIV.linux.org.uk, linux-fsdevel@vger.kernel.org, hch@lst.de,
-	linux-crypto@vger.kernel.org
-To: David Miller <davem@davemloft.net>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <20150323.164221.1726829049738525120.davem@davemloft.net>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from ringil.hengli.com.au ([178.18.16.133]:49787 "EHLO
+	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751418AbbCXL1c (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 24 Mar 2015 07:27:32 -0400
+Content-Disposition: inline
+In-Reply-To: <1427142789-13960-1-git-send-email-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 03/23/2015 01:42 PM, David Miller wrote:
-> From: Tadeusz Struk <tadeusz.struk@intel.com>
-> Date: Thu, 19 Mar 2015 12:31:19 -0700
+On Mon, Mar 23, 2015 at 09:33:09PM +0100, Ard Biesheuvel wrote:
+> This fixes a bug in the new v8 Crypto Extensions GHASH code
+> that only manifests itself in big-endian mode.
 > 
->> After the iocb parameter has been removed from sendmsg() and recvmsg() ops
->> the socket layer, and the network stack no longer support async operations.
->> This patch set adds support for asynchronous operations on sockets back.
->>
->> Changes in v3:
->> * As sugested by Al Viro instead of adding new functions aio_sendmsg
->>   and aio_recvmsg, added a ptr to iocb into the kernel-side msghdr structure.
->>   This way no change to aio.c is required.
->>
->> Changes in v2:
->> * removed redundant total_size param from aio_sendmsg and aio_recvmsg functions
-> 
-> Series applied to net-next.
-> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Thanks Dave!
-
-Herbert, is it possible to pull it to cryptodev?
-
+Patch applied.  Thanks!
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
