@@ -1,31 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto/arm: fix big-endian bug in ghash
-Date: Tue, 24 Mar 2015 22:27:25 +1100
-Message-ID: <20150324112725.GB11405@gondor.apana.org.au>
-References: <1427142789-13960-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v3 net-next 0/3] Add support for async socket operations
+Date: Tue, 24 Mar 2015 22:29:52 +1100
+Message-ID: <20150324112952.GC11405@gondor.apana.org.au>
+References: <20150319193118.11500.10463.stgit@tstruk-mobl1>
+ <20150323.164221.1726829049738525120.davem@davemloft.net>
+ <551081F1.9090303@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from ringil.hengli.com.au ([178.18.16.133]:49787 "EHLO
-	ringil.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751418AbbCXL1c (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 24 Mar 2015 07:27:32 -0400
+Cc: David Miller <davem@davemloft.net>, linux-aio@kvack.org,
+	netdev@vger.kernel.org, ying.xue@windriver.com, bcrl@kvack.org,
+	viro@ZenIV.linux.org.uk, linux-fsdevel@vger.kernel.org, hch@lst.de,
+	linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <owner-linux-aio@kvack.org>
 Content-Disposition: inline
-In-Reply-To: <1427142789-13960-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <551081F1.9090303@intel.com>
+Sender: owner-linux-aio@kvack.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Mar 23, 2015 at 09:33:09PM +0100, Ard Biesheuvel wrote:
-> This fixes a bug in the new v8 Crypto Extensions GHASH code
-> that only manifests itself in big-endian mode.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+On Mon, Mar 23, 2015 at 02:13:21PM -0700, Tadeusz Struk wrote:
+>
+> Herbert, is it possible to pull it to cryptodev?
 
-Patch applied.  Thanks!
+How many more changes do you have that sit on top of this? If
+it's small we could just push them through net-next until the
+merge window opens again.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-aio' in
+the body to majordomo@kvack.org.  For more info on Linux AIO,
+see: http://www.kvack.org/aio/
+Don't email: <a href=mailto:"aart@kvack.org">aart@kvack.org</a>
