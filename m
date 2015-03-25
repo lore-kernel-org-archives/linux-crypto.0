@@ -1,27 +1,37 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH net-next] crypto: algif - fix warn: unsigned 'used' is
- never less than zero
-Date: Wed, 25 Mar 2015 11:45:54 -0400 (EDT)
-Message-ID: <20150325.114554.625753070227410964.davem@davemloft.net>
-References: <20150325142919.4229.90027.stgit@tstruk-mobl1>
+From: Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
+Subject: Re: [PATCH] arm: crypto: Add NEON optimized SHA-256
+Date: Wed, 25 Mar 2015 21:00:38 +0100
+Message-ID: <20150325200038.GM14457@ns203013.ovh.net>
+References: <20150316154835.GA31336@google.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au
-To: tadeusz.struk@intel.com
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20150325142919.4229.90027.stgit@tstruk-mobl1>
-Sender: netdev-owner@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ ard.biesheuvel@linaro.org
+To: Sami Tolvanen <samitolvanen@google.com>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <20150316154835.GA31336@google.com>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 List-Id: linux-crypto.vger.kernel.org
 
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Date: Wed, 25 Mar 2015 07:29:19 -0700
-
-> Change type from unsigned long to int to fix an issue reported by kbuild robot:
-> crypto/algif_skcipher.c:596 skcipher_recvmsg_async() warn: unsigned 'used' is
-> never less than zero.
+On 15:48 Mon 16 Mar     , Sami Tolvanen wrote:
+> Add Andy Polyakov's NEON optimized SHA-256 implementation.
 > 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> On Nexus 6, this implementation is ~2x faster than sha256-generic.
 
-Applied.
+do you plan to add the sha512 from openssl too?
+
+Whould be nice so armv4 can get faster implementatio too
+
+Best Regards,
+J.
