@@ -1,37 +1,35 @@
-From: Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
-Subject: Re: [PATCH] arm: crypto: Add NEON optimized SHA-256
-Date: Wed, 25 Mar 2015 21:00:38 +0100
-Message-ID: <20150325200038.GM14457@ns203013.ovh.net>
-References: <20150316154835.GA31336@google.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch -next] crypto: algif - signedness bug in
+ skcipher_recvmsg_async()
+Date: Thu, 26 Mar 2015 12:13:12 +0300
+Message-ID: <20150326091312.GA21084@mwanda>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- ard.biesheuvel@linaro.org
-To: Sami Tolvanen <samitolvanen@google.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <kernel-janitors-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150316154835.GA31336@google.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: kernel-janitors-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 15:48 Mon 16 Mar     , Sami Tolvanen wrote:
-> Add Andy Polyakov's NEON optimized SHA-256 implementation.
-> 
-> On Nexus 6, this implementation is ~2x faster than sha256-generic.
+This needs to be signed because af_alg_make_sg() returns negative error
+codes.
 
-do you plan to add the sha512 from openssl too?
+Fixes: a596999b7ddf ('crypto: algif - change algif_skcipher to be asynchronous')
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-Whould be nice so armv4 can get faster implementatio too
-
-Best Regards,
-J.
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 506eb5f..142430f 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -537,7 +537,7 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 
+ 	while (iov_iter_count(&msg->msg_iter)) {
+ 		struct skcipher_async_rsgl *rsgl;
+-		unsigned long used;
++		long used;
+ 
+ 		if (!ctx->used) {
+ 			err = skcipher_wait_for_data(sk, flags);
