@@ -1,96 +1,84 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 00/20] crypto: restrict usage of helper ciphers
-Date: Fri, 27 Mar 2015 23:49:13 +0100
-Message-ID: <1746748.uPZFXamDiM@tachyon.chronox.de>
+Subject: [PATCH v2 01/20] crypto: prevent helper ciphers from being used
+Date: Fri, 27 Mar 2015 23:49:58 +0100
+Message-ID: <2386905.FFHjDQ6mFB@tachyon.chronox.de>
+References: <1746748.uPZFXamDiM@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: 'Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:46776 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932076AbbC0XFm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 27 Mar 2015 19:05:42 -0400
+In-Reply-To: <1746748.uPZFXamDiM@tachyon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi,
+Several hardware related cipher implementations are implemented as
+follows: a "helper" cipher implementation is registered with the
+kernel crypto API.
 
-Based on the discussion in the thread [1], a flag is added to the
-kernel crypto API to allow ciphers to be marked as internal.
+Such helper ciphers are never intended to be called by normal users. In
+some cases, calling them via the normal crypto API may even cause
+failures including kernel crashes. In a normal case, the "wrapping"
+ciphers that use the helpers ensure that these helpers are invoked
+such that they cannot cause any calamity.
 
-The patch set is tested in FIPS and non-FIPS mode. In addition,
-the enforcement that the helper cipher of __driver-gcm-aes-aesni
-cannot be loaded, but the wrapper of rfc4106-gcm-aesni can be used
-is tested to demonstrate that the patch works. The testing also shows
-that of__driver-gcm-aes-aesni is subject to the testmgr self test an
-can therefore be used in FIPS mode.
+Considering the AF_ALG user space interface, unprivileged users can
+call all ciphers registered with the crypto API, including these
+helper ciphers that are not intended to be called directly. That
+means, with AF_ALG user space may invoke these helper ciphers
+and may cause undefined states or side effects.
 
-All cipher implementation whose definition has a cra_priority of 0
-as well as the ciphers that are wrapped by cryptd and mcryptd
-are marked as internal ciphers to prevent them from being called by
-users.
+To avoid any potential side effects with such helpers, the patch
+prevents the helpers to be called directly. A new cipher type
+flag is added: CRYPTO_ALG_INTERNAL. This flag shall be used
+to mark helper ciphers. These ciphers can only be used if the
+caller invoke the cipher with CRYPTO_ALG_INTERNAL in the type and
+mask field.
 
-The testing also includes the invocation of normal crypto operations
-from user space via AF_ALG and libkcapi showing that all of them work
-unaffected.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/api.c           | 6 ++++++
+ include/linux/crypto.h | 6 ++++++
+ 2 files changed, 12 insertions(+)
 
-[1] http://comments.gmane.org/gmane.linux.kernel.cryptoapi/13705
-
-Changes v2:
-* Overhaul enforcement of the internal flag as suggested by Herbert:
-  a cipher marked as internal can only be invoked if the caller
-  instantiates it with the internal flag set in the type and mask
-  field.
-* The overhaul implies that cryptd and mcryptd instances are marked
-  as internal if the underlying cipher is marked as internal.
-* The overhaul implies that the testmgr must try to allocate a
-  cipher again with the internal flag in case the first allocation
-  failed with -ENOENT.
-* Mark internal cipher in arch/x86/crypto/sha-mb/sha1_mb.c.
-
-Stephan Mueller (20):
-  crypto: prevent helper ciphers from being used
-  crypto: testmgr to use CRYPTO_ALG_INTERNAL
-  crypto: cryptd to process CRYPTO_ALG_INTERNAL
-  crypto: /proc/crypto: identify internal ciphers
-  crypto: mark AES-NI helper ciphers
-  crypto: mark ghash clmulni helper ciphers
-  crypto: mark GHASH ARMv8 vmull.p64 helper ciphers
-  crypto: mark AES-NI Camellia helper ciphers
-  crypto: mark CAST5 helper ciphers
-  crypto: mark AVX Camellia helper ciphers
-  crypto: mark CAST6 helper ciphers
-  crypto: mark Serpent AVX2 helper ciphers
-  crypto: mark Serpent AVX helper ciphers
-  crypto: mark Serpent SSE2 helper ciphers
-  crypto: mark Twofish AVX helper ciphers
-  crypto: mark NEON bit sliced AES helper ciphers
-  crypto: mark ARMv8 AES helper ciphers
-  crypto: mark 64 bit ARMv8 AES helper ciphers
-  crypto: mcryptd to process CRYPTO_ALG_INTERNAL
-  crypto: mark Multi buffer SHA1 helper cipher
-
- arch/arm/crypto/aes-ce-glue.c              | 12 +++++---
- arch/arm/crypto/aesbs-glue.c               |  9 ++++--
- arch/arm/crypto/ghash-ce-glue.c            |  6 ++--
- arch/arm64/crypto/aes-glue.c               | 12 +++++---
- arch/x86/crypto/aesni-intel_glue.c         | 23 +++++++++-----
- arch/x86/crypto/camellia_aesni_avx2_glue.c | 15 ++++++---
- arch/x86/crypto/camellia_aesni_avx_glue.c  | 15 ++++++---
- arch/x86/crypto/cast5_avx_glue.c           |  9 ++++--
- arch/x86/crypto/cast6_avx_glue.c           | 15 ++++++---
- arch/x86/crypto/ghash-clmulni-intel_glue.c |  7 +++--
- arch/x86/crypto/serpent_avx2_glue.c        | 15 ++++++---
- arch/x86/crypto/serpent_avx_glue.c         | 15 ++++++---
- arch/x86/crypto/serpent_sse2_glue.c        | 15 ++++++---
- arch/x86/crypto/sha-mb/sha1_mb.c           |  7 +++--
- arch/x86/crypto/twofish_avx_glue.c         | 15 ++++++---
- crypto/ablk_helper.c                       |  3 +-
- crypto/api.c                               |  6 ++++
- crypto/cryptd.c                            | 49 +++++++++++++++++++++++++-----
- crypto/mcryptd.c                           | 25 +++++++++++++--
- crypto/proc.c                              |  3 ++
- crypto/testmgr.c                           | 22 ++++++++++++++
- include/linux/crypto.h                     |  6 ++++
- 22 files changed, 230 insertions(+), 74 deletions(-)
-
+diff --git a/crypto/api.c b/crypto/api.c
+index 2a81e98..e45d37a 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -257,6 +257,12 @@ struct crypto_alg *crypto_alg_mod_lookup(const char *name, u32 type, u32 mask)
+ 		mask |= CRYPTO_ALG_TESTED;
+ 	}
+ 
++	/*
++	 * If the internal flag is set for a cipher, require a caller to
++	 * to invoke the cipher with the internal flag to use that cipher.
++	 */
++	mask |= CRYPTO_ALG_INTERNAL;
++
+ 	larval = crypto_larval_lookup(name, type, mask);
+ 	if (IS_ERR(larval) || !crypto_is_larval(larval))
+ 		return larval;
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index fb5ef16..10df5d2 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -95,6 +95,12 @@
+ #define CRYPTO_ALG_KERN_DRIVER_ONLY	0x00001000
+ 
+ /*
++ * Mark a cipher as a service implementation only usable by another
++ * cipher and never by a normal user of the kernel crypto API
++ */
++#define CRYPTO_ALG_INTERNAL		0x00002000
++
++/*
+  * Transform masks and values (for crt_flags).
+  */
+ #define CRYPTO_TFM_REQ_MASK		0x000fff00
 -- 
 2.1.0
