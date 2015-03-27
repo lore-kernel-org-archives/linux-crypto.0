@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 15/20] crypto: mark Twofish AVX helper ciphers
-Date: Fri, 27 Mar 2015 23:58:38 +0100
-Message-ID: <2841739.EUoOT9A2qi@tachyon.chronox.de>
+Subject: [PATCH v2 20/20] crypto: mark Multi buffer SHA1 helper cipher
+Date: Sat, 28 Mar 2015 00:02:30 +0100
+Message-ID: <1904568.I4NK9lf4NM@tachyon.chronox.de>
 References: <1746748.uPZFXamDiM@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -13,67 +13,38 @@ In-Reply-To: <1746748.uPZFXamDiM@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Flag all Twofish AVX helper ciphers as internal ciphers to prevent
-them from being called by normal users.
+Flag all Multi buffer SHA1 helper ciphers as internal ciphers
+to prevent them from being called by normal users.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- arch/x86/crypto/twofish_avx_glue.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ arch/x86/crypto/sha-mb/sha1_mb.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/crypto/twofish_avx_glue.c b/arch/x86/crypto/twofish_avx_glue.c
-index 1ac531e..b5e2d56 100644
---- a/arch/x86/crypto/twofish_avx_glue.c
-+++ b/arch/x86/crypto/twofish_avx_glue.c
-@@ -340,7 +340,8 @@ static struct crypto_alg twofish_algs[10] = { {
- 	.cra_name		= "__ecb-twofish-avx",
- 	.cra_driver_name	= "__driver-ecb-twofish-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= TF_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct twofish_ctx),
- 	.cra_alignmask		= 0,
-@@ -359,7 +360,8 @@ static struct crypto_alg twofish_algs[10] = { {
- 	.cra_name		= "__cbc-twofish-avx",
- 	.cra_driver_name	= "__driver-cbc-twofish-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= TF_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct twofish_ctx),
- 	.cra_alignmask		= 0,
-@@ -378,7 +380,8 @@ static struct crypto_alg twofish_algs[10] = { {
- 	.cra_name		= "__ctr-twofish-avx",
- 	.cra_driver_name	= "__driver-ctr-twofish-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= 1,
- 	.cra_ctxsize		= sizeof(struct twofish_ctx),
- 	.cra_alignmask		= 0,
-@@ -398,7 +401,8 @@ static struct crypto_alg twofish_algs[10] = { {
- 	.cra_name		= "__lrw-twofish-avx",
- 	.cra_driver_name	= "__driver-lrw-twofish-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= TF_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct twofish_lrw_ctx),
- 	.cra_alignmask		= 0,
-@@ -421,7 +425,8 @@ static struct crypto_alg twofish_algs[10] = { {
- 	.cra_name		= "__xts-twofish-avx",
- 	.cra_driver_name	= "__driver-xts-twofish-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= TF_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct twofish_xts_ctx),
- 	.cra_alignmask		= 0,
+diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
+index 9414fd9..e510b1c 100644
+--- a/arch/x86/crypto/sha-mb/sha1_mb.c
++++ b/arch/x86/crypto/sha-mb/sha1_mb.c
+@@ -694,7 +694,8 @@ static struct shash_alg sha1_mb_shash_alg = {
+ 		 * use ASYNC flag as some buffers in multi-buffer
+ 		 * algo may not have completed before hashing thread sleep
+ 		 */
+-		.cra_flags	 = CRYPTO_ALG_TYPE_SHASH | CRYPTO_ALG_ASYNC,
++		.cra_flags	 = CRYPTO_ALG_TYPE_SHASH | CRYPTO_ALG_ASYNC |
++				   CRYPTO_ALG_INTERNAL,
+ 		.cra_blocksize	 = SHA1_BLOCK_SIZE,
+ 		.cra_module	 = THIS_MODULE,
+ 		.cra_list	 = LIST_HEAD_INIT(sha1_mb_shash_alg.base.cra_list),
+@@ -770,7 +771,9 @@ static int sha1_mb_async_init_tfm(struct crypto_tfm *tfm)
+ 	struct sha1_mb_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct mcryptd_hash_ctx *mctx;
+ 
+-	mcryptd_tfm = mcryptd_alloc_ahash("__intel_sha1-mb", 0, 0);
++	mcryptd_tfm = mcryptd_alloc_ahash("__intel_sha1-mb",
++					  CRYPTO_ALG_INTERNAL,
++					  CRYPTO_ALG_INTERNAL);
+ 	if (IS_ERR(mcryptd_tfm))
+ 		return PTR_ERR(mcryptd_tfm);
+ 	mctx = crypto_ahash_ctx(&mcryptd_tfm->base);
 -- 
 2.1.0
