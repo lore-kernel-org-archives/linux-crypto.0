@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 19/20] crypto: mcryptd to process CRYPTO_ALG_INTERNAL
-Date: Sat, 28 Mar 2015 00:01:32 +0100
-Message-ID: <3240728.vJTA2zCdgt@tachyon.chronox.de>
+Subject: [PATCH v2 04/20] crypto: /proc/crypto: identify internal ciphers
+Date: Fri, 27 Mar 2015 23:52:12 +0100
+Message-ID: <5494145.Bbqz8bIKd2@tachyon.chronox.de>
 References: <1746748.uPZFXamDiM@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -13,66 +13,29 @@ In-Reply-To: <1746748.uPZFXamDiM@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The mcryptd is used as a wrapper around internal ciphers. Therefore,
-the mcryptd must process the internal cipher by marking mcryptd as
-internal if the underlying cipher is an internal cipher.
+With ciphers that now cannot be accessed via the kernel crypto API,
+callers shall be able to identify the ciphers that are not callable. The
+/proc/crypto file is added a boolean field identifying that such
+internal ciphers.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/mcryptd.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+ crypto/proc.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/crypto/mcryptd.c b/crypto/mcryptd.c
-index a8e8704..fe5b495a 100644
---- a/crypto/mcryptd.c
-+++ b/crypto/mcryptd.c
-@@ -258,6 +258,20 @@ out_free_inst:
- 	goto out;
- }
+diff --git a/crypto/proc.c b/crypto/proc.c
+index 4a0a7aa..4ffe73b 100644
+--- a/crypto/proc.c
++++ b/crypto/proc.c
+@@ -89,6 +89,9 @@ static int c_show(struct seq_file *m, void *p)
+ 	seq_printf(m, "selftest     : %s\n",
+ 		   (alg->cra_flags & CRYPTO_ALG_TESTED) ?
+ 		   "passed" : "unknown");
++	seq_printf(m, "internal     : %s\n",
++		   (alg->cra_flags & CRYPTO_ALG_INTERNAL) ?
++		   "yes" : "no");
  
-+static inline void mcryptd_check_internal(struct rtattr **tb, u32 *type,
-+					  u32 *mask)
-+{
-+	struct crypto_attr_type *algt;
-+
-+	algt = crypto_get_attr_type(tb);
-+	if (IS_ERR(algt))
-+		return;
-+	if ((algt->type & CRYPTO_ALG_INTERNAL))
-+		*type |= CRYPTO_ALG_INTERNAL;
-+	if ((algt->mask & CRYPTO_ALG_INTERNAL))
-+		*mask |= CRYPTO_ALG_INTERNAL;
-+}
-+
- static int mcryptd_hash_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-@@ -480,9 +494,13 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
- 	struct ahash_instance *inst;
- 	struct shash_alg *salg;
- 	struct crypto_alg *alg;
-+	u32 type = 0;
-+	u32 mask = 0;
- 	int err;
- 
--	salg = shash_attr_alg(tb[1], 0, 0);
-+	mcryptd_check_internal(tb, &type, &mask);
-+
-+	salg = shash_attr_alg(tb[1], type, mask);
- 	if (IS_ERR(salg))
- 		return PTR_ERR(salg);
- 
-@@ -502,7 +520,10 @@ static int mcryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
- 	if (err)
- 		goto out_free_inst;
- 
--	inst->alg.halg.base.cra_flags = CRYPTO_ALG_ASYNC;
-+	type = CRYPTO_ALG_ASYNC;
-+	if (alg->cra_flags & CRYPTO_ALG_INTERNAL)
-+		type |= CRYPTO_ALG_INTERNAL;
-+	inst->alg.halg.base.cra_flags = type;
- 
- 	inst->alg.halg.digestsize = salg->digestsize;
- 	inst->alg.halg.base.cra_ctxsize = sizeof(struct mcryptd_hash_ctx);
+ 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
+ 		seq_printf(m, "type         : larval\n");
 -- 
 2.1.0
