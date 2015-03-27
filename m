@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 07/20] crypto: mark GHASH ARMv8 vmull.p64 helper ciphers
-Date: Fri, 27 Mar 2015 23:54 +0100
-Message-ID: <6866738.b3jUbsQeMA@tachyon.chronox.de>
+Subject: [PATCH v2 11/20] crypto: mark CAST6 helper ciphers
+Date: Fri, 27 Mar 2015 23:56:16 +0100
+Message-ID: <11899581.xTDIjvyDGg@tachyon.chronox.de>
 References: <1746748.uPZFXamDiM@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -13,37 +13,67 @@ In-Reply-To: <1746748.uPZFXamDiM@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Flag all GHASH ARMv8 vmull.p64 helper ciphers as internal ciphers
-to prevent them from being called by normal users.
+Flag all CAST6 helper ciphers as internal ciphers to prevent them
+from being called by normal users.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- arch/arm/crypto/ghash-ce-glue.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/x86/crypto/cast6_avx_glue.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
-index 8c959d1..03a39fe 100644
---- a/arch/arm/crypto/ghash-ce-glue.c
-+++ b/arch/arm/crypto/ghash-ce-glue.c
-@@ -141,7 +141,7 @@ static struct shash_alg ghash_alg = {
- 		.cra_name	= "ghash",
- 		.cra_driver_name = "__driver-ghash-ce",
- 		.cra_priority	= 0,
--		.cra_flags	= CRYPTO_ALG_TYPE_SHASH,
-+		.cra_flags	= CRYPTO_ALG_TYPE_SHASH | CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize	= GHASH_BLOCK_SIZE,
- 		.cra_ctxsize	= sizeof(struct ghash_key),
- 		.cra_module	= THIS_MODULE,
-@@ -248,7 +248,9 @@ static int ghash_async_init_tfm(struct crypto_tfm *tfm)
- 	struct cryptd_ahash *cryptd_tfm;
- 	struct ghash_async_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	cryptd_tfm = cryptd_alloc_ahash("__driver-ghash-ce", 0, 0);
-+	cryptd_tfm = cryptd_alloc_ahash("__driver-ghash-ce",
-+					CRYPTO_ALG_INTERNAL,
-+					CRYPTO_ALG_INTERNAL);
- 	if (IS_ERR(cryptd_tfm))
- 		return PTR_ERR(cryptd_tfm);
- 	ctx->cryptd_tfm = cryptd_tfm;
+diff --git a/arch/x86/crypto/cast6_avx_glue.c b/arch/x86/crypto/cast6_avx_glue.c
+index 0160f68..f448810 100644
+--- a/arch/x86/crypto/cast6_avx_glue.c
++++ b/arch/x86/crypto/cast6_avx_glue.c
+@@ -372,7 +372,8 @@ static struct crypto_alg cast6_algs[10] = { {
+ 	.cra_name		= "__ecb-cast6-avx",
+ 	.cra_driver_name	= "__driver-ecb-cast6-avx",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= CAST6_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct cast6_ctx),
+ 	.cra_alignmask		= 0,
+@@ -391,7 +392,8 @@ static struct crypto_alg cast6_algs[10] = { {
+ 	.cra_name		= "__cbc-cast6-avx",
+ 	.cra_driver_name	= "__driver-cbc-cast6-avx",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= CAST6_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct cast6_ctx),
+ 	.cra_alignmask		= 0,
+@@ -410,7 +412,8 @@ static struct crypto_alg cast6_algs[10] = { {
+ 	.cra_name		= "__ctr-cast6-avx",
+ 	.cra_driver_name	= "__driver-ctr-cast6-avx",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= 1,
+ 	.cra_ctxsize		= sizeof(struct cast6_ctx),
+ 	.cra_alignmask		= 0,
+@@ -430,7 +433,8 @@ static struct crypto_alg cast6_algs[10] = { {
+ 	.cra_name		= "__lrw-cast6-avx",
+ 	.cra_driver_name	= "__driver-lrw-cast6-avx",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= CAST6_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct cast6_lrw_ctx),
+ 	.cra_alignmask		= 0,
+@@ -453,7 +457,8 @@ static struct crypto_alg cast6_algs[10] = { {
+ 	.cra_name		= "__xts-cast6-avx",
+ 	.cra_driver_name	= "__driver-xts-cast6-avx",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= CAST6_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct cast6_xts_ctx),
+ 	.cra_alignmask		= 0,
 -- 
 2.1.0
