@@ -1,69 +1,3624 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 17/20] crypto: mark ARMv8 AES helper ciphers
-Date: Sat, 28 Mar 2015 00:00:02 +0100
-Message-ID: <2637531.YSkNFdGsKx@tachyon.chronox.de>
-References: <1746748.uPZFXamDiM@tachyon.chronox.de>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] crypto/arm: accelerated SHA-512 using ARM generic ASM and NEON
+Date: Sat, 28 Mar 2015 08:28:46 +0100
+Message-ID: <1427527726-25022-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: 'Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1746748.uPZFXamDiM@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: plagnioj@jcrosoft.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	samitolvanen@google.com, appro@openssl.org,
+	herbert@gondor.apana.org.au, jussi.kivilinna@iki.fi
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:38403 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751111AbbC1H3K (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 28 Mar 2015 03:29:10 -0400
+Received: by wibgn9 with SMTP id gn9so59000776wib.1
+        for <linux-crypto@vger.kernel.org>; Sat, 28 Mar 2015 00:29:08 -0700 (PDT)
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Flag all ARMv8 AES helper ciphers as internal ciphers to prevent
-them from being called by normal users.
+This updates the SHA-512 NEON module with the faster and more
+versatile implementation from the OpenSSL project. It consists
+of both a NEON and a generic ASM version of the core SHA-512
+transform, where the NEON version reverts to the ASM version
+when invoked in non-process context.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Performance relative to the generic implementation (measured
+using tcrypt.ko mode=3D306 sec=3D1 running on a Cortex-A57 under
+KVM):
+
+	input size	block size	asm	neon	old neon
+
+	16		16		1.39	2.54	2.21
+	64		16		1.32	2.33	2.09
+	64		64		1.38	2.53	2.19
+	256		16		1.31	2.28	2.06
+	256		64		1.38	2.54	2.25
+	256		256		1.40	2.77	2.39
+	1024		16		1.29	2.22	2.01
+	1024		256		1.40	2.82	2.45
+	1024		1024		1.41	2.93	2.53
+	2048		16		1.33	2.21	2.00
+	2048		256		1.40	2.84	2.46
+	2048		1024		1.41	2.96	2.55
+	2048		2048		1.41	2.98	2.56
+	4096		16		1.34	2.20	1.99
+	4096		256		1.40	2.84	2.46
+	4096		1024		1.41	2.97	2.56
+	4096		4096		1.41	3.01	2.58
+	8192		16		1.34	2.19	1.99
+	8192		256		1.40	2.85	2.47
+	8192		1024		1.41	2.98	2.56
+	8192		4096		1.41	2.71	2.59
+	8192		8192		1.51	3.51	2.69
+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/aes-ce-glue.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
-index d2ee591..b445a5d 100644
---- a/arch/arm/crypto/aes-ce-glue.c
-+++ b/arch/arm/crypto/aes-ce-glue.c
-@@ -354,7 +354,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__ecb-aes-ce",
- 	.cra_driver_name	= "__driver-ecb-aes-ce",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 	.cra_alignmask		= 7,
-@@ -372,7 +373,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__cbc-aes-ce",
- 	.cra_driver_name	= "__driver-cbc-aes-ce",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 	.cra_alignmask		= 7,
-@@ -390,7 +392,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__ctr-aes-ce",
- 	.cra_driver_name	= "__driver-ctr-aes-ce",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= 1,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 	.cra_alignmask		= 7,
-@@ -408,7 +411,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__xts-aes-ce",
- 	.cra_driver_name	= "__driver-xts-aes-ce",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_xts_ctx),
- 	.cra_alignmask		= 7,
--- 
-2.1.0
+This should get the same treatment as Sami's sha56 version: I would lik=
+e
+to wait until the OpenSSL source file hits the upstream repository so t=
+hat
+I can refer to its sha1 hash in the commit log.
+
+ arch/arm/crypto/Kconfig               |    2 -
+ arch/arm/crypto/Makefile              |    8 +-
+ arch/arm/crypto/sha512-armv4.pl       |  656 ++++++++++++
+ arch/arm/crypto/sha512-armv7-neon.S   |  455 ---------
+ arch/arm/crypto/sha512-core.S_shipped | 1814 +++++++++++++++++++++++++=
+++++++++
+ arch/arm/crypto/sha512.h              |   14 +
+ arch/arm/crypto/sha512_glue.c         |  255 +++++
+ arch/arm/crypto/sha512_neon_glue.c    |  155 +--
+ 8 files changed, 2762 insertions(+), 597 deletions(-)
+ create mode 100644 arch/arm/crypto/sha512-armv4.pl
+ delete mode 100644 arch/arm/crypto/sha512-armv7-neon.S
+ create mode 100644 arch/arm/crypto/sha512-core.S_shipped
+ create mode 100644 arch/arm/crypto/sha512.h
+ create mode 100644 arch/arm/crypto/sha512_glue.c
+
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index 458729d2ce22..846694ad2b7d 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -55,8 +55,6 @@ config CRYPTO_SHA256_ARM
+=20
+ config CRYPTO_SHA512_ARM_NEON
+ 	tristate "SHA384 and SHA512 digest algorithm (ARM NEON)"
+-	depends on KERNEL_MODE_NEON
+-	select CRYPTO_SHA512
+ 	select CRYPTO_HASH
+ 	help
+ 	  SHA-512 secure hash standard (DFIPS 180-2) implemented
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index ef46e898f98b..c0ed9b68fe12 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -19,7 +19,8 @@ sha1-arm-y	:=3D sha1-armv4-large.o sha1_glue.o
+ sha1-arm-neon-y	:=3D sha1-armv7-neon.o sha1_neon_glue.o
+ sha256-arm-neon-$(CONFIG_KERNEL_MODE_NEON) :=3D sha256_neon_glue.o
+ sha256-arm-y	:=3D sha256-core.o sha256_glue.o $(sha256-arm-neon-y)
+-sha512-arm-neon-y :=3D sha512-armv7-neon.o sha512_neon_glue.o
++sha512-arm-neon-$(CONFIG_KERNEL_MODE_NEON) :=3D sha512_neon_glue.o
++sha512-arm-neon-y :=3D sha512-core.o sha512_glue.o $(sha512-arm-neon-y=
+)
+ sha1-arm-ce-y	:=3D sha1-ce-core.o sha1-ce-glue.o
+ sha2-arm-ce-y	:=3D sha2-ce-core.o sha2-ce-glue.o
+ aes-arm-ce-y	:=3D aes-ce-core.o aes-ce-glue.o
+@@ -34,4 +35,7 @@ $(src)/aesbs-core.S_shipped: $(src)/bsaes-armv7.pl
+ $(src)/sha256-core.S_shipped: $(src)/sha256-armv4.pl
+ 	$(call cmd,perl)
+=20
+-.PRECIOUS: $(obj)/aesbs-core.S $(obj)/sha256-core.S
++$(src)/sha512-core.S_shipped: $(src)/sha512-armv4.pl
++	$(call cmd,perl)
++
++.PRECIOUS: $(obj)/aesbs-core.S $(obj)/sha256-core.S $(obj)/sha512-core=
+=2ES
+diff --git a/arch/arm/crypto/sha512-armv4.pl b/arch/arm/crypto/sha512-a=
+rmv4.pl
+new file mode 100644
+index 000000000000..7e540f8439da
+--- /dev/null
++++ b/arch/arm/crypto/sha512-armv4.pl
+@@ -0,0 +1,656 @@
++#!/usr/bin/env perl
++
++# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
++# project. The module is, however, dual licensed under OpenSSL and
++# CRYPTOGAMS licenses depending on where you obtain it. For further
++# details see http://www.openssl.org/~appro/cryptogams/.
++#
++# Permission to use under GPL terms is granted.
++# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++# SHA512 block procedure for ARMv4. September 2007.
++
++# This code is ~4.5 (four and a half) times faster than code generated
++# by gcc 3.4 and it spends ~72 clock cycles per byte [on single-issue
++# Xscale PXA250 core].
++#
++# July 2010.
++#
++# Rescheduling for dual-issue pipeline resulted in 6% improvement on
++# Cortex A8 core and ~40 cycles per processed byte.
++
++# February 2011.
++#
++# Profiler-assisted and platform-specific optimization resulted in 7%
++# improvement on Coxtex A8 core and ~38 cycles per byte.
++
++# March 2011.
++#
++# Add NEON implementation. On Cortex A8 it was measured to process
++# one byte in 23.3 cycles or ~60% faster than integer-only code.
++
++# August 2012.
++#
++# Improve NEON performance by 12% on Snapdragon S4. In absolute
++# terms it's 22.6 cycles per byte, which is disappointing result.
++# Technical writers asserted that 3-way S4 pipeline can sustain
++# multiple NEON instructions per cycle, but dual NEON issue could
++# not be observed, and for NEON-only sequences IPC(*) was found to
++# be limited by 1:-( 0.33 and 0.66 were measured for sequences with
++# ILPs(*) of 1 and 2 respectively. This in turn means that you can
++# even find yourself striving, as I did here, for achieving IPC
++# adequate to one delivered by Cortex A8 [for reference, it's
++# 0.5 for ILP of 1, and 1 for higher ILPs].
++#
++# (*) ILP, instruction-level parallelism, how many instructions
++#     *can* execute at the same time. IPC, instructions per cycle,
++#     indicates how many instructions actually execute.
++
++# Byte order [in]dependence. =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
++#
++# Originally caller was expected to maintain specific *dword* order in
++# h[0-7], namely with most significant dword at *lower* address, which
++# was reflected in below two parameters as 0 and 4. Now caller is
++# expected to maintain native byte order for whole 64-bit values.
++$hi=3D"HI";
++$lo=3D"LO";
++# =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++while (($output=3Dshift) && ($output!~/^\w[\w\-]*\.\w+$/)) {}
++open STDOUT,">$output";
++
++$ctx=3D"r0";	# parameter block
++$inp=3D"r1";
++$len=3D"r2";
++
++$Tlo=3D"r3";
++$Thi=3D"r4";
++$Alo=3D"r5";
++$Ahi=3D"r6";
++$Elo=3D"r7";
++$Ehi=3D"r8";
++$t0=3D"r9";
++$t1=3D"r10";
++$t2=3D"r11";
++$t3=3D"r12";
++############	r13 is stack pointer
++$Ktbl=3D"r14";
++############	r15 is program counter
++
++$Aoff=3D8*0;
++$Boff=3D8*1;
++$Coff=3D8*2;
++$Doff=3D8*3;
++$Eoff=3D8*4;
++$Foff=3D8*5;
++$Goff=3D8*6;
++$Hoff=3D8*7;
++$Xoff=3D8*8;
++
++sub BODY_00_15() {
++my $magic =3D shift;
++$code.=3D<<___;
++	@ Sigma1(x)	(ROTR((x),14) ^ ROTR((x),18)  ^ ROTR((x),41))
++	@ LO		lo>>14^hi<<18 ^ lo>>18^hi<<14 ^ hi>>9^lo<<23
++	@ HI		hi>>14^lo<<18 ^ hi>>18^lo<<14 ^ lo>>9^hi<<23
++	mov	$t0,$Elo,lsr#14
++	str	$Tlo,[sp,#$Xoff+0]
++	mov	$t1,$Ehi,lsr#14
++	str	$Thi,[sp,#$Xoff+4]
++	eor	$t0,$t0,$Ehi,lsl#18
++	ldr	$t2,[sp,#$Hoff+0]	@ h.lo
++	eor	$t1,$t1,$Elo,lsl#18
++	ldr	$t3,[sp,#$Hoff+4]	@ h.hi
++	eor	$t0,$t0,$Elo,lsr#18
++	eor	$t1,$t1,$Ehi,lsr#18
++	eor	$t0,$t0,$Ehi,lsl#14
++	eor	$t1,$t1,$Elo,lsl#14
++	eor	$t0,$t0,$Ehi,lsr#9
++	eor	$t1,$t1,$Elo,lsr#9
++	eor	$t0,$t0,$Elo,lsl#23
++	eor	$t1,$t1,$Ehi,lsl#23	@ Sigma1(e)
++	adds	$Tlo,$Tlo,$t0
++	ldr	$t0,[sp,#$Foff+0]	@ f.lo
++	adc	$Thi,$Thi,$t1		@ T +=3D Sigma1(e)
++	ldr	$t1,[sp,#$Foff+4]	@ f.hi
++	adds	$Tlo,$Tlo,$t2
++	ldr	$t2,[sp,#$Goff+0]	@ g.lo
++	adc	$Thi,$Thi,$t3		@ T +=3D h
++	ldr	$t3,[sp,#$Goff+4]	@ g.hi
++
++	eor	$t0,$t0,$t2
++	str	$Elo,[sp,#$Eoff+0]
++	eor	$t1,$t1,$t3
++	str	$Ehi,[sp,#$Eoff+4]
++	and	$t0,$t0,$Elo
++	str	$Alo,[sp,#$Aoff+0]
++	and	$t1,$t1,$Ehi
++	str	$Ahi,[sp,#$Aoff+4]
++	eor	$t0,$t0,$t2
++	ldr	$t2,[$Ktbl,#$lo]	@ K[i].lo
++	eor	$t1,$t1,$t3		@ Ch(e,f,g)
++	ldr	$t3,[$Ktbl,#$hi]	@ K[i].hi
++
++	adds	$Tlo,$Tlo,$t0
++	ldr	$Elo,[sp,#$Doff+0]	@ d.lo
++	adc	$Thi,$Thi,$t1		@ T +=3D Ch(e,f,g)
++	ldr	$Ehi,[sp,#$Doff+4]	@ d.hi
++	adds	$Tlo,$Tlo,$t2
++	and	$t0,$t2,#0xff
++	adc	$Thi,$Thi,$t3		@ T +=3D K[i]
++	adds	$Elo,$Elo,$Tlo
++	ldr	$t2,[sp,#$Boff+0]	@ b.lo
++	adc	$Ehi,$Ehi,$Thi		@ d +=3D T
++	teq	$t0,#$magic
++
++	ldr	$t3,[sp,#$Coff+0]	@ c.lo
++#if __ARM_ARCH__>=3D7
++	it	eq			@ Thumb2 thing, sanity check in ARM
++#endif
++	orreq	$Ktbl,$Ktbl,#1
++	@ Sigma0(x)	(ROTR((x),28) ^ ROTR((x),34) ^ ROTR((x),39))
++	@ LO		lo>>28^hi<<4  ^ hi>>2^lo<<30 ^ hi>>7^lo<<25
++	@ HI		hi>>28^lo<<4  ^ lo>>2^hi<<30 ^ lo>>7^hi<<25
++	mov	$t0,$Alo,lsr#28
++	mov	$t1,$Ahi,lsr#28
++	eor	$t0,$t0,$Ahi,lsl#4
++	eor	$t1,$t1,$Alo,lsl#4
++	eor	$t0,$t0,$Ahi,lsr#2
++	eor	$t1,$t1,$Alo,lsr#2
++	eor	$t0,$t0,$Alo,lsl#30
++	eor	$t1,$t1,$Ahi,lsl#30
++	eor	$t0,$t0,$Ahi,lsr#7
++	eor	$t1,$t1,$Alo,lsr#7
++	eor	$t0,$t0,$Alo,lsl#25
++	eor	$t1,$t1,$Ahi,lsl#25	@ Sigma0(a)
++	adds	$Tlo,$Tlo,$t0
++	and	$t0,$Alo,$t2
++	adc	$Thi,$Thi,$t1		@ T +=3D Sigma0(a)
++
++	ldr	$t1,[sp,#$Boff+4]	@ b.hi
++	orr	$Alo,$Alo,$t2
++	ldr	$t2,[sp,#$Coff+4]	@ c.hi
++	and	$Alo,$Alo,$t3
++	and	$t3,$Ahi,$t1
++	orr	$Ahi,$Ahi,$t1
++	orr	$Alo,$Alo,$t0		@ Maj(a,b,c).lo
++	and	$Ahi,$Ahi,$t2
++	adds	$Alo,$Alo,$Tlo
++	orr	$Ahi,$Ahi,$t3		@ Maj(a,b,c).hi
++	sub	sp,sp,#8
++	adc	$Ahi,$Ahi,$Thi		@ h +=3D T
++	tst	$Ktbl,#1
++	add	$Ktbl,$Ktbl,#8
++___
++}
++$code=3D<<___;
++#ifndef __KERNEL__
++# include "arm_arch.h"
++# define VFP_ABI_PUSH	vstmdb	sp!,{d8-d15}
++# define VFP_ABI_POP	vldmia	sp!,{d8-d15}
++#else
++# define __ARM_ARCH__ __LINUX_ARM_ARCH__
++# define __ARM_MAX_ARCH__ 7
++# define VFP_ABI_PUSH
++# define VFP_ABI_POP
++#endif
++
++#ifdef __ARMEL__
++# define LO 0
++# define HI 4
++# define WORD64(hi0,lo0,hi1,lo1)	.word	lo0,hi0, lo1,hi1
++#else
++# define HI 0
++# define LO 4
++# define WORD64(hi0,lo0,hi1,lo1)	.word	hi0,lo0, hi1,lo1
++#endif
++
++.text
++#if __ARM_ARCH__<7
++.code	32
++#else
++.syntax unified
++# ifdef __thumb2__
++#  define adrl adr
++.thumb
++# else
++.code   32
++# endif
++#endif
++
++.type	K512,%object
++.align	5
++K512:
++WORD64(0x428a2f98,0xd728ae22, 0x71374491,0x23ef65cd)
++WORD64(0xb5c0fbcf,0xec4d3b2f, 0xe9b5dba5,0x8189dbbc)
++WORD64(0x3956c25b,0xf348b538, 0x59f111f1,0xb605d019)
++WORD64(0x923f82a4,0xaf194f9b, 0xab1c5ed5,0xda6d8118)
++WORD64(0xd807aa98,0xa3030242, 0x12835b01,0x45706fbe)
++WORD64(0x243185be,0x4ee4b28c, 0x550c7dc3,0xd5ffb4e2)
++WORD64(0x72be5d74,0xf27b896f, 0x80deb1fe,0x3b1696b1)
++WORD64(0x9bdc06a7,0x25c71235, 0xc19bf174,0xcf692694)
++WORD64(0xe49b69c1,0x9ef14ad2, 0xefbe4786,0x384f25e3)
++WORD64(0x0fc19dc6,0x8b8cd5b5, 0x240ca1cc,0x77ac9c65)
++WORD64(0x2de92c6f,0x592b0275, 0x4a7484aa,0x6ea6e483)
++WORD64(0x5cb0a9dc,0xbd41fbd4, 0x76f988da,0x831153b5)
++WORD64(0x983e5152,0xee66dfab, 0xa831c66d,0x2db43210)
++WORD64(0xb00327c8,0x98fb213f, 0xbf597fc7,0xbeef0ee4)
++WORD64(0xc6e00bf3,0x3da88fc2, 0xd5a79147,0x930aa725)
++WORD64(0x06ca6351,0xe003826f, 0x14292967,0x0a0e6e70)
++WORD64(0x27b70a85,0x46d22ffc, 0x2e1b2138,0x5c26c926)
++WORD64(0x4d2c6dfc,0x5ac42aed, 0x53380d13,0x9d95b3df)
++WORD64(0x650a7354,0x8baf63de, 0x766a0abb,0x3c77b2a8)
++WORD64(0x81c2c92e,0x47edaee6, 0x92722c85,0x1482353b)
++WORD64(0xa2bfe8a1,0x4cf10364, 0xa81a664b,0xbc423001)
++WORD64(0xc24b8b70,0xd0f89791, 0xc76c51a3,0x0654be30)
++WORD64(0xd192e819,0xd6ef5218, 0xd6990624,0x5565a910)
++WORD64(0xf40e3585,0x5771202a, 0x106aa070,0x32bbd1b8)
++WORD64(0x19a4c116,0xb8d2d0c8, 0x1e376c08,0x5141ab53)
++WORD64(0x2748774c,0xdf8eeb99, 0x34b0bcb5,0xe19b48a8)
++WORD64(0x391c0cb3,0xc5c95a63, 0x4ed8aa4a,0xe3418acb)
++WORD64(0x5b9cca4f,0x7763e373, 0x682e6ff3,0xd6b2b8a3)
++WORD64(0x748f82ee,0x5defb2fc, 0x78a5636f,0x43172f60)
++WORD64(0x84c87814,0xa1f0ab72, 0x8cc70208,0x1a6439ec)
++WORD64(0x90befffa,0x23631e28, 0xa4506ceb,0xde82bde9)
++WORD64(0xbef9a3f7,0xb2c67915, 0xc67178f2,0xe372532b)
++WORD64(0xca273ece,0xea26619c, 0xd186b8c7,0x21c0c207)
++WORD64(0xeada7dd6,0xcde0eb1e, 0xf57d4f7f,0xee6ed178)
++WORD64(0x06f067aa,0x72176fba, 0x0a637dc5,0xa2c898a6)
++WORD64(0x113f9804,0xbef90dae, 0x1b710b35,0x131c471b)
++WORD64(0x28db77f5,0x23047d84, 0x32caab7b,0x40c72493)
++WORD64(0x3c9ebe0a,0x15c9bebc, 0x431d67c4,0x9c100d4c)
++WORD64(0x4cc5d4be,0xcb3e42b6, 0x597f299c,0xfc657e2a)
++WORD64(0x5fcb6fab,0x3ad6faec, 0x6c44198c,0x4a475817)
++.size	K512,.-K512
++#if __ARM_MAX_ARCH__>=3D7 && !defined(__KERNEL__)
++.LOPENSSL_armcap:
++.word	OPENSSL_armcap_P-sha512_block_data_order
++.skip	32-4
++#else
++.skip	32
++#endif
++
++.global	sha512_block_data_order
++.type	sha512_block_data_order,%function
++sha512_block_data_order:
++#if __ARM_ARCH__<7
++	sub	r3,pc,#8		@ sha512_block_data_order
++#else
++	adr	r3,sha512_block_data_order
++#endif
++#if __ARM_MAX_ARCH__>=3D7 && !defined(__KERNEL__)
++	ldr	r12,.LOPENSSL_armcap
++	ldr	r12,[r3,r12]		@ OPENSSL_armcap_P
++	tst	r12,#1
++	bne	.LNEON
++#endif
++	add	$len,$inp,$len,lsl#7	@ len to point at the end of inp
++	stmdb	sp!,{r4-r12,lr}
++	sub	$Ktbl,r3,#672		@ K512
++	sub	sp,sp,#9*8
++
++	ldr	$Elo,[$ctx,#$Eoff+$lo]
++	ldr	$Ehi,[$ctx,#$Eoff+$hi]
++	ldr	$t0, [$ctx,#$Goff+$lo]
++	ldr	$t1, [$ctx,#$Goff+$hi]
++	ldr	$t2, [$ctx,#$Hoff+$lo]
++	ldr	$t3, [$ctx,#$Hoff+$hi]
++.Loop:
++	str	$t0, [sp,#$Goff+0]
++	str	$t1, [sp,#$Goff+4]
++	str	$t2, [sp,#$Hoff+0]
++	str	$t3, [sp,#$Hoff+4]
++	ldr	$Alo,[$ctx,#$Aoff+$lo]
++	ldr	$Ahi,[$ctx,#$Aoff+$hi]
++	ldr	$Tlo,[$ctx,#$Boff+$lo]
++	ldr	$Thi,[$ctx,#$Boff+$hi]
++	ldr	$t0, [$ctx,#$Coff+$lo]
++	ldr	$t1, [$ctx,#$Coff+$hi]
++	ldr	$t2, [$ctx,#$Doff+$lo]
++	ldr	$t3, [$ctx,#$Doff+$hi]
++	str	$Tlo,[sp,#$Boff+0]
++	str	$Thi,[sp,#$Boff+4]
++	str	$t0, [sp,#$Coff+0]
++	str	$t1, [sp,#$Coff+4]
++	str	$t2, [sp,#$Doff+0]
++	str	$t3, [sp,#$Doff+4]
++	ldr	$Tlo,[$ctx,#$Foff+$lo]
++	ldr	$Thi,[$ctx,#$Foff+$hi]
++	str	$Tlo,[sp,#$Foff+0]
++	str	$Thi,[sp,#$Foff+4]
++
++.L00_15:
++#if __ARM_ARCH__<7
++	ldrb	$Tlo,[$inp,#7]
++	ldrb	$t0, [$inp,#6]
++	ldrb	$t1, [$inp,#5]
++	ldrb	$t2, [$inp,#4]
++	ldrb	$Thi,[$inp,#3]
++	ldrb	$t3, [$inp,#2]
++	orr	$Tlo,$Tlo,$t0,lsl#8
++	ldrb	$t0, [$inp,#1]
++	orr	$Tlo,$Tlo,$t1,lsl#16
++	ldrb	$t1, [$inp],#8
++	orr	$Tlo,$Tlo,$t2,lsl#24
++	orr	$Thi,$Thi,$t3,lsl#8
++	orr	$Thi,$Thi,$t0,lsl#16
++	orr	$Thi,$Thi,$t1,lsl#24
++#else
++	ldr	$Tlo,[$inp,#4]
++	ldr	$Thi,[$inp],#8
++#ifdef __ARMEL__
++	rev	$Tlo,$Tlo
++	rev	$Thi,$Thi
++#endif
++#endif
++___
++	&BODY_00_15(0x94);
++$code.=3D<<___;
++	tst	$Ktbl,#1
++	beq	.L00_15
++	ldr	$t0,[sp,#`$Xoff+8*(16-1)`+0]
++	ldr	$t1,[sp,#`$Xoff+8*(16-1)`+4]
++	bic	$Ktbl,$Ktbl,#1
++.L16_79:
++	@ sigma0(x)	(ROTR((x),1)  ^ ROTR((x),8)  ^ ((x)>>7))
++	@ LO		lo>>1^hi<<31  ^ lo>>8^hi<<24 ^ lo>>7^hi<<25
++	@ HI		hi>>1^lo<<31  ^ hi>>8^lo<<24 ^ hi>>7
++	mov	$Tlo,$t0,lsr#1
++	ldr	$t2,[sp,#`$Xoff+8*(16-14)`+0]
++	mov	$Thi,$t1,lsr#1
++	ldr	$t3,[sp,#`$Xoff+8*(16-14)`+4]
++	eor	$Tlo,$Tlo,$t1,lsl#31
++	eor	$Thi,$Thi,$t0,lsl#31
++	eor	$Tlo,$Tlo,$t0,lsr#8
++	eor	$Thi,$Thi,$t1,lsr#8
++	eor	$Tlo,$Tlo,$t1,lsl#24
++	eor	$Thi,$Thi,$t0,lsl#24
++	eor	$Tlo,$Tlo,$t0,lsr#7
++	eor	$Thi,$Thi,$t1,lsr#7
++	eor	$Tlo,$Tlo,$t1,lsl#25
++
++	@ sigma1(x)	(ROTR((x),19) ^ ROTR((x),61) ^ ((x)>>6))
++	@ LO		lo>>19^hi<<13 ^ hi>>29^lo<<3 ^ lo>>6^hi<<26
++	@ HI		hi>>19^lo<<13 ^ lo>>29^hi<<3 ^ hi>>6
++	mov	$t0,$t2,lsr#19
++	mov	$t1,$t3,lsr#19
++	eor	$t0,$t0,$t3,lsl#13
++	eor	$t1,$t1,$t2,lsl#13
++	eor	$t0,$t0,$t3,lsr#29
++	eor	$t1,$t1,$t2,lsr#29
++	eor	$t0,$t0,$t2,lsl#3
++	eor	$t1,$t1,$t3,lsl#3
++	eor	$t0,$t0,$t2,lsr#6
++	eor	$t1,$t1,$t3,lsr#6
++	ldr	$t2,[sp,#`$Xoff+8*(16-9)`+0]
++	eor	$t0,$t0,$t3,lsl#26
++
++	ldr	$t3,[sp,#`$Xoff+8*(16-9)`+4]
++	adds	$Tlo,$Tlo,$t0
++	ldr	$t0,[sp,#`$Xoff+8*16`+0]
++	adc	$Thi,$Thi,$t1
++
++	ldr	$t1,[sp,#`$Xoff+8*16`+4]
++	adds	$Tlo,$Tlo,$t2
++	adc	$Thi,$Thi,$t3
++	adds	$Tlo,$Tlo,$t0
++	adc	$Thi,$Thi,$t1
++___
++	&BODY_00_15(0x17);
++$code.=3D<<___;
++#if __ARM_ARCH__>=3D7
++	ittt	eq			@ Thumb2 thing, sanity check in ARM
++#endif
++	ldreq	$t0,[sp,#`$Xoff+8*(16-1)`+0]
++	ldreq	$t1,[sp,#`$Xoff+8*(16-1)`+4]
++	beq	.L16_79
++	bic	$Ktbl,$Ktbl,#1
++
++	ldr	$Tlo,[sp,#$Boff+0]
++	ldr	$Thi,[sp,#$Boff+4]
++	ldr	$t0, [$ctx,#$Aoff+$lo]
++	ldr	$t1, [$ctx,#$Aoff+$hi]
++	ldr	$t2, [$ctx,#$Boff+$lo]
++	ldr	$t3, [$ctx,#$Boff+$hi]
++	adds	$t0,$Alo,$t0
++	str	$t0, [$ctx,#$Aoff+$lo]
++	adc	$t1,$Ahi,$t1
++	str	$t1, [$ctx,#$Aoff+$hi]
++	adds	$t2,$Tlo,$t2
++	str	$t2, [$ctx,#$Boff+$lo]
++	adc	$t3,$Thi,$t3
++	str	$t3, [$ctx,#$Boff+$hi]
++
++	ldr	$Alo,[sp,#$Coff+0]
++	ldr	$Ahi,[sp,#$Coff+4]
++	ldr	$Tlo,[sp,#$Doff+0]
++	ldr	$Thi,[sp,#$Doff+4]
++	ldr	$t0, [$ctx,#$Coff+$lo]
++	ldr	$t1, [$ctx,#$Coff+$hi]
++	ldr	$t2, [$ctx,#$Doff+$lo]
++	ldr	$t3, [$ctx,#$Doff+$hi]
++	adds	$t0,$Alo,$t0
++	str	$t0, [$ctx,#$Coff+$lo]
++	adc	$t1,$Ahi,$t1
++	str	$t1, [$ctx,#$Coff+$hi]
++	adds	$t2,$Tlo,$t2
++	str	$t2, [$ctx,#$Doff+$lo]
++	adc	$t3,$Thi,$t3
++	str	$t3, [$ctx,#$Doff+$hi]
++
++	ldr	$Tlo,[sp,#$Foff+0]
++	ldr	$Thi,[sp,#$Foff+4]
++	ldr	$t0, [$ctx,#$Eoff+$lo]
++	ldr	$t1, [$ctx,#$Eoff+$hi]
++	ldr	$t2, [$ctx,#$Foff+$lo]
++	ldr	$t3, [$ctx,#$Foff+$hi]
++	adds	$Elo,$Elo,$t0
++	str	$Elo,[$ctx,#$Eoff+$lo]
++	adc	$Ehi,$Ehi,$t1
++	str	$Ehi,[$ctx,#$Eoff+$hi]
++	adds	$t2,$Tlo,$t2
++	str	$t2, [$ctx,#$Foff+$lo]
++	adc	$t3,$Thi,$t3
++	str	$t3, [$ctx,#$Foff+$hi]
++
++	ldr	$Alo,[sp,#$Goff+0]
++	ldr	$Ahi,[sp,#$Goff+4]
++	ldr	$Tlo,[sp,#$Hoff+0]
++	ldr	$Thi,[sp,#$Hoff+4]
++	ldr	$t0, [$ctx,#$Goff+$lo]
++	ldr	$t1, [$ctx,#$Goff+$hi]
++	ldr	$t2, [$ctx,#$Hoff+$lo]
++	ldr	$t3, [$ctx,#$Hoff+$hi]
++	adds	$t0,$Alo,$t0
++	str	$t0, [$ctx,#$Goff+$lo]
++	adc	$t1,$Ahi,$t1
++	str	$t1, [$ctx,#$Goff+$hi]
++	adds	$t2,$Tlo,$t2
++	str	$t2, [$ctx,#$Hoff+$lo]
++	adc	$t3,$Thi,$t3
++	str	$t3, [$ctx,#$Hoff+$hi]
++
++	add	sp,sp,#640
++	sub	$Ktbl,$Ktbl,#640
++
++	teq	$inp,$len
++	bne	.Loop
++
++	add	sp,sp,#8*9		@ destroy frame
++#if __ARM_ARCH__>=3D5
++	ldmia	sp!,{r4-r12,pc}
++#else
++	ldmia	sp!,{r4-r12,lr}
++	tst	lr,#1
++	moveq	pc,lr			@ be binary compatible with V4, yet
++	bx	lr			@ interoperable with Thumb ISA:-)
++#endif
++.size	sha512_block_data_order,.-sha512_block_data_order
++___
++
++{
++my @Sigma0=3D(28,34,39);
++my @Sigma1=3D(14,18,41);
++my @sigma0=3D(1, 8, 7);
++my @sigma1=3D(19,61,6);
++
++my $Ktbl=3D"r3";
++my $cnt=3D"r12";	# volatile register known as ip, intra-procedure-call=
+ scratch
++
++my @X=3Dmap("d$_",(0..15));
++my @V=3D($A,$B,$C,$D,$E,$F,$G,$H)=3Dmap("d$_",(16..23));
++
++sub NEON_00_15() {
++my $i=3Dshift;
++my ($a,$b,$c,$d,$e,$f,$g,$h)=3D@_;
++my ($t0,$t1,$t2,$T1,$K,$Ch,$Maj)=3Dmap("d$_",(24..31));	# temps
++
++$code.=3D<<___ if ($i<16 || $i&1);
++	vshr.u64	$t0,$e,#@Sigma1[0]	@ $i
++#if $i<16
++	vld1.64		{@X[$i%16]},[$inp]!	@ handles unaligned
++#endif
++	vshr.u64	$t1,$e,#@Sigma1[1]
++#if $i>0
++	 vadd.i64	$a,$Maj			@ h+=3DMaj from the past
++#endif
++	vshr.u64	$t2,$e,#@Sigma1[2]
++___
++$code.=3D<<___;
++	vld1.64		{$K},[$Ktbl,:64]!	@ K[i++]
++	vsli.64		$t0,$e,#`64-@Sigma1[0]`
++	vsli.64		$t1,$e,#`64-@Sigma1[1]`
++	vmov		$Ch,$e
++	vsli.64		$t2,$e,#`64-@Sigma1[2]`
++#if $i<16 && defined(__ARMEL__)
++	vrev64.8	@X[$i],@X[$i]
++#endif
++	veor		$t1,$t0
++	vbsl		$Ch,$f,$g		@ Ch(e,f,g)
++	vshr.u64	$t0,$a,#@Sigma0[0]
++	veor		$t2,$t1			@ Sigma1(e)
++	vadd.i64	$T1,$Ch,$h
++	vshr.u64	$t1,$a,#@Sigma0[1]
++	vsli.64		$t0,$a,#`64-@Sigma0[0]`
++	vadd.i64	$T1,$t2
++	vshr.u64	$t2,$a,#@Sigma0[2]
++	vadd.i64	$K,@X[$i%16]
++	vsli.64		$t1,$a,#`64-@Sigma0[1]`
++	veor		$Maj,$a,$b
++	vsli.64		$t2,$a,#`64-@Sigma0[2]`
++	veor		$h,$t0,$t1
++	vadd.i64	$T1,$K
++	vbsl		$Maj,$c,$b		@ Maj(a,b,c)
++	veor		$h,$t2			@ Sigma0(a)
++	vadd.i64	$d,$T1
++	vadd.i64	$Maj,$T1
++	@ vadd.i64	$h,$Maj
++___
++}
++
++sub NEON_16_79() {
++my $i=3Dshift;
++
++if ($i&1)	{ &NEON_00_15($i,@_); return; }
++
++# 2x-vectorized, therefore runs every 2nd round
++my @X=3Dmap("q$_",(0..7));			# view @X as 128-bit vector
++my ($t0,$t1,$s0,$s1) =3D map("q$_",(12..15));	# temps
++my ($d0,$d1,$d2) =3D map("d$_",(24..26));		# temps from NEON_00_15
++my $e=3D@_[4];					# $e from NEON_00_15
++$i /=3D 2;
++$code.=3D<<___;
++	vshr.u64	$t0,@X[($i+7)%8],#@sigma1[0]
++	vshr.u64	$t1,@X[($i+7)%8],#@sigma1[1]
++	 vadd.i64	@_[0],d30			@ h+=3DMaj from the past
++	vshr.u64	$s1,@X[($i+7)%8],#@sigma1[2]
++	vsli.64		$t0,@X[($i+7)%8],#`64-@sigma1[0]`
++	vext.8		$s0,@X[$i%8],@X[($i+1)%8],#8	@ X[i+1]
++	vsli.64		$t1,@X[($i+7)%8],#`64-@sigma1[1]`
++	veor		$s1,$t0
++	vshr.u64	$t0,$s0,#@sigma0[0]
++	veor		$s1,$t1				@ sigma1(X[i+14])
++	vshr.u64	$t1,$s0,#@sigma0[1]
++	vadd.i64	@X[$i%8],$s1
++	vshr.u64	$s1,$s0,#@sigma0[2]
++	vsli.64		$t0,$s0,#`64-@sigma0[0]`
++	vsli.64		$t1,$s0,#`64-@sigma0[1]`
++	vext.8		$s0,@X[($i+4)%8],@X[($i+5)%8],#8	@ X[i+9]
++	veor		$s1,$t0
++	vshr.u64	$d0,$e,#@Sigma1[0]		@ from NEON_00_15
++	vadd.i64	@X[$i%8],$s0
++	vshr.u64	$d1,$e,#@Sigma1[1]		@ from NEON_00_15
++	veor		$s1,$t1				@ sigma0(X[i+1])
++	vshr.u64	$d2,$e,#@Sigma1[2]		@ from NEON_00_15
++	vadd.i64	@X[$i%8],$s1
++___
++	&NEON_00_15(2*$i,@_);
++}
++
++$code.=3D<<___;
++#if __ARM_MAX_ARCH__>=3D7
++.arch	armv7-a
++.fpu	neon
++
++.global	sha512_block_data_order_neon
++.type	sha512_block_data_order_neon,%function
++.align	4
++sha512_block_data_order_neon:
++.LNEON:
++	dmb				@ errata #451034 on early Cortex A8
++	add	$len,$inp,$len,lsl#7	@ len to point at the end of inp
++	VFP_ABI_PUSH
++	adrl	$Ktbl,K512
++	vldmia	$ctx,{$A-$H}		@ load context
++.Loop_neon:
++___
++for($i=3D0;$i<16;$i++)	{ &NEON_00_15($i,@V); unshift(@V,pop(@V)); }
++$code.=3D<<___;
++	mov		$cnt,#4
++.L16_79_neon:
++	subs		$cnt,#1
++___
++for(;$i<32;$i++)	{ &NEON_16_79($i,@V); unshift(@V,pop(@V)); }
++$code.=3D<<___;
++	bne		.L16_79_neon
++
++	 vadd.i64	$A,d30		@ h+=3DMaj from the past
++	vldmia		$ctx,{d24-d31}	@ load context to temp
++	vadd.i64	q8,q12		@ vectorized accumulate
++	vadd.i64	q9,q13
++	vadd.i64	q10,q14
++	vadd.i64	q11,q15
++	vstmia		$ctx,{$A-$H}	@ save context
++	teq		$inp,$len
++	sub		$Ktbl,#640	@ rewind K512
++	bne		.Loop_neon
++
++	VFP_ABI_POP
++	ret				@ bx lr
++.size	sha512_block_data_order_neon,.-sha512_block_data_order_neon
++#endif
++___
++}
++$code.=3D<<___;
++.asciz	"SHA512 block transform for ARMv4/NEON, CRYPTOGAMS by <appro\@o=
+penssl.org>"
++.align	2
++#if __ARM_MAX_ARCH__>=3D7 && !defined(__KERNEL__)
++.comm	OPENSSL_armcap_P,4,4
++#endif
++___
++
++$code =3D~ s/\`([^\`]*)\`/eval $1/gem;
++$code =3D~ s/\bbx\s+lr\b/.word\t0xe12fff1e/gm;	# make it possible to c=
+ompile with -march=3Darmv4
++$code =3D~ s/\bret\b/bx	lr/gm;
++
++open SELF,$0;
++while(<SELF>) {
++	next if (/^#!/);
++	last if (!s/^#/@/ and !/^$/);
++	print;
++}
++close SELF;
++
++print $code;
++close STDOUT; # enforce flush
+diff --git a/arch/arm/crypto/sha512-armv7-neon.S b/arch/arm/crypto/sha5=
+12-armv7-neon.S
+deleted file mode 100644
+index fe99472e507c..000000000000
+--- a/arch/arm/crypto/sha512-armv7-neon.S
++++ /dev/null
+@@ -1,455 +0,0 @@
+-/* sha512-armv7-neon.S  -  ARM/NEON assembly implementation of SHA-512=
+ transform
+- *
+- * Copyright =C2=A9 2013-2014 Jussi Kivilinna <jussi.kivilinna@iki.fi>
+- *
+- * This program is free software; you can redistribute it and/or modif=
+y it
+- * under the terms of the GNU General Public License as published by t=
+he Free
+- * Software Foundation; either version 2 of the License, or (at your o=
+ption)
+- * any later version.
+- */
+-
+-#include <linux/linkage.h>
+-
+-
+-.syntax unified
+-.code   32
+-.fpu neon
+-
+-.text
+-
+-/* structure of SHA512_CONTEXT */
+-#define hd_a 0
+-#define hd_b ((hd_a) + 8)
+-#define hd_c ((hd_b) + 8)
+-#define hd_d ((hd_c) + 8)
+-#define hd_e ((hd_d) + 8)
+-#define hd_f ((hd_e) + 8)
+-#define hd_g ((hd_f) + 8)
+-
+-/* register macros */
+-#define RK %r2
+-
+-#define RA d0
+-#define RB d1
+-#define RC d2
+-#define RD d3
+-#define RE d4
+-#define RF d5
+-#define RG d6
+-#define RH d7
+-
+-#define RT0 d8
+-#define RT1 d9
+-#define RT2 d10
+-#define RT3 d11
+-#define RT4 d12
+-#define RT5 d13
+-#define RT6 d14
+-#define RT7 d15
+-
+-#define RT01q q4
+-#define RT23q q5
+-#define RT45q q6
+-#define RT67q q7
+-
+-#define RW0 d16
+-#define RW1 d17
+-#define RW2 d18
+-#define RW3 d19
+-#define RW4 d20
+-#define RW5 d21
+-#define RW6 d22
+-#define RW7 d23
+-#define RW8 d24
+-#define RW9 d25
+-#define RW10 d26
+-#define RW11 d27
+-#define RW12 d28
+-#define RW13 d29
+-#define RW14 d30
+-#define RW15 d31
+-
+-#define RW01q q8
+-#define RW23q q9
+-#define RW45q q10
+-#define RW67q q11
+-#define RW89q q12
+-#define RW1011q q13
+-#define RW1213q q14
+-#define RW1415q q15
+-
+-/*********************************************************************=
+**
+- * ARM assembly implementation of sha512 transform
+- *********************************************************************=
+**/
+-#define rounds2_0_63(ra, rb, rc, rd, re, rf, rg, rh, rw0, rw1, rw01q, =
+rw2, \
+-                     rw23q, rw1415q, rw9, rw10, interleave_op, arg1) \
+-	/* t1 =3D h + Sum1 (e) + Ch (e, f, g) + k[t] + w[t]; */ \
+-	vshr.u64 RT2, re, #14; \
+-	vshl.u64 RT3, re, #64 - 14; \
+-	interleave_op(arg1); \
+-	vshr.u64 RT4, re, #18; \
+-	vshl.u64 RT5, re, #64 - 18; \
+-	vld1.64 {RT0}, [RK]!; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vshr.u64 RT4, re, #41; \
+-	vshl.u64 RT5, re, #64 - 41; \
+-	vadd.u64 RT0, RT0, rw0; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vmov.64 RT7, re; \
+-	veor.64 RT1, RT2, RT3; \
+-	vbsl.64 RT7, rf, rg; \
+-	\
+-	vadd.u64 RT1, RT1, rh; \
+-	vshr.u64 RT2, ra, #28; \
+-	vshl.u64 RT3, ra, #64 - 28; \
+-	vadd.u64 RT1, RT1, RT0; \
+-	vshr.u64 RT4, ra, #34; \
+-	vshl.u64 RT5, ra, #64 - 34; \
+-	vadd.u64 RT1, RT1, RT7; \
+-	\
+-	/* h =3D Sum0 (a) + Maj (a, b, c); */ \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vshr.u64 RT4, ra, #39; \
+-	vshl.u64 RT5, ra, #64 - 39; \
+-	veor.64 RT0, ra, rb; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vbsl.64 RT0, rc, rb; \
+-	vadd.u64 rd, rd, RT1; /* d+=3Dt1; */ \
+-	veor.64 rh, RT2, RT3; \
+-	\
+-	/* t1 =3D g + Sum1 (d) + Ch (d, e, f) + k[t] + w[t]; */ \
+-	vshr.u64 RT2, rd, #14; \
+-	vshl.u64 RT3, rd, #64 - 14; \
+-	vadd.u64 rh, rh, RT0; \
+-	vshr.u64 RT4, rd, #18; \
+-	vshl.u64 RT5, rd, #64 - 18; \
+-	vadd.u64 rh, rh, RT1; /* h+=3Dt1; */ \
+-	vld1.64 {RT0}, [RK]!; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vshr.u64 RT4, rd, #41; \
+-	vshl.u64 RT5, rd, #64 - 41; \
+-	vadd.u64 RT0, RT0, rw1; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vmov.64 RT7, rd; \
+-	veor.64 RT1, RT2, RT3; \
+-	vbsl.64 RT7, re, rf; \
+-	\
+-	vadd.u64 RT1, RT1, rg; \
+-	vshr.u64 RT2, rh, #28; \
+-	vshl.u64 RT3, rh, #64 - 28; \
+-	vadd.u64 RT1, RT1, RT0; \
+-	vshr.u64 RT4, rh, #34; \
+-	vshl.u64 RT5, rh, #64 - 34; \
+-	vadd.u64 RT1, RT1, RT7; \
+-	\
+-	/* g =3D Sum0 (h) + Maj (h, a, b); */ \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vshr.u64 RT4, rh, #39; \
+-	vshl.u64 RT5, rh, #64 - 39; \
+-	veor.64 RT0, rh, ra; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vbsl.64 RT0, rb, ra; \
+-	vadd.u64 rc, rc, RT1; /* c+=3Dt1; */ \
+-	veor.64 rg, RT2, RT3; \
+-	\
+-	/* w[0] +=3D S1 (w[14]) + w[9] + S0 (w[1]); */ \
+-	/* w[1] +=3D S1 (w[15]) + w[10] + S0 (w[2]); */ \
+-	\
+-	/**** S0(w[1:2]) */ \
+-	\
+-	/* w[0:1] +=3D w[9:10] */ \
+-	/* RT23q =3D rw1:rw2 */ \
+-	vext.u64 RT23q, rw01q, rw23q, #1; \
+-	vadd.u64 rw0, rw9; \
+-	vadd.u64 rg, rg, RT0; \
+-	vadd.u64 rw1, rw10;\
+-	vadd.u64 rg, rg, RT1; /* g+=3Dt1; */ \
+-	\
+-	vshr.u64 RT45q, RT23q, #1; \
+-	vshl.u64 RT67q, RT23q, #64 - 1; \
+-	vshr.u64 RT01q, RT23q, #8; \
+-	veor.u64 RT45q, RT45q, RT67q; \
+-	vshl.u64 RT67q, RT23q, #64 - 8; \
+-	veor.u64 RT45q, RT45q, RT01q; \
+-	vshr.u64 RT01q, RT23q, #7; \
+-	veor.u64 RT45q, RT45q, RT67q; \
+-	\
+-	/**** S1(w[14:15]) */ \
+-	vshr.u64 RT23q, rw1415q, #6; \
+-	veor.u64 RT01q, RT01q, RT45q; \
+-	vshr.u64 RT45q, rw1415q, #19; \
+-	vshl.u64 RT67q, rw1415q, #64 - 19; \
+-	veor.u64 RT23q, RT23q, RT45q; \
+-	vshr.u64 RT45q, rw1415q, #61; \
+-	veor.u64 RT23q, RT23q, RT67q; \
+-	vshl.u64 RT67q, rw1415q, #64 - 61; \
+-	veor.u64 RT23q, RT23q, RT45q; \
+-	vadd.u64 rw01q, RT01q; /* w[0:1] +=3D S(w[1:2]) */ \
+-	veor.u64 RT01q, RT23q, RT67q;
+-#define vadd_RT01q(rw01q) \
+-	/* w[0:1] +=3D S(w[14:15]) */ \
+-	vadd.u64 rw01q, RT01q;
+-
+-#define dummy(_) /*_*/
+-
+-#define rounds2_64_79(ra, rb, rc, rd, re, rf, rg, rh, rw0, rw1, \
+-	              interleave_op1, arg1, interleave_op2, arg2) \
+-	/* t1 =3D h + Sum1 (e) + Ch (e, f, g) + k[t] + w[t]; */ \
+-	vshr.u64 RT2, re, #14; \
+-	vshl.u64 RT3, re, #64 - 14; \
+-	interleave_op1(arg1); \
+-	vshr.u64 RT4, re, #18; \
+-	vshl.u64 RT5, re, #64 - 18; \
+-	interleave_op2(arg2); \
+-	vld1.64 {RT0}, [RK]!; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vshr.u64 RT4, re, #41; \
+-	vshl.u64 RT5, re, #64 - 41; \
+-	vadd.u64 RT0, RT0, rw0; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vmov.64 RT7, re; \
+-	veor.64 RT1, RT2, RT3; \
+-	vbsl.64 RT7, rf, rg; \
+-	\
+-	vadd.u64 RT1, RT1, rh; \
+-	vshr.u64 RT2, ra, #28; \
+-	vshl.u64 RT3, ra, #64 - 28; \
+-	vadd.u64 RT1, RT1, RT0; \
+-	vshr.u64 RT4, ra, #34; \
+-	vshl.u64 RT5, ra, #64 - 34; \
+-	vadd.u64 RT1, RT1, RT7; \
+-	\
+-	/* h =3D Sum0 (a) + Maj (a, b, c); */ \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vshr.u64 RT4, ra, #39; \
+-	vshl.u64 RT5, ra, #64 - 39; \
+-	veor.64 RT0, ra, rb; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vbsl.64 RT0, rc, rb; \
+-	vadd.u64 rd, rd, RT1; /* d+=3Dt1; */ \
+-	veor.64 rh, RT2, RT3; \
+-	\
+-	/* t1 =3D g + Sum1 (d) + Ch (d, e, f) + k[t] + w[t]; */ \
+-	vshr.u64 RT2, rd, #14; \
+-	vshl.u64 RT3, rd, #64 - 14; \
+-	vadd.u64 rh, rh, RT0; \
+-	vshr.u64 RT4, rd, #18; \
+-	vshl.u64 RT5, rd, #64 - 18; \
+-	vadd.u64 rh, rh, RT1; /* h+=3Dt1; */ \
+-	vld1.64 {RT0}, [RK]!; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vshr.u64 RT4, rd, #41; \
+-	vshl.u64 RT5, rd, #64 - 41; \
+-	vadd.u64 RT0, RT0, rw1; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vmov.64 RT7, rd; \
+-	veor.64 RT1, RT2, RT3; \
+-	vbsl.64 RT7, re, rf; \
+-	\
+-	vadd.u64 RT1, RT1, rg; \
+-	vshr.u64 RT2, rh, #28; \
+-	vshl.u64 RT3, rh, #64 - 28; \
+-	vadd.u64 RT1, RT1, RT0; \
+-	vshr.u64 RT4, rh, #34; \
+-	vshl.u64 RT5, rh, #64 - 34; \
+-	vadd.u64 RT1, RT1, RT7; \
+-	\
+-	/* g =3D Sum0 (h) + Maj (h, a, b); */ \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vshr.u64 RT4, rh, #39; \
+-	vshl.u64 RT5, rh, #64 - 39; \
+-	veor.64 RT0, rh, ra; \
+-	veor.64 RT23q, RT23q, RT45q; \
+-	vbsl.64 RT0, rb, ra; \
+-	vadd.u64 rc, rc, RT1; /* c+=3Dt1; */ \
+-	veor.64 rg, RT2, RT3;
+-#define vadd_rg_RT0(rg) \
+-	vadd.u64 rg, rg, RT0;
+-#define vadd_rg_RT1(rg) \
+-	vadd.u64 rg, rg, RT1; /* g+=3Dt1; */
+-
+-.align 3
+-ENTRY(sha512_transform_neon)
+-	/* Input:
+-	 *	%r0: SHA512_CONTEXT
+-	 *	%r1: data
+-	 *	%r2: u64 k[] constants
+-	 *	%r3: nblks
+-	 */
+-	push {%lr};
+-
+-	mov %lr, #0;
+-
+-	/* Load context to d0-d7 */
+-	vld1.64 {RA-RD}, [%r0]!;
+-	vld1.64 {RE-RH}, [%r0];
+-	sub %r0, #(4*8);
+-
+-	/* Load input to w[16], d16-d31 */
+-	/* NOTE: Assumes that on ARMv7 unaligned accesses are always allowed.=
+ */
+-	vld1.64 {RW0-RW3}, [%r1]!;
+-	vld1.64 {RW4-RW7}, [%r1]!;
+-	vld1.64 {RW8-RW11}, [%r1]!;
+-	vld1.64 {RW12-RW15}, [%r1]!;
+-#ifdef __ARMEL__
+-	/* byteswap */
+-	vrev64.8 RW01q, RW01q;
+-	vrev64.8 RW23q, RW23q;
+-	vrev64.8 RW45q, RW45q;
+-	vrev64.8 RW67q, RW67q;
+-	vrev64.8 RW89q, RW89q;
+-	vrev64.8 RW1011q, RW1011q;
+-	vrev64.8 RW1213q, RW1213q;
+-	vrev64.8 RW1415q, RW1415q;
+-#endif
+-
+-	/* EABI says that d8-d15 must be preserved by callee. */
+-	/*vpush {RT0-RT7};*/
+-
+-.Loop:
+-	rounds2_0_63(RA, RB, RC, RD, RE, RF, RG, RH, RW0, RW1, RW01q, RW2,
+-		     RW23q, RW1415q, RW9, RW10, dummy, _);
+-	b .Lenter_rounds;
+-
+-.Loop_rounds:
+-	rounds2_0_63(RA, RB, RC, RD, RE, RF, RG, RH, RW0, RW1, RW01q, RW2,
+-		     RW23q, RW1415q, RW9, RW10, vadd_RT01q, RW1415q);
+-.Lenter_rounds:
+-	rounds2_0_63(RG, RH, RA, RB, RC, RD, RE, RF, RW2, RW3, RW23q, RW4,
+-		     RW45q, RW01q, RW11, RW12, vadd_RT01q, RW01q);
+-	rounds2_0_63(RE, RF, RG, RH, RA, RB, RC, RD, RW4, RW5, RW45q, RW6,
+-		     RW67q, RW23q, RW13, RW14, vadd_RT01q, RW23q);
+-	rounds2_0_63(RC, RD, RE, RF, RG, RH, RA, RB, RW6, RW7, RW67q, RW8,
+-		     RW89q, RW45q, RW15, RW0, vadd_RT01q, RW45q);
+-	rounds2_0_63(RA, RB, RC, RD, RE, RF, RG, RH, RW8, RW9, RW89q, RW10,
+-		     RW1011q, RW67q, RW1, RW2, vadd_RT01q, RW67q);
+-	rounds2_0_63(RG, RH, RA, RB, RC, RD, RE, RF, RW10, RW11, RW1011q, RW1=
+2,
+-		     RW1213q, RW89q, RW3, RW4, vadd_RT01q, RW89q);
+-	add %lr, #16;
+-	rounds2_0_63(RE, RF, RG, RH, RA, RB, RC, RD, RW12, RW13, RW1213q, RW1=
+4,
+-		     RW1415q, RW1011q, RW5, RW6, vadd_RT01q, RW1011q);
+-	cmp %lr, #64;
+-	rounds2_0_63(RC, RD, RE, RF, RG, RH, RA, RB, RW14, RW15, RW1415q, RW0=
+,
+-		     RW01q, RW1213q, RW7, RW8, vadd_RT01q, RW1213q);
+-	bne .Loop_rounds;
+-
+-	subs %r3, #1;
+-
+-	rounds2_64_79(RA, RB, RC, RD, RE, RF, RG, RH, RW0, RW1,
+-		      vadd_RT01q, RW1415q, dummy, _);
+-	rounds2_64_79(RG, RH, RA, RB, RC, RD, RE, RF, RW2, RW3,
+-		      vadd_rg_RT0, RG, vadd_rg_RT1, RG);
+-	beq .Lhandle_tail;
+-	vld1.64 {RW0-RW3}, [%r1]!;
+-	rounds2_64_79(RE, RF, RG, RH, RA, RB, RC, RD, RW4, RW5,
+-		      vadd_rg_RT0, RE, vadd_rg_RT1, RE);
+-	rounds2_64_79(RC, RD, RE, RF, RG, RH, RA, RB, RW6, RW7,
+-		      vadd_rg_RT0, RC, vadd_rg_RT1, RC);
+-#ifdef __ARMEL__
+-	vrev64.8 RW01q, RW01q;
+-	vrev64.8 RW23q, RW23q;
+-#endif
+-	vld1.64 {RW4-RW7}, [%r1]!;
+-	rounds2_64_79(RA, RB, RC, RD, RE, RF, RG, RH, RW8, RW9,
+-		      vadd_rg_RT0, RA, vadd_rg_RT1, RA);
+-	rounds2_64_79(RG, RH, RA, RB, RC, RD, RE, RF, RW10, RW11,
+-		      vadd_rg_RT0, RG, vadd_rg_RT1, RG);
+-#ifdef __ARMEL__
+-	vrev64.8 RW45q, RW45q;
+-	vrev64.8 RW67q, RW67q;
+-#endif
+-	vld1.64 {RW8-RW11}, [%r1]!;
+-	rounds2_64_79(RE, RF, RG, RH, RA, RB, RC, RD, RW12, RW13,
+-		      vadd_rg_RT0, RE, vadd_rg_RT1, RE);
+-	rounds2_64_79(RC, RD, RE, RF, RG, RH, RA, RB, RW14, RW15,
+-		      vadd_rg_RT0, RC, vadd_rg_RT1, RC);
+-#ifdef __ARMEL__
+-	vrev64.8 RW89q, RW89q;
+-	vrev64.8 RW1011q, RW1011q;
+-#endif
+-	vld1.64 {RW12-RW15}, [%r1]!;
+-	vadd_rg_RT0(RA);
+-	vadd_rg_RT1(RA);
+-
+-	/* Load context */
+-	vld1.64 {RT0-RT3}, [%r0]!;
+-	vld1.64 {RT4-RT7}, [%r0];
+-	sub %r0, #(4*8);
+-
+-#ifdef __ARMEL__
+-	vrev64.8 RW1213q, RW1213q;
+-	vrev64.8 RW1415q, RW1415q;
+-#endif
+-
+-	vadd.u64 RA, RT0;
+-	vadd.u64 RB, RT1;
+-	vadd.u64 RC, RT2;
+-	vadd.u64 RD, RT3;
+-	vadd.u64 RE, RT4;
+-	vadd.u64 RF, RT5;
+-	vadd.u64 RG, RT6;
+-	vadd.u64 RH, RT7;
+-
+-	/* Store the first half of context */
+-	vst1.64 {RA-RD}, [%r0]!;
+-	sub RK, $(8*80);
+-	vst1.64 {RE-RH}, [%r0]; /* Store the last half of context */
+-	mov %lr, #0;
+-	sub %r0, #(4*8);
+-
+-	b .Loop;
+-
+-.Lhandle_tail:
+-	rounds2_64_79(RE, RF, RG, RH, RA, RB, RC, RD, RW4, RW5,
+-		      vadd_rg_RT0, RE, vadd_rg_RT1, RE);
+-	rounds2_64_79(RC, RD, RE, RF, RG, RH, RA, RB, RW6, RW7,
+-		      vadd_rg_RT0, RC, vadd_rg_RT1, RC);
+-	rounds2_64_79(RA, RB, RC, RD, RE, RF, RG, RH, RW8, RW9,
+-		      vadd_rg_RT0, RA, vadd_rg_RT1, RA);
+-	rounds2_64_79(RG, RH, RA, RB, RC, RD, RE, RF, RW10, RW11,
+-		      vadd_rg_RT0, RG, vadd_rg_RT1, RG);
+-	rounds2_64_79(RE, RF, RG, RH, RA, RB, RC, RD, RW12, RW13,
+-		      vadd_rg_RT0, RE, vadd_rg_RT1, RE);
+-	rounds2_64_79(RC, RD, RE, RF, RG, RH, RA, RB, RW14, RW15,
+-		      vadd_rg_RT0, RC, vadd_rg_RT1, RC);
+-
+-	/* Load context to d16-d23 */
+-	vld1.64 {RW0-RW3}, [%r0]!;
+-	vadd_rg_RT0(RA);
+-	vld1.64 {RW4-RW7}, [%r0];
+-	vadd_rg_RT1(RA);
+-	sub %r0, #(4*8);
+-
+-	vadd.u64 RA, RW0;
+-	vadd.u64 RB, RW1;
+-	vadd.u64 RC, RW2;
+-	vadd.u64 RD, RW3;
+-	vadd.u64 RE, RW4;
+-	vadd.u64 RF, RW5;
+-	vadd.u64 RG, RW6;
+-	vadd.u64 RH, RW7;
+-
+-	/* Store the first half of context */
+-	vst1.64 {RA-RD}, [%r0]!;
+-
+-	/* Clear used registers */
+-	/* d16-d31 */
+-	veor.u64 RW01q, RW01q;
+-	veor.u64 RW23q, RW23q;
+-	veor.u64 RW45q, RW45q;
+-	veor.u64 RW67q, RW67q;
+-	vst1.64 {RE-RH}, [%r0]; /* Store the last half of context */
+-	veor.u64 RW89q, RW89q;
+-	veor.u64 RW1011q, RW1011q;
+-	veor.u64 RW1213q, RW1213q;
+-	veor.u64 RW1415q, RW1415q;
+-	/* d8-d15 */
+-	/*vpop {RT0-RT7};*/
+-	/* d0-d7 (q0-q3) */
+-	veor.u64 %q0, %q0;
+-	veor.u64 %q1, %q1;
+-	veor.u64 %q2, %q2;
+-	veor.u64 %q3, %q3;
+-
+-	pop {%pc};
+-ENDPROC(sha512_transform_neon)
+diff --git a/arch/arm/crypto/sha512-core.S_shipped b/arch/arm/crypto/sh=
+a512-core.S_shipped
+new file mode 100644
+index 000000000000..281924c1238f
+--- /dev/null
++++ b/arch/arm/crypto/sha512-core.S_shipped
+@@ -0,0 +1,1814 @@
++#ifndef __KERNEL__
++# include "arm_arch.h"
++# define VFP_ABI_PUSH	vstmdb	sp!,{d8-d15}
++# define VFP_ABI_POP	vldmia	sp!,{d8-d15}
++#else
++# define __ARM_ARCH__ __LINUX_ARM_ARCH__
++# define __ARM_MAX_ARCH__ 7
++# define VFP_ABI_PUSH
++# define VFP_ABI_POP
++#endif
++
++#ifdef __ARMEL__
++# define LO 0
++# define HI 4
++# define WORD64(hi0,lo0,hi1,lo1)	.word	lo0,hi0, lo1,hi1
++#else
++# define HI 0
++# define LO 4
++# define WORD64(hi0,lo0,hi1,lo1)	.word	hi0,lo0, hi1,lo1
++#endif
++
++.text
++#if __ARM_ARCH__<7
++.code	32
++#else
++.syntax unified
++# ifdef __thumb2__
++#  define adrl adr
++.thumb
++# else
++.code   32
++# endif
++#endif
++
++.type	K512,%object
++.align	5
++K512:
++WORD64(0x428a2f98,0xd728ae22, 0x71374491,0x23ef65cd)
++WORD64(0xb5c0fbcf,0xec4d3b2f, 0xe9b5dba5,0x8189dbbc)
++WORD64(0x3956c25b,0xf348b538, 0x59f111f1,0xb605d019)
++WORD64(0x923f82a4,0xaf194f9b, 0xab1c5ed5,0xda6d8118)
++WORD64(0xd807aa98,0xa3030242, 0x12835b01,0x45706fbe)
++WORD64(0x243185be,0x4ee4b28c, 0x550c7dc3,0xd5ffb4e2)
++WORD64(0x72be5d74,0xf27b896f, 0x80deb1fe,0x3b1696b1)
++WORD64(0x9bdc06a7,0x25c71235, 0xc19bf174,0xcf692694)
++WORD64(0xe49b69c1,0x9ef14ad2, 0xefbe4786,0x384f25e3)
++WORD64(0x0fc19dc6,0x8b8cd5b5, 0x240ca1cc,0x77ac9c65)
++WORD64(0x2de92c6f,0x592b0275, 0x4a7484aa,0x6ea6e483)
++WORD64(0x5cb0a9dc,0xbd41fbd4, 0x76f988da,0x831153b5)
++WORD64(0x983e5152,0xee66dfab, 0xa831c66d,0x2db43210)
++WORD64(0xb00327c8,0x98fb213f, 0xbf597fc7,0xbeef0ee4)
++WORD64(0xc6e00bf3,0x3da88fc2, 0xd5a79147,0x930aa725)
++WORD64(0x06ca6351,0xe003826f, 0x14292967,0x0a0e6e70)
++WORD64(0x27b70a85,0x46d22ffc, 0x2e1b2138,0x5c26c926)
++WORD64(0x4d2c6dfc,0x5ac42aed, 0x53380d13,0x9d95b3df)
++WORD64(0x650a7354,0x8baf63de, 0x766a0abb,0x3c77b2a8)
++WORD64(0x81c2c92e,0x47edaee6, 0x92722c85,0x1482353b)
++WORD64(0xa2bfe8a1,0x4cf10364, 0xa81a664b,0xbc423001)
++WORD64(0xc24b8b70,0xd0f89791, 0xc76c51a3,0x0654be30)
++WORD64(0xd192e819,0xd6ef5218, 0xd6990624,0x5565a910)
++WORD64(0xf40e3585,0x5771202a, 0x106aa070,0x32bbd1b8)
++WORD64(0x19a4c116,0xb8d2d0c8, 0x1e376c08,0x5141ab53)
++WORD64(0x2748774c,0xdf8eeb99, 0x34b0bcb5,0xe19b48a8)
++WORD64(0x391c0cb3,0xc5c95a63, 0x4ed8aa4a,0xe3418acb)
++WORD64(0x5b9cca4f,0x7763e373, 0x682e6ff3,0xd6b2b8a3)
++WORD64(0x748f82ee,0x5defb2fc, 0x78a5636f,0x43172f60)
++WORD64(0x84c87814,0xa1f0ab72, 0x8cc70208,0x1a6439ec)
++WORD64(0x90befffa,0x23631e28, 0xa4506ceb,0xde82bde9)
++WORD64(0xbef9a3f7,0xb2c67915, 0xc67178f2,0xe372532b)
++WORD64(0xca273ece,0xea26619c, 0xd186b8c7,0x21c0c207)
++WORD64(0xeada7dd6,0xcde0eb1e, 0xf57d4f7f,0xee6ed178)
++WORD64(0x06f067aa,0x72176fba, 0x0a637dc5,0xa2c898a6)
++WORD64(0x113f9804,0xbef90dae, 0x1b710b35,0x131c471b)
++WORD64(0x28db77f5,0x23047d84, 0x32caab7b,0x40c72493)
++WORD64(0x3c9ebe0a,0x15c9bebc, 0x431d67c4,0x9c100d4c)
++WORD64(0x4cc5d4be,0xcb3e42b6, 0x597f299c,0xfc657e2a)
++WORD64(0x5fcb6fab,0x3ad6faec, 0x6c44198c,0x4a475817)
++.size	K512,.-K512
++#if __ARM_MAX_ARCH__>=3D7 && !defined(__KERNEL__)
++.LOPENSSL_armcap:
++.word	OPENSSL_armcap_P-sha512_block_data_order
++.skip	32-4
++#else
++.skip	32
++#endif
++
++.global	sha512_block_data_order
++.type	sha512_block_data_order,%function
++sha512_block_data_order:
++#if __ARM_ARCH__<7
++	sub	r3,pc,#8		@ sha512_block_data_order
++#else
++	adr	r3,sha512_block_data_order
++#endif
++#if __ARM_MAX_ARCH__>=3D7 && !defined(__KERNEL__)
++	ldr	r12,.LOPENSSL_armcap
++	ldr	r12,[r3,r12]		@ OPENSSL_armcap_P
++	tst	r12,#1
++	bne	.LNEON
++#endif
++	add	r2,r1,r2,lsl#7	@ len to point at the end of inp
++	stmdb	sp!,{r4-r12,lr}
++	sub	r14,r3,#672		@ K512
++	sub	sp,sp,#9*8
++
++	ldr	r7,[r0,#32+LO]
++	ldr	r8,[r0,#32+HI]
++	ldr	r9, [r0,#48+LO]
++	ldr	r10, [r0,#48+HI]
++	ldr	r11, [r0,#56+LO]
++	ldr	r12, [r0,#56+HI]
++.Loop:
++	str	r9, [sp,#48+0]
++	str	r10, [sp,#48+4]
++	str	r11, [sp,#56+0]
++	str	r12, [sp,#56+4]
++	ldr	r5,[r0,#0+LO]
++	ldr	r6,[r0,#0+HI]
++	ldr	r3,[r0,#8+LO]
++	ldr	r4,[r0,#8+HI]
++	ldr	r9, [r0,#16+LO]
++	ldr	r10, [r0,#16+HI]
++	ldr	r11, [r0,#24+LO]
++	ldr	r12, [r0,#24+HI]
++	str	r3,[sp,#8+0]
++	str	r4,[sp,#8+4]
++	str	r9, [sp,#16+0]
++	str	r10, [sp,#16+4]
++	str	r11, [sp,#24+0]
++	str	r12, [sp,#24+4]
++	ldr	r3,[r0,#40+LO]
++	ldr	r4,[r0,#40+HI]
++	str	r3,[sp,#40+0]
++	str	r4,[sp,#40+4]
++
++.L00_15:
++#if __ARM_ARCH__<7
++	ldrb	r3,[r1,#7]
++	ldrb	r9, [r1,#6]
++	ldrb	r10, [r1,#5]
++	ldrb	r11, [r1,#4]
++	ldrb	r4,[r1,#3]
++	ldrb	r12, [r1,#2]
++	orr	r3,r3,r9,lsl#8
++	ldrb	r9, [r1,#1]
++	orr	r3,r3,r10,lsl#16
++	ldrb	r10, [r1],#8
++	orr	r3,r3,r11,lsl#24
++	orr	r4,r4,r12,lsl#8
++	orr	r4,r4,r9,lsl#16
++	orr	r4,r4,r10,lsl#24
++#else
++	ldr	r3,[r1,#4]
++	ldr	r4,[r1],#8
++#ifdef __ARMEL__
++	rev	r3,r3
++	rev	r4,r4
++#endif
++#endif
++	@ Sigma1(x)	(ROTR((x),14) ^ ROTR((x),18)  ^ ROTR((x),41))
++	@ LO		lo>>14^hi<<18 ^ lo>>18^hi<<14 ^ hi>>9^lo<<23
++	@ HI		hi>>14^lo<<18 ^ hi>>18^lo<<14 ^ lo>>9^hi<<23
++	mov	r9,r7,lsr#14
++	str	r3,[sp,#64+0]
++	mov	r10,r8,lsr#14
++	str	r4,[sp,#64+4]
++	eor	r9,r9,r8,lsl#18
++	ldr	r11,[sp,#56+0]	@ h.lo
++	eor	r10,r10,r7,lsl#18
++	ldr	r12,[sp,#56+4]	@ h.hi
++	eor	r9,r9,r7,lsr#18
++	eor	r10,r10,r8,lsr#18
++	eor	r9,r9,r8,lsl#14
++	eor	r10,r10,r7,lsl#14
++	eor	r9,r9,r8,lsr#9
++	eor	r10,r10,r7,lsr#9
++	eor	r9,r9,r7,lsl#23
++	eor	r10,r10,r8,lsl#23	@ Sigma1(e)
++	adds	r3,r3,r9
++	ldr	r9,[sp,#40+0]	@ f.lo
++	adc	r4,r4,r10		@ T +=3D Sigma1(e)
++	ldr	r10,[sp,#40+4]	@ f.hi
++	adds	r3,r3,r11
++	ldr	r11,[sp,#48+0]	@ g.lo
++	adc	r4,r4,r12		@ T +=3D h
++	ldr	r12,[sp,#48+4]	@ g.hi
++
++	eor	r9,r9,r11
++	str	r7,[sp,#32+0]
++	eor	r10,r10,r12
++	str	r8,[sp,#32+4]
++	and	r9,r9,r7
++	str	r5,[sp,#0+0]
++	and	r10,r10,r8
++	str	r6,[sp,#0+4]
++	eor	r9,r9,r11
++	ldr	r11,[r14,#LO]	@ K[i].lo
++	eor	r10,r10,r12		@ Ch(e,f,g)
++	ldr	r12,[r14,#HI]	@ K[i].hi
++
++	adds	r3,r3,r9
++	ldr	r7,[sp,#24+0]	@ d.lo
++	adc	r4,r4,r10		@ T +=3D Ch(e,f,g)
++	ldr	r8,[sp,#24+4]	@ d.hi
++	adds	r3,r3,r11
++	and	r9,r11,#0xff
++	adc	r4,r4,r12		@ T +=3D K[i]
++	adds	r7,r7,r3
++	ldr	r11,[sp,#8+0]	@ b.lo
++	adc	r8,r8,r4		@ d +=3D T
++	teq	r9,#148
++
++	ldr	r12,[sp,#16+0]	@ c.lo
++#if __ARM_ARCH__>=3D7
++	it	eq			@ Thumb2 thing, sanity check in ARM
++#endif
++	orreq	r14,r14,#1
++	@ Sigma0(x)	(ROTR((x),28) ^ ROTR((x),34) ^ ROTR((x),39))
++	@ LO		lo>>28^hi<<4  ^ hi>>2^lo<<30 ^ hi>>7^lo<<25
++	@ HI		hi>>28^lo<<4  ^ lo>>2^hi<<30 ^ lo>>7^hi<<25
++	mov	r9,r5,lsr#28
++	mov	r10,r6,lsr#28
++	eor	r9,r9,r6,lsl#4
++	eor	r10,r10,r5,lsl#4
++	eor	r9,r9,r6,lsr#2
++	eor	r10,r10,r5,lsr#2
++	eor	r9,r9,r5,lsl#30
++	eor	r10,r10,r6,lsl#30
++	eor	r9,r9,r6,lsr#7
++	eor	r10,r10,r5,lsr#7
++	eor	r9,r9,r5,lsl#25
++	eor	r10,r10,r6,lsl#25	@ Sigma0(a)
++	adds	r3,r3,r9
++	and	r9,r5,r11
++	adc	r4,r4,r10		@ T +=3D Sigma0(a)
++
++	ldr	r10,[sp,#8+4]	@ b.hi
++	orr	r5,r5,r11
++	ldr	r11,[sp,#16+4]	@ c.hi
++	and	r5,r5,r12
++	and	r12,r6,r10
++	orr	r6,r6,r10
++	orr	r5,r5,r9		@ Maj(a,b,c).lo
++	and	r6,r6,r11
++	adds	r5,r5,r3
++	orr	r6,r6,r12		@ Maj(a,b,c).hi
++	sub	sp,sp,#8
++	adc	r6,r6,r4		@ h +=3D T
++	tst	r14,#1
++	add	r14,r14,#8
++	tst	r14,#1
++	beq	.L00_15
++	ldr	r9,[sp,#184+0]
++	ldr	r10,[sp,#184+4]
++	bic	r14,r14,#1
++.L16_79:
++	@ sigma0(x)	(ROTR((x),1)  ^ ROTR((x),8)  ^ ((x)>>7))
++	@ LO		lo>>1^hi<<31  ^ lo>>8^hi<<24 ^ lo>>7^hi<<25
++	@ HI		hi>>1^lo<<31  ^ hi>>8^lo<<24 ^ hi>>7
++	mov	r3,r9,lsr#1
++	ldr	r11,[sp,#80+0]
++	mov	r4,r10,lsr#1
++	ldr	r12,[sp,#80+4]
++	eor	r3,r3,r10,lsl#31
++	eor	r4,r4,r9,lsl#31
++	eor	r3,r3,r9,lsr#8
++	eor	r4,r4,r10,lsr#8
++	eor	r3,r3,r10,lsl#24
++	eor	r4,r4,r9,lsl#24
++	eor	r3,r3,r9,lsr#7
++	eor	r4,r4,r10,lsr#7
++	eor	r3,r3,r10,lsl#25
++
++	@ sigma1(x)	(ROTR((x),19) ^ ROTR((x),61) ^ ((x)>>6))
++	@ LO		lo>>19^hi<<13 ^ hi>>29^lo<<3 ^ lo>>6^hi<<26
++	@ HI		hi>>19^lo<<13 ^ lo>>29^hi<<3 ^ hi>>6
++	mov	r9,r11,lsr#19
++	mov	r10,r12,lsr#19
++	eor	r9,r9,r12,lsl#13
++	eor	r10,r10,r11,lsl#13
++	eor	r9,r9,r12,lsr#29
++	eor	r10,r10,r11,lsr#29
++	eor	r9,r9,r11,lsl#3
++	eor	r10,r10,r12,lsl#3
++	eor	r9,r9,r11,lsr#6
++	eor	r10,r10,r12,lsr#6
++	ldr	r11,[sp,#120+0]
++	eor	r9,r9,r12,lsl#26
++
++	ldr	r12,[sp,#120+4]
++	adds	r3,r3,r9
++	ldr	r9,[sp,#192+0]
++	adc	r4,r4,r10
++
++	ldr	r10,[sp,#192+4]
++	adds	r3,r3,r11
++	adc	r4,r4,r12
++	adds	r3,r3,r9
++	adc	r4,r4,r10
++	@ Sigma1(x)	(ROTR((x),14) ^ ROTR((x),18)  ^ ROTR((x),41))
++	@ LO		lo>>14^hi<<18 ^ lo>>18^hi<<14 ^ hi>>9^lo<<23
++	@ HI		hi>>14^lo<<18 ^ hi>>18^lo<<14 ^ lo>>9^hi<<23
++	mov	r9,r7,lsr#14
++	str	r3,[sp,#64+0]
++	mov	r10,r8,lsr#14
++	str	r4,[sp,#64+4]
++	eor	r9,r9,r8,lsl#18
++	ldr	r11,[sp,#56+0]	@ h.lo
++	eor	r10,r10,r7,lsl#18
++	ldr	r12,[sp,#56+4]	@ h.hi
++	eor	r9,r9,r7,lsr#18
++	eor	r10,r10,r8,lsr#18
++	eor	r9,r9,r8,lsl#14
++	eor	r10,r10,r7,lsl#14
++	eor	r9,r9,r8,lsr#9
++	eor	r10,r10,r7,lsr#9
++	eor	r9,r9,r7,lsl#23
++	eor	r10,r10,r8,lsl#23	@ Sigma1(e)
++	adds	r3,r3,r9
++	ldr	r9,[sp,#40+0]	@ f.lo
++	adc	r4,r4,r10		@ T +=3D Sigma1(e)
++	ldr	r10,[sp,#40+4]	@ f.hi
++	adds	r3,r3,r11
++	ldr	r11,[sp,#48+0]	@ g.lo
++	adc	r4,r4,r12		@ T +=3D h
++	ldr	r12,[sp,#48+4]	@ g.hi
++
++	eor	r9,r9,r11
++	str	r7,[sp,#32+0]
++	eor	r10,r10,r12
++	str	r8,[sp,#32+4]
++	and	r9,r9,r7
++	str	r5,[sp,#0+0]
++	and	r10,r10,r8
++	str	r6,[sp,#0+4]
++	eor	r9,r9,r11
++	ldr	r11,[r14,#LO]	@ K[i].lo
++	eor	r10,r10,r12		@ Ch(e,f,g)
++	ldr	r12,[r14,#HI]	@ K[i].hi
++
++	adds	r3,r3,r9
++	ldr	r7,[sp,#24+0]	@ d.lo
++	adc	r4,r4,r10		@ T +=3D Ch(e,f,g)
++	ldr	r8,[sp,#24+4]	@ d.hi
++	adds	r3,r3,r11
++	and	r9,r11,#0xff
++	adc	r4,r4,r12		@ T +=3D K[i]
++	adds	r7,r7,r3
++	ldr	r11,[sp,#8+0]	@ b.lo
++	adc	r8,r8,r4		@ d +=3D T
++	teq	r9,#23
++
++	ldr	r12,[sp,#16+0]	@ c.lo
++#if __ARM_ARCH__>=3D7
++	it	eq			@ Thumb2 thing, sanity check in ARM
++#endif
++	orreq	r14,r14,#1
++	@ Sigma0(x)	(ROTR((x),28) ^ ROTR((x),34) ^ ROTR((x),39))
++	@ LO		lo>>28^hi<<4  ^ hi>>2^lo<<30 ^ hi>>7^lo<<25
++	@ HI		hi>>28^lo<<4  ^ lo>>2^hi<<30 ^ lo>>7^hi<<25
++	mov	r9,r5,lsr#28
++	mov	r10,r6,lsr#28
++	eor	r9,r9,r6,lsl#4
++	eor	r10,r10,r5,lsl#4
++	eor	r9,r9,r6,lsr#2
++	eor	r10,r10,r5,lsr#2
++	eor	r9,r9,r5,lsl#30
++	eor	r10,r10,r6,lsl#30
++	eor	r9,r9,r6,lsr#7
++	eor	r10,r10,r5,lsr#7
++	eor	r9,r9,r5,lsl#25
++	eor	r10,r10,r6,lsl#25	@ Sigma0(a)
++	adds	r3,r3,r9
++	and	r9,r5,r11
++	adc	r4,r4,r10		@ T +=3D Sigma0(a)
++
++	ldr	r10,[sp,#8+4]	@ b.hi
++	orr	r5,r5,r11
++	ldr	r11,[sp,#16+4]	@ c.hi
++	and	r5,r5,r12
++	and	r12,r6,r10
++	orr	r6,r6,r10
++	orr	r5,r5,r9		@ Maj(a,b,c).lo
++	and	r6,r6,r11
++	adds	r5,r5,r3
++	orr	r6,r6,r12		@ Maj(a,b,c).hi
++	sub	sp,sp,#8
++	adc	r6,r6,r4		@ h +=3D T
++	tst	r14,#1
++	add	r14,r14,#8
++#if __ARM_ARCH__>=3D7
++	ittt	eq			@ Thumb2 thing, sanity check in ARM
++#endif
++	ldreq	r9,[sp,#184+0]
++	ldreq	r10,[sp,#184+4]
++	beq	.L16_79
++	bic	r14,r14,#1
++
++	ldr	r3,[sp,#8+0]
++	ldr	r4,[sp,#8+4]
++	ldr	r9, [r0,#0+LO]
++	ldr	r10, [r0,#0+HI]
++	ldr	r11, [r0,#8+LO]
++	ldr	r12, [r0,#8+HI]
++	adds	r9,r5,r9
++	str	r9, [r0,#0+LO]
++	adc	r10,r6,r10
++	str	r10, [r0,#0+HI]
++	adds	r11,r3,r11
++	str	r11, [r0,#8+LO]
++	adc	r12,r4,r12
++	str	r12, [r0,#8+HI]
++
++	ldr	r5,[sp,#16+0]
++	ldr	r6,[sp,#16+4]
++	ldr	r3,[sp,#24+0]
++	ldr	r4,[sp,#24+4]
++	ldr	r9, [r0,#16+LO]
++	ldr	r10, [r0,#16+HI]
++	ldr	r11, [r0,#24+LO]
++	ldr	r12, [r0,#24+HI]
++	adds	r9,r5,r9
++	str	r9, [r0,#16+LO]
++	adc	r10,r6,r10
++	str	r10, [r0,#16+HI]
++	adds	r11,r3,r11
++	str	r11, [r0,#24+LO]
++	adc	r12,r4,r12
++	str	r12, [r0,#24+HI]
++
++	ldr	r3,[sp,#40+0]
++	ldr	r4,[sp,#40+4]
++	ldr	r9, [r0,#32+LO]
++	ldr	r10, [r0,#32+HI]
++	ldr	r11, [r0,#40+LO]
++	ldr	r12, [r0,#40+HI]
++	adds	r7,r7,r9
++	str	r7,[r0,#32+LO]
++	adc	r8,r8,r10
++	str	r8,[r0,#32+HI]
++	adds	r11,r3,r11
++	str	r11, [r0,#40+LO]
++	adc	r12,r4,r12
++	str	r12, [r0,#40+HI]
++
++	ldr	r5,[sp,#48+0]
++	ldr	r6,[sp,#48+4]
++	ldr	r3,[sp,#56+0]
++	ldr	r4,[sp,#56+4]
++	ldr	r9, [r0,#48+LO]
++	ldr	r10, [r0,#48+HI]
++	ldr	r11, [r0,#56+LO]
++	ldr	r12, [r0,#56+HI]
++	adds	r9,r5,r9
++	str	r9, [r0,#48+LO]
++	adc	r10,r6,r10
++	str	r10, [r0,#48+HI]
++	adds	r11,r3,r11
++	str	r11, [r0,#56+LO]
++	adc	r12,r4,r12
++	str	r12, [r0,#56+HI]
++
++	add	sp,sp,#640
++	sub	r14,r14,#640
++
++	teq	r1,r2
++	bne	.Loop
++
++	add	sp,sp,#8*9		@ destroy frame
++#if __ARM_ARCH__>=3D5
++	ldmia	sp!,{r4-r12,pc}
++#else
++	ldmia	sp!,{r4-r12,lr}
++	tst	lr,#1
++	moveq	pc,lr			@ be binary compatible with V4, yet
++	.word	0xe12fff1e			@ interoperable with Thumb ISA:-)
++#endif
++.size	sha512_block_data_order,.-sha512_block_data_order
++#if __ARM_MAX_ARCH__>=3D7
++.arch	armv7-a
++.fpu	neon
++
++.global	sha512_block_data_order_neon
++.type	sha512_block_data_order_neon,%function
++.align	4
++sha512_block_data_order_neon:
++.LNEON:
++	dmb				@ errata #451034 on early Cortex A8
++	add	r2,r1,r2,lsl#7	@ len to point at the end of inp
++	VFP_ABI_PUSH
++	adrl	r3,K512
++	vldmia	r0,{d16-d23}		@ load context
++.Loop_neon:
++	vshr.u64	d24,d20,#14	@ 0
++#if 0<16
++	vld1.64		{d0},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d20,#18
++#if 0>0
++	 vadd.i64	d16,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d20,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d20,#50
++	vsli.64		d25,d20,#46
++	vmov		d29,d20
++	vsli.64		d26,d20,#23
++#if 0<16 && defined(__ARMEL__)
++	vrev64.8	d0,d0
++#endif
++	veor		d25,d24
++	vbsl		d29,d21,d22		@ Ch(e,f,g)
++	vshr.u64	d24,d16,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d23
++	vshr.u64	d25,d16,#34
++	vsli.64		d24,d16,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d16,#39
++	vadd.i64	d28,d0
++	vsli.64		d25,d16,#30
++	veor		d30,d16,d17
++	vsli.64		d26,d16,#25
++	veor		d23,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d18,d17		@ Maj(a,b,c)
++	veor		d23,d26			@ Sigma0(a)
++	vadd.i64	d19,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d23,d30
++	vshr.u64	d24,d19,#14	@ 1
++#if 1<16
++	vld1.64		{d1},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d19,#18
++#if 1>0
++	 vadd.i64	d23,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d19,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d19,#50
++	vsli.64		d25,d19,#46
++	vmov		d29,d19
++	vsli.64		d26,d19,#23
++#if 1<16 && defined(__ARMEL__)
++	vrev64.8	d1,d1
++#endif
++	veor		d25,d24
++	vbsl		d29,d20,d21		@ Ch(e,f,g)
++	vshr.u64	d24,d23,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d22
++	vshr.u64	d25,d23,#34
++	vsli.64		d24,d23,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d23,#39
++	vadd.i64	d28,d1
++	vsli.64		d25,d23,#30
++	veor		d30,d23,d16
++	vsli.64		d26,d23,#25
++	veor		d22,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d17,d16		@ Maj(a,b,c)
++	veor		d22,d26			@ Sigma0(a)
++	vadd.i64	d18,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d22,d30
++	vshr.u64	d24,d18,#14	@ 2
++#if 2<16
++	vld1.64		{d2},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d18,#18
++#if 2>0
++	 vadd.i64	d22,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d18,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d18,#50
++	vsli.64		d25,d18,#46
++	vmov		d29,d18
++	vsli.64		d26,d18,#23
++#if 2<16 && defined(__ARMEL__)
++	vrev64.8	d2,d2
++#endif
++	veor		d25,d24
++	vbsl		d29,d19,d20		@ Ch(e,f,g)
++	vshr.u64	d24,d22,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d21
++	vshr.u64	d25,d22,#34
++	vsli.64		d24,d22,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d22,#39
++	vadd.i64	d28,d2
++	vsli.64		d25,d22,#30
++	veor		d30,d22,d23
++	vsli.64		d26,d22,#25
++	veor		d21,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d16,d23		@ Maj(a,b,c)
++	veor		d21,d26			@ Sigma0(a)
++	vadd.i64	d17,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d21,d30
++	vshr.u64	d24,d17,#14	@ 3
++#if 3<16
++	vld1.64		{d3},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d17,#18
++#if 3>0
++	 vadd.i64	d21,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d17,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d17,#50
++	vsli.64		d25,d17,#46
++	vmov		d29,d17
++	vsli.64		d26,d17,#23
++#if 3<16 && defined(__ARMEL__)
++	vrev64.8	d3,d3
++#endif
++	veor		d25,d24
++	vbsl		d29,d18,d19		@ Ch(e,f,g)
++	vshr.u64	d24,d21,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d20
++	vshr.u64	d25,d21,#34
++	vsli.64		d24,d21,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d21,#39
++	vadd.i64	d28,d3
++	vsli.64		d25,d21,#30
++	veor		d30,d21,d22
++	vsli.64		d26,d21,#25
++	veor		d20,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d23,d22		@ Maj(a,b,c)
++	veor		d20,d26			@ Sigma0(a)
++	vadd.i64	d16,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d20,d30
++	vshr.u64	d24,d16,#14	@ 4
++#if 4<16
++	vld1.64		{d4},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d16,#18
++#if 4>0
++	 vadd.i64	d20,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d16,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d16,#50
++	vsli.64		d25,d16,#46
++	vmov		d29,d16
++	vsli.64		d26,d16,#23
++#if 4<16 && defined(__ARMEL__)
++	vrev64.8	d4,d4
++#endif
++	veor		d25,d24
++	vbsl		d29,d17,d18		@ Ch(e,f,g)
++	vshr.u64	d24,d20,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d19
++	vshr.u64	d25,d20,#34
++	vsli.64		d24,d20,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d20,#39
++	vadd.i64	d28,d4
++	vsli.64		d25,d20,#30
++	veor		d30,d20,d21
++	vsli.64		d26,d20,#25
++	veor		d19,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d22,d21		@ Maj(a,b,c)
++	veor		d19,d26			@ Sigma0(a)
++	vadd.i64	d23,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d19,d30
++	vshr.u64	d24,d23,#14	@ 5
++#if 5<16
++	vld1.64		{d5},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d23,#18
++#if 5>0
++	 vadd.i64	d19,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d23,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d23,#50
++	vsli.64		d25,d23,#46
++	vmov		d29,d23
++	vsli.64		d26,d23,#23
++#if 5<16 && defined(__ARMEL__)
++	vrev64.8	d5,d5
++#endif
++	veor		d25,d24
++	vbsl		d29,d16,d17		@ Ch(e,f,g)
++	vshr.u64	d24,d19,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d18
++	vshr.u64	d25,d19,#34
++	vsli.64		d24,d19,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d19,#39
++	vadd.i64	d28,d5
++	vsli.64		d25,d19,#30
++	veor		d30,d19,d20
++	vsli.64		d26,d19,#25
++	veor		d18,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d21,d20		@ Maj(a,b,c)
++	veor		d18,d26			@ Sigma0(a)
++	vadd.i64	d22,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d18,d30
++	vshr.u64	d24,d22,#14	@ 6
++#if 6<16
++	vld1.64		{d6},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d22,#18
++#if 6>0
++	 vadd.i64	d18,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d22,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d22,#50
++	vsli.64		d25,d22,#46
++	vmov		d29,d22
++	vsli.64		d26,d22,#23
++#if 6<16 && defined(__ARMEL__)
++	vrev64.8	d6,d6
++#endif
++	veor		d25,d24
++	vbsl		d29,d23,d16		@ Ch(e,f,g)
++	vshr.u64	d24,d18,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d17
++	vshr.u64	d25,d18,#34
++	vsli.64		d24,d18,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d18,#39
++	vadd.i64	d28,d6
++	vsli.64		d25,d18,#30
++	veor		d30,d18,d19
++	vsli.64		d26,d18,#25
++	veor		d17,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d20,d19		@ Maj(a,b,c)
++	veor		d17,d26			@ Sigma0(a)
++	vadd.i64	d21,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d17,d30
++	vshr.u64	d24,d21,#14	@ 7
++#if 7<16
++	vld1.64		{d7},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d21,#18
++#if 7>0
++	 vadd.i64	d17,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d21,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d21,#50
++	vsli.64		d25,d21,#46
++	vmov		d29,d21
++	vsli.64		d26,d21,#23
++#if 7<16 && defined(__ARMEL__)
++	vrev64.8	d7,d7
++#endif
++	veor		d25,d24
++	vbsl		d29,d22,d23		@ Ch(e,f,g)
++	vshr.u64	d24,d17,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d16
++	vshr.u64	d25,d17,#34
++	vsli.64		d24,d17,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d17,#39
++	vadd.i64	d28,d7
++	vsli.64		d25,d17,#30
++	veor		d30,d17,d18
++	vsli.64		d26,d17,#25
++	veor		d16,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d19,d18		@ Maj(a,b,c)
++	veor		d16,d26			@ Sigma0(a)
++	vadd.i64	d20,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d16,d30
++	vshr.u64	d24,d20,#14	@ 8
++#if 8<16
++	vld1.64		{d8},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d20,#18
++#if 8>0
++	 vadd.i64	d16,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d20,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d20,#50
++	vsli.64		d25,d20,#46
++	vmov		d29,d20
++	vsli.64		d26,d20,#23
++#if 8<16 && defined(__ARMEL__)
++	vrev64.8	d8,d8
++#endif
++	veor		d25,d24
++	vbsl		d29,d21,d22		@ Ch(e,f,g)
++	vshr.u64	d24,d16,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d23
++	vshr.u64	d25,d16,#34
++	vsli.64		d24,d16,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d16,#39
++	vadd.i64	d28,d8
++	vsli.64		d25,d16,#30
++	veor		d30,d16,d17
++	vsli.64		d26,d16,#25
++	veor		d23,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d18,d17		@ Maj(a,b,c)
++	veor		d23,d26			@ Sigma0(a)
++	vadd.i64	d19,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d23,d30
++	vshr.u64	d24,d19,#14	@ 9
++#if 9<16
++	vld1.64		{d9},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d19,#18
++#if 9>0
++	 vadd.i64	d23,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d19,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d19,#50
++	vsli.64		d25,d19,#46
++	vmov		d29,d19
++	vsli.64		d26,d19,#23
++#if 9<16 && defined(__ARMEL__)
++	vrev64.8	d9,d9
++#endif
++	veor		d25,d24
++	vbsl		d29,d20,d21		@ Ch(e,f,g)
++	vshr.u64	d24,d23,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d22
++	vshr.u64	d25,d23,#34
++	vsli.64		d24,d23,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d23,#39
++	vadd.i64	d28,d9
++	vsli.64		d25,d23,#30
++	veor		d30,d23,d16
++	vsli.64		d26,d23,#25
++	veor		d22,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d17,d16		@ Maj(a,b,c)
++	veor		d22,d26			@ Sigma0(a)
++	vadd.i64	d18,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d22,d30
++	vshr.u64	d24,d18,#14	@ 10
++#if 10<16
++	vld1.64		{d10},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d18,#18
++#if 10>0
++	 vadd.i64	d22,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d18,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d18,#50
++	vsli.64		d25,d18,#46
++	vmov		d29,d18
++	vsli.64		d26,d18,#23
++#if 10<16 && defined(__ARMEL__)
++	vrev64.8	d10,d10
++#endif
++	veor		d25,d24
++	vbsl		d29,d19,d20		@ Ch(e,f,g)
++	vshr.u64	d24,d22,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d21
++	vshr.u64	d25,d22,#34
++	vsli.64		d24,d22,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d22,#39
++	vadd.i64	d28,d10
++	vsli.64		d25,d22,#30
++	veor		d30,d22,d23
++	vsli.64		d26,d22,#25
++	veor		d21,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d16,d23		@ Maj(a,b,c)
++	veor		d21,d26			@ Sigma0(a)
++	vadd.i64	d17,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d21,d30
++	vshr.u64	d24,d17,#14	@ 11
++#if 11<16
++	vld1.64		{d11},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d17,#18
++#if 11>0
++	 vadd.i64	d21,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d17,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d17,#50
++	vsli.64		d25,d17,#46
++	vmov		d29,d17
++	vsli.64		d26,d17,#23
++#if 11<16 && defined(__ARMEL__)
++	vrev64.8	d11,d11
++#endif
++	veor		d25,d24
++	vbsl		d29,d18,d19		@ Ch(e,f,g)
++	vshr.u64	d24,d21,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d20
++	vshr.u64	d25,d21,#34
++	vsli.64		d24,d21,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d21,#39
++	vadd.i64	d28,d11
++	vsli.64		d25,d21,#30
++	veor		d30,d21,d22
++	vsli.64		d26,d21,#25
++	veor		d20,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d23,d22		@ Maj(a,b,c)
++	veor		d20,d26			@ Sigma0(a)
++	vadd.i64	d16,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d20,d30
++	vshr.u64	d24,d16,#14	@ 12
++#if 12<16
++	vld1.64		{d12},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d16,#18
++#if 12>0
++	 vadd.i64	d20,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d16,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d16,#50
++	vsli.64		d25,d16,#46
++	vmov		d29,d16
++	vsli.64		d26,d16,#23
++#if 12<16 && defined(__ARMEL__)
++	vrev64.8	d12,d12
++#endif
++	veor		d25,d24
++	vbsl		d29,d17,d18		@ Ch(e,f,g)
++	vshr.u64	d24,d20,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d19
++	vshr.u64	d25,d20,#34
++	vsli.64		d24,d20,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d20,#39
++	vadd.i64	d28,d12
++	vsli.64		d25,d20,#30
++	veor		d30,d20,d21
++	vsli.64		d26,d20,#25
++	veor		d19,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d22,d21		@ Maj(a,b,c)
++	veor		d19,d26			@ Sigma0(a)
++	vadd.i64	d23,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d19,d30
++	vshr.u64	d24,d23,#14	@ 13
++#if 13<16
++	vld1.64		{d13},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d23,#18
++#if 13>0
++	 vadd.i64	d19,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d23,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d23,#50
++	vsli.64		d25,d23,#46
++	vmov		d29,d23
++	vsli.64		d26,d23,#23
++#if 13<16 && defined(__ARMEL__)
++	vrev64.8	d13,d13
++#endif
++	veor		d25,d24
++	vbsl		d29,d16,d17		@ Ch(e,f,g)
++	vshr.u64	d24,d19,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d18
++	vshr.u64	d25,d19,#34
++	vsli.64		d24,d19,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d19,#39
++	vadd.i64	d28,d13
++	vsli.64		d25,d19,#30
++	veor		d30,d19,d20
++	vsli.64		d26,d19,#25
++	veor		d18,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d21,d20		@ Maj(a,b,c)
++	veor		d18,d26			@ Sigma0(a)
++	vadd.i64	d22,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d18,d30
++	vshr.u64	d24,d22,#14	@ 14
++#if 14<16
++	vld1.64		{d14},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d22,#18
++#if 14>0
++	 vadd.i64	d18,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d22,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d22,#50
++	vsli.64		d25,d22,#46
++	vmov		d29,d22
++	vsli.64		d26,d22,#23
++#if 14<16 && defined(__ARMEL__)
++	vrev64.8	d14,d14
++#endif
++	veor		d25,d24
++	vbsl		d29,d23,d16		@ Ch(e,f,g)
++	vshr.u64	d24,d18,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d17
++	vshr.u64	d25,d18,#34
++	vsli.64		d24,d18,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d18,#39
++	vadd.i64	d28,d14
++	vsli.64		d25,d18,#30
++	veor		d30,d18,d19
++	vsli.64		d26,d18,#25
++	veor		d17,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d20,d19		@ Maj(a,b,c)
++	veor		d17,d26			@ Sigma0(a)
++	vadd.i64	d21,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d17,d30
++	vshr.u64	d24,d21,#14	@ 15
++#if 15<16
++	vld1.64		{d15},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d21,#18
++#if 15>0
++	 vadd.i64	d17,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d21,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d21,#50
++	vsli.64		d25,d21,#46
++	vmov		d29,d21
++	vsli.64		d26,d21,#23
++#if 15<16 && defined(__ARMEL__)
++	vrev64.8	d15,d15
++#endif
++	veor		d25,d24
++	vbsl		d29,d22,d23		@ Ch(e,f,g)
++	vshr.u64	d24,d17,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d16
++	vshr.u64	d25,d17,#34
++	vsli.64		d24,d17,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d17,#39
++	vadd.i64	d28,d15
++	vsli.64		d25,d17,#30
++	veor		d30,d17,d18
++	vsli.64		d26,d17,#25
++	veor		d16,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d19,d18		@ Maj(a,b,c)
++	veor		d16,d26			@ Sigma0(a)
++	vadd.i64	d20,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d16,d30
++	mov		r12,#4
++.L16_79_neon:
++	subs		r12,#1
++	vshr.u64	q12,q7,#19
++	vshr.u64	q13,q7,#61
++	 vadd.i64	d16,d30			@ h+=3DMaj from the past
++	vshr.u64	q15,q7,#6
++	vsli.64		q12,q7,#45
++	vext.8		q14,q0,q1,#8	@ X[i+1]
++	vsli.64		q13,q7,#3
++	veor		q15,q12
++	vshr.u64	q12,q14,#1
++	veor		q15,q13				@ sigma1(X[i+14])
++	vshr.u64	q13,q14,#8
++	vadd.i64	q0,q15
++	vshr.u64	q15,q14,#7
++	vsli.64		q12,q14,#63
++	vsli.64		q13,q14,#56
++	vext.8		q14,q4,q5,#8	@ X[i+9]
++	veor		q15,q12
++	vshr.u64	d24,d20,#14		@ from NEON_00_15
++	vadd.i64	q0,q14
++	vshr.u64	d25,d20,#18		@ from NEON_00_15
++	veor		q15,q13				@ sigma0(X[i+1])
++	vshr.u64	d26,d20,#41		@ from NEON_00_15
++	vadd.i64	q0,q15
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d20,#50
++	vsli.64		d25,d20,#46
++	vmov		d29,d20
++	vsli.64		d26,d20,#23
++#if 16<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d21,d22		@ Ch(e,f,g)
++	vshr.u64	d24,d16,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d23
++	vshr.u64	d25,d16,#34
++	vsli.64		d24,d16,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d16,#39
++	vadd.i64	d28,d0
++	vsli.64		d25,d16,#30
++	veor		d30,d16,d17
++	vsli.64		d26,d16,#25
++	veor		d23,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d18,d17		@ Maj(a,b,c)
++	veor		d23,d26			@ Sigma0(a)
++	vadd.i64	d19,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d23,d30
++	vshr.u64	d24,d19,#14	@ 17
++#if 17<16
++	vld1.64		{d1},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d19,#18
++#if 17>0
++	 vadd.i64	d23,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d19,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d19,#50
++	vsli.64		d25,d19,#46
++	vmov		d29,d19
++	vsli.64		d26,d19,#23
++#if 17<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d20,d21		@ Ch(e,f,g)
++	vshr.u64	d24,d23,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d22
++	vshr.u64	d25,d23,#34
++	vsli.64		d24,d23,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d23,#39
++	vadd.i64	d28,d1
++	vsli.64		d25,d23,#30
++	veor		d30,d23,d16
++	vsli.64		d26,d23,#25
++	veor		d22,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d17,d16		@ Maj(a,b,c)
++	veor		d22,d26			@ Sigma0(a)
++	vadd.i64	d18,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d22,d30
++	vshr.u64	q12,q0,#19
++	vshr.u64	q13,q0,#61
++	 vadd.i64	d22,d30			@ h+=3DMaj from the past
++	vshr.u64	q15,q0,#6
++	vsli.64		q12,q0,#45
++	vext.8		q14,q1,q2,#8	@ X[i+1]
++	vsli.64		q13,q0,#3
++	veor		q15,q12
++	vshr.u64	q12,q14,#1
++	veor		q15,q13				@ sigma1(X[i+14])
++	vshr.u64	q13,q14,#8
++	vadd.i64	q1,q15
++	vshr.u64	q15,q14,#7
++	vsli.64		q12,q14,#63
++	vsli.64		q13,q14,#56
++	vext.8		q14,q5,q6,#8	@ X[i+9]
++	veor		q15,q12
++	vshr.u64	d24,d18,#14		@ from NEON_00_15
++	vadd.i64	q1,q14
++	vshr.u64	d25,d18,#18		@ from NEON_00_15
++	veor		q15,q13				@ sigma0(X[i+1])
++	vshr.u64	d26,d18,#41		@ from NEON_00_15
++	vadd.i64	q1,q15
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d18,#50
++	vsli.64		d25,d18,#46
++	vmov		d29,d18
++	vsli.64		d26,d18,#23
++#if 18<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d19,d20		@ Ch(e,f,g)
++	vshr.u64	d24,d22,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d21
++	vshr.u64	d25,d22,#34
++	vsli.64		d24,d22,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d22,#39
++	vadd.i64	d28,d2
++	vsli.64		d25,d22,#30
++	veor		d30,d22,d23
++	vsli.64		d26,d22,#25
++	veor		d21,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d16,d23		@ Maj(a,b,c)
++	veor		d21,d26			@ Sigma0(a)
++	vadd.i64	d17,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d21,d30
++	vshr.u64	d24,d17,#14	@ 19
++#if 19<16
++	vld1.64		{d3},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d17,#18
++#if 19>0
++	 vadd.i64	d21,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d17,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d17,#50
++	vsli.64		d25,d17,#46
++	vmov		d29,d17
++	vsli.64		d26,d17,#23
++#if 19<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d18,d19		@ Ch(e,f,g)
++	vshr.u64	d24,d21,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d20
++	vshr.u64	d25,d21,#34
++	vsli.64		d24,d21,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d21,#39
++	vadd.i64	d28,d3
++	vsli.64		d25,d21,#30
++	veor		d30,d21,d22
++	vsli.64		d26,d21,#25
++	veor		d20,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d23,d22		@ Maj(a,b,c)
++	veor		d20,d26			@ Sigma0(a)
++	vadd.i64	d16,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d20,d30
++	vshr.u64	q12,q1,#19
++	vshr.u64	q13,q1,#61
++	 vadd.i64	d20,d30			@ h+=3DMaj from the past
++	vshr.u64	q15,q1,#6
++	vsli.64		q12,q1,#45
++	vext.8		q14,q2,q3,#8	@ X[i+1]
++	vsli.64		q13,q1,#3
++	veor		q15,q12
++	vshr.u64	q12,q14,#1
++	veor		q15,q13				@ sigma1(X[i+14])
++	vshr.u64	q13,q14,#8
++	vadd.i64	q2,q15
++	vshr.u64	q15,q14,#7
++	vsli.64		q12,q14,#63
++	vsli.64		q13,q14,#56
++	vext.8		q14,q6,q7,#8	@ X[i+9]
++	veor		q15,q12
++	vshr.u64	d24,d16,#14		@ from NEON_00_15
++	vadd.i64	q2,q14
++	vshr.u64	d25,d16,#18		@ from NEON_00_15
++	veor		q15,q13				@ sigma0(X[i+1])
++	vshr.u64	d26,d16,#41		@ from NEON_00_15
++	vadd.i64	q2,q15
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d16,#50
++	vsli.64		d25,d16,#46
++	vmov		d29,d16
++	vsli.64		d26,d16,#23
++#if 20<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d17,d18		@ Ch(e,f,g)
++	vshr.u64	d24,d20,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d19
++	vshr.u64	d25,d20,#34
++	vsli.64		d24,d20,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d20,#39
++	vadd.i64	d28,d4
++	vsli.64		d25,d20,#30
++	veor		d30,d20,d21
++	vsli.64		d26,d20,#25
++	veor		d19,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d22,d21		@ Maj(a,b,c)
++	veor		d19,d26			@ Sigma0(a)
++	vadd.i64	d23,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d19,d30
++	vshr.u64	d24,d23,#14	@ 21
++#if 21<16
++	vld1.64		{d5},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d23,#18
++#if 21>0
++	 vadd.i64	d19,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d23,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d23,#50
++	vsli.64		d25,d23,#46
++	vmov		d29,d23
++	vsli.64		d26,d23,#23
++#if 21<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d16,d17		@ Ch(e,f,g)
++	vshr.u64	d24,d19,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d18
++	vshr.u64	d25,d19,#34
++	vsli.64		d24,d19,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d19,#39
++	vadd.i64	d28,d5
++	vsli.64		d25,d19,#30
++	veor		d30,d19,d20
++	vsli.64		d26,d19,#25
++	veor		d18,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d21,d20		@ Maj(a,b,c)
++	veor		d18,d26			@ Sigma0(a)
++	vadd.i64	d22,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d18,d30
++	vshr.u64	q12,q2,#19
++	vshr.u64	q13,q2,#61
++	 vadd.i64	d18,d30			@ h+=3DMaj from the past
++	vshr.u64	q15,q2,#6
++	vsli.64		q12,q2,#45
++	vext.8		q14,q3,q4,#8	@ X[i+1]
++	vsli.64		q13,q2,#3
++	veor		q15,q12
++	vshr.u64	q12,q14,#1
++	veor		q15,q13				@ sigma1(X[i+14])
++	vshr.u64	q13,q14,#8
++	vadd.i64	q3,q15
++	vshr.u64	q15,q14,#7
++	vsli.64		q12,q14,#63
++	vsli.64		q13,q14,#56
++	vext.8		q14,q7,q0,#8	@ X[i+9]
++	veor		q15,q12
++	vshr.u64	d24,d22,#14		@ from NEON_00_15
++	vadd.i64	q3,q14
++	vshr.u64	d25,d22,#18		@ from NEON_00_15
++	veor		q15,q13				@ sigma0(X[i+1])
++	vshr.u64	d26,d22,#41		@ from NEON_00_15
++	vadd.i64	q3,q15
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d22,#50
++	vsli.64		d25,d22,#46
++	vmov		d29,d22
++	vsli.64		d26,d22,#23
++#if 22<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d23,d16		@ Ch(e,f,g)
++	vshr.u64	d24,d18,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d17
++	vshr.u64	d25,d18,#34
++	vsli.64		d24,d18,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d18,#39
++	vadd.i64	d28,d6
++	vsli.64		d25,d18,#30
++	veor		d30,d18,d19
++	vsli.64		d26,d18,#25
++	veor		d17,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d20,d19		@ Maj(a,b,c)
++	veor		d17,d26			@ Sigma0(a)
++	vadd.i64	d21,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d17,d30
++	vshr.u64	d24,d21,#14	@ 23
++#if 23<16
++	vld1.64		{d7},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d21,#18
++#if 23>0
++	 vadd.i64	d17,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d21,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d21,#50
++	vsli.64		d25,d21,#46
++	vmov		d29,d21
++	vsli.64		d26,d21,#23
++#if 23<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d22,d23		@ Ch(e,f,g)
++	vshr.u64	d24,d17,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d16
++	vshr.u64	d25,d17,#34
++	vsli.64		d24,d17,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d17,#39
++	vadd.i64	d28,d7
++	vsli.64		d25,d17,#30
++	veor		d30,d17,d18
++	vsli.64		d26,d17,#25
++	veor		d16,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d19,d18		@ Maj(a,b,c)
++	veor		d16,d26			@ Sigma0(a)
++	vadd.i64	d20,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d16,d30
++	vshr.u64	q12,q3,#19
++	vshr.u64	q13,q3,#61
++	 vadd.i64	d16,d30			@ h+=3DMaj from the past
++	vshr.u64	q15,q3,#6
++	vsli.64		q12,q3,#45
++	vext.8		q14,q4,q5,#8	@ X[i+1]
++	vsli.64		q13,q3,#3
++	veor		q15,q12
++	vshr.u64	q12,q14,#1
++	veor		q15,q13				@ sigma1(X[i+14])
++	vshr.u64	q13,q14,#8
++	vadd.i64	q4,q15
++	vshr.u64	q15,q14,#7
++	vsli.64		q12,q14,#63
++	vsli.64		q13,q14,#56
++	vext.8		q14,q0,q1,#8	@ X[i+9]
++	veor		q15,q12
++	vshr.u64	d24,d20,#14		@ from NEON_00_15
++	vadd.i64	q4,q14
++	vshr.u64	d25,d20,#18		@ from NEON_00_15
++	veor		q15,q13				@ sigma0(X[i+1])
++	vshr.u64	d26,d20,#41		@ from NEON_00_15
++	vadd.i64	q4,q15
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d20,#50
++	vsli.64		d25,d20,#46
++	vmov		d29,d20
++	vsli.64		d26,d20,#23
++#if 24<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d21,d22		@ Ch(e,f,g)
++	vshr.u64	d24,d16,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d23
++	vshr.u64	d25,d16,#34
++	vsli.64		d24,d16,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d16,#39
++	vadd.i64	d28,d8
++	vsli.64		d25,d16,#30
++	veor		d30,d16,d17
++	vsli.64		d26,d16,#25
++	veor		d23,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d18,d17		@ Maj(a,b,c)
++	veor		d23,d26			@ Sigma0(a)
++	vadd.i64	d19,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d23,d30
++	vshr.u64	d24,d19,#14	@ 25
++#if 25<16
++	vld1.64		{d9},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d19,#18
++#if 25>0
++	 vadd.i64	d23,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d19,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d19,#50
++	vsli.64		d25,d19,#46
++	vmov		d29,d19
++	vsli.64		d26,d19,#23
++#if 25<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d20,d21		@ Ch(e,f,g)
++	vshr.u64	d24,d23,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d22
++	vshr.u64	d25,d23,#34
++	vsli.64		d24,d23,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d23,#39
++	vadd.i64	d28,d9
++	vsli.64		d25,d23,#30
++	veor		d30,d23,d16
++	vsli.64		d26,d23,#25
++	veor		d22,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d17,d16		@ Maj(a,b,c)
++	veor		d22,d26			@ Sigma0(a)
++	vadd.i64	d18,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d22,d30
++	vshr.u64	q12,q4,#19
++	vshr.u64	q13,q4,#61
++	 vadd.i64	d22,d30			@ h+=3DMaj from the past
++	vshr.u64	q15,q4,#6
++	vsli.64		q12,q4,#45
++	vext.8		q14,q5,q6,#8	@ X[i+1]
++	vsli.64		q13,q4,#3
++	veor		q15,q12
++	vshr.u64	q12,q14,#1
++	veor		q15,q13				@ sigma1(X[i+14])
++	vshr.u64	q13,q14,#8
++	vadd.i64	q5,q15
++	vshr.u64	q15,q14,#7
++	vsli.64		q12,q14,#63
++	vsli.64		q13,q14,#56
++	vext.8		q14,q1,q2,#8	@ X[i+9]
++	veor		q15,q12
++	vshr.u64	d24,d18,#14		@ from NEON_00_15
++	vadd.i64	q5,q14
++	vshr.u64	d25,d18,#18		@ from NEON_00_15
++	veor		q15,q13				@ sigma0(X[i+1])
++	vshr.u64	d26,d18,#41		@ from NEON_00_15
++	vadd.i64	q5,q15
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d18,#50
++	vsli.64		d25,d18,#46
++	vmov		d29,d18
++	vsli.64		d26,d18,#23
++#if 26<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d19,d20		@ Ch(e,f,g)
++	vshr.u64	d24,d22,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d21
++	vshr.u64	d25,d22,#34
++	vsli.64		d24,d22,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d22,#39
++	vadd.i64	d28,d10
++	vsli.64		d25,d22,#30
++	veor		d30,d22,d23
++	vsli.64		d26,d22,#25
++	veor		d21,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d16,d23		@ Maj(a,b,c)
++	veor		d21,d26			@ Sigma0(a)
++	vadd.i64	d17,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d21,d30
++	vshr.u64	d24,d17,#14	@ 27
++#if 27<16
++	vld1.64		{d11},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d17,#18
++#if 27>0
++	 vadd.i64	d21,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d17,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d17,#50
++	vsli.64		d25,d17,#46
++	vmov		d29,d17
++	vsli.64		d26,d17,#23
++#if 27<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d18,d19		@ Ch(e,f,g)
++	vshr.u64	d24,d21,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d20
++	vshr.u64	d25,d21,#34
++	vsli.64		d24,d21,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d21,#39
++	vadd.i64	d28,d11
++	vsli.64		d25,d21,#30
++	veor		d30,d21,d22
++	vsli.64		d26,d21,#25
++	veor		d20,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d23,d22		@ Maj(a,b,c)
++	veor		d20,d26			@ Sigma0(a)
++	vadd.i64	d16,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d20,d30
++	vshr.u64	q12,q5,#19
++	vshr.u64	q13,q5,#61
++	 vadd.i64	d20,d30			@ h+=3DMaj from the past
++	vshr.u64	q15,q5,#6
++	vsli.64		q12,q5,#45
++	vext.8		q14,q6,q7,#8	@ X[i+1]
++	vsli.64		q13,q5,#3
++	veor		q15,q12
++	vshr.u64	q12,q14,#1
++	veor		q15,q13				@ sigma1(X[i+14])
++	vshr.u64	q13,q14,#8
++	vadd.i64	q6,q15
++	vshr.u64	q15,q14,#7
++	vsli.64		q12,q14,#63
++	vsli.64		q13,q14,#56
++	vext.8		q14,q2,q3,#8	@ X[i+9]
++	veor		q15,q12
++	vshr.u64	d24,d16,#14		@ from NEON_00_15
++	vadd.i64	q6,q14
++	vshr.u64	d25,d16,#18		@ from NEON_00_15
++	veor		q15,q13				@ sigma0(X[i+1])
++	vshr.u64	d26,d16,#41		@ from NEON_00_15
++	vadd.i64	q6,q15
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d16,#50
++	vsli.64		d25,d16,#46
++	vmov		d29,d16
++	vsli.64		d26,d16,#23
++#if 28<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d17,d18		@ Ch(e,f,g)
++	vshr.u64	d24,d20,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d19
++	vshr.u64	d25,d20,#34
++	vsli.64		d24,d20,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d20,#39
++	vadd.i64	d28,d12
++	vsli.64		d25,d20,#30
++	veor		d30,d20,d21
++	vsli.64		d26,d20,#25
++	veor		d19,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d22,d21		@ Maj(a,b,c)
++	veor		d19,d26			@ Sigma0(a)
++	vadd.i64	d23,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d19,d30
++	vshr.u64	d24,d23,#14	@ 29
++#if 29<16
++	vld1.64		{d13},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d23,#18
++#if 29>0
++	 vadd.i64	d19,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d23,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d23,#50
++	vsli.64		d25,d23,#46
++	vmov		d29,d23
++	vsli.64		d26,d23,#23
++#if 29<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d16,d17		@ Ch(e,f,g)
++	vshr.u64	d24,d19,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d18
++	vshr.u64	d25,d19,#34
++	vsli.64		d24,d19,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d19,#39
++	vadd.i64	d28,d13
++	vsli.64		d25,d19,#30
++	veor		d30,d19,d20
++	vsli.64		d26,d19,#25
++	veor		d18,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d21,d20		@ Maj(a,b,c)
++	veor		d18,d26			@ Sigma0(a)
++	vadd.i64	d22,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d18,d30
++	vshr.u64	q12,q6,#19
++	vshr.u64	q13,q6,#61
++	 vadd.i64	d18,d30			@ h+=3DMaj from the past
++	vshr.u64	q15,q6,#6
++	vsli.64		q12,q6,#45
++	vext.8		q14,q7,q0,#8	@ X[i+1]
++	vsli.64		q13,q6,#3
++	veor		q15,q12
++	vshr.u64	q12,q14,#1
++	veor		q15,q13				@ sigma1(X[i+14])
++	vshr.u64	q13,q14,#8
++	vadd.i64	q7,q15
++	vshr.u64	q15,q14,#7
++	vsli.64		q12,q14,#63
++	vsli.64		q13,q14,#56
++	vext.8		q14,q3,q4,#8	@ X[i+9]
++	veor		q15,q12
++	vshr.u64	d24,d22,#14		@ from NEON_00_15
++	vadd.i64	q7,q14
++	vshr.u64	d25,d22,#18		@ from NEON_00_15
++	veor		q15,q13				@ sigma0(X[i+1])
++	vshr.u64	d26,d22,#41		@ from NEON_00_15
++	vadd.i64	q7,q15
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d22,#50
++	vsli.64		d25,d22,#46
++	vmov		d29,d22
++	vsli.64		d26,d22,#23
++#if 30<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d23,d16		@ Ch(e,f,g)
++	vshr.u64	d24,d18,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d17
++	vshr.u64	d25,d18,#34
++	vsli.64		d24,d18,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d18,#39
++	vadd.i64	d28,d14
++	vsli.64		d25,d18,#30
++	veor		d30,d18,d19
++	vsli.64		d26,d18,#25
++	veor		d17,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d20,d19		@ Maj(a,b,c)
++	veor		d17,d26			@ Sigma0(a)
++	vadd.i64	d21,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d17,d30
++	vshr.u64	d24,d21,#14	@ 31
++#if 31<16
++	vld1.64		{d15},[r1]!	@ handles unaligned
++#endif
++	vshr.u64	d25,d21,#18
++#if 31>0
++	 vadd.i64	d17,d30			@ h+=3DMaj from the past
++#endif
++	vshr.u64	d26,d21,#41
++	vld1.64		{d28},[r3,:64]!	@ K[i++]
++	vsli.64		d24,d21,#50
++	vsli.64		d25,d21,#46
++	vmov		d29,d21
++	vsli.64		d26,d21,#23
++#if 31<16 && defined(__ARMEL__)
++	vrev64.8	,
++#endif
++	veor		d25,d24
++	vbsl		d29,d22,d23		@ Ch(e,f,g)
++	vshr.u64	d24,d17,#28
++	veor		d26,d25			@ Sigma1(e)
++	vadd.i64	d27,d29,d16
++	vshr.u64	d25,d17,#34
++	vsli.64		d24,d17,#36
++	vadd.i64	d27,d26
++	vshr.u64	d26,d17,#39
++	vadd.i64	d28,d15
++	vsli.64		d25,d17,#30
++	veor		d30,d17,d18
++	vsli.64		d26,d17,#25
++	veor		d16,d24,d25
++	vadd.i64	d27,d28
++	vbsl		d30,d19,d18		@ Maj(a,b,c)
++	veor		d16,d26			@ Sigma0(a)
++	vadd.i64	d20,d27
++	vadd.i64	d30,d27
++	@ vadd.i64	d16,d30
++	bne		.L16_79_neon
++
++	 vadd.i64	d16,d30		@ h+=3DMaj from the past
++	vldmia		r0,{d24-d31}	@ load context to temp
++	vadd.i64	q8,q12		@ vectorized accumulate
++	vadd.i64	q9,q13
++	vadd.i64	q10,q14
++	vadd.i64	q11,q15
++	vstmia		r0,{d16-d23}	@ save context
++	teq		r1,r2
++	sub		r3,#640	@ rewind K512
++	bne		.Loop_neon
++
++	VFP_ABI_POP
++	bx	lr				@ .word	0xe12fff1e
++.size	sha512_block_data_order_neon,.-sha512_block_data_order_neon
++#endif
++.asciz	"SHA512 block transform for ARMv4/NEON, CRYPTOGAMS by <appro@op=
+enssl.org>"
++.align	2
++#if __ARM_MAX_ARCH__>=3D7 && !defined(__KERNEL__)
++.comm	OPENSSL_armcap_P,4,4
++#endif
+diff --git a/arch/arm/crypto/sha512.h b/arch/arm/crypto/sha512.h
+new file mode 100644
+index 000000000000..5cb43ebf7523
+--- /dev/null
++++ b/arch/arm/crypto/sha512.h
+@@ -0,0 +1,14 @@
++
++extern struct shash_alg sha512_neon_algs[2];
++
++int sha512_arm_init(struct shash_desc *desc);
++int sha384_arm_init(struct shash_desc *desc);
++
++int sha512_arm_export(struct shash_desc *desc, void *out);
++int sha512_arm_import(struct shash_desc *desc, const void *in);
++
++int sha512_arm_update(struct shash_desc *desc, const u8 *data,
++		      unsigned int len);
++
++int __sha512_arm_update(struct shash_desc *desc, const u8 *data,
++			unsigned int len, unsigned int partial);
+diff --git a/arch/arm/crypto/sha512_glue.c b/arch/arm/crypto/sha512_glu=
+e.c
+new file mode 100644
+index 000000000000..6acfb52e0793
+--- /dev/null
++++ b/arch/arm/crypto/sha512_glue.c
+@@ -0,0 +1,255 @@
++/*
++ * Glue code for the SHA512 Secure Hash Algorithm assembly implementat=
+ion
++ * using NEON instructions.
++ *
++ * Copyright =C2=A9 2014 Jussi Kivilinna <jussi.kivilinna@iki.fi>
++ *
++ * This file is based on sha512_ssse3_glue.c:
++ *   Copyright (C) 2013 Intel Corporation
++ *   Author: Tim Chen <tim.c.chen@linux.intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modif=
+y it
++ * under the terms of the GNU General Public License as published by t=
+he Free
++ * Software Foundation; either version 2 of the License, or (at your o=
+ption)
++ * any later version.
++ *
++ */
++
++#include <crypto/internal/hash.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/mm.h>
++#include <linux/cryptohash.h>
++#include <linux/types.h>
++#include <linux/string.h>
++#include <crypto/sha.h>
++#include <asm/byteorder.h>
++#include <asm/simd.h>
++#include <asm/neon.h>
++
++#include "sha512.h"
++
++asmlinkage void sha512_block_data_order(u64 *digest, const void *data,
++					unsigned int num_blks);
++
++int sha512_arm_init(struct shash_desc *desc)
++{
++	struct sha512_state *sctx =3D shash_desc_ctx(desc);
++
++	sctx->state[0] =3D SHA512_H0;
++	sctx->state[1] =3D SHA512_H1;
++	sctx->state[2] =3D SHA512_H2;
++	sctx->state[3] =3D SHA512_H3;
++	sctx->state[4] =3D SHA512_H4;
++	sctx->state[5] =3D SHA512_H5;
++	sctx->state[6] =3D SHA512_H6;
++	sctx->state[7] =3D SHA512_H7;
++	sctx->count[0] =3D sctx->count[1] =3D 0;
++
++	return 0;
++}
++
++int __sha512_arm_update(struct shash_desc *desc, const u8 *data,
++			unsigned int len, unsigned int partial)
++{
++	struct sha512_state *sctx =3D shash_desc_ctx(desc);
++	unsigned int done =3D 0;
++
++	sctx->count[0] +=3D len;
++	if (sctx->count[0] < len)
++		sctx->count[1]++;
++
++	if (partial) {
++		done =3D SHA512_BLOCK_SIZE - partial;
++		memcpy(sctx->buf + partial, data, done);
++		sha512_block_data_order(sctx->state, sctx->buf, 1);
++	}
++
++	if (len - done >=3D SHA512_BLOCK_SIZE) {
++		const unsigned int rounds =3D (len - done) / SHA512_BLOCK_SIZE;
++
++		sha512_block_data_order(sctx->state, data + done, rounds);
++
++		done +=3D rounds * SHA512_BLOCK_SIZE;
++	}
++
++	memcpy(sctx->buf, data + done, len - done);
++
++	return 0;
++}
++
++int sha512_arm_update(struct shash_desc *desc, const u8 *data,
++		      unsigned int len)
++{
++	struct sha512_state *sctx =3D shash_desc_ctx(desc);
++	unsigned int partial =3D sctx->count[0] % SHA512_BLOCK_SIZE;
++
++	/* Handle the fast case right here */
++	if (partial + len < SHA512_BLOCK_SIZE) {
++		sctx->count[0] +=3D len;
++		if (sctx->count[0] < len)
++			sctx->count[1]++;
++		memcpy(sctx->buf + partial, data, len);
++
++		return 0;
++	}
++
++	return __sha512_arm_update(desc, data, len, partial);
++}
++
++
++/* Add padding and return the message digest. */
++static int sha512_arm_final(struct shash_desc *desc, u8 *out)
++{
++	struct sha512_state *sctx =3D shash_desc_ctx(desc);
++	unsigned int i, index, padlen;
++	__be64 *dst =3D (__be64 *)out;
++	__be64 bits[2];
++	static const u8 padding[SHA512_BLOCK_SIZE] =3D { 0x80, };
++
++	/* save number of bits */
++	bits[1] =3D cpu_to_be64(sctx->count[0] << 3);
++	bits[0] =3D cpu_to_be64(sctx->count[1] << 3 | sctx->count[0] >> 61);
++
++	/* Pad out to 112 mod 128 and append length */
++	index =3D sctx->count[0] & 0x7f;
++	padlen =3D (index < 112) ? (112 - index) : ((128+112) - index);
++
++	sha512_arm_update(desc, padding, padlen);
++	sha512_arm_update(desc, (const u8 *)&bits, sizeof(bits));
++
++	/* Store state in digest */
++	for (i =3D 0; i < 8; i++)
++		dst[i] =3D cpu_to_be64(sctx->state[i]);
++
++	/* Wipe context */
++	memset(sctx, 0, sizeof(*sctx));
++
++	return 0;
++}
++
++int sha512_arm_export(struct shash_desc *desc, void *out)
++{
++	struct sha512_state *sctx =3D shash_desc_ctx(desc);
++
++	memcpy(out, sctx, sizeof(*sctx));
++
++	return 0;
++}
++
++int sha512_arm_import(struct shash_desc *desc, const void *in)
++{
++	struct sha512_state *sctx =3D shash_desc_ctx(desc);
++
++	memcpy(sctx, in, sizeof(*sctx));
++
++	return 0;
++}
++
++int sha384_arm_init(struct shash_desc *desc)
++{
++	struct sha512_state *sctx =3D shash_desc_ctx(desc);
++
++	sctx->state[0] =3D SHA384_H0;
++	sctx->state[1] =3D SHA384_H1;
++	sctx->state[2] =3D SHA384_H2;
++	sctx->state[3] =3D SHA384_H3;
++	sctx->state[4] =3D SHA384_H4;
++	sctx->state[5] =3D SHA384_H5;
++	sctx->state[6] =3D SHA384_H6;
++	sctx->state[7] =3D SHA384_H7;
++
++	sctx->count[0] =3D sctx->count[1] =3D 0;
++
++	return 0;
++}
++
++static int sha384_arm_final(struct shash_desc *desc, u8 *hash)
++{
++	u8 D[SHA512_DIGEST_SIZE];
++
++	sha512_arm_final(desc, D);
++
++	memcpy(hash, D, SHA384_DIGEST_SIZE);
++	memzero_explicit(D, SHA512_DIGEST_SIZE);
++
++	return 0;
++}
++
++static struct shash_alg sha512_arm_algs[] =3D { {
++	.digestsize	=3D	SHA512_DIGEST_SIZE,
++	.init		=3D	sha512_arm_init,
++	.update		=3D	sha512_arm_update,
++	.final		=3D	sha512_arm_final,
++	.export		=3D	sha512_arm_export,
++	.import		=3D	sha512_arm_import,
++	.descsize	=3D	sizeof(struct sha512_state),
++	.statesize	=3D	sizeof(struct sha512_state),
++	.base		=3D	{
++		.cra_name	=3D	"sha512",
++		.cra_driver_name =3D	"sha512-arm",
++		.cra_priority	=3D	250,
++		.cra_flags	=3D	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=3D	SHA512_BLOCK_SIZE,
++		.cra_module	=3D	THIS_MODULE,
++	}
++},  {
++	.digestsize	=3D	SHA384_DIGEST_SIZE,
++	.init		=3D	sha384_arm_init,
++	.update		=3D	sha512_arm_update,
++	.final		=3D	sha384_arm_final,
++	.export		=3D	sha512_arm_export,
++	.import		=3D	sha512_arm_import,
++	.descsize	=3D	sizeof(struct sha512_state),
++	.statesize	=3D	sizeof(struct sha512_state),
++	.base		=3D	{
++		.cra_name	=3D	"sha384",
++		.cra_driver_name =3D	"sha384-arm",
++		.cra_priority	=3D	250,
++		.cra_flags	=3D	CRYPTO_ALG_TYPE_SHASH,
++		.cra_blocksize	=3D	SHA384_BLOCK_SIZE,
++		.cra_module	=3D	THIS_MODULE,
++	}
++} };
++
++static int __init sha512_arm_mod_init(void)
++{
++	int err;
++
++	err =3D crypto_register_shashes(sha512_arm_algs,
++				      ARRAY_SIZE(sha512_arm_algs));
++	if (err)
++		return err;
++
++	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && cpu_has_neon()) {
++		err =3D crypto_register_shashes(sha512_neon_algs,
++					      ARRAY_SIZE(sha512_neon_algs));
++		if (err)
++			goto err_unregister;
++	}
++	return 0;
++
++err_unregister:
++	crypto_unregister_shashes(sha512_arm_algs,
++				  ARRAY_SIZE(sha512_arm_algs));
++
++	return err;
++}
++
++static void __exit sha512_arm_mod_fini(void)
++{
++	crypto_unregister_shashes(sha512_arm_algs,
++				  ARRAY_SIZE(sha512_arm_algs));
++	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && cpu_has_neon())
++		crypto_unregister_shashes(sha512_neon_algs,
++					  ARRAY_SIZE(sha512_neon_algs));
++}
++
++module_init(sha512_arm_mod_init);
++module_exit(sha512_arm_mod_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("SHA512 Secure Hash Algorithm, ARM ASM/NEON acceler=
+ated");
++
++MODULE_ALIAS_CRYPTO("sha512");
++MODULE_ALIAS_CRYPTO("sha384");
+diff --git a/arch/arm/crypto/sha512_neon_glue.c b/arch/arm/crypto/sha51=
+2_neon_glue.c
+index b124dce838d6..0cd6cbb0340b 100644
+--- a/arch/arm/crypto/sha512_neon_glue.c
++++ b/arch/arm/crypto/sha512_neon_glue.c
+@@ -27,71 +27,10 @@
+ #include <asm/simd.h>
+ #include <asm/neon.h>
+=20
++#include "sha512.h"
+=20
+-static const u64 sha512_k[] =3D {
+-	0x428a2f98d728ae22ULL, 0x7137449123ef65cdULL,
+-	0xb5c0fbcfec4d3b2fULL, 0xe9b5dba58189dbbcULL,
+-	0x3956c25bf348b538ULL, 0x59f111f1b605d019ULL,
+-	0x923f82a4af194f9bULL, 0xab1c5ed5da6d8118ULL,
+-	0xd807aa98a3030242ULL, 0x12835b0145706fbeULL,
+-	0x243185be4ee4b28cULL, 0x550c7dc3d5ffb4e2ULL,
+-	0x72be5d74f27b896fULL, 0x80deb1fe3b1696b1ULL,
+-	0x9bdc06a725c71235ULL, 0xc19bf174cf692694ULL,
+-	0xe49b69c19ef14ad2ULL, 0xefbe4786384f25e3ULL,
+-	0x0fc19dc68b8cd5b5ULL, 0x240ca1cc77ac9c65ULL,
+-	0x2de92c6f592b0275ULL, 0x4a7484aa6ea6e483ULL,
+-	0x5cb0a9dcbd41fbd4ULL, 0x76f988da831153b5ULL,
+-	0x983e5152ee66dfabULL, 0xa831c66d2db43210ULL,
+-	0xb00327c898fb213fULL, 0xbf597fc7beef0ee4ULL,
+-	0xc6e00bf33da88fc2ULL, 0xd5a79147930aa725ULL,
+-	0x06ca6351e003826fULL, 0x142929670a0e6e70ULL,
+-	0x27b70a8546d22ffcULL, 0x2e1b21385c26c926ULL,
+-	0x4d2c6dfc5ac42aedULL, 0x53380d139d95b3dfULL,
+-	0x650a73548baf63deULL, 0x766a0abb3c77b2a8ULL,
+-	0x81c2c92e47edaee6ULL, 0x92722c851482353bULL,
+-	0xa2bfe8a14cf10364ULL, 0xa81a664bbc423001ULL,
+-	0xc24b8b70d0f89791ULL, 0xc76c51a30654be30ULL,
+-	0xd192e819d6ef5218ULL, 0xd69906245565a910ULL,
+-	0xf40e35855771202aULL, 0x106aa07032bbd1b8ULL,
+-	0x19a4c116b8d2d0c8ULL, 0x1e376c085141ab53ULL,
+-	0x2748774cdf8eeb99ULL, 0x34b0bcb5e19b48a8ULL,
+-	0x391c0cb3c5c95a63ULL, 0x4ed8aa4ae3418acbULL,
+-	0x5b9cca4f7763e373ULL, 0x682e6ff3d6b2b8a3ULL,
+-	0x748f82ee5defb2fcULL, 0x78a5636f43172f60ULL,
+-	0x84c87814a1f0ab72ULL, 0x8cc702081a6439ecULL,
+-	0x90befffa23631e28ULL, 0xa4506cebde82bde9ULL,
+-	0xbef9a3f7b2c67915ULL, 0xc67178f2e372532bULL,
+-	0xca273eceea26619cULL, 0xd186b8c721c0c207ULL,
+-	0xeada7dd6cde0eb1eULL, 0xf57d4f7fee6ed178ULL,
+-	0x06f067aa72176fbaULL, 0x0a637dc5a2c898a6ULL,
+-	0x113f9804bef90daeULL, 0x1b710b35131c471bULL,
+-	0x28db77f523047d84ULL, 0x32caab7b40c72493ULL,
+-	0x3c9ebe0a15c9bebcULL, 0x431d67c49c100d4cULL,
+-	0x4cc5d4becb3e42b6ULL, 0x597f299cfc657e2aULL,
+-	0x5fcb6fab3ad6faecULL, 0x6c44198c4a475817ULL
+-};
+-
+-
+-asmlinkage void sha512_transform_neon(u64 *digest, const void *data,
+-				      const u64 k[], unsigned int num_blks);
+-
+-
+-static int sha512_neon_init(struct shash_desc *desc)
+-{
+-	struct sha512_state *sctx =3D shash_desc_ctx(desc);
+-
+-	sctx->state[0] =3D SHA512_H0;
+-	sctx->state[1] =3D SHA512_H1;
+-	sctx->state[2] =3D SHA512_H2;
+-	sctx->state[3] =3D SHA512_H3;
+-	sctx->state[4] =3D SHA512_H4;
+-	sctx->state[5] =3D SHA512_H5;
+-	sctx->state[6] =3D SHA512_H6;
+-	sctx->state[7] =3D SHA512_H7;
+-	sctx->count[0] =3D sctx->count[1] =3D 0;
+-
+-	return 0;
+-}
++asmlinkage void sha512_block_data_order_neon(u64 *digest, const void *=
+data,
++					     unsigned int num_blks);
+=20
+ static int __sha512_neon_update(struct shash_desc *desc, const u8 *dat=
+a,
+ 				unsigned int len, unsigned int partial)
+@@ -106,14 +45,13 @@ static int __sha512_neon_update(struct shash_desc =
+*desc, const u8 *data,
+ 	if (partial) {
+ 		done =3D SHA512_BLOCK_SIZE - partial;
+ 		memcpy(sctx->buf + partial, data, done);
+-		sha512_transform_neon(sctx->state, sctx->buf, sha512_k, 1);
++		sha512_block_data_order_neon(sctx->state, sctx->buf, 1);
+ 	}
+=20
+ 	if (len - done >=3D SHA512_BLOCK_SIZE) {
+ 		const unsigned int rounds =3D (len - done) / SHA512_BLOCK_SIZE;
+=20
+-		sha512_transform_neon(sctx->state, data + done, sha512_k,
+-				      rounds);
++		sha512_block_data_order_neon(sctx->state, data + done, rounds);
+=20
+ 		done +=3D rounds * SHA512_BLOCK_SIZE;
+ 	}
+@@ -141,7 +79,7 @@ static int sha512_neon_update(struct shash_desc *des=
+c, const u8 *data,
+ 	}
+=20
+ 	if (!may_use_simd()) {
+-		res =3D crypto_sha512_update(desc, data, len);
++		res =3D __sha512_arm_update(desc, data, len, partial);
+ 	} else {
+ 		kernel_neon_begin();
+ 		res =3D __sha512_neon_update(desc, data, len, partial);
+@@ -151,7 +89,6 @@ static int sha512_neon_update(struct shash_desc *des=
+c, const u8 *data,
+ 	return res;
+ }
+=20
+-
+ /* Add padding and return the message digest. */
+ static int sha512_neon_final(struct shash_desc *desc, u8 *out)
+ {
+@@ -170,8 +107,8 @@ static int sha512_neon_final(struct shash_desc *des=
+c, u8 *out)
+ 	padlen =3D (index < 112) ? (112 - index) : ((128+112) - index);
+=20
+ 	if (!may_use_simd()) {
+-		crypto_sha512_update(desc, padding, padlen);
+-		crypto_sha512_update(desc, (const u8 *)&bits, sizeof(bits));
++		sha512_arm_update(desc, padding, padlen);
++		sha512_arm_update(desc, (const u8 *)&bits, sizeof(bits));
+ 	} else {
+ 		kernel_neon_begin();
+ 		/* We need to fill a whole block for __sha512_neon_update() */
+@@ -198,42 +135,6 @@ static int sha512_neon_final(struct shash_desc *de=
+sc, u8 *out)
+ 	return 0;
+ }
+=20
+-static int sha512_neon_export(struct shash_desc *desc, void *out)
+-{
+-	struct sha512_state *sctx =3D shash_desc_ctx(desc);
+-
+-	memcpy(out, sctx, sizeof(*sctx));
+-
+-	return 0;
+-}
+-
+-static int sha512_neon_import(struct shash_desc *desc, const void *in)
+-{
+-	struct sha512_state *sctx =3D shash_desc_ctx(desc);
+-
+-	memcpy(sctx, in, sizeof(*sctx));
+-
+-	return 0;
+-}
+-
+-static int sha384_neon_init(struct shash_desc *desc)
+-{
+-	struct sha512_state *sctx =3D shash_desc_ctx(desc);
+-
+-	sctx->state[0] =3D SHA384_H0;
+-	sctx->state[1] =3D SHA384_H1;
+-	sctx->state[2] =3D SHA384_H2;
+-	sctx->state[3] =3D SHA384_H3;
+-	sctx->state[4] =3D SHA384_H4;
+-	sctx->state[5] =3D SHA384_H5;
+-	sctx->state[6] =3D SHA384_H6;
+-	sctx->state[7] =3D SHA384_H7;
+-
+-	sctx->count[0] =3D sctx->count[1] =3D 0;
+-
+-	return 0;
+-}
+-
+ static int sha384_neon_final(struct shash_desc *desc, u8 *hash)
+ {
+ 	u8 D[SHA512_DIGEST_SIZE];
+@@ -246,60 +147,38 @@ static int sha384_neon_final(struct shash_desc *d=
+esc, u8 *hash)
+ 	return 0;
+ }
+=20
+-static struct shash_alg algs[] =3D { {
++struct shash_alg sha512_neon_algs[] =3D { {
+ 	.digestsize	=3D	SHA512_DIGEST_SIZE,
+-	.init		=3D	sha512_neon_init,
++	.init		=3D	sha512_arm_init,
+ 	.update		=3D	sha512_neon_update,
+ 	.final		=3D	sha512_neon_final,
+-	.export		=3D	sha512_neon_export,
+-	.import		=3D	sha512_neon_import,
++	.export		=3D	sha512_arm_export,
++	.import		=3D	sha512_arm_import,
+ 	.descsize	=3D	sizeof(struct sha512_state),
+ 	.statesize	=3D	sizeof(struct sha512_state),
+ 	.base		=3D	{
+ 		.cra_name	=3D	"sha512",
+ 		.cra_driver_name =3D	"sha512-neon",
+-		.cra_priority	=3D	250,
++		.cra_priority	=3D	300,
+ 		.cra_flags	=3D	CRYPTO_ALG_TYPE_SHASH,
+ 		.cra_blocksize	=3D	SHA512_BLOCK_SIZE,
+ 		.cra_module	=3D	THIS_MODULE,
+ 	}
+ },  {
+ 	.digestsize	=3D	SHA384_DIGEST_SIZE,
+-	.init		=3D	sha384_neon_init,
++	.init		=3D	sha384_arm_init,
+ 	.update		=3D	sha512_neon_update,
+ 	.final		=3D	sha384_neon_final,
+-	.export		=3D	sha512_neon_export,
+-	.import		=3D	sha512_neon_import,
++	.export		=3D	sha512_arm_export,
++	.import		=3D	sha512_arm_import,
+ 	.descsize	=3D	sizeof(struct sha512_state),
+ 	.statesize	=3D	sizeof(struct sha512_state),
+ 	.base		=3D	{
+ 		.cra_name	=3D	"sha384",
+ 		.cra_driver_name =3D	"sha384-neon",
+-		.cra_priority	=3D	250,
++		.cra_priority	=3D	300,
+ 		.cra_flags	=3D	CRYPTO_ALG_TYPE_SHASH,
+ 		.cra_blocksize	=3D	SHA384_BLOCK_SIZE,
+ 		.cra_module	=3D	THIS_MODULE,
+ 	}
+ } };
+-
+-static int __init sha512_neon_mod_init(void)
+-{
+-	if (!cpu_has_neon())
+-		return -ENODEV;
+-
+-	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
+-}
+-
+-static void __exit sha512_neon_mod_fini(void)
+-{
+-	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
+-}
+-
+-module_init(sha512_neon_mod_init);
+-module_exit(sha512_neon_mod_fini);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("SHA512 Secure Hash Algorithm, NEON accelerated");
+-
+-MODULE_ALIAS_CRYPTO("sha512");
+-MODULE_ALIAS_CRYPTO("sha384");
+--=20
+1.8.3.2
