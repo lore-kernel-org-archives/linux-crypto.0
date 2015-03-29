@@ -1,61 +1,58 @@
-From: Andy Polyakov <appro@openssl.org>
-Subject: Re: [PATCH] crypto/arm: accelerated SHA-512 using ARM generic ASM
- and NEON
-Date: Sun, 29 Mar 2015 16:07:02 +0200
-Message-ID: <55180706.9030104@openssl.org>
-References: <1427527726-25022-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] crypto: remove instance when test failed
+Date: Sun, 29 Mar 2015 16:26:40 +0200
+Message-ID: <1636428.jcYq32xsYj@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Cc: plagnioj@jcrosoft.com
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	samitolvanen@google.com, herbert@gondor.apana.org.au,
-	jussi.kivilinna@iki.fi
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: 'Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mta.openssl.org ([194.97.150.230]:45257 "EHLO mta.openssl.org"
+Received: from mail.eperm.de ([89.247.134.16]:46794 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752757AbbC2OHD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 29 Mar 2015 10:07:03 -0400
-In-Reply-To: <1427527726-25022-1-git-send-email-ard.biesheuvel@linaro.org>
+	id S1752610AbbC2O0p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 29 Mar 2015 10:26:45 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-> This updates the SHA-512 NEON module with the faster and more
-> versatile implementation from the OpenSSL project. It consists
-> of both a NEON and a generic ASM version of the core SHA-512
-> transform, where the NEON version reverts to the ASM version
-> when invoked in non-process context.
-> 
-> Performance relative to the generic implementation (measured
-> using tcrypt.ko mode=306 sec=1 running on a Cortex-A57 under
-> KVM):
-> 
-> 	input size	block size	asm	neon	old neon
-> 
-> 	8192		8192		1.51	3.51	2.69
+A cipher instance is added to the list of instances unconditionally
+regardless of whether the associated test failed. However, a failed
+test implies that during another lookup, the cipher instance will
+be added to the list again as it will not be found by the lookup
+code.
 
-One should keep in mind that improvement coefficients vary greatly from
-platform to platform. Normally you *should* observe higher coefficients
-in asm column and *can* observe smaller differences between "neon" and
-"old neon". BTW, 1.51 is unexpectedly low, I wonder which compiler
-version stands for 1.0? Nor can I replicate difference between "neon"
-and "old neon", I get smaller difference, 17%, on Cortex-A57. Well, I'm
-comparing in user-land, but it shouldn't be that significant at large
-blocks...
+That means that the list can be filled up with instances whose tests
+failed.
 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
-> 
-> This should get the same treatment as Sami's sha56 version: I would like
-> to wait until the OpenSSL source file hits the upstream repository so that
-> I can refer to its sha1 hash in the commit log.
+Note: tests only fail in reality in FIPS mode when a cipher is not
+marked as fips_allowed=1. This can be seen with cmac(des3_ede) that does
+not have a fips_allowed=1. When allocating the cipher, the allocation
+fails with -ENOENT due to the missing fips_allowed=1 flag (which
+causes the testmgr to return EINVAL). Yet, the instance of
+cmac(des3_ede) is shown in /proc/crypto. Allocating the cipher again
+fails again, but a 2nd instance is listed in /proc/crypto.
 
-Update is committed as
-http://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=b1a5d1c652086257930a1f62ae51c9cdee654b2c.
-Note that the file I've initially sent privately was a little bit off.
-Sorry about that. But that little bit is just a commentary update that
-adds performance result for Cortex-A15. So that kernel patch as
-originally posted is 100% functionally equivalent.
+The patch simply de-registers the instance when the testing failed.
 
-Cheers.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/algapi.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 83b04e0..c029afe 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -545,6 +545,10 @@ unlock:
+ 		goto err;
+ 
+ 	crypto_wait_for_test(larval);
++
++	/* Remove instance if test failed */
++	if (!(inst->alg.cra_flags & CRYPTO_ALG_TESTED))
++		crypto_unregister_instance((void *)inst);
+ 	err = 0;
+ 
+ err:
+-- 
+2.1.0
