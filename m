@@ -1,42 +1,59 @@
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH v2 1/6] crypto/ccp: drop linux/pci dependencies
-Date: Mon, 30 Mar 2015 12:59:23 +0200
-Message-ID: <1427712964-16155-2-git-send-email-mst@redhat.com>
-References: <1427712964-16155-1-git-send-email-mst@redhat.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 02/20] crypto: testmgr to use CRYPTO_ALG_INTERNAL
+Date: Tue, 31 Mar 2015 00:10:34 +1100
+Message-ID: <20150330131034.GA6251@gondor.apana.org.au>
+References: <1746748.uPZFXamDiM@tachyon.chronox.de>
+ <1657882.6iCTT84gKK@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-To: linux-kernel@vger.kernel.org
-Return-path: <linux-pci-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:59472 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752322AbbC3NKj (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 30 Mar 2015 09:10:39 -0400
 Content-Disposition: inline
-In-Reply-To: <1427712964-16155-1-git-send-email-mst@redhat.com>
-Sender: linux-pci-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1657882.6iCTT84gKK@tachyon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-pci code is in ccp-pci.c, don't include pci
-headers from ccp/ccp-ops.c.
+On Fri, Mar 27, 2015 at 11:50:42PM +0100, Stephan Mueller wrote:
+> If a cipher allocation fails with -ENOENT, the testmgr now retries
+> to allocate the cipher with CRYPTO_ALG_INTERNAL flag.
+> 
+> As all ciphers, including the internal ciphers will be processed by
+> the testmgr, it needs to be able to allocate those ciphers.
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> ---
+>  crypto/testmgr.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 1f879ad..609bafa 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -1506,6 +1506,9 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
+>  	int err = 0;
+>  
+>  	tfm = crypto_alloc_aead(driver, type, mask);
+> +	if (PTR_ERR(tfm) == -ENOENT)
+> +		tfm = crypto_alloc_aead(driver, type | CRYPTO_ALG_INTERNAL,
+> +					mask | CRYPTO_ALG_INTERNAL);
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- drivers/crypto/ccp/ccp-ops.c | 2 --
- 1 file changed, 2 deletions(-)
+We need to be able to say give me an algorithm regardless of the
+INTERNAL bit.  How about treating (type & CRYPTO_ALG_INTERNAL) &&
+!(mask & CRYPTO_ALG_INTERNAL) as that special case?
 
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index 8729364..3da1140 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -12,8 +12,6 @@
- 
- #include <linux/module.h>
- #include <linux/kernel.h>
--#include <linux/pci.h>
--#include <linux/pci_ids.h>
- #include <linux/kthread.h>
- #include <linux/sched.h>
- #include <linux/interrupt.h>
+So in patch 1 you would do
+
+	if (!((type | mask) & CRYPTO_ALG_INTERNAL))
+		mask |= CRYPTO_ALG_INTERNAL;
+
+Thanks,
 -- 
-MST
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
