@@ -1,69 +1,45 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 18/20] crypto: mark 64 bit ARMv8 AES helper ciphers
-Date: Mon, 30 Mar 2015 22:10:27 +0200
-Message-ID: <3039926.R4ZOqdyoa0@tachyon.chronox.de>
+Subject: [PATCH v3 04/20] crypto: /proc/crypto: identify internal ciphers
+Date: Mon, 30 Mar 2015 21:57:42 +0200
+Message-ID: <1697828.hl4vyQHuZT@tachyon.chronox.de>
 References: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: 'Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:39601 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753896AbbC3UIM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 30 Mar 2015 16:08:12 -0400
 In-Reply-To: <3417827.fluZli1WvQ@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Flag all 64 bit ARMv8 AES helper ciphers as internal ciphers to
-prevent them from being called by normal users.
+With ciphers that now cannot be accessed via the kernel crypto API,
+callers shall be able to identify the ciphers that are not callable. The
+/proc/crypto file is added a boolean field identifying that such
+internal ciphers.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- arch/arm64/crypto/aes-glue.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ crypto/proc.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index b1b5b89..05d9e16 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -284,7 +284,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__ecb-aes-" MODE,
- 	.cra_driver_name	= "__driver-ecb-aes-" MODE,
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 	.cra_alignmask		= 7,
-@@ -302,7 +303,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__cbc-aes-" MODE,
- 	.cra_driver_name	= "__driver-cbc-aes-" MODE,
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 	.cra_alignmask		= 7,
-@@ -320,7 +322,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__ctr-aes-" MODE,
- 	.cra_driver_name	= "__driver-ctr-aes-" MODE,
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= 1,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 	.cra_alignmask		= 7,
-@@ -338,7 +341,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__xts-aes-" MODE,
- 	.cra_driver_name	= "__driver-xts-aes-" MODE,
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_xts_ctx),
- 	.cra_alignmask		= 7,
+diff --git a/crypto/proc.c b/crypto/proc.c
+index 4a0a7aa..4ffe73b 100644
+--- a/crypto/proc.c
++++ b/crypto/proc.c
+@@ -89,6 +89,9 @@ static int c_show(struct seq_file *m, void *p)
+ 	seq_printf(m, "selftest     : %s\n",
+ 		   (alg->cra_flags & CRYPTO_ALG_TESTED) ?
+ 		   "passed" : "unknown");
++	seq_printf(m, "internal     : %s\n",
++		   (alg->cra_flags & CRYPTO_ALG_INTERNAL) ?
++		   "yes" : "no");
+ 
+ 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
+ 		seq_printf(m, "type         : larval\n");
 -- 
 2.1.0
