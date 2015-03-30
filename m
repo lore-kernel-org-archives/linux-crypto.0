@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 17/20] crypto: mark ARMv8 AES helper ciphers
-Date: Mon, 30 Mar 2015 22:09:53 +0200
-Message-ID: <1483233.skKUOJ8xXE@tachyon.chronox.de>
+Subject: [PATCH v3 12/20] crypto: mark Serpent AVX2 helper ciphers
+Date: Mon, 30 Mar 2015 22:06:13 +0200
+Message-ID: <1837318.P7A9y7EGFY@tachyon.chronox.de>
 References: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -13,57 +13,67 @@ In-Reply-To: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Flag all ARMv8 AES helper ciphers as internal ciphers to prevent
+Flag all Serpent AVX2 helper ciphers as internal ciphers to prevent
 them from being called by normal users.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- arch/arm/crypto/aes-ce-glue.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ arch/x86/crypto/serpent_avx2_glue.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
-index d2ee591..b445a5d 100644
---- a/arch/arm/crypto/aes-ce-glue.c
-+++ b/arch/arm/crypto/aes-ce-glue.c
-@@ -354,7 +354,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__ecb-aes-ce",
- 	.cra_driver_name	= "__driver-ecb-aes-ce",
+diff --git a/arch/x86/crypto/serpent_avx2_glue.c b/arch/x86/crypto/serpent_avx2_glue.c
+index 437e47a..2f63dc8 100644
+--- a/arch/x86/crypto/serpent_avx2_glue.c
++++ b/arch/x86/crypto/serpent_avx2_glue.c
+@@ -309,7 +309,8 @@ static struct crypto_alg srp_algs[10] = { {
+ 	.cra_name		= "__ecb-serpent-avx2",
+ 	.cra_driver_name	= "__driver-ecb-serpent-avx2",
  	.cra_priority		= 0,
 -	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
 +	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
 +				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 	.cra_alignmask		= 7,
-@@ -372,7 +373,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__cbc-aes-ce",
- 	.cra_driver_name	= "__driver-cbc-aes-ce",
+ 	.cra_blocksize		= SERPENT_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct serpent_ctx),
+ 	.cra_alignmask		= 0,
+@@ -329,7 +330,8 @@ static struct crypto_alg srp_algs[10] = { {
+ 	.cra_name		= "__cbc-serpent-avx2",
+ 	.cra_driver_name	= "__driver-cbc-serpent-avx2",
  	.cra_priority		= 0,
 -	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
 +	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
 +				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 	.cra_alignmask		= 7,
-@@ -390,7 +392,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__ctr-aes-ce",
- 	.cra_driver_name	= "__driver-ctr-aes-ce",
+ 	.cra_blocksize		= SERPENT_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct serpent_ctx),
+ 	.cra_alignmask		= 0,
+@@ -349,7 +351,8 @@ static struct crypto_alg srp_algs[10] = { {
+ 	.cra_name		= "__ctr-serpent-avx2",
+ 	.cra_driver_name	= "__driver-ctr-serpent-avx2",
  	.cra_priority		= 0,
 -	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
 +	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
 +				  CRYPTO_ALG_INTERNAL,
  	.cra_blocksize		= 1,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
- 	.cra_alignmask		= 7,
-@@ -408,7 +411,8 @@ static struct crypto_alg aes_algs[] = { {
- 	.cra_name		= "__xts-aes-ce",
- 	.cra_driver_name	= "__driver-xts-aes-ce",
+ 	.cra_ctxsize		= sizeof(struct serpent_ctx),
+ 	.cra_alignmask		= 0,
+@@ -370,7 +373,8 @@ static struct crypto_alg srp_algs[10] = { {
+ 	.cra_name		= "__lrw-serpent-avx2",
+ 	.cra_driver_name	= "__driver-lrw-serpent-avx2",
  	.cra_priority		= 0,
 -	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
 +	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
 +				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= AES_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct crypto_aes_xts_ctx),
- 	.cra_alignmask		= 7,
+ 	.cra_blocksize		= SERPENT_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct serpent_lrw_ctx),
+ 	.cra_alignmask		= 0,
+@@ -394,7 +398,8 @@ static struct crypto_alg srp_algs[10] = { {
+ 	.cra_name		= "__xts-serpent-avx2",
+ 	.cra_driver_name	= "__driver-xts-serpent-avx2",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= SERPENT_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct serpent_xts_ctx),
+ 	.cra_alignmask		= 0,
 -- 
 2.1.0
