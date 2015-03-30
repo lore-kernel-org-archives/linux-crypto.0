@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 06/20] crypto: mark ghash clmulni helper ciphers
-Date: Mon, 30 Mar 2015 22:01:49 +0200
-Message-ID: <2468051.2WmyzWNf6x@tachyon.chronox.de>
+Subject: [PATCH v3 05/20] crypto: mark AES-NI helper ciphers
+Date: Mon, 30 Mar 2015 21:58:17 +0200
+Message-ID: <9096089.KWmBo13BRk@tachyon.chronox.de>
 References: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -13,38 +13,96 @@ In-Reply-To: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Flag all ash clmulni helper ciphers as internal ciphers to prevent them
-from being called by normal users.
+Flag all AES-NI helper ciphers as internal ciphers to prevent them from
+being called by normal users.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- arch/x86/crypto/ghash-clmulni-intel_glue.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-index 8253d85..2079baf 100644
---- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-+++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-@@ -154,7 +154,8 @@ static struct shash_alg ghash_alg = {
- 		.cra_name		= "__ghash",
- 		.cra_driver_name	= "__ghash-pclmulqdqni",
- 		.cra_priority		= 0,
--		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
-+		.cra_flags		= CRYPTO_ALG_TYPE_SHASH |
-+					  CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize		= GHASH_BLOCK_SIZE,
- 		.cra_ctxsize		= sizeof(struct ghash_ctx),
- 		.cra_module		= THIS_MODULE,
-@@ -261,7 +262,9 @@ static int ghash_async_init_tfm(struct crypto_tfm *tfm)
- 	struct cryptd_ahash *cryptd_tfm;
- 	struct ghash_async_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	cryptd_tfm = cryptd_alloc_ahash("__ghash-pclmulqdqni", 0, 0);
-+	cryptd_tfm = cryptd_alloc_ahash("__ghash-pclmulqdqni",
-+					CRYPTO_ALG_INTERNAL,
-+					CRYPTO_ALG_INTERNAL);
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 6893f49..f9a78f3 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -797,7 +797,9 @@ static int rfc4106_init(struct crypto_tfm *tfm)
+ 		PTR_ALIGN((u8 *)crypto_tfm_ctx(tfm), AESNI_ALIGN);
+ 	struct crypto_aead *cryptd_child;
+ 	struct aesni_rfc4106_gcm_ctx *child_ctx;
+-	cryptd_tfm = cryptd_alloc_aead("__driver-gcm-aes-aesni", 0, 0);
++	cryptd_tfm = cryptd_alloc_aead("__driver-gcm-aes-aesni",
++				       CRYPTO_ALG_INTERNAL,
++				       CRYPTO_ALG_INTERNAL);
  	if (IS_ERR(cryptd_tfm))
  		return PTR_ERR(cryptd_tfm);
- 	ctx->cryptd_tfm = cryptd_tfm;
+ 
+@@ -1262,7 +1264,7 @@ static struct crypto_alg aesni_algs[] = { {
+ 	.cra_name		= "__aes-aesni",
+ 	.cra_driver_name	= "__driver-aes-aesni",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER | CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx) +
+ 				  AESNI_ALIGN - 1,
+@@ -1281,7 +1283,8 @@ static struct crypto_alg aesni_algs[] = { {
+ 	.cra_name		= "__ecb-aes-aesni",
+ 	.cra_driver_name	= "__driver-ecb-aes-aesni",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx) +
+ 				  AESNI_ALIGN - 1,
+@@ -1301,7 +1304,8 @@ static struct crypto_alg aesni_algs[] = { {
+ 	.cra_name		= "__cbc-aes-aesni",
+ 	.cra_driver_name	= "__driver-cbc-aes-aesni",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx) +
+ 				  AESNI_ALIGN - 1,
+@@ -1365,7 +1369,8 @@ static struct crypto_alg aesni_algs[] = { {
+ 	.cra_name		= "__ctr-aes-aesni",
+ 	.cra_driver_name	= "__driver-ctr-aes-aesni",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= 1,
+ 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx) +
+ 				  AESNI_ALIGN - 1,
+@@ -1409,7 +1414,7 @@ static struct crypto_alg aesni_algs[] = { {
+ 	.cra_name		= "__gcm-aes-aesni",
+ 	.cra_driver_name	= "__driver-gcm-aes-aesni",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_AEAD,
++	.cra_flags		= CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= 1,
+ 	.cra_ctxsize		= sizeof(struct aesni_rfc4106_gcm_ctx) +
+ 				  AESNI_ALIGN,
+@@ -1479,7 +1484,8 @@ static struct crypto_alg aesni_algs[] = { {
+ 	.cra_name		= "__lrw-aes-aesni",
+ 	.cra_driver_name	= "__driver-lrw-aes-aesni",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct aesni_lrw_ctx),
+ 	.cra_alignmask		= 0,
+@@ -1500,7 +1506,8 @@ static struct crypto_alg aesni_algs[] = { {
+ 	.cra_name		= "__xts-aes-aesni",
+ 	.cra_driver_name	= "__driver-xts-aes-aesni",
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct aesni_xts_ctx),
+ 	.cra_alignmask		= 0,
 -- 
 2.1.0
