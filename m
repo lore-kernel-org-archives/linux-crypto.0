@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 20/20] crypto: mark Multi buffer SHA1 helper cipher
-Date: Mon, 30 Mar 2015 22:11:46 +0200
-Message-ID: <2304985.iXGnBoI4kx@tachyon.chronox.de>
+Subject: [PATCH v3 06/20] crypto: mark ghash clmulni helper ciphers
+Date: Mon, 30 Mar 2015 22:01:49 +0200
+Message-ID: <2468051.2WmyzWNf6x@tachyon.chronox.de>
 References: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -13,38 +13,38 @@ In-Reply-To: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Flag all Multi buffer SHA1 helper ciphers as internal ciphers
-to prevent them from being called by normal users.
+Flag all ash clmulni helper ciphers as internal ciphers to prevent them
+from being called by normal users.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- arch/x86/crypto/sha-mb/sha1_mb.c | 7 +++++--
+ arch/x86/crypto/ghash-clmulni-intel_glue.c | 7 +++++--
  1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
-index 9414fd9..e510b1c 100644
---- a/arch/x86/crypto/sha-mb/sha1_mb.c
-+++ b/arch/x86/crypto/sha-mb/sha1_mb.c
-@@ -694,7 +694,8 @@ static struct shash_alg sha1_mb_shash_alg = {
- 		 * use ASYNC flag as some buffers in multi-buffer
- 		 * algo may not have completed before hashing thread sleep
- 		 */
--		.cra_flags	 = CRYPTO_ALG_TYPE_SHASH | CRYPTO_ALG_ASYNC,
-+		.cra_flags	 = CRYPTO_ALG_TYPE_SHASH | CRYPTO_ALG_ASYNC |
-+				   CRYPTO_ALG_INTERNAL,
- 		.cra_blocksize	 = SHA1_BLOCK_SIZE,
- 		.cra_module	 = THIS_MODULE,
- 		.cra_list	 = LIST_HEAD_INIT(sha1_mb_shash_alg.base.cra_list),
-@@ -770,7 +771,9 @@ static int sha1_mb_async_init_tfm(struct crypto_tfm *tfm)
- 	struct sha1_mb_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct mcryptd_hash_ctx *mctx;
- 
--	mcryptd_tfm = mcryptd_alloc_ahash("__intel_sha1-mb", 0, 0);
-+	mcryptd_tfm = mcryptd_alloc_ahash("__intel_sha1-mb",
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+index 8253d85..2079baf 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
++++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+@@ -154,7 +154,8 @@ static struct shash_alg ghash_alg = {
+ 		.cra_name		= "__ghash",
+ 		.cra_driver_name	= "__ghash-pclmulqdqni",
+ 		.cra_priority		= 0,
+-		.cra_flags		= CRYPTO_ALG_TYPE_SHASH,
++		.cra_flags		= CRYPTO_ALG_TYPE_SHASH |
 +					  CRYPTO_ALG_INTERNAL,
-+					  CRYPTO_ALG_INTERNAL);
- 	if (IS_ERR(mcryptd_tfm))
- 		return PTR_ERR(mcryptd_tfm);
- 	mctx = crypto_ahash_ctx(&mcryptd_tfm->base);
+ 		.cra_blocksize		= GHASH_BLOCK_SIZE,
+ 		.cra_ctxsize		= sizeof(struct ghash_ctx),
+ 		.cra_module		= THIS_MODULE,
+@@ -261,7 +262,9 @@ static int ghash_async_init_tfm(struct crypto_tfm *tfm)
+ 	struct cryptd_ahash *cryptd_tfm;
+ 	struct ghash_async_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	cryptd_tfm = cryptd_alloc_ahash("__ghash-pclmulqdqni", 0, 0);
++	cryptd_tfm = cryptd_alloc_ahash("__ghash-pclmulqdqni",
++					CRYPTO_ALG_INTERNAL,
++					CRYPTO_ALG_INTERNAL);
+ 	if (IS_ERR(cryptd_tfm))
+ 		return PTR_ERR(cryptd_tfm);
+ 	ctx->cryptd_tfm = cryptd_tfm;
 -- 
 2.1.0
