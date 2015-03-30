@@ -1,59 +1,76 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 09/20] crypto: mark CAST5 helper ciphers
-Date: Mon, 30 Mar 2015 22:03:57 +0200
-Message-ID: <1712044.VG2c1MGQEK@tachyon.chronox.de>
-References: <3417827.fluZli1WvQ@tachyon.chronox.de>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH net-next] crypto: algif - explicitly mark end of data
+Date: Mon, 30 Mar 2015 14:25:43 -0700
+Message-ID: <20150330212543.7133.97653.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: 'Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <3417827.fluZli1WvQ@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au
+To: davem@davemloft.net
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga09.intel.com ([134.134.136.24]:36124 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752855AbbC3V2b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 30 Mar 2015 17:28:31 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Flag all CAST5 helper ciphers as internal ciphers to prevent them
-from being called by normal users.
+After the TX sgl is expanded we need to explicitly mark end of data
+at the last buffer that contains data.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- arch/x86/crypto/cast5_avx_glue.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ crypto/algif_skcipher.c |   13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/crypto/cast5_avx_glue.c b/arch/x86/crypto/cast5_avx_glue.c
-index 60ada67..236c809 100644
---- a/arch/x86/crypto/cast5_avx_glue.c
-+++ b/arch/x86/crypto/cast5_avx_glue.c
-@@ -341,7 +341,8 @@ static struct crypto_alg cast5_algs[6] = { {
- 	.cra_name		= "__ecb-cast5-avx",
- 	.cra_driver_name	= "__driver-ecb-cast5-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= CAST5_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct cast5_ctx),
- 	.cra_alignmask		= 0,
-@@ -360,7 +361,8 @@ static struct crypto_alg cast5_algs[6] = { {
- 	.cra_name		= "__cbc-cast5-avx",
- 	.cra_driver_name	= "__driver-cbc-cast5-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= CAST5_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct cast5_ctx),
- 	.cra_alignmask		= 0,
-@@ -379,7 +381,8 @@ static struct crypto_alg cast5_algs[6] = { {
- 	.cra_name		= "__ctr-cast5-avx",
- 	.cra_driver_name	= "__driver-ctr-cast5-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= 1,
- 	.cra_ctxsize		= sizeof(struct cast5_ctx),
- 	.cra_alignmask		= 0,
--- 
-2.1.0
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index 8276f21..9492dd5 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -509,11 +509,10 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 	struct skcipher_async_req *sreq;
+ 	struct ablkcipher_request *req;
+ 	struct skcipher_async_rsgl *last_rsgl = NULL;
+-	unsigned int len = 0, tx_nents = skcipher_all_sg_nents(ctx);
++	unsigned int txbufs = 0, len = 0, tx_nents = skcipher_all_sg_nents(ctx);
+ 	unsigned int reqlen = sizeof(struct skcipher_async_req) +
+ 				GET_REQ_SIZE(ctx) + GET_IV_SIZE(ctx);
+-	int i = 0;
+-	int err = -ENOMEM;
++	int mark = 0, err = -ENOMEM;
+ 
+ 	lock_sock(sk);
+ 	req = kmalloc(reqlen, GFP_KERNEL);
+@@ -555,7 +554,7 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 			     iov_iter_count(&msg->msg_iter));
+ 		used = min_t(unsigned long, used, sg->length);
+ 
+-		if (i == tx_nents) {
++		if (txbufs == tx_nents) {
+ 			struct scatterlist *tmp;
+ 			int x;
+ 			/* Ran out of tx slots in async request
+@@ -573,10 +572,11 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 			kfree(sreq->tsg);
+ 			sreq->tsg = tmp;
+ 			tx_nents *= 2;
++			mark = 1;
+ 		}
+ 		/* Need to take over the tx sgl from ctx
+ 		 * to the asynch req - these sgls will be freed later */
+-		sg_set_page(sreq->tsg + i++, sg_page(sg), sg->length,
++		sg_set_page(sreq->tsg + txbufs++, sg_page(sg), sg->length,
+ 			    sg->offset);
+ 
+ 		if (list_empty(&sreq->list)) {
+@@ -604,6 +604,9 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 		iov_iter_advance(&msg->msg_iter, used);
+ 	}
+ 
++	if (mark)
++		sg_mark_end(sreq->tsg + txbufs - 1);
++
+ 	ablkcipher_request_set_crypt(req, sreq->tsg, sreq->first_sgl.sgl.sg,
+ 				     len, sreq->iv);
+ 	err = ctx->enc ? crypto_ablkcipher_encrypt(req) :
