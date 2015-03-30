@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 02/20] crypto: testmgr to use CRYPTO_ALG_INTERNAL
-Date: Mon, 30 Mar 2015 21:56:31 +0200
-Message-ID: <35695803.75HNLbDkdq@tachyon.chronox.de>
+Subject: [PATCH v3 18/20] crypto: mark 64 bit ARMv8 AES helper ciphers
+Date: Mon, 30 Mar 2015 22:10:27 +0200
+Message-ID: <3039926.R4ZOqdyoa0@tachyon.chronox.de>
 References: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -13,82 +13,57 @@ In-Reply-To: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Allocate the ciphers irrespectively if they are marked as internal
-or not. As all ciphers, including the internal ciphers will be
-processed by the testmgr, it needs to be able to allocate those
-ciphers.
+Flag all 64 bit ARMv8 AES helper ciphers as internal ciphers to
+prevent them from being called by normal users.
 
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/testmgr.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ arch/arm64/crypto/aes-glue.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 1f879ad..f9bce3d 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1505,7 +1505,7 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
- 	struct crypto_aead *tfm;
- 	int err = 0;
- 
--	tfm = crypto_alloc_aead(driver, type, mask);
-+	tfm = crypto_alloc_aead(driver, type | CRYPTO_ALG_INTERNAL, mask);
- 	if (IS_ERR(tfm)) {
- 		printk(KERN_ERR "alg: aead: Failed to load transform for %s: "
- 		       "%ld\n", driver, PTR_ERR(tfm));
-@@ -1534,7 +1534,7 @@ static int alg_test_cipher(const struct alg_test_desc *desc,
- 	struct crypto_cipher *tfm;
- 	int err = 0;
- 
--	tfm = crypto_alloc_cipher(driver, type, mask);
-+	tfm = crypto_alloc_cipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
- 	if (IS_ERR(tfm)) {
- 		printk(KERN_ERR "alg: cipher: Failed to load transform for "
- 		       "%s: %ld\n", driver, PTR_ERR(tfm));
-@@ -1563,7 +1563,7 @@ static int alg_test_skcipher(const struct alg_test_desc *desc,
- 	struct crypto_ablkcipher *tfm;
- 	int err = 0;
- 
--	tfm = crypto_alloc_ablkcipher(driver, type, mask);
-+	tfm = crypto_alloc_ablkcipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
- 	if (IS_ERR(tfm)) {
- 		printk(KERN_ERR "alg: skcipher: Failed to load transform for "
- 		       "%s: %ld\n", driver, PTR_ERR(tfm));
-@@ -1636,7 +1636,7 @@ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
- 	struct crypto_ahash *tfm;
- 	int err;
- 
--	tfm = crypto_alloc_ahash(driver, type, mask);
-+	tfm = crypto_alloc_ahash(driver, type | CRYPTO_ALG_INTERNAL, mask);
- 	if (IS_ERR(tfm)) {
- 		printk(KERN_ERR "alg: hash: Failed to load transform for %s: "
- 		       "%ld\n", driver, PTR_ERR(tfm));
-@@ -1664,7 +1664,7 @@ static int alg_test_crc32c(const struct alg_test_desc *desc,
- 	if (err)
- 		goto out;
- 
--	tfm = crypto_alloc_shash(driver, type, mask);
-+	tfm = crypto_alloc_shash(driver, type | CRYPTO_ALG_INTERNAL, mask);
- 	if (IS_ERR(tfm)) {
- 		printk(KERN_ERR "alg: crc32c: Failed to load transform for %s: "
- 		       "%ld\n", driver, PTR_ERR(tfm));
-@@ -1706,7 +1706,7 @@ static int alg_test_cprng(const struct alg_test_desc *desc, const char *driver,
- 	struct crypto_rng *rng;
- 	int err;
- 
--	rng = crypto_alloc_rng(driver, type, mask);
-+	rng = crypto_alloc_rng(driver, type | CRYPTO_ALG_INTERNAL, mask);
- 	if (IS_ERR(rng)) {
- 		printk(KERN_ERR "alg: cprng: Failed to load transform for %s: "
- 		       "%ld\n", driver, PTR_ERR(rng));
-@@ -1733,7 +1733,7 @@ static int drbg_cavs_test(struct drbg_testvec *test, int pr,
- 	if (!buf)
- 		return -ENOMEM;
- 
--	drng = crypto_alloc_rng(driver, type, mask);
-+	drng = crypto_alloc_rng(driver, type | CRYPTO_ALG_INTERNAL, mask);
- 	if (IS_ERR(drng)) {
- 		printk(KERN_ERR "alg: drbg: could not allocate DRNG handle for "
- 		       "%s\n", driver);
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index b1b5b89..05d9e16 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -284,7 +284,8 @@ static struct crypto_alg aes_algs[] = { {
+ 	.cra_name		= "__ecb-aes-" MODE,
+ 	.cra_driver_name	= "__driver-ecb-aes-" MODE,
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
+ 	.cra_alignmask		= 7,
+@@ -302,7 +303,8 @@ static struct crypto_alg aes_algs[] = { {
+ 	.cra_name		= "__cbc-aes-" MODE,
+ 	.cra_driver_name	= "__driver-cbc-aes-" MODE,
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
+ 	.cra_alignmask		= 7,
+@@ -320,7 +322,8 @@ static struct crypto_alg aes_algs[] = { {
+ 	.cra_name		= "__ctr-aes-" MODE,
+ 	.cra_driver_name	= "__driver-ctr-aes-" MODE,
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= 1,
+ 	.cra_ctxsize		= sizeof(struct crypto_aes_ctx),
+ 	.cra_alignmask		= 7,
+@@ -338,7 +341,8 @@ static struct crypto_alg aes_algs[] = { {
+ 	.cra_name		= "__xts-aes-" MODE,
+ 	.cra_driver_name	= "__driver-xts-aes-" MODE,
+ 	.cra_priority		= 0,
+-	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
++	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
++				  CRYPTO_ALG_INTERNAL,
+ 	.cra_blocksize		= AES_BLOCK_SIZE,
+ 	.cra_ctxsize		= sizeof(struct crypto_aes_xts_ctx),
+ 	.cra_alignmask		= 7,
 -- 
 2.1.0
