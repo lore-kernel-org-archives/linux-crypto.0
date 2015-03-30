@@ -1,20 +1,20 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 3/6] crypto: sha256: implement base layer for SHA-256
-Date: Mon, 30 Mar 2015 11:36:15 +0200
-Message-ID: <1427708184-2353-6-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 02/14] crypto: sha256: implement base layer for SHA-256
+Date: Mon, 30 Mar 2015 11:36:12 +0200
+Message-ID: <1427708184-2353-3-git-send-email-ard.biesheuvel@linaro.org>
 References: <1427708184-2353-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
 	samitolvanen@google.com, herbert@gondor.apana.org.au,
 	jussi.kivilinna@iki.fi, stockhausen@collogia.de, x86@kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:35781 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752596AbbC3Jgx (ORCPT
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:37171 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752481AbbC3Jgo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 30 Mar 2015 05:36:53 -0400
-Received: by wicne17 with SMTP id ne17so23501644wic.0
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2015 02:36:51 -0700 (PDT)
+	Mon, 30 Mar 2015 05:36:44 -0400
+Received: by wiaa2 with SMTP id a2so120318505wia.0
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2015 02:36:43 -0700 (PDT)
 In-Reply-To: <1427708184-2353-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -28,13 +28,13 @@ Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
  crypto/Kconfig       |   4 ++
  crypto/Makefile      |   1 +
- crypto/sha256_base.c | 138 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/sha256_base.c | 140 +++++++++++++++++++++++++++++++++++++++++++++++++++
  include/crypto/sha.h |  17 +++++++
- 4 files changed, 160 insertions(+)
+ 4 files changed, 162 insertions(+)
  create mode 100644 crypto/sha256_base.c
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 880aa518c2eb..551bbf2e2ab5 100644
+index 3400cf4e3cdb..1664bd68b97d 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
 @@ -602,6 +602,10 @@ config CRYPTO_SHA1_MB
@@ -62,10 +62,10 @@ index 6174bf2592fe..bb9bafeb3ac7 100644
  obj-$(CONFIG_CRYPTO_SHA512) += sha512_generic.o
 diff --git a/crypto/sha256_base.c b/crypto/sha256_base.c
 new file mode 100644
-index 000000000000..1ba2f6812c6b
+index 000000000000..5fd728066912
 --- /dev/null
 +++ b/crypto/sha256_base.c
-@@ -0,0 +1,138 @@
+@@ -0,0 +1,140 @@
 +/*
 + * sha256_base.c - core logic for SHA-256 implementations
 + *
@@ -83,35 +83,35 @@ index 000000000000..1ba2f6812c6b
 +
 +#include <asm/unaligned.h>
 +
-+int sha224_base_init(struct shash_desc *desc)
++int crypto_sha224_base_init(struct shash_desc *desc)
 +{
++	static const u32 sha224_init_state[] = {
++		SHA224_H0, SHA224_H1, SHA224_H2, SHA224_H3,
++		SHA224_H4, SHA224_H5, SHA224_H6, SHA224_H7,
++	};
 +	struct sha256_state *sctx = shash_desc_ctx(desc);
 +
-+	*sctx = (struct sha256_state){
-+		.state = {
-+			SHA224_H0, SHA224_H1, SHA224_H2, SHA224_H3,
-+			SHA224_H4, SHA224_H5, SHA224_H6, SHA224_H7,
-+		}
-+	};
++	memcpy(sctx->state, sha224_init_state, sizeof(sctx->state));
++	sctx->count = 0;
 +	return 0;
 +}
-+EXPORT_SYMBOL(sha224_base_init);
++EXPORT_SYMBOL(crypto_sha224_base_init);
 +
-+int sha256_base_init(struct shash_desc *desc)
++int crypto_sha256_base_init(struct shash_desc *desc)
 +{
++	static const u32 sha256_init_state[] = {
++		SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
++		SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7,
++	};
 +	struct sha256_state *sctx = shash_desc_ctx(desc);
 +
-+	*sctx = (struct sha256_state){
-+		.state = {
-+			SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
-+			SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7,
-+		}
-+	};
++	memcpy(sctx->state, sha256_init_state, sizeof(sctx->state));
++	sctx->count = 0;
 +	return 0;
 +}
-+EXPORT_SYMBOL(sha256_base_init);
++EXPORT_SYMBOL(crypto_sha256_base_init);
 +
-+int sha256_base_export(struct shash_desc *desc, void *out)
++int crypto_sha256_base_export(struct shash_desc *desc, void *out)
 +{
 +	struct sha256_state *sctx = shash_desc_ctx(desc);
 +	struct sha256_state *dst = out;
@@ -120,9 +120,9 @@ index 000000000000..1ba2f6812c6b
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL(sha256_base_export);
++EXPORT_SYMBOL(crypto_sha256_base_export);
 +
-+int sha256_base_import(struct shash_desc *desc, const void *in)
++int crypto_sha256_base_import(struct shash_desc *desc, const void *in)
 +{
 +	struct sha256_state *sctx = shash_desc_ctx(desc);
 +	struct sha256_state const *src = in;
@@ -131,17 +131,18 @@ index 000000000000..1ba2f6812c6b
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL(sha256_base_import);
++EXPORT_SYMBOL(crypto_sha256_base_import);
 +
-+int sha256_base_do_update(struct shash_desc *desc, const u8 *data,
-+			  unsigned int len, sha256_block_fn *block_fn, void *p)
++int crypto_sha256_base_do_update(struct shash_desc *desc, const u8 *data,
++				 unsigned int len, sha256_block_fn *block_fn,
++				 void *p)
 +{
 +	struct sha256_state *sctx = shash_desc_ctx(desc);
 +	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
 +
 +	sctx->count += len;
 +
-+	if ((partial + len) >= SHA256_BLOCK_SIZE) {
++	if (unlikely((partial + len) >= SHA256_BLOCK_SIZE)) {
 +		int blocks;
 +
 +		if (partial) {
@@ -156,7 +157,7 @@ index 000000000000..1ba2f6812c6b
 +		len %= SHA256_BLOCK_SIZE;
 +
 +		block_fn(blocks, data, sctx->state,
-+			partial ? sctx->buf : NULL, p);
++			 partial ? sctx->buf : NULL, p);
 +		data += blocks * SHA256_BLOCK_SIZE;
 +		partial = 0;
 +	}
@@ -165,32 +166,33 @@ index 000000000000..1ba2f6812c6b
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL(sha256_base_do_update);
++EXPORT_SYMBOL(crypto_sha256_base_do_update);
 +
-+int sha256_base_do_finalize(struct shash_desc *desc, sha256_block_fn *block_fn,
-+			    void *p)
++int crypto_sha256_base_do_finalize(struct shash_desc *desc,
++				   sha256_block_fn *block_fn, void *p)
 +{
-+	static const u8 padding[SHA256_BLOCK_SIZE] = { 0x80, };
-+
++	const int bit_offset = SHA256_BLOCK_SIZE - sizeof(__be64);
 +	struct sha256_state *sctx = shash_desc_ctx(desc);
-+	unsigned int padlen;
-+	__be64 bits;
++	__be64 *bits = (__be64 *)(sctx->buf + bit_offset);
++	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
 +
-+	padlen = SHA256_BLOCK_SIZE -
-+		 (sctx->count + sizeof(bits)) % SHA256_BLOCK_SIZE;
++	sctx->buf[partial++] = 0x80;
++	if (partial > bit_offset) {
++		memset(sctx->buf + partial, 0x0, SHA256_BLOCK_SIZE - partial);
++		partial = 0;
 +
-+	bits = cpu_to_be64(sctx->count << 3);
++		block_fn(1, sctx->buf, sctx->state, NULL, p);
++	}
 +
-+	sha256_base_do_update(desc, padding, padlen, block_fn, p);
-+
-+	memcpy(sctx->buf + SHA256_BLOCK_SIZE - sizeof(bits),
-+	       &bits, sizeof(bits));
++	memset(sctx->buf + partial, 0x0, bit_offset - partial);
++	*bits = cpu_to_be64(sctx->count << 3);
 +	block_fn(1, sctx->buf, sctx->state, NULL, p);
++
 +	return 0;
 +}
-+EXPORT_SYMBOL(sha256_base_do_finalize);
++EXPORT_SYMBOL(crypto_sha256_base_do_finalize);
 +
-+int sha256_base_finish(struct shash_desc *desc, u8 *out)
++int crypto_sha256_base_finish(struct shash_desc *desc, u8 *out)
 +{
 +	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
 +	struct sha256_state *sctx = shash_desc_ctx(desc);
@@ -203,9 +205,9 @@ index 000000000000..1ba2f6812c6b
 +	*sctx = (struct sha256_state){};
 +	return 0;
 +}
-+EXPORT_SYMBOL(sha256_base_finish);
++EXPORT_SYMBOL(crypto_sha256_base_finish);
 diff --git a/include/crypto/sha.h b/include/crypto/sha.h
-index d252a8fcc4de..bc87995e9771 100644
+index 85997a17d4e2..0ed6630d7c40 100644
 --- a/include/crypto/sha.h
 +++ b/include/crypto/sha.h
 @@ -82,6 +82,8 @@ struct sha512_state {
@@ -217,24 +219,24 @@ index d252a8fcc4de..bc87995e9771 100644
  typedef void (sha512_block_fn)(int blocks, u8 const *src, u64 *state,
  			       const u8 *head, void *p);
  
-@@ -112,4 +114,19 @@ extern int sha512_base_do_finalize(struct shash_desc *desc,
+@@ -112,4 +114,19 @@ extern int crypto_sha512_base_do_finalize(struct shash_desc *desc,
  
- extern int sha512_base_finish(struct shash_desc *desc, u8 *out);
+ extern int crypto_sha512_base_finish(struct shash_desc *desc, u8 *out);
  
-+extern int sha224_base_init(struct shash_desc *desc);
-+extern int sha256_base_init(struct shash_desc *desc);
++extern int crypto_sha224_base_init(struct shash_desc *desc);
++extern int crypto_sha256_base_init(struct shash_desc *desc);
 +
-+extern int sha256_base_export(struct shash_desc *desc, void *out);
-+extern int sha256_base_import(struct shash_desc *desc, const void *in);
++extern int crypto_sha256_base_export(struct shash_desc *desc, void *out);
++extern int crypto_sha256_base_import(struct shash_desc *desc, const void *in);
 +
-+extern int sha256_base_do_update(struct shash_desc *desc, const u8 *data,
++extern int crypto_sha256_base_do_update(struct shash_desc *desc, const u8 *data,
 +			         unsigned int len, sha256_block_fn *block_fn,
 +			         void *p);
 +
-+extern int sha256_base_do_finalize(struct shash_desc *desc,
++extern int crypto_sha256_base_do_finalize(struct shash_desc *desc,
 +				   sha256_block_fn *block_fn, void *p);
 +
-+extern int sha256_base_finish(struct shash_desc *desc, u8 *out);
++extern int crypto_sha256_base_finish(struct shash_desc *desc, u8 *out);
 +
  #endif
 -- 
