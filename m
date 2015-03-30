@@ -1,211 +1,227 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 07/14] crypto/arm: move SHA-1 ARM asm implementation to base layer
-Date: Mon, 30 Mar 2015 11:36:22 +0200
-Message-ID: <1427708184-2353-13-git-send-email-ard.biesheuvel@linaro.org>
-References: <1427708184-2353-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 resend 03/14] crypto: sha1: implement base layer for SHA-1
+Date: Mon, 30 Mar 2015 11:48:22 +0200
+Message-ID: <1427708913-29678-4-git-send-email-ard.biesheuvel@linaro.org>
+References: <1427708913-29678-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
 	samitolvanen@google.com, herbert@gondor.apana.org.au,
 	jussi.kivilinna@iki.fi, stockhausen@collogia.de, x86@kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:37099 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752880AbbC3JhR (ORCPT
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:37636 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752657AbbC3JtA (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 30 Mar 2015 05:37:17 -0400
-Received: by wiaa2 with SMTP id a2so120340581wia.0
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2015 02:37:15 -0700 (PDT)
-In-Reply-To: <1427708184-2353-1-git-send-email-ard.biesheuvel@linaro.org>
+	Mon, 30 Mar 2015 05:49:00 -0400
+Received: by wiaa2 with SMTP id a2so120826524wia.0
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2015 02:48:59 -0700 (PDT)
+In-Reply-To: <1427708913-29678-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+To reduce the number of copies of boilerplate code throughout
+the tree, this patch implements generic glue for the SHA-1
+algorithm. This allows a specific arch or hardware implementation
+to only implement the special handling that it needs.
+
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/Kconfig                  |   1 +
- arch/arm/{include/asm => }/crypto/sha1.h |   3 +
- arch/arm/crypto/sha1_glue.c              | 117 +++++++------------------------
- 3 files changed, 28 insertions(+), 93 deletions(-)
- rename arch/arm/{include/asm => }/crypto/sha1.h (67%)
+ crypto/Kconfig       |   3 ++
+ crypto/Makefile      |   1 +
+ crypto/sha1_base.c   | 125 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/crypto/sha.h |  17 +++++++
+ 4 files changed, 146 insertions(+)
+ create mode 100644 crypto/sha1_base.c
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index d63f319924d2..c111d8992afb 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -11,6 +11,7 @@ if ARM_CRYPTO
- config CRYPTO_SHA1_ARM
- 	tristate "SHA1 digest algorithm (ARM-asm)"
- 	select CRYPTO_SHA1
-+	select CRYPTO_SHA1_BASE
- 	select CRYPTO_HASH
- 	help
- 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
-diff --git a/arch/arm/include/asm/crypto/sha1.h b/arch/arm/crypto/sha1.h
-similarity index 67%
-rename from arch/arm/include/asm/crypto/sha1.h
-rename to arch/arm/crypto/sha1.h
-index 75e6a417416b..ffd8bd08b1a7 100644
---- a/arch/arm/include/asm/crypto/sha1.h
-+++ b/arch/arm/crypto/sha1.h
-@@ -7,4 +7,7 @@
- extern int sha1_update_arm(struct shash_desc *desc, const u8 *data,
- 			   unsigned int len);
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 1664bd68b97d..155cc15c2719 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -516,6 +516,9 @@ config CRYPTO_RMD320
+ 	  Developed by Hans Dobbertin, Antoon Bosselaers and Bart Preneel.
+ 	  See <http://homes.esat.kuleuven.be/~bosselae/ripemd160.html>
  
-+extern int sha1_finup_arm(struct shash_desc *desc, const u8 *data,
-+			   unsigned int len, u8 *out);
++config CRYPTO_SHA1_BASE
++	tristate
++
+ config CRYPTO_SHA1
+ 	tristate "SHA1 digest algorithm"
+ 	select CRYPTO_HASH
+diff --git a/crypto/Makefile b/crypto/Makefile
+index bb9bafeb3ac7..42446cab15f3 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -43,6 +43,7 @@ obj-$(CONFIG_CRYPTO_RMD128) += rmd128.o
+ obj-$(CONFIG_CRYPTO_RMD160) += rmd160.o
+ obj-$(CONFIG_CRYPTO_RMD256) += rmd256.o
+ obj-$(CONFIG_CRYPTO_RMD320) += rmd320.o
++obj-$(CONFIG_CRYPTO_SHA1_BASE) += sha1_base.o
+ obj-$(CONFIG_CRYPTO_SHA1) += sha1_generic.o
+ obj-$(CONFIG_CRYPTO_SHA256_BASE) += sha256_base.o
+ obj-$(CONFIG_CRYPTO_SHA256) += sha256_generic.o
+diff --git a/crypto/sha1_base.c b/crypto/sha1_base.c
+new file mode 100644
+index 000000000000..30fb0f9b47cf
+--- /dev/null
++++ b/crypto/sha1_base.c
+@@ -0,0 +1,125 @@
++/*
++ * sha1_base.c - core logic for SHA-1 implementations
++ *
++ * Copyright (C) 2015 Linaro Ltd <ard.biesheuvel@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <crypto/internal/hash.h>
++#include <crypto/sha.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++
++#include <asm/unaligned.h>
++
++int crypto_sha1_base_init(struct shash_desc *desc)
++{
++	static const u32 sha1_init_state[] = {
++		SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4,
++	};
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++
++	memcpy(sctx->state, sha1_init_state, sizeof(sctx->state));
++	sctx->count = 0;
++	return 0;
++}
++EXPORT_SYMBOL(crypto_sha1_base_init);
++
++int crypto_sha1_base_export(struct shash_desc *desc, void *out)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state *dst = out;
++
++	*dst = *sctx;
++
++	return 0;
++}
++EXPORT_SYMBOL(crypto_sha1_base_export);
++
++int crypto_sha1_base_import(struct shash_desc *desc, const void *in)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	struct sha1_state const *src = in;
++
++	*sctx = *src;
++
++	return 0;
++}
++EXPORT_SYMBOL(crypto_sha1_base_import);
++
++int crypto_sha1_base_do_update(struct shash_desc *desc, const u8 *data,
++				 unsigned int len, sha1_block_fn *block_fn,
++				 void *p)
++{
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
++
++	sctx->count += len;
++
++	if (unlikely((partial + len) >= SHA1_BLOCK_SIZE)) {
++		int blocks;
++
++		if (partial) {
++			int p = SHA1_BLOCK_SIZE - partial;
++
++			memcpy(sctx->buffer + partial, data, p);
++			data += p;
++			len -= p;
++		}
++
++		blocks = len / SHA1_BLOCK_SIZE;
++		len %= SHA1_BLOCK_SIZE;
++
++		block_fn(blocks, data, sctx->state,
++			 partial ? sctx->buffer : NULL, p);
++		data += blocks * SHA1_BLOCK_SIZE;
++		partial = 0;
++	}
++	if (len)
++		memcpy(sctx->buffer + partial, data, len);
++
++	return 0;
++}
++EXPORT_SYMBOL(crypto_sha1_base_do_update);
++
++int crypto_sha1_base_do_finalize(struct shash_desc *desc,
++				 sha1_block_fn *block_fn, void *p)
++{
++	const int bit_offset = SHA1_BLOCK_SIZE - sizeof(__be64);
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	__be64 *bits = (__be64 *)(sctx->buffer + bit_offset);
++	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
++
++	sctx->buffer[partial++] = 0x80;
++	if (partial > bit_offset) {
++		memset(sctx->buffer + partial, 0x0, SHA1_BLOCK_SIZE - partial);
++		partial = 0;
++
++		block_fn(1, sctx->buffer, sctx->state, NULL, p);
++	}
++
++	memset(sctx->buffer + partial, 0x0, bit_offset - partial);
++	*bits = cpu_to_be64(sctx->count << 3);
++	block_fn(1, sctx->buffer, sctx->state, NULL, p);
++
++	return 0;
++}
++EXPORT_SYMBOL(crypto_sha1_base_do_finalize);
++
++int crypto_sha1_base_finish(struct shash_desc *desc, u8 *out)
++{
++	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
++	struct sha1_state *sctx = shash_desc_ctx(desc);
++	__be32 *digest = (__be32 *)out;
++	int i;
++
++	for (i = 0; digest_size > 0; i++, digest_size -= sizeof(__be32))
++		put_unaligned_be32(sctx->state[i], digest++);
++
++	*sctx = (struct sha1_state){};
++	return 0;
++}
++EXPORT_SYMBOL(crypto_sha1_base_finish);
+diff --git a/include/crypto/sha.h b/include/crypto/sha.h
+index 0ed6630d7c40..63cba0bbf3bc 100644
+--- a/include/crypto/sha.h
++++ b/include/crypto/sha.h
+@@ -82,6 +82,8 @@ struct sha512_state {
+ 	u8 buf[SHA512_BLOCK_SIZE];
+ };
+ 
++typedef void (sha1_block_fn)(int blocks, u8 const *src, u32 *state,
++			     const u8 *head, void *p);
+ typedef void (sha256_block_fn)(int blocks, u8 const *src, u32 *state,
+ 			       const u8 *head, void *p);
+ typedef void (sha512_block_fn)(int blocks, u8 const *src, u64 *state,
+@@ -129,4 +131,19 @@ extern int crypto_sha256_base_do_finalize(struct shash_desc *desc,
+ 
+ extern int crypto_sha256_base_finish(struct shash_desc *desc, u8 *out);
+ 
++extern int crypto_sha1_base_init(struct shash_desc *desc);
++extern int crypto_sha1_base_init(struct shash_desc *desc);
++
++extern int crypto_sha1_base_export(struct shash_desc *desc, void *out);
++extern int crypto_sha1_base_import(struct shash_desc *desc, const void *in);
++
++extern int crypto_sha1_base_do_update(struct shash_desc *desc, const u8 *data,
++			         unsigned int len, sha1_block_fn *block_fn,
++			         void *p);
++
++extern int crypto_sha1_base_do_finalize(struct shash_desc *desc,
++				   sha1_block_fn *block_fn, void *p);
++
++extern int crypto_sha1_base_finish(struct shash_desc *desc, u8 *out);
 +
  #endif
-diff --git a/arch/arm/crypto/sha1_glue.c b/arch/arm/crypto/sha1_glue.c
-index e31b0440c613..b6a78be0367f 100644
---- a/arch/arm/crypto/sha1_glue.c
-+++ b/arch/arm/crypto/sha1_glue.c
-@@ -23,124 +23,55 @@
- #include <linux/types.h>
- #include <crypto/sha.h>
- #include <asm/byteorder.h>
--#include <asm/crypto/sha1.h>
- 
-+#include "sha1.h"
- 
- asmlinkage void sha1_block_data_order(u32 *digest,
- 		const unsigned char *data, unsigned int rounds);
- 
--
--static int sha1_init(struct shash_desc *desc)
--{
--	struct sha1_state *sctx = shash_desc_ctx(desc);
--
--	*sctx = (struct sha1_state){
--		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
--	};
--
--	return 0;
--}
--
--
--static int __sha1_update(struct sha1_state *sctx, const u8 *data,
--			 unsigned int len, unsigned int partial)
-+static void sha1_arm_block_fn(int blocks, u8 const *src, u32 *state,
-+			      const u8 *head, void *p)
- {
--	unsigned int done = 0;
--
--	sctx->count += len;
--
--	if (partial) {
--		done = SHA1_BLOCK_SIZE - partial;
--		memcpy(sctx->buffer + partial, data, done);
--		sha1_block_data_order(sctx->state, sctx->buffer, 1);
--	}
--
--	if (len - done >= SHA1_BLOCK_SIZE) {
--		const unsigned int rounds = (len - done) / SHA1_BLOCK_SIZE;
--		sha1_block_data_order(sctx->state, data + done, rounds);
--		done += rounds * SHA1_BLOCK_SIZE;
--	}
--
--	memcpy(sctx->buffer, data + done, len - done);
--	return 0;
-+	if (head)
-+		sha1_block_data_order(state, head, 1);
-+	if (blocks)
-+		sha1_block_data_order(state, src, blocks);
- }
- 
--
- int sha1_update_arm(struct shash_desc *desc, const u8 *data,
- 		    unsigned int len)
- {
--	struct sha1_state *sctx = shash_desc_ctx(desc);
--	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
--	int res;
--
--	/* Handle the fast case right here */
--	if (partial + len < SHA1_BLOCK_SIZE) {
--		sctx->count += len;
--		memcpy(sctx->buffer + partial, data, len);
--		return 0;
--	}
--	res = __sha1_update(sctx, data, len, partial);
--	return res;
-+	return crypto_sha1_base_do_update(desc, data, len, sha1_arm_block_fn,
-+					  NULL);
- }
- EXPORT_SYMBOL_GPL(sha1_update_arm);
- 
--
--/* Add padding and return the message digest. */
--static int sha1_final(struct shash_desc *desc, u8 *out)
-+int sha1_finup_arm(struct shash_desc *desc, const u8 *data,
-+		   unsigned int len, u8 *out)
- {
--	struct sha1_state *sctx = shash_desc_ctx(desc);
--	unsigned int i, index, padlen;
--	__be32 *dst = (__be32 *)out;
--	__be64 bits;
--	static const u8 padding[SHA1_BLOCK_SIZE] = { 0x80, };
--
--	bits = cpu_to_be64(sctx->count << 3);
--
--	/* Pad out to 56 mod 64 and append length */
--	index = sctx->count % SHA1_BLOCK_SIZE;
--	padlen = (index < 56) ? (56 - index) : ((SHA1_BLOCK_SIZE+56) - index);
--	/* We need to fill a whole block for __sha1_update() */
--	if (padlen <= 56) {
--		sctx->count += padlen;
--		memcpy(sctx->buffer + index, padding, padlen);
--	} else {
--		__sha1_update(sctx, padding, padlen, index);
--	}
--	__sha1_update(sctx, (const u8 *)&bits, sizeof(bits), 56);
--
--	/* Store state in digest */
--	for (i = 0; i < 5; i++)
--		dst[i] = cpu_to_be32(sctx->state[i]);
--
--	/* Wipe context */
--	memset(sctx, 0, sizeof(*sctx));
--	return 0;
--}
--
-+	if (len)
-+		crypto_sha1_base_do_update(desc, data, len,
-+					   sha1_arm_block_fn, NULL);
-+	crypto_sha1_base_do_finalize(desc, sha1_arm_block_fn, NULL);
- 
--static int sha1_export(struct shash_desc *desc, void *out)
--{
--	struct sha1_state *sctx = shash_desc_ctx(desc);
--	memcpy(out, sctx, sizeof(*sctx));
--	return 0;
-+	return crypto_sha1_base_finish(desc, out);
- }
-+EXPORT_SYMBOL_GPL(sha1_finup_arm);
- 
--
--static int sha1_import(struct shash_desc *desc, const void *in)
-+/* Add padding and return the message digest. */
-+static int sha1_final(struct shash_desc *desc, u8 *out)
- {
--	struct sha1_state *sctx = shash_desc_ctx(desc);
--	memcpy(sctx, in, sizeof(*sctx));
--	return 0;
-+	return sha1_finup_arm(desc, NULL, 0, out);
- }
- 
--
- static struct shash_alg alg = {
- 	.digestsize	=	SHA1_DIGEST_SIZE,
--	.init		=	sha1_init,
-+	.init		=	crypto_sha1_base_init,
- 	.update		=	sha1_update_arm,
- 	.final		=	sha1_final,
--	.export		=	sha1_export,
--	.import		=	sha1_import,
-+	.finup		=	sha1_finup_arm,
-+	.export		=	crypto_sha1_base_export,
-+	.import		=	crypto_sha1_base_import,
- 	.descsize	=	sizeof(struct sha1_state),
- 	.statesize	=	sizeof(struct sha1_state),
- 	.base		=	{
 -- 
 1.8.3.2
