@@ -1,59 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 02/20] crypto: testmgr to use CRYPTO_ALG_INTERNAL
-Date: Tue, 31 Mar 2015 00:10:34 +1100
-Message-ID: <20150330131034.GA6251@gondor.apana.org.au>
-References: <1746748.uPZFXamDiM@tachyon.chronox.de>
- <1657882.6iCTT84gKK@tachyon.chronox.de>
+From: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: problem with testing a CTR block cipher mode which is
+ partially working
+Date: Mon, 30 Mar 2015 19:59:48 +0200
+Message-ID: <55198F14.1090902@gmail.com>
+Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59472 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752322AbbC3NKj (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 30 Mar 2015 09:10:39 -0400
-Content-Disposition: inline
-In-Reply-To: <1657882.6iCTT84gKK@tachyon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBF4642UAKGQEB35Q3TY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, Mar 27, 2015 at 11:50:42PM +0100, Stephan Mueller wrote:
-> If a cipher allocation fails with -ENOENT, the testmgr now retries
-> to allocate the cipher with CRYPTO_ALG_INTERNAL flag.
-> 
-> As all ciphers, including the internal ciphers will be processed by
-> the testmgr, it needs to be able to allocate those ciphers.
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> ---
->  crypto/testmgr.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index 1f879ad..609bafa 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -1506,6 +1506,9 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
->  	int err = 0;
->  
->  	tfm = crypto_alloc_aead(driver, type, mask);
-> +	if (PTR_ERR(tfm) == -ENOENT)
-> +		tfm = crypto_alloc_aead(driver, type | CRYPTO_ALG_INTERNAL,
-> +					mask | CRYPTO_ALG_INTERNAL);
+hello
 
-We need to be able to say give me an algorithm regardless of the
-INTERNAL bit.  How about treating (type & CRYPTO_ALG_INTERNAL) &&
-!(mask & CRYPTO_ALG_INTERNAL) as that special case?
+I am trying to add the CTR (counter) block cipher mode for AES on my Security System driver.
 
-So in patch 1 you would do
+When testing with the tcrypt module I got the following result:
+[ 1256.986989] alg: skcipher: Test 1 failed on encryption for ctr-aes-sunxi-ss
+[ 1256.987004] 00000000: 87 4d 61 91 b6 20 e3 26 1b ef 68 64 99 0d b6 ce
+[ 1256.987013] 00000010: 40 94 25 91 d7 b4 4f 49 ab c1 9d 33 a4 4e f6 54
+[ 1256.987023] 00000020: ce 58 d2 f0 01 8f 92 a2 5f 2c bb 66 13 8b 9d 76
+[ 1256.987032] 00000030: 30 fa 4a 40 b1 67 2e f3 46 b7 9a 7c ba 91 0b a2
 
-	if (!((type | mask) & CRYPTO_ALG_INTERNAL))
-		mask |= CRYPTO_ALG_INTERNAL;
+As you can see the first ciphered block is correct (according to testmgr.h), the subsequent blocks are bad.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+So Could I assume that the setting of key and IV are good (at least for the first cipher pass.
+
+The number of inputs(register) are limited and I have tested near all the possibility.
+Any idea of what could be wrong.
+
+Regards
+Thanks in advance
