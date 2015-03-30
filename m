@@ -1,79 +1,102 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 13/20] crypto: mark Serpent AVX helper ciphers
-Date: Mon, 30 Mar 2015 22:07:05 +0200
-Message-ID: <3809491.8663rLpNxe@tachyon.chronox.de>
-References: <3417827.fluZli1WvQ@tachyon.chronox.de>
+Subject: [PATCH v3 00/20] crypto: restrict usage of helper ciphers
+Date: Mon, 30 Mar 2015 21:54:32 +0200
+Message-ID: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: 'Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <3417827.fluZli1WvQ@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Flag all Serpent AVX helper ciphers as internal ciphers to prevent
-them from being called by normal users.
+Hi,
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- arch/x86/crypto/serpent_avx_glue.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+Based on the discussion in the thread [1], a flag is added to the
+kernel crypto API to allow ciphers to be marked as internal.
 
-diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
-index 7e21739..c8d478a 100644
---- a/arch/x86/crypto/serpent_avx_glue.c
-+++ b/arch/x86/crypto/serpent_avx_glue.c
-@@ -378,7 +378,8 @@ static struct crypto_alg serpent_algs[10] = { {
- 	.cra_name		= "__ecb-serpent-avx",
- 	.cra_driver_name	= "__driver-ecb-serpent-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= SERPENT_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct serpent_ctx),
- 	.cra_alignmask		= 0,
-@@ -397,7 +398,8 @@ static struct crypto_alg serpent_algs[10] = { {
- 	.cra_name		= "__cbc-serpent-avx",
- 	.cra_driver_name	= "__driver-cbc-serpent-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= SERPENT_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct serpent_ctx),
- 	.cra_alignmask		= 0,
-@@ -416,7 +418,8 @@ static struct crypto_alg serpent_algs[10] = { {
- 	.cra_name		= "__ctr-serpent-avx",
- 	.cra_driver_name	= "__driver-ctr-serpent-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= 1,
- 	.cra_ctxsize		= sizeof(struct serpent_ctx),
- 	.cra_alignmask		= 0,
-@@ -436,7 +439,8 @@ static struct crypto_alg serpent_algs[10] = { {
- 	.cra_name		= "__lrw-serpent-avx",
- 	.cra_driver_name	= "__driver-lrw-serpent-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= SERPENT_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct serpent_lrw_ctx),
- 	.cra_alignmask		= 0,
-@@ -459,7 +463,8 @@ static struct crypto_alg serpent_algs[10] = { {
- 	.cra_name		= "__xts-serpent-avx",
- 	.cra_driver_name	= "__driver-xts-serpent-avx",
- 	.cra_priority		= 0,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
-+	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER |
-+				  CRYPTO_ALG_INTERNAL,
- 	.cra_blocksize		= SERPENT_BLOCK_SIZE,
- 	.cra_ctxsize		= sizeof(struct serpent_xts_ctx),
- 	.cra_alignmask		= 0,
+The patch set is tested in FIPS and non-FIPS mode. In addition,
+the enforcement that the helper cipher of __driver-gcm-aes-aesni
+cannot be loaded, but the wrapper of rfc4106-gcm-aesni can be used
+is tested to demonstrate that the patch works. The testing also shows
+that of__driver-gcm-aes-aesni is subject to the testmgr self test an
+can therefore be used in FIPS mode.
+
+All cipher implementation whose definition has a cra_priority of 0
+as well as the ciphers that are wrapped by cryptd and mcryptd
+are marked as internal ciphers to prevent them from being called by
+users.
+
+The testing also includes the invocation of normal crypto operations
+from user space via AF_ALG and libkcapi showing that all of them work
+unaffected.
+
+[1] http://comments.gmane.org/gmane.linux.kernel.cryptoapi/13705
+
+Changes v2:
+* Overhaul enforcement of the internal flag as suggested by Herbert:
+  a cipher marked as internal can only be invoked if the caller
+  instantiates it with the internal flag set in the type and mask
+  field.
+* The overhaul implies that cryptd and mcryptd instances are marked
+  as internal if the underlying cipher is marked as internal.
+* The overhaul implies that the testmgr must try to allocate a
+  cipher again with the internal flag in case the first allocation
+  failed with -ENOENT.
+* Mark internal cipher in arch/x86/crypto/sha-mb/sha1_mb.c.
+
+Changes v3:
+* Allow a caller to specify type & CRYPTO_ALG_INTERNAL and
+  !(mask & CRYPTO_ALG_INTERNAL) when caller requests a cipher and
+  does not care whether it is marked as internal or not (suggested by
+  Herbert Xu)
+
+Stephan Mueller (20):
+  crypto: prevent helper ciphers from being used
+  crypto: testmgr to use CRYPTO_ALG_INTERNAL
+  crypto: cryptd to process CRYPTO_ALG_INTERNAL
+  crypto: /proc/crypto: identify internal ciphers
+  crypto: mark AES-NI helper ciphers
+  crypto: mark ghash clmulni helper ciphers
+  crypto: mark GHASH ARMv8 vmull.p64 helper ciphers
+  crypto: mark AES-NI Camellia helper ciphers
+  crypto: mark CAST5 helper ciphers
+  crypto: mark AVX Camellia helper ciphers
+  crypto: mark CAST6 helper ciphers
+  crypto: mark Serpent AVX2 helper ciphers
+  crypto: mark Serpent AVX helper ciphers
+  crypto: mark Serpent SSE2 helper ciphers
+  crypto: mark Twofish AVX helper ciphers
+  crypto: mark NEON bit sliced AES helper ciphers
+  crypto: mark ARMv8 AES helper ciphers
+  crypto: mark 64 bit ARMv8 AES helper ciphers
+  crypto: mcryptd to process CRYPTO_ALG_INTERNAL
+  crypto: mark Multi buffer SHA1 helper cipher
+
+ arch/arm/crypto/aes-ce-glue.c              | 12 +++++---
+ arch/arm/crypto/aesbs-glue.c               |  9 ++++--
+ arch/arm/crypto/ghash-ce-glue.c            |  6 ++--
+ arch/arm64/crypto/aes-glue.c               | 12 +++++---
+ arch/x86/crypto/aesni-intel_glue.c         | 23 +++++++++-----
+ arch/x86/crypto/camellia_aesni_avx2_glue.c | 15 ++++++---
+ arch/x86/crypto/camellia_aesni_avx_glue.c  | 15 ++++++---
+ arch/x86/crypto/cast5_avx_glue.c           |  9 ++++--
+ arch/x86/crypto/cast6_avx_glue.c           | 15 ++++++---
+ arch/x86/crypto/ghash-clmulni-intel_glue.c |  7 +++--
+ arch/x86/crypto/serpent_avx2_glue.c        | 15 ++++++---
+ arch/x86/crypto/serpent_avx_glue.c         | 15 ++++++---
+ arch/x86/crypto/serpent_sse2_glue.c        | 15 ++++++---
+ arch/x86/crypto/sha-mb/sha1_mb.c           |  7 +++--
+ arch/x86/crypto/twofish_avx_glue.c         | 15 ++++++---
+ crypto/ablk_helper.c                       |  3 +-
+ crypto/api.c                               | 10 ++++++
+ crypto/cryptd.c                            | 49 +++++++++++++++++++++++++-----
+ crypto/mcryptd.c                           | 25 +++++++++++++--
+ crypto/proc.c                              |  3 ++
+ crypto/testmgr.c                           | 14 ++++-----
+ include/linux/crypto.h                     |  6 ++++
+ 22 files changed, 219 insertions(+), 81 deletions(-)
+
 -- 
 2.1.0
