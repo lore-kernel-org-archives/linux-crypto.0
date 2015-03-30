@@ -1,113 +1,199 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 resend 00/14] crypto: SHA glue code consolidation
-Date: Mon, 30 Mar 2015 11:48:19 +0200
-Message-ID: <1427708913-29678-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 resend 06/14] crypto: sha1-generic: move to generic glue implementation
+Date: Mon, 30 Mar 2015 11:48:25 +0200
+Message-ID: <1427708913-29678-7-git-send-email-ard.biesheuvel@linaro.org>
+References: <1427708913-29678-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
 	samitolvanen@google.com, herbert@gondor.apana.org.au,
 	jussi.kivilinna@iki.fi, stockhausen@collogia.de, x86@kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:34403 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751482AbbC3Jsv (ORCPT
+Received: from mail-wg0-f49.google.com ([74.125.82.49]:33917 "EHLO
+	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751482AbbC3JtJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 30 Mar 2015 05:48:51 -0400
-Received: by wibg7 with SMTP id g7so86967699wib.1
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2015 02:48:49 -0700 (PDT)
+	Mon, 30 Mar 2015 05:49:09 -0400
+Received: by wgbdm7 with SMTP id dm7so61134464wgb.1
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2015 02:49:08 -0700 (PDT)
+In-Reply-To: <1427708913-29678-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-NOTE: I appear to have screwed up something when I just sent this, so
-      resending now with no patches missing and no duplicates.
+This updated the generic SHA-1 implementation to use the generic
+shared SHA-1 glue code.
 
-Hello all,
+It also implements a .finup hook crypto_sha1_finup() and exports
+it to other modules.
 
-This is v2 of what is now a complete glue code consolidation series
-for generic, x86, arm and arm64 implementations of SHA-1, SHA-224/256
-and SHA-384/512.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ crypto/Kconfig        |   1 +
+ crypto/sha1_generic.c | 105 ++++++++++++--------------------------------------
+ include/crypto/sha.h  |   3 ++
+ 3 files changed, 29 insertions(+), 80 deletions(-)
 
-The base layer implements all the update and finalization logic around
-the block transforms, where the prototypes of the latter look something
-like this:
-
-typedef void (shaXXX_block_fn)(int blocks, u8 const *src, uXX *state,
-			     const u8 *head, void *p);
-
-The block implementation should process the head block first, then
-process the requested number of block starting at 'src'. The generic
-pointer 'p' is passed down from the do_update/do_finalize() versions;
-this is used for instance by the ARM64 implementations to indicate to
-the core ASM implementation that it should finalize the digest, which
-it will do only if the input was a round multiple of the block size.
-The generic pointer is used here as a means of conveying that information
-back and forth.
-
-Note that the base functions prototypes are all 'returning int' but
-they all return 0. They should be invoked as tail calls where possible
-to eliminate some of the function call overhead. If that is not possible,
-the return values can be safely ignored.
-
-Changes since v1 (RFC):
-- prefixed globally visible generic symbols with crypto_
-- added SHA-1 base layer
-- updated init code to only set the initial constants and clear the
-  count, clearing the buffer is unnecessary [Markus]
-- favor the small update path in crypto_sha_XXX_base_do_update() [Markus]
-- update crypto_sha_XXX_do_finalize() to use memset() on the buffer directly
-  rather than copying a statically allocated padding buffer into it
-  [Markus]
-- moved a bunch of existing arm and x86 implementations to use the new base
-  layers
-
-Note: looking at the generated asm (for arm64), I noticed that the memcpy/memset
-invocations with compile time constant src and len arguments (which includes
-the empty struct assignments) are eliminated completely, and replaced by
-direct loads and stores. Hopefully this addresses the concern raised by Markus
-regarding this.
-
-Ard Biesheuvel (14):
-  crypto: sha512: implement base layer for SHA-512
-  crypto: sha256: implement base layer for SHA-256
-  crypto: sha1: implement base layer for SHA-1
-  crypto: sha512-generic: move to generic glue implementation
-  crypto: sha256-generic: move to generic glue implementation
-  crypto: sha1-generic: move to generic glue implementation
-  crypto/arm: move SHA-1 ARM asm implementation to base layer
-  crypto/arm: move SHA-1 ARMv8 implementation to base layer
-  crypto/arm: move SHA-224/256 ARMv8 implementation to base layer
-  crypto/arm64: move SHA-1 ARMv8 implementation to base layer
-  crypto/arm64: move SHA-224/256 ARMv8 implementation to base layer
-  crypto/x86: move SHA-1 SSSE3 implementation to base layer
-  crypto/x86: move SHA-224/256 SSSE3 implementation to base layer
-  crypto/x86: move SHA-384/512 SSSE3 implementation to base layer
-
- arch/arm/crypto/Kconfig                  |   4 +-
- arch/arm/crypto/sha1-ce-glue.c           | 110 +++++-----------
- arch/arm/{include/asm => }/crypto/sha1.h |   3 +
- arch/arm/crypto/sha1_glue.c              | 117 ++++-------------
- arch/arm/crypto/sha2-ce-glue.c           | 151 +++++-----------------
- arch/arm64/crypto/Kconfig                |   2 +
- arch/arm64/crypto/sha1-ce-core.S         |  11 +-
- arch/arm64/crypto/sha1-ce-glue.c         | 132 ++++----------------
- arch/arm64/crypto/sha2-ce-core.S         |  11 +-
- arch/arm64/crypto/sha2-ce-glue.c         | 208 +++++--------------------------
- arch/x86/crypto/sha1_ssse3_glue.c        | 139 +++++----------------
- arch/x86/crypto/sha256_ssse3_glue.c      | 186 ++++++---------------------
- arch/x86/crypto/sha512_ssse3_glue.c      | 195 ++++++-----------------------
- crypto/Kconfig                           |  16 +++
- crypto/Makefile                          |   3 +
- crypto/sha1_base.c                       | 125 +++++++++++++++++++
- crypto/sha1_generic.c                    | 105 ++++------------
- crypto/sha256_base.c                     | 140 +++++++++++++++++++++
- crypto/sha256_generic.c                  | 139 ++++-----------------
- crypto/sha512_base.c                     | 143 +++++++++++++++++++++
- crypto/sha512_generic.c                  | 126 ++++---------------
- include/crypto/sha.h                     |  62 +++++++++
- 22 files changed, 836 insertions(+), 1292 deletions(-)
- rename arch/arm/{include/asm => }/crypto/sha1.h (67%)
- create mode 100644 crypto/sha1_base.c
- create mode 100644 crypto/sha256_base.c
- create mode 100644 crypto/sha512_base.c
-
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 72bf5af7240d..8f16d90f7c55 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -522,6 +522,7 @@ config CRYPTO_SHA1_BASE
+ config CRYPTO_SHA1
+ 	tristate "SHA1 digest algorithm"
+ 	select CRYPTO_HASH
++	select CRYPTO_SHA1_BASE
+ 	help
+ 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2).
+ 
+diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
+index a3e50c37eb6f..3975f63ea6f9 100644
+--- a/crypto/sha1_generic.c
++++ b/crypto/sha1_generic.c
+@@ -25,107 +25,52 @@
+ #include <crypto/sha.h>
+ #include <asm/byteorder.h>
+ 
+-static int sha1_init(struct shash_desc *desc)
++static void sha1_generic_block_fn(int blocks, u8 const *src, u32 *state,
++				  const u8 *head, void *p)
+ {
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
++	u32 temp[SHA_WORKSPACE_WORDS];
+ 
+-	*sctx = (struct sha1_state){
+-		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
+-	};
++	if (head)
++		sha_transform(state, head, temp);
+ 
+-	return 0;
++	while (blocks--) {
++		sha_transform(state, src, temp);
++		src += SHA1_BLOCK_SIZE;
++	}
+ }
+ 
+ int crypto_sha1_update(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len)
+ {
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	unsigned int partial, done;
+-	const u8 *src;
+-
+-	partial = sctx->count % SHA1_BLOCK_SIZE;
+-	sctx->count += len;
+-	done = 0;
+-	src = data;
+-
+-	if ((partial + len) >= SHA1_BLOCK_SIZE) {
+-		u32 temp[SHA_WORKSPACE_WORDS];
+-
+-		if (partial) {
+-			done = -partial;
+-			memcpy(sctx->buffer + partial, data,
+-			       done + SHA1_BLOCK_SIZE);
+-			src = sctx->buffer;
+-		}
+-
+-		do {
+-			sha_transform(sctx->state, src, temp);
+-			done += SHA1_BLOCK_SIZE;
+-			src = data + done;
+-		} while (done + SHA1_BLOCK_SIZE <= len);
+-
+-		memzero_explicit(temp, sizeof(temp));
+-		partial = 0;
+-	}
+-	memcpy(sctx->buffer + partial, src, len - done);
+-
+-	return 0;
++	return crypto_sha1_base_do_update(desc, data, len,
++					  sha1_generic_block_fn, NULL);
+ }
+ EXPORT_SYMBOL(crypto_sha1_update);
+ 
+-
+-/* Add padding and return the message digest. */
+-static int sha1_final(struct shash_desc *desc, u8 *out)
+-{
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	__be32 *dst = (__be32 *)out;
+-	u32 i, index, padlen;
+-	__be64 bits;
+-	static const u8 padding[64] = { 0x80, };
+-
+-	bits = cpu_to_be64(sctx->count << 3);
+-
+-	/* Pad out to 56 mod 64 */
+-	index = sctx->count & 0x3f;
+-	padlen = (index < 56) ? (56 - index) : ((64+56) - index);
+-	crypto_sha1_update(desc, padding, padlen);
+-
+-	/* Append length */
+-	crypto_sha1_update(desc, (const u8 *)&bits, sizeof(bits));
+-
+-	/* Store state in digest */
+-	for (i = 0; i < 5; i++)
+-		dst[i] = cpu_to_be32(sctx->state[i]);
+-
+-	/* Wipe context */
+-	memset(sctx, 0, sizeof *sctx);
+-
+-	return 0;
+-}
+-
+-static int sha1_export(struct shash_desc *desc, void *out)
++int crypto_sha1_finup(struct shash_desc *desc, const u8 *data,
++		      unsigned int len, u8 *out)
+ {
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(out, sctx, sizeof(*sctx));
+-	return 0;
++	if (len)
++		crypto_sha1_base_do_update(desc, data, len,
++					   sha1_generic_block_fn, NULL);
++	crypto_sha1_base_do_finalize(desc, sha1_generic_block_fn, NULL);
++	return crypto_sha1_base_finish(desc, out);
+ }
++EXPORT_SYMBOL(crypto_sha1_finup);
+ 
+-static int sha1_import(struct shash_desc *desc, const void *in)
++/* Add padding and return the message digest. */
++static int sha1_final(struct shash_desc *desc, u8 *out)
+ {
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(sctx, in, sizeof(*sctx));
+-	return 0;
++	return crypto_sha1_finup(desc, NULL, 0, out);
+ }
+ 
+ static struct shash_alg alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+-	.init		=	sha1_init,
++	.init		=	crypto_sha1_base_init,
+ 	.update		=	crypto_sha1_update,
+ 	.final		=	sha1_final,
+-	.export		=	sha1_export,
+-	.import		=	sha1_import,
++	.export		=	crypto_sha1_base_export,
++	.import		=	crypto_sha1_base_import,
+ 	.descsize	=	sizeof(struct sha1_state),
+ 	.statesize	=	sizeof(struct sha1_state),
+ 	.base		=	{
+diff --git a/include/crypto/sha.h b/include/crypto/sha.h
+index 1b4d9a87c2a4..7bb3140d2d8a 100644
+--- a/include/crypto/sha.h
++++ b/include/crypto/sha.h
+@@ -94,6 +94,9 @@ struct shash_desc;
+ extern int crypto_sha1_update(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len);
+ 
++extern int crypto_sha1_finup(struct shash_desc *desc, const u8 *data,
++			     unsigned int len, u8 *hash);
++
+ extern int crypto_sha256_update(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len);
+ 
 -- 
 1.8.3.2
