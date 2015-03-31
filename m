@@ -1,7 +1,7 @@
 From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: [PATCH] crypto: omap-aes: Fix support for unequal lengths
-Date: Tue, 31 Mar 2015 09:52:25 +0530
-Message-ID: <1427775745-4674-3-git-send-email-lokeshvutla@ti.com>
+Subject: [PATCH] crypto: omap-sham: Use pm_runtime_irq_safe()
+Date: Tue, 31 Mar 2015 09:52:24 +0530
+Message-ID: <1427775745-4674-2-git-send-email-lokeshvutla@ti.com>
 References: <1427775745-4674-1-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -13,61 +13,31 @@ In-Reply-To: <1427775745-4674-1-git-send-email-lokeshvutla@ti.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-For cases where total length of an input SGs is not same as
-length of the input data for encryption, omap-aes driver
-crashes. This happens in the case when IPsec is trying to use
-omap-aes driver.
+omap_sham_handle_queue() can be called as part of done_task tasklet.
+During this its atomic and any calls to pm functions cannot sleep.
 
-To avoid this, we copy all the pages from the input SG list
-into a contiguous buffer and prepare a single element SG list
-for this buffer with length as the total bytes to crypt, which is
-similar thing that is done in case of unaligned lengths.
+But there is a call to pm_runtime_get_sync() (which can sleep) in
+omap_sham_handle_queue(), because of which the following appears:
+" [  116.169969] BUG: scheduling while atomic: kworker/0:2/2676/0x00000100"
 
-Fixes: 6242332ff2f3 ("crypto: omap-aes - Add support for cases of unaligned lengths")
+Add pm_runtime_irq_safe() to avoid this.
+
 Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 ---
- drivers/crypto/omap-aes.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ drivers/crypto/omap-sham.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 42f95a4..9a28b7e 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -554,15 +554,23 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
- 	return err;
- }
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index ace5852..81ed511 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1949,6 +1949,7 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	dd->flags |= dd->pdata->flags;
  
--static int omap_aes_check_aligned(struct scatterlist *sg)
-+static int omap_aes_check_aligned(struct scatterlist *sg, int total)
- {
-+	int len = 0;
-+
- 	while (sg) {
- 		if (!IS_ALIGNED(sg->offset, 4))
- 			return -1;
- 		if (!IS_ALIGNED(sg->length, AES_BLOCK_SIZE))
- 			return -1;
-+
-+		len += sg->length;
- 		sg = sg_next(sg);
- 	}
-+
-+	if (len != total)
-+		return -1;
-+
- 	return 0;
- }
- 
-@@ -633,8 +641,8 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
- 	dd->in_sg = req->src;
- 	dd->out_sg = req->dst;
- 
--	if (omap_aes_check_aligned(dd->in_sg) ||
--	    omap_aes_check_aligned(dd->out_sg)) {
-+	if (omap_aes_check_aligned(dd->in_sg, dd->total) ||
-+	    omap_aes_check_aligned(dd->out_sg, dd->total)) {
- 		if (omap_aes_copy_sgs(dd))
- 			pr_err("Failed to copy SGs for unaligned cases\n");
- 		dd->sgs_copied = 1;
+ 	pm_runtime_enable(dev);
++	pm_runtime_irq_safe(dev);
+ 	pm_runtime_get_sync(dev);
+ 	rev = omap_sham_read(dd, SHA_REG_REV(dd));
+ 	pm_runtime_put_sync(&pdev->dev);
 -- 
 1.9.1
