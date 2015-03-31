@@ -1,57 +1,73 @@
 From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: [PATCH] crypto: omap-sham: Check for HIGHMEM before mapping SG pages
-Date: Tue, 31 Mar 2015 09:52:23 +0530
-Message-ID: <1427775745-4674-1-git-send-email-lokeshvutla@ti.com>
+Subject: [PATCH] crypto: omap-aes: Fix support for unequal lengths
+Date: Tue, 31 Mar 2015 09:52:25 +0530
+Message-ID: <1427775745-4674-3-git-send-email-lokeshvutla@ti.com>
+References: <1427775745-4674-1-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain
 Cc: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<nsekhar@ti.com>, <t-kristo@ti.com>, <lokeshvutla@ti.com>
 To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1427775745-4674-1-git-send-email-lokeshvutla@ti.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Commit 26a05489ee0e ("crypto: omap-sham - Map SG pages if they are HIGHMEM before accessing")
-says that HIGHMEM pages may not be mapped so we must
-kmap them before accessing, but it doesn't check whether the
-corresponding page is in highmem or not. Because of this all
-the crypto tests are failing.
+For cases where total length of an input SGs is not same as
+length of the input data for encryption, omap-aes driver
+crashes. This happens in the case when IPsec is trying to use
+omap-aes driver.
 
-00000000: d9 a1 1b 7c aa 90 3b aa 11 ab cb 25 00 b8 ac bf
-[    2.338169] 00000010: c1 39 cd ff 48 d0 a8 e2 2b fa 33 a1
-[    2.344008] alg: hash: Chunking test 1 failed for omap-sha256
+To avoid this, we copy all the pages from the input SG list
+into a contiguous buffer and prepare a single element SG list
+for this buffer with length as the total bytes to crypt, which is
+similar thing that is done in case of unaligned lengths.
 
-So Checking for HIGHMEM before mapping SG pages.
-
-Fixes: 26a05489ee0 ("crypto: omap-sham - Map SG pages if they are HIGHMEM before accessing")
+Fixes: 6242332ff2f3 ("crypto: omap-aes - Add support for cases of unaligned lengths")
 Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
 ---
- drivers/crypto/omap-sham.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/crypto/omap-aes.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 3c76696..ace5852 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -639,13 +639,17 @@ static size_t omap_sham_append_sg(struct omap_sham_reqctx *ctx)
- 	const u8 *vaddr;
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 42f95a4..9a28b7e 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -554,15 +554,23 @@ static int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd)
+ 	return err;
+ }
  
- 	while (ctx->sg) {
--		vaddr = kmap_atomic(sg_page(ctx->sg));
-+		if (PageHighMem(sg_page(ctx->sg)))
-+			vaddr = kmap_atomic(sg_page(ctx->sg));
-+		else
-+			vaddr = sg_virt(ctx->sg);
+-static int omap_aes_check_aligned(struct scatterlist *sg)
++static int omap_aes_check_aligned(struct scatterlist *sg, int total)
+ {
++	int len = 0;
++
+ 	while (sg) {
+ 		if (!IS_ALIGNED(sg->offset, 4))
+ 			return -1;
+ 		if (!IS_ALIGNED(sg->length, AES_BLOCK_SIZE))
+ 			return -1;
++
++		len += sg->length;
+ 		sg = sg_next(sg);
+ 	}
++
++	if (len != total)
++		return -1;
++
+ 	return 0;
+ }
  
- 		count = omap_sham_append_buffer(ctx,
- 				vaddr + ctx->offset,
- 				ctx->sg->length - ctx->offset);
+@@ -633,8 +641,8 @@ static int omap_aes_handle_queue(struct omap_aes_dev *dd,
+ 	dd->in_sg = req->src;
+ 	dd->out_sg = req->dst;
  
--		kunmap_atomic((void *)vaddr);
-+		if (PageHighMem(sg_page(ctx->sg)))
-+			kunmap_atomic((void *)vaddr);
- 
- 		if (!count)
- 			break;
+-	if (omap_aes_check_aligned(dd->in_sg) ||
+-	    omap_aes_check_aligned(dd->out_sg)) {
++	if (omap_aes_check_aligned(dd->in_sg, dd->total) ||
++	    omap_aes_check_aligned(dd->out_sg, dd->total)) {
+ 		if (omap_aes_copy_sgs(dd))
+ 			pr_err("Failed to copy SGs for unaligned cases\n");
+ 		dd->sgs_copied = 1;
 -- 
 1.9.1
