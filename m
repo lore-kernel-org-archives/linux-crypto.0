@@ -1,39 +1,63 @@
-From: Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [PATCHv3] arm: crypto: Add optimized SHA-256/224
-Date: Wed, 1 Apr 2015 14:19:24 +0100
-Message-ID: <20150401131924.GA21344@google.com>
-References: <20150316154835.GA31336@google.com>
- <20150323135009.GB820@google.com>
- <20150330083727.GA22406@google.com>
- <20150401124325.GA26623@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: omap-sham: Check for HIGHMEM before mapping SG
+ pages
+Date: Wed, 1 Apr 2015 22:18:14 +0800
+Message-ID: <20150401141814.GA28592@gondor.apana.org.au>
+References: <1427775745-4674-1-git-send-email-lokeshvutla@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	ard.biesheuvel@linaro.org, davem@davemloft.net,
-	Andy Polyakov <appro@openssl.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:36916 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753257AbbDANT3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Apr 2015 09:19:29 -0400
-Received: by wiaa2 with SMTP id a2so66078986wia.0
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Apr 2015 06:19:26 -0700 (PDT)
+Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-kernel@vger.kernel.org, nsekhar@ti.com, t-kristo@ti.com
+To: Lokesh Vutla <lokeshvutla@ti.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150401124325.GA26623@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1427775745-4674-1-git-send-email-lokeshvutla@ti.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Apr 01, 2015 at 08:43:25PM +0800, Herbert Xu wrote:
-> I cannot merge this because none of your emails are making it
-> to the mailing list so nobody except those on the cc list can
-> see the patch.
+On Tue, Mar 31, 2015 at 09:52:23AM +0530, Lokesh Vutla wrote:
+> Commit 26a05489ee0e ("crypto: omap-sham - Map SG pages if they are HIGHMEM before accessing")
+> says that HIGHMEM pages may not be mapped so we must
+> kmap them before accessing, but it doesn't check whether the
+> corresponding page is in highmem or not. Because of this all
+> the crypto tests are failing.
 > 
-> Please refer to section 7 in Documentation/SubmittingPatches.
+> 00000000: d9 a1 1b 7c aa 90 3b aa 11 ab cb 25 00 b8 ac bf
+> [    2.338169] 00000010: c1 39 cd ff 48 d0 a8 e2 2b fa 33 a1
+> [    2.344008] alg: hash: Chunking test 1 failed for omap-sha256
+> 
+> So Checking for HIGHMEM before mapping SG pages.
+> 
+> Fixes: 26a05489ee0 ("crypto: omap-sham - Map SG pages if they are HIGHMEM before accessing")
+> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+> ---
+>  drivers/crypto/omap-sham.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+> index 3c76696..ace5852 100644
+> --- a/drivers/crypto/omap-sham.c
+> +++ b/drivers/crypto/omap-sham.c
+> @@ -639,13 +639,17 @@ static size_t omap_sham_append_sg(struct omap_sham_reqctx *ctx)
+>  	const u8 *vaddr;
+>  
+>  	while (ctx->sg) {
+> -		vaddr = kmap_atomic(sg_page(ctx->sg));
+> +		if (PageHighMem(sg_page(ctx->sg)))
+> +			vaddr = kmap_atomic(sg_page(ctx->sg));
+> +		else
+> +			vaddr = sg_virt(ctx->sg);
 
-Please find a hosted version of the patch here:
+This is completely bogus.  kmap_atomic should be identical to
+sg_virt(sg_page()) for the lowmem case.
 
-https://raw.githubusercontent.com/samitolvanen/kernelpatches/master/sha256.v3.patch
+So either your architecture is broken (because the same problem
+would obviously affect the core crypto code which does exactly
+the same thing), or there is some other bug causing the selftest
+to fail.
 
-Sami
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
