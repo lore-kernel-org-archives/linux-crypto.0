@@ -1,317 +1,270 @@
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 10/17] crypto: talitos - fill in talitos descriptor iaw
- SEC1 or SEC2+
-Date: Sat, 14 Mar 2015 14:06:06 +0100
-Message-ID: <20150417142403.EF36E1A242C@localhost.localdomain>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David S Miller <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: "kevin.z.m.zh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <kevin.z.m.zh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Re: AW: problem with testing a CTR block cipher
+ mode which is partially working
+Date: Wed, 1 Apr 2015 10:06:37 +0800
+Message-ID: <2015040110063394945846@gmail.com>
+References: <55198F14.1090902@gmail.com>,
+	<12EF8D94C6F8734FB2FF37B9FBEDD1735FC8AB40@EXCHANGE.collogia.de>,
+	<551AE140.3000209@gmail.com>
+Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+Mime-Version: 1.0
+Content-Type: multipart/alternative;
+	boundary="----=_001_NextPart650844260004_=----"
+Cc: "linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org" <linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+To: "linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org" <linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+	"Markus Stockhausen" <stockhausen-FhFLwxQf9jkb1SvskN2V4Q@public.gmane.org>,
+	"linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-sunxi+bncBC5PRQO6XENRBMNF5WUAKGQEX3BS6TI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-talitos descriptor is slightly different for SEC1 and SEC2+, so
-lets the helper function that fills the descriptor take into account
-the type of SEC.
+This is a multi-part message in MIME format.
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- drivers/crypto/talitos.c | 105 ++++++++++++++++++++++++++++++-----------------
- 1 file changed, 67 insertions(+), 38 deletions(-)
+------=_001_NextPart650844260004_=----
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index db95023..678b528 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -55,25 +55,38 @@
- 
- #include "talitos.h"
- 
--static void to_talitos_ptr(struct talitos_ptr *ptr, dma_addr_t dma_addr)
-+static void to_talitos_ptr(struct talitos_ptr *ptr, dma_addr_t dma_addr,
-+			   bool is_sec1)
- {
- 	ptr->ptr = cpu_to_be32(lower_32_bits(dma_addr));
--	ptr->eptr = upper_32_bits(dma_addr);
-+	if (!is_sec1)
-+		ptr->eptr = upper_32_bits(dma_addr);
- }
- 
--static void to_talitos_ptr_len(struct talitos_ptr *ptr, unsigned short len)
-+static void to_talitos_ptr_len(struct talitos_ptr *ptr, unsigned short len,
-+			       bool is_sec1)
- {
--	ptr->len = cpu_to_be16(len);
-+	if (is_sec1) {
-+		ptr->res = 0;
-+		ptr->len1 = cpu_to_be16(len);
-+	} else {
-+		ptr->len = cpu_to_be16(len);
-+	}
- }
- 
--static unsigned short from_talitos_ptr_len(struct talitos_ptr *ptr)
-+static unsigned short from_talitos_ptr_len(struct talitos_ptr *ptr,
-+					   bool is_sec1)
- {
--	return be16_to_cpu(ptr->len);
-+	if (is_sec1)
-+		return be16_to_cpu(ptr->len1);
-+	else
-+		return be16_to_cpu(ptr->len);
- }
- 
--static void to_talitos_ptr_extent_clear(struct talitos_ptr *ptr)
-+static void to_talitos_ptr_extent_clear(struct talitos_ptr *ptr, bool is_sec1)
- {
--	ptr->j_extent = 0;
-+	if (!is_sec1)
-+		ptr->j_extent = 0;
- }
- 
- /*
-@@ -85,10 +98,12 @@ static void map_single_talitos_ptr(struct device *dev,
- 				   enum dma_data_direction dir)
- {
- 	dma_addr_t dma_addr = dma_map_single(dev, data, len, dir);
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	bool is_sec1 = has_ftr_sec1(priv);
- 
--	to_talitos_ptr_len(ptr, len);
--	to_talitos_ptr(ptr, dma_addr);
--	to_talitos_ptr_extent_clear(ptr);
-+	to_talitos_ptr_len(ptr, len, is_sec1);
-+	to_talitos_ptr(ptr, dma_addr, is_sec1);
-+	to_talitos_ptr_extent_clear(ptr, is_sec1);
- }
- 
- /*
-@@ -98,8 +113,11 @@ static void unmap_single_talitos_ptr(struct device *dev,
- 				     struct talitos_ptr *ptr,
- 				     enum dma_data_direction dir)
- {
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	bool is_sec1 = has_ftr_sec1(priv);
-+
- 	dma_unmap_single(dev, be32_to_cpu(ptr->ptr),
--			 from_talitos_ptr_len(ptr), dir);
-+			 from_talitos_ptr_len(ptr, is_sec1), dir);
- }
- 
- static int reset_channel(struct device *dev, int ch)
-@@ -922,7 +940,7 @@ static int sg_to_link_tbl(struct scatterlist *sg, int sg_count,
- 	int n_sg = sg_count;
- 
- 	while (n_sg--) {
--		to_talitos_ptr(link_tbl_ptr, sg_dma_address(sg));
-+		to_talitos_ptr(link_tbl_ptr, sg_dma_address(sg), 0);
- 		link_tbl_ptr->len = cpu_to_be16(sg_dma_len(sg));
- 		link_tbl_ptr->j_extent = 0;
- 		link_tbl_ptr++;
-@@ -976,7 +994,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 		struct talitos_ptr *tbl_ptr = &edesc->link_tbl[tbl_off];
- 
- 		to_talitos_ptr(&desc->ptr[1], edesc->dma_link_tbl + tbl_off *
--			       sizeof(struct talitos_ptr));
-+			       sizeof(struct talitos_ptr), 0);
- 		desc->ptr[1].j_extent = DESC_PTR_LNKTBL_JUMP;
- 
- 		/* assoc_nents - 1 entries for assoc, 1 for IV */
-@@ -987,7 +1005,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 		tbl_ptr += sg_count - 1;
- 		tbl_ptr->j_extent = 0;
- 		tbl_ptr++;
--		to_talitos_ptr(tbl_ptr, edesc->iv_dma);
-+		to_talitos_ptr(tbl_ptr, edesc->iv_dma, 0);
- 		tbl_ptr->len = cpu_to_be16(ivsize);
- 		tbl_ptr->j_extent = DESC_PTR_LNKTBL_RETURN;
- 
-@@ -996,14 +1014,14 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 	} else {
- 		if (areq->assoclen)
- 			to_talitos_ptr(&desc->ptr[1],
--				       sg_dma_address(areq->assoc));
-+				       sg_dma_address(areq->assoc), 0);
- 		else
--			to_talitos_ptr(&desc->ptr[1], edesc->iv_dma);
-+			to_talitos_ptr(&desc->ptr[1], edesc->iv_dma, 0);
- 		desc->ptr[1].j_extent = 0;
- 	}
- 
- 	/* cipher iv */
--	to_talitos_ptr(&desc->ptr[2], edesc->iv_dma);
-+	to_talitos_ptr(&desc->ptr[2], edesc->iv_dma, 0);
- 	desc->ptr[2].len = cpu_to_be16(ivsize);
- 	desc->ptr[2].j_extent = 0;
- 	/* Sync needed for the aead_givencrypt case */
-@@ -1029,7 +1047,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 				  edesc->src_chained);
- 
- 	if (sg_count == 1) {
--		to_talitos_ptr(&desc->ptr[4], sg_dma_address(areq->src));
-+		to_talitos_ptr(&desc->ptr[4], sg_dma_address(areq->src), 0);
- 	} else {
- 		sg_link_tbl_len = cryptlen;
- 
-@@ -1040,14 +1058,14 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 					  &edesc->link_tbl[0]);
- 		if (sg_count > 1) {
- 			desc->ptr[4].j_extent |= DESC_PTR_LNKTBL_JUMP;
--			to_talitos_ptr(&desc->ptr[4], edesc->dma_link_tbl);
-+			to_talitos_ptr(&desc->ptr[4], edesc->dma_link_tbl, 0);
- 			dma_sync_single_for_device(dev, edesc->dma_link_tbl,
- 						   edesc->dma_len,
- 						   DMA_BIDIRECTIONAL);
- 		} else {
- 			/* Only one segment now, so no link tbl needed */
- 			to_talitos_ptr(&desc->ptr[4],
--				       sg_dma_address(areq->src));
-+				       sg_dma_address(areq->src), 0);
- 		}
- 	}
- 
-@@ -1061,13 +1079,13 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 					  DMA_FROM_DEVICE, edesc->dst_chained);
- 
- 	if (sg_count == 1) {
--		to_talitos_ptr(&desc->ptr[5], sg_dma_address(areq->dst));
-+		to_talitos_ptr(&desc->ptr[5], sg_dma_address(areq->dst), 0);
- 	} else {
- 		int tbl_off = edesc->src_nents + 1;
- 		struct talitos_ptr *tbl_ptr = &edesc->link_tbl[tbl_off];
- 
- 		to_talitos_ptr(&desc->ptr[5], edesc->dma_link_tbl +
--			       tbl_off * sizeof(struct talitos_ptr));
-+			       tbl_off * sizeof(struct talitos_ptr), 0);
- 		sg_count = sg_to_link_tbl(areq->dst, sg_count, cryptlen,
- 					  tbl_ptr);
- 
-@@ -1082,7 +1100,7 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- 		to_talitos_ptr(tbl_ptr, edesc->dma_link_tbl +
- 			       (tbl_off + edesc->dst_nents + 1 +
- 				edesc->assoc_nents) *
--			       sizeof(struct talitos_ptr));
-+			       sizeof(struct talitos_ptr), 0);
- 		desc->ptr[5].j_extent |= DESC_PTR_LNKTBL_JUMP;
- 		dma_sync_single_for_device(ctx->dev, edesc->dma_link_tbl,
- 					   edesc->dma_len, DMA_BIDIRECTIONAL);
-@@ -1384,27 +1402,29 @@ int map_sg_in_talitos_ptr(struct device *dev, struct scatterlist *src,
- 			  enum dma_data_direction dir, struct talitos_ptr *ptr)
- {
- 	int sg_count;
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	bool is_sec1 = has_ftr_sec1(priv);
- 
--	to_talitos_ptr_len(ptr, len);
--	to_talitos_ptr_extent_clear(ptr);
-+	to_talitos_ptr_len(ptr, len, is_sec1);
-+	to_talitos_ptr_extent_clear(ptr, is_sec1);
- 
- 	sg_count = talitos_map_sg(dev, src, edesc->src_nents ? : 1, dir,
- 				  edesc->src_chained);
- 
- 	if (sg_count == 1) {
--		to_talitos_ptr(ptr, sg_dma_address(src));
-+		to_talitos_ptr(ptr, sg_dma_address(src), is_sec1);
- 	} else {
- 		sg_count = sg_to_link_tbl(src, sg_count, len,
- 					  &edesc->link_tbl[0]);
- 		if (sg_count > 1) {
--			to_talitos_ptr(ptr, edesc->dma_link_tbl);
-+			to_talitos_ptr(ptr, edesc->dma_link_tbl, 0);
- 			ptr->j_extent |= DESC_PTR_LNKTBL_JUMP;
- 			dma_sync_single_for_device(dev, edesc->dma_link_tbl,
- 						   edesc->dma_len,
- 						   DMA_BIDIRECTIONAL);
- 		} else {
- 			/* Only one segment now, so no link tbl needed */
--			to_talitos_ptr(ptr, sg_dma_address(src));
-+			to_talitos_ptr(ptr, sg_dma_address(src), is_sec1);
- 		}
- 	}
- 	return sg_count;
-@@ -1415,22 +1435,25 @@ void map_sg_out_talitos_ptr(struct device *dev, struct scatterlist *dst,
- 			    enum dma_data_direction dir,
- 			    struct talitos_ptr *ptr, int sg_count)
- {
--	to_talitos_ptr_len(ptr, len);
--	to_talitos_ptr_extent_clear(ptr);
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	bool is_sec1 = has_ftr_sec1(priv);
-+
-+	to_talitos_ptr_len(ptr, len, is_sec1);
-+	to_talitos_ptr_extent_clear(ptr, is_sec1);
- 
- 	if (dir != DMA_NONE)
- 		sg_count = talitos_map_sg(dev, dst, edesc->dst_nents ? : 1,
- 					  dir, edesc->dst_chained);
- 
- 	if (sg_count == 1) {
--		to_talitos_ptr(ptr, sg_dma_address(dst));
-+		to_talitos_ptr(ptr, sg_dma_address(dst), is_sec1);
- 	} else {
- 		struct talitos_ptr *link_tbl_ptr =
- 			&edesc->link_tbl[edesc->src_nents + 1];
- 
- 		to_talitos_ptr(ptr, edesc->dma_link_tbl +
- 					      (edesc->src_nents + 1) *
--					      sizeof(struct talitos_ptr));
-+					      sizeof(struct talitos_ptr), 0);
- 		ptr->j_extent |= DESC_PTR_LNKTBL_JUMP;
- 		sg_count = sg_to_link_tbl(dst, sg_count, len, link_tbl_ptr);
- 		dma_sync_single_for_device(dev, edesc->dma_link_tbl,
-@@ -1451,14 +1474,16 @@ static int common_nonsnoop(struct talitos_edesc *edesc,
- 	unsigned int cryptlen = areq->nbytes;
- 	unsigned int ivsize = crypto_ablkcipher_ivsize(cipher);
- 	int sg_count, ret;
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	bool is_sec1 = has_ftr_sec1(priv);
- 
- 	/* first DWORD empty */
- 	desc->ptr[0] = zero_entry;
- 
- 	/* cipher iv */
--	to_talitos_ptr(&desc->ptr[1], edesc->iv_dma);
--	to_talitos_ptr_len(&desc->ptr[1], ivsize);
--	to_talitos_ptr_extent_clear(&desc->ptr[1]);
-+	to_talitos_ptr(&desc->ptr[1], edesc->iv_dma, is_sec1);
-+	to_talitos_ptr_len(&desc->ptr[1], ivsize, is_sec1);
-+	to_talitos_ptr_extent_clear(&desc->ptr[1], is_sec1);
- 
- 	/* cipher key */
- 	map_single_talitos_ptr(dev, &desc->ptr[2], ctx->keylen,
-@@ -1543,17 +1568,19 @@ static void common_nonsnoop_hash_unmap(struct device *dev,
- 				       struct ahash_request *areq)
- {
- 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	bool is_sec1 = has_ftr_sec1(priv);
- 
- 	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[5], DMA_FROM_DEVICE);
- 
- 	unmap_sg_talitos_ptr(dev, req_ctx->psrc, NULL, 0, edesc);
- 
- 	/* When using hashctx-in, must unmap it. */
--	if (from_talitos_ptr_len(&edesc->desc.ptr[1]))
-+	if (from_talitos_ptr_len(&edesc->desc.ptr[1], is_sec1))
- 		unmap_single_talitos_ptr(dev, &edesc->desc.ptr[1],
- 					 DMA_TO_DEVICE);
- 
--	if (from_talitos_ptr_len(&edesc->desc.ptr[2]))
-+	if (from_talitos_ptr_len(&edesc->desc.ptr[2], is_sec1))
- 		unmap_single_talitos_ptr(dev, &edesc->desc.ptr[2],
- 					 DMA_TO_DEVICE);
- 
-@@ -1596,6 +1623,8 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
- 	struct device *dev = ctx->dev;
- 	struct talitos_desc *desc = &edesc->desc;
- 	int ret;
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	bool is_sec1 = has_ftr_sec1(priv);
- 
- 	/* first DWORD empty */
- 	desc->ptr[0] = zero_entry;
--- 
-2.1.0
+Dear All,
+
+About the SS module, there is some detail information.
+There is some issues on the SS hardware module, the issues make the some=20
+AES/DES/3DS algorithm be not available.
+1. The byte order of the counter is wrong, make the result error, so, the C=
+TR=20
+mode is not available.
+2. Hardware don't support the continuous subcontracting, make the CTS mode =
+is=20
+not available.
+3. Another issue need be taken attention is that hardware will modify the k=
+ey=20
+register when do AES encrypt, so, it need software to restore the key regis=
+ter
+when doing every frame.
+
+These issues are presented on the A10, A13, A20, A31 and A33.
+The issues of SS module have been fixed on the A83T platform, so, I suggest=
+ to=20
+take more attention to the A83T platform if any interest in the SS module.
+
+If any problem, please don't hesitate to contact me(kevin-0TFLnhJekD6UEPyfVivIlAC/G2K4zDHf@public.gmane.org=
+)
+or Shuge(shuge-0TFLnhJekD6UEPyfVivIlAC/G2K4zDHf@public.gmane.org).
+
+
+
+kevin.z.m.zh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+=20
+From: Corentin LABBE
+Date: 2015-04-01 02:02
+To: Markus Stockhausen; linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+CC: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+Subject: [linux-sunxi] Re: AW: problem with testing a CTR block cipher mode=
+ which is partially working
+Le 30/03/2015 20:08, Markus Stockhausen a =C3=A9crit :
+>> Von: linux-crypto-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [linux-crypto-owner-u79uwXL29TasMV2rI37PzA@public.gmane.org=
+org]&quot; im Auftrag von &quot;Corentin LABBE [clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]
+>> Gesendet: Montag, 30. M=C3=A4rz 2015 19:59
+>> An: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> Cc: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+>> Betreff: problem with testing a CTR block cipher mode which is partially=
+ working
+>>
+>> hello
+>>
+>> I am trying to add the CTR (counter) block cipher mode for AES on my Sec=
+urity System driver.
+>>
+>> When testing with the tcrypt module I got the following result:
+>> [ 1256.986989] alg: skcipher: Test 1 failed on encryption for ctr-aes-su=
+nxi-ss
+>> [ 1256.987004] 00000000: 87 4d 61 91 b6 20 e3 26 1b ef 68 64 99 0d b6 ce
+>> [ 1256.987013] 00000010: 40 94 25 91 d7 b4 4f 49 ab c1 9d 33 a4 4e f6 54
+>> [ 1256.987023] 00000020: ce 58 d2 f0 01 8f 92 a2 5f 2c bb 66 13 8b 9d 76
+>> [ 1256.987032] 00000030: 30 fa 4a 40 b1 67 2e f3 46 b7 9a 7c ba 91 0b a2
+>>
+>> As you can see the first ciphered block is correct (according to testmgr=
+.h), the subsequent blocks are bad.
+>>
+>> So Could I assume that the setting of key and IV are good (at least for =
+the first cipher pass.
+>>
+>> The number of inputs(register) are limited and I have tested near all th=
+e possibility.
+>> Any idea of what could be wrong.
+>>
+>=20
+> had a similar challenge a few months ago. I had to take care about
+>=20
+> - counter IV is big endian (implemented it little endian in first place)
+> - CTR allows to encrypt data that does not need to be amultiple of 16 byt=
+es.
+>=20
+> Markus
+>=20
+=20
+Sorry but if I change endianness of anything, the first block became invali=
+d.
+=20
+I have tryed ctr(des) but the same problem rise, the first block (so the fi=
+rst 8bytes) are correctly ciphered then everything is bad.
+So I suspect the hardware to not increasing counter between blocks, but why=
+..
+=20
+=20
+--=20
+You received this message because you are subscribed to the Google Groups "=
+linux-sunxi" group.
+To unsubscribe from this group and stop receiving emails from it, send an e=
+mail to linux-sunxi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
+For more options, visit https://groups.google.com/d/optout.
+
+--=20
+You received this message because you are subscribed to the Google Groups "=
+linux-sunxi" group.
+To unsubscribe from this group and stop receiving emails from it, send an e=
+mail to linux-sunxi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
+For more options, visit https://groups.google.com/d/optout.
+
+------=_001_NextPart650844260004_=----
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<html><head><meta http-equiv=3D"content-type" content=3D"text/html; charset=
+=3DUTF-8"><style>body { line-height: 1.5; }blockquote { margin-top: 0px; ma=
+rgin-bottom: 0px; margin-left: 0.5em; }p { margin-top: 0px; margin-bottom: =
+0px; }body { font-size: 10.5pt; font-family: =E6=A5=B7=E4=BD=93; color: rgb=
+(0, 0, 0); line-height: 1.5; }</style></head><body>
+<div><span></span><p class=3D"MsoNormal" style=3D"margin: 0cm 0cm 0pt; font=
+-family: =E6=A5=B7=E4=BD=93, Tahoma; font-size: 14.399999618530273px; line-=
+height: 16.799999237060547px;"><span style=3D"font-family: =E6=96=B0=E5=AE=
+=8B=E4=BD=93;">Dear All,</span></p><p class=3D"MsoNormal" style=3D"margin: =
+0cm 0cm 0pt; font-family: =E6=A5=B7=E4=BD=93, Tahoma; font-size: 14.3999996=
+18530273px; line-height: 16.799999237060547px;"><span style=3D"font-family:=
+ =E6=96=B0=E5=AE=8B=E4=BD=93;"><br></span></p><p class=3D"MsoNormal" style=
+=3D"margin: 0cm 0cm 0pt; font-size: 14.399999618530273px; line-height: 16.7=
+99999237060547px;"><span style=3D"font-family: =E6=96=B0=E5=AE=8B=E4=BD=93;=
+ background-color: rgba(0, 0, 0, 0);">About the SS module, there is some de=
+tail information.<br>There is some issues on the SS hardware module, the is=
+sues make the some <br>AES/DES/3DS algorithm be not available.<br>1. The by=
+te order of the counter is wrong, make the result error, so, the CTR <br>mo=
+de is not available.<br>2. Hardware don't support the continuous subcontrac=
+ting, make the CTS mode is <br>not available.<br>3. Another issue need be t=
+aken attention is that hardware will modify the key <br>register when do AE=
+S encrypt, so, it need software to restore the key register</span></p><p cl=
+ass=3D"MsoNormal" style=3D"margin: 0cm 0cm 0pt; font-size: 14.3999996185302=
+73px; line-height: 16.799999237060547px;"><span style=3D"font-family: =E6=
+=96=B0=E5=AE=8B=E4=BD=93; background-color: rgba(0, 0, 0, 0);">when doing e=
+very frame.<br><br>These issues are presented on the A10, A13, A20, A31 and=
+ A33.<br>The issues of SS module have been fixed on the A83T platform, so, =
+I suggest to <br>take more attention to the A83T platform if any interest i=
+n the SS module.<br><br>If any problem, please don't hesitate to contact me=
+(kevin-0TFLnhJekD6UEPyfVivIlAC/G2K4zDHf@public.gmane.org</span><span style=3D"background-color: rgba(0, 0, =
+0, 0); font-family: =E6=96=B0=E5=AE=8B=E4=BD=93; font-size: 14.399999618530=
+273px; line-height: 16.799999237060547px;">)</span></p><p class=3D"MsoNorma=
+l" style=3D"margin: 0cm 0cm 0pt; font-size: 14.399999618530273px; line-heig=
+ht: 16.799999237060547px;"><span style=3D"font-family: =E6=96=B0=E5=AE=8B=
+=E4=BD=93; background-color: rgba(0, 0, 0, 0);">or Shuge(shuge@allwinnertec=
+h.com).</span></p><p class=3D"MsoNormal" style=3D"margin: 0cm 0cm 0pt; font=
+-family: =E6=A5=B7=E4=BD=93, Tahoma; font-size: 14.399999618530273px; line-=
+height: 16.799999237060547px;"><br></p></div><hr style=3D"width: 210px; hei=
+ght: 1px;" color=3D"#b5c4df" size=3D"1" align=3D"left">
+<div><span><div style=3D"MARGIN: 10px; FONT-FAMILY: verdana; FONT-SIZE: 10p=
+t"><div>kevin.z.m.zh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org</div></div></span></div>
+<blockquote style=3D"margin-top: 0px; margin-bottom: 0px; margin-left: 0.5e=
+m;"><div>&nbsp;</div><div style=3D"border:none;border-top:solid #B5C4DF 1.0=
+pt;padding:3.0pt 0cm 0cm 0cm"><div style=3D"PADDING-RIGHT: 8px; PADDING-LEF=
+T: 8px; FONT-SIZE: 12px;FONT-FAMILY:tahoma;COLOR:#000000; BACKGROUND: #efef=
+ef; PADDING-BOTTOM: 8px; PADDING-TOP: 8px"><div><b>From:</b>&nbsp;<a href=
+=3D"mailto:clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org">Corentin LABBE</a></div><div><b>Date:=
+</b>&nbsp;2015-04-01&nbsp;02:02</div><div><b>To:</b>&nbsp;<a href=3D"mailto=
+:stockhausen-FhFLwxQf9jkb1SvskN2V4Q@public.gmane.org">Markus Stockhausen</a>; <a href=3D"mailto:linux-c=
+rypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org">linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org</a></div><div><b>CC:</b=
+>&nbsp;<a href=3D"mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org">linux-sunxi@googlegr=
+oups.com</a></div><div><b>Subject:</b>&nbsp;[linux-sunxi] Re: AW: problem w=
+ith testing a CTR block cipher mode which is partially working</div></div><=
+/div><div><div>Le 30/03/2015 20:08, Markus Stockhausen a =C3=A9crit :</div>
+<div>&gt;&gt; Von: linux-crypto-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [linux-crypto-owner@v=
+ger.kernel.org]&amp;quot; im Auftrag von &amp;quot;Corentin LABBE [clabbe.m=
+ontjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]</div>
+<div>&gt;&gt; Gesendet: Montag, 30. M=C3=A4rz 2015 19:59</div>
+<div>&gt;&gt; An: linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org</div>
+<div>&gt;&gt; Cc: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org</div>
+<div>&gt;&gt; Betreff: problem with testing a CTR block cipher mode which i=
+s partially working</div>
+<div>&gt;&gt;</div>
+<div>&gt;&gt; hello</div>
+<div>&gt;&gt;</div>
+<div>&gt;&gt; I am trying to add the CTR (counter) block cipher mode for AE=
+S on my Security System driver.</div>
+<div>&gt;&gt;</div>
+<div>&gt;&gt; When testing with the tcrypt module I got the following resul=
+t:</div>
+<div>&gt;&gt; [ 1256.986989] alg: skcipher: Test 1 failed on encryption for=
+ ctr-aes-sunxi-ss</div>
+<div>&gt;&gt; [ 1256.987004] 00000000: 87 4d 61 91 b6 20 e3 26 1b ef 68 64 =
+99 0d b6 ce</div>
+<div>&gt;&gt; [ 1256.987013] 00000010: 40 94 25 91 d7 b4 4f 49 ab c1 9d 33 =
+a4 4e f6 54</div>
+<div>&gt;&gt; [ 1256.987023] 00000020: ce 58 d2 f0 01 8f 92 a2 5f 2c bb 66 =
+13 8b 9d 76</div>
+<div>&gt;&gt; [ 1256.987032] 00000030: 30 fa 4a 40 b1 67 2e f3 46 b7 9a 7c =
+ba 91 0b a2</div>
+<div>&gt;&gt;</div>
+<div>&gt;&gt; As you can see the first ciphered block is correct (according=
+ to testmgr.h), the subsequent blocks are bad.</div>
+<div>&gt;&gt;</div>
+<div>&gt;&gt; So Could I assume that the setting of key and IV are good (at=
+ least for the first cipher pass.</div>
+<div>&gt;&gt;</div>
+<div>&gt;&gt; The number of inputs(register) are limited and I have tested =
+near all the possibility.</div>
+<div>&gt;&gt; Any idea of what could be wrong.</div>
+<div>&gt;&gt;</div>
+<div>&gt; </div>
+<div>&gt; had a similar challenge a few months ago. I had to take care abou=
+t</div>
+<div>&gt; </div>
+<div>&gt; - counter IV is big endian (implemented it little endian in first=
+ place)</div>
+<div>&gt; - CTR allows to encrypt data that does not need to be amultiple o=
+f 16 bytes.</div>
+<div>&gt; </div>
+<div>&gt; Markus</div>
+<div>&gt; </div>
+<div>&nbsp;</div>
+<div>Sorry but if I change endianness of anything, the first block became i=
+nvalid.</div>
+<div>&nbsp;</div>
+<div>I have tryed ctr(des) but the same problem rise, the first block (so t=
+he first 8bytes) are correctly ciphered then everything is bad.</div>
+<div>So I suspect the hardware to not increasing counter between blocks, bu=
+t why..</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>-- </div>
+<div>You received this message because you are subscribed to the Google Gro=
+ups "linux-sunxi" group.</div>
+<div>To unsubscribe from this group and stop receiving emails from it, send=
+ an email to linux-sunxi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org</div>
+<div>For more options, visit https://groups.google.com/d/optout.</div>
+</div></blockquote>
+</body></html>
+
+<p></p>
+
+-- <br />
+You received this message because you are subscribed to the Google Groups &=
+quot;linux-sunxi&quot; group.<br />
+To unsubscribe from this group and stop receiving emails from it, send an e=
+mail to <a href=3D"mailto:linux-sunxi+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org">linux-s=
+unxi+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org</a>.<br />
+For more options, visit <a href=3D"https://groups.google.com/d/optout">http=
+s://groups.google.com/d/optout</a>.<br />
+
+------=_001_NextPart650844260004_=------
