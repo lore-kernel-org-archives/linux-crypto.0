@@ -1,35 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: omap-aes: Fix support for unequal lengths
-Date: Wed, 1 Apr 2015 22:24:39 +0800
-Message-ID: <20150401142439.GB28651@gondor.apana.org.au>
-References: <1427775745-4674-1-git-send-email-lokeshvutla@ti.com>
- <1427775745-4674-3-git-send-email-lokeshvutla@ti.com>
+Subject: Re: [PATCH] crypto: qat - fix typo
+Date: Wed, 1 Apr 2015 22:27:41 +0800
+Message-ID: <20150401142741.GA28732@gondor.apana.org.au>
+References: <20150331163024.6379.51821.stgit@bwallan-smackover2.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-kernel@vger.kernel.org, nsekhar@ti.com, t-kristo@ti.com
-To: Lokesh Vutla <lokeshvutla@ti.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org
+To: Bruce Allan <bruce.w.allan@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:51721 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753865AbbDAO1p (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 1 Apr 2015 10:27:45 -0400
 Content-Disposition: inline
-In-Reply-To: <1427775745-4674-3-git-send-email-lokeshvutla@ti.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20150331163024.6379.51821.stgit@bwallan-smackover2.jf.intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Mar 31, 2015 at 09:52:25AM +0530, Lokesh Vutla wrote:
-> For cases where total length of an input SGs is not same as
-> length of the input data for encryption, omap-aes driver
-> crashes. This happens in the case when IPsec is trying to use
-> omap-aes driver.
+Bruce Allan <bruce.w.allan@intel.com> wrote:
+> adt_ctl_drv should be adf_ctl_drv
 > 
-> To avoid this, we copy all the pages from the input SG list
-> into a contiguous buffer and prepare a single element SG list
-> for this buffer with length as the total bytes to crypt, which is
-> similar thing that is done in case of unaligned lengths.
-> 
-> Fixes: 6242332ff2f3 ("crypto: omap-aes - Add support for cases of unaligned lengths")
-> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+> Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
 
-Applied.
+All seven patches applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
