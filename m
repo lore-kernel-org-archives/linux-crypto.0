@@ -1,45 +1,39 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Sami Tolvanen <samitolvanen@google.com>
 Subject: Re: [PATCHv3] arm: crypto: Add optimized SHA-256/224
-Date: Wed, 1 Apr 2015 20:43:25 +0800
-Message-ID: <20150401124325.GA26623@gondor.apana.org.au>
+Date: Wed, 1 Apr 2015 14:19:24 +0100
+Message-ID: <20150401131924.GA21344@google.com>
 References: <20150316154835.GA31336@google.com>
  <20150323135009.GB820@google.com>
  <20150330083727.GA22406@google.com>
+ <20150401124325.GA26623@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
 	ard.biesheuvel@linaro.org, davem@davemloft.net,
 	Andy Polyakov <appro@openssl.org>
-To: Sami Tolvanen <samitolvanen@google.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41199 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751668AbbDAMno (ORCPT
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:36916 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753257AbbDANT3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Apr 2015 08:43:44 -0400
+	Wed, 1 Apr 2015 09:19:29 -0400
+Received: by wiaa2 with SMTP id a2so66078986wia.0
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Apr 2015 06:19:26 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20150330083727.GA22406@google.com>
+In-Reply-To: <20150401124325.GA26623@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Mar 30, 2015 at 09:37:27AM +0100, Sami Tolvanen wrote:
-> Add Andy Polyakov's optimized assembly and NEON implementations for
-> SHA-256/224.
+On Wed, Apr 01, 2015 at 08:43:25PM +0800, Herbert Xu wrote:
+> I cannot merge this because none of your emails are making it
+> to the mailing list so nobody except those on the cc list can
+> see the patch.
 > 
-> The sha256-armv4.pl script for generating the assembly code is from
-> OpenSSL commit 51f8d095562f36cdaa6893597b5c609e943b0565.
-> 
-> Compared to sha256-generic these implementations have the following
-> tcrypt speed improvements on Motorola Nexus 6 (Snapdragon 805):
+> Please refer to section 7 in Documentation/SubmittingPatches.
 
-I cannot merge this because none of your emails are making it
-to the mailing list so nobody except those on the cc list can
-see the patch.
+Please find a hosted version of the patch here:
 
-Please refer to section 7 in Documentation/SubmittingPatches.
+https://raw.githubusercontent.com/samitolvanen/kernelpatches/master/sha256.v3.patch
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sami
