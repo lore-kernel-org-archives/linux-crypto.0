@@ -1,30 +1,38 @@
-From: sri sowj <srisowj4linux@gmail.com>
-Subject: AES Crypto driver in CTS mode
-Date: Wed, 1 Apr 2015 22:54:45 +0530
-Message-ID: <CAHTT9VJ7TVqCe4zExuuJto8Pn+0_ysfJhbConwZ2S6dpOUWoog@mail.gmail.com>
+From: David Miller <davem@davemloft.net>
+Subject: Re: [PATCH net-next] crypto: algif - explicitly mark end of data
+Date: Wed, 01 Apr 2015 15:32:02 -0400 (EDT)
+Message-ID: <20150401.153202.1090532458862532893.davem@davemloft.net>
+References: <20150330212543.7133.97653.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ob0-f169.google.com ([209.85.214.169]:34612 "EHLO
-	mail-ob0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750849AbbDARYq (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 1 Apr 2015 13:24:46 -0400
-Received: by obbgh1 with SMTP id gh1so84787163obb.1
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Apr 2015 10:24:45 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au
+To: tadeusz.struk@intel.com
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20150330212543.7133.97653.stgit@tstruk-mobl1>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi All,
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Date: Mon, 30 Mar 2015 14:25:43 -0700
 
+> +	int mark = 0, err = -ENOMEM;
+>  
+>  	lock_sock(sk);
+>  	req = kmalloc(reqlen, GFP_KERNEL);
+ ...
+> @@ -573,10 +572,11 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+>  			kfree(sreq->tsg);
+>  			sreq->tsg = tmp;
+>  			tx_nents *= 2;
+> +			mark = 1;
+ ...
+> @@ -604,6 +604,9 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+>  		iov_iter_advance(&msg->msg_iter, used);
+>  	}
+>  
+> +	if (mark)
+> +		sg_mark_end(sreq->tsg + txbufs - 1);
 
-I tried to get the reference drivers for AES in CTS mode in open
-source(driver/crypto) ,but looks like there is no reference driver
-implementation is available for any of the Crypto Hardware.But it
-seems support for software implementation for CTS mode is
-available.Please can some one help me with this if there are any
-reference driver implementation in CTS mode?
-
-BR,
-Srisowj
+Please use type 'bool' and true/false for 'mark'.
