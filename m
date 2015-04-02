@@ -1,53 +1,93 @@
-From: Lokesh Vutla <lokeshvutla@ti.com>
-Subject: [PATCH v2] crypto: omap-sham: Add the offset of sg page to vaddr
-Date: Thu, 2 Apr 2015 15:32:45 +0530
-Message-ID: <1427968965-4944-1-git-send-email-lokeshvutla@ti.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: crypto: api - Fix races in crypto_unregister_instance
+Date: Thu, 2 Apr 2015 22:31:22 +0800
+Message-ID: <20150402143122.GA9699@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<nsekhar@ti.com>, <t-kristo@ti.com>,
-	Lokesh Vutla <lokeshvutla@ti.com>
-To: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Stephan Mueller <smueller@chronox.de>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:51151 "EHLO comal.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752056AbbDBKCz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Apr 2015 06:02:55 -0400
+Received: from helcar.hengli.com.au ([209.40.204.226]:34749 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753532AbbDBOb2 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 2 Apr 2015 10:31:28 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-kmap_atomic() gives only the page address of the input page.
-Driver should take care of adding the offset of the scatterlist
-within the page to the returned page address.
-omap-sham driver is not adding the offset to page and directly operates
-on the return vale of kmap_atomic(), because of which the following
-error comes when running crypto tests:
+There are multiple problems in crypto_unregister_instance:
 
-00000000: d9 a1 1b 7c aa 90 3b aa 11 ab cb 25 00 b8 ac bf
-[    2.338169] 00000010: c1 39 cd ff 48 d0 a8 e2 2b fa 33 a1
-[    2.344008] alg: hash: Chunking test 1 failed for omap-sha256
+1) The cra_refcnt BUG_ON check is racy and can cause crashes.
+2) The cra_refcnt check shouldn't exist at all.
+3) There is no reference on tmpl to protect the tmpl->free call.
 
-So adding the scatterlist offset to vaddr.
+This patch rewrites the function using crypto_remove_spawn which
+now morphs into crypto_remove_instance.
 
-Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
----
-- Tested on BBB. Logs below.
-	Without this patch: http://pastebin.ubuntu.com/10722994/
-	With this patch: http://pastebin.ubuntu.com/10722992/
- drivers/crypto/omap-sham.c | 1 +
- 1 file changed, 1 insertion(+)
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 21fd515..4d63e0d 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -640,6 +640,7 @@ static size_t omap_sham_append_sg(struct omap_sham_reqctx *ctx)
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 83b04e0..0f1976e 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -99,10 +99,9 @@ static struct list_head *crypto_more_spawns(struct crypto_alg *alg,
+ 	return &n->list == stack ? top : &n->inst->alg.cra_users;
+ }
  
- 	while (ctx->sg) {
- 		vaddr = kmap_atomic(sg_page(ctx->sg));
-+		vaddr += ctx->sg->offset;
+-static void crypto_remove_spawn(struct crypto_spawn *spawn,
+-				struct list_head *list)
++static void crypto_remove_instance(struct crypto_instance *inst,
++				   struct list_head *list)
+ {
+-	struct crypto_instance *inst = spawn->inst;
+ 	struct crypto_template *tmpl = inst->tmpl;
  
- 		count = omap_sham_append_buffer(ctx,
- 				vaddr + ctx->offset,
+ 	if (crypto_is_dead(&inst->alg))
+@@ -167,7 +166,7 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
+ 		if (spawn->alg)
+ 			list_move(&spawn->list, &spawn->alg->cra_users);
+ 		else
+-			crypto_remove_spawn(spawn, list);
++			crypto_remove_instance(spawn->inst, list);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(crypto_remove_spawns);
+@@ -554,28 +553,20 @@ EXPORT_SYMBOL_GPL(crypto_register_instance);
+ 
+ int crypto_unregister_instance(struct crypto_alg *alg)
+ {
+-	int err;
+ 	struct crypto_instance *inst = (void *)alg;
+-	struct crypto_template *tmpl = inst->tmpl;
+-	LIST_HEAD(users);
++	LIST_HEAD(list);
+ 
+ 	if (!(alg->cra_flags & CRYPTO_ALG_INSTANCE))
+ 		return -EINVAL;
+ 
+-	BUG_ON(atomic_read(&alg->cra_refcnt) != 1);
+-
+ 	down_write(&crypto_alg_sem);
+ 
+-	hlist_del_init(&inst->list);
+-	err = crypto_remove_alg(alg, &users);
++	crypto_remove_spawns(alg, &list, NULL);
++	crypto_remove_instance(inst, &list);
+ 
+ 	up_write(&crypto_alg_sem);
+ 
+-	if (err)
+-		return err;
+-
+-	tmpl->free(inst);
+-	crypto_remove_final(&users);
++	crypto_remove_final(&list);
+ 
+ 	return 0;
+ }
 -- 
-1.9.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
