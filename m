@@ -1,58 +1,121 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2] crypto: remove instance when test failed
-Date: Thu, 02 Apr 2015 19:05:27 +0200
-Message-ID: <3394653.LODBE1uz62@tachyon.chronox.de>
+From: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Re: AW: problem with testing a CTR block cipher
+ mode which is partially working
+Date: Thu, 02 Apr 2015 21:02:42 +0200
+Message-ID: <551D9252.4070509@gmail.com>
+References: <55198F14.1090902@gmail.com>, 	<12EF8D94C6F8734FB2FF37B9FBEDD1735FC8AB40@EXCHANGE.collogia.de>, 	<551AE140.3000209@gmail.com>, 	<2015040110063394945846@gmail.com>, 	<551BD38B.6050307@gmail.com> <2015040210102714744761@gmail.com>
+Reply-To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58123 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750771AbbDBRFb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 2 Apr 2015 13:05:31 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+To: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
+ "linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBVNE62UAKGQEOI4DZVY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+In-Reply-To: <2015040210102714744761-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-A cipher instance is added to the list of instances unconditionally
-regardless of whether the associated test failed. However, a failed
-test implies that during another lookup, the cipher instance will
-be added to the list again as it will not be found by the lookup
-code.
+On 04/02/15 04:10, kevin.z.m.zh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>> Thanks for your answer, I have loose hours on that problem.
+> I'm sorry to hear that.
+> =20
+>> Perhaps you could update all datasheet/user manual about this known issu=
+e ?
+> We have updated the user manual and datasheet, the latest version is 1.3 =
+for=20
+> A20 which is released in Oct. 2014. The CTR block mode is not support.
+> You can download it from the github: https://github.com/allwinner-zh/docu=
+ments=20
+> and check the details of the SS moudle.
 
-That means that the list can be filled up with instances whose tests
-failed.
+Sorry, I believed to have the latest user manual.
 
-Note: tests only fail in reality in FIPS mode when a cipher is not
-marked as fips_allowed=1. This can be seen with cmac(des3_ede) that does
-not have a fips_allowed=1. When allocating the cipher, the allocation
-fails with -ENOENT due to the missing fips_allowed=1 flag (which
-causes the testmgr to return EINVAL). Yet, the instance of
-cmac(des3_ede) is shown in /proc/crypto. Allocating the cipher again
-fails again, but a 2nd instance is listed in /proc/crypto.
+Great thanks for the information.
 
-The patch simply de-registers the instance when the testing failed.
+Regards
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/algapi.c | 4 ++++
- 1 file changed, 4 insertions(+)
+>=20
+> Best Regards,
+> -------------------------------------------------------------------------=
+---------------------------------------------------------------------------=
+---------------------------------------------------------------------------=
+---------------------------------------------------------------------------=
+---------------------------------------------------------------------------=
+---------------------------------------------------------------------------=
+----------------------------------------------------
+> kevin.z.m.zh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+>=20
+>     =20
+>     *From:* Corentin LABBE <mailto:clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>     *Date:* 2015-04-01 19:16
+>     *To:* linux-sunxi <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>; linux-crypto=
+@vger.kernel.org <mailto:linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+>     *Subject:* Re: [linux-sunxi] Re: AW: problem with testing a CTR block=
+ cipher mode which is partially working
+>     On 04/01/15 04:06, kevin.z.m.zh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>     > Dear All,
+>     >
+>     >
+>     > About the SS module, there is some detail information.
+>     > There is some issues on the SS hardware module, the issues make the=
+ some
+>     > AES/DES/3DS algorithm be not available.
+>     > 1. The byte order of the counter is wrong, make the result error, s=
+o, the CTR
+>     > mode is not available.
+>     > 2. Hardware don't support the continuous subcontracting, make the C=
+TS mode is
+>     > not available.
+>     > 3. Another issue need be taken attention is that hardware will modi=
+fy the key
+>     > register when do AES encrypt, so, it need software to restore the k=
+ey register
+>     >
+>     > when doing every frame.
+>     >
+>     > These issues are presented on the A10, A13, A20, A31 and A33.
+>     > The issues of SS module have been fixed on the A83T platform, so, I=
+ suggest to
+>     > take more attention to the A83T platform if any interest in the SS =
+module.
+>     >
+>     > If any problem, please don't hesitate to contact me(kevin@allwinner=
+tech.com)
+>     >
+>     > or Shuge(shuge-0TFLnhJekD6UEPyfVivIlAC/G2K4zDHf@public.gmane.org).
+>     >
+>     =20
+>     Thanks for your answer, I have loose hours on that problem.
+>     =20
+>     Perhaps you could update all datasheet/user manual about this known i=
+ssue ?
+>     =20
+>     Regards
+>     =20
+>     --=20
+>     You received this message because you are subscribed to the Google Gr=
+oups "linux-sunxi" group.
+>     To unsubscribe from this group and stop receiving emails from it, sen=
+d an email to linux-sunxi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
+>     For more options, visit https://groups.google.com/d/optout.
+>=20
+> --=20
+> You received this message because you are subscribed to the Google Groups=
+ "linux-sunxi" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to linux-sunxi+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org <mailto:linux-sunxi+unsu=
+bscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>.
+> For more options, visit https://groups.google.com/d/optout.
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 83b04e0..215c604 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -545,6 +545,10 @@ unlock:
- 		goto err;
- 
- 	crypto_wait_for_test(larval);
-+
-+	/* Remove instance if test failed */
-+	if (!(inst->alg.cra_flags & CRYPTO_ALG_TESTED))
-+		crypto_unregister_instance(inst);
- 	err = 0;
- 
- err:
--- 
-2.1.0
+--=20
+You received this message because you are subscribed to the Google Groups "=
+linux-sunxi" group.
+To unsubscribe from this group and stop receiving emails from it, send an e=
+mail to linux-sunxi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
+For more options, visit https://groups.google.com/d/optout.
