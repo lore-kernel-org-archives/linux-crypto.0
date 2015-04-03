@@ -1,39 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: omap-sham: Add the offset of sg page to vaddr
-Date: Fri, 3 Apr 2015 18:00:25 +0800
-Message-ID: <20150403100025.GA19317@gondor.apana.org.au>
-References: <1427968965-4944-1-git-send-email-lokeshvutla@ti.com>
+Subject: Re: [PATCHv3] arm: crypto: Add optimized SHA-256/224
+Date: Fri, 3 Apr 2015 18:04:19 +0800
+Message-ID: <20150403100419.GA19382@gondor.apana.org.au>
+References: <20150316154835.GA31336@google.com>
+ <20150323135009.GB820@google.com>
+ <20150330083727.GA22406@google.com>
+ <20150401124325.GA26623@gondor.apana.org.au>
+ <20150401131924.GA21344@google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-omap@vger.kernel.org,
-	linux-kernel@vger.kernel.org, nsekhar@ti.com, t-kristo@ti.com
-To: Lokesh Vutla <lokeshvutla@ti.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	ard.biesheuvel@linaro.org, davem@davemloft.net,
+	Andy Polyakov <appro@openssl.org>
+To: Sami Tolvanen <samitolvanen@google.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50425 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48770 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751223AbbDCKAa (ORCPT
+	with ESMTP id S1751541AbbDCKEp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Apr 2015 06:00:30 -0400
+	Fri, 3 Apr 2015 06:04:45 -0400
 Content-Disposition: inline
-In-Reply-To: <1427968965-4944-1-git-send-email-lokeshvutla@ti.com>
+In-Reply-To: <20150401131924.GA21344@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 02, 2015 at 03:32:45PM +0530, Lokesh Vutla wrote:
-> kmap_atomic() gives only the page address of the input page.
-> Driver should take care of adding the offset of the scatterlist
-> within the page to the returned page address.
-> omap-sham driver is not adding the offset to page and directly operates
-> on the return vale of kmap_atomic(), because of which the following
-> error comes when running crypto tests:
+On Wed, Apr 01, 2015 at 02:19:24PM +0100, Sami Tolvanen wrote:
+> On Wed, Apr 01, 2015 at 08:43:25PM +0800, Herbert Xu wrote:
+> > I cannot merge this because none of your emails are making it
+> > to the mailing list so nobody except those on the cc list can
+> > see the patch.
+> > 
+> > Please refer to section 7 in Documentation/SubmittingPatches.
 > 
-> 00000000: d9 a1 1b 7c aa 90 3b aa 11 ab cb 25 00 b8 ac bf
-> [    2.338169] 00000010: c1 39 cd ff 48 d0 a8 e2 2b fa 33 a1
-> [    2.344008] alg: hash: Chunking test 1 failed for omap-sha256
+> Please find a hosted version of the patch here:
 > 
-> So adding the scatterlist offset to vaddr.
-> 
-> Signed-off-by: Lokesh Vutla <lokeshvutla@ti.com>
+> https://raw.githubusercontent.com/samitolvanen/kernelpatches/master/sha256.v3.patch
 
 Patch applied.  Thanks!
 -- 
