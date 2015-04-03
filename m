@@ -1,43 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv3] arm: crypto: Add optimized SHA-256/224
-Date: Fri, 3 Apr 2015 18:04:19 +0800
-Message-ID: <20150403100419.GA19382@gondor.apana.org.au>
-References: <20150316154835.GA31336@google.com>
- <20150323135009.GB820@google.com>
- <20150330083727.GA22406@google.com>
- <20150401124325.GA26623@gondor.apana.org.au>
- <20150401131924.GA21344@google.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v2] crypto: remove instance when test failed
+Date: Fri, 03 Apr 2015 17:17:13 +0200
+Message-ID: <1731327.mgbsjj4MeV@tachyon.chronox.de>
+References: <3394653.LODBE1uz62@tachyon.chronox.de> <20150403095828.GA19273@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	ard.biesheuvel@linaro.org, davem@davemloft.net,
-	Andy Polyakov <appro@openssl.org>
-To: Sami Tolvanen <samitolvanen@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:48770 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751541AbbDCKEp (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Apr 2015 06:04:45 -0400
-Content-Disposition: inline
-In-Reply-To: <20150401131924.GA21344@google.com>
+Received: from mail.eperm.de ([89.247.134.16]:58125 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752582AbbDCPRR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 3 Apr 2015 11:17:17 -0400
+In-Reply-To: <20150403095828.GA19273@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 01, 2015 at 02:19:24PM +0100, Sami Tolvanen wrote:
-> On Wed, Apr 01, 2015 at 08:43:25PM +0800, Herbert Xu wrote:
-> > I cannot merge this because none of your emails are making it
-> > to the mailing list so nobody except those on the cc list can
-> > see the patch.
-> > 
-> > Please refer to section 7 in Documentation/SubmittingPatches.
-> 
-> Please find a hosted version of the patch here:
-> 
-> https://raw.githubusercontent.com/samitolvanen/kernelpatches/master/sha256.v3.patch
+Am Freitag, 3. April 2015, 17:58:28 schrieb Herbert Xu:
 
-Patch applied.  Thanks!
+Hi Herbert,
+
+> On Thu, Apr 02, 2015 at 07:05:27PM +0200, Stephan Mueller wrote:
+> > diff --git a/crypto/algapi.c b/crypto/algapi.c
+> > index 83b04e0..215c604 100644
+> > --- a/crypto/algapi.c
+> > +++ b/crypto/algapi.c
+> > 
+> > @@ -545,6 +545,10 @@ unlock:
+> >  		goto err;
+> >  	
+> >  	crypto_wait_for_test(larval);
+> > 
+> > +
+> > +	/* Remove instance if test failed */
+> > +	if (!(inst->alg.cra_flags & CRYPTO_ALG_TESTED))
+> > +		crypto_unregister_instance(inst);
+> 
+> Unfortunately I don't think this is safe because the moment you
+> release the mutex the instance can be freed.  So you'll need to
+> hold a reference to it.
+> 
+> Cheers,
+
+Wpuldn't crypto_del_alg suffer from the same issue? I see that the cra_refcnt 
+is checked. But I guess there would be the same kind of race?
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
