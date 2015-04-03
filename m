@@ -1,38 +1,39 @@
-From: Masanari Iida <standby24x7@gmail.com>
-Subject: [PATCH] crypto: Fix a typo in Kconfig
-Date: Sat,  4 Apr 2015 00:20:30 +0900
-Message-ID: <1428074430-17268-1-git-send-email-standby24x7@gmail.com>
-Cc: Masanari Iida <standby24x7@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: qat - print ring name in debug output
+Date: Fri, 03 Apr 2015 08:40:58 -0700
+Message-ID: <20150403154058.1144.75189.stgit@tstruk-mobl1>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	qat-linux@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f46.google.com ([209.85.220.46]:34643 "EHLO
-	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751083AbbDCPUQ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 3 Apr 2015 11:20:16 -0400
+Received: from mga01.intel.com ([192.55.52.88]:16373 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751497AbbDCPns (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 3 Apr 2015 11:43:48 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch fix a spelling typo in crypto/Kconfig.
+Ring name was allocated but never refenenced.
+It was supposed to be printed out in debug output.
 
-Signed-off-by: Masanari Iida <standby24x7@gmail.com>
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- crypto/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../crypto/qat/qat_common/adf_transport_debug.c    |    2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 8863993..8aaf298 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1188,7 +1188,7 @@ config CRYPTO_SERPENT_SSE2_X86_64
- 	  Keys are allowed to be from 0 to 256 bits in length, in steps
- 	  of 8 bits.
+diff --git a/drivers/crypto/qat/qat_common/adf_transport_debug.c b/drivers/crypto/qat/qat_common/adf_transport_debug.c
+index 6b69745..e419869 100644
+--- a/drivers/crypto/qat/qat_common/adf_transport_debug.c
++++ b/drivers/crypto/qat/qat_common/adf_transport_debug.c
+@@ -100,6 +100,8 @@ static int adf_ring_show(struct seq_file *sfile, void *v)
+ 		empty = READ_CSR_E_STAT(csr, bank->bank_number);
  
--	  This module provides Serpent cipher algorithm that processes eigth
-+	  This module provides Serpent cipher algorithm that processes eight
- 	  blocks parallel using SSE2 instruction set.
- 
- 	  See also:
--- 
-2.4.0.rc0.43.gcf8a8c6
+ 		seq_puts(sfile, "------- Ring configuration -------\n");
++		seq_printf(sfile, "ring name: %s\n",
++			   ring->ring_debug->ring_name);
+ 		seq_printf(sfile, "ring num %d, bank num %d\n",
+ 			   ring->ring_number, ring->bank->bank_number);
+ 		seq_printf(sfile, "head %x, tail %x, empty: %d\n",
