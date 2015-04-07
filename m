@@ -1,12 +1,12 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 06/11] drivers/crypto/nx: add nx842 constraints
-Date: Tue,  7 Apr 2015 13:34:25 -0400
-Message-ID: <1428428070-17803-7-git-send-email-ddstreet@ieee.org>
+Subject: [PATCH 03/11] crypto: add software 842 decompression
+Date: Tue,  7 Apr 2015 13:34:22 -0400
+Message-ID: <1428428070-17803-4-git-send-email-ddstreet@ieee.org>
 References: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
 Cc: Seth Jennings <sjennings@variantweb.net>,
 	Robert Jennings <rob@pochix.net>,
-	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
-	Fionnuala Gunter <fin@linux.vnet.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Greg KH <gregkh@linuxfoundation.org>,
 	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
 	linux-kernel@vger.kernel.org, Dan Streetman <ddstreet@ieee.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -19,141 +19,505 @@ In-Reply-To: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add "constraints" for the NX-842 driver.  The constraints are used to
-indicate what the current NX-842 platform driver is capable of.  The
-constraints tell the NX-842 user what alignment, min and max length, and
-length multiple each provided buffers should conform to.  These are
-required because the 842 hardware requires buffers to meet specific
-constraints that vary based on platform - for example, the pSeries
-max length is much lower than the PowerNV max length.
+Add an 842-format software decompression function.  Update the MAINTAINERS
+842 section to include the new files.
 
-These constraints are used by a later patch that improves the crypto 842
-driver.
+This decompression function can decompress any standard-format 842
+compressed data.  The 842 compressed format is explained in the header
+comments.  This general-use decompression function is required by later
+patches that update the crypto 842 driver to fall back to software 842
+decompression if the NX-842 hardware fails and/or returns an error.
 
 Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- drivers/crypto/nx/nx-842-pseries.c | 10 ++++++++++
- drivers/crypto/nx/nx-842.c         | 38 ++++++++++++++++++++++++++++++++++++++
- drivers/crypto/nx/nx-842.h         |  2 ++
- include/linux/nx842.h              |  9 +++++++++
- 4 files changed, 59 insertions(+)
+ MAINTAINERS              |   2 +
+ include/linux/sw842.h    |   7 +
+ lib/842/842_decompress.c | 413 +++++++++++++++++++++++++++++++++++++++++++++++
+ lib/842/Makefile         |   1 +
+ lib/Kconfig              |   3 +
+ lib/Makefile             |   1 +
+ 6 files changed, 427 insertions(+)
+ create mode 100644 include/linux/sw842.h
+ create mode 100644 lib/842/842_decompress.c
+ create mode 100644 lib/842/Makefile
 
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
-index 728a148..baa2e52 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -40,6 +40,13 @@ MODULE_DESCRIPTION("842 H/W Compression driver for IBM Power processors");
- /* IO buffer must be 128 byte aligned */
- #define IO_BUFFER_ALIGN 128
+diff --git a/MAINTAINERS b/MAINTAINERS
+index efbcb50..3dc973a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4836,6 +4836,8 @@ M:	Dan Streetman <ddstreet@us.ibm.com>
+ S:	Supported
+ F:	drivers/crypto/nx/nx-842.c
+ F:	include/linux/nx842.h
++F:	include/linux/sw842.h
++F:	lib/842/
  
-+static struct nx842_constraints nx842_pseries_constraints = {
-+	.alignment =	IO_BUFFER_ALIGN,
-+	.multiple =	DDE_BUFFER_LAST_MULT,
-+	.minimum =	IO_BUFFER_ALIGN,
-+	.maximum =	PAGE_SIZE, /* dynamic, max_sync_size */
-+};
+ IBM Power Linux RAID adapter
+ M:	Brian King <brking@us.ibm.com>
+diff --git a/include/linux/sw842.h b/include/linux/sw842.h
+new file mode 100644
+index 0000000..aa8d86e
+--- /dev/null
++++ b/include/linux/sw842.h
+@@ -0,0 +1,7 @@
++#ifndef __SW842_H__
++#define __SW842_H__
 +
- struct nx842_header {
- 	int blocks_nr; /* number of compressed blocks */
- 	int offset; /* offset of the first block (from beginning of header) */
-@@ -840,6 +847,8 @@ static int nx842_OF_upd_maxsyncop(struct nx842_devdata *devdata,
- 		goto out;
- 	}
- 
-+	nx842_pseries_constraints.maximum = devdata->max_sync_size;
++int sw842_decompress(const unsigned char *src, int srclen,
++			unsigned char *dst, int *destlen);
 +
- 	devdata->max_sync_sg = (unsigned int)min(maxsynccop->comp_sg_limit,
- 						maxsynccop->decomp_sg_limit);
- 	if (devdata->max_sync_sg < 1) {
-@@ -1113,6 +1122,7 @@ static struct attribute_group nx842_attribute_group = {
- 
- static struct nx842_driver nx842_pseries_driver = {
- 	.owner =	THIS_MODULE,
-+	.constraints =	&nx842_pseries_constraints,
- 	.compress =	nx842_pseries_compress,
- 	.decompress =	nx842_pseries_decompress,
- };
-diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
-index 815d277..279a38e 100644
---- a/drivers/crypto/nx/nx-842.c
-+++ b/drivers/crypto/nx/nx-842.c
-@@ -86,6 +86,44 @@ static void put_driver(struct nx842_driver *driver)
- 	module_put(driver->owner);
- }
- 
-+/**
-+ * nx842_constraints
++#endif
+diff --git a/lib/842/842_decompress.c b/lib/842/842_decompress.c
+new file mode 100644
+index 0000000..9fc0ffc
+--- /dev/null
++++ b/lib/842/842_decompress.c
+@@ -0,0 +1,413 @@
++/*
++ * 842 Decompressor
 + *
-+ * This provides the driver's constraints.  Different nx842 implementations
-+ * may have varying requirements.  The constraints are:
-+ *   @alignment:	All buffers should be aligned to this
-+ *   @multiple:		All buffer lengths should be a multiple of this
-+ *   @minimum:		Buffer lengths must not be less than this amount
-+ *   @maximum:		Buffer lengths must not be more than this amount
++ * Copyright (C) 2015 Dan Streetman, IBM Corp
 + *
-+ * The constraints apply to all buffers and lengths, both input and output,
-+ * for both compression and decompression, except for the minimum which
-+ * only applies to compression input and decompression output; the
-+ * compressed data can be less than the minimum constraint.  It can be
-+ * assumed that compressed data will always adhere to the multiple
-+ * constraint.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
 + *
-+ * The driver may succeed even if these constraints are violated;
-+ * however the driver can return failure or suffer reduced performance
-+ * if any constraint is not met.
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * The 842 compressed format is made up of multiple blocks, each of
++ * which have the format:
++ *
++ * <template>[arg1][arg2][arg3][arg4]
++ *
++ * where there are between 0 and 4 template args, depending on the specific
++ * template operation.  For normal operations, each arg is either a specific
++ * number of data bytes to add to the output stream, or an index pointing
++ * to a previously-written number of data bytes to copy to the output stream.
++ *
++ * The template code is a 5-bit value.  This code indicates what to
++ * do with the following data.  Template codes from 0 to 0x19 should
++ * use the template table, the static "ops" table in the code below.
++ * For each template (table row), there are between 1 and 4 actions;
++ * each action corresponds to an arg following the template code
++ * bits.  Each action is either a "data" type action, or a "index"
++ * type action, and each action results in 2, 4, or 8 bytes being
++ * written to the output stream.  Each template (i.e. all actions in
++ * the table row) will add up to 8 bytes being written to the output
++ * stream.  Any row with less than 4 actions is padded with noop
++ * actions, indicated by N0 (for which there is no corresponding arg
++ * in the compressed data stream).
++ *
++ * "Data" actions, indicated in the table by D2, D4, and D8, mean that
++ * the corresponding arg is 2, 4, or 8 bytes, respectively, in the
++ * compressed data stream should be copied directly to the output stream.
++ *
++ * "Index" actions, indicated in the table by I2, I4, and I8, mean
++ * the corresponding arg is an index parameter that points to,
++ * respectively, a 2, 4, or 8 byte value already in the output
++ * stream, that should be copied to the end of the output stream.
++ * Essentially, the index points to a position in a ring buffer that
++ * contains the last N bytes of output stream data.  The number of bits
++ * for each index's arg are: 8 bits for I2, 9 bits for I4, and 8 bits for
++ * I8.  Since each index points to a 2, 4, or 8 byte section, this means
++ * that I2 can reference 512 bytes ((2^8 bits = 256) * 2 bytes), I4 can
++ * reference 2048 bytes ((2^9 = 512) * 4 bytes), and I8 can reference
++ * 2048 bytes ((2^8 = 256) * 8 bytes).  Think of it as a dedicated ring
++ * buffer for each of I2, I4, and I8 that are updated for each byte
++ * written to the output stream.  In this implementation, the output stream
++ * is directly used for each index; there is no additional memory required.
++ * Note that the index is into a ring buffer, not a sliding window;
++ * for example, if there have been 260 bytes written to the output stream,
++ * an I2 index of 0 would index to byte 256 in the output stream, while
++ * an I2 index of 16 would index to byte 16 in the output stream.
++ *
++ * There are also 3 special template codes; 0x1b for "repeat", 0x1c for
++ * "zeros", and 0x1e for "end".  The "repeat" operation is followed by
++ * a 6 bit arg N indicating how many times to repeat.  The last 8
++ * bytes written to the output stream are written again to the output
++ * stream, N + 1 times.  The "zeros" operation, which has no arg bits,
++ * writes 8 zeros to the output stream.  The "end" operation, which also
++ * has no arg bits, signals the end of the compressed data.  There may
++ * be some number of padding (don't care, but usually 0) bits after
++ * the "end" operation bits, to fill the stream length to a specific
++ * byte multiple (usually a multiple of 8, 16, or 32 bytes).
++ *
++ * After all actions for each operation code are processed, another
++ * template code is in the next 5 bits.  The decompression ends
++ * once the "end" template code is detected.
 + */
-+int nx842_constraints(struct nx842_constraints *c)
-+{
-+	struct nx842_driver *driver = get_driver();
-+	int ret = 0;
 +
-+	if (!driver)
-+		return -ENODEV;
++#ifndef STATIC
++#include <linux/module.h>
++#include <linux/kernel.h>
++#endif
 +
-+	BUG_ON(!c);
-+	memcpy(c, driver->constraints, sizeof(*c));
++#include <linux/sw842.h>
 +
-+	put_driver(driver);
++/* special templates */
++#define OP_REPEAT	(0x1B)
++#define OP_ZEROS	(0x1C)
++#define OP_END		(0x1E)
 +
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(nx842_constraints);
++/* additional bits of each op param */
++#define OP_BITS		(5)
++#define REPEAT_BITS	(6)
++#define I2_BITS		(8)
++#define I4_BITS		(9)
++#define I8_BITS		(8)
 +
- int nx842_compress(const unsigned char *in, unsigned int in_len,
- 			unsigned char *out, unsigned int *out_len,
- 			void *wrkmem)
-diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
-index 2a5d4e1..c6ceb0f 100644
---- a/drivers/crypto/nx/nx-842.h
-+++ b/drivers/crypto/nx/nx-842.h
-@@ -12,6 +12,8 @@
- struct nx842_driver {
- 	struct module *owner;
- 
-+	struct nx842_constraints *constraints;
++/* rolling fifo sizes */
++#define I2_FIFO_SIZE	(512)
++#define I4_FIFO_SIZE	(2048)
++#define I8_FIFO_SIZE	(2048)
 +
- 	int (*compress)(const unsigned char *in, unsigned int in_len,
- 			unsigned char *out, unsigned int *out_len,
- 			void *wrkmem);
-diff --git a/include/linux/nx842.h b/include/linux/nx842.h
-index 778e3ab..883b474 100644
---- a/include/linux/nx842.h
-+++ b/include/linux/nx842.h
-@@ -5,6 +5,15 @@
- 
- #define NX842_MEM_COMPRESS	__NX842_PSERIES_MEM_COMPRESS
- 
-+struct nx842_constraints {
-+	int alignment;
-+	int multiple;
-+	int minimum;
-+	int maximum;
++/* Arbitrary values used to indicate action */
++#define OP_ACTION	(0x30)
++#define OP_ACTION_NOOP	(0x00)
++#define OP_ACTION_DATA	(0x10)
++#define OP_ACTION_INDEX	(0x20)
++#define OP_AMOUNT	(0x0f)
++#define OP_AMOUNT_0	(0x00)
++#define OP_AMOUNT_2	(0x02)
++#define OP_AMOUNT_4	(0x04)
++#define OP_AMOUNT_8	(0x08)
++
++#define D2		(OP_ACTION_DATA  | OP_AMOUNT_2)
++#define D4		(OP_ACTION_DATA  | OP_AMOUNT_4)
++#define D8		(OP_ACTION_DATA  | OP_AMOUNT_8)
++#define I2		(OP_ACTION_INDEX | OP_AMOUNT_2)
++#define I4		(OP_ACTION_INDEX | OP_AMOUNT_4)
++#define I8		(OP_ACTION_INDEX | OP_AMOUNT_8)
++#define N0		(OP_ACTION_NOOP  | OP_AMOUNT_0)
++
++#define OPS_MAX		(0x19)
++
++static u8 ops[OPS_MAX + 1][4] = {
++	{ D8, N0, N0, N0 },
++	{ D4, D2, I2, N0 },
++	{ D4, I2, D2, N0 },
++	{ D4, I2, I2, N0 },
++	{ D4, I4, N0, N0 },
++	{ D2, I2, D4, N0 },
++	{ D2, I2, D2, I2 },
++	{ D2, I2, I2, D2 },
++	{ D2, I2, I2, I2 },
++	{ D2, I2, I4, N0 },
++	{ I2, D2, D4, N0 },
++	{ I2, D4, I2, N0 },
++	{ I2, D2, I2, D2 },
++	{ I2, D2, I2, I2 },
++	{ I2, D2, I4, N0 },
++	{ I2, I2, D4, N0 },
++	{ I2, I2, D2, I2 },
++	{ I2, I2, I2, D2 },
++	{ I2, I2, I2, I2 },
++	{ I2, I2, I4, N0 },
++	{ I4, D4, N0, N0 },
++	{ I4, D2, I2, N0 },
++	{ I4, I2, D2, N0 },
++	{ I4, I2, I2, N0 },
++	{ I4, I4, N0, N0 },
++	{ I8, N0, N0, N0 }
 +};
 +
-+int nx842_constraints(struct nx842_constraints *constraints);
++struct sw842_param {
++	u8 *in;
++	int bit;
++	int ilen;
++	u8 *out;
++	u8 *ostart;
++	int olen;
++};
 +
- int nx842_compress(const unsigned char *in, unsigned int in_len,
- 		unsigned char *out, unsigned int *out_len, void *wrkmem);
- int nx842_decompress(const unsigned char *in, unsigned int in_len,
++/**
++ * Get the next specified bits, up to 57 bits
++ *
++ * This also increments the byte and bit positions, and remaining
++ * length.  This can return no more than 57 bits, because in the
++ * worst case the starting bit is bit 7, which would place the end
++ * of the following 57 bits at the end of an 8 byte span, which
++ * is the max that this function's type casting approach can
++ * handle.
++ *
++ * Returns: the value of the requested bits, or -1 on failure
++ */
++static s64 next_bits(struct sw842_param *p, int n)
++{
++	u64 v;
++	u8 *in = p->in;
++	int b = p->bit, bits = b + n;
++
++	if (b > 7 || n > 57) {
++		WARN(1, "b %d n %d\n", b, n);
++		return -EINVAL;
++	}
++
++	if (DIV_ROUND_UP(bits, 8) > p->ilen)
++		return -EOVERFLOW;
++
++	if (bits <= 8)
++		v = *in >> (8 - bits);
++	else if (bits <= 16)
++		v = be16_to_cpu(*(__be16 *)in) >> (16 - bits);
++	else if (bits <= 32)
++		v = be32_to_cpu(*(__be32 *)in) >> (32 - bits);
++	else
++		v = be64_to_cpu(*(__be64 *)in) >> (64 - bits);
++
++	p->bit += n;
++
++	p->in += p->bit / 8;
++	p->ilen -= p->bit / 8;
++	p->bit %= 8;
++
++	return (s64)(v & ((1 << n) - 1));
++}
++
++static int __do_data(struct sw842_param *p, int n)
++{
++	s64 v = next_bits(p, n * 8);
++
++	if (v < 0 || n > p->olen)
++		return -EINVAL;
++
++	switch (n) {
++	case 2:
++		*(__be16 *)p->out = cpu_to_be16((u16)v);
++		break;
++	case 4:
++		*(__be32 *)p->out = cpu_to_be32((u32)v);
++		break;
++	default:
++		return -EINVAL;
++	}
++	p->out += n;
++	p->olen -= n;
++
++	return 0;
++}
++
++static int do_data(struct sw842_param *p, int n)
++{
++	switch (n) {
++	case 2:
++		if (__do_data(p, 2))
++			return -EINVAL;
++		break;
++	case 8:
++		/* we copy two 4-byte chunks here because
++		 * next_bits() can't do a full 64 bits
++		 */
++		if (__do_data(p, 4))
++			return -EINVAL;
++		/* fallthrough */
++	case 4:
++		if (__do_data(p, 4))
++			return -EINVAL;
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int __do_index(struct sw842_param *p, int size, int bits, int fsize)
++{
++	s64 index = next_bits(p, bits);
++	u64 offset;
++	int total = (int)(p->out - p->ostart);
++
++	if (index < 0)
++		return -EINVAL;
++
++	offset = index * size;
++
++	/* a ring buffer of fsize is used; correct the offset */
++	if (total > fsize) {
++		/* this is where the current fifo is */
++		int sec = (total / fsize) * fsize;
++		/* the current pos in the fifo */
++		int pos = total % fsize;
++
++		/* if the offset is past/at the pos, we need to
++		 * go back to the last fifo section
++		 */
++		if (offset >= pos)
++			sec -= fsize;
++
++		offset += sec;
++	}
++
++	if (offset + size > total)
++		return -EINVAL;
++
++	memcpy(p->out, &p->ostart[offset], size);
++	p->out += size;
++	p->olen -= size;
++
++	return 0;
++}
++
++int do_index(struct sw842_param *p, int n)
++{
++	switch (n) {
++	case 2:
++		return __do_index(p, 2, I2_BITS, I2_FIFO_SIZE);
++	case 4:
++		return __do_index(p, 4, I4_BITS, I4_FIFO_SIZE);
++	case 8:
++		return __do_index(p, 8, I8_BITS, I8_FIFO_SIZE);
++	default:
++		return -EINVAL;
++	}
++}
++
++int do_op(struct sw842_param *p, int o)
++{
++	int i;
++	u8 op, n;
++
++	if (o > OPS_MAX)
++		return -EINVAL;
++
++	for (i = 0; i < 4; i++) {
++		op = ops[o][i];
++		n = op & OP_AMOUNT;
++
++		switch (op & OP_ACTION) {
++		case OP_ACTION_DATA:
++			if (do_data(p, n))
++				return -EINVAL;
++			break;
++		case OP_ACTION_INDEX:
++			if (do_index(p, n))
++				return -EINVAL;
++			break;
++		case OP_ACTION_NOOP:
++			break;
++		default:
++			return -EINVAL;
++		}
++	}
++
++	return 0;
++}
++
++/**
++ * sw842_decompress
++ *
++ * Decompress the 842-compressed buffer of length @len at @in
++ * to the output buffer @out.
++ *
++ * The compressed buffer must be only a single 842-compressed buffer,
++ * with the standard format described in the comments at the top of
++ * this file.  Processing will stop when the 842 "END" template is
++ * detected, not the end of the buffer.
++ *
++ * Returns: 0 on success, error on failure.  The @olen parameter
++ * will contain the number of output bytes written on success, or
++ * 0 on error.
++ */
++int sw842_decompress(const unsigned char *in, int len,
++		     unsigned char *out, int *olen)
++{
++	struct sw842_param p;
++	int op, total = *olen;
++
++	p.in = (unsigned char *)in;
++	p.bit = 0;
++	p.ilen = len;
++	p.out = out;
++	p.ostart = out;
++	p.olen = *olen;
++
++	*olen = 0;
++
++	while ((op = (int)next_bits(&p, OP_BITS)) != OP_END) {
++		if (op < 0)
++			return op;
++
++		if (op == OP_REPEAT) {
++			int rep = (int)next_bits(&p, REPEAT_BITS);
++
++			if (rep < 0)
++				return rep;
++
++			if (p.out == out) /* no previous bytes */
++				return -EINVAL;
++
++			/* copy rep + 1 */
++			rep++;
++
++			if (rep * 8 > p.olen)
++				return -ENOSPC;
++
++			while (rep-- > 0) {
++				memcpy(p.out, p.out - 8, 8);
++				p.out += 8;
++				p.olen -= 8;
++			}
++		} else if (op == OP_ZEROS) {
++			if (8 > p.olen)
++				return -ENOSPC;
++
++			memset(p.out, 0, 8);
++			p.out += 8;
++			p.olen -= 8;
++		} else { /* use template */
++			if (do_op(&p, op))
++				return -EINVAL;
++		}
++	}
++
++	*olen = total - p.olen;
++
++	return 0;
++}
++#ifndef STATIC
++EXPORT_SYMBOL_GPL(sw842_decompress);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Software 842 Decompressor");
++MODULE_AUTHOR("Dan Streetman <ddstreet@ieee.org>");
++
++#endif
+diff --git a/lib/842/Makefile b/lib/842/Makefile
+new file mode 100644
+index 0000000..8071c3f
+--- /dev/null
++++ b/lib/842/Makefile
+@@ -0,0 +1 @@
++obj-$(CONFIG_842_DECOMPRESS) += 842_decompress.o
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 87da53b..78aee1f 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -213,6 +213,9 @@ config RANDOM32_SELFTEST
+ #
+ # compression support is select'ed if needed
+ #
++config 842_DECOMPRESS
++	tristate
++
+ config ZLIB_INFLATE
+ 	tristate
+ 
+diff --git a/lib/Makefile b/lib/Makefile
+index 58f74d2..88b144e 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -78,6 +78,7 @@ obj-$(CONFIG_LIBCRC32C)	+= libcrc32c.o
+ obj-$(CONFIG_CRC8)	+= crc8.o
+ obj-$(CONFIG_GENERIC_ALLOCATOR) += genalloc.o
+ 
++obj-$(CONFIG_842_DECOMPRESS) += 842/
+ obj-$(CONFIG_ZLIB_INFLATE) += zlib_inflate/
+ obj-$(CONFIG_ZLIB_DEFLATE) += zlib_deflate/
+ obj-$(CONFIG_REED_SOLOMON) += reed_solomon/
 -- 
 2.1.0
