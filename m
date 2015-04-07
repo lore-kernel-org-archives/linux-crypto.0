@@ -1,12 +1,16 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 07/11] drivers/crypto/nx: add PowerNV platform NX-842 driver
-Date: Tue,  7 Apr 2015 13:34:26 -0400
-Message-ID: <1428428070-17803-8-git-send-email-ddstreet@ieee.org>
+Subject: [PATCH 05/11] drivers/crypto/nx: add NX-842 platform frontend driver
+Date: Tue,  7 Apr 2015 13:34:24 -0400
+Message-ID: <1428428070-17803-6-git-send-email-ddstreet@ieee.org>
 References: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
 Cc: Seth Jennings <sjennings@variantweb.net>,
 	Robert Jennings <rob@pochix.net>,
 	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
 	Fionnuala Gunter <fin@linux.vnet.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	Mauro Carvalho Chehab <mchehab@osg.samsung.com>,
+	Arnd Bergmann <arnd@arndb.de>, Joe Perches <joe@perches.com>,
 	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
 	linux-kernel@vger.kernel.org, Dan Streetman <ddstreet@ieee.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
@@ -19,64 +23,313 @@ In-Reply-To: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add driver for NX-842 hardware on the PowerNV platform.
-
-This allows the use of the 842 compression hardware coprocessor on
-the PowerNV platform.
+Add NX-842 frontend that allows using either the pSeries platform
+or PowerNV platform driver for the NX-842 hardware.  Update the
+MAINTAINERS file to include the new filenames.
 
 Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- drivers/crypto/nx/Kconfig          |  10 +
- drivers/crypto/nx/Makefile         |   2 +
- drivers/crypto/nx/nx-842-powernv.c | 623 +++++++++++++++++++++++++++++++++++++
- drivers/crypto/nx/nx-842-pseries.c |   9 -
- drivers/crypto/nx/nx-842.c         |   4 +-
- drivers/crypto/nx/nx-842.h         |  97 ++++++
+ MAINTAINERS                        |   2 +-
+ crypto/842.c                       |   2 +-
+ drivers/crypto/Kconfig             |   6 +-
+ drivers/crypto/nx/Kconfig          |  33 ++++++---
+ drivers/crypto/nx/Makefile         |   4 +-
+ drivers/crypto/nx/nx-842-pseries.c |  51 ++++++-------
+ drivers/crypto/nx/nx-842.c         | 144 +++++++++++++++++++++++++++++++++++++
+ drivers/crypto/nx/nx-842.h         |  32 +++++++++
  include/linux/nx842.h              |   6 +-
- 7 files changed, 739 insertions(+), 12 deletions(-)
- create mode 100644 drivers/crypto/nx/nx-842-powernv.c
+ 9 files changed, 235 insertions(+), 45 deletions(-)
+ create mode 100644 drivers/crypto/nx/nx-842.c
+ create mode 100644 drivers/crypto/nx/nx-842.h
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 3dc973a..5a8d46d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4834,7 +4834,7 @@ F:	drivers/crypto/nx/
+ IBM Power 842 compression accelerator
+ M:	Dan Streetman <ddstreet@us.ibm.com>
+ S:	Supported
+-F:	drivers/crypto/nx/nx-842.c
++F:	drivers/crypto/nx/nx-842*
+ F:	include/linux/nx842.h
+ F:	include/linux/sw842.h
+ F:	lib/842/
+diff --git a/crypto/842.c b/crypto/842.c
+index b48f4f1..d21cedb 100644
+--- a/crypto/842.c
++++ b/crypto/842.c
+@@ -52,7 +52,7 @@ static int nx842_init(struct crypto_tfm *tfm)
+ 	struct nx842_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	int wmemsize;
+ 
+-	wmemsize = max_t(int, nx842_get_workmem_size(), LZO1X_MEM_COMPRESS);
++	wmemsize = max_t(int, NX842_MEM_COMPRESS, LZO1X_MEM_COMPRESS);
+ 	ctx->nx842_wmem = kmalloc(wmemsize, GFP_NOFS);
+ 	if (!ctx->nx842_wmem)
+ 		return -ENOMEM;
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 2fb0fdf..6d8b11f 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -312,11 +312,11 @@ config CRYPTO_DEV_S5P
+ 	  algorithms execution.
+ 
+ config CRYPTO_DEV_NX
+-	bool "Support for IBM Power7+ in-Nest cryptographic acceleration"
+-	depends on PPC64 && IBMVIO && !CPU_LITTLE_ENDIAN
++	bool "Support for IBM Power in-Nest cryptographic acceleration"
++	depends on PPC64
+ 	default n
+ 	help
+-	  Support for Power7+ in-Nest cryptographic acceleration.
++	  Support for Power in-Nest cryptographic acceleration.
+ 
+ if CRYPTO_DEV_NX
+ 	source "drivers/crypto/nx/Kconfig"
 diff --git a/drivers/crypto/nx/Kconfig b/drivers/crypto/nx/Kconfig
-index e4396fc..4bf400a 100644
+index f826166..e4396fc 100644
 --- a/drivers/crypto/nx/Kconfig
 +++ b/drivers/crypto/nx/Kconfig
-@@ -38,4 +38,14 @@ config CRYPTO_DEV_NX_PSERIES_COMPRESS
- 	  algorithm.  This supports NX hardware on the pSeries platform.
- 	  If you choose 'M' here, this module will be called nx_compress_pseries.
+@@ -1,6 +1,6 @@
+ config CRYPTO_DEV_NX_ENCRYPT
+-	tristate "Encryption acceleration support"
+-	depends on PPC64 && IBMVIO
++	tristate "Encryption acceleration support on pSeries platform"
++	depends on PPC_PSERIES && IBMVIO && !CPU_LITTLE_ENDIAN
+ 	default y
+ 	select CRYPTO_AES
+ 	select CRYPTO_CBC
+@@ -12,15 +12,30 @@ config CRYPTO_DEV_NX_ENCRYPT
+ 	select CRYPTO_SHA256
+ 	select CRYPTO_SHA512
+ 	help
+-	  Support for Power7+ in-Nest encryption acceleration. This
+-	  module supports acceleration for AES and SHA2 algorithms. If you
+-	  choose 'M' here, this module will be called nx_crypto.
++	  Support for Power in-Nest encryption acceleration. This
++	  module supports acceleration for AES and SHA2 algorithms on
++	  the pSeries platform.  If you choose 'M' here, this module
++	  will be called nx_crypto.
  
-+config CRYPTO_DEV_NX_POWERNV_COMPRESS
-+	tristate "Compression acceleration support on PowerNV platform"
-+	depends on PPC_POWERNV
+ config CRYPTO_DEV_NX_COMPRESS
+ 	tristate "Compression acceleration support"
+-	depends on PPC64 && IBMVIO
+ 	default y
+ 	help
+-	  Support for Power7+ in-Nest compression acceleration. This
+-	  module supports acceleration for AES and SHA2 algorithms. If you
+-	  choose 'M' here, this module will be called nx_compress.
++	  Support for Power in-Nest compression acceleration. This
++	  module supports acceleration for compressing memory with the 842
++	  algorithm.  One of the platform drivers must be selected also.
++	  If you choose 'M' here, this module will be called nx_compress.
++
++if CRYPTO_DEV_NX_COMPRESS
++
++config CRYPTO_DEV_NX_PSERIES_COMPRESS
++	tristate "Compression acceleration support on pSeries platform"
++	depends on PPC_PSERIES && IBMVIO && !CPU_LITTLE_ENDIAN
 +	default y
 +	help
 +	  Support for Power in-Nest compression acceleration. This
 +	  module supports acceleration for compressing memory with the 842
-+	  algorithm.  This supports NX hardware on the PowerNV platform.
-+	  If you choose 'M' here, this module will be called nx_compress_powernv.
++	  algorithm.  This supports NX hardware on the pSeries platform.
++	  If you choose 'M' here, this module will be called nx_compress_pseries.
 +
- endif
++endif
 diff --git a/drivers/crypto/nx/Makefile b/drivers/crypto/nx/Makefile
-index bc7b7ea..82221f2 100644
+index 8669ffa..bc7b7ea 100644
 --- a/drivers/crypto/nx/Makefile
 +++ b/drivers/crypto/nx/Makefile
-@@ -12,5 +12,7 @@ nx-crypto-objs := nx.o \
+@@ -11,4 +11,6 @@ nx-crypto-objs := nx.o \
+ 		  nx-sha512.o
  
  obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS) += nx-compress.o
- obj-$(CONFIG_CRYPTO_DEV_NX_PSERIES_COMPRESS) += nx-compress-pseries.o
-+obj-$(CONFIG_CRYPTO_DEV_NX_POWERNV_COMPRESS) += nx-compress-powernv.o
- nx-compress-objs := nx-842.o
- nx-compress-pseries-objs := nx-842-pseries.o
-+nx-compress-powernv-objs := nx-842-powernv.o
-diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+-nx-compress-objs := nx-842-pseries.o
++obj-$(CONFIG_CRYPTO_DEV_NX_PSERIES_COMPRESS) += nx-compress-pseries.o
++nx-compress-objs := nx-842.o
++nx-compress-pseries-objs := nx-842-pseries.o
+diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
+index 887196e..728a148 100644
+--- a/drivers/crypto/nx/nx-842-pseries.c
++++ b/drivers/crypto/nx/nx-842-pseries.c
+@@ -21,18 +21,13 @@
+  *          Seth Jennings <sjenning@linux.vnet.ibm.com>
+  */
+ 
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/nx842.h>
+-#include <linux/of.h>
+-#include <linux/slab.h>
+-
+ #include <asm/page.h>
+ #include <asm/vio.h>
+ 
++#include "nx-842.h"
+ #include "nx_csbcpb.h" /* struct nx_csbcpb */
+ 
+-#define MODULE_NAME "nx-compress"
++#define MODULE_NAME NX842_PSERIES_MODULE_NAME
+ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Robert Jennings <rcj@linux.vnet.ibm.com>");
+ MODULE_DESCRIPTION("842 H/W Compression driver for IBM Power processors");
+@@ -236,18 +231,6 @@ struct nx842_workmem {
+ 	};
+ };
+ 
+-int nx842_get_workmem_size(void)
+-{
+-	return sizeof(struct nx842_workmem) + NX842_HW_PAGE_SIZE;
+-}
+-EXPORT_SYMBOL_GPL(nx842_get_workmem_size);
+-
+-int nx842_get_workmem_size_aligned(void)
+-{
+-	return sizeof(struct nx842_workmem);
+-}
+-EXPORT_SYMBOL_GPL(nx842_get_workmem_size_aligned);
+-
+ static int nx842_validate_result(struct device *dev,
+ 	struct cop_status_block *csb)
+ {
+@@ -300,7 +283,7 @@ static int nx842_validate_result(struct device *dev,
+ }
+ 
+ /**
+- * nx842_compress - Compress data using the 842 algorithm
++ * nx842_pseries_compress - Compress data using the 842 algorithm
+  *
+  * Compression provide by the NX842 coprocessor on IBM Power systems.
+  * The input buffer is compressed and the result is stored in the
+@@ -315,7 +298,7 @@ static int nx842_validate_result(struct device *dev,
+  * @out: Pointer to output buffer
+  * @outlen: Length of output buffer
+  * @wrkmem: ptr to buffer for working memory, size determined by
+- *          nx842_get_workmem_size()
++ *          NX842_MEM_COMPRESS
+  *
+  * Returns:
+  *   0		Success, output of length @outlen stored in the buffer at @out
+@@ -325,7 +308,7 @@ static int nx842_validate_result(struct device *dev,
+  *   -EIO	Internal error
+  *   -ENODEV	Hardware unavailable
+  */
+-int nx842_compress(const unsigned char *in, unsigned int inlen,
++static int nx842_pseries_compress(const unsigned char *in, unsigned int inlen,
+ 		       unsigned char *out, unsigned int *outlen, void *wmem)
+ {
+ 	struct nx842_header *hdr;
+@@ -493,13 +476,12 @@ unlock:
+ 	rcu_read_unlock();
+ 	return ret;
+ }
+-EXPORT_SYMBOL_GPL(nx842_compress);
+ 
+ static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
+ 			const void *);
+ 
+ /**
+- * nx842_decompress - Decompress data using the 842 algorithm
++ * nx842_pseries_decompress - Decompress data using the 842 algorithm
+  *
+  * Decompression provide by the NX842 coprocessor on IBM Power systems.
+  * The input buffer is decompressed and the result is stored in the
+@@ -515,7 +497,7 @@ static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
+  * @out: Pointer to output buffer, must be page aligned
+  * @outlen: Length of output buffer, must be PAGE_SIZE
+  * @wrkmem: ptr to buffer for working memory, size determined by
+- *          nx842_get_workmem_size()
++ *          NX842_MEM_COMPRESS
+  *
+  * Returns:
+  *   0		Success, output of length @outlen stored in the buffer at @out
+@@ -525,7 +507,7 @@ static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
+  *   -EINVAL	Bad input data encountered when attempting decompress
+  *   -EIO	Internal error
+  */
+-int nx842_decompress(const unsigned char *in, unsigned int inlen,
++static int nx842_pseries_decompress(const unsigned char *in, unsigned int inlen,
+ 			 unsigned char *out, unsigned int *outlen, void *wmem)
+ {
+ 	struct nx842_header *hdr;
+@@ -694,7 +676,6 @@ unlock:
+ 	rcu_read_unlock();
+ 	return ret;
+ }
+-EXPORT_SYMBOL_GPL(nx842_decompress);
+ 
+ /**
+  * nx842_OF_set_defaults -- Set default (disabled) values for devdata
+@@ -1130,6 +1111,12 @@ static struct attribute_group nx842_attribute_group = {
+ 	.attrs = nx842_sysfs_entries,
+ };
+ 
++static struct nx842_driver nx842_pseries_driver = {
++	.owner =	THIS_MODULE,
++	.compress =	nx842_pseries_compress,
++	.decompress =	nx842_pseries_decompress,
++};
++
+ static int __init nx842_probe(struct vio_dev *viodev,
+ 				  const struct vio_device_id *id)
+ {
+@@ -1192,6 +1179,8 @@ static int __init nx842_probe(struct vio_dev *viodev,
+ 		goto error;
+ 	}
+ 
++	nx842_register_driver(&nx842_pseries_driver);
++
+ 	return 0;
+ 
+ error_unlock:
+@@ -1222,11 +1211,14 @@ static int __exit nx842_remove(struct vio_dev *viodev)
+ 	if (old_devdata)
+ 		kfree(old_devdata->counters);
+ 	kfree(old_devdata);
++
++	nx842_unregister_driver(&nx842_pseries_driver);
++
+ 	return 0;
+ }
+ 
+ static struct vio_device_id nx842_driver_ids[] = {
+-	{"ibm,compression-v1", "ibm,compression"},
++	{NX842_PSERIES_COMPAT_NAME "-v1", NX842_PSERIES_COMPAT_NAME},
+ 	{"", ""},
+ };
+ 
+@@ -1243,6 +1235,8 @@ static int __init nx842_init(void)
+ 	struct nx842_devdata *new_devdata;
+ 	pr_info("Registering IBM Power 842 compression driver\n");
+ 
++	BUILD_BUG_ON(sizeof(struct nx842_workmem) > NX842_MEM_COMPRESS);
++
+ 	RCU_INIT_POINTER(devdata, NULL);
+ 	new_devdata = kzalloc(sizeof(*new_devdata), GFP_KERNEL);
+ 	if (!new_devdata) {
+@@ -1272,6 +1266,7 @@ static void __exit nx842_exit(void)
+ 	if (old_devdata)
+ 		dev_set_drvdata(old_devdata->dev, NULL);
+ 	kfree(old_devdata);
++	nx842_unregister_driver(&nx842_pseries_driver);
+ 	vio_unregister_driver(&nx842_driver);
+ }
+ 
+diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
 new file mode 100644
-index 0000000..f1624a8
+index 0000000..815d277
 --- /dev/null
-+++ b/drivers/crypto/nx/nx-842-powernv.c
-@@ -0,0 +1,623 @@
++++ b/drivers/crypto/nx/nx-842.c
+@@ -0,0 +1,144 @@
 +/*
-+ * Driver for IBM PowerNV 842 compression accelerator
++ * Driver frontend for IBM Power 842 compression accelerator
 + *
 + * Copyright (C) 2015 Dan Streetman, IBM Corp
++ *
++ * Designer of the Power data compression engine:
++ *   Bulent Abali <abali@us.ibm.com>
 + *
 + * This program is free software; you can redistribute it and/or modify
 + * it under the terms of the GNU General Public License as published by
@@ -93,779 +346,181 @@ index 0000000..f1624a8
 +
 +#include "nx-842.h"
 +
-+#include <linux/timer.h>
-+
-+#include <asm/prom.h>
-+#include <asm/icswx.h>
-+
-+#define MODULE_NAME NX842_POWERNV_MODULE_NAME
++#define MODULE_NAME "nx-compress"
 +MODULE_LICENSE("GPL");
 +MODULE_AUTHOR("Dan Streetman <ddstreet@ieee.org>");
-+MODULE_DESCRIPTION("842 H/W Compression driver for IBM PowerNV processors");
++MODULE_DESCRIPTION("842 H/W Compression driver for IBM Power processors");
 +
-+#define WORKMEM_ALIGN	(CRB_ALIGN)
-+#define CSB_WAIT_MAX	(5000) /* ms */
++/* Only one driver is expected, based on the HW platform */
++static struct nx842_driver *nx842_driver;
++static DEFINE_SPINLOCK(nx842_driver_lock); /* protects driver pointers */
 +
-+struct nx842_workmem {
-+	/* Below fields must be properly aligned */
-+	struct coprocessor_request_block crb; /* CRB_ALIGN align */
-+	struct data_descriptor_entry ddl_in[DDL_LEN_MAX]; /* DDE_ALIGN align */
-+	struct data_descriptor_entry ddl_out[DDL_LEN_MAX]; /* DDE_ALIGN align */
-+	/* Above fields must be properly aligned */
-+
-+	ktime_t start;
-+
-+	char padding[WORKMEM_ALIGN]; /* unused, to allow alignment */
-+} __packed __aligned(WORKMEM_ALIGN);
-+
-+struct nx842_coproc {
-+	unsigned int chip_id;
-+	unsigned int ct;
-+	unsigned int ci;
-+	struct list_head list;
-+};
-+
-+/* no cpu hotplug on powernv, so this list never changes after init */
-+static LIST_HEAD(nx842_coprocs);
-+static unsigned int nx842_ct;
-+
-+/**
-+ * setup_indirect_dde - Setup an indirect DDE
-+ *
-+ * The DDE is setup with the the DDE count, byte count, and address of
-+ * first direct DDE in the list.
-+ */
-+static void setup_indirect_dde(struct data_descriptor_entry *dde,
-+			struct data_descriptor_entry *ddl,
-+			unsigned int dde_count, unsigned int byte_count)
++void nx842_register_driver(struct nx842_driver *driver)
 +{
-+	dde->flags = 0;
-+	dde->count = dde_count;
-+	dde->index = 0;
-+	dde->length = cpu_to_be32(byte_count);
-+	dde->address = cpu_to_be64(nx842_get_pa(ddl));
++	spin_lock(&nx842_driver_lock);
++
++	if (nx842_driver) {
++		pr_err("can't register driver %s, already using driver %s\n",
++		       driver->owner->name, nx842_driver->owner->name);
++	} else {
++		pr_info("registering driver %s\n", driver->owner->name);
++		nx842_driver = driver;
++	}
++
++	spin_unlock(&nx842_driver_lock);
++}
++EXPORT_SYMBOL_GPL(nx842_register_driver);
++
++void nx842_unregister_driver(struct nx842_driver *driver)
++{
++	spin_lock(&nx842_driver_lock);
++
++	if (nx842_driver == driver) {
++		pr_info("unregistering driver %s\n", driver->owner->name);
++		nx842_driver = NULL;
++	} else if (nx842_driver) {
++		pr_err("can't unregister driver %s, using driver %s\n",
++		       driver->owner->name, nx842_driver->owner->name);
++	} else {
++		pr_err("can't unregister driver %s, no driver in use\n",
++		       driver->owner->name);
++	}
++
++	spin_unlock(&nx842_driver_lock);
++}
++EXPORT_SYMBOL_GPL(nx842_unregister_driver);
++
++static struct nx842_driver *get_driver(void)
++{
++	struct nx842_driver *driver = NULL;
++
++	spin_lock(&nx842_driver_lock);
++
++	driver = nx842_driver;
++
++	if (driver && !try_module_get(driver->owner))
++		driver = NULL;
++
++	spin_unlock(&nx842_driver_lock);
++
++	return driver;
 +}
 +
-+/**
-+ * setup_direct_dde - Setup single DDE from buffer
-+ *
-+ * The DDE is setup with the buffer and length.  The buffer must be properly
-+ * aligned.  The used length is returned.
-+ * Returns:
-+ *   N    Successfully set up DDE with N bytes
-+ */
-+static unsigned int setup_direct_dde(struct data_descriptor_entry *dde,
-+			unsigned long pa, unsigned int len)
++static void put_driver(struct nx842_driver *driver)
 +{
-+	unsigned int l = min_t(unsigned int, len, LEN_ON_PAGE(pa));
-+
-+	dde->flags = 0;
-+	dde->count = 0;
-+	dde->index = 0;
-+	dde->length = cpu_to_be32(l);
-+	dde->address = cpu_to_be64(pa);
-+
-+	return l;
++	module_put(driver->owner);
 +}
 +
-+/**
-+ * setup_ddl - Setup DDL from buffer
-+ *
-+ * Returns:
-+ *   0		Successfully set up DDL
-+ */
-+static int setup_ddl(struct data_descriptor_entry *dde,
-+			struct data_descriptor_entry *ddl,
-+			unsigned char *buf, unsigned int len,
-+			bool in)
++int nx842_compress(const unsigned char *in, unsigned int in_len,
++			unsigned char *out, unsigned int *out_len,
++			void *wrkmem)
 +{
-+	unsigned long pa = nx842_get_pa(buf);
-+	int i, ret, total_len = len;
-+
-+	if (!IS_ALIGNED(pa, DDE_BUFFER_ALIGN)) {
-+		pr_debug("%s buffer pa 0x%lx not 0x%x-byte aligned\n",
-+			 in ? "input" : "output", pa, DDE_BUFFER_ALIGN);
-+		return -EINVAL;
-+	}
-+
-+	/* only need to check last mult; since buffer must be
-+	 * DDE_BUFFER_ALIGN aligned, and that is a multiple of
-+	 * DDE_BUFFER_SIZE_MULT, and pre-last page DDE buffers
-+	 * are guaranteed a multiple of DDE_BUFFER_SIZE_MULT.
-+	 */
-+	if (len % DDE_BUFFER_LAST_MULT) {
-+		pr_debug("%s buffer len 0x%x not a multiple of 0x%x\n",
-+			 in ? "input" : "output", len, DDE_BUFFER_LAST_MULT);
-+		if (in)
-+			return -EINVAL;
-+		len = round_down(len, DDE_BUFFER_LAST_MULT);
-+	}
-+
-+	/* use a single direct DDE */
-+	if (len <= LEN_ON_PAGE(pa)) {
-+		ret = setup_direct_dde(dde, pa, len);
-+		WARN_ON(ret < len);
-+		return 0;
-+	}
-+
-+	/* use the DDL */
-+	for (i = 0; i < DDL_LEN_MAX && len > 0; i++) {
-+		ret = setup_direct_dde(&ddl[i], pa, len);
-+		buf += ret;
-+		len -= ret;
-+		pa = nx842_get_pa(buf);
-+	}
-+
-+	if (len > 0) {
-+		pr_debug("0x%x total %s bytes 0x%x too many for DDL.\n",
-+			 total_len, in ? "input" : "output", len);
-+		if (in)
-+			return -EMSGSIZE;
-+		total_len -= len;
-+	}
-+	setup_indirect_dde(dde, ddl, i, total_len);
-+
-+	return 0;
-+}
-+
-+#define CSB_ERR(csb, msg, ...)					\
-+	pr_err("ERROR: " msg " : %02x %02x %02x %02x %08x\n",	\
-+	       ##__VA_ARGS__, (csb)->flags,			\
-+	       (csb)->cs, (csb)->cc, (csb)->ce,			\
-+	       be32_to_cpu((csb)->count))
-+
-+#define CSB_ERR_ADDR(csb, msg, ...)				\
-+	CSB_ERR(csb, msg " at %lx", ##__VA_ARGS__,		\
-+		(unsigned long)be64_to_cpu((csb)->address))
-+
-+/**
-+ * wait_for_csb
-+ */
-+static int wait_for_csb(struct nx842_workmem *wmem,
-+			struct coprocessor_status_block *csb)
-+{
-+	ktime_t start = wmem->start, now = ktime_get();
-+	ktime_t timeout = ktime_add_ms(start, CSB_WAIT_MAX);
-+
-+	while (!(ACCESS_ONCE(csb->flags) & CSB_V)) {
-+		cpu_relax();
-+		now = ktime_get();
-+		if (ktime_after(now, timeout))
-+			break;
-+	}
-+
-+	/* hw has updated csb and output buffer */
-+	barrier();
-+
-+	/* check CSB flags */
-+	if (!(csb->flags & CSB_V)) {
-+		CSB_ERR(csb, "CSB still not valid after %ld us, giving up",
-+			(long)ktime_us_delta(now, start));
-+		return -ETIMEDOUT;
-+	}
-+	if (csb->flags & CSB_F) {
-+		CSB_ERR(csb, "Invalid CSB format");
-+		return -EPROTO;
-+	}
-+	if (csb->flags & CSB_CH) {
-+		CSB_ERR(csb, "Invalid CSB chaining state");
-+		return -EPROTO;
-+	}
-+
-+	/* verify CSB completion sequence is 0 */
-+	if (csb->cs) {
-+		CSB_ERR(csb, "Invalid CSB completion sequence");
-+		return -EPROTO;
-+	}
-+
-+	/* check CSB Completion Code */
-+	switch (csb->cc) {
-+	/* no error */
-+	case CSB_CC_SUCCESS:
-+		break;
-+	case CSB_CC_TPBC_GT_SPBC:
-+		/* not an error, but the compressed data is
-+		 * larger than the uncompressed data :(
-+		 */
-+		break;
-+
-+	/* input data errors */
-+	case CSB_CC_OPERAND_OVERLAP:
-+		/* input and output buffers overlap */
-+		CSB_ERR(csb, "Operand Overlap error");
-+		return -EINVAL;
-+	case CSB_CC_INVALID_OPERAND:
-+		CSB_ERR(csb, "Invalid operand");
-+		return -EINVAL;
-+	case CSB_CC_NOSPC:
-+		/* output buffer too small */
-+		return -ENOSPC;
-+	case CSB_CC_ABORT:
-+		CSB_ERR(csb, "Function aborted");
-+		return -EINTR;
-+	case CSB_CC_CRC_MISMATCH:
-+		CSB_ERR(csb, "CRC mismatch");
-+		return -EINVAL;
-+	case CSB_CC_TEMPL_INVALID:
-+		CSB_ERR(csb, "Compressed data template invalid");
-+		return -EINVAL;
-+	case CSB_CC_TEMPL_OVERFLOW:
-+		CSB_ERR(csb, "Compressed data template shows data past end");
-+		return -EINVAL;
-+
-+	/* these should not happen */
-+	case CSB_CC_INVALID_ALIGN:
-+		/* setup_ddl should have detected this */
-+		CSB_ERR_ADDR(csb, "Invalid alignment");
-+		return -EINVAL;
-+	case CSB_CC_DATA_LENGTH:
-+		/* setup_ddl should have detected this */
-+		CSB_ERR(csb, "Invalid data length");
-+		return -EINVAL;
-+	case CSB_CC_WR_TRANSLATION:
-+	case CSB_CC_TRANSLATION:
-+	case CSB_CC_TRANSLATION_DUP1:
-+	case CSB_CC_TRANSLATION_DUP2:
-+	case CSB_CC_TRANSLATION_DUP3:
-+	case CSB_CC_TRANSLATION_DUP4:
-+	case CSB_CC_TRANSLATION_DUP5:
-+	case CSB_CC_TRANSLATION_DUP6:
-+		/* should not happen, we use physical addrs */
-+		CSB_ERR_ADDR(csb, "Translation error");
-+		return -EPROTO;
-+	case CSB_CC_WR_PROTECTION:
-+	case CSB_CC_PROTECTION:
-+	case CSB_CC_PROTECTION_DUP1:
-+	case CSB_CC_PROTECTION_DUP2:
-+	case CSB_CC_PROTECTION_DUP3:
-+	case CSB_CC_PROTECTION_DUP4:
-+	case CSB_CC_PROTECTION_DUP5:
-+	case CSB_CC_PROTECTION_DUP6:
-+		/* should not happen, we use physical addrs */
-+		CSB_ERR_ADDR(csb, "Protection error");
-+		return -EPROTO;
-+	case CSB_CC_PRIVILEGE:
-+		/* shouldn't happen, we're in HYP mode */
-+		CSB_ERR(csb, "Insufficient Privilege error");
-+		return -EPROTO;
-+	case CSB_CC_EXCESSIVE_DDE:
-+		/* shouldn't happen, setup_ddl doesn't use many dde's */
-+		CSB_ERR(csb, "Too many DDEs in DDL");
-+		return -EINVAL;
-+	case CSB_CC_TRANSPORT:
-+		/* shouldn't happen, we setup CRB correctly */
-+		CSB_ERR(csb, "Invalid CRB");
-+		return -EINVAL;
-+	case CSB_CC_SEGMENTED_DDL:
-+		/* shouldn't happen, setup_ddl creates DDL right */
-+		CSB_ERR(csb, "Segmented DDL error");
-+		return -EINVAL;
-+	case CSB_CC_DDE_OVERFLOW:
-+		/* shouldn't happen, setup_ddl creates DDL right */
-+		CSB_ERR(csb, "DDE overflow error");
-+		return -EINVAL;
-+	case CSB_CC_SESSION:
-+		/* should not happen with ICSWX */
-+		CSB_ERR(csb, "Session violation error");
-+		return -EPROTO;
-+	case CSB_CC_CHAIN:
-+		/* should not happen, we don't use chained CRBs */
-+		CSB_ERR(csb, "Chained CRB error");
-+		return -EPROTO;
-+	case CSB_CC_SEQUENCE:
-+		/* should not happen, we don't use chained CRBs */
-+		CSB_ERR(csb, "CRB seqeunce number error");
-+		return -EPROTO;
-+	case CSB_CC_UNKNOWN_CODE:
-+		CSB_ERR(csb, "Unknown subfunction code");
-+		return -EPROTO;
-+
-+	/* hardware errors */
-+	case CSB_CC_RD_EXTERNAL:
-+	case CSB_CC_RD_EXTERNAL_DUP1:
-+	case CSB_CC_RD_EXTERNAL_DUP2:
-+	case CSB_CC_RD_EXTERNAL_DUP3:
-+		CSB_ERR_ADDR(csb, "Read error outside coprocessor");
-+		return -EPROTO;
-+	case CSB_CC_WR_EXTERNAL:
-+		CSB_ERR_ADDR(csb, "Write error outside coprocessor");
-+		return -EPROTO;
-+	case CSB_CC_INTERNAL:
-+		CSB_ERR(csb, "Internal error in coprocessor");
-+		return -EPROTO;
-+	case CSB_CC_PROVISION:
-+		CSB_ERR(csb, "Storage provision error");
-+		return -EPROTO;
-+	case CSB_CC_HW:
-+		CSB_ERR(csb, "Correctable hardware error");
-+		return -EPROTO;
-+
-+	default:
-+		CSB_ERR(csb, "Invalid CC %d", csb->cc);
-+		return -EPROTO;
-+	}
-+
-+	/* check Completion Extension state */
-+	if (csb->ce & CSB_CE_TERMINATION) {
-+		CSB_ERR(csb, "CSB request was terminated");
-+		return -EPROTO;
-+	}
-+	if (csb->ce & CSB_CE_INCOMPLETE) {
-+		CSB_ERR(csb, "CSB request not complete");
-+		return -EPROTO;
-+	}
-+	if (!(csb->ce & CSB_CE_TPBC)) {
-+		CSB_ERR(csb, "TPBC not provided, unknown target length");
-+		return -EPROTO;
-+	}
-+
-+	/* successful completion */
-+	pr_debug_ratelimited("Processed %u bytes in %lu us\n", csb->count,
-+			     (unsigned long)ktime_us_delta(now, start));
-+
-+	return 0;
-+}
-+
-+/**
-+ * nx842_powernv_function - compress/decompress data using the 842 algorithm
-+ *
-+ * (De)compression provided by the NX842 coprocessor on IBM PowerNV systems.
-+ * This compresses or decompresses the provided input buffer into the provided
-+ * output buffer.
-+ *
-+ * Upon return from this function @outlen contains the length of the
-+ * output data.  If there is an error then @outlen will be 0 and an
-+ * error will be specified by the return code from this function.
-+ *
-+ * The @workmem buffer should only be used by one function call at a time.
-+ *
-+ * @in: input buffer pointer
-+ * @inlen: input buffer size
-+ * @out: output buffer pointer
-+ * @outlenp: output buffer size pointer
-+ * @workmem: working memory buffer pointer, must be at least NX842_MEM_COMPRESS
-+ * @fc: function code, see CCW Function Codes in nx-842.h
-+ *
-+ * Returns:
-+ *   0		Success, output of length @outlenp stored in the buffer at @out
-+ *   -ENODEV	Hardware unavailable
-+ *   -ENOSPC	Output buffer is to small
-+ *   -EMSGSIZE	Input buffer too large
-+ *   -EINVAL	buffer constraints do not fix nx842_constraints
-+ *   -EPROTO	hardware error during operation
-+ *   -ETIMEDOUT	hardware did not complete operation in reasonable time
-+ *   -EINTR	operation was aborted
-+ */
-+static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
-+			unsigned char *out, unsigned int *outlenp,
-+			void *workmem, int fc)
-+{
-+	struct coprocessor_request_block *crb;
-+	struct coprocessor_status_block *csb;
-+	struct nx842_workmem *wmem;
++	struct nx842_driver *driver = get_driver();
 +	int ret;
-+	u64 csb_addr;
-+	u32 ccw;
-+	unsigned int outlen = *outlenp;
 +
-+	wmem = PTR_ALIGN(workmem, WORKMEM_ALIGN);
-+
-+	*outlenp = 0;
-+
-+	/* shoudn't happen, we don't load without a coproc */
-+	if (!nx842_ct) {
-+		pr_err_ratelimited("coprocessor CT is 0");
++	if (!driver)
 +		return -ENODEV;
-+	}
 +
-+	crb = &wmem->crb;
-+	csb = &crb->csb;
++	ret = driver->compress(in, in_len, out, out_len, wrkmem);
 +
-+	/* Clear any previous values */
-+	memset(crb, 0, sizeof(*crb));
-+
-+	/* set up DDLs */
-+	ret = setup_ddl(&crb->source, wmem->ddl_in,
-+			(unsigned char *)in, inlen, true);
-+	if (ret)
-+		return ret;
-+	ret = setup_ddl(&crb->target, wmem->ddl_out,
-+			out, outlen, false);
-+	if (ret)
-+		return ret;
-+
-+	/* set up CCW */
-+	ccw = 0;
-+	ccw = SET_FIELD(ccw, CCW_CT, nx842_ct);
-+	ccw = SET_FIELD(ccw, CCW_CI_842, 0); /* use 0 for hw auto-selection */
-+	ccw = SET_FIELD(ccw, CCW_FC_842, fc);
-+
-+	/* set up CRB's CSB addr */
-+	csb_addr = nx842_get_pa(csb) & CRB_CSB_ADDRESS;
-+	csb_addr |= CRB_CSB_AT; /* Addrs are phys */
-+	crb->csb_addr = cpu_to_be64(csb_addr);
-+
-+	wmem->start = ktime_get();
-+
-+	/* do ICSWX */
-+	ret = icswx(cpu_to_be32(ccw), crb);
-+
-+	pr_debug_ratelimited("icswx CR %x ccw %x crb->ccw %x\n", ret,
-+			     (unsigned int)ccw,
-+			     (unsigned int)be32_to_cpu(crb->ccw));
-+
-+	switch (ret) {
-+	case ICSWX_INITIATED:
-+		ret = wait_for_csb(wmem, csb);
-+		break;
-+	case ICSWX_BUSY:
-+		pr_debug_ratelimited("842 Coprocessor busy\n");
-+		ret = -EBUSY;
-+		break;
-+	case ICSWX_REJECTED:
-+		pr_err_ratelimited("ICSWX rejected\n");
-+		ret = -EPROTO;
-+		break;
-+	default:
-+		pr_err_ratelimited("Invalid ICSWX return code %x\n", ret);
-+		ret = -EPROTO;
-+		break;
-+	}
-+
-+	if (!ret)
-+		*outlenp = be32_to_cpu(csb->count);
++	put_driver(driver);
 +
 +	return ret;
 +}
++EXPORT_SYMBOL_GPL(nx842_compress);
 +
-+/**
-+ * nx842_powernv_compress - Compress data using the 842 algorithm
-+ *
-+ * Compression provided by the NX842 coprocessor on IBM PowerNV systems.
-+ * The input buffer is compressed and the result is stored in the
-+ * provided output buffer.
-+ *
-+ * Upon return from this function @outlen contains the length of the
-+ * compressed data.  If there is an error then @outlen will be 0 and an
-+ * error will be specified by the return code from this function.
-+ *
-+ * @in: input buffer pointer
-+ * @inlen: input buffer size
-+ * @out: output buffer pointer
-+ * @outlenp: output buffer size pointer
-+ * @workmem: working memory buffer pointer, must be at least NX842_MEM_COMPRESS
-+ *
-+ * Returns: see @nx842_powernv_function()
-+ */
-+static int nx842_powernv_compress(const unsigned char *in, unsigned int inlen,
-+		       unsigned char *out, unsigned int *outlenp, void *wmem)
++int nx842_decompress(const unsigned char *in, unsigned int in_len,
++			unsigned char *out, unsigned int *out_len,
++			void *wrkmem)
 +{
-+	return nx842_powernv_function(in, inlen, out, outlenp,
-+				      wmem, CCW_FC_842_COMP_NOCRC);
++	struct nx842_driver *driver = get_driver();
++	int ret;
++
++	if (!driver)
++		return -ENODEV;
++
++	ret = driver->decompress(in, in_len, out, out_len, wrkmem);
++
++	put_driver(driver);
++
++	return ret;
 +}
++EXPORT_SYMBOL_GPL(nx842_decompress);
 +
-+/**
-+ * nx842_powernv_decompress - Decompress data using the 842 algorithm
-+ *
-+ * Decompression provided by the NX842 coprocessor on IBM PowerNV systems.
-+ * The input buffer is decompressed and the result is stored in the
-+ * provided output buffer.
-+ *
-+ * Upon return from this function @outlen contains the length of the
-+ * decompressed data.  If there is an error then @outlen will be 0 and an
-+ * error will be specified by the return code from this function.
-+ *
-+ * @in: input buffer pointer
-+ * @inlen: input buffer size
-+ * @out: output buffer pointer
-+ * @outlenp: output buffer size pointer
-+ * @workmem: working memory buffer pointer, must be at least NX842_MEM_COMPRESS
-+ *
-+ * Returns: see @nx842_powernv_function()
-+ */
-+static int nx842_powernv_decompress(const unsigned char *in, unsigned int inlen,
-+			 unsigned char *out, unsigned int *outlenp, void *wmem)
++static __init int nx842_init(void)
 +{
-+	return nx842_powernv_function(in, inlen, out, outlenp,
-+				      wmem, CCW_FC_842_DECOMP_NOCRC);
-+}
-+
-+static int __init nx842_powernv_probe(struct device_node *dn)
-+{
-+	struct nx842_coproc *coproc;
-+	struct property *ct_prop, *ci_prop;
-+	unsigned int ct, ci;
-+	int chip_id;
-+
-+	chip_id = of_get_ibm_chip_id(dn);
-+	if (chip_id < 0) {
-+		pr_err("ibm,chip-id missing\n");
-+		return -EINVAL;
-+	}
-+	ct_prop = of_find_property(dn, "ibm,842-coprocessor-type", NULL);
-+	if (!ct_prop) {
-+		pr_err("ibm,842-coprocessor-type missing\n");
-+		return -EINVAL;
-+	}
-+	ct = be32_to_cpu(*(unsigned int *)ct_prop->value);
-+	ci_prop = of_find_property(dn, "ibm,842-coprocessor-instance", NULL);
-+	if (!ci_prop) {
-+		pr_err("ibm,842-coprocessor-instance missing\n");
-+		return -EINVAL;
-+	}
-+	ci = be32_to_cpu(*(unsigned int *)ci_prop->value);
-+
-+	coproc = kmalloc(sizeof(*coproc), GFP_KERNEL);
-+	if (!coproc)
-+		return -ENOMEM;
-+
-+	coproc->chip_id = chip_id;
-+	coproc->ct = ct;
-+	coproc->ci = ci;
-+	INIT_LIST_HEAD(&coproc->list);
-+	list_add(&coproc->list, &nx842_coprocs);
-+
-+	pr_info("coprocessor found on chip %d, CT %d CI %d\n", chip_id, ct, ci);
-+
-+	if (!nx842_ct)
-+		nx842_ct = ct;
-+	else if (nx842_ct != ct)
-+		pr_err("NX842 chip %d, CT %d != first found CT %d\n",
-+		       chip_id, ct, nx842_ct);
-+
-+	return 0;
-+}
-+
-+static struct nx842_constraints nx842_powernv_constraints = {
-+	.alignment =	DDE_BUFFER_ALIGN,
-+	.multiple =	DDE_BUFFER_LAST_MULT,
-+	.minimum =	DDE_BUFFER_LAST_MULT,
-+	.maximum =	(DDL_LEN_MAX - 1) * PAGE_SIZE,
-+};
-+
-+static struct nx842_driver nx842_powernv_driver = {
-+	.owner =	THIS_MODULE,
-+	.constraints =	&nx842_powernv_constraints,
-+	.compress =	nx842_powernv_compress,
-+	.decompress =	nx842_powernv_decompress,
-+};
-+
-+static __init int nx842_powernv_init(void)
-+{
-+	struct device_node *dn;
-+
-+	/* verify workmem size/align restrictions */
-+	BUILD_BUG_ON(sizeof(struct nx842_workmem) > NX842_MEM_COMPRESS);
-+	BUILD_BUG_ON(WORKMEM_ALIGN % CRB_ALIGN);
-+	BUILD_BUG_ON(CRB_ALIGN % DDE_ALIGN);
-+	BUILD_BUG_ON(CRB_SIZE % DDE_ALIGN);
-+	/* verify buffer size/align restrictions */
-+	BUILD_BUG_ON(PAGE_SIZE % DDE_BUFFER_ALIGN);
-+	BUILD_BUG_ON(DDE_BUFFER_ALIGN % DDE_BUFFER_SIZE_MULT);
-+	BUILD_BUG_ON(DDE_BUFFER_SIZE_MULT % DDE_BUFFER_LAST_MULT);
-+
 +	pr_info("loading\n");
 +
-+	for_each_compatible_node(dn, NULL, NX842_POWERNV_COMPAT_NAME)
-+		nx842_powernv_probe(dn);
-+
-+	if (!nx842_ct) {
-+		pr_err("no coprocessors found\n");
-+		return -ENODEV;
-+	}
-+
-+	nx842_register_driver(&nx842_powernv_driver);
++	if (of_find_compatible_node(NULL, NULL, NX842_PSERIES_COMPAT_NAME))
++		request_module_nowait(NX842_PSERIES_MODULE_NAME);
++	else
++		pr_err("no nx842 driver found.\n");
 +
 +	pr_info("loaded\n");
 +
 +	return 0;
 +}
-+module_init(nx842_powernv_init);
++module_init(nx842_init);
 +
-+static void __exit nx842_powernv_exit(void)
++static void __exit nx842_exit(void)
 +{
-+	struct nx842_coproc *coproc, *n;
-+
-+	nx842_unregister_driver(&nx842_powernv_driver);
-+
-+	list_for_each_entry_safe(coproc, n, &nx842_coprocs, list) {
-+		list_del(&coproc->list);
-+		kfree(coproc);
-+	}
-+
-+	pr_info("unloaded\n");
++	pr_info("NX842 unloaded\n");
 +}
-+module_exit(nx842_powernv_exit);
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
-index baa2e52..3773e36 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -160,15 +160,6 @@ static inline unsigned long nx842_get_scatterlist_size(
- 	return sl->entry_nr * sizeof(struct nx842_slentry);
- }
- 
--static inline unsigned long nx842_get_pa(void *addr)
--{
--	if (is_vmalloc_addr(addr))
--		return page_to_phys(vmalloc_to_page(addr))
--		       + offset_in_page(addr);
--	else
--		return __pa(addr);
--}
--
- static int nx842_build_scatterlist(unsigned long buf, int len,
- 			struct nx842_scatterlist *sl)
- {
-diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
-index 279a38e..6187bcc 100644
---- a/drivers/crypto/nx/nx-842.c
-+++ b/drivers/crypto/nx/nx-842.c
-@@ -164,7 +164,9 @@ static __init int nx842_init(void)
- {
- 	pr_info("loading\n");
- 
--	if (of_find_compatible_node(NULL, NULL, NX842_PSERIES_COMPAT_NAME))
-+	if (of_find_compatible_node(NULL, NULL, NX842_POWERNV_COMPAT_NAME))
-+		request_module_nowait(NX842_POWERNV_MODULE_NAME);
-+	else if (of_find_compatible_node(NULL, NULL, NX842_PSERIES_COMPAT_NAME))
- 		request_module_nowait(NX842_PSERIES_MODULE_NAME);
- 	else
- 		pr_err("no nx842 driver found.\n");
++module_exit(nx842_exit);
 diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
-index c6ceb0f..84b15b7 100644
---- a/drivers/crypto/nx/nx-842.h
+new file mode 100644
+index 0000000..2a5d4e1
+--- /dev/null
 +++ b/drivers/crypto/nx/nx-842.h
-@@ -5,9 +5,104 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/nx842.h>
-+#include <linux/sw842.h>
- #include <linux/of.h>
- #include <linux/slab.h>
- #include <linux/io.h>
-+#include <linux/mm.h>
-+#include <linux/ratelimit.h>
+@@ -0,0 +1,32 @@
 +
-+/* Restrictions on Data Descriptor List (DDL) and Entry (DDE) buffers
-+ *
-+ * From NX P8 workbook, sec 4.9.1 "842 details"
-+ *   Each DDE buffer is 128 byte aligned
-+ *   Each DDE buffer size is a multiple of 32 bytes (except the last)
-+ *   The last DDE buffer size is a multiple of 8 bytes
-+ */
-+#define DDE_BUFFER_ALIGN	(128)
-+#define DDE_BUFFER_SIZE_MULT	(32)
-+#define DDE_BUFFER_LAST_MULT	(8)
++#ifndef __NX_842_H__
++#define __NX_842_H__
 +
-+/* Arbitrary DDL length limit
-+ * Allows max buffer size of MAX-1 to MAX pages
-+ * (depending on alignment)
-+ */
-+#define DDL_LEN_MAX		(17)
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/nx842.h>
++#include <linux/of.h>
++#include <linux/slab.h>
++#include <linux/io.h>
 +
-+/* CCW 842 CI/FC masks
-+ * NX P8 workbook, section 4.3.1, figure 4-6
-+ * "CI/FC Boundary by NX CT type"
-+ */
-+#define CCW_CI_842		(0x00003ff8)
-+#define CCW_FC_842		(0x00000007)
++struct nx842_driver {
++	struct module *owner;
 +
-+/* CCW Function Codes (FC) for 842
-+ * NX P8 workbook, section 4.9, table 4-28
-+ * "Function Code Definitions for 842 Memory Compression"
-+ */
-+#define CCW_FC_842_COMP_NOCRC	(0)
-+#define CCW_FC_842_COMP_CRC	(1)
-+#define CCW_FC_842_DECOMP_NOCRC	(2)
-+#define CCW_FC_842_DECOMP_CRC	(3)
-+#define CCW_FC_842_MOVE		(4)
++	int (*compress)(const unsigned char *in, unsigned int in_len,
++			unsigned char *out, unsigned int *out_len,
++			void *wrkmem);
++	int (*decompress)(const unsigned char *in, unsigned int in_len,
++			  unsigned char *out, unsigned int *out_len,
++			  void *wrkmem);
++};
 +
-+/* CSB CC Error Types for 842
-+ * NX P8 workbook, section 4.10.3, table 4-30
-+ * "Reported Error Types Summary Table"
-+ */
-+/* These are all duplicates of existing codes defined in icswx.h. */
-+#define CSB_CC_TRANSLATION_DUP1	(80)
-+#define CSB_CC_TRANSLATION_DUP2	(82)
-+#define CSB_CC_TRANSLATION_DUP3	(84)
-+#define CSB_CC_TRANSLATION_DUP4	(86)
-+#define CSB_CC_TRANSLATION_DUP5	(92)
-+#define CSB_CC_TRANSLATION_DUP6	(94)
-+#define CSB_CC_PROTECTION_DUP1	(81)
-+#define CSB_CC_PROTECTION_DUP2	(83)
-+#define CSB_CC_PROTECTION_DUP3	(85)
-+#define CSB_CC_PROTECTION_DUP4	(87)
-+#define CSB_CC_PROTECTION_DUP5	(93)
-+#define CSB_CC_PROTECTION_DUP6	(95)
-+#define CSB_CC_RD_EXTERNAL_DUP1	(89)
-+#define CSB_CC_RD_EXTERNAL_DUP2	(90)
-+#define CSB_CC_RD_EXTERNAL_DUP3	(91)
-+/* These are specific to NX */
-+/* 842 codes */
-+#define CSB_CC_TPBC_GT_SPBC	(64) /* no error, but >1 comp ratio */
-+#define CSB_CC_CRC_MISMATCH	(65) /* decomp crc mismatch */
-+#define CSB_CC_TEMPL_INVALID	(66) /* decomp invalid template value */
-+#define CSB_CC_TEMPL_OVERFLOW	(67) /* decomp template shows data after end */
-+/* sym crypt codes */
-+#define CSB_CC_DECRYPT_OVERFLOW	(64)
-+/* asym crypt codes */
-+#define CSB_CC_MINV_OVERFLOW	(128)
-+/* These are reserved for hypervisor use */
-+#define CSB_CC_HYP_RESERVE_START	(240)
-+#define CSB_CC_HYP_RESERVE_END		(253)
-+#define CSB_CC_HYP_NO_HW		(254)
-+#define CSB_CC_HYP_HANG_ABORTED		(255)
++void nx842_register_driver(struct nx842_driver *driver);
++void nx842_unregister_driver(struct nx842_driver *driver);
 +
-+/* CCB Completion Modes (CM) for 842
-+ * NX P8 workbook, section 4.3, figure 4-5
-+ * "CRB Details - Normal Cop_Req (CL=00, C=1)"
-+ */
-+#define CCB_CM_EXTRA_WRITE	(CCB_CM0_ALL_COMPLETIONS & CCB_CM12_STORE)
-+#define CCB_CM_INTERRUPT	(CCB_CM0_ALL_COMPLETIONS & CCB_CM12_INTERRUPT)
 +
-+#define LEN_ON_PAGE(pa)		(PAGE_SIZE - ((pa) & ~PAGE_MASK))
++/* To allow the main nx-compress module to load platform module */
++#define NX842_PSERIES_MODULE_NAME	"nx-compress-pseries"
++#define NX842_PSERIES_COMPAT_NAME	"ibm,compression"
 +
-+static inline unsigned long nx842_get_pa(void *addr)
-+{
-+	if (!is_vmalloc_addr(addr))
-+		return __pa(addr);
 +
-+	return page_to_phys(vmalloc_to_page(addr)) + offset_in_page(addr);
-+}
-+
-+/* Get/Set bit fields */
-+#define MASK_LSH(m)		(__builtin_ffsl(m) - 1)
-+#define GET_FIELD(v, m)		(((v) & (m)) >> MASK_LSH(m))
-+#define SET_FIELD(v, m, val)	(((v) & ~(m)) | (((val) << MASK_LSH(m)) & (m)))
- 
- struct nx842_driver {
- 	struct module *owner;
-@@ -27,6 +122,8 @@ void nx842_unregister_driver(struct nx842_driver *driver);
- 
- 
- /* To allow the main nx-compress module to load platform module */
-+#define NX842_POWERNV_MODULE_NAME	"nx-compress-powernv"
-+#define NX842_POWERNV_COMPAT_NAME	"ibm,power-nx"
- #define NX842_PSERIES_MODULE_NAME	"nx-compress-pseries"
- #define NX842_PSERIES_COMPAT_NAME	"ibm,compression"
- 
++#endif /* __NX_842_H__ */
 diff --git a/include/linux/nx842.h b/include/linux/nx842.h
-index 883b474..966d4d5 100644
+index a4d324c..778e3ab 100644
 --- a/include/linux/nx842.h
 +++ b/include/linux/nx842.h
-@@ -1,9 +1,11 @@
+@@ -1,8 +1,10 @@
  #ifndef __NX842_H__
  #define __NX842_H__
  
--#define __NX842_PSERIES_MEM_COMPRESS	(PAGE_SIZE * 2 + 10240)
-+#define __NX842_PSERIES_MEM_COMPRESS	(10240)
-+#define __NX842_POWERNV_MEM_COMPRESS	(1024)
- 
--#define NX842_MEM_COMPRESS	__NX842_PSERIES_MEM_COMPRESS
-+#define NX842_MEM_COMPRESS	(max_t(unsigned int,			\
-+	__NX842_PSERIES_MEM_COMPRESS, __NX842_POWERNV_MEM_COMPRESS))
- 
- struct nx842_constraints {
- 	int alignment;
+-int nx842_get_workmem_size(void);
+-int nx842_get_workmem_size_aligned(void);
++#define __NX842_PSERIES_MEM_COMPRESS	(PAGE_SIZE * 2 + 10240)
++
++#define NX842_MEM_COMPRESS	__NX842_PSERIES_MEM_COMPRESS
++
+ int nx842_compress(const unsigned char *in, unsigned int in_len,
+ 		unsigned char *out, unsigned int *out_len, void *wrkmem);
+ int nx842_decompress(const unsigned char *in, unsigned int in_len,
 -- 
 2.1.0
