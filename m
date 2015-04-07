@@ -1,7 +1,7 @@
 From: Leilei Zhao <leilei.zhao@atmel.com>
-Subject: [PATCH 06/10] crypto: atmel-sha: correct the max burst size
-Date: Tue, 7 Apr 2015 17:45:07 +0800
-Message-ID: <1428399911-23325-7-git-send-email-leilei.zhao@atmel.com>
+Subject: [PATCH 05/10] crypto: atmel-sha: initialize spinlock in probe
+Date: Tue, 7 Apr 2015 17:45:06 +0800
+Message-ID: <1428399911-23325-6-git-send-email-leilei.zhao@atmel.com>
 References: <1428399911-23325-1-git-send-email-leilei.zhao@atmel.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -15,43 +15,28 @@ In-Reply-To: <1428399911-23325-1-git-send-email-leilei.zhao@atmel.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The maximum source and destination burst size is 16
-according to the datasheet of Atmel DMA. And the value
-is also checked in function at_xdmac_csize of Atmel
-DMA driver. With the restrict, the value beyond maximum
-value will not be processed in DMA driver, so SHA384 and
-SHA512 will not work and the program will wait forever.
-
-So here change the max burst size of all the cases to 16
-in order to make SHA384 and SHA512 work and keep consistent
-with DMA driver and datasheet.
+Kernel will report "BUG: spinlock lockup suspected on CPU#0"
+when CONFIG_DEBUG_SPINLOCK is enabled in kernel config and the
+spinlock is used at the first time. It's caused by uninitialized
+spinlock, so just initialize it in probe.
 
 Signed-off-by: Leilei Zhao <leilei.zhao@atmel.com>
 Acked-by: Nicolas Ferre <nicolas.ferre@atmel.com>
 ---
- drivers/crypto/atmel-sha.c |   10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ drivers/crypto/atmel-sha.c |    1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 6430f6a..99a632c 100644
+index 9fb8af1..6430f6a 100644
 --- a/drivers/crypto/atmel-sha.c
 +++ b/drivers/crypto/atmel-sha.c
-@@ -432,14 +432,8 @@ static int atmel_sha_xmit_dma(struct atmel_sha_dev *dd, dma_addr_t dma_addr1,
- 	dev_dbg(dd->dev, "xmit_dma: digcnt: 0x%llx 0x%llx, length: %d, final: %d\n",
- 		ctx->digcnt[1], ctx->digcnt[0], length1, final);
+@@ -1367,6 +1367,7 @@ static int atmel_sha_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, sha_dd);
  
--	if (ctx->flags & (SHA_FLAGS_SHA1 | SHA_FLAGS_SHA224 |
--			SHA_FLAGS_SHA256)) {
--		dd->dma_lch_in.dma_conf.src_maxburst = 16;
--		dd->dma_lch_in.dma_conf.dst_maxburst = 16;
--	} else {
--		dd->dma_lch_in.dma_conf.src_maxburst = 32;
--		dd->dma_lch_in.dma_conf.dst_maxburst = 32;
--	}
-+	dd->dma_lch_in.dma_conf.src_maxburst = 16;
-+	dd->dma_lch_in.dma_conf.dst_maxburst = 16;
+ 	INIT_LIST_HEAD(&sha_dd->list);
++	spin_lock_init(&sha_dd->lock);
  
- 	dmaengine_slave_config(dd->dma_lch_in.chan, &dd->dma_lch_in.dma_conf);
- 
+ 	tasklet_init(&sha_dd->done_task, atmel_sha_done_task,
+ 					(unsigned long)sha_dd);
 -- 
 1.7.9.5
