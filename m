@@ -1,1029 +1,1004 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 08/11] drivers/crypto/nx: simplify pSeries nx842 driver
-Date: Tue,  7 Apr 2015 13:34:27 -0400
-Message-ID: <1428428070-17803-9-git-send-email-ddstreet@ieee.org>
+Subject: [PATCH 11/11] crypto: add crypto compression sefltest
+Date: Tue,  7 Apr 2015 13:34:30 -0400
+Message-ID: <1428428070-17803-12-git-send-email-ddstreet@ieee.org>
 References: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
 Cc: Seth Jennings <sjennings@variantweb.net>,
-	Robert Jennings <rob@pochix.net>,
-	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
-	Fionnuala Gunter <fin@linux.vnet.ibm.com>,
-	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org, Dan Streetman <ddstreet@ieee.org>
+	Robert Jennings <rob@pochix.net>, linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+	Dan Streetman <ddstreet@ieee.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Michael Ellerman <mpe@ellerman.id.au>,
 	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
 	Paul Mackerras <paulus@samba.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f176.google.com ([209.85.223.176]:34440 "EHLO
-	mail-ie0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753580AbbDGRf3 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 7 Apr 2015 13:35:29 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Simplify the pSeries NX-842 driver: do not expect incoming buffers to be
-exactly page-sized; do not break up input buffers to compress smaller blocks;
-do not use any internal headers in the compressed data blocks; remove the
-software decompression implementation.
+Add configurable module to perform self-tests on any crypto compression
+driver.
 
-This changes the pSeries NX-842 driver to perform constraints-based compression
-so that it only needs to compress one entire input block at a time.  This
-removes the need for it to split input data blocks into multiple compressed
-data sections in the output buffer, and removes the need for any extra header
-info in the compressed data; all that is moved (in a later patch) into the
-main crypto 842 driver.  Additionally, the 842 software decompression
-implementation is no longer needed here, and the crypto 842 driver will use
-the generic software 842 decompression function as a fallback if any hardware
-842 driver fails.
+This allows testing any crypto compression driver with any input buffer,
+at varying alignments and lengths.  It calculates the average bytes per
+second compression and decompression rates.  Any errors reported by the
+compressor during compression or decompression will end the test and
+be logged.
 
 Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- drivers/crypto/nx/nx-842-pseries.c | 779 ++++++++-----------------------------
- 1 file changed, 153 insertions(+), 626 deletions(-)
+ crypto/Kconfig         |   9 +
+ crypto/Makefile        |   1 +
+ crypto/comp_selftest.c | 928 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 938 insertions(+)
+ create mode 100644 crypto/comp_selftest.c
 
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
-index 3773e36..0b7bad3 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -21,7 +21,6 @@
-  *          Seth Jennings <sjenning@linux.vnet.ibm.com>
-  */
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index a7148ff..e56ecf2 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -189,6 +189,15 @@ config CRYPTO_TEST
+ 	help
+ 	  Quick & dirty crypto test module.
  
--#include <asm/page.h>
- #include <asm/vio.h>
- 
- #include "nx-842.h"
-@@ -32,11 +31,6 @@ MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Robert Jennings <rcj@linux.vnet.ibm.com>");
- MODULE_DESCRIPTION("842 H/W Compression driver for IBM Power processors");
- 
--#define SHIFT_4K 12
--#define SHIFT_64K 16
--#define SIZE_4K (1UL << SHIFT_4K)
--#define SIZE_64K (1UL << SHIFT_64K)
--
- /* IO buffer must be 128 byte aligned */
- #define IO_BUFFER_ALIGN 128
- 
-@@ -47,18 +41,52 @@ static struct nx842_constraints nx842_pseries_constraints = {
- 	.maximum =	PAGE_SIZE, /* dynamic, max_sync_size */
- };
- 
--struct nx842_header {
--	int blocks_nr; /* number of compressed blocks */
--	int offset; /* offset of the first block (from beginning of header) */
--	int sizes[0]; /* size of compressed blocks */
--};
--
--static inline int nx842_header_size(const struct nx842_header *hdr)
-+static int check_constraints(unsigned long buf, unsigned int *len, bool in)
- {
--	return sizeof(struct nx842_header) +
--			hdr->blocks_nr * sizeof(hdr->sizes[0]);
-+	if (!IS_ALIGNED(buf, nx842_pseries_constraints.alignment)) {
-+		pr_debug("%s buffer 0x%lx not aligned to 0x%x\n",
-+			 in ? "input" : "output", buf,
-+			 nx842_pseries_constraints.alignment);
++config CRYPTO_COMP_SELFTEST
++	tristate "Compression Self-Testing module"
++	help
++	  Configurable Compression Self-Testing using debugfs interface.
++	  This allows you to compress and decompress buffers of variable
++	  offsets, lengths, and data, using different compressors.  Also
++	  the average bytes per second rate for compression/decompression
++	  can be calculated.
++
+ config CRYPTO_ABLK_HELPER
+ 	tristate
+ 	select CRYPTO_CRYPTD
+diff --git a/crypto/Makefile b/crypto/Makefile
+index ba19465..0bb1ac2 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -95,6 +95,7 @@ obj-$(CONFIG_CRYPTO_RNG2) += krng.o
+ obj-$(CONFIG_CRYPTO_ANSI_CPRNG) += ansi_cprng.o
+ obj-$(CONFIG_CRYPTO_DRBG) += drbg.o
+ obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
++obj-$(CONFIG_CRYPTO_COMP_SELFTEST) += comp_selftest.o
+ obj-$(CONFIG_CRYPTO_GHASH) += ghash-generic.o
+ obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
+ obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
+diff --git a/crypto/comp_selftest.c b/crypto/comp_selftest.c
+new file mode 100644
+index 0000000..691a8ea
+--- /dev/null
++++ b/crypto/comp_selftest.c
+@@ -0,0 +1,928 @@
++/*
++ * Self-test for compression
++ *
++ * Copyright (C) 2015 Dan Streetman, IBM Corp
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#include <linux/module.h>
++#include <linux/kthread.h>
++#include <linux/debugfs.h>
++#include <linux/uaccess.h>
++#include <linux/crypto.h>
++#include <linux/rwsem.h>
++#include <linux/ratelimit.h>
++
++#define MODULE_NAME "comp_selftest"
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Dan Streetman <ddstreet@ieee.org>");
++MODULE_DESCRIPTION("Crypto Compression Self-Test");
++
++static unsigned int test_kthreads_max = 64;
++module_param_named(threads_max, test_kthreads_max, uint, 0444);
++
++static unsigned int test_buffer_order = 2;
++module_param_named(buffer_order, test_buffer_order, uint, 0444);
++
++#define TEST_KTHREADS_DEFAULT	(4)
++
++#define TEST_REPEAT_DEFAULT	(1)
++
++#define TEST_BPS_WINDOW_DEFAULT	(1)
++
++#define TEST_BUFFER_SIZE	(PAGE_SIZE << test_buffer_order)
++
++#define TEST_CHECK_INTERVAL	(msecs_to_jiffies(500))
++
++#define OFFSET_START_DEFAULT	(0)
++#define OFFSET_END_DEFAULT	OFFSET_START_DEFAULT
++#define OFFSET_INTERVAL_DEFAULT	(1)
++#define LENGTH_START_DEFAULT	(PAGE_SIZE)
++#define LENGTH_END_DEFAULT	LENGTH_START_DEFAULT
++#define LENGTH_INTERVAL_DEFAULT	(1)
++
++struct test_range {
++	u32 start, interval, end;
++};
++
++struct test_param {
++	u32 running;
++	u32 repeat;
++	u32 kthreads;
++	u32 bps_window; /* in seconds */
++	struct test_range offset[3];
++	struct test_range length[3];
++};
++
++struct test_kthread_param {
++	bool running;
++	struct task_struct *kthread;
++	struct crypto_comp *tfm;
++	u8 *buffer[3];
++	u32 offset[3];
++	u32 length[3];
++	atomic64_t bps[2];
++};
++
++static struct test_kthread_param *test_kthread_params;
++
++static struct task_struct *test_kthread;
++static int test_return;
++static u8 *test_buffer;
++
++static atomic64_t test_max_bps[2];
++
++#define TEST_TFM_NAME_MAX	(32)
++static char test_tfm[TEST_TFM_NAME_MAX];
++
++static struct test_param test_params, test_new_params;
++
++static DECLARE_RWSEM(test_lock);
++
++
++static unsigned long total_bps(int i)
++{
++	unsigned long total = 0;
++	int j;
++
++	for (j = 0; j < test_kthreads_max; j++)
++		total += atomic64_read(&test_kthread_params[j].bps[i]);
++
++	return total;
++}
++
++static void update_max_bps(int i)
++{
++	uint64_t prev, t;
++
++	t = total_bps(i);
++	prev = atomic64_read(&test_max_bps[i]);
++	while (t > prev) {
++		uint64_t a = atomic64_cmpxchg(&test_max_bps[i], prev, t);
++
++		if (prev == a)
++			break;
++		prev = a;
++	}
++}
++
++#define NS_PER_S	(1000000000)
++
++static void update_bps(struct test_kthread_param *p,
++		       int i, u64 bytes, ktime_t start)
++{
++	u64 ns = ktime_to_ns(ktime_sub(ktime_get(), start));
++	u64 bps = atomic64_read(&p->bps[i]);
++	u64 window_ns = NS_PER_S * test_params.bps_window;
++	u64 window_bytes = bps * test_params.bps_window;
++	s64 a, b, delta;
++
++	a = window_ns * bytes;
++	b = ns * window_bytes;
++
++	delta = (s64)(a - b) / (s64)(window_ns + ns);
++
++	window_bytes += delta;
++
++	atomic64_set(&p->bps[i], window_bytes / test_params.bps_window);
++
++	update_max_bps(i);
++}
++
++static void reset_bps(void)
++{
++	int i;
++
++	for (i = 0; i < test_kthreads_max; i++) {
++		atomic64_set(&test_kthread_params[i].bps[0], 0);
++		atomic64_set(&test_kthread_params[i].bps[1], 0);
++	}
++
++	atomic64_set(&test_max_bps[0], 0);
++	atomic64_set(&test_max_bps[1], 0);
++}
++
++static int test_compare(struct test_kthread_param *p, unsigned int clen)
++{
++	u8 *a = &p->buffer[0][p->offset[0]];
++	u8 *c = &p->buffer[2][p->offset[2]];
++	unsigned int alen = p->length[0];
++
++	if (alen != clen) {
++		pr_err("buffer length mismatch, alen 0x%x clen 0x%x\n",
++		      alen, clen);
 +		return -EINVAL;
 +	}
-+	if (*len % nx842_pseries_constraints.multiple) {
-+		pr_debug("%s buffer len 0x%x not multiple of 0x%x\n",
-+			 in ? "input" : "output", *len,
-+			 nx842_pseries_constraints.multiple);
-+		if (in)
-+			return -EINVAL;
-+		*len = round_down(*len, nx842_pseries_constraints.multiple);
-+	}
-+	if (*len < nx842_pseries_constraints.minimum) {
-+		pr_debug("%s buffer len 0x%x under minimum 0x%x\n",
-+			 in ? "input" : "output", *len,
-+			 nx842_pseries_constraints.minimum);
++
++	if (memcmp(a, c, alen)) {
++		pr_err("buffer data mismatch\n");
 +		return -EINVAL;
 +	}
-+	if (*len > nx842_pseries_constraints.maximum) {
-+		pr_debug("%s buffer len 0x%x over maximum 0x%x\n",
-+			 in ? "input" : "output", *len,
-+			 nx842_pseries_constraints.maximum);
-+		if (in)
-+			return -EINVAL;
-+		*len = nx842_pseries_constraints.maximum;
-+	}
++
 +	return 0;
- }
- 
-+/* I assume we need to align the CSB? */
-+#define WORKMEM_ALIGN	(256)
++}
 +
-+struct nx842_workmem {
-+	/* scatterlist */
-+	char slin[4096];
-+	char slout[4096];
-+	/* coprocessor status/parameter block */
-+	struct nx_csbcpb csbcpb;
++static int __test_decompress(struct test_kthread_param *p, unsigned int blen)
++{
++	u8 *b = &p->buffer[1][p->offset[1]];
++	u8 *c = &p->buffer[2][p->offset[2]];
++	unsigned int clen = p->length[2];
++	ktime_t start = ktime_get();
++	int ret;
 +
-+	char padding[WORKMEM_ALIGN];
-+} __packed __aligned(WORKMEM_ALIGN);
-+
- /* Macros for fields within nx_csbcpb */
- /* Check the valid bit within the csbcpb valid field */
- #define NX842_CSBCBP_VALID_CHK(x) (x & BIT_MASK(7))
-@@ -72,8 +100,7 @@ static inline int nx842_header_size(const struct nx842_header *hdr)
- #define NX842_CSBCPB_CE2(x)	(x & BIT_MASK(5))
- 
- /* The NX unit accepts data only on 4K page boundaries */
--#define NX842_HW_PAGE_SHIFT	SHIFT_4K
--#define NX842_HW_PAGE_SIZE	(ASM_CONST(1) << NX842_HW_PAGE_SHIFT)
-+#define NX842_HW_PAGE_SIZE	(4096)
- #define NX842_HW_PAGE_MASK	(~(NX842_HW_PAGE_SIZE-1))
- 
- enum nx842_status {
-@@ -194,41 +221,6 @@ static int nx842_build_scatterlist(unsigned long buf, int len,
- 	return 0;
- }
- 
--/*
-- * Working memory for software decompression
-- */
--struct sw842_fifo {
--	union {
--		char f8[256][8];
--		char f4[512][4];
--	};
--	char f2[256][2];
--	unsigned char f84_full;
--	unsigned char f2_full;
--	unsigned char f8_count;
--	unsigned char f2_count;
--	unsigned int f4_count;
--};
--
--/*
-- * Working memory for crypto API
-- */
--struct nx842_workmem {
--	char bounce[PAGE_SIZE]; /* bounce buffer for decompression input */
--	union {
--		/* hardware working memory */
--		struct {
--			/* scatterlist */
--			char slin[SIZE_4K];
--			char slout[SIZE_4K];
--			/* coprocessor status/parameter block */
--			struct nx_csbcpb csbcpb;
--		};
--		/* software working memory */
--		struct sw842_fifo swfifo; /* software decompression fifo */
--	};
--};
--
- static int nx842_validate_result(struct device *dev,
- 	struct cop_status_block *csb)
- {
-@@ -291,8 +283,8 @@ static int nx842_validate_result(struct device *dev,
-  * compressed data.  If there is an error then @outlen will be 0 and an
-  * error will be specified by the return code from this function.
-  *
-- * @in: Pointer to input buffer, must be page aligned
-- * @inlen: Length of input buffer, must be PAGE_SIZE
-+ * @in: Pointer to input buffer
-+ * @inlen: Length of input buffer
-  * @out: Pointer to output buffer
-  * @outlen: Length of output buffer
-  * @wrkmem: ptr to buffer for working memory, size determined by
-@@ -302,36 +294,32 @@ static int nx842_validate_result(struct device *dev,
-  *   0		Success, output of length @outlen stored in the buffer at @out
-  *   -ENOMEM	Unable to allocate internal buffers
-  *   -ENOSPC	Output buffer is to small
-- *   -EMSGSIZE	XXX Difficult to describe this limitation
-  *   -EIO	Internal error
-  *   -ENODEV	Hardware unavailable
-  */
- static int nx842_pseries_compress(const unsigned char *in, unsigned int inlen,
- 		       unsigned char *out, unsigned int *outlen, void *wmem)
- {
--	struct nx842_header *hdr;
- 	struct nx842_devdata *local_devdata;
- 	struct device *dev = NULL;
- 	struct nx842_workmem *workmem;
- 	struct nx842_scatterlist slin, slout;
- 	struct nx_csbcpb *csbcpb;
--	int ret = 0, max_sync_size, i, bytesleft, size, hdrsize;
--	unsigned long inbuf, outbuf, padding;
-+	int ret = 0, max_sync_size;
-+	unsigned long inbuf, outbuf;
- 	struct vio_pfo_op op = {
- 		.done = NULL,
- 		.handle = 0,
- 		.timeout = 0,
- 	};
--	unsigned long start_time = get_tb();
-+	unsigned long start = get_tb();
- 
--	/*
--	 * Make sure input buffer is 64k page aligned.  This is assumed since
--	 * this driver is designed for page compression only (for now).  This
--	 * is very nice since we can now use direct DDE(s) for the input and
--	 * the alignment is guaranteed.
--	*/
- 	inbuf = (unsigned long)in;
--	if (!IS_ALIGNED(inbuf, PAGE_SIZE) || inlen != PAGE_SIZE)
-+	if (check_constraints(inbuf, &inlen, true))
-+		return -EINVAL;
-+
-+	outbuf = (unsigned long)out;
-+	if (check_constraints(outbuf, outlen, false))
- 		return -EINVAL;
- 
- 	rcu_read_lock();
-@@ -343,16 +331,8 @@ static int nx842_pseries_compress(const unsigned char *in, unsigned int inlen,
- 	max_sync_size = local_devdata->max_sync_size;
- 	dev = local_devdata->dev;
- 
--	/* Create the header */
--	hdr = (struct nx842_header *)out;
--	hdr->blocks_nr = PAGE_SIZE / max_sync_size;
--	hdrsize = nx842_header_size(hdr);
--	outbuf = (unsigned long)out + hdrsize;
--	bytesleft = *outlen - hdrsize;
--
- 	/* Init scatterlist */
--	workmem = (struct nx842_workmem *)ALIGN((unsigned long)wmem,
--		NX842_HW_PAGE_SIZE);
-+	workmem = PTR_ALIGN(wmem, WORKMEM_ALIGN);
- 	slin.entries = (struct nx842_slentry *)workmem->slin;
- 	slout.entries = (struct nx842_slentry *)workmem->slout;
- 
-@@ -363,105 +343,48 @@ static int nx842_pseries_compress(const unsigned char *in, unsigned int inlen,
- 	op.csbcpb = nx842_get_pa(csbcpb);
- 	op.out = nx842_get_pa(slout.entries);
- 
--	for (i = 0; i < hdr->blocks_nr; i++) {
--		/*
--		 * Aligning the output blocks to 128 bytes does waste space,
--		 * but it prevents the need for bounce buffers and memory
--		 * copies.  It also simplifies the code a lot.  In the worst
--		 * case (64k page, 4k max_sync_size), you lose up to
--		 * (128*16)/64k = ~3% the compression factor. For 64k
--		 * max_sync_size, the loss would be at most 128/64k = ~0.2%.
--		 */
--		padding = ALIGN(outbuf, IO_BUFFER_ALIGN) - outbuf;
--		outbuf += padding;
--		bytesleft -= padding;
--		if (i == 0)
--			/* save offset into first block in header */
--			hdr->offset = padding + hdrsize;
--
--		if (bytesleft <= 0) {
--			ret = -ENOSPC;
--			goto unlock;
--		}
--
--		/*
--		 * NOTE: If the default max_sync_size is changed from 4k
--		 * to 64k, remove the "likely" case below, since a
--		 * scatterlist will always be needed.
--		 */
--		if (likely(max_sync_size == NX842_HW_PAGE_SIZE)) {
--			/* Create direct DDE */
--			op.in = nx842_get_pa((void *)inbuf);
--			op.inlen = max_sync_size;
--
--		} else {
--			/* Create indirect DDE (scatterlist) */
--			nx842_build_scatterlist(inbuf, max_sync_size, &slin);
--			op.in = nx842_get_pa(slin.entries);
--			op.inlen = -nx842_get_scatterlist_size(&slin);
--		}
-+	if ((inbuf & NX842_HW_PAGE_MASK) ==
-+	    ((inbuf + inlen - 1) & NX842_HW_PAGE_MASK)) {
-+		/* Create direct DDE */
-+		op.in = nx842_get_pa((void *)inbuf);
-+		op.inlen = inlen;
-+	} else {
-+		/* Create indirect DDE (scatterlist) */
-+		nx842_build_scatterlist(inbuf, inlen, &slin);
-+		op.in = nx842_get_pa(slin.entries);
-+		op.inlen = -nx842_get_scatterlist_size(&slin);
-+	}
- 
--		/*
--		 * If max_sync_size != NX842_HW_PAGE_SIZE, an indirect
--		 * DDE is required for the outbuf.
--		 * If max_sync_size == NX842_HW_PAGE_SIZE, outbuf must
--		 * also be page aligned (1 in 128/4k=32 chance) in order
--		 * to use a direct DDE.
--		 * This is unlikely, just use an indirect DDE always.
--		 */
--		nx842_build_scatterlist(outbuf,
--			min(bytesleft, max_sync_size), &slout);
--		/* op.out set before loop */
-+	if ((outbuf & NX842_HW_PAGE_MASK) ==
-+	    ((outbuf + *outlen - 1) & NX842_HW_PAGE_MASK)) {
-+		/* Create direct DDE */
-+		op.out = nx842_get_pa((void *)outbuf);
-+		op.outlen = *outlen;
-+	} else {
-+		/* Create indirect DDE (scatterlist) */
-+		nx842_build_scatterlist(outbuf, *outlen, &slout);
-+		op.out = nx842_get_pa(slout.entries);
- 		op.outlen = -nx842_get_scatterlist_size(&slout);
-+	}
- 
--		/* Send request to pHyp */
--		ret = vio_h_cop_sync(local_devdata->vdev, &op);
--
--		/* Check for pHyp error */
--		if (ret) {
--			dev_dbg(dev, "%s: vio_h_cop_sync error (ret=%d, hret=%ld)\n",
--				__func__, ret, op.hcall_err);
--			ret = -EIO;
--			goto unlock;
--		}
--
--		/* Check for hardware error */
--		ret = nx842_validate_result(dev, &csbcpb->csb);
--		if (ret && ret != -ENOSPC)
--			goto unlock;
--
--		/* Handle incompressible data */
--		if (unlikely(ret == -ENOSPC)) {
--			if (bytesleft < max_sync_size) {
--				/*
--				 * Not enough space left in the output buffer
--				 * to store uncompressed block
--				 */
--				goto unlock;
--			} else {
--				/* Store incompressible block */
--				memcpy((void *)outbuf, (void *)inbuf,
--					max_sync_size);
--				hdr->sizes[i] = -max_sync_size;
--				outbuf += max_sync_size;
--				bytesleft -= max_sync_size;
--				/* Reset ret, incompressible data handled */
--				ret = 0;
--			}
--		} else {
--			/* Normal case, compression was successful */
--			size = csbcpb->csb.processed_byte_count;
--			dev_dbg(dev, "%s: processed_bytes=%d\n",
--				__func__, size);
--			hdr->sizes[i] = size;
--			outbuf += size;
--			bytesleft -= size;
--		}
-+	/* Send request to pHyp */
-+	ret = vio_h_cop_sync(local_devdata->vdev, &op);
- 
--		inbuf += max_sync_size;
-+	/* Check for pHyp error */
-+	if (ret) {
-+		dev_dbg(dev, "%s: vio_h_cop_sync error (ret=%d, hret=%ld)\n",
-+			__func__, ret, op.hcall_err);
-+		ret = -EIO;
-+		goto unlock;
- 	}
- 
--	*outlen = (unsigned int)(outbuf - (unsigned long)out);
-+	/* Check for hardware error */
-+	ret = nx842_validate_result(dev, &csbcpb->csb);
++	ret = crypto_comp_decompress(p->tfm, b, blen, c, &clen);
 +	if (ret)
-+		goto unlock;
++		return ret;
 +
-+	*outlen = csbcpb->csb.processed_byte_count;
-+	dev_dbg(dev, "%s: processed_bytes=%d\n", __func__, *outlen);
- 
- unlock:
- 	if (ret)
-@@ -469,15 +392,12 @@ unlock:
- 	else {
- 		nx842_inc_comp_complete(local_devdata);
- 		ibm_nx842_incr_hist(local_devdata->counters->comp_times,
--			(get_tb() - start_time) / tb_ticks_per_usec);
-+			(get_tb() - start) / tb_ticks_per_usec);
- 	}
- 	rcu_read_unlock();
- 	return ret;
- }
- 
--static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
--			const void *);
--
- /**
-  * nx842_pseries_decompress - Decompress data using the 842 algorithm
-  *
-@@ -489,11 +409,10 @@ static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
-  * If there is an error then @outlen will be 0 and an error will be
-  * specified by the return code from this function.
-  *
-- * @in: Pointer to input buffer, will use bounce buffer if not 128 byte
-- *      aligned
-+ * @in: Pointer to input buffer
-  * @inlen: Length of input buffer
-- * @out: Pointer to output buffer, must be page aligned
-- * @outlen: Length of output buffer, must be PAGE_SIZE
-+ * @out: Pointer to output buffer
-+ * @outlen: Length of output buffer
-  * @wrkmem: ptr to buffer for working memory, size determined by
-  *          NX842_MEM_COMPRESS
-  *
-@@ -508,43 +427,39 @@ static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
- static int nx842_pseries_decompress(const unsigned char *in, unsigned int inlen,
- 			 unsigned char *out, unsigned int *outlen, void *wmem)
- {
--	struct nx842_header *hdr;
- 	struct nx842_devdata *local_devdata;
- 	struct device *dev = NULL;
- 	struct nx842_workmem *workmem;
- 	struct nx842_scatterlist slin, slout;
- 	struct nx_csbcpb *csbcpb;
--	int ret = 0, i, size, max_sync_size;
-+	int ret = 0, max_sync_size;
- 	unsigned long inbuf, outbuf;
- 	struct vio_pfo_op op = {
- 		.done = NULL,
- 		.handle = 0,
- 		.timeout = 0,
- 	};
--	unsigned long start_time = get_tb();
-+	unsigned long start = get_tb();
- 
- 	/* Ensure page alignment and size */
-+	inbuf = (unsigned long)in;
-+	if (check_constraints(inbuf, &inlen, true))
++	update_bps(p, 1, clen, start);
++
++	return test_compare(p, clen);
++}
++
++static int test_decompress(struct test_kthread_param *p, unsigned int blen)
++{
++	struct test_range *off, *len;
++	u32 o, l;
++	int ret;
++
++	off = &test_params.offset[2];
++	len = &test_params.length[2];
++
++	for (l = len->start; l <= len->end; l += len->interval) {
++		p->length[2] = l;
++
++		for (o = off->start; o <= off->end; o += off->interval) {
++			p->offset[2] = o;
++
++			ret = __test_decompress(p, blen);
++			if (ret)
++				return ret;
++
++			if (kthread_should_stop())
++				return 0;
++
++			/* so we don't appear hung */
++			schedule();
++		}
++	}
++
++	return 0;
++}
++
++static int __test_compress(struct test_kthread_param *p)
++{
++	u8 *a = &p->buffer[0][p->offset[0]];
++	u8 *b = &p->buffer[1][p->offset[1]];
++	unsigned int alen = p->length[0], blen = p->length[1];
++	ktime_t start = ktime_get();
++	int ret;
++
++	ret = crypto_comp_compress(p->tfm, a, alen, b, &blen);
++	if (ret)
++		return ret;
++
++	update_bps(p, 0, alen, start);
++
++	return test_decompress(p, blen);
++}
++
++static int test_compress(struct test_kthread_param *p)
++{
++	struct test_range *off, *len;
++	u32 o, l;
++	int ret;
++
++	off = &test_params.offset[1];
++	len = &test_params.length[1];
++
++	for (l = len->start; l <= len->end; l += len->interval) {
++		p->length[1] = l;
++
++		for (o = off->start; o <= off->end; o += off->interval) {
++			p->offset[1] = o;
++
++			ret = __test_compress(p);
++			if (ret)
++				return ret;
++
++			if (kthread_should_stop())
++				return 0;
++
++			/* so we don't appear hung */
++			schedule();
++		}
++	}
++
++	return 0;
++}
++
++static int test_kthread_func(void *arg)
++{
++	struct test_kthread_param *p = arg;
++	struct test_range *off, *len;
++	u32 o, l;
++	int ret;
++
++	off = &test_params.offset[0];
++	len = &test_params.length[0];
++
++repeat:
++	for (l = len->start; l <= len->end; l += len->interval) {
++		p->length[0] = l;
++
++		for (o = off->start; o <= off->end; o += off->interval) {
++			p->offset[0] = o;
++
++			ret = test_compress(p);
++			if (ret)
++				goto end;
++
++			if (kthread_should_stop())
++				goto end;
++
++			/* so we don't appear hung */
++			schedule();
++		}
++	}
++
++	if (test_params.repeat)
++		goto repeat;
++
++end:
++	if (ret)
++		test_return = ret;
++
++	p->running = false;
++
++	return 0;
++}
++
++static void test_free_kthread(int i)
++{
++	struct test_kthread_param *p;
++
++	if (i > test_kthreads_max)
++		return;
++
++	p = &test_kthread_params[i];
++
++	if (p->tfm && !IS_ERR(p->tfm))
++		crypto_free_comp(p->tfm);
++	p->tfm = NULL;
++
++	free_pages((unsigned long)p->buffer[0], test_buffer_order);
++	p->buffer[0] = NULL;
++	free_pages((unsigned long)p->buffer[1], test_buffer_order);
++	p->buffer[1] = NULL;
++	free_pages((unsigned long)p->buffer[2], test_buffer_order);
++	p->buffer[2] = NULL;
++}
++
++static int test_alloc_kthread(int i)
++{
++	struct test_kthread_param *p;
++	int ret = 0;
++
++	if (i > test_kthreads_max)
 +		return -EINVAL;
 +
- 	outbuf = (unsigned long)out;
--	if (!IS_ALIGNED(outbuf, PAGE_SIZE) || *outlen != PAGE_SIZE)
-+	if (check_constraints(outbuf, outlen, false))
- 		return -EINVAL;
- 
- 	rcu_read_lock();
- 	local_devdata = rcu_dereference(devdata);
--	if (local_devdata)
--		dev = local_devdata->dev;
--
--	/* Get header */
--	hdr = (struct nx842_header *)in;
--
--	workmem = (struct nx842_workmem *)ALIGN((unsigned long)wmem,
--		NX842_HW_PAGE_SIZE);
--
--	inbuf = (unsigned long)in + hdr->offset;
--	if (likely(!IS_ALIGNED(inbuf, IO_BUFFER_ALIGN))) {
--		/* Copy block(s) into bounce buffer for alignment */
--		memcpy(workmem->bounce, in + hdr->offset, inlen - hdr->offset);
--		inbuf = (unsigned long)workmem->bounce;
-+	if (!local_devdata || !local_devdata->dev) {
-+		rcu_read_unlock();
++	p = &test_kthread_params[i];
++
++	p->buffer[0] = (u8 *)__get_free_pages(GFP_KERNEL, test_buffer_order);
++	p->buffer[1] = (u8 *)__get_free_pages(GFP_KERNEL, test_buffer_order);
++	p->buffer[2] = (u8 *)__get_free_pages(GFP_KERNEL, test_buffer_order);
++	p->tfm = crypto_alloc_comp(test_tfm, 0, 0);
++
++	if (IS_ERR(p->tfm)) {
++		pr_err("could not create compressor %s : %ld\n",
++			 test_tfm, PTR_ERR(p->tfm));
++		ret = PTR_ERR(p->tfm);
++	}
++
++	if (!p->buffer[0] || !p->buffer[1] || !p->buffer[2]) {
++		pr_err("could not create buffer\n");
++		ret = -ENOMEM;
++	}
++
++	if (ret) {
++		test_free_kthread(i);
++	} else {
++		memcpy(p->buffer[0], test_buffer, TEST_BUFFER_SIZE);
++		memcpy(p->buffer[1], test_buffer, TEST_BUFFER_SIZE);
++		memcpy(p->buffer[2], test_buffer, TEST_BUFFER_SIZE);
++	}
++
++	return ret;
++}
++
++static int test_kthread_running(void)
++{
++	int i;
++
++	for (i = 0; i < test_kthreads_max; i++)
++		if (test_kthread_params[i].running)
++			return 1;
++
++	return 0;
++}
++
++static int test_run(void *arg)
++{
++	int i;
++
++	test_return = 0;
++
++	if (test_tfm[0] == 0) {
++		test_return = -ENODEV;
++		pr_err("compression self test error: no compressor defined\n");
++		goto error;
++	}
++
++	reset_bps();
++
++	pr_info("compression self test starting\n");
++	pr_info("  compressor: %s\n", test_tfm);
++	pr_info("  repeat: %s\n", test_params.repeat ? "Y" : "N");
++	pr_info("  threads: %d\n", test_params.kthreads);
++	pr_info("  offsets %x-%x/%x, %x-%x/%x, %x-%x/%x\n",
++		test_params.offset[0].start, test_params.offset[0].end,
++		test_params.offset[0].interval,
++		test_params.offset[1].start, test_params.offset[1].end,
++		test_params.offset[1].interval,
++		test_params.offset[2].start, test_params.offset[2].end,
++		test_params.offset[2].interval);
++	pr_info("  lengths %x-%x/%x, %x-%x/%x, %x-%x/%x\n",
++		test_params.length[0].start, test_params.length[0].end,
++		test_params.length[0].interval,
++		test_params.length[1].start, test_params.length[1].end,
++		test_params.length[1].interval,
++		test_params.length[2].start, test_params.length[2].end,
++		test_params.length[2].interval);
++
++	for (i = 0; !test_return && i < test_params.kthreads; i++) {
++		test_return = test_alloc_kthread(i);
++		if (test_return)
++			while (--i >= 0)
++				test_free_kthread(i);
++	}
++
++	for (i = 0; !test_return && i < test_params.kthreads; i++) {
++		struct test_kthread_param *p = &test_kthread_params[i];
++
++		p->running = true;
++		p->kthread = kthread_run(test_kthread_func, p, "selftest%d", i);
++		if (IS_ERR(p->kthread)) {
++			test_return = PTR_ERR(p->kthread);
++			p->kthread = NULL;
++			p->running = false;
++		} else {
++			get_task_struct(p->kthread);
++		}
++	}
++
++	while (!kthread_should_stop() && !test_return && test_kthread_running())
++		schedule_timeout_interruptible(msecs_to_jiffies(100));
++
++	for (i = 0; i < test_params.kthreads; i++) {
++		struct test_kthread_param *p = &test_kthread_params[i];
++
++		if (p->running)
++			kthread_stop(p->kthread);
++		if (p->kthread)
++			put_task_struct(p->kthread);
++		p->kthread = NULL;
++		p->running = false;
++	}
++
++	pr_info("compression self test MBps %ld/%ld peak %ld/%ld\n",
++		(unsigned long)(total_bps(0) / 1000000),
++		(unsigned long)(total_bps(1) / 1000000),
++		(unsigned long)(atomic64_read(&test_max_bps[0]) / 1000000),
++		(unsigned long)(atomic64_read(&test_max_bps[1]) / 1000000));
++
++	if (kthread_should_stop())
++		pr_info("compression self test stopped by user\n");
++	else
++		pr_info("compression self test ended\n");
++
++error:
++	/* this causes test_stop() to get called */
++	test_new_params.running = 0;
++
++	if (test_return)
++		pr_info("compression self test failed\n");
++
++	return test_return;
++}
++
++static void test_stop(void)
++{
++	if (!test_kthread)
++		return;
++
++	if (!IS_ERR(test_kthread)) {
++		kthread_stop(test_kthread);
++		put_task_struct(test_kthread);
++	}
++
++	test_kthread = NULL;
++	test_params.running = false;
++	test_new_params.running = false;
++}
++
++static int test_start(void)
++{
++	int ret = 0;
++
++	if (test_kthread)
++		return 0;
++
++	test_kthread = kthread_run(test_run, NULL, MODULE_NAME);
++	if (IS_ERR(test_kthread)) {
++		ret = PTR_ERR(test_kthread);
++		test_stop();
++	} else
++		get_task_struct(test_kthread);
++
++	return ret;
++}
++
++/* this changes the source buffer passed in */
++static void test_buffer_fill(u8 *buf, size_t len)
++{
++	size_t i, l, pos;
++
++	/* repeat source buf across entire test buffer,
++	 * changing each byte by 1 per repeat
++	 */
++	for (pos = 0; pos < TEST_BUFFER_SIZE; pos += len) {
++		l = min_t(size_t, len, TEST_BUFFER_SIZE - pos);
++
++		memcpy(&test_buffer[pos], buf, l);
++
++		if (pos + len < TEST_BUFFER_SIZE)
++			for (i = 0; i < len; i++)
++				buf[i] += 1;
++	}
++}
++
++static ssize_t test_buffer_read(struct file *file, char __user *buf,
++				size_t len, loff_t *off)
++{
++	return simple_read_from_buffer(buf, len, off,
++				       test_buffer, TEST_BUFFER_SIZE);
++}
++
++static ssize_t test_buffer_write(struct file *file, const char __user *buf,
++				 size_t len, loff_t *off)
++{
++	size_t l = min_t(size_t, len, TEST_BUFFER_SIZE);
++	char *tmp;
++	u32 was_running;
++
++	tmp = kmalloc(l, GFP_KERNEL);
++	if (!tmp)
++		return -ENOMEM;
++
++	if (copy_from_user(tmp, buf, l)) {
++		kfree(tmp);
++		return -EFAULT;
++	}
++
++	down_write(&test_lock);
++
++	was_running = test_params.running && test_new_params.running;
++
++	/* if was_running, this clears the running flags */
++	test_stop();
++
++	/* special case if writing to start, we fill out the rest
++	 * of the buffer using the starting pattern
++	 */
++	if (*off == 0)
++		test_buffer_fill(tmp, l);
++	else
++		l = simple_write_to_buffer(test_buffer, TEST_BUFFER_SIZE,
++					   off, buf, l);
++	*off += l;
++
++	if (was_running) {
++		int ret;
++
++		test_new_params.running = was_running;
++		test_params.running = was_running;
++		ret = test_start();
++		if (ret)
++			l = ret;
++	}
++
++	up_write(&test_lock);
++
++	kfree(tmp);
++
++	return l;
++}
++
++static const struct file_operations test_buffer_ops = {
++	.owner =	THIS_MODULE,
++	.read =		test_buffer_read,
++	.write =	test_buffer_write,
++};
++
++static ssize_t test_compressor_read(struct file *file, char __user *buf,
++				    size_t len, loff_t *off)
++{
++	char name[TEST_TFM_NAME_MAX] = "none\n";
++
++	down_read(&test_lock);
++
++	if (test_tfm[0] != 0)
++		snprintf(name, TEST_TFM_NAME_MAX, "%s\n", test_tfm);
++	name[TEST_TFM_NAME_MAX-1] = 0;
++
++	up_read(&test_lock);
++
++	return simple_read_from_buffer(buf, len, off, name, TEST_TFM_NAME_MAX);
++}
++
++static ssize_t test_compressor_write(struct file *file, const char __user *buf,
++				     size_t len, loff_t *off)
++{
++	char tmp[TEST_TFM_NAME_MAX], *name;
++	size_t l = min_t(size_t, len, TEST_TFM_NAME_MAX);
++	u32 was_running;
++
++	if (l < 1)
++		return -EINVAL;
++
++	if (copy_from_user(tmp, buf, l))
++		return -EFAULT;
++	tmp[l-1] = 0;
++	name = strim(tmp);
++	l = strlen(name) + 1;
++
++	if (!crypto_has_comp(name, 0, 0))
 +		return -ENODEV;
- 	}
-+	max_sync_size = local_devdata->max_sync_size;
-+	dev = local_devdata->dev;
 +
-+	workmem = PTR_ALIGN(wmem, WORKMEM_ALIGN);
- 
- 	/* Init scatterlist */
- 	slin.entries = (struct nx842_slentry *)workmem->slin;
-@@ -556,119 +471,55 @@ static int nx842_pseries_decompress(const unsigned char *in, unsigned int inlen,
- 	memset(csbcpb, 0, sizeof(*csbcpb));
- 	op.csbcpb = nx842_get_pa(csbcpb);
- 
--	/*
--	 * max_sync_size may have changed since compression,
--	 * so we can't read it from the device info. We need
--	 * to derive it from hdr->blocks_nr.
--	 */
--	max_sync_size = PAGE_SIZE / hdr->blocks_nr;
--
--	for (i = 0; i < hdr->blocks_nr; i++) {
--		/* Skip padding */
--		inbuf = ALIGN(inbuf, IO_BUFFER_ALIGN);
--
--		if (hdr->sizes[i] < 0) {
--			/* Negative sizes indicate uncompressed data blocks */
--			size = abs(hdr->sizes[i]);
--			memcpy((void *)outbuf, (void *)inbuf, size);
--			outbuf += size;
--			inbuf += size;
--			continue;
--		}
--
--		if (!dev)
--			goto sw;
--
--		/*
--		 * The better the compression, the more likely the "likely"
--		 * case becomes.
--		 */
--		if (likely((inbuf & NX842_HW_PAGE_MASK) ==
--			((inbuf + hdr->sizes[i] - 1) & NX842_HW_PAGE_MASK))) {
--			/* Create direct DDE */
--			op.in = nx842_get_pa((void *)inbuf);
--			op.inlen = hdr->sizes[i];
--		} else {
--			/* Create indirect DDE (scatterlist) */
--			nx842_build_scatterlist(inbuf, hdr->sizes[i] , &slin);
--			op.in = nx842_get_pa(slin.entries);
--			op.inlen = -nx842_get_scatterlist_size(&slin);
--		}
--
--		/*
--		 * NOTE: If the default max_sync_size is changed from 4k
--		 * to 64k, remove the "likely" case below, since a
--		 * scatterlist will always be needed.
--		 */
--		if (likely(max_sync_size == NX842_HW_PAGE_SIZE)) {
--			/* Create direct DDE */
--			op.out = nx842_get_pa((void *)outbuf);
--			op.outlen = max_sync_size;
--		} else {
--			/* Create indirect DDE (scatterlist) */
--			nx842_build_scatterlist(outbuf, max_sync_size, &slout);
--			op.out = nx842_get_pa(slout.entries);
--			op.outlen = -nx842_get_scatterlist_size(&slout);
--		}
--
--		/* Send request to pHyp */
--		ret = vio_h_cop_sync(local_devdata->vdev, &op);
--
--		/* Check for pHyp error */
--		if (ret) {
--			dev_dbg(dev, "%s: vio_h_cop_sync error (ret=%d, hret=%ld)\n",
--				__func__, ret, op.hcall_err);
--			dev = NULL;
--			goto sw;
--		}
-+	if ((inbuf & NX842_HW_PAGE_MASK) ==
-+	    ((inbuf + inlen - 1) & NX842_HW_PAGE_MASK)) {
-+		/* Create direct DDE */
-+		op.in = nx842_get_pa((void *)inbuf);
-+		op.inlen = inlen;
-+	} else {
-+		/* Create indirect DDE (scatterlist) */
-+		nx842_build_scatterlist(inbuf, inlen, &slin);
-+		op.in = nx842_get_pa(slin.entries);
-+		op.inlen = -nx842_get_scatterlist_size(&slin);
++	down_write(&test_lock);
++
++	was_running = test_params.running && test_new_params.running;
++
++	/* if was_running, this clears the running flags */
++	test_stop();
++
++	strncpy(test_tfm, name, l);
++	test_tfm[l-1] = 0;
++
++	if (was_running) {
++		int ret;
++
++		test_new_params.running = was_running;
++		test_params.running = was_running;
++		ret = test_start();
++		if (ret)
++			len = ret;
 +	}
- 
--		/* Check for hardware error */
--		ret = nx842_validate_result(dev, &csbcpb->csb);
--		if (ret) {
--			dev = NULL;
--			goto sw;
--		}
-+	if ((outbuf & NX842_HW_PAGE_MASK) ==
-+	    ((outbuf + *outlen - 1) & NX842_HW_PAGE_MASK)) {
-+		/* Create direct DDE */
-+		op.out = nx842_get_pa((void *)outbuf);
-+		op.outlen = *outlen;
-+	} else {
-+		/* Create indirect DDE (scatterlist) */
-+		nx842_build_scatterlist(outbuf, *outlen, &slout);
-+		op.out = nx842_get_pa(slout.entries);
-+		op.outlen = -nx842_get_scatterlist_size(&slout);
++
++	up_write(&test_lock);
++
++	return len;
++}
++
++static const struct file_operations test_compressor_ops = {
++	.owner =	THIS_MODULE,
++	.read =		test_compressor_read,
++	.write =	test_compressor_write,
++};
++
++static ssize_t test_status_read(struct file *file, char __user *buf,
++				size_t len, loff_t *off)
++{
++	int tmplen = 120;
++	char tmp[tmplen];
++
++	if (!test_params.running) {
++		if (*off == 0) /* haven't printed anything yet, so print msg */
++			snprintf(tmp, tmplen, "Test not running\n");
++		else if (*off == 1) /* printed status, just print \n */
++			snprintf(tmp, tmplen, "\n");
++		else /* printed msg or \n, report end */
++			return 0;
++		*off = 2;
++		goto end;
 +	}
- 
--		/* HW decompression success */
--		inbuf += hdr->sizes[i];
--		outbuf += csbcpb->csb.processed_byte_count;
--		continue;
--
--sw:
--		/* software decompression */
--		size = max_sync_size;
--		ret = sw842_decompress(
--			(unsigned char *)inbuf, hdr->sizes[i],
--			(unsigned char *)outbuf, &size, wmem);
--		if (ret)
--			pr_debug("%s: sw842_decompress failed with %d\n",
--				__func__, ret);
--
--		if (ret) {
--			if (ret != -ENOSPC && ret != -EINVAL &&
--					ret != -EMSGSIZE)
--				ret = -EIO;
--			goto unlock;
--		}
-+	/* Send request to pHyp */
-+	ret = vio_h_cop_sync(local_devdata->vdev, &op);
- 
--		/* SW decompression success */
--		inbuf += hdr->sizes[i];
--		outbuf += size;
-+	/* Check for pHyp error */
-+	if (ret) {
-+		dev_dbg(dev, "%s: vio_h_cop_sync error (ret=%d, hret=%ld)\n",
-+			__func__, ret, op.hcall_err);
-+		goto unlock;
- 	}
- 
--	*outlen = (unsigned int)(outbuf - (unsigned long)out);
-+	/* Check for hardware error */
-+	ret = nx842_validate_result(dev, &csbcpb->csb);
++
++	/* slow down reading */
++	schedule_timeout_interruptible(msecs_to_jiffies(250));
++
++	snprintf(tmp, tmplen, "Threads %d MBps: %lu/%lu peak %lu/%lu       \r",
++		 test_params.kthreads,
++		 (unsigned long)(total_bps(0) / 1000000),
++		 (unsigned long)(total_bps(1) / 1000000),
++		 (unsigned long)(atomic64_read(&test_max_bps[0]) / 1000000),
++		 (unsigned long)(atomic64_read(&test_max_bps[1]) / 1000000));
++	tmp[tmplen - 2] = '\r';
++	tmp[tmplen - 1] = 0;
++
++end:
++	len = min(len, strlen(tmp));
++
++	if (copy_to_user(buf, tmp, len))
++		return -EFAULT;
++
++	if (*off == 0)
++		*off = 1;
++
++	return len;
++}
++
++static const struct file_operations test_status_ops = {
++	.owner =	THIS_MODULE,
++	.read =		test_status_read,
++};
++
++static void test_param_check_valid(int i)
++{
++	struct test_range *off, *len;
++
++	off = &test_params.offset[i];
++	len = &test_params.length[i];
++
++	/* interval must be at least 1 */
++	if (off->interval < 1)
++		off->interval = OFFSET_INTERVAL_DEFAULT;
++	if (len->interval < 1)
++		len->interval = LENGTH_INTERVAL_DEFAULT;
++
++	/* end offset + length can't be more than buffer size */
++	if (off->end + len->end > TEST_BUFFER_SIZE)
++		off->end = max_t(u32, 0, TEST_BUFFER_SIZE - len->end);
++	if (off->end + len->end > TEST_BUFFER_SIZE)
++		len->end = TEST_BUFFER_SIZE;
++
++	/* end must be equal or after start */
++	if (off->end < off->start)
++		off->start = off->end;
++	if (len->end < len->start)
++		len->start = len->end;
++}
++
++static void test_param_change(void)
++{
++	bool should_run;
++	int i;
++
++	down_write(&test_lock);
++
++	should_run = test_new_params.running;
++
++	/* if already running, this clears running flags */
++	test_stop();
++
++	test_new_params.running = should_run;
++
++	memcpy(&test_params, &test_new_params, sizeof(test_params));
++
++	/* kthreads must be between 1 and max */
++	if (test_params.kthreads < 1)
++		test_params.kthreads = 1;
++	if (test_params.kthreads > test_kthreads_max)
++		test_params.kthreads = test_kthreads_max;
++
++	/* bps_window must be at least 1 */
++	if (test_params.bps_window < 1)
++		test_params.bps_window = 1;
++
++	for (i = 0; i < 3; i++)
++		test_param_check_valid(i);
++
++	/* update any corrected params */
++	memcpy(&test_new_params, &test_params, sizeof(test_params));
++
++	if (test_params.running)
++		test_start();
++
++	up_write(&test_lock);
++}
++
++static int test_check(void *ignored)
++{
++	bool changed;
++
++	while (1) {
++		set_current_state(TASK_INTERRUPTIBLE);
++		if (kthread_should_stop())
++			break;
++
++		schedule_timeout(TEST_CHECK_INTERVAL);
++
++		if (kthread_should_stop())
++			break;
++
++		down_read(&test_lock);
++		changed = !!memcmp(&test_params, &test_new_params,
++				   sizeof(test_params));
++		up_read(&test_lock);
++
++		if (changed)
++			test_param_change();
++	}
++
++	return 0;
++}
++
++static struct task_struct *test_check_kthread;
++
++static struct dentry *test_root;
++
++static void test_exit(void)
++{
++	if (test_root && !IS_ERR(test_root))
++		debugfs_remove_recursive(test_root);
++	if (test_check_kthread && !IS_ERR(test_check_kthread))
++		kthread_stop(test_check_kthread);
++	test_stop();
++	kfree(test_kthread_params);
++	free_pages((unsigned long)test_buffer, test_buffer_order);
++}
++module_exit(test_exit);
++
++static int __init test_init(void)
++{
++	struct dentry *offsets, *lengths;
++	u8 test_buffer_fill_default[8] = { 0 };
++	int ret = 0, i;
++
++	if (!debugfs_initialized())
++		return -EINVAL;
++
++	test_root = debugfs_create_dir(MODULE_NAME, NULL);
++	if (IS_ERR(test_root)) {
++		pr_err("could not create debugfs dir %s : %ld\n",
++		       MODULE_NAME, PTR_ERR(test_root));
++		return PTR_ERR(test_root);
++	}
++
++	offsets = debugfs_create_dir("offsets", test_root);
++	if (IS_ERR(offsets)) {
++		pr_err("could not create debugfs dir %s/offsets : %ld\n",
++		       MODULE_NAME, PTR_ERR(offsets));
++		ret = PTR_ERR(offsets);
++		goto end;
++	}
++	lengths = debugfs_create_dir("lengths", test_root);
++	if (IS_ERR(lengths)) {
++		pr_err("could not create debugfs dir %s/lengths : %ld\n",
++		       MODULE_NAME, PTR_ERR(lengths));
++		ret = PTR_ERR(lengths);
++		goto end;
++	}
++
++	debugfs_create_file("status", S_IRUGO, test_root, NULL,
++			    &test_status_ops);
++	debugfs_create_file("compressor", S_IRUGO | S_IWUSR, test_root, NULL,
++			    &test_compressor_ops);
++	debugfs_create_file("buffer", S_IRUSR | S_IWUSR, test_root, NULL,
++			    &test_buffer_ops);
++
++	debugfs_create_bool("running", S_IRUGO | S_IWUSR, test_root,
++			    &test_new_params.running);
++	debugfs_create_bool("repeat", S_IRUGO | S_IWUSR, test_root,
++			    &test_new_params.repeat);
++	debugfs_create_u32("threads", S_IRUGO | S_IWUSR, test_root,
++			    &test_new_params.kthreads);
++	debugfs_create_u32("bps_window", S_IRUGO | S_IWUSR, test_root,
++			    &test_new_params.bps_window);
++
++	debugfs_create_u32("start_a", S_IRUGO | S_IWUSR, offsets,
++			    &test_new_params.offset[0].start);
++	debugfs_create_u32("start_b", S_IRUGO | S_IWUSR, offsets,
++			    &test_new_params.offset[1].start);
++	debugfs_create_u32("start_c", S_IRUGO | S_IWUSR, offsets,
++			    &test_new_params.offset[2].start);
++	debugfs_create_u32("end_a", S_IRUGO | S_IWUSR, offsets,
++			    &test_new_params.offset[0].end);
++	debugfs_create_u32("end_b", S_IRUGO | S_IWUSR, offsets,
++			    &test_new_params.offset[1].end);
++	debugfs_create_u32("end_c", S_IRUGO | S_IWUSR, offsets,
++			    &test_new_params.offset[2].end);
++	debugfs_create_u32("interval_a", S_IRUGO | S_IWUSR, offsets,
++			    &test_new_params.offset[0].interval);
++	debugfs_create_u32("interval_b", S_IRUGO | S_IWUSR, offsets,
++			    &test_new_params.offset[1].interval);
++	debugfs_create_u32("interval_c", S_IRUGO | S_IWUSR, offsets,
++			    &test_new_params.offset[2].interval);
++
++	debugfs_create_u32("start_a", S_IRUGO | S_IWUSR, lengths,
++			    &test_new_params.length[0].start);
++	debugfs_create_u32("start_b", S_IRUGO | S_IWUSR, lengths,
++			    &test_new_params.length[1].start);
++	debugfs_create_u32("start_c", S_IRUGO | S_IWUSR, lengths,
++			    &test_new_params.length[2].start);
++	debugfs_create_u32("end_a", S_IRUGO | S_IWUSR, lengths,
++			    &test_new_params.length[0].end);
++	debugfs_create_u32("end_b", S_IRUGO | S_IWUSR, lengths,
++			    &test_new_params.length[1].end);
++	debugfs_create_u32("end_c", S_IRUGO | S_IWUSR, lengths,
++			    &test_new_params.length[2].end);
++	debugfs_create_u32("interval_a", S_IRUGO | S_IWUSR, lengths,
++			    &test_new_params.length[0].interval);
++	debugfs_create_u32("interval_b", S_IRUGO | S_IWUSR, lengths,
++			    &test_new_params.length[1].interval);
++	debugfs_create_u32("interval_c", S_IRUGO | S_IWUSR, lengths,
++			    &test_new_params.length[2].interval);
++
++	test_kthread_params = kcalloc(test_kthreads_max,
++				      sizeof(*test_kthread_params),
++				      GFP_KERNEL);
++
++	if (!test_kthread_params) {
++		pr_err("could kthread params\n");
++		ret = -ENOMEM;
++		goto end;
++	}
++
++	test_buffer = (u8 *)__get_free_pages(GFP_KERNEL, test_buffer_order);
++	if (!test_buffer) {
++		pr_err("could not allocate test buffer\n");
++		ret = -ENOMEM;
++		goto end;
++	}
++
++	test_buffer_fill(test_buffer_fill_default,
++			 ARRAY_SIZE(test_buffer_fill_default));
++
++	test_params.running = 0;
++	test_params.repeat = TEST_REPEAT_DEFAULT;
++	test_params.kthreads = TEST_KTHREADS_DEFAULT;
++	test_params.bps_window = TEST_BPS_WINDOW_DEFAULT;
++	for (i = 0; i < 3; i++) {
++		test_params.offset[i].start = OFFSET_START_DEFAULT;
++		test_params.offset[i].end = OFFSET_END_DEFAULT;
++		test_params.offset[i].interval = OFFSET_INTERVAL_DEFAULT;
++		test_params.length[i].start = LENGTH_START_DEFAULT;
++		test_params.length[i].end = LENGTH_END_DEFAULT;
++		test_params.length[i].interval = LENGTH_INTERVAL_DEFAULT;
++	}
++	memcpy(&test_new_params, &test_params, sizeof(test_params));
++
++	test_check_kthread = kthread_run(test_check, NULL, MODULE_NAME "_chk");
++	if (IS_ERR(test_check_kthread))
++		ret = PTR_ERR(test_check_kthread);
++
++end:
 +	if (ret)
-+		goto unlock;
++		test_exit();
 +
-+	*outlen = csbcpb->csb.processed_byte_count;
- 
- unlock:
- 	if (ret)
- 		/* decompress fail */
- 		nx842_inc_decomp_failed(local_devdata);
- 	else {
--		if (!dev)
--			/* software decompress */
--			nx842_inc_swdecomp(local_devdata);
- 		nx842_inc_decomp_complete(local_devdata);
- 		ibm_nx842_incr_hist(local_devdata->counters->decomp_times,
--			(get_tb() - start_time) / tb_ticks_per_usec);
-+			(get_tb() - start) / tb_ticks_per_usec);
- 	}
- 
- 	rcu_read_unlock();
-@@ -827,9 +678,9 @@ static int nx842_OF_upd_maxsyncop(struct nx842_devdata *devdata,
- 					maxsynccop->decomp_data_limit);
- 
- 	devdata->max_sync_size = min_t(unsigned int, devdata->max_sync_size,
--					SIZE_64K);
-+					65536);
- 
--	if (devdata->max_sync_size < SIZE_4K) {
-+	if (devdata->max_sync_size < 4096) {
- 		dev_err(devdata->dev, "%s: hardware max data size (%u) is "
- 				"less than the driver minimum, unable to use "
- 				"the hardware device\n",
-@@ -1218,17 +1069,17 @@ static int __exit nx842_remove(struct vio_dev *viodev)
- 	return 0;
- }
- 
--static struct vio_device_id nx842_driver_ids[] = {
-+static struct vio_device_id nx842_vio_driver_ids[] = {
- 	{NX842_PSERIES_COMPAT_NAME "-v1", NX842_PSERIES_COMPAT_NAME},
- 	{"", ""},
- };
- 
--static struct vio_driver nx842_driver = {
-+static struct vio_driver nx842_vio_driver = {
- 	.name = MODULE_NAME,
- 	.probe = nx842_probe,
- 	.remove = __exit_p(nx842_remove),
- 	.get_desired_dma = nx842_get_desired_dma,
--	.id_table = nx842_driver_ids,
-+	.id_table = nx842_vio_driver_ids,
- };
- 
- static int __init nx842_init(void)
-@@ -1247,7 +1098,7 @@ static int __init nx842_init(void)
- 	new_devdata->status = UNAVAILABLE;
- 	RCU_INIT_POINTER(devdata, new_devdata);
- 
--	return vio_register_driver(&nx842_driver);
-+	return vio_register_driver(&nx842_vio_driver);
- }
- 
- module_init(nx842_init);
-@@ -1264,336 +1115,12 @@ static void __exit nx842_exit(void)
- 	RCU_INIT_POINTER(devdata, NULL);
- 	spin_unlock_irqrestore(&devdata_mutex, flags);
- 	synchronize_rcu();
--	if (old_devdata)
-+	if (old_devdata && old_devdata->dev)
- 		dev_set_drvdata(old_devdata->dev, NULL);
- 	kfree(old_devdata);
- 	nx842_unregister_driver(&nx842_pseries_driver);
--	vio_unregister_driver(&nx842_driver);
-+	vio_unregister_driver(&nx842_vio_driver);
- }
- 
- module_exit(nx842_exit);
- 
--/*********************************
-- * 842 software decompressor
--*********************************/
--typedef int (*sw842_template_op)(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--
--static int sw842_data8(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--static int sw842_data4(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--static int sw842_data2(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--static int sw842_ptr8(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--static int sw842_ptr4(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--static int sw842_ptr2(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--
--/* special templates */
--#define SW842_TMPL_REPEAT 0x1B
--#define SW842_TMPL_ZEROS 0x1C
--#define SW842_TMPL_EOF 0x1E
--
--static sw842_template_op sw842_tmpl_ops[26][4] = {
--	{ sw842_data8, NULL}, /* 0 (00000) */
--	{ sw842_data4, sw842_data2, sw842_ptr2,  NULL},
--	{ sw842_data4, sw842_ptr2,  sw842_data2, NULL},
--	{ sw842_data4, sw842_ptr2,  sw842_ptr2,  NULL},
--	{ sw842_data4, sw842_ptr4,  NULL},
--	{ sw842_data2, sw842_ptr2,  sw842_data4, NULL},
--	{ sw842_data2, sw842_ptr2,  sw842_data2, sw842_ptr2},
--	{ sw842_data2, sw842_ptr2,  sw842_ptr2,  sw842_data2},
--	{ sw842_data2, sw842_ptr2,  sw842_ptr2,  sw842_ptr2,},
--	{ sw842_data2, sw842_ptr2,  sw842_ptr4,  NULL},
--	{ sw842_ptr2,  sw842_data2, sw842_data4, NULL}, /* 10 (01010) */
--	{ sw842_ptr2,  sw842_data4, sw842_ptr2,  NULL},
--	{ sw842_ptr2,  sw842_data2, sw842_ptr2,  sw842_data2},
--	{ sw842_ptr2,  sw842_data2, sw842_ptr2,  sw842_ptr2},
--	{ sw842_ptr2,  sw842_data2, sw842_ptr4,  NULL},
--	{ sw842_ptr2,  sw842_ptr2,  sw842_data4, NULL},
--	{ sw842_ptr2,  sw842_ptr2,  sw842_data2, sw842_ptr2},
--	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr2,  sw842_data2},
--	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr2,  sw842_ptr2},
--	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr4,  NULL},
--	{ sw842_ptr4,  sw842_data4, NULL}, /* 20 (10100) */
--	{ sw842_ptr4,  sw842_data2, sw842_ptr2,  NULL},
--	{ sw842_ptr4,  sw842_ptr2,  sw842_data2, NULL},
--	{ sw842_ptr4,  sw842_ptr2,  sw842_ptr2,  NULL},
--	{ sw842_ptr4,  sw842_ptr4,  NULL},
--	{ sw842_ptr8,  NULL}
--};
--
--/* Software decompress helpers */
--
--static uint8_t sw842_get_byte(const char *buf, int bit)
--{
--	uint8_t tmpl;
--	uint16_t tmp;
--	tmp = htons(*(uint16_t *)(buf));
--	tmp = (uint16_t)(tmp << bit);
--	tmp = ntohs(tmp);
--	memcpy(&tmpl, &tmp, 1);
--	return tmpl;
--}
--
--static uint8_t sw842_get_template(const char **buf, int *bit)
--{
--	uint8_t byte;
--	byte = sw842_get_byte(*buf, *bit);
--	byte = byte >> 3;
--	byte &= 0x1F;
--	*buf += (*bit + 5) / 8;
--	*bit = (*bit + 5) % 8;
--	return byte;
--}
--
--/* repeat_count happens to be 5-bit too (like the template) */
--static uint8_t sw842_get_repeat_count(const char **buf, int *bit)
--{
--	uint8_t byte;
--	byte = sw842_get_byte(*buf, *bit);
--	byte = byte >> 2;
--	byte &= 0x3F;
--	*buf += (*bit + 6) / 8;
--	*bit = (*bit + 6) % 8;
--	return byte;
--}
--
--static uint8_t sw842_get_ptr2(const char **buf, int *bit)
--{
--	uint8_t ptr;
--	ptr = sw842_get_byte(*buf, *bit);
--	(*buf)++;
--	return ptr;
--}
--
--static uint16_t sw842_get_ptr4(const char **buf, int *bit,
--		struct sw842_fifo *fifo)
--{
--	uint16_t ptr;
--	ptr = htons(*(uint16_t *)(*buf));
--	ptr = (uint16_t)(ptr << *bit);
--	ptr = ptr >> 7;
--	ptr &= 0x01FF;
--	*buf += (*bit + 9) / 8;
--	*bit = (*bit + 9) % 8;
--	return ptr;
--}
--
--static uint8_t sw842_get_ptr8(const char **buf, int *bit,
--		struct sw842_fifo *fifo)
--{
--	return sw842_get_ptr2(buf, bit);
--}
--
--/* Software decompress template ops */
--
--static int sw842_data8(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	int ret;
--
--	ret = sw842_data4(inbuf, inbit, outbuf, fifo);
--	if (ret)
--		return ret;
--	ret = sw842_data4(inbuf, inbit, outbuf, fifo);
--	return ret;
--}
--
--static int sw842_data4(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	int ret;
--
--	ret = sw842_data2(inbuf, inbit, outbuf, fifo);
--	if (ret)
--		return ret;
--	ret = sw842_data2(inbuf, inbit, outbuf, fifo);
--	return ret;
--}
--
--static int sw842_data2(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	**outbuf = sw842_get_byte(*inbuf, *inbit);
--	(*inbuf)++;
--	(*outbuf)++;
--	**outbuf = sw842_get_byte(*inbuf, *inbit);
--	(*inbuf)++;
--	(*outbuf)++;
--	return 0;
--}
--
--static int sw842_ptr8(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	uint8_t ptr;
--	ptr = sw842_get_ptr8(inbuf, inbit, fifo);
--	if (!fifo->f84_full && (ptr >= fifo->f8_count))
--		return 1;
--	memcpy(*outbuf, fifo->f8[ptr], 8);
--	*outbuf += 8;
--	return 0;
--}
--
--static int sw842_ptr4(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	uint16_t ptr;
--	ptr = sw842_get_ptr4(inbuf, inbit, fifo);
--	if (!fifo->f84_full && (ptr >= fifo->f4_count))
--		return 1;
--	memcpy(*outbuf, fifo->f4[ptr], 4);
--	*outbuf += 4;
--	return 0;
--}
--
--static int sw842_ptr2(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	uint8_t ptr;
--	ptr = sw842_get_ptr2(inbuf, inbit);
--	if (!fifo->f2_full && (ptr >= fifo->f2_count))
--		return 1;
--	memcpy(*outbuf, fifo->f2[ptr], 2);
--	*outbuf += 2;
--	return 0;
--}
--
--static void sw842_copy_to_fifo(const char *buf, struct sw842_fifo *fifo)
--{
--	unsigned char initial_f2count = fifo->f2_count;
--
--	memcpy(fifo->f8[fifo->f8_count], buf, 8);
--	fifo->f4_count += 2;
--	fifo->f8_count += 1;
--
--	if (!fifo->f84_full && fifo->f4_count >= 512) {
--		fifo->f84_full = 1;
--		fifo->f4_count /= 512;
--	}
--
--	memcpy(fifo->f2[fifo->f2_count++], buf, 2);
--	memcpy(fifo->f2[fifo->f2_count++], buf + 2, 2);
--	memcpy(fifo->f2[fifo->f2_count++], buf + 4, 2);
--	memcpy(fifo->f2[fifo->f2_count++], buf + 6, 2);
--	if (fifo->f2_count < initial_f2count)
--		fifo->f2_full = 1;
--}
--
--static int sw842_decompress(const unsigned char *src, int srclen,
--			unsigned char *dst, int *destlen,
--			const void *wrkmem)
--{
--	uint8_t tmpl;
--	const char *inbuf;
--	int inbit = 0;
--	unsigned char *outbuf, *outbuf_end, *origbuf, *prevbuf;
--	const char *inbuf_end;
--	sw842_template_op op;
--	int opindex;
--	int i, repeat_count;
--	struct sw842_fifo *fifo;
--	int ret = 0;
--
--	fifo = &((struct nx842_workmem *)(wrkmem))->swfifo;
--	memset(fifo, 0, sizeof(*fifo));
--
--	origbuf = NULL;
--	inbuf = src;
--	inbuf_end = src + srclen;
--	outbuf = dst;
--	outbuf_end = dst + *destlen;
--
--	while ((tmpl = sw842_get_template(&inbuf, &inbit)) != SW842_TMPL_EOF) {
--		if (inbuf >= inbuf_end) {
--			ret = -EINVAL;
--			goto out;
--		}
--
--		opindex = 0;
--		prevbuf = origbuf;
--		origbuf = outbuf;
--		switch (tmpl) {
--		case SW842_TMPL_REPEAT:
--			if (prevbuf == NULL) {
--				ret = -EINVAL;
--				goto out;
--			}
--
--			repeat_count = sw842_get_repeat_count(&inbuf,
--								&inbit) + 1;
--
--			/* Did the repeat count advance past the end of input */
--			if (inbuf > inbuf_end) {
--				ret = -EINVAL;
--				goto out;
--			}
--
--			for (i = 0; i < repeat_count; i++) {
--				/* Would this overflow the output buffer */
--				if ((outbuf + 8) > outbuf_end) {
--					ret = -ENOSPC;
--					goto out;
--				}
--
--				memcpy(outbuf, prevbuf, 8);
--				sw842_copy_to_fifo(outbuf, fifo);
--				outbuf += 8;
--			}
--			break;
--
--		case SW842_TMPL_ZEROS:
--			/* Would this overflow the output buffer */
--			if ((outbuf + 8) > outbuf_end) {
--				ret = -ENOSPC;
--				goto out;
--			}
--
--			memset(outbuf, 0, 8);
--			sw842_copy_to_fifo(outbuf, fifo);
--			outbuf += 8;
--			break;
--
--		default:
--			if (tmpl > 25) {
--				ret = -EINVAL;
--				goto out;
--			}
--
--			/* Does this go past the end of the input buffer */
--			if ((inbuf + 2) > inbuf_end) {
--				ret = -EINVAL;
--				goto out;
--			}
--
--			/* Would this overflow the output buffer */
--			if ((outbuf + 8) > outbuf_end) {
--				ret = -ENOSPC;
--				goto out;
--			}
--
--			while (opindex < 4 &&
--				(op = sw842_tmpl_ops[tmpl][opindex++])
--					!= NULL) {
--				ret = (*op)(&inbuf, &inbit, &outbuf, fifo);
--				if (ret) {
--					ret = -EINVAL;
--					goto out;
--				}
--				sw842_copy_to_fifo(origbuf, fifo);
--			}
--		}
--	}
--
--out:
--	if (!ret)
--		*destlen = (unsigned int)(outbuf - dst);
--	else
--		*destlen = 0;
--
--	return ret;
--}
++	return ret;
++}
++module_init(test_init);
 -- 
 2.1.0
