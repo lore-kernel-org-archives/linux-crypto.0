@@ -1,10 +1,9 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: Re: [PATCH 09/11] crypto: remove LZO fallback from crypto 842
-Date: Wed, 8 Apr 2015 10:45:45 -0400
-Message-ID: <CALZtONAZenUKxJdzOFXe1hBxGCASO_GsVfG9vtKWBe5EwcftmA@mail.gmail.com>
+Subject: Re: [PATCH 11/11] crypto: add crypto compression sefltest
+Date: Wed, 8 Apr 2015 10:48:03 -0400
+Message-ID: <CALZtONB371ODDyhAVxgaGtxMWRSgshaXsYB8P_5AwSmdiJaAQg@mail.gmail.com>
 References: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
- <1428428070-17803-10-git-send-email-ddstreet@ieee.org> <20150408141600.GA30338@gondor.apana.org.au>
- <CALZtONC0WWkfaRs+0SNHaDQ1DhT+1ekgk0YXsQBi_2NRoP1e8Q@mail.gmail.com> <20150408143831.GA30762@gondor.apana.org.au>
+ <1428428070-17803-12-git-send-email-ddstreet@ieee.org> <20150408141631.GB30338@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -17,58 +16,38 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-kernel <linux-kernel@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f174.google.com ([209.85.213.174]:35388 "EHLO
-	mail-ig0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753666AbbDHOqG (ORCPT
+Received: from mail-ie0-f180.google.com ([209.85.223.180]:32928 "EHLO
+	mail-ie0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754148AbbDHOs2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 8 Apr 2015 10:46:06 -0400
-In-Reply-To: <20150408143831.GA30762@gondor.apana.org.au>
+	Wed, 8 Apr 2015 10:48:28 -0400
+In-Reply-To: <20150408141631.GB30338@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 8, 2015 at 10:38 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Wed, Apr 08, 2015 at 10:28:23AM -0400, Dan Streetman wrote:
+On Wed, Apr 8, 2015 at 10:16 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Tue, Apr 07, 2015 at 01:34:30PM -0400, Dan Streetman wrote:
+>> Add configurable module to perform self-tests on any crypto compression
+>> driver.
 >>
->> So, the sw implementation is only for decompression; there's no sw
->> compression implementation in these patches.
->
-> As a general rule we don't add any hardware implementation unless
-> there is a software implementation.  The reason is that every new
-> algorithm creates an API (potentially a user-space API if the
-> algorithm can be exported via algif).  But sometimes things slip
-> through.
->
-> So I'm not going to immediately remove 842 but it would be nice
-> if we had a reference implementation so that if ever there were
-> another hardware 842 implmentation added then at least we have
-> something that we can judge against.
-
-Ok I'll see if I can include a sw compression implementation.
-
->
->> The hw 842 driver is currently at drivers/crypto/nx, and the
->> crypto/842 driver just calls the hw driver (after correctly
->> aligning/sizing the provided buffers to what the hw driver expects),
->> and falls back to the sw decompression if the hw decompression fails
->> (there is no compression fallback, a failure is reported to the
->> caller).
+>> This allows testing any crypto compression driver with any input buffer,
+>> at varying alignments and lengths.  It calculates the average bytes per
+>> second compression and decompression rates.  Any errors reported by the
+>> compressor during compression or decompression will end the test and
+>> be logged.
 >>
->> Is that setup ok?  If users had to directly call the hw driver,
->> instead of using the generic crypto_comp interface, it would
->> complicate things, e.g. in zswap it only expects to call
->> crypto_comp_compress()/decompress(), not call the 842 hw driver
->> directly.
+>> Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 >
-> I think the only thing that needs to happen for now is moving
-> crypto/842.c over to drivers/crypto/nx (perhaps merge it into
-> nx-842.c) so that it's obvious that this is not a generic
-> implementation.
+> Please use the existing infrastructure in testmgr/tcrypt.
 
-ah ok, so you mean it can still be a crypto_comp interface, just move
-its location and/or merge it into nx-842.c?
+I think I looked at that and it didn't seem like it would be able to
+include all the user controls, but I'll look again.  In any case this
+test doesn't have to be included in this 842 patch set, so I'll drop
+it from the next version and re-send it by itself if/when I can update
+it to use testmgr.
 
 >
-> Cheers,
+> Thanks,
 > --
 > Email: Herbert Xu <herbert@gondor.apana.org.au>
 > Home Page: http://gondor.apana.org.au/~herbert/
