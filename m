@@ -1,374 +1,378 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 16/16] crypto/x86: move SHA-384/512 SSSE3 implementation to base layer
-Date: Thu,  9 Apr 2015 12:55:48 +0200
-Message-ID: <1428576948-23863-17-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 15/16] crypto/x86: move SHA-224/256 SSSE3 implementation to base layer
+Date: Thu,  9 Apr 2015 12:55:47 +0200
+Message-ID: <1428576948-23863-16-git-send-email-ard.biesheuvel@linaro.org>
 References: <1428576948-23863-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: stockhausen@collogia.de, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	x86@kernel.org, herbert@gondor.apana.org.au,
 	samitolvanen@google.com, jussi.kivilinna@iki.fi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:36870 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754991AbbDIK4k (ORCPT
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:34180 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933288AbbDIK4h (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Apr 2015 06:56:40 -0400
-Received: by wiaa2 with SMTP id a2so93261641wia.0
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Apr 2015 03:56:38 -0700 (PDT)
+	Thu, 9 Apr 2015 06:56:37 -0400
+Received: by wgso17 with SMTP id o17so4066513wgs.1
+        for <linux-crypto@vger.kernel.org>; Thu, 09 Apr 2015 03:56:36 -0700 (PDT)
 In-Reply-To: <1428576948-23863-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 This removes all the boilerplate from the existing implementation,
-and replaces it with calls into the base layer.  It also changes the
+and replaces it with calls into the base layer. It also changes the
 prototypes of the core asm functions to be compatible with the base
 prototype
 
-  void (sha512_block_fn)(struct sha256_state *sst, u8 const *src, int blocks)
+  void (sha256_block_fn)(struct sha256_state *sst, u8 const *src, int blocks)
 
 so that they can be passed to the base layer directly.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/x86/crypto/sha512-avx-asm.S    |   6 +-
- arch/x86/crypto/sha512-avx2-asm.S   |   6 +-
- arch/x86/crypto/sha512-ssse3-asm.S  |   6 +-
- arch/x86/crypto/sha512_ssse3_glue.c | 202 +++++++-----------------------------
- 4 files changed, 44 insertions(+), 176 deletions(-)
+ arch/x86/crypto/sha256-avx-asm.S    |  10 +-
+ arch/x86/crypto/sha256-avx2-asm.S   |  10 +-
+ arch/x86/crypto/sha256-ssse3-asm.S  |  10 +-
+ arch/x86/crypto/sha256_ssse3_glue.c | 193 +++++++-----------------------------
+ 4 files changed, 50 insertions(+), 173 deletions(-)
 
-diff --git a/arch/x86/crypto/sha512-avx-asm.S b/arch/x86/crypto/sha512-avx-asm.S
-index 974dde9bc6cd..565274d6a641 100644
---- a/arch/x86/crypto/sha512-avx-asm.S
-+++ b/arch/x86/crypto/sha512-avx-asm.S
-@@ -54,9 +54,9 @@
+diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
+index 642f15687a0a..92b3b5d75ba9 100644
+--- a/arch/x86/crypto/sha256-avx-asm.S
++++ b/arch/x86/crypto/sha256-avx-asm.S
+@@ -96,10 +96,10 @@ SHUF_DC00 = %xmm12      # shuffle xDxC -> DC00
+ BYTE_FLIP_MASK = %xmm13
  
- # Virtual Registers
- # ARG1
--msg	= %rdi
-+digest	= %rdi
- # ARG2
--digest	= %rsi
-+msg	= %rsi
- # ARG3
- msglen	= %rdx
- T1	= %rcx
-@@ -271,7 +271,7 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
- .endm
+ NUM_BLKS = %rdx   # 3rd arg
+-CTX = %rsi        # 2nd arg
+-INP = %rdi        # 1st arg
++INP = %rsi        # 2nd arg
++CTX = %rdi        # 1st arg
  
- ########################################################################
--# void sha512_transform_avx(const void* M, void* D, u64 L)
-+# void sha512_transform_avx(void* D, const void* M, u64 L)
- # Purpose: Updates the SHA512 digest stored at D with the message stored in M.
- # The size of the message pointed to by M must be an integer multiple of SHA512
- # message blocks.
-diff --git a/arch/x86/crypto/sha512-avx2-asm.S b/arch/x86/crypto/sha512-avx2-asm.S
-index 568b96105f5c..a4771dcd1fcf 100644
---- a/arch/x86/crypto/sha512-avx2-asm.S
-+++ b/arch/x86/crypto/sha512-avx2-asm.S
-@@ -70,9 +70,9 @@ XFER  = YTMP0
- BYTE_FLIP_MASK  = %ymm9
- 
- # 1st arg
--INP         = %rdi
-+CTX         = %rdi
- # 2nd arg
--CTX         = %rsi
-+INP         = %rsi
- # 3rd arg
- NUM_BLKS    = %rdx
- 
-@@ -562,7 +562,7 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
- .endm
+-SRND = %rdi       # clobbers INP
++SRND = %rsi       # clobbers INP
+ c = %ecx
+ d = %r8d
+ e = %edx
+@@ -342,8 +342,8 @@ a = TMP_
  
  ########################################################################
--# void sha512_transform_rorx(const void* M, void* D, uint64_t L)#
-+# void sha512_transform_rorx(void* D, const void* M, uint64_t L)#
- # Purpose: Updates the SHA512 digest stored at D with the message stored in M.
- # The size of the message pointed to by M must be an integer multiple of SHA512
- #   message blocks.
-diff --git a/arch/x86/crypto/sha512-ssse3-asm.S b/arch/x86/crypto/sha512-ssse3-asm.S
-index fb56855d51f5..e610e29cbc81 100644
---- a/arch/x86/crypto/sha512-ssse3-asm.S
-+++ b/arch/x86/crypto/sha512-ssse3-asm.S
-@@ -53,9 +53,9 @@
+ ## void sha256_transform_avx(void *input_data, UINT32 digest[8], UINT64 num_blks)
+-## arg 1 : pointer to input data
+-## arg 2 : pointer to digest
++## arg 1 : pointer to digest
++## arg 2 : pointer to input data
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+diff --git a/arch/x86/crypto/sha256-avx2-asm.S b/arch/x86/crypto/sha256-avx2-asm.S
+index 9e86944c539d..570ec5ec62d7 100644
+--- a/arch/x86/crypto/sha256-avx2-asm.S
++++ b/arch/x86/crypto/sha256-avx2-asm.S
+@@ -91,12 +91,12 @@ BYTE_FLIP_MASK = %ymm13
+ X_BYTE_FLIP_MASK = %xmm13 # XMM version of BYTE_FLIP_MASK
  
- # Virtual Registers
- # ARG1
--msg =		%rdi
-+digest =	%rdi
- # ARG2
--digest =	%rsi
-+msg =		%rsi
- # ARG3
- msglen =	%rdx
- T1 =		%rcx
-@@ -269,7 +269,7 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
- .endm
+ NUM_BLKS = %rdx	# 3rd arg
+-CTX	= %rsi  # 2nd arg
+-INP	= %rdi	# 1st arg
++INP	= %rsi  # 2nd arg
++CTX	= %rdi	# 1st arg
+ c	= %ecx
+ d	= %r8d
+ e       = %edx	# clobbers NUM_BLKS
+-y3	= %edi	# clobbers INP
++y3	= %esi	# clobbers INP
+ 
+ 
+ TBL	= %rbp
+@@ -523,8 +523,8 @@ STACK_SIZE	= _RSP      + _RSP_SIZE
  
  ########################################################################
--# void sha512_transform_ssse3(const void* M, void* D, u64 L)#
-+# void sha512_transform_ssse3(void* D, const void* M, u64 L)#
- # Purpose: Updates the SHA512 digest stored at D with the message stored in M.
- # The size of the message pointed to by M must be an integer multiple of SHA512
- #   message blocks.
-diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 0b6af26832bf..d9fa4c1e063f 100644
---- a/arch/x86/crypto/sha512_ssse3_glue.c
-+++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -34,205 +34,75 @@
+ ## void sha256_transform_rorx(void *input_data, UINT32 digest[8], UINT64 num_blks)
+-## arg 1 : pointer to input data
+-## arg 2 : pointer to digest
++## arg 1 : pointer to digest
++## arg 2 : pointer to input data
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+diff --git a/arch/x86/crypto/sha256-ssse3-asm.S b/arch/x86/crypto/sha256-ssse3-asm.S
+index f833b74d902b..2cedc44e8121 100644
+--- a/arch/x86/crypto/sha256-ssse3-asm.S
++++ b/arch/x86/crypto/sha256-ssse3-asm.S
+@@ -88,10 +88,10 @@ SHUF_DC00 = %xmm11      # shuffle xDxC -> DC00
+ BYTE_FLIP_MASK = %xmm12
+ 
+ NUM_BLKS = %rdx   # 3rd arg
+-CTX = %rsi        # 2nd arg
+-INP = %rdi        # 1st arg
++INP = %rsi        # 2nd arg
++CTX = %rdi        # 1st arg
+ 
+-SRND = %rdi       # clobbers INP
++SRND = %rsi       # clobbers INP
+ c = %ecx
+ d = %r8d
+ e = %edx
+@@ -348,8 +348,8 @@ a = TMP_
+ 
+ ########################################################################
+ ## void sha256_transform_ssse3(void *input_data, UINT32 digest[8], UINT64 num_blks)
+-## arg 1 : pointer to input data
+-## arg 2 : pointer to digest
++## arg 1 : pointer to digest
++## arg 2 : pointer to input data
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+index 8fad72f4dfd2..ccc338881ee8 100644
+--- a/arch/x86/crypto/sha256_ssse3_glue.c
++++ b/arch/x86/crypto/sha256_ssse3_glue.c
+@@ -36,195 +36,74 @@
  #include <linux/cryptohash.h>
  #include <linux/types.h>
  #include <crypto/sha.h>
 -#include <asm/byteorder.h>
-+#include <crypto/sha512_base.h>
++#include <crypto/sha256_base.h>
  #include <asm/i387.h>
  #include <asm/xcr.h>
  #include <asm/xsave.h>
- 
  #include <linux/string.h>
  
--asmlinkage void sha512_transform_ssse3(const char *data, u64 *digest,
+-asmlinkage void sha256_transform_ssse3(const char *data, u32 *digest,
 -				     u64 rounds);
-+asmlinkage void sha512_transform_ssse3(u64 *digest, const char *data,
++asmlinkage void sha256_transform_ssse3(u32 *digest, const char *data,
 +				       u64 rounds);
  #ifdef CONFIG_AS_AVX
--asmlinkage void sha512_transform_avx(const char *data, u64 *digest,
-+asmlinkage void sha512_transform_avx(u64 *digest, const char *data,
+-asmlinkage void sha256_transform_avx(const char *data, u32 *digest,
++asmlinkage void sha256_transform_avx(u32 *digest, const char *data,
  				     u64 rounds);
  #endif
  #ifdef CONFIG_AS_AVX2
--asmlinkage void sha512_transform_rorx(const char *data, u64 *digest,
+-asmlinkage void sha256_transform_rorx(const char *data, u32 *digest,
 -				     u64 rounds);
-+asmlinkage void sha512_transform_rorx(u64 *digest, const char *data,
++asmlinkage void sha256_transform_rorx(u32 *digest, const char *data,
 +				      u64 rounds);
  #endif
  
--static asmlinkage void (*sha512_transform_asm)(const char *, u64 *, u64);
+-static asmlinkage void (*sha256_transform_asm)(const char *, u32 *, u64);
 -
 -
--static int sha512_ssse3_init(struct shash_desc *desc)
+-static int sha256_ssse3_init(struct shash_desc *desc)
 -{
--	struct sha512_state *sctx = shash_desc_ctx(desc);
+-	struct sha256_state *sctx = shash_desc_ctx(desc);
 -
--	sctx->state[0] = SHA512_H0;
--	sctx->state[1] = SHA512_H1;
--	sctx->state[2] = SHA512_H2;
--	sctx->state[3] = SHA512_H3;
--	sctx->state[4] = SHA512_H4;
--	sctx->state[5] = SHA512_H5;
--	sctx->state[6] = SHA512_H6;
--	sctx->state[7] = SHA512_H7;
--	sctx->count[0] = sctx->count[1] = 0;
+-	sctx->state[0] = SHA256_H0;
+-	sctx->state[1] = SHA256_H1;
+-	sctx->state[2] = SHA256_H2;
+-	sctx->state[3] = SHA256_H3;
+-	sctx->state[4] = SHA256_H4;
+-	sctx->state[5] = SHA256_H5;
+-	sctx->state[6] = SHA256_H6;
+-	sctx->state[7] = SHA256_H7;
+-	sctx->count = 0;
 -
 -	return 0;
 -}
-+static void (*sha512_transform_asm)(u64 *, const char *, u64);
- 
--static int __sha512_ssse3_update(struct shash_desc *desc, const u8 *data,
+-
+-static int __sha256_ssse3_update(struct shash_desc *desc, const u8 *data,
 -			       unsigned int len, unsigned int partial)
-+static int sha512_ssse3_update(struct shash_desc *desc, const u8 *data,
-+			       unsigned int len)
- {
- 	struct sha512_state *sctx = shash_desc_ctx(desc);
+-{
+-	struct sha256_state *sctx = shash_desc_ctx(desc);
 -	unsigned int done = 0;
 -
--	sctx->count[0] += len;
--	if (sctx->count[0] < len)
--		sctx->count[1]++;
- 
+-	sctx->count += len;
+-
 -	if (partial) {
--		done = SHA512_BLOCK_SIZE - partial;
+-		done = SHA256_BLOCK_SIZE - partial;
 -		memcpy(sctx->buf + partial, data, done);
--		sha512_transform_asm(sctx->buf, sctx->state, 1);
+-		sha256_transform_asm(sctx->buf, sctx->state, 1);
 -	}
 -
--	if (len - done >= SHA512_BLOCK_SIZE) {
--		const unsigned int rounds = (len - done) / SHA512_BLOCK_SIZE;
-+	if (!irq_fpu_usable() ||
-+	    (sctx->count[0] % SHA512_BLOCK_SIZE) + len < SHA512_BLOCK_SIZE)
-+		return crypto_sha512_update(desc, data, len);
- 
--		sha512_transform_asm(data + done, sctx->state, (u64) rounds);
+-	if (len - done >= SHA256_BLOCK_SIZE) {
+-		const unsigned int rounds = (len - done) / SHA256_BLOCK_SIZE;
 -
--		done += rounds * SHA512_BLOCK_SIZE;
+-		sha256_transform_asm(data + done, sctx->state, (u64) rounds);
+-
+-		done += rounds * SHA256_BLOCK_SIZE;
 -	}
-+	/* make sure casting to sha512_block_fn() is safe */
-+	BUILD_BUG_ON(offsetof(struct sha512_state, state) != 0);
- 
+-
 -	memcpy(sctx->buf, data + done, len - done);
-+	kernel_fpu_begin();
-+	sha512_base_do_update(desc, data, len,
-+			      (sha512_block_fn *)sha512_transform_asm);
-+	kernel_fpu_end();
+-
+-	return 0;
+-}
++static void (*sha256_transform_asm)(u32 *, const char *, u64);
  
- 	return 0;
- }
- 
--static int sha512_ssse3_update(struct shash_desc *desc, const u8 *data,
--			     unsigned int len)
-+static int sha512_ssse3_finup(struct shash_desc *desc, const u8 *data,
-+			      unsigned int len, u8 *out)
+ static int sha256_ssse3_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len)
  {
--	struct sha512_state *sctx = shash_desc_ctx(desc);
--	unsigned int partial = sctx->count[0] % SHA512_BLOCK_SIZE;
+ 	struct sha256_state *sctx = shash_desc_ctx(desc);
+-	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
 -	int res;
--
+ 
 -	/* Handle the fast case right here */
--	if (partial + len < SHA512_BLOCK_SIZE) {
--		sctx->count[0] += len;
--		if (sctx->count[0] < len)
--			sctx->count[1]++;
+-	if (partial + len < SHA256_BLOCK_SIZE) {
+-		sctx->count += len;
 -		memcpy(sctx->buf + partial, data, len);
--
++	if (!irq_fpu_usable() ||
++	    (sctx->count % SHA256_BLOCK_SIZE) + len < SHA256_BLOCK_SIZE)
++		return crypto_sha256_update(desc, data, len);
+ 
 -		return 0;
 -	}
-+	if (!irq_fpu_usable())
-+		return crypto_sha512_finup(desc, data, len, out);
- 
+-
 -	if (!irq_fpu_usable()) {
--		res = crypto_sha512_update(desc, data, len);
+-		res = crypto_sha256_update(desc, data, len);
 -	} else {
 -		kernel_fpu_begin();
--		res = __sha512_ssse3_update(desc, data, len, partial);
+-		res = __sha256_ssse3_update(desc, data, len, partial);
 -		kernel_fpu_end();
 -	}
-+	kernel_fpu_begin();
-+	if (len)
-+		sha512_base_do_update(desc, data, len,
-+				      (sha512_block_fn *)sha512_transform_asm);
-+	sha512_base_do_finalize(desc, (sha512_block_fn *)sha512_transform_asm);
-+	kernel_fpu_end();
- 
+-
 -	return res;
-+	return sha512_base_finish(desc, out);
- }
+-}
++	/* make sure casting to sha256_block_fn() is safe */
++	BUILD_BUG_ON(offsetof(struct sha256_state, state) != 0);
  
 -
- /* Add padding and return the message digest. */
- static int sha512_ssse3_final(struct shash_desc *desc, u8 *out)
- {
--	struct sha512_state *sctx = shash_desc_ctx(desc);
+-/* Add padding and return the message digest. */
+-static int sha256_ssse3_final(struct shash_desc *desc, u8 *out)
+-{
+-	struct sha256_state *sctx = shash_desc_ctx(desc);
 -	unsigned int i, index, padlen;
--	__be64 *dst = (__be64 *)out;
--	__be64 bits[2];
--	static const u8 padding[SHA512_BLOCK_SIZE] = { 0x80, };
+-	__be32 *dst = (__be32 *)out;
+-	__be64 bits;
+-	static const u8 padding[SHA256_BLOCK_SIZE] = { 0x80, };
 -
--	/* save number of bits */
--	bits[1] = cpu_to_be64(sctx->count[0] << 3);
--	bits[0] = cpu_to_be64(sctx->count[1] << 3 | sctx->count[0] >> 61);
+-	bits = cpu_to_be64(sctx->count << 3);
 -
--	/* Pad out to 112 mod 128 and append length */
--	index = sctx->count[0] & 0x7f;
--	padlen = (index < 112) ? (112 - index) : ((128+112) - index);
+-	/* Pad out to 56 mod 64 and append length */
+-	index = sctx->count % SHA256_BLOCK_SIZE;
+-	padlen = (index < 56) ? (56 - index) : ((SHA256_BLOCK_SIZE+56)-index);
 -
 -	if (!irq_fpu_usable()) {
--		crypto_sha512_update(desc, padding, padlen);
--		crypto_sha512_update(desc, (const u8 *)&bits, sizeof(bits));
+-		crypto_sha256_update(desc, padding, padlen);
+-		crypto_sha256_update(desc, (const u8 *)&bits, sizeof(bits));
 -	} else {
 -		kernel_fpu_begin();
--		/* We need to fill a whole block for __sha512_ssse3_update() */
--		if (padlen <= 112) {
--			sctx->count[0] += padlen;
--			if (sctx->count[0] < padlen)
--				sctx->count[1]++;
+-		/* We need to fill a whole block for __sha256_ssse3_update() */
+-		if (padlen <= 56) {
+-			sctx->count += padlen;
 -			memcpy(sctx->buf + index, padding, padlen);
 -		} else {
--			__sha512_ssse3_update(desc, padding, padlen, index);
+-			__sha256_ssse3_update(desc, padding, padlen, index);
 -		}
--		__sha512_ssse3_update(desc, (const u8 *)&bits,
--					sizeof(bits), 112);
+-		__sha256_ssse3_update(desc, (const u8 *)&bits,
+-					sizeof(bits), 56);
 -		kernel_fpu_end();
 -	}
 -
 -	/* Store state in digest */
 -	for (i = 0; i < 8; i++)
--		dst[i] = cpu_to_be64(sctx->state[i]);
+-		dst[i] = cpu_to_be32(sctx->state[i]);
 -
 -	/* Wipe context */
 -	memset(sctx, 0, sizeof(*sctx));
--
--	return 0;
--}
--
--static int sha512_ssse3_export(struct shash_desc *desc, void *out)
--{
--	struct sha512_state *sctx = shash_desc_ctx(desc);
--
++	kernel_fpu_begin();
++	sha256_base_do_update(desc, data, len,
++			      (sha256_block_fn *)sha256_transform_asm);
++	kernel_fpu_end();
+ 
+ 	return 0;
+ }
+ 
+-static int sha256_ssse3_export(struct shash_desc *desc, void *out)
++static int sha256_ssse3_finup(struct shash_desc *desc, const u8 *data,
++			      unsigned int len, u8 *out)
+ {
+-	struct sha256_state *sctx = shash_desc_ctx(desc);
++	if (!irq_fpu_usable())
++		return crypto_sha256_finup(desc, data, len, out);
+ 
 -	memcpy(out, sctx, sizeof(*sctx));
--
++	kernel_fpu_begin();
++	if (len)
++		sha256_base_do_update(desc, data, len,
++				      (sha256_block_fn *)sha256_transform_asm);
++	sha256_base_do_finalize(desc, (sha256_block_fn *)sha256_transform_asm);
++	kernel_fpu_end();
+ 
 -	return 0;
--}
--
--static int sha512_ssse3_import(struct shash_desc *desc, const void *in)
++	return sha256_base_finish(desc, out);
+ }
+ 
+-static int sha256_ssse3_import(struct shash_desc *desc, const void *in)
 -{
--	struct sha512_state *sctx = shash_desc_ctx(desc);
+-	struct sha256_state *sctx = shash_desc_ctx(desc);
 -
 -	memcpy(sctx, in, sizeof(*sctx));
 -
 -	return 0;
 -}
 -
--static int sha384_ssse3_init(struct shash_desc *desc)
+-static int sha224_ssse3_init(struct shash_desc *desc)
 -{
--	struct sha512_state *sctx = shash_desc_ctx(desc);
+-	struct sha256_state *sctx = shash_desc_ctx(desc);
 -
--	sctx->state[0] = SHA384_H0;
--	sctx->state[1] = SHA384_H1;
--	sctx->state[2] = SHA384_H2;
--	sctx->state[3] = SHA384_H3;
--	sctx->state[4] = SHA384_H4;
--	sctx->state[5] = SHA384_H5;
--	sctx->state[6] = SHA384_H6;
--	sctx->state[7] = SHA384_H7;
--
--	sctx->count[0] = sctx->count[1] = 0;
+-	sctx->state[0] = SHA224_H0;
+-	sctx->state[1] = SHA224_H1;
+-	sctx->state[2] = SHA224_H2;
+-	sctx->state[3] = SHA224_H3;
+-	sctx->state[4] = SHA224_H4;
+-	sctx->state[5] = SHA224_H5;
+-	sctx->state[6] = SHA224_H6;
+-	sctx->state[7] = SHA224_H7;
+-	sctx->count = 0;
 -
 -	return 0;
 -}
 -
--static int sha384_ssse3_final(struct shash_desc *desc, u8 *hash)
--{
--	u8 D[SHA512_DIGEST_SIZE];
+-static int sha224_ssse3_final(struct shash_desc *desc, u8 *hash)
++/* Add padding and return the message digest. */
++static int sha256_ssse3_final(struct shash_desc *desc, u8 *out)
+ {
+-	u8 D[SHA256_DIGEST_SIZE];
 -
--	sha512_ssse3_final(desc, D);
+-	sha256_ssse3_final(desc, D);
 -
--	memcpy(hash, D, SHA384_DIGEST_SIZE);
--	memzero_explicit(D, SHA512_DIGEST_SIZE);
+-	memcpy(hash, D, SHA224_DIGEST_SIZE);
+-	memzero_explicit(D, SHA256_DIGEST_SIZE);
 -
 -	return 0;
-+	return sha512_ssse3_finup(desc, NULL, 0, out);
++	return sha256_ssse3_finup(desc, NULL, 0, out);
  }
  
  static struct shash_alg algs[] = { {
- 	.digestsize	=	SHA512_DIGEST_SIZE,
--	.init		=	sha512_ssse3_init,
-+	.init		=	sha512_base_init,
- 	.update		=	sha512_ssse3_update,
- 	.final		=	sha512_ssse3_final,
--	.export		=	sha512_ssse3_export,
--	.import		=	sha512_ssse3_import,
-+	.finup		=	sha512_ssse3_finup,
- 	.descsize	=	sizeof(struct sha512_state),
--	.statesize	=	sizeof(struct sha512_state),
+ 	.digestsize	=	SHA256_DIGEST_SIZE,
+-	.init		=	sha256_ssse3_init,
++	.init		=	sha256_base_init,
+ 	.update		=	sha256_ssse3_update,
+ 	.final		=	sha256_ssse3_final,
+-	.export		=	sha256_ssse3_export,
+-	.import		=	sha256_ssse3_import,
++	.finup		=	sha256_ssse3_finup,
+ 	.descsize	=	sizeof(struct sha256_state),
+-	.statesize	=	sizeof(struct sha256_state),
  	.base		=	{
- 		.cra_name	=	"sha512",
- 		.cra_driver_name =	"sha512-ssse3",
-@@ -243,13 +113,11 @@ static struct shash_alg algs[] = { {
+ 		.cra_name	=	"sha256",
+ 		.cra_driver_name =	"sha256-ssse3",
+@@ -235,13 +114,11 @@ static struct shash_alg algs[] = { {
  	}
- },  {
- 	.digestsize	=	SHA384_DIGEST_SIZE,
--	.init		=	sha384_ssse3_init,
-+	.init		=	sha384_base_init,
- 	.update		=	sha512_ssse3_update,
--	.final		=	sha384_ssse3_final,
--	.export		=	sha512_ssse3_export,
--	.import		=	sha512_ssse3_import,
-+	.final		=	sha512_ssse3_final,
-+	.finup		=	sha512_ssse3_finup,
- 	.descsize	=	sizeof(struct sha512_state),
--	.statesize	=	sizeof(struct sha512_state),
+ }, {
+ 	.digestsize	=	SHA224_DIGEST_SIZE,
+-	.init		=	sha224_ssse3_init,
++	.init		=	sha224_base_init,
+ 	.update		=	sha256_ssse3_update,
+-	.final		=	sha224_ssse3_final,
+-	.export		=	sha256_ssse3_export,
+-	.import		=	sha256_ssse3_import,
++	.final		=	sha256_ssse3_final,
++	.finup		=	sha256_ssse3_finup,
+ 	.descsize	=	sizeof(struct sha256_state),
+-	.statesize	=	sizeof(struct sha256_state),
  	.base		=	{
- 		.cra_name	=	"sha384",
- 		.cra_driver_name =	"sha384-ssse3",
+ 		.cra_name	=	"sha224",
+ 		.cra_driver_name =	"sha224-ssse3",
 -- 
 1.8.3.2
