@@ -1,20 +1,20 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 08/16] crypto/arm: move SHA-1 NEON implementation to base layer
-Date: Thu,  9 Apr 2015 12:55:40 +0200
-Message-ID: <1428576948-23863-9-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 09/16] crypto/arm: move SHA-1 ARMv8 implementation to base layer
+Date: Thu,  9 Apr 2015 12:55:41 +0200
+Message-ID: <1428576948-23863-10-git-send-email-ard.biesheuvel@linaro.org>
 References: <1428576948-23863-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: stockhausen@collogia.de, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	x86@kernel.org, herbert@gondor.apana.org.au,
 	samitolvanen@google.com, jussi.kivilinna@iki.fi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:35822 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933258AbbDIK4X (ORCPT
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:35773 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933258AbbDIK4Z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Apr 2015 06:56:23 -0400
-Received: by wgyo15 with SMTP id o15so105205394wgy.2
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Apr 2015 03:56:21 -0700 (PDT)
+	Thu, 9 Apr 2015 06:56:25 -0400
+Received: by widdi4 with SMTP id di4so87418113wid.0
+        for <linux-crypto@vger.kernel.org>; Thu, 09 Apr 2015 03:56:23 -0700 (PDT)
 In-Reply-To: <1428576948-23863-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -24,183 +24,226 @@ and replaces it with calls into the base layer.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/sha1_neon_glue.c | 135 +++++++--------------------------------
- 1 file changed, 24 insertions(+), 111 deletions(-)
+ arch/arm/crypto/Kconfig        |   1 -
+ arch/arm/crypto/sha1-ce-core.S |  23 +++------
+ arch/arm/crypto/sha1-ce-glue.c | 107 ++++++++++-------------------------------
+ 3 files changed, 33 insertions(+), 98 deletions(-)
 
-diff --git a/arch/arm/crypto/sha1_neon_glue.c b/arch/arm/crypto/sha1_neon_glue.c
-index 5d9a1b4aac73..4e22f122f966 100644
---- a/arch/arm/crypto/sha1_neon_glue.c
-+++ b/arch/arm/crypto/sha1_neon_glue.c
-@@ -25,7 +25,7 @@
- #include <linux/cryptohash.h>
- #include <linux/types.h>
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index 458729d2ce22..5ed98bc6f95d 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -31,7 +31,6 @@ config CRYPTO_SHA1_ARM_CE
+ 	tristate "SHA1 digest algorithm (ARM v8 Crypto Extensions)"
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_SHA1_ARM
+-	select CRYPTO_SHA1
+ 	select CRYPTO_HASH
+ 	help
+ 	  SHA-1 secure hash standard (FIPS 180-1/DFIPS 180-2) implemented
+diff --git a/arch/arm/crypto/sha1-ce-core.S b/arch/arm/crypto/sha1-ce-core.S
+index 4aad520935d8..b623f51ccbcf 100644
+--- a/arch/arm/crypto/sha1-ce-core.S
++++ b/arch/arm/crypto/sha1-ce-core.S
+@@ -61,8 +61,8 @@
+ 	.word		0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6
+ 
+ 	/*
+-	 * void sha1_ce_transform(int blocks, u8 const *src, u32 *state,
+-	 *			  u8 *head);
++	 * void sha1_ce_transform(struct sha1_state *sst, u8 const *src,
++	 *			  int blocks);
+ 	 */
+ ENTRY(sha1_ce_transform)
+ 	/* load round constants */
+@@ -71,23 +71,14 @@ ENTRY(sha1_ce_transform)
+ 	vld1.32		{k2-k3}, [ip, :128]
+ 
+ 	/* load state */
+-	vld1.32		{dga}, [r2]
+-	vldr		dgbs, [r2, #16]
+-
+-	/* load partial input (if supplied) */
+-	teq		r3, #0
+-	beq		0f
+-	vld1.32		{q8-q9}, [r3]!
+-	vld1.32		{q10-q11}, [r3]
+-	teq		r0, #0
+-	b		1f
++	vld1.32		{dga}, [r0]
++	vldr		dgbs, [r0, #16]
+ 
+ 	/* load input */
+ 0:	vld1.32		{q8-q9}, [r1]!
+ 	vld1.32		{q10-q11}, [r1]!
+-	subs		r0, r0, #1
++	subs		r2, r2, #1
+ 
+-1:
+ #ifndef CONFIG_CPU_BIG_ENDIAN
+ 	vrev32.8	q8, q8
+ 	vrev32.8	q9, q9
+@@ -128,7 +119,7 @@ ENTRY(sha1_ce_transform)
+ 	bne		0b
+ 
+ 	/* store new state */
+-	vst1.32		{dga}, [r2]
+-	vstr		dgbs, [r2, #16]
++	vst1.32		{dga}, [r0]
++	vstr		dgbs, [r0, #16]
+ 	bx		lr
+ ENDPROC(sha1_ce_transform)
+diff --git a/arch/arm/crypto/sha1-ce-glue.c b/arch/arm/crypto/sha1-ce-glue.c
+index e93b24c1af1f..80bc2fcd241a 100644
+--- a/arch/arm/crypto/sha1-ce-glue.c
++++ b/arch/arm/crypto/sha1-ce-glue.c
+@@ -10,13 +10,13 @@
+ 
+ #include <crypto/internal/hash.h>
  #include <crypto/sha.h>
--#include <asm/byteorder.h>
 +#include <crypto/sha1_base.h>
+ #include <linux/crypto.h>
+ #include <linux/module.h>
+ 
+ #include <asm/hwcap.h>
  #include <asm/neon.h>
  #include <asm/simd.h>
+-#include <asm/unaligned.h>
  
-@@ -34,138 +34,51 @@
- asmlinkage void sha1_transform_neon(void *state_h, const char *data,
- 				    unsigned int rounds);
+ #include "sha1.h"
  
--
--static int sha1_neon_init(struct shash_desc *desc)
--{
--	struct sha1_state *sctx = shash_desc_ctx(desc);
--
--	*sctx = (struct sha1_state){
--		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
--	};
--
--	return 0;
--}
--
--static int __sha1_neon_update(struct shash_desc *desc, const u8 *data,
--			       unsigned int len, unsigned int partial)
--{
--	struct sha1_state *sctx = shash_desc_ctx(desc);
--	unsigned int done = 0;
--
--	sctx->count += len;
--
--	if (partial) {
--		done = SHA1_BLOCK_SIZE - partial;
--		memcpy(sctx->buffer + partial, data, done);
--		sha1_transform_neon(sctx->state, sctx->buffer, 1);
--	}
--
--	if (len - done >= SHA1_BLOCK_SIZE) {
--		const unsigned int rounds = (len - done) / SHA1_BLOCK_SIZE;
--
--		sha1_transform_neon(sctx->state, data + done, rounds);
--		done += rounds * SHA1_BLOCK_SIZE;
--	}
--
--	memcpy(sctx->buffer, data + done, len - done);
--
--	return 0;
--}
--
- static int sha1_neon_update(struct shash_desc *desc, const u8 *data,
--			     unsigned int len)
+@@ -24,107 +24,52 @@ MODULE_DESCRIPTION("SHA1 secure hash using ARMv8 Crypto Extensions");
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+ MODULE_LICENSE("GPL v2");
+ 
+-asmlinkage void sha1_ce_transform(int blocks, u8 const *src, u32 *state, 
+-				  u8 *head);
++asmlinkage void sha1_ce_transform(struct sha1_state *sst, u8 const *src,
++				  int blocks);
+ 
+-static int sha1_init(struct shash_desc *desc)
++static int sha1_ce_update(struct shash_desc *desc, const u8 *data,
 +			  unsigned int len)
  {
  	struct sha1_state *sctx = shash_desc_ctx(desc);
--	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
--	int res;
  
--	/* Handle the fast case right here */
--	if (partial + len < SHA1_BLOCK_SIZE) {
--		sctx->count += len;
--		memcpy(sctx->buffer + partial, data, len);
-+	if (!may_use_simd() ||
-+	    (sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
-+		return sha1_update_arm(desc, data, len);
- 
--		return 0;
--	}
--
--	if (!may_use_simd()) {
--		res = sha1_update_arm(desc, data, len);
--	} else {
--		kernel_neon_begin();
--		res = __sha1_neon_update(desc, data, len, partial);
--		kernel_neon_end();
--	}
--
--	return res;
+-	*sctx = (struct sha1_state){
+-		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
+-	};
+-	return 0;
 -}
 -
--
--/* Add padding and return the message digest. */
--static int sha1_neon_final(struct shash_desc *desc, u8 *out)
+-static int sha1_update(struct shash_desc *desc, const u8 *data,
+-		       unsigned int len)
 -{
 -	struct sha1_state *sctx = shash_desc_ctx(desc);
--	unsigned int i, index, padlen;
--	__be32 *dst = (__be32 *)out;
--	__be64 bits;
--	static const u8 padding[SHA1_BLOCK_SIZE] = { 0x80, };
+-	unsigned int partial;
 -
--	bits = cpu_to_be64(sctx->count << 3);
+-	if (!may_use_simd())
++	if (!may_use_simd() ||
++	    (sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
+ 		return sha1_update_arm(desc, data, len);
+ 
+-	partial = sctx->count % SHA1_BLOCK_SIZE;
+-	sctx->count += len;
 -
--	/* Pad out to 56 mod 64 and append length */
--	index = sctx->count % SHA1_BLOCK_SIZE;
--	padlen = (index < 56) ? (56 - index) : ((SHA1_BLOCK_SIZE+56) - index);
--	if (!may_use_simd()) {
--		sha1_update_arm(desc, padding, padlen);
--		sha1_update_arm(desc, (const u8 *)&bits, sizeof(bits));
--	} else {
--		kernel_neon_begin();
--		/* We need to fill a whole block for __sha1_neon_update() */
--		if (padlen <= 56) {
--			sctx->count += padlen;
--			memcpy(sctx->buffer + index, padding, padlen);
--		} else {
--			__sha1_neon_update(desc, padding, padlen, index);
--		}
--		__sha1_neon_update(desc, (const u8 *)&bits, sizeof(bits), 56);
--		kernel_neon_end();
--	}
--
--	/* Store state in digest */
--	for (i = 0; i < 5; i++)
--		dst[i] = cpu_to_be32(sctx->state[i]);
--
--	/* Wipe context */
--	memset(sctx, 0, sizeof(*sctx));
+-	if ((partial + len) >= SHA1_BLOCK_SIZE) {
+-		int blocks;
 +	kernel_neon_begin();
-+	sha1_base_do_update(desc, data, len,
-+			    (sha1_block_fn *)sha1_transform_neon);
++	sha1_base_do_update(desc, data, len, sha1_ce_transform);
 +	kernel_neon_end();
  
+-		if (partial) {
+-			int p = SHA1_BLOCK_SIZE - partial;
+-
+-			memcpy(sctx->buffer + partial, data, p);
+-			data += p;
+-			len -= p;
+-		}
+-
+-		blocks = len / SHA1_BLOCK_SIZE;
+-		len %= SHA1_BLOCK_SIZE;
+-
+-		kernel_neon_begin();
+-		sha1_ce_transform(blocks, data, sctx->state,
+-				  partial ? sctx->buffer : NULL);
+-		kernel_neon_end();
+-
+-		data += blocks * SHA1_BLOCK_SIZE;
+-		partial = 0;
+-	}
+-	if (len)
+-		memcpy(sctx->buffer + partial, data, len);
  	return 0;
  }
  
--static int sha1_neon_export(struct shash_desc *desc, void *out)
-+static int sha1_neon_finup(struct shash_desc *desc, const u8 *data,
-+			   unsigned int len, u8 *out)
+-static int sha1_final(struct shash_desc *desc, u8 *out)
++static int sha1_ce_finup(struct shash_desc *desc, const u8 *data,
++			 unsigned int len, u8 *out)
  {
+-	static const u8 padding[SHA1_BLOCK_SIZE] = { 0x80, };
+-
 -	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	__be64 bits = cpu_to_be64(sctx->count << 3);
+-	__be32 *dst = (__be32 *)out;
+-	int i;
+-
+-	u32 padlen = SHA1_BLOCK_SIZE
+-		     - ((sctx->count + sizeof(bits)) % SHA1_BLOCK_SIZE);
+-
+-	sha1_update(desc, padding, padlen);
+-	sha1_update(desc, (const u8 *)&bits, sizeof(bits));
+-
+-	for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(__be32); i++)
+-		put_unaligned_be32(sctx->state[i], dst++);
+-
+-	*sctx = (struct sha1_state){};
+-	return 0;
+-}
 +	if (!may_use_simd())
 +		return sha1_finup_arm(desc, data, len, out);
  
--	memcpy(out, sctx, sizeof(*sctx));
+-static int sha1_export(struct shash_desc *desc, void *out)
+-{
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	struct sha1_state *dst = out;
 +	kernel_neon_begin();
 +	if (len)
-+		sha1_base_do_update(desc, data, len,
-+				    (sha1_block_fn *)sha1_transform_neon);
-+	sha1_base_do_finalize(desc, (sha1_block_fn *)sha1_transform_neon);
++		sha1_base_do_update(desc, data, len, sha1_ce_transform);
++	sha1_base_do_finalize(desc, sha1_ce_transform);
 +	kernel_neon_end();
  
+-	*dst = *sctx;
 -	return 0;
 +	return sha1_base_finish(desc, out);
  }
  
--static int sha1_neon_import(struct shash_desc *desc, const void *in)
-+static int sha1_neon_final(struct shash_desc *desc, u8 *out)
+-static int sha1_import(struct shash_desc *desc, const void *in)
++static int sha1_ce_final(struct shash_desc *desc, u8 *out)
  {
 -	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	struct sha1_state const *src = in;
 -
--	memcpy(sctx, in, sizeof(*sctx));
--
+-	*sctx = *src;
 -	return 0;
-+	return sha1_neon_finup(desc, NULL, 0, out);
++	return sha1_ce_finup(desc, NULL, 0, out);
  }
  
  static struct shash_alg alg = {
- 	.digestsize	=	SHA1_DIGEST_SIZE,
--	.init		=	sha1_neon_init,
-+	.init		=	sha1_base_init,
- 	.update		=	sha1_neon_update,
- 	.final		=	sha1_neon_final,
--	.export		=	sha1_neon_export,
--	.import		=	sha1_neon_import,
-+	.finup		=	sha1_neon_finup,
- 	.descsize	=	sizeof(struct sha1_state),
--	.statesize	=	sizeof(struct sha1_state),
- 	.base		=	{
+-	.init			= sha1_init,
+-	.update			= sha1_update,
+-	.final			= sha1_final,
+-	.export			= sha1_export,
+-	.import			= sha1_import,
++	.init			= sha1_base_init,
++	.update			= sha1_ce_update,
++	.final			= sha1_ce_final,
++	.finup			= sha1_ce_finup,
+ 	.descsize		= sizeof(struct sha1_state),
+ 	.digestsize		= SHA1_DIGEST_SIZE,
+-	.statesize		= sizeof(struct sha1_state),
+ 	.base			= {
  		.cra_name		= "sha1",
- 		.cra_driver_name	= "sha1-neon",
+ 		.cra_driver_name	= "sha1-ce",
 -- 
 1.8.3.2
