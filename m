@@ -1,217 +1,187 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 06/16] crypto: sha512-generic: move to generic glue implementation
-Date: Thu,  9 Apr 2015 12:55:38 +0200
-Message-ID: <1428576948-23863-7-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 04/16] crypto: sha1-generic: move to generic glue implementation
+Date: Thu,  9 Apr 2015 12:55:36 +0200
+Message-ID: <1428576948-23863-5-git-send-email-ard.biesheuvel@linaro.org>
 References: <1428576948-23863-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: stockhausen@collogia.de, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	x86@kernel.org, herbert@gondor.apana.org.au,
 	samitolvanen@google.com, jussi.kivilinna@iki.fi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:35663 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933260AbbDIK4T (ORCPT
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:35582 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754431AbbDIK4O (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Apr 2015 06:56:19 -0400
-Received: by widdi4 with SMTP id di4so87415594wid.0
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Apr 2015 03:56:17 -0700 (PDT)
+	Thu, 9 Apr 2015 06:56:14 -0400
+Received: by widdi4 with SMTP id di4so87413728wid.0
+        for <linux-crypto@vger.kernel.org>; Thu, 09 Apr 2015 03:56:13 -0700 (PDT)
 In-Reply-To: <1428576948-23863-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This updated the generic SHA-512 implementation to use the
-generic shared SHA-512 glue code.
+This updated the generic SHA-1 implementation to use the generic
+shared SHA-1 glue code.
 
-It also implements a .finup hook crypto_sha512_finup() and exports
+It also implements a .finup hook crypto_sha1_finup() and exports
 it to other modules. The import and export() functions and the
 .statesize member are dropped, since the default implementation
 is perfectly suitable for this module.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/sha512_generic.c | 123 +++++++++---------------------------------------
- include/crypto/sha.h    |   3 ++
- 2 files changed, 24 insertions(+), 102 deletions(-)
+ crypto/sha1_generic.c | 102 ++++++++++----------------------------------------
+ include/crypto/sha.h  |   3 ++
+ 2 files changed, 23 insertions(+), 82 deletions(-)
 
-diff --git a/crypto/sha512_generic.c b/crypto/sha512_generic.c
-index 1c3c3767e079..eba965d18bfc 100644
---- a/crypto/sha512_generic.c
-+++ b/crypto/sha512_generic.c
-@@ -18,6 +18,7 @@
- #include <linux/crypto.h>
+diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
+index a3e50c37eb6f..39e3acc438d9 100644
+--- a/crypto/sha1_generic.c
++++ b/crypto/sha1_generic.c
+@@ -23,111 +23,49 @@
+ #include <linux/cryptohash.h>
  #include <linux/types.h>
  #include <crypto/sha.h>
-+#include <crypto/sha512_base.h>
- #include <linux/percpu.h>
++#include <crypto/sha1_base.h>
  #include <asm/byteorder.h>
- #include <asm/unaligned.h>
-@@ -130,125 +131,42 @@ sha512_transform(u64 *state, const u8 *input)
- 	a = b = c = d = e = f = g = h = t1 = t2 = 0;
- }
  
--static int
--sha512_init(struct shash_desc *desc)
-+static void sha512_generic_block_fn(struct sha512_state *sst, u8 const *src,
-+				    int blocks)
+-static int sha1_init(struct shash_desc *desc)
++static void sha1_generic_block_fn(struct sha1_state *sst, u8 const *src,
++				  int blocks)
  {
--	struct sha512_state *sctx = shash_desc_ctx(desc);
--	sctx->state[0] = SHA512_H0;
--	sctx->state[1] = SHA512_H1;
--	sctx->state[2] = SHA512_H2;
--	sctx->state[3] = SHA512_H3;
--	sctx->state[4] = SHA512_H4;
--	sctx->state[5] = SHA512_H5;
--	sctx->state[6] = SHA512_H6;
--	sctx->state[7] = SHA512_H7;
--	sctx->count[0] = sctx->count[1] = 0;
--
--	return 0;
--}
--
--static int
--sha384_init(struct shash_desc *desc)
--{
--	struct sha512_state *sctx = shash_desc_ctx(desc);
--	sctx->state[0] = SHA384_H0;
--	sctx->state[1] = SHA384_H1;
--	sctx->state[2] = SHA384_H2;
--	sctx->state[3] = SHA384_H3;
--	sctx->state[4] = SHA384_H4;
--	sctx->state[5] = SHA384_H5;
--	sctx->state[6] = SHA384_H6;
--	sctx->state[7] = SHA384_H7;
--	sctx->count[0] = sctx->count[1] = 0;
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
++	u32 temp[SHA_WORKSPACE_WORDS];
+ 
+-	*sctx = (struct sha1_state){
+-		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
+-	};
 -
 -	return 0;
 +	while (blocks--) {
-+		sha512_transform(sst->state, src);
-+		src += SHA512_BLOCK_SIZE;
++		sha_transform(sst->state, src, temp);
++		src += SHA1_BLOCK_SIZE;
 +	}
++	memzero_explicit(temp, sizeof(temp));
  }
  
- int crypto_sha512_update(struct shash_desc *desc, const u8 *data,
- 			unsigned int len)
+ int crypto_sha1_update(struct shash_desc *desc, const u8 *data,
+-			unsigned int len)
++		       unsigned int len)
  {
--	struct sha512_state *sctx = shash_desc_ctx(desc);
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	unsigned int partial, done;
+-	const u8 *src;
 -
--	unsigned int i, index, part_len;
+-	partial = sctx->count % SHA1_BLOCK_SIZE;
+-	sctx->count += len;
+-	done = 0;
+-	src = data;
 -
--	/* Compute number of bytes mod 128 */
--	index = sctx->count[0] & 0x7f;
+-	if ((partial + len) >= SHA1_BLOCK_SIZE) {
+-		u32 temp[SHA_WORKSPACE_WORDS];
 -
--	/* Update number of bytes */
--	if ((sctx->count[0] += len) < len)
--		sctx->count[1]++;
+-		if (partial) {
+-			done = -partial;
+-			memcpy(sctx->buffer + partial, data,
+-			       done + SHA1_BLOCK_SIZE);
+-			src = sctx->buffer;
+-		}
 -
--        part_len = 128 - index;
+-		do {
+-			sha_transform(sctx->state, src, temp);
+-			done += SHA1_BLOCK_SIZE;
+-			src = data + done;
+-		} while (done + SHA1_BLOCK_SIZE <= len);
 -
--	/* Transform as many times as possible. */
--	if (len >= part_len) {
--		memcpy(&sctx->buf[index], data, part_len);
--		sha512_transform(sctx->state, sctx->buf);
--
--		for (i = part_len; i + 127 < len; i+=128)
--			sha512_transform(sctx->state, &data[i]);
--
--		index = 0;
--	} else {
--		i = 0;
+-		memzero_explicit(temp, sizeof(temp));
+-		partial = 0;
 -	}
--
--	/* Buffer remaining input */
--	memcpy(&sctx->buf[index], &data[i], len - i);
+-	memcpy(sctx->buffer + partial, src, len - done);
 -
 -	return 0;
-+	return sha512_base_do_update(desc, data, len, sha512_generic_block_fn);
++	return sha1_base_do_update(desc, data, len, sha1_generic_block_fn);
  }
- EXPORT_SYMBOL(crypto_sha512_update);
+ EXPORT_SYMBOL(crypto_sha1_update);
  
--static int
--sha512_final(struct shash_desc *desc, u8 *hash)
-+static int sha512_final(struct shash_desc *desc, u8 *hash)
+-
+-/* Add padding and return the message digest. */
+ static int sha1_final(struct shash_desc *desc, u8 *out)
  {
--	struct sha512_state *sctx = shash_desc_ctx(desc);
--        static u8 padding[128] = { 0x80, };
--	__be64 *dst = (__be64 *)hash;
--	__be64 bits[2];
--	unsigned int index, pad_len;
--	int i;
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	__be32 *dst = (__be32 *)out;
+-	u32 i, index, padlen;
+-	__be64 bits;
+-	static const u8 padding[64] = { 0x80, };
 -
--	/* Save number of bits */
--	bits[1] = cpu_to_be64(sctx->count[0] << 3);
--	bits[0] = cpu_to_be64(sctx->count[1] << 3 | sctx->count[0] >> 61);
+-	bits = cpu_to_be64(sctx->count << 3);
 -
--	/* Pad out to 112 mod 128. */
--	index = sctx->count[0] & 0x7f;
--	pad_len = (index < 112) ? (112 - index) : ((128+112) - index);
--	crypto_sha512_update(desc, padding, pad_len);
+-	/* Pad out to 56 mod 64 */
+-	index = sctx->count & 0x3f;
+-	padlen = (index < 56) ? (56 - index) : ((64+56) - index);
+-	crypto_sha1_update(desc, padding, padlen);
 -
--	/* Append length (before padding) */
--	crypto_sha512_update(desc, (const u8 *)bits, sizeof(bits));
+-	/* Append length */
+-	crypto_sha1_update(desc, (const u8 *)&bits, sizeof(bits));
 -
 -	/* Store state in digest */
--	for (i = 0; i < 8; i++)
--		dst[i] = cpu_to_be64(sctx->state[i]);
+-	for (i = 0; i < 5; i++)
+-		dst[i] = cpu_to_be32(sctx->state[i]);
 -
--	/* Zeroize sensitive information. */
--	memset(sctx, 0, sizeof(struct sha512_state));
+-	/* Wipe context */
+-	memset(sctx, 0, sizeof *sctx);
 -
 -	return 0;
-+	sha512_base_do_finalize(desc, sha512_generic_block_fn);
-+	return sha512_base_finish(desc, hash);
++	sha1_base_do_finalize(desc, sha1_generic_block_fn);
++	return sha1_base_finish(desc, out);
  }
  
--static int sha384_final(struct shash_desc *desc, u8 *hash)
-+int crypto_sha512_finup(struct shash_desc *desc, const u8 *data,
-+			unsigned int len, u8 *hash)
+-static int sha1_export(struct shash_desc *desc, void *out)
++int crypto_sha1_finup(struct shash_desc *desc, const u8 *data,
++		      unsigned int len, u8 *out)
  {
--	u8 D[64];
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
 -
--	sha512_final(desc, D);
--
--	memcpy(hash, D, 48);
--	memzero_explicit(D, 64);
--
+-	memcpy(out, sctx, sizeof(*sctx));
 -	return 0;
-+	sha512_base_do_update(desc, data, len, sha512_generic_block_fn);
-+	return sha512_final(desc, hash);
+-}
+-
+-static int sha1_import(struct shash_desc *desc, const void *in)
+-{
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-
+-	memcpy(sctx, in, sizeof(*sctx));
+-	return 0;
++	sha1_base_do_update(desc, data, len, sha1_generic_block_fn);
++	return sha1_final(desc, out);
  }
-+EXPORT_SYMBOL(crypto_sha512_finup);
++EXPORT_SYMBOL(crypto_sha1_finup);
  
- static struct shash_alg sha512_algs[2] = { {
- 	.digestsize	=	SHA512_DIGEST_SIZE,
--	.init		=	sha512_init,
-+	.init		=	sha512_base_init,
- 	.update		=	crypto_sha512_update,
- 	.final		=	sha512_final,
-+	.finup		=	crypto_sha512_finup,
- 	.descsize	=	sizeof(struct sha512_state),
+ static struct shash_alg alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+-	.init		=	sha1_init,
++	.init		=	sha1_base_init,
+ 	.update		=	crypto_sha1_update,
+ 	.final		=	sha1_final,
+-	.export		=	sha1_export,
+-	.import		=	sha1_import,
++	.finup		=	crypto_sha1_finup,
+ 	.descsize	=	sizeof(struct sha1_state),
+-	.statesize	=	sizeof(struct sha1_state),
  	.base		=	{
- 		.cra_name	=	"sha512",
-@@ -259,9 +177,10 @@ static struct shash_alg sha512_algs[2] = { {
- 	}
- }, {
- 	.digestsize	=	SHA384_DIGEST_SIZE,
--	.init		=	sha384_init,
-+	.init		=	sha384_base_init,
- 	.update		=	crypto_sha512_update,
--	.final		=	sha384_final,
-+	.final		=	sha512_final,
-+	.finup		=	crypto_sha512_finup,
- 	.descsize	=	sizeof(struct sha512_state),
- 	.base		=	{
- 		.cra_name	=	"sha384",
+ 		.cra_name	=	"sha1",
+ 		.cra_driver_name=	"sha1-generic",
 diff --git a/include/crypto/sha.h b/include/crypto/sha.h
-index e28c4b5e805d..dd7905a3c22e 100644
+index 05e82cbc4d8f..a754cdd749c6 100644
 --- a/include/crypto/sha.h
 +++ b/include/crypto/sha.h
-@@ -98,4 +98,7 @@ extern int crypto_sha256_finup(struct shash_desc *desc, const u8 *data,
- 
- extern int crypto_sha512_update(struct shash_desc *desc, const u8 *data,
+@@ -87,6 +87,9 @@ struct shash_desc;
+ extern int crypto_sha1_update(struct shash_desc *desc, const u8 *data,
  			      unsigned int len);
+ 
++extern int crypto_sha1_finup(struct shash_desc *desc, const u8 *data,
++			     unsigned int len, u8 *hash);
 +
-+extern int crypto_sha512_finup(struct shash_desc *desc, const u8 *data,
-+			       unsigned int len, u8 *hash);
- #endif
+ extern int crypto_sha256_update(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len);
+ 
 -- 
 1.8.3.2
