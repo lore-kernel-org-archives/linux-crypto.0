@@ -1,20 +1,20 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 10/16] crypto/arm: move SHA-224/256 ASM/NEON implementation to base layer
-Date: Thu,  9 Apr 2015 12:55:42 +0200
-Message-ID: <1428576948-23863-11-git-send-email-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 07/16] crypto/arm: move SHA-1 ARM asm implementation to base layer
+Date: Thu,  9 Apr 2015 12:55:39 +0200
+Message-ID: <1428576948-23863-8-git-send-email-ard.biesheuvel@linaro.org>
 References: <1428576948-23863-1-git-send-email-ard.biesheuvel@linaro.org>
 Cc: stockhausen@collogia.de, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	x86@kernel.org, herbert@gondor.apana.org.au,
 	samitolvanen@google.com, jussi.kivilinna@iki.fi
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:37994 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933268AbbDIK41 (ORCPT
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:35903 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933260AbbDIK4V (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 9 Apr 2015 06:56:27 -0400
-Received: by wiun10 with SMTP id n10so92967156wiu.1
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Apr 2015 03:56:26 -0700 (PDT)
+	Thu, 9 Apr 2015 06:56:21 -0400
+Received: by wizk4 with SMTP id k4so87505630wiz.1
+        for <linux-crypto@vger.kernel.org>; Thu, 09 Apr 2015 03:56:20 -0700 (PDT)
 In-Reply-To: <1428576948-23863-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
@@ -24,437 +24,208 @@ and replaces it with calls into the base layer.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/sha256_glue.c      | 170 ++++++-------------------------------
- arch/arm/crypto/sha256_glue.h      |  17 +---
- arch/arm/crypto/sha256_neon_glue.c | 143 ++++++++-----------------------
- 3 files changed, 66 insertions(+), 264 deletions(-)
+ arch/arm/crypto/sha1-ce-glue.c           |   3 +-
+ arch/arm/{include/asm => }/crypto/sha1.h |   3 +
+ arch/arm/crypto/sha1_glue.c              | 112 +++++--------------------------
+ arch/arm/crypto/sha1_neon_glue.c         |   2 +-
+ 4 files changed, 22 insertions(+), 98 deletions(-)
+ rename arch/arm/{include/asm => }/crypto/sha1.h (67%)
 
-diff --git a/arch/arm/crypto/sha256_glue.c b/arch/arm/crypto/sha256_glue.c
-index ccef5e25bbcb..a84e869ef900 100644
---- a/arch/arm/crypto/sha256_glue.c
-+++ b/arch/arm/crypto/sha256_glue.c
-@@ -24,165 +24,49 @@
- #include <linux/types.h>
- #include <linux/string.h>
- #include <crypto/sha.h>
--#include <asm/byteorder.h>
-+#include <crypto/sha256_base.h>
- #include <asm/simd.h>
+diff --git a/arch/arm/crypto/sha1-ce-glue.c b/arch/arm/crypto/sha1-ce-glue.c
+index a9dd90df9fd7..e93b24c1af1f 100644
+--- a/arch/arm/crypto/sha1-ce-glue.c
++++ b/arch/arm/crypto/sha1-ce-glue.c
+@@ -13,12 +13,13 @@
+ #include <linux/crypto.h>
+ #include <linux/module.h>
+ 
+-#include <asm/crypto/sha1.h>
+ #include <asm/hwcap.h>
  #include <asm/neon.h>
+ #include <asm/simd.h>
+ #include <asm/unaligned.h>
+ 
++#include "sha1.h"
 +
- #include "sha256_glue.h"
+ MODULE_DESCRIPTION("SHA1 secure hash using ARMv8 Crypto Extensions");
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+ MODULE_LICENSE("GPL v2");
+diff --git a/arch/arm/include/asm/crypto/sha1.h b/arch/arm/crypto/sha1.h
+similarity index 67%
+rename from arch/arm/include/asm/crypto/sha1.h
+rename to arch/arm/crypto/sha1.h
+index 75e6a417416b..ffd8bd08b1a7 100644
+--- a/arch/arm/include/asm/crypto/sha1.h
++++ b/arch/arm/crypto/sha1.h
+@@ -7,4 +7,7 @@
+ extern int sha1_update_arm(struct shash_desc *desc, const u8 *data,
+ 			   unsigned int len);
  
- asmlinkage void sha256_block_data_order(u32 *digest, const void *data,
--				      unsigned int num_blks);
++extern int sha1_finup_arm(struct shash_desc *desc, const u8 *data,
++			   unsigned int len, u8 *out);
++
+ #endif
+diff --git a/arch/arm/crypto/sha1_glue.c b/arch/arm/crypto/sha1_glue.c
+index e31b0440c613..6fc73bf8766d 100644
+--- a/arch/arm/crypto/sha1_glue.c
++++ b/arch/arm/crypto/sha1_glue.c
+@@ -22,127 +22,47 @@
+ #include <linux/cryptohash.h>
+ #include <linux/types.h>
+ #include <crypto/sha.h>
++#include <crypto/sha1_base.h>
+ #include <asm/byteorder.h>
+-#include <asm/crypto/sha1.h>
+ 
++#include "sha1.h"
+ 
+ asmlinkage void sha1_block_data_order(u32 *digest,
+ 		const unsigned char *data, unsigned int rounds);
+ 
 -
--
--int sha256_init(struct shash_desc *desc)
+-static int sha1_init(struct shash_desc *desc)
 -{
--	struct sha256_state *sctx = shash_desc_ctx(desc);
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
 -
--	sctx->state[0] = SHA256_H0;
--	sctx->state[1] = SHA256_H1;
--	sctx->state[2] = SHA256_H2;
--	sctx->state[3] = SHA256_H3;
--	sctx->state[4] = SHA256_H4;
--	sctx->state[5] = SHA256_H5;
--	sctx->state[6] = SHA256_H6;
--	sctx->state[7] = SHA256_H7;
--	sctx->count = 0;
+-	*sctx = (struct sha1_state){
+-		.state = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
+-	};
 -
 -	return 0;
 -}
 -
--int sha224_init(struct shash_desc *desc)
+-
+-static int __sha1_update(struct sha1_state *sctx, const u8 *data,
+-			 unsigned int len, unsigned int partial)
 -{
--	struct sha256_state *sctx = shash_desc_ctx(desc);
--
--	sctx->state[0] = SHA224_H0;
--	sctx->state[1] = SHA224_H1;
--	sctx->state[2] = SHA224_H2;
--	sctx->state[3] = SHA224_H3;
--	sctx->state[4] = SHA224_H4;
--	sctx->state[5] = SHA224_H5;
--	sctx->state[6] = SHA224_H6;
--	sctx->state[7] = SHA224_H7;
--	sctx->count = 0;
--
--	return 0;
--}
--
--int __sha256_update(struct shash_desc *desc, const u8 *data, unsigned int len,
--		    unsigned int partial)
--{
--	struct sha256_state *sctx = shash_desc_ctx(desc);
 -	unsigned int done = 0;
-+					unsigned int num_blks);
- 
+-
 -	sctx->count += len;
 -
 -	if (partial) {
--		done = SHA256_BLOCK_SIZE - partial;
--		memcpy(sctx->buf + partial, data, done);
--		sha256_block_data_order(sctx->state, sctx->buf, 1);
+-		done = SHA1_BLOCK_SIZE - partial;
+-		memcpy(sctx->buffer + partial, data, done);
+-		sha1_block_data_order(sctx->state, sctx->buffer, 1);
 -	}
 -
--	if (len - done >= SHA256_BLOCK_SIZE) {
--		const unsigned int rounds = (len - done) / SHA256_BLOCK_SIZE;
--
--		sha256_block_data_order(sctx->state, data + done, rounds);
--		done += rounds * SHA256_BLOCK_SIZE;
+-	if (len - done >= SHA1_BLOCK_SIZE) {
+-		const unsigned int rounds = (len - done) / SHA1_BLOCK_SIZE;
+-		sha1_block_data_order(sctx->state, data + done, rounds);
+-		done += rounds * SHA1_BLOCK_SIZE;
 -	}
 -
--	memcpy(sctx->buf, data + done, len - done);
--
+-	memcpy(sctx->buffer, data + done, len - done);
 -	return 0;
 -}
 -
--int sha256_update(struct shash_desc *desc, const u8 *data, unsigned int len)
-+int crypto_sha256_arm_update(struct shash_desc *desc, const u8 *data,
-+			     unsigned int len)
- {
--	struct sha256_state *sctx = shash_desc_ctx(desc);
--	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
 -
--	/* Handle the fast case right here */
--	if (partial + len < SHA256_BLOCK_SIZE) {
--		sctx->count += len;
--		memcpy(sctx->buf + partial, data, len);
-+	/* make sure casting to sha256_block_fn() is safe */
-+	BUILD_BUG_ON(offsetof(struct sha256_state, state) != 0);
+ int sha1_update_arm(struct shash_desc *desc, const u8 *data,
+ 		    unsigned int len)
+ {
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
+-	int res;
++	/* make sure casting to sha1_block_fn() is safe */
++	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
  
+-	/* Handle the fast case right here */
+-	if (partial + len < SHA1_BLOCK_SIZE) {
+-		sctx->count += len;
+-		memcpy(sctx->buffer + partial, data, len);
 -		return 0;
 -	}
--
--	return __sha256_update(desc, data, len, partial);
-+	return sha256_base_do_update(desc, data, len,
-+				(sha256_block_fn *)sha256_block_data_order);
+-	res = __sha1_update(sctx, data, len, partial);
+-	return res;
++	return sha1_base_do_update(desc, data, len,
++				   (sha1_block_fn *)sha1_block_data_order);
  }
-+EXPORT_SYMBOL(crypto_sha256_arm_update);
+ EXPORT_SYMBOL_GPL(sha1_update_arm);
  
+-
 -/* Add padding and return the message digest. */
- static int sha256_final(struct shash_desc *desc, u8 *out)
+ static int sha1_final(struct shash_desc *desc, u8 *out)
  {
--	struct sha256_state *sctx = shash_desc_ctx(desc);
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
 -	unsigned int i, index, padlen;
 -	__be32 *dst = (__be32 *)out;
 -	__be64 bits;
--	static const u8 padding[SHA256_BLOCK_SIZE] = { 0x80, };
+-	static const u8 padding[SHA1_BLOCK_SIZE] = { 0x80, };
 -
--	/* save number of bits */
 -	bits = cpu_to_be64(sctx->count << 3);
 -
 -	/* Pad out to 56 mod 64 and append length */
--	index = sctx->count % SHA256_BLOCK_SIZE;
--	padlen = (index < 56) ? (56 - index) : ((SHA256_BLOCK_SIZE+56)-index);
--
--	/* We need to fill a whole block for __sha256_update */
+-	index = sctx->count % SHA1_BLOCK_SIZE;
+-	padlen = (index < 56) ? (56 - index) : ((SHA1_BLOCK_SIZE+56) - index);
+-	/* We need to fill a whole block for __sha1_update() */
 -	if (padlen <= 56) {
 -		sctx->count += padlen;
--		memcpy(sctx->buf + index, padding, padlen);
+-		memcpy(sctx->buffer + index, padding, padlen);
 -	} else {
--		__sha256_update(desc, padding, padlen, index);
+-		__sha1_update(sctx, padding, padlen, index);
 -	}
--	__sha256_update(desc, (const u8 *)&bits, sizeof(bits), 56);
+-	__sha1_update(sctx, (const u8 *)&bits, sizeof(bits), 56);
 -
 -	/* Store state in digest */
--	for (i = 0; i < 8; i++)
+-	for (i = 0; i < 5; i++)
 -		dst[i] = cpu_to_be32(sctx->state[i]);
 -
 -	/* Wipe context */
 -	memset(sctx, 0, sizeof(*sctx));
--
 -	return 0;
--}
++	sha1_base_do_finalize(desc, (sha1_block_fn *)sha1_block_data_order);
++	return sha1_base_finish(desc, out);
+ }
+ 
 -
--static int sha224_final(struct shash_desc *desc, u8 *out)
--{
--	u8 D[SHA256_DIGEST_SIZE];
--
--	sha256_final(desc, D);
--
--	memcpy(out, D, SHA224_DIGEST_SIZE);
--	memzero_explicit(D, SHA256_DIGEST_SIZE);
--
--	return 0;
--}
--
--int sha256_export(struct shash_desc *desc, void *out)
--{
--	struct sha256_state *sctx = shash_desc_ctx(desc);
--
+-static int sha1_export(struct shash_desc *desc, void *out)
++int sha1_finup_arm(struct shash_desc *desc, const u8 *data,
++		   unsigned int len, u8 *out)
+ {
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
 -	memcpy(out, sctx, sizeof(*sctx));
--
 -	return 0;
-+	sha256_base_do_finalize(desc,
-+				(sha256_block_fn *)sha256_block_data_order);
-+	return sha256_base_finish(desc, out);
++	sha1_base_do_update(desc, data, len,
++			    (sha1_block_fn *)sha1_block_data_order);
++	return sha1_final(desc, out);
  }
- 
--int sha256_import(struct shash_desc *desc, const void *in)
-+int crypto_sha256_arm_finup(struct shash_desc *desc, const u8 *data,
-+			    unsigned int len, u8 *out)
- {
--	struct sha256_state *sctx = shash_desc_ctx(desc);
 -
--	memcpy(sctx, in, sizeof(*sctx));
 -
--	return 0;
-+	sha256_base_do_update(desc, data, len,
-+			      (sha256_block_fn *)sha256_block_data_order);
-+	return sha256_final(desc, out);
- }
-+EXPORT_SYMBOL(crypto_sha256_arm_finup);
- 
- static struct shash_alg algs[] = { {
- 	.digestsize	=	SHA256_DIGEST_SIZE,
--	.init		=	sha256_init,
--	.update		=	sha256_update,
-+	.init		=	sha256_base_init,
-+	.update		=	crypto_sha256_arm_update,
- 	.final		=	sha256_final,
--	.export		=	sha256_export,
--	.import		=	sha256_import,
-+	.finup		=	crypto_sha256_arm_finup,
- 	.descsize	=	sizeof(struct sha256_state),
--	.statesize	=	sizeof(struct sha256_state),
- 	.base		=	{
- 		.cra_name	=	"sha256",
- 		.cra_driver_name =	"sha256-asm",
-@@ -193,13 +77,11 @@ static struct shash_alg algs[] = { {
- 	}
- }, {
- 	.digestsize	=	SHA224_DIGEST_SIZE,
--	.init		=	sha224_init,
--	.update		=	sha256_update,
--	.final		=	sha224_final,
--	.export		=	sha256_export,
--	.import		=	sha256_import,
-+	.init		=	sha224_base_init,
-+	.update		=	crypto_sha256_arm_update,
-+	.final		=	sha256_final,
-+	.finup		=	crypto_sha256_arm_finup,
- 	.descsize	=	sizeof(struct sha256_state),
--	.statesize	=	sizeof(struct sha256_state),
- 	.base		=	{
- 		.cra_name	=	"sha224",
- 		.cra_driver_name =	"sha224-asm",
-diff --git a/arch/arm/crypto/sha256_glue.h b/arch/arm/crypto/sha256_glue.h
-index 0312f4ffe8cc..7cf0bf786ada 100644
---- a/arch/arm/crypto/sha256_glue.h
-+++ b/arch/arm/crypto/sha256_glue.h
-@@ -2,22 +2,13 @@
- #define _CRYPTO_SHA256_GLUE_H
- 
- #include <linux/crypto.h>
--#include <crypto/sha.h>
- 
- extern struct shash_alg sha256_neon_algs[2];
- 
--extern int sha256_init(struct shash_desc *desc);
-+int crypto_sha256_arm_update(struct shash_desc *desc, const u8 *data,
-+			     unsigned int len);
- 
--extern int sha224_init(struct shash_desc *desc);
--
--extern int __sha256_update(struct shash_desc *desc, const u8 *data,
--			   unsigned int len, unsigned int partial);
--
--extern int sha256_update(struct shash_desc *desc, const u8 *data,
--			 unsigned int len);
--
--extern int sha256_export(struct shash_desc *desc, void *out);
--
--extern int sha256_import(struct shash_desc *desc, const void *in);
-+int crypto_sha256_arm_finup(struct shash_desc *desc, const u8 *data,
-+			    unsigned int len, u8 *hash);
- 
- #endif /* _CRYPTO_SHA256_GLUE_H */
-diff --git a/arch/arm/crypto/sha256_neon_glue.c b/arch/arm/crypto/sha256_neon_glue.c
-index c4da10090eee..39ccd658817e 100644
---- a/arch/arm/crypto/sha256_neon_glue.c
-+++ b/arch/arm/crypto/sha256_neon_glue.c
-@@ -19,131 +19,62 @@
- #include <linux/types.h>
- #include <linux/string.h>
- #include <crypto/sha.h>
-+#include <crypto/sha256_base.h>
- #include <asm/byteorder.h>
- #include <asm/simd.h>
- #include <asm/neon.h>
-+
- #include "sha256_glue.h"
- 
- asmlinkage void sha256_block_data_order_neon(u32 *digest, const void *data,
--				      unsigned int num_blks);
--
-+					     unsigned int num_blks);
- 
--static int __sha256_neon_update(struct shash_desc *desc, const u8 *data,
--				unsigned int len, unsigned int partial)
-+static int sha256_update(struct shash_desc *desc, const u8 *data,
-+			 unsigned int len)
- {
- 	struct sha256_state *sctx = shash_desc_ctx(desc);
--	unsigned int done = 0;
--
--	sctx->count += len;
--
--	if (partial) {
--		done = SHA256_BLOCK_SIZE - partial;
--		memcpy(sctx->buf + partial, data, done);
--		sha256_block_data_order_neon(sctx->state, sctx->buf, 1);
--	}
--
--	if (len - done >= SHA256_BLOCK_SIZE) {
--		const unsigned int rounds = (len - done) / SHA256_BLOCK_SIZE;
- 
--		sha256_block_data_order_neon(sctx->state, data + done, rounds);
--		done += rounds * SHA256_BLOCK_SIZE;
--	}
-+	if (!may_use_simd() ||
-+	    (sctx->count % SHA256_BLOCK_SIZE) + len < SHA256_BLOCK_SIZE)
-+		return crypto_sha256_arm_update(desc, data, len);
- 
--	memcpy(sctx->buf, data + done, len - done);
-+	kernel_neon_begin();
-+	sha256_base_do_update(desc, data, len,
-+			(sha256_block_fn *)sha256_block_data_order_neon);
-+	kernel_neon_end();
- 
- 	return 0;
- }
- 
--static int sha256_neon_update(struct shash_desc *desc, const u8 *data,
--			      unsigned int len)
+-static int sha1_import(struct shash_desc *desc, const void *in)
 -{
--	struct sha256_state *sctx = shash_desc_ctx(desc);
--	unsigned int partial = sctx->count % SHA256_BLOCK_SIZE;
--	int res;
--
--	/* Handle the fast case right here */
--	if (partial + len < SHA256_BLOCK_SIZE) {
--		sctx->count += len;
--		memcpy(sctx->buf + partial, data, len);
--
--		return 0;
--	}
--
--	if (!may_use_simd()) {
--		res = __sha256_update(desc, data, len, partial);
--	} else {
--		kernel_neon_begin();
--		res = __sha256_neon_update(desc, data, len, partial);
--		kernel_neon_end();
--	}
--
--	return res;
+-	struct sha1_state *sctx = shash_desc_ctx(desc);
+-	memcpy(sctx, in, sizeof(*sctx));
+-	return 0;
 -}
 -
--/* Add padding and return the message digest. */
--static int sha256_neon_final(struct shash_desc *desc, u8 *out)
-+static int sha256_finup(struct shash_desc *desc, const u8 *data,
-+			unsigned int len, u8 *out)
- {
--	struct sha256_state *sctx = shash_desc_ctx(desc);
--	unsigned int i, index, padlen;
--	__be32 *dst = (__be32 *)out;
--	__be64 bits;
--	static const u8 padding[SHA256_BLOCK_SIZE] = { 0x80, };
--
--	/* save number of bits */
--	bits = cpu_to_be64(sctx->count << 3);
--
--	/* Pad out to 56 mod 64 and append length */
--	index = sctx->count % SHA256_BLOCK_SIZE;
--	padlen = (index < 56) ? (56 - index) : ((SHA256_BLOCK_SIZE+56)-index);
--
--	if (!may_use_simd()) {
--		sha256_update(desc, padding, padlen);
--		sha256_update(desc, (const u8 *)&bits, sizeof(bits));
--	} else {
--		kernel_neon_begin();
--		/* We need to fill a whole block for __sha256_neon_update() */
--		if (padlen <= 56) {
--			sctx->count += padlen;
--			memcpy(sctx->buf + index, padding, padlen);
--		} else {
--			__sha256_neon_update(desc, padding, padlen, index);
--		}
--		__sha256_neon_update(desc, (const u8 *)&bits,
--					sizeof(bits), 56);
--		kernel_neon_end();
--	}
--
--	/* Store state in digest */
--	for (i = 0; i < 8; i++)
--		dst[i] = cpu_to_be32(sctx->state[i]);
--
--	/* Wipe context */
--	memzero_explicit(sctx, sizeof(*sctx));
--
--	return 0;
-+	if (!may_use_simd())
-+		return crypto_sha256_arm_finup(desc, data, len, out);
-+
-+	kernel_neon_begin();
-+	if (len)
-+		sha256_base_do_update(desc, data, len,
-+			(sha256_block_fn *)sha256_block_data_order_neon);
-+	sha256_base_do_finalize(desc,
-+			(sha256_block_fn *)sha256_block_data_order_neon);
-+	kernel_neon_end();
-+
-+	return sha256_base_finish(desc, out);
- }
++EXPORT_SYMBOL_GPL(sha1_finup_arm);
  
--static int sha224_neon_final(struct shash_desc *desc, u8 *out)
-+static int sha256_final(struct shash_desc *desc, u8 *out)
- {
--	u8 D[SHA256_DIGEST_SIZE];
--
--	sha256_neon_final(desc, D);
--
--	memcpy(out, D, SHA224_DIGEST_SIZE);
--	memzero_explicit(D, SHA256_DIGEST_SIZE);
--
--	return 0;
-+	return sha256_finup(desc, NULL, 0, out);
- }
+ static struct shash_alg alg = {
+ 	.digestsize	=	SHA1_DIGEST_SIZE,
+-	.init		=	sha1_init,
++	.init		=	sha1_base_init,
+ 	.update		=	sha1_update_arm,
+ 	.final		=	sha1_final,
+-	.export		=	sha1_export,
+-	.import		=	sha1_import,
++	.finup		=	sha1_finup_arm,
+ 	.descsize	=	sizeof(struct sha1_state),
+-	.statesize	=	sizeof(struct sha1_state),
+ 	.base		=	{
+ 		.cra_name	=	"sha1",
+ 		.cra_driver_name=	"sha1-asm",
+diff --git a/arch/arm/crypto/sha1_neon_glue.c b/arch/arm/crypto/sha1_neon_glue.c
+index 0b0083757d47..5d9a1b4aac73 100644
+--- a/arch/arm/crypto/sha1_neon_glue.c
++++ b/arch/arm/crypto/sha1_neon_glue.c
+@@ -28,8 +28,8 @@
+ #include <asm/byteorder.h>
+ #include <asm/neon.h>
+ #include <asm/simd.h>
+-#include <asm/crypto/sha1.h>
  
- struct shash_alg sha256_neon_algs[] = { {
- 	.digestsize	=	SHA256_DIGEST_SIZE,
--	.init		=	sha256_init,
--	.update		=	sha256_neon_update,
--	.final		=	sha256_neon_final,
--	.export		=	sha256_export,
--	.import		=	sha256_import,
-+	.init		=	sha256_base_init,
-+	.update		=	sha256_update,
-+	.final		=	sha256_final,
-+	.finup		=	sha256_finup,
- 	.descsize	=	sizeof(struct sha256_state),
--	.statesize	=	sizeof(struct sha256_state),
- 	.base		=	{
- 		.cra_name	=	"sha256",
- 		.cra_driver_name =	"sha256-neon",
-@@ -154,13 +85,11 @@ struct shash_alg sha256_neon_algs[] = { {
- 	}
- }, {
- 	.digestsize	=	SHA224_DIGEST_SIZE,
--	.init		=	sha224_init,
--	.update		=	sha256_neon_update,
--	.final		=	sha224_neon_final,
--	.export		=	sha256_export,
--	.import		=	sha256_import,
-+	.init		=	sha224_base_init,
-+	.update		=	sha256_update,
-+	.final		=	sha256_final,
-+	.finup		=	sha256_finup,
- 	.descsize	=	sizeof(struct sha256_state),
--	.statesize	=	sizeof(struct sha256_state),
- 	.base		=	{
- 		.cra_name	=	"sha224",
- 		.cra_driver_name =	"sha224-neon",
++#include "sha1.h"
+ 
+ asmlinkage void sha1_transform_neon(void *state_h, const char *data,
+ 				    unsigned int rounds);
 -- 
 1.8.3.2
