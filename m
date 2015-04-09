@@ -1,82 +1,70 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v3] crypto: remove instance when test failed
-Date: Thu, 09 Apr 2015 12:05:14 +0200
-Message-ID: <1948823.Yx9TPYrsU5@tauon>
-References: <1461449.htSjBpksos@tachyon.chronox.de> <9590265.Rdkakn8z8k@tauon> <20150409094035.GA5327@gondor.apana.org.au>
+Subject: [PATCH v4] crypto: remove instance when test failed
+Date: Thu, 09 Apr 2015 12:09:55 +0200
+Message-ID: <4399727.C1fCR46vxf@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: herbert@gondor.apana.org.au
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150409094035.GA5327@gondor.apana.org.au>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 9. April 2015, 17:40:35 schrieb Herbert Xu:
+A cipher instance is added to the list of instances unconditionally
+regardless of whether the associated test failed. However, a failed
+test implies that during another lookup, the cipher instance will
+be added to the list again as it will not be found by the lookup
+code.
 
-Hi Herbert,
+That means that the list can be filled up with instances whose tests
+failed.
 
->On Thu, Apr 09, 2015 at 11:22:19AM +0200, Stephan Mueller wrote:
->> I tested it and this approach does not work.
->> 
->> If I see that right, the reason for that is the following: The suggestion
->> is
->> to grab the ref count at the start of the function followed by a
->> __crypto_register_alg. __crypto_register_alg however sets the refcount to 1
->> unconditionally. That means that the final put of the alg will most likely
->> set the refcount to 0 that causes an issue with all other operations (at
->> least I cannot allocate HMAC or CMAC any more -- the ones I currently
->> test).
->> 
->> So, the grabing of the alg must happen after the invocation of
->> __crypto_register_alg.
->
->Well let's move it then.
+Note: tests only fail in reality in FIPS mode when a cipher is not
+marked as fips_allowed=1. This can be seen with cmac(des3_ede) that does
+not have a fips_allowed=1. When allocating the cipher, the allocation
+fails with -ENOENT due to the missing fips_allowed=1 flag (which
+causes the testmgr to return EINVAL). Yet, the instance of
+cmac(des3_ede) is shown in /proc/crypto. Allocating the cipher again
+fails again, but a 2nd instance is listed in /proc/crypto.
 
-Perfect. This now works with the changed patch too. I will resend my patch as 
-v4 -- note that this new patch depends on your patch here as otherwise 
-instances do not work at all. :-)
->
->---8<---
->crypto: api - Move alg ref count init to crypto_check_alg
->
->We currently initialise the crypto_alg ref count in the function
->__crypto_register_alg.  As one of the callers of that function
->crypto_register_instance needs to obtain a ref count before it
->calls __crypto_register_alg, we need to move the initialisation
->out of there.
->
->Since both callers of __crypto_register_alg call crypto_check_alg,
->this is the logical place to perform the initialisation.
->
->Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+The patch simply de-registers the instance when the testing failed.
 
-Acked-by: Stephan Mueller <smueller@chronox.de>
->
->diff --git a/crypto/algapi.c b/crypto/algapi.c
->index f1d0307..1462c68 100644
->--- a/crypto/algapi.c
->+++ b/crypto/algapi.c
->@@ -64,6 +64,8 @@ static int crypto_check_alg(struct crypto_alg *alg)
-> 	if (alg->cra_priority < 0)
-> 		return -EINVAL;
->
->+	atomic_set(&alg->cra_refcnt, 1);
->+
-> 	return crypto_set_driver_name(alg);
-> }
->
->@@ -187,7 +189,6 @@ static struct crypto_larval *__crypto_register_alg(struct
->crypto_alg *alg)
->
-> 	ret = -EEXIST;
->
->-	atomic_set(&alg->cra_refcnt, 1);
-> 	list_for_each_entry(q, &crypto_alg_list, cra_list) {
-> 		if (q == alg)
-> 			goto err;
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/algapi.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-
-Ciao
-Stephan
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index f1d0307..1907d5b 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -522,7 +522,10 @@ int crypto_register_instance(struct crypto_template *tmpl,
+ 
+ 	err = crypto_check_alg(&inst->alg);
+ 	if (err)
+-		goto err;
++		return err;
++
++	if (unlikely(!crypto_mod_get(&inst->alg)))
++		return -EAGAIN;
+ 
+ 	inst->alg.cra_module = tmpl->module;
+ 	inst->alg.cra_flags |= CRYPTO_ALG_INSTANCE;
+@@ -544,9 +547,14 @@ unlock:
+ 		goto err;
+ 
+ 	crypto_wait_for_test(larval);
++
++	/* Remove instance if test failed */
++	if (!(inst->alg.cra_flags & CRYPTO_ALG_TESTED))
++		crypto_unregister_instance(inst);
+ 	err = 0;
+ 
+ err:
++	crypto_mod_put(&inst->alg);
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(crypto_register_instance);
+-- 
+2.1.0
