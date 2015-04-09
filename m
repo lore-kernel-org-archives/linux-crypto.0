@@ -1,7 +1,8 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH 0/2] crypto: add new driver for Marvell CESA
-Date: Thu,  9 Apr 2015 16:58:41 +0200
-Message-ID: <1428591523-1780-1-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH 2/2] crypto: marvell/CESA: update DT bindings documentation
+Date: Thu,  9 Apr 2015 16:58:43 +0200
+Message-ID: <1428591523-1780-3-git-send-email-boris.brezillon@free-electrons.com>
+References: <1428591523-1780-1-git-send-email-boris.brezillon@free-electrons.com>
 Cc: Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Ian Campbell <ijc+devicetree@hellion.org.uk>,
@@ -22,61 +23,81 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1428591523-1780-1-git-send-email-boris.brezillon@free-electrons.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+Document new compatible strings, document the new method to reference the
+crypto SRAM and deprecate the old one and document the the 'clocks' and
+'clock-names' properties.
 
-This is an attempt to replace the mv_cesa driver by a new one to address
-some limitations of the existing driver.
->From a performance and CPU load point of view the most important
-limitation is the lack of DMA support, thus preventing us from chaining
-crypto operations.
+Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+---
+ .../devicetree/bindings/crypto/mv_cesa.txt         | 50 ++++++++++++++++------
+ 1 file changed, 38 insertions(+), 12 deletions(-)
 
-I know we usually try to adapt existing drivers instead of replacing them
-by new ones, but after trying to refactor the mv_cesa driver I realized it
-would take longer than writing an new one from scratch.
-
-Here are the main features brought by this new driver:
-- support for armada SoCs (up to 38x) while keeping support for older ones
-  (Orion and Kirkwood)
-- DMA mode to offload the CPU in case of intensive crypto usage
-- new algorithms: SHA256, DES and 3DES
-
-I'd like to thank Arnaud, who has carefully reviewed several iterations of
-this driver, helped me improved my implementation, provided support for
-several crypto algorithms, provided support for armada-370 and tested
-the driver on different platforms, hence the SoB and dual MODULE_AUTHOR
-in the driver code.
-
-Best Regards,
-
-Boris
-
-Boris Brezillon (2):
-  crypto: add new driver for Marvell CESA
-  crypto: marvell/CESA: update DT bindings documentation
-
- .../devicetree/bindings/crypto/mv_cesa.txt         |   50 +-
- drivers/crypto/Kconfig                             |    2 +
- drivers/crypto/Makefile                            |    2 +-
- drivers/crypto/marvell/Makefile                    |    1 +
- drivers/crypto/marvell/cesa.c                      |  539 ++++++++
- drivers/crypto/marvell/cesa.h                      |  802 ++++++++++++
- drivers/crypto/marvell/cipher.c                    |  761 +++++++++++
- drivers/crypto/marvell/hash.c                      | 1349 ++++++++++++++++++++
- drivers/crypto/marvell/tdma.c                      |  223 ++++
- drivers/crypto/mv_cesa.c                           | 1193 -----------------
- drivers/crypto/mv_cesa.h                           |  150 ---
- 11 files changed, 3716 insertions(+), 1356 deletions(-)
- create mode 100644 drivers/crypto/marvell/Makefile
- create mode 100644 drivers/crypto/marvell/cesa.c
- create mode 100644 drivers/crypto/marvell/cesa.h
- create mode 100644 drivers/crypto/marvell/cipher.c
- create mode 100644 drivers/crypto/marvell/hash.c
- create mode 100644 drivers/crypto/marvell/tdma.c
- delete mode 100644 drivers/crypto/mv_cesa.c
- delete mode 100644 drivers/crypto/mv_cesa.h
-
+diff --git a/Documentation/devicetree/bindings/crypto/mv_cesa.txt b/Documentation/devicetree/bindings/crypto/mv_cesa.txt
+index 47229b1..4ce9bc5 100644
+--- a/Documentation/devicetree/bindings/crypto/mv_cesa.txt
++++ b/Documentation/devicetree/bindings/crypto/mv_cesa.txt
+@@ -1,20 +1,46 @@
+ Marvell Cryptographic Engines And Security Accelerator
+ 
+ Required properties:
+-- compatible : should be "marvell,orion-crypto"
+-- reg : base physical address of the engine and length of memory mapped
+-        region, followed by base physical address of sram and its memory
+-        length
+-- reg-names : "regs" , "sram";
+-- interrupts : interrupt number
++- compatible: should be one of the following string
++	      "marvell,orion-crypto"
++	      "marvell,kirkwood-crypto"
++	      "marvell,armada-370-crypto"
++	      "marvell,armada-xp-crypto"
++	      "marvell,armada-375-crypto"
++	      "marvell,armada-38x-crypto"
++- reg: base physical address of the engine and length of memory mapped
++       region
++- reg-names: "regs"
++- interrupts: interrupt number
++- clocks: reference to the crypto engines clocks. This property is not
++	  required for orion and kirkwood platforms
++- clock-names: "cesaX" and "cesazX", X should be replaced by the crypto engine
++	       id.
++	       This property is not required for the orion and kirkwoord
++	       platforms.
++	       "cesazX" clocks are not required on armada-370 platforms
++- marvell,crypto-srams: phandle to crypto SRAM definitions
++
++Optional properties:
++- marvell,crypto-sram-size: SRAM size reserved for crypto operations, if not
++			    specified the whole SRAM is used (2KB)
++
++Deprecated properties:
++- reg: base physical address of the engine and length of memory mapped
++       region, followed by base physical address of sram and its memory
++       length
++- reg-names: "regs" , "sram"
+ 
+ Examples:
+ 
+-	crypto@30000 {
+-		compatible = "marvell,orion-crypto";
+-		reg = <0x30000 0x10000>,
+-		      <0x4000000 0x800>;
+-		reg-names = "regs" , "sram";
+-		interrupts = <22>;
++	crypto@90000 {
++		compatible = "marvell,armada-xp-crypto";
++		reg = <0x90000 0x10000>;
++		reg-names = "regs";
++		interrupts = <48>, <49>;
++		clocks = <&gateclk 23>, <&gateclk 23>;
++		clock-names = "cesa0", "cesa1";
++		marvell,crypto-srams = <&crypto_sram0>, <&crypto_sram1>;
++		marvell,crypto-sram-size = <0x600>;
+ 		status = "okay";
+ 	};
 -- 
 1.9.1
