@@ -1,41 +1,54 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4] crypto: remove instance when test failed
-Date: Fri, 10 Apr 2015 21:42:29 +0800
-Message-ID: <20150410134229.GA21873@gondor.apana.org.au>
-References: <4399727.C1fCR46vxf@myon.chronox.de>
+Subject: Re: [PATCH v4 00/16] crypto: SHA glue code consolidation
+Date: Fri, 10 Apr 2015 21:42:51 +0800
+Message-ID: <20150410134251.GB21873@gondor.apana.org.au>
+References: <1428576948-23863-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	x86@kernel.org, samitolvanen@google.com, jussi.kivilinna@iki.fi,
+	stockhausen@collogia.de
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:56270 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S964851AbbDJNnE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 10 Apr 2015 09:43:04 -0400
 Content-Disposition: inline
-In-Reply-To: <4399727.C1fCR46vxf@myon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1428576948-23863-1-git-send-email-ard.biesheuvel@linaro.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 09, 2015 at 12:09:55PM +0200, Stephan Mueller wrote:
-> A cipher instance is added to the list of instances unconditionally
-> regardless of whether the associated test failed. However, a failed
-> test implies that during another lookup, the cipher instance will
-> be added to the list again as it will not be found by the lookup
-> code.
+On Thu, Apr 09, 2015 at 12:55:32PM +0200, Ard Biesheuvel wrote:
+> Hello all,
 > 
-> That means that the list can be filled up with instances whose tests
-> failed.
+> This is v4 of what is now a complete glue code consolidation series
+> for generic, x86, arm and arm64 implementations of SHA-1, SHA-224/256
+> and SHA-384/512.
 > 
-> Note: tests only fail in reality in FIPS mode when a cipher is not
-> marked as fips_allowed=1. This can be seen with cmac(des3_ede) that does
-> not have a fips_allowed=1. When allocating the cipher, the allocation
-> fails with -ENOENT due to the missing fips_allowed=1 flag (which
-> causes the testmgr to return EINVAL). Yet, the instance of
-> cmac(des3_ede) is shown in /proc/crypto. Allocating the cipher again
-> fails again, but a 2nd instance is listed in /proc/crypto.
+> The purpose is to have a single, canonical implementation of the core
+> logic that gets reused by all versions of the algorithm. Note that this
+> is not about saving space in the binary, but about ensuring that the same
+> code is used everywhere, reducing the maintenance burden.
 > 
-> The patch simply de-registers the instance when the testing failed.
+> The base layer implements all the update and finalization logic around
+> the block transforms, where the prototypes of the latter look something
+> like this:
 > 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> typedef void (shaXXX_block_fn)(struct sha###_state *, u8 const *src, int blocks)
+> 
+> Note that the definitions of sha1_state, sha256_state and sha512_state are
+> updated to put the state[] member first: this allows us to easily cast
+> existing asm implementation that take a state[] member as first argument
+> to the above prototype.
+> 
+> Note that the base functions prototypes are all 'returning int' but
+> they all return 0. They should be invoked as tail calls where possible
+> to eliminate some of the function call overhead. If that is not possible,
+> the return values can be safely ignored.
 
-Patch applied.  Thanks a lot!
+All applied.  Thanks Ard!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
