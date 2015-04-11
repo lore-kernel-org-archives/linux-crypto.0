@@ -1,91 +1,125 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] crypto: arm: workaround for building with old binutils
-Date: Sat, 11 Apr 2015 15:32:34 +0200
-Message-ID: <1428759154-16251-1-git-send-email-ard.biesheuvel@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-	linux@arm.linux.org.uk, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, davem@davemloft.net,
-	arnd@arndb.de
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Sandy Harris <sandyinchina@gmail.com>
+Subject: Re: Counter Size in CTR mode for AES Driver
+Date: Sat, 11 Apr 2015 11:40:08 -0400
+Message-ID: <CACXcFmnuk3soBgZ0mzFj9pigqPiPdt1Gi3uZXf0hx4Y3f_uozg@mail.gmail.com>
+References: <CAHTT9V+VXHYMc1Nkc9hh0Ew7nZy28zTc=rip4op-+BvC80MsTw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ig0-f180.google.com ([209.85.213.180]:36355 "EHLO
+	mail-ig0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755376AbbDKPkI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 11 Apr 2015 11:40:08 -0400
+Received: by igblo3 with SMTP id lo3so18503381igb.1
+        for <linux-crypto@vger.kernel.org>; Sat, 11 Apr 2015 08:40:08 -0700 (PDT)
+In-Reply-To: <CAHTT9V+VXHYMc1Nkc9hh0Ew7nZy28zTc=rip4op-+BvC80MsTw@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Arnd Bergmann <arnd@arndb.de>
+sri sowj <srisowj4linux@gmail.com> wrote:
 
-How about something like this:
+> I have seen multiple open source drivers for AES(CTR) mode for
+> different Crypto Hardware Engines, I was not really sure on
+> countersize,nonce etc.
+> Please can any one provide some info on the following
 
-A warning will be emitted by make when descending into the arch/arm/crypto
-directory, but only if any ARMv8 Crypto modules were in fact selected.
-
-/home/ard/linux-2.6/arch/arm/crypto/Makefile:22: These ARMv8 Crypto Extensions modules need binutils 2.23 or higher
-/home/ard/linux-2.6/arch/arm/crypto/Makefile:23: aes-arm-ce.o sha1-arm-ce.o sha2-arm-ce.o ghash-arm-ce.o
+Not what you asked for, but in case it is useful here is the counter
+management code from a version of the random(4) driver that
+I am working on:
 
 
------------------>8------------------
-Old versions of binutils (before 2.23) do not yet understand the
-crypto-neon-fp-armv8 fpu instructions, and an attempt to build these
-files results in a build failure:
+/*****************************************************************
+ * 128-bit counter to mix in when hashing
+ ****************************************************************/
 
-arch/arm/crypto/aes-ce-core.S:133: Error: selected processor does not support ARM mode `vld1.8 {q10-q11},[ip]!'
-arch/arm/crypto/aes-ce-core.S:133: Error: bad instruction `aese.8 q0,q8'
-arch/arm/crypto/aes-ce-core.S:133: Error: bad instruction `aesmc.8 q0,q0'
-arch/arm/crypto/aes-ce-core.S:133: Error: bad instruction `aese.8 q0,q9'
-arch/arm/crypto/aes-ce-core.S:133: Error: bad instruction `aesmc.8 q0,q0'
+static u32 iter_count = 0 ;
+static spinlock_t counter_lock ;
 
-Since the affected versions are still in widespread use, and this breaks
-'allmodconfig' builds, we should try to at least get a successful kernel
-build. Unfortunately, I could not come up with a way to make the Kconfig
-symbol depend on the binutils version, which would be the nicest solution.
+/*
+ * constants are from SHA-1
+ * ones in counter[] are used only once, in initialisation
+ * then random data is mixed in there
+ */
+#define COUNTER_DELTA 0x67452301
 
-Instead, this patch uses the 'as-instr' Kbuild macro to find out whether
-the support is present in the assembler, and otherwise emits a non-fatal
-warning indicating which selected modules could not be built.
+static u32 counter[] = {0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0} ;
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Link: http://storage.kernelci.org/next/next-20150410/arm-allmodconfig/build.log
-Fixes: 864cbeed4ab22d ("crypto: arm - add support for SHA1 using ARMv8 Crypto Instructions")
-[ard.biesheuvel:
- - omit modules entirely instead of building empty ones if binutils is too old
- - update commit log accordingly]
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/crypto/Makefile | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
+/*
+ * Code is based on my own work in the Enchilada cipher:
+ * https://aezoo.compute.dtu.dk/doku.php?id=enchilada
+ *
+ * Mix operations so Hamming weight changes more than for a simple
+ * counter. This may not be strictly necessary, but a simple counter
+ * can be considered safe only if you trust the crypto completely.
+ * Low Hamming weight differences in inputs do allow some attacks on
+ * block ciphers or hashes and the high bits of a large counter that
+ * is only incremented do not change for aeons.
+ *
+ * The extra code here is cheap insurance.
+ * Somewhat nonlinear since it uses +, XOR and rotation.
+ *
+ * For discussion, see mailing list thread starting at:
+ * http://www.metzdowd.com/pipermail/cryptography/2014-May/021345.html
+ */
+static void count(void)
+{
+    spin_lock( &counter_lock ) ;
 
-diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
-index b37597ad979c..fc5150702b64 100644
---- a/arch/arm/crypto/Makefile
-+++ b/arch/arm/crypto/Makefile
-@@ -4,14 +4,25 @@
- 
- obj-$(CONFIG_CRYPTO_AES_ARM) += aes-arm.o
- obj-$(CONFIG_CRYPTO_AES_ARM_BS) += aes-arm-bs.o
--obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
- obj-$(CONFIG_CRYPTO_SHA1_ARM) += sha1-arm.o
- obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
- obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
- obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
--obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
--obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
--obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
-+
-+ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
-+ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
-+ce-obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
-+ce-obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
-+
-+ifneq ($(ce-obj-y)$(ce-obj-m),)
-+ifeq ($(call as-instr,.fpu crypto-neon-fp-armv8,y,n),y)
-+obj-y += $(ce-obj-y)
-+obj-m += $(ce-obj-m)
-+else
-+$(warning These ARMv8 Crypto Extensions modules need binutils 2.23 or higher)
-+$(warning $(ce-obj-y) $(ce-obj-m))
-+endif
-+endif
- 
- aes-arm-y	:= aes-armv4.o aes_glue.o
- aes-arm-bs-y	:= aesbs-core.o aesbs-glue.o
--- 
-1.8.3.2
+    /*
+    * Limit the switch to < 256 cases
+    * should work with any CPU & compiler
+    *
+    * Five constants used, all primes
+    * roughly evenly spaced, around 50, 100, 150, 200, 250
+    */
+    switch( iter_count )    {
+        /*
+        * mix three array elements
+        * each element is used twice
+        * once on left, once on right
+        * pattern is circular
+        */
+        case 47:
+            counter[1] += counter[2] ;
+            break ;
+        case 101:
+            counter[2] += counter[3] ;
+            break ;
+        case 197:
+            counter[3] += counter[1] ;
+            break ;
+        /*
+        * inject counter[0] into that loop
+        * loop and counter[0] use +=
+        * so use ^= here
+        */
+        case 149:
+            counter[1] ^= counter[0] ;
+            break ;
+        /*
+        * restart loop
+        * include a rotation for nonlinearity
+        */
+        case 251:
+            counter[0] = ROTL( counter[0], 5) ;
+            iter_count = -1 ;
+            break ;
+        /*
+        * for 247 out of every 252 iterations
+        * the switch does nothing
+        */
+        default:
+            break ;
+    }
+    /*
+    * counter[0] is almost purely a counter
+    * uses += instead of ++ to change Hamming weight more
+    * nothing above affects it, except the rotation
+    */
+    counter[0] += COUNTER_DELTA ;
+    iter_count++ ;
+
+    spin_unlock( &counter_lock ) ;
+}
