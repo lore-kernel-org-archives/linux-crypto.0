@@ -1,96 +1,112 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH 0/2] crypto: add new driver for Marvell CESA
-Date: Fri, 10 Apr 2015 22:30:08 +0000
-Message-ID: <20150410223008.GA18660@io.lakedaemon.net>
-References: <1428591523-1780-1-git-send-email-boris.brezillon@free-electrons.com>
- <20150410135056.GB28873@io.lakedaemon.net>
- <20150410171148.07bc9429@bbrezillon>
+From: sri sowj <srisowj4linux@gmail.com>
+Subject: Re: Counter Size in CTR mode for AES Driver
+Date: Sat, 11 Apr 2015 09:07:35 +0530
+Message-ID: <CAHTT9VKt_uWGWuRcUQR98T-Z_MWC2ovZBxJNQiH+NOMmezfOuA@mail.gmail.com>
+References: <CAHTT9V+VXHYMc1Nkc9hh0Ew7nZy28zTc=rip4op-+BvC80MsTw@mail.gmail.com>
+	<3837185.yfoG22Ljkb@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <info@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Arnaud Ebalard <arno@natisbad.org>
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150410171148.07bc9429@bbrezillon>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-qk0-f180.google.com ([209.85.220.180]:32923 "EHLO
+	mail-qk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751967AbbDKDhg (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 10 Apr 2015 23:37:36 -0400
+Received: by qkx62 with SMTP id 62so59722338qkx.0
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Apr 2015 20:37:36 -0700 (PDT)
+In-Reply-To: <3837185.yfoG22Ljkb@tachyon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hey Boris,
+Hi Stephen,
 
-On Fri, Apr 10, 2015 at 05:11:48PM +0200, Boris Brezillon wrote:
-> On Fri, 10 Apr 2015 13:50:56 +0000 Jason Cooper <jason@lakedaemon.net> wrote:
-> > On Thu, Apr 09, 2015 at 04:58:41PM +0200, Boris Brezillon wrote:
-> > > I know we usually try to adapt existing drivers instead of replacing them
-> > > by new ones, but after trying to refactor the mv_cesa driver I realized it
-> > > would take longer than writing an new one from scratch.
-> > 
-> > I'm sorry, but this makes me *very* uncomfortable.  Any organization
-> > worth it's salt will do a very careful audit of code touching
-> > cryptographic material and sensitive (decrypted) data.  From that point
-> > on, small audits of the changes to the code allow the organization to
-> > build a comfort level with kernel updates.  iow, following the git
-> > history of the driver.
-> > 
-> > By apply this series, we are basically forcing those organizations to
-> > either a) stop updating, or b) expend significant resources to do
-> > another full audit.
-> > 
-> > In short, this series breaks the audit chain for the mv_cesa driver.
-> > 
-> > Maybe I'm the only person with this level of paranoia.  If so, I'm sure
-> > others will override me.
-> > 
-> > From my POV, it looks like the *only* reason we've chosen this route is
-> > developer convenience.  I don't think that's sufficient reason to break
-> > the change history of a driver handling sensitive data.
-> 
-> Well, I understand you concern, but if you read carefully the old and
-> new drivers, you'll notice that they are completely different (the only
-> thing I kept are the macro definitions).
+Thanks a million for the information provided. I really appreciate
+your time and efforts.
 
-Yes, that's the worrying part for me. ;-)
+In CTR mode counter size is not fixed , it varies based on
+requirements like for rfc 3686 its size is 4 bytes, for other "CTR
+Mode" operations it is 8/16 bytes. So how does linux crypto HW drivers
+like nx-aes-ctr.c or omap-aes.c etc handles these variations?
 
-> I really tried to adapt the existing driver to add the missing
-> features (especially the support for TDMA), but all my attempts
-> ended up introducing hackish code (not even talking about the
-> performance penalty of this approach).
+In CTR mode nonce and counters plays a significant role while
+performing encryption or decryption? ,So I am trying to understand
+these aspect from linux kernel driver aspects where crypto H/W engine
+is present.
 
-Ok, fair enough.  It would be helpful if this account of attempting to
-reconcile the old driver made it into the commit message.  This puts us
-in "perfect is the enemy of getting it done" territory.
+from the user it might be possible to get request consisting the
+counter size of 4 or 8 or 16 bytes.There has to be a way to deal these
+variations from linux kernel crypto subsystem , but i am finding
+little hard time to understand this.
 
-> I have another solution though: keep the existing driver for old
-> marvell SoCs (orion, kirkwood and dove), and add a new one for modern
-> SoCs (armada 370, XP, 375 and 38x), so that users of the mv_cesa driver
-> won't have to audit the new code.
+Just to give a thought, is it possible  to find size of these fields
+like nonce or counter from IV size ?
 
-A fair proposal, but I'll freely admit the number of people actually auditing
-their code paths is orders of magnitude smaller than the number of users
-of the driver.
+BR,
+Srisowj
 
-There's such a large population of compatible legacy SoCs in the wild,
-adding an artificial boundary doesn't make sense.  Especially since
-we're talking about features everyone would want to use.
-
-Perhaps we should keep both around, and deprecate the legacy driver over
-3 to 4 cycles?
-
-thx,
-
-Jason.
+On Sat, Apr 11, 2015 at 2:21 AM, Stephan Mueller <smueller@chronox.de> wrote:
+> Am Samstag, 11. April 2015, 00:30:30 schrieb sri sowj:
+>
+> Hi sri,
+>
+>> Hi All,
+>>
+>> I have seen multiple open source drivers for AES(CTR) mode for
+>> different Crypto Hardware Engines, I was not really sure on
+>> countersize,nonce etc.
+>> Please can any one provide some info on the following
+>>
+>> #1:How does AES driver identifies the counter size during the CTR mode
+>> of operation?
+>
+> I am not sure about the question, but the block chaining mode is orthogonal to
+> the block cipher.
+>
+> Thus, the block cipher does not need to know of the counter size of CTR. That
+> applies to any block chaining mode.
+>>
+>> looks like AES in CTR mode supports "countersize" of multiple lengths as
+> below:
+>> >>1: First is a counter which is made up of a nonce and counter. The nonce
+>> >>is random, and the remaining bytes are counter bytes (which are
+>> >>incremented).
+>>  For example, a 16 byte block cipher might use the high 8 bytes as a
+>> nonce, and the low 8 bytes as a counter.
+>>
+>> >>2: Second is a counter block, where all bytes are counter bytes and can be
+>> >>incremented as carries are generated.
+>>  For example, in a 16 byte block cipher, all 16 bytes are counter bytes
+>>
+>> #2: Does Linux Kernel Crypto subsystem increments the counter value
+>> for every block of input or is it needs tp be taken care by Kernel
+>> Driver for the respective Crypto H/W ?
+>
+> This depends on your choice -- the kernel crypto API provides crypto_inc() for
+> the increment, it provides the ctr template to wrap a block chaining mode. The
+> kernel crypto API does not restrict, it enables you.
+>>
+>>
+>> #3:counters and nonces are something which will be extracted from the
+>> IV i.e., IV = nonce + counter
+>> Note if "l" is length of IV then first "l/2" is length of nonce and
+>> next "l/2" is length of counter.
+>
+> What you describe may be on e convention. But the ctr.c template initializes
+> the counter value to 0 during init time. So, you see that there is no hard
+> fact. The counter is in fact just an IV.
+>>
+>> Any information regarding the above is really appreciable.
+>>
+>> BR,
+>> SriSowj
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-crypto" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> --
+> Ciao
+> Stephan
