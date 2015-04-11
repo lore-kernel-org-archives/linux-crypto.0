@@ -1,47 +1,34 @@
 From: Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [PATCH] crypto: arm: workaround for building with old binutils
-Date: Sat, 11 Apr 2015 22:44:59 +0200
-Message-ID: <2057328.zEoCGSuP0u@wuerfel>
-References: <3461827.FYLMCAIQyv@wuerfel> <2148670.W34n3asXfA@wuerfel> <51652361-AEE7-4C88-920A-5F0ED60EE275@linaro.org>
+Date: Sat, 11 Apr 2015 22:54:43 +0200
+Message-ID: <2659525.NqojY2z1jk@wuerfel>
+References: <1428759154-16251-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-	Russell King <linux@arm.linux.org.uk>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: linux-arm-kernel@lists.infradead.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.130]:64005 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755482AbbDKUpL (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 11 Apr 2015 16:45:11 -0400
-In-Reply-To: <51652361-AEE7-4C88-920A-5F0ED60EE275@linaro.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+	linux@arm.linux.org.uk, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, davem@davemloft.net
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1428759154-16251-1-git-send-email-ard.biesheuvel@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Saturday 11 April 2015 12:35:19 Ard Biesheuvel wrote:
+On Saturday 11 April 2015 15:32:34 Ard Biesheuvel wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Yes, that should work. Could we also move the CE objs to ce-obj-$() and put
+> How about something like this:
 > 
-> ifneq ($(ce-obj-y)$(ce-obj-m),)
-> if <as check>
-> obj-y += $(ce-obj-y)
-> obj-m += $(ce-obj-m)
-> else
-> $(warning ...)
-> endif
-> endif
+> A warning will be emitted by make when descending into the arch/arm/crypto
+> directory, but only if any ARMv8 Crypto modules were in fact selected.
 > 
-> around it so you only get the warning if you have selected any of these modules?
+> /home/ard/linux-2.6/arch/arm/crypto/Makefile:22: These ARMv8 Crypto Extensions modules need binutils 2.23 or higher
+> /home/ard/linux-2.6/arch/arm/crypto/Makefile:23: aes-arm-ce.o sha1-arm-ce.o sha2-arm-ce.o ghash-arm-ce.o
+> 
+> 
 
-Sounds good, I had not thought of that.
-
-> In any case, I strongly prefer to leave the .S files themselves alone if at all possible
-
-Yes, makes sense.
+Looks good. Do you want me to do more randconfig tests on this, or put it in
+right away to fix the allmodconfig problem?
 
 	Arnd
