@@ -1,73 +1,91 @@
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] crypto: arm: workaround for building with old binutils
-Date: Sat, 11 Apr 2015 12:35:19 +0200
-Message-ID: <51652361-AEE7-4C88-920A-5F0ED60EE275@linaro.org>
-References: <3461827.FYLMCAIQyv@wuerfel> <CAKv+Gu_n0-sMZZjWOmQ5koEfJRX6jqme5WOOP1zrF_zMnB7=nA@mail.gmail.com> <2148670.W34n3asXfA@wuerfel>
-Mime-Version: 1.0 (1.0)
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Russell King <linux@arm.linux.org.uk>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:34377 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751451AbbDKKfZ convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 11 Apr 2015 06:35:25 -0400
-Received: by widjs5 with SMTP id js5so31492498wid.1
-        for <linux-crypto@vger.kernel.org>; Sat, 11 Apr 2015 03:35:24 -0700 (PDT)
-In-Reply-To: <2148670.W34n3asXfA@wuerfel>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Subject: [PATCH] crypto: arm: workaround for building with old binutils
+Date: Sat, 11 Apr 2015 15:32:34 +0200
+Message-ID: <1428759154-16251-1-git-send-email-ard.biesheuvel@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+	linux@arm.linux.org.uk, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, davem@davemloft.net,
+	arnd@arndb.de
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
+
+From: Arnd Bergmann <arnd@arndb.de>
+
+How about something like this:
+
+A warning will be emitted by make when descending into the arch/arm/crypto
+directory, but only if any ARMv8 Crypto modules were in fact selected.
+
+/home/ard/linux-2.6/arch/arm/crypto/Makefile:22: These ARMv8 Crypto Extensions modules need binutils 2.23 or higher
+/home/ard/linux-2.6/arch/arm/crypto/Makefile:23: aes-arm-ce.o sha1-arm-ce.o sha2-arm-ce.o ghash-arm-ce.o
 
 
-> On 11 apr. 2015, at 10:55, Arnd Bergmann <arnd@arndb.de> wrote:
-> 
->> On Saturday 11 April 2015 09:41:08 Ard Biesheuvel wrote:
->> Could you perhaps put the rules that build these modules inside a
->> 
->> ifneq ($(armv8-ce-flags),-DARMV8_CE_DISABLED)
->> ...
->> endif
-> 
-> How about something like this:
-> 
-> ifeq ($(call as-option,-Wa$(comma)-mfpu=crypto-neon-fp-armv8),)
-> $(warning ARMv8 Crypto Extensions need binutils 2.23 or higher)
-> else
-> ...
-> endif
-> 
-> That would basically be a reimplementation of the missing "as-option-yn"
-> macro though, so we could also add that instead and do
-> 
-> ifeq ($(call as-option-yn,-Wa$(comma)-mfpu=crypto-neon-fp-armv8),y)
-> $(warning ARMv8 Crypto Extensions need binutils 2.23 or higher)
-> else
-> ...
-> endif
-> 
+----------------->8------------------
+Old versions of binutils (before 2.23) do not yet understand the
+crypto-neon-fp-armv8 fpu instructions, and an attempt to build these
+files results in a build failure:
 
-Yes, that should work. Could we also move the CE objs to ce-obj-$() and put
+arch/arm/crypto/aes-ce-core.S:133: Error: selected processor does not support ARM mode `vld1.8 {q10-q11},[ip]!'
+arch/arm/crypto/aes-ce-core.S:133: Error: bad instruction `aese.8 q0,q8'
+arch/arm/crypto/aes-ce-core.S:133: Error: bad instruction `aesmc.8 q0,q0'
+arch/arm/crypto/aes-ce-core.S:133: Error: bad instruction `aese.8 q0,q9'
+arch/arm/crypto/aes-ce-core.S:133: Error: bad instruction `aesmc.8 q0,q0'
 
-ifneq ($(ce-obj-y)$(ce-obj-m),)
-if <as check>
-obj-y += $(ce-obj-y)
-obj-m += $(ce-obj-m)
-else
-$(warning ...)
-endif
-endif
+Since the affected versions are still in widespread use, and this breaks
+'allmodconfig' builds, we should try to at least get a successful kernel
+build. Unfortunately, I could not come up with a way to make the Kconfig
+symbol depend on the binutils version, which would be the nicest solution.
 
-around it so you only get the warning if you have selected any of these modules?
+Instead, this patch uses the 'as-instr' Kbuild macro to find out whether
+the support is present in the assembler, and otherwise emits a non-fatal
+warning indicating which selected modules could not be built.
 
-In any case, I strongly prefer to leave the .S files themselves alone if at all possible
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Link: http://storage.kernelci.org/next/next-20150410/arm-allmodconfig/build.log
+Fixes: 864cbeed4ab22d ("crypto: arm - add support for SHA1 using ARMv8 Crypto Instructions")
+[ard.biesheuvel:
+ - omit modules entirely instead of building empty ones if binutils is too old
+ - update commit log accordingly]
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm/crypto/Makefile | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-Ard.
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index b37597ad979c..fc5150702b64 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -4,14 +4,25 @@
+ 
+ obj-$(CONFIG_CRYPTO_AES_ARM) += aes-arm.o
+ obj-$(CONFIG_CRYPTO_AES_ARM_BS) += aes-arm-bs.o
+-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
+ obj-$(CONFIG_CRYPTO_SHA1_ARM) += sha1-arm.o
+ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sha1-arm-neon.o
+ obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
+ obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
+-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
+-obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
+-obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
++
++ce-obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
++ce-obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
++ce-obj-$(CONFIG_CRYPTO_SHA2_ARM_CE) += sha2-arm-ce.o
++ce-obj-$(CONFIG_CRYPTO_GHASH_ARM_CE) += ghash-arm-ce.o
++
++ifneq ($(ce-obj-y)$(ce-obj-m),)
++ifeq ($(call as-instr,.fpu crypto-neon-fp-armv8,y,n),y)
++obj-y += $(ce-obj-y)
++obj-m += $(ce-obj-m)
++else
++$(warning These ARMv8 Crypto Extensions modules need binutils 2.23 or higher)
++$(warning $(ce-obj-y) $(ce-obj-m))
++endif
++endif
+ 
+ aes-arm-y	:= aes-armv4.o aes_glue.o
+ aes-arm-bs-y	:= aesbs-core.o aesbs-glue.o
+-- 
+1.8.3.2
