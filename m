@@ -1,125 +1,106 @@
-From: Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: Counter Size in CTR mode for AES Driver
-Date: Sat, 11 Apr 2015 11:40:08 -0400
-Message-ID: <CACXcFmnuk3soBgZ0mzFj9pigqPiPdt1Gi3uZXf0hx4Y3f_uozg@mail.gmail.com>
-References: <CAHTT9V+VXHYMc1Nkc9hh0Ew7nZy28zTc=rip4op-+BvC80MsTw@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2] crypto/arm: accelerated SHA-512 using ARM generic ASM
+ and NEON
+Date: Sat, 11 Apr 2015 21:15:10 +0200
+Message-ID: <CAKv+Gu9TU6ETRQDvp7M7Q43xAR5A25scgP3tsvZMmzBQNOK7Cg@mail.gmail.com>
+References: <1428676148-28210-1-git-send-email-ard.biesheuvel@linaro.org>
+	<F695F357-2A5C-4DFC-9F0E-188CDBBE7C01@linaro.org>
+	<CAKv+Gu-6mZwrVSCvS+ZWWwwM-294nWAqX4_J3r5Z8NM7KKC0=Q@mail.gmail.com>
+	<2845656.4sNJ3XBxnz@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"samitolvanen@google.com" <samitolvanen@google.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+To: Arnd Bergmann <arnd@arndb.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f180.google.com ([209.85.213.180]:36355 "EHLO
-	mail-ig0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755376AbbDKPkI (ORCPT
+Received: from mail-ie0-f169.google.com ([209.85.223.169]:36443 "EHLO
+	mail-ie0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751827AbbDKTPL (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 11 Apr 2015 11:40:08 -0400
-Received: by igblo3 with SMTP id lo3so18503381igb.1
-        for <linux-crypto@vger.kernel.org>; Sat, 11 Apr 2015 08:40:08 -0700 (PDT)
-In-Reply-To: <CAHTT9V+VXHYMc1Nkc9hh0Ew7nZy28zTc=rip4op-+BvC80MsTw@mail.gmail.com>
+	Sat, 11 Apr 2015 15:15:11 -0400
+Received: by iebrs15 with SMTP id rs15so39758181ieb.3
+        for <linux-crypto@vger.kernel.org>; Sat, 11 Apr 2015 12:15:10 -0700 (PDT)
+In-Reply-To: <2845656.4sNJ3XBxnz@wuerfel>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-sri sowj <srisowj4linux@gmail.com> wrote:
+On 11 April 2015 at 10:48, Arnd Bergmann <arnd@arndb.de> wrote:
+> On Saturday 11 April 2015 09:35:15 Ard Biesheuvel wrote:
+>> On 10 April 2015 at 22:23, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>> >
+>> >> On 10 apr. 2015, at 22:08, Arnd Bergmann <arnd@arndb.de> wrote:
+>> >>
+>> >>> On Friday 10 April 2015 16:29:08 Ard Biesheuvel wrote:
+>> >>> +#if __ARM_MAX_ARCH__>=7
+>> >>> +.arch  armv7-a
+>> >>> +.fpu   neon
+>> >>> +
+>> >>
+>> >> This will cause a build failure on an ARMv7-M build, which is incompatible
+>> >> with .arch  armv7-a and .fpu   neon.
+>> >>
+>> >
+>> > The neon part depends on CONFIG_KERNEL_MODE_NEON, which would never be set for that platform, I suppose
+>>
+>> On second thought, that is not entirely true, but I still don't think
+>> there is problem here:
+>> the .arch/.fpu declarations are understood perfectly fine by GAS when
+>> targeting ARMv7-M. Only, it will emit code that is incompatible with
+>> it. However, this code is invoked at runtime only if a NEON unit has
+>> been detected, so it will just be ignored on ARMv7-M
+>
+> Sorry, I should have collected my findings better when replying to your
+> patch. What I remembered was that I saw a problem in this area in linux-next
+> with randconfig builds, but I did not notice that it was for a different
+> file, and I had not double-checked that patch yet in order to send it
+> out.
+>
+> See below for the patch I'm currently using for my randconfig builder.
+> Before you apply this, please check again which files are affected, as
+> it's possible that there are other modules that suffer from the same
+> problem.
+>
+>         Arnd
+>
+> 8<-----------
+> Subject: [PATCH] ARM: crypto: avoid sha256 code on ARMv7-M
+>
+> The sha256 assembly implementation can deal with all architecture levels
+> from ARMv4 to ARMv7-A, but not with ARMv7-M. Enabling it in an
+> ARMv7-M kernel results in this build failure:
+>
+> arm-linux-gnueabi-ld: error: arch/arm/crypto/sha256_glue.o: Conflicting architecture profiles M/A
+> arm-linux-gnueabi-ld: failed to merge target specific data of file arch/arm/crypto/sha256_glue.o
+>
+> This adds a Kconfig dependency to prevent the code from being disabled
 
-> I have seen multiple open source drivers for AES(CTR) mode for
-> different Crypto Hardware Engines, I was not really sure on
-> countersize,nonce etc.
-> Please can any one provide some info on the following
+... enabled?
 
-Not what you asked for, but in case it is useful here is the counter
-management code from a version of the random(4) driver that
-I am working on:
+> for ARMv7-M.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>
+> diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+> index 458729d2ce22..76463da22f81 100644
+> --- a/arch/arm/crypto/Kconfig
+> +++ b/arch/arm/crypto/Kconfig
+> @@ -49,6 +49,7 @@ config CRYPTO_SHA2_ARM_CE
+>  config CRYPTO_SHA256_ARM
+>         tristate "SHA-224/256 digest algorithm (ARM-asm and NEON)"
+>         select CRYPTO_HASH
+> +       depends on !CPU_V7M
+>         help
+>           SHA-256 secure hash standard (DFIPS 180-2) implemented
+>           using optimized ARM assembler and NEON, when available.
+>
 
+@Herbert: could you please apply this onto cryptodev before sending
+out your pull request for v4.1?
+And please disregard $subject, I will post a v3 with a similar
+'depends on' added (unless you're ok to add it yourself)
 
-/*****************************************************************
- * 128-bit counter to mix in when hashing
- ****************************************************************/
-
-static u32 iter_count = 0 ;
-static spinlock_t counter_lock ;
-
-/*
- * constants are from SHA-1
- * ones in counter[] are used only once, in initialisation
- * then random data is mixed in there
- */
-#define COUNTER_DELTA 0x67452301
-
-static u32 counter[] = {0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0} ;
-
-/*
- * Code is based on my own work in the Enchilada cipher:
- * https://aezoo.compute.dtu.dk/doku.php?id=enchilada
- *
- * Mix operations so Hamming weight changes more than for a simple
- * counter. This may not be strictly necessary, but a simple counter
- * can be considered safe only if you trust the crypto completely.
- * Low Hamming weight differences in inputs do allow some attacks on
- * block ciphers or hashes and the high bits of a large counter that
- * is only incremented do not change for aeons.
- *
- * The extra code here is cheap insurance.
- * Somewhat nonlinear since it uses +, XOR and rotation.
- *
- * For discussion, see mailing list thread starting at:
- * http://www.metzdowd.com/pipermail/cryptography/2014-May/021345.html
- */
-static void count(void)
-{
-    spin_lock( &counter_lock ) ;
-
-    /*
-    * Limit the switch to < 256 cases
-    * should work with any CPU & compiler
-    *
-    * Five constants used, all primes
-    * roughly evenly spaced, around 50, 100, 150, 200, 250
-    */
-    switch( iter_count )    {
-        /*
-        * mix three array elements
-        * each element is used twice
-        * once on left, once on right
-        * pattern is circular
-        */
-        case 47:
-            counter[1] += counter[2] ;
-            break ;
-        case 101:
-            counter[2] += counter[3] ;
-            break ;
-        case 197:
-            counter[3] += counter[1] ;
-            break ;
-        /*
-        * inject counter[0] into that loop
-        * loop and counter[0] use +=
-        * so use ^= here
-        */
-        case 149:
-            counter[1] ^= counter[0] ;
-            break ;
-        /*
-        * restart loop
-        * include a rotation for nonlinearity
-        */
-        case 251:
-            counter[0] = ROTL( counter[0], 5) ;
-            iter_count = -1 ;
-            break ;
-        /*
-        * for 247 out of every 252 iterations
-        * the switch does nothing
-        */
-        default:
-            break ;
-    }
-    /*
-    * counter[0] is almost purely a counter
-    * uses += instead of ++ to change Hamming weight more
-    * nothing above affects it, except the rotation
-    */
-    counter[0] += COUNTER_DELTA ;
-    iter_count++ ;
-
-    spin_unlock( &counter_lock ) ;
-}
+Thanks,
+Ard.
