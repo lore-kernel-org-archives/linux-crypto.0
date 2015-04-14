@@ -1,50 +1,31 @@
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] crypto: ensure backlog is initialised
-Date: Tue, 14 Apr 2015 11:51:29 -0500
-Message-ID: <1429030289-4070-1-git-send-email-colin.king@canonical.com>
-Cc: linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH 03/17] fs: don't allow to complete sync iocbs through
+ aio_complete
+Date: Tue, 14 Apr 2015 11:00:49 -0700
+Message-ID: <552D55D1.2000908@intel.com>
+References: <20150411211742.GJ889@ZenIV.linux.org.uk> <1428787108-13650-3-git-send-email-viro@ZenIV.linux.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Al Viro <viro@ZenIV.linux.org.uk>, davem@davemloft.net
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:42188 "EHLO
-	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932869AbbDNQxU (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Apr 2015 12:53:20 -0400
+Received: from mga03.intel.com ([134.134.136.65]:4449 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752500AbbDNSDx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 14 Apr 2015 14:03:53 -0400
+In-Reply-To: <1428787108-13650-3-git-send-email-viro@ZenIV.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Colin Ian King <colin.king@canonical.com>
+On 04/11/2015 02:18 PM, Al Viro wrote:
+> @@ -766,8 +765,7 @@ int sock_recvmsg(struct socket *sock, struct msghdr *msg,
+>  
+>  	init_sync_kiocb(&iocb, NULL);
+>  	ret = __sock_recvmsg(&iocb, sock, msg, size, flags);
+> -	if (-EIOCBQUEUED == ret)
+> -		ret = wait_on_sync_kiocb(&iocb);
+> +	BUG_ON(ret == -EIOCBQUEUED);
 
-backlog is not initialised so in the case where
-cpg->eng_st != ENGINE_IDLE it is never initialised and
-hence which could lead to an illegal memory dereference
-in the statement:
-
-  backlog->complete(backlog, -EINPROGRESS);
-
-Discovered with cppcheck static analsys:
-[drivers/crypto/mv_cesa.c:616]:
-   (error) Uninitialized variable: backlog
-
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/crypto/mv_cesa.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index f91f15d..e63efbd 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -595,7 +595,7 @@ static int queue_manag(void *data)
- 	cpg->eng_st = ENGINE_IDLE;
- 	do {
- 		struct crypto_async_request *async_req = NULL;
--		struct crypto_async_request *backlog;
-+		struct crypto_async_request *backlog = NULL;
- 
- 		__set_current_state(TASK_INTERRUPTIBLE);
- 
--- 
-2.1.4
+NACK - PF_ALG type sockets support async operations and return -EIOCBQUEUED
+See skcipher_recvmsg_async() in crypto/algif_skcipher.c in net-next
