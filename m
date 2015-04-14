@@ -1,31 +1,49 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
+From: Al Viro <viro@ZenIV.linux.org.uk>
 Subject: Re: [PATCH 03/17] fs: don't allow to complete sync iocbs through
  aio_complete
-Date: Tue, 14 Apr 2015 11:00:49 -0700
-Message-ID: <552D55D1.2000908@intel.com>
-References: <20150411211742.GJ889@ZenIV.linux.org.uk> <1428787108-13650-3-git-send-email-viro@ZenIV.linux.org.uk>
+Date: Tue, 14 Apr 2015 19:26:33 +0100
+Message-ID: <20150414182633.GD889@ZenIV.linux.org.uk>
+References: <20150411211742.GJ889@ZenIV.linux.org.uk>
+ <1428787108-13650-3-git-send-email-viro@ZenIV.linux.org.uk>
+ <552D55D1.2000908@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Al Viro <viro@ZenIV.linux.org.uk>, davem@davemloft.net
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:4449 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752500AbbDNSDx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 14 Apr 2015 14:03:53 -0400
-In-Reply-To: <1428787108-13650-3-git-send-email-viro@ZenIV.linux.org.uk>
+Received: from zeniv.linux.org.uk ([195.92.253.2]:60339 "EHLO
+	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753356AbbDNS0i (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 14 Apr 2015 14:26:38 -0400
+Content-Disposition: inline
+In-Reply-To: <552D55D1.2000908@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 04/11/2015 02:18 PM, Al Viro wrote:
-> @@ -766,8 +765,7 @@ int sock_recvmsg(struct socket *sock, struct msghdr *msg,
->  
->  	init_sync_kiocb(&iocb, NULL);
->  	ret = __sock_recvmsg(&iocb, sock, msg, size, flags);
-> -	if (-EIOCBQUEUED == ret)
-> -		ret = wait_on_sync_kiocb(&iocb);
-> +	BUG_ON(ret == -EIOCBQUEUED);
+On Tue, Apr 14, 2015 at 11:00:49AM -0700, Tadeusz Struk wrote:
+> On 04/11/2015 02:18 PM, Al Viro wrote:
+> > @@ -766,8 +765,7 @@ int sock_recvmsg(struct socket *sock, struct msghdr *msg,
+> >  
+> >  	init_sync_kiocb(&iocb, NULL);
+> >  	ret = __sock_recvmsg(&iocb, sock, msg, size, flags);
+> > -	if (-EIOCBQUEUED == ret)
+> > -		ret = wait_on_sync_kiocb(&iocb);
+> > +	BUG_ON(ret == -EIOCBQUEUED);
+> 
+> NACK - PF_ALG type sockets support async operations and return -EIOCBQUEUED
+> See skcipher_recvmsg_async() in crypto/algif_skcipher.c in net-next
 
-NACK - PF_ALG type sockets support async operations and return -EIOCBQUEUED
-See skcipher_recvmsg_async() in crypto/algif_skcipher.c in net-next
+Its only caller is
+
+static int skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+                            size_t ignored, int flags)
+{
+        return (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb)) ?
+                skcipher_recvmsg_async(sock, msg, flags) :
+                skcipher_recvmsg_sync(sock, msg, flags);
+}
+
+Note that !is_sync_kiocb() in there.  Compare with init_sync_kiocb() in
+sock_recvmsg()...
