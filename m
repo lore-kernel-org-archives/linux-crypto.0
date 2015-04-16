@@ -1,58 +1,48 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: DRBG seeding
-Date: Thu, 16 Apr 2015 17:07:20 +0200
-Message-ID: <1505308.pr7rreheuo@tauon>
+Date: Thu, 16 Apr 2015 23:26:18 +0800
+Message-ID: <20150416152618.GA17690@gondor.apana.org.au>
 References: <20150416143617.GA17178@gondor.apana.org.au>
+ <1505308.pr7rreheuo@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=us-ascii
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34139 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751179AbbDPPRn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Apr 2015 11:17:43 -0400
-In-Reply-To: <20150416143617.GA17178@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:57335 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751025AbbDPP0W (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 16 Apr 2015 11:26:22 -0400
+Content-Disposition: inline
+In-Reply-To: <1505308.pr7rreheuo@tauon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 16. April 2015, 22:36:17 schrieb Herbert Xu:
-
-Hi Herbert,
-
->Hi Stephan:
+On Thu, Apr 16, 2015 at 05:07:20PM +0200, Stephan Mueller wrote:
 >
->Currently DRBG is seeded with entropy from get_random_bytes.
->However, get_random_bytes is basically the kernel version of
->/dev/urandom.  So there is no guarantee that you're actually
->getting the amount of entropy required.
->
->Are you sure this is compliant with the DRBG specification?
+> I do not see a specific requirement in SP800-90A about the quality of the 
+> noise source.
 
-I do not see a specific requirement in SP800-90A about the quality of the 
-noise source.
+Well it explicitly says that you cannot use a DRBG.  In the worst
+case get_random_bytes is completely deterministic.
+ 
+> That said, I already developed an in-kernel version of /dev/random. I sent the 
+> patch to LKML some half year ago. If I understood Ted Tso right, there is no 
+> general objection against adding that in-kernel interface. See [1] for the 
+> thread.
+> 
+> Furthermore, I already started working on updating the DRBG to use that in-
+> kernel /dev/random interface.
+> 
+> Shall I pursue that work in earnest now?
+> 
+> [1] https://lkml.org/lkml/2014/5/11/276
 
-But SP800-90B specifies tests and assessments about the quality. When applying 
-that specification, I applied some initial assessments: /dev/urandom complies 
-with SP800-90B when disregarding the very early boot stage (i.e. when assuming 
-that the input_pool received sufficient entropy).
+Yes I think we should do this.
 
-The only shaky time is the boot time until the nonblocking_pool/input_pool has 
-been sufficiently seeded.
-
-That said, I already developed an in-kernel version of /dev/random. I sent the 
-patch to LKML some half year ago. If I understood Ted Tso right, there is no 
-general objection against adding that in-kernel interface. See [1] for the 
-thread.
-
-Furthermore, I already started working on updating the DRBG to use that in-
-kernel /dev/random interface.
-
-Shall I pursue that work in earnest now?
-
-[1] https://lkml.org/lkml/2014/5/11/276
-
-
-Ciao
-Stephan
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
