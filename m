@@ -1,66 +1,188 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: DRBG parallel requests
-Date: Thu, 16 Apr 2015 17:36:09 +0200
-Message-ID: <2516428.A8Iv54MNdy@tauon>
-References: <20150416144455.GA17293@gondor.apana.org.au> <1683076.LPItN49aSW@tauon> <20150416153038.GB17690@gondor.apana.org.au>
+From: Andreas Steffen <andreas.steffen@strongswan.org>
+Subject: Re: DRBG seeding
+Date: Thu, 16 Apr 2015 19:11:18 +0200
+Message-ID: <552FED36.6080904@strongswan.org>
+References: <20150416143617.GA17178@gondor.apana.org.au> <1505308.pr7rreheuo@tauon> <20150416152618.GA17690@gondor.apana.org.au> <2037814.HNld8WWmfI@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Rafael Aquini <aquini@redhat.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha1; boundary="------------ms050201030802080503020304"
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34143 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751277AbbDPPgO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 16 Apr 2015 11:36:14 -0400
-In-Reply-To: <20150416153038.GB17690@gondor.apana.org.au>
+Received: from sitav-80046.hsr.ch ([152.96.80.46]:34069 "EHLO
+	mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753404AbbDPRSo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 16 Apr 2015 13:18:44 -0400
+In-Reply-To: <2037814.HNld8WWmfI@tauon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 16. April 2015, 23:30:38 schrieb Herbert Xu:
+This is a cryptographically signed message in MIME format.
 
-Hi Herbert,
+--------------ms050201030802080503020304
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
->On Thu, Apr 16, 2015 at 05:13:50PM +0200, Stephan Mueller wrote:
->> Surely, the shadow approach scales better than a global lock. But its
->> drawback is the (almost) identical state.
->
->The drawback is that your DRBG is no longer anything like that
->specified by the standard.  You've completely changed the
->cryptography by reusing the internal state.
+Hi Stephan,
 
-Well, I used the same line of thought as found in other implementations of the 
-DRBG (I do not want to name names though :-) ). As I thought another call to 
-get_random_bytes is too expensive, the high-res timer came to mind.
+in my opinion you definitively have to seed the DRBG with true
+entropy from /dev/random. This is what we are currently doing
+in userland with the strongSwan DRBG needed for the post-quantum
+NTRU-based key exchange algorithm. The NIST SP800-90A spec defines
+a parameter which estimates the entropy contained in the seed,
+but I think it is extremely difficult to derive an estimate
+if /dev/urandom is used.
 
-But during my discussions with Rafael, I already did not like that solution.
->
->> Rafael: do you have any better idea here other than remove the shadow copy
->> approach and use a global lock?
->
->I don't think you can get around the global lock due to the sequential
->nature of the DRBG that is built into its design.
->
->> >The only users of RNG in the crypto API do so in process context
->> >so we can make it a rule that all users RNG must be in process
->> >context.
->> 
->> Herbert, which type of lock am I allowed to use? Is a spin lock sufficient
->> or shall I use a mutex. I am not fully sure whether the used shash or
->> cipher type can sleep.
->
->As I said we can make it a rule that any user of our RNG must be in
->process context (all existing users are) so you can use a mutex.
->
->Also, if we change the entropy source to a blocking one as discussed
->in the other thread then you'd definitely want to have a mutex intead
->of a spin lock.
+Our plans within the strongSwan project is to make the Linux
+kernel DRBG available via the af-alg interface.
 
-Ok, a mutex will appear shortly.
+Best regards
+
+Andreas
+
+On 16.04.2015 17:32, Stephan Mueller wrote:
+> Am Donnerstag, 16. April 2015, 23:26:18 schrieb Herbert Xu:
 >
->Cheers,
+> Hi Herbert,
+>
+>> On Thu, Apr 16, 2015 at 05:07:20PM +0200, Stephan Mueller wrote:
+>>> I do not see a specific requirement in SP800-90A about the quality of=
+ the
+>>> noise source.
+>>
+>> Well it explicitly says that you cannot use a DRBG.  In the worst
+>> case get_random_bytes is completely deterministic.
+>>
+>>> That said, I already developed an in-kernel version of /dev/random. I=
+ sent
+>>> the patch to LKML some half year ago. If I understood Ted Tso right, =
+there
+>>> is no general objection against adding that in-kernel interface. See =
+[1]
+>>> for the thread.
+>>>
+>>> Furthermore, I already started working on updating the DRBG to use th=
+at in-
+>>> kernel /dev/random interface.
+>>>
+>>> Shall I pursue that work in earnest now?
+>>>
+>>> [1] https://lkml.org/lkml/2014/5/11/276
+>>
+>> Yes I think we should do this.
+>
+> Ok, I will work on that after I added the global lock to the DRBG.
+>>
+>> Thanks,
+>
+>
+> Ciao
+> Stephan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-crypto"=
+ in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+--=20
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Andreas Steffen                         andreas.steffen@strongswan.org
+strongSwan - the Open Source VPN Solution!          www.strongswan.org
+Institute for Internet Technologies and Applications
+University of Applied Sciences Rapperswil
+CH-8640 Rapperswil (Switzerland)
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D[ITA-HSR]=3D=3D
 
 
-Ciao
-Stephan
+--------------ms050201030802080503020304
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIMhDCC
+BjQwggQcoAMCAQICAR4wDQYJKoZIhvcNAQEFBQAwfTELMAkGA1UEBhMCSUwxFjAUBgNVBAoT
+DVN0YXJ0Q29tIEx0ZC4xKzApBgNVBAsTIlNlY3VyZSBEaWdpdGFsIENlcnRpZmljYXRlIFNp
+Z25pbmcxKTAnBgNVBAMTIFN0YXJ0Q29tIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTA3
+MTAyNDIxMDE1NVoXDTE3MTAyNDIxMDE1NVowgYwxCzAJBgNVBAYTAklMMRYwFAYDVQQKEw1T
+dGFydENvbSBMdGQuMSswKQYDVQQLEyJTZWN1cmUgRGlnaXRhbCBDZXJ0aWZpY2F0ZSBTaWdu
+aW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAxIFByaW1hcnkgSW50ZXJtZWRpYXRlIENs
+aWVudCBDQTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMcJg8zOLdgasSmkLhOr
+lr6KMoOMpohBllVHrdRvEg/q6r8jR+EK75xCGhR8ToREoqe7zM9/UnC6TS2y9UKTpT1v7RSM
+zR0t6ndl0TWBuUr/UXBhPk+Kmy7bI4yW4urC+y7P3/1/X7U8ocb8VpH/Clt+4iq7nirMcNh6
+qJR+xjOhV+VHzQMALuGYn5KZmc1NbJQYclsGkDxDz2UbFqE2+6vIZoL+jb9x4Pa5gNf1TwSD
+kOkikZB1xtB4ZqtXThaABSONdfmv/Z1pua3FYxnCFmdr/+N2JLKutIxMYqQOJebr/f/h5t95
+m4JgrM3Y/w7YX9d7YAL9jvN4SydHsU6n65cCAwEAAaOCAa0wggGpMA8GA1UdEwEB/wQFMAMB
+Af8wDgYDVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRTcu2SnODaywFcfH6WNU7y1LhRgjAfBgNV
+HSMEGDAWgBROC+8apEBbpRdphzDKNGhD0EGu8jBmBggrBgEFBQcBAQRaMFgwJwYIKwYBBQUH
+MAGGG2h0dHA6Ly9vY3NwLnN0YXJ0c3NsLmNvbS9jYTAtBggrBgEFBQcwAoYhaHR0cDovL3d3
+dy5zdGFydHNzbC5jb20vc2ZzY2EuY3J0MFsGA1UdHwRUMFIwJ6AloCOGIWh0dHA6Ly93d3cu
+c3RhcnRzc2wuY29tL3Nmc2NhLmNybDAnoCWgI4YhaHR0cDovL2NybC5zdGFydHNzbC5jb20v
+c2ZzY2EuY3JsMIGABgNVHSAEeTB3MHUGCysGAQQBgbU3AQIBMGYwLgYIKwYBBQUHAgEWImh0
+dHA6Ly93d3cuc3RhcnRzc2wuY29tL3BvbGljeS5wZGYwNAYIKwYBBQUHAgEWKGh0dHA6Ly93
+d3cuc3RhcnRzc2wuY29tL2ludGVybWVkaWF0ZS5wZGYwDQYJKoZIhvcNAQEFBQADggIBAAqD
+CH14qywGXLhjjF6uHLkjd02hcdh9hrw+VUsv+q1eeQWB21jWj3kJ96AUlPCoEGZ/ynJNScWy
+6QMVQjbbMXltUfO4n4bGGdKo3awPWp61tjAFgraLJgDk+DsSvUD6EowjMTNx25GQgyYJ5RPI
+zKKR9tQW8gGK+2+RHxkUCTbYFnL6kl8Ch507rUdPPipJ9CgJFws3kDS3gOS5WFMxcjO5DwKf
+KSETEPrHh7p5shuuNktvsv6hxHTLhiMKX893gxdT3XLS9OKmCv87vkINQcNEcIIoFWbP9HOR
+z9v3vQwR4e3ksLc2JZOAFK+ssS5XMEoznzpihEP0PLc4dCBYjbvSD7kxgDwZ+Aj8Q9PkbvE9
+sIPP7ON0fz095HdThKjiVJe6vofq+n6b1NBc8XdrQvBmunwxD5nvtTW4vtN6VY7mUCmxsCie
+uoBJ9OlqmsVWQvifIYf40dJPZkk9YgGTzWLpXDSfLSplbY2LL9C9U0ptvjcDjefLTvqSFc7t
+w1sEhF0n/qpA2r0GpvkLRDmcSwVyPvmjFBGqUp/pNy8ZuPGQmHwFi2/14+xeSUDG2bwnsYJQ
+G2EdJCB6luQ57GEnTA/yKZSTKI8dDQa8Sd3zfXb19mOgSF0bBdXbuKhEpuP9wirslFe6fQ1t
+5j5R0xi72MZ8ikMu1RQZKCyDbMwazlHiMIIGSDCCBTCgAwIBAgIDC0oMMA0GCSqGSIb3DQEB
+CwUAMIGMMQswCQYDVQQGEwJJTDEWMBQGA1UEChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMi
+U2VjdXJlIERpZ2l0YWwgQ2VydGlmaWNhdGUgU2lnbmluZzE4MDYGA1UEAxMvU3RhcnRDb20g
+Q2xhc3MgMSBQcmltYXJ5IEludGVybWVkaWF0ZSBDbGllbnQgQ0EwHhcNMTQwOTIyMTc0MjM0
+WhcNMTUwOTIzMTYyNzUyWjBYMScwJQYDVQQDDB5hbmRyZWFzLnN0ZWZmZW5Ac3Ryb25nc3dh
+bi5vcmcxLTArBgkqhkiG9w0BCQEWHmFuZHJlYXMuc3RlZmZlbkBzdHJvbmdzd2FuLm9yZzCC
+ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALTWE8Ab5LeaiLpYD1vLjg3OM11mc8CC
+t2h2gdZGpCg5Yv9awYOy1zd8VlXPoOnVtnk2yiXrT9wnz5iZthKfiaqh0fgd18G43svQYuto
+nFJX+G0BldOkTWDobhbYc9aGzl927+XDcIf/zMaZOiZXsU4ErCOnhumq4zUNtJX1kFh/haow
+CSj4HPI5MDzRLCGPcngE/XKLmSRLaXnBo+BO1AEmSzysCgihNnwxFxpqfm39X1WlharG0wJy
+JGXqgXAuXZ7jh2pDH8A9Ww8G4gxv58iiY5VW5wsfiPmbWwQsbIDIXXq6gFKRKi9zWeqchV5r
+JW/g/JFw0AFCqgAkmJwtowkCAwEAAaOCAuQwggLgMAkGA1UdEwQCMAAwCwYDVR0PBAQDAgSw
+MB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDAdBgNVHQ4EFgQUF3XH/qcfHMgVFp7S
+4EH1ZE157+8wHwYDVR0jBBgwFoAUU3Ltkpzg2ssBXHx+ljVO8tS4UYIwKQYDVR0RBCIwIIEe
+YW5kcmVhcy5zdGVmZmVuQHN0cm9uZ3N3YW4ub3JnMIIBTAYDVR0gBIIBQzCCAT8wggE7Bgsr
+BgEEAYG1NwECAzCCASowLgYIKwYBBQUHAgEWImh0dHA6Ly93d3cuc3RhcnRzc2wuY29tL3Bv
+bGljeS5wZGYwgfcGCCsGAQUFBwICMIHqMCcWIFN0YXJ0Q29tIENlcnRpZmljYXRpb24gQXV0
+aG9yaXR5MAMCAQEagb5UaGlzIGNlcnRpZmljYXRlIHdhcyBpc3N1ZWQgYWNjb3JkaW5nIHRv
+IHRoZSBDbGFzcyAxIFZhbGlkYXRpb24gcmVxdWlyZW1lbnRzIG9mIHRoZSBTdGFydENvbSBD
+QSBwb2xpY3ksIHJlbGlhbmNlIG9ubHkgZm9yIHRoZSBpbnRlbmRlZCBwdXJwb3NlIGluIGNv
+bXBsaWFuY2Ugb2YgdGhlIHJlbHlpbmcgcGFydHkgb2JsaWdhdGlvbnMuMDYGA1UdHwQvMC0w
+K6ApoCeGJWh0dHA6Ly9jcmwuc3RhcnRzc2wuY29tL2NydHUxLWNybC5jcmwwgY4GCCsGAQUF
+BwEBBIGBMH8wOQYIKwYBBQUHMAGGLWh0dHA6Ly9vY3NwLnN0YXJ0c3NsLmNvbS9zdWIvY2xh
+c3MxL2NsaWVudC9jYTBCBggrBgEFBQcwAoY2aHR0cDovL2FpYS5zdGFydHNzbC5jb20vY2Vy
+dHMvc3ViLmNsYXNzMS5jbGllbnQuY2EuY3J0MCMGA1UdEgQcMBqGGGh0dHA6Ly93d3cuc3Rh
+cnRzc2wuY29tLzANBgkqhkiG9w0BAQsFAAOCAQEAC5bWzDjemB04RK3lLPYsMhvYGUg58HL6
+SUlMl6yZm8VSG5Y3VDgJPLSrpLdGpXJwwP+d7kJ1zxETcd7/ouoXLTcSkTeglnZemEV8M6wd
+DNPuGCc3klL7g2hWH22F0/OZkgY/HMMLtpPQcGyAzh83qr2ISJPBY9Pw6tqVOKGIKB/EhQey
+rZkMtYuAO6TlKYIwO0FZxqB+Ot1Cp8ocwwzXe504eD+MHAdR8Ikz1hh4KyEqn/p7DBeYhrhY
+7ZsCEkRf8eb8ckiJ2XzY/sDmmgby/toBx3m2XISu38Qfu2BdCFdMbBjr9ZcnYMjit+XdNmvT
+uCNgX3k/cGlTa7scuAkc8DGCA90wggPZAgEBMIGUMIGMMQswCQYDVQQGEwJJTDEWMBQGA1UE
+ChMNU3RhcnRDb20gTHRkLjErMCkGA1UECxMiU2VjdXJlIERpZ2l0YWwgQ2VydGlmaWNhdGUg
+U2lnbmluZzE4MDYGA1UEAxMvU3RhcnRDb20gQ2xhc3MgMSBQcmltYXJ5IEludGVybWVkaWF0
+ZSBDbGllbnQgQ0ECAwtKDDAJBgUrDgMCGgUAoIICHTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
+AQcBMBwGCSqGSIb3DQEJBTEPFw0xNTA0MTYxNzExMThaMCMGCSqGSIb3DQEJBDEWBBSYNP6N
+DLE8r73pj2gWwT8V6FLWBDBsBgkqhkiG9w0BCQ8xXzBdMAsGCWCGSAFlAwQBKjALBglghkgB
+ZQMEAQIwCgYIKoZIhvcNAwcwDgYIKoZIhvcNAwICAgCAMA0GCCqGSIb3DQMCAgFAMAcGBSsO
+AwIHMA0GCCqGSIb3DQMCAgEoMIGlBgkrBgEEAYI3EAQxgZcwgZQwgYwxCzAJBgNVBAYTAklM
+MRYwFAYDVQQKEw1TdGFydENvbSBMdGQuMSswKQYDVQQLEyJTZWN1cmUgRGlnaXRhbCBDZXJ0
+aWZpY2F0ZSBTaWduaW5nMTgwNgYDVQQDEy9TdGFydENvbSBDbGFzcyAxIFByaW1hcnkgSW50
+ZXJtZWRpYXRlIENsaWVudCBDQQIDC0oMMIGnBgsqhkiG9w0BCRACCzGBl6CBlDCBjDELMAkG
+A1UEBhMCSUwxFjAUBgNVBAoTDVN0YXJ0Q29tIEx0ZC4xKzApBgNVBAsTIlNlY3VyZSBEaWdp
+dGFsIENlcnRpZmljYXRlIFNpZ25pbmcxODA2BgNVBAMTL1N0YXJ0Q29tIENsYXNzIDEgUHJp
+bWFyeSBJbnRlcm1lZGlhdGUgQ2xpZW50IENBAgMLSgwwDQYJKoZIhvcNAQEBBQAEggEAm3sx
+Ezgzj48/hnWCuOOHVHm0DcZzwziMYWQFaDRD1ZTxVXVNzlv1AeRktu19QrGpHhXmd5dZo9Vz
+iqJiBUnIcrNJksKsoLTFuNgXFaDBhruo+EuL+Y92dsJNtQXhAWV1gczpDOt1NAXnNUPrpi+f
+VNIS2aQzg3YaT95oCIc1wnXr8OBL25i9yrgMdH3jSy5gKP0YYvXN96eKznjlhH/Ll3PpTu43
+/b4m8IHaiWh1Diptp67eUjCTHvi9D/pUgjdPJmH6/M/kTUpOEFQQRIH7jbQPY1EFHZSTnnYc
+uY5hETuy9y3z4GUPaJlDI7uEXytqyuZF7PFPquX6z5uOwkL/wwAAAAAAAA==
+--------------ms050201030802080503020304--
