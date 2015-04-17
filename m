@@ -1,84 +1,46 @@
-From: Gregory CLEMENT <gregory.clement@free-electrons.com>
-Subject: Re: [PATCH 0/2] crypto: add new driver for Marvell CESA
-Date: Fri, 17 Apr 2015 15:01:01 +0200
-Message-ID: <5531040D.4000007@free-electrons.com>
-References: <1428591523-1780-1-git-send-email-boris.brezillon@free-electrons.com>	<20150410135056.GB28873@io.lakedaemon.net>	<20150410171148.07bc9429@bbrezillon>	<20150410223008.GA18660@io.lakedaemon.net>	<552B8EC4.209@free-electrons.com>	<20150413124711.GI18660@io.lakedaemon.net>	<87r3rom2qu.fsf@natisbad.org>	<20150413201146.GL18660@io.lakedaemon.net>	<20150417103356.6ce78145@bbrezillon> <20150417103946.2a46c243@bbrezillon>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: DRBG seeding
+Date: Fri, 17 Apr 2015 21:11:37 +0800
+Message-ID: <20150417131137.GA27060@gondor.apana.org.au>
+References: <20150416143617.GA17178@gondor.apana.org.au>
+ <3303782.1Fl4anZ2PL@myon.chronox.de>
+ <20150417021430.GA22835@gondor.apana.org.au>
+ <2956307.5uMbChcz7z@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Cc: Jason Cooper <jason@lakedaemon.net>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Thomas Petazzoni <info@free-electrons.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>, devicetree@vger.kernel.org,
-	Rob Herring <robh+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	linux-crypto@vger.kernel.org, Kumar Gala <galak@codeaurora.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Lior Amsalem <alior@marvell.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150417103946.2a46c243@bbrezillon>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Andreas Steffen <andreas.steffen@strongswan.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:59672 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753262AbbDQNLo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 17 Apr 2015 09:11:44 -0400
+Content-Disposition: inline
+In-Reply-To: <2956307.5uMbChcz7z@myon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Boris,
+On Fri, Apr 17, 2015 at 02:48:51PM +0200, Stephan Mueller wrote:
+>
+> Do you really think that this is possible? If the DRBG becomes the stdrng, you 
+> would imply that those callers (e.g. IPSEC) may suffer from a long block (and 
+> with long I mean not just seconds, but minutes).
 
-On 17/04/2015 10:39, Boris Brezillon wrote:
-> On Fri, 17 Apr 2015 10:33:56 +0200
-> Boris Brezillon <boris.brezillon@free-electrons.com> wrote:
-> 
->> Hi Jason,
->>
->> On Mon, 13 Apr 2015 20:11:46 +0000
->> Jason Cooper <jason@lakedaemon.net> wrote:
->>
->>>>
->>>>> I'd appreciate if we'd look into it.  I understand from on-list and
->>>>> off-list discussion that the rewrite was unavoidable.  So I'm willing to
->>>>> concede that.  Giving people time to migrate from old to new while still
->>>>> being able to update for other security fixes seems reasonable.
->>>>
->>>> Jason, what do you think of the approach above? 
->>>
->>> I say keep it simple.  We shouldn't use the DT changes to trigger one
->>> vice the other.  We need to be able to build both, but only load one at
->>> a time.  If that's anything other than simple to do, then we make it a
->>> Kconfig binary choice and move on.
->>
->> Actually I was planning to handle it with a Kconfig dependency rule
->> (NEW_DRIVER depends on !OLD_DRIVER and OLD_DRIVER depends
->> on !NEW_DRIVER).
->> I don't know how to make it a runtime check without adding new
->> compatible strings for the kirkwood, dove and orion platforms, and I'm
->> sure sure this is a good idea.
->   ^ not
-> 
->> Do you have any ideas ?
+It's only 49 bytes for every 64K so I think it's reasonable.
+The only reason someone would use this is to comply with the
+standard and this is what the standard requires so I don't see
+how we can do anything else.
+ 
+> Furthermore, I fail to see the difference between the current default stdrng 
+> (krng -- which is just get_random_bytes in disguise). Thus, the current 
+> situation with the DRBG seeding is not different from the non-DRBG use case.
 
-You use devm_ioremap_resource() in the new driver, so if the old one
-is already loaded the memory region will be already hold and the new
-driver will simply fail during the probe. So for this part it is OK.
+The difference is that krng doesn't have to satisfy any standard.
 
-However, the old driver doesn't try to reserve the region, it directly
-uses an ioremap(). So if the new driver is loaded first, then the old
-one will manage to be loaded too. I think that just adding a
-request_region()/release_region() (or converting the ioremap in a
-devm_ioremap_resource() in the old driver would be enough.
-
-
-Gregory
-
-
-
+Cheers,
 -- 
-Gregory Clement, Free Electrons
-Kernel, drivers, real-time and embedded Linux
-development, consulting, training and support.
-http://free-electrons.com
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
