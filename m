@@ -1,64 +1,50 @@
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v3 15/17] crypto: talitos - SEC1 bugs on 0 data hash
-Date: Fri, 17 Apr 2015 16:32:18 +0200 (CEST)
-Message-ID: <20150417143218.110F81A242C@localhost.localdomain>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org
-To: Kim Phillips <kim.phillips@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David S Miller <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Christophe Leroy <christophe.leroy-GgN8y9CXRhA@public.gmane.org>
+Subject: [PATCH v3 17/17] crypto: talitos - Update DT bindings with SEC1
+Date: Fri, 17 Apr 2015 16:32:22 +0200 (CEST)
+Message-ID: <20150417143222.31AFE1A242C@localhost.localdomain>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linuxppc-dev-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Kim Phillips <kim.phillips-KZfg59tc24xl57MIdRCFDg@public.gmane.org>,
+	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
+	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
+	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-SEC1 bugs on 0 data hash, so we submit an already padded block representing 0 data
+This patch updates the documentation by including SEC1 into SEC2/3 doc
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Signed-off-by: Christophe Leroy <christophe.leroy-GgN8y9CXRhA@public.gmane.org>
 ---
- drivers/crypto/talitos.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ Documentation/devicetree/bindings/crypto/fsl-sec2.txt | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index dddf4b3..f1406d7b 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1797,6 +1797,27 @@ static void ahash_done(struct device *dev,
- 	areq->base.complete(&areq->base, err);
- }
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec2.txt b/Documentation/devicetree/bindings/crypto/fsl-sec2.txt
+index 38988ef..f0d926b 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-sec2.txt
++++ b/Documentation/devicetree/bindings/crypto/fsl-sec2.txt
+@@ -1,9 +1,11 @@
+-Freescale SoC SEC Security Engines versions 2.x-3.x
++Freescale SoC SEC Security Engines versions 1.x-2.x-3.x
  
-+/*
-+ * SEC1 doesn't like hashing of 0 sized message, so we do the padding
-+ * ourself and submit a padded block
-+ */
-+void talitos_handle_buggy_hash(struct talitos_ctx *ctx,
-+			       struct talitos_edesc *edesc,
-+			       struct talitos_ptr *ptr)
-+{
-+	static u8 padded_hash[64] = {
-+		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-+	};
-+
-+	pr_err_once("Bug in SEC1, padding ourself\n");
-+	edesc->desc.hdr &= ~DESC_HDR_MODE0_MDEU_PAD;
-+	map_single_talitos_ptr(ctx->dev, ptr, sizeof(padded_hash),
-+			       (char *)padded_hash, DMA_TO_DEVICE);
-+}
-+
- static int common_nonsnoop_hash(struct talitos_edesc *edesc,
- 				struct ahash_request *areq, unsigned int length,
- 				void (*callback) (struct device *dev,
-@@ -1857,6 +1878,9 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
- 	/* last DWORD empty */
- 	desc->ptr[6] = zero_entry;
+ Required properties:
  
-+	if (is_sec1 && from_talitos_ptr_len(&desc->ptr[3], true) == 0)
-+		talitos_handle_buggy_hash(ctx, edesc, &desc->ptr[3]);
-+
- 	ret = talitos_submit(dev, ctx->ch, desc, callback, areq);
- 	if (ret != -EINPROGRESS) {
- 		common_nonsnoop_hash_unmap(dev, edesc, areq);
+ - compatible : Should contain entries for this and backward compatible
+-  SEC versions, high to low, e.g., "fsl,sec2.1", "fsl,sec2.0"
++  SEC versions, high to low, e.g., "fsl,sec2.1", "fsl,sec2.0" (SEC2/3)
++                             e.g., "fsl,sec1.2", "fsl,sec1.0" (SEC1)
++    warning: SEC1 and SEC2 are mutually exclusive
+ - reg : Offset and length of the register set for the device
+ - interrupts : the SEC's interrupt number
+ - fsl,num-channels : An integer representing the number of channels
 -- 
 2.1.0
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
