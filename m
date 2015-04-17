@@ -1,50 +1,44 @@
-From: Christophe Leroy <christophe.leroy-GgN8y9CXRhA@public.gmane.org>
-Subject: [PATCH v3 17/17] crypto: talitos - Update DT bindings with SEC1
-Date: Fri, 17 Apr 2015 16:32:22 +0200 (CEST)
-Message-ID: <20150417143222.31AFE1A242C@localhost.localdomain>
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linuxppc-dev-uLR06cmDAlY/bJ5BZ2RsiQ@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Kim Phillips <kim.phillips-KZfg59tc24xl57MIdRCFDg@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
-	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
-	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v3 16/17] crypto: talitos - Add fsl,sec1.0 compatible
+Date: Fri, 17 Apr 2015 16:32:20 +0200 (CEST)
+Message-ID: <20150417143220.237551A242C@localhost.localdomain>
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-crypto@vger.kernel.org
+To: Kim Phillips <kim.phillips@freescale.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David S Miller <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-This patch updates the documentation by including SEC1 into SEC2/3 doc
+We add a specific compatible for SEC1, to handle the differences
+between SEC1 and SEC2+
 
-Signed-off-by: Christophe Leroy <christophe.leroy-GgN8y9CXRhA@public.gmane.org>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- Documentation/devicetree/bindings/crypto/fsl-sec2.txt | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/crypto/talitos.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec2.txt b/Documentation/devicetree/bindings/crypto/fsl-sec2.txt
-index 38988ef..f0d926b 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-sec2.txt
-+++ b/Documentation/devicetree/bindings/crypto/fsl-sec2.txt
-@@ -1,9 +1,11 @@
--Freescale SoC SEC Security Engines versions 2.x-3.x
-+Freescale SoC SEC Security Engines versions 1.x-2.x-3.x
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index f1406d7b..c04074d 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -3086,9 +3086,16 @@ err_out:
+ }
  
- Required properties:
- 
- - compatible : Should contain entries for this and backward compatible
--  SEC versions, high to low, e.g., "fsl,sec2.1", "fsl,sec2.0"
-+  SEC versions, high to low, e.g., "fsl,sec2.1", "fsl,sec2.0" (SEC2/3)
-+                             e.g., "fsl,sec1.2", "fsl,sec1.0" (SEC1)
-+    warning: SEC1 and SEC2 are mutually exclusive
- - reg : Offset and length of the register set for the device
- - interrupts : the SEC's interrupt number
- - fsl,num-channels : An integer representing the number of channels
+ static const struct of_device_id talitos_match[] = {
++#ifdef CONFIG_CRYPTO_DEV_TALITOS1
++	{
++		.compatible = "fsl,sec1.0",
++	},
++#endif
++#ifdef CONFIG_CRYPTO_DEV_TALITOS2
+ 	{
+ 		.compatible = "fsl,sec2.0",
+ 	},
++#endif
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, talitos_match);
 -- 
 2.1.0
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
