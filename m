@@ -1,34 +1,40 @@
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH v3 03/17] crypto: talitos - talitos_ptr renamed ptr for
- more lisibility
-Date: Fri, 17 Apr 2015 15:14:18 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6D1CB21235@AcuExch.aculab.com>
-References: <20150417142356.797BC1A242C@localhost.localdomain>
+From: Olaf Hering <olaf@aepfle.de>
+Subject: Re: [PATCH v3 00/17] crypto: talitos - Add support for SEC1
+Date: Fri, 17 Apr 2015 17:26:42 +0200
+Message-ID: <20150417152642.GA7671@aepfle.de>
+References: <20150417143147.154871A242C@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: 'Christophe Leroy' <christophe.leroy@c-s.fr>,
-	Kim Phillips <kim.phillips@freescale.com>,
+Content-Type: text/plain; charset=utf-8
+Cc: Kim Phillips <kim.phillips@freescale.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	David S Miller <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150417142356.797BC1A242C@localhost.localdomain>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Christophe Leroy <christophe.leroy@c-s.fr>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.220]:59460 "EHLO
+	mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754225AbbDQPcp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 17 Apr 2015 11:32:45 -0400
+Content-Disposition: inline
+In-Reply-To: <20150417143147.154871A242C@localhost.localdomain>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-RnJvbTogQ2hyaXN0b3BoZSBMZXJveQ0KPiBMaW51eCBDb2R5aW5nU3R5bGUgcmVjb21tZW5kcyB0
-byB1c2Ugc2hvcnQgdmFyaWFibGVzIGZvciBsb2NhbA0KPiB2YXJpYWJsZXMuIHB0ciBpcyBqdXN0
-IGdvb2QgZW5vdWdoIGZvciB0aG9zZSAzIGxpbmVzIGZ1bmN0aW9ucy4NCj4gSXQgaGVscHMga2Vl
-cCBzaW5nbGUgbGluZXMgc2hvcnRlciB0aGFuIDgwIGNoYXJhY3RlcnMuDQouLi4NCj4gLXN0YXRp
-YyB2b2lkIHRvX3RhbGl0b3NfcHRyKHN0cnVjdCB0YWxpdG9zX3B0ciAqdGFsaXRvc19wdHIsIGRt
-YV9hZGRyX3QgZG1hX2FkZHIpDQo+ICtzdGF0aWMgdm9pZCB0b190YWxpdG9zX3B0cihzdHJ1Y3Qg
-dGFsaXRvc19wdHIgKnB0ciwgZG1hX2FkZHJfdCBkbWFfYWRkcikNCj4gIHsNCj4gLQl0YWxpdG9z
-X3B0ci0+cHRyID0gY3B1X3RvX2JlMzIobG93ZXJfMzJfYml0cyhkbWFfYWRkcikpOw0KPiAtCXRh
-bGl0b3NfcHRyLT5lcHRyID0gdXBwZXJfMzJfYml0cyhkbWFfYWRkcik7DQo+ICsJcHRyLT5wdHIg
-PSBjcHVfdG9fYmUzMihsb3dlcl8zMl9iaXRzKGRtYV9hZGRyKSk7DQo+ICsJcHRyLT5lcHRyID0g
-dXBwZXJfMzJfYml0cyhkbWFfYWRkcik7DQo+ICB9DQouLi4NCg0KTWF5YmUsIGJ1dCAncHRyJyBp
-c24ndCBhIGdvb2QgY2hvaWNlLg0KDQoJRGF2aWQNCg0K
+On Fri, Apr 17, Christophe Leroy wrote:
+
+> v3 is a complete rework of the patchset. Since a kernel can be built
+> with support for both MPC82xx and MPC83xx at the same time, talitos
+> driver shall support both SEC1 and SEC2+ at the same time.
+
+The used git send-email command lacked the --thread option.
+
+>From this perspective: NACK to the whole series...
+
+Olaf
