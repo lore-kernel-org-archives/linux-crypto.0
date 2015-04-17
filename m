@@ -1,75 +1,44 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 4/4] crypto: drbg - leave cipher handles operational
-Date: Fri, 17 Apr 2015 14:56:07 +0200
-Message-ID: <14302102.Dg0uVzjy9r@myon.chronox.de>
-References: <1551177.C0RmlOO9iU@myon.chronox.de>
+Subject: [PATCH 0/4] crypto: drbg - revamp locking
+Date: Fri, 17 Apr 2015 14:53:26 +0200
+Message-ID: <1551177.C0RmlOO9iU@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34153 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:34161 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750991AbbDQM4q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Apr 2015 08:56:46 -0400
-In-Reply-To: <1551177.C0RmlOO9iU@myon.chronox.de>
+	id S1752325AbbDQM44 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 17 Apr 2015 08:56:56 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-As the DRBG does not operate on shadow copies of the DRBG instance
-any more, the cipher handles only need to be allocated once during
-initalization time and deallocated during uninstantiate time.
+Hi,
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+the current implementation of the DRBG generates a shadow copy of its
+DRBG state for each incoming request. The idea is that only a short
+term lock is needed to spawn the shadow copy. The drawback is that
+if multiple parallel requests come in, the generated DRBG shadow
+states only differ by a high-resolution timer that was mixed in during
+the shadow state generation.
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 19916ea..4289624 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1249,11 +1249,6 @@ static int drbg_generate(struct drbg_state *drbg,
- 	if ((drbg_max_requests(drbg)) < drbg->reseed_ctr)
- 		drbg->seeded = false;
- 
--	/* allocate cipher handle */
--	len = drbg->d_ops->crypto_init(drbg);
--	if (len)
--		goto err;
--
- 	if (drbg->pr || !drbg->seeded) {
- 		pr_devel("DRBG: reseeding before generation (prediction "
- 			 "resistance: %s, state %s)\n",
-@@ -1325,7 +1320,6 @@ static int drbg_generate(struct drbg_state *drbg,
- 	 */
- 	len = 0;
- err:
--	drbg->d_ops->crypto_fini(drbg);
- 	return len;
- }
- 
-@@ -1425,9 +1419,10 @@ static int drbg_instantiate(struct drbg_state *drbg, struct drbg_string *pers,
- 	if (drbg->d_ops->crypto_init(drbg))
- 		goto err;
- 	ret = drbg_seed(drbg, pers, false);
--	drbg->d_ops->crypto_fini(drbg);
--	if (ret)
-+	if (ret) {
-+		drbg->d_ops->crypto_fini(drbg);
- 		goto err;
-+	}
- 
- 	mutex_unlock(&drbg->drbg_mutex);
- 	return 0;
-@@ -1451,6 +1446,7 @@ unlock:
- static int drbg_uninstantiate(struct drbg_state *drbg)
- {
- 	mutex_lock(&drbg->drbg_mutex);
-+	drbg->d_ops->crypto_fini(drbg);
- 	drbg_dealloc_state(drbg);
- 	/* no scrubbing of test_data -- this shall survive an uninstantiate */
- 	mutex_unlock(&drbg->drbg_mutex);
+This patch now removes this shadow state and introduces a mutex
+to serialize all requests to one DRBG instance.
+
+The patch was fully CAVS tested and demonstrates that the DRBG still
+complies with the standard.
+
+Stephan Mueller (4):
+  cryoto: drbg - clear all temporary memory
+  crypto: drbg - do not create shadow copy
+  crypto: drbg - replace spinlock with mutex
+  crypto: drbg - leave cipher handles operational
+
+ crypto/drbg.c         | 154 +++++++++-----------------------------------------
+ include/crypto/drbg.h |   4 +-
+ 2 files changed, 30 insertions(+), 128 deletions(-)
+
 -- 
 2.1.0
