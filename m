@@ -1,45 +1,39 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: DRBG seeding
-Date: Sat, 18 Apr 2015 03:32:03 +0200
-Message-ID: <3151046.CNv2ChE2Gl@myon.chronox.de>
-References: <20150416143617.GA17178@gondor.apana.org.au> <2278042.JS7c5BLrbA@myon.chronox.de> <20150418012744.GA1329@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: Fix aead_{sendmsg,recvmsg}() signatures.
+Date: Sat, 18 Apr 2015 09:33:17 +0800
+Message-ID: <20150418013317.GB1329@gondor.apana.org.au>
+References: <20150417.151953.196971237843380420.davem@davemloft.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Andreas Steffen <andreas.steffen@strongswan.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: David Miller <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34176 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751494AbbDRBcJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 17 Apr 2015 21:32:09 -0400
-In-Reply-To: <20150418012744.GA1329@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:43496 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751494AbbDRBdU (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 17 Apr 2015 21:33:20 -0400
+Content-Disposition: inline
+In-Reply-To: <20150417.151953.196971237843380420.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Samstag, 18. April 2015, 09:27:44 schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Fri, Apr 17, 2015 at 03:22:56PM +0200, Stephan Mueller wrote:
-> > > The only reason someone would use this is to comply with the
-> > > standard and this is what the standard requires so I don't see
-> > > how we can do anything else.
-> > 
-> > I do not see a definite quality requirement of the seed source in
-> > SP800-90A.
-> Section 8.6.5 "Source of Entropy Input" explicitly requires this.
+On Fri, Apr 17, 2015 at 03:19:53PM -0400, David Miller wrote:
 > 
-> TBH whether /dev/random even satisfies 8.6.5 is also debatable.
-> But it agrees with the specification at least in spirit.
+> The kiocb argument is no longer present.
+> 
+> Signed-off-by: David S. Miller <davem@davemloft.net>
 
-Ok, if I re-read that one and consider our discussion, I would agree. But it 
-was handled differently up to now.
+I think Linus has already fixed this with
 
-In any case, I am almost ready with the patch for an async seeding. Though, I 
-want to give it a thorough testing.
+commit eccd02f32a2c25139da2d5e72ebab1fee7b5baab
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Apr 15 14:09:46 2015 -0700
 
+    crypto: fix mis-merge with the networking merge
+
+Thanks,
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
