@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 3/3] crypto: drbg - leave cipher handles operational
-Date: Sat, 18 Apr 2015 16:46:06 +0200
-Message-ID: <1979860.aVF28TxxBZ@myon.chronox.de>
+Subject: [PATCH v2 1/3] crypto: drbg - fix drbg_generate return val check
+Date: Sat, 18 Apr 2015 16:42:20 +0200
+Message-ID: <2357671.arYJ3FSGcR@myon.chronox.de>
 References: <2596998.Ykulm8tym0@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -9,67 +9,36 @@ Content-Transfer-Encoding: 7Bit
 Cc: linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34185 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:34189 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752188AbbDROqx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 18 Apr 2015 10:46:53 -0400
+	id S1752187AbbDROrC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 18 Apr 2015 10:47:02 -0400
 In-Reply-To: <2596998.Ykulm8tym0@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-As the DRBG does not operate on shadow copies of the DRBG instance
-any more, the cipher handles only need to be allocated once during
-initalization time and deallocated during uninstantiate time.
+The drbg_generate returns 0 in success case. That means that
+drbg_generate_long will always only generate drbg_max_request_bytes at
+most. Longer requests will be truncated to drbg_max_request_bytes.
 
+Reported-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/drbg.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ crypto/drbg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/crypto/drbg.c b/crypto/drbg.c
-index d34926b..6f503c5 100644
+index b69409c..74f7c1e 100644
 --- a/crypto/drbg.c
 +++ b/crypto/drbg.c
-@@ -1249,11 +1249,6 @@ static int drbg_generate(struct drbg_state *drbg,
- 	if ((drbg_max_requests(drbg)) < drbg->reseed_ctr)
- 		drbg->seeded = false;
- 
--	/* allocate cipher handle */
--	len = drbg->d_ops->crypto_init(drbg);
--	if (len)
--		goto err;
--
- 	if (drbg->pr || !drbg->seeded) {
- 		pr_devel("DRBG: reseeding before generation (prediction "
- 			 "resistance: %s, state %s)\n",
-@@ -1325,7 +1320,6 @@ static int drbg_generate(struct drbg_state *drbg,
- 	 */
- 	len = 0;
- err:
--	drbg->d_ops->crypto_fini(drbg);
- 	return len;
- }
- 
-@@ -1424,9 +1418,10 @@ static int drbg_instantiate(struct drbg_state *drbg, struct drbg_string *pers,
- 	if (drbg->d_ops->crypto_init(drbg))
- 		goto err;
- 	ret = drbg_seed(drbg, pers, false);
--	drbg->d_ops->crypto_fini(drbg);
--	if (ret)
-+	if (ret) {
-+		drbg->d_ops->crypto_fini(drbg);
- 		goto err;
-+	}
- 
- 	mutex_unlock(&drbg->drbg_mutex);
- 	return 0;
-@@ -1450,6 +1445,7 @@ unlock:
- static int drbg_uninstantiate(struct drbg_state *drbg)
- {
- 	mutex_lock(&drbg->drbg_mutex);
-+	drbg->d_ops->crypto_fini(drbg);
- 	drbg_dealloc_state(drbg);
- 	/* no scrubbing of test_data -- this shall survive an uninstantiate */
- 	mutex_unlock(&drbg->drbg_mutex);
+@@ -1450,7 +1450,7 @@ static int drbg_generate_long(struct drbg_state *drbg,
+ 		slice = ((buflen - len) / drbg_max_request_bytes(drbg));
+ 		chunk = slice ? drbg_max_request_bytes(drbg) : (buflen - len);
+ 		tmplen = drbg_generate(drbg, buf + len, chunk, addtl);
+-		if (0 >= tmplen)
++		if (0 > tmplen)
+ 			return tmplen;
+ 		len += tmplen;
+ 	} while (slice > 0 && (len < buflen));
 -- 
 2.1.0
