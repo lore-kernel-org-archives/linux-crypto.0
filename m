@@ -1,67 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 3/4] crypto: drbg - replace spinlock with mutex
-Date: Sat, 18 Apr 2015 18:55:23 +0800
-Message-ID: <20150418105523.GB5408@gondor.apana.org.au>
+Subject: Re: [PATCH 1/4] cryoto: drbg - clear all temporary memory
+Date: Sat, 18 Apr 2015 18:59:29 +0800
+Message-ID: <20150418105929.GA5561@gondor.apana.org.au>
 References: <1551177.C0RmlOO9iU@myon.chronox.de>
- <2415536.7nqArbGB13@myon.chronox.de>
+ <11443550.8lhOr92W5F@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55608 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:51557 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751657AbbDRKz2 (ORCPT
+	with ESMTP id S1752052AbbDRK7d (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 18 Apr 2015 06:55:28 -0400
+	Sat, 18 Apr 2015 06:59:33 -0400
 Content-Disposition: inline
-In-Reply-To: <2415536.7nqArbGB13@myon.chronox.de>
+In-Reply-To: <11443550.8lhOr92W5F@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 17, 2015 at 02:55:28PM +0200, Stephan Mueller wrote:
->
-> @@ -1349,7 +1348,9 @@ static int drbg_generate_long(struct drbg_state *drbg,
->  		unsigned int chunk = 0;
->  		slice = ((buflen - len) / drbg_max_request_bytes(drbg));
->  		chunk = slice ? drbg_max_request_bytes(drbg) : (buflen - len);
-> +		mutex_lock(&drbg->drbg_mutex);
->  		tmplen = drbg_generate(drbg, buf + len, chunk, addtl);
-> +		mutex_unlock(&drbg->drbg_mutex);
->  		if (0 >= tmplen)
->  			return tmplen;
+On Fri, Apr 17, 2015 at 02:54:08PM +0200, Stephan Mueller wrote:
+> The buffer uses for temporary data must be cleared entirely. In AES192
+> the used buffer is drbg_statelen(drbg) + drbg_blocklen(drbg) as
+> documented in the comment above drbg_ctr_df.
+> 
+> This patch ensures that the temp buffer is completely wiped.
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-BTW I just noticed that we always return 0 now so this is broken.
-
-> @@ -1377,10 +1378,12 @@ static int drbg_generate_long(struct drbg_state *drbg,
->  static int drbg_instantiate(struct drbg_state *drbg, struct drbg_string *pers,
->  			    int coreref, bool pr)
->  {
-> -	int ret = -ENOMEM;
-> +	int ret = -EOPNOTSUPP;
->  
->  	pr_devel("DRBG: Initializing DRBG core %d with prediction resistance "
->  		 "%s\n", coreref, pr ? "enabled" : "disabled");
-> +	mutex_init(&drbg->drbg_mutex);
-
-This shouldn't be here because the reset function will call this
-and break.  This needs to be moved to cra_init.
-
-Incidentally the whole reset concept seems redundant as you could
-always free and allocate a new RNG instead.  So I'm planning on
-replacing it with a seed/reseed function instead.  IOW it will
-keep the existing state and just add in new data if it's already
-seeded.
-
-This will change our user-space API semantically but as you're the
-only user I hope we won't need to add any backwards compatibility
-cruft.
-
-This also means that cra_init will no longer seed this and the RNG
-won't be usable until seed is called.
-
-Cheers,
-- 
+Patch applied.
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
