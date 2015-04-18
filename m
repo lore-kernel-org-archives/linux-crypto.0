@@ -1,32 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/4] cryoto: drbg - clear all temporary memory
-Date: Sat, 18 Apr 2015 18:59:29 +0800
-Message-ID: <20150418105929.GA5561@gondor.apana.org.au>
-References: <1551177.C0RmlOO9iU@myon.chronox.de>
- <11443550.8lhOr92W5F@myon.chronox.de>
+Subject: Re: [PATCH] crypto: ensure backlog is initialised
+Date: Sat, 18 Apr 2015 19:00:01 +0800
+Message-ID: <20150418110001.GA5590@gondor.apana.org.au>
+References: <1429030289-4070-1-git-send-email-colin.king@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51557 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48923 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752052AbbDRK7d (ORCPT
+	with ESMTP id S1752083AbbDRLAK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 18 Apr 2015 06:59:33 -0400
+	Sat, 18 Apr 2015 07:00:10 -0400
 Content-Disposition: inline
-In-Reply-To: <11443550.8lhOr92W5F@myon.chronox.de>
+In-Reply-To: <1429030289-4070-1-git-send-email-colin.king@canonical.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 17, 2015 at 02:54:08PM +0200, Stephan Mueller wrote:
-> The buffer uses for temporary data must be cleared entirely. In AES192
-> the used buffer is drbg_statelen(drbg) + drbg_blocklen(drbg) as
-> documented in the comment above drbg_ctr_df.
+On Tue, Apr 14, 2015 at 11:51:29AM -0500, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> This patch ensures that the temp buffer is completely wiped.
+> backlog is not initialised so in the case where
+> cpg->eng_st != ENGINE_IDLE it is never initialised and
+> hence which could lead to an illegal memory dereference
+> in the statement:
 > 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+>   backlog->complete(backlog, -EINPROGRESS);
+> 
+> Discovered with cppcheck static analsys:
+> [drivers/crypto/mv_cesa.c:616]:
+>    (error) Uninitialized variable: backlog
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
 Patch applied.
 -- 
