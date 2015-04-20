@@ -1,45 +1,40 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 3/4] crypto: drbg - replace spinlock with mutex
-Date: Mon, 20 Apr 2015 02:51:30 +0200
-Message-ID: <1710531.pgBfBsv2an@tauon>
-References: <1551177.C0RmlOO9iU@myon.chronox.de> <2050637.ShmA9JvV53@tauon> <20150420004855.GA16974@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: crypto: drbg - Initialise mutex in drbg_healthcheck_sanity
+Date: Mon, 20 Apr 2015 11:26:48 +0800
+Message-ID: <20150420032648.GA17746@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+To: Stephan Mueller <smueller@chronox.de>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34218 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751185AbbDTAvh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 19 Apr 2015 20:51:37 -0400
-In-Reply-To: <20150420004855.GA16974@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:42907 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751986AbbDTD0z (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 19 Apr 2015 23:26:55 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 20. April 2015, 08:48:55 schrieb Herbert Xu:
+As we moved the mutex init out of drbg_instantiate and into cra_init
+we need to explicitly initialise the mutex in drbg_healthcheck_sanity.
 
-Hi Herbert,
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
->On Mon, Apr 20, 2015 at 02:45:02AM +0200, Stephan Mueller wrote:
->> I do not want to deviate from the kernel crypto API by adding some
->> additional wrapper. But what we can do is to leave the DRBG unseeded
->> during alloc time. As long as the DRBG is unseeded, it will return EAGAIN
->> to any request for random numbers, forcing the caller to use
->> crypto_rng_reset to activate the DRBG.
->> 
->> When the DRBG receives a reset, it will always obtain the seed and treat
->> any
->> user-provided data as personalization string / additional data.
->
->That's exactly what I was suggesting.  I already have two patches
->that I will post once I finish testing.
-
-Ok, I will wait then for your patches before I send out my patch set for the 
-seeding revamp.
->
->Cheers,
-
-
-Ciao
-Stephan
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 30ec2a6..57fd479 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1741,6 +1741,8 @@ static inline int __init drbg_healthcheck_sanity(void)
+ 	if (!drbg)
+ 		return -ENOMEM;
+ 
++	mutex_init(&drbg->drbg_mutex);
++
+ 	/*
+ 	 * if the following tests fail, it is likely that there is a buffer
+ 	 * overflow as buf is much smaller than the requested or provided
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
