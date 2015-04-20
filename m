@@ -1,92 +1,41 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 13/15] crypto: krng - Convert to new rng interface
-Date: Mon, 20 Apr 2015 13:39:15 +0800
-Message-ID: <E1Yk4QN-0004rv-Ev@gondolin.me.apana.org.au>
+Subject: [PATCH 15/15] crypto: algif_rng - Remove obsolete const-removal cast
+Date: Mon, 20 Apr 2015 13:39:18 +0800
+Message-ID: <E1Yk4QQ-0004sR-Kb@gondolin.me.apana.org.au>
 References: <20150420053515.GA18444@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52475 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:38947 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751684AbbDTFjT (ORCPT
+	with ESMTP id S1753295AbbDTFjX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Apr 2015 01:39:19 -0400
+	Mon, 20 Apr 2015 01:39:23 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1Yk4QO-0003GC-6C
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Apr 2015 15:39:16 +1000
+	id 1Yk4QS-0003Hm-5v
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Apr 2015 15:39:20 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch ocnverts the KRNG implementation to the new low-level
-rng interface.
+Now that crypto_rng_reset takes a const argument, we no longer
+need to cast away the const qualifier.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/krng.c |   33 ++++++++++++++-------------------
- 1 file changed, 14 insertions(+), 19 deletions(-)
+ crypto/algif_rng.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/krng.c b/crypto/krng.c
-index 0224841..40ed78e 100644
---- a/crypto/krng.c
-+++ b/crypto/krng.c
-@@ -16,31 +16,27 @@
- #include <linux/module.h>
- #include <linux/random.h>
- 
--static int krng_get_random(struct crypto_rng *tfm, u8 *rdata, unsigned int dlen)
-+static int krng_generate(struct crypto_rng *tfm,
-+			 const u8 *src, unsigned int slen,
-+			 u8 *rdata, unsigned int dlen)
- {
- 	get_random_bytes(rdata, dlen);
- 	return 0;
+diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
+index a346173..2a6c59c 100644
+--- a/crypto/algif_rng.c
++++ b/crypto/algif_rng.c
+@@ -164,7 +164,7 @@ static int rng_setkey(void *private, const u8 *seed, unsigned int seedlen)
+ 	 * Check whether seedlen is of sufficient size is done in RNG
+ 	 * implementations.
+ 	 */
+-	return crypto_rng_reset(private, (u8 *)seed, seedlen);
++	return crypto_rng_reset(private, seed, seedlen);
  }
  
--static int krng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
-+static int krng_seed(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
- {
- 	return 0;
- }
- 
--static struct crypto_alg krng_alg = {
--	.cra_name		= "stdrng",
--	.cra_driver_name	= "krng",
--	.cra_priority		= 200,
--	.cra_flags		= CRYPTO_ALG_TYPE_RNG,
--	.cra_ctxsize		= 0,
--	.cra_type		= &crypto_rng_type,
--	.cra_module		= THIS_MODULE,
--	.cra_u			= {
--		.rng = {
--			.rng_make_random	= krng_get_random,
--			.rng_reset		= krng_reset,
--			.seedsize		= 0,
--		}
-+static struct rng_alg krng_alg = {
-+	.generate		= krng_generate,
-+	.seed			= krng_seed,
-+	.base			=	{
-+		.cra_name		= "stdrng",
-+		.cra_driver_name	= "krng",
-+		.cra_priority		= 200,
-+		.cra_module		= THIS_MODULE,
- 	}
- };
- 
-@@ -48,13 +44,12 @@ static struct crypto_alg krng_alg = {
- /* Module initalization */
- static int __init krng_mod_init(void)
- {
--	return crypto_register_alg(&krng_alg);
-+	return crypto_register_rng(&krng_alg);
- }
- 
- static void __exit krng_mod_fini(void)
- {
--	crypto_unregister_alg(&krng_alg);
--	return;
-+	crypto_unregister_rng(&krng_alg);
- }
- 
- module_init(krng_mod_init);
+ static const struct af_alg_type algif_type_rng = {
