@@ -1,262 +1,89 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 9/11] crypto: rng - Remove old low-level rng interface
-Date: Tue, 21 Apr 2015 10:46:46 +0800
-Message-ID: <E1YkOD0-0007Lk-Oo@gondolin.me.apana.org.au>
+Subject: [v2 PATCH 8/11] crypto: krng - Convert to new rng interface
+Date: Tue, 21 Apr 2015 10:46:45 +0800
+Message-ID: <E1YkOCz-0007LT-Eg@gondolin.me.apana.org.au>
 References: <20150421024436.GA28057@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50145 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:43598 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752051AbbDUCqu (ORCPT
+	with ESMTP id S1752021AbbDUCqs (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 20 Apr 2015 22:46:50 -0400
+	Mon, 20 Apr 2015 22:46:48 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Now that all rng implementations have switched over to the new
-interface, we can remove the old low-level interface.
+This patch ocnverts the KRNG implementation to the new low-level
+rng interface.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/rng.c                  |   57 ++----------------------------------------
- include/crypto/internal/rng.h |    3 --
- include/crypto/rng.h          |   10 ++-----
- include/linux/crypto.h        |   30 ----------------------
- 4 files changed, 8 insertions(+), 92 deletions(-)
+ crypto/krng.c |   33 ++++++++++++++-------------------
+ 1 file changed, 14 insertions(+), 19 deletions(-)
 
-diff --git a/crypto/rng.c b/crypto/rng.c
-index e98ce1c..055e276 100644
---- a/crypto/rng.c
-+++ b/crypto/rng.c
-@@ -4,6 +4,7 @@
-  * RNG operations.
-  *
-  * Copyright (c) 2008 Neil Horman <nhorman@tuxdriver.com>
-+ * Copyright (c) 2015 Herbert Xu <herbert@gondor.apana.org.au>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-@@ -36,39 +37,6 @@ static inline struct crypto_rng *__crypto_rng_cast(struct crypto_tfm *tfm)
- 	return container_of(tfm, struct crypto_rng, base);
- }
+diff --git a/crypto/krng.c b/crypto/krng.c
+index 0224841..40ed78e 100644
+--- a/crypto/krng.c
++++ b/crypto/krng.c
+@@ -16,31 +16,27 @@
+ #include <linux/module.h>
+ #include <linux/random.h>
  
--static inline struct old_rng_alg *crypto_old_rng_alg(struct crypto_rng *tfm)
--{
--	return &crypto_rng_tfm(tfm)->__crt_alg->cra_rng;
--}
--
--static int generate(struct crypto_rng *tfm, const u8 *src, unsigned int slen,
--		    u8 *dst, unsigned int dlen)
--{
--	return crypto_old_rng_alg(tfm)->rng_make_random(tfm, dst, dlen);
--}
--
--static int rngapi_reset(struct crypto_rng *tfm, const u8 *seed,
--			unsigned int slen)
--{
--	u8 *buf = NULL;
--	u8 *src = (u8 *)seed;
--	int err;
--
--	if (slen) {
--		buf = kmalloc(slen, GFP_KERNEL);
--		if (!buf)
--			return -ENOMEM;
--
--		memcpy(buf, seed, slen);
--		src = buf;
--	}
--
--	err = crypto_old_rng_alg(tfm)->rng_reset(tfm, src, slen);
--
--	kzfree(buf);
--	return err;
--}
--
- int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
+-static int krng_get_random(struct crypto_rng *tfm, u8 *rdata, unsigned int dlen)
++static int krng_generate(struct crypto_rng *tfm,
++			 const u8 *src, unsigned int slen,
++			 u8 *rdata, unsigned int dlen)
  {
- 	u8 *buf = NULL;
-@@ -83,7 +51,7 @@ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
- 		seed = buf;
- 	}
- 
--	err = tfm->seed(tfm, seed, slen);
-+	err = crypto_rng_alg(tfm)->seed(tfm, seed, slen);
- 
- 	kfree(buf);
- 	return err;
-@@ -92,21 +60,6 @@ EXPORT_SYMBOL_GPL(crypto_rng_reset);
- 
- static int crypto_rng_init_tfm(struct crypto_tfm *tfm)
- {
--	struct crypto_rng *rng = __crypto_rng_cast(tfm);
--	struct rng_alg *alg = crypto_rng_alg(rng);
--	struct old_rng_alg *oalg = crypto_old_rng_alg(rng);
--
--	if (oalg->rng_make_random) {
--		rng->generate = generate;
--		rng->seed = rngapi_reset;
--		rng->seedsize = oalg->seedsize;
--		return 0;
--	}
--
--	rng->generate = alg->generate;
--	rng->seed = alg->seed;
--	rng->seedsize = alg->seedsize;
--
+ 	get_random_bytes(rdata, dlen);
  	return 0;
  }
  
-@@ -114,8 +67,7 @@ static unsigned int seedsize(struct crypto_alg *alg)
+-static int krng_reset(struct crypto_rng *tfm, u8 *seed, unsigned int slen)
++static int krng_seed(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
  {
- 	struct rng_alg *ralg = container_of(alg, struct rng_alg, base);
- 
--	return alg->cra_rng.rng_make_random ?
--	       alg->cra_rng.seedsize : ralg->seedsize;
-+	return ralg->seedsize;
+ 	return 0;
  }
  
- #ifdef CONFIG_NET
-@@ -150,7 +102,7 @@ static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
- 	seq_printf(m, "seedsize     : %u\n", seedsize(alg));
+-static struct crypto_alg krng_alg = {
+-	.cra_name		= "stdrng",
+-	.cra_driver_name	= "krng",
+-	.cra_priority		= 200,
+-	.cra_flags		= CRYPTO_ALG_TYPE_RNG,
+-	.cra_ctxsize		= 0,
+-	.cra_type		= &crypto_rng_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_u			= {
+-		.rng = {
+-			.rng_make_random	= krng_get_random,
+-			.rng_reset		= krng_reset,
+-			.seedsize		= 0,
+-		}
++static struct rng_alg krng_alg = {
++	.generate		= krng_generate,
++	.seed			= krng_seed,
++	.base			=	{
++		.cra_name		= "stdrng",
++		.cra_driver_name	= "krng",
++		.cra_priority		= 200,
++		.cra_module		= THIS_MODULE,
+ 	}
+ };
+ 
+@@ -48,13 +44,12 @@ static struct crypto_alg krng_alg = {
+ /* Module initalization */
+ static int __init krng_mod_init(void)
+ {
+-	return crypto_register_alg(&krng_alg);
++	return crypto_register_rng(&krng_alg);
  }
  
--const struct crypto_type crypto_rng_type = {
-+static const struct crypto_type crypto_rng_type = {
- 	.extsize = crypto_alg_extsize,
- 	.init_tfm = crypto_rng_init_tfm,
- #ifdef CONFIG_PROC_FS
-@@ -162,7 +114,6 @@ const struct crypto_type crypto_rng_type = {
- 	.type = CRYPTO_ALG_TYPE_RNG,
- 	.tfmsize = offsetof(struct crypto_rng, base),
- };
--EXPORT_SYMBOL_GPL(crypto_rng_type);
- 
- struct crypto_rng *crypto_alloc_rng(const char *alg_name, u32 type, u32 mask)
+ static void __exit krng_mod_fini(void)
  {
-diff --git a/include/crypto/internal/rng.h b/include/crypto/internal/rng.h
-index 2c9a865..263f1a5 100644
---- a/include/crypto/internal/rng.h
-+++ b/include/crypto/internal/rng.h
-@@ -2,6 +2,7 @@
-  * RNG: Random Number Generator  algorithms under the crypto API
-  *
-  * Copyright (c) 2008 Neil Horman <nhorman@tuxdriver.com>
-+ * Copyright (c) 2015 Herbert Xu <herbert@gondor.apana.org.au>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-@@ -16,8 +17,6 @@
- #include <crypto/algapi.h>
- #include <crypto/rng.h>
- 
--extern const struct crypto_type crypto_rng_type;
--
- int crypto_register_rng(struct rng_alg *alg);
- void crypto_unregister_rng(struct rng_alg *alg);
- int crypto_register_rngs(struct rng_alg *algs, int count);
-diff --git a/include/crypto/rng.h b/include/crypto/rng.h
-index cc22e52..c5d4684 100644
---- a/include/crypto/rng.h
-+++ b/include/crypto/rng.h
-@@ -2,6 +2,7 @@
-  * RNG: Random Number Generator  algorithms under the crypto API
-  *
-  * Copyright (c) 2008 Neil Horman <nhorman@tuxdriver.com>
-+ * Copyright (c) 2015 Herbert Xu <herbert@gondor.apana.org.au>
-  *
-  * This program is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU General Public License as published by the Free
-@@ -56,11 +57,6 @@ struct rng_alg {
- };
- 
- struct crypto_rng {
--	int (*generate)(struct crypto_rng *tfm,
--			const u8 *src, unsigned int slen,
--			u8 *dst, unsigned int dlen);
--	int (*seed)(struct crypto_rng *tfm, const u8 *seed, unsigned int slen);
--	unsigned int seedsize;
- 	struct crypto_tfm base;
- };
- 
-@@ -144,7 +140,7 @@ static inline int crypto_rng_generate(struct crypto_rng *tfm,
- 				      const u8 *src, unsigned int slen,
- 				      u8 *dst, unsigned int dlen)
- {
--	return tfm->generate(tfm, src, slen, dst, dlen);
-+	return crypto_rng_alg(tfm)->generate(tfm, src, slen, dst, dlen);
+-	crypto_unregister_alg(&krng_alg);
+-	return;
++	crypto_unregister_rng(&krng_alg);
  }
  
- /**
-@@ -198,7 +194,7 @@ int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed,
-  */
- static inline int crypto_rng_seedsize(struct crypto_rng *tfm)
- {
--	return tfm->seedsize;
-+	return crypto_rng_alg(tfm)->seedsize;
- }
- 
- #endif
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 2fa9b05..ee14140 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -138,7 +138,6 @@ struct crypto_async_request;
- struct crypto_aead;
- struct crypto_blkcipher;
- struct crypto_hash;
--struct crypto_rng;
- struct crypto_tfm;
- struct crypto_type;
- struct aead_givcrypt_request;
-@@ -426,40 +425,12 @@ struct compress_alg {
- 			      unsigned int slen, u8 *dst, unsigned int *dlen);
- };
- 
--/**
-- * struct old_rng_alg - random number generator definition
-- * @rng_make_random: The function defined by this variable obtains a random
-- *		     number. The random number generator transform must generate
-- *		     the random number out of the context provided with this
-- *		     call.
-- * @rng_reset: Reset of the random number generator by clearing the entire state.
-- *	       With the invocation of this function call, the random number
-- *             generator shall completely reinitialize its state. If the random
-- *	       number generator requires a seed for setting up a new state,
-- *	       the seed must be provided by the consumer while invoking this
-- *	       function. The required size of the seed is defined with
-- *	       @seedsize .
-- * @seedsize: The seed size required for a random number generator
-- *	      initialization defined with this variable. Some random number
-- *	      generators like the SP800-90A DRBG does not require a seed as the
-- *	      seeding is implemented internally without the need of support by
-- *	      the consumer. In this case, the seed size is set to zero.
-- */
--struct old_rng_alg {
--	int (*rng_make_random)(struct crypto_rng *tfm, u8 *rdata,
--			       unsigned int dlen);
--	int (*rng_reset)(struct crypto_rng *tfm, u8 *seed, unsigned int slen);
--
--	unsigned int seedsize;
--};
--
- 
- #define cra_ablkcipher	cra_u.ablkcipher
- #define cra_aead	cra_u.aead
- #define cra_blkcipher	cra_u.blkcipher
- #define cra_cipher	cra_u.cipher
- #define cra_compress	cra_u.compress
--#define cra_rng		cra_u.rng
- 
- /**
-  * struct crypto_alg - definition of a cryptograpic cipher algorithm
-@@ -559,7 +530,6 @@ struct crypto_alg {
- 		struct blkcipher_alg blkcipher;
- 		struct cipher_alg cipher;
- 		struct compress_alg compress;
--		struct old_rng_alg rng;
- 	} cra_u;
- 
- 	int (*cra_init)(struct crypto_tfm *tfm);
+ module_init(krng_mod_init);
