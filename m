@@ -1,35 +1,139 @@
-From: David Miller <davem@davemloft.net>
-Subject: Re: [PATCH 0/6] crypto: Make all AEAD users include aead.h
-Date: Wed, 22 Apr 2015 11:41:48 -0400 (EDT)
-Message-ID: <20150422.114148.495349325919156837.davem@davemloft.net>
-References: <20150422070455.GA8351@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 5/6] crypto: drbg - use Jitter RNG to obtain seed
+Date: Wed, 22 Apr 2015 21:24:49 +0200
+Message-ID: <2016176.70CSf50Lea@myon.chronox.de>
+References: <5054521.el7mZro33c@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	johannes@sipsolutions.net, marcel@holtmann.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Andreas Steffen <andreas.steffen@strongswan.org>,
+	Theodore Ts'o <tytso@mit.edu>,
+	Sandy Harris <sandyinchina@gmail.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:33323 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932245AbbDVPlv (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Apr 2015 11:41:51 -0400
-In-Reply-To: <20150422070455.GA8351@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:34254 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750930AbbDVT1h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Apr 2015 15:27:37 -0400
+In-Reply-To: <5054521.el7mZro33c@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Date: Wed, 22 Apr 2015 15:04:55 +0800
+During initialization, the DRBG now tries to allocate a handle of the
+Jitter RNG. If such a Jitter RNG is available during seeding, the DRBG
+pulls the required entropy/nonce string from get_random_bytes and
+concatenates it with a string of equal size from the Jitter RNG. That
+combined string is now the seed for the DRBG.
 
-> This series adds inclusions of aead.h to all AEAD users including
-> AEAD implementors (where it's internal/aead.h).  This is necessary
-> because I'll be adding an updated AEAD interface and that will live
-> in aead.h instead of crypto.h.
-> 
-> Dave, if it's OK with you I'd like to push the last two patches
-> through my tree as the new AEAD interface would depend on them.
+Written differently, the initial seed of the DRBG is now:
 
-No objection, feel free to add my:
+get_random_bytes(entropy/nonce) || jitterentropy (entropy/nonce)
 
-Acked-by: David S. Miller <davem@davemloft.net>
+If the Jitter RNG is not available, the DRBG only seeds from
+get_random_bytes.
+
+CC: Andreas Steffen <andreas.steffen@strongswan.org>
+CC: Theodore Ts'o <tytso@mit.edu>
+CC: Sandy Harris <sandyinchina@gmail.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/drbg.c         | 44 ++++++++++++++++++++++++++++++++++++++------
+ include/crypto/drbg.h |  1 +
+ 2 files changed, 39 insertions(+), 6 deletions(-)
+
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index cdc23c8..c98941a 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1125,10 +1125,25 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 				 drbg->test_data.len);
+ 		pr_devel("DRBG: using test entropy\n");
+ 	} else {
+-		pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
+-			 drbg->seed_buf_len);
++		/* Get seed from in-kernel /dev/urandom */
+ 		get_random_bytes(drbg->seed_buf, drbg->seed_buf_len);
+-		drbg_string_fill(&data1, drbg->seed_buf, drbg->seed_buf_len);
++
++		/* Get seed from Jitter RNG */
++		if (!drbg->jent ||
++		    crypto_rng_get_bytes(drbg->jent,
++					 drbg->seed_buf + drbg->seed_buf_len,
++					 drbg->seed_buf_len)) {
++			pr_info("DRBG: could not obtain random data from Jitter RNG\n");
++			drbg_string_fill(&data1, drbg->seed_buf,
++					 drbg->seed_buf_len);
++			pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
++				 drbg->seed_buf_len);
++		} else {
++			drbg_string_fill(&data1, drbg->seed_buf,
++					 drbg->seed_buf_len * 2);
++			pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
++				 drbg->seed_buf_len * 2);
++		}
+ 	}
+ 	list_add_tail(&data1.list, &seedlist);
+ 
+@@ -1153,7 +1168,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 	 * Clear the initial entropy buffer as the async call may not overwrite
+ 	 * that buffer for quite some time.
+ 	 */
+-	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len);
++	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len * 2);
+ 	if (ret)
+ 		goto out;
+ 	/*
+@@ -1195,6 +1210,8 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+ #endif
+ 	kzfree(drbg->seed_buf);
+ 	drbg->seed_buf = NULL;
++	crypto_free_rng(drbg->jent);
++	drbg->jent = NULL;
+ }
+ 
+ /*
+@@ -1270,12 +1287,27 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 		ret = -EFAULT;
+ 		goto err;
+ 	}
+-	/* ensure we have sufficient buffer space for initial seed */
++	/*
++	 * Ensure we have sufficient buffer space for initial seed which
++	 * consists of the seed from get_random_bytes and the Jitter RNG.
++	 */
+ 	drbg->seed_buf_len = ((drbg->seed_buf_len + 1) / 2) * 3;
+-	drbg->seed_buf = kzalloc(drbg->seed_buf_len, GFP_KERNEL);
++	drbg->seed_buf = kzalloc(drbg->seed_buf_len * 2, GFP_KERNEL);
+ 	if (!drbg->seed_buf)
+ 		goto err;
+ 
++	drbg->jent = crypto_alloc_rng("jitterentropy_rng", 0, 0);
++	if(IS_ERR(drbg->jent))
++	{
++		pr_info("DRBG: could not allocate Jitter RNG handle for seeding\n");
++		/*
++		 * As the Jitter RNG is a module that may not be present, we
++		 * continue with the operation and do not fully tie the DRBG
++		 * to the Jitter RNG.
++		 */
++		drbg->jent = NULL;
++	}
++
+ 	return 0;
+ 
+ err:
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index e4980a1..fabf102 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -122,6 +122,7 @@ struct drbg_state {
+ 	struct random_work seed_work;	/* asynchronous seeding support */
+ 	u8 *seed_buf;			/* buffer holding the seed */
+ 	size_t seed_buf_len;
++	struct crypto_rng *jent;
+ 	const struct drbg_state_ops *d_ops;
+ 	const struct drbg_core *core;
+ 	struct drbg_string test_data;
+-- 
+2.1.0
