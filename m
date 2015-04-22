@@ -1,162 +1,78 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/6] crypto: fips - Move fips_enabled sysctl into fips.c
-Date: Wed, 22 Apr 2015 13:25:56 +0800
-Message-ID: <E1YknAa-0001zQ-1V@gondolin.me.apana.org.au>
-References: <20150422052452.GA7553@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] crypto: add key wrapping block chaining mode
+Date: Wed, 22 Apr 2015 13:48:46 +0800
+Message-ID: <20150422054846.GA7804@gondor.apana.org.au>
+References: <6218629.uO4632Hmli@myon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36137 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:44859 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757335AbbDVFZ6 (ORCPT
+	with ESMTP id S1755749AbbDVFsv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Apr 2015 01:25:58 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1YknAa-0005SE-6l
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2015 15:25:56 +1000
+	Wed, 22 Apr 2015 01:48:51 -0400
+Content-Disposition: inline
+In-Reply-To: <6218629.uO4632Hmli@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-There is currently a large ifdef FIPS code section in proc.c.
-Ostensibly it's there because the fips_enabled sysctl sits under
-/proc/sys/crypto.  However, no other crypto sysctls exist.
+On Wed, Apr 22, 2015 at 06:36:59AM +0200, Stephan Mueller wrote:
+>
+> +static int crypto_kw_decrypt(struct aead_request *req)
+> +{
+> +	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+> +	struct crypto_kw_ctx *ctx = crypto_aead_ctx(aead);
+> +	struct crypto_cipher *tfm = ctx->child;
+> +	unsigned long alignmask = crypto_cipher_alignmask(tfm);
+> +	unsigned int src_nbytes, dst_nbytes, i;
+> +	struct scatter_walk src_walk, dst_walk;
+> +	struct crypto_kw_block block;
 
-In fact, the whole ethos of the crypto API is against such user
-interfaces so this patch moves all the FIPS sysctl code over to
-fips.c.
+Why isn't this aligned like tbe_buffer?
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+> +	u8 tmpblock[SEMIBSIZE];
+> +	u64 t = 6 * ((req->cryptlen - SEMIBSIZE) >> 3);
+> +	int ret = -EAGAIN;
+> +	struct scatterlist src, dst;
+> +	/* IV of KW defined by section 6.2 */
+> +	u8 *default_iv = "\xA6\xA6\xA6\xA6\xA6\xA6\xA6\xA6";
+> +	unsigned int outcryptlen = req->cryptlen - SEMIBSIZE;
+> +
+> +	/*
+> +	 * Require at least 3 semiblocks as defined in SP800-38F and ensure
+> +	 * that the given data is aligned to semiblock.
+> +	 */
+> +	if (req->cryptlen < (3 * SEMIBSIZE) || req->cryptlen % 8)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * src scatterlist is read only. dst scatterlist is r/w. During the
+> +	 * first loop, src points to req->src and dst to req->dst. For any
+> +	 * subsequent round, the code operates on req->dst only.
+> +	 */
+> +	crypto_kw_copy_scatterlist(req->src, &src);
+> +	crypto_kw_copy_scatterlist(req->dst, &dst);
+> +
+> +	for (i = 0; i < 6; i++) {
+> +		u8 tbe_buffer[SEMIBSIZE + alignmask];
+> +		/* alignment for the crypto_xor operation */
 
- crypto/fips.c |   48 ++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/proc.c |   41 -----------------------------------------
- 2 files changed, 48 insertions(+), 41 deletions(-)
+You're setting alignmask to that of the child transform, which
+may have no requirements on alignment at all.  So you need to
+ensure that it's at least 4-byte aligned for crypto_xor.
 
-diff --git a/crypto/fips.c b/crypto/fips.c
-index 0f65df9..9d627c1 100644
---- a/crypto/fips.c
-+++ b/crypto/fips.c
-@@ -13,7 +13,9 @@
- #include <linux/export.h>
- #include <linux/fips.h>
- #include <linux/init.h>
-+#include <linux/module.h>
- #include <linux/kernel.h>
-+#include <linux/sysctl.h>
- 
- int fips_enabled;
- EXPORT_SYMBOL_GPL(fips_enabled);
-@@ -28,3 +30,49 @@ static int fips_enable(char *str)
- }
- 
- __setup("fips=", fips_enable);
-+
-+static struct ctl_table crypto_sysctl_table[] = {
-+	{
-+		.procname       = "fips_enabled",
-+		.data           = &fips_enabled,
-+		.maxlen         = sizeof(int),
-+		.mode           = 0444,
-+		.proc_handler   = proc_dointvec
-+	},
-+	{}
-+};
-+
-+static struct ctl_table crypto_dir_table[] = {
-+	{
-+		.procname       = "crypto",
-+		.mode           = 0555,
-+		.child          = crypto_sysctl_table
-+	},
-+	{}
-+};
-+
-+static struct ctl_table_header *crypto_sysctls;
-+
-+static void crypto_proc_fips_init(void)
-+{
-+	crypto_sysctls = register_sysctl_table(crypto_dir_table);
-+}
-+
-+static void crypto_proc_fips_exit(void)
-+{
-+	unregister_sysctl_table(crypto_sysctls);
-+}
-+
-+static int __init fips_init(void)
-+{
-+	crypto_proc_fips_init();
-+	return 0;
-+}
-+
-+static void __exit fips_exit(void)
-+{
-+	crypto_proc_fips_exit();
-+}
-+
-+module_init(fips_init);
-+module_exit(fips_exit);
-diff --git a/crypto/proc.c b/crypto/proc.c
-index 4ffe73b..2cc10c9 100644
---- a/crypto/proc.c
-+++ b/crypto/proc.c
-@@ -20,47 +20,8 @@
- #include <linux/rwsem.h>
- #include <linux/proc_fs.h>
- #include <linux/seq_file.h>
--#include <linux/sysctl.h>
- #include "internal.h"
- 
--#ifdef CONFIG_CRYPTO_FIPS
--static struct ctl_table crypto_sysctl_table[] = {
--	{
--		.procname       = "fips_enabled",
--		.data           = &fips_enabled,
--		.maxlen         = sizeof(int),
--		.mode           = 0444,
--		.proc_handler   = proc_dointvec
--	},
--	{}
--};
--
--static struct ctl_table crypto_dir_table[] = {
--	{
--		.procname       = "crypto",
--		.mode           = 0555,
--		.child          = crypto_sysctl_table
--	},
--	{}
--};
--
--static struct ctl_table_header *crypto_sysctls;
--
--static void crypto_proc_fips_init(void)
--{
--	crypto_sysctls = register_sysctl_table(crypto_dir_table);
--}
--
--static void crypto_proc_fips_exit(void)
--{
--	if (crypto_sysctls)
--		unregister_sysctl_table(crypto_sysctls);
--}
--#else
--#define crypto_proc_fips_init()
--#define crypto_proc_fips_exit()
--#endif
--
- static void *c_start(struct seq_file *m, loff_t *pos)
- {
- 	down_read(&crypto_alg_sem);
-@@ -148,11 +109,9 @@ static const struct file_operations proc_crypto_ops = {
- void __init crypto_init_proc(void)
- {
- 	proc_create("crypto", 0, NULL, &proc_crypto_ops);
--	crypto_proc_fips_init();
- }
- 
- void __exit crypto_exit_proc(void)
- {
--	crypto_proc_fips_exit();
- 	remove_proc_entry("crypto", NULL);
- }
+> +	inst->alg.cra_alignmask = alg->cra_alignmask | (__alignof__(u64) - 1);
+
+Where does this 8-byte alignment requirement come from?
+
+You also never actually pass any input data directly to the child,
+except for the key so you don't need to specify the child's alignment
+here at all.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
