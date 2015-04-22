@@ -1,41 +1,45 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: crypto: api - Move module sig ifdef into accessor function
-Date: Wed, 22 Apr 2015 16:12:20 +0800
-Message-ID: <20150422081220.GA9337@gondor.apana.org.au>
-References: <20150422032846.GA6798@gondor.apana.org.au>
- <87pp6wodh7.fsf@rustcorp.com.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: add key wrapping block chaining mode
+Date: Wed, 22 Apr 2015 14:23:04 +0200
+Message-ID: <5036814.6LNlN5eOjK@myon.chronox.de>
+References: <6218629.uO4632Hmli@myon.chronox.de> <20150422055324.GA7872@gondor.apana.org.au> <20150422061354.GA8053@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:35055 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932267AbbDVIMZ (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Apr 2015 04:12:25 -0400
-Content-Disposition: inline
-In-Reply-To: <87pp6wodh7.fsf@rustcorp.com.au>
+Received: from mail.eperm.de ([89.247.134.16]:34237 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751897AbbDVMYq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Apr 2015 08:24:46 -0400
+In-Reply-To: <20150422061354.GA8053@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Apr 22, 2015 at 04:29:16PM +0930, Rusty Russell wrote:
-> Herbert Xu <herbert@gondor.apana.org.au> writes:
-> > Currently we're hiding mod->sig_ok under an ifdef in open code.
-> > This patch adds a module_sig_ok accessor function and removes that
-> > ifdef.
-> >     
-> > Cc: Rusty Russell <rusty@rustcorp.com.au>
-> > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> Did you want me to take this via modules-next?  Assuming not.
-> 
-> So:
->         Acked-by: Rusty Russell <rusty@rustcorp.com.au>
+Am Mittwoch, 22. April 2015, 14:13:54 schrieb Herbert Xu:
 
-Thanks Rusty.  Yes I'd lik to push this through the crypto tree.
+Hi Herbert,
+
+> On Wed, Apr 22, 2015 at 01:53:24PM +0800, Herbert Xu wrote:
+> > On Wed, Apr 22, 2015 at 06:36:59AM +0200, Stephan Mueller wrote:
+> > > The key wrapping is an authenticated encryption operation without
+> > > associated data. Therefore, setting of AAD is permissible, but that data
+> > > is not used by the cipher implementation.
+> > 
+> > In that case you should return an error if AAD is provided rather
+> > than silently discarding them since by definition AEAD must include
+> > the AAD in the integrity value.
+> 
+> In fact drop the AEAD altogether and just use ablkcipher.  The
+> integrity value is then simply the output IV.
+
+Initially I was playing with ablkcipher. But then I moved to AEAD because the 
+ciphertext is longer than the plaintext.
+
+Isn't it a basic assumption to ablkcipher is that the ciphertext is equal in 
+size as the plaintext?
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
