@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 4/6] crypto: drbg - add async seeding operation
-Date: Wed, 22 Apr 2015 21:24:07 +0200
-Message-ID: <9795146.aMrfnC05Xd@myon.chronox.de>
+Subject: [PATCH 2/6] random: Async and sync API for accessing kernel_pool
+Date: Wed, 22 Apr 2015 21:19:09 +0200
+Message-ID: <1833111.HyaVVWWl5o@myon.chronox.de>
 References: <5054521.el7mZro33c@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -16,110 +16,191 @@ In-Reply-To: <5054521.el7mZro33c@myon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The async seeding operation is triggered during initalization right
-after the first non-blocking seeding is completed. As required by the
-asynchronous operation of random.c, a callback function is provided that
-is triggered by random.c once entropy is available. That callback
-function performs the actual seeding of the DRBG.
+The kernel_pool is intended to be the in-kernel equivalent to the
+blocking_pool, i.e. requests for random data may be blocked if
+insufficient entropy is present.
+
+The added API calls provide a synchronous function call
+get_blocking_random_bytes where the caller is blocked.
+
+In addition, an asynchronous API call of get_blocking_random_bytes_cb
+is provided which returns immediately to the caller after submitting
+the request for random data. The caller-provided buffer that shall be
+filled with random data is filled up as available entropy permits. The
+caller may provide a callback function that is invoked once the
+request is completed.
+
+A third API call, get_blocking_random_bytes_cancel, is provided to
+cancel the random number gathering operation.
 
 CC: Andreas Steffen <andreas.steffen@strongswan.org>
 CC: Theodore Ts'o <tytso@mit.edu>
 CC: Sandy Harris <sandyinchina@gmail.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/drbg.c         | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- include/crypto/drbg.h |  1 +
- 2 files changed, 47 insertions(+)
+ drivers/char/random.c  | 116 +++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/random.h |  20 +++++++++
+ 2 files changed, 136 insertions(+)
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 906b6e5..cdc23c8 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1056,6 +1056,40 @@ static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
- 	return ret;
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 2868754..fa4dd48 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1804,3 +1804,119 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
+ 	credit_entropy_bits(poolp, entropy);
  }
- 
-+/* DRBG callback for obtaining data from the async Linux RNG */
-+static void drbg_async_seed_cb(void *buf, ssize_t buflen, void *private)
+ EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
++
++static bool get_blocking_random_bytes_term(bool *cancel)
 +{
-+	struct drbg_string data;
-+	LIST_HEAD(seedlist);
-+	struct drbg_state *drbg = (struct drbg_state *)private;
-+	int ret = 0;
++	if (ENTROPY_BITS(&input_pool) >= random_read_wakeup_bits)
++		return true;
++	return *cancel;
++}
 +
-+	if (buflen <= 0 || !buf)
-+		return;
++/*
++ * Equivalent function to get_random_bytes with the difference that this
++ * function blocks the request in a similar fashion as random_read(),
++ * implementing a /dev/random device for in-kernel users.
++ *
++ * This function may sleep.
++ *
++ * @buf caller allocated buffer filled with random data
++ * @nbytes requested number of bytes -- buffer should be at least as big
++ * @cancel pointer to variable that can be used to cancel the collection
++ *	   operation. If this boolean is set to true, the collection operation
++ *	   is terminated immediately. When it is set to true during the
++ *	   collection loop, the collection is terminated immediately.
++ *
++ * return: positive value: obtained number of bytes on successful
++ *	   negative value: error code on error
++ */
++ssize_t get_blocking_random_bytes(void *buf, ssize_t nbytes, bool *cancel)
++{
++	ssize_t ret = 0;
 +
-+	drbg_string_fill(&data, buf, buflen);
-+	list_add_tail(&data.list, &seedlist);
-+	/* sanity check to verify that there is still a DRBG instance */
-+	if (!drbg)
-+		return;
-+	mutex_lock(&drbg->drbg_mutex);
-+	/* sanity check to verify that the DRBG instance is valid */
-+	if (!drbg->V) {
-+		mutex_unlock(&drbg->drbg_mutex);
-+		return;
++	if (nbytes <= 0)
++		return nbytes;
++	BUG_ON(!buf);
++
++	while (ret < nbytes) {
++		ssize_t round = 0;
++		ssize_t pull = min_t(ssize_t, (nbytes - ret), SEC_XFER_SIZE);
++
++		if (*cancel)
++			return ret;
++		round = extract_entropy(&kernel_pool, (buf + ret), pull, 0, 0);
++		if (0 > round)
++			return round;
++		if (0 == round)
++			wait_event_interruptible(random_kernel_wait,
++				get_blocking_random_bytes_term(cancel));
++		ret += round;
 +	}
-+	ret = __drbg_seed(drbg, &seedlist, true);
-+	memzero_explicit(buf, buflen);
-+	mutex_unlock(&drbg->drbg_mutex);
++	return ret;
 +}
++EXPORT_SYMBOL(get_blocking_random_bytes);
 +
-+/* Cancel any outstanding async operation and wait for their completion */
-+static inline void drbg_async_work_cancel(struct random_work *work)
++/*
++ * Immediate canceling the collection operation for the random_work
++ */
++void get_blocking_random_bytes_cancel(struct random_work *rw)
 +{
-+	get_blocking_random_bytes_cancel(work);
-+	cancel_work_sync(&work->rw_work);
++	rw->cancel = true;
++	wake_up_interruptible(&random_kernel_wait);
++
++}
++EXPORT_SYMBOL(get_blocking_random_bytes_cancel);
++
++static void get_blocking_random_bytes_work(struct work_struct *work)
++{
++	struct random_work *rw = container_of(work, struct random_work,
++					      rw_work);
++	ssize_t ret;
++
++	ret = get_blocking_random_bytes(rw->rw_buf, rw->rw_len, &rw->cancel);
++	if (rw->rw_cb)
++		rw->rw_cb(rw->rw_buf, ret, rw->private);
 +}
 +
- /*
-  * Seeding or reseeding of the DRBG
-  *
-@@ -1081,6 +1115,11 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 		return -EINVAL;
- 	}
++/*
++ * Asynchronous invocation of the blocking interface. The function
++ * queues the request in either the private work queue supplied with the
++ * wq argument or in the general work queue framework if wq is NULL.
++ * Once the request is completed or upon receiving an error, the callback
++ * function of cb is called, if not NULL, to inform the caller about the
++ * completion of its operation.
++ *
++ * If a caller wants to cancel the work (e.g. in the module_exit function),
++ * simply call
++ *	get_blocking_random_bytes_cancel(&my_random_work);
++ *	cancel_work_sync(&my_random_work.rw_work);
++ *
++ * @wq pointer to private work queue or NULL - input
++ * @rw handle to the work queue frame - output
++ * @buf allocated buffer where random numbers are to be stored
++ * @nbytes size of buf and implicitly number of bytes requested
++ * @private pointer to data that is not processed by here, but handed to the
++ *	    callback function to allow the caller to maintain a state
++ * @cb callback function where
++ *	* buf holds the pointer to buf will be supplied
++ *	* buflen holds the length of the gathered random numbers or error code
++ *	  of the generation function.
++ *	* private provides a reference to the private data pointer
++ */
++void get_blocking_random_bytes_cb(struct workqueue_struct *wq,
++				  struct random_work *rw,
++				  u8 *buf, ssize_t nbytes, void *private,
++				  void (*cb)(void *buf, ssize_t buflen,
++					     void *private))
++{
++	rw->rw_buf = buf;
++	rw->rw_len = nbytes;
++	rw->private = private;
++	rw->rw_cb = cb;
++	rw->cancel = false;
++	INIT_WORK(&rw->rw_work, get_blocking_random_bytes_work);
++	if (wq)
++		queue_work(wq, &rw->rw_work);
++	else
++		schedule_work(&rw->rw_work);
++}
++EXPORT_SYMBOL(get_blocking_random_bytes_cb);
+diff --git a/include/linux/random.h b/include/linux/random.h
+index b05856e..960803b 100644
+--- a/include/linux/random.h
++++ b/include/linux/random.h
+@@ -7,6 +7,7 @@
+ #define _LINUX_RANDOM_H
  
-+	/* cancel any previously invoked seeding */
-+	mutex_unlock(&drbg->drbg_mutex);
-+	drbg_async_work_cancel(&drbg->seed_work);
-+	mutex_lock(&drbg->drbg_mutex);
-+
- 	if (list_empty(&drbg->test_data.list)) {
- 		drbg_string_fill(&data1, drbg->test_data.buf,
- 				 drbg->test_data.len);
-@@ -1125,6 +1164,12 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 	if (!reseed)
- 		drbg->seed_buf_len = drbg->seed_buf_len / 3 * 2;
+ #include <uapi/linux/random.h>
++#include <linux/workqueue.h>
  
-+	/* Invoke asynchronous seeding unless DRBG is in test mode. */
-+	if (!list_empty(&drbg->test_data.list))
-+		get_blocking_random_bytes_cb(NULL, &drbg->seed_work,
-+					     drbg->seed_buf, drbg->seed_buf_len,
-+					     drbg, drbg_async_seed_cb);
-+
- out:
- 	return ret;
+ extern void add_device_randomness(const void *, unsigned int);
+ extern void add_input_randomness(unsigned int type, unsigned int code,
+@@ -112,4 +113,23 @@ static inline u32 next_pseudo_random32(u32 seed)
+ 	return seed * 1664525 + 1013904223;
  }
-@@ -1487,6 +1532,7 @@ unlock:
-  */
- static int drbg_uninstantiate(struct drbg_state *drbg)
- {
-+	drbg_async_work_cancel(&drbg->seed_work);
- 	if (drbg->d_ops)
- 		drbg->d_ops->crypto_fini(drbg);
- 	drbg_dealloc_state(drbg);
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index b052698..e4980a1 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -119,6 +119,7 @@ struct drbg_state {
- 	bool fips_primed;	/* Continuous test primed? */
- 	unsigned char *prev;	/* FIPS 140-2 continuous test value */
- #endif
-+	struct random_work seed_work;	/* asynchronous seeding support */
- 	u8 *seed_buf;			/* buffer holding the seed */
- 	size_t seed_buf_len;
- 	const struct drbg_state_ops *d_ops;
+ 
++/* API for asynchronous in-kernel operation */
++struct random_work {
++	struct work_struct	rw_work;
++	u8			*rw_buf;
++	ssize_t			rw_len;
++	void			*private;
++	void			(*rw_cb)(void *buf, ssize_t buflen,
++					 void *private);
++	bool			cancel;
++};
++
++ssize_t get_blocking_random_bytes(void *buf, ssize_t nbytes, bool *cancel);
++void get_blocking_random_bytes_cancel(struct random_work *rw);
++void get_blocking_random_bytes_cb(struct workqueue_struct *wq,
++				  struct random_work *rw,
++				  u8 *buf, ssize_t nbytes, void *private,
++				  void (*cb)(void *buf, ssize_t buflen,
++					     void *private));
++
+ #endif /* _LINUX_RANDOM_H */
 -- 
 2.1.0
