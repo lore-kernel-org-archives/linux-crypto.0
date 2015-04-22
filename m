@@ -1,44 +1,169 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: add key wrapping block chaining mode
-Date: Wed, 22 Apr 2015 14:23:04 +0200
-Message-ID: <5036814.6LNlN5eOjK@myon.chronox.de>
-References: <6218629.uO4632Hmli@myon.chronox.de> <20150422055324.GA7872@gondor.apana.org.au> <20150422061354.GA8053@gondor.apana.org.au>
+Subject: Re: crypto: fips - Move fips_enabled sysctl into fips.c
+Date: Wed, 22 Apr 2015 14:33:03 +0200
+Message-ID: <4705621.sm6yBUSkxg@myon.chronox.de>
+References: <20150422050222.GA7414@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34237 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:34240 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751897AbbDVMYq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Apr 2015 08:24:46 -0400
-In-Reply-To: <20150422061354.GA8053@gondor.apana.org.au>
+	id S1755798AbbDVMdK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Apr 2015 08:33:10 -0400
+In-Reply-To: <20150422050222.GA7414@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Mittwoch, 22. April 2015, 14:13:54 schrieb Herbert Xu:
+Am Mittwoch, 22. April 2015, 13:02:22 schrieb Herbert Xu:
 
 Hi Herbert,
 
-> On Wed, Apr 22, 2015 at 01:53:24PM +0800, Herbert Xu wrote:
-> > On Wed, Apr 22, 2015 at 06:36:59AM +0200, Stephan Mueller wrote:
-> > > The key wrapping is an authenticated encryption operation without
-> > > associated data. Therefore, setting of AAD is permissible, but that data
-> > > is not used by the cipher implementation.
-> > 
-> > In that case you should return an error if AAD is provided rather
-> > than silently discarding them since by definition AEAD must include
-> > the AAD in the integrity value.
+> There is currently a large ifdef FIPS code section in proc.c.
+> Ostensibly it's there because the fips_enabled sysctl sits under
+> /proc/sys/crypto.  However, no other crypto sysctls exist.
 > 
-> In fact drop the AEAD altogether and just use ablkcipher.  The
-> integrity value is then simply the output IV.
+> In fact, the whole ethos of the crypto API is against such user
+> interfaces so this patch moves all the FIPS sysctl code over to
+> fips.c.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/crypto/fips.c b/crypto/fips.c
+> index 0f65df9..9d627c1 100644
+> --- a/crypto/fips.c
+> +++ b/crypto/fips.c
+> @@ -13,7 +13,9 @@
+>  #include <linux/export.h>
+>  #include <linux/fips.h>
+>  #include <linux/init.h>
+> +#include <linux/module.h>
+>  #include <linux/kernel.h>
+> +#include <linux/sysctl.h>
+> 
+>  int fips_enabled;
+>  EXPORT_SYMBOL_GPL(fips_enabled);
+> @@ -28,3 +30,49 @@ static int fips_enable(char *str)
+>  }
+> 
+>  __setup("fips=", fips_enable);
+> +
+> +static struct ctl_table crypto_sysctl_table[] = {
+> +	{
+> +		.procname       = "fips_enabled",
+> +		.data           = &fips_enabled,
+> +		.maxlen         = sizeof(int),
+> +		.mode           = 0444,
+> +		.proc_handler   = proc_dointvec
+> +	},
+> +	{}
+> +};
+> +
+> +static struct ctl_table crypto_dir_table[] = {
+> +	{
+> +		.procname       = "crypto",
+> +		.mode           = 0555,
+> +		.child          = crypto_sysctl_table
+> +	},
+> +	{}
+> +};
+> +
+> +static struct ctl_table_header *crypto_sysctls;
+> +
+> +static void crypto_proc_fips_init(void)
+> +{
+> +	crypto_sysctls = register_sysctl_table(crypto_dir_table);
+> +}
+> +
+> +static void crypto_proc_fips_exit(void)
+> +{
+> +	unregister_sysctl_table(crypto_sysctls);
+> +}
+> +
+> +static int __init fips_init(void)
+> +{
+> +	crypto_proc_fips_init();
+> +	return 0;
+> +}
+> +
+> +static void __exit fips_exit(void)
+> +{
+> +	crypto_proc_fips_exit();
+> +}
+> +
+> +module_init(fips_init);
+> +module_exit(fips_exit);
+> diff --git a/crypto/proc.c b/crypto/proc.c
+> index 4ffe73b..2cc10c9 100644
+> --- a/crypto/proc.c
+> +++ b/crypto/proc.c
+> @@ -20,47 +20,8 @@
+>  #include <linux/rwsem.h>
+>  #include <linux/proc_fs.h>
+>  #include <linux/seq_file.h>
+> -#include <linux/sysctl.h>
+>  #include "internal.h"
+> 
+> -#ifdef CONFIG_CRYPTO_FIPS
+> -static struct ctl_table crypto_sysctl_table[] = {
+> -	{
+> -		.procname       = "fips_enabled",
+> -		.data           = &fips_enabled,
+> -		.maxlen         = sizeof(int),
+> -		.mode           = 0444,
+> -		.proc_handler   = proc_dointvec
+> -	},
+> -	{}
+> -};
+> -
+> -static struct ctl_table crypto_dir_table[] = {
+> -	{
+> -		.procname       = "crypto",
+> -		.mode           = 0555,
+> -		.child          = crypto_sysctl_table
+> -	},
+> -	{}
+> -};
+> -
+> -static struct ctl_table_header *crypto_sysctls;
+> -
+> -static void crypto_proc_fips_init(void)
+> -{
+> -	crypto_sysctls = register_sysctl_table(crypto_dir_table);
+> -}
+> -
+> -static void crypto_proc_fips_exit(void)
+> -{
+> -	if (crypto_sysctls)
+> -		unregister_sysctl_table(crypto_sysctls);
+> -}
+> -#else
+> -#define crypto_proc_fips_init()
+> -#define crypto_proc_fips_exit()
+> -#endif
+> -
+>  static void *c_start(struct seq_file *m, loff_t *pos)
+>  {
+>  	down_read(&crypto_alg_sem);
+> @@ -148,11 +109,9 @@ static const struct file_operations proc_crypto_ops = {
+> void __init crypto_init_proc(void)
+>  {
+>  	proc_create("crypto", 0, NULL, &proc_crypto_ops);
+> -	crypto_proc_fips_init();
+>  }
+> 
+>  void __exit crypto_exit_proc(void)
+>  {
+> -	crypto_proc_fips_exit();
+>  	remove_proc_entry("crypto", NULL);
+>  }
 
-Initially I was playing with ablkcipher. But then I moved to AEAD because the 
-ciphertext is longer than the plaintext.
+With this removal of crypto_proc_fips_* from crypto_*_proc, wouldn't you have 
+broken the link from algapi.c? There, crypto_*_proc is called where now the 
+FIPS logic may not be initialized any more.
 
-Isn't it a basic assumption to ablkcipher is that the ciphertext is equal in 
-size as the plaintext?
 
 -- 
 Ciao
