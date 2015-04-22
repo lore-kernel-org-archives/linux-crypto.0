@@ -1,8 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 1/6] random: Addition of kernel_pool
-Date: Wed, 22 Apr 2015 21:18:04 +0200
-Message-ID: <9728527.rMI4vu0tMf@myon.chronox.de>
-References: <5054521.el7mZro33c@myon.chronox.de>
+Subject: [PATCH 0/6] Seeding DRBG with more entropy
+Date: Wed, 22 Apr 2015 21:16:49 +0200
+Message-ID: <5054521.el7mZro33c@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -11,135 +10,226 @@ Cc: Andreas Steffen <andreas.steffen@strongswan.org>,
 	Sandy Harris <sandyinchina@gmail.com>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5054521.el7mZro33c@myon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34278 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753161AbbDVT1z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Apr 2015 15:27:55 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The kernel pool is intended to serve kernel-internal callers only.
-Its purpose and usage is identical to the blocking_pool.
+Hi,
 
-As the kernel_pool is not available to user space, user space cannot
-directly interfere with the blocking behavior when obtaining
-data from the kernel_pool. Thus, if entropy is present in the
-kernel_pool, user space can hog /dev/random and yet the kernel
-internal requestor of random numbers that are generated equally
-to the blocking_pool (i.e. with the blocking behavior) will not
-be affected until data is needed from the input_pool.
+as of now, the DRBG is only seeded from get_random_bytes. In various
+circumstances, the nonblocking_pool behind get_random_bytes may not be fully
+seeded from hardware events at the time the DRBG requires to be seeded.
+Based on the discussion in [1], the DRBG seeding is updated such that it
+does not completely rely on get_random_bytes any more.
 
-The patch treats the kernel_pool fully equally to the blocking and
-nonblocking pool with respect to the initialization and update. As now
-there are three output pools, the patch adds a round-robin logic for
-processing additional entropy when the input_pool is nearly full.
+The seeding approach can be characterized as follows:
 
-CC: Andreas Steffen <andreas.steffen@strongswan.org>
-CC: Theodore Ts'o <tytso@mit.edu>
-CC: Sandy Harris <sandyinchina@gmail.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/char/random.c | 52 ++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 39 insertions(+), 13 deletions(-)
+1. pull buffer of size entropy + nonce from get_random_bytes
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 9cd6968..2868754 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -407,6 +407,7 @@ static struct poolinfo {
- static DECLARE_WAIT_QUEUE_HEAD(random_read_wait);
- static DECLARE_WAIT_QUEUE_HEAD(random_write_wait);
- static DECLARE_WAIT_QUEUE_HEAD(urandom_init_wait);
-+static DECLARE_WAIT_QUEUE_HEAD(random_kernel_wait);
- static struct fasync_struct *fasync;
- 
- /**********************************************************************
-@@ -442,6 +443,7 @@ static void push_to_pool(struct work_struct *work);
- static __u32 input_pool_data[INPUT_POOL_WORDS];
- static __u32 blocking_pool_data[OUTPUT_POOL_WORDS];
- static __u32 nonblocking_pool_data[OUTPUT_POOL_WORDS];
-+static __u32 kernel_pool_data[OUTPUT_POOL_WORDS];
- 
- static struct entropy_store input_pool = {
- 	.poolinfo = &poolinfo_table[0],
-@@ -472,6 +474,17 @@ static struct entropy_store nonblocking_pool = {
- 					push_to_pool),
- };
- 
-+static struct entropy_store kernel_pool = {
-+	.poolinfo = &poolinfo_table[1],
-+	.name = "kernel",
-+	.limit = 1,
-+	.pull = &input_pool,
-+	.lock = __SPIN_LOCK_UNLOCKED(kernel_pool.lock),
-+	.pool = kernel_pool_data,
-+	.push_work = __WORK_INITIALIZER(kernel_pool.push_work,
-+					push_to_pool),
-+};
-+
- static __u32 const twist_table[8] = {
- 	0x00000000, 0x3b6e20c8, 0x76dc4190, 0x4db26158,
- 	0xedb88320, 0xd6d6a3e8, 0x9b64c2b0, 0xa00ae278 };
-@@ -674,29 +687,41 @@ retry:
- 
- 		/* should we wake readers? */
- 		if (entropy_bits >= random_read_wakeup_bits) {
-+			wake_up_interruptible(&random_kernel_wait);
- 			wake_up_interruptible(&random_read_wait);
- 			kill_fasync(&fasync, SIGIO, POLL_IN);
- 		}
- 		/* If the input pool is getting full, send some
--		 * entropy to the two output pools, flipping back and
-+		 * entropy to the output pools, flipping back and
- 		 * forth between them, until the output pools are 75%
- 		 * full.
- 		 */
- 		if (entropy_bits > random_write_wakeup_bits &&
- 		    r->initialized &&
- 		    r->entropy_total >= 2*random_read_wakeup_bits) {
--			static struct entropy_store *last = &blocking_pool;
--			struct entropy_store *other = &blocking_pool;
--
--			if (last == &blocking_pool)
--				other = &nonblocking_pool;
--			if (other->entropy_count <=
--			    3 * other->poolinfo->poolfracbits / 4)
--				last = other;
--			if (last->entropy_count <=
--			    3 * last->poolinfo->poolfracbits / 4) {
--				schedule_work(&last->push_work);
--				r->entropy_total = 0;
-+#define NUM_OUTPUT_POOLS 3
-+			/* as we will recalculate this variable first thing in
-+			 * the loop, it will point to the first output pool
-+			 * after the first recalculation */
-+			static int selected_pool = (NUM_OUTPUT_POOLS - 1);
-+			int i = 0;
-+			struct entropy_store *output_pools[NUM_OUTPUT_POOLS] = {
-+				&blocking_pool,
-+				&nonblocking_pool,
-+				&kernel_pool};
-+			/* select the next pool that has less than 75% fill
-+			 * rate */
-+			for (i = 0; NUM_OUTPUT_POOLS > i; i++) {
-+				struct entropy_store *p = NULL;
-+				selected_pool =
-+					(selected_pool + 1) % NUM_OUTPUT_POOLS;
-+				p = output_pools[selected_pool];
-+				if (p->entropy_count <=
-+					p->poolinfo->poolfracbits / 4) {
-+					schedule_work(&p->push_work);
-+					r->entropy_total = 0;
-+					break;
-+				}
- 			}
- 		}
- 	}
-@@ -1318,6 +1343,7 @@ static int rand_initialize(void)
- 	init_std_data(&input_pool);
- 	init_std_data(&blocking_pool);
- 	init_std_data(&nonblocking_pool);
-+	init_std_data(&kernel_pool);
- 	return 0;
- }
- early_initcall(rand_initialize);
+2. pull another buffer of size entropy + nonce from my Jitter RNG
+
+3. concatenate both buffers
+
+4. seed the DRBG with the concatenated buffer
+
+5. trigger the async invocation of the in-kernel /dev/random with a buffer of
+   size entropy
+
+6. return the DRBG instance to the caller without waiting for the completion
+   of step 5
+
+7. at some point in time, the in-kernel /dev/random returns with a full buffer
+   which is then used to re-seed the DRBG
+
+This way, we will get entropy during the first initialization without
+blocking.
+
+The patch set adds an in-kernel /dev/random equivalent that was discussed with
+Ted Ts'o last July -- see [2] and [3]. A test module for testing the
+asynchronous operation of the in-kernel /dev/random is given with the code
+below.
+
+Ted: shall we really create and maintain a new entropy pool (the kernel_pool),
+or should the in-kernel /dev/random logic draw directly from the input_pool?
+In other words, shall we drop the first patch and update the 2nd patch to
+use input_pool? Also, I would not recommend using the blocking_pool as this
+would mix kernel and user land operation.
+
+Note: the DRBG and Jitter RNG patches are against the current cryptodev-2.6
+tree.
+
+The new Jitter RNG is an RNG that has large set of tests and was presented on
+LKML some time back. After speaking with mathematicians at NIST, that Jitter
+RNG approach would be acceptable from their side as a noise source. Note, I
+personally think that the Jitter RNG has sufficient entropy in almost all
+circumstances (see the massive testing I conducted on all more widely used
+CPUs as shown in [4]).
+
+[1] http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg13891.html
+
+[2] https://lkml.org/lkml/2014/4/27/174
+
+[3] http://comments.gmane.org/gmane.linux.kernel/1701117
+
+[4] http://www.chronox.de/jent.html
+
+
+Stephan Mueller (6):
+  random: Addition of kernel_pool
+  random: Async and sync API for accessing kernel_pool
+  crypto: drbg - prepare for async seeding
+  crypto: drbg - add async seeding operation
+  crypto: drbg - use Jitter RNG to obtain seed
+  crypto: add jitterentropy RNG
+
+ crypto/Kconfig         |  10 +
+ crypto/Makefile        |   2 +
+ crypto/drbg.c          | 159 +++++++--
+ crypto/jitterentropy.c | 909 +++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.c       |   4 +
+ drivers/char/random.c  | 168 ++++++++-
+ include/crypto/drbg.h  |   4 +
+ include/linux/random.h |  20 ++
+ 8 files changed, 1236 insertions(+), 40 deletions(-)
+ create mode 100644 crypto/jitterentropy.c
+
+--
+/*
+ * Test module for verifying the correct operation of the
+ * in-kernel /dev/random handling
+ *
+ * Use: compile, load into the kernel and observe dmesg
+ *
+ * Written by: Stephan Mueller <smueller@chronox.de>
+ * Copyright (c) 2014
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, and the entire permission notice in its entirety,
+ *    including the disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote
+ *    products derived from this software without specific prior
+ *    written permission.
+ *
+ * ALTERNATIVELY, this product may be distributed under the terms of
+ * the GNU General Public License, in which case the provisions of the GPL are
+ * required INSTEAD OF the above restrictions.  (This clause is
+ * necessary due to a potential bad interaction between the GPL and
+ * the restrictions contained in a BSD-style copyright.)
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
+ * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ */
+
+#include <linux/random.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
+MODULE_DESCRIPTION("Test module for verifying the correct operation of async LRNG operation");
+
+static struct random_work my_work;
+static struct random_work my_work1;
+static struct random_work my_work2;
+static struct random_work my_work3;
+static struct random_work my_work4;
+static struct random_work my_work5;
+static struct random_work my_work6;
+static struct random_work my_work7;
+static struct random_work my_work8;
+static struct random_work my_work9;
+#define LEN 10
+static char buffer[LEN];
+
+static char *string = "a";
+static char *string2 = "b";
+static char *string3 = "c";
+static char *string4 = "d";
+static char *string5 = "e";
+static char *string6 = "f";
+static char *string7 = "g";
+static char *string8 = "h";
+static char *string9 = "i";
+
+void lrng_cb(void *buf, ssize_t buflen, void *private)
+{
+	printk("received %d bytes for %s\n", (int)buflen, (char *)private);
+}
+
+static void cn(struct random_work *work)
+{
+	get_blocking_random_bytes_cancel(work);
+	cancel_work_sync(&work->rw_work);
+}
+
+static int __init lrng_init(void)
+{
+	get_blocking_random_bytes_cb(NULL, &my_work, buffer, LEN,
+				     string, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work1, buffer, LEN,
+				     string, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work2, buffer, LEN,
+				     string2, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work3, buffer, LEN,
+				     string3, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work4, buffer, LEN,
+				     string4, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work5, buffer, LEN,
+				     string5, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work6, buffer, LEN,
+				     string6, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work7, buffer, LEN,
+				     string7, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work8, buffer, LEN,
+				     string8, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work9, buffer, LEN,
+				     string9, lrng_cb);
+
+	/*
+	 * cancel one work to see that work can be canceled independent from
+	 * others
+	 */
+	cn(&my_work);
+	/* try again to verify that double cancellation is harmless */
+        cn(&my_work);
+
+	return 0;
+}
+
+static void __exit lrng_exit(void)
+{
+	cn(&my_work1);
+	cn(&my_work2);
+	cn(&my_work3);
+	cn(&my_work4);
+	cn(&my_work5);
+	cn(&my_work6);
+	cn(&my_work7);
+	cn(&my_work8);
+	cn(&my_work9);
+}
+
+module_init(lrng_init);
+module_exit(lrng_exit);
 -- 
 2.1.0
