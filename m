@@ -1,73 +1,36 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 5/6] mac80211: Include crypto/aead.h
-Date: Wed, 22 Apr 2015 15:06:32 +0800
-Message-ID: <E1Ykojw-0002DB-BM@gondolin.me.apana.org.au>
+From: Johannes Berg <johannes@sipsolutions.net>
+Subject: Re: [PATCH 0/6] crypto: Make all AEAD users include aead.h
+Date: Wed, 22 Apr 2015 09:18:48 +0200
+Message-ID: <1429687128.2185.0.camel@sipsolutions.net>
 References: <20150422070455.GA8351@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
 	Marcel Holtmann <marcel@holtmann.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:59137 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755893AbbDVHGf (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Apr 2015 03:06:35 -0400
+Received: from s3.sipsolutions.net ([5.9.151.49]:52591 "EHLO sipsolutions.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755966AbbDVHSy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Apr 2015 03:18:54 -0400
+In-Reply-To: <20150422070455.GA8351@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-All users of AEAD should include crypto/aead.h instead of
-include/linux/crypto.h.
+On Wed, 2015-04-22 at 15:04 +0800, Herbert Xu wrote:
+> Hi:
+> 
+> This series adds inclusions of aead.h to all AEAD users including
+> AEAD implementors (where it's internal/aead.h).  This is necessary
+> because I'll be adding an updated AEAD interface and that will live
+> in aead.h instead of crypto.h.
+> 
+> Dave, if it's OK with you I'd like to push the last two patches
+> through my tree as the new AEAD interface would depend on them.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+Looks good to me. Fine with me if you do that for the mac80211 patch,
+I'm not expecting to change that file and cause conflicts.
 
- net/mac80211/aes_ccm.c  |    3 +--
- net/mac80211/aes_gcm.c  |    3 +--
- net/mac80211/aes_gmac.c |    2 +-
- 3 files changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/net/mac80211/aes_ccm.c b/net/mac80211/aes_ccm.c
-index 208df7c..70d53da 100644
---- a/net/mac80211/aes_ccm.c
-+++ b/net/mac80211/aes_ccm.c
-@@ -11,9 +11,8 @@
- 
- #include <linux/kernel.h>
- #include <linux/types.h>
--#include <linux/crypto.h>
- #include <linux/err.h>
--#include <crypto/aes.h>
-+#include <crypto/aead.h>
- 
- #include <net/mac80211.h>
- #include "key.h"
-diff --git a/net/mac80211/aes_gcm.c b/net/mac80211/aes_gcm.c
-index fd278bb..b91c9d7 100644
---- a/net/mac80211/aes_gcm.c
-+++ b/net/mac80211/aes_gcm.c
-@@ -8,9 +8,8 @@
- 
- #include <linux/kernel.h>
- #include <linux/types.h>
--#include <linux/crypto.h>
- #include <linux/err.h>
--#include <crypto/aes.h>
-+#include <crypto/aead.h>
- 
- #include <net/mac80211.h>
- #include "key.h"
-diff --git a/net/mac80211/aes_gmac.c b/net/mac80211/aes_gmac.c
-index f1321b7..c34b06ca 100644
---- a/net/mac80211/aes_gmac.c
-+++ b/net/mac80211/aes_gmac.c
-@@ -9,8 +9,8 @@
- 
- #include <linux/kernel.h>
- #include <linux/types.h>
--#include <linux/crypto.h>
- #include <linux/err.h>
-+#include <crypto/aead.h>
- #include <crypto/aes.h>
- 
- #include <net/mac80211.h>
+johannes
