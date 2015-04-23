@@ -1,54 +1,54 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH] crypto: add key wrapping block chaining mode
-Date: Thu, 23 Apr 2015 04:51:56 +0200
-Message-ID: <1470287.z00squjPAu@myon.chronox.de>
-References: <6218629.uO4632Hmli@myon.chronox.de> <2382170.NBi3QxkUu4@myon.chronox.de> <20150423014609.GA17267@gondor.apana.org.au>
+Date: Thu, 23 Apr 2015 10:55:58 +0800
+Message-ID: <20150423025558.GA17870@gondor.apana.org.au>
+References: <6218629.uO4632Hmli@myon.chronox.de>
+ <2382170.NBi3QxkUu4@myon.chronox.de>
+ <20150423014609.GA17267@gondor.apana.org.au>
+ <1470287.z00squjPAu@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34287 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755767AbbDWCwC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Apr 2015 22:52:02 -0400
-In-Reply-To: <20150423014609.GA17267@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45783 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757917AbbDWC4C (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 22 Apr 2015 22:56:02 -0400
+Content-Disposition: inline
+In-Reply-To: <1470287.z00squjPAu@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 23. April 2015, 09:46:09 schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Thu, Apr 23, 2015 at 03:39:11AM +0200, Stephan Mueller wrote:
-> > The KW does not return an IV. The IV is used for encryption to stir the
-> > encryption a bit. The resulting ciphertext now contains the mixed in IV.
-> > For decryption, the IV is only used to verify that the one block in the
-> > decryption operation matches the IV.
-> > 
-> > So, there is no IV returned by the encryption.
+On Thu, Apr 23, 2015 at 04:51:56AM +0200, Stephan Mueller wrote:
+>
+> Encrypt input: IV, plaintext
 > 
-> Of course there is.  The first 8 bytes of the ciphertext is the
-> output IV.
+> Encrypt output: processed IV, ciphertext
 > 
-> If you really want to pedantic then make a function wrapper around
-> the whole thing and copy the IV in there.
+> Decrypt input: processed IV, ciphertext, IV to use for compare operation
+> 
+> Decrypt output: plaintext
 
-Ok, I am trying to get it moved to blkcipher.
+Actually it is
 
-I am still unsure how to handle the IV. The reason for that is the following:
+Decrypt input: processed IV, ciphertext
+Decrypt output: IV, plaintext
 
-Encrypt input: IV, plaintext
+> How do you propose I send 2 IVs to blkcipher?
 
-Encrypt output: processed IV, ciphertext
+As I suggested earlier, you can use the currently unused givdecrypt
+interface for the fixed IV case as specified in the RFC.  The giv
+interfaces provide space for two IVs.
 
-Decrypt input: processed IV, ciphertext, IV to use for compare operation
+If givdecrypt fails the comparison, then you can return EBADMSG
+and zap the decrypted key.
 
-Decrypt output: plaintext
+For the normal decrypt path, just return the IV and plaintet.
 
-How do you propose I send 2 IVs to blkcipher?
-
+Cheers,
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
