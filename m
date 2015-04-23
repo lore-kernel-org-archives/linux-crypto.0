@@ -1,8 +1,8 @@
 From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v8 3/4] MAINTAINERS: Add myself as maintainer of
- Allwinner Security System
-Date: Thu, 23 Apr 2015 08:45:22 +0200
-Message-ID: <1429771523-2936-4-git-send-email-clabbe.montjoie@gmail.com>
+Subject: [PATCH v8 2/4] ARM: sunxi: dt: Add DT bindings
+ documentation for SUNXI Security System
+Date: Thu, 23 Apr 2015 08:45:21 +0200
+Message-ID: <1429771523-2936-3-git-send-email-clabbe.montjoie@gmail.com>
 References: <1429771523-2936-1-git-send-email-clabbe.montjoie@gmail.com>
 Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
@@ -30,7 +30,7 @@ To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
 	tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
 	jg1.han-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org,
 	arnd-r2nGTMty4D4@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBFVK4KUQKGQEOALTZBY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBFFK4KUQKGQERCS2XGY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 In-Reply-To: <1429771523-2936-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
 List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
@@ -41,27 +41,28 @@ List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39
  <http://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
+This patch adds documentation for Device-Tree bindings for the Security System cryptographic accelerator driver.
+
 Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+ Documentation/devicetree/bindings/crypto/sunxi-ss.txt | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/sunxi-ss.txt
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b4b131a..b678265 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -555,6 +555,12 @@ S:	Maintained
- F:	Documentation/i2c/busses/i2c-ali1563
- F:	drivers/i2c/busses/i2c-ali1563.c
- 
-+ALLWINNER SECURITY SYSTEM
-+M:	Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-+L:	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-+S:	Maintained
-+F:	drivers/crypto/sunxi-ss/
+diff --git a/Documentation/devicetree/bindings/crypto/sunxi-ss.txt b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+new file mode 100644
+index 0000000..a566803
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+@@ -0,0 +1,9 @@
++* Allwinner Security System found on A20 SoC
 +
- ALPHA PORT
- M:	Richard Henderson <rth-hL46jP5Bxq7R7s880joybQ@public.gmane.org>
- M:	Ivan Kokshaysky <ink-biIs/Y0ymYJMZLIVYojuPNP0rXTJTi09@public.gmane.org>
++Required properties:
++- compatible : Should be "allwinner,sun7i-a20-crypto".
++- reg: Should contain the Security System register location and length.
++- interrupts: Should contain the IRQ line for the Security System.
++- clocks : A phandle to the functional clock node of the Security System module
++- clock-names : Name of the functional clock, should be "ahb" and "mod".
++
 -- 
 2.0.5
