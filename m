@@ -1,51 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: add key wrapping block chaining mode
-Date: Thu, 23 Apr 2015 10:55:58 +0800
-Message-ID: <20150423025558.GA17870@gondor.apana.org.au>
-References: <6218629.uO4632Hmli@myon.chronox.de>
- <2382170.NBi3QxkUu4@myon.chronox.de>
- <20150423014609.GA17267@gondor.apana.org.au>
- <1470287.z00squjPAu@myon.chronox.de>
+Subject: CCM/GCM implementation defect
+Date: Thu, 23 Apr 2015 11:26:20 +0800
+Message-ID: <20150423032619.GA17648@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Paul Wouters <pwouters@redhat.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:45783 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:49277 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757917AbbDWC4C (ORCPT
+	with ESMTP id S932246AbbDWD0c (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 22 Apr 2015 22:56:02 -0400
+	Wed, 22 Apr 2015 23:26:32 -0400
 Content-Disposition: inline
-In-Reply-To: <1470287.z00squjPAu@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 23, 2015 at 04:51:56AM +0200, Stephan Mueller wrote:
->
-> Encrypt input: IV, plaintext
-> 
-> Encrypt output: processed IV, ciphertext
-> 
-> Decrypt input: processed IV, ciphertext, IV to use for compare operation
-> 
-> Decrypt output: plaintext
+Hi:
 
-Actually it is
+It looks like our IPsec implementations of CCM and GCM are buggy
+in that they don't include the IV in the authentication calculation.
 
-Decrypt input: processed IV, ciphertext
-Decrypt output: IV, plaintext
+This definitely breaks interoperability with anyone who implements
+them correctly.  The fact that there have been no reports on this
+probably means that nobody has run into this in the field yet.
 
-> How do you propose I send 2 IVs to blkcipher?
+On the security side, this is probably not a big deal for CCM
+because it always verifies the authentication tag after decryption.
+But for GCM this may be a DoS issue as an attacker could modify
+the IV without triggering the authentication check and thus cause
+an unnecessary decryption.  For both CCM and GCM this will result
+in random data injected as a packet into the network stack which
+hopefully will be dropped.
 
-As I suggested earlier, you can use the currently unused givdecrypt
-interface for the fixed IV case as specified in the RFC.  The giv
-interfaces provide space for two IVs.
+In order to fix this without breaking backwards compatibility,
+my plan is to introduce new templates such as rfc4106v2 which
+implement the RFC correctly.  The existing templates will be
+retained so that current users aren't broken by the fix.
 
-If givdecrypt fails the comparison, then you can return EBADMSG
-and zap the decrypted key.
+Once the kernel side is complete we could then get the user-space
+implementors to update their tools to request for the new v2
+templates.
 
-For the normal decrypt path, just return the IV and plaintet.
+Comments?
 
 Cheers,
 -- 
