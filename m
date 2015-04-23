@@ -1,454 +1,66 @@
-From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
-Subject: [PATCH 2/2] Fixing SHA update bug
-Date: Thu, 23 Apr 2015 17:41:43 -0300
-Message-ID: <20150423204134.GA11475@bluepex.com>
+From: Bobby Powers <bobbypowers@gmail.com>
+Subject: Re: Crypto Update for 4.1
+Date: Thu, 23 Apr 2015 17:35:28 -0400
+Message-ID: <CAArOQ2U-dSkbNba_dDiO6cgCXDZEQJ8iChBLxxPO=Hi_mn-2Ag@mail.gmail.com>
+References: <20140804130339.GA1178@gondor.apana.org.au>
+	<20141007131826.GA29688@gondor.apana.org.au>
+	<20141211125119.GA12380@gondor.apana.org.au>
+	<20150214094328.GA7457@gondor.apana.org.au>
+	<20150415033951.GA1406@gondor.apana.org.au>
+	<CA+55aFyynQ75NfQy7Lp6t9Tp8+bp=LKG9Xw9q8KQqNoS+gGLmA@mail.gmail.com>
+	<CA+55aFz8pr-J7K-EY5gjCV7ajJZC2tkFwjNG1xLXvQk0qAm2HA@mail.gmail.com>
+	<CA+55aFwG1y6KSu-ZUMHXFnw69nRttS3LZW_pScvB6LCZjS02tA@mail.gmail.com>
+	<20150416024252.GA11558@gondor.apana.org.au>
+	<CA+55aFx+gm+=Xqr-wFN0Akg7=XJOtv3PDbHgVbo38p=DMv=3OQ@mail.gmail.com>
+	<20150416030713.GA11668@gondor.apana.org.au>
+	<CA+55aFyinAKD8E5Xj49r+5ByfPRvB4axSxJSWg6R6Zd=bDMHig@mail.gmail.com>
+	<CAArOQ2Vrbm5xyWyaFNq44gxmK6m_7nxsQhxBXowE=7FrWbhHCA@mail.gmail.com>
+	<CAKv+Gu8s=-qyX9MAcpyd39AtBVCa-+Ly1ue1zBwam_bHqqJuvg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=UTF-8
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Stephan Mueller <smueller@chronox.de>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org
-To: linux-crypto@vger.kernel.org
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from e24smtp02.br.ibm.com ([32.104.18.86]:40583 "EHLO
-	e24smtp02.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1030658AbbDWUly (ORCPT
+Received: from mail-ob0-f180.google.com ([209.85.214.180]:32890 "EHLO
+	mail-ob0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751769AbbDWVf3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Apr 2015 16:41:54 -0400
-Received: from /spool/local
-	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
-	Thu, 23 Apr 2015 17:41:52 -0300
-Content-Disposition: inline
+	Thu, 23 Apr 2015 17:35:29 -0400
+In-Reply-To: <CAKv+Gu8s=-qyX9MAcpyd39AtBVCa-+Ly1ue1zBwam_bHqqJuvg@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Bug happens when a data size less than SHA block size is passed.
-Since first attempt will be saved in buffer, second round attempt
-get into two step to calculate op.inlen and op.outlen. The issue
-resides in this step. A  wrong value of op.inlen and outlen was being
-calculated.
+On Thu, Apr 23, 2015 at 4:10 PM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+>
+> Hello Bobby,
+>
+> Would you be able to check whether the following patch fixes the crash?
+>
+> diff --git a/arch/x86/crypto/sha512-avx2-asm.S
+> b/arch/x86/crypto/sha512-avx2-asm.S
+> index a4771dcd1fcf..1f20b35d8573 100644
+> --- a/arch/x86/crypto/sha512-avx2-asm.S
+> +++ b/arch/x86/crypto/sha512-avx2-asm.S
+> @@ -79,7 +79,7 @@ NUM_BLKS    = %rdx
+>  c           = %rcx
+>  d           = %r8
+>  e           = %rdx
+> -y3          = %rdi
+> +y3          = %rsi
+>
+>  TBL   = %rbp
+>
 
-This patch fix this eliminate the nx_sha_build_sg_list, that is
-useless in SHA's algorithm context. Instead we call nx_build_sg_list
-directly and pass a previous calculated max_sg_len to it.
+Tested-By: Bobby Powers <bobbypowers@gmail.com>
 
-Signed-off-by: Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
----
- drivers/crypto/nx/nx-sha256.c |   84 +++++++++++++++++++++++-----------------
- drivers/crypto/nx/nx-sha512.c |   85 ++++++++++++++++++++++++-----------------
- drivers/crypto/nx/nx.c        |   47 ----------------------
- drivers/crypto/nx/nx.h        |    2 -
- 4 files changed, 99 insertions(+), 119 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-sha256.c b/drivers/crypto/nx/nx-sha256.c
-index 23621da..4e91bdb 100644
---- a/drivers/crypto/nx/nx-sha256.c
-+++ b/drivers/crypto/nx/nx-sha256.c
-@@ -33,8 +33,9 @@ static int nx_sha256_init(struct shash_desc *desc)
- {
- 	struct sha256_state *sctx = shash_desc_ctx(desc);
- 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
-+	struct nx_sg *out_sg;
- 	int len;
--	int rc;
-+	u32 max_sg_len;
+Thanks Ard.  Yes, this fixes things for me.  Good eye :)
 
- 	nx_ctx_init(nx_ctx, HCOP_FC_SHA);
-
-@@ -44,15 +45,18 @@ static int nx_sha256_init(struct shash_desc *desc)
-
- 	NX_CPB_SET_DIGEST_SIZE(nx_ctx->csbcpb, NX_DS_SHA256);
-
-+	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
-+			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
-+	max_sg_len = min_t(u64, max_sg_len,
-+			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
-+
- 	len = SHA256_DIGEST_SIZE;
--	rc = nx_sha_build_sg_list(nx_ctx, nx_ctx->out_sg,
--				  &nx_ctx->op.outlen,
--				  &len,
--				  (u8 *) sctx->state,
--				  NX_DS_SHA256);
-+	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
-+				  &len, max_sg_len);
-+	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
-
--	if (rc)
--		goto out;
-+	if (len != SHA256_DIGEST_SIZE)
-+		return -EINVAL;
-
- 	sctx->state[0] = __cpu_to_be32(SHA256_H0);
- 	sctx->state[1] = __cpu_to_be32(SHA256_H1);
-@@ -64,7 +68,6 @@ static int nx_sha256_init(struct shash_desc *desc)
- 	sctx->state[7] = __cpu_to_be32(SHA256_H7);
- 	sctx->count = 0;
-
--out:
- 	return 0;
- }
-
-@@ -74,10 +77,12 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
- 	struct sha256_state *sctx = shash_desc_ctx(desc);
- 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
-+	struct nx_sg *in_sg;
- 	u64 to_process = 0, leftover, total;
- 	unsigned long irq_flags;
- 	int rc = 0;
- 	int data_len;
-+	u32 max_sg_len;
- 	u64 buf_len = (sctx->count % SHA256_BLOCK_SIZE);
-
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
-@@ -97,6 +102,12 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
-
-+	in_sg = nx_ctx->in_sg;
-+	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
-+			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
-+	max_sg_len = min_t(u64, max_sg_len,
-+			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
-+
- 	do {
- 		/*
- 		 * to_process: the SHA256_BLOCK_SIZE data chunk to process in
-@@ -108,25 +119,22 @@ static int nx_sha256_update(struct shash_desc *desc, const u8 *data,
-
- 		if (buf_len) {
- 			data_len = buf_len;
--			rc = nx_sha_build_sg_list(nx_ctx, nx_ctx->in_sg,
--						  &nx_ctx->op.inlen,
--						  &data_len,
--						  (u8 *) sctx->buf,
--						  NX_DS_SHA256);
-+			in_sg = nx_build_sg_list(nx_ctx->in_sg,
-+						 (u8 *) sctx->buf,
-+						 &data_len,
-+						 max_sg_len);
-
--			if (rc || data_len != buf_len)
-+			if (data_len != buf_len) {
-+				rc = -EINVAL;
- 				goto out;
-+			}
- 		}
-
- 		data_len = to_process - buf_len;
--		rc = nx_sha_build_sg_list(nx_ctx, nx_ctx->in_sg,
--					  &nx_ctx->op.inlen,
--					  &data_len,
--					  (u8 *) data,
--					  NX_DS_SHA256);
-+		in_sg = nx_build_sg_list(in_sg, (u8 *) data,
-+					 &data_len, max_sg_len);
-
--		if (rc)
--			goto out;
-+		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
-
- 		to_process = (data_len + buf_len);
- 		leftover = total - to_process;
-@@ -173,12 +181,19 @@ static int nx_sha256_final(struct shash_desc *desc, u8 *out)
- 	struct sha256_state *sctx = shash_desc_ctx(desc);
- 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
-+	struct nx_sg *in_sg, *out_sg;
- 	unsigned long irq_flags;
--	int rc;
-+	u32 max_sg_len;
-+	int rc = 0;
- 	int len;
-
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
-
-+	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
-+			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
-+	max_sg_len = min_t(u64, max_sg_len,
-+			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
-+
- 	/* final is represented by continuing the operation and indicating that
- 	 * this is not an intermediate operation */
- 	if (sctx->count >= SHA256_BLOCK_SIZE) {
-@@ -195,25 +210,24 @@ static int nx_sha256_final(struct shash_desc *desc, u8 *out)
- 	csbcpb->cpb.sha256.message_bit_length = (u64) (sctx->count * 8);
-
- 	len = sctx->count & (SHA256_BLOCK_SIZE - 1);
--	rc = nx_sha_build_sg_list(nx_ctx, nx_ctx->in_sg,
--				  &nx_ctx->op.inlen,
--				  &len,
--				  (u8 *) sctx->buf,
--				  NX_DS_SHA256);
-+	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *) sctx->buf,
-+				 &len, max_sg_len);
-
--	if (rc || len != (sctx->count & (SHA256_BLOCK_SIZE - 1)))
-+	if (len != (sctx->count & (SHA256_BLOCK_SIZE - 1))) {
-+		rc = -EINVAL;
- 		goto out;
-+	}
-
- 	len = SHA256_DIGEST_SIZE;
--	rc = nx_sha_build_sg_list(nx_ctx, nx_ctx->out_sg,
--				  &nx_ctx->op.outlen,
--				  &len,
--				  out,
--				  NX_DS_SHA256);
-+	out_sg = nx_build_sg_list(nx_ctx->out_sg, out, &len, max_sg_len);
-
--	if (rc || len != SHA256_DIGEST_SIZE)
-+	if (len != SHA256_DIGEST_SIZE) {
-+		rc = -EINVAL;
- 		goto out;
-+	}
-
-+	nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
-+	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
- 	if (!nx_ctx->op.outlen) {
- 		rc = -EINVAL;
- 		goto out;
-diff --git a/drivers/crypto/nx/nx-sha512.c b/drivers/crypto/nx/nx-sha512.c
-index b3adf10..e6a58d2 100644
---- a/drivers/crypto/nx/nx-sha512.c
-+++ b/drivers/crypto/nx/nx-sha512.c
-@@ -32,8 +32,9 @@ static int nx_sha512_init(struct shash_desc *desc)
- {
- 	struct sha512_state *sctx = shash_desc_ctx(desc);
- 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
-+	struct nx_sg *out_sg;
- 	int len;
--	int rc;
-+	u32 max_sg_len;
-
- 	nx_ctx_init(nx_ctx, HCOP_FC_SHA);
-
-@@ -43,15 +44,18 @@ static int nx_sha512_init(struct shash_desc *desc)
-
- 	NX_CPB_SET_DIGEST_SIZE(nx_ctx->csbcpb, NX_DS_SHA512);
-
-+	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
-+			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
-+	max_sg_len = min_t(u64, max_sg_len,
-+			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
-+
- 	len = SHA512_DIGEST_SIZE;
--	rc = nx_sha_build_sg_list(nx_ctx, nx_ctx->out_sg,
--				  &nx_ctx->op.outlen,
--				  &len,
--				  (u8 *)sctx->state,
--				  NX_DS_SHA512);
-+	out_sg = nx_build_sg_list(nx_ctx->out_sg, (u8 *)sctx->state,
-+				  &len, max_sg_len);
-+	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
-
--	if (rc || len != SHA512_DIGEST_SIZE)
--		goto out;
-+	if (len != SHA512_DIGEST_SIZE)
-+		return -EINVAL;
-
- 	sctx->state[0] = __cpu_to_be64(SHA512_H0);
- 	sctx->state[1] = __cpu_to_be64(SHA512_H1);
-@@ -63,7 +67,6 @@ static int nx_sha512_init(struct shash_desc *desc)
- 	sctx->state[7] = __cpu_to_be64(SHA512_H7);
- 	sctx->count[0] = 0;
-
--out:
- 	return 0;
- }
-
-@@ -73,10 +76,12 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 	struct sha512_state *sctx = shash_desc_ctx(desc);
- 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
-+	struct nx_sg *in_sg;
- 	u64 to_process, leftover = 0, total;
- 	unsigned long irq_flags;
- 	int rc = 0;
- 	int data_len;
-+	u32 max_sg_len;
- 	u64 buf_len = (sctx->count[0] % SHA512_BLOCK_SIZE);
-
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
-@@ -96,6 +101,12 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_INTERMEDIATE;
- 	NX_CPB_FDM(csbcpb) |= NX_FDM_CONTINUATION;
-
-+	in_sg = nx_ctx->in_sg;
-+	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
-+			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
-+	max_sg_len = min_t(u64, max_sg_len,
-+			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
-+
- 	do {
- 		/*
- 		 * to_process: the SHA512_BLOCK_SIZE data chunk to process in
-@@ -108,25 +119,26 @@ static int nx_sha512_update(struct shash_desc *desc, const u8 *data,
-
- 		if (buf_len) {
- 			data_len = buf_len;
--			rc = nx_sha_build_sg_list(nx_ctx, nx_ctx->in_sg,
--						  &nx_ctx->op.inlen,
--						  &data_len,
--						  (u8 *) sctx->buf,
--						  NX_DS_SHA512);
-+			in_sg = nx_build_sg_list(nx_ctx->in_sg,
-+						 (u8 *) sctx->buf,
-+						 &data_len, max_sg_len);
-
--			if (rc || data_len != buf_len)
-+			if (data_len != buf_len) {
-+				rc = -EINVAL;
- 				goto out;
-+			}
- 		}
-
- 		data_len = to_process - buf_len;
--		rc = nx_sha_build_sg_list(nx_ctx, nx_ctx->in_sg,
--					  &nx_ctx->op.inlen,
--					  &data_len,
--					  (u8 *) data,
--					  NX_DS_SHA512);
-+		in_sg = nx_build_sg_list(in_sg, (u8 *) data,
-+					 &data_len, max_sg_len);
-
--		if (rc || data_len != (to_process - buf_len))
-+		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
-+
-+		if (data_len != (to_process - buf_len)) {
-+			rc = -EINVAL;
- 			goto out;
-+		}
-
- 		to_process = (data_len + buf_len);
- 		leftover = total - to_process;
-@@ -172,13 +184,20 @@ static int nx_sha512_final(struct shash_desc *desc, u8 *out)
- 	struct sha512_state *sctx = shash_desc_ctx(desc);
- 	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(&desc->tfm->base);
- 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
-+	struct nx_sg *in_sg, *out_sg;
-+	u32 max_sg_len;
- 	u64 count0;
- 	unsigned long irq_flags;
--	int rc;
-+	int rc = 0;
- 	int len;
-
- 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
-
-+	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
-+			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
-+	max_sg_len = min_t(u64, max_sg_len,
-+			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
-+
- 	/* final is represented by continuing the operation and indicating that
- 	 * this is not an intermediate operation */
- 	if (sctx->count[0] >= SHA512_BLOCK_SIZE) {
-@@ -200,24 +219,20 @@ static int nx_sha512_final(struct shash_desc *desc, u8 *out)
- 	csbcpb->cpb.sha512.message_bit_length_lo = count0;
-
- 	len = sctx->count[0] & (SHA512_BLOCK_SIZE - 1);
--	rc = nx_sha_build_sg_list(nx_ctx, nx_ctx->in_sg,
--				  &nx_ctx->op.inlen,
--				  &len,
--				  (u8 *)sctx->buf,
--				  NX_DS_SHA512);
-+	in_sg = nx_build_sg_list(nx_ctx->in_sg, sctx->buf, &len,
-+				 max_sg_len);
-
--	if (rc || len != (sctx->count[0] & (SHA512_BLOCK_SIZE - 1)))
-+	if (len != (sctx->count[0] & (SHA512_BLOCK_SIZE - 1))) {
-+		rc = -EINVAL;
- 		goto out;
-+	}
-
- 	len = SHA512_DIGEST_SIZE;
--	rc = nx_sha_build_sg_list(nx_ctx, nx_ctx->out_sg,
--				  &nx_ctx->op.outlen,
--				  &len,
--				  out,
--				  NX_DS_SHA512);
-+	out_sg = nx_build_sg_list(nx_ctx->out_sg, out, &len,
-+				 max_sg_len);
-
--	if (rc)
--		goto out;
-+	nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) * sizeof(struct nx_sg);
-+	nx_ctx->op.outlen = (nx_ctx->out_sg - out_sg) * sizeof(struct nx_sg);
-
- 	if (!nx_ctx->op.outlen) {
- 		rc = -EINVAL;
-diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
-index 3e8a50c..3d6a31c 100644
---- a/drivers/crypto/nx/nx.c
-+++ b/drivers/crypto/nx/nx.c
-@@ -252,53 +252,6 @@ static long int trim_sg_list(struct nx_sg *sg,
- }
-
- /**
-- * nx_sha_build_sg_list - walk and build sg list to sha modes
-- *			  using right bounds and limits.
-- * @nx_ctx: NX crypto context for the lists we're building
-- * @nx_sg: current sg list in or out list
-- * @op_len: current op_len to be used in order to build a sg list
-- * @nbytes:  number or bytes to be processed
-- * @offset: buf offset
-- * @mode: SHA256 or SHA512
-- */
--int nx_sha_build_sg_list(struct nx_crypto_ctx *nx_ctx,
--			  struct nx_sg 	      *nx_in_outsg,
--			  s64		      *op_len,
--			  unsigned int        *nbytes,
--			  u8 		      *offset,
--			  u32		      mode)
--{
--	unsigned int delta = 0;
--	unsigned int total = *nbytes;
--	struct nx_sg *nx_insg = nx_in_outsg;
--	unsigned int max_sg_len;
--
--	max_sg_len = min_t(u64, nx_ctx->ap->sglen,
--			nx_driver.of.max_sg_len/sizeof(struct nx_sg));
--	max_sg_len = min_t(u64, max_sg_len,
--			nx_ctx->ap->databytelen/NX_PAGE_SIZE);
--
--	*nbytes = min_t(u64, *nbytes, nx_ctx->ap->databytelen);
--	nx_insg = nx_build_sg_list(nx_insg, offset, nbytes, max_sg_len);
--
--	switch (mode) {
--	case NX_DS_SHA256:
--		if (*nbytes < total)
--			delta = *nbytes - (*nbytes & ~(SHA256_BLOCK_SIZE - 1));
--		break;
--	case NX_DS_SHA512:
--		if (*nbytes < total)
--			delta = *nbytes - (*nbytes & ~(SHA512_BLOCK_SIZE - 1));
--		break;
--	default:
--		return -EINVAL;
--	}
--	*op_len = trim_sg_list(nx_in_outsg, nx_insg, delta);
--
--	return 0;
--}
--
--/**
-  * nx_build_sg_lists - walk the input scatterlists and build arrays of NX
-  *                     scatterlists based on them.
-  *
-diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-index 6c9ecaa..41b87ee 100644
---- a/drivers/crypto/nx/nx.h
-+++ b/drivers/crypto/nx/nx.h
-@@ -153,8 +153,6 @@ void nx_crypto_ctx_exit(struct crypto_tfm *tfm);
- void nx_ctx_init(struct nx_crypto_ctx *nx_ctx, unsigned int function);
- int nx_hcall_sync(struct nx_crypto_ctx *ctx, struct vio_pfo_op *op,
- 		  u32 may_sleep);
--int nx_sha_build_sg_list(struct nx_crypto_ctx *, struct nx_sg *,
--			 s64 *, unsigned int *, u8 *, u32);
- struct nx_sg *nx_build_sg_list(struct nx_sg *, u8 *, unsigned int *, u32);
- int nx_build_sg_lists(struct nx_crypto_ctx *, struct blkcipher_desc *,
- 		      struct scatterlist *, struct scatterlist *, unsigned int *,
---
-1.7.1
+yours,
+Bobby
