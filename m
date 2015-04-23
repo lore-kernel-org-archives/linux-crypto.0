@@ -1,74 +1,79 @@
-From: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Subject: Re: [PATCH v8 2/4] ARM: sunxi: dt: Add DT bindings
- documentation for SUNXI Security System
-Date: Thu, 23 Apr 2015 21:35:38 +0200
-Message-ID: <20150423193538.GF28007@lukather>
-References: <1429771523-2936-1-git-send-email-clabbe.montjoie@gmail.com>
- <1429771523-2936-3-git-send-email-clabbe.montjoie@gmail.com>
-Reply-To: maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: Crypto Update for 4.1
+Date: Thu, 23 Apr 2015 22:10:26 +0200
+Message-ID: <CAKv+Gu8s=-qyX9MAcpyd39AtBVCa-+Ly1ue1zBwam_bHqqJuvg@mail.gmail.com>
+References: <20140804130339.GA1178@gondor.apana.org.au>
+	<20141007131826.GA29688@gondor.apana.org.au>
+	<20141211125119.GA12380@gondor.apana.org.au>
+	<20150214094328.GA7457@gondor.apana.org.au>
+	<20150415033951.GA1406@gondor.apana.org.au>
+	<CA+55aFyynQ75NfQy7Lp6t9Tp8+bp=LKG9Xw9q8KQqNoS+gGLmA@mail.gmail.com>
+	<CA+55aFz8pr-J7K-EY5gjCV7ajJZC2tkFwjNG1xLXvQk0qAm2HA@mail.gmail.com>
+	<CA+55aFwG1y6KSu-ZUMHXFnw69nRttS3LZW_pScvB6LCZjS02tA@mail.gmail.com>
+	<20150416024252.GA11558@gondor.apana.org.au>
+	<CA+55aFx+gm+=Xqr-wFN0Akg7=XJOtv3PDbHgVbo38p=DMv=3OQ@mail.gmail.com>
+	<20150416030713.GA11668@gondor.apana.org.au>
+	<CA+55aFyinAKD8E5Xj49r+5ByfPRvB4axSxJSWg6R6Zd=bDMHig@mail.gmail.com>
+	<CAArOQ2Vrbm5xyWyaFNq44gxmK6m_7nxsQhxBXowE=7FrWbhHCA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="XIiC+We3v3zHqZ6Z"
-Cc: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
-	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
-	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org, tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, jg1.han-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org,
-	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-To: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-sunxi+bncBD2ZNBF5VYJRBE4V4WUQKGQE4V2K2IA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1429771523-2936-3-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <http://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <http://groups.google.com/group/linux-sunxi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
-
---XIiC+We3v3zHqZ6Z
 Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Stephan Mueller <smueller@chronox.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Bobby Powers <bobbypowers@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ie0-f169.google.com ([209.85.223.169]:36739 "EHLO
+	mail-ie0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758310AbbDWUK0 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Apr 2015 16:10:26 -0400
+Received: by iebrs15 with SMTP id rs15so69495027ieb.3
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Apr 2015 13:10:26 -0700 (PDT)
+In-Reply-To: <CAArOQ2Vrbm5xyWyaFNq44gxmK6m_7nxsQhxBXowE=7FrWbhHCA@mail.gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 23, 2015 at 08:45:21AM +0200, LABBE Corentin wrote:
-> This patch adds documentation for Device-Tree bindings for the Security System cryptographic accelerator driver.
-> 
-> Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  Documentation/devicetree/bindings/crypto/sunxi-ss.txt | 9 +++++++++
->  1 file changed, 9 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/sunxi-ss.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/sunxi-ss.txt b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
-> new file mode 100644
-> index 0000000..a566803
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
-> @@ -0,0 +1,9 @@
-> +* Allwinner Security System found on A20 SoC
-> +
-> +Required properties:
-> +- compatible : Should be "allwinner,sun7i-a20-crypto".
-> +- reg: Should contain the Security System register location and length.
-> +- interrupts: Should contain the IRQ line for the Security System.
-> +- clocks : A phandle to the functional clock node of the Security System module
+On 23 April 2015 at 21:27, Bobby Powers <bobbypowers@gmail.com> wrote:
+> Hello,
+>
+> Linus Torvalds <torvalds@linux-foundation.org> wrote:
+>> Ok, this patch seems to fix it for me, so I undid my revert that I
+>> hadn't pushed out yet, and pushed out this instead.
+>
+> Commit e68410ebf62676dfb93aafff7c55b76644f37072 in Linus's tree from
+> this crpyto update (crypto: x86/sha512_ssse3 - move SHA-384/512 SSSE3
+> implementation to base layer) causes a GPF on boot in
+> sha512_ssse3_finup for me on a Broadwell i7-5600U, rendering the
+> kernel unbootable.
+>
+> Reverting that commit enables me to boot.  I don't know enough about
+> the code to comment.  Config is attached, and I can provide a photo of
+> the reported Call Trace if thats helpful.  It is quite reproducible
+> for me.
+>
 
-You actually need two clock references, not just a single phandle.
+Hello Bobby,
 
-> +- clock-names : Name of the functional clock, should be "ahb" and "mod".
+Would you be able to check whether the following patch fixes the crash?
 
-And we usually have an example after too.
+diff --git a/arch/x86/crypto/sha512-avx2-asm.S
+b/arch/x86/crypto/sha512-avx2-asm.S
+index a4771dcd1fcf..1f20b35d8573 100644
+--- a/arch/x86/crypto/sha512-avx2-asm.S
++++ b/arch/x86/crypto/sha512-avx2-asm.S
+@@ -79,7 +79,7 @@ NUM_BLKS    = %rdx
+ c           = %rcx
+ d           = %r8
+ e           = %rdx
+-y3          = %rdi
++y3          = %rsi
 
-Thanks!
-Maxime
+ TBL   = %rbp
 
--- 
-Maxime Ripard, Free Electrons
-Embedded Linux, Kernel and Android engineering
-http://free-electrons.com
---XIiC+We3v3zHqZ6Z--
+If not, please share the call trace and the content of /proc/cpuinfo
+
+Regards,
+Ard.
