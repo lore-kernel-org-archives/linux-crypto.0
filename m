@@ -1,42 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: aead - Fix corner case in crypto_lookup_aead
-Date: Thu, 23 Apr 2015 16:37:46 +0800
-Message-ID: <20150423083746.GA20206@gondor.apana.org.au>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: CCM/GCM implementation defect
+Date: Thu, 23 Apr 2015 12:03:38 +0300
+Message-ID: <5538B56A.7060707@freescale.com>
+References: <20150423032619.GA17648@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Paul Wouters <pwouters@redhat.com>,
+	"Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37301 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756098AbbDWIhs (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Apr 2015 04:37:48 -0400
-Content-Disposition: inline
+Received: from mail-bn1bbn0105.outbound.protection.outlook.com ([157.56.111.105]:10496
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1754032AbbDWJD4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Apr 2015 05:03:56 -0400
+In-Reply-To: <20150423032619.GA17648@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-When the user explicitly states that they don't care whether the
-algorithm has been tested (type = CRYPTO_ALG_TESTED and mask = 0),
-there is a corner case where we may erroneously return ENOENT.
-    
-This patch fixes it by correcting the logic in the test.
-    
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On 4/23/2015 6:26 AM, Herbert Xu wrote:
+> Hi:
+>
+> It looks like our IPsec implementations of CCM and GCM are buggy
+This applies also to GMAC (rfc4543), right?
 
-diff --git a/crypto/aead.c b/crypto/aead.c
-index 2222710..d6ad0c6 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -489,7 +489,7 @@ struct crypto_alg *crypto_lookup_aead(const char *name, u32 type, u32 mask)
- 		return alg;
- 
- 	if (alg->cra_type == &crypto_aead_type) {
--		if ((alg->cra_flags ^ type ^ ~mask) & CRYPTO_ALG_TESTED) {
-+		if (~alg->cra_flags & (type ^ ~mask) & CRYPTO_ALG_TESTED) {
- 			crypto_mod_put(alg);
- 			alg = ERR_PTR(-ENOENT);
- 		}
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> in that they don't include the IV in the authentication calculation.
+>
+> This definitely breaks interoperability with anyone who implements
+> them correctly.  The fact that there have been no reports on this
+> probably means that nobody has run into this in the field yet.
+Does this mean that even the test vectors (crypto/testmgr.h) are broken?
+
+Thanks,
+Horia
