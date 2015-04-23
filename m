@@ -1,140 +1,59 @@
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v2] splice: sendfile() at once fails for big files
-Date: Thu, 23 Apr 2015 17:03:08 +0200 (CEST)
-Message-ID: <20150423150308.8782B1A2439@localhost.localdomain>
-Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Alexander Viro <viro@zeniv.linux.org.uk>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
+From: Paul Wouters <pwouters@redhat.com>
+Subject: Re: CCM/GCM implementation defect
+Date: Thu, 23 Apr 2015 11:21:19 -0400
+Message-ID: <55390DEF.2010904@redhat.com>
+References: <20150423032619.GA17648@gondor.apana.org.au> <20150423114533.GI8928@secunet.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20150423114533.GI8928@secunet.com>
+Sender: netdev-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Using sendfile with below small program to get MD5 sums of some files,
-it appear that big files (over 64kbytes with 4k pages system) get a
-wrong MD5 sum while small files get the correct sum.
-This program uses sendfile() to send a file to an AF_ALG socket
-for hashing.
+On 04/23/2015 07:45 AM, Steffen Klassert wrote:
+> On Thu, Apr 23, 2015 at 11:26:20AM +0800, Herbert Xu wrote:
+>> Hi:
+>>
+>> It looks like our IPsec implementations of CCM and GCM are buggy
+>> in that they don't include the IV in the authentication calculation.
+> 
+> Seems like crypto_rfc4106_crypt() passes the associated data it
+> got from ESP directly to gcm, without chaining with the IV.
+> 
+>>
+>> This definitely breaks interoperability with anyone who implements
+>> them correctly.  The fact that there have been no reports on this
+>> probably means that nobody has run into this in the field yet.
+>>
+>> On the security side, this is probably not a big deal for CCM
+>> because it always verifies the authentication tag after decryption.
+>> But for GCM this may be a DoS issue as an attacker could modify
+>> the IV without triggering the authentication check and thus cause
+>> an unnecessary decryption.  For both CCM and GCM this will result
+>> in random data injected as a packet into the network stack which
+>> hopefully will be dropped.
+>>
+>> In order to fix this without breaking backwards compatibility,
+>> my plan is to introduce new templates such as rfc4106v2 which
+>> implement the RFC correctly.  The existing templates will be
+>> retained so that current users aren't broken by the fix.
+> 
+> Adding a second template for the correct implementation is
+> probaply the only thing that we can do if we don't want to
+> break backwards compatibility. But maybe we can add a warning
+> to the old implementation, such that users notice that they
+> use a broken version.
 
+Unless we have a cryptographer indicate to us how that this mistake does not significantly reduce or break the confidentiality and authentication, I do not
+think we should keep a known broken implementation around. Lets say this brings GCM security down to ROT13, then it just needs to die without keeping
+interoperability.
 
-/* md5sum2.c */
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <fcntl.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <linux/if_alg.h>
+Additionally, looking at how long we suffered and still suffer from defaulting to something broken (sha2_256 truncation) I'm really not in favour of keeping
+broken crypto implementations around.
 
-int main(int argc, char **argv)
-{
-	int sk = socket(AF_ALG, SOCK_SEQPACKET, 0);
-	struct stat st;
-	struct sockaddr_alg sa = {
-		.salg_family = AF_ALG,
-		.salg_type = "hash",
-		.salg_name = "md5",
-	};
-	int n;
-
-	bind(sk, (struct sockaddr*)&sa, sizeof(sa));
-
-	for (n = 1; n < argc; n++) {
-		int size;
-		int offset = 0;
-		char buf[4096];
-		int fd;
-		int sko;
-		int i;
-
-		fd = open(argv[n], O_RDONLY);
-		sko = accept(sk, NULL, 0);
-		fstat(fd, &st);
-		size = st.st_size;
-		sendfile(sko, fd, &offset, size);
-		size = read(sko, buf, sizeof(buf));
-		for (i = 0; i < size; i++)
-			printf("%2.2x", buf[i]);
-		printf("  %s\n", argv[n]);
-		close(fd);
-		close(sko);
-	}
-	exit(0);
-}
-
-Test below is done using official linux patch files. First result is
-with a software based md5sum. Second result is with the program above.
-
-root@vgoip:~# ls -l patch-3.6.*
--rw-r--r--    1 root     root         64011 Aug 24 12:01 patch-3.6.2.gz
--rw-r--r--    1 root     root         94131 Aug 24 12:01 patch-3.6.3.gz
-
-root@vgoip:~# md5sum patch-3.6.*
-b3ffb9848196846f31b2ff133d2d6443  patch-3.6.2.gz
-c5e8f687878457db77cb7158c38a7e43  patch-3.6.3.gz
-
-root@vgoip:~# ./md5sum2 patch-3.6.*
-b3ffb9848196846f31b2ff133d2d6443  patch-3.6.2.gz
-5fd77b24e68bb24dcc72d6e57c64790e  patch-3.6.3.gz
-
-
-After investivation, it appears that sendfile() sends the files by blocks
-of 64kbytes (16 times PAGE_SIZE). The problem is that at the end of each
-block, the SPLICE_F_MORE flag is missing, therefore the hashing operation
-is reset as if it was the end of the file.
-
-This patch adds SPLICE_F_MORE to the flags when more data is pending.
-
-With the patch applied, we get the correct sums:
-
-root@vgoip:~# md5sum patch-3.6.*
-b3ffb9848196846f31b2ff133d2d6443  patch-3.6.2.gz
-c5e8f687878457db77cb7158c38a7e43  patch-3.6.3.gz
-
-root@vgoip:~# ./md5sum2 patch-3.6.*
-b3ffb9848196846f31b2ff133d2d6443  patch-3.6.2.gz
-c5e8f687878457db77cb7158c38a7e43  patch-3.6.3.gz
-
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- v2: no change, only new commit text
- 
- fs/splice.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/fs/splice.c b/fs/splice.c
-index 476024b..fe61723 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -1161,7 +1161,7 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 	long ret, bytes;
- 	umode_t i_mode;
- 	size_t len;
--	int i, flags;
-+	int i, flags, more;
- 
- 	/*
- 	 * We require the input being a regular file, as we don't want to
-@@ -1204,6 +1204,7 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 	 * Don't block on output, we have to drain the direct pipe.
- 	 */
- 	sd->flags &= ~SPLICE_F_NONBLOCK;
-+	more = sd->flags & SPLICE_F_MORE;
- 
- 	while (len) {
- 		size_t read_len;
-@@ -1216,6 +1217,10 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 		read_len = ret;
- 		sd->total_len = read_len;
- 
-+		if (read_len < len)
-+			sd->flags |= SPLICE_F_MORE;
-+		else if (!more)
-+			sd->flags &= ~SPLICE_F_MORE;
- 		/*
- 		 * NOTE: nonblocking mode only applies to the input. We
- 		 * must not do the output in nonblocking mode as then we
--- 
-2.1.0
-
+Paul
