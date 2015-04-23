@@ -1,36 +1,58 @@
-From: Martin Willi <martin@strongswan.org>
-Subject: Re: CCM/GCM implementation defect
-Date: Thu, 23 Apr 2015 15:24:59 +0200
-Message-ID: <1429795499.31437.9.camel@martin>
-References: <20150423032619.GA17648@gondor.apana.org.au>
-	 <20150423114533.GI8928@secunet.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: add key wrapping block chaining mode
+Date: Thu, 23 Apr 2015 15:42:19 +0200
+Message-ID: <2261126.vD1ovnGobO@myon.chronox.de>
+References: <6218629.uO4632Hmli@myon.chronox.de> <1470287.z00squjPAu@myon.chronox.de> <20150423025558.GA17870@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Paul Wouters <pwouters@redhat.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20150423114533.GI8928@secunet.com>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34288 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932081AbbDWNn7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Apr 2015 09:43:59 -0400
+In-Reply-To: <20150423025558.GA17870@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Steffen,
+Am Donnerstag, 23. April 2015, 10:55:58 schrieb Herbert Xu:
 
-> > It looks like our IPsec implementations of CCM and GCM are buggy
-> > in that they don't include the IV in the authentication calculation.
+Hi Herbert,
+
+> On Thu, Apr 23, 2015 at 04:51:56AM +0200, Stephan Mueller wrote:
+> > Encrypt input: IV, plaintext
+> > 
+> > Encrypt output: processed IV, ciphertext
+> > 
+> > Decrypt input: processed IV, ciphertext, IV to use for compare operation
+> > 
+> > Decrypt output: plaintext
 > 
-> Seems like crypto_rfc4106_crypt() passes the associated data it
-> got from ESP directly to gcm, without chaining with the IV.
+> Actually it is
+> 
+> Decrypt input: processed IV, ciphertext
+> Decrypt output: IV, plaintext
+> 
+> > How do you propose I send 2 IVs to blkcipher?
+> 
+> As I suggested earlier, you can use the currently unused givdecrypt
+> interface for the fixed IV case as specified in the RFC.  The giv
+> interfaces provide space for two IVs.
+> 
+> If givdecrypt fails the comparison, then you can return EBADMSG
+> and zap the decrypted key.
+> 
+> For the normal decrypt path, just return the IV and plaintet.
 
-Do you have any pointer for me where this is defined? Why is it needed,
-given that GCM implicitly authenticates the IV by using it in Y0?
+The conversion to blkcipher is done and the math still works. As CBC or others 
+it is a blkcipher and not an ablkcipher.
 
-Also, I've just verified that a tunnel between the Windows Filtering
-Platform and Linux 3.13 using AES128GCM16 works just fine. So if we do
-something wrong, the problem does not only affect Linux.
+Now, shall I kind of re-implement the chainiv ablkcipher wrapper into an IV 
+handler that just helps my code? That will be a lot of code for a simple 
+memcmp.
 
-Regards
-Martin
+-- 
+Ciao
+Stephan
