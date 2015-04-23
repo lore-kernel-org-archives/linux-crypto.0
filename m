@@ -1,45 +1,44 @@
-From: Martin Willi <martin@strongswan.org>
-Subject: Re: CCM/GCM implementation defect
-Date: Thu, 23 Apr 2015 11:58:52 +0200
-Message-ID: <1429783132.3083.15.camel@martin>
-References: <20150423032619.GA17648@gondor.apana.org.au>
-	 <5538B56A.7060707@freescale.com>
-	 <20150423090545.GA20369@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Horia =?UTF-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Paul Wouters <pwouters@redhat.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <20150423090545.GA20369@gondor.apana.org.au>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Firo Yang <firogm@gmail.com>
+Subject: [PATCH] crypto: sha1-mb - Remove pointless cast
+Date: Thu, 23 Apr 2015 18:12:10 +0800
+Message-ID: <1429783930-7318-1-git-send-email-firogm@gmail.com>
+Cc: kernel-janitors@vger.kernel.org, davem@davemloft.net,
+	tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+	tim.c.chen@linux.intel.com, smueller@chronox.de,
+	minipli@googlemail.com, dan.carpenter@oracle.com,
+	ameenali023@gmail.com, fengguang.wu@intel.com,
+	linux-crypto@vger.kernel.org, Firo Yang <firogm@gmail.com>
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pa0-f67.google.com ([209.85.220.67]:34785 "EHLO
+	mail-pa0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932168AbbDWKMM (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Apr 2015 06:12:12 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+Since kzalloc() returns a void pointer, we don't need to cast the
+return value in arch/x86/crypto/sha-mb/sha1_mb.c::sha1_mb_mod_init().
 
-> > Does this mean that even the test vectors (crypto/testmgr.h) are broken?
-> 
-> Indeed.  The test vectors appear to be generated either through
-> our implementation or by one that is identical to us.
+Signed-off-by: Firo Yang <firogm@gmail.com>
+---
+ arch/x86/crypto/sha-mb/sha1_mb.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-I'm not sure about that. RFC4106 refers to [1] for test vectors, which
-is still available at web.archive.org [2].
-
-When looking for example at Test Case 3, this is the same as in a newer
-revision of the document [3]. That looks exactly the same as
-aes_gcm_enc_tv_template[2] from testmgr.h.
-
-We by the way use test vectors in userland from the same document to
-verify our own GCM backend, our OpenSSL backend and an AESNI/PCLMULQD
-backend. And I've never heard of any incompatibilities.
-
-Regards
-Martin
-
-[1]http://csrc.nist.gov/CryptoToolkit/modes/proposedmodes/gcm/gcm-spec.pdf
-[2]http://web.archive.org/web/20070712195408/http://csrc.nist.gov/CryptoToolkit/modes/proposedmodes/gcm/gcm-spec.pdf
-[3]http://csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/gcm/gcm-revised-spec.pdf
+diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
+index e510b1c..0cb5149 100644
+--- a/arch/x86/crypto/sha-mb/sha1_mb.c
++++ b/arch/x86/crypto/sha-mb/sha1_mb.c
+@@ -885,7 +885,8 @@ static int __init sha1_mb_mod_init(void)
+ 		INIT_DELAYED_WORK(&cpu_state->flush, mcryptd_flusher);
+ 		cpu_state->cpu = cpu;
+ 		cpu_state->alg_state = &sha1_mb_alg_state;
+-		cpu_state->mgr = (struct sha1_ctx_mgr *) kzalloc(sizeof(struct sha1_ctx_mgr), GFP_KERNEL);
++		cpu_state->mgr = kzalloc(sizeof(struct sha1_ctx_mgr),
++					GFP_KERNEL);
+ 		if (!cpu_state->mgr)
+ 			goto err2;
+ 		sha1_ctx_mgr_init(cpu_state->mgr);
+-- 
+2.1.0
