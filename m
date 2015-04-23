@@ -1,44 +1,53 @@
-From: Firo Yang <firogm@gmail.com>
-Subject: [PATCH] crypto: sha1-mb - Remove pointless cast
-Date: Thu, 23 Apr 2015 18:12:10 +0800
-Message-ID: <1429783930-7318-1-git-send-email-firogm@gmail.com>
-Cc: kernel-janitors@vger.kernel.org, davem@davemloft.net,
-	tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-	tim.c.chen@linux.intel.com, smueller@chronox.de,
-	minipli@googlemail.com, dan.carpenter@oracle.com,
-	ameenali023@gmail.com, fengguang.wu@intel.com,
-	linux-crypto@vger.kernel.org, Firo Yang <firogm@gmail.com>
-To: herbert@gondor.apana.org.au
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: CCM/GCM implementation defect
+Date: Thu, 23 Apr 2015 13:45:34 +0200
+Message-ID: <20150423114533.GI8928@secunet.com>
+References: <20150423032619.GA17648@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Cc: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Paul Wouters <pwouters@redhat.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f67.google.com ([209.85.220.67]:34785 "EHLO
-	mail-pa0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932168AbbDWKMM (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Apr 2015 06:12:12 -0400
+Received: from a.mx.secunet.com ([195.81.216.161]:34745 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757469AbbDWLpp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Apr 2015 07:45:45 -0400
+Content-Disposition: inline
+In-Reply-To: <20150423032619.GA17648@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Since kzalloc() returns a void pointer, we don't need to cast the
-return value in arch/x86/crypto/sha-mb/sha1_mb.c::sha1_mb_mod_init().
+On Thu, Apr 23, 2015 at 11:26:20AM +0800, Herbert Xu wrote:
+> Hi:
+> 
+> It looks like our IPsec implementations of CCM and GCM are buggy
+> in that they don't include the IV in the authentication calculation.
 
-Signed-off-by: Firo Yang <firogm@gmail.com>
----
- arch/x86/crypto/sha-mb/sha1_mb.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Seems like crypto_rfc4106_crypt() passes the associated data it
+got from ESP directly to gcm, without chaining with the IV.
 
-diff --git a/arch/x86/crypto/sha-mb/sha1_mb.c b/arch/x86/crypto/sha-mb/sha1_mb.c
-index e510b1c..0cb5149 100644
---- a/arch/x86/crypto/sha-mb/sha1_mb.c
-+++ b/arch/x86/crypto/sha-mb/sha1_mb.c
-@@ -885,7 +885,8 @@ static int __init sha1_mb_mod_init(void)
- 		INIT_DELAYED_WORK(&cpu_state->flush, mcryptd_flusher);
- 		cpu_state->cpu = cpu;
- 		cpu_state->alg_state = &sha1_mb_alg_state;
--		cpu_state->mgr = (struct sha1_ctx_mgr *) kzalloc(sizeof(struct sha1_ctx_mgr), GFP_KERNEL);
-+		cpu_state->mgr = kzalloc(sizeof(struct sha1_ctx_mgr),
-+					GFP_KERNEL);
- 		if (!cpu_state->mgr)
- 			goto err2;
- 		sha1_ctx_mgr_init(cpu_state->mgr);
--- 
-2.1.0
+> 
+> This definitely breaks interoperability with anyone who implements
+> them correctly.  The fact that there have been no reports on this
+> probably means that nobody has run into this in the field yet.
+> 
+> On the security side, this is probably not a big deal for CCM
+> because it always verifies the authentication tag after decryption.
+> But for GCM this may be a DoS issue as an attacker could modify
+> the IV without triggering the authentication check and thus cause
+> an unnecessary decryption.  For both CCM and GCM this will result
+> in random data injected as a packet into the network stack which
+> hopefully will be dropped.
+> 
+> In order to fix this without breaking backwards compatibility,
+> my plan is to introduce new templates such as rfc4106v2 which
+> implement the RFC correctly.  The existing templates will be
+> retained so that current users aren't broken by the fix.
+
+Adding a second template for the correct implementation is
+probaply the only thing that we can do if we don't want to
+break backwards compatibility. But maybe we can add a warning
+to the old implementation, such that users notice that they
+use a broken version.
