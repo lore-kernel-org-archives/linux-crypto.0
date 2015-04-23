@@ -1,68 +1,70 @@
-From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v8 2/4] ARM: sunxi: dt: Add DT bindings
- documentation for SUNXI Security System
-Date: Thu, 23 Apr 2015 08:45:21 +0200
-Message-ID: <1429771523-2936-3-git-send-email-clabbe.montjoie@gmail.com>
-References: <1429771523-2936-1-git-send-email-clabbe.montjoie@gmail.com>
-Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: crypto: api - Fix build error when modules are disabled
+Date: Thu, 23 Apr 2015 14:48:05 +0800
+Message-ID: <20150423064805.GA19442@gondor.apana.org.au>
+References: <201504231434.WFmkfUGj%fengguang.wu@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
-	LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	pawel.moll-5wv7dgnIgG8@public.gmane.org,
-	mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
-	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
-	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
-	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
-	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
-	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
-	tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	jg1.han-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org,
-	arnd-r2nGTMty4D4@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBFFK4KUQKGQERCS2XGY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <1429771523-2936-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <http://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <http://groups.google.com/group/linux-sunxi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild-all@01.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: kbuild test robot <fengguang.wu@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:42545 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750893AbbDWGsN (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 23 Apr 2015 02:48:13 -0400
+Content-Disposition: inline
+In-Reply-To: <201504231434.WFmkfUGj%fengguang.wu@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds documentation for Device-Tree bindings for the Security System cryptographic accelerator driver.
+On Thu, Apr 23, 2015 at 02:27:36PM +0800, kbuild test robot wrote:
+> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> head:   8a1a2b717e0d4d5f3e3bb59b7dee5079a15ab24b
+> commit: 59afdc7b32143528524455039e7557a46b60e4c8 [42/56] crypto: api - Move module sig ifdef into accessor function
+> config: xtensa-iss_defconfig (attached as .config)
+> reproduce:
+>   wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
+>   chmod +x ~/bin/make.cross
+>   git checkout 59afdc7b32143528524455039e7557a46b60e4c8
+>   # save the attached .config to linux build tree
+>   make.cross ARCH=xtensa 
+> 
+> All error/warnings:
+> 
+>    crypto/algapi.c: In function 'crypto_check_module_sig':
+> >> crypto/algapi.c:48:12: error: dereferencing pointer to incomplete type
+>             mod->name);
+>                ^
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- Documentation/devicetree/bindings/crypto/sunxi-ss.txt | 9 +++++++++
- 1 file changed, 9 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/sunxi-ss.txt
+Thanks.  This patch should fix the problem.
 
-diff --git a/Documentation/devicetree/bindings/crypto/sunxi-ss.txt b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
-new file mode 100644
-index 0000000..a566803
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/sunxi-ss.txt
-@@ -0,0 +1,9 @@
-+* Allwinner Security System found on A20 SoC
-+
-+Required properties:
-+- compatible : Should be "allwinner,sun7i-a20-crypto".
-+- reg: Should contain the Security System register location and length.
-+- interrupts: Should contain the IRQ line for the Security System.
-+- clocks : A phandle to the functional clock node of the Security System module
-+- clock-names : Name of the functional clock, should be "ahb" and "mod".
-+
+---8<---
+The commit 59afdc7b32143528524455039e7557a46b60e4c8 ("crypto:
+api - Move module sig ifdef into accessor function") broke the
+build when modules are completely disabled because we directly
+dereference module->name.
+
+This patch fixes this by using the accessor function module_name.
+
+Reported-by: Fengguang Wu <fengguang.wu@intel.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index c63836f..3103e6a 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -46,7 +46,7 @@ static inline void crypto_check_module_sig(struct module *mod)
+ {
+ 	if (fips_enabled && mod && !module_sig_ok(mod))
+ 		panic("Module %s signature verification failed in FIPS mode\n",
+-		      mod->name);
++		      module_name(mod));
+ }
+ 
+ static int crypto_check_alg(struct crypto_alg *alg)
 -- 
-2.0.5
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
