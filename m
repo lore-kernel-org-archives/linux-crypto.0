@@ -1,79 +1,96 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: Crypto Update for 4.1
-Date: Thu, 23 Apr 2015 22:10:26 +0200
-Message-ID: <CAKv+Gu8s=-qyX9MAcpyd39AtBVCa-+Ly1ue1zBwam_bHqqJuvg@mail.gmail.com>
-References: <20140804130339.GA1178@gondor.apana.org.au>
-	<20141007131826.GA29688@gondor.apana.org.au>
-	<20141211125119.GA12380@gondor.apana.org.au>
-	<20150214094328.GA7457@gondor.apana.org.au>
-	<20150415033951.GA1406@gondor.apana.org.au>
-	<CA+55aFyynQ75NfQy7Lp6t9Tp8+bp=LKG9Xw9q8KQqNoS+gGLmA@mail.gmail.com>
-	<CA+55aFz8pr-J7K-EY5gjCV7ajJZC2tkFwjNG1xLXvQk0qAm2HA@mail.gmail.com>
-	<CA+55aFwG1y6KSu-ZUMHXFnw69nRttS3LZW_pScvB6LCZjS02tA@mail.gmail.com>
-	<20150416024252.GA11558@gondor.apana.org.au>
-	<CA+55aFx+gm+=Xqr-wFN0Akg7=XJOtv3PDbHgVbo38p=DMv=3OQ@mail.gmail.com>
-	<20150416030713.GA11668@gondor.apana.org.au>
-	<CA+55aFyinAKD8E5Xj49r+5ByfPRvB4axSxJSWg6R6Zd=bDMHig@mail.gmail.com>
-	<CAArOQ2Vrbm5xyWyaFNq44gxmK6m_7nxsQhxBXowE=7FrWbhHCA@mail.gmail.com>
+From: "Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>
+Subject: [PATCH 1/2] Fixing NX data alignment with nx_sg list
+Date: Thu, 23 Apr 2015 17:40:30 -0300
+Message-ID: <20150423204024.GA11036@bluepex.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Bobby Powers <bobbypowers@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f169.google.com ([209.85.223.169]:36739 "EHLO
-	mail-ie0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758310AbbDWUK0 (ORCPT
+Received: from e24smtp01.br.ibm.com ([32.104.18.85]:41120 "EHLO
+	e24smtp01.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1030684AbbDWUkm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Apr 2015 16:10:26 -0400
-Received: by iebrs15 with SMTP id rs15so69495027ieb.3
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Apr 2015 13:10:26 -0700 (PDT)
-In-Reply-To: <CAArOQ2Vrbm5xyWyaFNq44gxmK6m_7nxsQhxBXowE=7FrWbhHCA@mail.gmail.com>
+	Thu, 23 Apr 2015 16:40:42 -0400
+Received: from /spool/local
+	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-crypto@vger.kernel.org> from <leosilva@linux.vnet.ibm.com>;
+	Thu, 23 Apr 2015 17:40:38 -0300
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 23 April 2015 at 21:27, Bobby Powers <bobbypowers@gmail.com> wrote:
-> Hello,
->
-> Linus Torvalds <torvalds@linux-foundation.org> wrote:
->> Ok, this patch seems to fix it for me, so I undid my revert that I
->> hadn't pushed out yet, and pushed out this instead.
->
-> Commit e68410ebf62676dfb93aafff7c55b76644f37072 in Linus's tree from
-> this crpyto update (crypto: x86/sha512_ssse3 - move SHA-384/512 SSSE3
-> implementation to base layer) causes a GPF on boot in
-> sha512_ssse3_finup for me on a Broadwell i7-5600U, rendering the
-> kernel unbootable.
->
-> Reverting that commit enables me to boot.  I don't know enough about
-> the code to comment.  Config is attached, and I can provide a photo of
-> the reported Call Trace if thats helpful.  It is quite reproducible
-> for me.
->
+In NX we need to pass always a 16 multiple size nx_sg_list to
+co processor. Trim function handle with this assuring all nx_sg_lists
+are 16 multiple size, although data was not being considerated when
+crop was done. It was causing an unalignment between size of the list
+and data, corrupting csbcpb fields returning a -23 H_ST_PARM error, or
+invalid operation.
 
-Hello Bobby,
+This patch fix this recalculating how much data should be put back
+in to_process variable what assures the size of sg_list will be
+correct with size of the data.
 
-Would you be able to check whether the following patch fixes the crash?
+Signed-off-by: Leonidas S. Barbosa <leosilva@linux.vnet.ibm.com>
+---
+ drivers/crypto/nx/nx.c |   28 ++++++++++++++++++++++++----
+ 1 files changed, 24 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/crypto/sha512-avx2-asm.S
-b/arch/x86/crypto/sha512-avx2-asm.S
-index a4771dcd1fcf..1f20b35d8573 100644
---- a/arch/x86/crypto/sha512-avx2-asm.S
-+++ b/arch/x86/crypto/sha512-avx2-asm.S
-@@ -79,7 +79,7 @@ NUM_BLKS    = %rdx
- c           = %rcx
- d           = %r8
- e           = %rdx
--y3          = %rdi
-+y3          = %rsi
+diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
+index 1da6dc5..3e8a50c 100644
+--- a/drivers/crypto/nx/nx.c
++++ b/drivers/crypto/nx/nx.c
+@@ -215,8 +215,15 @@ struct nx_sg *nx_walk_and_build(struct nx_sg       *nx_dst,
+  * @delta:  is the amount we need to crop in order to bound the list.
+  *
+  */
+-static long int trim_sg_list(struct nx_sg *sg, struct nx_sg *end, unsigned int delta)
++static long int trim_sg_list(struct nx_sg *sg,
++			     struct nx_sg *end,
++ 			     unsigned int delta,
++			     unsigned int *nbytes)
+ {
++	long int oplen;
++	long int data_back;
++	unsigned int is_delta = delta;
++
+ 	while (delta && end > sg) {
+ 		struct nx_sg *last = end - 1;
 
- TBL   = %rbp
+@@ -228,7 +235,20 @@ static long int trim_sg_list(struct nx_sg *sg, struct nx_sg *end, unsigned int d
+ 			delta -= last->len;
+ 		}
+ 	}
+-	return (sg - end) * sizeof(struct nx_sg);
++
++	/* There are cases where we need to crop list in order to make it
++ 	 * a block size multiple, but we also need to align data. In order to
++ 	 * that we need to calculate how much we need to put back to be
++ 	 * processed
++ 	 */
++	oplen = (sg - end) * sizeof(struct nx_sg);
++	if (is_delta) {
++		data_back = (abs(oplen) / AES_BLOCK_SIZE) *  sg->len;
++		data_back = *nbytes - (data_back & ~(AES_BLOCK_SIZE - 1));
++		*nbytes -= data_back;
++	}
++
++	return oplen;
+ }
 
-If not, please share the call trace and the content of /proc/cpuinfo
+ /**
+@@ -330,8 +350,8 @@ int nx_build_sg_lists(struct nx_crypto_ctx  *nx_ctx,
+ 	/* these lengths should be negative, which will indicate to phyp that
+ 	 * the input and output parameters are scatterlists, not linear
+ 	 * buffers */
+-	nx_ctx->op.inlen = trim_sg_list(nx_ctx->in_sg, nx_insg, delta);
+-	nx_ctx->op.outlen = trim_sg_list(nx_ctx->out_sg, nx_outsg, delta);
++	nx_ctx->op.inlen = trim_sg_list(nx_ctx->in_sg, nx_insg, delta, nbytes);
++	nx_ctx->op.outlen = trim_sg_list(nx_ctx->out_sg, nx_outsg, delta, nbytes);
 
-Regards,
-Ard.
+ 	return 0;
+ }
+--
+1.7.1
