@@ -1,41 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: CCM/GCM implementation defect
-Date: Thu, 23 Apr 2015 17:05:45 +0800
-Message-ID: <20150423090545.GA20369@gondor.apana.org.au>
+Date: Thu, 23 Apr 2015 18:01:52 +0800
+Message-ID: <20150423100152.GA20693@gondor.apana.org.au>
 References: <20150423032619.GA17648@gondor.apana.org.au>
  <5538B56A.7060707@freescale.com>
+ <20150423090545.GA20369@gondor.apana.org.au>
+ <1429783132.3083.15.camel@martin>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
 	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Paul Wouters <pwouters@redhat.com>,
 	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>
+To: Martin Willi <martin@strongswan.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41124 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:43752 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932092AbbDWJF7 (ORCPT
+	with ESMTP id S1751996AbbDWKCI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Apr 2015 05:05:59 -0400
+	Thu, 23 Apr 2015 06:02:08 -0400
 Content-Disposition: inline
-In-Reply-To: <5538B56A.7060707@freescale.com>
+In-Reply-To: <1429783132.3083.15.camel@martin>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 23, 2015 at 12:03:38PM +0300, Horia Geant=C4=83 wrote:
-> This applies also to GMAC (rfc4543), right?
+On Thu, Apr 23, 2015 at 11:58:52AM +0200, Martin Willi wrote:
+>
+> I'm not sure about that. RFC4106 refers to [1] for test vectors, which
+> is still available at web.archive.org [2].
+> 
+> When looking for example at Test Case 3, this is the same as in a newer
+> revision of the document [3]. That looks exactly the same as
+> aes_gcm_enc_tv_template[2] from testmgr.h.
 
-No RFC4543 appears to be correctly implemented.
+These are GCM test vectors, not RFC4106 test vectors so they are
+of no use when you're testing whether the IPsec IV (which is not
+the same thing as the GCM IV) is included in the authentication
+or not.
 
-> Does this mean that even the test vectors (crypto/testmgr.h) are brok=
-en?
-
-Indeed.  The test vectors appear to be generated either through
-our implementation or by one that is identical to us.
+AFAIK GCM itself is implemented correctly.  It's only the IPsec
+wrapper around it (rfc4106 in particular) that's broken.
 
 Cheers,
---=20
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
