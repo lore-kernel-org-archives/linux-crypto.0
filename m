@@ -1,37 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: CCM/GCM implementation defect
-Date: Fri, 24 Apr 2015 07:17:03 +0800
-Message-ID: <20150423231703.GB26635@gondor.apana.org.au>
-References: <20150423032619.GA17648@gondor.apana.org.au>
- <20150423114533.GI8928@secunet.com>
+Subject: Re: [PATCH] crypto: add key wrapping block chaining mode
+Date: Fri, 24 Apr 2015 07:21:05 +0800
+Message-ID: <20150423232105.GC26635@gondor.apana.org.au>
+References: <6218629.uO4632Hmli@myon.chronox.de>
+ <1470287.z00squjPAu@myon.chronox.de>
+ <20150423025558.GA17870@gondor.apana.org.au>
+ <2261126.vD1ovnGobO@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Paul Wouters <pwouters@redhat.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39316 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:55218 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932410AbbDWXRM (ORCPT
+	with ESMTP id S1031132AbbDWXVK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Apr 2015 19:17:12 -0400
+	Thu, 23 Apr 2015 19:21:10 -0400
 Content-Disposition: inline
-In-Reply-To: <20150423114533.GI8928@secunet.com>
+In-Reply-To: <2261126.vD1ovnGobO@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Apr 23, 2015 at 01:45:34PM +0200, Steffen Klassert wrote:
+On Thu, Apr 23, 2015 at 03:42:19PM +0200, Stephan Mueller wrote:
 >
-> Adding a second template for the correct implementation is
-> probaply the only thing that we can do if we don't want to
-> break backwards compatibility. But maybe we can add a warning
-> to the old implementation, such that users notice that they
-> use a broken version.
+> Now, shall I kind of re-implement the chainiv ablkcipher wrapper into an IV 
+> handler that just helps my code? That will be a lot of code for a simple 
+> memcmp.
 
-If we are going to do a warning I think the place to do it would
-be in xfrm_algo.c.  We could add an insecure/warning flag and if
-then print a warning if said algorithm is used.
+No no no.  You don't need to do a template for givencrypt.  chainiv
+is a template because it can be used by any blkcipher.  In your case
+your fixed IV is only used by you.  So just implement givencrypt and
+givdecrypt directly in your blkcipher (or ablkcipher rather because
+only ablkcipher supports givencrypt/givdecrypt).
+
+If you really want to keep the underlying kw as a blkcipher for the
+sake of simplicity you could go back to the wrapper idea and have
+the rfc wrapper around kw as an ablkcipher so that you can add the
+givencrypt/givdecrypt calls.
 
 Cheers,
 -- 
