@@ -1,47 +1,140 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 6/6] crypto: add jitterentropy RNG
-Date: Thu, 23 Apr 2015 16:26:23 +0200
-Message-ID: <4170874.MzN8F3hvVD@myon.chronox.de>
-References: <5054521.el7mZro33c@myon.chronox.de> <3179693.vMYTrm5f8Q@myon.chronox.de> <1429798711.2927.8.camel@x220>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au,
-	Andreas Steffen <andreas.steffen@strongswan.org>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Sandy Harris <sandyinchina@gmail.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Paul Bolle <pebolle@tiscali.nl>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1429798711.2927.8.camel@x220>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2] splice: sendfile() at once fails for big files
+Date: Thu, 23 Apr 2015 17:03:08 +0200 (CEST)
+Message-ID: <20150423150308.8782B1A2439@localhost.localdomain>
+Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Alexander Viro <viro@zeniv.linux.org.uk>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Donnerstag, 23. April 2015, 16:18:31 schrieb Paul Bolle:
-
-Hi Paul,
-
-> On Thu, 2015-04-23 at 16:08 +0200, Stephan Mueller wrote:
-> > Other patches that are in the kernel that I wrote (e.g.
-> > the crypto/drbg.c) have the same license as above, but use
-> > MODULE_LICENSE("GPL") -- Thus I would think that leaving it as is should
-> > be
-> > ok.
-> 
-> Why not submit the trivial patches to make the license comment and the
-> MODULE_LICENSE() macro match in those files too?
-
-Well, ok, I can do that.
-
-I will wait for further comments on the patch set before I resubmit the patch 
-set with the license change as suggested.
-> 
-> Thanks,
-> 
-> 
-> Paul Bolle
+Using sendfile with below small program to get MD5 sums of some files,
+it appear that big files (over 64kbytes with 4k pages system) get a
+wrong MD5 sum while small files get the correct sum.
+This program uses sendfile() to send a file to an AF_ALG socket
+for hashing.
 
 
+/* md5sum2.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <linux/if_alg.h>
+
+int main(int argc, char **argv)
+{
+	int sk = socket(AF_ALG, SOCK_SEQPACKET, 0);
+	struct stat st;
+	struct sockaddr_alg sa = {
+		.salg_family = AF_ALG,
+		.salg_type = "hash",
+		.salg_name = "md5",
+	};
+	int n;
+
+	bind(sk, (struct sockaddr*)&sa, sizeof(sa));
+
+	for (n = 1; n < argc; n++) {
+		int size;
+		int offset = 0;
+		char buf[4096];
+		int fd;
+		int sko;
+		int i;
+
+		fd = open(argv[n], O_RDONLY);
+		sko = accept(sk, NULL, 0);
+		fstat(fd, &st);
+		size = st.st_size;
+		sendfile(sko, fd, &offset, size);
+		size = read(sko, buf, sizeof(buf));
+		for (i = 0; i < size; i++)
+			printf("%2.2x", buf[i]);
+		printf("  %s\n", argv[n]);
+		close(fd);
+		close(sko);
+	}
+	exit(0);
+}
+
+Test below is done using official linux patch files. First result is
+with a software based md5sum. Second result is with the program above.
+
+root@vgoip:~# ls -l patch-3.6.*
+-rw-r--r--    1 root     root         64011 Aug 24 12:01 patch-3.6.2.gz
+-rw-r--r--    1 root     root         94131 Aug 24 12:01 patch-3.6.3.gz
+
+root@vgoip:~# md5sum patch-3.6.*
+b3ffb9848196846f31b2ff133d2d6443  patch-3.6.2.gz
+c5e8f687878457db77cb7158c38a7e43  patch-3.6.3.gz
+
+root@vgoip:~# ./md5sum2 patch-3.6.*
+b3ffb9848196846f31b2ff133d2d6443  patch-3.6.2.gz
+5fd77b24e68bb24dcc72d6e57c64790e  patch-3.6.3.gz
+
+
+After investivation, it appears that sendfile() sends the files by blocks
+of 64kbytes (16 times PAGE_SIZE). The problem is that at the end of each
+block, the SPLICE_F_MORE flag is missing, therefore the hashing operation
+is reset as if it was the end of the file.
+
+This patch adds SPLICE_F_MORE to the flags when more data is pending.
+
+With the patch applied, we get the correct sums:
+
+root@vgoip:~# md5sum patch-3.6.*
+b3ffb9848196846f31b2ff133d2d6443  patch-3.6.2.gz
+c5e8f687878457db77cb7158c38a7e43  patch-3.6.3.gz
+
+root@vgoip:~# ./md5sum2 patch-3.6.*
+b3ffb9848196846f31b2ff133d2d6443  patch-3.6.2.gz
+c5e8f687878457db77cb7158c38a7e43  patch-3.6.3.gz
+
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ v2: no change, only new commit text
+ 
+ fs/splice.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/fs/splice.c b/fs/splice.c
+index 476024b..fe61723 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -1161,7 +1161,7 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
+ 	long ret, bytes;
+ 	umode_t i_mode;
+ 	size_t len;
+-	int i, flags;
++	int i, flags, more;
+ 
+ 	/*
+ 	 * We require the input being a regular file, as we don't want to
+@@ -1204,6 +1204,7 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
+ 	 * Don't block on output, we have to drain the direct pipe.
+ 	 */
+ 	sd->flags &= ~SPLICE_F_NONBLOCK;
++	more = sd->flags & SPLICE_F_MORE;
+ 
+ 	while (len) {
+ 		size_t read_len;
+@@ -1216,6 +1217,10 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
+ 		read_len = ret;
+ 		sd->total_len = read_len;
+ 
++		if (read_len < len)
++			sd->flags |= SPLICE_F_MORE;
++		else if (!more)
++			sd->flags &= ~SPLICE_F_MORE;
+ 		/*
+ 		 * NOTE: nonblocking mode only applies to the input. We
+ 		 * must not do the output in nonblocking mode as then we
 -- 
-Ciao
-Stephan
+2.1.0
+
