@@ -1,68 +1,46 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: add key wrapping block chaining mode
-Date: Fri, 24 Apr 2015 02:22:15 +0200
-Message-ID: <1631170.dsiKAyPJ3M@tauon>
-References: <6218629.uO4632Hmli@myon.chronox.de> <2261126.vD1ovnGobO@myon.chronox.de> <20150423232105.GC26635@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: CCM/GCM implementation defect
+Date: Fri, 24 Apr 2015 13:30:00 +0800
+Message-ID: <20150424053000.GA28657@gondor.apana.org.au>
+References: <20150423032619.GA17648@gondor.apana.org.au>
+ <20150423114533.GI8928@secunet.com>
+ <1429795499.31437.9.camel@martin>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Paul Wouters <pwouters@redhat.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Martin Willi <martin@strongswan.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.atsec.com ([195.30.99.214]:50464 "EHLO mail.atsec.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750703AbbDXAbv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 23 Apr 2015 20:31:51 -0400
-Received: from mail.atsec.com (localhost [127.0.0.1])
-	by mail.atsec.com (Postfix) with ESMTP id 37C8121B14
-	for <linux-crypto@vger.kernel.org>; Fri, 24 Apr 2015 02:22:22 +0200 (CEST)
-In-Reply-To: <20150423232105.GC26635@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45747 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754260AbbDXFaQ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Apr 2015 01:30:16 -0400
+Content-Disposition: inline
+In-Reply-To: <1429795499.31437.9.camel@martin>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Freitag, 24. April 2015, 07:21:05 schrieb Herbert Xu:
-
-Hi Herbert,
-
->On Thu, Apr 23, 2015 at 03:42:19PM +0200, Stephan Mueller wrote:
->> Now, shall I kind of re-implement the chainiv ablkcipher wrapper into an IV
->> handler that just helps my code? That will be a lot of code for a simple
->> memcmp.
+On Thu, Apr 23, 2015 at 03:24:59PM +0200, Martin Willi wrote:
 >
->No no no.  You don't need to do a template for givencrypt.  chainiv
->is a template because it can be used by any blkcipher.  In your case
->your fixed IV is only used by you.  So just implement givencrypt and
->givdecrypt directly in your blkcipher (or ablkcipher rather because
->only ablkcipher supports givencrypt/givdecrypt).
->
->If you really want to keep the underlying kw as a blkcipher for the
->sake of simplicity you could go back to the wrapper idea and have
->the rfc wrapper around kw as an ablkcipher so that you can add the
->givencrypt/givdecrypt calls.
+> Do you have any pointer for me where this is defined? Why is it needed,
+> given that GCM implicitly authenticates the IV by using it in Y0?
 
-For the moment, I was working on the following approach:
+Actually you're quite right.  Both GCM and CCM implicitly includes
+the IV in the authentication tag.
 
-- kw() as blkcipher (like ctr()
+In fact after reviewing the two relevant RFCs (4106/4309) it seems
+that we are correct after all since they explicitly exclude the IV
+from the AAD.
 
-- implement a kwiv geniv handler and use it by kw via:
+Now we just need to figre out whether we're still OK with RFC4543.
 
-	inst->alg.cra_blkcipher.geniv = "kwiv";
+Sorry for the false alarm.
 
-
-
-So, if I read your recommendation right, I would do the following:
-
-- kw() as blkcipher (like the ctr())
-
-- rfc3394() as ablkcipher around kw (like rfc3686())
-
-I also have the givencrypt and givdecrypt functions. How would I directly hook 
-them into the ablkcipher without using a reference for inst-
->alg.cra_ablkcipher.geniv?
-
-
-Which approach would fit best?
-
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
