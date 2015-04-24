@@ -1,44 +1,39 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: x86/sha512_ssse3 - fixup for asm function
- prototype change
-Date: Fri, 24 Apr 2015 20:20:13 +0800
-Message-ID: <20150424122012.GA31439@gondor.apana.org.au>
-References: <CAArOQ2U-dSkbNba_dDiO6cgCXDZEQJ8iChBLxxPO=Hi_mn-2Ag@mail.gmail.com>
- <1429857429-13323-1-git-send-email-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: CRYPTO_DEV_IMGTEC_HASH should depend on HAS_DMA
+Date: Fri, 24 Apr 2015 20:20:37 +0800
+Message-ID: <20150424122037.GB31439@gondor.apana.org.au>
+References: <1429812238-9306-1-git-send-email-geert@linux-m68k.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, torvalds@linux-foundation.org,
-	smueller@chronox.de, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, bobbypowers@gmail.com
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:58831 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753151AbbDXMUo (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 24 Apr 2015 08:20:44 -0400
 Content-Disposition: inline
-In-Reply-To: <1429857429-13323-1-git-send-email-ard.biesheuvel@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1429812238-9306-1-git-send-email-geert@linux-m68k.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Apr 24, 2015 at 08:37:09AM +0200, Ard Biesheuvel wrote:
-> Patch e68410ebf626 ("crypto: x86/sha512_ssse3 - move SHA-384/512
-> SSSE3 implementation to base layer") changed the prototypes of the
-> core asm SHA-512 implementations so that they are compatible with
-> the prototype used by the base layer.
+On Thu, Apr 23, 2015 at 08:03:58PM +0200, Geert Uytterhoeven wrote:
+> If NO_DMA=y:
 > 
-> However, in one instance, the register that was used for passing the
-> input buffer was reused as a scratch register later on in the code,
-> and since the input buffer param changed places with the digest param
-> -which needs to be written back before the function returns- this
-> resulted in the scratch register to be dereferenced in a memory write
-> operation, causing a GPF.
+>     drivers/built-in.o: In function `img_hash_write_via_dma_stop':
+>     img-hash.c:(.text+0xa2b822): undefined reference to `dma_unmap_sg'
+>     drivers/built-in.o: In function `img_hash_xmit_dma':
+>     img-hash.c:(.text+0xa2b8d8): undefined reference to `dma_map_sg'
+>     img-hash.c:(.text+0xa2b948): undefined reference to `dma_unmap_sg'
 > 
-> Fix this by changing the scratch register to use the same register as
-> the input buffer param again.
+> Also move the "depends" section below the "tristate" line while we're at
+> it.
 > 
-> Fixes: e68410ebf626 ("crypto: x86/sha512_ssse3 - move SHA-384/512 SSSE3 implementation to base layer")
-> Reported-By: Bobby Powers <bobbypowers@gmail.com>
-> Tested-By: Bobby Powers <bobbypowers@gmail.com>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-Patch applied.  Thanks!
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
