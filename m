@@ -1,39 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: CRYPTO_DEV_IMGTEC_HASH should depend on HAS_DMA
-Date: Fri, 24 Apr 2015 20:20:37 +0800
-Message-ID: <20150424122037.GB31439@gondor.apana.org.au>
-References: <1429812238-9306-1-git-send-email-geert@linux-m68k.org>
+Subject: Re: [PATCH -next] crypto: api: Do not access module name directly
+ from module structure
+Date: Sat, 25 Apr 2015 06:38:03 +0800
+Message-ID: <20150424223803.GB3690@gondor.apana.org.au>
+References: <1429891083-525-1-git-send-email-linux@roeck-us.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:58831 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753151AbbDXMUo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 24 Apr 2015 08:20:44 -0400
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Rusty Russell <rusty@rustcorp.com.au>
+To: Guenter Roeck <linux@roeck-us.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1429812238-9306-1-git-send-email-geert@linux-m68k.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1429891083-525-1-git-send-email-linux@roeck-us.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Apr 23, 2015 at 08:03:58PM +0200, Geert Uytterhoeven wrote:
-> If NO_DMA=y:
+On Fri, Apr 24, 2015 at 08:58:03AM -0700, Guenter Roeck wrote:
+> 'struct module' is only fully declared if CONFIG_MODULES is configured.
+> If not, the build fails with
 > 
->     drivers/built-in.o: In function `img_hash_write_via_dma_stop':
->     img-hash.c:(.text+0xa2b822): undefined reference to `dma_unmap_sg'
->     drivers/built-in.o: In function `img_hash_xmit_dma':
->     img-hash.c:(.text+0xa2b8d8): undefined reference to `dma_map_sg'
->     img-hash.c:(.text+0xa2b948): undefined reference to `dma_unmap_sg'
+> crypto/algapi.c: In function 'crypto_check_module_sig':
+> crypto/algapi.c:49:12: error: dereferencing pointer to incomplete type
 > 
-> Also move the "depends" section below the "tristate" line while we're at
-> it.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Fixes: 59afdc7b3214 ("crypto: api - Move module sig ifdef into accessor
+> 	function")
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Rusty Russell <rusty@rustcorp.com.au>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> ---
+> Seen in next-20150424.
 
-Applied.
+Thanks but a similar patch has already been queued.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
