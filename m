@@ -1,44 +1,66 @@
-From: Guenter Roeck <linux@roeck-us.net>
-Subject: [PATCH -next] crypto: api: Do not access module name directly from module structure
-Date: Fri, 24 Apr 2015 08:58:03 -0700
-Message-ID: <1429891083-525-1-git-send-email-linux@roeck-us.net>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Guenter Roeck <linux@roeck-us.net>,
-	Rusty Russell <rusty@rustcorp.com.au>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Akinobu Mita <akinobu.mita@gmail.com>
+Subject: [PATCH v3 0/5] target: Fix several problems related to T10-PI support
+Date: Sat, 25 Apr 2015 23:33:25 +0900
+Message-ID: <1429972410-7146-1-git-send-email-akinobu.mita@gmail.com>
+Cc: Akinobu Mita <akinobu.mita@gmail.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Nicholas Bellinger <nab@linux-iscsi.org>,
+	Sagi Grimberg <sagig@mellanox.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+To: target-devel@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pd0-f173.google.com ([209.85.192.173]:33498 "EHLO
+	mail-pd0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752090AbbDYOdu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 25 Apr 2015 10:33:50 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-'struct module' is only fully declared if CONFIG_MODULES is configured.
-If not, the build fails with
+This patchset aims to fix several problems related to T10-PI support.
 
-crypto/algapi.c: In function 'crypto_check_module_sig':
-crypto/algapi.c:49:12: error: dereferencing pointer to incomplete type
+These patches can be applied on top of Sagi's "[v1] Simlify dif_verify
+routines and fixup fileio protection information code" patchset.
 
-Fixes: 59afdc7b3214 ("crypto: api - Move module sig ifdef into accessor
-	function")
+* Changes from v2:
+- Introduces crc_t10dif_update() to calculate CRC by mutiple calls
+- Handle odd SG mapping correctly instead of giving up
+
+* Changes from v1:
+- Reduce code duplication a bit in target_read_prot_action()
+- Fix sbc_dif_verify() for WRITE_SAME command
+- Fix inverted rw argument for fd_do_rw()
+- Perform DIF verify before write for WRITE_SAME
+
+Akinobu Mita (5):
+  target: ensure se_cmd->t_prot_sg is allocated when required
+  lib: introduce crc_t10dif_update()
+  target: handle odd SG mapping for data transfer memory
+  target: Fix sbc_dif_generate() and sbc_dif_verify() for WRITE SAME
+  target/file: enable WRITE SAME when protection info is enabled
+
+ drivers/target/target_core_file.c      |  18 +++--
+ drivers/target/target_core_sbc.c       | 136 +++++++++++++++++++++++----------
+ drivers/target/target_core_transport.c |  30 +++++---
+ include/linux/crc-t10dif.h             |   1 +
+ include/target/target_core_base.h      |   1 +
+ lib/crc-t10dif.c                       |  23 ++++++
+ 6 files changed, 153 insertions(+), 56 deletions(-)
+
+Cc: Tim Chen <tim.c.chen@linux.intel.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Rusty Russell <rusty@rustcorp.com.au>
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
-Seen in next-20150424.
-
- crypto/algapi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index c63836f4ff64..3103e6a1282e 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -46,7 +46,7 @@ static inline void crypto_check_module_sig(struct module *mod)
- {
- 	if (fips_enabled && mod && !module_sig_ok(mod))
- 		panic("Module %s signature verification failed in FIPS mode\n",
--		      mod->name);
-+		      module_name(mod));
- }
- 
- static int crypto_check_alg(struct crypto_alg *alg)
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: Nicholas Bellinger <nab@linux-iscsi.org>
+Cc: Sagi Grimberg <sagig@mellanox.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+Cc: target-devel@vger.kernel.org
 -- 
-2.1.0
+1.9.1
