@@ -1,238 +1,140 @@
-From: Akinobu Mita <akinobu.mita@gmail.com>
-Subject: [PATCH v3 3/5] target: handle odd SG mapping for data transfer memory
-Date: Sat, 25 Apr 2015 23:33:28 +0900
-Message-ID: <1429972410-7146-4-git-send-email-akinobu.mita@gmail.com>
-References: <1429972410-7146-1-git-send-email-akinobu.mita@gmail.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Nicholas Bellinger <nab@linux-iscsi.org>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	linux-scsi@vger.kernel.org
-To: target-devel@vger.kernel.org
-Return-path: <target-devel-owner@vger.kernel.org>
-In-Reply-To: <1429972410-7146-1-git-send-email-akinobu.mita@gmail.com>
-Sender: target-devel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH v2 5/6] crypto: drbg - use Jitter RNG to obtain seed
+Date: Sat, 25 Apr 2015 17:45:59 +0200
+Message-ID: <1702706.22yZysTRs1@myon.chronox.de>
+References: <1631051.qmxH657I75@myon.chronox.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Paul Bolle <pebolle@tiscali.nl>, andreas.steffen@strongswan.org,
+	tytso@mit.edu, sandyinchina@gmail.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34317 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933819AbbDYPsJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 25 Apr 2015 11:48:09 -0400
+In-Reply-To: <1631051.qmxH657I75@myon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-sbc_dif_generate() and sbc_dif_verify() currently assume that each
-SG element for data transfer memory doesn't straddle the block size
-boundary.
+During initialization, the DRBG now tries to allocate a handle of the
+Jitter RNG. If such a Jitter RNG is available during seeding, the DRBG
+pulls the required entropy/nonce string from get_random_bytes and
+concatenates it with a string of equal size from the Jitter RNG. That
+combined string is now the seed for the DRBG.
 
-However, when using SG_IO ioctl, we can choose the data transfer
-memory which doesn't satisfy that alignment requirement.
+Written differently, the initial seed of the DRBG is now:
 
-In order to handle such cases correctly, this change inverts the outer
-loop to iterate data transfer memory and the inner loop to iterate
-protection information and enables to calculate CRC for a block which
-straddles multiple SG elements.
+get_random_bytes(entropy/nonce) || jitterentropy (entropy/nonce)
 
-Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
-Cc: Tim Chen <tim.c.chen@linux.intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: Nicholas Bellinger <nab@linux-iscsi.org>
-Cc: Sagi Grimberg <sagig@mellanox.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-Cc: target-devel@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org
+If the Jitter RNG is not available, the DRBG only seeds from
+get_random_bytes.
+
+CC: Andreas Steffen <andreas.steffen@strongswan.org>
+CC: Theodore Ts'o <tytso@mit.edu>
+CC: Sandy Harris <sandyinchina@gmail.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
-* Changes from v2:
-- Handle odd SG mapping correctly instead of giving up
+ crypto/drbg.c         | 46 ++++++++++++++++++++++++++++++++++++++++------
+ include/crypto/drbg.h |  1 +
+ 2 files changed, 41 insertions(+), 6 deletions(-)
 
- drivers/target/target_core_sbc.c | 108 +++++++++++++++++++++++++--------------
- 1 file changed, 69 insertions(+), 39 deletions(-)
-
-diff --git a/drivers/target/target_core_sbc.c b/drivers/target/target_core_sbc.c
-index edba39f..33d2426 100644
---- a/drivers/target/target_core_sbc.c
-+++ b/drivers/target/target_core_sbc.c
-@@ -1182,27 +1182,43 @@ sbc_dif_generate(struct se_cmd *cmd)
- {
- 	struct se_device *dev = cmd->se_dev;
- 	struct se_dif_v1_tuple *sdt;
--	struct scatterlist *dsg, *psg = cmd->t_prot_sg;
-+	struct scatterlist *dsg = cmd->t_data_sg, *psg;
- 	sector_t sector = cmd->t_task_lba;
- 	void *daddr, *paddr;
- 	int i, j, offset = 0;
-+	unsigned int block_size = dev->dev_attrib.block_size;
- 
--	for_each_sg(cmd->t_data_sg, dsg, cmd->t_data_nents, i) {
--		daddr = kmap_atomic(sg_page(dsg)) + dsg->offset;
-+	for_each_sg(cmd->t_prot_sg, psg, cmd->t_prot_nents, i) {
- 		paddr = kmap_atomic(sg_page(psg)) + psg->offset;
-+		daddr = kmap_atomic(sg_page(dsg)) + dsg->offset;
- 
--		for (j = 0; j < dsg->length; j += dev->dev_attrib.block_size) {
-+		for (j = 0; j < psg->length;
-+				j += sizeof(struct se_dif_v1_tuple)) {
-+			__u16 crc = 0;
-+			unsigned int avail;
- 
--			if (offset >= psg->length) {
--				kunmap_atomic(paddr);
--				psg = sg_next(psg);
--				paddr = kmap_atomic(sg_page(psg)) + psg->offset;
--				offset = 0;
-+			if (offset >= dsg->length) {
-+				offset -= dsg->length;
-+				kunmap_atomic(daddr);
-+				dsg = sg_next(dsg);
-+				daddr = kmap_atomic(sg_page(dsg)) + dsg->offset;
- 			}
- 
--			sdt = paddr + offset;
--			sdt->guard_tag = cpu_to_be16(crc_t10dif(daddr + j,
--						dev->dev_attrib.block_size));
-+			sdt = paddr + j;
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 13dd626..fe081e1 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1125,10 +1125,25 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 				 drbg->test_data.len);
+ 		pr_devel("DRBG: using test entropy\n");
+ 	} else {
+-		pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
+-			 drbg->seed_buf_len);
++		/* Get seed from in-kernel /dev/urandom */
+ 		get_random_bytes(drbg->seed_buf, drbg->seed_buf_len);
+-		drbg_string_fill(&data1, drbg->seed_buf, drbg->seed_buf_len);
 +
-+			avail = min(block_size, dsg->length - offset);
-+			crc = crc_t10dif(daddr + offset, avail);
-+			if (avail < block_size) {
-+				kunmap_atomic(daddr);
-+				dsg = sg_next(dsg);
-+				daddr = kmap_atomic(sg_page(dsg)) + dsg->offset;
-+				offset = block_size - avail;
-+				crc = crc_t10dif_update(crc, daddr, offset);
-+			} else {
-+				offset += block_size;
-+			}
-+
-+			sdt->guard_tag = cpu_to_be16(crc);
- 			if (cmd->prot_type == TARGET_DIF_TYPE1_PROT)
- 				sdt->ref_tag = cpu_to_be32(sector & 0xffffffff);
- 			sdt->app_tag = 0;
-@@ -1215,26 +1231,23 @@ sbc_dif_generate(struct se_cmd *cmd)
- 				 be32_to_cpu(sdt->ref_tag));
- 
- 			sector++;
--			offset += sizeof(struct se_dif_v1_tuple);
- 		}
- 
--		kunmap_atomic(paddr);
- 		kunmap_atomic(daddr);
-+		kunmap_atomic(paddr);
++		/* Get seed from Jitter RNG */
++		if (!drbg->jent ||
++		    crypto_rng_get_bytes(drbg->jent,
++					 drbg->seed_buf + drbg->seed_buf_len,
++					 drbg->seed_buf_len)) {
++			pr_info("DRBG: could not obtain random data from Jitter RNG\n");
++			drbg_string_fill(&data1, drbg->seed_buf,
++					 drbg->seed_buf_len);
++			pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
++				 drbg->seed_buf_len);
++		} else {
++			drbg_string_fill(&data1, drbg->seed_buf,
++					 drbg->seed_buf_len * 2);
++			pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
++				 drbg->seed_buf_len * 2);
++		}
  	}
+ 	list_add_tail(&data1.list, &seedlist);
+ 
+@@ -1153,7 +1168,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 	 * Clear the initial entropy buffer as the async call may not overwrite
+ 	 * that buffer for quite some time.
+ 	 */
+-	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len);
++	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len * 2);
+ 	if (ret)
+ 		goto out;
+ 	/*
+@@ -1195,6 +1210,10 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+ #endif
+ 	kzfree(drbg->seed_buf);
+ 	drbg->seed_buf = NULL;
++	if (drbg->jent) {
++		crypto_free_rng(drbg->jent);
++		drbg->jent = NULL;
++	}
  }
  
- static sense_reason_t
- sbc_dif_v1_verify(struct se_cmd *cmd, struct se_dif_v1_tuple *sdt,
--		  const void *p, sector_t sector, unsigned int ei_lba)
-+		  __u16 crc, sector_t sector, unsigned int ei_lba)
- {
--	struct se_device *dev = cmd->se_dev;
--	int block_size = dev->dev_attrib.block_size;
- 	__be16 csum;
- 
- 	if (!(cmd->prot_checks & TARGET_DIF_CHECK_GUARD))
- 		goto check_ref;
- 
--	csum = cpu_to_be16(crc_t10dif(p, block_size));
-+	csum = cpu_to_be16(crc);
- 
- 	if (sdt->guard_tag != csum) {
- 		pr_err("DIFv1 checksum failed on sector %llu guard tag 0x%04x"
-@@ -1316,26 +1329,32 @@ sbc_dif_verify(struct se_cmd *cmd, sector_t start, unsigned int sectors,
- {
- 	struct se_device *dev = cmd->se_dev;
- 	struct se_dif_v1_tuple *sdt;
--	struct scatterlist *dsg;
-+	struct scatterlist *dsg = cmd->t_data_sg;
- 	sector_t sector = start;
- 	void *daddr, *paddr;
--	int i, j;
-+	int i;
- 	sense_reason_t rc;
-+	int dsg_off = 0;
-+	unsigned int block_size = dev->dev_attrib.block_size;
- 
--	for_each_sg(cmd->t_data_sg, dsg, cmd->t_data_nents, i) {
--		daddr = kmap_atomic(sg_page(dsg)) + dsg->offset;
-+	for (; psg && sector < start + sectors; psg = sg_next(psg)) {
- 		paddr = kmap_atomic(sg_page(psg)) + psg->offset;
-+		daddr = kmap_atomic(sg_page(dsg)) + dsg->offset;
- 
--		for (j = 0; j < dsg->length; j += dev->dev_attrib.block_size) {
--
--			if (psg_off >= psg->length) {
--				kunmap_atomic(paddr - psg->offset);
--				psg = sg_next(psg);
--				paddr = kmap_atomic(sg_page(psg)) + psg->offset;
--				psg_off = 0;
-+		for (i = psg_off; i < psg->length &&
-+				sector < start + sectors;
-+				i += sizeof(struct se_dif_v1_tuple)) {
-+			__u16 crc;
-+			unsigned int avail;
-+
-+			if (dsg_off >= dsg->length) {
-+				dsg_off -= dsg->length;
-+				kunmap_atomic(daddr);
-+				dsg = sg_next(dsg);
-+				daddr = kmap_atomic(sg_page(dsg)) + dsg->offset;
- 			}
- 
--			sdt = paddr + psg_off;
-+			sdt = paddr + i;
- 
- 			pr_debug("DIF READ sector: %llu guard_tag: 0x%04x"
- 				 " app_tag: 0x%04x ref_tag: %u\n",
-@@ -1343,27 +1362,38 @@ sbc_dif_verify(struct se_cmd *cmd, sector_t start, unsigned int sectors,
- 				 sdt->app_tag, be32_to_cpu(sdt->ref_tag));
- 
- 			if (sdt->app_tag == cpu_to_be16(0xffff)) {
--				sector++;
--				psg_off += sizeof(struct se_dif_v1_tuple);
--				continue;
-+				dsg_off += block_size;
-+				goto next;
-+			}
-+
-+			avail = min(block_size, dsg->length - dsg_off);
-+
-+			crc = crc_t10dif(daddr + dsg_off, avail);
-+			if (avail < block_size) {
-+				kunmap_atomic(daddr);
-+				dsg = sg_next(dsg);
-+				daddr = kmap_atomic(sg_page(dsg)) + dsg->offset;
-+				dsg_off = block_size - avail;
-+				crc = crc_t10dif_update(crc, daddr, dsg_off);
-+			} else {
-+				dsg_off += block_size;
- 			}
- 
--			rc = sbc_dif_v1_verify(cmd, sdt, daddr + j, sector,
--					       ei_lba);
-+			rc = sbc_dif_v1_verify(cmd, sdt, crc, sector, ei_lba);
- 			if (rc) {
--				kunmap_atomic(paddr - psg->offset);
- 				kunmap_atomic(daddr - dsg->offset);
-+				kunmap_atomic(paddr - psg->offset);
- 				cmd->bad_sector = sector;
- 				return rc;
- 			}
--
-+next:
- 			sector++;
- 			ei_lba++;
--			psg_off += sizeof(struct se_dif_v1_tuple);
- 		}
- 
--		kunmap_atomic(paddr - psg->offset);
-+		psg_off = 0;
- 		kunmap_atomic(daddr - dsg->offset);
-+		kunmap_atomic(paddr - psg->offset);
+ /*
+@@ -1270,12 +1289,27 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 		ret = -EFAULT;
+ 		goto err;
  	}
+-	/* ensure we have sufficient buffer space for initial seed */
++	/*
++	 * Ensure we have sufficient buffer space for initial seed which
++	 * consists of the seed from get_random_bytes and the Jitter RNG.
++	 */
+ 	drbg->seed_buf_len = ((drbg->seed_buf_len + 1) / 2) * 3;
+-	drbg->seed_buf = kzalloc(drbg->seed_buf_len, GFP_KERNEL);
++	drbg->seed_buf = kzalloc(drbg->seed_buf_len * 2, GFP_KERNEL);
+ 	if (!drbg->seed_buf)
+ 		goto err;
  
++	drbg->jent = crypto_alloc_rng("jitterentropy_rng", 0, 0);
++	if(IS_ERR(drbg->jent))
++	{
++		pr_info("DRBG: could not allocate Jitter RNG handle for seeding\n");
++		/*
++		 * As the Jitter RNG is a module that may not be present, we
++		 * continue with the operation and do not fully tie the DRBG
++		 * to the Jitter RNG.
++		 */
++		drbg->jent = NULL;
++	}
++
  	return 0;
+ 
+ err:
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index e4980a1..fabf102 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -122,6 +122,7 @@ struct drbg_state {
+ 	struct random_work seed_work;	/* asynchronous seeding support */
+ 	u8 *seed_buf;			/* buffer holding the seed */
+ 	size_t seed_buf_len;
++	struct crypto_rng *jent;
+ 	const struct drbg_state_ops *d_ops;
+ 	const struct drbg_core *core;
+ 	struct drbg_string test_data;
 -- 
-1.9.1
+2.1.0
