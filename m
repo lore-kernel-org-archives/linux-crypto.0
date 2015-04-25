@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v2 2/6] random: Async and sync API for accessing kernel_pool
-Date: Sat, 25 Apr 2015 17:41:12 +0200
-Message-ID: <1528499.qXc2UF8N4S@myon.chronox.de>
+Subject: [PATCH v2 1/6] random: Addition of kernel_pool
+Date: Sat, 25 Apr 2015 17:40:41 +0200
+Message-ID: <3407082.JU6Cks92ze@myon.chronox.de>
 References: <1631051.qmxH657I75@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -15,191 +15,130 @@ In-Reply-To: <1631051.qmxH657I75@myon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The kernel_pool is intended to be the in-kernel equivalent to the
-blocking_pool, i.e. requests for random data may be blocked if
-insufficient entropy is present.
+The kernel pool is intended to serve kernel-internal callers only.
+Its purpose and usage is identical to the blocking_pool.
 
-The added API calls provide a synchronous function call
-get_blocking_random_bytes where the caller is blocked.
+As the kernel_pool is not available to user space, user space cannot
+directly interfere with the blocking behavior when obtaining
+data from the kernel_pool. Thus, if entropy is present in the
+kernel_pool, user space can hog /dev/random and yet the kernel
+internal requestor of random numbers that are generated equally
+to the blocking_pool (i.e. with the blocking behavior) will not
+be affected until data is needed from the input_pool.
 
-In addition, an asynchronous API call of get_blocking_random_bytes_cb
-is provided which returns immediately to the caller after submitting
-the request for random data. The caller-provided buffer that shall be
-filled with random data is filled up as available entropy permits. The
-caller may provide a callback function that is invoked once the
-request is completed.
-
-A third API call, get_blocking_random_bytes_cancel, is provided to
-cancel the random number gathering operation.
+The patch treats the kernel_pool fully equally to the blocking and
+nonblocking pool with respect to the initialization and update. As now
+there are three output pools, the patch adds a round-robin logic for
+processing additional entropy when the input_pool is nearly full.
 
 CC: Andreas Steffen <andreas.steffen@strongswan.org>
 CC: Theodore Ts'o <tytso@mit.edu>
 CC: Sandy Harris <sandyinchina@gmail.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/random.c  | 116 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/random.h |  20 +++++++++
- 2 files changed, 136 insertions(+)
+ drivers/char/random.c | 52 ++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 39 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 2868754..fa4dd48 100644
+index 9cd6968..2868754 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -1804,3 +1804,119 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
- 	credit_entropy_bits(poolp, entropy);
- }
- EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
-+
-+static bool get_blocking_random_bytes_term(bool *cancel)
-+{
-+	if (ENTROPY_BITS(&input_pool) >= random_read_wakeup_bits)
-+		return true;
-+	return *cancel;
-+}
-+
-+/*
-+ * Equivalent function to get_random_bytes with the difference that this
-+ * function blocks the request in a similar fashion as random_read(),
-+ * implementing a /dev/random device for in-kernel users.
-+ *
-+ * This function may sleep.
-+ *
-+ * @buf caller allocated buffer filled with random data
-+ * @nbytes requested number of bytes -- buffer should be at least as big
-+ * @cancel pointer to variable that can be used to cancel the collection
-+ *	   operation. If this boolean is set to true, the collection operation
-+ *	   is terminated immediately. When it is set to true during the
-+ *	   collection loop, the collection is terminated immediately.
-+ *
-+ * return: positive value: obtained number of bytes on successful
-+ *	   negative value: error code on error
-+ */
-+ssize_t get_blocking_random_bytes(void *buf, ssize_t nbytes, bool *cancel)
-+{
-+	ssize_t ret = 0;
-+
-+	if (nbytes <= 0)
-+		return nbytes;
-+	BUG_ON(!buf);
-+
-+	while (ret < nbytes) {
-+		ssize_t round = 0;
-+		ssize_t pull = min_t(ssize_t, (nbytes - ret), SEC_XFER_SIZE);
-+
-+		if (*cancel)
-+			return ret;
-+		round = extract_entropy(&kernel_pool, (buf + ret), pull, 0, 0);
-+		if (0 > round)
-+			return round;
-+		if (0 == round)
-+			wait_event_interruptible(random_kernel_wait,
-+				get_blocking_random_bytes_term(cancel));
-+		ret += round;
-+	}
-+	return ret;
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes);
-+
-+/*
-+ * Immediate canceling the collection operation for the random_work
-+ */
-+void get_blocking_random_bytes_cancel(struct random_work *rw)
-+{
-+	rw->cancel = true;
-+	wake_up_interruptible(&random_kernel_wait);
-+
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes_cancel);
-+
-+static void get_blocking_random_bytes_work(struct work_struct *work)
-+{
-+	struct random_work *rw = container_of(work, struct random_work,
-+					      rw_work);
-+	ssize_t ret;
-+
-+	ret = get_blocking_random_bytes(rw->rw_buf, rw->rw_len, &rw->cancel);
-+	if (rw->rw_cb)
-+		rw->rw_cb(rw->rw_buf, ret, rw->private);
-+}
-+
-+/*
-+ * Asynchronous invocation of the blocking interface. The function
-+ * queues the request in either the private work queue supplied with the
-+ * wq argument or in the general work queue framework if wq is NULL.
-+ * Once the request is completed or upon receiving an error, the callback
-+ * function of cb is called, if not NULL, to inform the caller about the
-+ * completion of its operation.
-+ *
-+ * If a caller wants to cancel the work (e.g. in the module_exit function),
-+ * simply call
-+ *	get_blocking_random_bytes_cancel(&my_random_work);
-+ *	cancel_work_sync(&my_random_work.rw_work);
-+ *
-+ * @wq pointer to private work queue or NULL - input
-+ * @rw handle to the work queue frame - output
-+ * @buf allocated buffer where random numbers are to be stored
-+ * @nbytes size of buf and implicitly number of bytes requested
-+ * @private pointer to data that is not processed by here, but handed to the
-+ *	    callback function to allow the caller to maintain a state
-+ * @cb callback function where
-+ *	* buf holds the pointer to buf will be supplied
-+ *	* buflen holds the length of the gathered random numbers or error code
-+ *	  of the generation function.
-+ *	* private provides a reference to the private data pointer
-+ */
-+void get_blocking_random_bytes_cb(struct workqueue_struct *wq,
-+				  struct random_work *rw,
-+				  u8 *buf, ssize_t nbytes, void *private,
-+				  void (*cb)(void *buf, ssize_t buflen,
-+					     void *private))
-+{
-+	rw->rw_buf = buf;
-+	rw->rw_len = nbytes;
-+	rw->private = private;
-+	rw->rw_cb = cb;
-+	rw->cancel = false;
-+	INIT_WORK(&rw->rw_work, get_blocking_random_bytes_work);
-+	if (wq)
-+		queue_work(wq, &rw->rw_work);
-+	else
-+		schedule_work(&rw->rw_work);
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes_cb);
-diff --git a/include/linux/random.h b/include/linux/random.h
-index b05856e..960803b 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -7,6 +7,7 @@
- #define _LINUX_RANDOM_H
+@@ -407,6 +407,7 @@ static struct poolinfo {
+ static DECLARE_WAIT_QUEUE_HEAD(random_read_wait);
+ static DECLARE_WAIT_QUEUE_HEAD(random_write_wait);
+ static DECLARE_WAIT_QUEUE_HEAD(urandom_init_wait);
++static DECLARE_WAIT_QUEUE_HEAD(random_kernel_wait);
+ static struct fasync_struct *fasync;
  
- #include <uapi/linux/random.h>
-+#include <linux/workqueue.h>
+ /**********************************************************************
+@@ -442,6 +443,7 @@ static void push_to_pool(struct work_struct *work);
+ static __u32 input_pool_data[INPUT_POOL_WORDS];
+ static __u32 blocking_pool_data[OUTPUT_POOL_WORDS];
+ static __u32 nonblocking_pool_data[OUTPUT_POOL_WORDS];
++static __u32 kernel_pool_data[OUTPUT_POOL_WORDS];
  
- extern void add_device_randomness(const void *, unsigned int);
- extern void add_input_randomness(unsigned int type, unsigned int code,
-@@ -112,4 +113,23 @@ static inline u32 next_pseudo_random32(u32 seed)
- 	return seed * 1664525 + 1013904223;
- }
+ static struct entropy_store input_pool = {
+ 	.poolinfo = &poolinfo_table[0],
+@@ -472,6 +474,17 @@ static struct entropy_store nonblocking_pool = {
+ 					push_to_pool),
+ };
  
-+/* API for asynchronous in-kernel operation */
-+struct random_work {
-+	struct work_struct	rw_work;
-+	u8			*rw_buf;
-+	ssize_t			rw_len;
-+	void			*private;
-+	void			(*rw_cb)(void *buf, ssize_t buflen,
-+					 void *private);
-+	bool			cancel;
++static struct entropy_store kernel_pool = {
++	.poolinfo = &poolinfo_table[1],
++	.name = "kernel",
++	.limit = 1,
++	.pull = &input_pool,
++	.lock = __SPIN_LOCK_UNLOCKED(kernel_pool.lock),
++	.pool = kernel_pool_data,
++	.push_work = __WORK_INITIALIZER(kernel_pool.push_work,
++					push_to_pool),
 +};
 +
-+ssize_t get_blocking_random_bytes(void *buf, ssize_t nbytes, bool *cancel);
-+void get_blocking_random_bytes_cancel(struct random_work *rw);
-+void get_blocking_random_bytes_cb(struct workqueue_struct *wq,
-+				  struct random_work *rw,
-+				  u8 *buf, ssize_t nbytes, void *private,
-+				  void (*cb)(void *buf, ssize_t buflen,
-+					     void *private));
-+
- #endif /* _LINUX_RANDOM_H */
+ static __u32 const twist_table[8] = {
+ 	0x00000000, 0x3b6e20c8, 0x76dc4190, 0x4db26158,
+ 	0xedb88320, 0xd6d6a3e8, 0x9b64c2b0, 0xa00ae278 };
+@@ -674,29 +687,41 @@ retry:
+ 
+ 		/* should we wake readers? */
+ 		if (entropy_bits >= random_read_wakeup_bits) {
++			wake_up_interruptible(&random_kernel_wait);
+ 			wake_up_interruptible(&random_read_wait);
+ 			kill_fasync(&fasync, SIGIO, POLL_IN);
+ 		}
+ 		/* If the input pool is getting full, send some
+-		 * entropy to the two output pools, flipping back and
++		 * entropy to the output pools, flipping back and
+ 		 * forth between them, until the output pools are 75%
+ 		 * full.
+ 		 */
+ 		if (entropy_bits > random_write_wakeup_bits &&
+ 		    r->initialized &&
+ 		    r->entropy_total >= 2*random_read_wakeup_bits) {
+-			static struct entropy_store *last = &blocking_pool;
+-			struct entropy_store *other = &blocking_pool;
+-
+-			if (last == &blocking_pool)
+-				other = &nonblocking_pool;
+-			if (other->entropy_count <=
+-			    3 * other->poolinfo->poolfracbits / 4)
+-				last = other;
+-			if (last->entropy_count <=
+-			    3 * last->poolinfo->poolfracbits / 4) {
+-				schedule_work(&last->push_work);
+-				r->entropy_total = 0;
++#define NUM_OUTPUT_POOLS 3
++			/* as we will recalculate this variable first thing in
++			 * the loop, it will point to the first output pool
++			 * after the first recalculation */
++			static int selected_pool = (NUM_OUTPUT_POOLS - 1);
++			int i = 0;
++			struct entropy_store *output_pools[NUM_OUTPUT_POOLS] = {
++				&blocking_pool,
++				&nonblocking_pool,
++				&kernel_pool};
++			/* select the next pool that has less than 75% fill
++			 * rate */
++			for (i = 0; NUM_OUTPUT_POOLS > i; i++) {
++				struct entropy_store *p = NULL;
++				selected_pool =
++					(selected_pool + 1) % NUM_OUTPUT_POOLS;
++				p = output_pools[selected_pool];
++				if (p->entropy_count <=
++					p->poolinfo->poolfracbits / 4) {
++					schedule_work(&p->push_work);
++					r->entropy_total = 0;
++					break;
++				}
+ 			}
+ 		}
+ 	}
+@@ -1318,6 +1343,7 @@ static int rand_initialize(void)
+ 	init_std_data(&input_pool);
+ 	init_std_data(&blocking_pool);
+ 	init_std_data(&nonblocking_pool);
++	init_std_data(&kernel_pool);
+ 	return 0;
+ }
+ early_initcall(rand_initialize);
 -- 
 2.1.0
