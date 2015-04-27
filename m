@@ -1,68 +1,61 @@
-From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Subject: Re: Sahara performance on i.MX53
-Date: Mon, 27 Apr 2015 19:34:05 +0200
-Message-ID: <20150427173405.GR19889@pengutronix.de>
-References: <553E6EE6.2050803@parkeon.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [BUG/PATCH] kernel RNG and its secrets
+Date: Mon, 27 Apr 2015 21:10:14 +0200
+Message-ID: <11353383.zL7vZDIZ69@tauon>
+References: <20150318095345.GA12923@zoho.com> <5527E22C.9080909@iogearbox.net> <2604864.n87lBBrmsR@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-To: Martin Fuzzey <mfuzzey@parkeon.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Hannes Frederic Sowa <hannes@stressinduktion.org>,
+	mancha <mancha1@zoho.com>, tytso@mit.edu,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au, dborkman@redhat.com
+To: Daniel Borkmann <daniel@iogearbox.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:49673 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932817AbbD0ReI (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Apr 2015 13:34:08 -0400
-Content-Disposition: inline
-In-Reply-To: <553E6EE6.2050803@parkeon.com>
+Received: from mail.eperm.de ([89.247.134.16]:34544 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S965122AbbD0TK4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 27 Apr 2015 15:10:56 -0400
+In-Reply-To: <2604864.n87lBBrmsR@tauon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
+Am Freitag, 10. April 2015, 16:50:22 schrieb Stephan Mueller:
 
-On Mon, Apr 27, 2015 at 07:16:22PM +0200, Martin Fuzzey wrote:
-> Hi,
-> 
-> I've been trying the Sahara crypto module on i.MX53 [mainline 3.19
-> kernel + b251638c46a (crypto: sahara - use the backlog)]
-> 
-> I tested using dm-crypt with AES-128:
-> cryptsetup -v  --key-size=128 luksFormat /dev/mmcblk0p7
-> cryptsetup luksOpen /dev/mmcblk0p7 cryptotest
-> 
-> dd if=/dev/mapper/cryptotest of=/dev/null bs=1M count=100
-> 
-> 
-> CPU Freq (MHz)       Time (s) WITHOUT Sahara        Time (s) WITH Sahara
-> 1200                          3.26         5.34
-> 1000                          3.26         5.62
-> 800                            4.0           6.24
-> 400                            7.72         9.86
-> 166                            18.42       18.87
-> 
-> I was hoping for something better.
-> There is a reduction in CPU usage as expected but the performance
-> figures aren't looking very good.
-> As this is in kernel use by dm-crypt cryptodev or af_alg aren't involved.
-> 
-> Has anyone else done any measurements?
-> 
+Hi Stephan,
 
-Yes. My measurements wheren't overwhelming either. :-(
-The problem with the Sahara is: NDAs. So, I am Jon Snow
-and know nothing :-(
+>Am Freitag, 10. April 2015, 16:46:04 schrieb Daniel Borkmann:
+>
+>Hi Daniel,
+>
+>>On 04/10/2015 04:36 PM, Stephan Mueller wrote:
+>>> Am Freitag, 10. April 2015, 16:26:00 schrieb Hannes Frederic Sowa:
+>>...
+>>
+>>>> I suspected a problem in how volatile with non-present output args could
+>>>> be different, but this seems not to be the case.
+>>>> 
+>>>> I would contact llvm/clang mailing list and ask. Maybe there is a
+>>>> problem? It seems kind of strange to me...
+>>
+>>+1
+>>
+>>> Do you really think this is a compiler issue?
+>>
+>>If clang/LLVM advertises "GCC compatibility", then this would
+>>certainly be a different behavior.
+>
+>As you wish. I will contact the clang folks. As the proposed fix is not super
+>urgend, I think we can leave it until I got word from clang.
 
-Everything I do know, is from the Freescale kernel git repo.
-Maybe I missed something. The FSL driver is very cryptic if
-you ask me; so it is absolutely possible.
+I posted the issue on the clang mailing list on April 10 -- no word so far. I 
+would interpret this as a sign that it is a no-issue for them.
 
-Regards,
-Steffen
+Thus, I propose we update our memzero_explicit implementation to use
 
--- 
-Pengutronix e.K.                           |                             |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+__asm__ __volatile__("" : "=r" (s) : "0" (s) : "memory");
+
+Concerns?
+
+Ciao
+Stephan
