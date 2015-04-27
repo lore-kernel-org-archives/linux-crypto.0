@@ -1,39 +1,42 @@
-From: Bruce Allan <bruce.w.allan@intel.com>
-Subject: [PATCH] crypto: qat - do not duplicate string containing firmware
- name
-Date: Mon, 27 Apr 2015 13:58:27 -0700
-Message-ID: <20150427205827.27002.45117.stgit@bwallan-smackover2.jf.intel.com>
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v3 2/5] lib: introduce crc_t10dif_update()
+Date: Mon, 27 Apr 2015 19:41:14 -0400
+Message-ID: <yq1y4lduokl.fsf@sermon.lab.mkp.net>
+References: <1429972410-7146-1-git-send-email-akinobu.mita@gmail.com>
+	<1429972410-7146-3-git-send-email-akinobu.mita@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-To: linux-crypto@vger.kernel.org
+Content-Type: text/plain
+Cc: target-devel@vger.kernel.org,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Nicholas Bellinger <nab@linux-iscsi.org>,
+	Sagi Grimberg <sagig@mellanox.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+To: Akinobu Mita <akinobu.mita@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:41019 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965081AbbD0U62 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Apr 2015 16:58:28 -0400
-Received: from bwallan-smackover2.jf.intel.com (localhost.localdomain [127.0.0.1])
-	by bwallan-smackover2.jf.intel.com (8.14.8/8.14.8) with ESMTP id t3RKwRLR027024
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2015 13:58:27 -0700
+Received: from aserp1040.oracle.com ([141.146.126.69]:27615 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751283AbbD0Xlj (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 27 Apr 2015 19:41:39 -0400
+In-Reply-To: <1429972410-7146-3-git-send-email-akinobu.mita@gmail.com>
+	(Akinobu Mita's message of "Sat, 25 Apr 2015 23:33:27 +0900")
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use ADF_DH895XCC_FW instead of duplicating the string "qat_895xcc.bin"
-when referring to the DH895xCC firmware.
+>>>>> "Akinobu" == Akinobu Mita <akinobu.mita@gmail.com> writes:
 
-Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
----
- drivers/crypto/qat/qat_dh895xcc/adf_drv.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Akinobu> This introduces crc_t10dif_update() which enables to calculate
+Akinobu> CRC for a block which straddles multiple SG elements by calling
+Akinobu> multiple times.
 
-diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-index 9decea2..c1b3f0b 100644
---- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-+++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
-@@ -417,5 +417,5 @@ module_exit(adfdrv_release);
- 
- MODULE_LICENSE("Dual BSD/GPL");
- MODULE_AUTHOR("Intel");
--MODULE_FIRMWARE("qat_895xcc.bin");
-+MODULE_FIRMWARE(ADF_DH895XCC_FW);
- MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
+Looks good. We need this for the initiator side too.
+
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
