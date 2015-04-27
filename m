@@ -1,53 +1,53 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2] crypto: add key wrapping block chaining mode
-Date: Mon, 27 Apr 2015 16:58:51 +0200
-Message-ID: <3344357.7kIb8DDjMB@tauon>
-References: <1515730.LIeS5qas5m@myon.chronox.de> <3407264.GJDOVGtEDe@myon.chronox.de> <20150427082935.GA21691@gondor.apana.org.au>
+From: Martin Fuzzey <mfuzzey@parkeon.com>
+Subject: Sahara performance on i.MX53
+Date: Mon, 27 Apr 2015 19:16:22 +0200
+Message-ID: <553E6EE6.2050803@parkeon.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
+To: linux-crypto@vger.kernel.org,
+	Steffen Trumtrar <s.trumtrar@pengutronix.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34535 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S964784AbbD0O65 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Apr 2015 10:58:57 -0400
-In-Reply-To: <20150427082935.GA21691@gondor.apana.org.au>
+Received: from mail-wg0-f45.google.com ([74.125.82.45]:36522 "EHLO
+	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932208AbbD0RQZ (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 27 Apr 2015 13:16:25 -0400
+Received: by wgen6 with SMTP id n6so123332747wge.3
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2015 10:16:24 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 27. April 2015, 16:29:35 schrieb Herbert Xu:
+Hi,
 
-Hi Herbert,
+I've been trying the Sahara crypto module on i.MX53 [mainline 3.19 
+kernel + b251638c46a (crypto: sahara - use the backlog)]
 
->On Sun, Apr 26, 2015 at 12:08:20AM +0200, Stephan Mueller wrote:
->> This patch implements the AES key wrapping as specified in
->> NIST SP800-38F and RFC3394.
->
->This is my attempt at turning kw into a givcipher.  The encrypt
->part is complete but untested as I gave up after finding the
->reverse SG problem with your decrypt code.
+I tested using dm-crypt with AES-128:
+cryptsetup -v  --key-size=128 luksFormat /dev/mmcblk0p7
+cryptsetup luksOpen /dev/mmcblk0p7 cryptotest
 
-Is it that easy? I was struggling to understand what to do in the alloc 
-function.
-
-Thank you very much for that hint.
-
->static int crypto_kw_givdecrypt(struct skcipher_givcrypt_request *req)
->{
->	int err = crypto_kw_decrypt(&req->creq);
->
->	if (err)
->		return err;
->
->	return memcmp(req->creq.info, "\xA6\xA6\xA6\xA6\xA6\xA6\xA6\xA6",
->		      SEMIBSIZE) ? -EBADMSG : 0;
-
-This memcmp implies that the final block->A from the decrypt is memcpy'ed to 
-req->creq.info. I wanted to avoid any additional memcpy calls to not hurt 
-performance even more.
+dd if=/dev/mapper/cryptotest of=/dev/null bs=1M count=100
 
 
-Ciao
-Stephan
+CPU Freq (MHz)       Time (s) WITHOUT Sahara        Time (s) WITH Sahara
+1200                          3.26         5.34
+1000                          3.26         5.62
+800                            4.0           6.24
+400                            7.72         9.86
+166                            18.42       18.87
+
+I was hoping for something better.
+There is a reduction in CPU usage as expected but the performance 
+figures aren't looking very good.
+As this is in kernel use by dm-crypt cryptodev or af_alg aren't involved.
+
+Has anyone else done any measurements?
+
+Something wrong with my setup or with my expectations?
+
+Regards,
+
+Martin
