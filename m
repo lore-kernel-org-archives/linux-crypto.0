@@ -1,32 +1,39 @@
-From: Daniel Borkmann <daniel@iogearbox.net>
-Subject: Re: [BUG/PATCH] kernel RNG and its secrets
-Date: Mon, 27 Apr 2015 22:53:18 +0200
-Message-ID: <553EA1BE.2010005@iogearbox.net>
-References: <20150318095345.GA12923@zoho.com> <11353383.zL7vZDIZ69@tauon> <553E9D56.1020202@iogearbox.net> <3111959.ZXZJYjVLIH@myon.chronox.de>
+From: Bruce Allan <bruce.w.allan@intel.com>
+Subject: [PATCH] crypto: qat - do not duplicate string containing firmware
+ name
+Date: Mon, 27 Apr 2015 13:58:27 -0700
+Message-ID: <20150427205827.27002.45117.stgit@bwallan-smackover2.jf.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	mancha <mancha1@zoho.com>, tytso@mit.edu,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au, dborkman@redhat.com
-To: Stephan Mueller <smueller@chronox.de>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www62.your-server.de ([213.133.104.62]:33784 "EHLO
-	www62.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965148AbbD0UxY (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Apr 2015 16:53:24 -0400
-In-Reply-To: <3111959.ZXZJYjVLIH@myon.chronox.de>
+Received: from mga11.intel.com ([192.55.52.93]:41019 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S965081AbbD0U62 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 27 Apr 2015 16:58:28 -0400
+Received: from bwallan-smackover2.jf.intel.com (localhost.localdomain [127.0.0.1])
+	by bwallan-smackover2.jf.intel.com (8.14.8/8.14.8) with ESMTP id t3RKwRLR027024
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2015 13:58:27 -0700
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 04/27/2015 10:41 PM, Stephan Mueller wrote:
-...
-> It seems you have the code already in mind, so please if you could write it
-> :-)
+Use ADF_DH895XCC_FW instead of duplicating the string "qat_895xcc.bin"
+when referring to the DH895xCC firmware.
 
-Ok, sure. I'll cook something by tomorrow morning.
+Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
+---
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
-Daniel
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+index 9decea2..c1b3f0b 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+@@ -417,5 +417,5 @@ module_exit(adfdrv_release);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_AUTHOR("Intel");
+-MODULE_FIRMWARE("qat_895xcc.bin");
++MODULE_FIRMWARE(ADF_DH895XCC_FW);
+ MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
