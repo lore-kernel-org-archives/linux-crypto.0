@@ -1,58 +1,47 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2] SP800-38F / RFC3394 key wrapping
-Date: Tue, 28 Apr 2015 04:45:17 +0200
-Message-ID: <1742335.S7ujyfP8MQ@myon.chronox.de>
-References: <1515730.LIeS5qas5m@myon.chronox.de> <20150428010941.GA28820@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: add key wrapping block chaining mode
+Date: Tue, 28 Apr 2015 10:50:40 +0800
+Message-ID: <20150428025040.GA29738@gondor.apana.org.au>
+References: <1515730.LIeS5qas5m@myon.chronox.de>
+ <2485784.4PBTOVspUY@tauon>
+ <20150428011047.GB28820@gondor.apana.org.au>
+ <23448160.9Lv9TcfRHB@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34564 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932082AbbD1CrD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Apr 2015 22:47:03 -0400
-In-Reply-To: <20150428010941.GA28820@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:40032 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932840AbbD1Cuq (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 27 Apr 2015 22:50:46 -0400
+Content-Disposition: inline
+In-Reply-To: <23448160.9Lv9TcfRHB@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 28. April 2015, 09:09:41 schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Sun, Apr 26, 2015 at 12:07:31AM +0200, Stephan Mueller wrote:
-> > Hi,
-> > 
-> > Please note that this patch will conflict with the DRBG patch for
-> > additional seeding sent earlier today. Both add test vectors in
-> > testmgr.c between the existing hmac() and lrw() due to the ordering
-> > requirements of testmgr.c.
+On Tue, Apr 28, 2015 at 04:35:57AM +0200, Stephan Mueller wrote:
+>
+> In this case, shouldn't we just have a loop where:
 > 
-> Can you clarify the use case of this algorithm? In particular,
-> who is going to use it in the kernel? This doesn't seem to be
-> a candidate for use via algif since there aren't any or aren't
-> likely going to be any hardware implementations.
+> 1. from the given endpoint, we go a semiblock back
 > 
-> If we can narrow down who is going to use it perhaps we can then
-> figure out the appropriate interface for this.
+> 2. now we see how many bytes we get when fetching the SG list till the end,
+> 
+> 3a. if answer from 2 is semiblock or larger -> fetch it and exit
+> 
+> 3b. if answer from 2 is less than a semiblock, fetch the available data, 
+> advance to the next SGL and go to step 2 to try to fetch semiblock - obtained 
+> data.
 
-The use case I see goes along the lines of dm-crypt and Ext4 crypto, or 
-ecryptfs:
+The problem is that the SG list is not designed to be walked over
+backwards.  So you always have to start from the beginning and go
+to the end, for every block.  There is no easy way of saying give
+me the next SG.  You have to go back to the beginning and find it.
 
-For the key wrapping they all do, I am thinking about suggesting KW as it has 
-one advantage no other cipher currently has: it is an authenticated decryption 
-where I still only need one symmetric key. Yes, KW is inefficient compared to 
-other ciphers, but for handling small data blobs, it should be just fine.
-
-For example, dm-crypt: dm-crypt currently uses the same cipher used for the 
-bulk encryption to wrap the LUKS header. Obviously we miss the authentication 
-check of the data blob. So, we could use other authenticated schemas, like GCM 
-or authenc(). But they all need either two keys or AAD for which the common 
-mechanisms typically have no provisions. Therefore, KW is a drop-in 
-replacement for standard symmetric ciphers where one want authentication as 
-well.
-
+Cheers,
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
