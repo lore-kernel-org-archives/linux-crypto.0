@@ -1,40 +1,36 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] SP800-38F / RFC3394 key wrapping
-Date: Tue, 28 Apr 2015 09:09:41 +0800
-Message-ID: <20150428010941.GA28820@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: add key wrapping block chaining mode
+Date: Tue, 28 Apr 2015 09:10:47 +0800
+Message-ID: <20150428011047.GB28820@gondor.apana.org.au>
 References: <1515730.LIeS5qas5m@myon.chronox.de>
+ <3407264.GJDOVGtEDe@myon.chronox.de>
+ <20150427082607.GA21590@gondor.apana.org.au>
+ <2485784.4PBTOVspUY@tauon>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51682 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:40229 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751629AbbD1BJr (ORCPT
+	with ESMTP id S1752727AbbD1BKu (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Apr 2015 21:09:47 -0400
+	Mon, 27 Apr 2015 21:10:50 -0400
 Content-Disposition: inline
-In-Reply-To: <1515730.LIeS5qas5m@myon.chronox.de>
+In-Reply-To: <2485784.4PBTOVspUY@tauon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Apr 26, 2015 at 12:07:31AM +0200, Stephan Mueller wrote:
-> Hi,
-> 
-> Please note that this patch will conflict with the DRBG patch for
-> additional seeding sent earlier today. Both add test vectors in
-> testmgr.c between the existing hmac() and lrw() due to the ordering
-> requirements of testmgr.c.
+On Mon, Apr 27, 2015 at 04:34:19PM +0200, Stephan Mueller wrote:
+>
+> Why do you think that will not work? I thought that the code works when the 
+> non-linear scatterlists are at least broken at an 8 byte boundary.
 
-Can you clarify the use case of this algorithm? In particular,
-who is going to use it in the kernel? This doesn't seem to be
-a candidate for use via algif since there aren't any or aren't
-likely going to be any hardware implementations.
+There is no guarantee that SG lists are set at 8-byte boundaries.
+In fact, you need to be able to handle any SG list, including the
+worst-case 1-byte per-entry SG lists.
 
-If we can narrow down who is going to use it perhaps we can then
-figure out the appropriate interface for this.
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
