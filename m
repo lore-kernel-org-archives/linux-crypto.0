@@ -1,158 +1,154 @@
-From: Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH crypto-2.6] lib: make memzero_explicit more robust against dead store elimination
-Date: Tue, 28 Apr 2015 17:22:20 +0200
-Message-ID: <85dfdd23d98412a183546e2e7659a6a2bed1fca8.1430230786.git.daniel@iogearbox.net>
-Cc: linux-crypto@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Stephan Mueller <smueller@chronox.de>,
-	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	mancha security <mancha1@zoho.com>,
-	Mark Charlebois <charlebm@gmail.com>,
-	Behan Webster <behanw@converseincode.com>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www62.your-server.de ([213.133.104.62]:60564 "EHLO
-	www62.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965792AbbD1PWa (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 28 Apr 2015 11:22:30 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v3 2/5] lib: introduce crc_t10dif_update()
+Date: Tue, 28 Apr 2015 10:38:36 -0700
+Message-ID: <1430242716.660.70.camel@schen9-desk2.jf.intel.com>
+References: <1429972410-7146-1-git-send-email-akinobu.mita@gmail.com>
+	 <1429972410-7146-3-git-send-email-akinobu.mita@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: target-devel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Nicholas Bellinger <nab@linux-iscsi.org>,
+	Sagi Grimberg <sagig@mellanox.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+To: Akinobu Mita <akinobu.mita@gmail.com>
+Return-path: <target-devel-owner@vger.kernel.org>
+In-Reply-To: <1429972410-7146-3-git-send-email-akinobu.mita@gmail.com>
+Sender: target-devel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-In commit 0b053c951829 ("lib: memzero_explicit: use barrier instead
-of OPTIMIZER_HIDE_VAR"), we made memzero_explicit() more robust in
-case LTO would decide to inline memzero_explicit() and eventually
-find out it could be elimiated as dead store.
+On Sat, 2015-04-25 at 23:33 +0900, Akinobu Mita wrote:
+> This introduces crc_t10dif_update() which enables to calculate CRC
+> for a block which straddles multiple SG elements by calling multiple
+> times.
+> 
+> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
+> Cc: Tim Chen <tim.c.chen@linux.intel.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: Nicholas Bellinger <nab@linux-iscsi.org>
+> Cc: Sagi Grimberg <sagig@mellanox.com>
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+> Cc: target-devel@vger.kernel.org
+> ---
+> * New patch from v3
+> 
+>  include/linux/crc-t10dif.h |  1 +
+>  lib/crc-t10dif.c           | 23 +++++++++++++++++++++++
+>  2 files changed, 24 insertions(+)
+> 
+> diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
+> index cf53d07..d81961e 100644
+> --- a/include/linux/crc-t10dif.h
+> +++ b/include/linux/crc-t10dif.h
+> @@ -9,5 +9,6 @@
+>  extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
+>  				size_t len);
+>  extern __u16 crc_t10dif(unsigned char const *, size_t);
+> +extern __u16 crc_t10dif_update(__u16 crc, unsigned char const *, size_t);
+>  
+>  #endif
+> diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
+> index dfe6ec1..7cdbe2e 100644
+> --- a/lib/crc-t10dif.c
+> +++ b/lib/crc-t10dif.c
+> @@ -19,6 +19,29 @@
+>  static struct crypto_shash *crct10dif_tfm;
+>  static struct static_key crct10dif_fallback __read_mostly;
+>  
+> +__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
+> +{
+> +	struct {
+> +		struct shash_desc shash;
+> +		char ctx[2];
+> +	} desc;
+> +	int err;
+> +
+> +	if (static_key_false(&crct10dif_fallback))
+> +		return crc_t10dif_generic(crc, buffer, len);
+> +
+> +	desc.shash.tfm = crct10dif_tfm;
+> +	desc.shash.flags = 0;
+> +
+> +	err = crypto_shash_import(&desc.shash, &crc);
+> +	BUG_ON(err);
+> +	err = crypto_shash_update(&desc.shash, buffer, len);
+> +	BUG_ON(err);
+> +
+> +	return *(__u16 *)desc.ctx;
+> +}
+> +EXPORT_SYMBOL(crc_t10dif_update);
+> +
+>  __u16 crc_t10dif(const unsigned char *buffer, size_t len)
+>  {
+>  	struct {
 
-While using barrier() works well for the case of gcc, recent efforts
-from LLVMLinux people suggest to use llvm as an alternative to gcc,
-and there, Stephan found in a simple stand-alone user space example
-that llvm could nevertheless optimize and thus elimitate the memset().
-A similar issue has been observed in the referenced llvm bug report,
-which is regarded as not-a-bug.
 
-The fix in this patch now works for both compilers (also tested with
-more aggressive optimization levels). Arguably, in the current kernel
-tree it's more of a theoretical issue, but imho, it's better to be
-pedantic about it.
+There are a lot of duplicated code between crc_t10dif_update and
+crc_t10dif.  The only difference is for the update function
+we import the crc value.  I will prefer that we consolidate the code
+into a local inline function that crc_t10dif_update and
+crc_t10dif invoke to get rid of all the duplication.
 
-It's clearly visible though, with the below code: if we would have
-used barrier()-only here, llvm would have omitted clearing, not so
-with barrier_data() variant:
+Probably something like:
 
-  static inline void memzero_explicit(void *s, size_t count)
-  {
-    memset(s, 0, count);
-    barrier_data(s);
-  }
-
-  int main(void)
-  {
-    char buff[20];
-    memzero_explicit(buff, sizeof(buff));
-    return 0;
-  }
-
-  $ gcc -O2 test.c
-  $ gdb a.out
-  (gdb) disassemble main
-  Dump of assembler code for function main:
-   0x0000000000400400  <+0>: lea   -0x28(%rsp),%rax
-   0x0000000000400405  <+5>: movq  $0x0,-0x28(%rsp)
-   0x000000000040040e <+14>: movq  $0x0,-0x20(%rsp)
-   0x0000000000400417 <+23>: movl  $0x0,-0x18(%rsp)
-   0x000000000040041f <+31>: xor   %eax,%eax
-   0x0000000000400421 <+33>: retq
-  End of assembler dump.
-
-  $ clang -O2 test.c
-  $ gdb a.out
-  (gdb) disassemble main
-  Dump of assembler code for function main:
-   0x00000000004004f0  <+0>: xorps  %xmm0,%xmm0
-   0x00000000004004f3  <+3>: movaps %xmm0,-0x18(%rsp)
-   0x00000000004004f8  <+8>: movl   $0x0,-0x8(%rsp)
-   0x0000000000400500 <+16>: lea    -0x18(%rsp),%rax
-   0x0000000000400505 <+21>: xor    %eax,%eax
-   0x0000000000400507 <+23>: retq
-  End of assembler dump.
-
-As clang (but also icc) defines __GNUC__, it's sufficient to define this
-in compiler-gcc.h only.
-
-Reference: https://llvm.org/bugs/show_bug.cgi?id=15495
-Reported-by: Stephan Mueller <smueller@chronox.de>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Theodore Ts'o <tytso@mit.edu>
-Cc: Stephan Mueller <smueller@chronox.de>
-Cc: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Cc: mancha security <mancha1@zoho.com>
-Cc: Mark Charlebois <charlebm@gmail.com>
-Cc: Behan Webster <behanw@converseincode.com>
----
- include/linux/compiler-gcc.h | 16 +++++++++++++++-
- include/linux/compiler.h     |  4 ++++
- lib/string.c                 |  2 +-
- 3 files changed, 20 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index cdf13ca..371e560 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -9,10 +9,24 @@
- 		   + __GNUC_MINOR__ * 100 \
- 		   + __GNUC_PATCHLEVEL__)
+diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
+index dfe6ec1..0248f78 100644
+--- a/lib/crc-t10dif.c
++++ b/lib/crc-t10dif.c
+@@ -19,7 +19,7 @@
+ static struct crypto_shash *crct10dif_tfm;
+ static struct static_key crct10dif_fallback __read_mostly;
  
--
- /* Optimization barrier */
-+
- /* The "volatile" is due to gcc bugs */
- #define barrier() __asm__ __volatile__("": : :"memory")
-+/*
-+ * This version is i.e. to prevent dead stores elimination on @ptr
-+ * where gcc and llvm may behave differently when otherwise using
-+ * normal barrier(): while gcc behavior gets along with a normal
-+ * barrier(), llvm needs an explicit input variable to be assumed
-+ * clobbered. The issue is as follows: while the inline asm might
-+ * access any memory it wants, the compiler could have fit all of
-+ * @ptr into memory registers instead, and since @ptr never escaped
-+ * from that, it proofed that the inline asm wasn't touching any of
-+ * it. This version works well with both compilers, i.e. we're telling
-+ * the compiler that the inline asm absolutely may see the contents
-+ * of @ptr. See also: https://llvm.org/bugs/show_bug.cgi?id=15495
-+ */
-+#define barrier_data(ptr) __asm__ __volatile__("": :"r"(ptr) :"memory")
- 
- /*
-  * This macro obfuscates arithmetic on a variable address so that gcc
-diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-index 0e41ca0..8677225 100644
---- a/include/linux/compiler.h
-+++ b/include/linux/compiler.h
-@@ -169,6 +169,10 @@ void ftrace_likely_update(struct ftrace_branch_data *f, int val, int expect);
- # define barrier() __memory_barrier()
- #endif
- 
-+#ifndef barrier_data
-+# define barrier_data(ptr) barrier()
-+#endif
-+
- /* Unreachable code */
- #ifndef unreachable
- # define unreachable() do { } while (1)
-diff --git a/lib/string.c b/lib/string.c
-index a579201..bb3d4b6 100644
---- a/lib/string.c
-+++ b/lib/string.c
-@@ -607,7 +607,7 @@ EXPORT_SYMBOL(memset);
- void memzero_explicit(void *s, size_t count)
+-__u16 crc_t10dif(const unsigned char *buffer, size_t len)
++static inline __u16 __crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len, bool update)
  {
- 	memset(s, 0, count);
--	barrier();
-+	barrier_data(s);
- }
- EXPORT_SYMBOL(memzero_explicit);
+        struct {
+                struct shash_desc shash;
+@@ -28,17 +28,33 @@ __u16 crc_t10dif(const unsigned char *buffer, size_t len)
+        int err;
  
--- 
-1.9.3
+        if (static_key_false(&crct10dif_fallback))
+-               return crc_t10dif_generic(0, buffer, len);
++               return crc_t10dif_generic(crc, buffer, len);
+ 
+        desc.shash.tfm = crct10dif_tfm;
+        desc.shash.flags = 0;
+-       *(__u16 *)desc.ctx = 0;
++
++       if (update) {
++               err = crypto_shash_import(&desc.shash, &crc);   
++               BUG_ON(err);
++       } else
++               *(__u16 *)desc.ctx = 0;
+ 
+        err = crypto_shash_update(&desc.shash, buffer, len);
+        BUG_ON(err);
+ 
+        return *(__u16 *)desc.ctx;
+ }
++
++__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
++{
++       return __crc_t10dif_update(crc, buffer, len, true);
++}
++EXPORT_SYMBOL(crc_t10dif_update);
++
++__u16 crc_t10dif(const unsigned char *buffer, size_t len)
++{
++       return __crc_t10dif_update(0, buffer, len, false);
++}
+ EXPORT_SYMBOL(crc_t10dif);
+
+
+Thanks.
+
+Tim
