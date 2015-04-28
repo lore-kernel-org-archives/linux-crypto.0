@@ -1,120 +1,65 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH 0/2] crypto: add new driver for Marvell CESA
-Date: Tue, 28 Apr 2015 21:52:32 +0200
-Message-ID: <20150428215232.6834906c@bbrezillon>
-References: <1428591523-1780-1-git-send-email-boris.brezillon@free-electrons.com>
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v3 0/5] target: Fix several problems related to T10-PI support
+Date: Tue, 28 Apr 2015 19:06:48 -0400
+Message-ID: <yq1d22nyhrr.fsf@sermon.lab.mkp.net>
+References: <1429972410-7146-1-git-send-email-akinobu.mita@gmail.com>
+	<553CBF07.6080902@dev.mellanox.co.il>
+	<yq1tww1uo4d.fsf@sermon.lab.mkp.net>
+	<553F5F6F.5040800@dev.mellanox.co.il>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	linux-crypto@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <info@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Arnaud Ebalard <arno@natisbad.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1428591523-1780-1-git-send-email-boris.brezillon@free-electrons.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	target-devel@vger.kernel.org,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Nicholas Bellinger <nab@linux-iscsi.org>,
+	Sagi Grimberg <sagig@mellanox.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+To: Sagi Grimberg <sagig@dev.mellanox.co.il>
+Return-path: <target-devel-owner@vger.kernel.org>
+In-Reply-To: <553F5F6F.5040800@dev.mellanox.co.il> (Sagi Grimberg's message of
+	"Tue, 28 Apr 2015 13:22:39 +0300")
+Sender: target-devel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Herbert, David,
+>>>>> "Sagi" == Sagi Grimberg <sagig@dev.mellanox.co.il> writes:
 
-Any comment on the crypto driver implementation ?
+Sagi,
 
-I've had several reviews focused on:
-1/ splitting the patch series into smaller subsets
-2/ allowing for smoother transition from the old driver to the new one
+Sagi> I thought that WRITE_SAME with DIX would include PI for the block
+Sagi> that is being sent over the wire, the initiator and target HBAs
+Sagi> will verify the single block integrity and the target backend will
+Sagi> expand the PI for the number of same sectors involved (unless the
+Sagi> target backend includes another wire, in this case it should
+Sagi> handle it like the initiator...)
 
-I'll address (or have addressed) all of these comments, but I'd like to
-have your opinion on the crypto driver itself.
+Yep. I'm just saying there's nothing to be done wrt. DIX and WRITE SAME
+on the initiator side. If you were to do something special it would
+effectively mean turning WRITE SAME into a WRITE which kind of defeats
+the purpose.
 
-In particular, I'd like to discuss the threaded-irq approach taken in
-this driver (other drivers are using tasklets).
-The main reason behind this choice is the fact that crypto engines
-are quite fast, and I'm worried about the CPU contention that might
-happen in case of fully loaded crypto engines (the CPU might spend most
-of its time in interrupt context until the crypto queue is emptied).
-Using threaded-irq allows preemption of the crypto completion
-operation, thus authorizing another thread (with higher priority) to be
-scheduled. ITOH, the tasklet approach provide slightly performances (I
-don't recall the exact numbers, but Arnaud did some tests).
+>> In target mode it is conceivable to set up a prot sgl after parsing
+>> the CDB and let the HBA do the work. But I'm not aware of any
+>> hardware that allows that.
 
-On Thu,  9 Apr 2015 16:58:41 +0200
-Boris Brezillon <boris.brezillon@free-electrons.com> wrote:
+Sagi> I don't either, I think it would be simpler to have the target
+Sagi> core implement it instead of having each fabric driver doing the
+Sagi> same thing.
 
-> Hello,
-> 
-> This is an attempt to replace the mv_cesa driver by a new one to address
-> some limitations of the existing driver.
-> From a performance and CPU load point of view the most important
-> limitation is the lack of DMA support, thus preventing us from chaining
-> crypto operations.
-> 
-> I know we usually try to adapt existing drivers instead of replacing them
-> by new ones, but after trying to refactor the mv_cesa driver I realized it
-> would take longer than writing an new one from scratch.
-> 
-> Here are the main features brought by this new driver:
-> - support for armada SoCs (up to 38x) while keeping support for older ones
->   (Orion and Kirkwood)
-> - DMA mode to offload the CPU in case of intensive crypto usage
-> - new algorithms: SHA256, DES and 3DES
-> 
-> I'd like to thank Arnaud, who has carefully reviewed several iterations of
-> this driver, helped me improved my implementation, provided support for
-> several crypto algorithms, provided support for armada-370 and tested
-> the driver on different platforms, hence the SoB and dual MODULE_AUTHOR
-> in the driver code.
+Yep.
 
+Sagi> The initiator can pass PI for the block that is transferred, and
+Sagi> the target is responsible to handle it. The target will also pass
+Sagi> this single block with PI to it's backend. The backend is
+Sagi> responsible to update PI for all the sectors that are written.
 
+Sagi> Sounds right?
 
-> 
-> Best Regards,
-> 
-> Boris
-> 
-> Boris Brezillon (2):
->   crypto: add new driver for Marvell CESA
->   crypto: marvell/CESA: update DT bindings documentation
-> 
->  .../devicetree/bindings/crypto/mv_cesa.txt         |   50 +-
->  drivers/crypto/Kconfig                             |    2 +
->  drivers/crypto/Makefile                            |    2 +-
->  drivers/crypto/marvell/Makefile                    |    1 +
->  drivers/crypto/marvell/cesa.c                      |  539 ++++++++
->  drivers/crypto/marvell/cesa.h                      |  802 ++++++++++++
->  drivers/crypto/marvell/cipher.c                    |  761 +++++++++++
->  drivers/crypto/marvell/hash.c                      | 1349 ++++++++++++++++++++
->  drivers/crypto/marvell/tdma.c                      |  223 ++++
->  drivers/crypto/mv_cesa.c                           | 1193 -----------------
->  drivers/crypto/mv_cesa.h                           |  150 ---
->  11 files changed, 3716 insertions(+), 1356 deletions(-)
->  create mode 100644 drivers/crypto/marvell/Makefile
->  create mode 100644 drivers/crypto/marvell/cesa.c
->  create mode 100644 drivers/crypto/marvell/cesa.h
->  create mode 100644 drivers/crypto/marvell/cipher.c
->  create mode 100644 drivers/crypto/marvell/hash.c
->  create mode 100644 drivers/crypto/marvell/tdma.c
->  delete mode 100644 drivers/crypto/mv_cesa.c
->  delete mode 100644 drivers/crypto/mv_cesa.h
-> 
-
-
+Yes, I agree.
 
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Martin K. Petersen	Oracle Linux Engineering
