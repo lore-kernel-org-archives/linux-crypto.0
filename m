@@ -1,154 +1,120 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v3 2/5] lib: introduce crc_t10dif_update()
-Date: Tue, 28 Apr 2015 10:38:36 -0700
-Message-ID: <1430242716.660.70.camel@schen9-desk2.jf.intel.com>
-References: <1429972410-7146-1-git-send-email-akinobu.mita@gmail.com>
-	 <1429972410-7146-3-git-send-email-akinobu.mita@gmail.com>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: Re: [PATCH 0/2] crypto: add new driver for Marvell CESA
+Date: Tue, 28 Apr 2015 21:52:32 +0200
+Message-ID: <20150428215232.6834906c@bbrezillon>
+References: <1428591523-1780-1-git-send-email-boris.brezillon@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: target-devel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Nicholas Bellinger <nab@linux-iscsi.org>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-To: Akinobu Mita <akinobu.mita@gmail.com>
-Return-path: <target-devel-owner@vger.kernel.org>
-In-Reply-To: <1429972410-7146-3-git-send-email-akinobu.mita@gmail.com>
-Sender: target-devel-owner@vger.kernel.org
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	linux-crypto@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Thomas Petazzoni <info@free-electrons.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Arnaud Ebalard <arno@natisbad.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1428591523-1780-1-git-send-email-boris.brezillon@free-electrons.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Sat, 2015-04-25 at 23:33 +0900, Akinobu Mita wrote:
-> This introduces crc_t10dif_update() which enables to calculate CRC
-> for a block which straddles multiple SG elements by calling multiple
-> times.
+Herbert, David,
+
+Any comment on the crypto driver implementation ?
+
+I've had several reviews focused on:
+1/ splitting the patch series into smaller subsets
+2/ allowing for smoother transition from the old driver to the new one
+
+I'll address (or have addressed) all of these comments, but I'd like to
+have your opinion on the crypto driver itself.
+
+In particular, I'd like to discuss the threaded-irq approach taken in
+this driver (other drivers are using tasklets).
+The main reason behind this choice is the fact that crypto engines
+are quite fast, and I'm worried about the CPU contention that might
+happen in case of fully loaded crypto engines (the CPU might spend most
+of its time in interrupt context until the crypto queue is emptied).
+Using threaded-irq allows preemption of the crypto completion
+operation, thus authorizing another thread (with higher priority) to be
+scheduled. ITOH, the tasklet approach provide slightly performances (I
+don't recall the exact numbers, but Arnaud did some tests).
+
+On Thu,  9 Apr 2015 16:58:41 +0200
+Boris Brezillon <boris.brezillon@free-electrons.com> wrote:
+
+> Hello,
 > 
-> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
-> Cc: Tim Chen <tim.c.chen@linux.intel.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: Nicholas Bellinger <nab@linux-iscsi.org>
-> Cc: Sagi Grimberg <sagig@mellanox.com>
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-> Cc: target-devel@vger.kernel.org
-> ---
-> * New patch from v3
+> This is an attempt to replace the mv_cesa driver by a new one to address
+> some limitations of the existing driver.
+> From a performance and CPU load point of view the most important
+> limitation is the lack of DMA support, thus preventing us from chaining
+> crypto operations.
 > 
->  include/linux/crc-t10dif.h |  1 +
->  lib/crc-t10dif.c           | 23 +++++++++++++++++++++++
->  2 files changed, 24 insertions(+)
+> I know we usually try to adapt existing drivers instead of replacing them
+> by new ones, but after trying to refactor the mv_cesa driver I realized it
+> would take longer than writing an new one from scratch.
 > 
-> diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
-> index cf53d07..d81961e 100644
-> --- a/include/linux/crc-t10dif.h
-> +++ b/include/linux/crc-t10dif.h
-> @@ -9,5 +9,6 @@
->  extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
->  				size_t len);
->  extern __u16 crc_t10dif(unsigned char const *, size_t);
-> +extern __u16 crc_t10dif_update(__u16 crc, unsigned char const *, size_t);
->  
->  #endif
-> diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
-> index dfe6ec1..7cdbe2e 100644
-> --- a/lib/crc-t10dif.c
-> +++ b/lib/crc-t10dif.c
-> @@ -19,6 +19,29 @@
->  static struct crypto_shash *crct10dif_tfm;
->  static struct static_key crct10dif_fallback __read_mostly;
->  
-> +__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
-> +{
-> +	struct {
-> +		struct shash_desc shash;
-> +		char ctx[2];
-> +	} desc;
-> +	int err;
-> +
-> +	if (static_key_false(&crct10dif_fallback))
-> +		return crc_t10dif_generic(crc, buffer, len);
-> +
-> +	desc.shash.tfm = crct10dif_tfm;
-> +	desc.shash.flags = 0;
-> +
-> +	err = crypto_shash_import(&desc.shash, &crc);
-> +	BUG_ON(err);
-> +	err = crypto_shash_update(&desc.shash, buffer, len);
-> +	BUG_ON(err);
-> +
-> +	return *(__u16 *)desc.ctx;
-> +}
-> +EXPORT_SYMBOL(crc_t10dif_update);
-> +
->  __u16 crc_t10dif(const unsigned char *buffer, size_t len)
->  {
->  	struct {
+> Here are the main features brought by this new driver:
+> - support for armada SoCs (up to 38x) while keeping support for older ones
+>   (Orion and Kirkwood)
+> - DMA mode to offload the CPU in case of intensive crypto usage
+> - new algorithms: SHA256, DES and 3DES
+> 
+> I'd like to thank Arnaud, who has carefully reviewed several iterations of
+> this driver, helped me improved my implementation, provided support for
+> several crypto algorithms, provided support for armada-370 and tested
+> the driver on different platforms, hence the SoB and dual MODULE_AUTHOR
+> in the driver code.
 
 
-There are a lot of duplicated code between crc_t10dif_update and
-crc_t10dif.  The only difference is for the update function
-we import the crc value.  I will prefer that we consolidate the code
-into a local inline function that crc_t10dif_update and
-crc_t10dif invoke to get rid of all the duplication.
 
-Probably something like:
-
-diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
-index dfe6ec1..0248f78 100644
---- a/lib/crc-t10dif.c
-+++ b/lib/crc-t10dif.c
-@@ -19,7 +19,7 @@
- static struct crypto_shash *crct10dif_tfm;
- static struct static_key crct10dif_fallback __read_mostly;
- 
--__u16 crc_t10dif(const unsigned char *buffer, size_t len)
-+static inline __u16 __crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len, bool update)
- {
-        struct {
-                struct shash_desc shash;
-@@ -28,17 +28,33 @@ __u16 crc_t10dif(const unsigned char *buffer, size_t len)
-        int err;
- 
-        if (static_key_false(&crct10dif_fallback))
--               return crc_t10dif_generic(0, buffer, len);
-+               return crc_t10dif_generic(crc, buffer, len);
- 
-        desc.shash.tfm = crct10dif_tfm;
-        desc.shash.flags = 0;
--       *(__u16 *)desc.ctx = 0;
-+
-+       if (update) {
-+               err = crypto_shash_import(&desc.shash, &crc);   
-+               BUG_ON(err);
-+       } else
-+               *(__u16 *)desc.ctx = 0;
- 
-        err = crypto_shash_update(&desc.shash, buffer, len);
-        BUG_ON(err);
- 
-        return *(__u16 *)desc.ctx;
- }
-+
-+__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
-+{
-+       return __crc_t10dif_update(crc, buffer, len, true);
-+}
-+EXPORT_SYMBOL(crc_t10dif_update);
-+
-+__u16 crc_t10dif(const unsigned char *buffer, size_t len)
-+{
-+       return __crc_t10dif_update(0, buffer, len, false);
-+}
- EXPORT_SYMBOL(crc_t10dif);
+> 
+> Best Regards,
+> 
+> Boris
+> 
+> Boris Brezillon (2):
+>   crypto: add new driver for Marvell CESA
+>   crypto: marvell/CESA: update DT bindings documentation
+> 
+>  .../devicetree/bindings/crypto/mv_cesa.txt         |   50 +-
+>  drivers/crypto/Kconfig                             |    2 +
+>  drivers/crypto/Makefile                            |    2 +-
+>  drivers/crypto/marvell/Makefile                    |    1 +
+>  drivers/crypto/marvell/cesa.c                      |  539 ++++++++
+>  drivers/crypto/marvell/cesa.h                      |  802 ++++++++++++
+>  drivers/crypto/marvell/cipher.c                    |  761 +++++++++++
+>  drivers/crypto/marvell/hash.c                      | 1349 ++++++++++++++++++++
+>  drivers/crypto/marvell/tdma.c                      |  223 ++++
+>  drivers/crypto/mv_cesa.c                           | 1193 -----------------
+>  drivers/crypto/mv_cesa.h                           |  150 ---
+>  11 files changed, 3716 insertions(+), 1356 deletions(-)
+>  create mode 100644 drivers/crypto/marvell/Makefile
+>  create mode 100644 drivers/crypto/marvell/cesa.c
+>  create mode 100644 drivers/crypto/marvell/cesa.h
+>  create mode 100644 drivers/crypto/marvell/cipher.c
+>  create mode 100644 drivers/crypto/marvell/hash.c
+>  create mode 100644 drivers/crypto/marvell/tdma.c
+>  delete mode 100644 drivers/crypto/mv_cesa.c
+>  delete mode 100644 drivers/crypto/mv_cesa.h
+> 
 
 
-Thanks.
 
-Tim
+-- 
+Boris Brezillon, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
