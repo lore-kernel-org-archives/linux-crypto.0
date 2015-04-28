@@ -1,58 +1,41 @@
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v3 0/5] target: Fix several problems related to T10-PI support
-Date: Mon, 27 Apr 2015 19:50:58 -0400
-Message-ID: <yq1tww1uo4d.fsf@sermon.lab.mkp.net>
-References: <1429972410-7146-1-git-send-email-akinobu.mita@gmail.com>
-	<553CBF07.6080902@dev.mellanox.co.il>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] SP800-38F / RFC3394 key wrapping
+Date: Tue, 28 Apr 2015 09:09:41 +0800
+Message-ID: <20150428010941.GA28820@gondor.apana.org.au>
+References: <1515730.LIeS5qas5m@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Akinobu Mita <akinobu.mita@gmail.com>,
-	target-devel@vger.kernel.org,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Nicholas Bellinger <nab@linux-iscsi.org>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-To: Sagi Grimberg <sagig@dev.mellanox.co.il>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:30813 "EHLO
-	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752574AbbD0XvT (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:51682 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751629AbbD1BJr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 27 Apr 2015 19:51:19 -0400
-In-Reply-To: <553CBF07.6080902@dev.mellanox.co.il> (Sagi Grimberg's message of
-	"Sun, 26 Apr 2015 13:33:43 +0300")
+	Mon, 27 Apr 2015 21:09:47 -0400
+Content-Disposition: inline
+In-Reply-To: <1515730.LIeS5qas5m@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
->>>>> "Sagi" == Sagi Grimberg <sagig@dev.mellanox.co.il> writes:
+On Sun, Apr 26, 2015 at 12:07:31AM +0200, Stephan Mueller wrote:
+> Hi,
+> 
+> Please note that this patch will conflict with the DRBG patch for
+> additional seeding sent earlier today. Both add test vectors in
+> testmgr.c between the existing hmac() and lrw() due to the ordering
+> requirements of testmgr.c.
 
-Sagi> The problem is that the HBA does not have the write_same
-Sagi> functionality you introduce here, i.e. generate multiple same
-Sagi> protection fields for a single data block.
+Can you clarify the use case of this algorithm? In particular,
+who is going to use it in the kernel? This doesn't seem to be
+a candidate for use via algif since there aren't any or aren't
+likely going to be any hardware implementations.
 
-Adding support to DIX would be problematic since it would essentially
-turn a WRITE SAME into a WRITE. You'd only do one block of DMA but you'd
-get N blocks going over the wire.
+If we can narrow down who is going to use it perhaps we can then
+figure out the appropriate interface for this.
 
-In target mode it is conceivable to set up a prot sgl after parsing the
-CDB and let the HBA do the work. But I'm not aware of any hardware that
-allows that.
-
-Sagi> In this case, for WRITE_SAME, have the fabrics generate/verify a
-Sagi> single data block (one integrity field) like they do today, and
-Sagi> then the core will expand it to the correct number of sectors
-Sagi> using some form of sbc_dif_expand_same()
-
-Yeah. In a simple world you'd just keep overriding the ref tag in the
-received PI tuple. But for performance reasons you'll obviously want to
-do I/O in units bigger than a single block. Blindly preallocating PI to
-fit the entire I/O is also be problematic, however, since a block count
-of 0 unfortunately means "the whole disk".
-
+Thanks,
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
