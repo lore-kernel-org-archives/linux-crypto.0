@@ -1,124 +1,63 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 4/6] crypto: drbg - add async seeding operation
-Date: Tue, 28 Apr 2015 05:00:03 +0200
-Message-ID: <26987163.Lvcqt6Smju@myon.chronox.de>
-References: <11175802.HG0pHJfshY@myon.chronox.de>
+Subject: Re: [PATCH v2] SP800-38F / RFC3394 key wrapping
+Date: Tue, 28 Apr 2015 04:58:31 +0200
+Message-ID: <1906826.TjaHhvv93b@myon.chronox.de>
+References: <1515730.LIeS5qas5m@myon.chronox.de> <1742335.S7ujyfP8MQ@myon.chronox.de> <20150428025402.GB29738@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
-	sandyinchina@gmail.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <11175802.HG0pHJfshY@myon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34584 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S964771AbbD1DDU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 27 Apr 2015 23:03:20 -0400
+In-Reply-To: <20150428025402.GB29738@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The async seeding operation is triggered during initalization right
-after the first non-blocking seeding is completed. As required by the
-asynchronous operation of random.c, a callback function is provided that
-is triggered by random.c once entropy is available. That callback
-function performs the actual seeding of the DRBG.
+Am Dienstag, 28. April 2015, 10:54:02 schrieb Herbert Xu:
 
-CC: Andreas Steffen <andreas.steffen@strongswan.org>
-CC: Theodore Ts'o <tytso@mit.edu>
-CC: Sandy Harris <sandyinchina@gmail.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c         | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- include/crypto/drbg.h |  1 +
- 2 files changed, 47 insertions(+)
+Hi Herbert,
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 36dfece..13dd626 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1056,6 +1056,40 @@ static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
- 	return ret;
- }
- 
-+/* DRBG callback for obtaining data from the async Linux RNG */
-+static void drbg_async_seed_cb(void *buf, ssize_t buflen, void *private)
-+{
-+	struct drbg_string data;
-+	LIST_HEAD(seedlist);
-+	struct drbg_state *drbg = (struct drbg_state *)private;
-+	int ret = 0;
-+
-+	if (buflen <= 0 || !buf)
-+		return;
-+
-+	drbg_string_fill(&data, buf, buflen);
-+	list_add_tail(&data.list, &seedlist);
-+	/* sanity check to verify that there is still a DRBG instance */
-+	if (!drbg)
-+		return;
-+	mutex_lock(&drbg->drbg_mutex);
-+	/* sanity check to verify that the DRBG instance is valid */
-+	if (!drbg->V) {
-+		mutex_unlock(&drbg->drbg_mutex);
-+		return;
-+	}
-+	ret = __drbg_seed(drbg, &seedlist, true);
-+	memzero_explicit(buf, buflen);
-+	mutex_unlock(&drbg->drbg_mutex);
-+}
-+
-+/* Cancel any outstanding async operation and wait for their completion */
-+static inline void drbg_async_work_cancel(struct random_work *work)
-+{
-+	get_blocking_random_bytes_cancel(work);
-+	cancel_work_sync(&work->rw_work);
-+}
-+
- /*
-  * Seeding or reseeding of the DRBG
-  *
-@@ -1081,6 +1115,11 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 		return -EINVAL;
- 	}
- 
-+	/* cancel any previously invoked seeding */
-+	mutex_unlock(&drbg->drbg_mutex);
-+	drbg_async_work_cancel(&drbg->seed_work);
-+	mutex_lock(&drbg->drbg_mutex);
-+
- 	if (list_empty(&drbg->test_data.list)) {
- 		drbg_string_fill(&data1, drbg->test_data.buf,
- 				 drbg->test_data.len);
-@@ -1125,6 +1164,12 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 	if (!reseed)
- 		drbg->seed_buf_len = drbg->seed_buf_len / 3 * 2;
- 
-+	/* Invoke asynchronous seeding unless DRBG is in test mode. */
-+	if (!list_empty(&drbg->test_data.list))
-+		get_blocking_random_bytes_cb(NULL, &drbg->seed_work,
-+					     drbg->seed_buf, drbg->seed_buf_len,
-+					     drbg, drbg_async_seed_cb);
-+
- out:
- 	return ret;
- }
-@@ -1487,6 +1532,7 @@ unlock:
-  */
- static int drbg_uninstantiate(struct drbg_state *drbg)
- {
-+	drbg_async_work_cancel(&drbg->seed_work);
- 	if (drbg->d_ops)
- 		drbg->d_ops->crypto_fini(drbg);
- 	drbg_dealloc_state(drbg);
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index b052698..e4980a1 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -119,6 +119,7 @@ struct drbg_state {
- 	bool fips_primed;	/* Continuous test primed? */
- 	unsigned char *prev;	/* FIPS 140-2 continuous test value */
- #endif
-+	struct random_work seed_work;	/* asynchronous seeding support */
- 	u8 *seed_buf;			/* buffer holding the seed */
- 	size_t seed_buf_len;
- 	const struct drbg_state_ops *d_ops;
+> On Tue, Apr 28, 2015 at 04:45:17AM +0200, Stephan Mueller wrote:
+> > The use case I see goes along the lines of dm-crypt and Ext4 crypto, or
+> > ecryptfs:
+> > 
+> > For the key wrapping they all do, I am thinking about suggesting KW as it
+> > has one advantage no other cipher currently has: it is an authenticated
+> > decryption where I still only need one symmetric key. Yes, KW is
+> > inefficient compared to other ciphers, but for handling small data blobs,
+> > it should be just fine.
+> > 
+> > For example, dm-crypt: dm-crypt currently uses the same cipher used for
+> > the
+> > bulk encryption to wrap the LUKS header. Obviously we miss the
+> > authentication check of the data blob. So, we could use other
+> > authenticated schemas, like GCM or authenc(). But they all need either
+> > two keys or AAD for which the common mechanisms typically have no
+> > provisions. Therefore, KW is a drop-in replacement for standard symmetric
+> > ciphers where one want authentication as well.
+> 
+> If it's for cases where the data is always linear, we could always
+> do this outside the crypto API.  You can still use AES from the crypto
+> API to do the actual crypto of course.
+> 
+> By keeping it out of the crypto API you wouldn't have to worry about
+> SG lists and can simply require the input to be linear u8 * buffers.
+> 
+> However, because this is an algorithm that is not otherwise useful
+> you'll need to ensure that at least one user is going to be accepted
+> into the kernel.
+> 
+> The implementation could go into lib.
+
+Hm, in case of dm-crypt, that is not really possible, because this is fully 
+driven by user space: libcryptsetup sets up a temporary dm-crypt container for 
+the LUKS header space. Then user space accesses the data it needs and re-
+injects it into the kernel for the bulk encryption dm-crypt component.
+
 -- 
-2.1.0
+Ciao
+Stephan
