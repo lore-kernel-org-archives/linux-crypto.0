@@ -1,7 +1,8 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 0/6] Seeding DRBG with more entropy
-Date: Tue, 28 Apr 2015 04:53:37 +0200
-Message-ID: <11175802.HG0pHJfshY@myon.chronox.de>
+Subject: [PATCH v3 3/6] crypto: drbg - prepare for async seeding
+Date: Tue, 28 Apr 2015 04:59:34 +0200
+Message-ID: <6532993.CAu85Fcg7H@myon.chronox.de>
+References: <11175802.HG0pHJfshY@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -10,237 +11,172 @@ Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
 	linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <11175802.HG0pHJfshY@myon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hi,
+In order to prepare for the addition of the asynchronous seeding call,
+the invocation of seeding the DRBG is moved out into a helper function.
 
-as of now, the DRBG is only seeded from get_random_bytes. In various
-circumstances, the nonblocking_pool behind get_random_bytes may not be fully
-seeded from hardware events at the time the DRBG requires to be seeded.
-Based on the discussion in [1], the DRBG seeding is updated such that it
-does not completely rely on get_random_bytes any more.
+In addition, a block of memory is allocated during initialization time
+that will be used as a scratchpad for obtaining entropy. That scratchpad
+is used for the initial seeding operation as well as by the
+asynchronous seeding call. The memory must be zeroized every time the
+DRBG seeding call succeeds to avoid entropy data lingering in memory.
 
-The seeding approach can be characterized as follows:
-
-1. pull buffer of size entropy + nonce from get_random_bytes
-
-2. pull another buffer of size entropy + nonce from my Jitter RNG
-
-3. concatenate both buffers
-
-4. seed the DRBG with the concatenated buffer
-
-5. trigger the async invocation of the in-kernel /dev/random with a buffer of
-   size entropy
-
-6. return the DRBG instance to the caller without waiting for the completion
-   of step 5
-
-7. at some point in time, the in-kernel /dev/random returns with a full buffer
-   which is then used to re-seed the DRBG
-
-This way, we will get entropy during the first initialization without
-blocking.
-
-The patch set adds an in-kernel /dev/random equivalent that was discussed with
-Ted Ts'o last July -- see [2] and [3]. A test module for testing the
-asynchronous operation of the in-kernel /dev/random is given with the code
-below.
-
-Ted: shall we really create and maintain a new entropy pool (the kernel_pool),
-or should the in-kernel /dev/random logic draw directly from the input_pool?
-In other words, shall we drop the first patch and update the 2nd patch to
-use input_pool? Also, I would not recommend using the blocking_pool as this
-would mix kernel and user land operation.
-
-Note: the DRBG and Jitter RNG patches are against the current cryptodev-2.6
-tree.
-
-The new Jitter RNG is an RNG that has large set of tests and was presented on
-LKML some time back. After speaking with mathematicians at NIST, that Jitter
-RNG approach would be acceptable from their side as a noise source. Note, I
-personally think that the Jitter RNG has sufficient entropy in almost all
-circumstances (see the massive testing I conducted on all more widely used
-CPUs as shown in [4]).
-
-Changes v3:
-* Patch 01: Correct calculation of entropy count as pointed out by Herbert Xu
-* Patch 06: Correct a trivial coding issue in jent_entropy_init for
-  checking JENT_EMINVARVAR reported by cppcheck
-
-Changes v2:
-* Use Dual BSD/GPL license in MODULE_LICENSE as suggested by
-  Paul Bolle <pebolle@tiscali.nl>
-* Patch 05, drbg_dealloc_state: only deallocate Jitter RNG if one was
-  instantiated in the first place. There are two main reasons why the Jitter RNG
-  may not be allocated: either it is not available as kernel module/in vmlinuz
-  or during init time of the Jitter RNG, the performed testing shows that the
-  underlying hardware is not suitable for the Jitter RNG (e.g. has a too coarse
-  timer).
-
-
-[1] http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg13891.html
-
-[2] https://lkml.org/lkml/2014/4/27/174
-
-[3] http://comments.gmane.org/gmane.linux.kernel/1701117
-
-[4] http://www.chronox.de/jent.html
-
-
-Stephan Mueller (6):
-  random: Addition of kernel_pool
-  random: Async and sync API for accessing kernel_pool
-  crypto: drbg - prepare for async seeding
-  crypto: drbg - add async seeding operation
-  crypto: drbg - use Jitter RNG to obtain seed
-  crypto: add jitterentropy RNG
-
- crypto/Kconfig         |  10 +
- crypto/Makefile        |   2 +
- crypto/drbg.c          | 161 +++++++--
- crypto/jitterentropy.c | 909 +++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/testmgr.c       |   4 +
- drivers/char/random.c  | 168 ++++++++-
- include/crypto/drbg.h  |   4 +
- include/linux/random.h |  20 ++
- 8 files changed, 1238 insertions(+), 40 deletions(-)
- create mode 100644 crypto/jitterentropy.c
-
+CC: Andreas Steffen <andreas.steffen@strongswan.org>
+CC: Theodore Ts'o <tytso@mit.edu>
+CC: Sandy Harris <sandyinchina@gmail.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
-/*
- * Test module for verifying the correct operation of the
- * in-kernel /dev/random handling
- *
- * Use: compile, load into the kernel and observe dmesg
- *
- * Written by: Stephan Mueller <smueller@chronox.de>
- * Copyright (c) 2014
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
- *    products derived from this software without specific prior
- *    written permission.
- *
- * ALTERNATIVELY, this product may be distributed under the terms of
- * the GNU General Public License, in which case the provisions of the GPL are
- * required INSTEAD OF the above restrictions.  (This clause is
- * necessary due to a potential bad interaction between the GPL and
- * the restrictions contained in a BSD-style copyright.)
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
- * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
- */
+ crypto/drbg.c         | 81 ++++++++++++++++++++++++++++++++++-----------------
+ include/crypto/drbg.h |  2 ++
+ 2 files changed, 56 insertions(+), 27 deletions(-)
 
-#include <linux/random.h>
-#include <linux/module.h>
-#include <linux/slab.h>
-
-MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-MODULE_DESCRIPTION("Test module for verifying the correct operation of async LRNG operation");
-
-static struct random_work my_work;
-static struct random_work my_work1;
-static struct random_work my_work2;
-static struct random_work my_work3;
-static struct random_work my_work4;
-static struct random_work my_work5;
-static struct random_work my_work6;
-static struct random_work my_work7;
-static struct random_work my_work8;
-static struct random_work my_work9;
-#define LEN 10
-static char buffer[LEN];
-
-static char *string = "a";
-static char *string2 = "b";
-static char *string3 = "c";
-static char *string4 = "d";
-static char *string5 = "e";
-static char *string6 = "f";
-static char *string7 = "g";
-static char *string8 = "h";
-static char *string9 = "i";
-
-void lrng_cb(void *buf, ssize_t buflen, void *private)
-{
-	printk("received %d bytes for %s\n", (int)buflen, (char *)private);
-}
-
-static void cn(struct random_work *work)
-{
-	get_blocking_random_bytes_cancel(work);
-	cancel_work_sync(&work->rw_work);
-}
-
-static int __init lrng_init(void)
-{
-	get_blocking_random_bytes_cb(NULL, &my_work, buffer, LEN,
-				     string, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work1, buffer, LEN,
-				     string, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work2, buffer, LEN,
-				     string2, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work3, buffer, LEN,
-				     string3, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work4, buffer, LEN,
-				     string4, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work5, buffer, LEN,
-				     string5, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work6, buffer, LEN,
-				     string6, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work7, buffer, LEN,
-				     string7, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work8, buffer, LEN,
-				     string8, lrng_cb);
-	get_blocking_random_bytes_cb(NULL, &my_work9, buffer, LEN,
-				     string9, lrng_cb);
-
-	/*
-	 * cancel one work to see that work can be canceled independent from
-	 * others
-	 */
-	cn(&my_work);
-	/* try again to verify that double cancellation is harmless */
-        cn(&my_work);
-
-	return 0;
-}
-
-static void __exit lrng_exit(void)
-{
-	cn(&my_work1);
-	cn(&my_work2);
-	cn(&my_work3);
-	cn(&my_work4);
-	cn(&my_work5);
-	cn(&my_work6);
-	cn(&my_work7);
-	cn(&my_work8);
-	cn(&my_work9);
-}
-
-module_init(lrng_init);
-module_exit(lrng_exit);
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 23d444e..36dfece 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1041,6 +1041,21 @@ static struct drbg_state_ops drbg_hash_ops = {
+  * Functions common for DRBG implementations
+  ******************************************************************/
+ 
++static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
++			      int reseed)
++{
++	int ret = drbg->d_ops->update(drbg, seed, reseed);
++
++	if (ret)
++		return ret;
++
++	drbg->seeded = true;
++	/* 10.1.1.2 / 10.1.1.3 step 5 */
++	drbg->reseed_ctr = 1;
++
++	return ret;
++}
++
+ /*
+  * Seeding or reseeding of the DRBG
+  *
+@@ -1056,8 +1071,6 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 		     bool reseed)
+ {
+ 	int ret = 0;
+-	unsigned char *entropy = NULL;
+-	size_t entropylen = 0;
+ 	struct drbg_string data1;
+ 	LIST_HEAD(seedlist);
+ 
+@@ -1073,26 +1086,10 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 				 drbg->test_data.len);
+ 		pr_devel("DRBG: using test entropy\n");
+ 	} else {
+-		/*
+-		 * Gather entropy equal to the security strength of the DRBG.
+-		 * With a derivation function, a nonce is required in addition
+-		 * to the entropy. A nonce must be at least 1/2 of the security
+-		 * strength of the DRBG in size. Thus, entropy * nonce is 3/2
+-		 * of the strength. The consideration of a nonce is only
+-		 * applicable during initial seeding.
+-		 */
+-		entropylen = drbg_sec_strength(drbg->core->flags);
+-		if (!entropylen)
+-			return -EFAULT;
+-		if (!reseed)
+-			entropylen = ((entropylen + 1) / 2) * 3;
+ 		pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
+-			 entropylen);
+-		entropy = kzalloc(entropylen, GFP_KERNEL);
+-		if (!entropy)
+-			return -ENOMEM;
+-		get_random_bytes(entropy, entropylen);
+-		drbg_string_fill(&data1, entropy, entropylen);
++			 drbg->seed_buf_len);
++		get_random_bytes(drbg->seed_buf, drbg->seed_buf_len);
++		drbg_string_fill(&data1, drbg->seed_buf, drbg->seed_buf_len);
+ 	}
+ 	list_add_tail(&data1.list, &seedlist);
+ 
+@@ -1111,16 +1108,24 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 		memset(drbg->C, 0, drbg_statelen(drbg));
+ 	}
+ 
+-	ret = drbg->d_ops->update(drbg, &seedlist, reseed);
++	ret = __drbg_seed(drbg, &seedlist, reseed);
++
++	/*
++	 * Clear the initial entropy buffer as the async call may not overwrite
++	 * that buffer for quite some time.
++	 */
++	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len);
+ 	if (ret)
+ 		goto out;
+-
+-	drbg->seeded = true;
+-	/* 10.1.1.2 / 10.1.1.3 step 5 */
+-	drbg->reseed_ctr = 1;
++	/*
++	 * For all subsequent seeding calls, we only need the seed buffer
++	 * equal to the security strength of the DRBG. We undo the calculation
++	 * in drbg_alloc_state.
++	 */
++	if (!reseed)
++		drbg->seed_buf_len = drbg->seed_buf_len / 3 * 2;
+ 
+ out:
+-	kzfree(entropy);
+ 	return ret;
+ }
+ 
+@@ -1143,6 +1148,8 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+ 	drbg->prev = NULL;
+ 	drbg->fips_primed = false;
+ #endif
++	kzfree(drbg->seed_buf);
++	drbg->seed_buf = NULL;
+ }
+ 
+ /*
+@@ -1204,6 +1211,26 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 		if (!drbg->scratchpad)
+ 			goto err;
+ 	}
++
++	/*
++	 * Gather entropy equal to the security strength of the DRBG.
++	 * With a derivation function, a nonce is required in addition
++	 * to the entropy. A nonce must be at least 1/2 of the security
++	 * strength of the DRBG in size. Thus, entropy * nonce is 3/2
++	 * of the strength. The consideration of a nonce is only
++	 * applicable during initial seeding.
++	 */
++	drbg->seed_buf_len = drbg_sec_strength(drbg->core->flags);
++	if (!drbg->seed_buf_len) {
++		ret = -EFAULT;
++		goto err;
++	}
++	/* ensure we have sufficient buffer space for initial seed */
++	drbg->seed_buf_len = ((drbg->seed_buf_len + 1) / 2) * 3;
++	drbg->seed_buf = kzalloc(drbg->seed_buf_len, GFP_KERNEL);
++	if (!drbg->seed_buf)
++		goto err;
++
+ 	return 0;
+ 
+ err:
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 480d7a0..b052698 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -119,6 +119,8 @@ struct drbg_state {
+ 	bool fips_primed;	/* Continuous test primed? */
+ 	unsigned char *prev;	/* FIPS 140-2 continuous test value */
+ #endif
++	u8 *seed_buf;			/* buffer holding the seed */
++	size_t seed_buf_len;
+ 	const struct drbg_state_ops *d_ops;
+ 	const struct drbg_core *core;
+ 	struct drbg_string test_data;
 -- 
 2.1.0
