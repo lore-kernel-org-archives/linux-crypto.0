@@ -1,205 +1,75 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v3 2/6] random: Async and sync API for accessing kernel_pool
-Date: Tue, 28 Apr 2015 04:58:42 +0200
-Message-ID: <3084751.ujJM0DBhCD@myon.chronox.de>
-References: <11175802.HG0pHJfshY@myon.chronox.de>
+From: Sagi Grimberg <sagig@dev.mellanox.co.il>
+Subject: Re: [PATCH v3 0/5] target: Fix several problems related to T10-PI
+ support
+Date: Tue, 28 Apr 2015 13:22:39 +0300
+Message-ID: <553F5F6F.5040800@dev.mellanox.co.il>
+References: <1429972410-7146-1-git-send-email-akinobu.mita@gmail.com>	<553CBF07.6080902@dev.mellanox.co.il> <yq1tww1uo4d.fsf@sermon.lab.mkp.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
-	sandyinchina@gmail.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <11175802.HG0pHJfshY@myon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Akinobu Mita <akinobu.mita@gmail.com>,
+	target-devel@vger.kernel.org,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Nicholas Bellinger <nab@linux-iscsi.org>,
+	Sagi Grimberg <sagig@mellanox.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Return-path: <target-devel-owner@vger.kernel.org>
+In-Reply-To: <yq1tww1uo4d.fsf@sermon.lab.mkp.net>
+Sender: target-devel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The kernel_pool is intended to be the in-kernel equivalent to the
-blocking_pool, i.e. requests for random data may be blocked if
-insufficient entropy is present.
+On 4/28/2015 2:50 AM, Martin K. Petersen wrote:
+>>>>>> "Sagi" == Sagi Grimberg <sagig@dev.mellanox.co.il> writes:
+>
+> Sagi> The problem is that the HBA does not have the write_same
+> Sagi> functionality you introduce here, i.e. generate multiple same
+> Sagi> protection fields for a single data block.
+>
+> Adding support to DIX would be problematic since it would essentially
+> turn a WRITE SAME into a WRITE. You'd only do one block of DMA but you'd
+> get N blocks going over the wire.
 
-The added API calls provide a synchronous function call
-get_blocking_random_bytes where the caller is blocked.
+I thought that WRITE_SAME with DIX would include PI for the block that
+is being sent over the wire, the initiator and target HBAs will verify
+the single block integrity and the target backend will expand the PI
+for the number of same sectors involved (unless the target backend
+includes another wire, in this case it should handle it like the
+initiator...)
 
-In addition, an asynchronous API call of get_blocking_random_bytes_cb
-is provided which returns immediately to the caller after submitting
-the request for random data. The caller-provided buffer that shall be
-filled with random data is filled up as available entropy permits. The
-caller may provide a callback function that is invoked once the
-request is completed.
+>
+> In target mode it is conceivable to set up a prot sgl after parsing the
+> CDB and let the HBA do the work. But I'm not aware of any hardware that
+> allows that.
 
-A third API call, get_blocking_random_bytes_cancel, is provided to
-cancel the random number gathering operation.
+I don't either, I think it would be simpler to have the target core
+implement it instead of having each fabric driver doing the same thing.
 
-CC: Andreas Steffen <andreas.steffen@strongswan.org>
-CC: Theodore Ts'o <tytso@mit.edu>
-CC: Sandy Harris <sandyinchina@gmail.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/char/random.c  | 116 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/random.h |  20 +++++++++
- 2 files changed, 136 insertions(+)
+>
+> Sagi> In this case, for WRITE_SAME, have the fabrics generate/verify a
+> Sagi> single data block (one integrity field) like they do today, and
+> Sagi> then the core will expand it to the correct number of sectors
+> Sagi> using some form of sbc_dif_expand_same()
+>
+> Yeah. In a simple world you'd just keep overriding the ref tag in the
+> received PI tuple. But for performance reasons you'll obviously want to
+> do I/O in units bigger than a single block. Blindly preallocating PI to
+> fit the entire I/O is also be problematic, however, since a block count
+> of 0 unfortunately means "the whole disk".
+>
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 0b139dc..30d39ba 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1804,3 +1804,119 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
- 	credit_entropy_bits(poolp, entropy);
- }
- EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
-+
-+static bool get_blocking_random_bytes_term(bool *cancel)
-+{
-+	if (ENTROPY_BITS(&input_pool) >= random_read_wakeup_bits)
-+		return true;
-+	return *cancel;
-+}
-+
-+/*
-+ * Equivalent function to get_random_bytes with the difference that this
-+ * function blocks the request in a similar fashion as random_read(),
-+ * implementing a /dev/random device for in-kernel users.
-+ *
-+ * This function may sleep.
-+ *
-+ * @buf caller allocated buffer filled with random data
-+ * @nbytes requested number of bytes -- buffer should be at least as big
-+ * @cancel pointer to variable that can be used to cancel the collection
-+ *	   operation. If this boolean is set to true, the collection operation
-+ *	   is terminated immediately. When it is set to true during the
-+ *	   collection loop, the collection is terminated immediately.
-+ *
-+ * return: positive value: obtained number of bytes on successful
-+ *	   negative value: error code on error
-+ */
-+ssize_t get_blocking_random_bytes(void *buf, ssize_t nbytes, bool *cancel)
-+{
-+	ssize_t ret = 0;
-+
-+	if (nbytes <= 0)
-+		return nbytes;
-+	BUG_ON(!buf);
-+
-+	while (ret < nbytes) {
-+		ssize_t round = 0;
-+		ssize_t pull = min_t(ssize_t, (nbytes - ret), SEC_XFER_SIZE);
-+
-+		if (*cancel)
-+			return ret;
-+		round = extract_entropy(&kernel_pool, (buf + ret), pull, 0, 0);
-+		if (0 > round)
-+			return round;
-+		if (0 == round)
-+			wait_event_interruptible(random_kernel_wait,
-+				get_blocking_random_bytes_term(cancel));
-+		ret += round;
-+	}
-+	return ret;
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes);
-+
-+/*
-+ * Immediate canceling the collection operation for the random_work
-+ */
-+void get_blocking_random_bytes_cancel(struct random_work *rw)
-+{
-+	rw->cancel = true;
-+	wake_up_interruptible(&random_kernel_wait);
-+
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes_cancel);
-+
-+static void get_blocking_random_bytes_work(struct work_struct *work)
-+{
-+	struct random_work *rw = container_of(work, struct random_work,
-+					      rw_work);
-+	ssize_t ret;
-+
-+	ret = get_blocking_random_bytes(rw->rw_buf, rw->rw_len, &rw->cancel);
-+	if (rw->rw_cb)
-+		rw->rw_cb(rw->rw_buf, ret, rw->private);
-+}
-+
-+/*
-+ * Asynchronous invocation of the blocking interface. The function
-+ * queues the request in either the private work queue supplied with the
-+ * wq argument or in the general work queue framework if wq is NULL.
-+ * Once the request is completed or upon receiving an error, the callback
-+ * function of cb is called, if not NULL, to inform the caller about the
-+ * completion of its operation.
-+ *
-+ * If a caller wants to cancel the work (e.g. in the module_exit function),
-+ * simply call
-+ *	get_blocking_random_bytes_cancel(&my_random_work);
-+ *	cancel_work_sync(&my_random_work.rw_work);
-+ *
-+ * @wq pointer to private work queue or NULL - input
-+ * @rw handle to the work queue frame - output
-+ * @buf allocated buffer where random numbers are to be stored
-+ * @nbytes size of buf and implicitly number of bytes requested
-+ * @private pointer to data that is not processed by here, but handed to the
-+ *	    callback function to allow the caller to maintain a state
-+ * @cb callback function where
-+ *	* buf holds the pointer to buf will be supplied
-+ *	* buflen holds the length of the gathered random numbers or error code
-+ *	  of the generation function.
-+ *	* private provides a reference to the private data pointer
-+ */
-+void get_blocking_random_bytes_cb(struct workqueue_struct *wq,
-+				  struct random_work *rw,
-+				  u8 *buf, ssize_t nbytes, void *private,
-+				  void (*cb)(void *buf, ssize_t buflen,
-+					     void *private))
-+{
-+	rw->rw_buf = buf;
-+	rw->rw_len = nbytes;
-+	rw->private = private;
-+	rw->rw_cb = cb;
-+	rw->cancel = false;
-+	INIT_WORK(&rw->rw_work, get_blocking_random_bytes_work);
-+	if (wq)
-+		queue_work(wq, &rw->rw_work);
-+	else
-+		schedule_work(&rw->rw_work);
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes_cb);
-diff --git a/include/linux/random.h b/include/linux/random.h
-index b05856e..960803b 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -7,6 +7,7 @@
- #define _LINUX_RANDOM_H
- 
- #include <uapi/linux/random.h>
-+#include <linux/workqueue.h>
- 
- extern void add_device_randomness(const void *, unsigned int);
- extern void add_input_randomness(unsigned int type, unsigned int code,
-@@ -112,4 +113,23 @@ static inline u32 next_pseudo_random32(u32 seed)
- 	return seed * 1664525 + 1013904223;
- }
- 
-+/* API for asynchronous in-kernel operation */
-+struct random_work {
-+	struct work_struct	rw_work;
-+	u8			*rw_buf;
-+	ssize_t			rw_len;
-+	void			*private;
-+	void			(*rw_cb)(void *buf, ssize_t buflen,
-+					 void *private);
-+	bool			cancel;
-+};
-+
-+ssize_t get_blocking_random_bytes(void *buf, ssize_t nbytes, bool *cancel);
-+void get_blocking_random_bytes_cancel(struct random_work *rw);
-+void get_blocking_random_bytes_cb(struct workqueue_struct *wq,
-+				  struct random_work *rw,
-+				  u8 *buf, ssize_t nbytes, void *private,
-+				  void (*cb)(void *buf, ssize_t buflen,
-+					     void *private));
-+
- #endif /* _LINUX_RANDOM_H */
--- 
-2.1.0
+It seems that the only one that can handle write_same PI expansion is
+the backend.
+
+The initiator can pass PI for the block that is transferred, and the
+target is responsible to handle it. The target will also pass this
+single block with PI to it's backend. The backend is responsible to
+update PI for all the sectors that are written.
+
+Sounds right?
+
+Sagi.
