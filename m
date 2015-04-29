@@ -1,37 +1,40 @@
-From: Daniel Borkmann <daniel@iogearbox.net>
-Subject: Re: [PATCH crypto-2.6] lib: make memzero_explicit more robust against
- dead store elimination
-Date: Wed, 29 Apr 2015 16:56:37 +0200
-Message-ID: <5540F125.9090108@iogearbox.net>
-References: <85dfdd23d98412a183546e2e7659a6a2bed1fca8.1430230786.git.daniel@iogearbox.net> <20150429130816.GA8526@zoho.com> <5540E42F.70607@iogearbox.net>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v3 2/5] lib: introduce crc_t10dif_update()
+Date: Wed, 29 Apr 2015 09:07:35 -0700
+Message-ID: <1430323655.660.71.camel@schen9-desk2.jf.intel.com>
+References: <1429972410-7146-1-git-send-email-akinobu.mita@gmail.com>
+	 <1429972410-7146-3-git-send-email-akinobu.mita@gmail.com>
+	 <1430242716.660.70.camel@schen9-desk2.jf.intel.com>
+	 <20150429004911.GA7221@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	Theodore Ts'o <tytso@mit.edu>,
-	Stephan Mueller <smueller@chronox.de>,
-	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	Mark Charlebois <charlebm@gmail.com>,
-	Behan Webster <behanw@converseincode.com>
-To: mancha security <mancha1@zoho.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www62.your-server.de ([213.133.104.62]:54892 "EHLO
-	www62.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1423175AbbD2O4m (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Apr 2015 10:56:42 -0400
-In-Reply-To: <5540E42F.70607@iogearbox.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Akinobu Mita <akinobu.mita@gmail.com>,
+	target-devel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Nicholas Bellinger <nab@linux-iscsi.org>,
+	Sagi Grimberg <sagig@mellanox.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <target-devel-owner@vger.kernel.org>
+In-Reply-To: <20150429004911.GA7221@gondor.apana.org.au>
+Sender: target-devel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 04/29/2015 04:01 PM, Daniel Borkmann wrote:
-...
-> So funny enough, we don't actually use __memory_barrier() at the
-> moment. ;)
+On Wed, 2015-04-29 at 08:49 +0800, Herbert Xu wrote:
+> On Tue, Apr 28, 2015 at 10:38:36AM -0700, Tim Chen wrote:
+> >
+> > +       if (update) {
+> > +               err = crypto_shash_import(&desc.shash, &crc);   
+> > +               BUG_ON(err);
+> 
+> You don't even have to make this conditional.  Just always do
+> the import since it's just doing a memcpy anyway.
+> 
 
-Anyway, I will send a v2 of the patch since we need to undef the gcc
-definition in case someone really uses an ecc compiler that doesn't
-support inline asm.
+Cool, this will simplify things more :)
 
-Thanks,
-Daniel
+Tim
