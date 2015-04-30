@@ -1,189 +1,145 @@
-From: Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH v2 crypto-2.6] lib: make memzero_explicit more robust against dead store elimination
-Date: Thu, 30 Apr 2015 04:13:52 +0200
-Message-ID: <130433ffe7d52c43c7e2804db424e07f4a64a7eb.1430359793.git.daniel@iogearbox.net>
-Cc: linux-crypto@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
+From: mancha security <mancha1@zoho.com>
+Subject: Re: [PATCH crypto-2.6] lib: make memzero_explicit more robust
+ against dead store elimination
+Date: Thu, 30 Apr 2015 06:17:11 +0000
+Message-ID: <20150430061711.GD12861@zoho.com>
+References: <85dfdd23d98412a183546e2e7659a6a2bed1fca8.1430230786.git.daniel@iogearbox.net>
+ <20150429130816.GA8526@zoho.com>
+ <5540E42F.70607@iogearbox.net>
+ <20150429145400.GA12861@zoho.com>
+ <55416C8B.1070909@iogearbox.net>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="q9KOos5vDmpwPx9o"
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
 	Theodore Ts'o <tytso@mit.edu>,
 	Stephan Mueller <smueller@chronox.de>,
 	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	mancha security <mancha1@zoho.com>,
 	Mark Charlebois <charlebm@gmail.com>,
 	Behan Webster <behanw@converseincode.com>
-To: herbert@gondor.apana.org.au
+To: Daniel Borkmann <daniel@iogearbox.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from www62.your-server.de ([213.133.104.62]:42008 "EHLO
-	www62.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751361AbbD3COB (ORCPT
+Received: from sender1.zohomail.com ([74.201.84.155]:35699 "EHLO
+	sender1.zohomail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750871AbbD3GRd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 29 Apr 2015 22:14:01 -0400
+	Thu, 30 Apr 2015 02:17:33 -0400
+Content-Disposition: inline
+In-Reply-To: <55416C8B.1070909@iogearbox.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In commit 0b053c951829 ("lib: memzero_explicit: use barrier instead
-of OPTIMIZER_HIDE_VAR"), we made memzero_explicit() more robust in
-case LTO would decide to inline memzero_explicit() and eventually
-find out it could be elimiated as dead store.
 
-While using barrier() works well for the case of gcc, recent efforts
-from LLVMLinux people suggest to use llvm as an alternative to gcc,
-and there, Stephan found in a simple stand-alone user space example
-that llvm could nevertheless optimize and thus elimitate the memset().
-A similar issue has been observed in the referenced llvm bug report,
-which is regarded as not-a-bug.
+--q9KOos5vDmpwPx9o
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Based on some experiments, icc is a bit special on its own, while it
-doesn't seem to eliminate the memset(), it could do so with an own
-implementation, and then result in similar findings as with llvm.
+On Thu, Apr 30, 2015 at 01:43:07AM +0200, Daniel Borkmann wrote:
+> On 04/29/2015 04:54 PM, mancha security wrote:
+> >On Wed, Apr 29, 2015 at 04:01:19PM +0200, Daniel Borkmann wrote:
+> >>On 04/29/2015 03:08 PM, mancha security wrote:
+> >>...
+> >>>By the way, has anyone been able to verify that __memory_barrier
+> >>>provides DSE protection under various optimizations? Unfortunately,
+> >>>I don't have ready access to ICC at the moment or I'd test it
+> >>>myself.
+> >>
+> >>Never used icc, but it looks like it's free for open source
+> >>projects; I can give it a try, but in case you're faster than I am,
+> >>feel free to post results here.
+> >
+> >Time permitting, I'll try setting this up and post my results.
+>=20
+> So I finally got the download link and an eval license for icc, and
+> after needing to download gigbytes of bloat for the suite, I could
+> finally start to experiment a bit.
 
-The fix in this patch now works for all three compilers (also tested
-with more aggressive optimization levels). Arguably, in the current
-kernel tree it's more of a theoretical issue, but imho, it's better
-to be pedantic about it.
+Ugh.
 
-It's clearly visible with gcc/llvm though, with the below code: if we
-would have used barrier() only here, llvm would have omitted clearing,
-not so with barrier_data() variant:
+> So __GNUC__ and __INTEL_COMPILER is definitely defined by icc, __ECC
+> not in my case, so that part is as expected for the kernel header
+> includes.
+>=20
+> With barrier_data(), I could observe insns for an inlined memset()
+> being emitted in the disassembly, same with barrier(), same with
+> __memory_barrier(). In fact, even if I only use ...
+>=20
+> static inline void memzero_explicit(void *s, size_t count)
+> {
+>   memset(s, 0, count);
+> }
+>=20
+> int main(void)
+> {
+>   char buff[20];
+>   memzero_explicit(buff, sizeof(buff));
+>   return 0;
+> }
+>=20
+> ... icc will emit memset instrinsic insns (did you notice that as
+> well?) when using various optimization levels. Using f.e. -Ofast
+> -ffreestanding resp. -fno-builtin-memset will emit a function call,
+> presumably, icc is then not allowed to make any assumptions, so given
+> the previous result, then would then be expected.
 
-  static inline void memzero_explicit(void *s, size_t count)
-  {
-    memset(s, 0, count);
-    barrier_data(s);
-  }
+I didn't get around to installing ICC so thanks for sharing the very
+interesting results.
 
-  int main(void)
-  {
-    char buff[20];
-    memzero_explicit(buff, sizeof(buff));
-    return 0;
-  }
+> So, crafting a stupid example:
+>=20
+> static inline void
+> dumb_memset(char *s, unsigned char c, size_t n)
+> {
+>         int i;
+>=20
+>         for (i =3D 0; i < n; i++)
+>                 s[i] =3D c;
+> }
+>=20
+> static inline void memzero_explicit(void *s, size_t count)
+> {
+>   dumb_memset(s, 0, count);
+>   <barrier-variant>
+> }
+>=20
+> int main(void)
+> {
+>   char buff[20];
+>   memzero_explicit(buff, sizeof(buff));
+>   return 0;
+> }
+>=20
+> With no barrier at all, icc optimizes all that away (using -Ofast),
+> with barrier_data() it inlines and emits additional mov* insns!  Just
+> using barrier() or __memory_barrier(), we end up with the same case as
+> with clang, that is, it gets optimized away. So, barrier_data() seems
+> to be better here as well.
 
-  $ gcc -O2 test.c
-  $ gdb a.out
-  (gdb) disassemble main
-  Dump of assembler code for function main:
-   0x0000000000400400  <+0>: lea   -0x28(%rsp),%rax
-   0x0000000000400405  <+5>: movq  $0x0,-0x28(%rsp)
-   0x000000000040040e <+14>: movq  $0x0,-0x20(%rsp)
-   0x0000000000400417 <+23>: movl  $0x0,-0x18(%rsp)
-   0x000000000040041f <+31>: xor   %eax,%eax
-   0x0000000000400421 <+33>: retq
-  End of assembler dump.
+For now, seems we're good with barrier_data should things like the LTO
+initiative pick up steam, etc.
 
-  $ clang -O2 test.c
-  $ gdb a.out
-  (gdb) disassemble main
-  Dump of assembler code for function main:
-   0x00000000004004f0  <+0>: xorps  %xmm0,%xmm0
-   0x00000000004004f3  <+3>: movaps %xmm0,-0x18(%rsp)
-   0x00000000004004f8  <+8>: movl   $0x0,-0x8(%rsp)
-   0x0000000000400500 <+16>: lea    -0x18(%rsp),%rax
-   0x0000000000400505 <+21>: xor    %eax,%eax
-   0x0000000000400507 <+23>: retq
-  End of assembler dump.
+Cheers.
 
-As gcc, clang, but also icc defines __GNUC__, it's sufficient to define
-this in compiler-gcc.h only to be picked up. For a fallback or otherwise
-unsupported compiler, we define it as a barrier. Similarly, for ecc which
-does not support gcc inline asm.
+--q9KOos5vDmpwPx9o
+Content-Type: application/pgp-signature
 
-Reference: https://llvm.org/bugs/show_bug.cgi?id=15495
-Reported-by: Stephan Mueller <smueller@chronox.de>
-Tested-by: Stephan Mueller <smueller@chronox.de>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Theodore Ts'o <tytso@mit.edu>
-Cc: Stephan Mueller <smueller@chronox.de>
-Cc: Hannes Frederic Sowa <hannes@stressinduktion.org>
-Cc: mancha security <mancha1@zoho.com>
-Cc: Mark Charlebois <charlebm@gmail.com>
-Cc: Behan Webster <behanw@converseincode.com>
----
- v1->v2:
-  - fixed up ecc case
-  - improved commit msg a bit
-  - kept Stephan's Tested-by
-  - rest as-is
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
 
- include/linux/compiler-gcc.h   | 16 +++++++++++++++-
- include/linux/compiler-intel.h |  3 +++
- include/linux/compiler.h       |  4 ++++
- lib/string.c                   |  2 +-
- 4 files changed, 23 insertions(+), 2 deletions(-)
+iQIcBAEBCgAGBQJVQcjmAAoJEB4VYy8JqhaD+Q4P/2u3bCkoN3OdibPQLorKMGbU
+189wR2tIDST5I4FQyvxVcIzAnWMm3a+GjsgiqCIPdjeqrtwuIzpw3qUdMb5igIy/
+mPpxZQBjbRj59NJ80GBivKLe861ka7T02YMWvSm0sEajgPuwL3djNXcmtiyoOujw
+yI2Gyvs87BL44KcjaGP5sWgLe9jLnF91masVlv3FdoD7rHJKFKCsnXvlpkBeHYoJ
+byjXeSuq8DxnfwHORkt0cgH+lZtKDkuhOq3WVq0HpMaug2fMYszQPVOI6Kfe19hf
+mqVgCETwRR/HxIlXVc4czwDjankaBhDGLYNqLlvnzlIlWwm6oyxE38YEFGUlmBg+
+v1bmL0E1F7438MzzTXUlZSulJsyaU3jI7POKEg3nHvcWiMBheJl+3LV8Xu0tcvjh
+52TZsUXfH/LBSK7ykXdyQhbLJMwDKCkrXawJlFH8xfGb9hZtvGfTVqF65fkDLdZ1
+NwTTbOgguJ8w/W7pZ/4zRQOA4+QNYfvI5eCGtQjt9eOHQHOzn6LMsyuIXsL3L1o9
+p18AlWxF4Cx93NDXwrxs8DDKd/I01lbv20Y0NGMYT4Pj3He7sHetzTKfzBnB6wDr
+7Tlvz7PEJEsJdspj7LHduPnZ7LQzexSR+fg3afHJfHLz+PssWu6YF3Vz7ZhEltEd
+hKHd0Sel5WQB3I4KDJ4O
+=/l/T
+-----END PGP SIGNATURE-----
 
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index cdf13ca..371e560 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -9,10 +9,24 @@
- 		   + __GNUC_MINOR__ * 100 \
- 		   + __GNUC_PATCHLEVEL__)
- 
--
- /* Optimization barrier */
-+
- /* The "volatile" is due to gcc bugs */
- #define barrier() __asm__ __volatile__("": : :"memory")
-+/*
-+ * This version is i.e. to prevent dead stores elimination on @ptr
-+ * where gcc and llvm may behave differently when otherwise using
-+ * normal barrier(): while gcc behavior gets along with a normal
-+ * barrier(), llvm needs an explicit input variable to be assumed
-+ * clobbered. The issue is as follows: while the inline asm might
-+ * access any memory it wants, the compiler could have fit all of
-+ * @ptr into memory registers instead, and since @ptr never escaped
-+ * from that, it proofed that the inline asm wasn't touching any of
-+ * it. This version works well with both compilers, i.e. we're telling
-+ * the compiler that the inline asm absolutely may see the contents
-+ * of @ptr. See also: https://llvm.org/bugs/show_bug.cgi?id=15495
-+ */
-+#define barrier_data(ptr) __asm__ __volatile__("": :"r"(ptr) :"memory")
- 
- /*
-  * This macro obfuscates arithmetic on a variable address so that gcc
-diff --git a/include/linux/compiler-intel.h b/include/linux/compiler-intel.h
-index ba147a1..0c9a2f2 100644
---- a/include/linux/compiler-intel.h
-+++ b/include/linux/compiler-intel.h
-@@ -13,9 +13,12 @@
- /* Intel ECC compiler doesn't support gcc specific asm stmts.
-  * It uses intrinsics to do the equivalent things.
-  */
-+#undef barrier_data
- #undef RELOC_HIDE
- #undef OPTIMIZER_HIDE_VAR
- 
-+#define barrier_data(ptr) barrier()
-+
- #define RELOC_HIDE(ptr, off)					\
-   ({ unsigned long __ptr;					\
-      __ptr = (unsigned long) (ptr);				\
-diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-index 0e41ca0..8677225 100644
---- a/include/linux/compiler.h
-+++ b/include/linux/compiler.h
-@@ -169,6 +169,10 @@ void ftrace_likely_update(struct ftrace_branch_data *f, int val, int expect);
- # define barrier() __memory_barrier()
- #endif
- 
-+#ifndef barrier_data
-+# define barrier_data(ptr) barrier()
-+#endif
-+
- /* Unreachable code */
- #ifndef unreachable
- # define unreachable() do { } while (1)
-diff --git a/lib/string.c b/lib/string.c
-index a579201..bb3d4b6 100644
---- a/lib/string.c
-+++ b/lib/string.c
-@@ -607,7 +607,7 @@ EXPORT_SYMBOL(memset);
- void memzero_explicit(void *s, size_t count)
- {
- 	memset(s, 0, count);
--	barrier();
-+	barrier_data(s);
- }
- EXPORT_SYMBOL(memzero_explicit);
- 
--- 
-1.9.3
+--q9KOos5vDmpwPx9o--
