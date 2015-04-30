@@ -1,7 +1,8 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH RFC 1/2] crypto: add PKE API
-Date: Thu, 30 Apr 2015 15:36:52 -0700
-Message-ID: <20150430223652.10157.86151.stgit@tstruk-mobl1>
+Subject: [PATCH RFC 2/2] crypto: RSA: KEYS: convert rsa and public key to new
+ PKE API
+Date: Thu, 30 Apr 2015 15:36:58 -0700
+Message-ID: <20150430223658.10157.32631.stgit@tstruk-mobl1>
 References: <20150430223647.10157.82156.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -18,523 +19,562 @@ In-Reply-To: <20150430223647.10157.82156.stgit@tstruk-mobl1>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add Public Key Encryption API.
+Change the existing rsa and public key code to integrate it
+with the new Public Key Encryption API.
 
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- crypto/Kconfig             |    6 +
- crypto/Makefile            |    1 
- crypto/crypto_user.c       |   23 +++++
- crypto/pke.c               |  114 ++++++++++++++++++++++++++
- include/crypto/algapi.h    |    6 +
- include/linux/crypto.h     |  191 ++++++++++++++++++++++++++++++++++++++++++++
- include/linux/cryptouser.h |    7 ++
- 7 files changed, 347 insertions(+), 1 deletion(-)
- create mode 100644 crypto/pke.c
+ Documentation/crypto/asymmetric-keys.txt  |   10 +++-
+ crypto/asymmetric_keys/Kconfig            |    1 
+ crypto/asymmetric_keys/pkcs7_parser.c     |    4 +-
+ crypto/asymmetric_keys/pkcs7_trust.c      |    2 -
+ crypto/asymmetric_keys/pkcs7_verify.c     |    5 +-
+ crypto/asymmetric_keys/public_key.c       |   73 +++++++++++++++++------------
+ crypto/asymmetric_keys/public_key.h       |   36 --------------
+ crypto/asymmetric_keys/rsa.c              |   47 +++++++++++++++----
+ crypto/asymmetric_keys/x509_cert_parser.c |   14 ++++--
+ crypto/asymmetric_keys/x509_public_key.c  |   14 ++----
+ include/crypto/public_key.h               |   24 +++-------
+ kernel/module_signing.c                   |    9 +++-
+ 12 files changed, 124 insertions(+), 115 deletions(-)
+ delete mode 100644 crypto/asymmetric_keys/public_key.h
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 8aaf298..9a14b33 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -87,6 +87,12 @@ config CRYPTO_PCOMP2
- 	tristate
- 	select CRYPTO_ALGAPI2
+diff --git a/Documentation/crypto/asymmetric-keys.txt b/Documentation/crypto/asymmetric-keys.txt
+index b767590..47bb5fb 100644
+--- a/Documentation/crypto/asymmetric-keys.txt
++++ b/Documentation/crypto/asymmetric-keys.txt
+@@ -89,11 +89,9 @@ inclusion is required:
+ 	#include <crypto/public_key.h>
  
-+config CRYPTO_PKE
-+	tristate "Public Key Algorithms API"
-+	select CRYPTO_ALGAPI
-+	help
-+	  Crypto API interface for public key algorithms.
-+
- config CRYPTO_MANAGER
- 	tristate "Cryptographic algorithm manager"
- 	select CRYPTO_MANAGER2
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 97b7d3a..e7dd283 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -27,6 +27,7 @@ crypto_hash-y += shash.o
- obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
+ This gives access to functions for dealing with asymmetric / public keys.
+-Three enums are defined there for representing public-key cryptography
++Two enums are defined there for representing public-key cryptography
+ algorithms:
  
- obj-$(CONFIG_CRYPTO_PCOMP2) += pcompress.o
-+obj-$(CONFIG_CRYPTO_PKE) += pke.o
+-	enum pkey_algo
+-
+ digest algorithms used by those:
  
- cryptomgr-y := algboss.o testmgr.o
+ 	enum pkey_hash_algo
+@@ -102,6 +100,11 @@ and key identifier representations:
  
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index 41dfe76..83b4d0f 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -110,6 +110,23 @@ nla_put_failure:
- 	return -EMSGSIZE;
- }
+ 	enum pkey_id_type
  
-+static int crypto_report_pke(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_pke rpke;
++Additionally public key algorithm names are defined:
++#define PKEY_ALGO_DSA "dsa"
++#define PKEY_ALGO_RSA "rsa"
++These will be used to allocate public key tfm instances.
 +
-+	strncpy(rpke.type, "pke", sizeof(rpke.type));
-+	strncpy(rpke.subtype, alg->cra_name, sizeof(rpke.subtype));
-+	rpke.capabilities = alg->cra_pke.capabilities;
-+
-+	if (nla_put(skb, CRYPTOCFGA_REPORT_PKE,
-+		    sizeof(struct crypto_report_pke), &rpke))
-+		goto nla_put_failure;
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+
- static int crypto_report_one(struct crypto_alg *alg,
- 			     struct crypto_user_alg *ualg, struct sk_buff *skb)
- {
-@@ -154,6 +171,12 @@ static int crypto_report_one(struct crypto_alg *alg,
- 			goto nla_put_failure;
+ Note that the key type representation types are required because key
+ identifiers from different standards aren't necessarily compatible.  For
+ instance, PGP generates key identifiers by hashing the key data plus some
+@@ -131,6 +134,7 @@ transferred the relevant bits to the structure pointed to by sig.
  
- 		break;
-+
-+	case CRYPTO_ALG_TYPE_PKE:
-+		if (crypto_report_pke(skb, alg))
-+			goto nla_put_failure;
-+
-+		break;
- 	}
+ 	struct public_key_signature {
+ 		u8 *digest;
++		char *pkey_algo;
+ 		u8 digest_size;
+ 		enum pkey_hash_algo pkey_hash_algo : 8;
+ 		u8 nr_mpi;
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 4870f28..1ad10f1 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -23,6 +23,7 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+ config PUBLIC_KEY_ALGO_RSA
+ 	tristate "RSA public-key algorithm"
+ 	select MPILIB
++	select CRYPTO_PKE
+ 	help
+ 	  This option enables support for the RSA algorithm (PKCS#1, RFC3447).
  
- out:
-diff --git a/crypto/pke.c b/crypto/pke.c
-new file mode 100644
-index 0000000..c1350fa
---- /dev/null
-+++ b/crypto/pke.c
-@@ -0,0 +1,114 @@
-+/*
-+ * Public Key Encryption operations.
-+ *
-+ * Copyright (c) 2015, Intel Corporation
-+ * Authors: Tadeusz Struk <tadeusz.struk@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+#include <linux/errno.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/seq_file.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/crypto.h>
-+#include <linux/cryptouser.h>
-+#include <net/netlink.h>
-+#include "internal.h"
-+
-+static unsigned int crypto_pke_ctxsize(struct crypto_alg *alg, u32 type,
-+				       u32 mask)
-+{
-+	unsigned int len = alg->cra_ctxsize;
-+
-+	return ALIGN(len, (unsigned long)alg->cra_alignmask + 1);
-+}
-+
-+static int crypto_init_pke_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
-+{
-+	struct pke_tfm *crt = &tfm->crt_pke;
-+	struct pke_alg *alg = &tfm->__crt_alg->cra_pke;
-+
-+	if (alg->pub_mpis > 5 || alg->sec_mpis > 5 || alg->sig_mpis > 2)
-+		return -EINVAL;
-+
-+	if ((alg->capabilities & PKEY_CAN_ENCRYPT) && !alg->encrypt)
-+		return -EINVAL;
-+
-+	if ((alg->capabilities & PKEY_CAN_DECRYPT) && !alg->decrypt)
-+		return -EINVAL;
-+
-+	if ((alg->capabilities & PKEY_CAN_SIGN) && !alg->sign)
-+		return -EINVAL;
-+
-+	if ((alg->capabilities & PKEY_CAN_VERIFY) && !alg->verify)
-+		return -EINVAL;
-+
-+	crt->sign = alg->sign;
-+	crt->verify = alg->verify;
-+	crt->encrypt = alg->encrypt;
-+	crt->decrypt = alg->decrypt;
-+	crt->base = __crypto_pke_cast(tfm);
-+
-+	return 0;
-+}
-+
-+#ifdef CONFIG_NET
-+static int crypto_pke_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	struct crypto_report_pke rep_pke;
-+
-+	strncpy(rep_pke.type, "pke", sizeof(rep_pke.type));
-+	strncpy(rep_pke.subtype, alg->cra_name, sizeof(rep_pke.subtype));
-+	rep_pke.capabilities = alg->cra_pke.capabilities;
-+
-+	if (nla_put(skb, CRYPTOCFGA_REPORT_PKE,
-+		    sizeof(struct crypto_report_pke), &rep_pke))
-+		goto nla_put_failure;
-+	return 0;
-+
-+nla_put_failure:
-+	return -EMSGSIZE;
-+}
-+#else
-+static int crypto_pke_report(struct sk_buff *skb, struct crypto_alg *alg)
-+{
-+	return -ENOSYS;
-+}
-+#endif
-+
-+static void crypto_pke_show(struct seq_file *m, struct crypto_alg *alg)
-+	__attribute__ ((unused));
-+static void crypto_pke_show(struct seq_file *m, struct crypto_alg *alg)
-+{
-+	int cap = alg->cra_pke.capabilities;
-+
-+	seq_puts(m, "type         : pke\n");
-+	seq_printf(m, "subtype      : %s\n", alg->cra_name);
-+	seq_printf(m, "can encrypt  : %s\n", cap & PKEY_CAN_ENCRYPT ?
-+		   "yes" : "no");
-+	seq_printf(m, "can decrypt  : %s\n", cap & PKEY_CAN_DECRYPT ?
-+		   "yes" : "no");
-+	seq_printf(m, "can sign     : %s\n", cap & PKEY_CAN_SIGN ?
-+		   "yes" : "no");
-+	seq_printf(m, "can verify   : %s\n", cap & PKEY_CAN_VERIFY ?
-+		   "yes" : "no");
-+}
-+
-+const struct crypto_type crypto_pke_type = {
-+	.ctxsize = crypto_pke_ctxsize,
-+	.init = crypto_init_pke_ops,
-+#ifdef CONFIG_PROC_FS
-+	.show = crypto_pke_show,
-+#endif
-+	.report = crypto_pke_report,
-+};
-+EXPORT_SYMBOL_GPL(crypto_pke_type);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Generic public key type");
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 0ecb768..5c46eb8 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -128,6 +128,7 @@ struct ablkcipher_walk {
- extern const struct crypto_type crypto_ablkcipher_type;
- extern const struct crypto_type crypto_aead_type;
- extern const struct crypto_type crypto_blkcipher_type;
-+extern const struct crypto_type crypto_pke_type;
+diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+index 3bd5a1e..d37a608 100644
+--- a/crypto/asymmetric_keys/pkcs7_parser.c
++++ b/crypto/asymmetric_keys/pkcs7_parser.c
+@@ -15,7 +15,7 @@
+ #include <linux/slab.h>
+ #include <linux/err.h>
+ #include <linux/oid_registry.h>
+-#include "public_key.h"
++#include <crypto/public_key.h>
+ #include "pkcs7_parser.h"
+ #include "pkcs7-asn1.h"
  
- void crypto_mod_put(struct crypto_alg *alg);
+@@ -376,7 +376,7 @@ int pkcs7_sig_note_signature(void *context, size_t hdrlen,
+ 	struct pkcs7_parse_context *ctx = context;
+ 	MPI mpi;
  
-@@ -378,6 +379,11 @@ static inline u32 aead_request_flags(struct aead_request *req)
- 	return req->base.flags;
- }
+-	BUG_ON(ctx->sinfo->sig.pkey_algo != PKEY_ALGO_RSA);
++	BUG_ON(strcmp(ctx->sinfo->sig.pkey_algo, PKEY_ALGO_RSA));
  
-+static inline void pke_request_complete(struct pke_request *req, int err)
-+{
-+	req->base.complete(&req->base, err);
-+}
-+
- static inline struct crypto_alg *crypto_get_attr_alg(struct rtattr **tb,
- 						     u32 type, u32 mask)
- {
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index ee14140..9538e2e 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -52,6 +52,7 @@
- #define CRYPTO_ALG_TYPE_HASH		0x00000008
- #define CRYPTO_ALG_TYPE_SHASH		0x00000009
- #define CRYPTO_ALG_TYPE_AHASH		0x0000000a
-+#define CRYPTO_ALG_TYPE_PKE		0x0000000b
- #define CRYPTO_ALG_TYPE_RNG		0x0000000c
- #define CRYPTO_ALG_TYPE_PCOMPRESS	0x0000000f
- 
-@@ -142,6 +143,8 @@ struct crypto_tfm;
- struct crypto_type;
- struct aead_givcrypt_request;
- struct skcipher_givcrypt_request;
-+struct public_key;
-+struct public_key_signature;
- 
- typedef void (*crypto_completion_t)(struct crypto_async_request *req, int err);
- 
-@@ -200,6 +203,12 @@ struct aead_request {
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
- };
- 
-+struct pke_request {
-+	struct crypto_async_request base;
-+	const struct public_key *pk;
-+	const struct public_key_signature *pks;
-+};
-+
- struct blkcipher_desc {
- 	struct crypto_blkcipher *tfm;
- 	void *info;
-@@ -425,12 +434,28 @@ struct compress_alg {
- 			      unsigned int slen, u8 *dst, unsigned int *dlen);
- };
- 
-+struct pke_alg {
-+	int (*sign)(struct pke_request *pkereq);
-+	int (*verify)(struct pke_request *pkereq);
-+	int (*encrypt)(struct pke_request *pkereq);
-+	int (*decrypt)(struct pke_request *pkereq);
-+
-+	u8 pub_mpis;	/* Number of MPIs in public key */
-+	u8 sec_mpis;	/* Number of MPIs in secret key */
-+	u8 sig_mpis;	/* Number of MPIs in a signature */
-+#define PKEY_CAN_ENCRYPT	0x01
-+#define PKEY_CAN_DECRYPT	0x02
-+#define PKEY_CAN_SIGN		0x04
-+#define PKEY_CAN_VERIFY		0x08
-+	u8 capabilities;
-+};
- 
- #define cra_ablkcipher	cra_u.ablkcipher
- #define cra_aead	cra_u.aead
- #define cra_blkcipher	cra_u.blkcipher
- #define cra_cipher	cra_u.cipher
- #define cra_compress	cra_u.compress
-+#define cra_pke		cra_u.pke
+ 	mpi = mpi_read_raw_data(value, vlen);
+ 	if (!mpi)
+diff --git a/crypto/asymmetric_keys/pkcs7_trust.c b/crypto/asymmetric_keys/pkcs7_trust.c
+index 1d29376..68ebae2 100644
+--- a/crypto/asymmetric_keys/pkcs7_trust.c
++++ b/crypto/asymmetric_keys/pkcs7_trust.c
+@@ -17,7 +17,7 @@
+ #include <linux/asn1.h>
+ #include <linux/key.h>
+ #include <keys/asymmetric-type.h>
+-#include "public_key.h"
++#include <crypto/public_key.h>
+ #include "pkcs7_parser.h"
  
  /**
-  * struct crypto_alg - definition of a cryptograpic cipher algorithm
-@@ -530,6 +555,7 @@ struct crypto_alg {
- 		struct blkcipher_alg blkcipher;
- 		struct cipher_alg cipher;
- 		struct compress_alg compress;
-+		struct pke_alg pke;
- 	} cra_u;
+diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+index cd45545..28f4a77 100644
+--- a/crypto/asymmetric_keys/pkcs7_verify.c
++++ b/crypto/asymmetric_keys/pkcs7_verify.c
+@@ -16,7 +16,7 @@
+ #include <linux/err.h>
+ #include <linux/asn1.h>
+ #include <crypto/hash.h>
+-#include "public_key.h"
++#include <crypto/public_key.h>
+ #include "pkcs7_parser.h"
  
- 	int (*cra_init)(struct crypto_tfm *tfm);
-@@ -625,12 +651,23 @@ struct compress_tfm {
- 	                      u8 *dst, unsigned int *dlen);
+ /*
+@@ -144,7 +144,8 @@ static int pkcs7_find_key(struct pkcs7_message *pkcs7,
+ 		pr_devel("Sig %u: Found cert serial match X.509[%u]\n",
+ 			 sinfo->index, certix);
+ 
+-		if (x509->pub->pkey_algo != sinfo->sig.pkey_algo) {
++		if (strcmp(pke_alg_name(x509->pub->tfm),
++			   sinfo->sig.pkey_algo)) {
+ 			pr_warn("Sig %u: X.509 algo and PKCS#7 sig algo don't match\n",
+ 				sinfo->index);
+ 			continue;
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 2f6e4fb..031112a 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -18,30 +18,21 @@
+ #include <linux/slab.h>
+ #include <linux/seq_file.h>
+ #include <keys/asymmetric-subtype.h>
+-#include "public_key.h"
++#include <crypto/public_key.h>
+ 
+ MODULE_LICENSE("GPL");
+ 
+-const char *const pkey_algo_name[PKEY_ALGO__LAST] = {
+-	[PKEY_ALGO_DSA]		= "DSA",
+-	[PKEY_ALGO_RSA]		= "RSA",
+-};
+-EXPORT_SYMBOL_GPL(pkey_algo_name);
+-
+-const struct public_key_algorithm *pkey_algo[PKEY_ALGO__LAST] = {
+-#if defined(CONFIG_PUBLIC_KEY_ALGO_RSA) || \
+-	defined(CONFIG_PUBLIC_KEY_ALGO_RSA_MODULE)
+-	[PKEY_ALGO_RSA]		= &RSA_public_key_algorithm,
+-#endif
+-};
+-EXPORT_SYMBOL_GPL(pkey_algo);
+-
+ const char *const pkey_id_type_name[PKEY_ID_TYPE__LAST] = {
+ 	[PKEY_ID_PGP]		= "PGP",
+ 	[PKEY_ID_X509]		= "X509",
  };
+ EXPORT_SYMBOL_GPL(pkey_id_type_name);
  
-+struct pke_tfm {
-+	int (*sign)(struct pke_request *pkereq);
-+	int (*verify)(struct pke_request *pkereq);
-+	int (*encrypt)(struct pke_request *pkereq);
-+	int (*decrypt)(struct pke_request *pkereq);
-+
-+	struct crypto_pke *base;
-+	unsigned int reqsize;
++struct public_key_completion {
++	struct completion completion;
++	int err;
 +};
 +
- #define crt_ablkcipher	crt_u.ablkcipher
- #define crt_aead	crt_u.aead
- #define crt_blkcipher	crt_u.blkcipher
- #define crt_cipher	crt_u.cipher
- #define crt_hash	crt_u.hash
- #define crt_compress	crt_u.compress
-+#define crt_pke		crt_u.pke
+ /*
+  * Provide a part of a description of the key for /proc/keys.
+  */
+@@ -52,7 +43,8 @@ static void public_key_describe(const struct key *asymmetric_key,
  
- struct crypto_tfm {
- 
-@@ -643,6 +680,7 @@ struct crypto_tfm {
- 		struct cipher_tfm cipher;
- 		struct hash_tfm hash;
- 		struct compress_tfm compress;
-+		struct pke_tfm pke;
- 	} crt_u;
- 
- 	void (*exit)(struct crypto_tfm *tfm);
-@@ -676,6 +714,10 @@ struct crypto_hash {
- 	struct crypto_tfm base;
- };
- 
-+struct crypto_pke {
-+	struct crypto_tfm base;
-+};
-+
- enum {
- 	CRYPTOA_UNSPEC,
- 	CRYPTOA_ALG,
-@@ -2356,5 +2398,152 @@ static inline int crypto_comp_decompress(struct crypto_comp *tfm,
- 						    src, slen, dst, dlen);
+ 	if (key)
+ 		seq_printf(m, "%s.%s",
+-			   pkey_id_type_name[key->id_type], key->algo->name);
++			   pkey_id_type_name[key->id_type],
++			   pke_alg_name(key->tfm));
  }
  
--#endif	/* _LINUX_CRYPTO_H */
-+static inline struct crypto_pke *__crypto_pke_cast(struct crypto_tfm *tfm)
+ /*
+@@ -71,13 +63,27 @@ void public_key_destroy(void *payload)
+ }
+ EXPORT_SYMBOL_GPL(public_key_destroy);
+ 
++static void public_key_verify_done(struct crypto_async_request *req, int err)
 +{
-+	return (struct crypto_pke *)tfm;
++	struct public_key_completion *compl = req->data;
++
++	if (err == -EINPROGRESS)
++		return;
++
++	compl->err = err;
++	complete(&compl->completion);
 +}
 +
-+static inline struct crypto_pke *crypto_pke_cast(struct crypto_tfm *tfm)
-+{
-+	BUG_ON(crypto_tfm_alg_type(tfm) != CRYPTO_ALG_TYPE_PKE);
-+	return __crypto_pke_cast(tfm);
-+}
-+
-+static inline struct crypto_pke *crypto_alloc_pke(const char *alg_name,
-+						  u32 type, u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_PKE;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+
-+	return __crypto_pke_cast(crypto_alloc_base(alg_name, type, mask));
-+}
-+
-+static inline struct crypto_tfm *crypto_pke_tfm(struct crypto_pke *tfm)
-+{
-+	return &tfm->base;
-+}
-+
-+static inline struct pke_tfm *crypto_pke_crt(struct crypto_pke *tfm)
-+{
-+	return &crypto_pke_tfm(tfm)->crt_pke;
-+}
-+
-+static inline void crypto_free_pke(struct crypto_pke *tfm)
-+{
-+	crypto_free_tfm(crypto_pke_tfm(tfm));
-+}
-+
-+static inline unsigned int crypto_pke_reqsize(struct crypto_pke *tfm)
-+{
-+	return crypto_pke_crt(tfm)->reqsize;
-+}
-+
-+static inline void pke_request_set_tfm(struct pke_request *req,
-+				       struct crypto_pke *tfm)
-+{
-+	req->base.tfm = crypto_pke_tfm(crypto_pke_crt(tfm)->base);
-+}
-+
-+static inline struct crypto_pke *crypto_pke_reqtfm(struct pke_request *req)
-+{
-+	return __crypto_pke_cast(req->base.tfm);
-+}
-+
-+static inline struct pke_request *pke_request_alloc(struct crypto_pke *tfm,
-+						    gfp_t gfp)
-+{
+ /*
+  * Verify a signature using a public key.
+  */
+ int public_key_verify_signature(const struct public_key *pk,
+ 				const struct public_key_signature *sig)
+ {
+-	const struct public_key_algorithm *algo;
++	struct crypto_pke *tfm;
 +	struct pke_request *req;
-+
-+	req = kmalloc(sizeof(*req) + crypto_pke_reqsize(tfm), gfp);
-+	if (likely(req))
-+		pke_request_set_tfm(req, tfm);
-+
-+	return req;
-+}
++	struct public_key_completion compl;
++	int ret;
  
-+static inline void pke_request_free(struct pke_request *req)
-+{
-+	kzfree(req);
-+}
-+
-+static inline void pke_request_set_callback(struct pke_request *req,
-+					    u32 flags, crypto_completion_t cmpl,
-+					    void *data)
-+{
-+	req->base.complete = cmpl;
-+	req->base.data = data;
-+	req->base.flags = flags;
-+}
-+
-+static inline void pke_request_set_crypt(struct pke_request *req,
-+					 const struct public_key *pk,
-+					 const struct public_key_signature *sig)
-+{
-+	req->pk = pk;
-+	req->pks = sig;
-+}
-+
-+static inline u8 pke_num_sig_mpi(struct crypto_pke *tfm)
-+{
-+	struct crypto_tfm *base_tfm = &tfm->base;
-+
-+	return base_tfm->__crt_alg->cra_pke.sig_mpis;
-+}
-+
-+static inline u8 pke_num_pub_mpi(struct crypto_pke *tfm)
-+{
-+	struct crypto_tfm *base_tfm = &tfm->base;
-+
-+	return base_tfm->__crt_alg->cra_pke.pub_mpis;
-+}
-+
-+static inline u8 pke_num_sec_mpi(struct crypto_pke *tfm)
-+{
-+	struct crypto_tfm *base_tfm = &tfm->base;
-+
-+	return base_tfm->__crt_alg->cra_pke.sec_mpis;
-+}
-+
-+static inline u8 pke_capab(struct crypto_pke *tfm)
-+{
-+	struct crypto_tfm *base_tfm = &tfm->base;
-+
-+	return base_tfm->__crt_alg->cra_pke.capabilities;
-+}
-+
-+static inline const char *pke_alg_name(struct crypto_pke *tfm)
-+{
-+	struct crypto_tfm *base_tfm = &tfm->base;
-+
-+	return base_tfm->__crt_alg->cra_name;
-+}
-+
-+static inline int crypto_pke_encrypt(struct pke_request *req)
-+{
-+	struct pke_tfm *tfm = crypto_pke_crt(crypto_pke_reqtfm(req));
-+
-+	return tfm->encrypt(req);
-+}
-+
-+static inline int crypto_pke_decrypt(struct pke_request *req)
-+{
-+	struct pke_tfm *tfm = crypto_pke_crt(crypto_pke_reqtfm(req));
-+
-+	return tfm->decrypt(req);
-+}
-+
-+static inline int crypto_pke_sign(struct pke_request *req)
-+{
-+	struct pke_tfm *tfm = crypto_pke_crt(crypto_pke_reqtfm(req));
-+
-+	return tfm->sign(req);
-+}
-+
-+static inline int crypto_pke_verify(struct pke_request *req)
-+{
-+	struct pke_tfm *tfm = crypto_pke_crt(crypto_pke_reqtfm(req));
-+
-+	return tfm->verify(req);
-+}
-+#endif	/* _LINUX_CRYPTO_H */
-diff --git a/include/linux/cryptouser.h b/include/linux/cryptouser.h
-index 4abf2ea..e801130 100644
---- a/include/linux/cryptouser.h
-+++ b/include/linux/cryptouser.h
-@@ -43,6 +43,7 @@ enum crypto_attr_type_t {
- 	CRYPTOCFGA_REPORT_COMPRESS,	/* struct crypto_report_comp */
- 	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
- 	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
-+	CRYPTOCFGA_REPORT_PKE,		/* struct crypto_report_pke */
- 	__CRYPTOCFGA_MAX
+ 	BUG_ON(!pk);
+ 	BUG_ON(!pk->mpi[0]);
+@@ -86,25 +92,32 @@ int public_key_verify_signature(const struct public_key *pk,
+ 	BUG_ON(!sig->digest);
+ 	BUG_ON(!sig->mpi[0]);
  
- #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
-@@ -101,5 +102,11 @@ struct crypto_report_rng {
- 	unsigned int seedsize;
+-	algo = pk->algo;
+-	if (!algo) {
+-		if (pk->pkey_algo >= PKEY_ALGO__LAST)
+-			return -ENOPKG;
+-		algo = pkey_algo[pk->pkey_algo];
+-		if (!algo)
+-			return -ENOPKG;
+-	}
++	tfm = pk->tfm;
++	if (IS_ERR(tfm))
++		return -EINVAL;
+ 
+-	if (!algo->verify_signature)
+-		return -ENOTSUPP;
++	req = pke_request_alloc(tfm, GFP_KERNEL);
++	if (!req)
++		return -ENOMEM;
+ 
+-	if (sig->nr_mpi != algo->n_sig_mpi) {
++	if (sig->nr_mpi != pke_num_sig_mpi(tfm)) {
+ 		pr_debug("Signature has %u MPI not %u\n",
+-			 sig->nr_mpi, algo->n_sig_mpi);
++			 sig->nr_mpi, pke_num_sig_mpi(tfm));
+ 		return -EINVAL;
+ 	}
+ 
+-	return algo->verify_signature(pk, sig);
++	init_completion(&compl.completion);
++	pke_request_set_crypt(req, pk, sig);
++	pke_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
++				 CRYPTO_TFM_REQ_MAY_SLEEP,
++				 public_key_verify_done, &compl);
++	ret = crypto_pke_verify(req);
++	if (ret == -EINPROGRESS) {
++		wait_for_completion(&compl.completion);
++		ret = compl.err;
++	}
++	pke_request_free(req);
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(public_key_verify_signature);
+ 
+diff --git a/crypto/asymmetric_keys/public_key.h b/crypto/asymmetric_keys/public_key.h
+deleted file mode 100644
+index 5c37a22..0000000
+--- a/crypto/asymmetric_keys/public_key.h
++++ /dev/null
+@@ -1,36 +0,0 @@
+-/* Public key algorithm internals
+- *
+- * See Documentation/crypto/asymmetric-keys.txt
+- *
+- * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
+- * Written by David Howells (dhowells@redhat.com)
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public Licence
+- * as published by the Free Software Foundation; either version
+- * 2 of the Licence, or (at your option) any later version.
+- */
+-
+-#include <crypto/public_key.h>
+-
+-extern struct asymmetric_key_subtype public_key_subtype;
+-
+-/*
+- * Public key algorithm definition.
+- */
+-struct public_key_algorithm {
+-	const char	*name;
+-	u8		n_pub_mpi;	/* Number of MPIs in public key */
+-	u8		n_sec_mpi;	/* Number of MPIs in secret key */
+-	u8		n_sig_mpi;	/* Number of MPIs in a signature */
+-	int (*verify_signature)(const struct public_key *key,
+-				const struct public_key_signature *sig);
+-};
+-
+-extern const struct public_key_algorithm RSA_public_key_algorithm;
+-
+-/*
+- * public_key.c
+- */
+-extern int public_key_verify_signature(const struct public_key *pk,
+-				       const struct public_key_signature *sig);
+diff --git a/crypto/asymmetric_keys/rsa.c b/crypto/asymmetric_keys/rsa.c
+index 459cf97..d7ad132 100644
+--- a/crypto/asymmetric_keys/rsa.c
++++ b/crypto/asymmetric_keys/rsa.c
+@@ -14,7 +14,7 @@
+ #include <linux/kernel.h>
+ #include <linux/slab.h>
+ #include <crypto/algapi.h>
+-#include "public_key.h"
++#include <crypto/public_key.h>
+ 
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("RSA Public Key Algorithm");
+@@ -207,9 +207,10 @@ static int RSA_verify(const u8 *H, const u8 *EM, size_t k, size_t hash_size,
+ /*
+  * Perform the verification step [RFC3447 sec 8.2.2].
+  */
+-static int RSA_verify_signature(const struct public_key *key,
+-				const struct public_key_signature *sig)
++static int RSA_verify_signature(struct pke_request *req)
+ {
++	const struct public_key *key = req->pk;
++	const struct public_key_signature *sig = req->pks;
+ 	size_t tsize;
+ 	int ret;
+ 
+@@ -268,11 +269,37 @@ error:
+ 	return ret;
+ }
+ 
+-const struct public_key_algorithm RSA_public_key_algorithm = {
+-	.name		= "RSA",
+-	.n_pub_mpi	= 2,
+-	.n_sec_mpi	= 3,
+-	.n_sig_mpi	= 1,
+-	.verify_signature = RSA_verify_signature,
++static struct crypto_alg rsa = {
++	.cra_name = "rsa",
++	.cra_driver_name = "rsa-keys",
++	.cra_priority = 100,
++	.cra_flags = CRYPTO_ALG_TYPE_PKE,
++	.cra_ctxsize = 0,
++	.cra_alignmask = 0,
++	.cra_type = &crypto_pke_type,
++	.cra_module = THIS_MODULE,
++	.cra_u = {
++		.pke = {
++			.verify = RSA_verify_signature,
++			.capabilities = PKEY_CAN_VERIFY,
++			.pub_mpis = 2,
++			.sec_mpis = 3,
++			.sig_mpis = 1,
++		},
++	},
+ };
+-EXPORT_SYMBOL_GPL(RSA_public_key_algorithm);
++
++static int rsa_init(void)
++{
++	return crypto_register_alg(&rsa);
++}
++
++static void rsa_exit(void)
++{
++	if (crypto_unregister_alg(&rsa))
++		BUG();
++}
++
++module_init(rsa_init);
++module_exit(rsa_exit);
++MODULE_ALIAS_CRYPTO("rsa");
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index a668d90..56816aa 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -15,7 +15,7 @@
+ #include <linux/slab.h>
+ #include <linux/err.h>
+ #include <linux/oid_registry.h>
+-#include "public_key.h"
++#include <crypto/public_key.h>
+ #include "x509_parser.h"
+ #include "x509-asn1.h"
+ #include "x509_rsakey-asn1.h"
+@@ -43,6 +43,8 @@ struct x509_parse_context {
+ void x509_free_certificate(struct x509_certificate *cert)
+ {
+ 	if (cert) {
++		if (cert->pub && !IS_ERR(cert->pub->tfm))
++			crypto_free_pke(cert->pub->tfm);
+ 		public_key_destroy(cert->pub);
+ 		kfree(cert->issuer);
+ 		kfree(cert->subject);
+@@ -100,6 +102,14 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
+ 		ret = PTR_ERR(kid);
+ 		goto error_decode;
+ 	}
++
++	cert->pub->tfm = crypto_alloc_pke(ctx->cert->sig.pkey_algo, 0, 0);
++	if (IS_ERR(cert->pub->tfm)) {
++		pr_err("Failed to alloc pkey algo %s\n",
++		       ctx->cert->sig.pkey_algo);
++		goto error_decode;
++	}
++
+ 	cert->id = kid;
+ 
+ 	kfree(ctx);
+@@ -378,8 +388,6 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+ 	if (ctx->last_oid != OID_rsaEncryption)
+ 		return -ENOPKG;
+ 
+-	ctx->cert->pub->pkey_algo = PKEY_ALGO_RSA;
+-
+ 	/* Discard the BIT STRING metadata */
+ 	ctx->key = value + 1;
+ 	ctx->key_size = vlen - 1;
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index a6c4203..4a346c7 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -20,8 +20,8 @@
+ #include <keys/asymmetric-parser.h>
+ #include <keys/system_keyring.h>
+ #include <crypto/hash.h>
++#include <crypto/public_key.h>
+ #include "asymmetric_keys.h"
+-#include "public_key.h"
+ #include "x509_parser.h"
+ 
+ static bool use_builtin_keys;
+@@ -247,17 +247,13 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 	pr_devel("Cert Issuer: %s\n", cert->issuer);
+ 	pr_devel("Cert Subject: %s\n", cert->subject);
+ 
+-	if (cert->pub->pkey_algo >= PKEY_ALGO__LAST ||
+-	    cert->sig.pkey_algo >= PKEY_ALGO__LAST ||
+-	    cert->sig.pkey_hash_algo >= PKEY_HASH__LAST ||
+-	    !pkey_algo[cert->pub->pkey_algo] ||
+-	    !pkey_algo[cert->sig.pkey_algo] ||
++	if (cert->sig.pkey_hash_algo >= PKEY_HASH__LAST ||
+ 	    !hash_algo_name[cert->sig.pkey_hash_algo]) {
+ 		ret = -ENOPKG;
+ 		goto error_free_cert;
+ 	}
+ 
+-	pr_devel("Cert Key Algo: %s\n", pkey_algo_name[cert->pub->pkey_algo]);
++	pr_devel("Cert Key Algo: %s\n", pke_alg_name(cert->pub->tfm));
+ 	pr_devel("Cert Valid From: %04ld-%02d-%02d %02d:%02d:%02d\n",
+ 		 cert->valid_from.tm_year + 1900, cert->valid_from.tm_mon + 1,
+ 		 cert->valid_from.tm_mday, cert->valid_from.tm_hour,
+@@ -266,11 +262,9 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
+ 		 cert->valid_to.tm_year + 1900, cert->valid_to.tm_mon + 1,
+ 		 cert->valid_to.tm_mday, cert->valid_to.tm_hour,
+ 		 cert->valid_to.tm_min,  cert->valid_to.tm_sec);
+-	pr_devel("Cert Signature: %s + %s\n",
+-		 pkey_algo_name[cert->sig.pkey_algo],
++	pr_devel("Cert Signature: %s + %s\n", cert->sig.pkey_algo,
+ 		 hash_algo_name[cert->sig.pkey_hash_algo]);
+ 
+-	cert->pub->algo = pkey_algo[cert->pub->pkey_algo];
+ 	cert->pub->id_type = PKEY_ID_X509;
+ 
+ 	/* Check the signature on the key if it appears to be self-signed */
+diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+index 54add20..c4420e9 100644
+--- a/include/crypto/public_key.h
++++ b/include/crypto/public_key.h
+@@ -15,17 +15,12 @@
+ #define _LINUX_PUBLIC_KEY_H
+ 
+ #include <linux/mpi.h>
++#include <linux/crypto.h>
+ #include <keys/asymmetric-type.h>
+ #include <crypto/hash_info.h>
+ 
+-enum pkey_algo {
+-	PKEY_ALGO_DSA,
+-	PKEY_ALGO_RSA,
+-	PKEY_ALGO__LAST
+-};
+-
+-extern const char *const pkey_algo_name[PKEY_ALGO__LAST];
+-extern const struct public_key_algorithm *pkey_algo[PKEY_ALGO__LAST];
++#define PKEY_ALGO_DSA "dsa"
++#define PKEY_ALGO_RSA "rsa"
+ 
+ /* asymmetric key implementation supports only up to SHA224 */
+ #define PKEY_HASH__LAST		(HASH_ALGO_SHA224 + 1)
+@@ -45,13 +40,7 @@ extern const char *const pkey_id_type_name[PKEY_ID_TYPE__LAST];
+  * part.
+  */
+ struct public_key {
+-	const struct public_key_algorithm *algo;
+-	u8	capabilities;
+-#define PKEY_CAN_ENCRYPT	0x01
+-#define PKEY_CAN_DECRYPT	0x02
+-#define PKEY_CAN_SIGN		0x04
+-#define PKEY_CAN_VERIFY		0x08
+-	enum pkey_algo pkey_algo : 8;
++	struct crypto_pke *tfm;
+ 	enum pkey_id_type id_type : 8;
+ 	union {
+ 		MPI	mpi[5];
+@@ -79,9 +68,9 @@ extern void public_key_destroy(void *payload);
+  */
+ struct public_key_signature {
+ 	u8 *digest;
++	char *pkey_algo;
+ 	u8 digest_size;			/* Number of bytes in digest */
+ 	u8 nr_mpi;			/* Occupancy of mpi[] */
+-	enum pkey_algo pkey_algo : 8;
+ 	enum hash_algo pkey_hash_algo : 8;
+ 	union {
+ 		MPI mpi[2];
+@@ -95,6 +84,7 @@ struct public_key_signature {
+ 	};
  };
  
-+struct crypto_report_pke {
-+	char type[CRYPTO_MAX_NAME];
-+	char subtype[CRYPTO_MAX_NAME];
-+	unsigned int capabilities;
++extern struct asymmetric_key_subtype public_key_subtype;
+ struct key;
+ extern int verify_signature(const struct key *key,
+ 			    const struct public_key_signature *sig);
+@@ -104,4 +94,6 @@ extern struct key *x509_request_asymmetric_key(struct key *keyring,
+ 					       const struct asymmetric_key_id *kid,
+ 					       bool partial);
+ 
++int public_key_verify_signature(const struct public_key *pk,
++				const struct public_key_signature *sig);
+ #endif /* _LINUX_PUBLIC_KEY_H */
+diff --git a/kernel/module_signing.c b/kernel/module_signing.c
+index be5b8fa..1c55adb 100644
+--- a/kernel/module_signing.c
++++ b/kernel/module_signing.c
+@@ -28,7 +28,7 @@
+  *	- Information block
+  */
+ struct module_signature {
+-	u8	algo;		/* Public-key crypto algorithm [enum pkey_algo] */
++	u8	algo;		/* Public-key crypto algorithm */
+ 	u8	hash;		/* Digest algorithm [enum hash_algo] */
+ 	u8	id_type;	/* Key identifier type [enum pkey_id_type] */
+ 	u8	signer_len;	/* Length of signer's name */
+@@ -37,6 +37,10 @@ struct module_signature {
+ 	__be32	sig_len;	/* Length of signature data */
+ };
+ 
++static const char *const pkey_algo_name[] = {
++	PKEY_ALGO_DSA, PKEY_ALGO_RSA
 +};
 +
- #define CRYPTO_REPORT_MAXSIZE (sizeof(struct crypto_user_alg) + \
- 			       sizeof(struct crypto_report_blkcipher))
+ /*
+  * Digest the module contents.
+  */
+@@ -213,7 +217,8 @@ int mod_verify_sig(const void *mod, unsigned long *_modlen)
+ 	sig = mod + modlen;
+ 
+ 	/* For the moment, only support RSA and X.509 identifiers */
+-	if (ms.algo != PKEY_ALGO_RSA ||
++	if (ARRAY_SIZE(pkey_algo_name) - 1 < ms.algo ||
++	    strcmp(pkey_algo_name[ms.algo], PKEY_ALGO_RSA) != 0 ||
+ 	    ms.id_type != PKEY_ID_X509)
+ 		return -ENOPKG;
+ 
