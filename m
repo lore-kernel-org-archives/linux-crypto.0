@@ -1,70 +1,119 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH RFC 1/2] crypto: add PKE API
-Date: Fri, 01 May 2015 17:04:00 +0100
-Message-ID: <4227.1430496240@warthog.procyon.org.uk>
-References: <20150430223652.10157.86151.stgit@tstruk-mobl1> <20150430223647.10157.82156.stgit@tstruk-mobl1>
+From: Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v4 3/4] lib: introduce crc_t10dif_update()
+Date: Fri, 01 May 2015 09:15:06 -0700
+Message-ID: <1430496906.660.79.camel@schen9-desk2.jf.intel.com>
+References: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
+	 <1430461431-5936-4-git-send-email-akinobu.mita@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Cc: dhowells@redhat.com, herbert@gondor.apana.org.au, corbet@lwn.net,
-	keescook@chromium.org, qat-linux@intel.com, jwboyer@redhat.com,
-	richard@nod.at, d.kasatkin@samsung.com,
-	linux-kernel@vger.kernel.org, steved@redhat.com, vgoyal@redhat.com,
-	james.l.morris@oracle.com, jkosina@suse.cz,
-	zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: target-devel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Nicholas Bellinger <nab@linux-iscsi.org>,
+	Sagi Grimberg <sagig@mellanox.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+To: Akinobu Mita <akinobu.mita@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56120 "EHLO mx1.redhat.com"
+Received: from mga03.intel.com ([134.134.136.65]:9993 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1030365AbbEAQEd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 May 2015 12:04:33 -0400
-In-Reply-To: <20150430223652.10157.86151.stgit@tstruk-mobl1>
-Content-ID: <4226.1430496240.1@warthog.procyon.org.uk>
+	id S1750717AbbEAQPI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 1 May 2015 12:15:08 -0400
+In-Reply-To: <1430461431-5936-4-git-send-email-akinobu.mita@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Tadeusz Struk <tadeusz.struk@intel.com> wrote:
+On Fri, 2015-05-01 at 15:23 +0900, Akinobu Mita wrote:
+> This introduces crc_t10dif_update() which enables to calculate CRC
+> for a block which straddles multiple SG elements by calling multiple
+> times.  This also converts crc_t10dif() to use crc_t10dif_update() as
+> they are almost same.
+> 
+> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
+> Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+> Cc: Tim Chen <tim.c.chen@linux.intel.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: Nicholas Bellinger <nab@linux-iscsi.org>
+> Cc: Sagi Grimberg <sagig@mellanox.com>
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+> Cc: target-devel@vger.kernel.org
+> ---
+> * Changes from v3:
+> - Reduce duplicated code between crc_t10dif_update and crc_t10dif,
+>   suggested by Tim and Herbert
+> 
+>  include/linux/crc-t10dif.h |  1 +
+>  lib/crc-t10dif.c           | 13 ++++++++++---
+>  2 files changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
+> index cf53d07..d81961e 100644
+> --- a/include/linux/crc-t10dif.h
+> +++ b/include/linux/crc-t10dif.h
+> @@ -9,5 +9,6 @@
+>  extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
+>  				size_t len);
+>  extern __u16 crc_t10dif(unsigned char const *, size_t);
+> +extern __u16 crc_t10dif_update(__u16 crc, unsigned char const *, size_t);
+>  
+>  #endif
+> diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
+> index dfe6ec1..d775737 100644
+> --- a/lib/crc-t10dif.c
+> +++ b/lib/crc-t10dif.c
+> @@ -19,7 +19,7 @@
+>  static struct crypto_shash *crct10dif_tfm;
+>  static struct static_key crct10dif_fallback __read_mostly;
+>  
+> -__u16 crc_t10dif(const unsigned char *buffer, size_t len)
+> +__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
+>  {
+>  	struct {
+>  		struct shash_desc shash;
+> @@ -28,17 +28,24 @@ __u16 crc_t10dif(const unsigned char *buffer, size_t len)
+>  	int err;
+>  
+>  	if (static_key_false(&crct10dif_fallback))
+> -		return crc_t10dif_generic(0, buffer, len);
+> +		return crc_t10dif_generic(crc, buffer, len);
+>  
+>  	desc.shash.tfm = crct10dif_tfm;
+>  	desc.shash.flags = 0;
+> -	*(__u16 *)desc.ctx = 0;
+>  
+> +	err = crypto_shash_import(&desc.shash, &crc);
+> +	BUG_ON(err);
+>  	err = crypto_shash_update(&desc.shash, buffer, len);
+>  	BUG_ON(err);
+>  
+>  	return *(__u16 *)desc.ctx;
+>  }
+> +EXPORT_SYMBOL(crc_t10dif_update);
+> +
+> +__u16 crc_t10dif(const unsigned char *buffer, size_t len)
+> +{
+> +	return crc_t10dif_update(0, buffer, len);
 
-> +config CRYPTO_PKE
+Nitpicking a bit:
 
-I would prefer CRYPTO_PKEY and pkey rather than pke generally and algo rather
-than alg where possible - this will have more consistency with what we have
-now.
+Will putting an extra function call to crc_t10dif_update will add extra
+overhead to crc_t10dif, which is what most driver uses? As
+we are calling crc_t10dif a lot (millions of times) as we go
+through a block device, this extra function call
+is undesirable.  Using a __crc_t10dif_update
+inline function that both crc_t10dif_update and crc_t10dif
+invokes can will avoid this overhead.
 
-I understand, however, that in core crypto code, 'alg' is used.
+Tim
 
-+	seq_printf(m, "can encrypt  : %s\n", cap & PKEY_CAN_ENCRYPT ?
-+		   "yes" : "no");
-
-Please split the line after the comma.
-
->  #define CRYPTO_ALG_TYPE_AHASH		0x0000000a
-> +#define CRYPTO_ALG_TYPE_PKE		0x0000000b
->  #define CRYPTO_ALG_TYPE_RNG		0x0000000c
-
-Will filling a hole cause a problem with something that got obsoleted?
-
-> +struct pke_request {
-> +	struct crypto_async_request base;
-> +	const struct public_key *pk;
-> +	const struct public_key_signature *pks;
-> +};
-
-I recommend:
-
-	pk -> key or pkey
-	pks -> sig or signature
-
-> +	u8 pub_mpis;	/* Number of MPIs in public key */
-> +	u8 sec_mpis;	/* Number of MPIs in secret key */
-> +	u8 sig_mpis;	/* Number of MPIs in a signature */
-
-Keep member names as:
-
-	u8		n_pub_mpi;	/* Number of MPIs in public key */
-	u8		n_sec_mpi;	/* Number of MPIs in secret key */
-	u8		n_sig_mpi;	/* Number of MPIs in a signature */
-
-please.
-
-David
+> +}
+>  EXPORT_SYMBOL(crc_t10dif);
+>  
+>  static int __init crc_t10dif_mod_init(void)
