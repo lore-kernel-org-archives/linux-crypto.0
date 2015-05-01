@@ -1,100 +1,65 @@
-From: Akinobu Mita <akinobu.mita@gmail.com>
-Subject: [PATCH v4 3/4] lib: introduce crc_t10dif_update()
-Date: Fri,  1 May 2015 15:23:50 +0900
-Message-ID: <1430461431-5936-4-git-send-email-akinobu.mita@gmail.com>
-References: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Nicholas Bellinger <nab@linux-iscsi.org>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-To: target-devel@vger.kernel.org
-Return-path: <target-devel-owner@vger.kernel.org>
-In-Reply-To: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
-Sender: target-devel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v3 4/6] crypto: drbg - add async seeding operation
+Date: Fri, 01 May 2015 06:15:58 +0200
+Message-ID: <1920079.qHlzZPHHdY@tauon>
+References: <11175802.HG0pHJfshY@myon.chronox.de> <26987163.Lvcqt6Smju@myon.chronox.de> <20150501031331.GA32741@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
+	sandyinchina@gmail.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34628 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750843AbbEAHEZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 1 May 2015 03:04:25 -0400
+In-Reply-To: <20150501031331.GA32741@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-This introduces crc_t10dif_update() which enables to calculate CRC
-for a block which straddles multiple SG elements by calling multiple
-times.  This also converts crc_t10dif() to use crc_t10dif_update() as
-they are almost same.
+Am Freitag, 1. Mai 2015, 11:13:31 schrieb Herbert Xu:
 
-Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
-Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Tim Chen <tim.c.chen@linux.intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: Nicholas Bellinger <nab@linux-iscsi.org>
-Cc: Sagi Grimberg <sagig@mellanox.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-Cc: target-devel@vger.kernel.org
----
-* Changes from v3:
-- Reduce duplicated code between crc_t10dif_update and crc_t10dif,
-  suggested by Tim and Herbert
+Hi Herbert,
 
- include/linux/crc-t10dif.h |  1 +
- lib/crc-t10dif.c           | 13 ++++++++++---
- 2 files changed, 11 insertions(+), 3 deletions(-)
+>On Tue, Apr 28, 2015 at 05:00:03AM +0200, Stephan Mueller wrote:
+>> @@ -1081,6 +1115,11 @@ static int drbg_seed(struct drbg_state *drbg, struct
+>> drbg_string *pers,> 
+>>  		return -EINVAL;
+>>  	
+>>  	}
+>> 
+>> +	/* cancel any previously invoked seeding */
+>> +	mutex_unlock(&drbg->drbg_mutex);
+>> +	drbg_async_work_cancel(&drbg->seed_work);
+>> +	mutex_lock(&drbg->drbg_mutex);
+>
+>This seems dangerous and unnecessary.  Releasing and reacquiring
+>the locks may invalidate previous checks.  Even if it doesn't
+>matter today if somebody modifies the callers later on this could
+>explode.
 
-diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
-index cf53d07..d81961e 100644
---- a/include/linux/crc-t10dif.h
-+++ b/include/linux/crc-t10dif.h
-@@ -9,5 +9,6 @@
- extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
- 				size_t len);
- extern __u16 crc_t10dif(unsigned char const *, size_t);
-+extern __u16 crc_t10dif_update(__u16 crc, unsigned char const *, size_t);
- 
- #endif
-diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
-index dfe6ec1..d775737 100644
---- a/lib/crc-t10dif.c
-+++ b/lib/crc-t10dif.c
-@@ -19,7 +19,7 @@
- static struct crypto_shash *crct10dif_tfm;
- static struct static_key crct10dif_fallback __read_mostly;
- 
--__u16 crc_t10dif(const unsigned char *buffer, size_t len)
-+__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
- {
- 	struct {
- 		struct shash_desc shash;
-@@ -28,17 +28,24 @@ __u16 crc_t10dif(const unsigned char *buffer, size_t len)
- 	int err;
- 
- 	if (static_key_false(&crct10dif_fallback))
--		return crc_t10dif_generic(0, buffer, len);
-+		return crc_t10dif_generic(crc, buffer, len);
- 
- 	desc.shash.tfm = crct10dif_tfm;
- 	desc.shash.flags = 0;
--	*(__u16 *)desc.ctx = 0;
- 
-+	err = crypto_shash_import(&desc.shash, &crc);
-+	BUG_ON(err);
- 	err = crypto_shash_update(&desc.shash, buffer, len);
- 	BUG_ON(err);
- 
- 	return *(__u16 *)desc.ctx;
- }
-+EXPORT_SYMBOL(crc_t10dif_update);
-+
-+__u16 crc_t10dif(const unsigned char *buffer, size_t len)
-+{
-+	return crc_t10dif_update(0, buffer, len);
-+}
- EXPORT_SYMBOL(crc_t10dif);
- 
- static int __init crc_t10dif_mod_init(void)
--- 
-1.9.1
+Agreed.
+>
+>You can easily remove this by making get_blocking_random_bytes_cb
+>idempotent, i.e., do nothing if the work is already queued, which
+>is what it would do anyway if you simply move the INIT_WORK out of
+>it.
+
+As the get_blocking_random_bytes_cb fully sets up the random_work data 
+structure, I think INIT_WORK should be left in there to have a nice and easy 
+API. Otherwise either a new call would need to be added to random.c. The 
+caller is not able to invoke INIT_WORK himself as the worker function is 
+static.
+
+However, what about simply checking if rw->work is NULL and only then 
+performing the INIT_WORK? In that case then, I guess that all the members of 
+random_walk in get_blocking_random_bytes_cb should only be filled in if 
+INIT_WORK is to be called as otherwise a race may occur: 
+get_blocking_random_bytes_work already performs its operation on the data in 
+the supplied random_work and in the middle of that work, and then we would 
+change it with a new call to get_blocking_random_bytes_cb.
+
+Ciao
+Stephan
