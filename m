@@ -1,32 +1,49 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH RFC 1/2] crypto: add PKE API
-Date: Thu, 30 Apr 2015 16:04:41 -0700
-Message-ID: <5542B509.9010703@intel.com>
-References: <20150430223647.10157.82156.stgit@tstruk-mobl1> <20150430223652.10157.86151.stgit@tstruk-mobl1> <20150430224312.GA30417@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v3 4/6] crypto: drbg - add async seeding operation
+Date: Fri, 1 May 2015 11:13:31 +0800
+Message-ID: <20150501031331.GA32741@gondor.apana.org.au>
+References: <11175802.HG0pHJfshY@myon.chronox.de>
+ <26987163.Lvcqt6Smju@myon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: corbet@lwn.net, keescook@chromium.org, qat-linux@intel.com,
-	jwboyer@redhat.com, richard@nod.at, d.kasatkin@samsung.com,
-	linux-kernel@vger.kernel.org, steved@redhat.com,
-	dhowells@redhat.com, vgoyal@redhat.com, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	jdelvare@suse.de, linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
+	sandyinchina@gmail.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:42122 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750839AbbD3XHq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Apr 2015 19:07:46 -0400
-In-Reply-To: <20150430224312.GA30417@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:44976 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753134AbbEADNs (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 30 Apr 2015 23:13:48 -0400
+Content-Disposition: inline
+In-Reply-To: <26987163.Lvcqt6Smju@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 04/30/2015 03:43 PM, Herbert Xu wrote:
-> Please remodel it after pcompress or the newly converted rng type.
-> 
-> This union stuff has been obsolete since 2008 and it's time for
-> it to die.
+On Tue, Apr 28, 2015 at 05:00:03AM +0200, Stephan Mueller wrote:
+>
+> @@ -1081,6 +1115,11 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+>  		return -EINVAL;
+>  	}
+>  
+> +	/* cancel any previously invoked seeding */
+> +	mutex_unlock(&drbg->drbg_mutex);
+> +	drbg_async_work_cancel(&drbg->seed_work);
+> +	mutex_lock(&drbg->drbg_mutex);
 
-Ok, I didn't realize. Will send v2 shortly.
-Thanks
+This seems dangerous and unnecessary.  Releasing and reacquiring
+the locks may invalidate previous checks.  Even if it doesn't
+matter today if somebody modifies the callers later on this could
+explode.
+
+You can easily remove this by making get_blocking_random_bytes_cb
+idempotent, i.e., do nothing if the work is already queued, which
+is what it would do anyway if you simply move the INIT_WORK out of
+it.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
