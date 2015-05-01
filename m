@@ -1,119 +1,110 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v4 3/4] lib: introduce crc_t10dif_update()
-Date: Fri, 01 May 2015 09:15:06 -0700
-Message-ID: <1430496906.660.79.camel@schen9-desk2.jf.intel.com>
-References: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
-	 <1430461431-5936-4-git-send-email-akinobu.mita@gmail.com>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH RFC 2/2] crypto: RSA: KEYS: convert rsa and public key to new PKE API
+Date: Fri, 01 May 2015 17:21:43 +0100
+Message-ID: <4394.1430497303@warthog.procyon.org.uk>
+References: <20150430223658.10157.32631.stgit@tstruk-mobl1> <20150430223647.10157.82156.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: target-devel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Nicholas Bellinger <nab@linux-iscsi.org>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-To: Akinobu Mita <akinobu.mita@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Cc: dhowells@redhat.com, herbert@gondor.apana.org.au, corbet@lwn.net,
+	keescook@chromium.org, qat-linux@intel.com, jwboyer@redhat.com,
+	richard@nod.at, d.kasatkin@samsung.com,
+	linux-kernel@vger.kernel.org, steved@redhat.com, vgoyal@redhat.com,
+	james.l.morris@oracle.com, jkosina@suse.cz,
+	zohar@linux.vnet.ibm.com, davem@davemloft.net, jdelvare@suse.de,
+	linux-crypto@vger.kernel.org
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:9993 "EHLO mga03.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:53132 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750717AbbEAQPI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 May 2015 12:15:08 -0400
-In-Reply-To: <1430461431-5936-4-git-send-email-akinobu.mita@gmail.com>
+	id S1751512AbbEAQWL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 1 May 2015 12:22:11 -0400
+In-Reply-To: <20150430223658.10157.32631.stgit@tstruk-mobl1>
+Content-ID: <4393.1430497303.1@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 2015-05-01 at 15:23 +0900, Akinobu Mita wrote:
-> This introduces crc_t10dif_update() which enables to calculate CRC
-> for a block which straddles multiple SG elements by calling multiple
-> times.  This also converts crc_t10dif() to use crc_t10dif_update() as
-> they are almost same.
-> 
-> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
-> Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: Tim Chen <tim.c.chen@linux.intel.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: Nicholas Bellinger <nab@linux-iscsi.org>
-> Cc: Sagi Grimberg <sagig@mellanox.com>
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-> Cc: target-devel@vger.kernel.org
-> ---
-> * Changes from v3:
-> - Reduce duplicated code between crc_t10dif_update and crc_t10dif,
->   suggested by Tim and Herbert
-> 
->  include/linux/crc-t10dif.h |  1 +
->  lib/crc-t10dif.c           | 13 ++++++++++---
->  2 files changed, 11 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
-> index cf53d07..d81961e 100644
-> --- a/include/linux/crc-t10dif.h
-> +++ b/include/linux/crc-t10dif.h
-> @@ -9,5 +9,6 @@
->  extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
->  				size_t len);
->  extern __u16 crc_t10dif(unsigned char const *, size_t);
-> +extern __u16 crc_t10dif_update(__u16 crc, unsigned char const *, size_t);
->  
->  #endif
-> diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
-> index dfe6ec1..d775737 100644
-> --- a/lib/crc-t10dif.c
-> +++ b/lib/crc-t10dif.c
-> @@ -19,7 +19,7 @@
->  static struct crypto_shash *crct10dif_tfm;
->  static struct static_key crct10dif_fallback __read_mostly;
->  
-> -__u16 crc_t10dif(const unsigned char *buffer, size_t len)
-> +__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
->  {
->  	struct {
->  		struct shash_desc shash;
-> @@ -28,17 +28,24 @@ __u16 crc_t10dif(const unsigned char *buffer, size_t len)
->  	int err;
->  
->  	if (static_key_false(&crct10dif_fallback))
-> -		return crc_t10dif_generic(0, buffer, len);
-> +		return crc_t10dif_generic(crc, buffer, len);
->  
->  	desc.shash.tfm = crct10dif_tfm;
->  	desc.shash.flags = 0;
-> -	*(__u16 *)desc.ctx = 0;
->  
-> +	err = crypto_shash_import(&desc.shash, &crc);
-> +	BUG_ON(err);
->  	err = crypto_shash_update(&desc.shash, buffer, len);
->  	BUG_ON(err);
->  
->  	return *(__u16 *)desc.ctx;
->  }
-> +EXPORT_SYMBOL(crc_t10dif_update);
+Tadeusz Struk <tadeusz.struk@intel.com> wrote:
+
+> +Additionally public key algorithm names are defined:
+> +#define PKEY_ALGO_DSA "dsa"
+> +#define PKEY_ALGO_RSA "rsa"
+> +These will be used to allocate public key tfm instances.
+
+These should be a blank line either side of the two #defines and the #defines
+should be indented a tab.
+
+> -	BUG_ON(ctx->sinfo->sig.pkey_algo != PKEY_ALGO_RSA);
+> +	BUG_ON(strcmp(ctx->sinfo->sig.pkey_algo, PKEY_ALGO_RSA));
+
+If you make PKEY_ALGO_RSA a const char [] can you use != here?
+
+Oh, and can you do either != 0 or == 0 on the end of your strcmp()?  It's a
+bit more obvious since strcmp()'s return is sort of inverse.
+
+> +			.verify = RSA_verify_signature,
+> +			.capabilities = PKEY_CAN_VERIFY,
+
+Can we keep .verify_signature as the name of the first.  The second is
+redundant given the function pointers.
+
+> +		if (cert->pub && !IS_ERR(cert->pub->tfm))
+> +			crypto_free_pke(cert->pub->tfm);
+> ...
 > +
-> +__u16 crc_t10dif(const unsigned char *buffer, size_t len)
-> +{
-> +	return crc_t10dif_update(0, buffer, len);
+> +	cert->pub->tfm = crypto_alloc_pke(ctx->cert->sig.pkey_algo, 0, 0);
+> +	if (IS_ERR(cert->pub->tfm)) {
+> +		pr_err("Failed to alloc pkey algo %s\n",
+> +		       ctx->cert->sig.pkey_algo);
+> +		goto error_decode;
+> +	}
+> +
 
-Nitpicking a bit:
+Given that X.509 certs can hang around for a very long time, having a tfm in
+the cert is probably a bad idea as it may pin resources such as crypto h/w.
 
-Will putting an extra function call to crc_t10dif_update will add extra
-overhead to crc_t10dif, which is what most driver uses? As
-we are calling crc_t10dif a lot (millions of times) as we go
-through a block device, this extra function call
-is undesirable.  Using a __crc_t10dif_update
-inline function that both crc_t10dif_update and crc_t10dif
-invokes can will avoid this overhead.
+> -	ctx->cert->pub->pkey_algo = PKEY_ALGO_RSA;
+> -
 
-Tim
+I think you need this rather than the above.  You should only get the tfm when
+you actually need it.
 
-> +}
->  EXPORT_SYMBOL(crc_t10dif);
->  
->  static int __init crc_t10dif_mod_init(void)
+> -	pr_devel("Cert Key Algo: %s\n", pkey_algo_name[cert->pub->pkey_algo]);
+> +	pr_devel("Cert Key Algo: %s\n", pke_alg_name(cert->pub->tfm));
+
+pkey_algo_name() perhaps?
+
+> +	pr_devel("Cert Signature: %s + %s\n", cert->sig.pkey_algo,
+
+Split line at that comma please.  That way all the arguments line up.
+
+> -	cert->pub->algo = pkey_algo[cert->pub->pkey_algo];
+
+Might still need this.
+
+> -enum pkey_algo {
+> -	PKEY_ALGO_DSA,
+> -	PKEY_ALGO_RSA,
+> -	PKEY_ALGO__LAST
+> -};
+
+This represents a value seen external to the kernel - at least for the
+moment.  Switching to PKCS#7 module sigs would cure that.
+
+> +#define PKEY_ALGO_DSA "dsa"
+> +#define PKEY_ALGO_RSA "rsa"
+
+const char []
+
+> +int public_key_verify_signature(const struct public_key *pk,
+> +				const struct public_key_signature *sig);
+
+Retain the extern please and the following blank line.
+
+> +static const char *const pkey_algo_name[] = {
+> +	PKEY_ALGO_DSA, PKEY_ALGO_RSA
+> +};
+> +
+
+Split the list over multiple lines, please.  Better still, move to PKCS#7.
+
+David
