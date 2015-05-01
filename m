@@ -1,67 +1,51 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH RFC 1/2] crypto: add PKE API
-Date: Fri, 01 May 2015 11:17:44 -0700
-Message-ID: <5543C348.9060004@intel.com>
-References: <20150430223652.10157.86151.stgit@tstruk-mobl1> <20150430223647.10157.82156.stgit@tstruk-mobl1> <4227.1430496240@warthog.procyon.org.uk>
+Subject: Re: [PATCH RFC 2/2] crypto: RSA: KEYS: convert rsa and public key
+ to new PKE API
+Date: Fri, 01 May 2015 12:27:58 -0700
+Message-ID: <5543D3BE.3000904@intel.com>
+References: <20150430223658.10157.32631.stgit@tstruk-mobl1> <20150430223647.10157.82156.stgit@tstruk-mobl1> <4394.1430497303@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, corbet@lwn.net,
-	keescook@chromium.org, qat-linux@intel.com, jwboyer@redhat.com,
-	richard@nod.at, linux-kernel@vger.kernel.org, steved@redhat.com,
-	vgoyal@redhat.com, james.l.morris@oracle.com, jkosina@suse.cz,
-	zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Cc: herbert@gondor.apana.org.au, corbet@lwn.net, keescook@chromium.org,
+	qat-linux@intel.com, jwboyer@redhat.com, richard@nod.at,
+	d.kasatkin@samsung.com, linux-kernel@vger.kernel.org,
+	steved@redhat.com, vgoyal@redhat.com, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	jdelvare@suse.de, linux-crypto@vger.kernel.org
 To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:11168 "EHLO mga03.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:10759 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750905AbbEASUv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 1 May 2015 14:20:51 -0400
-In-Reply-To: <4227.1430496240@warthog.procyon.org.uk>
+	id S1750902AbbEATbG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 1 May 2015 15:31:06 -0400
+In-Reply-To: <4394.1430497303@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 05/01/2015 09:04 AM, David Howells wrote:
->> +config CRYPTO_PKE
-> I would prefer CRYPTO_PKEY and pkey rather than pke generally and algo rather
-> than alg where possible - this will have more consistency with what we have
-> now.
-> 
-> I understand, however, that in core crypto code, 'alg' is used.
+On 05/01/2015 09:21 AM, David Howells wrote:
+>> +			.verify = RSA_verify_signature,
+>> > +			.capabilities = PKEY_CAN_VERIFY,
+> Can we keep .verify_signature as the name of the first.  The second is
+> redundant given the function pointers.
 
-I'm fine with pkey. Herbert do you have preference with regards 'algo' vs 'alg'?
-
->>  #define CRYPTO_ALG_TYPE_AHASH		0x0000000a
->> > +#define CRYPTO_ALG_TYPE_PKE		0x0000000b
->> >  #define CRYPTO_ALG_TYPE_RNG		0x0000000c
-> Will filling a hole cause a problem with something that got obsoleted?
-
-I hope not. I checked as far back as 2.6.18 and I don't see any clash.
-Herbert, what do you think?
+I'm thinking that .verify will be more generic. If in the future
+we would like to implement something that verifies not a signature, but
+for instance is a number is a prime, then we can register a "prime" alg
+that implements verify and returns true if a number is a prime.   
 
 > 
->> +struct pke_request {
->> > +	struct crypto_async_request base;
->> > +	const struct public_key *pk;
->> > +	const struct public_key_signature *pks;
->> > +};
-> I recommend:
+> Given that X.509 certs can hang around for a very long time, having a tfm in
+> the cert is probably a bad idea as it may pin resources such as crypto h/w.
 > 
-> 	pk -> key or pkey
-> 	pks -> sig or signature
-
-no problem
-
+>> > -	ctx->cert->pub->pkey_algo = PKEY_ALGO_RSA;
+>> > -
+> I think you need this rather than the above.  You should only get the tfm when
+> you actually need it.
 > 
->> +	u8 pub_mpis;	/* Number of MPIs in public key */
->> > +	u8 sec_mpis;	/* Number of MPIs in secret key */
->> > +	u8 sig_mpis;	/* Number of MPIs in a signature */
-> Keep member names as:
-> 
-> 	u8		n_pub_mpi;	/* Number of MPIs in public key */
-> 	u8		n_sec_mpi;	/* Number of MPIs in secret key */
-> 	u8		n_sig_mpi;	/* Number of MPIs in a signature */
 
-same here.
-thanks
+That's a good point.
+Thank you David for all your comments. I'll rework my patches and send v2 soon.
+I'll also try to integrate it with your sign-file as you suggested.
+Thanks
+T
