@@ -1,46 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v3 4/6] crypto: drbg - add async seeding operation
-Date: Fri, 1 May 2015 11:13:31 +0800
-Message-ID: <20150501031331.GA32741@gondor.apana.org.au>
-References: <11175802.HG0pHJfshY@myon.chronox.de>
- <26987163.Lvcqt6Smju@myon.chronox.de>
+Subject: Re: [PATCH v2] SP800-38F / RFC3394 key wrapping
+Date: Fri, 1 May 2015 11:20:35 +0800
+Message-ID: <20150501032035.GA371@gondor.apana.org.au>
+References: <1515730.LIeS5qas5m@myon.chronox.de>
+ <1742335.S7ujyfP8MQ@myon.chronox.de>
+ <20150428025402.GB29738@gondor.apana.org.au>
+ <1906826.TjaHhvv93b@myon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
-	sandyinchina@gmail.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44976 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:55072 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753134AbbEADNs (ORCPT
+	with ESMTP id S1751168AbbEADUj (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Apr 2015 23:13:48 -0400
+	Thu, 30 Apr 2015 23:20:39 -0400
 Content-Disposition: inline
-In-Reply-To: <26987163.Lvcqt6Smju@myon.chronox.de>
+In-Reply-To: <1906826.TjaHhvv93b@myon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 28, 2015 at 05:00:03AM +0200, Stephan Mueller wrote:
+On Tue, Apr 28, 2015 at 04:58:31AM +0200, Stephan Mueller wrote:
 >
-> @@ -1081,6 +1115,11 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
->  		return -EINVAL;
->  	}
->  
-> +	/* cancel any previously invoked seeding */
-> +	mutex_unlock(&drbg->drbg_mutex);
-> +	drbg_async_work_cancel(&drbg->seed_work);
-> +	mutex_lock(&drbg->drbg_mutex);
+> Hm, in case of dm-crypt, that is not really possible, because this is fully 
+> driven by user space: libcryptsetup sets up a temporary dm-crypt container for 
+> the LUKS header space. Then user space accesses the data it needs and re-
+> injects it into the kernel for the bulk encryption dm-crypt component.
 
-This seems dangerous and unnecessary.  Releasing and reacquiring
-the locks may invalidate previous checks.  Even if it doesn't
-matter today if somebody modifies the callers later on this could
-explode.
-
-You can easily remove this by making get_blocking_random_bytes_cb
-idempotent, i.e., do nothing if the work is already queued, which
-is what it would do anyway if you simply move the INIT_WORK out of
-it.
+If both user-space and the kernel implements the same algorithm
+correctly why wouldn't it work?
 
 Cheers,
 -- 
