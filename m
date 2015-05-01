@@ -1,37 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] SP800-38F / RFC3394 key wrapping
-Date: Fri, 1 May 2015 11:20:35 +0800
-Message-ID: <20150501032035.GA371@gondor.apana.org.au>
-References: <1515730.LIeS5qas5m@myon.chronox.de>
- <1742335.S7ujyfP8MQ@myon.chronox.de>
- <20150428025402.GB29738@gondor.apana.org.au>
- <1906826.TjaHhvv93b@myon.chronox.de>
+Subject: Re: [PATCH 1/2] crypto: Constify (de)compression parameters
+Date: Fri, 1 May 2015 11:21:25 +0800
+Message-ID: <20150501032125.GB371@gondor.apana.org.au>
+References: <20150428143630.7186.86312.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55072 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48275 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751168AbbEADUj (ORCPT
+	with ESMTP id S1751077AbbEADV2 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 30 Apr 2015 23:20:39 -0400
+	Thu, 30 Apr 2015 23:21:28 -0400
 Content-Disposition: inline
-In-Reply-To: <1906826.TjaHhvv93b@myon.chronox.de>
+In-Reply-To: <20150428143630.7186.86312.stgit@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Apr 28, 2015 at 04:58:31AM +0200, Stephan Mueller wrote:
->
-> Hm, in case of dm-crypt, that is not really possible, because this is fully 
-> driven by user space: libcryptsetup sets up a temporary dm-crypt container for 
-> the LUKS header space. Then user space accesses the data it needs and re-
-> injects it into the kernel for the bulk encryption dm-crypt component.
+On Tue, Apr 28, 2015 at 03:36:30PM +0100, David Howells wrote:
+> In testmgr, struct pcomp_testvec takes a non-const 'params' field, which is
+> pointed to a const deflate_comp_params or deflate_decomp_params object.  With
+> gcc-5 this incurs the following warnings:
+> 
+> In file included from ../crypto/testmgr.c:44:0:
+> ../crypto/testmgr.h:28736:13: warning: initialization discards 'const' qualifier from pointer target type [-Wdiscarded-array-qualifiers]
+>    .params = &deflate_comp_params,
+>              ^
+> ../crypto/testmgr.h:28748:13: warning: initialization discards 'const' qualifier from pointer target type [-Wdiscarded-array-qualifiers]
+>    .params = &deflate_comp_params,
+>              ^
+> ../crypto/testmgr.h:28776:13: warning: initialization discards 'const' qualifier from pointer target type [-Wdiscarded-array-qualifiers]
+>    .params = &deflate_decomp_params,
+>              ^
+> ../crypto/testmgr.h:28800:13: warning: initialization discards 'const' qualifier from pointer target type [-Wdiscarded-array-qualifiers]
+>    .params = &deflate_decomp_params,
+>              ^
+> 
+> Fix this by making the parameters pointer const and constifying the things
+> that use it.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
 
-If both user-space and the kernel implements the same algorithm
-correctly why wouldn't it work?
-
-Cheers,
+Both patches applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
