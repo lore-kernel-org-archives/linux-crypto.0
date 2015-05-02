@@ -1,90 +1,71 @@
-From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?=
-	<noltari@gmail.com>
-Subject: [PATCH v2] hw_random: bcm63xx-rng: Fix driver compilation
-Date: Sat,  2 May 2015 12:08:42 +0200
-Message-ID: <1430561322-26309-1-git-send-email-noltari@gmail.com>
-References: <1430491041-24480-1-git-send-email-noltari@gmail.com>
+From: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+Subject: Re: [PATCH v4 0/4] target: Fix several problems related to T10-PI
+ support
+Date: Sat, 02 May 2015 15:34:06 -0700
+Message-ID: <1430606046.16112.5.camel@haakon3.risingtidesystems.com>
+References: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?=
-	<noltari@gmail.com>
-To: herbert@gondor.apana.org.au, dmitry.torokhov@gmail.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	jogo@openwrt.org, f.fainelli@gmail.com, cernekee@gmail.com
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:34833 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750839AbbEBKIu (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 2 May 2015 06:08:50 -0400
-In-Reply-To: <1430491041-24480-1-git-send-email-noltari@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: target-devel@vger.kernel.org,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Sagi Grimberg <sagig@mellanox.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+To: Akinobu Mita <akinobu.mita@gmail.com>
+Return-path: <target-devel-owner@vger.kernel.org>
+In-Reply-To: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
+Sender: target-devel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-- s/clk_didsable_unprepare/clk_disable_unprepare
-- s/prov/priv
-- s/error/ret (bcm63xx_rng_probe)
+On Fri, 2015-05-01 at 15:23 +0900, Akinobu Mita wrote:
+> This patchset aims to fix several problems related to T10-PI support.
+> 
+> These patches can be applied on top of Sagi's "[v1] Simlify dif_verify
+> routines and fixup fileio protection information code" patchset.
+> 
+> * Changes from v3:
+> - Drop WRITE SAME support from this patch series, as it requires more
+>   works than I expected in the first place.
+> - Improve the condition in transport_generic_new_cmd() a bit
+> - Reduce duplicated code between crc_t10dif_update and crc_t10dif,
+>   suggested by Tim and Herbert
+> - Fix inconsistent address passed to kunmap_atomic, reported by Sagi
+> - Stop operation in sbc_dif_generate() and sbc_dif_verify() when
+>   reaching the end of data SG elements
+> 
+> * Changes from v2:
+> - Introduces crc_t10dif_update() to calculate CRC by multiple calls
+> - Handle odd SG mapping correctly instead of giving up
+> 
+> * Changes from v1:
+> - Reduce code duplication a bit in target_read_prot_action()
+> - Fix sbc_dif_verify() for WRITE_SAME command
+> - Fix inverted rw argument for fd_do_rw()
+> - Perform DIF verify before write for WRITE_SAME
+> 
+> Akinobu Mita (4):
+>   target: Fix inconsistent address passed to kunmap_atomic() in
+>     sbc_dif_copy_prot()
+>   target: ensure se_cmd->t_prot_sg is allocated when required
+>   lib: introduce crc_t10dif_update()
+>   target: handle odd SG mapping for data transfer memory
+> 
+>  drivers/target/target_core_sbc.c       | 127 ++++++++++++++++++++++-----------
+>  drivers/target/target_core_transport.c |  27 +++----
+>  include/linux/crc-t10dif.h             |   1 +
+>  include/target/target_core_base.h      |   1 +
+>  lib/crc-t10dif.c                       |  13 +++-
+>  5 files changed, 113 insertions(+), 56 deletions(-)
 
-=46ixes: 6229c16060fe ("hwrng: bcm63xx - make use of devm_hwrng_registe=
-r")
-Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
----
- v2: fix subject, add fixes tag as suggested by Florian
+Thanks Akinobu and Sagi.
 
- drivers/char/hw_random/bcm63xx-rng.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Applied to target-pending/for-next as v4.2 code.
 
-diff --git a/drivers/char/hw_random/bcm63xx-rng.c b/drivers/char/hw_ran=
-dom/bcm63xx-rng.c
-index d1494ec..4b31f13 100644
---- a/drivers/char/hw_random/bcm63xx-rng.c
-+++ b/drivers/char/hw_random/bcm63xx-rng.c
-@@ -57,7 +57,7 @@ static void bcm63xx_rng_cleanup(struct hwrng *rng)
- 	val &=3D ~RNG_EN;
- 	__raw_writel(val, priv->regs + RNG_CTRL);
-=20
--	clk_didsable_unprepare(prov->clk);
-+	clk_disable_unprepare(priv->clk);
- }
-=20
- static int bcm63xx_rng_data_present(struct hwrng *rng, int wait)
-@@ -97,14 +97,14 @@ static int bcm63xx_rng_probe(struct platform_device=
- *pdev)
- 	priv->rng.name =3D pdev->name;
- 	priv->rng.init =3D bcm63xx_rng_init;
- 	priv->rng.cleanup =3D bcm63xx_rng_cleanup;
--	prov->rng.data_present =3D bcm63xx_rng_data_present;
-+	priv->rng.data_present =3D bcm63xx_rng_data_present;
- 	priv->rng.data_read =3D bcm63xx_rng_data_read;
-=20
- 	priv->clk =3D devm_clk_get(&pdev->dev, "ipsec");
- 	if (IS_ERR(priv->clk)) {
--		error =3D PTR_ERR(priv->clk);
--		dev_err(&pdev->dev, "no clock for device: %d\n", error);
--		return error;
-+		ret =3D PTR_ERR(priv->clk);
-+		dev_err(&pdev->dev, "no clock for device: %d\n", ret);
-+		return ret;
- 	}
-=20
- 	if (!devm_request_mem_region(&pdev->dev, r->start,
-@@ -120,11 +120,11 @@ static int bcm63xx_rng_probe(struct platform_devi=
-ce *pdev)
- 		return -ENOMEM;
- 	}
-=20
--	error =3D devm_hwrng_register(&pdev->dev, &priv->rng);
--	if (error) {
-+	ret =3D devm_hwrng_register(&pdev->dev, &priv->rng);
-+	if (ret) {
- 		dev_err(&pdev->dev, "failed to register rng device: %d\n",
--			error);
--		return error;
-+			ret);
-+		return ret;
- 	}
-=20
- 	dev_info(&pdev->dev, "registered RNG driver\n");
---=20
-1.9.1
+Feel free to send incremental patch to address the nit in patch #3, and
+I'll apply + squash appropriately.
+
+--nab
