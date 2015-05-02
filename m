@@ -1,113 +1,90 @@
-From: Akinobu Mita <akinobu.mita@gmail.com>
-Subject: Re: [PATCH v4 3/4] lib: introduce crc_t10dif_update()
-Date: Sat, 2 May 2015 10:38:35 +0900
-Message-ID: <CAC5umyi8dQgtN4qQBm6_X6MvPZo56sUs-RRKR+4Ds6Tx_67-wA@mail.gmail.com>
-References: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
-	<1430461431-5936-4-git-send-email-akinobu.mita@gmail.com>
-	<1430496906.660.79.camel@schen9-desk2.jf.intel.com>
+From: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?=
+	<noltari@gmail.com>
+Subject: [PATCH v2] hw_random: bcm63xx-rng: Fix driver compilation
+Date: Sat,  2 May 2015 12:08:42 +0200
+Message-ID: <1430561322-26309-1-git-send-email-noltari@gmail.com>
+References: <1430491041-24480-1-git-send-email-noltari@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: target-devel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Nicholas Bellinger <nab@linux-iscsi.org>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <target-devel-owner@vger.kernel.org>
-In-Reply-To: <1430496906.660.79.camel@schen9-desk2.jf.intel.com>
-Sender: target-devel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: =?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?=
+	<noltari@gmail.com>
+To: herbert@gondor.apana.org.au, dmitry.torokhov@gmail.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	jogo@openwrt.org, f.fainelli@gmail.com, cernekee@gmail.com
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:34833 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750839AbbEBKIu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 2 May 2015 06:08:50 -0400
+In-Reply-To: <1430491041-24480-1-git-send-email-noltari@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-2015-05-02 1:15 GMT+09:00 Tim Chen <tim.c.chen@linux.intel.com>:
-> On Fri, 2015-05-01 at 15:23 +0900, Akinobu Mita wrote:
->> This introduces crc_t10dif_update() which enables to calculate CRC
->> for a block which straddles multiple SG elements by calling multiple
->> times.  This also converts crc_t10dif() to use crc_t10dif_update() as
->> they are almost same.
->>
->> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
->> Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
->> Cc: Tim Chen <tim.c.chen@linux.intel.com>
->> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: linux-crypto@vger.kernel.org
->> Cc: Nicholas Bellinger <nab@linux-iscsi.org>
->> Cc: Sagi Grimberg <sagig@mellanox.com>
->> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
->> Cc: Christoph Hellwig <hch@lst.de>
->> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
->> Cc: target-devel@vger.kernel.org
->> ---
->> * Changes from v3:
->> - Reduce duplicated code between crc_t10dif_update and crc_t10dif,
->>   suggested by Tim and Herbert
->>
->>  include/linux/crc-t10dif.h |  1 +
->>  lib/crc-t10dif.c           | 13 ++++++++++---
->>  2 files changed, 11 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
->> index cf53d07..d81961e 100644
->> --- a/include/linux/crc-t10dif.h
->> +++ b/include/linux/crc-t10dif.h
->> @@ -9,5 +9,6 @@
->>  extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
->>                               size_t len);
->>  extern __u16 crc_t10dif(unsigned char const *, size_t);
->> +extern __u16 crc_t10dif_update(__u16 crc, unsigned char const *, size_t);
->>
->>  #endif
->> diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
->> index dfe6ec1..d775737 100644
->> --- a/lib/crc-t10dif.c
->> +++ b/lib/crc-t10dif.c
->> @@ -19,7 +19,7 @@
->>  static struct crypto_shash *crct10dif_tfm;
->>  static struct static_key crct10dif_fallback __read_mostly;
->>
->> -__u16 crc_t10dif(const unsigned char *buffer, size_t len)
->> +__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
->>  {
->>       struct {
->>               struct shash_desc shash;
->> @@ -28,17 +28,24 @@ __u16 crc_t10dif(const unsigned char *buffer, size_t len)
->>       int err;
->>
->>       if (static_key_false(&crct10dif_fallback))
->> -             return crc_t10dif_generic(0, buffer, len);
->> +             return crc_t10dif_generic(crc, buffer, len);
->>
->>       desc.shash.tfm = crct10dif_tfm;
->>       desc.shash.flags = 0;
->> -     *(__u16 *)desc.ctx = 0;
->>
->> +     err = crypto_shash_import(&desc.shash, &crc);
->> +     BUG_ON(err);
->>       err = crypto_shash_update(&desc.shash, buffer, len);
->>       BUG_ON(err);
->>
->>       return *(__u16 *)desc.ctx;
->>  }
->> +EXPORT_SYMBOL(crc_t10dif_update);
->> +
->> +__u16 crc_t10dif(const unsigned char *buffer, size_t len)
->> +{
->> +     return crc_t10dif_update(0, buffer, len);
->
-> Nitpicking a bit:
->
-> Will putting an extra function call to crc_t10dif_update will add extra
-> overhead to crc_t10dif, which is what most driver uses? As
-> we are calling crc_t10dif a lot (millions of times) as we go
-> through a block device, this extra function call
-> is undesirable.  Using a __crc_t10dif_update
-> inline function that both crc_t10dif_update and crc_t10dif
-> invokes can will avoid this overhead.
+- s/clk_didsable_unprepare/clk_disable_unprepare
+- s/prov/priv
+- s/error/ret (bcm63xx_rng_probe)
 
-I'll convert crc_t10dif to inline function.  But do we also need to
-make crc_t10dif_update inline function? (i.e. is there any difference
-between __crc_t10dif_update and crc_t10dif_update?)
+=46ixes: 6229c16060fe ("hwrng: bcm63xx - make use of devm_hwrng_registe=
+r")
+Signed-off-by: =C3=81lvaro Fern=C3=A1ndez Rojas <noltari@gmail.com>
+---
+ v2: fix subject, add fixes tag as suggested by Florian
+
+ drivers/char/hw_random/bcm63xx-rng.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/char/hw_random/bcm63xx-rng.c b/drivers/char/hw_ran=
+dom/bcm63xx-rng.c
+index d1494ec..4b31f13 100644
+--- a/drivers/char/hw_random/bcm63xx-rng.c
++++ b/drivers/char/hw_random/bcm63xx-rng.c
+@@ -57,7 +57,7 @@ static void bcm63xx_rng_cleanup(struct hwrng *rng)
+ 	val &=3D ~RNG_EN;
+ 	__raw_writel(val, priv->regs + RNG_CTRL);
+=20
+-	clk_didsable_unprepare(prov->clk);
++	clk_disable_unprepare(priv->clk);
+ }
+=20
+ static int bcm63xx_rng_data_present(struct hwrng *rng, int wait)
+@@ -97,14 +97,14 @@ static int bcm63xx_rng_probe(struct platform_device=
+ *pdev)
+ 	priv->rng.name =3D pdev->name;
+ 	priv->rng.init =3D bcm63xx_rng_init;
+ 	priv->rng.cleanup =3D bcm63xx_rng_cleanup;
+-	prov->rng.data_present =3D bcm63xx_rng_data_present;
++	priv->rng.data_present =3D bcm63xx_rng_data_present;
+ 	priv->rng.data_read =3D bcm63xx_rng_data_read;
+=20
+ 	priv->clk =3D devm_clk_get(&pdev->dev, "ipsec");
+ 	if (IS_ERR(priv->clk)) {
+-		error =3D PTR_ERR(priv->clk);
+-		dev_err(&pdev->dev, "no clock for device: %d\n", error);
+-		return error;
++		ret =3D PTR_ERR(priv->clk);
++		dev_err(&pdev->dev, "no clock for device: %d\n", ret);
++		return ret;
+ 	}
+=20
+ 	if (!devm_request_mem_region(&pdev->dev, r->start,
+@@ -120,11 +120,11 @@ static int bcm63xx_rng_probe(struct platform_devi=
+ce *pdev)
+ 		return -ENOMEM;
+ 	}
+=20
+-	error =3D devm_hwrng_register(&pdev->dev, &priv->rng);
+-	if (error) {
++	ret =3D devm_hwrng_register(&pdev->dev, &priv->rng);
++	if (ret) {
+ 		dev_err(&pdev->dev, "failed to register rng device: %d\n",
+-			error);
+-		return error;
++			ret);
++		return ret;
+ 	}
+=20
+ 	dev_info(&pdev->dev, "registered RNG driver\n");
+--=20
+1.9.1
