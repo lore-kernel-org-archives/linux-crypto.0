@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v4 3/6] crypto: drbg - prepare for async seeding
-Date: Sun, 03 May 2015 17:34:20 +0200
-Message-ID: <1461167.Ep7v5tERoY@tachyon.chronox.de>
+Subject: [PATCH v4 1/6] random: Addition of kernel_pool
+Date: Sun, 03 May 2015 17:33:30 +0200
+Message-ID: <1943994.Bq1YkXRtQR@tachyon.chronox.de>
 References: <1626703.0h1HzJAx4d@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -12,176 +12,138 @@ Cc: Paul Bolle <pebolle@tiscali.it>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34677 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:34690 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751013AbbECPhz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 May 2015 11:37:55 -0400
+	id S1751122AbbECPh5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 May 2015 11:37:57 -0400
 In-Reply-To: <1626703.0h1HzJAx4d@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-In order to prepare for the addition of the asynchronous seeding call,
-the invocation of seeding the DRBG is moved out into a helper function.
+The kernel pool is intended to serve kernel-internal callers only.
+Its purpose and usage is identical to the blocking_pool.
 
-In addition, a block of memory is allocated during initialization time
-that will be used as a scratchpad for obtaining entropy. That scratchpad
-is used for the initial seeding operation as well as by the
-asynchronous seeding call. The memory must be zeroized every time the
-DRBG seeding call succeeds to avoid entropy data lingering in memory.
+As the kernel_pool is not available to user space, user space cannot
+directly interfere with the blocking behavior when obtaining
+data from the kernel_pool. Thus, if entropy is present in the
+kernel_pool, user space can hog /dev/random and yet the kernel
+internal requestor of random numbers that are generated equally
+to the blocking_pool (i.e. with the blocking behavior) will not
+be affected until data is needed from the input_pool.
+
+The patch treats the kernel_pool fully equally to the blocking and
+nonblocking pool with respect to the initialization and update. As now
+there are three output pools, the patch adds a round-robin logic for
+processing additional entropy when the input_pool is nearly full.
 
 CC: Andreas Steffen <andreas.steffen@strongswan.org>
 CC: Theodore Ts'o <tytso@mit.edu>
 CC: Sandy Harris <sandyinchina@gmail.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/drbg.c         | 81 ++++++++++++++++++++++++++++++++++-----------------
- include/crypto/drbg.h |  2 ++
- 2 files changed, 56 insertions(+), 27 deletions(-)
+ drivers/char/random.c | 52 ++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 39 insertions(+), 13 deletions(-)
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 23d444e..36dfece 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1041,6 +1041,21 @@ static struct drbg_state_ops drbg_hash_ops = {
-  * Functions common for DRBG implementations
-  ******************************************************************/
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 9cd6968..0b139dc 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -407,6 +407,7 @@ static struct poolinfo {
+ static DECLARE_WAIT_QUEUE_HEAD(random_read_wait);
+ static DECLARE_WAIT_QUEUE_HEAD(random_write_wait);
+ static DECLARE_WAIT_QUEUE_HEAD(urandom_init_wait);
++static DECLARE_WAIT_QUEUE_HEAD(random_kernel_wait);
+ static struct fasync_struct *fasync;
  
-+static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
-+			      int reseed)
-+{
-+	int ret = drbg->d_ops->update(drbg, seed, reseed);
-+
-+	if (ret)
-+		return ret;
-+
-+	drbg->seeded = true;
-+	/* 10.1.1.2 / 10.1.1.3 step 5 */
-+	drbg->reseed_ctr = 1;
-+
-+	return ret;
-+}
-+
- /*
-  * Seeding or reseeding of the DRBG
-  *
-@@ -1056,8 +1071,6 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 		     bool reseed)
- {
- 	int ret = 0;
--	unsigned char *entropy = NULL;
--	size_t entropylen = 0;
- 	struct drbg_string data1;
- 	LIST_HEAD(seedlist);
+ /**********************************************************************
+@@ -442,6 +443,7 @@ static void push_to_pool(struct work_struct *work);
+ static __u32 input_pool_data[INPUT_POOL_WORDS];
+ static __u32 blocking_pool_data[OUTPUT_POOL_WORDS];
+ static __u32 nonblocking_pool_data[OUTPUT_POOL_WORDS];
++static __u32 kernel_pool_data[OUTPUT_POOL_WORDS];
  
-@@ -1073,26 +1086,10 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 				 drbg->test_data.len);
- 		pr_devel("DRBG: using test entropy\n");
- 	} else {
--		/*
--		 * Gather entropy equal to the security strength of the DRBG.
--		 * With a derivation function, a nonce is required in addition
--		 * to the entropy. A nonce must be at least 1/2 of the security
--		 * strength of the DRBG in size. Thus, entropy * nonce is 3/2
--		 * of the strength. The consideration of a nonce is only
--		 * applicable during initial seeding.
--		 */
--		entropylen = drbg_sec_strength(drbg->core->flags);
--		if (!entropylen)
--			return -EFAULT;
--		if (!reseed)
--			entropylen = ((entropylen + 1) / 2) * 3;
- 		pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
--			 entropylen);
--		entropy = kzalloc(entropylen, GFP_KERNEL);
--		if (!entropy)
--			return -ENOMEM;
--		get_random_bytes(entropy, entropylen);
--		drbg_string_fill(&data1, entropy, entropylen);
-+			 drbg->seed_buf_len);
-+		get_random_bytes(drbg->seed_buf, drbg->seed_buf_len);
-+		drbg_string_fill(&data1, drbg->seed_buf, drbg->seed_buf_len);
- 	}
- 	list_add_tail(&data1.list, &seedlist);
+ static struct entropy_store input_pool = {
+ 	.poolinfo = &poolinfo_table[0],
+@@ -472,6 +474,17 @@ static struct entropy_store nonblocking_pool = {
+ 					push_to_pool),
+ };
  
-@@ -1111,16 +1108,24 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 		memset(drbg->C, 0, drbg_statelen(drbg));
- 	}
- 
--	ret = drbg->d_ops->update(drbg, &seedlist, reseed);
-+	ret = __drbg_seed(drbg, &seedlist, reseed);
++static struct entropy_store kernel_pool = {
++	.poolinfo = &poolinfo_table[1],
++	.name = "kernel",
++	.limit = 1,
++	.pull = &input_pool,
++	.lock = __SPIN_LOCK_UNLOCKED(kernel_pool.lock),
++	.pool = kernel_pool_data,
++	.push_work = __WORK_INITIALIZER(kernel_pool.push_work,
++					push_to_pool),
++};
 +
-+	/*
-+	 * Clear the initial entropy buffer as the async call may not overwrite
-+	 * that buffer for quite some time.
-+	 */
-+	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len);
- 	if (ret)
- 		goto out;
+ static __u32 const twist_table[8] = {
+ 	0x00000000, 0x3b6e20c8, 0x76dc4190, 0x4db26158,
+ 	0xedb88320, 0xd6d6a3e8, 0x9b64c2b0, 0xa00ae278 };
+@@ -674,29 +687,41 @@ retry:
+ 
+ 		/* should we wake readers? */
+ 		if (entropy_bits >= random_read_wakeup_bits) {
++			wake_up_interruptible(&random_kernel_wait);
+ 			wake_up_interruptible(&random_read_wait);
+ 			kill_fasync(&fasync, SIGIO, POLL_IN);
+ 		}
+ 		/* If the input pool is getting full, send some
+-		 * entropy to the two output pools, flipping back and
++		 * entropy to the output pools, flipping back and
+ 		 * forth between them, until the output pools are 75%
+ 		 * full.
+ 		 */
+ 		if (entropy_bits > random_write_wakeup_bits &&
+ 		    r->initialized &&
+ 		    r->entropy_total >= 2*random_read_wakeup_bits) {
+-			static struct entropy_store *last = &blocking_pool;
+-			struct entropy_store *other = &blocking_pool;
 -
--	drbg->seeded = true;
--	/* 10.1.1.2 / 10.1.1.3 step 5 */
--	drbg->reseed_ctr = 1;
-+	/*
-+	 * For all subsequent seeding calls, we only need the seed buffer
-+	 * equal to the security strength of the DRBG. We undo the calculation
-+	 * in drbg_alloc_state.
-+	 */
-+	if (!reseed)
-+		drbg->seed_buf_len = drbg->seed_buf_len / 3 * 2;
- 
- out:
--	kzfree(entropy);
- 	return ret;
- }
- 
-@@ -1143,6 +1148,8 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
- 	drbg->prev = NULL;
- 	drbg->fips_primed = false;
- #endif
-+	kzfree(drbg->seed_buf);
-+	drbg->seed_buf = NULL;
- }
- 
- /*
-@@ -1204,6 +1211,26 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
- 		if (!drbg->scratchpad)
- 			goto err;
+-			if (last == &blocking_pool)
+-				other = &nonblocking_pool;
+-			if (other->entropy_count <=
+-			    3 * other->poolinfo->poolfracbits / 4)
+-				last = other;
+-			if (last->entropy_count <=
+-			    3 * last->poolinfo->poolfracbits / 4) {
+-				schedule_work(&last->push_work);
+-				r->entropy_total = 0;
++#define NUM_OUTPUT_POOLS 3
++			/* as we will recalculate this variable first thing in
++			 * the loop, it will point to the first output pool
++			 * after the first recalculation */
++			static int selected_pool = (NUM_OUTPUT_POOLS - 1);
++			int i = 0;
++			struct entropy_store *output_pools[NUM_OUTPUT_POOLS] = {
++				&blocking_pool,
++				&nonblocking_pool,
++				&kernel_pool};
++			/* select the next pool that has less than 75% fill
++			 * rate */
++			for (i = 0; NUM_OUTPUT_POOLS > i; i++) {
++				struct entropy_store *p = NULL;
++				selected_pool =
++					(selected_pool + 1) % NUM_OUTPUT_POOLS;
++				p = output_pools[selected_pool];
++				if (p->entropy_count <=
++					3 * p->poolinfo->poolfracbits / 4) {
++					schedule_work(&p->push_work);
++					r->entropy_total = 0;
++					break;
++				}
+ 			}
+ 		}
  	}
-+
-+	/*
-+	 * Gather entropy equal to the security strength of the DRBG.
-+	 * With a derivation function, a nonce is required in addition
-+	 * to the entropy. A nonce must be at least 1/2 of the security
-+	 * strength of the DRBG in size. Thus, entropy * nonce is 3/2
-+	 * of the strength. The consideration of a nonce is only
-+	 * applicable during initial seeding.
-+	 */
-+	drbg->seed_buf_len = drbg_sec_strength(drbg->core->flags);
-+	if (!drbg->seed_buf_len) {
-+		ret = -EFAULT;
-+		goto err;
-+	}
-+	/* ensure we have sufficient buffer space for initial seed */
-+	drbg->seed_buf_len = ((drbg->seed_buf_len + 1) / 2) * 3;
-+	drbg->seed_buf = kzalloc(drbg->seed_buf_len, GFP_KERNEL);
-+	if (!drbg->seed_buf)
-+		goto err;
-+
+@@ -1318,6 +1343,7 @@ static int rand_initialize(void)
+ 	init_std_data(&input_pool);
+ 	init_std_data(&blocking_pool);
+ 	init_std_data(&nonblocking_pool);
++	init_std_data(&kernel_pool);
  	return 0;
- 
- err:
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index 480d7a0..b052698 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -119,6 +119,8 @@ struct drbg_state {
- 	bool fips_primed;	/* Continuous test primed? */
- 	unsigned char *prev;	/* FIPS 140-2 continuous test value */
- #endif
-+	u8 *seed_buf;			/* buffer holding the seed */
-+	size_t seed_buf_len;
- 	const struct drbg_state_ops *d_ops;
- 	const struct drbg_core *core;
- 	struct drbg_string test_data;
+ }
+ early_initcall(rand_initialize);
 -- 
 2.1.0
