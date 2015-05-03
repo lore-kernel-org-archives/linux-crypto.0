@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v4 4/6] crypto: drbg - add async seeding operation
-Date: Sun, 03 May 2015 17:34:45 +0200
-Message-ID: <2473718.578F5zZVyD@tachyon.chronox.de>
+Subject: [PATCH v4 3/6] crypto: drbg - prepare for async seeding
+Date: Sun, 03 May 2015 17:34:20 +0200
+Message-ID: <1461167.Ep7v5tERoY@tachyon.chronox.de>
 References: <1626703.0h1HzJAx4d@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -12,106 +12,176 @@ Cc: Paul Bolle <pebolle@tiscali.it>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34671 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:34677 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750996AbbECPhy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 May 2015 11:37:54 -0400
+	id S1751013AbbECPhz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 May 2015 11:37:55 -0400
 In-Reply-To: <1626703.0h1HzJAx4d@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The async seeding operation is triggered during initalization right
-after the first non-blocking seeding is completed. As required by the
-asynchronous operation of random.c, a callback function is provided that
-is triggered by random.c once entropy is available. That callback
-function performs the actual seeding of the DRBG.
+In order to prepare for the addition of the asynchronous seeding call,
+the invocation of seeding the DRBG is moved out into a helper function.
+
+In addition, a block of memory is allocated during initialization time
+that will be used as a scratchpad for obtaining entropy. That scratchpad
+is used for the initial seeding operation as well as by the
+asynchronous seeding call. The memory must be zeroized every time the
+DRBG seeding call succeeds to avoid entropy data lingering in memory.
 
 CC: Andreas Steffen <andreas.steffen@strongswan.org>
 CC: Theodore Ts'o <tytso@mit.edu>
 CC: Sandy Harris <sandyinchina@gmail.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/drbg.c         | 41 +++++++++++++++++++++++++++++++++++++++++
- include/crypto/drbg.h |  1 +
- 2 files changed, 42 insertions(+)
+ crypto/drbg.c         | 81 ++++++++++++++++++++++++++++++++++-----------------
+ include/crypto/drbg.h |  2 ++
+ 2 files changed, 56 insertions(+), 27 deletions(-)
 
 diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 36dfece..693dac4 100644
+index 23d444e..36dfece 100644
 --- a/crypto/drbg.c
 +++ b/crypto/drbg.c
-@@ -1056,6 +1056,40 @@ static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
- 	return ret;
- }
+@@ -1041,6 +1041,21 @@ static struct drbg_state_ops drbg_hash_ops = {
+  * Functions common for DRBG implementations
+  ******************************************************************/
  
-+/* DRBG callback for obtaining data from the async Linux RNG */
-+static void drbg_async_seed_cb(void *buf, ssize_t buflen, void *private)
++static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
++			      int reseed)
 +{
-+	struct drbg_string data;
-+	LIST_HEAD(seedlist);
-+	struct drbg_state *drbg = (struct drbg_state *)private;
-+	int ret = 0;
++	int ret = drbg->d_ops->update(drbg, seed, reseed);
 +
-+	if (buflen <= 0 || !buf)
-+		return;
++	if (ret)
++		return ret;
 +
-+	drbg_string_fill(&data, buf, buflen);
-+	list_add_tail(&data.list, &seedlist);
-+	/* sanity check to verify that there is still a DRBG instance */
-+	if (!drbg)
-+		return;
-+	mutex_lock(&drbg->drbg_mutex);
-+	/* sanity check to verify that the DRBG instance is valid */
-+	if (!drbg->V) {
-+		mutex_unlock(&drbg->drbg_mutex);
-+		return;
-+	}
-+	ret = __drbg_seed(drbg, &seedlist, true);
-+	memzero_explicit(buf, buflen);
-+	mutex_unlock(&drbg->drbg_mutex);
-+}
++	drbg->seeded = true;
++	/* 10.1.1.2 / 10.1.1.3 step 5 */
++	drbg->reseed_ctr = 1;
 +
-+/* Cancel any outstanding async operation and wait for their completion */
-+static inline void drbg_async_work_cancel(struct random_work *work)
-+{
-+	get_blocking_random_bytes_cancel(work);
-+	cancel_work_sync(&work->rw_work);
++	return ret;
 +}
 +
  /*
   * Seeding or reseeding of the DRBG
   *
-@@ -1125,6 +1159,12 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 	if (!reseed)
- 		drbg->seed_buf_len = drbg->seed_buf_len / 3 * 2;
+@@ -1056,8 +1071,6 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 		     bool reseed)
+ {
+ 	int ret = 0;
+-	unsigned char *entropy = NULL;
+-	size_t entropylen = 0;
+ 	struct drbg_string data1;
+ 	LIST_HEAD(seedlist);
  
-+	/* Invoke asynchronous seeding unless DRBG is in test mode. */
-+	if (!list_empty(&drbg->test_data.list))
-+		get_blocking_random_bytes_cb(NULL, &drbg->seed_work,
-+					     drbg->seed_buf, drbg->seed_buf_len,
-+					     drbg, drbg_async_seed_cb);
+@@ -1073,26 +1086,10 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 				 drbg->test_data.len);
+ 		pr_devel("DRBG: using test entropy\n");
+ 	} else {
+-		/*
+-		 * Gather entropy equal to the security strength of the DRBG.
+-		 * With a derivation function, a nonce is required in addition
+-		 * to the entropy. A nonce must be at least 1/2 of the security
+-		 * strength of the DRBG in size. Thus, entropy * nonce is 3/2
+-		 * of the strength. The consideration of a nonce is only
+-		 * applicable during initial seeding.
+-		 */
+-		entropylen = drbg_sec_strength(drbg->core->flags);
+-		if (!entropylen)
+-			return -EFAULT;
+-		if (!reseed)
+-			entropylen = ((entropylen + 1) / 2) * 3;
+ 		pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
+-			 entropylen);
+-		entropy = kzalloc(entropylen, GFP_KERNEL);
+-		if (!entropy)
+-			return -ENOMEM;
+-		get_random_bytes(entropy, entropylen);
+-		drbg_string_fill(&data1, entropy, entropylen);
++			 drbg->seed_buf_len);
++		get_random_bytes(drbg->seed_buf, drbg->seed_buf_len);
++		drbg_string_fill(&data1, drbg->seed_buf, drbg->seed_buf_len);
+ 	}
+ 	list_add_tail(&data1.list, &seedlist);
+ 
+@@ -1111,16 +1108,24 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 		memset(drbg->C, 0, drbg_statelen(drbg));
+ 	}
+ 
+-	ret = drbg->d_ops->update(drbg, &seedlist, reseed);
++	ret = __drbg_seed(drbg, &seedlist, reseed);
 +
++	/*
++	 * Clear the initial entropy buffer as the async call may not overwrite
++	 * that buffer for quite some time.
++	 */
++	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len);
+ 	if (ret)
+ 		goto out;
+-
+-	drbg->seeded = true;
+-	/* 10.1.1.2 / 10.1.1.3 step 5 */
+-	drbg->reseed_ctr = 1;
++	/*
++	 * For all subsequent seeding calls, we only need the seed buffer
++	 * equal to the security strength of the DRBG. We undo the calculation
++	 * in drbg_alloc_state.
++	 */
++	if (!reseed)
++		drbg->seed_buf_len = drbg->seed_buf_len / 3 * 2;
+ 
  out:
+-	kzfree(entropy);
  	return ret;
  }
-@@ -1487,6 +1527,7 @@ unlock:
-  */
- static int drbg_uninstantiate(struct drbg_state *drbg)
- {
-+	drbg_async_work_cancel(&drbg->seed_work);
- 	if (drbg->d_ops)
- 		drbg->d_ops->crypto_fini(drbg);
- 	drbg_dealloc_state(drbg);
+ 
+@@ -1143,6 +1148,8 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+ 	drbg->prev = NULL;
+ 	drbg->fips_primed = false;
+ #endif
++	kzfree(drbg->seed_buf);
++	drbg->seed_buf = NULL;
+ }
+ 
+ /*
+@@ -1204,6 +1211,26 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 		if (!drbg->scratchpad)
+ 			goto err;
+ 	}
++
++	/*
++	 * Gather entropy equal to the security strength of the DRBG.
++	 * With a derivation function, a nonce is required in addition
++	 * to the entropy. A nonce must be at least 1/2 of the security
++	 * strength of the DRBG in size. Thus, entropy * nonce is 3/2
++	 * of the strength. The consideration of a nonce is only
++	 * applicable during initial seeding.
++	 */
++	drbg->seed_buf_len = drbg_sec_strength(drbg->core->flags);
++	if (!drbg->seed_buf_len) {
++		ret = -EFAULT;
++		goto err;
++	}
++	/* ensure we have sufficient buffer space for initial seed */
++	drbg->seed_buf_len = ((drbg->seed_buf_len + 1) / 2) * 3;
++	drbg->seed_buf = kzalloc(drbg->seed_buf_len, GFP_KERNEL);
++	if (!drbg->seed_buf)
++		goto err;
++
+ 	return 0;
+ 
+ err:
 diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index b052698..e4980a1 100644
+index 480d7a0..b052698 100644
 --- a/include/crypto/drbg.h
 +++ b/include/crypto/drbg.h
-@@ -119,6 +119,7 @@ struct drbg_state {
+@@ -119,6 +119,8 @@ struct drbg_state {
  	bool fips_primed;	/* Continuous test primed? */
  	unsigned char *prev;	/* FIPS 140-2 continuous test value */
  #endif
-+	struct random_work seed_work;	/* asynchronous seeding support */
- 	u8 *seed_buf;			/* buffer holding the seed */
- 	size_t seed_buf_len;
++	u8 *seed_buf;			/* buffer holding the seed */
++	size_t seed_buf_len;
  	const struct drbg_state_ops *d_ops;
+ 	const struct drbg_core *core;
+ 	struct drbg_string test_data;
 -- 
 2.1.0
