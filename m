@@ -1,8 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v4 2/6] random: Async and sync API for accessing kernel_pool
-Date: Sun, 03 May 2015 17:33:54 +0200
-Message-ID: <1551132.jNO2hp8j9J@tachyon.chronox.de>
-References: <1626703.0h1HzJAx4d@tachyon.chronox.de>
+Subject: [PATCH v4 0/6] Seeding DRBG with more entropy
+Date: Sun, 03 May 2015 17:33 +0200
+Message-ID: <1626703.0h1HzJAx4d@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -12,206 +11,249 @@ Cc: Paul Bolle <pebolle@tiscali.it>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34681 "EHLO mail.eperm.de"
+Received: from mail.eperm.de ([89.247.134.16]:34691 "EHLO mail.eperm.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750961AbbECPhz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 3 May 2015 11:37:55 -0400
-In-Reply-To: <1626703.0h1HzJAx4d@tachyon.chronox.de>
+	id S1751161AbbECPh5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 3 May 2015 11:37:57 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The kernel_pool is intended to be the in-kernel equivalent to the
-blocking_pool, i.e. requests for random data may be blocked if
-insufficient entropy is present.
+Hi,
 
-The added API calls provide a synchronous function call
-get_blocking_random_bytes where the caller is blocked.
+as of now, the DRBG is only seeded from get_random_bytes. In various
+circumstances, the nonblocking_pool behind get_random_bytes may not be fully
+seeded from hardware events at the time the DRBG requires to be seeded.
+Based on the discussion in [1], the DRBG seeding is updated such that it
+does not completely rely on get_random_bytes any more.
 
-In addition, an asynchronous API call of get_blocking_random_bytes_cb
-is provided which returns immediately to the caller after submitting
-the request for random data. The caller-provided buffer that shall be
-filled with random data is filled up as available entropy permits. The
-caller may provide a callback function that is invoked once the
-request is completed.
+The seeding approach can be characterized as follows:
 
-A third API call, get_blocking_random_bytes_cancel, is provided to
-cancel the random number gathering operation.
+1. pull buffer of size entropy + nonce from get_random_bytes
 
-CC: Andreas Steffen <andreas.steffen@strongswan.org>
-CC: Theodore Ts'o <tytso@mit.edu>
-CC: Sandy Harris <sandyinchina@gmail.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/char/random.c  | 123 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/random.h |  20 ++++++++
- 2 files changed, 143 insertions(+)
+2. pull another buffer of size entropy + nonce from my Jitter RNG
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 0b139dc..e9c0144 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1804,3 +1804,126 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
- 	credit_entropy_bits(poolp, entropy);
- }
- EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
-+
-+static bool get_blocking_random_bytes_term(bool *cancel)
-+{
-+	if (ENTROPY_BITS(&input_pool) >= random_read_wakeup_bits)
-+		return true;
-+	return *cancel;
-+}
-+
-+/*
-+ * Equivalent function to get_random_bytes with the difference that this
-+ * function blocks the request in a similar fashion as random_read(),
-+ * implementing a /dev/random device for in-kernel users.
-+ *
-+ * This function may sleep.
-+ *
-+ * @buf caller allocated buffer filled with random data
-+ * @nbytes requested number of bytes -- buffer should be at least as big
-+ * @cancel pointer to variable that can be used to cancel the collection
-+ *	   operation. If this boolean is set to true, the collection operation
-+ *	   is terminated immediately. When it is set to true during the
-+ *	   collection loop, the collection is terminated immediately.
-+ *
-+ * return: positive value: obtained number of bytes on successful
-+ *	   negative value: error code on error
-+ */
-+ssize_t get_blocking_random_bytes(void *buf, ssize_t nbytes, bool *cancel)
-+{
-+	ssize_t ret = 0;
-+
-+	if (nbytes <= 0)
-+		return nbytes;
-+	BUG_ON(!buf);
-+
-+	while (ret < nbytes) {
-+		ssize_t round = 0;
-+		ssize_t pull = min_t(ssize_t, (nbytes - ret), SEC_XFER_SIZE);
-+
-+		if (*cancel)
-+			return ret;
-+		round = extract_entropy(&kernel_pool, (buf + ret), pull, 0, 0);
-+		if (0 > round)
-+			return round;
-+		if (0 == round)
-+			wait_event_interruptible(random_kernel_wait,
-+				get_blocking_random_bytes_term(cancel));
-+		ret += round;
-+	}
-+	return ret;
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes);
-+
-+/*
-+ * Immediate canceling the collection operation for the random_work
-+ */
-+void get_blocking_random_bytes_cancel(struct random_work *rw)
-+{
-+	rw->cancel = true;
-+	wake_up_interruptible(&random_kernel_wait);
-+
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes_cancel);
-+
-+static void get_blocking_random_bytes_work(struct work_struct *work)
-+{
-+	struct random_work *rw = container_of(work, struct random_work,
-+					      rw_work);
-+	ssize_t ret;
-+
-+	ret = get_blocking_random_bytes(rw->rw_buf, rw->rw_len, &rw->cancel);
-+	if (rw->rw_cb)
-+		rw->rw_cb(rw->rw_buf, ret, rw->private);
-+}
-+
-+/*
-+ * Asynchronous invocation of the blocking interface. The function
-+ * queues the request in either the private work queue supplied with the
-+ * wq argument or in the general work queue framework if wq is NULL.
-+ * Once the request is completed or upon receiving an error, the callback
-+ * function of cb is called, if not NULL, to inform the caller about the
-+ * completion of its operation.
-+ *
-+ * Only if no work is pending, the pointers for the callback function
-+ * or the output data can be changed.
-+ *
-+ * If a caller wants to cancel the work (e.g. in the module_exit function),
-+ * simply call
-+ *	get_blocking_random_bytes_cancel(&my_random_work);
-+ *	cancel_work_sync(&my_random_work.rw_work);
-+ *
-+ * @wq pointer to private work queue or NULL - input
-+ * @rw handle to the work queue frame - output
-+ * @buf allocated buffer where random numbers are to be stored
-+ * @nbytes size of buf and implicitly number of bytes requested
-+ * @private pointer to data that is not processed by here, but handed to the
-+ *	    callback function to allow the caller to maintain a state
-+ * @cb callback function where
-+ *	* buf holds the pointer to buf will be supplied
-+ *	* buflen holds the length of the gathered random numbers or error code
-+ *	  of the generation function.
-+ *	* private provides a reference to the private data pointer
-+ */
-+void get_blocking_random_bytes_cb(struct workqueue_struct *wq,
-+				  struct random_work *rw,
-+				  u8 *buf, ssize_t nbytes, void *private,
-+				  void (*cb)(void *buf, ssize_t buflen,
-+					     void *private))
-+{
-+	BUG_ON(!cb);
-+	if (!rw->cb)
-+		INIT_WORK(&rw->rw_work, get_blocking_random_bytes_work);
-+	if (!work_pending(&rw->rw_work)) {
-+		rw->rw_buf = buf;
-+		rw->rw_len = nbytes;
-+		rw->private = private;
-+		rw->rw_cb = cb;
-+		rw->cancel = false;
-+	|
-+	if (wq)
-+		queue_work(wq, &rw->rw_work);
-+	else
-+		schedule_work(&rw->rw_work);
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes_cb);
-diff --git a/include/linux/random.h b/include/linux/random.h
-index b05856e..960803b 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -7,6 +7,7 @@
- #define _LINUX_RANDOM_H
- 
- #include <uapi/linux/random.h>
-+#include <linux/workqueue.h>
- 
- extern void add_device_randomness(const void *, unsigned int);
- extern void add_input_randomness(unsigned int type, unsigned int code,
-@@ -112,4 +113,23 @@ static inline u32 next_pseudo_random32(u32 seed)
- 	return seed * 1664525 + 1013904223;
- }
- 
-+/* API for asynchronous in-kernel operation */
-+struct random_work {
-+	struct work_struct	rw_work;
-+	u8			*rw_buf;
-+	ssize_t			rw_len;
-+	void			*private;
-+	void			(*rw_cb)(void *buf, ssize_t buflen,
-+					 void *private);
-+	bool			cancel;
-+};
-+
-+ssize_t get_blocking_random_bytes(void *buf, ssize_t nbytes, bool *cancel);
-+void get_blocking_random_bytes_cancel(struct random_work *rw);
-+void get_blocking_random_bytes_cb(struct workqueue_struct *wq,
-+				  struct random_work *rw,
-+				  u8 *buf, ssize_t nbytes, void *private,
-+				  void (*cb)(void *buf, ssize_t buflen,
-+					     void *private));
-+
- #endif /* _LINUX_RANDOM_H */
+3. concatenate both buffers
+
+4. seed the DRBG with the concatenated buffer
+
+5. trigger the async invocation of the in-kernel /dev/random with a buffer of
+   size entropy
+
+6. return the DRBG instance to the caller without waiting for the completion
+   of step 5
+
+7. at some point in time, the in-kernel /dev/random returns with a full buffer
+   which is then used to re-seed the DRBG
+
+This way, we will get entropy during the first initialization without
+blocking.
+
+The patch set adds an in-kernel /dev/random equivalent that was discussed with
+Ted Ts'o last July -- see [2] and [3]. A test module for testing the
+asynchronous operation of the in-kernel /dev/random is given with the code
+below.
+
+Ted: shall we really create and maintain a new entropy pool (the kernel_pool),
+or should the in-kernel /dev/random logic draw directly from the input_pool?
+In other words, shall we drop the first patch and update the 2nd patch to
+use input_pool? Also, I would not recommend using the blocking_pool as this
+would mix kernel and user land operation.
+
+Note: the DRBG and Jitter RNG patches are against the current cryptodev-2.6
+tree.
+
+The new Jitter RNG is an RNG that has large set of tests and was presented on
+LKML some time back. After speaking with mathematicians at NIST, that Jitter
+RNG approach would be acceptable from their side as a noise source. Note, I
+personally think that the Jitter RNG has sufficient entropy in almost all
+circumstances (see the massive testing I conducted on all more widely used
+CPUs as shown in [4]).
+
+Changes v4:
+* Patch 02: Change get_blocking_random_bytes_cb to allow callers to call it
+  multiple times without re-initializing the work data structure. Furthermore,
+  only change the pointers to the output buffer and callback if work is not
+  pending to avoid race conditions.
+* Patch 04: No canceling of seeding during drbg_seed as the invocation of
+  get_blocking_random_bytes_cb can now be done repeatedly without
+  re-initializing the work data structure.
+
+Changes v3:
+* Patch 01: Correct calculation of entropy count as pointed out by Herbert Xu
+* Patch 06: Correct a trivial coding issue in jent_entropy_init for
+  checking JENT_EMINVARVAR reported by cppcheck
+
+Changes v2:
+* Use Dual BSD/GPL license in MODULE_LICENSE as suggested by
+  Paul Bolle <pebolle@tiscali.nl>
+* Patch 05, drbg_dealloc_state: only deallocate Jitter RNG if one was
+  instantiated in the first place. There are two main reasons why the Jitter RNG
+  may not be allocated: either it is not available as kernel module/in vmlinuz
+  or during init time of the Jitter RNG, the performed testing shows that the
+  underlying hardware is not suitable for the Jitter RNG (e.g. has a too coarse
+  timer).
+
+
+[1] http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg13891.html
+
+[2] https://lkml.org/lkml/2014/4/27/174
+
+[3] http://comments.gmane.org/gmane.linux.kernel/1701117
+
+[4] http://www.chronox.de/jent.html
+
+Stephan Mueller (6):
+  random: Addition of kernel_pool
+  random: Async and sync API for accessing kernel_pool
+  crypto: drbg - prepare for async seeding
+  crypto: drbg - add async seeding operation
+  crypto: drbg - use Jitter RNG to obtain seed
+  crypto: add jitterentropy RNG
+
+ crypto/Kconfig         |  10 +
+ crypto/Makefile        |   2 +
+ crypto/drbg.c          | 156 +++++++--
+ crypto/jitterentropy.c | 909 +++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.c       |   4 +
+ drivers/char/random.c  | 175 +++++++++-
+ include/crypto/drbg.h  |   4 +
+ include/linux/random.h |  20 ++
+ 8 files changed, 1240 insertions(+), 40 deletions(-)
+ create mode 100644 crypto/jitterentropy.c
+
+ ---
+/*
+ * Test module for verifying the correct operation of the
+ * in-kernel /dev/random handling
+ *
+ * Use: compile, load into the kernel and observe dmesg
+ *
+ * Written by: Stephan Mueller <smueller@chronox.de>
+ * Copyright (c) 2014
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, and the entire permission notice in its entirety,
+ *    including the disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote
+ *    products derived from this software without specific prior
+ *    written permission.
+ *
+ * ALTERNATIVELY, this product may be distributed under the terms of
+ * the GNU General Public License, in which case the provisions of the GPL are
+ * required INSTEAD OF the above restrictions.  (This clause is
+ * necessary due to a potential bad interaction between the GPL and
+ * the restrictions contained in a BSD-style copyright.)
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
+ * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ */
+
+#include <linux/random.h>
+#include <linux/module.h>
+#include <linux/slab.h>
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
+MODULE_DESCRIPTION("Test module for verifying the correct operation of async LRNG operation");
+
+static struct random_work my_work;
+static struct random_work my_work1;
+static struct random_work my_work2;
+static struct random_work my_work3;
+static struct random_work my_work4;
+static struct random_work my_work5;
+static struct random_work my_work6;
+static struct random_work my_work7;
+static struct random_work my_work8;
+static struct random_work my_work9;
+#define LEN 10
+static char buffer[LEN];
+
+static char *string = "a";
+static char *string2 = "b";
+static char *string3 = "c";
+static char *string4 = "d";
+static char *string5 = "e";
+static char *string6 = "f";
+static char *string7 = "g";
+static char *string8 = "h";
+static char *string9 = "i";
+
+void lrng_cb(void *buf, ssize_t buflen, void *private)
+{
+	printk("received %d bytes for %s\n", (int)buflen, (char *)private);
+}
+
+static void cn(struct random_work *work)
+{
+	get_blocking_random_bytes_cancel(work);
+	cancel_work_sync(&work->rw_work);
+}
+
+static int __init lrng_init(void)
+{
+	get_blocking_random_bytes_cb(NULL, &my_work, buffer, LEN,
+				     string, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work1, buffer, LEN,
+				     string, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work2, buffer, LEN,
+				     string2, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work3, buffer, LEN,
+				     string3, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work4, buffer, LEN,
+				     string4, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work5, buffer, LEN,
+				     string5, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work6, buffer, LEN,
+				     string6, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work7, buffer, LEN,
+				     string7, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work8, buffer, LEN,
+				     string8, lrng_cb);
+	get_blocking_random_bytes_cb(NULL, &my_work9, buffer, LEN,
+				     string9, lrng_cb);
+
+	/*
+	 * cancel one work to see that work can be canceled independent from
+	 * others
+	 */
+	cn(&my_work);
+	/* try again to verify that double cancellation is harmless */
+        cn(&my_work);
+
+	return 0;
+}
+
+static void __exit lrng_exit(void)
+{
+	cn(&my_work1);
+	cn(&my_work2);
+	cn(&my_work3);
+	cn(&my_work4);
+	cn(&my_work5);
+	cn(&my_work6);
+	cn(&my_work7);
+	cn(&my_work8);
+	cn(&my_work9);
+}
+
+module_init(lrng_init);
+module_exit(lrng_exit);
 -- 
 2.1.0
