@@ -1,96 +1,56 @@
-From: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Subject: [PATCH v2 1/7] crypto: mv_cesa: request registers memory region
-Date: Mon,  4 May 2015 14:27:00 +0200
-Message-ID: <1430742426-21202-2-git-send-email-boris.brezillon@free-electrons.com>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: [PATCH v2 5/7] ARM: marvell/dt: add crypto node to armada-xp-gp board
+Date: Mon,  4 May 2015 14:27:04 +0200
+Message-ID: <1430742426-21202-6-git-send-email-boris.brezillon@free-electrons.com>
 References: <1430742426-21202-1-git-send-email-boris.brezillon@free-electrons.com>
-Cc: Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
-	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
-	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Tawfik Bayouk <tawfik-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Lior Amsalem <alior-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Nadav Haklai <nadavh-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Eran Ben-Avi <benavi-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Thomas Petazzoni <thomas.petazzoni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Gregory CLEMENT <gregory.clement-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>,
-	Sebastian Hesselbarth <sebastian.hesselbarth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
-	Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1430742426-21202-1-git-send-email-boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Boris Brezillon <boris.brezillon@free-electrons.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from down.free-electrons.com ([37.187.137.238]:57785 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752744AbbEDM11 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 4 May 2015 08:27:27 -0400
+In-Reply-To: <1430742426-21202-1-git-send-email-boris.brezillon@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-The mv_cesa driver does not request the CESA registers memory region.
-Since we're about to add a new CESA driver, we need to make sure only one
-of these drivers probe the CESA device, and requesting the registers memory
-region is a good way to achieve that.
-
-Signed-off-by: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 ---
- drivers/crypto/mv_cesa.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ arch/arm/boot/dts/armada-xp-gp.dts | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index f91f15d..27b2373 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -1041,23 +1041,23 @@ static int mv_probe(struct platform_device *pdev)
+diff --git a/arch/arm/boot/dts/armada-xp-gp.dts b/arch/arm/boot/dts/armada-xp-gp.dts
+index 206aebb..586b60b 100644
+--- a/arch/arm/boot/dts/armada-xp-gp.dts
++++ b/arch/arm/boot/dts/armada-xp-gp.dts
+@@ -94,7 +94,9 @@
+ 	soc {
+ 		ranges = <MBUS_ID(0xf0, 0x01) 0 0 0xf1000000 0x100000
+ 			  MBUS_ID(0x01, 0x1d) 0 0 0xfff00000 0x100000
+-			  MBUS_ID(0x01, 0x2f) 0 0 0xf0000000 0x1000000>;
++			  MBUS_ID(0x01, 0x2f) 0 0 0xf0000000 0x1000000
++			  MBUS_ID(0x09, 0x09) 0 0 0xf1100000 0x10000
++			  MBUS_ID(0x09, 0x05) 0 0 0xf1110000 0x10000>;
  
- 	spin_lock_init(&cp->lock);
- 	crypto_init_queue(&cp->queue, 50);
--	cp->reg = ioremap(res->start, resource_size(res));
--	if (!cp->reg) {
--		ret = -ENOMEM;
-+	cp->reg = devm_ioremap_resource(&pdev->dev, res);
-+	if (IS_ERR(cp->reg)) {
-+		ret = PTR_ERR(cp->reg);
- 		goto err;
- 	}
- 
- 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "sram");
- 	if (!res) {
- 		ret = -ENXIO;
--		goto err_unmap_reg;
-+		goto err;
- 	}
- 	cp->sram_size = resource_size(res);
- 	cp->max_req_size = cp->sram_size - SRAM_CFG_SPACE;
- 	cp->sram = ioremap(res->start, cp->sram_size);
- 	if (!cp->sram) {
- 		ret = -ENOMEM;
--		goto err_unmap_reg;
-+		goto err;
- 	}
- 
- 	if (pdev->dev.of_node)
-@@ -1136,8 +1136,6 @@ err_thread:
- 	kthread_stop(cp->queue_th);
- err_unmap_sram:
- 	iounmap(cp->sram);
--err_unmap_reg:
--	iounmap(cp->reg);
- err:
- 	kfree(cp);
- 	cpg = NULL;
-@@ -1158,7 +1156,6 @@ static int mv_remove(struct platform_device *pdev)
- 	free_irq(cp->irq, cp);
- 	memset(cp->sram, 0, cp->sram_size);
- 	iounmap(cp->sram);
--	iounmap(cp->reg);
- 
- 	if (!IS_ERR(cp->clk)) {
- 		clk_disable_unprepare(cp->clk);
+ 		devbus-bootcs {
+ 			status = "okay";
 -- 
 1.9.1
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
