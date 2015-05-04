@@ -1,54 +1,47 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH RFC 1/2] crypto: add PKE API
-Date: Mon, 04 May 2015 12:26:40 -0700
-Message-ID: <5547C7F0.5010905@intel.com>
-References: <20150430223652.10157.86151.stgit@tstruk-mobl1> <20150430223647.10157.82156.stgit@tstruk-mobl1> <4227.1430496240@warthog.procyon.org.uk> <5543C348.9060004@intel.com> <20150503000744.GB16211@gondor.apana.org.au>
+Subject: Re: [PATCH RFC 0/2] crypto: Introduce Public Key Encryption API
+Date: Mon, 04 May 2015 13:42:11 -0700
+Message-ID: <5547D9A3.9060800@intel.com>
+References: <20150430223647.10157.82156.stgit@tstruk-mobl1> <55477111.2050803@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Cc: David Howells <dhowells@redhat.com>, corbet@lwn.net,
-	keescook@chromium.org, qat-linux@intel.com, jwboyer@redhat.com,
-	richard@nod.at, linux-kernel@vger.kernel.org, steved@redhat.com,
-	vgoyal@redhat.com, james.l.morris@oracle.com, jkosina@suse.cz,
-	zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: corbet@lwn.net, keescook@chromium.org, qat-linux@intel.com,
+	jwboyer@redhat.com, richard@nod.at, d.kasatkin@samsung.com,
+	linux-kernel@vger.kernel.org, steved@redhat.com,
+	dhowells@redhat.com, vgoyal@redhat.com, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	jdelvare@suse.de, linux-crypto@vger.kernel.org
+To: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>,
+	herbert@gondor.apana.org.au
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150503000744.GB16211@gondor.apana.org.au>
+In-Reply-To: <55477111.2050803@freescale.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 05/02/2015 05:07 PM, Herbert Xu wrote:
->>>> > >>  #define CRYPTO_ALG_TYPE_AHASH		0x0000000a
->>>>> > >> > +#define CRYPTO_ALG_TYPE_PKE		0x0000000b
->>>>> > >> >  #define CRYPTO_ALG_TYPE_RNG		0x0000000c
->>> > > Will filling a hole cause a problem with something that got obsoleted?
->> > 
->> > I hope not. I checked as far back as 2.6.18 and I don't see any clash.
->> > Herbert, what do you think?
-> Indeed you can't use this hole as it'll make you a hash algorithm.
+Hi Horia,
+On 05/04/2015 06:16 AM, Horia Geant=C4=83 wrote:
+>> 	int (*sign)(struct pke_request *pkereq);
+>> > 	int (*verify)(struct pke_request *pkereq);
+>> > 	int (*encrypt)(struct pke_request *pkereq);
+>> > 	int (*decrypt)(struct pke_request *pkereq);
+> Where would be the proper place for keygen operation?
 
-So in this case isn't RNG a hash algorithm as well?
-Anyway will something like this be ok with you:
+This will need to be extended to support keygen.
 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index ee14140..ac18cd3 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -41,7 +41,7 @@
- /*
-  * Algorithm masks and types.
-  */
--#define CRYPTO_ALG_TYPE_MASK           0x0000000f
-+#define CRYPTO_ALG_TYPE_MASK           0xf000000f
- #define CRYPTO_ALG_TYPE_CIPHER         0x00000001
- #define CRYPTO_ALG_TYPE_COMPRESS       0x00000002
- #define CRYPTO_ALG_TYPE_AEAD           0x00000003
-@@ -54,6 +54,7 @@
- #define CRYPTO_ALG_TYPE_AHASH          0x0000000a
- #define CRYPTO_ALG_TYPE_RNG            0x0000000c
- #define CRYPTO_ALG_TYPE_PCOMPRESS      0x0000000f
-+#define CRYPTO_ALG_TYPE_PKE            0x10000001
- 
- #define CRYPTO_ALG_TYPE_HASH_MASK      0x0000000e
- #define CRYPTO_ALG_TYPE_AHASH_MASK     0x0000000c
+>=20
+> AFAICT algorithms currently map to primitives + encoding methods, whi=
+ch
+> is not flexible. For e.g. current RSA implementation hardcodes the
+> PKCS1-v1_5 encoding method, making it hard to add OAEP(+) etc.
+>=20
+> One solution would be to map algorithms to primitives only. Encoding
+> methods need to be abstracted somehow, maybe using templates to wrap =
+the
+> algorithms.
+
+So far there is only one rsa implementation in kernel and it is only us=
+ed
+by module signing code.
+Later we can add templates or simply one can register "oaep-rsa" algori=
+thm.
