@@ -1,505 +1,97 @@
-From: Steve Capper <steve.capper@linaro.org>
-Subject: Re: [PATCH 2/2] crypto: testmgr: add test cases for CRC32
-Date: Tue, 5 May 2015 11:12:30 +0100
-Message-ID: <CAPvkgC0BrHmkLN15FjqLRMFskTrRvLiGLUNRE4svKwLT0PmAgg@mail.gmail.com>
-References: <1430730017-3712-1-git-send-email-ard.biesheuvel@linaro.org>
-	<1430730017-3712-2-git-send-email-ard.biesheuvel@linaro.org>
+From: Mike Snitzer <snitzer@redhat.com>
+Subject: Re: [PATCH 3.14 73/92] dm crypt: fix deadlock when async crypto
+ algorithm returns -EBUSY
+Date: Tue, 5 May 2015 08:50:40 -0400
+Message-ID: <20150505125040.GB7782@redhat.com>
+References: <20150502190109.683061482@linuxfoundation.org>
+ <20150502190117.069180534@linuxfoundation.org>
+ <20150504213254.GA27445@debian>
+ <20150505032213.GB4954@redhat.com>
+ <55486664.4000607@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org,
-	Yazen Ghannam <yazen.ghannam@linaro.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Rabin Vincent <rabin@rab.in>, herbert@gondor.apana.org.au,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	dm-devel@redhat.com, linux-crypto@vger.kernel.org,
+	Ben Collins <ben.c@servergy.com>
+To: Milan Broz <mbroz@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ob0-f170.google.com ([209.85.214.170]:35945 "EHLO
-	mail-ob0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757574AbbEEKMb (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 May 2015 06:12:31 -0400
-Received: by obbkp3 with SMTP id kp3so76763013obb.3
-        for <linux-crypto@vger.kernel.org>; Tue, 05 May 2015 03:12:30 -0700 (PDT)
-In-Reply-To: <1430730017-3712-2-git-send-email-ard.biesheuvel@linaro.org>
+Received: from mx1.redhat.com ([209.132.183.28]:58503 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753942AbbEEMum (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 5 May 2015 08:50:42 -0400
+Content-Disposition: inline
+In-Reply-To: <55486664.4000607@redhat.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 4 May 2015 at 10:00, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> This adds a couple of test cases for CRC32 (not CRC32c) to
-> ensure that the generic and arch specific implementations
-> are in sync.
->
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Acked-by: Steve Capper <steve.capper@linaro.org>
+On Tue, May 05 2015 at  2:42am -0400,
+Milan Broz <mbroz@redhat.com> wrote:
 
-> ---
->  crypto/testmgr.c |   9 ++
->  crypto/testmgr.h | 434 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 443 insertions(+)
->
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index f9bce3d7ee7f..2ad2a0e442ce 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -2318,6 +2318,15 @@ static const struct alg_test_desc alg_test_descs[] = {
->                 .alg = "compress_null",
->                 .test = alg_test_null,
->         }, {
-> +               .alg = "crc32",
-> +               .test = alg_test_hash,
-> +               .suite = {
-> +                       .hash = {
-> +                               .vecs = crc32_tv_template,
-> +                               .count = CRC32_TEST_VECTORS
-> +                       }
-> +               }
-> +       }, {
->                 .alg = "crc32c",
->                 .test = alg_test_crc32c,
->                 .fips_allowed = 1,
-> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> index 62e2485bb428..dd4ede5c833c 100644
-> --- a/crypto/testmgr.h
-> +++ b/crypto/testmgr.h
-> @@ -28946,6 +28946,440 @@ static struct hash_testvec michael_mic_tv_template[] = {
->  };
->
->  /*
-> + * CRC32 test vectors
-> + */
-> +#define CRC32_TEST_VECTORS 14
-> +
-> +static struct hash_testvec crc32_tv_template[] = {
-> +       {
-> +               .key = "\x87\xa9\xcb\xed",
-> +               .ksize = 4,
-> +               .psize = 0,
-> +               .digest = "\x87\xa9\xcb\xed",
-> +       },
-> +       {
-> +               .key = "\xff\xff\xff\xff",
-> +               .ksize = 4,
-> +               .plaintext = "\x01\x02\x03\x04\x05\x06\x07\x08"
-> +                            "\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10"
-> +                            "\x11\x12\x13\x14\x15\x16\x17\x18"
-> +                            "\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20"
-> +                            "\x21\x22\x23\x24\x25\x26\x27\x28",
-> +               .psize = 40,
-> +               .digest = "\x3a\xdf\x4b\xb0",
-> +       },
-> +       {
-> +               .key = "\xff\xff\xff\xff",
-> +               .ksize = 4,
-> +               .plaintext = "\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30"
-> +                            "\x31\x32\x33\x34\x35\x36\x37\x38"
-> +                            "\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40"
-> +                            "\x41\x42\x43\x44\x45\x46\x47\x48"
-> +                            "\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50",
-> +               .psize = 40,
-> +               .digest = "\xa9\x7a\x7f\x7b",
-> +       },
-> +       {
-> +               .key = "\xff\xff\xff\xff",
-> +               .ksize = 4,
-> +               .plaintext = "\x51\x52\x53\x54\x55\x56\x57\x58"
-> +                            "\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60"
-> +                            "\x61\x62\x63\x64\x65\x66\x67\x68"
-> +                            "\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70"
-> +                            "\x71\x72\x73\x74\x75\x76\x77\x78",
-> +               .psize = 40,
-> +               .digest = "\xba\xd3\xf8\x1c",
-> +       },
-> +       {
-> +               .key = "\xff\xff\xff\xff",
-> +               .ksize = 4,
-> +               .plaintext = "\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80"
-> +                            "\x81\x82\x83\x84\x85\x86\x87\x88"
-> +                            "\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90"
-> +                            "\x91\x92\x93\x94\x95\x96\x97\x98"
-> +                            "\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0",
-> +               .psize = 40,
-> +               .digest = "\xa8\xa9\xc2\x02",
-> +       },
-> +       {
-> +               .key = "\xff\xff\xff\xff",
-> +               .ksize = 4,
-> +               .plaintext = "\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8"
-> +                            "\xa9\xaa\xab\xac\xad\xae\xaf\xb0"
-> +                            "\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8"
-> +                            "\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0"
-> +                            "\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8",
-> +               .psize = 40,
-> +               .digest = "\x27\xf0\x57\xe2",
-> +       },
-> +       {
-> +               .key = "\xff\xff\xff\xff",
-> +               .ksize = 4,
-> +               .plaintext = "\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0"
-> +                            "\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8"
-> +                            "\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0"
-> +                            "\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8"
-> +                            "\xe9\xea\xeb\xec\xed\xee\xef\xf0",
-> +               .psize = 40,
-> +               .digest = "\x49\x78\x10\x08",
-> +       },
-> +       {
-> +               .key = "\x80\xea\xd3\xf1",
-> +               .ksize = 4,
-> +               .plaintext = "\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30"
-> +                            "\x31\x32\x33\x34\x35\x36\x37\x38"
-> +                            "\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40"
-> +                            "\x41\x42\x43\x44\x45\x46\x47\x48"
-> +                            "\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50",
-> +               .psize = 40,
-> +               .digest = "\x9a\xb1\xdc\xf0",
-> +       },
-> +       {
-> +               .key = "\xf3\x4a\x1d\x5d",
-> +               .ksize = 4,
-> +               .plaintext = "\x51\x52\x53\x54\x55\x56\x57\x58"
-> +                            "\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60"
-> +                            "\x61\x62\x63\x64\x65\x66\x67\x68"
-> +                            "\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70"
-> +                            "\x71\x72\x73\x74\x75\x76\x77\x78",
-> +               .psize = 40,
-> +               .digest = "\xb4\x97\xcc\xd4",
-> +       },
-> +       {
-> +               .key = "\x2e\x80\x04\x59",
-> +               .ksize = 4,
-> +               .plaintext = "\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80"
-> +                            "\x81\x82\x83\x84\x85\x86\x87\x88"
-> +                            "\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90"
-> +                            "\x91\x92\x93\x94\x95\x96\x97\x98"
-> +                            "\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0",
-> +               .psize = 40,
-> +               .digest = "\x67\x9b\xfa\x79",
-> +       },
-> +       {
-> +               .key = "\xa6\xcc\x19\x85",
-> +               .ksize = 4,
-> +               .plaintext = "\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8"
-> +                            "\xa9\xaa\xab\xac\xad\xae\xaf\xb0"
-> +                            "\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8"
-> +                            "\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0"
-> +                            "\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8",
-> +               .psize = 40,
-> +               .digest = "\x24\xb5\x16\xef",
-> +       },
-> +       {
-> +               .key = "\x41\xfc\xfe\x2d",
-> +               .ksize = 4,
-> +               .plaintext = "\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0"
-> +                            "\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8"
-> +                            "\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0"
-> +                            "\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8"
-> +                            "\xe9\xea\xeb\xec\xed\xee\xef\xf0",
-> +               .psize = 40,
-> +               .digest = "\x15\x94\x80\x39",
-> +       },
-> +       {
-> +               .key = "\xff\xff\xff\xff",
-> +               .ksize = 4,
-> +               .plaintext = "\x01\x02\x03\x04\x05\x06\x07\x08"
-> +                            "\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10"
-> +                            "\x11\x12\x13\x14\x15\x16\x17\x18"
-> +                            "\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20"
-> +                            "\x21\x22\x23\x24\x25\x26\x27\x28"
-> +                            "\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30"
-> +                            "\x31\x32\x33\x34\x35\x36\x37\x38"
-> +                            "\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40"
-> +                            "\x41\x42\x43\x44\x45\x46\x47\x48"
-> +                            "\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50"
-> +                            "\x51\x52\x53\x54\x55\x56\x57\x58"
-> +                            "\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60"
-> +                            "\x61\x62\x63\x64\x65\x66\x67\x68"
-> +                            "\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70"
-> +                            "\x71\x72\x73\x74\x75\x76\x77\x78"
-> +                            "\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80"
-> +                            "\x81\x82\x83\x84\x85\x86\x87\x88"
-> +                            "\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90"
-> +                            "\x91\x92\x93\x94\x95\x96\x97\x98"
-> +                            "\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0"
-> +                            "\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8"
-> +                            "\xa9\xaa\xab\xac\xad\xae\xaf\xb0"
-> +                            "\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8"
-> +                            "\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0"
-> +                            "\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8"
-> +                            "\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0"
-> +                            "\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8"
-> +                            "\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0"
-> +                            "\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8"
-> +                            "\xe9\xea\xeb\xec\xed\xee\xef\xf0",
-> +               .psize = 240,
-> +               .digest = "\x6c\xc6\x56\xde",
-> +               .np = 2,
-> +               .tap = { 31, 209 }
-> +       }, {
-> +               .key = "\xff\xff\xff\xff",
-> +               .ksize = 4,
-> +               .plaintext =    "\x6e\x05\x79\x10\xa7\x1b\xb2\x49"
-> +                               "\xe0\x54\xeb\x82\x19\x8d\x24\xbb"
-> +                               "\x2f\xc6\x5d\xf4\x68\xff\x96\x0a"
-> +                               "\xa1\x38\xcf\x43\xda\x71\x08\x7c"
-> +                               "\x13\xaa\x1e\xb5\x4c\xe3\x57\xee"
-> +                               "\x85\x1c\x90\x27\xbe\x32\xc9\x60"
-> +                               "\xf7\x6b\x02\x99\x0d\xa4\x3b\xd2"
-> +                               "\x46\xdd\x74\x0b\x7f\x16\xad\x21"
-> +                               "\xb8\x4f\xe6\x5a\xf1\x88\x1f\x93"
-> +                               "\x2a\xc1\x35\xcc\x63\xfa\x6e\x05"
-> +                               "\x9c\x10\xa7\x3e\xd5\x49\xe0\x77"
-> +                               "\x0e\x82\x19\xb0\x24\xbb\x52\xe9"
-> +                               "\x5d\xf4\x8b\x22\x96\x2d\xc4\x38"
-> +                               "\xcf\x66\xfd\x71\x08\x9f\x13\xaa"
-> +                               "\x41\xd8\x4c\xe3\x7a\x11\x85\x1c"
-> +                               "\xb3\x27\xbe\x55\xec\x60\xf7\x8e"
-> +                               "\x02\x99\x30\xc7\x3b\xd2\x69\x00"
-> +                               "\x74\x0b\xa2\x16\xad\x44\xdb\x4f"
-> +                               "\xe6\x7d\x14\x88\x1f\xb6\x2a\xc1"
-> +                               "\x58\xef\x63\xfa\x91\x05\x9c\x33"
-> +                               "\xca\x3e\xd5\x6c\x03\x77\x0e\xa5"
-> +                               "\x19\xb0\x47\xde\x52\xe9\x80\x17"
-> +                               "\x8b\x22\xb9\x2d\xc4\x5b\xf2\x66"
-> +                               "\xfd\x94\x08\x9f\x36\xcd\x41\xd8"
-> +                               "\x6f\x06\x7a\x11\xa8\x1c\xb3\x4a"
-> +                               "\xe1\x55\xec\x83\x1a\x8e\x25\xbc"
-> +                               "\x30\xc7\x5e\xf5\x69\x00\x97\x0b"
-> +                               "\xa2\x39\xd0\x44\xdb\x72\x09\x7d"
-> +                               "\x14\xab\x1f\xb6\x4d\xe4\x58\xef"
-> +                               "\x86\x1d\x91\x28\xbf\x33\xca\x61"
-> +                               "\xf8\x6c\x03\x9a\x0e\xa5\x3c\xd3"
-> +                               "\x47\xde\x75\x0c\x80\x17\xae\x22"
-> +                               "\xb9\x50\xe7\x5b\xf2\x89\x20\x94"
-> +                               "\x2b\xc2\x36\xcd\x64\xfb\x6f\x06"
-> +                               "\x9d\x11\xa8\x3f\xd6\x4a\xe1\x78"
-> +                               "\x0f\x83\x1a\xb1\x25\xbc\x53\xea"
-> +                               "\x5e\xf5\x8c\x00\x97\x2e\xc5\x39"
-> +                               "\xd0\x67\xfe\x72\x09\xa0\x14\xab"
-> +                               "\x42\xd9\x4d\xe4\x7b\x12\x86\x1d"
-> +                               "\xb4\x28\xbf\x56\xed\x61\xf8\x8f"
-> +                               "\x03\x9a\x31\xc8\x3c\xd3\x6a\x01"
-> +                               "\x75\x0c\xa3\x17\xae\x45\xdc\x50"
-> +                               "\xe7\x7e\x15\x89\x20\xb7\x2b\xc2"
-> +                               "\x59\xf0\x64\xfb\x92\x06\x9d\x34"
-> +                               "\xcb\x3f\xd6\x6d\x04\x78\x0f\xa6"
-> +                               "\x1a\xb1\x48\xdf\x53\xea\x81\x18"
-> +                               "\x8c\x23\xba\x2e\xc5\x5c\xf3\x67"
-> +                               "\xfe\x95\x09\xa0\x37\xce\x42\xd9"
-> +                               "\x70\x07\x7b\x12\xa9\x1d\xb4\x4b"
-> +                               "\xe2\x56\xed\x84\x1b\x8f\x26\xbd"
-> +                               "\x31\xc8\x5f\xf6\x6a\x01\x98\x0c"
-> +                               "\xa3\x3a\xd1\x45\xdc\x73\x0a\x7e"
-> +                               "\x15\xac\x20\xb7\x4e\xe5\x59\xf0"
-> +                               "\x87\x1e\x92\x29\xc0\x34\xcb\x62"
-> +                               "\xf9\x6d\x04\x9b\x0f\xa6\x3d\xd4"
-> +                               "\x48\xdf\x76\x0d\x81\x18\xaf\x23"
-> +                               "\xba\x51\xe8\x5c\xf3\x8a\x21\x95"
-> +                               "\x2c\xc3\x37\xce\x65\xfc\x70\x07"
-> +                               "\x9e\x12\xa9\x40\xd7\x4b\xe2\x79"
-> +                               "\x10\x84\x1b\xb2\x26\xbd\x54\xeb"
-> +                               "\x5f\xf6\x8d\x01\x98\x2f\xc6\x3a"
-> +                               "\xd1\x68\xff\x73\x0a\xa1\x15\xac"
-> +                               "\x43\xda\x4e\xe5\x7c\x13\x87\x1e"
-> +                               "\xb5\x29\xc0\x57\xee\x62\xf9\x90"
-> +                               "\x04\x9b\x32\xc9\x3d\xd4\x6b\x02"
-> +                               "\x76\x0d\xa4\x18\xaf\x46\xdd\x51"
-> +                               "\xe8\x7f\x16\x8a\x21\xb8\x2c\xc3"
-> +                               "\x5a\xf1\x65\xfc\x93\x07\x9e\x35"
-> +                               "\xcc\x40\xd7\x6e\x05\x79\x10\xa7"
-> +                               "\x1b\xb2\x49\xe0\x54\xeb\x82\x19"
-> +                               "\x8d\x24\xbb\x2f\xc6\x5d\xf4\x68"
-> +                               "\xff\x96\x0a\xa1\x38\xcf\x43\xda"
-> +                               "\x71\x08\x7c\x13\xaa\x1e\xb5\x4c"
-> +                               "\xe3\x57\xee\x85\x1c\x90\x27\xbe"
-> +                               "\x32\xc9\x60\xf7\x6b\x02\x99\x0d"
-> +                               "\xa4\x3b\xd2\x46\xdd\x74\x0b\x7f"
-> +                               "\x16\xad\x21\xb8\x4f\xe6\x5a\xf1"
-> +                               "\x88\x1f\x93\x2a\xc1\x35\xcc\x63"
-> +                               "\xfa\x6e\x05\x9c\x10\xa7\x3e\xd5"
-> +                               "\x49\xe0\x77\x0e\x82\x19\xb0\x24"
-> +                               "\xbb\x52\xe9\x5d\xf4\x8b\x22\x96"
-> +                               "\x2d\xc4\x38\xcf\x66\xfd\x71\x08"
-> +                               "\x9f\x13\xaa\x41\xd8\x4c\xe3\x7a"
-> +                               "\x11\x85\x1c\xb3\x27\xbe\x55\xec"
-> +                               "\x60\xf7\x8e\x02\x99\x30\xc7\x3b"
-> +                               "\xd2\x69\x00\x74\x0b\xa2\x16\xad"
-> +                               "\x44\xdb\x4f\xe6\x7d\x14\x88\x1f"
-> +                               "\xb6\x2a\xc1\x58\xef\x63\xfa\x91"
-> +                               "\x05\x9c\x33\xca\x3e\xd5\x6c\x03"
-> +                               "\x77\x0e\xa5\x19\xb0\x47\xde\x52"
-> +                               "\xe9\x80\x17\x8b\x22\xb9\x2d\xc4"
-> +                               "\x5b\xf2\x66\xfd\x94\x08\x9f\x36"
-> +                               "\xcd\x41\xd8\x6f\x06\x7a\x11\xa8"
-> +                               "\x1c\xb3\x4a\xe1\x55\xec\x83\x1a"
-> +                               "\x8e\x25\xbc\x30\xc7\x5e\xf5\x69"
-> +                               "\x00\x97\x0b\xa2\x39\xd0\x44\xdb"
-> +                               "\x72\x09\x7d\x14\xab\x1f\xb6\x4d"
-> +                               "\xe4\x58\xef\x86\x1d\x91\x28\xbf"
-> +                               "\x33\xca\x61\xf8\x6c\x03\x9a\x0e"
-> +                               "\xa5\x3c\xd3\x47\xde\x75\x0c\x80"
-> +                               "\x17\xae\x22\xb9\x50\xe7\x5b\xf2"
-> +                               "\x89\x20\x94\x2b\xc2\x36\xcd\x64"
-> +                               "\xfb\x6f\x06\x9d\x11\xa8\x3f\xd6"
-> +                               "\x4a\xe1\x78\x0f\x83\x1a\xb1\x25"
-> +                               "\xbc\x53\xea\x5e\xf5\x8c\x00\x97"
-> +                               "\x2e\xc5\x39\xd0\x67\xfe\x72\x09"
-> +                               "\xa0\x14\xab\x42\xd9\x4d\xe4\x7b"
-> +                               "\x12\x86\x1d\xb4\x28\xbf\x56\xed"
-> +                               "\x61\xf8\x8f\x03\x9a\x31\xc8\x3c"
-> +                               "\xd3\x6a\x01\x75\x0c\xa3\x17\xae"
-> +                               "\x45\xdc\x50\xe7\x7e\x15\x89\x20"
-> +                               "\xb7\x2b\xc2\x59\xf0\x64\xfb\x92"
-> +                               "\x06\x9d\x34\xcb\x3f\xd6\x6d\x04"
-> +                               "\x78\x0f\xa6\x1a\xb1\x48\xdf\x53"
-> +                               "\xea\x81\x18\x8c\x23\xba\x2e\xc5"
-> +                               "\x5c\xf3\x67\xfe\x95\x09\xa0\x37"
-> +                               "\xce\x42\xd9\x70\x07\x7b\x12\xa9"
-> +                               "\x1d\xb4\x4b\xe2\x56\xed\x84\x1b"
-> +                               "\x8f\x26\xbd\x31\xc8\x5f\xf6\x6a"
-> +                               "\x01\x98\x0c\xa3\x3a\xd1\x45\xdc"
-> +                               "\x73\x0a\x7e\x15\xac\x20\xb7\x4e"
-> +                               "\xe5\x59\xf0\x87\x1e\x92\x29\xc0"
-> +                               "\x34\xcb\x62\xf9\x6d\x04\x9b\x0f"
-> +                               "\xa6\x3d\xd4\x48\xdf\x76\x0d\x81"
-> +                               "\x18\xaf\x23\xba\x51\xe8\x5c\xf3"
-> +                               "\x8a\x21\x95\x2c\xc3\x37\xce\x65"
-> +                               "\xfc\x70\x07\x9e\x12\xa9\x40\xd7"
-> +                               "\x4b\xe2\x79\x10\x84\x1b\xb2\x26"
-> +                               "\xbd\x54\xeb\x5f\xf6\x8d\x01\x98"
-> +                               "\x2f\xc6\x3a\xd1\x68\xff\x73\x0a"
-> +                               "\xa1\x15\xac\x43\xda\x4e\xe5\x7c"
-> +                               "\x13\x87\x1e\xb5\x29\xc0\x57\xee"
-> +                               "\x62\xf9\x90\x04\x9b\x32\xc9\x3d"
-> +                               "\xd4\x6b\x02\x76\x0d\xa4\x18\xaf"
-> +                               "\x46\xdd\x51\xe8\x7f\x16\x8a\x21"
-> +                               "\xb8\x2c\xc3\x5a\xf1\x65\xfc\x93"
-> +                               "\x07\x9e\x35\xcc\x40\xd7\x6e\x05"
-> +                               "\x79\x10\xa7\x1b\xb2\x49\xe0\x54"
-> +                               "\xeb\x82\x19\x8d\x24\xbb\x2f\xc6"
-> +                               "\x5d\xf4\x68\xff\x96\x0a\xa1\x38"
-> +                               "\xcf\x43\xda\x71\x08\x7c\x13\xaa"
-> +                               "\x1e\xb5\x4c\xe3\x57\xee\x85\x1c"
-> +                               "\x90\x27\xbe\x32\xc9\x60\xf7\x6b"
-> +                               "\x02\x99\x0d\xa4\x3b\xd2\x46\xdd"
-> +                               "\x74\x0b\x7f\x16\xad\x21\xb8\x4f"
-> +                               "\xe6\x5a\xf1\x88\x1f\x93\x2a\xc1"
-> +                               "\x35\xcc\x63\xfa\x6e\x05\x9c\x10"
-> +                               "\xa7\x3e\xd5\x49\xe0\x77\x0e\x82"
-> +                               "\x19\xb0\x24\xbb\x52\xe9\x5d\xf4"
-> +                               "\x8b\x22\x96\x2d\xc4\x38\xcf\x66"
-> +                               "\xfd\x71\x08\x9f\x13\xaa\x41\xd8"
-> +                               "\x4c\xe3\x7a\x11\x85\x1c\xb3\x27"
-> +                               "\xbe\x55\xec\x60\xf7\x8e\x02\x99"
-> +                               "\x30\xc7\x3b\xd2\x69\x00\x74\x0b"
-> +                               "\xa2\x16\xad\x44\xdb\x4f\xe6\x7d"
-> +                               "\x14\x88\x1f\xb6\x2a\xc1\x58\xef"
-> +                               "\x63\xfa\x91\x05\x9c\x33\xca\x3e"
-> +                               "\xd5\x6c\x03\x77\x0e\xa5\x19\xb0"
-> +                               "\x47\xde\x52\xe9\x80\x17\x8b\x22"
-> +                               "\xb9\x2d\xc4\x5b\xf2\x66\xfd\x94"
-> +                               "\x08\x9f\x36\xcd\x41\xd8\x6f\x06"
-> +                               "\x7a\x11\xa8\x1c\xb3\x4a\xe1\x55"
-> +                               "\xec\x83\x1a\x8e\x25\xbc\x30\xc7"
-> +                               "\x5e\xf5\x69\x00\x97\x0b\xa2\x39"
-> +                               "\xd0\x44\xdb\x72\x09\x7d\x14\xab"
-> +                               "\x1f\xb6\x4d\xe4\x58\xef\x86\x1d"
-> +                               "\x91\x28\xbf\x33\xca\x61\xf8\x6c"
-> +                               "\x03\x9a\x0e\xa5\x3c\xd3\x47\xde"
-> +                               "\x75\x0c\x80\x17\xae\x22\xb9\x50"
-> +                               "\xe7\x5b\xf2\x89\x20\x94\x2b\xc2"
-> +                               "\x36\xcd\x64\xfb\x6f\x06\x9d\x11"
-> +                               "\xa8\x3f\xd6\x4a\xe1\x78\x0f\x83"
-> +                               "\x1a\xb1\x25\xbc\x53\xea\x5e\xf5"
-> +                               "\x8c\x00\x97\x2e\xc5\x39\xd0\x67"
-> +                               "\xfe\x72\x09\xa0\x14\xab\x42\xd9"
-> +                               "\x4d\xe4\x7b\x12\x86\x1d\xb4\x28"
-> +                               "\xbf\x56\xed\x61\xf8\x8f\x03\x9a"
-> +                               "\x31\xc8\x3c\xd3\x6a\x01\x75\x0c"
-> +                               "\xa3\x17\xae\x45\xdc\x50\xe7\x7e"
-> +                               "\x15\x89\x20\xb7\x2b\xc2\x59\xf0"
-> +                               "\x64\xfb\x92\x06\x9d\x34\xcb\x3f"
-> +                               "\xd6\x6d\x04\x78\x0f\xa6\x1a\xb1"
-> +                               "\x48\xdf\x53\xea\x81\x18\x8c\x23"
-> +                               "\xba\x2e\xc5\x5c\xf3\x67\xfe\x95"
-> +                               "\x09\xa0\x37\xce\x42\xd9\x70\x07"
-> +                               "\x7b\x12\xa9\x1d\xb4\x4b\xe2\x56"
-> +                               "\xed\x84\x1b\x8f\x26\xbd\x31\xc8"
-> +                               "\x5f\xf6\x6a\x01\x98\x0c\xa3\x3a"
-> +                               "\xd1\x45\xdc\x73\x0a\x7e\x15\xac"
-> +                               "\x20\xb7\x4e\xe5\x59\xf0\x87\x1e"
-> +                               "\x92\x29\xc0\x34\xcb\x62\xf9\x6d"
-> +                               "\x04\x9b\x0f\xa6\x3d\xd4\x48\xdf"
-> +                               "\x76\x0d\x81\x18\xaf\x23\xba\x51"
-> +                               "\xe8\x5c\xf3\x8a\x21\x95\x2c\xc3"
-> +                               "\x37\xce\x65\xfc\x70\x07\x9e\x12"
-> +                               "\xa9\x40\xd7\x4b\xe2\x79\x10\x84"
-> +                               "\x1b\xb2\x26\xbd\x54\xeb\x5f\xf6"
-> +                               "\x8d\x01\x98\x2f\xc6\x3a\xd1\x68"
-> +                               "\xff\x73\x0a\xa1\x15\xac\x43\xda"
-> +                               "\x4e\xe5\x7c\x13\x87\x1e\xb5\x29"
-> +                               "\xc0\x57\xee\x62\xf9\x90\x04\x9b"
-> +                               "\x32\xc9\x3d\xd4\x6b\x02\x76\x0d"
-> +                               "\xa4\x18\xaf\x46\xdd\x51\xe8\x7f"
-> +                               "\x16\x8a\x21\xb8\x2c\xc3\x5a\xf1"
-> +                               "\x65\xfc\x93\x07\x9e\x35\xcc\x40"
-> +                               "\xd7\x6e\x05\x79\x10\xa7\x1b\xb2"
-> +                               "\x49\xe0\x54\xeb\x82\x19\x8d\x24"
-> +                               "\xbb\x2f\xc6\x5d\xf4\x68\xff\x96"
-> +                               "\x0a\xa1\x38\xcf\x43\xda\x71\x08"
-> +                               "\x7c\x13\xaa\x1e\xb5\x4c\xe3\x57"
-> +                               "\xee\x85\x1c\x90\x27\xbe\x32\xc9"
-> +                               "\x60\xf7\x6b\x02\x99\x0d\xa4\x3b"
-> +                               "\xd2\x46\xdd\x74\x0b\x7f\x16\xad"
-> +                               "\x21\xb8\x4f\xe6\x5a\xf1\x88\x1f"
-> +                               "\x93\x2a\xc1\x35\xcc\x63\xfa\x6e"
-> +                               "\x05\x9c\x10\xa7\x3e\xd5\x49\xe0"
-> +                               "\x77\x0e\x82\x19\xb0\x24\xbb\x52"
-> +                               "\xe9\x5d\xf4\x8b\x22\x96\x2d\xc4"
-> +                               "\x38\xcf\x66\xfd\x71\x08\x9f\x13"
-> +                               "\xaa\x41\xd8\x4c\xe3\x7a\x11\x85"
-> +                               "\x1c\xb3\x27\xbe\x55\xec\x60\xf7"
-> +                               "\x8e\x02\x99\x30\xc7\x3b\xd2\x69"
-> +                               "\x00\x74\x0b\xa2\x16\xad\x44\xdb"
-> +                               "\x4f\xe6\x7d\x14\x88\x1f\xb6\x2a"
-> +                               "\xc1\x58\xef\x63\xfa\x91\x05\x9c"
-> +                               "\x33\xca\x3e\xd5\x6c\x03\x77\x0e"
-> +                               "\xa5\x19\xb0\x47\xde\x52\xe9\x80"
-> +                               "\x17\x8b\x22\xb9\x2d\xc4\x5b\xf2"
-> +                               "\x66\xfd\x94\x08\x9f\x36\xcd\x41"
-> +                               "\xd8\x6f\x06\x7a\x11\xa8\x1c\xb3"
-> +                               "\x4a\xe1\x55\xec\x83\x1a\x8e\x25"
-> +                               "\xbc\x30\xc7\x5e\xf5\x69\x00\x97"
-> +                               "\x0b\xa2\x39\xd0\x44\xdb\x72\x09"
-> +                               "\x7d\x14\xab\x1f\xb6\x4d\xe4\x58"
-> +                               "\xef\x86\x1d\x91\x28\xbf\x33\xca"
-> +                               "\x61\xf8\x6c\x03\x9a\x0e\xa5\x3c"
-> +                               "\xd3\x47\xde\x75\x0c\x80\x17\xae"
-> +                               "\x22\xb9\x50\xe7\x5b\xf2\x89\x20"
-> +                               "\x94\x2b\xc2\x36\xcd\x64\xfb\x6f"
-> +                               "\x06\x9d\x11\xa8\x3f\xd6\x4a\xe1"
-> +                               "\x78\x0f\x83\x1a\xb1\x25\xbc\x53"
-> +                               "\xea\x5e\xf5\x8c\x00\x97\x2e\xc5"
-> +                               "\x39\xd0\x67\xfe\x72\x09\xa0\x14"
-> +                               "\xab\x42\xd9\x4d\xe4\x7b\x12\x86"
-> +                               "\x1d\xb4\x28\xbf\x56\xed\x61\xf8"
-> +                               "\x8f\x03\x9a\x31\xc8\x3c\xd3\x6a"
-> +                               "\x01\x75\x0c\xa3\x17\xae\x45\xdc"
-> +                               "\x50\xe7\x7e\x15\x89\x20\xb7\x2b"
-> +                               "\xc2\x59\xf0\x64\xfb\x92\x06\x9d"
-> +                               "\x34\xcb\x3f\xd6\x6d\x04\x78\x0f"
-> +                               "\xa6\x1a\xb1\x48\xdf\x53\xea\x81"
-> +                               "\x18\x8c\x23\xba\x2e\xc5\x5c\xf3"
-> +                               "\x67\xfe\x95\x09\xa0\x37\xce\x42"
-> +                               "\xd9\x70\x07\x7b\x12\xa9\x1d\xb4"
-> +                               "\x4b\xe2\x56\xed\x84\x1b\x8f\x26"
-> +                               "\xbd\x31\xc8\x5f\xf6\x6a\x01\x98",
-> +               .psize = 2048,
-> +               .digest = "\xfb\x3a\x7a\xda",
-> +       }
-> +};
-> +
-> +/*
->   * CRC32C test vectors
->   */
->  #define CRC32C_TEST_VECTORS 15
-> --
-> 1.9.1
->
+> On 05/05/2015 05:22 AM, Mike Snitzer wrote:
+> > On Mon, May 04 2015 at  5:32pm -0400,
+> > Rabin Vincent <rabin@rab.in> wrote:
+> > 
+> >> On Sat, May 02, 2015 at 09:03:28PM +0200, Greg Kroah-Hartman wrote:
+> >>> 3.14-stable review patch.  If anyone has any objections, please let me know.
+> >>>
+> >>> ------------------
+> >>>
+> >>> From: Ben Collins <ben.c@servergy.com>
+> >>>
+> >>> commit 0618764cb25f6fa9fb31152995de42a8a0496475 upstream.
+> >>
+> >> The commit in question was recently merged to mainline and is now being
+> >> sent to various stable kernels.  But I think the patch is wrong and the
+> >> real problem lies in the Freescale CAAM driver which is described as
+> >> having being tested with.
+> ...
+> 
+> >> dm-crypt uses CRYPTO_TFM_REQ_MAY_BACKLOG.  This means the the crypto
+> >> driver should internally backlog requests which arrive when the queue is
+> >> full and process them later.  Until the crypto hw's queue becomes full,
+> >> the driver returns -EINPROGRESS.  When the crypto hw's queue if full,
+> >> the driver returns -EBUSY, and if CRYPTO_TFM_REQ_MAY_BACKLOG is set, is
+> >> expected to backlog the request and process it when the hardware has
+> >> queue space.  At the point when the driver takes the request from the
+> >> backlog and starts processing it, it calls the completion function with
+> >> a status of -EINPROGRESS.  The completion function is called (for a
+> >> second time, in the case of backlogged requests) with a status/err of 0
+> >> when a request is done.
+> 
+> 
+> Mike, I thought there was a discussion with crypto API maintainer before
+> merging this patch, I think there were some comments that the patch seems
+> to be not correct...
+
+I unfortunately didn't cc Herbert on the original v2 patch (but I did
+later bounce the mail to him IIRC).  Regardless, no I didn't see any
+feedback and I really should've been more active in engaging him.
+
+> This API (EBUSY/EINPROGESS codes) use was there since dmcrypt switched
+> to async crypto API.
+> 
+> There should tests for it (some years ago we tested the async path by forcing
+> to use cryptd, this was able to clearly simulate the BUSY path as well),
+> but not sure if it is still possible so easily.
+> 
+> > Any chance you'd be willing to provide in-code comments in the
+> > appropriate places in dm-crypt.c (after having reverted this patch in
+> > question)?
+> > 
+> > I'd be happy to take the combination of the revert and documentation in
+> > a single patch and get it to Linus for 4.0-rc3.
+> 
+> Please, do not mix revert patches with additions (even if it is just comment),
+> someone could be even more confused what's going on here.
+
+I was only saying to mix comments and revert if the patch in question
+didn't get into stable@ at all.
+
+But safer to just do a pure revert.  I get it queued up to send to Linus.
+
+> If nobody volunteers, I'll try to add some comments later to dmcrypt code,
+> but that is definitely not for stable.
+
+Yeap, thanks.
