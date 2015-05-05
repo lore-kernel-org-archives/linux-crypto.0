@@ -1,155 +1,76 @@
-From: Akinobu Mita <akinobu.mita@gmail.com>
-Subject: Re: [PATCH v4 3/4] lib: introduce crc_t10dif_update()
-Date: Tue, 5 May 2015 13:22:03 +0900
-Message-ID: <CAC5umyg5iAXruJkvCOQui84TdueLCik72+Wi3caXpmHUQghvyw@mail.gmail.com>
-References: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
-	<1430461431-5936-4-git-send-email-akinobu.mita@gmail.com>
-	<1430496906.660.79.camel@schen9-desk2.jf.intel.com>
-	<CAC5umyi8dQgtN4qQBm6_X6MvPZo56sUs-RRKR+4Ds6Tx_67-wA@mail.gmail.com>
-	<1430755775.660.88.camel@schen9-desk2.jf.intel.com>
+From: Milan Broz <mbroz@redhat.com>
+Subject: Re: [PATCH 3.14 73/92] dm crypt: fix deadlock when async crypto algorithm
+ returns -EBUSY
+Date: Tue, 05 May 2015 08:42:44 +0200
+Message-ID: <55486664.4000607@redhat.com>
+References: <20150502190109.683061482@linuxfoundation.org> <20150502190117.069180534@linuxfoundation.org> <20150504213254.GA27445@debian> <20150505032213.GB4954@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: target-devel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Nicholas Bellinger <nab@linux-iscsi.org>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>
-To: Tim Chen <tim.c.chen@linux.intel.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-lb0-f169.google.com ([209.85.217.169]:33266 "EHLO
-	mail-lb0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751034AbbEEEWG (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 May 2015 00:22:06 -0400
-In-Reply-To: <1430755775.660.88.camel@schen9-desk2.jf.intel.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ben Collins <ben.c@servergy.com>, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, dm-devel@redhat.com,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+To: Mike Snitzer <snitzer@redhat.com>, Rabin Vincent <rabin@rab.in>
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20150505032213.GB4954@redhat.com>
+Sender: stable-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-2015-05-05 1:09 GMT+09:00 Tim Chen <tim.c.chen@linux.intel.com>:
-> On Sat, 2015-05-02 at 10:38 +0900, Akinobu Mita wrote:
->> 2015-05-02 1:15 GMT+09:00 Tim Chen <tim.c.chen@linux.intel.com>:
->> > On Fri, 2015-05-01 at 15:23 +0900, Akinobu Mita wrote:
->> >> This introduces crc_t10dif_update() which enables to calculate CRC
->> >> for a block which straddles multiple SG elements by calling multiple
->> >> times.  This also converts crc_t10dif() to use crc_t10dif_update() as
->> >> they are almost same.
->> >>
->> >> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
->> >> Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
->> >> Cc: Tim Chen <tim.c.chen@linux.intel.com>
->> >> Cc: Herbert Xu <herbert@gondor.apana.org.au>
->> >> Cc: "David S. Miller" <davem@davemloft.net>
->> >> Cc: linux-crypto@vger.kernel.org
->> >> Cc: Nicholas Bellinger <nab@linux-iscsi.org>
->> >> Cc: Sagi Grimberg <sagig@mellanox.com>
->> >> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
->> >> Cc: Christoph Hellwig <hch@lst.de>
->> >> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
->> >> Cc: target-devel@vger.kernel.org
->> >> ---
->> >> * Changes from v3:
->> >> - Reduce duplicated code between crc_t10dif_update and crc_t10dif,
->> >>   suggested by Tim and Herbert
->> >>
->> >>  include/linux/crc-t10dif.h |  1 +
->> >>  lib/crc-t10dif.c           | 13 ++++++++++---
->> >>  2 files changed, 11 insertions(+), 3 deletions(-)
->> >>
->> >> diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
->> >> index cf53d07..d81961e 100644
->> >> --- a/include/linux/crc-t10dif.h
->> >> +++ b/include/linux/crc-t10dif.h
->> >> @@ -9,5 +9,6 @@
->> >>  extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
->> >>                               size_t len);
->> >>  extern __u16 crc_t10dif(unsigned char const *, size_t);
->> >> +extern __u16 crc_t10dif_update(__u16 crc, unsigned char const *, size_t);
->> >>
->> >>  #endif
->> >> diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
->> >> index dfe6ec1..d775737 100644
->> >> --- a/lib/crc-t10dif.c
->> >> +++ b/lib/crc-t10dif.c
->> >> @@ -19,7 +19,7 @@
->> >>  static struct crypto_shash *crct10dif_tfm;
->> >>  static struct static_key crct10dif_fallback __read_mostly;
->> >>
->> >> -__u16 crc_t10dif(const unsigned char *buffer, size_t len)
->> >> +__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
->> >>  {
->> >>       struct {
->> >>               struct shash_desc shash;
->> >> @@ -28,17 +28,24 @@ __u16 crc_t10dif(const unsigned char *buffer, size_t len)
->> >>       int err;
->> >>
->> >>       if (static_key_false(&crct10dif_fallback))
->> >> -             return crc_t10dif_generic(0, buffer, len);
->> >> +             return crc_t10dif_generic(crc, buffer, len);
->> >>
->> >>       desc.shash.tfm = crct10dif_tfm;
->> >>       desc.shash.flags = 0;
->> >> -     *(__u16 *)desc.ctx = 0;
->> >>
->> >> +     err = crypto_shash_import(&desc.shash, &crc);
->> >> +     BUG_ON(err);
->> >>       err = crypto_shash_update(&desc.shash, buffer, len);
->> >>       BUG_ON(err);
->> >>
->> >>       return *(__u16 *)desc.ctx;
->> >>  }
->> >> +EXPORT_SYMBOL(crc_t10dif_update);
->> >> +
->> >> +__u16 crc_t10dif(const unsigned char *buffer, size_t len)
->> >> +{
->> >> +     return crc_t10dif_update(0, buffer, len);
->> >
->> > Nitpicking a bit:
->> >
->> > Will putting an extra function call to crc_t10dif_update will add extra
->> > overhead to crc_t10dif, which is what most driver uses? As
->> > we are calling crc_t10dif a lot (millions of times) as we go
->> > through a block device, this extra function call
->> > is undesirable.  Using a __crc_t10dif_update
->> > inline function that both crc_t10dif_update and crc_t10dif
->> > invokes can will avoid this overhead.
+On 05/05/2015 05:22 AM, Mike Snitzer wrote:
+> On Mon, May 04 2015 at  5:32pm -0400,
+> Rabin Vincent <rabin@rab.in> wrote:
+> 
+>> On Sat, May 02, 2015 at 09:03:28PM +0200, Greg Kroah-Hartman wrote:
+>>> 3.14-stable review patch.  If anyone has any objections, please let me know.
+>>>
+>>> ------------------
+>>>
+>>> From: Ben Collins <ben.c@servergy.com>
+>>>
+>>> commit 0618764cb25f6fa9fb31152995de42a8a0496475 upstream.
 >>
->> I'll convert crc_t10dif to inline function.  But do we also need to
->> make crc_t10dif_update inline function? (i.e. is there any difference
->> between __crc_t10dif_update and crc_t10dif_update?)
->
-> I don't mean convert crc_t10dif to inline, but make a local inline function
-> __crc_t10dif_update that both crc_t10dif_update and crc_t10dif can use
-> so crc_t10dif don't have to do one more function call.  Yes, crc_t10dif_update
-> and __crc_t10dif_update are equivalent but since the latter is inlined, so there's no
-> performance impact and we get rid of the overhead of the extra function
-> call in crc_t10dif.
->
-> Like
->
-> +
-> +__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
-> +{
-> +       return __crc_t10dif_update(crc, buffer, len, true);
-> +}
-> +EXPORT_SYMBOL(crc_t10dif_update);
-> +
-> +__u16 crc_t10dif(const unsigned char *buffer, size_t len)
-> +{
-> +       return __crc_t10dif_update(0, buffer, len, false);
-> +}
->  EXPORT_SYMBOL(crc_t10dif);
+>> The commit in question was recently merged to mainline and is now being
+>> sent to various stable kernels.  But I think the patch is wrong and the
+>> real problem lies in the Freescale CAAM driver which is described as
+>> having being tested with.
+...
 
-You mean that we should avoid crypto_shash_import() function call
-in crc_t10dif(), right?
+>> dm-crypt uses CRYPTO_TFM_REQ_MAY_BACKLOG.  This means the the crypto
+>> driver should internally backlog requests which arrive when the queue is
+>> full and process them later.  Until the crypto hw's queue becomes full,
+>> the driver returns -EINPROGRESS.  When the crypto hw's queue if full,
+>> the driver returns -EBUSY, and if CRYPTO_TFM_REQ_MAY_BACKLOG is set, is
+>> expected to backlog the request and process it when the hardware has
+>> queue space.  At the point when the driver takes the request from the
+>> backlog and starts processing it, it calls the completion function with
+>> a status of -EINPROGRESS.  The completion function is called (for a
+>> second time, in the case of backlogged requests) with a status/err of 0
+>> when a request is done.
 
-The reason for crypto_shash_import() was I wanted to make
-crc_t10dif_update() more generic.  But as far as I can see existing
-crct10dif modules (crct10dif-generic and crct10dif-pclmul), we don't
-need it (i.e. '*(__u16 *)desc.ctx = crc' instead of crc_t10dif_import)
 
-Do you think it's better to remove crc_t10dif_import call from
-crc_t10dif() and crc_t10dif_update() altogether?
+Mike, I thought there was a discussion with crypto API maintainer before
+merging this patch, I think there were some comments that the patch seems
+to be not correct...
+This API (EBUSY/EINPROGESS codes) use was there since dmcrypt switched
+to async crypto API.
+
+There should tests for it (some years ago we tested the async path by forcing
+to use cryptd, this was able to clearly simulate the BUSY path as well),
+but not sure if it is still possible so easily.
+
+> Any chance you'd be willing to provide in-code comments in the
+> appropriate places in dm-crypt.c (after having reverted this patch in
+> question)?
+> 
+> I'd be happy to take the combination of the revert and documentation in
+> a single patch and get it to Linus for 4.0-rc3.
+
+Please, do not mix revert patches with additions (even if it is just comment),
+someone could be even more confused what's going on here.
+
+If nobody volunteers, I'll try to add some comments later to dmcrypt code,
+but that is definitely not for stable.
+
+Thanks,
+Milan
