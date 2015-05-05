@@ -1,128 +1,155 @@
-From: Mike Snitzer <snitzer@redhat.com>
-Subject: Re: [PATCH 3.14 73/92] dm crypt: fix deadlock when async crypto
- algorithm returns -EBUSY
-Date: Mon, 4 May 2015 23:22:13 -0400
-Message-ID: <20150505032213.GB4954@redhat.com>
-References: <20150502190109.683061482@linuxfoundation.org>
- <20150502190117.069180534@linuxfoundation.org>
- <20150504213254.GA27445@debian>
+From: Akinobu Mita <akinobu.mita@gmail.com>
+Subject: Re: [PATCH v4 3/4] lib: introduce crc_t10dif_update()
+Date: Tue, 5 May 2015 13:22:03 +0900
+Message-ID: <CAC5umyg5iAXruJkvCOQui84TdueLCik72+Wi3caXpmHUQghvyw@mail.gmail.com>
+References: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
+	<1430461431-5936-4-git-send-email-akinobu.mita@gmail.com>
+	<1430496906.660.79.camel@schen9-desk2.jf.intel.com>
+	<CAC5umyi8dQgtN4qQBm6_X6MvPZo56sUs-RRKR+4Ds6Tx_67-wA@mail.gmail.com>
+	<1430755775.660.88.camel@schen9-desk2.jf.intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ben Collins <ben.c@servergy.com>, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, dm-devel@redhat.com,
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-To: Rabin Vincent <rabin@rab.in>
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150504213254.GA27445@debian>
-Sender: stable-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Cc: target-devel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Nicholas Bellinger <nab@linux-iscsi.org>,
+	Sagi Grimberg <sagig@mellanox.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>
+To: Tim Chen <tim.c.chen@linux.intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-lb0-f169.google.com ([209.85.217.169]:33266 "EHLO
+	mail-lb0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751034AbbEEEWG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 5 May 2015 00:22:06 -0400
+In-Reply-To: <1430755775.660.88.camel@schen9-desk2.jf.intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 04 2015 at  5:32pm -0400,
-Rabin Vincent <rabin@rab.in> wrote:
+2015-05-05 1:09 GMT+09:00 Tim Chen <tim.c.chen@linux.intel.com>:
+> On Sat, 2015-05-02 at 10:38 +0900, Akinobu Mita wrote:
+>> 2015-05-02 1:15 GMT+09:00 Tim Chen <tim.c.chen@linux.intel.com>:
+>> > On Fri, 2015-05-01 at 15:23 +0900, Akinobu Mita wrote:
+>> >> This introduces crc_t10dif_update() which enables to calculate CRC
+>> >> for a block which straddles multiple SG elements by calling multiple
+>> >> times.  This also converts crc_t10dif() to use crc_t10dif_update() as
+>> >> they are almost same.
+>> >>
+>> >> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
+>> >> Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+>> >> Cc: Tim Chen <tim.c.chen@linux.intel.com>
+>> >> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+>> >> Cc: "David S. Miller" <davem@davemloft.net>
+>> >> Cc: linux-crypto@vger.kernel.org
+>> >> Cc: Nicholas Bellinger <nab@linux-iscsi.org>
+>> >> Cc: Sagi Grimberg <sagig@mellanox.com>
+>> >> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+>> >> Cc: Christoph Hellwig <hch@lst.de>
+>> >> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+>> >> Cc: target-devel@vger.kernel.org
+>> >> ---
+>> >> * Changes from v3:
+>> >> - Reduce duplicated code between crc_t10dif_update and crc_t10dif,
+>> >>   suggested by Tim and Herbert
+>> >>
+>> >>  include/linux/crc-t10dif.h |  1 +
+>> >>  lib/crc-t10dif.c           | 13 ++++++++++---
+>> >>  2 files changed, 11 insertions(+), 3 deletions(-)
+>> >>
+>> >> diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
+>> >> index cf53d07..d81961e 100644
+>> >> --- a/include/linux/crc-t10dif.h
+>> >> +++ b/include/linux/crc-t10dif.h
+>> >> @@ -9,5 +9,6 @@
+>> >>  extern __u16 crc_t10dif_generic(__u16 crc, const unsigned char *buffer,
+>> >>                               size_t len);
+>> >>  extern __u16 crc_t10dif(unsigned char const *, size_t);
+>> >> +extern __u16 crc_t10dif_update(__u16 crc, unsigned char const *, size_t);
+>> >>
+>> >>  #endif
+>> >> diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
+>> >> index dfe6ec1..d775737 100644
+>> >> --- a/lib/crc-t10dif.c
+>> >> +++ b/lib/crc-t10dif.c
+>> >> @@ -19,7 +19,7 @@
+>> >>  static struct crypto_shash *crct10dif_tfm;
+>> >>  static struct static_key crct10dif_fallback __read_mostly;
+>> >>
+>> >> -__u16 crc_t10dif(const unsigned char *buffer, size_t len)
+>> >> +__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
+>> >>  {
+>> >>       struct {
+>> >>               struct shash_desc shash;
+>> >> @@ -28,17 +28,24 @@ __u16 crc_t10dif(const unsigned char *buffer, size_t len)
+>> >>       int err;
+>> >>
+>> >>       if (static_key_false(&crct10dif_fallback))
+>> >> -             return crc_t10dif_generic(0, buffer, len);
+>> >> +             return crc_t10dif_generic(crc, buffer, len);
+>> >>
+>> >>       desc.shash.tfm = crct10dif_tfm;
+>> >>       desc.shash.flags = 0;
+>> >> -     *(__u16 *)desc.ctx = 0;
+>> >>
+>> >> +     err = crypto_shash_import(&desc.shash, &crc);
+>> >> +     BUG_ON(err);
+>> >>       err = crypto_shash_update(&desc.shash, buffer, len);
+>> >>       BUG_ON(err);
+>> >>
+>> >>       return *(__u16 *)desc.ctx;
+>> >>  }
+>> >> +EXPORT_SYMBOL(crc_t10dif_update);
+>> >> +
+>> >> +__u16 crc_t10dif(const unsigned char *buffer, size_t len)
+>> >> +{
+>> >> +     return crc_t10dif_update(0, buffer, len);
+>> >
+>> > Nitpicking a bit:
+>> >
+>> > Will putting an extra function call to crc_t10dif_update will add extra
+>> > overhead to crc_t10dif, which is what most driver uses? As
+>> > we are calling crc_t10dif a lot (millions of times) as we go
+>> > through a block device, this extra function call
+>> > is undesirable.  Using a __crc_t10dif_update
+>> > inline function that both crc_t10dif_update and crc_t10dif
+>> > invokes can will avoid this overhead.
+>>
+>> I'll convert crc_t10dif to inline function.  But do we also need to
+>> make crc_t10dif_update inline function? (i.e. is there any difference
+>> between __crc_t10dif_update and crc_t10dif_update?)
+>
+> I don't mean convert crc_t10dif to inline, but make a local inline function
+> __crc_t10dif_update that both crc_t10dif_update and crc_t10dif can use
+> so crc_t10dif don't have to do one more function call.  Yes, crc_t10dif_update
+> and __crc_t10dif_update are equivalent but since the latter is inlined, so there's no
+> performance impact and we get rid of the overhead of the extra function
+> call in crc_t10dif.
+>
+> Like
+>
+> +
+> +__u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
+> +{
+> +       return __crc_t10dif_update(crc, buffer, len, true);
+> +}
+> +EXPORT_SYMBOL(crc_t10dif_update);
+> +
+> +__u16 crc_t10dif(const unsigned char *buffer, size_t len)
+> +{
+> +       return __crc_t10dif_update(0, buffer, len, false);
+> +}
+>  EXPORT_SYMBOL(crc_t10dif);
 
-> On Sat, May 02, 2015 at 09:03:28PM +0200, Greg Kroah-Hartman wrote:
-> > 3.14-stable review patch.  If anyone has any objections, please let me know.
-> > 
-> > ------------------
-> > 
-> > From: Ben Collins <ben.c@servergy.com>
-> > 
-> > commit 0618764cb25f6fa9fb31152995de42a8a0496475 upstream.
-> 
-> The commit in question was recently merged to mainline and is now being
-> sent to various stable kernels.  But I think the patch is wrong and the
-> real problem lies in the Freescale CAAM driver which is described as
-> having being tested with.
-> 
->  commit 0618764cb25f6fa9fb31152995de42a8a0496475
->  Author: Ben Collins <ben.c@servergy.com>
->  Date:   Fri Apr 3 16:09:46 2015 +0000
->  
->      dm crypt: fix deadlock when async crypto algorithm returns -EBUSY
->      
->      I suspect this doesn't show up for most anyone because software
->      algorithms typically don't have a sense of being too busy.  However,
->      when working with the Freescale CAAM driver it will return -EBUSY on
->      occasion under heavy -- which resulted in dm-crypt deadlock.
->      
->      After checking the logic in some other drivers, the scheme for
->      crypt_convert() and it's callback, kcryptd_async_done(), were not
->      correctly laid out to properly handle -EBUSY or -EINPROGRESS.
->      
->      Fix this by using the completion for both -EBUSY and -EINPROGRESS.  Now
->      crypt_convert()'s use of completion is comparable to
->      af_alg_wait_for_completion().  Similarly, kcryptd_async_done() follows
->      the pattern used in af_alg_complete().
->      
->      Before this fix dm-crypt would lockup within 1-2 minutes running with
->      the CAAM driver.  Fix was regression tested against software algorithms
->      on PPC32 and x86_64, and things seem perfectly happy there as well.
->      
->      Signed-off-by: Ben Collins <ben.c@servergy.com>
->      Signed-off-by: Mike Snitzer <snitzer@redhat.com>
->      Cc: stable@vger.kernel.org
-> 
-> dm-crypt uses CRYPTO_TFM_REQ_MAY_BACKLOG.  This means the the crypto
-> driver should internally backlog requests which arrive when the queue is
-> full and process them later.  Until the crypto hw's queue becomes full,
-> the driver returns -EINPROGRESS.  When the crypto hw's queue if full,
-> the driver returns -EBUSY, and if CRYPTO_TFM_REQ_MAY_BACKLOG is set, is
-> expected to backlog the request and process it when the hardware has
-> queue space.  At the point when the driver takes the request from the
-> backlog and starts processing it, it calls the completion function with
-> a status of -EINPROGRESS.  The completion function is called (for a
-> second time, in the case of backlogged requests) with a status/err of 0
-> when a request is done.
-> 
-> Crypto drivers for hardware without hardware queueing use the helpers,
-> crypto_init_queue(), crypto_enqueue_request(), crypto_dequeue_request()
-> and crypto_get_backlog() helpers to implement this behaviour correctly,
-> while others implement this behaviour without these helpers (ccp, for
-> example).
-> 
-> dm-crypt (before this patch) uses this API correctly.  It queues up as
-> many requests as the hw queues will allow (i.e. as long as it gets back
-> -EINPROGRESS from the request function).  Then, when it sees at least
-> one backlogged request (gets -EBUSY), it waits till that backlogged
-> request is handled (completion gets called with -EINPROGRESS), and then
-> continues.  The references to af_alg_wait_for_completion() and
-> af_alg_complete() in the commit message are irrelevant because those
-> functions only handle one request at a time, unlink dm-crypt.
+You mean that we should avoid crypto_shash_import() function call
+in crc_t10dif(), right?
 
-OK, I clearly missed the subtleties of the API.  dm-crypt.c definitely
-needs more documentation related to CRYPTO_TFM_REQ_MAY_BACKLOG and the
-implications it has on completions, etc.
+The reason for crypto_shash_import() was I wanted to make
+crc_t10dif_update() more generic.  But as far as I can see existing
+crct10dif modules (crct10dif-generic and crct10dif-pclmul), we don't
+need it (i.e. '*(__u16 *)desc.ctx = crc' instead of crc_t10dif_import)
 
-Any chance you'd be willing to provide in-code comments in the
-appropriate places in dm-crypt.c (after having reverted this patch in
-question)?
-
-I'd be happy to take the combination of the revert and documentation in
-a single patch and get it to Linus for 4.0-rc3.
-
-> The problem is that the Freescale CAAM driver, which this problem is
-> described as being seen on, fails to implement the backlogging behaviour
-> correctly.  In cam_jr_enqueue(), if the hardware queue is full, it
-> simply returns -EBUSY without backlogging the request.  What the
-> observed deadlock was is not described in the commit message but it is
-> obviously the wait_for_completion() in crypto_convert() where dm-crypto
-> would wait for the completion being called with -EINPROGRESS in the case
-> of backlogged requests.  This completion will never be completed due to
-> the bug in the CAAM driver.
-> 
-> What this patch does is that it makes dm-crypt wait for every request,
-> even when the driver/hardware queues are not full, which means that
-> dm-crypt will never see -EBUSY.  This means that this patch will cause a
-> performance regression on all crypto drivers which implement the API
-> correctly.
-> 
-> So, I think this patch should be reverted in mainline and the stable
-> kernels where it has been merged, and correct backlog handling should be
-> implemented in the CAAM driver instead.
-
-Hopefully it hasn't been merged, Greg?
-
-If it has been merged to stable@ then we'll have to split the revert
-patch out from any documentation improvements.
+Do you think it's better to remove crc_t10dif_import call from
+crc_t10dif() and crc_t10dif_update() altogether?
