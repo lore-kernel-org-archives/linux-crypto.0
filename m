@@ -1,43 +1,66 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v4 3/4] lib: introduce crc_t10dif_update()
-Date: Tue, 5 May 2015 15:54:36 +0800
-Message-ID: <20150505075436.GA7378@gondor.apana.org.au>
-References: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
- <1430461431-5936-4-git-send-email-akinobu.mita@gmail.com>
- <1430496906.660.79.camel@schen9-desk2.jf.intel.com>
- <CAC5umyi8dQgtN4qQBm6_X6MvPZo56sUs-RRKR+4Ds6Tx_67-wA@mail.gmail.com>
- <1430755775.660.88.camel@schen9-desk2.jf.intel.com>
- <CAC5umyg5iAXruJkvCOQui84TdueLCik72+Wi3caXpmHUQghvyw@mail.gmail.com>
+Subject: Crypto Fixes for 4.1
+Date: Tue, 5 May 2015 18:06:21 +0800
+Message-ID: <20150505100621.GA8678@gondor.apana.org.au>
+References: <20120823083242.GA23102@gondor.apana.org.au>
+ <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20141231033217.GA27261@gondor.apana.org.au>
+ <20150107021737.GA25043@gondor.apana.org.au>
+ <20150425080310.GA6873@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tim Chen <tim.c.chen@linux.intel.com>,
-	target-devel@vger.kernel.org,
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Linus Torvalds <torvalds@linux-foundation.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Nicholas Bellinger <nab@linux-iscsi.org>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>
-To: Akinobu Mita <akinobu.mita@gmail.com>
-Return-path: <target-devel-owner@vger.kernel.org>
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:50287 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757286AbbEEKGc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 5 May 2015 06:06:32 -0400
 Content-Disposition: inline
-In-Reply-To: <CAC5umyg5iAXruJkvCOQui84TdueLCik72+Wi3caXpmHUQghvyw@mail.gmail.com>
-Sender: target-devel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20150425080310.GA6873@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 05, 2015 at 01:22:03PM +0900, Akinobu Mita wrote:
->
-> The reason for crypto_shash_import() was I wanted to make
-> crc_t10dif_update() more generic.  But as far as I can see existing
-> crct10dif modules (crct10dif-generic and crct10dif-pclmul), we don't
-> need it (i.e. '*(__u16 *)desc.ctx = crc' instead of crc_t10dif_import)
+Hi Linus:
 
-Yes we do the same thing with crc32c so I don't see why you couldn't
-do that here.
+This push fixes a build problem with bcm63xx and yet another fix
+to the memzero_explicit function to ensure that the memset is not
+elided.
 
-Cheers,
--- 
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Daniel Borkmann (1):
+      lib: make memzero_explicit more robust against dead store elimina=
+tion
+
+=C1lvaro Fern=E1ndez Rojas (1):
+      hwrng: bcm63xx - Fix driver compilation
+
+ drivers/char/hw_random/bcm63xx-rng.c |   18 +++++++++---------
+ include/linux/compiler-gcc.h         |   16 +++++++++++++++-
+ include/linux/compiler-intel.h       |    3 +++
+ include/linux/compiler.h             |    4 ++++
+ lib/string.c                         |    2 +-
+ 5 files changed, 32 insertions(+), 11 deletions(-)
+
+Thanks,
+--=20
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
