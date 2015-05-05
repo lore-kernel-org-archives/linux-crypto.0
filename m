@@ -1,46 +1,64 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v4 3/4] lib: introduce crc_t10dif_update()
-Date: Tue, 05 May 2015 09:16:33 -0700
-Message-ID: <1430842593.660.112.camel@schen9-desk2.jf.intel.com>
-References: <1430461431-5936-1-git-send-email-akinobu.mita@gmail.com>
-	 <1430461431-5936-4-git-send-email-akinobu.mita@gmail.com>
-	 <1430496906.660.79.camel@schen9-desk2.jf.intel.com>
-	 <CAC5umyi8dQgtN4qQBm6_X6MvPZo56sUs-RRKR+4Ds6Tx_67-wA@mail.gmail.com>
-	 <1430755775.660.88.camel@schen9-desk2.jf.intel.com>
-	 <CAC5umyg5iAXruJkvCOQui84TdueLCik72+Wi3caXpmHUQghvyw@mail.gmail.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [Linaro-acpi] [V2 PATCH 2/5] arm64 : Introduce support for ACPI
+ _CCA object
+Date: Tue, 5 May 2015 11:24:03 -0500
+Message-ID: <5548EEA3.8010101@amd.com>
+References: <1430838729-21572-1-git-send-email-Suravee.Suthikulpanit@amd.com>
+ <5126612.k0u2CL2zi5@wuerfel> <5548EB42.5010800@amd.com>
+ <8157862.NJP1L4Rh25@wuerfel> <5548EC47.3020501@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: target-devel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Nicholas Bellinger <nab@linux-iscsi.org>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>
-To: Akinobu Mita <akinobu.mita@gmail.com>
+Cc: <rjw@rjwysocki.net>, <herbert@gondor.apana.org.au>,
+	<catalin.marinas@arm.com>, <will.deacon@arm.com>,
+	<linux-kernel@vger.kernel.org>, <linux-acpi@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <linux-arm-kernel@lists.infradead.org>,
+	<lenb@kernel.org>
+To: Suravee Suthikulanit <suravee.suthikulpanit@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>, <linaro-acpi@lists.linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:21957 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752042AbbEEQQe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 5 May 2015 12:16:34 -0400
-In-Reply-To: <CAC5umyg5iAXruJkvCOQui84TdueLCik72+Wi3caXpmHUQghvyw@mail.gmail.com>
+Received: from mail-bn1bbn0104.outbound.protection.outlook.com ([157.56.111.104]:57504
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752828AbbEEQYQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 5 May 2015 12:24:16 -0400
+In-Reply-To: <5548EC47.3020501@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, 2015-05-05 at 13:22 +0900, Akinobu Mita wrote:
+On 05/05/2015 11:13 AM, Suravee Suthikulanit wrote:
+> On 5/5/2015 11:12 AM, Arnd Bergmann wrote:
+>> On Tuesday 05 May 2015 11:09:38 Suravee Suthikulanit wrote:
+>>>
+>>> However, codes in several places are making use of dma_map_ops without
+>>> checking if the ops are NULL (i.e.
+>>> include/asm-generic/dma-mapping-common.h and in arch-specific
+>>> implementation). If setting it to NULL is what we are planning to
+>>> support, we would need to scrub the current code to put NULL check.
+>>> Also, would you consider if that is safe to do going forward?
+>>>
+>>>
+>>
+>> I mean the dma_mask pointer, not dma_map_ops.
 
-> The reason for crypto_shash_import() was I wanted to make
-> crc_t10dif_update() more generic.  But as far as I can see existing
-> crct10dif modules (crct10dif-generic and crct10dif-pclmul), we don't
-> need it (i.e. '*(__u16 *)desc.ctx = crc' instead of crc_t10dif_import)
-> 
-> Do you think it's better to remove crc_t10dif_import call from
-> crc_t10dif() and crc_t10dif_update() altogether?
+Except a lot of drivers will actually set the dma_mask pointer during
+probe (usually by setting dev->dma_mask = &dev->coherent_dma_mask or by
+calling dma_coerce_mask_and_coherent).  So I think the dummy_dma_ops
+might be the safest way to go.
 
-Yes, it will be better if we can eliminate crc_t10dif_import call if
-we can do a direct assignment.
+Thanks,
+Tom
 
-Tim
+>>
+>>     Arnd
+>>
+>
+> Ah, got it. Sorry for confusion.
+>
+> Suravee
+>
+> _______________________________________________
+> Linaro-acpi mailing list
+> Linaro-acpi@lists.linaro.org
+> https://lists.linaro.org/mailman/listinfo/linaro-acpi
