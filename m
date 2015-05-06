@@ -1,7 +1,7 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 10/10] drivers/crypto/nx: add hardware 842 crypto comp alg
-Date: Wed,  6 May 2015 12:51:06 -0400
-Message-ID: <1430931066-4536-11-git-send-email-ddstreet@ieee.org>
+Subject: [PATCH 09/10] drivers/crypto/nx: simplify pSeries nx842 driver
+Date: Wed,  6 May 2015 12:51:05 -0400
+Message-ID: <1430931066-4536-10-git-send-email-ddstreet@ieee.org>
 References: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
  <1430931066-4536-1-git-send-email-ddstreet@ieee.org>
 Cc: Dan Streetman <ddstreet@ieee.org>,
@@ -18,675 +18,1008 @@ In-Reply-To: <1430931066-4536-1-git-send-email-ddstreet@ieee.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add crypto compression alg for 842 hardware compression and decompression.
+Simplify the pSeries NX-842 driver: do not expect incoming buffers to be
+exactly page-sized; do not break up input buffers to compress smaller
+blocks; do not use any internal headers in the compressed data blocks;
+remove the software decompression implementation; implement the pSeries
+nx842_constraints.
 
-This crypto compression alg is named "nx842" to indicate it uses hardware
-to perform the compression and decompression, while the software 842
-compression alg is named "sw842".  However, since before this split there
-was only one 842 compression alg named "842" which only used hardware,
-this is also aliased "842" for backwards compatibility.
-
-This uses only the PowerPC coprocessor hardware for 842 compression.  It
-also uses the hardware for decompression, but if the hardware fails it will
-fall back to the 842 software decompression library, so that decompression
-never fails (for valid 842 compressed buffers).  A header must be used in
-most cases, due to the hardware's restrictions on the buffers being
-specifically aligned and sized.
-
-Due to the header this driver adds, compressed buffers it creates cannot be
-directly passed to the 842 software library for decompression.  However,
-compressed buffers created by the software 842 library can be passed to
-this driver for hardware 842 decompression (with the exception of buffers
-containing the "short data" template, as lib/842/842.h explains).
+This changes the pSeries NX-842 driver to perform constraints-based
+compression so that it only needs to compress one entire input block at a
+time.  This removes the need for it to split input data blocks into
+multiple compressed data sections in the output buffer, and removes the
+need for any extra header info in the compressed data; all that is moved
+(in a later patch) into the main crypto 842 driver.  Additionally, the
+842 software decompression implementation is no longer needed here, as
+the crypto 842 driver will use the generic software 842 decompression
+function as a fallback if any hardware 842 driver fails.
 
 Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- drivers/crypto/nx/Kconfig         |  10 +
- drivers/crypto/nx/Makefile        |   2 +
- drivers/crypto/nx/nx-842-crypto.c | 603 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 615 insertions(+)
- create mode 100644 drivers/crypto/nx/nx-842-crypto.c
+ drivers/crypto/nx/nx-842-pseries.c | 779 ++++++++-----------------------------
+ 1 file changed, 153 insertions(+), 626 deletions(-)
 
-diff --git a/drivers/crypto/nx/Kconfig b/drivers/crypto/nx/Kconfig
-index ee9e259..3e621ad 100644
---- a/drivers/crypto/nx/Kconfig
-+++ b/drivers/crypto/nx/Kconfig
-@@ -50,4 +50,14 @@ config CRYPTO_DEV_NX_COMPRESS_POWERNV
- 	  algorithm.  This supports NX hardware on the PowerNV platform.
- 	  If you choose 'M' here, this module will be called nx_compress_powernv.
+diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
+index 6db9992..85837e9 100644
+--- a/drivers/crypto/nx/nx-842-pseries.c
++++ b/drivers/crypto/nx/nx-842-pseries.c
+@@ -21,7 +21,6 @@
+  *          Seth Jennings <sjenning@linux.vnet.ibm.com>
+  */
  
-+config CRYPTO_DEV_NX_COMPRESS_CRYPTO
-+	tristate "Compression acceleration cryptographic interface"
-+	select CRYPTO_ALGAPI
-+	select 842_DECOMPRESS
-+	default y
-+	help
-+	  Support for PowerPC Nest (NX) accelerators using the cryptographic
-+	  API.  If you choose 'M' here, this module will be called
-+	  nx_compress_crypto.
-+
- endif
-diff --git a/drivers/crypto/nx/Makefile b/drivers/crypto/nx/Makefile
-index 6619787..868b5e6 100644
---- a/drivers/crypto/nx/Makefile
-+++ b/drivers/crypto/nx/Makefile
-@@ -13,6 +13,8 @@ nx-crypto-objs := nx.o \
- obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS) += nx-compress.o
- obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_PSERIES) += nx-compress-pseries.o
- obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_POWERNV) += nx-compress-powernv.o
-+obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_CRYPTO) += nx-compress-crypto.o
- nx-compress-objs := nx-842.o
- nx-compress-pseries-objs := nx-842-pseries.o
- nx-compress-powernv-objs := nx-842-powernv.o
-+nx-compress-crypto-objs := nx-842-crypto.o
-diff --git a/drivers/crypto/nx/nx-842-crypto.c b/drivers/crypto/nx/nx-842-crypto.c
-new file mode 100644
-index 0000000..42d0da8
---- /dev/null
-+++ b/drivers/crypto/nx/nx-842-crypto.c
-@@ -0,0 +1,603 @@
-+/*
-+ * Cryptographic API for the NX-842 hardware compression.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * Copyright (C) IBM Corporation, 2011-2015
-+ *
-+ * Original Authors: Robert Jennings <rcj@linux.vnet.ibm.com>
-+ *                   Seth Jennings <sjenning@linux.vnet.ibm.com>
-+ *
-+ * Rewrite: Dan Streetman <ddstreet@ieee.org>
-+ *
-+ * This is an interface to the NX-842 compression hardware in PowerPC
-+ * processors.  Most of the complexity of this drvier is due to the fact that
-+ * the NX-842 compression hardware requires the input and output data buffers
-+ * to be specifically aligned, to be a specific multiple in length, and within
-+ * specific minimum and maximum lengths.  Those restrictions, provided by the
-+ * nx-842 driver via nx842_constraints, mean this driver must use bounce
-+ * buffers and headers to correct misaligned in or out buffers, and to split
-+ * input buffers that are too large.
-+ *
-+ * This driver will fall back to software decompression if the hardware
-+ * decompression fails, so this driver's decompression should never fail as
-+ * long as the provided compressed buffer is valid.  Any compressed buffer
-+ * created by this driver will have a header (except ones where the input
-+ * perfectly matches the constraints); so users of this driver cannot simply
-+ * pass a compressed buffer created by this driver over to the 842 software
-+ * decompression library.  Instead, users must use this driver to decompress;
-+ * if the hardware fails or is unavailable, the compressed buffer will be
-+ * parsed and the header removed, and the raw 842 buffer(s) passed to the 842
-+ * software decompression library.
-+ *
-+ * This does not fall back to software compression, however, since the caller
-+ * of this function is specifically requesting hardware compression; if the
-+ * hardware compression fails, the caller can fall back to software
-+ * compression, and the raw 842 compressed buffer that the software compressor
-+ * creates can be passed to this driver for hardware decompression; any
-+ * buffer without our specific header magic is assumed to be a raw 842 buffer
-+ * and passed directly to the hardware.  Note that the software compression
-+ * library will produce a compressed buffer that is incompatible with the
-+ * hardware decompressor if the original input buffer length is not a multiple
-+ * of 8; if such a compressed buffer is passed to this driver for
-+ * decompression, the hardware will reject it and this driver will then pass
-+ * it over to the software library for decompression.
-+ */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/crypto.h>
-+#include <linux/vmalloc.h>
-+#include <linux/nx842.h>
-+#include <linux/sw842.h>
-+#include <linux/ratelimit.h>
-+
-+/* Use the name "nx842" to register as a crypto compression alg. */
-+#define NX842_CRYPTO_NAME	"nx842"
-+/* Also alias as "842" to keep backwards compatibility; before the crypto 842
-+ * software compression alg (named "sw842") was added, the existing crypto
-+ * compression alg was named "842" and used this hardware 842 compression.
-+ * This allows users to continue using "842" to access this hardware 842
-+ * compression.
-+ */
-+#define NX842_CRYPTO_ALIAS	"842"
-+
-+/* The first 5 bits of this magic are 0x1f, which is an invalid 842 5-bit
-+ * template (see lib/842/842.h), so this magic number will never appear at
-+ * the start of a raw 842 compressed buffer.  That is important, as any buffer
-+ * passed to us without this magic is assumed to be a raw 842 compressed
-+ * buffer, and passed directly to the hardware to decompress.
-+ */
-+#define NX842_CRYPTO_MAGIC	(0xf842)
-+#define NX842_CRYPTO_GROUP_MAX	(0x20)
-+#define NX842_CRYPTO_HEADER_SIZE(g)				\
-+	(sizeof(struct nx842_crypto_header) +			\
-+	 sizeof(struct nx842_crypto_header_group) * (g))
-+#define NX842_CRYPTO_HEADER_MAX_SIZE				\
-+	NX842_CRYPTO_HEADER_SIZE(NX842_CRYPTO_GROUP_MAX)
-+
-+/* bounce buffer size */
-+#define BOUNCE_BUFFER_ORDER	(2)
-+#define BOUNCE_BUFFER_SIZE					\
-+	((unsigned int)(PAGE_SIZE << BOUNCE_BUFFER_ORDER))
-+
-+/* try longer on comp because we can fallback to sw decomp if hw is busy */
-+#define COMP_BUSY_TIMEOUT	(250) /* ms */
-+#define DECOMP_BUSY_TIMEOUT	(50) /* ms */
-+
-+struct nx842_crypto_header_group {
-+	__be16 padding;			/* unused bytes at start of group */
-+	__be32 compressed_length;	/* compressed bytes in group */
-+	__be32 uncompressed_length;	/* bytes after decompression */
-+} __packed;
-+
-+struct nx842_crypto_header {
-+	__be16 magic;		/* NX842_CRYPTO_MAGIC */
-+	__be16 ignore;		/* decompressed end bytes to ignore */
-+	u8 groups;		/* total groups in this header */
-+	struct nx842_crypto_header_group group[];
-+} __packed;
-+
-+struct nx842_crypto_param {
-+	u8 *in;
-+	unsigned int iremain;
-+	u8 *out;
-+	unsigned int oremain;
-+	unsigned int ototal;
-+};
-+
-+static int update_param(struct nx842_crypto_param *p,
-+			unsigned int slen, unsigned int dlen)
-+{
-+	if (p->iremain < slen)
-+		return -EOVERFLOW;
-+	if (p->oremain < dlen)
-+		return -ENOSPC;
-+
-+	p->in += slen;
-+	p->iremain -= slen;
-+	p->out += dlen;
-+	p->oremain -= dlen;
-+	p->ototal += dlen;
-+
-+	return 0;
-+}
-+
-+struct nx842_crypto_ctx {
-+	u8 *wmem;
-+	u8 *sbounce, *dbounce;
-+
-+	struct nx842_crypto_header header;
-+	struct nx842_crypto_header_group group[NX842_CRYPTO_GROUP_MAX];
-+};
-+
-+static int nx842_crypto_init(struct crypto_tfm *tfm)
-+{
-+	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	ctx->wmem = kmalloc(NX842_MEM_COMPRESS, GFP_KERNEL);
-+	ctx->sbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
-+	ctx->dbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
-+	if (!ctx->wmem || !ctx->sbounce || !ctx->dbounce) {
-+		kfree(ctx->wmem);
-+		free_page((unsigned long)ctx->sbounce);
-+		free_page((unsigned long)ctx->dbounce);
-+		return -ENOMEM;
+-#include <asm/page.h>
+ #include <asm/vio.h>
+ 
+ #include "nx-842.h"
+@@ -32,11 +31,6 @@ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Robert Jennings <rcj@linux.vnet.ibm.com>");
+ MODULE_DESCRIPTION("842 H/W Compression driver for IBM Power processors");
+ 
+-#define SHIFT_4K 12
+-#define SHIFT_64K 16
+-#define SIZE_4K (1UL << SHIFT_4K)
+-#define SIZE_64K (1UL << SHIFT_64K)
+-
+ /* IO buffer must be 128 byte aligned */
+ #define IO_BUFFER_ALIGN 128
+ 
+@@ -47,18 +41,52 @@ static struct nx842_constraints nx842_pseries_constraints = {
+ 	.maximum =	PAGE_SIZE, /* dynamic, max_sync_size */
+ };
+ 
+-struct nx842_header {
+-	int blocks_nr; /* number of compressed blocks */
+-	int offset; /* offset of the first block (from beginning of header) */
+-	int sizes[0]; /* size of compressed blocks */
+-};
+-
+-static inline int nx842_header_size(const struct nx842_header *hdr)
++static int check_constraints(unsigned long buf, unsigned int *len, bool in)
+ {
+-	return sizeof(struct nx842_header) +
+-			hdr->blocks_nr * sizeof(hdr->sizes[0]);
++	if (!IS_ALIGNED(buf, nx842_pseries_constraints.alignment)) {
++		pr_debug("%s buffer 0x%lx not aligned to 0x%x\n",
++			 in ? "input" : "output", buf,
++			 nx842_pseries_constraints.alignment);
++		return -EINVAL;
 +	}
-+
++	if (*len % nx842_pseries_constraints.multiple) {
++		pr_debug("%s buffer len 0x%x not multiple of 0x%x\n",
++			 in ? "input" : "output", *len,
++			 nx842_pseries_constraints.multiple);
++		if (in)
++			return -EINVAL;
++		*len = round_down(*len, nx842_pseries_constraints.multiple);
++	}
++	if (*len < nx842_pseries_constraints.minimum) {
++		pr_debug("%s buffer len 0x%x under minimum 0x%x\n",
++			 in ? "input" : "output", *len,
++			 nx842_pseries_constraints.minimum);
++		return -EINVAL;
++	}
++	if (*len > nx842_pseries_constraints.maximum) {
++		pr_debug("%s buffer len 0x%x over maximum 0x%x\n",
++			 in ? "input" : "output", *len,
++			 nx842_pseries_constraints.maximum);
++		if (in)
++			return -EINVAL;
++		*len = nx842_pseries_constraints.maximum;
++	}
 +	return 0;
-+}
+ }
+ 
++/* I assume we need to align the CSB? */
++#define WORKMEM_ALIGN	(256)
 +
-+static void nx842_crypto_exit(struct crypto_tfm *tfm)
-+{
-+	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
++struct nx842_workmem {
++	/* scatterlist */
++	char slin[4096];
++	char slout[4096];
++	/* coprocessor status/parameter block */
++	struct nx_csbcpb csbcpb;
 +
-+	kfree(ctx->wmem);
-+	free_page((unsigned long)ctx->sbounce);
-+	free_page((unsigned long)ctx->dbounce);
-+}
++	char padding[WORKMEM_ALIGN];
++} __aligned(WORKMEM_ALIGN);
 +
-+static int read_constraints(struct nx842_constraints *c)
-+{
-+	int ret;
+ /* Macros for fields within nx_csbcpb */
+ /* Check the valid bit within the csbcpb valid field */
+ #define NX842_CSBCBP_VALID_CHK(x) (x & BIT_MASK(7))
+@@ -72,8 +100,7 @@ static inline int nx842_header_size(const struct nx842_header *hdr)
+ #define NX842_CSBCPB_CE2(x)	(x & BIT_MASK(5))
+ 
+ /* The NX unit accepts data only on 4K page boundaries */
+-#define NX842_HW_PAGE_SHIFT	SHIFT_4K
+-#define NX842_HW_PAGE_SIZE	(ASM_CONST(1) << NX842_HW_PAGE_SHIFT)
++#define NX842_HW_PAGE_SIZE	(4096)
+ #define NX842_HW_PAGE_MASK	(~(NX842_HW_PAGE_SIZE-1))
+ 
+ enum nx842_status {
+@@ -194,41 +221,6 @@ static int nx842_build_scatterlist(unsigned long buf, int len,
+ 	return 0;
+ }
+ 
+-/*
+- * Working memory for software decompression
+- */
+-struct sw842_fifo {
+-	union {
+-		char f8[256][8];
+-		char f4[512][4];
+-	};
+-	char f2[256][2];
+-	unsigned char f84_full;
+-	unsigned char f2_full;
+-	unsigned char f8_count;
+-	unsigned char f2_count;
+-	unsigned int f4_count;
+-};
+-
+-/*
+- * Working memory for crypto API
+- */
+-struct nx842_workmem {
+-	char bounce[PAGE_SIZE]; /* bounce buffer for decompression input */
+-	union {
+-		/* hardware working memory */
+-		struct {
+-			/* scatterlist */
+-			char slin[SIZE_4K];
+-			char slout[SIZE_4K];
+-			/* coprocessor status/parameter block */
+-			struct nx_csbcpb csbcpb;
+-		};
+-		/* software working memory */
+-		struct sw842_fifo swfifo; /* software decompression fifo */
+-	};
+-};
+-
+ static int nx842_validate_result(struct device *dev,
+ 	struct cop_status_block *csb)
+ {
+@@ -291,8 +283,8 @@ static int nx842_validate_result(struct device *dev,
+  * compressed data.  If there is an error then @outlen will be 0 and an
+  * error will be specified by the return code from this function.
+  *
+- * @in: Pointer to input buffer, must be page aligned
+- * @inlen: Length of input buffer, must be PAGE_SIZE
++ * @in: Pointer to input buffer
++ * @inlen: Length of input buffer
+  * @out: Pointer to output buffer
+  * @outlen: Length of output buffer
+  * @wrkmem: ptr to buffer for working memory, size determined by
+@@ -302,7 +294,6 @@ static int nx842_validate_result(struct device *dev,
+  *   0		Success, output of length @outlen stored in the buffer at @out
+  *   -ENOMEM	Unable to allocate internal buffers
+  *   -ENOSPC	Output buffer is to small
+- *   -EMSGSIZE	XXX Difficult to describe this limitation
+  *   -EIO	Internal error
+  *   -ENODEV	Hardware unavailable
+  */
+@@ -310,29 +301,26 @@ static int nx842_pseries_compress(const unsigned char *in, unsigned int inlen,
+ 				  unsigned char *out, unsigned int *outlen,
+ 				  void *wmem)
+ {
+-	struct nx842_header *hdr;
+ 	struct nx842_devdata *local_devdata;
+ 	struct device *dev = NULL;
+ 	struct nx842_workmem *workmem;
+ 	struct nx842_scatterlist slin, slout;
+ 	struct nx_csbcpb *csbcpb;
+-	int ret = 0, max_sync_size, i, bytesleft, size, hdrsize;
+-	unsigned long inbuf, outbuf, padding;
++	int ret = 0, max_sync_size;
++	unsigned long inbuf, outbuf;
+ 	struct vio_pfo_op op = {
+ 		.done = NULL,
+ 		.handle = 0,
+ 		.timeout = 0,
+ 	};
+-	unsigned long start_time = get_tb();
++	unsigned long start = get_tb();
+ 
+-	/*
+-	 * Make sure input buffer is 64k page aligned.  This is assumed since
+-	 * this driver is designed for page compression only (for now).  This
+-	 * is very nice since we can now use direct DDE(s) for the input and
+-	 * the alignment is guaranteed.
+-	*/
+ 	inbuf = (unsigned long)in;
+-	if (!IS_ALIGNED(inbuf, PAGE_SIZE) || inlen != PAGE_SIZE)
++	if (check_constraints(inbuf, &inlen, true))
++		return -EINVAL;
 +
-+	ret = nx842_constraints(c);
++	outbuf = (unsigned long)out;
++	if (check_constraints(outbuf, outlen, false))
+ 		return -EINVAL;
+ 
+ 	rcu_read_lock();
+@@ -344,16 +332,8 @@ static int nx842_pseries_compress(const unsigned char *in, unsigned int inlen,
+ 	max_sync_size = local_devdata->max_sync_size;
+ 	dev = local_devdata->dev;
+ 
+-	/* Create the header */
+-	hdr = (struct nx842_header *)out;
+-	hdr->blocks_nr = PAGE_SIZE / max_sync_size;
+-	hdrsize = nx842_header_size(hdr);
+-	outbuf = (unsigned long)out + hdrsize;
+-	bytesleft = *outlen - hdrsize;
+-
+ 	/* Init scatterlist */
+-	workmem = (struct nx842_workmem *)ALIGN((unsigned long)wmem,
+-		NX842_HW_PAGE_SIZE);
++	workmem = PTR_ALIGN(wmem, WORKMEM_ALIGN);
+ 	slin.entries = (struct nx842_slentry *)workmem->slin;
+ 	slout.entries = (struct nx842_slentry *)workmem->slout;
+ 
+@@ -364,105 +344,48 @@ static int nx842_pseries_compress(const unsigned char *in, unsigned int inlen,
+ 	op.csbcpb = nx842_get_pa(csbcpb);
+ 	op.out = nx842_get_pa(slout.entries);
+ 
+-	for (i = 0; i < hdr->blocks_nr; i++) {
+-		/*
+-		 * Aligning the output blocks to 128 bytes does waste space,
+-		 * but it prevents the need for bounce buffers and memory
+-		 * copies.  It also simplifies the code a lot.  In the worst
+-		 * case (64k page, 4k max_sync_size), you lose up to
+-		 * (128*16)/64k = ~3% the compression factor. For 64k
+-		 * max_sync_size, the loss would be at most 128/64k = ~0.2%.
+-		 */
+-		padding = ALIGN(outbuf, IO_BUFFER_ALIGN) - outbuf;
+-		outbuf += padding;
+-		bytesleft -= padding;
+-		if (i == 0)
+-			/* save offset into first block in header */
+-			hdr->offset = padding + hdrsize;
+-
+-		if (bytesleft <= 0) {
+-			ret = -ENOSPC;
+-			goto unlock;
+-		}
+-
+-		/*
+-		 * NOTE: If the default max_sync_size is changed from 4k
+-		 * to 64k, remove the "likely" case below, since a
+-		 * scatterlist will always be needed.
+-		 */
+-		if (likely(max_sync_size == NX842_HW_PAGE_SIZE)) {
+-			/* Create direct DDE */
+-			op.in = nx842_get_pa((void *)inbuf);
+-			op.inlen = max_sync_size;
+-
+-		} else {
+-			/* Create indirect DDE (scatterlist) */
+-			nx842_build_scatterlist(inbuf, max_sync_size, &slin);
+-			op.in = nx842_get_pa(slin.entries);
+-			op.inlen = -nx842_get_scatterlist_size(&slin);
+-		}
++	if ((inbuf & NX842_HW_PAGE_MASK) ==
++	    ((inbuf + inlen - 1) & NX842_HW_PAGE_MASK)) {
++		/* Create direct DDE */
++		op.in = nx842_get_pa((void *)inbuf);
++		op.inlen = inlen;
++	} else {
++		/* Create indirect DDE (scatterlist) */
++		nx842_build_scatterlist(inbuf, inlen, &slin);
++		op.in = nx842_get_pa(slin.entries);
++		op.inlen = -nx842_get_scatterlist_size(&slin);
++	}
+ 
+-		/*
+-		 * If max_sync_size != NX842_HW_PAGE_SIZE, an indirect
+-		 * DDE is required for the outbuf.
+-		 * If max_sync_size == NX842_HW_PAGE_SIZE, outbuf must
+-		 * also be page aligned (1 in 128/4k=32 chance) in order
+-		 * to use a direct DDE.
+-		 * This is unlikely, just use an indirect DDE always.
+-		 */
+-		nx842_build_scatterlist(outbuf,
+-			min(bytesleft, max_sync_size), &slout);
+-		/* op.out set before loop */
++	if ((outbuf & NX842_HW_PAGE_MASK) ==
++	    ((outbuf + *outlen - 1) & NX842_HW_PAGE_MASK)) {
++		/* Create direct DDE */
++		op.out = nx842_get_pa((void *)outbuf);
++		op.outlen = *outlen;
++	} else {
++		/* Create indirect DDE (scatterlist) */
++		nx842_build_scatterlist(outbuf, *outlen, &slout);
++		op.out = nx842_get_pa(slout.entries);
+ 		op.outlen = -nx842_get_scatterlist_size(&slout);
++	}
+ 
+-		/* Send request to pHyp */
+-		ret = vio_h_cop_sync(local_devdata->vdev, &op);
+-
+-		/* Check for pHyp error */
+-		if (ret) {
+-			dev_dbg(dev, "%s: vio_h_cop_sync error (ret=%d, hret=%ld)\n",
+-				__func__, ret, op.hcall_err);
+-			ret = -EIO;
+-			goto unlock;
+-		}
+-
+-		/* Check for hardware error */
+-		ret = nx842_validate_result(dev, &csbcpb->csb);
+-		if (ret && ret != -ENOSPC)
+-			goto unlock;
+-
+-		/* Handle incompressible data */
+-		if (unlikely(ret == -ENOSPC)) {
+-			if (bytesleft < max_sync_size) {
+-				/*
+-				 * Not enough space left in the output buffer
+-				 * to store uncompressed block
+-				 */
+-				goto unlock;
+-			} else {
+-				/* Store incompressible block */
+-				memcpy((void *)outbuf, (void *)inbuf,
+-					max_sync_size);
+-				hdr->sizes[i] = -max_sync_size;
+-				outbuf += max_sync_size;
+-				bytesleft -= max_sync_size;
+-				/* Reset ret, incompressible data handled */
+-				ret = 0;
+-			}
+-		} else {
+-			/* Normal case, compression was successful */
+-			size = csbcpb->csb.processed_byte_count;
+-			dev_dbg(dev, "%s: processed_bytes=%d\n",
+-				__func__, size);
+-			hdr->sizes[i] = size;
+-			outbuf += size;
+-			bytesleft -= size;
+-		}
++	/* Send request to pHyp */
++	ret = vio_h_cop_sync(local_devdata->vdev, &op);
+ 
+-		inbuf += max_sync_size;
++	/* Check for pHyp error */
 +	if (ret) {
-+		pr_err_ratelimited("could not get nx842 constraints : %d\n",
-+				   ret);
-+		return ret;
-+	}
-+
-+	/* limit maximum, to always have enough bounce buffer to decompress */
-+	if (c->maximum > BOUNCE_BUFFER_SIZE) {
-+		c->maximum = BOUNCE_BUFFER_SIZE;
-+		pr_info_once("limiting nx842 maximum to %x\n", c->maximum);
-+	}
-+
-+	return 0;
-+}
-+
-+static int nx842_crypto_add_header(struct nx842_crypto_header *hdr, u8 *buf)
-+{
-+	int s = NX842_CRYPTO_HEADER_SIZE(hdr->groups);
-+
-+	/* compress should have added space for header */
-+	if (s > be16_to_cpu(hdr->group[0].padding)) {
-+		pr_err("Internal error: no space for header\n");
-+		return -EINVAL;
-+	}
-+
-+	memcpy(buf, hdr, s);
-+
-+	print_hex_dump_debug("header ", DUMP_PREFIX_OFFSET, 16, 1, buf, s, 0);
-+
-+	return 0;
-+}
-+
-+static int compress(struct nx842_crypto_ctx *ctx,
-+		    struct nx842_crypto_param *p,
-+		    struct nx842_crypto_header_group *g,
-+		    struct nx842_constraints *c,
-+		    u16 *ignore,
-+		    unsigned int hdrsize)
-+{
-+	unsigned int slen = p->iremain, dlen = p->oremain, tmplen;
-+	unsigned int adj_slen = slen;
-+	u8 *src = p->in, *dst = p->out;
-+	int ret, dskip = 0;
-+	ktime_t timeout;
-+
-+	if (p->iremain == 0)
-+		return -EOVERFLOW;
-+
-+	if (p->oremain == 0 || hdrsize + c->minimum > dlen)
-+		return -ENOSPC;
-+
-+	if (slen % c->multiple)
-+		adj_slen = round_up(slen, c->multiple);
-+	if (slen < c->minimum)
-+		adj_slen = c->minimum;
-+	if (slen > c->maximum)
-+		adj_slen = slen = c->maximum;
-+	if (adj_slen > slen || (u64)src % c->alignment) {
-+		adj_slen = min(adj_slen, BOUNCE_BUFFER_SIZE);
-+		slen = min(slen, BOUNCE_BUFFER_SIZE);
-+		if (adj_slen > slen)
-+			memset(ctx->sbounce + slen, 0, adj_slen - slen);
-+		memcpy(ctx->sbounce, src, slen);
-+		src = ctx->sbounce;
-+		slen = adj_slen;
-+		pr_debug("using comp sbounce buffer, len %x\n", slen);
-+	}
-+
-+	dst += hdrsize;
-+	dlen -= hdrsize;
-+
-+	if ((u64)dst % c->alignment) {
-+		dskip = (int)(PTR_ALIGN(dst, c->alignment) - dst);
-+		dst += dskip;
-+		dlen -= dskip;
-+	}
-+	if (dlen % c->multiple)
-+		dlen = round_down(dlen, c->multiple);
-+	if (dlen < c->minimum) {
-+nospc:
-+		dst = ctx->dbounce;
-+		dlen = min(p->oremain, BOUNCE_BUFFER_SIZE);
-+		dlen = round_down(dlen, c->multiple);
-+		dskip = 0;
-+		pr_debug("using comp dbounce buffer, len %x\n", dlen);
-+	}
-+	if (dlen > c->maximum)
-+		dlen = c->maximum;
-+
-+	tmplen = dlen;
-+	timeout = ktime_add_ms(ktime_get(), COMP_BUSY_TIMEOUT);
-+	do {
-+		dlen = tmplen; /* reset dlen, if we're retrying */
-+		ret = nx842_compress(src, slen, dst, &dlen, ctx->wmem);
-+		/* possibly we should reduce the slen here, instead of
-+		 * retrying with the dbounce buffer?
-+		 */
-+		if (ret == -ENOSPC && dst != ctx->dbounce)
-+			goto nospc;
-+	} while (ret == -EBUSY && ktime_before(ktime_get(), timeout));
++		dev_dbg(dev, "%s: vio_h_cop_sync error (ret=%d, hret=%ld)\n",
++			__func__, ret, op.hcall_err);
++		ret = -EIO;
++		goto unlock;
+ 	}
+ 
+-	*outlen = (unsigned int)(outbuf - (unsigned long)out);
++	/* Check for hardware error */
++	ret = nx842_validate_result(dev, &csbcpb->csb);
 +	if (ret)
-+		return ret;
++		goto unlock;
 +
-+	dskip += hdrsize;
-+
-+	if (dst == ctx->dbounce)
-+		memcpy(p->out + dskip, dst, dlen);
-+
-+	g->padding = cpu_to_be16(dskip);
-+	g->compressed_length = cpu_to_be32(dlen);
-+	g->uncompressed_length = cpu_to_be32(slen);
-+
-+	if (p->iremain < slen) {
-+		*ignore = slen - p->iremain;
-+		slen = p->iremain;
-+	}
-+
-+	pr_debug("compress slen %x ignore %x dlen %x padding %x\n",
-+		 slen, *ignore, dlen, dskip);
-+
-+	return update_param(p, slen, dskip + dlen);
-+}
-+
-+static int nx842_crypto_compress(struct crypto_tfm *tfm,
-+				 const u8 *src, unsigned int slen,
-+				 u8 *dst, unsigned int *dlen)
-+{
-+	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct nx842_crypto_header *hdr = &ctx->header;
-+	struct nx842_crypto_param p;
-+	struct nx842_constraints c;
-+	unsigned int groups, hdrsize, h;
-+	int ret, n;
-+	bool add_header;
-+	u16 ignore = 0;
-+
-+	if (!tfm || !src || !slen || !dst || !dlen)
++	*outlen = csbcpb->csb.processed_byte_count;
++	dev_dbg(dev, "%s: processed_bytes=%d\n", __func__, *outlen);
+ 
+ unlock:
+ 	if (ret)
+@@ -470,15 +393,12 @@ unlock:
+ 	else {
+ 		nx842_inc_comp_complete(local_devdata);
+ 		ibm_nx842_incr_hist(local_devdata->counters->comp_times,
+-			(get_tb() - start_time) / tb_ticks_per_usec);
++			(get_tb() - start) / tb_ticks_per_usec);
+ 	}
+ 	rcu_read_unlock();
+ 	return ret;
+ }
+ 
+-static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
+-			const void *);
+-
+ /**
+  * nx842_pseries_decompress - Decompress data using the 842 algorithm
+  *
+@@ -490,11 +410,10 @@ static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
+  * If there is an error then @outlen will be 0 and an error will be
+  * specified by the return code from this function.
+  *
+- * @in: Pointer to input buffer, will use bounce buffer if not 128 byte
+- *      aligned
++ * @in: Pointer to input buffer
+  * @inlen: Length of input buffer
+- * @out: Pointer to output buffer, must be page aligned
+- * @outlen: Length of output buffer, must be PAGE_SIZE
++ * @out: Pointer to output buffer
++ * @outlen: Length of output buffer
+  * @wrkmem: ptr to buffer for working memory, size determined by
+  *          NX842_MEM_COMPRESS
+  *
+@@ -510,43 +429,39 @@ static int nx842_pseries_decompress(const unsigned char *in, unsigned int inlen,
+ 				    unsigned char *out, unsigned int *outlen,
+ 				    void *wmem)
+ {
+-	struct nx842_header *hdr;
+ 	struct nx842_devdata *local_devdata;
+ 	struct device *dev = NULL;
+ 	struct nx842_workmem *workmem;
+ 	struct nx842_scatterlist slin, slout;
+ 	struct nx_csbcpb *csbcpb;
+-	int ret = 0, i, size, max_sync_size;
++	int ret = 0, max_sync_size;
+ 	unsigned long inbuf, outbuf;
+ 	struct vio_pfo_op op = {
+ 		.done = NULL,
+ 		.handle = 0,
+ 		.timeout = 0,
+ 	};
+-	unsigned long start_time = get_tb();
++	unsigned long start = get_tb();
+ 
+ 	/* Ensure page alignment and size */
++	inbuf = (unsigned long)in;
++	if (check_constraints(inbuf, &inlen, true))
 +		return -EINVAL;
 +
-+	p.in = (u8 *)src;
-+	p.iremain = slen;
-+	p.out = dst;
-+	p.oremain = *dlen;
-+	p.ototal = 0;
+ 	outbuf = (unsigned long)out;
+-	if (!IS_ALIGNED(outbuf, PAGE_SIZE) || *outlen != PAGE_SIZE)
++	if (check_constraints(outbuf, outlen, false))
+ 		return -EINVAL;
+ 
+ 	rcu_read_lock();
+ 	local_devdata = rcu_dereference(devdata);
+-	if (local_devdata)
+-		dev = local_devdata->dev;
+-
+-	/* Get header */
+-	hdr = (struct nx842_header *)in;
+-
+-	workmem = (struct nx842_workmem *)ALIGN((unsigned long)wmem,
+-		NX842_HW_PAGE_SIZE);
+-
+-	inbuf = (unsigned long)in + hdr->offset;
+-	if (likely(!IS_ALIGNED(inbuf, IO_BUFFER_ALIGN))) {
+-		/* Copy block(s) into bounce buffer for alignment */
+-		memcpy(workmem->bounce, in + hdr->offset, inlen - hdr->offset);
+-		inbuf = (unsigned long)workmem->bounce;
++	if (!local_devdata || !local_devdata->dev) {
++		rcu_read_unlock();
++		return -ENODEV;
+ 	}
++	max_sync_size = local_devdata->max_sync_size;
++	dev = local_devdata->dev;
 +
-+	*dlen = 0;
-+
-+	ret = read_constraints(&c);
-+	if (ret)
-+		return ret;
-+
-+	groups = min_t(unsigned int, NX842_CRYPTO_GROUP_MAX,
-+		       DIV_ROUND_UP(p.iremain, c.maximum));
-+	hdrsize = NX842_CRYPTO_HEADER_SIZE(groups);
-+
-+	/* skip adding header if the buffers meet all constraints */
-+	add_header = (p.iremain % c.multiple	||
-+		      p.iremain < c.minimum	||
-+		      p.iremain > c.maximum	||
-+		      (u64)p.in % c.alignment	||
-+		      p.oremain % c.multiple	||
-+		      p.oremain < c.minimum	||
-+		      p.oremain > c.maximum	||
-+		      (u64)p.out % c.alignment);
-+
-+	hdr->magic = cpu_to_be16(NX842_CRYPTO_MAGIC);
-+	hdr->groups = 0;
-+	hdr->ignore = 0;
-+
-+	while (p.iremain > 0) {
-+		n = hdr->groups++;
-+		if (hdr->groups > NX842_CRYPTO_GROUP_MAX)
-+			return -ENOSPC;
-+
-+		/* header goes before first group */
-+		h = !n && add_header ? hdrsize : 0;
-+
-+		if (ignore)
-+			pr_warn("interal error, ignore is set %x\n", ignore);
-+
-+		ret = compress(ctx, &p, &hdr->group[n], &c, &ignore, h);
-+		if (ret)
-+			return ret;
++	workmem = PTR_ALIGN(wmem, WORKMEM_ALIGN);
+ 
+ 	/* Init scatterlist */
+ 	slin.entries = (struct nx842_slentry *)workmem->slin;
+@@ -558,119 +473,55 @@ static int nx842_pseries_decompress(const unsigned char *in, unsigned int inlen,
+ 	memset(csbcpb, 0, sizeof(*csbcpb));
+ 	op.csbcpb = nx842_get_pa(csbcpb);
+ 
+-	/*
+-	 * max_sync_size may have changed since compression,
+-	 * so we can't read it from the device info. We need
+-	 * to derive it from hdr->blocks_nr.
+-	 */
+-	max_sync_size = PAGE_SIZE / hdr->blocks_nr;
+-
+-	for (i = 0; i < hdr->blocks_nr; i++) {
+-		/* Skip padding */
+-		inbuf = ALIGN(inbuf, IO_BUFFER_ALIGN);
+-
+-		if (hdr->sizes[i] < 0) {
+-			/* Negative sizes indicate uncompressed data blocks */
+-			size = abs(hdr->sizes[i]);
+-			memcpy((void *)outbuf, (void *)inbuf, size);
+-			outbuf += size;
+-			inbuf += size;
+-			continue;
+-		}
+-
+-		if (!dev)
+-			goto sw;
+-
+-		/*
+-		 * The better the compression, the more likely the "likely"
+-		 * case becomes.
+-		 */
+-		if (likely((inbuf & NX842_HW_PAGE_MASK) ==
+-			((inbuf + hdr->sizes[i] - 1) & NX842_HW_PAGE_MASK))) {
+-			/* Create direct DDE */
+-			op.in = nx842_get_pa((void *)inbuf);
+-			op.inlen = hdr->sizes[i];
+-		} else {
+-			/* Create indirect DDE (scatterlist) */
+-			nx842_build_scatterlist(inbuf, hdr->sizes[i] , &slin);
+-			op.in = nx842_get_pa(slin.entries);
+-			op.inlen = -nx842_get_scatterlist_size(&slin);
+-		}
+-
+-		/*
+-		 * NOTE: If the default max_sync_size is changed from 4k
+-		 * to 64k, remove the "likely" case below, since a
+-		 * scatterlist will always be needed.
+-		 */
+-		if (likely(max_sync_size == NX842_HW_PAGE_SIZE)) {
+-			/* Create direct DDE */
+-			op.out = nx842_get_pa((void *)outbuf);
+-			op.outlen = max_sync_size;
+-		} else {
+-			/* Create indirect DDE (scatterlist) */
+-			nx842_build_scatterlist(outbuf, max_sync_size, &slout);
+-			op.out = nx842_get_pa(slout.entries);
+-			op.outlen = -nx842_get_scatterlist_size(&slout);
+-		}
+-
+-		/* Send request to pHyp */
+-		ret = vio_h_cop_sync(local_devdata->vdev, &op);
+-
+-		/* Check for pHyp error */
+-		if (ret) {
+-			dev_dbg(dev, "%s: vio_h_cop_sync error (ret=%d, hret=%ld)\n",
+-				__func__, ret, op.hcall_err);
+-			dev = NULL;
+-			goto sw;
+-		}
++	if ((inbuf & NX842_HW_PAGE_MASK) ==
++	    ((inbuf + inlen - 1) & NX842_HW_PAGE_MASK)) {
++		/* Create direct DDE */
++		op.in = nx842_get_pa((void *)inbuf);
++		op.inlen = inlen;
++	} else {
++		/* Create indirect DDE (scatterlist) */
++		nx842_build_scatterlist(inbuf, inlen, &slin);
++		op.in = nx842_get_pa(slin.entries);
++		op.inlen = -nx842_get_scatterlist_size(&slin);
 +	}
-+
-+	if (!add_header && hdr->groups > 1) {
-+		pr_err("Internal error: No header but multiple groups\n");
-+		return -EINVAL;
+ 
+-		/* Check for hardware error */
+-		ret = nx842_validate_result(dev, &csbcpb->csb);
+-		if (ret) {
+-			dev = NULL;
+-			goto sw;
+-		}
++	if ((outbuf & NX842_HW_PAGE_MASK) ==
++	    ((outbuf + *outlen - 1) & NX842_HW_PAGE_MASK)) {
++		/* Create direct DDE */
++		op.out = nx842_get_pa((void *)outbuf);
++		op.outlen = *outlen;
++	} else {
++		/* Create indirect DDE (scatterlist) */
++		nx842_build_scatterlist(outbuf, *outlen, &slout);
++		op.out = nx842_get_pa(slout.entries);
++		op.outlen = -nx842_get_scatterlist_size(&slout);
 +	}
-+
-+	/* ignore indicates the input stream needed to be padded */
-+	hdr->ignore = cpu_to_be16(ignore);
-+	if (ignore)
-+		pr_debug("marked %d bytes as ignore\n", ignore);
-+
-+	if (add_header)
-+		ret = nx842_crypto_add_header(hdr, dst);
-+	if (ret)
-+		return ret;
-+
-+	*dlen = p.ototal;
-+
-+	pr_debug("compress total slen %x dlen %x\n", slen, *dlen);
-+
-+	return 0;
-+}
-+
-+static int decompress(struct nx842_crypto_ctx *ctx,
-+		      struct nx842_crypto_param *p,
-+		      struct nx842_crypto_header_group *g,
-+		      struct nx842_constraints *c,
-+		      u16 ignore,
-+		      bool usehw)
-+{
-+	unsigned int slen = be32_to_cpu(g->compressed_length);
-+	unsigned int required_len = be32_to_cpu(g->uncompressed_length);
-+	unsigned int dlen = p->oremain, tmplen;
-+	unsigned int adj_slen = slen;
-+	u8 *src = p->in, *dst = p->out;
-+	u16 padding = be16_to_cpu(g->padding);
-+	int ret, spadding = 0, dpadding = 0;
-+	ktime_t timeout;
-+
-+	if (!slen || !required_len)
-+		return -EINVAL;
-+
-+	if (p->iremain <= 0 || padding + slen > p->iremain)
-+		return -EOVERFLOW;
-+
-+	if (p->oremain <= 0 || required_len - ignore > p->oremain)
-+		return -ENOSPC;
-+
-+	src += padding;
-+
-+	if (!usehw)
-+		goto usesw;
-+
-+	if (slen % c->multiple)
-+		adj_slen = round_up(slen, c->multiple);
-+	if (slen < c->minimum)
-+		adj_slen = c->minimum;
-+	if (slen > c->maximum)
-+		goto usesw;
-+	if (slen < adj_slen || (u64)src % c->alignment) {
-+		/* we can append padding bytes because the 842 format defines
-+		 * an "end" template (see lib/842/842_decompress.c) and will
-+		 * ignore any bytes following it.
-+		 */
-+		if (slen < adj_slen)
-+			memset(ctx->sbounce + slen, 0, adj_slen - slen);
-+		memcpy(ctx->sbounce, src, slen);
-+		src = ctx->sbounce;
-+		spadding = adj_slen - slen;
-+		slen = adj_slen;
-+		pr_debug("using decomp sbounce buffer, len %x\n", slen);
-+	}
-+
-+	if (dlen % c->multiple)
-+		dlen = round_down(dlen, c->multiple);
-+	if (dlen < required_len || (u64)dst % c->alignment) {
-+		dst = ctx->dbounce;
-+		dlen = min(required_len, BOUNCE_BUFFER_SIZE);
-+		pr_debug("using decomp dbounce buffer, len %x\n", dlen);
-+	}
-+	if (dlen < c->minimum)
-+		goto usesw;
-+	if (dlen > c->maximum)
-+		dlen = c->maximum;
-+
-+	tmplen = dlen;
-+	timeout = ktime_add_ms(ktime_get(), DECOMP_BUSY_TIMEOUT);
-+	do {
-+		dlen = tmplen; /* reset dlen, if we're retrying */
-+		ret = nx842_decompress(src, slen, dst, &dlen, ctx->wmem);
-+	} while (ret == -EBUSY && ktime_before(ktime_get(), timeout));
+ 
+-		/* HW decompression success */
+-		inbuf += hdr->sizes[i];
+-		outbuf += csbcpb->csb.processed_byte_count;
+-		continue;
+-
+-sw:
+-		/* software decompression */
+-		size = max_sync_size;
+-		ret = sw842_decompress(
+-			(unsigned char *)inbuf, hdr->sizes[i],
+-			(unsigned char *)outbuf, &size, wmem);
+-		if (ret)
+-			pr_debug("%s: sw842_decompress failed with %d\n",
+-				__func__, ret);
+-
+-		if (ret) {
+-			if (ret != -ENOSPC && ret != -EINVAL &&
+-					ret != -EMSGSIZE)
+-				ret = -EIO;
+-			goto unlock;
+-		}
++	/* Send request to pHyp */
++	ret = vio_h_cop_sync(local_devdata->vdev, &op);
+ 
+-		/* SW decompression success */
+-		inbuf += hdr->sizes[i];
+-		outbuf += size;
++	/* Check for pHyp error */
 +	if (ret) {
-+usesw:
-+		/* reset everything, sw doesn't have constraints */
-+		src = p->in + padding;
-+		slen = be32_to_cpu(g->compressed_length);
-+		spadding = 0;
-+		dst = p->out;
-+		dlen = p->oremain;
-+		dpadding = 0;
-+		if (dlen < required_len) { /* have ignore bytes */
-+			dst = ctx->dbounce;
-+			dlen = BOUNCE_BUFFER_SIZE;
-+		}
-+		pr_info_ratelimited("using software 842 decompression\n");
-+		ret = sw842_decompress(src, slen, dst, &dlen);
-+	}
++		dev_dbg(dev, "%s: vio_h_cop_sync error (ret=%d, hret=%ld)\n",
++			__func__, ret, op.hcall_err);
++		goto unlock;
+ 	}
+ 
+-	*outlen = (unsigned int)(outbuf - (unsigned long)out);
++	/* Check for hardware error */
++	ret = nx842_validate_result(dev, &csbcpb->csb);
 +	if (ret)
-+		return ret;
++		goto unlock;
 +
-+	slen -= spadding;
-+
-+	dlen -= ignore;
-+	if (ignore)
-+		pr_debug("ignoring last %x bytes\n", ignore);
-+
-+	if (dst == ctx->dbounce)
-+		memcpy(p->out, dst, dlen);
-+
-+	pr_debug("decompress slen %x padding %x dlen %x ignore %x\n",
-+		 slen, padding, dlen, ignore);
-+
-+	return update_param(p, slen + padding, dlen);
-+}
-+
-+static int nx842_crypto_decompress(struct crypto_tfm *tfm,
-+				   const u8 *src, unsigned int slen,
-+				   u8 *dst, unsigned int *dlen)
-+{
-+	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct nx842_crypto_header *hdr;
-+	struct nx842_crypto_param p;
-+	struct nx842_constraints c;
-+	int n, ret, hdr_len;
-+	u16 ignore = 0;
-+	bool usehw = true;
-+
-+	if (!tfm || !src || !slen || !dst || !dlen)
-+		return -EINVAL;
-+
-+	p.in = (u8 *)src;
-+	p.iremain = slen;
-+	p.out = dst;
-+	p.oremain = *dlen;
-+	p.ototal = 0;
-+
-+	*dlen = 0;
-+
-+	if (read_constraints(&c))
-+		usehw = false;
-+
-+	hdr = (struct nx842_crypto_header *)src;
-+
-+	/* If it doesn't start with our header magic number, assume it's a raw
-+	 * 842 compressed buffer and pass it directly to the hardware driver
-+	 */
-+	if (be16_to_cpu(hdr->magic) != NX842_CRYPTO_MAGIC) {
-+		struct nx842_crypto_header_group g = {
-+			.padding =		0,
-+			.compressed_length =	cpu_to_be32(p.iremain),
-+			.uncompressed_length =	cpu_to_be32(p.oremain),
-+		};
-+
-+		ret = decompress(ctx, &p, &g, &c, 0, usehw);
-+		if (ret)
-+			return ret;
-+
-+		*dlen = p.ototal;
-+
-+		return 0;
-+	}
-+
-+	if (!hdr->groups) {
-+		pr_err("header has no groups\n");
-+		return -EINVAL;
-+	}
-+	if (hdr->groups > NX842_CRYPTO_GROUP_MAX) {
-+		pr_err("header has too many groups %x, max %x\n",
-+		       hdr->groups, NX842_CRYPTO_GROUP_MAX);
-+		return -EINVAL;
-+	}
-+
-+	hdr_len = NX842_CRYPTO_HEADER_SIZE(hdr->groups);
-+	if (hdr_len > slen)
-+		return -EOVERFLOW;
-+
-+	memcpy(&ctx->header, src, hdr_len);
-+	hdr = &ctx->header;
-+
-+	for (n = 0; n < hdr->groups; n++) {
-+		/* ignore applies to last group */
-+		if (n + 1 == hdr->groups)
-+			ignore = be16_to_cpu(hdr->ignore);
-+
-+		ret = decompress(ctx, &p, &hdr->group[n], &c, ignore, usehw);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	*dlen = p.ototal;
-+
-+	pr_debug("decompress total slen %x dlen %x\n", slen, *dlen);
-+
-+	return 0;
-+}
-+
-+static struct crypto_alg algs[2] = { {
-+	.cra_name		= NX842_CRYPTO_NAME,
-+	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
-+	.cra_ctxsize		= sizeof(struct nx842_crypto_ctx),
-+	.cra_module		= THIS_MODULE,
-+	.cra_init		= nx842_crypto_init,
-+	.cra_exit		= nx842_crypto_exit,
-+	.cra_u			= { .compress = {
-+	.coa_compress		= nx842_crypto_compress,
-+	.coa_decompress		= nx842_crypto_decompress } }
-+}, {
-+	.cra_name		= NX842_CRYPTO_ALIAS,
-+	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
-+	.cra_ctxsize		= sizeof(struct nx842_crypto_ctx),
-+	.cra_module		= THIS_MODULE,
-+	.cra_init		= nx842_crypto_init,
-+	.cra_exit		= nx842_crypto_exit,
-+	.cra_u			= { .compress = {
-+	.coa_compress		= nx842_crypto_compress,
-+	.coa_decompress		= nx842_crypto_decompress } }
-+} };
-+
-+static int __init nx842_crypto_mod_init(void)
-+{
-+	return crypto_register_algs(algs, ARRAY_SIZE(algs));
-+}
-+module_init(nx842_crypto_mod_init);
-+
-+static void __exit nx842_crypto_mod_exit(void)
-+{
-+	crypto_unregister_algs(algs, ARRAY_SIZE(algs));
-+}
-+module_exit(nx842_crypto_mod_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("IBM PowerPC Nest (NX) 842 Hardware Compression Interface");
-+MODULE_ALIAS_CRYPTO(NX842_CRYPTO_NAME);
-+MODULE_ALIAS_CRYPTO(NX842_CRYPTO_ALIAS);
-+MODULE_AUTHOR("Dan Streetman <ddstreet@ieee.org>");
++	*outlen = csbcpb->csb.processed_byte_count;
+ 
+ unlock:
+ 	if (ret)
+ 		/* decompress fail */
+ 		nx842_inc_decomp_failed(local_devdata);
+ 	else {
+-		if (!dev)
+-			/* software decompress */
+-			nx842_inc_swdecomp(local_devdata);
+ 		nx842_inc_decomp_complete(local_devdata);
+ 		ibm_nx842_incr_hist(local_devdata->counters->decomp_times,
+-			(get_tb() - start_time) / tb_ticks_per_usec);
++			(get_tb() - start) / tb_ticks_per_usec);
+ 	}
+ 
+ 	rcu_read_unlock();
+@@ -829,9 +680,9 @@ static int nx842_OF_upd_maxsyncop(struct nx842_devdata *devdata,
+ 					maxsynccop->decomp_data_limit);
+ 
+ 	devdata->max_sync_size = min_t(unsigned int, devdata->max_sync_size,
+-					SIZE_64K);
++					65536);
+ 
+-	if (devdata->max_sync_size < SIZE_4K) {
++	if (devdata->max_sync_size < 4096) {
+ 		dev_err(devdata->dev, "%s: hardware max data size (%u) is "
+ 				"less than the driver minimum, unable to use "
+ 				"the hardware device\n",
+@@ -1220,17 +1071,17 @@ static int __exit nx842_remove(struct vio_dev *viodev)
+ 	return 0;
+ }
+ 
+-static struct vio_device_id nx842_driver_ids[] = {
++static struct vio_device_id nx842_vio_driver_ids[] = {
+ 	{NX842_PSERIES_COMPAT_NAME "-v1", NX842_PSERIES_COMPAT_NAME},
+ 	{"", ""},
+ };
+ 
+-static struct vio_driver nx842_driver = {
++static struct vio_driver nx842_vio_driver = {
+ 	.name = MODULE_NAME,
+ 	.probe = nx842_probe,
+ 	.remove = __exit_p(nx842_remove),
+ 	.get_desired_dma = nx842_get_desired_dma,
+-	.id_table = nx842_driver_ids,
++	.id_table = nx842_vio_driver_ids,
+ };
+ 
+ static int __init nx842_init(void)
+@@ -1249,7 +1100,7 @@ static int __init nx842_init(void)
+ 	new_devdata->status = UNAVAILABLE;
+ 	RCU_INIT_POINTER(devdata, new_devdata);
+ 
+-	return vio_register_driver(&nx842_driver);
++	return vio_register_driver(&nx842_vio_driver);
+ }
+ 
+ module_init(nx842_init);
+@@ -1266,336 +1117,12 @@ static void __exit nx842_exit(void)
+ 	RCU_INIT_POINTER(devdata, NULL);
+ 	spin_unlock_irqrestore(&devdata_mutex, flags);
+ 	synchronize_rcu();
+-	if (old_devdata)
++	if (old_devdata && old_devdata->dev)
+ 		dev_set_drvdata(old_devdata->dev, NULL);
+ 	kfree(old_devdata);
+ 	nx842_unregister_driver(&nx842_pseries_driver);
+-	vio_unregister_driver(&nx842_driver);
++	vio_unregister_driver(&nx842_vio_driver);
+ }
+ 
+ module_exit(nx842_exit);
+ 
+-/*********************************
+- * 842 software decompressor
+-*********************************/
+-typedef int (*sw842_template_op)(const char **, int *, unsigned char **,
+-						struct sw842_fifo *);
+-
+-static int sw842_data8(const char **, int *, unsigned char **,
+-						struct sw842_fifo *);
+-static int sw842_data4(const char **, int *, unsigned char **,
+-						struct sw842_fifo *);
+-static int sw842_data2(const char **, int *, unsigned char **,
+-						struct sw842_fifo *);
+-static int sw842_ptr8(const char **, int *, unsigned char **,
+-						struct sw842_fifo *);
+-static int sw842_ptr4(const char **, int *, unsigned char **,
+-						struct sw842_fifo *);
+-static int sw842_ptr2(const char **, int *, unsigned char **,
+-						struct sw842_fifo *);
+-
+-/* special templates */
+-#define SW842_TMPL_REPEAT 0x1B
+-#define SW842_TMPL_ZEROS 0x1C
+-#define SW842_TMPL_EOF 0x1E
+-
+-static sw842_template_op sw842_tmpl_ops[26][4] = {
+-	{ sw842_data8, NULL}, /* 0 (00000) */
+-	{ sw842_data4, sw842_data2, sw842_ptr2,  NULL},
+-	{ sw842_data4, sw842_ptr2,  sw842_data2, NULL},
+-	{ sw842_data4, sw842_ptr2,  sw842_ptr2,  NULL},
+-	{ sw842_data4, sw842_ptr4,  NULL},
+-	{ sw842_data2, sw842_ptr2,  sw842_data4, NULL},
+-	{ sw842_data2, sw842_ptr2,  sw842_data2, sw842_ptr2},
+-	{ sw842_data2, sw842_ptr2,  sw842_ptr2,  sw842_data2},
+-	{ sw842_data2, sw842_ptr2,  sw842_ptr2,  sw842_ptr2,},
+-	{ sw842_data2, sw842_ptr2,  sw842_ptr4,  NULL},
+-	{ sw842_ptr2,  sw842_data2, sw842_data4, NULL}, /* 10 (01010) */
+-	{ sw842_ptr2,  sw842_data4, sw842_ptr2,  NULL},
+-	{ sw842_ptr2,  sw842_data2, sw842_ptr2,  sw842_data2},
+-	{ sw842_ptr2,  sw842_data2, sw842_ptr2,  sw842_ptr2},
+-	{ sw842_ptr2,  sw842_data2, sw842_ptr4,  NULL},
+-	{ sw842_ptr2,  sw842_ptr2,  sw842_data4, NULL},
+-	{ sw842_ptr2,  sw842_ptr2,  sw842_data2, sw842_ptr2},
+-	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr2,  sw842_data2},
+-	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr2,  sw842_ptr2},
+-	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr4,  NULL},
+-	{ sw842_ptr4,  sw842_data4, NULL}, /* 20 (10100) */
+-	{ sw842_ptr4,  sw842_data2, sw842_ptr2,  NULL},
+-	{ sw842_ptr4,  sw842_ptr2,  sw842_data2, NULL},
+-	{ sw842_ptr4,  sw842_ptr2,  sw842_ptr2,  NULL},
+-	{ sw842_ptr4,  sw842_ptr4,  NULL},
+-	{ sw842_ptr8,  NULL}
+-};
+-
+-/* Software decompress helpers */
+-
+-static uint8_t sw842_get_byte(const char *buf, int bit)
+-{
+-	uint8_t tmpl;
+-	uint16_t tmp;
+-	tmp = htons(*(uint16_t *)(buf));
+-	tmp = (uint16_t)(tmp << bit);
+-	tmp = ntohs(tmp);
+-	memcpy(&tmpl, &tmp, 1);
+-	return tmpl;
+-}
+-
+-static uint8_t sw842_get_template(const char **buf, int *bit)
+-{
+-	uint8_t byte;
+-	byte = sw842_get_byte(*buf, *bit);
+-	byte = byte >> 3;
+-	byte &= 0x1F;
+-	*buf += (*bit + 5) / 8;
+-	*bit = (*bit + 5) % 8;
+-	return byte;
+-}
+-
+-/* repeat_count happens to be 5-bit too (like the template) */
+-static uint8_t sw842_get_repeat_count(const char **buf, int *bit)
+-{
+-	uint8_t byte;
+-	byte = sw842_get_byte(*buf, *bit);
+-	byte = byte >> 2;
+-	byte &= 0x3F;
+-	*buf += (*bit + 6) / 8;
+-	*bit = (*bit + 6) % 8;
+-	return byte;
+-}
+-
+-static uint8_t sw842_get_ptr2(const char **buf, int *bit)
+-{
+-	uint8_t ptr;
+-	ptr = sw842_get_byte(*buf, *bit);
+-	(*buf)++;
+-	return ptr;
+-}
+-
+-static uint16_t sw842_get_ptr4(const char **buf, int *bit,
+-		struct sw842_fifo *fifo)
+-{
+-	uint16_t ptr;
+-	ptr = htons(*(uint16_t *)(*buf));
+-	ptr = (uint16_t)(ptr << *bit);
+-	ptr = ptr >> 7;
+-	ptr &= 0x01FF;
+-	*buf += (*bit + 9) / 8;
+-	*bit = (*bit + 9) % 8;
+-	return ptr;
+-}
+-
+-static uint8_t sw842_get_ptr8(const char **buf, int *bit,
+-		struct sw842_fifo *fifo)
+-{
+-	return sw842_get_ptr2(buf, bit);
+-}
+-
+-/* Software decompress template ops */
+-
+-static int sw842_data8(const char **inbuf, int *inbit,
+-		unsigned char **outbuf, struct sw842_fifo *fifo)
+-{
+-	int ret;
+-
+-	ret = sw842_data4(inbuf, inbit, outbuf, fifo);
+-	if (ret)
+-		return ret;
+-	ret = sw842_data4(inbuf, inbit, outbuf, fifo);
+-	return ret;
+-}
+-
+-static int sw842_data4(const char **inbuf, int *inbit,
+-		unsigned char **outbuf, struct sw842_fifo *fifo)
+-{
+-	int ret;
+-
+-	ret = sw842_data2(inbuf, inbit, outbuf, fifo);
+-	if (ret)
+-		return ret;
+-	ret = sw842_data2(inbuf, inbit, outbuf, fifo);
+-	return ret;
+-}
+-
+-static int sw842_data2(const char **inbuf, int *inbit,
+-		unsigned char **outbuf, struct sw842_fifo *fifo)
+-{
+-	**outbuf = sw842_get_byte(*inbuf, *inbit);
+-	(*inbuf)++;
+-	(*outbuf)++;
+-	**outbuf = sw842_get_byte(*inbuf, *inbit);
+-	(*inbuf)++;
+-	(*outbuf)++;
+-	return 0;
+-}
+-
+-static int sw842_ptr8(const char **inbuf, int *inbit,
+-		unsigned char **outbuf, struct sw842_fifo *fifo)
+-{
+-	uint8_t ptr;
+-	ptr = sw842_get_ptr8(inbuf, inbit, fifo);
+-	if (!fifo->f84_full && (ptr >= fifo->f8_count))
+-		return 1;
+-	memcpy(*outbuf, fifo->f8[ptr], 8);
+-	*outbuf += 8;
+-	return 0;
+-}
+-
+-static int sw842_ptr4(const char **inbuf, int *inbit,
+-		unsigned char **outbuf, struct sw842_fifo *fifo)
+-{
+-	uint16_t ptr;
+-	ptr = sw842_get_ptr4(inbuf, inbit, fifo);
+-	if (!fifo->f84_full && (ptr >= fifo->f4_count))
+-		return 1;
+-	memcpy(*outbuf, fifo->f4[ptr], 4);
+-	*outbuf += 4;
+-	return 0;
+-}
+-
+-static int sw842_ptr2(const char **inbuf, int *inbit,
+-		unsigned char **outbuf, struct sw842_fifo *fifo)
+-{
+-	uint8_t ptr;
+-	ptr = sw842_get_ptr2(inbuf, inbit);
+-	if (!fifo->f2_full && (ptr >= fifo->f2_count))
+-		return 1;
+-	memcpy(*outbuf, fifo->f2[ptr], 2);
+-	*outbuf += 2;
+-	return 0;
+-}
+-
+-static void sw842_copy_to_fifo(const char *buf, struct sw842_fifo *fifo)
+-{
+-	unsigned char initial_f2count = fifo->f2_count;
+-
+-	memcpy(fifo->f8[fifo->f8_count], buf, 8);
+-	fifo->f4_count += 2;
+-	fifo->f8_count += 1;
+-
+-	if (!fifo->f84_full && fifo->f4_count >= 512) {
+-		fifo->f84_full = 1;
+-		fifo->f4_count /= 512;
+-	}
+-
+-	memcpy(fifo->f2[fifo->f2_count++], buf, 2);
+-	memcpy(fifo->f2[fifo->f2_count++], buf + 2, 2);
+-	memcpy(fifo->f2[fifo->f2_count++], buf + 4, 2);
+-	memcpy(fifo->f2[fifo->f2_count++], buf + 6, 2);
+-	if (fifo->f2_count < initial_f2count)
+-		fifo->f2_full = 1;
+-}
+-
+-static int sw842_decompress(const unsigned char *src, int srclen,
+-			unsigned char *dst, int *destlen,
+-			const void *wrkmem)
+-{
+-	uint8_t tmpl;
+-	const char *inbuf;
+-	int inbit = 0;
+-	unsigned char *outbuf, *outbuf_end, *origbuf, *prevbuf;
+-	const char *inbuf_end;
+-	sw842_template_op op;
+-	int opindex;
+-	int i, repeat_count;
+-	struct sw842_fifo *fifo;
+-	int ret = 0;
+-
+-	fifo = &((struct nx842_workmem *)(wrkmem))->swfifo;
+-	memset(fifo, 0, sizeof(*fifo));
+-
+-	origbuf = NULL;
+-	inbuf = src;
+-	inbuf_end = src + srclen;
+-	outbuf = dst;
+-	outbuf_end = dst + *destlen;
+-
+-	while ((tmpl = sw842_get_template(&inbuf, &inbit)) != SW842_TMPL_EOF) {
+-		if (inbuf >= inbuf_end) {
+-			ret = -EINVAL;
+-			goto out;
+-		}
+-
+-		opindex = 0;
+-		prevbuf = origbuf;
+-		origbuf = outbuf;
+-		switch (tmpl) {
+-		case SW842_TMPL_REPEAT:
+-			if (prevbuf == NULL) {
+-				ret = -EINVAL;
+-				goto out;
+-			}
+-
+-			repeat_count = sw842_get_repeat_count(&inbuf,
+-								&inbit) + 1;
+-
+-			/* Did the repeat count advance past the end of input */
+-			if (inbuf > inbuf_end) {
+-				ret = -EINVAL;
+-				goto out;
+-			}
+-
+-			for (i = 0; i < repeat_count; i++) {
+-				/* Would this overflow the output buffer */
+-				if ((outbuf + 8) > outbuf_end) {
+-					ret = -ENOSPC;
+-					goto out;
+-				}
+-
+-				memcpy(outbuf, prevbuf, 8);
+-				sw842_copy_to_fifo(outbuf, fifo);
+-				outbuf += 8;
+-			}
+-			break;
+-
+-		case SW842_TMPL_ZEROS:
+-			/* Would this overflow the output buffer */
+-			if ((outbuf + 8) > outbuf_end) {
+-				ret = -ENOSPC;
+-				goto out;
+-			}
+-
+-			memset(outbuf, 0, 8);
+-			sw842_copy_to_fifo(outbuf, fifo);
+-			outbuf += 8;
+-			break;
+-
+-		default:
+-			if (tmpl > 25) {
+-				ret = -EINVAL;
+-				goto out;
+-			}
+-
+-			/* Does this go past the end of the input buffer */
+-			if ((inbuf + 2) > inbuf_end) {
+-				ret = -EINVAL;
+-				goto out;
+-			}
+-
+-			/* Would this overflow the output buffer */
+-			if ((outbuf + 8) > outbuf_end) {
+-				ret = -ENOSPC;
+-				goto out;
+-			}
+-
+-			while (opindex < 4 &&
+-				(op = sw842_tmpl_ops[tmpl][opindex++])
+-					!= NULL) {
+-				ret = (*op)(&inbuf, &inbit, &outbuf, fifo);
+-				if (ret) {
+-					ret = -EINVAL;
+-					goto out;
+-				}
+-				sw842_copy_to_fifo(origbuf, fifo);
+-			}
+-		}
+-	}
+-
+-out:
+-	if (!ret)
+-		*destlen = (unsigned int)(outbuf - dst);
+-	else
+-		*destlen = 0;
+-
+-	return ret;
+-}
 -- 
 2.1.0
