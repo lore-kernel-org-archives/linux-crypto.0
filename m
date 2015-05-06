@@ -1,85 +1,76 @@
-From: Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [V2 PATCH 2/5] arm64 : Introduce support for ACPI _CCA object
-Date: Wed, 06 May 2015 11:08:52 +0100
-Message-ID: <5549E834.1040305@arm.com>
-References: <1430838729-21572-1-git-send-email-Suravee.Suthikulpanit@amd.com> <1430838729-21572-3-git-send-email-Suravee.Suthikulpanit@amd.com>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH RFC 0/2] crypto: Introduce Public Key Encryption API
+Date: Wed, 6 May 2015 14:31:32 +0300
+Message-ID: <5549FB94.6020601@freescale.com>
+References: <20150430223647.10157.82156.stgit@tstruk-mobl1>
+ <55477111.2050803@freescale.com> <5547D9A3.9060800@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: 8BIT
-Cc: "al.stone@linaro.org" <al.stone@linaro.org>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"linaro-acpi@lists.linaro.org" <linaro-acpi@lists.linaro.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
-	"leo.duran@amd.com" <leo.duran@amd.com>,
-	"hanjun.guo@linaro.org" <hanjun.guo@linaro.org>,
-	"msalter@redhat.com" <msalter@redhat.com>,
-	"grant.likely@linaro.org" <grant.likely@linaro.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>,
-	"rjw@rjwysocki.net" <rjw@rjwysocki.net>,
-	"lenb@kernel.org" <lenb@kernel.org>,
-	Catalin Marinas <Catalin.Marinas@arm.com>,
-	Will Deacon <Will.Deacon@arm.com>,
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <1430838729-21572-3-git-send-email-Suravee.Suthikulpanit@amd.com>
-Sender: linux-acpi-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: <corbet@lwn.net>, <keescook@chromium.org>, <qat-linux@intel.com>,
+	<jwboyer@redhat.com>, <richard@nod.at>, <d.kasatkin@samsung.com>,
+	<linux-kernel@vger.kernel.org>, <steved@redhat.com>,
+	<dhowells@redhat.com>, <vgoyal@redhat.com>,
+	<james.l.morris@oracle.com>, <jkosina@suse.cz>,
+	<zohar@linux.vnet.ibm.com>, <davem@davemloft.net>,
+	<jdelvare@suse.de>, <linux-crypto@vger.kernel.org>
+To: Tadeusz Struk <tadeusz.struk@intel.com>,
+	<herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bl2on0112.outbound.protection.outlook.com ([65.55.169.112]:21024
+	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751384AbbEFLbp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 6 May 2015 07:31:45 -0400
+In-Reply-To: <5547D9A3.9060800@intel.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Suravee,
+On 5/4/2015 11:42 PM, Tadeusz Struk wrote:
+> Hi Horia,
+> On 05/04/2015 06:16 AM, Horia Geant=C4=83 wrote:
+>>> 	int (*sign)(struct pke_request *pkereq);
+>>>> 	int (*verify)(struct pke_request *pkereq);
+>>>> 	int (*encrypt)(struct pke_request *pkereq);
+>>>> 	int (*decrypt)(struct pke_request *pkereq);
+>> Where would be the proper place for keygen operation?
+>=20
+> This will need to be extended to support keygen.
+>=20
+>>
+>> AFAICT algorithms currently map to primitives + encoding methods, wh=
+ich
+>> is not flexible. For e.g. current RSA implementation hardcodes the
+>> PKCS1-v1_5 encoding method, making it hard to add OAEP(+) etc.
+>>
+>> One solution would be to map algorithms to primitives only. Encoding
+>> methods need to be abstracted somehow, maybe using templates to wrap=
+ the
+>> algorithms.
+>=20
+> So far there is only one rsa implementation in kernel and it is only =
+used
+> by module signing code.
+> Later we can add templates or simply one can register "oaep-rsa" algo=
+rithm.
 
-On 05/05/15 16:12, Suravee Suthikulpanit wrote:
->  From http://www.uefi.org/sites/default/files/resources/ACPI_6.0.pdf,
-> section 6.2.17 _CCA states that ARM platforms require ACPI _CCA
-> object to be specified for DMA-cabpable devices. This patch introduces
-> ACPI_MUST_HAVE_CCA in arm64 Kconfig to specify such requirement.
->
-> In this case of missing _CCA, arm64 would assign dummy_dma_ops
-> to disable DMA capability of the device.
->
-> Signed-off-by: Mark Salter <msalter@redhat.com>
-> Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
-> ---
+I am thinking that it would be more logical for "rsa" to represent only
+the *primitives*, for e.g. RSASP1, RSAVP1, RSAEP, RSADP (in rfc3447
+terminology).
 
-[...]
-> +static void __dummy_sync_single_for_cpu(struct device *dev,
-> +					dma_addr_t dev_addr, size_t size,
-> +					enum dma_data_direction dir)
-> +{
-> +}
-> +
-> +static void __dummy_sync_single_for_device(struct device *dev,
-> +					   dma_addr_t dev_addr, size_t size,
-> +					   enum dma_data_direction dir)
-> +{
-> +}
+Then pkcs1_v15(rsa), oaep(rsa), pss(rsa) (i.e. RSAES-PKCS1-v1_5,
+RSAES-OAEP, RSASSA-PSS encryption and/or signature schemes) would share
+the primitives implementation, the only thing that would differ being
+the encoding/padding method.
 
-Minor point, but I don't see the need to have multiple dummy functions 
-with identical signatures - just have a generic dummy_sync_single and 
-assign it to both ops.
+This is similar to symmetric ciphers convention of having the mode
+defined as a wrapper: we have cbc(aes), ctr(aes), gcm(aes) and not
+cbc-aes, ctr-aes, gcm-aes.
 
-> +static void __dummy_sync_sg_for_cpu(struct device *dev,
-> +				    struct scatterlist *sgl, int nelems,
-> +				    enum dma_data_direction dir)
-> +{
-> +}
-> +
-> +static void __dummy_sync_sg_for_device(struct device *dev,
-> +				       struct scatterlist *sgl, int nelems,
-> +				       enum dma_data_direction dir)
-> +{
-> +}
+Another thing to consider is that there might be crypto engines which
+are able to perform only "textbook" rsa. This would allow for the
+primitives to be offloaded, while the encoding methods would be
+performed in SW.
 
-Ditto here with dummy_sync_sg.
-
-I wonder if there's any argument for putting the dummy DMA ops somewhere 
-common, like drivers/base/dma-mapping.c?
-
-Robin.
-
+Thanks,
+Horia
