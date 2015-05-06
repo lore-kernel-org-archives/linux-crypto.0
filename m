@@ -1,7 +1,7 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 04/10] crypto: change 842 alg to use software
-Date: Wed,  6 May 2015 12:51:00 -0400
-Message-ID: <1430931066-4536-5-git-send-email-ddstreet@ieee.org>
+Subject: [PATCH 02/10] powerpc: Add ICSWX instruction
+Date: Wed,  6 May 2015 12:50:58 -0400
+Message-ID: <1430931066-4536-3-git-send-email-ddstreet@ieee.org>
 References: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
  <1430931066-4536-1-git-send-email-ddstreet@ieee.org>
 Cc: Dan Streetman <ddstreet@ieee.org>,
@@ -13,293 +13,245 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	Michael Ellerman <mpe@ellerman.id.au>,
 	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
 	Paul Mackerras <paulus@samba.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f169.google.com ([209.85.223.169]:34225 "EHLO
-	mail-ie0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751442AbbEFQwo (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 6 May 2015 12:52:44 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1430931066-4536-1-git-send-email-ddstreet@ieee.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Change the crypto 842 compression alg to use the software 842 compression
-and decompression library.  Change the name of this crypto alg to "sw842".
-Remove the fallback to LZO compression.
+Add the asm ICSWX and ICSWEPX opcodes.  Add definitions for the
+Coprocessor Request structures needed to use the icswx calls to
+coprocessors.  Add icswx() function to perform the ICSWX asm
+using the provided Coprocessor Command Word value and
+Coprocessor Request Block structure.
 
-Previously, this crypto compression alg attemped 842 compression using
-PowerPC hardware, and fell back to LZO compression and decompression if
-the 842 PowerPC hardware was unavailable or failed.  This should not
-fall back to any other compression method, however; users of this crypto
-compression alg can fallback if desired, and transparent fallback tricks
-callers into thinking they are getting 842 compression when they actually
-get LZO compression - the failure of the 842 hardware should not be
-transparent to the caller.
-
-The crypto compression alg for a hardware device also should not be located
-in crypto/ so this is now a software-only implementation that uses the 842
-software compression/decompression library.  Since users of the "842" alg
-expected hardware compression, the name of this software-only alg is
-changed to "sw842"; the new hardware 842 crypto compression alg will be
-aliased to "842" in a later patch.
+This is required for communication with the NX-842 coprocessor on
+a PowerNV system.
 
 Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- MAINTAINERS    |   1 +
- crypto/842.c   | 175 ++++++++++++---------------------------------------------
- crypto/Kconfig |   7 +--
- 3 files changed, 41 insertions(+), 142 deletions(-)
+ arch/powerpc/include/asm/icswx.h      | 184 ++++++++++++++++++++++++++++++++++
+ arch/powerpc/include/asm/ppc-opcode.h |  13 +++
+ 2 files changed, 197 insertions(+)
+ create mode 100644 arch/powerpc/include/asm/icswx.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 116af01..5a5c1dc 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4873,6 +4873,7 @@ S:	Supported
- F:	drivers/crypto/nx/nx-842.c
- F:	include/linux/nx842.h
- F:	include/linux/sw842.h
-+F:	crypto/842.c
- F:	lib/842/
- 
- IBM Power Linux RAID adapter
-diff --git a/crypto/842.c b/crypto/842.c
-index b48f4f1..c43b157 100644
---- a/crypto/842.c
-+++ b/crypto/842.c
-@@ -1,5 +1,5 @@
- /*
-- * Cryptographic API for the 842 compression algorithm.
-+ * Cryptographic API for the 842 software compression algorithm.
-  *
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License as published by
-@@ -11,173 +11,72 @@
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  * GNU General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License
-- * along with this program; if not, write to the Free Software
-- * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-+ * Copyright (C) IBM Corporation, 2011-2015
-  *
-- * Copyright (C) IBM Corporation, 2011
-+ * Original Authors: Robert Jennings <rcj@linux.vnet.ibm.com>
-+ *                   Seth Jennings <sjenning@linux.vnet.ibm.com>
-  *
-- * Authors: Robert Jennings <rcj@linux.vnet.ibm.com>
-- *          Seth Jennings <sjenning@linux.vnet.ibm.com>
-+ * Rewrite: Dan Streetman <ddstreet@ieee.org>
+diff --git a/arch/powerpc/include/asm/icswx.h b/arch/powerpc/include/asm/icswx.h
+new file mode 100644
+index 0000000..9f8402b
+--- /dev/null
++++ b/arch/powerpc/include/asm/icswx.h
+@@ -0,0 +1,184 @@
++/*
++ * ICSWX api
 + *
-+ * This is the software implementation of compression and decompression using
-+ * the 842 format.  This uses the software 842 library at lib/842/ which is
-+ * only a reference implementation, and is very, very slow as compared to other
-+ * software compressors.  You probably do not want to use this software
-+ * compression.  If you have access to the PowerPC 842 compression hardware, you
-+ * want to use the 842 hardware compression interface, which is at:
-+ * drivers/crypto/nx/nx-842-crypto.c
-  */
++ * Copyright (C) 2015 IBM Corp.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
++ *
++ * This provides the Initiate Coprocessor Store Word Indexed (ICSWX)
++ * instruction.  This instruction is used to communicate with PowerPC
++ * coprocessors.  This also provides definitions of the structures used
++ * to communicate with the coprocessor.
++ *
++ * The RFC02130: Coprocessor Architecture document is the reference for
++ * everything in this file unless otherwise noted.
++ */
++#ifndef _ARCH_POWERPC_INCLUDE_ASM_ICSWX_H_
++#define _ARCH_POWERPC_INCLUDE_ASM_ICSWX_H_
++
++#include <asm/ppc-opcode.h> /* for PPC_ICSWX */
++
++/* Chapter 6.5.8 Coprocessor-Completion Block (CCB) */
++
++#define CCB_VALUE		(0x3fffffffffffffff)
++#define CCB_ADDRESS		(0xfffffffffffffff8)
++#define CCB_CM			(0x0000000000000007)
++#define CCB_CM0			(0x0000000000000004)
++#define CCB_CM12		(0x0000000000000003)
++
++#define CCB_CM0_ALL_COMPLETIONS	(0x0)
++#define CCB_CM0_LAST_IN_CHAIN	(0x4)
++#define CCB_CM12_STORE		(0x0)
++#define CCB_CM12_INTERRUPT	(0x1)
++
++#define CCB_SIZE		(0x10)
++#define CCB_ALIGN		CCB_SIZE
++
++struct coprocessor_completion_block {
++	__be64 value;
++	__be64 address;
++} __packed __aligned(CCB_ALIGN);
++
++
++/* Chapter 6.5.7 Coprocessor-Status Block (CSB) */
++
++#define CSB_V			(0x80)
++#define CSB_F			(0x04)
++#define CSB_CH			(0x03)
++#define CSB_CE_INCOMPLETE	(0x80)
++#define CSB_CE_TERMINATION	(0x40)
++#define CSB_CE_TPBC		(0x20)
++
++#define CSB_CC_SUCCESS		(0)
++#define CSB_CC_INVALID_ALIGN	(1)
++#define CSB_CC_OPERAND_OVERLAP	(2)
++#define CSB_CC_DATA_LENGTH	(3)
++#define CSB_CC_TRANSLATION	(5)
++#define CSB_CC_PROTECTION	(6)
++#define CSB_CC_RD_EXTERNAL	(7)
++#define CSB_CC_INVALID_OPERAND	(8)
++#define CSB_CC_PRIVILEGE	(9)
++#define CSB_CC_INTERNAL		(10)
++#define CSB_CC_WR_EXTERNAL	(12)
++#define CSB_CC_NOSPC		(13)
++#define CSB_CC_EXCESSIVE_DDE	(14)
++#define CSB_CC_WR_TRANSLATION	(15)
++#define CSB_CC_WR_PROTECTION	(16)
++#define CSB_CC_UNKNOWN_CODE	(17)
++#define CSB_CC_ABORT		(18)
++#define CSB_CC_TRANSPORT	(20)
++#define CSB_CC_SEGMENTED_DDL	(31)
++#define CSB_CC_PROGRESS_POINT	(32)
++#define CSB_CC_DDE_OVERFLOW	(33)
++#define CSB_CC_SESSION		(34)
++#define CSB_CC_PROVISION	(36)
++#define CSB_CC_CHAIN		(37)
++#define CSB_CC_SEQUENCE		(38)
++#define CSB_CC_HW		(39)
++
++#define CSB_SIZE		(0x10)
++#define CSB_ALIGN		CSB_SIZE
++
++struct coprocessor_status_block {
++	u8 flags;
++	u8 cs;
++	u8 cc;
++	u8 ce;
++	__be32 count;
++	__be64 address;
++} __packed __aligned(CSB_ALIGN);
++
++
++/* Chapter 6.5.10 Data-Descriptor List (DDL)
++ * each list contains one or more Data-Descriptor Entries (DDE)
++ */
++
++#define DDE_P			(0x8000)
++
++#define DDE_SIZE		(0x10)
++#define DDE_ALIGN		DDE_SIZE
++
++struct data_descriptor_entry {
++	__be16 flags;
++	u8 count;
++	u8 index;
++	__be32 length;
++	__be64 address;
++} __packed __aligned(DDE_ALIGN);
++
++
++/* Chapter 6.5.2 Coprocessor-Request Block (CRB) */
++
++#define CRB_SIZE		(0x80)
++#define CRB_ALIGN		(0x100) /* Errata: requires 256 alignment */
++
++/* Coprocessor Status Block field
++ *   ADDRESS	address of CSB
++ *   C		CCB is valid
++ *   AT		0 = addrs are virtual, 1 = addrs are phys
++ *   M		enable perf monitor
++ */
++#define CRB_CSB_ADDRESS		(0xfffffffffffffff0)
++#define CRB_CSB_C		(0x0000000000000008)
++#define CRB_CSB_AT		(0x0000000000000002)
++#define CRB_CSB_M		(0x0000000000000001)
++
++struct coprocessor_request_block {
++	__be32 ccw;
++	__be32 flags;
++	__be64 csb_addr;
++
++	struct data_descriptor_entry source;
++	struct data_descriptor_entry target;
++
++	struct coprocessor_completion_block ccb;
++
++	u8 reserved[48];
++
++	struct coprocessor_status_block csb;
++} __packed __aligned(CRB_ALIGN);
++
++
++/* RFC02167 Initiate Coprocessor Instructions document
++ * Chapter 8.2.1.1.1 RS
++ * Chapter 8.2.3 Coprocessor Directive
++ * Chapter 8.2.4 Execution
++ *
++ * The CCW must be converted to BE before passing to icswx()
++ */
++
++#define CCW_PS			(0xff000000)
++#define CCW_CT			(0x00ff0000)
++#define CCW_CD			(0x0000ffff)
++#define CCW_CL			(0x0000c000)
++
++
++/* RFC02167 Initiate Coprocessor Instructions document
++ * Chapter 8.2.1 Initiate Coprocessor Store Word Indexed (ICSWX)
++ * Chapter 8.2.4.1 Condition Register 0
++ */
++
++#define ICSWX_INITIATED		(0x8)
++#define ICSWX_BUSY		(0x4)
++#define ICSWX_REJECTED		(0x2)
++
++static inline int icswx(__be32 ccw, struct coprocessor_request_block *crb)
++{
++	__be64 ccw_reg = ccw;
++	u32 cr;
++
++	__asm__ __volatile__(
++	PPC_ICSWX(%1,0,%2) "\n"
++	"mfcr %0\n"
++	: "=r" (cr)
++	: "r" (ccw_reg), "r" (crb)
++	: "cr0", "memory");
++
++	return (int)((cr >> 28) & 0xf);
++}
++
++
++#endif /* _ARCH_POWERPC_INCLUDE_ASM_ICSWX_H_ */
+diff --git a/arch/powerpc/include/asm/ppc-opcode.h b/arch/powerpc/include/asm/ppc-opcode.h
+index 5c93f69..8452335 100644
+--- a/arch/powerpc/include/asm/ppc-opcode.h
++++ b/arch/powerpc/include/asm/ppc-opcode.h
+@@ -136,6 +136,8 @@
+ #define PPC_INST_DCBAL			0x7c2005ec
+ #define PPC_INST_DCBZL			0x7c2007ec
+ #define PPC_INST_ICBT			0x7c00002c
++#define PPC_INST_ICSWX			0x7c00032d
++#define PPC_INST_ICSWEPX		0x7c00076d
+ #define PPC_INST_ISEL			0x7c00001e
+ #define PPC_INST_ISEL_MASK		0xfc00003e
+ #define PPC_INST_LDARX			0x7c0000a8
+@@ -403,4 +405,15 @@
+ #define MFTMR(tmr, r)		stringify_in_c(.long PPC_INST_MFTMR | \
+ 					       TMRN(tmr) | ___PPC_RT(r))
  
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/crypto.h>
--#include <linux/vmalloc.h>
--#include <linux/nx842.h>
--#include <linux/lzo.h>
--#include <linux/timer.h>
--
--static int nx842_uselzo;
--
--struct nx842_ctx {
--	void *nx842_wmem; /* working memory for 842/lzo */
--};
-+#include <linux/sw842.h>
- 
--enum nx842_crypto_type {
--	NX842_CRYPTO_TYPE_842,
--	NX842_CRYPTO_TYPE_LZO
--};
--
--#define NX842_SENTINEL 0xdeadbeef
-+#define CRYPTO842_NAME	"sw842"
- 
--struct nx842_crypto_header {
--	unsigned int sentinel; /* debug */
--	enum nx842_crypto_type type;
-+struct crypto842_ctx {
-+	char wmem[SW842_MEM_COMPRESS];	/* working memory for compress */
- };
- 
--static int nx842_init(struct crypto_tfm *tfm)
--{
--	struct nx842_ctx *ctx = crypto_tfm_ctx(tfm);
--	int wmemsize;
--
--	wmemsize = max_t(int, nx842_get_workmem_size(), LZO1X_MEM_COMPRESS);
--	ctx->nx842_wmem = kmalloc(wmemsize, GFP_NOFS);
--	if (!ctx->nx842_wmem)
--		return -ENOMEM;
--
--	return 0;
--}
--
--static void nx842_exit(struct crypto_tfm *tfm)
-+static int crypto842_compress(struct crypto_tfm *tfm,
-+			      const u8 *src, unsigned int slen,
-+			      u8 *dst, unsigned int *dlen)
- {
--	struct nx842_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	kfree(ctx->nx842_wmem);
-+	return sw842_compress(src, slen, dst, dlen, ctx->wmem);
- }
- 
--static void nx842_reset_uselzo(unsigned long data)
-+static int crypto842_decompress(struct crypto_tfm *tfm,
-+				const u8 *src, unsigned int slen,
-+				u8 *dst, unsigned int *dlen)
- {
--	nx842_uselzo = 0;
--}
--
--static DEFINE_TIMER(failover_timer, nx842_reset_uselzo, 0, 0);
--
--static int nx842_crypto_compress(struct crypto_tfm *tfm, const u8 *src,
--			    unsigned int slen, u8 *dst, unsigned int *dlen)
--{
--	struct nx842_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct nx842_crypto_header *hdr;
--	unsigned int tmp_len = *dlen;
--	size_t lzodlen; /* needed for lzo */
--	int err;
--
--	*dlen = 0;
--	hdr = (struct nx842_crypto_header *)dst;
--	hdr->sentinel = NX842_SENTINEL; /* debug */
--	dst += sizeof(struct nx842_crypto_header);
--	tmp_len -= sizeof(struct nx842_crypto_header);
--	lzodlen = tmp_len;
--
--	if (likely(!nx842_uselzo)) {
--		err = nx842_compress(src, slen, dst, &tmp_len, ctx->nx842_wmem);
--
--		if (likely(!err)) {
--			hdr->type = NX842_CRYPTO_TYPE_842;
--			*dlen = tmp_len + sizeof(struct nx842_crypto_header);
--			return 0;
--		}
--
--		/* hardware failed */
--		nx842_uselzo = 1;
--
--		/* set timer to check for hardware again in 1 second */
--		mod_timer(&failover_timer, jiffies + msecs_to_jiffies(1000));
--	}
--
--	/* no hardware, use lzo */
--	err = lzo1x_1_compress(src, slen, dst, &lzodlen, ctx->nx842_wmem);
--	if (err != LZO_E_OK)
--		return -EINVAL;
--
--	hdr->type = NX842_CRYPTO_TYPE_LZO;
--	*dlen = lzodlen + sizeof(struct nx842_crypto_header);
--	return 0;
--}
--
--static int nx842_crypto_decompress(struct crypto_tfm *tfm, const u8 *src,
--			      unsigned int slen, u8 *dst, unsigned int *dlen)
--{
--	struct nx842_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct nx842_crypto_header *hdr;
--	unsigned int tmp_len = *dlen;
--	size_t lzodlen; /* needed for lzo */
--	int err;
--
--	*dlen = 0;
--	hdr = (struct nx842_crypto_header *)src;
--
--	if (unlikely(hdr->sentinel != NX842_SENTINEL))
--		return -EINVAL;
--
--	src += sizeof(struct nx842_crypto_header);
--	slen -= sizeof(struct nx842_crypto_header);
--
--	if (likely(hdr->type == NX842_CRYPTO_TYPE_842)) {
--		err = nx842_decompress(src, slen, dst, &tmp_len,
--			ctx->nx842_wmem);
--		if (err)
--			return -EINVAL;
--		*dlen = tmp_len;
--	} else if (hdr->type == NX842_CRYPTO_TYPE_LZO) {
--		lzodlen = tmp_len;
--		err = lzo1x_decompress_safe(src, slen, dst, &lzodlen);
--		if (err != LZO_E_OK)
--			return -EINVAL;
--		*dlen = lzodlen;
--	} else
--		return -EINVAL;
--
--	return 0;
-+	return sw842_decompress(src, slen, dst, dlen);
- }
- 
- static struct crypto_alg alg = {
--	.cra_name		= "842",
-+	.cra_name		= CRYPTO842_NAME,
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
--	.cra_ctxsize		= sizeof(struct nx842_ctx),
-+	.cra_ctxsize		= sizeof(struct crypto842_ctx),
- 	.cra_module		= THIS_MODULE,
--	.cra_init		= nx842_init,
--	.cra_exit		= nx842_exit,
- 	.cra_u			= { .compress = {
--	.coa_compress		= nx842_crypto_compress,
--	.coa_decompress		= nx842_crypto_decompress } }
-+	.coa_compress		= crypto842_compress,
-+	.coa_decompress		= crypto842_decompress } }
- };
- 
--static int __init nx842_mod_init(void)
-+static int __init crypto842_mod_init(void)
- {
--	del_timer(&failover_timer);
- 	return crypto_register_alg(&alg);
- }
-+module_init(crypto842_mod_init);
- 
--static void __exit nx842_mod_exit(void)
-+static void __exit crypto842_mod_exit(void)
- {
- 	crypto_unregister_alg(&alg);
- }
--
--module_init(nx842_mod_init);
--module_exit(nx842_mod_exit);
-+module_exit(crypto842_mod_exit);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("842 Compression Algorithm");
--MODULE_ALIAS_CRYPTO("842");
-+MODULE_DESCRIPTION("842 Software Compression Algorithm");
-+MODULE_ALIAS_CRYPTO(CRYPTO842_NAME);
-+MODULE_AUTHOR("Dan Streetman <ddstreet@ieee.org>");
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 8aaf298..eba55b4 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1412,10 +1412,9 @@ config CRYPTO_LZO
- 
- config CRYPTO_842
- 	tristate "842 compression algorithm"
--	depends on CRYPTO_DEV_NX_COMPRESS
--	# 842 uses lzo if the hardware becomes unavailable
--	select LZO_COMPRESS
--	select LZO_DECOMPRESS
-+	select CRYPTO_ALGAPI
-+	select 842_COMPRESS
-+	select 842_DECOMPRESS
- 	help
- 	  This is the 842 algorithm.
- 
++/* Coprocessor instructions */
++#define PPC_ICSWX(s, a, b)	stringify_in_c(.long PPC_INST_ICSWX |	\
++					       ___PPC_RS(s) |		\
++					       ___PPC_RA(a) |		\
++					       ___PPC_RB(b))
++#define PPC_ICSWEPX(s, a, b)	stringify_in_c(.long PPC_INST_ICSWEPX | \
++					       ___PPC_RS(s) |		\
++					       ___PPC_RA(a) |		\
++					       ___PPC_RB(b))
++
++
+ #endif /* _ASM_POWERPC_PPC_OPCODE_H */
 -- 
 2.1.0
