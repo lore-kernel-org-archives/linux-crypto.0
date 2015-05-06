@@ -1,60 +1,85 @@
-From: Akinobu Mita <akinobu.mita@gmail.com>
-Subject: [PATCH -next] crct10dif: remove extra function call in crc_t10dif() and crc_t10dif_update()
-Date: Wed,  6 May 2015 18:18:51 +0900
-Message-ID: <1430903931-4465-1-git-send-email-akinobu.mita@gmail.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Nicholas Bellinger <nab@linux-iscsi.org>,
-	Sagi Grimberg <sagig@mellanox.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	linux-scsi@vger.kernel.org
-To: target-devel@vger.kernel.org
-Return-path: <linux-scsi-owner@vger.kernel.org>
-Sender: linux-scsi-owner@vger.kernel.org
+From: Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [V2 PATCH 2/5] arm64 : Introduce support for ACPI _CCA object
+Date: Wed, 06 May 2015 11:08:52 +0100
+Message-ID: <5549E834.1040305@arm.com>
+References: <1430838729-21572-1-git-send-email-Suravee.Suthikulpanit@amd.com> <1430838729-21572-3-git-send-email-Suravee.Suthikulpanit@amd.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: 8BIT
+Cc: "al.stone@linaro.org" <al.stone@linaro.org>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"linaro-acpi@lists.linaro.org" <linaro-acpi@lists.linaro.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
+	"leo.duran@amd.com" <leo.duran@amd.com>,
+	"hanjun.guo@linaro.org" <hanjun.guo@linaro.org>,
+	"msalter@redhat.com" <msalter@redhat.com>,
+	"grant.likely@linaro.org" <grant.likely@linaro.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+To: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>,
+	"rjw@rjwysocki.net" <rjw@rjwysocki.net>,
+	"lenb@kernel.org" <lenb@kernel.org>,
+	Catalin Marinas <Catalin.Marinas@arm.com>,
+	Will Deacon <Will.Deacon@arm.com>,
+	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <1430838729-21572-3-git-send-email-Suravee.Suthikulpanit@amd.com>
+Sender: linux-acpi-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Calling crypto_shash_import() in crc_t10dif() and crc_t10dif_update()
-is overkill as the existing crct10dif modules (crct10dif-generic and
-crct10dif-pclmul) don't require.
+Hi Suravee,
 
-We also do the same thing with crc32c() in lib/libcrc32.c.
+On 05/05/15 16:12, Suravee Suthikulpanit wrote:
+>  From http://www.uefi.org/sites/default/files/resources/ACPI_6.0.pdf,
+> section 6.2.17 _CCA states that ARM platforms require ACPI _CCA
+> object to be specified for DMA-cabpable devices. This patch introduces
+> ACPI_MUST_HAVE_CCA in arm64 Kconfig to specify such requirement.
+>
+> In this case of missing _CCA, arm64 would assign dummy_dma_ops
+> to disable DMA capability of the device.
+>
+> Signed-off-by: Mark Salter <msalter@redhat.com>
+> Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+> ---
 
-Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
-Cc: Tim Chen <tim.c.chen@linux.intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: Nicholas Bellinger <nab@linux-iscsi.org>
-Cc: Sagi Grimberg <sagig@mellanox.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-Cc: target-devel@vger.kernel.org
-Cc: linux-scsi@vger.kernel.org
----
- lib/crc-t10dif.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+[...]
+> +static void __dummy_sync_single_for_cpu(struct device *dev,
+> +					dma_addr_t dev_addr, size_t size,
+> +					enum dma_data_direction dir)
+> +{
+> +}
+> +
+> +static void __dummy_sync_single_for_device(struct device *dev,
+> +					   dma_addr_t dev_addr, size_t size,
+> +					   enum dma_data_direction dir)
+> +{
+> +}
 
-diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
-index d775737..1ad33e5 100644
---- a/lib/crc-t10dif.c
-+++ b/lib/crc-t10dif.c
-@@ -32,9 +32,8 @@ __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
- 
- 	desc.shash.tfm = crct10dif_tfm;
- 	desc.shash.flags = 0;
-+	*(__u16 *)desc.ctx = crc;
- 
--	err = crypto_shash_import(&desc.shash, &crc);
--	BUG_ON(err);
- 	err = crypto_shash_update(&desc.shash, buffer, len);
- 	BUG_ON(err);
- 
--- 
-1.9.1
+Minor point, but I don't see the need to have multiple dummy functions 
+with identical signatures - just have a generic dummy_sync_single and 
+assign it to both ops.
+
+> +static void __dummy_sync_sg_for_cpu(struct device *dev,
+> +				    struct scatterlist *sgl, int nelems,
+> +				    enum dma_data_direction dir)
+> +{
+> +}
+> +
+> +static void __dummy_sync_sg_for_device(struct device *dev,
+> +				       struct scatterlist *sgl, int nelems,
+> +				       enum dma_data_direction dir)
+> +{
+> +}
+
+Ditto here with dummy_sync_sg.
+
+I wonder if there's any argument for putting the dummy DMA ops somewhere 
+common, like drivers/base/dma-mapping.c?
+
+Robin.
 
