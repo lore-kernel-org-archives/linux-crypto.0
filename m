@@ -1,45 +1,64 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [Linaro-acpi] [V2 PATCH 1/5] ACPI / scan: Parse _CCA and setup device coherency
-Date: Thu, 07 May 2015 11:07:08 +0200
-Message-ID: <2842267.oTDe4myPcU@wuerfel>
-References: <1430838729-21572-1-git-send-email-Suravee.Suthikulpanit@amd.com> <4573209.dHyztuCFMt@vostro.rjw.lan> <554A92C3.7060606@amd.com>
+From: Yao Dongdong <yaodongdong@huawei.com>
+Subject: [Question] AEAD crypto api for userspace can't deal with a PTlen=0
+ vector
+Date: Thu, 7 May 2015 17:44:53 +0800
+Message-ID: <554B3415.3060707@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Suravee Suthikulanit <suravee.suthikulpanit@amd.com>,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	herbert@gondor.apana.org.au, catalin.marinas@arm.com,
-	will.deacon@arm.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-acpi@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	davem@davemloft.net, linux-arm-kernel@lists.infradead.org,
-	lenb@kernel.org
-To: linaro-acpi@lists.linaro.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <554A92C3.7060606@amd.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>, "Lihui (Eric)" <lihui8@huawei.com>
+To: <smueller@chronox.de>, <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from szxga01-in.huawei.com ([58.251.152.64]:32670 "EHLO
+	szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751314AbbEGJpG (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 7 May 2015 05:45:06 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday 06 May 2015 17:16:35 Suravee Suthikulanit wrote:
-> On 5/6/2015 5:21 PM, Rafael J. Wysocki wrote:
-> >>>> > >>+      bool
-> >>>> > >>+
-> >>>> > >>+config ACPI_SUPPORT_CCA_ZERO
-> >>> > >
-> >>> > >I guess this means "we support devices that can DMA, but are not coherent".
-> >>> > >right?
-> >> >
-> >> >Yes, basically when _CCA=0.
-> > So what about
-> >
-> >       ARCH_SUPPORT_CACHE_INCOHERENT_DMA
-> 
-> Since this is specific to ACPI _CCA, I just want to be clear with the 
-> naming.
+while we use crypto api for userspace to do vectors test for AEAD(aes-gcm),
+we encounter a problem. There are some test vector's PTlen is 0,for example:
+[Keylen = 128]
+[IVlen = 96]
+[PTlen = 0]
+[AADlen = 0]
+[Taglen = 128]
 
-How about directly using the architecture names here, this is inherently
-architecture specific, and it's more likely that if another architecture
-gets added in the future that it will have other requirements.
+Count = 0
+Key = 7e93936b2e2188cfa9c9882ad901312f
+IV = b6879804163b9eaf5bfe5218
+CT =
+AAD =
+Tag = aa77daf382d0d63480ff8c8a2dee149e
 
-	Arnd
+In testing vectors like that, we will get an error result that the decrypt
+return is success but the right return is a ghash verify fail.
+After digging into the kernel(3.10) code, we find the function sock_aio_read
+in net/socket.c has a judgement of iocb->ki_left which will be 0 when we
+do an aes-gcm decrypt decribed above.
+
+static ssize_t sock_aio_read(struct kiocb *iocb, const struct iovec *iov,
+                unsigned long nr_segs, loff_t pos)
+{
+    struct sock_iocb siocb, *x;
+
+    if (pos != 0)
+        return -ESPIPE;
+
+    if (iocb->ki_left == 0) /* Match SYS5 behaviour */
+        return 0;
+
+    x = alloc_sock_iocb(iocb, &siocb);
+    if (!x)
+        return -ENOMEM;
+    return do_sock_read(&x->async_msg, iocb, iocb->ki_filp, iov, nr_segs);
+}
+
+So it directly return before calling aes-gcm decrypt.
+
+How can we deal with that?
+
+-- 
+Kind regards,
+Yao Dongdong
