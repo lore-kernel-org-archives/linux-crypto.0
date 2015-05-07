@@ -1,111 +1,64 @@
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Subject: Re: [V2 PATCH 3/5] device property: Introduces device_dma_is_coherent()
-Date: Thu, 7 May 2015 01:58:53 +0200
-Message-ID: <CAJZ5v0gbSFrjce0oZwxOiGYVwx+bp3hJ+YghgO75dyf3iuiWYA@mail.gmail.com>
-References: <1430838729-21572-1-git-send-email-Suravee.Suthikulpanit@amd.com>
-	<1430838729-21572-4-git-send-email-Suravee.Suthikulpanit@amd.com>
-	<554AA94D.6020503@amd.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2 2/7] crypto: add new driver for Marvell CESA
+Date: Thu, 7 May 2015 11:01:00 +0800
+Message-ID: <20150507030100.GA29395@gondor.apana.org.au>
+References: <1430742426-21202-1-git-send-email-boris.brezillon@free-electrons.com>
+ <1430742426-21202-3-git-send-email-boris.brezillon@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Len Brown <lenb@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will.deacon@arm.com>, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, David Miller <davem@davemloft.net>,
-	msalter@redhat.com, Hanjun Guo <hanjun.guo@linaro.org>,
-	Al Stone <al.stone@linaro.org>,
-	Grant Likely <grant.likely@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>, leo.duran@amd.com,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"linaro-acpi@lists.linaro.org" <linaro-acpi@lists.linaro.org>,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Suravee Suthikulanit <suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Arnaud Ebalard <arno@natisbad.org>
+To: Boris Brezillon <boris.brezillon@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:37223 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751219AbbEFX6z (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:57036 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751726AbbEGDBm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 6 May 2015 19:58:55 -0400
-In-Reply-To: <554AA94D.6020503@amd.com>
+	Wed, 6 May 2015 23:01:42 -0400
+Content-Disposition: inline
+In-Reply-To: <1430742426-21202-3-git-send-email-boris.brezillon@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 7, 2015 at 1:52 AM, Suravee Suthikulanit
-<suravee.suthikulpanit@amd.com> wrote:
-> Rafael,
->
-> Any comments on this patch?
+On Mon, May 04, 2015 at 02:27:01PM +0200, Boris Brezillon wrote:
+> The existing mv_cesa driver supports some features of the CESA IP but is
+> quite limited, and reworking it to support new features (like involving the
+> TDMA engine to offload the CPU) is almost impossible.
+> This driver has been rewritten from scratch to take those new features into
+> account.
+> 
+> This new driver adds support for:
+> - new armada SoCs (up to 38x) while keeping support for older ones (Orion
+>   and Kirkwood)
+> - DMA mode to offload the CPU in case of intensive crypto usage
+> - new algorithms: SHA256, DES and 3DES
+> 
+> The existing CESA driver is kept around to ease transition to this new
+> driver (take some time to audit the code and/or wait for users feedback).
+> 
+> Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+> Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
 
-Well, as long as acpi_dma_is_coherent() does the right thing on all
-architectures, I have no objections.
+This patch is too big for the mailing list.  Please provide a
+URL for people to download and review.
 
 Thanks,
-Rafael
-
-
-> On 5/5/2015 10:12 AM, Suravee Suthikulpanit wrote:
->>
->> Currently, device drivers, which support both OF and ACPI,
->> need to call two separate APIs, of_dma_is_coherent() and
->> acpi_dma_is_coherent()) to determine device coherency attribute.
->>
->> This patch simplifies this process by introducing a new device
->> property API, device_dma_is_coherent(), which calls the appropriate
->> interface based on the booting architecture.
->>
->> Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
->> ---
->>   drivers/base/property.c  | 12 ++++++++++++
->>   include/linux/property.h |  2 ++
->>   2 files changed, 14 insertions(+)
->>
->> diff --git a/drivers/base/property.c b/drivers/base/property.c
->> index 1d0b116..8123c6e 100644
->> --- a/drivers/base/property.c
->> +++ b/drivers/base/property.c
->> @@ -14,6 +14,7 @@
->>   #include <linux/export.h>
->>   #include <linux/kernel.h>
->>   #include <linux/of.h>
->> +#include <linux/of_address.h>
->>   #include <linux/property.h>
->>
->>   /**
->> @@ -519,3 +520,14 @@ unsigned int device_get_child_node_count(struct
->> device *dev)
->>         return count;
->>   }
->>   EXPORT_SYMBOL_GPL(device_get_child_node_count);
->> +
->> +bool device_dma_is_coherent(struct device *dev)
->> +{
->> +       if (IS_ENABLED(CONFIG_OF) && dev->of_node)
->> +               return of_dma_is_coherent(dev->of_node);
->> +       else if (has_acpi_companion(dev))
->> +               return acpi_dma_is_coherent(acpi_node(dev->fwnode));
->> +
->> +       return false;
->> +}
->> +EXPORT_SYMBOL_GPL(device_dma_is_coherent);
->> diff --git a/include/linux/property.h b/include/linux/property.h
->> index de8bdf4..76ebde9 100644
->> --- a/include/linux/property.h
->> +++ b/include/linux/property.h
->> @@ -164,4 +164,6 @@ struct property_set {
->>
->>   void device_add_property_set(struct device *dev, struct property_set
->> *pset);
->>
->> +bool device_dma_is_coherent(struct device *dev);
->> +
->>   #endif /* _LINUX_PROPERTY_H_ */
->>
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-acpi" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
