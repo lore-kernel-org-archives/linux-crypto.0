@@ -1,80 +1,45 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH v2 2/7] crypto: add new driver for Marvell CESA
-Date: Thu, 7 May 2015 09:18:09 +0200
-Message-ID: <20150507091809.2fb5b22e@bbrezillon>
-References: <1430742426-21202-1-git-send-email-boris.brezillon@free-electrons.com>
-	<1430742426-21202-3-git-send-email-boris.brezillon@free-electrons.com>
-	<20150507030100.GA29395@gondor.apana.org.au>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [Linaro-acpi] [V2 PATCH 1/5] ACPI / scan: Parse _CCA and setup device coherency
+Date: Thu, 07 May 2015 11:07:08 +0200
+Message-ID: <2842267.oTDe4myPcU@wuerfel>
+References: <1430838729-21572-1-git-send-email-Suravee.Suthikulpanit@amd.com> <4573209.dHyztuCFMt@vostro.rjw.lan> <554A92C3.7060606@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Arnaud Ebalard <arno@natisbad.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:46608 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753243AbbEGHSO (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 May 2015 03:18:14 -0400
-In-Reply-To: <20150507030100.GA29395@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Suravee Suthikulanit <suravee.suthikulpanit@amd.com>,
+	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
+	herbert@gondor.apana.org.au, catalin.marinas@arm.com,
+	will.deacon@arm.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-acpi@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	davem@davemloft.net, linux-arm-kernel@lists.infradead.org,
+	lenb@kernel.org
+To: linaro-acpi@lists.linaro.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <554A92C3.7060606@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Herbert,
-
-On Thu, 7 May 2015 11:01:00 +0800
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
-
-> On Mon, May 04, 2015 at 02:27:01PM +0200, Boris Brezillon wrote:
-> > The existing mv_cesa driver supports some features of the CESA IP but is
-> > quite limited, and reworking it to support new features (like involving the
-> > TDMA engine to offload the CPU) is almost impossible.
-> > This driver has been rewritten from scratch to take those new features into
-> > account.
-> > 
-> > This new driver adds support for:
-> > - new armada SoCs (up to 38x) while keeping support for older ones (Orion
-> >   and Kirkwood)
-> > - DMA mode to offload the CPU in case of intensive crypto usage
-> > - new algorithms: SHA256, DES and 3DES
-> > 
-> > The existing CESA driver is kept around to ease transition to this new
-> > driver (take some time to audit the code and/or wait for users feedback).
-> > 
-> > Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-> > Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
+On Wednesday 06 May 2015 17:16:35 Suravee Suthikulanit wrote:
+> On 5/6/2015 5:21 PM, Rafael J. Wysocki wrote:
+> >>>> > >>+      bool
+> >>>> > >>+
+> >>>> > >>+config ACPI_SUPPORT_CCA_ZERO
+> >>> > >
+> >>> > >I guess this means "we support devices that can DMA, but are not coherent".
+> >>> > >right?
+> >> >
+> >> >Yes, basically when _CCA=0.
+> > So what about
+> >
+> >       ARCH_SUPPORT_CACHE_INCOHERENT_DMA
 > 
-> This patch is too big for the mailing list.  Please provide a
-> URL for people to download and review.
+> Since this is specific to ACPI _CCA, I just want to be clear with the 
+> naming.
 
-Here [1] is a branch containing the patches submitted in this series.
-I guess I won't have other choices but to split this patch (as
-Sebastian suggested) in my next iteration :-).
+How about directly using the architecture names here, this is inherently
+architecture specific, and it's more likely that if another architecture
+gets added in the future that it will have other requirements.
 
-Best Regards,
-
-Boris
-
-[1]https://github.com/bbrezillon/linux-marvell/commits/cesa-v2
-
-
--- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+	Arnd
