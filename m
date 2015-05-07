@@ -1,8 +1,8 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 02/10] powerpc: Add ICSWX instruction
-Date: Thu,  7 May 2015 13:49:13 -0400
-Message-ID: <1431020961-22285-3-git-send-email-ddstreet@ieee.org>
-References: <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
+Subject: [PATCHv3 00/10] add 842 hw compression for PowerNV platform
+Date: Thu,  7 May 2015 13:49:11 -0400
+Message-ID: <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
+References: <1430931066-4536-1-git-send-email-ddstreet@ieee.org>
 Cc: Seth Jennings <sjennings@variantweb.net>,
 	Robert Jennings <rob@pochix.net>, linux-crypto@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
@@ -12,250 +12,105 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	Michael Ellerman <mpe@ellerman.id.au>,
 	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
 	Paul Mackerras <paulus@samba.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f181.google.com ([209.85.213.181]:36970 "EHLO
-	mail-ig0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751613AbbEGRtz (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 May 2015 13:49:55 -0400
-In-Reply-To: <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1430931066-4536-1-git-send-email-ddstreet@ieee.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add the asm ICSWX and ICSWEPX opcodes.  Add definitions for the
-Coprocessor Request structures needed to use the icswx calls to
-coprocessors.  Add icswx() function to perform the ICSWX asm
-using the provided Coprocessor Command Word value and
-Coprocessor Request Block structure.
+IBM PowerPC processors starting at version P7+ contain a NX coprocessor
+that provides various hw-accelerated functions, one of which is memory
+compression to the IBM "842" compression format.  This NX-842 coprocessor
+is already supported on the pSeries platform, by the nx-842.c driver and
+the crypto compression interface at crypto/842.c.  This patch set adds
+support for NX-842 on the PowerNV (Non-Virtualized) platform, as well as
+adding a full software 842 compression/decompression implementation.
 
-This is required for communication with the NX-842 coprocessor on
-a PowerNV system.
+Quick summary of changes: the current 842 crypto compression interface uses
+only the 842 hardware on pSeries platforms, and can handle only page-sized
+and page-aligned uncompressed buffers.  These patches add a full software
+842 impementation, change the crypto/ directory 842 interface to a
+software only implementation, add a 842 hardware crypto compression
+interface that can handle any size and alignment buffers, add a
+driver for 842 hardware on PowerNV platforms, and create a common
+interface for both 842 hardware platform drivers.
 
-Signed-off-by: Dan Streetman <ddstreet@ieee.org>
----
- arch/powerpc/include/asm/icswx.h      | 184 ++++++++++++++++++++++++++++++++++
- arch/powerpc/include/asm/ppc-opcode.h |  13 +++
- 2 files changed, 197 insertions(+)
+The existing pSeries platform NX-842 driver could not be re-used for the
+PowerNV platform driver, as there are fundamentally different interfaces;
+on pSeries the system hypervisor (pHyp) provides the interface and manages
+communication with the coprocessor, while on PowerNV the kernel talks directly
+to the coprocessor using the ICSWX instruction.  The data structures used to
+describe each compression or decompression request to the coprocessor are
+also different between pHyp's interface and direct communication with ICSWX.
+So, different drivers for pSeries and PowerNV are required.  Adding the new
+PowerNV driver but keeping the interface to the drivers the same required
+adding a new common frontend interface, to which only one of the platform
+drivers will connect (based on what platform the kernel is currently running
+on), and moving some functionality out of the existing pSeries driver into a
+more common location.
+
+The existing crypto/842.c interface is in the wrong place, since crypto/
+should only contain software implementations; so lib/842/ is added
+containing a reference (i.e. rather slow) implementation in software
+of both 842 compression and 842 decompression.  The crypto/842.c interface
+is changed to use only that software implementation.
+
+The hardware 842 crypto compression interface is moved to
+drivers/crypto/nx/nx-842-crypto.c.  It is also modified to be able to
+handle any alignment/length input or output buffer; currently it is only
+able to handle page-size and page-aligned (uncompressed) buffers, due to
+restrictions in the pSeries 842 hardware driver.
+
+v3 changes the sw and hw crypto drivers to use the same alg name "842",
+and different driver names, "842-generic" and "842-nx"
+
+
+Dan Streetman (10):
+  powerpc: export of_get_ibm_chip_id function
+  powerpc: Add ICSWX instruction
+  lib: add software 842 compression/decompression
+  crypto: change 842 alg to use software
+  drivers/crypto/nx: rename nx-842.c to nx-842-pseries.c
+  drivers/crypto/nx: add NX-842 platform frontend driver
+  drivers/crypto/nx: add nx842 constraints
+  drivers/crypto/nx: add PowerNV platform NX-842 driver
+  drivers/crypto/nx: simplify pSeries nx842 driver
+  drivers/crypto/nx: add hardware 842 crypto comp alg
+
+ MAINTAINERS                           |    5 +-
+ arch/powerpc/include/asm/icswx.h      |  184 ++++
+ arch/powerpc/include/asm/ppc-opcode.h |   13 +
+ arch/powerpc/kernel/prom.c            |    1 +
+ crypto/842.c                          |  174 +---
+ crypto/Kconfig                        |    7 +-
+ drivers/crypto/Kconfig                |   10 +-
+ drivers/crypto/nx/Kconfig             |   55 +-
+ drivers/crypto/nx/Makefile            |    6 +
+ drivers/crypto/nx/nx-842-crypto.c     |  585 ++++++++++++
+ drivers/crypto/nx/nx-842-powernv.c    |  625 +++++++++++++
+ drivers/crypto/nx/nx-842-pseries.c    | 1128 +++++++++++++++++++++++
+ drivers/crypto/nx/nx-842.c            | 1623 +++------------------------------
+ drivers/crypto/nx/nx-842.h            |  131 +++
+ include/linux/nx842.h                 |   21 +-
+ include/linux/sw842.h                 |   12 +
+ lib/842/842.h                         |  127 +++
+ lib/842/842_compress.c                |  626 +++++++++++++
+ lib/842/842_debugfs.h                 |   52 ++
+ lib/842/842_decompress.c              |  405 ++++++++
+ lib/842/Makefile                      |    2 +
+ lib/Kconfig                           |    6 +
+ lib/Makefile                          |    2 +
+ 23 files changed, 4120 insertions(+), 1680 deletions(-)
  create mode 100644 arch/powerpc/include/asm/icswx.h
+ create mode 100644 drivers/crypto/nx/nx-842-crypto.c
+ create mode 100644 drivers/crypto/nx/nx-842-powernv.c
+ create mode 100644 drivers/crypto/nx/nx-842-pseries.c
+ create mode 100644 drivers/crypto/nx/nx-842.h
+ create mode 100644 include/linux/sw842.h
+ create mode 100644 lib/842/842.h
+ create mode 100644 lib/842/842_compress.c
+ create mode 100644 lib/842/842_debugfs.h
+ create mode 100644 lib/842/842_decompress.c
+ create mode 100644 lib/842/Makefile
 
-diff --git a/arch/powerpc/include/asm/icswx.h b/arch/powerpc/include/asm/icswx.h
-new file mode 100644
-index 0000000..9f8402b
---- /dev/null
-+++ b/arch/powerpc/include/asm/icswx.h
-@@ -0,0 +1,184 @@
-+/*
-+ * ICSWX api
-+ *
-+ * Copyright (C) 2015 IBM Corp.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the License, or (at your option) any later version.
-+ *
-+ * This provides the Initiate Coprocessor Store Word Indexed (ICSWX)
-+ * instruction.  This instruction is used to communicate with PowerPC
-+ * coprocessors.  This also provides definitions of the structures used
-+ * to communicate with the coprocessor.
-+ *
-+ * The RFC02130: Coprocessor Architecture document is the reference for
-+ * everything in this file unless otherwise noted.
-+ */
-+#ifndef _ARCH_POWERPC_INCLUDE_ASM_ICSWX_H_
-+#define _ARCH_POWERPC_INCLUDE_ASM_ICSWX_H_
-+
-+#include <asm/ppc-opcode.h> /* for PPC_ICSWX */
-+
-+/* Chapter 6.5.8 Coprocessor-Completion Block (CCB) */
-+
-+#define CCB_VALUE		(0x3fffffffffffffff)
-+#define CCB_ADDRESS		(0xfffffffffffffff8)
-+#define CCB_CM			(0x0000000000000007)
-+#define CCB_CM0			(0x0000000000000004)
-+#define CCB_CM12		(0x0000000000000003)
-+
-+#define CCB_CM0_ALL_COMPLETIONS	(0x0)
-+#define CCB_CM0_LAST_IN_CHAIN	(0x4)
-+#define CCB_CM12_STORE		(0x0)
-+#define CCB_CM12_INTERRUPT	(0x1)
-+
-+#define CCB_SIZE		(0x10)
-+#define CCB_ALIGN		CCB_SIZE
-+
-+struct coprocessor_completion_block {
-+	__be64 value;
-+	__be64 address;
-+} __packed __aligned(CCB_ALIGN);
-+
-+
-+/* Chapter 6.5.7 Coprocessor-Status Block (CSB) */
-+
-+#define CSB_V			(0x80)
-+#define CSB_F			(0x04)
-+#define CSB_CH			(0x03)
-+#define CSB_CE_INCOMPLETE	(0x80)
-+#define CSB_CE_TERMINATION	(0x40)
-+#define CSB_CE_TPBC		(0x20)
-+
-+#define CSB_CC_SUCCESS		(0)
-+#define CSB_CC_INVALID_ALIGN	(1)
-+#define CSB_CC_OPERAND_OVERLAP	(2)
-+#define CSB_CC_DATA_LENGTH	(3)
-+#define CSB_CC_TRANSLATION	(5)
-+#define CSB_CC_PROTECTION	(6)
-+#define CSB_CC_RD_EXTERNAL	(7)
-+#define CSB_CC_INVALID_OPERAND	(8)
-+#define CSB_CC_PRIVILEGE	(9)
-+#define CSB_CC_INTERNAL		(10)
-+#define CSB_CC_WR_EXTERNAL	(12)
-+#define CSB_CC_NOSPC		(13)
-+#define CSB_CC_EXCESSIVE_DDE	(14)
-+#define CSB_CC_WR_TRANSLATION	(15)
-+#define CSB_CC_WR_PROTECTION	(16)
-+#define CSB_CC_UNKNOWN_CODE	(17)
-+#define CSB_CC_ABORT		(18)
-+#define CSB_CC_TRANSPORT	(20)
-+#define CSB_CC_SEGMENTED_DDL	(31)
-+#define CSB_CC_PROGRESS_POINT	(32)
-+#define CSB_CC_DDE_OVERFLOW	(33)
-+#define CSB_CC_SESSION		(34)
-+#define CSB_CC_PROVISION	(36)
-+#define CSB_CC_CHAIN		(37)
-+#define CSB_CC_SEQUENCE		(38)
-+#define CSB_CC_HW		(39)
-+
-+#define CSB_SIZE		(0x10)
-+#define CSB_ALIGN		CSB_SIZE
-+
-+struct coprocessor_status_block {
-+	u8 flags;
-+	u8 cs;
-+	u8 cc;
-+	u8 ce;
-+	__be32 count;
-+	__be64 address;
-+} __packed __aligned(CSB_ALIGN);
-+
-+
-+/* Chapter 6.5.10 Data-Descriptor List (DDL)
-+ * each list contains one or more Data-Descriptor Entries (DDE)
-+ */
-+
-+#define DDE_P			(0x8000)
-+
-+#define DDE_SIZE		(0x10)
-+#define DDE_ALIGN		DDE_SIZE
-+
-+struct data_descriptor_entry {
-+	__be16 flags;
-+	u8 count;
-+	u8 index;
-+	__be32 length;
-+	__be64 address;
-+} __packed __aligned(DDE_ALIGN);
-+
-+
-+/* Chapter 6.5.2 Coprocessor-Request Block (CRB) */
-+
-+#define CRB_SIZE		(0x80)
-+#define CRB_ALIGN		(0x100) /* Errata: requires 256 alignment */
-+
-+/* Coprocessor Status Block field
-+ *   ADDRESS	address of CSB
-+ *   C		CCB is valid
-+ *   AT		0 = addrs are virtual, 1 = addrs are phys
-+ *   M		enable perf monitor
-+ */
-+#define CRB_CSB_ADDRESS		(0xfffffffffffffff0)
-+#define CRB_CSB_C		(0x0000000000000008)
-+#define CRB_CSB_AT		(0x0000000000000002)
-+#define CRB_CSB_M		(0x0000000000000001)
-+
-+struct coprocessor_request_block {
-+	__be32 ccw;
-+	__be32 flags;
-+	__be64 csb_addr;
-+
-+	struct data_descriptor_entry source;
-+	struct data_descriptor_entry target;
-+
-+	struct coprocessor_completion_block ccb;
-+
-+	u8 reserved[48];
-+
-+	struct coprocessor_status_block csb;
-+} __packed __aligned(CRB_ALIGN);
-+
-+
-+/* RFC02167 Initiate Coprocessor Instructions document
-+ * Chapter 8.2.1.1.1 RS
-+ * Chapter 8.2.3 Coprocessor Directive
-+ * Chapter 8.2.4 Execution
-+ *
-+ * The CCW must be converted to BE before passing to icswx()
-+ */
-+
-+#define CCW_PS			(0xff000000)
-+#define CCW_CT			(0x00ff0000)
-+#define CCW_CD			(0x0000ffff)
-+#define CCW_CL			(0x0000c000)
-+
-+
-+/* RFC02167 Initiate Coprocessor Instructions document
-+ * Chapter 8.2.1 Initiate Coprocessor Store Word Indexed (ICSWX)
-+ * Chapter 8.2.4.1 Condition Register 0
-+ */
-+
-+#define ICSWX_INITIATED		(0x8)
-+#define ICSWX_BUSY		(0x4)
-+#define ICSWX_REJECTED		(0x2)
-+
-+static inline int icswx(__be32 ccw, struct coprocessor_request_block *crb)
-+{
-+	__be64 ccw_reg = ccw;
-+	u32 cr;
-+
-+	__asm__ __volatile__(
-+	PPC_ICSWX(%1,0,%2) "\n"
-+	"mfcr %0\n"
-+	: "=r" (cr)
-+	: "r" (ccw_reg), "r" (crb)
-+	: "cr0", "memory");
-+
-+	return (int)((cr >> 28) & 0xf);
-+}
-+
-+
-+#endif /* _ARCH_POWERPC_INCLUDE_ASM_ICSWX_H_ */
-diff --git a/arch/powerpc/include/asm/ppc-opcode.h b/arch/powerpc/include/asm/ppc-opcode.h
-index 5c93f69..8452335 100644
---- a/arch/powerpc/include/asm/ppc-opcode.h
-+++ b/arch/powerpc/include/asm/ppc-opcode.h
-@@ -136,6 +136,8 @@
- #define PPC_INST_DCBAL			0x7c2005ec
- #define PPC_INST_DCBZL			0x7c2007ec
- #define PPC_INST_ICBT			0x7c00002c
-+#define PPC_INST_ICSWX			0x7c00032d
-+#define PPC_INST_ICSWEPX		0x7c00076d
- #define PPC_INST_ISEL			0x7c00001e
- #define PPC_INST_ISEL_MASK		0xfc00003e
- #define PPC_INST_LDARX			0x7c0000a8
-@@ -403,4 +405,15 @@
- #define MFTMR(tmr, r)		stringify_in_c(.long PPC_INST_MFTMR | \
- 					       TMRN(tmr) | ___PPC_RT(r))
- 
-+/* Coprocessor instructions */
-+#define PPC_ICSWX(s, a, b)	stringify_in_c(.long PPC_INST_ICSWX |	\
-+					       ___PPC_RS(s) |		\
-+					       ___PPC_RA(a) |		\
-+					       ___PPC_RB(b))
-+#define PPC_ICSWEPX(s, a, b)	stringify_in_c(.long PPC_INST_ICSWEPX | \
-+					       ___PPC_RS(s) |		\
-+					       ___PPC_RA(a) |		\
-+					       ___PPC_RB(b))
-+
-+
- #endif /* _ASM_POWERPC_PPC_OPCODE_H */
 -- 
 2.1.0
