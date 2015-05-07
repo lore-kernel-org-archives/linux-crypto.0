@@ -1,79 +1,78 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [Question] AEAD crypto api for userspace can't deal with a PTlen=0 vector
-Date: Thu, 07 May 2015 13:28:14 +0200
-Message-ID: <1449423.5ryfY6rDCG@tauon>
-References: <554B3415.3060707@huawei.com>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: Re: [PATCH 10/10] drivers/crypto/nx: add hardware 842 crypto comp alg
+Date: Thu, 7 May 2015 11:06:06 -0400
+Message-ID: <CALZtONBBoy=sM8Qt43-_k8BWTwSKA3FaJg9JMfJHzJ3wh5+kvQ@mail.gmail.com>
+References: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
+ <1430931066-4536-1-git-send-email-ddstreet@ieee.org> <1430931066-4536-11-git-send-email-ddstreet@ieee.org>
+ <20150507031238.GC29395@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-	"Lihui (Eric)" <lihui8@huawei.com>
-To: Yao Dongdong <yaodongdong@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Paul Mackerras <paulus@samba.org>,
+	Seth Jennings <sjennings@variantweb.net>,
+	Robert Jennings <rob@pochix.net>, linux-crypto@vger.kernel.org,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34706 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751365AbbEGL2R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 May 2015 07:28:17 -0400
-In-Reply-To: <554B3415.3060707@huawei.com>
+Received: from mail-ig0-f173.google.com ([209.85.213.173]:36500 "EHLO
+	mail-ig0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750793AbbEGPG1 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 7 May 2015 11:06:27 -0400
+In-Reply-To: <20150507031238.GC29395@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 7. Mai 2015, 17:44:53 schrieb Yao Dongdong:
+On Wed, May 6, 2015 at 11:12 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Wed, May 06, 2015 at 12:51:06PM -0400, Dan Streetman wrote:
+>> Add crypto compression alg for 842 hardware compression and decompression.
+>>
+>> This crypto compression alg is named "nx842" to indicate it uses hardware
+>> to perform the compression and decompression, while the software 842
+>> compression alg is named "sw842".  However, since before this split there
+>> was only one 842 compression alg named "842" which only used hardware,
+>> this is also aliased "842" for backwards compatibility.
+>
+> This should still be called 842.  You can set the driver name to
+> nx842 or 842-nx.
 
-Hi Yao,
+ah, ok, will do.
 
->while we use crypto api for userspace to do vectors test for AEAD(aes-gcm),
->we encounter a problem. There are some test vector's PTlen is 0,for example:
->[Keylen = 128]
->[IVlen = 96]
->[PTlen = 0]
->[AADlen = 0]
->[Taglen = 128]
->
->Count = 0
->Key = 7e93936b2e2188cfa9c9882ad901312f
->IV = b6879804163b9eaf5bfe5218
->CT =
->AAD =
->Tag = aa77daf382d0d63480ff8c8a2dee149e
->
->In testing vectors like that, we will get an error result that the decrypt
->return is success but the right return is a ghash verify fail.
->After digging into the kernel(3.10) code, we find the function sock_aio_read
->in net/socket.c has a judgement of iocb->ki_left which will be 0 when we
->do an aes-gcm decrypt decribed above.
->
->static ssize_t sock_aio_read(struct kiocb *iocb, const struct iovec *iov,
->                unsigned long nr_segs, loff_t pos)
->{
->    struct sock_iocb siocb, *x;
->
->    if (pos != 0)
->        return -ESPIPE;
->
->    if (iocb->ki_left == 0) /* Match SYS5 behaviour */
->        return 0;
->
->    x = alloc_sock_iocb(iocb, &siocb);
->    if (!x)
->        return -ENOMEM;
->    return do_sock_read(&x->async_msg, iocb, iocb->ki_filp, iov, nr_segs);
->}
->
->So it directly return before calling aes-gcm decrypt.
->
->How can we deal with that?
+So, I'm wondering about the common NX 842 frontend driver, for the
+pSeries and PowerNV platform drivers.  The current setup is:
 
-You cannot. Currently, the interface is not intended to handle such specific 
-CAVS conditions (zero CT and AAD). Note, this test effectively only validates 
-GHASH.
+[ crypto "842-nx" driver ]
+           v
+[ nx-842 main driver ]
+          v
+[ nx-842 pSeries driver | nx-842 PowerNV driver ]
 
-In any case, if you need to perform CAVS testing, you will only be able to do 
-that with a kernel module for all obscure operations CAVS requests (not only 
-for AEAD, but also for RNGs).
+The main reason for that is that the HW has specific constraints,
+specifically each input and output buffer passed to it for comp or
+decomp has to:
+-be located at a specific alignment
+-have a length of a specific multiple
+-have a length between a specific minimum and maximum
 
-Or you restrict your usage (and thus the CAVS testing) to CT/AAD lengths > 0.
+The crypto 842-nx has (significant) code in it to handle any alignment
+and length input buffers, to match them to what the driver requires.
+Would it be better to move that into the crypto code, so that any
+crypto compression hw driver can request buffers be specifically
+aligned/sized?  I did have to use a header on each compressed buffer
+that needed re-alignment or re-sizing, so maybe it's not appropriate
+for common crypto compression code.
 
+Since there doesn't seem to be any other hw compression drivers (yet),
+maybe it should stay in the 842-nx code, at least for now.  Hopefully
+any future compression hw won't have alignment or length multiple
+restrictions...
 
-Ciao
-Stephan
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
