@@ -1,10 +1,10 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 04/10] crypto: change 842 alg to use software
-Date: Thu, 7 May 2015 11:07:17 +0800
-Message-ID: <20150507030717.GB29395@gondor.apana.org.au>
+Subject: Re: [PATCH 10/10] drivers/crypto/nx: add hardware 842 crypto comp alg
+Date: Thu, 7 May 2015 11:12:38 +0800
+Message-ID: <20150507031238.GC29395@gondor.apana.org.au>
 References: <1428428070-17803-1-git-send-email-ddstreet@ieee.org>
  <1430931066-4536-1-git-send-email-ddstreet@ieee.org>
- <1430931066-4536-5-git-send-email-ddstreet@ieee.org>
+ <1430931066-4536-11-git-send-email-ddstreet@ieee.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -16,25 +16,27 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
 To: Dan Streetman <ddstreet@ieee.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:46516 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:42158 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751519AbbEGDHr (ORCPT
+	with ESMTP id S1752064AbbEGDNC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 6 May 2015 23:07:47 -0400
+	Wed, 6 May 2015 23:13:02 -0400
 Content-Disposition: inline
-In-Reply-To: <1430931066-4536-5-git-send-email-ddstreet@ieee.org>
+In-Reply-To: <1430931066-4536-11-git-send-email-ddstreet@ieee.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 06, 2015 at 12:51:00PM -0400, Dan Streetman wrote:
-> Change the crypto 842 compression alg to use the software 842 compression
-> and decompression library.  Change the name of this crypto alg to "sw842".
-> Remove the fallback to LZO compression.
+On Wed, May 06, 2015 at 12:51:06PM -0400, Dan Streetman wrote:
+> Add crypto compression alg for 842 hardware compression and decompression.
+> 
+> This crypto compression alg is named "nx842" to indicate it uses hardware
+> to perform the compression and decompression, while the software 842
+> compression alg is named "sw842".  However, since before this split there
+> was only one 842 compression alg named "842" which only used hardware,
+> this is also aliased "842" for backwards compatibility.
 
-That's not how the name works.  All implementations of 842 should
-bear that name.  They should differentiate themselves based on
-cra_driver_name.  For example, we generally call the software
-implementation of foo "foo-generic".
+This should still be called 842.  You can set the driver name to
+nx842 or 842-nx.
 
 Cheers,
 -- 
