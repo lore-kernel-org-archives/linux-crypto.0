@@ -1,11 +1,8 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 05/10] drivers/crypto/nx: rename nx-842.c to nx-842-pseries.c
-Date: Thu,  7 May 2015 13:49:16 -0400
-Message-ID: <1431020961-22285-6-git-send-email-ddstreet@ieee.org>
+Subject: [PATCH 08/10] drivers/crypto/nx: add PowerNV platform NX-842 driver
+Date: Thu,  7 May 2015 13:49:19 -0400
+Message-ID: <1431020961-22285-9-git-send-email-ddstreet@ieee.org>
 References: <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Seth Jennings <sjennings@variantweb.net>,
 	Robert Jennings <rob@pochix.net>, linux-crypto@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
@@ -16,57 +13,76 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
 	Paul Mackerras <paulus@samba.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ie0-f180.google.com ([209.85.223.180]:35333 "EHLO
-	mail-ie0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751846AbbEGRuB (ORCPT
+Received: from mail-ig0-f182.google.com ([209.85.213.182]:36224 "EHLO
+	mail-ig0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751870AbbEGRuG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 7 May 2015 13:50:01 -0400
+	Thu, 7 May 2015 13:50:06 -0400
 In-Reply-To: <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Move the entire NX-842 driver for the pSeries platform from the file
-nx-842.c to nx-842-pseries.c.  This is required by later patches that
-add NX-842 support for the PowerNV platform.
+Add driver for NX-842 hardware on the PowerNV platform.
 
-This patch does not alter the content of the pSeries NX-842 driver at
-all, it only changes the filename.
+This allows the use of the 842 compression hardware coprocessor on
+the PowerNV platform.
 
 Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- drivers/crypto/nx/Makefile         |    2 +-
- drivers/crypto/nx/nx-842-pseries.c | 1603 ++++++++++++++++++++++++++++=
-++++++++
- drivers/crypto/nx/nx-842.c         | 1603 ----------------------------=
---------
- 3 files changed, 1604 insertions(+), 1604 deletions(-)
- create mode 100644 drivers/crypto/nx/nx-842-pseries.c
- delete mode 100644 drivers/crypto/nx/nx-842.c
+ drivers/crypto/nx/Kconfig          |  10 +
+ drivers/crypto/nx/Makefile         |   2 +
+ drivers/crypto/nx/nx-842-powernv.c | 625 +++++++++++++++++++++++++++++++++++++
+ drivers/crypto/nx/nx-842-pseries.c |   9 -
+ drivers/crypto/nx/nx-842.c         |   4 +-
+ drivers/crypto/nx/nx-842.h         |  97 ++++++
+ include/linux/nx842.h              |   6 +-
+ 7 files changed, 741 insertions(+), 12 deletions(-)
+ create mode 100644 drivers/crypto/nx/nx-842-powernv.c
 
+diff --git a/drivers/crypto/nx/Kconfig b/drivers/crypto/nx/Kconfig
+index 34013f7..ee9e259 100644
+--- a/drivers/crypto/nx/Kconfig
++++ b/drivers/crypto/nx/Kconfig
+@@ -40,4 +40,14 @@ config CRYPTO_DEV_NX_COMPRESS_PSERIES
+ 	  algorithm.  This supports NX hardware on the pSeries platform.
+ 	  If you choose 'M' here, this module will be called nx_compress_pseries.
+ 
++config CRYPTO_DEV_NX_COMPRESS_POWERNV
++	tristate "Compression acceleration support on PowerNV platform"
++	depends on PPC_POWERNV
++	default y
++	help
++	  Support for PowerPC Nest (NX) compression acceleration. This
++	  module supports acceleration for compressing memory with the 842
++	  algorithm.  This supports NX hardware on the PowerNV platform.
++	  If you choose 'M' here, this module will be called nx_compress_powernv.
++
+ endif
 diff --git a/drivers/crypto/nx/Makefile b/drivers/crypto/nx/Makefile
-index bb770ea..8669ffa 100644
+index 5d9f4bc..6619787 100644
 --- a/drivers/crypto/nx/Makefile
 +++ b/drivers/crypto/nx/Makefile
-@@ -11,4 +11,4 @@ nx-crypto-objs :=3D nx.o \
- 		  nx-sha512.o
-=20
- obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS) +=3D nx-compress.o
--nx-compress-objs :=3D nx-842.o
-+nx-compress-objs :=3D nx-842-pseries.o
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-=
-842-pseries.c
+@@ -12,5 +12,7 @@ nx-crypto-objs := nx.o \
+ 
+ obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS) += nx-compress.o
+ obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_PSERIES) += nx-compress-pseries.o
++obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_POWERNV) += nx-compress-powernv.o
+ nx-compress-objs := nx-842.o
+ nx-compress-pseries-objs := nx-842-pseries.o
++nx-compress-powernv-objs := nx-842-powernv.o
+diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
 new file mode 100644
-index 0000000..887196e
+index 0000000..6a9fb8b
 --- /dev/null
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -0,0 +1,1603 @@
++++ b/drivers/crypto/nx/nx-842-powernv.c
+@@ -0,0 +1,625 @@
 +/*
-+ * Driver for IBM Power 842 compression accelerator
++ * Driver for IBM PowerNV 842 compression accelerator
 + *
-+ * This program is free software; you can redistribute it and/or modif=
-y
-+ * it under the terms of the GNU General Public License as published b=
-y
++ * Copyright (C) 2015 Dan Streetman, IBM Corp
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
 + * the Free Software Foundation; either version 2 of the License, or
 + * (at your option) any later version.
 + *
@@ -74,1819 +90,625 @@ y
 + * but WITHOUT ANY WARRANTY; without even the implied warranty of
 + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 + * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301=
-, USA.
-+ *
-+ * Copyright (C) IBM Corporation, 2012
-+ *
-+ * Authors: Robert Jennings <rcj@linux.vnet.ibm.com>
-+ *          Seth Jennings <sjenning@linux.vnet.ibm.com>
 + */
 +
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/nx842.h>
-+#include <linux/of.h>
-+#include <linux/slab.h>
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <asm/page.h>
-+#include <asm/vio.h>
++#include "nx-842.h"
 +
-+#include "nx_csbcpb.h" /* struct nx_csbcpb */
++#include <linux/timer.h>
 +
-+#define MODULE_NAME "nx-compress"
++#include <asm/prom.h>
++#include <asm/icswx.h>
++
++#define MODULE_NAME NX842_POWERNV_MODULE_NAME
 +MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Robert Jennings <rcj@linux.vnet.ibm.com>");
-+MODULE_DESCRIPTION("842 H/W Compression driver for IBM Power processor=
-s");
++MODULE_AUTHOR("Dan Streetman <ddstreet@ieee.org>");
++MODULE_DESCRIPTION("842 H/W Compression driver for IBM PowerNV processors");
 +
-+#define SHIFT_4K 12
-+#define SHIFT_64K 16
-+#define SIZE_4K (1UL << SHIFT_4K)
-+#define SIZE_64K (1UL << SHIFT_64K)
++#define WORKMEM_ALIGN	(CRB_ALIGN)
++#define CSB_WAIT_MAX	(5000) /* ms */
 +
-+/* IO buffer must be 128 byte aligned */
-+#define IO_BUFFER_ALIGN 128
-+
-+struct nx842_header {
-+	int blocks_nr; /* number of compressed blocks */
-+	int offset; /* offset of the first block (from beginning of header) *=
-/
-+	int sizes[0]; /* size of compressed blocks */
-+};
-+
-+static inline int nx842_header_size(const struct nx842_header *hdr)
-+{
-+	return sizeof(struct nx842_header) +
-+			hdr->blocks_nr * sizeof(hdr->sizes[0]);
-+}
-+
-+/* Macros for fields within nx_csbcpb */
-+/* Check the valid bit within the csbcpb valid field */
-+#define NX842_CSBCBP_VALID_CHK(x) (x & BIT_MASK(7))
-+
-+/* CE macros operate on the completion_extension field bits in the csb=
-cpb.
-+ * CE0 0=3Dfull completion, 1=3Dpartial completion
-+ * CE1 0=3DCE0 indicates completion, 1=3Dtermination (output may be mo=
-dified)
-+ * CE2 0=3Dprocessed_bytes is source bytes, 1=3Dprocessed_bytes is tar=
-get bytes */
-+#define NX842_CSBCPB_CE0(x)	(x & BIT_MASK(7))
-+#define NX842_CSBCPB_CE1(x)	(x & BIT_MASK(6))
-+#define NX842_CSBCPB_CE2(x)	(x & BIT_MASK(5))
-+
-+/* The NX unit accepts data only on 4K page boundaries */
-+#define NX842_HW_PAGE_SHIFT	SHIFT_4K
-+#define NX842_HW_PAGE_SIZE	(ASM_CONST(1) << NX842_HW_PAGE_SHIFT)
-+#define NX842_HW_PAGE_MASK	(~(NX842_HW_PAGE_SIZE-1))
-+
-+enum nx842_status {
-+	UNAVAILABLE,
-+	AVAILABLE
-+};
-+
-+struct ibm_nx842_counters {
-+	atomic64_t comp_complete;
-+	atomic64_t comp_failed;
-+	atomic64_t decomp_complete;
-+	atomic64_t decomp_failed;
-+	atomic64_t swdecomp;
-+	atomic64_t comp_times[32];
-+	atomic64_t decomp_times[32];
-+};
-+
-+static struct nx842_devdata {
-+	struct vio_dev *vdev;
-+	struct device *dev;
-+	struct ibm_nx842_counters *counters;
-+	unsigned int max_sg_len;
-+	unsigned int max_sync_size;
-+	unsigned int max_sync_sg;
-+	enum nx842_status status;
-+} __rcu *devdata;
-+static DEFINE_SPINLOCK(devdata_mutex);
-+
-+#define NX842_COUNTER_INC(_x) \
-+static inline void nx842_inc_##_x( \
-+	const struct nx842_devdata *dev) { \
-+	if (dev) \
-+		atomic64_inc(&dev->counters->_x); \
-+}
-+NX842_COUNTER_INC(comp_complete);
-+NX842_COUNTER_INC(comp_failed);
-+NX842_COUNTER_INC(decomp_complete);
-+NX842_COUNTER_INC(decomp_failed);
-+NX842_COUNTER_INC(swdecomp);
-+
-+#define NX842_HIST_SLOTS 16
-+
-+static void ibm_nx842_incr_hist(atomic64_t *times, unsigned int time)
-+{
-+	int bucket =3D fls(time);
-+
-+	if (bucket)
-+		bucket =3D min((NX842_HIST_SLOTS - 1), bucket - 1);
-+
-+	atomic64_inc(&times[bucket]);
-+}
-+
-+/* NX unit operation flags */
-+#define NX842_OP_COMPRESS	0x0
-+#define NX842_OP_CRC		0x1
-+#define NX842_OP_DECOMPRESS	0x2
-+#define NX842_OP_COMPRESS_CRC   (NX842_OP_COMPRESS | NX842_OP_CRC)
-+#define NX842_OP_DECOMPRESS_CRC (NX842_OP_DECOMPRESS | NX842_OP_CRC)
-+#define NX842_OP_ASYNC		(1<<23)
-+#define NX842_OP_NOTIFY		(1<<22)
-+#define NX842_OP_NOTIFY_INT(x)	((x & 0xff)<<8)
-+
-+static unsigned long nx842_get_desired_dma(struct vio_dev *viodev)
-+{
-+	/* No use of DMA mappings within the driver. */
-+	return 0;
-+}
-+
-+struct nx842_slentry {
-+	unsigned long ptr; /* Real address (use __pa()) */
-+	unsigned long len;
-+};
-+
-+/* pHyp scatterlist entry */
-+struct nx842_scatterlist {
-+	int entry_nr; /* number of slentries */
-+	struct nx842_slentry *entries; /* ptr to array of slentries */
-+};
-+
-+/* Does not include sizeof(entry_nr) in the size */
-+static inline unsigned long nx842_get_scatterlist_size(
-+				struct nx842_scatterlist *sl)
-+{
-+	return sl->entry_nr * sizeof(struct nx842_slentry);
-+}
-+
-+static inline unsigned long nx842_get_pa(void *addr)
-+{
-+	if (is_vmalloc_addr(addr))
-+		return page_to_phys(vmalloc_to_page(addr))
-+		       + offset_in_page(addr);
-+	else
-+		return __pa(addr);
-+}
-+
-+static int nx842_build_scatterlist(unsigned long buf, int len,
-+			struct nx842_scatterlist *sl)
-+{
-+	unsigned long nextpage;
-+	struct nx842_slentry *entry;
-+
-+	sl->entry_nr =3D 0;
-+
-+	entry =3D sl->entries;
-+	while (len) {
-+		entry->ptr =3D nx842_get_pa((void *)buf);
-+		nextpage =3D ALIGN(buf + 1, NX842_HW_PAGE_SIZE);
-+		if (nextpage < buf + len) {
-+			/* we aren't at the end yet */
-+			if (IS_ALIGNED(buf, NX842_HW_PAGE_SIZE))
-+				/* we are in the middle (or beginning) */
-+				entry->len =3D NX842_HW_PAGE_SIZE;
-+			else
-+				/* we are at the beginning */
-+				entry->len =3D nextpage - buf;
-+		} else {
-+			/* at the end */
-+			entry->len =3D len;
-+		}
-+
-+		len -=3D entry->len;
-+		buf +=3D entry->len;
-+		sl->entry_nr++;
-+		entry++;
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Working memory for software decompression
-+ */
-+struct sw842_fifo {
-+	union {
-+		char f8[256][8];
-+		char f4[512][4];
-+	};
-+	char f2[256][2];
-+	unsigned char f84_full;
-+	unsigned char f2_full;
-+	unsigned char f8_count;
-+	unsigned char f2_count;
-+	unsigned int f4_count;
-+};
-+
-+/*
-+ * Working memory for crypto API
-+ */
 +struct nx842_workmem {
-+	char bounce[PAGE_SIZE]; /* bounce buffer for decompression input */
-+	union {
-+		/* hardware working memory */
-+		struct {
-+			/* scatterlist */
-+			char slin[SIZE_4K];
-+			char slout[SIZE_4K];
-+			/* coprocessor status/parameter block */
-+			struct nx_csbcpb csbcpb;
-+		};
-+		/* software working memory */
-+		struct sw842_fifo swfifo; /* software decompression fifo */
-+	};
++	/* Below fields must be properly aligned */
++	struct coprocessor_request_block crb; /* CRB_ALIGN align */
++	struct data_descriptor_entry ddl_in[DDL_LEN_MAX]; /* DDE_ALIGN align */
++	struct data_descriptor_entry ddl_out[DDL_LEN_MAX]; /* DDE_ALIGN align */
++	/* Above fields must be properly aligned */
++
++	ktime_t start;
++
++	char padding[WORKMEM_ALIGN]; /* unused, to allow alignment */
++} __packed __aligned(WORKMEM_ALIGN);
++
++struct nx842_coproc {
++	unsigned int chip_id;
++	unsigned int ct;
++	unsigned int ci;
++	struct list_head list;
 +};
 +
-+int nx842_get_workmem_size(void)
++/* no cpu hotplug on powernv, so this list never changes after init */
++static LIST_HEAD(nx842_coprocs);
++static unsigned int nx842_ct;
++
++/**
++ * setup_indirect_dde - Setup an indirect DDE
++ *
++ * The DDE is setup with the the DDE count, byte count, and address of
++ * first direct DDE in the list.
++ */
++static void setup_indirect_dde(struct data_descriptor_entry *dde,
++			       struct data_descriptor_entry *ddl,
++			       unsigned int dde_count, unsigned int byte_count)
 +{
-+	return sizeof(struct nx842_workmem) + NX842_HW_PAGE_SIZE;
++	dde->flags = 0;
++	dde->count = dde_count;
++	dde->index = 0;
++	dde->length = cpu_to_be32(byte_count);
++	dde->address = cpu_to_be64(nx842_get_pa(ddl));
 +}
-+EXPORT_SYMBOL_GPL(nx842_get_workmem_size);
 +
-+int nx842_get_workmem_size_aligned(void)
++/**
++ * setup_direct_dde - Setup single DDE from buffer
++ *
++ * The DDE is setup with the buffer and length.  The buffer must be properly
++ * aligned.  The used length is returned.
++ * Returns:
++ *   N    Successfully set up DDE with N bytes
++ */
++static unsigned int setup_direct_dde(struct data_descriptor_entry *dde,
++				     unsigned long pa, unsigned int len)
 +{
-+	return sizeof(struct nx842_workmem);
++	unsigned int l = min_t(unsigned int, len, LEN_ON_PAGE(pa));
++
++	dde->flags = 0;
++	dde->count = 0;
++	dde->index = 0;
++	dde->length = cpu_to_be32(l);
++	dde->address = cpu_to_be64(pa);
++
++	return l;
 +}
-+EXPORT_SYMBOL_GPL(nx842_get_workmem_size_aligned);
 +
-+static int nx842_validate_result(struct device *dev,
-+	struct cop_status_block *csb)
++/**
++ * setup_ddl - Setup DDL from buffer
++ *
++ * Returns:
++ *   0		Successfully set up DDL
++ */
++static int setup_ddl(struct data_descriptor_entry *dde,
++		     struct data_descriptor_entry *ddl,
++		     unsigned char *buf, unsigned int len,
++		     bool in)
 +{
-+	/* The csb must be valid after returning from vio_h_cop_sync */
-+	if (!NX842_CSBCBP_VALID_CHK(csb->valid)) {
-+		dev_err(dev, "%s: cspcbp not valid upon completion.\n",
-+				__func__);
-+		dev_dbg(dev, "valid:0x%02x cs:0x%02x cc:0x%02x ce:0x%02x\n",
-+				csb->valid,
-+				csb->crb_seq_number,
-+				csb->completion_code,
-+				csb->completion_extension);
-+		dev_dbg(dev, "processed_bytes:%d address:0x%016lx\n",
-+				csb->processed_byte_count,
-+				(unsigned long)csb->address);
-+		return -EIO;
-+	}
++	unsigned long pa = nx842_get_pa(buf);
++	int i, ret, total_len = len;
 +
-+	/* Check return values from the hardware in the CSB */
-+	switch (csb->completion_code) {
-+	case 0:	/* Completed without error */
-+		break;
-+	case 64: /* Target bytes > Source bytes during compression */
-+	case 13: /* Output buffer too small */
-+		dev_dbg(dev, "%s: Compression output larger than input\n",
-+					__func__);
-+		return -ENOSPC;
-+	case 66: /* Input data contains an illegal template field */
-+	case 67: /* Template indicates data past the end of the input stream =
-*/
-+		dev_dbg(dev, "%s: Bad data for decompression (code:%d)\n",
-+					__func__, csb->completion_code);
++	if (!IS_ALIGNED(pa, DDE_BUFFER_ALIGN)) {
++		pr_debug("%s buffer pa 0x%lx not 0x%x-byte aligned\n",
++			 in ? "input" : "output", pa, DDE_BUFFER_ALIGN);
 +		return -EINVAL;
-+	default:
-+		dev_dbg(dev, "%s: Unspecified error (code:%d)\n",
-+					__func__, csb->completion_code);
-+		return -EIO;
 +	}
 +
-+	/* Hardware sanity check */
-+	if (!NX842_CSBCPB_CE2(csb->completion_extension)) {
-+		dev_err(dev, "%s: No error returned by hardware, but "
-+				"data returned is unusable, contact support.\n"
-+				"(Additional info: csbcbp->processed bytes "
-+				"does not specify processed bytes for the "
-+				"target buffer.)\n", __func__);
-+		return -EIO;
++	/* only need to check last mult; since buffer must be
++	 * DDE_BUFFER_ALIGN aligned, and that is a multiple of
++	 * DDE_BUFFER_SIZE_MULT, and pre-last page DDE buffers
++	 * are guaranteed a multiple of DDE_BUFFER_SIZE_MULT.
++	 */
++	if (len % DDE_BUFFER_LAST_MULT) {
++		pr_debug("%s buffer len 0x%x not a multiple of 0x%x\n",
++			 in ? "input" : "output", len, DDE_BUFFER_LAST_MULT);
++		if (in)
++			return -EINVAL;
++		len = round_down(len, DDE_BUFFER_LAST_MULT);
 +	}
++
++	/* use a single direct DDE */
++	if (len <= LEN_ON_PAGE(pa)) {
++		ret = setup_direct_dde(dde, pa, len);
++		WARN_ON(ret < len);
++		return 0;
++	}
++
++	/* use the DDL */
++	for (i = 0; i < DDL_LEN_MAX && len > 0; i++) {
++		ret = setup_direct_dde(&ddl[i], pa, len);
++		buf += ret;
++		len -= ret;
++		pa = nx842_get_pa(buf);
++	}
++
++	if (len > 0) {
++		pr_debug("0x%x total %s bytes 0x%x too many for DDL.\n",
++			 total_len, in ? "input" : "output", len);
++		if (in)
++			return -EMSGSIZE;
++		total_len -= len;
++	}
++	setup_indirect_dde(dde, ddl, i, total_len);
++
++	return 0;
++}
++
++#define CSB_ERR(csb, msg, ...)					\
++	pr_err("ERROR: " msg " : %02x %02x %02x %02x %08x\n",	\
++	       ##__VA_ARGS__, (csb)->flags,			\
++	       (csb)->cs, (csb)->cc, (csb)->ce,			\
++	       be32_to_cpu((csb)->count))
++
++#define CSB_ERR_ADDR(csb, msg, ...)				\
++	CSB_ERR(csb, msg " at %lx", ##__VA_ARGS__,		\
++		(unsigned long)be64_to_cpu((csb)->address))
++
++/**
++ * wait_for_csb
++ */
++static int wait_for_csb(struct nx842_workmem *wmem,
++			struct coprocessor_status_block *csb)
++{
++	ktime_t start = wmem->start, now = ktime_get();
++	ktime_t timeout = ktime_add_ms(start, CSB_WAIT_MAX);
++
++	while (!(ACCESS_ONCE(csb->flags) & CSB_V)) {
++		cpu_relax();
++		now = ktime_get();
++		if (ktime_after(now, timeout))
++			break;
++	}
++
++	/* hw has updated csb and output buffer */
++	barrier();
++
++	/* check CSB flags */
++	if (!(csb->flags & CSB_V)) {
++		CSB_ERR(csb, "CSB still not valid after %ld us, giving up",
++			(long)ktime_us_delta(now, start));
++		return -ETIMEDOUT;
++	}
++	if (csb->flags & CSB_F) {
++		CSB_ERR(csb, "Invalid CSB format");
++		return -EPROTO;
++	}
++	if (csb->flags & CSB_CH) {
++		CSB_ERR(csb, "Invalid CSB chaining state");
++		return -EPROTO;
++	}
++
++	/* verify CSB completion sequence is 0 */
++	if (csb->cs) {
++		CSB_ERR(csb, "Invalid CSB completion sequence");
++		return -EPROTO;
++	}
++
++	/* check CSB Completion Code */
++	switch (csb->cc) {
++	/* no error */
++	case CSB_CC_SUCCESS:
++		break;
++	case CSB_CC_TPBC_GT_SPBC:
++		/* not an error, but the compressed data is
++		 * larger than the uncompressed data :(
++		 */
++		break;
++
++	/* input data errors */
++	case CSB_CC_OPERAND_OVERLAP:
++		/* input and output buffers overlap */
++		CSB_ERR(csb, "Operand Overlap error");
++		return -EINVAL;
++	case CSB_CC_INVALID_OPERAND:
++		CSB_ERR(csb, "Invalid operand");
++		return -EINVAL;
++	case CSB_CC_NOSPC:
++		/* output buffer too small */
++		return -ENOSPC;
++	case CSB_CC_ABORT:
++		CSB_ERR(csb, "Function aborted");
++		return -EINTR;
++	case CSB_CC_CRC_MISMATCH:
++		CSB_ERR(csb, "CRC mismatch");
++		return -EINVAL;
++	case CSB_CC_TEMPL_INVALID:
++		CSB_ERR(csb, "Compressed data template invalid");
++		return -EINVAL;
++	case CSB_CC_TEMPL_OVERFLOW:
++		CSB_ERR(csb, "Compressed data template shows data past end");
++		return -EINVAL;
++
++	/* these should not happen */
++	case CSB_CC_INVALID_ALIGN:
++		/* setup_ddl should have detected this */
++		CSB_ERR_ADDR(csb, "Invalid alignment");
++		return -EINVAL;
++	case CSB_CC_DATA_LENGTH:
++		/* setup_ddl should have detected this */
++		CSB_ERR(csb, "Invalid data length");
++		return -EINVAL;
++	case CSB_CC_WR_TRANSLATION:
++	case CSB_CC_TRANSLATION:
++	case CSB_CC_TRANSLATION_DUP1:
++	case CSB_CC_TRANSLATION_DUP2:
++	case CSB_CC_TRANSLATION_DUP3:
++	case CSB_CC_TRANSLATION_DUP4:
++	case CSB_CC_TRANSLATION_DUP5:
++	case CSB_CC_TRANSLATION_DUP6:
++		/* should not happen, we use physical addrs */
++		CSB_ERR_ADDR(csb, "Translation error");
++		return -EPROTO;
++	case CSB_CC_WR_PROTECTION:
++	case CSB_CC_PROTECTION:
++	case CSB_CC_PROTECTION_DUP1:
++	case CSB_CC_PROTECTION_DUP2:
++	case CSB_CC_PROTECTION_DUP3:
++	case CSB_CC_PROTECTION_DUP4:
++	case CSB_CC_PROTECTION_DUP5:
++	case CSB_CC_PROTECTION_DUP6:
++		/* should not happen, we use physical addrs */
++		CSB_ERR_ADDR(csb, "Protection error");
++		return -EPROTO;
++	case CSB_CC_PRIVILEGE:
++		/* shouldn't happen, we're in HYP mode */
++		CSB_ERR(csb, "Insufficient Privilege error");
++		return -EPROTO;
++	case CSB_CC_EXCESSIVE_DDE:
++		/* shouldn't happen, setup_ddl doesn't use many dde's */
++		CSB_ERR(csb, "Too many DDEs in DDL");
++		return -EINVAL;
++	case CSB_CC_TRANSPORT:
++		/* shouldn't happen, we setup CRB correctly */
++		CSB_ERR(csb, "Invalid CRB");
++		return -EINVAL;
++	case CSB_CC_SEGMENTED_DDL:
++		/* shouldn't happen, setup_ddl creates DDL right */
++		CSB_ERR(csb, "Segmented DDL error");
++		return -EINVAL;
++	case CSB_CC_DDE_OVERFLOW:
++		/* shouldn't happen, setup_ddl creates DDL right */
++		CSB_ERR(csb, "DDE overflow error");
++		return -EINVAL;
++	case CSB_CC_SESSION:
++		/* should not happen with ICSWX */
++		CSB_ERR(csb, "Session violation error");
++		return -EPROTO;
++	case CSB_CC_CHAIN:
++		/* should not happen, we don't use chained CRBs */
++		CSB_ERR(csb, "Chained CRB error");
++		return -EPROTO;
++	case CSB_CC_SEQUENCE:
++		/* should not happen, we don't use chained CRBs */
++		CSB_ERR(csb, "CRB seqeunce number error");
++		return -EPROTO;
++	case CSB_CC_UNKNOWN_CODE:
++		CSB_ERR(csb, "Unknown subfunction code");
++		return -EPROTO;
++
++	/* hardware errors */
++	case CSB_CC_RD_EXTERNAL:
++	case CSB_CC_RD_EXTERNAL_DUP1:
++	case CSB_CC_RD_EXTERNAL_DUP2:
++	case CSB_CC_RD_EXTERNAL_DUP3:
++		CSB_ERR_ADDR(csb, "Read error outside coprocessor");
++		return -EPROTO;
++	case CSB_CC_WR_EXTERNAL:
++		CSB_ERR_ADDR(csb, "Write error outside coprocessor");
++		return -EPROTO;
++	case CSB_CC_INTERNAL:
++		CSB_ERR(csb, "Internal error in coprocessor");
++		return -EPROTO;
++	case CSB_CC_PROVISION:
++		CSB_ERR(csb, "Storage provision error");
++		return -EPROTO;
++	case CSB_CC_HW:
++		CSB_ERR(csb, "Correctable hardware error");
++		return -EPROTO;
++
++	default:
++		CSB_ERR(csb, "Invalid CC %d", csb->cc);
++		return -EPROTO;
++	}
++
++	/* check Completion Extension state */
++	if (csb->ce & CSB_CE_TERMINATION) {
++		CSB_ERR(csb, "CSB request was terminated");
++		return -EPROTO;
++	}
++	if (csb->ce & CSB_CE_INCOMPLETE) {
++		CSB_ERR(csb, "CSB request not complete");
++		return -EPROTO;
++	}
++	if (!(csb->ce & CSB_CE_TPBC)) {
++		CSB_ERR(csb, "TPBC not provided, unknown target length");
++		return -EPROTO;
++	}
++
++	/* successful completion */
++	pr_debug_ratelimited("Processed %u bytes in %lu us\n", csb->count,
++			     (unsigned long)ktime_us_delta(now, start));
 +
 +	return 0;
 +}
 +
 +/**
-+ * nx842_compress - Compress data using the 842 algorithm
++ * nx842_powernv_function - compress/decompress data using the 842 algorithm
 + *
-+ * Compression provide by the NX842 coprocessor on IBM Power systems.
++ * (De)compression provided by the NX842 coprocessor on IBM PowerNV systems.
++ * This compresses or decompresses the provided input buffer into the provided
++ * output buffer.
++ *
++ * Upon return from this function @outlen contains the length of the
++ * output data.  If there is an error then @outlen will be 0 and an
++ * error will be specified by the return code from this function.
++ *
++ * The @workmem buffer should only be used by one function call at a time.
++ *
++ * @in: input buffer pointer
++ * @inlen: input buffer size
++ * @out: output buffer pointer
++ * @outlenp: output buffer size pointer
++ * @workmem: working memory buffer pointer, must be at least NX842_MEM_COMPRESS
++ * @fc: function code, see CCW Function Codes in nx-842.h
++ *
++ * Returns:
++ *   0		Success, output of length @outlenp stored in the buffer at @out
++ *   -ENODEV	Hardware unavailable
++ *   -ENOSPC	Output buffer is to small
++ *   -EMSGSIZE	Input buffer too large
++ *   -EINVAL	buffer constraints do not fix nx842_constraints
++ *   -EPROTO	hardware error during operation
++ *   -ETIMEDOUT	hardware did not complete operation in reasonable time
++ *   -EINTR	operation was aborted
++ */
++static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
++				  unsigned char *out, unsigned int *outlenp,
++				  void *workmem, int fc)
++{
++	struct coprocessor_request_block *crb;
++	struct coprocessor_status_block *csb;
++	struct nx842_workmem *wmem;
++	int ret;
++	u64 csb_addr;
++	u32 ccw;
++	unsigned int outlen = *outlenp;
++
++	wmem = PTR_ALIGN(workmem, WORKMEM_ALIGN);
++
++	*outlenp = 0;
++
++	/* shoudn't happen, we don't load without a coproc */
++	if (!nx842_ct) {
++		pr_err_ratelimited("coprocessor CT is 0");
++		return -ENODEV;
++	}
++
++	crb = &wmem->crb;
++	csb = &crb->csb;
++
++	/* Clear any previous values */
++	memset(crb, 0, sizeof(*crb));
++
++	/* set up DDLs */
++	ret = setup_ddl(&crb->source, wmem->ddl_in,
++			(unsigned char *)in, inlen, true);
++	if (ret)
++		return ret;
++	ret = setup_ddl(&crb->target, wmem->ddl_out,
++			out, outlen, false);
++	if (ret)
++		return ret;
++
++	/* set up CCW */
++	ccw = 0;
++	ccw = SET_FIELD(ccw, CCW_CT, nx842_ct);
++	ccw = SET_FIELD(ccw, CCW_CI_842, 0); /* use 0 for hw auto-selection */
++	ccw = SET_FIELD(ccw, CCW_FC_842, fc);
++
++	/* set up CRB's CSB addr */
++	csb_addr = nx842_get_pa(csb) & CRB_CSB_ADDRESS;
++	csb_addr |= CRB_CSB_AT; /* Addrs are phys */
++	crb->csb_addr = cpu_to_be64(csb_addr);
++
++	wmem->start = ktime_get();
++
++	/* do ICSWX */
++	ret = icswx(cpu_to_be32(ccw), crb);
++
++	pr_debug_ratelimited("icswx CR %x ccw %x crb->ccw %x\n", ret,
++			     (unsigned int)ccw,
++			     (unsigned int)be32_to_cpu(crb->ccw));
++
++	switch (ret) {
++	case ICSWX_INITIATED:
++		ret = wait_for_csb(wmem, csb);
++		break;
++	case ICSWX_BUSY:
++		pr_debug_ratelimited("842 Coprocessor busy\n");
++		ret = -EBUSY;
++		break;
++	case ICSWX_REJECTED:
++		pr_err_ratelimited("ICSWX rejected\n");
++		ret = -EPROTO;
++		break;
++	default:
++		pr_err_ratelimited("Invalid ICSWX return code %x\n", ret);
++		ret = -EPROTO;
++		break;
++	}
++
++	if (!ret)
++		*outlenp = be32_to_cpu(csb->count);
++
++	return ret;
++}
++
++/**
++ * nx842_powernv_compress - Compress data using the 842 algorithm
++ *
++ * Compression provided by the NX842 coprocessor on IBM PowerNV systems.
 + * The input buffer is compressed and the result is stored in the
 + * provided output buffer.
 + *
 + * Upon return from this function @outlen contains the length of the
-+ * compressed data.  If there is an error then @outlen will be 0 and a=
-n
++ * compressed data.  If there is an error then @outlen will be 0 and an
 + * error will be specified by the return code from this function.
 + *
-+ * @in: Pointer to input buffer, must be page aligned
-+ * @inlen: Length of input buffer, must be PAGE_SIZE
-+ * @out: Pointer to output buffer
-+ * @outlen: Length of output buffer
-+ * @wrkmem: ptr to buffer for working memory, size determined by
-+ *          nx842_get_workmem_size()
++ * @in: input buffer pointer
++ * @inlen: input buffer size
++ * @out: output buffer pointer
++ * @outlenp: output buffer size pointer
++ * @workmem: working memory buffer pointer, must be at least NX842_MEM_COMPRESS
 + *
-+ * Returns:
-+ *   0		Success, output of length @outlen stored in the buffer at @out
-+ *   -ENOMEM	Unable to allocate internal buffers
-+ *   -ENOSPC	Output buffer is to small
-+ *   -EMSGSIZE	XXX Difficult to describe this limitation
-+ *   -EIO	Internal error
-+ *   -ENODEV	Hardware unavailable
++ * Returns: see @nx842_powernv_function()
 + */
-+int nx842_compress(const unsigned char *in, unsigned int inlen,
-+		       unsigned char *out, unsigned int *outlen, void *wmem)
++static int nx842_powernv_compress(const unsigned char *in, unsigned int inlen,
++				  unsigned char *out, unsigned int *outlenp,
++				  void *wmem)
 +{
-+	struct nx842_header *hdr;
-+	struct nx842_devdata *local_devdata;
-+	struct device *dev =3D NULL;
-+	struct nx842_workmem *workmem;
-+	struct nx842_scatterlist slin, slout;
-+	struct nx_csbcpb *csbcpb;
-+	int ret =3D 0, max_sync_size, i, bytesleft, size, hdrsize;
-+	unsigned long inbuf, outbuf, padding;
-+	struct vio_pfo_op op =3D {
-+		.done =3D NULL,
-+		.handle =3D 0,
-+		.timeout =3D 0,
-+	};
-+	unsigned long start_time =3D get_tb();
-+
-+	/*
-+	 * Make sure input buffer is 64k page aligned.  This is assumed since
-+	 * this driver is designed for page compression only (for now).  This
-+	 * is very nice since we can now use direct DDE(s) for the input and
-+	 * the alignment is guaranteed.
-+	*/
-+	inbuf =3D (unsigned long)in;
-+	if (!IS_ALIGNED(inbuf, PAGE_SIZE) || inlen !=3D PAGE_SIZE)
-+		return -EINVAL;
-+
-+	rcu_read_lock();
-+	local_devdata =3D rcu_dereference(devdata);
-+	if (!local_devdata || !local_devdata->dev) {
-+		rcu_read_unlock();
-+		return -ENODEV;
-+	}
-+	max_sync_size =3D local_devdata->max_sync_size;
-+	dev =3D local_devdata->dev;
-+
-+	/* Create the header */
-+	hdr =3D (struct nx842_header *)out;
-+	hdr->blocks_nr =3D PAGE_SIZE / max_sync_size;
-+	hdrsize =3D nx842_header_size(hdr);
-+	outbuf =3D (unsigned long)out + hdrsize;
-+	bytesleft =3D *outlen - hdrsize;
-+
-+	/* Init scatterlist */
-+	workmem =3D (struct nx842_workmem *)ALIGN((unsigned long)wmem,
-+		NX842_HW_PAGE_SIZE);
-+	slin.entries =3D (struct nx842_slentry *)workmem->slin;
-+	slout.entries =3D (struct nx842_slentry *)workmem->slout;
-+
-+	/* Init operation */
-+	op.flags =3D NX842_OP_COMPRESS;
-+	csbcpb =3D &workmem->csbcpb;
-+	memset(csbcpb, 0, sizeof(*csbcpb));
-+	op.csbcpb =3D nx842_get_pa(csbcpb);
-+	op.out =3D nx842_get_pa(slout.entries);
-+
-+	for (i =3D 0; i < hdr->blocks_nr; i++) {
-+		/*
-+		 * Aligning the output blocks to 128 bytes does waste space,
-+		 * but it prevents the need for bounce buffers and memory
-+		 * copies.  It also simplifies the code a lot.  In the worst
-+		 * case (64k page, 4k max_sync_size), you lose up to
-+		 * (128*16)/64k =3D ~3% the compression factor. For 64k
-+		 * max_sync_size, the loss would be at most 128/64k =3D ~0.2%.
-+		 */
-+		padding =3D ALIGN(outbuf, IO_BUFFER_ALIGN) - outbuf;
-+		outbuf +=3D padding;
-+		bytesleft -=3D padding;
-+		if (i =3D=3D 0)
-+			/* save offset into first block in header */
-+			hdr->offset =3D padding + hdrsize;
-+
-+		if (bytesleft <=3D 0) {
-+			ret =3D -ENOSPC;
-+			goto unlock;
-+		}
-+
-+		/*
-+		 * NOTE: If the default max_sync_size is changed from 4k
-+		 * to 64k, remove the "likely" case below, since a
-+		 * scatterlist will always be needed.
-+		 */
-+		if (likely(max_sync_size =3D=3D NX842_HW_PAGE_SIZE)) {
-+			/* Create direct DDE */
-+			op.in =3D nx842_get_pa((void *)inbuf);
-+			op.inlen =3D max_sync_size;
-+
-+		} else {
-+			/* Create indirect DDE (scatterlist) */
-+			nx842_build_scatterlist(inbuf, max_sync_size, &slin);
-+			op.in =3D nx842_get_pa(slin.entries);
-+			op.inlen =3D -nx842_get_scatterlist_size(&slin);
-+		}
-+
-+		/*
-+		 * If max_sync_size !=3D NX842_HW_PAGE_SIZE, an indirect
-+		 * DDE is required for the outbuf.
-+		 * If max_sync_size =3D=3D NX842_HW_PAGE_SIZE, outbuf must
-+		 * also be page aligned (1 in 128/4k=3D32 chance) in order
-+		 * to use a direct DDE.
-+		 * This is unlikely, just use an indirect DDE always.
-+		 */
-+		nx842_build_scatterlist(outbuf,
-+			min(bytesleft, max_sync_size), &slout);
-+		/* op.out set before loop */
-+		op.outlen =3D -nx842_get_scatterlist_size(&slout);
-+
-+		/* Send request to pHyp */
-+		ret =3D vio_h_cop_sync(local_devdata->vdev, &op);
-+
-+		/* Check for pHyp error */
-+		if (ret) {
-+			dev_dbg(dev, "%s: vio_h_cop_sync error (ret=3D%d, hret=3D%ld)\n",
-+				__func__, ret, op.hcall_err);
-+			ret =3D -EIO;
-+			goto unlock;
-+		}
-+
-+		/* Check for hardware error */
-+		ret =3D nx842_validate_result(dev, &csbcpb->csb);
-+		if (ret && ret !=3D -ENOSPC)
-+			goto unlock;
-+
-+		/* Handle incompressible data */
-+		if (unlikely(ret =3D=3D -ENOSPC)) {
-+			if (bytesleft < max_sync_size) {
-+				/*
-+				 * Not enough space left in the output buffer
-+				 * to store uncompressed block
-+				 */
-+				goto unlock;
-+			} else {
-+				/* Store incompressible block */
-+				memcpy((void *)outbuf, (void *)inbuf,
-+					max_sync_size);
-+				hdr->sizes[i] =3D -max_sync_size;
-+				outbuf +=3D max_sync_size;
-+				bytesleft -=3D max_sync_size;
-+				/* Reset ret, incompressible data handled */
-+				ret =3D 0;
-+			}
-+		} else {
-+			/* Normal case, compression was successful */
-+			size =3D csbcpb->csb.processed_byte_count;
-+			dev_dbg(dev, "%s: processed_bytes=3D%d\n",
-+				__func__, size);
-+			hdr->sizes[i] =3D size;
-+			outbuf +=3D size;
-+			bytesleft -=3D size;
-+		}
-+
-+		inbuf +=3D max_sync_size;
-+	}
-+
-+	*outlen =3D (unsigned int)(outbuf - (unsigned long)out);
-+
-+unlock:
-+	if (ret)
-+		nx842_inc_comp_failed(local_devdata);
-+	else {
-+		nx842_inc_comp_complete(local_devdata);
-+		ibm_nx842_incr_hist(local_devdata->counters->comp_times,
-+			(get_tb() - start_time) / tb_ticks_per_usec);
-+	}
-+	rcu_read_unlock();
-+	return ret;
++	return nx842_powernv_function(in, inlen, out, outlenp,
++				      wmem, CCW_FC_842_COMP_NOCRC);
 +}
-+EXPORT_SYMBOL_GPL(nx842_compress);
-+
-+static int sw842_decompress(const unsigned char *, int, unsigned char =
-*, int *,
-+			const void *);
 +
 +/**
-+ * nx842_decompress - Decompress data using the 842 algorithm
++ * nx842_powernv_decompress - Decompress data using the 842 algorithm
 + *
-+ * Decompression provide by the NX842 coprocessor on IBM Power systems=
-=2E
++ * Decompression provided by the NX842 coprocessor on IBM PowerNV systems.
 + * The input buffer is decompressed and the result is stored in the
-+ * provided output buffer.  The size allocated to the output buffer is
-+ * provided by the caller of this function in @outlen.  Upon return fr=
-om
-+ * this function @outlen contains the length of the decompressed data.
-+ * If there is an error then @outlen will be 0 and an error will be
-+ * specified by the return code from this function.
++ * provided output buffer.
 + *
-+ * @in: Pointer to input buffer, will use bounce buffer if not 128 byt=
-e
-+ *      aligned
-+ * @inlen: Length of input buffer
-+ * @out: Pointer to output buffer, must be page aligned
-+ * @outlen: Length of output buffer, must be PAGE_SIZE
-+ * @wrkmem: ptr to buffer for working memory, size determined by
-+ *          nx842_get_workmem_size()
++ * Upon return from this function @outlen contains the length of the
++ * decompressed data.  If there is an error then @outlen will be 0 and an
++ * error will be specified by the return code from this function.
 + *
-+ * Returns:
-+ *   0		Success, output of length @outlen stored in the buffer at @out
-+ *   -ENODEV	Hardware decompression device is unavailable
-+ *   -ENOMEM	Unable to allocate internal buffers
-+ *   -ENOSPC	Output buffer is to small
-+ *   -EINVAL	Bad input data encountered when attempting decompress
-+ *   -EIO	Internal error
++ * @in: input buffer pointer
++ * @inlen: input buffer size
++ * @out: output buffer pointer
++ * @outlenp: output buffer size pointer
++ * @workmem: working memory buffer pointer, must be at least NX842_MEM_COMPRESS
++ *
++ * Returns: see @nx842_powernv_function()
 + */
-+int nx842_decompress(const unsigned char *in, unsigned int inlen,
-+			 unsigned char *out, unsigned int *outlen, void *wmem)
++static int nx842_powernv_decompress(const unsigned char *in, unsigned int inlen,
++				    unsigned char *out, unsigned int *outlenp,
++				    void *wmem)
 +{
-+	struct nx842_header *hdr;
-+	struct nx842_devdata *local_devdata;
-+	struct device *dev =3D NULL;
-+	struct nx842_workmem *workmem;
-+	struct nx842_scatterlist slin, slout;
-+	struct nx_csbcpb *csbcpb;
-+	int ret =3D 0, i, size, max_sync_size;
-+	unsigned long inbuf, outbuf;
-+	struct vio_pfo_op op =3D {
-+		.done =3D NULL,
-+		.handle =3D 0,
-+		.timeout =3D 0,
-+	};
-+	unsigned long start_time =3D get_tb();
++	return nx842_powernv_function(in, inlen, out, outlenp,
++				      wmem, CCW_FC_842_DECOMP_NOCRC);
++}
 +
-+	/* Ensure page alignment and size */
-+	outbuf =3D (unsigned long)out;
-+	if (!IS_ALIGNED(outbuf, PAGE_SIZE) || *outlen !=3D PAGE_SIZE)
++static int __init nx842_powernv_probe(struct device_node *dn)
++{
++	struct nx842_coproc *coproc;
++	struct property *ct_prop, *ci_prop;
++	unsigned int ct, ci;
++	int chip_id;
++
++	chip_id = of_get_ibm_chip_id(dn);
++	if (chip_id < 0) {
++		pr_err("ibm,chip-id missing\n");
 +		return -EINVAL;
-+
-+	rcu_read_lock();
-+	local_devdata =3D rcu_dereference(devdata);
-+	if (local_devdata)
-+		dev =3D local_devdata->dev;
-+
-+	/* Get header */
-+	hdr =3D (struct nx842_header *)in;
-+
-+	workmem =3D (struct nx842_workmem *)ALIGN((unsigned long)wmem,
-+		NX842_HW_PAGE_SIZE);
-+
-+	inbuf =3D (unsigned long)in + hdr->offset;
-+	if (likely(!IS_ALIGNED(inbuf, IO_BUFFER_ALIGN))) {
-+		/* Copy block(s) into bounce buffer for alignment */
-+		memcpy(workmem->bounce, in + hdr->offset, inlen - hdr->offset);
-+		inbuf =3D (unsigned long)workmem->bounce;
 +	}
-+
-+	/* Init scatterlist */
-+	slin.entries =3D (struct nx842_slentry *)workmem->slin;
-+	slout.entries =3D (struct nx842_slentry *)workmem->slout;
-+
-+	/* Init operation */
-+	op.flags =3D NX842_OP_DECOMPRESS;
-+	csbcpb =3D &workmem->csbcpb;
-+	memset(csbcpb, 0, sizeof(*csbcpb));
-+	op.csbcpb =3D nx842_get_pa(csbcpb);
-+
-+	/*
-+	 * max_sync_size may have changed since compression,
-+	 * so we can't read it from the device info. We need
-+	 * to derive it from hdr->blocks_nr.
-+	 */
-+	max_sync_size =3D PAGE_SIZE / hdr->blocks_nr;
-+
-+	for (i =3D 0; i < hdr->blocks_nr; i++) {
-+		/* Skip padding */
-+		inbuf =3D ALIGN(inbuf, IO_BUFFER_ALIGN);
-+
-+		if (hdr->sizes[i] < 0) {
-+			/* Negative sizes indicate uncompressed data blocks */
-+			size =3D abs(hdr->sizes[i]);
-+			memcpy((void *)outbuf, (void *)inbuf, size);
-+			outbuf +=3D size;
-+			inbuf +=3D size;
-+			continue;
-+		}
-+
-+		if (!dev)
-+			goto sw;
-+
-+		/*
-+		 * The better the compression, the more likely the "likely"
-+		 * case becomes.
-+		 */
-+		if (likely((inbuf & NX842_HW_PAGE_MASK) =3D=3D
-+			((inbuf + hdr->sizes[i] - 1) & NX842_HW_PAGE_MASK))) {
-+			/* Create direct DDE */
-+			op.in =3D nx842_get_pa((void *)inbuf);
-+			op.inlen =3D hdr->sizes[i];
-+		} else {
-+			/* Create indirect DDE (scatterlist) */
-+			nx842_build_scatterlist(inbuf, hdr->sizes[i] , &slin);
-+			op.in =3D nx842_get_pa(slin.entries);
-+			op.inlen =3D -nx842_get_scatterlist_size(&slin);
-+		}
-+
-+		/*
-+		 * NOTE: If the default max_sync_size is changed from 4k
-+		 * to 64k, remove the "likely" case below, since a
-+		 * scatterlist will always be needed.
-+		 */
-+		if (likely(max_sync_size =3D=3D NX842_HW_PAGE_SIZE)) {
-+			/* Create direct DDE */
-+			op.out =3D nx842_get_pa((void *)outbuf);
-+			op.outlen =3D max_sync_size;
-+		} else {
-+			/* Create indirect DDE (scatterlist) */
-+			nx842_build_scatterlist(outbuf, max_sync_size, &slout);
-+			op.out =3D nx842_get_pa(slout.entries);
-+			op.outlen =3D -nx842_get_scatterlist_size(&slout);
-+		}
-+
-+		/* Send request to pHyp */
-+		ret =3D vio_h_cop_sync(local_devdata->vdev, &op);
-+
-+		/* Check for pHyp error */
-+		if (ret) {
-+			dev_dbg(dev, "%s: vio_h_cop_sync error (ret=3D%d, hret=3D%ld)\n",
-+				__func__, ret, op.hcall_err);
-+			dev =3D NULL;
-+			goto sw;
-+		}
-+
-+		/* Check for hardware error */
-+		ret =3D nx842_validate_result(dev, &csbcpb->csb);
-+		if (ret) {
-+			dev =3D NULL;
-+			goto sw;
-+		}
-+
-+		/* HW decompression success */
-+		inbuf +=3D hdr->sizes[i];
-+		outbuf +=3D csbcpb->csb.processed_byte_count;
-+		continue;
-+
-+sw:
-+		/* software decompression */
-+		size =3D max_sync_size;
-+		ret =3D sw842_decompress(
-+			(unsigned char *)inbuf, hdr->sizes[i],
-+			(unsigned char *)outbuf, &size, wmem);
-+		if (ret)
-+			pr_debug("%s: sw842_decompress failed with %d\n",
-+				__func__, ret);
-+
-+		if (ret) {
-+			if (ret !=3D -ENOSPC && ret !=3D -EINVAL &&
-+					ret !=3D -EMSGSIZE)
-+				ret =3D -EIO;
-+			goto unlock;
-+		}
-+
-+		/* SW decompression success */
-+		inbuf +=3D hdr->sizes[i];
-+		outbuf +=3D size;
++	ct_prop = of_find_property(dn, "ibm,842-coprocessor-type", NULL);
++	if (!ct_prop) {
++		pr_err("ibm,842-coprocessor-type missing\n");
++		return -EINVAL;
 +	}
-+
-+	*outlen =3D (unsigned int)(outbuf - (unsigned long)out);
-+
-+unlock:
-+	if (ret)
-+		/* decompress fail */
-+		nx842_inc_decomp_failed(local_devdata);
-+	else {
-+		if (!dev)
-+			/* software decompress */
-+			nx842_inc_swdecomp(local_devdata);
-+		nx842_inc_decomp_complete(local_devdata);
-+		ibm_nx842_incr_hist(local_devdata->counters->decomp_times,
-+			(get_tb() - start_time) / tb_ticks_per_usec);
++	ct = be32_to_cpu(*(unsigned int *)ct_prop->value);
++	ci_prop = of_find_property(dn, "ibm,842-coprocessor-instance", NULL);
++	if (!ci_prop) {
++		pr_err("ibm,842-coprocessor-instance missing\n");
++		return -EINVAL;
 +	}
++	ci = be32_to_cpu(*(unsigned int *)ci_prop->value);
 +
-+	rcu_read_unlock();
-+	return ret;
++	coproc = kmalloc(sizeof(*coproc), GFP_KERNEL);
++	if (!coproc)
++		return -ENOMEM;
++
++	coproc->chip_id = chip_id;
++	coproc->ct = ct;
++	coproc->ci = ci;
++	INIT_LIST_HEAD(&coproc->list);
++	list_add(&coproc->list, &nx842_coprocs);
++
++	pr_info("coprocessor found on chip %d, CT %d CI %d\n", chip_id, ct, ci);
++
++	if (!nx842_ct)
++		nx842_ct = ct;
++	else if (nx842_ct != ct)
++		pr_err("NX842 chip %d, CT %d != first found CT %d\n",
++		       chip_id, ct, nx842_ct);
++
++	return 0;
 +}
-+EXPORT_SYMBOL_GPL(nx842_decompress);
 +
-+/**
-+ * nx842_OF_set_defaults -- Set default (disabled) values for devdata
-+ *
-+ * @devdata - struct nx842_devdata to update
-+ *
-+ * Returns:
-+ *  0 on success
-+ *  -ENOENT if @devdata ptr is NULL
-+ */
-+static int nx842_OF_set_defaults(struct nx842_devdata *devdata)
++static struct nx842_constraints nx842_powernv_constraints = {
++	.alignment =	DDE_BUFFER_ALIGN,
++	.multiple =	DDE_BUFFER_LAST_MULT,
++	.minimum =	DDE_BUFFER_LAST_MULT,
++	.maximum =	(DDL_LEN_MAX - 1) * PAGE_SIZE,
++};
++
++static struct nx842_driver nx842_powernv_driver = {
++	.owner =	THIS_MODULE,
++	.constraints =	&nx842_powernv_constraints,
++	.compress =	nx842_powernv_compress,
++	.decompress =	nx842_powernv_decompress,
++};
++
++static __init int nx842_powernv_init(void)
 +{
-+	if (devdata) {
-+		devdata->max_sync_size =3D 0;
-+		devdata->max_sync_sg =3D 0;
-+		devdata->max_sg_len =3D 0;
-+		devdata->status =3D UNAVAILABLE;
-+		return 0;
-+	} else
-+		return -ENOENT;
-+}
++	struct device_node *dn;
 +
-+/**
-+ * nx842_OF_upd_status -- Update the device info from OF status prop
-+ *
-+ * The status property indicates if the accelerator is enabled.  If th=
-e
-+ * device is in the OF tree it indicates that the hardware is present.
-+ * The status field indicates if the device is enabled when the status
-+ * is 'okay'.  Otherwise the device driver will be disabled.
-+ *
-+ * @devdata - struct nx842_devdata to update
-+ * @prop - struct property point containing the maxsyncop for the upda=
-te
-+ *
-+ * Returns:
-+ *  0 - Device is available
-+ *  -EINVAL - Device is not available
-+ */
-+static int nx842_OF_upd_status(struct nx842_devdata *devdata,
-+					struct property *prop) {
-+	int ret =3D 0;
-+	const char *status =3D (const char *)prop->value;
++	/* verify workmem size/align restrictions */
++	BUILD_BUG_ON(sizeof(struct nx842_workmem) > NX842_MEM_COMPRESS);
++	BUILD_BUG_ON(WORKMEM_ALIGN % CRB_ALIGN);
++	BUILD_BUG_ON(CRB_ALIGN % DDE_ALIGN);
++	BUILD_BUG_ON(CRB_SIZE % DDE_ALIGN);
++	/* verify buffer size/align restrictions */
++	BUILD_BUG_ON(PAGE_SIZE % DDE_BUFFER_ALIGN);
++	BUILD_BUG_ON(DDE_BUFFER_ALIGN % DDE_BUFFER_SIZE_MULT);
++	BUILD_BUG_ON(DDE_BUFFER_SIZE_MULT % DDE_BUFFER_LAST_MULT);
 +
-+	if (!strncmp(status, "okay", (size_t)prop->length)) {
-+		devdata->status =3D AVAILABLE;
-+	} else {
-+		dev_info(devdata->dev, "%s: status '%s' is not 'okay'\n",
-+				__func__, status);
-+		devdata->status =3D UNAVAILABLE;
-+	}
++	pr_info("loading\n");
 +
-+	return ret;
-+}
++	for_each_compatible_node(dn, NULL, NX842_POWERNV_COMPAT_NAME)
++		nx842_powernv_probe(dn);
 +
-+/**
-+ * nx842_OF_upd_maxsglen -- Update the device info from OF maxsglen pr=
-op
-+ *
-+ * Definition of the 'ibm,max-sg-len' OF property:
-+ *  This field indicates the maximum byte length of a scatter list
-+ *  for the platform facility. It is a single cell encoded as with enc=
-ode-int.
-+ *
-+ * Example:
-+ *  # od -x ibm,max-sg-len
-+ *  0000000 0000 0ff0
-+ *
-+ *  In this example, the maximum byte length of a scatter list is
-+ *  0x0ff0 (4,080).
-+ *
-+ * @devdata - struct nx842_devdata to update
-+ * @prop - struct property point containing the maxsyncop for the upda=
-te
-+ *
-+ * Returns:
-+ *  0 on success
-+ *  -EINVAL on failure
-+ */
-+static int nx842_OF_upd_maxsglen(struct nx842_devdata *devdata,
-+					struct property *prop) {
-+	int ret =3D 0;
-+	const int *maxsglen =3D prop->value;
-+
-+	if (prop->length !=3D sizeof(*maxsglen)) {
-+		dev_err(devdata->dev, "%s: unexpected format for ibm,max-sg-len prop=
-erty\n", __func__);
-+		dev_dbg(devdata->dev, "%s: ibm,max-sg-len is %d bytes long, expected=
- %lu bytes\n", __func__,
-+				prop->length, sizeof(*maxsglen));
-+		ret =3D -EINVAL;
-+	} else {
-+		devdata->max_sg_len =3D (unsigned int)min(*maxsglen,
-+				(int)NX842_HW_PAGE_SIZE);
-+	}
-+
-+	return ret;
-+}
-+
-+/**
-+ * nx842_OF_upd_maxsyncop -- Update the device info from OF maxsyncop =
-prop
-+ *
-+ * Definition of the 'ibm,max-sync-cop' OF property:
-+ *  Two series of cells.  The first series of cells represents the max=
-imums
-+ *  that can be synchronously compressed. The second series of cells
-+ *  represents the maximums that can be synchronously decompressed.
-+ *  1. The first cell in each series contains the count of the number =
-of
-+ *     data length, scatter list elements pairs that follow =E2=80=93 =
-each being
-+ *     of the form
-+ *    a. One cell data byte length
-+ *    b. One cell total number of scatter list elements
-+ *
-+ * Example:
-+ *  # od -x ibm,max-sync-cop
-+ *  0000000 0000 0001 0000 1000 0000 01fe 0000 0001
-+ *  0000020 0000 1000 0000 01fe
-+ *
-+ *  In this example, compression supports 0x1000 (4,096) data byte len=
-gth
-+ *  and 0x1fe (510) total scatter list elements.  Decompression suppor=
-ts
-+ *  0x1000 (4,096) data byte length and 0x1f3 (510) total scatter list
-+ *  elements.
-+ *
-+ * @devdata - struct nx842_devdata to update
-+ * @prop - struct property point containing the maxsyncop for the upda=
-te
-+ *
-+ * Returns:
-+ *  0 on success
-+ *  -EINVAL on failure
-+ */
-+static int nx842_OF_upd_maxsyncop(struct nx842_devdata *devdata,
-+					struct property *prop) {
-+	int ret =3D 0;
-+	const struct maxsynccop_t {
-+		int comp_elements;
-+		int comp_data_limit;
-+		int comp_sg_limit;
-+		int decomp_elements;
-+		int decomp_data_limit;
-+		int decomp_sg_limit;
-+	} *maxsynccop;
-+
-+	if (prop->length !=3D sizeof(*maxsynccop)) {
-+		dev_err(devdata->dev, "%s: unexpected format for ibm,max-sync-cop pr=
-operty\n", __func__);
-+		dev_dbg(devdata->dev, "%s: ibm,max-sync-cop is %d bytes long, expect=
-ed %lu bytes\n", __func__, prop->length,
-+				sizeof(*maxsynccop));
-+		ret =3D -EINVAL;
-+		goto out;
-+	}
-+
-+	maxsynccop =3D (const struct maxsynccop_t *)prop->value;
-+
-+	/* Use one limit rather than separate limits for compression and
-+	 * decompression. Set a maximum for this so as not to exceed the
-+	 * size that the header can support and round the value down to
-+	 * the hardware page size (4K) */
-+	devdata->max_sync_size =3D
-+			(unsigned int)min(maxsynccop->comp_data_limit,
-+					maxsynccop->decomp_data_limit);
-+
-+	devdata->max_sync_size =3D min_t(unsigned int, devdata->max_sync_size=
-,
-+					SIZE_64K);
-+
-+	if (devdata->max_sync_size < SIZE_4K) {
-+		dev_err(devdata->dev, "%s: hardware max data size (%u) is "
-+				"less than the driver minimum, unable to use "
-+				"the hardware device\n",
-+				__func__, devdata->max_sync_size);
-+		ret =3D -EINVAL;
-+		goto out;
-+	}
-+
-+	devdata->max_sync_sg =3D (unsigned int)min(maxsynccop->comp_sg_limit,
-+						maxsynccop->decomp_sg_limit);
-+	if (devdata->max_sync_sg < 1) {
-+		dev_err(devdata->dev, "%s: hardware max sg size (%u) is "
-+				"less than the driver minimum, unable to use "
-+				"the hardware device\n",
-+				__func__, devdata->max_sync_sg);
-+		ret =3D -EINVAL;
-+		goto out;
-+	}
-+
-+out:
-+	return ret;
-+}
-+
-+/**
-+ *
-+ * nx842_OF_upd -- Handle OF properties updates for the device.
-+ *
-+ * Set all properties from the OF tree.  Optionally, a new property
-+ * can be provided by the @new_prop pointer to overwrite an existing v=
-alue.
-+ * The device will remain disabled until all values are valid, this fu=
-nction
-+ * will return an error for updates unless all values are valid.
-+ *
-+ * @new_prop: If not NULL, this property is being updated.  If NULL, u=
-pdate
-+ *  all properties from the current values in the OF tree.
-+ *
-+ * Returns:
-+ *  0 - Success
-+ *  -ENOMEM - Could not allocate memory for new devdata structure
-+ *  -EINVAL - property value not found, new_prop is not a recognized
-+ *	property for the device or property value is not valid.
-+ *  -ENODEV - Device is not available
-+ */
-+static int nx842_OF_upd(struct property *new_prop)
-+{
-+	struct nx842_devdata *old_devdata =3D NULL;
-+	struct nx842_devdata *new_devdata =3D NULL;
-+	struct device_node *of_node =3D NULL;
-+	struct property *status =3D NULL;
-+	struct property *maxsglen =3D NULL;
-+	struct property *maxsyncop =3D NULL;
-+	int ret =3D 0;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&devdata_mutex, flags);
-+	old_devdata =3D rcu_dereference_check(devdata,
-+			lockdep_is_held(&devdata_mutex));
-+	if (old_devdata)
-+		of_node =3D old_devdata->dev->of_node;
-+
-+	if (!old_devdata || !of_node) {
-+		pr_err("%s: device is not available\n", __func__);
-+		spin_unlock_irqrestore(&devdata_mutex, flags);
++	if (!nx842_ct) {
++		pr_err("no coprocessors found\n");
 +		return -ENODEV;
 +	}
 +
-+	new_devdata =3D kzalloc(sizeof(*new_devdata), GFP_NOFS);
-+	if (!new_devdata) {
-+		dev_err(old_devdata->dev, "%s: Could not allocate memory for device =
-data\n", __func__);
-+		ret =3D -ENOMEM;
-+		goto error_out;
-+	}
++	nx842_register_driver(&nx842_powernv_driver);
 +
-+	memcpy(new_devdata, old_devdata, sizeof(*old_devdata));
-+	new_devdata->counters =3D old_devdata->counters;
-+
-+	/* Set ptrs for existing properties */
-+	status =3D of_find_property(of_node, "status", NULL);
-+	maxsglen =3D of_find_property(of_node, "ibm,max-sg-len", NULL);
-+	maxsyncop =3D of_find_property(of_node, "ibm,max-sync-cop", NULL);
-+	if (!status || !maxsglen || !maxsyncop) {
-+		dev_err(old_devdata->dev, "%s: Could not locate device properties\n"=
-, __func__);
-+		ret =3D -EINVAL;
-+		goto error_out;
-+	}
-+
-+	/*
-+	 * If this is a property update, there are only certain properties th=
-at
-+	 * we care about. Bail if it isn't in the below list
-+	 */
-+	if (new_prop && (strncmp(new_prop->name, "status", new_prop->length) =
-||
-+		         strncmp(new_prop->name, "ibm,max-sg-len", new_prop->length)=
- ||
-+		         strncmp(new_prop->name, "ibm,max-sync-cop", new_prop->lengt=
-h)))
-+		goto out;
-+
-+	/* Perform property updates */
-+	ret =3D nx842_OF_upd_status(new_devdata, status);
-+	if (ret)
-+		goto error_out;
-+
-+	ret =3D nx842_OF_upd_maxsglen(new_devdata, maxsglen);
-+	if (ret)
-+		goto error_out;
-+
-+	ret =3D nx842_OF_upd_maxsyncop(new_devdata, maxsyncop);
-+	if (ret)
-+		goto error_out;
-+
-+out:
-+	dev_info(old_devdata->dev, "%s: max_sync_size new:%u old:%u\n",
-+			__func__, new_devdata->max_sync_size,
-+			old_devdata->max_sync_size);
-+	dev_info(old_devdata->dev, "%s: max_sync_sg new:%u old:%u\n",
-+			__func__, new_devdata->max_sync_sg,
-+			old_devdata->max_sync_sg);
-+	dev_info(old_devdata->dev, "%s: max_sg_len new:%u old:%u\n",
-+			__func__, new_devdata->max_sg_len,
-+			old_devdata->max_sg_len);
-+
-+	rcu_assign_pointer(devdata, new_devdata);
-+	spin_unlock_irqrestore(&devdata_mutex, flags);
-+	synchronize_rcu();
-+	dev_set_drvdata(new_devdata->dev, new_devdata);
-+	kfree(old_devdata);
-+	return 0;
-+
-+error_out:
-+	if (new_devdata) {
-+		dev_info(old_devdata->dev, "%s: device disabled\n", __func__);
-+		nx842_OF_set_defaults(new_devdata);
-+		rcu_assign_pointer(devdata, new_devdata);
-+		spin_unlock_irqrestore(&devdata_mutex, flags);
-+		synchronize_rcu();
-+		dev_set_drvdata(new_devdata->dev, new_devdata);
-+		kfree(old_devdata);
-+	} else {
-+		dev_err(old_devdata->dev, "%s: could not update driver from hardware=
-\n", __func__);
-+		spin_unlock_irqrestore(&devdata_mutex, flags);
-+	}
-+
-+	if (!ret)
-+		ret =3D -EINVAL;
-+	return ret;
-+}
-+
-+/**
-+ * nx842_OF_notifier - Process updates to OF properties for the device
-+ *
-+ * @np: notifier block
-+ * @action: notifier action
-+ * @update: struct pSeries_reconfig_prop_update pointer if action is
-+ *	PSERIES_UPDATE_PROPERTY
-+ *
-+ * Returns:
-+ *	NOTIFY_OK on success
-+ *	NOTIFY_BAD encoded with error number on failure, use
-+ *		notifier_to_errno() to decode this value
-+ */
-+static int nx842_OF_notifier(struct notifier_block *np, unsigned long =
-action,
-+			     void *data)
-+{
-+	struct of_reconfig_data *upd =3D data;
-+	struct nx842_devdata *local_devdata;
-+	struct device_node *node =3D NULL;
-+
-+	rcu_read_lock();
-+	local_devdata =3D rcu_dereference(devdata);
-+	if (local_devdata)
-+		node =3D local_devdata->dev->of_node;
-+
-+	if (local_devdata &&
-+			action =3D=3D OF_RECONFIG_UPDATE_PROPERTY &&
-+			!strcmp(upd->dn->name, node->name)) {
-+		rcu_read_unlock();
-+		nx842_OF_upd(upd->prop);
-+	} else
-+		rcu_read_unlock();
-+
-+	return NOTIFY_OK;
-+}
-+
-+static struct notifier_block nx842_of_nb =3D {
-+	.notifier_call =3D nx842_OF_notifier,
-+};
-+
-+#define nx842_counter_read(_name)					\
-+static ssize_t nx842_##_name##_show(struct device *dev,		\
-+		struct device_attribute *attr,				\
-+		char *buf) {						\
-+	struct nx842_devdata *local_devdata;			\
-+	int p =3D 0;							\
-+	rcu_read_lock();						\
-+	local_devdata =3D rcu_dereference(devdata);			\
-+	if (local_devdata)						\
-+		p =3D snprintf(buf, PAGE_SIZE, "%ld\n",			\
-+		       atomic64_read(&local_devdata->counters->_name));	\
-+	rcu_read_unlock();						\
-+	return p;							\
-+}
-+
-+#define NX842DEV_COUNTER_ATTR_RO(_name)					\
-+	nx842_counter_read(_name);					\
-+	static struct device_attribute dev_attr_##_name =3D __ATTR(_name,	\
-+						0444,			\
-+						nx842_##_name##_show,\
-+						NULL);
-+
-+NX842DEV_COUNTER_ATTR_RO(comp_complete);
-+NX842DEV_COUNTER_ATTR_RO(comp_failed);
-+NX842DEV_COUNTER_ATTR_RO(decomp_complete);
-+NX842DEV_COUNTER_ATTR_RO(decomp_failed);
-+NX842DEV_COUNTER_ATTR_RO(swdecomp);
-+
-+static ssize_t nx842_timehist_show(struct device *,
-+		struct device_attribute *, char *);
-+
-+static struct device_attribute dev_attr_comp_times =3D __ATTR(comp_tim=
-es, 0444,
-+		nx842_timehist_show, NULL);
-+static struct device_attribute dev_attr_decomp_times =3D __ATTR(decomp=
-_times,
-+		0444, nx842_timehist_show, NULL);
-+
-+static ssize_t nx842_timehist_show(struct device *dev,
-+		struct device_attribute *attr, char *buf) {
-+	char *p =3D buf;
-+	struct nx842_devdata *local_devdata;
-+	atomic64_t *times;
-+	int bytes_remain =3D PAGE_SIZE;
-+	int bytes;
-+	int i;
-+
-+	rcu_read_lock();
-+	local_devdata =3D rcu_dereference(devdata);
-+	if (!local_devdata) {
-+		rcu_read_unlock();
-+		return 0;
-+	}
-+
-+	if (attr =3D=3D &dev_attr_comp_times)
-+		times =3D local_devdata->counters->comp_times;
-+	else if (attr =3D=3D &dev_attr_decomp_times)
-+		times =3D local_devdata->counters->decomp_times;
-+	else {
-+		rcu_read_unlock();
-+		return 0;
-+	}
-+
-+	for (i =3D 0; i < (NX842_HIST_SLOTS - 2); i++) {
-+		bytes =3D snprintf(p, bytes_remain, "%u-%uus:\t%ld\n",
-+			       i ? (2<<(i-1)) : 0, (2<<i)-1,
-+			       atomic64_read(&times[i]));
-+		bytes_remain -=3D bytes;
-+		p +=3D bytes;
-+	}
-+	/* The last bucket holds everything over
-+	 * 2<<(NX842_HIST_SLOTS - 2) us */
-+	bytes =3D snprintf(p, bytes_remain, "%uus - :\t%ld\n",
-+			2<<(NX842_HIST_SLOTS - 2),
-+			atomic64_read(&times[(NX842_HIST_SLOTS - 1)]));
-+	p +=3D bytes;
-+
-+	rcu_read_unlock();
-+	return p - buf;
-+}
-+
-+static struct attribute *nx842_sysfs_entries[] =3D {
-+	&dev_attr_comp_complete.attr,
-+	&dev_attr_comp_failed.attr,
-+	&dev_attr_decomp_complete.attr,
-+	&dev_attr_decomp_failed.attr,
-+	&dev_attr_swdecomp.attr,
-+	&dev_attr_comp_times.attr,
-+	&dev_attr_decomp_times.attr,
-+	NULL,
-+};
-+
-+static struct attribute_group nx842_attribute_group =3D {
-+	.name =3D NULL,		/* put in device directory */
-+	.attrs =3D nx842_sysfs_entries,
-+};
-+
-+static int __init nx842_probe(struct vio_dev *viodev,
-+				  const struct vio_device_id *id)
-+{
-+	struct nx842_devdata *old_devdata, *new_devdata =3D NULL;
-+	unsigned long flags;
-+	int ret =3D 0;
-+
-+	spin_lock_irqsave(&devdata_mutex, flags);
-+	old_devdata =3D rcu_dereference_check(devdata,
-+			lockdep_is_held(&devdata_mutex));
-+
-+	if (old_devdata && old_devdata->vdev !=3D NULL) {
-+		dev_err(&viodev->dev, "%s: Attempt to register more than one instanc=
-e of the hardware\n", __func__);
-+		ret =3D -1;
-+		goto error_unlock;
-+	}
-+
-+	dev_set_drvdata(&viodev->dev, NULL);
-+
-+	new_devdata =3D kzalloc(sizeof(*new_devdata), GFP_NOFS);
-+	if (!new_devdata) {
-+		dev_err(&viodev->dev, "%s: Could not allocate memory for device data=
-\n", __func__);
-+		ret =3D -ENOMEM;
-+		goto error_unlock;
-+	}
-+
-+	new_devdata->counters =3D kzalloc(sizeof(*new_devdata->counters),
-+			GFP_NOFS);
-+	if (!new_devdata->counters) {
-+		dev_err(&viodev->dev, "%s: Could not allocate memory for performance=
- counters\n", __func__);
-+		ret =3D -ENOMEM;
-+		goto error_unlock;
-+	}
-+
-+	new_devdata->vdev =3D viodev;
-+	new_devdata->dev =3D &viodev->dev;
-+	nx842_OF_set_defaults(new_devdata);
-+
-+	rcu_assign_pointer(devdata, new_devdata);
-+	spin_unlock_irqrestore(&devdata_mutex, flags);
-+	synchronize_rcu();
-+	kfree(old_devdata);
-+
-+	of_reconfig_notifier_register(&nx842_of_nb);
-+
-+	ret =3D nx842_OF_upd(NULL);
-+	if (ret && ret !=3D -ENODEV) {
-+		dev_err(&viodev->dev, "could not parse device tree. %d\n", ret);
-+		ret =3D -1;
-+		goto error;
-+	}
-+
-+	rcu_read_lock();
-+	dev_set_drvdata(&viodev->dev, rcu_dereference(devdata));
-+	rcu_read_unlock();
-+
-+	if (sysfs_create_group(&viodev->dev.kobj, &nx842_attribute_group)) {
-+		dev_err(&viodev->dev, "could not create sysfs device attributes\n");
-+		ret =3D -1;
-+		goto error;
-+	}
++	pr_info("loaded\n");
 +
 +	return 0;
-+
-+error_unlock:
-+	spin_unlock_irqrestore(&devdata_mutex, flags);
-+	if (new_devdata)
-+		kfree(new_devdata->counters);
-+	kfree(new_devdata);
-+error:
-+	return ret;
 +}
++module_init(nx842_powernv_init);
 +
-+static int __exit nx842_remove(struct vio_dev *viodev)
++static void __exit nx842_powernv_exit(void)
 +{
-+	struct nx842_devdata *old_devdata;
-+	unsigned long flags;
++	struct nx842_coproc *coproc, *n;
 +
-+	pr_info("Removing IBM Power 842 compression device\n");
-+	sysfs_remove_group(&viodev->dev.kobj, &nx842_attribute_group);
++	nx842_unregister_driver(&nx842_powernv_driver);
 +
-+	spin_lock_irqsave(&devdata_mutex, flags);
-+	old_devdata =3D rcu_dereference_check(devdata,
-+			lockdep_is_held(&devdata_mutex));
-+	of_reconfig_notifier_unregister(&nx842_of_nb);
-+	RCU_INIT_POINTER(devdata, NULL);
-+	spin_unlock_irqrestore(&devdata_mutex, flags);
-+	synchronize_rcu();
-+	dev_set_drvdata(&viodev->dev, NULL);
-+	if (old_devdata)
-+		kfree(old_devdata->counters);
-+	kfree(old_devdata);
-+	return 0;
-+}
-+
-+static struct vio_device_id nx842_driver_ids[] =3D {
-+	{"ibm,compression-v1", "ibm,compression"},
-+	{"", ""},
-+};
-+
-+static struct vio_driver nx842_driver =3D {
-+	.name =3D MODULE_NAME,
-+	.probe =3D nx842_probe,
-+	.remove =3D __exit_p(nx842_remove),
-+	.get_desired_dma =3D nx842_get_desired_dma,
-+	.id_table =3D nx842_driver_ids,
-+};
-+
-+static int __init nx842_init(void)
-+{
-+	struct nx842_devdata *new_devdata;
-+	pr_info("Registering IBM Power 842 compression driver\n");
-+
-+	RCU_INIT_POINTER(devdata, NULL);
-+	new_devdata =3D kzalloc(sizeof(*new_devdata), GFP_KERNEL);
-+	if (!new_devdata) {
-+		pr_err("Could not allocate memory for device data\n");
-+		return -ENOMEM;
-+	}
-+	new_devdata->status =3D UNAVAILABLE;
-+	RCU_INIT_POINTER(devdata, new_devdata);
-+
-+	return vio_register_driver(&nx842_driver);
-+}
-+
-+module_init(nx842_init);
-+
-+static void __exit nx842_exit(void)
-+{
-+	struct nx842_devdata *old_devdata;
-+	unsigned long flags;
-+
-+	pr_info("Exiting IBM Power 842 compression driver\n");
-+	spin_lock_irqsave(&devdata_mutex, flags);
-+	old_devdata =3D rcu_dereference_check(devdata,
-+			lockdep_is_held(&devdata_mutex));
-+	RCU_INIT_POINTER(devdata, NULL);
-+	spin_unlock_irqrestore(&devdata_mutex, flags);
-+	synchronize_rcu();
-+	if (old_devdata)
-+		dev_set_drvdata(old_devdata->dev, NULL);
-+	kfree(old_devdata);
-+	vio_unregister_driver(&nx842_driver);
-+}
-+
-+module_exit(nx842_exit);
-+
-+/*********************************
-+ * 842 software decompressor
-+*********************************/
-+typedef int (*sw842_template_op)(const char **, int *, unsigned char *=
-*,
-+						struct sw842_fifo *);
-+
-+static int sw842_data8(const char **, int *, unsigned char **,
-+						struct sw842_fifo *);
-+static int sw842_data4(const char **, int *, unsigned char **,
-+						struct sw842_fifo *);
-+static int sw842_data2(const char **, int *, unsigned char **,
-+						struct sw842_fifo *);
-+static int sw842_ptr8(const char **, int *, unsigned char **,
-+						struct sw842_fifo *);
-+static int sw842_ptr4(const char **, int *, unsigned char **,
-+						struct sw842_fifo *);
-+static int sw842_ptr2(const char **, int *, unsigned char **,
-+						struct sw842_fifo *);
-+
-+/* special templates */
-+#define SW842_TMPL_REPEAT 0x1B
-+#define SW842_TMPL_ZEROS 0x1C
-+#define SW842_TMPL_EOF 0x1E
-+
-+static sw842_template_op sw842_tmpl_ops[26][4] =3D {
-+	{ sw842_data8, NULL}, /* 0 (00000) */
-+	{ sw842_data4, sw842_data2, sw842_ptr2,  NULL},
-+	{ sw842_data4, sw842_ptr2,  sw842_data2, NULL},
-+	{ sw842_data4, sw842_ptr2,  sw842_ptr2,  NULL},
-+	{ sw842_data4, sw842_ptr4,  NULL},
-+	{ sw842_data2, sw842_ptr2,  sw842_data4, NULL},
-+	{ sw842_data2, sw842_ptr2,  sw842_data2, sw842_ptr2},
-+	{ sw842_data2, sw842_ptr2,  sw842_ptr2,  sw842_data2},
-+	{ sw842_data2, sw842_ptr2,  sw842_ptr2,  sw842_ptr2,},
-+	{ sw842_data2, sw842_ptr2,  sw842_ptr4,  NULL},
-+	{ sw842_ptr2,  sw842_data2, sw842_data4, NULL}, /* 10 (01010) */
-+	{ sw842_ptr2,  sw842_data4, sw842_ptr2,  NULL},
-+	{ sw842_ptr2,  sw842_data2, sw842_ptr2,  sw842_data2},
-+	{ sw842_ptr2,  sw842_data2, sw842_ptr2,  sw842_ptr2},
-+	{ sw842_ptr2,  sw842_data2, sw842_ptr4,  NULL},
-+	{ sw842_ptr2,  sw842_ptr2,  sw842_data4, NULL},
-+	{ sw842_ptr2,  sw842_ptr2,  sw842_data2, sw842_ptr2},
-+	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr2,  sw842_data2},
-+	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr2,  sw842_ptr2},
-+	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr4,  NULL},
-+	{ sw842_ptr4,  sw842_data4, NULL}, /* 20 (10100) */
-+	{ sw842_ptr4,  sw842_data2, sw842_ptr2,  NULL},
-+	{ sw842_ptr4,  sw842_ptr2,  sw842_data2, NULL},
-+	{ sw842_ptr4,  sw842_ptr2,  sw842_ptr2,  NULL},
-+	{ sw842_ptr4,  sw842_ptr4,  NULL},
-+	{ sw842_ptr8,  NULL}
-+};
-+
-+/* Software decompress helpers */
-+
-+static uint8_t sw842_get_byte(const char *buf, int bit)
-+{
-+	uint8_t tmpl;
-+	uint16_t tmp;
-+	tmp =3D htons(*(uint16_t *)(buf));
-+	tmp =3D (uint16_t)(tmp << bit);
-+	tmp =3D ntohs(tmp);
-+	memcpy(&tmpl, &tmp, 1);
-+	return tmpl;
-+}
-+
-+static uint8_t sw842_get_template(const char **buf, int *bit)
-+{
-+	uint8_t byte;
-+	byte =3D sw842_get_byte(*buf, *bit);
-+	byte =3D byte >> 3;
-+	byte &=3D 0x1F;
-+	*buf +=3D (*bit + 5) / 8;
-+	*bit =3D (*bit + 5) % 8;
-+	return byte;
-+}
-+
-+/* repeat_count happens to be 5-bit too (like the template) */
-+static uint8_t sw842_get_repeat_count(const char **buf, int *bit)
-+{
-+	uint8_t byte;
-+	byte =3D sw842_get_byte(*buf, *bit);
-+	byte =3D byte >> 2;
-+	byte &=3D 0x3F;
-+	*buf +=3D (*bit + 6) / 8;
-+	*bit =3D (*bit + 6) % 8;
-+	return byte;
-+}
-+
-+static uint8_t sw842_get_ptr2(const char **buf, int *bit)
-+{
-+	uint8_t ptr;
-+	ptr =3D sw842_get_byte(*buf, *bit);
-+	(*buf)++;
-+	return ptr;
-+}
-+
-+static uint16_t sw842_get_ptr4(const char **buf, int *bit,
-+		struct sw842_fifo *fifo)
-+{
-+	uint16_t ptr;
-+	ptr =3D htons(*(uint16_t *)(*buf));
-+	ptr =3D (uint16_t)(ptr << *bit);
-+	ptr =3D ptr >> 7;
-+	ptr &=3D 0x01FF;
-+	*buf +=3D (*bit + 9) / 8;
-+	*bit =3D (*bit + 9) % 8;
-+	return ptr;
-+}
-+
-+static uint8_t sw842_get_ptr8(const char **buf, int *bit,
-+		struct sw842_fifo *fifo)
-+{
-+	return sw842_get_ptr2(buf, bit);
-+}
-+
-+/* Software decompress template ops */
-+
-+static int sw842_data8(const char **inbuf, int *inbit,
-+		unsigned char **outbuf, struct sw842_fifo *fifo)
-+{
-+	int ret;
-+
-+	ret =3D sw842_data4(inbuf, inbit, outbuf, fifo);
-+	if (ret)
-+		return ret;
-+	ret =3D sw842_data4(inbuf, inbit, outbuf, fifo);
-+	return ret;
-+}
-+
-+static int sw842_data4(const char **inbuf, int *inbit,
-+		unsigned char **outbuf, struct sw842_fifo *fifo)
-+{
-+	int ret;
-+
-+	ret =3D sw842_data2(inbuf, inbit, outbuf, fifo);
-+	if (ret)
-+		return ret;
-+	ret =3D sw842_data2(inbuf, inbit, outbuf, fifo);
-+	return ret;
-+}
-+
-+static int sw842_data2(const char **inbuf, int *inbit,
-+		unsigned char **outbuf, struct sw842_fifo *fifo)
-+{
-+	**outbuf =3D sw842_get_byte(*inbuf, *inbit);
-+	(*inbuf)++;
-+	(*outbuf)++;
-+	**outbuf =3D sw842_get_byte(*inbuf, *inbit);
-+	(*inbuf)++;
-+	(*outbuf)++;
-+	return 0;
-+}
-+
-+static int sw842_ptr8(const char **inbuf, int *inbit,
-+		unsigned char **outbuf, struct sw842_fifo *fifo)
-+{
-+	uint8_t ptr;
-+	ptr =3D sw842_get_ptr8(inbuf, inbit, fifo);
-+	if (!fifo->f84_full && (ptr >=3D fifo->f8_count))
-+		return 1;
-+	memcpy(*outbuf, fifo->f8[ptr], 8);
-+	*outbuf +=3D 8;
-+	return 0;
-+}
-+
-+static int sw842_ptr4(const char **inbuf, int *inbit,
-+		unsigned char **outbuf, struct sw842_fifo *fifo)
-+{
-+	uint16_t ptr;
-+	ptr =3D sw842_get_ptr4(inbuf, inbit, fifo);
-+	if (!fifo->f84_full && (ptr >=3D fifo->f4_count))
-+		return 1;
-+	memcpy(*outbuf, fifo->f4[ptr], 4);
-+	*outbuf +=3D 4;
-+	return 0;
-+}
-+
-+static int sw842_ptr2(const char **inbuf, int *inbit,
-+		unsigned char **outbuf, struct sw842_fifo *fifo)
-+{
-+	uint8_t ptr;
-+	ptr =3D sw842_get_ptr2(inbuf, inbit);
-+	if (!fifo->f2_full && (ptr >=3D fifo->f2_count))
-+		return 1;
-+	memcpy(*outbuf, fifo->f2[ptr], 2);
-+	*outbuf +=3D 2;
-+	return 0;
-+}
-+
-+static void sw842_copy_to_fifo(const char *buf, struct sw842_fifo *fif=
-o)
-+{
-+	unsigned char initial_f2count =3D fifo->f2_count;
-+
-+	memcpy(fifo->f8[fifo->f8_count], buf, 8);
-+	fifo->f4_count +=3D 2;
-+	fifo->f8_count +=3D 1;
-+
-+	if (!fifo->f84_full && fifo->f4_count >=3D 512) {
-+		fifo->f84_full =3D 1;
-+		fifo->f4_count /=3D 512;
++	list_for_each_entry_safe(coproc, n, &nx842_coprocs, list) {
++		list_del(&coproc->list);
++		kfree(coproc);
 +	}
 +
-+	memcpy(fifo->f2[fifo->f2_count++], buf, 2);
-+	memcpy(fifo->f2[fifo->f2_count++], buf + 2, 2);
-+	memcpy(fifo->f2[fifo->f2_count++], buf + 4, 2);
-+	memcpy(fifo->f2[fifo->f2_count++], buf + 6, 2);
-+	if (fifo->f2_count < initial_f2count)
-+		fifo->f2_full =3D 1;
++	pr_info("unloaded\n");
 +}
-+
-+static int sw842_decompress(const unsigned char *src, int srclen,
-+			unsigned char *dst, int *destlen,
-+			const void *wrkmem)
-+{
-+	uint8_t tmpl;
-+	const char *inbuf;
-+	int inbit =3D 0;
-+	unsigned char *outbuf, *outbuf_end, *origbuf, *prevbuf;
-+	const char *inbuf_end;
-+	sw842_template_op op;
-+	int opindex;
-+	int i, repeat_count;
-+	struct sw842_fifo *fifo;
-+	int ret =3D 0;
-+
-+	fifo =3D &((struct nx842_workmem *)(wrkmem))->swfifo;
-+	memset(fifo, 0, sizeof(*fifo));
-+
-+	origbuf =3D NULL;
-+	inbuf =3D src;
-+	inbuf_end =3D src + srclen;
-+	outbuf =3D dst;
-+	outbuf_end =3D dst + *destlen;
-+
-+	while ((tmpl =3D sw842_get_template(&inbuf, &inbit)) !=3D SW842_TMPL_=
-EOF) {
-+		if (inbuf >=3D inbuf_end) {
-+			ret =3D -EINVAL;
-+			goto out;
-+		}
-+
-+		opindex =3D 0;
-+		prevbuf =3D origbuf;
-+		origbuf =3D outbuf;
-+		switch (tmpl) {
-+		case SW842_TMPL_REPEAT:
-+			if (prevbuf =3D=3D NULL) {
-+				ret =3D -EINVAL;
-+				goto out;
-+			}
-+
-+			repeat_count =3D sw842_get_repeat_count(&inbuf,
-+								&inbit) + 1;
-+
-+			/* Did the repeat count advance past the end of input */
-+			if (inbuf > inbuf_end) {
-+				ret =3D -EINVAL;
-+				goto out;
-+			}
-+
-+			for (i =3D 0; i < repeat_count; i++) {
-+				/* Would this overflow the output buffer */
-+				if ((outbuf + 8) > outbuf_end) {
-+					ret =3D -ENOSPC;
-+					goto out;
-+				}
-+
-+				memcpy(outbuf, prevbuf, 8);
-+				sw842_copy_to_fifo(outbuf, fifo);
-+				outbuf +=3D 8;
-+			}
-+			break;
-+
-+		case SW842_TMPL_ZEROS:
-+			/* Would this overflow the output buffer */
-+			if ((outbuf + 8) > outbuf_end) {
-+				ret =3D -ENOSPC;
-+				goto out;
-+			}
-+
-+			memset(outbuf, 0, 8);
-+			sw842_copy_to_fifo(outbuf, fifo);
-+			outbuf +=3D 8;
-+			break;
-+
-+		default:
-+			if (tmpl > 25) {
-+				ret =3D -EINVAL;
-+				goto out;
-+			}
-+
-+			/* Does this go past the end of the input buffer */
-+			if ((inbuf + 2) > inbuf_end) {
-+				ret =3D -EINVAL;
-+				goto out;
-+			}
-+
-+			/* Would this overflow the output buffer */
-+			if ((outbuf + 8) > outbuf_end) {
-+				ret =3D -ENOSPC;
-+				goto out;
-+			}
-+
-+			while (opindex < 4 &&
-+				(op =3D sw842_tmpl_ops[tmpl][opindex++])
-+					!=3D NULL) {
-+				ret =3D (*op)(&inbuf, &inbit, &outbuf, fifo);
-+				if (ret) {
-+					ret =3D -EINVAL;
-+					goto out;
-+				}
-+				sw842_copy_to_fifo(origbuf, fifo);
-+			}
-+		}
-+	}
-+
-+out:
-+	if (!ret)
-+		*destlen =3D (unsigned int)(outbuf - dst);
-+	else
-+		*destlen =3D 0;
-+
-+	return ret;
-+}
-diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
-deleted file mode 100644
-index 887196e..0000000
---- a/drivers/crypto/nx/nx-842.c
-+++ /dev/null
-@@ -1,1603 +0,0 @@
--/*
-- * Driver for IBM Power 842 compression accelerator
-- *
-- * This program is free software; you can redistribute it and/or modif=
-y
-- * it under the terms of the GNU General Public License as published b=
-y
-- * the Free Software Foundation; either version 2 of the License, or
-- * (at your option) any later version.
-- *
-- * This program is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License
-- * along with this program; if not, write to the Free Software
-- * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301=
-, USA.
-- *
-- * Copyright (C) IBM Corporation, 2012
-- *
-- * Authors: Robert Jennings <rcj@linux.vnet.ibm.com>
-- *          Seth Jennings <sjenning@linux.vnet.ibm.com>
-- */
--
--#include <linux/kernel.h>
--#include <linux/module.h>
--#include <linux/nx842.h>
--#include <linux/of.h>
--#include <linux/slab.h>
--
--#include <asm/page.h>
--#include <asm/vio.h>
--
--#include "nx_csbcpb.h" /* struct nx_csbcpb */
--
--#define MODULE_NAME "nx-compress"
--MODULE_LICENSE("GPL");
--MODULE_AUTHOR("Robert Jennings <rcj@linux.vnet.ibm.com>");
--MODULE_DESCRIPTION("842 H/W Compression driver for IBM Power processor=
-s");
--
--#define SHIFT_4K 12
--#define SHIFT_64K 16
--#define SIZE_4K (1UL << SHIFT_4K)
--#define SIZE_64K (1UL << SHIFT_64K)
--
--/* IO buffer must be 128 byte aligned */
--#define IO_BUFFER_ALIGN 128
--
--struct nx842_header {
--	int blocks_nr; /* number of compressed blocks */
--	int offset; /* offset of the first block (from beginning of header) *=
-/
--	int sizes[0]; /* size of compressed blocks */
--};
--
--static inline int nx842_header_size(const struct nx842_header *hdr)
--{
--	return sizeof(struct nx842_header) +
--			hdr->blocks_nr * sizeof(hdr->sizes[0]);
--}
--
--/* Macros for fields within nx_csbcpb */
--/* Check the valid bit within the csbcpb valid field */
--#define NX842_CSBCBP_VALID_CHK(x) (x & BIT_MASK(7))
--
--/* CE macros operate on the completion_extension field bits in the csb=
-cpb.
-- * CE0 0=3Dfull completion, 1=3Dpartial completion
-- * CE1 0=3DCE0 indicates completion, 1=3Dtermination (output may be mo=
-dified)
-- * CE2 0=3Dprocessed_bytes is source bytes, 1=3Dprocessed_bytes is tar=
-get bytes */
--#define NX842_CSBCPB_CE0(x)	(x & BIT_MASK(7))
--#define NX842_CSBCPB_CE1(x)	(x & BIT_MASK(6))
--#define NX842_CSBCPB_CE2(x)	(x & BIT_MASK(5))
--
--/* The NX unit accepts data only on 4K page boundaries */
--#define NX842_HW_PAGE_SHIFT	SHIFT_4K
--#define NX842_HW_PAGE_SIZE	(ASM_CONST(1) << NX842_HW_PAGE_SHIFT)
--#define NX842_HW_PAGE_MASK	(~(NX842_HW_PAGE_SIZE-1))
--
--enum nx842_status {
--	UNAVAILABLE,
--	AVAILABLE
--};
--
--struct ibm_nx842_counters {
--	atomic64_t comp_complete;
--	atomic64_t comp_failed;
--	atomic64_t decomp_complete;
--	atomic64_t decomp_failed;
--	atomic64_t swdecomp;
--	atomic64_t comp_times[32];
--	atomic64_t decomp_times[32];
--};
--
--static struct nx842_devdata {
--	struct vio_dev *vdev;
--	struct device *dev;
--	struct ibm_nx842_counters *counters;
--	unsigned int max_sg_len;
--	unsigned int max_sync_size;
--	unsigned int max_sync_sg;
--	enum nx842_status status;
--} __rcu *devdata;
--static DEFINE_SPINLOCK(devdata_mutex);
--
--#define NX842_COUNTER_INC(_x) \
--static inline void nx842_inc_##_x( \
--	const struct nx842_devdata *dev) { \
--	if (dev) \
--		atomic64_inc(&dev->counters->_x); \
--}
--NX842_COUNTER_INC(comp_complete);
--NX842_COUNTER_INC(comp_failed);
--NX842_COUNTER_INC(decomp_complete);
--NX842_COUNTER_INC(decomp_failed);
--NX842_COUNTER_INC(swdecomp);
--
--#define NX842_HIST_SLOTS 16
--
--static void ibm_nx842_incr_hist(atomic64_t *times, unsigned int time)
--{
--	int bucket =3D fls(time);
--
--	if (bucket)
--		bucket =3D min((NX842_HIST_SLOTS - 1), bucket - 1);
--
--	atomic64_inc(&times[bucket]);
--}
--
--/* NX unit operation flags */
--#define NX842_OP_COMPRESS	0x0
--#define NX842_OP_CRC		0x1
--#define NX842_OP_DECOMPRESS	0x2
--#define NX842_OP_COMPRESS_CRC   (NX842_OP_COMPRESS | NX842_OP_CRC)
--#define NX842_OP_DECOMPRESS_CRC (NX842_OP_DECOMPRESS | NX842_OP_CRC)
--#define NX842_OP_ASYNC		(1<<23)
--#define NX842_OP_NOTIFY		(1<<22)
--#define NX842_OP_NOTIFY_INT(x)	((x & 0xff)<<8)
--
--static unsigned long nx842_get_desired_dma(struct vio_dev *viodev)
--{
--	/* No use of DMA mappings within the driver. */
--	return 0;
--}
--
--struct nx842_slentry {
--	unsigned long ptr; /* Real address (use __pa()) */
--	unsigned long len;
--};
--
--/* pHyp scatterlist entry */
--struct nx842_scatterlist {
--	int entry_nr; /* number of slentries */
--	struct nx842_slentry *entries; /* ptr to array of slentries */
--};
--
--/* Does not include sizeof(entry_nr) in the size */
--static inline unsigned long nx842_get_scatterlist_size(
--				struct nx842_scatterlist *sl)
--{
--	return sl->entry_nr * sizeof(struct nx842_slentry);
--}
--
++module_exit(nx842_powernv_exit);
+diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
+index cb481d8..6db9992 100644
+--- a/drivers/crypto/nx/nx-842-pseries.c
++++ b/drivers/crypto/nx/nx-842-pseries.c
+@@ -160,15 +160,6 @@ static inline unsigned long nx842_get_scatterlist_size(
+ 	return sl->entry_nr * sizeof(struct nx842_slentry);
+ }
+ 
 -static inline unsigned long nx842_get_pa(void *addr)
 -{
 -	if (is_vmalloc_addr(addr))
@@ -1896,1481 +718,159 @@ get bytes */
 -		return __pa(addr);
 -}
 -
--static int nx842_build_scatterlist(unsigned long buf, int len,
--			struct nx842_scatterlist *sl)
--{
--	unsigned long nextpage;
--	struct nx842_slentry *entry;
--
--	sl->entry_nr =3D 0;
--
--	entry =3D sl->entries;
--	while (len) {
--		entry->ptr =3D nx842_get_pa((void *)buf);
--		nextpage =3D ALIGN(buf + 1, NX842_HW_PAGE_SIZE);
--		if (nextpage < buf + len) {
--			/* we aren't at the end yet */
--			if (IS_ALIGNED(buf, NX842_HW_PAGE_SIZE))
--				/* we are in the middle (or beginning) */
--				entry->len =3D NX842_HW_PAGE_SIZE;
--			else
--				/* we are at the beginning */
--				entry->len =3D nextpage - buf;
--		} else {
--			/* at the end */
--			entry->len =3D len;
--		}
--
--		len -=3D entry->len;
--		buf +=3D entry->len;
--		sl->entry_nr++;
--		entry++;
--	}
--
--	return 0;
--}
--
--/*
-- * Working memory for software decompression
-- */
--struct sw842_fifo {
--	union {
--		char f8[256][8];
--		char f4[512][4];
--	};
--	char f2[256][2];
--	unsigned char f84_full;
--	unsigned char f2_full;
--	unsigned char f8_count;
--	unsigned char f2_count;
--	unsigned int f4_count;
--};
--
--/*
-- * Working memory for crypto API
-- */
--struct nx842_workmem {
--	char bounce[PAGE_SIZE]; /* bounce buffer for decompression input */
--	union {
--		/* hardware working memory */
--		struct {
--			/* scatterlist */
--			char slin[SIZE_4K];
--			char slout[SIZE_4K];
--			/* coprocessor status/parameter block */
--			struct nx_csbcpb csbcpb;
--		};
--		/* software working memory */
--		struct sw842_fifo swfifo; /* software decompression fifo */
--	};
--};
--
--int nx842_get_workmem_size(void)
--{
--	return sizeof(struct nx842_workmem) + NX842_HW_PAGE_SIZE;
--}
--EXPORT_SYMBOL_GPL(nx842_get_workmem_size);
--
--int nx842_get_workmem_size_aligned(void)
--{
--	return sizeof(struct nx842_workmem);
--}
--EXPORT_SYMBOL_GPL(nx842_get_workmem_size_aligned);
--
--static int nx842_validate_result(struct device *dev,
--	struct cop_status_block *csb)
--{
--	/* The csb must be valid after returning from vio_h_cop_sync */
--	if (!NX842_CSBCBP_VALID_CHK(csb->valid)) {
--		dev_err(dev, "%s: cspcbp not valid upon completion.\n",
--				__func__);
--		dev_dbg(dev, "valid:0x%02x cs:0x%02x cc:0x%02x ce:0x%02x\n",
--				csb->valid,
--				csb->crb_seq_number,
--				csb->completion_code,
--				csb->completion_extension);
--		dev_dbg(dev, "processed_bytes:%d address:0x%016lx\n",
--				csb->processed_byte_count,
--				(unsigned long)csb->address);
--		return -EIO;
--	}
--
--	/* Check return values from the hardware in the CSB */
--	switch (csb->completion_code) {
--	case 0:	/* Completed without error */
--		break;
--	case 64: /* Target bytes > Source bytes during compression */
--	case 13: /* Output buffer too small */
--		dev_dbg(dev, "%s: Compression output larger than input\n",
--					__func__);
--		return -ENOSPC;
--	case 66: /* Input data contains an illegal template field */
--	case 67: /* Template indicates data past the end of the input stream =
-*/
--		dev_dbg(dev, "%s: Bad data for decompression (code:%d)\n",
--					__func__, csb->completion_code);
--		return -EINVAL;
--	default:
--		dev_dbg(dev, "%s: Unspecified error (code:%d)\n",
--					__func__, csb->completion_code);
--		return -EIO;
--	}
--
--	/* Hardware sanity check */
--	if (!NX842_CSBCPB_CE2(csb->completion_extension)) {
--		dev_err(dev, "%s: No error returned by hardware, but "
--				"data returned is unusable, contact support.\n"
--				"(Additional info: csbcbp->processed bytes "
--				"does not specify processed bytes for the "
--				"target buffer.)\n", __func__);
--		return -EIO;
--	}
--
--	return 0;
--}
--
--/**
-- * nx842_compress - Compress data using the 842 algorithm
-- *
-- * Compression provide by the NX842 coprocessor on IBM Power systems.
-- * The input buffer is compressed and the result is stored in the
-- * provided output buffer.
-- *
-- * Upon return from this function @outlen contains the length of the
-- * compressed data.  If there is an error then @outlen will be 0 and a=
-n
-- * error will be specified by the return code from this function.
-- *
-- * @in: Pointer to input buffer, must be page aligned
-- * @inlen: Length of input buffer, must be PAGE_SIZE
-- * @out: Pointer to output buffer
-- * @outlen: Length of output buffer
-- * @wrkmem: ptr to buffer for working memory, size determined by
-- *          nx842_get_workmem_size()
-- *
-- * Returns:
-- *   0		Success, output of length @outlen stored in the buffer at @out
-- *   -ENOMEM	Unable to allocate internal buffers
-- *   -ENOSPC	Output buffer is to small
-- *   -EMSGSIZE	XXX Difficult to describe this limitation
-- *   -EIO	Internal error
-- *   -ENODEV	Hardware unavailable
-- */
--int nx842_compress(const unsigned char *in, unsigned int inlen,
--		       unsigned char *out, unsigned int *outlen, void *wmem)
--{
--	struct nx842_header *hdr;
--	struct nx842_devdata *local_devdata;
--	struct device *dev =3D NULL;
--	struct nx842_workmem *workmem;
--	struct nx842_scatterlist slin, slout;
--	struct nx_csbcpb *csbcpb;
--	int ret =3D 0, max_sync_size, i, bytesleft, size, hdrsize;
--	unsigned long inbuf, outbuf, padding;
--	struct vio_pfo_op op =3D {
--		.done =3D NULL,
--		.handle =3D 0,
--		.timeout =3D 0,
--	};
--	unsigned long start_time =3D get_tb();
--
--	/*
--	 * Make sure input buffer is 64k page aligned.  This is assumed since
--	 * this driver is designed for page compression only (for now).  This
--	 * is very nice since we can now use direct DDE(s) for the input and
--	 * the alignment is guaranteed.
--	*/
--	inbuf =3D (unsigned long)in;
--	if (!IS_ALIGNED(inbuf, PAGE_SIZE) || inlen !=3D PAGE_SIZE)
--		return -EINVAL;
--
--	rcu_read_lock();
--	local_devdata =3D rcu_dereference(devdata);
--	if (!local_devdata || !local_devdata->dev) {
--		rcu_read_unlock();
--		return -ENODEV;
--	}
--	max_sync_size =3D local_devdata->max_sync_size;
--	dev =3D local_devdata->dev;
--
--	/* Create the header */
--	hdr =3D (struct nx842_header *)out;
--	hdr->blocks_nr =3D PAGE_SIZE / max_sync_size;
--	hdrsize =3D nx842_header_size(hdr);
--	outbuf =3D (unsigned long)out + hdrsize;
--	bytesleft =3D *outlen - hdrsize;
--
--	/* Init scatterlist */
--	workmem =3D (struct nx842_workmem *)ALIGN((unsigned long)wmem,
--		NX842_HW_PAGE_SIZE);
--	slin.entries =3D (struct nx842_slentry *)workmem->slin;
--	slout.entries =3D (struct nx842_slentry *)workmem->slout;
--
--	/* Init operation */
--	op.flags =3D NX842_OP_COMPRESS;
--	csbcpb =3D &workmem->csbcpb;
--	memset(csbcpb, 0, sizeof(*csbcpb));
--	op.csbcpb =3D nx842_get_pa(csbcpb);
--	op.out =3D nx842_get_pa(slout.entries);
--
--	for (i =3D 0; i < hdr->blocks_nr; i++) {
--		/*
--		 * Aligning the output blocks to 128 bytes does waste space,
--		 * but it prevents the need for bounce buffers and memory
--		 * copies.  It also simplifies the code a lot.  In the worst
--		 * case (64k page, 4k max_sync_size), you lose up to
--		 * (128*16)/64k =3D ~3% the compression factor. For 64k
--		 * max_sync_size, the loss would be at most 128/64k =3D ~0.2%.
--		 */
--		padding =3D ALIGN(outbuf, IO_BUFFER_ALIGN) - outbuf;
--		outbuf +=3D padding;
--		bytesleft -=3D padding;
--		if (i =3D=3D 0)
--			/* save offset into first block in header */
--			hdr->offset =3D padding + hdrsize;
--
--		if (bytesleft <=3D 0) {
--			ret =3D -ENOSPC;
--			goto unlock;
--		}
--
--		/*
--		 * NOTE: If the default max_sync_size is changed from 4k
--		 * to 64k, remove the "likely" case below, since a
--		 * scatterlist will always be needed.
--		 */
--		if (likely(max_sync_size =3D=3D NX842_HW_PAGE_SIZE)) {
--			/* Create direct DDE */
--			op.in =3D nx842_get_pa((void *)inbuf);
--			op.inlen =3D max_sync_size;
--
--		} else {
--			/* Create indirect DDE (scatterlist) */
--			nx842_build_scatterlist(inbuf, max_sync_size, &slin);
--			op.in =3D nx842_get_pa(slin.entries);
--			op.inlen =3D -nx842_get_scatterlist_size(&slin);
--		}
--
--		/*
--		 * If max_sync_size !=3D NX842_HW_PAGE_SIZE, an indirect
--		 * DDE is required for the outbuf.
--		 * If max_sync_size =3D=3D NX842_HW_PAGE_SIZE, outbuf must
--		 * also be page aligned (1 in 128/4k=3D32 chance) in order
--		 * to use a direct DDE.
--		 * This is unlikely, just use an indirect DDE always.
--		 */
--		nx842_build_scatterlist(outbuf,
--			min(bytesleft, max_sync_size), &slout);
--		/* op.out set before loop */
--		op.outlen =3D -nx842_get_scatterlist_size(&slout);
--
--		/* Send request to pHyp */
--		ret =3D vio_h_cop_sync(local_devdata->vdev, &op);
--
--		/* Check for pHyp error */
--		if (ret) {
--			dev_dbg(dev, "%s: vio_h_cop_sync error (ret=3D%d, hret=3D%ld)\n",
--				__func__, ret, op.hcall_err);
--			ret =3D -EIO;
--			goto unlock;
--		}
--
--		/* Check for hardware error */
--		ret =3D nx842_validate_result(dev, &csbcpb->csb);
--		if (ret && ret !=3D -ENOSPC)
--			goto unlock;
--
--		/* Handle incompressible data */
--		if (unlikely(ret =3D=3D -ENOSPC)) {
--			if (bytesleft < max_sync_size) {
--				/*
--				 * Not enough space left in the output buffer
--				 * to store uncompressed block
--				 */
--				goto unlock;
--			} else {
--				/* Store incompressible block */
--				memcpy((void *)outbuf, (void *)inbuf,
--					max_sync_size);
--				hdr->sizes[i] =3D -max_sync_size;
--				outbuf +=3D max_sync_size;
--				bytesleft -=3D max_sync_size;
--				/* Reset ret, incompressible data handled */
--				ret =3D 0;
--			}
--		} else {
--			/* Normal case, compression was successful */
--			size =3D csbcpb->csb.processed_byte_count;
--			dev_dbg(dev, "%s: processed_bytes=3D%d\n",
--				__func__, size);
--			hdr->sizes[i] =3D size;
--			outbuf +=3D size;
--			bytesleft -=3D size;
--		}
--
--		inbuf +=3D max_sync_size;
--	}
--
--	*outlen =3D (unsigned int)(outbuf - (unsigned long)out);
--
--unlock:
--	if (ret)
--		nx842_inc_comp_failed(local_devdata);
--	else {
--		nx842_inc_comp_complete(local_devdata);
--		ibm_nx842_incr_hist(local_devdata->counters->comp_times,
--			(get_tb() - start_time) / tb_ticks_per_usec);
--	}
--	rcu_read_unlock();
--	return ret;
--}
--EXPORT_SYMBOL_GPL(nx842_compress);
--
--static int sw842_decompress(const unsigned char *, int, unsigned char =
-*, int *,
--			const void *);
--
--/**
-- * nx842_decompress - Decompress data using the 842 algorithm
-- *
-- * Decompression provide by the NX842 coprocessor on IBM Power systems=
-=2E
-- * The input buffer is decompressed and the result is stored in the
-- * provided output buffer.  The size allocated to the output buffer is
-- * provided by the caller of this function in @outlen.  Upon return fr=
-om
-- * this function @outlen contains the length of the decompressed data.
-- * If there is an error then @outlen will be 0 and an error will be
-- * specified by the return code from this function.
-- *
-- * @in: Pointer to input buffer, will use bounce buffer if not 128 byt=
-e
-- *      aligned
-- * @inlen: Length of input buffer
-- * @out: Pointer to output buffer, must be page aligned
-- * @outlen: Length of output buffer, must be PAGE_SIZE
-- * @wrkmem: ptr to buffer for working memory, size determined by
-- *          nx842_get_workmem_size()
-- *
-- * Returns:
-- *   0		Success, output of length @outlen stored in the buffer at @out
-- *   -ENODEV	Hardware decompression device is unavailable
-- *   -ENOMEM	Unable to allocate internal buffers
-- *   -ENOSPC	Output buffer is to small
-- *   -EINVAL	Bad input data encountered when attempting decompress
-- *   -EIO	Internal error
-- */
--int nx842_decompress(const unsigned char *in, unsigned int inlen,
--			 unsigned char *out, unsigned int *outlen, void *wmem)
--{
--	struct nx842_header *hdr;
--	struct nx842_devdata *local_devdata;
--	struct device *dev =3D NULL;
--	struct nx842_workmem *workmem;
--	struct nx842_scatterlist slin, slout;
--	struct nx_csbcpb *csbcpb;
--	int ret =3D 0, i, size, max_sync_size;
--	unsigned long inbuf, outbuf;
--	struct vio_pfo_op op =3D {
--		.done =3D NULL,
--		.handle =3D 0,
--		.timeout =3D 0,
--	};
--	unsigned long start_time =3D get_tb();
--
--	/* Ensure page alignment and size */
--	outbuf =3D (unsigned long)out;
--	if (!IS_ALIGNED(outbuf, PAGE_SIZE) || *outlen !=3D PAGE_SIZE)
--		return -EINVAL;
--
--	rcu_read_lock();
--	local_devdata =3D rcu_dereference(devdata);
--	if (local_devdata)
--		dev =3D local_devdata->dev;
--
--	/* Get header */
--	hdr =3D (struct nx842_header *)in;
--
--	workmem =3D (struct nx842_workmem *)ALIGN((unsigned long)wmem,
--		NX842_HW_PAGE_SIZE);
--
--	inbuf =3D (unsigned long)in + hdr->offset;
--	if (likely(!IS_ALIGNED(inbuf, IO_BUFFER_ALIGN))) {
--		/* Copy block(s) into bounce buffer for alignment */
--		memcpy(workmem->bounce, in + hdr->offset, inlen - hdr->offset);
--		inbuf =3D (unsigned long)workmem->bounce;
--	}
--
--	/* Init scatterlist */
--	slin.entries =3D (struct nx842_slentry *)workmem->slin;
--	slout.entries =3D (struct nx842_slentry *)workmem->slout;
--
--	/* Init operation */
--	op.flags =3D NX842_OP_DECOMPRESS;
--	csbcpb =3D &workmem->csbcpb;
--	memset(csbcpb, 0, sizeof(*csbcpb));
--	op.csbcpb =3D nx842_get_pa(csbcpb);
--
--	/*
--	 * max_sync_size may have changed since compression,
--	 * so we can't read it from the device info. We need
--	 * to derive it from hdr->blocks_nr.
--	 */
--	max_sync_size =3D PAGE_SIZE / hdr->blocks_nr;
--
--	for (i =3D 0; i < hdr->blocks_nr; i++) {
--		/* Skip padding */
--		inbuf =3D ALIGN(inbuf, IO_BUFFER_ALIGN);
--
--		if (hdr->sizes[i] < 0) {
--			/* Negative sizes indicate uncompressed data blocks */
--			size =3D abs(hdr->sizes[i]);
--			memcpy((void *)outbuf, (void *)inbuf, size);
--			outbuf +=3D size;
--			inbuf +=3D size;
--			continue;
--		}
--
--		if (!dev)
--			goto sw;
--
--		/*
--		 * The better the compression, the more likely the "likely"
--		 * case becomes.
--		 */
--		if (likely((inbuf & NX842_HW_PAGE_MASK) =3D=3D
--			((inbuf + hdr->sizes[i] - 1) & NX842_HW_PAGE_MASK))) {
--			/* Create direct DDE */
--			op.in =3D nx842_get_pa((void *)inbuf);
--			op.inlen =3D hdr->sizes[i];
--		} else {
--			/* Create indirect DDE (scatterlist) */
--			nx842_build_scatterlist(inbuf, hdr->sizes[i] , &slin);
--			op.in =3D nx842_get_pa(slin.entries);
--			op.inlen =3D -nx842_get_scatterlist_size(&slin);
--		}
--
--		/*
--		 * NOTE: If the default max_sync_size is changed from 4k
--		 * to 64k, remove the "likely" case below, since a
--		 * scatterlist will always be needed.
--		 */
--		if (likely(max_sync_size =3D=3D NX842_HW_PAGE_SIZE)) {
--			/* Create direct DDE */
--			op.out =3D nx842_get_pa((void *)outbuf);
--			op.outlen =3D max_sync_size;
--		} else {
--			/* Create indirect DDE (scatterlist) */
--			nx842_build_scatterlist(outbuf, max_sync_size, &slout);
--			op.out =3D nx842_get_pa(slout.entries);
--			op.outlen =3D -nx842_get_scatterlist_size(&slout);
--		}
--
--		/* Send request to pHyp */
--		ret =3D vio_h_cop_sync(local_devdata->vdev, &op);
--
--		/* Check for pHyp error */
--		if (ret) {
--			dev_dbg(dev, "%s: vio_h_cop_sync error (ret=3D%d, hret=3D%ld)\n",
--				__func__, ret, op.hcall_err);
--			dev =3D NULL;
--			goto sw;
--		}
--
--		/* Check for hardware error */
--		ret =3D nx842_validate_result(dev, &csbcpb->csb);
--		if (ret) {
--			dev =3D NULL;
--			goto sw;
--		}
--
--		/* HW decompression success */
--		inbuf +=3D hdr->sizes[i];
--		outbuf +=3D csbcpb->csb.processed_byte_count;
--		continue;
--
--sw:
--		/* software decompression */
--		size =3D max_sync_size;
--		ret =3D sw842_decompress(
--			(unsigned char *)inbuf, hdr->sizes[i],
--			(unsigned char *)outbuf, &size, wmem);
--		if (ret)
--			pr_debug("%s: sw842_decompress failed with %d\n",
--				__func__, ret);
--
--		if (ret) {
--			if (ret !=3D -ENOSPC && ret !=3D -EINVAL &&
--					ret !=3D -EMSGSIZE)
--				ret =3D -EIO;
--			goto unlock;
--		}
--
--		/* SW decompression success */
--		inbuf +=3D hdr->sizes[i];
--		outbuf +=3D size;
--	}
--
--	*outlen =3D (unsigned int)(outbuf - (unsigned long)out);
--
--unlock:
--	if (ret)
--		/* decompress fail */
--		nx842_inc_decomp_failed(local_devdata);
--	else {
--		if (!dev)
--			/* software decompress */
--			nx842_inc_swdecomp(local_devdata);
--		nx842_inc_decomp_complete(local_devdata);
--		ibm_nx842_incr_hist(local_devdata->counters->decomp_times,
--			(get_tb() - start_time) / tb_ticks_per_usec);
--	}
--
--	rcu_read_unlock();
--	return ret;
--}
--EXPORT_SYMBOL_GPL(nx842_decompress);
--
--/**
-- * nx842_OF_set_defaults -- Set default (disabled) values for devdata
-- *
-- * @devdata - struct nx842_devdata to update
-- *
-- * Returns:
-- *  0 on success
-- *  -ENOENT if @devdata ptr is NULL
-- */
--static int nx842_OF_set_defaults(struct nx842_devdata *devdata)
--{
--	if (devdata) {
--		devdata->max_sync_size =3D 0;
--		devdata->max_sync_sg =3D 0;
--		devdata->max_sg_len =3D 0;
--		devdata->status =3D UNAVAILABLE;
--		return 0;
--	} else
--		return -ENOENT;
--}
--
--/**
-- * nx842_OF_upd_status -- Update the device info from OF status prop
-- *
-- * The status property indicates if the accelerator is enabled.  If th=
-e
-- * device is in the OF tree it indicates that the hardware is present.
-- * The status field indicates if the device is enabled when the status
-- * is 'okay'.  Otherwise the device driver will be disabled.
-- *
-- * @devdata - struct nx842_devdata to update
-- * @prop - struct property point containing the maxsyncop for the upda=
-te
-- *
-- * Returns:
-- *  0 - Device is available
-- *  -EINVAL - Device is not available
-- */
--static int nx842_OF_upd_status(struct nx842_devdata *devdata,
--					struct property *prop) {
--	int ret =3D 0;
--	const char *status =3D (const char *)prop->value;
--
--	if (!strncmp(status, "okay", (size_t)prop->length)) {
--		devdata->status =3D AVAILABLE;
--	} else {
--		dev_info(devdata->dev, "%s: status '%s' is not 'okay'\n",
--				__func__, status);
--		devdata->status =3D UNAVAILABLE;
--	}
--
--	return ret;
--}
--
--/**
-- * nx842_OF_upd_maxsglen -- Update the device info from OF maxsglen pr=
-op
-- *
-- * Definition of the 'ibm,max-sg-len' OF property:
-- *  This field indicates the maximum byte length of a scatter list
-- *  for the platform facility. It is a single cell encoded as with enc=
-ode-int.
-- *
-- * Example:
-- *  # od -x ibm,max-sg-len
-- *  0000000 0000 0ff0
-- *
-- *  In this example, the maximum byte length of a scatter list is
-- *  0x0ff0 (4,080).
-- *
-- * @devdata - struct nx842_devdata to update
-- * @prop - struct property point containing the maxsyncop for the upda=
-te
-- *
-- * Returns:
-- *  0 on success
-- *  -EINVAL on failure
-- */
--static int nx842_OF_upd_maxsglen(struct nx842_devdata *devdata,
--					struct property *prop) {
--	int ret =3D 0;
--	const int *maxsglen =3D prop->value;
--
--	if (prop->length !=3D sizeof(*maxsglen)) {
--		dev_err(devdata->dev, "%s: unexpected format for ibm,max-sg-len prop=
-erty\n", __func__);
--		dev_dbg(devdata->dev, "%s: ibm,max-sg-len is %d bytes long, expected=
- %lu bytes\n", __func__,
--				prop->length, sizeof(*maxsglen));
--		ret =3D -EINVAL;
--	} else {
--		devdata->max_sg_len =3D (unsigned int)min(*maxsglen,
--				(int)NX842_HW_PAGE_SIZE);
--	}
--
--	return ret;
--}
--
--/**
-- * nx842_OF_upd_maxsyncop -- Update the device info from OF maxsyncop =
-prop
-- *
-- * Definition of the 'ibm,max-sync-cop' OF property:
-- *  Two series of cells.  The first series of cells represents the max=
-imums
-- *  that can be synchronously compressed. The second series of cells
-- *  represents the maximums that can be synchronously decompressed.
-- *  1. The first cell in each series contains the count of the number =
-of
-- *     data length, scatter list elements pairs that follow =E2=80=93 =
-each being
-- *     of the form
-- *    a. One cell data byte length
-- *    b. One cell total number of scatter list elements
-- *
-- * Example:
-- *  # od -x ibm,max-sync-cop
-- *  0000000 0000 0001 0000 1000 0000 01fe 0000 0001
-- *  0000020 0000 1000 0000 01fe
-- *
-- *  In this example, compression supports 0x1000 (4,096) data byte len=
-gth
-- *  and 0x1fe (510) total scatter list elements.  Decompression suppor=
-ts
-- *  0x1000 (4,096) data byte length and 0x1f3 (510) total scatter list
-- *  elements.
-- *
-- * @devdata - struct nx842_devdata to update
-- * @prop - struct property point containing the maxsyncop for the upda=
-te
-- *
-- * Returns:
-- *  0 on success
-- *  -EINVAL on failure
-- */
--static int nx842_OF_upd_maxsyncop(struct nx842_devdata *devdata,
--					struct property *prop) {
--	int ret =3D 0;
--	const struct maxsynccop_t {
--		int comp_elements;
--		int comp_data_limit;
--		int comp_sg_limit;
--		int decomp_elements;
--		int decomp_data_limit;
--		int decomp_sg_limit;
--	} *maxsynccop;
--
--	if (prop->length !=3D sizeof(*maxsynccop)) {
--		dev_err(devdata->dev, "%s: unexpected format for ibm,max-sync-cop pr=
-operty\n", __func__);
--		dev_dbg(devdata->dev, "%s: ibm,max-sync-cop is %d bytes long, expect=
-ed %lu bytes\n", __func__, prop->length,
--				sizeof(*maxsynccop));
--		ret =3D -EINVAL;
--		goto out;
--	}
--
--	maxsynccop =3D (const struct maxsynccop_t *)prop->value;
--
--	/* Use one limit rather than separate limits for compression and
--	 * decompression. Set a maximum for this so as not to exceed the
--	 * size that the header can support and round the value down to
--	 * the hardware page size (4K) */
--	devdata->max_sync_size =3D
--			(unsigned int)min(maxsynccop->comp_data_limit,
--					maxsynccop->decomp_data_limit);
--
--	devdata->max_sync_size =3D min_t(unsigned int, devdata->max_sync_size=
-,
--					SIZE_64K);
--
--	if (devdata->max_sync_size < SIZE_4K) {
--		dev_err(devdata->dev, "%s: hardware max data size (%u) is "
--				"less than the driver minimum, unable to use "
--				"the hardware device\n",
--				__func__, devdata->max_sync_size);
--		ret =3D -EINVAL;
--		goto out;
--	}
--
--	devdata->max_sync_sg =3D (unsigned int)min(maxsynccop->comp_sg_limit,
--						maxsynccop->decomp_sg_limit);
--	if (devdata->max_sync_sg < 1) {
--		dev_err(devdata->dev, "%s: hardware max sg size (%u) is "
--				"less than the driver minimum, unable to use "
--				"the hardware device\n",
--				__func__, devdata->max_sync_sg);
--		ret =3D -EINVAL;
--		goto out;
--	}
--
--out:
--	return ret;
--}
--
--/**
-- *
-- * nx842_OF_upd -- Handle OF properties updates for the device.
-- *
-- * Set all properties from the OF tree.  Optionally, a new property
-- * can be provided by the @new_prop pointer to overwrite an existing v=
-alue.
-- * The device will remain disabled until all values are valid, this fu=
-nction
-- * will return an error for updates unless all values are valid.
-- *
-- * @new_prop: If not NULL, this property is being updated.  If NULL, u=
-pdate
-- *  all properties from the current values in the OF tree.
-- *
-- * Returns:
-- *  0 - Success
-- *  -ENOMEM - Could not allocate memory for new devdata structure
-- *  -EINVAL - property value not found, new_prop is not a recognized
-- *	property for the device or property value is not valid.
-- *  -ENODEV - Device is not available
-- */
--static int nx842_OF_upd(struct property *new_prop)
--{
--	struct nx842_devdata *old_devdata =3D NULL;
--	struct nx842_devdata *new_devdata =3D NULL;
--	struct device_node *of_node =3D NULL;
--	struct property *status =3D NULL;
--	struct property *maxsglen =3D NULL;
--	struct property *maxsyncop =3D NULL;
--	int ret =3D 0;
--	unsigned long flags;
--
--	spin_lock_irqsave(&devdata_mutex, flags);
--	old_devdata =3D rcu_dereference_check(devdata,
--			lockdep_is_held(&devdata_mutex));
--	if (old_devdata)
--		of_node =3D old_devdata->dev->of_node;
--
--	if (!old_devdata || !of_node) {
--		pr_err("%s: device is not available\n", __func__);
--		spin_unlock_irqrestore(&devdata_mutex, flags);
--		return -ENODEV;
--	}
--
--	new_devdata =3D kzalloc(sizeof(*new_devdata), GFP_NOFS);
--	if (!new_devdata) {
--		dev_err(old_devdata->dev, "%s: Could not allocate memory for device =
-data\n", __func__);
--		ret =3D -ENOMEM;
--		goto error_out;
--	}
--
--	memcpy(new_devdata, old_devdata, sizeof(*old_devdata));
--	new_devdata->counters =3D old_devdata->counters;
--
--	/* Set ptrs for existing properties */
--	status =3D of_find_property(of_node, "status", NULL);
--	maxsglen =3D of_find_property(of_node, "ibm,max-sg-len", NULL);
--	maxsyncop =3D of_find_property(of_node, "ibm,max-sync-cop", NULL);
--	if (!status || !maxsglen || !maxsyncop) {
--		dev_err(old_devdata->dev, "%s: Could not locate device properties\n"=
-, __func__);
--		ret =3D -EINVAL;
--		goto error_out;
--	}
--
--	/*
--	 * If this is a property update, there are only certain properties th=
-at
--	 * we care about. Bail if it isn't in the below list
--	 */
--	if (new_prop && (strncmp(new_prop->name, "status", new_prop->length) =
-||
--		         strncmp(new_prop->name, "ibm,max-sg-len", new_prop->length)=
- ||
--		         strncmp(new_prop->name, "ibm,max-sync-cop", new_prop->lengt=
-h)))
--		goto out;
--
--	/* Perform property updates */
--	ret =3D nx842_OF_upd_status(new_devdata, status);
--	if (ret)
--		goto error_out;
--
--	ret =3D nx842_OF_upd_maxsglen(new_devdata, maxsglen);
--	if (ret)
--		goto error_out;
--
--	ret =3D nx842_OF_upd_maxsyncop(new_devdata, maxsyncop);
--	if (ret)
--		goto error_out;
--
--out:
--	dev_info(old_devdata->dev, "%s: max_sync_size new:%u old:%u\n",
--			__func__, new_devdata->max_sync_size,
--			old_devdata->max_sync_size);
--	dev_info(old_devdata->dev, "%s: max_sync_sg new:%u old:%u\n",
--			__func__, new_devdata->max_sync_sg,
--			old_devdata->max_sync_sg);
--	dev_info(old_devdata->dev, "%s: max_sg_len new:%u old:%u\n",
--			__func__, new_devdata->max_sg_len,
--			old_devdata->max_sg_len);
--
--	rcu_assign_pointer(devdata, new_devdata);
--	spin_unlock_irqrestore(&devdata_mutex, flags);
--	synchronize_rcu();
--	dev_set_drvdata(new_devdata->dev, new_devdata);
--	kfree(old_devdata);
--	return 0;
--
--error_out:
--	if (new_devdata) {
--		dev_info(old_devdata->dev, "%s: device disabled\n", __func__);
--		nx842_OF_set_defaults(new_devdata);
--		rcu_assign_pointer(devdata, new_devdata);
--		spin_unlock_irqrestore(&devdata_mutex, flags);
--		synchronize_rcu();
--		dev_set_drvdata(new_devdata->dev, new_devdata);
--		kfree(old_devdata);
--	} else {
--		dev_err(old_devdata->dev, "%s: could not update driver from hardware=
-\n", __func__);
--		spin_unlock_irqrestore(&devdata_mutex, flags);
--	}
--
--	if (!ret)
--		ret =3D -EINVAL;
--	return ret;
--}
--
--/**
-- * nx842_OF_notifier - Process updates to OF properties for the device
-- *
-- * @np: notifier block
-- * @action: notifier action
-- * @update: struct pSeries_reconfig_prop_update pointer if action is
-- *	PSERIES_UPDATE_PROPERTY
-- *
-- * Returns:
-- *	NOTIFY_OK on success
-- *	NOTIFY_BAD encoded with error number on failure, use
-- *		notifier_to_errno() to decode this value
-- */
--static int nx842_OF_notifier(struct notifier_block *np, unsigned long =
-action,
--			     void *data)
--{
--	struct of_reconfig_data *upd =3D data;
--	struct nx842_devdata *local_devdata;
--	struct device_node *node =3D NULL;
--
--	rcu_read_lock();
--	local_devdata =3D rcu_dereference(devdata);
--	if (local_devdata)
--		node =3D local_devdata->dev->of_node;
--
--	if (local_devdata &&
--			action =3D=3D OF_RECONFIG_UPDATE_PROPERTY &&
--			!strcmp(upd->dn->name, node->name)) {
--		rcu_read_unlock();
--		nx842_OF_upd(upd->prop);
--	} else
--		rcu_read_unlock();
--
--	return NOTIFY_OK;
--}
--
--static struct notifier_block nx842_of_nb =3D {
--	.notifier_call =3D nx842_OF_notifier,
--};
--
--#define nx842_counter_read(_name)					\
--static ssize_t nx842_##_name##_show(struct device *dev,		\
--		struct device_attribute *attr,				\
--		char *buf) {						\
--	struct nx842_devdata *local_devdata;			\
--	int p =3D 0;							\
--	rcu_read_lock();						\
--	local_devdata =3D rcu_dereference(devdata);			\
--	if (local_devdata)						\
--		p =3D snprintf(buf, PAGE_SIZE, "%ld\n",			\
--		       atomic64_read(&local_devdata->counters->_name));	\
--	rcu_read_unlock();						\
--	return p;							\
--}
--
--#define NX842DEV_COUNTER_ATTR_RO(_name)					\
--	nx842_counter_read(_name);					\
--	static struct device_attribute dev_attr_##_name =3D __ATTR(_name,	\
--						0444,			\
--						nx842_##_name##_show,\
--						NULL);
--
--NX842DEV_COUNTER_ATTR_RO(comp_complete);
--NX842DEV_COUNTER_ATTR_RO(comp_failed);
--NX842DEV_COUNTER_ATTR_RO(decomp_complete);
--NX842DEV_COUNTER_ATTR_RO(decomp_failed);
--NX842DEV_COUNTER_ATTR_RO(swdecomp);
--
--static ssize_t nx842_timehist_show(struct device *,
--		struct device_attribute *, char *);
--
--static struct device_attribute dev_attr_comp_times =3D __ATTR(comp_tim=
-es, 0444,
--		nx842_timehist_show, NULL);
--static struct device_attribute dev_attr_decomp_times =3D __ATTR(decomp=
-_times,
--		0444, nx842_timehist_show, NULL);
--
--static ssize_t nx842_timehist_show(struct device *dev,
--		struct device_attribute *attr, char *buf) {
--	char *p =3D buf;
--	struct nx842_devdata *local_devdata;
--	atomic64_t *times;
--	int bytes_remain =3D PAGE_SIZE;
--	int bytes;
--	int i;
--
--	rcu_read_lock();
--	local_devdata =3D rcu_dereference(devdata);
--	if (!local_devdata) {
--		rcu_read_unlock();
--		return 0;
--	}
--
--	if (attr =3D=3D &dev_attr_comp_times)
--		times =3D local_devdata->counters->comp_times;
--	else if (attr =3D=3D &dev_attr_decomp_times)
--		times =3D local_devdata->counters->decomp_times;
--	else {
--		rcu_read_unlock();
--		return 0;
--	}
--
--	for (i =3D 0; i < (NX842_HIST_SLOTS - 2); i++) {
--		bytes =3D snprintf(p, bytes_remain, "%u-%uus:\t%ld\n",
--			       i ? (2<<(i-1)) : 0, (2<<i)-1,
--			       atomic64_read(&times[i]));
--		bytes_remain -=3D bytes;
--		p +=3D bytes;
--	}
--	/* The last bucket holds everything over
--	 * 2<<(NX842_HIST_SLOTS - 2) us */
--	bytes =3D snprintf(p, bytes_remain, "%uus - :\t%ld\n",
--			2<<(NX842_HIST_SLOTS - 2),
--			atomic64_read(&times[(NX842_HIST_SLOTS - 1)]));
--	p +=3D bytes;
--
--	rcu_read_unlock();
--	return p - buf;
--}
--
--static struct attribute *nx842_sysfs_entries[] =3D {
--	&dev_attr_comp_complete.attr,
--	&dev_attr_comp_failed.attr,
--	&dev_attr_decomp_complete.attr,
--	&dev_attr_decomp_failed.attr,
--	&dev_attr_swdecomp.attr,
--	&dev_attr_comp_times.attr,
--	&dev_attr_decomp_times.attr,
--	NULL,
--};
--
--static struct attribute_group nx842_attribute_group =3D {
--	.name =3D NULL,		/* put in device directory */
--	.attrs =3D nx842_sysfs_entries,
--};
--
--static int __init nx842_probe(struct vio_dev *viodev,
--				  const struct vio_device_id *id)
--{
--	struct nx842_devdata *old_devdata, *new_devdata =3D NULL;
--	unsigned long flags;
--	int ret =3D 0;
--
--	spin_lock_irqsave(&devdata_mutex, flags);
--	old_devdata =3D rcu_dereference_check(devdata,
--			lockdep_is_held(&devdata_mutex));
--
--	if (old_devdata && old_devdata->vdev !=3D NULL) {
--		dev_err(&viodev->dev, "%s: Attempt to register more than one instanc=
-e of the hardware\n", __func__);
--		ret =3D -1;
--		goto error_unlock;
--	}
--
--	dev_set_drvdata(&viodev->dev, NULL);
--
--	new_devdata =3D kzalloc(sizeof(*new_devdata), GFP_NOFS);
--	if (!new_devdata) {
--		dev_err(&viodev->dev, "%s: Could not allocate memory for device data=
-\n", __func__);
--		ret =3D -ENOMEM;
--		goto error_unlock;
--	}
--
--	new_devdata->counters =3D kzalloc(sizeof(*new_devdata->counters),
--			GFP_NOFS);
--	if (!new_devdata->counters) {
--		dev_err(&viodev->dev, "%s: Could not allocate memory for performance=
- counters\n", __func__);
--		ret =3D -ENOMEM;
--		goto error_unlock;
--	}
--
--	new_devdata->vdev =3D viodev;
--	new_devdata->dev =3D &viodev->dev;
--	nx842_OF_set_defaults(new_devdata);
--
--	rcu_assign_pointer(devdata, new_devdata);
--	spin_unlock_irqrestore(&devdata_mutex, flags);
--	synchronize_rcu();
--	kfree(old_devdata);
--
--	of_reconfig_notifier_register(&nx842_of_nb);
--
--	ret =3D nx842_OF_upd(NULL);
--	if (ret && ret !=3D -ENODEV) {
--		dev_err(&viodev->dev, "could not parse device tree. %d\n", ret);
--		ret =3D -1;
--		goto error;
--	}
--
--	rcu_read_lock();
--	dev_set_drvdata(&viodev->dev, rcu_dereference(devdata));
--	rcu_read_unlock();
--
--	if (sysfs_create_group(&viodev->dev.kobj, &nx842_attribute_group)) {
--		dev_err(&viodev->dev, "could not create sysfs device attributes\n");
--		ret =3D -1;
--		goto error;
--	}
--
--	return 0;
--
--error_unlock:
--	spin_unlock_irqrestore(&devdata_mutex, flags);
--	if (new_devdata)
--		kfree(new_devdata->counters);
--	kfree(new_devdata);
--error:
--	return ret;
--}
--
--static int __exit nx842_remove(struct vio_dev *viodev)
--{
--	struct nx842_devdata *old_devdata;
--	unsigned long flags;
--
--	pr_info("Removing IBM Power 842 compression device\n");
--	sysfs_remove_group(&viodev->dev.kobj, &nx842_attribute_group);
--
--	spin_lock_irqsave(&devdata_mutex, flags);
--	old_devdata =3D rcu_dereference_check(devdata,
--			lockdep_is_held(&devdata_mutex));
--	of_reconfig_notifier_unregister(&nx842_of_nb);
--	RCU_INIT_POINTER(devdata, NULL);
--	spin_unlock_irqrestore(&devdata_mutex, flags);
--	synchronize_rcu();
--	dev_set_drvdata(&viodev->dev, NULL);
--	if (old_devdata)
--		kfree(old_devdata->counters);
--	kfree(old_devdata);
--	return 0;
--}
--
--static struct vio_device_id nx842_driver_ids[] =3D {
--	{"ibm,compression-v1", "ibm,compression"},
--	{"", ""},
--};
--
--static struct vio_driver nx842_driver =3D {
--	.name =3D MODULE_NAME,
--	.probe =3D nx842_probe,
--	.remove =3D __exit_p(nx842_remove),
--	.get_desired_dma =3D nx842_get_desired_dma,
--	.id_table =3D nx842_driver_ids,
--};
--
--static int __init nx842_init(void)
--{
--	struct nx842_devdata *new_devdata;
--	pr_info("Registering IBM Power 842 compression driver\n");
--
--	RCU_INIT_POINTER(devdata, NULL);
--	new_devdata =3D kzalloc(sizeof(*new_devdata), GFP_KERNEL);
--	if (!new_devdata) {
--		pr_err("Could not allocate memory for device data\n");
--		return -ENOMEM;
--	}
--	new_devdata->status =3D UNAVAILABLE;
--	RCU_INIT_POINTER(devdata, new_devdata);
--
--	return vio_register_driver(&nx842_driver);
--}
--
--module_init(nx842_init);
--
--static void __exit nx842_exit(void)
--{
--	struct nx842_devdata *old_devdata;
--	unsigned long flags;
--
--	pr_info("Exiting IBM Power 842 compression driver\n");
--	spin_lock_irqsave(&devdata_mutex, flags);
--	old_devdata =3D rcu_dereference_check(devdata,
--			lockdep_is_held(&devdata_mutex));
--	RCU_INIT_POINTER(devdata, NULL);
--	spin_unlock_irqrestore(&devdata_mutex, flags);
--	synchronize_rcu();
--	if (old_devdata)
--		dev_set_drvdata(old_devdata->dev, NULL);
--	kfree(old_devdata);
--	vio_unregister_driver(&nx842_driver);
--}
--
--module_exit(nx842_exit);
--
--/*********************************
-- * 842 software decompressor
--*********************************/
--typedef int (*sw842_template_op)(const char **, int *, unsigned char *=
-*,
--						struct sw842_fifo *);
--
--static int sw842_data8(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--static int sw842_data4(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--static int sw842_data2(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--static int sw842_ptr8(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--static int sw842_ptr4(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--static int sw842_ptr2(const char **, int *, unsigned char **,
--						struct sw842_fifo *);
--
--/* special templates */
--#define SW842_TMPL_REPEAT 0x1B
--#define SW842_TMPL_ZEROS 0x1C
--#define SW842_TMPL_EOF 0x1E
--
--static sw842_template_op sw842_tmpl_ops[26][4] =3D {
--	{ sw842_data8, NULL}, /* 0 (00000) */
--	{ sw842_data4, sw842_data2, sw842_ptr2,  NULL},
--	{ sw842_data4, sw842_ptr2,  sw842_data2, NULL},
--	{ sw842_data4, sw842_ptr2,  sw842_ptr2,  NULL},
--	{ sw842_data4, sw842_ptr4,  NULL},
--	{ sw842_data2, sw842_ptr2,  sw842_data4, NULL},
--	{ sw842_data2, sw842_ptr2,  sw842_data2, sw842_ptr2},
--	{ sw842_data2, sw842_ptr2,  sw842_ptr2,  sw842_data2},
--	{ sw842_data2, sw842_ptr2,  sw842_ptr2,  sw842_ptr2,},
--	{ sw842_data2, sw842_ptr2,  sw842_ptr4,  NULL},
--	{ sw842_ptr2,  sw842_data2, sw842_data4, NULL}, /* 10 (01010) */
--	{ sw842_ptr2,  sw842_data4, sw842_ptr2,  NULL},
--	{ sw842_ptr2,  sw842_data2, sw842_ptr2,  sw842_data2},
--	{ sw842_ptr2,  sw842_data2, sw842_ptr2,  sw842_ptr2},
--	{ sw842_ptr2,  sw842_data2, sw842_ptr4,  NULL},
--	{ sw842_ptr2,  sw842_ptr2,  sw842_data4, NULL},
--	{ sw842_ptr2,  sw842_ptr2,  sw842_data2, sw842_ptr2},
--	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr2,  sw842_data2},
--	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr2,  sw842_ptr2},
--	{ sw842_ptr2,  sw842_ptr2,  sw842_ptr4,  NULL},
--	{ sw842_ptr4,  sw842_data4, NULL}, /* 20 (10100) */
--	{ sw842_ptr4,  sw842_data2, sw842_ptr2,  NULL},
--	{ sw842_ptr4,  sw842_ptr2,  sw842_data2, NULL},
--	{ sw842_ptr4,  sw842_ptr2,  sw842_ptr2,  NULL},
--	{ sw842_ptr4,  sw842_ptr4,  NULL},
--	{ sw842_ptr8,  NULL}
--};
--
--/* Software decompress helpers */
--
--static uint8_t sw842_get_byte(const char *buf, int bit)
--{
--	uint8_t tmpl;
--	uint16_t tmp;
--	tmp =3D htons(*(uint16_t *)(buf));
--	tmp =3D (uint16_t)(tmp << bit);
--	tmp =3D ntohs(tmp);
--	memcpy(&tmpl, &tmp, 1);
--	return tmpl;
--}
--
--static uint8_t sw842_get_template(const char **buf, int *bit)
--{
--	uint8_t byte;
--	byte =3D sw842_get_byte(*buf, *bit);
--	byte =3D byte >> 3;
--	byte &=3D 0x1F;
--	*buf +=3D (*bit + 5) / 8;
--	*bit =3D (*bit + 5) % 8;
--	return byte;
--}
--
--/* repeat_count happens to be 5-bit too (like the template) */
--static uint8_t sw842_get_repeat_count(const char **buf, int *bit)
--{
--	uint8_t byte;
--	byte =3D sw842_get_byte(*buf, *bit);
--	byte =3D byte >> 2;
--	byte &=3D 0x3F;
--	*buf +=3D (*bit + 6) / 8;
--	*bit =3D (*bit + 6) % 8;
--	return byte;
--}
--
--static uint8_t sw842_get_ptr2(const char **buf, int *bit)
--{
--	uint8_t ptr;
--	ptr =3D sw842_get_byte(*buf, *bit);
--	(*buf)++;
--	return ptr;
--}
--
--static uint16_t sw842_get_ptr4(const char **buf, int *bit,
--		struct sw842_fifo *fifo)
--{
--	uint16_t ptr;
--	ptr =3D htons(*(uint16_t *)(*buf));
--	ptr =3D (uint16_t)(ptr << *bit);
--	ptr =3D ptr >> 7;
--	ptr &=3D 0x01FF;
--	*buf +=3D (*bit + 9) / 8;
--	*bit =3D (*bit + 9) % 8;
--	return ptr;
--}
--
--static uint8_t sw842_get_ptr8(const char **buf, int *bit,
--		struct sw842_fifo *fifo)
--{
--	return sw842_get_ptr2(buf, bit);
--}
--
--/* Software decompress template ops */
--
--static int sw842_data8(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	int ret;
--
--	ret =3D sw842_data4(inbuf, inbit, outbuf, fifo);
--	if (ret)
--		return ret;
--	ret =3D sw842_data4(inbuf, inbit, outbuf, fifo);
--	return ret;
--}
--
--static int sw842_data4(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	int ret;
--
--	ret =3D sw842_data2(inbuf, inbit, outbuf, fifo);
--	if (ret)
--		return ret;
--	ret =3D sw842_data2(inbuf, inbit, outbuf, fifo);
--	return ret;
--}
--
--static int sw842_data2(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	**outbuf =3D sw842_get_byte(*inbuf, *inbit);
--	(*inbuf)++;
--	(*outbuf)++;
--	**outbuf =3D sw842_get_byte(*inbuf, *inbit);
--	(*inbuf)++;
--	(*outbuf)++;
--	return 0;
--}
--
--static int sw842_ptr8(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	uint8_t ptr;
--	ptr =3D sw842_get_ptr8(inbuf, inbit, fifo);
--	if (!fifo->f84_full && (ptr >=3D fifo->f8_count))
--		return 1;
--	memcpy(*outbuf, fifo->f8[ptr], 8);
--	*outbuf +=3D 8;
--	return 0;
--}
--
--static int sw842_ptr4(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	uint16_t ptr;
--	ptr =3D sw842_get_ptr4(inbuf, inbit, fifo);
--	if (!fifo->f84_full && (ptr >=3D fifo->f4_count))
--		return 1;
--	memcpy(*outbuf, fifo->f4[ptr], 4);
--	*outbuf +=3D 4;
--	return 0;
--}
--
--static int sw842_ptr2(const char **inbuf, int *inbit,
--		unsigned char **outbuf, struct sw842_fifo *fifo)
--{
--	uint8_t ptr;
--	ptr =3D sw842_get_ptr2(inbuf, inbit);
--	if (!fifo->f2_full && (ptr >=3D fifo->f2_count))
--		return 1;
--	memcpy(*outbuf, fifo->f2[ptr], 2);
--	*outbuf +=3D 2;
--	return 0;
--}
--
--static void sw842_copy_to_fifo(const char *buf, struct sw842_fifo *fif=
-o)
--{
--	unsigned char initial_f2count =3D fifo->f2_count;
--
--	memcpy(fifo->f8[fifo->f8_count], buf, 8);
--	fifo->f4_count +=3D 2;
--	fifo->f8_count +=3D 1;
--
--	if (!fifo->f84_full && fifo->f4_count >=3D 512) {
--		fifo->f84_full =3D 1;
--		fifo->f4_count /=3D 512;
--	}
--
--	memcpy(fifo->f2[fifo->f2_count++], buf, 2);
--	memcpy(fifo->f2[fifo->f2_count++], buf + 2, 2);
--	memcpy(fifo->f2[fifo->f2_count++], buf + 4, 2);
--	memcpy(fifo->f2[fifo->f2_count++], buf + 6, 2);
--	if (fifo->f2_count < initial_f2count)
--		fifo->f2_full =3D 1;
--}
--
--static int sw842_decompress(const unsigned char *src, int srclen,
--			unsigned char *dst, int *destlen,
--			const void *wrkmem)
--{
--	uint8_t tmpl;
--	const char *inbuf;
--	int inbit =3D 0;
--	unsigned char *outbuf, *outbuf_end, *origbuf, *prevbuf;
--	const char *inbuf_end;
--	sw842_template_op op;
--	int opindex;
--	int i, repeat_count;
--	struct sw842_fifo *fifo;
--	int ret =3D 0;
--
--	fifo =3D &((struct nx842_workmem *)(wrkmem))->swfifo;
--	memset(fifo, 0, sizeof(*fifo));
--
--	origbuf =3D NULL;
--	inbuf =3D src;
--	inbuf_end =3D src + srclen;
--	outbuf =3D dst;
--	outbuf_end =3D dst + *destlen;
--
--	while ((tmpl =3D sw842_get_template(&inbuf, &inbit)) !=3D SW842_TMPL_=
-EOF) {
--		if (inbuf >=3D inbuf_end) {
--			ret =3D -EINVAL;
--			goto out;
--		}
--
--		opindex =3D 0;
--		prevbuf =3D origbuf;
--		origbuf =3D outbuf;
--		switch (tmpl) {
--		case SW842_TMPL_REPEAT:
--			if (prevbuf =3D=3D NULL) {
--				ret =3D -EINVAL;
--				goto out;
--			}
--
--			repeat_count =3D sw842_get_repeat_count(&inbuf,
--								&inbit) + 1;
--
--			/* Did the repeat count advance past the end of input */
--			if (inbuf > inbuf_end) {
--				ret =3D -EINVAL;
--				goto out;
--			}
--
--			for (i =3D 0; i < repeat_count; i++) {
--				/* Would this overflow the output buffer */
--				if ((outbuf + 8) > outbuf_end) {
--					ret =3D -ENOSPC;
--					goto out;
--				}
--
--				memcpy(outbuf, prevbuf, 8);
--				sw842_copy_to_fifo(outbuf, fifo);
--				outbuf +=3D 8;
--			}
--			break;
--
--		case SW842_TMPL_ZEROS:
--			/* Would this overflow the output buffer */
--			if ((outbuf + 8) > outbuf_end) {
--				ret =3D -ENOSPC;
--				goto out;
--			}
--
--			memset(outbuf, 0, 8);
--			sw842_copy_to_fifo(outbuf, fifo);
--			outbuf +=3D 8;
--			break;
--
--		default:
--			if (tmpl > 25) {
--				ret =3D -EINVAL;
--				goto out;
--			}
--
--			/* Does this go past the end of the input buffer */
--			if ((inbuf + 2) > inbuf_end) {
--				ret =3D -EINVAL;
--				goto out;
--			}
--
--			/* Would this overflow the output buffer */
--			if ((outbuf + 8) > outbuf_end) {
--				ret =3D -ENOSPC;
--				goto out;
--			}
--
--			while (opindex < 4 &&
--				(op =3D sw842_tmpl_ops[tmpl][opindex++])
--					!=3D NULL) {
--				ret =3D (*op)(&inbuf, &inbit, &outbuf, fifo);
--				if (ret) {
--					ret =3D -EINVAL;
--					goto out;
--				}
--				sw842_copy_to_fifo(origbuf, fifo);
--			}
--		}
--	}
--
--out:
--	if (!ret)
--		*destlen =3D (unsigned int)(outbuf - dst);
--	else
--		*destlen =3D 0;
--
--	return ret;
--}
---=20
+ static int nx842_build_scatterlist(unsigned long buf, int len,
+ 			struct nx842_scatterlist *sl)
+ {
+diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
+index 160fe2d..bf2823c 100644
+--- a/drivers/crypto/nx/nx-842.c
++++ b/drivers/crypto/nx/nx-842.c
+@@ -164,7 +164,9 @@ static __init int nx842_init(void)
+ {
+ 	pr_info("loading\n");
+ 
+-	if (of_find_compatible_node(NULL, NULL, NX842_PSERIES_COMPAT_NAME))
++	if (of_find_compatible_node(NULL, NULL, NX842_POWERNV_COMPAT_NAME))
++		request_module_nowait(NX842_POWERNV_MODULE_NAME);
++	else if (of_find_compatible_node(NULL, NULL, NX842_PSERIES_COMPAT_NAME))
+ 		request_module_nowait(NX842_PSERIES_MODULE_NAME);
+ 	else
+ 		pr_err("no nx842 driver found.\n");
+diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
+index c6ceb0f..84b15b7 100644
+--- a/drivers/crypto/nx/nx-842.h
++++ b/drivers/crypto/nx/nx-842.h
+@@ -5,9 +5,104 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/nx842.h>
++#include <linux/sw842.h>
+ #include <linux/of.h>
+ #include <linux/slab.h>
+ #include <linux/io.h>
++#include <linux/mm.h>
++#include <linux/ratelimit.h>
++
++/* Restrictions on Data Descriptor List (DDL) and Entry (DDE) buffers
++ *
++ * From NX P8 workbook, sec 4.9.1 "842 details"
++ *   Each DDE buffer is 128 byte aligned
++ *   Each DDE buffer size is a multiple of 32 bytes (except the last)
++ *   The last DDE buffer size is a multiple of 8 bytes
++ */
++#define DDE_BUFFER_ALIGN	(128)
++#define DDE_BUFFER_SIZE_MULT	(32)
++#define DDE_BUFFER_LAST_MULT	(8)
++
++/* Arbitrary DDL length limit
++ * Allows max buffer size of MAX-1 to MAX pages
++ * (depending on alignment)
++ */
++#define DDL_LEN_MAX		(17)
++
++/* CCW 842 CI/FC masks
++ * NX P8 workbook, section 4.3.1, figure 4-6
++ * "CI/FC Boundary by NX CT type"
++ */
++#define CCW_CI_842		(0x00003ff8)
++#define CCW_FC_842		(0x00000007)
++
++/* CCW Function Codes (FC) for 842
++ * NX P8 workbook, section 4.9, table 4-28
++ * "Function Code Definitions for 842 Memory Compression"
++ */
++#define CCW_FC_842_COMP_NOCRC	(0)
++#define CCW_FC_842_COMP_CRC	(1)
++#define CCW_FC_842_DECOMP_NOCRC	(2)
++#define CCW_FC_842_DECOMP_CRC	(3)
++#define CCW_FC_842_MOVE		(4)
++
++/* CSB CC Error Types for 842
++ * NX P8 workbook, section 4.10.3, table 4-30
++ * "Reported Error Types Summary Table"
++ */
++/* These are all duplicates of existing codes defined in icswx.h. */
++#define CSB_CC_TRANSLATION_DUP1	(80)
++#define CSB_CC_TRANSLATION_DUP2	(82)
++#define CSB_CC_TRANSLATION_DUP3	(84)
++#define CSB_CC_TRANSLATION_DUP4	(86)
++#define CSB_CC_TRANSLATION_DUP5	(92)
++#define CSB_CC_TRANSLATION_DUP6	(94)
++#define CSB_CC_PROTECTION_DUP1	(81)
++#define CSB_CC_PROTECTION_DUP2	(83)
++#define CSB_CC_PROTECTION_DUP3	(85)
++#define CSB_CC_PROTECTION_DUP4	(87)
++#define CSB_CC_PROTECTION_DUP5	(93)
++#define CSB_CC_PROTECTION_DUP6	(95)
++#define CSB_CC_RD_EXTERNAL_DUP1	(89)
++#define CSB_CC_RD_EXTERNAL_DUP2	(90)
++#define CSB_CC_RD_EXTERNAL_DUP3	(91)
++/* These are specific to NX */
++/* 842 codes */
++#define CSB_CC_TPBC_GT_SPBC	(64) /* no error, but >1 comp ratio */
++#define CSB_CC_CRC_MISMATCH	(65) /* decomp crc mismatch */
++#define CSB_CC_TEMPL_INVALID	(66) /* decomp invalid template value */
++#define CSB_CC_TEMPL_OVERFLOW	(67) /* decomp template shows data after end */
++/* sym crypt codes */
++#define CSB_CC_DECRYPT_OVERFLOW	(64)
++/* asym crypt codes */
++#define CSB_CC_MINV_OVERFLOW	(128)
++/* These are reserved for hypervisor use */
++#define CSB_CC_HYP_RESERVE_START	(240)
++#define CSB_CC_HYP_RESERVE_END		(253)
++#define CSB_CC_HYP_NO_HW		(254)
++#define CSB_CC_HYP_HANG_ABORTED		(255)
++
++/* CCB Completion Modes (CM) for 842
++ * NX P8 workbook, section 4.3, figure 4-5
++ * "CRB Details - Normal Cop_Req (CL=00, C=1)"
++ */
++#define CCB_CM_EXTRA_WRITE	(CCB_CM0_ALL_COMPLETIONS & CCB_CM12_STORE)
++#define CCB_CM_INTERRUPT	(CCB_CM0_ALL_COMPLETIONS & CCB_CM12_INTERRUPT)
++
++#define LEN_ON_PAGE(pa)		(PAGE_SIZE - ((pa) & ~PAGE_MASK))
++
++static inline unsigned long nx842_get_pa(void *addr)
++{
++	if (!is_vmalloc_addr(addr))
++		return __pa(addr);
++
++	return page_to_phys(vmalloc_to_page(addr)) + offset_in_page(addr);
++}
++
++/* Get/Set bit fields */
++#define MASK_LSH(m)		(__builtin_ffsl(m) - 1)
++#define GET_FIELD(v, m)		(((v) & (m)) >> MASK_LSH(m))
++#define SET_FIELD(v, m, val)	(((v) & ~(m)) | (((val) << MASK_LSH(m)) & (m)))
+ 
+ struct nx842_driver {
+ 	struct module *owner;
+@@ -27,6 +122,8 @@ void nx842_unregister_driver(struct nx842_driver *driver);
+ 
+ 
+ /* To allow the main nx-compress module to load platform module */
++#define NX842_POWERNV_MODULE_NAME	"nx-compress-powernv"
++#define NX842_POWERNV_COMPAT_NAME	"ibm,power-nx"
+ #define NX842_PSERIES_MODULE_NAME	"nx-compress-pseries"
+ #define NX842_PSERIES_COMPAT_NAME	"ibm,compression"
+ 
+diff --git a/include/linux/nx842.h b/include/linux/nx842.h
+index aa1a97e9..4ddf68d 100644
+--- a/include/linux/nx842.h
++++ b/include/linux/nx842.h
+@@ -1,9 +1,11 @@
+ #ifndef __NX842_H__
+ #define __NX842_H__
+ 
+-#define __NX842_PSERIES_MEM_COMPRESS	((PAGE_SIZE * 2) + 10240)
++#define __NX842_PSERIES_MEM_COMPRESS	(10240)
++#define __NX842_POWERNV_MEM_COMPRESS	(1024)
+ 
+-#define NX842_MEM_COMPRESS	__NX842_PSERIES_MEM_COMPRESS
++#define NX842_MEM_COMPRESS	(max_t(unsigned int,			\
++	__NX842_PSERIES_MEM_COMPRESS, __NX842_POWERNV_MEM_COMPRESS))
+ 
+ struct nx842_constraints {
+ 	int alignment;
+-- 
 2.1.0
