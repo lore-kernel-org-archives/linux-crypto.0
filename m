@@ -1,333 +1,91 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 06/10] drivers/crypto/nx: add NX-842 platform frontend driver
-Date: Thu,  7 May 2015 13:49:17 -0400
-Message-ID: <1431020961-22285-7-git-send-email-ddstreet@ieee.org>
+Subject: [PATCH 10/10] drivers/crypto/nx: add hardware 842 crypto comp alg
+Date: Thu,  7 May 2015 13:49:21 -0400
+Message-ID: <1431020961-22285-11-git-send-email-ddstreet@ieee.org>
 References: <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
 Cc: Seth Jennings <sjennings@variantweb.net>,
-	Robert Jennings <rob@pochix.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Greg KH <gregkh@linuxfoundation.org>,
-	Mauro Carvalho Chehab <mchehab@osg.samsung.com>,
-	Arnd Bergmann <arnd@arndb.de>, Joe Perches <joe@perches.com>,
-	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org, Dan Streetman <ddstreet@ieee.org>
+	Robert Jennings <rob@pochix.net>, linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+	Dan Streetman <ddstreet@ieee.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Michael Ellerman <mpe@ellerman.id.au>,
 	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
 	Paul Mackerras <paulus@samba.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-ie0-f174.google.com ([209.85.223.174]:34686 "EHLO
+	mail-ie0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751971AbbEGRuL (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 7 May 2015 13:50:11 -0400
 In-Reply-To: <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Add NX-842 frontend that allows using either the pSeries platform or
-PowerNV platform driver (to be added by later patch) for the NX-842
-hardware.  Update the MAINTAINERS file to include the new filenames.
-Update Kconfig files to clarify titles and descriptions, and correct
-dependencies.
+Add crypto compression alg for 842 hardware compression and decompression,
+using the alg name "842" and driver_name "842-nx".
+
+This uses only the PowerPC coprocessor hardware for 842 compression.  It
+also uses the hardware for decompression, but if the hardware fails it will
+fall back to the 842 software decompression library, so that decompression
+never fails (for valid 842 compressed buffers).  A header must be used in
+most cases, due to the hardware's restrictions on the buffers being
+specifically aligned and sized.
+
+Due to the header this driver adds, compressed buffers it creates cannot be
+directly passed to the 842 software library for decompression.  However,
+compressed buffers created by the software 842 library can be passed to
+this driver for hardware 842 decompression (with the exception of buffers
+containing the "short data" template, as lib/842/842.h explains).
 
 Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- MAINTAINERS                        |   2 +-
- drivers/crypto/Kconfig             |  10 +--
- drivers/crypto/nx/Kconfig          |  35 ++++++---
- drivers/crypto/nx/Makefile         |   4 +-
- drivers/crypto/nx/nx-842-pseries.c |  57 +++++++--------
- drivers/crypto/nx/nx-842.c         | 144 +++++++++++++++++++++++++++++++++++++
- drivers/crypto/nx/nx-842.h         |  32 +++++++++
- include/linux/nx842.h              |  10 +--
- 8 files changed, 245 insertions(+), 49 deletions(-)
- create mode 100644 drivers/crypto/nx/nx-842.c
- create mode 100644 drivers/crypto/nx/nx-842.h
+ drivers/crypto/nx/Kconfig         |  10 +
+ drivers/crypto/nx/Makefile        |   2 +
+ drivers/crypto/nx/nx-842-crypto.c | 585 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 597 insertions(+)
+ create mode 100644 drivers/crypto/nx/nx-842-crypto.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5a5c1dc..e71855f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4870,7 +4870,7 @@ F:	drivers/crypto/nx/
- IBM Power 842 compression accelerator
- M:	Dan Streetman <ddstreet@us.ibm.com>
- S:	Supported
--F:	drivers/crypto/nx/nx-842.c
-+F:	drivers/crypto/nx/nx-842*
- F:	include/linux/nx842.h
- F:	include/linux/sw842.h
- F:	crypto/842.c
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 033c0c8..872de26 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -312,11 +312,13 @@ config CRYPTO_DEV_S5P
- 	  algorithms execution.
- 
- config CRYPTO_DEV_NX
--	bool "Support for IBM Power7+ in-Nest cryptographic acceleration"
--	depends on PPC64 && IBMVIO && !CPU_LITTLE_ENDIAN
--	default n
-+	bool "Support for IBM PowerPC Nest (NX) cryptographic acceleration"
-+	depends on PPC64
- 	help
--	  Support for Power7+ in-Nest cryptographic acceleration.
-+	  This enables support for the NX hardware cryptographic accelerator
-+	  coprocessor that is in IBM PowerPC P7+ or later processors.  This
-+	  does not actually enable any drivers, it only allows you to select
-+	  which acceleration type (encryption and/or compression) to enable.
- 
- if CRYPTO_DEV_NX
- 	source "drivers/crypto/nx/Kconfig"
 diff --git a/drivers/crypto/nx/Kconfig b/drivers/crypto/nx/Kconfig
-index f826166..34013f7 100644
+index ee9e259..3e621ad 100644
 --- a/drivers/crypto/nx/Kconfig
 +++ b/drivers/crypto/nx/Kconfig
-@@ -1,7 +1,9 @@
-+
- config CRYPTO_DEV_NX_ENCRYPT
--	tristate "Encryption acceleration support"
--	depends on PPC64 && IBMVIO
-+	tristate "Encryption acceleration support on pSeries platform"
-+	depends on PPC_PSERIES && IBMVIO && !CPU_LITTLE_ENDIAN
- 	default y
-+	select CRYPTO_ALGAPI
- 	select CRYPTO_AES
- 	select CRYPTO_CBC
- 	select CRYPTO_ECB
-@@ -12,15 +14,30 @@ config CRYPTO_DEV_NX_ENCRYPT
- 	select CRYPTO_SHA256
- 	select CRYPTO_SHA512
- 	help
--	  Support for Power7+ in-Nest encryption acceleration. This
--	  module supports acceleration for AES and SHA2 algorithms. If you
--	  choose 'M' here, this module will be called nx_crypto.
-+	  Support for PowerPC Nest (NX) encryption acceleration. This
-+	  module supports acceleration for AES and SHA2 algorithms on
-+	  the pSeries platform.  If you choose 'M' here, this module
-+	  will be called nx_crypto.
+@@ -50,4 +50,14 @@ config CRYPTO_DEV_NX_COMPRESS_POWERNV
+ 	  algorithm.  This supports NX hardware on the PowerNV platform.
+ 	  If you choose 'M' here, this module will be called nx_compress_powernv.
  
- config CRYPTO_DEV_NX_COMPRESS
- 	tristate "Compression acceleration support"
--	depends on PPC64 && IBMVIO
- 	default y
- 	help
--	  Support for Power7+ in-Nest compression acceleration. This
--	  module supports acceleration for AES and SHA2 algorithms. If you
--	  choose 'M' here, this module will be called nx_compress.
-+	  Support for PowerPC Nest (NX) compression acceleration. This
-+	  module supports acceleration for compressing memory with the 842
-+	  algorithm.  One of the platform drivers must be selected also.
-+	  If you choose 'M' here, this module will be called nx_compress.
-+
-+if CRYPTO_DEV_NX_COMPRESS
-+
-+config CRYPTO_DEV_NX_COMPRESS_PSERIES
-+	tristate "Compression acceleration support on pSeries platform"
-+	depends on PPC_PSERIES && IBMVIO && !CPU_LITTLE_ENDIAN
++config CRYPTO_DEV_NX_COMPRESS_CRYPTO
++	tristate "Compression acceleration cryptographic interface"
++	select CRYPTO_ALGAPI
++	select 842_DECOMPRESS
 +	default y
 +	help
-+	  Support for PowerPC Nest (NX) compression acceleration. This
-+	  module supports acceleration for compressing memory with the 842
-+	  algorithm.  This supports NX hardware on the pSeries platform.
-+	  If you choose 'M' here, this module will be called nx_compress_pseries.
++	  Support for PowerPC Nest (NX) accelerators using the cryptographic
++	  API.  If you choose 'M' here, this module will be called
++	  nx_compress_crypto.
 +
-+endif
+ endif
 diff --git a/drivers/crypto/nx/Makefile b/drivers/crypto/nx/Makefile
-index 8669ffa..5d9f4bc 100644
+index 6619787..868b5e6 100644
 --- a/drivers/crypto/nx/Makefile
 +++ b/drivers/crypto/nx/Makefile
-@@ -11,4 +11,6 @@ nx-crypto-objs := nx.o \
- 		  nx-sha512.o
- 
+@@ -13,6 +13,8 @@ nx-crypto-objs := nx.o \
  obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS) += nx-compress.o
--nx-compress-objs := nx-842-pseries.o
-+obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_PSERIES) += nx-compress-pseries.o
-+nx-compress-objs := nx-842.o
-+nx-compress-pseries-objs := nx-842-pseries.o
-diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
-index 887196e..9b83c9e 100644
---- a/drivers/crypto/nx/nx-842-pseries.c
-+++ b/drivers/crypto/nx/nx-842-pseries.c
-@@ -21,18 +21,13 @@
-  *          Seth Jennings <sjenning@linux.vnet.ibm.com>
-  */
- 
--#include <linux/kernel.h>
--#include <linux/module.h>
--#include <linux/nx842.h>
--#include <linux/of.h>
--#include <linux/slab.h>
--
- #include <asm/page.h>
- #include <asm/vio.h>
- 
-+#include "nx-842.h"
- #include "nx_csbcpb.h" /* struct nx_csbcpb */
- 
--#define MODULE_NAME "nx-compress"
-+#define MODULE_NAME NX842_PSERIES_MODULE_NAME
- MODULE_LICENSE("GPL");
- MODULE_AUTHOR("Robert Jennings <rcj@linux.vnet.ibm.com>");
- MODULE_DESCRIPTION("842 H/W Compression driver for IBM Power processors");
-@@ -236,18 +231,6 @@ struct nx842_workmem {
- 	};
- };
- 
--int nx842_get_workmem_size(void)
--{
--	return sizeof(struct nx842_workmem) + NX842_HW_PAGE_SIZE;
--}
--EXPORT_SYMBOL_GPL(nx842_get_workmem_size);
--
--int nx842_get_workmem_size_aligned(void)
--{
--	return sizeof(struct nx842_workmem);
--}
--EXPORT_SYMBOL_GPL(nx842_get_workmem_size_aligned);
--
- static int nx842_validate_result(struct device *dev,
- 	struct cop_status_block *csb)
- {
-@@ -300,7 +283,7 @@ static int nx842_validate_result(struct device *dev,
- }
- 
- /**
-- * nx842_compress - Compress data using the 842 algorithm
-+ * nx842_pseries_compress - Compress data using the 842 algorithm
-  *
-  * Compression provide by the NX842 coprocessor on IBM Power systems.
-  * The input buffer is compressed and the result is stored in the
-@@ -315,7 +298,7 @@ static int nx842_validate_result(struct device *dev,
-  * @out: Pointer to output buffer
-  * @outlen: Length of output buffer
-  * @wrkmem: ptr to buffer for working memory, size determined by
-- *          nx842_get_workmem_size()
-+ *          NX842_MEM_COMPRESS
-  *
-  * Returns:
-  *   0		Success, output of length @outlen stored in the buffer at @out
-@@ -325,8 +308,9 @@ static int nx842_validate_result(struct device *dev,
-  *   -EIO	Internal error
-  *   -ENODEV	Hardware unavailable
-  */
--int nx842_compress(const unsigned char *in, unsigned int inlen,
--		       unsigned char *out, unsigned int *outlen, void *wmem)
-+static int nx842_pseries_compress(const unsigned char *in, unsigned int inlen,
-+				  unsigned char *out, unsigned int *outlen,
-+				  void *wmem)
- {
- 	struct nx842_header *hdr;
- 	struct nx842_devdata *local_devdata;
-@@ -493,13 +477,12 @@ unlock:
- 	rcu_read_unlock();
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(nx842_compress);
- 
- static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
- 			const void *);
- 
- /**
-- * nx842_decompress - Decompress data using the 842 algorithm
-+ * nx842_pseries_decompress - Decompress data using the 842 algorithm
-  *
-  * Decompression provide by the NX842 coprocessor on IBM Power systems.
-  * The input buffer is decompressed and the result is stored in the
-@@ -515,7 +498,7 @@ static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
-  * @out: Pointer to output buffer, must be page aligned
-  * @outlen: Length of output buffer, must be PAGE_SIZE
-  * @wrkmem: ptr to buffer for working memory, size determined by
-- *          nx842_get_workmem_size()
-+ *          NX842_MEM_COMPRESS
-  *
-  * Returns:
-  *   0		Success, output of length @outlen stored in the buffer at @out
-@@ -525,8 +508,9 @@ static int sw842_decompress(const unsigned char *, int, unsigned char *, int *,
-  *   -EINVAL	Bad input data encountered when attempting decompress
-  *   -EIO	Internal error
-  */
--int nx842_decompress(const unsigned char *in, unsigned int inlen,
--			 unsigned char *out, unsigned int *outlen, void *wmem)
-+static int nx842_pseries_decompress(const unsigned char *in, unsigned int inlen,
-+				    unsigned char *out, unsigned int *outlen,
-+				    void *wmem)
- {
- 	struct nx842_header *hdr;
- 	struct nx842_devdata *local_devdata;
-@@ -694,7 +678,6 @@ unlock:
- 	rcu_read_unlock();
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(nx842_decompress);
- 
- /**
-  * nx842_OF_set_defaults -- Set default (disabled) values for devdata
-@@ -1130,6 +1113,12 @@ static struct attribute_group nx842_attribute_group = {
- 	.attrs = nx842_sysfs_entries,
- };
- 
-+static struct nx842_driver nx842_pseries_driver = {
-+	.owner =	THIS_MODULE,
-+	.compress =	nx842_pseries_compress,
-+	.decompress =	nx842_pseries_decompress,
-+};
-+
- static int __init nx842_probe(struct vio_dev *viodev,
- 				  const struct vio_device_id *id)
- {
-@@ -1192,6 +1181,8 @@ static int __init nx842_probe(struct vio_dev *viodev,
- 		goto error;
- 	}
- 
-+	nx842_register_driver(&nx842_pseries_driver);
-+
- 	return 0;
- 
- error_unlock:
-@@ -1222,11 +1213,14 @@ static int __exit nx842_remove(struct vio_dev *viodev)
- 	if (old_devdata)
- 		kfree(old_devdata->counters);
- 	kfree(old_devdata);
-+
-+	nx842_unregister_driver(&nx842_pseries_driver);
-+
- 	return 0;
- }
- 
- static struct vio_device_id nx842_driver_ids[] = {
--	{"ibm,compression-v1", "ibm,compression"},
-+	{NX842_PSERIES_COMPAT_NAME "-v1", NX842_PSERIES_COMPAT_NAME},
- 	{"", ""},
- };
- 
-@@ -1243,6 +1237,8 @@ static int __init nx842_init(void)
- 	struct nx842_devdata *new_devdata;
- 	pr_info("Registering IBM Power 842 compression driver\n");
- 
-+	BUILD_BUG_ON(sizeof(struct nx842_workmem) > NX842_MEM_COMPRESS);
-+
- 	RCU_INIT_POINTER(devdata, NULL);
- 	new_devdata = kzalloc(sizeof(*new_devdata), GFP_KERNEL);
- 	if (!new_devdata) {
-@@ -1272,6 +1268,7 @@ static void __exit nx842_exit(void)
- 	if (old_devdata)
- 		dev_set_drvdata(old_devdata->dev, NULL);
- 	kfree(old_devdata);
-+	nx842_unregister_driver(&nx842_pseries_driver);
- 	vio_unregister_driver(&nx842_driver);
- }
- 
-diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
+ obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_PSERIES) += nx-compress-pseries.o
+ obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_POWERNV) += nx-compress-powernv.o
++obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_CRYPTO) += nx-compress-crypto.o
+ nx-compress-objs := nx-842.o
+ nx-compress-pseries-objs := nx-842-pseries.o
+ nx-compress-powernv-objs := nx-842-powernv.o
++nx-compress-crypto-objs := nx-842-crypto.o
+diff --git a/drivers/crypto/nx/nx-842-crypto.c b/drivers/crypto/nx/nx-842-crypto.c
 new file mode 100644
-index 0000000..f1f378e
+index 0000000..cb177c3
 --- /dev/null
-+++ b/drivers/crypto/nx/nx-842.c
-@@ -0,0 +1,144 @@
++++ b/drivers/crypto/nx/nx-842-crypto.c
+@@ -0,0 +1,585 @@
 +/*
-+ * Driver frontend for IBM Power 842 compression accelerator
-+ *
-+ * Copyright (C) 2015 Dan Streetman, IBM Corp
-+ *
-+ * Designer of the Power data compression engine:
-+ *   Bulent Abali <abali@us.ibm.com>
++ * Cryptographic API for the NX-842 hardware compression.
 + *
 + * This program is free software; you can redistribute it and/or modify
 + * it under the terms of the GNU General Public License as published by
@@ -338,192 +96,578 @@ index 0000000..f1f378e
 + * but WITHOUT ANY WARRANTY; without even the implied warranty of
 + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 + * GNU General Public License for more details.
++ *
++ * Copyright (C) IBM Corporation, 2011-2015
++ *
++ * Original Authors: Robert Jennings <rcj@linux.vnet.ibm.com>
++ *                   Seth Jennings <sjenning@linux.vnet.ibm.com>
++ *
++ * Rewrite: Dan Streetman <ddstreet@ieee.org>
++ *
++ * This is an interface to the NX-842 compression hardware in PowerPC
++ * processors.  Most of the complexity of this drvier is due to the fact that
++ * the NX-842 compression hardware requires the input and output data buffers
++ * to be specifically aligned, to be a specific multiple in length, and within
++ * specific minimum and maximum lengths.  Those restrictions, provided by the
++ * nx-842 driver via nx842_constraints, mean this driver must use bounce
++ * buffers and headers to correct misaligned in or out buffers, and to split
++ * input buffers that are too large.
++ *
++ * This driver will fall back to software decompression if the hardware
++ * decompression fails, so this driver's decompression should never fail as
++ * long as the provided compressed buffer is valid.  Any compressed buffer
++ * created by this driver will have a header (except ones where the input
++ * perfectly matches the constraints); so users of this driver cannot simply
++ * pass a compressed buffer created by this driver over to the 842 software
++ * decompression library.  Instead, users must use this driver to decompress;
++ * if the hardware fails or is unavailable, the compressed buffer will be
++ * parsed and the header removed, and the raw 842 buffer(s) passed to the 842
++ * software decompression library.
++ *
++ * This does not fall back to software compression, however, since the caller
++ * of this function is specifically requesting hardware compression; if the
++ * hardware compression fails, the caller can fall back to software
++ * compression, and the raw 842 compressed buffer that the software compressor
++ * creates can be passed to this driver for hardware decompression; any
++ * buffer without our specific header magic is assumed to be a raw 842 buffer
++ * and passed directly to the hardware.  Note that the software compression
++ * library will produce a compressed buffer that is incompatible with the
++ * hardware decompressor if the original input buffer length is not a multiple
++ * of 8; if such a compressed buffer is passed to this driver for
++ * decompression, the hardware will reject it and this driver will then pass
++ * it over to the software library for decompression.
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include "nx-842.h"
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/crypto.h>
++#include <linux/vmalloc.h>
++#include <linux/nx842.h>
++#include <linux/sw842.h>
++#include <linux/ratelimit.h>
 +
-+#define MODULE_NAME "nx-compress"
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Dan Streetman <ddstreet@ieee.org>");
-+MODULE_DESCRIPTION("842 H/W Compression driver for IBM Power processors");
++/* The first 5 bits of this magic are 0x1f, which is an invalid 842 5-bit
++ * template (see lib/842/842.h), so this magic number will never appear at
++ * the start of a raw 842 compressed buffer.  That is important, as any buffer
++ * passed to us without this magic is assumed to be a raw 842 compressed
++ * buffer, and passed directly to the hardware to decompress.
++ */
++#define NX842_CRYPTO_MAGIC	(0xf842)
++#define NX842_CRYPTO_GROUP_MAX	(0x20)
++#define NX842_CRYPTO_HEADER_SIZE(g)				\
++	(sizeof(struct nx842_crypto_header) +			\
++	 sizeof(struct nx842_crypto_header_group) * (g))
++#define NX842_CRYPTO_HEADER_MAX_SIZE				\
++	NX842_CRYPTO_HEADER_SIZE(NX842_CRYPTO_GROUP_MAX)
 +
-+/* Only one driver is expected, based on the HW platform */
-+static struct nx842_driver *nx842_driver;
-+static DEFINE_SPINLOCK(nx842_driver_lock); /* protects driver pointers */
++/* bounce buffer size */
++#define BOUNCE_BUFFER_ORDER	(2)
++#define BOUNCE_BUFFER_SIZE					\
++	((unsigned int)(PAGE_SIZE << BOUNCE_BUFFER_ORDER))
 +
-+void nx842_register_driver(struct nx842_driver *driver)
++/* try longer on comp because we can fallback to sw decomp if hw is busy */
++#define COMP_BUSY_TIMEOUT	(250) /* ms */
++#define DECOMP_BUSY_TIMEOUT	(50) /* ms */
++
++struct nx842_crypto_header_group {
++	__be16 padding;			/* unused bytes at start of group */
++	__be32 compressed_length;	/* compressed bytes in group */
++	__be32 uncompressed_length;	/* bytes after decompression */
++} __packed;
++
++struct nx842_crypto_header {
++	__be16 magic;		/* NX842_CRYPTO_MAGIC */
++	__be16 ignore;		/* decompressed end bytes to ignore */
++	u8 groups;		/* total groups in this header */
++	struct nx842_crypto_header_group group[];
++} __packed;
++
++struct nx842_crypto_param {
++	u8 *in;
++	unsigned int iremain;
++	u8 *out;
++	unsigned int oremain;
++	unsigned int ototal;
++};
++
++static int update_param(struct nx842_crypto_param *p,
++			unsigned int slen, unsigned int dlen)
 +{
-+	spin_lock(&nx842_driver_lock);
++	if (p->iremain < slen)
++		return -EOVERFLOW;
++	if (p->oremain < dlen)
++		return -ENOSPC;
 +
-+	if (nx842_driver) {
-+		pr_err("can't register driver %s, already using driver %s\n",
-+		       driver->owner->name, nx842_driver->owner->name);
-+	} else {
-+		pr_info("registering driver %s\n", driver->owner->name);
-+		nx842_driver = driver;
-+	}
-+
-+	spin_unlock(&nx842_driver_lock);
-+}
-+EXPORT_SYMBOL_GPL(nx842_register_driver);
-+
-+void nx842_unregister_driver(struct nx842_driver *driver)
-+{
-+	spin_lock(&nx842_driver_lock);
-+
-+	if (nx842_driver == driver) {
-+		pr_info("unregistering driver %s\n", driver->owner->name);
-+		nx842_driver = NULL;
-+	} else if (nx842_driver) {
-+		pr_err("can't unregister driver %s, using driver %s\n",
-+		       driver->owner->name, nx842_driver->owner->name);
-+	} else {
-+		pr_err("can't unregister driver %s, no driver in use\n",
-+		       driver->owner->name);
-+	}
-+
-+	spin_unlock(&nx842_driver_lock);
-+}
-+EXPORT_SYMBOL_GPL(nx842_unregister_driver);
-+
-+static struct nx842_driver *get_driver(void)
-+{
-+	struct nx842_driver *driver = NULL;
-+
-+	spin_lock(&nx842_driver_lock);
-+
-+	driver = nx842_driver;
-+
-+	if (driver && !try_module_get(driver->owner))
-+		driver = NULL;
-+
-+	spin_unlock(&nx842_driver_lock);
-+
-+	return driver;
-+}
-+
-+static void put_driver(struct nx842_driver *driver)
-+{
-+	module_put(driver->owner);
-+}
-+
-+int nx842_compress(const unsigned char *in, unsigned int in_len,
-+		   unsigned char *out, unsigned int *out_len,
-+		   void *wrkmem)
-+{
-+	struct nx842_driver *driver = get_driver();
-+	int ret;
-+
-+	if (!driver)
-+		return -ENODEV;
-+
-+	ret = driver->compress(in, in_len, out, out_len, wrkmem);
-+
-+	put_driver(driver);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(nx842_compress);
-+
-+int nx842_decompress(const unsigned char *in, unsigned int in_len,
-+		     unsigned char *out, unsigned int *out_len,
-+		     void *wrkmem)
-+{
-+	struct nx842_driver *driver = get_driver();
-+	int ret;
-+
-+	if (!driver)
-+		return -ENODEV;
-+
-+	ret = driver->decompress(in, in_len, out, out_len, wrkmem);
-+
-+	put_driver(driver);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(nx842_decompress);
-+
-+static __init int nx842_init(void)
-+{
-+	pr_info("loading\n");
-+
-+	if (of_find_compatible_node(NULL, NULL, NX842_PSERIES_COMPAT_NAME))
-+		request_module_nowait(NX842_PSERIES_MODULE_NAME);
-+	else
-+		pr_err("no nx842 driver found.\n");
-+
-+	pr_info("loaded\n");
++	p->in += slen;
++	p->iremain -= slen;
++	p->out += dlen;
++	p->oremain -= dlen;
++	p->ototal += dlen;
 +
 +	return 0;
 +}
-+module_init(nx842_init);
 +
-+static void __exit nx842_exit(void)
-+{
-+	pr_info("NX842 unloaded\n");
-+}
-+module_exit(nx842_exit);
-diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
-new file mode 100644
-index 0000000..2a5d4e1
---- /dev/null
-+++ b/drivers/crypto/nx/nx-842.h
-@@ -0,0 +1,32 @@
++struct nx842_crypto_ctx {
++	u8 *wmem;
++	u8 *sbounce, *dbounce;
 +
-+#ifndef __NX_842_H__
-+#define __NX_842_H__
-+
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/nx842.h>
-+#include <linux/of.h>
-+#include <linux/slab.h>
-+#include <linux/io.h>
-+
-+struct nx842_driver {
-+	struct module *owner;
-+
-+	int (*compress)(const unsigned char *in, unsigned int in_len,
-+			unsigned char *out, unsigned int *out_len,
-+			void *wrkmem);
-+	int (*decompress)(const unsigned char *in, unsigned int in_len,
-+			  unsigned char *out, unsigned int *out_len,
-+			  void *wrkmem);
++	struct nx842_crypto_header header;
++	struct nx842_crypto_header_group group[NX842_CRYPTO_GROUP_MAX];
 +};
 +
-+void nx842_register_driver(struct nx842_driver *driver);
-+void nx842_unregister_driver(struct nx842_driver *driver);
++static int nx842_crypto_init(struct crypto_tfm *tfm)
++{
++	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
 +
++	ctx->wmem = kmalloc(NX842_MEM_COMPRESS, GFP_KERNEL);
++	ctx->sbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
++	ctx->dbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
++	if (!ctx->wmem || !ctx->sbounce || !ctx->dbounce) {
++		kfree(ctx->wmem);
++		free_page((unsigned long)ctx->sbounce);
++		free_page((unsigned long)ctx->dbounce);
++		return -ENOMEM;
++	}
 +
-+/* To allow the main nx-compress module to load platform module */
-+#define NX842_PSERIES_MODULE_NAME	"nx-compress-pseries"
-+#define NX842_PSERIES_COMPAT_NAME	"ibm,compression"
++	return 0;
++}
 +
++static void nx842_crypto_exit(struct crypto_tfm *tfm)
++{
++	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
 +
-+#endif /* __NX_842_H__ */
-diff --git a/include/linux/nx842.h b/include/linux/nx842.h
-index a4d324c..d919c22 100644
---- a/include/linux/nx842.h
-+++ b/include/linux/nx842.h
-@@ -1,11 +1,13 @@
- #ifndef __NX842_H__
- #define __NX842_H__
- 
--int nx842_get_workmem_size(void);
--int nx842_get_workmem_size_aligned(void);
-+#define __NX842_PSERIES_MEM_COMPRESS	((PAGE_SIZE * 2) + 10240)
++	kfree(ctx->wmem);
++	free_page((unsigned long)ctx->sbounce);
++	free_page((unsigned long)ctx->dbounce);
++}
 +
-+#define NX842_MEM_COMPRESS	__NX842_PSERIES_MEM_COMPRESS
++static int read_constraints(struct nx842_constraints *c)
++{
++	int ret;
 +
- int nx842_compress(const unsigned char *in, unsigned int in_len,
--		unsigned char *out, unsigned int *out_len, void *wrkmem);
-+		   unsigned char *out, unsigned int *out_len, void *wrkmem);
- int nx842_decompress(const unsigned char *in, unsigned int in_len,
--		unsigned char *out, unsigned int *out_len, void *wrkmem);
-+		     unsigned char *out, unsigned int *out_len, void *wrkmem);
- 
- #endif
++	ret = nx842_constraints(c);
++	if (ret) {
++		pr_err_ratelimited("could not get nx842 constraints : %d\n",
++				   ret);
++		return ret;
++	}
++
++	/* limit maximum, to always have enough bounce buffer to decompress */
++	if (c->maximum > BOUNCE_BUFFER_SIZE) {
++		c->maximum = BOUNCE_BUFFER_SIZE;
++		pr_info_once("limiting nx842 maximum to %x\n", c->maximum);
++	}
++
++	return 0;
++}
++
++static int nx842_crypto_add_header(struct nx842_crypto_header *hdr, u8 *buf)
++{
++	int s = NX842_CRYPTO_HEADER_SIZE(hdr->groups);
++
++	/* compress should have added space for header */
++	if (s > be16_to_cpu(hdr->group[0].padding)) {
++		pr_err("Internal error: no space for header\n");
++		return -EINVAL;
++	}
++
++	memcpy(buf, hdr, s);
++
++	print_hex_dump_debug("header ", DUMP_PREFIX_OFFSET, 16, 1, buf, s, 0);
++
++	return 0;
++}
++
++static int compress(struct nx842_crypto_ctx *ctx,
++		    struct nx842_crypto_param *p,
++		    struct nx842_crypto_header_group *g,
++		    struct nx842_constraints *c,
++		    u16 *ignore,
++		    unsigned int hdrsize)
++{
++	unsigned int slen = p->iremain, dlen = p->oremain, tmplen;
++	unsigned int adj_slen = slen;
++	u8 *src = p->in, *dst = p->out;
++	int ret, dskip = 0;
++	ktime_t timeout;
++
++	if (p->iremain == 0)
++		return -EOVERFLOW;
++
++	if (p->oremain == 0 || hdrsize + c->minimum > dlen)
++		return -ENOSPC;
++
++	if (slen % c->multiple)
++		adj_slen = round_up(slen, c->multiple);
++	if (slen < c->minimum)
++		adj_slen = c->minimum;
++	if (slen > c->maximum)
++		adj_slen = slen = c->maximum;
++	if (adj_slen > slen || (u64)src % c->alignment) {
++		adj_slen = min(adj_slen, BOUNCE_BUFFER_SIZE);
++		slen = min(slen, BOUNCE_BUFFER_SIZE);
++		if (adj_slen > slen)
++			memset(ctx->sbounce + slen, 0, adj_slen - slen);
++		memcpy(ctx->sbounce, src, slen);
++		src = ctx->sbounce;
++		slen = adj_slen;
++		pr_debug("using comp sbounce buffer, len %x\n", slen);
++	}
++
++	dst += hdrsize;
++	dlen -= hdrsize;
++
++	if ((u64)dst % c->alignment) {
++		dskip = (int)(PTR_ALIGN(dst, c->alignment) - dst);
++		dst += dskip;
++		dlen -= dskip;
++	}
++	if (dlen % c->multiple)
++		dlen = round_down(dlen, c->multiple);
++	if (dlen < c->minimum) {
++nospc:
++		dst = ctx->dbounce;
++		dlen = min(p->oremain, BOUNCE_BUFFER_SIZE);
++		dlen = round_down(dlen, c->multiple);
++		dskip = 0;
++		pr_debug("using comp dbounce buffer, len %x\n", dlen);
++	}
++	if (dlen > c->maximum)
++		dlen = c->maximum;
++
++	tmplen = dlen;
++	timeout = ktime_add_ms(ktime_get(), COMP_BUSY_TIMEOUT);
++	do {
++		dlen = tmplen; /* reset dlen, if we're retrying */
++		ret = nx842_compress(src, slen, dst, &dlen, ctx->wmem);
++		/* possibly we should reduce the slen here, instead of
++		 * retrying with the dbounce buffer?
++		 */
++		if (ret == -ENOSPC && dst != ctx->dbounce)
++			goto nospc;
++	} while (ret == -EBUSY && ktime_before(ktime_get(), timeout));
++	if (ret)
++		return ret;
++
++	dskip += hdrsize;
++
++	if (dst == ctx->dbounce)
++		memcpy(p->out + dskip, dst, dlen);
++
++	g->padding = cpu_to_be16(dskip);
++	g->compressed_length = cpu_to_be32(dlen);
++	g->uncompressed_length = cpu_to_be32(slen);
++
++	if (p->iremain < slen) {
++		*ignore = slen - p->iremain;
++		slen = p->iremain;
++	}
++
++	pr_debug("compress slen %x ignore %x dlen %x padding %x\n",
++		 slen, *ignore, dlen, dskip);
++
++	return update_param(p, slen, dskip + dlen);
++}
++
++static int nx842_crypto_compress(struct crypto_tfm *tfm,
++				 const u8 *src, unsigned int slen,
++				 u8 *dst, unsigned int *dlen)
++{
++	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct nx842_crypto_header *hdr = &ctx->header;
++	struct nx842_crypto_param p;
++	struct nx842_constraints c;
++	unsigned int groups, hdrsize, h;
++	int ret, n;
++	bool add_header;
++	u16 ignore = 0;
++
++	if (!tfm || !src || !slen || !dst || !dlen)
++		return -EINVAL;
++
++	p.in = (u8 *)src;
++	p.iremain = slen;
++	p.out = dst;
++	p.oremain = *dlen;
++	p.ototal = 0;
++
++	*dlen = 0;
++
++	ret = read_constraints(&c);
++	if (ret)
++		return ret;
++
++	groups = min_t(unsigned int, NX842_CRYPTO_GROUP_MAX,
++		       DIV_ROUND_UP(p.iremain, c.maximum));
++	hdrsize = NX842_CRYPTO_HEADER_SIZE(groups);
++
++	/* skip adding header if the buffers meet all constraints */
++	add_header = (p.iremain % c.multiple	||
++		      p.iremain < c.minimum	||
++		      p.iremain > c.maximum	||
++		      (u64)p.in % c.alignment	||
++		      p.oremain % c.multiple	||
++		      p.oremain < c.minimum	||
++		      p.oremain > c.maximum	||
++		      (u64)p.out % c.alignment);
++
++	hdr->magic = cpu_to_be16(NX842_CRYPTO_MAGIC);
++	hdr->groups = 0;
++	hdr->ignore = 0;
++
++	while (p.iremain > 0) {
++		n = hdr->groups++;
++		if (hdr->groups > NX842_CRYPTO_GROUP_MAX)
++			return -ENOSPC;
++
++		/* header goes before first group */
++		h = !n && add_header ? hdrsize : 0;
++
++		if (ignore)
++			pr_warn("interal error, ignore is set %x\n", ignore);
++
++		ret = compress(ctx, &p, &hdr->group[n], &c, &ignore, h);
++		if (ret)
++			return ret;
++	}
++
++	if (!add_header && hdr->groups > 1) {
++		pr_err("Internal error: No header but multiple groups\n");
++		return -EINVAL;
++	}
++
++	/* ignore indicates the input stream needed to be padded */
++	hdr->ignore = cpu_to_be16(ignore);
++	if (ignore)
++		pr_debug("marked %d bytes as ignore\n", ignore);
++
++	if (add_header)
++		ret = nx842_crypto_add_header(hdr, dst);
++	if (ret)
++		return ret;
++
++	*dlen = p.ototal;
++
++	pr_debug("compress total slen %x dlen %x\n", slen, *dlen);
++
++	return 0;
++}
++
++static int decompress(struct nx842_crypto_ctx *ctx,
++		      struct nx842_crypto_param *p,
++		      struct nx842_crypto_header_group *g,
++		      struct nx842_constraints *c,
++		      u16 ignore,
++		      bool usehw)
++{
++	unsigned int slen = be32_to_cpu(g->compressed_length);
++	unsigned int required_len = be32_to_cpu(g->uncompressed_length);
++	unsigned int dlen = p->oremain, tmplen;
++	unsigned int adj_slen = slen;
++	u8 *src = p->in, *dst = p->out;
++	u16 padding = be16_to_cpu(g->padding);
++	int ret, spadding = 0, dpadding = 0;
++	ktime_t timeout;
++
++	if (!slen || !required_len)
++		return -EINVAL;
++
++	if (p->iremain <= 0 || padding + slen > p->iremain)
++		return -EOVERFLOW;
++
++	if (p->oremain <= 0 || required_len - ignore > p->oremain)
++		return -ENOSPC;
++
++	src += padding;
++
++	if (!usehw)
++		goto usesw;
++
++	if (slen % c->multiple)
++		adj_slen = round_up(slen, c->multiple);
++	if (slen < c->minimum)
++		adj_slen = c->minimum;
++	if (slen > c->maximum)
++		goto usesw;
++	if (slen < adj_slen || (u64)src % c->alignment) {
++		/* we can append padding bytes because the 842 format defines
++		 * an "end" template (see lib/842/842_decompress.c) and will
++		 * ignore any bytes following it.
++		 */
++		if (slen < adj_slen)
++			memset(ctx->sbounce + slen, 0, adj_slen - slen);
++		memcpy(ctx->sbounce, src, slen);
++		src = ctx->sbounce;
++		spadding = adj_slen - slen;
++		slen = adj_slen;
++		pr_debug("using decomp sbounce buffer, len %x\n", slen);
++	}
++
++	if (dlen % c->multiple)
++		dlen = round_down(dlen, c->multiple);
++	if (dlen < required_len || (u64)dst % c->alignment) {
++		dst = ctx->dbounce;
++		dlen = min(required_len, BOUNCE_BUFFER_SIZE);
++		pr_debug("using decomp dbounce buffer, len %x\n", dlen);
++	}
++	if (dlen < c->minimum)
++		goto usesw;
++	if (dlen > c->maximum)
++		dlen = c->maximum;
++
++	tmplen = dlen;
++	timeout = ktime_add_ms(ktime_get(), DECOMP_BUSY_TIMEOUT);
++	do {
++		dlen = tmplen; /* reset dlen, if we're retrying */
++		ret = nx842_decompress(src, slen, dst, &dlen, ctx->wmem);
++	} while (ret == -EBUSY && ktime_before(ktime_get(), timeout));
++	if (ret) {
++usesw:
++		/* reset everything, sw doesn't have constraints */
++		src = p->in + padding;
++		slen = be32_to_cpu(g->compressed_length);
++		spadding = 0;
++		dst = p->out;
++		dlen = p->oremain;
++		dpadding = 0;
++		if (dlen < required_len) { /* have ignore bytes */
++			dst = ctx->dbounce;
++			dlen = BOUNCE_BUFFER_SIZE;
++		}
++		pr_info_ratelimited("using software 842 decompression\n");
++		ret = sw842_decompress(src, slen, dst, &dlen);
++	}
++	if (ret)
++		return ret;
++
++	slen -= spadding;
++
++	dlen -= ignore;
++	if (ignore)
++		pr_debug("ignoring last %x bytes\n", ignore);
++
++	if (dst == ctx->dbounce)
++		memcpy(p->out, dst, dlen);
++
++	pr_debug("decompress slen %x padding %x dlen %x ignore %x\n",
++		 slen, padding, dlen, ignore);
++
++	return update_param(p, slen + padding, dlen);
++}
++
++static int nx842_crypto_decompress(struct crypto_tfm *tfm,
++				   const u8 *src, unsigned int slen,
++				   u8 *dst, unsigned int *dlen)
++{
++	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct nx842_crypto_header *hdr;
++	struct nx842_crypto_param p;
++	struct nx842_constraints c;
++	int n, ret, hdr_len;
++	u16 ignore = 0;
++	bool usehw = true;
++
++	if (!tfm || !src || !slen || !dst || !dlen)
++		return -EINVAL;
++
++	p.in = (u8 *)src;
++	p.iremain = slen;
++	p.out = dst;
++	p.oremain = *dlen;
++	p.ototal = 0;
++
++	*dlen = 0;
++
++	if (read_constraints(&c))
++		usehw = false;
++
++	hdr = (struct nx842_crypto_header *)src;
++
++	/* If it doesn't start with our header magic number, assume it's a raw
++	 * 842 compressed buffer and pass it directly to the hardware driver
++	 */
++	if (be16_to_cpu(hdr->magic) != NX842_CRYPTO_MAGIC) {
++		struct nx842_crypto_header_group g = {
++			.padding =		0,
++			.compressed_length =	cpu_to_be32(p.iremain),
++			.uncompressed_length =	cpu_to_be32(p.oremain),
++		};
++
++		ret = decompress(ctx, &p, &g, &c, 0, usehw);
++		if (ret)
++			return ret;
++
++		*dlen = p.ototal;
++
++		return 0;
++	}
++
++	if (!hdr->groups) {
++		pr_err("header has no groups\n");
++		return -EINVAL;
++	}
++	if (hdr->groups > NX842_CRYPTO_GROUP_MAX) {
++		pr_err("header has too many groups %x, max %x\n",
++		       hdr->groups, NX842_CRYPTO_GROUP_MAX);
++		return -EINVAL;
++	}
++
++	hdr_len = NX842_CRYPTO_HEADER_SIZE(hdr->groups);
++	if (hdr_len > slen)
++		return -EOVERFLOW;
++
++	memcpy(&ctx->header, src, hdr_len);
++	hdr = &ctx->header;
++
++	for (n = 0; n < hdr->groups; n++) {
++		/* ignore applies to last group */
++		if (n + 1 == hdr->groups)
++			ignore = be16_to_cpu(hdr->ignore);
++
++		ret = decompress(ctx, &p, &hdr->group[n], &c, ignore, usehw);
++		if (ret)
++			return ret;
++	}
++
++	*dlen = p.ototal;
++
++	pr_debug("decompress total slen %x dlen %x\n", slen, *dlen);
++
++	return 0;
++}
++
++static struct crypto_alg alg = {
++	.cra_name		= "842",
++	.cra_driver_name	= "842-nx",
++	.cra_priority		= 300,
++	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
++	.cra_ctxsize		= sizeof(struct nx842_crypto_ctx),
++	.cra_module		= THIS_MODULE,
++	.cra_init		= nx842_crypto_init,
++	.cra_exit		= nx842_crypto_exit,
++	.cra_u			= { .compress = {
++	.coa_compress		= nx842_crypto_compress,
++	.coa_decompress		= nx842_crypto_decompress } }
++};
++
++static int __init nx842_crypto_mod_init(void)
++{
++	return crypto_register_alg(&alg);
++}
++module_init(nx842_crypto_mod_init);
++
++static void __exit nx842_crypto_mod_exit(void)
++{
++	crypto_unregister_alg(&alg);
++}
++module_exit(nx842_crypto_mod_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("IBM PowerPC Nest (NX) 842 Hardware Compression Interface");
++MODULE_ALIAS_CRYPTO("842");
++MODULE_ALIAS_CRYPTO("842-nx");
++MODULE_AUTHOR("Dan Streetman <ddstreet@ieee.org>");
 -- 
 2.1.0
