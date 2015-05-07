@@ -1,44 +1,48 @@
-From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 01/10] powerpc: export of_get_ibm_chip_id function
-Date: Thu,  7 May 2015 13:49:12 -0400
-Message-ID: <1431020961-22285-2-git-send-email-ddstreet@ieee.org>
-References: <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Subject: Re: [Linaro-acpi] [V2 PATCH 1/5] ACPI / scan: Parse _CCA and setup device coherency
+Date: Thu, 07 May 2015 22:18:44 +0200
+Message-ID: <4260574.bvpyYkBNGq@vostro.rjw.lan>
+References: <1430838729-21572-1-git-send-email-Suravee.Suthikulpanit@amd.com> <554A92C3.7060606@amd.com> <2842267.oTDe4myPcU@wuerfel>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Rob Herring <robh@kernel.org>, linux-kernel@vger.kernel.org,
- Robert Jennings <rob@pochix.net>, linux-crypto@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Seth Jennings <sjennings@variantweb.net>,
- Dan Streetman <ddstreet@ieee.org>, Anton Blanchard <anton@samba.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Michael Ellerman <mpe@ellerman.id.au>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- Paul Mackerras <paulus@samba.org>
-Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
-In-Reply-To: <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
-List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
-List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
-List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
-List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
-List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
- <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
-Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
-Sender: "Linuxppc-dev"
- <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+Content-Transfer-Encoding: 7Bit
+Cc: linaro-acpi@lists.linaro.org,
+	Suravee Suthikulanit <suravee.suthikulpanit@amd.com>,
+	herbert@gondor.apana.org.au, catalin.marinas@arm.com,
+	will.deacon@arm.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-acpi@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	davem@davemloft.net, linux-arm-kernel@lists.infradead.org,
+	lenb@kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <2842267.oTDe4myPcU@wuerfel>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-RXhwb3J0IHRoZSBvZl9nZXRfaWJtX2NoaXBfaWQoKSBmdW5jdGlvbi4gIFRoaXMgd2lsbCBiZSB1
-c2VkIGJ5IHRoZQpQb3dlck5WIE5YLTg0MiBkcml2ZXIuCgpTaWduZWQtb2ZmLWJ5OiBEYW4gU3Ry
-ZWV0bWFuIDxkZHN0cmVldEBpZWVlLm9yZz4KLS0tCiBhcmNoL3Bvd2VycGMva2VybmVsL3Byb20u
-YyB8IDEgKwogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspCgpkaWZmIC0tZ2l0IGEvYXJj
-aC9wb3dlcnBjL2tlcm5lbC9wcm9tLmMgYi9hcmNoL3Bvd2VycGMva2VybmVsL3Byb20uYwppbmRl
-eCAzMDhjNWUxLi5lYTJjZWE3IDEwMDY0NAotLS0gYS9hcmNoL3Bvd2VycGMva2VybmVsL3Byb20u
-YworKysgYi9hcmNoL3Bvd2VycGMva2VybmVsL3Byb20uYwpAQCAtODAwLDYgKzgwMCw3IEBAIGlu
-dCBvZl9nZXRfaWJtX2NoaXBfaWQoc3RydWN0IGRldmljZV9ub2RlICpucCkKIAl9CiAJcmV0dXJu
-IC0xOwogfQorRVhQT1JUX1NZTUJPTChvZl9nZXRfaWJtX2NoaXBfaWQpOwogCiAvKioKICAqIGNw
-dV90b19jaGlwX2lkIC0gUmV0dXJuIHRoZSBjcHVzIGNoaXAtaWQKLS0gCjIuMS4wCgpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpMaW51eHBwYy1kZXYgbWFp
-bGluZyBsaXN0CkxpbnV4cHBjLWRldkBsaXN0cy5vemxhYnMub3JnCmh0dHBzOi8vbGlzdHMub3ps
-YWJzLm9yZy9saXN0aW5mby9saW51eHBwYy1kZXY=
+On Thursday, May 07, 2015 11:07:08 AM Arnd Bergmann wrote:
+> On Wednesday 06 May 2015 17:16:35 Suravee Suthikulanit wrote:
+> > On 5/6/2015 5:21 PM, Rafael J. Wysocki wrote:
+> > >>>> > >>+      bool
+> > >>>> > >>+
+> > >>>> > >>+config ACPI_SUPPORT_CCA_ZERO
+> > >>> > >
+> > >>> > >I guess this means "we support devices that can DMA, but are not coherent".
+> > >>> > >right?
+> > >> >
+> > >> >Yes, basically when _CCA=0.
+> > > So what about
+> > >
+> > >       ARCH_SUPPORT_CACHE_INCOHERENT_DMA
+> > 
+> > Since this is specific to ACPI _CCA, I just want to be clear with the 
+> > naming.
+> 
+> How about directly using the architecture names here, this is inherently
+> architecture specific, and it's more likely that if another architecture
+> gets added in the future that it will have other requirements.
+
+Sounds reasonable to me.
+
+Rafael
