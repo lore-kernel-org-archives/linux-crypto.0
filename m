@@ -1,48 +1,62 @@
-From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Subject: Re: [Linaro-acpi] [V2 PATCH 1/5] ACPI / scan: Parse _CCA and setup device coherency
-Date: Thu, 07 May 2015 22:18:44 +0200
-Message-ID: <4260574.bvpyYkBNGq@vostro.rjw.lan>
-References: <1430838729-21572-1-git-send-email-Suravee.Suthikulpanit@amd.com> <554A92C3.7060606@amd.com> <2842267.oTDe4myPcU@wuerfel>
+From: Bruce Allan <bruce.w.allan@intel.com>
+Subject: [PATCH] qat: add driver version
+Date: Thu, 07 May 2015 17:00:42 -0700
+Message-ID: <20150508000042.8205.32112.stgit@bwallan-smackover2.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7Bit
-Cc: linaro-acpi@lists.linaro.org,
-	Suravee Suthikulanit <suravee.suthikulpanit@amd.com>,
-	herbert@gondor.apana.org.au, catalin.marinas@arm.com,
-	will.deacon@arm.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-acpi@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	davem@davemloft.net, linux-arm-kernel@lists.infradead.org,
-	lenb@kernel.org
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <2842267.oTDe4myPcU@wuerfel>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 7bit
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:20295 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750907AbbEHAAu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 7 May 2015 20:00:50 -0400
+Received: from bwallan-smackover2.jf.intel.com (localhost.localdomain [127.0.0.1])
+	by bwallan-smackover2.jf.intel.com (8.14.8/8.14.8) with ESMTP id t4800g7D008227
+	for <linux-crypto@vger.kernel.org>; Thu, 7 May 2015 17:00:42 -0700
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thursday, May 07, 2015 11:07:08 AM Arnd Bergmann wrote:
-> On Wednesday 06 May 2015 17:16:35 Suravee Suthikulanit wrote:
-> > On 5/6/2015 5:21 PM, Rafael J. Wysocki wrote:
-> > >>>> > >>+      bool
-> > >>>> > >>+
-> > >>>> > >>+config ACPI_SUPPORT_CCA_ZERO
-> > >>> > >
-> > >>> > >I guess this means "we support devices that can DMA, but are not coherent".
-> > >>> > >right?
-> > >> >
-> > >> >Yes, basically when _CCA=0.
-> > > So what about
-> > >
-> > >       ARCH_SUPPORT_CACHE_INCOHERENT_DMA
-> > 
-> > Since this is specific to ACPI _CCA, I just want to be clear with the 
-> > naming.
-> 
-> How about directly using the architecture names here, this is inherently
-> architecture specific, and it's more likely that if another architecture
-> gets added in the future that it will have other requirements.
+Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
+---
+ drivers/crypto/qat/qat_common/adf_common_drv.h |    7 +++++++
+ drivers/crypto/qat/qat_common/adf_ctl_drv.c    |    1 +
+ drivers/crypto/qat/qat_dh895xcc/adf_drv.c      |    1 +
+ 3 files changed, 9 insertions(+)
 
-Sounds reasonable to me.
-
-Rafael
+diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
+index 0666ee6..27e16c0 100644
+--- a/drivers/crypto/qat/qat_common/adf_common_drv.h
++++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
+@@ -53,6 +53,13 @@
+ #include "icp_qat_fw_loader_handle.h"
+ #include "icp_qat_hal.h"
+ 
++#define ADF_MAJOR_VERSION	0
++#define ADF_MINOR_VERSION	1
++#define ADF_BUILD_VERSION	3
++#define ADF_DRV_VERSION		__stringify(ADF_MAJOR_VERSION) "." \
++				__stringify(ADF_MINOR_VERSION) "." \
++				__stringify(ADF_BUILD_VERSION)
++
+ #define ADF_STATUS_RESTARTING 0
+ #define ADF_STATUS_STARTING 1
+ #define ADF_STATUS_CONFIGURED 2
+diff --git a/drivers/crypto/qat/qat_common/adf_ctl_drv.c b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
+index cb5f066..e056b9e 100644
+--- a/drivers/crypto/qat/qat_common/adf_ctl_drv.c
++++ b/drivers/crypto/qat/qat_common/adf_ctl_drv.c
+@@ -504,3 +504,4 @@ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_AUTHOR("Intel");
+ MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
+ MODULE_ALIAS_CRYPTO("intel_qat");
++MODULE_VERSION(ADF_DRV_VERSION);
+diff --git a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+index c1b3f0b..ecf0ef1 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
++++ b/drivers/crypto/qat/qat_dh895xcc/adf_drv.c
+@@ -419,3 +419,4 @@ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_AUTHOR("Intel");
+ MODULE_FIRMWARE(ADF_DH895XCC_FW);
+ MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
++MODULE_VERSION(ADF_DRV_VERSION);
