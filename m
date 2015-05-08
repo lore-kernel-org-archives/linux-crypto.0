@@ -1,63 +1,77 @@
-From: "santosh.shilimkar@oracle.com" <santosh.shilimkar@oracle.com>
-Subject: Re: [V3 PATCH 3/5] device property: Introduces device_dma_is_coherent()
-Date: Thu, 07 May 2015 21:12:00 -0700
-Message-ID: <554C3790.4010407@oracle.com>
-References: <1431045436-8690-1-git-send-email-Suravee.Suthikulpanit@amd.com> <1431045436-8690-4-git-send-email-Suravee.Suthikulpanit@amd.com>
+From: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+Subject: Re: [PATCH -next] crct10dif: remove extra function call in
+ crc_t10dif() and crc_t10dif_update()
+Date: Thu, 07 May 2015 22:11:16 -0700
+Message-ID: <1431061876.10406.107.camel@haakon3.risingtidesystems.com>
+References: <1430903931-4465-1-git-send-email-akinobu.mita@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: msalter@redhat.com, hanjun.guo@linaro.org, al.stone@linaro.org,
-	grant.likely@linaro.org, leo.duran@amd.com,
-	linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linaro-acpi@lists.linaro.org,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>,
-	rjw@rjwysocki.net, lenb@kernel.org, catalin.marinas@arm.com,
-	will.deacon@arm.com, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net, arnd@arndb.de
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <1431045436-8690-4-git-send-email-Suravee.Suthikulpanit@amd.com>
-Sender: linux-acpi-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: target-devel@vger.kernel.org,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Sagi Grimberg <sagig@mellanox.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	linux-scsi@vger.kernel.org
+To: Akinobu Mita <akinobu.mita@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.linux-iscsi.org ([67.23.28.174]:42583 "EHLO
+	linux-iscsi.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750943AbbEHFLS (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 8 May 2015 01:11:18 -0400
+In-Reply-To: <1430903931-4465-1-git-send-email-akinobu.mita@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 5/7/15 5:37 PM, Suravee Suthikulpanit wrote:
-> Currently, device drivers, which support both OF and ACPI,
-> need to call two separate APIs, of_dma_is_coherent() and
-> acpi_dma_is_coherent()) to determine device coherency attribute.
->
-> This patch simplifies this process by introducing a new device
-> property API, device_dma_is_coherent(), which calls the appropriate
-> interface based on the booting architecture.
->
-> Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+On Wed, 2015-05-06 at 18:18 +0900, Akinobu Mita wrote:
+> Calling crypto_shash_import() in crc_t10dif() and crc_t10dif_update()
+> is overkill as the existing crct10dif modules (crct10dif-generic and
+> crct10dif-pclmul) don't require.
+> 
+> We also do the same thing with crc32c() in lib/libcrc32.c.
+> 
+> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
+> Cc: Tim Chen <tim.c.chen@linux.intel.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: Nicholas Bellinger <nab@linux-iscsi.org>
+> Cc: Sagi Grimberg <sagig@mellanox.com>
+> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+> Cc: target-devel@vger.kernel.org
+> Cc: linux-scsi@vger.kernel.org
 > ---
->   drivers/base/property.c  | 12 ++++++++++++
->   include/linux/property.h |  2 ++
->   2 files changed, 14 insertions(+)
->
-> diff --git a/drivers/base/property.c b/drivers/base/property.c
-> index 1d0b116..8123c6e 100644
-> --- a/drivers/base/property.c
-> +++ b/drivers/base/property.c
-> @@ -14,6 +14,7 @@
->   #include <linux/export.h>
->   #include <linux/kernel.h>
->   #include <linux/of.h>
-> +#include <linux/of_address.h>
->   #include <linux/property.h>
->
->   /**
-> @@ -519,3 +520,14 @@ unsigned int device_get_child_node_count(struct device *dev)
->   	return count;
->   }
->   EXPORT_SYMBOL_GPL(device_get_child_node_count);
-> +
-> +bool device_dma_is_coherent(struct device *dev)
-> +{
-> +	if (IS_ENABLED(CONFIG_OF) && dev->of_node)
+>  lib/crc-t10dif.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/lib/crc-t10dif.c b/lib/crc-t10dif.c
+> index d775737..1ad33e5 100644
+> --- a/lib/crc-t10dif.c
+> +++ b/lib/crc-t10dif.c
+> @@ -32,9 +32,8 @@ __u16 crc_t10dif_update(__u16 crc, const unsigned char *buffer, size_t len)
+>  
+>  	desc.shash.tfm = crct10dif_tfm;
+>  	desc.shash.flags = 0;
+> +	*(__u16 *)desc.ctx = crc;
+>  
+> -	err = crypto_shash_import(&desc.shash, &crc);
+> -	BUG_ON(err);
+>  	err = crypto_shash_update(&desc.shash, buffer, len);
+>  	BUG_ON(err);
+>  
 
-Do you really need that IS_ENABLED(CONFIG_OF) ?
-In other words, dev->of_node should be null for !CONFIG_OF
+Applied + squashed into the original commit in target-pending/for-next:
 
-Regards,
-Santosh
+    lib: introduce crc_t10dif_update()
+
+Please let me know if anything else needs to be applied.
+
+Thanks Akinobu + Tim + Herbert!
+
+--nab
