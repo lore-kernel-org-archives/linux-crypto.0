@@ -1,19 +1,19 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 14/24] crypto: ccm - Use crypto_aead_set_reqsize helper
-Date: Mon, 11 May 2015 17:47:56 +0800
-Message-ID: <E1YrkJY-0001D1-Ok@gondolin.me.apana.org.au>
+Subject: [PATCH 17/24] crypto: pcrypt - Use crypto_aead_set_reqsize helper
+Date: Mon, 11 May 2015 17:48:01 +0800
+Message-ID: <E1YrkJd-0001Dt-7K@gondolin.me.apana.org.au>
 References: <20150511094444.GA4260@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:57049 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48992 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753060AbbEKJsA (ORCPT
+	with ESMTP id S1753060AbbEKJsF (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 May 2015 05:48:00 -0400
+	Mon, 11 May 2015 05:48:05 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1YrkJZ-0000II-JM
-	for <linux-crypto@vger.kernel.org>; Mon, 11 May 2015 19:47:57 +1000
+	id 1YrkJe-0000Jw-9F
+	for <linux-crypto@vger.kernel.org>; Mon, 11 May 2015 19:48:02 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
@@ -23,38 +23,24 @@ touching the internals of aead.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/ccm.c |   14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ crypto/pcrypt.c |    7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 003bbbd..a4d1a5e 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -453,9 +453,9 @@ static int crypto_ccm_init_tfm(struct crypto_tfm *tfm)
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index c305d41..ac115d5 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -292,9 +292,10 @@ static int pcrypt_aead_init_tfm(struct crypto_tfm *tfm)
+ 		return PTR_ERR(cipher);
  
- 	align = crypto_tfm_alg_alignmask(tfm);
- 	align &= ~(crypto_tfm_ctx_alignment() - 1);
--	tfm->crt_aead.reqsize = align +
--				sizeof(struct crypto_ccm_req_priv_ctx) +
--				crypto_ablkcipher_reqsize(ctr);
+ 	ctx->child = cipher;
+-	tfm->crt_aead.reqsize = sizeof(struct pcrypt_request)
+-		+ sizeof(struct aead_givcrypt_request)
+-		+ crypto_aead_reqsize(cipher);
 +	crypto_aead_set_reqsize(__crypto_aead_cast(tfm),
-+		align + sizeof(struct crypto_ccm_req_priv_ctx) +
-+		crypto_ablkcipher_reqsize(ctr));
- 
- 	return 0;
- 
-@@ -729,10 +729,10 @@ static int crypto_rfc4309_init_tfm(struct crypto_tfm *tfm)
- 
- 	align = crypto_aead_alignmask(aead);
- 	align &= ~(crypto_tfm_ctx_alignment() - 1);
--	tfm->crt_aead.reqsize = sizeof(struct aead_request) +
--				ALIGN(crypto_aead_reqsize(aead),
--				      crypto_tfm_ctx_alignment()) +
--				align + 16;
-+	crypto_aead_set_reqsize(__crypto_aead_cast(tfm),
-+		sizeof(struct aead_request) +
-+		ALIGN(crypto_aead_reqsize(aead), crypto_tfm_ctx_alignment()) +
-+		align + 16);
++		sizeof(struct pcrypt_request) +
++		sizeof(struct aead_givcrypt_request) +
++		crypto_aead_reqsize(cipher));
  
  	return 0;
  }
