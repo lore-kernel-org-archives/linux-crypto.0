@@ -1,36 +1,27 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv3 00/10] add 842 hw compression for PowerNV platform
-Date: Mon, 11 May 2015 15:21:07 +0800
-Message-ID: <20150511072107.GB2789@gondor.apana.org.au>
-References: <1430931066-4536-1-git-send-email-ddstreet@ieee.org>
- <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
+Subject: Re: [PATCH] qat: add driver version
+Date: Mon, 11 May 2015 15:23:28 +0800
+Message-ID: <20150511072328.GA2935@gondor.apana.org.au>
+References: <20150508000042.8205.32112.stgit@bwallan-smackover2.jf.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
-	Seth Jennings <sjennings@variantweb.net>,
-	Robert Jennings <rob@pochix.net>, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-To: Dan Streetman <ddstreet@ieee.org>
+Cc: linux-crypto@vger.kernel.org
+To: Bruce Allan <bruce.w.allan@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39551 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:50745 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752302AbbEKHVh (ORCPT
+	with ESMTP id S1752530AbbEKHXd (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 May 2015 03:21:37 -0400
+	Mon, 11 May 2015 03:23:33 -0400
 Content-Disposition: inline
-In-Reply-To: <1431020961-22285-1-git-send-email-ddstreet@ieee.org>
+In-Reply-To: <20150508000042.8205.32112.stgit@bwallan-smackover2.jf.intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 07, 2015 at 01:49:11PM -0400, Dan Streetman wrote:
->
-> v3 changes the sw and hw crypto drivers to use the same alg name "842",
-> and different driver names, "842-generic" and "842-nx"
+Bruce Allan <bruce.w.allan@intel.com> wrote:
+> Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
 
-All applied.  Thanks a lot!
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
