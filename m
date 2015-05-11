@@ -1,91 +1,62 @@
-From: Yao Dongdong <yaodongdong@huawei.com>
-Subject: Re: [Question] AEAD crypto api for userspace can't deal with a PTlen=0
- vector
-Date: Mon, 11 May 2015 09:51:15 +0800
-Message-ID: <55500B13.2090400@huawei.com>
-References: <554B3415.3060707@huawei.com> <1449423.5ryfY6rDCG@tauon>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.1
+Date: Mon, 11 May 2015 13:56:08 +0800
+Message-ID: <20150511055608.GA2055@gondor.apana.org.au>
+References: <20121109093005.GA25632@gondor.apana.org.au>
+ <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20141231033217.GA27261@gondor.apana.org.au>
+ <20150107021737.GA25043@gondor.apana.org.au>
+ <20150425080310.GA6873@gondor.apana.org.au>
+ <20150505100621.GA8678@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-	"Lihui (Eric)" <lihui8@huawei.com>
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga03-in.huawei.com ([119.145.14.66]:8264 "EHLO
-	szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750756AbbEKBv2 (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:47239 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750789AbbEKF4T (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 10 May 2015 21:51:28 -0400
-In-Reply-To: <1449423.5ryfY6rDCG@tauon>
+	Mon, 11 May 2015 01:56:19 -0400
+Content-Disposition: inline
+In-Reply-To: <20150505100621.GA8678@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2015/5/7 19:28, Stephan Mueller wrote:
-> Am Donnerstag, 7. Mai 2015, 17:44:53 schrieb Yao Dongdong:
->
-> Hi Yao,
->
->> while we use crypto api for userspace to do vectors test for AEAD(aes-gcm),
->> we encounter a problem. There are some test vector's PTlen is 0,for example:
->> [Keylen = 128]
->> [IVlen = 96]
->> [PTlen = 0]
->> [AADlen = 0]
->> [Taglen = 128]
->>
->> Count = 0
->> Key = 7e93936b2e2188cfa9c9882ad901312f
->> IV = b6879804163b9eaf5bfe5218
->> CT =
->> AAD =
->> Tag = aa77daf382d0d63480ff8c8a2dee149e
->>
->> In testing vectors like that, we will get an error result that the decrypt
->> return is success but the right return is a ghash verify fail.
->> After digging into the kernel(3.10) code, we find the function sock_aio_read
->> in net/socket.c has a judgement of iocb->ki_left which will be 0 when we
->> do an aes-gcm decrypt decribed above.
->>
->> static ssize_t sock_aio_read(struct kiocb *iocb, const struct iovec *iov,
->>                unsigned long nr_segs, loff_t pos)
->> {
->>    struct sock_iocb siocb, *x;
->>
->>    if (pos != 0)
->>        return -ESPIPE;
->>
->>    if (iocb->ki_left == 0) /* Match SYS5 behaviour */
->>        return 0;
->>
->>    x = alloc_sock_iocb(iocb, &siocb);
->>    if (!x)
->>        return -ENOMEM;
->>    return do_sock_read(&x->async_msg, iocb, iocb->ki_filp, iov, nr_segs);
->> }
->>
->> So it directly return before calling aes-gcm decrypt.
->>
->> How can we deal with that?
-> You cannot. Currently, the interface is not intended to handle such specific 
-> CAVS conditions (zero CT and AAD). Note, this test effectively only validates 
-> GHASH.
->
-> In any case, if you need to perform CAVS testing, you will only be able to do 
-> that with a kernel module for all obscure operations CAVS requests (not only 
-> for AEAD, but also for RNGs).
->
-> Or you restrict your usage (and thus the CAVS testing) to CT/AAD lengths > 0.
+Hi Linus:
 
-Thanks for your replay and we will modify our treatment based on your suggestions.
+This push fixes a the implementation of CRC32 on arm64 where it
+incorrectly applied negation on the result.  It also fixes the
+arm64 implementations of SHA/SHA256 where in some cases it may
+end up finalising the result twice.
 
->
-> Ciao
-> Stephan
->
-> .
->
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
 
+Ard Biesheuvel (3):
+      crypto: arm64/crc32 - bring in line with generic CRC32
+      crypto: arm64/sha1-ce - prevent asm code finalization in final() path
+      crypto: arm64/sha2-ce - prevent asm code finalization in final() path
+
+ arch/arm64/crypto/crc32-arm64.c  |   22 +++++++++++++++++++---
+ arch/arm64/crypto/sha1-ce-glue.c |    3 +++
+ arch/arm64/crypto/sha2-ce-glue.c |    3 +++
+ 3 files changed, 25 insertions(+), 3 deletions(-)
+
+Thanks,
 -- 
-Kind regards,
-Yao Dongdong
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
