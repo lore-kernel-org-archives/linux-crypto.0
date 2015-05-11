@@ -1,43 +1,59 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2] SP800-38F / RFC3394 key wrapping
-Date: Mon, 11 May 2015 12:15:56 +0200
-Message-ID: <3967410.spMBXlI7nE@tauon>
-References: <1515730.LIeS5qas5m@myon.chronox.de> <1472762.oGxlyZfssS@tauon> <20150511094212.GA4224@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: [PATCH] crypto: make lib/842 decompress functions static
+Date: Mon, 11 May 2015 07:22:35 -0400
+Message-ID: <1431343355-32005-1-git-send-email-ddstreet@ieee.org>
+Cc: Dan Streetman <ddstreet@ieee.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: Fengguang Wu <fengguang.wu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34765 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752814AbbEKKQE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 May 2015 06:16:04 -0400
-In-Reply-To: <20150511094212.GA4224@gondor.apana.org.au>
+Received: from mail-ig0-f181.google.com ([209.85.213.181]:32926 "EHLO
+	mail-ig0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753240AbbEKLWx (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 11 May 2015 07:22:53 -0400
+Received: by igbpi8 with SMTP id pi8so69997619igb.0
+        for <linux-crypto@vger.kernel.org>; Mon, 11 May 2015 04:22:53 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 11. Mai 2015, 17:42:12 schrieb Herbert Xu:
+Make the do_index and do_op functions static.
 
-Hi Herbert,
+They are used only internally by the 842 decompression function,
+and should be static.
 
->On Fri, May 01, 2015 at 03:21:19PM +0200, Stephan Mueller wrote:
->> My idea would be to use keywrap in step 3.
->
->How is dm-crypt going to cope with the increase in ciphertext size?
+Reported-By: Fengguang Wu <fengguang.wu@intel.com>
+Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
+Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+---
+Oops, I missed making these static.  Thanks for catching it!
+I left your Signed-off-by even though this patch covers do_index
+also (I assumed you agree with making both static :)
 
-The LUKS header is not fixed-size, so it would be able to handle the increased 
-cipher text size.
+lib/842/842_decompress.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-But I think I should rather go back and write up the ideas that I have for key 
-handling. Currently it seems that too many components in kernel and user space 
-handle plaintext keys.
-
-After writing that one up, I like to present it with an assoicated discussion 
-of how to handle key wrapping considering that addition of it to the kernel 
-crypto API is not possible at this point.
-
-Thanks for your help.
-
-Ciao
-Stephan
+diff --git a/lib/842/842_decompress.c b/lib/842/842_decompress.c
+index 6b2b45a..dbeb058 100644
+--- a/lib/842/842_decompress.c
++++ b/lib/842/842_decompress.c
+@@ -214,7 +214,7 @@ static int __do_index(struct sw842_param *p, u8 size, u8 bits, u64 fsize)
+ 	return 0;
+ }
+ 
+-int do_index(struct sw842_param *p, u8 n)
++static int do_index(struct sw842_param *p, u8 n)
+ {
+ 	switch (n) {
+ 	case 2:
+@@ -228,7 +228,7 @@ int do_index(struct sw842_param *p, u8 n)
+ 	}
+ }
+ 
+-int do_op(struct sw842_param *p, u8 o)
++static int do_op(struct sw842_param *p, u8 o)
+ {
+ 	int i, ret = 0;
+ 
+-- 
+2.1.0
