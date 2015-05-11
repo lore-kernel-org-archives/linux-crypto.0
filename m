@@ -1,50 +1,43 @@
-From: Horia Geanta <horia.geanta@freescale.com>
-Subject: [PATCH 2/4] Revert "crypto: talitos - convert to use be16_add_cpu()"
-Date: Mon, 11 May 2015 20:04:49 +0300
-Message-ID: <1431363889-2706-1-git-send-email-horia.geanta@freescale.com>
-References: <1431363804-2331-1-git-send-email-horia.geanta@freescale.com>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Wei Yongjun <yongjun_wei@trendmicro.com.cn>,
-	<linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: [PATCH] crypto: correct 842 decompress for 32 bit
+Date: Mon, 11 May 2015 18:53:36 -0400
+Message-ID: <1431384816-21606-1-git-send-email-ddstreet@ieee.org>
+Cc: Dan Streetman <ddstreet@ieee.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Fengguang Wu <fengguang.wu@intel.com>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0127.outbound.protection.outlook.com ([65.55.169.127]:53432
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751407AbbEKRgw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 May 2015 13:36:52 -0400
-In-Reply-To: <1431363804-2331-1-git-send-email-horia.geanta@freescale.com>
+Received: from mail-ig0-f179.google.com ([209.85.213.179]:37198 "EHLO
+	mail-ig0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751980AbbEKWyD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 11 May 2015 18:54:03 -0400
+Received: by igbsb11 with SMTP id sb11so85959361igb.0
+        for <linux-crypto@vger.kernel.org>; Mon, 11 May 2015 15:54:02 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This reverts commit 7291a932c6e27d9768e374e9d648086636daf61c.
+Avoid 64 bit mod operation, which won't work on 32 bit systems.
+Simple subtraction can be used instead in this case.
 
-The conversion to be16_add_cpu() is incorrect in case cryptlen is
-negative due to premature (i.e. before addition / subtraction)
-implicit conversion of cryptlen (int -> u16) leading to sign loss.
-
-Cc: <stable@vger.kernel.org> # 3.10+
-Cc: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
-Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+Reported-By: Fengguang Wu <fengguang.wu@intel.com>
+Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- drivers/crypto/talitos.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ lib/842/842_decompress.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 2c2ec0e0c145..6b19b3dca616 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1083,7 +1083,8 @@ static int sg_to_link_tbl(struct scatterlist *sg, int sg_count,
- 		sg_count--;
- 		link_tbl_ptr--;
- 	}
--	be16_add_cpu(&link_tbl_ptr->len, cryptlen);
-+	link_tbl_ptr->len = cpu_to_be16(be16_to_cpu(link_tbl_ptr->len)
-+					+ cryptlen);
+diff --git a/lib/842/842_decompress.c b/lib/842/842_decompress.c
+index dbeb058..999b629 100644
+--- a/lib/842/842_decompress.c
++++ b/lib/842/842_decompress.c
+@@ -185,7 +185,7 @@ static int __do_index(struct sw842_param *p, u8 size, u8 bits, u64 fsize)
+ 		/* this is where the current fifo is */
+ 		u64 section = round_down(total, fsize);
+ 		/* the current pos in the fifo */
+-		u64 pos = total % fsize;
++		u64 pos = total - section;
  
- 	/* tag end of link table */
- 	link_tbl_ptr->j_extent = DESC_PTR_LNKTBL_RETURN;
+ 		/* if the offset is past/at the pos, we need to
+ 		 * go back to the last fifo section
 -- 
-1.8.3.1
+2.1.0
