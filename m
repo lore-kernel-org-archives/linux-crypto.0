@@ -1,7 +1,7 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH RFC v2 1/2] crypto: add PKE API
-Date: Mon, 11 May 2015 14:27:47 +0800
-Message-ID: <20150511062747.GA2316@gondor.apana.org.au>
+Date: Mon, 11 May 2015 14:32:22 +0800
+Message-ID: <20150511063222.GB2316@gondor.apana.org.au>
 References: <20150506193643.9329.75351.stgit@tstruk-mobl1>
  <20150506193648.9329.27232.stgit@tstruk-mobl1>
 Mime-Version: 1.0
@@ -21,12 +21,11 @@ List-Id: linux-crypto.vger.kernel.org
 
 On Wed, May 06, 2015 at 12:36:48PM -0700, Tadeusz Struk wrote:
 >
-> +struct pkey_request {
-> +	struct crypto_async_request base;
-> +	const struct public_key *pkey;
+> +	const struct public_key_signature *signature;
 
-The key should not come from the request.  It should go into the
-tfm.
+Doing this means that you aren't adding it to the crypto API
+properly.  You need to start from scratch and design a proper
+interface and not just wrap some existing opaque data strcture.
 
 Cheers,
 -- 
