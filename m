@@ -1,59 +1,40 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.1
-Date: Mon, 11 May 2015 13:56:08 +0800
-Message-ID: <20150511055608.GA2055@gondor.apana.org.au>
-References: <20121109093005.GA25632@gondor.apana.org.au>
- <20130328082841.GA7425@gondor.apana.org.au>
- <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
- <20140101061016.GA22579@gondor.apana.org.au>
- <20140203125944.GA31446@gondor.apana.org.au>
- <20141231033217.GA27261@gondor.apana.org.au>
- <20150107021737.GA25043@gondor.apana.org.au>
- <20150425080310.GA6873@gondor.apana.org.au>
- <20150505100621.GA8678@gondor.apana.org.au>
+Subject: Re: [PATCH RFC v2 1/2] crypto: add PKE API
+Date: Mon, 11 May 2015 14:03:47 +0800
+Message-ID: <20150511060347.GA2117@gondor.apana.org.au>
+References: <20150506193643.9329.75351.stgit@tstruk-mobl1>
+ <20150506193648.9329.27232.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47239 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750789AbbEKF4T (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 May 2015 01:56:19 -0400
+Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
+	jwboyer@redhat.com, richard@nod.at, steved@redhat.com,
+	qat-linux@intel.com, dhowells@redhat.com,
+	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	vgoyal@redhat.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150505100621.GA8678@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20150506193648.9329.27232.stgit@tstruk-mobl1>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi Linus:
+On Wed, May 06, 2015 at 12:36:48PM -0700, Tadeusz Struk wrote:
+>
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 8aaf298..daa9c07 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -87,6 +87,12 @@ config CRYPTO_PCOMP2
+>  	tristate
+>  	select CRYPTO_ALGAPI2
+>  
+> +config CRYPTO_PKEY
 
-This push fixes a the implementation of CRC32 on arm64 where it
-incorrectly applied negation on the result.  It also fixes the
-arm64 implementations of SHA/SHA256 where in some cases it may
-end up finalising the result twice.
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Ard Biesheuvel (3):
-      crypto: arm64/crc32 - bring in line with generic CRC32
-      crypto: arm64/sha1-ce - prevent asm code finalization in final() path
-      crypto: arm64/sha2-ce - prevent asm code finalization in final() path
-
- arch/arm64/crypto/crc32-arm64.c  |   22 +++++++++++++++++++---
- arch/arm64/crypto/sha1-ce-glue.c |    3 +++
- arch/arm64/crypto/sha2-ce-glue.c |    3 +++
- 3 files changed, 25 insertions(+), 3 deletions(-)
+Please call this AKCIPHER instead of PKEY.  The existing ciphers
+are already known as skcipher (although the conversion process is
+by no means complete so other names such as blkcipher/ablkcipher
+still exist).
 
 Thanks,
 -- 
