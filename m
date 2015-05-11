@@ -1,87 +1,50 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [V3 PATCH 2/5] arm64 : Introduce support for ACPI _CCA object
-Date: Mon, 11 May 2015 18:12:29 +0100
-Message-ID: <20150511171229.GK18655@e104818-lin.cambridge.arm.com>
-References: <1431045436-8690-1-git-send-email-Suravee.Suthikulpanit@amd.com>
- <1431045436-8690-3-git-send-email-Suravee.Suthikulpanit@amd.com>
+From: Horia Geanta <horia.geanta@freescale.com>
+Subject: [PATCH 2/4] Revert "crypto: talitos - convert to use be16_add_cpu()"
+Date: Mon, 11 May 2015 20:04:22 +0300
+Message-ID: <1431363862-2470-1-git-send-email-horia.geanta@freescale.com>
+References: <1431363804-2331-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: rjw@rjwysocki.net, lenb@kernel.org, will.deacon@arm.com,
-	thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, arnd@arndb.de, al.stone@linaro.org,
-	linaro-acpi@lists.linaro.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
-	leo.duran@amd.com, hanjun.guo@linaro.org, msalter@redhat.com,
-	grant.likely@linaro.org, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org
-To: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1431045436-8690-3-git-send-email-Suravee.Suthikulpanit@amd.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain
+Cc: Wei Yongjun <yongjun_wei@trendmicro.com.cn>,
+	<linux-crypto@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-bn1bbn0104.outbound.protection.outlook.com ([157.56.111.104]:49072
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751413AbbEKRSy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 11 May 2015 13:18:54 -0400
+In-Reply-To: <1431363804-2331-1-git-send-email-horia.geanta@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 07, 2015 at 07:37:13PM -0500, Suravee Suthikulpanit wrote:
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 4269dba..c7227e8 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -1,5 +1,6 @@
->  config ARM64
->  	def_bool y
-> +	select ACPI_CCA_REQUIRED if ACPI
->  	select ACPI_GENERIC_GSI if ACPI
->  	select ACPI_REDUCED_HARDWARE_ONLY if ACPI
->  	select ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE
-> @@ -19,6 +20,7 @@ config ARM64
->  	select ARM_GIC_V2M if PCI_MSI
->  	select ARM_GIC_V3
->  	select ARM_GIC_V3_ITS if PCI_MSI
-> +	select ARM64_SUPPORT_ACPI_CCA_ZERO if ACPI
+This reverts commit 7291a932c6e27d9768e374e9d648086636daf61c.
 
-As per the other sub-thread, I don't think we need this option at all.
+The conversion to be16_add_cpu() is incorrect in case cryptlen is
+negative due to premature (i.e. before addition / subtraction)
+implicit conversion of cryptlen (int -> u16) leading to sign loss.
 
-> diff --git a/arch/arm64/include/asm/dma-mapping.h b/arch/arm64/include/asm/dma-mapping.h
-> index 9437e3d..f0d6d0b 100644
-> --- a/arch/arm64/include/asm/dma-mapping.h
-> +++ b/arch/arm64/include/asm/dma-mapping.h
-> @@ -18,6 +18,7 @@
->  
->  #ifdef __KERNEL__
->  
-> +#include <linux/acpi.h>
->  #include <linux/types.h>
->  #include <linux/vmalloc.h>
->  
-> @@ -28,13 +29,23 @@
->  
->  #define DMA_ERROR_CODE	(~(dma_addr_t)0)
->  extern struct dma_map_ops *dma_ops;
-> +extern struct dma_map_ops dummy_dma_ops;
->  
->  static inline struct dma_map_ops *__generic_dma_ops(struct device *dev)
->  {
-> -	if (unlikely(!dev) || !dev->archdata.dma_ops)
-> +	if (unlikely(!dev))
->  		return dma_ops;
-> -	else
-> +	else if (dev->archdata.dma_ops)
->  		return dev->archdata.dma_ops;
-> +	else if (acpi_disabled)
-> +		return dma_ops;
-> +
-> +	/*
-> +	 * When ACPI is enabled, if arch_set_dma_ops is not called,
-> +	 * we will disable device DMA capability by setting it
-> +	 * to dummy_dma_ops.
-> +	 */
-> +	return &dummy_dma_ops;
->  }
+Cc: <stable@vger.kernel.org> # 3.10+
+Cc: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
+---
+ drivers/crypto/talitos.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-The code looks fine to me but Arnd had some comments that I didn't fully
-understand (dropping dummy_map_ops in favour of simply setting dma_mask
-to NULL; I don't think the existing swiotlb ops would behave in a way
-that always return NULL).
-
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 2c2ec0e0c145..6b19b3dca616 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1083,7 +1083,8 @@ static int sg_to_link_tbl(struct scatterlist *sg, int sg_count,
+ 		sg_count--;
+ 		link_tbl_ptr--;
+ 	}
+-	be16_add_cpu(&link_tbl_ptr->len, cryptlen);
++	link_tbl_ptr->len = cpu_to_be16(be16_to_cpu(link_tbl_ptr->len)
++					+ cryptlen);
+ 
+ 	/* tag end of link table */
+ 	link_tbl_ptr->j_extent = DESC_PTR_LNKTBL_RETURN;
 -- 
-Catalin
+1.8.3.1
