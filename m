@@ -1,74 +1,46 @@
-From: Yao Dongdong <yaodongdong@huawei.com>
-Subject: Re: [Question] AEAD crypto api for userspace can't deal with a PTlen=0
- vector
-Date: Mon, 11 May 2015 16:35:24 +0800
-Message-ID: <555069CC.9060306@huawei.com>
-References: <554B3415.3060707@huawei.com> <20150511063509.GA2430@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v5 1/5] random: Async and sync API for accessing
+ nonblocking_pool
+Date: Mon, 11 May 2015 17:28:29 +0800
+Message-ID: <20150511092829.GA4014@gondor.apana.org.au>
+References: <1887272.cxqymnQQZn@tachyon.chronox.de>
+ <3264123.O3YfJV7UGj@tachyon.chronox.de>
+ <20150511065714.GA2598@gondor.apana.org.au>
+ <3644541.vBsSXgpCaS@tauon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: <smueller@chronox.de>, <linux-crypto@vger.kernel.org>,
-	"Lihui (Eric)" <lihui8@huawei.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
+	sandyinchina@gmail.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from szxga01-in.huawei.com ([58.251.152.64]:1933 "EHLO
-	szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750810AbbEKIfk (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:45867 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752376AbbEKJ2p (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 May 2015 04:35:40 -0400
-In-Reply-To: <20150511063509.GA2430@gondor.apana.org.au>
+	Mon, 11 May 2015 05:28:45 -0400
+Content-Disposition: inline
+In-Reply-To: <3644541.vBsSXgpCaS@tauon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2015/5/11 14:35, Herbert Xu wrote:
-> On Thu, May 07, 2015 at 05:44:53PM +0800, Yao Dongdong wrote:
->> while we use crypto api for userspace to do vectors test for AEAD(aes-gcm),
->> we encounter a problem. There are some test vector's PTlen is 0,for example:
->> [Keylen = 128]
->> [IVlen = 96]
->> [PTlen = 0]
->> [AADlen = 0]
->> [Taglen = 128]
->>
->> Count = 0
->> Key = 7e93936b2e2188cfa9c9882ad901312f
->> IV = b6879804163b9eaf5bfe5218
->> CT =
->> AAD =
->> Tag = aa77daf382d0d63480ff8c8a2dee149e
->>
->> In testing vectors like that, we will get an error result that the decrypt
->> return is success but the right return is a ghash verify fail.
->> After digging into the kernel(3.10) code, we find the function sock_aio_read
->> in net/socket.c has a judgement of iocb->ki_left which will be 0 when we
->> do an aes-gcm decrypt decribed above.
->>
->> static ssize_t sock_aio_read(struct kiocb *iocb, const struct iovec *iov,
->>                 unsigned long nr_segs, loff_t pos)
->> {
->>     struct sock_iocb siocb, *x;
->>
->>     if (pos != 0)
->>         return -ESPIPE;
->>
->>     if (iocb->ki_left == 0) /* Match SYS5 behaviour */
->>         return 0;
->>
->>     x = alloc_sock_iocb(iocb, &siocb);
->>     if (!x)
->>         return -ENOMEM;
->>     return do_sock_read(&x->async_msg, iocb, iocb->ki_filp, iov, nr_segs);
->> }
->>
->> So it directly return before calling aes-gcm decrypt.
->>
->> How can we deal with that?
-> Does this still happen if you use recvmsg?
-Yes, it works.
+On Mon, May 11, 2015 at 09:30:11AM +0200, Stephan Mueller wrote:
+>
+> I will remove that in the next installment. But that means that the DRBG 
+> kernel module (or any other module) cannot be unloaded until the work 
+> completes.
 
-> Cheers,
+I don't think that's a big deal.
 
+> Are you suggesting to only leave get_blocking_random_bytes and have the caller 
+> implementing the appropriate synchronous wait or async work?
 
+No there should just be a single interface where you feed it a
+function pointer and a data pointer.  This function should then
+be called when the pool is ready.
+
+Cheers,
 -- 
-Kind regards,
-Yao Dongdong
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
