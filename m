@@ -1,36 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] crypto: arm/sha512 - accelerated SHA-512 using ARM
- generic ASM and NEON
-Date: Mon, 11 May 2015 15:20:25 +0800
-Message-ID: <20150511072025.GA2789@gondor.apana.org.au>
-References: <1431074782-22141-1-git-send-email-ard.biesheuvel@linaro.org>
- <20150511065952.GB2598@gondor.apana.org.au>
- <CAKv+Gu9+xrX2nB43cskOoL63WjZGTDdq9ZTO-maWas5u=ng=JQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] crypto: testmgr: add test cases for CRC32
+Date: Mon, 11 May 2015 15:21:29 +0800
+Message-ID: <20150511072129.GC2789@gondor.apana.org.au>
+References: <1430730017-3712-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1430730017-3712-2-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
+Cc: linux-crypto@vger.kernel.org, yazen.ghannam@linaro.org,
+	steve.capper@linaro.org
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:40646 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:54440 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752192AbbEKHUb (ORCPT
+	with ESMTP id S1752192AbbEKHVc (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 May 2015 03:20:31 -0400
+	Mon, 11 May 2015 03:21:32 -0400
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu9+xrX2nB43cskOoL63WjZGTDdq9ZTO-maWas5u=ng=JQ@mail.gmail.com>
+In-Reply-To: <1430730017-3712-2-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 11, 2015 at 09:00:49AM +0200, Ard Biesheuvel wrote:
->
-> Yes, you are right. Let me figure out what's going on and send you a
-> new version.
+On Mon, May 04, 2015 at 11:00:17AM +0200, Ard Biesheuvel wrote:
+> This adds a couple of test cases for CRC32 (not CRC32c) to
+> ensure that the generic and arch specific implementations
+> are in sync.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Don't worry.  I fixed it up while applying the patch.
-
-Cheers,
+Applied to cryptodev.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
