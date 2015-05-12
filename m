@@ -1,43 +1,87 @@
-From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH] crypto: correct 842 decompress for 32 bit
-Date: Mon, 11 May 2015 18:53:36 -0400
-Message-ID: <1431384816-21606-1-git-send-email-ddstreet@ieee.org>
-Cc: Dan Streetman <ddstreet@ieee.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Fengguang Wu <fengguang.wu@intel.com>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Subject: Re: [V3 PATCH 1/5] ACPI / scan: Parse _CCA and setup device coherency
+Date: Tue, 12 May 2015 03:20:04 +0200
+Message-ID: <1664523.WMm4AqWTY5@vostro.rjw.lan>
+References: <1431045436-8690-1-git-send-email-Suravee.Suthikulpanit@amd.com> <3684853.vaQGhc4jR5@vostro.rjw.lan> <20150511161626.GI18655@e104818-lin.cambridge.arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7Bit
+Cc: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>,
+	thomas.lendacky@amd.com, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au, arnd@arndb.de,
+	linaro-acpi@lists.linaro.org, will.deacon@arm.com,
+	linux-kernel@vger.kernel.org, al.stone@linaro.org,
+	linux-acpi@vger.kernel.org, netdev@vger.kernel.org,
+	leo.duran@amd.com, hanjun.guo@linaro.org, msalter@redhat.com,
+	grant.likely@linaro.org, davem@davemloft.net,
+	linux-arm-kernel@lists.infradead.org, lenb@kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f179.google.com ([209.85.213.179]:37198 "EHLO
-	mail-ig0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751980AbbEKWyD (ORCPT
+Received: from v094114.home.net.pl ([79.96.170.134]:54487 "HELO
+	v094114.home.net.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1750882AbbELAy4 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 May 2015 18:54:03 -0400
-Received: by igbsb11 with SMTP id sb11so85959361igb.0
-        for <linux-crypto@vger.kernel.org>; Mon, 11 May 2015 15:54:02 -0700 (PDT)
+	Mon, 11 May 2015 20:54:56 -0400
+In-Reply-To: <20150511161626.GI18655@e104818-lin.cambridge.arm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Avoid 64 bit mod operation, which won't work on 32 bit systems.
-Simple subtraction can be used instead in this case.
+On Monday, May 11, 2015 05:16:27 PM Catalin Marinas wrote:
+> On Fri, May 08, 2015 at 10:53:59PM +0200, Rafael J. Wysocki wrote:
+> > On Thursday, May 07, 2015 07:37:12 PM Suravee Suthikulpanit wrote:
+> > > diff --git a/drivers/acpi/Kconfig b/drivers/acpi/Kconfig
+> > > index ab2cbb5..7822149 100644
+> > > --- a/drivers/acpi/Kconfig
+> > > +++ b/drivers/acpi/Kconfig
+> > > @@ -54,6 +54,12 @@ config ACPI_GENERIC_GSI
+> > >  config ACPI_SYSTEM_POWER_STATES_SUPPORT
+> > >  	bool
+> > >  
+> > > +config ACPI_CCA_REQUIRED
+> > > +	bool
+> > > +
+> > > +config ARM64_SUPPORT_ACPI_CCA_ZERO
+> > 
+> > Hmm.  I guess the Arnd's idea what to simply use CONFIG_ARM64 directly instead
+> > of adding this new option.
+> 
+> I agree.
+> 
+> > > +static inline bool acpi_dma_is_supported(struct acpi_device *adev)
+> > > +{
+> > > +	/**
+> > > +	 * Currently, we mainly support _CCA=1 (i.e. is_coherent=1)
+> > > +	 * This should be equivalent to specifyig dma-coherent for
+> > > +	 * a device in OF.
+> > > +	 *
+> > > +	 * For the case when _CCA=0 (i.e. is_coherent=0 && cca_seen=1),
+> > > +	 * we would rely on arch-specific cache maintenance for
+> > > +	 * non-coherence DMA operations if architecture specifies
+> > > +	 * _XXX_SUPPORT_CCA_ZERO. Otherwise, we do not support
+> > > +	 * DMA on this device and fallback to arch-specific default
+> > > +	 * handling.
+> > > +	 *
+> > > +	 * For the case when _CCA is missing (i.e. cca_seen=0) but
+> > > +	 * platform specifies ACPI_CCA_REQUIRED, we do not support DMA,
+> > > +	 * and fallback to arch-specific default handling.
+> > > +	 */
+> > > +	return adev && (adev->flags.is_coherent ||
+> > > +			(adev->flags.cca_seen &&
+> > > +			 IS_ENABLED(CONFIG_ARM64_SUPPORT_ACPI_CCA_ZERO)));
+> > 
+> > So what exactly would be wrong with using IS_ENABLED(CONFIG_ARM64) here?
+> 
+> I'm not sure I follow why we need to check for ARM64 here at all. Can we
+> not just have something like:
+> 
+> 	return adev && (!IS_ENABLED(CONFIG_ACPI_CCA_REQUIRED) ||
+> 			adev->flags.cca_seen)
 
-Reported-By: Fengguang Wu <fengguang.wu@intel.com>
-Signed-off-by: Dan Streetman <ddstreet@ieee.org>
----
- lib/842/842_decompress.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If _CCA returns 0 on non-ARM64, DMA is not supported for this device, so
+in that case the function should return 'false' while the above check will
+make it return 'true'.
 
-diff --git a/lib/842/842_decompress.c b/lib/842/842_decompress.c
-index dbeb058..999b629 100644
---- a/lib/842/842_decompress.c
-+++ b/lib/842/842_decompress.c
-@@ -185,7 +185,7 @@ static int __do_index(struct sw842_param *p, u8 size, u8 bits, u64 fsize)
- 		/* this is where the current fifo is */
- 		u64 section = round_down(total, fsize);
- 		/* the current pos in the fifo */
--		u64 pos = total % fsize;
-+		u64 pos = total - section;
- 
- 		/* if the offset is past/at the pos, we need to
- 		 * go back to the last fifo section
+
 -- 
-2.1.0
+I speak only for myself.
+Rafael J. Wysocki, Intel Open Source Technology Center.
