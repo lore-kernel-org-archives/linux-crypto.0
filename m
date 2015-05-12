@@ -1,159 +1,64 @@
-From: Maxime Ripard <maxime.ripard@free-electrons.com>
-Subject: [PATCH 5/8] dmaengine: mv_xor: bug fix for racing condition in
- descriptors cleanup
-Date: Tue, 12 May 2015 17:37:40 +0200
-Message-ID: <1431445063-20226-6-git-send-email-maxime.ripard@free-electrons.com>
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: Re: [PATCH 2/8] dmaengine: mv_xor: add support for a38x command in
+ descriptor mode
+Date: Tue, 12 May 2015 17:49:36 +0200
+Message-ID: <20150512174936.284783d4@free-electrons.com>
 References: <1431445063-20226-1-git-send-email-maxime.ripard@free-electrons.com>
+	<1431445063-20226-3-git-send-email-maxime.ripard@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Lior Amsalem <alior@marvell.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Thomas Petazzoni <thomas@free-electrons.com>, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
- Maxime Ripard <maxime.ripard@free-electrons.com>,
- "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org
-To: Vinod Koul <vinod.koul@intel.com>, Dan Williams <dan.j.williams@intel.com>,
- Gregory Clement <gregory.clement@free-electrons.com>,
- Jason Cooper <jason@lakedaemon.net>, Andrew Lunn <andrew@lunn.ch>,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1431445063-20226-1-git-send-email-maxime.ripard@free-electrons.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-List-Id: linux-crypto.vger.kernel.org
+Cc: Vinod Koul <vinod.koul@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Gregory Clement <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	dmaengine@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Lior Amsalem <alior@marvell.com>,
+	Thomas Petazzoni <thomas@free-electrons.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+To: Maxime Ripard <maxime.ripard@free-electrons.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from down.free-electrons.com ([37.187.137.238]:57900 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753185AbbELPtl (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 12 May 2015 11:49:41 -0400
+In-Reply-To: <1431445063-20226-3-git-send-email-maxime.ripard@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Lior Amsalem <alior@marvell.com>
+Maxime,
 
-This patch fixes a bug in the XOR driver where the cleanup function can be
-called and free descriptors that never been processed by the engine (which
-result in data errors).
+On Tue, 12 May 2015 17:37:37 +0200, Maxime Ripard wrote:
 
-The cleanup function will free descriptors based on the ownership bit in
-the descriptors.
+>  Required properties:
+> -- compatible: Should be "marvell,orion-xor"
+> +- compatible: Should be "marvell,orion-xor" or "marvell,a38x-xor"
 
-Signed-off-by: Lior Amsalem <alior@marvell.com>
-Reviewed-by: Ofer Heifetz <oferh@marvell.com>
-Signed-off-by: Maxime Ripard <maxime.ripard@free-electrons.com>
----
- drivers/dma/mv_xor.c | 72 +++++++++++++++++++++++++++++++++-------------------
- drivers/dma/mv_xor.h |  1 +
- 2 files changed, 47 insertions(+), 26 deletions(-)
+I believe the new compatible string should be armada-380-xor or
+armada380-xor. Wildcards in compatible strings are generally not
+recommended, and we don't use the a38x- prefix anywhere in the tree, as
+far as I can see:
 
-diff --git a/drivers/dma/mv_xor.c b/drivers/dma/mv_xor.c
-index d1110442f0d2..28980483eafb 100644
---- a/drivers/dma/mv_xor.c
-+++ b/drivers/dma/mv_xor.c
-@@ -293,7 +293,8 @@ static void mv_chan_slot_cleanup(struct mv_xor_chan *mv_chan)
- 	dma_cookie_t cookie = 0;
- 	int busy = mv_chan_is_busy(mv_chan);
- 	u32 current_desc = mv_chan_get_current_desc(mv_chan);
--	int seen_current = 0;
-+	int current_cleaned = 0;
-+	struct mv_xor_desc *hw_desc;
- 
- 	dev_dbg(mv_chan_to_devp(mv_chan), "%s %d\n", __func__, __LINE__);
- 	dev_dbg(mv_chan_to_devp(mv_chan), "current_desc %x\n", current_desc);
-@@ -305,38 +306,57 @@ static void mv_chan_slot_cleanup(struct mv_xor_chan *mv_chan)
- 
- 	list_for_each_entry_safe(iter, _iter, &mv_chan->chain,
- 					node) {
--		prefetch(_iter);
--		prefetch(&_iter->async_tx);
- 
--		/* do not advance past the current descriptor loaded into the
--		 * hardware channel, subsequent descriptors are either in
--		 * process or have not been submitted
--		 */
--		if (seen_current)
--			break;
-+		/* clean finished descriptors */
-+		hw_desc = iter->hw_desc;
-+		if (hw_desc->status & XOR_DESC_SUCCESS) {
-+			cookie = mv_desc_run_tx_complete_actions(iter, mv_chan,
-+								 cookie);
- 
--		/* stop the search if we reach the current descriptor and the
--		 * channel is busy
--		 */
--		if (iter->async_tx.phys == current_desc) {
--			seen_current = 1;
--			if (busy)
-+			/* done processing desc, clean slot */
-+			mv_desc_clean_slot(iter, mv_chan);
-+
-+			/* break if we did cleaned the current */
-+			if (iter->async_tx.phys == current_desc) {
-+				current_cleaned = 1;
- 				break;
-+			}
-+		} else {
-+			if (iter->async_tx.phys == current_desc) {
-+				current_cleaned = 0;
-+				break;
-+			}
- 		}
--
--		cookie = mv_desc_run_tx_complete_actions(iter, mv_chan, cookie);
--
--		if (mv_desc_clean_slot(iter, mv_chan))
--			break;
- 	}
- 
- 	if ((busy == 0) && !list_empty(&mv_chan->chain)) {
--		struct mv_xor_desc_slot *chain_head;
--		chain_head = list_entry(mv_chan->chain.next,
--					struct mv_xor_desc_slot,
--					node);
--
--		mv_chan_start_new_chain(mv_chan, chain_head);
-+		if (current_cleaned) {
-+			/*
-+			 * current descriptor cleaned and removed, run
-+			 * from list head
-+			 */
-+			iter = list_entry(mv_chan->chain.next,
-+					  struct mv_xor_desc_slot,
-+					  node);
-+			mv_chan_start_new_chain(mv_chan, iter);
-+		} else {
-+			if (!list_is_last(&iter->node, &mv_chan->chain)) {
-+				/*
-+				 * descriptors are still waiting after
-+				 * current, trigger them
-+				 */
-+				iter = list_entry(iter->node.next,
-+						  struct mv_xor_desc_slot,
-+						  node);
-+				mv_chan_start_new_chain(mv_chan, iter);
-+			} else {
-+				/*
-+				 * some descriptors are still waiting
-+				 * to be cleaned
-+				 */
-+				tasklet_schedule(&mv_chan->irq_tasklet);
-+			}
-+		}
- 	}
- 
- 	if (cookie > 0)
-diff --git a/drivers/dma/mv_xor.h b/drivers/dma/mv_xor.h
-index 71684de37ddb..b7455b42137b 100644
---- a/drivers/dma/mv_xor.h
-+++ b/drivers/dma/mv_xor.h
-@@ -32,6 +32,7 @@
- #define XOR_OPERATION_MODE_MEMCPY	2
- #define XOR_OPERATION_MODE_IN_DESC      7
- #define XOR_DESCRIPTOR_SWAP		BIT(14)
-+#define XOR_DESC_SUCCESS		0x40000000
- 
- #define XOR_DESC_OPERATION_XOR          (0 << 24)
- #define XOR_DESC_OPERATION_CRC32C       (1 << 24)
+drivers/ata/ahci_mvebu.c:	{ .compatible = "marvell,armada-380-ahci", },
+drivers/bus/mvebu-mbus.c:	{ .compatible = "marvell,armada380-mbus",
+drivers/mmc/host/sdhci-pxav3.c:		.compatible = "marvell,armada-380-sdhci",
+drivers/rtc/rtc-armada38x.c:	{ .compatible = "marvell,armada-380-rtc", },
+drivers/thermal/armada_thermal.c:		.compatible = "marvell,armada380-thermal",
+drivers/usb/host/xhci-plat.c:	{ .compatible = "marvell,armada-380-xhci"},
+drivers/watchdog/orion_wdt.c:		.compatible = "marvell,armada-380-wdt",
+
+Yes, we're not very consistent between armada380 and armada-380, but
+we're not using a38x anywhere.
+
+Best regards,
+
+Thomas
 -- 
-2.4.0
+Thomas Petazzoni, CTO, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
