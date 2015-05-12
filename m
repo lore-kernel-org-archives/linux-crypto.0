@@ -1,17 +1,12 @@
-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Subject: Re: [PATCH 2/8] dmaengine: mv_xor: add support for a38x command in
- descriptor mode
-Date: Tue, 12 May 2015 18:05:39 +0200
-Message-ID: <20150512180539.4ea5d158@free-electrons.com>
+From: Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH 6/8] async_tx: adding mult and sum_product flags
+Date: Tue, 12 May 2015 18:05:35 +0200
+Message-ID: <20150512160535.GK19927@lunn.ch>
 References: <1431445063-20226-1-git-send-email-maxime.ripard@free-electrons.com>
-	<1431445063-20226-3-git-send-email-maxime.ripard@free-electrons.com>
-	<20150512174936.284783d4@free-electrons.com>
-	<20150512155824.GJ19927@lunn.ch>
+ <1431445063-20226-7-git-send-email-maxime.ripard@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Maxime Ripard <maxime.ripard@free-electrons.com>,
-	Vinod Koul <vinod.koul@intel.com>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Vinod Koul <vinod.koul@intel.com>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Gregory Clement <gregory.clement@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>,
@@ -22,25 +17,73 @@ Cc: Maxime Ripard <maxime.ripard@free-electrons.com>,
 	Thomas Petazzoni <thomas@free-electrons.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-To: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Ripard <maxime.ripard@free-electrons.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150512155824.GJ19927@lunn.ch>
+Content-Disposition: inline
+In-Reply-To: <1431445063-20226-7-git-send-email-maxime.ripard@free-electrons.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Andrew,
+On Tue, May 12, 2015 at 05:37:41PM +0200, Maxime Ripard wrote:
+> From: Lior Amsalem <alior@marvell.com>
+> 
+> Some engines (like Marvell mv_xor) do not support mult and sum_product
+> operations as part of the pq support.
+> 
+> This patch adds new flags: DMA_PREP_PQ_MULT & DMA_PREP_PQ_SUM_PRODUCT these
+> flags helps the driver identify such operations.
+> 
+> Signed-off-by: Lior Amsalem <alior@marvell.com>
+> Reviewed-by: Ofer Heifetz <oferh@marvell.com>
+> Reviewed-by: Nadav Haklai <nadavh@marvell.com>
+> Signed-off-by: Maxime Ripard <maxime.ripard@free-electrons.com>
+> ---
+>  crypto/async_tx/async_raid6_recov.c | 4 ++--
+>  include/linux/dmaengine.h           | 4 ++++
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/crypto/async_tx/async_raid6_recov.c b/crypto/async_tx/async_raid6_recov.c
+> index 934a84981495..2db5486fd873 100644
+> --- a/crypto/async_tx/async_raid6_recov.c
+> +++ b/crypto/async_tx/async_raid6_recov.c
+> @@ -47,7 +47,7 @@ async_sum_product(struct page *dest, struct page **srcs, unsigned char *coef,
+>  		struct device *dev = dma->dev;
+>  		dma_addr_t pq[2];
+>  		struct dma_async_tx_descriptor *tx;
+> -		enum dma_ctrl_flags dma_flags = DMA_PREP_PQ_DISABLE_P;
+> +		enum dma_ctrl_flags dma_flags = DMA_PREP_PQ_DISABLE_P | DMA_PREP_PQ_SUM_PRODUCT;
+>  
+>  		if (submit->flags & ASYNC_TX_FENCE)
+>  			dma_flags |= DMA_PREP_FENCE;
+> @@ -111,7 +111,7 @@ async_mult(struct page *dest, struct page *src, u8 coef, size_t len,
+>  		dma_addr_t dma_dest[2];
+>  		struct device *dev = dma->dev;
+>  		struct dma_async_tx_descriptor *tx;
+> -		enum dma_ctrl_flags dma_flags = DMA_PREP_PQ_DISABLE_P;
+> +		enum dma_ctrl_flags dma_flags = DMA_PREP_PQ_DISABLE_P | DMA_PREP_PQ_MULT;
+>  
+>  		if (submit->flags & ASYNC_TX_FENCE)
+>  			dma_flags |= DMA_PREP_FENCE;
+> diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
+> index ad419757241f..f19ecebb4d3f 100644
+> --- a/include/linux/dmaengine.h
+> +++ b/include/linux/dmaengine.h
+> @@ -174,6 +174,8 @@ struct dma_interleaved_template {
+>   *  operation it continues the calculation with new sources
+>   * @DMA_PREP_FENCE - tell the driver that subsequent operations depend
+>   *  on the result of this operation
+> + * @DMA_PREP_PQ_MULT - tell the driver that this is a mult request
+> + * @DMA_PREP_PQ_SUM_PRODUCT - tell the driver that this is a sum product request
+>   */
+>  enum dma_ctrl_flags {
+>  	DMA_PREP_INTERRUPT = (1 << 0),
+> @@ -182,6 +184,8 @@ enum dma_ctrl_flags {
+>  	DMA_PREP_PQ_DISABLE_Q = (1 << 3),
+>  	DMA_PREP_CONTINUE = (1 << 4),
+>  	DMA_PREP_FENCE = (1 << 5),
+> +	DMA_PREP_PQ_MULT = (1 << 10),
+> +	DMA_PREP_PQ_SUM_PRODUCT = (1 << 11),
 
-On Tue, 12 May 2015 17:58:24 +0200, Andrew Lunn wrote:
+Any reason for skipping 6 to 9?
 
-> A quick grep for marvell,orion, marvell,kirkwood and marvell,dove
-> suggests it should have the - if we want to be consistent with older
-> Marvell devices. As you said, starting with marvell,armanda it gets
-> pretty inconsistent :-(
-
-Yes, with the "-" would be better IMO.
-
-Thomas
--- 
-Thomas Petazzoni, CTO, Free Electrons
-Embedded Linux, Kernel and Android engineering
-http://free-electrons.com
+    Andrew
