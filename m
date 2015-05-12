@@ -1,87 +1,45 @@
-From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Subject: Re: [V3 PATCH 1/5] ACPI / scan: Parse _CCA and setup device coherency
-Date: Tue, 12 May 2015 03:20:04 +0200
-Message-ID: <1664523.WMm4AqWTY5@vostro.rjw.lan>
-References: <1431045436-8690-1-git-send-email-Suravee.Suthikulpanit@amd.com> <3684853.vaQGhc4jR5@vostro.rjw.lan> <20150511161626.GI18655@e104818-lin.cambridge.arm.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH RFC v2 1/2] crypto: add PKE API
+Date: Tue, 12 May 2015 09:21:59 +0800
+Message-ID: <20150512012158.GA13237@gondor.apana.org.au>
+References: <20150511062421.GA2266@gondor.apana.org.au>
+ <20150506193643.9329.75351.stgit@tstruk-mobl1>
+ <20150506193648.9329.27232.stgit@tstruk-mobl1>
+ <11243.1431351927@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7Bit
-Cc: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>,
-	thomas.lendacky@amd.com, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au, arnd@arndb.de,
-	linaro-acpi@lists.linaro.org, will.deacon@arm.com,
-	linux-kernel@vger.kernel.org, al.stone@linaro.org,
-	linux-acpi@vger.kernel.org, netdev@vger.kernel.org,
-	leo.duran@amd.com, hanjun.guo@linaro.org, msalter@redhat.com,
-	grant.likely@linaro.org, davem@davemloft.net,
-	linux-arm-kernel@lists.infradead.org, lenb@kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+	linux-kernel@vger.kernel.org, keescook@chromium.org,
+	jwboyer@redhat.com, richard@nod.at, steved@redhat.com,
+	qat-linux@intel.com, linux-crypto@vger.kernel.org,
+	james.l.morris@oracle.com, jkosina@suse.cz,
+	zohar@linux.vnet.ibm.com, davem@davemloft.net, vgoyal@redhat.com
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from v094114.home.net.pl ([79.96.170.134]:54487 "HELO
-	v094114.home.net.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1750882AbbELAy4 (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:53210 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751413AbbELBWQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 11 May 2015 20:54:56 -0400
-In-Reply-To: <20150511161626.GI18655@e104818-lin.cambridge.arm.com>
+	Mon, 11 May 2015 21:22:16 -0400
+Content-Disposition: inline
+In-Reply-To: <11243.1431351927@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Monday, May 11, 2015 05:16:27 PM Catalin Marinas wrote:
-> On Fri, May 08, 2015 at 10:53:59PM +0200, Rafael J. Wysocki wrote:
-> > On Thursday, May 07, 2015 07:37:12 PM Suravee Suthikulpanit wrote:
-> > > diff --git a/drivers/acpi/Kconfig b/drivers/acpi/Kconfig
-> > > index ab2cbb5..7822149 100644
-> > > --- a/drivers/acpi/Kconfig
-> > > +++ b/drivers/acpi/Kconfig
-> > > @@ -54,6 +54,12 @@ config ACPI_GENERIC_GSI
-> > >  config ACPI_SYSTEM_POWER_STATES_SUPPORT
-> > >  	bool
-> > >  
-> > > +config ACPI_CCA_REQUIRED
-> > > +	bool
-> > > +
-> > > +config ARM64_SUPPORT_ACPI_CCA_ZERO
-> > 
-> > Hmm.  I guess the Arnd's idea what to simply use CONFIG_ARM64 directly instead
-> > of adding this new option.
-> 
-> I agree.
-> 
-> > > +static inline bool acpi_dma_is_supported(struct acpi_device *adev)
-> > > +{
-> > > +	/**
-> > > +	 * Currently, we mainly support _CCA=1 (i.e. is_coherent=1)
-> > > +	 * This should be equivalent to specifyig dma-coherent for
-> > > +	 * a device in OF.
-> > > +	 *
-> > > +	 * For the case when _CCA=0 (i.e. is_coherent=0 && cca_seen=1),
-> > > +	 * we would rely on arch-specific cache maintenance for
-> > > +	 * non-coherence DMA operations if architecture specifies
-> > > +	 * _XXX_SUPPORT_CCA_ZERO. Otherwise, we do not support
-> > > +	 * DMA on this device and fallback to arch-specific default
-> > > +	 * handling.
-> > > +	 *
-> > > +	 * For the case when _CCA is missing (i.e. cca_seen=0) but
-> > > +	 * platform specifies ACPI_CCA_REQUIRED, we do not support DMA,
-> > > +	 * and fallback to arch-specific default handling.
-> > > +	 */
-> > > +	return adev && (adev->flags.is_coherent ||
-> > > +			(adev->flags.cca_seen &&
-> > > +			 IS_ENABLED(CONFIG_ARM64_SUPPORT_ACPI_CCA_ZERO)));
-> > 
-> > So what exactly would be wrong with using IS_ENABLED(CONFIG_ARM64) here?
-> 
-> I'm not sure I follow why we need to check for ARM64 here at all. Can we
-> not just have something like:
-> 
-> 	return adev && (!IS_ENABLED(CONFIG_ACPI_CCA_REQUIRED) ||
-> 			adev->flags.cca_seen)
+On Mon, May 11, 2015 at 02:45:27PM +0100, David Howells wrote:
+>
+> What if the fallback doesn't exist?  For instance, a H/W contained key is
+> specifically limited to, say, just sign/verify and the not permitted to be
+> used for encrypt/decrypt.  How do you provide a fallback given you can't get
+> at the key?
 
-If _CCA returns 0 on non-ARM64, DMA is not supported for this device, so
-in that case the function should return 'false' while the above check will
-make it return 'true'.
+That's a transform with a specific key.  I don't see why such a
+piece of hardware would even need to be exposed through the crypto
+API which is about generic implementations that can take any
+arbitrary key.
 
-
+Cheers,
 -- 
-I speak only for myself.
-Rafael J. Wysocki, Intel Open Source Technology Center.
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
