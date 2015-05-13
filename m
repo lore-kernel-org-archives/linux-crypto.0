@@ -1,58 +1,111 @@
 From: Maxime Ripard <maxime.ripard@free-electrons.com>
-Subject: Re: [PATCH 2/8] dmaengine: mv_xor: add support for a38x command in
- descriptor mode
-Date: Wed, 13 May 2015 10:23:55 +0200
-Message-ID: <20150513082355.GT10961@lukather>
+Subject: Re: [PATCH 8/8] ARM: mvebu: a38x: Enable A38x XOR engine features
+Date: Wed, 13 May 2015 10:33:28 +0200
+Message-ID: <20150513083328.GU10961@lukather>
 References: <1431445063-20226-1-git-send-email-maxime.ripard@free-electrons.com>
- <1431445063-20226-3-git-send-email-maxime.ripard@free-electrons.com>
- <20150512174936.284783d4@free-electrons.com>
- <20150512155824.GJ19927@lunn.ch>
- <20150512180539.4ea5d158@free-electrons.com>
+ <1431445063-20226-9-git-send-email-maxime.ripard@free-electrons.com>
+ <20150512161314.GL19927@lunn.ch>
+ <14c9a6d3ba4c46f89880e4c1b4494dbb@IL-EXCH02.marvell.com>
 Mime-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mgIE+9cwyCTt+85Z"
+	protocol="application/pgp-signature"; boundary="1PHmS26pdpOR3Xc0"
 Cc: Andrew Lunn <andrew@lunn.ch>, Vinod Koul <vinod.koul@intel.com>,
 	Dan Williams <dan.j.williams@intel.com>,
 	Gregory Clement <gregory.clement@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>,
 	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	dmaengine@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Lior Amsalem <alior@marvell.com>,
+	"dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
 	Thomas Petazzoni <thomas@free-electrons.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:52540 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753955AbbEMIZE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 May 2015 04:25:04 -0400
+To: Lior Amsalem <alior@marvell.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150512180539.4ea5d158@free-electrons.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <14c9a6d3ba4c46f89880e4c1b4494dbb@IL-EXCH02.marvell.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 
---mgIE+9cwyCTt+85Z
+--1PHmS26pdpOR3Xc0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 12, 2015 at 06:05:39PM +0200, Thomas Petazzoni wrote:
-> Andrew,
+On Wed, May 13, 2015 at 07:16:34AM +0000, Lior Amsalem wrote:
+> > From: Andrew Lunn [mailto:andrew@lunn.ch]
+> > Sent: Tuesday, May 12, 2015 7:13 PM
+> >=20
+> > On Tue, May 12, 2015 at 05:37:43PM +0200, Maxime Ripard wrote:
+> > > From: Lior Amsalem <alior@marvell.com>
+> > >
+> > > The new XOR engine has a new compatible of its own, together with new
+> > > channel capabilities.
+> > >
+> > > Use that new compatible now that we have a driver that can handle it.
+> > >
+> > > Signed-off-by: Lior Amsalem <alior@marvell.com>
+> > > Reviewed-by: Ofer Heifetz <oferh@marvell.com>
+> > > Reviewed-by: Nadav Haklai <nadavh@marvell.com>
+> > > Tested-by: Nadav Haklai <nadavh@marvell.com>
+> > > ---
+> > >  arch/arm/boot/dts/armada-38x.dtsi | 20 ++++++--------------
+> > >  1 file changed, 6 insertions(+), 14 deletions(-)
+> > >
+> > > diff --git a/arch/arm/boot/dts/armada-38x.dtsi
+> > > b/arch/arm/boot/dts/armada-38x.dtsi
+> > > index ed2dd8ba4080..6d07b7389415 100644
+> > > --- a/arch/arm/boot/dts/armada-38x.dtsi
+> > > +++ b/arch/arm/boot/dts/armada-38x.dtsi
+> > > @@ -448,7 +448,7 @@
+> > >  			};
+> > >
+> > >  			xor@60800 {
+> > > -				compatible =3D "marvell,orion-xor";
+> > > +				compatible =3D "marvell,a38x-xor";
+> > >  				reg =3D <0x60800 0x100
+> > >  				       0x60a00 0x100>;
+> > >  				clocks =3D <&gateclk 22>;
+> > > @@ -458,17 +458,13 @@
+> > >  					interrupts =3D <GIC_SPI 22
+> > IRQ_TYPE_LEVEL_HIGH>;
+> > >  					dmacap,memcpy;
+> > >  					dmacap,xor;
+> > > -				};
+> > > -				xor01 {
+> > > -					interrupts =3D <GIC_SPI 23
+> > IRQ_TYPE_LEVEL_HIGH>;
+> > > -					dmacap,memcpy;
+> > > -					dmacap,xor;
+> > > -					dmacap,memset;
+> > > +					dmacap,pq;
+> > > +					dmacap,interrupt;
+> >=20
+> > Does this mean the hardware only has one channel?
+> > And memset is no longer supported?
+> >=20
 >=20
-> On Tue, 12 May 2015 17:58:24 +0200, Andrew Lunn wrote:
+> The hardware has two channels per engine and two engines.
+> However, both on HW side (both channels are on the same "bus port")
+> and SW (the dma subsystem will assign one channel per CPU).
+> we found it's better (performance wise) to use only one channel on each e=
+ngine
+> and let the framework assign one per CPU.
+> This way, descriptors chaining was better (cause of the depended descript=
+ors
+> problem) and overall interrupt number reduced.
 >=20
-> > A quick grep for marvell,orion, marvell,kirkwood and marvell,dove
-> > suggests it should have the - if we want to be consistent with older
-> > Marvell devices. As you said, starting with marvell,armanda it gets
-> > pretty inconsistent :-(
->=20
-> Yes, with the "-" would be better IMO.
+> Yes, since memset is a problematic one. It can only be done via registers
+> (and not on descriptors level) plus no one really needs it...
 
-changed to armada-380-xor, thanks!
+And memset support has been removed from dmaengine since 3.11, so it
+doesn't look like anyone really needs it :)
+
+We're talking about reintroducing it for some platforms that actually
+need it, but it wasn't really used on marvell anyway...
 
 Maxime
 
@@ -61,26 +114,26 @@ Maxime Ripard, Free Electrons
 Embedded Linux, Kernel and Android engineering
 http://free-electrons.com
 
---mgIE+9cwyCTt+85Z
+--1PHmS26pdpOR3Xc0
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJVUwobAAoJEBx+YmzsjxAgsCEQAJRestbJeFlabTOFZsveCDq+
-9B/XlgQ4JNLG5eLTod3aUv8IwM0JIhCKzvS+IBb2TsOZfl6PCnu5JXyZEaQOrQ/n
-J1wC58wYbDluVDMKh5pVMpNf6rVEN3P2u6b62K7Iq287wdb2+8vb90g3fdq9ZH0w
-Wz9vCLgEZVMFgsNMillBjEnSGbt9acOA1kqcP2kiQcmzTK6+ZP4BO+lL5+GAhZzC
-iuDB0h+4HyidKA5tKhOFOYdzU3/qH4mjp0lQ+zjrDDAVZZgGO+NivjUupdBKWSHt
-gEIWmsC2W7+4pDkLV/nG25h9PcSq0K0WqP+nHFG8UmB0bsaCOye3jRQ3GS+PGI4S
-j4XxxCrLR9ElIriDM6qaAndmuxd50uLDRgdelIEhubU7aGx1rLZ2ZYRfSUwNs5bx
-LKD5Ya2EE7aRqHhqXYTrZDmLw8Hh12rfxgteYkCqQpiQ+IelY9zUu9mYXfwk5Zuh
-juxRiCbJsws6zVE8DwDTZO1nA+rEAq2pk0PUOYsXw/d7R+XsmDAMfJLYQRgIu0Ec
-0JIAze+d2CY48tDP4Vjm1+YZ9ZM/Vila6T3cEa5Wo4qtQHbrnDt1gsGwbuXfYtoa
-cZUro2SnPaLU0ErIsYZCf+Smx7PLVxP47Gnvdl1R8CVqdZQHNBI1I8bakkuOXVEz
-nwoJGpvHGchdIEmfpjwo
-=sxVF
+iQIcBAEBAgAGBQJVUwxYAAoJEBx+YmzsjxAgd/IP/jUrdlsl5heMbcuMMmphUk2O
+5SWYkHN6FAaxIsmzveAB5FgajkJC8MaQ94VxCit5ts+FvmQIJ7wPcho/JaFoqSXP
+sVmxKGonamy8NlGJUMDonf4XfpNzQ3O0C6N7qbpxnQWbQ5hTz1w0FL52zGfk8pFh
+yqzYyW1DkXjHfUxFPX0G3d8PdVT3wa6Mwk17kwtLCrtS7N6PwNgJ6qlN7o9tjH/d
+BA7bAzDmH5OYeUE0/3qOB7BYfSQ6/ZpJAoNlvL1UIXhILL2v6pwLvIAlAnFqxOHl
+gOfWYMlQKt1O6uHlb2INBgFcK2tv2zBz6iWGyY8l68C3HKPMeP/ddhFf9B6zw9gm
+VxJUON4FQgcTkwSB/EmEI+Avs80nCkI1tBC2BEDuggvBi5jb23yrBwsDJwjSjzwc
+bh5x9clnDSNTA3YC1QI6Mn5nEvGyy//NNvojeV6zYdb5AmIkQUjAMXUhAd2C+pHY
+flO3fmFWdUlmrHZZHVEH9GW4sAkMo7jhSHPgzs/k1SfY47P6zrda4f6EUPBQr9gw
+z/QZtrEVj1YHhdcBDSUItTX3czfQ3utBxScdA9oI0uM2Aua6oC56XJcL77jG78x4
+jgcNL0G9XXM/Gkw6WxxQWz+AYn2YpWwoDEZMOvxqf5zyLSyohDv+XX9V/gkNd8Wb
+LfGG+wt2jAI8T61EYfzN
+=GSJC
 -----END PGP SIGNATURE-----
 
---mgIE+9cwyCTt+85Z--
+--1PHmS26pdpOR3Xc0--
