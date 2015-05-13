@@ -1,36 +1,38 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: s390 ghash
-Date: Wed, 13 May 2015 18:08:03 +0800
-Message-ID: <20150513100803.GA29694@gondor.apana.org.au>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH RFC v2 1/2] crypto: add PKE API
+Date: Wed, 13 May 2015 16:03:55 +0100
+Message-ID: <12222.1431529435@warthog.procyon.org.uk>
+References: <20150512012158.GA13237@gondor.apana.org.au> <20150511062421.GA2266@gondor.apana.org.au> <20150506193643.9329.75351.stgit@tstruk-mobl1> <20150506193648.9329.27232.stgit@tstruk-mobl1> <11243.1431351927@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-	Jan Glauber <jang@linux.vnet.ibm.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38317 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932954AbbEMKIM (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 May 2015 06:08:12 -0400
-Content-Disposition: inline
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: dhowells@redhat.com, Tadeusz Struk <tadeusz.struk@intel.com>,
+	linux-kernel@vger.kernel.org, keescook@chromium.org,
+	jwboyer@redhat.com, richard@nod.at, steved@redhat.com,
+	qat-linux@intel.com, linux-crypto@vger.kernel.org,
+	james.l.morris@oracle.com, jkosina@suse.cz,
+	zohar@linux.vnet.ibm.com, davem@davemloft.net, vgoyal@redhat.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20150512012158.GA13237@gondor.apana.org.au>
+Content-ID: <12221.1431529435.1@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Hi:
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-It appears that your implementation of ghash is buggy:
+> > What if the fallback doesn't exist?  For instance, a H/W contained key is
+> > specifically limited to, say, just sign/verify and the not permitted to be
+> > used for encrypt/decrypt.  How do you provide a fallback given you can't get
+> > at the key?
+> 
+> That's a transform with a specific key.  I don't see why such a
+> piece of hardware would even need to be exposed through the crypto
+> API which is about generic implementations that can take any
+> arbitrary key.
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1207598
+So what if we want to use a key that's stored in a TPM?  I presume then we
+can't use the crypto interface, but must rather use the *key* as the primary
+interface somehow.
 
-The gist of the report is that using s390 ghash causes IPsec
-to fail when the other side is x86_64.  Using the generic ghash
-code on the s390 side fixes it.
-
-Please look into this.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+David
