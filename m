@@ -1,35 +1,31 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: make lib/842 decompress functions static
-Date: Wed, 13 May 2015 11:19:57 +0800
-Message-ID: <20150513031957.GB24980@gondor.apana.org.au>
-References: <1431343355-32005-1-git-send-email-ddstreet@ieee.org>
+Subject: Re: [PATCH 1/4] crypto: talitos - avoid memleak in
+ talitos_alg_alloc()
+Date: Wed, 13 May 2015 11:20:09 +0800
+Message-ID: <20150513032009.GC24980@gondor.apana.org.au>
+References: <1431363804-2331-1-git-send-email-horia.geanta@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Fengguang Wu <fengguang.wu@intel.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Dan Streetman <ddstreet@ieee.org>
+Cc: linux-crypto@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>
+To: Horia Geanta <horia.geanta@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52094 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:38172 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933994AbbEMDUG (ORCPT
+	with ESMTP id S933994AbbEMDUM (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 12 May 2015 23:20:06 -0400
+	Tue, 12 May 2015 23:20:12 -0400
 Content-Disposition: inline
-In-Reply-To: <1431343355-32005-1-git-send-email-ddstreet@ieee.org>
+In-Reply-To: <1431363804-2331-1-git-send-email-horia.geanta@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 11, 2015 at 07:22:35AM -0400, Dan Streetman wrote:
-> Make the do_index and do_op functions static.
-> 
-> They are used only internally by the 842 decompression function,
-> and should be static.
-> 
-> Reported-By: Fengguang Wu <fengguang.wu@intel.com>
-> Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
-> Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+On Mon, May 11, 2015 at 08:03:24PM +0300, Horia Geanta wrote:
+> Cc: <stable@vger.kernel.org> # 3.2+
+> Fixes: 1d11911a8c57 ("crypto: talitos - fix warning: 'alg' may be used uninitialized in this function")
+> Signed-off-by: Horia Geanta <horia.geanta@freescale.com>
 
-Applied.
+All applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
