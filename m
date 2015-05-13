@@ -1,8 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v6 1/5] random: Blocking API for accessing nonblocking_pool
-Date: Wed, 13 May 2015 21:54:41 +0200
-Message-ID: <34087343.u7K3uzbyiZ@tachyon.chronox.de>
-References: <1921857.OvxEu6y28S@tachyon.chronox.de>
+Subject: [PATCH v6 0/5] Seeding DRBG with more entropy
+Date: Wed, 13 May 2015 21:54:12 +0200
+Message-ID: <1921857.OvxEu6y28S@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -11,59 +10,110 @@ Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
 	linux-crypto@vger.kernel.org
 To: herbert@gondor.apana.org.au
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1921857.OvxEu6y28S@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The added API calls provide a synchronous function call
-get_blocking_random_bytes where the caller is blocked until
-the nonblocking_pool is initialized.
+Hi,
 
-CC: Andreas Steffen <andreas.steffen@strongswan.org>
-CC: Theodore Ts'o <tytso@mit.edu>
-CC: Sandy Harris <sandyinchina@gmail.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- drivers/char/random.c  | 14 ++++++++++++++
- include/linux/random.h |  1 +
- 2 files changed, 15 insertions(+)
+as of now, the DRBG is only seeded from get_random_bytes. In various
+circumstances, the nonblocking_pool behind get_random_bytes may not be fully
+seeded from hardware events at the time the DRBG requires to be seeded.
+Based on the discussion in [1], the DRBG seeding is updated such that it
+does not completely rely on get_random_bytes any more.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 9cd6968..6f71354 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1245,6 +1245,20 @@ void get_random_bytes(void *buf, int nbytes)
- EXPORT_SYMBOL(get_random_bytes);
- 
- /*
-+ * Equivalent function to get_random_bytes with the difference that this
-+ * function blocks the request until the nonblocking_pool is initialized.
-+ */
-+void get_blocking_random_bytes(void *buf, int nbytes)
-+{
-+	if (unlikely(nonblocking_pool.initialized == 0))
-+		wait_event_interruptible(urandom_init_wait,
-+					 nonblocking_pool.initialized);
-+	extract_entropy(&nonblocking_pool, buf, nbytes, 0, 0);
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes);
-+
-+
-+/*
-  * This function will use the architecture-specific hardware random
-  * number generator if it is available.  The arch-specific hw RNG will
-  * almost certainly be faster than what we can do in software, but it
-diff --git a/include/linux/random.h b/include/linux/random.h
-index b05856e..0926d78 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -14,6 +14,7 @@ extern void add_input_randomness(unsigned int type, unsigned int code,
- extern void add_interrupt_randomness(int irq, int irq_flags);
- 
- extern void get_random_bytes(void *buf, int nbytes);
-+extern void get_blocking_random_bytes(void *buf, int nbytes);
- extern void get_random_bytes_arch(void *buf, int nbytes);
- void generate_random_uuid(unsigned char uuid_out[16]);
- extern int random_int_secret_init(void);
+The seeding approach can be characterized as follows:
+
+1. pull buffer of size entropy + nonce from get_random_bytes
+
+2. pull another buffer of size entropy + nonce from my Jitter RNG
+
+3. concatenate both buffers
+
+4. seed the DRBG with the concatenated buffer
+
+5. trigger the async invocation of the blocking API for accessing
+   the nonblocking pool with a buffer of size entropy
+
+6. return the DRBG instance to the caller without waiting for the completion
+   of step 5
+
+7. at some point in time, the blocking API returns with a full buffer
+   which is then used to re-seed the DRBG
+
+This way, we will get entropy during the first initialization without
+blocking.
+
+The patch set adds a blocking API to access the nonblocking pool to wait
+until the nonblocking pool is initialized.
+
+Note: the DRBG and Jitter RNG patches are against the current cryptodev-2.6
+tree.
+
+The new Jitter RNG is an RNG that has large set of tests and was presented on
+LKML some time back. After speaking with mathematicians at NIST, that Jitter
+RNG approach would be acceptable from their side as a noise source. Note, I
+personally think that the Jitter RNG has sufficient entropy in almost all
+circumstances (see the massive testing I conducted on all more widely used
+CPUs as shown in [2]).
+
+Changes v6:
+* patch 01: simplify patch by just adding a blocking API call to random.c as
+  suggested by Herbert Xu.
+* patch 03: move the async operation into this patch: the DRBG is in control
+  of the async work.
+
+Changes v5:
+* drop patch 01 and therefore drop the creation of a kernel pool
+* change patch 02 to use the nonblocking pool and block until the nonblocking
+  pool is initialized or until the cancel operation is triggered.
+
+Changes v4:
+* Patch 02: Change get_blocking_random_bytes_cb to allow callers to call it
+  multiple times without re-initializing the work data structure. Furthermore,
+  only change the pointers to the output buffer and callback if work is not
+  pending to avoid race conditions.
+* Patch 04: No canceling of seeding during drbg_seed as the invocation of
+  get_blocking_random_bytes_cb can now be done repeatedly without
+  re-initializing the work data structure.
+
+Changes v3:
+* Patch 01: Correct calculation of entropy count as pointed out by Herbert Xu
+* Patch 06: Correct a trivial coding issue in jent_entropy_init for
+  checking JENT_EMINVARVAR reported by cppcheck
+
+Changes v2:
+* Use Dual BSD/GPL license in MODULE_LICENSE as suggested by
+  Paul Bolle <pebolle@tiscali.nl>
+* Patch 05, drbg_dealloc_state: only deallocate Jitter RNG if one was
+  instantiated in the first place. There are two main reasons why the Jitter RNG
+  may not be allocated: either it is not available as kernel module/in vmlinuz
+  or during init time of the Jitter RNG, the performed testing shows that the
+  underlying hardware is not suitable for the Jitter RNG (e.g. has a too coarse
+  timer).
+
+
+[1] http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg13891.html
+
+[2] http://www.chronox.de/jent.html
+
+
+Stephan Mueller (5):
+  random: Blocking API for accessing nonblocking_pool
+  crypto: drbg - prepare for async seeding
+  crypto: drbg - add async seeding operation
+  crypto: drbg - use Jitter RNG to obtain seed
+  crypto: add jitterentropy RNG
+
+ crypto/Kconfig         |  10 +
+ crypto/Makefile        |   2 +
+ crypto/drbg.c          | 140 ++++++--
+ crypto/jitterentropy.c | 909 +++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.c       |   4 +
+ drivers/char/random.c  |  14 +
+ include/crypto/drbg.h  |   5 +
+ include/linux/random.h |   1 +
+ 8 files changed, 1058 insertions(+), 27 deletions(-)
+ create mode 100644 crypto/jitterentropy.c
+
 -- 
 2.1.0
