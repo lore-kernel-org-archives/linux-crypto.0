@@ -1,111 +1,81 @@
 From: Maxime Ripard <maxime.ripard@free-electrons.com>
-Subject: Re: [PATCH 6/8] async_tx: adding mult and sum_product flags
-Date: Wed, 13 May 2015 10:45:27 +0200
-Message-ID: <20150513084527.GV10961@lukather>
+Subject: Re: [PATCH 0/8] ARM: mvebu: Add support for RAID6 PQ offloading
+Date: Wed, 13 May 2015 11:17:33 +0200
+Message-ID: <20150513091733.GW10961@lukather>
 References: <1431445063-20226-1-git-send-email-maxime.ripard@free-electrons.com>
- <1431445063-20226-7-git-send-email-maxime.ripard@free-electrons.com>
- <20150512160535.GK19927@lunn.ch>
+ <CAPcyv4gshyaji2HarAeOg3XOiNnmGwnSOMuFGWpuDu8ZTGg=jw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="CSNFvL6ilyiKL/Hs"
+	protocol="application/pgp-signature"; boundary="yPlaimQd/TpiYx8R"
 Cc: Vinod Koul <vinod.koul@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
 	Gregory Clement <gregory.clement@free-electrons.com>,
 	Jason Cooper <jason@lakedaemon.net>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	dmaengine@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Lior Amsalem <alior@marvell.com>,
+	"dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-crypto@vger.kernel.org, Lior Amsalem <alior@marvell.com>,
 	Thomas Petazzoni <thomas@free-electrons.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-To: Andrew Lunn <andrew@lunn.ch>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:53543 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753450AbbEMIuF (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 13 May 2015 04:50:05 -0400
+To: Dan Williams <dan.j.williams@intel.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150512160535.GK19927@lunn.ch>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <CAPcyv4gshyaji2HarAeOg3XOiNnmGwnSOMuFGWpuDu8ZTGg=jw@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 
---CSNFvL6ilyiKL/Hs
+--yPlaimQd/TpiYx8R
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 12, 2015 at 06:05:35PM +0200, Andrew Lunn wrote:
-> On Tue, May 12, 2015 at 05:37:41PM +0200, Maxime Ripard wrote:
-> > From: Lior Amsalem <alior@marvell.com>
-> >=20
-> > Some engines (like Marvell mv_xor) do not support mult and sum_product
-> > operations as part of the pq support.
-> >=20
-> > This patch adds new flags: DMA_PREP_PQ_MULT & DMA_PREP_PQ_SUM_PRODUCT t=
-hese
-> > flags helps the driver identify such operations.
-> >=20
-> > Signed-off-by: Lior Amsalem <alior@marvell.com>
-> > Reviewed-by: Ofer Heifetz <oferh@marvell.com>
-> > Reviewed-by: Nadav Haklai <nadavh@marvell.com>
-> > Signed-off-by: Maxime Ripard <maxime.ripard@free-electrons.com>
-> > ---
-> >  crypto/async_tx/async_raid6_recov.c | 4 ++--
-> >  include/linux/dmaengine.h           | 4 ++++
-> >  2 files changed, 6 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/crypto/async_tx/async_raid6_recov.c b/crypto/async_tx/asyn=
-c_raid6_recov.c
-> > index 934a84981495..2db5486fd873 100644
-> > --- a/crypto/async_tx/async_raid6_recov.c
-> > +++ b/crypto/async_tx/async_raid6_recov.c
-> > @@ -47,7 +47,7 @@ async_sum_product(struct page *dest, struct page **sr=
-cs, unsigned char *coef,
-> >  		struct device *dev =3D dma->dev;
-> >  		dma_addr_t pq[2];
-> >  		struct dma_async_tx_descriptor *tx;
-> > -		enum dma_ctrl_flags dma_flags =3D DMA_PREP_PQ_DISABLE_P;
-> > +		enum dma_ctrl_flags dma_flags =3D DMA_PREP_PQ_DISABLE_P | DMA_PREP_P=
-Q_SUM_PRODUCT;
-> > =20
-> >  		if (submit->flags & ASYNC_TX_FENCE)
-> >  			dma_flags |=3D DMA_PREP_FENCE;
-> > @@ -111,7 +111,7 @@ async_mult(struct page *dest, struct page *src, u8 =
-coef, size_t len,
-> >  		dma_addr_t dma_dest[2];
-> >  		struct device *dev =3D dma->dev;
-> >  		struct dma_async_tx_descriptor *tx;
-> > -		enum dma_ctrl_flags dma_flags =3D DMA_PREP_PQ_DISABLE_P;
-> > +		enum dma_ctrl_flags dma_flags =3D DMA_PREP_PQ_DISABLE_P | DMA_PREP_P=
-Q_MULT;
-> > =20
-> >  		if (submit->flags & ASYNC_TX_FENCE)
-> >  			dma_flags |=3D DMA_PREP_FENCE;
-> > diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
-> > index ad419757241f..f19ecebb4d3f 100644
-> > --- a/include/linux/dmaengine.h
-> > +++ b/include/linux/dmaengine.h
-> > @@ -174,6 +174,8 @@ struct dma_interleaved_template {
-> >   *  operation it continues the calculation with new sources
-> >   * @DMA_PREP_FENCE - tell the driver that subsequent operations depend
-> >   *  on the result of this operation
-> > + * @DMA_PREP_PQ_MULT - tell the driver that this is a mult request
-> > + * @DMA_PREP_PQ_SUM_PRODUCT - tell the driver that this is a sum produ=
-ct request
-> >   */
-> >  enum dma_ctrl_flags {
-> >  	DMA_PREP_INTERRUPT =3D (1 << 0),
-> > @@ -182,6 +184,8 @@ enum dma_ctrl_flags {
-> >  	DMA_PREP_PQ_DISABLE_Q =3D (1 << 3),
-> >  	DMA_PREP_CONTINUE =3D (1 << 4),
-> >  	DMA_PREP_FENCE =3D (1 << 5),
-> > +	DMA_PREP_PQ_MULT =3D (1 << 10),
-> > +	DMA_PREP_PQ_SUM_PRODUCT =3D (1 << 11),
+Hi Dan,
 
-None. I just forgot to change this. Thanks!
+On Tue, May 12, 2015 at 09:05:41AM -0700, Dan Williams wrote:
+> On Tue, May 12, 2015 at 8:37 AM, Maxime Ripard
+> <maxime.ripard@free-electrons.com> wrote:
+> > Hi,
+> >
+> > This serie refactors the mv_xor in order to support the latest Armada
+> > 38x features, including the PQ support in order to offload the RAID6
+> > PQ operations.
+> >
+> > Not all the PQ operations are supported by the XOR engine, so we had
+> > to introduce new async_tx flags in the process to identify
+> > un-supported operations.
+> >
+> > Please note that this is currently not usable because of a possible
+> > regression in the RAID stack in 4.1 that is being discussed at the
+> > moment here: https://lkml.org/lkml/2015/5/7/527
+>=20
+> This is problematic as async_tx is a wart on the dmaengine subsystem
+> and needs to be deprecated, I just have yet to find the time to do
+> that work.  It turns out it was a mistake to hide the device details
+> from md, it should be explicitly managing the dma channels, not
+> relying on a abstraction api.  The async_tx api usage of the
+> dma-mapping api is broken in that it relies on overlapping mappings of
+> the same address.  This happens to work on x86, but on arm it needs
+> explicit non-overlapping mappings.  I started the work to reference
+> count dma-mappings in 3.13, and we need to teach md to use
+> dmaengine_unmap_data explicitly.  Yielding dma channel management to
+> md also results in a more efficient implementation as we can dma_map()
+> the stripe cache once rather than per-io.  The  "async_tx_ack()"
+> disaster can also go away when md is explicitly handling channel
+> switching.
+
+Even though I'd be very much in favor of deprecating / removing
+async_tx, is it something likely to happen soon?
+
+I remember discussing this with Vinod at Plumbers back in October, but
+haven't seen anything since then.
+
+If not, I think that we shouldn't really hold back patches to
+async_tx, even though we know than in a year from now, it's going to
+be gone.
 
 Maxime
 
@@ -114,26 +84,26 @@ Maxime Ripard, Free Electrons
 Embedded Linux, Kernel and Android engineering
 http://free-electrons.com
 
---CSNFvL6ilyiKL/Hs
+--yPlaimQd/TpiYx8R
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJVUw8nAAoJEBx+YmzsjxAgI4gP/R7DmYIddxVc+Lgqv2OUXit1
-yGmQck1cdTyluAxGfNOe+OjzIjMPreQZjyWyDh6hQ3cb3Kk56duKcshj2+pcTWKK
-AzNoDg1F4CHrSKCnsZQrZdflSBANgvkQe9Mx9NWAw0CJSAFHDKkcfSA4gxxryR+6
-DebtGWIGGMc586ZfA6iIQL68vqhOlk5iiGOpeVMw6j2LnUAf3nIWAGdoLlfqaevK
-7w6z6QPplyhcHz3ZHioWOKCC0zDcBho0Bc8SNvMLYKeTYKtTrPYuOFU5zpcltmUL
-3g8LrlCTadcw1Z5PB9EQLJl3JUAxN+EdcBVuIrKI0I8MpgOSSSnqWBejnbW77L1D
-cc71d7x6I7wzW0MYgsDj45zj8lNmZ94/EfoQq3aZ9Y8/gMEGvcQTRKb0b/0Q2Arp
-L7eiLRAvDwQX6fYFpIVtzIRiudWm04m4LdWZldSflcsk6dd4DLnW/Haa3NsbAG5S
-EcLW1c4TKA9OhvDpdD2BRDWEjot2EbNYDv3+IoZzni4txmuk/xjiPk9A+o4wpLcO
-j6GtE1tLMXB1Oekohdbe2oky6xqpV8gZP8pbMgzf6yZgigfnCc7o4MQTNP+xPhpy
-2Yxns1OTdrbPJ2mqhTcV44zLzjgIkVfYPF/jO4FNwsyeVIZhmIlKHQl27nSrby6I
-J3yGo92rHh9NEFiqYf0f
-=bURe
+iQIcBAEBAgAGBQJVUxatAAoJEBx+YmzsjxAg9ukQALGls0TRdlNouugFNfVAjJkb
+z69xNfbq+nJyg9Z6rq6nTrPQ9tCMR3FC0D0Uo1FkOS+8EnQA1fPqccjqWZ0BO2j+
+DltDCC45Q+tafNbstc1s0GXjzzLbZAKs+4C0hdFKjAg7iiGtLobBhZUm+FqZrfnE
+lqBglBaGVKyPC7HrdC6nZ4I8fw+cBJ6tGCHsldd9wv74SMsqujrX+TRQ6TA7Y+XX
+1FBMft0essPHj4Im1J8ktHOaqTMR8ILBWY/AAmkvJyd/oZMHpvylbv2ai6sC82sY
+zVx9evDokfm//EG5E6GXXS8cZRivouvaIxA0BR50l8DqYibosPKaFX91ybFCvjH5
+7YU5uQOiI5Ir/XvB/0vpKWOdszp2SoFNRmzN2i61RJG89OWRcI8HrDasq99rCysc
+ziu15taxQhh/uSLMdQG/1QT14ZFYH4Mb+qxE1Sf60QBmPNvs7ljlaOrREkS0zo8H
+fJujx7FlWMMdQiFtm8cL0QAdEG/YX57HF9rvHFkbRoQ3vRTdu6wxsVNf9aF8s1He
+2G5xICgyj2U6kmoGBTjowYY1WJI2t8Xfl3e5A6bd6ViYh94Z7tUIvZ2/dYiSBhp8
+itSRZgKi2nD+gVqX742kg0uU2FsBkUAOxDVA1TKbxOMwxY06wFp46pD2g0ArxWBZ
+8k1ZnuG4Hf3CP/ml0NiL
+=8uoD
 -----END PGP SIGNATURE-----
 
---CSNFvL6ilyiKL/Hs--
+--yPlaimQd/TpiYx8R--
