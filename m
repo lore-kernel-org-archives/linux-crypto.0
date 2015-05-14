@@ -1,59 +1,75 @@
-From: Dan Streetman <ddstreet@ieee.org>
-Subject: Re: [PATCH] lib: fix 842 build on 32-bit architectures
-Date: Thu, 14 May 2015 07:03:09 -0400
-Message-ID: <CALZtONA9DcqPSnbUEQpEkhZChWs+XRYXqV8e4_AqQYjS5EwpYg@mail.gmail.com>
-References: <2802721.Q9KnE9eNH4@wuerfel> <1431561144-29931-1-git-send-email-ddstreet@ieee.org>
- <CALZtONC5Fc-Dsw_aob7zyycYdS6rP6ckT-wdyxF1WJTNsSLp7g@mail.gmail.com> <9630890.oRRRs96DG8@wuerfel>
+From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH v9 1/4] ARM: sun7i: dt: Add Security System to
+ A20 SoC DTS
+Date: Thu, 14 May 2015 14:58:58 +0200
+Message-ID: <1431608341-10936-2-git-send-email-clabbe.montjoie@gmail.com>
+References: <1431608341-10936-1-git-send-email-clabbe.montjoie@gmail.com>
+Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-arm-kernel@lists.infradead.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-ig0-f180.google.com ([209.85.213.180]:33030 "EHLO
-	mail-ig0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750759AbbENLDb (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 14 May 2015 07:03:31 -0400
-In-Reply-To: <9630890.oRRRs96DG8@wuerfel>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
+	LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org,
+	mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
+	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
+	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
+	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
+	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
+	tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	arnd-r2nGTMty4D4@public.gmane.org,
+	boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBINY2KVAKGQEUO4IIUI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+In-Reply-To: <1431608341-10936-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 14, 2015 at 6:49 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Thursday 14 May 2015 04:54:07 Dan Streetman wrote:
->> On Wed, May 13, 2015 at 7:52 PM, Dan Streetman <ddstreet@ieee.org> wrote:
->> >> Building the 842 code on 32-bit ARM currently results in this link
->> >> error:
->> >>
->> >> ERROR: "__aeabi_uldivmod" [lib/842/842_decompress.ko] undefined!
->> >
->> > Oops!  Guess I should build/test on 32 bit more.
->> >
->> >>
->> >> The reason is that the __do_index function performs a 64-bit
->> >> division by a power-of-two number, but it has no insight into
->> >> the function arguments.
->>
->> wait, do you mean the 64 bit mod, total % fsize?  That should already
->> be fixed in Herbert's tree, I changed it to subtraction instead.
->
-> Yes, that's the one. I was looking at yesterday's linux-next which still
-> had the bug, but your fix has made it into today's release, so my patch
-> is no longer needed.
->
->> In any case, I looked at the code again and I think the fsize
->> parameter can be removed, and just simply calculated in the function,
->> it's just a shift.  I'll send a patch.
->
-> Not necessary for this problem any more, but it could still make sense
-> if you think that improves the code. You can also try to see if marking
-> the function inline has any effect on code size or performance if either
-> of them matters.
+The Security System is a hardware cryptographic accelerator that support
+AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+It could be found on many Allwinner SoC.
 
-Yep, I'll run some performance tests both ways and send a patch if it
-does improve things.  Thanks!
+This patch enable the Security System on the Allwinner A20 SoC Device-tree.
 
->
->         Arnd
+Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ arch/arm/boot/dts/sun7i-a20.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/arm/boot/dts/sun7i-a20.dtsi b/arch/arm/boot/dts/sun7i-a20.dtsi
+index fdd1817..9a823ce 100644
+--- a/arch/arm/boot/dts/sun7i-a20.dtsi
++++ b/arch/arm/boot/dts/sun7i-a20.dtsi
+@@ -679,6 +679,14 @@
+ 			status = "disabled";
+ 		};
+ 
++		crypto: crypto-engine@01c15000 {
++			compatible = "allwinner,sun4i-a20-crypto";
++			reg = <0x01c15000 0x1000>;
++			interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ahb_gates 5>, <&ss_clk>;
++			clock-names = "ahb", "mod";
++		};
++
+ 		spi2: spi@01c17000 {
+ 			compatible = "allwinner,sun4i-a10-spi";
+ 			reg = <0x01c17000 0x1000>;
+-- 
+2.3.6
