@@ -1,67 +1,57 @@
-From: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH v9 3/4] MAINTAINERS: Add myself as maintainer of
- Allwinner Security System
-Date: Thu, 14 May 2015 14:59:00 +0200
-Message-ID: <1431608341-10936-4-git-send-email-clabbe.montjoie@gmail.com>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: [PATCH v9 2/4] ARM: sun4i: dt: Add DT bindings documentation for SUN4I Security System
+Date: Thu, 14 May 2015 14:58:59 +0200
+Message-ID: <1431608341-10936-3-git-send-email-clabbe.montjoie@gmail.com>
 References: <1431608341-10936-1-git-send-email-clabbe.montjoie@gmail.com>
-Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org,
-	LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	pawel.moll-5wv7dgnIgG8@public.gmane.org,
-	mark.rutland-5wv7dgnIgG8@public.gmane.org,
-	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
-	galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
-	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
-	linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
-	herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
-	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
-	mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
-	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
-	tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	arnd-r2nGTMty4D4@public.gmane.org,
-	boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org
-Return-path: <linux-sunxi+bncBD7YLCN32UNBBJVY2KVAKGQENJDCEUI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <1431608341-10936-1-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <http://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <http://groups.google.com/group/linux-sunxi/subscribe>
+Cc: devicetree@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-sunxi@googlegroups.com,
+	LABBE Corentin <clabbe.montjoie@gmail.com>
+To: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
+	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
+	maxime.ripard@free-electrons.com, linux@arm.linux.org.uk,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	akpm@linux-foundation.org, gregkh@linuxfoundation.org,
+	mchehab@osg.samsung.com, joe@perches.com, tj@kernel.org,
+	arnd@arndb.de, boris.brezillon@free-electrons.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1431608341-10936-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+This patch adds documentation for Device-Tree bindings for the Security System
+cryptographic accelerator driver.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5d87ccb..f2518d8 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -555,6 +555,12 @@ S:	Maintained
- F:	Documentation/i2c/busses/i2c-ali1563
- F:	drivers/i2c/busses/i2c-ali1563.c
- 
-+ALLWINNER SECURITY SYSTEM
-+M:	Corentin Labbe <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-+L:	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-+S:	Maintained
-+F:	drivers/crypto/sunxi-ss/
+Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+---
+ Documentation/devicetree/bindings/crypto/sun4i-ss.txt | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/sun4i-ss.txt
+
+diff --git a/Documentation/devicetree/bindings/crypto/sun4i-ss.txt b/Documentation/devicetree/bindings/crypto/sun4i-ss.txt
+new file mode 100644
+index 0000000..f2192d4
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/sun4i-ss.txt
+@@ -0,0 +1,19 @@
++* Allwinner Security System found on A20 SoC
 +
- ALPHA PORT
- M:	Richard Henderson <rth-hL46jP5Bxq7R7s880joybQ@public.gmane.org>
- M:	Ivan Kokshaysky <ink-biIs/Y0ymYJMZLIVYojuPNP0rXTJTi09@public.gmane.org>
++Required properties:
++- compatible : Should be "allwinner,sun4i-a20-crypto".
++- reg: Should contain the Security System register location and length.
++- interrupts: Should contain the IRQ line for the Security System.
++- clocks : List of clock specifiers, corresponding to ahb and ss.
++- clock-names : Name of the functional clock, should be
++	* "ahb" : AHB gating clock
++	* "mod" : SS controller clock
++
++Example:
++	crypto: crypto-engine@01c15000 {
++		compatible = "allwinner,sun4i-a20-crypto";
++		reg = <0x01c15000 0x1000>;
++		interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&ahb_gates 5>, <&ss_clk>;
++		clock-names = "ahb", "mod";
++	};
 -- 
 2.3.6
