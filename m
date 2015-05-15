@@ -1,10 +1,12 @@
 From: Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-Subject: Re: [PATCH 03/10] crypto: omap-sham: Add support for omap3 devices
-Date: Fri, 15 May 2015 11:19:33 +0200
-Message-ID: <20150515091933.GA12078@pali>
-References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
- <1424958600-18881-4-git-send-email-pali.rohar@gmail.com>
- <20150228162502.GC4978@amd>
+Subject: Re: [PATCH v2] crypto: omap-sham: Check for return value from
+ pm_runtime_get_sync
+Date: Fri, 15 May 2015 11:20:51 +0200
+Message-ID: <20150515092051.GB12078@pali>
+References: <1424958600-18881-5-git-send-email-pali.rohar@gmail.com>
+ <1425808861-17004-1-git-send-email-pali.rohar@gmail.com>
+ <201505142340.37649@pali>
+ <20150515070229.GA16939@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
@@ -16,48 +18,36 @@ Cc: =?utf-8?Q?Beno=C3=AEt?= Cousson <bcousson@baylibre.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Nishanth Menon <nm@ti.com>,
+	Pavel Machek <pavel@ucw.cz>, Nishanth Menon <nm@ti.com>,
 	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
 	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Sebastian Reichel <sre@kernel.org>, Pavel Machek <pavel@ucw.cz>
+	Sebastian Reichel <sre@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-omap-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:36599 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752880AbbEOJVA (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 15 May 2015 05:21:00 -0400
 Content-Disposition: inline
-In-Reply-To: <20150228162502.GC4978@amd>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20150515070229.GA16939@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Saturday 28 February 2015 17:25:02 Pavel Machek wrote:
-> On Thu 2015-02-26 14:49:53, Pali Roh=C3=A1r wrote:
-> > omap3 support is same as omap2, just with different IO address (spe=
-cified in DT)
-> >=20
-> > Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
+On Friday 15 May 2015 15:02:29 Herbert Xu wrote:
+> On Thu, May 14, 2015 at 11:40:37PM +0200, Pali Roh=C3=A1r wrote:
+> > On Sunday 08 March 2015 11:01:01 Pali Roh=C3=A1r wrote:
+> > > Function pm_runtime_get_sync could fail and we need to check retu=
+rn
+> > > value to prevent kernel crash.
+> > >=20
+> > > Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
 >=20
-> Acked-by: Pavel Machek <pavel@ucw.cz>
->=20
-> > @@ -1792,6 +1792,10 @@ static const struct of_device_id omap_sham_o=
-f_match[] =3D {
-> >  		.data		=3D &omap_sham_pdata_omap2,
-> >  	},
-> >  	{
-> > +		.compatible	=3D "ti,omap3-sham",
-> > +		.data		=3D &omap_sham_pdata_omap2,
-> > +	},
-> > +	{
-> >  		.compatible	=3D "ti,omap4-sham",
-> >  		.data		=3D &omap_sham_pdata_omap4,
-> >  	},
->=20
+> Applied.
 
-Herbert, this is second crypto patch in this series, can you apply it t=
-oo?
+Thanks! In this patch series is also another one patch for crypto
+subsystem. I replied to that patch email.
 
 --=20
 Pali Roh=C3=A1r
 pali.rohar@gmail.com
---
-To unsubscribe from this list: send the line "unsubscribe linux-omap" i=
-n
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
