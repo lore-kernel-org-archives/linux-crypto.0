@@ -1,53 +1,56 @@
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-Subject: Re: [PATCH v2] crypto: omap-sham: Check for return value from
- pm_runtime_get_sync
-Date: Fri, 15 May 2015 11:20:51 +0200
-Message-ID: <20150515092051.GB12078@pali>
-References: <1424958600-18881-5-git-send-email-pali.rohar@gmail.com>
- <1425808861-17004-1-git-send-email-pali.rohar@gmail.com>
- <201505142340.37649@pali>
- <20150515070229.GA16939@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: =?utf-8?Q?Beno=C3=AEt?= Cousson <bcousson@baylibre.com>,
-	Tony Lindgren <tony@atomide.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Russell King <linux@arm.linux.org.uk>,
-	Paul Walmsley <paul@pwsan.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Pavel Machek <pavel@ucw.cz>, Nishanth Menon <nm@ti.com>,
-	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Sebastian Reichel <sre@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: [PATCH] crypto: remove 842-nx null checks
+Date: Fri, 15 May 2015 11:07:33 -0400
+Message-ID: <1431702453-12118-1-git-send-email-ddstreet@ieee.org>
+References: <20150515070424.GA17008@gondor.apana.org.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Dan Carpenter <dan.carpenter@oracle.com>,
+	Dan Streetman <ddstreet@ieee.org>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:36599 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752880AbbEOJVA (ORCPT
+Received: from mail-ie0-f172.google.com ([209.85.223.172]:34056 "EHLO
+	mail-ie0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753874AbbEOPIE (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 May 2015 05:21:00 -0400
-Content-Disposition: inline
-In-Reply-To: <20150515070229.GA16939@gondor.apana.org.au>
+	Fri, 15 May 2015 11:08:04 -0400
+Received: by ieczm2 with SMTP id zm2so43750000iec.1
+        for <linux-crypto@vger.kernel.org>; Fri, 15 May 2015 08:08:04 -0700 (PDT)
+In-Reply-To: <20150515070424.GA17008@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Friday 15 May 2015 15:02:29 Herbert Xu wrote:
-> On Thu, May 14, 2015 at 11:40:37PM +0200, Pali Roh=C3=A1r wrote:
-> > On Sunday 08 March 2015 11:01:01 Pali Roh=C3=A1r wrote:
-> > > Function pm_runtime_get_sync could fail and we need to check retu=
-rn
-> > > value to prevent kernel crash.
-> > >=20
-> > > Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
->=20
-> Applied.
+Remove the null checks for tfm, src, slen, dst, dlen; tfm will never
+be null and the other fields are always expected to be set correctly.
 
-Thanks! In this patch series is also another one patch for crypto
-subsystem. I replied to that patch email.
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+---
+ drivers/crypto/nx/nx-842-crypto.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
+diff --git a/drivers/crypto/nx/nx-842-crypto.c b/drivers/crypto/nx/nx-842-crypto.c
+index cb177c3..2ffa103 100644
+--- a/drivers/crypto/nx/nx-842-crypto.c
++++ b/drivers/crypto/nx/nx-842-crypto.c
+@@ -298,9 +298,6 @@ static int nx842_crypto_compress(struct crypto_tfm *tfm,
+ 	bool add_header;
+ 	u16 ignore = 0;
+ 
+-	if (!tfm || !src || !slen || !dst || !dlen)
+-		return -EINVAL;
+-
+ 	p.in = (u8 *)src;
+ 	p.iremain = slen;
+ 	p.out = dst;
+@@ -483,9 +480,6 @@ static int nx842_crypto_decompress(struct crypto_tfm *tfm,
+ 	u16 ignore = 0;
+ 	bool usehw = true;
+ 
+-	if (!tfm || !src || !slen || !dst || !dlen)
+-		return -EINVAL;
+-
+ 	p.in = (u8 *)src;
+ 	p.iremain = slen;
+ 	p.out = dst;
+-- 
+2.1.0
