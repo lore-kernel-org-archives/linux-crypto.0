@@ -1,215 +1,228 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH] crypto: algif_aead - fix invalid sgl linking
-Date: Fri, 15 May 2015 10:18:37 -0700
-Message-ID: <20150515171837.5222.92988.stgit@tstruk-mobl1>
+From: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+Subject: [V4 PATCH 1/6] ACPI / scan: Parse _CCA and setup device coherency
+Date: Fri, 15 May 2015 16:23:09 -0500
+Message-ID: <1431724994-21601-2-git-send-email-Suravee.Suthikulpanit@amd.com>
+References: <1431724994-21601-1-git-send-email-Suravee.Suthikulpanit@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: smueller@chronox.de, linux-crypto@vger.kernel.org,
-	tadeusz.struk@intel.com
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:44693 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752969AbbEORWC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 May 2015 13:22:02 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain
+Cc: <msalter@redhat.com>, <hanjun.guo@linaro.org>,
+	<al.stone@linaro.org>, <grant.likely@linaro.org>,
+	<leo.duran@amd.com>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-acpi@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linaro-acpi@lists.linaro.org>, <netdev@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>,
+	"Suravee Suthikulpanit" <Suravee.Suthikulpanit@amd.com>
+To: <rjw@rjwysocki.net>, <lenb@kernel.org>, <catalin.marinas@arm.com>,
+	<will.deacon@arm.com>, <bhelgaas@google.com>,
+	<thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>, <arnd@arndb.de>
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <1431724994-21601-1-git-send-email-Suravee.Suthikulpanit@amd.com>
+Sender: linux-acpi-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-The current linking of receive sgls is invalid.
-It only works with a single list, but when multiple rsgls are being chained
-the list is built incorrectly. The following example, when run on the existing
-implementation causes an Oops.
+This patch implements support for ACPI _CCA object, which is introduced in
+ACPIv5.1, can be used for specifying device DMA coherency attribute.
 
------ %< ------
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <linux/types.h>
-#define SOL_ALG 279
+The parsing logic traverses device namespace to parse coherency
+information, and stores it in acpi_device_flags. Then uses it to call
+arch_setup_dma_ops() when creating each device enumerated in DSDT
+during ACPI scan.
 
-#define SPLICE_F_GIFT	(0x08)
-struct sockaddr_alg {
-	__u16	salg_family;
-	__u8	salg_type[14];
-	__u32	salg_feat;
-	__u32	salg_mask;
-	__u8	salg_name[64];
-};
-struct af_alg_iv {
-	__u32	ivlen;
-	__u8	iv[0];
-};
-/* Socket options */
-#define ALG_SET_KEY			1
-#define ALG_SET_IV			2
-#define ALG_SET_OP			3
-#define ALG_SET_AEAD_ASSOCLEN           4
-#define ALG_SET_AEAD_AUTHSIZE           5
-/* Operations */
-#define ALG_OP_DECRYPT			0
-#define ALG_OP_ENCRYPT			1
-#define ASSOCLEN 512
-#define AUTHLEN 64
-#define PKG_SIZE ((4096 * 16) + ASSOCLEN)
-#define PKG_SIZE_TO_READ ((512 * 16) + AUTHLEN)
-#define PKG_SINGLE_LEN (512)
-#define PKG_SINGLE_RCV_LEN (512)
-static char buf[PKG_SIZE]__attribute__((__aligned__(4096)));
+This patch also introduces acpi_dma_is_coherent(), which provides
+an interface for device drivers to check the coherency information
+similarly to the of_dma_is_coherent().
 
-void dump(char *mem, unsigned int len)
-{
-        unsigned int i;
-
-        for (i = 0; i < len ; i++)
-        {
-                if (!(i % 0x10))
-                        printf("0x%04x: ", i);
-
-                if (i < len)
-                        printf("%02x ", 0xff & *(mem + i));
-
-		if (i && !((i + 1) % 0x10))
-			printf("\n");
-        }
-}
-
-int main(int argc, char **argv)
-{
-	const char key[16] =
-		"\x06\xa9\x21\x40\x36\xb8\xa1\x5b"
-		"\x51\x2e\x03\xd5\x34\x12\x00\x06";
-	char oiv[16] =
-		"\x3d\xaf\xba\x42\x9d\x9e\xb4\x30"
-		"\xb4\x22\xda\x80\x2c\x9f\xac\x41";
-	int opfd;
-	int tfmfd;
-	struct sockaddr_alg sa = {
-		.salg_family = AF_ALG,
-		.salg_type = "aead",
-		.salg_name = "authenc(hmac(sha512),cbc(aes))"
-	};
-	struct msghdr msg = {};
-	struct msghdr rcvmsg = {};
-	struct cmsghdr *cmsg;
-	char cbuf[CMSG_SPACE(4) + CMSG_SPACE(4) + CMSG_SPACE(20)] = {};
-	struct aes_iv {
-		__u32 len;
-		__u8 iv[16];
-	} *iv;
-	struct iovec iov[16];
-	struct iovec rcviov[16];
-	char *ptrs[16];
-	int pipes[2];
-	int i, ret;
-
-	memset(buf, 'A', PKG_SIZE);
-	pipe(pipes);
-	tfmfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
-	bind(tfmfd, (struct sockaddr *)&sa, sizeof(sa));
-	setsockopt(tfmfd, SOL_ALG, ALG_SET_KEY, key, 16);
-	setsockopt(tfmfd, SOL_ALG, ALG_SET_AEAD_AUTHSIZE, NULL, AUTHLEN);
-	opfd = accept(tfmfd, NULL, 0);
-
-	msg.msg_control = cbuf;
-	msg.msg_controllen = sizeof(cbuf);
-
-	cmsg = CMSG_FIRSTHDR(&msg);
-	cmsg->cmsg_level = SOL_ALG;
-	cmsg->cmsg_type = ALG_SET_OP;
-	cmsg->cmsg_len = CMSG_LEN(4);
-	*(__u32 *)CMSG_DATA(cmsg) = ALG_OP_ENCRYPT;
-
-	cmsg = CMSG_NXTHDR(&msg, cmsg);
-	cmsg->cmsg_level = SOL_ALG;
-	cmsg->cmsg_type = ALG_SET_AEAD_ASSOCLEN;
-	cmsg->cmsg_len = CMSG_LEN(4);
-	*(__u32 *)CMSG_DATA(cmsg) = ASSOCLEN;
-
-	cmsg = CMSG_NXTHDR(&msg, cmsg);
-	cmsg->cmsg_level = SOL_ALG;
-	cmsg->cmsg_type = ALG_SET_IV;
-	cmsg->cmsg_len = CMSG_LEN(20);
-	iv = (void *)CMSG_DATA(cmsg);
-	iv->len = 16;
-	memcpy(iv->iv, oiv, 16);
-
-	for (i = 0; i < 16; i++)
-	{
-		ptrs[i] = malloc(PKG_SINGLE_RCV_LEN);
-		if (!ptrs[i])
-			return -1;
-		memset(ptrs[i], 'A', PKG_SINGLE_RCV_LEN);
-	}
-	for (i = 0; i < 16; i++)
-	{
-		iov[i].iov_base = buf + i * 4096;
-		iov[i].iov_len = PKG_SINGLE_LEN;
-	}
-
-	iov[0].iov_len += ASSOCLEN;
-	msg.msg_iovlen = 0;
-	msg.msg_flags = MSG_MORE;
-	for (i = 0; i < 16; i++)
-	{
-		rcviov[i].iov_base = ptrs[i];
-		rcviov[i].iov_len = PKG_SINGLE_RCV_LEN;
-	}
-	rcvmsg.msg_iovlen = 16;
-	rcvmsg.msg_iov = rcviov;
-
-	ret = sendmsg(opfd, &msg, 0);
-	vmsplice(pipes[1], iov, 16, SPLICE_F_GIFT);
-	splice(pipes[0], NULL, opfd, NULL, PKG_SIZE_TO_READ, 0);
-	ret = recvmsg(opfd, &rcvmsg, 0);
-	for (i = 0; i < 16; i++)
-	{
-		printf("*********** Buff %d ***************\n", i);
-		dump(ptrs[i], PKG_SINGLE_RCV_LEN);
-		free(ptrs[i]);
-	}
-	close(opfd);
-	close(tfmfd);
-	close(pipes[0]);
-	close(pipes[1]);
-}
------ %< ------
-This patch fixes it.
-Also minor updates to comments.
-
-Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+Signed-off-by: Mark Salter <msalter@redhat.com>
+Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+CC: Rafael J. Wysocki <rjw@rjwysocki.net>
+CC: Arnd Bergmann <arnd@arndb.de>
+CC: Will Deacon <will.deacon@arm.com>
+CC: Catalin Marinas <catalin.marinas@arm.com>
 ---
- crypto/algif_aead.c |    9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ drivers/acpi/Kconfig         |  3 +++
+ drivers/acpi/acpi_platform.c | 10 +++++++---
+ drivers/acpi/scan.c          | 40 ++++++++++++++++++++++++++++++++++++++++
+ include/acpi/acpi_bus.h      | 32 +++++++++++++++++++++++++++++++-
+ include/linux/acpi.h         | 10 ++++++++++
+ 5 files changed, 91 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 53702e9..a55e4e6 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -34,7 +34,7 @@ struct aead_ctx {
- 	/*
- 	 * RSGL_MAX_ENTRIES is an artificial limit where user space at maximum
- 	 * can cause the kernel to allocate RSGL_MAX_ENTRIES * ALG_MAX_PAGES
--	 * bytes
-+	 * pages
- 	 */
- #define RSGL_MAX_ENTRIES ALG_MAX_PAGES
- 	struct af_alg_sgl rsgl[RSGL_MAX_ENTRIES];
-@@ -436,11 +436,10 @@ static int aead_recvmsg(struct socket *sock, struct msghdr *msg, size_t ignored,
- 		if (err < 0)
- 			goto unlock;
- 		usedpages += err;
--		/* chain the new scatterlist with initial list */
-+		/* chain the new scatterlist with previous one */
- 		if (cnt)
--			scatterwalk_crypto_chain(ctx->rsgl[0].sg,
--					ctx->rsgl[cnt].sg, 1,
--					sg_nents(ctx->rsgl[cnt-1].sg));
-+			af_alg_link_sg(&ctx->rsgl[cnt-1], &ctx->rsgl[cnt]);
+diff --git a/drivers/acpi/Kconfig b/drivers/acpi/Kconfig
+index ab2cbb5..212735f 100644
+--- a/drivers/acpi/Kconfig
++++ b/drivers/acpi/Kconfig
+@@ -54,6 +54,9 @@ config ACPI_GENERIC_GSI
+ config ACPI_SYSTEM_POWER_STATES_SUPPORT
+ 	bool
+ 
++config ACPI_CCA_REQUIRED
++	bool
 +
- 		/* we do not need more iovecs as we have sufficient memory */
- 		if (outlen <= usedpages)
- 			break;
+ config ACPI_SLEEP
+ 	bool
+ 	depends on SUSPEND || HIBERNATION
+diff --git a/drivers/acpi/acpi_platform.c b/drivers/acpi/acpi_platform.c
+index 4bf7559..f6bc438 100644
+--- a/drivers/acpi/acpi_platform.c
++++ b/drivers/acpi/acpi_platform.c
+@@ -103,14 +103,18 @@ struct platform_device *acpi_create_platform_device(struct acpi_device *adev)
+ 	pdevinfo.res = resources;
+ 	pdevinfo.num_res = count;
+ 	pdevinfo.fwnode = acpi_fwnode_handle(adev);
+-	pdevinfo.dma_mask = DMA_BIT_MASK(32);
++	pdevinfo.dma_mask = acpi_dma_is_supported(adev) ? DMA_BIT_MASK(32) : 0;
+ 	pdev = platform_device_register_full(&pdevinfo);
+-	if (IS_ERR(pdev))
++	if (IS_ERR(pdev)) {
+ 		dev_err(&adev->dev, "platform device creation failed: %ld\n",
+ 			PTR_ERR(pdev));
+-	else
++	} else {
++		if (acpi_dma_is_supported(adev))
++			arch_setup_dma_ops(&pdev->dev, 0, 0, NULL,
++					   acpi_dma_is_coherent(adev));
+ 		dev_dbg(&adev->dev, "created platform device %s\n",
+ 			dev_name(&pdev->dev));
++	}
+ 
+ 	kfree(resources);
+ 	return pdev;
+diff --git a/drivers/acpi/scan.c b/drivers/acpi/scan.c
+index 849b699..c56e66a 100644
+--- a/drivers/acpi/scan.c
++++ b/drivers/acpi/scan.c
+@@ -11,6 +11,7 @@
+ #include <linux/kthread.h>
+ #include <linux/dmi.h>
+ #include <linux/nls.h>
++#include <linux/dma-mapping.h>
+ 
+ #include <asm/pgtable.h>
+ 
+@@ -2137,6 +2138,44 @@ void acpi_free_pnp_ids(struct acpi_device_pnp *pnp)
+ 	kfree(pnp->unique_id);
+ }
+ 
++static void acpi_init_coherency(struct acpi_device *adev)
++{
++	unsigned long long cca = 0;
++	acpi_status status;
++	struct acpi_device *parent = adev->parent;
++	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
++
++	if (parent && parent->flags.cca_seen) {
++		/*
++		 * From ACPI spec, OSPM will ignore _CCA if an ancestor
++		 * already saw one.
++		 */
++		adev->flags.cca_seen = 1;
++		cca = acpi_dma_is_coherent(parent);
++	} else {
++		status = acpi_evaluate_integer(adev->handle, "_CCA",
++					       NULL, &cca);
++		if (ACPI_SUCCESS(status)) {
++			adev->flags.cca_seen = 1;
++		} else if (!IS_ENABLED(CONFIG_ACPI_CCA_REQUIRED)) {
++			/*
++			 * If architecture does not specify that _CCA is
++			 * required for DMA-able devices (e.g. x86),
++			 * we default to _CCA=1.
++			 */
++			cca = 1;
++		} else {
++			acpi_get_name(adev->handle, ACPI_FULL_PATHNAME,
++				      &buffer);
++			pr_debug("ACPI device %s is missing _CCA.\n",
++				(char *) buffer.pointer);
++			kfree(buffer.pointer);
++		}
++	}
++
++	adev->flags.is_coherent = cca;
++}
++
+ void acpi_init_device_object(struct acpi_device *device, acpi_handle handle,
+ 			     int type, unsigned long long sta)
+ {
+@@ -2155,6 +2194,7 @@ void acpi_init_device_object(struct acpi_device *device, acpi_handle handle,
+ 	device->flags.visited = false;
+ 	device_initialize(&device->dev);
+ 	dev_set_uevent_suppress(&device->dev, true);
++	acpi_init_coherency(device);
+ }
+ 
+ void acpi_device_add_finalize(struct acpi_device *device)
+diff --git a/include/acpi/acpi_bus.h b/include/acpi/acpi_bus.h
+index 8de4fa9..2a05ffb 100644
+--- a/include/acpi/acpi_bus.h
++++ b/include/acpi/acpi_bus.h
+@@ -208,7 +208,9 @@ struct acpi_device_flags {
+ 	u32 visited:1;
+ 	u32 hotplug_notify:1;
+ 	u32 is_dock_station:1;
+-	u32 reserved:23;
++	u32 is_coherent:1;
++	u32 cca_seen:1;
++	u32 reserved:21;
+ };
+ 
+ /* File System */
+@@ -380,6 +382,34 @@ struct acpi_device {
+ 	void (*remove)(struct acpi_device *);
+ };
+ 
++static inline bool acpi_dma_is_supported(struct acpi_device *adev)
++{
++	/**
++	 * Currently, we mainly support _CCA=1 (i.e. is_coherent=1)
++	 * This should be equivalent to specifyig dma-coherent for
++	 * a device in OF.
++	 *
++	 * For the case when _CCA=0 (i.e. is_coherent=0 && cca_seen=1),
++	 * There are two approaches:
++	 * 1. Do not support and disable DMA.
++	 * 2. Support but rely on arch-specific cache maintenance for
++	 * non-coherence DMA operations. ARM64 is one example.
++	 *
++	 * For the case when _CCA is missing (i.e. cca_seen=0) but
++	 * platform specifies ACPI_CCA_REQUIRED, we do not support DMA,
++	 * and fallback to arch-specific default handling.
++	 *
++	 * See acpi_init_coherency() for more info.
++	 */
++	return adev && (adev->flags.is_coherent ||
++			(adev->flags.cca_seen && IS_ENABLED(CONFIG_ARM64)));
++}
++
++static inline bool acpi_dma_is_coherent(struct acpi_device *adev)
++{
++	return adev && adev->flags.is_coherent;
++}
++
+ static inline bool is_acpi_node(struct fwnode_handle *fwnode)
+ {
+ 	return fwnode && fwnode->type == FWNODE_ACPI;
+diff --git a/include/linux/acpi.h b/include/linux/acpi.h
+index b10c4a6..baccf3b 100644
+--- a/include/linux/acpi.h
++++ b/include/linux/acpi.h
+@@ -583,6 +583,16 @@ static inline int acpi_device_modalias(struct device *dev,
+ 	return -ENODEV;
+ }
+ 
++static inline bool acpi_dma_is_supported(struct acpi_device *adev)
++{
++	return false;
++}
++
++static inline bool acpi_dma_is_coherent(struct acpi_device *adev)
++{
++	return false;
++}
++
+ #define ACPI_PTR(_ptr)	(NULL)
+ 
+ #endif	/* !CONFIG_ACPI */
+-- 
+2.1.0
+
