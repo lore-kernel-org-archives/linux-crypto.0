@@ -1,50 +1,29 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v9 4/4] crypto: Add Allwinner Security System crypto
- accelerator
-Date: Fri, 15 May 2015 14:52:22 +0800
-Message-ID: <20150515065222.GA16808@gondor.apana.org.au>
-References: <1431608341-10936-1-git-send-email-clabbe.montjoie@gmail.com>
- <1431608341-10936-5-git-send-email-clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH] crypto: qat - remove unused structure members
+Date: Fri, 15 May 2015 15:02:42 +0800
+Message-ID: <20150515070241.GB16939@gondor.apana.org.au>
+References: <20150513214530.30612.5748.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
-	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
-	maxime.ripard@free-electrons.com, linux@arm.linux.org.uk,
-	davem@davemloft.net, akpm@linux-foundation.org,
-	gregkh@linuxfoundation.org, mchehab@osg.samsung.com,
-	joe@perches.com, tj@kernel.org, arnd@arndb.de,
-	boris.brezillon@free-electrons.com, devicetree@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-sunxi@googlegroups.com
-To: LABBE Corentin <clabbe.montjoie@gmail.com>
-Return-path: <linux-doc-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
+To: Tadeusz Struk <tadeusz.struk@intel.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:60283 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753714AbbEOHCp (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 15 May 2015 03:02:45 -0400
 Content-Disposition: inline
-In-Reply-To: <1431608341-10936-5-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-doc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20150513214530.30612.5748.stgit@tstruk-mobl1>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 14, 2015 at 02:59:01PM +0200, LABBE Corentin wrote:
->
-> +int sun4i_hash_export(struct ahash_request *areq, void *out)
-> +{
-> +	struct sun4i_req_ctx *op = ahash_request_ctx(areq);
-> +
-> +	memcpy(out, op, sizeof(struct sun4i_req_ctx));
-> +	return 0;
-> +}
-> +
-> +int sun4i_hash_import(struct ahash_request *areq, const void *in)
-> +{
-> +	struct sun4i_req_ctx *op = ahash_request_ctx(areq);
-> +
-> +	memcpy(op, in, sizeof(struct sun4i_req_ctx));
+On Wed, May 13, 2015 at 02:45:30PM -0700, Tadeusz Struk wrote:
+> Cleanup unused structure members.
+> 
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 
-This is very wrong.  You're importing an arbitrary ss pointer.  The
-whole point of having an import function instead of just a simple
-memcpy is to deal with such problems.
-
-Cheers,
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
