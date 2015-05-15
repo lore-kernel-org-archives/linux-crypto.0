@@ -1,64 +1,42 @@
-From: Tony Lindgren <tony-4v6yS6AI5VpBDgjK7y7TUQ@public.gmane.org>
-Subject: Re: [PATCH 00/10] omap3 crypto fixes
-Date: Thu, 14 May 2015 15:03:26 -0700
-Message-ID: <20150514220325.GR15563@atomide.com>
-References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
- <201505142317.41151@pali>
- <20150514213418.GP15563@atomide.com>
- <201505142339.14697@pali>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: omap-sham: Check for return value from
+ pm_runtime_get_sync
+Date: Fri, 15 May 2015 08:15:16 +0800
+Message-ID: <20150515001515.GB13821@gondor.apana.org.au>
+References: <1424958600-18881-5-git-send-email-pali.rohar@gmail.com>
+ <1425808861-17004-1-git-send-email-pali.rohar@gmail.com>
+ <201505142340.37649@pali>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Aaro Koskinen <aaro.koskinen-X3B1VOXEql0@public.gmane.org>,
-	=?utf-8?Q?Beno=C3=AEt?= Cousson <bcousson-rdvid1DuHRBWk0Htik3J/w@public.gmane.org>,
-	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Russell King <linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org>,
-	Paul Walmsley <paul-DWxLp4Yu+b8AvxtiuMwx3w@public.gmane.org>,
-	Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>, Nishanth Menon <nm-l0cyMroinI0@public.gmane.org>,
-	Ivaylo Dimitrov <ivo.g.dimitrov.75-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Sebastian Reichel <sre-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-To: Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: =?iso-8859-1?Q?Beno=EEt?= Cousson <bcousson@baylibre.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Russell King <linux@arm.linux.org.uk>,
+	Paul Walmsley <paul@pwsan.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Pavel Machek <pavel@ucw.cz>, Nishanth Menon <nm@ti.com>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Sebastian Reichel <sre@kernel.org>
+To: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <201505142339.14697@pali>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+In-Reply-To: <201505142340.37649@pali>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-* Pali Roh=C3=A1r <pali.rohar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> [150514 14:40]:
-> On Thursday 14 May 2015 23:34:19 Tony Lindgren wrote:
-> > * Pali Roh=C3=A1r <pali.rohar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> [150514 14:19]:
-> > > On Friday 06 March 2015 23:23:06 Aaro Koskinen wrote:
-> > > > Hi,
-> > > >=20
-> > > > On Fri, Mar 06, 2015 at 10:36:32AM -0800, Tony Lindgren wrote:
-> > > > > Are there any fixes in this series that should go into
-> > > > > v4.0-rc series, or can it all wait for v4.1?
-> > > >=20
-> > > > I think these all should wait for v4.1.
-> > > >=20
-> > > > A.
-> > >=20
-> > > 4.1-rc3 was released and this patch series is still not included.=
-=2E.
-> >=20
-> > The dts changes should be merged?
-> >=20
->=20
-> Looks like yes, but first two arch/arm/mach-omap2 patches not.
+On Thu, May 14, 2015 at 11:40:37PM +0200, Pali Roh=E1r wrote:
+>
+> Herbert, can you apply this patch?
 
-I suggest you repost those to separately so Paul can take
-a look at them. It seems they can be merged separately from
-the driver changes?
-=20
-Regards,
+OK I dug this out of patchwork for you.  In future please post
+patches that you want me to apply separately.
 
-Tony
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" i=
-n
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Thanks,
+--=20
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
