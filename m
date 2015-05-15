@@ -1,61 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: re: crypto: nx - add hardware 842 crypto comp alg
-Date: Fri, 15 May 2015 15:04:25 +0800
-Message-ID: <20150515070424.GA17008@gondor.apana.org.au>
-References: <20150514100944.GA19879@mwanda>
+Subject: Re: [PATCH] crypto: vmx - fix two mistyped texts
+Date: Fri, 15 May 2015 15:05:06 +0800
+Message-ID: <20150515070506.GA17026@gondor.apana.org.au>
+References: <1431616869-31080-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: ddstreet@ieee.org, linux-crypto@vger.kernel.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52201 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754009AbbEOHEe (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 15 May 2015 03:04:34 -0400
+Cc: linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
+	"Marcelo H. Cerri" <mhcerri@linux.vnet.ibm.com>,
+	"open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+To: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150514100944.GA19879@mwanda>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1431616869-31080-1-git-send-email-pfsmorigo@linux.vnet.ibm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Dan Carpenter <dan.carpenter@oracle.com> wrote:
-> Hello Dan Streetman,
+On Thu, May 14, 2015 at 12:21:04PM -0300, Paulo Flabiano Smorigo wrote:
+> One mistyped description and another mistyped target were corrected.
 > 
-> This is a semi-automatic email about new static checker warnings.
-> 
-> The patch ed70b479c2c0: "crypto: nx - add hardware 842 crypto comp
-> alg" from May 7, 2015, leads to the following Smatch complaint:
-> 
-> drivers/crypto/nx/nx-842-crypto.c:301 nx842_crypto_compress()
->         warn: variable dereferenced before check 'tfm' (see line 292)
-> 
-> drivers/crypto/nx/nx-842-crypto.c
->   288  static int nx842_crypto_compress(struct crypto_tfm *tfm,
->   289                                   const u8 *src, unsigned int slen,
->   290                                   u8 *dst, unsigned int *dlen)
->   291  {
->   292          struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
->                                                              ^^^
-> Dereference.
-> 
->   293          struct nx842_crypto_header *hdr = &ctx->header;
->   294          struct nx842_crypto_param p;
->   295          struct nx842_constraints c;
->   296          unsigned int groups, hdrsize, h;
->   297          int ret, n;
->   298          bool add_header;
->   299          u16 ignore = 0;
->   300  
->   301          if (!tfm || !src || !slen || !dst || !dlen)
->                     ^^^
-> Checked for NULL.
-> 
->   302                  return -EINVAL;
->   303  
+> Signed-off-by: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
 
-tfm can never be NULL so this should be removed.
-
-Cheers,
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
