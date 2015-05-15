@@ -1,49 +1,46 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v6 1/5] random: Blocking API for accessing
- nonblocking_pool
-Date: Fri, 15 May 2015 14:46:26 +0800
-Message-ID: <20150515064626.GA16704@gondor.apana.org.au>
-References: <1921857.OvxEu6y28S@tachyon.chronox.de>
- <34087343.u7K3uzbyiZ@tachyon.chronox.de>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v9 4/4] crypto: Add Allwinner Security System crypto
+ accelerator
+Date: Fri, 15 May 2015 14:49:33 +0800
+Message-ID: <20150515064932.GB16704@gondor.apana.org.au>
+References: <1431608341-10936-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1431608341-10936-5-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
-	sandyinchina@gmail.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
+	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org, tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org,
+	boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <34087343.u7K3uzbyiZ@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1431608341-10936-5-git-send-email-clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 13, 2015 at 09:54:41PM +0200, Stephan Mueller wrote:
->  /*
-> + * Equivalent function to get_random_bytes with the difference that this
-> + * function blocks the request until the nonblocking_pool is initialized.
-> + */
-> +void get_blocking_random_bytes(void *buf, int nbytes)
-> +{
-> +	if (unlikely(nonblocking_pool.initialized == 0))
-> +		wait_event_interruptible(urandom_init_wait,
-> +					 nonblocking_pool.initialized);
-> +	extract_entropy(&nonblocking_pool, buf, nbytes, 0, 0);
+On Thu, May 14, 2015 at 02:59:01PM +0200, LABBE Corentin wrote:
+>
+> +	err = crypto_ablkcipher_setkey(op->fallback, kkey, op->keylen);
+> +	if (err != 0) {
+> +		dev_err(ss->dev, "Cannot set key on fallback\n");
+> +		return -EINVAL;
+> +	}
 
-So what if the wait was interrupted? You are going to extract
-entropy from an empty pool.
-
-Anyway, you still haven't addressed my primary concern with this
-model which is the potential for dead-lock.  Sleeping for an open
-period of time like this in a work queue is bad form.  It may also
-lead to dead-locks if whatever you're waiting for happened to use
-the same work thread.
-
-That's why I think you should simply provide a function and data
-pointer which random.c can then stash onto a list to call when
-the pool is ready.
+You cannot call setkey from an atomic context.  The easiest solution
+is to call setkey in your setkey function instead.
 
 Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
