@@ -1,108 +1,106 @@
-From: Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH 0/8] ARM: mvebu: Add support for RAID6 PQ offloading
-Date: Mon, 18 May 2015 10:06:55 -0700
-Message-ID: <CAPcyv4jbW=B_mYfx5HfKckLYeWctfC-9jYeDf0Z1APvQZfHj6Q@mail.gmail.com>
-References: <1431445063-20226-1-git-send-email-maxime.ripard@free-electrons.com>
-	<CAPcyv4gshyaji2HarAeOg3XOiNnmGwnSOMuFGWpuDu8ZTGg=jw@mail.gmail.com>
-	<20150513091733.GW10961@lukather>
-	<CAPcyv4jv=xWHbrO=rKhnWt9zFn8vkhS2J5mJiCBKKwESdUk5tg@mail.gmail.com>
-	<20150518091454.GP4004@lukather>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] random: add random_initialized command line param
+Date: Mon, 18 May 2015 18:25:25 +0200
+Message-ID: <4206400.x843ypJTc1@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Vinod Koul <vinod.koul@intel.com>,
-	Gregory Clement <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	"dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org, Lior Amsalem <alior@marvell.com>,
-	Thomas Petazzoni <thomas@free-electrons.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-To: Maxime Ripard <maxime.ripard@free-electrons.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150518091454.GP4004@lukather>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Ted Tso <tytso@mit.edu>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34830 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754419AbbERRy7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 May 2015 13:54:59 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 18, 2015 at 2:14 AM, Maxime Ripard
-<maxime.ripard@free-electrons.com> wrote:
-> Hi Dan,
->
-> On Wed, May 13, 2015 at 09:00:46AM -0700, Dan Williams wrote:
->> On Wed, May 13, 2015 at 2:17 AM, Maxime Ripard
->> <maxime.ripard@free-electrons.com> wrote:
->> > Hi Dan,
->> >
->> > On Tue, May 12, 2015 at 09:05:41AM -0700, Dan Williams wrote:
->> >> On Tue, May 12, 2015 at 8:37 AM, Maxime Ripard
->> >> <maxime.ripard@free-electrons.com> wrote:
->> >> > Hi,
->> >> >
->> >> > This serie refactors the mv_xor in order to support the latest Armada
->> >> > 38x features, including the PQ support in order to offload the RAID6
->> >> > PQ operations.
->> >> >
->> >> > Not all the PQ operations are supported by the XOR engine, so we had
->> >> > to introduce new async_tx flags in the process to identify
->> >> > un-supported operations.
->> >> >
->> >> > Please note that this is currently not usable because of a possible
->> >> > regression in the RAID stack in 4.1 that is being discussed at the
->> >> > moment here: https://lkml.org/lkml/2015/5/7/527
->> >>
->> >> This is problematic as async_tx is a wart on the dmaengine subsystem
->> >> and needs to be deprecated, I just have yet to find the time to do
->> >> that work.  It turns out it was a mistake to hide the device details
->> >> from md, it should be explicitly managing the dma channels, not
->> >> relying on a abstraction api.  The async_tx api usage of the
->> >> dma-mapping api is broken in that it relies on overlapping mappings of
->> >> the same address.  This happens to work on x86, but on arm it needs
->> >> explicit non-overlapping mappings.  I started the work to reference
->> >> count dma-mappings in 3.13, and we need to teach md to use
->> >> dmaengine_unmap_data explicitly.  Yielding dma channel management to
->> >> md also results in a more efficient implementation as we can dma_map()
->> >> the stripe cache once rather than per-io.  The  "async_tx_ack()"
->> >> disaster can also go away when md is explicitly handling channel
->> >> switching.
->> >
->> > Even though I'd be very much in favor of deprecating / removing
->> > async_tx, is it something likely to happen soon?
->>
->> Not unless someone else takes it on, I'm actively asking for help.
->>
->> > I remember discussing this with Vinod at Plumbers back in October, but
->> > haven't seen anything since then.
->>
->> Right, "help!" :)
->>
->> > If not, I think that we shouldn't really hold back patches to
->> > async_tx, even though we know than in a year from now, it's going to
->> > be gone.
->>
->> We definitely should block new usages, because they make a bad
->> situation worse.  Russell already warned that the dma_mapping api
->> abuse could lead to data corruption on ARM (speculative pre-fetching).
->> We need to mark ASYNC_TX_DMA as "depends on !ARM" or even "depends on
->> BROKEN" until we can get this resolved.
->
-> I'm not sure what the issues exactly are with async_tx and ARM, but
-> these patches have been tested on ARM and are working quite well.
+Make the threshold at which the output entropy pools are considered to
+be initialized configurable via a kernel command line option. The
+current integer value of 128 bits is a good default value. However, some
+user groups may want to use different values. For example, the SOGIS
+group now requires 125 bits at least (BSI, the participant at that group
+used to require 100 bits). NIST moved from 80 bits to 112 bits starting
+with 2014.
 
-https://lkml.org/lkml/2011/7/8/363
+It is therefore to be expected that in the future, this threshold may
+increase for different user groups.
 
-> What I'm doing here is merely using the existing API, I'm not making
-> it worse, just using the API that is used by numerous drivers
-> already. So I'm not sure this is really reasonable to ask for such a
-> huge rework (with a huge potential of regressions) before merging my
-> patches.
+CC: Ted Tso <tytso@mit.edu>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ Documentation/kernel-parameters.txt |  7 +++++++
+ drivers/char/random.c               | 26 +++++++++++++++++++++++++-
+ 2 files changed, 32 insertions(+), 1 deletion(-)
 
-It happens.
-
-https://lwn.net/Articles/641443/
-
-I'm not happy about not having had the time to do this rework myself.
-Linux is better off with this api deprecated.
+diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
+index 61ab162..bc6c6f1 100644
+--- a/Documentation/kernel-parameters.txt
++++ b/Documentation/kernel-parameters.txt
+@@ -2965,6 +2965,13 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
+ 	ramdisk_size=	[RAM] Sizes of RAM disks in kilobytes
+ 			See Documentation/blockdev/ramdisk.txt.
+ 
++	random_initialized= [KNL] Set the threshold in bits at which the
++			Linux random number generator considers an output
++			entropy pool initialized.
++			Format: <int> (must be >= 112 and <= size of output
++				       entropy pool in bits)
++			Default: 128
++
+ 	rcu_nocbs=	[KNL]
+ 			In kernels built with CONFIG_RCU_NOCB_CPU=y, set
+ 			the specified list of CPUs to be no-callback CPUs.
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 9cd6968..cfe4d9b 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -317,6 +317,12 @@ static int random_write_wakeup_bits = 28 * OUTPUT_POOL_WORDS;
+ static int random_min_urandom_seed = 60;
+ 
+ /*
++ * Threshold of entropy at which an entropy pool is considered to be
++ * initialized.
++ */
++static int random_initialized_threshold = 128;
++
++/*
+  * Originally, we used a primitive polynomial of degree .poolwords
+  * over GF(2).  The taps for various sizes are defined below.  They
+  * were chosen to be evenly spaced except for the last tap, which is 1
+@@ -655,7 +661,8 @@ retry:
+ 		goto retry;
+ 
+ 	r->entropy_total += nbits;
+-	if (!r->initialized && r->entropy_total > 128) {
++	if (!r->initialized &&
++	    r->entropy_total > random_initialized_threshold) {
+ 		r->initialized = 1;
+ 		r->entropy_total = 0;
+ 		if (r == &nonblocking_pool) {
+@@ -938,6 +945,23 @@ void add_disk_randomness(struct gendisk *disk)
+ EXPORT_SYMBOL_GPL(add_disk_randomness);
+ #endif
+ 
++/* Process kernel command-line parameter at boot time. */
++static __init int random_initalized_cmdline(char *str)
++{
++	unsigned long thresh = simple_strtoul(str, NULL, 10);
++
++	if (thresh < 112)
++		thresh = 112;
++	if (thresh > OUTPUT_POOL_WORDS * 32)
++		thresh = OUTPUT_POOL_WORDS * 32;
++	random_initialized_threshold = thresh;
++	pr_notice("random: entropy pool initialization threshold set to %d bits\n",
++		  random_initialized_threshold);
++	return 1;
++}
++
++__setup("random_initialized=", random_initalized_cmdline);
++
+ /*********************************************************************
+  *
+  * Entropy extraction routines
+-- 
+2.1.0
