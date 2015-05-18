@@ -1,65 +1,54 @@
-From: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Subject: Re: [PATCH v9 4/4] crypto: Add Allwinner Security
- System crypto accelerator
-Date: Mon, 18 May 2015 09:24:49 +0200
-Message-ID: <20150518092449.2364d21e@bbrezillon>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v9 4/4] crypto: Add Allwinner Security System crypto
+ accelerator
+Date: Mon, 18 May 2015 16:33:08 +0800
+Message-ID: <20150518083308.GB18195@gondor.apana.org.au>
 References: <1431608341-10936-1-git-send-email-clabbe.montjoie@gmail.com>
-	<1431608341-10936-5-git-send-email-clabbe.montjoie@gmail.com>
-	<20150517104508.468b032f@bbrezillon>
-	<20150517103440.GA7800@gondor.apana.org.au>
-	<20150517124811.797fab32@bbrezillon>
-	<20150518004121.GA11910@gondor.apana.org.au>
-Reply-To: boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org
+ <1431608341-10936-5-git-send-email-clabbe.montjoie@gmail.com>
+ <20150517104508.468b032f@bbrezillon>
+ <20150517103440.GA7800@gondor.apana.org.au>
+ <20150517124811.797fab32@bbrezillon>
+ <20150518004121.GA11910@gondor.apana.org.au>
+ <20150518092449.2364d21e@bbrezillon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
- pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org, ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org,
- galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
- linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
- gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
- tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
- linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Return-path: <linux-sunxi+bncBCIPJ6FA2QLBBRVH42VAKGQEGLKUJXY-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <20150518004121.GA11910-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <http://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <http://groups.google.com/group/linux-sunxi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: LABBE Corentin <clabbe.montjoie@gmail.com>, robh+dt@kernel.org,
+	pawel.moll@arm.com, mark.rutland@arm.com,
+	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
+	maxime.ripard@free-electrons.com, linux@arm.linux.org.uk,
+	davem@davemloft.net, akpm@linux-foundation.org,
+	gregkh@linuxfoundation.org, mchehab@osg.samsung.com,
+	joe@perches.com, tj@kernel.org, arnd@arndb.de,
+	devicetree@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-sunxi@googlegroups.com
+To: Boris Brezillon <boris.brezillon@free-electrons.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:60278 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752396AbbERId7 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 18 May 2015 04:33:59 -0400
+Content-Disposition: inline
+In-Reply-To: <20150518092449.2364d21e@bbrezillon>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
-
-On Mon, 18 May 2015 08:41:21 +0800
-Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org> wrote:
-
-> On Sun, May 17, 2015 at 12:48:11PM +0200, Boris Brezillon wrote:
-> > 
-> > Yep, but then they shouldn't be declared with CRYPTO_ALG_ASYNC and as an
-
-                                                                  not ^
-
-> > ablkcipher algorithm (*Asynchronous* Block Cipher), right ?
+On Mon, May 18, 2015 at 09:24:49AM +0200, Boris Brezillon wrote:
 > 
-> Right.  They can still use ablkcipher but should clear the ASYNC
-> bit.
+> Okay, just to be sure, what does "Asynchronous" mean in ablkcipher or
+> ahash ?
+> Is it related to the fact that crypto operations can be done in
+> multiple steps (e.g.: one set_key + several encrypt chunk operations),
+> or is this something else ?
 
-Okay, just to be sure, what does "Asynchronous" mean in ablkcipher or
-ahash ?
-Is it related to the fact that crypto operations can be done in
-multiple steps (e.g.: one set_key + several encrypt chunk operations),
-or is this something else ?
+It gives you the ability to postpone the processing.  However
+it doesn't mean that you have to postpone the processing.  For
+instance, all of our sync software algorithms are also available
+through the async interface for obvious reasons.
 
-Best Regards,
-
-Boris
-
+Cheers,
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
