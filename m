@@ -1,33 +1,28 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: remove 842-nx null checks
-Date: Mon, 18 May 2015 12:25:39 +0800
-Message-ID: <20150518042539.GA13238@gondor.apana.org.au>
-References: <20150515070424.GA17008@gondor.apana.org.au>
- <1431702453-12118-1-git-send-email-ddstreet@ieee.org>
+Subject: Re: [PATCH 1/6] crypto: md5: add MD5 initial vectors
+Date: Mon, 18 May 2015 12:25:54 +0800
+Message-ID: <20150518042554.GB13238@gondor.apana.org.au>
+References: <1431860057-5232-1-git-send-email-clabbe.montjoie@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@oracle.com>
-To: Dan Streetman <ddstreet@ieee.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:35883 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750720AbbEREZp (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 18 May 2015 00:25:45 -0400
+Cc: davem@davemloft.net, ralf@linux-mips.org, benh@kernel.crashing.org,
+	paulus@samba.org, mpe@ellerman.id.au, aaro.koskinen@iki.fi,
+	linux-crypto@vger.kernel.org, linux-mips@linux-mips.org,
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	sparclinux@vger.kernel.org
+To: LABBE Corentin <clabbe.montjoie@gmail.com>
+Return-path: <sparclinux-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1431702453-12118-1-git-send-email-ddstreet@ieee.org>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1431860057-5232-1-git-send-email-clabbe.montjoie@gmail.com>
+Sender: sparclinux-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, May 15, 2015 at 11:07:33AM -0400, Dan Streetman wrote:
-> Remove the null checks for tfm, src, slen, dst, dlen; tfm will never
-> be null and the other fields are always expected to be set correctly.
+On Sun, May 17, 2015 at 12:54:12PM +0200, LABBE Corentin wrote:
+> This patch simply adds the MD5 IV in the md5 header.
 > 
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+> Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
 
-Applied.
+All applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
