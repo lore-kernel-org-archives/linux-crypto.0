@@ -1,53 +1,49 @@
-From: LABBE Corentin <clabbe.montjoie@gmail.com>
-Subject: [PATCH 3/6] crypto: powerpc/md5: use md5 IV MD5_HX instead of their raw value
-Date: Sun, 17 May 2015 12:54:14 +0200
-Message-ID: <1431860057-5232-3-git-send-email-clabbe.montjoie@gmail.com>
-References: <1431860057-5232-1-git-send-email-clabbe.montjoie@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-mips@linux-mips.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        sparclinux@vger.kernel.org,
-        LABBE Corentin <clabbe.montjoie@gmail.com>
-To: herbert@gondor.apana.org.au, davem@davemloft.net,
-        ralf@linux-mips.org, benh@kernel.crashing.org, paulus@samba.org,
-        mpe@ellerman.id.au, aaro.koskinen@iki.fi
-Return-path: <linux-mips-bounce@linux-mips.org>
-In-Reply-To: <1431860057-5232-1-git-send-email-clabbe.montjoie@gmail.com>
-Sender: linux-mips-bounce@linux-mips.org
-Errors-to: linux-mips-bounce@linux-mips.org
-List-help: <mailto:ecartis@linux-mips.org?Subject=help>
-List-unsubscribe: <mailto:ecartis@linux-mips.org?subject=unsubscribe%20linux-mips>
-List-software: Ecartis version 1.0.0
-List-subscribe: <mailto:ecartis@linux-mips.org?subject=subscribe%20linux-mips>
-List-owner: <mailto:ralf@linux-mips.org>
-List-post: <mailto:linux-mips@linux-mips.org>
-List-archive: <http://www.linux-mips.org/archives/linux-mips/>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v9 4/4] crypto: Add Allwinner Security
+ System crypto accelerator
+Date: Mon, 18 May 2015 08:41:21 +0800
+Message-ID: <20150518004121.GA11910@gondor.apana.org.au>
+References: <1431608341-10936-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1431608341-10936-5-git-send-email-clabbe.montjoie@gmail.com>
+ <20150517104508.468b032f@bbrezillon>
+ <20150517103440.GA7800@gondor.apana.org.au>
+ <20150517124811.797fab32@bbrezillon>
+Reply-To: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
+	pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+	ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+	maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
+	davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org,
+	joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org, tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org,
+	devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Return-path: <linux-sunxi+bncBDTY5EWUQMEBB47K4SVAKGQEEH7ISKQ-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20150517124811.797fab32@bbrezillon>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
 List-Id: linux-crypto.vger.kernel.org
 
-Since MD5 IV are now available in crypto/md5.h, use them.
+On Sun, May 17, 2015 at 12:48:11PM +0200, Boris Brezillon wrote:
+> 
+> Yep, but then they shouldn't be declared with CRYPTO_ALG_ASYNC and as an
+> ablkcipher algorithm (*Asynchronous* Block Cipher), right ?
 
-Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
----
- arch/powerpc/crypto/md5-glue.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Right.  They can still use ablkcipher but should clear the ASYNC
+bit.
 
-diff --git a/arch/powerpc/crypto/md5-glue.c b/arch/powerpc/crypto/md5-glue.c
-index 452fb4d..9228967 100644
---- a/arch/powerpc/crypto/md5-glue.c
-+++ b/arch/powerpc/crypto/md5-glue.c
-@@ -37,10 +37,10 @@ static int ppc_md5_init(struct shash_desc *desc)
- {
- 	struct md5_state *sctx = shash_desc_ctx(desc);
- 
--	sctx->hash[0] = 0x67452301;
--	sctx->hash[1] = 0xefcdab89;
--	sctx->hash[2] = 0x98badcfe;
--	sctx->hash[3] =	0x10325476;
-+	sctx->hash[0] = MD5_H0;
-+	sctx->hash[1] = MD5_H1;
-+	sctx->hash[2] = MD5_H2;
-+	sctx->hash[3] =	MD5_H3;
- 	sctx->byte_count = 0;
- 
- 	return 0;
+Cheers,
 -- 
-2.3.6
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
