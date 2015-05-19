@@ -1,47 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2] crypto: allow to assign gfp_t for
- __crypto_alloc_tfm
-Date: Tue, 19 May 2015 14:32:50 +0800
-Message-ID: <20150519063250.GB28347@gondor.apana.org.au>
-References: <1432014416-39326-1-git-send-email-jaegeuk@kernel.org>
-	<20150519054945.GA28060@gondor.apana.org.au>
-	<20150519062430.GA39588@jaegeuk-mac02.hsd1.ca.comcast.net>
-	<20150519063142.GA39834@jaegeuk-mac02.hsd1.ca.comcast.net>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v6 1/5] random: Blocking API for accessing nonblocking_pool
+Date: Tue, 19 May 2015 07:58:25 +0200
+Message-ID: <6511355.kQJsTdtLzf@tachyon.chronox.de>
+References: <1921857.OvxEu6y28S@tachyon.chronox.de> <2931045.EGfWxfUOa7@tauon> <20150518150234.GA4180@thunk.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: ecryptfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-crypto@vger.kernel.org, linux-ext4@vger.kernel.org,
-	davem@davemloft.net, linux-arm-kernel@lists.infradead.org
-To: Jaegeuk Kim <jaegeuk@kernel.org>
-Return-path: <linux-f2fs-devel-bounces@lists.sourceforge.net>
-Content-Disposition: inline
-In-Reply-To: <20150519063142.GA39834@jaegeuk-mac02.hsd1.ca.comcast.net>
-List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
-	<mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=unsubscribe>
-List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum_name=linux-f2fs-devel>
-List-Post: <mailto:linux-f2fs-devel@lists.sourceforge.net>
-List-Help: <mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=help>
-List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel>,
-	<mailto:linux-f2fs-devel-request@lists.sourceforge.net?subject=subscribe>
-Errors-To: linux-f2fs-devel-bounces@lists.sourceforge.net
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 7Bit
+Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org,
+	sandyinchina@gmail.com, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+To: Theodore Ts'o <tytso@mit.edu>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:34837 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750767AbbESGsx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 May 2015 02:48:53 -0400
+In-Reply-To: <20150518150234.GA4180@thunk.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, May 18, 2015 at 11:31:42PM -0700, Jaegeuk Kim wrote:
->  Change log from v1:
->   - fix missing change
+Am Montag, 18. Mai 2015, 11:02:34 schrieb Theodore Ts'o:
 
-Please do not resend your patch until you have addressed my
-questions.
+Hi Theodore, Herbert,
+> 
+> The simplest thing to do is to put a refcount on inside the DRBG
+> handle structure.  The caller instantiates the DRBG handle, and
+> invokes the the DRBG.  The DRBG, since it is kicking off an
+> asynchronous operation, increments the refcount.
+
+That is a good idea. After experimenting with the refcount, I see that kernel 
+crypto API release function of crypto_destroy_tfm unconditionally destroys the 
+crypto handle by freeing it.
+
+So, if a caller releases the DRBG handle, the DRBG code cannot prevent the 
+destruction of its context with a refcount.
+
+Herbert, do you have any ideas?
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
-------------------------------------------------------------------------------
-One dashboard for servers and applications across Physical-Virtual-Cloud 
-Widest out-of-the-box monitoring support with 50+ applications
-Performance metrics, stats and reports that give you Actionable Insights
-Deep dive visibility with transaction tracing using APM Insight.
-http://ad.doubleclick.net/ddm/clk/290420510;117567292;y
+Ciao
+Stephan
