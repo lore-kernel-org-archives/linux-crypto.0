@@ -1,39 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: allow to assign gfp_t for __crypto_alloc_tfm
-Date: Tue, 19 May 2015 15:15:21 +0800
-Message-ID: <20150519071521.GA28862@gondor.apana.org.au>
-References: <1432014416-39326-1-git-send-email-jaegeuk@kernel.org>
- <20150519054945.GA28060@gondor.apana.org.au>
- <20150519062430.GA39588@jaegeuk-mac02.hsd1.ca.comcast.net>
- <20150519063211.GA28347@gondor.apana.org.au>
- <20150519065812.GA40012@jaegeuk-mac02.hsd1.ca.comcast.net>
- <20150519065929.GA28610@gondor.apana.org.au>
- <20150519071317.GB40012@jaegeuk-mac02.hsd1.ca.comcast.net>
+Subject: Re: [PATCH v6 1/5] random: Blocking API for accessing
+ nonblocking_pool
+Date: Tue, 19 May 2015 15:22:27 +0800
+Message-ID: <20150519072227.GA28837@gondor.apana.org.au>
+References: <1921857.OvxEu6y28S@tachyon.chronox.de>
+ <2931045.EGfWxfUOa7@tauon>
+ <20150518150234.GA4180@thunk.org>
+ <6511355.kQJsTdtLzf@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, ecryptfs@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-To: Jaegeuk Kim <jaegeuk@kernel.org>
-Return-path: <ecryptfs-owner@vger.kernel.org>
+Cc: Theodore Ts'o <tytso@mit.edu>, pebolle@tiscali.nl,
+	andreas.steffen@strongswan.org, sandyinchina@gmail.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:47035 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754354AbbESHWm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 May 2015 03:22:42 -0400
 Content-Disposition: inline
-In-Reply-To: <20150519071317.GB40012@jaegeuk-mac02.hsd1.ca.comcast.net>
-Sender: ecryptfs-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <6511355.kQJsTdtLzf@tachyon.chronox.de>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 19, 2015 at 12:13:17AM -0700, Jaegeuk Kim wrote:
->
-> The key generation is done by ext4_generate_encryption_key in
-> fs/ext4/crypto_key.c.
-> And, ext4_file_mmap and ext4_file_open trigger it.
+On Tue, May 19, 2015 at 07:58:25AM +0200, Stephan Mueller wrote:
+> 
+> Herbert, do you have any ideas?
 
-Well that's where you should be doing crypto_alloc_ablkcipher
-and crypto_ablkcipher_setkey.
+On the /dev/random side,
 
-The whole point of a crypto tfm is to represent a key so any time
-you get one you should create a crypto tfm.  Carrying around a raw
-key is just wrong.
+1) Add a struct module argument in addition to func/data.
+2) Grab module ref count when func/data is registered.
+3) Drop module ref count after func returns.
+
+On the drbg side,
+
+1) Allocate data pointer before func/data registration, it should
+contain a flag indicating whether drbg is still alive.
+2) In cra_exit, zap the flag in allocated data.
+3) In func immediately return if flag indicates drbg is dead.
+4) Free allocated data pointer when func is done.
+
+Obviously you need to add some locking so that func doesn't race
+against cra_exit or any other drbg paths that it intersects.
 
 Cheers,
 -- 
