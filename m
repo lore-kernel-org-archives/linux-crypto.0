@@ -1,43 +1,64 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v6 1/5] random: Blocking API for accessing nonblocking_pool
-Date: Tue, 19 May 2015 07:58:25 +0200
-Message-ID: <6511355.kQJsTdtLzf@tachyon.chronox.de>
-References: <1921857.OvxEu6y28S@tachyon.chronox.de> <2931045.EGfWxfUOa7@tauon> <20150518150234.GA4180@thunk.org>
+From: Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: Re: [PATCH] crypto: allow to assign gfp_t for __crypto_alloc_tfm
+Date: Mon, 18 May 2015 23:58:12 -0700
+Message-ID: <20150519065812.GA40012@jaegeuk-mac02.hsd1.ca.comcast.net>
+References: <1432014416-39326-1-git-send-email-jaegeuk@kernel.org>
+ <20150519054945.GA28060@gondor.apana.org.au>
+ <20150519062430.GA39588@jaegeuk-mac02.hsd1.ca.comcast.net>
+ <20150519063211.GA28347@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org,
-	sandyinchina@gmail.com, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-To: Theodore Ts'o <tytso@mit.edu>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, ecryptfs@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34837 "EHLO mail.eperm.de"
+Received: from mail.kernel.org ([198.145.29.136]:59645 "EHLO mail.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750767AbbESGsx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 May 2015 02:48:53 -0400
-In-Reply-To: <20150518150234.GA4180@thunk.org>
+	id S1751070AbbESG6R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 May 2015 02:58:17 -0400
+Content-Disposition: inline
+In-Reply-To: <20150519063211.GA28347@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 18. Mai 2015, 11:02:34 schrieb Theodore Ts'o:
-
-Hi Theodore, Herbert,
+On Tue, May 19, 2015 at 02:32:11PM +0800, Herbert Xu wrote:
+> On Mon, May 18, 2015 at 11:24:30PM -0700, Jaegeuk Kim wrote:
+> >
+> > The call path in fs/ext4/crypto.c is:
+> >  - writepage
+> >   - ext4_encrypt
+> >    - ext4_get_crypto_ctx
+> >     - crypto_alloc_ablkcipher
+> > 
+> > AFAIK, this way can achieve to reduce memory footprint gracefully.
+> > Just before submitting bios, fs allocates the required memory, and then end_io
+> > will free them in pair.
 > 
-> The simplest thing to do is to put a refcount on inside the DRBG
-> handle structure.  The caller instantiates the DRBG handle, and
-> invokes the the DRBG.  The DRBG, since it is kicking off an
-> asynchronous operation, increments the refcount.
+> So where does the key get generated? The crypto tfm should be
+> allocated when you generate the key.
 
-That is a good idea. After experimenting with the refcount, I see that kernel 
-crypto API release function of crypto_destroy_tfm unconditionally destroys the 
-crypto handle by freeing it.
+In fs/ext4/crypto.c,
 
-So, if a caller releases the DRBG handle, the DRBG code cannot prevent the 
-destruction of its context with a refcount.
+ - writepage
+   - ext4_encrypt
+     - ext4_get_crypto_ctx
+       - crypto_alloc_ablkcipher
+     - ext4_page_crypto
+       - crypto_ablkcipher_setkey
+       - ablkcipher_request_alloc(GFP_NOFS)
+       - ablkcipher_request_set_crypt(PAGE_CACHE_SIZE)
+       - crypto_ablkcipher_encrypt
 
-Herbert, do you have any ideas?
+ - end_io
+   - crypto_free_tfm
 
--- 
-Ciao
-Stephan
+Thanks,
+
+> 
+> Cheers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
