@@ -1,61 +1,51 @@
-From: Jaegeuk Kim <jaegeuk@kernel.org>
-Subject: Re: [PATCH] crypto: allow to assign gfp_t for __crypto_alloc_tfm
-Date: Tue, 19 May 2015 00:59:05 -0700
-Message-ID: <20150519075905.GA40521@jaegeuk-mac02.hsd1.ca.comcast.net>
-References: <1432014416-39326-1-git-send-email-jaegeuk@kernel.org>
- <20150519054945.GA28060@gondor.apana.org.au>
- <20150519062430.GA39588@jaegeuk-mac02.hsd1.ca.comcast.net>
- <20150519063211.GA28347@gondor.apana.org.au>
- <20150519065812.GA40012@jaegeuk-mac02.hsd1.ca.comcast.net>
- <20150519065929.GA28610@gondor.apana.org.au>
- <20150519071317.GB40012@jaegeuk-mac02.hsd1.ca.comcast.net>
- <20150519071521.GA28862@gondor.apana.org.au>
- <20150519072740.GA40281@jaegeuk-mac02.hsd1.ca.comcast.net>
- <20150519073012.GA29030@gondor.apana.org.au>
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH v6 1/5] random: Blocking API for accessing
+ nonblocking_pool
+Date: Tue, 19 May 2015 09:50:28 -0400
+Message-ID: <20150519135028.GC20421@thunk.org>
+References: <1921857.OvxEu6y28S@tachyon.chronox.de>
+ <6511355.kQJsTdtLzf@tachyon.chronox.de>
+ <20150519072227.GA28837@gondor.apana.org.au>
+ <2404915.vbuKFfjVR8@tachyon.chronox.de>
+ <20150519075155.GA29242@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, ecryptfs@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
+Cc: Stephan Mueller <smueller@chronox.de>, pebolle@tiscali.nl,
+	andreas.steffen@strongswan.org, sandyinchina@gmail.com,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:35991 "EHLO mail.kernel.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754440AbbESH7I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 May 2015 03:59:08 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150519073012.GA29030@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20150519075155.GA29242@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Tue, May 19, 2015 at 03:30:12PM +0800, Herbert Xu wrote:
-> On Tue, May 19, 2015 at 12:27:40AM -0700, Jaegeuk Kim wrote:
-> >
-> > So, IMHO, it can consume memory too much, since tfm should be allocated for
-> > every inodes and be alive until inode eviction.
+On Tue, May 19, 2015 at 03:51:55PM +0800, Herbert Xu wrote:
+> On Tue, May 19, 2015 at 09:35:15AM +0200, Stephan Mueller wrote:
+> > 
+> > Thank you for the hints. I will follow your guidance.
+> > 
+> > Just for my edification: why is this (rather complex sounding) approach 
+> > preferred over a simple cancel API? Other async APIs (e.g. the AIO syscalls 
+> > with io_cancel) have such cancel operations.
+> > 
+> > Such cancel function would be as simple as:
 > 
-> Are you sure this is a real problem? Have you actually looked at
-> how much memory it consumes?
+> You're right.  The cancel function is indeed simpler.  I can
+> certainly live with that.
 
-I didn't measure the memory footprint. I can't tell it is a real problem,
-but at least, I hope it can reduce somewhat memory consumption.
-Because, already per-inode crypto structure consumes at least 84 bytes.
+I'm not at all convinced it's simpler.  I see it add a huge amount of
+hair to drivers/char/random.c that is only used by a single caller.
 
-> 
-> > Apart from giving GFP_NOFS, do you mean that it is a wrong approach?
-> 
-> Allocating the tfm and setting a key on the data path is not
-> acceptable.
+I'm also not sure I understand herbert's suggstion of adding a struct
+module to the /dev/random code.  Why is this helpful, and what is the
+race that you are trying to protect against?
 
-Ok, I'll check it again and investigate in more detail how not to break
-this rule.
+Finally, this is only going to block *once*, when the system is
+initially botting up.  Why is it so important that we get the
+asynchronous nature of this right, and why can't we solve it simply by
+just simply doing the work in a workqueue, with a completion barrier
+getting triggered once /dev/random initializes itself, and just simply
+blocking the module unload until /dev/random is initialized?
 
-Thank you very much for the comments.
-
-> 
-> Cheers,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	     	    	   	 	     - Ted
