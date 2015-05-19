@@ -1,33 +1,61 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v6 1/5] random: Blocking API for accessing nonblocking_pool
-Date: Tue, 19 May 2015 09:56:20 +0200
-Message-ID: <3206340.zt3CC7Msc7@tauon>
-References: <1921857.OvxEu6y28S@tachyon.chronox.de> <2404915.vbuKFfjVR8@tachyon.chronox.de> <20150519075155.GA29242@gondor.apana.org.au>
+From: Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: Re: [PATCH] crypto: allow to assign gfp_t for __crypto_alloc_tfm
+Date: Tue, 19 May 2015 00:59:05 -0700
+Message-ID: <20150519075905.GA40521@jaegeuk-mac02.hsd1.ca.comcast.net>
+References: <1432014416-39326-1-git-send-email-jaegeuk@kernel.org>
+ <20150519054945.GA28060@gondor.apana.org.au>
+ <20150519062430.GA39588@jaegeuk-mac02.hsd1.ca.comcast.net>
+ <20150519063211.GA28347@gondor.apana.org.au>
+ <20150519065812.GA40012@jaegeuk-mac02.hsd1.ca.comcast.net>
+ <20150519065929.GA28610@gondor.apana.org.au>
+ <20150519071317.GB40012@jaegeuk-mac02.hsd1.ca.comcast.net>
+ <20150519071521.GA28862@gondor.apana.org.au>
+ <20150519072740.GA40281@jaegeuk-mac02.hsd1.ca.comcast.net>
+ <20150519073012.GA29030@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Theodore Ts'o <tytso@mit.edu>, pebolle@tiscali.nl,
-	andreas.steffen@strongswan.org, sandyinchina@gmail.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, ecryptfs@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:34854 "EHLO mail.eperm.de"
+Received: from mail.kernel.org ([198.145.29.136]:35991 "EHLO mail.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753789AbbESH4Y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 19 May 2015 03:56:24 -0400
-In-Reply-To: <20150519075155.GA29242@gondor.apana.org.au>
+	id S1754440AbbESH7I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 19 May 2015 03:59:08 -0400
+Content-Disposition: inline
+In-Reply-To: <20150519073012.GA29030@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 19. Mai 2015, 15:51:55 schrieb Herbert Xu:
+On Tue, May 19, 2015 at 03:30:12PM +0800, Herbert Xu wrote:
+> On Tue, May 19, 2015 at 12:27:40AM -0700, Jaegeuk Kim wrote:
+> >
+> > So, IMHO, it can consume memory too much, since tfm should be allocated for
+> > every inodes and be alive until inode eviction.
+> 
+> Are you sure this is a real problem? Have you actually looked at
+> how much memory it consumes?
 
-Hi Herbert,
+I didn't measure the memory footprint. I can't tell it is a real problem,
+but at least, I hope it can reduce somewhat memory consumption.
+Because, already per-inode crypto structure consumes at least 84 bytes.
 
->You're right.  The cancel function is indeed simpler.  I can
->certainly live with that.
+> 
+> > Apart from giving GFP_NOFS, do you mean that it is a wrong approach?
+> 
+> Allocating the tfm and setting a key on the data path is not
+> acceptable.
 
-Thank you. I will test my patch a bit more and then release it with the 
-discussed changes.
+Ok, I'll check it again and investigate in more detail how not to break
+this rule.
 
-Ciao
-Stephan
+Thank you very much for the comments.
+
+> 
+> Cheers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
