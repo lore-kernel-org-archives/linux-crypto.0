@@ -1,50 +1,79 @@
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] random: add random_initialized command line param
-Date: Wed, 20 May 2015 11:06:42 -0400
-Message-ID: <20150520150642.GJ2871@thunk.org>
-References: <477328243.LmeEDk1ili@tauon>
- <20150518225807.GA25931@gondor.apana.org.au>
- <CACXcFmnZw9eS1EuokG54OYgCXnju2iD2q2o9miWmQMab5SJmDQ@mail.gmail.com>
- <3005024.K2tYVGR0qE@tauon>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH] crypto: allow to assign gfp_t for __crypto_alloc_tfm
+Date: Wed, 20 May 2015 17:30:14 +0200
+Message-ID: <CAKv+Gu_TDwaftr=f8yG8Vna8e+PcKGXD-uggP2oB-2Tq7DWMtA@mail.gmail.com>
+References: <20150519054945.GA28060@gondor.apana.org.au>
+	<20150519062430.GA39588@jaegeuk-mac02.hsd1.ca.comcast.net>
+	<20150519063211.GA28347@gondor.apana.org.au>
+	<20150519065812.GA40012@jaegeuk-mac02.hsd1.ca.comcast.net>
+	<20150519065929.GA28610@gondor.apana.org.au>
+	<20150519071317.GB40012@jaegeuk-mac02.hsd1.ca.comcast.net>
+	<20150519071521.GA28862@gondor.apana.org.au>
+	<20150519141430.GD20421@thunk.org>
+	<20150519142755.GB32663@gondor.apana.org.au>
+	<20150520072118.GN8928@secunet.com>
+	<20150520145901.GI2871@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Sandy Harris <sandyinchina@gmail.com>,
+Content-Type: text/plain; charset=UTF-8
+To: "Theodore Ts'o" <tytso@mit.edu>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	linux-ext4@vger.kernel.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-f2fs-devel@lists.sourceforge.net, ecryptfs@vger.kernel.org,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:47861 "EHLO imap.thunk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751861AbbETPGp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 May 2015 11:06:45 -0400
-Content-Disposition: inline
-In-Reply-To: <3005024.K2tYVGR0qE@tauon>
+Received: from mail-ig0-f177.google.com ([209.85.213.177]:35374 "EHLO
+	mail-ig0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754909AbbETPaP (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 20 May 2015 11:30:15 -0400
+Received: by igbyr2 with SMTP id yr2so105573735igb.0
+        for <linux-crypto@vger.kernel.org>; Wed, 20 May 2015 08:30:14 -0700 (PDT)
+In-Reply-To: <20150520145901.GI2871@thunk.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 20, 2015 at 08:29:19AM +0200, Stephan Mueller wrote:
-> 
-> But I see that such a change may not be warranted at this
-> point. Though, I see that discussion may rise again in the future
-> when such new requirements for 256 bit keys (not only AES, thanks
-> Sandy for mentioning :-) ) are commonly raised.
+On 20 May 2015 at 16:59, Theodore Ts'o <tytso@mit.edu> wrote:
+> On Wed, May 20, 2015 at 09:21:20AM +0200, Steffen Klassert wrote:
+>> The current pcrypt version is used just for IPsec because it supports
+>> only AEAD type algorithms and does not support request backlog. But
+>> I have patches to support ablkcipher algorithms and request backlog.
+>> I could provide them if there is interest in it.
+>
+> I don't know the crypto layer well enough, and I certainly don't know
+> how to deal with things like ARM CPU's with "big-little" architectures
+> to understand what we might need to do to power optimize things for
+> mobile handsets.  But if someone has time to look at this, that would
+> be great.
+>
 
-Given that you would need a 15,360-bit RSA key to have a key strength
-equivalent to a 256-bit key (and a 3072-bit RSA key is equivalent to
-128-bit symmetric keys, and there are plenty of people still using
-2048-bit keys), permit me to be a little skeptical about the value of
-256 bit keys for anything other than marketing value...
+I'd be interested in getting involved: I'm fairly intimate with the
+crypto layer and the ARM/arm64 architectures, since I wrote a big
+chunk of the ARM/arm64 CPU based crypto drivers.
 
-If you trust ECC, you'd "only" need a 7,680 bit ECC key.  But the ECC
-curves under discussion today are (at least) an order of magnitude
-smaller.
+However, it's quite a can of worms you're opening here. Speed is
+easily quantified, and it may even be feasible to introduce some kind
+of boottime benchmark to select the fastest implementation available
+(like already exists for xor and raid6, for instance).
+@Herbert: was something like this ever proposed? And would you
+consider merging it if it were implemented adequately?
 
-And if it's just to make gullible rubes feel safer, I don't see the
-real point of non-blocking random pool threshold larger than the
-safety of the whole system is constrainted by public key crypto.
+Power efficiency is *much* harder, since you're not only dealing with
+big.LITTLE, but also NEON versus ALU (i.e., SIMD math versus integer
+math) and CPU versus hw accelerator based crypto. (We have the NEON
+based bit sliced AES as an example: we know it does fundamentally more
+work by calculating values that the table based AES implementation
+reads from a lookup table, so while it is a lot faster on most NEON
+implementations, it is most likely not as power efficient) Even if it
+were possible to quantify the power efficiency in the first place,
+whether the most power efficient implementation should be preferred
+over the fastest one is a policy decision which does not really belong
+inside the kernel.
 
-> So, let us disregard the patch until hard requirements are coming up.
-
-Sounds like a fine idea to me.
-
-              				- Ted
+Are there any background materials or other references you can share
+that shed a bit more light on this?
