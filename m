@@ -1,68 +1,94 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [Linaro-acpi] [V4 PATCH 1/6] ACPI / scan: Parse _CCA and setup device coherency
-Date: Wed, 20 May 2015 14:04:02 +0200
-Message-ID: <5074701.G8z7gpKvin@wuerfel>
-References: <1431724994-21601-1-git-send-email-Suravee.Suthikulpanit@amd.com> <20150520100122.GD25313@e104818-lin.cambridge.arm.com> <555C7563.6080409@amd.com>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] documentation: change header file locations
+Date: Wed, 20 May 2015 15:21:54 +0200
+Message-ID: <2568733.jyKSVuFE5b@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
-Cc: Suravee Suthikulanit <suravee.suthikulpanit@amd.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	herbert@gondor.apana.org.au, rjw@rjwysocki.net,
-	will.deacon@arm.com, linux-kernel@vger.kernel.org,
-	linux-acpi@vger.kernel.org, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org, bhelgaas@google.com, davem@davemloft.net,
-	linux-arm-kernel@lists.infradead.org, lenb@kernel.org
-To: linaro-acpi@lists.linaro.org
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:56674 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751801AbbETMEr (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 May 2015 08:04:47 -0400
-In-Reply-To: <555C7563.6080409@amd.com>
+Received: from mail.eperm.de ([89.247.134.16]:57990 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753440AbbETNWt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 20 May 2015 09:22:49 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wednesday 20 May 2015 06:52:03 Suravee Suthikulanit wrote:
-> On 5/20/2015 5:01 AM, Catalin Marinas wrote:
-> > On Fri, May 15, 2015 at 04:23:09PM -0500, Suravee Suthikulpanit wrote:
-> >> +static inline bool acpi_dma_is_supported(struct acpi_device *adev)
-> >> +{
-> >> +    /**
-> >> +     * Currently, we mainly support _CCA=1 (i.e. is_coherent=1)
-> >> +     * This should be equivalent to specifyig dma-coherent for
-> >> +     * a device in OF.
-> >> +     *
-> >> +     * For the case when _CCA=0 (i.e. is_coherent=0 && cca_seen=1),
-> >> +     * There are two approaches:
-> >> +     * 1. Do not support and disable DMA.
-> >> +     * 2. Support but rely on arch-specific cache maintenance for
-> >> +     * non-coherence DMA operations. ARM64 is one example.
-> >> +     *
-> >> +     * For the case when _CCA is missing (i.e. cca_seen=0) but
-> >> +     * platform specifies ACPI_CCA_REQUIRED, we do not support DMA,
-> >> +     * and fallback to arch-specific default handling.
-> >> +     *
-> >> +     * See acpi_init_coherency() for more info.
-> >> +     */
-> >> +    return adev && (adev->flags.is_coherent ||
-> >> +                    (adev->flags.cca_seen && IS_ENABLED(CONFIG_ARM64)));
-> >> +}
-> >
-> > I don't particularly like the check for CONFIG_ARM64 here but I
-> > understand why it was added (I had the wrong impression that x86 can
-> > cope with _CCA = 0).
-> >
-> > Alternatively, we could leave it out (together with cca_seen) until
-> > someone comes forward with a real use-case for _CCA = 0 on arm64. One
-> > platform I'm aware of is Juno but even though it boot with ACPI, I
-> > wouldn't call it a server platform.
-> 
-> Ok. That seems to be what Arnd would prefer as well.  Let's just leave 
-> the support for _CCA=0 out until it is needed then.
-> 
+Due to the recent update of the kernel crypto API header files,
+locations of function definitions and their documentation have changed.
 
-Yes, that would be best (as I said repeatedly ;-) )
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ Documentation/DocBook/crypto-API.tmpl | 40 +++++++++++++++++------------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
 
-	Arnd
+diff --git a/Documentation/DocBook/crypto-API.tmpl b/Documentation/DocBook/crypto-API.tmpl
+index efc8d90..5b05510 100644
+--- a/Documentation/DocBook/crypto-API.tmpl
++++ b/Documentation/DocBook/crypto-API.tmpl
+@@ -1671,7 +1671,7 @@ read(opfd, out, outlen);
+   <chapter id="API"><title>Programming Interface</title>
+    <sect1><title>Block Cipher Context Data Structures</title>
+ !Pinclude/linux/crypto.h Block Cipher Context Data Structures
+-!Finclude/linux/crypto.h aead_request
++!Finclude/crypto/aead.h aead_request
+    </sect1>
+    <sect1><title>Block Cipher Algorithm Definitions</title>
+ !Pinclude/linux/crypto.h Block Cipher Algorithm Definitions
+@@ -1680,7 +1680,7 @@ read(opfd, out, outlen);
+ !Finclude/linux/crypto.h aead_alg
+ !Finclude/linux/crypto.h blkcipher_alg
+ !Finclude/linux/crypto.h cipher_alg
+-!Finclude/linux/crypto.h rng_alg
++!Finclude/crypto/rng.h rng_alg
+    </sect1>
+    <sect1><title>Asynchronous Block Cipher API</title>
+ !Pinclude/linux/crypto.h Asynchronous Block Cipher API
+@@ -1704,26 +1704,26 @@ read(opfd, out, outlen);
+ !Finclude/linux/crypto.h ablkcipher_request_set_crypt
+    </sect1>
+    <sect1><title>Authenticated Encryption With Associated Data (AEAD) Cipher API</title>
+-!Pinclude/linux/crypto.h Authenticated Encryption With Associated Data (AEAD) Cipher API
+-!Finclude/linux/crypto.h crypto_alloc_aead
+-!Finclude/linux/crypto.h crypto_free_aead
+-!Finclude/linux/crypto.h crypto_aead_ivsize
+-!Finclude/linux/crypto.h crypto_aead_authsize
+-!Finclude/linux/crypto.h crypto_aead_blocksize
+-!Finclude/linux/crypto.h crypto_aead_setkey
+-!Finclude/linux/crypto.h crypto_aead_setauthsize
+-!Finclude/linux/crypto.h crypto_aead_encrypt
+-!Finclude/linux/crypto.h crypto_aead_decrypt
++!Pinclude/crypto/aead.h Authenticated Encryption With Associated Data (AEAD) Cipher API
++!Finclude/crypto/aead.h crypto_alloc_aead
++!Finclude/crypto/aead.h crypto_free_aead
++!Finclude/crypto/aead.h crypto_aead_ivsize
++!Finclude/crypto/aead.h crypto_aead_authsize
++!Finclude/crypto/aead.h crypto_aead_blocksize
++!Finclude/crypto/aead.h crypto_aead_setkey
++!Finclude/crypto/aead.h crypto_aead_setauthsize
++!Finclude/crypto/aead.h crypto_aead_encrypt
++!Finclude/crypto/aead.h crypto_aead_decrypt
+    </sect1>
+    <sect1><title>Asynchronous AEAD Request Handle</title>
+-!Pinclude/linux/crypto.h Asynchronous AEAD Request Handle
+-!Finclude/linux/crypto.h crypto_aead_reqsize
+-!Finclude/linux/crypto.h aead_request_set_tfm
+-!Finclude/linux/crypto.h aead_request_alloc
+-!Finclude/linux/crypto.h aead_request_free
+-!Finclude/linux/crypto.h aead_request_set_callback
+-!Finclude/linux/crypto.h aead_request_set_crypt
+-!Finclude/linux/crypto.h aead_request_set_assoc
++!Pinclude/crypto/aead.h Asynchronous AEAD Request Handle
++!Finclude/crypto/aead.h crypto_aead_reqsize
++!Finclude/crypto/aead.h aead_request_set_tfm
++!Finclude/crypto/aead.h aead_request_alloc
++!Finclude/crypto/aead.h aead_request_free
++!Finclude/crypto/aead.h aead_request_set_callback
++!Finclude/crypto/aead.h aead_request_set_crypt
++!Finclude/crypto/aead.h aead_request_set_assoc
+    </sect1>
+    <sect1><title>Synchronous Block Cipher API</title>
+ !Pinclude/linux/crypto.h Synchronous Block Cipher API
+-- 
+2.1.0
