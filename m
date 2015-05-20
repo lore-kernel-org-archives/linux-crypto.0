@@ -1,42 +1,50 @@
 From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] crypto: allow to assign gfp_t for __crypto_alloc_tfm
-Date: Wed, 20 May 2015 10:59:01 -0400
-Message-ID: <20150520145901.GI2871@thunk.org>
-References: <20150519054945.GA28060@gondor.apana.org.au>
- <20150519062430.GA39588@jaegeuk-mac02.hsd1.ca.comcast.net>
- <20150519063211.GA28347@gondor.apana.org.au>
- <20150519065812.GA40012@jaegeuk-mac02.hsd1.ca.comcast.net>
- <20150519065929.GA28610@gondor.apana.org.au>
- <20150519071317.GB40012@jaegeuk-mac02.hsd1.ca.comcast.net>
- <20150519071521.GA28862@gondor.apana.org.au>
- <20150519141430.GD20421@thunk.org>
- <20150519142755.GB32663@gondor.apana.org.au>
- <20150520072118.GN8928@secunet.com>
+Subject: Re: [PATCH] random: add random_initialized command line param
+Date: Wed, 20 May 2015 11:06:42 -0400
+Message-ID: <20150520150642.GJ2871@thunk.org>
+References: <477328243.LmeEDk1ili@tauon>
+ <20150518225807.GA25931@gondor.apana.org.au>
+ <CACXcFmnZw9eS1EuokG54OYgCXnju2iD2q2o9miWmQMab5SJmDQ@mail.gmail.com>
+ <3005024.K2tYVGR0qE@tauon>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, ecryptfs@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Return-path: <ecryptfs-owner@vger.kernel.org>
+Cc: Sandy Harris <sandyinchina@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:47861 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751861AbbETPGp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 20 May 2015 11:06:45 -0400
 Content-Disposition: inline
-In-Reply-To: <20150520072118.GN8928@secunet.com>
-Sender: ecryptfs-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <3005024.K2tYVGR0qE@tauon>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 20, 2015 at 09:21:20AM +0200, Steffen Klassert wrote:
-> The current pcrypt version is used just for IPsec because it supports
-> only AEAD type algorithms and does not support request backlog. But
-> I have patches to support ablkcipher algorithms and request backlog.
-> I could provide them if there is interest in it.
+On Wed, May 20, 2015 at 08:29:19AM +0200, Stephan Mueller wrote:
+> 
+> But I see that such a change may not be warranted at this
+> point. Though, I see that discussion may rise again in the future
+> when such new requirements for 256 bit keys (not only AES, thanks
+> Sandy for mentioning :-) ) are commonly raised.
 
-I don't know the crypto layer well enough, and I certainly don't know
-how to deal with things like ARM CPU's with "big-little" architectures
-to understand what we might need to do to power optimize things for
-mobile handsets.  But if someone has time to look at this, that would
-be great.
+Given that you would need a 15,360-bit RSA key to have a key strength
+equivalent to a 256-bit key (and a 3072-bit RSA key is equivalent to
+128-bit symmetric keys, and there are plenty of people still using
+2048-bit keys), permit me to be a little skeptical about the value of
+256 bit keys for anything other than marketing value...
 
-					- Ted
+If you trust ECC, you'd "only" need a 7,680 bit ECC key.  But the ECC
+curves under discussion today are (at least) an order of magnitude
+smaller.
+
+And if it's just to make gullible rubes feel safer, I don't see the
+real point of non-blocking random pool threshold larger than the
+safety of the whole system is constrainted by public key crypto.
+
+> So, let us disregard the patch until hard requirements are coming up.
+
+Sounds like a fine idea to me.
+
+              				- Ted
