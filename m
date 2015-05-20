@@ -1,72 +1,58 @@
 From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [V4 PATCH 3/6] pci: Generic function for setting up PCI device
- DMA coherency
-Date: Wed, 20 May 2015 10:34:01 +0100
-Message-ID: <20150520093401.GC25313@e104818-lin.cambridge.arm.com>
+Subject: Re: [V4 PATCH 1/6] ACPI / scan: Parse _CCA and setup device coherency
+Date: Wed, 20 May 2015 11:01:22 +0100
+Message-ID: <20150520100122.GD25313@e104818-lin.cambridge.arm.com>
 References: <1431724994-21601-1-git-send-email-Suravee.Suthikulpanit@amd.com>
- <3954735.qeaTp8qOcM@vostro.rjw.lan>
- <20150520092415.GA25313@e104818-lin.cambridge.arm.com>
- <2072233.lIH4idDurI@wuerfel>
+ <1431724994-21601-2-git-send-email-Suravee.Suthikulpanit@amd.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org, linaro-acpi@lists.linaro.org,
-	will.deacon@arm.com, herbert@gondor.apana.org.au,
-	al.stone@linaro.org, linux-acpi@vger.kernel.org,
-	Murali Karicheri <m-karicheri2@ti.com>, msalter@redhat.com,
-	grant.likely@linaro.org, hanjun.guo@linaro.org,
-	thomas.lendacky@amd.com, Rob Herring <robh+dt@kernel.org>,
-	bhelgaas@google.com, netdev@vger.kernel.org,
-	"Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	linux-kernel@vger.kernel.org, leo.duran@amd.com,
-	linux-crypto@vger.kernel.org,
-	Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>,
-	lenb@kernel.org, David Woodhouse <dwmw2@infradead.org>,
-	davem@davemloft.net
-To: Arnd Bergmann <arnd@arndb.de>
-Return-path: <linux-acpi-owner@vger.kernel.org>
+Cc: rjw@rjwysocki.net, lenb@kernel.org, will.deacon@arm.com,
+	bhelgaas@google.com, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, arnd@arndb.de,
+	al.stone@linaro.org, linaro-acpi@lists.linaro.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-acpi@vger.kernel.org, leo.duran@amd.com,
+	hanjun.guo@linaro.org, msalter@redhat.com, grant.likely@linaro.org,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+To: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <2072233.lIH4idDurI@wuerfel>
-Sender: linux-acpi-owner@vger.kernel.org
+In-Reply-To: <1431724994-21601-2-git-send-email-Suravee.Suthikulpanit@amd.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 20, 2015 at 11:27:54AM +0200, Arnd Bergmann wrote:
-> On Wednesday 20 May 2015 10:24:15 Catalin Marinas wrote:
-> > On Sat, May 16, 2015 at 01:59:00AM +0200, Rafael J. Wysocki wrote:
-> > > On Friday, May 15, 2015 04:23:11 PM Suravee Suthikulpanit wrote:
-> > > > +/**
-> > > > + * pci_dma_configure - Setup DMA configuration
-> > > > + * @pci_dev: ptr to pci_dev struct of the PCI device
-> > > > + *
-> > > > + * Function to update PCI devices's DMA configuration using the same
-> > > > + * info from the OF node or ACPI node of host bridge's parent (if any).
-> > > > + */
-> > > > +static void pci_dma_configure(struct pci_dev *pci_dev)
-> > > > +{
-> > > > +   struct device *dev = &pci_dev->dev;
-> > > > +   struct device *bridge = pci_get_host_bridge_device(pci_dev);
-> > > > +   struct device *host = bridge->parent;
-> > > > +   struct acpi_device *adev;
-> > > > +
-> > > > +   if (!host)
-> > > > +           return;
-> > > > +
-> > > > +   if (acpi_disabled) {
-> > > > +           of_dma_configure(dev, host->of_node);
-> > > 
-> > > I'd rather do
-> > > 
-> > >       if (IS_ENABLED(CONFIG_OF) && host->of_node) {
-> > >               of_dma_configure(dev, host->of_node);
-> > 
-> > Nitpick: do we need the CONFIG_OF check? If disabled, I don't think
-> > anyone would set host->of_node.
-> 
-> If of_dma_configure() is defined in a file that is built conditionally
-> based on CONFIG_OF, you need it.
+On Fri, May 15, 2015 at 04:23:09PM -0500, Suravee Suthikulpanit wrote:
+> +static inline bool acpi_dma_is_supported(struct acpi_device *adev)
+> +{
+> +	/**
+> +	 * Currently, we mainly support _CCA=1 (i.e. is_coherent=1)
+> +	 * This should be equivalent to specifyig dma-coherent for
+> +	 * a device in OF.
+> +	 *
+> +	 * For the case when _CCA=0 (i.e. is_coherent=0 && cca_seen=1),
+> +	 * There are two approaches:
+> +	 * 1. Do not support and disable DMA.
+> +	 * 2. Support but rely on arch-specific cache maintenance for
+> +	 * non-coherence DMA operations. ARM64 is one example.
+> +	 *
+> +	 * For the case when _CCA is missing (i.e. cca_seen=0) but
+> +	 * platform specifies ACPI_CCA_REQUIRED, we do not support DMA,
+> +	 * and fallback to arch-specific default handling.
+> +	 *
+> +	 * See acpi_init_coherency() for more info.
+> +	 */
+> +	return adev && (adev->flags.is_coherent ||
+> +			(adev->flags.cca_seen && IS_ENABLED(CONFIG_ARM64)));
+> +}
 
-We have a dummy of_dma_configure() already when !CONFIG_OF, otherwise
-we would need #ifndef here. I already replied, I think for other
-architectures we need this check to avoid a useless host->of_node test.
+I don't particularly like the check for CONFIG_ARM64 here but I
+understand why it was added (I had the wrong impression that x86 can
+cope with _CCA = 0).
+
+Alternatively, we could leave it out (together with cca_seen) until
+someone comes forward with a real use-case for _CCA = 0 on arm64. One
+platform I'm aware of is Juno but even though it boot with ACPI, I
+wouldn't call it a server platform.
 
 -- 
 Catalin
