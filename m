@@ -1,79 +1,48 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [V4 PATCH 4/6] device property: Introduces
- device_dma_is_coherent()
-Date: Wed, 20 May 2015 11:28:29 +0100
-Message-ID: <20150520102829.GB11498@arm.com>
+From: Suravee Suthikulanit <suravee.suthikulpanit@amd.com>
+Subject: Re: [V4 PATCH 2/6] arm64 : Introduce support for ACPI _CCA object
+Date: Wed, 20 May 2015 06:51:34 -0500
+Message-ID: <555C7546.4040601@amd.com>
 References: <1431724994-21601-1-git-send-email-Suravee.Suthikulpanit@amd.com>
- <1431724994-21601-5-git-send-email-Suravee.Suthikulpanit@amd.com>
+ <1431724994-21601-3-git-send-email-Suravee.Suthikulpanit@amd.com>
+ <20150520100304.GE25313@e104818-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "rjw@rjwysocki.net" <rjw@rjwysocki.net>,
-	"lenb@kernel.org" <lenb@kernel.org>,
-	Catalin Marinas <Catalin.Marinas@arm.com>,
-	"bhelgaas@google.com" <bhelgaas@google.com>,
-	"thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"msalter@redhat.com" <msalter@redhat.com>,
-	"hanjun.guo@linaro.org" <hanjun.guo@linaro.org>,
-	"al.stone@linaro.org" <al.stone@linaro.org>,
-	"grant.likely@linaro.org" <grant.likely@linaro.org>,
-	"leo.duran@amd.com" <leo.duran@amd.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linaro-acpi@lists.linaro.org" <linaro-acpi@lists.linaro.org>,
-	"netdev@vger.kernel.org"
-To: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <rjw@rjwysocki.net>, <lenb@kernel.org>, <will.deacon@arm.com>,
+	<bhelgaas@google.com>, <thomas.lendacky@amd.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<arnd@arndb.de>, <al.stone@linaro.org>,
+	<linaro-acpi@lists.linaro.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-acpi@vger.kernel.org>,
+	<leo.duran@amd.com>, <hanjun.guo@linaro.org>, <msalter@redhat.com>,
+	<grant.likely@linaro.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-crypto@vger.kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
 Return-path: <linux-acpi-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1431724994-21601-5-git-send-email-Suravee.Suthikulpanit@amd.com>
+In-Reply-To: <20150520100304.GE25313@e104818-lin.cambridge.arm.com>
 Sender: linux-acpi-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Fri, May 15, 2015 at 10:23:12PM +0100, Suravee Suthikulpanit wrote:
-> Currently, device drivers, which support both OF and ACPI,
-> need to call two separate APIs, of_dma_is_coherent() and
-> acpi_dma_is_coherent()) to determine device coherency attribute.
-> 
-> This patch simplifies this process by introducing a new device
-> property API, device_dma_is_coherent(), which calls the appropriate
-> interface based on the booting architecture.
-> 
-> Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
-> CC: Rafael J. Wysocki <rjw@rjwysocki.net>
-> ---
->  drivers/base/property.c  | 12 ++++++++++++
->  include/linux/property.h |  2 ++
->  2 files changed, 14 insertions(+)
-> 
-> diff --git a/drivers/base/property.c b/drivers/base/property.c
-> index 1d0b116..8123c6e 100644
-> --- a/drivers/base/property.c
-> +++ b/drivers/base/property.c
-> @@ -14,6 +14,7 @@
->  #include <linux/export.h>
->  #include <linux/kernel.h>
->  #include <linux/of.h>
-> +#include <linux/of_address.h>
->  #include <linux/property.h>
->  
->  /**
-> @@ -519,3 +520,14 @@ unsigned int device_get_child_node_count(struct device *dev)
->  	return count;
->  }
->  EXPORT_SYMBOL_GPL(device_get_child_node_count);
-> +
-> +bool device_dma_is_coherent(struct device *dev)
-> +{
-> +	if (IS_ENABLED(CONFIG_OF) && dev->of_node)
-> +		return of_dma_is_coherent(dev->of_node);
-> +	else if (has_acpi_companion(dev))
-> +		return acpi_dma_is_coherent(acpi_node(dev->fwnode));
+On 5/20/2015 5:03 AM, Catalin Marinas wrote:
+> On Fri, May 15, 2015 at 04:23:10PM -0500, Suravee Suthikulpanit wrote:
+>>  From http://www.uefi.org/sites/default/files/resources/ACPI_6.0.pdf,
+>> section 6.2.17 _CCA states that ARM platforms require ACPI _CCA
+>> object to be specified for DMA-cabpable devices. This patch introduces
+>> ACPI_MUST_HAVE_CCA in arm64 Kconfig to specify such requirement.
+>>
+>> In case _CCA is missing, arm64 would assign dummy_dma_ops
+>> to disable DMA capability of the device.
+>>
+>> Signed-off-by: Mark Salter <msalter@redhat.com>
+>> Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+>> CC: Catalin Marinas <catalin.marinas@arm.com>
+>> CC: Will Deacon <will.deacon@arm.com>
+>> CC: Arnd Bergmann <arnd@arndb.de>
+>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+>
 
-I don't think you need the has_acpi_companion check, as acpi_node handles
-this and acpi_dma_is_coherent(NULL) returns false.
+Thanks,
 
-Will
+Suravee
+
