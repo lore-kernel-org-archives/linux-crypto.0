@@ -1,44 +1,56 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] random: add random_initialized command line param
-Date: Wed, 20 May 2015 08:29:19 +0200
-Message-ID: <3005024.K2tYVGR0qE@tauon>
-References: <477328243.LmeEDk1ili@tauon> <20150518225807.GA25931@gondor.apana.org.au> <CACXcFmnZw9eS1EuokG54OYgCXnju2iD2q2o9miWmQMab5SJmDQ@mail.gmail.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.1
+Date: Wed, 20 May 2015 14:54:41 +0800
+Message-ID: <20150520065441.GA8330@gondor.apana.org.au>
+References: <20130328082841.GA7425@gondor.apana.org.au>
+ <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20141231033217.GA27261@gondor.apana.org.au>
+ <20150107021737.GA25043@gondor.apana.org.au>
+ <20150425080310.GA6873@gondor.apana.org.au>
+ <20150505100621.GA8678@gondor.apana.org.au>
+ <20150511055608.GA2055@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>
-To: Sandy Harris <sandyinchina@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:57986 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752502AbbETG30 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 20 May 2015 02:29:26 -0400
-In-Reply-To: <CACXcFmnZw9eS1EuokG54OYgCXnju2iD2q2o9miWmQMab5SJmDQ@mail.gmail.com>
+Received: from helcar.hengli.com.au ([209.40.204.226]:60417 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751555AbbETGyz (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 20 May 2015 02:54:55 -0400
+Content-Disposition: inline
+In-Reply-To: <20150511055608.GA2055@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 19. Mai 2015, 18:40:20 schrieb Sandy Harris:
+Hi Linus:
 
-Hi Sandy,
->
->When we do do it, I see no reason to support anything other than 128
->and 256, and I am not sure about retaining 128. Nor do I see any
->reason this should be a command-line option rather than just a
->compile-time constant.
+This push fixes a the crash in the newly added algif_aead interface
+when it tries to link SG lists.
 
-I would hazard to guess that a compile time option is a bit difficult for 
-distributions which typically only want one kernel for all their user base. As 
-that user base is typically large, they would potentially be unable to please 
-everybody with a compile time option.
+Please pull from
 
-But I see that such a change may not be warranted at this point. Though, I see 
-that discussion may rise again in the future when such new requirements for 
-256 bit keys (not only AES, thanks Sandy for mentioning :-) ) are commonly 
-raised.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-So, let us disregard the patch until hard requirements are coming up.
+or
 
-Ciao
-Stephan
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Tadeusz Struk (1):
+      crypto: algif_aead - fix invalid sgl linking
+
+ crypto/algif_aead.c |    9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
