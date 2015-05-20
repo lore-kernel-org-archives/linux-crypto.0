@@ -1,7 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v7 1/5] random: Blocking API for accessing nonblocking_pool
-Date: Wed, 20 May 2015 19:44:39 +0200
-Message-ID: <143216583.t5fUODkLsI@tachyon.chronox.de>
+Subject: [PATCH v7 2/5] crypto: drbg - prepare for async seeding
+Date: Wed, 20 May 2015 19:45:04 +0200
+Message-ID: <1460591.8oSi4XhjYM@tachyon.chronox.de>
 References: <1693038.ndeE0L22jl@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -15,59 +15,168 @@ In-Reply-To: <1693038.ndeE0L22jl@tachyon.chronox.de>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-The added API calls provide a synchronous function call
-get_blocking_random_bytes where the caller is blocked until
-the nonblocking_pool is initialized.
+In order to prepare for the addition of the asynchronous seeding call,
+the invocation of seeding the DRBG is moved out into a helper function.
+
+In addition, a block of memory is allocated during initialization time
+that will be used as a scratchpad for obtaining entropy. That scratchpad
+is used for the initial seeding operation as well as by the
+asynchronous seeding call. The memory must be zeroized every time the
+DRBG seeding call succeeds to avoid entropy data lingering in memory.
 
 CC: Andreas Steffen <andreas.steffen@strongswan.org>
 CC: Theodore Ts'o <tytso@mit.edu>
 CC: Sandy Harris <sandyinchina@gmail.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/char/random.c  | 18 ++++++++++++++++++
- include/linux/random.h |  1 +
- 2 files changed, 19 insertions(+)
+ crypto/drbg.c         | 81 ++++++++++++++++++++++++++++++++++-----------------
+ include/crypto/drbg.h |  2 ++
+ 2 files changed, 56 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 9cd6968..3d1c027 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1245,6 +1245,24 @@ void get_random_bytes(void *buf, int nbytes)
- EXPORT_SYMBOL(get_random_bytes);
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 23d444e..36dfece 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1041,6 +1041,21 @@ static struct drbg_state_ops drbg_hash_ops = {
+  * Functions common for DRBG implementations
+  ******************************************************************/
+ 
++static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
++			      int reseed)
++{
++	int ret = drbg->d_ops->update(drbg, seed, reseed);
++
++	if (ret)
++		return ret;
++
++	drbg->seeded = true;
++	/* 10.1.1.2 / 10.1.1.3 step 5 */
++	drbg->reseed_ctr = 1;
++
++	return ret;
++}
++
+ /*
+  * Seeding or reseeding of the DRBG
+  *
+@@ -1056,8 +1071,6 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 		     bool reseed)
+ {
+ 	int ret = 0;
+-	unsigned char *entropy = NULL;
+-	size_t entropylen = 0;
+ 	struct drbg_string data1;
+ 	LIST_HEAD(seedlist);
+ 
+@@ -1073,26 +1086,10 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 				 drbg->test_data.len);
+ 		pr_devel("DRBG: using test entropy\n");
+ 	} else {
+-		/*
+-		 * Gather entropy equal to the security strength of the DRBG.
+-		 * With a derivation function, a nonce is required in addition
+-		 * to the entropy. A nonce must be at least 1/2 of the security
+-		 * strength of the DRBG in size. Thus, entropy * nonce is 3/2
+-		 * of the strength. The consideration of a nonce is only
+-		 * applicable during initial seeding.
+-		 */
+-		entropylen = drbg_sec_strength(drbg->core->flags);
+-		if (!entropylen)
+-			return -EFAULT;
+-		if (!reseed)
+-			entropylen = ((entropylen + 1) / 2) * 3;
+ 		pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
+-			 entropylen);
+-		entropy = kzalloc(entropylen, GFP_KERNEL);
+-		if (!entropy)
+-			return -ENOMEM;
+-		get_random_bytes(entropy, entropylen);
+-		drbg_string_fill(&data1, entropy, entropylen);
++			 drbg->seed_buf_len);
++		get_random_bytes(drbg->seed_buf, drbg->seed_buf_len);
++		drbg_string_fill(&data1, drbg->seed_buf, drbg->seed_buf_len);
+ 	}
+ 	list_add_tail(&data1.list, &seedlist);
+ 
+@@ -1111,16 +1108,24 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 		memset(drbg->C, 0, drbg_statelen(drbg));
+ 	}
+ 
+-	ret = drbg->d_ops->update(drbg, &seedlist, reseed);
++	ret = __drbg_seed(drbg, &seedlist, reseed);
++
++	/*
++	 * Clear the initial entropy buffer as the async call may not overwrite
++	 * that buffer for quite some time.
++	 */
++	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len);
+ 	if (ret)
+ 		goto out;
+-
+-	drbg->seeded = true;
+-	/* 10.1.1.2 / 10.1.1.3 step 5 */
+-	drbg->reseed_ctr = 1;
++	/*
++	 * For all subsequent seeding calls, we only need the seed buffer
++	 * equal to the security strength of the DRBG. We undo the calculation
++	 * in drbg_alloc_state.
++	 */
++	if (!reseed)
++		drbg->seed_buf_len = drbg->seed_buf_len / 3 * 2;
+ 
+ out:
+-	kzfree(entropy);
+ 	return ret;
+ }
+ 
+@@ -1143,6 +1148,8 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+ 	drbg->prev = NULL;
+ 	drbg->fips_primed = false;
+ #endif
++	kzfree(drbg->seed_buf);
++	drbg->seed_buf = NULL;
+ }
  
  /*
-+ * Equivalent function to get_random_bytes with the difference that this
-+ * function blocks the request until the nonblocking_pool is initialized.
-+ */
-+void get_blocking_random_bytes(void *buf, int nbytes)
-+{
-+	int rc;
+@@ -1204,6 +1211,26 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 		if (!drbg->scratchpad)
+ 			goto err;
+ 	}
 +
-+	if (unlikely(nonblocking_pool.initialized == 0)) {
-+		do {
-+			rc = wait_event_interruptible(urandom_init_wait,
-+						nonblocking_pool.initialized);
-+		} while (rc == -ERESTARTSYS);
++	/*
++	 * Gather entropy equal to the security strength of the DRBG.
++	 * With a derivation function, a nonce is required in addition
++	 * to the entropy. A nonce must be at least 1/2 of the security
++	 * strength of the DRBG in size. Thus, entropy * nonce is 3/2
++	 * of the strength. The consideration of a nonce is only
++	 * applicable during initial seeding.
++	 */
++	drbg->seed_buf_len = drbg_sec_strength(drbg->core->flags);
++	if (!drbg->seed_buf_len) {
++		ret = -EFAULT;
++		goto err;
 +	}
-+	extract_entropy(&nonblocking_pool, buf, nbytes, 0, 0);
-+}
-+EXPORT_SYMBOL(get_blocking_random_bytes);
++	/* ensure we have sufficient buffer space for initial seed */
++	drbg->seed_buf_len = ((drbg->seed_buf_len + 1) / 2) * 3;
++	drbg->seed_buf = kzalloc(drbg->seed_buf_len, GFP_KERNEL);
++	if (!drbg->seed_buf)
++		goto err;
 +
-+/*
-  * This function will use the architecture-specific hardware random
-  * number generator if it is available.  The arch-specific hw RNG will
-  * almost certainly be faster than what we can do in software, but it
-diff --git a/include/linux/random.h b/include/linux/random.h
-index b05856e..796267d 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -14,6 +14,7 @@ extern void add_input_randomness(unsigned int type, unsigned int code,
- extern void add_interrupt_randomness(int irq, int irq_flags);
+ 	return 0;
  
- extern void get_random_bytes(void *buf, int nbytes);
-+extern void get_blocking_random_bytes(void *buf, int nbytes);
- extern void get_random_bytes_arch(void *buf, int nbytes);
- void generate_random_uuid(unsigned char uuid_out[16]);
- extern int random_int_secret_init(void);
+ err:
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 480d7a0..b052698 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -119,6 +119,8 @@ struct drbg_state {
+ 	bool fips_primed;	/* Continuous test primed? */
+ 	unsigned char *prev;	/* FIPS 140-2 continuous test value */
+ #endif
++	u8 *seed_buf;			/* buffer holding the seed */
++	size_t seed_buf_len;
+ 	const struct drbg_state_ops *d_ops;
+ 	const struct drbg_core *core;
+ 	struct drbg_string test_data;
 -- 
 2.1.0
