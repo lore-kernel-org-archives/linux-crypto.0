@@ -1,156 +1,196 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 2/16] crypto: pcrypt - Use crypto_grab_aead
-Date: Thu, 21 May 2015 15:10:58 +0800
-Message-ID: <E1YvKd8-0005d6-LO@gondolin.me.apana.org.au>
+Subject: [PATCH 5/16] crypto: aead - Rename aead_alg to old_aead_alg
+Date: Thu, 21 May 2015 15:11:02 +0800
+Message-ID: <E1YvKdC-0005dv-C6@gondolin.me.apana.org.au>
 References: <20150521070915.GA20997@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37267 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:53957 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751453AbbEUHLB (ORCPT
+	with ESMTP id S1755014AbbEUHLG (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 May 2015 03:11:01 -0400
+	Thu, 21 May 2015 03:11:06 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1YvKd8-0002wu-Ud
-	for <linux-crypto@vger.kernel.org>; Thu, 21 May 2015 17:10:59 +1000
+	id 1YvKdD-0002xR-5f
+	for <linux-crypto@vger.kernel.org>; Thu, 21 May 2015 17:11:03 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-As AEAD has switched over to using frontend types, the function
-crypto_init_spawn must not be used since it does not specify a
-frontend type.  Otherwise it leads to a crash when the spawn is
-used.
+This patch is the first step in the introduction of a new AEAD
+alg type.  Unlike normal conversions this patch only renames the
+existing aead_alg structure because there are external references
+to it.
 
-This patch fixes it by switching over to crypto_grab_aead instead.
+Those references will be removed after this patch.
 
-Fixes: 5d1d65f8bea6 ("crypto: aead - Convert top level interface to new style")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/pcrypt.c |   71 +++++++++++++++++++++++++++-----------------------------
- 1 file changed, 35 insertions(+), 36 deletions(-)
+ crypto/aead.c                  |   25 +++++++++++++------------
+ include/crypto/aead.h          |    2 ++
+ include/crypto/internal/aead.h |    5 +++++
+ include/linux/crypto.h         |    6 +++---
+ 4 files changed, 23 insertions(+), 15 deletions(-)
 
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index ac115d5..3942a9f 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -60,7 +60,7 @@ static struct padata_pcrypt pdecrypt;
- static struct kset           *pcrypt_kset;
+diff --git a/crypto/aead.c b/crypto/aead.c
+index c2bf3b3..ebc91ea 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -33,7 +33,7 @@ static int aead_null_givdecrypt(struct aead_givcrypt_request *req);
+ static int setkey_unaligned(struct crypto_aead *tfm, const u8 *key,
+ 			    unsigned int keylen)
+ {
+-	struct aead_alg *aead = crypto_aead_alg(tfm);
++	struct old_aead_alg *aead = crypto_old_aead_alg(tfm);
+ 	unsigned long alignmask = crypto_aead_alignmask(tfm);
+ 	int ret;
+ 	u8 *buffer, *alignbuffer;
+@@ -55,7 +55,7 @@ static int setkey_unaligned(struct crypto_aead *tfm, const u8 *key,
+ int crypto_aead_setkey(struct crypto_aead *tfm,
+ 		       const u8 *key, unsigned int keylen)
+ {
+-	struct aead_alg *aead = crypto_aead_alg(tfm);
++	struct old_aead_alg *aead = crypto_old_aead_alg(tfm);
+ 	unsigned long alignmask = crypto_aead_alignmask(tfm);
  
- struct pcrypt_instance_ctx {
--	struct crypto_spawn spawn;
-+	struct crypto_aead_spawn spawn;
- 	unsigned int tfm_count;
+ 	tfm = tfm->child;
+@@ -71,11 +71,12 @@ int crypto_aead_setauthsize(struct crypto_aead *tfm, unsigned int authsize)
+ {
+ 	int err;
+ 
+-	if (authsize > crypto_aead_alg(tfm)->maxauthsize)
++	if (authsize > crypto_old_aead_alg(tfm)->maxauthsize)
+ 		return -EINVAL;
+ 
+-	if (crypto_aead_alg(tfm)->setauthsize) {
+-		err = crypto_aead_alg(tfm)->setauthsize(tfm->child, authsize);
++	if (crypto_old_aead_alg(tfm)->setauthsize) {
++		err = crypto_old_aead_alg(tfm)->setauthsize(
++			tfm->child, authsize);
+ 		if (err)
+ 			return err;
+ 	}
+@@ -126,7 +127,7 @@ static int old_crypt(struct aead_request *req,
+ static int old_encrypt(struct aead_request *req)
+ {
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-	struct aead_alg *alg = crypto_aead_alg(aead);
++	struct old_aead_alg *alg = crypto_old_aead_alg(aead);
+ 
+ 	return old_crypt(req, alg->encrypt);
+ }
+@@ -134,7 +135,7 @@ static int old_encrypt(struct aead_request *req)
+ static int old_decrypt(struct aead_request *req)
+ {
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-	struct aead_alg *alg = crypto_aead_alg(aead);
++	struct old_aead_alg *alg = crypto_old_aead_alg(aead);
+ 
+ 	return old_crypt(req, alg->decrypt);
+ }
+@@ -146,7 +147,7 @@ static int no_givcrypt(struct aead_givcrypt_request *req)
+ 
+ static int crypto_aead_init_tfm(struct crypto_tfm *tfm)
+ {
+-	struct aead_alg *alg = &tfm->__crt_alg->cra_aead;
++	struct old_aead_alg *alg = &tfm->__crt_alg->cra_aead;
+ 	struct crypto_aead *crt = __crypto_aead_cast(tfm);
+ 
+ 	if (max(alg->maxauthsize, alg->ivsize) > PAGE_SIZE / 8)
+@@ -172,7 +173,7 @@ static int crypto_aead_init_tfm(struct crypto_tfm *tfm)
+ static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_aead raead;
+-	struct aead_alg *aead = &alg->cra_aead;
++	struct old_aead_alg *aead = &alg->cra_aead;
+ 
+ 	strncpy(raead.type, "aead", sizeof(raead.type));
+ 	strncpy(raead.geniv, aead->geniv ?: "<built-in>", sizeof(raead.geniv));
+@@ -200,7 +201,7 @@ static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
+ 	__attribute__ ((unused));
+ static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
+ {
+-	struct aead_alg *aead = &alg->cra_aead;
++	struct old_aead_alg *aead = &alg->cra_aead;
+ 
+ 	seq_printf(m, "type         : aead\n");
+ 	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
+@@ -240,7 +241,7 @@ static int aead_null_givdecrypt(struct aead_givcrypt_request *req)
+ static int crypto_nivaead_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_aead raead;
+-	struct aead_alg *aead = &alg->cra_aead;
++	struct old_aead_alg *aead = &alg->cra_aead;
+ 
+ 	strncpy(raead.type, "nivaead", sizeof(raead.type));
+ 	strncpy(raead.geniv, aead->geniv, sizeof(raead.geniv));
+@@ -269,7 +270,7 @@ static void crypto_nivaead_show(struct seq_file *m, struct crypto_alg *alg)
+ 	__attribute__ ((unused));
+ static void crypto_nivaead_show(struct seq_file *m, struct crypto_alg *alg)
+ {
+-	struct aead_alg *aead = &alg->cra_aead;
++	struct old_aead_alg *aead = &alg->cra_aead;
+ 
+ 	seq_printf(m, "type         : nivaead\n");
+ 	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
+diff --git a/include/crypto/aead.h b/include/crypto/aead.h
+index e2d2c3c..aebf57d 100644
+--- a/include/crypto/aead.h
++++ b/include/crypto/aead.h
+@@ -17,6 +17,8 @@
+ #include <linux/kernel.h>
+ #include <linux/slab.h>
+ 
++#define aead_alg old_aead_alg
++
+ /**
+  * DOC: Authenticated Encryption With Associated Data (AEAD) Cipher API
+  *
+diff --git a/include/crypto/internal/aead.h b/include/crypto/internal/aead.h
+index a2d104a..84c17bb 100644
+--- a/include/crypto/internal/aead.h
++++ b/include/crypto/internal/aead.h
+@@ -26,6 +26,11 @@ struct crypto_aead_spawn {
+ extern const struct crypto_type crypto_aead_type;
+ extern const struct crypto_type crypto_nivaead_type;
+ 
++static inline struct old_aead_alg *crypto_old_aead_alg(struct crypto_aead *tfm)
++{
++	return &crypto_aead_tfm(tfm)->__crt_alg->cra_aead;
++}
++
+ static inline struct aead_alg *crypto_aead_alg(struct crypto_aead *tfm)
+ {
+ 	return &crypto_aead_tfm(tfm)->__crt_alg->cra_aead;
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 59ca408..7d290a9 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -268,7 +268,7 @@ struct ablkcipher_alg {
  };
  
-@@ -307,57 +307,50 @@ static void pcrypt_aead_exit_tfm(struct crypto_tfm *tfm)
- 	crypto_free_aead(ctx->child);
- }
+ /**
+- * struct aead_alg - AEAD cipher definition
++ * struct old_aead_alg - AEAD cipher definition
+  * @maxauthsize: Set the maximum authentication tag size supported by the
+  *		 transformation. A transformation may support smaller tag sizes.
+  *		 As the authentication tag is a message digest to ensure the
+@@ -293,7 +293,7 @@ struct ablkcipher_alg {
+  * All fields except @givencrypt , @givdecrypt , @geniv and @ivsize are
+  * mandatory and must be filled.
+  */
+-struct aead_alg {
++struct old_aead_alg {
+ 	int (*setkey)(struct crypto_aead *tfm, const u8 *key,
+ 	              unsigned int keylen);
+ 	int (*setauthsize)(struct crypto_aead *tfm, unsigned int authsize);
+@@ -501,7 +501,7 @@ struct crypto_alg {
  
--static struct crypto_instance *pcrypt_alloc_instance(struct crypto_alg *alg)
-+static int pcrypt_init_instance(struct crypto_instance *inst,
-+				struct crypto_alg *alg)
- {
--	struct crypto_instance *inst;
--	struct pcrypt_instance_ctx *ctx;
--	int err;
--
--	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
--	if (!inst) {
--		inst = ERR_PTR(-ENOMEM);
--		goto out;
--	}
--
--	err = -ENAMETOOLONG;
- 	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
- 		     "pcrypt(%s)", alg->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
--		goto out_free_inst;
-+		return -ENAMETOOLONG;
- 
- 	memcpy(inst->alg.cra_name, alg->cra_name, CRYPTO_MAX_ALG_NAME);
- 
--	ctx = crypto_instance_ctx(inst);
--	err = crypto_init_spawn(&ctx->spawn, alg, inst,
--				CRYPTO_ALG_TYPE_MASK);
--	if (err)
--		goto out_free_inst;
--
- 	inst->alg.cra_priority = alg->cra_priority + 100;
- 	inst->alg.cra_blocksize = alg->cra_blocksize;
- 	inst->alg.cra_alignmask = alg->cra_alignmask;
- 
--out:
--	return inst;
--
--out_free_inst:
--	kfree(inst);
--	inst = ERR_PTR(err);
--	goto out;
-+	return 0;
- }
- 
- static struct crypto_instance *pcrypt_alloc_aead(struct rtattr **tb,
- 						 u32 type, u32 mask)
- {
-+	struct pcrypt_instance_ctx *ctx;
- 	struct crypto_instance *inst;
- 	struct crypto_alg *alg;
-+	const char *name;
-+	int err;
-+
-+	name = crypto_attr_alg_name(tb[1]);
-+	if (IS_ERR(name))
-+		return ERR_CAST(name);
-+
-+	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
-+	if (!inst)
-+		return ERR_PTR(-ENOMEM);
-+
-+	ctx = crypto_instance_ctx(inst);
-+	crypto_set_aead_spawn(&ctx->spawn, inst);
- 
--	alg = crypto_get_attr_alg(tb, type, (mask & CRYPTO_ALG_TYPE_MASK));
--	if (IS_ERR(alg))
--		return ERR_CAST(alg);
-+	err = crypto_grab_aead(&ctx->spawn, name, 0, 0);
-+	if (err)
-+		goto out_free_inst;
- 
--	inst = pcrypt_alloc_instance(alg);
--	if (IS_ERR(inst))
--		goto out_put_alg;
-+	alg = crypto_aead_spawn_alg(&ctx->spawn);
-+	err = pcrypt_init_instance(inst, alg);
-+	if (err)
-+		goto out_drop_aead;
- 
- 	inst->alg.cra_flags = CRYPTO_ALG_TYPE_AEAD | CRYPTO_ALG_ASYNC;
- 	inst->alg.cra_type = &crypto_aead_type;
-@@ -377,9 +370,15 @@ static struct crypto_instance *pcrypt_alloc_aead(struct rtattr **tb,
- 	inst->alg.cra_aead.decrypt = pcrypt_aead_decrypt;
- 	inst->alg.cra_aead.givencrypt = pcrypt_aead_givencrypt;
- 
--out_put_alg:
--	crypto_mod_put(alg);
-+out:
- 	return inst;
-+
-+out_drop_aead:
-+	crypto_drop_aead(&ctx->spawn);
-+out_free_inst:
-+	kfree(inst);
-+	inst = ERR_PTR(err);
-+	goto out;
- }
- 
- static struct crypto_instance *pcrypt_alloc(struct rtattr **tb)
-@@ -402,7 +401,7 @@ static void pcrypt_free(struct crypto_instance *inst)
- {
- 	struct pcrypt_instance_ctx *ctx = crypto_instance_ctx(inst);
- 
--	crypto_drop_spawn(&ctx->spawn);
-+	crypto_drop_aead(&ctx->spawn);
- 	kfree(inst);
- }
- 
+ 	union {
+ 		struct ablkcipher_alg ablkcipher;
+-		struct aead_alg aead;
++		struct old_aead_alg aead;
+ 		struct blkcipher_alg blkcipher;
+ 		struct cipher_alg cipher;
+ 		struct compress_alg compress;
