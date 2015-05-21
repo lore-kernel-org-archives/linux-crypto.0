@@ -1,36 +1,60 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: random: Wake up all getrandom(2) callers when pool is ready
-Date: Thu, 21 May 2015 10:36:47 +0200
-Message-ID: <9183463.XNhR7e5TNc@tauon>
-References: <3340545.QDDPvU7BuN@tachyon.chronox.de> <9182932.rX0DhQWPrJ@tachyon.chronox.de> <20150521081953.GA22301@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 0/7] crypto: Convert all AEAD users to new interface
+Date: Thu, 21 May 2015 18:39:39 +0800
+Message-ID: <20150521103938.GA23035@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
-	sandyinchina@gmail.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150521081953.GA22301@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:57063 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753275AbbEUKjv (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 21 May 2015 06:39:51 -0400
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Am Donnerstag, 21. Mai 2015, 16:19:54 schrieb Herbert Xu:
+Hi:
 
-Hi Herbert,
+This series of patches convert all in-tree AEAD users that I
+could find to the new single SG list interface.  For IPsec it
+also adopts the new explicit IV generator scheme.
 
->On Thu, May 21, 2015 at 09:55:17AM +0200, Stephan Mueller wrote:
->> So, I will create a 2nd wait queue in random.c for uninterruptible waits,
->> change the get_blocking_random_bytes back to void and use wait_event to
->> wait
->> for the initialization.
->
->Hold your horses.  You don't need a second queue, you just need to
->change wake_up_interruptible to wake_up.
+To recap, the old AEAD interface takes an associated data (AD)
+SG list in addition to the plain/cipher text SG list(s).  That
+forces the underlying AEAD algorithm implementors to try to stitch
+those two lists together where possible in order to maximise the
+contiguous chunk of memory passed to the ICV/hash function.  Things
+get even more hairy for IPsec as it has a third piece of memory,
+the generated IV (giv) that needs to be hashed.  One look at the
+nasty things authenc does for example is enough to make anyone
+puke :)
 
-A simple change to wake_up is not working -- I already checked. But the 
-proposed wake_up_all does the trick.
+In fact the interface is just getting in our way because for the
+main user IPsec the data is naturally contiguous as the protocol
+was designed with this in mind.
 
+So the new AEAD interface gets rid of the separate AD SG list
+and instead simply requires the AD to be at the head of the src
+and dst SG lists.  There is further provision for optional space
+between the AD and the plain/cipher text for ease of implementation.
 
-Ciao
-Stephan
+The conversion of in-tree users is fairly straightforward.  The
+only non-trivial bit is IPsec as I'm taking this opportunity to
+move the IV generation knowledge into IPsec as that's where it
+belongs since we may in future wish to support different generation
+schemes for a single algorithm.
+
+As this depends on patches that have not hit mainline yet please
+do not apply them.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
