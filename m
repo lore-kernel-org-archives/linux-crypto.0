@@ -1,607 +1,433 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 16/16] crypto: echainiv - Add encrypted chain IV generator
-Date: Thu, 21 May 2015 15:11:15 +0800
-Message-ID: <E1YvKdP-0005h0-QX@gondolin.me.apana.org.au>
+Subject: [PATCH 10/16] crypto: aead - Add support for new AEAD implementations
+Date: Thu, 21 May 2015 15:11:08 +0800
+Message-ID: <E1YvKdI-0005fI-Qo@gondolin.me.apana.org.au>
 References: <20150521070915.GA20997@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49301 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:40760 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932177AbbEUHLS (ORCPT
+	with ESMTP id S1751660AbbEUHLL (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 May 2015 03:11:18 -0400
+	Thu, 21 May 2015 03:11:11 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1YvKdQ-00032E-2N
-	for <linux-crypto@vger.kernel.org>; Thu, 21 May 2015 17:11:16 +1000
+	id 1YvKdJ-0002zD-07
+	for <linux-crypto@vger.kernel.org>; Thu, 21 May 2015 17:11:09 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds a new AEAD IV generator echainiv.  It is intended
-to replace the existing skcipher IV generator eseqiv.
-
-If the underlying AEAD algorithm is using the old AEAD interface,
-then echainiv will simply use its IV generator.
-
-Otherwise, echainiv will encrypt a counter just like eseqiv but
-it'll first xor it against a previously stored IV similar to
-chainiv.
+This patch adds the basic structure of the new AEAD type.  Unlike
+the current version, there is no longer any concept of geniv.  IV
+generation will still be carried out by wrappers but they will be
+normal AEAD algorithms that simply take the IPsec sequence number
+as the IV.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/Kconfig    |   10 +
- crypto/Makefile   |    1 
- crypto/echainiv.c |  531 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 542 insertions(+)
+ crypto/aead.c                  |  152 ++++++++++++++++++++++++++++++++++++-----
+ include/crypto/aead.h          |   44 +++++++++++
+ include/crypto/internal/aead.h |   36 +++++++++
+ 3 files changed, 213 insertions(+), 19 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 657bb82..b7088d1 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -227,6 +227,16 @@ config CRYPTO_SEQIV
- 	  This IV generator generates an IV based on a sequence number by
- 	  xoring it with a salt.  This algorithm is mainly useful for CTR
+diff --git a/crypto/aead.c b/crypto/aead.c
+index ebc91ea..d231e28 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -33,7 +33,6 @@ static int aead_null_givdecrypt(struct aead_givcrypt_request *req);
+ static int setkey_unaligned(struct crypto_aead *tfm, const u8 *key,
+ 			    unsigned int keylen)
+ {
+-	struct old_aead_alg *aead = crypto_old_aead_alg(tfm);
+ 	unsigned long alignmask = crypto_aead_alignmask(tfm);
+ 	int ret;
+ 	u8 *buffer, *alignbuffer;
+@@ -46,7 +45,7 @@ static int setkey_unaligned(struct crypto_aead *tfm, const u8 *key,
  
-+config CRYPTO_ECHAINIV
-+	tristate "Encrypted Chain IV Generator"
-+	select CRYPTO_AEAD
-+	select CRYPTO_NULL
-+	select CRYPTO_RNG
-+	help
-+	  This IV generator generates an IV based on the encryption of
-+	  a sequence number xored with a salt.  This is the default
-+	  algorithm for CBC.
+ 	alignbuffer = (u8 *)ALIGN((unsigned long)buffer, alignmask + 1);
+ 	memcpy(alignbuffer, key, keylen);
+-	ret = aead->setkey(tfm, alignbuffer, keylen);
++	ret = tfm->setkey(tfm, alignbuffer, keylen);
+ 	memset(alignbuffer, 0, keylen);
+ 	kfree(buffer);
+ 	return ret;
+@@ -55,7 +54,6 @@ static int setkey_unaligned(struct crypto_aead *tfm, const u8 *key,
+ int crypto_aead_setkey(struct crypto_aead *tfm,
+ 		       const u8 *key, unsigned int keylen)
+ {
+-	struct old_aead_alg *aead = crypto_old_aead_alg(tfm);
+ 	unsigned long alignmask = crypto_aead_alignmask(tfm);
+ 
+ 	tfm = tfm->child;
+@@ -63,7 +61,7 @@ int crypto_aead_setkey(struct crypto_aead *tfm,
+ 	if ((unsigned long)key & alignmask)
+ 		return setkey_unaligned(tfm, key, keylen);
+ 
+-	return aead->setkey(tfm, key, keylen);
++	return tfm->setkey(tfm, key, keylen);
+ }
+ EXPORT_SYMBOL_GPL(crypto_aead_setkey);
+ 
+@@ -71,12 +69,11 @@ int crypto_aead_setauthsize(struct crypto_aead *tfm, unsigned int authsize)
+ {
+ 	int err;
+ 
+-	if (authsize > crypto_old_aead_alg(tfm)->maxauthsize)
++	if (authsize > tfm->maxauthsize)
+ 		return -EINVAL;
+ 
+-	if (crypto_old_aead_alg(tfm)->setauthsize) {
+-		err = crypto_old_aead_alg(tfm)->setauthsize(
+-			tfm->child, authsize);
++	if (tfm->setauthsize) {
++		err = tfm->setauthsize(tfm->child, authsize);
+ 		if (err)
+ 			return err;
+ 	}
+@@ -145,7 +142,7 @@ static int no_givcrypt(struct aead_givcrypt_request *req)
+ 	return -ENOSYS;
+ }
+ 
+-static int crypto_aead_init_tfm(struct crypto_tfm *tfm)
++static int crypto_old_aead_init_tfm(struct crypto_tfm *tfm)
+ {
+ 	struct old_aead_alg *alg = &tfm->__crt_alg->cra_aead;
+ 	struct crypto_aead *crt = __crypto_aead_cast(tfm);
+@@ -153,6 +150,8 @@ static int crypto_aead_init_tfm(struct crypto_tfm *tfm)
+ 	if (max(alg->maxauthsize, alg->ivsize) > PAGE_SIZE / 8)
+ 		return -EINVAL;
+ 
++	crt->setkey = alg->setkey;
++	crt->setauthsize = alg->setauthsize;
+ 	crt->encrypt = old_encrypt;
+ 	crt->decrypt = old_decrypt;
+ 	if (alg->ivsize) {
+@@ -164,13 +163,34 @@ static int crypto_aead_init_tfm(struct crypto_tfm *tfm)
+ 	}
+ 	crt->child = __crypto_aead_cast(tfm);
+ 	crt->ivsize = alg->ivsize;
++	crt->maxauthsize = alg->maxauthsize;
+ 	crt->authsize = alg->maxauthsize;
+ 
+ 	return 0;
+ }
+ 
++static int crypto_aead_init_tfm(struct crypto_tfm *tfm)
++{
++	struct crypto_aead *aead = __crypto_aead_cast(tfm);
++	struct aead_alg *alg = crypto_aead_alg(aead);
 +
- comment "Block modes"
++	if (crypto_old_aead_alg(aead)->encrypt)
++		return crypto_old_aead_init_tfm(tfm);
++
++	aead->setkey = alg->setkey;
++	aead->setauthsize = alg->setauthsize;
++	aead->encrypt = alg->encrypt;
++	aead->decrypt = alg->decrypt;
++	aead->child = __crypto_aead_cast(tfm);
++	aead->ivsize = alg->ivsize;
++	aead->maxauthsize = alg->maxauthsize;
++	aead->authsize = alg->maxauthsize;
++
++	return 0;
++}
++
+ #ifdef CONFIG_NET
+-static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
++static int crypto_old_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	struct crypto_report_aead raead;
+ 	struct old_aead_alg *aead = &alg->cra_aead;
+@@ -191,15 +211,15 @@ nla_put_failure:
+ 	return -EMSGSIZE;
+ }
+ #else
+-static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
++static int crypto_old_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+ 	return -ENOSYS;
+ }
+ #endif
  
- config CRYPTO_CBC
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 97b7d3a..df55363 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -21,6 +21,7 @@ obj-$(CONFIG_CRYPTO_BLKCIPHER2) += crypto_blkcipher.o
- obj-$(CONFIG_CRYPTO_BLKCIPHER2) += chainiv.o
- obj-$(CONFIG_CRYPTO_BLKCIPHER2) += eseqiv.o
- obj-$(CONFIG_CRYPTO_SEQIV) += seqiv.o
-+obj-$(CONFIG_CRYPTO_ECHAINIV) += echainiv.o
+-static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
++static void crypto_old_aead_show(struct seq_file *m, struct crypto_alg *alg)
+ 	__attribute__ ((unused));
+-static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
++static void crypto_old_aead_show(struct seq_file *m, struct crypto_alg *alg)
+ {
+ 	struct old_aead_alg *aead = &alg->cra_aead;
  
- crypto_hash-y += ahash.o
- crypto_hash-y += shash.o
-diff --git a/crypto/echainiv.c b/crypto/echainiv.c
-new file mode 100644
-index 0000000..e5a9878
---- /dev/null
-+++ b/crypto/echainiv.c
-@@ -0,0 +1,531 @@
-+/*
-+ * echainiv: Encrypted Chain IV Generator
+@@ -216,9 +236,9 @@ const struct crypto_type crypto_aead_type = {
+ 	.extsize = crypto_alg_extsize,
+ 	.init_tfm = crypto_aead_init_tfm,
+ #ifdef CONFIG_PROC_FS
+-	.show = crypto_aead_show,
++	.show = crypto_old_aead_show,
+ #endif
+-	.report = crypto_aead_report,
++	.report = crypto_old_aead_report,
+ 	.lookup = crypto_lookup_aead,
+ 	.maskclear = ~(CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_GENIV),
+ 	.maskset = CRYPTO_ALG_TYPE_MASK,
+@@ -227,6 +247,62 @@ const struct crypto_type crypto_aead_type = {
+ };
+ EXPORT_SYMBOL_GPL(crypto_aead_type);
+ 
++#ifdef CONFIG_NET
++static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	struct crypto_report_aead raead;
++	struct aead_alg *aead = container_of(alg, struct aead_alg, base);
++
++	strncpy(raead.type, "aead", sizeof(raead.type));
++	strncpy(raead.geniv, "<none>", sizeof(raead.geniv));
++
++	raead.blocksize = alg->cra_blocksize;
++	raead.maxauthsize = aead->maxauthsize;
++	raead.ivsize = aead->ivsize;
++
++	if (nla_put(skb, CRYPTOCFGA_REPORT_AEAD,
++		    sizeof(struct crypto_report_aead), &raead))
++		goto nla_put_failure;
++	return 0;
++
++nla_put_failure:
++	return -EMSGSIZE;
++}
++#else
++static int crypto_aead_report(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	return -ENOSYS;
++}
++#endif
++
++static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
++	__attribute__ ((unused));
++static void crypto_aead_show(struct seq_file *m, struct crypto_alg *alg)
++{
++	struct aead_alg *aead = container_of(alg, struct aead_alg, base);
++
++	seq_printf(m, "type         : aead\n");
++	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
++					     "yes" : "no");
++	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
++	seq_printf(m, "ivsize       : %u\n", aead->ivsize);
++	seq_printf(m, "maxauthsize  : %u\n", aead->maxauthsize);
++	seq_printf(m, "geniv        : <none>\n");
++}
++
++static const struct crypto_type crypto_new_aead_type = {
++	.extsize = crypto_alg_extsize,
++	.init_tfm = crypto_aead_init_tfm,
++#ifdef CONFIG_PROC_FS
++	.show = crypto_aead_show,
++#endif
++	.report = crypto_aead_report,
++	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
++	.maskset = CRYPTO_ALG_TYPE_MASK,
++	.type = CRYPTO_ALG_TYPE_AEAD,
++	.tfmsize = offsetof(struct crypto_aead, base),
++};
++
+ static int aead_null_givencrypt(struct aead_givcrypt_request *req)
+ {
+ 	return crypto_aead_encrypt(&req->areq);
+@@ -552,5 +628,51 @@ struct crypto_aead *crypto_alloc_aead(const char *alg_name, u32 type, u32 mask)
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_aead);
+ 
++static int aead_prepare_alg(struct aead_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++
++	if (max(alg->maxauthsize, alg->ivsize) > PAGE_SIZE / 8)
++		return -EINVAL;
++
++	base->cra_type = &crypto_new_aead_type;
++	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
++	base->cra_flags |= CRYPTO_ALG_TYPE_AEAD;
++
++	return 0;
++}
++
++int crypto_register_aead(struct aead_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++	int err;
++
++	err = aead_prepare_alg(alg);
++	if (err)
++		return err;
++
++	return crypto_register_alg(base);
++}
++EXPORT_SYMBOL_GPL(crypto_register_aead);
++
++int crypto_unregister_aead(struct aead_alg *alg)
++{
++	return crypto_unregister_alg(&alg->base);
++}
++EXPORT_SYMBOL_GPL(crypto_unregister_aead);
++
++int aead_register_instance(struct crypto_template *tmpl,
++			   struct aead_instance *inst)
++{
++	int err;
++
++	err = aead_prepare_alg(&inst->alg);
++	if (err)
++		return err;
++
++	return crypto_register_instance(tmpl, aead_crypto_instance(inst));
++}
++EXPORT_SYMBOL_GPL(aead_register_instance);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Authenticated Encryption with Associated Data (AEAD)");
+diff --git a/include/crypto/aead.h b/include/crypto/aead.h
+index aebf57d..177e6f4 100644
+--- a/include/crypto/aead.h
++++ b/include/crypto/aead.h
+@@ -17,8 +17,6 @@
+ #include <linux/kernel.h>
+ #include <linux/slab.h>
+ 
+-#define aead_alg old_aead_alg
+-
+ /**
+  * DOC: Authenticated Encryption With Associated Data (AEAD) Cipher API
+  *
+@@ -92,7 +90,48 @@ struct aead_givcrypt_request {
+ 	struct aead_request areq;
+ };
+ 
++/**
++ * struct aead_alg - AEAD cipher definition
++ * @maxauthsize: Set the maximum authentication tag size supported by the
++ *		 transformation. A transformation may support smaller tag sizes.
++ *		 As the authentication tag is a message digest to ensure the
++ *		 integrity of the encrypted data, a consumer typically wants the
++ *		 largest authentication tag possible as defined by this
++ *		 variable.
++ * @setauthsize: Set authentication size for the AEAD transformation. This
++ *		 function is used to specify the consumer requested size of the
++ * 		 authentication tag to be either generated by the transformation
++ *		 during encryption or the size of the authentication tag to be
++ *		 supplied during the decryption operation. This function is also
++ *		 responsible for checking the authentication tag size for
++ *		 validity.
++ * @setkey: see struct ablkcipher_alg
++ * @encrypt: see struct ablkcipher_alg
++ * @decrypt: see struct ablkcipher_alg
++ * @geniv: see struct ablkcipher_alg
++ * @ivsize: see struct ablkcipher_alg
 + *
-+ * This generator generates an IV based on a sequence number by xoring it
-+ * with a salt and then encrypting it with the same key as used to encrypt
-+ * the plain text.  This algorithm requires that the block size be equal
-+ * to the IV size.  It is mainly useful for CBC.
-+ *
-+ * This generator can only be used by algorithms where authentication
-+ * is performed after encryption (i.e., authenc).
-+ *
-+ * Copyright (c) 2015 Herbert Xu <herbert@gondor.apana.org.au>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
++ * All fields except @ivsize is mandatory and must be filled.
 + */
++struct aead_alg {
++	int (*setkey)(struct crypto_aead *tfm, const u8 *key,
++	              unsigned int keylen);
++	int (*setauthsize)(struct crypto_aead *tfm, unsigned int authsize);
++	int (*encrypt)(struct aead_request *req);
++	int (*decrypt)(struct aead_request *req);
 +
-+#include <crypto/internal/aead.h>
-+#include <crypto/null.h>
-+#include <crypto/rng.h>
-+#include <crypto/scatterwalk.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/mm.h>
-+#include <linux/module.h>
-+#include <linux/percpu.h>
-+#include <linux/spinlock.h>
-+#include <linux/string.h>
++	const char *geniv;
 +
-+#define MAX_IV_SIZE 16
++	unsigned int ivsize;
++	unsigned int maxauthsize;
 +
-+struct echainiv_request_ctx {
-+	struct scatterlist src[2];
-+	struct scatterlist dst[2];
-+	struct scatterlist ivbuf[2];
-+	struct scatterlist *ivsg;
-+	struct aead_givcrypt_request subreq;
++	struct crypto_alg base;
 +};
 +
-+struct echainiv_ctx {
-+	struct crypto_aead *child;
-+	spinlock_t lock;
-+	struct crypto_blkcipher *null;
-+	u8 salt[] __attribute__ ((aligned(__alignof__(u32))));
+ struct crypto_aead {
++	int (*setkey)(struct crypto_aead *tfm, const u8 *key,
++	              unsigned int keylen);
++	int (*setauthsize)(struct crypto_aead *tfm, unsigned int authsize);
+ 	int (*encrypt)(struct aead_request *req);
+ 	int (*decrypt)(struct aead_request *req);
+ 	int (*givencrypt)(struct aead_givcrypt_request *req);
+@@ -102,6 +141,7 @@ struct crypto_aead {
+ 
+ 	unsigned int ivsize;
+ 	unsigned int authsize;
++	unsigned int maxauthsize;
+ 	unsigned int reqsize;
+ 
+ 	struct crypto_tfm base;
+diff --git a/include/crypto/internal/aead.h b/include/crypto/internal/aead.h
+index 4614f79..6cd3151 100644
+--- a/include/crypto/internal/aead.h
++++ b/include/crypto/internal/aead.h
+@@ -19,6 +19,10 @@
+ 
+ struct rtattr;
+ 
++struct aead_instance {
++	struct aead_alg alg;
 +};
 +
-+static DEFINE_PER_CPU(u32 [MAX_IV_SIZE / sizeof(u32)], echainiv_iv);
-+
-+static int echainiv_setkey(struct crypto_aead *tfm,
-+			      const u8 *key, unsigned int keylen)
+ struct crypto_aead_spawn {
+ 	struct crypto_spawn base;
+ };
+@@ -33,7 +37,8 @@ static inline struct old_aead_alg *crypto_old_aead_alg(struct crypto_aead *tfm)
+ 
+ static inline struct aead_alg *crypto_aead_alg(struct crypto_aead *tfm)
+ {
+-	return &crypto_aead_tfm(tfm)->__crt_alg->cra_aead;
++	return container_of(crypto_aead_tfm(tfm)->__crt_alg,
++			    struct aead_alg, base);
+ }
+ 
+ static inline void *crypto_aead_ctx(struct crypto_aead *tfm)
+@@ -47,6 +52,22 @@ static inline struct crypto_instance *crypto_aead_alg_instance(
+ 	return crypto_tfm_alg_instance(&aead->base);
+ }
+ 
++static inline struct crypto_instance *aead_crypto_instance(
++	struct aead_instance *inst)
 +{
-+	struct echainiv_ctx *ctx = crypto_aead_ctx(tfm);
-+
-+	return crypto_aead_setkey(ctx->child, key, keylen);
++	return container_of(&inst->alg.base, struct crypto_instance, alg);
 +}
 +
-+static int echainiv_setauthsize(struct crypto_aead *tfm,
-+				  unsigned int authsize)
++static inline struct aead_instance *aead_instance(struct crypto_instance *inst)
 +{
-+	struct echainiv_ctx *ctx = crypto_aead_ctx(tfm);
-+
-+	return crypto_aead_setauthsize(ctx->child, authsize);
++	return container_of(&inst->alg, struct aead_instance, alg.base);
 +}
 +
-+/* We don't care if we get preempted and read/write IVs from the next CPU. */
-+void echainiv_read_iv(u8 *dst, unsigned size)
++static inline void *aead_instance_ctx(struct aead_instance *inst)
 +{
-+	u32 *a = (u32 *)dst;
-+	u32 __percpu *b = echainiv_iv;
-+
-+	for (; size >= 4; size -= 4) {
-+		*a++ = this_cpu_read(*b);
-+		b++;
-+	}
++	return crypto_instance_ctx(aead_crypto_instance(inst));
 +}
 +
-+void echainiv_write_iv(const u8 *src, unsigned size)
+ static inline void *aead_request_ctx(struct aead_request *req)
+ {
+ 	return req->__ctx;
+@@ -84,6 +105,12 @@ static inline struct crypto_alg *crypto_aead_spawn_alg(
+ 	return spawn->base.alg;
+ }
+ 
++static inline struct aead_alg *crypto_spawn_aead_alg(
++	struct crypto_aead_spawn *spawn)
 +{
-+	const u32 *a = (const u32 *)src;
-+	u32 __percpu *b = echainiv_iv;
-+
-+	for (; size >= 4; size -= 4) {
-+		this_cpu_write(*b, *a);
-+		a++;
-+		b++;
-+	}
++	return container_of(spawn->base.alg, struct aead_alg, base);
 +}
 +
-+static void echainiv_encrypt_compat_complete2(struct aead_request *req,
-+						 int err)
-+{
-+	struct echainiv_request_ctx *rctx = aead_request_ctx(req);
-+	struct aead_givcrypt_request *subreq = &rctx->subreq;
-+	struct crypto_aead *geniv;
-+
-+	if (err == -EINPROGRESS)
-+		return;
-+
-+	if (err)
-+		goto out;
-+
-+	geniv = crypto_aead_reqtfm(req);
-+	scatterwalk_map_and_copy(subreq->giv, rctx->ivsg, 0,
-+				 crypto_aead_ivsize(geniv), 1);
-+
-+out:
-+	kzfree(subreq->giv);
-+}
-+
-+static void echainiv_encrypt_compat_complete(
-+	struct crypto_async_request *base, int err)
-+{
-+	struct aead_request *req = base->data;
-+
-+	echainiv_encrypt_compat_complete2(req, err);
-+	aead_request_complete(req, err);
-+}
-+
-+static void echainiv_encrypt_complete2(struct aead_request *req, int err)
-+{
-+	struct aead_request *subreq = aead_request_ctx(req);
-+	struct crypto_aead *geniv;
-+	unsigned int ivsize;
-+
-+	if (err == -EINPROGRESS)
-+		return;
-+
-+	if (err)
-+		goto out;
-+
-+	geniv = crypto_aead_reqtfm(req);
-+	ivsize = crypto_aead_ivsize(geniv);
-+
-+	echainiv_write_iv(subreq->iv, ivsize);
-+
-+	if (req->iv != subreq->iv)
-+		memcpy(req->iv, subreq->iv, ivsize);
-+
-+out:
-+	if (req->iv != subreq->iv)
-+		kzfree(subreq->iv);
-+}
-+
-+static void echainiv_encrypt_complete(struct crypto_async_request *base,
-+					 int err)
-+{
-+	struct aead_request *req = base->data;
-+
-+	echainiv_encrypt_complete2(req, err);
-+	aead_request_complete(req, err);
-+}
-+
-+static int echainiv_encrypt_compat(struct aead_request *req)
-+{
-+	struct crypto_aead *geniv = crypto_aead_reqtfm(req);
-+	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
-+	struct echainiv_request_ctx *rctx = aead_request_ctx(req);
-+	struct aead_givcrypt_request *subreq = &rctx->subreq;
-+	unsigned int ivsize = crypto_aead_ivsize(geniv);
-+	crypto_completion_t compl;
-+	void *data;
-+	u8 *info;
-+	__be64 seq;
-+	int err;
-+
-+	compl = req->base.complete;
-+	data = req->base.data;
-+
-+	rctx->ivsg = scatterwalk_ffwd(rctx->ivbuf, req->dst, req->assoclen);
-+	info = PageHighMem(sg_page(rctx->ivsg)) ? NULL : sg_virt(rctx->ivsg);
-+
-+	if (!info) {
-+		info = kmalloc(ivsize, req->base.flags &
-+				       CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL:
-+								  GFP_ATOMIC);
-+		if (!info)
-+			return -ENOMEM;
-+
-+		compl = echainiv_encrypt_compat_complete;
-+		data = req;
-+	}
-+
-+	memcpy(&seq, req->iv + ivsize - sizeof(seq), sizeof(seq));
-+
-+	aead_givcrypt_set_tfm(subreq, ctx->child);
-+	aead_givcrypt_set_callback(subreq, req->base.flags,
-+				   req->base.complete, req->base.data);
-+	aead_givcrypt_set_crypt(subreq,
-+				scatterwalk_ffwd(rctx->src, req->src,
-+						 req->assoclen + ivsize),
-+				scatterwalk_ffwd(rctx->dst, rctx->ivsg,
-+						 ivsize),
-+				req->cryptlen - ivsize, req->iv);
-+	aead_givcrypt_set_assoc(subreq, req->src, req->assoclen);
-+	aead_givcrypt_set_giv(subreq, info, be64_to_cpu(seq));
-+
-+	err = crypto_aead_givencrypt(subreq);
-+	if (unlikely(PageHighMem(sg_page(rctx->ivsg))))
-+		echainiv_encrypt_compat_complete2(req, err);
-+	return err;
-+}
-+
-+static int echainiv_encrypt(struct aead_request *req)
-+{
-+	struct crypto_aead *geniv = crypto_aead_reqtfm(req);
-+	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
-+	struct aead_request *subreq = aead_request_ctx(req);
-+	crypto_completion_t compl;
-+	void *data;
-+	u8 *info;
-+	unsigned int ivsize;
-+	int err;
-+
-+	aead_request_set_tfm(subreq, ctx->child);
-+
-+	compl = echainiv_encrypt_complete;
-+	data = req;
-+	info = req->iv;
-+
-+	ivsize = crypto_aead_ivsize(geniv);
-+
-+	if (req->src != req->dst) {
-+		struct scatterlist src[2];
-+		struct scatterlist dst[2];
-+		struct blkcipher_desc desc = {
-+			.tfm = ctx->null,
-+		};
-+
-+		err = crypto_blkcipher_encrypt(
-+			&desc,
-+			scatterwalk_ffwd(dst, req->dst,
-+					 req->assoclen + ivsize),
-+			scatterwalk_ffwd(src, req->src,
-+					 req->assoclen + ivsize),
-+			req->cryptlen - ivsize);
-+		if (err)
-+			return err;
-+	}
-+
-+	if (unlikely(!IS_ALIGNED((unsigned long)info,
-+				 crypto_aead_alignmask(geniv) + 1))) {
-+		info = kmalloc(ivsize, req->base.flags &
-+				       CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL:
-+								  GFP_ATOMIC);
-+		if (!info)
-+			return -ENOMEM;
-+
-+		memcpy(info, req->iv, ivsize);
-+	}
-+
-+	aead_request_set_callback(subreq, req->base.flags, compl, data);
-+	aead_request_set_crypt(subreq, req->dst, req->dst,
-+			       req->cryptlen - ivsize, info);
-+	aead_request_set_ad(subreq, req->assoclen + ivsize, 0);
-+
-+	crypto_xor(info, ctx->salt, ivsize);
-+	scatterwalk_map_and_copy(info, req->dst, req->assoclen, ivsize, 1);
-+	echainiv_read_iv(info, ivsize);
-+
-+	err = crypto_aead_encrypt(subreq);
-+	echainiv_encrypt_complete2(req, err);
-+	return err;
-+}
-+
-+static int echainiv_decrypt_compat(struct aead_request *req)
-+{
-+	struct crypto_aead *geniv = crypto_aead_reqtfm(req);
-+	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
-+	struct aead_request *subreq = aead_request_ctx(req);
-+	crypto_completion_t compl;
-+	void *data;
-+	unsigned int ivsize;
-+
-+	aead_request_set_tfm(subreq, ctx->child);
-+
-+	compl = req->base.complete;
-+	data = req->base.data;
-+
-+	ivsize = crypto_aead_ivsize(geniv);
-+
-+	aead_request_set_callback(subreq, req->base.flags, compl, data);
-+	aead_request_set_crypt(subreq, req->src, req->dst,
-+			       req->cryptlen - ivsize, req->iv);
-+	aead_request_set_ad(subreq, req->assoclen, ivsize);
-+
-+	scatterwalk_map_and_copy(req->iv, req->src, req->assoclen, ivsize, 0);
-+
-+	return crypto_aead_decrypt(subreq);
-+}
-+
-+static int echainiv_decrypt(struct aead_request *req)
-+{
-+	struct crypto_aead *geniv = crypto_aead_reqtfm(req);
-+	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
-+	struct aead_request *subreq = aead_request_ctx(req);
-+	crypto_completion_t compl;
-+	void *data;
-+	unsigned int ivsize;
-+
-+	aead_request_set_tfm(subreq, ctx->child);
-+
-+	compl = req->base.complete;
-+	data = req->base.data;
-+
-+	ivsize = crypto_aead_ivsize(geniv);
-+
-+	aead_request_set_callback(subreq, req->base.flags, compl, data);
-+	aead_request_set_crypt(subreq, req->src, req->dst,
-+			       req->cryptlen - ivsize, req->iv);
-+	aead_request_set_ad(subreq, req->assoclen + ivsize, 0);
-+
-+	scatterwalk_map_and_copy(req->iv, req->src, req->assoclen, ivsize, 0);
-+	if (req->src != req->dst)
-+		scatterwalk_map_and_copy(req->iv, req->dst,
-+					 req->assoclen, ivsize, 1);
-+
-+	return crypto_aead_decrypt(subreq);
-+}
-+
-+static int echainiv_encrypt_compat_first(struct aead_request *req)
-+{
-+	struct crypto_aead *geniv = crypto_aead_reqtfm(req);
-+	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
-+	int err = 0;
-+
-+	spin_lock_bh(&ctx->lock);
-+	if (geniv->encrypt != echainiv_encrypt_compat_first)
-+		goto unlock;
-+
-+	geniv->encrypt = echainiv_encrypt_compat;
-+	err = crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
-+				   crypto_aead_ivsize(geniv));
-+
-+unlock:
-+	spin_unlock_bh(&ctx->lock);
-+
-+	if (err)
-+		return err;
-+
-+	return echainiv_encrypt_compat(req);
-+}
-+
-+static int echainiv_encrypt_first(struct aead_request *req)
-+{
-+	struct crypto_aead *geniv = crypto_aead_reqtfm(req);
-+	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
-+	int err = 0;
-+
-+	spin_lock_bh(&ctx->lock);
-+	if (geniv->encrypt != echainiv_encrypt_first)
-+		goto unlock;
-+
-+	geniv->encrypt = echainiv_encrypt;
-+	err = crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
-+				   crypto_aead_ivsize(geniv));
-+
-+unlock:
-+	spin_unlock_bh(&ctx->lock);
-+
-+	if (err)
-+		return err;
-+
-+	return echainiv_encrypt(req);
-+}
-+
-+static int echainiv_compat_init(struct crypto_tfm *tfm)
-+{
-+	struct crypto_aead *geniv = __crypto_aead_cast(tfm);
-+	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
-+	int err;
-+
-+	spin_lock_init(&ctx->lock);
-+
-+	crypto_aead_set_reqsize(geniv, sizeof(struct echainiv_request_ctx));
-+
-+	err = aead_geniv_init(tfm);
-+
-+	ctx->child = geniv->child;
-+	geniv->child = geniv;
-+
-+	return err;
-+}
-+
-+static int echainiv_init(struct crypto_tfm *tfm)
-+{
-+	struct crypto_aead *geniv = __crypto_aead_cast(tfm);
-+	struct echainiv_ctx *ctx = crypto_aead_ctx(geniv);
-+	int err;
-+
-+	spin_lock_init(&ctx->lock);
-+
-+	crypto_aead_set_reqsize(geniv, sizeof(struct aead_request));
-+
-+	ctx->null = crypto_get_default_null_skcipher();
-+	err = PTR_ERR(ctx->null);
-+	if (IS_ERR(ctx->null))
-+		goto out;
-+
-+	err = aead_geniv_init(tfm);
-+	if (err)
-+		goto drop_null;
-+
-+	ctx->child = geniv->child;
-+	geniv->child = geniv;
-+
-+out:
-+	return err;
-+
-+drop_null:
-+	crypto_put_default_null_skcipher();
-+	goto out;
-+}
-+
-+static void echainiv_compat_exit(struct crypto_tfm *tfm)
-+{
-+	struct echainiv_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto_free_aead(ctx->child);
-+}
-+
-+static void echainiv_exit(struct crypto_tfm *tfm)
-+{
-+	struct echainiv_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto_free_aead(ctx->child);
-+	crypto_put_default_null_skcipher();
-+}
-+
-+static struct crypto_template echainiv_tmpl;
-+
-+static struct crypto_instance *echainiv_aead_alloc(struct rtattr **tb)
-+{
-+	struct aead_instance *inst;
-+	struct crypto_aead_spawn *spawn;
-+	struct aead_alg *alg;
-+
-+	inst = aead_geniv_alloc(&echainiv_tmpl, tb, 0, 0);
-+
-+	if (IS_ERR(inst))
-+		goto out;
-+
-+	if (inst->alg.ivsize < sizeof(u64) ||
-+	    inst->alg.ivsize & (sizeof(u32) - 1) ||
-+	    inst->alg.ivsize > MAX_IV_SIZE) {
-+		aead_geniv_free(inst);
-+		inst = ERR_PTR(-EINVAL);
-+		goto out;
-+	}
-+
-+	spawn = aead_instance_ctx(inst);
-+	alg = crypto_spawn_aead_alg(spawn);
-+
-+	inst->alg.setkey = echainiv_setkey;
-+	inst->alg.setauthsize = echainiv_setauthsize;
-+	inst->alg.encrypt = echainiv_encrypt_first;
-+	inst->alg.decrypt = echainiv_decrypt;
-+
-+	inst->alg.base.cra_init = echainiv_init;
-+	inst->alg.base.cra_exit = echainiv_exit;
-+
-+	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
-+	inst->alg.base.cra_ctxsize = sizeof(struct echainiv_ctx);
-+	inst->alg.base.cra_ctxsize += inst->alg.base.cra_aead.ivsize;
-+
-+	if (alg->base.cra_aead.encrypt) {
-+		inst->alg.encrypt = echainiv_encrypt_compat_first;
-+		inst->alg.decrypt = echainiv_decrypt_compat;
-+
-+		inst->alg.base.cra_init = echainiv_compat_init;
-+		inst->alg.base.cra_exit = echainiv_compat_exit;
-+	}
-+
-+out:
-+	return aead_crypto_instance(inst);
-+}
-+
-+static struct crypto_instance *echainiv_alloc(struct rtattr **tb)
-+{
-+	struct crypto_instance *inst;
-+	int err;
-+
-+	err = crypto_get_default_rng();
-+	if (err)
-+		return ERR_PTR(err);
-+
-+	inst = echainiv_aead_alloc(tb);
-+
-+	if (IS_ERR(inst))
-+		goto put_rng;
-+
-+out:
-+	return inst;
-+
-+put_rng:
-+	crypto_put_default_rng();
-+	goto out;
-+}
-+
-+static void echainiv_free(struct crypto_instance *inst)
-+{
-+	aead_geniv_free(aead_instance(inst));
-+	crypto_put_default_rng();
-+}
-+
-+static struct crypto_template echainiv_tmpl = {
-+	.name = "echainiv",
-+	.alloc = echainiv_alloc,
-+	.free = echainiv_free,
-+	.module = THIS_MODULE,
-+};
-+
-+static int __init echainiv_module_init(void)
-+{
-+	return crypto_register_template(&echainiv_tmpl);
-+}
-+
-+static void __exit echainiv_module_exit(void)
-+{
-+	crypto_unregister_template(&echainiv_tmpl);
-+}
-+
-+module_init(echainiv_module_init);
-+module_exit(echainiv_module_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Encrypted Chain IV Generator");
-+MODULE_ALIAS_CRYPTO("echainiv");
+ static inline struct crypto_aead *crypto_spawn_aead(
+ 	struct crypto_aead_spawn *spawn)
+ {
+@@ -121,8 +148,13 @@ static inline void crypto_aead_set_reqsize(struct crypto_aead *aead,
+ 
+ static inline unsigned int crypto_aead_maxauthsize(struct crypto_aead *aead)
+ {
+-	return crypto_old_aead_alg(aead)->maxauthsize;
++	return aead->maxauthsize;
+ }
+ 
++int crypto_register_aead(struct aead_alg *alg);
++int crypto_unregister_aead(struct aead_alg *alg);
++int aead_register_instance(struct crypto_template *tmpl,
++			   struct aead_instance *inst);
++
+ #endif	/* _CRYPTO_INTERNAL_AEAD_H */
+ 
