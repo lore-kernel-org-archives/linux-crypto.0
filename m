@@ -1,50 +1,74 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 8/16] crypto: ixp4xx - Use crypto_aead_maxauthsize
-Date: Thu, 21 May 2015 15:11:06 +0800
-Message-ID: <E1YvKdG-0005ek-Eu@gondolin.me.apana.org.au>
+Subject: [PATCH 3/16] crypto: scatterwalk - Add scatterwalk_ffwd helper
+Date: Thu, 21 May 2015 15:10:59 +0800
+Message-ID: <E1YvKd9-0005dN-WD@gondolin.me.apana.org.au>
 References: <20150521070915.GA20997@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:56852 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:46698 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752331AbbEUHLK (ORCPT
+	with ESMTP id S1751660AbbEUHLD (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 May 2015 03:11:10 -0400
+	Thu, 21 May 2015 03:11:03 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1YvKdG-0002yD-QK
-	for <linux-crypto@vger.kernel.org>; Thu, 21 May 2015 17:11:06 +1000
+	id 1YvKdA-0002x2-73
+	for <linux-crypto@vger.kernel.org>; Thu, 21 May 2015 17:11:00 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch uses the helper crypto_aead_maxauthsize instead of
-directly dereferencing aead_alg.
+This patch adds the scatterwalk_ffwd helper which can create an
+SG list that starts in the middle of an existing SG list.  The
+new list may either be part of the existing list or be a chain
+that latches onto part of the existing list.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/ixp4xx_crypto.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ crypto/scatterwalk.c         |   22 ++++++++++++++++++++++
+ include/crypto/scatterwalk.h |    4 ++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index 46cd696..7ba495f 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -1097,7 +1097,7 @@ static int aead_setup(struct crypto_aead *tfm, unsigned int authsize)
- {
- 	struct ixp_ctx *ctx = crypto_aead_ctx(tfm);
- 	u32 *flags = &tfm->base.crt_flags;
--	unsigned digest_len = crypto_aead_alg(tfm)->maxauthsize;
-+	unsigned digest_len = crypto_aead_maxauthsize(tfm);
- 	int ret;
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index 3bd749c..db920b5 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -146,3 +146,25 @@ int scatterwalk_bytes_sglen(struct scatterlist *sg, int num_bytes)
+ 	return n;
+ }
+ EXPORT_SYMBOL_GPL(scatterwalk_bytes_sglen);
++
++struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
++				     struct scatterlist *src,
++				     unsigned int len)
++{
++	for (;;) {
++		if (!len)
++			return src;
++
++		if (src->length > len)
++			break;
++
++		len -= src->length;
++		src = sg_next(src);
++	}
++
++	sg_set_page(dst, sg_page(src), src->length - len, src->offset + len);
++	scatterwalk_crypto_chain(dst, sg_next(src), 0, 2);
++
++	return dst;
++}
++EXPORT_SYMBOL_GPL(scatterwalk_ffwd);
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 20e4226..96670e7 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -102,4 +102,8 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
  
- 	if (!ctx->enckey_len && !ctx->authkey_len)
-@@ -1139,7 +1139,7 @@ out:
+ int scatterwalk_bytes_sglen(struct scatterlist *sg, int num_bytes);
  
- static int aead_setauthsize(struct crypto_aead *tfm, unsigned int authsize)
- {
--	int max = crypto_aead_alg(tfm)->maxauthsize >> 2;
-+	int max = crypto_aead_maxauthsize(tfm) >> 2;
- 
- 	if ((authsize>>2) < 1 || (authsize>>2) > max || (authsize & 3))
- 		return -EINVAL;
++struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
++				     struct scatterlist *src,
++				     unsigned int len);
++
+ #endif  /* _CRYPTO_SCATTERWALK_H */
