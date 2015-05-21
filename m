@@ -1,42 +1,61 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v9 3/5] crypto: drbg - add async seeding operation
-Date: Thu, 21 May 2015 14:56:43 +0800
-Message-ID: <20150521065643.GA21490@gondor.apana.org.au>
-References: <3340545.QDDPvU7BuN@tachyon.chronox.de>
- <23102012.0an2QbkQix@tachyon.chronox.de>
- <20150521063618.GA21348@gondor.apana.org.au>
- <1887173.hBZISiAer1@tauon>
+Subject: [PATCH 0/16] crypto: aead - Add single SG interface and new IPsec IV
+ generation
+Date: Thu, 21 May 2015 15:09:15 +0800
+Message-ID: <20150521070915.GA20997@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
-	sandyinchina@gmail.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:53101 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:38122 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751075AbbEUG4y (ORCPT
+	with ESMTP id S1751667AbbEUHJT (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 May 2015 02:56:54 -0400
+	Thu, 21 May 2015 03:09:19 -0400
 Content-Disposition: inline
-In-Reply-To: <1887173.hBZISiAer1@tauon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 21, 2015 at 08:53:13AM +0200, Stephan Mueller wrote:
->
-> Thank you for pointing that out - I have seen that too. But the crux is that 
-> when using wait_event, the cancel function to serialize the destruction code 
-> path will *not* return at all, even when the async callback function completed 
-> successfully. Hence the choice for wait_event_interruptible
+Hi:
 
-Why is that? It should return when the pool is initialised and
-your work completes.  If it does not then that means either the
-pool isn't initialising or somehow your code is racy and getting
-stuck.
+This series of patches takes the opportunity of the AEAD conversion
+to adjust the interface so that it is more optimal for the intended
+use-cases.
 
-If it's racy then wait_event_interruptible is just hiding the
-real problem.
+As it stands, AEAD takes two separate SG lists, one containing the
+asssociated data (AD) and one containing the plain/cipher text.
+These two lists have to be combined when we generate the ICV.
+
+In order to provide the best performance, many AEAD algorithms try
+to stitch these two lists together into a single contiguous SG
+entry where possible.  Worse, with IPsec there is also an IV involved
+that needs to be added into the mix.  The end result is a lot of
+black magic all spread out through the crypto stack.  You just have
+to take a look at the complexity in crypto/authenc.c to know what
+I'm talking about (not to mention crypto/authencesn.c).
+
+Another wart in the system is IV generation.  This is exclusively
+used by IPsec.  However, it carries with it almost an entire
+operation type in the form of givencrypt.  Again a lot of complexity
+has been added in order to support this.
+
+So this series slightly adjusts the AEAD interface in an attempt
+to solve these two issues.  Firstly the AD is now placed into the
+same SG list as the plain/cipher text.  This removes the need to
+do any stitching.  As the primary user of AEAD, IPsec naturally
+has a contiguous buffer containing the AD and plain/cipher text,
+this simplifies esp4/esp6 quite a bit.
+
+Secondly IV generation is now carried out in explicit but normal
+AEAD algorithms.  The generated IV is simply part of the cipher
+text.  This means that we can kill at least half of the AEAD geniv
+code and all of the ablkcipher geniv code.  It also means that
+authenc and other IPsec-specific algorithms no longer has to do
+IV stitching.
+
+This series only creates the new interface.  The actual conversion
+will be carried out in subsequent series.  The old interface will
+be maintained until the conversion is complete.
 
 Cheers,
 -- 
