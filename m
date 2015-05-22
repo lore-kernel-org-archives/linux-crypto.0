@@ -1,36 +1,34 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/7] crypto: Convert all AEAD users to new interface
-Date: Fri, 22 May 2015 08:21:12 +0800
-Message-ID: <20150522002112.GB29073@gondor.apana.org.au>
-References: <20150521103938.GA23035@gondor.apana.org.au>
- <20150521.120347.286409931588196234.davem@davemloft.net>
+Subject: Re: random: Wake up all getrandom(2) callers when pool is ready
+Date: Fri, 22 May 2015 08:23:08 +0800
+Message-ID: <20150522002302.GC29073@gondor.apana.org.au>
+References: <3340545.QDDPvU7BuN@tachyon.chronox.de>
+ <12904468.qCSNRrkb6t@tachyon.chronox.de>
+ <20150520214408.GA17264@gondor.apana.org.au>
+ <9182932.rX0DhQWPrJ@tachyon.chronox.de>
+ <20150521081953.GA22301@gondor.apana.org.au>
+ <20150521191739.GP2871@thunk.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	johannes@sipsolutions.net, marcel@holtmann.org,
-	steffen.klassert@secunet.com
-To: David Miller <davem@davemloft.net>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49631 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753397AbbEVAVa (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 May 2015 20:21:30 -0400
+To: Theodore Ts'o <tytso@mit.edu>,
+	Stephan Mueller <smueller@chronox.de>, pebolle@tiscali.nl,
+	andreas.steffen@strongswan.org, sandyinchina@gmail.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150521.120347.286409931588196234.davem@davemloft.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20150521191739.GP2871@thunk.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 21, 2015 at 12:03:47PM -0400, David Miller wrote:
+On Thu, May 21, 2015 at 03:17:39PM -0400, Theodore Ts'o wrote:
 >
-> No objections on my end.
-> 
-> I assume since the dependencies exist in the crypto tree, you'll
-> want to merge this series there right?
+> Yes, this should definitely be wake_up_all()
 
-Yes that's probably the easiest path.
+Thanks for the confirmation.  Can I push this patch through the
+cryptodev tree since Stephan's work is probably going to depend
+on it?
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
