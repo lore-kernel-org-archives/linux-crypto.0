@@ -1,42 +1,30 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] s390/crypto: Fix incorrect ghash icv buffer handling.
-Date: Fri, 22 May 2015 11:24:25 +0800
-Message-ID: <20150522032425.GA30171@gondor.apana.org.au>
-References: <1432195271-3036-1-git-send-email-freude@linux.vnet.ibm.com>
+Subject: Re: [PATCH] documentation: change header file locations
+Date: Fri, 22 May 2015 11:30:45 +0800
+Message-ID: <20150522033045.GA30278@gondor.apana.org.au>
+References: <2568733.jyKSVuFE5b@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>,
-	Ingo Tuchscherer <ingo.tuchscherer@linux.vnet.ibm.com>,
-	Hendrik Brueckner <brueckner@de.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-	Harald Freudenberger <freude@de.ibm.com>,
-	Gerald Schaefer <geraldsc@linux.vnet.ibm.com>
-To: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41606 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:44754 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754656AbbEVDYb (ORCPT
+	with ESMTP id S1753397AbbEVDau (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 May 2015 23:24:31 -0400
+	Thu, 21 May 2015 23:30:50 -0400
 Content-Disposition: inline
-In-Reply-To: <1432195271-3036-1-git-send-email-freude@linux.vnet.ibm.com>
+In-Reply-To: <2568733.jyKSVuFE5b@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 21, 2015 at 10:01:11AM +0200, Harald Freudenberger wrote:
-> Multitheaded tests showed that the icv buffer in the current ghash
-> implementation is not handled correctly. A move of this working ghash
-> buffer value to the descriptor context fixed this. Code is tested and
-> verified with an multithreaded application via af_alg interface.
+On Wed, May 20, 2015 at 03:21:54PM +0200, Stephan Mueller wrote:
+> Due to the recent update of the kernel crypto API header files,
+> locations of function definitions and their documentation have changed.
 > 
-> Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
-> Signed-off-by: Gerald Schaefer <geraldsc@linux.vnet.ibm.com>
-> Reported-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-Nice work! Patch applied to crypto with stable cc.
-
-Thanks,
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
