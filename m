@@ -1,34 +1,42 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: random: Wake up all getrandom(2) callers when pool is ready
-Date: Fri, 22 May 2015 08:23:08 +0800
-Message-ID: <20150522002302.GC29073@gondor.apana.org.au>
-References: <3340545.QDDPvU7BuN@tachyon.chronox.de>
- <12904468.qCSNRrkb6t@tachyon.chronox.de>
- <20150520214408.GA17264@gondor.apana.org.au>
- <9182932.rX0DhQWPrJ@tachyon.chronox.de>
- <20150521081953.GA22301@gondor.apana.org.au>
- <20150521191739.GP2871@thunk.org>
+Subject: Re: [PATCH] s390/crypto: Fix incorrect ghash icv buffer handling.
+Date: Fri, 22 May 2015 11:24:25 +0800
+Message-ID: <20150522032425.GA30171@gondor.apana.org.au>
+References: <1432195271-3036-1-git-send-email-freude@linux.vnet.ibm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Theodore Ts'o <tytso@mit.edu>,
-	Stephan Mueller <smueller@chronox.de>, pebolle@tiscali.nl,
-	andreas.steffen@strongswan.org, sandyinchina@gmail.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	Martin Schwidefsky <schwidefsky@de.ibm.com>,
+	Ingo Tuchscherer <ingo.tuchscherer@linux.vnet.ibm.com>,
+	Hendrik Brueckner <brueckner@de.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+	Harald Freudenberger <freude@de.ibm.com>,
+	Gerald Schaefer <geraldsc@linux.vnet.ibm.com>
+To: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:41606 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754656AbbEVDYb (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 21 May 2015 23:24:31 -0400
 Content-Disposition: inline
-In-Reply-To: <20150521191739.GP2871@thunk.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1432195271-3036-1-git-send-email-freude@linux.vnet.ibm.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 21, 2015 at 03:17:39PM -0400, Theodore Ts'o wrote:
->
-> Yes, this should definitely be wake_up_all()
+On Thu, May 21, 2015 at 10:01:11AM +0200, Harald Freudenberger wrote:
+> Multitheaded tests showed that the icv buffer in the current ghash
+> implementation is not handled correctly. A move of this working ghash
+> buffer value to the descriptor context fixed this. Code is tested and
+> verified with an multithreaded application via af_alg interface.
+> 
+> Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
+> Signed-off-by: Gerald Schaefer <geraldsc@linux.vnet.ibm.com>
+> Reported-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Thanks for the confirmation.  Can I push this patch through the
-cryptodev tree since Stephan's work is probably going to depend
-on it?
+Nice work! Patch applied to crypto with stable cc.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
