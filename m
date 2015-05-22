@@ -1,38 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 7/7] mac80211: Switch to new AEAD interface
-Date: Fri, 22 May 2015 12:11:48 +0800
-Message-ID: <20150522041148.GA30589@gondor.apana.org.au>
-References: <20150521103938.GA23035@gondor.apana.org.au>
- <E1YvNxS-00063i-AZ@gondolin.me.apana.org.au>
- <1432207249.2343.9.camel@sipsolutions.net>
- <20150521115013.GA23833@gondor.apana.org.au>
- <1432210664.2343.10.camel@sipsolutions.net>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH 5/7] esp6: Switch to new AEAD interface
+Date: Fri, 22 May 2015 08:40:25 +0200
+Message-ID: <2287044.Rx7bts6Hbt@tauon>
+References: <20150521103938.GA23035@gondor.apana.org.au> <E1YvNxL-00063M-DH@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Johannes Berg <johannes@sipsolutions.net>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Steffen Klassert <steffen.klassert@secunet.com>
-To: Johannes Berg <johannes@sipsolutions.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:34343 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750732AbbEVELx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 May 2015 00:11:53 -0400
-Content-Disposition: inline
-In-Reply-To: <1432210664.2343.10.camel@sipsolutions.net>
+Received: from mail.eperm.de ([89.247.134.16]:58169 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750918AbbEVGk2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 22 May 2015 02:40:28 -0400
+In-Reply-To: <E1YvNxL-00063M-DH@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 21, 2015 at 02:17:44PM +0200, Johannes Berg wrote:
->
-> Do you have a branch somewhere with all of that?
+Am Donnerstag, 21. Mai 2015, 18:44:03 schrieb Herbert Xu:
 
-OK the prerequisite patches are now in cryptodev.
+Hi Herbert,
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>-	aead_givcrypt_set_callback(req, 0, esp_output_done, skb);
+>-	aead_givcrypt_set_crypt(req, sg, sg, clen, iv);
+>-	aead_givcrypt_set_assoc(req, asg, assoclen);
+>-	aead_givcrypt_set_giv(req, esph->enc_data,
+>-			      XFRM_SKB_CB(skb)->seq.output.low);
+>+	aead_request_set_crypt(req, sg, sg, ivlen + clen, iv);
+>+	aead_request_set_ad(req, assoclen, 0);
+
+If I may ask, where in your initial patch set is now decided that the IV 
+generator is used (i.e. so that the givcrypt API is not needed any more)?
+
+Do I understand it correctly that you want to retire the givcrypt API 
+entirely?
+
+Thanks
+Stephan
