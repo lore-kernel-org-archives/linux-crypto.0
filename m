@@ -1,132 +1,103 @@
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH v3 0/2] crypto: add a new driver for Marvell's CESA
-Date: Fri, 22 May 2015 14:02:17 +0000
-Message-ID: <20150522140217.GB19834@io.lakedaemon.net>
-References: <1432301642-11470-1-git-send-email-boris.brezillon@free-electrons.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH RFC v2 1/2] crypto: add PKE API
+Date: Fri, 22 May 2015 11:37:49 -0700
+Message-ID: <555F777D.1030509@intel.com>
+References: <20150506193643.9329.75351.stgit@tstruk-mobl1> <20150506193648.9329.27232.stgit@tstruk-mobl1> <20150511063222.GB2316@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org
-To: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+	keescook@chromium.org, jwboyer@redhat.com, richard@nod.at,
+	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
+	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	vgoyal@redhat.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from pmta2.delivery3.ore.mailhop.org ([54.213.22.21]:19762 "HELO
-	pmta2.delivery3.ore.mailhop.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1753131AbbEVOSX (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 May 2015 10:18:23 -0400
-Content-Disposition: inline
-In-Reply-To: <1432301642-11470-1-git-send-email-boris.brezillon@free-electrons.com>
+Received: from mga09.intel.com ([134.134.136.24]:52030 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1945919AbbEVSlU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 22 May 2015 14:41:20 -0400
+In-Reply-To: <20150511063222.GB2316@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-+ Jason Gunthorpe, he may be interested in this.
+On 05/10/2015 11:32 PM, Herbert Xu wrote:
+> On Wed, May 06, 2015 at 12:36:48PM -0700, Tadeusz Struk wrote:
+>>
+>> +	const struct public_key_signature *signature;
+> 
+> Doing this means that you aren't adding it to the crypto API
+> properly.  You need to start from scratch and design a proper
+> interface and not just wrap some existing opaque data strcture.
+> 
+> Cheers,
+> 
 
-On Fri, May 22, 2015 at 03:33:46PM +0200, Boris Brezillon wrote:
-> Hello,
-> 
-> This patch series adds a new driver supporting Marvell's CESA IP.
-> This driver addresses some limitations of the existing one.
-> From a performance and CPU load point of view the most important
-> limitation in the existing driver is the lack of DMA support, thus
-> preventing us from chaining crypto operations.
-> 
-> I know we usually try to adapt existing drivers instead of replacing them
-> by new ones, but after trying to refactor the mv_cesa driver I realized it
-> would take longer than writing an new one from scratch.
-> 
-> Here are the main features brought by this new driver:
-> - support for armada SoCs (up to 38x) while keeping support for older ones
->   (Orion and Kirkwood). Note that old DT bindings (those used on Orion and
->   Kirkwood platforms) are supported, or IOTW, old DTs are compatible with
->   this new driver.
-> - DMA mode to offload the CPU in case of intensive crypto usage
-> - new algorithms: SHA256, DES and 3DES
-> 
-> In addition to this driver comes a bunch of DT updates adding crypto device
-> nodes to several Marvell SoCs (those are only the tested ones, others might
-> be added later).
-> 
-> I'd like to thank Arnaud, who has carefully reviewed several iterations of
-> this driver, helped me improved my implementation, provided support for
-> several crypto algorithms, provided support for armada-370 and tested
-> the driver on different platforms, hence the SoB and dual MODULE_AUTHOR
-> in the driver code.
-> 
-> Best Regards,
-> 
-> Boris
-> 
-> Changes since v2:
-> - fixes in the cipher code (->dst_nents was assigned the ->src_nents
->   value and CBC state was overwritten by the IV after each chunk
->   operation)
-> - spit the code as suggested by Sebastian
-> 
-> Changes since v1:
-> - (suggested by Jason) kept the existing CESA driver and added a mechanism
->   to prevent the new driver from probing devices handled my the existing
->   one (Orion and Kirkwood platforms)
-> - (reported by Paul) addressed a few Kconfig and module definition issues
-> - (suggested by Andrew) added DT changes to the series
-> 
-> Arnaud Ebalard (6):
->   crypto: marvell/CESA: add Triple-DES support
->   crypto: marvell/CESA: add MD5 support
->   crypto: marvell/CESA: add SHA256 support
->   crypto: marvell/CESA: add support for Kirkwood SoCs
->   ARM: marvell/dt: add crypto node to armada 370 dtsi
->   ARM: marvell/dt: add crypto node to kirkwood dtsi
-> 
-> Boris Brezillon (10):
->   crypto: mv_cesa: request registers memory region
->   crypto: add a new driver for Marvell's CESA
->   crypto: marvell/CESA: add TDMA support
->   crypto: marvell/CESA: add DES support
->   crypto: marvell/CESA: add support for all armada SoCs
->   crypto: marvell/CESA: add allhwsupport module parameter
->   crypto: marvell/CESA: add support for Orion SoCs
->   crypto: marvell/CESA: update DT bindings documentation
->   ARM: marvell/dt: add crypto node to armada-xp.dtsi
->   ARM: marvell/dt: enable crypto on armada-xp-gp
-> 
->  .../devicetree/bindings/crypto/marvell-cesa.txt    |   46 +
->  arch/arm/boot/dts/armada-370.dtsi                  |   20 +
->  arch/arm/boot/dts/armada-xp-gp.dts                 |    4 +-
->  arch/arm/boot/dts/armada-xp.dtsi                   |   31 +
->  arch/arm/boot/dts/kirkwood.dtsi                    |    2 +-
->  drivers/crypto/Kconfig                             |   18 +
->  drivers/crypto/Makefile                            |    1 +
->  drivers/crypto/marvell/Makefile                    |    2 +
->  drivers/crypto/marvell/cesa.c                      |  543 ++++++++
->  drivers/crypto/marvell/cesa.h                      |  804 ++++++++++++
->  drivers/crypto/marvell/cipher.c                    |  769 +++++++++++
->  drivers/crypto/marvell/hash.c                      | 1349 ++++++++++++++++++++
->  drivers/crypto/marvell/tdma.c                      |  224 ++++
->  drivers/crypto/mv_cesa.c                           |   13 +-
->  14 files changed, 3816 insertions(+), 10 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/marvell-cesa.txt
->  create mode 100644 drivers/crypto/marvell/Makefile
->  create mode 100644 drivers/crypto/marvell/cesa.c
->  create mode 100644 drivers/crypto/marvell/cesa.h
->  create mode 100644 drivers/crypto/marvell/cipher.c
->  create mode 100644 drivers/crypto/marvell/hash.c
->  create mode 100644 drivers/crypto/marvell/tdma.c
-> 
-> -- 
-> 1.9.1
-> 
+Hi Herbert,
+Thanks for your feedback.
+How about this:
+
+/**
+ * struct akcipher_request - public key request
+ *
+ * @base:	Common attributes for async crypto requests
+ * @inparams:	scatterlist of input parameters (one ent per parameter)
+ *		for the operation as defined in RFC.
+ *		For instance for rsa encrypt only one input param is required,
+ *		(i.e. 'm' - message) as specified in RFC3447 sec 5.1.1
+ *		(Note: the key belongs to the tfm)
+ * @outparams:	scatterlist of output parameters (one ent per parameter)
+ *		for the operation as defined in RFC.
+ *		For instance for rsa encrypt only one output param will be
+ *		produced (i.e. 'c' - cipher text) as specified in
+ *		RFC3447 sec 5.1.1
+ *
+ * @__ctx:	Start of private context data
+ */
+struct akcipher_request {
+	struct crypto_async_request base;
+	struct scatterlist *inparams;
+	struct scatterlist *outparams;
+	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+};
+
+/**
+ * struct akcipher_alg - generic public key algorithm
+ *
+ * @sign:	Function performs a sign operation as defined by public key
+ *		algorithm
+ * @verify:	Function performs a sign operation as defined by public key
+ *		algorithm
+ * @encrypt:	Function performs an encrypt operation as defined by public key
+ *		algorithm
+ * @decrypt:	Function performs a decrypt operation as defined by public key
+ *		algorithm
+ * @reqsize:	Request context size required by algorithm implementation
+ *
+ * @base:	Common crypto API algorithm data structure
+ */
+struct akcipher_alg {
+	int (*sign)(struct akcipher_request *req);
+	int (*verify)(struct akcipher_request *req);
+	int (*encrypt)(struct akcipher_request *req);
+	int (*decrypt)(struct akcipher_request *req);
+
+	unsigned int reqsize;
+	struct crypto_alg base;
+};
+
+/**
+ * struct crypto_akcipher - user-instantiated objects which encapsulate
+ * algorithms and core processing logic
+ *
+ * @base:	Common crypto API algorithm data structure
+ * @pkey:	Key representation. Note: this can be both public or private
+ *		key, depending on the operation.
+ * @__ctx:	Start of private context data
+ */
+struct crypto_akcipher {
+	struct crypto_tfm base;
+	const struct public_key *pkey;
+	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+};
