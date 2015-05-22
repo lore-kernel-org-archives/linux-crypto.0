@@ -1,30 +1,64 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] documentation: change header file locations
-Date: Fri, 22 May 2015 11:30:45 +0800
-Message-ID: <20150522033045.GA30278@gondor.apana.org.au>
-References: <2568733.jyKSVuFE5b@tachyon.chronox.de>
+Subject: Crypto Fixes for 4.1
+Date: Fri, 22 May 2015 12:05:59 +0800
+Message-ID: <20150522040559.GA30475@gondor.apana.org.au>
+References: <20131203124129.GA12067@gondor.apana.org.au>
+ <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20141231033217.GA27261@gondor.apana.org.au>
+ <20150107021737.GA25043@gondor.apana.org.au>
+ <20150425080310.GA6873@gondor.apana.org.au>
+ <20150505100621.GA8678@gondor.apana.org.au>
+ <20150511055608.GA2055@gondor.apana.org.au>
+ <20150520065441.GA8330@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org
-To: Stephan Mueller <smueller@chronox.de>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44754 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:60791 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753397AbbEVDau (ORCPT
+	with ESMTP id S1752025AbbEVEGI (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 21 May 2015 23:30:50 -0400
+	Fri, 22 May 2015 00:06:08 -0400
 Content-Disposition: inline
-In-Reply-To: <2568733.jyKSVuFE5b@tachyon.chronox.de>
+In-Reply-To: <20150520065441.GA8330@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 20, 2015 at 03:21:54PM +0200, Stephan Mueller wrote:
-> Due to the recent update of the kernel crypto API header files,
-> locations of function definitions and their documentation have changed.
-> 
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Hi Linus:
 
-Applied.
+This push fixes the following issues:
+
+* Crash in the newly added algif_aead interface when it tries to
+  link SG lists.
+
+* ICV corruption in s390/ghash when the same tfm is used by more
+  than one thread.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+or
+
+master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Harald Freudenberger (1):
+      crypto: s390/ghash - Fix incorrect ghash icv buffer handling.
+
+Tadeusz Struk (1):
+      crypto: algif_aead - fix invalid sgl linking
+
+ arch/s390/crypto/ghash_s390.c |   25 +++++++++++++------------
+ crypto/algif_aead.c           |    9 ++++-----
+ 2 files changed, 17 insertions(+), 17 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
