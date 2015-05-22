@@ -1,93 +1,65 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [v2 PATCH 13/13] crypto: algif_aead - Switch to new AEAD
- interface
-Date: Sat, 23 May 2015 05:58:18 +0800
-Message-ID: <20150522215818.GB11512@gondor.apana.org.au>
-References: <20150522082708.GA3507@gondor.apana.org.au>
- <E1YviMC-00010E-Uk@gondolin.me.apana.org.au>
- <1711949.C5mmxUsD4a@myon.chronox.de>
- <13023896.hEcYqcIc2j@myon.chronox.de>
+From: Suravee Suthikulanit <suravee.suthikulpanit@amd.com>
+Subject: Re: [V5 PATCH 1/5] ACPI / scan: Parse _CCA and setup device coherency
+Date: Fri, 22 May 2015 17:24:15 -0500
+Message-ID: <555FAC8F.4010306@amd.com>
+References: <1432159758-4486-1-git-send-email-Suravee.Suthikulpanit@amd.com>
+ <1432159758-4486-2-git-send-email-Suravee.Suthikulpanit@amd.com>
+ <1815824.lIg0NQ97lU@vostro.rjw.lan>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49747 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1422674AbbEVV6W (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 May 2015 17:58:22 -0400
-Content-Disposition: inline
-In-Reply-To: <13023896.hEcYqcIc2j@myon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <lenb@kernel.org>, <catalin.marinas@arm.com>,
+	<will.deacon@arm.com>, <thomas.lendacky@amd.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<arnd@arndb.de>, <msalter@redhat.com>, <hanjun.guo@linaro.org>,
+	<al.stone@linaro.org>, <grant.likely@linaro.org>,
+	<leo.duran@amd.com>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-acpi@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linaro-acpi@lists.linaro.org>, <netdev@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>
+To: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <1815824.lIg0NQ97lU@vostro.rjw.lan>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Fri, May 22, 2015 at 11:04:39PM +0200, Stephan Mueller wrote:
+Not sure if this went out earlier. So I am resending.
+
+On 5/22/15 16:56, Rafael J. Wysocki wrote:
+>> diff --git a/drivers/acpi/glue.c b/drivers/acpi/glue.c
+>> >index 39c485b..b9657af 100644
+>> >--- a/drivers/acpi/glue.c
+>> >+++ b/drivers/acpi/glue.c
+>> >@@ -13,6 +13,7 @@
+>> >  #include <linux/slab.h>
+>> >  #include <linux/rwsem.h>
+>> >  #include <linux/acpi.h>
+>> >+#include <linux/dma-mapping.h>
+>> >
+>> >  #include "internal.h"
+>> >
+>> >@@ -167,6 +168,7 @@ int acpi_bind_one(struct device *dev, struct acpi_device *acpi_dev)
+>> >  	struct list_head *physnode_list;
+>> >  	unsigned int node_id;
+>> >  	int retval = -EINVAL;
+>> >+	bool coherent;
+>> >
+>> >  	if (has_acpi_companion(dev)) {
+>> >  		if (acpi_dev) {
+>> >@@ -223,6 +225,9 @@ int acpi_bind_one(struct device *dev, struct acpi_device *acpi_dev)
+>> >  	if (!has_acpi_companion(dev))
+>> >  		ACPI_COMPANION_SET(dev, acpi_dev);
+>> >
+>> >+	if (acpi_check_dma(acpi_dev, &coherent))
+>> >+		arch_setup_dma_ops(dev, 0, 0, NULL, coherent);
+>> >+
+> Well, so is this going to work for PCI too after all?
 >
-> Note, gcm(aes) looks good. Only rfc4106(gcm(aes)) causes the crash.
 
-Actually it looks like the culprit hasn't been merged yet so I'll
-just respin the series.
+No, as Bjorn suggested, PCI changes for setting DMA coherent from _CCA 
+(patch 3/6 in V4) will be submitted separately. We are working on 
+cleaning up and up-streaming the PCI ACPI support for ARM64.
 
-Anyway, this patch should fix your crash:
+Thanks,
 
-diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-index b3dded4..b15d797 100644
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -586,6 +586,13 @@ static int crypto_givcipher_default(struct crypto_alg *alg, u32 type, u32 mask)
- 	if (!tmpl)
- 		goto kill_larval;
- 
-+	if (tmpl->create) {
-+		err = tmpl->create(tmpl, tb);
-+		if (err)
-+			goto put_tmpl;
-+		goto ok;
-+	}
-+
- 	inst = tmpl->alloc(tb);
- 	err = PTR_ERR(inst);
- 	if (IS_ERR(inst))
-@@ -597,6 +604,7 @@ static int crypto_givcipher_default(struct crypto_alg *alg, u32 type, u32 mask)
- 		goto put_tmpl;
- 	}
- 
-+ok:
- 	/* Redo the lookup to use the instance we just registered. */
- 	err = -EAGAIN;
- 
-diff --git a/crypto/aead.c b/crypto/aead.c
-index 8b26613..070e4b9 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -570,6 +570,13 @@ static int crypto_nivaead_default(struct crypto_alg *alg, u32 type, u32 mask)
- 	if (!tmpl)
- 		goto kill_larval;
- 
-+	if (tmpl->create) {
-+		err = tmpl->create(tmpl, tb);
-+		if (err)
-+			goto put_tmpl;
-+		goto ok;
-+	}
-+
- 	inst = tmpl->alloc(tb);
- 	err = PTR_ERR(inst);
- 	if (IS_ERR(inst))
-@@ -581,6 +588,7 @@ static int crypto_nivaead_default(struct crypto_alg *alg, u32 type, u32 mask)
- 		goto put_tmpl;
- 	}
- 
-+ok:
- 	/* Redo the lookup to use the instance we just registered. */
- 	err = -EAGAIN;
- 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Suravee
