@@ -1,62 +1,35 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Crypto Fixes for 4.1
-Date: Fri, 22 May 2015 12:05:59 +0800
-Message-ID: <20150522040559.GA30475@gondor.apana.org.au>
-References: <20131203124129.GA12067@gondor.apana.org.au>
- <20131209115705.GA1361@gondor.apana.org.au>
- <20140101061016.GA22579@gondor.apana.org.au>
- <20140203125944.GA31446@gondor.apana.org.au>
- <20141231033217.GA27261@gondor.apana.org.au>
- <20150107021737.GA25043@gondor.apana.org.au>
- <20150425080310.GA6873@gondor.apana.org.au>
- <20150505100621.GA8678@gondor.apana.org.au>
- <20150511055608.GA2055@gondor.apana.org.au>
- <20150520065441.GA8330@gondor.apana.org.au>
+Subject: Re: [PATCH 7/7] mac80211: Switch to new AEAD interface
+Date: Fri, 22 May 2015 12:11:48 +0800
+Message-ID: <20150522041148.GA30589@gondor.apana.org.au>
+References: <20150521103938.GA23035@gondor.apana.org.au>
+ <E1YvNxS-00063i-AZ@gondolin.me.apana.org.au>
+ <1432207249.2343.9.camel@sipsolutions.net>
+ <20150521115013.GA23833@gondor.apana.org.au>
+ <1432210664.2343.10.camel@sipsolutions.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+To: Johannes Berg <johannes@sipsolutions.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60791 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:34343 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752025AbbEVEGI (ORCPT
+	with ESMTP id S1750732AbbEVELx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 22 May 2015 00:06:08 -0400
+	Fri, 22 May 2015 00:11:53 -0400
 Content-Disposition: inline
-In-Reply-To: <20150520065441.GA8330@gondor.apana.org.au>
+In-Reply-To: <1432210664.2343.10.camel@sipsolutions.net>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus:
+On Thu, May 21, 2015 at 02:17:44PM +0200, Johannes Berg wrote:
+>
+> Do you have a branch somewhere with all of that?
 
-This push fixes the following issues:
-
-* Crash in the newly added algif_aead interface when it tries to
-  link SG lists.
-
-* ICV corruption in s390/ghash when the same tfm is used by more
-  than one thread.
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-or
-
-master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
-
-
-Harald Freudenberger (1):
-      crypto: s390/ghash - Fix incorrect ghash icv buffer handling.
-
-Tadeusz Struk (1):
-      crypto: algif_aead - fix invalid sgl linking
-
- arch/s390/crypto/ghash_s390.c |   25 +++++++++++++------------
- crypto/algif_aead.c           |    9 ++++-----
- 2 files changed, 17 insertions(+), 17 deletions(-)
+OK the prerequisite patches are now in cryptodev.
 
 Thanks,
 -- 
