@@ -1,43 +1,42 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [v2 PATCH 13/13] crypto: algif_aead - Switch to new AEAD interface
-Date: Fri, 22 May 2015 23:04:39 +0200
-Message-ID: <13023896.hEcYqcIc2j@myon.chronox.de>
-References: <20150522082708.GA3507@gondor.apana.org.au> <E1YviMC-00010E-Uk@gondolin.me.apana.org.au> <1711949.C5mmxUsD4a@myon.chronox.de>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: Crypto Fixes for 4.1
+Date: Fri, 22 May 2015 14:29:11 -0700
+Message-ID: <CA+55aFw894YfLFXVLAVW6-g4bVXSaL5dxVnB633YOuhyQ=RGJQ@mail.gmail.com>
+References: <20131203124129.GA12067@gondor.apana.org.au>
+	<20131209115705.GA1361@gondor.apana.org.au>
+	<20140101061016.GA22579@gondor.apana.org.au>
+	<20140203125944.GA31446@gondor.apana.org.au>
+	<20141231033217.GA27261@gondor.apana.org.au>
+	<20150107021737.GA25043@gondor.apana.org.au>
+	<20150425080310.GA6873@gondor.apana.org.au>
+	<20150505100621.GA8678@gondor.apana.org.au>
+	<20150511055608.GA2055@gondor.apana.org.au>
+	<20150520065441.GA8330@gondor.apana.org.au>
+	<20150522040559.GA30475@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset=UTF-8
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <netdev-owner@vger.kernel.org>
-In-Reply-To: <1711949.C5mmxUsD4a@myon.chronox.de>
-Sender: netdev-owner@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20150522040559.GA30475@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Am Freitag, 22. Mai 2015, 22:59:34 schrieb Stephan Mueller:
+On Thu, May 21, 2015 at 9:05 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> Please pull from
+>
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+>
+> or
+>
+> master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Hi Stephan,
+Mind fixing your script to not have that old "master.kernel.org' thing
+that no longer works and hasn't worked in a long time? I thought I
+asked you earlier, but it turns out that was Dmitry and the input tree
+who had the same old script...
 
-> Am Freitag, 22. Mai 2015, 16:31:04 schrieb Herbert Xu:
-> 
-> Hi Herbert,
-> 
-> > This patch makes use of the new AEAD interface which uses a single
-> > SG list instead of separate lists for the AD and plain text.
-> 
-> Using an up-to date tree with the full set of patches of this patch set, I
-> get the following oops.
-> 
-> It can easily be reproduced by using [1]: go to libkcapi/test/ and compile
-> with make. Then execute ./test.sh
-> 
-> [1] http://www.chronox.de/libkcapi.html
-
-Note, gcm(aes) looks good. Only rfc4106(gcm(aes)) causes the crash.
-
--- 
-Ciao
-Stephan
+               Linus
