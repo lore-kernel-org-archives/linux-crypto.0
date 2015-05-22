@@ -1,42 +1,111 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: Crypto Fixes for 4.1
-Date: Fri, 22 May 2015 14:29:11 -0700
-Message-ID: <CA+55aFw894YfLFXVLAVW6-g4bVXSaL5dxVnB633YOuhyQ=RGJQ@mail.gmail.com>
-References: <20131203124129.GA12067@gondor.apana.org.au>
-	<20131209115705.GA1361@gondor.apana.org.au>
-	<20140101061016.GA22579@gondor.apana.org.au>
-	<20140203125944.GA31446@gondor.apana.org.au>
-	<20141231033217.GA27261@gondor.apana.org.au>
-	<20150107021737.GA25043@gondor.apana.org.au>
-	<20150425080310.GA6873@gondor.apana.org.au>
-	<20150505100621.GA8678@gondor.apana.org.au>
-	<20150511055608.GA2055@gondor.apana.org.au>
-	<20150520065441.GA8330@gondor.apana.org.au>
-	<20150522040559.GA30475@gondor.apana.org.au>
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Subject: Re: [V5 PATCH 1/5] ACPI / scan: Parse _CCA and setup device coherency
+Date: Fri, 22 May 2015 23:56:45 +0200
+Message-ID: <1815824.lIg0NQ97lU@vostro.rjw.lan>
+References: <1432159758-4486-1-git-send-email-Suravee.Suthikulpanit@amd.com> <1432159758-4486-2-git-send-email-Suravee.Suthikulpanit@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7Bit
+Cc: lenb@kernel.org, catalin.marinas@arm.com, will.deacon@arm.com,
+	thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, arnd@arndb.de, msalter@redhat.com,
+	hanjun.guo@linaro.org, al.stone@linaro.org,
+	grant.likely@linaro.org, leo.duran@amd.com,
+	linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linaro-acpi@lists.linaro.org,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150522040559.GA30475@gondor.apana.org.au>
+In-Reply-To: <1432159758-4486-2-git-send-email-Suravee.Suthikulpanit@amd.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Thu, May 21, 2015 at 9:05 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> Please pull from
->
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
->
-> or
->
-> master.kernel.org:/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+On Wednesday, May 20, 2015 05:09:14 PM Suravee Suthikulpanit wrote:
+> This patch implements support for ACPI _CCA object, which is introduced in
+> ACPIv5.1, can be used for specifying device DMA coherency attribute.
+> 
+> The parsing logic traverses device namespace to parse coherency
+> information, and stores it in acpi_device_flags. Then uses it to call
+> arch_setup_dma_ops() when creating each device enumerated in DSDT
+> during ACPI scan.
+> 
+> This patch also introduces acpi_dma_is_coherent(), which provides
+> an interface for device drivers to check the coherency information
+> similarly to the of_dma_is_coherent().
+> 
+> Signed-off-by: Mark Salter <msalter@redhat.com>
+> Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+> ---
+>  drivers/acpi/Kconfig         |  3 +++
+>  drivers/acpi/acpi_platform.c |  2 +-
+>  drivers/acpi/glue.c          |  5 +++++
+>  drivers/acpi/scan.c          | 35 +++++++++++++++++++++++++++++++++++
+>  include/acpi/acpi_bus.h      | 37 ++++++++++++++++++++++++++++++++++++-
+>  include/linux/acpi.h         |  5 +++++
+>  6 files changed, 85 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/acpi/Kconfig b/drivers/acpi/Kconfig
+> index ab2cbb5..212735f 100644
+> --- a/drivers/acpi/Kconfig
+> +++ b/drivers/acpi/Kconfig
+> @@ -54,6 +54,9 @@ config ACPI_GENERIC_GSI
+>  config ACPI_SYSTEM_POWER_STATES_SUPPORT
+>  	bool
+>  
+> +config ACPI_CCA_REQUIRED
+> +	bool
+> +
+>  config ACPI_SLEEP
+>  	bool
+>  	depends on SUSPEND || HIBERNATION
+> diff --git a/drivers/acpi/acpi_platform.c b/drivers/acpi/acpi_platform.c
+> index 4bf7559..06a67d5 100644
+> --- a/drivers/acpi/acpi_platform.c
+> +++ b/drivers/acpi/acpi_platform.c
+> @@ -103,7 +103,7 @@ struct platform_device *acpi_create_platform_device(struct acpi_device *adev)
+>  	pdevinfo.res = resources;
+>  	pdevinfo.num_res = count;
+>  	pdevinfo.fwnode = acpi_fwnode_handle(adev);
+> -	pdevinfo.dma_mask = DMA_BIT_MASK(32);
+> +	pdevinfo.dma_mask = acpi_check_dma(adev, NULL) ? DMA_BIT_MASK(32) : 0;
+>  	pdev = platform_device_register_full(&pdevinfo);
+>  	if (IS_ERR(pdev))
+>  		dev_err(&adev->dev, "platform device creation failed: %ld\n",
+> diff --git a/drivers/acpi/glue.c b/drivers/acpi/glue.c
+> index 39c485b..b9657af 100644
+> --- a/drivers/acpi/glue.c
+> +++ b/drivers/acpi/glue.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/rwsem.h>
+>  #include <linux/acpi.h>
+> +#include <linux/dma-mapping.h>
+>  
+>  #include "internal.h"
+>  
+> @@ -167,6 +168,7 @@ int acpi_bind_one(struct device *dev, struct acpi_device *acpi_dev)
+>  	struct list_head *physnode_list;
+>  	unsigned int node_id;
+>  	int retval = -EINVAL;
+> +	bool coherent;
+>  
+>  	if (has_acpi_companion(dev)) {
+>  		if (acpi_dev) {
+> @@ -223,6 +225,9 @@ int acpi_bind_one(struct device *dev, struct acpi_device *acpi_dev)
+>  	if (!has_acpi_companion(dev))
+>  		ACPI_COMPANION_SET(dev, acpi_dev);
+>  
+> +	if (acpi_check_dma(acpi_dev, &coherent))
+> +		arch_setup_dma_ops(dev, 0, 0, NULL, coherent);
+> +
 
-Mind fixing your script to not have that old "master.kernel.org' thing
-that no longer works and hasn't worked in a long time? I thought I
-asked you earlier, but it turns out that was Dmitry and the input tree
-who had the same old script...
+Well, so is this going to work for PCI too after all?
 
-               Linus
+>  	acpi_physnode_link_name(physical_node_name, node_id);
+>  	retval = sysfs_create_link(&acpi_dev->dev.kobj, &dev->kobj,
+>  				   physical_node_name);
+
+
+-- 
+I speak only for myself.
+Rafael J. Wysocki, Intel Open Source Technology Center.
