@@ -1,113 +1,44 @@
-From: Suravee Suthikulanit <suravee.suthikulpanit@amd.com>
-Subject: Re: [V5 PATCH 1/5] ACPI / scan: Parse _CCA and setup device coherency
-Date: Fri, 22 May 2015 20:38:28 -0500
-Message-ID: <555FDA14.9050404@amd.com>
-References: <1432159758-4486-1-git-send-email-Suravee.Suthikulpanit@amd.com>
- <2939517.7sXtxU6TkU@vostro.rjw.lan> <555FC695.1000404@amd.com>
- <9319342.HPcAml3MbA@vostro.rjw.lan>
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: [PATCH cryptodev] crypto: echainiv_read_iv() can be static
+Date: Sat, 23 May 2015 11:22:47 +0800
+Message-ID: <20150522074410.GA102425@lkp-sb04>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <lenb@kernel.org>, <catalin.marinas@arm.com>,
-	<will.deacon@arm.com>, <thomas.lendacky@amd.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<arnd@arndb.de>, <msalter@redhat.com>, <hanjun.guo@linaro.org>,
-	<al.stone@linaro.org>, <grant.likely@linaro.org>,
-	<leo.duran@amd.com>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-acpi@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linaro-acpi@lists.linaro.org>, <netdev@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>
-To: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <9319342.HPcAml3MbA@vostro.rjw.lan>
-Sender: linux-acpi-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:16000 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756159AbbEWDWv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 22 May 2015 23:22:51 -0400
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 5/22/2015 8:25 PM, Rafael J. Wysocki wrote:
-> On Friday, May 22, 2015 07:15:17 PM Suravee Suthikulanit wrote:
->> On 5/22/2015 6:05 PM, Rafael J. Wysocki wrote:
->>> On Friday, May 22, 2015 05:24:15 PM Suravee Suthikulanit wrote:
->>>> Not sure if this went out earlier. So I am resending.
->>>>
->>>> On 5/22/15 16:56, Rafael J. Wysocki wrote:
->>>>>> diff --git a/drivers/acpi/glue.c b/drivers/acpi/glue.c
->>>>>>> index 39c485b..b9657af 100644
->>>>>>> --- a/drivers/acpi/glue.c
->>>>>>> +++ b/drivers/acpi/glue.c
->>>>>>> @@ -13,6 +13,7 @@
->>>>>>>    #include <linux/slab.h>
->>>>>>>    #include <linux/rwsem.h>
->>>>>>>    #include <linux/acpi.h>
->>>>>>> +#include <linux/dma-mapping.h>
->>>>>>>
->>>>>>>    #include "internal.h"
->>>>>>>
->>>>>>> @@ -167,6 +168,7 @@ int acpi_bind_one(struct device *dev, struct acpi_device *acpi_dev)
->>>>>>>    	struct list_head *physnode_list;
->>>>>>>    	unsigned int node_id;
->>>>>>>    	int retval = -EINVAL;
->>>>>>> +	bool coherent;
->>>>>>>
->>>>>>>    	if (has_acpi_companion(dev)) {
->>>>>>>    		if (acpi_dev) {
->>>>>>> @@ -223,6 +225,9 @@ int acpi_bind_one(struct device *dev, struct acpi_device *acpi_dev)
->>>>>>>    	if (!has_acpi_companion(dev))
->>>>>>>    		ACPI_COMPANION_SET(dev, acpi_dev);
->>>>>>>
->>>>>>> +	if (acpi_check_dma(acpi_dev, &coherent))
->>>>>>> +		arch_setup_dma_ops(dev, 0, 0, NULL, coherent);
->>>>>>> +
->>>>> Well, so is this going to work for PCI too after all?
->>>>>
->>>>
->>>> No, as Bjorn suggested, PCI changes for setting DMA coherent from _CCA
->>>> (patch 3/6 in V4) will be submitted separately. We are working on
->>>> cleaning up and up-streaming the PCI ACPI support for ARM64.
->>>
->>> OK, but acpi_bind_one() is called for PCI devices too.  Won't that be a problem?
->>>
->>>
->>   >
->> In this case, we would be going through the following call path:
->>
->>     --> pci_device_add()
->>      |--> pci_dma_configure() ** 1 **
->>      |--> device_add()
->>        |--> platform_notify()
->>          |--> acpi_platform_notify()
->>           |--> acpi_bind_one() ** 2 **
->>
->> At (1), we would be calling arch_setup_dma_ops() with the PCI host
->> bridge _CCA information. So, it should have already taken care of
->> setting up device coherency here.
->>
->> At (2), if there is no acpi_dev for endpoint devices (which I believe
->> this is normally the case), it would return early and skip
->> arch_setup_dma_ops().
->
-> That's not correct.  There may be ACPI companions for endpoint devices too.
+Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
+---
+ echainiv.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Ok. Duly noted :)
-
->> At (2), if there is an acpi_dev, the coherent_dma flag should have
->> already been setup by the acpi_init_device_object during ACPI scan.
->
-> That one sets the flag for the *ACPI* *companion* of the device, which
-> I'm still thinking is pointless, isn't it?
-
-When you say pointless, are you referring to the part where we are end 
-up calling arch_setup_dma_coherent() twice in this case? I am not quite 
-following your point.
-
->> However, I am not certain about this case since I don't have the DSDT
->> containing  PCI endpoint devices to test with.
->
-> Every x86 PC has them (as far as I can say), but in that case there's no
-> _CCA and they are all coherent.
-
-Ok.
-
-Thanks,
-Suravee
-
-
+diff --git a/crypto/echainiv.c b/crypto/echainiv.c
+index e5a9878..d0e325d0 100644
+--- a/crypto/echainiv.c
++++ b/crypto/echainiv.c
+@@ -67,7 +67,7 @@ static int echainiv_setauthsize(struct crypto_aead *tfm,
+ }
+ 
+ /* We don't care if we get preempted and read/write IVs from the next CPU. */
+-void echainiv_read_iv(u8 *dst, unsigned size)
++static void echainiv_read_iv(u8 *dst, unsigned size)
+ {
+ 	u32 *a = (u32 *)dst;
+ 	u32 __percpu *b = echainiv_iv;
+@@ -78,7 +78,7 @@ void echainiv_read_iv(u8 *dst, unsigned size)
+ 	}
+ }
+ 
+-void echainiv_write_iv(const u8 *src, unsigned size)
++static void echainiv_write_iv(const u8 *src, unsigned size)
+ {
+ 	const u32 *a = (const u32 *)src;
+ 	u32 __percpu *b = echainiv_iv;
