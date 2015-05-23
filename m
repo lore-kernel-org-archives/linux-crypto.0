@@ -1,150 +1,74 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 8/8] crypto: aead - Remove unused cryptoff parameter
-Date: Sat, 23 May 2015 15:41:57 +0800
-Message-ID: <E1Yw44D-0003tZ-JR@gondolin.me.apana.org.au>
-References: <20150523074058.GA14781@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:43795 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757196AbbEWHmB (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 23 May 2015 03:42:01 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6])
-	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1Yw44E-00034H-Ln
-	for <linux-crypto@vger.kernel.org>; Sat, 23 May 2015 17:41:58 +1000
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v9 1/4] ARM: sun7i: dt: Add Security System
+ to A20 SoC DTS
+Date: Sat, 23 May 2015 14:08:52 +0200
+Message-ID: <55606DD4.5030502@gmail.com>
+References: <1431608341-10936-1-git-send-email-clabbe.montjoie@gmail.com> <1431608341-10936-2-git-send-email-clabbe.montjoie@gmail.com> <20150515073114.GO4004@lukather>
+Reply-To: clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org, mark.rutland-5wv7dgnIgG8@public.gmane.org,
+ ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
+ linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org, herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org,
+ davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+ gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org, mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org,
+ tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org, boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org,
+ devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+ linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+To: Maxime Ripard <maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Return-path: <linux-sunxi+bncBD7YLCN32UNBBWG3QGVQKGQE6KTZJGI-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+In-Reply-To: <20150515073114.GO4004@lukather>
+List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Archive: <http://groups.google.com/group/linux-sunxi
+Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
+List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
+ <http://groups.google.com/group/linux-sunxi/subscribe>
+List-Id: linux-crypto.vger.kernel.org
 
-This patch removes the cryptoff parameter now that all users
-set it to zero.
+Le 15/05/2015 09:31, Maxime Ripard a =C3=A9crit :
+> On Thu, May 14, 2015 at 02:58:58PM +0200, LABBE Corentin wrote:
+>> The Security System is a hardware cryptographic accelerator that support
+>> AES/MD5/SHA1/DES/3DES/PRNG algorithms.
+>> It could be found on many Allwinner SoC.
+>>
+>> This patch enable the Security System on the Allwinner A20 SoC Device-tr=
+ee.
+>>
+>> Signed-off-by: LABBE Corentin <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> ---
+>>  arch/arm/boot/dts/sun7i-a20.dtsi | 8 ++++++++
+>>  1 file changed, 8 insertions(+)
+>>
+>> diff --git a/arch/arm/boot/dts/sun7i-a20.dtsi b/arch/arm/boot/dts/sun7i-=
+a20.dtsi
+>> index fdd1817..9a823ce 100644
+>> --- a/arch/arm/boot/dts/sun7i-a20.dtsi
+>> +++ b/arch/arm/boot/dts/sun7i-a20.dtsi
+>> @@ -679,6 +679,14 @@
+>>  			status =3D "disabled";
+>>  		};
+>> =20
+>> +		crypto: crypto-engine@01c15000 {
+>> +			compatible =3D "allwinner,sun4i-a20-crypto";
+>=20
+> This looks wrong. It's either sun4i-a10 or sun7i-a20.
+>=20
+> It looks good otherwise.
+>=20
+> Thanks!
+> Maxime
+>=20
+Fixed with sun4i-a10
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+Thanks
 
- crypto/aead.c         |    6 ++----
- crypto/echainiv.c     |    4 ++--
- crypto/seqiv.c        |    8 ++++----
- include/crypto/aead.h |    7 +------
- 4 files changed, 9 insertions(+), 16 deletions(-)
-
-diff --git a/crypto/aead.c b/crypto/aead.c
-index 070e4b9..7c3d725 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -106,10 +106,8 @@ static int old_crypt(struct aead_request *req,
- 	if (req->old)
- 		return crypt(req);
- 
--	src = scatterwalk_ffwd(nreq->srcbuf, req->src,
--			       req->assoclen + req->cryptoff);
--	dst = scatterwalk_ffwd(nreq->dstbuf, req->dst,
--			       req->assoclen + req->cryptoff);
-+	src = scatterwalk_ffwd(nreq->srcbuf, req->src, req->assoclen);
-+	dst = scatterwalk_ffwd(nreq->dstbuf, req->dst, req->assoclen);
- 
- 	aead_request_set_tfm(&nreq->subreq, aead);
- 	aead_request_set_callback(&nreq->subreq, aead_request_flags(req),
-diff --git a/crypto/echainiv.c b/crypto/echainiv.c
-index e24022e..7b62dfc 100644
---- a/crypto/echainiv.c
-+++ b/crypto/echainiv.c
-@@ -259,7 +259,7 @@ static int echainiv_encrypt(struct aead_request *req)
- 	aead_request_set_callback(subreq, req->base.flags, compl, data);
- 	aead_request_set_crypt(subreq, req->dst, req->dst,
- 			       req->cryptlen - ivsize, info);
--	aead_request_set_ad(subreq, req->assoclen + ivsize, 0);
-+	aead_request_set_ad(subreq, req->assoclen + ivsize);
- 
- 	crypto_xor(info, ctx->salt, ivsize);
- 	scatterwalk_map_and_copy(info, req->dst, req->assoclen, ivsize, 1);
-@@ -322,7 +322,7 @@ static int echainiv_decrypt(struct aead_request *req)
- 	aead_request_set_callback(subreq, req->base.flags, compl, data);
- 	aead_request_set_crypt(subreq, req->src, req->dst,
- 			       req->cryptlen - ivsize, req->iv);
--	aead_request_set_ad(subreq, req->assoclen + ivsize, 0);
-+	aead_request_set_ad(subreq, req->assoclen + ivsize);
- 
- 	scatterwalk_map_and_copy(req->iv, req->src, req->assoclen, ivsize, 0);
- 	if (req->src != req->dst)
-diff --git a/crypto/seqiv.c b/crypto/seqiv.c
-index 16738c5..127970a 100644
---- a/crypto/seqiv.c
-+++ b/crypto/seqiv.c
-@@ -337,7 +337,7 @@ static int seqiv_aead_encrypt_compat(struct aead_request *req)
- 	aead_request_set_callback(subreq, req->base.flags, compl, data);
- 	aead_request_set_crypt(subreq, dst, dst,
- 			       req->cryptlen - ivsize, req->iv);
--	aead_request_set_ad(subreq, req->assoclen, 0);
-+	aead_request_set_ad(subreq, req->assoclen);
- 
- 	memcpy(buf, req->iv, ivsize);
- 	crypto_xor(buf, ctx->salt, ivsize);
-@@ -406,7 +406,7 @@ static int seqiv_aead_encrypt(struct aead_request *req)
- 	aead_request_set_callback(subreq, req->base.flags, compl, data);
- 	aead_request_set_crypt(subreq, req->dst, req->dst,
- 			       req->cryptlen - ivsize, info);
--	aead_request_set_ad(subreq, req->assoclen + ivsize, 0);
-+	aead_request_set_ad(subreq, req->assoclen + ivsize);
- 
- 	crypto_xor(info, ctx->salt, ivsize);
- 	scatterwalk_map_and_copy(info, req->dst, req->assoclen, ivsize, 1);
-@@ -473,7 +473,7 @@ static int seqiv_aead_decrypt_compat(struct aead_request *req)
- 	aead_request_set_callback(subreq, req->base.flags, compl, data);
- 	aead_request_set_crypt(subreq, dst, dst,
- 			       req->cryptlen - ivsize, req->iv);
--	aead_request_set_ad(subreq, req->assoclen, 0);
-+	aead_request_set_ad(subreq, req->assoclen);
- 
- 	err = crypto_aead_decrypt(subreq);
- 	if (req->assoclen > 8)
-@@ -501,7 +501,7 @@ static int seqiv_aead_decrypt(struct aead_request *req)
- 	aead_request_set_callback(subreq, req->base.flags, compl, data);
- 	aead_request_set_crypt(subreq, req->src, req->dst,
- 			       req->cryptlen - ivsize, req->iv);
--	aead_request_set_ad(subreq, req->assoclen + ivsize, 0);
-+	aead_request_set_ad(subreq, req->assoclen + ivsize);
- 
- 	scatterwalk_map_and_copy(req->iv, req->src, req->assoclen, ivsize, 0);
- 	if (req->src != req->dst)
-diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index ba28c61..94141dc 100644
---- a/include/crypto/aead.h
-+++ b/include/crypto/aead.h
-@@ -52,7 +52,6 @@
-  *	@base: Common attributes for async crypto requests
-  *	@assoclen: Length in bytes of associated data for authentication
-  *	@cryptlen: Length of data to be encrypted or decrypted
-- *	@cryptoff: Bytes to skip after AD before plain/cipher text
-  *	@iv: Initialisation vector
-  *	@assoc: Associated data
-  *	@src: Source data
-@@ -66,7 +65,6 @@ struct aead_request {
- 
- 	unsigned int assoclen;
- 	unsigned int cryptlen;
--	unsigned int cryptoff;
- 
- 	u8 *iv;
- 
-@@ -525,18 +523,15 @@ static inline void aead_request_set_assoc(struct aead_request *req,
-  * aead_request_set_ad - set associated data information
-  * @req: request handle
-  * @assoclen: number of bytes in associated data
-- * @cryptoff: Number of bytes to skip after AD before plain/cipher text
-  *
-  * Setting the AD information.  This function sets the length of
-  * the associated data and the number of bytes to skip after it to
-  * access the plain/cipher text.
-  */
- static inline void aead_request_set_ad(struct aead_request *req,
--				       unsigned int assoclen,
--				       unsigned int cryptoff)
-+				       unsigned int assoclen)
- {
- 	req->assoclen = assoclen;
--	req->cryptoff = cryptoff;
- 	req->old = false;
- }
- 
+--=20
+You received this message because you are subscribed to the Google Groups "=
+linux-sunxi" group.
+To unsubscribe from this group and stop receiving emails from it, send an e=
+mail to linux-sunxi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
+For more options, visit https://groups.google.com/d/optout.
