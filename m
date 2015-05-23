@@ -1,38 +1,54 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 0/8] crypto: aead - Use type-safe instance registration and
- remove cryptoff
-Date: Sat, 23 May 2015 15:40:58 +0800
-Message-ID: <20150523074058.GA14781@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [PATCH 1/8] crypto: skcipher - Use tmpl->create
+Date: Sat, 23 May 2015 15:41:48 +0800
+Message-ID: <E1Yw444-0003rc-Jq@gondolin.me.apana.org.au>
+References: <20150523074058.GA14781@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:39493 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:48675 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755713AbbEWHlC (ORCPT
+	with ESMTP id S1755039AbbEWHlv (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 23 May 2015 03:41:02 -0400
-Content-Disposition: inline
+	Sat, 23 May 2015 03:41:51 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
+	id 1Yw444-00032T-Se
+	for <linux-crypto@vger.kernel.org>; Sat, 23 May 2015 17:41:49 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi:
+Newer templates use tmpl->create and have a NULL tmpl->alloc.  So
+we must use tmpl->create if it is set.
 
-This series of patches makes the new seqiv/echainiv implementation
-use the type-safe instance registration mechanism.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-It also removes the cryptoff parameter from the new AEAD interface.
-The cryptoff parameter only existed to ease the pain on implementing
-seqniv (i.e., skipping IV when generating ICV, used by GCM and CCM).
+ crypto/ablkcipher.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-However it turns out that it only helped because the implementation
-was buggy and totally ignored the IPsec user's cryptoff setting.
-
-So the last three pathces remove that use of cryptoff and instead
-rearranges the AD such that the gap left by the IV is filled.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+index b3dded4..b15d797 100644
+--- a/crypto/ablkcipher.c
++++ b/crypto/ablkcipher.c
+@@ -586,6 +586,13 @@ static int crypto_givcipher_default(struct crypto_alg *alg, u32 type, u32 mask)
+ 	if (!tmpl)
+ 		goto kill_larval;
+ 
++	if (tmpl->create) {
++		err = tmpl->create(tmpl, tb);
++		if (err)
++			goto put_tmpl;
++		goto ok;
++	}
++
+ 	inst = tmpl->alloc(tb);
+ 	err = PTR_ERR(inst);
+ 	if (IS_ERR(inst))
+@@ -597,6 +604,7 @@ static int crypto_givcipher_default(struct crypto_alg *alg, u32 type, u32 mask)
+ 		goto put_tmpl;
+ 	}
+ 
++ok:
+ 	/* Redo the lookup to use the instance we just registered. */
+ 	err = -EAGAIN;
+ 
