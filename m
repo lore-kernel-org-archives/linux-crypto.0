@@ -1,348 +1,109 @@
-From: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Subject: Re: [PATCH v9 4/4] crypto: Add Allwinner Security
- System crypto accelerator
-Date: Sat, 23 May 2015 16:35:36 +0200
-Message-ID: <20150523163536.2d64ef8d@bbrezillon>
-References: <1431608341-10936-1-git-send-email-clabbe.montjoie@gmail.com>
-	<1431608341-10936-5-git-send-email-clabbe.montjoie@gmail.com>
-	<20150517104508.468b032f@bbrezillon>
-	<55607CB7.8020505@gmail.com>
-Reply-To: boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [v2 PATCH 13/13] crypto: algif_aead - Switch to new AEAD interface
+Date: Sat, 23 May 2015 20:04:19 +0200
+Message-ID: <1969904.xZlo35YxmK@tachyon.chronox.de>
+References: <20150522082708.GA3507@gondor.apana.org.au> <E1YviMC-00010E-Uk@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Cc: herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org, robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, pawel.moll-5wv7dgnIgG8@public.gmane.org,
- mark.rutland-5wv7dgnIgG8@public.gmane.org, ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org, galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org,
- maxime.ripard-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org, linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org,
- davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org,
- mchehab-JPH+aEBZ4P+UEJcrhfAQsw@public.gmane.org, joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org, tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org,
- devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
- linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-To: Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-sunxi+bncBCIPJ6FA2QLBBPNAQKVQKGQEW5WXHRA-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-In-Reply-To: <55607CB7.8020505-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-List-Post: <http://groups.google.com/group/linux-sunxi/post>, <mailto:linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Help: <http://groups.google.com/support/>, <mailto:linux-sunxi+help-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Archive: <http://groups.google.com/group/linux-sunxi
-Sender: linux-sunxi-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org
-List-Subscribe: <http://groups.google.com/group/linux-sunxi/subscribe>, <mailto:linux-sunxi+subscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-List-Unsubscribe: <mailto:googlegroups-manage+1076902468213+unsubscribe-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>,
- <http://groups.google.com/group/linux-sunxi/subscribe>
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:58197 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754116AbbEWSEX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Sat, 23 May 2015 14:04:23 -0400
+In-Reply-To: <E1YviMC-00010E-Uk@gondolin.me.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Corentin,
+Am Freitag, 22. Mai 2015, 16:31:04 schrieb Herbert Xu:
 
-On Sat, 23 May 2015 15:12:23 +0200
-Corentin LABBE <clabbe.montjoie-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Hi Herbert,
 
-> Le 17/05/2015 10:45, Boris Brezillon a =C3=A9crit :
-> > Hi Corentin,
-> >=20
-> > I started to review this new version, and I still think there's
-> > something wrong with the way your processing crypto requests.
-> > From my POV this is not asynchronous at all (see my comments inline),
-> > but maybe Herbert can confirm that.
-> > I haven't reviewed the hash part yet, but I guess it has the same
-> > problem.
->=20
-> For resuming your conversation with Herbert, I have removed all CRYPTO_AL=
-G_ASYNC flags.
+> This patch makes use of the new AEAD interface which uses a single
+> SG list instead of separate lists for the AD and plain text.
 
-Okay. I really think you can easily deal with asynchronous request (I
-had a look at the datasheet), but I'll let maintainers decide whether
-this is important or not.
+After applying your additional patch, the "normal" AEAD operation works.
 
-
-> >=20
-> >> +
-> >> +int sun4i_ss_aes_poll(struct ablkcipher_request *areq, u32 mode)
-> >> +{
-> >> +	u32 spaces;
-> >> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(areq);
-> >> +	struct sun4i_tfm_ctx *op =3D crypto_ablkcipher_ctx(tfm);
-> >> +	struct sun4i_ss_ctx *ss =3D op->ss;
-> >> +	unsigned int ivsize =3D crypto_ablkcipher_ivsize(tfm);
-> >> +	/* when activating SS, the default FIFO space is 32 */
-> >> +	u32 rx_cnt =3D 32;
-> >> +	u32 tx_cnt =3D 0;
-> >> +	u32 v;
-> >> +	int i, sgnum, err =3D 0;
-> >> +	unsigned int ileft =3D areq->nbytes;
-> >> +	unsigned int oleft =3D areq->nbytes;
-> >> +	unsigned int todo, miter_flag;
-> >> +	unsigned long flags;
-> >> +	struct sg_mapping_iter mi, mo;
-> >> +	unsigned int oi, oo; /* offset for in and out */
-> >> +
-> >> +	if (areq->nbytes =3D=3D 0)
-> >> +		return 0;
-> >> +
-> >> +	if (areq->info =3D=3D NULL) {
-> >> +		dev_err(ss->dev, "ERROR: Empty IV\n");
-> >> +		return -EINVAL;
-> >> +	}
-> >> +
-> >> +	if (areq->src =3D=3D NULL || areq->dst =3D=3D NULL) {
-> >> +		dev_err(ss->dev, "ERROR: Some SGs are NULL\n");
-> >> +		return -EINVAL;
-> >> +	}
-> >> +
-> >> +	spin_lock_irqsave(&ss->slock, flags);
-> >=20
-> > Do you really need to take this lock so early ?
-> > BTW, what is this lock protecting ?
->=20
-> As I have written in the header, the spinlock protect the usage of the de=
-vice.
-> In this case, I need to lock just before writing the key in the device.
-
-I'm not denying the fact that you need some locking, just how this
-locking is done: you're preventing the all system from receiving
-interrupts for the all time your doing your crypto request.
-
-Here is a suggestion (if you still want to keep the synchronous model,
-which IMHO is not a good idea, but hey, that's not my call to make).
-
-1/ wait for the device to be ready (using a waitqueue)
-2/ take the lock
-3/ check if the engine is busy (already handling another crypto
-   request).
-4.1/ If the engine is not busy, mark the engine as busy, release the
-     lock and proceed with the crytpo request handling.
-4.2/ If the engine is busy, release the lock and go back to 1/=20
-
-
->=20
-> >=20
-> > IMHO, taking a spinlock and disabling irqs for the whole time you're
-> > executing a crypto request is not a good idea (it will prevent all
-> > other irqs from running, and potentially introduce latencies in other
-> > parts of the kernel).
->=20
-> Since crypto operation could be called by software interrupt, I need to d=
-isable them.
-> (Confirmed by http://www.makelinux.net/ldd3/chp-5-sect-5 5.5.3)
-
-Hm, you're not even using the interrupts provided by the IP to detect
-when the engine is ready to accept new data chunks (which is another
-aspect that should be addressed IMO), so I don't get why you need to
-disable HW interrupts.
-If you just want to disable SW interrupts, you can use spin_lock_bh()
-instead of spin_lock_irqsave().
-
->=20
-> >=20
-> > What you can do though is declare the following fields in your crypto
-> > engine struct (sun4i_ss_ctx):
-> > - a crypto request queue (struct crypto_queue [1])
-> > - a crypto_async_request variable storing the request being processed
-> > - a lock protecting the queue and the current request variable
-> >=20
-> > This way you'll only have to take the lock when queuing or dequeuing a
-> > request.
-> >=20
-> > Another comment, your implementation does not seem to be asynchronous a=
-t
-> > all: you're blocking the caller until its crypto request is complete.
-> >=20
-> >=20
-> >> +
-> >> +	for (i =3D 0; i < op->keylen; i +=3D 4)
-> >> +		writel(*(op->key + i / 4), ss->base + SS_KEY0 + i);
-> >> +
-> >> +	if (areq->info !=3D NULL) {
-> >> +		for (i =3D 0; i < 4 && i < ivsize / 4; i++) {
-> >> +			v =3D *(u32 *)(areq->info + i * 4);
-> >> +			writel(v, ss->base + SS_IV0 + i * 4);
-> >> +		}
-> >> +	}
-> >> +	writel(mode, ss->base + SS_CTL);
-> >> +
-> >> +	sgnum =3D sg_nents(areq->src);
-> >> +	if (sgnum =3D=3D 1)
-> >> +		miter_flag =3D SG_MITER_FROM_SG | SG_MITER_ATOMIC;
-> >> +	else
-> >> +		miter_flag =3D SG_MITER_FROM_SG;
-> >=20
-> >=20
-> > Why is the ATOMIC flag depending on the number of sg elements.
-> > IMO it should only depends on the context you're currently in, and in
-> > your specific case, you're always in atomic context since you've taken
-> > a spinlock (and disabled irqs) a few lines above.
-> >=20
-> > Note that with the approach I previously proposed, you can even get rid
-> > of this ATMIC flag (or always set it depending on the context you're in
-> > when dequeuing the crypto requests).
-> >=20
->=20
-> For sg_miter, the ATOMIC flag control the usage of kmap vs kmap_atomic.
-> Since kmap_atomic must not be held too long, I use them only for short cr=
-ypto operation.
-> But I need to rebench for be sure that using kmap_atomic give faster resu=
-lt.
-> If I keep that, I will add a comment explaining that.
-
-Maybe you can call kmap_atomic when you're in standard context (even if
-I'm not sure this is relevant), but you definitely can't call kmap when
-you're in atomic context (see the might_sleep() line here [1]). And
-since you've taken a spinlock (and disabled all the interrupts) a few
-lines above, you're in atomic context here.
-
-> >=20
-> >> +	sg_miter_start(&mo, areq->dst, sgnum, miter_flag);
-> >> +	sg_miter_next(&mi);
-> >> +	sg_miter_next(&mo);
-> >> +	if (mi.addr =3D=3D NULL || mo.addr =3D=3D NULL) {
-> >> +		err =3D -EINVAL;
-> >> +		goto release_ss;
-> >> +	}
-> >> +
-> >> +	ileft =3D areq->nbytes / 4;
-> >> +	oleft =3D areq->nbytes / 4;
-> >> +	oi =3D 0;
-> >> +	oo =3D 0;
-> >> +	do {
-> >> +		todo =3D min3(rx_cnt, ileft, (mi.length - oi) / 4);
-> >> +		if (todo > 0) {
-> >> +			ileft -=3D todo;
-> >> +			writesl(ss->base + SS_RXFIFO, mi.addr + oi, todo);
-> >=20
-> > Is there anything guaranteeing that your pointer is aligned on a 4 byte
-> > boundary ? If that's not the case, I guess you should copy it in a
-> > temporary variable before using writesl.
->=20
-> The cra_alignmask is my guarantee.
-
-Right.
-
->=20
-> >=20
-> >> +			oi +=3D todo * 4;
-> >> +		}
-> >> +		if (oi =3D=3D mi.length) {
-> >> +			sg_miter_next(&mi);
-> >> +			oi =3D 0;
-> >> +		}
-> >> +
-> >> +		ispaces =3D readl_relaxed(ss->base + SS_FCSR);
-> >=20
-> > Is there a good reason for using the _relaxed version of readl/writel
-> > (the same comment applies a few lines below) ?
->=20
-> No, it is clearly a remaining of the times where all my read/write was wi=
-th _relaxed.
-
-
-Okay, then maybe you should reconsider using readl/writel, unless you
-really know why you're using relaxed versions.
-
-> >=20
-> >> +	spin_unlock_irqrestore(&ss->slock, flags);
-> >> +	return err;
-> >> +}
-> >> +
-> >> +/* Pure CPU driven way of doing DES/3DES with SS */
-> >> +int sun4i_ss_des_poll(struct ablkcipher_request *areq, u32 mode)
-> >> +{
-> >> +	struct crypto_ablkcipher *tfm =3D crypto_ablkcipher_reqtfm(areq);
-> >> +	struct sun4i_tfm_ctx *op =3D crypto_ablkcipher_ctx(tfm);
-> >> +	struct sun4i_ss_ctx *ss =3D op->ss;
-> >> +	int i, err =3D 0;
-> >> +	int no_chunk =3D 1;
-> >> +	struct scatterlist *in_sg =3D areq->src;
-> >> +	struct scatterlist *out_sg =3D areq->dst;
-> >> +	u8 kkey[256 / 8];
-> >> +
-> >> +	if (areq->nbytes =3D=3D 0)
-> >> +		return 0;
-> >> +
-> >> +	if (areq->info =3D=3D NULL) {
-> >> +		dev_err(ss->dev, "ERROR: Empty IV\n");
-> >> +		return -EINVAL;
-> >> +	}
-> >> +
-> >> +	if (areq->src =3D=3D NULL || areq->dst =3D=3D NULL) {
-> >> +		dev_err(ss->dev, "ERROR: Some SGs are NULL\n");
-> >> +		return -EINVAL;
-> >> +	}
-> >> +
-> >> +	/*
-> >> +	 * if we have only SGs with size multiple of 4,
-> >> +	 * we can use the SS AES function
-> >> +	 */
-> >> +	while (in_sg !=3D NULL && no_chunk =3D=3D 1) {
-> >> +		if ((in_sg->length % 4) !=3D 0)
-> >> +			no_chunk =3D 0;
-> >> +		in_sg =3D sg_next(in_sg);
-> >> +	}
-> >> +	while (out_sg !=3D NULL && no_chunk =3D=3D 1) {
-> >> +		if ((out_sg->length % 4) !=3D 0)
-> >> +			no_chunk =3D 0;
-> >> +		out_sg =3D sg_next(out_sg);
-> >> +	}
-> >> +
-> >> +	if (no_chunk =3D=3D 1)
-> >> +		return sun4i_ss_aes_poll(areq, mode);
-> >> +
-> >> +	/*
-> >> +	 * if some SG are not multiple of 4bytes use a fallback
-> >> +	 * it is much easy and clean
-> >> +	 */
-> >=20
-> > Hm, is this really the best solution. I mean, you can easily pack
-> > values from non aligned sg buffers so that you have only a 4 byte
-> > aligned buffers.
-> > Moreover, by doing this you'll end up with a single
-> > sun4i_ss_ablkcipher_poll function.
-> >=20
-> > BTW, I wonder if there's anything preventing an AES crypto request to b=
-e
-> > forged the same way DES/3DES requests are (sg entries not aligned on 4
-> > bytes boundary).
->=20
-> There are two different problem: chunking and alignment.
-> The correct alignment is handled by the crypto API with the alignmask, so=
- the driver do not need to care about it.
-
-Yes...
-
-> The chunking is the fact that I can have a SG with a size that is non mul=
-tiple of 4.
-
-and I was takling about this specific aspect here.
-
-> For DES/3DES I handle this problem by using a fallback since DES/3DES was=
- not my priority. (but yes I will handle it in the future)
-> For AES I have assumed that it cannot happen since no test in tcrypt chec=
-k for it.
-
-If that's something you're willing to address in a future version, then
-I'm fine with that.
-
-> Since all SG I get was always a multiple of 16 (AES BLOCK SIZE) it was a =
-sort of confirmation.
->=20
-> Herbert ? does am I right or a chunking test is missing for cbc(aes) in t=
-estmgr.h
-
-Okay, just sharing my vision of this thing (I'll let Herbert comment on
-this aspect): I'd say that theoretically nothing prevents one from
-splitting its sg list in chunks smaller than the block size, so I'd
-say you should use the same trick for AES.=20
+But with long messages (16 filled pages), I get the following. To test, simply 
+use [1], cd libkcapi/test, compile and execute ./kcapi -y
 
 
 
-[1]http://lxr.free-electrons.com/source/arch/arm/mm/highmem.c#L37
-
---=20
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
-
---=20
-You received this message because you are subscribed to the Google Groups "=
-linux-sunxi" group.
-To unsubscribe from this group and stop receiving emails from it, send an e=
-mail to linux-sunxi+unsubscribe-/JYPxA39Uh5TLH3MbocFF+G/Ez6ZCGd0@public.gmane.org
-For more options, visit https://groups.google.com/d/optout.
+[   59.441841] BUG: unable to handle kernel NULL pointer dereference at 
+000000000000000c
+[   59.441853] IP: [<ffffffff812b6d78>] scatterwalk_ffwd+0x28/0xd0
+[   59.441866] PGD 78ad6067 PUD 799f5067 PMD 0 
+[   59.441874] Oops: 0000 [#1] SMP 
+[   59.441880] Modules linked in: ansi_cprng drbg algif_rng ccm gcm algif_aead 
+algif_skcipher sha512_ssse3 sha512_generic mcryptd sha1_ssse3 sha1_generic 
+crypto_user des3_ede_x86_64 des_generic cmac algif_hash af_alg 
+nf_conntrack_netbios_ns nf_conntrack_broadcast ip6t_rpfilter ip6t_REJECT 
+nf_reject_ipv6 nf_conntrack_ipv6 nf_defrag_ipv6 nf_conntrack_ipv4 
+nf_defrag_ipv4 xt_conntrack nf_conntrack cfg80211 ebtable_nat ebtable_broute 
+bridge stp llc ebtable_filter ebtables ip6table_mangle ip6table_security 
+ip6table_raw ip6table_filter ip6_tables iptable_mangle iptable_security 
+iptable_raw crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel 
+aesni_intel aes_x86_64 glue_helper ablk_helper microcode joydev pcspkr 
+serio_raw virtio_balloon i2c_piix4 acpi_cpufreq virtio_net qxl virtio_blk 
+drm_kms_helper
+[   59.441958]  ttm drm virtio_pci virtio_ring virtio
+[   59.441970] CPU: 1 PID: 2338 Comm: kcapi Not tainted 4.0.0+ #220
+[   59.441975] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 
+1.7.5-20140709_153950- 04/01/2014
+[   59.441995] task: ffff88007aa1e600 ti: ffff880035998000 task.ti: 
+ffff880035998000
+[   59.441999] RIP: 0010:[<ffffffff812b6d78>]  [<ffffffff812b6d78>] 
+scatterwalk_ffwd+0x28/0xd0
+[   59.442007] RSP: 0018:ffff88003599ba98  EFLAGS: 00010202
+[   59.442007] RAX: 0000000000000000 RBX: 0000000000006fe0 RCX: 
+ffffea0001eaa500
+[   59.442007] RDX: 0000000000001000 RSI: ffff88003599bb38 RDI: 
+ffff88003599bc18
+[   59.442007] RBP: ffff88003599baa8 R08: ffff88003599bcf8 R09: 
+0000000000000000
+[   59.442007] R10: 0000000000000000 R11: 0000000000001000 R12: 
+ffff88007b802d90
+[   59.442007] R13: ffff88007b3f3c40 R14: ffff88007b802d50 R15: 
+ffff88007b800000
+[   59.442007] FS:  00007f6cf9da6700(0000) GS:ffff88007fd00000(0000) 
+knlGS:0000000000000000
+[   59.442007] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   59.442007] CR2: 000000000000000c CR3: 00000000799a6000 CR4: 
+00000000000407e0
+[   59.442007] Stack:
+[   59.442007]  ffff88007b802cf0 ffffffffa02f6380 ffff88003599bad8 
+ffffffff812b7b40
+[   59.442007]  ffff88007b802cb0 ffff88007b800008 0000000000000000 
+ffff88007aa04000
+[   59.442007]  ffff88003599bae8 ffffffff812b7c0d ffff88003599bd88 
+ffffffffa02e5252
+[   59.442007] Call Trace:
+[   59.442007]  [<ffffffffa02f6380>] ? crypto_ccm_decrypt+0x350/0x350 [ccm]
+[   59.442007]  [<ffffffff812b7b40>] old_crypt+0x50/0xe0
+[   59.442007]  [<ffffffff812b7c0d>] old_encrypt+0x1d/0x20
+[   59.442007]  [<ffffffffa02e5252>] aead_recvmsg+0x702/0x862 [algif_aead]
+[   59.442007]  [<ffffffff8114a672>] ? __alloc_pages_nodemask+0x1a2/0x9d0
+[   59.442007]  [<ffffffff81687b7a>] ? _raw_spin_unlock_bh+0x1a/0x20
+[   59.442007]  [<ffffffffa02e4849>] ? aead_sendmsg+0x429/0x4c0 [algif_aead]
+[   59.442007]  [<ffffffff81561528>] sock_recvmsg+0x38/0x50
+[   59.442007]  [<ffffffff815615c8>] sock_read_iter+0x88/0xd0
+[   59.442007]  [<ffffffff811a9990>] __vfs_read+0x90/0xc0
+[   59.442007]  [<ffffffff811aa12a>] vfs_read+0x8a/0x140
+[   59.442007]  [<ffffffff811aab56>] SyS_read+0x46/0xb0
+[   59.442007]  [<ffffffff8168812e>] system_call_fastpath+0x12/0x71
+[   59.442007] Code: 0f 1f 00 66 66 66 66 90 55 85 d2 48 89 f0 48 89 e5 41 54 
+53 89 d3 74 28 8b 56 0c 49 89 fc 39 d3 73 10 eb 27 0f 1f 80 00 00 00 00 <8b> 
+50 0c 39 da 77 19 29 d3 48 89 c7 e8 87 a9 05 00 85 db 75 eb 
+[   59.442007] RIP  [<ffffffff812b6d78>] scatterwalk_ffwd+0x28/0xd0
+[   59.442007]  RSP <ffff88003599ba98>
+[   59.442007] CR2: 000000000000000c
+[   59.442368] ---[ end trace 09389ca31f370515 ]---
+-- 
+Ciao
+Stephan
