@@ -1,40 +1,39 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [v2 PATCH 13/13] crypto: algif_aead - Switch to new AEAD interface
-Date: Sat, 23 May 2015 20:04:50 +0200
-Message-ID: <43408506.iDYSmTTTDp@tachyon.chronox.de>
-References: <20150522082708.GA3507@gondor.apana.org.au> <13023896.hEcYqcIc2j@myon.chronox.de> <20150522215818.GB11512@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [linux-sunxi] Re: [PATCH v9 4/4] crypto: Add Allwinner Security
+ System crypto accelerator
+Date: Sun, 24 May 2015 11:30:50 +0800
+Message-ID: <20150524033050.GA20656@gondor.apana.org.au>
+References: <1431608341-10936-1-git-send-email-clabbe.montjoie@gmail.com>
+ <1431608341-10936-5-git-send-email-clabbe.montjoie@gmail.com>
+ <20150515064932.GB16704@gondor.apana.org.au>
+ <55606FFE.4000902@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58204 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754116AbbEWSEw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 23 May 2015 14:04:52 -0400
-In-Reply-To: <20150522215818.GB11512@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: robh+dt@kernel.org, pawel.moll@arm.com, mark.rutland@arm.com,
+	ijc+devicetree@hellion.org.uk, galak@codeaurora.org,
+	maxime.ripard@free-electrons.com, linux@arm.linux.org.uk,
+	davem@davemloft.net, akpm@linux-foundation.org,
+	gregkh@linuxfoundation.org, mchehab@osg.samsung.com,
+	joe@perches.com, tj@kernel.org, arnd@arndb.de,
+	boris.brezillon@free-electrons.com, devicetree@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-sunxi@googlegroups.com
+To: Corentin LABBE <clabbe.montjoie@gmail.com>
+Return-path: <linux-doc-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <55606FFE.4000902@gmail.com>
+Sender: linux-doc-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Samstag, 23. Mai 2015, 05:58:18 schrieb Herbert Xu:
+On Sat, May 23, 2015 at 02:18:06PM +0200, Corentin LABBE wrote:
+>
+> What do you think about adding a BUG_ON(in_atomic()) in crypto_ablkcipher_setkey() ?
 
-Hi Herbert,
+Just add a might_sleep() to it.
 
-> On Fri, May 22, 2015 at 11:04:39PM +0200, Stephan Mueller wrote:
-> > Note, gcm(aes) looks good. Only rfc4106(gcm(aes)) causes the crash.
-> 
-> Actually it looks like the culprit hasn't been merged yet so I'll
-> just respin the series.
-> 
-> Anyway, this patch should fix your crash:
-
-That fixes the rfc4106(gcm(aes)) issue. Thanks.
-
+Thanks,
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
