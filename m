@@ -1,60 +1,82 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH v3 02/16] crypto: add a new driver for Marvell's CESA
-Date: Mon, 25 May 2015 15:58:12 +0800
-Message-ID: <20150525075812.GA28689@gondor.apana.org.au>
+Date: Mon, 25 May 2015 16:05:47 +0800
+Message-ID: <20150525080547.GB28689@gondor.apana.org.au>
 References: <1432301642-11470-1-git-send-email-boris.brezillon@free-electrons.com>
  <1432301642-11470-3-git-send-email-boris.brezillon@free-electrons.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
-	Thomas Petazzoni <thomas.petazzoni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Gregory CLEMENT <gregory.clement-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>,
-	Sebastian Hesselbarth <sebastian.hesselbarth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>,
-	Tawfik Bayouk <tawfik-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Lior Amsalem <alior-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Nadav Haklai <nadavh-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Eran Ben-Avi <benavi-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
-	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
-	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org
+To: Boris Brezillon <boris.brezillon@free-electrons.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:43050 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750852AbbEYIGe (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 May 2015 04:06:34 -0400
 Content-Disposition: inline
-In-Reply-To: <1432301642-11470-3-git-send-email-boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1432301642-11470-3-git-send-email-boris.brezillon@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
 On Fri, May 22, 2015 at 03:33:48PM +0200, Boris Brezillon wrote:
 >
-> +static int mv_cesa_sha1_export(struct ahash_request *req, void *out)
-> +{
-> +	struct sha1_state *out_state = out;
-> +	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
-> +	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
-> +	unsigned int digsize = crypto_ahash_digestsize(ahash);
-> +
-> +	out_state->count = creq->len;
-> +	memcpy(out_state->state, creq->state, digsize);
-> +	memset(out_state->buffer, 0, sizeof(out_state->buffer));
-> +	if (creq->cache)
-> +		memcpy(out_state->buffer, creq->cache, creq->cache_ptr);
-> +
-> +	return 0;
-> +}
+> +struct ahash_alg mv_ahmac_sha1_alg = {
+> +	.init = mv_cesa_ahmac_sha1_init,
+> +	.update = mv_cesa_ahash_update,
+> +	.final = mv_cesa_ahash_final,
+> +	.finup = mv_cesa_ahash_finup,
+> +	.digest = mv_cesa_ahmac_sha1_digest,
+> +	.setkey = mv_cesa_ahmac_sha1_setkey,
+> +	.halg = {
+> +		.digestsize = SHA1_DIGEST_SIZE,
+> +		.statesize = sizeof(struct sha1_state),
+> +		.base = {
+> +			.cra_name = "hmac(sha1)",
+> +			.cra_driver_name = "mv-hmac-sha1",
+> +			.cra_priority = 300,
+> +			.cra_flags = CRYPTO_ALG_ASYNC |
+> +				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+> +			.cra_blocksize = SHA1_BLOCK_SIZE,
+> +			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
+> +			.cra_init = mv_cesa_ahmac_cra_init,
+> +			.cra_module = THIS_MODULE,
+> +		 }
+> +	}
+> +};
 
-Where is the import function?
+So your hmac implementation is purely done in software.  Since
+you've already written the code, could you please generalise this
+and make it a template?
 
-Cheers,
+When you're done just add it to crypto/hmac.c and have it operate
+on ahash algorithms while the existing hmac can continue to oeprate
+on shash ones.  For an example of a template that operates on two
+different types of algorithms check out crypto/seqiv.c.  I'm happy
+to help you with the glue code should you have any issues.
+
+This way the next guy who comes along won't have to rewrite hmac
+yet again.  Who knows one of our existing hash drivers may also
+be doing things purely in software and then we can kill the duplicate
+code.
+
+Thanks,
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
