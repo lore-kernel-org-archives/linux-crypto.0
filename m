@@ -1,12 +1,12 @@
 From: Gregory CLEMENT <gregory.clement@free-electrons.com>
-Subject: Re: [PATCH v3 15/16] ARM: marvell/dt: add crypto node to armada 370
+Subject: Re: [PATCH v3 16/16] ARM: marvell/dt: add crypto node to kirkwood
  dtsi
-Date: Mon, 25 May 2015 17:33:24 +0200
-Message-ID: <556340C4.5090208@free-electrons.com>
-References: <1432301642-11470-1-git-send-email-boris.brezillon@free-electrons.com> <1432301642-11470-16-git-send-email-boris.brezillon@free-electrons.com>
+Date: Mon, 25 May 2015 17:39:13 +0200
+Message-ID: <55634221.6050504@free-electrons.com>
+References: <1432301642-11470-1-git-send-email-boris.brezillon@free-electrons.com> <1432301642-11470-17-git-send-email-boris.brezillon@free-electrons.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org,
@@ -26,76 +26,50 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 To: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Arnaud Ebalard <arno@natisbad.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:36945 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:37264 "EHLO
 	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750962AbbEYPdd (ORCPT
+	with ESMTP id S1750803AbbEYPjQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 May 2015 11:33:33 -0400
-In-Reply-To: <1432301642-11470-16-git-send-email-boris.brezillon@free-electrons.com>
+	Mon, 25 May 2015 11:39:16 -0400
+In-Reply-To: <1432301642-11470-17-git-send-email-boris.brezillon@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Hi Boris, Arnaud,
 
-
-
 On 22/05/2015 15:34, Boris Brezillon wrote:
 > From: Arnaud Ebalard <arno@natisbad.org>
 > 
-> Add crypto related nodes in armada-370.dtsi.
-> 
-> Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
-> Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-> ---
->  arch/arm/boot/dts/armada-370.dtsi | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
-> diff --git a/arch/arm/boot/dts/armada-370.dtsi b/arch/arm/boot/dts/armada-370.dtsi
-> index 00b50db5..1255318 100644
-> --- a/arch/arm/boot/dts/armada-370.dtsi
-> +++ b/arch/arm/boot/dts/armada-370.dtsi
-> @@ -307,6 +307,26 @@
->  					dmacap,memset;
->  				};
->  			};
-> +
-> +			crypto@90000 {
-> +				compatible = "marvell,armada-370-crypto";
-> +				reg = <0x90000 0x10000>;
-> +				reg-names = "regs";
-> +				interrupts = <48>;
+> Add crypto related nodes to kirkwood.dtsi.
 
-There is no clocks property. After a quick look on the datasheet, indeed I didn't
-find any clock which match the CESA. In this case you should update the binding
-documentation by adding that the clock is optional for armada-370-crypto.
-
-But for this patch:
-Acked-by: Gregory CLEMENT <gregory.clement@free-electrons.com>
-
-And as for the other one I will wait for that the driver will be merged before applying it.
+Here you use a new compatible string but with an old binding
+to let the user chose between the old and the new driver. Am I right?
 
 Thanks,
 
 Gregory
 
 
-> +				marvell,crypto-srams = <&crypto_sram>;
-> +				marvell,crypto-sram-size = <0x800>;
-> +				status = "okay";
-> +			};
-> +		};
-> +
-> +		crypto_sram: sa-sram {
-> +			compatible = "mmio-sram";
-> +			reg = <MBUS_ID(0x09, 0x01) 0 0x800>;
-> +			reg-names = "sram";
-> +			#address-cells = <1>;
-> +			#size-cells = <1>;
-> +			ranges = <0 MBUS_ID(0x09, 0x01) 0 0x800>;
-> +			status = "okay";
->  		};
->  	};
->  };
+> 
+> Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
+> Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+> ---
+>  arch/arm/boot/dts/kirkwood.dtsi | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm/boot/dts/kirkwood.dtsi b/arch/arm/boot/dts/kirkwood.dtsi
+> index 464f09a..1700b2b 100644
+> --- a/arch/arm/boot/dts/kirkwood.dtsi
+> +++ b/arch/arm/boot/dts/kirkwood.dtsi
+> @@ -41,7 +41,7 @@
+>  		pcie-io-aperture  = <0xf2000000 0x100000>;   /*   1 MiB    I/O space */
+>  
+>  		cesa: crypto@0301 {
+> -			compatible = "marvell,orion-crypto";
+> +			compatible = "marvell,kirkwood-crypto";
+>  			reg = <MBUS_ID(0xf0, 0x01) 0x30000 0x10000>,
+>  			      <MBUS_ID(0x03, 0x01) 0 0x800>;
+>  			reg-names = "regs", "sram";
 > 
 
 
