@@ -1,13 +1,13 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH v3 02/16] crypto: add a new driver for Marvell's CESA
-Date: Mon, 25 May 2015 10:10:16 +0200
-Message-ID: <20150525101016.252a1dc0@bbrezillon>
+Date: Mon, 25 May 2015 16:12:34 +0800
+Message-ID: <20150525081234.GC28689@gondor.apana.org.au>
 References: <1432301642-11470-1-git-send-email-boris.brezillon@free-electrons.com>
-	<1432301642-11470-3-git-send-email-boris.brezillon@free-electrons.com>
-	<20150525075812.GA28689@gondor.apana.org.au>
+ <1432301642-11470-3-git-send-email-boris.brezillon@free-electrons.com>
+ <20150525075812.GA28689@gondor.apana.org.au>
+ <20150525101016.252a1dc0@bbrezillon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
 	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
@@ -24,53 +24,28 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Ian Campbell <ijc+devicetree@hellion.org.uk>,
 	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Boris Brezillon <boris.brezillon@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:55231 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750848AbbEYIKW (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:51681 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751784AbbEYINK (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 May 2015 04:10:22 -0400
-In-Reply-To: <20150525075812.GA28689@gondor.apana.org.au>
+	Mon, 25 May 2015 04:13:10 -0400
+Content-Disposition: inline
+In-Reply-To: <20150525101016.252a1dc0@bbrezillon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Herbert,
+On Mon, May 25, 2015 at 10:10:16AM +0200, Boris Brezillon wrote:
+> Yep, I noticed that after submitting this version. I guess I only
+> needed the import function for my test cases and thus forgot to
+> implement the import function.
+> Anyway, I just added the the import functions (they'll be available in
+> my v4).
 
-On Mon, 25 May 2015 15:58:12 +0800
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
-
-> On Fri, May 22, 2015 at 03:33:48PM +0200, Boris Brezillon wrote:
-> >
-> > +static int mv_cesa_sha1_export(struct ahash_request *req, void *out)
-> > +{
-> > +	struct sha1_state *out_state = out;
-> > +	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
-> > +	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
-> > +	unsigned int digsize = crypto_ahash_digestsize(ahash);
-> > +
-> > +	out_state->count = creq->len;
-> > +	memcpy(out_state->state, creq->state, digsize);
-> > +	memset(out_state->buffer, 0, sizeof(out_state->buffer));
-> > +	if (creq->cache)
-> > +		memcpy(out_state->buffer, creq->cache, creq->cache_ptr);
-> > +
-> > +	return 0;
-> > +}
-> 
-> Where is the import function?
-
-Yep, I noticed that after submitting this version. I guess I only
-needed the import function for my test cases and thus forgot to
-implement the import function.
-Anyway, I just added the the import functions (they'll be available in
-my v4).
-
-Best Regards,
-
-Boris
-
+If you do the hmac template like I suggested you won't be able to
+get away without the import function :)
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
