@@ -1,45 +1,55 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [v2 PATCH 13/13] crypto: algif_aead - Switch to new AEAD
- interface
-Date: Mon, 25 May 2015 18:20:21 +0800
-Message-ID: <20150525102021.GA30038@gondor.apana.org.au>
-References: <20150522082708.GA3507@gondor.apana.org.au>
- <1969904.xZlo35YxmK@tachyon.chronox.de>
- <20150524033420.GC20656@gondor.apana.org.au>
- <3847514.ujeNcPGtgS@tachyon.chronox.de>
+From: "Imre Kaloz" <kaloz@openwrt.org>
+Subject: Re: [PATCH v3 02/16] crypto: add a new driver for Marvell's CESA
+Date: Mon, 25 May 2015 12:44:44 +0200
+Message-ID: <op.xy6tguug2s3iss@ecaz>
+References: <1432301642-11470-1-git-send-email-boris.brezillon@free-electrons.com> <1432301642-11470-3-git-send-email-boris.brezillon@free-electrons.com> <20150525075812.GA28689@gondor.apana.org.au> <20150525101016.252a1dc0@bbrezillon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <3847514.ujeNcPGtgS@tachyon.chronox.de>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes
+Content-Transfer-Encoding: 7bit
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, "Arnaud Ebalard" <arno@natisbad.org>,
+	"Thomas Petazzoni" <thomas.petazzoni@free-electrons.com>,
+	"Gregory CLEMENT" <gregory.clement@free-electrons.com>,
+	"Jason Cooper" <jason@lakedaemon.net>,
+	"Sebastian Hesselbarth" <sebastian.hesselbarth@gmail.com>,
+	"Andrew Lunn" <andrew@lunn.ch>,
+	"Tawfik Bayouk" <tawfik@marvell.com>,
+	"Lior Amsalem" <alior@marvell.com>,
+	"Nadav Haklai" <nadavh@marvell.com>,
+	"Eran Ben-Avi" <benavi@marvell.com>,
+	"Rob Herring" <robh+dt@kernel.org>,
+	"Pawel Moll" <pawel.moll@arm.com>,
+	"Mark Rutland" <mark.rutland@arm.com>,
+	"Ian Campbell" <ijc+devicetree@hellion.org.uk>,
+	"Kumar Gala" <galak@codeaurora.org>, devicetree@vger.kernel.org
+To: "Herbert Xu" <herbert@gondor.apana.org.au>,
+	"Boris Brezillon" <boris.brezillon@free-electrons.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from arrakis.dune.hu ([78.24.191.176]:52593 "EHLO arrakis.dune.hu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751857AbbEYKpE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 May 2015 06:45:04 -0400
+In-Reply-To: <20150525101016.252a1dc0@bbrezillon>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, May 24, 2015 at 12:52:02PM +0200, Stephan Mueller wrote:
-> 
-> [   29.653113] BUG: unable to handle kernel NULL pointer dereference at 
-> 000000000000000c
+Hi Boris,
 
-Weird.  I tried running your test but it appears to pass.  The only
-failures were the nonsense strings and everything else says pased.
+On Mon, 25 May 2015 10:10:16 +0200, Boris Brezillon  
+<boris.brezillon@free-electrons.com> wrote:
 
-It certainly didn't crash for me.
+<snip>
 
-Considering that I just killed cryptoff in my local tree, it is
-entirely possible that the patches that you are running are no
-longer the same as mine.
+> Yep, I noticed that after submitting this version. I guess I only
+> needed the import function for my test cases and thus forgot to
+> implement the import function.
+> Anyway, I just added the the import functions (they'll be available in
+> my v4).
 
-So let me merge the cryptoff patches and then I'll repost the
-algif_aead patch and ask you to retest.
+Given the driver is supposed to work on platforms up to 38x, could v4  
+include the missing bindings for those platforms, too?
+
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+Imre
