@@ -1,8 +1,7 @@
 From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH v10 4/5] crypto: drbg - use Jitter RNG to obtain seed
-Date: Mon, 25 May 2015 15:09:59 +0200
-Message-ID: <19631228.pyHso9euok@tachyon.chronox.de>
-References: <1818200.UPNYCFQzYg@tachyon.chronox.de>
+Subject: [PATCH v10 0/5] Seeding DRBG with more entropy
+Date: Mon, 25 May 2015 15:08:08 +0200
+Message-ID: <1818200.UPNYCFQzYg@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7Bit
@@ -10,148 +9,138 @@ Cc: pebolle@tiscali.nl, andreas.steffen@strongswan.org, tytso@mit.edu,
 	sandyinchina@gmail.com, linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1818200.UPNYCFQzYg@tachyon.chronox.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:58252 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751276AbbEYNLI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 25 May 2015 09:11:08 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-During initialization, the DRBG now tries to allocate a handle of the
-Jitter RNG. If such a Jitter RNG is available during seeding, the DRBG
-pulls the required entropy/nonce string from get_random_bytes and
-concatenates it with a string of equal size from the Jitter RNG. That
-combined string is now the seed for the DRBG.
+Hi,
 
-Written differently, the initial seed of the DRBG is now:
+as of now, the DRBG is only seeded from get_random_bytes. In various
+circumstances, the nonblocking_pool behind get_random_bytes may not be fully
+seeded from hardware events at the time the DRBG requires to be seeded.
+Based on the discussion in [1], the DRBG seeding is updated such that it
+does not completely rely on get_random_bytes any more.
 
-get_random_bytes(entropy/nonce) || jitterentropy (entropy/nonce)
+The seeding approach can be characterized as follows:
 
-If the Jitter RNG is not available, the DRBG only seeds from
-get_random_bytes.
+1. pull buffer of size entropy + nonce from get_random_bytes
 
-CC: Andreas Steffen <andreas.steffen@strongswan.org>
-CC: Theodore Ts'o <tytso@mit.edu>
-CC: Sandy Harris <sandyinchina@gmail.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c         | 52 ++++++++++++++++++++++++++++++++++++++++++++-------
- include/crypto/drbg.h |  1 +
- 2 files changed, 46 insertions(+), 7 deletions(-)
+2. pull another buffer of size entropy + nonce from my Jitter RNG
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index aca8684..9284348 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1062,13 +1062,18 @@ static void drbg_async_seed(struct work_struct *work)
- 	LIST_HEAD(seedlist);
- 	struct drbg_state *drbg = container_of(work, struct drbg_state,
- 					       seed_work);
-+	int ret;
- 
- 	get_blocking_random_bytes(drbg->seed_buf, drbg->seed_buf_len);
- 
- 	drbg_string_fill(&data, drbg->seed_buf, drbg->seed_buf_len);
- 	list_add_tail(&data.list, &seedlist);
- 	mutex_lock(&drbg->drbg_mutex);
--	__drbg_seed(drbg, &seedlist, true);
-+	ret = __drbg_seed(drbg, &seedlist, true);
-+	if (!ret && drbg->jent) {
-+		crypto_free_rng(drbg->jent);
-+		drbg->jent = NULL;
-+	}
- 	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len);
- 	mutex_unlock(&drbg->drbg_mutex);
- }
-@@ -1103,10 +1108,24 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 				 drbg->test_data.len);
- 		pr_devel("DRBG: using test entropy\n");
- 	} else {
--		pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
--			 drbg->seed_buf_len);
-+		/* Get seed from in-kernel /dev/urandom */
- 		get_random_bytes(drbg->seed_buf, drbg->seed_buf_len);
--		drbg_string_fill(&data1, drbg->seed_buf, drbg->seed_buf_len);
-+
-+		/* Get seed from Jitter RNG */
-+		if (!drbg->jent ||
-+		    crypto_rng_get_bytes(drbg->jent,
-+					 drbg->seed_buf + drbg->seed_buf_len,
-+					 drbg->seed_buf_len)) {
-+			drbg_string_fill(&data1, drbg->seed_buf,
-+					 drbg->seed_buf_len);
-+			pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
-+				 drbg->seed_buf_len);
-+		} else {
-+			drbg_string_fill(&data1, drbg->seed_buf,
-+					 drbg->seed_buf_len * 2);
-+			pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
-+				 drbg->seed_buf_len * 2);
-+		}
- 	}
- 	list_add_tail(&data1.list, &seedlist);
- 
-@@ -1131,7 +1150,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 	 * Clear the initial entropy buffer as the async call may not overwrite
- 	 * that buffer for quite some time.
- 	 */
--	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len);
-+	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len * 2);
- 	if (ret)
- 		goto out;
- 	/*
-@@ -1171,6 +1190,10 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
- #endif
- 	kzfree(drbg->seed_buf);
- 	drbg->seed_buf = NULL;
-+	if (drbg->jent) {
-+		crypto_free_rng(drbg->jent);
-+		drbg->jent = NULL;
-+	}
- }
- 
- /*
-@@ -1246,14 +1269,29 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
- 		ret = -EFAULT;
- 		goto err;
- 	}
--	/* ensure we have sufficient buffer space for initial seed */
-+	/*
-+	 * Ensure we have sufficient buffer space for initial seed which
-+	 * consists of the seed from get_random_bytes and the Jitter RNG.
-+	 */
- 	drbg->seed_buf_len = ((drbg->seed_buf_len + 1) / 2) * 3;
--	drbg->seed_buf = kzalloc(drbg->seed_buf_len, GFP_KERNEL);
-+	drbg->seed_buf = kzalloc(drbg->seed_buf_len * 2, GFP_KERNEL);
- 	if (!drbg->seed_buf)
- 		goto err;
- 
- 	INIT_WORK(&drbg->seed_work, drbg_async_seed);
- 
-+	drbg->jent = crypto_alloc_rng("jitterentropy_rng", 0, 0);
-+	if(IS_ERR(drbg->jent))
-+	{
-+		pr_info("DRBG: could not allocate Jitter RNG handle for seeding\n");
-+		/*
-+		 * As the Jitter RNG is a module that may not be present, we
-+		 * continue with the operation and do not fully tie the DRBG
-+		 * to the Jitter RNG.
-+		 */
-+		drbg->jent = NULL;
-+	}
-+
- 	return 0;
- 
- err:
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index 46994b2..c3f208d 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -123,6 +123,7 @@ struct drbg_state {
- 	struct work_struct seed_work;	/* asynchronous seeding support */
- 	u8 *seed_buf;			/* buffer holding the seed */
- 	size_t seed_buf_len;
-+	struct crypto_rng *jent;
- 	const struct drbg_state_ops *d_ops;
- 	const struct drbg_core *core;
- 	struct drbg_string test_data;
+3. concatenate both buffers
+
+4. seed the DRBG with the concatenated buffer
+
+5. trigger the async invocation of the blocking API for accessing
+   the nonblocking pool with a buffer of size entropy
+
+6. return the DRBG instance to the caller without waiting for the completion
+   of step 5
+
+7. at some point in time, the blocking API returns with a full buffer
+   which is then used to re-seed the DRBG
+
+This way, we will get entropy during the first initialization without
+blocking.
+
+The patch set adds a blocking API to access the nonblocking pool to wait
+until the nonblocking pool is initialized.
+
+Note: the DRBG and Jitter RNG patches are against the current cryptodev-2.6
+tree.
+
+The new Jitter RNG is an RNG that has large set of tests and was presented on
+LKML some time back. After speaking with mathematicians at NIST, that Jitter
+RNG approach would be acceptable from their side as a noise source. Note, I
+personally think that the Jitter RNG has sufficient entropy in almost all
+circumstances (see the massive testing I conducted on all more widely used
+CPUs as shown in [2]).
+
+Changes v10:
+* patch 01/03: use uninterruptible sleep -- this patch only works with the
+  change from wake_up_interruptible to wake_up_all for drivers/char/random.c
+  proposed by Herbert Xu
+
+Changes v9:
+* patch 01: initialize return code
+
+Changes v8:
+* patch 01: make get_blocking_random_bytes to return the
+  wait_event_interruptible error code
+* patch 03: catch the ERESTARTSYS error code from get_blocking_random_bytes
+
+Changes v7:
+* patch 01: Catch ERESTARTSYS error for wait_event_interruptible
+* patch 03: move the cancel invocation to drbg_uninstantiate to ensure that
+  the ->fini function pointer is not yet invoked before the cancel is completed.
+  As the cancel operation may potentially invoke crypto operations, the
+  cipher state must be available.
+* patch 04: deallocate Jitter RNG after nonblocking_pool is fully initialized.
+  The change implies that regardless of the state of the nonblocking_pool, the
+  Jitter RNG is used for the initial seeding in any case and only dropped for
+  later reseeding operations.
+
+Changes v6:
+* patch 01: simplify patch by just adding a blocking API call to random.c as
+  suggested by Herbert Xu.
+* patch 03: move the async operation into this patch: the DRBG is in control
+  of the async work.
+
+Changes v5:
+* drop patch 01 and therefore drop the creation of a kernel pool
+* change patch 02 to use the nonblocking pool and block until the nonblocking
+  pool is initialized or until the cancel operation is triggered.
+
+Changes v4:
+* Patch 02: Change get_blocking_random_bytes_cb to allow callers to call it
+  multiple times without re-initializing the work data structure. Furthermore,
+  only change the pointers to the output buffer and callback if work is not
+  pending to avoid race conditions.
+* Patch 04: No canceling of seeding during drbg_seed as the invocation of
+  get_blocking_random_bytes_cb can now be done repeatedly without
+  re-initializing the work data structure.
+
+Changes v3:
+* Patch 01: Correct calculation of entropy count as pointed out by Herbert Xu
+* Patch 06: Correct a trivial coding issue in jent_entropy_init for
+  checking JENT_EMINVARVAR reported by cppcheck
+
+Changes v2:
+* Use Dual BSD/GPL license in MODULE_LICENSE as suggested by
+  Paul Bolle <pebolle@tiscali.nl>
+* Patch 05, drbg_dealloc_state: only deallocate Jitter RNG if one was
+  instantiated in the first place. There are two main reasons why the Jitter RNG
+  may not be allocated: either it is not available as kernel module/in vmlinuz
+  or during init time of the Jitter RNG, the performed testing shows that the
+  underlying hardware is not suitable for the Jitter RNG (e.g. has a too coarse
+  timer).
+
+
+[1] http://www.mail-archive.com/linux-crypto@vger.kernel.org/msg13891.html
+
+[2] http://www.chronox.de/jent.html
+
+Stephan Mueller (5):
+  random: Blocking API for accessing nonblocking_pool
+  crypto: drbg - prepare for async seeding
+  crypto: drbg - add async seeding operation
+  crypto: drbg - use Jitter RNG to obtain seed
+  crypto: add jitterentropy RNG
+
+ crypto/Kconfig         |  10 +
+ crypto/Makefile        |   2 +
+ crypto/drbg.c          | 143 ++++++--
+ crypto/jitterentropy.c | 909 +++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.c       |   4 +
+ drivers/char/random.c  |  12 +
+ include/crypto/drbg.h  |   5 +
+ include/linux/random.h |   1 +
+ 8 files changed, 1059 insertions(+), 27 deletions(-)
+ create mode 100644 crypto/jitterentropy.c
+
 -- 
 2.1.0
