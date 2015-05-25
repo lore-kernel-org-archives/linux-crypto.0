@@ -1,29 +1,25 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] Added one larger ghash testvector (400 bytes) to the
- testmgr.
-Date: Mon, 25 May 2015 20:57:27 +0800
-Message-ID: <20150525125727.GB30783@gondor.apana.org.au>
-References: <1432222471-10966-1-git-send-email-freude@linux.vnet.ibm.com>
+Subject: Re: [PATCH cryptodev] crypto: echainiv_read_iv() can be static
+Date: Mon, 25 May 2015 20:58:52 +0800
+Message-ID: <20150525125852.GC30783@gondor.apana.org.au>
+References: <20150522074410.GA102425@lkp-sb04>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org,
-	Martin Schwidefsky <schwidefsky@de.ibm.com>,
-	Ingo Tuchscherer <ingo.tuchscherer@linux.vnet.ibm.com>,
-	Harald Freudenberger <freude@de.ibm.com>
-To: Harald Freudenberger <freude@linux.vnet.ibm.com>
+Cc: kbuild-all@01.org, linux-crypto@vger.kernel.org
+To: Fengguang Wu <fengguang.wu@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:53282 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:39343 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750757AbbEYM5b (ORCPT
+	with ESMTP id S1750894AbbEYM7C (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 May 2015 08:57:31 -0400
+	Mon, 25 May 2015 08:59:02 -0400
 Content-Disposition: inline
-In-Reply-To: <1432222471-10966-1-git-send-email-freude@linux.vnet.ibm.com>
+In-Reply-To: <20150522074410.GA102425@lkp-sb04>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 21, 2015 at 05:34:31PM +0200, Harald Freudenberger wrote:
-> Signed-off-by: Harald Freudenberger <freude@linux.vnet.ibm.com>
+On Sat, May 23, 2015 at 11:22:47AM +0800, Fengguang Wu wrote:
+> Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
 
 Patch applied.
 -- 
