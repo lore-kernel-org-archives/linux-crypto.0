@@ -1,83 +1,77 @@
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v1 3/3] crypto: ccp - Protect against poorly marked end of
- sg list
-Date: Tue, 26 May 2015 13:06:35 -0500
-Message-ID: <20150526180635.6527.5580.stgit@tlendack-t1.amdoffice.net>
-References: <20150526180612.6527.53332.stgit@tlendack-t1.amdoffice.net>
+From: Alexander Duyck <alexander.h.duyck@redhat.com>
+Subject: [net-next PATCH RFC 1/3] ip_vti/ip6_vti: Do not touch skb->mark on
+ xmit
+Date: Tue, 26 May 2015 15:41:17 -0700
+Message-ID: <20150526224117.1328.98060.stgit@ahduyck-vm-fedora22>
+References: <20150526223849.1328.64212.stgit@ahduyck-vm-fedora22>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>
-To: <linux-crypto@vger.kernel.org>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: steffen.klassert@secunet.com, davem@davemloft.net,
+	herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-by2on0111.outbound.protection.outlook.com ([207.46.100.111]:44640
-	"EHLO na01-by2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750835AbbEZSk2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 May 2015 14:40:28 -0400
-In-Reply-To: <20150526180612.6527.53332.stgit@tlendack-t1.amdoffice.net>
+Received: from mx1.redhat.com ([209.132.183.28]:60389 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751085AbbEZWlS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 May 2015 18:41:18 -0400
+In-Reply-To: <20150526223849.1328.64212.stgit@ahduyck-vm-fedora22>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Scatter gather lists can be created with more available entries than are
-actually used (e.g. using sg_init_table() to reserve a specific number
-of sg entries, but in actuality using something less than that based on
-the data length).  The caller sometimes fails to mark the last entry
-with sg_mark_end().  In these cases, sg_nents() will return the original
-size of the sg list as opposed to the actual number of sg entries that
-contain valid data.
+Instead of modifying skb->mark we can simply modify the flowi_mark that is
+generated as a result of the xfrm_decode_session.  By doing this we don't
+need to actually touch the skb->mark and it can be preserved as it passes
+out through the tunnel.
 
-On arm64, if the sg_nents() value is used in a call to dma_map_sg() in
-this situation, then it causes a BUG_ON in lib/swiotlb.c because an
-"empty" sg list entry results in dma_capable() returning false and
-swiotlb trying to create a bounce buffer of size 0. This occurred in
-the userspace crypto interface before being fixed by
-
-0f477b655a52 ("crypto: algif - Mark sgl end at the end of data")
-
-Protect against this in the future by counting the number of sg entries
-needed to meet the length requirement and supplying that value to
-dma_map_sg().
-
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Alexander Duyck <alexander.h.duyck@redhat.com>
 ---
- drivers/crypto/ccp/ccp-ops.c |   18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ net/ipv4/ip_vti.c  |    5 +++--
+ net/ipv6/ip6_vti.c |    4 +++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index 542453c..8377ed6 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -477,6 +477,22 @@ static u32 ccp_gen_jobid(struct ccp_device *ccp)
- 	return atomic_inc_return(&ccp->current_id) & CCP_JOBID_MASK;
+diff --git a/net/ipv4/ip_vti.c b/net/ipv4/ip_vti.c
+index 9f7269f3c54a..4c318e1c13c8 100644
+--- a/net/ipv4/ip_vti.c
++++ b/net/ipv4/ip_vti.c
+@@ -216,8 +216,6 @@ static netdev_tx_t vti_tunnel_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	memset(&fl, 0, sizeof(fl));
+ 
+-	skb->mark = be32_to_cpu(tunnel->parms.o_key);
+-
+ 	switch (skb->protocol) {
+ 	case htons(ETH_P_IP):
+ 		xfrm_decode_session(skb, &fl, AF_INET);
+@@ -233,6 +231,9 @@ static netdev_tx_t vti_tunnel_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		return NETDEV_TX_OK;
+ 	}
+ 
++	/* override mark with tunnel output key */
++	fl.flowi_mark = be32_to_cpu(tunnel->parms.o_key);
++
+ 	return vti_xmit(skb, dev, &fl);
  }
  
-+static int ccp_sg_nents(struct scatterlist *sg, u64 len)
-+{
-+	int nents = 0;
-+
-+	while (sg && len) {
-+		nents++;
-+		if (sg->length > len)
-+			break;
-+
-+		len -= sg->length;
-+		sg = sg_next(sg);
-+	}
-+
-+	return nents;
-+}
-+
- static void ccp_sg_free(struct ccp_sg_workarea *wa)
- {
- 	if (wa->dma_count)
-@@ -495,7 +511,7 @@ static int ccp_init_sg_workarea(struct ccp_sg_workarea *wa, struct device *dev,
- 	if (!sg)
- 		return 0;
+diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
+index ed9d681207fa..104de4da3ff3 100644
+--- a/net/ipv6/ip6_vti.c
++++ b/net/ipv6/ip6_vti.c
+@@ -495,7 +495,6 @@ vti6_tnl_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	int ret;
  
--	wa->nents = sg_nents(sg);
-+	wa->nents = ccp_sg_nents(sg, len);
- 	wa->bytes_left = len;
- 	wa->sg_used = 0;
+ 	memset(&fl, 0, sizeof(fl));
+-	skb->mark = be32_to_cpu(t->parms.o_key);
  
+ 	switch (skb->protocol) {
+ 	case htons(ETH_P_IPV6):
+@@ -516,6 +515,9 @@ vti6_tnl_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		goto tx_err;
+ 	}
+ 
++	/* override mark with tunnel output key */
++	fl.flowi_mark = be32_to_cpu(t->parms.o_key);
++
+ 	ret = vti6_xmit(skb, dev, &fl);
+ 	if (ret < 0)
+ 		goto tx_err;
