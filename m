@@ -1,37 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 5/7] esp6: Switch to new AEAD interface
-Date: Tue, 26 May 2015 15:21:52 +0800
-Message-ID: <20150526072152.GA6407@gondor.apana.org.au>
-References: <20150521103938.GA23035@gondor.apana.org.au>
- <2066513.Bca9qAkvxD@tauon>
- <20150522071923.GA2777@gondor.apana.org.au>
- <2306681.gksi6E3i3N@tachyon.chronox.de>
+Subject: crypto: algif_aead - Disable AEAD user-space for now
+Date: Tue, 26 May 2015 15:32:42 +0800
+Message-ID: <20150526073242.GA6501@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-To: Stephan Mueller <smueller@chronox.de>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:60235 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:32922 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751011AbbEZHV7 (ORCPT
+	with ESMTP id S1751398AbbEZHcr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 May 2015 03:21:59 -0400
+	Tue, 26 May 2015 03:32:47 -0400
 Content-Disposition: inline
-In-Reply-To: <2306681.gksi6E3i3N@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 26, 2015 at 08:39:56AM +0200, Stephan Mueller wrote:
-> 
-> May I also ask where I can find the generated IV when using rfc4106(gcm(aes))? 
+The newly added AEAD user-space isn't quite ready for prime time
+just yet.  In particular it is conflicting with the AEAD single
+SG list interface change so this patch disables it now.
 
-You need to use the IV generator, seqniv(rfc4106(gcm(aes)))
+Once the SG list stuff is completely done we can then renable
+this interface.
 
-Cheers,
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 8aaf298..362905e 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1512,15 +1512,6 @@ config CRYPTO_USER_API_RNG
+ 	  This option enables the user-spaces interface for random
+ 	  number generator algorithms.
+ 
+-config CRYPTO_USER_API_AEAD
+-	tristate "User-space interface for AEAD cipher algorithms"
+-	depends on NET
+-	select CRYPTO_AEAD
+-	select CRYPTO_USER_API
+-	help
+-	  This option enables the user-spaces interface for AEAD
+-	  cipher algorithms.
+-
+ config CRYPTO_HASH_INFO
+ 	bool
+ 
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
