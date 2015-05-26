@@ -1,60 +1,57 @@
-From: Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH v3 14/16] ARM: marvell/dt: enable crypto on armada-xp-gp
-Date: Tue, 26 May 2015 13:57:46 +0200
-Message-ID: <20150526115746.GA28523@lunn.ch>
-References: <1432301642-11470-1-git-send-email-boris.brezillon@free-electrons.com>
- <1432301642-11470-15-git-send-email-boris.brezillon@free-electrons.com>
- <55633B6D.7080307@free-electrons.com>
- <20150526105936.25db3afb@bbrezillon>
- <op.xy8j7ryh2s3iss@ecaz>
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+Subject: Re: [PATCH 02/10] ARM: OMAP3: Fix crypto support for HS devices
+Date: Tue, 26 May 2015 12:54:15 +0200
+Message-ID: <20150526105415.GB14541@pali>
+References: <1424958600-18881-1-git-send-email-pali.rohar@gmail.com>
+ <1424958600-18881-3-git-send-email-pali.rohar@gmail.com>
+ <20150228162436.GB4978@amd>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Boris Brezillon <boris.brezillon@free-electrons.com>,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: =?utf-8?Q?Beno=C3=AEt?= Cousson <bcousson@baylibre.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Russell King <linux@arm.linux.org.uk>,
+	Paul Walmsley <paul@pwsan.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org
-To: Imre Kaloz <kaloz@openwrt.org>
+	linux-omap@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Nishanth Menon <nm@ti.com>,
+	Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Sebastian Reichel <sre@kernel.org>, Pavel Machek <pavel@ucw.cz>
+To: Paul Walmsley <paul@pwsan.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from [178.209.37.122] ([178.209.37.122]:40687 "EHLO vps0.lunn.ch"
-	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1753088AbbEZMEN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 May 2015 08:04:13 -0400
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:35263 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752002AbbEZMga (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 May 2015 08:36:30 -0400
 Content-Disposition: inline
-In-Reply-To: <op.xy8j7ryh2s3iss@ecaz>
+In-Reply-To: <20150228162436.GB4978@amd>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 26, 2015 at 11:22:45AM +0200, Imre Kaloz wrote:
-> On Tue, 26 May 2015 10:59:36 +0200, Boris Brezillon
-> <boris.brezillon@free-electrons.com> wrote:
-> 
-> <snip>
-> 
-> >>As the crypto engine really depend on the SoC itself and not of
-> >>the board,
-> >>what about updating the dts of the other board using an Armada XP?
-> >
-> >But that means introducing changes I haven't tested. Are you okay with
-> >that ?
-> 
-> Well, worst case send it as a separate patch as RFC - I'm sure
-> people will test and report back.
+Hi Paul,
 
-Yes, there are a few of us with diverse hardware that can perform
-tests. It is best if you provide a git tree with all the patches
-applied, and instructions how to test.
+this patch is also for omap2... Can you review it too?
 
-	 Andrew
+On Saturday 28 February 2015 17:24:36 Pavel Machek wrote:
+> On Thu 2015-02-26 14:49:52, Pali Roh=C3=A1r wrote:
+> > Register crypto hwmod links only if they are not disabled in DT.
+> > If DT information is missing, enable them only for GP devices.
+> >=20
+> > Before this patch crypto hwmod links were always disabled for all H=
+S devices
+> > and it was not possible to use omap-aes and omap-sham linux drivers=
+=2E
+> >=20
+> > Signed-off-by: Pali Roh=C3=A1r <pali.rohar@gmail.com>
+>=20
+> Acked-by: Pavel Machek <pavel@ucw.cz>
+>=20
+
+--=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
