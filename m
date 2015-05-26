@@ -1,74 +1,122 @@
 From: Peter Ujfalusi <peter.ujfalusi@ti.com>
-Subject: [PATCH 02/13] dmaengine: Introduce
-	dma_request_slave_channel_compat_reason()
-Date: Tue, 26 May 2015 16:25:57 +0300
-Message-ID: <1432646768-12532-3-git-send-email-peter.ujfalusi@ti.com>
+Subject: [PATCH 08/13] crypto: omap-aes - Support for deferred probing when requesting DMA channels
+Date: Tue, 26 May 2015 16:26:03 +0300
+Message-ID: <1432646768-12532-9-git-send-email-peter.ujfalusi@ti.com>
 References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devicetree@vger.kernel.org, alsa-devel@alsa-project.org,
- linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-serial@vger.kernel.org, dmaengine@vger.kernel.org,
- dan.j.williams@intel.com, linux-omap@vger.kernel.org,
- linux-media@vger.kernel.org
+Content-Type: text/plain
+Cc: <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <dmaengine@vger.kernel.org>,
+	<linux-serial@vger.kernel.org>, <linux-omap@vger.kernel.org>,
+	<linux-mmc@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-spi@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<alsa-devel@alsa-project.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Lokesh Vutla <lokeshvutla@ti.com>
 To: <vinod.koul@intel.com>, <tony@atomide.com>
-Return-path: <alsa-devel-bounces@alsa-project.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com>
-List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
-List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
-List-Post: <mailto:alsa-devel@alsa-project.org>
-List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
-List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
-Errors-To: alsa-devel-bounces@alsa-project.org
-Sender: alsa-devel-bounces@alsa-project.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-dma_request_slave_channel_compat() 'eats' up the returned error codes which
-prevents drivers using the compat call to be able to do deferred probing.
-
-The new wrapper is identical in functionality but it will return with error
-code in case of failure and will pass the -EPROBE_DEFER to the caller in
-case dma_request_slave_channel_reason() returned with it.
+Switch to use ma_request_slave_channel_compat_reason() to request the DMA
+channels. Only fall back to pio mode if the error code returned is not
+-EPROBE_DEFER, otherwise return from the probe with the -EPROBE_DEFER.
 
 Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>
+CC: David S. Miller <davem@davemloft.net>
+CC: Lokesh Vutla <lokeshvutla@ti.com>
 ---
- include/linux/dmaengine.h | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ drivers/crypto/omap-aes.c | 38 ++++++++++++++++++++------------------
+ 1 file changed, 20 insertions(+), 18 deletions(-)
 
-diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
-index abf63ceabef9..6c777394835c 100644
---- a/include/linux/dmaengine.h
-+++ b/include/linux/dmaengine.h
-@@ -1120,4 +1120,26 @@ static inline struct dma_chan
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 9a28b7e07c71..699a14509adb 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -356,7 +356,7 @@ static void omap_aes_dma_out_callback(void *data)
  
- 	return __dma_request_channel(mask, fn, fn_param);
+ static int omap_aes_dma_init(struct omap_aes_dev *dd)
+ {
+-	int err = -ENOMEM;
++	int err;
+ 	dma_cap_mask_t mask;
+ 
+ 	dd->dma_lch_out = NULL;
+@@ -365,21 +365,20 @@ static int omap_aes_dma_init(struct omap_aes_dev *dd)
+ 	dma_cap_zero(mask);
+ 	dma_cap_set(DMA_SLAVE, mask);
+ 
+-	dd->dma_lch_in = dma_request_slave_channel_compat(mask,
+-							  omap_dma_filter_fn,
+-							  &dd->dma_in,
+-							  dd->dev, "rx");
+-	if (!dd->dma_lch_in) {
++	dd->dma_lch_in = dma_request_slave_channel_compat_reason(mask,
++					omap_dma_filter_fn, &dd->dma_in,
++					dd->dev, "rx");
++	if (IS_ERR(dd->dma_lch_in)) {
+ 		dev_err(dd->dev, "Unable to request in DMA channel\n");
+-		goto err_dma_in;
++		return PTR_ERR(dd->dma_lch_in);
+ 	}
+ 
+-	dd->dma_lch_out = dma_request_slave_channel_compat(mask,
+-							   omap_dma_filter_fn,
+-							   &dd->dma_out,
+-							   dd->dev, "tx");
+-	if (!dd->dma_lch_out) {
++	dd->dma_lch_out = dma_request_slave_channel_compat_reason(mask,
++					omap_dma_filter_fn, &dd->dma_out,
++					dd->dev, "tx");
++	if (IS_ERR(dd->dma_lch_out)) {
+ 		dev_err(dd->dev, "Unable to request out DMA channel\n");
++		err = PTR_ERR(dd->dma_lch_out);
+ 		goto err_dma_out;
+ 	}
+ 
+@@ -387,14 +386,15 @@ static int omap_aes_dma_init(struct omap_aes_dev *dd)
+ 
+ err_dma_out:
+ 	dma_release_channel(dd->dma_lch_in);
+-err_dma_in:
+-	if (err)
+-		pr_err("error: %d\n", err);
++
+ 	return err;
  }
+ 
+ static void omap_aes_dma_cleanup(struct omap_aes_dev *dd)
+ {
++	if (dd->pio_only)
++		return;
 +
-+#define dma_request_slave_channel_compat_reason(mask, x, y, dev, name) \
-+	__dma_request_slave_channel_compat_reason(&(mask), x, y, dev, name)
+ 	dma_release_channel(dd->dma_lch_out);
+ 	dma_release_channel(dd->dma_lch_in);
+ }
+@@ -1218,7 +1218,9 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 	tasklet_init(&dd->queue_task, omap_aes_queue_task, (unsigned long)dd);
+ 
+ 	err = omap_aes_dma_init(dd);
+-	if (err && AES_REG_IRQ_STATUS(dd) && AES_REG_IRQ_ENABLE(dd)) {
++	if (err == -EPROBE_DEFER) {
++		goto err_irq;
++	} else if (err && AES_REG_IRQ_STATUS(dd) && AES_REG_IRQ_ENABLE(dd)) {
+ 		dd->pio_only = 1;
+ 
+ 		irq = platform_get_irq(pdev, 0);
+@@ -1262,8 +1264,8 @@ err_algs:
+ 		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
+ 			crypto_unregister_alg(
+ 					&dd->pdata->algs_info[i].algs_list[j]);
+-	if (!dd->pio_only)
+-		omap_aes_dma_cleanup(dd);
 +
-+static inline struct dma_chan
-+*__dma_request_slave_channel_compat_reason(const dma_cap_mask_t *mask,
-+				  dma_filter_fn fn, void *fn_param,
-+				  struct device *dev, char *name)
-+{
-+	struct dma_chan *chan;
-+
-+	chan = dma_request_slave_channel_reason(dev, name);
-+	/* Try via legacy API if not requesting for deferred probing */
-+	if (IS_ERR(chan) && PTR_ERR(chan) != -EPROBE_DEFER)
-+		chan = __dma_request_channel(mask, fn, fn_param);
-+
-+	if (!chan)
-+		chan = ERR_PTR(-ENODEV);
-+
-+	return chan;
-+}
-+
- #endif /* DMAENGINE_H */
++	omap_aes_dma_cleanup(dd);
+ err_irq:
+ 	tasklet_kill(&dd->done_task);
+ 	tasklet_kill(&dd->queue_task);
 -- 
 2.3.5
