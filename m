@@ -1,36 +1,54 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH 5/7] esp6: Switch to new AEAD interface
-Date: Tue, 26 May 2015 10:27:27 +0200
-Message-ID: <2026198.dunBikth8E@tauon>
-References: <20150521103938.GA23035@gondor.apana.org.au> <2896909.aPhD1VIluo@tauon> <20150526081801.GA7067@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Crypto Fixes for 4.1
+Date: Tue, 26 May 2015 16:43:51 +0800
+Message-ID: <20150526084351.GA7377@gondor.apana.org.au>
+References: <20131209115705.GA1361@gondor.apana.org.au>
+ <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20141231033217.GA27261@gondor.apana.org.au>
+ <20150107021737.GA25043@gondor.apana.org.au>
+ <20150425080310.GA6873@gondor.apana.org.au>
+ <20150505100621.GA8678@gondor.apana.org.au>
+ <20150511055608.GA2055@gondor.apana.org.au>
+ <20150520065441.GA8330@gondor.apana.org.au>
+ <20150522040559.GA30475@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58312 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751371AbbEZInd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 May 2015 04:43:33 -0400
-In-Reply-To: <20150526081801.GA7067@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:47974 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751009AbbEZIoA (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 May 2015 04:44:00 -0400
+Content-Disposition: inline
+In-Reply-To: <20150522040559.GA30475@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 26. Mai 2015, 16:18:01 schrieb Herbert Xu:
+Hi Linus:
 
-Hi Herbert,
+This push disables the newly (4.1) added user-space AEAD interface
+so that we can fix issues in the underlying kernel AEAD interface.
+Once the new kernel AEAD interface is ready we can then reenable
+the user-space AEAD interface.
+ 
+Please pull from
 
->
->This is all in the patch series that you're responding.  So please
->actually read it rather than making assumptions :)
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
 
-Sorry, you are right -- I overlooked the xfrm_algo_desc change. Thanks for 
-helping.
 
-Ciao
-Stephan
+Herbert Xu (1):
+      crypto: algif_aead - Disable AEAD user-space for now
+
+ crypto/Kconfig |    9 ---------
+ 1 file changed, 9 deletions(-)
+ 
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
