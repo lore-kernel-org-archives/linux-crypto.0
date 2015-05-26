@@ -1,45 +1,35 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 5/7] esp6: Switch to new AEAD interface
-Date: Tue, 26 May 2015 15:40:13 +0800
-Message-ID: <20150526074013.GA6685@gondor.apana.org.au>
-References: <20150521103938.GA23035@gondor.apana.org.au>
- <2306681.gksi6E3i3N@tachyon.chronox.de>
- <20150526072152.GA6407@gondor.apana.org.au>
- <1712288.Rcrx4S4ED0@tauon>
- <20150526073858.GA6634@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [v2 PATCH 13/13] crypto: algif_aead - Switch to new AEAD interface
+Date: Tue, 26 May 2015 09:57:51 +0200
+Message-ID: <5101027.rdCY05rkLJ@tauon>
+References: <20150522082708.GA3507@gondor.apana.org.au> <1720790.K1nOQU1Nxi@tachyon.chronox.de> <20150526073605.GA6530@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Johannes Berg <johannes@sipsolutions.net>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Steffen Klassert <steffen.klassert@secunet.com>
-To: Stephan Mueller <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:34681 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751272AbbEZHkR (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 May 2015 03:40:17 -0400
-Content-Disposition: inline
-In-Reply-To: <20150526073858.GA6634@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:58295 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751729AbbEZH5x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 May 2015 03:57:53 -0400
+In-Reply-To: <20150526073605.GA6530@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 26, 2015 at 03:38:58PM +0800, Herbert Xu wrote:
-> On Tue, May 26, 2015 at 09:37:09AM +0200, Stephan Mueller wrote:
-> >
-> > - the current IKE implementations use rfc4106(gcm(aes)). They would need to 
-> > use seqniv(rfc4106(gcm(aes))) depending on the kernel version. So, we have a 
-> > clear change in the user space API where the old configuration even works 
-> > (i.e. no error), but does not produce the correct encryption that is required.
-> 
-> You mean through the user-space AEAD interface? That's not a problem
-> because I'm going to disable it for 4.1 :)
+Am Dienstag, 26. Mai 2015, 15:36:05 schrieb Herbert Xu:
 
-In fact it isn't a problem anyway because we never exported
-givencrypt to user-space so this interface never existed.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi Herbert,
+>
+>In order to allow this to be done I'm going to disable the AEAD
+>user-space interface in 4.1 so that we have time to fix it properly
+>for 4.2.
+
+Ok. Would you look into that one or shall I do that?
+
+Ciao
+Stephan
