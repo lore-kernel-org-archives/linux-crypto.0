@@ -1,86 +1,62 @@
-From: Tony Lindgren <tony@atomide.com>
-Subject: Re: [PATCH 03/13] serial: 8250_dma: Support for
- deferred probing when requesting DMA channels
-Date: Tue, 26 May 2015 08:08:53 -0700
-Message-ID: <20150526150852.GC16525@atomide.com>
+From: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 11/13] spi: omap2-mcspi: Support for deferred probing
+ when requesting DMA channels
+Date: Tue, 26 May 2015 16:27:30 +0100
+Message-ID: <20150526152730.GT21577@sirena.org.uk>
 References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com>
- <1432646768-12532-4-git-send-email-peter.ujfalusi@ti.com>
+ <1432646768-12532-12-git-send-email-peter.ujfalusi@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: devicetree@vger.kernel.org, alsa-devel@alsa-project.org,
- vinod.koul@intel.com, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-serial@vger.kernel.org, dmaengine@vger.kernel.org,
- dan.j.williams@intel.com, linux-omap@vger.kernel.org,
- linux-media@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="cCVGH4QhGbYkRKO5"
+Cc: vinod.koul@intel.com, tony@atomide.com, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dan.j.williams@intel.com,
+	dmaengine@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-omap@vger.kernel.org, linux-mmc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-media@vger.kernel.org, alsa-devel@alsa-project.org
 To: Peter Ujfalusi <peter.ujfalusi@ti.com>
-Return-path: <alsa-devel-bounces@alsa-project.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mezzanine.sirena.org.uk ([106.187.55.193]:57400 "EHLO
+	mezzanine.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751287AbbEZP1k (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 26 May 2015 11:27:40 -0400
 Content-Disposition: inline
-In-Reply-To: <1432646768-12532-4-git-send-email-peter.ujfalusi@ti.com>
-List-Unsubscribe: <http://mailman.alsa-project.org/mailman/options/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=unsubscribe>
-List-Archive: <http://mailman.alsa-project.org/pipermail/alsa-devel/>
-List-Post: <mailto:alsa-devel@alsa-project.org>
-List-Help: <mailto:alsa-devel-request@alsa-project.org?subject=help>
-List-Subscribe: <http://mailman.alsa-project.org/mailman/listinfo/alsa-devel>,
- <mailto:alsa-devel-request@alsa-project.org?subject=subscribe>
-Errors-To: alsa-devel-bounces@alsa-project.org
-Sender: alsa-devel-bounces@alsa-project.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1432646768-12532-12-git-send-email-peter.ujfalusi@ti.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-* Peter Ujfalusi <peter.ujfalusi@ti.com> [150526 06:28]:
+
+--cCVGH4QhGbYkRKO5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Tue, May 26, 2015 at 04:26:06PM +0300, Peter Ujfalusi wrote:
+
 > Switch to use ma_request_slave_channel_compat_reason() to request the DMA
-> channels. In case of error, return the error code we received including
-> -EPROBE_DEFER
-> 
-> Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
-> CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
->  drivers/tty/serial/8250/8250_dma.c | 18 ++++++++----------
->  1 file changed, 8 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/tty/serial/8250/8250_dma.c b/drivers/tty/serial/8250/8250_dma.c
-> index 21d01a491405..a617eca4e97d 100644
-> --- a/drivers/tty/serial/8250/8250_dma.c
-> +++ b/drivers/tty/serial/8250/8250_dma.c
-> @@ -182,21 +182,19 @@ int serial8250_request_dma(struct uart_8250_port *p)
->  	dma_cap_set(DMA_SLAVE, mask);
->  
->  	/* Get a channel for RX */
-> -	dma->rxchan = dma_request_slave_channel_compat(mask,
-> -						       dma->fn, dma->rx_param,
-> -						       p->port.dev, "rx");
-> -	if (!dma->rxchan)
-> -		return -ENODEV;
-> +	dma->rxchan = dma_request_slave_channel_compat_reason(mask, dma->fn,
-> +					dma->rx_param, p->port.dev, "rx");
-> +	if (IS_ERR(dma->rxchan))
-> +		return PTR_ERR(dma->rxchan);
->  
->  	dmaengine_slave_config(dma->rxchan, &dma->rxconf);
->  
->  	/* Get a channel for TX */
-> -	dma->txchan = dma_request_slave_channel_compat(mask,
-> -						       dma->fn, dma->tx_param,
-> -						       p->port.dev, "tx");
-> -	if (!dma->txchan) {
-> +	dma->txchan = dma_request_slave_channel_compat_reason(mask, dma->fn,
-> +					dma->tx_param, p->port.dev, "tx");
-> +	if (IS_ERR(dma->txchan)) {
->  		dma_release_channel(dma->rxchan);
-> -		return -ENODEV;
-> +		return PTR_ERR(dma->txchan);
->  	}
->  
->  	dmaengine_slave_config(dma->txchan, &dma->txconf);
+> channels. Only fall back to pio mode if the error code returned is not
+> -EPROBE_DEFER, otherwise return from the probe with the -EPROBE_DEFER.
 
-In general the drivers need to work just fine also without DMA.
+I've got two patches from a patch series here with no cover letter...
+I'm guessing there's no interdependencies or anything?  Please always
+ensure that when sending a patch series everyone getting the patches can
+tell what the series as a whole looks like (if there's no dependencies
+consider posting as individual patches rather than a series).
 
-Does this handle the case properly where no DMA channel is configured
-for the driver in the dts file?
+--cCVGH4QhGbYkRKO5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-Regards,
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Tony
+iQEcBAEBCAAGBQJVZJDhAAoJECTWi3JdVIfQii8H/1dNPl+UQ4hYgOsQbXMiYH/e
+613k9/0lY7U0SMHKZ0pKlQNnbkrEDfY1qniWMTAYfBjxhcP97iACvq/Dhf8hPBoX
+UsaJGnpjmbMBw9OKGo3aSFQW3OA84ifW7VZK51316IwlL9weniqOJlQ7zRAl8nJe
+mBwR9lhFKAfUexsHRZkfqeoxIiZkCM4DU9pqPNeZUI4cu7uiGPGWmwonZ/+K0Zr5
+Vm5pe7A4BAyKUYoJatAOfektb0ODeNvo8ogFbsYGThHghm4+24fRQdNDiw/jYGTP
+TUJQRHR2/KRHvi2EjdlTMKdG7c/EhnPtH6jS8H2ryIDYtLte+1nBs8lL2EzQJRE=
+=GuJ4
+-----END PGP SIGNATURE-----
+
+--cCVGH4QhGbYkRKO5--
