@@ -1,85 +1,55 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH v3 16/16] ARM: marvell/dt: add crypto node to kirkwood
- dtsi
-Date: Mon, 25 May 2015 20:43:02 +0200
-Message-ID: <20150525204302.7c79afbf@bbrezillon>
-References: <1432301642-11470-1-git-send-email-boris.brezillon@free-electrons.com>
-	<1432301642-11470-17-git-send-email-boris.brezillon@free-electrons.com>
-	<55634221.6050504@free-electrons.com>
-	<20150525164651.GA13641@io.lakedaemon.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [v2 PATCH 13/13] crypto: algif_aead - Switch to new AEAD
+ interface
+Date: Tue, 26 May 2015 14:24:33 +0800
+Message-ID: <20150526062433.GA6025@gondor.apana.org.au>
+References: <20150522082708.GA3507@gondor.apana.org.au>
+ <3847514.ujeNcPGtgS@tachyon.chronox.de>
+ <20150525102021.GA30038@gondor.apana.org.au>
+ <3817112.GjAvZ3MSSX@tachyon.chronox.de>
+ <20150525115341.GA30627@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org
-To: Jason Cooper <jason@lakedaemon.net>
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:39791 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751781AbbEYSnI (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:52253 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751612AbbEZGYm (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 25 May 2015 14:43:08 -0400
-In-Reply-To: <20150525164651.GA13641@io.lakedaemon.net>
+	Tue, 26 May 2015 02:24:42 -0400
+Content-Disposition: inline
+In-Reply-To: <20150525115341.GA30627@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Jason, Gregory,
-
-On Mon, 25 May 2015 16:46:51 +0000
-Jason Cooper <jason@lakedaemon.net> wrote:
-
-> On Mon, May 25, 2015 at 05:39:13PM +0200, Gregory CLEMENT wrote:
-> > Hi Boris, Arnaud,
-> > 
-> > On 22/05/2015 15:34, Boris Brezillon wrote:
-> > > From: Arnaud Ebalard <arno@natisbad.org>
-> > > 
-> > > Add crypto related nodes to kirkwood.dtsi.
-> > 
-> > Here you use a new compatible string but with an old binding
-> > to let the user chose between the old and the new driver. Am I right?
-
-That was not the intention, but you're right, that's exactly what's
-happening here.
-
+On Mon, May 25, 2015 at 07:53:41PM +0800, Herbert Xu wrote:
+> On Mon, May 25, 2015 at 01:50:55PM +0200, Stephan Mueller wrote:
+> >
+> > When you have my code local, simply execute libkcapi/test/kcapi -y twice or 
+> > three times. That triggered the crash.
 > 
-> I thought we had settled on the user choosing by module load/ which driver is
-> compiled in?  The DT should be describing the hardware, not which driver the
-> user chooses to use.
+> Aha that's what I was missing.  I'll look into the crash.
 
-Right, but I didn't want to add new compatible strings to the old
-driver in the first place, neither I wanted to support the new way of
-defining/referencing the crypto SRAMs.
-ITOH, if we want to benefit from the TDMA optimization on Kirkwood SoCs,
-we have to add a new compatible (unlike Orion SoCs, Kirkwood ones embed
-a TDMA engine).
+OK I forgot to initialise the SG list.  This patch fixes it for me.
 
-This leaves the following solutions:
- - avoid changing the compatible in existing orion and kirkwood dtsi
-   files
- - adding kirkwood compatible string support to the existing CESA
-   driver (and I think supporting the new approach to retrieve SRAM
-   memory region would make sense too)
-
-Best Regards,
-
-Boris
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 1d08483..35556a6 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -454,6 +454,7 @@ static int aead_recvmsg(struct socket *sock, struct msghdr *msg, size_t ignored,
+ 	if (usedpages < outlen)
+ 		goto unlock;
+ 
++	sg_init_table(dstbuf, ALG_MAX_PAGES + 1);
+ 	sg_mark_end(sgl->sg + sgl->cur);
+ 	assoclen = ctx->aead_assoclen;
+ 	/*
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
