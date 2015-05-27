@@ -1,52 +1,50 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Johannes Berg <johannes@sipsolutions.net>
 Subject: Re: [v3 PATCH 0/8] crypto: Convert all AEAD users to new interface
-Date: Wed, 27 May 2015 16:39:11 +0800
-Message-ID: <20150527083911.GA27432@gondor.apana.org.au>
+Date: Wed, 27 May 2015 11:00:40 +0200
+Message-ID: <1432717240.2159.5.camel@sipsolutions.net>
 References: <20150521103938.GA23035@gondor.apana.org.au>
- <20150522082708.GA3507@gondor.apana.org.au>
- <20150527080105.GA26751@gondor.apana.org.au>
- <1432714550.2159.4.camel@sipsolutions.net>
+	 <20150522082708.GA3507@gondor.apana.org.au>
+	 <20150527080105.GA26751@gondor.apana.org.au>
+	 <1432714550.2159.4.camel@sipsolutions.net>
+	 <20150527083911.GA27432@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Steffen Klassert <steffen.klassert@secunet.com>,
 	Stephan Mueller <smueller@chronox.de>
-To: Johannes Berg <johannes@sipsolutions.net>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47677 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751935AbbE0IjR (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 May 2015 04:39:17 -0400
-Content-Disposition: inline
-In-Reply-To: <1432714550.2159.4.camel@sipsolutions.net>
+Received: from s3.sipsolutions.net ([5.9.151.49]:49541 "EHLO sipsolutions.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750955AbbE0JAo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 May 2015 05:00:44 -0400
+In-Reply-To: <20150527083911.GA27432@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 27, 2015 at 10:15:50AM +0200, Johannes Berg wrote:
+On Wed, 2015-05-27 at 16:39 +0800, Herbert Xu wrote:
+> On Wed, May 27, 2015 at 10:15:50AM +0200, Johannes Berg wrote:
+> > 
+> > Do you think it'd be feasible at all to somehow override the
+> > aead_request_set_crypt() and aead_request_set_ad() functions or so to do
+> > something that works on older kernels (and thus older crypto subsystems)
+> > or do you think I just shouldn't bother looking at that and just add
+> > ifdefs to "undo" your changes in this series on older kernels?
 > 
-> Do you think it'd be feasible at all to somehow override the
-> aead_request_set_crypt() and aead_request_set_ad() functions or so to do
-> something that works on older kernels (and thus older crypto subsystems)
-> or do you think I just shouldn't bother looking at that and just add
-> ifdefs to "undo" your changes in this series on older kernels?
+> Another option is to backport the new interface to the older kernel.
+> 
+> You only need something like
+> 
+> https://patchwork.kernel.org/patch/6452601/
+> 
+> for the older kernel to support the new interface along with the
+> old interface.
 
-Another option is to backport the new interface to the older kernel.
+Right. Unfortunately, I can't typically rely on being able to make
+changes to the kernel our driver is built against, and I don't think we
+could do these changes otherwise.
 
-You only need something like
-
-https://patchwork.kernel.org/patch/6452601/
-
-for the older kernel to support the new interface along with the
-old interface.
-
-Note that this patch itself won't be good enough because I have since
-removed cryptoff.  But it illustrates the amount of code you need.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+johannes
