@@ -1,43 +1,136 @@
-From: Johannes Berg <johannes@sipsolutions.net>
-Subject: Re: [v3 PATCH 0/8] crypto: Convert all AEAD users to new interface
-Date: Wed, 27 May 2015 11:18:31 +0200
-Message-ID: <1432718311.2159.6.camel@sipsolutions.net>
-References: <20150521103938.GA23035@gondor.apana.org.au>
-	 <20150522082708.GA3507@gondor.apana.org.au>
-	 <20150527080105.GA26751@gondor.apana.org.au>
-	 <1432714550.2159.4.camel@sipsolutions.net>
-	 <20150527083911.GA27432@gondor.apana.org.au>
-	 <1432717240.2159.5.camel@sipsolutions.net>
-	 <20150527090737.GA27692@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: crypto: algif_aead - Switch to new AEAD interface
+Date: Wed, 27 May 2015 17:24:41 +0800
+Message-ID: <20150527092441.GA27913@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Stephan Mueller <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from s3.sipsolutions.net ([5.9.151.49]:49625 "EHLO sipsolutions.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751814AbbE0JSe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 May 2015 05:18:34 -0400
-In-Reply-To: <20150527090737.GA27692@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:45700 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751154AbbE0JYr (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 May 2015 05:24:47 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 2015-05-27 at 17:07 +0800, Herbert Xu wrote:
-> On Wed, May 27, 2015 at 11:00:40AM +0200, Johannes Berg wrote:
-> >
-> > Right. Unfortunately, I can't typically rely on being able to make
-> > changes to the kernel our driver is built against, and I don't think we
-> > could do these changes otherwise.
-> 
-> You could provide your own version of crypto_aead_encrypt and
-> crypto_aead_decrypt that did the same thing as old_crypt.
+This patch makes use of the new AEAD interface which uses a single
+SG list instead of separate lists for the AD and plain text.
 
-Ah, good point, thanks. I'll look into it once these changes hit my
-tree :)
+Note that the user-space interface now requires both input and
+output to be of the same length, and both must include space for
+the AD as well as the authentication tag.
 
-johannes
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 53702e9..72a94dc 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -72,7 +72,7 @@ static inline bool aead_sufficient_data(struct aead_ctx *ctx)
+ {
+ 	unsigned as = crypto_aead_authsize(crypto_aead_reqtfm(&ctx->aead_req));
+ 
+-	return (ctx->used >= (ctx->aead_assoclen + (ctx->enc ? 0 : as)));
++	return ctx->used >= ctx->aead_assoclen + as;
+ }
+ 
+ static void aead_put_sgl(struct sock *sk)
+@@ -353,12 +353,8 @@ static int aead_recvmsg(struct socket *sock, struct msghdr *msg, size_t ignored,
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct aead_ctx *ctx = ask->private;
+-	unsigned bs = crypto_aead_blocksize(crypto_aead_reqtfm(&ctx->aead_req));
+ 	unsigned as = crypto_aead_authsize(crypto_aead_reqtfm(&ctx->aead_req));
+ 	struct aead_sg_list *sgl = &ctx->tsgl;
+-	struct scatterlist *sg = NULL;
+-	struct scatterlist assoc[ALG_MAX_PAGES];
+-	size_t assoclen = 0;
+ 	unsigned int i = 0;
+ 	int err = -EINVAL;
+ 	unsigned long used = 0;
+@@ -407,23 +403,13 @@ static int aead_recvmsg(struct socket *sock, struct msghdr *msg, size_t ignored,
+ 	if (!aead_sufficient_data(ctx))
+ 		goto unlock;
+ 
++	outlen = used;
++
+ 	/*
+ 	 * The cipher operation input data is reduced by the associated data
+ 	 * length as this data is processed separately later on.
+ 	 */
+-	used -= ctx->aead_assoclen;
+-
+-	if (ctx->enc) {
+-		/* round up output buffer to multiple of block size */
+-		outlen = ((used + bs - 1) / bs * bs);
+-		/* add the size needed for the auth tag to be created */
+-		outlen += as;
+-	} else {
+-		/* output data size is input without the authentication tag */
+-		outlen = used - as;
+-		/* round up output buffer to multiple of block size */
+-		outlen = ((outlen + bs - 1) / bs * bs);
+-	}
++	used -= ctx->aead_assoclen + (ctx->enc ? as : 0);
+ 
+ 	/* convert iovecs of output buffers into scatterlists */
+ 	while (iov_iter_count(&msg->msg_iter)) {
+@@ -453,47 +439,11 @@ static int aead_recvmsg(struct socket *sock, struct msghdr *msg, size_t ignored,
+ 	if (usedpages < outlen)
+ 		goto unlock;
+ 
+-	sg_init_table(assoc, ALG_MAX_PAGES);
+-	assoclen = ctx->aead_assoclen;
+-	/*
+-	 * Split scatterlist into two: first part becomes AD, second part
+-	 * is plaintext / ciphertext. The first part is assigned to assoc
+-	 * scatterlist. When this loop finishes, sg points to the start of the
+-	 * plaintext / ciphertext.
+-	 */
+-	for (i = 0; i < ctx->tsgl.cur; i++) {
+-		sg = sgl->sg + i;
+-		if (sg->length <= assoclen) {
+-			/* AD is larger than one page */
+-			sg_set_page(assoc + i, sg_page(sg),
+-				    sg->length, sg->offset);
+-			assoclen -= sg->length;
+-			if (i >= ctx->tsgl.cur)
+-				goto unlock;
+-		} else if (!assoclen) {
+-			/* current page is to start of plaintext / ciphertext */
+-			if (i)
+-				/* AD terminates at page boundary */
+-				sg_mark_end(assoc + i - 1);
+-			else
+-				/* AD size is zero */
+-				sg_mark_end(assoc);
+-			break;
+-		} else {
+-			/* AD does not terminate at page boundary */
+-			sg_set_page(assoc + i, sg_page(sg),
+-				    assoclen, sg->offset);
+-			sg_mark_end(assoc + i);
+-			/* plaintext / ciphertext starts after AD */
+-			sg->length -= assoclen;
+-			sg->offset += assoclen;
+-			break;
+-		}
+-	}
++	sg_mark_end(sgl->sg + sgl->cur - 1);
+ 
+-	aead_request_set_assoc(&ctx->aead_req, assoc, ctx->aead_assoclen);
+-	aead_request_set_crypt(&ctx->aead_req, sg, ctx->rsgl[0].sg, used,
+-			       ctx->iv);
++	aead_request_set_crypt(&ctx->aead_req, sgl->sg, ctx->rsgl[0].sg,
++			       used, ctx->iv);
++	aead_request_set_ad(&ctx->aead_req, ctx->aead_assoclen);
+ 
+ 	err = af_alg_wait_for_completion(ctx->enc ?
+ 					 crypto_aead_encrypt(&ctx->aead_req) :
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
