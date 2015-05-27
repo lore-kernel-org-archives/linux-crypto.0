@@ -1,79 +1,39 @@
-From: Alexander Duyck <alexander.h.duyck@redhat.com>
-Subject: [net-next PATCH RFC 2/3] xfrm: Override skb->mark with
- tunnel->parm.i_key in xfrm_input
-Date: Tue, 26 May 2015 15:41:23 -0700
-Message-ID: <20150526224123.1328.85343.stgit@ahduyck-vm-fedora22>
-References: <20150526223849.1328.64212.stgit@ahduyck-vm-fedora22>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 0/11] crypto: aead - Tweaks/fixes to new AEAD interface
+Date: Wed, 27 May 2015 14:35:39 +0800
+Message-ID: <20150527063539.GA25889@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-To: steffen.klassert@secunet.com, davem@davemloft.net,
-	herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=us-ascii
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:58434 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751230AbbEZWld (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 26 May 2015 18:41:33 -0400
-In-Reply-To: <20150526223849.1328.64212.stgit@ahduyck-vm-fedora22>
+Received: from helcar.hengli.com.au ([209.40.204.226]:49273 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752013AbbE0Gfm (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 May 2015 02:35:42 -0400
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This change makes it so that if a tunnel is defined we just use the mark
-from the tunnel instead of the mark from the skb header.  By doing this we
-can avoid the need to set skb->mark inside of the tunnel receive functions.
+Hi:
 
-Signed-off-by: Alexander Duyck <alexander.h.duyck@redhat.com>
----
- net/xfrm/xfrm_input.c |   17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+Previously the AD was required to exist in both the source and
+destination buffers.  This creates a rather confusing situation
+where the destination served as both input as well as output.
 
-diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
-index 526c4feb3b50..b58286ecd156 100644
---- a/net/xfrm/xfrm_input.c
-+++ b/net/xfrm/xfrm_input.c
-@@ -13,6 +13,8 @@
- #include <net/dst.h>
- #include <net/ip.h>
- #include <net/xfrm.h>
-+#include <net/ip_tunnels.h>
-+#include <net/ip6_tunnel.h>
- 
- static struct kmem_cache *secpath_cachep __read_mostly;
- 
-@@ -186,6 +188,7 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 	struct xfrm_state *x = NULL;
- 	xfrm_address_t *daddr;
- 	struct xfrm_mode *inner_mode;
-+	u32 mark = skb->mark;
- 	unsigned int family;
- 	int decaps = 0;
- 	int async = 0;
-@@ -203,6 +206,18 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 				   XFRM_SPI_SKB_CB(skb)->daddroff);
- 	family = XFRM_SPI_SKB_CB(skb)->family;
- 
-+	/* if tunnel is present override skb->mark value with tunnel i_key */
-+	if (XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4) {
-+		switch (family) {
-+		case AF_INET:
-+			mark = be32_to_cpu(XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4->parms.i_key);
-+			break;
-+		case AF_INET6:
-+			mark = be32_to_cpu(XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6->parms.i_key);
-+			break;
-+		}
-+	}
-+
- 	/* Allocate new secpath or COW existing one. */
- 	if (!skb->sp || atomic_read(&skb->sp->refcnt) != 1) {
- 		struct sec_path *sp;
-@@ -229,7 +244,7 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
- 			goto drop;
- 		}
- 
--		x = xfrm_state_lookup(net, skb->mark, daddr, spi, nexthdr, family);
-+		x = xfrm_state_lookup(net, mark, daddr, spi, nexthdr, family);
- 		if (x == NULL) {
- 			XFRM_INC_STATS(net, LINUX_MIB_XFRMINNOSTATES);
- 			xfrm_audit_state_notfound(skb, family, spi, seq);
+This series rectifies by allowing the destination to contain
+the AD (e.g., it always does for in-place encryption) but not
+require it.  Those AEAD algorithms that need the AD to be in
+the destination buffer will do their own copying.
+
+This series also merges some common code between echainiv and
+seqiv.  In particular, the entire compatibility layer is now
+shared.
+
+Finally a number of bugs have been quashed.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
