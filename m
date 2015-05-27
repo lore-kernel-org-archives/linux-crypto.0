@@ -1,39 +1,43 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 2/11] crypto: scatterwalk - Add missing sg_init_table to
- scatterwalk_ffwd
-Date: Wed, 27 May 2015 17:08:55 +0800
-Message-ID: <20150527090855.GB27692@gondor.apana.org.au>
-References: <20150527063539.GA25889@gondor.apana.org.au>
- <E1YxUxz-0006lD-TG@gondolin.me.apana.org.au>
- <8805468.lNrScoBP33@tauon>
+From: Johannes Berg <johannes@sipsolutions.net>
+Subject: Re: [v3 PATCH 0/8] crypto: Convert all AEAD users to new interface
+Date: Wed, 27 May 2015 11:18:31 +0200
+Message-ID: <1432718311.2159.6.camel@sipsolutions.net>
+References: <20150521103938.GA23035@gondor.apana.org.au>
+	 <20150522082708.GA3507@gondor.apana.org.au>
+	 <20150527080105.GA26751@gondor.apana.org.au>
+	 <1432714550.2159.4.camel@sipsolutions.net>
+	 <20150527083911.GA27432@gondor.apana.org.au>
+	 <1432717240.2159.5.camel@sipsolutions.net>
+	 <20150527090737.GA27692@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Stephan Mueller <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44873 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751380AbbE0JI6 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 May 2015 05:08:58 -0400
-Content-Disposition: inline
-In-Reply-To: <8805468.lNrScoBP33@tauon>
+Received: from s3.sipsolutions.net ([5.9.151.49]:49625 "EHLO sipsolutions.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751814AbbE0JSe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 May 2015 05:18:34 -0400
+In-Reply-To: <20150527090737.GA27692@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 27, 2015 at 11:00:55AM +0200, Stephan Mueller wrote:
->
-> Shouldn't there be a check for src == NULL here? I see the scatterwalk_ffwd 
-> being used in the IV generators where they simply use the AD len and others. 
-> For AF_ALG, those values may be set by user space in a deliberately wrong way 
-> (e.g. more AD len than provided buffers).
+On Wed, 2015-05-27 at 17:07 +0800, Herbert Xu wrote:
+> On Wed, May 27, 2015 at 11:00:40AM +0200, Johannes Berg wrote:
+> >
+> > Right. Unfortunately, I can't typically rely on being able to make
+> > changes to the kernel our driver is built against, and I don't think we
+> > could do these changes otherwise.
+> 
+> You could provide your own version of crypto_aead_encrypt and
+> crypto_aead_decrypt that did the same thing as old_crypt.
 
-algif_aead should be verifying the user provided input.  AFAICS it
-is doing exactly that.  The crash we had previously were due to
-bugs in my algif_aead patch.
+Ah, good point, thanks. I'll look into it once these changes hit my
+tree :)
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+johannes
