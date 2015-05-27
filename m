@@ -1,54 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1 3/3] crypto: ccp - Protect against poorly marked end
- of sg list
-Date: Wed, 27 May 2015 17:45:54 +0800
-Message-ID: <20150527094554.GA28211@gondor.apana.org.au>
-References: <20150526180635.6527.5580.stgit@tlendack-t1.amdoffice.net>
- <20150527094305.GA28142@gondor.apana.org.au>
+Subject: Re: [PATCH] crypto: nx - tweak Makefile dependencies
+Date: Wed, 27 May 2015 17:50:43 +0800
+Message-ID: <20150527095043.GA28255@gondor.apana.org.au>
+References: <1432529116-21279-1-git-send-email-cyrilbur@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net
-To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
+	Fionnuala Gunter <fin@linux.vnet.ibm.com>,
+	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Cyril Bur <cyrilbur@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:57559 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:36112 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750755AbbE0Jp7 (ORCPT
+	with ESMTP id S1750851AbbE0Jus (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 May 2015 05:45:59 -0400
+	Wed, 27 May 2015 05:50:48 -0400
 Content-Disposition: inline
-In-Reply-To: <20150527094305.GA28142@gondor.apana.org.au>
+In-Reply-To: <1432529116-21279-1-git-send-email-cyrilbur@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 27, 2015 at 05:43:05PM +0800, Herbert Xu wrote:
-> Tom Lendacky <thomas.lendacky@amd.com> wrote:
-> > Scatter gather lists can be created with more available entries than are
-> > actually used (e.g. using sg_init_table() to reserve a specific number
-> > of sg entries, but in actuality using something less than that based on
-> > the data length).  The caller sometimes fails to mark the last entry
-> > with sg_mark_end().  In these cases, sg_nents() will return the original
-> > size of the sg list as opposed to the actual number of sg entries that
-> > contain valid data.
-> > 
-> > On arm64, if the sg_nents() value is used in a call to dma_map_sg() in
-> > this situation, then it causes a BUG_ON in lib/swiotlb.c because an
-> > "empty" sg list entry results in dma_capable() returning false and
-> > swiotlb trying to create a bounce buffer of size 0. This occurred in
-> > the userspace crypto interface before being fixed by
-> > 
-> > 0f477b655a52 ("crypto: algif - Mark sgl end at the end of data")
-> > 
-> > Protect against this in the future by counting the number of sg entries
-> > needed to meet the length requirement and supplying that value to
-> > dma_map_sg().
+On Mon, May 25, 2015 at 02:45:16PM +1000, Cyril Bur wrote:
+> Selecting CRYPTO_DEV_NX causes a conditional include of nx/Kconfig but
+> options within nx/Kconfig do not depend on it. The included options should
+> depend on CRYPTO_DEV_NX since currently CRYPTO_DEV_NX cannot be built for
+> little endian. While Kconfig appears to understand this convoluted
+> dependency situation, it isn't explicitly stated.
 > 
-> Is this needed for any reason other than this bug that's already
-> been fixed?
+> This patch addresses the missing dependencies for CRYPTO_DEV_NX_ENCRYPT and
+> CRYPTO_DEV_NX_COMPRESS which should depend on CRYPTO_DEV_NX. It also makes
+> more sense to put all three options into the nx/Kconfig file and have the
+> file included unconditionally.
+> 
+> CC: Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>
+> CC: Fionnuala Gunter <fin@linux.vnet.ibm.com>
+> CC: linux-crypto@vger.kernel.org
+> CC: linuxppc-dev@lists.ozlabs.org
+> Signed-off-by: Cyril Bur <cyrilbur@gmail.com>
 
-Could this be needed if you have a properly marked SG list say of
-100 bytes but len is only 10 bytes?
+Your patch doesn't apply against the cryptodev tree.  Please rebase
+it.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
