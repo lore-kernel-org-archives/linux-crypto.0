@@ -1,37 +1,49 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1 0/3] crypto: ccp - CCP driver updates 2015-05-26
-Date: Wed, 27 May 2015 17:55:58 +0800
-Message-ID: <20150527095558.GC28255@gondor.apana.org.au>
-References: <20150526180612.6527.53332.stgit@tlendack-t1.amdoffice.net>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: crypto: algif_aead - Switch to new AEAD interface
+Date: Wed, 27 May 2015 12:10:03 +0200
+Message-ID: <1517596.JekxWSB2Qc@tauon>
+References: <20150527092441.GA27913@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, David Miller <davem@davemloft.net>
-To: Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:32919 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752851AbbE0J4C (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 May 2015 05:56:02 -0400
-Content-Disposition: inline
-In-Reply-To: <20150526180612.6527.53332.stgit@tlendack-t1.amdoffice.net>
+Received: from mail.eperm.de ([89.247.134.16]:58327 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752928AbbE0KKM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 May 2015 06:10:12 -0400
+In-Reply-To: <20150527092441.GA27913@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, May 26, 2015 at 01:06:13PM -0500, Tom Lendacky wrote:
-> The following patches are included in this driver update series:
-> 
-> - Remove the checking and setting of the device dma_mask field
-> - Remove an unused field from a structure to help avoid any confusion
-> - Protect against poorly marked end of scatter-gather list
->  
-> This patch series is based on cryptodev-2.6.
+Am Mittwoch, 27. Mai 2015, 17:24:41 schrieb Herbert Xu:
 
-Patches 1 and 2 applied.  I'll wait for your response before
-deciding on patch 3.
+Hi Herbert,
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>-
+>-	if (ctx->enc) {
+>-		/* round up output buffer to multiple of block size */
+>-		outlen = ((used + bs - 1) / bs * bs);
+
+Why wouldn't the round up for the output not be needed any more? If the caller 
+provides input data that is not multiple of block sizes and the output buffer 
+is also not multiple of block sizes, wouldn't an encrypt overstep boundaries?
+
+>-		/* add the size needed for the auth tag to be created */
+>-		outlen += as;
+>-	} else {
+>-		/* output data size is input without the authentication tag */
+>-		outlen = used - as;
+>-		/* round up output buffer to multiple of block size */
+>-		outlen = ((outlen + bs - 1) / bs * bs);
+
+Same here.
+
+>-	}
+>+	used -= ctx->aead_assoclen + (ctx->enc ? as : 0);
+
+
+
+Ciao
+Stephan
