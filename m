@@ -1,101 +1,78 @@
 From: Alexander Duyck <alexander.h.duyck@redhat.com>
-Subject: [ipsec PATCH 3/3] ip_vti/ip6_vti: Preserve skb->mark after rcv_cb
- call
-Date: Wed, 27 May 2015 07:16:54 -0700
-Message-ID: <20150527141654.1576.93876.stgit@ahduyck-vm-fedora22>
-References: <20150527141042.1576.47399.stgit@ahduyck-vm-fedora22>
+Subject: [PATCH] xfrm6: Do not use xfrm_local_error for path MTU issues in
+ tunnels
+Date: Wed, 27 May 2015 10:40:32 -0700
+Message-ID: <20150527173823.1415.96248.stgit@ahduyck-vm-fedora22>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: steffen.klassert@secunet.com, davem@davemloft.net,
 	herbert@gondor.apana.org.au
-To: steffen.klassert@secunet.com, netdev@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49992 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:53669 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752423AbbE0ORA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 May 2015 10:17:00 -0400
-In-Reply-To: <20150527141042.1576.47399.stgit@ahduyck-vm-fedora22>
+	id S1751546AbbE0Rkp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 May 2015 13:40:45 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The vti6_rcv_cb and vti_rcv_cb calls were leaving the skb->mark modified
-after completing the function.  This resulted in the original skb->mark
-value being lost.  Since we only need skb->mark to be set for
-xfrm_policy_check we can pull the assignment into the rcv_cb calls and then
-just restore the original mark after xfrm_policy_check has been completed.
+This change makes it so that we use icmpv6_send to report PMTU issues back
+into tunnels in the case that the resulting packet is larger than the MTU
+of the outgoing interface.  Previously xfrm_local_error was being used in
+this case, however this was resulting in no changes, I suspect due to the
+fact that the tunnel itself was being kept out of the loop.
+
+This patch fixes PMTU problems seen on ip6_vti tunnels and is based on the
+behavior seen if the socket was orphaned.  Instead of requiring the socket
+to be orphaned this patch simply defaults to using icmpv6_send in the case
+that the frame came though a tunnel.
 
 Signed-off-by: Alexander Duyck <alexander.h.duyck@redhat.com>
 ---
- net/ipv4/ip_vti.c  |    9 +++++++--
- net/ipv6/ip6_vti.c |    9 +++++++--
- 2 files changed, 14 insertions(+), 4 deletions(-)
+ net/ipv6/xfrm6_output.c |   18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/net/ipv4/ip_vti.c b/net/ipv4/ip_vti.c
-index 4c318e1c13c8..0c152087ca15 100644
---- a/net/ipv4/ip_vti.c
-+++ b/net/ipv4/ip_vti.c
-@@ -65,7 +65,6 @@ static int vti_input(struct sk_buff *skb, int nexthdr, __be32 spi,
- 			goto drop;
+diff --git a/net/ipv6/xfrm6_output.c b/net/ipv6/xfrm6_output.c
+index 09c76a7b474d..6f9b514d0e38 100644
+--- a/net/ipv6/xfrm6_output.c
++++ b/net/ipv6/xfrm6_output.c
+@@ -72,6 +72,7 @@ static int xfrm6_tunnel_check_size(struct sk_buff *skb)
+ {
+ 	int mtu, ret = 0;
+ 	struct dst_entry *dst = skb_dst(skb);
++	struct xfrm_state *x = dst->xfrm;
  
- 		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4 = tunnel;
--		skb->mark = be32_to_cpu(tunnel->parms.i_key);
+ 	mtu = dst_mtu(dst);
+ 	if (mtu < IPV6_MIN_MTU)
+@@ -82,7 +83,7 @@ static int xfrm6_tunnel_check_size(struct sk_buff *skb)
  
- 		return xfrm_input(skb, nexthdr, spi, encap_type);
+ 		if (xfrm6_local_dontfrag(skb))
+ 			xfrm6_local_rxpmtu(skb, mtu);
+-		else if (skb->sk)
++		else if (skb->sk && x->props.mode != XFRM_MODE_TUNNEL)
+ 			xfrm_local_error(skb, mtu);
+ 		else
+ 			icmpv6_send(skb, ICMPV6_PKT_TOOBIG, 0, mtu);
+@@ -149,11 +150,16 @@ static int __xfrm6_output(struct sock *sk, struct sk_buff *skb)
+ 	else
+ 		mtu = dst_mtu(skb_dst(skb));
+ 
+-	if (skb->len > mtu && xfrm6_local_dontfrag(skb)) {
+-		xfrm6_local_rxpmtu(skb, mtu);
+-		return -EMSGSIZE;
+-	} else if (!skb->ignore_df && skb->len > mtu && skb->sk) {
+-		xfrm_local_error(skb, mtu);
++	if (!skb->ignore_df && skb->len > mtu) {
++		skb->dev = dst->dev;
++
++		if (xfrm6_local_dontfrag(skb))
++			xfrm6_local_rxpmtu(skb, mtu);
++		else if (skb->sk && x->props.mode != XFRM_MODE_TUNNEL)
++			xfrm_local_error(skb, mtu);
++		else
++			icmpv6_send(skb, ICMPV6_PKT_TOOBIG, 0, mtu);
++
+ 		return -EMSGSIZE;
  	}
-@@ -91,6 +90,8 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
- 	struct pcpu_sw_netstats *tstats;
- 	struct xfrm_state *x;
- 	struct ip_tunnel *tunnel = XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip4;
-+	u32 orig_mark = skb->mark;
-+	int ret;
  
- 	if (!tunnel)
- 		return 1;
-@@ -107,7 +108,11 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
- 	x = xfrm_input_state(skb);
- 	family = x->inner_mode->afinfo->family;
- 
--	if (!xfrm_policy_check(NULL, XFRM_POLICY_IN, skb, family))
-+	skb->mark = be32_to_cpu(tunnel->parms.i_key);
-+	ret = xfrm_policy_check(NULL, XFRM_POLICY_IN, skb, family);
-+	skb->mark = orig_mark;
-+
-+	if (!ret)
- 		return -EPERM;
- 
- 	skb_scrub_packet(skb, !net_eq(tunnel->net, dev_net(skb->dev)));
-diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
-index 104de4da3ff3..ff3bd863fa03 100644
---- a/net/ipv6/ip6_vti.c
-+++ b/net/ipv6/ip6_vti.c
-@@ -322,7 +322,6 @@ static int vti6_rcv(struct sk_buff *skb)
- 		}
- 
- 		XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6 = t;
--		skb->mark = be32_to_cpu(t->parms.i_key);
- 
- 		rcu_read_unlock();
- 
-@@ -342,6 +341,8 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
- 	struct pcpu_sw_netstats *tstats;
- 	struct xfrm_state *x;
- 	struct ip6_tnl *t = XFRM_TUNNEL_SKB_CB(skb)->tunnel.ip6;
-+	u32 orig_mark = skb->mark;
-+	int ret;
- 
- 	if (!t)
- 		return 1;
-@@ -358,7 +359,11 @@ static int vti6_rcv_cb(struct sk_buff *skb, int err)
- 	x = xfrm_input_state(skb);
- 	family = x->inner_mode->afinfo->family;
- 
--	if (!xfrm_policy_check(NULL, XFRM_POLICY_IN, skb, family))
-+	skb->mark = be32_to_cpu(t->parms.i_key);
-+	ret = xfrm_policy_check(NULL, XFRM_POLICY_IN, skb, family);
-+	skb->mark = orig_mark;
-+
-+	if (!ret)
- 		return -EPERM;
- 
- 	skb_scrub_packet(skb, !net_eq(t->net, dev_net(skb->dev)));
