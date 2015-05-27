@@ -1,41 +1,98 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 7/11] crypto: echainiv - Fix IV size in context size calculation
-Date: Wed, 27 May 2015 14:37:34 +0800
-Message-ID: <E1YxUy6-0006ma-QR@gondolin.me.apana.org.au>
+Subject: [PATCH 8/11] crypto: seqiv - Copy AD along with plain/cipher text
+Date: Wed, 27 May 2015 14:37:36 +0800
+Message-ID: <E1YxUy8-0006mq-9g@gondolin.me.apana.org.au>
 References: <20150527063539.GA25889@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38135 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:57269 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751948AbbE0Ghi (ORCPT
+	with ESMTP id S1752401AbbE0Ghk (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 27 May 2015 02:37:38 -0400
+	Wed, 27 May 2015 02:37:40 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1YxUy7-0005cj-OJ
-	for <linux-crypto@vger.kernel.org>; Wed, 27 May 2015 16:37:35 +1000
+	id 1YxUy9-0005dE-Bj
+	for <linux-crypto@vger.kernel.org>; Wed, 27 May 2015 16:37:37 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch fixes a bug in the context size calculation where we
-were still referring to the old cra_aead.
+As the AD does not necessarily exist in the destination buffer
+it must be copied along with the plain/cipher text.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/echainiv.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/seqiv.c |   33 ++++++---------------------------
+ 1 file changed, 6 insertions(+), 27 deletions(-)
 
-diff --git a/crypto/echainiv.c b/crypto/echainiv.c
-index 0f79fc6..62a817f 100644
---- a/crypto/echainiv.c
-+++ b/crypto/echainiv.c
-@@ -280,7 +280,7 @@ static int echainiv_aead_create(struct crypto_template *tmpl,
+diff --git a/crypto/seqiv.c b/crypto/seqiv.c
+index 127970a..b55c685 100644
+--- a/crypto/seqiv.c
++++ b/crypto/seqiv.c
+@@ -315,19 +315,12 @@ static int seqiv_aead_encrypt_compat(struct aead_request *req)
+ 	data = req;
  
- 	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
- 	inst->alg.base.cra_ctxsize = sizeof(struct echainiv_ctx);
--	inst->alg.base.cra_ctxsize += inst->alg.base.cra_aead.ivsize;
-+	inst->alg.base.cra_ctxsize += inst->alg.ivsize;
+ 	if (req->src != req->dst) {
+-		struct scatterlist srcbuf[2];
+-		struct scatterlist dstbuf[2];
+ 		struct blkcipher_desc desc = {
+ 			.tfm = ctx->null,
+ 		};
  
- done:
- 	err = aead_register_instance(tmpl, inst);
+-		err = crypto_blkcipher_encrypt(
+-			&desc,
+-			scatterwalk_ffwd(dstbuf, req->dst,
+-					 req->assoclen + ivsize),
+-			scatterwalk_ffwd(srcbuf, req->src,
+-					 req->assoclen + ivsize),
+-			req->cryptlen - ivsize);
++		err = crypto_blkcipher_encrypt(&desc, req->dst, req->src,
++					       req->assoclen + req->cryptlen);
+ 		if (err)
+ 			return err;
+ 	}
+@@ -373,19 +366,12 @@ static int seqiv_aead_encrypt(struct aead_request *req)
+ 	info = req->iv;
+ 
+ 	if (req->src != req->dst) {
+-		struct scatterlist src[2];
+-		struct scatterlist dst[2];
+ 		struct blkcipher_desc desc = {
+ 			.tfm = ctx->null,
+ 		};
+ 
+-		err = crypto_blkcipher_encrypt(
+-			&desc,
+-			scatterwalk_ffwd(dst, req->dst,
+-					 req->assoclen + ivsize),
+-			scatterwalk_ffwd(src, req->src,
+-					 req->assoclen + ivsize),
+-			req->cryptlen - ivsize);
++		err = crypto_blkcipher_encrypt(&desc, req->dst, req->src,
++					       req->assoclen + req->cryptlen);
+ 		if (err)
+ 			return err;
+ 	}
+@@ -446,19 +432,12 @@ static int seqiv_aead_decrypt_compat(struct aead_request *req)
+ 	}
+ 
+ 	if (req->src != req->dst) {
+-		struct scatterlist srcbuf[2];
+-		struct scatterlist dstbuf[2];
+ 		struct blkcipher_desc desc = {
+ 			.tfm = ctx->null,
+ 		};
+ 
+-		err = crypto_blkcipher_encrypt(
+-			&desc,
+-			scatterwalk_ffwd(dstbuf, req->dst,
+-					 req->assoclen + ivsize),
+-			scatterwalk_ffwd(srcbuf, req->src,
+-					 req->assoclen + ivsize),
+-			req->cryptlen - ivsize);
++		err = crypto_blkcipher_encrypt(&desc, req->dst, req->src,
++					       req->assoclen + req->cryptlen);
+ 		if (err)
+ 			return err;
+ 	}
