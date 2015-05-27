@@ -1,57 +1,77 @@
-From: Peter Ujfalusi <peter.ujfalusi@ti.com>
-Subject: Re: [PATCH 11/13] spi: omap2-mcspi: Support for deferred probing
- when requesting DMA channels
-Date: Wed, 27 May 2015 14:15:12 +0300
-Message-ID: <5565A740.2020707@ti.com>
-References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com> <1432646768-12532-12-git-send-email-peter.ujfalusi@ti.com> <20150526152730.GT21577@sirena.org.uk>
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: Re: [PATCH v3 14/16] ARM: marvell/dt: enable crypto on armada-xp-gp
+Date: Wed, 27 May 2015 13:23:46 +0200
+Message-ID: <20150527132346.40bf820c@free-electrons.com>
+References: <1432301642-11470-1-git-send-email-boris.brezillon@free-electrons.com>
+	<1432301642-11470-15-git-send-email-boris.brezillon@free-electrons.com>
+	<55633B6D.7080307@free-electrons.com>
+	<20150526105936.25db3afb@bbrezillon>
+	<55659A81.3040600@free-electrons.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: <vinod.koul@intel.com>, <tony@atomide.com>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <dmaengine@vger.kernel.org>,
-	<linux-serial@vger.kernel.org>, <linux-omap@vger.kernel.org>,
-	<linux-mmc@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linux-spi@vger.kernel.org>, <linux-media@vger.kernel.org>,
-	<alsa-devel@alsa-project.org>
-To: Mark Brown <broonie@kernel.org>
-Return-path: <linux-mmc-owner@vger.kernel.org>
-In-Reply-To: <20150526152730.GT21577@sirena.org.uk>
-Sender: linux-mmc-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org
+To: Gregory CLEMENT <gregory.clement@free-electrons.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from down.free-electrons.com ([37.187.137.238]:57098 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751360AbbE0LXu (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 27 May 2015 07:23:50 -0400
+In-Reply-To: <55659A81.3040600@free-electrons.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Mark,
+Dear Gregory CLEMENT,
 
-On 05/26/2015 06:27 PM, Mark Brown wrote:
-> On Tue, May 26, 2015 at 04:26:06PM +0300, Peter Ujfalusi wrote:
->=20
->> Switch to use ma_request_slave_channel_compat_reason() to request th=
-e DMA
->> channels. Only fall back to pio mode if the error code returned is n=
-ot
->> -EPROBE_DEFER, otherwise return from the probe with the -EPROBE_DEFE=
-R.
->=20
-> I've got two patches from a patch series here with no cover letter...
-> I'm guessing there's no interdependencies or anything?  Please always
-> ensure that when sending a patch series everyone getting the patches =
-can
-> tell what the series as a whole looks like (if there's no dependencie=
-s
-> consider posting as individual patches rather than a series).
+On Wed, 27 May 2015 12:20:49 +0200, Gregory CLEMENT wrote:
 
-I have put the maintainers of the relevant subsystems as CC in the comm=
-it
-message and sent the series to all of the mailing lists. This series wa=
-s
-touching 7 subsystems and I thought not spamming every maintainer with =
-all the
-mails might be better.
+> But is it really depending of the board itself?
+> I see that the first lines are the same on all the dts, I just remember that
+> there was a reason why we could not put it in the dtsi.
 
-In v2 I will keep this in mind.
+Yes, because the DT language doesn't have a += operator, basically.
 
-The series depends on the first two patch, which adds the
-dma_request_slave_channel_compat_reason() function.
+Some of the MBus ranges are inherently board-specific: when you have a
+NOR flash, you need a specific MBus range for it. And such a MBus range
+is board-specific.
 
---=20
-P=E9ter
+Since it's not possible to do:
+
+	ranges = <SoC level ranges>
+
+in .dtsi, and:
+
+	ranges += <board level ranges>
+
+in .dts, we simply decided to always put:
+
+	ranges = <SoC level and board level ranges>
+
+in the .dts.
+
+It does create some duplication, but that's the best we could do with
+the existing DT infrastructure.
+
+Best regards,
+
+Thomas
+-- 
+Thomas Petazzoni, CTO, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
