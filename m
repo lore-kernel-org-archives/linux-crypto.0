@@ -1,66 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RFC v2 1/2] crypto: add PKE API
-Date: Thu, 28 May 2015 12:08:56 +0800
-Message-ID: <20150528040856.GB3849@gondor.apana.org.au>
-References: <20150506193643.9329.75351.stgit@tstruk-mobl1>
- <20150506193648.9329.27232.stgit@tstruk-mobl1>
- <20150511063222.GB2316@gondor.apana.org.au>
- <555F777D.1030509@intel.com>
- <20150523054734.GA14239@gondor.apana.org.au>
- <55608C9F.7040500@intel.com>
+Subject: Re: [PATCH] xfrm6: Do not use xfrm_local_error for path MTU issues
+ in tunnels
+Date: Thu, 28 May 2015 12:49:19 +0800
+Message-ID: <20150528044918.GA4333@gondor.apana.org.au>
+References: <20150527173823.1415.96248.stgit@ahduyck-vm-fedora22>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-	keescook@chromium.org, jwboyer@redhat.com, richard@nod.at,
-	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	vgoyal@redhat.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: steffen.klassert@secunet.com, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Alexander Duyck <alexander.h.duyck@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:57296 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:59131 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751374AbbE1EJP (ORCPT
+	with ESMTP id S1750886AbbE1Eta (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 May 2015 00:09:15 -0400
+	Thu, 28 May 2015 00:49:30 -0400
 Content-Disposition: inline
-In-Reply-To: <55608C9F.7040500@intel.com>
+In-Reply-To: <20150527173823.1415.96248.stgit@ahduyck-vm-fedora22>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sat, May 23, 2015 at 07:20:15AM -0700, Tadeusz Struk wrote:
->
-> The length would be redundant. It can be obtained by sg_nents(reg->inparams)
-> I don't limit the number of parameters. You can pass as many as you want. For instance to pass 3 in and 2 out you do:
+On Wed, May 27, 2015 at 10:40:32AM -0700, Alexander Duyck wrote:
+> This change makes it so that we use icmpv6_send to report PMTU issues back
+> into tunnels in the case that the resulting packet is larger than the MTU
+> of the outgoing interface.  Previously xfrm_local_error was being used in
+> this case, however this was resulting in no changes, I suspect due to the
+> fact that the tunnel itself was being kept out of the loop.
 > 
-> 	struct scatterlist in[3];
-> 	struct scatterlist out[2];
+> This patch fixes PMTU problems seen on ip6_vti tunnels and is based on the
+> behavior seen if the socket was orphaned.  Instead of requiring the socket
+> to be orphaned this patch simply defaults to using icmpv6_send in the case
+> that the frame came though a tunnel.
 > 
-> 	sg_init_table(in, 3);
-> 	sg_init_table(out, 2);
-> 
-> 	sg_set_buf(in, first_in_param, len_of_first_in_param);
-> 	sg_set_buf(in + 1, second_in_param, len_of_second_in_param);
-> 	sg_set_buf(in + 2, third_in_param, len_of_third_in_param);
-> 		
-> 	sg_set_buf(out, first_out_param, len_of_first_out_param);
-> 	sg_set_buf(out + 1, second_out_param, len_of_second_out_param);
-> 
-> 	akcipher_request_set_crypt(req, &in, &out);
-> 
-> The limitation here is that one parameter can not span multiple sgs. This should be ok as they will never be bigger than one page.
-> In fact MPI limits it to 2K max with #define MAX_EXTERN_MPI_BITS 16384.
-> I'm ok to rename it to src and dst.
+> Signed-off-by: Alexander Duyck <alexander.h.duyck@redhat.com>
 
-Do you have a specific piece of hardware in mind? What are its
-capabilities?
-
-If we are going to go with just contiguous memory then we might
-as well just do u8 *src, *dst, unsigned int slen, dlen.
-
-The whole point of the SG complexity is to deal with non-contiguous
-memory (e.g., fragmented packets with IPsec).  If you can't do that
-then why add the SG complexity?
+Does this still work with normal tunnel mode and identical inner
+and outer addresses? I recall we used to have a bug where in that
+situation the kernel would interpret the ICMP message as a reduction
+in outer MTU and thus resulting in a loop where the MTU keeps
+getting smaller.
 
 Cheers,
 -- 
