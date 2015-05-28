@@ -1,51 +1,45 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH RFC v2 1/2] crypto: add PKE API
-Date: Thu, 28 May 2015 09:54:41 -0700
-Message-ID: <55674851.9050903@intel.com>
-References: <20150506193643.9329.75351.stgit@tstruk-mobl1> <20150506193648.9329.27232.stgit@tstruk-mobl1> <20150511063222.GB2316@gondor.apana.org.au> <555F777D.1030509@intel.com> <20150523054734.GA14239@gondor.apana.org.au> <55608C9F.7040500@intel.com> <20150528040856.GB3849@gondor.apana.org.au>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v1 3/3] crypto: ccp - Protect against poorly marked end
+ of sg list
+Date: Thu, 28 May 2015 12:30:15 -0500
+Message-ID: <556750A7.6020003@amd.com>
+References: <20150527094305.GA28142@gondor.apana.org.au>
+ <5565D0B2.8070708@amd.com> <20150528003612.GA2739@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-	keescook@chromium.org, jwboyer@redhat.com, richard@nod.at,
-	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	vgoyal@redhat.com
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <linux-crypto@vger.kernel.org>, <davem@davemloft.net>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:38587 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751672AbbE1QyZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 May 2015 12:54:25 -0400
-In-Reply-To: <20150528040856.GB3849@gondor.apana.org.au>
+Received: from mail-by2on0148.outbound.protection.outlook.com ([207.46.100.148]:37964
+	"EHLO na01-by2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753942AbbE1RaZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 28 May 2015 13:30:25 -0400
+In-Reply-To: <20150528003612.GA2739@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 05/27/2015 09:08 PM, Herbert Xu wrote:
-> Do you have a specific piece of hardware in mind? What are its
-> capabilities?
+On 05/27/2015 07:36 PM, Herbert Xu wrote:
+> On Wed, May 27, 2015 at 09:12:02AM -0500, Tom Lendacky wrote:
+>>
+>>> The reason I'm asking is because while this patch fixes your driver
+>>> everybody else will still crash and burn should something like this
+>>> happen again.
+>>
+>> A number of other drivers already have similar sg-count functions in
+>> them.
+>
+> Perhaps you can help abstract this into a helper that everybody can
+> call?
 
-I'm going to use it with Intel's DH985xcc accelerator. It can accelerate
-RSA, DH, ECDSA and ECDH just to name the most commonly used.
-But I don't want to add anything that is device specific.
-I just want it to be flexible enough so that new algorithms can be easily added.
+I can do that.  Something like an sg_nents_for_len() function that takes
+an sg pointer and a u64 length as arguments. The function should also
+return an error if the length requirement isn't satisfied.
 
-> 
-> If we are going to go with just contiguous memory then we might
-> as well just do u8 *src, *dst, unsigned int slen, dlen.
-> 
-> The whole point of the SG complexity is to deal with non-contiguous
-> memory (e.g., fragmented packets with IPsec).  If you can't do that
-> then why add the SG complexity?
+Thanks,
+Tom
 
-If we do this that way then we will be able to pass only one input and one
-output parameter. There are cases when we will need more that this.
-For instance for ECDSA signature generation we need one input param hash(m)
-and two output parameters (r, s).
-So I have used the SG for that. This is not to deal with non-contiguous memory,
-but to pass more in/out parameters. Each parameter will need to occupy contiguous space in memory.
-I will update the comment to make it more clear.
-If you have other idea how to do this I will be happy to try it.
-Regards,
-T
+>
+> Cheers,
+>
