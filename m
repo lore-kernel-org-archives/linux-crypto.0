@@ -1,103 +1,95 @@
-From: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH 05/13] mmc: omap_hsmmc: Support for deferred probing when
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Subject: Re: [PATCH 07/13] mmc: davinci_mmc: Support for deferred probing when
  requesting DMA channels
-Date: Thu, 28 May 2015 09:23:25 +0200
-Message-ID: <CAPDyKFocEvZnV=BpPB8L3+XvS4YrMB9OJUW4_x=7H43mDww45Q@mail.gmail.com>
+Date: Thu, 28 May 2015 09:31:19 +0200
+Message-ID: <CAPDyKFpiHz9nePG0D5HzMkuBGcyt7340hWjjn1emqAKZGWoUnA@mail.gmail.com>
 References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com>
-	<1432646768-12532-6-git-send-email-peter.ujfalusi@ti.com>
+	<1432646768-12532-8-git-send-email-peter.ujfalusi@ti.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Vinod Koul <vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	Tony Lindgren <tony-4v6yS6AI5VpBDgjK7y7TUQ@public.gmane.org>,
-	"devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Dan Williams <dan.j.williams-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>,
-	dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-serial-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-omap <linux-omap-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-mmc <linux-mmc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"linux-spi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-spi-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-media-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, alsa-devel-K7yf7f+aM1XWsZ/bQMPhNw@public.gmane.org
-To: Peter Ujfalusi <peter.ujfalusi-l0cyMroinI0@public.gmane.org>
-Return-path: <linux-spi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1432646768-12532-6-git-send-email-peter.ujfalusi-l0cyMroinI0@public.gmane.org>
-Sender: linux-spi-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Vinod Koul <vinod.koul@intel.com>,
+	Tony Lindgren <tony@atomide.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	dmaengine@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-omap <linux-omap@vger.kernel.org>,
+	linux-mmc <linux-mmc@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	"linux-spi@vger.kernel.org" <linux-spi@vger.kernel.org>,
+	linux-media@vger.kernel.org, alsa-devel@alsa-project.org
+To: Peter Ujfalusi <peter.ujfalusi@ti.com>
+Return-path: <linux-omap-owner@vger.kernel.org>
+In-Reply-To: <1432646768-12532-8-git-send-email-peter.ujfalusi@ti.com>
+Sender: linux-omap-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-On 26 May 2015 at 15:26, Peter Ujfalusi <peter.ujfalusi-l0cyMroinI0@public.gmane.org> wrote:
+On 26 May 2015 at 15:26, Peter Ujfalusi <peter.ujfalusi@ti.com> wrote:
 > Switch to use ma_request_slave_channel_compat_reason() to request the DMA
-
-I guess it should be dma_request_slave_... huh, that was a long name. :-)
-
-> channels. In case of error, return the error code we received including
-> -EPROBE_DEFER
+> channels. Only fall back to pio mode if the error code returned is not
+> -EPROBE_DEFER, otherwise return from the probe with the -EPROBE_DEFER.
 >
-> Signed-off-by: Peter Ujfalusi <peter.ujfalusi-l0cyMroinI0@public.gmane.org>
-> CC: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
+> CC: Ulf Hansson <ulf.hansson@linaro.org>
 
-With the minor change above.
-
-Acked-by: Ulf Hansson <ulf.hansson-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
 
 Kind regards
 Uffe
 
 > ---
->  drivers/mmc/host/omap_hsmmc.c | 22 ++++++++++------------
->  1 file changed, 10 insertions(+), 12 deletions(-)
+>  drivers/mmc/host/davinci_mmc.c | 26 +++++++++++++++-----------
+>  1 file changed, 15 insertions(+), 11 deletions(-)
 >
-> diff --git a/drivers/mmc/host/omap_hsmmc.c b/drivers/mmc/host/omap_hsmmc.c
-> index 57bb85930f81..d252478391ee 100644
-> --- a/drivers/mmc/host/omap_hsmmc.c
-> +++ b/drivers/mmc/host/omap_hsmmc.c
-> @@ -2088,23 +2088,21 @@ static int omap_hsmmc_probe(struct platform_device *pdev)
+> diff --git a/drivers/mmc/host/davinci_mmc.c b/drivers/mmc/host/davinci_mmc.c
+> index b2b3f8bbfd8c..df81e4e2f662 100644
+> --- a/drivers/mmc/host/davinci_mmc.c
+> +++ b/drivers/mmc/host/davinci_mmc.c
+> @@ -530,20 +530,20 @@ static int __init davinci_acquire_dma_channels(struct mmc_davinci_host *host)
 >         dma_cap_zero(mask);
 >         dma_cap_set(DMA_SLAVE, mask);
 >
-> -       host->rx_chan =
-> -               dma_request_slave_channel_compat(mask, omap_dma_filter_fn,
-> -                                                &rx_req, &pdev->dev, "rx");
-> +       host->rx_chan = dma_request_slave_channel_compat_reason(mask,
-> +                               omap_dma_filter_fn, &rx_req, &pdev->dev, "rx");
->
-> -       if (!host->rx_chan) {
-> +       if (IS_ERR(host->rx_chan)) {
->                 dev_err(mmc_dev(host->mmc), "unable to obtain RX DMA engine channel %u\n", rx_req);
-> -               ret = -ENXIO;
-> +               ret = PTR_ERR(host->rx_chan);
->                 goto err_irq;
+> -       host->dma_tx =
+> -               dma_request_slave_channel_compat(mask, edma_filter_fn,
+> -                               &host->txdma, mmc_dev(host->mmc), "tx");
+> -       if (!host->dma_tx) {
+> +       host->dma_tx = dma_request_slave_channel_compat_reason(mask,
+> +                               edma_filter_fn, &host->txdma,
+> +                               mmc_dev(host->mmc), "tx");
+> +       if (IS_ERR(host->dma_tx)) {
+>                 dev_err(mmc_dev(host->mmc), "Can't get dma_tx channel\n");
+> -               return -ENODEV;
+> +               return PTR_ERR(host->dma_tx);
 >         }
 >
-> -       host->tx_chan =
-> -               dma_request_slave_channel_compat(mask, omap_dma_filter_fn,
-> -                                                &tx_req, &pdev->dev, "tx");
-> +       host->tx_chan = dma_request_slave_channel_compat_reason(mask,
-> +                               omap_dma_filter_fn, &tx_req, &pdev->dev, "tx");
->
-> -       if (!host->tx_chan) {
-> +       if (IS_ERR(host->tx_chan)) {
->                 dev_err(mmc_dev(host->mmc), "unable to obtain TX DMA engine channel %u\n", tx_req);
-> -               ret = -ENXIO;
-> +               ret = PTR_ERR(host->tx_chan);
->                 goto err_irq;
+> -       host->dma_rx =
+> -               dma_request_slave_channel_compat(mask, edma_filter_fn,
+> -                               &host->rxdma, mmc_dev(host->mmc), "rx");
+> -       if (!host->dma_rx) {
+> +       host->dma_rx = dma_request_slave_channel_compat_reason(mask,
+> +                               edma_filter_fn, &host->rxdma,
+> +                               mmc_dev(host->mmc), "rx");
+> +       if (IS_ERR(host->dma_rx)) {
+>                 dev_err(mmc_dev(host->mmc), "Can't get dma_rx channel\n");
+> -               r = -ENODEV;
+> +               r = PTR_ERR(host->dma_rx);
+>                 goto free_master_write;
 >         }
 >
-> @@ -2166,9 +2164,9 @@ err_slot_name:
->         if (host->use_reg)
->                 omap_hsmmc_reg_put(host);
->  err_irq:
-> -       if (host->tx_chan)
-> +       if (!IS_ERR_OR_NULL(host->tx_chan))
->                 dma_release_channel(host->tx_chan);
-> -       if (host->rx_chan)
-> +       if (!IS_ERR_OR_NULL(host->rx_chan))
->                 dma_release_channel(host->rx_chan);
->         pm_runtime_put_sync(host->dev);
->         pm_runtime_disable(host->dev);
+> @@ -1307,8 +1307,12 @@ static int __init davinci_mmcsd_probe(struct platform_device *pdev)
+>         host->mmc_irq = irq;
+>         host->sdio_irq = platform_get_irq(pdev, 1);
+>
+> -       if (host->use_dma && davinci_acquire_dma_channels(host) != 0)
+> +       if (host->use_dma) {
+> +               ret = davinci_acquire_dma_channels(host);
+> +               if (ret == -EPROBE_DEFER)
+> +                       goto out;
+>                 host->use_dma = 0;
+> +       }
+>
+>         /* REVISIT:  someday, support IRQ-driven card detection.  */
+>         mmc->caps |= MMC_CAP_NEEDS_POLL;
 > --
 > 2.3.5
 >
---
-To unsubscribe from this list: send the line "unsubscribe linux-spi" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
