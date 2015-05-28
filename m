@@ -1,34 +1,113 @@
-From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [ipsec PATCH 0/3] Preserve skb->mark through VTI tunnels
-Date: Thu, 28 May 2015 07:58:48 +0200
-Message-ID: <20150528055845.GH27342@secunet.com>
-References: <20150527141042.1576.47399.stgit@ahduyck-vm-fedora22>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH] crypto: documentation - cover new AEAD interface
+Date: Thu, 28 May 2015 08:52:42 +0200
+Message-ID: <29243893.aiPfC1p5hR@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Cc: <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<davem@davemloft.net>, <herbert@gondor.apana.org.au>
-To: Alexander Duyck <alexander.h.duyck@redhat.com>
-Return-path: <netdev-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150527141042.1576.47399.stgit@ahduyck-vm-fedora22>
-Sender: netdev-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail.eperm.de ([89.247.134.16]:58334 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751122AbbE1Gwu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 28 May 2015 02:52:50 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, May 27, 2015 at 07:16:37AM -0700, Alexander Duyck wrote:
-> These patches are meant to try and address the fact the VTI tunnels are
-> currently overwriting the skb->mark value.  I am generally happy with the
-> first two patches, however the third patch still modifies the skb->mark,
-> though it undoes after the fact.
-> 
-> The main problem I am trying to address is the fact that currently if I use
-> an v6 over v6 VTI tunnel I cannot receive any traffic on the interface as
-> the skb->mark is bleeding through and causing the traffic to be dropped.
-> 
-> ---
-> 
-> Alexander Duyck (3):
->       ip_vti/ip6_vti: Do not touch skb->mark on xmit
->       xfrm: Override skb->mark with tunnel->parm.i_key in xfrm_input
->       ip_vti/ip6_vti: Preserve skb->mark after rcv_cb call
+The patch updates the DocBook to cover the new AEAD interface
+implementation.
 
-All applied to the ipsec tree, thanks a lot Alexander!
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ Documentation/DocBook/crypto-API.tmpl | 23 +++++++++++++++++------
+ include/crypto/aead.h                 |  5 ++++-
+ 2 files changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/Documentation/DocBook/crypto-API.tmpl b/Documentation/DocBook/crypto-API.tmpl
+index 5b05510..f3fc077 100644
+--- a/Documentation/DocBook/crypto-API.tmpl
++++ b/Documentation/DocBook/crypto-API.tmpl
+@@ -536,8 +536,8 @@
+ 
+      <para>
+       For other use cases of AEAD ciphers, the ASCII art applies as
+-      well, but the caller may not use the GIVCIPHER interface. In
+-      this case, the caller must generate the IV.
++      well, but the caller may not use the AEAD cipher with a separate
++      IV generator. In this case, the caller must generate the IV.
+      </para>
+ 
+      <para>
+@@ -584,8 +584,8 @@ kernel crypto API                                |   IPSEC Layer
+                                                  |
+ +-----------+                                    |
+ |           |            (1)
+-| givcipher | <-----------------------------------  esp_output
+-|  (seqiv)  | ---+
++|   aead    | <-----------------------------------  esp_output
++| (seqniv)  | ---+
+ +-----------+    |
+                  | (2)
+ +-----------+    |
+@@ -620,8 +620,8 @@ kernel crypto API                                |   IPSEC Layer
+      <orderedlist>
+       <listitem>
+        <para>
+-        esp_output() invokes crypto_aead_givencrypt() to trigger an encryption
+-        operation of the GIVCIPHER implementation.
++        esp_output() invokes crypto_aead_encrypt() to trigger an encryption
++        operation of the AEAD cipher with IV generator.
+        </para>
+ 
+        <para>
+@@ -1669,6 +1669,16 @@ read(opfd, out, outlen);
+   </chapter>
+ 
+   <chapter id="API"><title>Programming Interface</title>
++   <para>
++    Please note that the kernel crypto API contains the AEAD givcrypt
++    API (crypto_aead_giv* and aead_givcrypt_* function calls in
++    include/crypto/aead.h). This API is obsolete and will be removed
++    in the future. To obtain the functionality of an AEAD cipher with
++    internal IV generation, use the IV generator as a regular cipher.
++    For example, rfc4106(gcm(aes)) is the AEAD cipher with external
++    IV generation and seqniv(rfc4106(gcm(aes))) implies that the kernel
++    crypto API generates the IV. Different IV generators are available.
++   </para>
+    <sect1><title>Block Cipher Context Data Structures</title>
+ !Pinclude/linux/crypto.h Block Cipher Context Data Structures
+ !Finclude/crypto/aead.h aead_request
+@@ -1724,6 +1734,7 @@ read(opfd, out, outlen);
+ !Finclude/crypto/aead.h aead_request_set_callback
+ !Finclude/crypto/aead.h aead_request_set_crypt
+ !Finclude/crypto/aead.h aead_request_set_assoc
++!Finclude/crypto/aead.h aead_request_set_ad
+    </sect1>
+    <sect1><title>Synchronous Block Cipher API</title>
+ !Pinclude/linux/crypto.h Synchronous Block Cipher API
+diff --git a/include/crypto/aead.h b/include/crypto/aead.h
+index 61306ed..1a273bc 100644
+--- a/include/crypto/aead.h
++++ b/include/crypto/aead.h
+@@ -50,6 +50,7 @@
+ /**
+  *	struct aead_request - AEAD request
+  *	@base: Common attributes for async crypto requests
++ *	@old: Boolean whether the old or new AEAD API is used
+  *	@assoclen: Length in bytes of associated data for authentication
+  *	@cryptlen: Length of data to be encrypted or decrypted
+  *	@iv: Initialisation vector
+@@ -467,7 +468,9 @@ static inline void aead_request_set_callback(struct aead_request *req,
+  * @iv: IV for the cipher operation which must comply with the IV size defined
+  *      by crypto_aead_ivsize()
+  *
+- * Setting the source data and destination data scatter / gather lists.
++ * Setting the source data and destination data scatter / gather lists which
++ * hold the associated data concatenated with the plaintext or ciphertext. See
++ * below for the authentication tag.
+  *
+  * For encryption, the source is treated as the plaintext and the
+  * destination is the ciphertext. For a decryption operation, the use is
+-- 
+2.1.0
