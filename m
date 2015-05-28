@@ -1,7 +1,7 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 7/10] crypto: cryptd - Add setkey/setauthsize functions for AEAD
-Date: Thu, 28 May 2015 22:08:01 +0800
-Message-ID: <E1YxyTZ-0002Ks-Ol@gondolin.me.apana.org.au>
+Subject: [PATCH 5/10] crypto: aead - Add multiple algorithm registration interface
+Date: Thu, 28 May 2015 22:07:59 +0800
+Message-ID: <E1YxyTX-0002KK-1g@gondolin.me.apana.org.au>
 References: <20150528140311.GA8423@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Steffen Klassert <steffen.klassert@secunet.com>,
@@ -11,59 +11,74 @@ To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Timothy McCaffrey <timothy.mccaffrey@unisys.com>,
 	Tim Chen <tim.c.chen@linux.intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:57725 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:43011 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753766AbbE1OIF (ORCPT
+	with ESMTP id S1753464AbbE1OIC (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 May 2015 10:08:05 -0400
+	Thu, 28 May 2015 10:08:02 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds setkey and setauthsize for cryptd AEAD.
+This patch adds the helpers that allow the registration and removal
+of multiple algorithms.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/cryptd.c |   22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ crypto/aead.c                  |   29 +++++++++++++++++++++++++++++
+ include/crypto/internal/aead.h |    2 ++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 4264c8d..74c4dcb 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -664,6 +664,24 @@ out_put_alg:
- 	return err;
+diff --git a/crypto/aead.c b/crypto/aead.c
+index ac44792..07bf997 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -896,6 +896,35 @@ void crypto_unregister_aead(struct aead_alg *alg)
  }
+ EXPORT_SYMBOL_GPL(crypto_unregister_aead);
  
-+static int cryptd_aead_setkey(struct crypto_aead *parent,
-+			      const u8 *key, unsigned int keylen)
++int crypto_register_aeads(struct aead_alg *algs, int count)
 +{
-+	struct cryptd_aead_ctx *ctx = crypto_aead_ctx(parent);
-+	struct crypto_aead *child = ctx->child;
++	int i, ret;
 +
-+	return crypto_aead_setkey(child, key, keylen);
++	for (i = 0; i < count; i++) {
++		ret = crypto_register_aead(&algs[i]);
++		if (ret)
++			goto err;
++	}
++
++	return 0;
++
++err:
++	for (--i; i >= 0; --i)
++		crypto_unregister_aead(&algs[i]);
++
++	return ret;
 +}
++EXPORT_SYMBOL_GPL(crypto_register_aeads);
 +
-+static int cryptd_aead_setauthsize(struct crypto_aead *parent,
-+				   unsigned int authsize)
++void crypto_unregister_aeads(struct aead_alg *algs, int count)
 +{
-+	struct cryptd_aead_ctx *ctx = crypto_aead_ctx(parent);
-+	struct crypto_aead *child = ctx->child;
++	int i;
 +
-+	return crypto_aead_setauthsize(child, authsize);
++	for (i = count - 1; i >= 0; --i)
++		crypto_unregister_aead(&algs[i]);
 +}
++EXPORT_SYMBOL_GPL(crypto_unregister_aeads);
 +
- static void cryptd_aead_crypt(struct aead_request *req,
- 			struct crypto_aead *child,
- 			int err,
-@@ -793,8 +811,8 @@ static int cryptd_create_aead(struct crypto_template *tmpl,
- 	inst->alg.cra_ctxsize = sizeof(struct cryptd_aead_ctx);
- 	inst->alg.cra_init = cryptd_aead_init_tfm;
- 	inst->alg.cra_exit = cryptd_aead_exit_tfm;
--	inst->alg.cra_aead.setkey      = alg->cra_aead.setkey;
--	inst->alg.cra_aead.setauthsize = alg->cra_aead.setauthsize;
-+	inst->alg.cra_aead.setkey      = cryptd_aead_setkey;
-+	inst->alg.cra_aead.setauthsize = cryptd_aead_setauthsize;
- 	inst->alg.cra_aead.geniv       = alg->cra_aead.geniv;
- 	inst->alg.cra_aead.ivsize      = alg->cra_aead.ivsize;
- 	inst->alg.cra_aead.maxauthsize = alg->cra_aead.maxauthsize;
+ int aead_register_instance(struct crypto_template *tmpl,
+ 			   struct aead_instance *inst)
+ {
+diff --git a/include/crypto/internal/aead.h b/include/crypto/internal/aead.h
+index 3cb35d8..ba52c37b8 100644
+--- a/include/crypto/internal/aead.h
++++ b/include/crypto/internal/aead.h
+@@ -152,6 +152,8 @@ static inline unsigned int crypto_aead_maxauthsize(struct crypto_aead *aead)
+ 
+ int crypto_register_aead(struct aead_alg *alg);
+ void crypto_unregister_aead(struct aead_alg *alg);
++int crypto_register_aeads(struct aead_alg *algs, int count);
++void crypto_unregister_aeads(struct aead_alg *algs, int count);
+ int aead_register_instance(struct crypto_template *tmpl,
+ 			   struct aead_instance *inst);
+ 
