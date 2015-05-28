@@ -1,40 +1,34 @@
 From: Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH] xfrm6: Do not use xfrm_local_error for path MTU issues
- in tunnels
-Date: Thu, 28 May 2015 07:36:08 +0200
-Message-ID: <20150528053607.GF27342@secunet.com>
-References: <20150527173823.1415.96248.stgit@ahduyck-vm-fedora22>
+Subject: Re: [ipsec PATCH 0/3] Preserve skb->mark through VTI tunnels
+Date: Thu, 28 May 2015 07:58:48 +0200
+Message-ID: <20150528055845.GH27342@secunet.com>
+References: <20150527141042.1576.47399.stgit@ahduyck-vm-fedora22>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Cc: <davem@davemloft.net>, <herbert@gondor.apana.org.au>,
-	<netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Cc: <netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<davem@davemloft.net>, <herbert@gondor.apana.org.au>
 To: Alexander Duyck <alexander.h.duyck@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from a.mx.secunet.com ([195.81.216.161]:49036 "EHLO a.mx.secunet.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750886AbbE1FgO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 May 2015 01:36:14 -0400
+Return-path: <netdev-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150527173823.1415.96248.stgit@ahduyck-vm-fedora22>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <20150527141042.1576.47399.stgit@ahduyck-vm-fedora22>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, May 27, 2015 at 10:40:32AM -0700, Alexander Duyck wrote:
-> This change makes it so that we use icmpv6_send to report PMTU issues back
-> into tunnels in the case that the resulting packet is larger than the MTU
-> of the outgoing interface.  Previously xfrm_local_error was being used in
-> this case, however this was resulting in no changes, I suspect due to the
-> fact that the tunnel itself was being kept out of the loop.
+On Wed, May 27, 2015 at 07:16:37AM -0700, Alexander Duyck wrote:
+> These patches are meant to try and address the fact the VTI tunnels are
+> currently overwriting the skb->mark value.  I am generally happy with the
+> first two patches, however the third patch still modifies the skb->mark,
+> though it undoes after the fact.
 > 
-> This patch fixes PMTU problems seen on ip6_vti tunnels and is based on the
-> behavior seen if the socket was orphaned.  Instead of requiring the socket
-> to be orphaned this patch simply defaults to using icmpv6_send in the case
-> that the frame came though a tunnel.
+> The main problem I am trying to address is the fact that currently if I use
+> an v6 over v6 VTI tunnel I cannot receive any traffic on the interface as
+> the skb->mark is bleeding through and causing the traffic to be dropped.
+> 
+> ---
+> 
+> Alexander Duyck (3):
+>       ip_vti/ip6_vti: Do not touch skb->mark on xmit
+>       xfrm: Override skb->mark with tunnel->parm.i_key in xfrm_input
+>       ip_vti/ip6_vti: Preserve skb->mark after rcv_cb call
 
-We can use icmpv6_send() just in the case that the packet
-was already transmitted by a tunnel device, otherwise we
-get the bug back that I mentioned in my other mail.
-
-Not sure if we have something to know that the packet
-traversed a tunnel device. That's what I asked in the
-thread 'Looking for a lost patch'.
+All applied to the ipsec tree, thanks a lot Alexander!
