@@ -1,60 +1,51 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 4/10] crypto: aead - Ignore return value from crypto_unregister_alg
-Date: Thu, 28 May 2015 22:07:57 +0800
-Message-ID: <E1YxyTV-0002K3-N4@gondolin.me.apana.org.au>
-References: <20150528140311.GA8423@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Adrian Hoban <adrian.hoban@intel.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	Timothy McCaffrey <timothy.mccaffrey@unisys.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH RFC v2 1/2] crypto: add PKE API
+Date: Thu, 28 May 2015 09:54:41 -0700
+Message-ID: <55674851.9050903@intel.com>
+References: <20150506193643.9329.75351.stgit@tstruk-mobl1> <20150506193648.9329.27232.stgit@tstruk-mobl1> <20150511063222.GB2316@gondor.apana.org.au> <555F777D.1030509@intel.com> <20150523054734.GA14239@gondor.apana.org.au> <55608C9F.7040500@intel.com> <20150528040856.GB3849@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
+	keescook@chromium.org, jwboyer@redhat.com, richard@nod.at,
+	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
+	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	vgoyal@redhat.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:49727 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753492AbbE1OIB (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 May 2015 10:08:01 -0400
+Received: from mga03.intel.com ([134.134.136.65]:38587 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751672AbbE1QyZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 28 May 2015 12:54:25 -0400
+In-Reply-To: <20150528040856.GB3849@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-No new code should be using the return value of crypto_unregister_alg
-as it will become void soon.
+On 05/27/2015 09:08 PM, Herbert Xu wrote:
+> Do you have a specific piece of hardware in mind? What are its
+> capabilities?
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+I'm going to use it with Intel's DH985xcc accelerator. It can accelerate
+RSA, DH, ECDSA and ECDH just to name the most commonly used.
+But I don't want to add anything that is device specific.
+I just want it to be flexible enough so that new algorithms can be easily added.
 
- crypto/aead.c                  |    4 ++--
- include/crypto/internal/aead.h |    2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> If we are going to go with just contiguous memory then we might
+> as well just do u8 *src, *dst, unsigned int slen, dlen.
+> 
+> The whole point of the SG complexity is to deal with non-contiguous
+> memory (e.g., fragmented packets with IPsec).  If you can't do that
+> then why add the SG complexity?
 
-diff --git a/crypto/aead.c b/crypto/aead.c
-index 4bab3cf..ac44792 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -890,9 +890,9 @@ int crypto_register_aead(struct aead_alg *alg)
- }
- EXPORT_SYMBOL_GPL(crypto_register_aead);
- 
--int crypto_unregister_aead(struct aead_alg *alg)
-+void crypto_unregister_aead(struct aead_alg *alg)
- {
--	return crypto_unregister_alg(&alg->base);
-+	crypto_unregister_alg(&alg->base);
- }
- EXPORT_SYMBOL_GPL(crypto_unregister_aead);
- 
-diff --git a/include/crypto/internal/aead.h b/include/crypto/internal/aead.h
-index f068d74..3cb35d8 100644
---- a/include/crypto/internal/aead.h
-+++ b/include/crypto/internal/aead.h
-@@ -151,7 +151,7 @@ static inline unsigned int crypto_aead_maxauthsize(struct crypto_aead *aead)
- }
- 
- int crypto_register_aead(struct aead_alg *alg);
--int crypto_unregister_aead(struct aead_alg *alg);
-+void crypto_unregister_aead(struct aead_alg *alg);
- int aead_register_instance(struct crypto_template *tmpl,
- 			   struct aead_instance *inst);
- 
+If we do this that way then we will be able to pass only one input and one
+output parameter. There are cases when we will need more that this.
+For instance for ECDSA signature generation we need one input param hash(m)
+and two output parameters (r, s).
+So I have used the SG for that. This is not to deal with non-contiguous memory,
+but to pass more in/out parameters. Each parameter will need to occupy contiguous space in memory.
+I will update the comment to make it more clear.
+If you have other idea how to do this I will be happy to try it.
+Regards,
+T
