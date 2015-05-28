@@ -1,113 +1,50 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH] crypto: documentation - cover new AEAD interface
-Date: Thu, 28 May 2015 08:52:42 +0200
-Message-ID: <29243893.aiPfC1p5hR@tachyon.chronox.de>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Subject: Re: [PATCH] xfrm6: Do not use xfrm_local_error for path MTU issues
+ in tunnels
+Date: Thu, 28 May 2015 00:18:51 -0700
+Message-ID: <5566C15B.7090403@gmail.com>
+References: <20150527173823.1415.96248.stgit@ahduyck-vm-fedora22> <20150528053607.GF27342@secunet.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: herbert@gondor.apana.org.au
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Alexander Duyck <alexander.h.duyck@redhat.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58334 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751122AbbE1Gwu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 May 2015 02:52:50 -0400
+Received: from mail-pa0-f53.google.com ([209.85.220.53]:34551 "EHLO
+	mail-pa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751709AbbE1HSx (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 28 May 2015 03:18:53 -0400
+In-Reply-To: <20150528053607.GF27342@secunet.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The patch updates the DocBook to cover the new AEAD interface
-implementation.
+On 05/27/2015 10:36 PM, Steffen Klassert wrote:
+> On Wed, May 27, 2015 at 10:40:32AM -0700, Alexander Duyck wrote:
+>> This change makes it so that we use icmpv6_send to report PMTU issues back
+>> into tunnels in the case that the resulting packet is larger than the MTU
+>> of the outgoing interface.  Previously xfrm_local_error was being used in
+>> this case, however this was resulting in no changes, I suspect due to the
+>> fact that the tunnel itself was being kept out of the loop.
+>>
+>> This patch fixes PMTU problems seen on ip6_vti tunnels and is based on the
+>> behavior seen if the socket was orphaned.  Instead of requiring the socket
+>> to be orphaned this patch simply defaults to using icmpv6_send in the case
+>> that the frame came though a tunnel.
+> We can use icmpv6_send() just in the case that the packet
+> was already transmitted by a tunnel device, otherwise we
+> get the bug back that I mentioned in my other mail.
+>
+> Not sure if we have something to know that the packet
+> traversed a tunnel device. That's what I asked in the
+> thread 'Looking for a lost patch'.
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- Documentation/DocBook/crypto-API.tmpl | 23 +++++++++++++++++------
- include/crypto/aead.h                 |  5 ++++-
- 2 files changed, 21 insertions(+), 7 deletions(-)
+Okay I will try to do some more digging.  From what I can tell right now 
+it looks like my ping attempts are getting hung up on the 
+xfrm_local_error in __xfrm6_output.  I wonder if we couldn't somehow 
+make use of the skb->cb to store a pointer to the tunnel that could be 
+checked to determine if we are going through a VTI or not.
 
-diff --git a/Documentation/DocBook/crypto-API.tmpl b/Documentation/DocBook/crypto-API.tmpl
-index 5b05510..f3fc077 100644
---- a/Documentation/DocBook/crypto-API.tmpl
-+++ b/Documentation/DocBook/crypto-API.tmpl
-@@ -536,8 +536,8 @@
- 
-      <para>
-       For other use cases of AEAD ciphers, the ASCII art applies as
--      well, but the caller may not use the GIVCIPHER interface. In
--      this case, the caller must generate the IV.
-+      well, but the caller may not use the AEAD cipher with a separate
-+      IV generator. In this case, the caller must generate the IV.
-      </para>
- 
-      <para>
-@@ -584,8 +584,8 @@ kernel crypto API                                |   IPSEC Layer
-                                                  |
- +-----------+                                    |
- |           |            (1)
--| givcipher | <-----------------------------------  esp_output
--|  (seqiv)  | ---+
-+|   aead    | <-----------------------------------  esp_output
-+| (seqniv)  | ---+
- +-----------+    |
-                  | (2)
- +-----------+    |
-@@ -620,8 +620,8 @@ kernel crypto API                                |   IPSEC Layer
-      <orderedlist>
-       <listitem>
-        <para>
--        esp_output() invokes crypto_aead_givencrypt() to trigger an encryption
--        operation of the GIVCIPHER implementation.
-+        esp_output() invokes crypto_aead_encrypt() to trigger an encryption
-+        operation of the AEAD cipher with IV generator.
-        </para>
- 
-        <para>
-@@ -1669,6 +1669,16 @@ read(opfd, out, outlen);
-   </chapter>
- 
-   <chapter id="API"><title>Programming Interface</title>
-+   <para>
-+    Please note that the kernel crypto API contains the AEAD givcrypt
-+    API (crypto_aead_giv* and aead_givcrypt_* function calls in
-+    include/crypto/aead.h). This API is obsolete and will be removed
-+    in the future. To obtain the functionality of an AEAD cipher with
-+    internal IV generation, use the IV generator as a regular cipher.
-+    For example, rfc4106(gcm(aes)) is the AEAD cipher with external
-+    IV generation and seqniv(rfc4106(gcm(aes))) implies that the kernel
-+    crypto API generates the IV. Different IV generators are available.
-+   </para>
-    <sect1><title>Block Cipher Context Data Structures</title>
- !Pinclude/linux/crypto.h Block Cipher Context Data Structures
- !Finclude/crypto/aead.h aead_request
-@@ -1724,6 +1734,7 @@ read(opfd, out, outlen);
- !Finclude/crypto/aead.h aead_request_set_callback
- !Finclude/crypto/aead.h aead_request_set_crypt
- !Finclude/crypto/aead.h aead_request_set_assoc
-+!Finclude/crypto/aead.h aead_request_set_ad
-    </sect1>
-    <sect1><title>Synchronous Block Cipher API</title>
- !Pinclude/linux/crypto.h Synchronous Block Cipher API
-diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index 61306ed..1a273bc 100644
---- a/include/crypto/aead.h
-+++ b/include/crypto/aead.h
-@@ -50,6 +50,7 @@
- /**
-  *	struct aead_request - AEAD request
-  *	@base: Common attributes for async crypto requests
-+ *	@old: Boolean whether the old or new AEAD API is used
-  *	@assoclen: Length in bytes of associated data for authentication
-  *	@cryptlen: Length of data to be encrypted or decrypted
-  *	@iv: Initialisation vector
-@@ -467,7 +468,9 @@ static inline void aead_request_set_callback(struct aead_request *req,
-  * @iv: IV for the cipher operation which must comply with the IV size defined
-  *      by crypto_aead_ivsize()
-  *
-- * Setting the source data and destination data scatter / gather lists.
-+ * Setting the source data and destination data scatter / gather lists which
-+ * hold the associated data concatenated with the plaintext or ciphertext. See
-+ * below for the authentication tag.
-  *
-  * For encryption, the source is treated as the plaintext and the
-  * destination is the ciphertext. For a decryption operation, the use is
--- 
-2.1.0
+- Alex
