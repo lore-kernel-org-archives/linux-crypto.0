@@ -1,50 +1,62 @@
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Subject: Re: [PATCH] xfrm6: Do not use xfrm_local_error for path MTU issues
- in tunnels
-Date: Thu, 28 May 2015 00:18:51 -0700
-Message-ID: <5566C15B.7090403@gmail.com>
-References: <20150527173823.1415.96248.stgit@ahduyck-vm-fedora22> <20150528053607.GF27342@secunet.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Subject: Re: [PATCH 04/13] mmc: omap_hsmmc: No need to check DMA channel
+ validity at module remove
+Date: Thu, 28 May 2015 09:20:18 +0200
+Message-ID: <CAPDyKFrOUOuctSMpx+RFixB_ub=d66YqXEsa7D78gyFeiGiNkQ@mail.gmail.com>
+References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com>
+	<1432646768-12532-5-git-send-email-peter.ujfalusi@ti.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Alexander Duyck <alexander.h.duyck@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pa0-f53.google.com ([209.85.220.53]:34551 "EHLO
-	mail-pa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751709AbbE1HSx (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 28 May 2015 03:18:53 -0400
-In-Reply-To: <20150528053607.GF27342@secunet.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Vinod Koul <vinod.koul@intel.com>,
+	Tony Lindgren <tony@atomide.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	dmaengine@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-omap <linux-omap@vger.kernel.org>,
+	linux-mmc <linux-mmc@vger.kernel.org>,
+	linux-crypto@vger.kernel.org,
+	"linux-spi@vger.kernel.org" <linux-spi@vger.kernel.org>,
+	linux-media@vger.kernel.org, alsa-devel@alsa-project.org
+To: Peter Ujfalusi <peter.ujfalusi@ti.com>
+Return-path: <linux-media-owner@vger.kernel.org>
+In-Reply-To: <1432646768-12532-5-git-send-email-peter.ujfalusi@ti.com>
+Sender: linux-media-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 05/27/2015 10:36 PM, Steffen Klassert wrote:
-> On Wed, May 27, 2015 at 10:40:32AM -0700, Alexander Duyck wrote:
->> This change makes it so that we use icmpv6_send to report PMTU issues back
->> into tunnels in the case that the resulting packet is larger than the MTU
->> of the outgoing interface.  Previously xfrm_local_error was being used in
->> this case, however this was resulting in no changes, I suspect due to the
->> fact that the tunnel itself was being kept out of the loop.
->>
->> This patch fixes PMTU problems seen on ip6_vti tunnels and is based on the
->> behavior seen if the socket was orphaned.  Instead of requiring the socket
->> to be orphaned this patch simply defaults to using icmpv6_send in the case
->> that the frame came though a tunnel.
-> We can use icmpv6_send() just in the case that the packet
-> was already transmitted by a tunnel device, otherwise we
-> get the bug back that I mentioned in my other mail.
+On 26 May 2015 at 15:25, Peter Ujfalusi <peter.ujfalusi@ti.com> wrote:
+> The driver will not probe without valid DMA channels so no need to check
+> if they are valid when the module is removed.
 >
-> Not sure if we have something to know that the packet
-> traversed a tunnel device. That's what I asked in the
-> thread 'Looking for a lost patch'.
+> Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
+> CC: Ulf Hansson <ulf.hansson@linaro.org>
 
-Okay I will try to do some more digging.  From what I can tell right now 
-it looks like my ping attempts are getting hung up on the 
-xfrm_local_error in __xfrm6_output.  I wonder if we couldn't somehow 
-make use of the skb->cb to store a pointer to the tunnel that could be 
-checked to determine if we are going through a VTI or not.
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-- Alex
+Kind regards
+Uffe
+
+> ---
+>  drivers/mmc/host/omap_hsmmc.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/mmc/host/omap_hsmmc.c b/drivers/mmc/host/omap_hsmmc.c
+> index 2cd828f42151..57bb85930f81 100644
+> --- a/drivers/mmc/host/omap_hsmmc.c
+> +++ b/drivers/mmc/host/omap_hsmmc.c
+> @@ -2190,10 +2190,8 @@ static int omap_hsmmc_remove(struct platform_device *pdev)
+>         if (host->use_reg)
+>                 omap_hsmmc_reg_put(host);
+>
+> -       if (host->tx_chan)
+> -               dma_release_channel(host->tx_chan);
+> -       if (host->rx_chan)
+> -               dma_release_channel(host->rx_chan);
+> +       dma_release_channel(host->tx_chan);
+> +       dma_release_channel(host->rx_chan);
+>
+>         pm_runtime_put_sync(host->dev);
+>         pm_runtime_disable(host->dev);
+> --
+> 2.3.5
+>
