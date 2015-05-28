@@ -1,95 +1,97 @@
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Subject: Re: [PATCH 07/13] mmc: davinci_mmc: Support for deferred probing when
- requesting DMA channels
-Date: Thu, 28 May 2015 09:31:19 +0200
-Message-ID: <CAPDyKFpiHz9nePG0D5HzMkuBGcyt7340hWjjn1emqAKZGWoUnA@mail.gmail.com>
-References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com>
-	<1432646768-12532-8-git-send-email-peter.ujfalusi@ti.com>
+From: Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH] xfrm6: Do not use xfrm_local_error for path MTU issues
+ in tunnels
+Date: Thu, 28 May 2015 10:40:05 +0200
+Message-ID: <20150528084002.GI27342@secunet.com>
+References: <20150527173823.1415.96248.stgit@ahduyck-vm-fedora22>
+ <20150528053607.GF27342@secunet.com>
+ <5566C15B.7090403@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Vinod Koul <vinod.koul@intel.com>,
-	Tony Lindgren <tony@atomide.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	dmaengine@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-omap <linux-omap@vger.kernel.org>,
-	linux-mmc <linux-mmc@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	"linux-spi@vger.kernel.org" <linux-spi@vger.kernel.org>,
-	linux-media@vger.kernel.org, alsa-devel@alsa-project.org
-To: Peter Ujfalusi <peter.ujfalusi@ti.com>
-Return-path: <linux-omap-owner@vger.kernel.org>
-In-Reply-To: <1432646768-12532-8-git-send-email-peter.ujfalusi@ti.com>
-Sender: linux-omap-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Cc: Alexander Duyck <alexander.h.duyck@redhat.com>,
+	<davem@davemloft.net>, <herbert@gondor.apana.org.au>,
+	<netdev@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from a.mx.secunet.com ([195.81.216.161]:52958 "EHLO a.mx.secunet.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753357AbbE1IkV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 28 May 2015 04:40:21 -0400
+Content-Disposition: inline
+In-Reply-To: <5566C15B.7090403@gmail.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 26 May 2015 at 15:26, Peter Ujfalusi <peter.ujfalusi@ti.com> wrote:
-> Switch to use ma_request_slave_channel_compat_reason() to request the DMA
-> channels. Only fall back to pio mode if the error code returned is not
-> -EPROBE_DEFER, otherwise return from the probe with the -EPROBE_DEFER.
->
-> Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
-> CC: Ulf Hansson <ulf.hansson@linaro.org>
+On Thu, May 28, 2015 at 12:18:51AM -0700, Alexander Duyck wrote:
+> On 05/27/2015 10:36 PM, Steffen Klassert wrote:
+> >On Wed, May 27, 2015 at 10:40:32AM -0700, Alexander Duyck wrote:
+> >>This change makes it so that we use icmpv6_send to report PMTU issues back
+> >>into tunnels in the case that the resulting packet is larger than the MTU
+> >>of the outgoing interface.  Previously xfrm_local_error was being used in
+> >>this case, however this was resulting in no changes, I suspect due to the
+> >>fact that the tunnel itself was being kept out of the loop.
+> >>
+> >>This patch fixes PMTU problems seen on ip6_vti tunnels and is based on the
+> >>behavior seen if the socket was orphaned.  Instead of requiring the socket
+> >>to be orphaned this patch simply defaults to using icmpv6_send in the case
+> >>that the frame came though a tunnel.
+> >We can use icmpv6_send() just in the case that the packet
+> >was already transmitted by a tunnel device, otherwise we
+> >get the bug back that I mentioned in my other mail.
+> >
+> >Not sure if we have something to know that the packet
+> >traversed a tunnel device. That's what I asked in the
+> >thread 'Looking for a lost patch'.
+> 
+> Okay I will try to do some more digging.  From what I can tell right
+> now it looks like my ping attempts are getting hung up on the
+> xfrm_local_error in __xfrm6_output.  I wonder if we couldn't somehow
+> make use of the skb->cb to store a pointer to the tunnel that could
+> be checked to determine if we are going through a VTI or not.
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
+Maybe it is as easy as the patch below, could you please test it?
 
-Kind regards
-Uffe
+Subject: [PATCH RFC] vti6: Add pmtu handling to vti6_xmit.
 
-> ---
->  drivers/mmc/host/davinci_mmc.c | 26 +++++++++++++++-----------
->  1 file changed, 15 insertions(+), 11 deletions(-)
->
-> diff --git a/drivers/mmc/host/davinci_mmc.c b/drivers/mmc/host/davinci_mmc.c
-> index b2b3f8bbfd8c..df81e4e2f662 100644
-> --- a/drivers/mmc/host/davinci_mmc.c
-> +++ b/drivers/mmc/host/davinci_mmc.c
-> @@ -530,20 +530,20 @@ static int __init davinci_acquire_dma_channels(struct mmc_davinci_host *host)
->         dma_cap_zero(mask);
->         dma_cap_set(DMA_SLAVE, mask);
->
-> -       host->dma_tx =
-> -               dma_request_slave_channel_compat(mask, edma_filter_fn,
-> -                               &host->txdma, mmc_dev(host->mmc), "tx");
-> -       if (!host->dma_tx) {
-> +       host->dma_tx = dma_request_slave_channel_compat_reason(mask,
-> +                               edma_filter_fn, &host->txdma,
-> +                               mmc_dev(host->mmc), "tx");
-> +       if (IS_ERR(host->dma_tx)) {
->                 dev_err(mmc_dev(host->mmc), "Can't get dma_tx channel\n");
-> -               return -ENODEV;
-> +               return PTR_ERR(host->dma_tx);
->         }
->
-> -       host->dma_rx =
-> -               dma_request_slave_channel_compat(mask, edma_filter_fn,
-> -                               &host->rxdma, mmc_dev(host->mmc), "rx");
-> -       if (!host->dma_rx) {
-> +       host->dma_rx = dma_request_slave_channel_compat_reason(mask,
-> +                               edma_filter_fn, &host->rxdma,
-> +                               mmc_dev(host->mmc), "rx");
-> +       if (IS_ERR(host->dma_rx)) {
->                 dev_err(mmc_dev(host->mmc), "Can't get dma_rx channel\n");
-> -               r = -ENODEV;
-> +               r = PTR_ERR(host->dma_rx);
->                 goto free_master_write;
->         }
->
-> @@ -1307,8 +1307,12 @@ static int __init davinci_mmcsd_probe(struct platform_device *pdev)
->         host->mmc_irq = irq;
->         host->sdio_irq = platform_get_irq(pdev, 1);
->
-> -       if (host->use_dma && davinci_acquire_dma_channels(host) != 0)
-> +       if (host->use_dma) {
-> +               ret = davinci_acquire_dma_channels(host);
-> +               if (ret == -EPROBE_DEFER)
-> +                       goto out;
->                 host->use_dma = 0;
-> +       }
->
->         /* REVISIT:  someday, support IRQ-driven card detection.  */
->         mmc->caps |= MMC_CAP_NEEDS_POLL;
-> --
-> 2.3.5
->
+We currently rely on the PMTU discovery of xfrm.
+However if a packet is localy sent, the PMTU mechanism
+of xfrm tries to to local socket notification what
+might not work for applications like ping that don't
+check for this. So add pmtu handling to vti6_xmit to
+report MTU changes immediately.
+
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ net/ipv6/ip6_vti.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
+index ff3bd86..13cb771 100644
+--- a/net/ipv6/ip6_vti.c
++++ b/net/ipv6/ip6_vti.c
+@@ -434,6 +434,7 @@ vti6_xmit(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+ 	struct dst_entry *dst = skb_dst(skb);
+ 	struct net_device *tdev;
+ 	struct xfrm_state *x;
++	int mtu;
+ 	int err = -1;
+ 
+ 	if (!dst)
+@@ -468,6 +469,15 @@ vti6_xmit(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+ 	skb_dst_set(skb, dst);
+ 	skb->dev = skb_dst(skb)->dev;
+ 
++	mtu = dst_mtu(dst);
++	if (!skb->ignore_df && skb->len > mtu) {
++		skb_dst(skb)->ops->update_pmtu(dst, NULL, skb, mtu);
++
++		icmpv6_send(skb, ICMPV6_PKT_TOOBIG, 0, mtu);
++
++		return -EMSGSIZE;
++	}
++
+ 	err = dst_output(skb);
+ 	if (net_xmit_eval(err) == 0) {
+ 		struct pcpu_sw_netstats *tstats = this_cpu_ptr(dev->tstats);
+-- 
+1.9.1
