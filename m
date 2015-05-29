@@ -1,52 +1,72 @@
-From: Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH 10/10] crypto: aesni - Convert rfc4106 to new AEAD
- interface
-Date: Fri, 29 May 2015 10:32:24 -0700
-Message-ID: <1432920744.15761.17.camel@schen9-desk2.jf.intel.com>
-References: <20150528140311.GA8423@gondor.apana.org.au>
-	 <E1YxyQL-0002Ha-OL@gondolin.me.apana.org.au>
-	 <1432848213.15761.13.camel@schen9-desk2.jf.intel.com>
-	 <20150529002923.GB14942@gondor.apana.org.au>
+From: Alexander Duyck <alexander.h.duyck@redhat.com>
+Subject: [PATCH] vti6: Add pmtu handling to vti6_xmit.
+Date: Fri, 29 May 2015 11:28:26 -0700
+Message-ID: <20150529182709.2147.78230.stgit@ahduyck-vm-fedora22>
+References: <5567695F.6070505@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Adrian Hoban <adrian.hoban@intel.com>,
-	Tadeusz Struk <tadeusz.struk@intel.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	Timothy McCaffrey <timothy.mccaffrey@unisys.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: steffen.klassert@secunet.com, davem@davemloft.net,
+	herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:18947 "EHLO mga02.intel.com"
+Received: from mx1.redhat.com ([209.132.183.28]:39349 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752875AbbE2Rc0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 May 2015 13:32:26 -0400
-In-Reply-To: <20150529002923.GB14942@gondor.apana.org.au>
+	id S1161065AbbE2S22 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 May 2015 14:28:28 -0400
+In-Reply-To: <5567695F.6070505@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, 2015-05-29 at 08:29 +0800, Herbert Xu wrote:
-> On Thu, May 28, 2015 at 02:23:33PM -0700, Tim Chen wrote:
-> >
-> > Quick question.  When src and dst are different, the above code 
-> > leave space for the assoc data in dst.  However, I don't think we copy
-> > over the assoc data from src to dst.
-> > I assume we don't have to do that, right?  If so, we have not
-> > initialized assoc in dst.  This won't be a problem, will it?
-> 
-> It shouldn't be an issue.  If you look at the documentation for
-> aead_rquest_set_crypt, it says:
-> 
->  * The content of the AD in the destination buffer after processing
->  * will either be untouched, or it will contain a copy of the AD
->  * from the source buffer.  In order to ensure that it always has
->  * a copy of the AD, the user must copy the AD over either before
->  * or after processing.  Of course this is not relevant if the user
->  * is doing in-place processing where src == dst.
-> 
+From: Steffen Klassert <steffen.klassert@secunet.com>
 
-Great, then it is clearly a user's responsibility to make sure 
-that AD in dst is initialized.
+We currently rely on the PMTU discovery of xfrm.
+However if a packet is localy sent, the PMTU mechanism
+of xfrm tries to to local socket notification what
+might not work for applications like ping that don't
+check for this. So add pmtu handling to vti6_xmit to
+report MTU changes immediately.
 
-Tim 
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Alexander Duyck <alexander.h.duyck@redhat.com>
+---
+
+So this version is slightly modified to cover the IPv4 case in addition to
+the IPv6 case.  With this patch I was able to run netperf over either an
+IPv4 or IPv6 address routed over the ip6_vti tunnel.
+
+ net/ipv6/ip6_vti.c |   14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
+index d25209657edc..3b5c1ea50d2f 100644
+--- a/net/ipv6/ip6_vti.c
++++ b/net/ipv6/ip6_vti.c
+@@ -435,6 +435,7 @@ vti6_xmit(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+ 	struct net_device *tdev;
+ 	struct xfrm_state *x;
+ 	int err = -1;
++	int mtu;
+ 
+ 	if (!dst)
+ 		goto tx_err_link_failure;
+@@ -468,6 +469,19 @@ vti6_xmit(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+ 	skb_dst_set(skb, dst);
+ 	skb->dev = skb_dst(skb)->dev;
+ 
++	mtu = dst_mtu(dst);
++	if (!skb->ignore_df && skb->len > mtu) {
++		skb_dst(skb)->ops->update_pmtu(dst, NULL, skb, mtu);
++
++		if (skb->protocol == htons(ETH_P_IPV6))
++			icmpv6_send(skb, ICMPV6_PKT_TOOBIG, 0, mtu);
++		else
++			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
++				  htonl(mtu));
++
++		return -EMSGSIZE;
++	}
++
+ 	err = dst_output(skb);
+ 	if (net_xmit_eval(err) == 0) {
+ 		struct pcpu_sw_netstats *tstats = this_cpu_ptr(dev->tstats);
