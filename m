@@ -1,58 +1,42 @@
-From: Vinod Koul <vinod.koul@intel.com>
-Subject: Re: [PATCH 02/13] dmaengine: Introduce
- dma_request_slave_channel_compat_reason()
-Date: Fri, 29 May 2015 15:48:46 +0530
-Message-ID: <20150529101846.GG3140@localhost>
-References: <1432646768-12532-1-git-send-email-peter.ujfalusi@ti.com>
- <1432646768-12532-3-git-send-email-peter.ujfalusi@ti.com>
- <20150529093317.GF3140@localhost>
- <CAMuHMdVJ0h9qXxBWH9L2y4O2KLkEq12KW_6k8rTgi+Lux=C0gw@mail.gmail.com>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: Crypto driver -DCP
+Date: Fri, 29 May 2015 15:02:59 +0200
+Message-ID: <201505291502.59208.marex@denx.de>
+References: <554BBD05.3050807@freescale.com> <201505290329.59713.marex@denx.de> <20150529013211.GA15566@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Peter Ujfalusi <peter.ujfalusi@ti.com>,
-	Tony Lindgren <tony@atomide.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>,
-	dmaengine@vger.kernel.org,
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-	"linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
-	Linux MMC List <linux-mmc@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-spi <linux-spi@vger.kernel.org>,
-	Linux Media Mailing List <linux-media@vger.kernel.org>,
-	ALSA Development Mailing List <alsa-devel@alsa-project.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Jay Monkman <jay.monkman@freescale.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:23086 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754278AbbE2KSC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 29 May 2015 06:18:02 -0400
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdVJ0h9qXxBWH9L2y4O2KLkEq12KW_6k8rTgi+Lux=C0gw@mail.gmail.com>
+Received: from mail-out.m-online.net ([212.18.0.9]:45388 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752833AbbE2NDC (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 29 May 2015 09:03:02 -0400
+In-Reply-To: <20150529013211.GA15566@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, May 29, 2015 at 11:42:27AM +0200, Geert Uytterhoeven wrote:
-> On Fri, May 29, 2015 at 11:33 AM, Vinod Koul <vinod.koul@intel.com> wrote:
-> > On Tue, May 26, 2015 at 04:25:57PM +0300, Peter Ujfalusi wrote:
-> >> dma_request_slave_channel_compat() 'eats' up the returned error codes which
-> >> prevents drivers using the compat call to be able to do deferred probing.
-> >>
-> >> The new wrapper is identical in functionality but it will return with error
-> >> code in case of failure and will pass the -EPROBE_DEFER to the caller in
-> >> case dma_request_slave_channel_reason() returned with it.
-> > This is okay but am worried about one more warpper, how about fixing
-> > dma_request_slave_channel_compat()
+On Friday, May 29, 2015 at 03:32:11 AM, Herbert Xu wrote:
+> On Fri, May 29, 2015 at 03:29:59AM +0200, Marek Vasut wrote:
+> > On Friday, May 29, 2015 at 03:23:59 AM, Herbert Xu wrote:
+> > > On Fri, May 29, 2015 at 03:00:35AM +0200, Marek Vasut wrote:
+> > > > My understanding (!) is that everyone should be able to use this key
+> > > > to encrypt/decrypt their data using the AES128 engine in the DCP.
+> > > 
+> > > If that's the case just make it the key you use if setkey has never
+> > > been called.
+> > 
+> > Shouldn't you always call setkey when using symetric crypto ?
 > 
-> Then all callers of dma_request_slave_channel_compat() have to be
-> modified to handle ERR_PTR first.
-> 
-> The same is true for (the existing) dma_request_slave_channel_reason()
-> vs. dma_request_slave_channel().
-Good point, looking again, I think we should rather fix
-dma_request_slave_channel_reason() as it was expected to return err code and
-add new users. Anyway users of this API do expect the reason...
+> Normally yes but we don't require it so in this case it should
+> be fine.
 
--- 
-~Vinod
+This does look somewhat hacky to me. Wouldn't it make more sense to
+add a CRYPTO_TFM_REQ flag ?
+
+Best regards,
+Marek Vasut
