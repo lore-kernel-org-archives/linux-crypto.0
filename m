@@ -1,58 +1,43 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RFC v2 1/2] crypto: add PKE API
-Date: Mon, 1 Jun 2015 13:48:57 +0800
-Message-ID: <20150601054857.GA10460@gondor.apana.org.au>
-References: <20150506193643.9329.75351.stgit@tstruk-mobl1>
- <20150506193648.9329.27232.stgit@tstruk-mobl1>
- <20150511063222.GB2316@gondor.apana.org.au>
- <555F777D.1030509@intel.com>
- <20150523054734.GA14239@gondor.apana.org.au>
- <55608C9F.7040500@intel.com>
- <20150528040856.GB3849@gondor.apana.org.au>
- <55674851.9050903@intel.com>
+Subject: Re: [PATCH 8/10] crypto: aesni - Convert top-level rfc4106 algorithm
+ to new interface
+Date: Mon, 1 Jun 2015 15:41:16 +0800
+Message-ID: <20150601074116.GA11528@gondor.apana.org.au>
+References: <20150528140311.GA8423@gondor.apana.org.au>
+ <E1YxyTb-0002L9-6g@gondolin.me.apana.org.au>
+ <3237777.1pZ3XZ1aYV@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-	keescook@chromium.org, jwboyer@redhat.com, richard@nod.at,
-	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	vgoyal@redhat.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Adrian Hoban <adrian.hoban@intel.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Timothy McCaffrey <timothy.mccaffrey@unisys.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:42946 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:47526 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753125AbbFAFtT (ORCPT
+	with ESMTP id S1750812AbbFAHl1 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Jun 2015 01:49:19 -0400
+	Mon, 1 Jun 2015 03:41:27 -0400
 Content-Disposition: inline
-In-Reply-To: <55674851.9050903@intel.com>
+In-Reply-To: <3237777.1pZ3XZ1aYV@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, May 28, 2015 at 09:54:41AM -0700, Tadeusz Struk wrote:
-> 
-> If we do this that way then we will be able to pass only one input and one
-> output parameter. There are cases when we will need more that this.
-> For instance for ECDSA signature generation we need one input param hash(m)
-> and two output parameters (r, s).
+On Fri, May 29, 2015 at 11:39:03PM +0200, Stephan Mueller wrote:
+>
+> Not sure what goes wrong, but when using algif_aead with the new code, I get:
 
-There is no reason why you couldn't encode that within one stream.
-As far as as the user is concerned the output is one entity, i.e.,
-the signature.  The fact that it is made up of two numbers is of
-no concern to the API.  It's a technicality for the algorithm to
-sort out.
+This is a bug in the way it's using scatterwalk.  It needs to
+advance the walk object by the number of bytes it has processed.
+Previously it didn't crash because it didn't set out to 1 which
+you should do if you're writing to the buffer.
 
-> So I have used the SG for that. This is not to deal with non-contiguous memory,
-> but to pass more in/out parameters. Each parameter will need to occupy contiguous space in memory.
-> I will update the comment to make it more clear.
-> If you have other idea how to do this I will be happy to try it.
+I'll resend the patch with the bug fixed.
 
-If you really wanted to do this then you should be using a simple
-(u8 *, unsigned int) pair but I don't really think this is at all
-necessary.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
