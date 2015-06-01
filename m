@@ -1,47 +1,36 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: AEAD x86 assembler crash
-Date: Mon, 01 Jun 2015 11:27:42 +0200
-Message-ID: <4763307.0Ij2da8UTH@tachyon.chronox.de>
-References: <5734608.jOsyQWs821@tachyon.chronox.de> <20150601091745.GA12441@gondor.apana.org.au>
+Date: Mon, 1 Jun 2015 17:29:41 +0800
+Message-ID: <20150601092941.GA12534@gondor.apana.org.au>
+References: <5734608.jOsyQWs821@tachyon.chronox.de>
+ <20150601091745.GA12441@gondor.apana.org.au>
+ <4763307.0Ij2da8UTH@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58393 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751889AbbFAJ1p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Jun 2015 05:27:45 -0400
-In-Reply-To: <20150601091745.GA12441@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:54646 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751735AbbFAJ3o (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 1 Jun 2015 05:29:44 -0400
+Content-Disposition: inline
+In-Reply-To: <4763307.0Ij2da8UTH@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 1. Juni 2015, 17:17:45 schrieb Herbert Xu:
+On Mon, Jun 01, 2015 at 11:27:42AM +0200, Stephan Mueller wrote:
+>
+> Just a question: is the new API without an IV generator to be used differently 
+> when using the new API with an IV generator?
 
-Hi Herbert,
+Sorry I'm totally confused by your question :)
 
-> On Mon, Jun 01, 2015 at 11:12:45AM +0200, Stephan Mueller wrote:
-> > [  599.243227]  [<ffffffff812b7b85>] old_crypt+0xc5/0xe0
-> > [  599.243229]  [<ffffffff812b7bdd>] old_encrypt+0x1d/0x20
-> > [  599.243233]  [<ffffffffa02c1183>] kccavs_aead_encdec+0x53/0x80
-> > [kcapi_cavs] [  599.243235]  [<ffffffffa02c1cca>]
-> > kccavs_test_aead+0x23a/0x3e0 [kcapi_cavs] [  599.243238] 
-> > [<ffffffffa02c0f17>] kccavs_data_read+0xf7/0x130 [kcapi_cavs]
-> Hang on, what is this kcapi_cavs? We don't support out-of-tree
-> crypto users.
+Please give an example using actual code.
 
-I understand -- this is my test tool that invokes all ciphers with all 
-permutations. And it may be the case that it is my code. I am looking into it.
-
-Though, it happens with the new API only, the old API works fine. And my test 
-code with the new API works just fine when invoking GCM with an IV generator.
-
-Just a question: is the new API without an IV generator to be used differently 
-when using the new API with an IV generator?
-
-Thank you.
-
+Thanks,
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
