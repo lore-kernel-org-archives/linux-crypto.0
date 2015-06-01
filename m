@@ -1,41 +1,47 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: AEAD x86 assembler crash
-Date: Mon, 01 Jun 2015 11:48:54 +0200
-Message-ID: <4731884.YtTi9ZUAcQ@tachyon.chronox.de>
-References: <5734608.jOsyQWs821@tachyon.chronox.de> <20150601091551.GA12387@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [v3 PATCH] crypto: aesni - Convert rfc4106 to new AEAD interface
+Date: Mon, 1 Jun 2015 17:52:45 +0800
+Message-ID: <20150601095245.GA12754@gondor.apana.org.au>
+References: <20150528140311.GA8423@gondor.apana.org.au>
+ <2306645.epOL7FXtYn@tauon>
+ <20150601090951.GA12317@gondor.apana.org.au>
+ <5138754.L8j0JzbJL1@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset=us-ascii
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Adrian Hoban <adrian.hoban@intel.com>,
+	Tadeusz Struk <tadeusz.struk@intel.com>,
+	Timothy McCaffrey <timothy.mccaffrey@unisys.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:58401 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751384AbbFAJs5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Jun 2015 05:48:57 -0400
-In-Reply-To: <20150601091551.GA12387@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:40301 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752350AbbFAJwy (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 1 Jun 2015 05:52:54 -0400
+Content-Disposition: inline
+In-Reply-To: <5138754.L8j0JzbJL1@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Montag, 1. Juni 2015, 17:15:51 schrieb Herbert Xu:
-
-Hi Herbert,
-
-> On Mon, Jun 01, 2015 at 11:12:45AM +0200, Stephan Mueller wrote:
-> > another crash with all of the latest patches and using gcm_base(ctr(aes-
-> > asm),ghash-generic) using the standard AEAD interface and performing
-> > encryption.
+On Mon, Jun 01, 2015 at 11:44:22AM +0200, Stephan Mueller wrote:
+>
+> That code crashes with the following stacktrace:
 > 
-> Can you send me the patch of libkcapi against
-> b1e885f64f7b7f6cbc34faa1617158090c6123df?
+> [ 2000.433502] BUG: unable to handle kernel NULL pointer dereference at           
+> (null)
 
-The testing of the AF_ALG API is done -- all works with your latest patch set.
+This crash is totally different from the previous crash you sent.
+This one is expected because you're calling givencrypt on an
+algorithm that has already been converted.
 
-Now, I am testing the in-kernel API with an out-of tree test module that 
-invokes all permutations of ciphers that are out there using NIST test 
-vectors. I just want to make sure that the ciphers still work as expected and 
-that the new API works well.
+Once converted they no longer have a givencrypt function and
+calling crypto_aead_givencrypt on them will crash.
 
+Cheers,
 -- 
-Ciao
-Stephan
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
