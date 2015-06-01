@@ -1,10 +1,11 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH] crypto: aesni - Convert rfc4106 to new AEAD interface
-Date: Mon, 1 Jun 2015 15:50:22 +0800
-Message-ID: <20150601075022.GA11611@gondor.apana.org.au>
+Subject: [v3 PATCH] crypto: aesni - Convert rfc4106 to new AEAD interface
+Date: Mon, 1 Jun 2015 15:53:06 +0800
+Message-ID: <20150601075306.GA11725@gondor.apana.org.au>
 References: <20150528140311.GA8423@gondor.apana.org.au>
  <E1YxyTe-0002Le-1o@gondolin.me.apana.org.au>
  <3814289.kexBYB1orb@tachyon.chronox.de>
+ <20150601075022.GA11611@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -15,23 +16,30 @@ Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Tim Chen <tim.c.chen@linux.intel.com>
 To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38415 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:43816 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751440AbbFAHu1 (ORCPT
+	with ESMTP id S1751415AbbFAHxL (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Jun 2015 03:50:27 -0400
+	Mon, 1 Jun 2015 03:53:11 -0400
 Content-Disposition: inline
-In-Reply-To: <3814289.kexBYB1orb@tachyon.chronox.de>
+In-Reply-To: <20150601075022.GA11611@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+On Mon, Jun 01, 2015 at 03:50:22PM +0800, Herbert Xu wrote:
+> This patch converts the low-level __gcm-aes-aesni algorithm to
+> the new AEAD interface.
+
+Oops, I missed two more spots.
+
+---8<---
 This patch converts the low-level __gcm-aes-aesni algorithm to
 the new AEAD interface.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 5660a18..8ab9630 100644
+index 5660a18..ebcb981d 100644
 --- a/arch/x86/crypto/aesni-intel_glue.c
 +++ b/arch/x86/crypto/aesni-intel_glue.c
 @@ -44,13 +44,18 @@
@@ -354,19 +362,21 @@ index 5660a18..8ab9630 100644
  
  	/* Compare generated tag with passed in tag. */
  	retval = crypto_memneq(src + tempCipherLen, authTag, auth_tag_len) ?
-@@ -1135,16 +1085,15 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
+@@ -1135,16 +1085,17 @@ static int __driver_rfc4106_decrypt(struct aead_request *req)
  
  	if (one_entry_in_sg) {
  		if (unlikely(req->src != req->dst)) {
 -			scatterwalk_unmap(dst);
 -			scatterwalk_done(&dst_sg_walk, 0, 0);
 +			scatterwalk_unmap(dst - req->assoclen);
++			scatterwalk_advance(&dst_sg_walk, req->dst->length);
 +			scatterwalk_done(&dst_sg_walk, 1, 0);
  		}
 -		scatterwalk_unmap(src);
  		scatterwalk_unmap(assoc);
 -		scatterwalk_done(&src_sg_walk, 0, 0);
 -		scatterwalk_done(&assoc_sg_walk, 0, 0);
++		scatterwalk_advance(&src_sg_walk, req->src->length);
 +		scatterwalk_done(&src_sg_walk, req->src == req->dst, 0);
  	} else {
 -		scatterwalk_map_and_copy(dst, req->dst, 0, tempCipherLen, 1);
@@ -377,7 +387,7 @@ index 5660a18..8ab9630 100644
  	}
  	return retval;
  }
-@@ -1188,36 +1137,6 @@ static int rfc4106_decrypt(struct aead_request *req)
+@@ -1188,36 +1139,6 @@ static int rfc4106_decrypt(struct aead_request *req)
  
  	return crypto_aead_decrypt(subreq);
  }
@@ -414,7 +424,7 @@ index 5660a18..8ab9630 100644
  #endif
  
  static struct crypto_alg aesni_algs[] = { {
-@@ -1389,27 +1308,6 @@ static struct crypto_alg aesni_algs[] = { {
+@@ -1389,27 +1310,6 @@ static struct crypto_alg aesni_algs[] = { {
  			.geniv		= "chainiv",
  		},
  	},
@@ -442,7 +452,7 @@ index 5660a18..8ab9630 100644
  #endif
  #if IS_ENABLED(CONFIG_CRYPTO_PCBC)
  }, {
-@@ -1526,6 +1424,22 @@ static struct crypto_alg aesni_algs[] = { {
+@@ -1526,6 +1426,22 @@ static struct crypto_alg aesni_algs[] = { {
  
  #ifdef CONFIG_X86_64
  static struct aead_alg aesni_aead_algs[] = { {
