@@ -1,41 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto driver -DCP
-Date: Mon, 1 Jun 2015 22:50:15 +0800
-Message-ID: <20150601145014.GA16400@gondor.apana.org.au>
-References: <554BBD05.3050807@freescale.com>
- <201505291502.59208.marex@denx.de>
- <20150529133018.GB20596@gondor.apana.org.au>
- <201506011524.03531.marex@denx.de>
+From: Stephan Mueller <smueller-T9tCv8IpfcWELgA04lAiVw@public.gmane.org>
+Subject: Re: [PATCH 7/7] mac80211: Switch to new AEAD interface
+Date: Mon, 01 Jun 2015 17:36:58 +0200
+Message-ID: <2613062.1qx4rgqk9F@tauon>
+References: <20150521103938.GA23035@gondor.apana.org.au> <1433167519.3505.11.camel@sipsolutions.net> <1433169326.3505.12.camel@sipsolutions.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jay Monkman <jay.monkman@freescale.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Marek Vasut <marex@denx.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:46211 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753110AbbFAOu1 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 1 Jun 2015 10:50:27 -0400
-Content-Disposition: inline
-In-Reply-To: <201506011524.03531.marex@denx.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	Linux Crypto Mailing List <linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	Marcel Holtmann <marcel-kz+m5ild9QBg9hUCZPvPmw@public.gmane.org>,
+	Steffen Klassert <steffen.klassert-opNxpl+3fjRBDgjK7y7TUQ@public.gmane.org>,
+	linux-wireless <linux-wireless-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Johannes Berg <johannes-cdvu00un1VgdHxzADdlk8Q@public.gmane.org>
+Return-path: <linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1433169326.3505.12.camel-cdvu00un1VgdHxzADdlk8Q@public.gmane.org>
+Sender: linux-wireless-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 01, 2015 at 03:24:03PM +0200, Marek Vasut wrote:
-> On Friday, May 29, 2015 at 03:30:18 PM, Herbert Xu wrote:
-> > On Fri, May 29, 2015 at 03:02:59PM +0200, Marek Vasut wrote:
-> > > This does look somewhat hacky to me. Wouldn't it make more sense to
-> > > add a CRYPTO_TFM_REQ flag ?
-> > 
-> > What are you going to do when you have more than one hard-coded
-> > key? A flag is a non-starter.
-> 
-> Well, abusing a non-well-defined part of the API is also not a nice
-> way to do it. Maybe we should consider some other -- third -- option ?
+Am Montag, 1. Juni 2015, 16:35:26 schrieb Johannes Berg:
 
-I'm waiting to hear it :)
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi Johannes,
+
+>
+>IOW, I think something like this would make sense:
+>
+
+That looks definitely cleaner :-)
+
+Though, my main concern was just to ensure that the aad length value is not 
+zero.
+
+
+Ciao
+Stephan
+--
+To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
