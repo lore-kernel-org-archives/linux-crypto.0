@@ -1,45 +1,54 @@
-From: Jay Monkman <jtm@smoothsmoothie.com>
-Subject: Re: Crypto driver -DCP
-Date: Tue, 02 Jun 2015 13:57:28 -0500
-Message-ID: <556DFC98.10406@smoothsmoothie.com>
-References: <554BBD05.3050807@freescale.com> <201505290300.36019.marex@denx.de> <20150529012359.GA15471@gondor.apana.org.au> <201505290329.59713.marex@denx.de> <20150529013211.GA15566@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Jay Monkman <jay.monkman@freescale.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: [PATCH] crypto: fix nx-842 pSeries driver minimum buffer size
+Date: Tue,  2 Jun 2015 15:22:10 -0400
+Message-ID: <1433272930-5991-1-git-send-email-ddstreet@ieee.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Dan Streetman <ddstreet@ieee.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Marek Vasut <marex@denx.de>
+	"David S. Miller" <davem@davemloft.net>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from smoothsmoothie.com ([198.58.104.115]:51802 "EHLO
-	smoothsmoothie.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751533AbbFBTGQ (ORCPT
+Received: from mail-oi0-f44.google.com ([209.85.218.44]:36733 "EHLO
+	mail-oi0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752703AbbFBTWX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 2 Jun 2015 15:06:16 -0400
-In-Reply-To: <20150529013211.GA15566@gondor.apana.org.au>
+	Tue, 2 Jun 2015 15:22:23 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 05/28/2015 08:32 PM, Herbert Xu wrote:
-> On Fri, May 29, 2015 at 03:29:59AM +0200, Marek Vasut wrote:
->> On Friday, May 29, 2015 at 03:23:59 AM, Herbert Xu wrote:
->>> On Fri, May 29, 2015 at 03:00:35AM +0200, Marek Vasut wrote:
->>>> My understanding (!) is that everyone should be able to use this key to
->>>> encrypt/decrypt their data using the AES128 engine in the DCP.
->>> If that's the case just make it the key you use if setkey has never
->>> been called.
->> Shouldn't you always call setkey when using symetric crypto ?
-> Normally yes but we don't require it so in this case it should
-> be fine.
->
-> Cheers,
+Reduce the nx-842 pSeries driver minimum buffer size from 128 to 8.
+Also replace the single use of IO_BUFFER_ALIGN macro with the standard
+and correct DDE_BUFFER_ALIGN.
 
-Okay, that seems obvious after you suggested it.
+The hw sometimes rejects buffers that contain padding past the end of the
+8-byte aligned section where it sees the "end" marker.  With the minimum
+buffer size set too high, some highly compressed buffers were being padded
+and the hw was incorrectly rejecting them; this sets the minimum correctly
+so there will be no incorrect padding.
 
-I have another question. The DCP (and other crypto accelerators on other 
-SOCs) supports key slots - basically write only RAM that's used to store 
-keys so they can be used for encrypt/decrypt operations. DCP supports 4 
-key slots, other devices have different numbers. Do you have any 
-suggestion for how to add support for something like that to the driver?
+Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+---
+ drivers/crypto/nx/nx-842-pseries.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Thanks.
+diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
+index 17f1917..41bc551 100644
+--- a/drivers/crypto/nx/nx-842-pseries.c
++++ b/drivers/crypto/nx/nx-842-pseries.c
+@@ -30,13 +30,10 @@ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Robert Jennings <rcj@linux.vnet.ibm.com>");
+ MODULE_DESCRIPTION("842 H/W Compression driver for IBM Power processors");
+ 
+-/* IO buffer must be 128 byte aligned */
+-#define IO_BUFFER_ALIGN 128
+-
+ static struct nx842_constraints nx842_pseries_constraints = {
+-	.alignment =	IO_BUFFER_ALIGN,
++	.alignment =	DDE_BUFFER_ALIGN,
+ 	.multiple =	DDE_BUFFER_LAST_MULT,
+-	.minimum =	IO_BUFFER_ALIGN,
++	.minimum =	DDE_BUFFER_LAST_MULT,
+ 	.maximum =	PAGE_SIZE, /* dynamic, max_sync_size */
+ };
+ 
+-- 
+2.1.0
