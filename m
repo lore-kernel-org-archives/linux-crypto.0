@@ -1,89 +1,104 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 7/8] crypto: rng - Make DRBG the default RNG
-Date: Wed, 03 Jun 2015 14:49:31 +0800
-Message-ID: <E1Z02UV-0001Hc-9E@gondolin.me.apana.org.au>
+Subject: [PATCH 8/8] crypto: rng - Remove krng
+Date: Wed, 03 Jun 2015 14:49:32 +0800
+Message-ID: <E1Z02UW-0001Hy-Mo@gondolin.me.apana.org.au>
 References: <20150603064641.GA4655@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:56270 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:51829 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753142AbbFCGtf (ORCPT
+	with ESMTP id S1753142AbbFCGtg (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Jun 2015 02:49:35 -0400
+	Wed, 3 Jun 2015 02:49:36 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch creates a new invisible Kconfig option CRYPTO_RNG_DEFAULT
-that simply selects the DRBG.  This new option is then selected
-by the IV generators.
+This patch removes krng so that DRBG can take its place.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/Kconfig |   15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ crypto/Makefile |    1 
+ crypto/krng.c   |   61 --------------------------------------------------------
+ 2 files changed, 62 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index c3b6a5b..19ca651 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -78,6 +78,10 @@ config CRYPTO_RNG2
- 	tristate
- 	select CRYPTO_ALGAPI2
- 
-+config CRYPTO_RNG_DEFAULT
-+	tristate
-+	select CRYPTO_DRBG_MENU
-+
- config CRYPTO_PCOMP
- 	tristate
- 	select CRYPTO_PCOMP2
-@@ -222,7 +226,7 @@ config CRYPTO_SEQIV
- 	select CRYPTO_AEAD
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_NULL
--	select CRYPTO_RNG
-+	select CRYPTO_RNG_DEFAULT
- 	help
- 	  This IV generator generates an IV based on a sequence number by
- 	  xoring it with a salt.  This algorithm is mainly useful for CTR
-@@ -231,7 +235,7 @@ config CRYPTO_ECHAINIV
- 	tristate "Encrypted Chain IV Generator"
- 	select CRYPTO_AEAD
- 	select CRYPTO_NULL
--	select CRYPTO_RNG
-+	select CRYPTO_RNG_DEFAULT
- 	default m
- 	help
- 	  This IV generator generates an IV based on the encryption of
-@@ -1450,7 +1454,6 @@ comment "Random Number Generation"
- 
- config CRYPTO_ANSI_CPRNG
- 	tristate "Pseudo Random Number Generation for Cryptographic modules"
--	default m
- 	select CRYPTO_AES
- 	select CRYPTO_RNG
- 	help
-@@ -1468,11 +1471,9 @@ menuconfig CRYPTO_DRBG_MENU
- if CRYPTO_DRBG_MENU
- 
- config CRYPTO_DRBG_HMAC
--	bool "Enable HMAC DRBG"
-+	bool
- 	default y
- 	select CRYPTO_HMAC
--	help
--	  Enable the HMAC DRBG variant as defined in NIST SP800-90A.
- 
- config CRYPTO_DRBG_HASH
- 	bool "Enable Hash DRBG"
-@@ -1488,7 +1489,7 @@ config CRYPTO_DRBG_CTR
- 
- config CRYPTO_DRBG
- 	tristate
--	default CRYPTO_DRBG_MENU if (CRYPTO_DRBG_HMAC || CRYPTO_DRBG_HASH || CRYPTO_DRBG_CTR)
-+	default CRYPTO_DRBG_MENU
- 	select CRYPTO_RNG
- 	select CRYPTO_JITTERENTROPY
- 
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 5db5b95..a0f49c3 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -92,7 +92,6 @@ obj-$(CONFIG_CRYPTO_LZ4) += lz4.o
+ obj-$(CONFIG_CRYPTO_LZ4HC) += lz4hc.o
+ obj-$(CONFIG_CRYPTO_842) += 842.o
+ obj-$(CONFIG_CRYPTO_RNG2) += rng.o
+-obj-$(CONFIG_CRYPTO_RNG2) += krng.o
+ obj-$(CONFIG_CRYPTO_ANSI_CPRNG) += ansi_cprng.o
+ obj-$(CONFIG_CRYPTO_DRBG) += drbg.o
+ CFLAGS_jitterentropy.o = -O0
+diff --git a/crypto/krng.c b/crypto/krng.c
+deleted file mode 100644
+index 40ed78e..0000000
+--- a/crypto/krng.c
++++ /dev/null
+@@ -1,61 +0,0 @@
+-/*
+- * RNG implementation using standard kernel RNG.
+- *
+- * Copyright (c) 2008 Herbert Xu <herbert@gondor.apana.org.au>
+- *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by the
+- * Free Software Foundation; either version 2 of the License, or (at your
+- * any later version.
+- *
+- */
+-
+-#include <crypto/internal/rng.h>
+-#include <linux/err.h>
+-#include <linux/init.h>
+-#include <linux/module.h>
+-#include <linux/random.h>
+-
+-static int krng_generate(struct crypto_rng *tfm,
+-			 const u8 *src, unsigned int slen,
+-			 u8 *rdata, unsigned int dlen)
+-{
+-	get_random_bytes(rdata, dlen);
+-	return 0;
+-}
+-
+-static int krng_seed(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
+-{
+-	return 0;
+-}
+-
+-static struct rng_alg krng_alg = {
+-	.generate		= krng_generate,
+-	.seed			= krng_seed,
+-	.base			=	{
+-		.cra_name		= "stdrng",
+-		.cra_driver_name	= "krng",
+-		.cra_priority		= 200,
+-		.cra_module		= THIS_MODULE,
+-	}
+-};
+-
+-
+-/* Module initalization */
+-static int __init krng_mod_init(void)
+-{
+-	return crypto_register_rng(&krng_alg);
+-}
+-
+-static void __exit krng_mod_fini(void)
+-{
+-	crypto_unregister_rng(&krng_alg);
+-}
+-
+-module_init(krng_mod_init);
+-module_exit(krng_mod_fini);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("Kernel Random Number Generator");
+-MODULE_ALIAS_CRYPTO("stdrng");
+-MODULE_ALIAS_CRYPTO("krng");
