@@ -1,37 +1,42 @@
-From: James Morris <jmorris@namei.org>
-Subject: [CFP] Reminder: Linux Security Summit 2015 CFP closes this Friday
-	5th June
-Date: Wed, 3 Jun 2015 19:31:26 +1000 (AEST)
-Message-ID: <alpine.LRH.2.11.1506031851260.19959@namei.org>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: Crypto driver -DCP
+Date: Wed, 3 Jun 2015 14:54:54 +0200
+Message-ID: <201506031454.54763.marex@denx.de>
+References: <554BBD05.3050807@freescale.com> <201506011524.03531.marex@denx.de> <20150601145014.GA16400@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: keyrings@linux-nfs.org, security@lists.fedoraproject.org,
-	debian-security@lists.debian.org, apparmor@lists.ubuntu.com,
-	linux-kernel@vger.kernel.org, selinux@lists.fedoraproject.org,
-	opensuse-security@opensuse.org, linux-crypto@vger.kernel.org
-To: linux-security-module@vger.kernel.org
-Return-path: <selinux-bounces@lists.fedoraproject.org>
-List-Unsubscribe: <https://admin.fedoraproject.org/mailman/options/selinux>,
-	<mailto:selinux-request@lists.fedoraproject.org?subject=unsubscribe>
-List-Archive: <http://lists.fedoraproject.org/pipermail/selinux/>
-List-Post: <mailto:selinux@lists.fedoraproject.org>
-List-Help: <mailto:selinux-request@lists.fedoraproject.org?subject=help>
-List-Subscribe: <https://admin.fedoraproject.org/mailman/listinfo/selinux>,
-	<mailto:selinux-request@lists.fedoraproject.org?subject=subscribe>
-Sender: selinux-bounces@lists.fedoraproject.org
-Errors-To: selinux-bounces@lists.fedoraproject.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Jay Monkman <jay.monkman@freescale.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-out.m-online.net ([212.18.0.9]:60218 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759488AbbFCMzD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Jun 2015 08:55:03 -0400
+In-Reply-To: <20150601145014.GA16400@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-SnVzdCBhIHJlbWluZGVyIHRvIGZvbGsgd2hvJ3ZlIGRvbmUgaW50ZXJlc3RpbmcgdGhpbmdzIGlu
-IExpbnV4IHNlY3VyaXR5IAp0aGlzIHllYXIsIHRoZSBDRlAgZm9yIExTUyAyMDE1IGlzIG9wZW4g
-dW50aWwgdGhpcyBGcmlkYXksIDV0aCBKdW5lLgoKU2VlIHRoZSBmb2xsb3dpbmcgbGluayBmb3Ig
-ZGV0YWlsczoKaHR0cDovL2tlcm5zZWMub3JnL3dpa2kvaW5kZXgucGhwL0xpbnV4X1NlY3VyaXR5
-X1N1bW1pdF8yMDE1CgpUaGlzIGlzIG5vdCBqdXN0IGZvciBrZXJuZWwgZGV2ZWxvcGVycywgb3Ig
-ZXZlbiBkZXZlbG9wZXJzIC0tIGFueSAKaW50ZXJlc3Rpbmcvbm92ZWwgYXBwbGljYXRpb24gb2Yg
-TGludXggc2VjdXJpdHkgb3IgcmVzZWFyY2ggaXMgd2VsY29tZS4gIAoKV2UncmUgYWxzbyBsb29r
-aW5nIGZvciByb3VuZC10YWJsZSBkaXNjdXNzaW9uIHRvcGljcywgYW5kIHBlb3BsZSB0byBsZWFk
-IAp0aG9zZSBkaXNjdXNzaW9ucy4KCkdldCB5b3VyIHByb3Bvc2FscyBpbiBzb29uIQoKCgotIEph
-bWVzCi0tIApKYW1lcyBNb3JyaXMKPGptb3JyaXNAbmFtZWkub3JnPgoKLS0Kc2VsaW51eCBtYWls
-aW5nIGxpc3QKc2VsaW51eEBsaXN0cy5mZWRvcmFwcm9qZWN0Lm9yZwpodHRwczovL2FkbWluLmZl
-ZG9yYXByb2plY3Qub3JnL21haWxtYW4vbGlzdGluZm8vc2VsaW51eA==
+On Monday, June 01, 2015 at 04:50:15 PM, Herbert Xu wrote:
+> On Mon, Jun 01, 2015 at 03:24:03PM +0200, Marek Vasut wrote:
+> > On Friday, May 29, 2015 at 03:30:18 PM, Herbert Xu wrote:
+> > > On Fri, May 29, 2015 at 03:02:59PM +0200, Marek Vasut wrote:
+> > > > This does look somewhat hacky to me. Wouldn't it make more sense to
+> > > > add a CRYPTO_TFM_REQ flag ?
+> > > 
+> > > What are you going to do when you have more than one hard-coded
+> > > key? A flag is a non-starter.
+> > 
+> > Well, abusing a non-well-defined part of the API is also not a nice
+> > way to do it. Maybe we should consider some other -- third -- option ?
+> 
+> I'm waiting to hear it :)
+
+I cannot tell, I wasn't digging in the API for a while now, so I forgot
+the details. Maybe someone else can chime in ?
+
+Best regards,
+Marek Vasut
