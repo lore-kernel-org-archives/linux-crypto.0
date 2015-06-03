@@ -1,8 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH RFC v3 2/3] crypto: RSA: KEYS: convert rsa and public key to
- new PKE API
-Date: Wed, 03 Jun 2015 15:44:14 -0700
-Message-ID: <20150603224414.22310.17260.stgit@tstruk-mobl1>
+Subject: [PATCH RFC v3 3/3] crypto: add tests vectors for RSA
+Date: Wed, 03 Jun 2015 15:44:24 -0700
+Message-ID: <20150603224424.22310.24677.stgit@tstruk-mobl1>
 References: <20150603224403.22310.79731.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -15,1125 +14,309 @@ Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
 	vgoyal@redhat.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:43216 "EHLO mga11.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:18015 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752452AbbFCWoM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 3 Jun 2015 18:44:12 -0400
+	id S1754065AbbFCWoO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 3 Jun 2015 18:44:14 -0400
 In-Reply-To: <20150603224403.22310.79731.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Change the existing rsa and public key code to integrate it
-with the new Public Key Encryption API.
+New test vectors for RSA algorithm.
 
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- crypto/asymmetric_keys/Kconfig            |    1 
- crypto/asymmetric_keys/Makefile           |    1 
- crypto/asymmetric_keys/pkcs7_parser.c     |    2 
- crypto/asymmetric_keys/pkcs7_trust.c      |    2 
- crypto/asymmetric_keys/pkcs7_verify.c     |    2 
- crypto/asymmetric_keys/public_key.c       |   53 +--
- crypto/asymmetric_keys/public_key.h       |   36 --
- crypto/asymmetric_keys/rsa.c              |  467 ++++++++++++++++-------------
- crypto/asymmetric_keys/rsa_pkcs1_v1_5.c   |  259 ++++++++++++++++
- crypto/asymmetric_keys/x509_cert_parser.c |    2 
- crypto/asymmetric_keys/x509_public_key.c  |    4 
- include/crypto/public_key.h               |   11 -
- 12 files changed, 540 insertions(+), 300 deletions(-)
- delete mode 100644 crypto/asymmetric_keys/public_key.h
- create mode 100644 crypto/asymmetric_keys/rsa_pkcs1_v1_5.c
+ crypto/testmgr.c |  151 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.h |   86 +++++++++++++++++++++++++++++++
+ 2 files changed, 237 insertions(+)
 
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index 4870f28..4d27116 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -23,6 +23,7 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
- config PUBLIC_KEY_ALGO_RSA
- 	tristate "RSA public-key algorithm"
- 	select MPILIB
-+	select CRYPTO_AKCIPHER
- 	help
- 	  This option enables support for the RSA algorithm (PKCS#1, RFC3447).
- 
-diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
-index e47fcd9..a9cb1b8 100644
---- a/crypto/asymmetric_keys/Makefile
-+++ b/crypto/asymmetric_keys/Makefile
-@@ -8,6 +8,7 @@ asymmetric_keys-y := asymmetric_type.o signature.o
- 
- obj-$(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE) += public_key.o
- obj-$(CONFIG_PUBLIC_KEY_ALGO_RSA) += rsa.o
-+obj-$(CONFIG_PUBLIC_KEY_ALGO_RSA) += rsa_pkcs1_v1_5.o
- 
- #
- # X.509 Certificate handling
-diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
-index 3bd5a1e..054f110 100644
---- a/crypto/asymmetric_keys/pkcs7_parser.c
-+++ b/crypto/asymmetric_keys/pkcs7_parser.c
-@@ -15,7 +15,7 @@
- #include <linux/slab.h>
- #include <linux/err.h>
- #include <linux/oid_registry.h>
--#include "public_key.h"
-+#include <crypto/public_key.h>
- #include "pkcs7_parser.h"
- #include "pkcs7-asn1.h"
- 
-diff --git a/crypto/asymmetric_keys/pkcs7_trust.c b/crypto/asymmetric_keys/pkcs7_trust.c
-index 1d29376..68ebae2 100644
---- a/crypto/asymmetric_keys/pkcs7_trust.c
-+++ b/crypto/asymmetric_keys/pkcs7_trust.c
-@@ -17,7 +17,7 @@
- #include <linux/asn1.h>
- #include <linux/key.h>
- #include <keys/asymmetric-type.h>
--#include "public_key.h"
-+#include <crypto/public_key.h>
- #include "pkcs7_parser.h"
- 
- /**
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index cd45545..c32a337 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -16,7 +16,7 @@
- #include <linux/err.h>
- #include <linux/asn1.h>
- #include <crypto/hash.h>
--#include "public_key.h"
-+#include <crypto/public_key.h>
- #include "pkcs7_parser.h"
- 
- /*
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index 2f6e4fb..4685aed 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -18,30 +18,26 @@
- #include <linux/slab.h>
- #include <linux/seq_file.h>
- #include <keys/asymmetric-subtype.h>
--#include "public_key.h"
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 717d6f2..54a5412 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -30,6 +30,8 @@
+ #include <linux/string.h>
+ #include <crypto/rng.h>
+ #include <crypto/drbg.h>
 +#include <crypto/public_key.h>
 +#include <crypto/akcipher.h>
  
- MODULE_LICENSE("GPL");
+ #include "internal.h"
  
- const char *const pkey_algo_name[PKEY_ALGO__LAST] = {
--	[PKEY_ALGO_DSA]		= "DSA",
--	[PKEY_ALGO_RSA]		= "RSA",
-+	[PKEY_ALGO_DSA]		= "dsa",
-+	[PKEY_ALGO_RSA]		= "rsa",
+@@ -116,6 +118,11 @@ struct drbg_test_suite {
+ 	unsigned int count;
  };
- EXPORT_SYMBOL_GPL(pkey_algo_name);
  
--const struct public_key_algorithm *pkey_algo[PKEY_ALGO__LAST] = {
--#if defined(CONFIG_PUBLIC_KEY_ALGO_RSA) || \
--	defined(CONFIG_PUBLIC_KEY_ALGO_RSA_MODULE)
--	[PKEY_ALGO_RSA]		= &RSA_public_key_algorithm,
--#endif
--};
--EXPORT_SYMBOL_GPL(pkey_algo);
--
- const char *const pkey_id_type_name[PKEY_ID_TYPE__LAST] = {
- 	[PKEY_ID_PGP]		= "PGP",
- 	[PKEY_ID_X509]		= "X509",
++struct akcipher_test_suite {
++	struct akcipher_testvec *vecs;
++	unsigned int count;
++};
++
+ struct alg_test_desc {
+ 	const char *alg;
+ 	int (*test)(const struct alg_test_desc *desc, const char *driver,
+@@ -130,6 +137,7 @@ struct alg_test_desc {
+ 		struct hash_test_suite hash;
+ 		struct cprng_test_suite cprng;
+ 		struct drbg_test_suite drbg;
++		struct akcipher_test_suite akcipher;
+ 	} suite;
  };
- EXPORT_SYMBOL_GPL(pkey_id_type_name);
  
-+int rsa_pkcs1_v1_5_verify_signature(const struct public_key *pkey,
-+				    const struct public_key_signature *sig);
-+
- /*
-  * Provide a part of a description of the key for /proc/keys.
-  */
-@@ -52,7 +48,8 @@ static void public_key_describe(const struct key *asymmetric_key,
+@@ -1825,6 +1833,139 @@ static int alg_test_drbg(const struct alg_test_desc *desc, const char *driver,
  
- 	if (key)
- 		seq_printf(m, "%s.%s",
--			   pkey_id_type_name[key->id_type], key->algo->name);
-+			   pkey_id_type_name[key->id_type],
-+			   pkey_algo_name[key->pkey_algo]);
  }
  
- /*
-@@ -74,37 +71,20 @@ EXPORT_SYMBOL_GPL(public_key_destroy);
- /*
-  * Verify a signature using a public key.
-  */
--int public_key_verify_signature(const struct public_key *pk,
-+int public_key_verify_signature(const struct public_key *pkey,
- 				const struct public_key_signature *sig)
- {
--	const struct public_key_algorithm *algo;
--
--	BUG_ON(!pk);
--	BUG_ON(!pk->mpi[0]);
--	BUG_ON(!pk->mpi[1]);
-+	BUG_ON(!pkey);
-+	BUG_ON(!pkey->mpi[0]);
-+	BUG_ON(!pkey->mpi[1]);
- 	BUG_ON(!sig);
- 	BUG_ON(!sig->digest);
- 	BUG_ON(!sig->mpi[0]);
- 
--	algo = pk->algo;
--	if (!algo) {
--		if (pk->pkey_algo >= PKEY_ALGO__LAST)
--			return -ENOPKG;
--		algo = pkey_algo[pk->pkey_algo];
--		if (!algo)
--			return -ENOPKG;
--	}
-+	if (pkey->pkey_algo != PKEY_ALGO_RSA)
-+		return -ENOPKG;
- 
--	if (!algo->verify_signature)
--		return -ENOTSUPP;
--
--	if (sig->nr_mpi != algo->n_sig_mpi) {
--		pr_debug("Signature has %u MPI not %u\n",
--			 sig->nr_mpi, algo->n_sig_mpi);
--		return -EINVAL;
--	}
--
--	return algo->verify_signature(pk, sig);
-+	return rsa_pkcs1_v1_5_verify_signature(pkey, sig);
- }
- EXPORT_SYMBOL_GPL(public_key_verify_signature);
- 
-@@ -112,6 +92,7 @@ static int public_key_verify_signature_2(const struct key *key,
- 					 const struct public_key_signature *sig)
- {
- 	const struct public_key *pk = key->payload.data;
-+
- 	return public_key_verify_signature(pk, sig);
- }
- 
-diff --git a/crypto/asymmetric_keys/public_key.h b/crypto/asymmetric_keys/public_key.h
-deleted file mode 100644
-index 5c37a22..0000000
---- a/crypto/asymmetric_keys/public_key.h
-+++ /dev/null
-@@ -1,36 +0,0 @@
--/* Public key algorithm internals
-- *
-- * See Documentation/crypto/asymmetric-keys.txt
-- *
-- * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
-- * Written by David Howells (dhowells@redhat.com)
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public Licence
-- * as published by the Free Software Foundation; either version
-- * 2 of the Licence, or (at your option) any later version.
-- */
--
--#include <crypto/public_key.h>
--
--extern struct asymmetric_key_subtype public_key_subtype;
--
--/*
-- * Public key algorithm definition.
-- */
--struct public_key_algorithm {
--	const char	*name;
--	u8		n_pub_mpi;	/* Number of MPIs in public key */
--	u8		n_sec_mpi;	/* Number of MPIs in secret key */
--	u8		n_sig_mpi;	/* Number of MPIs in a signature */
--	int (*verify_signature)(const struct public_key *key,
--				const struct public_key_signature *sig);
--};
--
--extern const struct public_key_algorithm RSA_public_key_algorithm;
--
--/*
-- * public_key.c
-- */
--extern int public_key_verify_signature(const struct public_key *pk,
--				       const struct public_key_signature *sig);
-diff --git a/crypto/asymmetric_keys/rsa.c b/crypto/asymmetric_keys/rsa.c
-index 459cf97..9e805ae 100644
---- a/crypto/asymmetric_keys/rsa.c
-+++ b/crypto/asymmetric_keys/rsa.c
-@@ -3,276 +3,317 @@
-  * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
-  * Written by David Howells (dhowells@redhat.com)
-  *
-+ * Split to RSA cryptographic primitives and RSA encryption schemes
-+ * added support for encrypt, decrypt and sign
-+ * Tadeusz Struk <tadeusz.struk@intel.com>
-+ * Copyright (c) 2015, Intel Corporation
-+ *
-  * This program is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU General Public Licence
-  * as published by the Free Software Foundation; either version
-  * 2 of the Licence, or (at your option) any later version.
-  */
- 
--#define pr_fmt(fmt) "RSA: "fmt
- #include <linux/module.h>
--#include <linux/kernel.h>
--#include <linux/slab.h>
--#include <crypto/algapi.h>
--#include "public_key.h"
-+#include <linux/scatterlist.h>
-+#include <crypto/public_key.h>
-+#include <crypto/akcipher.h>
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("RSA Public Key Algorithm");
- 
--#define kenter(FMT, ...) \
--	pr_devel("==> %s("FMT")\n", __func__, ##__VA_ARGS__)
--#define kleave(FMT, ...) \
--	pr_devel("<== %s()"FMT"\n", __func__, ##__VA_ARGS__)
--
- /*
-- * Hash algorithm OIDs plus ASN.1 DER wrappings [RFC4880 sec 5.2.2].
-+ * RSAEP function [RFC3447 sec 5.1.1]
-+ * c = m^e mod n;
-  */
--static const u8 RSA_digest_info_MD5[] = {
--	0x30, 0x20, 0x30, 0x0C, 0x06, 0x08,
--	0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x02, 0x05, /* OID */
--	0x05, 0x00, 0x04, 0x10
--};
--
--static const u8 RSA_digest_info_SHA1[] = {
--	0x30, 0x21, 0x30, 0x09, 0x06, 0x05,
--	0x2B, 0x0E, 0x03, 0x02, 0x1A,
--	0x05, 0x00, 0x04, 0x14
--};
--
--static const u8 RSA_digest_info_RIPE_MD_160[] = {
--	0x30, 0x21, 0x30, 0x09, 0x06, 0x05,
--	0x2B, 0x24, 0x03, 0x02, 0x01,
--	0x05, 0x00, 0x04, 0x14
--};
-+static int _rsa_enc(const struct public_key *key, MPI c, MPI m)
++static int do_test_rsa(struct crypto_akcipher *tfm,
++		       struct akcipher_testvec *vecs)
 +{
-+	/* (1) Validate 0 <= m < n */
-+	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->rsa.n) >= 0)
-+		return -EBADMSG;
- 
--static const u8 RSA_digest_info_SHA224[] = {
--	0x30, 0x2d, 0x30, 0x0d, 0x06, 0x09,
--	0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x04,
--	0x05, 0x00, 0x04, 0x1C
--};
-+	/* (2) c = m^e mod n */
-+	return mpi_powm(c, m, key->rsa.e, key->rsa.n);
-+}
- 
--static const u8 RSA_digest_info_SHA256[] = {
--	0x30, 0x31, 0x30, 0x0d, 0x06, 0x09,
--	0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01,
--	0x05, 0x00, 0x04, 0x20
--};
-+/*
-+ * RSADP function [RFC3447 sec 5.1.2]
-+ * m = c^d mod n;
-+ */
-+static int _rsa_dec(const struct public_key *key, MPI m, MPI c)
-+{
-+	/* (1) Validate 0 <= c < n */
-+	if (mpi_cmp_ui(c, 0) < 0 || mpi_cmp(c, key->rsa.n) >= 0)
-+		return -EBADMSG;
- 
--static const u8 RSA_digest_info_SHA384[] = {
--	0x30, 0x41, 0x30, 0x0d, 0x06, 0x09,
--	0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02,
--	0x05, 0x00, 0x04, 0x30
--};
-+	/* (2) m = c^d mod n */
-+	return mpi_powm(m, c, key->rsa.d, key->rsa.n);
-+}
- 
--static const u8 RSA_digest_info_SHA512[] = {
--	0x30, 0x51, 0x30, 0x0d, 0x06, 0x09,
--	0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03,
--	0x05, 0x00, 0x04, 0x40
--};
-+/*
-+ * RSASP1 function [RFC3447 sec 5.2.1]
-+ * s = m^d mod n
-+ */
-+static int _rsa_sign(const struct public_key *key, MPI s, MPI m)
-+{
-+	/* (1) Validate 0 <= m < n */
-+	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->rsa.n) >= 0)
-+		return -EBADMSG;
- 
--static const struct {
--	const u8 *data;
--	size_t size;
--} RSA_ASN1_templates[PKEY_HASH__LAST] = {
--#define _(X) { RSA_digest_info_##X, sizeof(RSA_digest_info_##X) }
--	[HASH_ALGO_MD5]		= _(MD5),
--	[HASH_ALGO_SHA1]	= _(SHA1),
--	[HASH_ALGO_RIPE_MD_160]	= _(RIPE_MD_160),
--	[HASH_ALGO_SHA256]	= _(SHA256),
--	[HASH_ALGO_SHA384]	= _(SHA384),
--	[HASH_ALGO_SHA512]	= _(SHA512),
--	[HASH_ALGO_SHA224]	= _(SHA224),
--#undef _
--};
-+	/* (2) s = m^d mod n */
-+	return mpi_powm(s, m, key->rsa.d, key->rsa.n);
-+}
- 
- /*
-- * RSAVP1() function [RFC3447 sec 5.2.2]
-+ * RSAVP1 function [RFC3447 sec 5.2.2]
-+ * m = s^e mod n;
-  */
--static int RSAVP1(const struct public_key *key, MPI s, MPI *_m)
-+static int _rsa_verify(const struct public_key *key, MPI m, MPI s)
- {
--	MPI m;
--	int ret;
--
- 	/* (1) Validate 0 <= s < n */
--	if (mpi_cmp_ui(s, 0) < 0) {
--		kleave(" = -EBADMSG [s < 0]");
--		return -EBADMSG;
--	}
--	if (mpi_cmp(s, key->rsa.n) >= 0) {
--		kleave(" = -EBADMSG [s >= n]");
-+	if (mpi_cmp_ui(s, 0) < 0 || mpi_cmp(s, key->rsa.n) >= 0)
- 		return -EBADMSG;
--	}
--
--	m = mpi_alloc(0);
--	if (!m)
--		return -ENOMEM;
- 
- 	/* (2) m = s^e mod n */
--	ret = mpi_powm(m, s, key->rsa.e, key->rsa.n);
--	if (ret < 0) {
--		mpi_free(m);
--		return ret;
--	}
--
--	*_m = m;
--	return 0;
-+	return mpi_powm(m, s, key->rsa.e, key->rsa.n);
- }
- 
--/*
-- * Integer to Octet String conversion [RFC3447 sec 4.1]
-- */
--static int RSA_I2OSP(MPI x, size_t xLen, u8 **_X)
-+static int rsa_enc(struct akcipher_request *req)
- {
--	unsigned X_size, x_size;
--	int X_sign;
--	u8 *X;
--
--	/* Make sure the string is the right length.  The number should begin
--	 * with { 0x00, 0x01, ... } so we have to account for 15 leading zero
--	 * bits not being reported by MPI.
--	 */
--	x_size = mpi_get_nbits(x);
--	pr_devel("size(x)=%u xLen*8=%zu\n", x_size, xLen * 8);
--	if (x_size != xLen * 8 - 15)
--		return -ERANGE;
--
--	X = mpi_get_buffer(x, &X_size, &X_sign);
--	if (!X)
-+	struct crypto_akcipher *tfm = akcipher_request_get_tfm(req);
-+	const struct public_key *pkey = tfm->pkey;
-+	MPI m, c = mpi_alloc(0);
-+	char *buf;
-+	unsigned int len;
-+	int ret = 0;
-+	int sign;
++	struct akcipher_request *req;
++	struct public_key pkey;
++	void *outbuf_enc = NULL;
++	void *outbuf_dec = NULL;
++	struct tcrypt_result result;
++	unsigned int out_len = vecs->c_size;
++	int err = -ENOMEM;
 +
-+	if (!c)
- 		return -ENOMEM;
--	if (X_sign < 0) {
--		kfree(X);
--		return -EBADMSG;
++	req = akcipher_request_alloc(tfm, GFP_KERNEL);
++	if (!req)
++		return err;
 +
-+	m = mpi_read_raw_data(req->src, req->src_len);
-+	if (!m) {
-+		ret = -ENOMEM;
-+		goto err_free_c;
- 	}
--	if (X_size != xLen - 1) {
--		kfree(X);
--		return -EBADMSG;
++	pkey.rsa.n = mpi_read_raw_data(vecs->pub_key_n, vecs->pub_key_n_size);
++	if (!pkey.rsa.n)
++		goto free_req;
 +
-+	ret = _rsa_enc(pkey, c, m);
-+	if (ret)
-+		goto err_free_m;
++	pkey.rsa.e = mpi_read_raw_data(vecs->pub_key_e, vecs->pub_key_e_size);
++	if (!pkey.rsa.e)
++		goto free_n;
 +
-+	buf = mpi_get_buffer(c, &len, &sign);
-+	if (!buf) {
-+		ret = -ENOMEM;
-+		goto err_free_m;
++	pkey.rsa.d = mpi_read_raw_data(vecs->sec_key_d, vecs->sec_key_d_size);
++	if (!pkey.rsa.d)
++		goto free_e;
++
++	outbuf_enc = kzalloc(vecs->c_size, GFP_KERNEL);
++	if (!outbuf_enc)
++		goto free_d;
++
++	/* Run RSA encrypt - c = m^e mod n;*/
++	init_completion(&result.completion);
++	crypto_akcipher_setkey(tfm, &pkey);
++	akcipher_request_set_crypt(req, vecs->m, outbuf_enc, vecs->m_size,
++				   out_len, &out_len);
++	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				      tcrypt_complete, &result);
++	err = wait_async_op(&result, crypto_akcipher_encrypt(req));
++	if (err) {
++		pr_err("alg: rsa: encrypt test failed. err %d\n", err);
++		goto free_all;
 +	}
 +
-+	if (sign < 0) {
-+		ret = -EBADMSG;
-+		goto err_free_buf;
- 	}
- 
--	*_X = X;
--	return 0;
-+	if (req->dst_len < len) {
-+		ret = -EINVAL;
-+		goto err_free_buf;
++	if (out_len != vecs->c_size) {
++		err = -EINVAL;
++		goto free_all;
 +	}
 +
-+	if (req->result_len)
-+		*req->result_len = len;
-+
-+	memcpy(req->dst, buf, len);
-+
-+err_free_buf:
-+	kfree(buf);
-+err_free_m:
-+	mpi_free(m);
-+err_free_c:
-+	mpi_free(c);
-+	return ret;
- }
- 
--/*
-- * Perform the RSA signature verification.
-- * @H: Value of hash of data and metadata
-- * @EM: The computed signature value
-- * @k: The size of EM (EM[0] is an invalid location but should hold 0x00)
-- * @hash_size: The size of H
-- * @asn1_template: The DigestInfo ASN.1 template
-- * @asn1_size: Size of asm1_template[]
-- */
--static int RSA_verify(const u8 *H, const u8 *EM, size_t k, size_t hash_size,
--		      const u8 *asn1_template, size_t asn1_size)
-+static int rsa_dec(struct akcipher_request *req)
- {
--	unsigned PS_end, T_offset, i;
-+	struct crypto_akcipher *tfm = akcipher_request_get_tfm(req);
-+	const struct public_key *pkey = tfm->pkey;
-+	MPI c, m = mpi_alloc(0);
-+	char *buf;
-+	unsigned int len;
-+	int ret = 0;
-+	int sign;
- 
--	kenter(",,%zu,%zu,%zu", k, hash_size, asn1_size);
-+	if (!m)
-+		return -ENOMEM;
- 
--	if (k < 2 + 1 + asn1_size + hash_size)
--		return -EBADMSG;
-+	c = mpi_read_raw_data(req->src, req->src_len);
-+	if (!c) {
-+		ret = -ENOMEM;
-+		goto err_free_m;
++	outbuf_dec = kzalloc(out_len, GFP_KERNEL);
++	if (!outbuf_dec) {
++		err = -ENOMEM;
++		goto free_all;
 +	}
- 
--	/* Decode the EMSA-PKCS1-v1_5 */
--	if (EM[1] != 0x01) {
--		kleave(" = -EBADMSG [EM[1] == %02u]", EM[1]);
--		return -EBADMSG;
-+	ret = _rsa_dec(pkey, m, c);
-+	if (ret)
-+		goto err_free_c;
 +
-+	buf = mpi_get_buffer(m, &len, &sign);
-+	if (!buf) {
-+		ret = -ENOMEM;
-+		goto err_free_c;
- 	}
- 
--	T_offset = k - (asn1_size + hash_size);
--	PS_end = T_offset - 1;
--	if (EM[PS_end] != 0x00) {
--		kleave(" = -EBADMSG [EM[T-1] == %02u]", EM[PS_end]);
--		return -EBADMSG;
-+	if (sign < 0) {
-+		ret = -EBADMSG;
-+		goto err_free_buf;
- 	}
- 
--	for (i = 2; i < PS_end; i++) {
--		if (EM[i] != 0xff) {
--			kleave(" = -EBADMSG [EM[PS%x] == %02u]", i - 2, EM[i]);
--			return -EBADMSG;
--		}
-+	if (req->dst_len < len) {
-+		ret = -EINVAL;
-+		goto err_free_buf;
- 	}
- 
--	if (crypto_memneq(asn1_template, EM + T_offset, asn1_size) != 0) {
--		kleave(" = -EBADMSG [EM[T] ASN.1 mismatch]");
--		return -EBADMSG;
-+	if (req->result_len)
-+		*req->result_len = len;
++	init_completion(&result.completion);
++	akcipher_request_set_crypt(req, outbuf_enc, outbuf_dec, vecs->c_size,
++				   out_len, &out_len);
++	/* Run RSA decrypt - m = c^d mod n;*/
++	err = wait_async_op(&result, crypto_akcipher_decrypt(req));
++	if (err) {
++		pr_err("alg: rsa: decrypt test failed. err %d\n", err);
++		goto free_all;
++	}
 +
-+	memcpy(req->dst, buf, len);
++	if (out_len != vecs->m_size) {
++		err = -EINVAL;
++		goto free_all;
++	}
 +
-+err_free_buf:
-+	kfree(buf);
-+err_free_c:
-+	mpi_free(c);
-+err_free_m:
-+	mpi_free(m);
-+	return ret;
++	/* verify that decrypted message is equal to the original msg */
++	if (memcmp(vecs->m, outbuf_dec, vecs->m_size)) {
++		pr_err("alg: rsa: encrypt test failed. Invalid output\n");
++		err = -EINVAL;
++	}
++free_all:
++	kfree(outbuf_dec);
++	kfree(outbuf_enc);
++free_d:
++	mpi_free(pkey.rsa.d);
++free_e:
++	mpi_free(pkey.rsa.e);
++free_n:
++	mpi_free(pkey.rsa.n);
++free_req:
++	akcipher_request_free(req);
++	return err;
 +}
 +
-+static int rsa_sign(struct akcipher_request *req)
++static int test_rsa(struct crypto_akcipher *tfm, struct akcipher_testvec *vecs,
++		    unsigned int tcount)
 +{
-+	struct crypto_akcipher *tfm = akcipher_request_get_tfm(req);
-+	const struct public_key *pkey = tfm->pkey;
-+	MPI m, s = mpi_alloc(0);
-+	char *buf;
-+	unsigned int len;
-+	int ret = 0;
-+	int sign;
++	int ret, i;
 +
-+	if (!s)
-+		return -ENOMEM;
-+
-+	m = mpi_read_raw_data(req->src, req->src_len);
-+	if (!m) {
-+		ret = -ENOMEM;
-+		goto err_free_s;
-+	}
-+	ret = _rsa_sign(pkey, s, m);
-+	if (ret)
-+		goto err_free_m;
-+
-+	buf = mpi_get_buffer(s, &len, &sign);
-+	if (!buf) {
-+		ret = -ENOMEM;
-+		goto err_free_m;
-+	}
-+
-+	if (sign < 0) {
-+		ret = -EBADMSG;
-+		goto err_free_buf;
- 	}
- 
--	if (crypto_memneq(H, EM + T_offset + asn1_size, hash_size) != 0) {
--		kleave(" = -EKEYREJECTED [EM[T] hash mismatch]");
--		return -EKEYREJECTED;
-+	if (req->dst_len < len) {
-+		ret = -EINVAL;
-+		goto err_free_buf;
- 	}
- 
--	kleave(" = 0");
--	return 0;
-+	if (req->result_len)
-+		*req->result_len = len;
-+
-+	memcpy(req->dst, buf, len);
-+
-+err_free_buf:
-+	kfree(buf);
-+err_free_m:
-+	mpi_free(m);
-+err_free_s:
-+	mpi_free(s);
-+	return ret;
- }
- 
--/*
-- * Perform the verification step [RFC3447 sec 8.2.2].
-- */
--static int RSA_verify_signature(const struct public_key *key,
--				const struct public_key_signature *sig)
-+static int rsa_verify(struct akcipher_request *req)
- {
--	size_t tsize;
--	int ret;
--
--	/* Variables as per RFC3447 sec 8.2.2 */
--	const u8 *H = sig->digest;
--	u8 *EM = NULL;
--	MPI m = NULL;
--	size_t k;
--
--	kenter("");
--
--	if (!RSA_ASN1_templates[sig->pkey_hash_algo].data)
--		return -ENOTSUPP;
--
--	/* (1) Check the signature size against the public key modulus size */
--	k = mpi_get_nbits(key->rsa.n);
--	tsize = mpi_get_nbits(sig->rsa.s);
--
--	/* According to RFC 4880 sec 3.2, length of MPI is computed starting
--	 * from most significant bit.  So the RFC 3447 sec 8.2.2 size check
--	 * must be relaxed to conform with shorter signatures - so we fail here
--	 * only if signature length is longer than modulus size.
--	 */
--	pr_devel("step 1: k=%zu size(S)=%zu\n", k, tsize);
--	if (k < tsize) {
-+	struct crypto_akcipher *tfm = akcipher_request_get_tfm(req);
-+	const struct public_key *pkey = tfm->pkey;
-+	MPI s, m = mpi_alloc(0);
-+	char *buf;
-+	unsigned int len;
-+	int ret = 0;
-+	int sign;
-+
-+	if (!m)
-+		return -ENOMEM;
-+
-+	s = mpi_read_raw_data(req->src, req->src_len);
-+	if (!s) {
-+		ret = -ENOMEM;
-+		goto err_free_m;
-+	}
-+
-+	ret = _rsa_verify(pkey, m, s);
-+	if (ret)
-+		goto err_free_s;
-+
-+	buf = mpi_get_buffer(m, &len, &sign);
-+	if (!buf) {
-+		ret = -ENOMEM;
-+		goto err_free_s;
-+	}
-+
-+	if (sign < 0) {
- 		ret = -EBADMSG;
--		goto error;
-+		goto err_free_buf;
-+	}
-+
-+	if (req->dst_len < len) {
-+		ret = -EINVAL;
-+		goto err_free_buf;
- 	}
- 
--	/* Round up and convert to octets */
--	k = (k + 7) / 8;
--
--	/* (2b) Apply the RSAVP1 verification primitive to the public key */
--	ret = RSAVP1(key, sig->rsa.s, &m);
--	if (ret < 0)
--		goto error;
--
--	/* (2c) Convert the message representative (m) to an encoded message
--	 *      (EM) of length k octets.
--	 *
--	 *      NOTE!  The leading zero byte is suppressed by MPI, so we pass a
--	 *      pointer to the _preceding_ byte to RSA_verify()!
--	 */
--	ret = RSA_I2OSP(m, k, &EM);
--	if (ret < 0)
--		goto error;
--
--	ret = RSA_verify(H, EM - 1, k, sig->digest_size,
--			 RSA_ASN1_templates[sig->pkey_hash_algo].data,
--			 RSA_ASN1_templates[sig->pkey_hash_algo].size);
--
--error:
--	kfree(EM);
-+	if (req->result_len)
-+		*req->result_len = len;
-+
-+	memcpy(req->dst, buf, len);
-+
-+err_free_buf:
-+	kfree(buf);
-+err_free_s:
-+	mpi_free(s);
-+err_free_m:
- 	mpi_free(m);
--	kleave(" = %d", ret);
- 	return ret;
- }
- 
--const struct public_key_algorithm RSA_public_key_algorithm = {
--	.name		= "RSA",
--	.n_pub_mpi	= 2,
--	.n_sec_mpi	= 3,
--	.n_sig_mpi	= 1,
--	.verify_signature = RSA_verify_signature,
-+static struct akcipher_alg rsa = {
-+	.encrypt = rsa_enc,
-+	.decrypt = rsa_dec,
-+	.sign = rsa_sign,
-+	.verify = rsa_verify,
-+	.base = {
-+		.cra_name = "rsa",
-+		.cra_driver_name = "rsa-generic",
-+		.cra_priority = 100,
-+		.cra_ctxsize = 0,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
- };
--EXPORT_SYMBOL_GPL(RSA_public_key_algorithm);
-+
-+static int rsa_init(void)
-+{
-+	return crypto_register_akcipher(&rsa);
-+}
-+
-+static void rsa_exit(void)
-+{
-+	crypto_unregister_akcipher(&rsa);
-+}
-+
-+module_init(rsa_init);
-+module_exit(rsa_exit);
-+MODULE_ALIAS_CRYPTO("rsa");
-diff --git a/crypto/asymmetric_keys/rsa_pkcs1_v1_5.c b/crypto/asymmetric_keys/rsa_pkcs1_v1_5.c
-new file mode 100644
-index 0000000..8feb28e
---- /dev/null
-+++ b/crypto/asymmetric_keys/rsa_pkcs1_v1_5.c
-@@ -0,0 +1,259 @@
-+/* RSA asymmetric public-key algorithm [RFC3447]
-+ * RSA encryption schemes part
-+ *
-+ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ *
-+ * Split to RSA cryptographic primitives and RSA encryption schemes
-+ * Tadeusz Struk <tadeusz.struk@intel.com>
-+ * Copyright (c) 2015, Intel Corporation
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
-+ */
-+
-+#define pr_fmt(fmt) "PKEY: "fmt
-+#include <linux/module.h>
-+#include <linux/slab.h>
-+#include <crypto/public_key.h>
-+#include <crypto/akcipher.h>
-+#include <crypto/algapi.h>
-+
-+#define kenter(FMT, ...) \
-+	pr_devel("==> %s("FMT")\n", __func__, ##__VA_ARGS__)
-+#define kleave(FMT, ...) \
-+	pr_devel("<== %s()"FMT"\n", __func__, ##__VA_ARGS__)
-+
-+/*
-+ * Hash algorithm OIDs plus ASN.1 DER wrappings [RFC4880 sec 5.2.2].
-+ */
-+static const u8 RSA_digest_info_MD5[] = {
-+	0x30, 0x20, 0x30, 0x0C, 0x06, 0x08,
-+	0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x02, 0x05, /* OID */
-+	0x05, 0x00, 0x04, 0x10
-+};
-+
-+static const u8 RSA_digest_info_SHA1[] = {
-+	0x30, 0x21, 0x30, 0x09, 0x06, 0x05,
-+	0x2B, 0x0E, 0x03, 0x02, 0x1A,
-+	0x05, 0x00, 0x04, 0x14
-+};
-+
-+static const u8 RSA_digest_info_RIPE_MD_160[] = {
-+	0x30, 0x21, 0x30, 0x09, 0x06, 0x05,
-+	0x2B, 0x24, 0x03, 0x02, 0x01,
-+	0x05, 0x00, 0x04, 0x14
-+};
-+
-+static const u8 RSA_digest_info_SHA224[] = {
-+	0x30, 0x2d, 0x30, 0x0d, 0x06, 0x09,
-+	0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x04,
-+	0x05, 0x00, 0x04, 0x1C
-+};
-+
-+static const u8 RSA_digest_info_SHA256[] = {
-+	0x30, 0x31, 0x30, 0x0d, 0x06, 0x09,
-+	0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01,
-+	0x05, 0x00, 0x04, 0x20
-+};
-+
-+static const u8 RSA_digest_info_SHA384[] = {
-+	0x30, 0x41, 0x30, 0x0d, 0x06, 0x09,
-+	0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02,
-+	0x05, 0x00, 0x04, 0x30
-+};
-+
-+static const u8 RSA_digest_info_SHA512[] = {
-+	0x30, 0x51, 0x30, 0x0d, 0x06, 0x09,
-+	0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03,
-+	0x05, 0x00, 0x04, 0x40
-+};
-+
-+static const struct {
-+	const u8 *data;
-+	size_t size;
-+} RSA_ASN1_templates[PKEY_HASH__LAST] = {
-+#define _(X) { RSA_digest_info_##X, sizeof(RSA_digest_info_##X) }
-+	[HASH_ALGO_MD5]		= _(MD5),
-+	[HASH_ALGO_SHA1]	= _(SHA1),
-+	[HASH_ALGO_RIPE_MD_160]	= _(RIPE_MD_160),
-+	[HASH_ALGO_SHA256]	= _(SHA256),
-+	[HASH_ALGO_SHA384]	= _(SHA384),
-+	[HASH_ALGO_SHA512]	= _(SHA512),
-+	[HASH_ALGO_SHA224]	= _(SHA224),
-+#undef _
-+};
-+
-+struct rsa_completion {
-+	struct completion completion;
-+	int err;
-+};
-+
-+/*
-+ * Perform the RSA signature verification.
-+ * @H: Value of hash of data and metadata
-+ * @EM: The computed signature value
-+ * @k: The size of EM (EM[0] is an invalid location but should hold 0x00)
-+ * @hash_size: The size of H
-+ * @asn1_template: The DigestInfo ASN.1 template
-+ * @asn1_size: Size of asm1_template[]
-+ */
-+static int rsa_signture_verify(const u8 *H, const u8 *EM, size_t k,
-+			       size_t hash_size, const u8 *asn1_template,
-+			       size_t asn1_size)
-+{
-+	unsigned PS_end, T_offset, i;
-+
-+	kenter(",,%zu,%zu,%zu", k, hash_size, asn1_size);
-+
-+	if (k < 2 + 1 + asn1_size + hash_size)
-+		return -EBADMSG;
-+
-+	/* Decode the EMSA-PKCS1-v1_5 */
-+	if (EM[1] != 0x01) {
-+		kleave(" = -EBADMSG [EM[1] == %02u]", EM[1]);
-+		return -EBADMSG;
-+	}
-+
-+	T_offset = k - (asn1_size + hash_size);
-+	PS_end = T_offset - 1;
-+	if (EM[PS_end] != 0x00) {
-+		kleave(" = -EBADMSG [EM[T-1] == %02u]", EM[PS_end]);
-+		return -EBADMSG;
-+	}
-+
-+	for (i = 2; i < PS_end; i++) {
-+		if (EM[i] != 0xff) {
-+			kleave(" = -EBADMSG [EM[PS%x] == %02u]", i - 2, EM[i]);
-+			return -EBADMSG;
++	for (i = 0; i < tcount; i++) {
++		ret = do_test_rsa(tfm, vecs++);
++		if (ret) {
++			pr_err("alg: rsa: test failed on vector %d\n", i + 1);
++			return ret;
 +		}
 +	}
-+
-+	if (crypto_memneq(asn1_template, EM + T_offset, asn1_size) != 0) {
-+		kleave(" = -EBADMSG [EM[T] ASN.1 mismatch]");
-+		return -EBADMSG;
-+	}
-+
-+	if (crypto_memneq(H, EM + T_offset + asn1_size, hash_size) != 0) {
-+		kleave(" = -EKEYREJECTED [EM[T] hash mismatch]");
-+		return -EKEYREJECTED;
-+	}
-+
-+	kleave(" = 0");
 +	return 0;
 +}
 +
-+static void public_key_verify_done(struct crypto_async_request *req, int err)
++static int test_akcipher(struct crypto_akcipher *tfm, const char *alg,
++			 struct akcipher_testvec *vecs, unsigned int tcount)
 +{
-+	struct rsa_completion *compl = req->data;
++	if (strncmp(alg, "rsa", 3) == 0)
++		return test_rsa(tfm, vecs, tcount);
 +
-+	if (err == -EINPROGRESS)
-+		return;
-+
-+	compl->err = err;
-+	complete(&compl->completion);
++	return 0;
 +}
 +
-+/*
-+ * Perform the verification step [RFC3447 sec 8.2.2].
-+ */
-+int rsa_pkcs1_v1_5_verify_signature(const struct public_key *pkey,
-+				    const struct public_key_signature *sig)
++static int alg_test_akcipher(const struct alg_test_desc *desc,
++			     const char *driver, u32 type, u32 mask)
 +{
 +	struct crypto_akcipher *tfm;
-+	struct akcipher_request *req;
-+	struct rsa_completion compl;
-+	void *outbuf = NULL;
-+	void *inbuf = NULL;
-+	size_t tsize;
-+	unsigned int len, len_out;
-+	int ret;
-+	/* Variables as per RFC3447 sec 8.2.2 */
-+	const u8 *H = sig->digest;
-+	size_t k;
++	int err = 0;
 +
-+	kenter("");
-+	tfm = crypto_alloc_akcipher("rsa", 0, 0);
++	tfm = crypto_alloc_akcipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
 +	if (IS_ERR(tfm)) {
-+		ret = -ENOMEM;
-+		goto error_out;
++		printk(KERN_ERR "alg: akcipher: Failed to load transform for %s: "
++		       "%ld\n", driver, PTR_ERR(tfm));
++		return PTR_ERR(tfm);
 +	}
++	if (desc->suite.akcipher.vecs)
++		err = test_akcipher(tfm, desc->alg, desc->suite.akcipher.vecs,
++				    desc->suite.akcipher.count);
 +
-+	req = akcipher_request_alloc(tfm, GFP_KERNEL);
-+	if (!req) {
-+		ret = -ENOMEM;
-+		goto error_free_tfm;
-+	}
-+	/* (1) Check the signature size against the public key modulus size */
-+	k = mpi_get_nbits(pkey->rsa.n);
-+	tsize = mpi_get_nbits(sig->rsa.s);
-+
-+	/* According to RFC 4880 sec 3.2, length of MPI is computed starting
-+	 * from most significant bit.  So the RFC 3447 sec 8.2.2 size check
-+	 * must be relaxed to conform with shorter signatures - so we fail here
-+	 * only if signature length is longer than modulus size.
-+	 */
-+	if (k < tsize) {
-+		ret = -EBADMSG;
-+		goto error_free_req;
-+	}
-+
-+	/* initialize input with signature */
-+	inbuf = mpi_get_buffer(sig->rsa.s, &len, NULL);
-+	if (!inbuf) {
-+		ret = -ENOMEM;
-+		goto error_free_req;
-+	}
-+
-+	/* Expect the same result size as the size of the signature */
-+	len_out = len;
-+
-+	/* initlialzie out buf */
-+	outbuf = kmalloc(len_out, GFP_KERNEL);
-+	if (!outbuf) {
-+		ret = -ENOMEM;
-+		goto error_free_req;
-+	}
-+
-+	/* Perform RSA verification primitive */
-+	crypto_akcipher_setkey(tfm, pkey);
-+	akcipher_request_set_crypt(req, inbuf, outbuf, len, len_out, &len_out);
-+	init_completion(&compl.completion);
-+	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
-+				      CRYPTO_TFM_REQ_MAY_SLEEP,
-+				      public_key_verify_done, &compl);
-+
-+	ret = crypto_akcipher_verify(req);
-+	if (ret == -EINPROGRESS) {
-+		wait_for_completion(&compl.completion);
-+		ret = compl.err;
-+	}
-+
-+	if (ret)
-+		goto error_free_req;
-+
-+	/* Round up and convert to octets */
-+	k = (k + 7) / 8;
-+
-+	/*
-+	 * Output from the operation is an encoded message (EM) of
-+	 * length k octets.
-+	 *
-+	 * NOTE!  The leading zero byte is suppressed by MPI, so we pass a
-+	 * pointer to the _preceding_ byte to rsa_verify()!
-+	 */
-+	ret = rsa_signture_verify(H, outbuf - 1, k, sig->digest_size,
-+				  RSA_ASN1_templates[sig->pkey_hash_algo].data,
-+				  RSA_ASN1_templates[sig->pkey_hash_algo].size);
-+error_free_req:
-+	akcipher_request_free(req);
-+error_free_tfm:
 +	crypto_free_akcipher(tfm);
-+error_out:
-+	kfree(inbuf);
-+	kfree(outbuf);
-+	kleave(" = %d", ret);
-+	return ret;
++	return err;
 +}
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index a668d90..bab3fdd 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -15,7 +15,7 @@
- #include <linux/slab.h>
- #include <linux/err.h>
- #include <linux/oid_registry.h>
--#include "public_key.h"
-+#include <crypto/public_key.h>
- #include "x509_parser.h"
- #include "x509-asn1.h"
- #include "x509_rsakey-asn1.h"
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index a6c4203..8f35975 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -21,7 +21,6 @@
- #include <keys/system_keyring.h>
- #include <crypto/hash.h>
- #include "asymmetric_keys.h"
--#include "public_key.h"
- #include "x509_parser.h"
- 
- static bool use_builtin_keys;
-@@ -250,8 +249,6 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 	if (cert->pub->pkey_algo >= PKEY_ALGO__LAST ||
- 	    cert->sig.pkey_algo >= PKEY_ALGO__LAST ||
- 	    cert->sig.pkey_hash_algo >= PKEY_HASH__LAST ||
--	    !pkey_algo[cert->pub->pkey_algo] ||
--	    !pkey_algo[cert->sig.pkey_algo] ||
- 	    !hash_algo_name[cert->sig.pkey_hash_algo]) {
- 		ret = -ENOPKG;
- 		goto error_free_cert;
-@@ -270,7 +267,6 @@ static int x509_key_preparse(struct key_preparsed_payload *prep)
- 		 pkey_algo_name[cert->sig.pkey_algo],
- 		 hash_algo_name[cert->sig.pkey_hash_algo]);
- 
--	cert->pub->algo = pkey_algo[cert->pub->pkey_algo];
- 	cert->pub->id_type = PKEY_ID_X509;
- 
- 	/* Check the signature on the key if it appears to be self-signed */
-diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-index 54add20..34b6fb8 100644
---- a/include/crypto/public_key.h
-+++ b/include/crypto/public_key.h
-@@ -25,7 +25,6 @@ enum pkey_algo {
- };
- 
- extern const char *const pkey_algo_name[PKEY_ALGO__LAST];
--extern const struct public_key_algorithm *pkey_algo[PKEY_ALGO__LAST];
- 
- /* asymmetric key implementation supports only up to SHA224 */
- #define PKEY_HASH__LAST		(HASH_ALGO_SHA224 + 1)
-@@ -45,12 +44,6 @@ extern const char *const pkey_id_type_name[PKEY_ID_TYPE__LAST];
-  * part.
-  */
- struct public_key {
--	const struct public_key_algorithm *algo;
--	u8	capabilities;
--#define PKEY_CAN_ENCRYPT	0x01
--#define PKEY_CAN_DECRYPT	0x02
--#define PKEY_CAN_SIGN		0x04
--#define PKEY_CAN_VERIFY		0x08
- 	enum pkey_algo pkey_algo : 8;
- 	enum pkey_id_type id_type : 8;
- 	union {
-@@ -95,6 +88,7 @@ struct public_key_signature {
- 	};
- };
- 
-+extern struct asymmetric_key_subtype public_key_subtype;
- struct key;
- extern int verify_signature(const struct key *key,
- 			    const struct public_key_signature *sig);
-@@ -104,4 +98,7 @@ extern struct key *x509_request_asymmetric_key(struct key *keyring,
- 					       const struct asymmetric_key_id *kid,
- 					       bool partial);
- 
-+int public_key_verify_signature(const struct public_key *pkey,
-+				const struct public_key_signature *sig);
 +
- #endif /* _LINUX_PUBLIC_KEY_H */
+ static int alg_test_null(const struct alg_test_desc *desc,
+ 			     const char *driver, u32 type, u32 mask)
+ {
+@@ -3399,6 +3540,16 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "rsa",
++		.test = alg_test_akcipher,
++		.fips_allowed = 1,
++		.suite = {
++			.akcipher = {
++				.vecs = rsa_tv_template,
++				.count = RSA_TEST_VECTORS
++			}
++		}
++	}, {
+ 		.alg = "salsa20",
+ 		.test = alg_test_skcipher,
+ 		.suite = {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 6003143..ab68906 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -107,9 +107,95 @@ struct drbg_testvec {
+ 	size_t expectedlen;
+ };
+ 
++struct akcipher_testvec {
++	unsigned char *pub_key_n;
++	unsigned char *pub_key_e;
++	unsigned char *sec_key_d;
++	unsigned char *m;
++	unsigned int pub_key_n_size;
++	unsigned int pub_key_e_size;
++	unsigned int sec_key_d_size;
++	unsigned int m_size;
++	unsigned int c_size; /* size of encrypted message */
++};
++
+ static char zeroed_string[48];
+ 
+ /*
++ * RSA test vectors. Borrowed from openSSL.
++ */
++#define RSA_TEST_VECTORS	3
++
++static struct akcipher_testvec rsa_tv_template [] = {
++	{
++	.pub_key_n =
++	"\x00\xAA\x36\xAB\xCE\x88\xAC\xFD\xFF\x55\x52\x3C\x7F\xC4\x52\x3F"
++	"\x90\xEF\xA0\x0D\xF3\x77\x4A\x25\x9F\x2E\x62\xB4\xC5\xD9\x9C\xB5"
++	"\xAD\xB3\x00\xA0\x28\x5E\x53\x01\x93\x0E\x0C\x70\xFB\x68\x76\x93"
++	"\x9C\xE6\x16\xCE\x62\x4A\x11\xE0\x08\x6D\x34\x1E\xBC\xAC\xA0\xA1"
++	"\xF5",
++	.pub_key_e = "\x11",
++	.sec_key_d =
++	"\x0A\x03\x37\x48\x62\x64\x87\x69\x5F\x5F\x30\xBC\x38\xB9\x8B\x44"
++	"\xC2\xCD\x2D\xFF\x43\x40\x98\xCD\x20\xD8\xA1\x38\xD0\x90\xBF\x64"
++	"\x79\x7C\x3F\xA7\xA2\xCD\xCB\x3C\xD1\xE0\xBD\xBA\x26\x54\xB4\xF9"
++	"\xDF\x8E\x8A\xE5\x9D\x73\x3D\x9F\x33\xB3\x01\x62\x4A\xFD\x1D\x51",
++	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
++	.pub_key_n_size = 65,
++	.pub_key_e_size = 1,
++	.sec_key_d_size = 64,
++	.m_size = 8,
++	.c_size = 64,
++	}, {
++	.pub_key_n =
++	"\x00\xA3\x07\x9A\x90\xDF\x0D\xFD\x72\xAC\x09\x0C\xCC\x2A\x78\xB8"
++	"\x74\x13\x13\x3E\x40\x75\x9C\x98\xFA\xF8\x20\x4F\x35\x8A\x0B\x26"
++	"\x3C\x67\x70\xE7\x83\xA9\x3B\x69\x71\xB7\x37\x79\xD2\x71\x7B\xE8"
++	"\x34\x77\xCF",
++	.pub_key_e = "\x3",
++	.sec_key_d =
++	"\x6C\xAF\xBC\x60\x94\xB3\xFE\x4C\x72\xB0\xB3\x32\xC6\xFB\x25\xA2"
++	"\xB7\x62\x29\x80\x4E\x68\x65\xFC\xA4\x5A\x74\xDF\x0F\x8F\xB8\x41"
++	"\x3B\x52\xC0\xD0\xE5\x3D\x9B\x59\x0F\xF1\x9B\xE7\x9F\x49\xDD\x21"
++	"\xE5\xEB",
++	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
++	.pub_key_n_size = 51,
++	.pub_key_e_size = 1,
++	.sec_key_d_size = 50,
++	.m_size = 8,
++	.c_size = 24,
++	}, {
++	.pub_key_n =
++	"\x00\xBB\xF8\x2F\x09\x06\x82\xCE\x9C\x23\x38\xAC\x2B\x9D\xA8\x71"
++	"\xF7\x36\x8D\x07\xEE\xD4\x10\x43\xA4\x40\xD6\xB6\xF0\x74\x54\xF5"
++	"\x1F\xB8\xDF\xBA\xAF\x03\x5C\x02\xAB\x61\xEA\x48\xCE\xEB\x6F\xCD"
++	"\x48\x76\xED\x52\x0D\x60\xE1\xEC\x46\x19\x71\x9D\x8A\x5B\x8B\x80"
++	"\x7F\xAF\xB8\xE0\xA3\xDF\xC7\x37\x72\x3E\xE6\xB4\xB7\xD9\x3A\x25"
++	"\x84\xEE\x6A\x64\x9D\x06\x09\x53\x74\x88\x34\xB2\x45\x45\x98\x39"
++	"\x4E\xE0\xAA\xB1\x2D\x7B\x61\xA5\x1F\x52\x7A\x9A\x41\xF6\xC1\x68"
++	"\x7F\xE2\x53\x72\x98\xCA\x2A\x8F\x59\x46\xF8\xE5\xFD\x09\x1D\xBD"
++	"\xCB",
++	.pub_key_e = "\x11",
++	.sec_key_d =
++	"\x00\xA5\xDA\xFC\x53\x41\xFA\xF2\x89\xC4\xB9\x88\xDB\x30\xC1\xCD"
++	"\xF8\x3F\x31\x25\x1E\x06\x68\xB4\x27\x84\x81\x38\x01\x57\x96\x41"
++	"\xB2\x94\x10\xB3\xC7\x99\x8D\x6B\xC4\x65\x74\x5E\x5C\x39\x26\x69"
++	"\xD6\x87\x0D\xA2\xC0\x82\xA9\x39\xE3\x7F\xDC\xB8\x2E\xC9\x3E\xDA"
++	"\xC9\x7F\xF3\xAD\x59\x50\xAC\xCF\xBC\x11\x1C\x76\xF1\xA9\x52\x94"
++	"\x44\xE5\x6A\xAF\x68\xC5\x6C\x09\x2C\xD3\x8D\xC3\xBE\xF5\xD2\x0A"
++	"\x93\x99\x26\xED\x4F\x74\xA1\x3E\xDD\xFB\xE1\xA1\xCE\xCC\x48\x94"
++	"\xAF\x94\x28\xC2\xB7\xB8\x88\x3F\xE4\x46\x3A\x4B\xC8\x5B\x1C\xB3"
++	"\xC1",
++	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
++	.pub_key_n_size = 129,
++	.pub_key_e_size = 1,
++	.sec_key_d_size = 129,
++	.m_size = 8,
++	.c_size = 128,
++	}
++};
++
++/*
+  * MD4 test vectors from RFC1320
+  */
+ #define MD4_TEST_VECTORS	7
