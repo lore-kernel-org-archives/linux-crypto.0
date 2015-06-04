@@ -1,53 +1,52 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RFC v3 2/3] crypto: RSA: KEYS: convert rsa and public key
- to new PKE API
-Date: Thu, 4 Jun 2015 14:53:33 +0800
-Message-ID: <20150604065333.GB22158@gondor.apana.org.au>
-References: <20150603224403.22310.79731.stgit@tstruk-mobl1>
- <20150603224414.22310.17260.stgit@tstruk-mobl1>
+Subject: Re: [PATCH 0/9] crypto: Add ChaCha20-Poly1305 AEAD support for IPsec
+Date: Thu, 4 Jun 2015 16:13:55 +0800
+Message-ID: <20150604081355.GA23360@gondor.apana.org.au>
+References: <1433159044-30753-1-git-send-email-martin@strongswan.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
-	jwboyer@redhat.com, richard@nod.at, steved@redhat.com,
-	qat-linux@intel.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	vgoyal@redhat.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	linux-crypto@vger.kernel.org
+To: Martin Willi <martin@strongswan.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:33294 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:37581 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751459AbbFDGxm (ORCPT
+	with ESMTP id S1752243AbbFDIOJ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Jun 2015 02:53:42 -0400
+	Thu, 4 Jun 2015 04:14:09 -0400
 Content-Disposition: inline
-In-Reply-To: <20150603224414.22310.17260.stgit@tstruk-mobl1>
+In-Reply-To: <1433159044-30753-1-git-send-email-martin@strongswan.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 03, 2015 at 03:44:14PM -0700, Tadeusz Struk wrote:
-> Change the existing rsa and public key code to integrate it
-> with the new Public Key Encryption API.
+On Mon, Jun 01, 2015 at 01:43:55PM +0200, Martin Willi wrote:
+> This is a first version of a patch series implementing the ChaCha20-Poly1305
+> AEAD construction defined in RFC7539. It is based on the current cryptodev tree.
 > 
-> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+> The first two patches implement the ChaCha20 cipher, the second two the Poly1305
+> authenticator, both in portable C for all architectures. Patch 5 and 6
+> provide an AEAD construction using the two cipher primitives, named rfc7539.
+> 
+> Patch 7 and 8 add a variant of the same AEAD that uses additional key material
+> as a nonce to shorten the explicit IV to 8 bytes, as defined for use in IPsec
+> in draft-ietf-ipsecme-chacha20-poly1305. The last patch exposes that AEAD
+> to IPsec users.
+> 
+> I don't expect any technical changes to draft-ietf-ipsecme-chacha20-poly1305,
+> but we don't have an RFC name yet to reference the AEAD. We therefore simply
+> name it rfc7539esp, but other suggestions are welcome.
+> 
+> The AEAD uses the crypto_nivaead_type to make it available to IPsec. However,
+> I was unable to run test vectors against this type of AEAD on cryptodev, but
+> I've verified the vectors against the same AEAD using crypto_aead_type.
+> Additionally IPsec traffic has been tested against our userland ESP backend in
+> strongSwan.
+> 
+> On my x64_64 test setup the IPsec throughput is ~700Mbits/s with these portable
+> drivers. Architecture specific drivers subject to a future patchset can improve
+> performance, for example with SSE doubling performance is feasible.
 
-I'd like to see this split into multiple patches.  First of all
-the new crypto_akcipher implementation should coexist with the
-existing code.  That way the exiting users can be converted over
-one-by-one.
-
-Also you should implement the crypto_akcipher completely before
-converting anybody over, that means doing encoding/wrapping in
-addition to the crypto.
-
-That way we don't have to have craziness like converting in and
-out of MPI multiple times.
-
-Lastly you should consider adding an MPI helper that writes to
-an existing buffer instead of allocating a new one and copying
-it over.
-
-Thanks,
+All applied.  Thanks a lot!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
