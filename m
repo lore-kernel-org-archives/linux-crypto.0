@@ -1,43 +1,41 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH RFC v3 2/3] crypto: RSA: KEYS: convert rsa and public
- key to new PKE API
-Date: Thu, 04 Jun 2015 10:23:30 -0700
-Message-ID: <55708992.4090100@intel.com>
-References: <20150603224403.22310.79731.stgit@tstruk-mobl1> <20150603224414.22310.17260.stgit@tstruk-mobl1> <20150604065333.GB22158@gondor.apana.org.au>
+From: Martin Willi <martin@strongswan.org>
+Subject: Re: [PATCH 3/9] crypto: Add a generic Poly1305 authenticator
+ implementation
+Date: Thu, 04 Jun 2015 21:42:31 +0200
+Message-ID: <1433446951.2945.6.camel@martin>
+References: <1433159044-30753-1-git-send-email-martin@strongswan.org>
+	 <1433159044-30753-4-git-send-email-martin@strongswan.org>
+	 <20150604095910.GA24246@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
-	jwboyer@redhat.com, richard@nod.at, steved@redhat.com,
-	qat-linux@intel.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	vgoyal@redhat.com
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150604065333.GB22158@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from sitav-80046.hsr.ch ([152.96.80.46]:57567 "EHLO
+	mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752184AbbFDTwD (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Jun 2015 15:52:03 -0400
+In-Reply-To: <20150604095910.GA24246@gondor.apana.org.au>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On 06/03/2015 11:53 PM, Herbert Xu wrote:
-> I'd like to see this split into multiple patches.  First of all
-> the new crypto_akcipher implementation should coexist with the
-> existing code.  That way the exiting users can be converted over
-> one-by-one.
-> 
-> Also you should implement the crypto_akcipher completely before
-> converting anybody over, that means doing encoding/wrapping in
-> addition to the crypto.
-> 
-> That way we don't have to have craziness like converting in and
-> out of MPI multiple times.
+Herbert,
 
-That's cool. It will make it easier for me. I wanted to convert
-one to show that the interface is working.
+> I just realised that this doesn't quite work.  The key is shared
+> by all users of the tfm, yet in your case you need it to be local
 
-> 
-> Lastly you should consider adding an MPI helper that writes to
-> an existing buffer instead of allocating a new one and copying
-> it over.
+I agree, as Poly1305 uses a different key for each tag the current
+approach doesn't work.
 
-I'll think about something.
+> I think the simplest solution is to make the key the beginning
+> of the hashed text instead.  So the first two blocks that you
+> process get used as the key.
+
+Yes, that makes sense. I'll prepare a fix, might require some days,
+though.
+
+Thanks!
+Martin
