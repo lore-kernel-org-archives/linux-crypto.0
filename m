@@ -1,31 +1,33 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/2] Doc:crypto: Fix typo in crypto-API.tmpl
-Date: Thu, 4 Jun 2015 16:14:34 +0800
-Message-ID: <20150604081433.GC23360@gondor.apana.org.au>
-References: <20150603032848.GA3126@gondor.apana.org.au>
- <1433343681-10060-1-git-send-email-standby24x7@gmail.com>
+Subject: Re: [PATCH] crypto: fix nx-842 pSeries driver minimum buffer size
+Date: Thu, 4 Jun 2015 16:14:21 +0800
+Message-ID: <20150604081421.GB23360@gondor.apana.org.au>
+References: <1433272930-5991-1-git-send-email-ddstreet@ieee.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, corbet@lwn.net,
-	linux-crypto@vger.kernel.org
-To: Masanari Iida <standby24x7@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54549 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752958AbbFDIOi (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Jun 2015 04:14:38 -0400
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Dan Streetman <ddstreet@ieee.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1433343681-10060-1-git-send-email-standby24x7@gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1433272930-5991-1-git-send-email-ddstreet@ieee.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Thu, Jun 04, 2015 at 12:01:20AM +0900, Masanari Iida wrote:
-> This patch fix some spelling typo found in crypto-API.tmpl
+On Tue, Jun 02, 2015 at 03:22:10PM -0400, Dan Streetman wrote:
+> Reduce the nx-842 pSeries driver minimum buffer size from 128 to 8.
+> Also replace the single use of IO_BUFFER_ALIGN macro with the standard
+> and correct DDE_BUFFER_ALIGN.
 > 
-> Signed-off-by: Masanari Iida <standby24x7@gmail.com>
+> The hw sometimes rejects buffers that contain padding past the end of the
+> 8-byte aligned section where it sees the "end" marker.  With the minimum
+> buffer size set too high, some highly compressed buffers were being padded
+> and the hw was incorrectly rejecting them; this sets the minimum correctly
+> so there will be no incorrect padding.
+> 
+> Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 
-Both applied.
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
