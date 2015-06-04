@@ -1,41 +1,46 @@
-From: Martin Willi <martin@strongswan.org>
-Subject: Re: [PATCH 3/9] crypto: Add a generic Poly1305 authenticator
- implementation
-Date: Thu, 04 Jun 2015 21:42:31 +0200
-Message-ID: <1433446951.2945.6.camel@martin>
-References: <1433159044-30753-1-git-send-email-martin@strongswan.org>
-	 <1433159044-30753-4-git-send-email-martin@strongswan.org>
-	 <20150604095910.GA24246@gondor.apana.org.au>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [v2 PATCH 5/13] crypto: testmgr - Switch to new AEAD interface
+Date: Thu, 04 Jun 2015 15:15:19 -0700
+Message-ID: <5570CDF7.4090308@intel.com>
+References: <20150522082708.GA3507@gondor.apana.org.au> <E1YviM1-0000xu-GV@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-crypto@vger.kernel.org
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from sitav-80046.hsr.ch ([152.96.80.46]:57567 "EHLO
-	mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752184AbbFDTwD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 4 Jun 2015 15:52:03 -0400
-In-Reply-To: <20150604095910.GA24246@gondor.apana.org.au>
+Received: from mga14.intel.com ([192.55.52.115]:55612 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753136AbbFDWPJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 4 Jun 2015 18:15:09 -0400
+In-Reply-To: <E1YviM1-0000xu-GV@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Herbert,
+Hi Herbert,
+On 05/22/2015 01:30 AM, Herbert Xu wrote:
+> This patch makes use of the new AEAD interface which uses a single
+> SG list instead of separate lists for the AD and plain text.
 
-> I just realised that this doesn't quite work.  The key is shared
-> by all users of the tfm, yet in your case you need it to be local
+The fact the src and assoc point to the same sgl causes some inconsistency. The input I'm getting is:
+req->old = 1
+req->src_nents = 1
+req->src_len = 80
+req->dst_nents = 1
+req->dst_len = 80
+req->assoclen = 0
 
-I agree, as Poly1305 uses a different key for each tag the current
-approach doesn't work.
+but
 
-> I think the simplest solution is to make the key the beginning
-> of the hashed text instead.  So the first two blocks that you
-> process get used as the key.
+req->assoc_nents = 1
+req->assoc_len = 80
 
-Yes, that makes sense. I'll prepare a fix, might require some days,
-though.
-
-Thanks!
-Martin
+I presume req->assoc is obsolete now and drivers need to use req->assoclen. right?
+Currently I just loop over req->assoc to get the AD.
+regards,
+T
