@@ -1,104 +1,76 @@
-From: Paul Bolle <pebolle@tiscali.nl>
-Subject: Re: [PATCH RFC v3 2/3] crypto: RSA: KEYS: convert rsa and public
- key to new PKE API
-Date: Fri, 05 Jun 2015 10:50:12 +0200
-Message-ID: <1433494212.3358.16.camel@x220>
-References: <20150603224403.22310.79731.stgit@tstruk-mobl1>
-	 <20150603224414.22310.17260.stgit@tstruk-mobl1>
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Subject: [PATCH RFC] crypto: testmgr - Document struct cipher_testvec
+Date: Fri, 5 Jun 2015 11:39:22 +0200
+Message-ID: <20150605093922.GA16806@Red>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-	keescook@chromium.org, jwboyer@redhat.com, richard@nod.at,
-	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	vgoyal@redhat.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150603224414.22310.17260.stgit@tstruk-mobl1>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+To: linux-crypto@vger.kernel.org
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:38616 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751149AbbFEJj3 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Jun 2015 05:39:29 -0400
+Received: by wibdq8 with SMTP id dq8so12873628wib.1
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Jun 2015 02:39:28 -0700 (PDT)
+Received: from Red ([2a01:240:fe00:142::2])
+        by mx.google.com with ESMTPSA id ef10sm9738818wjd.49.2015.06.05.02.39.26
+        for <linux-crypto@vger.kernel.org>
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 05 Jun 2015 02:39:27 -0700 (PDT)
+Content-Disposition: inline
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-A few remarks, perhaps not of the kind you'd like for an RFC, that I
-hope are still relevant after Herbert's comment.
+Hello                                                                           
+                                                                                
+I was adding a test to testmgr for cbc(aes) but I hesitate on the cipher_testvec parameter also_non_np.
+                                                                                
+Since its functions is not trivial, I propose a patch for documenting the struture.
+                                                                                
+So does I have well understand the purpose of also_non_np ?                      
+And if yes what it is the interest of doing a test twice (one with and one without SG splitting) ?
+                                                                                
+Regards
 
-On Wed, 2015-06-03 at 15:44 -0700, Tadeusz Struk wrote:
-> --- a/crypto/asymmetric_keys/Makefile
-> +++ b/crypto/asymmetric_keys/Makefile
-> @@ -8,6 +8,7 @@ asymmetric_keys-y := asymmetric_type.o signature.o
->  
->  obj-$(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE) += public_key.o
->  obj-$(CONFIG_PUBLIC_KEY_ALGO_RSA) += rsa.o
-> +obj-$(CONFIG_PUBLIC_KEY_ALGO_RSA) += rsa_pkcs1_v1_5.o
+>From 0156e32be7dd7ffd0a4fdad8d0a3eaf3c0bf92c7 Mon Sep 17 00:00:00 2001
+From: LABBE Corentin <clabbe.montjoie@gmail.com>
+Date: Wed, 3 Jun 2015 09:09:13 +0200
+Subject: [PATCH 02/11] crypto: testmgr - Document struct cipher_testvec
 
-This builds two modules if PUBLIC_KEY_ALGO_RSA = 'm': rsa.ko and
-rsa_pkcs1_v1_5.ko. Is that what you want?
+Signed-off-by: LABBE Corentin <clabbe.montjoie@gmail.com>
+---
+ crypto/testmgr.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 8a31e9a..ab2019e 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -46,6 +46,24 @@ struct hash_testvec {
+ 	unsigned char ksize;
+ };
  
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-
-> +int rsa_pkcs1_v1_5_verify_signature(const struct public_key *pkey,
-> +				    const struct public_key_signature *sig);
-> +
-
-> -int public_key_verify_signature(const struct public_key *pk,
-> +int public_key_verify_signature(const struct public_key *pkey,
->  				const struct public_key_signature *sig)
->  {
-> [...]
-> -	return algo->verify_signature(pk, sig);
-> +	return rsa_pkcs1_v1_5_verify_signature(pkey, sig);
->  }
-
-
-> --- a/crypto/asymmetric_keys/rsa.c
-> +++ b/crypto/asymmetric_keys/rsa.c
- 
->  MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("RSA Public Key Algorithm");
-
-> +static int rsa_init(void)
-> +{
-> +	return crypto_register_akcipher(&rsa);
-> +}
-
-Is there a reason not to mark this __init? (This is not a rhetorical
-question, perhaps there really is.)
-
-> +static void rsa_exit(void)
-> +{
-> +	crypto_unregister_akcipher(&rsa);
-> +}
-
-Ditto for __exit.
-
-> +module_init(rsa_init);
-> +module_exit(rsa_exit);
-> +MODULE_ALIAS_CRYPTO("rsa");
-
-Could the MODULE_* macros be grouped in one place please?
-
-> --- /dev/null
-> +++ b/crypto/asymmetric_keys/rsa_pkcs1_v1_5.c
-
-> +/*
-> + * Perform the verification step [RFC3447 sec 8.2.2].
-> + */
-> +int rsa_pkcs1_v1_5_verify_signature(const struct public_key *pkey,
-> +				    const struct public_key_signature *sig)
-> +{
-> [...]
-> +}
-
-public_key.c uses this, so it can end up in public_key.ko. But it's not
-exported. So a _quick and dirty_ build test generated:
-    WARNING: "rsa_pkcs1_v1_5_verify_signature" [[...]/crypto/asymmetric_keys/public_key.ko] undefined!
-
-Also no MODULE_LICENSE() macro, so loading rsa_pkcs1_v1_5.ko should
-trigger a warning and taint the kernel.
-
-Thanks,
-
-
-Paul Bolle
++/*
++ * cipher_testvec:	structure to describe a cipher test
++ * @key:	A pointer to a key used by the test
++ * @klen:	The length of @key
++ * @iv:		A pointer to the IV used by the test
++ * @input:	A pointer to data used as input
++ * @ilen	The length of data in @input
++ * @result:	A pointer to what the test need to produce
++ * @rlen:	The length of data in @result
++ * @fail:	If set to one, the test need to fail
++ * @wk:		Does the test need CRYPTO_TFM_REQ_WEAK_KEY
++ * 		( e.g. test needs to fail due to a weak key )
++ * @np: 	numbers of SG to distribute data in (from 1 to MAX_TAP)
++ * @tap:	How to distribute data in @np SGs
++ * @also_non_np: 	if set to 1, the test will be also done without
++ * 			splitting data in @np SGs
++ */
++
+ struct cipher_testvec {
+ 	char *key;
+ 	char *iv;
+-- 
+2.3.6
