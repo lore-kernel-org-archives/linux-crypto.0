@@ -1,42 +1,32 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH RFC v3 2/3] crypto: RSA: KEYS: convert rsa and public
- key to new PKE API
-Date: Fri, 05 Jun 2015 09:42:39 -0700
-Message-ID: <5571D17F.90502@intel.com>
-References: <20150603224403.22310.79731.stgit@tstruk-mobl1>	 <20150603224414.22310.17260.stgit@tstruk-mobl1> <1433494212.3358.16.camel@x220>
+Subject: Re: [v2 PATCH 5/13] crypto: testmgr - Switch to new AEAD interface
+Date: Fri, 05 Jun 2015 15:10:00 -0700
+Message-ID: <55721E38.2060801@intel.com>
+References: <20150522082708.GA3507@gondor.apana.org.au> <E1YviM1-0000xu-GV@gondolin.me.apana.org.au> <5570CDF7.4090308@intel.com> <20150605035747.GC527@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-	keescook@chromium.org, jwboyer@redhat.com, richard@nod.at,
-	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	vgoyal@redhat.com
-To: Paul Bolle <pebolle@tiscali.nl>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:39728 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1422987AbbFEQmz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Jun 2015 12:42:55 -0400
-In-Reply-To: <1433494212.3358.16.camel@x220>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Stephan Mueller <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <netdev-owner@vger.kernel.org>
+In-Reply-To: <20150605035747.GC527@gondor.apana.org.au>
+Sender: netdev-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 06/05/2015 01:50 AM, Paul Bolle wrote:
-> This builds two modules if PUBLIC_KEY_ALGO_RSA = 'm': rsa.ko and
-> rsa_pkcs1_v1_5.ko. Is that what you want?
+On 06/04/2015 08:57 PM, Herbert Xu wrote:
+> Existing AEAD implementations should be completely unaware of
+> the new interface because we recreate the old req->assoc in the
+> crypto API.
 
-No, this not what I wanted.
+Yes, assuming that one is using req->assoclen not only req->assoc ;)
 
 > 
-> public_key.c uses this, so it can end up in public_key.ko. But it's not
-> exported. So a _quick and dirty_ build test generated:
->     WARNING: "rsa_pkcs1_v1_5_verify_signature" [[...]/crypto/asymmetric_keys/public_key.ko] undefined!
-> 
-> Also no MODULE_LICENSE() macro, so loading rsa_pkcs1_v1_5.ko should
-> trigger a warning and taint the kernel.
+> However, if you are creating a new AEAD implementation then yes
+> you should stop using req->assoc and fetch it from req->src instead.
 
-Thank you Paul for taking the time to review the patches and for your feedback.
-I'll have to change this again based on Herbert's feedback so this rsa_pkcs1_v1_5.c file
-will go away anyway.
+When do you expect the assoc will be removed?
