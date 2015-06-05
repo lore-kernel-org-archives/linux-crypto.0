@@ -1,46 +1,42 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: Crypto driver -DCP
-Date: Fri, 5 Jun 2015 16:38:03 +0200
-Message-ID: <201506051638.03892.marex@denx.de>
-References: <554BBD05.3050807@freescale.com> <201506041734.40053.marex@denx.de> <20150605035433.GB527@gondor.apana.org.au>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH RFC v3 2/3] crypto: RSA: KEYS: convert rsa and public
+ key to new PKE API
+Date: Fri, 05 Jun 2015 09:42:39 -0700
+Message-ID: <5571D17F.90502@intel.com>
+References: <20150603224403.22310.79731.stgit@tstruk-mobl1>	 <20150603224414.22310.17260.stgit@tstruk-mobl1> <1433494212.3358.16.camel@x220>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: Jay Monkman <jay.monkman@freescale.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+	keescook@chromium.org, jwboyer@redhat.com, richard@nod.at,
+	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
+	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	vgoyal@redhat.com
+To: Paul Bolle <pebolle@tiscali.nl>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:41645 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1423953AbbFEOjD (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 5 Jun 2015 10:39:03 -0400
-In-Reply-To: <20150605035433.GB527@gondor.apana.org.au>
+Received: from mga14.intel.com ([192.55.52.115]:39728 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1422987AbbFEQmz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 5 Jun 2015 12:42:55 -0400
+In-Reply-To: <1433494212.3358.16.camel@x220>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Friday, June 05, 2015 at 05:54:33 AM, Herbert Xu wrote:
-> On Thu, Jun 04, 2015 at 05:34:39PM +0200, Marek Vasut wrote:
-> > Is this really a valid way to go about crypto -- introduce all kinds
-> > of obscure nuances into the API which are driver specific at best ?
+On 06/05/2015 01:50 AM, Paul Bolle wrote:
+> This builds two modules if PUBLIC_KEY_ALGO_RSA = 'm': rsa.ko and
+> rsa_pkcs1_v1_5.ko. Is that what you want?
+
+No, this not what I wanted.
+
 > 
-> So what do you suggest?
+> public_key.c uses this, so it can end up in public_key.ko. But it's not
+> exported. So a _quick and dirty_ build test generated:
+>     WARNING: "rsa_pkcs1_v1_5_verify_signature" [[...]/crypto/asymmetric_keys/public_key.ko] undefined!
+> 
+> Also no MODULE_LICENSE() macro, so loading rsa_pkcs1_v1_5.ko should
+> trigger a warning and taint the kernel.
 
-Well what about extending the API ?
-
-Since Jay seems to be looking at the keyslots as well, it might make sense
-to consider the "DCP key" as a special case of a "fixed" keyslot.
-
-In general, it would probably make sense to add a flag to .setkey() to
-store the key in a keyslot. The keyslot allocation would be up to the
-driver. In case all keyslots would be full, the setkey() with the flag
-set would simply fail. This would imply you would need to have a counterpart
-function to .setkey() to free keyslots -- something like .unsetkey() .
-
-The .setkey() could also be extended with one more argument, integer one,
-to let users select which fixed keyslot to load the key from. Wouldn't
-that resolve the issue with multiple fixed keyslots too ?
-
-Best regards,
-Marek Vasut
+Thank you Paul for taking the time to review the patches and for your feedback.
+I'll have to change this again based on Herbert's feedback so this rsa_pkcs1_v1_5.c file
+will go away anyway.
