@@ -1,42 +1,32 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [v2 PATCH 5/13] crypto: testmgr - Switch to new AEAD interface
-Date: Sun, 7 Jun 2015 15:06:43 +0800
-Message-ID: <20150607070643.GA19281@gondor.apana.org.au>
-References: <20150522082708.GA3507@gondor.apana.org.au>
- <E1YviM1-0000xu-GV@gondolin.me.apana.org.au>
- <5570CDF7.4090308@intel.com>
- <20150605035747.GC527@gondor.apana.org.au>
- <55721E38.2060801@intel.com>
+Subject: Re: [PATCH] crypto: drbg - decrease verbosity
+Date: Mon, 8 Jun 2015 09:33:55 +0800
+Message-ID: <20150608013355.GA24494@gondor.apana.org.au>
+References: <7507652.XDRqQzIvs8@tachyon.chronox.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Stephan Mueller <smueller@chronox.de>
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Cc: linux-crypto@vger.kernel.org
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:44743 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:59030 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751345AbbFGHG5 (ORCPT
+	with ESMTP id S1750978AbbFHBeB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 7 Jun 2015 03:06:57 -0400
+	Sun, 7 Jun 2015 21:34:01 -0400
 Content-Disposition: inline
-In-Reply-To: <55721E38.2060801@intel.com>
+In-Reply-To: <7507652.XDRqQzIvs8@tachyon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 05, 2015 at 03:10:00PM -0700, Tadeusz Struk wrote:
-> 
-> Yes, assuming that one is using req->assoclen not only req->assoc ;)
+On Sat, Jun 06, 2015 at 04:20:35AM +0200, Stephan Mueller wrote:
+> When compiling the DRBG statically into the kernel, the testmgr
+> allocation of the DRBG may be done at a time the Jitter RNG is
+> not available. The testmgr instantiates a number of DRBGs for performing
+> testing which may cause a flurry of logs about unavailable Jitter RNG.
+> Note, the Jitter RNG is not needed for the testmgr operation anyways.
 
-You're quite right.  I found two more drivers that need to be fixed
-before this goes mainline.
-
-> When do you expect the assoc will be removed?
-
-It will be removed once every single driver has been converted.
+I think we should fix by ensuring the jitter is registered first.
+You could try registering jitter at subsys_init instead of module_init.
 
 Cheers,
 -- 
