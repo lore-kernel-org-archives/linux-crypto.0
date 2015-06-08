@@ -1,44 +1,54 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: crypto: caam - Clamp AEAD SG list by input length
-Date: Mon, 08 Jun 2015 07:34:23 -0700
-Message-ID: <5575A7EF.7090404@intel.com>
-References: <20150608083824.GA26193@gondor.apana.org.au> <55759CA6.8070108@intel.com> <20150608135325.GA31073@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: randconfig build error with next-20150529, in crypto/jitterentropy.c
+Date: Mon, 08 Jun 2015 17:52:49 +0200
+Message-ID: <2190933.vdB90a64Et@tauon.atsec.com>
+References: <CA+r1ZhhfcfZ5RvAtFEnR0y3Y79dz2Em7JsuqF_XRPBRhL5pROQ@mail.gmail.com> <20150608122502.GA29454@gondor.apana.org.au> <1433766990.1495.39.camel@twins>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Cristian Stoica <cristian.stoica@freescale.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:20417 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752228AbbFHOeP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Jun 2015 10:34:15 -0400
-In-Reply-To: <20150608135325.GA31073@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Jim Davis <jim.epost@gmail.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next <linux-next@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto <linux-crypto@vger.kernel.org>,
+	Waiman Long <Waiman.Long@hp.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	"x86@kernel.org" <x86@kernel.org>
+To: Peter Zijlstra <peterz@infradead.org>
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <1433766990.1495.39.camel@twins>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 06/08/2015 06:53 AM, Herbert Xu wrote:
-> On Mon, Jun 08, 2015 at 06:46:14AM -0700, Tadeusz Struk wrote:
->> On 06/08/2015 01:38 AM, Herbert Xu wrote:
->>> +static inline struct sec4_sg_entry *sg_to_sec4_sg_len(
->>> +	struct scatterlist *sg, unsigned int total,
->>> +	struct sec4_sg_entry *sec4_sg_ptr)
->>> +{
->>> +	do {
->>> +		unsigned int len = min(sg_dma_len(sg), total);
->>> +
->>> +		dma_to_sec4_sg_one(sec4_sg_ptr, sg_dma_address(sg), len, 0);
->>> +		sec4_sg_ptr++;
->>> +		sg = sg_next(sg);
->>> +		total -= len;
->>> +	} while (total);
->>> +	return sec4_sg_ptr - 1;
->>> +}
->>
->> Is req->assoclen guaranteed to be assoc->length aligned?
-> 
-> No req->assoclen can be any length.  What is the problem?
+Am Monday 08 June 2015, 14:36:30 schrieb Peter Zijlstra:
 
-There is no problem, just asking.
+Hi Peter,
+>
+>Would something like
+>
+>#pragma GCC push_options
+>#pragma GCC optimize ("-O0")
+>static __u64 jent_fold_time(struct rand_data *ec, __u64 time,
+>			    __u64 *folded, __u64 loop_cnt)
+>{
+>	...
+>}
+>#pragma GCC pop_options
+>
+>Be an option to allow the file to be compiled with regular optimizations
+>enabled?
+
+After doing some tests, I see that neither the min entropy nor the Shannon 
+Entropy of the raw noise is affected by using the mentioned pragmas at the 
+right locations.
+
+So I will prepare a patch tonight.
+
+Just for my edification: why does an -O0 on a self contained file break the 
+compile run? Any why do the pragmas work?
+
+Thanks
+Stephan
