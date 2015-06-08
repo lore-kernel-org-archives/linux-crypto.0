@@ -1,118 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: caam - Clamp AEAD SG list by input length
-Date: Mon, 8 Jun 2015 16:38:24 +0800
-Message-ID: <20150608083824.GA26193@gondor.apana.org.au>
+From: Marek Vasut <marex@denx.de>
+Subject: Re: Crypto driver -DCP
+Date: Mon, 8 Jun 2015 10:45:53 +0200
+Message-ID: <201506081045.53449.marex@denx.de>
+References: <554BBD05.3050807@freescale.com> <201506051638.03892.marex@denx.de> <20150608045200.GA25459@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Cristian Stoica <cristian.stoica@freescale.com>
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: Jay Monkman <jay.monkman@freescale.com>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55427 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752056AbbFHIia (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.10]:51016 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751735AbbFHIpw (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Jun 2015 04:38:30 -0400
-Content-Disposition: inline
+	Mon, 8 Jun 2015 04:45:52 -0400
+In-Reply-To: <20150608045200.GA25459@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Currently caam assumes that the SG list contains exactly the number
-of bytes required.  This assumption is incorrect.
+On Monday, June 08, 2015 at 06:52:00 AM, Herbert Xu wrote:
+> On Fri, Jun 05, 2015 at 04:38:03PM +0200, Marek Vasut wrote:
+> > In general, it would probably make sense to add a flag to .setkey() to
+> > store the key in a keyslot. The keyslot allocation would be up to the
+> > driver. In case all keyslots would be full, the setkey() with the flag
+> > set would simply fail. This would imply you would need to have a
+> > counterpart function to .setkey() to free keyslots -- something like
+> > .unsetkey() .
+> 
+> Changing setkey is going to cause too much churn.  In any case
+> I don't think these key slots should be written to by the kernel
+> since the intention appears to be for entites outside the kernel
+> to place secret keys in there that can then be used but not read
+> by the kernel.
 
-Up until now this has been harmless.  However with the new AEAD
-interface this now breaks as the AD SG list contains more bytes
-than just the AD.
+You mean like bootloader or you mean userspace code ? Maybe Jay
+can explain how these slots are intended to be used. I'd like to
+know the expected usecase.
 
-This patch fixes this by always clamping the AD SG list by the
-specified AD length.
+> So as far as the kernel is concerned these are constant keys.
+> 
+> Therefore there should be no need for unsetkey.
+> 
+> So perhaps just add a new call setkey_slot that is optional and
+> only needs to be implemented by drivers such as ccp.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+Might work as well ... but let's maybe wait for the usecase.
 
- drivers/crypto/caam/caamalg.c    |   20 ++++++++------------
- drivers/crypto/caam/sg_sw_sec4.h |   15 +++++++++++++++
- 2 files changed, 23 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 3d850ab..3c37fe6 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -2713,10 +2713,8 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 	sec4_sg_index = 0;
- 	if (!all_contig) {
- 		if (!is_gcm) {
--			sg_to_sec4_sg(req->assoc,
--				      assoc_nents,
--				      edesc->sec4_sg +
--				      sec4_sg_index, 0);
-+			sg_to_sec4_sg_len(req->assoc, req->assoclen,
-+					  edesc->sec4_sg + sec4_sg_index);
- 			sec4_sg_index += assoc_nents;
- 		}
- 
-@@ -2725,10 +2723,8 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 		sec4_sg_index += 1;
- 
- 		if (is_gcm) {
--			sg_to_sec4_sg(req->assoc,
--				      assoc_nents,
--				      edesc->sec4_sg +
--				      sec4_sg_index, 0);
-+			sg_to_sec4_sg_len(req->assoc, req->assoclen,
-+					  edesc->sec4_sg + sec4_sg_index);
- 			sec4_sg_index += assoc_nents;
- 		}
- 
-@@ -2953,8 +2949,8 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
- 	sec4_sg_index = 0;
- 	if (!(contig & GIV_SRC_CONTIG)) {
- 		if (!is_gcm) {
--			sg_to_sec4_sg(req->assoc, assoc_nents,
--				      edesc->sec4_sg + sec4_sg_index, 0);
-+			sg_to_sec4_sg_len(req->assoc, req->assoclen,
-+					  edesc->sec4_sg + sec4_sg_index);
- 			sec4_sg_index += assoc_nents;
- 		}
- 
-@@ -2963,8 +2959,8 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
- 		sec4_sg_index += 1;
- 
- 		if (is_gcm) {
--			sg_to_sec4_sg(req->assoc, assoc_nents,
--				      edesc->sec4_sg + sec4_sg_index, 0);
-+			sg_to_sec4_sg_len(req->assoc, req->assoclen,
-+					  edesc->sec4_sg + sec4_sg_index);
- 			sec4_sg_index += assoc_nents;
- 		}
- 
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index 3b91821..efbc1db 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -55,6 +55,21 @@ static inline void sg_to_sec4_sg_last(struct scatterlist *sg, int sg_count,
- 	sec4_sg_ptr->len |= SEC4_SG_LEN_FIN;
- }
- 
-+static inline struct sec4_sg_entry *sg_to_sec4_sg_len(
-+	struct scatterlist *sg, unsigned int total,
-+	struct sec4_sg_entry *sec4_sg_ptr)
-+{
-+	do {
-+		unsigned int len = min(sg_dma_len(sg), total);
-+
-+		dma_to_sec4_sg_one(sec4_sg_ptr, sg_dma_address(sg), len, 0);
-+		sec4_sg_ptr++;
-+		sg = sg_next(sg);
-+		total -= len;
-+	} while (total);
-+	return sec4_sg_ptr - 1;
-+}
-+
- /* count number of elements in scatterlist */
- static inline int __sg_count(struct scatterlist *sg_list, int nbytes,
- 			     bool *chained)
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Best regards,
+Marek Vasut
