@@ -1,52 +1,41 @@
-From: Marek Vasut <marex@denx.de>
-Subject: Re: Crypto driver -DCP
-Date: Mon, 8 Jun 2015 10:45:53 +0200
-Message-ID: <201506081045.53449.marex@denx.de>
-References: <554BBD05.3050807@freescale.com> <201506051638.03892.marex@denx.de> <20150608045200.GA25459@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH] crypto: drbg - decrease verbosity
+Date: Mon, 08 Jun 2015 13:02:12 +0200
+Message-ID: <11203229.1MDhPYad8M@tachyon.chronox.de>
+References: <7507652.XDRqQzIvs8@tachyon.chronox.de> <20150608013355.GA24494@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Jay Monkman <jay.monkman@freescale.com>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: linux-crypto@vger.kernel.org
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:51016 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751735AbbFHIpw (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 8 Jun 2015 04:45:52 -0400
-In-Reply-To: <20150608045200.GA25459@gondor.apana.org.au>
+Received: from mail.eperm.de ([89.247.134.16]:46111 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752248AbbFHLCY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 8 Jun 2015 07:02:24 -0400
+In-Reply-To: <20150608013355.GA24494@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Monday, June 08, 2015 at 06:52:00 AM, Herbert Xu wrote:
-> On Fri, Jun 05, 2015 at 04:38:03PM +0200, Marek Vasut wrote:
-> > In general, it would probably make sense to add a flag to .setkey() to
-> > store the key in a keyslot. The keyslot allocation would be up to the
-> > driver. In case all keyslots would be full, the setkey() with the flag
-> > set would simply fail. This would imply you would need to have a
-> > counterpart function to .setkey() to free keyslots -- something like
-> > .unsetkey() .
+Am Montag, 8. Juni 2015, 09:33:55 schrieb Herbert Xu:
+
+Hi Herbert,
+
+> On Sat, Jun 06, 2015 at 04:20:35AM +0200, Stephan Mueller wrote:
+> > When compiling the DRBG statically into the kernel, the testmgr
+> > allocation of the DRBG may be done at a time the Jitter RNG is
+> > not available. The testmgr instantiates a number of DRBGs for performing
+> > testing which may cause a flurry of logs about unavailable Jitter RNG.
+> > Note, the Jitter RNG is not needed for the testmgr operation anyways.
 > 
-> Changing setkey is going to cause too much churn.  In any case
-> I don't think these key slots should be written to by the kernel
-> since the intention appears to be for entites outside the kernel
-> to place secret keys in there that can then be used but not read
-> by the kernel.
+> I think we should fix by ensuring the jitter is registered first.
+> You could try registering jitter at subsys_init instead of module_init.
 
-You mean like bootloader or you mean userspace code ? Maybe Jay
-can explain how these slots are intended to be used. I'd like to
-know the expected usecase.
-
-> So as far as the kernel is concerned these are constant keys.
+Thanks for the hint about the root cause. I will do that right away.
 > 
-> Therefore there should be no need for unsetkey.
-> 
-> So perhaps just add a new call setkey_slot that is optional and
-> only needs to be implemented by drivers such as ccp.
+> Cheers,
 
-Might work as well ... but let's maybe wait for the usecase.
 
-Best regards,
-Marek Vasut
+-- 
+Ciao
+Stephan
