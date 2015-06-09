@@ -1,12 +1,13 @@
-From: Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [PATCH] crypto: drbg - use pragmas for disabling optimization
-Date: Mon, 08 Jun 2015 21:31:54 -0700
-Message-ID: <55766C3A.3070101@roeck-us.net>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: nios2: Export get_cycles
+Date: Tue, 9 Jun 2015 12:46:46 +0800
+Message-ID: <20150609044646.GA6892@gondor.apana.org.au>
 References: <3181127.KGS6GDHCq6@tachyon.chronox.de>
+ <55766C3A.3070101@roeck-us.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Peter Zijlstra
+Content-Type: text/plain; charset=us-ascii
+Cc: Stephan Mueller <smueller@chronox.de>,
+	Peter Zijlstra
 	<public-peterz-wegcikhe2lqwvfeawa7xhq@plane.gmane.org>,
 	Andy Shevchenko <andy.shevchenko@gmail.com>,
 	Jim Davis <jim.epost@gmail.com>,
@@ -16,67 +17,51 @@ Cc: Peter Zijlstra
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, Waiman Long <waiman.long@hp.com>,
 	Ingo Molnar <mingo@kernel.org>, x86 <x86@kernel.org>
-To: Stephan Mueller <smueller@chronox.de>, herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bh-25.webhostbox.net ([208.91.199.152]:41058 "EHLO
-	bh-25.webhostbox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750814AbbFIEcE (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Jun 2015 00:32:04 -0400
-In-Reply-To: <3181127.KGS6GDHCq6@tachyon.chronox.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Return-path: <linux-next-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <55766C3A.3070101@roeck-us.net>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 06/08/2015 07:08 PM, Stephan Mueller wrote:
-> Hi,
->
-> I performed measurements of the upper and lower boundary of the minimum and
-> Shannon entropy for the RNG before the patch and after the patch. The values
-> are very similar which demonstrates that the change does not affect the
-> cryptographic characteristics of the RNG.
->
-> The tests are available at:
->
-> [1] shows the lower boundary of the fully non-optimized RNG
->
-> [2] shows the lower boundary of the RNG with the patch below
->
-> [3] shows the upper boundary of the fully non-optimized RNG
->
-> [4] shows the upper boundary of the RNG with the patch below
->
-> The pictures are fully explained in [5], but the key values are the minimum
-> and Shannon entropy numbers in the legend of the graphs.
->
-> [1] http://www.eperm.de/userspace-foldtime-testO0.data-single-time-dist-delta-3036-hist.pdf
->
-> [2] http://www.eperm.de/userspace-foldtime-test-pragmas-O2.data-single-time-dist-delta-2370-hist.pdf
->
-> [3] http://www.eperm.de/userspace-foldtime-testO0.data-varying-time-dist-delta-7302-hist.pdf
->
-> [4] http://www.eperm.de/userspace-foldtime-test-pragmas-O2.data-varying-time-dist-delta-7055-hist.pdf
->
-> [5] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.pdf
->
-> ---8<---
-> Replace the global -O0 compiler flag from the Makefile with GCC
-> pragmas to mark only the functions required to be compiled without
-> optimizations.
->
-> This patch also adds a comment describing the rationale for the
-> functions chosen to be compiled without optimizations.
->
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+On Mon, Jun 08, 2015 at 09:31:54PM -0700, Guenter Roeck wrote:
+> 
+> nios2 still fails to build with
+> 
+> ERROR: "get_cycles" [crypto/jitterentropy.ko] undefined!
 
-With openrisc, I get:
+It's the only arch that doesn't inline get_cycles and doesn't
+export it.
 
-   CC [M]  crypto/jitterentropy.o
-crypto/jitterentropy.c:266:9: warning: #pragma GCC target is not supported for this machine
+---8<---
+nios2 is the only architecture that does not inline get_cycles
+and does not export it.  This breaks crypto as it uses get_cycles
+in a number of modules.
 
-which may not be perfect, but is better than a compile error ;-).
+Reported-by: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-nios2 still fails to build with
-
-ERROR: "get_cycles" [crypto/jitterentropy.ko] undefined!
-
-Guenter
+diff --git a/arch/nios2/kernel/time.c b/arch/nios2/kernel/time.c
+index 7f45474..be186a7 100644
+--- a/arch/nios2/kernel/time.c
++++ b/arch/nios2/kernel/time.c
+@@ -8,6 +8,7 @@
+  * for more details.
+  */
+ 
++#include <linux/export.h>
+ #include <linux/interrupt.h>
+ #include <linux/clockchips.h>
+ #include <linux/clocksource.h>
+@@ -106,6 +107,7 @@ cycles_t get_cycles(void)
+ {
+ 	return nios2_timer_read(&nios2_cs.cs);
+ }
++EXPORT_SYMBOL(get_cycles);
+ 
+ static void nios2_timer_start(struct nios2_timer *timer)
+ {
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
