@@ -1,73 +1,82 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
+From: Guenter Roeck <linux@roeck-us.net>
 Subject: Re: [PATCH] crypto: drbg - use pragmas for disabling optimization
-Date: Tue, 9 Jun 2015 13:22:58 +1000
-Message-ID: <20150609132258.26f6b108@canb.auug.org.au>
+Date: Mon, 08 Jun 2015 21:31:54 -0700
+Message-ID: <55766C3A.3070101@roeck-us.net>
 References: <3181127.KGS6GDHCq6@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/l2q7TJoL1q4vS+nB_0gT27f"; protocol="application/pgp-signature"
-Cc: herbert@gondor.apana.org.au,
-	Peter Zijlstra
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Peter Zijlstra
 	<public-peterz-wegcikhe2lqwvfeawa7xhq@plane.gmane.org>,
 	Andy Shevchenko <andy.shevchenko@gmail.com>,
 	Jim Davis <jim.epost@gmail.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
 	Linux-Next <linux-next@vger.kernel.org>,
 	linux-kernel@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, Waiman Long <waiman.long@hp.com>,
-	Ingo Molnar <mingo@kernel.org>, x86 <x86@kernel.org>,
-	Guenter Roeck <linux@roeck-us.net>
-To: Stephan Mueller <smueller@chronox.de>
-Return-path: <linux-next-owner@vger.kernel.org>
+	Ingo Molnar <mingo@kernel.org>, x86 <x86@kernel.org>
+To: Stephan Mueller <smueller@chronox.de>, herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from bh-25.webhostbox.net ([208.91.199.152]:41058 "EHLO
+	bh-25.webhostbox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750814AbbFIEcE (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 9 Jun 2015 00:32:04 -0400
 In-Reply-To: <3181127.KGS6GDHCq6@tachyon.chronox.de>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
---Sig_/l2q7TJoL1q4vS+nB_0gT27f
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi Stephan,
-
-On Tue, 09 Jun 2015 04:08:49 +0200 Stephan Mueller <smueller@chronox.de> wr=
-ote:
+On 06/08/2015 07:08 PM, Stephan Mueller wrote:
+> Hi,
 >
+> I performed measurements of the upper and lower boundary of the minimum and
+> Shannon entropy for the RNG before the patch and after the patch. The values
+> are very similar which demonstrates that the change does not affect the
+> cryptographic characteristics of the RNG.
+>
+> The tests are available at:
+>
+> [1] shows the lower boundary of the fully non-optimized RNG
+>
+> [2] shows the lower boundary of the RNG with the patch below
+>
+> [3] shows the upper boundary of the fully non-optimized RNG
+>
+> [4] shows the upper boundary of the RNG with the patch below
+>
+> The pictures are fully explained in [5], but the key values are the minimum
+> and Shannon entropy numbers in the legend of the graphs.
+>
+> [1] http://www.eperm.de/userspace-foldtime-testO0.data-single-time-dist-delta-3036-hist.pdf
+>
+> [2] http://www.eperm.de/userspace-foldtime-test-pragmas-O2.data-single-time-dist-delta-2370-hist.pdf
+>
+> [3] http://www.eperm.de/userspace-foldtime-testO0.data-varying-time-dist-delta-7302-hist.pdf
+>
+> [4] http://www.eperm.de/userspace-foldtime-test-pragmas-O2.data-varying-time-dist-delta-7055-hist.pdf
+>
+> [5] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.pdf
+>
+> ---8<---
 > Replace the global -O0 compiler flag from the Makefile with GCC
 > pragmas to mark only the functions required to be compiled without
 > optimizations.
->=20
+>
 > This patch also adds a comment describing the rationale for the
 > functions chosen to be compiled without optimizations.
->=20
+>
 > Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
-I will add this as a fix patch to the crypto tree merge today (unless
-someone yells at me).
+With openrisc, I get:
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
+   CC [M]  crypto/jitterentropy.o
+crypto/jitterentropy.c:266:9: warning: #pragma GCC target is not supported for this machine
 
---Sig_/l2q7TJoL1q4vS+nB_0gT27f
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+which may not be perfect, but is better than a compile error ;-).
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+nios2 still fails to build with
 
-iQIcBAEBCAAGBQJVdlwXAAoJEMDTa8Ir7ZwVD+AP/1lO++xTQsvNYmgKcqX8mL+I
-/+RCH07+KtNbellYu+jax1FT2zxa0MOQJCXbI7VT5qPwsds5fPAJV2pKzUnvSolk
-xOHflZ6UAAIcDvhuCVepk03vGll0BnIjFSk6wJvqJSpJLh9WUX/tYAyHIqx3g2OM
-XDuWorLqy5Jp9oTQc8n0oRvRObmEnjHkYXKYWQ3PHmkbY5mov+IEWQMI2wxH0SSA
-9/o3iXinkbxxSDjU8VewMQF2hx5KQ1dAoTPfeXYx6waA5nzZzpZ6hzMzjQmYiipu
-6uKSEU+E6DTaO3DhwZvL/rKy1JxfkoHdiNm3uVF4mxeIBo8FF7gdm/2fBfv4jySR
-E+2h8vGMsIlKstR9ADUNrD6SyU97nDIoXL8OkCOQ34dfZYY3fhITj4n+OOO8O39P
-SSRZwiWVAXwYWmL1/eKj5nFsA7Fh27Z+/6uJFG7P9f1ebbuLf7S7s2eQp1xRbVhN
-h74CQMl8/vL+njwWffYzsRWsjyIDd5A06MNkOE7AmATqtgHPJxUAGlOllqmpYhiv
-R9wqvVEZ2iM6jBnKD08P6GuLNEoEsTMeUPJi+PXDfXSsWglYchl9RNWVR+mgssHG
-/jSmw0zVoPgk12wjCBLkiHiWxtLXvTQCq+H4Wd2BX8/+00p0NAQZ2lmXj9MjuJ6E
-DT4wJHDOyhjIawmPK6nQ
-=YgA9
------END PGP SIGNATURE-----
+ERROR: "get_cycles" [crypto/jitterentropy.ko] undefined!
 
---Sig_/l2q7TJoL1q4vS+nB_0gT27f--
+Guenter
