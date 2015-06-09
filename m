@@ -1,176 +1,364 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/3] random: Add callback API for random pool readiness
-Date: Tue, 09 Jun 2015 18:19:39 +0800
-Message-ID: <E1Z2Gd9-0002mc-QC@gondolin.me.apana.org.au>
+Subject: [PATCH 2/3] crypto: drbg - Use callback API for random readiness
+Date: Tue, 09 Jun 2015 18:19:41 +0800
+Message-ID: <E1Z2GdB-0002mv-3N@gondolin.me.apana.org.au>
 References: <20150609101830.GA10521@gondor.apana.org.au>
 To: Stephan Mueller <smueller@chronox.de>, Ted Tso <tytso@mit.edu>,
 	andreas.steffen@strongswan.org, sandyinchina@gmail.com,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54737 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752869AbbFIKTw (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 9 Jun 2015 06:19:52 -0400
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 The get_blocking_random_bytes API is broken because the wait can
 be arbitrarily long (potentially forever) so there is no safe way
 of calling it from within the kernel.
 
-This patch replaces it with a callback API instead.  The callback
-is invoked potentially from interrupt context so the user needs
-to schedule their own work thread if necessary.
+This patch replaces it with the new callback API which does not
+have this problem.
 
-In addition to adding callbacks, they can also be removed as
-otherwise this opens up a way for user-space to allocate kernel
-memory with no bound (by opening algif_rng descriptors and then
-closing them).
+The patch also removes the entropy buffer registered with the DRBG
+handle in favor of stack variables to hold the seed data.
 
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/char/random.c  |   78 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/random.h |    9 +++++
- 2 files changed, 87 insertions(+)
+ crypto/drbg.c         |  215 ++++++++++++++++++++++++++++----------------------
+ include/crypto/drbg.h |    3 
+ 2 files changed, 125 insertions(+), 93 deletions(-)
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 159d070..a1576ed 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -409,6 +409,9 @@ static DECLARE_WAIT_QUEUE_HEAD(random_write_wait);
- static DECLARE_WAIT_QUEUE_HEAD(urandom_init_wait);
- static struct fasync_struct *fasync;
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 04836b4..6118fd5 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -98,6 +98,7 @@
+  */
  
-+static DEFINE_SPINLOCK(random_ready_list_lock);
-+static LIST_HEAD(random_ready_list);
+ #include <crypto/drbg.h>
++#include <linux/kernel.h>
+ 
+ /***************************************************************
+  * Backend cipher definitions available to DRBG
+@@ -190,6 +191,8 @@ static const struct drbg_core drbg_cores[] = {
+ #endif /* CONFIG_CRYPTO_DRBG_HMAC */
+ };
+ 
++static int drbg_uninstantiate(struct drbg_state *drbg);
 +
- /**********************************************************************
-  *
-  * OS independent entropy store.   Here are the functions which handle
-@@ -589,6 +592,22 @@ static void fast_mix(struct fast_pool *f)
- 	f->count++;
+ /******************************************************************
+  * Generic helper functions
+  ******************************************************************/
+@@ -1062,20 +1065,32 @@ static void drbg_async_seed(struct work_struct *work)
+ 	LIST_HEAD(seedlist);
+ 	struct drbg_state *drbg = container_of(work, struct drbg_state,
+ 					       seed_work);
+-	int ret;
++	unsigned int entropylen = drbg_sec_strength(drbg->core->flags);
++	unsigned char entropy[32];
+ 
+-	get_blocking_random_bytes(drbg->seed_buf, drbg->seed_buf_len);
++	BUG_ON(!entropylen);
++	BUG_ON(entropylen > sizeof(entropy));
++	get_random_bytes(entropy, entropylen);
+ 
+-	drbg_string_fill(&data, drbg->seed_buf, drbg->seed_buf_len);
++	drbg_string_fill(&data, entropy, entropylen);
+ 	list_add_tail(&data.list, &seedlist);
++
+ 	mutex_lock(&drbg->drbg_mutex);
+-	ret = __drbg_seed(drbg, &seedlist, true);
+-	if (!ret && drbg->jent) {
+-		crypto_free_rng(drbg->jent);
+-		drbg->jent = NULL;
+-	}
+-	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len);
++
++	/* If nonblocking pool is initialized, deactivate Jitter RNG */
++	crypto_free_rng(drbg->jent);
++	drbg->jent = NULL;
++
++	/* Set seeded to false so that if __drbg_seed fails the
++	 * next generate call will trigger a reseed.
++	 */
++	drbg->seeded = false;
++
++	__drbg_seed(drbg, &seedlist, true);
++
+ 	mutex_unlock(&drbg->drbg_mutex);
++
++	memzero_explicit(entropy, entropylen);
  }
  
-+static void process_random_ready_list(void)
-+{
-+	unsigned long flags;
-+	struct random_ready_callback *rdy, *tmp;
-+
-+	spin_lock_irqsave(&random_ready_list_lock, flags);
-+	list_for_each_entry_safe(rdy, tmp, &random_ready_list, list) {
-+		struct module *owner = rdy->owner;
-+
-+		list_del_init(&rdy->list);
-+		rdy->func(rdy);
-+		module_put(owner);
-+	}
-+	spin_unlock_irqrestore(&random_ready_list_lock, flags);
-+}
-+
  /*
-  * Credit (or debit) the entropy store with n bits of entropy.
-  * Use credit_entropy_bits_safe() if the value comes from userspace
-@@ -660,6 +679,7 @@ retry:
- 		r->entropy_total = 0;
- 		if (r == &nonblocking_pool) {
- 			prandom_reseed_late();
-+			process_random_ready_list();
- 			wake_up_all(&urandom_init_wait);
- 			pr_notice("random: %s pool is initialized\n", r->name);
+@@ -1092,7 +1107,9 @@ static void drbg_async_seed(struct work_struct *work)
+ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 		     bool reseed)
+ {
+-	int ret = 0;
++	int ret;
++	unsigned char entropy[((32 + 16) * 2)];
++	unsigned int entropylen = drbg_sec_strength(drbg->core->flags);
+ 	struct drbg_string data1;
+ 	LIST_HEAD(seedlist);
+ 
+@@ -1108,23 +1125,39 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 				 drbg->test_data.len);
+ 		pr_devel("DRBG: using test entropy\n");
+ 	} else {
++		/*
++		 * Gather entropy equal to the security strength of the DRBG.
++		 * With a derivation function, a nonce is required in addition
++		 * to the entropy. A nonce must be at least 1/2 of the security
++		 * strength of the DRBG in size. Thus, entropy + nonce is 3/2
++		 * of the strength. The consideration of a nonce is only
++		 * applicable during initial seeding.
++		 */
++		BUG_ON(!entropylen);
++		if (!reseed)
++			entropylen = ((entropylen + 1) / 2) * 3;
++		BUG_ON((entropylen * 2) > sizeof(entropy));
++
+ 		/* Get seed from in-kernel /dev/urandom */
+-		get_random_bytes(drbg->seed_buf, drbg->seed_buf_len);
+-
+-		/* Get seed from Jitter RNG */
+-		if (!drbg->jent ||
+-		    crypto_rng_get_bytes(drbg->jent,
+-					 drbg->seed_buf + drbg->seed_buf_len,
+-					 drbg->seed_buf_len)) {
+-			drbg_string_fill(&data1, drbg->seed_buf,
+-					 drbg->seed_buf_len);
+-			pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
+-				 drbg->seed_buf_len);
++		get_random_bytes(entropy, entropylen);
++
++		if (!drbg->jent) {
++			drbg_string_fill(&data1, entropy, entropylen);
++			pr_devel("DRBG: (re)seeding with %u bytes of entropy\n",
++				 entropylen);
+ 		} else {
+-			drbg_string_fill(&data1, drbg->seed_buf,
+-					 drbg->seed_buf_len * 2);
+-			pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
+-				 drbg->seed_buf_len * 2);
++			/* Get seed from Jitter RNG */
++			ret = crypto_rng_get_bytes(drbg->jent,
++						   entropy + entropylen,
++						   entropylen);
++			if (ret) {
++				pr_devel("DRBG: jent failed with %d\n", ret);
++				return ret;
++			}
++
++			drbg_string_fill(&data1, entropy, entropylen * 2);
++			pr_devel("DRBG: (re)seeding with %u bytes of entropy\n",
++				 entropylen * 2);
  		}
-@@ -1257,6 +1277,64 @@ void get_blocking_random_bytes(void *buf, int nbytes)
- EXPORT_SYMBOL(get_blocking_random_bytes);
+ 	}
+ 	list_add_tail(&data1.list, &seedlist);
+@@ -1146,26 +1179,8 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 
+ 	ret = __drbg_seed(drbg, &seedlist, reseed);
+ 
+-	/*
+-	 * Clear the initial entropy buffer as the async call may not overwrite
+-	 * that buffer for quite some time.
+-	 */
+-	memzero_explicit(drbg->seed_buf, drbg->seed_buf_len * 2);
+-	if (ret)
+-		goto out;
+-	/*
+-	 * For all subsequent seeding calls, we only need the seed buffer
+-	 * equal to the security strength of the DRBG. We undo the calculation
+-	 * in drbg_alloc_state.
+-	 */
+-	if (!reseed)
+-		drbg->seed_buf_len = drbg->seed_buf_len / 3 * 2;
+-
+-	/* Invoke asynchronous seeding unless DRBG is in test mode. */
+-	if (!list_empty(&drbg->test_data.list) && !reseed)
+-		schedule_work(&drbg->seed_work);
++	memzero_explicit(entropy, entropylen * 2);
+ 
+-out:
+ 	return ret;
+ }
+ 
+@@ -1188,12 +1203,6 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+ 	drbg->prev = NULL;
+ 	drbg->fips_primed = false;
+ #endif
+-	kzfree(drbg->seed_buf);
+-	drbg->seed_buf = NULL;
+-	if (drbg->jent) {
+-		crypto_free_rng(drbg->jent);
+-		drbg->jent = NULL;
+-	}
+ }
  
  /*
-+ * Add a callback function that will be invoked when the nonblocking
-+ * pool is initialised.
-+ *
-+ * returns: 0 if callback is successfully added
-+ *	    -EALREADY if pool is already initialised (callback not called)
-+ *	    -ENOENT if module for callback is not alive
-+ */
-+int add_random_ready_callback(struct random_ready_callback *rdy)
+@@ -1256,42 +1265,6 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 			goto err;
+ 	}
+ 
+-	/*
+-	 * Gather entropy equal to the security strength of the DRBG.
+-	 * With a derivation function, a nonce is required in addition
+-	 * to the entropy. A nonce must be at least 1/2 of the security
+-	 * strength of the DRBG in size. Thus, entropy * nonce is 3/2
+-	 * of the strength. The consideration of a nonce is only
+-	 * applicable during initial seeding.
+-	 */
+-	drbg->seed_buf_len = drbg_sec_strength(drbg->core->flags);
+-	if (!drbg->seed_buf_len) {
+-		ret = -EFAULT;
+-		goto err;
+-	}
+-	/*
+-	 * Ensure we have sufficient buffer space for initial seed which
+-	 * consists of the seed from get_random_bytes and the Jitter RNG.
+-	 */
+-	drbg->seed_buf_len = ((drbg->seed_buf_len + 1) / 2) * 3;
+-	drbg->seed_buf = kzalloc(drbg->seed_buf_len * 2, GFP_KERNEL);
+-	if (!drbg->seed_buf)
+-		goto err;
+-
+-	INIT_WORK(&drbg->seed_work, drbg_async_seed);
+-
+-	drbg->jent = crypto_alloc_rng("jitterentropy_rng", 0, 0);
+-	if(IS_ERR(drbg->jent))
+-	{
+-		pr_info("DRBG: could not allocate Jitter RNG handle for seeding\n");
+-		/*
+-		 * As the Jitter RNG is a module that may not be present, we
+-		 * continue with the operation and do not fully tie the DRBG
+-		 * to the Jitter RNG.
+-		 */
+-		drbg->jent = NULL;
+-	}
+-
+ 	return 0;
+ 
+ err:
+@@ -1467,6 +1440,47 @@ static int drbg_generate_long(struct drbg_state *drbg,
+ 	return 0;
+ }
+ 
++static void drbg_schedule_async_seed(struct random_ready_callback *rdy)
 +{
-+	struct module *owner;
-+	unsigned long flags;
-+	int err = -EALREADY;
++	struct drbg_state *drbg = container_of(rdy, struct drbg_state,
++					       random_ready);
 +
-+	if (likely(nonblocking_pool.initialized))
++	schedule_work(&drbg->seed_work);
++}
++
++static int drbg_prepare_hrng(struct drbg_state *drbg)
++{
++	int err;
++
++	/* We do not need an HRNG in test mode. */
++	if (list_empty(&drbg->test_data.list))
++		return 0;
++
++	INIT_WORK(&drbg->seed_work, drbg_async_seed);
++
++	drbg->random_ready.owner = THIS_MODULE;
++	drbg->random_ready.func = drbg_schedule_async_seed;
++
++	err = add_random_ready_callback(&drbg->random_ready);
++
++	switch (err) {
++	case 0:
++		break;
++
++	case -EALREADY:
++		err = 0;
++		/* fall through */
++
++	default:
++		drbg->random_ready.func = NULL;
 +		return err;
++	}
 +
-+	owner = rdy->owner;
-+	if (!try_module_get(owner))
-+		return -ENOENT;
-+
-+	spin_lock_irqsave(&random_ready_list_lock, flags);
-+	if (nonblocking_pool.initialized)
-+		goto out;
-+
-+	owner = NULL;
-+
-+	list_add(&rdy->list, &random_ready_list);
-+	err = 0;
-+
-+out:
-+	spin_unlock_irqrestore(&random_ready_list_lock, flags);
-+
-+	module_put(owner);
++	drbg->jent = crypto_alloc_rng("jitterentropy_rng", 0, 0);
 +
 +	return err;
 +}
-+EXPORT_SYMBOL(add_random_ready_callback);
 +
-+/*
-+ * Delete a previously registered readiness callback function.
-+ */
-+void del_random_ready_callback(struct random_ready_callback *rdy)
-+{
-+	unsigned long flags;
-+	struct module *owner = NULL;
+ /*
+  * DRBG instantiation function as required by SP800-90A - this function
+  * sets up the DRBG handle, performs the initial seeding and all sanity
+@@ -1517,15 +1531,23 @@ static int drbg_instantiate(struct drbg_state *drbg, struct drbg_string *pers,
+ 		if (drbg->d_ops->crypto_init(drbg))
+ 			goto err;
+ 
++		ret = drbg_prepare_hrng(drbg);
++		if (ret)
++			goto free_everything;
 +
-+	spin_lock_irqsave(&random_ready_list_lock, flags);
-+	if (!list_empty(&rdy->list)) {
-+		list_del_init(&rdy->list);
-+		owner = rdy->owner;
++		if (IS_ERR(drbg->jent)) {
++			ret = PTR_ERR(drbg->jent);
++			drbg->jent = NULL;
++			goto free_everything;
++		}
++
+ 		reseed = false;
+ 	}
+ 
+ 	ret = drbg_seed(drbg, pers, reseed);
+ 
+-	if (ret && !reseed) {
+-		drbg->d_ops->crypto_fini(drbg);
+-		goto err;
+-	}
++	if (ret && !reseed)
++		goto free_everything;
+ 
+ 	mutex_unlock(&drbg->drbg_mutex);
+ 	return ret;
+@@ -1535,6 +1557,11 @@ err:
+ unlock:
+ 	mutex_unlock(&drbg->drbg_mutex);
+ 	return ret;
++
++free_everything:
++	mutex_unlock(&drbg->drbg_mutex);
++	drbg_uninstantiate(drbg);
++	return ret;
+ }
+ 
+ /*
+@@ -1548,7 +1575,13 @@ unlock:
+  */
+ static int drbg_uninstantiate(struct drbg_state *drbg)
+ {
+-	cancel_work_sync(&drbg->seed_work);
++	if (drbg->random_ready.func) {
++		del_random_ready_callback(&drbg->random_ready);
++		cancel_work_sync(&drbg->seed_work);
++		crypto_free_rng(drbg->jent);
++		drbg->jent = NULL;
 +	}
-+	spin_unlock_irqrestore(&random_ready_list_lock, flags);
 +
-+	module_put(owner);
-+}
-+EXPORT_SYMBOL(del_random_ready_callback);
-+
-+/*
-  * This function will use the architecture-specific hardware random
-  * number generator if it is available.  The arch-specific hw RNG will
-  * almost certainly be faster than what we can do in software, but it
-diff --git a/include/linux/random.h b/include/linux/random.h
-index 796267d..30e2aca 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -6,8 +6,15 @@
- #ifndef _LINUX_RANDOM_H
- #define _LINUX_RANDOM_H
+ 	if (drbg->d_ops)
+ 		drbg->d_ops->crypto_fini(drbg);
+ 	drbg_dealloc_state(drbg);
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index c3f208d..fad6450 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -121,12 +121,11 @@ struct drbg_state {
+ 	unsigned char *prev;	/* FIPS 140-2 continuous test value */
+ #endif
+ 	struct work_struct seed_work;	/* asynchronous seeding support */
+-	u8 *seed_buf;			/* buffer holding the seed */
+-	size_t seed_buf_len;
+ 	struct crypto_rng *jent;
+ 	const struct drbg_state_ops *d_ops;
+ 	const struct drbg_core *core;
+ 	struct drbg_string test_data;
++	struct random_ready_callback random_ready;
+ };
  
-+#include <linux/list.h>
- #include <uapi/linux/random.h>
- 
-+struct random_ready_callback {
-+	struct list_head list;
-+	void (*func)(struct random_ready_callback *rdy);
-+	struct module *owner;
-+};
-+
- extern void add_device_randomness(const void *, unsigned int);
- extern void add_input_randomness(unsigned int type, unsigned int code,
- 				 unsigned int value);
-@@ -15,6 +22,8 @@ extern void add_interrupt_randomness(int irq, int irq_flags);
- 
- extern void get_random_bytes(void *buf, int nbytes);
- extern void get_blocking_random_bytes(void *buf, int nbytes);
-+extern int add_random_ready_callback(struct random_ready_callback *rdy);
-+extern void del_random_ready_callback(struct random_ready_callback *rdy);
- extern void get_random_bytes_arch(void *buf, int nbytes);
- void generate_random_uuid(unsigned char uuid_out[16]);
- extern int random_int_secret_init(void);
+ static inline __u8 drbg_statelen(struct drbg_state *drbg)
