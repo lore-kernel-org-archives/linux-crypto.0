@@ -1,116 +1,53 @@
-From: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
-Subject: [V6 PATCH 4/7] crypto: ccp - Unify coherency checking logic with device_dma_is_coherent()
-Date: Wed, 10 Jun 2015 11:08:55 -0500
-Message-ID: <1433952538-22455-5-git-send-email-Suravee.Suthikulpanit@amd.com>
-References: <1433952538-22455-1-git-send-email-Suravee.Suthikulpanit@amd.com>
+From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Subject: Re: [PATCH] crypto/drbg: report backend_cra_name when allocation
+ fails
+Date: Thu, 11 Jun 2015 08:38:06 +0900
+Message-ID: <20150610233806.GA499@swordfish>
+References: <1433942868-16447-1-git-send-email-sergey.senozhatsky@gmail.com>
+ <1433942868-16447-2-git-send-email-sergey.senozhatsky@gmail.com>
+ <4705999.2gbf3TdHYZ@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <msalter@redhat.com>, <hanjun.guo@linaro.org>,
-	<al.stone@linaro.org>, <grant.likely@linaro.org>,
-	<leo.duran@amd.com>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-acpi@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linaro-acpi@lists.linaro.org>, <netdev@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>,
-	"Suravee Suthikulpanit" <Suravee.Suthikulpanit@amd.com>
-To: <rjw@rjwysocki.net>, <lenb@kernel.org>, <catalin.marinas@arm.com>,
-	<will.deacon@arm.com>, <thomas.lendacky@amd.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<arnd@arndb.de>, <kashyap.desai@avagotech.com>,
-	<sumit.saxena@avagotech.com>, <uday.lingala@avagotech.com>,
-	<vinholikatti@gmail.com>
-Return-path: <linux-acpi-owner@vger.kernel.org>
-In-Reply-To: <1433952538-22455-1-git-send-email-Suravee.Suthikulpanit@amd.com>
-Sender: linux-acpi-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sergey.senozhatsky.work@gmail.com
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mail-pd0-f193.google.com ([209.85.192.193]:33895 "EHLO
+	mail-pd0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751556AbbFJXhk (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 10 Jun 2015 19:37:40 -0400
+Content-Disposition: inline
+In-Reply-To: <4705999.2gbf3TdHYZ@tauon.atsec.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Currently, the driver has separate logic to determine device coherency
-for DT vs ACPI.  This patch simplifies the code with a call to
-device_dma_is_coherent().
+On (06/10/15 17:09), Stephan Mueller wrote:
+> Hi Sergey,
+> 
+> >Be more verbose and also report ->backend_cra_name when
+> >crypto_alloc_shash() or crypto_alloc_cipher() fail in
+> >drbg_init_hash_kernel() or drbg_init_sym_kernel()
+> >correspondingly.
+> >
+> >Example
+> > DRBG: could not allocate digest TFM handle: hmac(sha256)
+> >
+> >Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+> 
+> Headscratch -- the Kconfig should have HMAC selected for compilation. When 
+> HMAC is available (regardless whether it is a module or not), it is pulled in 
+> by the kernel crypto API. Thus, there should not have been the error that HMAC 
+> is missing.
+> 
+> Can you send your .config file, please?
+> 
 
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
----
- drivers/crypto/ccp/ccp-platform.c | 60 +--------------------------------------
- 1 file changed, 1 insertion(+), 59 deletions(-)
+Hi Stephan,
 
-diff --git a/drivers/crypto/ccp/ccp-platform.c b/drivers/crypto/ccp/ccp-platform.c
-index b1c20b2..e446781 100644
---- a/drivers/crypto/ccp/ccp-platform.c
-+++ b/drivers/crypto/ccp/ccp-platform.c
-@@ -90,58 +90,6 @@ static struct resource *ccp_find_mmio_area(struct ccp_device *ccp)
- 	return NULL;
- }
- 
--#ifdef CONFIG_ACPI
--static int ccp_acpi_support(struct ccp_device *ccp)
--{
--	struct ccp_platform *ccp_platform = ccp->dev_specific;
--	struct acpi_device *adev = ACPI_COMPANION(ccp->dev);
--	acpi_handle handle;
--	acpi_status status;
--	unsigned long long data;
--	int cca;
--
--	/* Retrieve the device cache coherency value */
--	handle = adev->handle;
--	do {
--		status = acpi_evaluate_integer(handle, "_CCA", NULL, &data);
--		if (!ACPI_FAILURE(status)) {
--			cca = data;
--			break;
--		}
--	} while (!ACPI_FAILURE(status));
--
--	if (ACPI_FAILURE(status)) {
--		dev_err(ccp->dev, "error obtaining acpi coherency value\n");
--		return -EINVAL;
--	}
--
--	ccp_platform->coherent = !!cca;
--
--	return 0;
--}
--#else	/* CONFIG_ACPI */
--static int ccp_acpi_support(struct ccp_device *ccp)
--{
--	return -EINVAL;
--}
--#endif
--
--#ifdef CONFIG_OF
--static int ccp_of_support(struct ccp_device *ccp)
--{
--	struct ccp_platform *ccp_platform = ccp->dev_specific;
--
--	ccp_platform->coherent = of_dma_is_coherent(ccp->dev->of_node);
--
--	return 0;
--}
--#else
--static int ccp_of_support(struct ccp_device *ccp)
--{
--	return -EINVAL;
--}
--#endif
--
- static int ccp_platform_probe(struct platform_device *pdev)
- {
- 	struct ccp_device *ccp;
-@@ -182,13 +130,7 @@ static int ccp_platform_probe(struct platform_device *pdev)
- 		goto e_err;
- 	}
- 
--	if (ccp_platform->use_acpi)
--		ret = ccp_acpi_support(ccp);
--	else
--		ret = ccp_of_support(ccp);
--	if (ret)
--		goto e_err;
--
-+	ccp_platform->coherent = device_dma_is_coherent(ccp->dev);
- 	if (ccp_platform->coherent)
- 		ccp->axcache = CACHE_WB_NO_ALLOC;
- 	else
--- 
-2.1.0
+sure, will post it later (as soon as I get back to my laptop).
 
+	-ss
