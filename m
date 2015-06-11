@@ -1,47 +1,32 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: drbg - Add select on sha256
-Date: Thu, 11 Jun 2015 08:55:10 +0800
-Message-ID: <20150611005510.GA9267@gondor.apana.org.au>
+From: Stephan Mueller <smueller@chronox.de>
+Subject: Re: crypto: drbg - Add select on sha256
+Date: Thu, 11 Jun 2015 03:37:38 +0200
+Message-ID: <7796083.9xmz0KqbMC@tachyon.chronox.de>
+References: <20150611005510.GA9267@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7Bit
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36028 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751392AbbFKAzP (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Jun 2015 20:55:15 -0400
-Content-Disposition: inline
+Received: from mail.eperm.de ([89.247.134.16]:46202 "EHLO mail.eperm.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751798AbbFKBhv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 10 Jun 2015 21:37:51 -0400
+In-Reply-To: <20150611005510.GA9267@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The hash-based DRBG variants all use sha256 so we need to add a
-select on it.
+Am Donnerstag, 11. Juni 2015, 08:55:10 schrieb Herbert Xu:
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/Kconfig |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi Herbert,
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index cb7806f..f6fc054 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1508,10 +1508,11 @@ config CRYPTO_DRBG_HMAC
- 	bool
- 	default y
- 	select CRYPTO_HMAC
-+	select CRYPTO_SHA256
- 
- config CRYPTO_DRBG_HASH
- 	bool "Enable Hash DRBG"
--	select CRYPTO_HASH
-+	select CRYPTO_SHA256
- 	help
- 	  Enable the Hash DRBG variant as defined in NIST SP800-90A.
- 
+> The hash-based DRBG variants all use sha256 so we need to add a
+> select on it.
+
+Would that be sufficient? We can have SHA1, SHA384 and SHA512 with the current 
+drbg_cores[] too.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao
+Stephan
