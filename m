@@ -1,7 +1,7 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH v4 09/14] crypto: marvell/CESA: add SHA256 support
-Date: Thu, 11 Jun 2015 19:36:36 +0200
-Message-ID: <1434044206-10459-18-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH v4 08/13] crypto: marvell/CESA: add SHA256 support
+Date: Thu, 11 Jun 2015 19:36:35 +0200
+Message-ID: <1434044206-10459-17-git-send-email-boris.brezillon@free-electrons.com>
 References: <1434044206-10459-1-git-send-email-boris.brezillon@free-electrons.com>
 Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Arnaud Ebalard <arno@natisbad.org>,
