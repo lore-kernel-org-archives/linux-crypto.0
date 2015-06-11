@@ -1,32 +1,32 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH v4 04/14] crypto: add a new driver for Marvell's CESA
-Date: Thu, 11 Jun 2015 19:36:26 +0200
-Message-ID: <1434044206-10459-8-git-send-email-boris.brezillon@free-electrons.com>
+From: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Subject: [PATCH v4 03/13] crypto: add a new driver for Marvell's CESA
+Date: Thu, 11 Jun 2015 19:36:24 +0200
+Message-ID: <1434044206-10459-6-git-send-email-boris.brezillon@free-electrons.com>
 References: <1434044206-10459-1-git-send-email-boris.brezillon@free-electrons.com>
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	"Imre Kaloz" <kaloz@openwrt.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1434044206-10459-1-git-send-email-boris.brezillon@free-electrons.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+	Tawfik Bayouk <tawfik-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Lior Amsalem <alior-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Nadav Haklai <nadavh-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Eran Ben-Avi <benavi-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Thomas Petazzoni <thomas.petazzoni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Gregory CLEMENT <gregory.clement-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>,
+	Sebastian Hesselbarth <sebastian.hesselbarth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
+	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
+	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Jason Gunthorpe <jgunthorpe-ePGOBjL8dl3ta4EC/59zMFaTQe2KTcn/@public.gmane.org>,
+	"Imre Kaloz" <kaloz-p3rKhJxN3npAfugRpC6u6w@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1434044206-10459-1-git-send-email-boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
 The existing mv_cesa driver supports some features of the CESA IP but is
@@ -42,8 +42,8 @@ algorithm, and enable those features on the Armada 370 SoC.
 
 Other algorithms and platforms will be added later on.
 
-Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
+Signed-off-by: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Signed-off-by: Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>
 ---
  drivers/crypto/Kconfig          |  16 +
  drivers/crypto/Makefile         |   1 +
@@ -117,8 +117,8 @@ index 0000000..8d90e28
 + * that can be found on the following platform: Orion, Kirkwood, Armada. This
 + * driver supports the TDMA engine on platforms on which it is available.
 + *
-+ * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
-+ * Author: Arnaud Ebalard <arno@natisbad.org>
++ * Author: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
++ * Author: Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>
 + *
 + * This work is based on an initial version written by
 + * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
@@ -521,8 +521,8 @@ index 0000000..8d90e28
 +module_platform_driver(marvell_cesa);
 +
 +MODULE_ALIAS("platform:mv_crypto");
-+MODULE_AUTHOR("Boris Brezillon <boris.brezillon@free-electrons.com>");
-+MODULE_AUTHOR("Arnaud Ebalard <arno@natisbad.org>");
++MODULE_AUTHOR("Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>");
++MODULE_AUTHOR("Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>");
 +MODULE_DESCRIPTION("Support for Marvell's cryptographic engine");
 +MODULE_LICENSE("GPL v2");
 diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
@@ -1107,8 +1107,8 @@ index 0000000..a8dfa57
 +/*
 + * Cipher algorithms supported by the CESA: DES, 3DES and AES.
 + *
-+ * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
-+ * Author: Arnaud Ebalard <arno@natisbad.org>
++ * Author: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
++ * Author: Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>
 + *
 + * This work is based on an initial version written by
 + * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
@@ -1433,8 +1433,8 @@ index 0000000..54543ec
 +/*
 + * Hash algorithms supported by the CESA: MD5, SHA1 and SHA256.
 + *
-+ * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
-+ * Author: Arnaud Ebalard <arno@natisbad.org>
++ * Author: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
++ * Author: Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>
 + *
 + * This work is based on an initial version written by
 + * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
@@ -2150,3 +2150,8 @@ index 0000000..54543ec
 +};
 -- 
 1.9.1
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
