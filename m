@@ -1,7 +1,7 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH v4 06/13] crypto: marvell/CESA: add Triple-DES support
-Date: Thu, 11 Jun 2015 19:36:31 +0200
-Message-ID: <1434044206-10459-13-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH v4 07/14] crypto: marvell/CESA: add Triple-DES support
+Date: Thu, 11 Jun 2015 19:36:33 +0200
+Message-ID: <1434044206-10459-15-git-send-email-boris.brezillon@free-electrons.com>
 References: <1434044206-10459-1-git-send-email-boris.brezillon@free-electrons.com>
 Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Arnaud Ebalard <arno@natisbad.org>,
