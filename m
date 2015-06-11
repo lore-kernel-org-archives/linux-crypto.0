@@ -1,53 +1,54 @@
-From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Subject: Re: [PATCH] crypto/drbg: report backend_cra_name when allocation
- fails
-Date: Thu, 11 Jun 2015 08:38:06 +0900
-Message-ID: <20150610233806.GA499@swordfish>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] trivial: report backend_cra_name when allocation fails
+Date: Thu, 11 Jun 2015 08:28:53 +0800
+Message-ID: <20150611002853.GA8904@gondor.apana.org.au>
 References: <1433942868-16447-1-git-send-email-sergey.senozhatsky@gmail.com>
- <1433942868-16447-2-git-send-email-sergey.senozhatsky@gmail.com>
- <4705999.2gbf3TdHYZ@tauon.atsec.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
+Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	sergey.senozhatsky.work@gmail.com
-To: Stephan Mueller <smueller@chronox.de>
+To: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-pd0-f193.google.com ([209.85.192.193]:33895 "EHLO
-	mail-pd0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751556AbbFJXhk (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:47951 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751392AbbFKA26 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Jun 2015 19:37:40 -0400
+	Wed, 10 Jun 2015 20:28:58 -0400
 Content-Disposition: inline
-In-Reply-To: <4705999.2gbf3TdHYZ@tauon.atsec.com>
+In-Reply-To: <1433942868-16447-1-git-send-email-sergey.senozhatsky@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On (06/10/15 17:09), Stephan Mueller wrote:
-> Hi Sergey,
+On Wed, Jun 10, 2015 at 10:27:47PM +0900, Sergey Senozhatsky wrote:
+> Hello,
 > 
-> >Be more verbose and also report ->backend_cra_name when
-> >crypto_alloc_shash() or crypto_alloc_cipher() fail in
-> >drbg_init_hash_kernel() or drbg_init_sym_kernel()
-> >correspondingly.
-> >
-> >Example
-> > DRBG: could not allocate digest TFM handle: hmac(sha256)
-> >
-> >Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+> A trivial patch.
 > 
-> Headscratch -- the Kconfig should have HMAC selected for compilation. When 
-> HMAC is available (regardless whether it is a module or not), it is pulled in 
-> by the kernel crypto API. Thus, there should not have been the error that HMAC 
-> is missing.
+> My wifi stopped working recently, and the error message was not too
+> informative (at least to me):
 > 
-> Can you send your .config file, please?
+> kernel: wlp2s0: authenticate with 64:e5:99:74:dc:44
+> kernel: wlp2s0: send auth to 64:e5:99:74:dc:44 (try 1/3)
+> kernel: wlp2s0: authenticated
+> kernel: wlp2s0: associate with 64:e5:99:74:dc:44 (try 1/3)
+> kernel: wlp2s0: RX AssocResp from 64:e5:99:74:dc:44 (capab=0x411 status=0 aid=1)
+> kernel: wlp2s0: associated
+> kernel: IPv6: ADDRCONF(NETDEV_CHANGE): wlp2s0: link becomes ready
+> dhclient[355]: DHCPREQUEST on wlp2s0 to 255.255.255.255 port 67
+> kernel: DRBG: could not allocate digest TFM handle
+> kernel: wlp2s0: deauthenticating from 64:e5:99:74:dc:44 by local choice (Reason: 1=UNSPECIFIED)
+> kernel: cfg80211: Calling CRDA to update world regulatory domain
 > 
+> 
+> an update error message
+>   DRBG: could not allocate digest TFM handle: hmac(sha256)
+> 
+> is slightly more helpful (didn't have sha256 config enabled).
 
-Hi Stephan,
-
-sure, will post it later (as soon as I get back to my laptop).
-
-	-ss
+Thanks.  And I'll make sure drbg select sha256 so that this doesn't
+happen.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
