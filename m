@@ -1,53 +1,46 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] trivial: report backend_cra_name when allocation fails
-Date: Thu, 11 Jun 2015 08:28:53 +0800
-Message-ID: <20150611002853.GA8904@gondor.apana.org.au>
-References: <1433942868-16447-1-git-send-email-sergey.senozhatsky@gmail.com>
+Subject: crypto: drbg - Add select on sha256
+Date: Thu, 11 Jun 2015 08:55:10 +0800
+Message-ID: <20150611005510.GA9267@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sergey.senozhatsky.work@gmail.com
-To: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:47951 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:36028 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751392AbbFKA26 (ORCPT
+	with ESMTP id S1751392AbbFKAzP (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 10 Jun 2015 20:28:58 -0400
+	Wed, 10 Jun 2015 20:55:15 -0400
 Content-Disposition: inline
-In-Reply-To: <1433942868-16447-1-git-send-email-sergey.senozhatsky@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 10, 2015 at 10:27:47PM +0900, Sergey Senozhatsky wrote:
-> Hello,
-> 
-> A trivial patch.
-> 
-> My wifi stopped working recently, and the error message was not too
-> informative (at least to me):
-> 
-> kernel: wlp2s0: authenticate with 64:e5:99:74:dc:44
-> kernel: wlp2s0: send auth to 64:e5:99:74:dc:44 (try 1/3)
-> kernel: wlp2s0: authenticated
-> kernel: wlp2s0: associate with 64:e5:99:74:dc:44 (try 1/3)
-> kernel: wlp2s0: RX AssocResp from 64:e5:99:74:dc:44 (capab=0x411 status=0 aid=1)
-> kernel: wlp2s0: associated
-> kernel: IPv6: ADDRCONF(NETDEV_CHANGE): wlp2s0: link becomes ready
-> dhclient[355]: DHCPREQUEST on wlp2s0 to 255.255.255.255 port 67
-> kernel: DRBG: could not allocate digest TFM handle
-> kernel: wlp2s0: deauthenticating from 64:e5:99:74:dc:44 by local choice (Reason: 1=UNSPECIFIED)
-> kernel: cfg80211: Calling CRDA to update world regulatory domain
-> 
-> 
-> an update error message
->   DRBG: could not allocate digest TFM handle: hmac(sha256)
-> 
-> is slightly more helpful (didn't have sha256 config enabled).
+The hash-based DRBG variants all use sha256 so we need to add a
+select on it.
 
-Thanks.  And I'll make sure drbg select sha256 so that this doesn't
-happen.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ crypto/Kconfig |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index cb7806f..f6fc054 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1508,10 +1508,11 @@ config CRYPTO_DRBG_HMAC
+ 	bool
+ 	default y
+ 	select CRYPTO_HMAC
++	select CRYPTO_SHA256
+ 
+ config CRYPTO_DRBG_HASH
+ 	bool "Enable Hash DRBG"
+-	select CRYPTO_HASH
++	select CRYPTO_SHA256
+ 	help
+ 	  Enable the Hash DRBG variant as defined in NIST SP800-90A.
+ 
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
