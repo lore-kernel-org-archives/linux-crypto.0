@@ -1,8 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH RFC v4 1/4] MPILIB: add mpi_read_buf(),
- mpi_copy() and mpi_get_size() helpers
-Date: Thu, 11 Jun 2015 12:05:38 -0700
-Message-ID: <20150611190538.31826.97258.stgit@tstruk-mobl1>
+Subject: [PATCH RFC v4 2/4] crypto: add PKE API
+Date: Thu, 11 Jun 2015 12:05:44 -0700
+Message-ID: <20150611190543.31826.357.stgit@tstruk-mobl1>
 References: <20150611190533.31826.13956.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -14,220 +13,713 @@ Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
 	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
 	vgoyal@redhat.com
 To: herbert@gondor.apana.org.au
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga11.intel.com ([192.55.52.93]:12702 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754780AbbFKTFm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Jun 2015 15:05:42 -0400
 In-Reply-To: <20150611190533.31826.13956.stgit@tstruk-mobl1>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-Added a mpi_read_buf() helper function to export MPI to a buf provided by
-the user, and a mpi_get_size() helper, that tells the user how big the buf is.
-Implemented mpi_copy(), which was declared in mpi.h, but never implemented.
+Add Public Key Encryption API.
 
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- include/linux/mpi.h |    3 ++
- lib/mpi/mpicoder.c  |   86 ++++++++++++++++++++++++++++++++++++++++-----------
- lib/mpi/mpiutil.c   |   47 ++++++++++++++++++++++++++++
- 3 files changed, 117 insertions(+), 19 deletions(-)
+ crypto/Kconfig             |    6 +
+ crypto/Makefile            |    1 
+ crypto/akcipher.c          |  154 +++++++++++++++++
+ crypto/crypto_user.c       |   23 ++
+ include/crypto/akcipher.h  |  408 ++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/crypto.h     |    1 
+ include/linux/cryptouser.h |    6 +
+ 7 files changed, 599 insertions(+)
+ create mode 100644 crypto/akcipher.c
+ create mode 100644 include/crypto/akcipher.h
 
-diff --git a/include/linux/mpi.h b/include/linux/mpi.h
-index 5af1b81..5e55fd0 100644
---- a/include/linux/mpi.h
-+++ b/include/linux/mpi.h
-@@ -73,6 +73,7 @@ int mpi_set_ui(MPI w, ulong u);
- MPI mpi_alloc_set_ui(unsigned long u);
- void mpi_m_check(MPI a);
- void mpi_swap(MPI a, MPI b);
-+unsigned int mpi_get_size(MPI a);
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index cb7806f..d119b38 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -91,6 +91,12 @@ config CRYPTO_PCOMP2
+ 	tristate
+ 	select CRYPTO_ALGAPI2
  
- /*-- mpicoder.c --*/
- MPI do_encode_md(const void *sha_buffer, unsigned nbits);
-@@ -81,6 +82,8 @@ MPI mpi_read_from_buffer(const void *buffer, unsigned *ret_nread);
- int mpi_fromstr(MPI val, const char *str);
- u32 mpi_get_keyid(MPI a, u32 *keyid);
- void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign);
-+int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
-+		    int *sign);
- void *mpi_get_secure_buffer(MPI a, unsigned *nbytes, int *sign);
- int mpi_set_buffer(MPI a, const void *buffer, unsigned nbytes, int sign);
++config CRYPTO_AKCIPHER
++	tristate "Public Key Algorithms API"
++	select CRYPTO_ALGAPI
++	help
++	  Crypto API interface for public key algorithms.
++
+ config CRYPTO_MANAGER
+ 	tristate "Cryptographic algorithm manager"
+ 	select CRYPTO_MANAGER2
+diff --git a/crypto/Makefile b/crypto/Makefile
+index c842035..6f2940a 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -28,6 +28,7 @@ crypto_hash-y += shash.o
+ obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
  
-diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
-index 4cc6442..f48b028 100644
---- a/lib/mpi/mpicoder.c
-+++ b/lib/mpi/mpicoder.c
-@@ -128,28 +128,36 @@ leave:
- }
- EXPORT_SYMBOL_GPL(mpi_read_from_buffer);
+ obj-$(CONFIG_CRYPTO_PCOMP2) += pcompress.o
++obj-$(CONFIG_CRYPTO_AKCIPHER) += akcipher.o
  
--/****************
-- * Return an allocated buffer with the MPI (msb first).
-- * NBYTES receives the length of this buffer. Caller must free the
-- * return string (This function does return a 0 byte buffer with NBYTES
-- * set to zero if the value of A is zero. If sign is not NULL, it will
-- * be set to the sign of the A.
-+/**
-+ * mpi_read_buffer() - read MPI to a bufer provided by user (msb first)
+ cryptomgr-y := algboss.o testmgr.o
+ 
+diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+new file mode 100644
+index 0000000..286f31f
+--- /dev/null
++++ b/crypto/akcipher.c
+@@ -0,0 +1,154 @@
++/*
++ * Public Key Encryption
 + *
-+ * @a:		a multi precision integer
-+ * @buf:	bufer to which the output will be written to. Needs to be at
-+ *		leaset mpi_get_size(a) long.
-+ * @buf_len:	size of the buf.
-+ * @nbytes:	receives the actual length of the data written.
-+ * @sign:	if not NULL, it will be set to the sign of a.
++ * Copyright (c) 2015, Intel Corporation
++ * Authors: Tadeusz Struk <tadeusz.struk@intel.com>
 + *
-+ * Return:	0 on success or error code in case of error
-  */
--void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign)
-+int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
-+		    int *sign)
- {
--	uint8_t *p, *buffer;
-+	uint8_t *p;
- 	mpi_limb_t alimb;
-+	unsigned int n = mpi_get_size(a);
- 	int i;
--	unsigned int n;
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++#include <linux/errno.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/seq_file.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/crypto.h>
++#include <crypto/algapi.h>
++#include <linux/cryptouser.h>
++#include <net/netlink.h>
++#include <crypto/akcipher.h>
++#include <crypto/public_key.h>
++#include "internal.h"
 +
-+	if (buf_len < n || !buf)
-+		return -EINVAL;
- 
- 	if (sign)
- 		*sign = a->sign;
--	*nbytes = n = a->nlimbs * BYTES_PER_MPI_LIMB;
--	if (!n)
--		n++;		/* avoid zero length allocation */
--	p = buffer = kmalloc(n, GFP_KERNEL);
--	if (!p)
--		return NULL;
++#ifdef CONFIG_NET
++static int crypto_akcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	struct crypto_report_akcipher rakcipher;
 +
-+	if (nbytes)
-+		*nbytes = n;
++	strncpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
++	strncpy(rakcipher.subtype, alg->cra_name, sizeof(rakcipher.subtype));
 +
-+	p = buf;
- 
- 	for (i = a->nlimbs - 1; i >= 0; i--) {
- 		alimb = a->d[i];
-@@ -171,15 +179,55 @@ void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign)
- #error please implement for this limb size.
- #endif
- 	}
++	if (nla_put(skb, CRYPTOCFGA_REPORT_AKCIPHER,
++		    sizeof(struct crypto_report_akcipher), &rakcipher))
++		goto nla_put_failure;
++	return 0;
++
++nla_put_failure:
++	return -EMSGSIZE;
++}
++#else
++static int crypto_akcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	return -ENOSYS;
++}
++#endif
++
++static void crypto_akcipher_show(struct seq_file *m, struct crypto_alg *alg)
++	__attribute__ ((unused));
++
++static void crypto_akcipher_show(struct seq_file *m, struct crypto_alg *alg)
++{
++	seq_puts(m, "type         : akcipher\n");
++	seq_printf(m, "subtype      : %s\n", alg->cra_name);
++}
++
++static void akcipher_free_key(struct public_key *key)
++{
++	public_key_destroy(key);
++}
++
++static void crypto_akcipher_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct crypto_akcipher *akcipher = __crypto_akcipher_tfm(tfm);
++
++	if (akcipher->pkey)
++		akcipher_free_key(akcipher->pkey);
++
++	akcipher->pkey = NULL;
++}
++
++static int crypto_akcipher_init_tfm(struct crypto_tfm *tfm)
++{
++	struct crypto_akcipher *akcipher = __crypto_akcipher_tfm(tfm);
++
++	akcipher->base.exit = crypto_akcipher_exit_tfm;
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(mpi_read_buffer);
 +
-+/*
-+ * mpi_get_buffer() - Returns an allocated buffer with the MPI (msb first).
-+ * Caller must free the return string.
-+ * This function does return a 0 byte buffer with nbytes set to zero if the
-+ * value of A is zero.
-+ *
-+ * @a:		a multi precision integer.
-+ * @nbytes:	receives the length of this buffer.
-+ * @sign:	if not NULL, it will be set to the sign of the a.
-+ *
-+ * Return:	Pointer to MPI buffer or NULL on error
-+ */
-+void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign)
++static const struct crypto_type crypto_akcipher_type = {
++	.extsize = crypto_alg_extsize,
++	.init_tfm = crypto_akcipher_init_tfm,
++#ifdef CONFIG_PROC_FS
++	.show = crypto_akcipher_show,
++#endif
++	.report = crypto_akcipher_report,
++	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
++	.maskset = CRYPTO_ALG_TYPE_MASK,
++	.type = CRYPTO_ALG_TYPE_AKCIPHER,
++	.tfmsize = offsetof(struct crypto_akcipher, base),
++};
++
++struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type,
++					      u32 mask)
 +{
-+	uint8_t *buf, *p;
-+	int n, ret;
++	return crypto_alloc_tfm(alg_name, &crypto_akcipher_type, type, mask);
++}
++EXPORT_SYMBOL_GPL(crypto_alloc_akcipher);
 +
-+	if (!nbytes)
-+		return NULL;
-+
-+	n = mpi_get_size(a);
-+
-+	if (!n)
-+		n++;
-+
-+	buf = kmalloc(n, GFP_KERNEL);
-+
-+	if (!buf)
-+		return NULL;
-+
-+	ret = mpi_read_buffer(a, buf, n, nbytes, sign);
-+
-+	if (ret) {
-+		kfree(buf);
-+		return NULL;
-+	}
- 
- 	/* this is sub-optimal but we need to do the shift operation
- 	 * because the caller has to free the returned buffer */
--	for (p = buffer; !*p && *nbytes; p++, --*nbytes)
-+	for (p = buf; !*p && *nbytes; p++, --*nbytes)
- 		;
--	if (p != buffer)
--		memmove(buffer, p, *nbytes);
-+	if (p != buf)
-+		memmove(buf, p, *nbytes);
- 
--	return buffer;
-+	return buf;
- }
- EXPORT_SYMBOL_GPL(mpi_get_buffer);
- 
-diff --git a/lib/mpi/mpiutil.c b/lib/mpi/mpiutil.c
-index bf076d2..ee078e2 100644
---- a/lib/mpi/mpiutil.c
-+++ b/lib/mpi/mpiutil.c
-@@ -54,6 +54,40 @@ MPI mpi_alloc(unsigned nlimbs)
- }
- EXPORT_SYMBOL_GPL(mpi_alloc);
- 
-+/**
-+ * mpi_copy() - allocates a new MPI as exact copy of a.
-+ *
-+ * @copy: pointer to an MPI in which the copy will be stored
-+ * @a:	A multi precision integer for which we want to do a copy
-+ *
-+ * Return: 0 on success or err
-+ */
-+int mpi_copy(MPI *copy, MPI a)
++static int akcipher_clone_key(struct crypto_akcipher *tfm,
++			      const struct public_key *pkey)
 +{
-+	int ret = 0;
++	int i, ret = 0;
 +
-+	if (!copy)
-+		return -EINVAL;
++	tfm->pkey = kzalloc(sizeof(*tfm->pkey), GFP_KERNEL);
 +
-+	if (a) {
-+		*copy = mpi_alloc(a->nlimbs);
-+		if (*copy) {
-+			memcpy((*copy)->d, a->d, a->nlimbs *
-+			       sizeof(mpi_limb_t));
-+			(*copy)->nlimbs = a->nlimbs;
-+			(*copy)->sign = a->sign;
-+			(*copy)->flags = a->flags;
-+			(*copy)->nbits = a->nbits;
-+		} else {
++	if (!tfm->pkey)
++		return -ENOMEM;
++
++	for (i = 0; i < ARRAY_SIZE(tfm->pkey->mpi); i++) {
++		if (!pkey->mpi[i])
++			continue;
++
++		if (mpi_copy(&tfm->pkey->mpi[i], pkey->mpi[i])) {
++			akcipher_free_key(tfm->pkey);
++			tfm->pkey = NULL;
 +			ret = -ENOMEM;
++			break;
 +		}
-+	} else {
-+		*copy = NULL;
 +	}
 +	return ret;
 +}
-+EXPORT_SYMBOL_GPL(mpi_copy);
 +
- mpi_ptr_t mpi_alloc_limb_space(unsigned nlimbs)
- {
- 	size_t len = nlimbs * sizeof(mpi_limb_t);
-@@ -122,5 +156,18 @@ void mpi_free(MPI a)
- }
- EXPORT_SYMBOL_GPL(mpi_free);
- 
-+/**
-+ * mpi_get_size() - returns max size required to store the number
-+ *
-+ * @a:	A multi precision integer for which we want to allocate a bufer
-+ *
-+ * Return: size required to store the number
-+ */
-+unsigned int mpi_get_size(MPI a)
++int crypto_akcipher_setkey(struct crypto_akcipher *tfm,
++			   const struct public_key *pkey)
 +{
-+	return a->nlimbs * BYTES_PER_MPI_LIMB;
-+}
-+EXPORT_SYMBOL_GPL(mpi_get_size);
++	if (tfm->pkey)
++		akcipher_free_key(tfm->pkey);
 +
- MODULE_DESCRIPTION("Multiprecision maths library");
- MODULE_LICENSE("GPL");
++	return akcipher_clone_key(tfm, pkey);
++}
++EXPORT_SYMBOL_GPL(crypto_akcipher_setkey);
++
++int crypto_register_akcipher(struct akcipher_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++
++	base->cra_type = &crypto_akcipher_type;
++	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
++	base->cra_flags |= CRYPTO_ALG_TYPE_AKCIPHER;
++	return crypto_register_alg(base);
++}
++EXPORT_SYMBOL_GPL(crypto_register_akcipher);
++
++void crypto_unregister_akcipher(struct akcipher_alg *alg)
++{
++	crypto_unregister_alg(&alg->base);
++}
++EXPORT_SYMBOL_GPL(crypto_unregister_akcipher);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Generic public key cihper type");
+diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+index 41dfe76..508e71d 100644
+--- a/crypto/crypto_user.c
++++ b/crypto/crypto_user.c
+@@ -27,6 +27,7 @@
+ #include <net/net_namespace.h>
+ #include <crypto/internal/aead.h>
+ #include <crypto/internal/skcipher.h>
++#include <crypto/akcipher.h>
+ 
+ #include "internal.h"
+ 
+@@ -110,6 +111,22 @@ nla_put_failure:
+ 	return -EMSGSIZE;
+ }
+ 
++static int crypto_report_akcipher(struct sk_buff *skb, struct crypto_alg *alg)
++{
++	struct crypto_report_akcipher rakcipher;
++
++	strncpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
++	strncpy(rakcipher.subtype, alg->cra_name, sizeof(rakcipher.subtype));
++
++	if (nla_put(skb, CRYPTOCFGA_REPORT_AKCIPHER,
++		    sizeof(struct crypto_report_akcipher), &rakcipher))
++		goto nla_put_failure;
++	return 0;
++
++nla_put_failure:
++	return -EMSGSIZE;
++}
++
+ static int crypto_report_one(struct crypto_alg *alg,
+ 			     struct crypto_user_alg *ualg, struct sk_buff *skb)
+ {
+@@ -154,6 +171,12 @@ static int crypto_report_one(struct crypto_alg *alg,
+ 			goto nla_put_failure;
+ 
+ 		break;
++
++	case CRYPTO_ALG_TYPE_AKCIPHER:
++		if (crypto_report_akcipher(skb, alg))
++			goto nla_put_failure;
++
++		break;
+ 	}
+ 
+ out:
+diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+new file mode 100644
+index 0000000..9337e9a
+--- /dev/null
++++ b/include/crypto/akcipher.h
+@@ -0,0 +1,408 @@
++/*
++ * Public Key Encryption
++ *
++ * Copyright (c) 2015, Intel Corporation
++ * Authors: Tadeusz Struk <tadeusz.struk@intel.com>
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the Free
++ * Software Foundation; either version 2 of the License, or (at your option)
++ * any later version.
++ *
++ */
++#ifndef _CRYPTO_AKCIPHER_H
++#define _CRYPTO_AKCIPHER_H
++#include <linux/crypto.h>
++
++struct public_key;
++
++/**
++ * struct akcipher_request - public key request
++ *
++ * @base:	Common attributes for async crypto requests
++ * @src:	Pointer to memory containing the input parameters
++ *		The format of the parameter(s) is expeted to be Octet String
++ * @dst:	Pointer to memory whare the result will be stored
++ * @src_len:	Size of the input parameter
++ * @dst_len:	Size of the output buffer. It needs to be at leaset
++ *		as big as the expected result depending	on the operation
++ * @result_len: If not NULL this will be updated by the implementation to
++ *		reflect the acctual size of the result
++ * @__ctx:	Start of private context data
++ */
++struct akcipher_request {
++	struct crypto_async_request base;
++	void *src;
++	void *dst;
++	unsigned int src_len;
++	unsigned int dst_len;
++	unsigned int *result_len;
++	void *__ctx[] CRYPTO_MINALIGN_ATTR;
++};
++
++/**
++ * struct crypto_akcipher - user-instantiated objects which encapsulate
++ * algorithms and core processing logic
++ *
++ * @base:	Common crypto API algorithm data structure
++ * @pkey:	Key representation. Note: this can be both public or private
++ *		key, depending on the operation.
++ */
++struct crypto_akcipher {
++	struct public_key *pkey;
++	struct crypto_tfm base;
++};
++
++/**
++ * struct akcipher_alg - generic public key algorithm
++ *
++ * @sign:	Function performs a sign operation as defined by public key
++ *		algorithm
++ * @verify:	Function performs a sign operation as defined by public key
++ *		algorithm
++ * @encrypt:	Function performs an encrytp operation as defined by public key
++ *		algorithm
++ * @decrypt:	Function performs a decrypt operation as defined by public key
++ *		algorithm
++ * @maxsize:	Returns bufer size required to store a result of an operation
++ *		User should allocate a buf of this size and pass it in req->dst
++ *
++ * @reqsize:	Request context size required by algorithm implementation
++ * @base:	Common crypto API algorithm data structure
++ */
++struct akcipher_alg {
++	int (*sign)(struct akcipher_request *req);
++	int (*verify)(struct akcipher_request *req);
++	int (*encrypt)(struct akcipher_request *req);
++	int (*decrypt)(struct akcipher_request *req);
++	int (*maxsize)(struct crypto_akcipher *tfm);
++
++	unsigned int reqsize;
++	struct crypto_alg base;
++};
++
++/**
++ * DOC: Generic Public Key API
++ *
++ * The Public Key API is used with the algorithms of type
++ * CRYPTO_ALG_TYPE_AKCIPHER (listed as type "akcipher" in /proc/crypto)
++ */
++
++/**
++ * crypto_alloc_akcipher() -- allocate AKCIPHER tfm handle
++ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
++ *	      public key algorithm e.g. "rsa"
++ * @type: specifies the type of the algorithm
++ * @mask: specifies the mask for the algorithm
++ *
++ * Allocate a handle for public key algorithm. The returned struct
++ * crypto_akcipher is the handle that is required for any subsequent
++ * API invocation for the public key operations.
++ *
++ * Return: allocated handle in case of success; IS_ERR() is true in case
++ *	   of an error, PTR_ERR() returns the error code.
++ */
++struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type,
++					      u32 mask);
++
++/*
++ * Transform internal helpers.
++ */
++static inline struct akcipher_alg *__crypto_akcipher_alg(struct crypto_alg *alg)
++{
++	return container_of(alg, struct akcipher_alg, base);
++}
++
++static inline struct crypto_akcipher *__crypto_akcipher_tfm(
++	struct crypto_tfm *tfm)
++{
++	return container_of(tfm, struct crypto_akcipher, base);
++}
++
++static inline struct crypto_tfm *crypto_akcipher_tfm(
++	struct crypto_akcipher *tfm)
++{
++	return &tfm->base;
++}
++
++static inline struct akcipher_alg *crypto_akcipher_alg(
++	struct crypto_akcipher *tfm)
++{
++	return __crypto_akcipher_alg(crypto_akcipher_tfm(tfm)->__crt_alg);
++}
++
++/**
++ * crypto_free_akcipher() -- free AKCIPHER tfm handle
++ *
++ * @tfm: AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
++ */
++static inline void crypto_free_akcipher(struct crypto_akcipher *tfm)
++{
++	crypto_destroy_tfm(tfm, crypto_akcipher_tfm(tfm));
++}
++
++static inline unsigned int crypto_akcipher_reqsize(struct crypto_akcipher *tfm)
++{
++	return crypto_akcipher_alg(tfm)->reqsize;
++}
++
++/**
++ * crypto_akcipher_setkey() -- assign a public key to an AKCIPHER tfm handle
++ *				Previously stored key will be freed and a new
++ *				one will be allocated.
++ *
++ * @tfm: AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
++ * @pkey: public key
++ *
++ * Return: zero on success; error code in case of error
++ */
++int crypto_akcipher_setkey(struct crypto_akcipher *tfm,
++			   const struct public_key *pkey);
++
++/**
++ * crypto_akcipher_getkey() -- retrieve a public key from an AKCIPHER tfm handle
++ *
++ * @tfm: AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
++ *
++ * Return: public key
++ */
++static inline const struct public_key *crypto_akcipher_getkey(
++	struct crypto_akcipher *tfm)
++{
++	return tfm->pkey;
++}
++
++static inline void akcipher_request_set_tfm(struct akcipher_request *req,
++					    struct crypto_akcipher *tfm)
++{
++	req->base.tfm = crypto_akcipher_tfm(tfm);
++}
++
++/**
++ * akcipher_request_alloc() -- allocates public key request
++ *
++ * @tfm:	AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
++ * @gfp:	allocation flags
++ *
++ * Return: allocated handle in case of success or NULL in case of an error.
++ */
++static inline struct akcipher_request *akcipher_request_alloc(
++	struct crypto_akcipher *tfm, gfp_t gfp)
++{
++	struct akcipher_request *req;
++
++	req = kmalloc(sizeof(*req) + crypto_akcipher_reqsize(tfm), gfp);
++	if (likely(req))
++		akcipher_request_set_tfm(req, tfm);
++
++	return req;
++}
++
++/**
++ * akcipher_request_get_tfm() -- return the AKCIPHER tfm handle from akcipher
++ *				 request
++ *
++ * @req:	akcipher request
++ *
++ * Return: AKCIPHER tfm handle.
++ */
++static inline struct crypto_akcipher *akcipher_request_get_tfm(
++	struct akcipher_request *req)
++{
++	return __crypto_akcipher_tfm(req->base.tfm);
++}
++
++static inline void *akcipher_request_ctx(struct akcipher_request *req)
++{
++	return req->__ctx;
++}
++
++static inline void *akcipher_tfm_ctx(struct crypto_akcipher *tfm)
++{
++	return tfm->base.__crt_ctx;
++}
++
++/**
++ * akcipher_request_free() -- zeroize and free public key request
++ *
++ * @req:	request to free
++ */
++static inline void akcipher_request_free(struct akcipher_request *req)
++{
++	kzfree(req);
++}
++
++/**
++ * akcipher_request_set_callback() -- Sets an asynchronous callback.
++ *
++ * Callback will be called when an asynchronous operation on a given
++ * request is finished.
++ *
++ * @req:	request that the callback will be set for
++ * @flgs:	specify for instance if the operation may backlog
++ * @cmlp:	callback which will be called
++ * @data:	private data used by the caller
++ */
++static inline void akcipher_request_set_callback(struct akcipher_request *req,
++						 u32 flgs,
++						 crypto_completion_t cmpl,
++						 void *data)
++{
++	req->base.complete = cmpl;
++	req->base.data = data;
++	req->base.flags = flgs;
++}
++
++static inline void akcipher_request_complete(struct akcipher_request *req,
++					     int err)
++{
++	req->base.complete(&req->base, err);
++}
++
++/**
++ * akcipher_request_set_crypt() -- Sets reqest parameters
++ *
++ * Sets parameters required by crypto operation
++ *
++ * @req:	public key request
++ * @src:	ptr to input parameter
++ * @dst:	ptr of output parameter
++ * @src_len:	size of the input buffer
++ * @dst_len:	size of the output buffer
++ * parameter:	Optional parameter. If not NULL this will be updated
++ *		by the implementation to reflect the acctual size of the result
++ */
++static inline void akcipher_request_set_crypt(struct akcipher_request *req,
++					      void *src, void *dst,
++					      unsigned int src_len,
++					      unsigned int dst_len,
++					      unsigned int *result_len)
++{
++	req->src = src;
++	req->dst = dst;
++	req->src_len = src_len;
++	req->dst_len = dst_len;
++	req->result_len = result_len;
++}
++
++/**
++ * akcipher_alg_name() -- Returns algorithm name
++ *
++ * Function returns public key algorithm name e.g.g "rsa"
++ *
++ * @tfm:	tfm handle
++ *
++ * Return: public key algorithm name
++ */
++static inline const char *akcipher_alg_name(struct crypto_akcipher *tfm)
++{
++	return crypto_akcipher_tfm(tfm)->__crt_alg->cra_name;
++}
++
++/**
++ * crypto_akcipher_encrypt() -- Invoke public key encrypt operation
++ *
++ * Function invokes the specific public key encrypt operation for a given
++ * public key algorithm
++ *
++ * @req:	asymmetric key request
++ *
++ * Return: zero on success; error code in case of error
++ */
++static inline int crypto_akcipher_encrypt(struct akcipher_request *req)
++{
++	struct crypto_akcipher *tfm = __crypto_akcipher_tfm(req->base.tfm);
++	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
++
++	return alg->encrypt(req);
++}
++
++/**
++ * crypto_akcipher_decrypt() -- Invoke public key decrypt operation
++ *
++ * Function invokes the specific public key decrypt operation for a given
++ * public key algorithm
++ *
++ * @req:	asymmetric key request
++ *
++ * Return: zero on success; error code in case of error
++ */
++static inline int crypto_akcipher_decrypt(struct akcipher_request *req)
++{
++	struct crypto_akcipher *tfm = __crypto_akcipher_tfm(req->base.tfm);
++	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
++
++	return alg->decrypt(req);
++}
++
++/**
++ * crypto_akcipher_sign() -- Invoke public key sign operation
++ *
++ * Function invokes the specific public key sign operation for a given
++ * public key algorithm
++ *
++ * @req:	asymmetric key request
++ *
++ * Return: zero on success; error code in case of error
++ */
++static inline int crypto_akcipher_sign(struct akcipher_request *req)
++{
++	struct crypto_akcipher *tfm = __crypto_akcipher_tfm(req->base.tfm);
++	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
++
++	return alg->sign(req);
++}
++
++/**
++ * crypto_akcipher_verify() -- Invoke public key verify operation
++ *
++ * Function invokes the specific public key verify operation for a given
++ * public key algorithm
++ *
++ * @req:	asymmetric key request
++ *
++ * Return: zero on success; error code in case of error
++ */
++static inline int crypto_akcipher_verify(struct akcipher_request *req)
++{
++	struct crypto_akcipher *tfm = __crypto_akcipher_tfm(req->base.tfm);
++	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
++
++	return alg->verify(req);
++}
++
++/**
++ * crypto_akcipher_maxsize() -- Get max size required to store result for give
++ *				implementation
++ *
++ * @tfm:	tfm handle
++ *
++ * Return: size required to store result or error code in case of error
++ */
++static inline int crypto_akcipher_maxsize(struct crypto_akcipher *tfm)
++{
++	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
++
++	return alg->maxsize(tfm);
++}
++
++/**
++ * crypto_register_akcipher() -- Register public key algorithm
++ *
++ * Function registers an implementation of a public key verify algorithm
++ *
++ * @alg:	algorithm definition
++ *
++ * Return: zero on success; error code in case of error
++ */
++int crypto_register_akcipher(struct akcipher_alg *alg);
++
++/**
++ * crypto_unregister_akcipher() -- Unregister public key algorithm
++ *
++ * Function unregisters an implementation of a public key verify algorithm
++ *
++ * @alg:	algorithm definition
++ */
++void crypto_unregister_akcipher(struct akcipher_alg *alg);
++#endif
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 25a4b71..0e3f71a 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -53,6 +53,7 @@
+ #define CRYPTO_ALG_TYPE_SHASH		0x00000009
+ #define CRYPTO_ALG_TYPE_AHASH		0x0000000a
+ #define CRYPTO_ALG_TYPE_RNG		0x0000000c
++#define CRYPTO_ALG_TYPE_AKCIPHER	0x0000000d
+ #define CRYPTO_ALG_TYPE_PCOMPRESS	0x0000000f
+ 
+ #define CRYPTO_ALG_TYPE_HASH_MASK	0x0000000e
+diff --git a/include/linux/cryptouser.h b/include/linux/cryptouser.h
+index 4abf2ea..8448ef8 100644
+--- a/include/linux/cryptouser.h
++++ b/include/linux/cryptouser.h
+@@ -43,6 +43,7 @@ enum crypto_attr_type_t {
+ 	CRYPTOCFGA_REPORT_COMPRESS,	/* struct crypto_report_comp */
+ 	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
+ 	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
++	CRYPTOCFGA_REPORT_AKCIPHER,	/* struct crypto_report_akcipher */
+ 	__CRYPTOCFGA_MAX
+ 
+ #define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
+@@ -101,5 +102,10 @@ struct crypto_report_rng {
+ 	unsigned int seedsize;
+ };
+ 
++struct crypto_report_akcipher {
++	char type[CRYPTO_MAX_NAME];
++	char subtype[CRYPTO_MAX_NAME];
++};
++
+ #define CRYPTO_REPORT_MAXSIZE (sizeof(struct crypto_user_alg) + \
+ 			       sizeof(struct crypto_report_blkcipher))
