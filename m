@@ -1,71 +1,55 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH RFC v4 2/4] crypto: add PKE API
-Date: Fri, 12 Jun 2015 03:00:42 +0200
-Message-ID: <2901639.xlpED6EpBc@tauon.atsec.com>
-References: <20150611190533.31826.13956.stgit@tstruk-mobl1> <20150611190543.31826.357.stgit@tstruk-mobl1>
+Date: Fri, 12 Jun 2015 10:42:46 +0800
+Message-ID: <20150612024246.GA30982@gondor.apana.org.au>
+References: <20150611190533.31826.13956.stgit@tstruk-mobl1>
+ <20150611190543.31826.357.stgit@tstruk-mobl1>
+ <2901639.xlpED6EpBc@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-	keescook@chromium.org, jwboyer@redhat.com, richard@nod.at,
-	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
+Content-Type: text/plain; charset=us-ascii
+Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
+	linux-kernel@vger.kernel.org, keescook@chromium.org,
+	jwboyer@redhat.com, richard@nod.at, steved@redhat.com,
+	qat-linux@intel.com, dhowells@redhat.com,
 	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
 	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
 	vgoyal@redhat.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+To: Stephan Mueller <smueller@chronox.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:46225 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751532AbbFLBDC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Jun 2015 21:03:02 -0400
-In-Reply-To: <20150611190543.31826.357.stgit@tstruk-mobl1>
+Received: from helcar.hengli.com.au ([209.40.204.226]:59809 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750808AbbFLCnP (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 11 Jun 2015 22:43:15 -0400
+Content-Disposition: inline
+In-Reply-To: <2901639.xlpED6EpBc@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Thursday 11 June 2015, 12:05:44 schrieb Tadeusz Struk:
+On Fri, Jun 12, 2015 at 03:00:42AM +0200, Stephan Mueller wrote:
+>
+> The testmgr code can mark an entire cipher implementation as fips_allowed=1 as 
+> already done for RSA. However, unlike with the other ciphers, that flag must 
+> go in conjunction with the used key sizes.
+> 
+> For FIPS mode, the following restrictions apply:
+> 
+> - RSA: 2048/3072
+> 
+> - DSA: L 2048 / N 224; L 2048 / N 256; L 3072 / N 256
+> 
+> - ECDSA: only the NIST curves
+> 
+> Any other key sizes for the given ciphers is not allowed in FIPS mode.
+> 
+> Should that constraint be considered here?
 
-Hi Tadeusz,
+Yes.  However it should be placed into a helper that everybody
+can call so that future hardware implementations can also make
+the same checks.
 
->+
->+static int akcipher_clone_key(struct crypto_akcipher *tfm,
->+			      const struct public_key *pkey)
->+{
->+	int i, ret = 0;
->+
->+	tfm->pkey = kzalloc(sizeof(*tfm->pkey), GFP_KERNEL);
->+
->+	if (!tfm->pkey)
->+		return -ENOMEM;
->+
->+	for (i = 0; i < ARRAY_SIZE(tfm->pkey->mpi); i++) {
->+		if (!pkey->mpi[i])
->+			continue;
->+
->+		if (mpi_copy(&tfm->pkey->mpi[i], pkey->mpi[i])) {
->+			akcipher_free_key(tfm->pkey);
->+			tfm->pkey = NULL;
->+			ret = -ENOMEM;
->+			break;
->+		}
->+	}
->+	return ret;
->+}
-
-The testmgr code can mark an entire cipher implementation as fips_allowed=1 as 
-already done for RSA. However, unlike with the other ciphers, that flag must 
-go in conjunction with the used key sizes.
-
-For FIPS mode, the following restrictions apply:
-
-- RSA: 2048/3072
-
-- DSA: L 2048 / N 224; L 2048 / N 256; L 3072 / N 256
-
-- ECDSA: only the NIST curves
-
-Any other key sizes for the given ciphers is not allowed in FIPS mode.
-
-Should that constraint be considered here?
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
