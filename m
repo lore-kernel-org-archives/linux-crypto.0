@@ -1,132 +1,243 @@
-From: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Subject: [RESEND PATCH v4 00/14] crypto: add a new driver for Marvell's CESA
-Date: Fri, 12 Jun 2015 09:15:52 +0200
-Message-ID: <1434093366-14681-1-git-send-email-boris.brezillon@free-electrons.com>
-Cc: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
-	Tawfik Bayouk <tawfik-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Lior Amsalem <alior-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Nadav Haklai <nadavh-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Eran Ben-Avi <benavi-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Thomas Petazzoni <thomas.petazzoni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Gregory CLEMENT <gregory.clement-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>,
-	Sebastian Hesselbarth <sebastian.hesselbarth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
-	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
-	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Jason Gunthorpe <jgunthorpe-ePGOBjL8dl3ta4EC/59zMFaTQe2KTcn/@public.gmane.org>,
-	"Imre Kaloz" <kaloz-p3rKhJxN3npAfugRpC6u6w@public.gmane.org>
-To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
-	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: [RESEND PATCH v4 07/14] crypto: marvell/CESA: add Triple-DES support
+Date: Fri, 12 Jun 2015 09:15:59 +0200
+Message-ID: <1434093366-14681-8-git-send-email-boris.brezillon@free-electrons.com>
+References: <1434093366-14681-1-git-send-email-boris.brezillon@free-electrons.com>
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	"Imre Kaloz" <kaloz@openwrt.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1434093366-14681-1-git-send-email-boris.brezillon@free-electrons.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Hello,
+From: Arnaud Ebalard <arno@natisbad.org>
 
-This patch series adds a new driver supporting Marvell's CESA IP.
-This driver addresses some limitations of the existing one.
->From a performance and CPU load point of view the most important
-limitation in the existing driver is the lack of DMA support, thus
-preventing us from chaining crypto operations.
+Add support for Triple-DES operations.
 
-I know we usually try to adapt existing drivers instead of replacing them
-by new ones, but after trying to refactor the mv_cesa driver I realized it
-would take longer than writing an new one from scratch.
+Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
+Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+---
+ drivers/crypto/marvell/cesa.c   |   2 +
+ drivers/crypto/marvell/cesa.h   |   2 +
+ drivers/crypto/marvell/cipher.c | 147 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 151 insertions(+)
 
-Here are the main features brought by this new driver:
-- support for armada SoCs (up to 38x) while keeping support for older ones
-  (Orion and Kirkwood). Note that old DT bindings (those used on Orion and
-  Kirkwood platforms) are supported, or IOTW, old DTs are compatible with
-  this new driver.
-- DMA mode to offload the CPU in case of intensive crypto usage
-- new algorithms: SHA256, DES and 3DES
-
-I'd like to thank Arnaud, who has carefully reviewed several iterations of
-this driver, helped me improved my implementation, provided support for
-several crypto algorithms, provided support for armada-370 and tested
-the driver on different platforms, hence the SoB and dual MODULE_AUTHOR
-in the driver code.
-
-In this version I dropped the DT changes, but you'll find them in my
-cesa-v4 branch [1]. In this branch you'll find everything you need to
-test on all Marvell platforms (including the old ones).
-I'll post a series updating all the DTs once this driver has been merged.
-
-Best Regards,
-
-Boris
-
-[1]https://github.com/bbrezillon/linux-marvell/tree/cesa-v4
-
-Changes since v3:
-- add import functions for hash algorithms
-- patch mv_cesa driver to support the new DT bindings
-- few fixes in the documentation
-- replace mv_mbus_dram_info() call by mv_mbus_dram_info_nooverlap()
-- remove DT updates from the series
-
-Changes since v2:
-- fixes in the cipher code (->dst_nents was assigned the ->src_nents
-  value and CBC state was overwritten by the IV after each chunk
-  operation)
-- spit the code as suggested by Sebastian
-
-Changes since v1:
-- (suggested by Jason) kept the existing CESA driver and added a mechanism
-  to prevent the new driver from probing devices handled my the existing
-  one (Orion and Kirkwood platforms)
-- (reported by Paul) addressed a few Kconfig and module definition issues
-- (suggested by Andrew) added DT changes to the series
-
-Arnaud Ebalard (4):
-  crypto: marvell/CESA: add Triple-DES support
-  crypto: marvell/CESA: add MD5 support
-  crypto: marvell/CESA: add SHA256 support
-  crypto: marvell/CESA: add support for Kirkwood and Dove SoCs
-
-Boris Brezillon (10):
-  crypto: mv_cesa: document the clocks property
-  crypto: mv_cesa: use gen_pool to reserve the SRAM memory region
-  crypto: mv_cesa: explicitly define kirkwood and dove compatible
-    strings
-  crypto: add a new driver for Marvell's CESA
-  crypto: marvell/CESA: add TDMA support
-  crypto: marvell/CESA: add DES support
-  crypto: marvell/CESA: add support for all armada SoCs
-  crypto: marvell/CESA: add allhwsupport module parameter
-  crypto: marvell/CESA: add support for Orion SoCs
-  crypto: marvell/CESA: add DT bindings documentation
-
- .../devicetree/bindings/crypto/marvell-cesa.txt    |   45 +
- .../devicetree/bindings/crypto/mv_cesa.txt         |   31 +-
- drivers/crypto/Kconfig                             |   18 +
- drivers/crypto/Makefile                            |    1 +
- drivers/crypto/marvell/Makefile                    |    2 +
- drivers/crypto/marvell/cesa.c                      |  544 ++++++++
- drivers/crypto/marvell/cesa.h                      |  804 +++++++++++
- drivers/crypto/marvell/cipher.c                    |  774 +++++++++++
- drivers/crypto/marvell/hash.c                      | 1433 ++++++++++++++++++++
- drivers/crypto/marvell/tdma.c                      |  224 +++
- drivers/crypto/mv_cesa.c                           |   60 +-
- 11 files changed, 3912 insertions(+), 24 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/marvell-cesa.txt
- create mode 100644 drivers/crypto/marvell/Makefile
- create mode 100644 drivers/crypto/marvell/cesa.c
- create mode 100644 drivers/crypto/marvell/cesa.h
- create mode 100644 drivers/crypto/marvell/cipher.c
- create mode 100644 drivers/crypto/marvell/hash.c
- create mode 100644 drivers/crypto/marvell/tdma.c
-
+diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+index 47c9ef8..b9f4d26 100644
+--- a/drivers/crypto/marvell/cesa.c
++++ b/drivers/crypto/marvell/cesa.c
+@@ -167,6 +167,8 @@ static void mv_cesa_remove_algs(struct mv_cesa_dev *cesa)
+ static struct crypto_alg *armada_370_cipher_algs[] = {
+ 	&mv_cesa_ecb_des_alg,
+ 	&mv_cesa_cbc_des_alg,
++	&mv_cesa_ecb_des3_ede_alg,
++	&mv_cesa_cbc_des3_ede_alg,
+ 	&mv_cesa_ecb_aes_alg,
+ 	&mv_cesa_cbc_aes_alg,
+ };
+diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
+index 5d91da3..d886280 100644
+--- a/drivers/crypto/marvell/cesa.h
++++ b/drivers/crypto/marvell/cesa.h
+@@ -792,6 +792,8 @@ extern struct ahash_alg mv_ahmac_sha1_alg;
+ 
+ extern struct crypto_alg mv_cesa_ecb_des_alg;
+ extern struct crypto_alg mv_cesa_cbc_des_alg;
++extern struct crypto_alg mv_cesa_ecb_des3_ede_alg;
++extern struct crypto_alg mv_cesa_cbc_des3_ede_alg;
+ extern struct crypto_alg mv_cesa_ecb_aes_alg;
+ extern struct crypto_alg mv_cesa_cbc_aes_alg;
+ 
+diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
+index 2094a9e..d71262d 100644
+--- a/drivers/crypto/marvell/cipher.c
++++ b/drivers/crypto/marvell/cipher.c
+@@ -22,6 +22,11 @@ struct mv_cesa_des_ctx {
+ 	u8 key[DES_KEY_SIZE];
+ };
+ 
++struct mv_cesa_des3_ctx {
++	struct mv_cesa_ctx base;
++	u8 key[DES3_EDE_KEY_SIZE];
++};
++
+ struct mv_cesa_aes_ctx {
+ 	struct mv_cesa_ctx base;
+ 	struct crypto_aes_ctx aes;
+@@ -253,6 +258,22 @@ static int mv_cesa_des_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
+ 	return 0;
+ }
+ 
++static int mv_cesa_des3_ede_setkey(struct crypto_ablkcipher *cipher,
++				   const u8 *key, unsigned int len)
++{
++	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
++	struct mv_cesa_des_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	if (len != DES3_EDE_KEY_SIZE) {
++		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
++	}
++
++	memcpy(ctx->key, key, DES3_EDE_KEY_SIZE);
++
++	return 0;
++}
++
+ static int mv_cesa_ablkcipher_dma_req_init(struct ablkcipher_request *req,
+ 				const struct mv_cesa_op_ctx *op_templ)
+ {
+@@ -491,6 +512,132 @@ struct crypto_alg mv_cesa_cbc_des_alg = {
+ 	},
+ };
+ 
++static int mv_cesa_des3_op(struct ablkcipher_request *req,
++			   struct mv_cesa_op_ctx *tmpl)
++{
++	struct mv_cesa_des3_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	int ret;
++
++	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_3DES,
++			      CESA_SA_DESC_CFG_CRYPTM_MSK);
++
++	memcpy(tmpl->ctx.blkcipher.key, ctx->key, DES3_EDE_KEY_SIZE);
++
++	ret = mv_cesa_ablkcipher_req_init(req, tmpl);
++	if (ret)
++		return ret;
++
++	ret = mv_cesa_queue_req(&req->base);
++	if (ret && ret != -EINPROGRESS)
++		mv_cesa_ablkcipher_cleanup(req);
++
++	return ret;
++}
++
++static int mv_cesa_ecb_des3_ede_encrypt(struct ablkcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_ENC);
++
++	return mv_cesa_des3_op(req, &tmpl);
++}
++
++static int mv_cesa_ecb_des3_ede_decrypt(struct ablkcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_DEC);
++
++	return mv_cesa_des3_op(req, &tmpl);
++}
++
++struct crypto_alg mv_cesa_ecb_des3_ede_alg = {
++	.cra_name = "ecb(des3_ede)",
++	.cra_driver_name = "mv-ecb-des3-ede",
++	.cra_priority = 300,
++	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
++		     CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++	.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++	.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
++	.cra_alignmask = 0,
++	.cra_type = &crypto_ablkcipher_type,
++	.cra_module = THIS_MODULE,
++	.cra_init = mv_cesa_ablkcipher_cra_init,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize = DES3_EDE_KEY_SIZE,
++			.max_keysize = DES3_EDE_KEY_SIZE,
++			.ivsize	     = DES3_EDE_BLOCK_SIZE,
++			.setkey = mv_cesa_des3_ede_setkey,
++			.encrypt = mv_cesa_ecb_des3_ede_encrypt,
++			.decrypt = mv_cesa_ecb_des3_ede_decrypt,
++		},
++	},
++};
++
++static int mv_cesa_cbc_des3_op(struct ablkcipher_request *req,
++			       struct mv_cesa_op_ctx *tmpl)
++{
++	memcpy(tmpl->ctx.blkcipher.iv, req->info, DES3_EDE_BLOCK_SIZE);
++
++	return mv_cesa_des3_op(req, tmpl);
++}
++
++static int mv_cesa_cbc_des3_ede_encrypt(struct ablkcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_ENC);
++
++	return mv_cesa_cbc_des3_op(req, &tmpl);
++}
++
++static int mv_cesa_cbc_des3_ede_decrypt(struct ablkcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_DEC);
++
++	return mv_cesa_cbc_des3_op(req, &tmpl);
++}
++
++struct crypto_alg mv_cesa_cbc_des3_ede_alg = {
++	.cra_name = "cbc(des3_ede)",
++	.cra_driver_name = "mv-cbc-des3-ede",
++	.cra_priority = 300,
++	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
++		     CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++	.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++	.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
++	.cra_alignmask = 0,
++	.cra_type = &crypto_ablkcipher_type,
++	.cra_module = THIS_MODULE,
++	.cra_init = mv_cesa_ablkcipher_cra_init,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize = DES3_EDE_KEY_SIZE,
++			.max_keysize = DES3_EDE_KEY_SIZE,
++			.ivsize	     = DES3_EDE_BLOCK_SIZE,
++			.setkey = mv_cesa_des3_ede_setkey,
++			.encrypt = mv_cesa_cbc_des3_ede_encrypt,
++			.decrypt = mv_cesa_cbc_des3_ede_decrypt,
++		},
++	},
++};
++
+ static int mv_cesa_aes_op(struct ablkcipher_request *req,
+ 			  struct mv_cesa_op_ctx *tmpl)
+ {
 -- 
 1.9.1
-
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
