@@ -1,10 +1,10 @@
 From: Dan Streetman <ddstreet@ieee.org>
-Subject: [PATCH 1/2] crypto: move include/linux/nx842.h into drivers/crypto/nx/nx-842.h
-Date: Fri, 12 Jun 2015 10:58:46 -0400
-Message-ID: <1434121127-14508-2-git-send-email-ddstreet@ieee.org>
+Subject: [PATCH 2/2] crypto: replace NX842_MEM_COMPRESS with function
+Date: Fri, 12 Jun 2015 10:58:47 -0400
+Message-ID: <1434121127-14508-3-git-send-email-ddstreet@ieee.org>
 References: <1434121127-14508-1-git-send-email-ddstreet@ieee.org>
 Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Dan Streetman <ddstreet@ieee.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-kernel-owner@vger.kernel.org>
@@ -12,139 +12,186 @@ In-Reply-To: <1434121127-14508-1-git-send-email-ddstreet@ieee.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Move the contents of the include/linux/nx842.h header file into the
-drivers/crypto/nx/nx-842.h header file.  Remove the nx842.h header
-file and its entry in the MAINTAINERS file.
+Replace the NX842_MEM_COMPRESS define with a function that returns the
+specific platform driver's required working memory size.
 
-The include/linux/nx842.h header originally was there because the
-crypto/842.c driver needed it to communicate with the nx-842 hw
-driver.  However, that crypto compression driver was moved into
-the drivers/crypto/nx/ directory, and now can directly include the
-nx-842.h header.  Nothing else needs the public include/linux/nx842.h
-header file, as all use of the nx-842 hardware driver will be through
-the "842-nx" crypto compression driver, since the direct nx-842 api is
-very limited in the buffer alignments and sizes that it will accept,
-and the crypto compression interface handles those limitations and
-allows any alignment and size buffers.
+The common nx-842.c driver refuses to load if there is no platform
+driver present, so instead of defining an approximate working memory
+size that's the maximum approximate size of both platform driver's
+size requirements, the platform driver can directly provide its
+specific, i.e. sizeof(struct nx842_workmem), size requirements which
+the 842-nx crypto compression driver will use.
+
+This saves memory by both reducing the required size of each driver
+to the specific sizeof() amount, as well as using the specific loaded
+platform driver's required amount, instead of the maximum of both.
 
 Signed-off-by: Dan Streetman <ddstreet@ieee.org>
 ---
- MAINTAINERS                       |  1 -
- drivers/crypto/nx/nx-842-crypto.c |  3 ++-
- drivers/crypto/nx/nx-842.h        | 21 ++++++++++++++++++++-
- include/linux/nx842.h             | 24 ------------------------
- 4 files changed, 22 insertions(+), 27 deletions(-)
- delete mode 100644 include/linux/nx842.h
+ drivers/crypto/nx/nx-842-crypto.c  |  2 +-
+ drivers/crypto/nx/nx-842-powernv.c | 11 +++++++----
+ drivers/crypto/nx/nx-842-pseries.c |  7 +++----
+ drivers/crypto/nx/nx-842.c         | 11 +++++++++++
+ drivers/crypto/nx/nx-842.h         |  9 +++------
+ 5 files changed, 25 insertions(+), 15 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 912c9d9..fb06e1e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4862,7 +4862,6 @@ IBM Power 842 compression accelerator
- M:	Dan Streetman <ddstreet@us.ibm.com>
- S:	Supported
- F:	drivers/crypto/nx/nx-842*
--F:	include/linux/nx842.h
- F:	include/linux/sw842.h
- F:	crypto/842.c
- F:	lib/842/
 diff --git a/drivers/crypto/nx/nx-842-crypto.c b/drivers/crypto/nx/nx-842-crypto.c
-index 2ffa103..95066f3 100644
+index 95066f3..d53a1dc 100644
 --- a/drivers/crypto/nx/nx-842-crypto.c
 +++ b/drivers/crypto/nx/nx-842-crypto.c
-@@ -58,10 +58,11 @@
- #include <linux/module.h>
- #include <linux/crypto.h>
- #include <linux/vmalloc.h>
--#include <linux/nx842.h>
- #include <linux/sw842.h>
- #include <linux/ratelimit.h>
+@@ -136,7 +136,7 @@ static int nx842_crypto_init(struct crypto_tfm *tfm)
+ {
+ 	struct nx842_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
  
-+#include "nx-842.h"
+-	ctx->wmem = kmalloc(NX842_MEM_COMPRESS, GFP_KERNEL);
++	ctx->wmem = kmalloc(nx842_workmem_size(), GFP_KERNEL);
+ 	ctx->sbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
+ 	ctx->dbounce = (u8 *)__get_free_pages(GFP_KERNEL, BOUNCE_BUFFER_ORDER);
+ 	if (!ctx->wmem || !ctx->sbounce || !ctx->dbounce) {
+diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+index c388dba..33b3b0a 100644
+--- a/drivers/crypto/nx/nx-842-powernv.c
++++ b/drivers/crypto/nx/nx-842-powernv.c
+@@ -367,7 +367,8 @@ static int wait_for_csb(struct nx842_workmem *wmem,
+  * @inlen: input buffer size
+  * @out: output buffer pointer
+  * @outlenp: output buffer size pointer
+- * @workmem: working memory buffer pointer, must be at least NX842_MEM_COMPRESS
++ * @workmem: working memory buffer pointer, size determined by
++ *           nx842_powernv_driver.workmem_size
+  * @fc: function code, see CCW Function Codes in nx-842.h
+  *
+  * Returns:
+@@ -477,7 +478,8 @@ static int nx842_powernv_function(const unsigned char *in, unsigned int inlen,
+  * @inlen: input buffer size
+  * @out: output buffer pointer
+  * @outlenp: output buffer size pointer
+- * @workmem: working memory buffer pointer, must be at least NX842_MEM_COMPRESS
++ * @workmem: working memory buffer pointer, size determined by
++ *           nx842_powernv_driver.workmem_size
+  *
+  * Returns: see @nx842_powernv_function()
+  */
+@@ -504,7 +506,8 @@ static int nx842_powernv_compress(const unsigned char *in, unsigned int inlen,
+  * @inlen: input buffer size
+  * @out: output buffer pointer
+  * @outlenp: output buffer size pointer
+- * @workmem: working memory buffer pointer, must be at least NX842_MEM_COMPRESS
++ * @workmem: working memory buffer pointer, size determined by
++ *           nx842_powernv_driver.workmem_size
+  *
+  * Returns: see @nx842_powernv_function()
+  */
+@@ -572,6 +575,7 @@ static struct nx842_constraints nx842_powernv_constraints = {
+ static struct nx842_driver nx842_powernv_driver = {
+ 	.name =		KBUILD_MODNAME,
+ 	.owner =	THIS_MODULE,
++	.workmem_size =	sizeof(struct nx842_workmem),
+ 	.constraints =	&nx842_powernv_constraints,
+ 	.compress =	nx842_powernv_compress,
+ 	.decompress =	nx842_powernv_decompress,
+@@ -582,7 +586,6 @@ static __init int nx842_powernv_init(void)
+ 	struct device_node *dn;
+ 
+ 	/* verify workmem size/align restrictions */
+-	BUILD_BUG_ON(sizeof(struct nx842_workmem) > NX842_MEM_COMPRESS);
+ 	BUILD_BUG_ON(WORKMEM_ALIGN % CRB_ALIGN);
+ 	BUILD_BUG_ON(CRB_ALIGN % DDE_ALIGN);
+ 	BUILD_BUG_ON(CRB_SIZE % DDE_ALIGN);
+diff --git a/drivers/crypto/nx/nx-842-pseries.c b/drivers/crypto/nx/nx-842-pseries.c
+index 41bc551..da52d8e 100644
+--- a/drivers/crypto/nx/nx-842-pseries.c
++++ b/drivers/crypto/nx/nx-842-pseries.c
+@@ -284,7 +284,7 @@ static int nx842_validate_result(struct device *dev,
+  * @out: Pointer to output buffer
+  * @outlen: Length of output buffer
+  * @wrkmem: ptr to buffer for working memory, size determined by
+- *          NX842_MEM_COMPRESS
++ *          nx842_pseries_driver.workmem_size
+  *
+  * Returns:
+  *   0		Success, output of length @outlen stored in the buffer at @out
+@@ -411,7 +411,7 @@ unlock:
+  * @out: Pointer to output buffer
+  * @outlen: Length of output buffer
+  * @wrkmem: ptr to buffer for working memory, size determined by
+- *          NX842_MEM_COMPRESS
++ *          nx842_pseries_driver.workmem_size
+  *
+  * Returns:
+  *   0		Success, output of length @outlen stored in the buffer at @out
+@@ -963,6 +963,7 @@ static struct attribute_group nx842_attribute_group = {
+ static struct nx842_driver nx842_pseries_driver = {
+ 	.name =		KBUILD_MODNAME,
+ 	.owner =	THIS_MODULE,
++	.workmem_size =	sizeof(struct nx842_workmem),
+ 	.constraints =	&nx842_pseries_constraints,
+ 	.compress =	nx842_pseries_compress,
+ 	.decompress =	nx842_pseries_decompress,
+@@ -1084,8 +1085,6 @@ static int __init nx842_init(void)
+ 
+ 	pr_info("Registering IBM Power 842 compression driver\n");
+ 
+-	BUILD_BUG_ON(sizeof(struct nx842_workmem) > NX842_MEM_COMPRESS);
+-
+ 	if (!of_find_compatible_node(NULL, NULL, "ibm,compression"))
+ 		return -ENODEV;
+ 
+diff --git a/drivers/crypto/nx/nx-842.c b/drivers/crypto/nx/nx-842.c
+index 9f391d6..6e5e0d6 100644
+--- a/drivers/crypto/nx/nx-842.c
++++ b/drivers/crypto/nx/nx-842.c
+@@ -53,6 +53,17 @@ int nx842_constraints(struct nx842_constraints *c)
+ }
+ EXPORT_SYMBOL_GPL(nx842_constraints);
+ 
++/**
++ * nx842_workmem_size
++ *
++ * Get the amount of working memory the driver requires.
++ */
++size_t nx842_workmem_size(void)
++{
++	return nx842_platform_driver()->workmem_size;
++}
++EXPORT_SYMBOL_GPL(nx842_workmem_size);
 +
- /* The first 5 bits of this magic are 0x1f, which is an invalid 842 5-bit
-  * template (see lib/842/842.h), so this magic number will never appear at
-  * the start of a raw 842 compressed buffer.  That is important, as any buffer
+ int nx842_compress(const unsigned char *in, unsigned int ilen,
+ 		   unsigned char *out, unsigned int *olen, void *wmem)
+ {
 diff --git a/drivers/crypto/nx/nx-842.h b/drivers/crypto/nx/nx-842.h
-index 1730f4da..4dbac11 100644
+index 4dbac11..f6821b6 100644
 --- a/drivers/crypto/nx/nx-842.h
 +++ b/drivers/crypto/nx/nx-842.h
-@@ -4,7 +4,6 @@
- 
- #include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/nx842.h>
- #include <linux/sw842.h>
- #include <linux/of.h>
- #include <linux/slab.h>
-@@ -12,6 +11,12 @@
+@@ -11,12 +11,6 @@
  #include <linux/mm.h>
  #include <linux/ratelimit.h>
  
-+#define __NX842_PSERIES_MEM_COMPRESS	(10240)
-+#define __NX842_POWERNV_MEM_COMPRESS	(1024)
-+
-+#define NX842_MEM_COMPRESS	(max_t(unsigned int,			\
-+	__NX842_PSERIES_MEM_COMPRESS, __NX842_POWERNV_MEM_COMPRESS))
-+
- /* Restrictions on Data Descriptor List (DDL) and Entry (DDE) buffers
-  *
-  * From NX P8 workbook, sec 4.9.1 "842 details"
-@@ -104,6 +109,13 @@ static inline unsigned long nx842_get_pa(void *addr)
- #define GET_FIELD(v, m)		(((v) & (m)) >> MASK_LSH(m))
- #define SET_FIELD(v, m, val)	(((v) & ~(m)) | (((val) << MASK_LSH(m)) & (m)))
- 
-+struct nx842_constraints {
-+	int alignment;
-+	int multiple;
-+	int minimum;
-+	int maximum;
-+};
-+
- struct nx842_driver {
- 	char *name;
- 	struct module *owner;
-@@ -124,4 +136,11 @@ void nx842_platform_driver_unset(struct nx842_driver *driver);
- bool nx842_platform_driver_get(void);
- void nx842_platform_driver_put(void);
- 
-+int nx842_constraints(struct nx842_constraints *constraints);
-+
-+int nx842_compress(const unsigned char *in, unsigned int in_len,
-+		   unsigned char *out, unsigned int *out_len, void *wrkmem);
-+int nx842_decompress(const unsigned char *in, unsigned int in_len,
-+		     unsigned char *out, unsigned int *out_len, void *wrkmem);
-+
- #endif /* __NX_842_H__ */
-diff --git a/include/linux/nx842.h b/include/linux/nx842.h
-deleted file mode 100644
-index 4ddf68d..0000000
---- a/include/linux/nx842.h
-+++ /dev/null
-@@ -1,24 +0,0 @@
--#ifndef __NX842_H__
--#define __NX842_H__
--
 -#define __NX842_PSERIES_MEM_COMPRESS	(10240)
 -#define __NX842_POWERNV_MEM_COMPRESS	(1024)
 -
 -#define NX842_MEM_COMPRESS	(max_t(unsigned int,			\
 -	__NX842_PSERIES_MEM_COMPRESS, __NX842_POWERNV_MEM_COMPRESS))
 -
--struct nx842_constraints {
--	int alignment;
--	int multiple;
--	int minimum;
--	int maximum;
--};
--
--int nx842_constraints(struct nx842_constraints *constraints);
--
--int nx842_compress(const unsigned char *in, unsigned int in_len,
--		   unsigned char *out, unsigned int *out_len, void *wrkmem);
--int nx842_decompress(const unsigned char *in, unsigned int in_len,
--		     unsigned char *out, unsigned int *out_len, void *wrkmem);
--
--#endif
+ /* Restrictions on Data Descriptor List (DDL) and Entry (DDE) buffers
+  *
+  * From NX P8 workbook, sec 4.9.1 "842 details"
+@@ -119,6 +113,7 @@ struct nx842_constraints {
+ struct nx842_driver {
+ 	char *name;
+ 	struct module *owner;
++	size_t workmem_size;
+ 
+ 	struct nx842_constraints *constraints;
+ 
+@@ -136,6 +131,8 @@ void nx842_platform_driver_unset(struct nx842_driver *driver);
+ bool nx842_platform_driver_get(void);
+ void nx842_platform_driver_put(void);
+ 
++size_t nx842_workmem_size(void);
++
+ int nx842_constraints(struct nx842_constraints *constraints);
+ 
+ int nx842_compress(const unsigned char *in, unsigned int in_len,
 -- 
 2.1.0
