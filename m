@@ -1,48 +1,50 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH RFC v4 2/4] crypto: add PKE API
-Date: Fri, 12 Jun 2015 07:24:10 -0700
-Message-ID: <557AEB8A.2040708@intel.com>
-References: <20150611190533.31826.13956.stgit@tstruk-mobl1> <20150611190543.31826.357.stgit@tstruk-mobl1> <2901639.xlpED6EpBc@tauon.atsec.com> <20150612024246.GA30982@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
-	jwboyer@redhat.com, richard@nod.at, steved@redhat.com,
-	qat-linux@intel.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	vgoyal@redhat.com
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>
+From: Dan Streetman <ddstreet@ieee.org>
+Subject: [PATCH 0/2] remove nx842.h from include/linux
+Date: Fri, 12 Jun 2015 10:58:45 -0400
+Message-ID: <1434121127-14508-1-git-send-email-ddstreet@ieee.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Dan Streetman <ddstreet@ieee.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:61073 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750814AbbFLOYK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Jun 2015 10:24:10 -0400
-In-Reply-To: <20150612024246.GA30982@gondor.apana.org.au>
+Received: from mail-ig0-f178.google.com ([209.85.213.178]:37704 "EHLO
+	mail-ig0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752818AbbFLO67 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 12 Jun 2015 10:58:59 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 06/11/2015 07:42 PM, Herbert Xu wrote:
->> The testmgr code can mark an entire cipher implementation as fips_allowed=1 as 
->> > already done for RSA. However, unlike with the other ciphers, that flag must 
->> > go in conjunction with the used key sizes.
->> > 
->> > For FIPS mode, the following restrictions apply:
->> > 
->> > - RSA: 2048/3072
->> > 
->> > - DSA: L 2048 / N 224; L 2048 / N 256; L 3072 / N 256
->> > 
->> > - ECDSA: only the NIST curves
->> > 
->> > Any other key sizes for the given ciphers is not allowed in FIPS mode.
->> > 
->> > Should that constraint be considered here?
-> Yes.  However it should be placed into a helper that everybody
-> can call so that future hardware implementations can also make
-> the same checks.
+Now that the crypto/842.c driver does only software 842 comp/decomp,
+and the hardware crypto compressor for 842-nx is located in
+drivers/crypto/nx with the NX 842 hw driver, there's no reason for
+the nx842.h header to be located in include/linux/ anymore; nobody
+should use the NX 842 hw driver directly, everyone should use the
+crypto compression API.
 
-I will make the algorithm marked as fips allowed always and then fail in setkey if fips is enabled
-and the given key doesn't meet the fips requirement.
-Thanks
+The first patch moves the contents of include/linux/nx842.h into the
+existing drivers/crypto/nx/nx-842.h header file.  The second patch
+replaces the use of the NX842_MEM_COMPRESS define, since the 842-nx
+crypto compression driver can directly get the required working
+memory size from the NX 842 hw driver.
+
+This cleans up include/linux/ by 1 file, and it saves some memory
+by reducing the 842-nx working memory size down to exactly what the
+NX 842 platform driver requires.
+
+Dan Streetman (2):
+  crypto: move include/linux/nx842.h into drivers/crypto/nx/nx-842.h
+  crypto: replace NX842_MEM_COMPRESS with function
+
+ MAINTAINERS                        |  1 -
+ drivers/crypto/nx/nx-842-crypto.c  |  5 +++--
+ drivers/crypto/nx/nx-842-powernv.c | 11 +++++++----
+ drivers/crypto/nx/nx-842-pseries.c |  7 +++----
+ drivers/crypto/nx/nx-842.c         | 11 +++++++++++
+ drivers/crypto/nx/nx-842.h         | 18 +++++++++++++++++-
+ include/linux/nx842.h              | 24 ------------------------
+ 7 files changed, 41 insertions(+), 36 deletions(-)
+ delete mode 100644 include/linux/nx842.h
+
+-- 
+2.1.0
