@@ -1,247 +1,97 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [RESEND PATCH v4 06/14] crypto: marvell/CESA: add DES support
-Date: Fri, 12 Jun 2015 09:15:58 +0200
-Message-ID: <1434093366-14681-7-git-send-email-boris.brezillon@free-electrons.com>
+From: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Subject: [RESEND PATCH v4 14/14] crypto: marvell/CESA: add DT bindings documentation
+Date: Fri, 12 Jun 2015 09:16:06 +0200
+Message-ID: <1434093366-14681-15-git-send-email-boris.brezillon@free-electrons.com>
 References: <1434093366-14681-1-git-send-email-boris.brezillon@free-electrons.com>
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	"Imre Kaloz" <kaloz@openwrt.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1434093366-14681-1-git-send-email-boris.brezillon@free-electrons.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+	Tawfik Bayouk <tawfik-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Lior Amsalem <alior-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Nadav Haklai <nadavh-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Eran Ben-Avi <benavi-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Thomas Petazzoni <thomas.petazzoni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Gregory CLEMENT <gregory.clement-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>,
+	Sebastian Hesselbarth <sebastian.hesselbarth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
+	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
+	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Jason Gunthorpe <jgunthorpe-ePGOBjL8dl3ta4EC/59zMFaTQe2KTcn/@public.gmane.org>,
+	"Imre Kaloz" <kaloz-p3rKhJxN3npAfugRpC6u6w@public.gmane.org>
+To: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>,
+	"David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1434093366-14681-1-git-send-email-boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add support for DES operations.
+Add DT bindings documentation for the new marvell-cesa driver.
 
-Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
-Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
+Signed-off-by: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
 ---
- drivers/crypto/marvell/cesa.c   |   2 +
- drivers/crypto/marvell/cesa.h   |   2 +
- drivers/crypto/marvell/cipher.c | 150 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 154 insertions(+)
+ .../devicetree/bindings/crypto/marvell-cesa.txt    | 45 ++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/marvell-cesa.txt
 
-diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index 5a226c4..47c9ef8 100644
---- a/drivers/crypto/marvell/cesa.c
-+++ b/drivers/crypto/marvell/cesa.c
-@@ -165,6 +165,8 @@ static void mv_cesa_remove_algs(struct mv_cesa_dev *cesa)
- }
- 
- static struct crypto_alg *armada_370_cipher_algs[] = {
-+	&mv_cesa_ecb_des_alg,
-+	&mv_cesa_cbc_des_alg,
- 	&mv_cesa_ecb_aes_alg,
- 	&mv_cesa_cbc_aes_alg,
- };
-diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index fcacc70..5d91da3 100644
---- a/drivers/crypto/marvell/cesa.h
-+++ b/drivers/crypto/marvell/cesa.h
-@@ -790,6 +790,8 @@ int mv_cesa_dma_add_op_transfers(struct mv_cesa_tdma_chain *chain,
- extern struct ahash_alg mv_sha1_alg;
- extern struct ahash_alg mv_ahmac_sha1_alg;
- 
-+extern struct crypto_alg mv_cesa_ecb_des_alg;
-+extern struct crypto_alg mv_cesa_cbc_des_alg;
- extern struct crypto_alg mv_cesa_ecb_aes_alg;
- extern struct crypto_alg mv_cesa_cbc_aes_alg;
- 
-diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
-index 8188fc2..2094a9e 100644
---- a/drivers/crypto/marvell/cipher.c
-+++ b/drivers/crypto/marvell/cipher.c
-@@ -13,9 +13,15 @@
-  */
- 
- #include <crypto/aes.h>
-+#include <crypto/des.h>
- 
- #include "cesa.h"
- 
-+struct mv_cesa_des_ctx {
-+	struct mv_cesa_ctx base;
-+	u8 key[DES_KEY_SIZE];
-+};
+diff --git a/Documentation/devicetree/bindings/crypto/marvell-cesa.txt b/Documentation/devicetree/bindings/crypto/marvell-cesa.txt
+new file mode 100644
+index 0000000..c6c6a4a0
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/marvell-cesa.txt
+@@ -0,0 +1,45 @@
++Marvell Cryptographic Engines And Security Accelerator
 +
- struct mv_cesa_aes_ctx {
- 	struct mv_cesa_ctx base;
- 	struct crypto_aes_ctx aes;
-@@ -223,6 +229,30 @@ static int mv_cesa_aes_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
- 	return 0;
- }
- 
-+static int mv_cesa_des_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
-+			      unsigned int len)
-+{
-+	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
-+	struct mv_cesa_des_ctx *ctx = crypto_tfm_ctx(tfm);
-+	u32 tmp[DES_EXPKEY_WORDS];
-+	int ret;
++Required properties:
++- compatible: should be one of the following string
++	      "marvell,orion-crypto"
++	      "marvell,kirkwood-crypto"
++	      "marvell,dove-crypto"
++	      "marvell,armada-370-crypto"
++	      "marvell,armada-xp-crypto"
++	      "marvell,armada-375-crypto"
++	      "marvell,armada-38x-crypto"
++- reg: base physical address of the engine and length of memory mapped
++       region. Can also contain an entry for the SRAM attached to the CESA,
++       but this representation is deprecated and marvell,crypto-srams should
++       be used instead
++- reg-names: "regs". Can contain an "sram" entry, but this representation
++	     is deprecated and marvell,crypto-srams should be used instead
++- interrupts: interrupt number
++- clocks: reference to the crypto engines clocks. This property is not
++	  required for orion and kirkwood platforms
++- clock-names: "cesaX" and "cesazX", X should be replaced by the crypto engine
++	       id.
++	       This property is not required for the orion and kirkwoord
++	       platforms.
++	       "cesazX" clocks are not required on armada-370 platforms
++- marvell,crypto-srams: phandle to crypto SRAM definitions
 +
-+	if (len != DES_KEY_SIZE) {
-+		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
++Optional properties:
++- marvell,crypto-sram-size: SRAM size reserved for crypto operations, if not
++			    specified the whole SRAM is used (2KB)
 +
-+	ret = des_ekey(tmp, key);
-+	if (!ret && (tfm->crt_flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
-+		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
-+		return -EINVAL;
-+	}
 +
-+	memcpy(ctx->key, key, DES_KEY_SIZE);
++Examples:
 +
-+	return 0;
-+}
-+
- static int mv_cesa_ablkcipher_dma_req_init(struct ablkcipher_request *req,
- 				const struct mv_cesa_op_ctx *op_templ)
- {
-@@ -341,6 +371,126 @@ static int mv_cesa_ablkcipher_req_init(struct ablkcipher_request *req,
- 	return ret;
- }
- 
-+static int mv_cesa_des_op(struct ablkcipher_request *req,
-+			  struct mv_cesa_op_ctx *tmpl)
-+{
-+	struct mv_cesa_des_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+	int ret;
-+
-+	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_DES,
-+			      CESA_SA_DESC_CFG_CRYPTM_MSK);
-+
-+	memcpy(tmpl->ctx.blkcipher.key, ctx->key, DES_KEY_SIZE);
-+
-+	ret = mv_cesa_ablkcipher_req_init(req, tmpl);
-+	if (ret)
-+		return ret;
-+
-+	ret = mv_cesa_queue_req(&req->base);
-+	if (ret && ret != -EINPROGRESS)
-+		mv_cesa_ablkcipher_cleanup(req);
-+
-+	return ret;
-+}
-+
-+static int mv_cesa_ecb_des_encrypt(struct ablkcipher_request *req)
-+{
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl,
-+			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
-+			   CESA_SA_DESC_CFG_DIR_ENC);
-+
-+	return mv_cesa_des_op(req, &tmpl);
-+}
-+
-+static int mv_cesa_ecb_des_decrypt(struct ablkcipher_request *req)
-+{
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl,
-+			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
-+			   CESA_SA_DESC_CFG_DIR_DEC);
-+
-+	return mv_cesa_des_op(req, &tmpl);
-+}
-+
-+struct crypto_alg mv_cesa_ecb_des_alg = {
-+	.cra_name = "ecb(des)",
-+	.cra_driver_name = "mv-ecb-des",
-+	.cra_priority = 300,
-+	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-+		     CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
-+	.cra_blocksize = DES_BLOCK_SIZE,
-+	.cra_ctxsize = sizeof(struct mv_cesa_des_ctx),
-+	.cra_alignmask = 0,
-+	.cra_type = &crypto_ablkcipher_type,
-+	.cra_module = THIS_MODULE,
-+	.cra_init = mv_cesa_ablkcipher_cra_init,
-+	.cra_u = {
-+		.ablkcipher = {
-+			.min_keysize = DES_KEY_SIZE,
-+			.max_keysize = DES_KEY_SIZE,
-+			.setkey = mv_cesa_des_setkey,
-+			.encrypt = mv_cesa_ecb_des_encrypt,
-+			.decrypt = mv_cesa_ecb_des_decrypt,
-+		},
-+	},
-+};
-+
-+static int mv_cesa_cbc_des_op(struct ablkcipher_request *req,
-+			      struct mv_cesa_op_ctx *tmpl)
-+{
-+	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTCM_CBC,
-+			      CESA_SA_DESC_CFG_CRYPTCM_MSK);
-+
-+	memcpy(tmpl->ctx.blkcipher.iv, req->info, 8);
-+
-+	return mv_cesa_des_op(req, tmpl);
-+}
-+
-+static int mv_cesa_cbc_des_encrypt(struct ablkcipher_request *req)
-+{
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_ENC);
-+
-+	return mv_cesa_cbc_des_op(req, &tmpl);
-+}
-+
-+static int mv_cesa_cbc_des_decrypt(struct ablkcipher_request *req)
-+{
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_DEC);
-+
-+	return mv_cesa_cbc_des_op(req, &tmpl);
-+}
-+
-+struct crypto_alg mv_cesa_cbc_des_alg = {
-+	.cra_name = "cbc(des)",
-+	.cra_driver_name = "mv-cbc-des",
-+	.cra_priority = 300,
-+	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-+		     CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
-+	.cra_blocksize = DES_BLOCK_SIZE,
-+	.cra_ctxsize = sizeof(struct mv_cesa_des_ctx),
-+	.cra_alignmask = 0,
-+	.cra_type = &crypto_ablkcipher_type,
-+	.cra_module = THIS_MODULE,
-+	.cra_init = mv_cesa_ablkcipher_cra_init,
-+	.cra_u = {
-+		.ablkcipher = {
-+			.min_keysize = DES_KEY_SIZE,
-+			.max_keysize = DES_KEY_SIZE,
-+			.ivsize	     = DES_BLOCK_SIZE,
-+			.setkey = mv_cesa_des_setkey,
-+			.encrypt = mv_cesa_cbc_des_encrypt,
-+			.decrypt = mv_cesa_cbc_des_decrypt,
-+		},
-+	},
-+};
-+
- static int mv_cesa_aes_op(struct ablkcipher_request *req,
- 			  struct mv_cesa_op_ctx *tmpl)
- {
++	crypto@90000 {
++		compatible = "marvell,armada-xp-crypto";
++		reg = <0x90000 0x10000>;
++		reg-names = "regs";
++		interrupts = <48>, <49>;
++		clocks = <&gateclk 23>, <&gateclk 23>;
++		clock-names = "cesa0", "cesa1";
++		marvell,crypto-srams = <&crypto_sram0>, <&crypto_sram1>;
++		marvell,crypto-sram-size = <0x600>;
++		status = "okay";
++	};
 -- 
 1.9.1
+
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
