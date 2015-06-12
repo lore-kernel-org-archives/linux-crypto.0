@@ -1,43 +1,44 @@
-From: Tadeusz Struk <tadeusz.struk@intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH RFC v4 2/4] crypto: add PKE API
-Date: Thu, 11 Jun 2015 23:50:06 -0700
-Message-ID: <557A811E.7010208@intel.com>
-References: <20150611190533.31826.13956.stgit@tstruk-mobl1> <20150611190543.31826.357.stgit@tstruk-mobl1> <20150612025940.GC30982@gondor.apana.org.au>
+Date: Fri, 12 Jun 2015 14:56:56 +0800
+Message-ID: <20150612065656.GA466@gondor.apana.org.au>
+References: <20150611190533.31826.13956.stgit@tstruk-mobl1>
+ <20150611190543.31826.357.stgit@tstruk-mobl1>
+ <20150612025940.GC30982@gondor.apana.org.au>
+ <557A811E.7010208@intel.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
 	jwboyer@redhat.com, richard@nod.at, steved@redhat.com,
 	qat-linux@intel.com, dhowells@redhat.com,
 	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
 	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
 	vgoyal@redhat.com
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:13073 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751248AbbFLGua (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 12 Jun 2015 02:50:30 -0400
-In-Reply-To: <20150612025940.GC30982@gondor.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:48013 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751119AbbFLG5b (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Fri, 12 Jun 2015 02:57:31 -0400
+Content-Disposition: inline
+In-Reply-To: <557A811E.7010208@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 06/11/2015 07:59 PM, Herbert Xu wrote:
->> +int crypto_akcipher_setkey(struct crypto_akcipher *tfm,
->> > +			   const struct public_key *pkey)
->> > +{
->> > +	if (tfm->pkey)
->> > +		akcipher_free_key(tfm->pkey);
->> > +
->> > +	return akcipher_clone_key(tfm, pkey);
->> > +}
-> No please do not expose the struct public_key crap to the new
-> API.  The key should be completely opaque to entities outside
-> of the algorithm.  So make it raw and read out the MPIs from
-> it.
-> 
-> The contents of the function must go into the algorithm setkey
-> function, not the crypto API.  So RSA would read out however
-> many MPIs it needs and verify it, and so on.
+On Thu, Jun 11, 2015 at 11:50:06PM -0700, Tadeusz Struk wrote:
+>
+> Should I make it MPI[] rather than void *
 
-Should I make it MPI[] rather than void *
+It should be in encoded format since only the algorithms should
+be decoding it.  Otherwise you have craziness where RSA-specific
+knowledge is placed into x509_cert_parser.c to parse RSA keys.
+
+It's probably easiest to go with the BER encoding that the only
+current user is using.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
