@@ -1,59 +1,48 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH RFC v4 2/4] crypto: add PKE API
-Date: Fri, 12 Jun 2015 10:45:49 +0800
-Message-ID: <20150612024549.GA31228@gondor.apana.org.au>
+Date: Fri, 12 Jun 2015 10:59:40 +0800
+Message-ID: <20150612025940.GC30982@gondor.apana.org.au>
 References: <20150611190533.31826.13956.stgit@tstruk-mobl1>
  <20150611190543.31826.357.stgit@tstruk-mobl1>
- <2901639.xlpED6EpBc@tauon.atsec.com>
- <20150612024246.GA30982@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>,
-	linux-kernel@vger.kernel.org, keescook@chromium.org,
+Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
 	jwboyer@redhat.com, richard@nod.at, steved@redhat.com,
 	qat-linux@intel.com, dhowells@redhat.com,
 	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
 	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
 	vgoyal@redhat.com
-To: Stephan Mueller <smueller@chronox.de>
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51077 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:38205 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752178AbbFLCqB (ORCPT
+	with ESMTP id S1750710AbbFLC7y (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 11 Jun 2015 22:46:01 -0400
+	Thu, 11 Jun 2015 22:59:54 -0400
 Content-Disposition: inline
-In-Reply-To: <20150612024246.GA30982@gondor.apana.org.au>
+In-Reply-To: <20150611190543.31826.357.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 12, 2015 at 10:42:46AM +0800, Herbert Xu wrote:
-> On Fri, Jun 12, 2015 at 03:00:42AM +0200, Stephan Mueller wrote:
-> >
-> > The testmgr code can mark an entire cipher implementation as fips_allowed=1 as 
-> > already done for RSA. However, unlike with the other ciphers, that flag must 
-> > go in conjunction with the used key sizes.
-> > 
-> > For FIPS mode, the following restrictions apply:
-> > 
-> > - RSA: 2048/3072
-> > 
-> > - DSA: L 2048 / N 224; L 2048 / N 256; L 3072 / N 256
-> > 
-> > - ECDSA: only the NIST curves
-> > 
-> > Any other key sizes for the given ciphers is not allowed in FIPS mode.
-> > 
-> > Should that constraint be considered here?
-> 
-> Yes.  However it should be placed into a helper that everybody
-> can call so that future hardware implementations can also make
-> the same checks.
+On Thu, Jun 11, 2015 at 12:05:44PM -0700, Tadeusz Struk wrote:
+>
+> +int crypto_akcipher_setkey(struct crypto_akcipher *tfm,
+> +			   const struct public_key *pkey)
+> +{
+> +	if (tfm->pkey)
+> +		akcipher_free_key(tfm->pkey);
+> +
+> +	return akcipher_clone_key(tfm, pkey);
+> +}
 
-Ugh I didn't notice this was the generic API setkey function.
-No it should go into the algorithm-specific setkey function and
-then be in the form of a helper so that all implementations of
-that algorithm can call it.
+No please do not expose the struct public_key crap to the new
+API.  The key should be completely opaque to entities outside
+of the algorithm.  So make it raw and read out the MPIs from
+it.
+
+The contents of the function must go into the algorithm setkey
+function, not the crypto API.  So RSA would read out however
+many MPIs it needs and verify it, and so on.
 
 Cheers,
 -- 
