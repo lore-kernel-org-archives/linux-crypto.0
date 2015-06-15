@@ -1,8 +1,8 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [RESEND PATCH v4 04/14] crypto: add a new driver for Marvell's
  CESA
-Date: Mon, 15 Jun 2015 17:37:54 +0800
-Message-ID: <20150615093754.GA31948@gondor.apana.org.au>
+Date: Mon, 15 Jun 2015 17:48:27 +0800
+Message-ID: <20150615094827.GA32073@gondor.apana.org.au>
 References: <1434093366-14681-1-git-send-email-boris.brezillon@free-electrons.com>
  <1434093366-14681-5-git-send-email-boris.brezillon@free-electrons.com>
 Mime-Version: 1.0
@@ -26,35 +26,24 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
 	Imre Kaloz <kaloz@openwrt.org>
 To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54506 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753329AbbFOJix (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 05:38:53 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
 In-Reply-To: <1434093366-14681-5-git-send-email-boris.brezillon@free-electrons.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
 On Fri, Jun 12, 2015 at 09:15:56AM +0200, Boris Brezillon wrote:
 >
-> +static inline int mv_cesa_sg_count(struct scatterlist *sg, int nbytes)
+> +static void mv_cesa_dequeue_req_unlocked(struct mv_cesa_engine *engine)
 > +{
-> +	int nents = 0;
+> +	struct crypto_async_request *req;
+> +	struct mv_cesa_ctx *ctx;
 > +
-> +	while (nbytes > 0) {
-> +		nents++;
-> +		nbytes -= sg->length;
-> +		sg = sg_next(sg);
-> +	}
-> +
-> +	return nents;
-> +}
+> +	spin_lock_bh(&cesa_dev->lock);
+> +	req = crypto_dequeue_request(&cesa_dev->queue);
 
-Please replace this with the newly added sg_nents_for_len.
-
-Thanks,
+Need to call crypto_get_backlog before this so you can do the
+backlog notification afterwards.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
