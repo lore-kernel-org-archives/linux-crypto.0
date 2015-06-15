@@ -1,7 +1,7 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH RFC 03/11] crypto: caam - Enable and disable clocks on Freescale i.MX platforms
-Date: Mon, 15 Jun 2015 16:52:51 -0700
-Message-ID: <1434412379-11623-4-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH RFC 02/11] crypto: caam - Add register I/O primitives for ARM compatibility
+Date: Mon, 15 Jun 2015 16:52:50 -0700
+Message-ID: <1434412379-11623-3-git-send-email-vicki.milhoan@freescale.com>
 References: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,158 +9,62 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<ruchika.gupta@freescale.com>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0112.outbound.protection.outlook.com ([157.56.111.112]:22863
+Received: from mail-bn1bon0146.outbound.protection.outlook.com ([157.56.111.146]:10209
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750911AbbFPAIn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 20:08:43 -0400
+	id S1750858AbbFPA0O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Jun 2015 20:26:14 -0400
 In-Reply-To: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-ARM-based systems may disable clocking to the CAAM device on the
-Freescale i.MX platform for power management purposes.  This patch
-enables the required clocks when the CAAM module is initialized and
-disables the required clocks when the CAAM module is shut down.
+From: Steve Cornelius <steve.cornelius@freescale.com>
 
+Add appropriate read/write register handling to support ARM/Little Endian
+devices.
+
+Add set/clear 32-bit primitives for compatibility with ARM devices since
+the primitives were previously only defined for the Power architecture.
+
+Signed-off-by: Steve Cornelius <steve.cornelius@freescale.com>
+[<vicki.milhoan@freescale.com>: Edit to accomodate __BIG_ENDIAN and __LITTLE_ENDIAN changes]
 Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 ---
- drivers/crypto/caam/compat.h |  4 +++
- drivers/crypto/caam/ctrl.c   | 81 ++++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/intern.h |  7 ++++
- 3 files changed, 92 insertions(+)
+ drivers/crypto/caam/regs.h | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/caam/compat.h b/drivers/crypto/caam/compat.h
-index acd7743..3148985 100644
---- a/drivers/crypto/caam/compat.h
-+++ b/drivers/crypto/caam/compat.h
-@@ -23,6 +23,10 @@
- #include <linux/types.h>
- #include <linux/debugfs.h>
- #include <linux/circ_buf.h>
-+
-+#ifdef CONFIG_ARM /* needs the clock control subsystem */
-+#include <linux/clk.h>
-+#endif
- #include <net/xfrm.h>
- 
- #include <crypto/algapi.h>
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index efba4cc..3226eb8 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -303,6 +303,14 @@ static int caam_remove(struct platform_device *pdev)
- 	/* Unmap controller region */
- 	iounmap(&ctrl);
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 378ddc1..9cca14e 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -74,17 +74,23 @@
+ #endif
+ #else
+ #ifdef __LITTLE_ENDIAN
+-#define wr_reg32(reg, data) __raw_writel(data, reg)
+-#define rd_reg32(reg) __raw_readl(reg)
++#define wr_reg32(reg, data) writel(data, reg)
++#define rd_reg32(reg) readl(reg)
+ #ifdef CONFIG_64BIT
+-#define wr_reg64(reg, data) __raw_writeq(data, reg)
+-#define rd_reg64(reg) __raw_readq(reg)
++#define wr_reg64(reg, data) writeq(data, reg)
++#define rd_reg64(reg) readq(reg)
+ #endif
+ #endif
+ #endif
  
 +#ifdef CONFIG_ARM
-+	/* shut clocks off before finalizing shutdown */
-+	clk_disable_unprepare(ctrlpriv->caam_ipg);
-+	clk_disable_unprepare(ctrlpriv->caam_mem);
-+	clk_disable_unprepare(ctrlpriv->caam_aclk);
-+	clk_disable_unprepare(ctrlpriv->caam_emi_slow);
++/* These are common macros for Power, put here for ARM */
++#define setbits32(_addr, _v) writel((readl(_addr) | (_v)), (_addr))
++#define clrbits32(_addr, _v) writel((readl(_addr) & ~(_v)), (_addr))
 +#endif
 +
- 	return ret;
- }
- 
-@@ -408,6 +416,79 @@ static int caam_probe(struct platform_device *pdev)
- 	ctrlpriv->pdev = pdev;
- 	nprop = pdev->dev.of_node;
- 
-+/*
-+ * ARM targets tend to have clock control subsystems that can
-+ * enable/disable clocking to our device. Turn clocking on to proceed
-+ */
-+#ifdef CONFIG_ARM
-+	ctrlpriv->caam_ipg = devm_clk_get(&pdev->dev, "caam_ipg");
-+	if (IS_ERR(ctrlpriv->caam_ipg)) {
-+		ret = PTR_ERR(ctrlpriv->caam_ipg);
-+		dev_err(&pdev->dev,
-+			"can't identify CAAM ipg clk: %d\n", ret);
-+		return -ENODEV;
-+	}
-+
-+	ctrlpriv->caam_mem = devm_clk_get(&pdev->dev, "caam_mem");
-+	if (IS_ERR(ctrlpriv->caam_mem)) {
-+		ret = PTR_ERR(ctrlpriv->caam_mem);
-+		dev_err(&pdev->dev,
-+			"can't identify CAAM secure mem clk: %d\n", ret);
-+		return -ENODEV;
-+	}
-+
-+	ctrlpriv->caam_aclk = devm_clk_get(&pdev->dev, "caam_aclk");
-+	if (IS_ERR(ctrlpriv->caam_aclk)) {
-+		ret = PTR_ERR(ctrlpriv->caam_aclk);
-+		dev_err(&pdev->dev,
-+			"can't identify CAAM aclk clk: %d\n", ret);
-+		return -ENODEV;
-+	}
-+
-+	ctrlpriv->caam_emi_slow = devm_clk_get(&pdev->dev, "caam_emi_slow");
-+	if (IS_ERR(ctrlpriv->caam_emi_slow)) {
-+		ret = PTR_ERR(ctrlpriv->caam_emi_slow);
-+		dev_err(&pdev->dev,
-+			"can't identify CAAM emi slow clk: %d\n", ret);
-+		return -ENODEV;
-+	}
-+
-+	ret = clk_prepare_enable(ctrlpriv->caam_ipg);
-+	if (ret < 0) {
-+		dev_err(&pdev->dev, "can't enable CAAM ipg clock: %d\n", ret);
-+		return -ENODEV;
-+	}
-+
-+	ret = clk_prepare_enable(ctrlpriv->caam_mem);
-+	if (ret < 0) {
-+		dev_err(&pdev->dev, "can't enable CAAM secure mem clock: %d\n",
-+			ret);
-+		return -ENODEV;
-+	}
-+
-+	ret = clk_prepare_enable(ctrlpriv->caam_aclk);
-+	if (ret < 0) {
-+		dev_err(&pdev->dev, "can't enable CAAM aclk clock: %d\n", ret);
-+		return -ENODEV;
-+	}
-+
-+	ret = clk_prepare_enable(ctrlpriv->caam_emi_slow);
-+	if (ret < 0) {
-+		dev_err(&pdev->dev, "can't enable CAAM emi slow clock: %d\n",
-+			ret);
-+		return -ENODEV;
-+	}
-+
-+	dev_info(dev, "%s caam_ipg clock:%d\n", __func__,
-+		(int)clk_get_rate(ctrlpriv->caam_ipg));
-+	dev_info(dev, "%s caam_mem clock:%d\n", __func__,
-+		(int)clk_get_rate(ctrlpriv->caam_mem));
-+	dev_info(dev, "%s caam_aclk clock:%d\n", __func__,
-+		(int)clk_get_rate(ctrlpriv->caam_aclk));
-+	dev_info(dev, "%s caam_emi_slow clock:%d\n", __func__,
-+		(int)clk_get_rate(ctrlpriv->caam_emi_slow));
-+#endif
-+
- 	/* Get configuration properties from device tree */
- 	/* First, get register page */
- 	ctrl = of_iomap(nprop, 0);
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 89b94cc..54f82dd 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -91,6 +91,13 @@ struct caam_drv_private {
- 				   Handles of the RNG4 block are initialized
- 				   by this driver */
- 
-+#ifdef CONFIG_ARM
-+	struct clk *caam_ipg;
-+	struct clk *caam_mem;
-+	struct clk *caam_aclk;
-+	struct clk *caam_emi_slow;
-+#endif
-+
- 	/*
- 	 * debugfs entries for developer view into driver/device
- 	 * variables at runtime.
+ #ifndef CONFIG_64BIT
+-#ifdef __BIG_ENDIAN
++#if defined(__BIG_ENDIAN) || defined(CONFIG_ARCH_MXC)
+ static inline void wr_reg64(u64 __iomem *reg, u64 data)
+ {
+ 	wr_reg32((u32 __iomem *)reg, (data & 0xffffffff00000000ull) >> 32);
 -- 
 2.1.4
