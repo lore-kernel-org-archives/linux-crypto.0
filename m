@@ -1,7 +1,9 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH RFC v5 0/4] crypto: Introduce Public Key Encryption API
-Date: Mon, 15 Jun 2015 13:18:31 -0700
-Message-ID: <20150615201831.15697.57738.stgit@tstruk-mobl1>
+Subject: [PATCH RFC v5 1/4] MPILIB: add mpi_read_buf() and mpi_get_size()
+ helpers
+Date: Mon, 15 Jun 2015 13:18:36 -0700
+Message-ID: <20150615201836.15697.27743.stgit@tstruk-mobl1>
+References: <20150615201831.15697.57738.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -13,119 +15,202 @@ Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
 	zohar@linux.vnet.ibm.com, davem@davemloft.net, vgoyal@redhat.com
 To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:36815 "EHLO mga01.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:18883 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752517AbbFOUSe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 16:18:34 -0400
+	id S1756030AbbFOUSk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Jun 2015 16:18:40 -0400
+In-Reply-To: <20150615201831.15697.57738.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch set introduces a Public Key Encryption API.
-What is proposed is a new crypto type called crypto_akcipher_type,
-plus new struct akcipher_alg and struct crypto_akcipher, together with number
-of helper functions to register akcipher type algorithms and allocate
-tfm instances. This is to make it similar to how the existing crypto
-API works for the ablkcipher, ahash, and aead types.
-The operations the new interface will allow to provide are:
+Added a mpi_read_buf() helper function to export MPI to a buf provided by
+the user, and a mpi_get_size() helper, that tells the user how big the buf is.
+Changed mpi_free to use kzfree instead of kfree because it is used to free
+crypto keys.
 
-	int (*sign)(struct akcipher_request *req);
-	int (*verify)(struct akcipher_request *req);
-	int (*encrypt)(struct akcipher_request *req);
-	int (*decrypt)(struct akcipher_request *req);
-
-The benefits it gives interface are:
-- drivers can add many implementations of RSA or DSA
-  algorithms and user will allocate instances (tfms) of these, base on
-  algorithm priority, in the same way as it is with the symmetric ciphers.
-- the new interface allows for asynchronous implementations that
-  can use crypto hardware to offload the calculations to.
-- integrating it with linux crypto api allows using all its benefits
-  i.e. managing algorithms using NETLINK_CRYPTO, monitoring implementations
-  using /proc/crypto. etc
-
-New helper functions have been added to allocate crypto_akcipher instances
-and invoke the operations to make it easier to use.
-For instance to verify a public_signature against a public_key using
-the RSA algorithm a user would do:
-
-	struct crypto_akcipher *tfm = crypto_alloc_akcipher("rsa", 0, 0);
-	struct akcipher_request *req = akcipher_request_alloc(tfm, GFP_KERNEL);
-	akcipher_request_set_crypt(req, pub_key, signature);
-	int ret = crypto_akcipher_verify(src, dst, src_len, dst_len, &res_len);
-	akcipher_request_free(req);
-	crypto_free_akcipher(tfm);
-	return ret;
-
-Changes in v5:
- - make mpi_get_size() function inline.
- - add a setkey function to the algorithm and rsa_parse_key() helper to
-   parse rsa keys from BER encoded to MPI. The helper will also validate
-   the given key if it is strong enough in case FIPS mode is enabled.
- - change the format of the key from struct public_key * to void * BER encoded
-   buffer.
- - change the format of the rsa keys in testmgr to BER encoded form.
- - change mpi_free to use kzfree instead of kfree because it is used to free
-   crypto keys
-
-Changes in v4:
- - add an rsa generic implementation
- - don't convert the existing public_key implementation to the new interface.
-   This will be done after the new interface is accepted.
- - add new mpi_get_buf(), mpi_copy() and mpi_get_size() mpi helpers 
- - on set key the ftm now will clone the key instead of just setting a ptr
- - add a check on enc/dec/sign/veryfi to make sure a valid (public or private)
-   key is setup
- - add maxsize fn into algorith that will be used to query implementation
-   what is the max size of a result for a give public key that the user needs
-   to allocate
- - removed private ctx from crypto_akcipher as the crypto_tfm base has one
-   already
- - add 2K bit RSA test vectors
- - add cipher text validation in crypto test mgr as (required for FIPS)
-
-Changes in v3:
- - changed input and output parameters type from sgl to void *
-   and added separate src_len & dst_len - requested by Herbert Xu
- - separated rsa implementation into cryptographic primitives and
-   left encryption scheme details outside of the algorithm implementation
- - added SW implementation for RSA encrypt, decrypt and sign operation
- - added RSA test vectors 
-   
-Changes in v2:
- - remodeled not to use obsolete cra_u and crt_u unions
- - changed type/funct names from pke_* to pkey_*
- - retained the enum pkey_algo type for it is external to the kernel
- - added documentation
-
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
-Tadeusz Struk (4):
-      MPILIB: add mpi_read_buf(), mpi_copy() and mpi_get_size() helpers
-      crypto: add PKE API
-      crypto: rsa: add a new rsa generic implementation
-      crypto: add tests vectors for RSA
+ include/linux/mpi.h |   15 +++++++++
+ lib/mpi/mpicoder.c  |   87 ++++++++++++++++++++++++++++++++++++++++-----------
+ lib/mpi/mpiutil.c   |    6 ++--
+ 3 files changed, 86 insertions(+), 22 deletions(-)
 
-
- crypto/Kconfig                |   14 +
- crypto/Makefile               |    9 +
- crypto/akcipher.c             |  102 ++++++++++
- crypto/crypto_user.c          |   23 ++
- crypto/rsa.c                  |  295 ++++++++++++++++++++++++++++++
- crypto/rsa_helper.c           |  134 ++++++++++++++
- crypto/rsakey.asn1            |    5 +
- crypto/testmgr.c              |  149 +++++++++++++++
- crypto/testmgr.h              |  143 +++++++++++++++
- include/crypto/akcipher.h     |  404 +++++++++++++++++++++++++++++++++++++++++
- include/crypto/internal/rsa.h |   30 +++
- include/linux/crypto.h        |    1 
- include/linux/cryptouser.h    |    6 +
- include/linux/mpi.h           |   15 ++
- lib/mpi/mpicoder.c            |   87 +++++++--
- lib/mpi/mpiutil.c             |   38 ++++
- 16 files changed, 1434 insertions(+), 21 deletions(-)
- create mode 100644 crypto/akcipher.c
- create mode 100644 crypto/rsa.c
- create mode 100644 crypto/rsa_helper.c
- create mode 100644 crypto/rsakey.asn1
- create mode 100644 include/crypto/akcipher.h
- create mode 100644 include/crypto/internal/rsa.h
--- 
+diff --git a/include/linux/mpi.h b/include/linux/mpi.h
+index 5af1b81..641b7d6 100644
+--- a/include/linux/mpi.h
++++ b/include/linux/mpi.h
+@@ -81,6 +81,8 @@ MPI mpi_read_from_buffer(const void *buffer, unsigned *ret_nread);
+ int mpi_fromstr(MPI val, const char *str);
+ u32 mpi_get_keyid(MPI a, u32 *keyid);
+ void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign);
++int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
++		    int *sign);
+ void *mpi_get_secure_buffer(MPI a, unsigned *nbytes, int *sign);
+ int mpi_set_buffer(MPI a, const void *buffer, unsigned nbytes, int sign);
+ 
+@@ -142,4 +144,17 @@ int mpi_rshift(MPI x, MPI a, unsigned n);
+ /*-- mpi-inv.c --*/
+ int mpi_invm(MPI x, MPI u, MPI v);
+ 
++/* inline functions */
++
++/**
++ * mpi_get_size() - returns max size required to store the number
++ *
++ * @a:	A multi precision integer for which we want to allocate a bufer
++ *
++ * Return: size required to store the number
++ */
++static inline unsigned int mpi_get_size(MPI a)
++{
++	return a->nlimbs * BYTES_PER_MPI_LIMB;
++}
+ #endif /*G10_MPI_H */
+diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+index 4cc6442..bc0a1da 100644
+--- a/lib/mpi/mpicoder.c
++++ b/lib/mpi/mpicoder.c
+@@ -128,28 +128,36 @@ leave:
+ }
+ EXPORT_SYMBOL_GPL(mpi_read_from_buffer);
+ 
+-/****************
+- * Return an allocated buffer with the MPI (msb first).
+- * NBYTES receives the length of this buffer. Caller must free the
+- * return string (This function does return a 0 byte buffer with NBYTES
+- * set to zero if the value of A is zero. If sign is not NULL, it will
+- * be set to the sign of the A.
++/**
++ * mpi_read_buffer() - read MPI to a bufer provided by user (msb first)
++ *
++ * @a:		a multi precision integer
++ * @buf:	bufer to which the output will be written to. Needs to be at
++ *		leaset mpi_get_size(a) long.
++ * @buf_len:	size of the buf.
++ * @nbytes:	receives the actual length of the data written.
++ * @sign:	if not NULL, it will be set to the sign of a.
++ *
++ * Return:	0 on success or error code in case of error
+  */
+-void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign)
++int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
++		    int *sign)
+ {
+-	uint8_t *p, *buffer;
++	uint8_t *p;
+ 	mpi_limb_t alimb;
++	unsigned int n = mpi_get_size(a);
+ 	int i;
+-	unsigned int n;
++
++	if (buf_len < n || !buf)
++		return -EINVAL;
+ 
+ 	if (sign)
+ 		*sign = a->sign;
+-	*nbytes = n = a->nlimbs * BYTES_PER_MPI_LIMB;
+-	if (!n)
+-		n++;		/* avoid zero length allocation */
+-	p = buffer = kmalloc(n, GFP_KERNEL);
+-	if (!p)
+-		return NULL;
++
++	if (nbytes)
++		*nbytes = n;
++
++	p = buf;
+ 
+ 	for (i = a->nlimbs - 1; i >= 0; i--) {
+ 		alimb = a->d[i];
+@@ -171,15 +179,56 @@ void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign)
+ #error please implement for this limb size.
+ #endif
+ 	}
++	return 0;
++}
++EXPORT_SYMBOL_GPL(mpi_read_buffer);
++
++/*
++ * mpi_get_buffer() - Returns an allocated buffer with the MPI (msb first).
++ * Caller must free the return string.
++ * This function does return a 0 byte buffer with nbytes set to zero if the
++ * value of A is zero.
++ *
++ * @a:		a multi precision integer.
++ * @nbytes:	receives the length of this buffer.
++ * @sign:	if not NULL, it will be set to the sign of the a.
++ *
++ * Return:	Pointer to MPI buffer or NULL on error
++ */
++void *mpi_get_buffer(MPI a, unsigned *nbytes, int *sign)
++{
++	uint8_t *buf, *p;
++	unsigned int n;
++	int ret;
++
++	if (!nbytes)
++		return NULL;
++
++	n = mpi_get_size(a);
++
++	if (!n)
++		n++;
++
++	buf = kmalloc(n, GFP_KERNEL);
++
++	if (!buf)
++		return NULL;
++
++	ret = mpi_read_buffer(a, buf, n, nbytes, sign);
++
++	if (ret) {
++		kfree(buf);
++		return NULL;
++	}
+ 
+ 	/* this is sub-optimal but we need to do the shift operation
+ 	 * because the caller has to free the returned buffer */
+-	for (p = buffer; !*p && *nbytes; p++, --*nbytes)
++	for (p = buf; !*p && *nbytes; p++, --*nbytes)
+ 		;
+-	if (p != buffer)
+-		memmove(buffer, p, *nbytes);
++	if (p != buf)
++		memmove(buf, p, *nbytes);
+ 
+-	return buffer;
++	return buf;
+ }
+ EXPORT_SYMBOL_GPL(mpi_get_buffer);
+ 
+diff --git a/lib/mpi/mpiutil.c b/lib/mpi/mpiutil.c
+index bf076d2..314f4df 100644
+--- a/lib/mpi/mpiutil.c
++++ b/lib/mpi/mpiutil.c
+@@ -69,7 +69,7 @@ void mpi_free_limb_space(mpi_ptr_t a)
+ 	if (!a)
+ 		return;
+ 
+-	kfree(a);
++	kzfree(a);
+ }
+ 
+ void mpi_assign_limb_space(MPI a, mpi_ptr_t ap, unsigned nlimbs)
+@@ -95,7 +95,7 @@ int mpi_resize(MPI a, unsigned nlimbs)
+ 		if (!p)
+ 			return -ENOMEM;
+ 		memcpy(p, a->d, a->alloced * sizeof(mpi_limb_t));
+-		kfree(a->d);
++		kzfree(a->d);
+ 		a->d = p;
+ 	} else {
+ 		a->d = kzalloc(nlimbs * sizeof(mpi_limb_t), GFP_KERNEL);
+@@ -112,7 +112,7 @@ void mpi_free(MPI a)
+ 		return;
+ 
+ 	if (a->flags & 4)
+-		kfree(a->d);
++		kzfree(a->d);
+ 	else
+ 		mpi_free_limb_space(a->d);
+ 
