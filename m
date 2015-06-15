@@ -1,81 +1,141 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [BUG?] crypto: caam: little/big endianness on ARM vs PPC
-Date: Tue, 16 Jun 2015 06:05:06 +0800
-Message-ID: <20150615220506.GA15134@gondor.apana.org.au>
-References: <20150615155907.GC7947@pengutronix.de>
+From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Subject: Re: [V6 PATCH 0/7] ACPI: Introduce support for _CCA object
+Date: Tue, 16 Jun 2015 01:24:57 +0200
+Message-ID: <29279491.10zZbufEv8@vostro.rjw.lan>
+References: <1433952538-22455-1-git-send-email-Suravee.Suthikulpanit@amd.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	kernel@pengutronix.de,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@freescale.com>,
-	Kim Phillips <kim.phillips@freescale.com>
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:57915 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750842AbbFOWFN (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 18:05:13 -0400
-Content-Disposition: inline
-In-Reply-To: <20150615155907.GC7947@pengutronix.de>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7Bit
+Cc: lenb@kernel.org, catalin.marinas@arm.com, will.deacon@arm.com,
+	thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, arnd@arndb.de, kashyap.desai@avagotech.com,
+	sumit.saxena@avagotech.com, uday.lingala@avagotech.com,
+	vinholikatti@gmail.com, msalter@redhat.com, hanjun.guo@linaro.org,
+	al.stone@linaro.org, grant.likely@linaro.org, leo.duran@amd.com,
+	linux-arm-kernel@lists.infradead.org, linux-acpi@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linaro-acpi@lists.linaro.org,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org
+To: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
+Return-path: <linux-acpi-owner@vger.kernel.org>
+In-Reply-To: <1433952538-22455-1-git-send-email-Suravee.Suthikulpanit@amd.com>
+Sender: linux-acpi-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Mon, Jun 15, 2015 at 05:59:07PM +0200, Steffen Trumtrar wrote:
-> Hi!
+On Wednesday, June 10, 2015 11:08:51 AM Suravee Suthikulpanit wrote:
+> This patch series introduce support for _CCA object, which is currently
+> used mainly by ARM64 platform to specify DMA coherency attribute for
+> devices when booting with ACPI.
 > 
-> I'm working on CAAM support for the ARM-based i.MX6 SoCs. The current
-> drivers/crypto/caam driver only works for PowerPC AFAIK.
-> Actually, there isn't that much to do, to get support for the i.MX6 but
-> one patch breaks the driver severely:
+> A copy of ACPIv6 can be found here:
+>     http://www.uefi.org/sites/default/files/resources/ACPI_6.0.pdf
 > 
-> 	commit ef94b1d834aace7101de77c3a7c2631b9ae9c5f6
-> 	crypto: caam - Add definition of rd/wr_reg64 for little endian platform
+> This patch also introduces a new APIS:
+>     1. acpi_check_dma() as part of ACPI API.
+>     2. device_dma_is_coherent() as part of unified device property API.
 > 
-> This patch adds
+> This simplifies the logic in device drivers to determine device coherency
+> attribute regardless of booting with DT vs ACPI.
 > 
-> +#ifdef __LITTLE_ENDIAN
-> +static inline void wr_reg64(u64 __iomem *reg, u64 data)
-> +{
-> +	wr_reg32((u32 __iomem *)reg + 1, (data & 0xffffffff00000000ull) >> 32);
-> +	wr_reg32((u32 __iomem *)reg, data & 0x00000000ffffffffull);
-> +}
+> This has been tested on AMD-Seattle platform, which implements _CCA 
+> object as described in the AMD Opteron A1100 Series Processor ACPI Porting Guide:
 > 
-> The wr_reg64 function is only used in one place in the drivers/crypto/caam/jr.c
-> driver: to write the dma_addr_t to the register. Without that patch everything
-> works fine on ARM (little endian, 32bit), with that patch the driver will write
-> 0's into the register that holds the DMA address (the numerically-higher) -> kernel hangs.
-> Also, from my understanding, the comment above the defines, stating that you
-> have to first write the numerically-lower and then the numerically-higher address
-> on 32bit systems doesn't match with the implementation.
+> http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2012/10/Seattle_ACPI_Guide.pdf
 > 
-> What I don't know/understand is if this makes any sense for any PowerPC implementation.
+> Changes from V5 (https://lkml.org/lkml/2015/5/20/1033):
+>     * Fix build error in the megaraid and ufs driver
+>       (reported by Mark Salter)
 > 
-> So, the question is, how to fix this? I'd prefer to do it directly in the jr driver
-> instead of the ifdef-ery.
+> Changes from V4 (https://lkml.org/lkml/2015/5/15/669):
+>     * Patch1:
+>       - Move the arch_setup_dma_ops() call from acpi_create_platform_device()
+>         to acpi_bind_one() to support other bus types (per Rafael).
+>       - Rename acpi_device_flags.is_coherent to acpi_device_flags.coherent_dma.
+>         (per Rafael)
+>       - Refactor acpi_dma_is_supported() and acpi_dma_is_coherent() to
+>         acpi_check_dma() to simplify the new interface.
+>       - Only support _CCA=1 for now. See acpi_check_dma() (per Arnd and Catalin)
+>     * Patch2:
+>       - Add acked-by Catalin.
+>     * Patch3:
+>       - Use ACPI_COMPANION() instead of acpi_node().
+>       - Remove has_acpi_companion() check since already done by acpi_node().
+>         (per Will)
+>     * Remove the patch "Generic function for setting up PCI device DMA coherency"
+>       introduced in V4. (per Bjorn)
 > 
-> Something like
-> 	if (sizeof(dma_addr_t) == sizeof(u32))
-> 		wr_reg32(&jrp->rregs->inpring_base + 1, inpbusaddr);
-> 	else if (sizeof(dma_addr_t) == sizeof(u64))
-> 		wr_reg64(...)
+> Changes from V3 (https://lkml.org/lkml/2015/5/7/1004):
+>     * Remove ARCH64_SUPPORT_ACPI_CCA_ZERO and just use CONFIG_ARM64.
+>       (per Catalin and Rafael)
+>     * Do not need to call arch_setup_dma_ops() for acpi_device->dev.
+>       (per Rafael)
+>     * [3/6] (New) We also need to call arch_setup_dma_ops() for pci
+>       devices and check the CCA of the host bridge. Similar logic
+>       exists for OF. So, I refactor of_pci_dma_configure() to
+>       the more generic version pci_dma_configure(), and add support
+>       for ACPI.
 > 
-> or just go by DT compatible and then remove the inline function definitions.
+> Changes from V2 (https://lkml.org/lkml/2015/5/5/510):
+>     * Reword ACPI_MUST_HAVE_CCA to ACPI_CCA_REQUIRED (per Rafael)
+>     * Reword ACPI_SUPPORT_CCA_ZERO to ARCH64_SUPPORT_ACPI_CCA_ZERO
+>       (per Rafael and Arnd)
+>     * Misc code styling clean up (per Rafael)
+>     * Only print missing _CCA warning message in debug mode.
+>     * Refactor logic in acpi_setup_device_dma() into
+>       if acpi_dma_is_supported() then call arch_setup_dma_ops().
+>     * Do not allocate device dma_mask if !acpi_dma_is_supported()
+>       (per Arnd).
+>     * Re-use the dummy functions with the same signature.
 > 
-> As far as I can tell, the compatible wouldn't be needed for anything else in the
-> jr driver, so maybe that is not optimal. On the other hand the sizeof(..)
-> solution would only catch little endian on 32bit and not big endian (?!)
-> I however don't know what combinations actually *have* to be caught, as I don't
-> know, which exist.
+> Changes from V1 (https://lkml.org/lkml/2015/4/29/290):
+>     * Remove supports for 32-bit ARM since doesn't currently
+>       supporting ACPI (Per Catalin suggestions.)
+>     * Do not call arch_setup_dma_ops() and when _CCA is missing.
+>       (per Arnd suggestion)
+>     * Add CONFIG_ACPI_SUPPORT_CCA_ZERO kernel config flag to
+>       allow architectures to specify the behavior when _CCA=0.
+>     * Add dummy_dma_ops for ARM64 (per Catalin suggestions).
+>     * Fixed build error when ACPI is not configured by defining
+>       acpi_dma_is_coherent() for when CONFIG_ACPI is not set.
+>     * Introduce device_dma_is_coherent().
+>     * Use device_dma_is_coherent in crypto/ccp and amd-xgbe driver.
 > 
-> So, what do you think people?
+> Changes from RFC: (https://lkml.org/lkml/2015/4/1/389)
+>     * New logic for deriving and propagating coherent attribute from
+>       parent devices. (by Mark)
+>     * Introducing acpi_dma_is_coherent() API (Per Tom suggestion)
+>     * Introducing CONFIG_ACPI_MUST_HAVE_CCA kernel configuration.
+>     * Rebased to linux-4.1-rc1
+> 
+> Suravee Suthikulpanit (7):
+>   ACPI / scan: Parse _CCA and setup device coherency
+>   arm64 : Introduce support for ACPI _CCA object
+>   device property: Introduces device_dma_is_coherent()
+>   crypto: ccp - Unify coherency checking logic with
+>     device_dma_is_coherent()
+>   amd-xgbe: Unify coherency checking logic with device_dma_is_coherent()
+>   megaraid_sas: fix TRUE and FALSE re-define build error
+>   ufs: fix TRUE and FALSE re-define build error
+> 
+>  arch/arm64/Kconfig                        |  1 +
+>  arch/arm64/include/asm/dma-mapping.h      | 18 +++++-
+>  arch/arm64/mm/dma-mapping.c               | 92 +++++++++++++++++++++++++++++++
+>  drivers/acpi/Kconfig                      |  3 +
+>  drivers/acpi/acpi_platform.c              |  2 +-
+>  drivers/acpi/glue.c                       |  5 ++
+>  drivers/acpi/scan.c                       | 35 ++++++++++++
+>  drivers/base/property.c                   | 14 +++++
+>  drivers/crypto/ccp/ccp-platform.c         | 60 +-------------------
+>  drivers/net/ethernet/amd/xgbe/xgbe-main.c | 27 +--------
+>  drivers/scsi/megaraid/megaraid_sas_fp.c   |  8 +++
+>  drivers/scsi/ufs/unipro.h                 |  8 +++
+>  include/acpi/acpi_bus.h                   | 37 ++++++++++++-
+>  include/linux/acpi.h                      |  5 ++
+>  include/linux/property.h                  |  2 +
+>  15 files changed, 228 insertions(+), 89 deletions(-)
 
-I'm adding a couple of CCs.
+I've queued up the series for 4.2, thanks!
 
-Thanks,
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I speak only for myself.
+Rafael J. Wysocki, Intel Open Source Technology Center.
