@@ -1,7 +1,7 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/8] crypto: testmgr - Update rfc4543 test vectors
-Date: Mon, 15 Jun 2015 16:09:41 +0800
-Message-ID: <E1Z4PSf-00083h-M9@gondolin.me.apana.org.au>
+Subject: [PATCH 5/8] crypto: caam - Handle errors in dma_map_sg_chained
+Date: Mon, 15 Jun 2015 16:09:44 +0800
+Message-ID: <E1Z4PSi-00084F-1p@gondolin.me.apana.org.au>
 References: <20150615080716.GA30753@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
@@ -11,62 +11,85 @@ To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	jinyanjiang@gmail.com, Kim Phillips <kim.phillips@freescale.com>,
 	Tudor Ambarus <tudor.ambarus@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37239 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:42153 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750887AbbFOIJp (ORCPT
+	with ESMTP id S1750887AbbFOIJr (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 04:09:45 -0400
+	Mon, 15 Jun 2015 04:09:47 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch updates the rfc4543 test vectors to the new format
-where the IV is part of the AD.  For now these vectors are still
-unused.  They will be reactivated once all rfc4543 implementations
-have migrated.
+Currently dma_map_sg_chained does not handle errors from the
+underlying dma_map_sg calls.  This patch adds rollback in case
+of an error by simply calling dma_unmap_sg_chained for the ones
+that we've already mapped.
+
+All current callers ignore the return value so this should have
+no impact on them.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/testmgr.h |   15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ drivers/crypto/caam/sg_sw_sec4.h |   35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 4c2b3e5..110142c 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -20309,8 +20309,9 @@ static struct aead_testvec aes_gcm_rfc4543_enc_tv_template[] = {
- 			  "\x22\x43\x3c\x64",
- 		.klen	= 20,
- 		.iv	= zeroed_string,
--		.assoc	= "\x00\x00\x43\x21\x00\x00\x00\x07",
--		.alen	= 8,
-+		.assoc	= "\x00\x00\x43\x21\x00\x00\x00\x07"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.alen	= 16,
- 		.input	= "\x45\x00\x00\x30\xda\x3a\x00\x00"
- 			  "\x80\x01\xdf\x3b\xc0\xa8\x00\x05"
- 			  "\xc0\xa8\x00\x01\x08\x00\xc6\xcd"
-@@ -20339,8 +20340,9 @@ static struct aead_testvec aes_gcm_rfc4543_dec_tv_template[] = {
- 			  "\x22\x43\x3c\x64",
- 		.klen	= 20,
- 		.iv	= zeroed_string,
--		.assoc	= "\x00\x00\x43\x21\x00\x00\x00\x07",
--		.alen	= 8,
-+		.assoc	= "\x00\x00\x43\x21\x00\x00\x00\x07"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.alen	= 16,
- 		.input	= "\x45\x00\x00\x30\xda\x3a\x00\x00"
- 			  "\x80\x01\xdf\x3b\xc0\xa8\x00\x05"
- 			  "\xc0\xa8\x00\x01\x08\x00\xc6\xcd"
-@@ -20365,8 +20367,9 @@ static struct aead_testvec aes_gcm_rfc4543_dec_tv_template[] = {
- 			  "\x22\x43\x3c\x64",
- 		.klen	= 20,
- 		.iv	= zeroed_string,
--		.assoc	= "\x00\x00\x43\x21\x00\x00\x00\x07",
--		.alen	= 8,
-+		.assoc	= "\x00\x00\x43\x21\x00\x00\x00\x07"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.alen	= 16,
- 		.input	= "\x45\x00\x00\x30\xda\x3a\x00\x00"
- 			  "\x80\x01\xdf\x3b\xc0\xa8\x00\x05"
- 			  "\xc0\xa8\x00\x01\x08\x00\xc6\xcd"
+diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
+index efbc1db..b68b74c 100644
+--- a/drivers/crypto/caam/sg_sw_sec4.h
++++ b/drivers/crypto/caam/sg_sw_sec4.h
+@@ -100,34 +100,41 @@ static inline int sg_count(struct scatterlist *sg_list, int nbytes,
+ 	return sg_nents;
+ }
+ 
+-static int dma_map_sg_chained(struct device *dev, struct scatterlist *sg,
+-			      unsigned int nents, enum dma_data_direction dir,
+-			      bool chained)
++static inline void dma_unmap_sg_chained(
++	struct device *dev, struct scatterlist *sg, unsigned int nents,
++	enum dma_data_direction dir, bool chained)
+ {
+ 	if (unlikely(chained)) {
+ 		int i;
+ 		for (i = 0; i < nents; i++) {
+-			dma_map_sg(dev, sg, 1, dir);
++			dma_unmap_sg(dev, sg, 1, dir);
+ 			sg = sg_next(sg);
+ 		}
+-	} else {
+-		dma_map_sg(dev, sg, nents, dir);
++	} else if (nents) {
++		dma_unmap_sg(dev, sg, nents, dir);
+ 	}
+-	return nents;
+ }
+ 
+-static int dma_unmap_sg_chained(struct device *dev, struct scatterlist *sg,
+-				unsigned int nents, enum dma_data_direction dir,
+-				bool chained)
++static inline int dma_map_sg_chained(
++	struct device *dev, struct scatterlist *sg, unsigned int nents,
++	enum dma_data_direction dir, bool chained)
+ {
++	struct scatterlist *first = sg;
++
+ 	if (unlikely(chained)) {
+ 		int i;
+ 		for (i = 0; i < nents; i++) {
+-			dma_unmap_sg(dev, sg, 1, dir);
++			if (!dma_map_sg(dev, sg, 1, dir)) {
++				dma_unmap_sg_chained(dev, first, i, dir,
++						     chained);
++				nents = 0;
++				break;
++			}
++
+ 			sg = sg_next(sg);
+ 		}
+-	} else {
+-		dma_unmap_sg(dev, sg, nents, dir);
+-	}
++	} else
++		nents = dma_map_sg(dev, sg, nents, dir);
++
+ 	return nents;
+ }
