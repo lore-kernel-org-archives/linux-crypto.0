@@ -1,86 +1,131 @@
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [BUG?] crypto: caam: little/big endianness on ARM vs PPC
-Date: Mon, 15 Jun 2015 18:18:48 +0100
-Message-ID: <20150615171848.GP7557@n2100.arm.linux.org.uk>
-References: <20150615155907.GC7947@pengutronix.de>
- <CALHpu34FHKTHr-2TZ-6Tmctev3WjBVTKfDbr6TYOJiOt+yDvfQ@mail.gmail.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH RFC v5 0/4] crypto: Introduce Public Key Encryption API
+Date: Mon, 15 Jun 2015 13:18:31 -0700
+Message-ID: <20150615201831.15697.57738.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org,
-	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	linux-crypto@vger.kernel.org, Sascha Hauer <kernel@pengutronix.de>,
-	linux-arm-kernel@lists.infradead.org
-To: Jon Nettleton <jon.nettleton@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CALHpu34FHKTHr-2TZ-6Tmctev3WjBVTKfDbr6TYOJiOt+yDvfQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
+	jwboyer@redhat.com, smueller@chronox.de, richard@nod.at,
+	tadeusz.struk@intel.com, steved@redhat.com, qat-linux@intel.com,
+	dhowells@redhat.com, linux-crypto@vger.kernel.org,
+	james.l.morris@oracle.com, jkosina@suse.cz,
+	zohar@linux.vnet.ibm.com, davem@davemloft.net, vgoyal@redhat.com
+To: herbert@gondor.apana.org.au
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:36815 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752517AbbFOUSe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Jun 2015 16:18:34 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 15, 2015 at 06:33:17PM +0200, Jon Nettleton wrote:
-> Funny enough I tackled this problem over the weekend as well.  My
-> approach was to switch the driver over to use the *_relaxed() io
-> functions and then special case the bits missing from the various
-> ARCHs.  Basically adding setbits32 and clrbits32 for !PPC
-> architectures and letting PPC and ARM share a writeq/readq set of
-> functions.  I left the existing LITTLE_ENDIAN special case until I
-> could verify if it was needed, or had been tested.
+This patch set introduces a Public Key Encryption API.
+What is proposed is a new crypto type called crypto_akcipher_type,
+plus new struct akcipher_alg and struct crypto_akcipher, together with number
+of helper functions to register akcipher type algorithms and allocate
+tfm instances. This is to make it similar to how the existing crypto
+API works for the ablkcipher, ahash, and aead types.
+The operations the new interface will allow to provide are:
 
-I'll follow up here with what I've mentioned elsewhere, and some further
-thoughts.
+	int (*sign)(struct akcipher_request *req);
+	int (*verify)(struct akcipher_request *req);
+	int (*encrypt)(struct akcipher_request *req);
+	int (*decrypt)(struct akcipher_request *req);
 
-I think this shows the dangers of using struct { } to define register
-offsets.  Let's start here:
+The benefits it gives interface are:
+- drivers can add many implementations of RSA or DSA
+  algorithms and user will allocate instances (tfms) of these, base on
+  algorithm priority, in the same way as it is with the symmetric ciphers.
+- the new interface allows for asynchronous implementations that
+  can use crypto hardware to offload the calculations to.
+- integrating it with linux crypto api allows using all its benefits
+  i.e. managing algorithms using NETLINK_CRYPTO, monitoring implementations
+  using /proc/crypto. etc
 
-/*
- * caam_job_ring - direct job ring setup
- * 1-4 possible per instantiation, base + 1000/2000/3000/4000
- * Padded out to 0x1000
- */
-struct caam_job_ring {
-        /* Input ring */
-        u64 inpring_base;       /* IRBAx -  Input desc ring baseaddr */
-        u32 rsvd1;
+New helper functions have been added to allocate crypto_akcipher instances
+and invoke the operations to make it easier to use.
+For instance to verify a public_signature against a public_key using
+the RSA algorithm a user would do:
 
-Apparently, this is a CPU-endian 64-bit value (it's not defined using
-le64 or be64 which would "fix" it's endian.)
+	struct crypto_akcipher *tfm = crypto_alloc_akcipher("rsa", 0, 0);
+	struct akcipher_request *req = akcipher_request_alloc(tfm, GFP_KERNEL);
+	akcipher_request_set_crypt(req, pub_key, signature);
+	int ret = crypto_akcipher_verify(src, dst, src_len, dst_len, &res_len);
+	akcipher_request_free(req);
+	crypto_free_akcipher(tfm);
+	return ret;
 
-The second question, which comes up in light of the breakage that's
-being reported is: is this really a 64-bit register, or is it a pair
-of 32-bit registers side-by-side?
+Changes in v5:
+ - make mpi_get_size() function inline.
+ - add a setkey function to the algorithm and rsa_parse_key() helper to
+   parse rsa keys from BER encoded to MPI. The helper will also validate
+   the given key if it is strong enough in case FIPS mode is enabled.
+ - change the format of the key from struct public_key * to void * BER encoded
+   buffer.
+ - change the format of the rsa keys in testmgr to BER encoded form.
+ - change mpi_free to use kzfree instead of kfree because it is used to free
+   crypto keys
 
-The documentation I'm looking at doesn't document the register at
-base + 0x1000, but documents the one at base + 0x1004, and the one
-at 0x1004 is given the name "IRBAR0_LS", which presumably stands
-for "input ring base address register 0, least significant".
+Changes in v4:
+ - add an rsa generic implementation
+ - don't convert the existing public_key implementation to the new interface.
+   This will be done after the new interface is accepted.
+ - add new mpi_get_buf(), mpi_copy() and mpi_get_size() mpi helpers 
+ - on set key the ftm now will clone the key instead of just setting a ptr
+ - add a check on enc/dec/sign/veryfi to make sure a valid (public or private)
+   key is setup
+ - add maxsize fn into algorith that will be used to query implementation
+   what is the max size of a result for a give public key that the user needs
+   to allocate
+ - removed private ctx from crypto_akcipher as the crypto_tfm base has one
+   already
+ - add 2K bit RSA test vectors
+ - add cipher text validation in crypto test mgr as (required for FIPS)
 
-As the code originally stood for PPC, IRBAR0_LS is also at 0x1004,
-but appears to be big endian.
+Changes in v3:
+ - changed input and output parameters type from sgl to void *
+   and added separate src_len & dst_len - requested by Herbert Xu
+ - separated rsa implementation into cryptographic primitives and
+   left encryption scheme details outside of the algorithm implementation
+ - added SW implementation for RSA encrypt, decrypt and sign operation
+ - added RSA test vectors 
+   
+Changes in v2:
+ - remodeled not to use obsolete cra_u and crt_u unions
+ - changed type/funct names from pke_* to pkey_*
+ - retained the enum pkey_algo type for it is external to the kernel
+ - added documentation
 
-On ARM, IRBAR0_LS appears at the same address, but is little endian.
+---
+Tadeusz Struk (4):
+      MPILIB: add mpi_read_buf(), mpi_copy() and mpi_get_size() helpers
+      crypto: add PKE API
+      crypto: rsa: add a new rsa generic implementation
+      crypto: add tests vectors for RSA
 
-This is *not* a 64-bit register at all, but is a pair of 32-bit
-registers side by side.  Moreover, readq() should not be used - no
-amount of arch mangling could ever produce a sane readq() which
-coped with this.
 
-So, the CAAM code is buggy in this regard: using readq() here when
-endian-portability is required is wrong.  It's got to be two 32-bit
-reads or two 32-bit writes in the appropriate endian.
-
-Also, note that there's a big difference between __raw_readl() and
-readl_relaxed().  readl_relaxed() is always little-endian.  __raw_readl()
-is god-knows-what-the-archtecture-decides endian.  Switching PPC
-drivers from __raw_readl() to readl_relaxed() is really not a good
-idea unless someone from the PPC camp reviews and tests the code.
-
-So, what I'd suggest is just fixing rd_reg64() and wr_reg64() to do
-the right thing: keeping the two 32-bit words in the same order
-irrespective of the endian-ness, and staying with the __raw_*
-accessors until PPC people can look at this.
-
+ crypto/Kconfig                |   14 +
+ crypto/Makefile               |    9 +
+ crypto/akcipher.c             |  102 ++++++++++
+ crypto/crypto_user.c          |   23 ++
+ crypto/rsa.c                  |  295 ++++++++++++++++++++++++++++++
+ crypto/rsa_helper.c           |  134 ++++++++++++++
+ crypto/rsakey.asn1            |    5 +
+ crypto/testmgr.c              |  149 +++++++++++++++
+ crypto/testmgr.h              |  143 +++++++++++++++
+ include/crypto/akcipher.h     |  404 +++++++++++++++++++++++++++++++++++++++++
+ include/crypto/internal/rsa.h |   30 +++
+ include/linux/crypto.h        |    1 
+ include/linux/cryptouser.h    |    6 +
+ include/linux/mpi.h           |   15 ++
+ lib/mpi/mpicoder.c            |   87 +++++++--
+ lib/mpi/mpiutil.c             |   38 ++++
+ 16 files changed, 1434 insertions(+), 21 deletions(-)
+ create mode 100644 crypto/akcipher.c
+ create mode 100644 crypto/rsa.c
+ create mode 100644 crypto/rsa_helper.c
+ create mode 100644 crypto/rsakey.asn1
+ create mode 100644 include/crypto/akcipher.h
+ create mode 100644 include/crypto/internal/rsa.h
 -- 
-FTTC broadband for 0.8mile line: currently at 10.5Mbps down 400kbps up
-according to speedtest.net.
