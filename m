@@ -1,7 +1,7 @@
 From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH RFC 07/11] crypto: caam - Unmap data prior to displaying data in print statements
-Date: Mon, 15 Jun 2015 16:52:55 -0700
-Message-ID: <1434412379-11623-8-git-send-email-vicki.milhoan@freescale.com>
+Subject: [PATCH RFC 08/11] crypto: caam - improve initalization for context state saves
+Date: Mon, 15 Jun 2015 16:52:56 -0700
+Message-ID: <1434412379-11623-9-git-send-email-vicki.milhoan@freescale.com>
 References: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -9,84 +9,98 @@ Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
 	<ruchika.gupta@freescale.com>
 To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1on0111.outbound.protection.outlook.com ([157.56.110.111]:35168
+Received: from mail-bn1bon0132.outbound.protection.outlook.com ([157.56.111.132]:13568
 	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750897AbbFOXxM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 19:53:12 -0400
+	id S1751736AbbFOXxN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Jun 2015 19:53:13 -0400
 In-Reply-To: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Move the dma unmap calls for data to occur before printing the data in
-debug print statements.
+From: Steve Cornelius <steve.cornelius@freescale.com>
 
+Multiple function in asynchronous hashing use a saved-state block,
+a.k.a. struct caam_hash_state, which holds a stash of information
+between requests (init/update/final). Certain values in this state
+block are loaded for processing using an inline-if, and when this
+is done, the potential for uninitialized data can pose conflicts.
+Therefore, this patch improves initialization of state data to
+prevent false assignments using uninitialized data in the state block.
+
+This patch addresses the following traceback, originating in
+ahash_final_ctx(), although a problem like this could certainly
+exhibit other symptoms:
+
+kernel BUG at arch/arm/mm/dma-mapping.c:465!
+Unable to handle kernel NULL pointer dereference at virtual address 00000000
+pgd = 80004000
+[00000000] *pgd=00000000
+Internal error: Oops: 805 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 0    Not tainted  (3.0.15-01752-gdd441b9-dirty #40)
+PC is at __bug+0x1c/0x28
+LR is at __bug+0x18/0x28
+pc : [<80043240>]    lr : [<8004323c>]    psr: 60000013
+sp : e423fd98  ip : 60000013  fp : 0000001c
+r10: e4191b84  r9 : 00000020  r8 : 00000009
+r7 : 88005038  r6 : 00000001  r5 : 2d676572  r4 : e4191a60
+r3 : 00000000  r2 : 00000001  r1 : 60000093  r0 : 00000033
+Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+Control: 10c53c7d  Table: 1000404a  DAC: 00000015
+Process cryptomgr_test (pid: 1306, stack limit = 0xe423e2f0)
+Stack: (0xe423fd98 to 0xe4240000)
+fd80:                                                       11807fd1 80048544
+fda0: 88005000 e4191a00 e5178040 8039dda0 00000000 00000014 2d676572 e4191008
+fdc0: 88005018 e4191a60 00100100 e4191a00 00000000 8039ce0c e423fea8 00000007
+fde0: e4191a00 e4227000 e5178000 8039ce18 e419183c 80203808 80a94a44 00000006
+fe00: 00000000 80207180 00000000 00000006 e423ff08 00000000 00000007 e5178000
+fe20: e41918a4 80a949b4 8c4844e2 00000000 00000049 74227000 8c4844e2 00000e90
+fe40: 0000000e 74227e90 ffff8c58 80ac29e0 e423fed4 8006a350 8c81625c e423ff5c
+fe60: 00008576 e4002500 00000003 00030010 e4002500 00000003 e5180000 e4002500
+fe80: e5178000 800e6d24 007fffff 00000000 00000010 e4001280 e4002500 60000013
+fea0: 000000d0 804df078 00000000 00000000 00000000 00000000 00000000 00000000
+fec0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+fee0: 00000000 00000000 e4227000 e4226000 e4753000 e4752000 e40a5000 e40a4000
+ff00: e41e7000 e41e6000 00000000 00000000 00000000 e423ff14 e423ff14 00000000
+ff20: 00000400 804f9080 e5178000 e4db0b40 00000000 e4db0b80 0000047c 00000400
+ff40: 00000000 8020758c 00000400 ffffffff 0000008a 00000000 e4db0b40 80206e00
+ff60: e4049dbc 00000000 00000000 00000003 e423ffa4 80062978 e41a8bfc 00000000
+ff80: 00000000 e4049db4 00000013 e4049db0 00000013 00000000 00000000 00000000
+ffa0: e4db0b40 e4db0b40 80204cbc 00000013 00000000 00000000 00000000 80204cfc
+ffc0: e4049da0 80089544 80040a40 00000000 e4db0b40 00000000 00000000 00000000
+ffe0: e423ffe0 e423ffe0 e4049da0 800894c4 80040a40 80040a40 00000000 00000000
+[<80043240>] (__bug+0x1c/0x28) from [<80048544>] (___dma_single_dev_to_cpu+0x84)
+[<80048544>] (___dma_single_dev_to_cpu+0x84/0x94) from [<8039dda0>] (ahash_fina)
+[<8039dda0>] (ahash_final_ctx+0x180/0x428) from [<8039ce18>] (ahash_final+0xc/0)
+[<8039ce18>] (ahash_final+0xc/0x10) from [<80203808>] (crypto_ahash_op+0x28/0xc)
+[<80203808>] (crypto_ahash_op+0x28/0xc0) from [<80207180>] (test_hash+0x214/0x5)
+[<80207180>] (test_hash+0x214/0x5b8) from [<8020758c>] (alg_test_hash+0x68/0x8c)
+[<8020758c>] (alg_test_hash+0x68/0x8c) from [<80206e00>] (alg_test+0x7c/0x1b8)
+[<80206e00>] (alg_test+0x7c/0x1b8) from [<80204cfc>] (cryptomgr_test+0x40/0x48)
+[<80204cfc>] (cryptomgr_test+0x40/0x48) from [<80089544>] (kthread+0x80/0x88)
+[<80089544>] (kthread+0x80/0x88) from [<80040a40>] (kernel_thread_exit+0x0/0x8)
+Code: e59f0010 e1a01003 eb126a8d e3a03000 (e5833000)
+---[ end trace d52a403a1d1eaa86 ]---
+
+Signed-off-by: Steve Cornelius <steve.cornelius@freescale.com>
 Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 ---
- drivers/crypto/caam/caamalg.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ drivers/crypto/caam/caamhash.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 29071a1..291a1a7 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -2234,6 +2234,11 @@ static void aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 	edesc = (struct aead_edesc *)((char *)desc -
- 		 offsetof(struct aead_edesc, hw_desc));
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 1662c65..f2f1e87 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1552,6 +1552,8 @@ static int ahash_init(struct ahash_request *req)
  
-+	if (err)
-+		caam_jr_strstatus(jrdev, err);
-+
-+	aead_unmap(jrdev, edesc, req);
-+
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
-@@ -2243,11 +2248,6 @@ static void aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 		       req->cryptlen - ctx->authsize, 1);
- #endif
+ 	state->current_buf = 0;
+ 	state->buf_dma = 0;
++	state->buflen_0 = 0;
++	state->buflen_1 = 0;
  
--	if (err)
--		caam_jr_strstatus(jrdev, err);
--
--	aead_unmap(jrdev, edesc, req);
--
- 	/*
- 	 * verify hw auth check passed else return -EBADMSG
- 	 */
-@@ -2292,6 +2292,8 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
- 
-+	ablkcipher_unmap(jrdev, edesc, req);
-+
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
-@@ -2301,7 +2303,6 @@ static void ablkcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 		       edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
- #endif
- 
--	ablkcipher_unmap(jrdev, edesc, req);
- 	kfree(edesc);
- 
- 	ablkcipher_request_complete(req, err);
-@@ -2324,6 +2325,8 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
- 
-+	ablkcipher_unmap(jrdev, edesc, req);
-+
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, req->info,
-@@ -2333,7 +2336,6 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 		       edesc->dst_nents > 1 ? 100 : req->nbytes, 1);
- #endif
- 
--	ablkcipher_unmap(jrdev, edesc, req);
- 	kfree(edesc);
- 
- 	ablkcipher_request_complete(req, err);
+ 	return 0;
+ }
 -- 
 2.1.4
