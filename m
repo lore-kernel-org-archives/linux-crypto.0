@@ -1,56 +1,52 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RFC v5 2/4] crypto: add PKE API
-Date: Tue, 16 Jun 2015 07:50:47 +0800
-Message-ID: <20150615235047.GA16562@gondor.apana.org.au>
-References: <20150615201831.15697.57738.stgit@tstruk-mobl1>
- <20150615201842.15697.59701.stgit@tstruk-mobl1>
+From: Victoria Milhoan <vicki.milhoan@freescale.com>
+Subject: [PATCH RFC 10/11] crypto: caam - Provide correct value to iounmap() in controller driver
+Date: Mon, 15 Jun 2015 16:52:58 -0700
+Message-ID: <1434412379-11623-11-git-send-email-vicki.milhoan@freescale.com>
+References: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
-	jwboyer@redhat.com, smueller@chronox.de, richard@nod.at,
-	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
-	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
-	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
-	vgoyal@redhat.com
-To: Tadeusz Struk <tadeusz.struk@intel.com>
+Content-Type: text/plain
+Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
+	<ruchika.gupta@freescale.com>
+To: <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:51706 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751397AbbFOXu5 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 19:50:57 -0400
-Content-Disposition: inline
-In-Reply-To: <20150615201842.15697.59701.stgit@tstruk-mobl1>
+Received: from mail-bn1bon0140.outbound.protection.outlook.com ([157.56.111.140]:12000
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751397AbbFOXxM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Jun 2015 19:53:12 -0400
+In-Reply-To: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 15, 2015 at 01:18:42PM -0700, Tadeusz Struk wrote:
->
-> +/**
-> + * crypto_register_akcipher() -- Register public key algorithm
-> + *
-> + * Function registers an implementation of a public key verify algorithm
-> + *
-> + * @alg:	algorithm definition
-> + *
-> + * Return: zero on success; error code in case of error
-> + */
-> +int crypto_register_akcipher(struct akcipher_alg *alg);
-> +
-> +/**
-> + * crypto_unregister_akcipher() -- Unregister public key algorithm
-> + *
-> + * Function unregisters an implementation of a public key verify algorithm
-> + *
-> + * @alg:	algorithm definition
-> + */
-> +void crypto_unregister_akcipher(struct akcipher_alg *alg);
+Fix a "Trying to vfree() nonexistent vm area" error when unloading the CAAM
+controller module by providing the correct pointer value to iounmap().
 
-These two functions and anything else that's specific to public key
-implementors should go into crypto/internal.
+Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+---
+ drivers/crypto/caam/ctrl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks,
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 3226eb8..8a4b239 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -301,7 +301,7 @@ static int caam_remove(struct platform_device *pdev)
+ #endif
+ 
+ 	/* Unmap controller region */
+-	iounmap(&ctrl);
++	iounmap(ctrl);
+ 
+ #ifdef CONFIG_ARM
+ 	/* shut clocks off before finalizing shutdown */
+@@ -577,7 +577,7 @@ static int caam_probe(struct platform_device *pdev)
+ 					sizeof(struct platform_device *) * rspec,
+ 					GFP_KERNEL);
+ 	if (ctrlpriv->jrpdev == NULL) {
+-		iounmap(&ctrl);
++		iounmap(ctrl);
+ 		return -ENOMEM;
+ 	}
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.1.4
