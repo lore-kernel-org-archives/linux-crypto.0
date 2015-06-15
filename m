@@ -1,70 +1,69 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [RESEND PATCH v4 04/14] crypto: add a new driver for Marvell's
- CESA
-Date: Mon, 15 Jun 2015 13:39:31 +0200
-Message-ID: <20150615133931.73f6f105@bbrezillon>
-References: <1434093366-14681-1-git-send-email-boris.brezillon@free-electrons.com>
-	<1434093366-14681-5-git-send-email-boris.brezillon@free-electrons.com>
-	<20150615093754.GA31948@gondor.apana.org.au>
+From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
+Subject: Re: [PATCH 6/8] crypto: caam - Convert GCM to new AEAD interface
+Date: Mon, 15 Jun 2015 15:33:20 +0300
+Message-ID: <557EC610.9070309@freescale.com>
+References: <20150615080716.GA30753@gondor.apana.org.au>
+ <E1Z4PSj-00084W-6B@gondolin.me.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	Imre Kaloz <kaloz@openwrt.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
+	Fionnuala Gunter <fin@linux.vnet.ibm.com>,
+	<ruchika.gupta@freescale.com>, <cristian.stoica@freescale.com>,
+	<NiteshNarayanLal@freescale.com>, <jinyanjiang@gmail.com>,
+	Tudor Ambarus <tudor.ambarus@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:33092 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753329AbbFOLjf (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 07:39:35 -0400
-In-Reply-To: <20150615093754.GA31948@gondor.apana.org.au>
+Received: from mail-bn1bon0116.outbound.protection.outlook.com ([157.56.111.116]:22633
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753842AbbFOMdl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Jun 2015 08:33:41 -0400
+In-Reply-To: <E1Z4PSj-00084W-6B@gondolin.me.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, 15 Jun 2015 17:37:54 +0800
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
-
-> On Fri, Jun 12, 2015 at 09:15:56AM +0200, Boris Brezillon wrote:
-> >
-> > +static inline int mv_cesa_sg_count(struct scatterlist *sg, int nbytes)
-> > +{
-> > +	int nents = 0;
-> > +
-> > +	while (nbytes > 0) {
-> > +		nents++;
-> > +		nbytes -= sg->length;
-> > +		sg = sg_next(sg);
-> > +	}
-> > +
-> > +	return nents;
-> > +}
+On 6/15/2015 11:09 AM, Herbert Xu wrote:
+> This patch converts the caam GCM implementations to the new AEAD
+> interface.  This is compile-tested only.
 > 
-> Please replace this with the newly added sg_nents_for_len.
+> Note that all IV generation for GCM algorithms have been removed.
+> The reason is that the current generation uses purely random IVs
+> which is not appropriate for counter-based algorithms where we
+> first and foremost require uniqueness.
+> 
+> Of course there is no reason why you couldn't implement seqiv or
+> seqniv within caam since all they do is xor the sequence number
+> with a salt, but since I can't test this on actual hardware I'll
+> leave it alone for now.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
 
-Sure, I'll use the sg_nents_for_len function.
+Testing on P2041RDB I see the following failures:
 
-Thanks,
+caam_jr ffe301000.jr: 40000f10: DECO: desc idx 15: Invalid Sequence
+Command. A SEQ IN PTR OR SEQ OUT PTR Command is invalid or a SEQ KEY,
+SEQ LOAD, SEQ FIFO LOAD, or SEQ FIFO STORE decremented the input or
+output sequence length below 0. This error may result if a built-in
+PROTOCOL Command has encountered a malformed PDU.
+alg: aead: encryption failed on test 1 for rfc4106-gcm-aes-caam:
+ret=-1073745680
 
-Boris
+caam_jr ffe301000.jr: 40000e10: DECO: desc idx 14: Invalid Sequence
+Command. A SEQ IN PTR OR SEQ OUT PTR Command is invalid or a SEQ KEY,
+SEQ LOAD, SEQ FIFO LOAD, or SEQ FIFO STORE decremented the input or
+output sequence length below 0. This error may result if a built-in
+PROTOCOL Command has encountered a malformed PDU.
+alg: aead: encryption failed on test 1 for rfc4543-gcm-aes-caam:
+ret=-1073745424
 
--- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+alg: aead: Test 2 failed on encryption for gcm-aes-caam
+00000000: ab 6e 47 d4 2c ec 13 bd f5 3a 67 b2 12 57 bd df
+00000010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+I'll check why this is happening.
+
+Regards,
+Horia
