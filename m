@@ -1,38 +1,44 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 0/8] crypto: aead - Convert gcm to new interface
-Date: Mon, 15 Jun 2015 16:07:16 +0800
-Message-ID: <20150615080716.GA30753@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: horia.geanta@freescale.com, ruchika.gupta@freescale.com,
+Subject: [PATCH 1/8] crypto: testmgr - Disable rfc4543 test
+Date: Mon, 15 Jun 2015 16:09:39 +0800
+Message-ID: <E1Z4PSd-000837-A1@gondolin.me.apana.org.au>
+References: <20150615080716.GA30753@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
+	Fionnuala Gunter <fin@linux.vnet.ibm.com>,
+	horia.geanta@freescale.com, ruchika.gupta@freescale.com,
 	cristian.stoica@freescale.com, NiteshNarayanLal@freescale.com,
 	jinyanjiang@gmail.com, Kim Phillips <kim.phillips@freescale.com>,
 	Tudor Ambarus <tudor.ambarus@freescale.com>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55284 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:51929 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754097AbbFOIHW (ORCPT
+	with ESMTP id S1751554AbbFOIJp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 04:07:22 -0400
-Content-Disposition: inline
+	Mon, 15 Jun 2015 04:09:45 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi:
+Because the old rfc4543 implementation always injected an IV into
+the AD, while the new one does not, we have to disable the test
+while it is converted over to the new AEAD interface.
 
-This series converts various GCM implementations to the new AEAD
-interface.  The main changes are that the IV must no longer be
-manually added to the AD for rfc4543, and that both src/dst now
-contain space at the head equal to assoclen, but only src has
-the actual AD.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-Note that I don't have hardware to test anything but generic
-GCM and aesni, so you guys will have to test the rest of it
-for me.
+ crypto/testmgr.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index ccd19cf..009714d 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3372,7 +3372,7 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
+-		.alg = "rfc4543(gcm(aes))",
++		.alg = "rfc4543(gcm(aes))-disabled",
+ 		.test = alg_test_aead,
+ 		.suite = {
+ 			.aead = {
