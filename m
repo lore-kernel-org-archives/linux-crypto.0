@@ -1,7 +1,7 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6/8] crypto: caam - Convert GCM to new AEAD interface
-Date: Mon, 15 Jun 2015 16:09:45 +0800
-Message-ID: <E1Z4PSj-00084W-6B@gondolin.me.apana.org.au>
+Subject: [PATCH 8/8] crypto: testmgr - Add mcgrew test vectors for rfc4106
+Date: Mon, 15 Jun 2015 16:09:48 +0800
+Message-ID: <E1Z4PSm-000855-CO@gondolin.me.apana.org.au>
 References: <20150615080716.GA30753@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
@@ -11,2186 +11,894 @@ To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	jinyanjiang@gmail.com, Kim Phillips <kim.phillips@freescale.com>,
 	Tudor Ambarus <tudor.ambarus@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:50259 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:36949 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753471AbbFOIJu (ORCPT
+	with ESMTP id S1750887AbbFOIJx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 04:09:50 -0400
+	Mon, 15 Jun 2015 04:09:53 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch converts the caam GCM implementations to the new AEAD
-interface.  This is compile-tested only.
-
-Note that all IV generation for GCM algorithms have been removed.
-The reason is that the current generation uses purely random IVs
-which is not appropriate for counter-based algorithms where we
-first and foremost require uniqueness.
-
-Of course there is no reason why you couldn't implement seqiv or
-seqniv within caam since all they do is xor the sequence number
-with a salt, but since I can't test this on actual hardware I'll
-leave it alone for now.
+This patch adds rfc4106 test vectors sourced from
+draft-mcgrew-gcm-test-01.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/caam/caamalg.c | 1434 +++++++++++++++++++++---------------------
- 1 file changed, 744 insertions(+), 690 deletions(-)
+ crypto/testmgr.h |  849 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 846 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 3c37fe6..95e8545 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -65,6 +65,10 @@
- /* max IV is max of AES_BLOCK_SIZE, DES3_EDE_BLOCK_SIZE */
- #define CAAM_MAX_IV_LENGTH		16
- 
-+#define AEAD_DESC_JOB_IO_LEN		(DESC_JOB_IO_LEN + CAAM_CMD_SZ * 2)
-+#define GCM_DESC_JOB_IO_LEN		(AEAD_DESC_JOB_IO_LEN + \
-+					 CAAM_CMD_SZ * 4)
-+
- /* length of descriptors text */
- #define DESC_AEAD_BASE			(4 * CAAM_CMD_SZ)
- #define DESC_AEAD_ENC_LEN		(DESC_AEAD_BASE + 15 * CAAM_CMD_SZ)
-@@ -79,18 +83,16 @@
- #define DESC_AEAD_NULL_DEC_LEN		(DESC_AEAD_NULL_BASE + 17 * CAAM_CMD_SZ)
- 
- #define DESC_GCM_BASE			(3 * CAAM_CMD_SZ)
--#define DESC_GCM_ENC_LEN		(DESC_GCM_BASE + 23 * CAAM_CMD_SZ)
--#define DESC_GCM_DEC_LEN		(DESC_GCM_BASE + 19 * CAAM_CMD_SZ)
-+#define DESC_GCM_ENC_LEN		(DESC_GCM_BASE + 16 * CAAM_CMD_SZ)
-+#define DESC_GCM_DEC_LEN		(DESC_GCM_BASE + 12 * CAAM_CMD_SZ)
- 
- #define DESC_RFC4106_BASE		(3 * CAAM_CMD_SZ)
--#define DESC_RFC4106_ENC_LEN		(DESC_RFC4106_BASE + 15 * CAAM_CMD_SZ)
--#define DESC_RFC4106_DEC_LEN		(DESC_RFC4106_BASE + 14 * CAAM_CMD_SZ)
--#define DESC_RFC4106_GIVENC_LEN		(DESC_RFC4106_BASE + 21 * CAAM_CMD_SZ)
-+#define DESC_RFC4106_ENC_LEN		(DESC_RFC4106_BASE + 10 * CAAM_CMD_SZ)
-+#define DESC_RFC4106_DEC_LEN		(DESC_RFC4106_BASE + 10 * CAAM_CMD_SZ)
- 
- #define DESC_RFC4543_BASE		(3 * CAAM_CMD_SZ)
--#define DESC_RFC4543_ENC_LEN		(DESC_RFC4543_BASE + 25 * CAAM_CMD_SZ)
--#define DESC_RFC4543_DEC_LEN		(DESC_RFC4543_BASE + 27 * CAAM_CMD_SZ)
--#define DESC_RFC4543_GIVENC_LEN		(DESC_RFC4543_BASE + 30 * CAAM_CMD_SZ)
-+#define DESC_RFC4543_ENC_LEN		(DESC_RFC4543_BASE + 11 * CAAM_CMD_SZ)
-+#define DESC_RFC4543_DEC_LEN		(DESC_RFC4543_BASE + 12 * CAAM_CMD_SZ)
- 
- #define DESC_ABLKCIPHER_BASE		(3 * CAAM_CMD_SZ)
- #define DESC_ABLKCIPHER_ENC_LEN		(DESC_ABLKCIPHER_BASE + \
-@@ -98,9 +100,7 @@
- #define DESC_ABLKCIPHER_DEC_LEN		(DESC_ABLKCIPHER_BASE + \
- 					 15 * CAAM_CMD_SZ)
- 
--#define DESC_MAX_USED_BYTES		(DESC_RFC4543_GIVENC_LEN + \
--					 CAAM_MAX_KEY_SIZE)
--#define DESC_MAX_USED_LEN		(DESC_MAX_USED_BYTES / CAAM_CMD_SZ)
-+#define DESC_MAX_USED_LEN		(CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN)
- 
- #ifdef DEBUG
- /* for print_hex_dumps with line references */
-@@ -273,7 +273,7 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
- 	    ctx->split_key_pad_len <= CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
- 
--	/* aead_encrypt shared descriptor */
-+	/* old_aead_encrypt shared descriptor */
- 	desc = ctx->sh_desc_enc;
- 
- 	init_sh_desc(desc, HDR_SHARE_SERIAL);
-@@ -362,7 +362,7 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
- 
- 	desc = ctx->sh_desc_dec;
- 
--	/* aead_decrypt shared descriptor */
-+	/* old_aead_decrypt shared descriptor */
- 	init_sh_desc(desc, HDR_SHARE_SERIAL);
- 
- 	/* Skip if already shared */
-@@ -496,7 +496,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	    CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
- 
--	/* aead_encrypt shared descriptor */
-+	/* old_aead_encrypt shared descriptor */
- 	desc = ctx->sh_desc_enc;
- 
- 	/* Note: Context registers are saved. */
-@@ -565,7 +565,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 	    CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
- 
--	/* aead_decrypt shared descriptor */
-+	/* old_aead_decrypt shared descriptor */
- 	desc = ctx->sh_desc_dec;
- 
- 	/* Note: Context registers are saved. */
-@@ -738,7 +738,6 @@ static int aead_setauthsize(struct crypto_aead *authenc,
- 
- static int gcm_set_sh_desc(struct crypto_aead *aead)
- {
--	unsigned int ivsize = crypto_aead_ivsize(aead);
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	struct device *jrdev = ctx->jrdev;
- 	bool keys_fit_inline = false;
-@@ -754,7 +753,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
- 	 * Job Descriptor and Shared Descriptor
- 	 * must fit into the 64-word Descriptor h/w Buffer
- 	 */
--	if (DESC_GCM_ENC_LEN + DESC_JOB_IO_LEN +
-+	if (DESC_GCM_ENC_LEN + GCM_DESC_JOB_IO_LEN +
- 	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
- 
-@@ -777,34 +776,34 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
- 	append_operation(desc, ctx->class1_alg_type |
- 			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
- 
--	/* cryptlen = seqoutlen - authsize */
--	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
-+	/* if assoclen + cryptlen is ZERO, skip to ICV write */
-+	append_math_sub(desc, NONE, SEQINLEN, REG0, CAAM_CMD_SZ);
-+	zero_assoc_jump_cmd2 = append_jump(desc, JUMP_TEST_ALL |
-+						 JUMP_COND_MATH_Z);
- 
--	/* assoclen + cryptlen = seqinlen - ivsize */
--	append_math_sub_imm_u32(desc, REG2, SEQINLEN, IMM, ivsize);
-+	/* if assoclen is ZERO, skip reading the assoc data */
-+	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
-+	zero_assoc_jump_cmd1 = append_jump(desc, JUMP_TEST_ALL |
-+						 JUMP_COND_MATH_Z);
- 
--	/* assoclen = (assoclen + cryptlen) - cryptlen */
--	append_math_sub(desc, REG1, REG2, REG3, CAAM_CMD_SZ);
-+	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
-+
-+	/* skip assoc data */
-+	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
-+
-+	/* cryptlen = seqinlen - assoclen */
-+	append_math_sub(desc, VARSEQOUTLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
- 
- 	/* if cryptlen is ZERO jump to zero-payload commands */
--	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
- 	zero_payload_jump_cmd = append_jump(desc, JUMP_TEST_ALL |
- 					    JUMP_COND_MATH_Z);
--	/* read IV */
--	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
--			     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
--
--	/* if assoclen is ZERO, skip reading the assoc data */
--	append_math_add(desc, VARSEQINLEN, ZERO, REG1, CAAM_CMD_SZ);
--	zero_assoc_jump_cmd1 = append_jump(desc, JUMP_TEST_ALL |
--					   JUMP_COND_MATH_Z);
- 
- 	/* read assoc data */
- 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
- 			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
- 	set_jump_tgt_here(desc, zero_assoc_jump_cmd1);
- 
--	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
-+	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
- 
- 	/* write encrypted data */
- 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
-@@ -814,31 +813,17 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
- 			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST1);
- 
- 	/* jump the zero-payload commands */
--	append_jump(desc, JUMP_TEST_ALL | 7);
-+	append_jump(desc, JUMP_TEST_ALL | 2);
- 
- 	/* zero-payload commands */
- 	set_jump_tgt_here(desc, zero_payload_jump_cmd);
- 
--	/* if assoclen is ZERO, jump to IV reading - is the only input data */
--	append_math_add(desc, VARSEQINLEN, ZERO, REG1, CAAM_CMD_SZ);
--	zero_assoc_jump_cmd2 = append_jump(desc, JUMP_TEST_ALL |
--					   JUMP_COND_MATH_Z);
--	/* read IV */
--	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
--			     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
--
- 	/* read assoc data */
- 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
- 			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_LAST1);
- 
--	/* jump to ICV writing */
--	append_jump(desc, JUMP_TEST_ALL | 2);
--
--	/* read IV - is the only input data */
-+	/* There is no input data */
- 	set_jump_tgt_here(desc, zero_assoc_jump_cmd2);
--	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
--			     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 |
--			     FIFOLD_TYPE_LAST1);
- 
- 	/* write ICV */
- 	append_seq_store(desc, ctx->authsize, LDST_CLASS_1_CCB |
-@@ -862,7 +847,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
- 	 * must all fit into the 64-word Descriptor h/w Buffer
- 	 */
- 	keys_fit_inline = false;
--	if (DESC_GCM_DEC_LEN + DESC_JOB_IO_LEN +
-+	if (DESC_GCM_DEC_LEN + GCM_DESC_JOB_IO_LEN +
- 	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
- 
-@@ -886,33 +871,30 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
- 	append_operation(desc, ctx->class1_alg_type |
- 			 OP_ALG_AS_INITFINAL | OP_ALG_DECRYPT | OP_ALG_ICV_ON);
- 
--	/* assoclen + cryptlen = seqinlen - ivsize - icvsize */
--	append_math_sub_imm_u32(desc, REG3, SEQINLEN, IMM,
--				ctx->authsize + ivsize);
--
--	/* assoclen = (assoclen + cryptlen) - cryptlen */
--	append_math_sub(desc, REG2, SEQOUTLEN, REG0, CAAM_CMD_SZ);
--	append_math_sub(desc, REG1, REG3, REG2, CAAM_CMD_SZ);
-+	/* if assoclen is ZERO, skip reading the assoc data */
-+	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
-+	zero_assoc_jump_cmd1 = append_jump(desc, JUMP_TEST_ALL |
-+						 JUMP_COND_MATH_Z);
- 
--	/* read IV */
--	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
--			     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
-+	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
- 
--	/* jump to zero-payload command if cryptlen is zero */
--	append_math_add(desc, VARSEQOUTLEN, ZERO, REG2, CAAM_CMD_SZ);
--	zero_payload_jump_cmd = append_jump(desc, JUMP_TEST_ALL |
--					    JUMP_COND_MATH_Z);
-+	/* skip assoc data */
-+	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
- 
--	append_math_add(desc, VARSEQINLEN, ZERO, REG1, CAAM_CMD_SZ);
--	/* if asoclen is ZERO, skip reading assoc data */
--	zero_assoc_jump_cmd1 = append_jump(desc, JUMP_TEST_ALL |
--					   JUMP_COND_MATH_Z);
- 	/* read assoc data */
- 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
- 			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
-+
- 	set_jump_tgt_here(desc, zero_assoc_jump_cmd1);
- 
--	append_math_add(desc, VARSEQINLEN, ZERO, REG2, CAAM_CMD_SZ);
-+	/* cryptlen = seqoutlen - assoclen */
-+	append_math_sub(desc, VARSEQINLEN, SEQOUTLEN, REG0, CAAM_CMD_SZ);
-+
-+	/* jump to zero-payload command if cryptlen is zero */
-+	zero_payload_jump_cmd = append_jump(desc, JUMP_TEST_ALL |
-+					    JUMP_COND_MATH_Z);
-+
-+	append_math_sub(desc, VARSEQOUTLEN, SEQOUTLEN, REG0, CAAM_CMD_SZ);
- 
- 	/* store encrypted data */
- 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
-@@ -921,21 +903,9 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
- 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
- 			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_FLUSH1);
- 
--	/* jump the zero-payload commands */
--	append_jump(desc, JUMP_TEST_ALL | 4);
--
- 	/* zero-payload command */
- 	set_jump_tgt_here(desc, zero_payload_jump_cmd);
- 
--	/* if assoclen is ZERO, jump to ICV reading */
--	append_math_add(desc, VARSEQINLEN, ZERO, REG1, CAAM_CMD_SZ);
--	zero_assoc_jump_cmd2 = append_jump(desc, JUMP_TEST_ALL |
--					   JUMP_COND_MATH_Z);
--	/* read assoc data */
--	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
--			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
--	set_jump_tgt_here(desc, zero_assoc_jump_cmd2);
--
- 	/* read ICV */
- 	append_seq_fifo_load(desc, ctx->authsize, FIFOLD_CLASS_CLASS1 |
- 			     FIFOLD_TYPE_ICV | FIFOLD_TYPE_LAST1);
-@@ -968,13 +938,11 @@ static int gcm_setauthsize(struct crypto_aead *authenc, unsigned int authsize)
- 
- static int rfc4106_set_sh_desc(struct crypto_aead *aead)
- {
--	unsigned int ivsize = crypto_aead_ivsize(aead);
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	struct device *jrdev = ctx->jrdev;
- 	bool keys_fit_inline = false;
--	u32 *key_jump_cmd, *move_cmd, *write_iv_cmd;
-+	u32 *key_jump_cmd;
- 	u32 *desc;
--	u32 geniv;
- 
- 	if (!ctx->enckeylen || !ctx->authsize)
- 		return 0;
-@@ -984,7 +952,7 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
- 	 * Job Descriptor and Shared Descriptor
- 	 * must fit into the 64-word Descriptor h/w Buffer
- 	 */
--	if (DESC_RFC4106_ENC_LEN + DESC_JOB_IO_LEN +
-+	if (DESC_RFC4106_ENC_LEN + GCM_DESC_JOB_IO_LEN +
- 	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
- 
-@@ -1007,29 +975,21 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
- 	append_operation(desc, ctx->class1_alg_type |
- 			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
- 
--	/* cryptlen = seqoutlen - authsize */
--	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
-+	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
- 	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
- 
--	/* assoclen + cryptlen = seqinlen - ivsize */
--	append_math_sub_imm_u32(desc, REG2, SEQINLEN, IMM, ivsize);
--
--	/* assoclen = (assoclen + cryptlen) - cryptlen */
--	append_math_sub(desc, VARSEQINLEN, REG2, REG3, CAAM_CMD_SZ);
--
--	/* Read Salt */
--	append_fifo_load_as_imm(desc, (void *)(ctx->key + ctx->enckeylen),
--				4, FIFOLD_CLASS_CLASS1 | FIFOLD_TYPE_IV);
--	/* Read AES-GCM-ESP IV */
--	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
--			     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
-+	/* Skip assoc data */
-+	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
- 
- 	/* Read assoc data */
- 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
- 			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
- 
-+	/* cryptlen = seqoutlen - assoclen */
-+	append_math_sub(desc, VARSEQOUTLEN, SEQOUTLEN, REG0, CAAM_CMD_SZ);
-+
- 	/* Will read cryptlen bytes */
--	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
-+	append_math_add(desc, VARSEQINLEN, SEQOUTLEN, REG0, CAAM_CMD_SZ);
- 
- 	/* Write encrypted data */
- 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
-@@ -1083,30 +1043,21 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
- 	append_operation(desc, ctx->class1_alg_type |
- 			 OP_ALG_AS_INITFINAL | OP_ALG_DECRYPT | OP_ALG_ICV_ON);
- 
--	/* assoclen + cryptlen = seqinlen - ivsize - icvsize */
--	append_math_sub_imm_u32(desc, REG3, SEQINLEN, IMM,
--				ctx->authsize + ivsize);
--
--	/* assoclen = (assoclen + cryptlen) - cryptlen */
--	append_math_sub(desc, REG2, SEQOUTLEN, REG0, CAAM_CMD_SZ);
--	append_math_sub(desc, VARSEQINLEN, REG3, REG2, CAAM_CMD_SZ);
--
--	/* Will write cryptlen bytes */
--	append_math_sub(desc, VARSEQOUTLEN, SEQOUTLEN, REG0, CAAM_CMD_SZ);
-+	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
-+	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
- 
--	/* Read Salt */
--	append_fifo_load_as_imm(desc, (void *)(ctx->key + ctx->enckeylen),
--				4, FIFOLD_CLASS_CLASS1 | FIFOLD_TYPE_IV);
--	/* Read AES-GCM-ESP IV */
--	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
--			     FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1);
-+	/* Skip assoc data */
-+	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
- 
- 	/* Read assoc data */
- 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
- 			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
- 
-+	/* Will write cryptlen bytes */
-+	append_math_sub(desc, VARSEQOUTLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
-+
- 	/* Will read cryptlen bytes */
--	append_math_add(desc, VARSEQINLEN, ZERO, REG2, CAAM_CMD_SZ);
-+	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
- 
- 	/* Store payload data */
- 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
-@@ -1132,107 +1083,6 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
- 		       desc_bytes(desc), 1);
- #endif
- 
--	/*
--	 * Job Descriptor and Shared Descriptors
--	 * must all fit into the 64-word Descriptor h/w Buffer
--	 */
--	keys_fit_inline = false;
--	if (DESC_RFC4106_GIVENC_LEN + DESC_JOB_IO_LEN +
--	    ctx->split_key_pad_len + ctx->enckeylen <=
--	    CAAM_DESC_BYTES_MAX)
--		keys_fit_inline = true;
--
--	/* rfc4106_givencrypt shared descriptor */
--	desc = ctx->sh_desc_givenc;
--
--	init_sh_desc(desc, HDR_SHARE_SERIAL);
--
--	/* Skip key loading if it is loaded due to sharing */
--	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
--				   JUMP_COND_SHRD);
--	if (keys_fit_inline)
--		append_key_as_imm(desc, (void *)ctx->key, ctx->enckeylen,
--				  ctx->enckeylen, CLASS_1 | KEY_DEST_CLASS_REG);
--	else
--		append_key(desc, ctx->key_dma, ctx->enckeylen,
--			   CLASS_1 | KEY_DEST_CLASS_REG);
--	set_jump_tgt_here(desc, key_jump_cmd);
--
--	/* Generate IV */
--	geniv = NFIFOENTRY_STYPE_PAD | NFIFOENTRY_DEST_DECO |
--		NFIFOENTRY_DTYPE_MSG | NFIFOENTRY_LC1 |
--		NFIFOENTRY_PTYPE_RND | (ivsize << NFIFOENTRY_DLEN_SHIFT);
--	append_load_imm_u32(desc, geniv, LDST_CLASS_IND_CCB |
--			    LDST_SRCDST_WORD_INFO_FIFO | LDST_IMM);
--	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
--	move_cmd = append_move(desc, MOVE_SRC_INFIFO | MOVE_DEST_DESCBUF |
--			       (ivsize << MOVE_LEN_SHIFT));
--	append_cmd(desc, CMD_LOAD | ENABLE_AUTO_INFO_FIFO);
--
--	/* Copy generated IV to OFIFO */
--	write_iv_cmd = append_move(desc, MOVE_SRC_DESCBUF | MOVE_DEST_OUTFIFO |
--				   (ivsize << MOVE_LEN_SHIFT));
--
--	/* Class 1 operation */
--	append_operation(desc, ctx->class1_alg_type |
--			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
--
--	/* ivsize + cryptlen = seqoutlen - authsize */
--	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
--
--	/* assoclen = seqinlen - (ivsize + cryptlen) */
--	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
--
--	/* Will write ivsize + cryptlen */
--	append_math_add(desc, VARSEQOUTLEN, REG3, REG0, CAAM_CMD_SZ);
--
--	/* Read Salt and generated IV */
--	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | FIFOLD_TYPE_IV |
--		   FIFOLD_TYPE_FLUSH1 | IMMEDIATE | 12);
--	/* Append Salt */
--	append_data(desc, (void *)(ctx->key + ctx->enckeylen), 4);
--	set_move_tgt_here(desc, move_cmd);
--	set_move_tgt_here(desc, write_iv_cmd);
--	/* Blank commands. Will be overwritten by generated IV. */
--	append_cmd(desc, 0x00000000);
--	append_cmd(desc, 0x00000000);
--	/* End of blank commands */
--
--	/* No need to reload iv */
--	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_SKIP);
--
--	/* Read assoc data */
--	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
--			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
--
--	/* Will read cryptlen */
--	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
--
--	/* Store generated IV and encrypted data */
--	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
--
--	/* Read payload data */
--	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
--			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST1);
--
--	/* Write ICV */
--	append_seq_store(desc, ctx->authsize, LDST_CLASS_1_CCB |
--			 LDST_SRCDST_BYTE_CONTEXT);
--
--	ctx->sh_desc_givenc_dma = dma_map_single(jrdev, desc,
--						 desc_bytes(desc),
--						 DMA_TO_DEVICE);
--	if (dma_mapping_error(jrdev, ctx->sh_desc_givenc_dma)) {
--		dev_err(jrdev, "unable to map shared descriptor\n");
--		return -ENOMEM;
--	}
--#ifdef DEBUG
--	print_hex_dump(KERN_ERR,
--		       "rfc4106 givenc shdesc@"__stringify(__LINE__)": ",
--		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
--		       desc_bytes(desc), 1);
--#endif
--
- 	return 0;
- }
- 
-@@ -1249,14 +1099,12 @@ static int rfc4106_setauthsize(struct crypto_aead *authenc,
- 
- static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- {
--	unsigned int ivsize = crypto_aead_ivsize(aead);
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
- 	struct device *jrdev = ctx->jrdev;
- 	bool keys_fit_inline = false;
--	u32 *key_jump_cmd, *write_iv_cmd, *write_aad_cmd;
-+	u32 *key_jump_cmd;
- 	u32 *read_move_cmd, *write_move_cmd;
- 	u32 *desc;
--	u32 geniv;
- 
- 	if (!ctx->enckeylen || !ctx->authsize)
- 		return 0;
-@@ -1266,7 +1114,7 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- 	 * Job Descriptor and Shared Descriptor
- 	 * must fit into the 64-word Descriptor h/w Buffer
- 	 */
--	if (DESC_RFC4543_ENC_LEN + DESC_JOB_IO_LEN +
-+	if (DESC_RFC4543_ENC_LEN + GCM_DESC_JOB_IO_LEN +
- 	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
- 
-@@ -1289,48 +1137,8 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- 	append_operation(desc, ctx->class1_alg_type |
- 			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
- 
--	/* Load AES-GMAC ESP IV into Math1 register */
--	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_WORD_DECO_MATH1 |
--		   LDST_CLASS_DECO | ivsize);
--
--	/* Wait the DMA transaction to finish */
--	append_jump(desc, JUMP_TEST_ALL | JUMP_COND_CALM |
--		    (1 << JUMP_OFFSET_SHIFT));
--
--	/* Overwrite blank immediate AES-GMAC ESP IV data */
--	write_iv_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
--				   (ivsize << MOVE_LEN_SHIFT));
--
--	/* Overwrite blank immediate AAD data */
--	write_aad_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
--				    (ivsize << MOVE_LEN_SHIFT));
--
--	/* cryptlen = seqoutlen - authsize */
--	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
--
--	/* assoclen = (seqinlen - ivsize) - cryptlen */
--	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
--
--	/* Read Salt and AES-GMAC ESP IV */
--	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
--		   FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 | (4 + ivsize));
--	/* Append Salt */
--	append_data(desc, (void *)(ctx->key + ctx->enckeylen), 4);
--	set_move_tgt_here(desc, write_iv_cmd);
--	/* Blank commands. Will be overwritten by AES-GMAC ESP IV. */
--	append_cmd(desc, 0x00000000);
--	append_cmd(desc, 0x00000000);
--	/* End of blank commands */
--
--	/* Read assoc data */
--	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
--			     FIFOLD_TYPE_AAD);
--
--	/* Will read cryptlen bytes */
--	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
--
--	/* Will write cryptlen bytes */
--	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
-+	/* assoclen + cryptlen = seqinlen */
-+	append_math_add(desc, REG3, SEQINLEN, REG0, CAAM_CMD_SZ);
- 
- 	/*
- 	 * MOVE_LEN opcode is not available in all SEC HW revisions,
-@@ -1342,17 +1150,16 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- 	write_move_cmd = append_move(desc, MOVE_SRC_MATH3 | MOVE_DEST_DESCBUF |
- 				     (0x8 << MOVE_LEN_SHIFT));
- 
--	/* Authenticate AES-GMAC ESP IV  */
--	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
--		   FIFOLD_TYPE_AAD | ivsize);
--	set_move_tgt_here(desc, write_aad_cmd);
--	/* Blank commands. Will be overwritten by AES-GMAC ESP IV. */
--	append_cmd(desc, 0x00000000);
--	append_cmd(desc, 0x00000000);
--	/* End of blank commands */
-+	/* Will read assoclen + cryptlen bytes */
-+	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
- 
--	/* Read and write cryptlen bytes */
--	aead_append_src_dst(desc, FIFOLD_TYPE_AAD);
-+	/* Will write assoclen + cryptlen bytes */
-+	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
-+
-+	/* Read and write assoclen + cryptlen bytes */
-+	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | KEY_VLF);
-+	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_BOTH | KEY_VLF |
-+				      FIFOLD_TYPE_AAD | FIFOLD_TYPE_LASTBOTH);
- 
- 	set_move_tgt_here(desc, read_move_cmd);
- 	set_move_tgt_here(desc, write_move_cmd);
-@@ -1382,7 +1189,7 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- 	 * must all fit into the 64-word Descriptor h/w Buffer
- 	 */
- 	keys_fit_inline = false;
--	if (DESC_RFC4543_DEC_LEN + DESC_JOB_IO_LEN +
-+	if (DESC_RFC4543_DEC_LEN + GCM_DESC_JOB_IO_LEN +
- 	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
- 		keys_fit_inline = true;
- 
-@@ -1405,28 +1212,8 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- 	append_operation(desc, ctx->class1_alg_type |
- 			 OP_ALG_AS_INITFINAL | OP_ALG_DECRYPT | OP_ALG_ICV_ON);
- 
--	/* Load AES-GMAC ESP IV into Math1 register */
--	append_cmd(desc, CMD_SEQ_LOAD | LDST_SRCDST_WORD_DECO_MATH1 |
--		   LDST_CLASS_DECO | ivsize);
--
--	/* Wait the DMA transaction to finish */
--	append_jump(desc, JUMP_TEST_ALL | JUMP_COND_CALM |
--		    (1 << JUMP_OFFSET_SHIFT));
--
--	/* assoclen + cryptlen = (seqinlen - ivsize) - icvsize */
--	append_math_sub_imm_u32(desc, REG3, SEQINLEN, IMM, ctx->authsize);
--
--	/* Overwrite blank immediate AES-GMAC ESP IV data */
--	write_iv_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
--				   (ivsize << MOVE_LEN_SHIFT));
--
--	/* Overwrite blank immediate AAD data */
--	write_aad_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
--				    (ivsize << MOVE_LEN_SHIFT));
--
--	/* assoclen = (assoclen + cryptlen) - cryptlen */
--	append_math_sub(desc, REG2, SEQOUTLEN, REG0, CAAM_CMD_SZ);
--	append_math_sub(desc, VARSEQINLEN, REG3, REG2, CAAM_CMD_SZ);
-+	/* assoclen + cryptlen = seqoutlen */
-+	append_math_add(desc, REG3, SEQOUTLEN, REG0, CAAM_CMD_SZ);
- 
- 	/*
- 	 * MOVE_LEN opcode is not available in all SEC HW revisions,
-@@ -1438,40 +1225,16 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- 	write_move_cmd = append_move(desc, MOVE_SRC_MATH3 | MOVE_DEST_DESCBUF |
- 				     (0x8 << MOVE_LEN_SHIFT));
- 
--	/* Read Salt and AES-GMAC ESP IV */
--	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
--		   FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 | (4 + ivsize));
--	/* Append Salt */
--	append_data(desc, (void *)(ctx->key + ctx->enckeylen), 4);
--	set_move_tgt_here(desc, write_iv_cmd);
--	/* Blank commands. Will be overwritten by AES-GMAC ESP IV. */
--	append_cmd(desc, 0x00000000);
--	append_cmd(desc, 0x00000000);
--	/* End of blank commands */
--
--	/* Read assoc data */
--	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
--			     FIFOLD_TYPE_AAD);
--
--	/* Will read cryptlen bytes */
--	append_math_add(desc, VARSEQINLEN, ZERO, REG2, CAAM_CMD_SZ);
--
--	/* Will write cryptlen bytes */
--	append_math_add(desc, VARSEQOUTLEN, ZERO, REG2, CAAM_CMD_SZ);
-+	/* Will read assoclen + cryptlen bytes */
-+	append_math_add(desc, VARSEQINLEN, ZERO, REG3, CAAM_CMD_SZ);
- 
--	/* Authenticate AES-GMAC ESP IV  */
--	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
--		   FIFOLD_TYPE_AAD | ivsize);
--	set_move_tgt_here(desc, write_aad_cmd);
--	/* Blank commands. Will be overwritten by AES-GMAC ESP IV. */
--	append_cmd(desc, 0x00000000);
--	append_cmd(desc, 0x00000000);
--	/* End of blank commands */
-+	/* Will write assoclen + cryptlen bytes */
-+	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
- 
- 	/* Store payload data */
- 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
- 
--	/* In-snoop cryptlen data */
-+	/* In-snoop assoclen + cryptlen data */
- 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_BOTH | FIFOLDST_VLF |
- 			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_LAST2FLUSH1);
- 
-@@ -1499,148 +1262,19 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
- 		       desc_bytes(desc), 1);
- #endif
- 
--	/*
--	 * Job Descriptor and Shared Descriptors
--	 * must all fit into the 64-word Descriptor h/w Buffer
--	 */
--	keys_fit_inline = false;
--	if (DESC_RFC4543_GIVENC_LEN + DESC_JOB_IO_LEN +
--	    ctx->enckeylen <= CAAM_DESC_BYTES_MAX)
--		keys_fit_inline = true;
--
--	/* rfc4543_givencrypt shared descriptor */
--	desc = ctx->sh_desc_givenc;
-+	return 0;
-+}
- 
--	init_sh_desc(desc, HDR_SHARE_SERIAL);
-+static int rfc4543_setauthsize(struct crypto_aead *authenc,
-+			       unsigned int authsize)
-+{
-+	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
- 
--	/* Skip key loading if it is loaded due to sharing */
--	key_jump_cmd = append_jump(desc, JUMP_JSL | JUMP_TEST_ALL |
--				   JUMP_COND_SHRD);
--	if (keys_fit_inline)
--		append_key_as_imm(desc, (void *)ctx->key, ctx->enckeylen,
--				  ctx->enckeylen, CLASS_1 | KEY_DEST_CLASS_REG);
--	else
--		append_key(desc, ctx->key_dma, ctx->enckeylen,
--			   CLASS_1 | KEY_DEST_CLASS_REG);
--	set_jump_tgt_here(desc, key_jump_cmd);
-+	ctx->authsize = authsize;
-+	rfc4543_set_sh_desc(authenc);
- 
--	/* Generate IV */
--	geniv = NFIFOENTRY_STYPE_PAD | NFIFOENTRY_DEST_DECO |
--		NFIFOENTRY_DTYPE_MSG | NFIFOENTRY_LC1 |
--		NFIFOENTRY_PTYPE_RND | (ivsize << NFIFOENTRY_DLEN_SHIFT);
--	append_load_imm_u32(desc, geniv, LDST_CLASS_IND_CCB |
--			    LDST_SRCDST_WORD_INFO_FIFO | LDST_IMM);
--	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
--	/* Move generated IV to Math1 register */
--	append_move(desc, MOVE_SRC_INFIFO | MOVE_DEST_MATH1 |
--		    (ivsize << MOVE_LEN_SHIFT));
--	append_cmd(desc, CMD_LOAD | ENABLE_AUTO_INFO_FIFO);
--
--	/* Overwrite blank immediate AES-GMAC IV data */
--	write_iv_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
--				   (ivsize << MOVE_LEN_SHIFT));
--
--	/* Overwrite blank immediate AAD data */
--	write_aad_cmd = append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_DESCBUF |
--				    (ivsize << MOVE_LEN_SHIFT));
--
--	/* Copy generated IV to OFIFO */
--	append_move(desc, MOVE_SRC_MATH1 | MOVE_DEST_OUTFIFO |
--		    (ivsize << MOVE_LEN_SHIFT));
--
--	/* Class 1 operation */
--	append_operation(desc, ctx->class1_alg_type |
--			 OP_ALG_AS_INITFINAL | OP_ALG_ENCRYPT);
--
--	/* ivsize + cryptlen = seqoutlen - authsize */
--	append_math_sub_imm_u32(desc, REG3, SEQOUTLEN, IMM, ctx->authsize);
--
--	/* assoclen = seqinlen - (ivsize + cryptlen) */
--	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
--
--	/* Will write ivsize + cryptlen */
--	append_math_add(desc, VARSEQOUTLEN, REG3, REG0, CAAM_CMD_SZ);
--
--	/*
--	 * MOVE_LEN opcode is not available in all SEC HW revisions,
--	 * thus need to do some magic, i.e. self-patch the descriptor
--	 * buffer.
--	 */
--	read_move_cmd = append_move(desc, MOVE_SRC_DESCBUF | MOVE_DEST_MATH3 |
--				    (0x6 << MOVE_LEN_SHIFT));
--	write_move_cmd = append_move(desc, MOVE_SRC_MATH3 | MOVE_DEST_DESCBUF |
--				     (0x8 << MOVE_LEN_SHIFT));
--
--	/* Read Salt and AES-GMAC generated IV */
--	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
--		   FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 | (4 + ivsize));
--	/* Append Salt */
--	append_data(desc, (void *)(ctx->key + ctx->enckeylen), 4);
--	set_move_tgt_here(desc, write_iv_cmd);
--	/* Blank commands. Will be overwritten by AES-GMAC generated IV. */
--	append_cmd(desc, 0x00000000);
--	append_cmd(desc, 0x00000000);
--	/* End of blank commands */
--
--	/* No need to reload iv */
--	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_SKIP);
--
--	/* Read assoc data */
--	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
--			     FIFOLD_TYPE_AAD);
--
--	/* Will read cryptlen */
--	append_math_add(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
--
--	/* Authenticate AES-GMAC IV  */
--	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
--		   FIFOLD_TYPE_AAD | ivsize);
--	set_move_tgt_here(desc, write_aad_cmd);
--	/* Blank commands. Will be overwritten by AES-GMAC IV. */
--	append_cmd(desc, 0x00000000);
--	append_cmd(desc, 0x00000000);
--	/* End of blank commands */
--
--	/* Read and write cryptlen bytes */
--	aead_append_src_dst(desc, FIFOLD_TYPE_AAD);
--
--	set_move_tgt_here(desc, read_move_cmd);
--	set_move_tgt_here(desc, write_move_cmd);
--	append_cmd(desc, CMD_LOAD | DISABLE_AUTO_INFO_FIFO);
--	/* Move payload data to OFIFO */
--	append_move(desc, MOVE_SRC_INFIFO_CL | MOVE_DEST_OUTFIFO);
--
--	/* Write ICV */
--	append_seq_store(desc, ctx->authsize, LDST_CLASS_1_CCB |
--			 LDST_SRCDST_BYTE_CONTEXT);
--
--	ctx->sh_desc_givenc_dma = dma_map_single(jrdev, desc,
--						 desc_bytes(desc),
--						 DMA_TO_DEVICE);
--	if (dma_mapping_error(jrdev, ctx->sh_desc_givenc_dma)) {
--		dev_err(jrdev, "unable to map shared descriptor\n");
--		return -ENOMEM;
--	}
--#ifdef DEBUG
--	print_hex_dump(KERN_ERR,
--		       "rfc4543 givenc shdesc@"__stringify(__LINE__)": ",
--		       DUMP_PREFIX_ADDRESS, 16, 4, desc,
--		       desc_bytes(desc), 1);
--#endif
--
--	return 0;
--}
--
--static int rfc4543_setauthsize(struct crypto_aead *authenc,
--			       unsigned int authsize)
--{
--	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
--
--	ctx->authsize = authsize;
--	rfc4543_set_sh_desc(authenc);
--
--	return 0;
--}
-+	return 0;
-+}
- 
- static u32 gen_split_aead_key(struct caam_ctx *ctx, const u8 *key_in,
- 			      u32 authkeylen)
-@@ -2100,7 +1734,7 @@ struct aead_edesc {
- 	int sec4_sg_bytes;
- 	dma_addr_t sec4_sg_dma;
- 	struct sec4_sg_entry *sec4_sg;
--	u32 hw_desc[0];
-+	u32 hw_desc[];
- };
- 
- /*
-@@ -2154,6 +1788,16 @@ static void aead_unmap(struct device *dev,
- 		       struct aead_edesc *edesc,
- 		       struct aead_request *req)
- {
-+	caam_unmap(dev, req->src, req->dst,
-+		   edesc->src_nents, edesc->src_chained, edesc->dst_nents,
-+		   edesc->dst_chained, 0, 0,
-+		   edesc->sec4_sg_dma, edesc->sec4_sg_bytes);
-+}
-+
-+static void old_aead_unmap(struct device *dev,
-+			   struct aead_edesc *edesc,
-+			   struct aead_request *req)
-+{
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	int ivsize = crypto_aead_ivsize(aead);
- 
-@@ -2184,6 +1828,28 @@ static void aead_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
- {
- 	struct aead_request *req = context;
- 	struct aead_edesc *edesc;
-+
-+#ifdef DEBUG
-+	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
-+#endif
-+
-+	edesc = container_of(desc, struct aead_edesc, hw_desc[0]);
-+
-+	if (err)
-+		caam_jr_strstatus(jrdev, err);
-+
-+	aead_unmap(jrdev, edesc, req);
-+
-+	kfree(edesc);
-+
-+	aead_request_complete(req, err);
-+}
-+
-+static void old_aead_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
-+				  void *context)
-+{
-+	struct aead_request *req = context;
-+	struct aead_edesc *edesc;
- #ifdef DEBUG
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-@@ -2198,7 +1864,7 @@ static void aead_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
- 
--	aead_unmap(jrdev, edesc, req);
-+	old_aead_unmap(jrdev, edesc, req);
- 
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "assoc  @"__stringify(__LINE__)": ",
-@@ -2223,6 +1889,34 @@ static void aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- {
- 	struct aead_request *req = context;
- 	struct aead_edesc *edesc;
-+
-+#ifdef DEBUG
-+	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
-+#endif
-+
-+	edesc = container_of(desc, struct aead_edesc, hw_desc[0]);
-+
-+	if (err)
-+		caam_jr_strstatus(jrdev, err);
-+
-+	aead_unmap(jrdev, edesc, req);
-+
-+	/*
-+	 * verify hw auth check passed else return -EBADMSG
-+	 */
-+	if ((err & JRSTA_CCBERR_ERRID_MASK) == JRSTA_CCBERR_ERRID_ICVCHK)
-+		err = -EBADMSG;
-+
-+	kfree(edesc);
-+
-+	aead_request_complete(req, err);
-+}
-+
-+static void old_aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
-+				  void *context)
-+{
-+	struct aead_request *req = context;
-+	struct aead_edesc *edesc;
- #ifdef DEBUG
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-@@ -2246,7 +1940,7 @@ static void aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		caam_jr_strstatus(jrdev, err);
- 
--	aead_unmap(jrdev, edesc, req);
-+	old_aead_unmap(jrdev, edesc, req);
- 
- 	/*
- 	 * verify hw auth check passed else return -EBADMSG
-@@ -2342,10 +2036,10 @@ static void ablkcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
- /*
-  * Fill in aead job descriptor
-  */
--static void init_aead_job(u32 *sh_desc, dma_addr_t ptr,
--			  struct aead_edesc *edesc,
--			  struct aead_request *req,
--			  bool all_contig, bool encrypt)
-+static void old_init_aead_job(u32 *sh_desc, dma_addr_t ptr,
-+			      struct aead_edesc *edesc,
-+			      struct aead_request *req,
-+			      bool all_contig, bool encrypt)
- {
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-@@ -2425,6 +2119,97 @@ static void init_aead_job(u32 *sh_desc, dma_addr_t ptr,
- }
- 
- /*
-+ * Fill in aead job descriptor
-+ */
-+static void init_aead_job(struct aead_request *req,
-+			  struct aead_edesc *edesc,
-+			  bool all_contig, bool encrypt)
-+{
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	int authsize = ctx->authsize;
-+	u32 *desc = edesc->hw_desc;
-+	u32 out_options, in_options;
-+	dma_addr_t dst_dma, src_dma;
-+	int len, sec4_sg_index = 0;
-+	dma_addr_t ptr;
-+	u32 *sh_desc;
-+
-+	sh_desc = encrypt ? ctx->sh_desc_enc : ctx->sh_desc_dec;
-+	ptr = encrypt ? ctx->sh_desc_enc_dma : ctx->sh_desc_dec_dma;
-+
-+	len = desc_len(sh_desc);
-+	init_job_desc_shared(desc, ptr, len, HDR_SHARE_DEFER | HDR_REVERSE);
-+
-+	if (all_contig) {
-+		src_dma = sg_dma_address(req->src);
-+		in_options = 0;
-+	} else {
-+		src_dma = edesc->sec4_sg_dma;
-+		sec4_sg_index += edesc->src_nents;
-+		in_options = LDST_SGF;
-+	}
-+
-+	append_seq_in_ptr(desc, src_dma, req->assoclen + req->cryptlen,
-+			  in_options);
-+
-+	dst_dma = src_dma;
-+	out_options = in_options;
-+
-+	if (unlikely(req->src != req->dst)) {
-+		if (!edesc->dst_nents) {
-+			dst_dma = sg_dma_address(req->dst);
-+		} else {
-+			dst_dma = edesc->sec4_sg_dma +
-+				  sec4_sg_index *
-+				  sizeof(struct sec4_sg_entry);
-+			out_options = LDST_SGF;
-+		}
-+	}
-+
-+	if (encrypt)
-+		append_seq_out_ptr(desc, dst_dma,
-+				   req->assoclen + req->cryptlen + authsize,
-+				   out_options);
-+	else
-+		append_seq_out_ptr(desc, dst_dma,
-+				   req->assoclen + req->cryptlen - authsize,
-+				   out_options);
-+
-+	/* REG3 = assoclen */
-+	append_math_add_imm_u32(desc, REG3, ZERO, IMM, req->assoclen);
-+}
-+
-+static void init_gcm_job(struct aead_request *req,
-+			 struct aead_edesc *edesc,
-+			 bool all_contig, bool encrypt)
-+{
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	unsigned int ivsize = crypto_aead_ivsize(aead);
-+	u32 *desc = edesc->hw_desc;
-+	bool generic_gcm = (ivsize == 12);
-+	unsigned int last;
-+
-+	init_aead_job(req, edesc, all_contig, encrypt);
-+
-+	/* BUG This should not be specific to generic GCM. */
-+	last = 0;
-+	if (encrypt && generic_gcm && !(req->assoclen + req->cryptlen))
-+		last = FIFOLD_TYPE_LAST1;
-+
-+	/* Read GCM IV */
-+	append_cmd(desc, CMD_FIFO_LOAD | FIFOLD_CLASS_CLASS1 | IMMEDIATE |
-+			 FIFOLD_TYPE_IV | FIFOLD_TYPE_FLUSH1 | 12 | last);
-+	/* Append Salt */
-+	if (!generic_gcm)
-+		append_data(desc, ctx->key + ctx->enckeylen, 4);
-+	/* Append IV */
-+	append_data(desc, req->iv, ivsize);
-+	/* End of blank commands */
-+}
-+
-+/*
-  * Fill in aead givencrypt job descriptor
-  */
- static void init_aead_giv_job(u32 *sh_desc, dma_addr_t ptr,
-@@ -2608,9 +2393,10 @@ static void init_ablkcipher_giv_job(u32 *sh_desc, dma_addr_t ptr,
- /*
-  * allocate and map the aead extended descriptor
-  */
--static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
--					   int desc_bytes, bool *all_contig_ptr,
--					   bool encrypt)
-+static struct aead_edesc *old_aead_edesc_alloc(struct aead_request *req,
-+					       int desc_bytes,
-+					       bool *all_contig_ptr,
-+					       bool encrypt)
- {
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
- 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-@@ -2661,29 +2447,132 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 		return ERR_PTR(-ENOMEM);
- 	}
- 
--	if (((ctx->class1_alg_type & OP_ALG_ALGSEL_MASK) ==
--	      OP_ALG_ALGSEL_AES) &&
--	    ((ctx->class1_alg_type & OP_ALG_AAI_MASK) == OP_ALG_AAI_GCM))
--		is_gcm = true;
-+	if (((ctx->class1_alg_type & OP_ALG_ALGSEL_MASK) ==
-+	      OP_ALG_ALGSEL_AES) &&
-+	    ((ctx->class1_alg_type & OP_ALG_AAI_MASK) == OP_ALG_AAI_GCM))
-+		is_gcm = true;
-+
-+	/*
-+	 * Check if data are contiguous.
-+	 * GCM expected input sequence: IV, AAD, text
-+	 * All other - expected input sequence: AAD, IV, text
-+	 */
-+	if (is_gcm)
-+		all_contig = (!assoc_nents &&
-+			      iv_dma + ivsize == sg_dma_address(req->assoc) &&
-+			      !src_nents && sg_dma_address(req->assoc) +
-+			      req->assoclen == sg_dma_address(req->src));
-+	else
-+		all_contig = (!assoc_nents && sg_dma_address(req->assoc) +
-+			      req->assoclen == iv_dma && !src_nents &&
-+			      iv_dma + ivsize == sg_dma_address(req->src));
-+	if (!all_contig) {
-+		assoc_nents = assoc_nents ? : 1;
-+		src_nents = src_nents ? : 1;
-+		sec4_sg_len = assoc_nents + 1 + src_nents;
-+	}
-+
-+	sec4_sg_len += dst_nents;
-+
-+	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
-+
-+	/* allocate space for base edesc and hw desc commands, link tables */
-+	edesc = kmalloc(sizeof(struct aead_edesc) + desc_bytes +
-+			sec4_sg_bytes, GFP_DMA | flags);
-+	if (!edesc) {
-+		dev_err(jrdev, "could not allocate extended descriptor\n");
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	edesc->assoc_nents = assoc_nents;
-+	edesc->assoc_chained = assoc_chained;
-+	edesc->src_nents = src_nents;
-+	edesc->src_chained = src_chained;
-+	edesc->dst_nents = dst_nents;
-+	edesc->dst_chained = dst_chained;
-+	edesc->iv_dma = iv_dma;
-+	edesc->sec4_sg_bytes = sec4_sg_bytes;
-+	edesc->sec4_sg = (void *)edesc + sizeof(struct aead_edesc) +
-+			 desc_bytes;
-+	*all_contig_ptr = all_contig;
-+
-+	sec4_sg_index = 0;
-+	if (!all_contig) {
-+		if (!is_gcm) {
-+			sg_to_sec4_sg_len(req->assoc, req->assoclen,
-+					  edesc->sec4_sg + sec4_sg_index);
-+			sec4_sg_index += assoc_nents;
-+		}
-+
-+		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
-+				   iv_dma, ivsize, 0);
-+		sec4_sg_index += 1;
-+
-+		if (is_gcm) {
-+			sg_to_sec4_sg_len(req->assoc, req->assoclen,
-+					  edesc->sec4_sg + sec4_sg_index);
-+			sec4_sg_index += assoc_nents;
-+		}
-+
-+		sg_to_sec4_sg_last(req->src,
-+				   src_nents,
-+				   edesc->sec4_sg +
-+				   sec4_sg_index, 0);
-+		sec4_sg_index += src_nents;
-+	}
-+	if (dst_nents) {
-+		sg_to_sec4_sg_last(req->dst, dst_nents,
-+				   edesc->sec4_sg + sec4_sg_index, 0);
-+	}
-+	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
-+					    sec4_sg_bytes, DMA_TO_DEVICE);
-+	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
-+		dev_err(jrdev, "unable to map S/G table\n");
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	return edesc;
-+}
-+
-+/*
-+ * allocate and map the aead extended descriptor
-+ */
-+static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
-+					   int desc_bytes, bool *all_contig_ptr,
-+					   bool encrypt)
-+{
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	gfp_t flags = (req->base.flags & (CRYPTO_TFM_REQ_MAY_BACKLOG |
-+		       CRYPTO_TFM_REQ_MAY_SLEEP)) ? GFP_KERNEL : GFP_ATOMIC;
-+	int src_nents, dst_nents = 0;
-+	struct aead_edesc *edesc;
-+	int sgc;
-+	bool all_contig = true;
-+	bool src_chained = false, dst_chained = false;
-+	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
-+	unsigned int authsize = ctx->authsize;
-+
-+	if (unlikely(req->dst != req->src)) {
-+		src_nents = sg_count(req->src, req->assoclen + req->cryptlen,
-+				     &src_chained);
-+		dst_nents = sg_count(req->dst,
-+				     req->assoclen + req->cryptlen +
-+					(encrypt ? authsize : (-authsize)),
-+				     &dst_chained);
-+	} else {
-+		src_nents = sg_count(req->src,
-+				     req->assoclen + req->cryptlen +
-+					(encrypt ? authsize : 0),
-+				     &src_chained);
-+	}
- 
--	/*
--	 * Check if data are contiguous.
--	 * GCM expected input sequence: IV, AAD, text
--	 * All other - expected input sequence: AAD, IV, text
--	 */
--	if (is_gcm)
--		all_contig = (!assoc_nents &&
--			      iv_dma + ivsize == sg_dma_address(req->assoc) &&
--			      !src_nents && sg_dma_address(req->assoc) +
--			      req->assoclen == sg_dma_address(req->src));
--	else
--		all_contig = (!assoc_nents && sg_dma_address(req->assoc) +
--			      req->assoclen == iv_dma && !src_nents &&
--			      iv_dma + ivsize == sg_dma_address(req->src));
-+	/* Check if data are contiguous. */
-+	all_contig = !src_nents;
- 	if (!all_contig) {
--		assoc_nents = assoc_nents ? : 1;
- 		src_nents = src_nents ? : 1;
--		sec4_sg_len = assoc_nents + 1 + src_nents;
-+		sec4_sg_len = src_nents;
- 	}
- 
- 	sec4_sg_len += dst_nents;
-@@ -2691,64 +2580,78 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = kmalloc(sizeof(struct aead_edesc) + desc_bytes +
-+	edesc = kzalloc(sizeof(struct aead_edesc) + desc_bytes +
- 			sec4_sg_bytes, GFP_DMA | flags);
- 	if (!edesc) {
- 		dev_err(jrdev, "could not allocate extended descriptor\n");
- 		return ERR_PTR(-ENOMEM);
- 	}
- 
--	edesc->assoc_nents = assoc_nents;
--	edesc->assoc_chained = assoc_chained;
-+	if (likely(req->src == req->dst)) {
-+		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
-+					 DMA_BIDIRECTIONAL, src_chained);
-+		if (unlikely(!sgc)) {
-+			dev_err(jrdev, "unable to map source\n");
-+			kfree(edesc);
-+			return ERR_PTR(-ENOMEM);
-+		}
-+	} else {
-+		sgc = dma_map_sg_chained(jrdev, req->src, src_nents ? : 1,
-+					 DMA_TO_DEVICE, src_chained);
-+		if (unlikely(!sgc)) {
-+			dev_err(jrdev, "unable to map source\n");
-+			kfree(edesc);
-+			return ERR_PTR(-ENOMEM);
-+		}
-+
-+		sgc = dma_map_sg_chained(jrdev, req->dst, dst_nents ? : 1,
-+					 DMA_FROM_DEVICE, dst_chained);
-+		if (unlikely(!sgc)) {
-+			dev_err(jrdev, "unable to map destination\n");
-+			dma_unmap_sg_chained(jrdev, req->src, src_nents ? : 1,
-+					     DMA_TO_DEVICE, src_chained);
-+			kfree(edesc);
-+			return ERR_PTR(-ENOMEM);
-+		}
-+	}
-+
- 	edesc->src_nents = src_nents;
- 	edesc->src_chained = src_chained;
- 	edesc->dst_nents = dst_nents;
- 	edesc->dst_chained = dst_chained;
--	edesc->iv_dma = iv_dma;
--	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 	edesc->sec4_sg = (void *)edesc + sizeof(struct aead_edesc) +
- 			 desc_bytes;
- 	*all_contig_ptr = all_contig;
- 
- 	sec4_sg_index = 0;
- 	if (!all_contig) {
--		if (!is_gcm) {
--			sg_to_sec4_sg_len(req->assoc, req->assoclen,
--					  edesc->sec4_sg + sec4_sg_index);
--			sec4_sg_index += assoc_nents;
--		}
--
--		dma_to_sec4_sg_one(edesc->sec4_sg + sec4_sg_index,
--				   iv_dma, ivsize, 0);
--		sec4_sg_index += 1;
--
--		if (is_gcm) {
--			sg_to_sec4_sg_len(req->assoc, req->assoclen,
--					  edesc->sec4_sg + sec4_sg_index);
--			sec4_sg_index += assoc_nents;
--		}
--
--		sg_to_sec4_sg_last(req->src,
--				   src_nents,
--				   edesc->sec4_sg +
--				   sec4_sg_index, 0);
-+		sg_to_sec4_sg(req->src, src_nents,
-+			      edesc->sec4_sg + sec4_sg_index, 0);
- 		sec4_sg_index += src_nents;
- 	}
- 	if (dst_nents) {
- 		sg_to_sec4_sg_last(req->dst, dst_nents,
- 				   edesc->sec4_sg + sec4_sg_index, 0);
- 	}
-+
-+	if (!sec4_sg_bytes)
-+		return edesc;
-+
- 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	if (dma_mapping_error(jrdev, edesc->sec4_sg_dma)) {
- 		dev_err(jrdev, "unable to map S/G table\n");
-+		aead_unmap(jrdev, edesc, req);
-+		kfree(edesc);
- 		return ERR_PTR(-ENOMEM);
- 	}
- 
-+	edesc->sec4_sg_bytes = sec4_sg_bytes;
-+
- 	return edesc;
- }
- 
--static int aead_encrypt(struct aead_request *req)
-+static int gcm_encrypt(struct aead_request *req)
- {
- 	struct aead_edesc *edesc;
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-@@ -2759,14 +2662,12 @@ static int aead_encrypt(struct aead_request *req)
- 	int ret = 0;
- 
- 	/* allocate extended descriptor */
--	edesc = aead_edesc_alloc(req, DESC_JOB_IO_LEN *
--				 CAAM_CMD_SZ, &all_contig, true);
-+	edesc = aead_edesc_alloc(req, GCM_DESC_JOB_IO_LEN, &all_contig, true);
- 	if (IS_ERR(edesc))
- 		return PTR_ERR(edesc);
- 
- 	/* Create and submit job descriptor */
--	init_aead_job(ctx->sh_desc_enc, ctx->sh_desc_enc_dma, edesc, req,
--		      all_contig, true);
-+	init_gcm_job(req, edesc, all_contig, true);
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "aead jobdesc@"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, edesc->hw_desc,
-@@ -2785,7 +2686,79 @@ static int aead_encrypt(struct aead_request *req)
- 	return ret;
- }
- 
--static int aead_decrypt(struct aead_request *req)
-+static int old_aead_encrypt(struct aead_request *req)
-+{
-+	struct aead_edesc *edesc;
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	bool all_contig;
-+	u32 *desc;
-+	int ret = 0;
-+
-+	/* allocate extended descriptor */
-+	edesc = old_aead_edesc_alloc(req, DESC_JOB_IO_LEN *
-+				     CAAM_CMD_SZ, &all_contig, true);
-+	if (IS_ERR(edesc))
-+		return PTR_ERR(edesc);
-+
-+	/* Create and submit job descriptor */
-+	old_init_aead_job(ctx->sh_desc_enc, ctx->sh_desc_enc_dma, edesc, req,
-+			  all_contig, true);
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "aead jobdesc@"__stringify(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, edesc->hw_desc,
-+		       desc_bytes(edesc->hw_desc), 1);
-+#endif
-+
-+	desc = edesc->hw_desc;
-+	ret = caam_jr_enqueue(jrdev, desc, old_aead_encrypt_done, req);
-+	if (!ret) {
-+		ret = -EINPROGRESS;
-+	} else {
-+		old_aead_unmap(jrdev, edesc, req);
-+		kfree(edesc);
-+	}
-+
-+	return ret;
-+}
-+
-+static int gcm_decrypt(struct aead_request *req)
-+{
-+	struct aead_edesc *edesc;
-+	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-+	struct caam_ctx *ctx = crypto_aead_ctx(aead);
-+	struct device *jrdev = ctx->jrdev;
-+	bool all_contig;
-+	u32 *desc;
-+	int ret = 0;
-+
-+	/* allocate extended descriptor */
-+	edesc = aead_edesc_alloc(req, GCM_DESC_JOB_IO_LEN, &all_contig, false);
-+	if (IS_ERR(edesc))
-+		return PTR_ERR(edesc);
-+
-+	/* Create and submit job descriptor*/
-+	init_gcm_job(req, edesc, all_contig, false);
-+#ifdef DEBUG
-+	print_hex_dump(KERN_ERR, "aead jobdesc@"__stringify(__LINE__)": ",
-+		       DUMP_PREFIX_ADDRESS, 16, 4, edesc->hw_desc,
-+		       desc_bytes(edesc->hw_desc), 1);
-+#endif
-+
-+	desc = edesc->hw_desc;
-+	ret = caam_jr_enqueue(jrdev, desc, aead_decrypt_done, req);
-+	if (!ret) {
-+		ret = -EINPROGRESS;
-+	} else {
-+		aead_unmap(jrdev, edesc, req);
-+		kfree(edesc);
-+	}
-+
-+	return ret;
-+}
-+
-+static int old_aead_decrypt(struct aead_request *req)
- {
- 	struct aead_edesc *edesc;
- 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-@@ -2796,8 +2769,8 @@ static int aead_decrypt(struct aead_request *req)
- 	int ret = 0;
- 
- 	/* allocate extended descriptor */
--	edesc = aead_edesc_alloc(req, DESC_JOB_IO_LEN *
--				 CAAM_CMD_SZ, &all_contig, false);
-+	edesc = old_aead_edesc_alloc(req, DESC_JOB_IO_LEN *
-+				     CAAM_CMD_SZ, &all_contig, false);
- 	if (IS_ERR(edesc))
- 		return PTR_ERR(edesc);
- 
-@@ -2808,8 +2781,8 @@ static int aead_decrypt(struct aead_request *req)
- #endif
- 
- 	/* Create and submit job descriptor*/
--	init_aead_job(ctx->sh_desc_dec,
--		      ctx->sh_desc_dec_dma, edesc, req, all_contig, false);
-+	old_init_aead_job(ctx->sh_desc_dec,
-+			  ctx->sh_desc_dec_dma, edesc, req, all_contig, false);
- #ifdef DEBUG
- 	print_hex_dump(KERN_ERR, "aead jobdesc@"__stringify(__LINE__)": ",
- 		       DUMP_PREFIX_ADDRESS, 16, 4, edesc->hw_desc,
-@@ -2817,11 +2790,11 @@ static int aead_decrypt(struct aead_request *req)
- #endif
- 
- 	desc = edesc->hw_desc;
--	ret = caam_jr_enqueue(jrdev, desc, aead_decrypt_done, req);
-+	ret = caam_jr_enqueue(jrdev, desc, old_aead_decrypt_done, req);
- 	if (!ret) {
- 		ret = -EINPROGRESS;
- 	} else {
--		aead_unmap(jrdev, edesc, req);
-+		old_aead_unmap(jrdev, edesc, req);
- 		kfree(edesc);
- 	}
- 
-@@ -2995,7 +2968,7 @@ static struct aead_edesc *aead_giv_edesc_alloc(struct aead_givcrypt_request
- 	return edesc;
- }
- 
--static int aead_givencrypt(struct aead_givcrypt_request *areq)
-+static int old_aead_givencrypt(struct aead_givcrypt_request *areq)
- {
- 	struct aead_request *req = &areq->areq;
- 	struct aead_edesc *edesc;
-@@ -3029,11 +3002,11 @@ static int aead_givencrypt(struct aead_givcrypt_request *areq)
- #endif
- 
- 	desc = edesc->hw_desc;
--	ret = caam_jr_enqueue(jrdev, desc, aead_encrypt_done, req);
-+	ret = caam_jr_enqueue(jrdev, desc, old_aead_encrypt_done, req);
- 	if (!ret) {
- 		ret = -EINPROGRESS;
- 	} else {
--		aead_unmap(jrdev, edesc, req);
-+		old_aead_unmap(jrdev, edesc, req);
- 		kfree(edesc);
- 	}
- 
-@@ -3042,7 +3015,7 @@ static int aead_givencrypt(struct aead_givcrypt_request *areq)
- 
- static int aead_null_givencrypt(struct aead_givcrypt_request *areq)
- {
--	return aead_encrypt(&areq->areq);
-+	return old_aead_encrypt(&areq->areq);
- }
- 
- /*
-@@ -3392,8 +3365,8 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
- 			.givencrypt = aead_null_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = NULL_IV_SIZE,
-@@ -3411,8 +3384,8 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
- 			.givencrypt = aead_null_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = NULL_IV_SIZE,
-@@ -3430,8 +3403,8 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
- 			.givencrypt = aead_null_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = NULL_IV_SIZE,
-@@ -3450,8 +3423,8 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
- 			.givencrypt = aead_null_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = NULL_IV_SIZE,
-@@ -3470,8 +3443,8 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
- 			.givencrypt = aead_null_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = NULL_IV_SIZE,
-@@ -3490,8 +3463,8 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
- 			.givencrypt = aead_null_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = NULL_IV_SIZE,
-@@ -3510,9 +3483,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = MD5_DIGEST_SIZE,
-@@ -3529,9 +3502,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = SHA1_DIGEST_SIZE,
-@@ -3548,9 +3521,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = SHA224_DIGEST_SIZE,
-@@ -3568,9 +3541,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = SHA256_DIGEST_SIZE,
-@@ -3588,9 +3561,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = SHA384_DIGEST_SIZE,
-@@ -3609,9 +3582,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = AES_BLOCK_SIZE,
- 			.maxauthsize = SHA512_DIGEST_SIZE,
-@@ -3629,9 +3602,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = MD5_DIGEST_SIZE,
-@@ -3648,9 +3621,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA1_DIGEST_SIZE,
-@@ -3667,9 +3640,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA224_DIGEST_SIZE,
-@@ -3687,9 +3660,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA256_DIGEST_SIZE,
-@@ -3707,9 +3680,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA384_DIGEST_SIZE,
-@@ -3727,9 +3700,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA512_DIGEST_SIZE,
-@@ -3747,9 +3720,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = MD5_DIGEST_SIZE,
-@@ -3766,9 +3739,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = SHA1_DIGEST_SIZE,
-@@ -3785,9 +3758,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = SHA224_DIGEST_SIZE,
-@@ -3805,9 +3778,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = SHA256_DIGEST_SIZE,
-@@ -3825,9 +3798,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = SHA384_DIGEST_SIZE,
-@@ -3845,9 +3818,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = DES_BLOCK_SIZE,
- 			.maxauthsize = SHA512_DIGEST_SIZE,
-@@ -3865,9 +3838,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = MD5_DIGEST_SIZE,
-@@ -3884,9 +3857,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = SHA1_DIGEST_SIZE,
-@@ -3903,9 +3876,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = SHA224_DIGEST_SIZE,
-@@ -3923,9 +3896,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = SHA256_DIGEST_SIZE,
-@@ -3943,9 +3916,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = SHA384_DIGEST_SIZE,
-@@ -3963,9 +3936,9 @@ static struct caam_alg_template driver_algs[] = {
- 		.template_aead = {
- 			.setkey = aead_setkey,
- 			.setauthsize = aead_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
-+			.encrypt = old_aead_encrypt,
-+			.decrypt = old_aead_decrypt,
-+			.givencrypt = old_aead_givencrypt,
- 			.geniv = "<built-in>",
- 			.ivsize = CTR_RFC3686_IV_SIZE,
- 			.maxauthsize = SHA512_DIGEST_SIZE,
-@@ -3975,58 +3948,6 @@ static struct caam_alg_template driver_algs[] = {
- 				   OP_ALG_AAI_HMAC_PRECOMP,
- 		.alg_op = OP_ALG_ALGSEL_SHA512 | OP_ALG_AAI_HMAC,
- 	},
--	{
--		.name = "rfc4106(gcm(aes))",
--		.driver_name = "rfc4106-gcm-aes-caam",
--		.blocksize = 1,
--		.type = CRYPTO_ALG_TYPE_AEAD,
--		.template_aead = {
--			.setkey = rfc4106_setkey,
--			.setauthsize = rfc4106_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
--			.geniv = "<built-in>",
--			.ivsize = 8,
--			.maxauthsize = AES_BLOCK_SIZE,
--			},
--		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
--	},
--	{
--		.name = "rfc4543(gcm(aes))",
--		.driver_name = "rfc4543-gcm-aes-caam",
--		.blocksize = 1,
--		.type = CRYPTO_ALG_TYPE_AEAD,
--		.template_aead = {
--			.setkey = rfc4543_setkey,
--			.setauthsize = rfc4543_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = aead_givencrypt,
--			.geniv = "<built-in>",
--			.ivsize = 8,
--			.maxauthsize = AES_BLOCK_SIZE,
--			},
--		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
--	},
--	/* Galois Counter Mode */
--	{
--		.name = "gcm(aes)",
--		.driver_name = "gcm-aes-caam",
--		.blocksize = 1,
--		.type = CRYPTO_ALG_TYPE_AEAD,
--		.template_aead = {
--			.setkey = gcm_setkey,
--			.setauthsize = gcm_setauthsize,
--			.encrypt = aead_encrypt,
--			.decrypt = aead_decrypt,
--			.givencrypt = NULL,
--			.geniv = "<built-in>",
--			.ivsize = 12,
--			.maxauthsize = AES_BLOCK_SIZE,
--			},
--		.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
--	},
- 	/* ablkcipher descriptor */
- 	{
- 		.name = "cbc(aes)",
-@@ -4116,21 +4037,84 @@ static struct caam_alg_template driver_algs[] = {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 110142c..56f8a8e 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -13963,8 +13963,8 @@ static struct cipher_testvec cast6_xts_dec_tv_template[] = {
+ #define AES_CTR_3686_DEC_TEST_VECTORS 6
+ #define AES_GCM_ENC_TEST_VECTORS 9
+ #define AES_GCM_DEC_TEST_VECTORS 8
+-#define AES_GCM_4106_ENC_TEST_VECTORS 7
+-#define AES_GCM_4106_DEC_TEST_VECTORS 7
++#define AES_GCM_4106_ENC_TEST_VECTORS 23
++#define AES_GCM_4106_DEC_TEST_VECTORS 23
+ #define AES_GCM_4543_ENC_TEST_VECTORS 1
+ #define AES_GCM_4543_DEC_TEST_VECTORS 2
+ #define AES_CCM_ENC_TEST_VECTORS 8
+@@ -20123,6 +20123,428 @@ static struct aead_testvec aes_gcm_rfc4106_enc_tv_template[] = {
+ 			  "\x37\x08\x1C\xCF\xBA\x5D\x71\x46"
+ 			  "\x80\x72\xB0\x4C\x82\x0D\x60\x3C",
+ 		.rlen	= 208,
++	}, { /* From draft-mcgrew-gcm-test-01 */
++		.key	= "\x4C\x80\xCD\xEF\xBB\x5D\x10\xDA"
++			  "\x90\x6A\xC7\x3C\x36\x13\xA6\x34"
++			  "\x2E\x44\x3B\x68",
++		.klen	= 20,
++		.iv	= "\x49\x56\xED\x7E\x3B\x24\x4C\xFE",
++		.input	= "\x45\x00\x00\x48\x69\x9A\x00\x00"
++			  "\x80\x11\x4D\xB7\xC0\xA8\x01\x02"
++			  "\xC0\xA8\x01\x01\x0A\x9B\xF1\x56"
++			  "\x38\xD3\x01\x00\x00\x01\x00\x00"
++			  "\x00\x00\x00\x00\x04\x5F\x73\x69"
++			  "\x70\x04\x5F\x75\x64\x70\x03\x73"
++			  "\x69\x70\x09\x63\x79\x62\x65\x72"
++			  "\x63\x69\x74\x79\x02\x64\x6B\x00"
++			  "\x00\x21\x00\x01\x01\x02\x02\x01",
++		.ilen	= 72,
++		.assoc	= "\x00\x00\x43\x21\x87\x65\x43\x21"
++			  "\x00\x00\x00\x00",
++		.alen	= 12,
++		.result	= "\xFE\xCF\x53\x7E\x72\x9D\x5B\x07"
++			  "\xDC\x30\xDF\x52\x8D\xD2\x2B\x76"
++			  "\x8D\x1B\x98\x73\x66\x96\xA6\xFD"
++			  "\x34\x85\x09\xFA\x13\xCE\xAC\x34"
++			  "\xCF\xA2\x43\x6F\x14\xA3\xF3\xCF"
++			  "\x65\x92\x5B\xF1\xF4\xA1\x3C\x5D"
++			  "\x15\xB2\x1E\x18\x84\xF5\xFF\x62"
++			  "\x47\xAE\xAB\xB7\x86\xB9\x3B\xCE"
++			  "\x61\xBC\x17\xD7\x68\xFD\x97\x32"
++			  "\x45\x90\x18\x14\x8F\x6C\xBE\x72"
++			  "\x2F\xD0\x47\x96\x56\x2D\xFD\xB4",
++		.rlen	= 88,
++	}, {
++		.key	= "\xFE\xFF\xE9\x92\x86\x65\x73\x1C"
++			  "\x6D\x6A\x8F\x94\x67\x30\x83\x08"
++			  "\xCA\xFE\xBA\xBE",
++		.klen	= 20,
++		.iv	= "\xFA\xCE\xDB\xAD\xDE\xCA\xF8\x88",
++		.input	= "\x45\x00\x00\x3E\x69\x8F\x00\x00"
++			  "\x80\x11\x4D\xCC\xC0\xA8\x01\x02"
++			  "\xC0\xA8\x01\x01\x0A\x98\x00\x35"
++			  "\x00\x2A\x23\x43\xB2\xD0\x01\x00"
++			  "\x00\x01\x00\x00\x00\x00\x00\x00"
++			  "\x03\x73\x69\x70\x09\x63\x79\x62"
++			  "\x65\x72\x63\x69\x74\x79\x02\x64"
++			  "\x6B\x00\x00\x01\x00\x01\x00\x01",
++		.ilen	= 64,
++		.assoc	= "\x00\x00\xA5\xF8\x00\x00\x00\x0A",
++		.alen	= 8,
++		.result	= "\xDE\xB2\x2C\xD9\xB0\x7C\x72\xC1"
++			  "\x6E\x3A\x65\xBE\xEB\x8D\xF3\x04"
++			  "\xA5\xA5\x89\x7D\x33\xAE\x53\x0F"
++			  "\x1B\xA7\x6D\x5D\x11\x4D\x2A\x5C"
++			  "\x3D\xE8\x18\x27\xC1\x0E\x9A\x4F"
++			  "\x51\x33\x0D\x0E\xEC\x41\x66\x42"
++			  "\xCF\xBB\x85\xA5\xB4\x7E\x48\xA4"
++			  "\xEC\x3B\x9B\xA9\x5D\x91\x8B\xD1"
++			  "\x83\xB7\x0D\x3A\xA8\xBC\x6E\xE4"
++			  "\xC3\x09\xE9\xD8\x5A\x41\xAD\x4A",
++		.rlen	= 80,
++	}, {
++		.key	= "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\x11\x22\x33\x44",
++		.klen	= 36,
++		.iv	= "\x01\x02\x03\x04\x05\x06\x07\x08",
++		.input	= "\x45\x00\x00\x30\x69\xA6\x40\x00"
++			  "\x80\x06\x26\x90\xC0\xA8\x01\x02"
++			  "\x93\x89\x15\x5E\x0A\x9E\x00\x8B"
++			  "\x2D\xC5\x7E\xE0\x00\x00\x00\x00"
++			  "\x70\x02\x40\x00\x20\xBF\x00\x00"
++			  "\x02\x04\x05\xB4\x01\x01\x04\x02"
++			  "\x01\x02\x02\x01",
++		.ilen	= 52,
++		.assoc	= "\x4A\x2C\xBF\xE3\x00\x00\x00\x02",
++		.alen	= 8,
++		.result	= "\xFF\x42\x5C\x9B\x72\x45\x99\xDF"
++			  "\x7A\x3B\xCD\x51\x01\x94\xE0\x0D"
++			  "\x6A\x78\x10\x7F\x1B\x0B\x1C\xBF"
++			  "\x06\xEF\xAE\x9D\x65\xA5\xD7\x63"
++			  "\x74\x8A\x63\x79\x85\x77\x1D\x34"
++			  "\x7F\x05\x45\x65\x9F\x14\xE9\x9D"
++			  "\xEF\x84\x2D\x8E\xB3\x35\xF4\xEE"
++			  "\xCF\xDB\xF8\x31\x82\x4B\x4C\x49"
++			  "\x15\x95\x6C\x96",
++		.rlen	= 68,
++	}, {
++		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00",
++		.klen	= 20,
++		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.input	= "\x45\x00\x00\x3C\x99\xC5\x00\x00"
++			  "\x80\x01\xCB\x7A\x40\x67\x93\x18"
++			  "\x01\x01\x01\x01\x08\x00\x07\x5C"
++			  "\x02\x00\x44\x00\x61\x62\x63\x64"
++			  "\x65\x66\x67\x68\x69\x6A\x6B\x6C"
++			  "\x6D\x6E\x6F\x70\x71\x72\x73\x74"
++			  "\x75\x76\x77\x61\x62\x63\x64\x65"
++			  "\x66\x67\x68\x69\x01\x02\x02\x01",
++		.ilen	= 64,
++		.assoc	= "\x00\x00\x00\x00\x00\x00\x00\x01",
++		.alen	= 8,
++		.result	= "\x46\x88\xDA\xF2\xF9\x73\xA3\x92"
++			  "\x73\x29\x09\xC3\x31\xD5\x6D\x60"
++			  "\xF6\x94\xAB\xAA\x41\x4B\x5E\x7F"
++			  "\xF5\xFD\xCD\xFF\xF5\xE9\xA2\x84"
++			  "\x45\x64\x76\x49\x27\x19\xFF\xB6"
++			  "\x4D\xE7\xD9\xDC\xA1\xE1\xD8\x94"
++			  "\xBC\x3B\xD5\x78\x73\xED\x4D\x18"
++			  "\x1D\x19\xD4\xD5\xC8\xC1\x8A\xF3"
++			  "\xF8\x21\xD4\x96\xEE\xB0\x96\xE9"
++			  "\x8A\xD2\xB6\x9E\x47\x99\xC7\x1D",
++		.rlen	= 80,
++	}, {
++		.key	= "\x3D\xE0\x98\x74\xB3\x88\xE6\x49"
++			  "\x19\x88\xD0\xC3\x60\x7E\xAE\x1F"
++			  "\x57\x69\x0E\x43",
++		.klen	= 20,
++		.iv	= "\x4E\x28\x00\x00\xA2\xFC\xA1\xA3",
++		.input	= "\x45\x00\x00\x3C\x99\xC3\x00\x00"
++			  "\x80\x01\xCB\x7C\x40\x67\x93\x18"
++			  "\x01\x01\x01\x01\x08\x00\x08\x5C"
++			  "\x02\x00\x43\x00\x61\x62\x63\x64"
++			  "\x65\x66\x67\x68\x69\x6A\x6B\x6C"
++			  "\x6D\x6E\x6F\x70\x71\x72\x73\x74"
++			  "\x75\x76\x77\x61\x62\x63\x64\x65"
++			  "\x66\x67\x68\x69\x01\x02\x02\x01",
++		.ilen	= 64,
++		.assoc	= "\x42\xF6\x7E\x3F\x10\x10\x10\x10"
++			  "\x10\x10\x10\x10",
++		.alen	= 12,
++		.result	= "\xFB\xA2\xCA\xA4\x85\x3C\xF9\xF0"
++			  "\xF2\x2C\xB1\x0D\x86\xDD\x83\xB0"
++			  "\xFE\xC7\x56\x91\xCF\x1A\x04\xB0"
++			  "\x0D\x11\x38\xEC\x9C\x35\x79\x17"
++			  "\x65\xAC\xBD\x87\x01\xAD\x79\x84"
++			  "\x5B\xF9\xFE\x3F\xBA\x48\x7B\xC9"
++			  "\x17\x55\xE6\x66\x2B\x4C\x8D\x0D"
++			  "\x1F\x5E\x22\x73\x95\x30\x32\x0A"
++			  "\xE0\xD7\x31\xCC\x97\x8E\xCA\xFA"
++			  "\xEA\xE8\x8F\x00\xE8\x0D\x6E\x48",
++		.rlen	= 80,
++	}, {
++		.key	= "\x3D\xE0\x98\x74\xB3\x88\xE6\x49"
++			  "\x19\x88\xD0\xC3\x60\x7E\xAE\x1F"
++			  "\x57\x69\x0E\x43",
++		.klen	= 20,
++		.iv	= "\x4E\x28\x00\x00\xA2\xFC\xA1\xA3",
++		.input	= "\x45\x00\x00\x1C\x42\xA2\x00\x00"
++			  "\x80\x01\x44\x1F\x40\x67\x93\xB6"
++			  "\xE0\x00\x00\x02\x0A\x00\xF5\xFF"
++			  "\x01\x02\x02\x01",
++		.ilen	= 28,
++		.assoc	= "\x42\xF6\x7E\x3F\x10\x10\x10\x10"
++			  "\x10\x10\x10\x10",
++		.alen	= 12,
++		.result	= "\xFB\xA2\xCA\x84\x5E\x5D\xF9\xF0"
++			  "\xF2\x2C\x3E\x6E\x86\xDD\x83\x1E"
++			  "\x1F\xC6\x57\x92\xCD\x1A\xF9\x13"
++			  "\x0E\x13\x79\xED\x36\x9F\x07\x1F"
++			  "\x35\xE0\x34\xBE\x95\xF1\x12\xE4"
++			  "\xE7\xD0\x5D\x35",
++		.rlen	= 44,
++	}, {
++		.key	= "\xFE\xFF\xE9\x92\x86\x65\x73\x1C"
++			  "\x6D\x6A\x8F\x94\x67\x30\x83\x08"
++			  "\xFE\xFF\xE9\x92\x86\x65\x73\x1C"
++			  "\xCA\xFE\xBA\xBE",
++		.klen	= 28,
++		.iv	= "\xFA\xCE\xDB\xAD\xDE\xCA\xF8\x88",
++		.input	= "\x45\x00\x00\x28\xA4\xAD\x40\x00"
++			  "\x40\x06\x78\x80\x0A\x01\x03\x8F"
++			  "\x0A\x01\x06\x12\x80\x23\x06\xB8"
++			  "\xCB\x71\x26\x02\xDD\x6B\xB0\x3E"
++			  "\x50\x10\x16\xD0\x75\x68\x00\x01",
++		.ilen	= 40,
++		.assoc	= "\x00\x00\xA5\xF8\x00\x00\x00\x0A",
++		.alen	= 8,
++		.result	= "\xA5\xB1\xF8\x06\x60\x29\xAE\xA4"
++			  "\x0E\x59\x8B\x81\x22\xDE\x02\x42"
++			  "\x09\x38\xB3\xAB\x33\xF8\x28\xE6"
++			  "\x87\xB8\x85\x8B\x5B\xFB\xDB\xD0"
++			  "\x31\x5B\x27\x45\x21\x44\xCC\x77"
++			  "\x95\x45\x7B\x96\x52\x03\x7F\x53"
++			  "\x18\x02\x7B\x5B\x4C\xD7\xA6\x36",
++		.rlen	= 56,
++	}, {
++		.key	= "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\xDE\xCA\xF8\x88",
++		.klen	= 20,
++		.iv	= "\xCA\xFE\xDE\xBA\xCE\xFA\xCE\x74",
++		.input	= "\x45\x00\x00\x49\x33\xBA\x00\x00"
++			  "\x7F\x11\x91\x06\xC3\xFB\x1D\x10"
++			  "\xC2\xB1\xD3\x26\xC0\x28\x31\xCE"
++			  "\x00\x35\xDD\x7B\x80\x03\x02\xD5"
++			  "\x00\x00\x4E\x20\x00\x1E\x8C\x18"
++			  "\xD7\x5B\x81\xDC\x91\xBA\xA0\x47"
++			  "\x6B\x91\xB9\x24\xB2\x80\x38\x9D"
++			  "\x92\xC9\x63\xBA\xC0\x46\xEC\x95"
++			  "\x9B\x62\x66\xC0\x47\x22\xB1\x49"
++			  "\x23\x01\x01\x01",
++		.ilen	= 76,
++		.assoc	= "\x00\x00\x01\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x01",
++		.alen	= 12,
++		.result	= "\x18\xA6\xFD\x42\xF7\x2C\xBF\x4A"
++			  "\xB2\xA2\xEA\x90\x1F\x73\xD8\x14"
++			  "\xE3\xE7\xF2\x43\xD9\x54\x12\xE1"
++			  "\xC3\x49\xC1\xD2\xFB\xEC\x16\x8F"
++			  "\x91\x90\xFE\xEB\xAF\x2C\xB0\x19"
++			  "\x84\xE6\x58\x63\x96\x5D\x74\x72"
++			  "\xB7\x9D\xA3\x45\xE0\xE7\x80\x19"
++			  "\x1F\x0D\x2F\x0E\x0F\x49\x6C\x22"
++			  "\x6F\x21\x27\xB2\x7D\xB3\x57\x24"
++			  "\xE7\x84\x5D\x68\x65\x1F\x57\xE6"
++			  "\x5F\x35\x4F\x75\xFF\x17\x01\x57"
++			  "\x69\x62\x34\x36",
++		.rlen	= 92,
++	}, {
++		.key	= "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\x73\x61\x6C\x74",
++		.klen	= 36,
++		.iv	= "\x61\x6E\x64\x01\x69\x76\x65\x63",
++		.input	= "\x45\x08\x00\x28\x73\x2C\x00\x00"
++			  "\x40\x06\xE9\xF9\x0A\x01\x06\x12"
++			  "\x0A\x01\x03\x8F\x06\xB8\x80\x23"
++			  "\xDD\x6B\xAF\xBE\xCB\x71\x26\x02"
++			  "\x50\x10\x1F\x64\x6D\x54\x00\x01",
++		.ilen	= 40,
++		.assoc	= "\x17\x40\x5E\x67\x15\x6F\x31\x26"
++			  "\xDD\x0D\xB9\x9B",
++		.alen	= 12,
++		.result	= "\xF2\xD6\x9E\xCD\xBD\x5A\x0D\x5B"
++			  "\x8D\x5E\xF3\x8B\xAD\x4D\xA5\x8D"
++			  "\x1F\x27\x8F\xDE\x98\xEF\x67\x54"
++			  "\x9D\x52\x4A\x30\x18\xD9\xA5\x7F"
++			  "\xF4\xD3\xA3\x1C\xE6\x73\x11\x9E"
++			  "\x45\x16\x26\xC2\x41\x57\x71\xE3"
++			  "\xB7\xEE\xBC\xA6\x14\xC8\x9B\x35",
++		.rlen	= 56,
++	}, {
++		.key	= "\x3D\xE0\x98\x74\xB3\x88\xE6\x49"
++			  "\x19\x88\xD0\xC3\x60\x7E\xAE\x1F"
++			  "\x57\x69\x0E\x43",
++		.klen	= 20,
++		.iv	= "\x4E\x28\x00\x00\xA2\xFC\xA1\xA3",
++		.input	= "\x45\x00\x00\x49\x33\x3E\x00\x00"
++			  "\x7F\x11\x91\x82\xC3\xFB\x1D\x10"
++			  "\xC2\xB1\xD3\x26\xC0\x28\x31\xCE"
++			  "\x00\x35\xCB\x45\x80\x03\x02\x5B"
++			  "\x00\x00\x01\xE0\x00\x1E\x8C\x18"
++			  "\xD6\x57\x59\xD5\x22\x84\xA0\x35"
++			  "\x2C\x71\x47\x5C\x88\x80\x39\x1C"
++			  "\x76\x4D\x6E\x5E\xE0\x49\x6B\x32"
++			  "\x5A\xE2\x70\xC0\x38\x99\x49\x39"
++			  "\x15\x01\x01\x01",
++		.ilen	= 76,
++		.assoc	= "\x42\xF6\x7E\x3F\x10\x10\x10\x10"
++			  "\x10\x10\x10\x10",
++		.alen	= 12,
++		.result	= "\xFB\xA2\xCA\xD1\x2F\xC1\xF9\xF0"
++			  "\x0D\x3C\xEB\xF3\x05\x41\x0D\xB8"
++			  "\x3D\x77\x84\xB6\x07\x32\x3D\x22"
++			  "\x0F\x24\xB0\xA9\x7D\x54\x18\x28"
++			  "\x00\xCA\xDB\x0F\x68\xD9\x9E\xF0"
++			  "\xE0\xC0\xC8\x9A\xE9\xBE\xA8\x88"
++			  "\x4E\x52\xD6\x5B\xC1\xAF\xD0\x74"
++			  "\x0F\x74\x24\x44\x74\x7B\x5B\x39"
++			  "\xAB\x53\x31\x63\xAA\xD4\x55\x0E"
++			  "\xE5\x16\x09\x75\xCD\xB6\x08\xC5"
++			  "\x76\x91\x89\x60\x97\x63\xB8\xE1"
++			  "\x8C\xAA\x81\xE2",
++		.rlen	= 92,
++	}, {
++		.key	= "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\x73\x61\x6C\x74",
++		.klen	= 36,
++		.iv	= "\x61\x6E\x64\x01\x69\x76\x65\x63",
++		.input	= "\x63\x69\x73\x63\x6F\x01\x72\x75"
++			  "\x6C\x65\x73\x01\x74\x68\x65\x01"
++			  "\x6E\x65\x74\x77\x65\x01\x64\x65"
++			  "\x66\x69\x6E\x65\x01\x74\x68\x65"
++			  "\x74\x65\x63\x68\x6E\x6F\x6C\x6F"
++			  "\x67\x69\x65\x73\x01\x74\x68\x61"
++			  "\x74\x77\x69\x6C\x6C\x01\x64\x65"
++			  "\x66\x69\x6E\x65\x74\x6F\x6D\x6F"
++			  "\x72\x72\x6F\x77\x01\x02\x02\x01",
++		.ilen	= 72,
++		.assoc	= "\x17\x40\x5E\x67\x15\x6F\x31\x26"
++			  "\xDD\x0D\xB9\x9B",
++		.alen	= 12,
++		.result	= "\xD4\xB7\xED\x86\xA1\x77\x7F\x2E"
++			  "\xA1\x3D\x69\x73\xD3\x24\xC6\x9E"
++			  "\x7B\x43\xF8\x26\xFB\x56\x83\x12"
++			  "\x26\x50\x8B\xEB\xD2\xDC\xEB\x18"
++			  "\xD0\xA6\xDF\x10\xE5\x48\x7D\xF0"
++			  "\x74\x11\x3E\x14\xC6\x41\x02\x4E"
++			  "\x3E\x67\x73\xD9\x1A\x62\xEE\x42"
++			  "\x9B\x04\x3A\x10\xE3\xEF\xE6\xB0"
++			  "\x12\xA4\x93\x63\x41\x23\x64\xF8"
++			  "\xC0\xCA\xC5\x87\xF2\x49\xE5\x6B"
++			  "\x11\xE2\x4F\x30\xE4\x4C\xCC\x76",
++		.rlen	= 88,
++	}, {
++		.key	= "\x7D\x77\x3D\x00\xC1\x44\xC5\x25"
++			  "\xAC\x61\x9D\x18\xC8\x4A\x3F\x47"
++			  "\xD9\x66\x42\x67",
++		.klen	= 20,
++		.iv	= "\x43\x45\x7E\x91\x82\x44\x3B\xC6",
++		.input	= "\x01\x02\x02\x01",
++		.ilen	= 4,
++		.assoc	= "\x33\x54\x67\xAE\xFF\xFF\xFF\xFF",
++		.alen	= 8,
++		.result	= "\x43\x7F\x86\x6B\xCB\x3F\x69\x9F"
++			  "\xE9\xB0\x82\x2B\xAC\x96\x1C\x45"
++			  "\x04\xBE\xF2\x70",
++		.rlen	= 20,
++	}, {
++		.key	= "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\xDE\xCA\xF8\x88",
++		.klen	= 20,
++		.iv	= "\xCA\xFE\xDE\xBA\xCE\xFA\xCE\x74",
++		.input	= "\x74\x6F\x01\x62\x65\x01\x6F\x72"
++			  "\x01\x6E\x6F\x74\x01\x74\x6F\x01"
++			  "\x62\x65\x00\x01",
++		.ilen	= 20,
++		.assoc	= "\x00\x00\x01\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x01",
++		.alen	= 12,
++		.result	= "\x29\xC9\xFC\x69\xA1\x97\xD0\x38"
++			  "\xCC\xDD\x14\xE2\xDD\xFC\xAA\x05"
++			  "\x43\x33\x21\x64\x41\x25\x03\x52"
++			  "\x43\x03\xED\x3C\x6C\x5F\x28\x38"
++			  "\x43\xAF\x8C\x3E",
++		.rlen	= 36,
++	}, {
++		.key	= "\x6C\x65\x67\x61\x6C\x69\x7A\x65"
++			  "\x6D\x61\x72\x69\x6A\x75\x61\x6E"
++			  "\x61\x61\x6E\x64\x64\x6F\x69\x74"
++			  "\x62\x65\x66\x6F\x72\x65\x69\x61"
++			  "\x74\x75\x72\x6E",
++		.klen	= 36,
++		.iv	= "\x33\x30\x21\x69\x67\x65\x74\x6D",
++		.input	= "\x45\x00\x00\x30\xDA\x3A\x00\x00"
++			  "\x80\x01\xDF\x3B\xC0\xA8\x00\x05"
++			  "\xC0\xA8\x00\x01\x08\x00\xC6\xCD"
++			  "\x02\x00\x07\x00\x61\x62\x63\x64"
++			  "\x65\x66\x67\x68\x69\x6A\x6B\x6C"
++			  "\x6D\x6E\x6F\x70\x71\x72\x73\x74"
++			  "\x01\x02\x02\x01",
++		.ilen	= 52,
++		.assoc	= "\x79\x6B\x69\x63\xFF\xFF\xFF\xFF"
++			  "\xFF\xFF\xFF\xFF",
++		.alen	= 12,
++		.result	= "\xF9\x7A\xB2\xAA\x35\x6D\x8E\xDC"
++			  "\xE1\x76\x44\xAC\x8C\x78\xE2\x5D"
++			  "\xD2\x4D\xED\xBB\x29\xEB\xF1\xB6"
++			  "\x4A\x27\x4B\x39\xB4\x9C\x3A\x86"
++			  "\x4C\xD3\xD7\x8C\xA4\xAE\x68\xA3"
++			  "\x2B\x42\x45\x8F\xB5\x7D\xBE\x82"
++			  "\x1D\xCC\x63\xB9\xD0\x93\x7B\xA2"
++			  "\x94\x5F\x66\x93\x68\x66\x1A\x32"
++			  "\x9F\xB4\xC0\x53",
++		.rlen	= 68,
++	}, {
++		.key	= "\x3D\xE0\x98\x74\xB3\x88\xE6\x49"
++			  "\x19\x88\xD0\xC3\x60\x7E\xAE\x1F"
++			  "\x57\x69\x0E\x43",
++		.klen	= 20,
++		.iv	= "\x4E\x28\x00\x00\xA2\xFC\xA1\xA3",
++		.input	= "\x45\x00\x00\x30\xDA\x3A\x00\x00"
++			  "\x80\x01\xDF\x3B\xC0\xA8\x00\x05"
++			  "\xC0\xA8\x00\x01\x08\x00\xC6\xCD"
++			  "\x02\x00\x07\x00\x61\x62\x63\x64"
++			  "\x65\x66\x67\x68\x69\x6A\x6B\x6C"
++			  "\x6D\x6E\x6F\x70\x71\x72\x73\x74"
++			  "\x01\x02\x02\x01",
++		.ilen	= 52,
++		.assoc	= "\x3F\x7E\xF6\x42\x10\x10\x10\x10"
++			  "\x10\x10\x10\x10",
++		.alen	= 12,
++		.result	= "\xFB\xA2\xCA\xA8\xC6\xC5\xF9\xF0"
++			  "\xF2\x2C\xA5\x4A\x06\x12\x10\xAD"
++			  "\x3F\x6E\x57\x91\xCF\x1A\xCA\x21"
++			  "\x0D\x11\x7C\xEC\x9C\x35\x79\x17"
++			  "\x65\xAC\xBD\x87\x01\xAD\x79\x84"
++			  "\x5B\xF9\xFE\x3F\xBA\x48\x7B\xC9"
++			  "\x63\x21\x93\x06\x84\xEE\xCA\xDB"
++			  "\x56\x91\x25\x46\xE7\xA9\x5C\x97"
++			  "\x40\xD7\xCB\x05",
++		.rlen	= 68,
++	}, {
++		.key	= "\x4C\x80\xCD\xEF\xBB\x5D\x10\xDA"
++			  "\x90\x6A\xC7\x3C\x36\x13\xA6\x34"
++			  "\x22\x43\x3C\x64",
++		.klen	= 20,
++		.iv	= "\x48\x55\xEC\x7D\x3A\x23\x4B\xFD",
++		.input	= "\x08\x00\xC6\xCD\x02\x00\x07\x00"
++			  "\x61\x62\x63\x64\x65\x66\x67\x68"
++			  "\x69\x6A\x6B\x6C\x6D\x6E\x6F\x70"
++			  "\x71\x72\x73\x74\x01\x02\x02\x01",
++		.ilen	= 32,
++		.assoc	= "\x00\x00\x43\x21\x87\x65\x43\x21"
++			  "\x00\x00\x00\x07",
++		.alen	= 12,
++		.result	= "\x74\x75\x2E\x8A\xEB\x5D\x87\x3C"
++			  "\xD7\xC0\xF4\xAC\xC3\x6C\x4B\xFF"
++			  "\x84\xB7\xD7\xB9\x8F\x0C\xA8\xB6"
++			  "\xAC\xDA\x68\x94\xBC\x61\x90\x69"
++			  "\xEF\x9C\xBC\x28\xFE\x1B\x56\xA7"
++			  "\xC4\xE0\xD5\x8C\x86\xCD\x2B\xC0",
++		.rlen	= 48,
  	}
  };
  
--struct caam_crypto_alg {
--	struct list_head entry;
-+struct caam_alg_entry {
- 	int class1_alg_type;
- 	int class2_alg_type;
- 	int alg_op;
-+};
-+
-+struct caam_aead_alg {
-+	struct aead_alg aead;
-+	struct caam_alg_entry caam;
-+	bool registered;
-+};
-+
-+static struct caam_aead_alg driver_aeads[] = {
-+	{
-+		.aead = {
-+			.base = {
-+				.cra_name = "rfc4106(gcm(aes))",
-+				.cra_driver_name = "rfc4106-gcm-aes-caam",
-+				.cra_blocksize = 1,
-+			},
-+			.setkey = rfc4106_setkey,
-+			.setauthsize = rfc4106_setauthsize,
-+			.encrypt = gcm_encrypt,
-+			.decrypt = gcm_decrypt,
-+			.ivsize = 8,
-+			.maxauthsize = AES_BLOCK_SIZE,
-+		},
-+		.caam = {
-+			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
-+		},
-+	},
-+	{
-+		.aead = {
-+			.base = {
-+				.cra_name = "rfc4543(gcm(aes))",
-+				.cra_driver_name = "rfc4543-gcm-aes-caam",
-+				.cra_blocksize = 1,
-+			},
-+			.setkey = rfc4543_setkey,
-+			.setauthsize = rfc4543_setauthsize,
-+			.encrypt = gcm_encrypt,
-+			.decrypt = gcm_decrypt,
-+			.ivsize = 8,
-+			.maxauthsize = AES_BLOCK_SIZE,
-+		},
-+		.caam = {
-+			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
-+		},
-+	},
-+	/* Galois Counter Mode */
-+	{
-+		.aead = {
-+			.base = {
-+				.cra_name = "gcm(aes)",
-+				.cra_driver_name = "gcm-aes-caam",
-+				.cra_blocksize = 1,
-+			},
-+			.setkey = gcm_setkey,
-+			.setauthsize = gcm_setauthsize,
-+			.encrypt = gcm_encrypt,
-+			.decrypt = gcm_decrypt,
-+			.ivsize = 12,
-+			.maxauthsize = AES_BLOCK_SIZE,
-+		},
-+		.caam = {
-+			.class1_alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_GCM,
-+		},
-+	},
-+};
-+
-+struct caam_crypto_alg {
- 	struct crypto_alg crypto_alg;
-+	struct list_head entry;
-+	struct caam_alg_entry caam;
+@@ -20298,7 +20720,428 @@ static struct aead_testvec aes_gcm_rfc4106_dec_tv_template[] = {
+                           "\xff\xff\xff\xff\xff\xff\xff\xff"
+                           "\xff\xff\xff\xff\xff\xff\xff\xff",
+                 .rlen   = 192,
+-
++	}, {
++		.key	= "\x4C\x80\xCD\xEF\xBB\x5D\x10\xDA"
++			  "\x90\x6A\xC7\x3C\x36\x13\xA6\x34"
++			  "\x2E\x44\x3B\x68",
++		.klen	= 20,
++		.iv	= "\x49\x56\xED\x7E\x3B\x24\x4C\xFE",
++		.result	= "\x45\x00\x00\x48\x69\x9A\x00\x00"
++			  "\x80\x11\x4D\xB7\xC0\xA8\x01\x02"
++			  "\xC0\xA8\x01\x01\x0A\x9B\xF1\x56"
++			  "\x38\xD3\x01\x00\x00\x01\x00\x00"
++			  "\x00\x00\x00\x00\x04\x5F\x73\x69"
++			  "\x70\x04\x5F\x75\x64\x70\x03\x73"
++			  "\x69\x70\x09\x63\x79\x62\x65\x72"
++			  "\x63\x69\x74\x79\x02\x64\x6B\x00"
++			  "\x00\x21\x00\x01\x01\x02\x02\x01",
++		.rlen	= 72,
++		.assoc	= "\x00\x00\x43\x21\x87\x65\x43\x21"
++			  "\x00\x00\x00\x00",
++		.alen	= 12,
++		.input	= "\xFE\xCF\x53\x7E\x72\x9D\x5B\x07"
++			  "\xDC\x30\xDF\x52\x8D\xD2\x2B\x76"
++			  "\x8D\x1B\x98\x73\x66\x96\xA6\xFD"
++			  "\x34\x85\x09\xFA\x13\xCE\xAC\x34"
++			  "\xCF\xA2\x43\x6F\x14\xA3\xF3\xCF"
++			  "\x65\x92\x5B\xF1\xF4\xA1\x3C\x5D"
++			  "\x15\xB2\x1E\x18\x84\xF5\xFF\x62"
++			  "\x47\xAE\xAB\xB7\x86\xB9\x3B\xCE"
++			  "\x61\xBC\x17\xD7\x68\xFD\x97\x32"
++			  "\x45\x90\x18\x14\x8F\x6C\xBE\x72"
++			  "\x2F\xD0\x47\x96\x56\x2D\xFD\xB4",
++		.ilen	= 88,
++	}, {
++		.key	= "\xFE\xFF\xE9\x92\x86\x65\x73\x1C"
++			  "\x6D\x6A\x8F\x94\x67\x30\x83\x08"
++			  "\xCA\xFE\xBA\xBE",
++		.klen	= 20,
++		.iv	= "\xFA\xCE\xDB\xAD\xDE\xCA\xF8\x88",
++		.result	= "\x45\x00\x00\x3E\x69\x8F\x00\x00"
++			  "\x80\x11\x4D\xCC\xC0\xA8\x01\x02"
++			  "\xC0\xA8\x01\x01\x0A\x98\x00\x35"
++			  "\x00\x2A\x23\x43\xB2\xD0\x01\x00"
++			  "\x00\x01\x00\x00\x00\x00\x00\x00"
++			  "\x03\x73\x69\x70\x09\x63\x79\x62"
++			  "\x65\x72\x63\x69\x74\x79\x02\x64"
++			  "\x6B\x00\x00\x01\x00\x01\x00\x01",
++		.rlen	= 64,
++		.assoc	= "\x00\x00\xA5\xF8\x00\x00\x00\x0A",
++		.alen	= 8,
++		.input	= "\xDE\xB2\x2C\xD9\xB0\x7C\x72\xC1"
++			  "\x6E\x3A\x65\xBE\xEB\x8D\xF3\x04"
++			  "\xA5\xA5\x89\x7D\x33\xAE\x53\x0F"
++			  "\x1B\xA7\x6D\x5D\x11\x4D\x2A\x5C"
++			  "\x3D\xE8\x18\x27\xC1\x0E\x9A\x4F"
++			  "\x51\x33\x0D\x0E\xEC\x41\x66\x42"
++			  "\xCF\xBB\x85\xA5\xB4\x7E\x48\xA4"
++			  "\xEC\x3B\x9B\xA9\x5D\x91\x8B\xD1"
++			  "\x83\xB7\x0D\x3A\xA8\xBC\x6E\xE4"
++			  "\xC3\x09\xE9\xD8\x5A\x41\xAD\x4A",
++		.ilen	= 80,
++	}, {
++		.key	= "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\x11\x22\x33\x44",
++		.klen	= 36,
++		.iv	= "\x01\x02\x03\x04\x05\x06\x07\x08",
++		.result	= "\x45\x00\x00\x30\x69\xA6\x40\x00"
++			  "\x80\x06\x26\x90\xC0\xA8\x01\x02"
++			  "\x93\x89\x15\x5E\x0A\x9E\x00\x8B"
++			  "\x2D\xC5\x7E\xE0\x00\x00\x00\x00"
++			  "\x70\x02\x40\x00\x20\xBF\x00\x00"
++			  "\x02\x04\x05\xB4\x01\x01\x04\x02"
++			  "\x01\x02\x02\x01",
++		.rlen	= 52,
++		.assoc	= "\x4A\x2C\xBF\xE3\x00\x00\x00\x02",
++		.alen	= 8,
++		.input	= "\xFF\x42\x5C\x9B\x72\x45\x99\xDF"
++			  "\x7A\x3B\xCD\x51\x01\x94\xE0\x0D"
++			  "\x6A\x78\x10\x7F\x1B\x0B\x1C\xBF"
++			  "\x06\xEF\xAE\x9D\x65\xA5\xD7\x63"
++			  "\x74\x8A\x63\x79\x85\x77\x1D\x34"
++			  "\x7F\x05\x45\x65\x9F\x14\xE9\x9D"
++			  "\xEF\x84\x2D\x8E\xB3\x35\xF4\xEE"
++			  "\xCF\xDB\xF8\x31\x82\x4B\x4C\x49"
++			  "\x15\x95\x6C\x96",
++		.ilen	= 68,
++	}, {
++		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00",
++		.klen	= 20,
++		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.result	= "\x45\x00\x00\x3C\x99\xC5\x00\x00"
++			  "\x80\x01\xCB\x7A\x40\x67\x93\x18"
++			  "\x01\x01\x01\x01\x08\x00\x07\x5C"
++			  "\x02\x00\x44\x00\x61\x62\x63\x64"
++			  "\x65\x66\x67\x68\x69\x6A\x6B\x6C"
++			  "\x6D\x6E\x6F\x70\x71\x72\x73\x74"
++			  "\x75\x76\x77\x61\x62\x63\x64\x65"
++			  "\x66\x67\x68\x69\x01\x02\x02\x01",
++		.rlen	= 64,
++		.assoc	= "\x00\x00\x00\x00\x00\x00\x00\x01",
++		.alen	= 8,
++		.input	= "\x46\x88\xDA\xF2\xF9\x73\xA3\x92"
++			  "\x73\x29\x09\xC3\x31\xD5\x6D\x60"
++			  "\xF6\x94\xAB\xAA\x41\x4B\x5E\x7F"
++			  "\xF5\xFD\xCD\xFF\xF5\xE9\xA2\x84"
++			  "\x45\x64\x76\x49\x27\x19\xFF\xB6"
++			  "\x4D\xE7\xD9\xDC\xA1\xE1\xD8\x94"
++			  "\xBC\x3B\xD5\x78\x73\xED\x4D\x18"
++			  "\x1D\x19\xD4\xD5\xC8\xC1\x8A\xF3"
++			  "\xF8\x21\xD4\x96\xEE\xB0\x96\xE9"
++			  "\x8A\xD2\xB6\x9E\x47\x99\xC7\x1D",
++		.ilen	= 80,
++	}, {
++		.key	= "\x3D\xE0\x98\x74\xB3\x88\xE6\x49"
++			  "\x19\x88\xD0\xC3\x60\x7E\xAE\x1F"
++			  "\x57\x69\x0E\x43",
++		.klen	= 20,
++		.iv	= "\x4E\x28\x00\x00\xA2\xFC\xA1\xA3",
++		.result	= "\x45\x00\x00\x3C\x99\xC3\x00\x00"
++			  "\x80\x01\xCB\x7C\x40\x67\x93\x18"
++			  "\x01\x01\x01\x01\x08\x00\x08\x5C"
++			  "\x02\x00\x43\x00\x61\x62\x63\x64"
++			  "\x65\x66\x67\x68\x69\x6A\x6B\x6C"
++			  "\x6D\x6E\x6F\x70\x71\x72\x73\x74"
++			  "\x75\x76\x77\x61\x62\x63\x64\x65"
++			  "\x66\x67\x68\x69\x01\x02\x02\x01",
++		.rlen	= 64,
++		.assoc	= "\x42\xF6\x7E\x3F\x10\x10\x10\x10"
++			  "\x10\x10\x10\x10",
++		.alen	= 12,
++		.input	= "\xFB\xA2\xCA\xA4\x85\x3C\xF9\xF0"
++			  "\xF2\x2C\xB1\x0D\x86\xDD\x83\xB0"
++			  "\xFE\xC7\x56\x91\xCF\x1A\x04\xB0"
++			  "\x0D\x11\x38\xEC\x9C\x35\x79\x17"
++			  "\x65\xAC\xBD\x87\x01\xAD\x79\x84"
++			  "\x5B\xF9\xFE\x3F\xBA\x48\x7B\xC9"
++			  "\x17\x55\xE6\x66\x2B\x4C\x8D\x0D"
++			  "\x1F\x5E\x22\x73\x95\x30\x32\x0A"
++			  "\xE0\xD7\x31\xCC\x97\x8E\xCA\xFA"
++			  "\xEA\xE8\x8F\x00\xE8\x0D\x6E\x48",
++		.ilen	= 80,
++	}, {
++		.key	= "\x3D\xE0\x98\x74\xB3\x88\xE6\x49"
++			  "\x19\x88\xD0\xC3\x60\x7E\xAE\x1F"
++			  "\x57\x69\x0E\x43",
++		.klen	= 20,
++		.iv	= "\x4E\x28\x00\x00\xA2\xFC\xA1\xA3",
++		.result	= "\x45\x00\x00\x1C\x42\xA2\x00\x00"
++			  "\x80\x01\x44\x1F\x40\x67\x93\xB6"
++			  "\xE0\x00\x00\x02\x0A\x00\xF5\xFF"
++			  "\x01\x02\x02\x01",
++		.rlen	= 28,
++		.assoc	= "\x42\xF6\x7E\x3F\x10\x10\x10\x10"
++			  "\x10\x10\x10\x10",
++		.alen	= 12,
++		.input	= "\xFB\xA2\xCA\x84\x5E\x5D\xF9\xF0"
++			  "\xF2\x2C\x3E\x6E\x86\xDD\x83\x1E"
++			  "\x1F\xC6\x57\x92\xCD\x1A\xF9\x13"
++			  "\x0E\x13\x79\xED\x36\x9F\x07\x1F"
++			  "\x35\xE0\x34\xBE\x95\xF1\x12\xE4"
++			  "\xE7\xD0\x5D\x35",
++		.ilen	= 44,
++	}, {
++		.key	= "\xFE\xFF\xE9\x92\x86\x65\x73\x1C"
++			  "\x6D\x6A\x8F\x94\x67\x30\x83\x08"
++			  "\xFE\xFF\xE9\x92\x86\x65\x73\x1C"
++			  "\xCA\xFE\xBA\xBE",
++		.klen	= 28,
++		.iv	= "\xFA\xCE\xDB\xAD\xDE\xCA\xF8\x88",
++		.result	= "\x45\x00\x00\x28\xA4\xAD\x40\x00"
++			  "\x40\x06\x78\x80\x0A\x01\x03\x8F"
++			  "\x0A\x01\x06\x12\x80\x23\x06\xB8"
++			  "\xCB\x71\x26\x02\xDD\x6B\xB0\x3E"
++			  "\x50\x10\x16\xD0\x75\x68\x00\x01",
++		.rlen	= 40,
++		.assoc	= "\x00\x00\xA5\xF8\x00\x00\x00\x0A",
++		.alen	= 8,
++		.input	= "\xA5\xB1\xF8\x06\x60\x29\xAE\xA4"
++			  "\x0E\x59\x8B\x81\x22\xDE\x02\x42"
++			  "\x09\x38\xB3\xAB\x33\xF8\x28\xE6"
++			  "\x87\xB8\x85\x8B\x5B\xFB\xDB\xD0"
++			  "\x31\x5B\x27\x45\x21\x44\xCC\x77"
++			  "\x95\x45\x7B\x96\x52\x03\x7F\x53"
++			  "\x18\x02\x7B\x5B\x4C\xD7\xA6\x36",
++		.ilen	= 56,
++	}, {
++		.key	= "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\xDE\xCA\xF8\x88",
++		.klen	= 20,
++		.iv	= "\xCA\xFE\xDE\xBA\xCE\xFA\xCE\x74",
++		.result	= "\x45\x00\x00\x49\x33\xBA\x00\x00"
++			  "\x7F\x11\x91\x06\xC3\xFB\x1D\x10"
++			  "\xC2\xB1\xD3\x26\xC0\x28\x31\xCE"
++			  "\x00\x35\xDD\x7B\x80\x03\x02\xD5"
++			  "\x00\x00\x4E\x20\x00\x1E\x8C\x18"
++			  "\xD7\x5B\x81\xDC\x91\xBA\xA0\x47"
++			  "\x6B\x91\xB9\x24\xB2\x80\x38\x9D"
++			  "\x92\xC9\x63\xBA\xC0\x46\xEC\x95"
++			  "\x9B\x62\x66\xC0\x47\x22\xB1\x49"
++			  "\x23\x01\x01\x01",
++		.rlen	= 76,
++		.assoc	= "\x00\x00\x01\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x01",
++		.alen	= 12,
++		.input	= "\x18\xA6\xFD\x42\xF7\x2C\xBF\x4A"
++			  "\xB2\xA2\xEA\x90\x1F\x73\xD8\x14"
++			  "\xE3\xE7\xF2\x43\xD9\x54\x12\xE1"
++			  "\xC3\x49\xC1\xD2\xFB\xEC\x16\x8F"
++			  "\x91\x90\xFE\xEB\xAF\x2C\xB0\x19"
++			  "\x84\xE6\x58\x63\x96\x5D\x74\x72"
++			  "\xB7\x9D\xA3\x45\xE0\xE7\x80\x19"
++			  "\x1F\x0D\x2F\x0E\x0F\x49\x6C\x22"
++			  "\x6F\x21\x27\xB2\x7D\xB3\x57\x24"
++			  "\xE7\x84\x5D\x68\x65\x1F\x57\xE6"
++			  "\x5F\x35\x4F\x75\xFF\x17\x01\x57"
++			  "\x69\x62\x34\x36",
++		.ilen	= 92,
++	}, {
++		.key	= "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\x73\x61\x6C\x74",
++		.klen	= 36,
++		.iv	= "\x61\x6E\x64\x01\x69\x76\x65\x63",
++		.result	= "\x45\x08\x00\x28\x73\x2C\x00\x00"
++			  "\x40\x06\xE9\xF9\x0A\x01\x06\x12"
++			  "\x0A\x01\x03\x8F\x06\xB8\x80\x23"
++			  "\xDD\x6B\xAF\xBE\xCB\x71\x26\x02"
++			  "\x50\x10\x1F\x64\x6D\x54\x00\x01",
++		.rlen	= 40,
++		.assoc	= "\x17\x40\x5E\x67\x15\x6F\x31\x26"
++			  "\xDD\x0D\xB9\x9B",
++		.alen	= 12,
++		.input	= "\xF2\xD6\x9E\xCD\xBD\x5A\x0D\x5B"
++			  "\x8D\x5E\xF3\x8B\xAD\x4D\xA5\x8D"
++			  "\x1F\x27\x8F\xDE\x98\xEF\x67\x54"
++			  "\x9D\x52\x4A\x30\x18\xD9\xA5\x7F"
++			  "\xF4\xD3\xA3\x1C\xE6\x73\x11\x9E"
++			  "\x45\x16\x26\xC2\x41\x57\x71\xE3"
++			  "\xB7\xEE\xBC\xA6\x14\xC8\x9B\x35",
++		.ilen	= 56,
++	}, {
++		.key	= "\x3D\xE0\x98\x74\xB3\x88\xE6\x49"
++			  "\x19\x88\xD0\xC3\x60\x7E\xAE\x1F"
++			  "\x57\x69\x0E\x43",
++		.klen	= 20,
++		.iv	= "\x4E\x28\x00\x00\xA2\xFC\xA1\xA3",
++		.result	= "\x45\x00\x00\x49\x33\x3E\x00\x00"
++			  "\x7F\x11\x91\x82\xC3\xFB\x1D\x10"
++			  "\xC2\xB1\xD3\x26\xC0\x28\x31\xCE"
++			  "\x00\x35\xCB\x45\x80\x03\x02\x5B"
++			  "\x00\x00\x01\xE0\x00\x1E\x8C\x18"
++			  "\xD6\x57\x59\xD5\x22\x84\xA0\x35"
++			  "\x2C\x71\x47\x5C\x88\x80\x39\x1C"
++			  "\x76\x4D\x6E\x5E\xE0\x49\x6B\x32"
++			  "\x5A\xE2\x70\xC0\x38\x99\x49\x39"
++			  "\x15\x01\x01\x01",
++		.rlen	= 76,
++		.assoc	= "\x42\xF6\x7E\x3F\x10\x10\x10\x10"
++			  "\x10\x10\x10\x10",
++		.alen	= 12,
++		.input	= "\xFB\xA2\xCA\xD1\x2F\xC1\xF9\xF0"
++			  "\x0D\x3C\xEB\xF3\x05\x41\x0D\xB8"
++			  "\x3D\x77\x84\xB6\x07\x32\x3D\x22"
++			  "\x0F\x24\xB0\xA9\x7D\x54\x18\x28"
++			  "\x00\xCA\xDB\x0F\x68\xD9\x9E\xF0"
++			  "\xE0\xC0\xC8\x9A\xE9\xBE\xA8\x88"
++			  "\x4E\x52\xD6\x5B\xC1\xAF\xD0\x74"
++			  "\x0F\x74\x24\x44\x74\x7B\x5B\x39"
++			  "\xAB\x53\x31\x63\xAA\xD4\x55\x0E"
++			  "\xE5\x16\x09\x75\xCD\xB6\x08\xC5"
++			  "\x76\x91\x89\x60\x97\x63\xB8\xE1"
++			  "\x8C\xAA\x81\xE2",
++		.ilen	= 92,
++	}, {
++		.key	= "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\x73\x61\x6C\x74",
++		.klen	= 36,
++		.iv	= "\x61\x6E\x64\x01\x69\x76\x65\x63",
++		.result	= "\x63\x69\x73\x63\x6F\x01\x72\x75"
++			  "\x6C\x65\x73\x01\x74\x68\x65\x01"
++			  "\x6E\x65\x74\x77\x65\x01\x64\x65"
++			  "\x66\x69\x6E\x65\x01\x74\x68\x65"
++			  "\x74\x65\x63\x68\x6E\x6F\x6C\x6F"
++			  "\x67\x69\x65\x73\x01\x74\x68\x61"
++			  "\x74\x77\x69\x6C\x6C\x01\x64\x65"
++			  "\x66\x69\x6E\x65\x74\x6F\x6D\x6F"
++			  "\x72\x72\x6F\x77\x01\x02\x02\x01",
++		.rlen	= 72,
++		.assoc	= "\x17\x40\x5E\x67\x15\x6F\x31\x26"
++			  "\xDD\x0D\xB9\x9B",
++		.alen	= 12,
++		.input	= "\xD4\xB7\xED\x86\xA1\x77\x7F\x2E"
++			  "\xA1\x3D\x69\x73\xD3\x24\xC6\x9E"
++			  "\x7B\x43\xF8\x26\xFB\x56\x83\x12"
++			  "\x26\x50\x8B\xEB\xD2\xDC\xEB\x18"
++			  "\xD0\xA6\xDF\x10\xE5\x48\x7D\xF0"
++			  "\x74\x11\x3E\x14\xC6\x41\x02\x4E"
++			  "\x3E\x67\x73\xD9\x1A\x62\xEE\x42"
++			  "\x9B\x04\x3A\x10\xE3\xEF\xE6\xB0"
++			  "\x12\xA4\x93\x63\x41\x23\x64\xF8"
++			  "\xC0\xCA\xC5\x87\xF2\x49\xE5\x6B"
++			  "\x11\xE2\x4F\x30\xE4\x4C\xCC\x76",
++		.ilen	= 88,
++	}, {
++		.key	= "\x7D\x77\x3D\x00\xC1\x44\xC5\x25"
++			  "\xAC\x61\x9D\x18\xC8\x4A\x3F\x47"
++			  "\xD9\x66\x42\x67",
++		.klen	= 20,
++		.iv	= "\x43\x45\x7E\x91\x82\x44\x3B\xC6",
++		.result	= "\x01\x02\x02\x01",
++		.rlen	= 4,
++		.assoc	= "\x33\x54\x67\xAE\xFF\xFF\xFF\xFF",
++		.alen	= 8,
++		.input	= "\x43\x7F\x86\x6B\xCB\x3F\x69\x9F"
++			  "\xE9\xB0\x82\x2B\xAC\x96\x1C\x45"
++			  "\x04\xBE\xF2\x70",
++		.ilen	= 20,
++	}, {
++		.key	= "\xAB\xBC\xCD\xDE\xF0\x01\x12\x23"
++			  "\x34\x45\x56\x67\x78\x89\x9A\xAB"
++			  "\xDE\xCA\xF8\x88",
++		.klen	= 20,
++		.iv	= "\xCA\xFE\xDE\xBA\xCE\xFA\xCE\x74",
++		.result	= "\x74\x6F\x01\x62\x65\x01\x6F\x72"
++			  "\x01\x6E\x6F\x74\x01\x74\x6F\x01"
++			  "\x62\x65\x00\x01",
++		.rlen	= 20,
++		.assoc	= "\x00\x00\x01\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x01",
++		.alen	= 12,
++		.input	= "\x29\xC9\xFC\x69\xA1\x97\xD0\x38"
++			  "\xCC\xDD\x14\xE2\xDD\xFC\xAA\x05"
++			  "\x43\x33\x21\x64\x41\x25\x03\x52"
++			  "\x43\x03\xED\x3C\x6C\x5F\x28\x38"
++			  "\x43\xAF\x8C\x3E",
++		.ilen	= 36,
++	}, {
++		.key	= "\x6C\x65\x67\x61\x6C\x69\x7A\x65"
++			  "\x6D\x61\x72\x69\x6A\x75\x61\x6E"
++			  "\x61\x61\x6E\x64\x64\x6F\x69\x74"
++			  "\x62\x65\x66\x6F\x72\x65\x69\x61"
++			  "\x74\x75\x72\x6E",
++		.klen	= 36,
++		.iv	= "\x33\x30\x21\x69\x67\x65\x74\x6D",
++		.result	= "\x45\x00\x00\x30\xDA\x3A\x00\x00"
++			  "\x80\x01\xDF\x3B\xC0\xA8\x00\x05"
++			  "\xC0\xA8\x00\x01\x08\x00\xC6\xCD"
++			  "\x02\x00\x07\x00\x61\x62\x63\x64"
++			  "\x65\x66\x67\x68\x69\x6A\x6B\x6C"
++			  "\x6D\x6E\x6F\x70\x71\x72\x73\x74"
++			  "\x01\x02\x02\x01",
++		.rlen	= 52,
++		.assoc	= "\x79\x6B\x69\x63\xFF\xFF\xFF\xFF"
++			  "\xFF\xFF\xFF\xFF",
++		.alen	= 12,
++		.input	= "\xF9\x7A\xB2\xAA\x35\x6D\x8E\xDC"
++			  "\xE1\x76\x44\xAC\x8C\x78\xE2\x5D"
++			  "\xD2\x4D\xED\xBB\x29\xEB\xF1\xB6"
++			  "\x4A\x27\x4B\x39\xB4\x9C\x3A\x86"
++			  "\x4C\xD3\xD7\x8C\xA4\xAE\x68\xA3"
++			  "\x2B\x42\x45\x8F\xB5\x7D\xBE\x82"
++			  "\x1D\xCC\x63\xB9\xD0\x93\x7B\xA2"
++			  "\x94\x5F\x66\x93\x68\x66\x1A\x32"
++			  "\x9F\xB4\xC0\x53",
++		.ilen	= 68,
++	}, {
++		.key	= "\x3D\xE0\x98\x74\xB3\x88\xE6\x49"
++			  "\x19\x88\xD0\xC3\x60\x7E\xAE\x1F"
++			  "\x57\x69\x0E\x43",
++		.klen	= 20,
++		.iv	= "\x4E\x28\x00\x00\xA2\xFC\xA1\xA3",
++		.result	= "\x45\x00\x00\x30\xDA\x3A\x00\x00"
++			  "\x80\x01\xDF\x3B\xC0\xA8\x00\x05"
++			  "\xC0\xA8\x00\x01\x08\x00\xC6\xCD"
++			  "\x02\x00\x07\x00\x61\x62\x63\x64"
++			  "\x65\x66\x67\x68\x69\x6A\x6B\x6C"
++			  "\x6D\x6E\x6F\x70\x71\x72\x73\x74"
++			  "\x01\x02\x02\x01",
++		.rlen	= 52,
++		.assoc	= "\x3F\x7E\xF6\x42\x10\x10\x10\x10"
++			  "\x10\x10\x10\x10",
++		.alen	= 12,
++		.input	= "\xFB\xA2\xCA\xA8\xC6\xC5\xF9\xF0"
++			  "\xF2\x2C\xA5\x4A\x06\x12\x10\xAD"
++			  "\x3F\x6E\x57\x91\xCF\x1A\xCA\x21"
++			  "\x0D\x11\x7C\xEC\x9C\x35\x79\x17"
++			  "\x65\xAC\xBD\x87\x01\xAD\x79\x84"
++			  "\x5B\xF9\xFE\x3F\xBA\x48\x7B\xC9"
++			  "\x63\x21\x93\x06\x84\xEE\xCA\xDB"
++			  "\x56\x91\x25\x46\xE7\xA9\x5C\x97"
++			  "\x40\xD7\xCB\x05",
++		.ilen	= 68,
++	}, {
++		.key	= "\x4C\x80\xCD\xEF\xBB\x5D\x10\xDA"
++			  "\x90\x6A\xC7\x3C\x36\x13\xA6\x34"
++			  "\x22\x43\x3C\x64",
++		.klen	= 20,
++		.iv	= "\x48\x55\xEC\x7D\x3A\x23\x4B\xFD",
++		.result	= "\x08\x00\xC6\xCD\x02\x00\x07\x00"
++			  "\x61\x62\x63\x64\x65\x66\x67\x68"
++			  "\x69\x6A\x6B\x6C\x6D\x6E\x6F\x70"
++			  "\x71\x72\x73\x74\x01\x02\x02\x01",
++		.rlen	= 32,
++		.assoc	= "\x00\x00\x43\x21\x87\x65\x43\x21"
++			  "\x00\x00\x00\x07",
++		.alen	= 12,
++		.input	= "\x74\x75\x2E\x8A\xEB\x5D\x87\x3C"
++			  "\xD7\xC0\xF4\xAC\xC3\x6C\x4B\xFF"
++			  "\x84\xB7\xD7\xB9\x8F\x0C\xA8\xB6"
++			  "\xAC\xDA\x68\x94\xBC\x61\x90\x69"
++			  "\xEF\x9C\xBC\x28\xFE\x1B\x56\xA7"
++			  "\xC4\xE0\xD5\x8C\x86\xCD\x2B\xC0",
++		.ilen	= 48,
+ 	}
  };
  
--static int caam_cra_init(struct crypto_tfm *tfm)
-+static int caam_init_common(struct caam_ctx *ctx, struct caam_alg_entry *caam)
- {
--	struct crypto_alg *alg = tfm->__crt_alg;
--	struct caam_crypto_alg *caam_alg =
--		 container_of(alg, struct caam_crypto_alg, crypto_alg);
--	struct caam_ctx *ctx = crypto_tfm_ctx(tfm);
--
- 	ctx->jrdev = caam_jr_alloc();
- 	if (IS_ERR(ctx->jrdev)) {
- 		pr_err("Job Ring Device allocation for transform failed\n");
-@@ -4138,17 +4122,35 @@ static int caam_cra_init(struct crypto_tfm *tfm)
- 	}
- 
- 	/* copy descriptor header template value */
--	ctx->class1_alg_type = OP_TYPE_CLASS1_ALG | caam_alg->class1_alg_type;
--	ctx->class2_alg_type = OP_TYPE_CLASS2_ALG | caam_alg->class2_alg_type;
--	ctx->alg_op = OP_TYPE_CLASS2_ALG | caam_alg->alg_op;
-+	ctx->class1_alg_type = OP_TYPE_CLASS1_ALG | caam->class1_alg_type;
-+	ctx->class2_alg_type = OP_TYPE_CLASS2_ALG | caam->class2_alg_type;
-+	ctx->alg_op = OP_TYPE_CLASS2_ALG | caam->alg_op;
- 
- 	return 0;
- }
- 
--static void caam_cra_exit(struct crypto_tfm *tfm)
-+static int caam_cra_init(struct crypto_tfm *tfm)
- {
-+	struct crypto_alg *alg = tfm->__crt_alg;
-+	struct caam_crypto_alg *caam_alg =
-+		 container_of(alg, struct caam_crypto_alg, crypto_alg);
- 	struct caam_ctx *ctx = crypto_tfm_ctx(tfm);
- 
-+	return caam_init_common(ctx, &caam_alg->caam);
-+}
-+
-+static int caam_aead_init(struct crypto_aead *tfm)
-+{
-+	struct aead_alg *alg = crypto_aead_alg(tfm);
-+	struct caam_aead_alg *caam_alg =
-+		 container_of(alg, struct caam_aead_alg, aead);
-+	struct caam_ctx *ctx = crypto_aead_ctx(tfm);
-+
-+	return caam_init_common(ctx, &caam_alg->caam);
-+}
-+
-+static void caam_exit_common(struct caam_ctx *ctx)
-+{
- 	if (ctx->sh_desc_enc_dma &&
- 	    !dma_mapping_error(ctx->jrdev, ctx->sh_desc_enc_dma))
- 		dma_unmap_single(ctx->jrdev, ctx->sh_desc_enc_dma,
-@@ -4171,10 +4173,28 @@ static void caam_cra_exit(struct crypto_tfm *tfm)
- 	caam_jr_free(ctx->jrdev);
- }
- 
-+static void caam_cra_exit(struct crypto_tfm *tfm)
-+{
-+	caam_exit_common(crypto_tfm_ctx(tfm));
-+}
-+
-+static void caam_aead_exit(struct crypto_aead *tfm)
-+{
-+	caam_exit_common(crypto_aead_ctx(tfm));
-+}
-+
- static void __exit caam_algapi_exit(void)
- {
- 
- 	struct caam_crypto_alg *t_alg, *n;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(driver_aeads); i++) {
-+		struct caam_aead_alg *t_alg = driver_aeads + i;
-+
-+		if (t_alg->registered)
-+			crypto_unregister_aead(&t_alg->aead);
-+	}
- 
- 	if (!alg_list.next)
- 		return;
-@@ -4227,13 +4247,26 @@ static struct caam_crypto_alg *caam_alg_alloc(struct caam_alg_template
- 		break;
- 	}
- 
--	t_alg->class1_alg_type = template->class1_alg_type;
--	t_alg->class2_alg_type = template->class2_alg_type;
--	t_alg->alg_op = template->alg_op;
-+	t_alg->caam.class1_alg_type = template->class1_alg_type;
-+	t_alg->caam.class2_alg_type = template->class2_alg_type;
-+	t_alg->caam.alg_op = template->alg_op;
- 
- 	return t_alg;
- }
- 
-+static void caam_aead_alg_init(struct caam_aead_alg *t_alg)
-+{
-+	struct aead_alg *alg = &t_alg->aead;
-+
-+	alg->base.cra_module = THIS_MODULE;
-+	alg->base.cra_priority = CAAM_CRA_PRIORITY;
-+	alg->base.cra_ctxsize = sizeof(struct caam_ctx);
-+	alg->base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
-+
-+	alg->init = caam_aead_init;
-+	alg->exit = caam_aead_exit;
-+}
-+
- static int __init caam_algapi_init(void)
- {
- 	struct device_node *dev_node;
-@@ -4241,6 +4274,7 @@ static int __init caam_algapi_init(void)
- 	struct device *ctrldev;
- 	void *priv;
- 	int i = 0, err = 0;
-+	bool registered = false;
- 
- 	dev_node = of_find_compatible_node(NULL, NULL, "fsl,sec-v4.0");
- 	if (!dev_node) {
-@@ -4287,10 +4321,30 @@ static int __init caam_algapi_init(void)
- 			pr_warn("%s alg registration failed\n",
- 				t_alg->crypto_alg.cra_driver_name);
- 			kfree(t_alg);
--		} else
--			list_add_tail(&t_alg->entry, &alg_list);
-+			continue;
-+		}
-+
-+		list_add_tail(&t_alg->entry, &alg_list);
-+		registered = true;
-+	}
-+
-+	for (i = 0; i < ARRAY_SIZE(driver_aeads); i++) {
-+		struct caam_aead_alg *t_alg = driver_aeads + i;
-+
-+		caam_aead_alg_init(t_alg);
-+
-+		err = crypto_register_aead(&t_alg->aead);
-+		if (err) {
-+			pr_warn("%s alg registration failed\n",
-+				t_alg->aead.base.cra_driver_name);
-+			continue;
-+		}
-+
-+		t_alg->registered = true;
-+		registered = true;
- 	}
--	if (!list_empty(&alg_list))
-+
-+	if (registered)
- 		pr_info("caam algorithms registered in /proc/crypto\n");
- 
- 	return err;
