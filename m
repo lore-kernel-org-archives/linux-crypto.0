@@ -1,7 +1,7 @@
 From: Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: [PATCH RFC v5 3/4] crypto: rsa: add a new rsa generic implementation
-Date: Mon, 15 Jun 2015 13:18:47 -0700
-Message-ID: <20150615201847.15697.55852.stgit@tstruk-mobl1>
+Subject: [PATCH RFC v5 4/4] crypto: add tests vectors for RSA
+Date: Mon, 15 Jun 2015 13:18:53 -0700
+Message-ID: <20150615201853.15697.45868.stgit@tstruk-mobl1>
 References: <20150615201831.15697.57738.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -13,554 +13,374 @@ Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
 	james.l.morris@oracle.com, jkosina@suse.cz,
 	zohar@linux.vnet.ibm.com, davem@davemloft.net, vgoyal@redhat.com
 To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:5175 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756079AbbFOUSv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 16:18:51 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20150615201831.15697.57738.stgit@tstruk-mobl1>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Add a new rsa generic SW implementation.
-This implements only cryptographic primitives.
+New test vectors for RSA algorithm.
 
 Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 ---
- crypto/Kconfig                |    7 +
- crypto/Makefile               |    8 +
- crypto/rsa.c                  |  295 +++++++++++++++++++++++++++++++++++++++++
- crypto/rsa_helper.c           |  134 +++++++++++++++++++
- crypto/rsakey.asn1            |    5 +
- include/crypto/internal/rsa.h |   30 ++++
- 6 files changed, 479 insertions(+)
- create mode 100644 crypto/rsa.c
- create mode 100644 crypto/rsa_helper.c
- create mode 100644 crypto/rsakey.asn1
- create mode 100644 include/crypto/internal/rsa.h
+ crypto/Kconfig   |    1 
+ crypto/testmgr.c |  149 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.h |  143 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 293 insertions(+)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index ed413d9..a09404b 100644
+index a09404b..90c1f77 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -97,6 +97,13 @@ config CRYPTO_AKCIPHER
- 	help
- 	  Crypto API interface for public key algorithms.
- 
-+config CRYPTO_RSA
-+	tristate "RSA algorithm"
-+	select AKCIPHER
-+	select MPILIB
-+	help
-+	  Generic implementation of the RSA public key algorithm.
-+
+@@ -107,6 +107,7 @@ config CRYPTO_RSA
  config CRYPTO_MANAGER
  	tristate "Cryptographic algorithm manager"
  	select CRYPTO_MANAGER2
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 6f2940a..c6217ea 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -30,6 +30,14 @@ obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
- obj-$(CONFIG_CRYPTO_PCOMP2) += pcompress.o
- obj-$(CONFIG_CRYPTO_AKCIPHER) += akcipher.o
- 
-+$(obj)/rsakey-asn1.o: $(obj)/rsakey-asn1.c $(obj)/rsakey-asn1.h
-+clean-files += rsakey-asn1.c rsakey-asn1.h
-+
-+rsa_generic-y := rsakey-asn1.o
-+rsa_generic-y += rsa.o
-+rsa_generic-y += rsa_helper.o
-+obj-$(CONFIG_CRYPTO_RSA) += rsa_generic.o
-+
- cryptomgr-y := algboss.o testmgr.o
- 
- obj-$(CONFIG_CRYPTO_MANAGER2) += cryptomgr.o
-diff --git a/crypto/rsa.c b/crypto/rsa.c
-new file mode 100644
-index 0000000..176f565
---- /dev/null
-+++ b/crypto/rsa.c
-@@ -0,0 +1,295 @@
-+/* RSA asymmetric public-key algorithm [RFC3447]
-+ *
-+ * Copyright (c) 2015, Intel Corporation
-+ * Authors: Tadeusz Struk <tadeusz.struk@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public Licence
-+ * as published by the Free Software Foundation; either version
-+ * 2 of the Licence, or (at your option) any later version.
-+ */
-+
-+#include <linux/module.h>
-+#include <crypto/internal/rsa.h>
++	select CRYPTO_AKCIPHER
+ 	help
+ 	  Create default cryptographic template instantiations such as
+ 	  cbc(aes).
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index ccd19cf..ff41714 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -30,6 +30,7 @@
+ #include <linux/string.h>
+ #include <crypto/rng.h>
+ #include <crypto/drbg.h>
 +#include <crypto/akcipher.h>
-+
-+/*
-+ * RSAEP function [RFC3447 sec 5.1.1]
-+ * c = m^e mod n;
-+ */
-+static int _rsa_enc(const struct rsa_key *key, MPI c, MPI m)
-+{
-+	/* (1) Validate 0 <= m < n */
-+	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
-+		return -EINVAL;
-+
-+	/* (2) c = m^e mod n */
-+	return mpi_powm(c, m, key->e, key->n);
-+}
-+
-+/*
-+ * RSADP function [RFC3447 sec 5.1.2]
-+ * m = c^d mod n;
-+ */
-+static int _rsa_dec(const struct rsa_key *key, MPI m, MPI c)
-+{
-+	/* (1) Validate 0 <= c < n */
-+	if (mpi_cmp_ui(c, 0) < 0 || mpi_cmp(c, key->n) >= 0)
-+		return -EINVAL;
-+
-+	/* (2) m = c^d mod n */
-+	return mpi_powm(m, c, key->d, key->n);
-+}
-+
-+/*
-+ * RSASP1 function [RFC3447 sec 5.2.1]
-+ * s = m^d mod n
-+ */
-+static int _rsa_sign(const struct rsa_key *key, MPI s, MPI m)
-+{
-+	/* (1) Validate 0 <= m < n */
-+	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
-+		return -EINVAL;
-+
-+	/* (2) s = m^d mod n */
-+	return mpi_powm(s, m, key->d, key->n);
-+}
-+
-+/*
-+ * RSAVP1 function [RFC3447 sec 5.2.2]
-+ * m = s^e mod n;
-+ */
-+static int _rsa_verify(const struct rsa_key *key, MPI m, MPI s)
-+{
-+	/* (1) Validate 0 <= s < n */
-+	if (mpi_cmp_ui(s, 0) < 0 || mpi_cmp(s, key->n) >= 0)
-+		return -EINVAL;
-+
-+	/* (2) m = s^e mod n */
-+	return mpi_powm(m, s, key->e, key->n);
-+}
-+
-+static int rsa_enc(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = akcipher_request_get_tfm(req);
-+	const struct rsa_key *pkey = rsa_get_key(tfm);
-+	MPI m, c = mpi_alloc(0);
-+	unsigned int len;
-+	int ret = 0;
-+	int sign;
-+
-+	if (!c)
-+		return -ENOMEM;
-+
-+	if (!pkey->n || !pkey->e || req->dst_len < mpi_get_size(pkey->n))
-+		return -EINVAL;
-+
-+	m = mpi_read_raw_data(req->src, req->src_len);
-+	if (!m) {
-+		ret = -ENOMEM;
-+		goto err_free_c;
-+	}
-+
-+	ret = _rsa_enc(pkey, c, m);
-+	if (ret)
-+		goto err_free_m;
-+
-+	ret = mpi_read_buffer(c, req->dst, req->dst_len, &len, &sign);
-+	if (ret)
-+		goto err_free_m;
-+
-+	if (sign < 0) {
-+		ret = -EBADMSG;
-+		goto err_free_m;
-+	}
-+
-+	if (req->result_len)
-+		*req->result_len = len;
-+
-+err_free_m:
-+	mpi_free(m);
-+err_free_c:
-+	mpi_free(c);
-+	return ret;
-+}
-+
-+static int rsa_dec(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = akcipher_request_get_tfm(req);
-+	const struct rsa_key *pkey = rsa_get_key(tfm);
-+	MPI c, m = mpi_alloc(0);
-+	unsigned int len;
-+	int ret = 0;
-+	int sign;
-+
-+	if (!m)
-+		return -ENOMEM;
-+
-+	if (!pkey->n || !pkey->d || req->dst_len < mpi_get_size(pkey->n))
-+		return -EINVAL;
-+
-+	c = mpi_read_raw_data(req->src, req->src_len);
-+	if (!c) {
-+		ret = -ENOMEM;
-+		goto err_free_m;
-+	}
-+
-+	ret = _rsa_dec(pkey, m, c);
-+	if (ret)
-+		goto err_free_c;
-+
-+	ret = mpi_read_buffer(m, req->dst, req->dst_len, &len, &sign);
-+	if (ret)
-+		goto err_free_c;
-+
-+	if (sign < 0) {
-+		ret = -EBADMSG;
-+		goto err_free_c;
-+	}
-+
-+	if (req->result_len)
-+		*req->result_len = len;
-+
-+err_free_c:
-+	mpi_free(c);
-+err_free_m:
-+	mpi_free(m);
-+	return ret;
-+}
-+
-+static int rsa_sign(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = akcipher_request_get_tfm(req);
-+	const struct rsa_key *pkey  = rsa_get_key(tfm);
-+	MPI m, s = mpi_alloc(0);
-+	unsigned int len;
-+	int ret = 0;
-+	int sign;
-+
-+	if (!s)
-+		return -ENOMEM;
-+
-+	if (!pkey->n || !pkey->d || req->dst_len < mpi_get_size(pkey->n))
-+		return -EINVAL;
-+
-+	m = mpi_read_raw_data(req->src, req->src_len);
-+	if (!m) {
-+		ret = -ENOMEM;
-+		goto err_free_s;
-+	}
-+
-+	ret = _rsa_sign(pkey, s, m);
-+	if (ret)
-+		goto err_free_m;
-+
-+	ret = mpi_read_buffer(s, req->dst, req->dst_len, &len, &sign);
-+	if (ret)
-+		goto err_free_m;
-+
-+	if (sign < 0) {
-+		ret = -EBADMSG;
-+		goto err_free_m;
-+	}
-+
-+	if (req->result_len)
-+		*req->result_len = len;
-+
-+err_free_m:
-+	mpi_free(m);
-+err_free_s:
-+	mpi_free(s);
-+	return ret;
-+}
-+
-+static int rsa_verify(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = akcipher_request_get_tfm(req);
-+	const struct rsa_key *pkey = rsa_get_key(tfm);
-+	MPI s, m = mpi_alloc(0);
-+	unsigned int len;
-+	int ret = 0;
-+	int sign;
-+
-+	if (!m)
-+		return -ENOMEM;
-+
-+	if (!pkey->n || !pkey->e || req->dst_len < mpi_get_size(pkey->n))
-+		return -EINVAL;
-+
-+	s = mpi_read_raw_data(req->src, req->src_len);
-+	if (!s) {
-+		ret = -ENOMEM;
-+		goto err_free_m;
-+	}
-+
-+	ret = _rsa_verify(pkey, m, s);
-+	if (ret)
-+		goto err_free_s;
-+
-+	ret = mpi_read_buffer(m, req->dst, req->dst_len, &len, &sign);
-+	if (ret)
-+		goto err_free_s;
-+
-+	if (sign < 0) {
-+		ret = -EBADMSG;
-+		goto err_free_s;
-+	}
-+
-+	if (req->result_len)
-+		*req->result_len = len;
-+
-+err_free_s:
-+	mpi_free(s);
-+err_free_m:
-+	mpi_free(m);
-+	return ret;
-+}
-+
-+static int rsa_maxsize(struct crypto_akcipher *tfm)
-+{
-+	const struct rsa_key *pkey = rsa_get_key(tfm);
-+
-+	if (pkey && pkey->n)
-+		return mpi_get_size(pkey->n);
-+
-+	return -EINVAL;
-+}
-+
-+static int rsa_setkey(struct crypto_akcipher *tfm, const void *key,
-+		      unsigned int keylen)
-+{
-+	return rsa_parse_key(tfm, key, keylen);
-+}
-+
-+static struct akcipher_alg rsa = {
-+	.encrypt = rsa_enc,
-+	.decrypt = rsa_dec,
-+	.sign = rsa_sign,
-+	.verify = rsa_verify,
-+	.maxsize = rsa_maxsize,
-+	.setkey = rsa_setkey,
-+	.base = {
-+		.cra_name = "rsa",
-+		.cra_driver_name = "rsa-generic",
-+		.cra_priority = 100,
-+		.cra_ctxsize = 0,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
+ 
+ #include "internal.h"
+ 
+@@ -116,6 +117,11 @@ struct drbg_test_suite {
+ 	unsigned int count;
+ };
+ 
++struct akcipher_test_suite {
++	struct akcipher_testvec *vecs;
++	unsigned int count;
 +};
 +
-+static int rsa_init(void)
+ struct alg_test_desc {
+ 	const char *alg;
+ 	int (*test)(const struct alg_test_desc *desc, const char *driver,
+@@ -130,6 +136,7 @@ struct alg_test_desc {
+ 		struct hash_test_suite hash;
+ 		struct cprng_test_suite cprng;
+ 		struct drbg_test_suite drbg;
++		struct akcipher_test_suite akcipher;
+ 	} suite;
+ };
+ 
+@@ -1825,6 +1832,138 @@ static int alg_test_drbg(const struct alg_test_desc *desc, const char *driver,
+ 
+ }
+ 
++static int do_test_rsa(struct crypto_akcipher *tfm,
++		       struct akcipher_testvec *vecs)
 +{
-+	return crypto_register_akcipher(&rsa);
-+}
++	struct akcipher_request *req;
++	void *outbuf_enc = NULL;
++	void *outbuf_dec = NULL;
++	struct tcrypt_result result;
++	unsigned int max_out_len, out_len;
++	int err = -ENOMEM;
 +
-+static void rsa_exit(void)
-+{
-+	crypto_unregister_akcipher(&rsa);
-+}
++	req = akcipher_request_alloc(tfm, GFP_KERNEL);
++	if (!req)
++		return err;
 +
-+module_init(rsa_init);
-+module_exit(rsa_exit);
-+MODULE_ALIAS_CRYPTO("rsa");
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("RSA generic algorithm");
-diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
-new file mode 100644
-index 0000000..6569b02
---- /dev/null
-+++ b/crypto/rsa_helper.c
-@@ -0,0 +1,134 @@
-+/*
-+ * RSA key extract helper
-+ *
-+ * Copyright (c) 2015, Intel Corporation
-+ * Authors: Tadeusz Struk <tadeusz.struk@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+#include <linux/fips.h>
-+#include <crypto/internal/rsa.h>
-+#include "rsakey-asn1.h"
++	init_completion(&result.completion);
++	err = crypto_akcipher_setkey(tfm, vecs->key, vecs->key_len);
++	if (err)
++		goto free_req;
 +
-+int rsa_get_n(void *context, size_t hdrlen, unsigned char tag,
-+	      const void *value, size_t vlen)
-+{
-+	struct crypto_akcipher *tfm = context;
-+	struct rsa_key *key = tfm->key;
++	err = -EINVAL;
++	max_out_len = crypto_akcipher_maxsize(tfm);
++	if (!(max_out_len > 0))
++		goto free_req;
 +
-+	key->n = mpi_read_raw_data(value, vlen);
++	err = -ENOMEM;
++	outbuf_enc = kzalloc(max_out_len, GFP_KERNEL);
++	if (!outbuf_enc)
++		goto free_req;
 +
-+	if (!key->n)
-+		return -ENOMEM;
++	akcipher_request_set_crypt(req, vecs->m, outbuf_enc, vecs->m_size,
++				   max_out_len, &out_len);
++	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				      tcrypt_complete, &result);
 +
-+	/* In FIPS mode only allow key size minimum 2K */
-+	if (fips_enabled && (mpi_get_size(key->n) < 256)) {
-+		pr_err("RSA: key size not allowed in FIPS mode\n");
-+		mpi_free(key->n);
-+		key->n = NULL;
-+		return -EINVAL;
++	/* Run RSA encrypt - c = m^e mod n;*/
++	err = wait_async_op(&result, crypto_akcipher_encrypt(req));
++	if (err) {
++		pr_err("alg: rsa: encrypt test failed. err %d\n", err);
++		goto free_all;
 +	}
 +
-+	return 0;
++	if (out_len != vecs->c_size) {
++		err = -EINVAL;
++		goto free_all;
++	}
++	/* verify that encrypted message is equal to expected */
++	if (memcmp(vecs->c, outbuf_enc, vecs->c_size)) {
++		pr_err("alg: rsa: encrypt test failed. Invalid output\n");
++		err = -EINVAL;
++		goto free_all;
++	}
++
++	outbuf_dec = kzalloc(max_out_len, GFP_KERNEL);
++	if (!outbuf_dec) {
++		err = -ENOMEM;
++		goto free_all;
++	}
++
++	init_completion(&result.completion);
++	akcipher_request_set_crypt(req, outbuf_enc, outbuf_dec, vecs->c_size,
++				   max_out_len, &out_len);
++
++	/* Run RSA decrypt - m = c^d mod n;*/
++	err = wait_async_op(&result, crypto_akcipher_decrypt(req));
++	if (err) {
++		pr_err("alg: rsa: decrypt test failed. err %d\n", err);
++		goto free_all;
++	}
++
++	if (out_len != vecs->m_size) {
++		err = -EINVAL;
++		goto free_all;
++	}
++
++	/* verify that decrypted message is equal to the original msg */
++	if (memcmp(vecs->m, outbuf_dec, vecs->m_size)) {
++		pr_err("alg: rsa: encrypt test failed. Invalid output\n");
++		err = -EINVAL;
++	}
++free_all:
++	kfree(outbuf_dec);
++	kfree(outbuf_enc);
++free_req:
++	akcipher_request_free(req);
++	return err;
 +}
 +
-+int rsa_get_e(void *context, size_t hdrlen, unsigned char tag,
-+	      const void *value, size_t vlen)
++static int test_rsa(struct crypto_akcipher *tfm, struct akcipher_testvec *vecs,
++		    unsigned int tcount)
 +{
-+	struct crypto_akcipher *tfm = context;
-+	struct rsa_key *key = tfm->key;
++	int ret, i;
 +
-+	key->e = mpi_read_raw_data(value, vlen);
-+
-+	if (!key->e)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+int rsa_get_d(void *context, size_t hdrlen, unsigned char tag,
-+	      const void *value, size_t vlen)
-+{
-+	struct crypto_akcipher *tfm = context;
-+	struct rsa_key *key = tfm->key;
-+
-+	key->d = mpi_read_raw_data(value, vlen);
-+
-+	if (!key->d)
-+		return -ENOMEM;
-+
-+	/* In FIPS mode only allow key size minimum 2K */
-+	if (fips_enabled && (mpi_get_size(key->d) < 256)) {
-+		pr_err("RSA: key size not allowed in FIPS mode\n");
-+		mpi_free(key->d);
-+		key->d = NULL;
-+		return -EINVAL;
++	for (i = 0; i < tcount; i++) {
++		ret = do_test_rsa(tfm, vecs++);
++		if (ret) {
++			pr_err("alg: rsa: test failed on vector %d, err=%d\n",
++			       i + 1, ret);
++			return ret;
++		}
 +	}
 +	return 0;
 +}
 +
-+static void free_mpis(struct rsa_key *key)
++static int test_akcipher(struct crypto_akcipher *tfm, const char *alg,
++			 struct akcipher_testvec *vecs, unsigned int tcount)
 +{
-+	if (key->n)
-+		mpi_free(key->n);
-+
-+	if (key->e)
-+		mpi_free(key->e);
-+
-+	if (key->d)
-+		mpi_free(key->d);
-+
-+	key->n = NULL;
-+	key->e = NULL;
-+	key->d = NULL;
-+}
-+
-+static void rsa_free_key(struct crypto_tfm *tfm_base)
-+{
-+	struct crypto_akcipher *tfm = __crypto_akcipher_tfm(tfm_base);
-+	struct crypto_alg *alg = tfm_base->__crt_alg;
-+
-+	if (alg->cra_exit)
-+		alg->cra_exit(tfm_base);
-+
-+	free_mpis(tfm->key);
-+	kfree(tfm->key);
-+	tfm->key = NULL;
-+}
-+
-+/**
-+ * rsa_parse_key() - extracts an rsa key from BER encoded buffer
-+ *		     and stores it in tfm
-+ *
-+ * @tfm:	akcipher handler
-+ * @key:	key in BER format
-+ * @key_len:	length of key
-+ *
-+ * Return:	0 on success or error code in case of error
-+ */
-+int rsa_parse_key(struct crypto_akcipher *tfm, const void *key,
-+		  unsigned int key_len)
-+{
-+	int ret;
-+
-+	if (!tfm->key) {
-+		tfm->key = kzalloc(sizeof(struct rsa_key), GFP_KERNEL);
-+		tfm->base.exit = rsa_free_key;
-+	} else {
-+		free_mpis(tfm->key);
-+	}
-+
-+	ret = asn1_ber_decoder(&rsakey_decoder, tfm, key, key_len);
-+	if (ret < 0)
-+		goto error;
++	if (strncmp(alg, "rsa", 3) == 0)
++		return test_rsa(tfm, vecs, tcount);
 +
 +	return 0;
-+error:
-+	free_mpis(tfm->key);
-+	return ret;
 +}
-+EXPORT_SYMBOL_GPL(rsa_parse_key);
-diff --git a/crypto/rsakey.asn1 b/crypto/rsakey.asn1
-new file mode 100644
-index 0000000..3c7b5df
---- /dev/null
-+++ b/crypto/rsakey.asn1
-@@ -0,0 +1,5 @@
-+RsaKey ::= SEQUENCE {
-+	n INTEGER ({ rsa_get_n }),
-+	e INTEGER ({ rsa_get_e }),
-+	d INTEGER ({ rsa_get_d })
-+}
-diff --git a/include/crypto/internal/rsa.h b/include/crypto/internal/rsa.h
-new file mode 100644
-index 0000000..475d52b
---- /dev/null
-+++ b/include/crypto/internal/rsa.h
-@@ -0,0 +1,30 @@
-+/*
-+ * RSA internal helpers
-+ *
-+ * Copyright (c) 2015, Intel Corporation
-+ * Authors: Tadeusz Struk <tadeusz.struk@intel.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the Free
-+ * Software Foundation; either version 2 of the License, or (at your option)
-+ * any later version.
-+ *
-+ */
-+#ifndef _RSA_HELPER_
-+#define _RSA_HELPER_
-+#include <linux/mpi.h>
-+#include <crypto/akcipher.h>
 +
-+struct rsa_key {
-+	MPI n;
-+	MPI e;
-+	MPI d;
++static int alg_test_akcipher(const struct alg_test_desc *desc,
++			     const char *driver, u32 type, u32 mask)
++{
++	struct crypto_akcipher *tfm;
++	int err = 0;
++
++	tfm = crypto_alloc_akcipher(driver, type | CRYPTO_ALG_INTERNAL, mask);
++	if (IS_ERR(tfm)) {
++		pr_err("alg: akcipher: Failed to load tfm for %s: %ld\n",
++		       driver, PTR_ERR(tfm));
++		return PTR_ERR(tfm);
++	}
++	if (desc->suite.akcipher.vecs)
++		err = test_akcipher(tfm, desc->alg, desc->suite.akcipher.vecs,
++				    desc->suite.akcipher.count);
++
++	crypto_free_akcipher(tfm);
++	return err;
++}
++
+ static int alg_test_null(const struct alg_test_desc *desc,
+ 			     const char *driver, u32 type, u32 mask)
+ {
+@@ -3453,6 +3592,16 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
++		.alg = "rsa",
++		.test = alg_test_akcipher,
++		.fips_allowed = 1,
++		.suite = {
++			.akcipher = {
++				.vecs = rsa_tv_template,
++				.count = RSA_TEST_VECTORS
++			}
++		}
++	}, {
+ 		.alg = "salsa20",
+ 		.test = alg_test_skcipher,
+ 		.suite = {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 4c2b3e5..8aad507 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -125,9 +125,152 @@ struct drbg_testvec {
+ 	size_t expectedlen;
+ };
+ 
++struct akcipher_testvec {
++	unsigned char *key;
++	unsigned char *m;
++	unsigned char *c;
++	unsigned int key_len;
++	unsigned int m_size;
++	unsigned int c_size;
 +};
 +
-+int rsa_parse_key(struct crypto_akcipher *tfm, const void *key,
-+		  unsigned int key_len);
-+static inline struct rsa_key *rsa_get_key(struct crypto_akcipher *tfm)
-+{
-+	return tfm->key;
-+}
+ static char zeroed_string[48];
+ 
+ /*
++ * RSA test vectors. Borrowed from openSSL.
++ */
++#ifdef CONFIG_CRYPTO_FIPS
++#define RSA_TEST_VECTORS	1
++#else
++#define RSA_TEST_VECTORS	3
 +#endif
++static struct akcipher_testvec rsa_tv_template[] = {
++	{
++#ifndef CONFIG_CRYPTO_FIPS
++	.key =
++	"\x30\x81\x88" /* sequence of 136 bytes */
++	"\x02\x41" /* modulus - integer of 65 bytes */
++	"\x00\xAA\x36\xAB\xCE\x88\xAC\xFD\xFF\x55\x52\x3C\x7F\xC4\x52\x3F"
++	"\x90\xEF\xA0\x0D\xF3\x77\x4A\x25\x9F\x2E\x62\xB4\xC5\xD9\x9C\xB5"
++	"\xAD\xB3\x00\xA0\x28\x5E\x53\x01\x93\x0E\x0C\x70\xFB\x68\x76\x93"
++	"\x9C\xE6\x16\xCE\x62\x4A\x11\xE0\x08\x6D\x34\x1E\xBC\xAC\xA0\xA1"
++	"\xF5"
++	"\x02\x01\x11" /* public key - integer of 1 byte */
++	"\x02\x40" /* private key - integer of 64 bytes */
++	"\x0A\x03\x37\x48\x62\x64\x87\x69\x5F\x5F\x30\xBC\x38\xB9\x8B\x44"
++	"\xC2\xCD\x2D\xFF\x43\x40\x98\xCD\x20\xD8\xA1\x38\xD0\x90\xBF\x64"
++	"\x79\x7C\x3F\xA7\xA2\xCD\xCB\x3C\xD1\xE0\xBD\xBA\x26\x54\xB4\xF9"
++	"\xDF\x8E\x8A\xE5\x9D\x73\x3D\x9F\x33\xB3\x01\x62\x4A\xFD\x1D\x51",
++	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
++	.c =
++	"\x63\x1c\xcd\x7b\xe1\x7e\xe4\xde\xc9\xa8\x89\xa1\x74\xcb\x3c\x63"
++	"\x7d\x24\xec\x83\xc3\x15\xe4\x7f\x73\x05\x34\xd1\xec\x22\xbb\x8a"
++	"\x5e\x32\x39\x6d\xc1\x1d\x7d\x50\x3b\x9f\x7a\xad\xf0\x2e\x25\x53"
++	"\x9f\x6e\xbd\x4c\x55\x84\x0c\x9b\xcf\x1a\x4b\x51\x1e\x9e\x0c\x06",
++	.key_len = 139,
++	.m_size = 8,
++	.c_size = 64,
++	}, {
++	.key =
++	"\x30\x82\x01\x0B" /* sequence of 267 bytes */
++	"\x02\x81\x81" /* modulus - integer of 129 bytes */
++	"\x00\xBB\xF8\x2F\x09\x06\x82\xCE\x9C\x23\x38\xAC\x2B\x9D\xA8\x71"
++	"\xF7\x36\x8D\x07\xEE\xD4\x10\x43\xA4\x40\xD6\xB6\xF0\x74\x54\xF5"
++	"\x1F\xB8\xDF\xBA\xAF\x03\x5C\x02\xAB\x61\xEA\x48\xCE\xEB\x6F\xCD"
++	"\x48\x76\xED\x52\x0D\x60\xE1\xEC\x46\x19\x71\x9D\x8A\x5B\x8B\x80"
++	"\x7F\xAF\xB8\xE0\xA3\xDF\xC7\x37\x72\x3E\xE6\xB4\xB7\xD9\x3A\x25"
++	"\x84\xEE\x6A\x64\x9D\x06\x09\x53\x74\x88\x34\xB2\x45\x45\x98\x39"
++	"\x4E\xE0\xAA\xB1\x2D\x7B\x61\xA5\x1F\x52\x7A\x9A\x41\xF6\xC1\x68"
++	"\x7F\xE2\x53\x72\x98\xCA\x2A\x8F\x59\x46\xF8\xE5\xFD\x09\x1D\xBD"
++	"\xCB"
++	"\x02\x01\x11" /* public key - integer of 1 byte */
++	"\x02\x81\x81"  /* private key - integer of 129 bytes */
++	"\x00\xA5\xDA\xFC\x53\x41\xFA\xF2\x89\xC4\xB9\x88\xDB\x30\xC1\xCD"
++	"\xF8\x3F\x31\x25\x1E\x06\x68\xB4\x27\x84\x81\x38\x01\x57\x96\x41"
++	"\xB2\x94\x10\xB3\xC7\x99\x8D\x6B\xC4\x65\x74\x5E\x5C\x39\x26\x69"
++	"\xD6\x87\x0D\xA2\xC0\x82\xA9\x39\xE3\x7F\xDC\xB8\x2E\xC9\x3E\xDA"
++	"\xC9\x7F\xF3\xAD\x59\x50\xAC\xCF\xBC\x11\x1C\x76\xF1\xA9\x52\x94"
++	"\x44\xE5\x6A\xAF\x68\xC5\x6C\x09\x2C\xD3\x8D\xC3\xBE\xF5\xD2\x0A"
++	"\x93\x99\x26\xED\x4F\x74\xA1\x3E\xDD\xFB\xE1\xA1\xCE\xCC\x48\x94"
++	"\xAF\x94\x28\xC2\xB7\xB8\x88\x3F\xE4\x46\x3A\x4B\xC8\x5B\x1C\xB3"
++	"\xC1",
++	.key_len = 271,
++	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
++	.c =
++	"\x74\x1b\x55\xac\x47\xb5\x08\x0a\x6e\x2b\x2d\xf7\x94\xb8\x8a\x95"
++	"\xed\xa3\x6b\xc9\x29\xee\xb2\x2c\x80\xc3\x39\x3b\x8c\x62\x45\x72"
++	"\xc2\x7f\x74\x81\x91\x68\x44\x48\x5a\xdc\xa0\x7e\xa7\x0b\x05\x7f"
++	"\x0e\xa0\x6c\xe5\x8f\x19\x4d\xce\x98\x47\x5f\xbd\x5f\xfe\xe5\x34"
++	"\x59\x89\xaf\xf0\xba\x44\xd7\xf1\x1a\x50\x72\xef\x5e\x4a\xb6\xb7"
++	"\x54\x34\xd1\xc4\x83\x09\xdf\x0f\x91\x5f\x7d\x91\x70\x2f\xd4\x13"
++	"\xcc\x5e\xa4\x6c\xc3\x4d\x28\xef\xda\xaf\xec\x14\x92\xfc\xa3\x75"
++	"\x13\xb4\xc1\xa1\x11\xfc\x40\x2f\x4c\x9d\xdf\x16\x76\x11\x20\x6b",
++	.m_size = 8,
++	.c_size = 128,
++	}, {
++#endif
++	.key =
++	"\x30\x82\x02\x0D" /* sequence of 525 bytes */
++	"\x02\x82\x01\x00" /* modulus - integer of 256 bytes */
++	"\xDB\x10\x1A\xC2\xA3\xF1\xDC\xFF\x13\x6B\xED\x44\xDF\xF0\x02\x6D"
++	"\x13\xC7\x88\xDA\x70\x6B\x54\xF1\xE8\x27\xDC\xC3\x0F\x99\x6A\xFA"
++	"\xC6\x67\xFF\x1D\x1E\x3C\x1D\xC1\xB5\x5F\x6C\xC0\xB2\x07\x3A\x6D"
++	"\x41\xE4\x25\x99\xAC\xFC\xD2\x0F\x02\xD3\xD1\x54\x06\x1A\x51\x77"
++	"\xBD\xB6\xBF\xEA\xA7\x5C\x06\xA9\x5D\x69\x84\x45\xD7\xF5\x05\xBA"
++	"\x47\xF0\x1B\xD7\x2B\x24\xEC\xCB\x9B\x1B\x10\x8D\x81\xA0\xBE\xB1"
++	"\x8C\x33\xE4\x36\xB8\x43\xEB\x19\x2A\x81\x8D\xDE\x81\x0A\x99\x48"
++	"\xB6\xF6\xBC\xCD\x49\x34\x3A\x8F\x26\x94\xE3\x28\x82\x1A\x7C\x8F"
++	"\x59\x9F\x45\xE8\x5D\x1A\x45\x76\x04\x56\x05\xA1\xD0\x1B\x8C\x77"
++	"\x6D\xAF\x53\xFA\x71\xE2\x67\xE0\x9A\xFE\x03\xA9\x85\xD2\xC9\xAA"
++	"\xBA\x2A\xBC\xF4\xA0\x08\xF5\x13\x98\x13\x5D\xF0\xD9\x33\x34\x2A"
++	"\x61\xC3\x89\x55\xF0\xAE\x1A\x9C\x22\xEE\x19\x05\x8D\x32\xFE\xEC"
++	"\x9C\x84\xBA\xB7\xF9\x6C\x3A\x4F\x07\xFC\x45\xEB\x12\xE5\x7B\xFD"
++	"\x55\xE6\x29\x69\xD1\xC2\xE8\xB9\x78\x59\xF6\x79\x10\xC6\x4E\xEB"
++	"\x6A\x5E\xB9\x9A\xC7\xC4\x5B\x63\xDA\xA3\x3F\x5E\x92\x7A\x81\x5E"
++	"\xD6\xB0\xE2\x62\x8F\x74\x26\xC2\x0C\xD3\x9A\x17\x47\xE6\x8E\xAB"
++	"\x02\x03\x01\x00\x01" /* public key - integer of 3 bytes */
++	"\x02\x82\x01\x00" /* private key - integer of 256 bytes */
++	"\x52\x41\xF4\xDA\x7B\xB7\x59\x55\xCA\xD4\x2F\x0F\x3A\xCB\xA4\x0D"
++	"\x93\x6C\xCC\x9D\xC1\xB2\xFB\xFD\xAE\x40\x31\xAC\x69\x52\x21\x92"
++	"\xB3\x27\xDF\xEA\xEE\x2C\x82\xBB\xF7\x40\x32\xD5\x14\xC4\x94\x12"
++	"\xEC\xB8\x1F\xCA\x59\xE3\xC1\x78\xF3\x85\xD8\x47\xA5\xD7\x02\x1A"
++	"\x65\x79\x97\x0D\x24\xF4\xF0\x67\x6E\x75\x2D\xBF\x10\x3D\xA8\x7D"
++	"\xEF\x7F\x60\xE4\xE6\x05\x82\x89\x5D\xDF\xC6\xD2\x6C\x07\x91\x33"
++	"\x98\x42\xF0\x02\x00\x25\x38\xC5\x85\x69\x8A\x7D\x2F\x95\x6C\x43"
++	"\x9A\xB8\x81\xE2\xD0\x07\x35\xAA\x05\x41\xC9\x1E\xAF\xE4\x04\x3B"
++	"\x19\xB8\x73\xA2\xAC\x4B\x1E\x66\x48\xD8\x72\x1F\xAC\xF6\xCB\xBC"
++	"\x90\x09\xCA\xEC\x0C\xDC\xF9\x2C\xD7\xEB\xAE\xA3\xA4\x47\xD7\x33"
++	"\x2F\x8A\xCA\xBC\x5E\xF0\x77\xE4\x97\x98\x97\xC7\x10\x91\x7D\x2A"
++	"\xA6\xFF\x46\x83\x97\xDE\xE9\xE2\x17\x03\x06\x14\xE2\xD7\xB1\x1D"
++	"\x77\xAF\x51\x27\x5B\x5E\x69\xB8\x81\xE6\x11\xC5\x43\x23\x81\x04"
++	"\x62\xFF\xE9\x46\xB8\xD8\x44\xDB\xA5\xCC\x31\x54\x34\xCE\x3E\x82"
++	"\xD6\xBF\x7A\x0B\x64\x21\x6D\x88\x7E\x5B\x45\x12\x1E\x63\x8D\x49"
++	"\xA7\x1D\xD9\x1E\x06\xCD\xE8\xBA\x2C\x8C\x69\x32\xEA\xBE\x60\x71",
++	.key_len = 529,
++	.m = "\x54\x85\x9b\x34\x2c\x49\xea\x2a",
++	.c =
++	"\xb2\x97\x76\xb4\xae\x3e\x38\x3c\x7e\x64\x1f\xcc\xa2\x7f\xf6\xbe"
++	"\xcf\x49\xbc\x48\xd3\x6c\x8f\x0a\x0e\xc1\x73\xbd\x7b\x55\x79\x36"
++	"\x0e\xa1\x87\x88\xb9\x2c\x90\xa6\x53\x5e\xe9\xef\xc4\xe2\x4d\xdd"
++	"\xf7\xa6\x69\x82\x3f\x56\xa4\x7b\xfb\x62\xe0\xae\xb8\xd3\x04\xb3"
++	"\xac\x5a\x15\x2a\xe3\x19\x9b\x03\x9a\x0b\x41\xda\x64\xec\x0a\x69"
++	"\xfc\xf2\x10\x92\xf3\xc1\xbf\x84\x7f\xfd\x2c\xae\xc8\xb5\xf6\x41"
++	"\x70\xc5\x47\x03\x8a\xf8\xff\x6f\x3f\xd2\x6f\x09\xb4\x22\xf3\x30"
++	"\xbe\xa9\x85\xcb\x9c\x8d\xf9\x8f\xeb\x32\x91\xa2\x25\x84\x8f\xf5"
++	"\xdc\xc7\x06\x9c\x2d\xe5\x11\x2c\x09\x09\x87\x09\xa9\xf6\x33\x73"
++	"\x90\xf1\x60\xf2\x65\xdd\x30\xa5\x66\xce\x62\x7b\xd0\xf8\x2d\x3d"
++	"\x19\x82\x77\xe3\x0a\x5f\x75\x2f\x8e\xb1\xe5\xe8\x91\x35\x1b\x3b"
++	"\x33\xb7\x66\x92\xd1\xf2\x8e\x6f\xe5\x75\x0c\xad\x36\xfb\x4e\xd0"
++	"\x66\x61\xbd\x49\xfe\xf4\x1a\xa2\x2b\x49\xfe\x03\x4c\x74\x47\x8d"
++	"\x9a\x66\xb2\x49\x46\x4d\x77\xea\x33\x4d\x6b\x3c\xb4\x49\x4a\xc6"
++	"\x7d\x3d\xb5\xb9\x56\x41\x15\x67\x0f\x94\x3c\x93\x65\x27\xe0\x21"
++	"\x5d\x59\xc3\x62\xd5\xa6\xda\x38\x26\x22\x5e\x34\x1c\x94\xaf\x98",
++	.m_size = 8,
++	.c_size = 256,
++	}
++};
++
++/*
+  * MD4 test vectors from RFC1320
+  */
+ #define MD4_TEST_VECTORS	7
