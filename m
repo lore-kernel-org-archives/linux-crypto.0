@@ -1,69 +1,70 @@
-From: =?UTF-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@freescale.com>
-Subject: Re: [PATCH 6/8] crypto: caam - Convert GCM to new AEAD interface
-Date: Mon, 15 Jun 2015 15:33:20 +0300
-Message-ID: <557EC610.9070309@freescale.com>
-References: <20150615080716.GA30753@gondor.apana.org.au>
- <E1Z4PSj-00084W-6B@gondolin.me.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [RESEND PATCH v4 04/14] crypto: add a new driver for Marvell's
+ CESA
+Date: Mon, 15 Jun 2015 20:38:39 +0800
+Message-ID: <20150615123839.GA1646@gondor.apana.org.au>
+References: <1434093366-14681-1-git-send-email-boris.brezillon@free-electrons.com>
+ <1434093366-14681-5-git-send-email-boris.brezillon@free-electrons.com>
+ <20150615095421.GA32158@gondor.apana.org.au>
+ <20150615133135.47ffd3e3@bbrezillon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Marcelo Henrique Cerri <mhcerri@linux.vnet.ibm.com>,
-	Fionnuala Gunter <fin@linux.vnet.ibm.com>,
-	<ruchika.gupta@freescale.com>, <cristian.stoica@freescale.com>,
-	<NiteshNarayanLal@freescale.com>, <jinyanjiang@gmail.com>,
-	Tudor Ambarus <tudor.ambarus@freescale.com>
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	Imre Kaloz <kaloz@openwrt.org>
+To: Boris Brezillon <boris.brezillon@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bon0116.outbound.protection.outlook.com ([157.56.111.116]:22633
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753842AbbFOMdl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 08:33:41 -0400
-In-Reply-To: <E1Z4PSj-00084W-6B@gondolin.me.apana.org.au>
+Received: from helcar.hengli.com.au ([209.40.204.226]:38905 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932130AbbFOMjV (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Jun 2015 08:39:21 -0400
+Content-Disposition: inline
+In-Reply-To: <20150615133135.47ffd3e3@bbrezillon>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 6/15/2015 11:09 AM, Herbert Xu wrote:
-> This patch converts the caam GCM implementations to the new AEAD
-> interface.  This is compile-tested only.
-> 
-> Note that all IV generation for GCM algorithms have been removed.
-> The reason is that the current generation uses purely random IVs
-> which is not appropriate for counter-based algorithms where we
-> first and foremost require uniqueness.
-> 
-> Of course there is no reason why you couldn't implement seqiv or
-> seqniv within caam since all they do is xor the sequence number
-> with a salt, but since I can't test this on actual hardware I'll
-> leave it alone for now.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
+On Mon, Jun 15, 2015 at 01:31:35PM +0200, Boris Brezillon wrote:
+>
+> I haven't found any driver updating the req->info field with the new
+> IV. Could you point me to one of them.
 
-Testing on P2041RDB I see the following failures:
+This is an integral part of the API so if any driver isn't doing
+this then they should be fixed.
 
-caam_jr ffe301000.jr: 40000f10: DECO: desc idx 15: Invalid Sequence
-Command. A SEQ IN PTR OR SEQ OUT PTR Command is invalid or a SEQ KEY,
-SEQ LOAD, SEQ FIFO LOAD, or SEQ FIFO STORE decremented the input or
-output sequence length below 0. This error may result if a built-in
-PROTOCOL Command has encountered a malformed PDU.
-alg: aead: encryption failed on test 1 for rfc4106-gcm-aes-caam:
-ret=-1073745680
+Ironically the original mv_cesa driver gets this right :)
+ 
+> Yes, that makes sense, but since a lot a drivers (if not all of them)
+> are not updating this field we'll break them when adding this test
+> unless we make it optional (with a new flag ?).
 
-caam_jr ffe301000.jr: 40000e10: DECO: desc idx 14: Invalid Sequence
-Command. A SEQ IN PTR OR SEQ OUT PTR Command is invalid or a SEQ KEY,
-SEQ LOAD, SEQ FIFO LOAD, or SEQ FIFO STORE decremented the input or
-output sequence length below 0. This error may result if a built-in
-PROTOCOL Command has encountered a malformed PDU.
-alg: aead: encryption failed on test 1 for rfc4543-gcm-aes-caam:
-ret=-1073745424
+No this has been part of the API since day one so it's definitely
+not optional.
 
-alg: aead: Test 2 failed on encryption for gcm-aes-caam
-00000000: ab 6e 47 d4 2c ec 13 bd f5 3a 67 b2 12 57 bd df
-00000010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> Do you have any suggestion to address this problem ?
 
-I'll check why this is happening.
+Adding a self-test would be a good start.  That should automatically
+disable any broken drivers and then we can fix them one by one.  Many
+drivers implement an AEAD interface and that can still be used even
+if we add the self-test.
 
-Regards,
-Horia
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
