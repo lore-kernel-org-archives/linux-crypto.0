@@ -1,76 +1,114 @@
-From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Subject: [BUG?] crypto: caam: little/big endianness on ARM vs PPC
-Date: Mon, 15 Jun 2015 17:59:07 +0200
-Message-ID: <20150615155907.GC7947@pengutronix.de>
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: Re: [BUG?] crypto: caam: little/big endianness on ARM vs PPC
+Date: Mon, 15 Jun 2015 17:28:16 +0100
+Message-ID: <20150615162816.GO7557@n2100.arm.linux.org.uk>
+References: <20150615155907.GC7947@pengutronix.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+Cc: linux-kernel@vger.kernel.org, kernel@pengutronix.de,
 	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, kernel@pengutronix.de
-To: linux-kernel@vger.kernel.org
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:33688 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752083AbbFOP7N (ORCPT
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:32906 "EHLO
+	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753288AbbFOQ20 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 11:59:13 -0400
+	Mon, 15 Jun 2015 12:28:26 -0400
 Content-Disposition: inline
+In-Reply-To: <20150615155907.GC7947@pengutronix.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi!
+On Mon, Jun 15, 2015 at 05:59:07PM +0200, Steffen Trumtrar wrote:
+> I'm working on CAAM support for the ARM-based i.MX6 SoCs. The current
+> drivers/crypto/caam driver only works for PowerPC AFAIK.
+> Actually, there isn't that much to do, to get support for the i.MX6 but
+> one patch breaks the driver severely:
+> 
+> 	commit ef94b1d834aace7101de77c3a7c2631b9ae9c5f6
+> 	crypto: caam - Add definition of rd/wr_reg64 for little endian platform
 
-I'm working on CAAM support for the ARM-based i.MX6 SoCs. The current
-drivers/crypto/caam driver only works for PowerPC AFAIK.
-Actually, there isn't that much to do, to get support for the i.MX6 but
-one patch breaks the driver severely:
+You're not the only one who's hitting problems with this - Jon Nettleton
+has been working on it recently.
 
-	commit ef94b1d834aace7101de77c3a7c2631b9ae9c5f6
-	crypto: caam - Add definition of rd/wr_reg64 for little endian platform
+The way this has been done is fairly yucky to start with: several things
+about it are particularly horrid.  The first is the repetitive code
+for the BE and LE cases, when all that's actually different is the
+register order between the two code cases.
 
-This patch adds
+The second thing is the excessive use of masking - I'm pretty sure the
+compiler won't complain with the below.
 
-+#ifdef __LITTLE_ENDIAN
-+static inline void wr_reg64(u64 __iomem *reg, u64 data)
-+{
-+	wr_reg32((u32 __iomem *)reg + 1, (data & 0xffffffff00000000ull) >> 32);
-+	wr_reg32((u32 __iomem *)reg, data & 0x00000000ffffffffull);
-+}
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 378ddc17f60e..ba0fa630a25d 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -84,34 +84,28 @@
+ #endif
+ 
+ #ifndef CONFIG_64BIT
+-#ifdef __BIG_ENDIAN
+-static inline void wr_reg64(u64 __iomem *reg, u64 data)
+-{
+-	wr_reg32((u32 __iomem *)reg, (data & 0xffffffff00000000ull) >> 32);
+-	wr_reg32((u32 __iomem *)reg + 1, data & 0x00000000ffffffffull);
+-}
+-
+-static inline u64 rd_reg64(u64 __iomem *reg)
+-{
+-	return (((u64)rd_reg32((u32 __iomem *)reg)) << 32) |
+-		((u64)rd_reg32((u32 __iomem *)reg + 1));
+-}
++#if defined(__BIG_ENDIAN)
++#define REG64_HI32(reg) ((u32 __iomem *)(reg))
++#define REG64_LO32(reg) ((u32 __iomem *)(reg) + 1)
++#elif defined(__LITTLE_ENDIAN)
++#define REG64_HI32(reg) ((u32 __iomem *)(reg) + 1)
++#define REG64_LO32(reg) ((u32 __iomem *)(reg))
+ #else
+-#ifdef __LITTLE_ENDIAN
++#error Broken endian?
++#endif
++
+ static inline void wr_reg64(u64 __iomem *reg, u64 data)
+ {
+-	wr_reg32((u32 __iomem *)reg + 1, (data & 0xffffffff00000000ull) >> 32);
+-	wr_reg32((u32 __iomem *)reg, data & 0x00000000ffffffffull);
++	wr_reg32(REG64_HI32(reg), data >> 32);
++	wr_reg32(REG64_LO32(reg), data);
+ }
+ 
+ static inline u64 rd_reg64(u64 __iomem *reg)
+ {
+-	return (((u64)rd_reg32((u32 __iomem *)reg + 1)) << 32) |
+-		((u64)rd_reg32((u32 __iomem *)reg));
++	return ((u64)rd_reg32(REG64_HI32(reg))) << 32 |
++		rd_reg32(REG64_LO32(reg));
+ }
+ #endif
+-#endif
+-#endif
+ 
+ /*
+  * jr_outentry
 
-The wr_reg64 function is only used in one place in the drivers/crypto/caam/jr.c
-driver: to write the dma_addr_t to the register. Without that patch everything
-works fine on ARM (little endian, 32bit), with that patch the driver will write
-0's into the register that holds the DMA address (the numerically-higher) -> kernel hangs.
-Also, from my understanding, the comment above the defines, stating that you
-have to first write the numerically-lower and then the numerically-higher address
-on 32bit systems doesn't match with the implementation.
+The second issue is that apparently, the register order doesn't actually
+change for LE devices - in other words, the byte order within each register
+does change, but they aren't a 64-bit register, they're two separate 32-bit
+registers.  So, they should always be written as such.
 
-What I don't know/understand is if this makes any sense for any PowerPC implementation.
+So, I'd get rid of the #if defined(__BIG_ENDIAN) stuff and instead have:
 
-So, the question is, how to fix this? I'd prefer to do it directly in the jr driver
-instead of the ifdef-ery.
++/*
++ * The DMA address register is a pair of 32-bit registers, and should
++ * always be accessed as such.
++ */
++#define REG64_HI32(reg) ((u32 __iomem *)(reg))
++#define REG64_LO32(reg) ((u32 __iomem *)(reg) + 1)
 
-Something like
-	if (sizeof(dma_addr_t) == sizeof(u32))
-		wr_reg32(&jrp->rregs->inpring_base + 1, inpbusaddr);
-	else if (sizeof(dma_addr_t) == sizeof(u64))
-		wr_reg64(...)
-
-or just go by DT compatible and then remove the inline function definitions.
-
-As far as I can tell, the compatible wouldn't be needed for anything else in the
-jr driver, so maybe that is not optimal. On the other hand the sizeof(..)
-solution would only catch little endian on 32bit and not big endian (?!)
-I however don't know what combinations actually *have* to be caught, as I don't
-know, which exist.
-
-So, what do you think people?
-
-Thanks,
-Steffen Trumtrar
 
 -- 
-Pengutronix e.K.                           |                             |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+FTTC broadband for 0.8mile line: currently at 10.5Mbps down 400kbps up
+according to speedtest.net.
