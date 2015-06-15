@@ -1,47 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/2] remove nx842.h from include/linux
-Date: Mon, 15 Jun 2015 18:19:09 +0800
-Message-ID: <20150615101909.GA32751@gondor.apana.org.au>
-References: <1434121127-14508-1-git-send-email-ddstreet@ieee.org>
+Subject: Re: [PATCH] crypto: aesni-intel: fix crypto_fpu_exit() section
+ mismatch
+Date: Mon, 15 Jun 2015 18:19:22 +0800
+Message-ID: <20150615101922.GB32751@gondor.apana.org.au>
+References: <1434171400-10566-1-git-send-email-jmmahler@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Dan Streetman <ddstreet@ieee.org>
+To: Jeremiah Mahler <jmmahler@gmail.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:52147 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:58898 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753471AbbFOKTT (ORCPT
+	with ESMTP id S1753471AbbFOKTo (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 06:19:19 -0400
+	Mon, 15 Jun 2015 06:19:44 -0400
 Content-Disposition: inline
-In-Reply-To: <1434121127-14508-1-git-send-email-ddstreet@ieee.org>
+In-Reply-To: <1434171400-10566-1-git-send-email-jmmahler@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jun 12, 2015 at 10:58:45AM -0400, Dan Streetman wrote:
-> Now that the crypto/842.c driver does only software 842 comp/decomp,
-> and the hardware crypto compressor for 842-nx is located in
-> drivers/crypto/nx with the NX 842 hw driver, there's no reason for
-> the nx842.h header to be located in include/linux/ anymore; nobody
-> should use the NX 842 hw driver directly, everyone should use the
-> crypto compression API.
+On Fri, Jun 12, 2015 at 09:56:40PM -0700, Jeremiah Mahler wrote:
+> The '__init aesni_init()' function calls the '__exit crypto_fpu_exit()'
+> function directly.  Since they are in different sections, this generates
+> a warning.
 > 
-> The first patch moves the contents of include/linux/nx842.h into the
-> existing drivers/crypto/nx/nx-842.h header file.  The second patch
-> replaces the use of the NX842_MEM_COMPRESS define, since the 842-nx
-> crypto compression driver can directly get the required working
-> memory size from the NX 842 hw driver.
+>   make CONFIG_DEBUG_SECTION_MISMATCH=y
+>   ...
+>   WARNING: arch/x86/crypto/aesni-intel.o(.init.text+0x12b): Section
+>   mismatch in reference from the function init_module() to the function
+>   .exit.text:crypto_fpu_exit()
+>   The function __init init_module() references
+>   a function __exit crypto_fpu_exit().
+>   This is often seen when error handling in the init function
+>   uses functionality in the exit path.
+>   The fix is often to remove the __exit annotation of
+>   crypto_fpu_exit() so it may be used outside an exit section.
 > 
-> This cleans up include/linux/ by 1 file, and it saves some memory
-> by reducing the 842-nx working memory size down to exactly what the
-> NX 842 platform driver requires.
+> Fix the warning by removing the __exit annotation.
 > 
-> Dan Streetman (2):
->   crypto: move include/linux/nx842.h into drivers/crypto/nx/nx-842.h
->   crypto: replace NX842_MEM_COMPRESS with function
+> Signed-off-by: Jeremiah Mahler <jmmahler@gmail.com>
 
-Both applied.
+Applied.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
