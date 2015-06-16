@@ -1,7 +1,7 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH v5 08/14] crypto: marvell/CESA: add MD5 support
-Date: Tue, 16 Jun 2015 11:59:02 +0200
-Message-ID: <1434448748-10828-9-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH v5 07/14] crypto: marvell/CESA: add Triple-DES support
+Date: Tue, 16 Jun 2015 11:59:01 +0200
+Message-ID: <1434448748-10828-8-git-send-email-boris.brezillon@free-electrons.com>
 References: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
 Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Arnaud Ebalard <arno@natisbad.org>,
@@ -31,247 +31,213 @@ List-Id: linux-crypto.vger.kernel.org
 
 From: Arnaud Ebalard <arno@natisbad.org>
 
-Add support for MD5 operations.
+Add support for Triple-DES operations.
 
 Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
 Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 ---
- drivers/crypto/marvell/cesa.c |   2 +
- drivers/crypto/marvell/cesa.h |   2 +
- drivers/crypto/marvell/hash.c | 172 +++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 174 insertions(+), 2 deletions(-)
+ drivers/crypto/marvell/cesa.c   |   2 +
+ drivers/crypto/marvell/cesa.h   |   2 +
+ drivers/crypto/marvell/cipher.c | 147 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 151 insertions(+)
 
 diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index c0b1b49..047c1c0 100644
+index 212840e..c0b1b49 100644
 --- a/drivers/crypto/marvell/cesa.c
 +++ b/drivers/crypto/marvell/cesa.c
-@@ -178,7 +178,9 @@ static struct crypto_alg *armada_370_cipher_algs[] = {
+@@ -171,6 +171,8 @@ static void mv_cesa_remove_algs(struct mv_cesa_dev *cesa)
+ static struct crypto_alg *armada_370_cipher_algs[] = {
+ 	&mv_cesa_ecb_des_alg,
+ 	&mv_cesa_cbc_des_alg,
++	&mv_cesa_ecb_des3_ede_alg,
++	&mv_cesa_cbc_des3_ede_alg,
+ 	&mv_cesa_ecb_aes_alg,
+ 	&mv_cesa_cbc_aes_alg,
  };
- 
- static struct ahash_alg *armada_370_ahash_algs[] = {
-+	&mv_md5_alg,
- 	&mv_sha1_alg,
-+	&mv_ahmac_md5_alg,
- 	&mv_ahmac_sha1_alg,
- };
- 
 diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index 2e8b7fc..2a7e21a 100644
+index 2ee48fe..2e8b7fc 100644
 --- a/drivers/crypto/marvell/cesa.h
 +++ b/drivers/crypto/marvell/cesa.h
-@@ -774,7 +774,9 @@ int mv_cesa_dma_add_op_transfers(struct mv_cesa_tdma_chain *chain,
- 
- /* Algorithm definitions */
- 
-+extern struct ahash_alg mv_md5_alg;
- extern struct ahash_alg mv_sha1_alg;
-+extern struct ahash_alg mv_ahmac_md5_alg;
- extern struct ahash_alg mv_ahmac_sha1_alg;
+@@ -779,6 +779,8 @@ extern struct ahash_alg mv_ahmac_sha1_alg;
  
  extern struct crypto_alg mv_cesa_ecb_des_alg;
-diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index 299106f..d8555c5 100644
---- a/drivers/crypto/marvell/hash.c
-+++ b/drivers/crypto/marvell/hash.c
-@@ -12,6 +12,7 @@
-  * by the Free Software Foundation.
-  */
+ extern struct crypto_alg mv_cesa_cbc_des_alg;
++extern struct crypto_alg mv_cesa_ecb_des3_ede_alg;
++extern struct crypto_alg mv_cesa_cbc_des3_ede_alg;
+ extern struct crypto_alg mv_cesa_ecb_aes_alg;
+ extern struct crypto_alg mv_cesa_cbc_aes_alg;
  
-+#include <crypto/md5.h>
- #include <crypto/sha.h>
+diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
+index 31b9311..e65592c 100644
+--- a/drivers/crypto/marvell/cipher.c
++++ b/drivers/crypto/marvell/cipher.c
+@@ -22,6 +22,11 @@ struct mv_cesa_des_ctx {
+ 	u8 key[DES_KEY_SIZE];
+ };
  
- #include "cesa.h"
-@@ -346,8 +347,16 @@ static int mv_cesa_ahash_process(struct crypto_async_request *req, u32 status)
- 				   ahashreq->nbytes - creq->cache_ptr);
- 
- 	if (creq->last_req) {
--		for (i = 0; i < digsize / 4; i++)
--			creq->state[i] = cpu_to_be32(creq->state[i]);
-+		for (i = 0; i < digsize / 4; i++) {
-+			/*
-+			 * Hardware provides MD5 digest in a different
-+			 * endianness than SHA-1 and SHA-256 ones.
-+			 */
-+			if (digsize == MD5_DIGEST_SIZE)
-+				creq->state[i] = cpu_to_le32(creq->state[i]);
-+			else
-+				creq->state[i] = cpu_to_be32(creq->state[i]);
-+		}
- 
- 		memcpy(ahashreq->result, creq->state, digsize);
- 	}
-@@ -788,6 +797,95 @@ static int mv_cesa_ahash_finup(struct ahash_request *req)
- 	return ret;
- }
- 
-+static int mv_cesa_md5_init(struct ahash_request *req)
-+{
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_MD5);
-+
-+	mv_cesa_ahash_init(req, &tmpl);
-+
-+	return 0;
-+}
-+
-+static int mv_cesa_md5_export(struct ahash_request *req, void *out)
-+{
-+	struct md5_state *out_state = out;
-+	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
-+	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
-+	unsigned int digsize = crypto_ahash_digestsize(ahash);
-+
-+	out_state->byte_count = creq->len;
-+	memcpy(out_state->hash, creq->state, digsize);
-+	memset(out_state->block, 0, sizeof(out_state->block));
-+	if (creq->cache)
-+		memcpy(out_state->block, creq->cache, creq->cache_ptr);
-+
-+	return 0;
-+}
-+
-+static int mv_cesa_md5_import(struct ahash_request *req, const void *in)
-+{
-+	const struct md5_state *in_state = in;
-+	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
-+	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
-+	unsigned int digsize = crypto_ahash_digestsize(ahash);
-+	unsigned int cache_ptr;
-+	int ret;
-+
-+	creq->len = in_state->byte_count;
-+	memcpy(creq->state, in_state->hash, digsize);
-+	creq->cache_ptr = 0;
-+
-+	cache_ptr = creq->len % sizeof(in_state->block);
-+	if (!cache_ptr)
-+		return 0;
-+
-+	ret = mv_cesa_ahash_alloc_cache(req);
-+	if (ret)
-+		return ret;
-+
-+	memcpy(creq->cache, in_state->block, cache_ptr);
-+	creq->cache_ptr = cache_ptr;
-+
-+	return 0;
-+}
-+
-+static int mv_cesa_md5_digest(struct ahash_request *req)
-+{
-+	int ret;
-+
-+	ret = mv_cesa_md5_init(req);
-+	if (ret)
-+		return ret;
-+
-+	return mv_cesa_ahash_finup(req);
-+}
-+
-+struct ahash_alg mv_md5_alg = {
-+	.init = mv_cesa_md5_init,
-+	.update = mv_cesa_ahash_update,
-+	.final = mv_cesa_ahash_final,
-+	.finup = mv_cesa_ahash_finup,
-+	.digest = mv_cesa_md5_digest,
-+	.export = mv_cesa_md5_export,
-+	.import = mv_cesa_md5_import,
-+	.halg = {
-+		.digestsize = MD5_DIGEST_SIZE,
-+		.base = {
-+			.cra_name = "md5",
-+			.cra_driver_name = "mv-md5",
-+			.cra_priority = 300,
-+			.cra_flags = CRYPTO_ALG_ASYNC |
-+				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+			.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
-+			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
-+			.cra_init = mv_cesa_ahash_cra_init,
-+			.cra_module = THIS_MODULE,
-+		 }
-+	}
++struct mv_cesa_des3_ctx {
++	struct mv_cesa_ctx base;
++	u8 key[DES3_EDE_KEY_SIZE];
 +};
 +
- static int mv_cesa_sha1_init(struct ahash_request *req)
- {
- 	struct mv_cesa_op_ctx tmpl;
-@@ -1043,6 +1141,76 @@ static int mv_cesa_ahmac_cra_init(struct crypto_tfm *tfm)
+ struct mv_cesa_aes_ctx {
+ 	struct mv_cesa_ctx base;
+ 	struct crypto_aes_ctx aes;
+@@ -261,6 +266,22 @@ static int mv_cesa_des_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
  	return 0;
  }
  
-+static int mv_cesa_ahmac_md5_init(struct ahash_request *req)
++static int mv_cesa_des3_ede_setkey(struct crypto_ablkcipher *cipher,
++				   const u8 *key, unsigned int len)
 +{
-+	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+	struct mv_cesa_op_ctx tmpl;
++	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
++	struct mv_cesa_des_ctx *ctx = crypto_tfm_ctx(tfm);
 +
-+	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_MD5);
-+	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
++	if (len != DES3_EDE_KEY_SIZE) {
++		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		return -EINVAL;
++	}
 +
-+	mv_cesa_ahash_init(req, &tmpl);
++	memcpy(ctx->key, key, DES3_EDE_KEY_SIZE);
 +
 +	return 0;
 +}
 +
-+static int mv_cesa_ahmac_md5_setkey(struct crypto_ahash *tfm, const u8 *key,
-+				    unsigned int keylen)
+ static int mv_cesa_ablkcipher_dma_req_init(struct ablkcipher_request *req,
+ 				const struct mv_cesa_op_ctx *op_templ)
+ {
+@@ -501,6 +522,132 @@ struct crypto_alg mv_cesa_cbc_des_alg = {
+ 	},
+ };
+ 
++static int mv_cesa_des3_op(struct ablkcipher_request *req,
++			   struct mv_cesa_op_ctx *tmpl)
 +{
-+	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
-+	struct md5_state istate, ostate;
-+	int ret, i;
-+
-+	ret = mv_cesa_ahmac_setkey("mv-md5", key, keylen, &istate, &ostate);
-+	if (ret)
-+		return ret;
-+
-+	for (i = 0; i < ARRAY_SIZE(istate.hash); i++)
-+		ctx->iv[i] = be32_to_cpu(istate.hash[i]);
-+
-+	for (i = 0; i < ARRAY_SIZE(ostate.hash); i++)
-+		ctx->iv[i + 8] = be32_to_cpu(ostate.hash[i]);
-+
-+	return 0;
-+}
-+
-+static int mv_cesa_ahmac_md5_digest(struct ahash_request *req)
-+{
++	struct mv_cesa_des3_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
 +	int ret;
 +
-+	ret = mv_cesa_ahmac_md5_init(req);
++	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_3DES,
++			      CESA_SA_DESC_CFG_CRYPTM_MSK);
++
++	memcpy(tmpl->ctx.blkcipher.key, ctx->key, DES3_EDE_KEY_SIZE);
++
++	ret = mv_cesa_ablkcipher_req_init(req, tmpl);
 +	if (ret)
 +		return ret;
 +
-+	return mv_cesa_ahash_finup(req);
++	ret = mv_cesa_queue_req(&req->base);
++	if (ret && ret != -EINPROGRESS)
++		mv_cesa_ablkcipher_cleanup(req);
++
++	return ret;
 +}
 +
-+struct ahash_alg mv_ahmac_md5_alg = {
-+	.init = mv_cesa_ahmac_md5_init,
-+	.update = mv_cesa_ahash_update,
-+	.final = mv_cesa_ahash_final,
-+	.finup = mv_cesa_ahash_finup,
-+	.digest = mv_cesa_ahmac_md5_digest,
-+	.setkey = mv_cesa_ahmac_md5_setkey,
-+	.export = mv_cesa_md5_export,
-+	.import = mv_cesa_md5_import,
-+	.halg = {
-+		.digestsize = MD5_DIGEST_SIZE,
-+		.statesize = sizeof(struct md5_state),
-+		.base = {
-+			.cra_name = "hmac(md5)",
-+			.cra_driver_name = "mv-hmac-md5",
-+			.cra_priority = 300,
-+			.cra_flags = CRYPTO_ALG_ASYNC |
-+				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+			.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
-+			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
-+			.cra_init = mv_cesa_ahmac_cra_init,
-+			.cra_module = THIS_MODULE,
-+		 }
-+	}
++static int mv_cesa_ecb_des3_ede_encrypt(struct ablkcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_ENC);
++
++	return mv_cesa_des3_op(req, &tmpl);
++}
++
++static int mv_cesa_ecb_des3_ede_decrypt(struct ablkcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_DEC);
++
++	return mv_cesa_des3_op(req, &tmpl);
++}
++
++struct crypto_alg mv_cesa_ecb_des3_ede_alg = {
++	.cra_name = "ecb(des3_ede)",
++	.cra_driver_name = "mv-ecb-des3-ede",
++	.cra_priority = 300,
++	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
++		     CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++	.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++	.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
++	.cra_alignmask = 0,
++	.cra_type = &crypto_ablkcipher_type,
++	.cra_module = THIS_MODULE,
++	.cra_init = mv_cesa_ablkcipher_cra_init,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize = DES3_EDE_KEY_SIZE,
++			.max_keysize = DES3_EDE_KEY_SIZE,
++			.ivsize	     = DES3_EDE_BLOCK_SIZE,
++			.setkey = mv_cesa_des3_ede_setkey,
++			.encrypt = mv_cesa_ecb_des3_ede_encrypt,
++			.decrypt = mv_cesa_ecb_des3_ede_decrypt,
++		},
++	},
 +};
 +
- static int mv_cesa_ahmac_sha1_init(struct ahash_request *req)
++static int mv_cesa_cbc_des3_op(struct ablkcipher_request *req,
++			       struct mv_cesa_op_ctx *tmpl)
++{
++	memcpy(tmpl->ctx.blkcipher.iv, req->info, DES3_EDE_BLOCK_SIZE);
++
++	return mv_cesa_des3_op(req, tmpl);
++}
++
++static int mv_cesa_cbc_des3_ede_encrypt(struct ablkcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_ENC);
++
++	return mv_cesa_cbc_des3_op(req, &tmpl);
++}
++
++static int mv_cesa_cbc_des3_ede_decrypt(struct ablkcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_DEC);
++
++	return mv_cesa_cbc_des3_op(req, &tmpl);
++}
++
++struct crypto_alg mv_cesa_cbc_des3_ede_alg = {
++	.cra_name = "cbc(des3_ede)",
++	.cra_driver_name = "mv-cbc-des3-ede",
++	.cra_priority = 300,
++	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
++		     CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++	.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++	.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
++	.cra_alignmask = 0,
++	.cra_type = &crypto_ablkcipher_type,
++	.cra_module = THIS_MODULE,
++	.cra_init = mv_cesa_ablkcipher_cra_init,
++	.cra_u = {
++		.ablkcipher = {
++			.min_keysize = DES3_EDE_KEY_SIZE,
++			.max_keysize = DES3_EDE_KEY_SIZE,
++			.ivsize	     = DES3_EDE_BLOCK_SIZE,
++			.setkey = mv_cesa_des3_ede_setkey,
++			.encrypt = mv_cesa_cbc_des3_ede_encrypt,
++			.decrypt = mv_cesa_cbc_des3_ede_decrypt,
++		},
++	},
++};
++
+ static int mv_cesa_aes_op(struct ablkcipher_request *req,
+ 			  struct mv_cesa_op_ctx *tmpl)
  {
- 	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
 -- 
 1.9.1
