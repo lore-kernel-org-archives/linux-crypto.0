@@ -1,11 +1,10 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RFC v5 4/4] crypto: add tests vectors for RSA
-Date: Tue, 16 Jun 2015 14:28:58 +0800
-Message-ID: <20150616062858.GA21883@gondor.apana.org.au>
+Subject: Re: [PATCH RFC v5 1/4] MPILIB: add mpi_read_buf() and mpi_get_size()
+ helpers
+Date: Tue, 16 Jun 2015 14:40:18 +0800
+Message-ID: <20150616064018.GA22118@gondor.apana.org.au>
 References: <20150615201831.15697.57738.stgit@tstruk-mobl1>
- <20150615201853.15697.45868.stgit@tstruk-mobl1>
- <20150616003741.GA18212@gondor.apana.org.au>
- <557FC1B2.1090603@intel.com>
+ <20150615201836.15697.27743.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
@@ -15,31 +14,26 @@ Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
 	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
 	vgoyal@redhat.com
 To: Tadeusz Struk <tadeusz.struk@intel.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:46275 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752876AbbFPGkc (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 16 Jun 2015 02:40:32 -0400
 Content-Disposition: inline
-In-Reply-To: <557FC1B2.1090603@intel.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <20150615201836.15697.27743.stgit@tstruk-mobl1>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 15, 2015 at 11:26:58PM -0700, Tadeusz Struk wrote:
-> On 06/15/2015 05:37 PM, Herbert Xu wrote:
-> >>  config CRYPTO_MANAGER
-> >> >  	tristate "Cryptographic algorithm manager"
-> >> >  	select CRYPTO_MANAGER2
-> >> > +	select CRYPTO_AKCIPHER
-> > Please add this to CRYPTO_MANAGER2 instead.
+On Mon, Jun 15, 2015 at 01:18:36PM -0700, Tadeusz Struk wrote:
+> Added a mpi_read_buf() helper function to export MPI to a buf provided by
+> the user, and a mpi_get_size() helper, that tells the user how big the buf is.
+> Changed mpi_free to use kzfree instead of kfree because it is used to free
+> crypto keys.
 > 
-> This causes a recursive dependency error
-> 
-> crypto/Kconfig:115:error: recursive dependency detected!
-> crypto/Kconfig:115:	symbol CRYPTO_MANAGER2 default value contains CRYPTO_ALGAPI
-> crypto/Kconfig:34:	symbol CRYPTO_ALGAPI is selected by CRYPTO_AKCIPHER
-> crypto/Kconfig:94:	symbol CRYPTO_AKCIPHER is selected by CRYPTO_MANAGER2
+> Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
 
-That's because you need to split AKCIPHER into AKCIPHER and
-AKCIPHER2 just like every other type.
-
-Cheers,
+Patch applied.  Thanks!
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
