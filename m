@@ -1,9 +1,8 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 0/8] crypto: aead - Convert gcm to new interface
-Date: Tue, 16 Jun 2015 13:45:51 +0800
-Message-ID: <20150616054551.GA21524@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [v2 PATCH 1/8] crypto: testmgr - Disable rfc4543 test
+Date: Tue, 16 Jun 2015 13:54:16 +0800
+Message-ID: <E1Z4jpA-0005cY-VT@gondolin.me.apana.org.au>
+References: <20150616054551.GA21524@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	"Leonidas S. Barbosa" <leosilva@linux.vnet.ibm.com>,
 	Fionnuala Gunter <fin@linux.vnet.ibm.com>,
@@ -12,33 +11,34 @@ To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
 	jinyanjiang@gmail.com, Kim Phillips <kim.phillips@freescale.com>,
 	Tudor Ambarus <tudor.ambarus@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:38953 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:37458 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752145AbbFPFp6 (ORCPT
+	with ESMTP id S1751183AbbFPFyW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Jun 2015 01:45:58 -0400
-Content-Disposition: inline
+	Tue, 16 Jun 2015 01:54:22 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Changes since v1:
+Because the old rfc4543 implementation always injected an IV into
+the AD, while the new one does not, we have to disable the test
+while it is converted over to the new AEAD interface.
 
-* Fixed various bugs in caam conversion.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-Original description:
+ crypto/testmgr.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This series converts various GCM implementations to the new AEAD
-interface.  The main changes are that the IV must no longer be
-manually added to the AD for rfc4543, and that both src/dst now
-contain space at the head equal to assoclen, but only src has
-the actual AD.
-
-Note that I don't have hardware to test anything but generic
-GCM and aesni, so you guys will have to test the rest of it
-for me.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index ccd19cf..009714d 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3372,7 +3372,7 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 			}
+ 		}
+ 	}, {
+-		.alg = "rfc4543(gcm(aes))",
++		.alg = "rfc4543(gcm(aes))-disabled",
+ 		.test = alg_test_aead,
+ 		.suite = {
+ 			.aead = {
