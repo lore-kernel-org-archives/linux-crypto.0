@@ -1,152 +1,97 @@
-From: Suravee Suthikulpanit <Suravee.Suthikulpanit@amd.com>
-Subject: Re: [V6 PATCH 0/7] ACPI: Introduce support for _CCA object
-Date: Mon, 15 Jun 2015 22:45:35 -0500
-Message-ID: <557F9BDF.9090201@amd.com>
-References: <1433952538-22455-1-git-send-email-Suravee.Suthikulpanit@amd.com>
- <29279491.10zZbufEv8@vostro.rjw.lan>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH RFC 01/11] crypto: caam - Add cache coherency support
+Date: Tue, 16 Jun 2015 11:29:04 +0800
+Message-ID: <20150616032904.GA20116@gondor.apana.org.au>
+References: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
+ <1434412379-11623-2-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <lenb@kernel.org>, <catalin.marinas@arm.com>,
-	<will.deacon@arm.com>, <thomas.lendacky@amd.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<arnd@arndb.de>, <kashyap.desai@avagotech.com>,
-	<sumit.saxena@avagotech.com>, <uday.lingala@avagotech.com>,
-	<vinholikatti@gmail.com>, <msalter@redhat.com>,
-	<hanjun.guo@linaro.org>, <al.stone@linaro.org>,
-	<grant.likely@linaro.org>, <leo.duran@amd.com>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<linux-acpi@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linaro-acpi@lists.linaro.org>, <netdev@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>
-To: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, horia.geanta@freescale.com,
+	ruchika.gupta@freescale.com
+To: Victoria Milhoan <vicki.milhoan@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bn1bbn0109.outbound.protection.outlook.com ([157.56.111.109]:1848
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750996AbbFPDob (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 23:44:31 -0400
-In-Reply-To: <29279491.10zZbufEv8@vostro.rjw.lan>
+Received: from helcar.hengli.com.au ([209.40.204.226]:56881 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750763AbbFPDvK (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Jun 2015 23:51:10 -0400
+Content-Disposition: inline
+In-Reply-To: <1434412379-11623-2-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Thank you.
+On Mon, Jun 15, 2015 at 04:52:49PM -0700, Victoria Milhoan wrote:
+> Freescale i.MX6 ARM platforms do not support hardware cache coherency.  This
+> patch adds cache coherency support to the CAAM driver.
+> 
+> Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
 
-Suravee
+What about caamalg.c?
 
-On 6/15/15 18:24, Rafael J. Wysocki wrote:
-> On Wednesday, June 10, 2015 11:08:51 AM Suravee Suthikulpanit wrote:
->> This patch series introduce support for _CCA object, which is currently
->> used mainly by ARM64 platform to specify DMA coherency attribute for
->> devices when booting with ACPI.
->>
->> A copy of ACPIv6 can be found here:
->>      http://www.uefi.org/sites/default/files/resources/ACPI_6.0.pdf
->>
->> This patch also introduces a new APIS:
->>      1. acpi_check_dma() as part of ACPI API.
->>      2. device_dma_is_coherent() as part of unified device property API.
->>
->> This simplifies the logic in device drivers to determine device coherency
->> attribute regardless of booting with DT vs ACPI.
->>
->> This has been tested on AMD-Seattle platform, which implements _CCA
->> object as described in the AMD Opteron A1100 Series Processor ACPI Porting Guide:
->>
->> http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2012/10/Seattle_ACPI_Guide.pdf
->>
->> Changes from V5 (https://lkml.org/lkml/2015/5/20/1033):
->>      * Fix build error in the megaraid and ufs driver
->>        (reported by Mark Salter)
->>
->> Changes from V4 (https://lkml.org/lkml/2015/5/15/669):
->>      * Patch1:
->>        - Move the arch_setup_dma_ops() call from acpi_create_platform_device()
->>          to acpi_bind_one() to support other bus types (per Rafael).
->>        - Rename acpi_device_flags.is_coherent to acpi_device_flags.coherent_dma.
->>          (per Rafael)
->>        - Refactor acpi_dma_is_supported() and acpi_dma_is_coherent() to
->>          acpi_check_dma() to simplify the new interface.
->>        - Only support _CCA=1 for now. See acpi_check_dma() (per Arnd and Catalin)
->>      * Patch2:
->>        - Add acked-by Catalin.
->>      * Patch3:
->>        - Use ACPI_COMPANION() instead of acpi_node().
->>        - Remove has_acpi_companion() check since already done by acpi_node().
->>          (per Will)
->>      * Remove the patch "Generic function for setting up PCI device DMA coherency"
->>        introduced in V4. (per Bjorn)
->>
->> Changes from V3 (https://lkml.org/lkml/2015/5/7/1004):
->>      * Remove ARCH64_SUPPORT_ACPI_CCA_ZERO and just use CONFIG_ARM64.
->>        (per Catalin and Rafael)
->>      * Do not need to call arch_setup_dma_ops() for acpi_device->dev.
->>        (per Rafael)
->>      * [3/6] (New) We also need to call arch_setup_dma_ops() for pci
->>        devices and check the CCA of the host bridge. Similar logic
->>        exists for OF. So, I refactor of_pci_dma_configure() to
->>        the more generic version pci_dma_configure(), and add support
->>        for ACPI.
->>
->> Changes from V2 (https://lkml.org/lkml/2015/5/5/510):
->>      * Reword ACPI_MUST_HAVE_CCA to ACPI_CCA_REQUIRED (per Rafael)
->>      * Reword ACPI_SUPPORT_CCA_ZERO to ARCH64_SUPPORT_ACPI_CCA_ZERO
->>        (per Rafael and Arnd)
->>      * Misc code styling clean up (per Rafael)
->>      * Only print missing _CCA warning message in debug mode.
->>      * Refactor logic in acpi_setup_device_dma() into
->>        if acpi_dma_is_supported() then call arch_setup_dma_ops().
->>      * Do not allocate device dma_mask if !acpi_dma_is_supported()
->>        (per Arnd).
->>      * Re-use the dummy functions with the same signature.
->>
->> Changes from V1 (https://lkml.org/lkml/2015/4/29/290):
->>      * Remove supports for 32-bit ARM since doesn't currently
->>        supporting ACPI (Per Catalin suggestions.)
->>      * Do not call arch_setup_dma_ops() and when _CCA is missing.
->>        (per Arnd suggestion)
->>      * Add CONFIG_ACPI_SUPPORT_CCA_ZERO kernel config flag to
->>        allow architectures to specify the behavior when _CCA=0.
->>      * Add dummy_dma_ops for ARM64 (per Catalin suggestions).
->>      * Fixed build error when ACPI is not configured by defining
->>        acpi_dma_is_coherent() for when CONFIG_ACPI is not set.
->>      * Introduce device_dma_is_coherent().
->>      * Use device_dma_is_coherent in crypto/ccp and amd-xgbe driver.
->>
->> Changes from RFC: (https://lkml.org/lkml/2015/4/1/389)
->>      * New logic for deriving and propagating coherent attribute from
->>        parent devices. (by Mark)
->>      * Introducing acpi_dma_is_coherent() API (Per Tom suggestion)
->>      * Introducing CONFIG_ACPI_MUST_HAVE_CCA kernel configuration.
->>      * Rebased to linux-4.1-rc1
->>
->> Suravee Suthikulpanit (7):
->>    ACPI / scan: Parse _CCA and setup device coherency
->>    arm64 : Introduce support for ACPI _CCA object
->>    device property: Introduces device_dma_is_coherent()
->>    crypto: ccp - Unify coherency checking logic with
->>      device_dma_is_coherent()
->>    amd-xgbe: Unify coherency checking logic with device_dma_is_coherent()
->>    megaraid_sas: fix TRUE and FALSE re-define build error
->>    ufs: fix TRUE and FALSE re-define build error
->>
->>   arch/arm64/Kconfig                        |  1 +
->>   arch/arm64/include/asm/dma-mapping.h      | 18 +++++-
->>   arch/arm64/mm/dma-mapping.c               | 92 +++++++++++++++++++++++++++++++
->>   drivers/acpi/Kconfig                      |  3 +
->>   drivers/acpi/acpi_platform.c              |  2 +-
->>   drivers/acpi/glue.c                       |  5 ++
->>   drivers/acpi/scan.c                       | 35 ++++++++++++
->>   drivers/base/property.c                   | 14 +++++
->>   drivers/crypto/ccp/ccp-platform.c         | 60 +-------------------
->>   drivers/net/ethernet/amd/xgbe/xgbe-main.c | 27 +--------
->>   drivers/scsi/megaraid/megaraid_sas_fp.c   |  8 +++
->>   drivers/scsi/ufs/unipro.h                 |  8 +++
->>   include/acpi/acpi_bus.h                   | 37 ++++++++++++-
->>   include/linux/acpi.h                      |  5 ++
->>   include/linux/property.h                  |  2 +
->>   15 files changed, 228 insertions(+), 89 deletions(-)
->
-> I've queued up the series for 4.2, thanks!
->
->
+> @@ -807,7 +815,7 @@ static int ahash_update_ctx(struct ahash_request *req)
+>  		 * allocate space for base edesc and hw desc commands,
+>  		 * link tables
+>  		 */
+> -		edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
+> +		edesc = kzalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
+
+Please put this into a separate patch as it appears to have nothing
+to do with the change description.
+
+> @@ -351,12 +381,22 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+>  
+>  	jrp->inpring[jrp->inp_ring_write_index] = desc_dma;
+>  
+> +	dma_sync_single_for_device(dev, inpbusaddr,
+> +					sizeof(dma_addr_t) * JOBR_DEPTH,
+> +					DMA_TO_DEVICE);
+> +
+>  	smp_wmb();
+
+While you're at it can you add a comment regarding what this
+barrier is meant to protect?
+
+>  	jrp->inp_ring_write_index = (jrp->inp_ring_write_index + 1) &
+>  				    (JOBR_DEPTH - 1);
+>  	jrp->head = (head + 1) & (JOBR_DEPTH - 1);
+>  
+> +	/*
+> +	 * Ensure that all job information has been written before
+> +	 * notifying CAAM that a new job was added to the input ring.
+> +	 */
+> +	wmb();
+> +
+>  	wr_reg32(&jrp->rregs->inpring_jobadd, 1);
+>  
+>  	spin_unlock_bh(&jrp->inplock);
+> diff --git a/drivers/crypto/caam/key_gen.c b/drivers/crypto/caam/key_gen.c
+> index e1eaf4f..6481f71 100644
+> --- a/drivers/crypto/caam/key_gen.c
+> +++ b/drivers/crypto/caam/key_gen.c
+> @@ -71,6 +71,7 @@ int gen_split_key(struct device *jrdev, u8 *key_out, int split_key_len,
+>  	}
+>  
+>  	init_job_desc(desc, 0);
+> +
+>  	append_key(desc, dma_addr_in, keylen, CLASS_2 | KEY_DEST_CLASS_REG);
+
+Please remove this unrelated hunk.
+
+> diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
+> index 3b91821..6365585 100644
+> --- a/drivers/crypto/caam/sg_sw_sec4.h
+> +++ b/drivers/crypto/caam/sg_sw_sec4.h
+> @@ -98,6 +98,7 @@ static int dma_map_sg_chained(struct device *dev, struct scatterlist *sg,
+>  	} else {
+>  		dma_map_sg(dev, sg, nents, dir);
+>  	}
+> +
+>  	return nents;
+
+Ditto
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
