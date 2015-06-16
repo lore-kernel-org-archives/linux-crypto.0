@@ -1,7 +1,8 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH v5 00/14] crypto: add a new driver for Marvell's CESA
-Date: Tue, 16 Jun 2015 11:58:54 +0200
-Message-ID: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH v5 02/14] crypto: mv_cesa: use gen_pool to reserve the SRAM memory region
+Date: Tue, 16 Jun 2015 11:58:56 +0200
+Message-ID: <1434448748-10828-3-git-send-email-boris.brezillon@free-electrons.com>
+References: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
 Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Arnaud Ebalard <arno@natisbad.org>,
 	Tawfik Bayouk <tawfik@marvell.com>,
@@ -24,116 +25,220 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:56451 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:56486 "EHLO
 	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932188AbbFPJ7X (ORCPT
+	with ESMTP id S932222AbbFPJ7Z (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Jun 2015 05:59:23 -0400
+	Tue, 16 Jun 2015 05:59:25 -0400
+In-Reply-To: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+The mv_cesa driver currently expects the SRAM memory region to be passed
+as a platform device resource.
 
-This patch series adds a new driver supporting Marvell's CESA IP.
-This driver addresses some limitations of the existing one.
->From a performance and CPU load point of view the most important
-limitation in the existing driver is the lack of DMA support, thus
-preventing us from chaining crypto operations.
+This approach implies two drawbacks:
+- the DT representation is wrong
+- the only one that can access the SRAM is the crypto engine
 
-I know we usually try to adapt existing drivers instead of replacing them
-by new ones, but after trying to refactor the mv_cesa driver I realized it
-would take longer than writing an new one from scratch.
+The last point is particularly annoying in some cases: for example on
+armada 370, a small region of the crypto SRAM is used to implement the
+cpuidle, which means you would not be able to enable both cpuidle and the
+CESA driver.
 
-Here are the main features brought by this new driver:
-- support for armada SoCs (up to 38x) while keeping support for older ones
-  (Orion and Kirkwood). Note that old DT bindings (those used on Orion and
-  Kirkwood platforms) are supported, or IOTW, old DTs are compatible with
-  this new driver.
-- DMA mode to offload the CPU in case of intensive crypto usage
-- new algorithms: SHA256, DES and 3DES
+To address that problem, we explicitly define the SRAM device in the DT
+and then reference the sram node from the crypto engine node.
 
-I'd like to thank Arnaud, who has carefully reviewed several iterations of
-this driver, helped me improved my implementation, provided support for
-several crypto algorithms, provided support for armada-370 and tested
-the driver on different platforms, hence the SoB and dual MODULE_AUTHOR
-in the driver code.
+Also note that the old way of retrieving the SRAM memory region is still
+supported, or in other words, backward compatibility is preserved.
 
-In this version I dropped the DT changes, but you'll find them in my
-cesa-v4 branch [1]. In this branch you'll find everything you need to
-test on all Marvell platforms (including the old ones).
-I'll post a series updating all the DTs once this driver has been merged.
+Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+---
+ .../devicetree/bindings/crypto/mv_cesa.txt         | 24 ++++++---
+ drivers/crypto/Kconfig                             |  1 +
+ drivers/crypto/mv_cesa.c                           | 58 ++++++++++++++++------
+ 3 files changed, 60 insertions(+), 23 deletions(-)
 
-Best Regards,
-
-Boris
-
-[1]https://github.com/bbrezillon/linux-marvell/tree/cesa-v5
-
-Changes since v4:
-- fix the dma_map_sg return code check
-- add import/export functions to all HMAC algos
-- update the passed IV when handling cipher requests
-- properly handle requests in the crypto queue backlog
-- use sg_nents_for_len
-
-Changes since v3:
-- add import functions for hash algorithms
-- patch mv_cesa driver to support the new DT bindings
-- few fixes in the documentation
-- replace mv_mbus_dram_info() call by mv_mbus_dram_info_nooverlap()
-- remove DT updates from the series
-
-Changes since v2:
-- fixes in the cipher code (->dst_nents was assigned the ->src_nents
-  value and CBC state was overwritten by the IV after each chunk
-  operation)
-- spit the code as suggested by Sebastian
-
-Changes since v1:
-- (suggested by Jason) kept the existing CESA driver and added a mechanism
-  to prevent the new driver from probing devices handled my the existing
-  one (Orion and Kirkwood platforms)
-- (reported by Paul) addressed a few Kconfig and module definition issues
-- (suggested by Andrew) added DT changes to the series
-
-Arnaud Ebalard (4):
-  crypto: marvell/CESA: add Triple-DES support
-  crypto: marvell/CESA: add MD5 support
-  crypto: marvell/CESA: add SHA256 support
-  crypto: marvell/CESA: add support for Kirkwood and Dove SoCs
-
-Boris Brezillon (10):
-  crypto: mv_cesa: document the clocks property
-  crypto: mv_cesa: use gen_pool to reserve the SRAM memory region
-  crypto: mv_cesa: explicitly define kirkwood and dove compatible
-    strings
-  crypto: add a new driver for Marvell's CESA
-  crypto: marvell/CESA: add TDMA support
-  crypto: marvell/CESA: add DES support
-  crypto: marvell/CESA: add support for all armada SoCs
-  crypto: marvell/CESA: add allhwsupport module parameter
-  crypto: marvell/CESA: add support for Orion SoCs
-  crypto: marvell/CESA: add DT bindings documentation
-
- .../devicetree/bindings/crypto/marvell-cesa.txt    |   45 +
- .../devicetree/bindings/crypto/mv_cesa.txt         |   31 +-
- drivers/crypto/Kconfig                             |   18 +
- drivers/crypto/Makefile                            |    1 +
- drivers/crypto/marvell/Makefile                    |    2 +
- drivers/crypto/marvell/cesa.c                      |  548 ++++++++
- drivers/crypto/marvell/cesa.h                      |  791 +++++++++++
- drivers/crypto/marvell/cipher.c                    |  784 +++++++++++
- drivers/crypto/marvell/hash.c                      | 1441 ++++++++++++++++++++
- drivers/crypto/marvell/tdma.c                      |  224 +++
- drivers/crypto/mv_cesa.c                           |   60 +-
- 11 files changed, 3921 insertions(+), 24 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/marvell-cesa.txt
- create mode 100644 drivers/crypto/marvell/Makefile
- create mode 100644 drivers/crypto/marvell/cesa.c
- create mode 100644 drivers/crypto/marvell/cesa.h
- create mode 100644 drivers/crypto/marvell/cipher.c
- create mode 100644 drivers/crypto/marvell/hash.c
- create mode 100644 drivers/crypto/marvell/tdma.c
-
+diff --git a/Documentation/devicetree/bindings/crypto/mv_cesa.txt b/Documentation/devicetree/bindings/crypto/mv_cesa.txt
+index eaa2873..13b8fc5 100644
+--- a/Documentation/devicetree/bindings/crypto/mv_cesa.txt
++++ b/Documentation/devicetree/bindings/crypto/mv_cesa.txt
+@@ -2,21 +2,29 @@ Marvell Cryptographic Engines And Security Accelerator
+ 
+ Required properties:
+ - compatible : should be "marvell,orion-crypto"
+-- reg : base physical address of the engine and length of memory mapped
+-        region, followed by base physical address of sram and its memory
+-        length
+-- reg-names : "regs" , "sram";
+-- interrupts : interrupt number
++- reg: base physical address of the engine and length of memory mapped
++       region. Can also contain an entry for the SRAM attached to the CESA,
++       but this representation is deprecated and marvell,crypto-srams should
++       be used instead
++- reg-names: "regs". Can contain an "sram" entry, but this representation
++	     is deprecated and marvell,crypto-srams should be used instead
++- interrupts: interrupt number
+ - clocks: reference to the crypto engines clocks. This property is only
+ 	  required for Dove platforms
++- marvell,crypto-srams: phandle to crypto SRAM definitions
++
++Optional properties:
++- marvell,crypto-sram-size: SRAM size reserved for crypto operations, if not
++			    specified the whole SRAM is used (2KB)
+ 
+ Examples:
+ 
+ 	crypto@30000 {
+ 		compatible = "marvell,orion-crypto";
+-		reg = <0x30000 0x10000>,
+-		      <0x4000000 0x800>;
+-		reg-names = "regs" , "sram";
++		reg = <0x30000 0x10000>;
++		reg-names = "regs";
+ 		interrupts = <22>;
++		marvell,crypto-srams = <&crypto_sram>;
++		marvell,crypto-sram-size = <0x600>;
+ 		status = "okay";
+ 	};
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 033c0c8..a6bbea8 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -166,6 +166,7 @@ config CRYPTO_DEV_MV_CESA
+ 	select CRYPTO_AES
+ 	select CRYPTO_BLKCIPHER2
+ 	select CRYPTO_HASH
++	select SRAM
+ 	help
+ 	  This driver allows you to utilize the Cryptographic Engines and
+ 	  Security Accelerator (CESA) which can be found on the Marvell Orion
+diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
+index 27b2373..a4c8637 100644
+--- a/drivers/crypto/mv_cesa.c
++++ b/drivers/crypto/mv_cesa.c
+@@ -9,6 +9,7 @@
+ #include <crypto/aes.h>
+ #include <crypto/algapi.h>
+ #include <linux/crypto.h>
++#include <linux/genalloc.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+ #include <linux/kthread.h>
+@@ -29,6 +30,8 @@
+ #define MAX_HW_HASH_SIZE	0xFFFF
+ #define MV_CESA_EXPIRE		500 /* msec */
+ 
++#define MV_CESA_DEFAULT_SRAM_SIZE	2048
++
+ /*
+  * STM:
+  *   /---------------------------------------\
+@@ -83,6 +86,8 @@ struct req_progress {
+ struct crypto_priv {
+ 	void __iomem *reg;
+ 	void __iomem *sram;
++	struct gen_pool *sram_pool;
++	dma_addr_t sram_dma;
+ 	int irq;
+ 	struct clk *clk;
+ 	struct task_struct *queue_th;
+@@ -1019,6 +1024,39 @@ static struct ahash_alg mv_hmac_sha1_alg = {
+ 		 }
+ };
+ 
++static int mv_cesa_get_sram(struct platform_device *pdev,
++			    struct crypto_priv *cp)
++{
++	struct resource *res;
++	u32 sram_size = MV_CESA_DEFAULT_SRAM_SIZE;
++
++	of_property_read_u32(pdev->dev.of_node, "marvell,crypto-sram-size",
++			     &sram_size);
++
++	cp->sram_size = sram_size;
++	cp->sram_pool = of_get_named_gen_pool(&pdev->dev.of_node,
++					      "marvell,crypto-srams", 0);
++	if (cp->sram_pool) {
++		cp->sram = gen_pool_dma_alloc(cp->sram_pool, sram_size,
++					      &cp->sram_dma);
++		if (cp->sram)
++			return 0;
++
++		return -ENOMEM;
++	}
++
++	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
++					   "sram");
++	if (!res || resource_size(res) < cp->sram_size)
++		return -EINVAL;
++
++	cp->sram = devm_ioremap_resource(&pdev->dev, res);
++	if (IS_ERR(cp->sram))
++		return PTR_ERR(cp->sram);
++
++	return 0;
++}
++
+ static int mv_probe(struct platform_device *pdev)
+ {
+ 	struct crypto_priv *cp;
+@@ -1047,18 +1085,11 @@ static int mv_probe(struct platform_device *pdev)
+ 		goto err;
+ 	}
+ 
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "sram");
+-	if (!res) {
+-		ret = -ENXIO;
++	ret = mv_cesa_get_sram(pdev, cp);
++	if (ret)
+ 		goto err;
+-	}
+-	cp->sram_size = resource_size(res);
++
+ 	cp->max_req_size = cp->sram_size - SRAM_CFG_SPACE;
+-	cp->sram = ioremap(res->start, cp->sram_size);
+-	if (!cp->sram) {
+-		ret = -ENOMEM;
+-		goto err;
+-	}
+ 
+ 	if (pdev->dev.of_node)
+ 		irq = irq_of_parse_and_map(pdev->dev.of_node, 0);
+@@ -1066,7 +1097,7 @@ static int mv_probe(struct platform_device *pdev)
+ 		irq = platform_get_irq(pdev, 0);
+ 	if (irq < 0 || irq == NO_IRQ) {
+ 		ret = irq;
+-		goto err_unmap_sram;
++		goto err;
+ 	}
+ 	cp->irq = irq;
+ 
+@@ -1076,7 +1107,7 @@ static int mv_probe(struct platform_device *pdev)
+ 	cp->queue_th = kthread_run(queue_manag, cp, "mv_crypto");
+ 	if (IS_ERR(cp->queue_th)) {
+ 		ret = PTR_ERR(cp->queue_th);
+-		goto err_unmap_sram;
++		goto err;
+ 	}
+ 
+ 	ret = request_irq(irq, crypto_int, 0, dev_name(&pdev->dev),
+@@ -1134,8 +1165,6 @@ err_irq:
+ 	}
+ err_thread:
+ 	kthread_stop(cp->queue_th);
+-err_unmap_sram:
+-	iounmap(cp->sram);
+ err:
+ 	kfree(cp);
+ 	cpg = NULL;
+@@ -1155,7 +1184,6 @@ static int mv_remove(struct platform_device *pdev)
+ 	kthread_stop(cp->queue_th);
+ 	free_irq(cp->irq, cp);
+ 	memset(cp->sram, 0, cp->sram_size);
+-	iounmap(cp->sram);
+ 
+ 	if (!IS_ERR(cp->clk)) {
+ 		clk_disable_unprepare(cp->clk);
 -- 
 1.9.1
