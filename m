@@ -1,60 +1,42 @@
-From: Victoria Milhoan <vicki.milhoan@freescale.com>
-Subject: [PATCH RFC 05/11] crypto: caam - Add cache coherency support to Freescale CAAM scatterlist implementation
-Date: Mon, 15 Jun 2015 16:52:53 -0700
-Message-ID: <1434412379-11623-6-git-send-email-vicki.milhoan@freescale.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH RFC 00/11] crypto: caam - Add i.MX6 support to the
+ Freescale CAAM driver
+Date: Tue, 16 Jun 2015 08:34:18 +0800
+Message-ID: <20150616003418.GA18047@gondor.apana.org.au>
 References: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Cc: <herbert@gondor.apana.org.au>, <horia.geanta@freescale.com>,
-	<ruchika.gupta@freescale.com>
-To: <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, horia.geanta@freescale.com,
+	ruchika.gupta@freescale.com,
+	Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+	Sascha Hauer <kernel@pengutronix.de>,
+	Russell King - ARM Linux <linux@arm.linux.org.uk>,
+	Jon Nettleton <jon.nettleton@gmail.com>
+To: Victoria Milhoan <vicki.milhoan@freescale.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0101.outbound.protection.outlook.com ([65.55.169.101]:22978
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750730AbbFPA0e (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 20:26:34 -0400
+Received: from helcar.hengli.com.au ([209.40.204.226]:52968 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750717AbbFPAeW (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Mon, 15 Jun 2015 20:34:22 -0400
+Content-Disposition: inline
 In-Reply-To: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add cache coherency support to the CAAM scatterlist implementation.
+On Mon, Jun 15, 2015 at 04:52:48PM -0700, Victoria Milhoan wrote:
+> This patch series adds i.MX6 support to the Freescale CAAM driver. Please use
+> these patches with the understanding that changes may occur. The patches are
+> provided for review at this time, in order to incur comments for permanent
+> inclusion. 
 
-Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
----
- drivers/crypto/caam/sg_sw_sec4.h | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+How timely :) Please have a look at this thread and chime in if
+you wish to add anything:
 
-diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-index 6365585..6730b01 100644
---- a/drivers/crypto/caam/sg_sw_sec4.h
-+++ b/drivers/crypto/caam/sg_sw_sec4.h
-@@ -91,9 +91,14 @@ static int dma_map_sg_chained(struct device *dev, struct scatterlist *sg,
- {
- 	if (unlikely(chained)) {
- 		int i;
-+	struct scatterlist *tsg = sg;
-+
-+	/* We use a local copy of the sg pointer to avoid moving the
-+	 * head of the list pointed to by sg as we wall the list.
-+	 */
- 		for (i = 0; i < nents; i++) {
--			dma_map_sg(dev, sg, 1, dir);
--			sg = sg_next(sg);
-+			dma_map_sg(dev, tsg, 1, dir);
-+			tsg = scatterwalk_sg_next(tsg);
- 		}
- 	} else {
- 		dma_map_sg(dev, sg, nents, dir);
-@@ -106,6 +111,9 @@ static int dma_unmap_sg_chained(struct device *dev, struct scatterlist *sg,
- 				unsigned int nents, enum dma_data_direction dir,
- 				bool chained)
- {
-+	if ((dir == DMA_FROM_DEVICE) || (dir == DMA_BIDIRECTIONAL))
-+		dma_sync_sg_for_cpu(dev, sg, nents, dir);
-+
- 	if (unlikely(chained)) {
- 		int i;
- 		for (i = 0; i < nents; i++) {
+https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg14890.html
+
+Thanks,
 -- 
-2.1.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
