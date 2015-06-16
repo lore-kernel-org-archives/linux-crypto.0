@@ -1,117 +1,153 @@
-From: Victoria Milhoan <Vicki.Milhoan@freescale.com>
-Subject: RE: [BUG?] crypto: caam: little/big endianness on ARM vs PPC
-Date: Tue, 16 Jun 2015 16:00:05 +0000
-Message-ID: <BLUPR03MB3919867FF4AEF8D19139504E9A70@BLUPR03MB391.namprd03.prod.outlook.com>
-References: <20150615155907.GC7947@pengutronix.de>
-	<20150615220506.GA15134@gondor.apana.org.au>
-	<BLUPR03MB391FCCC8B9AC019A0C8DA04E9A70@BLUPR03MB391.namprd03.prod.outlook.com>
- <CALHpu35h7H30QbY3nrp-hXcwodYWjzMBQddz3KCTVOV4+Wcp5Q@mail.gmail.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH RFC v7 0/3] crypto: Introduce Public Key Encryption API
+Date: Tue, 16 Jun 2015 10:30:50 -0700
+Message-ID: <20150616173050.1248.21847.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Ruchika Gupta <ruchika.gupta@freescale.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kernel@pengutronix.de" <kernel@pengutronix.de>,
-	Geanta Neag Horia <Horia.Geanta@freescale.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-To: Jon Nettleton <jon.nettleton@gmail.com>
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
+	jwboyer@redhat.com, smueller@chronox.de, richard@nod.at,
+	tadeusz.struk@intel.com, steved@redhat.com, qat-linux@intel.com,
+	dhowells@redhat.com, linux-crypto@vger.kernel.org,
+	james.l.morris@oracle.com, jkosina@suse.cz,
+	zohar@linux.vnet.ibm.com, davem@davemloft.net, vgoyal@redhat.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-bl2on0107.outbound.protection.outlook.com ([65.55.169.107]:27408
-	"EHLO na01-bl2-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753596AbbFPQAJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Jun 2015 12:00:09 -0400
-In-Reply-To: <CALHpu35h7H30QbY3nrp-hXcwodYWjzMBQddz3KCTVOV4+Wcp5Q@mail.gmail.com>
-Content-Language: en-US
+Received: from mga14.intel.com ([192.55.52.115]:62566 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756440AbbFPRa4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 16 Jun 2015 13:30:56 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Sm9uLA0KDQpUaGUgcGF0Y2hlcyBwdWJsaXNoZWQgdG8gdGhlIG1haWxpbmcgbGlzdCB5ZXN0ZXJk
-YXkgZm9yIGNvbW1lbnQgKHRpdGxlZCBjcnlwdG86IGNhYW0gLSBBZGQgaS5NWDYgc3VwcG9ydCB0
-byB0aGUgRnJlZXNjYWxlIENBQU0gZHJpdmVyKSBhcmUgYmFzZWQgb24gdGhlIHBhdGNoZXMgaW4g
-dGhlIEZyZWVzY2FsZSAzLjE0IGdpdCByZXBvc2l0b3J5IHdoaWNoIGVuYWJsZSBpLk1YNiBzdXBw
-b3J0LiBUaGUgaW5pdGlhbCBwYXRjaCBzZXQgaXMgaW50ZW5kZWQgdG8gcHJvdmlkZSBhIGZ1bmN0
-aW9uYWwgZHJpdmVyLCBiYXNlZCBvbiB0aGUgbWFpbmxpbmUga2VybmVsLCB3aGljaCBzdXBwb3J0
-cyBib3RoIFFvcklRIGFuZCBpLk1YNi4gDQoNClRoYW5rcywNClZpY3RvcmlhDQoNCi0tLS0tT3Jp
-Z2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBKb24gTmV0dGxldG9uIFttYWlsdG86am9uLm5ldHRs
-ZXRvbkBnbWFpbC5jb21dIA0KU2VudDogVHVlc2RheSwgSnVuZSAxNiwgMjAxNSAxOjExIEFNDQpU
-bzogTWlsaG9hbiBWaWN0b3JpYS1CNDIwODkNCkNjOiBIZXJiZXJ0IFh1OyBTdGVmZmVuIFRydW10
-cmFyOyBLaW0gUGhpbGxpcHM7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IEd1cHRhIFJ1
-Y2hpa2EtUjY2NDMxOyBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7IGtlcm5l
-bEBwZW5ndXRyb25peC5kZTsgR2VhbnRhIE5lYWcgSG9yaWEgSW9hbi1CMDU0NzE7IGxpbnV4LWNy
-eXB0b0B2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBbQlVHP10gY3J5cHRvOiBjYWFtOiBs
-aXR0bGUvYmlnIGVuZGlhbm5lc3Mgb24gQVJNIHZzIFBQQw0KDQpWaWN0b3JpYSwNCg0KSSB3YXMg
-aG9waW5nIHlvdSB3b3VsZCBqb2luIHRoZSBjb252ZXJzYXRpb24uICBJIGtub3cgeW91IGhhdmUg
-YSBzZXJpZXMgb2YgcGF0Y2hlcyBpbiBGcmVlc2NhbGUncyAzLjE0IGdpdCByZXBvc2l0b3J5LiAg
-SGF2ZSB5b3UgdXBkYXRlZCB0aG9zZSBmb3IgbWFpbmxpbmUgYW5kIHB1Ymxpc2hlZCB0aGVtIGZv
-ciByZXZpZXcgYW5kIGluY2x1c2lvbiBpbiB0aGUgdXBzdHJlYW0ga2VybmVsPyAgSWYgeWVzIHRv
-IGFueSBjb3VsZCB5b3UgcG9zdCBhIGxpbms/DQoNCi1Kb24NCg0KT24gVHVlLCBKdW4gMTYsIDIw
-MTUgYXQgNToyNyBBTSwgVmljdG9yaWEgTWlsaG9hbiA8Vmlja2kuTWlsaG9hbkBmcmVlc2NhbGUu
-Y29tPiB3cm90ZToNCj4gQWxsLA0KPg0KPiBGcmVlc2NhbGUgaGFzIGJlZW4gYWRkaW5nIGkuTVg2
-IHN1cHBvcnQgdG8gdGhlIENBQU0gZHJpdmVyIGFuZCB0ZXN0aW5nIG9uIGJvdGggaS5NWDYgYW5k
-IFFvcklRIHBsYXRmb3Jtcy4gVGhlIHBhdGNoIHNlcmllcyBpcyBub3cgYXZhaWxhYmxlIGZvciBy
-ZXZpZXcuIFlvdXIgZmVlZGJhY2sgZm9yIHRoZSBwcm92aWRlZCBwYXRjaGVzIGlzIGFwcHJlY2lh
-dGVkLg0KPg0KPiBUaGFua3MsDQo+IFZpY3RvcmlhDQo+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2Fn
-ZS0tLS0tDQo+IEZyb206IGxpbnV4LWNyeXB0by1vd25lckB2Z2VyLmtlcm5lbC5vcmcgDQo+IFtt
-YWlsdG86bGludXgtY3J5cHRvLW93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEhl
-cmJlcnQgWHUNCj4gU2VudDogTW9uZGF5LCBKdW5lIDE1LCAyMDE1IDM6MDUgUE0NCj4gVG86IFN0
-ZWZmZW4gVHJ1bXRyYXINCj4gQ2M6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IA0KPiBs
-aW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7IGxpbnV4LWNyeXB0b0B2Z2VyLmtl
-cm5lbC5vcmc7IA0KPiBHdXB0YSBSdWNoaWthLVI2NjQzMTsga2VybmVsQHBlbmd1dHJvbml4LmRl
-OyBHZWFudGEgTmVhZyBIb3JpYSANCj4gSW9hbi1CMDU0NzE7IEtpbSBQaGlsbGlwcw0KPiBTdWJq
-ZWN0OiBSZTogW0JVRz9dIGNyeXB0bzogY2FhbTogbGl0dGxlL2JpZyBlbmRpYW5uZXNzIG9uIEFS
-TSB2cyBQUEMNCj4NCj4gT24gTW9uLCBKdW4gMTUsIDIwMTUgYXQgMDU6NTk6MDdQTSArMDIwMCwg
-U3RlZmZlbiBUcnVtdHJhciB3cm90ZToNCj4+IEhpIQ0KPj4NCj4+IEknbSB3b3JraW5nIG9uIENB
-QU0gc3VwcG9ydCBmb3IgdGhlIEFSTS1iYXNlZCBpLk1YNiBTb0NzLiBUaGUgY3VycmVudCANCj4+
-IGRyaXZlcnMvY3J5cHRvL2NhYW0gZHJpdmVyIG9ubHkgd29ya3MgZm9yIFBvd2VyUEMgQUZBSUsu
-DQo+PiBBY3R1YWxseSwgdGhlcmUgaXNuJ3QgdGhhdCBtdWNoIHRvIGRvLCB0byBnZXQgc3VwcG9y
-dCBmb3IgdGhlIGkuTVg2IA0KPj4gYnV0IG9uZSBwYXRjaCBicmVha3MgdGhlIGRyaXZlciBzZXZl
-cmVseToNCj4+DQo+PiAgICAgICBjb21taXQgZWY5NGIxZDgzNGFhY2U3MTAxZGU3N2MzYTdjMjYz
-MWI5YWU5YzVmNg0KPj4gICAgICAgY3J5cHRvOiBjYWFtIC0gQWRkIGRlZmluaXRpb24gb2YgcmQv
-d3JfcmVnNjQgZm9yIGxpdHRsZSBlbmRpYW4gDQo+PiBwbGF0Zm9ybQ0KPj4NCj4+IFRoaXMgcGF0
-Y2ggYWRkcw0KPj4NCj4+ICsjaWZkZWYgX19MSVRUTEVfRU5ESUFODQo+PiArc3RhdGljIGlubGlu
-ZSB2b2lkIHdyX3JlZzY0KHU2NCBfX2lvbWVtICpyZWcsIHU2NCBkYXRhKSB7DQo+PiArICAgICB3
-cl9yZWczMigodTMyIF9faW9tZW0gKilyZWcgKyAxLCAoZGF0YSAmIDB4ZmZmZmZmZmYwMDAwMDAw
-MHVsbCkgPj4gMzIpOw0KPj4gKyAgICAgd3JfcmVnMzIoKHUzMiBfX2lvbWVtICopcmVnLCBkYXRh
-ICYgMHgwMDAwMDAwMGZmZmZmZmZmdWxsKTsgfQ0KPj4NCj4+IFRoZSB3cl9yZWc2NCBmdW5jdGlv
-biBpcyBvbmx5IHVzZWQgaW4gb25lIHBsYWNlIGluIHRoZSANCj4+IGRyaXZlcnMvY3J5cHRvL2Nh
-YW0vanIuYw0KPj4gZHJpdmVyOiB0byB3cml0ZSB0aGUgZG1hX2FkZHJfdCB0byB0aGUgcmVnaXN0
-ZXIuIFdpdGhvdXQgdGhhdCBwYXRjaCANCj4+IGV2ZXJ5dGhpbmcgd29ya3MgZmluZSBvbiBBUk0g
-KGxpdHRsZSBlbmRpYW4sIDMyYml0KSwgd2l0aCB0aGF0IHBhdGNoIA0KPj4gdGhlIGRyaXZlciB3
-aWxsIHdyaXRlIDAncyBpbnRvIHRoZSByZWdpc3RlciB0aGF0IGhvbGRzIHRoZSBETUEgYWRkcmVz
-cyAodGhlIG51bWVyaWNhbGx5LWhpZ2hlcikgLT4ga2VybmVsIGhhbmdzLg0KPj4gQWxzbywgZnJv
-bSBteSB1bmRlcnN0YW5kaW5nLCB0aGUgY29tbWVudCBhYm92ZSB0aGUgZGVmaW5lcywgc3RhdGlu
-ZyANCj4+IHRoYXQgeW91IGhhdmUgdG8gZmlyc3Qgd3JpdGUgdGhlIG51bWVyaWNhbGx5LWxvd2Vy
-IGFuZCB0aGVuIHRoZSANCj4+IG51bWVyaWNhbGx5LWhpZ2hlciBhZGRyZXNzIG9uIDMyYml0IHN5
-c3RlbXMgZG9lc24ndCBtYXRjaCB3aXRoIHRoZSBpbXBsZW1lbnRhdGlvbi4NCj4+DQo+PiBXaGF0
-IEkgZG9uJ3Qga25vdy91bmRlcnN0YW5kIGlzIGlmIHRoaXMgbWFrZXMgYW55IHNlbnNlIGZvciBh
-bnkgUG93ZXJQQyBpbXBsZW1lbnRhdGlvbi4NCj4+DQo+PiBTbywgdGhlIHF1ZXN0aW9uIGlzLCBo
-b3cgdG8gZml4IHRoaXM/IEknZCBwcmVmZXIgdG8gZG8gaXQgZGlyZWN0bHkgaW4gDQo+PiB0aGUg
-anIgZHJpdmVyIGluc3RlYWQgb2YgdGhlIGlmZGVmLWVyeS4NCj4+DQo+PiBTb21ldGhpbmcgbGlr
-ZQ0KPj4gICAgICAgaWYgKHNpemVvZihkbWFfYWRkcl90KSA9PSBzaXplb2YodTMyKSkNCj4+ICAg
-ICAgICAgICAgICAgd3JfcmVnMzIoJmpycC0+cnJlZ3MtPmlucHJpbmdfYmFzZSArIDEsIGlucGJ1
-c2FkZHIpOw0KPj4gICAgICAgZWxzZSBpZiAoc2l6ZW9mKGRtYV9hZGRyX3QpID09IHNpemVvZih1
-NjQpKQ0KPj4gICAgICAgICAgICAgICB3cl9yZWc2NCguLi4pDQo+Pg0KPj4gb3IganVzdCBnbyBi
-eSBEVCBjb21wYXRpYmxlIGFuZCB0aGVuIHJlbW92ZSB0aGUgaW5saW5lIGZ1bmN0aW9uIGRlZmlu
-aXRpb25zLg0KPj4NCj4+IEFzIGZhciBhcyBJIGNhbiB0ZWxsLCB0aGUgY29tcGF0aWJsZSB3b3Vs
-ZG4ndCBiZSBuZWVkZWQgZm9yIGFueXRoaW5nIA0KPj4gZWxzZSBpbiB0aGUganIgZHJpdmVyLCBz
-byBtYXliZSB0aGF0IGlzIG5vdCBvcHRpbWFsLiBPbiB0aGUgb3RoZXIgDQo+PiBoYW5kIHRoZSBz
-aXplb2YoLi4pIHNvbHV0aW9uIHdvdWxkIG9ubHkgY2F0Y2ggbGl0dGxlIGVuZGlhbiBvbiAzMmJp
-dCANCj4+IGFuZCBub3QgYmlnIGVuZGlhbiAoPyEpIEkgaG93ZXZlciBkb24ndCBrbm93IHdoYXQg
-Y29tYmluYXRpb25zIA0KPj4gYWN0dWFsbHkNCj4+ICpoYXZlKiB0byBiZSBjYXVnaHQsIGFzIEkg
-ZG9uJ3Qga25vdywgd2hpY2ggZXhpc3QuDQo+Pg0KPj4gU28sIHdoYXQgZG8geW91IHRoaW5rIHBl
-b3BsZT8NCj4NCj4gSSdtIGFkZGluZyBhIGNvdXBsZSBvZiBDQ3MuDQo+DQo+IFRoYW5rcywNCj4g
-LS0NCj4gRW1haWw6IEhlcmJlcnQgWHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT4gSG9t
-ZSBQYWdlOiANCj4gaHR0cDovL2dvbmRvci5hcGFuYS5vcmcuYXUvfmhlcmJlcnQvDQo+IFBHUCBL
-ZXk6IGh0dHA6Ly9nb25kb3IuYXBhbmEub3JnLmF1L35oZXJiZXJ0L3B1YmtleS50eHQNCj4gLS0N
-Cj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2Ny
-aWJlIA0KPiBsaW51eC1jcnlwdG8iIGluIHRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRv
-bW9Admdlci5rZXJuZWwub3JnIA0KPiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdl
-ci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwNCj4NCj4gX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCj4gbGludXgtYXJtLWtlcm5lbCBtYWlsaW5n
-IGxpc3QNCj4gbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnDQo+IGh0dHA6Ly9s
-aXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtYXJtLWtlcm5lbA0K
+This patch set introduces a Public Key Encryption API.
+What is proposed is a new crypto type called crypto_akcipher_type,
+plus new struct akcipher_alg and struct crypto_akcipher, together with number
+of helper functions to register akcipher type algorithms and allocate
+tfm instances. This is to make it similar to how the existing crypto
+API works for the ablkcipher, ahash, and aead types.
+The operations the new interface will allow to provide are:
+
+	int (*sign)(struct akcipher_request *req);
+	int (*verify)(struct akcipher_request *req);
+	int (*encrypt)(struct akcipher_request *req);
+	int (*decrypt)(struct akcipher_request *req);
+
+The benefits it gives interface are:
+- drivers can add many implementations of RSA or DSA
+  algorithms and user will allocate instances (tfms) of these, base on
+  algorithm priority, in the same way as it is with the symmetric ciphers.
+- the new interface allows for asynchronous implementations that
+  can use crypto hardware to offload the calculations to.
+- integrating it with linux crypto api allows using all its benefits
+  i.e. managing algorithms using NETLINK_CRYPTO, monitoring implementations
+  using /proc/crypto. etc
+
+New helper functions have been added to allocate crypto_akcipher instances
+and invoke the operations to make it easier to use.
+For instance to verify a public_signature against a public_key using
+the RSA algorithm a user would do:
+
+	struct crypto_akcipher *tfm = crypto_alloc_akcipher("rsa", 0, 0);
+	struct akcipher_request *req = akcipher_request_alloc(tfm, GFP_KERNEL);
+	akcipher_request_set_crypt(req, pub_key, signature);
+	int ret = crypto_akcipher_verify(src, dst, src_len, dst_len, &res_len);
+	akcipher_request_free(req);
+	crypto_free_akcipher(tfm);
+	return ret;
+
+Changes in v7:
+ - change req->dst_len to be int instead of int *
+ - remove result_len from comments - it's not longer there
+ - use crypto_akcipher_reqtfm helper instead of __crypto_akcipher_tfm
+ - fix memleak in rsa.c
+ - change error code to -EOVERFLOW if dst buf is not big enough
+ - drop redundant cra_ctxsize inits
+ - add type-safe init/exit functions
+ - cleanup headers in rsa_helpers
+ - remove checks for NULL before mpi_free
+
+Changes in v6:
+ - in FIPS mode only allow key sizes 2K & 3K
+ - remove result_len and use dst_len as in/out param
+ - remove subtype from akcipher reports
+ - store rsa_key in tfm ctx and change ras_parse_key to take struct rsa_key
+   instead of tfm. 
+ - export rsa_free_key, which free memory allocated by ras_parse_key.
+ - split akcipher.h into public and internal with public key specific helpers
+ - remove maxsize() and set the required size in enc/dec/sign/verify instead
+ - add public key vector
+ - split AKCIPHER into AKCIPHER and AKCIPHER2 in Kconfig
+ - remove MPI patch from the series - already applied
+
+Changes in v5:
+ - make mpi_get_size() function inline.
+ - add a setkey function to the algorithm and rsa_parse_key() helper to
+   parse rsa keys from BER encoded to MPI. The helper will also validate
+   the given key if it is strong enough in case FIPS mode is enabled.
+ - change the format of the key from struct public_key * to void * BER encoded
+   buffer.
+ - change the format of the rsa keys in testmgr to BER encoded form.
+ - change mpi_free to use kzfree instead of kfree because it is used to free
+   crypto keys
+
+Changes in v4:
+ - add an rsa generic implementation
+ - don't convert the existing public_key implementation to the new interface.
+   This will be done after the new interface is accepted.
+ - add new mpi_get_buf(), mpi_copy() and mpi_get_size() mpi helpers 
+ - on set key the ftm now will clone the key instead of just setting a ptr
+ - add a check on enc/dec/sign/veryfi to make sure a valid (public or private)
+   key is setup
+ - add maxsize fn into algorith that will be used to query implementation
+   what is the max size of a result for a give public key that the user needs
+   to allocate
+ - removed private ctx from crypto_akcipher as the crypto_tfm base has one
+   already
+ - add 2K bit RSA test vectors
+ - add cipher text validation in crypto test mgr as (required for FIPS)
+
+Changes in v3:
+ - changed input and output parameters type from sgl to void *
+   and added separate src_len & dst_len - requested by Herbert Xu
+ - separated rsa implementation into cryptographic primitives and
+   left encryption scheme details outside of the algorithm implementation
+ - added SW implementation for RSA encrypt, decrypt and sign operation
+ - added RSA test vectors 
+   
+Changes in v2:
+ - remodeled not to use obsolete cra_u and crt_u unions
+ - changed type/funct names from pke_* to pkey_*
+ - retained the enum pkey_algo type for it is external to the kernel
+ - added documentation
+
+---
+Tadeusz Struk (3):
+      crypto: add PKE API
+      crypto: rsa: add a new rsa generic implementation
+      crypto: add tests vectors for RSA
+
+
+ crypto/Kconfig                     |   19 ++
+ crypto/Makefile                    |    9 +
+ crypto/akcipher.c                  |  117 ++++++++++++
+ crypto/crypto_user.c               |   22 ++
+ crypto/rsa.c                       |  316 +++++++++++++++++++++++++++++++++
+ crypto/rsa_helper.c                |  121 +++++++++++++
+ crypto/rsakey.asn1                 |    5 +
+ crypto/testmgr.c                   |  156 +++++++++++++++++
+ crypto/testmgr.h                   |  187 ++++++++++++++++++++
+ include/crypto/akcipher.h          |  340 ++++++++++++++++++++++++++++++++++++
+ include/crypto/internal/akcipher.h |   60 ++++++
+ include/crypto/internal/rsa.h      |   27 +++
+ include/linux/crypto.h             |    1 
+ include/linux/cryptouser.h         |    5 +
+ 14 files changed, 1385 insertions(+)
+ create mode 100644 crypto/akcipher.c
+ create mode 100644 crypto/rsa.c
+ create mode 100644 crypto/rsa_helper.c
+ create mode 100644 crypto/rsakey.asn1
+ create mode 100644 include/crypto/akcipher.h
+ create mode 100644 include/crypto/internal/akcipher.h
+ create mode 100644 include/crypto/internal/rsa.h
+-- 
