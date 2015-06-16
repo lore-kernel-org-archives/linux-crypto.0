@@ -1,7 +1,7 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH v5 03/14] crypto: mv_cesa: explicitly define kirkwood and dove compatible strings
-Date: Tue, 16 Jun 2015 11:58:57 +0200
-Message-ID: <1434448748-10828-4-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH v5 14/14] crypto: marvell/CESA: add DT bindings documentation
+Date: Tue, 16 Jun 2015 11:59:08 +0200
+Message-ID: <1434448748-10828-15-git-send-email-boris.brezillon@free-electrons.com>
 References: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
 Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Arnaud Ebalard <arno@natisbad.org>,
@@ -25,70 +25,73 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:56502 "EHLO
+Received: from down.free-electrons.com ([37.187.137.238]:56664 "EHLO
 	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932270AbbFPJ72 (ORCPT
+	with ESMTP id S932521AbbFPJ7q (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 16 Jun 2015 05:59:28 -0400
+	Tue, 16 Jun 2015 05:59:46 -0400
 In-Reply-To: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-We are about to add a new driver to support new features like using the
-TDMA engine to offload the CPU.
-Orion, Dove and Kirkwood platforms are already using the mv_cesa driver,
-but Orion SoCs do not embed the TDMA engine, which means we will have to
-differentiate them if we want to get TDMA support on Dove and Kirkwood.
-In the other hand, the migration from the old driver to the new one is not
-something all people are willing to do without first auditing the new
-driver.
-Hence we have to support the new compatible in the mv_cesa driver so that
-new platforms with updated DTs can still attach their crypto engine device
-to this driver.
+Add DT bindings documentation for the new marvell-cesa driver.
 
 Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 ---
- Documentation/devicetree/bindings/crypto/mv_cesa.txt | 5 ++++-
- drivers/crypto/mv_cesa.c                             | 4 +++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ .../devicetree/bindings/crypto/marvell-cesa.txt    | 45 ++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/marvell-cesa.txt
 
-diff --git a/Documentation/devicetree/bindings/crypto/mv_cesa.txt b/Documentation/devicetree/bindings/crypto/mv_cesa.txt
-index 13b8fc5..c0c35f0 100644
---- a/Documentation/devicetree/bindings/crypto/mv_cesa.txt
-+++ b/Documentation/devicetree/bindings/crypto/mv_cesa.txt
-@@ -1,7 +1,10 @@
- Marvell Cryptographic Engines And Security Accelerator
- 
- Required properties:
--- compatible : should be "marvell,orion-crypto"
+diff --git a/Documentation/devicetree/bindings/crypto/marvell-cesa.txt b/Documentation/devicetree/bindings/crypto/marvell-cesa.txt
+new file mode 100644
+index 0000000..c6c6a4a0
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/marvell-cesa.txt
+@@ -0,0 +1,45 @@
++Marvell Cryptographic Engines And Security Accelerator
++
++Required properties:
 +- compatible: should be one of the following string
 +	      "marvell,orion-crypto"
 +	      "marvell,kirkwood-crypto"
 +	      "marvell,dove-crypto"
- - reg: base physical address of the engine and length of memory mapped
-        region. Can also contain an entry for the SRAM attached to the CESA,
-        but this representation is deprecated and marvell,crypto-srams should
-diff --git a/drivers/crypto/mv_cesa.c b/drivers/crypto/mv_cesa.c
-index a4c8637..fcab963 100644
---- a/drivers/crypto/mv_cesa.c
-+++ b/drivers/crypto/mv_cesa.c
-@@ -1034,7 +1034,7 @@ static int mv_cesa_get_sram(struct platform_device *pdev,
- 			     &sram_size);
- 
- 	cp->sram_size = sram_size;
--	cp->sram_pool = of_get_named_gen_pool(&pdev->dev.of_node,
-+	cp->sram_pool = of_get_named_gen_pool(pdev->dev.of_node,
- 					      "marvell,crypto-srams", 0);
- 	if (cp->sram_pool) {
- 		cp->sram = gen_pool_dma_alloc(cp->sram_pool, sram_size,
-@@ -1197,6 +1197,8 @@ static int mv_remove(struct platform_device *pdev)
- 
- static const struct of_device_id mv_cesa_of_match_table[] = {
- 	{ .compatible = "marvell,orion-crypto", },
-+	{ .compatible = "marvell,kirkwood-crypto", },
-+	{ .compatible = "marvell,dove-crypto", },
- 	{}
- };
- MODULE_DEVICE_TABLE(of, mv_cesa_of_match_table);
++	      "marvell,armada-370-crypto"
++	      "marvell,armada-xp-crypto"
++	      "marvell,armada-375-crypto"
++	      "marvell,armada-38x-crypto"
++- reg: base physical address of the engine and length of memory mapped
++       region. Can also contain an entry for the SRAM attached to the CESA,
++       but this representation is deprecated and marvell,crypto-srams should
++       be used instead
++- reg-names: "regs". Can contain an "sram" entry, but this representation
++	     is deprecated and marvell,crypto-srams should be used instead
++- interrupts: interrupt number
++- clocks: reference to the crypto engines clocks. This property is not
++	  required for orion and kirkwood platforms
++- clock-names: "cesaX" and "cesazX", X should be replaced by the crypto engine
++	       id.
++	       This property is not required for the orion and kirkwoord
++	       platforms.
++	       "cesazX" clocks are not required on armada-370 platforms
++- marvell,crypto-srams: phandle to crypto SRAM definitions
++
++Optional properties:
++- marvell,crypto-sram-size: SRAM size reserved for crypto operations, if not
++			    specified the whole SRAM is used (2KB)
++
++
++Examples:
++
++	crypto@90000 {
++		compatible = "marvell,armada-xp-crypto";
++		reg = <0x90000 0x10000>;
++		reg-names = "regs";
++		interrupts = <48>, <49>;
++		clocks = <&gateclk 23>, <&gateclk 23>;
++		clock-names = "cesa0", "cesa1";
++		marvell,crypto-srams = <&crypto_sram0>, <&crypto_sram1>;
++		marvell,crypto-sram-size = <0x600>;
++		status = "okay";
++	};
 -- 
 1.9.1
