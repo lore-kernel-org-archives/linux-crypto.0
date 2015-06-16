@@ -1,7 +1,7 @@
 From: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Subject: [PATCH v5 12/14] crypto: marvell/CESA: add support for Orion SoCs
-Date: Tue, 16 Jun 2015 11:59:06 +0200
-Message-ID: <1434448748-10828-13-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH v5 11/14] crypto: marvell/CESA: add allhwsupport module parameter
+Date: Tue, 16 Jun 2015 11:59:05 +0200
+Message-ID: <1434448748-10828-12-git-send-email-boris.brezillon@free-electrons.com>
 References: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
 Cc: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
 	Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
@@ -29,102 +29,33 @@ In-Reply-To: <1434448748-10828-1-git-send-email-boris.brezillon-wi1+55ScJUtKEb57
 Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add the Orion SoC description, and select this implementation by default
-to support non-DT probing: Orion is the only platform where non-DT boards
-are declaring the CESA block.
+The old and new marvell CESA drivers both support Orion and Kirkwood SoCs.
+Add a module parameter to choose whether these SoCs should be attached to
+the new or the old driver.
 
-Control the allhwsupport module parameter to avoid probing the CESA IP when
-the old CESA driver is enabled (unless it is explicitly requested to do
-so).
+The default policy is to keep attaching those IPs to the old driver if it
+is enabled, until we decide the new CESA driver is stable/secure enough.
 
 Signed-off-by: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
 ---
- drivers/crypto/marvell/cesa.c | 42 +++++++++++++++++++++++++++++++++++-------
- 1 file changed, 35 insertions(+), 7 deletions(-)
+ drivers/crypto/marvell/cesa.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index a05b5cb..8e5ea72 100644
+index af590bf..a05b5cb 100644
 --- a/drivers/crypto/marvell/cesa.c
 +++ b/drivers/crypto/marvell/cesa.c
-@@ -172,6 +172,22 @@ static void mv_cesa_remove_algs(struct mv_cesa_dev *cesa)
- 		crypto_unregister_alg(cesa->caps->cipher_algs[i]);
- }
+@@ -31,6 +31,10 @@
  
-+static struct crypto_alg *orion_cipher_algs[] = {
-+	&mv_cesa_ecb_des_alg,
-+	&mv_cesa_cbc_des_alg,
-+	&mv_cesa_ecb_des3_ede_alg,
-+	&mv_cesa_cbc_des3_ede_alg,
-+	&mv_cesa_ecb_aes_alg,
-+	&mv_cesa_cbc_aes_alg,
-+};
+ #include "cesa.h"
+ 
++static int allhwsupport = !IS_ENABLED(CONFIG_CRYPTO_DEV_MV_CESA);
++module_param_named(allhwsupport, allhwsupport, int, 0444);
++MODULE_PARM_DESC(allhwsupport, "Enable support for all hardware (even it if overlaps with the mv_cesa driver)");
 +
-+static struct ahash_alg *orion_ahash_algs[] = {
-+	&mv_md5_alg,
-+	&mv_sha1_alg,
-+	&mv_ahmac_md5_alg,
-+	&mv_ahmac_sha1_alg,
-+};
-+
- static struct crypto_alg *armada_370_cipher_algs[] = {
- 	&mv_cesa_ecb_des_alg,
- 	&mv_cesa_cbc_des_alg,
-@@ -190,6 +206,15 @@ static struct ahash_alg *armada_370_ahash_algs[] = {
- 	&mv_ahmac_sha256_alg,
- };
+ struct mv_cesa_dev *cesa_dev;
  
-+static const struct mv_cesa_caps orion_caps = {
-+	.nengines = 1,
-+	.cipher_algs = orion_cipher_algs,
-+	.ncipher_algs = ARRAY_SIZE(orion_cipher_algs),
-+	.ahash_algs = orion_ahash_algs,
-+	.nahash_algs = ARRAY_SIZE(orion_ahash_algs),
-+	.has_tdma = false,
-+};
-+
- static const struct mv_cesa_caps armada_370_caps = {
- 	.nengines = 1,
- 	.cipher_algs = armada_370_cipher_algs,
-@@ -209,6 +234,7 @@ static const struct mv_cesa_caps armada_xp_caps = {
- };
- 
- static const struct of_device_id mv_cesa_of_match_table[] = {
-+	{ .compatible = "marvell,orion-crypto", .data = &orion_caps },
- 	{ .compatible = "marvell,armada-370-crypto", .data = &armada_370_caps },
- 	{ .compatible = "marvell,armada-xp-crypto", .data = &armada_xp_caps },
- 	{ .compatible = "marvell,armada-375-crypto", .data = &armada_xp_caps },
-@@ -334,7 +360,7 @@ static void mv_cesa_put_sram(struct platform_device *pdev, int idx)
- 
- static int mv_cesa_probe(struct platform_device *pdev)
- {
--	const struct mv_cesa_caps *caps = NULL;
-+	const struct mv_cesa_caps *caps = &orion_caps;
- 	const struct mbus_dram_target_info *dram;
- 	const struct of_device_id *match;
- 	struct device *dev = &pdev->dev;
-@@ -349,14 +375,16 @@ static int mv_cesa_probe(struct platform_device *pdev)
- 		return -EEXIST;
- 	}
- 
--	if (!dev->of_node)
--		return -ENOTSUPP;
-+	if (dev->of_node) {
-+		match = of_match_node(mv_cesa_of_match_table, dev->of_node);
-+		if (!match || !match->data)
-+			return -ENOTSUPP;
- 
--	match = of_match_node(mv_cesa_of_match_table, dev->of_node);
--	if (!match || !match->data)
--		return -ENOTSUPP;
-+		caps = match->data;
-+	}
- 
--	caps = match->data;
-+	if (caps == &orion_caps && !allhwsupport)
-+		return -ENOTSUPP;
- 
- 	cesa = devm_kzalloc(dev, sizeof(*cesa), GFP_KERNEL);
- 	if (!cesa)
+ static void mv_cesa_dequeue_req_unlocked(struct mv_cesa_engine *engine)
 -- 
 1.9.1
 
