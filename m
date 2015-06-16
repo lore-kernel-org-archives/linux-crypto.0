@@ -1,94 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH RFC 01/11] crypto: caam - Add cache coherency support
-Date: Tue, 16 Jun 2015 11:29:04 +0800
-Message-ID: <20150616032904.GA20116@gondor.apana.org.au>
-References: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
- <1434412379-11623-2-git-send-email-vicki.milhoan@freescale.com>
+Subject: Re: [PATCH RFC v5 2/4] crypto: add PKE API
+Date: Tue, 16 Jun 2015 12:06:05 +0800
+Message-ID: <20150616040605.GA20597@gondor.apana.org.au>
+References: <20150615201831.15697.57738.stgit@tstruk-mobl1>
+ <20150615201842.15697.59701.stgit@tstruk-mobl1>
+ <20150616000519.GA16973@gondor.apana.org.au>
+ <557F83DF.2090003@intel.com>
+ <20150616022751.GA19040@gondor.apana.org.au>
+ <557F8CCA.2080405@intel.com>
+ <20150616032511.GA19977@gondor.apana.org.au>
+ <557F99A6.3010904@intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-crypto@vger.kernel.org, horia.geanta@freescale.com,
-	ruchika.gupta@freescale.com
-To: Victoria Milhoan <vicki.milhoan@freescale.com>
+Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
+	jwboyer@redhat.com, smueller@chronox.de, richard@nod.at,
+	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
+	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	vgoyal@redhat.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:56881 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:57159 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750763AbbFPDvK (ORCPT
+	with ESMTP id S1750789AbbFPEGW (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Mon, 15 Jun 2015 23:51:10 -0400
+	Tue, 16 Jun 2015 00:06:22 -0400
 Content-Disposition: inline
-In-Reply-To: <1434412379-11623-2-git-send-email-vicki.milhoan@freescale.com>
+In-Reply-To: <557F99A6.3010904@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jun 15, 2015 at 04:52:49PM -0700, Victoria Milhoan wrote:
-> Freescale i.MX6 ARM platforms do not support hardware cache coherency.  This
-> patch adds cache coherency support to the CAAM driver.
+On Mon, Jun 15, 2015 at 08:36:06PM -0700, Tadeusz Struk wrote:
+> On 06/15/2015 08:25 PM, Herbert Xu wrote:
+> > The current parse_key function requires all three number to be
+> > present, n, e, and d, no?
 > 
-> Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+> No, it will handle whatever it will find. So if a public key will be passed it will only set "n" and "e".
+> If a private key will be passed it will set all three "n", "e", and "d".
+> Then during operation I check if there is everything that's required.
 
-What about caamalg.c?
+AFAICS the ASN1 parser will call all three functions and bomb out
+if any one of them fails.  If you did make them all optional then
+you'd need to check to ensure that at least n and e are present.
 
-> @@ -807,7 +815,7 @@ static int ahash_update_ctx(struct ahash_request *req)
->  		 * allocate space for base edesc and hw desc commands,
->  		 * link tables
->  		 */
-> -		edesc = kmalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
-> +		edesc = kzalloc(sizeof(struct ahash_edesc) + DESC_JOB_IO_LEN +
-
-Please put this into a separate patch as it appears to have nothing
-to do with the change description.
-
-> @@ -351,12 +381,22 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
->  
->  	jrp->inpring[jrp->inp_ring_write_index] = desc_dma;
->  
-> +	dma_sync_single_for_device(dev, inpbusaddr,
-> +					sizeof(dma_addr_t) * JOBR_DEPTH,
-> +					DMA_TO_DEVICE);
-> +
->  	smp_wmb();
-
-While you're at it can you add a comment regarding what this
-barrier is meant to protect?
-
->  	jrp->inp_ring_write_index = (jrp->inp_ring_write_index + 1) &
->  				    (JOBR_DEPTH - 1);
->  	jrp->head = (head + 1) & (JOBR_DEPTH - 1);
->  
-> +	/*
-> +	 * Ensure that all job information has been written before
-> +	 * notifying CAAM that a new job was added to the input ring.
-> +	 */
-> +	wmb();
-> +
->  	wr_reg32(&jrp->rregs->inpring_jobadd, 1);
->  
->  	spin_unlock_bh(&jrp->inplock);
-> diff --git a/drivers/crypto/caam/key_gen.c b/drivers/crypto/caam/key_gen.c
-> index e1eaf4f..6481f71 100644
-> --- a/drivers/crypto/caam/key_gen.c
-> +++ b/drivers/crypto/caam/key_gen.c
-> @@ -71,6 +71,7 @@ int gen_split_key(struct device *jrdev, u8 *key_out, int split_key_len,
->  	}
->  
->  	init_job_desc(desc, 0);
-> +
->  	append_key(desc, dma_addr_in, keylen, CLASS_2 | KEY_DEST_CLASS_REG);
-
-Please remove this unrelated hunk.
-
-> diff --git a/drivers/crypto/caam/sg_sw_sec4.h b/drivers/crypto/caam/sg_sw_sec4.h
-> index 3b91821..6365585 100644
-> --- a/drivers/crypto/caam/sg_sw_sec4.h
-> +++ b/drivers/crypto/caam/sg_sw_sec4.h
-> @@ -98,6 +98,7 @@ static int dma_map_sg_chained(struct device *dev, struct scatterlist *sg,
->  	} else {
->  		dma_map_sg(dev, sg, nents, dir);
->  	}
-> +
->  	return nents;
-
-Ditto
+Also all your test vectors contain private keys.  Please add at
+least one that contains a public key only to test this.
 
 Cheers,
 -- 
