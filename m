@@ -1,243 +1,109 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH v5 07/14] crypto: marvell/CESA: add Triple-DES support
-Date: Tue, 16 Jun 2015 11:59:01 +0200
-Message-ID: <1434448748-10828-8-git-send-email-boris.brezillon@free-electrons.com>
-References: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	"Imre Kaloz" <kaloz@openwrt.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: [PATCH] crypto: caam - fix non-64-bit write/read access
+Date: Tue, 16 Jun 2015 12:59:07 +0200
+Message-ID: <1434452347-27177-1-git-send-email-s.trumtrar@pengutronix.de>
+Cc: Ruchika Gupta <ruchika.gupta@freescale.com>,
+	Victoria Milhoan <Vicki.Milhoan@freescale.com>,
+	Russell King <linux@arm.linux.org.uk>,
+	Jon Nettleton <jon.nettleton@gmail.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, Steffen Trumtrar <s.trumtrar@pengutronix.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:44705 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755903AbbFPK7x (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 16 Jun 2015 06:59:53 -0400
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Arnaud Ebalard <arno@natisbad.org>
+The patch
 
-Add support for Triple-DES operations.
+	crypto: caam - Add definition of rd/wr_reg64 for little endian platform
 
-Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
-Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+added support for little endian platforms to the CAAM driver. Namely a
+write and read function for 64 bit registers.
+The only user of this functions is the Job Ring driver (drivers/crypto/caam/jr.c).
+It uses the functions to set the DMA addresses for the input/output rings.
+However, at least in the default configuration, the least significant 32 bits are
+always in the base+0x0004 address; independent of the endianness of the bytes itself.
+That means the addresses do not change with the system endianness.
+
+DMA addresses are only 32 bits wide on non-64-bit systems, writing the upper 32 bits
+of this value to the register for the least significant bits results in the DMA address
+being set to 0.
+
+Fix this by always writing the registers in the same way.
+
+Suggested-by: Russell King <linux@arm.linux.org.uk>
+Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 ---
- drivers/crypto/marvell/cesa.c   |   2 +
- drivers/crypto/marvell/cesa.h   |   2 +
- drivers/crypto/marvell/cipher.c | 147 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 151 insertions(+)
 
-diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index 212840e..c0b1b49 100644
---- a/drivers/crypto/marvell/cesa.c
-+++ b/drivers/crypto/marvell/cesa.c
-@@ -171,6 +171,8 @@ static void mv_cesa_remove_algs(struct mv_cesa_dev *cesa)
- static struct crypto_alg *armada_370_cipher_algs[] = {
- 	&mv_cesa_ecb_des_alg,
- 	&mv_cesa_cbc_des_alg,
-+	&mv_cesa_ecb_des3_ede_alg,
-+	&mv_cesa_cbc_des3_ede_alg,
- 	&mv_cesa_ecb_aes_alg,
- 	&mv_cesa_cbc_aes_alg,
- };
-diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index 2ee48fe..2e8b7fc 100644
---- a/drivers/crypto/marvell/cesa.h
-+++ b/drivers/crypto/marvell/cesa.h
-@@ -779,6 +779,8 @@ extern struct ahash_alg mv_ahmac_sha1_alg;
+This patch is only compile-tested for PowerPC and tested on ARM.
+According to the datasheets for i.MX6 and P1010 this should be correct, though.
+
+ drivers/crypto/caam/regs.h | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 378ddc17f60e..672c97489505 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -83,35 +83,35 @@
+ #endif
+ #endif
  
- extern struct crypto_alg mv_cesa_ecb_des_alg;
- extern struct crypto_alg mv_cesa_cbc_des_alg;
-+extern struct crypto_alg mv_cesa_ecb_des3_ede_alg;
-+extern struct crypto_alg mv_cesa_cbc_des3_ede_alg;
- extern struct crypto_alg mv_cesa_ecb_aes_alg;
- extern struct crypto_alg mv_cesa_cbc_aes_alg;
- 
-diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
-index 31b9311..e65592c 100644
---- a/drivers/crypto/marvell/cipher.c
-+++ b/drivers/crypto/marvell/cipher.c
-@@ -22,6 +22,11 @@ struct mv_cesa_des_ctx {
- 	u8 key[DES_KEY_SIZE];
- };
- 
-+struct mv_cesa_des3_ctx {
-+	struct mv_cesa_ctx base;
-+	u8 key[DES3_EDE_KEY_SIZE];
-+};
++/*
++ * The only users of these wr/rd_reg64 functions is the Job Ring (JR).
++ * The DMA address registers in the JR are a pair of 32-bit registers.
++ * The layout is:
++ *
++ *    base + 0x0000 : most-significant 32 bits
++ *    base + 0x0004 : least-significant 32 bits
++ *
++ * The 32-bit version of this core therefore has to write to base + 0x0004
++ * to set the 32-bit wide DMA address. This seems to be independent of the
++ * endianness of the written/read data.
++ */
 +
- struct mv_cesa_aes_ctx {
- 	struct mv_cesa_ctx base;
- 	struct crypto_aes_ctx aes;
-@@ -261,6 +266,22 @@ static int mv_cesa_des_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
- 	return 0;
+ #ifndef CONFIG_64BIT
+-#ifdef __BIG_ENDIAN
+-static inline void wr_reg64(u64 __iomem *reg, u64 data)
+-{
+-	wr_reg32((u32 __iomem *)reg, (data & 0xffffffff00000000ull) >> 32);
+-	wr_reg32((u32 __iomem *)reg + 1, data & 0x00000000ffffffffull);
+-}
++#define REG64_MS32(reg) ((u32 __iomem *)(reg))
++#define REG64_LS32(reg) ((u32 __iomem *)(reg) + 1)
+ 
+-static inline u64 rd_reg64(u64 __iomem *reg)
+-{
+-	return (((u64)rd_reg32((u32 __iomem *)reg)) << 32) |
+-		((u64)rd_reg32((u32 __iomem *)reg + 1));
+-}
+-#else
+-#ifdef __LITTLE_ENDIAN
+ static inline void wr_reg64(u64 __iomem *reg, u64 data)
+ {
+-	wr_reg32((u32 __iomem *)reg + 1, (data & 0xffffffff00000000ull) >> 32);
+-	wr_reg32((u32 __iomem *)reg, data & 0x00000000ffffffffull);
++	wr_reg32(REG64_MS32(reg), data >> 32);
++	wr_reg32(REG64_LS32(reg), data);
  }
  
-+static int mv_cesa_des3_ede_setkey(struct crypto_ablkcipher *cipher,
-+				   const u8 *key, unsigned int len)
-+{
-+	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
-+	struct mv_cesa_des_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	if (len != DES3_EDE_KEY_SIZE) {
-+		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+
-+	memcpy(ctx->key, key, DES3_EDE_KEY_SIZE);
-+
-+	return 0;
-+}
-+
- static int mv_cesa_ablkcipher_dma_req_init(struct ablkcipher_request *req,
- 				const struct mv_cesa_op_ctx *op_templ)
+ static inline u64 rd_reg64(u64 __iomem *reg)
  {
-@@ -501,6 +522,132 @@ struct crypto_alg mv_cesa_cbc_des_alg = {
- 	},
- };
+-	return (((u64)rd_reg32((u32 __iomem *)reg + 1)) << 32) |
+-		((u64)rd_reg32((u32 __iomem *)reg));
++	return ((u64)rd_reg32(REG64_MS32(reg)) << 32 |
++		(u64)rd_reg32(REG64_LS32(reg)));
+ }
+ #endif
+-#endif
+-#endif
  
-+static int mv_cesa_des3_op(struct ablkcipher_request *req,
-+			   struct mv_cesa_op_ctx *tmpl)
-+{
-+	struct mv_cesa_des3_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+	int ret;
-+
-+	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_3DES,
-+			      CESA_SA_DESC_CFG_CRYPTM_MSK);
-+
-+	memcpy(tmpl->ctx.blkcipher.key, ctx->key, DES3_EDE_KEY_SIZE);
-+
-+	ret = mv_cesa_ablkcipher_req_init(req, tmpl);
-+	if (ret)
-+		return ret;
-+
-+	ret = mv_cesa_queue_req(&req->base);
-+	if (ret && ret != -EINPROGRESS)
-+		mv_cesa_ablkcipher_cleanup(req);
-+
-+	return ret;
-+}
-+
-+static int mv_cesa_ecb_des3_ede_encrypt(struct ablkcipher_request *req)
-+{
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl,
-+			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
-+			   CESA_SA_DESC_CFG_3DES_EDE |
-+			   CESA_SA_DESC_CFG_DIR_ENC);
-+
-+	return mv_cesa_des3_op(req, &tmpl);
-+}
-+
-+static int mv_cesa_ecb_des3_ede_decrypt(struct ablkcipher_request *req)
-+{
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl,
-+			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
-+			   CESA_SA_DESC_CFG_3DES_EDE |
-+			   CESA_SA_DESC_CFG_DIR_DEC);
-+
-+	return mv_cesa_des3_op(req, &tmpl);
-+}
-+
-+struct crypto_alg mv_cesa_ecb_des3_ede_alg = {
-+	.cra_name = "ecb(des3_ede)",
-+	.cra_driver_name = "mv-ecb-des3-ede",
-+	.cra_priority = 300,
-+	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-+		     CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
-+	.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+	.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
-+	.cra_alignmask = 0,
-+	.cra_type = &crypto_ablkcipher_type,
-+	.cra_module = THIS_MODULE,
-+	.cra_init = mv_cesa_ablkcipher_cra_init,
-+	.cra_u = {
-+		.ablkcipher = {
-+			.min_keysize = DES3_EDE_KEY_SIZE,
-+			.max_keysize = DES3_EDE_KEY_SIZE,
-+			.ivsize	     = DES3_EDE_BLOCK_SIZE,
-+			.setkey = mv_cesa_des3_ede_setkey,
-+			.encrypt = mv_cesa_ecb_des3_ede_encrypt,
-+			.decrypt = mv_cesa_ecb_des3_ede_decrypt,
-+		},
-+	},
-+};
-+
-+static int mv_cesa_cbc_des3_op(struct ablkcipher_request *req,
-+			       struct mv_cesa_op_ctx *tmpl)
-+{
-+	memcpy(tmpl->ctx.blkcipher.iv, req->info, DES3_EDE_BLOCK_SIZE);
-+
-+	return mv_cesa_des3_op(req, tmpl);
-+}
-+
-+static int mv_cesa_cbc_des3_ede_encrypt(struct ablkcipher_request *req)
-+{
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl,
-+			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
-+			   CESA_SA_DESC_CFG_3DES_EDE |
-+			   CESA_SA_DESC_CFG_DIR_ENC);
-+
-+	return mv_cesa_cbc_des3_op(req, &tmpl);
-+}
-+
-+static int mv_cesa_cbc_des3_ede_decrypt(struct ablkcipher_request *req)
-+{
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl,
-+			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
-+			   CESA_SA_DESC_CFG_3DES_EDE |
-+			   CESA_SA_DESC_CFG_DIR_DEC);
-+
-+	return mv_cesa_cbc_des3_op(req, &tmpl);
-+}
-+
-+struct crypto_alg mv_cesa_cbc_des3_ede_alg = {
-+	.cra_name = "cbc(des3_ede)",
-+	.cra_driver_name = "mv-cbc-des3-ede",
-+	.cra_priority = 300,
-+	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
-+		     CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
-+	.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+	.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
-+	.cra_alignmask = 0,
-+	.cra_type = &crypto_ablkcipher_type,
-+	.cra_module = THIS_MODULE,
-+	.cra_init = mv_cesa_ablkcipher_cra_init,
-+	.cra_u = {
-+		.ablkcipher = {
-+			.min_keysize = DES3_EDE_KEY_SIZE,
-+			.max_keysize = DES3_EDE_KEY_SIZE,
-+			.ivsize	     = DES3_EDE_BLOCK_SIZE,
-+			.setkey = mv_cesa_des3_ede_setkey,
-+			.encrypt = mv_cesa_cbc_des3_ede_encrypt,
-+			.decrypt = mv_cesa_cbc_des3_ede_decrypt,
-+		},
-+	},
-+};
-+
- static int mv_cesa_aes_op(struct ablkcipher_request *req,
- 			  struct mv_cesa_op_ctx *tmpl)
- {
+ /*
+  * jr_outentry
 -- 
-1.9.1
+2.1.4
