@@ -1,249 +1,229 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH v6 09/14] crypto: marvell/CESA: add SHA256 support
-Date: Wed, 17 Jun 2015 09:45:37 +0200
-Message-ID: <1434527142-3609-10-git-send-email-boris.brezillon@free-electrons.com>
-References: <1434527142-3609-1-git-send-email-boris.brezillon@free-electrons.com>
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	"Imre Kaloz" <kaloz@openwrt.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1434527142-3609-1-git-send-email-boris.brezillon@free-electrons.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: Re: [PATCH RFC 01/11] crypto: caam - Add cache coherency support
+Date: Wed, 17 Jun 2015 10:23:03 +0200
+Message-ID: <20150617082303.GM7947@pengutronix.de>
+References: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
+ <1434412379-11623-2-git-send-email-vicki.milhoan@freescale.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	horia.geanta@freescale.com, ruchika.gupta@freescale.com
+To: Victoria Milhoan <vicki.milhoan@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:57665 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751729AbbFQIXF (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Jun 2015 04:23:05 -0400
+Content-Disposition: inline
+In-Reply-To: <1434412379-11623-2-git-send-email-vicki.milhoan@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-From: Arnaud Ebalard <arno@natisbad.org>
+On Mon, Jun 15, 2015 at 04:52:49PM -0700, Victoria Milhoan wrote:
+> Freescale i.MX6 ARM platforms do not support hardware cache coherency.  This
+> patch adds cache coherency support to the CAAM driver.
+> 
+> Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+> ---
+>  drivers/crypto/caam/caamhash.c   | 28 +++++++++++++++++----------
+>  drivers/crypto/caam/caamrng.c    | 10 +++++++++-
+>  drivers/crypto/caam/jr.c         | 42 +++++++++++++++++++++++++++++++++++++++-
+>  drivers/crypto/caam/key_gen.c    |  4 +++-
+>  drivers/crypto/caam/sg_sw_sec4.h |  1 +
+>  5 files changed, 72 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+> index ba0532e..1662c65 100644
+> --- a/drivers/crypto/caam/caamhash.c
+> +++ b/drivers/crypto/caam/caamhash.c
+> @@ -500,6 +500,7 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, const u8 *key_in,
+>  #endif
+>  	}
+>  	dma_unmap_single(jrdev, src_dma, *keylen, DMA_TO_DEVICE);
+> +	dma_sync_single_for_cpu(jrdev, dst_dma, digestsize, DMA_FROM_DEVICE);
+>  	dma_unmap_single(jrdev, dst_dma, digestsize, DMA_FROM_DEVICE);
+>  
+>  	*keylen = digestsize;
+> @@ -608,8 +609,11 @@ static inline void ahash_unmap(struct device *dev,
+>  	if (edesc->src_nents)
+>  		dma_unmap_sg_chained(dev, req->src, edesc->src_nents,
+>  				     DMA_TO_DEVICE, edesc->chained);
+> -	if (edesc->dst_dma)
+> +	if (edesc->dst_dma) {
+> +		dma_sync_single_for_cpu(dev, edesc->dst_dma, dst_len,
+> +					DMA_FROM_DEVICE);
+>  		dma_unmap_single(dev, edesc->dst_dma, dst_len, DMA_FROM_DEVICE);
+> +	}
+>  
+>  	if (edesc->sec4_sg_bytes)
+>  		dma_unmap_single(dev, edesc->sec4_sg_dma,
+> @@ -624,8 +628,12 @@ static inline void ahash_unmap_ctx(struct device *dev,
+>  	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+>  	struct caam_hash_state *state = ahash_request_ctx(req);
+>  
+> -	if (state->ctx_dma)
+> +	if (state->ctx_dma) {
+> +		if ((flag == DMA_FROM_DEVICE) || (flag == DMA_BIDIRECTIONAL))
+> +			dma_sync_single_for_cpu(dev, state->ctx_dma,
+> +						ctx->ctx_len, flag);
+>  		dma_unmap_single(dev, state->ctx_dma, ctx->ctx_len, flag);
+> +	}
+>  	ahash_unmap(dev, edesc, req, dst_len);
+>  }
 
-Add support for SHA256 operations.
+Unneeded syncing, dma_unmap does it as long as it is not told otherwise.
 
-Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
-Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
----
- drivers/crypto/marvell/cesa.c |   2 +
- drivers/crypto/marvell/cesa.h |   2 +
- drivers/crypto/marvell/hash.c | 159 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 163 insertions(+)
+(...)
 
-diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index 047c1c0..9c43cd7e 100644
---- a/drivers/crypto/marvell/cesa.c
-+++ b/drivers/crypto/marvell/cesa.c
-@@ -180,8 +180,10 @@ static struct crypto_alg *armada_370_cipher_algs[] = {
- static struct ahash_alg *armada_370_ahash_algs[] = {
- 	&mv_md5_alg,
- 	&mv_sha1_alg,
-+	&mv_sha256_alg,
- 	&mv_ahmac_md5_alg,
- 	&mv_ahmac_sha1_alg,
-+	&mv_ahmac_sha256_alg,
- };
- 
- static const struct mv_cesa_caps armada_370_caps = {
-diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index 2a7e21a..a328938 100644
---- a/drivers/crypto/marvell/cesa.h
-+++ b/drivers/crypto/marvell/cesa.h
-@@ -776,8 +776,10 @@ int mv_cesa_dma_add_op_transfers(struct mv_cesa_tdma_chain *chain,
- 
- extern struct ahash_alg mv_md5_alg;
- extern struct ahash_alg mv_sha1_alg;
-+extern struct ahash_alg mv_sha256_alg;
- extern struct ahash_alg mv_ahmac_md5_alg;
- extern struct ahash_alg mv_ahmac_sha1_alg;
-+extern struct ahash_alg mv_ahmac_sha256_alg;
- 
- extern struct crypto_alg mv_cesa_ecb_des_alg;
- extern struct crypto_alg mv_cesa_cbc_des_alg;
-diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
-index 1c82d9b..f90a510 100644
---- a/drivers/crypto/marvell/hash.c
-+++ b/drivers/crypto/marvell/hash.c
-@@ -977,6 +977,95 @@ struct ahash_alg mv_sha1_alg = {
- 	}
- };
- 
-+static int mv_cesa_sha256_init(struct ahash_request *req)
-+{
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_SHA256);
-+
-+	mv_cesa_ahash_init(req, &tmpl);
-+
-+	return 0;
-+}
-+
-+static int mv_cesa_sha256_digest(struct ahash_request *req)
-+{
-+	int ret;
-+
-+	ret = mv_cesa_sha256_init(req);
-+	if (ret)
-+		return ret;
-+
-+	return mv_cesa_ahash_finup(req);
-+}
-+
-+static int mv_cesa_sha256_export(struct ahash_request *req, void *out)
-+{
-+	struct sha256_state *out_state = out;
-+	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
-+	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
-+	unsigned int ds = crypto_ahash_digestsize(ahash);
-+
-+	out_state->count = creq->len;
-+	memcpy(out_state->state, creq->state, ds);
-+	memset(out_state->buf, 0, sizeof(out_state->buf));
-+	if (creq->cache)
-+		memcpy(out_state->buf, creq->cache, creq->cache_ptr);
-+
-+	return 0;
-+}
-+
-+static int mv_cesa_sha256_import(struct ahash_request *req, const void *in)
-+{
-+	const struct sha256_state *in_state = in;
-+	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
-+	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
-+	unsigned int digsize = crypto_ahash_digestsize(ahash);
-+	unsigned int cache_ptr;
-+	int ret;
-+
-+	creq->len = in_state->count;
-+	memcpy(creq->state, in_state->state, digsize);
-+	creq->cache_ptr = 0;
-+
-+	cache_ptr = creq->len % SHA256_BLOCK_SIZE;
-+	if (!cache_ptr)
-+		return 0;
-+
-+	ret = mv_cesa_ahash_alloc_cache(req);
-+	if (ret)
-+		return ret;
-+
-+	memcpy(creq->cache, in_state->buf, cache_ptr);
-+	creq->cache_ptr = cache_ptr;
-+
-+	return 0;
-+}
-+
-+struct ahash_alg mv_sha256_alg = {
-+	.init = mv_cesa_sha256_init,
-+	.update = mv_cesa_ahash_update,
-+	.final = mv_cesa_ahash_final,
-+	.finup = mv_cesa_ahash_finup,
-+	.digest = mv_cesa_sha256_digest,
-+	.export = mv_cesa_sha256_export,
-+	.import = mv_cesa_sha256_import,
-+	.halg = {
-+		.digestsize = SHA256_DIGEST_SIZE,
-+		.base = {
-+			.cra_name = "sha256",
-+			.cra_driver_name = "mv-sha256",
-+			.cra_priority = 300,
-+			.cra_flags = CRYPTO_ALG_ASYNC |
-+				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+			.cra_blocksize = SHA256_BLOCK_SIZE,
-+			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
-+			.cra_init = mv_cesa_ahash_cra_init,
-+			.cra_module = THIS_MODULE,
-+		 }
-+	}
-+};
-+
- struct mv_cesa_ahash_result {
- 	struct completion completion;
- 	int error;
-@@ -1282,3 +1371,73 @@ struct ahash_alg mv_ahmac_sha1_alg = {
- 		 }
- 	}
- };
-+
-+static int mv_cesa_ahmac_sha256_setkey(struct crypto_ahash *tfm, const u8 *key,
-+				       unsigned int keylen)
-+{
-+	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
-+	struct sha256_state istate, ostate;
-+	int ret, i;
-+
-+	ret = mv_cesa_ahmac_setkey("mv-sha256", key, keylen, &istate, &ostate);
-+	if (ret)
-+		return ret;
-+
-+	for (i = 0; i < ARRAY_SIZE(istate.state); i++)
-+		ctx->iv[i] = be32_to_cpu(istate.state[i]);
-+
-+	for (i = 0; i < ARRAY_SIZE(ostate.state); i++)
-+		ctx->iv[i + 8] = be32_to_cpu(ostate.state[i]);
-+
-+	return 0;
-+}
-+
-+static int mv_cesa_ahmac_sha256_init(struct ahash_request *req)
-+{
-+	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
-+	struct mv_cesa_op_ctx tmpl;
-+
-+	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_SHA256);
-+	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
-+
-+	mv_cesa_ahash_init(req, &tmpl);
-+
-+	return 0;
-+}
-+
-+static int mv_cesa_ahmac_sha256_digest(struct ahash_request *req)
-+{
-+	int ret;
-+
-+	ret = mv_cesa_ahmac_sha256_init(req);
-+	if (ret)
-+		return ret;
-+
-+	return mv_cesa_ahash_finup(req);
-+}
-+
-+struct ahash_alg mv_ahmac_sha256_alg = {
-+	.init = mv_cesa_ahmac_sha256_init,
-+	.update = mv_cesa_ahash_update,
-+	.final = mv_cesa_ahash_final,
-+	.finup = mv_cesa_ahash_finup,
-+	.digest = mv_cesa_ahmac_sha256_digest,
-+	.setkey = mv_cesa_ahmac_sha256_setkey,
-+	.export = mv_cesa_sha256_export,
-+	.import = mv_cesa_sha256_import,
-+	.halg = {
-+		.digestsize = SHA256_DIGEST_SIZE,
-+		.statesize = sizeof(struct sha256_state),
-+		.base = {
-+			.cra_name = "hmac(sha256)",
-+			.cra_driver_name = "mv-hmac-sha256",
-+			.cra_priority = 300,
-+			.cra_flags = CRYPTO_ALG_ASYNC |
-+				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+			.cra_blocksize = SHA256_BLOCK_SIZE,
-+			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
-+			.cra_init = mv_cesa_ahmac_cra_init,
-+			.cra_module = THIS_MODULE,
-+		 }
-+	}
-+};
+> diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+> index 26a544b..a8c4af9 100644
+> --- a/drivers/crypto/caam/caamrng.c
+> +++ b/drivers/crypto/caam/caamrng.c
+> @@ -80,9 +80,12 @@ static struct caam_rng_ctx *rng_ctx;
+>  
+>  static inline void rng_unmap_buf(struct device *jrdev, struct buf_data *bd)
+>  {
+> -	if (bd->addr)
+> +	if (bd->addr) {
+> +		dma_sync_single_for_cpu(jrdev, bd->addr, RN_BUF_SIZE,
+> +					DMA_FROM_DEVICE);
+>  		dma_unmap_single(jrdev, bd->addr, RN_BUF_SIZE,
+>  				 DMA_FROM_DEVICE);
+> +	}
+>  }
+> 
+
+dito
+
+>  static inline void rng_unmap_ctx(struct caam_rng_ctx *ctx)
+> @@ -108,6 +111,10 @@ static void rng_done(struct device *jrdev, u32 *desc, u32 err, void *context)
+>  
+>  	atomic_set(&bd->empty, BUF_NOT_EMPTY);
+>  	complete(&bd->filled);
+> +
+> +	/* Buffer refilled, invalidate cache */
+> +	dma_sync_single_for_cpu(jrdev, bd->addr, RN_BUF_SIZE, DMA_FROM_DEVICE);
+> +
+
+This seems to be okay, though.
+
+>  #ifdef DEBUG
+>  	print_hex_dump(KERN_ERR, "rng refreshed buf@: ",
+>  		       DUMP_PREFIX_ADDRESS, 16, 4, bd->buf, RN_BUF_SIZE, 1);
+> @@ -211,6 +218,7 @@ static inline int rng_create_sh_desc(struct caam_rng_ctx *ctx)
+>  	print_hex_dump(KERN_ERR, "rng shdesc@: ", DUMP_PREFIX_ADDRESS, 16, 4,
+>  		       desc, desc_bytes(desc), 1);
+>  #endif
+> +
+>  	return 0;
+>  }
+>  
+> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+> index b8b5d47..a693bf7 100644
+> --- a/drivers/crypto/caam/jr.c
+> +++ b/drivers/crypto/caam/jr.c
+> @@ -168,6 +168,9 @@ static void caam_jr_dequeue(unsigned long devarg)
+>  	void (*usercall)(struct device *dev, u32 *desc, u32 status, void *arg);
+>  	u32 *userdesc, userstatus;
+>  	void *userarg;
+> +	dma_addr_t outbusaddr;
+> +
+> +	outbusaddr = rd_reg64(&jrp->rregs->outring_base);
+>  
+>  	while (rd_reg32(&jrp->rregs->outring_used)) {
+>  
+> @@ -177,10 +180,19 @@ static void caam_jr_dequeue(unsigned long devarg)
+>  
+>  		sw_idx = tail = jrp->tail;
+>  		hw_idx = jrp->out_ring_read_index;
+> +		dma_sync_single_for_cpu(dev, outbusaddr,
+> +					sizeof(struct jr_outentry) * JOBR_DEPTH,
+> +					DMA_FROM_DEVICE);
+>  
+
+This one and ...
+
+(...)
+
+> @@ -321,7 +346,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+>  	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+>  	struct caam_jrentry_info *head_entry;
+>  	int head, tail, desc_size;
+> -	dma_addr_t desc_dma;
+> +	dma_addr_t desc_dma, inpbusaddr;
+>  
+>  	desc_size = (*desc & HDR_JD_LENGTH_MASK) * sizeof(u32);
+>  	desc_dma = dma_map_single(dev, desc, desc_size, DMA_TO_DEVICE);
+> @@ -330,6 +355,11 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+>  		return -EIO;
+>  	}
+>  
+> +	inpbusaddr = rd_reg64(&jrp->rregs->inpring_base);
+> +	dma_sync_single_for_device(dev, inpbusaddr,
+> +					sizeof(dma_addr_t) * JOBR_DEPTH,
+> +					DMA_TO_DEVICE);
+> +
+>  	spin_lock_bh(&jrp->inplock);
+>  
+>  	head = jrp->head;
+> @@ -351,12 +381,22 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+>  
+>  	jrp->inpring[jrp->inp_ring_write_index] = desc_dma;
+>  
+> +	dma_sync_single_for_device(dev, inpbusaddr,
+> +					sizeof(dma_addr_t) * JOBR_DEPTH,
+> +					DMA_TO_DEVICE);
+> +
+
+... these one are also unnecessary, because the buffers are mapped with
+dma_alloc_coherent.
+
+>  	smp_wmb();
+>  
+>  	jrp->inp_ring_write_index = (jrp->inp_ring_write_index + 1) &
+>  				    (JOBR_DEPTH - 1);
+>  	jrp->head = (head + 1) & (JOBR_DEPTH - 1);
+>  
+> +	/*
+> +	 * Ensure that all job information has been written before
+> +	 * notifying CAAM that a new job was added to the input ring.
+> +	 */
+> +	wmb();
+> +
+>  	wr_reg32(&jrp->rregs->inpring_jobadd, 1);
+>  
+>  	spin_unlock_bh(&jrp->inplock);
+> diff --git a/drivers/crypto/caam/key_gen.c b/drivers/crypto/caam/key_gen.c
+> index e1eaf4f..6481f71 100644
+> --- a/drivers/crypto/caam/key_gen.c
+> +++ b/drivers/crypto/caam/key_gen.c
+> @@ -71,6 +71,7 @@ int gen_split_key(struct device *jrdev, u8 *key_out, int split_key_len,
+>  	}
+>  
+>  	init_job_desc(desc, 0);
+> +
+>  	append_key(desc, dma_addr_in, keylen, CLASS_2 | KEY_DEST_CLASS_REG);
+>  
+>  	/* Sets MDHA up into an HMAC-INIT */
+> @@ -111,7 +112,8 @@ int gen_split_key(struct device *jrdev, u8 *key_out, int split_key_len,
+>  			       split_key_pad_len, 1);
+>  #endif
+>  	}
+> -
+> +	dma_sync_single_for_cpu(jrdev, dma_addr_out, split_key_pad_len,
+> +				DMA_FROM_DEVICE);
+>  	dma_unmap_single(jrdev, dma_addr_out, split_key_pad_len,
+>  			 DMA_FROM_DEVICE);
+>  out_unmap_in:
+
+unneeded.
+
+Regards,
+Steffen
+
 -- 
-1.9.1
+Pengutronix e.K.                           |                             |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
