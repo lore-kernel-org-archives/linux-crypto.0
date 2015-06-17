@@ -1,61 +1,56 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH v5 04/14] crypto: add a new driver for Marvell's CESA
-Date: Wed, 17 Jun 2015 09:15:38 +0200
-Message-ID: <20150617091538.340f93d2@bbrezillon>
+From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Subject: Re: [PATCH v5 05/14] crypto: marvell/CESA: add TDMA support
+Date: Wed, 17 Jun 2015 15:18:29 +0800
+Message-ID: <20150617071829.GA9895@gondor.apana.org.au>
 References: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
-	<1434448748-10828-5-git-send-email-boris.brezillon@free-electrons.com>
-	<20150617055824.GA9155@gondor.apana.org.au>
+ <1434448748-10828-6-git-send-email-boris.brezillon@free-electrons.com>
+ <20150617050527.GA8807@gondor.apana.org.au>
+ <20150617055633.GA9123@gondor.apana.org.au>
+ <20150617091503.5f74b6e5@bbrezillon>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	Imre Kaloz <kaloz@openwrt.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20150617055824.GA9155@gondor.apana.org.au>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
+	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
+	Tawfik Bayouk <tawfik-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Lior Amsalem <alior-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Nadav Haklai <nadavh-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Eran Ben-Avi <benavi-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
+	Thomas Petazzoni <thomas.petazzoni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Gregory CLEMENT <gregory.clement-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
+	Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>,
+	Sebastian Hesselbarth <sebastian.hesselbarth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
+	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
+	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
+	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Jason Gunthorpe <jgunthorpe-ePGOBjL8dl3ta4EC/59zMFaTQe2KTcn/@public.gmane.org>,
+	Imre Kaloz <kaloz-p3rKhJxN3npAfugRpC6u6w@public.gmane.org>
+To: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20150617091503.5f74b6e5@bbrezillon>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-crypto.vger.kernel.org
 
-On Wed, 17 Jun 2015 13:58:24 +0800
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
-
-> On Tue, Jun 16, 2015 at 11:58:58AM +0200, Boris Brezillon wrote:
-> >
-> > +config CRYPTO_DEV_MARVELL_CESA
-> > +	tristate "New Marvell's Cryptographic Engine driver"
-> > +	depends on (PLAT_ORION || ARCH_MVEBU || COMPILE_TEST) && HAS_DMA && HAS_IOMEM
-> > +	select CRYPTO_ALGAPI
-> > +	select CRYPTO_AES
-> > +	select CRYPTO_DES
-> > +	select CRYPTO_BLKCIPHER2
-> > +	select CRYPTO_HASH
+On Wed, Jun 17, 2015 at 09:15:03AM +0200, Boris Brezillon wrote:
+>
+> Anyway, now I'm doing the following test:
 > 
-> While you're fixing the DMA issue, could you also replace BLKCIPHER2
-> with BLKCIPHER and kill the select on ALGAPI? BLKCIPHER2 is internal
-> to the crypto API and should not be used elsewhere while ALGAPI is
-> only meant to be selected by crypto types such as BLKCIPHER.
-> 
-> I know the existing driver does this too and I will fix that now.
+> if (creq->src_nents && !ret)
+> 	return -ENOMEM;
 
-Fixed.
+Best not call dma_map_sg at all in the !src_nents case as I think
+some architectures will WARN or BUG if you give it a zero-length
+list.
 
+Cheers,
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
