@@ -1,85 +1,42 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH v7 05/14] crypto: marvell/CESA: add TDMA support
-Date: Wed, 17 Jun 2015 17:58:28 +0200
-Message-ID: <20150617175828.2a83cda6@bbrezillon>
-References: <20150617122533.GA13185@gondor.apana.org.au>
-	<1434547922-10363-1-git-send-email-boris.brezillon@free-electrons.com>
-	<20150617150808.GA14915@gondor.apana.org.au>
-	<20150617173402.7946bbb0@bbrezillon>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH RFC v7 0/3] crypto: Introduce Public Key Encryption API
+Date: Wed, 17 Jun 2015 09:06:23 -0700
+Message-ID: <55819AFF.3010605@intel.com>
+References: <20150616173050.1248.21847.stgit@tstruk-mobl1> <20150617091453.GB11190@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	Imre Kaloz <kaloz@openw
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
+Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
+	jwboyer@redhat.com, smueller@chronox.de, richard@nod.at,
+	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
+	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	vgoyal@redhat.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:38280 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754990AbbFQP6c (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jun 2015 11:58:32 -0400
-In-Reply-To: <20150617173402.7946bbb0@bbrezillon>
+Received: from mga02.intel.com ([134.134.136.20]:14636 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757258AbbFQQGk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Jun 2015 12:06:40 -0400
+In-Reply-To: <20150617091453.GB11190@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, 17 Jun 2015 17:34:02 +0200
-Boris Brezillon <boris.brezillon@free-electrons.com> wrote:
+On 06/17/2015 02:14 AM, Herbert Xu wrote:
+>> This patch set introduces a Public Key Encryption API.
+>> > What is proposed is a new crypto type called crypto_akcipher_type,
+>> > plus new struct akcipher_alg and struct crypto_akcipher, together with number
+>> > of helper functions to register akcipher type algorithms and allocate
+>> > tfm instances. This is to make it similar to how the existing crypto
+>> > API works for the ablkcipher, ahash, and aead types.
+>> > The operations the new interface will allow to provide are:
+>> > 
+>> > 	int (*sign)(struct akcipher_request *req);
+>> > 	int (*verify)(struct akcipher_request *req);
+>> > 	int (*encrypt)(struct akcipher_request *req);
+>> > 	int (*decrypt)(struct akcipher_request *req);
+> All applied with two minor changes.  First of all I made AKCIPHER
+> invisible to the user like the other type config options.  I also
+> added a missing select on ASN1 that broke my build.
 
-> On Wed, 17 Jun 2015 23:08:08 +0800
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> 
-> > On Wed, Jun 17, 2015 at 03:32:02PM +0200, Boris Brezillon wrote:
-> > >
-> > > Hi Herbert,
-> > > 
-> > > I send you this patch alone so that you can verify I'm now properly
-> > > manipulating the SG list. Once I have your confirmation I'll send
-> > > the whole series again and annoy all the people in Cc one more time
-> > > ;-).
-> > 
-> > Thanks.  The only problem that I can see is the fact you're not
-> > checking for req->src == req->dst.  If they're equal then you must
-> > not map it twice.  Instead it should be mapped as DMA_BIDIRECTIONAL.
-> 
-> I can check for that too, but note that it doesn't prevent one from
-> providing different scatterlist structures pointing to the same memory
-> region.
-
-Actually, I don't know if it's a problem or not, so if it's not, please
-ignore my comment.
-
-> This being said, checking for req->src == req->dst should fix the case
-> where dst and src are pointing to the same scatterlist, which is a good
-> start.
-
-Here is an incremental patch [1], please let me know if something else
-is missing.
-
-Thanks,
-
-Boris
-
-[1]http://code.bulix.org/x8mz8x-88568
-
-
--- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Thank you very much for all your help with this Herbert
