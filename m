@@ -1,55 +1,57 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5 04/14] crypto: add a new driver for Marvell's CESA
-Date: Wed, 17 Jun 2015 13:58:24 +0800
-Message-ID: <20150617055824.GA9155@gondor.apana.org.au>
-References: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
- <1434448748-10828-5-git-send-email-boris.brezillon@free-electrons.com>
+Subject: crypto: tcrypt - Add rfc4309(ccm(aes)) speed test
+Date: Wed, 17 Jun 2015 14:04:21 +0800
+Message-ID: <20150617060421.GA9227@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	Imre Kaloz <kaloz@openwrt.org>
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:51265 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752180AbbFQGEY (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Jun 2015 02:04:24 -0400
 Content-Disposition: inline
-In-Reply-To: <1434448748-10828-5-git-send-email-boris.brezillon@free-electrons.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 16, 2015 at 11:58:58AM +0200, Boris Brezillon wrote:
->
-> +config CRYPTO_DEV_MARVELL_CESA
-> +	tristate "New Marvell's Cryptographic Engine driver"
-> +	depends on (PLAT_ORION || ARCH_MVEBU || COMPILE_TEST) && HAS_DMA && HAS_IOMEM
-> +	select CRYPTO_ALGAPI
-> +	select CRYPTO_AES
-> +	select CRYPTO_DES
-> +	select CRYPTO_BLKCIPHER2
-> +	select CRYPTO_HASH
+This patch adds a speed test for rfc4309(ccm(aes)) as mode 212.
 
-While you're fixing the DMA issue, could you also replace BLKCIPHER2
-with BLKCIPHER and kill the select on ALGAPI? BLKCIPHER2 is internal
-to the crypto API and should not be used elsewhere while ALGAPI is
-only meant to be selected by crypto types such as BLKCIPHER.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-I know the existing driver does this too and I will fix that now.
+ crypto/tcrypt.c |    5 +++++
+ crypto/tcrypt.h |    1 +
+ 2 files changed, 6 insertions(+)
 
-Thanks,
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 4b4a931..5146367 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1761,6 +1761,11 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
+ 				NULL, 0, 16, 8, aead_speed_template_20);
+ 		break;
+ 
++	case 212:
++		test_aead_speed("rfc4309(ccm(aes))", ENCRYPT, sec,
++				NULL, 0, 16, 8, aead_speed_template_19);
++		break;
++
+ 	case 300:
+ 		if (alg) {
+ 			test_hash_speed(alg, sec, generic_hash_speed_template);
+diff --git a/crypto/tcrypt.h b/crypto/tcrypt.h
+index 6c7e21a..6cc1b85 100644
+--- a/crypto/tcrypt.h
++++ b/crypto/tcrypt.h
+@@ -65,6 +65,7 @@ static u8 speed_template_32_64[] = {32, 64, 0};
+ /*
+  * AEAD speed tests
+  */
++static u8 aead_speed_template_19[] = {19, 0};
+ static u8 aead_speed_template_20[] = {20, 0};
+ 
+ /*
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
