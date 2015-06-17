@@ -1,121 +1,104 @@
 From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: [PATCH v6 06/14] crypto: marvell/CESA: add DES support
-Date: Wed, 17 Jun 2015 09:45:34 +0200
-Message-ID: <1434527142-3609-7-git-send-email-boris.brezillon@free-electrons.com>
+Subject: [PATCH v6 07/14] crypto: marvell/CESA: add Triple-DES support
+Date: Wed, 17 Jun 2015 09:45:35 +0200
+Message-ID: <1434527142-3609-8-git-send-email-boris.brezillon@free-electrons.com>
 References: <1434527142-3609-1-git-send-email-boris.brezillon@free-electrons.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Lior Amsalem <alior@marvell.com>,
- Boris Brezillon <boris.brezillon@free-electrons.com>,
- Ian Campbell <ijc+devicetree@hellion.org.uk>,
- Jason Cooper <jason@lakedaemon.net>, Tawfik Bayouk <tawfik@marvell.com>,
- Andrew Lunn <andrew@lunn.ch>, Arnaud Ebalard <arno@natisbad.org>,
- linux-kernel@vger.kernel.org,
- Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
- Eran Ben-Avi <benavi@marvell.com>, Nadav Haklai <nadavh@marvell.com>,
- devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
- Pawel Moll <pawel.moll@arm.com>, Kumar Gala <galak@codeaurora.org>,
- Gregory CLEMENT <gregory.clement@free-electrons.com>,
- Mark Rutland <mark.rutland@arm.com>, Imre Kaloz <kaloz@openwrt.org>,
- Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
- linux-arm-kernel@lists.infradead.org,
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	"Imre Kaloz" <kaloz@openwrt.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1434527142-3609-1-git-send-email-boris.brezillon@free-electrons.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-crypto.vger.kernel.org
 
-Add support for DES operations.
+From: Arnaud Ebalard <arno@natisbad.org>
 
-Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+Add support for Triple-DES operations.
+
 Signed-off-by: Arnaud Ebalard <arno@natisbad.org>
+Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
 ---
  drivers/crypto/marvell/cesa.c   |   2 +
  drivers/crypto/marvell/cesa.h   |   2 +
- drivers/crypto/marvell/cipher.c | 150 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 154 insertions(+)
+ drivers/crypto/marvell/cipher.c | 147 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 151 insertions(+)
 
 diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
-index 986f024..212840e 100644
+index 212840e..c0b1b49 100644
 --- a/drivers/crypto/marvell/cesa.c
 +++ b/drivers/crypto/marvell/cesa.c
-@@ -169,6 +169,8 @@ static void mv_cesa_remove_algs(struct mv_cesa_dev *cesa)
- }
- 
+@@ -171,6 +171,8 @@ static void mv_cesa_remove_algs(struct mv_cesa_dev *cesa)
  static struct crypto_alg *armada_370_cipher_algs[] = {
-+	&mv_cesa_ecb_des_alg,
-+	&mv_cesa_cbc_des_alg,
+ 	&mv_cesa_ecb_des_alg,
+ 	&mv_cesa_cbc_des_alg,
++	&mv_cesa_ecb_des3_ede_alg,
++	&mv_cesa_cbc_des3_ede_alg,
  	&mv_cesa_ecb_aes_alg,
  	&mv_cesa_cbc_aes_alg,
  };
 diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
-index 1a48323..2ee48fe 100644
+index 2ee48fe..2e8b7fc 100644
 --- a/drivers/crypto/marvell/cesa.h
 +++ b/drivers/crypto/marvell/cesa.h
-@@ -777,6 +777,8 @@ int mv_cesa_dma_add_op_transfers(struct mv_cesa_tdma_chain *chain,
- extern struct ahash_alg mv_sha1_alg;
- extern struct ahash_alg mv_ahmac_sha1_alg;
+@@ -779,6 +779,8 @@ extern struct ahash_alg mv_ahmac_sha1_alg;
  
-+extern struct crypto_alg mv_cesa_ecb_des_alg;
-+extern struct crypto_alg mv_cesa_cbc_des_alg;
+ extern struct crypto_alg mv_cesa_ecb_des_alg;
+ extern struct crypto_alg mv_cesa_cbc_des_alg;
++extern struct crypto_alg mv_cesa_ecb_des3_ede_alg;
++extern struct crypto_alg mv_cesa_cbc_des3_ede_alg;
  extern struct crypto_alg mv_cesa_ecb_aes_alg;
  extern struct crypto_alg mv_cesa_cbc_aes_alg;
  
 diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
-index a1f4013..ee49f5f 100644
+index ee49f5f..806c43a 100644
 --- a/drivers/crypto/marvell/cipher.c
 +++ b/drivers/crypto/marvell/cipher.c
-@@ -13,9 +13,15 @@
-  */
+@@ -22,6 +22,11 @@ struct mv_cesa_des_ctx {
+ 	u8 key[DES_KEY_SIZE];
+ };
  
- #include <crypto/aes.h>
-+#include <crypto/des.h>
- 
- #include "cesa.h"
- 
-+struct mv_cesa_des_ctx {
++struct mv_cesa_des3_ctx {
 +	struct mv_cesa_ctx base;
-+	u8 key[DES_KEY_SIZE];
++	u8 key[DES3_EDE_KEY_SIZE];
 +};
 +
  struct mv_cesa_aes_ctx {
  	struct mv_cesa_ctx base;
  	struct crypto_aes_ctx aes;
-@@ -231,6 +237,30 @@ static int mv_cesa_aes_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
+@@ -261,6 +266,22 @@ static int mv_cesa_des_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
  	return 0;
  }
  
-+static int mv_cesa_des_setkey(struct crypto_ablkcipher *cipher, const u8 *key,
-+			      unsigned int len)
++static int mv_cesa_des3_ede_setkey(struct crypto_ablkcipher *cipher,
++				   const u8 *key, unsigned int len)
 +{
 +	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(cipher);
 +	struct mv_cesa_des_ctx *ctx = crypto_tfm_ctx(tfm);
-+	u32 tmp[DES_EXPKEY_WORDS];
-+	int ret;
 +
-+	if (len != DES_KEY_SIZE) {
++	if (len != DES3_EDE_KEY_SIZE) {
 +		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
 +		return -EINVAL;
 +	}
 +
-+	ret = des_ekey(tmp, key);
-+	if (!ret && (tfm->crt_flags & CRYPTO_TFM_REQ_WEAK_KEY)) {
-+		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
-+		return -EINVAL;
-+	}
-+
-+	memcpy(ctx->key, key, DES_KEY_SIZE);
++	memcpy(ctx->key, key, DES3_EDE_KEY_SIZE);
 +
 +	return 0;
 +}
@@ -123,20 +106,20 @@ index a1f4013..ee49f5f 100644
  static int mv_cesa_ablkcipher_dma_req_init(struct ablkcipher_request *req,
  				const struct mv_cesa_op_ctx *op_templ)
  {
-@@ -351,6 +381,126 @@ static int mv_cesa_ablkcipher_req_init(struct ablkcipher_request *req,
- 	return ret;
- }
+@@ -501,6 +522,132 @@ struct crypto_alg mv_cesa_cbc_des_alg = {
+ 	},
+ };
  
-+static int mv_cesa_des_op(struct ablkcipher_request *req,
-+			  struct mv_cesa_op_ctx *tmpl)
++static int mv_cesa_des3_op(struct ablkcipher_request *req,
++			   struct mv_cesa_op_ctx *tmpl)
 +{
-+	struct mv_cesa_des_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	struct mv_cesa_des3_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
 +	int ret;
 +
-+	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_DES,
++	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_3DES,
 +			      CESA_SA_DESC_CFG_CRYPTM_MSK);
 +
-+	memcpy(tmpl->ctx.blkcipher.key, ctx->key, DES_KEY_SIZE);
++	memcpy(tmpl->ctx.blkcipher.key, ctx->key, DES3_EDE_KEY_SIZE);
 +
 +	ret = mv_cesa_ablkcipher_req_init(req, tmpl);
 +	if (ret)
@@ -149,100 +132,106 @@ index a1f4013..ee49f5f 100644
 +	return ret;
 +}
 +
-+static int mv_cesa_ecb_des_encrypt(struct ablkcipher_request *req)
++static int mv_cesa_ecb_des3_ede_encrypt(struct ablkcipher_request *req)
 +{
 +	struct mv_cesa_op_ctx tmpl;
 +
 +	mv_cesa_set_op_cfg(&tmpl,
 +			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_3DES_EDE |
 +			   CESA_SA_DESC_CFG_DIR_ENC);
 +
-+	return mv_cesa_des_op(req, &tmpl);
++	return mv_cesa_des3_op(req, &tmpl);
 +}
 +
-+static int mv_cesa_ecb_des_decrypt(struct ablkcipher_request *req)
++static int mv_cesa_ecb_des3_ede_decrypt(struct ablkcipher_request *req)
 +{
 +	struct mv_cesa_op_ctx tmpl;
 +
 +	mv_cesa_set_op_cfg(&tmpl,
 +			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_3DES_EDE |
 +			   CESA_SA_DESC_CFG_DIR_DEC);
 +
-+	return mv_cesa_des_op(req, &tmpl);
++	return mv_cesa_des3_op(req, &tmpl);
 +}
 +
-+struct crypto_alg mv_cesa_ecb_des_alg = {
-+	.cra_name = "ecb(des)",
-+	.cra_driver_name = "mv-ecb-des",
++struct crypto_alg mv_cesa_ecb_des3_ede_alg = {
++	.cra_name = "ecb(des3_ede)",
++	.cra_driver_name = "mv-ecb-des3-ede",
 +	.cra_priority = 300,
 +	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
 +		     CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
-+	.cra_blocksize = DES_BLOCK_SIZE,
-+	.cra_ctxsize = sizeof(struct mv_cesa_des_ctx),
++	.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++	.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
 +	.cra_alignmask = 0,
 +	.cra_type = &crypto_ablkcipher_type,
 +	.cra_module = THIS_MODULE,
 +	.cra_init = mv_cesa_ablkcipher_cra_init,
 +	.cra_u = {
 +		.ablkcipher = {
-+			.min_keysize = DES_KEY_SIZE,
-+			.max_keysize = DES_KEY_SIZE,
-+			.setkey = mv_cesa_des_setkey,
-+			.encrypt = mv_cesa_ecb_des_encrypt,
-+			.decrypt = mv_cesa_ecb_des_decrypt,
++			.min_keysize = DES3_EDE_KEY_SIZE,
++			.max_keysize = DES3_EDE_KEY_SIZE,
++			.ivsize	     = DES3_EDE_BLOCK_SIZE,
++			.setkey = mv_cesa_des3_ede_setkey,
++			.encrypt = mv_cesa_ecb_des3_ede_encrypt,
++			.decrypt = mv_cesa_ecb_des3_ede_decrypt,
 +		},
 +	},
 +};
 +
-+static int mv_cesa_cbc_des_op(struct ablkcipher_request *req,
-+			      struct mv_cesa_op_ctx *tmpl)
++static int mv_cesa_cbc_des3_op(struct ablkcipher_request *req,
++			       struct mv_cesa_op_ctx *tmpl)
 +{
-+	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTCM_CBC,
-+			      CESA_SA_DESC_CFG_CRYPTCM_MSK);
++	memcpy(tmpl->ctx.blkcipher.iv, req->info, DES3_EDE_BLOCK_SIZE);
 +
-+	memcpy(tmpl->ctx.blkcipher.iv, req->info, DES_BLOCK_SIZE);
-+
-+	return mv_cesa_des_op(req, tmpl);
++	return mv_cesa_des3_op(req, tmpl);
 +}
 +
-+static int mv_cesa_cbc_des_encrypt(struct ablkcipher_request *req)
++static int mv_cesa_cbc_des3_ede_encrypt(struct ablkcipher_request *req)
 +{
 +	struct mv_cesa_op_ctx tmpl;
 +
-+	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_ENC);
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_ENC);
 +
-+	return mv_cesa_cbc_des_op(req, &tmpl);
++	return mv_cesa_cbc_des3_op(req, &tmpl);
 +}
 +
-+static int mv_cesa_cbc_des_decrypt(struct ablkcipher_request *req)
++static int mv_cesa_cbc_des3_ede_decrypt(struct ablkcipher_request *req)
 +{
 +	struct mv_cesa_op_ctx tmpl;
 +
-+	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_DEC);
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_DEC);
 +
-+	return mv_cesa_cbc_des_op(req, &tmpl);
++	return mv_cesa_cbc_des3_op(req, &tmpl);
 +}
 +
-+struct crypto_alg mv_cesa_cbc_des_alg = {
-+	.cra_name = "cbc(des)",
-+	.cra_driver_name = "mv-cbc-des",
++struct crypto_alg mv_cesa_cbc_des3_ede_alg = {
++	.cra_name = "cbc(des3_ede)",
++	.cra_driver_name = "mv-cbc-des3-ede",
 +	.cra_priority = 300,
 +	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
 +		     CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
-+	.cra_blocksize = DES_BLOCK_SIZE,
-+	.cra_ctxsize = sizeof(struct mv_cesa_des_ctx),
++	.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++	.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
 +	.cra_alignmask = 0,
 +	.cra_type = &crypto_ablkcipher_type,
 +	.cra_module = THIS_MODULE,
 +	.cra_init = mv_cesa_ablkcipher_cra_init,
 +	.cra_u = {
 +		.ablkcipher = {
-+			.min_keysize = DES_KEY_SIZE,
-+			.max_keysize = DES_KEY_SIZE,
-+			.ivsize	     = DES_BLOCK_SIZE,
-+			.setkey = mv_cesa_des_setkey,
-+			.encrypt = mv_cesa_cbc_des_encrypt,
-+			.decrypt = mv_cesa_cbc_des_decrypt,
++			.min_keysize = DES3_EDE_KEY_SIZE,
++			.max_keysize = DES3_EDE_KEY_SIZE,
++			.ivsize	     = DES3_EDE_BLOCK_SIZE,
++			.setkey = mv_cesa_des3_ede_setkey,
++			.encrypt = mv_cesa_cbc_des3_ede_encrypt,
++			.decrypt = mv_cesa_cbc_des3_ede_decrypt,
 +		},
 +	},
 +};
