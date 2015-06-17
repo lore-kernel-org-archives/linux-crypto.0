@@ -1,11 +1,13 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
 Subject: Re: [PATCH v6 05/14] crypto: marvell/CESA: add TDMA support
-Date: Wed, 17 Jun 2015 17:50:01 +0800
-Message-ID: <20150617095001.GA11538@gondor.apana.org.au>
+Date: Wed, 17 Jun 2015 13:33:24 +0200
+Message-ID: <20150617133324.1ee6ad55@bbrezillon>
 References: <1434527142-3609-1-git-send-email-boris.brezillon@free-electrons.com>
- <1434527142-3609-6-git-send-email-boris.brezillon@free-electrons.com>
+	<1434527142-3609-6-git-send-email-boris.brezillon@free-electrons.com>
+	<20150617095001.GA11538@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
 	Tawfik Bayouk <tawfik@marvell.com>,
@@ -24,33 +26,44 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
 	Imre Kaloz <kaloz@openwrt.org>
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36785 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752658AbbFQJuk (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:56721 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752948AbbFQLd3 (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jun 2015 05:50:40 -0400
-Content-Disposition: inline
-In-Reply-To: <1434527142-3609-6-git-send-email-boris.brezillon@free-electrons.com>
+	Wed, 17 Jun 2015 07:33:29 -0400
+In-Reply-To: <20150617095001.GA11538@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 17, 2015 at 09:45:33AM +0200, Boris Brezillon wrote:
->
-> +	ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
-> +			 DMA_TO_DEVICE);
-> +	if (!ret)
-> +		return -ENOMEM;
-> +
-> +	creq->src_nents = ret;
+On Wed, 17 Jun 2015 17:50:01 +0800
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-DMA-API-HOWTO says that you must retain the original nents and
-use it when you call dma_unmap_sg.  So I'm afraid one more repost
-is needed :)
+> On Wed, Jun 17, 2015 at 09:45:33AM +0200, Boris Brezillon wrote:
+> >
+> > +	ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
+> > +			 DMA_TO_DEVICE);
+> > +	if (!ret)
+> > +		return -ENOMEM;
+> > +
+> > +	creq->src_nents = ret;
+> 
+> DMA-API-HOWTO says that you must retain the original nents and
+> use it when you call dma_unmap_sg.  So I'm afraid one more repost
+> is needed :)
 
-Thanks,
+My bad (again :-/).
+Actually, I think I don't need to save the dma_map_sg return val, since
+I'm using the sg_next function to iterate over the scatterlist. Am I
+right ?
+IOW, is the ->map_sg() function (in dma_map_ops) supposed to merge the
+contiguous entries and then flag the unused entries with the is_chain
+flag ?
+If that's not the case, and the ->map_sg() just marks the merged entries
+as empty (length = 0), then I'll have to rework my iterator algorithm.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Boris Brezillon, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
