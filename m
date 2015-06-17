@@ -1,56 +1,56 @@
-From: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Subject: Re: [PATCH v5 05/14] crypto: marvell/CESA: add TDMA support
-Date: Wed, 17 Jun 2015 15:18:29 +0800
-Message-ID: <20150617071829.GA9895@gondor.apana.org.au>
-References: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
- <1434448748-10828-6-git-send-email-boris.brezillon@free-electrons.com>
- <20150617050527.GA8807@gondor.apana.org.au>
- <20150617055633.GA9123@gondor.apana.org.au>
- <20150617091503.5f74b6e5@bbrezillon>
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: Re: [PATCH RFC 06/11] crypto: caam - Enable MXC devices to select
+ CAAM driver in Kconfig
+Date: Wed, 17 Jun 2015 09:27:34 +0200
+Message-ID: <20150617072734.GK7947@pengutronix.de>
+References: <1434412379-11623-1-git-send-email-vicki.milhoan@freescale.com>
+ <1434412379-11623-7-git-send-email-vicki.milhoan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem-fT/PcQaiUtIeIZ0/mPfg9Q@public.gmane.org>,
-	linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Arnaud Ebalard <arno-LkuqDEemtHBg9hUCZPvPmw@public.gmane.org>,
-	Tawfik Bayouk <tawfik-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Lior Amsalem <alior-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Nadav Haklai <nadavh-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Eran Ben-Avi <benavi-eYqpPyKDWXRBDgjK7y7TUQ@public.gmane.org>,
-	Thomas Petazzoni <thomas.petazzoni-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Gregory CLEMENT <gregory.clement-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>,
-	Jason Cooper <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>,
-	Sebastian Hesselbarth <sebastian.hesselbarth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Andrew Lunn <andrew-g2DYL2Zd6BY@public.gmane.org>, Rob Herring <robh+dt-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Pawel Moll <pawel.moll-5wv7dgnIgG8@public.gmane.org>,
-	Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>,
-	Ian Campbell <ijc+devicetree-KcIKpvwj1kUDXYZnReoRVg@public.gmane.org>,
-	Kumar Gala <galak-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Jason Gunthorpe <jgunthorpe-ePGOBjL8dl3ta4EC/59zMFaTQe2KTcn/@public.gmane.org>,
-	Imre Kaloz <kaloz-p3rKhJxN3npAfugRpC6u6w@public.gmane.org>
-To: Boris Brezillon <boris.brezillon-wi1+55ScJUtKEb57/3fJTNBPR1lH4CV8@public.gmane.org>
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	horia.geanta@freescale.com, ruchika.gupta@freescale.com
+To: Victoria Milhoan <vicki.milhoan@freescale.com>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:56897 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757812AbbFQH1h (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 17 Jun 2015 03:27:37 -0400
 Content-Disposition: inline
-In-Reply-To: <20150617091503.5f74b6e5@bbrezillon>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-crypto.vger.kernel.org
+In-Reply-To: <1434412379-11623-7-git-send-email-vicki.milhoan@freescale.com>
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 17, 2015 at 09:15:03AM +0200, Boris Brezillon wrote:
->
-> Anyway, now I'm doing the following test:
+On Mon, Jun 15, 2015 at 04:52:54PM -0700, Victoria Milhoan wrote:
+> From: Steve Cornelius <steve.cornelius@freescale.com>
 > 
-> if (creq->src_nents && !ret)
-> 	return -ENOMEM;
+> Allow CAAM to be selected in the kernel for Freescale i.MX6 devices if
+> ARCH_MXC is enabled.
+> 
+> Signed-off-by: Steve Cornelius <steve.cornelius@freescale.com>
+> Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+> ---
+>  drivers/crypto/caam/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+> index e7555ff..bc9aa07 100644
+> --- a/drivers/crypto/caam/Kconfig
+> +++ b/drivers/crypto/caam/Kconfig
+> @@ -1,6 +1,6 @@
+>  config CRYPTO_DEV_FSL_CAAM
+>  	tristate "Freescale CAAM-Multicore driver backend"
+> -	depends on FSL_SOC
+> +	depends on FSL_SOC || ARCH_MXC
 
-Best not call dma_map_sg at all in the !src_nents case as I think
-some architectures will WARN or BUG if you give it a zero-length
-list.
+Is this right? Are there other i.MX that have the CAAM IP core?
+Sounds like it should be SOC_IMX6 instead.
 
-Cheers,
+Regards,
+Steffen
+
 -- 
-Email: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Pengutronix e.K.                           |                             |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
