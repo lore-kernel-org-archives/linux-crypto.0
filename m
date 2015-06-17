@@ -1,10 +1,9 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5 05/14] crypto: marvell/CESA: add TDMA support
-Date: Wed, 17 Jun 2015 13:56:33 +0800
-Message-ID: <20150617055633.GA9123@gondor.apana.org.au>
+Subject: Re: [PATCH v5 04/14] crypto: add a new driver for Marvell's CESA
+Date: Wed, 17 Jun 2015 13:58:24 +0800
+Message-ID: <20150617055824.GA9155@gondor.apana.org.au>
 References: <1434448748-10828-1-git-send-email-boris.brezillon@free-electrons.com>
- <1434448748-10828-6-git-send-email-boris.brezillon@free-electrons.com>
- <20150617050527.GA8807@gondor.apana.org.au>
+ <1434448748-10828-5-git-send-email-boris.brezillon@free-electrons.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -26,34 +25,31 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
 	Imre Kaloz <kaloz@openwrt.org>
 To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:45192 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751873AbbFQF5F (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jun 2015 01:57:05 -0400
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150617050527.GA8807@gondor.apana.org.au>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+In-Reply-To: <1434448748-10828-5-git-send-email-boris.brezillon@free-electrons.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On Wed, Jun 17, 2015 at 01:05:27PM +0800, Herbert Xu wrote:
-> On Tue, Jun 16, 2015 at 11:58:59AM +0200, Boris Brezillon wrote:
-> >
-> > +	ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
-> > +			 DMA_TO_DEVICE);
-> > +	if (ret != creq->src_nents)
-> > +		return -ENOMEM;
-> 
-> Hmm it doesn't quite work like that.  It returns zero on error,
-> otherwise it returns the number (n) of mapped entries which may be
-> less than what you gave it due to merging.  You're then supposed
-> to use only the first n entries which should contain everything.
+On Tue, Jun 16, 2015 at 11:58:58AM +0200, Boris Brezillon wrote:
+>
+> +config CRYPTO_DEV_MARVELL_CESA
+> +	tristate "New Marvell's Cryptographic Engine driver"
+> +	depends on (PLAT_ORION || ARCH_MVEBU || COMPILE_TEST) && HAS_DMA && HAS_IOMEM
+> +	select CRYPTO_ALGAPI
+> +	select CRYPTO_AES
+> +	select CRYPTO_DES
+> +	select CRYPTO_BLKCIPHER2
+> +	select CRYPTO_HASH
 
-Please take a look at Documentation/DMA-API-HOWTO.txt, it has
-everything you need to know about the dma_map_sg interface.
+While you're fixing the DMA issue, could you also replace BLKCIPHER2
+with BLKCIPHER and kill the select on ALGAPI? BLKCIPHER2 is internal
+to the crypto API and should not be used elsewhere while ALGAPI is
+only meant to be selected by crypto types such as BLKCIPHER.
 
-Cheers,
+I know the existing driver does this too and I will fix that now.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
