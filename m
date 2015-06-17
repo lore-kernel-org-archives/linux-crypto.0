@@ -1,34 +1,47 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: poly1305 - Pass key as first two message blocks
- to each desc_ctx
-Date: Wed, 17 Jun 2015 17:13:47 +0800
-Message-ID: <20150617091347.GA11190@gondor.apana.org.au>
-References: <1434447256-6780-1-git-send-email-martin@strongswan.org>
+Subject: Re: [PATCH RFC v7 0/3] crypto: Introduce Public Key Encryption API
+Date: Wed, 17 Jun 2015 17:14:53 +0800
+Message-ID: <20150617091453.GB11190@gondor.apana.org.au>
+References: <20150616173050.1248.21847.stgit@tstruk-mobl1>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-crypto@vger.kernel.org
-To: Martin Willi <martin@strongswan.org>
+Cc: linux-kernel@vger.kernel.org, keescook@chromium.org,
+	jwboyer@redhat.com, smueller@chronox.de, richard@nod.at,
+	steved@redhat.com, qat-linux@intel.com, dhowells@redhat.com,
+	linux-crypto@vger.kernel.org, james.l.morris@oracle.com,
+	jkosina@suse.cz, zohar@linux.vnet.ibm.com, davem@davemloft.net,
+	vgoyal@redhat.com
+To: Tadeusz Struk <tadeusz.struk@intel.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:56897 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:34666 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751457AbbFQJN5 (ORCPT
+	with ESMTP id S1751526AbbFQJPQ (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jun 2015 05:13:57 -0400
+	Wed, 17 Jun 2015 05:15:16 -0400
 Content-Disposition: inline
-In-Reply-To: <1434447256-6780-1-git-send-email-martin@strongswan.org>
+In-Reply-To: <20150616173050.1248.21847.stgit@tstruk-mobl1>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 16, 2015 at 11:34:16AM +0200, Martin Willi wrote:
-> The Poly1305 authenticator requires a unique key for each generated tag. This
-> implies that we can't set the key per tfm, as multiple users set individual
-> keys. Instead we pass a desc specific key as the first two blocks of the
-> message to authenticate in update().
+On Tue, Jun 16, 2015 at 10:30:50AM -0700, Tadeusz Struk wrote:
+> This patch set introduces a Public Key Encryption API.
+> What is proposed is a new crypto type called crypto_akcipher_type,
+> plus new struct akcipher_alg and struct crypto_akcipher, together with number
+> of helper functions to register akcipher type algorithms and allocate
+> tfm instances. This is to make it similar to how the existing crypto
+> API works for the ablkcipher, ahash, and aead types.
+> The operations the new interface will allow to provide are:
 > 
-> Signed-off-by: Martin Willi <martin@strongswan.org>
+> 	int (*sign)(struct akcipher_request *req);
+> 	int (*verify)(struct akcipher_request *req);
+> 	int (*encrypt)(struct akcipher_request *req);
+> 	int (*decrypt)(struct akcipher_request *req);
 
-Patch applied.  Thanks Martin!
+All applied with two minor changes.  First of all I made AKCIPHER
+invisible to the user like the other type config options.  I also
+added a missing select on ASN1 that broke my build.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
