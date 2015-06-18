@@ -1,50 +1,55 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v7 05/14] crypto: marvell/CESA: add TDMA support
-Date: Thu, 18 Jun 2015 09:42:07 +0800
-Message-ID: <20150618014207.GB26238@gondor.apana.org.au>
-References: <20150617122533.GA13185@gondor.apana.org.au>
- <1434547922-10363-1-git-send-email-boris.brezillon@free-electrons.com>
- <20150617150808.GA14915@gondor.apana.org.au>
- <20150617173402.7946bbb0@bbrezillon>
- <20150617175828.2a83cda6@bbrezillon>
+Subject: Crypto Fixes for 4.1
+Date: Thu, 18 Jun 2015 11:43:53 +0800
+Message-ID: <20150618034353.GA27456@gondor.apana.org.au>
+References: <20140101061016.GA22579@gondor.apana.org.au>
+ <20140203125944.GA31446@gondor.apana.org.au>
+ <20141231033217.GA27261@gondor.apana.org.au>
+ <20150107021737.GA25043@gondor.apana.org.au>
+ <20150425080310.GA6873@gondor.apana.org.au>
+ <20150505100621.GA8678@gondor.apana.org.au>
+ <20150511055608.GA2055@gondor.apana.org.au>
+ <20150520065441.GA8330@gondor.apana.org.au>
+ <20150522040559.GA30475@gondor.apana.org.au>
+ <20150526084351.GA7377@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	Imre Kaloz <kaloz@openwrt.org>
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:54944 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:54721 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751197AbbFRBmb (ORCPT
+	with ESMTP id S1751371AbbFRDoB (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 17 Jun 2015 21:42:31 -0400
+	Wed, 17 Jun 2015 23:44:01 -0400
 Content-Disposition: inline
-In-Reply-To: <20150617175828.2a83cda6@bbrezillon>
+In-Reply-To: <20150526084351.GA7377@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jun 17, 2015 at 05:58:28PM +0200, Boris Brezillon wrote:
->
-> Here is an incremental patch [1], please let me know if something else
-> is missing.
+Hi Linus:
 
-Looks good.  Thanks!
+This push fixes the following issues:
+
+1) Crash in caam hash due to uninitialised buffer lengths.
+2) Alignment issue in caam RNG that may lead to non-random output.
+
+Please pull from
+
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git
+
+
+Steve Cornelius (2):
+      crypto: caam - improve initalization for context state saves
+      crypto: caam - fix RNG buffer cache alignment
+
+ drivers/crypto/caam/caamhash.c |    2 ++
+ drivers/crypto/caam/caamrng.c  |    2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
