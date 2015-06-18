@@ -1,15 +1,14 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCH v6 05/14] crypto: marvell/CESA: add TDMA support
-Date: Thu, 18 Jun 2015 11:33:24 +0200
-Message-ID: <20150618113324.2d469103@bbrezillon>
+Date: Thu, 18 Jun 2015 17:37:30 +0800
+Message-ID: <20150618093730.GA29911@gondor.apana.org.au>
 References: <1434527142-3609-1-git-send-email-boris.brezillon@free-electrons.com>
-	<1434527142-3609-6-git-send-email-boris.brezillon@free-electrons.com>
-	<20150617095001.GA11538@gondor.apana.org.au>
-	<20150618090400.GG7557@n2100.arm.linux.org.uk>
+ <1434527142-3609-6-git-send-email-boris.brezillon@free-electrons.com>
+ <20150617095001.GA11538@gondor.apana.org.au>
+ <20150618090400.GG7557@n2100.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
 	Lior Amsalem <alior@marvell.com>, Andrew Lunn <andrew@lunn.ch>,
 	Nadav Haklai <nadavh@marvell.com>,
 	Mark Rutland <mark.rutland@arm.com>,
@@ -28,40 +27,21 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	Kumar Gala <galak@codeaurora.org>,
 	Imre Kaloz <kaloz@openwrt.org>,
-	"David S. Miller" <davem@daveml
+	"David S. Miller" <
 To: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:57341 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754240AbbFRJdd (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:44915 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753950AbbFRJiX (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Jun 2015 05:33:33 -0400
+	Thu, 18 Jun 2015 05:38:23 -0400
+Content-Disposition: inline
 In-Reply-To: <20150618090400.GG7557@n2100.arm.linux.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Russel,
-
-On Thu, 18 Jun 2015 10:04:00 +0100
-Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
-
-> On Wed, Jun 17, 2015 at 05:50:01PM +0800, Herbert Xu wrote:
-> > On Wed, Jun 17, 2015 at 09:45:33AM +0200, Boris Brezillon wrote:
-> > >
-> > > +	ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
-> > > +			 DMA_TO_DEVICE);
-> > > +	if (!ret)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	creq->src_nents = ret;
-> > 
-> > DMA-API-HOWTO says that you must retain the original nents and
-> > use it when you call dma_unmap_sg.  So I'm afraid one more repost
-> > is needed :)
-> 
-> It's worse than that...  You're right on that point, but there's an
-> additional point.
-> 
+On Thu, Jun 18, 2015 at 10:04:00AM +0100, Russell King - ARM Linux wrote:
+>
 > If dma_map_sg() coalesces scatterlist entries, then ret will be smaller
 > than src_nents, and ret indicates how many scatterlist entries to be
 > walked during DMA - you should not use src_nents for that.  I couldn't
@@ -70,21 +50,12 @@ Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
 > entries: it just keeps going with sg_next() until it hits the end of
 > the allocated scatterlist.
 
-Yes, I realized that, and I never used the value returned by
-dma_map_sg() to walk the scatterlist anyway: I was using the sg_next()
-and sg->length value (which I replaced by sg_dma_len() in v7 as
-suggested by Herbert).
-So the ->src_nents assignment to dma_map_sg() return value was just a
-silly mistake caused by an uncareful read of the DMA-API-HOWTO.
+I think he should be OK even though he throws away the return value
+because he's stopping his walk once the sum of sg_dma_length reaches
+his end goal.
 
-Am I missing something else ?
-
-Best Regards,
-
-Boris
-
-
+Cheers,
 -- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
