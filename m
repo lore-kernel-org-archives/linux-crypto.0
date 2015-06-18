@@ -1,110 +1,44 @@
-From: Boris Brezillon <boris.brezillon@free-electrons.com>
-Subject: Re: [PATCH v6 05/14] crypto: marvell/CESA: add TDMA support
-Date: Thu, 18 Jun 2015 11:52:36 +0200
-Message-ID: <20150618115236.51e70ab9@bbrezillon>
-References: <1434527142-3609-1-git-send-email-boris.brezillon@free-electrons.com>
-	<1434527142-3609-6-git-send-email-boris.brezillon@free-electrons.com>
-	<20150617095001.GA11538@gondor.apana.org.au>
-	<20150618090400.GG7557@n2100.arm.linux.org.uk>
-	<20150618113324.2d469103@bbrezillon>
-	<20150618094803.GH7557@n2100.arm.linux.org.uk>
+From: Ambarus Tudor-Dan-B38632 <b38632@freescale.com>
+Subject: Re: variable iv lengths for aes-gcm
+Date: Thu, 18 Jun 2015 12:44:06 +0300
+Message-ID: <558292E6.3060708@freescale.com>
+References: <55827696.20704@freescale.com>
+ <20150618080707.GA29218@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Lior Amsalem <alior@marvell.com>, Andrew Lunn <andrew@lunn.ch>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	devicetree@vger.kernel.org, Jason Cooper <jason@lakedaemon.net>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Kumar Gala <galak@codeaurora.org>,
-	Imre Kaloz <kaloz@openwrt.org>,
-	"David S. Miller" <davem@daveml
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:57796 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753977AbbFRJwk (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Thu, 18 Jun 2015 05:52:40 -0400
-In-Reply-To: <20150618094803.GH7557@n2100.arm.linux.org.uk>
+Received: from mail-bn1bon0139.outbound.protection.outlook.com ([157.56.111.139]:13664
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1754506AbbFRKRw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Thu, 18 Jun 2015 06:17:52 -0400
+In-Reply-To: <20150618080707.GA29218@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 18 Jun 2015 10:48:03 +0100
-Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
-
-> On Thu, Jun 18, 2015 at 11:33:24AM +0200, Boris Brezillon wrote:
-> > Hi Russel,
-> > 
-> > On Thu, 18 Jun 2015 10:04:00 +0100
-> > Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
-> > 
-> > > On Wed, Jun 17, 2015 at 05:50:01PM +0800, Herbert Xu wrote:
-> > > > On Wed, Jun 17, 2015 at 09:45:33AM +0200, Boris Brezillon wrote:
-> > > > >
-> > > > > +	ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
-> > > > > +			 DMA_TO_DEVICE);
-> > > > > +	if (!ret)
-> > > > > +		return -ENOMEM;
-> > > > > +
-> > > > > +	creq->src_nents = ret;
-> > > > 
-> > > > DMA-API-HOWTO says that you must retain the original nents and
-> > > > use it when you call dma_unmap_sg.  So I'm afraid one more repost
-> > > > is needed :)
-> > > 
-> > > It's worse than that...  You're right on that point, but there's an
-> > > additional point.
-> > > 
-> > > If dma_map_sg() coalesces scatterlist entries, then ret will be smaller
-> > > than src_nents, and ret indicates how many scatterlist entries to be
-> > > walked during DMA - you should not use src_nents for that.  I couldn't
-> > > see where the driver used that information.  In fact, the driver seems
-> > > to be capable of walking more than src_nents/ret numbers of scatterlist
-> > > entries: it just keeps going with sg_next() until it hits the end of
-> > > the allocated scatterlist.
-> > 
-> > Yes, I realized that, and I never used the value returned by
-> > dma_map_sg() to walk the scatterlist anyway: I was using the sg_next()
-> > and sg->length value (which I replaced by sg_dma_len() in v7 as
-> > suggested by Herbert).
-> > So the ->src_nents assignment to dma_map_sg() return value was just a
-> > silly mistake caused by an uncareful read of the DMA-API-HOWTO.
-> > 
-> > Am I missing something else ?
-> 
-> Yes.  'ret' should be used to indicate the number of scatterlist entries
-> to walk for DMA purposes after the scatterlist has been mapped.  For PIO
-> purposes, using src_nents is still acceptable.
-> 
-> As Herbert points out, you're stopping after the sum of transferred bytes
-> matches, so I suppose that's fine.
-> 
-> One other point though: you should use sg_dma_address() rather than
-> dereferencing sg->dma_address directly.
-> 
-
-Okay, I'll fix that before submitting a new version.
-
-Thanks,
-
-Boris
 
 
+On 6/18/2015 11:07 AM, Herbert Xu wrote:
+> On Thu, Jun 18, 2015 at 10:43:18AM +0300, Ambarus Tudor-Dan-B38632 wrote:
+>>
+>> I'm trying to find a method to pass IVs of various lengths to an
+>> algorithm. A particular case would be aes-gcm IV. It can have any
+>> number of bits between 1 and 2^64.
+>>
+>> A possible way to do this is to set the ivlen per request. Are there
+>> any (better) ways to do this?
+>
+> Why would you want do this apart from the fact that your hardware
+> supports it and you want to export this?
+>
 
--- 
-Boris Brezillon, Free Electrons
-Embedded Linux and Kernel engineering
-http://free-electrons.com
+The reason is to cover a wide range of applications. Your question also 
+applies to the gcm NIST publication.
+
+Users may want to use a crypto module that meets the requirements of 
+FIPS Pub. for various applications that use variable lengths for IV.
+
+ta
