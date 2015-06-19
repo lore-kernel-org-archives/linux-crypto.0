@@ -1,87 +1,66 @@
-From: Gregory CLEMENT <gregory.clement@free-electrons.com>
-Subject: Re: [PATCH v7 04/14] crypto: add a new driver for Marvell's CESA
-Date: Fri, 19 Jun 2015 10:40:15 +0200
-Message-ID: <5583D56F.7020808@free-electrons.com>
-References: <1434635190-27733-1-git-send-email-boris.brezillon@free-electrons.com>	<1434635190-27733-5-git-send-email-boris.brezillon@free-electrons.com>	<20150619064256.GA10246@gondor.apana.org.au> <20150619102407.01187ff0@free-electrons.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
-	Imre Kaloz <kaloz@openwrt.org>,
-	Russell King - ARM Linux <linux@arm.linux.org.uk>
-To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
+From: Michael van der Westhuizen <michael@smart-africa.com>
+Subject: [PATCH] arm: crypto: picoxcell: Update to the current clk API
+Date: Fri, 19 Jun 2015 15:55:51 +0200
+Message-ID: <1434722151-4309-1-git-send-email-michael@smart-africa.com>
+Cc: Jamie Iles <jamie@jamieiles.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Miller <davem@davemloft.net>,
+	linux-arm-kernel@lists.infradead.org,
+	Michael van der Westhuizen <michael@smart-africa.com>
+To: linux-crypto@vger.kernel.org
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from down.free-electrons.com ([37.187.137.238]:59013 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754298AbbFSIkS (ORCPT
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:33310 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751662AbbFSN4K (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 19 Jun 2015 04:40:18 -0400
-In-Reply-To: <20150619102407.01187ff0@free-electrons.com>
+	Fri, 19 Jun 2015 09:56:10 -0400
+Received: by wgez8 with SMTP id z8so90443630wge.0
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Jun 2015 06:56:09 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Thomas, Herbert,
+The picoXcell hardware crypto accelerator driver was using an
+older version of the clk framework, and not (un)preparing the
+clock before enabling/disabling it.  This change uses the handy
+clk_prepare_enable function to interact with the current clk
+framework correctly.
 
-On 19/06/2015 10:24, Thomas Petazzoni wrote:
-> Hello Herbert,
-> 
-> On Fri, 19 Jun 2015 14:42:56 +0800, Herbert Xu wrote:
->> On Thu, Jun 18, 2015 at 03:46:20PM +0200, Boris Brezillon wrote:
->>>
->>> +	dram = mv_mbus_dram_info_nooverlap();
->>
->> This doesn't compile because it hasn't made it into mainline yet.
->> I'm afraid this patch-set will have to wait until that happens.
-> 
-> We have two options here:
-> 
->  1/ We can ask the mach-mvebu maintainers to provide a branch with just
->     the commit implementing mv_mbus_dram_info_nooverlap(), and you
->     merge that branch into your tree as a dependency.
+Signed-off-by: Michael van der Westhuizen <michael@smart-africa.com>
+---
+ drivers/crypto/picoxcell_crypto.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-For this option you can use the branch mvebu/drivers located at
- git://git.infradead.org/linux-mvebu.git.
-
-In this branch there is the commit "bus: mvebu-mbus: add mv_mbus_dram_info_nooverlap()"
-but not only this one because it depends also on fixes which have been
-merged in this same branch.
-
-This branch is immutable and have already been merged in arm-soc.
-
-Thanks,
-
-Gregory
-
-> 
->  2/ We temporarily revert back to using mv_mbus_dram_info(). For the
->     vast majority of platforms, this is OK. It's only if you have 4 GB
->     of RAM or more that it causes problem. And then we switch to
->     mv_mbus_dram_info_nooverlap() as part of the -rc cycle.
-> 
-> (2) is probably easier. Herbert, what do you think?
-> 
-> Thomas
-> 
-
-
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index 5da5b98..c5a9e5d 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -1754,15 +1754,15 @@ static int spacc_probe(struct platform_device *pdev)
+ 		return PTR_ERR(engine->clk);
+ 	}
+ 
+-	if (clk_enable(engine->clk)) {
+-		dev_info(&pdev->dev, "unable to enable clk\n");
++	if (clk_prepare_enable(engine->clk)) {
++		dev_info(&pdev->dev, "unable to prepare/enable clk\n");
+ 		clk_put(engine->clk);
+ 		return -EIO;
+ 	}
+ 
+ 	err = device_create_file(&pdev->dev, &dev_attr_stat_irq_thresh);
+ 	if (err) {
+-		clk_disable(engine->clk);
++		clk_disable_unprepare(engine->clk);
+ 		clk_put(engine->clk);
+ 		return err;
+ 	}
+@@ -1830,7 +1830,7 @@ static int spacc_remove(struct platform_device *pdev)
+ 		crypto_unregister_alg(&alg->alg);
+ 	}
+ 
+-	clk_disable(engine->clk);
++	clk_disable_unprepare(engine->clk);
+ 	clk_put(engine->clk);
+ 
+ 	return 0;
 -- 
-Gregory Clement, Free Electrons
-Kernel, drivers, real-time and embedded Linux
-development, consulting, training and support.
-http://free-electrons.com
+2.1.4
