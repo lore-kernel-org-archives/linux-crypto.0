@@ -1,66 +1,60 @@
-From: Michael van der Westhuizen <michael@smart-africa.com>
-Subject: [PATCH] arm: crypto: picoxcell: Update to the current clk API
-Date: Fri, 19 Jun 2015 15:55:51 +0200
-Message-ID: <1434722151-4309-1-git-send-email-michael@smart-africa.com>
-Cc: Jamie Iles <jamie@jamieiles.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Miller <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org,
-	Michael van der Westhuizen <michael@smart-africa.com>
-To: linux-crypto@vger.kernel.org
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v7 04/14] crypto: add a new driver for Marvell's CESA
+Date: Fri, 19 Jun 2015 22:03:15 +0800
+Message-ID: <20150619140315.GA14692@gondor.apana.org.au>
+References: <1434635190-27733-1-git-send-email-boris.brezillon@free-electrons.com>
+ <1434635190-27733-5-git-send-email-boris.brezillon@free-electrons.com>
+ <20150619064256.GA10246@gondor.apana.org.au>
+ <20150619102407.01187ff0@free-electrons.com>
+ <5583D56F.7020808@free-electrons.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Boris Brezillon <boris.brezillon@free-electrons.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	Imre Kaloz <kaloz@openwrt.org>,
+	Russell King - ARM Linux <linux@a
+To: Gregory CLEMENT <gregory.clement@free-electrons.com>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-wg0-f44.google.com ([74.125.82.44]:33310 "EHLO
-	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751662AbbFSN4K (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:45050 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751656AbbFSODx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 19 Jun 2015 09:56:10 -0400
-Received: by wgez8 with SMTP id z8so90443630wge.0
-        for <linux-crypto@vger.kernel.org>; Fri, 19 Jun 2015 06:56:09 -0700 (PDT)
+	Fri, 19 Jun 2015 10:03:53 -0400
+Content-Disposition: inline
+In-Reply-To: <5583D56F.7020808@free-electrons.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The picoXcell hardware crypto accelerator driver was using an
-older version of the clk framework, and not (un)preparing the
-clock before enabling/disabling it.  This change uses the handy
-clk_prepare_enable function to interact with the current clk
-framework correctly.
+On Fri, Jun 19, 2015 at 10:40:15AM +0200, Gregory CLEMENT wrote:
+> 
+> For this option you can use the branch mvebu/drivers located at
+>  git://git.infradead.org/linux-mvebu.git.
+> 
+> In this branch there is the commit "bus: mvebu-mbus: add mv_mbus_dram_info_nooverlap()"
+> but not only this one because it depends also on fixes which have been
+> merged in this same branch.
 
-Signed-off-by: Michael van der Westhuizen <michael@smart-africa.com>
----
- drivers/crypto/picoxcell_crypto.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+It looks like the parent of this changeset is already in the mainline
+so it's literally just a single patch.  I'll try to pull it into
+cryptodev.
 
-diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
-index 5da5b98..c5a9e5d 100644
---- a/drivers/crypto/picoxcell_crypto.c
-+++ b/drivers/crypto/picoxcell_crypto.c
-@@ -1754,15 +1754,15 @@ static int spacc_probe(struct platform_device *pdev)
- 		return PTR_ERR(engine->clk);
- 	}
- 
--	if (clk_enable(engine->clk)) {
--		dev_info(&pdev->dev, "unable to enable clk\n");
-+	if (clk_prepare_enable(engine->clk)) {
-+		dev_info(&pdev->dev, "unable to prepare/enable clk\n");
- 		clk_put(engine->clk);
- 		return -EIO;
- 	}
- 
- 	err = device_create_file(&pdev->dev, &dev_attr_stat_irq_thresh);
- 	if (err) {
--		clk_disable(engine->clk);
-+		clk_disable_unprepare(engine->clk);
- 		clk_put(engine->clk);
- 		return err;
- 	}
-@@ -1830,7 +1830,7 @@ static int spacc_remove(struct platform_device *pdev)
- 		crypto_unregister_alg(&alg->alg);
- 	}
- 
--	clk_disable(engine->clk);
-+	clk_disable_unprepare(engine->clk);
- 	clk_put(engine->clk);
- 
- 	return 0;
+Thanks,
 -- 
-2.1.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
