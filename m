@@ -1,36 +1,68 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: nx - add LE support to pSeries platform driver
-Date: Fri, 19 Jun 2015 15:30:33 +0800
-Message-ID: <20150619073033.GA10522@gondor.apana.org.au>
-References: <1434643530-17728-1-git-send-email-ddstreet@ieee.org>
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: Re: [PATCH v7 04/14] crypto: add a new driver for Marvell's CESA
+Date: Fri, 19 Jun 2015 10:24:07 +0200
+Message-ID: <20150619102407.01187ff0@free-electrons.com>
+References: <1434635190-27733-1-git-send-email-boris.brezillon@free-electrons.com>
+	<1434635190-27733-5-git-send-email-boris.brezillon@free-electrons.com>
+	<20150619064256.GA10246@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Dan Streetman <ddstreet@ieee.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jason Gunthorpe <jgunthorpe@obsidianresearch.com>,
+	Imre Kaloz <kaloz@openwrt.org>,
+	Russell King - ARM Linux <linux@arm
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:36580 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752148AbbFSHan (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:58753 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753740AbbFSIYP (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Fri, 19 Jun 2015 03:30:43 -0400
-Content-Disposition: inline
-In-Reply-To: <1434643530-17728-1-git-send-email-ddstreet@ieee.org>
+	Fri, 19 Jun 2015 04:24:15 -0400
+In-Reply-To: <20150619064256.GA10246@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jun 18, 2015 at 12:05:30PM -0400, Dan Streetman wrote:
-> Add support to the nx-842-pseries.c driver for running in little endian
-> mode.
-> 
-> The pSeries platform NX 842 driver currently only works as big endian.
-> This adds cpu_to_be*() and be*_to_cpu() in the appropriate places to
-> work in LE mode also.
-> 
-> Signed-off-by: Dan Streetman <ddstreet@ieee.org>
+Hello Herbert,
 
-Both patches applied.
+On Fri, 19 Jun 2015 14:42:56 +0800, Herbert Xu wrote:
+> On Thu, Jun 18, 2015 at 03:46:20PM +0200, Boris Brezillon wrote:
+> >
+> > +	dram = mv_mbus_dram_info_nooverlap();
+> 
+> This doesn't compile because it hasn't made it into mainline yet.
+> I'm afraid this patch-set will have to wait until that happens.
+
+We have two options here:
+
+ 1/ We can ask the mach-mvebu maintainers to provide a branch with just
+    the commit implementing mv_mbus_dram_info_nooverlap(), and you
+    merge that branch into your tree as a dependency.
+
+ 2/ We temporarily revert back to using mv_mbus_dram_info(). For the
+    vast majority of platforms, this is OK. It's only if you have 4 GB
+    of RAM or more that it causes problem. And then we switch to
+    mv_mbus_dram_info_nooverlap() as part of the -rc cycle.
+
+(2) is probably easier. Herbert, what do you think?
+
+Thomas
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thomas Petazzoni, CTO, Free Electrons
+Embedded Linux, Kernel and Android engineering
+http://free-electrons.com
