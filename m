@@ -1,63 +1,56 @@
-From: Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH] crypto: sahara - propagate the error on clk_disable_unprepare() failure
-Date: Sat, 20 Jun 2015 15:30:22 -0300
-Message-ID: <1434825022-5797-1-git-send-email-festevam@gmail.com>
-Cc: linux-crypto@vger.kernel.org, s.trumtrar@pengutronix.de,
-	Fabio Estevam <fabio.estevam@freescale.com>
-To: herbert@gondor.apana.org.au
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail-qk0-f177.google.com ([209.85.220.177]:36259 "EHLO
-	mail-qk0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754121AbbFTSa7 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Sat, 20 Jun 2015 14:30:59 -0400
-Received: by qkfe185 with SMTP id e185so78285512qkf.3
-        for <linux-crypto@vger.kernel.org>; Sat, 20 Jun 2015 11:30:58 -0700 (PDT)
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Subject: Re: [PATCH v7 00/14] crypto: add a new driver for Marvell's CESA
+Date: Sat, 20 Jun 2015 16:32:16 -0400
+Message-ID: <CAP=VYLqQynCNRTpm4JnOxeO6DH_739fO2QNcDMxaXqCKCHiTtQ@mail.gmail.com>
+References: <1434635190-27733-1-git-send-email-boris.brezillon@free-electrons.com>
+ <20150619142444.GA15234@gondor.apana.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: Boris Brezillon <boris.brezillon@free-electrons.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Jason Guntho
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <20150619142444.GA15234@gondor.apana.org.au>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-From: Fabio Estevam <fabio.estevam@freescale.com>
+On Fri, Jun 19, 2015 at 10:24 AM, Herbert Xu
+<herbert@gondor.apana.org.au> wrote:
+> On Thu, Jun 18, 2015 at 03:46:16PM +0200, Boris Brezillon wrote:
+>> Hello,
+>>
+>> This patch series adds a new driver supporting Marvell's CESA IP.
+>> This driver addresses some limitations of the existing one.
+>> >From a performance and CPU load point of view the most important
+>> limitation in the existing driver is the lack of DMA support, thus
+>> preventing us from chaining crypto operations.
+>
+> All applied to cryptodev.  Thanks a lot!
 
-clk_prepare_enable() may fail, so we should better check its return value
-and propagate it in the case of error.
+It seems this breaks linux-next allmodconfig on i386:
 
-Signed-off-by: Fabio Estevam <fabio.estevam@freescale.com>
----
- drivers/crypto/sahara.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+http://kisskb.ellerman.id.au/kisskb/buildresult/12445342/
 
-diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-index 6be377f..397a500b 100644
---- a/drivers/crypto/sahara.c
-+++ b/drivers/crypto/sahara.c
-@@ -1578,8 +1578,12 @@ static int sahara_probe(struct platform_device *pdev)
- 
- 	init_completion(&dev->dma_completion);
- 
--	clk_prepare_enable(dev->clk_ipg);
--	clk_prepare_enable(dev->clk_ahb);
-+	err = clk_prepare_enable(dev->clk_ipg);
-+	if (err)
-+		goto err_link;
-+	err = clk_prepare_enable(dev->clk_ahb);
-+	if (err)
-+		goto clk_ipg_disable;
- 
- 	version = sahara_read(dev, SAHARA_REG_VERSION);
- 	if (of_device_is_compatible(pdev->dev.of_node, "fsl,imx27-sahara")) {
-@@ -1619,10 +1623,11 @@ err_algs:
- 	dma_free_coherent(&pdev->dev,
- 			  SAHARA_MAX_HW_LINK * sizeof(struct sahara_hw_link),
- 			  dev->hw_link[0], dev->hw_phys_link[0]);
--	clk_disable_unprepare(dev->clk_ipg);
--	clk_disable_unprepare(dev->clk_ahb);
- 	kthread_stop(dev->kthread);
- 	dev_ptr = NULL;
-+	clk_disable_unprepare(dev->clk_ahb);
-+clk_ipg_disable:
-+	clk_disable_unprepare(dev->clk_ipg);
- err_link:
- 	dma_free_coherent(&pdev->dev,
- 			  2 * AES_KEYSIZE_128,
--- 
-1.9.1
+ERROR: "phys_to_dma" [drivers/crypto/marvell/marvell-cesa.ko] undefined!
+make[2]: *** [__modpost] Error 1
+
+Paul.
+--
