@@ -1,261 +1,101 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/8] crypto: user - Move cryptouser.h to uapi
-Date: Sun, 21 Jun 2015 19:11:44 +0800
-Message-ID: <E1Z6dA8-0007py-Bk@gondolin.me.apana.org.au>
+Subject: [PATCH 2/8] crypto: rng - Do not free default RNG when it becomes unused
+Date: Sun, 21 Jun 2015 19:11:43 +0800
+Message-ID: <E1Z6dA7-0007ph-7C@gondolin.me.apana.org.au>
 References: <20150621110702.GA29747@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:35294 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:47085 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752645AbbFULLs (ORCPT
+	with ESMTP id S1751495AbbFULLq (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 21 Jun 2015 07:11:48 -0400
+	Sun, 21 Jun 2015 07:11:46 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1Z6dA8-0000Ex-MI
-	for <linux-crypto@vger.kernel.org>; Sun, 21 Jun 2015 21:11:44 +1000
+	id 1Z6dA7-0000Ep-IG
+	for <linux-crypto@vger.kernel.org>; Sun, 21 Jun 2015 21:11:43 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The header file cryptouser.h only contains information that is
-exported to user-space.
+Currently we free the default RNG when its use count hits zero.
+This was OK when the IV generators would latch onto the RNG at
+instance creation time and keep it until the instance is torn
+down.
+
+Now that IV generators only keep the RNG reference during init
+time this scheme causes the default RNG to come and go at a high
+frequencey.  This is highly undesirable as we want to keep a single
+RNG in use unless the admin wants it to be removed.
+
+This patch changes the scheme so that the system RNG once allocated
+is never removed unless a specifically requested.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- include/linux/cryptouser.h      |  110 ----------------------------------------
- include/uapi/linux/cryptouser.h |  110 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 110 insertions(+), 110 deletions(-)
+ crypto/rng.c                  |   27 +++++++++++++++++++++++----
+ include/crypto/internal/rng.h |    9 +++++++++
+ 2 files changed, 32 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/cryptouser.h b/include/linux/cryptouser.h
-deleted file mode 100644
-index 36efbbb..0000000
---- a/include/linux/cryptouser.h
-+++ /dev/null
-@@ -1,110 +0,0 @@
--/*
-- * Crypto user configuration API.
-- *
-- * Copyright (C) 2011 secunet Security Networks AG
-- * Copyright (C) 2011 Steffen Klassert <steffen.klassert@secunet.com>
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms and conditions of the GNU General Public License,
-- * version 2, as published by the Free Software Foundation.
-- *
-- * This program is distributed in the hope it will be useful, but WITHOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-- * more details.
-- *
-- * You should have received a copy of the GNU General Public License along with
-- * this program; if not, write to the Free Software Foundation, Inc.,
-- * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
-- */
--
--/* Netlink configuration messages.  */
--enum {
--	CRYPTO_MSG_BASE = 0x10,
--	CRYPTO_MSG_NEWALG = 0x10,
--	CRYPTO_MSG_DELALG,
--	CRYPTO_MSG_UPDATEALG,
--	CRYPTO_MSG_GETALG,
--	__CRYPTO_MSG_MAX
--};
--#define CRYPTO_MSG_MAX (__CRYPTO_MSG_MAX - 1)
--#define CRYPTO_NR_MSGTYPES (CRYPTO_MSG_MAX + 1 - CRYPTO_MSG_BASE)
--
--#define CRYPTO_MAX_NAME CRYPTO_MAX_ALG_NAME
--
--/* Netlink message attributes.  */
--enum crypto_attr_type_t {
--	CRYPTOCFGA_UNSPEC,
--	CRYPTOCFGA_PRIORITY_VAL,	/* __u32 */
--	CRYPTOCFGA_REPORT_LARVAL,	/* struct crypto_report_larval */
--	CRYPTOCFGA_REPORT_HASH,		/* struct crypto_report_hash */
--	CRYPTOCFGA_REPORT_BLKCIPHER,	/* struct crypto_report_blkcipher */
--	CRYPTOCFGA_REPORT_AEAD,		/* struct crypto_report_aead */
--	CRYPTOCFGA_REPORT_COMPRESS,	/* struct crypto_report_comp */
--	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
--	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
--	CRYPTOCFGA_REPORT_AKCIPHER,	/* struct crypto_report_akcipher */
--	__CRYPTOCFGA_MAX
--
--#define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
--};
--
--struct crypto_user_alg {
--	char cru_name[CRYPTO_MAX_ALG_NAME];
--	char cru_driver_name[CRYPTO_MAX_ALG_NAME];
--	char cru_module_name[CRYPTO_MAX_ALG_NAME];
--	__u32 cru_type;
--	__u32 cru_mask;
--	__u32 cru_refcnt;
--	__u32 cru_flags;
--};
--
--struct crypto_report_larval {
--	char type[CRYPTO_MAX_NAME];
--};
--
--struct crypto_report_hash {
--	char type[CRYPTO_MAX_NAME];
--	unsigned int blocksize;
--	unsigned int digestsize;
--};
--
--struct crypto_report_cipher {
--	char type[CRYPTO_MAX_ALG_NAME];
--	unsigned int blocksize;
--	unsigned int min_keysize;
--	unsigned int max_keysize;
--};
--
--struct crypto_report_blkcipher {
--	char type[CRYPTO_MAX_NAME];
--	char geniv[CRYPTO_MAX_NAME];
--	unsigned int blocksize;
--	unsigned int min_keysize;
--	unsigned int max_keysize;
--	unsigned int ivsize;
--};
--
--struct crypto_report_aead {
--	char type[CRYPTO_MAX_NAME];
--	char geniv[CRYPTO_MAX_NAME];
--	unsigned int blocksize;
--	unsigned int maxauthsize;
--	unsigned int ivsize;
--};
--
--struct crypto_report_comp {
--	char type[CRYPTO_MAX_NAME];
--};
--
--struct crypto_report_rng {
--	char type[CRYPTO_MAX_NAME];
--	unsigned int seedsize;
--};
--
--struct crypto_report_akcipher {
--	char type[CRYPTO_MAX_NAME];
--};
--
--#define CRYPTO_REPORT_MAXSIZE (sizeof(struct crypto_user_alg) + \
--			       sizeof(struct crypto_report_blkcipher))
-diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
-new file mode 100644
-index 0000000..36efbbb
---- /dev/null
-+++ b/include/uapi/linux/cryptouser.h
-@@ -0,0 +1,110 @@
-+/*
-+ * Crypto user configuration API.
-+ *
-+ * Copyright (C) 2011 secunet Security Networks AG
-+ * Copyright (C) 2011 Steffen Klassert <steffen.klassert@secunet.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program; if not, write to the Free Software Foundation, Inc.,
-+ * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
-+ */
+diff --git a/crypto/rng.c b/crypto/rng.c
+index 1315505..b81cffb 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -155,14 +155,33 @@ EXPORT_SYMBOL_GPL(crypto_get_default_rng);
+ void crypto_put_default_rng(void)
+ {
+ 	mutex_lock(&crypto_default_rng_lock);
+-	if (!--crypto_default_rng_refcnt) {
+-		crypto_free_rng(crypto_default_rng);
+-		crypto_default_rng = NULL;
+-	}
++	crypto_default_rng_refcnt--;
+ 	mutex_unlock(&crypto_default_rng_lock);
+ }
+ EXPORT_SYMBOL_GPL(crypto_put_default_rng);
+ 
++#if defined(CONFIG_CRYPTO_RNG) || defined(CONFIG_CRYPTO_RNG_MODULE)
++int crypto_del_default_rng(void)
++{
++	int err = -EBUSY;
 +
-+/* Netlink configuration messages.  */
-+enum {
-+	CRYPTO_MSG_BASE = 0x10,
-+	CRYPTO_MSG_NEWALG = 0x10,
-+	CRYPTO_MSG_DELALG,
-+	CRYPTO_MSG_UPDATEALG,
-+	CRYPTO_MSG_GETALG,
-+	__CRYPTO_MSG_MAX
-+};
-+#define CRYPTO_MSG_MAX (__CRYPTO_MSG_MAX - 1)
-+#define CRYPTO_NR_MSGTYPES (CRYPTO_MSG_MAX + 1 - CRYPTO_MSG_BASE)
++	mutex_lock(&crypto_default_rng_lock);
++	if (crypto_default_rng_refcnt)
++		goto out;
 +
-+#define CRYPTO_MAX_NAME CRYPTO_MAX_ALG_NAME
++	crypto_free_rng(crypto_default_rng);
++	crypto_default_rng = NULL;
 +
-+/* Netlink message attributes.  */
-+enum crypto_attr_type_t {
-+	CRYPTOCFGA_UNSPEC,
-+	CRYPTOCFGA_PRIORITY_VAL,	/* __u32 */
-+	CRYPTOCFGA_REPORT_LARVAL,	/* struct crypto_report_larval */
-+	CRYPTOCFGA_REPORT_HASH,		/* struct crypto_report_hash */
-+	CRYPTOCFGA_REPORT_BLKCIPHER,	/* struct crypto_report_blkcipher */
-+	CRYPTOCFGA_REPORT_AEAD,		/* struct crypto_report_aead */
-+	CRYPTOCFGA_REPORT_COMPRESS,	/* struct crypto_report_comp */
-+	CRYPTOCFGA_REPORT_RNG,		/* struct crypto_report_rng */
-+	CRYPTOCFGA_REPORT_CIPHER,	/* struct crypto_report_cipher */
-+	CRYPTOCFGA_REPORT_AKCIPHER,	/* struct crypto_report_akcipher */
-+	__CRYPTOCFGA_MAX
++	err = 0;
 +
-+#define CRYPTOCFGA_MAX (__CRYPTOCFGA_MAX - 1)
-+};
++out:
++	mutex_unlock(&crypto_default_rng_lock);
 +
-+struct crypto_user_alg {
-+	char cru_name[CRYPTO_MAX_ALG_NAME];
-+	char cru_driver_name[CRYPTO_MAX_ALG_NAME];
-+	char cru_module_name[CRYPTO_MAX_ALG_NAME];
-+	__u32 cru_type;
-+	__u32 cru_mask;
-+	__u32 cru_refcnt;
-+	__u32 cru_flags;
-+};
++	return err;
++}
++EXPORT_SYMBOL_GPL(crypto_del_default_rng);
++#endif
 +
-+struct crypto_report_larval {
-+	char type[CRYPTO_MAX_NAME];
-+};
+ int crypto_register_rng(struct rng_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
+diff --git a/include/crypto/internal/rng.h b/include/crypto/internal/rng.h
+index 263f1a5..a52ef34 100644
+--- a/include/crypto/internal/rng.h
++++ b/include/crypto/internal/rng.h
+@@ -22,6 +22,15 @@ void crypto_unregister_rng(struct rng_alg *alg);
+ int crypto_register_rngs(struct rng_alg *algs, int count);
+ void crypto_unregister_rngs(struct rng_alg *algs, int count);
+ 
++#if defined(CONFIG_CRYPTO_RNG) || defined(CONFIG_CRYPTO_RNG_MODULE)
++int crypto_del_default_rng(void);
++#else
++static inline int crypto_del_default_rng(void)
++{
++	return 0;
++}
++#endif
 +
-+struct crypto_report_hash {
-+	char type[CRYPTO_MAX_NAME];
-+	unsigned int blocksize;
-+	unsigned int digestsize;
-+};
-+
-+struct crypto_report_cipher {
-+	char type[CRYPTO_MAX_ALG_NAME];
-+	unsigned int blocksize;
-+	unsigned int min_keysize;
-+	unsigned int max_keysize;
-+};
-+
-+struct crypto_report_blkcipher {
-+	char type[CRYPTO_MAX_NAME];
-+	char geniv[CRYPTO_MAX_NAME];
-+	unsigned int blocksize;
-+	unsigned int min_keysize;
-+	unsigned int max_keysize;
-+	unsigned int ivsize;
-+};
-+
-+struct crypto_report_aead {
-+	char type[CRYPTO_MAX_NAME];
-+	char geniv[CRYPTO_MAX_NAME];
-+	unsigned int blocksize;
-+	unsigned int maxauthsize;
-+	unsigned int ivsize;
-+};
-+
-+struct crypto_report_comp {
-+	char type[CRYPTO_MAX_NAME];
-+};
-+
-+struct crypto_report_rng {
-+	char type[CRYPTO_MAX_NAME];
-+	unsigned int seedsize;
-+};
-+
-+struct crypto_report_akcipher {
-+	char type[CRYPTO_MAX_NAME];
-+};
-+
-+#define CRYPTO_REPORT_MAXSIZE (sizeof(struct crypto_user_alg) + \
-+			       sizeof(struct crypto_report_blkcipher))
+ static inline void *crypto_rng_ctx(struct crypto_rng *tfm)
+ {
+ 	return crypto_tfm_ctx(&tfm->base);
