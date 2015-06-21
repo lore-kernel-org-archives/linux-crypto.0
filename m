@@ -1,59 +1,54 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 5/8] crypto: chainiv - Offer normal cipher functionality without RNG
-Date: Sun, 21 Jun 2015 19:11:46 +0800
-Message-ID: <E1Z6dAA-0007qW-Pg@gondolin.me.apana.org.au>
+Subject: [PATCH 7/8] crypto: seqiv - Add compatibility support without RNG
+Date: Sun, 21 Jun 2015 19:11:49 +0800
+Message-ID: <E1Z6dAD-0007r5-AN@gondolin.me.apana.org.au>
 References: <20150621110702.GA29747@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:56806 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:49499 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751495AbbFULLu (ORCPT
+	with ESMTP id S1753262AbbFULLx (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 21 Jun 2015 07:11:50 -0400
+	Sun, 21 Jun 2015 07:11:53 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6])
 	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
-	id 1Z6dAB-0000FD-54
-	for <linux-crypto@vger.kernel.org>; Sun, 21 Jun 2015 21:11:47 +1000
+	id 1Z6dAD-0000FU-Vw
+	for <linux-crypto@vger.kernel.org>; Sun, 21 Jun 2015 21:11:50 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The RNG may not be available during early boot, e.g., the relevant
-modules may not be included in the initramfs.  As the RNG Is only
-needed for IPsec, we should not let this prevent use of ciphers
-without IV generators, e.g., for disk encryption.
-
-This patch postpones the RNG allocation to the init function so
-that one failure during early boot does not make the RNG unavailable
-for all subsequent users of the same cipher.
-
-More importantly, it lets the cipher live even if RNG allocation
-fails.  Of course we no longer offer IV generation and which will
-fail with an error if invoked.  But all other cipher capabilities
-will function as usual.
+When seqiv is used in compatibility mode, this patch allows it
+to function even when an RNG Is not available.  It also changes
+the RNG allocation for the new explicit seqiv interface so that
+we only hold a reference to the RNG during initialisation.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/chainiv.c |   55 +++++++++++++++++++++++++++++--------------------------
- 1 file changed, 29 insertions(+), 26 deletions(-)
+ crypto/seqiv.c |   50 +++++++++++++++++++++++++-------------------------
+ 1 file changed, 25 insertions(+), 25 deletions(-)
 
-diff --git a/crypto/chainiv.c b/crypto/chainiv.c
-index be0bd52..b434001 100644
---- a/crypto/chainiv.c
-+++ b/crypto/chainiv.c
-@@ -83,21 +83,34 @@ unlock:
- static int chainiv_init_common(struct crypto_tfm *tfm, char iv[])
+diff --git a/crypto/seqiv.c b/crypto/seqiv.c
+index 42e4ee5..122c56e 100644
+--- a/crypto/seqiv.c
++++ b/crypto/seqiv.c
+@@ -478,29 +478,42 @@ static int seqiv_init(struct crypto_tfm *tfm)
  {
  	struct crypto_ablkcipher *geniv = __crypto_ablkcipher_cast(tfm);
-+	int err = 0;
+ 	struct seqiv_ctx *ctx = crypto_ablkcipher_ctx(geniv);
++	int err;
+ 
+ 	spin_lock_init(&ctx->lock);
  
  	tfm->crt_ablkcipher.reqsize = sizeof(struct ablkcipher_request);
  
--	return crypto_rng_get_bytes(crypto_default_rng, iv,
+-	return crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
 -				    crypto_ablkcipher_ivsize(geniv)) ?:
 -	       skcipher_geniv_init(tfm);
-+	if (iv) {
-+		err = crypto_rng_get_bytes(crypto_default_rng, iv,
++	err = 0;
++	if (!crypto_get_default_rng()) {
++		crypto_ablkcipher_crt(geniv)->givencrypt = seqiv_givencrypt;
++		err = crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
 +					   crypto_ablkcipher_ivsize(geniv));
 +		crypto_put_default_rng();
 +	}
@@ -61,103 +56,112 @@ index be0bd52..b434001 100644
 +	return err ?: skcipher_geniv_init(tfm);
  }
  
- static int chainiv_init(struct crypto_tfm *tfm)
+ static int seqiv_old_aead_init(struct crypto_tfm *tfm)
  {
-+	struct crypto_ablkcipher *geniv = __crypto_ablkcipher_cast(tfm);
- 	struct chainiv_ctx *ctx = crypto_tfm_ctx(tfm);
-+	char *iv;
+ 	struct crypto_aead *geniv = __crypto_aead_cast(tfm);
+ 	struct seqiv_ctx *ctx = crypto_aead_ctx(geniv);
++	int err;
  
  	spin_lock_init(&ctx->lock);
  
--	return chainiv_init_common(tfm, ctx->iv);
-+	iv = NULL;
+ 	crypto_aead_set_reqsize(__crypto_aead_cast(tfm),
+ 				sizeof(struct aead_request));
++	err = 0;
 +	if (!crypto_get_default_rng()) {
-+		crypto_ablkcipher_crt(geniv)->givencrypt = chainiv_givencrypt;
-+		iv = ctx->iv;
++		geniv->givencrypt = seqiv_aead_givencrypt;
++		err = crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
++					   crypto_aead_ivsize(geniv));
++		crypto_put_default_rng();
 +	}
-+
-+	return chainiv_init_common(tfm, iv);
+ 
+-	return crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
+-				    crypto_aead_ivsize(geniv)) ?:
+-	       aead_geniv_init(tfm);
++	return err ?: aead_geniv_init(tfm);
  }
  
- static int async_chainiv_schedule_work(struct async_chainiv_ctx *ctx)
-@@ -216,14 +229,23 @@ static void async_chainiv_do_postponed(struct work_struct *work)
+ static int seqiv_aead_init_common(struct crypto_tfm *tfm, unsigned int reqsize)
+@@ -513,8 +526,13 @@ static int seqiv_aead_init_common(struct crypto_tfm *tfm, unsigned int reqsize)
  
- static int async_chainiv_init(struct crypto_tfm *tfm)
- {
-+	struct crypto_ablkcipher *geniv = __crypto_ablkcipher_cast(tfm);
- 	struct async_chainiv_ctx *ctx = crypto_tfm_ctx(tfm);
-+	char *iv;
+ 	crypto_aead_set_reqsize(geniv, sizeof(struct aead_request));
  
- 	spin_lock_init(&ctx->lock);
- 
- 	crypto_init_queue(&ctx->queue, 100);
- 	INIT_WORK(&ctx->postponed, async_chainiv_do_postponed);
- 
--	return chainiv_init_common(tfm, ctx->iv);
-+	iv = NULL;
-+	if (!crypto_get_default_rng()) {
-+		crypto_ablkcipher_crt(geniv)->givencrypt =
-+			async_chainiv_givencrypt;
-+		iv = ctx->iv;
-+	}
++	err = crypto_get_default_rng();
++	if (err)
++		goto out;
 +
-+	return chainiv_init_common(tfm, iv);
- }
+ 	err = crypto_rng_get_bytes(crypto_default_rng, ctx->salt,
+ 				   crypto_aead_ivsize(geniv));
++	crypto_put_default_rng();
+ 	if (err)
+ 		goto out;
  
- static void async_chainiv_exit(struct crypto_tfm *tfm)
-@@ -241,21 +263,14 @@ static struct crypto_instance *chainiv_alloc(struct rtattr **tb)
- {
- 	struct crypto_attr_type *algt;
- 	struct crypto_instance *inst;
--	int err;
+@@ -571,8 +589,6 @@ static int seqiv_ablkcipher_create(struct crypto_template *tmpl,
+ 	if (inst->alg.cra_ablkcipher.ivsize < sizeof(u64))
+ 		goto free_inst;
  
- 	algt = crypto_get_attr_type(tb);
+-	inst->alg.cra_ablkcipher.givencrypt = seqiv_givencrypt;
+-
+ 	inst->alg.cra_init = seqiv_init;
+ 	inst->alg.cra_exit = skcipher_geniv_exit;
+ 
+@@ -602,8 +618,6 @@ static int seqiv_old_aead_create(struct crypto_template *tmpl,
+ 	if (inst->alg.cra_aead.ivsize < sizeof(u64))
+ 		goto free_inst;
+ 
+-	inst->alg.cra_aead.givencrypt = seqiv_aead_givencrypt;
+-
+ 	inst->alg.cra_init = seqiv_old_aead_init;
+ 	inst->alg.cra_exit = aead_geniv_exit;
+ 
+@@ -680,18 +694,11 @@ static int seqiv_create(struct crypto_template *tmpl, struct rtattr **tb)
  	if (IS_ERR(algt))
- 		return ERR_CAST(algt);
+ 		return PTR_ERR(algt);
  
 -	err = crypto_get_default_rng();
 -	if (err)
--		return ERR_PTR(err);
+-		return err;
 -
- 	inst = skcipher_geniv_alloc(&chainiv_tmpl, tb, 0, 0);
+ 	if ((algt->type ^ CRYPTO_ALG_TYPE_AEAD) & CRYPTO_ALG_TYPE_MASK)
+ 		err = seqiv_ablkcipher_create(tmpl, tb);
+ 	else
+ 		err = seqiv_aead_create(tmpl, tb);
+ 
+-	if (err)
+-		crypto_put_default_rng();
+-
+ 	return err;
+ }
+ 
+@@ -702,14 +709,10 @@ static int seqniv_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	struct aead_alg *alg;
+ 	int err;
+ 
+-	err = crypto_get_default_rng();
+-	if (err)
+-		return err;
+-
+ 	inst = aead_geniv_alloc(tmpl, tb, 0, 0);
+ 	err = PTR_ERR(inst);
  	if (IS_ERR(inst))
 -		goto put_rng;
--
--	inst->alg.cra_ablkcipher.givencrypt = chainiv_givencrypt;
 +		goto out;
  
- 	inst->alg.cra_init = chainiv_init;
- 	inst->alg.cra_exit = skcipher_geniv_exit;
-@@ -265,8 +280,6 @@ static struct crypto_instance *chainiv_alloc(struct rtattr **tb)
- 	if (!crypto_requires_sync(algt->type, algt->mask)) {
- 		inst->alg.cra_flags |= CRYPTO_ALG_ASYNC;
+ 	spawn = aead_instance_ctx(inst);
+ 	alg = crypto_spawn_aead_alg(spawn);
+@@ -741,8 +744,6 @@ out:
  
--		inst->alg.cra_ablkcipher.givencrypt = async_chainiv_givencrypt;
--
- 		inst->alg.cra_init = async_chainiv_init;
- 		inst->alg.cra_exit = async_chainiv_exit;
- 
-@@ -277,22 +290,12 @@ static struct crypto_instance *chainiv_alloc(struct rtattr **tb)
- 
- out:
- 	return inst;
--
+ free_inst:
+ 	aead_geniv_free(inst);
 -put_rng:
 -	crypto_put_default_rng();
--	goto out;
--}
--
--static void chainiv_free(struct crypto_instance *inst)
--{
--	skcipher_geniv_free(inst);
+ 	goto out;
+ }
+ 
+@@ -752,7 +753,6 @@ static void seqiv_free(struct crypto_instance *inst)
+ 		skcipher_geniv_free(inst);
+ 	else
+ 		aead_geniv_free(aead_instance(inst));
 -	crypto_put_default_rng();
  }
  
- static struct crypto_template chainiv_tmpl = {
- 	.name = "chainiv",
- 	.alloc = chainiv_alloc,
--	.free = chainiv_free,
-+	.free = skcipher_geniv_free,
- 	.module = THIS_MODULE,
- };
- 
+ static struct crypto_template seqiv_tmpl = {
