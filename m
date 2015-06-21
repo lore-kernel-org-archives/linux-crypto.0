@@ -1,53 +1,49 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 0/8] crypto: rng - Avoid boot failure with missing DRBG module
-Date: Sun, 21 Jun 2015 19:07:02 +0800
-Message-ID: <20150621110702.GA29747@gondor.apana.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [PATCH 1/8] crypto: skcipher - Allow givencrypt to be NULL
+Date: Sun, 21 Jun 2015 19:11:41 +0800
+Message-ID: <E1Z6dA5-0007pO-TO@gondolin.me.apana.org.au>
+References: <20150621110702.GA29747@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:55988 "EHLO
+Received: from helcar.hengli.com.au ([209.40.204.226]:58585 "EHLO
 	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751979AbbFULHI (ORCPT
+	with ESMTP id S1752645AbbFULLp (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 21 Jun 2015 07:07:08 -0400
-Content-Disposition: inline
+	Sun, 21 Jun 2015 07:11:45 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6])
+	by norbury.hengli.com.au with esmtp (Exim 4.80 #3 (Debian))
+	id 1Z6dA6-0000Eh-8y
+	for <linux-crypto@vger.kernel.org>; Sun, 21 Jun 2015 21:11:42 +1000
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi:
+Currently for skcipher IV generators they must provide givencrypt
+as that is the whole point.  We are currently replacing skcipher
+IV generators with explicit IV generators.  In order to maintain
+backwards compatibility, we need to allow the IV generators to
+still function as a normal skcipher when the RNG Is not present
+(e.g., in the initramfs during boot).  IOW everything but givencrypt
+and givdecrypt will still work but those two will fail.
 
-Distros use an initramfs to boot the system.  The initramfs may
-not contain all the modules that are normally present on the system.
-This poses a problem to the new default DRBG because it may be
-built as a module.  This isn't a problem itself since it is only
-meant to be used by IV generators which are now explicit.  However,
-as we still have legacy algorithms that are yet to be converted,
-they will not be available unless DRBG is loaded first.
+Therefore this patch assigns a default givencrypt that simply
+returns an error should it be NULL.
 
-The upshot is that the system may fail to boot if DRBG isn't in
-the initramfs and the system uses file system encryption for the
-root file system.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-This series avoids this issue by allowing legacy IV generators
-to function even when an RNG is not available.  Only the givencrypt
-functionality will be unavilable if the RNG is absent.
+ crypto/ablkcipher.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This change brings up a new problem.  Up until now the system
-RNG has been held down by the instances of the IV generators.
-This meant that it was never freed unless all IV generator instances
-were removed from the system.
-
-The new code only holds the RNG during algorithm initialisation.
-So unless something was done the crypto system RNG would be freed
-and allocated all the time which is not a good thing.
-
-This series avoids this by only freeing the system RNG when the
-admin requests it through the crypto_user interface.  A new command
-DELRNG has been added for this purpose.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
+index b15d797..b788f16 100644
+--- a/crypto/ablkcipher.c
++++ b/crypto/ablkcipher.c
+@@ -454,7 +454,7 @@ static int crypto_init_givcipher_ops(struct crypto_tfm *tfm, u32 type,
+ 		      alg->setkey : setkey;
+ 	crt->encrypt = alg->encrypt;
+ 	crt->decrypt = alg->decrypt;
+-	crt->givencrypt = alg->givencrypt;
++	crt->givencrypt = alg->givencrypt ?: no_givdecrypt;
+ 	crt->givdecrypt = alg->givdecrypt ?: no_givdecrypt;
+ 	crt->base = __crypto_ablkcipher_cast(tfm);
+ 	crt->ivsize = alg->ivsize;
