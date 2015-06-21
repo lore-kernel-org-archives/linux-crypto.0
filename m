@@ -1,46 +1,50 @@
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v7 00/14] crypto: add a new driver for Marvell's CESA
-Date: Sun, 21 Jun 2015 16:27:17 +0800
-Message-ID: <20150621082717.GA29128@gondor.apana.org.au>
-References: <1434635190-27733-1-git-send-email-boris.brezillon@free-electrons.com>
- <20150619142444.GA15234@gondor.apana.org.au>
- <CAP=VYLqQynCNRTpm4JnOxeO6DH_739fO2QNcDMxaXqCKCHiTtQ@mail.gmail.com>
- <CAP=VYLpSrTvXRovWo4G7AXWv1OKFQRpQR255hS5z+=h4+XOLhg@mail.gmail.com>
- <20150621102418.2ea74910@bbrezillon>
+Subject: [PATCH 0/8] crypto: rng - Avoid boot failure with missing DRBG module
+Date: Sun, 21 Jun 2015 19:07:02 +0800
+Message-ID: <20150621110702.GA29747@gondor.apana.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Paul Gortmaker <paul.gortmaker@windriver.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
-	Tawfik Bayouk <tawfik@marvell.com>,
-	Lior Amsalem <alior@marvell.com>,
-	Nadav Haklai <nadavh@marvell.com>,
-	Eran Ben-Avi <benavi@marvell.com>,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
-	Gregory CLEMENT <gregory.clement@free-electrons.com>,
-	Jason Cooper <jason@lakedaemon.net>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Pawel Moll <pawel.moll@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ian Campbell <ijc+devicetree@hellion.org.uk>,
-	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Jason Gunthorpe <jg
-To: Boris Brezillon <boris.brezillon@free-electrons.com>
-Return-path: <linux-next-owner@vger.kernel.org>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Received: from helcar.hengli.com.au ([209.40.204.226]:55988 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751979AbbFULHI (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Sun, 21 Jun 2015 07:07:08 -0400
 Content-Disposition: inline
-In-Reply-To: <20150621102418.2ea74910@bbrezillon>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-crypto.vger.kernel.org
+Sender: linux-crypto-owner@vger.kernel.org
+List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jun 21, 2015 at 10:24:18AM +0200, Boris Brezillon wrote:
-> 
-> Indeed. Here is a patch fixing that.
+Hi:
 
-I think you should just kill COMPILE_TEST instead of adding ARM.
+Distros use an initramfs to boot the system.  The initramfs may
+not contain all the modules that are normally present on the system.
+This poses a problem to the new default DRBG because it may be
+built as a module.  This isn't a problem itself since it is only
+meant to be used by IV generators which are now explicit.  However,
+as we still have legacy algorithms that are yet to be converted,
+they will not be available unless DRBG is loaded first.
+
+The upshot is that the system may fail to boot if DRBG isn't in
+the initramfs and the system uses file system encryption for the
+root file system.
+
+This series avoids this issue by allowing legacy IV generators
+to function even when an RNG is not available.  Only the givencrypt
+functionality will be unavilable if the RNG is absent.
+
+This change brings up a new problem.  Up until now the system
+RNG has been held down by the instances of the IV generators.
+This meant that it was never freed unless all IV generator instances
+were removed from the system.
+
+The new code only holds the RNG during algorithm initialisation.
+So unless something was done the crypto system RNG would be freed
+and allocated all the time which is not a good thing.
+
+This series avoids this by only freeing the system RNG when the
+admin requests it through the crypto_user interface.  A new command
+DELRNG has been added for this purpose.
 
 Cheers,
 -- 
