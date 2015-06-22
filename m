@@ -1,69 +1,91 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: crypto: algif_aead - Temporarily disable all AEAD algorithms
-Date: Mon, 22 Jun 2015 10:31:40 +0800
-Message-ID: <20150622023140.GA5914@gondor.apana.org.au>
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Subject: Re: [PATCH v7 00/14] crypto: add a new driver for Marvell's CESA
+Date: Mon, 22 Jun 2015 09:23:36 +0200
+Message-ID: <20150622092336.5949e258@bbrezillon>
+References: <1434635190-27733-1-git-send-email-boris.brezillon@free-electrons.com>
+	<20150619142444.GA15234@gondor.apana.org.au>
+	<CAP=VYLqQynCNRTpm4JnOxeO6DH_739fO2QNcDMxaXqCKCHiTtQ@mail.gmail.com>
+	<CAP=VYLpSrTvXRovWo4G7AXWv1OKFQRpQR255hS5z+=h4+XOLhg@mail.gmail.com>
+	<20150621102418.2ea74910@bbrezillon>
+	<20150621082717.GA29128@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Stephan Mueller <smueller@chronox.de>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Cc: Paul Gortmaker <paul.gortmaker@windriver.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Arnaud Ebalard <arno@natisbad.org>,
+	Tawfik Bayouk <tawfik@marvell.com>,
+	Lior Amsalem <alior@marvell.com>,
+	Nadav Haklai <nadavh@marvell.com>,
+	Eran Ben-Avi <benavi@marvell.com>,
+	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>,
+	Gregory CLEMENT <gregory.clement@free-electrons.com>,
+	Jason Cooper <jason@lakedaemon.net>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Pawel Moll <pawel.moll@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ian Campbell <ijc+devicetree@hellion.org.uk>,
+	Kumar Gala <galak@codeaurora.org>, devicetree@vger.kernel.org,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Jason Gunthorpe <jg
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:37541 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751823AbbFVCbn (ORCPT
+Received: from down.free-electrons.com ([37.187.137.238]:55776 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756122AbbFVHXl convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-crypto@vger.kernel.org>);
-	Sun, 21 Jun 2015 22:31:43 -0400
-Content-Disposition: inline
+	Mon, 22 Jun 2015 03:23:41 -0400
+In-Reply-To: <20150621082717.GA29128@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-As the AEAD conversion is still ongoing, we do not yet wish to
-export legacy AEAD implementations to user-space, as their calling
-convention will change.
+Hi Herbert,
 
-This patch actually disables all AEAD algorithms because some of
-them (e.g., cryptd) will need to be modified to propagate this flag.
+On Sun, 21 Jun 2015 16:27:17 +0800
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-Subsequent patches will reenable them on an individual basis.
+> On Sun, Jun 21, 2015 at 10:24:18AM +0200, Boris Brezillon wrote:
+> > 
+> > Indeed. Here is a patch fixing that.
+> 
+> I think you should just kill COMPILE_TEST instead of adding ARM.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+The following patch is killing the COMPILE_TEST dependency.
+
+-- >8 --
+
+>From 772232fe4f5e597e45701dd9c3ab68c4a065342f Mon Sep 17 00:00:00 2001
+From: Boris Brezillon <boris.brezillon@free-electrons.com>
+Date: Mon, 22 Jun 2015 09:22:14 +0200
+Subject: [PATCH] crypto: marvell/CESA: remove COMPILE_TEST dependency
+
+The CESA driver calls phys_to_virt() which is not available on all
+architectures.
+Remove the depency on COMPILE_TEST to prevent building this driver on
+non ARM architectures.
+
+Signed-off-by: Boris Brezillon <boris.brezillon@free-electrons.com>
+Reported-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
+ drivers/crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- crypto/algif_aead.c    |    3 ++-
- include/linux/crypto.h |    6 ++++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 38a6cab..e0408a4 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -514,7 +514,8 @@ static struct proto_ops algif_aead_ops = {
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index cdca762..f965d0c 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -176,7 +176,7 @@ config CRYPTO_DEV_MV_CESA
  
- static void *aead_bind(const char *name, u32 type, u32 mask)
- {
--	return crypto_alloc_aead(name, type, mask);
-+	return crypto_alloc_aead(name, type | CRYPTO_ALG_AEAD_NEW,
-+				 mask | CRYPTO_ALG_AEAD_NEW);
- }
- 
- static void aead_release(void *private)
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 964e573..81ef938 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -102,6 +102,12 @@
- #define CRYPTO_ALG_INTERNAL		0x00002000
- 
- /*
-+ * Temporary flag used to prevent legacy AEAD implementations from
-+ * being used by user-space.
-+ */
-+#define CRYPTO_ALG_AEAD_NEW		0x00004000
-+
-+/*
-  * Transform masks and values (for crt_flags).
-  */
- #define CRYPTO_TFM_REQ_MASK		0x000fff00
+ config CRYPTO_DEV_MARVELL_CESA
+ 	tristate "New Marvell's Cryptographic Engine driver"
+-	depends on (PLAT_ORION || ARCH_MVEBU || COMPILE_TEST) && HAS_DMA && HAS_IOMEM
++	depends on PLAT_ORION || ARCH_MVEBU
+ 	select CRYPTO_AES
+ 	select CRYPTO_DES
+ 	select CRYPTO_BLKCIPHER
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.9.1
