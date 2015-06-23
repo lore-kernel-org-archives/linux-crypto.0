@@ -1,56 +1,33 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] crypto: jitterentropy - avoid compiler warnings
-Date: Tue, 23 Jun 2015 17:36:56 +0200
-Message-ID: <2463718.ZGeM8ImuD9@tauon.atsec.com>
-References: <CAMuHMdXLDeqSU3WcVEh=jcGdS4z2YMejU_nZ2gDObDVjsm7vvw@mail.gmail.com> <1446731.BXdYRBoPhr@tachyon.chronox.de> <20150623153110.GA10784@roeck-us.net>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: akcipher - fix spelling cihper -> cipher
+Date: Tue, 23 Jun 2015 10:18:53 -0700
+Message-ID: <20150623171853.15642.88750.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Peter Zijlstra
-	<public-peterz-wegcikhe2lqwvfeawa7xhq@plane.gmane.org>,
-	Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Jim Davis <jim.epost@gmail.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Linux-Next <linux-next@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Waiman Long <waiman.long@hp.com>,
-	Ingo Molnar <mingo@kernel.org>, x86 <x86@kernel.org>
-To: Guenter Roeck <linux@roeck-us.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
+	tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47816 "EHLO mail.eperm.de"
+Received: from mga11.intel.com ([192.55.52.93]:9186 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754684AbbFWPhE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Jun 2015 11:37:04 -0400
-In-Reply-To: <20150623153110.GA10784@roeck-us.net>
+	id S1754154AbbFWRTE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Jun 2015 13:19:04 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 23. Juni 2015, 08:31:10 schrieb Guenter Roeck:
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ crypto/akcipher.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hi Guenter,
-
->On Tue, Jun 23, 2015 at 04:18:54PM +0200, Stephan Mueller wrote:
->> Hi Geert, Guenter,
->> 
->> may I ask that you check that the following patch compiles without errors
->> or warnings on your systems?
->Stephan,
->
->I applied your patch on top of the current mainline (which includes
->the crypto updates for 4.2) and pushed it into my 'testing' branch.
->You should be able to see the results in a couple of hours at
->http://server.roeck-us.net:8010/builders, in the 'testing' column.
->
->The build system doesn't log warnings, but this should give us an idea
->if the build passes for all architectures.
->
->I'll have a look myself later and let you know as well.
-
-Thank you very much!
-
-
-Ciao
-Stephan
+diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+index d798641..528ae6a 100644
+--- a/crypto/akcipher.c
++++ b/crypto/akcipher.c
+@@ -114,4 +114,4 @@ void crypto_unregister_akcipher(struct akcipher_alg *alg)
+ EXPORT_SYMBOL_GPL(crypto_unregister_akcipher);
+ 
+ MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("Generic public key cihper type");
++MODULE_DESCRIPTION("Generic public key cipher type");
