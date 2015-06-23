@@ -1,12 +1,15 @@
-From: Stephan Mueller <smueller@chronox.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
 Subject: Re: [PATCH] crypto: jitterentropy - avoid compiler warnings
-Date: Tue, 23 Jun 2015 19:55:27 +0200
-Message-ID: <1763021.bXoJhbvnM9@tauon.atsec.com>
-References: <CAMuHMdXLDeqSU3WcVEh=jcGdS4z2YMejU_nZ2gDObDVjsm7vvw@mail.gmail.com> <1446731.BXdYRBoPhr@tachyon.chronox.de> <20150623174103.GA11973@roeck-us.net>
+Date: Tue, 23 Jun 2015 20:15:05 +0200
+Message-ID: <CAMuHMdUVKRKZvZGcEfNkStdvYC+pGkiHyuGGzhdvcfT2GGucEw@mail.gmail.com>
+References: <CAMuHMdXLDeqSU3WcVEh=jcGdS4z2YMejU_nZ2gDObDVjsm7vvw@mail.gmail.com>
+	<33380936.3jDOACMRCz@tachyon.chronox.de>
+	<CAMuHMdUw9FJE3kWEQf+TNTaLB9gMjdHEGt27bnD--qoGX22H7Q@mail.gmail.com>
+	<1446731.BXdYRBoPhr@tachyon.chronox.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+Content-Type: text/plain; charset=UTF-8
+Cc: Guenter Roeck <linux@roeck-us.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	Peter Zijlstra
 	<public-peterz-wegcikhe2lqwvfeawa7xhq@plane.gmane.org>,
 	Andy Shevchenko <andy.shevchenko@gmail.com>,
@@ -17,37 +20,45 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, Waiman Long <waiman.long@hp.com>,
 	Ingo Molnar <mingo@kernel.org>, x86 <x86@kernel.org>
-To: Guenter Roeck <linux@roeck-us.net>,
-	Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47826 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754844AbbFWRzf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Jun 2015 13:55:35 -0400
-In-Reply-To: <20150623174103.GA11973@roeck-us.net>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+To: Stephan Mueller <smueller@chronox.de>
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <1446731.BXdYRBoPhr@tachyon.chronox.de>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-Am Dienstag, 23. Juni 2015, 10:41:03 schrieb Guenter Roeck:
+Hi Stephan,
 
-Hi Guenter, Geert,
+On Tue, Jun 23, 2015 at 4:18 PM, Stephan Mueller <smueller@chronox.de> wrote:
+> may I ask that you check that the following patch compiles without errors or warnings on your systems?
+>
+> Though, when I test that patch with the AVR32 cross compiler, I get a warning about the code being not relaxable.
+>
+> Thank you very much.
+>
+> ---8<---
+> The core of the Jitter RNG is intended to be compiled with -O0. To
+> ensure that the Jitter RNG can be compiled on all architectures,
+> separate out the RNG core into a stand-alone C file that can be compiled
+> with -O0 which does not depend on any kernel include file.
+>
+> As no kernel includes can be used in the C file implementing the core
+> RNG, any dependencies on kernel code must be extracted.
+>
+> A second file provides the link to the kernel and the kernel crypto API
+> that can be compiled with the regular compile options of the kernel.
+>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
 
->On Tue, Jun 23, 2015 at 04:18:54PM +0200, Stephan Mueller wrote:
->> Hi Geert, Guenter,
->> 
->> may I ask that you check that the following patch compiles without errors
->> or warnings on your systems?
->No build failures for all architectures.
+Thanks, the warnings I saw before with m68k-linux-gnu-gcc-4.1.2
+are gone.
 
-Thank you very much for your help.
+Gr{oetje,eeting}s,
 
-Now, if Geert would be so kind and have a check on his OpenRISC to ensure that 
-there are no compiler warnings, I would be happy.
+                        Geert
 
-Though, does anybody have any idea what the AVR32 compiler warning about 
-crypto/builtin.o not being relaxable mean and whether that is an issue? Note, 
-when I was compiling AVR32, I saw some of these warnings for other builtin.o 
-too.
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-Ciao
-Stephan
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
