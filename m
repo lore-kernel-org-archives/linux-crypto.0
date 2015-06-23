@@ -1,61 +1,57 @@
-From: Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH] random: add random_initialized command line param
-Date: Tue, 23 Jun 2015 23:47:33 +0200
-Message-ID: <3810058.lSGD55uyzM@myon.chronox.de>
-References: <4206400.x843ypJTc1@tachyon.chronox.de> <20150623204411.GB30826@amd>
+From: Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [PATCH] crypto: jitterentropy - avoid compiler warnings
+Date: Tue, 23 Jun 2015 16:18:52 -0700
+Message-ID: <5589E95C.2000409@roeck-us.net>
+References: <CAMuHMdXLDeqSU3WcVEh=jcGdS4z2YMejU_nZ2gDObDVjsm7vvw@mail.gmail.com> <1446731.BXdYRBoPhr@tachyon.chronox.de> <20150623174103.GA11973@roeck-us.net> <1763021.bXoJhbvnM9@tauon.atsec.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Cc: Ted Tso <tytso@mit.edu>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Pavel Machek <pavel@ucw.cz>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Peter Zijlstra
+	<public-peterz-wegcikhe2lqwvfeawa7xhq@plane.gmane.org>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Jim Davis <jim.epost@gmail.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Linux-Next <linux-next@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, Waiman Long <waiman.long@hp.com>,
+	Ingo Molnar <mingo@kernel.org>, x86 <x86@kernel.org>
+To: Stephan Mueller <smueller@chronox.de>,
+	Geert Uytterhoeven <geert@linux-m68k.org>
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from mail.eperm.de ([89.247.134.16]:47840 "EHLO mail.eperm.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932395AbbFWVrg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Jun 2015 17:47:36 -0400
-In-Reply-To: <20150623204411.GB30826@amd>
+Received: from bh-25.webhostbox.net ([208.91.199.152]:53281 "EHLO
+	bh-25.webhostbox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751259AbbFWXS6 (ORCPT
+	<rfc822;linux-crypto@vger.kernel.org>);
+	Tue, 23 Jun 2015 19:18:58 -0400
+In-Reply-To: <1763021.bXoJhbvnM9@tauon.atsec.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Dienstag, 23. Juni 2015, 22:44:11 schrieb Pavel Machek:
+On 06/23/2015 10:55 AM, Stephan Mueller wrote:
+> Am Dienstag, 23. Juni 2015, 10:41:03 schrieb Guenter Roeck:
+>
+> Hi Guenter, Geert,
+>
+>> On Tue, Jun 23, 2015 at 04:18:54PM +0200, Stephan Mueller wrote:
+>>> Hi Geert, Guenter,
+>>>
+>>> may I ask that you check that the following patch compiles without errors
+>>> or warnings on your systems?
+>> No build failures for all architectures.
+>
+> Thank you very much for your help.
+>
+> Now, if Geert would be so kind and have a check on his OpenRISC to ensure that
+> there are no compiler warnings, I would be happy.
+>
+> Though, does anybody have any idea what the AVR32 compiler warning about
+> crypto/builtin.o not being relaxable mean and whether that is an issue? Note,
+> when I was compiling AVR32, I saw some of these warnings for other builtin.o
+> too.
+>
 
-Hi Pavel,
+At least it compiles ;-). I don't think there is anything else we can do.
 
-> On Mon 2015-05-18 18:25:25, Stephan Mueller wrote:
-> > Make the threshold at which the output entropy pools are considered to
-> > be initialized configurable via a kernel command line option. The
-> > current integer value of 128 bits is a good default value. However, some
-> > user groups may want to use different values. For example, the SOGIS
-> > group now requires 125 bits at least (BSI, the participant at that group
-> > used to require 100 bits). NIST moved from 80 bits to 112 bits starting
-> > with 2014.
-> > 
-> > It is therefore to be expected that in the future, this threshold may
-> > increase for different user groups.
-> 
-> Speaking of random and kernel parameters... should we add random=<hex
-> digits> parameter to pass entropy from bootloader to the kernel?
-
-Everybody can see that string. How do you think that way of providing entropy 
-is protected?
-
-> u-boot-SPL does DRAM calibration, for example, and I guess that may
-> provide some rather hard to guess values...
-> 
-> [I initialy misread parameter below as "random_initize=" and thought
-> it does exactly this...]
-> 								Pavel
-> 
-> > +	random_initialized= [KNL] Set the threshold in bits at which the
-> > +			Linux random number generator considers an output
-> > +			entropy pool initialized.
-> > +			Format: <int> (must be >= 112 and <= size of output
-> > +				       entropy pool in bits)
-> > +			Default: 128
-> > +
-
-
--- 
-Ciao
-Stephan
+Guenter
