@@ -1,80 +1,40 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Crypto Update for 4.2
-Date: Wed, 24 Jun 2015 21:29:37 +0800
-Message-ID: <20150624132937.GA32020@gondor.apana.org.au>
-References: <20140123115319.GA20602@gondor.apana.org.au>
- <20140401100001.GA12386@gondor.apana.org.au>
- <20140605062336.GA14440@gondor.apana.org.au>
- <20140804130339.GA1178@gondor.apana.org.au>
- <20141007131826.GA29688@gondor.apana.org.au>
- <20141211125119.GA12380@gondor.apana.org.au>
- <20150214094328.GA7457@gondor.apana.org.au>
- <20150415033951.GA1406@gondor.apana.org.au>
- <20150622084457.GA7806@gondor.apana.org.au>
- <CA+55aFyQW-Em8weHOBDVYw08H=-RfbeXJg61Zv6T-35rTdXB+g@mail.gmail.com>
+From: Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: [PATCH] crypto: testmgr - don't print info about missing test for
+ gcm-aes-aesni
+Date: Wed, 24 Jun 2015 07:14:22 -0700
+Message-ID: <20150624141422.30488.59869.stgit@tstruk-mobl1>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-crypto@vger.kernel.org, tadeusz.struk@intel.com
+To: herbert@gondor.apana.org.au
 Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:53689 "EHLO
-	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752658AbbFXN3s (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Wed, 24 Jun 2015 09:29:48 -0400
-Content-Disposition: inline
-In-Reply-To: <CA+55aFyQW-Em8weHOBDVYw08H=-RfbeXJg61Zv6T-35rTdXB+g@mail.gmail.com>
+Received: from mga09.intel.com ([134.134.136.24]:30849 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753169AbbFXOOe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+	Wed, 24 Jun 2015 10:14:34 -0400
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jun 23, 2015 at 07:11:19PM -0700, Linus Torvalds wrote:
-> On Mon, Jun 22, 2015 at 1:44 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > Here is the crypto update for 4.2:
-> 
-> Hmm. I noticed a new annoyance:
-> 
-> I get this at bootup:
-> 
->   [  +0.001504] alg: No test for __gcm-aes-aesni (__driver-gcm-aes-aesni)
+Don't print info about missing test for the internal
+helper __driver-gcm-aes-aesni
 
-This is indeed bogus and I'll make sure it disappears.
+Signed-off-by: Tadeusz Struk <tadeusz.struk@intel.com>
+---
+ crypto/testmgr.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
->   [  +0.002233] alg: aead: setkey failed on test 1 for
-> rfc4106-gcm-aesni: flags=0
-
-This however is a real bug.  It looks like aesni is somehow broken
-and is failing on setkey.  I'll look into it.
-
-> in general, I'm not at all convinced that the crypto tests make sense.
-> I absolutely destest that horrid "testmgr.h" file that is 32
-> _thousand_ lines of noise. And now it's apparently complaining about a
-> missing test, so that nasty mess will presumably grow.
-> 
-> Could you not make the test infrastructure be something that gets run
-> in user space?
-
-I too think the current testmgr model has reached its limit.
-However, it has been quite useful in catching bugs like the
-one you saw which may otherwise result in hard-to-track-down
-bugs in other subsystems such as IPsec or disk encryption.
-
-What I was planning to do is to instead bundle the test vectors
-with the algorithms themselves.  So for each algorithm we would
-have the test vectors in the canonical C implementation which then
-would be used to test every other implmenetation of that algorithm.
-
-The test code could similarly be distributed out to the individual
-types, e.g., RNG tests would go into rng.c, hash tests into ahash.c,
-etc.
-
-When this is done there would be no central repository of testing
-information anymore.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 975e1ea..ad4c3e3 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2056,6 +2056,9 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.alg = "__driver-ecb-twofish-avx",
+ 		.test = alg_test_null,
+ 	}, {
++		.alg = "__driver-gcm-aes-aesni",
++		.test = alg_test_null,
++	}, {
+ 		.alg = "__ghash-pclmulqdqni",
+ 		.test = alg_test_null,
+ 		.fips_allowed = 1,
