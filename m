@@ -1,57 +1,47 @@
-From: Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [PATCH] crypto: jitterentropy - avoid compiler warnings
-Date: Tue, 23 Jun 2015 16:18:52 -0700
-Message-ID: <5589E95C.2000409@roeck-us.net>
-References: <CAMuHMdXLDeqSU3WcVEh=jcGdS4z2YMejU_nZ2gDObDVjsm7vvw@mail.gmail.com> <1446731.BXdYRBoPhr@tachyon.chronox.de> <20150623174103.GA11973@roeck-us.net> <1763021.bXoJhbvnM9@tauon.atsec.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: Crypto Update for 4.2
+Date: Tue, 23 Jun 2015 19:11:19 -0700
+Message-ID: <CA+55aFyQW-Em8weHOBDVYw08H=-RfbeXJg61Zv6T-35rTdXB+g@mail.gmail.com>
+References: <20130907035544.GA22658@gondor.apana.org.au>
+	<20131107080131.GA32307@gondor.apana.org.au>
+	<20140123115319.GA20602@gondor.apana.org.au>
+	<20140401100001.GA12386@gondor.apana.org.au>
+	<20140605062336.GA14440@gondor.apana.org.au>
+	<20140804130339.GA1178@gondor.apana.org.au>
+	<20141007131826.GA29688@gondor.apana.org.au>
+	<20141211125119.GA12380@gondor.apana.org.au>
+	<20150214094328.GA7457@gondor.apana.org.au>
+	<20150415033951.GA1406@gondor.apana.org.au>
+	<20150622084457.GA7806@gondor.apana.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Peter Zijlstra
-	<public-peterz-wegcikhe2lqwvfeawa7xhq@plane.gmane.org>,
-	Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Jim Davis <jim.epost@gmail.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Linux-Next <linux-next@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Waiman Long <waiman.long@hp.com>,
-	Ingo Molnar <mingo@kernel.org>, x86 <x86@kernel.org>
-To: Stephan Mueller <smueller@chronox.de>,
-	Geert Uytterhoeven <geert@linux-m68k.org>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Received: from bh-25.webhostbox.net ([208.91.199.152]:53281 "EHLO
-	bh-25.webhostbox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751259AbbFWXS6 (ORCPT
-	<rfc822;linux-crypto@vger.kernel.org>);
-	Tue, 23 Jun 2015 19:18:58 -0400
-In-Reply-To: <1763021.bXoJhbvnM9@tauon.atsec.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-ID: <linux-crypto.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20150622084457.GA7806@gondor.apana.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-crypto.vger.kernel.org
 
-On 06/23/2015 10:55 AM, Stephan Mueller wrote:
-> Am Dienstag, 23. Juni 2015, 10:41:03 schrieb Guenter Roeck:
+On Mon, Jun 22, 2015 at 1:44 AM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> Hi Guenter, Geert,
->
->> On Tue, Jun 23, 2015 at 04:18:54PM +0200, Stephan Mueller wrote:
->>> Hi Geert, Guenter,
->>>
->>> may I ask that you check that the following patch compiles without errors
->>> or warnings on your systems?
->> No build failures for all architectures.
->
-> Thank you very much for your help.
->
-> Now, if Geert would be so kind and have a check on his OpenRISC to ensure that
-> there are no compiler warnings, I would be happy.
->
-> Though, does anybody have any idea what the AVR32 compiler warning about
-> crypto/builtin.o not being relaxable mean and whether that is an issue? Note,
-> when I was compiling AVR32, I saw some of these warnings for other builtin.o
-> too.
->
+> Here is the crypto update for 4.2:
 
-At least it compiles ;-). I don't think there is anything else we can do.
+Hmm. I noticed a new annoyance:
 
-Guenter
+I get this at bootup:
+
+  [  +0.001504] alg: No test for __gcm-aes-aesni (__driver-gcm-aes-aesni)
+  [  +0.002233] alg: aead: setkey failed on test 1 for
+rfc4106-gcm-aesni: flags=0
+
+in general, I'm not at all convinced that the crypto tests make sense.
+I absolutely destest that horrid "testmgr.h" file that is 32
+_thousand_ lines of noise. And now it's apparently complaining about a
+missing test, so that nasty mess will presumably grow.
+
+Could you not make the test infrastructure be something that gets run
+in user space?
+
+                    Linus
